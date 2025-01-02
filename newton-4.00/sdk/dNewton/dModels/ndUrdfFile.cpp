@@ -172,7 +172,7 @@ void ndUrdfFile::ExportVisual(nd::TiXmlElement* const linkNode, const Surrogate*
 	const ndShape* const collisionShape = collision.GetShape();
 	const char* const className = collisionShape->ClassName();
 	
-	ndMatrix aligment(ndGetIdentityMatrix());
+	ndMatrix alignment(ndGetIdentityMatrix());
 	if (!strcmp(className, "ndShapeBox"))
 	{
 		ndShapeInfo info(collisionShape->GetShapeInfo());
@@ -194,7 +194,7 @@ void ndUrdfFile::ExportVisual(nd::TiXmlElement* const linkNode, const Surrogate*
 	
 		snprintf(buffer, sizeof(buffer), "%g", info.m_capsule.m_radio0);
 		shape->SetAttribute("radius", buffer);
-		aligment = ndYawMatrix(-ndPi * ndFloat32(0.5f));
+		alignment = ndYawMatrix(-ndPi * ndFloat32(0.5f));
 	
 		nd::TiXmlElement* const newtonExt = new nd::TiXmlElement("newton");
 		geometry->LinkEndChild(newtonExt);
@@ -212,7 +212,7 @@ void ndUrdfFile::ExportVisual(nd::TiXmlElement* const linkNode, const Surrogate*
 	
 		snprintf(buffer, sizeof(buffer), "%g", info.m_cylinder.m_radio0);
 		shape->SetAttribute("radius", buffer);
-		aligment = ndYawMatrix(-ndPi * ndFloat32(0.5f));
+		alignment = ndYawMatrix(-ndPi * ndFloat32(0.5f));
 	}
 	else if (!strcmp(className, "ndShapeSphere"))
 	{
@@ -234,8 +234,8 @@ void ndUrdfFile::ExportVisual(nd::TiXmlElement* const linkNode, const Surrogate*
 		shape->SetAttribute("size", buffer);
 	}
 	
-	//ndMatrix matrix(aligment * surroratelink->m_shapeMatrixMatrix);
-	ndMatrix matrix(aligment * surroratelink->m_shapeLocalMatrix);
+	//ndMatrix matrix(alignment * surroratelink->m_shapeMatrixMatrix);
+	ndMatrix matrix(alignment * surroratelink->m_shapeLocalMatrix);
 	ExportOrigin(visualNode, matrix);
 	
 	// add material node
@@ -259,7 +259,7 @@ void ndUrdfFile::ExportCollision(nd::TiXmlElement* const linkNode, const Surroga
 	nd::TiXmlElement* const geometry = new nd::TiXmlElement("geometry");
 	collisionNode->LinkEndChild(geometry);
 	
-	ndMatrix aligment(ndGetIdentityMatrix());
+	ndMatrix alignment (ndGetIdentityMatrix());
 	const char* const className = collisionShape->ClassName();
 	if (!strcmp(className, "ndShapeBox"))
 	{
@@ -282,7 +282,7 @@ void ndUrdfFile::ExportCollision(nd::TiXmlElement* const linkNode, const Surroga
 	
 		snprintf(buffer, sizeof(buffer), "%g", info.m_capsule.m_radio0);
 		shape->SetAttribute("radius", buffer);
-		aligment = ndYawMatrix(-ndPi * ndFloat32(0.5f));
+		alignment = ndYawMatrix(-ndPi * ndFloat32(0.5f));
 	
 		nd::TiXmlElement* const newtonExt = new nd::TiXmlElement("newton");
 		geometry->LinkEndChild(newtonExt);
@@ -300,7 +300,7 @@ void ndUrdfFile::ExportCollision(nd::TiXmlElement* const linkNode, const Surroga
 	
 		snprintf(buffer, sizeof(buffer), "%g", info.m_cylinder.m_radio0);
 		shape->SetAttribute("radius", buffer);
-		aligment = ndYawMatrix(-ndPi * ndFloat32(0.5f));
+		alignment = ndYawMatrix(-ndPi * ndFloat32(0.5f));
 	}
 	else if (!strcmp(className, "ndShapeSphere"))
 	{
@@ -322,7 +322,7 @@ void ndUrdfFile::ExportCollision(nd::TiXmlElement* const linkNode, const Surroga
 		shape->SetAttribute("size", buffer);
 	}
 	
-	ndMatrix matrix(aligment * surroratelink->m_shapeLocalMatrix);
+	ndMatrix matrix(alignment * surroratelink->m_shapeLocalMatrix);
 	ExportOrigin(collisionNode, matrix);
 }
 
@@ -839,16 +839,16 @@ void ndUrdfFile::ImportVisual(const nd::TiXmlNode* const linkNode, ndBodyDynamic
 		{
 			ndMatrix flipMatrix(ndGetIdentityMatrix());
 			flipMatrix[0][0] = ndFloat32(-1.0f);
-			ndMatrix aligmentUV(flipMatrix * uvMatrix);
-			meshEffect->SphericalMapping(materialIndex, aligmentUV);
+			ndMatrix alignmentUV(flipMatrix * uvMatrix);
+			meshEffect->SphericalMapping(materialIndex, alignmentUV);
 		}
 		else if (strcmp(name, "cylinder") == 0)
 		{
 			ndMatrix flipMatrix(ndGetIdentityMatrix());
 			flipMatrix[0][0] = ndFloat32(-1.0f);
-			ndMatrix aligmentUV(flipMatrix * uvMatrix);
-			meshEffect->SphericalMapping(materialIndex, aligmentUV);
-			//meshEffect->BoxMapping(materialIndex, materialIndex, materialIndex, aligmentUV);
+			ndMatrix alignmentUV(flipMatrix * uvMatrix);
+			meshEffect->SphericalMapping(materialIndex, alignmentUV);
+			//meshEffect->BoxMapping(materialIndex, materialIndex, materialIndex, alignmentUV);
 		}
 		else if (strcmp(name, "box") == 0)
 		{

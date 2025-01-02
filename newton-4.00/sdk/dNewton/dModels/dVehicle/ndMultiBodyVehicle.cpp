@@ -322,7 +322,7 @@ void ndMultiBodyVehicle::SetVehicleSolverModel(bool)
 	//}
 }
 
-void ndMultiBodyVehicle::ApplyAligmentAndBalancing()
+void ndMultiBodyVehicle::ApplyalignmentAndBalancing()
 {
 	ndAssert(0);
 	//for (ndReferencedObjects<ndMultiBodyVehicleTireJoint>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
@@ -1021,7 +1021,7 @@ void ndMultiBodyVehicle::PostUpdate(ndWorld* const, ndFloat32)
 {
 	if (isActive())
 	{
-		ApplyAligmentAndBalancing();
+		ApplyalignmentAndBalancing();
 	}
 }
 

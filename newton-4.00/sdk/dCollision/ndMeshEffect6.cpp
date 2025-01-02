@@ -1502,7 +1502,7 @@ void ndMeshEffect::ClearAttributeArray ()
 
 
 
-void ndMeshEffect::CylindricalMapping (ndInt32 cylinderMaterial, ndInt32 capMaterial, const ndMatrix& uvAligment)
+void ndMeshEffect::CylindricalMapping (ndInt32 cylinderMaterial, ndInt32 capMaterial, const ndMatrix& uvalignment)
 {
 	ndBigVector origin (GetOrigin());
 	ndStack<ndBigVector> buffer(m_points.m_vertex.m_count);
@@ -1510,7 +1510,7 @@ void ndMeshEffect::CylindricalMapping (ndInt32 cylinderMaterial, ndInt32 capMate
 	ndBigVector pMax(ndFloat64(-1.0e10f), ndFloat64(-1.0e10f), ndFloat64(-1.0e10f), ndFloat64(0.0f));
 
 	for (ndInt32 i = 0; i < m_points.m_vertex.m_count; ++i) {
-		buffer[i] = uvAligment.RotateVector (m_points.m_vertex[i] - origin);
+		buffer[i] = uvalignment.RotateVector (m_points.m_vertex[i] - origin);
 		const ndBigVector& tmp = buffer[i];
 		pMin.m_x = ndMin (pMin.m_x, tmp.m_x);
 		pMax.m_x = ndMax (pMax.m_x, tmp.m_x);

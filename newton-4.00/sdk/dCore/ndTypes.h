@@ -143,12 +143,10 @@
 // alternatively the end application can use a command line option to enable this define
 //#define __ANDROID__
 
-// by default newton run on a separate thread and 
-// optionally concurrent with the calling thread,
+// by default newton run on a separate thread concurrent with the calling thread.
 // it also uses a thread job pool for multi core systems.
-// define D_USE_THREAD_EMULATION on the command line for 
-// platform that do not support hardware multi threading or 
-// if the and application want to control threading at the application level 
+// uncoment this define for platforms that do not support hardware multi threading 
+// or applications that wants to control threading at the application level. 
 //#define D_USE_FORCE_THREAD_EMULATION
 
 #ifdef D_USE_FORCE_THREAD_EMULATION

@@ -1070,7 +1070,7 @@ template <class T>
 bool ndSolveDantzigLCP(ndInt32 size, T* const symetricMatrix, T* const x, T* const b, T* const low, T* const high)
 {
 	T* const choleskyMatrix = ndAlloca(T, size * size);
-	dCheckAligment(choleskyMatrix);
+	dCheckalignment(choleskyMatrix);
 
 	ndMemCpy (choleskyMatrix, symetricMatrix, size * size);
 	ndCholeskyFactorization(size, choleskyMatrix);

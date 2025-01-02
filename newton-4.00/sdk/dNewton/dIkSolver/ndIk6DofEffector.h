@@ -72,13 +72,11 @@ class ndIk6DofEffector: public ndJointBilateralConstraint
 	ndFloat32 m_angularDamper;
 	ndFloat32 m_angularMaxTorque;
 	ndFloat32 m_angularRegularizer;
-	ndFloat32 m_angularMaxSpringRamp;
 	
 	ndFloat32 m_linearSpring;
 	ndFloat32 m_linearDamper;
 	ndFloat32 m_linearMaxForce;
 	ndFloat32 m_linearRegularizer;
-	ndFloat32 m_linearMaxSpringRamp;
 
 	ndRotationType m_rotationType;
 	union

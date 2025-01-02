@@ -97,7 +97,7 @@ class ndMultiBodyVehicle: public ndModel
 
 	private:
 	void ApplyAerodynamics();
-	void ApplyAligmentAndBalancing();
+	void ApplyalignmentAndBalancing();
 	void ApplyTireModel(ndFloat32 timestep);
 	ndBodyKinematic* CreateInternalBodyPart(ndFloat32 mass, ndFloat32 radius) const;
 	void ApplyTireModel(ndFloat32 timestep, ndTireContactPair* const tires, ndInt32 tireCount);

@@ -553,6 +553,9 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 	m_scene->SetTimestep(timestep);
 
 	m_scene->BalanceScene();
+	// update skeletons topologies
+	UpdateSkeletons();
+
 	m_scene->ApplyExtForce();
 	m_scene->InitBodyArray();
 
@@ -567,9 +570,6 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 
 	// Update Particle base physics
 	//ParticleUpdate();
-
-	// update skeletons topologies
-	UpdateSkeletons();
 
 	// Update all models
 	ModelUpdate();
@@ -729,17 +729,6 @@ void ndWorld::UpdateSkeletons()
 				}
 			}
 		}
-	
-		//// reset of all bodies dirty state
-		//const ndArray<ndBodyKinematic*>& bodyArray = m_scene->GetActiveBodyArray();
-		//for (ndInt32 i = ndInt32(bodyArray.GetCount()) - 1; i >= 0; i--)
-		//{
-		//	ndBodyKinematic* const body = bodyArray[i];
-		//	body->m_index = -1;
-		//	body->m_skeletonMark = 0;
-		//	body->m_skeletonMark0 = 0;
-		//	body->m_skeletonMark1 = 0;
-		//}
 	
 		// find all root nodes for all independent joint arrangements
 		ndInt32 inslandCount = 0;
@@ -934,12 +923,12 @@ void ndWorld::UpdateSkeletons()
 			}
 		}
 	
-		for (ndInt32 i = ndInt32(bodyArray.GetCount()) - 1; i >= 0; i--)
-		{
-			ndBodyKinematic* const body = bodyArray[i];
-			body->PrepareStep(i);
-			ndAssert (bodyArray[i] == body);
-		}
+		//for (ndInt32 i = ndInt32(bodyArray.GetCount()) - 1; i >= 0; i--)
+		//{
+		//	ndBodyKinematic* const body = bodyArray[i];
+		//	body->PrepareStep(i);
+		//	ndAssert (bodyArray[i] == body);
+		//}
 	
 		m_activeSkeletons.SetCount(0);
 		ndSkeletonList::Iterator iter(m_skeletonList);
@@ -1165,4 +1154,9 @@ void ndWorld::CalculateJointContacts(ndContact* const contact)
 	body1->UpdateCollisionMatrix();
 
 	m_scene->CalculateJointContacts(0, contact);
+}
+
+bool ndWorld::ValidateScene() const
+{
+	return m_scene->ValidateScene();
 }

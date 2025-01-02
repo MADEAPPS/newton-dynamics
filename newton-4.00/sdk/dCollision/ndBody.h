@@ -59,23 +59,26 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	virtual ndBodyTriggerVolume* GetAsBodyTriggerVolume() { return nullptr; }
 	virtual ndBodyKinematicBase* GetAsBodyKinematicSpecial() { return nullptr; }
 
-	ndUnsigned32 GetId() const;
-	void GetAABB(ndVector& p0, ndVector& p1) const;
+	D_COLLISION_API ndUnsigned32 GetId() const;
+	D_COLLISION_API void GetAABB(ndVector& p0, ndVector& p1) const;
 
-	virtual ndFloat32 GetInvMass() const;
-	virtual bool RayCast(ndRayCastNotify& callback, const ndFastRay& ray, const ndFloat32 maxT) const = 0;
+	D_COLLISION_API bool GetSeletonSelfCollision() const;
+	D_COLLISION_API void SetSeletonSelfCollision(bool state);
 
-	const ndVector& GetCentreOfMass() const;
+	D_COLLISION_API virtual ndFloat32 GetInvMass() const;
+	D_COLLISION_API virtual bool RayCast(ndRayCastNotify& callback, const ndFastRay& ray, const ndFloat32 maxT) const = 0;
+
+	D_COLLISION_API const ndVector& GetCentreOfMass() const;
 	D_COLLISION_API virtual void SetCentreOfMass(const ndVector& com);
 	
-	ndVector GetOmega() const;
-	ndMatrix GetMatrix() const;
-	ndVector GetVelocity() const;
-	ndVector GetPosition() const;
-	ndQuaternion GetRotation() const;
-	ndVector GetGlobalGetCentreOfMass() const;
+	D_COLLISION_API ndVector GetOmega() const;
+	D_COLLISION_API ndMatrix GetMatrix() const;
+	D_COLLISION_API ndVector GetVelocity() const;
+	D_COLLISION_API ndVector GetPosition() const;
+	D_COLLISION_API ndQuaternion GetRotation() const;
+	D_COLLISION_API ndVector GetGlobalGetCentreOfMass() const;
 
-	ndBodyNotify* GetNotifyCallback() const;
+	D_COLLISION_API ndBodyNotify* GetNotifyCallback() const;
 	D_COLLISION_API virtual void SetNotifyCallback(ndBodyNotify* const notify);
 	D_COLLISION_API virtual void SetOmega(const ndVector& veloc);
 	D_COLLISION_API virtual void SetVelocity(const ndVector& veloc);
@@ -128,6 +131,7 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	ndUnsigned8 m_isConstrained;
 	ndUnsigned8 m_sceneForceUpdate;
 	ndUnsigned8 m_sceneEquilibrium;
+	ndUnsigned8 m_skeletonSelfCollision;
 	
 	D_COLLISION_API static ndUnsigned32 m_uniqueIdCount;
 
@@ -136,68 +140,6 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	friend class ndConstraint;
 	friend class ndBodyPlayerCapsuleImpulseSolver;
 } D_GCC_NEWTON_ALIGN_32;
-
-inline ndUnsigned32 ndBody::GetId() const
-{
-	return m_uniqueId;
-}
-
-inline ndBodyNotify* ndBody::GetNotifyCallback() const
-{
-	return m_notifyCallback;
-}
-
-inline ndMatrix ndBody::GetMatrix() const
-{
-	return m_matrix;
-}
-
-inline ndVector ndBody::GetPosition() const
-{
-	return m_matrix.m_posit;
-}
-
-inline ndQuaternion ndBody::GetRotation() const
-{
-	return m_rotation;
-}
-
-inline ndVector ndBody::GetGlobalGetCentreOfMass() const
-{
-	return m_globalCentreOfMass;
-}
-
-inline ndVector ndBody::GetVelocity() const
-{
-	return m_veloc;
-}
-
-inline ndVector ndBody::GetOmega() const
-{
-	return m_omega;
-}
-
-inline void ndBody::GetAABB(ndVector& p0, ndVector& p1) const
-{
-	p0 = m_minAabb;
-	p1 = m_maxAabb;
-}
-
-inline const ndVector& ndBody::GetCentreOfMass() const
-{
-	return m_localCentreOfMass;
-}
-
-inline ndVector ndBody::GetVelocityAtPoint(const ndVector& point) const
-{
-	return m_veloc + m_omega.CrossProduct(point - m_globalCentreOfMass);
-}
-
-inline ndFloat32 ndBody::GetInvMass() const 
-{ 
-	return ndFloat32(0.0f); 
-}
-
 
 #endif 
 

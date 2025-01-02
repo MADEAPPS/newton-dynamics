@@ -3903,13 +3903,13 @@ ndInt32 ndContactSolver::CalculatePolySoupToHullContactsContinue(ndPolygonMeshDe
 
 	const ndVector& polygonInstanceScale = polySoupInstance.GetScale();
 	const ndMatrix& polySoupGlobalMatrix = polySoupInstance.GetGlobalMatrix();
-	const ndMatrix& polySoupGlobalAligmentMatrix = polySoupInstance.GetAlignmentMatrix();
+	const ndMatrix& polySoupGlobalalignmentMatrix = polySoupInstance.GetAlignmentMatrix();
 
 	ndMatrix polySoupScaledMatrix(
-		polySoupGlobalAligmentMatrix[0] * polygonInstanceScale,
-		polySoupGlobalAligmentMatrix[1] * polygonInstanceScale,
-		polySoupGlobalAligmentMatrix[2] * polygonInstanceScale,
-		polySoupGlobalAligmentMatrix[3]);
+		polySoupGlobalalignmentMatrix[0] * polygonInstanceScale,
+		polySoupGlobalalignmentMatrix[1] * polygonInstanceScale,
+		polySoupGlobalalignmentMatrix[2] * polygonInstanceScale,
+		polySoupGlobalalignmentMatrix[3]);
 	polySoupScaledMatrix = polySoupScaledMatrix * polySoupGlobalMatrix;
 
 	const ndInt32 stride = polygon.m_stride;
@@ -4145,13 +4145,13 @@ ndInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDe
 
 	const ndVector& polygonInstanceScale = polySoupInstance.GetScale();
 	const ndMatrix& polySoupGlobalMatrix = polySoupInstance.GetGlobalMatrix();
-	const ndMatrix& polySoupGlobalAligmentMatrix = polySoupInstance.GetAlignmentMatrix();
+	const ndMatrix& polySoupGlobalalignmentMatrix = polySoupInstance.GetAlignmentMatrix();
 
 	ndMatrix polySoupScaledMatrix(
-		polySoupGlobalAligmentMatrix[0] * polygonInstanceScale,
-		polySoupGlobalAligmentMatrix[1] * polygonInstanceScale,
-		polySoupGlobalAligmentMatrix[2] * polygonInstanceScale,
-		polySoupGlobalAligmentMatrix[3]);
+		polySoupGlobalalignmentMatrix[0] * polygonInstanceScale,
+		polySoupGlobalalignmentMatrix[1] * polygonInstanceScale,
+		polySoupGlobalalignmentMatrix[2] * polygonInstanceScale,
+		polySoupGlobalalignmentMatrix[3]);
 	polySoupScaledMatrix = polySoupScaledMatrix * polySoupGlobalMatrix;
 
 	ndAssert(m_contact);

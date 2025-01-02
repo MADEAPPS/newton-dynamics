@@ -37,6 +37,7 @@ class ndSkeletonContainer
 	ndInt32 GetId() const;
 
 	const ndNodeList& GetNodeList() const;
+	ndInt32 FindBoneIndex(const ndBodyKinematic* const body) const;
 
 	protected:
 	class ndOrdinal
@@ -176,7 +177,7 @@ class ndSkeletonContainer
 	void UpdateForcesImmediate(const ndForcePair* const force) const;
 	void CalculateJointAccelImmediate(ndForcePair* const accel) const;
 	void SolveAuxiliaryImmediate(ndArray<ndBodyKinematic*>& bodyArray, ndForcePair* const force) const;
-	
+		
 	ndNode* m_skeleton;
 	ndNode** m_nodesOrder;
 	ndRightHandSide* m_rightHandSide;
@@ -212,20 +213,6 @@ class ndSkeletonContainer
 	friend class ndDynamicsUpdateCuda;
 };
 
-inline ndInt32 ndSkeletonContainer::GetId() const
-{
-	return m_id;
-}
-
-inline ndSkeletonContainer::ndNode* ndSkeletonContainer::GetRoot() const
-{
-	return m_skeleton;
-}
-
-inline const ndSkeletonContainer::ndNodeList& ndSkeletonContainer::GetNodeList() const
-{
-	return m_nodeList;
-}
 #endif
 
 
