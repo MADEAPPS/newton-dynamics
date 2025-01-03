@@ -256,8 +256,9 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 		ndDemoEntity* const vehicleEntity = vehicleEntityDummyRoot->GetFirstChild();
 		vehicleEntity->ResetMatrix(vehicleEntity->CalculateGlobalMatrix() * matrix);
 
-		ndPhysicsWorld* const world = scene->GetWorld();
+		//ndPhysicsWorld* const world = scene->GetWorld();
 
+		// 1- add chassis to the vehicle mode 
 		// create the vehicle chassis as a normal rigid body
 		AddChassis(ndSharedPtr<ndBody>(CreateChassis(scene, vehicleEntity, m_configuration.m_chassisMass)));
 		ndBodyDynamic* const chassis = m_chassis->GetAsBodyDynamic();
@@ -270,12 +271,7 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 		com += m_localFrame.m_right.Scale(m_configuration.m_comDisplacement.m_z);
 		chassis->SetCentreOfMass(com);
 
-		//// 1- add chassis to the vehicle mode 
-		//SetChassis(chassis);
-		//ndSharedPtr<ndBody> bodyPtr(chassis);
-		//world->AddBody(bodyPtr);
-
-		// 2- each tire to the model, 
+		// 2- each tire
 		// create the tire as a normal rigid body
 		// and attach them to the chassis with a tire joints
 		ndVehicleDectriptor::ndTireDefinition rr_tireConfiguration(m_configuration.m_rearTire);
@@ -292,17 +288,9 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 		ndMultiBodyVehicleTireJoint* const fr_tire = AddTire(fr_tireConfiguration, fr_tire_body);
 		ndMultiBodyVehicleTireJoint* const fl_tire = AddTire(fl_tireConfiguration, fl_tire_body);
 
-		//ndSharedPtr<ndBody> rr_tire_body_Ptr(rr_tire_body);
-		//ndSharedPtr<ndBody> rl_tire_body_Ptr(rl_tire_body);
-		//ndSharedPtr<ndBody> fr_tire_body_Ptr(fr_tire_body);
-		//ndSharedPtr<ndBody> fl_tire_body_Ptr(fl_tire_body);
-		//world->AddBody(rr_tire_body_Ptr);
-		//world->AddBody(rl_tire_body_Ptr);
-		//world->AddBody(fr_tire_body_Ptr);
-		//world->AddBody(fl_tire_body_Ptr);
-
 		m_currentGear = sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1;
 
+		// 3- add differential
 		// add the slip differential
 		ndMultiBodyVehicleDifferential* differential = nullptr;
 		switch (m_configuration.m_differentialType)
@@ -333,78 +321,76 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 				break;
 			}
 		}
-		ndTrace(("xxxxxxxxxxxxxxxxxxxxxxxxxxxx\n"));
-#if 0
 
-		// add a motor
+
+		// 4- add a motor
 		ndMultiBodyVehicleMotor* const motor = AddMotor(m_configuration.m_motorMass, m_configuration.m_motorRadius);
 		motor->SetMaxRpm(m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm);
 		motor->SetFrictionLoss(m_configuration.m_engine.GetTorque(0.0f) * 0.5f);
 
-		// add the gear box
+		// 5- add the gear box
 		ndMultiBodyVehicleGearBox* const gearBox = AddGearBox(differential);
 		gearBox->SetIdleOmega(m_configuration.m_engine.GetIdleRadPerSec() * dRadPerSecToRpm);
 
-		switch (m_configuration.m_torsionBarType)
-		{
-			case ndVehicleDectriptor::m_noWheelAxle:
-			{
-				// no torsion bar
-				break;
-			}
-
-			case ndVehicleDectriptor::m_rearWheelAxle:
-			{
-				ndMultiBodyVehicleTorsionBar* const torsionBar = AddTorsionBar(world->GetSentinelBody());
-				torsionBar->AddAxel(rl_tire->GetBody0(), rr_tire->GetBody0());
-				torsionBar->SetTorsionTorque(m_configuration.m_torsionBarSpringK, m_configuration.m_torsionBarDamperC, m_configuration.m_torsionBarRegularizer);
-				break;
-			}
-
-			case ndVehicleDectriptor::m_frontWheelAxle:
-			{
-				ndMultiBodyVehicleTorsionBar* const torsionBar = AddTorsionBar(world->GetSentinelBody());
-				torsionBar->AddAxel(fl_tire->GetBody0(), fr_tire->GetBody0());
-				torsionBar->SetTorsionTorque(m_configuration.m_torsionBarSpringK, m_configuration.m_torsionBarDamperC, m_configuration.m_torsionBarRegularizer);
-				break;
-			}
-
-			case ndVehicleDectriptor::m_fourWheelAxle:
-			{
-				ndMultiBodyVehicleTorsionBar* const torsionBar = AddTorsionBar(world->GetSentinelBody());
-				torsionBar->AddAxel(rl_tire->GetBody0(), rr_tire->GetBody0());
-				torsionBar->AddAxel(fl_tire->GetBody0(), fr_tire->GetBody0());
-				torsionBar->SetTorsionTorque(m_configuration.m_torsionBarSpringK, m_configuration.m_torsionBarDamperC, m_configuration.m_torsionBarRegularizer);
-				break;
-			}
-		}
+		//switch (m_configuration.m_torsionBarType)
+		//{
+		//	case ndVehicleDectriptor::m_noWheelAxle:
+		//	{
+		//		// no torsion bar
+		//		break;
+		//	}
+		//
+		//	case ndVehicleDectriptor::m_rearWheelAxle:
+		//	{
+		//		ndMultiBodyVehicleTorsionBar* const torsionBar = AddTorsionBar(world->GetSentinelBody());
+		//		torsionBar->AddAxel(rl_tire->GetBody0(), rr_tire->GetBody0());
+		//		torsionBar->SetTorsionTorque(m_configuration.m_torsionBarSpringK, m_configuration.m_torsionBarDamperC, m_configuration.m_torsionBarRegularizer);
+		//		break;
+		//	}
+		//
+		//	case ndVehicleDectriptor::m_frontWheelAxle:
+		//	{
+		//		ndMultiBodyVehicleTorsionBar* const torsionBar = AddTorsionBar(world->GetSentinelBody());
+		//		torsionBar->AddAxel(fl_tire->GetBody0(), fr_tire->GetBody0());
+		//		torsionBar->SetTorsionTorque(m_configuration.m_torsionBarSpringK, m_configuration.m_torsionBarDamperC, m_configuration.m_torsionBarRegularizer);
+		//		break;
+		//	}
+		//
+		//	case ndVehicleDectriptor::m_fourWheelAxle:
+		//	{
+		//		ndMultiBodyVehicleTorsionBar* const torsionBar = AddTorsionBar(world->GetSentinelBody());
+		//		torsionBar->AddAxel(rl_tire->GetBody0(), rr_tire->GetBody0());
+		//		torsionBar->AddAxel(fl_tire->GetBody0(), fr_tire->GetBody0());
+		//		torsionBar->SetTorsionTorque(m_configuration.m_torsionBarSpringK, m_configuration.m_torsionBarDamperC, m_configuration.m_torsionBarRegularizer);
+		//		break;
+		//	}
+		//}
 
 		// set a soft or hard mode
 		SetVehicleSolverModel(m_configuration.m_useHardSolverMode ? true : false);
 
-		// prepare data for animating suspension
-		m_rearAxlePivot = vehicleEntity->Find("rearAxlePivot");
-		m_frontAxlePivot = vehicleEntity->Find("frontAxlePivot");
-		m_rr_tire = rr_tire;
-		m_rl_tire = rl_tire;
-		m_fr_tire = fr_tire;
-		m_fl_tire = fl_tire;
-
-		// load all engine sound channels
-		ndSoundManager* const soundManager = world->GetSoundManager();
-
-		m_startEngine = false;
-		m_startEngineMemory = false;
-		m_startSound = soundManager->CreateSoundChannel(engineSounds[0]);
-		m_engineRpmSound = soundManager->CreateSoundChannel(engineSounds[1]);
-		m_skipMarks = soundManager->CreateSoundChannel(engineSounds[2]);
-
-		m_startSound->SetAttenuationRefDistance(20.0f, 40.0f, 50.0f);
-		m_engineRpmSound->SetAttenuationRefDistance(20.0f, 40.0f, 50.0f);
-
-		m_engineRpmSound->SetLoop(true);
-		m_skipMarks->SetLoop(true);
-#endif
+		//// prepare data for animating suspension
+		//m_rearAxlePivot = vehicleEntity->Find("rearAxlePivot");
+		//m_frontAxlePivot = vehicleEntity->Find("frontAxlePivot");
+		//m_rr_tire = rr_tire;
+		//m_rl_tire = rl_tire;
+		//m_fr_tire = fr_tire;
+		//m_fl_tire = fl_tire;
+		//
+		//// load all engine sound channels
+		//ndSoundManager* const soundManager = world->GetSoundManager();
+		//
+		//m_startEngine = false;
+		//m_startEngineMemory = false;
+		//m_startSound = soundManager->CreateSoundChannel(engineSounds[0]);
+		//m_engineRpmSound = soundManager->CreateSoundChannel(engineSounds[1]);
+		//m_skipMarks = soundManager->CreateSoundChannel(engineSounds[2]);
+		//
+		//m_startSound->SetAttenuationRefDistance(20.0f, 40.0f, 50.0f);
+		//m_engineRpmSound->SetAttenuationRefDistance(20.0f, 40.0f, 50.0f);
+		//
+		//m_engineRpmSound->SetLoop(true);
+		//m_skipMarks->SetLoop(true);
 	}
 
 	~ndBasicMultiBodyVehicle()
@@ -464,8 +450,6 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 
 	void SetCamera(ndDemoEntityManager* const manager, ndFloat32)
 	{
-		ndAssert(0);
-#if 0
 		ndDemoCamera* const camera = manager->GetCamera();
 		ndDemoEntity* const chassisEntity = (ndDemoEntity*)m_chassis->GetNotifyCallback()->GetUserData();
 		ndMatrix camMatrix(camera->GetNextMatrix());
@@ -477,7 +461,6 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 		camOrigin -= frontDir.Scale(10.0f);
 
 		camera->SetNextMatrix(camMatrix, camOrigin);
-#endif
 	}
 
 	void ApplyInputs(ndWorld* const, ndFloat32)
@@ -712,8 +695,8 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//world->AddModel(vehicle3);
 
 	//ndBasicMultiBodyVehicle* const vehicle = (ndBasicMultiBodyVehicle*)*vehicle3;
-	//ndBasicMultiBodyVehicle* const vehicle = (ndBasicMultiBodyVehicle*)*vehicle0;
-	//vehicle->SetAsPlayer(scene);
+	ndBasicMultiBodyVehicle* const vehicle = (ndBasicMultiBodyVehicle*)*vehicle0;
+	vehicle->SetAsPlayer(scene);
 	matrix.m_posit.m_x += 5.0f;
 	TestPlayerCapsuleInteraction(scene, matrix);
 	

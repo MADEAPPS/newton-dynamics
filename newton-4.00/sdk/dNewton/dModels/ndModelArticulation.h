@@ -69,7 +69,7 @@ class ndModelArticulation: public ndModel
 	D_NEWTON_API void AddToWorld(ndWorld* const world);
 	D_NEWTON_API void SetTransform(const ndMatrix& matrix);
 
-	private:
+	protected:
 	D_NEWTON_API void ConvertToUrdf();
 
 	ndString m_name;

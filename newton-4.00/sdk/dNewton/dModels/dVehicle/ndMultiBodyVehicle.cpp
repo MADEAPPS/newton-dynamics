@@ -134,31 +134,6 @@ ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddAxleTire(const ndMultiBodyVe
 	//return *tireJoint;
 }
 
-
-//ndMultiBodyVehicleMotor* ndMultiBodyVehicle::AddMotor(ndFloat32 mass, ndFloat32 radius)
-ndMultiBodyVehicleMotor* ndMultiBodyVehicle::AddMotor(ndFloat32, ndFloat32)
-{
-	ndAssert(0);
-	return nullptr;
-
-	//ndAssert(m_chassis);
-	//ndSharedPtr<ndBody> motorBody (CreateInternalBodyPart(mass, radius));
-	//m_internalBodies.Append(motorBody);
-	//m_motor = ndSharedPtr<ndMultiBodyVehicleMotor>(new ndMultiBodyVehicleMotor(motorBody->GetAsBodyKinematic(), this));
-	//return *m_motor;
-}
-
-//ndMultiBodyVehicleGearBox* ndMultiBodyVehicle::AddGearBox(ndMultiBodyVehicleDifferential* const differential)
-ndMultiBodyVehicleGearBox* ndMultiBodyVehicle::AddGearBox(ndMultiBodyVehicleDifferential* const)
-{
-	ndAssert(0);
-	return nullptr;
-
-	//ndAssert(*m_motor);
-	//m_gearBox = ndSharedPtr<ndMultiBodyVehicleGearBox>(new ndMultiBodyVehicleGearBox(m_motor->GetBody0(), differential->GetBody0(), this));
-	//return *m_gearBox;
-}
-
 //ndMultiBodyVehicleTorsionBar* ndMultiBodyVehicle::AddTorsionBar(ndBodyKinematic* const sentinel)
 ndMultiBodyVehicleTorsionBar* ndMultiBodyVehicle::AddTorsionBar(ndBodyKinematic* const)
 {
@@ -192,49 +167,6 @@ void ndMultiBodyVehicle::ApplyAerodynamics()
 	//		const ndVector tireDownForce(up.Scale(gravity * tireBody->GetMassMatrix().m_w));
 	//		tireBody->SetForce(tireWeight + tireDownForce);
 	//	}
-	//}
-}
-
-//void ndMultiBodyVehicle::SetVehicleSolverModel(bool hardJoint)
-void ndMultiBodyVehicle::SetVehicleSolverModel(bool)
-{
-	ndAssert(0);
-
-	//ndJointBilateralSolverModel openLoopMode = hardJoint ? m_jointkinematicOpenLoop : m_jointIterativeSoft;
-	//
-	//ndAssert(m_chassis);
-	//const ndBodyKinematic::ndJointList& chassisJoints = m_chassis->GetJointList();
-	//for (ndBodyKinematic::ndJointList::ndNode* node = chassisJoints.GetFirst(); node; node = node->GetNext())
-	//{
-	//	ndJointBilateralConstraint* const joint = node->GetInfo();
-	//	const char* const className = joint->ClassName();
-	//	if (!strcmp(className, "ndMultiBodyVehicleTireJoint") ||
-	//		!strcmp(className, "ndMultiBodyVehicleDifferential") ||
-	//		!strcmp(className, "ndMultiBodyVehicleMotor"))
-	//	{
-	//		joint->SetSolverModel(openLoopMode);
-	//	}
-	//}
-	//
-	//ndJointBilateralSolverModel driveTrainMode = hardJoint ? m_jointkinematicCloseLoop : m_jointIterativeSoft;
-	//for (ndReferencedObjects<ndMultiBodyVehicleDifferential>::ndNode* node = m_differentialList.GetFirst(); node; node = node->GetNext())
-	//{
-	//	ndJointBilateralConstraint* const joint = *node->GetInfo();
-	//	const ndBodyKinematic::ndJointList& jointList = joint->GetBody0()->GetJointList();
-	//	for (ndBodyKinematic::ndJointList::ndNode* node1 = jointList.GetFirst(); node1; node1 = node1->GetNext())
-	//	{
-	//		ndJointBilateralConstraint* const axle = node1->GetInfo();
-	//		const char* const clasName = axle->ClassName();
-	//		if (strcmp(clasName, "ndMultiBodyVehicleDifferential"))
-	//		{
-	//			axle->SetSolverModel(driveTrainMode);
-	//		}
-	//	}
-	//}
-	//
-	//if (*m_torsionBar)
-	//{
-	//	m_torsionBar->SetSolverModel(driveTrainMode);
 	//}
 }
 
@@ -948,6 +880,11 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const ndVector& frontDir, const ndVector&
 	////,m_differentialList()
 	//,m_downForce()
 {
+	m_motor = nullptr;
+	m_gearBox = nullptr;
+	m_chassis = nullptr;
+	m_torsionBar = nullptr;
+
 	m_tireShape->AddRef();
 	m_localFrame.m_front = (frontDir & ndVector::m_triplexMask).Normalize();
 	m_localFrame.m_up = upDir & ndVector::m_triplexMask;
@@ -966,6 +903,42 @@ void ndMultiBodyVehicle::AddChassis(const ndSharedPtr<ndBody>& chassis)
 	m_chassis = chassis->GetAsBodyDynamic();
 	ndAssert(m_chassis);
 }
+
+void ndMultiBodyVehicle::SetVehicleSolverModel(bool hardJoint)
+{
+	ndAssert(m_chassis);
+	ndJointBilateralSolverModel openLoopMode = hardJoint ? m_jointkinematicOpenLoop : m_jointIterativeSoft;
+	for (ndNode* node = GetRoot()->GetFirstChild(); node; node = node->GetNext())
+	{
+		ndJointBilateralConstraint* const joint = *node->m_joint;
+		const char* const className = joint->ClassName();
+		if (!strcmp(className, "ndMultiBodyVehicleTireJoint") ||
+			!strcmp(className, "ndMultiBodyVehicleDifferential") ||
+			!strcmp(className, "ndMultiBodyVehicleMotor"))
+		{
+			joint->SetSolverModel(openLoopMode);
+		}
+	}
+	
+	ndJointBilateralSolverModel driveTrainMode = hardJoint ? m_jointkinematicCloseLoop : m_jointIterativeSoft;
+	for (ndList<ndNode>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())
+	{
+		ndModelArticulation::ndNode& closeLoop = node->GetInfo();
+		ndJointBilateralConstraint* const joint = *closeLoop.m_joint;
+		const char* const clasName = joint->ClassName();
+		if (strcmp(clasName, "ndMultiBodyVehicleDifferential") || strcmp(clasName, "ndMultiBodyVehicleGearBox"))
+		{
+			joint->SetSolverModel(driveTrainMode);
+		}
+	}
+	
+	if (m_torsionBar)
+	{
+		ndAssert(0);
+		//m_torsionBar->SetSolverModel(driveTrainMode);
+	}
+}
+
 
 ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddTire(const ndMultiBodyVehicleTireJointInfo& desc, const ndSharedPtr<ndBody>& tire)
 {
@@ -1049,7 +1022,6 @@ ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndFloat32 ma
 	return (ndMultiBodyVehicleDifferential*) *differential;
 }
 
-
 ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndFloat32 mass, ndFloat32 radius, ndMultiBodyVehicleDifferential* const leftDifferential, ndMultiBodyVehicleDifferential* const rightDifferential, ndFloat32 slipOmegaLock)
 {
 	ndAssert(m_chassis);
@@ -1078,4 +1050,26 @@ ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndFloat32 ma
 	AddCloseLoop(leftAxle);
 	AddCloseLoop(rightAxle);
 	return (ndMultiBodyVehicleDifferential*)*differential;
+}
+
+ndMultiBodyVehicleMotor* ndMultiBodyVehicle::AddMotor(ndFloat32 mass, ndFloat32 radius)
+{
+	ndAssert(m_chassis);
+	ndSharedPtr<ndBody> motorBody (CreateInternalBodyPart(mass, radius));
+	//m_internalBodies.Append(motorBody);
+	//m_motor = ndSharedPtr<ndMultiBodyVehicleMotor>(new ndMultiBodyVehicleMotor(motorBody->GetAsBodyKinematic(), this));
+	ndSharedPtr<ndJointBilateralConstraint> motorJoint(new ndMultiBodyVehicleMotor(motorBody->GetAsBodyKinematic(), this));
+	AddLimb(GetRoot(), motorBody, motorJoint);
+	m_motor = (ndMultiBodyVehicleMotor*)*motorJoint;
+	return m_motor;
+}
+
+ndMultiBodyVehicleGearBox* ndMultiBodyVehicle::AddGearBox(ndMultiBodyVehicleDifferential* const differential)
+{
+	ndAssert(m_motor);
+	//m_gearBox = ndSharedPtr<ndMultiBodyVehicleGearBox>(new ndMultiBodyVehicleGearBox(m_motor->GetBody0(), differential->GetBody0(), this));
+	ndSharedPtr<ndJointBilateralConstraint> gearBox(new ndMultiBodyVehicleGearBox(m_motor->GetBody0(), differential->GetBody0(), this));
+	AddCloseLoop(gearBox);
+	m_gearBox = (ndMultiBodyVehicleGearBox*)*gearBox;
+	return m_gearBox;
 }
