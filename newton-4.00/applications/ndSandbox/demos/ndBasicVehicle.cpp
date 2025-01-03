@@ -251,6 +251,8 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 		,m_fr_tire(nullptr)
 		,m_fl_tire(nullptr)
 	{
+		SetNotifyCallback(new ndVehicleCommonNotify(this));
+
 		ndDemoEntity* const vehicleEntityDummyRoot = LoadMeshModel(scene, desc.m_name);
 
 		ndDemoEntity* const vehicleEntity = vehicleEntityDummyRoot->GetFirstChild();
@@ -322,7 +324,6 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 			}
 		}
 
-
 		// 4- add a motor
 		ndMultiBodyVehicleMotor* const motor = AddMotor(m_configuration.m_motorMass, m_configuration.m_motorRadius);
 		motor->SetMaxRpm(m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm);
@@ -391,8 +392,6 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 		//
 		//m_engineRpmSound->SetLoop(true);
 		//m_skipMarks->SetLoop(true);
-
-		SetNotifyCallback(new ndVehicleCommonNotify(this));
 	}
 
 	~ndBasicMultiBodyVehicle()

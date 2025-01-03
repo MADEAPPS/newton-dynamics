@@ -338,16 +338,6 @@ bool ndVehicleCommon::IsPlayer() const
 	return m_isPlayer;
 }
 
-//void ndVehicleCommon::SetChassis(ndBodyKinematic* const chassis)
-//{
-//	ndAssert(0);
-//	AddChassis(chassis);
-//	// assign chassis material id.
-//	ndShapeInstance& instanceShape = chassis->GetCollisionShape();
-//	instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
-//	instanceShape.m_shapeMaterial.m_userParam[ndDemoContactCallback::m_modelPointer].m_ptrData = this;
-//}
-
 void ndVehicleCommon::CalculateTireDimensions(const char* const tireName, ndFloat32& width, ndFloat32& radius, ndDemoEntity* const vehEntity) const
 {
 	// find the the tire visual mesh 
