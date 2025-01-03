@@ -391,6 +391,8 @@ class ndBasicMultiBodyVehicle : public ndVehicleCommon
 		//
 		//m_engineRpmSound->SetLoop(true);
 		//m_skipMarks->SetLoop(true);
+
+		SetNotifyCallback(new ndVehicleCommonNotify(this));
 	}
 
 	~ndBasicMultiBodyVehicle()
