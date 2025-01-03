@@ -240,6 +240,7 @@ class ndVehicleCommonNotify : public ndModelNotify
 	
 	void ApplyInputs(ndWorld* const world, ndFloat32 timestep);
 
+	void Debug(ndConstraintDebugCallback& context) const override;
 	void Update(ndWorld* const world, ndFloat32 timestep) override;
 	void PostUpdate(ndWorld* const world, ndFloat32 timestep) override;
 

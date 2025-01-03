@@ -478,6 +478,14 @@ void ndVehicleCommon::ApplyInputs(ndWorld* const world, ndFloat32)
 		ndFloat32 throttle = axis[m_gasPedal];
 		ndFloat32 steerAngle = axis[m_steeringWheel];
 		ndFloat32 handBrake = buttons[m_handBreakButton] ? 1.0f : 0.0f;
+
+		//for (int i = 0; i < buttons.GetCount(); ++i)
+		//{
+		//	if (buttons[i])
+		//	{
+		//		ndTrace(("button %d\n", i));
+		//	}
+		//}
 	
 		if (m_parking.Update(buttons[m_parkingButton] ? true : false))
 		{
@@ -663,3 +671,12 @@ void ndVehicleCommonNotify::PostUpdate(ndWorld* const world, ndFloat32 timestep)
 	}
 }
 
+void ndVehicleCommonNotify::Debug(ndConstraintDebugCallback& context) const
+{
+	ndModelNotify::Debug(context);
+	ndMultiBodyVehicle* const vehicle = (ndMultiBodyVehicle*)GetModel();
+	if (vehicle)
+	{
+		vehicle->Debug(context);
+	}
+}

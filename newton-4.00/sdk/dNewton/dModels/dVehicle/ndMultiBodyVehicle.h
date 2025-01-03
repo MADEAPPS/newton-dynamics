@@ -90,6 +90,7 @@ class ndMultiBodyVehicle : public ndModelArticulation
 	D_NEWTON_API ndMultiBodyVehicleDifferential* AddDifferential(ndFloat32 mass, ndFloat32 radius, ndMultiBodyVehicleTireJoint* const leftTire, ndMultiBodyVehicleTireJoint* const rightTire, ndFloat32 slipOmegaLock);
 	D_NEWTON_API ndMultiBodyVehicleDifferential* AddDifferential(ndFloat32 mass, ndFloat32 radius, ndMultiBodyVehicleDifferential* const leftDifferential, ndMultiBodyVehicleDifferential* const rightDifferential, ndFloat32 slipOmegaLock);
 
+	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;
 	D_NEWTON_API virtual void Update(ndWorld* const world, ndFloat32 timestep);
 	D_NEWTON_API virtual void PostUpdate(ndWorld* const world, ndFloat32 timestep);
 
@@ -100,9 +101,6 @@ class ndMultiBodyVehicle : public ndModelArticulation
 
 	private:
 	void ApplyVehicleDynamicControl(ndFloat32 timestep, ndTireContactPair* const tires, ndInt32 tireCount);
-
-	protected:
-	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;
 	
 #endif
 	private:
