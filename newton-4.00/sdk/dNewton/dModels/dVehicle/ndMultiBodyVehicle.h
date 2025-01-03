@@ -126,6 +126,7 @@ class ndMultiBodyVehicle : public ndModelArticulation
 	ndMultiBodyVehicleGearBox* m_gearBox;
 	ndMultiBodyVehicleTorsionBar* m_torsionBar;
 	ndList<ndMultiBodyVehicleTireJoint*> m_tireList;
+	ndList<ndMultiBodyVehicleDifferential*> m_differentialList;
 	ndDownForce m_downForce;
 	
 	friend class ndMultiBodyVehicleMotor;

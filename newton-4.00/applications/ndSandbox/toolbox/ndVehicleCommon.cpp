@@ -419,8 +419,8 @@ void ndVehicleCommon::Update(ndWorld* const world, ndFloat32 timestep)
 void ndVehicleCommon::PostUpdate(ndWorld* const world, ndFloat32 timestep)
 {
 	ndMultiBodyVehicle::PostUpdate(world, timestep);
-	// add a wind tunnel for calibration
 
+	// this is debug code wind tunnel for calibration
 	//ndMatrix matrix(ndGetIdentityMatrix());
 	//matrix.m_posit = m_chassis->GetMatrix().m_posit;
 	//matrix.m_posit.m_y = 0.0f;
@@ -462,10 +462,9 @@ void ndVehicleCommon::PostUpdate(ndWorld* const world, ndFloat32 timestep)
 	//{
 	//	m_motor->GetBody0()->SetMatrix(m_motor->GetBody0()->GetMatrix() * matrix);
 	//}
-
 }
 
-void ndVehicleCommon::ApplyInputs(ndWorld* const world, ndFloat32 timestep)
+void ndVehicleCommon::ApplyInputs(ndWorld* const world, ndFloat32)
 {
 	if (m_isPlayer && m_motor)
 	{

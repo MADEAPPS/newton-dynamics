@@ -540,8 +540,6 @@ ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndFloat32 ma
 	//ndSharedPtr<ndMultiBodyVehicleDifferential> differential(new ndMultiBodyVehicleDifferential(differentialBody->GetAsBodyKinematic(), m_chassis, slipOmegaLock));
 	ndSharedPtr<ndJointBilateralConstraint> differential(new ndMultiBodyVehicleDifferential(differentialBody->GetAsBodyDynamic(), m_chassis, slipOmegaLock));
 	AddLimb(GetRoot(), differentialBody, differential);
-	 
-	//m_differentialList.Append(differential);
 	
 	ndVector pin0(differentialBody->GetMatrix().RotateVector(differential->GetLocalMatrix0().m_front));
 	ndVector upPin(differentialBody->GetMatrix().RotateVector(differential->GetLocalMatrix0().m_up));
@@ -556,8 +554,10 @@ ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndFloat32 ma
 	//m_axleList.Append(rightAxle);
 	AddCloseLoop(leftAxle);
 	AddCloseLoop(rightAxle);
-	
-	return (ndMultiBodyVehicleDifferential*) *differential;
+
+	ndMultiBodyVehicleDifferential* const differentialJoint = (ndMultiBodyVehicleDifferential*)*differential;
+	m_differentialList.Append(differentialJoint);
+	return differentialJoint;
 }
 
 ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndFloat32 mass, ndFloat32 radius, ndMultiBodyVehicleDifferential* const leftDifferential, ndMultiBodyVehicleDifferential* const rightDifferential, ndFloat32 slipOmegaLock)
@@ -587,7 +587,10 @@ ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndFloat32 ma
 
 	AddCloseLoop(leftAxle);
 	AddCloseLoop(rightAxle);
-	return (ndMultiBodyVehicleDifferential*)*differential;
+
+	ndMultiBodyVehicleDifferential* const differentialJoint = (ndMultiBodyVehicleDifferential*)*differential;
+	m_differentialList.Append(differentialJoint);
+	return differentialJoint;
 }
 
 ndMultiBodyVehicleMotor* ndMultiBodyVehicle::AddMotor(ndFloat32 mass, ndFloat32 radius)
@@ -1034,11 +1037,11 @@ void ndMultiBodyVehicle::ApplyAlignmentAndBalancing()
 		tireBody->RestoreSleepState(savedSleepState);
 	}
 	
-	//for (ndReferencedObjects<ndMultiBodyVehicleDifferential>::ndNode* node = m_differentialList.GetFirst(); node; node = node->GetNext())
-	//{
-	//	ndMultiBodyVehicleDifferential* const diff = *node->GetInfo();
-	//	diff->AlignMatrix();
-	//}
+	for (ndList<ndMultiBodyVehicleDifferential*>::ndNode* node = m_differentialList.GetFirst(); node; node = node->GetNext())
+	{
+		ndMultiBodyVehicleDifferential* const diff = node->GetInfo();
+		diff->AlignMatrix();
+	}
 	
 	if (m_motor)
 	{
