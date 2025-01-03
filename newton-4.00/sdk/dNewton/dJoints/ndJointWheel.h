@@ -26,8 +26,8 @@ class ndWheelDescriptor
 		,m_lowerStop(ndFloat32(0.2f))
 		,m_regularizer(ndFloat32(0.1f))
 		,m_brakeTorque(ndFloat32(0.0f))
-		,m_handBrakeTorque(ndFloat32(0.0f))
 		,m_steeringAngle(ndFloat32(0.0f))
+		,m_handBrakeTorque(ndFloat32(0.0f))
 	{
 	}
 	
@@ -38,11 +38,10 @@ class ndWheelDescriptor
 	ndFloat32 m_lowerStop;
 	ndFloat32 m_regularizer;
 	ndFloat32 m_brakeTorque;
-	ndFloat32 m_handBrakeTorque;
 	ndFloat32 m_steeringAngle;
+	ndFloat32 m_handBrakeTorque;
 };
 
-//class ndJointWheel: public ndJointBilateralConstraint, public ndJointBilateralConstraint::ndIkInterface
 class ndJointWheel : public ndJointBilateralConstraint
 {
 	public:

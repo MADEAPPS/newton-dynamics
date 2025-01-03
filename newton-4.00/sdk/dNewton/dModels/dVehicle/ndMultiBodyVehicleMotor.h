@@ -59,5 +59,4 @@ class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 	friend class ndMultiBodyVehicle;
 	friend class ndMultiBodyVehicleGearBox;
 };
-
 #endif

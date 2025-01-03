@@ -27,6 +27,7 @@
 
 class ndMultiBodyVehicle;
 
+#if 0
 class ndMultiBodyVehicleTorsionBar : public ndJointBilateralConstraint
 {
 	public:
@@ -64,5 +65,6 @@ class ndMultiBodyVehicleTorsionBar : public ndJointBilateralConstraint
 	ndFloat32 m_springDamperRegularizer;
 	friend class ndMultiBodyVehicle;
 };
+#endif
 
 #endif

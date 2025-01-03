@@ -202,13 +202,14 @@ class ndVehicleCommon : public ndMultiBodyVehicle
 	bool IsPlayer() const;
 	virtual void SetAsPlayer(ndDemoEntityManager* const scene, bool mode = true);
 
+
+	void ApplyInputs(ndWorld* const world, ndFloat32 timestep);
+
 	protected:
 	void Update(ndWorld* const world, ndFloat32 timestep);
 	void PostUpdate(ndWorld* const world, ndFloat32 timestep);
 
-	void ApplyInputs(ndWorld* const world, ndFloat32 timestep);
-
-	void SetChassis(ndBodyKinematic* const chassis);
+	//void SetChassis(ndBodyKinematic* const chassis);
 	void CalculateTireDimensions(const char* const tireName, ndFloat32& width, ndFloat32& radius, ndDemoEntity* const vehEntity) const;
 	ndBodyKinematic* CreateTireBody(ndDemoEntityManager* const scene, ndBodyKinematic* const parentBody, ndVehicleDectriptor::ndTireDefinition& definition, const char* const tireName) const;
 
@@ -231,6 +232,21 @@ class ndVehicleCommon : public ndMultiBodyVehicle
 
 	friend class ndVehicleUI;
 };
+
+class ndVehicleCommonNotify : public ndModelNotify
+{
+	public:
+	ndVehicleCommonNotify(ndVehicleCommon* const vehicle);
+	
+	void ApplyInputs(ndWorld* const world, ndFloat32 timestep);
+
+	void Debug(ndConstraintDebugCallback& context) const override;
+	void Update(ndWorld* const world, ndFloat32 timestep) override;
+	void PostUpdate(ndWorld* const world, ndFloat32 timestep) override;
+
+	bool m_sleepingState;
+};
+
 
 class ndVehicleSelector : public ndModel
 {

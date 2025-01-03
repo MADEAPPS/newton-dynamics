@@ -177,9 +177,9 @@ ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized
 	
 	ndShapeInstance plane(new ndShapeStatic_bvh(meshBuilder));
 	ndMatrix uvMatrix(ndGetIdentityMatrix());
-	uvMatrix[0][0] *= 1.0f / 2.0f;
-	uvMatrix[1][1] *= 1.0f / 2.0f;
-	uvMatrix[2][2] *= 1.0f / 2.0f;
+	uvMatrix[0][0] *= 1.0f / 50.0f;
+	uvMatrix[1][1] *= 1.0f / 50.0f;
+	uvMatrix[2][2] *= 1.0f / 50.0f;
 
 	ndSharedPtr<ndDemoMeshInterface>geometry (new ndDemoMesh("box", scene->GetShaderCache(), &plane, "marbleCheckBoard.png", "marbleCheckBoard.png", "marbleCheckBoard.png", 1.0f, uvMatrix));
 
