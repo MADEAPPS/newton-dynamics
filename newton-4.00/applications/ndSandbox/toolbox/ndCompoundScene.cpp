@@ -13,6 +13,7 @@
 #include "ndDemoMesh.h"
 #include "ndMeshLoader.h"
 #include "ndDemoEntity.h"
+#include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndCompoundScene.h"
 #include "ndDemoEntityNotify.h"
@@ -215,9 +216,9 @@ ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const ndMa
 	ndFixSizeArray<ndBodyKinematic*, plankCount> array;
 	for (ndInt32 i = 0; i < plankCount; ++i)
 	{
-		ndAssert(0);
 		//array.PushBack(CreateBody(scene, plankShape, matrix, 20.0f));
-		//matrix.m_posit.m_z += sizez;
+		array.PushBack (AddBox(scene, matrix, 20.0f, sizex, sizey, sizez + deflection));
+		matrix.m_posit.m_z += sizez;
 	}
 
 	for (ndInt32 i = 1; i < plankCount; ++i)

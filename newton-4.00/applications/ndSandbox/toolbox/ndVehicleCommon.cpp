@@ -326,14 +326,6 @@ ndVehicleCommon::ndVehicleCommon(const ndVehicleDectriptor& desc)
 
 ndVehicleCommon::~ndVehicleCommon()
 {
-	ndAssert(0);
-	//ndWorld* const world = m_chassis->GetScene()->GetWorld();
-	//world->RemoveBody(m_chassis);
-	//for (ndReferencedObjects<ndMultiBodyVehicleTireJoint>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
-	//{
-	//	ndBodyKinematic* const tireBody = node->GetInfo()->GetBody0();
-	//	world->RemoveBody(tireBody);
-	//}
 }
 
 void ndVehicleCommon::SetAsPlayer(ndDemoEntityManager* const, bool mode)
@@ -346,14 +338,15 @@ bool ndVehicleCommon::IsPlayer() const
 	return m_isPlayer;
 }
 
-void ndVehicleCommon::SetChassis(ndBodyKinematic* const chassis)
-{
-	AddChassis(chassis);
-	// assign chassis material id.
-	ndShapeInstance& instanceShape = chassis->GetCollisionShape();
-	instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
-	instanceShape.m_shapeMaterial.m_userParam[ndDemoContactCallback::m_modelPointer].m_ptrData = this;
-}
+//void ndVehicleCommon::SetChassis(ndBodyKinematic* const chassis)
+//{
+//	ndAssert(0);
+//	AddChassis(chassis);
+//	// assign chassis material id.
+//	ndShapeInstance& instanceShape = chassis->GetCollisionShape();
+//	instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
+//	instanceShape.m_shapeMaterial.m_userParam[ndDemoContactCallback::m_modelPointer].m_ptrData = this;
+//}
 
 void ndVehicleCommon::CalculateTireDimensions(const char* const tireName, ndFloat32& width, ndFloat32& radius, ndDemoEntity* const vehEntity) const
 {
@@ -420,14 +413,17 @@ ndBodyKinematic* ndVehicleCommon::CreateTireBody(ndDemoEntityManager* const scen
 
 void ndVehicleCommon::Update(ndWorld* const world, ndFloat32 timestep)
 {
+	ndAssert(0);
+#if 0
 	ndMultiBodyVehicle::Update(world, timestep);
+#endif
 }
 
 void ndVehicleCommon::PostUpdate(ndWorld* const world, ndFloat32 timestep)
 {
-	ndMultiBodyVehicle::PostUpdate(world, timestep);
-
+	ndAssert(0);
 #if 0
+	ndMultiBodyVehicle::PostUpdate(world, timestep);
 	// add a wind tunnel for calibration
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit = m_chassis->GetMatrix().m_posit;

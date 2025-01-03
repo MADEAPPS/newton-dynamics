@@ -27,6 +27,7 @@
 #include "ndMultiBodyVehicleMotor.h"
 #include "ndMultiBodyVehicleTorsionBar.h"
 
+#if 0
 ndMultiBodyVehicleTorsionBar::ndMultiBodyVehicleTorsionBar()
 	:ndJointBilateralConstraint()
 	,m_axles()
@@ -118,3 +119,4 @@ void ndMultiBodyVehicleTorsionBar::JacobianDerivative(ndConstraintDescritor& des
 	}
 }
 
+#endif

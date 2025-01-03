@@ -212,6 +212,8 @@ class ndHeavyMultiBodyVehicle : public ndVehicleCommon
 		:ndVehicleCommon(desc)
 		,m_vehicleUI(vehicleUI)
 	{
+		ndAssert(0);
+#if 0
 		ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, desc.m_name);
 		
 		vehicleEntity->ResetMatrix(vehicleEntity->CalculateGlobalMatrix() * matrix);
@@ -233,6 +235,7 @@ class ndHeavyMultiBodyVehicle : public ndVehicleCommon
 		SetChassis(chassis);
 		ndSharedPtr<ndBody> bodyPtr(chassis);
 		world->AddBody(bodyPtr);
+#endif
 	}
 
 	~ndHeavyMultiBodyVehicle()
@@ -300,6 +303,8 @@ class ndHeavyMultiBodyVehicle : public ndVehicleCommon
 
 	void SetCamera(ndDemoEntityManager* const manager, ndFloat32)
 	{
+		ndAssert(0);
+#if 0
 		ndDemoCamera* const camera = manager->GetCamera();
 		ndDemoEntity* const chassisEntity = (ndDemoEntity*)m_chassis->GetNotifyCallback()->GetUserData();
 		ndMatrix camMatrix(camera->GetNextMatrix());
@@ -311,6 +316,7 @@ class ndHeavyMultiBodyVehicle : public ndVehicleCommon
 		camOrigin -= frontDir.Scale(10.0f);
 
 		camera->SetNextMatrix(camMatrix, camOrigin);
+#endif
 	}
 
 	protected:
@@ -326,9 +332,10 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 		,m_cannonHigh(0.0f)
 		,m_turretAngle(0.0f)
 	{
-		VehicleAssembly(scene);
+		ndAssert(0);
+		//VehicleAssembly(scene);
 	}
-
+#if 0
 	void VehicleAssembly(ndDemoEntityManager* const scene)
 	{
 		// 2- each tire to the model, 
@@ -524,7 +531,7 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 			}
 		}
 	}
-
+#endif
 	ndIk6DofEffector* m_effector;
 	ndFloat32 m_cannonHigh;
 	ndFloat32 m_turretAngle;
@@ -540,9 +547,11 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		,m_armAngle(0.0f)
 		,m_bucketAngle(0.0f)
 	{
-		VehicleAssembly(scene);
+		ndAssert(0);
+		//VehicleAssembly(scene);
 	}
 
+#if 0
 	void VehicleAssembly(ndDemoEntityManager* const scene)
 	{
 		// 2- each tire to the model, 
@@ -718,6 +727,7 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 			}
 		}
 	}
+#endif
 
 	ndJointHinge* m_armHinge;
 	ndJointHinge* m_bucketHinge;
@@ -740,7 +750,8 @@ class ndBigRigVehicle : public ndHeavyMultiBodyVehicle
 		// this function will create the tire as a normal rigid body
 		// and attach them to the chassis with the tire joints
 	
-
+		ndAssert(0);
+#if 0
 		ndWorld* const world = scene->GetWorld();
 		ndBodyKinematic* const chassis = m_chassis;
 		
@@ -796,6 +807,7 @@ class ndBigRigVehicle : public ndHeavyMultiBodyVehicle
 		
 		// set a soft or hard mode
 		SetVehicleSolverModel(m_configuration.m_useHardSolverMode ? true : false);
+#endif
 	}
 
 	void ApplyInputs(ndWorld* const world, ndFloat32 timestep)
@@ -846,21 +858,22 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	ndSharedPtr<ndUIEntity> vehicleUIPtr(vehicleUI);
 	scene->Set2DDisplayRenderFunction(vehicleUIPtr);
 	
-	ndSharedPtr<ndModel> vehicle0(new ndBigRigVehicle(scene, bigRigDesc, matrix, vehicleUI));
+	ndAssert(0);
+	//ndSharedPtr<ndModel> vehicle0(new ndBigRigVehicle(scene, bigRigDesc, matrix, vehicleUI));
 	
 	matrix.m_posit.m_x += 6.0f;
 	matrix.m_posit.m_z += 6.0f;
-	ndSharedPtr<ndModel> vehicle1(new ndLav25Vehicle(scene, lav25Desc, matrix, vehicleUI));
+	//ndSharedPtr<ndModel> vehicle1(new ndLav25Vehicle(scene, lav25Desc, matrix, vehicleUI));
 
 	matrix.m_posit.m_z -= 12.0f;
-	ndSharedPtr<ndModel> vehicle2(new ndTractorVehicle(scene, tractorDesc, matrix, vehicleUI));
+	//ndSharedPtr<ndModel> vehicle2(new ndTractorVehicle(scene, tractorDesc, matrix, vehicleUI));
 
-	world->AddModel(vehicle0);
-	world->AddModel(vehicle1);
-	world->AddModel(vehicle2);
+	//world->AddModel(vehicle0);
+	//world->AddModel(vehicle1);
+	//world->AddModel(vehicle2);
 
-	ndHeavyMultiBodyVehicle* const vehicle = (ndHeavyMultiBodyVehicle*)*vehicle2;
-	vehicle->SetAsPlayer(scene);
+	//ndHeavyMultiBodyVehicle* const vehicle = (ndHeavyMultiBodyVehicle*)*vehicle0;
+	//vehicle->SetAsPlayer(scene);
 	
 	matrix.m_posit.m_x += 25.0f;
 	matrix.m_posit.m_z += 6.0f;

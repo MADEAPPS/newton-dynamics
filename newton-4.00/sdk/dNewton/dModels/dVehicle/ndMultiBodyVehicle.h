@@ -25,8 +25,10 @@
 #include "ndNewtonStdafx.h"
 #include "dModels/ndModel.h"
 #include "dIkSolver/ndIkSolver.h"
+#include "dModels/ndModelArticulation.h"
 
 class ndWorld;
+class ndBodyDynamic;
 class ndMultiBodyVehicleMotor;
 class ndMultiBodyVehicleGearBox;
 class ndMultiBodyVehicleTireJoint;
@@ -37,16 +39,16 @@ class ndMultiBodyVehicleDifferentialAxle;
 
 #define dRadPerSecToRpm ndFloat32(9.55f)
 
-class ndMultiBodyVehicle: public ndModel
+class ndMultiBodyVehicle : public ndModelArticulation
 {
 	public:
-	class ndTireContactPair
-	{
-		public:
-		ndContact* m_contact;
-		ndMultiBodyVehicleTireJoint* m_tireJoint;
-	};
-
+	//class ndTireContactPair
+	//{
+	//	public:
+	//	ndContact* m_contact;
+	//	ndMultiBodyVehicleTireJoint* m_tireJoint;
+	//};
+	//
 	class ndDownForce
 	{
 		public:
@@ -58,10 +60,10 @@ class ndMultiBodyVehicle: public ndModel
 			ndFloat32 m_aerodynamicDownforceConstant;
 			friend class ndDownForce;
 		};
-
+	
 		ndDownForce();
 		ndFloat32 GetDownforceFactor(ndFloat32 speed) const;
-
+	
 		private:
 		ndFloat32 CalculateFactor(const ndSpeedForcePair* const entry) const;
 	
@@ -72,23 +74,31 @@ class ndMultiBodyVehicle: public ndModel
 		friend class ndMultiBodyVehicleTireJoint;
 	};
 
-	D_CLASS_REFLECTION(ndMultiBodyVehicle, ndModel)
+	D_CLASS_REFLECTION(ndMultiBodyVehicle, ndModelArticulation)
+
 	D_NEWTON_API ndMultiBodyVehicle(const ndVector& frontDir, const ndVector& upDir);
 	D_NEWTON_API virtual ~ndMultiBodyVehicle ();
 
+
+	D_NEWTON_API void AddChassis(const ndSharedPtr<ndBody>& chassis);
+
+	D_NEWTON_API ndShapeInstance CreateTireShape(ndFloat32 radius, ndFloat32 width) const;
+	D_NEWTON_API ndMultiBodyVehicleTireJoint* AddTire(const ndMultiBodyVehicleTireJointInfo& desc, const ndSharedPtr<ndBody>& tire);
+	D_NEWTON_API ndMultiBodyVehicleDifferential* AddDifferential(ndFloat32 mass, ndFloat32 radius, ndMultiBodyVehicleTireJoint* const leftTire, ndMultiBodyVehicleTireJoint* const rightTire, ndFloat32 slipOmegaLock);
+	D_NEWTON_API ndMultiBodyVehicleDifferential* AddDifferential(ndFloat32 mass, ndFloat32 radius, ndMultiBodyVehicleDifferential* const leftDifferential, ndMultiBodyVehicleDifferential* const rightDifferential, ndFloat32 slipOmegaLock);
+
+#if 0
 	virtual void OnAddToWorld() { ndAssert(0); }
 	virtual void OnRemoveFromToWorld() { ndAssert(0); }
 
 	D_NEWTON_API ndFloat32 GetSpeed() const;
-	D_NEWTON_API ndShapeInstance CreateTireShape(ndFloat32 radius, ndFloat32 width) const;
+	
 
-	D_NEWTON_API void AddChassis(ndBodyKinematic* const chassis);
 	D_NEWTON_API ndMultiBodyVehicleMotor* AddMotor(ndFloat32 mass, ndFloat32 radius);
 	D_NEWTON_API ndMultiBodyVehicleGearBox* AddGearBox(ndMultiBodyVehicleDifferential* const differential);
-	D_NEWTON_API ndMultiBodyVehicleTireJoint* AddTire(const ndMultiBodyVehicleTireJointInfo& desc, ndBodyKinematic* const tire);
+	
 	D_NEWTON_API ndMultiBodyVehicleTireJoint* AddAxleTire(const ndMultiBodyVehicleTireJointInfo& desc, ndBodyKinematic* const tire, ndBodyKinematic* const axleBody);
-	D_NEWTON_API ndMultiBodyVehicleDifferential* AddDifferential(ndFloat32 mass, ndFloat32 radius, ndMultiBodyVehicleTireJoint* const leftTire, ndMultiBodyVehicleTireJoint* const rightTire, ndFloat32 slipOmegaLock);
-	D_NEWTON_API ndMultiBodyVehicleDifferential* AddDifferential(ndFloat32 mass, ndFloat32 radius, ndMultiBodyVehicleDifferential* const leftDifferential, ndMultiBodyVehicleDifferential* const rightDifferential, ndFloat32 slipOmegaLock);
+	
 	D_NEWTON_API ndMultiBodyVehicleTorsionBar* AddTorsionBar(ndBodyKinematic* const sentinel);
 
 	D_NEWTON_API void SetVehicleSolverModel(bool hardJoint);
@@ -99,7 +109,6 @@ class ndMultiBodyVehicle: public ndModel
 	void ApplyAerodynamics();
 	void ApplyalignmentAndBalancing();
 	void ApplyTireModel(ndFloat32 timestep);
-	ndBodyKinematic* CreateInternalBodyPart(ndFloat32 mass, ndFloat32 radius) const;
 	void ApplyTireModel(ndFloat32 timestep, ndTireContactPair* const tires, ndInt32 tireCount);
 	void ApplyVehicleDynamicControl(ndFloat32 timestep, ndTireContactPair* const tires, ndInt32 tireCount);
 
@@ -118,28 +127,30 @@ class ndMultiBodyVehicle: public ndModel
 	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;
 	D_NEWTON_API virtual void Update(ndWorld* const world, ndFloat32 timestep);
 	D_NEWTON_API virtual void PostUpdate(ndWorld* const world, ndFloat32 timestep);
+#endif
+	private:
+	ndBodyKinematic* CreateInternalBodyPart(ndFloat32 mass, ndFloat32 radius) const;
 
+	protected:
 	ndMatrix m_localFrame;
-	ndBodyKinematic* m_chassis;
-	ndIkSolver m_invDynamicsSolver;
+	ndBodyDynamic* m_chassis;
+	//ndIkSolver m_invDynamicsSolver;
 	ndShapeChamferCylinder* m_tireShape;
+
 	//ndReferencedObjects<ndBody> m_internalBodies;
 	//ndSharedPtr<ndMultiBodyVehicleMotor> m_motor;
 	//ndSharedPtr<ndMultiBodyVehicleGearBox> m_gearBox;
 	//ndSharedPtr<ndMultiBodyVehicleTorsionBar> m_torsionBar;
-	//ndReferencedObjects<ndMultiBodyVehicleTireJoint> m_tireList;
+	ndList<ndMultiBodyVehicleTireJoint*> m_tireList;
 	//ndReferencedObjects<ndMultiBodyVehicleDifferentialAxle> m_axleList;
 	//ndReferencedObjects<ndMultiBodyVehicleDifferential> m_differentialList;
 	ndDownForce m_downForce;
 	
-	friend class ndMultiBodyVehicleMotor;
-	friend class ndMultiBodyVehicleGearBox;
+	//friend class ndMultiBodyVehicleMotor;
+	//friend class ndMultiBodyVehicleGearBox;
 	friend class ndMultiBodyVehicleTireJoint;
-	friend class ndMultiBodyVehicleTorsionBar;
+	//friend class ndMultiBodyVehicleTorsionBar;
 };
 
-inline void ndMultiBodyVehicle::ApplyInputs(ndWorld* const, ndFloat32)
-{
-}
 
 #endif

@@ -27,6 +27,7 @@
 #include "ndMultiBodyVehicleMotor.h"
 #include "ndMultiBodyVehicleGearBox.h"
 
+#if 0
 ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor()
 	:ndJointBilateralConstraint()
 	,m_omega(ndFloat32(0.0f))
@@ -154,4 +155,4 @@ void ndMultiBodyVehicleMotor::JacobianDerivative(ndConstraintDescritor&)
 	//}
 }
 
-
+#endif

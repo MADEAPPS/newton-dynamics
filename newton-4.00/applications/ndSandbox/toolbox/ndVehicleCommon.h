@@ -208,7 +208,7 @@ class ndVehicleCommon : public ndMultiBodyVehicle
 
 	void ApplyInputs(ndWorld* const world, ndFloat32 timestep);
 
-	void SetChassis(ndBodyKinematic* const chassis);
+	//void SetChassis(ndBodyKinematic* const chassis);
 	void CalculateTireDimensions(const char* const tireName, ndFloat32& width, ndFloat32& radius, ndDemoEntity* const vehEntity) const;
 	ndBodyKinematic* CreateTireBody(ndDemoEntityManager* const scene, ndBodyKinematic* const parentBody, ndVehicleDectriptor::ndTireDefinition& definition, const char* const tireName) const;
 

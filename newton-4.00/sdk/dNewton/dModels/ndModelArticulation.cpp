@@ -160,9 +160,7 @@ void ndModelArticulation::ClearMemory()
 		//	ndContact* const contact = it.GetNode()->GetInfo();
 		//	contact->ClearMemory();
 		//}
-
 	}
-
 }
 
 ndModelArticulation::ndNode* ndModelArticulation::AddRootBody(const ndSharedPtr<ndBody>& rootBody)
