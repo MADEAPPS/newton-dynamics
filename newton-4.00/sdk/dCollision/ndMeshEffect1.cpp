@@ -2402,7 +2402,7 @@ void ndMeshEffect::BeginBuildFace()
 void ndMeshEffect::AddPoint(ndFloat64 x, ndFloat64 y, ndFloat64 z)
 {
 	m_attrib.m_pointChannel.PushBack(ndInt32(m_points.m_vertex.GetCount()));
-	const ndBigVector point(QuantizeCordinade(x), QuantizeCordinade(y), QuantizeCordinade(z), ndFloat64(0.0f));
+	const ndBigVector point(QuantizeCoordinade(x), QuantizeCoordinade(y), QuantizeCoordinade(z), ndFloat64(0.0f));
 	m_points.m_vertex.PushBack(point);
 }
 

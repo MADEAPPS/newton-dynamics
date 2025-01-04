@@ -762,6 +762,36 @@ class ndBigRigVehicle : public ndHeavyMultiBodyVehicle
 	}
 };
 
+
+static ndDemoEntity* LoadVehicleMeshModel(ndDemoEntityManager* const scene, const char* const filename)
+{
+	ndMeshLoader loader;
+	ndDemoEntity* const vehicleEntity = loader.LoadEntity(filename, scene);
+	scene->AddEntity(vehicleEntity);
+	return vehicleEntity;
+}
+
+static ndMultiBodyVehicle* CreateBigRig(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const ndMatrix& matrix, ndVehicleUI* const vehicleUI)
+{
+	ndMultiBodyVehicle* const vehicle = new ndMultiBodyVehicle;
+
+	vehicle->SetNotifyCallback(ndSharedPtr<ndModelNotify>(new ndVehicleCommonNotify(desc, vehicle, vehicleUI)));
+	ndVehicleCommonNotify* const notifyCallback = (ndVehicleCommonNotify*)*vehicle->GetNotifyCallback();
+
+	ndDemoEntity* const vehicleEntityDummyRoot = LoadVehicleMeshModel(scene, desc.m_name);
+
+	ndDemoEntity* const vehicleEntity = vehicleEntityDummyRoot->GetFirstChild();
+	vehicleEntity->ResetMatrix(vehicleEntity->CalculateGlobalMatrix() * matrix);
+
+	// 1- add chassis to the vehicle mode 
+	// create the vehicle chassis as a normal rigid body
+	const ndVehicleDectriptor& configuration = notifyCallback->m_desc;
+
+
+	vehicle->SetVehicleSolverModel(configuration.m_useHardSolverMode ? true : false);
+	return vehicle;
+}
+
 void ndHeavyVehicle (ndDemoEntityManager* const scene)
 {
 	ndMatrix sceneLocation(ndGetIdentityMatrix());
@@ -805,20 +835,21 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	scene->Set2DDisplayRenderFunction(vehicleUIPtr);
 	
 	//ndSharedPtr<ndModel> vehicle0(new ndBigRigVehicle(scene, bigRigDesc, matrix, vehicleUI));
+	ndSharedPtr<ndModel> vehicle0(CreateBigRig(scene, bigRigDesc, matrix, vehicleUI));
 	
 	matrix.m_posit.m_x += 6.0f;
 	matrix.m_posit.m_z += 6.0f;
 	//ndSharedPtr<ndModel> vehicle1(new ndLav25Vehicle(scene, lav25Desc, matrix, vehicleUI));
 
 	matrix.m_posit.m_z -= 12.0f;
-	ndSharedPtr<ndModel> vehicle2(new ndTractorVehicle(scene, tractorDesc, matrix, vehicleUI));
+	//ndSharedPtr<ndModel> vehicle2(new ndTractorVehicle(scene, tractorDesc, matrix, vehicleUI));
 
-	//world->AddModel(vehicle0);
+	world->AddModel(vehicle0);
 	//world->AddModel(vehicle1);
-	world->AddModel(vehicle2);
+	//world->AddModel(vehicle2);
 
-	ndHeavyMultiBodyVehicle* const vehicle = (ndHeavyMultiBodyVehicle*)*vehicle2;
-	vehicle->SetAsPlayer(scene);
+	ndVehicleCommonNotify* const notifyCallback = (ndVehicleCommonNotify*)*vehicle0->GetNotifyCallback();
+	notifyCallback->SetAsPlayer(scene);
 	
 	matrix.m_posit.m_x += 25.0f;
 	matrix.m_posit.m_z += 6.0f;

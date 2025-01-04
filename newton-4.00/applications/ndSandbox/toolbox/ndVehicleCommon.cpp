@@ -949,19 +949,22 @@ void ndVehicleCommonNotify::Debug(ndConstraintDebugCallback& context) const
 	}
 }
 
-void ndVehicleCommonNotify::SetCamera(ndDemoEntityManager* const manager, ndFloat32 timestep)
+void ndVehicleCommonNotify::SetCamera(ndDemoEntityManager* const manager, ndFloat32)
 {
 	ndMultiBodyVehicle* const vehicle = (ndMultiBodyVehicle*)GetModel();
 
-	ndDemoCamera* const camera = manager->GetCamera();
-	ndDemoEntity* const chassisEntity = (ndDemoEntity*)vehicle->GetChassis()->GetNotifyCallback()->GetUserData();
-	ndMatrix camMatrix(camera->GetNextMatrix());
-	ndMatrix playerMatrix(chassisEntity->GetNextMatrix());
+	if (vehicle->GetRoot())
+	{
+		ndDemoCamera* const camera = manager->GetCamera();
+		ndDemoEntity* const chassisEntity = (ndDemoEntity*)vehicle->GetChassis()->GetNotifyCallback()->GetUserData();
+		ndMatrix camMatrix(camera->GetNextMatrix());
+		ndMatrix playerMatrix(chassisEntity->GetNextMatrix());
 
-	ndVector frontDir(camMatrix[0]);
-	ndVector camOrigin(0.0f);
-	camOrigin = playerMatrix.m_posit + ndVector(0.0f, 1.0f, 0.0f, 0.0f);
-	camOrigin -= frontDir.Scale(10.0f);
+		ndVector frontDir(camMatrix[0]);
+		ndVector camOrigin(0.0f);
+		camOrigin = playerMatrix.m_posit + ndVector(0.0f, 1.0f, 0.0f, 0.0f);
+		camOrigin -= frontDir.Scale(10.0f);
 
-	camera->SetNextMatrix(camMatrix, camOrigin);
+		camera->SetNextMatrix(camMatrix, camOrigin);
+	}
 }

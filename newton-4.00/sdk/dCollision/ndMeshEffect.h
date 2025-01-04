@@ -574,7 +574,7 @@ class ndMeshEffect: public ndPolyhedra
 	D_COLLISION_API void Init();
 	D_COLLISION_API virtual void BeginFace();
 	D_COLLISION_API virtual bool EndFace();
-	ndFloat64 QuantizeCordinade(ndFloat64 val) const;
+	ndFloat64 QuantizeCoordinade(ndFloat64 val) const;
 
 	bool Sanity() const;
 	void PackPoints();
@@ -633,7 +633,7 @@ inline dInt32 ndMeshEffect::GetVertexLayer(dInt32 index) const
 }
 #endif
 
-inline ndFloat64 ndMeshEffect::QuantizeCordinade(ndFloat64 x) const
+inline ndFloat64 ndMeshEffect::QuantizeCoordinade(ndFloat64 x) const
 {
 	ndInt32 exp;
 	ndFloat64 mantissa = frexp(x, &exp);

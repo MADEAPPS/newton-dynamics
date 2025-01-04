@@ -338,17 +338,19 @@ void ndMultiBodyVehicle::AddChassis(const ndSharedPtr<ndBody>& chassis)
 
 void ndMultiBodyVehicle::SetVehicleSolverModel(bool hardJoint)
 {
-	ndAssert(m_chassis);
 	ndJointBilateralSolverModel openLoopMode = hardJoint ? m_jointkinematicOpenLoop : m_jointIterativeSoft;
-	for (ndNode* node = GetRoot()->GetFirstChild(); node; node = node->GetNext())
+	if (GetRoot())
 	{
-		ndJointBilateralConstraint* const joint = *node->m_joint;
-		const char* const className = joint->ClassName();
-		if (!strcmp(className, "ndMultiBodyVehicleTireJoint") ||
-			!strcmp(className, "ndMultiBodyVehicleDifferential") ||
-			!strcmp(className, "ndMultiBodyVehicleMotor"))
+		for (ndNode* node = GetRoot()->GetFirstChild(); node; node = node->GetNext())
 		{
-			joint->SetSolverModel(openLoopMode);
+			ndJointBilateralConstraint* const joint = *node->m_joint;
+			const char* const className = joint->ClassName();
+			if (!strcmp(className, "ndMultiBodyVehicleTireJoint") ||
+				!strcmp(className, "ndMultiBodyVehicleDifferential") ||
+				!strcmp(className, "ndMultiBodyVehicleMotor"))
+			{
+				joint->SetSolverModel(openLoopMode);
+			}
 		}
 	}
 	
@@ -541,11 +543,13 @@ ndMultiBodyVehicleGearBox* ndMultiBodyVehicle::AddGearBox(ndMultiBodyVehicleDiff
 bool ndMultiBodyVehicle::IsSleeping() const
 {
 	bool sleeping = true;
-	for (ndNode* node = GetRoot()->GetFirstIterator(); sleeping && node; node = node->GetNextIterator())
+	if (GetRoot())
 	{
-		ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
-		//active = active || (body->GetScene() ? true : false);
-		sleeping = sleeping && body->GetSleepState();
+		for (ndNode* node = GetRoot()->GetFirstIterator(); sleeping && node; node = node->GetNextIterator())
+		{
+			ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
+			sleeping = sleeping && body->GetSleepState();
+		}
 	}
 	return sleeping;
 }
@@ -980,7 +984,12 @@ void ndMultiBodyVehicle::PostUpdate(ndWorld* const, ndFloat32)
 
 void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 {
-	// draw vehicle cordinade system;
+	if (!GetRoot())
+	{
+		return;
+	}
+
+	// draw vehicle coordinade system;
 	const ndBodyKinematic* const chassis = m_chassis;
 	ndAssert(chassis);
 	ndMatrix chassisMatrix(chassis->GetMatrix());
