@@ -497,15 +497,60 @@ static ndMultiBodyVehicle* CreateTractor(ndDemoEntityManager* const scene, const
 			,m_armHinge(nullptr)
 			,m_bucketHinge(nullptr)
 		{
+			m_armAngle = 0.0f;
+			m_bucketAngle = 0.0f;
 		}
 
 		virtual void ApplyInputs(ndWorld* const world, ndFloat32 timestep) override
 		{
 			ndVehicleCommonNotify::ApplyInputs(world, timestep);
+
+			if (m_isPlayer)
+			{
+				ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
+				ndFixSizeArray<char, 32> buttons;
+
+				bool wakeUpVehicle = false;
+				scene->GetJoystickButtons(buttons);
+				if (buttons[0])
+				{
+					wakeUpVehicle = true;
+					m_armAngle = m_armAngle + timestep * 0.25f;
+				}
+				else if (buttons[3])
+				{
+					wakeUpVehicle = true;
+					m_armAngle = m_armAngle - timestep * 0.25f;
+				}
+
+				if (buttons[1])
+				{
+					wakeUpVehicle = true;
+					m_bucketAngle = m_bucketAngle + timestep * 0.5f;
+				}
+				else if (buttons[2])
+				{
+					wakeUpVehicle = true;
+					m_bucketAngle = m_bucketAngle - timestep * 0.5f;
+				}
+
+				m_armAngle = ndClamp(m_armAngle, ndFloat32(-10.0f) * ndDegreeToRad, ndFloat32(45.0f) * ndDegreeToRad);
+				m_bucketAngle = ndClamp(m_bucketAngle, ndFloat32(-75.0f) * ndDegreeToRad, ndFloat32(80.0f) * ndDegreeToRad);
+
+				if (wakeUpVehicle)
+				{
+					m_armHinge->SetTargetAngle(m_armAngle);
+					m_bucketHinge->SetTargetAngle(m_bucketAngle);
+					ndMultiBodyVehicle* const vehicle = (ndMultiBodyVehicle*)GetModel();
+					vehicle->GetChassis()->SetSleepState(false);
+				}
+			}
 		}
 
 		ndJointHinge* m_armHinge;
 		ndJointHinge* m_bucketHinge;
+		ndFloat32 m_armAngle;
+		ndFloat32 m_bucketAngle;
 	};
 
 	ndMultiBodyVehicle* const vehicle = new ndMultiBodyVehicle;
@@ -606,36 +651,34 @@ static ndMultiBodyVehicle* CreateTractor(ndDemoEntityManager* const scene, const
 		ndSharedPtr<ndJointBilateralConstraint> bucketHinge(new ndJointHinge(frontBucketMatrix, frontBucketBody->GetAsBodyKinematic(), armBody->GetAsBodyKinematic()));
 		notifyCallback->m_bucketHinge = (ndJointHinge*)*bucketHinge;
 		notifyCallback->m_bucketHinge->SetAsSpringDamper(0.01f, 1500.0f, 20.0f);
-		ndModelArticulation::ndNode* const bucketNode = vehicle->AddLimb(armNode, frontBucketBody, bucketHinge);
+		vehicle->AddLimb(armNode, frontBucketBody, bucketHinge);
 
 		auto AddHydraulic = [vehicle, notifyCallback, scene](ndBodyDynamic* const parentBody, const char* const name0, const char* const name1, ndBodyKinematic* const attachmentBody, const char* const attachement)
 		{
-			//void AddHydraulic(ndDemoEntityManager* const scene, ndBodyKinematic* const parentBody, const char* const name0, const char* const name1, ndBodyKinematic* const attachmentBody, const char* const attachement)
-			//ndWorld* const world = scene->GetWorld();
-			//ndSharedPtr<ndBody>body0(MakeChildPart(scene, parentBody, name0, m_configuration.m_chassisMass * 0.01f));
-			//ndMatrix matrix0(m_localFrame * body0->GetMatrix());
-			//ndSharedPtr<ndJointBilateralConstraint>joint0(new ndJointHinge(matrix0, body0->GetAsBodyKinematic(), parentBody));
-			//world->AddBody(body0);
-			//world->AddJoint(joint0);
-			//
-			//ndSharedPtr<ndBody>body1(MakeChildPart(scene, body0->GetAsBodyKinematic(), name1, m_configuration.m_chassisMass * 0.01f));
-			//ndMatrix matrix1(m_localFrame * body1->GetMatrix());
-			//ndSharedPtr<ndJointBilateralConstraint>joint1(new ndJointSlider(matrix1, body1->GetAsBodyKinematic(), body0->GetAsBodyKinematic()));
-			//world->AddBody(body1);
-			//world->AddJoint(joint1);
-			//
-			//ndDemoEntity* const parentEntity = (ndDemoEntity*)m_chassis->GetNotifyCallback()->GetUserData();
-			//ndDemoEntity* const attachmentNode = parentEntity->Find(attachement);
-			//matrix0.m_posit = attachmentNode->CalculateGlobalMatrix(nullptr).m_posit;
-			//
-			//ndIk6DofEffector* const attachementJoint = new ndIk6DofEffector(matrix0, matrix0, body1->GetAsBodyKinematic(), attachmentBody);
-			//attachementJoint->EnableAxisX(false);
-			//attachementJoint->EnableAxisY(true);
-			//attachementJoint->EnableAxisZ(true);
-			//attachementJoint->EnableRotationAxis(ndIk6DofEffector::m_disabled);
-			//
-			//ndSharedPtr<ndJointBilateralConstraint> attachementJointPtr(attachementJoint);
-			//world->AddJoint(attachementJointPtr);
+			const ndMatrix localFrame(vehicle->GetLocalFrame());
+			const ndVehicleDectriptor& configuration = notifyCallback->m_desc;
+			ndSharedPtr<ndBody>baseBody(MakeChildPart(scene, parentBody, name0, configuration.m_chassisMass * 0.01f));
+			ndMatrix matrix0(localFrame * baseBody->GetMatrix());
+			ndSharedPtr<ndJointBilateralConstraint>hingeJoint(new ndJointHinge(matrix0, baseBody->GetAsBodyKinematic(), parentBody));
+			ndModelArticulation::ndNode* const hingeNode = vehicle->AddLimb(vehicle->FindByBody(parentBody), baseBody, hingeJoint);
+
+			ndSharedPtr<ndBody>boomBody(MakeChildPart(scene, baseBody->GetAsBodyKinematic(), name1, configuration.m_chassisMass * 0.01f));
+			ndMatrix matrix1(localFrame * boomBody->GetMatrix());
+			ndSharedPtr<ndJointBilateralConstraint>boomJoint(new ndJointSlider(matrix1, boomBody->GetAsBodyKinematic(), baseBody->GetAsBodyKinematic()));
+			vehicle->AddLimb(hingeNode, boomBody, boomJoint);
+			
+			ndBodyDynamic* const chassis = vehicle->GetChassis();
+			ndDemoEntity* const parentEntity = (ndDemoEntity*)chassis->GetNotifyCallback()->GetUserData();
+			ndDemoEntity* const attachmentNode = parentEntity->Find(attachement);
+			matrix0.m_posit = attachmentNode->CalculateGlobalMatrix().m_posit;
+			
+			ndIk6DofEffector* const attachementJoint = new ndIk6DofEffector(matrix0, matrix0, boomBody->GetAsBodyKinematic(), attachmentBody);
+			attachementJoint->EnableAxisX(false);
+			attachementJoint->EnableAxisY(true);
+			attachementJoint->EnableAxisZ(true);
+			attachementJoint->EnableRotationAxis(ndIk6DofEffector::m_disabled);
+			ndSharedPtr<ndJointBilateralConstraint> attachementJointPtr(attachementJoint);
+			vehicle->AddCloseLoop(attachementJointPtr);
 		};
 
 		AddHydraulic(chassis, "armHydraulicPiston_left", "armHydraulic_left", armBody->GetAsBodyKinematic(), "attach0_left");

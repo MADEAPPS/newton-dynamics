@@ -206,7 +206,6 @@ void ndModelArticulation::OnAddToWorld()
 
 	for (ndList<ndNode>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())
 	{
-		//ndNode* const node = *node->GetInfo();
 		m_world->AddJoint(node->GetInfo().m_joint);
 	}
 }
