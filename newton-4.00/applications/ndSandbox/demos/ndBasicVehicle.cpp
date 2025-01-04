@@ -255,7 +255,7 @@ static ndMultiBodyVehicle* CreateBasicVehicle(ndDemoEntityManager* const scene, 
 	ndDemoEntity* const vehicleEntity = vehicleEntityDummyRoot->GetFirstChild();
 	vehicleEntity->ResetMatrix(vehicleEntity->CalculateGlobalMatrix() * matrix);
 
-	// 1- add chassis to the vehicle mode 
+	// 1- add chassis to the vehicle model
 	// create the vehicle chassis as a normal rigid body
 	const ndVehicleDectriptor& configuration = notifyCallback->m_desc;
 	vehicle->AddChassis(ndSharedPtr<ndBody>(notifyCallback->CreateChassis(scene, vehicleEntity, configuration.m_chassisMass)));
