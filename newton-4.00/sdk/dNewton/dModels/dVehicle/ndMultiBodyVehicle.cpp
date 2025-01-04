@@ -270,7 +270,7 @@ void ndMultiBodyVehicle::ApplyVehicleDynamicControl(ndFloat32, ndTireContactPair
 #endif
 
 
-ndMultiBodyVehicle::ndMultiBodyVehicle(const ndVector& frontDir, const ndVector& upDir)
+ndMultiBodyVehicle::ndMultiBodyVehicle()
 	:ndModelArticulation()
 	,m_localFrame(ndGetIdentityMatrix())
 	,m_tireShape(new ndShapeChamferCylinder(ndFloat32(0.75f), ndFloat32(0.5f)))
@@ -282,15 +282,44 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const ndVector& frontDir, const ndVector&
 	m_torsionBar = nullptr;
 
 	m_tireShape->AddRef();
-	m_localFrame.m_front = (frontDir & ndVector::m_triplexMask).Normalize();
-	m_localFrame.m_up = upDir & ndVector::m_triplexMask;
-	m_localFrame.m_right = m_localFrame.m_front.CrossProduct(m_localFrame.m_up).Normalize();
-	m_localFrame.m_up = m_localFrame.m_right.CrossProduct(m_localFrame.m_front).Normalize();
 }
 
 ndMultiBodyVehicle::~ndMultiBodyVehicle()
 {
 	m_tireShape->Release();
+}
+
+const ndMatrix& ndMultiBodyVehicle::GetLocalFrame() const
+{
+	return m_localFrame;
+}
+
+void ndMultiBodyVehicle::SetLocalFrame(const ndMatrix& localframe)
+{
+	m_localFrame.m_front = (localframe.m_front & ndVector::m_triplexMask).Normalize();
+	m_localFrame.m_up = localframe.m_up & ndVector::m_triplexMask;
+	m_localFrame.m_right = m_localFrame.m_front.CrossProduct(m_localFrame.m_up).Normalize();
+	m_localFrame.m_up = m_localFrame.m_right.CrossProduct(m_localFrame.m_front).Normalize();
+}
+
+ndBodyDynamic* ndMultiBodyVehicle::GetChassis() const
+{
+	return m_chassis;
+}
+
+ndMultiBodyVehicleMotor* ndMultiBodyVehicle::GetMotor() const
+{
+	return m_motor;
+}
+
+ndMultiBodyVehicleGearBox* ndMultiBodyVehicle::GetGearBox() const
+{
+	return m_gearBox;
+}
+
+const ndList<ndMultiBodyVehicleTireJoint*>& ndMultiBodyVehicle::GetTireList() const
+{
+	return m_tireList;
 }
 
 ndFloat32 ndMultiBodyVehicle::GetSpeed() const

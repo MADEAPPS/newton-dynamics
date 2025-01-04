@@ -212,7 +212,7 @@ class ndHeavyMultiBodyVehicle : public ndVehicleCommon
 		:ndVehicleCommon(desc)
 		,m_vehicleUI(vehicleUI)
 	{
-		SetNotifyCallback(new ndVehicleCommonNotify(this));
+		SetNotifyCallback(new ndVehicleCommonNotify(desc, this, vehicleUI));
 		ndDemoEntity* const vehicleEntityRoot = LoadMeshModel(scene, desc.m_name);
 		ndDemoEntity* const vehicleEntity = vehicleEntityRoot->GetFirstChild();
 		

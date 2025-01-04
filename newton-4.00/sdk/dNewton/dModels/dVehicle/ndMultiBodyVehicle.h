@@ -76,8 +76,16 @@ class ndMultiBodyVehicle : public ndModelArticulation
 
 	D_CLASS_REFLECTION(ndMultiBodyVehicle, ndModelArticulation)
 
-	D_NEWTON_API ndMultiBodyVehicle(const ndVector& frontDir, const ndVector& upDir);
+	D_NEWTON_API ndMultiBodyVehicle();
 	D_NEWTON_API virtual ~ndMultiBodyVehicle ();
+
+	D_NEWTON_API const ndMatrix& GetLocalFrame() const;
+	D_NEWTON_API void SetLocalFrame(const ndMatrix& localframe);
+
+	D_NEWTON_API ndBodyDynamic* GetChassis() const;
+	D_NEWTON_API ndMultiBodyVehicleMotor* GetMotor() const;
+	D_NEWTON_API ndMultiBodyVehicleGearBox* GetGearBox() const;
+	D_NEWTON_API const ndList<ndMultiBodyVehicleTireJoint*>& GetTireList() const;
 
 	D_NEWTON_API bool IsSleeping() const;
 	D_NEWTON_API ndFloat32 GetSpeed() const;
@@ -119,7 +127,6 @@ class ndMultiBodyVehicle : public ndModelArticulation
 	ndMatrix m_localFrame;
 	ndBodyDynamic* m_chassis;
 	ndMultiBodyVehicleMotor* m_motor;
-	//ndIkSolver m_invDynamicsSolver;
 	ndShapeChamferCylinder* m_tireShape;
 	ndMultiBodyVehicleGearBox* m_gearBox;
 	ndMultiBodyVehicleTorsionBar* m_torsionBar;

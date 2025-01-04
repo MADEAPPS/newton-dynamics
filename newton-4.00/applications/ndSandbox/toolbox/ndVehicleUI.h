@@ -21,7 +21,6 @@
 #include "ndOpenGlUtil.h"
 #include "ndUIEntity.h"
 
-class ndVehicleCommon;
 class ndVehicleDectriptor;
 class ndDemoEntityManager;
 
@@ -33,7 +32,7 @@ class ndVehicleUI: public ndUIEntity
 
 	virtual void RenderUI();
 	virtual void RenderHelp();
-	void SetVehicle(ndVehicleCommon* const vehicle);
+	void SetVehicle(ndMultiBodyVehicle* const vehicle);
 
 	private:
 	void CreateBufferUI();
@@ -42,7 +41,7 @@ class ndVehicleUI: public ndUIEntity
 	void RenderGageUI(const GLuint tex1, const ndFloat32 origin_x, const ndFloat32 origin_y, const ndFloat32 ptsize, ndFloat32 cparam, ndFloat32 minAngle, ndFloat32 maxAngle);
 	
 	GLuint m_shaderHandle;
-	ndVehicleCommon* m_vehicle;
+	ndMultiBodyVehicle* m_vehicle;
 	static const GLchar* m_vertexShader;
 	static const GLchar* m_fragmentShader;
 	

@@ -16,7 +16,6 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndVehicleUI.h"
-#include "ndVehicleCommon.h"
 #include "ndPngToOpenGl.h"
 #include "ndDemoEntityManager.h"
 
@@ -119,7 +118,7 @@ ndVehicleUI::~ndVehicleUI()
 	}
 };
 
-void ndVehicleUI::SetVehicle(ndVehicleCommon* const vehicle)
+void ndVehicleUI::SetVehicle(ndMultiBodyVehicle* const vehicle)
 {
 	m_vehicle = vehicle;
 }
@@ -431,7 +430,7 @@ void ndVehicleUI::RenderHelp()
 	m_scene->Print(color, "parking gear	    : 'p'");
 }
 
-//void ndVehicleUI::RenderDash(ndDemoEntityManager* const scene, ndVehicleCommon* const vehicle)
+//void ndVehicleUI::RenderDash(ndDemoEntityManager* const scene, ndMultiBodyVehicle* const vehicle)
 void ndVehicleUI::RenderUI()
 {
 	if (!m_vehicle)
@@ -443,8 +442,8 @@ void ndVehicleUI::RenderUI()
 	
 	// draw the tachometer
 	//ndFloat32 x = gageSize / 2 + 20.0f;
-	ndFloat32 maxRpm = m_vehicle->m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm;
-	maxRpm += 500.0f;
+	//ndFloat32 maxRpm = m_vehicle->m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm;
+	//maxRpm += 500.0f;
 
 	//ndAssert(0);
 	//ndFloat32 rpm = (m_vehicle->m_motor->GetRpm() / maxRpm) * 2.85f;

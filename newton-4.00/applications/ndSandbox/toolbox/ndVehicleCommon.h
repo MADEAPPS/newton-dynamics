@@ -159,15 +159,33 @@ class ndVehicleMaterial : public ndApplicationMaterial
 	bool OnAabbOverlap(const ndContact* const joint, ndFloat32 timestep, const ndShapeInstance& instanceShape0, const ndShapeInstance& instanceShape1) const;
 };
 
-class ndVehicleNotify : public ndDemoEntityNotify
+class ndVehicleSelector : public ndModel
 {
 	public:
-	ndVehicleNotify(ndVehicleCommon* const me, ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyKinematic* const parentBody);
-	~ndVehicleNotify();
+	D_CLASS_REFLECTION(ndVehicleSelector, ndModel)
+		ndVehicleSelector();
+
+	virtual void OnAddToWorld() {}
+	virtual void OnRemoveFromToWorld() {}
+
+	void Update(ndWorld* const, ndFloat32) {}
+	void PostUpdate(ndWorld* const world, ndFloat32);
+
+	void SelectNext(ndWorld* const world);
+
+	ndDemoEntityManager::ndKeyTrigger m_changeVehicle;
+};
+
+
+class ndVehicleEntityNotify : public ndDemoEntityNotify
+{
+	public:
+	ndVehicleEntityNotify(ndMultiBodyVehicle* const me, ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyKinematic* const parentBody);
+	~ndVehicleEntityNotify();
 
 	void OnTransform(ndInt32 thread, const ndMatrix& matrix);
 
-	ndVehicleCommon* m_vehicle;
+	ndMultiBodyVehicle* m_vehicle;
 };
 
 class ndVehicleCommon : public ndMultiBodyVehicle
@@ -233,34 +251,62 @@ class ndVehicleCommon : public ndMultiBodyVehicle
 
 class ndVehicleCommonNotify : public ndModelNotify
 {
+	enum ndInputButtons
+	{
+		m_handBreakButton = ndGameControllerInputs::m_button_00,
+		m_upGearButton = ndGameControllerInputs::m_button_01,
+		m_downGearButton = ndGameControllerInputs::m_button_02,
+		m_neutralGearButton = ndGameControllerInputs::m_button_03,
+		m_ignitionButton = ndGameControllerInputs::m_button_04,
+		m_reverseGearButton = ndGameControllerInputs::m_button_05,
+		m_automaticGearBoxButton = ndGameControllerInputs::m_button_06,
+		m_parkingButton = ndGameControllerInputs::m_button_07,
+		m_isplayerButton = ndGameControllerInputs::m_button_08,
+	};
+
+	enum ndInputAxis
+	{
+		m_steeringWheel = ndGameControllerInputs::m_azis_00,
+		m_gasPedal = ndGameControllerInputs::m_azis_01,
+		m_brakePedal = ndGameControllerInputs::m_azis_02,
+		m_clutch = ndGameControllerInputs::m_azis_03,
+	};
+
 	public:
-	ndVehicleCommonNotify(ndVehicleCommon* const vehicle);
+	ndVehicleCommonNotify(const ndVehicleDectriptor& desc, ndMultiBodyVehicle* const vehicle, ndVehicleUI* const ui);
 	
 	void ApplyInputs(ndWorld* const world, ndFloat32 timestep);
 
 	void Debug(ndConstraintDebugCallback& context) const override;
 	void Update(ndWorld* const world, ndFloat32 timestep) override;
 	void PostUpdate(ndWorld* const world, ndFloat32 timestep) override;
+	void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep) override;
 
+	void SetAsPlayer(ndDemoEntityManager* const scene, bool mode = true);
+	ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, ndDemoEntity* const chassisEntity, ndFloat32 mass);
+	void CalculateTireDimensions(const char* const tireName, ndFloat32& width, ndFloat32& radius, ndDemoEntity* const vehEntity) const;
+	ndBodyKinematic* CreateTireBody(ndDemoEntityManager* const scene, ndBodyKinematic* const parentBody, ndVehicleDectriptor::ndTireDefinition& definition, const char* const tireName) const;
+
+	void SetCamera(ndDemoEntityManager* const manager, ndFloat32 timestep);
+	static void UpdateCameraCallback(ndDemoEntityManager* const manager, void* const context, ndFloat32 timestep);
+
+	ndGameControllerInputs m_inputs;
+	ndVehicleDectriptor m_desc;
+	ndVehicleUI* m_ui;
+	ndInt32 m_currentGear;
+	ndInt32 m_autoGearShiftTimer;
+	ndDemoEntityManager::ndKeyTrigger m_parking;
+	ndDemoEntityManager::ndKeyTrigger m_ignition;
+	ndDemoEntityManager::ndKeyTrigger m_neutralGear;
+	ndDemoEntityManager::ndKeyTrigger m_reverseGear;
+	ndDemoEntityManager::ndKeyTrigger m_forwardGearUp;
+	ndDemoEntityManager::ndKeyTrigger m_forwardGearDown;
+	ndDemoEntityManager::ndKeyTrigger m_manualTransmission;
+	bool m_isPlayer;
+	bool m_isParked;
+	bool m_startEngine;
 	bool m_sleepingState;
-};
-
-
-class ndVehicleSelector : public ndModel
-{
-	public:
-	D_CLASS_REFLECTION(ndVehicleSelector, ndModel)
-	ndVehicleSelector();
-
-	virtual void OnAddToWorld() {}
-	virtual void OnRemoveFromToWorld() {}
-
-	void Update(ndWorld* const, ndFloat32){}
-	void PostUpdate(ndWorld* const world, ndFloat32);
-
-	void SelectNext(ndWorld* const world);
-
-	ndDemoEntityManager::ndKeyTrigger m_changeVehicle;
+	bool m_isManualTransmission;
 };
 
 #endif
