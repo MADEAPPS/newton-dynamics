@@ -435,23 +435,6 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 		AddCloseLoop(effectorPtr);
 	}
 
-	//void LinkTires(ndDemoEntityManager* const scene, const ndMultiBodyVehicleTireJoint* const tire0, const ndMultiBodyVehicleTireJoint* const tire1)
-	//{
-	//	ndBodyKinematic* const body0 = tire0->GetBody0();
-	//	ndBodyKinematic* const body1 = tire1->GetBody0();
-	//	
-	//	ndShapeInfo rearInfo(body0->GetCollisionShape().GetShapeInfo());
-	//	ndShapeInfo frontInfo(body1->GetCollisionShape().GetShapeInfo());
-	//	ndFloat32 tireRatio = rearInfo.m_scale.m_y / frontInfo.m_scale.m_y;
-	//	
-	//	ndMatrix pin0(tire0->GetLocalMatrix0() * body0->GetMatrix());
-	//	ndMatrix pin1(tire1->GetLocalMatrix0() * body1->GetMatrix());
-	//	
-	//	ndWorld* const world = scene->GetWorld();
-	//	ndSharedPtr<ndJointBilateralConstraint> link(new ndJointGear(tireRatio, pin0.m_front.Scale(-1.0f), body0, pin1.m_front, body1));
-	//	world->AddJoint(link);
-	//}
-
 	void ApplyInputs(ndWorld* const world, ndFloat32 timestep)
 	{
 		ndVehicleCommon::ApplyInputs(world, timestep);
@@ -746,8 +729,9 @@ static ndMultiBodyVehicle* CreateFlatBedTruck(ndDemoEntityManager* const scene, 
 	ndMultiBodyVehicleTireJoint* const rr_tire1 = vehicle->AddTire(r2_tireConfiguration, rr_tire1_body);
 	ndMultiBodyVehicleTireJoint* const rl_tire1 = vehicle->AddTire(r3_tireConfiguration, rl_tire1_body);
 
-	// 3- add the slip differential, vehicle is rear wheel drive by has four wheels intread of two.
-	// this is done setting a diffrential for each pair and the connectin a differnetial to the two differentials.
+	// 3- add the slip differential, this vehicle is rear wheel drive but has four wheels instead of two.
+	// we link each wheel pair with one slip differetial, 
+	// the each differential is linke to one master slip differential
 	ndMultiBodyVehicleDifferential* const rearDifferential0 = vehicle->AddDifferential(configuration.m_differentialMass, configuration.m_differentialRadius, rl_tire0, rr_tire0, configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
 	ndMultiBodyVehicleDifferential* const rearDifferential1 = vehicle->AddDifferential(configuration.m_differentialMass, configuration.m_differentialRadius, rl_tire1, rr_tire1, configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
 	ndMultiBodyVehicleDifferential* const differential = vehicle->AddDifferential(configuration.m_differentialMass, configuration.m_differentialRadius, rearDifferential0, rearDifferential1, configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
@@ -760,6 +744,90 @@ static ndMultiBodyVehicle* CreateFlatBedTruck(ndDemoEntityManager* const scene, 
 	ndMultiBodyVehicleGearBox* const gearBox = vehicle->AddGearBox(differential);
 	gearBox->SetIdleOmega(configuration.m_engine.GetIdleRadPerSec() * dRadPerSecToRpm);
 
+	notifyCallback->m_currentGear = sizeof(configuration.m_transmission.m_forwardRatios) / sizeof(configuration.m_transmission.m_forwardRatios[0]) + 1;
+	vehicle->SetVehicleSolverModel(configuration.m_useHardSolverMode ? true : false);
+	return vehicle;
+}
+
+static ndMultiBodyVehicle* CreateLav25Vehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const ndMatrix& matrix, ndVehicleUI* const vehicleUI)
+{
+	ndMultiBodyVehicle* const vehicle = new ndMultiBodyVehicle;
+
+	vehicle->SetNotifyCallback(ndSharedPtr<ndModelNotify>(new ndVehicleCommonNotify(desc, vehicle, vehicleUI)));
+	ndVehicleCommonNotify* const notifyCallback = (ndVehicleCommonNotify*)*vehicle->GetNotifyCallback();
+
+	ndDemoEntity* const vehicleEntityDummyRoot = LoadVehicleMeshModel(scene, desc.m_name);
+
+	ndDemoEntity* const vehicleEntity = vehicleEntityDummyRoot->GetFirstChild();
+	vehicleEntity->ResetMatrix(vehicleEntity->CalculateGlobalMatrix() * matrix);
+
+	// 1- add chassis to the vehicle model 
+	// create the vehicle chassis as a normal rigid body
+	const ndVehicleDectriptor& configuration = notifyCallback->m_desc;
+
+	ndSharedPtr<ndBody> chassisBody(notifyCallback->CreateChassis(scene, vehicleEntity, configuration.m_chassisMass));
+	vehicle->AddChassis(chassisBody);
+
+	ndBodyDynamic* const chassis = vehicle->GetChassis();
+	chassis->SetAngularDamping(ndVector(configuration.m_chassisAngularDrag));
+
+	// lower vehicle com;
+	ndVector com(chassis->GetCentreOfMass());
+	const ndMatrix localFrame(vehicle->GetLocalFrame());
+	com += localFrame.m_up.Scale(configuration.m_comDisplacement.m_y);
+	com += localFrame.m_front.Scale(configuration.m_comDisplacement.m_x);
+	com += localFrame.m_right.Scale(configuration.m_comDisplacement.m_z);
+	chassis->SetCentreOfMass(com);
+
+	//2- add all tires
+	ndVehicleDectriptor::ndTireDefinition r0_tireConfiguration(configuration.m_rearTire);
+	ndVehicleDectriptor::ndTireDefinition r1_tireConfiguration(configuration.m_rearTire);
+	ndVehicleDectriptor::ndTireDefinition r2_tireConfiguration(configuration.m_rearTire);
+	ndVehicleDectriptor::ndTireDefinition r3_tireConfiguration(configuration.m_rearTire);
+	ndSharedPtr<ndBody> rr_tire0_body = notifyCallback->CreateTireBody(scene, chassis, r0_tireConfiguration, "rtire_3");
+	ndSharedPtr<ndBody> rl_tire0_body = notifyCallback->CreateTireBody(scene, chassis, r1_tireConfiguration, "ltire_3");
+	ndSharedPtr<ndBody> rr_tire1_body = notifyCallback->CreateTireBody(scene, chassis, r2_tireConfiguration, "rtire_2");
+	ndSharedPtr<ndBody> rl_tire1_body = notifyCallback->CreateTireBody(scene, chassis, r3_tireConfiguration, "ltire_2");
+	ndMultiBodyVehicleTireJoint* const rr_tire0 = vehicle->AddTire(r0_tireConfiguration, rr_tire0_body);
+	ndMultiBodyVehicleTireJoint* const rl_tire0 = vehicle->AddTire(r1_tireConfiguration, rl_tire0_body);
+	ndMultiBodyVehicleTireJoint* const rr_tire1 = vehicle->AddTire(r2_tireConfiguration, rr_tire1_body);
+	ndMultiBodyVehicleTireJoint* const rl_tire1 = vehicle->AddTire(r3_tireConfiguration, rl_tire1_body);
+
+	ndVehicleDectriptor::ndTireDefinition f0_tireConfiguration(configuration.m_frontTire);
+	ndVehicleDectriptor::ndTireDefinition f1_tireConfiguration(configuration.m_frontTire);
+	ndVehicleDectriptor::ndTireDefinition f2_tireConfiguration(configuration.m_frontTire);
+	ndVehicleDectriptor::ndTireDefinition f3_tireConfiguration(configuration.m_frontTire);
+	ndSharedPtr<ndBody> fr_tire0_body = notifyCallback->CreateTireBody(scene, chassis, f0_tireConfiguration, "rtire_0");
+	ndSharedPtr<ndBody> fl_tire0_body = notifyCallback->CreateTireBody(scene, chassis, f1_tireConfiguration, "ltire_0");
+	ndSharedPtr<ndBody> fr_tire1_body = notifyCallback->CreateTireBody(scene, chassis, f2_tireConfiguration, "rtire_1");
+	ndSharedPtr<ndBody> fl_tire1_body = notifyCallback->CreateTireBody(scene, chassis, f3_tireConfiguration, "ltire_1");
+	ndMultiBodyVehicleTireJoint* const fr_tire0 = vehicle->AddTire(f0_tireConfiguration, fr_tire0_body);
+	ndMultiBodyVehicleTireJoint* const fl_tire0 = vehicle->AddTire(f1_tireConfiguration, fl_tire0_body);
+	ndMultiBodyVehicleTireJoint* const fr_tire1 = vehicle->AddTire(f2_tireConfiguration, fr_tire1_body);
+	ndMultiBodyVehicleTireJoint* const fl_tire1 = vehicle->AddTire(f3_tireConfiguration, fl_tire1_body);
+
+	// 3- add the slip differential, this vehicle is all wheel drive but has eight wheels instead of two.
+	// we link each wheel pair with one slip differetial. 
+	// them each differential is link to one master slip differential, until there is onel one master
+	ndMultiBodyVehicleDifferential* const rearDifferential0 = vehicle->AddDifferential(configuration.m_differentialMass, configuration.m_differentialRadius, rl_tire0, rr_tire0, configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
+	ndMultiBodyVehicleDifferential* const rearDifferential1 = vehicle->AddDifferential(configuration.m_differentialMass, configuration.m_differentialRadius, rl_tire1, rr_tire1, configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
+
+	ndMultiBodyVehicleDifferential* const frontDifferential0 = vehicle->AddDifferential(configuration.m_differentialMass, configuration.m_differentialRadius, fl_tire0, fr_tire0, configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
+	ndMultiBodyVehicleDifferential* const frontDifferential1 = vehicle->AddDifferential(configuration.m_differentialMass, configuration.m_differentialRadius, fl_tire1, fr_tire1, configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
+
+	ndMultiBodyVehicleDifferential* const rearDifferential = vehicle->AddDifferential(configuration.m_differentialMass, configuration.m_differentialRadius, rearDifferential0, rearDifferential1, configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
+	ndMultiBodyVehicleDifferential* const frontDifferential = vehicle->AddDifferential(configuration.m_differentialMass, configuration.m_differentialRadius, frontDifferential0, frontDifferential1, configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
+
+	ndMultiBodyVehicleDifferential* const differential = vehicle->AddDifferential(configuration.m_differentialMass, configuration.m_differentialRadius, rearDifferential, frontDifferential, configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
+
+	// 4 - add a motor
+	ndMultiBodyVehicleMotor* const motor = vehicle->AddMotor(configuration.m_motorMass, configuration.m_motorRadius);
+	motor->SetMaxRpm(configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm);
+	
+	// 5- add the gear box
+	ndMultiBodyVehicleGearBox* const gearBox = vehicle->AddGearBox(differential);
+	gearBox->SetIdleOmega(configuration.m_engine.GetIdleRadPerSec() * dRadPerSecToRpm);
+	
 	notifyCallback->m_currentGear = sizeof(configuration.m_transmission.m_forwardRatios) / sizeof(configuration.m_transmission.m_forwardRatios[0]) + 1;
 	vehicle->SetVehicleSolverModel(configuration.m_useHardSolverMode ? true : false);
 	return vehicle;
@@ -807,26 +875,25 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	ndSharedPtr<ndUIEntity> vehicleUIPtr(vehicleUI);
 	scene->Set2DDisplayRenderFunction(vehicleUIPtr);
 	
-	//ndSharedPtr<ndModel> vehicle0(new ndBigRigVehicle(scene, bigRigDesc, matrix, vehicleUI));
-	ndSharedPtr<ndModel> vehicle0(CreateFlatBedTruck(scene, bigRigDesc, matrix, vehicleUI));
+	//ndSharedPtr<ndModel> vehicle0(CreateFlatBedTruck(scene, bigRigDesc, matrix, vehicleUI));
 	
 	matrix.m_posit.m_x += 6.0f;
 	matrix.m_posit.m_z += 6.0f;
-	//ndSharedPtr<ndModel> vehicle1(new ndLav25Vehicle(scene, lav25Desc, matrix, vehicleUI));
+	ndSharedPtr<ndModel> vehicle1(CreateLav25Vehicle(scene, lav25Desc, matrix, vehicleUI));
 
 	matrix.m_posit.m_z -= 12.0f;
 	//ndSharedPtr<ndModel> vehicle2(new ndTractorVehicle(scene, tractorDesc, matrix, vehicleUI));
 
-	world->AddModel(vehicle0);
-	//world->AddModel(vehicle1);
+	//world->AddModel(vehicle0);
+	world->AddModel(vehicle1);
 	//world->AddModel(vehicle2);
 
-	ndVehicleCommonNotify* const notifyCallback = (ndVehicleCommonNotify*)*vehicle0->GetNotifyCallback();
+	ndVehicleCommonNotify* const notifyCallback = (ndVehicleCommonNotify*)*vehicle1->GetNotifyCallback();
 	notifyCallback->SetAsPlayer(scene);
 	
 	matrix.m_posit.m_x += 25.0f;
 	matrix.m_posit.m_z += 6.0f;
-	AddPlanks(scene, matrix, 300.0f, 5);
+	AddPlanks(scene, matrix, 1000.0f, 5);
 	
 	ndQuaternion rot;
 	ndVector origin(-10.0f, 2.0f, 0.0f, 1.0f);
