@@ -96,32 +96,6 @@ ndMultiBodyVehicle* ndMultiBodyVehicle::GetAsMultiBodyVehicle()
 }
 
 
-ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddAxleTire(const ndMultiBodyVehicleTireJointInfo&, ndBodyKinematic* const, ndBodyKinematic* const)
-{
-	ndAssert(0);
-	return nullptr;
-	//ndMatrix tireFrame(ndGetIdentityMatrix());
-	//tireFrame.m_front = ndVector(0.0f, 0.0f, 1.0f, 0.0f);
-	//tireFrame.m_up = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
-	//tireFrame.m_right = ndVector(-1.0f, 0.0f, 0.0f, 0.0f);
-	//ndMatrix matrix(tireFrame * m_localFrame * axleBody->GetMatrix());
-	//matrix.m_posit = tire->GetMatrix().m_posit;
-	//
-	//// make tire inertia spherical
-	//ndVector inertia(tire->GetMassMatrix());
-	//ndFloat32 maxInertia(ndMax(ndMax(inertia.m_x, inertia.m_y), inertia.m_z));
-	//inertia.m_x = maxInertia;
-	//inertia.m_y = maxInertia;
-	//inertia.m_z = maxInertia;
-	//tire->SetMassMatrix(inertia);
-	//
-	//ndSharedPtr<ndMultiBodyVehicleTireJoint> tireJoint (new ndMultiBodyVehicleTireJoint(matrix, tire, axleBody, desc, this));
-	////ndSharedPtr<ndJointBilateralConstraint>& xxxx = (ndSharedPtr<ndJointBilateralConstraint>&)tireJointPtr;
-	//m_tireList.Append(tireJoint);
-	//
-	//tire->SetDebugMaxLinearAndAngularIntegrationStep(ndFloat32(2.0f * 360.0f) * ndDegreeToRad, ndFloat32(10.0f));
-	//return *tireJoint;
-}
 
 //ndMultiBodyVehicleTorsionBar* ndMultiBodyVehicle::AddTorsionBar(ndBodyKinematic* const sentinel)
 ndMultiBodyVehicleTorsionBar* ndMultiBodyVehicle::AddTorsionBar(ndBodyKinematic* const)
@@ -371,8 +345,6 @@ void ndMultiBodyVehicle::SetVehicleSolverModel(bool hardJoint)
 ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddTire(const ndMultiBodyVehicleTireJointInfo& desc, const ndSharedPtr<ndBody>& tire)
 {
 	ndAssert(m_chassis);
-	//return AddAxleTire(desc, tire, m_chassis);
-
 	ndMatrix tireFrame(ndGetIdentityMatrix());
 	tireFrame.m_front = ndVector(0.0f, 0.0f, 1.0f, 0.0f);
 	tireFrame.m_up = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
@@ -397,6 +369,38 @@ ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddTire(const ndMultiBodyVehicl
 	tireBody->SetDebugMaxLinearAndAngularIntegrationStep(ndFloat32(2.0f * 360.0f) * ndDegreeToRad, ndFloat32(10.0f));
 	return m_tireList.GetLast()->GetInfo();
 }
+
+ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddAxleTire(const ndMultiBodyVehicleTireJointInfo& desc, const ndSharedPtr<ndBody>& tire, const ndSharedPtr<ndBody>& axleBody)
+{
+	ndAssert(m_chassis);
+
+	ndMatrix tireFrame(ndGetIdentityMatrix());
+	tireFrame.m_front = ndVector(0.0f, 0.0f, 1.0f, 0.0f);
+	tireFrame.m_up = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
+	tireFrame.m_right = ndVector(-1.0f, 0.0f, 0.0f, 0.0f);
+	ndMatrix matrix(tireFrame * m_localFrame * axleBody->GetMatrix());
+	matrix.m_posit = tire->GetMatrix().m_posit;
+	
+	ndBodyDynamic* const tireBody = tire->GetAsBodyDynamic();
+	// make tire inertia spherical
+	ndVector inertia(tireBody->GetMassMatrix());
+	ndFloat32 maxInertia(ndMax(ndMax(inertia.m_x, inertia.m_y), inertia.m_z));
+	inertia.m_x = maxInertia;
+	inertia.m_y = maxInertia;
+	inertia.m_z = maxInertia;
+	tireBody->SetMassMatrix(inertia);
+	
+	//ndSharedPtr<ndMultiBodyVehicleTireJoint> tireJoint (new ndMultiBodyVehicleTireJoint(matrix, tire, axleBody, desc, this));
+	ndSharedPtr<ndJointBilateralConstraint> tireJoint(new ndMultiBodyVehicleTireJoint(matrix, tireBody, axleBody->GetAsBodyDynamic(), desc, this));
+	m_tireList.Append((ndMultiBodyVehicleTireJoint*)*tireJoint);
+	ndNode* const parentNode = FindByBody(*axleBody);
+	ndAssert(parentNode);
+	AddLimb(parentNode, tire, tireJoint);
+
+	tireBody->SetDebugMaxLinearAndAngularIntegrationStep(ndFloat32(2.0f * 360.0f) * ndDegreeToRad, ndFloat32(10.0f));
+	return m_tireList.GetLast()->GetInfo();
+}
+
 
 ndShapeInstance ndMultiBodyVehicle::CreateTireShape(ndFloat32 radius, ndFloat32 width) const
 {

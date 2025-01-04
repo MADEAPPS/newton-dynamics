@@ -181,6 +181,11 @@ GLuint LoadTexture(const char* const filename)
 	char pngName[1024];
 	char fullPathName[2048];
 
+	if (!strlen(filename))
+	{
+		return 0;
+	}
+
 	snprintf(pngName, sizeof (pngName), "%s", filename);
 	strtolwr(pngName);
 	char* const fileNameEnd = strstr(pngName, ".tga");

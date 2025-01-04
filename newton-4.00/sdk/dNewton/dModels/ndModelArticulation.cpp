@@ -322,6 +322,19 @@ void ndModelArticulation::AddToWorld(ndWorld* const world)
 	world->AddModel(this);
 }
 
+ndModelArticulation::ndNode* ndModelArticulation::FindByBody(const ndBody* const body) const
+{
+	for (ndModelArticulation::ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
+	{
+		if (*node->m_body == body)
+		{
+			return node;
+		}
+	}
+
+	return nullptr;
+}
+
 ndModelArticulation::ndNode* ndModelArticulation::FindByName(const char* const name) const
 {
 	for (ndModelArticulation::ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())

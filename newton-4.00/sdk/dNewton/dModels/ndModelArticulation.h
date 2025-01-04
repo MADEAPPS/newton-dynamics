@@ -63,6 +63,7 @@ class ndModelArticulation: public ndModel
 	D_NEWTON_API const ndString& GetName() const;
 	D_NEWTON_API void SetName(const ndString& name);
 	D_NEWTON_API ndNode* FindByName(const char* const name) const;
+	D_NEWTON_API ndNode* FindByBody(const ndBody* const body) const;
 	D_NEWTON_API ndNode* FindLoopByName(const char* const name) const;
 
 	D_NEWTON_API void ClearMemory();
