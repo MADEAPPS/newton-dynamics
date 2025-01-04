@@ -677,6 +677,23 @@ static ndDemoEntity* LoadVehicleMeshModel(ndDemoEntityManager* const scene, cons
 	return vehicleEntity;
 }
 
+static ndBodyKinematic* MakeChildPart(ndDemoEntityManager* const scene, ndBodyKinematic* const parentBody, const char* const partName, ndFloat32 mass)
+{
+	ndDemoEntity* const parentEntity = (ndDemoEntity*)parentBody->GetNotifyCallback()->GetUserData();
+
+	ndDemoEntity* const vehPart = parentEntity->Find(partName);
+	ndShapeInstance* const vehCollision = vehPart->CreateCollisionFromChildren();
+	ndSharedPtr<ndShapeInstance> vehCollisionPtr(vehCollision);
+
+	ndBodyKinematic* const vehBody = new ndBodyDynamic();
+	const ndMatrix matrix(vehPart->CalculateGlobalMatrix(nullptr));
+	vehBody->SetNotifyCallback(new ndDemoEntityNotify(scene, vehPart, parentBody));
+	vehBody->SetMatrix(matrix);
+	vehBody->SetCollisionShape(*vehCollision);
+	vehBody->SetMassMatrix(mass, *vehCollision);
+	return vehBody;
+}
+
 static ndMultiBodyVehicle* CreateFlatBedTruck(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const ndMatrix& matrix, ndVehicleUI* const vehicleUI)
 {
 	ndMultiBodyVehicle* const vehicle = new ndMultiBodyVehicle;
@@ -827,6 +844,43 @@ static ndMultiBodyVehicle* CreateLav25Vehicle(ndDemoEntityManager* const scene, 
 	// 5- add the gear box
 	ndMultiBodyVehicleGearBox* const gearBox = vehicle->AddGearBox(differential);
 	gearBox->SetIdleOmega(configuration.m_engine.GetIdleRadPerSec() * dRadPerSecToRpm);
+
+
+	// 6 add any extra funtionality
+	auto BuildTurrent = [vehicle, notifyCallback, scene]()
+	{
+		const ndMatrix localFrame(vehicle->GetLocalFrame());
+		ndBodyDynamic* const chassis = vehicle->GetChassis();
+		const ndVehicleDectriptor& configuration = notifyCallback->m_desc;
+
+		// turret body
+		ndSharedPtr<ndBody>turretBody(MakeChildPart(scene, chassis, "turret", configuration.m_chassisMass * 0.05f));
+		const ndMatrix turretMatrix(localFrame * turretBody->GetMatrix());
+		ndSharedPtr<ndJointBilateralConstraint> turretHinge(new ndJointHinge(turretMatrix, turretBody->GetAsBodyKinematic(), chassis));
+		ndModelArticulation::ndNode* const turretNode = vehicle->AddLimb(vehicle->GetRoot(), turretBody, turretHinge);
+		
+		// cannon body
+		ndSharedPtr<ndBody>canonBody(MakeChildPart(scene, turretBody->GetAsBodyKinematic(), "canon", configuration.m_chassisMass * 0.025f));
+		ndMatrix cannonMatrix(localFrame * canonBody->GetMatrix());
+		ndSharedPtr<ndJointBilateralConstraint> cannonHinge(new ndJointHinge(cannonMatrix, canonBody->GetAsBodyKinematic(), turretBody->GetAsBodyKinematic()));
+		vehicle->AddLimb(turretNode, canonBody, cannonHinge);
+		
+		// link the effector for controlling the turret
+		ndDemoEntity* const turretEntity = (ndDemoEntity*)turretBody->GetNotifyCallback()->GetUserData();
+		ndDemoEntity* const effectorEntity = turretEntity->Find("effector");
+		ndMatrix effectorMatrix(localFrame * effectorEntity->CalculateGlobalMatrix(nullptr));
+		effectorMatrix.m_posit = turretBody->GetMatrix().m_posit;
+		
+		// We need to remember the object in the notify, but for now just added to the model no controls.
+		ndIk6DofEffector* const effector = new ndIk6DofEffector(effectorMatrix, effectorMatrix, canonBody->GetAsBodyKinematic(), chassis);
+		effector->EnableAxisX(true);
+		effector->EnableAxisY(false);
+		effector->EnableAxisZ(false);
+		effector->EnableRotationAxis(ndIk6DofEffector::m_fixAxis);
+		ndSharedPtr<ndJointBilateralConstraint> effectorPtr(effector);
+		vehicle->AddCloseLoop(effectorPtr);
+	};
+	BuildTurrent();
 	
 	notifyCallback->m_currentGear = sizeof(configuration.m_transmission.m_forwardRatios) / sizeof(configuration.m_transmission.m_forwardRatios[0]) + 1;
 	vehicle->SetVehicleSolverModel(configuration.m_useHardSolverMode ? true : false);
