@@ -735,7 +735,7 @@ static ndMultiBodyVehicle* CreateLav25Vehicle(ndDemoEntityManager* const scene, 
 	gearBox->SetIdleOmega(configuration.m_engine.GetIdleRadPerSec() * dRadPerSecToRpm);
 
 	// 6 add any extra funtionality
-	auto BuildTurrent = [vehicle, notifyCallback, scene]()
+	auto BuildTurret = [vehicle, notifyCallback, scene]()
 	{
 		const ndMatrix localFrame(vehicle->GetLocalFrame());
 		ndBodyDynamic* const chassis = vehicle->GetChassis();
@@ -770,8 +770,107 @@ static ndMultiBodyVehicle* CreateLav25Vehicle(ndDemoEntityManager* const scene, 
 
 		notifyCallback->m_turretEffector = effector;
 	};
-	BuildTurrent();
+	BuildTurret();
 	
+	notifyCallback->m_currentGear = sizeof(configuration.m_transmission.m_forwardRatios) / sizeof(configuration.m_transmission.m_forwardRatios[0]) + 1;
+	vehicle->SetVehicleSolverModel(configuration.m_useHardSolverMode ? true : false);
+	return vehicle;
+}
+
+static ndMultiBodyVehicle* CreateTractor(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const ndMatrix& matrix, ndVehicleUI* const vehicleUI)
+{
+	class TractorController : public ndVehicleCommonNotify
+	{
+		public:
+		TractorController(const ndVehicleDectriptor& desc, ndMultiBodyVehicle* const vehicle, ndVehicleUI* const ui)
+			:ndVehicleCommonNotify(desc, vehicle, ui)
+			//, m_turretEffector(nullptr)
+		{
+			//m_cannonHigh = 0.0f;
+			//m_turretAngle = 0.0f;
+		}
+
+		virtual void ApplyInputs(ndWorld* const world, ndFloat32 timestep) override
+		{
+			ndVehicleCommonNotify::ApplyInputs(world, timestep);
+
+			//if (m_turretEffector && m_isPlayer)
+			//{
+			//	ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
+			//	ndFixSizeArray<char, 32> buttons;
+			//	scene->GetJoystickButtons(buttons);
+			//
+			//	bool wakeUpVehicle = false;
+			//	if (buttons[2])
+			//	{
+			//		wakeUpVehicle = true;
+			//		m_turretAngle += 5.0e-3f;
+			//	}
+			//	else if (buttons[1])
+			//	{
+			//		wakeUpVehicle = true;
+			//		m_turretAngle -= 5.0e-3f;
+			//	}
+			//
+			//	if (buttons[0])
+			//	{
+			//		wakeUpVehicle = true;
+			//		m_cannonHigh -= 2.0e-3f;
+			//	}
+			//	else if (buttons[3])
+			//	{
+			//		wakeUpVehicle = true;
+			//		m_cannonHigh += 2.0e-3f;
+			//	}
+			//
+			//	m_cannonHigh = ndClamp(m_cannonHigh, -ndFloat32(0.1f), ndFloat32(0.5f));
+			//	m_turretAngle = ndClamp(m_turretAngle, -ndFloat32(2.0f) * ndPi, ndFloat32(2.0f) * ndPi);
+			//
+			//	if (wakeUpVehicle)
+			//	{
+			//		ndMatrix effectorMatrix(ndPitchMatrix(m_turretAngle));
+			//		effectorMatrix.m_posit.m_x = m_cannonHigh;
+			//		m_turretEffector->SetOffsetMatrix(effectorMatrix);
+			//		ndMultiBodyVehicle* const vehicle = (ndMultiBodyVehicle*)GetModel();
+			//		vehicle->GetChassis()->SetSleepState(false);
+			//	}
+			//}
+		}
+
+		//ndIk6DofEffector* m_turretEffector;
+		//ndFloat32 m_cannonHigh;
+		//ndFloat32 m_turretAngle;
+	};
+
+	ndMultiBodyVehicle* const vehicle = new ndMultiBodyVehicle;
+
+	vehicle->SetNotifyCallback(ndSharedPtr<ndModelNotify>(new TractorController(desc, vehicle, vehicleUI)));
+	TractorController* const notifyCallback = (TractorController*)*vehicle->GetNotifyCallback();
+
+	ndDemoEntity* const vehicleEntityDummyRoot = LoadVehicleMeshModel(scene, desc.m_name);
+
+	ndDemoEntity* const vehicleEntity = vehicleEntityDummyRoot->GetFirstChild();
+	vehicleEntity->ResetMatrix(vehicleEntity->CalculateGlobalMatrix()* matrix);
+
+	// 1- add chassis to the vehicle model 
+	// create the vehicle chassis as a normal rigid body
+	const ndVehicleDectriptor& configuration = notifyCallback->m_desc;
+
+	ndSharedPtr<ndBody> chassisBody(notifyCallback->CreateChassis(scene, vehicleEntity, configuration.m_chassisMass));
+	vehicle->AddChassis(chassisBody);
+
+	ndBodyDynamic* const chassis = vehicle->GetChassis();
+	chassis->SetAngularDamping(ndVector(configuration.m_chassisAngularDrag));
+
+	// lower vehicle com;
+	ndVector com(chassis->GetCentreOfMass());
+	const ndMatrix localFrame(vehicle->GetLocalFrame());
+	com += localFrame.m_up.Scale(configuration.m_comDisplacement.m_y);
+	com += localFrame.m_front.Scale(configuration.m_comDisplacement.m_x);
+	com += localFrame.m_right.Scale(configuration.m_comDisplacement.m_z);
+	chassis->SetCentreOfMass(com);
+
+
 	notifyCallback->m_currentGear = sizeof(configuration.m_transmission.m_forwardRatios) / sizeof(configuration.m_transmission.m_forwardRatios[0]) + 1;
 	vehicle->SetVehicleSolverModel(configuration.m_useHardSolverMode ? true : false);
 	return vehicle;
@@ -823,16 +922,16 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	
 	matrix.m_posit.m_x += 6.0f;
 	matrix.m_posit.m_z += 6.0f;
-	ndSharedPtr<ndModel> vehicle1(CreateLav25Vehicle(scene, lav25Desc, matrix, vehicleUI));
+	//ndSharedPtr<ndModel> vehicle1(CreateLav25Vehicle(scene, lav25Desc, matrix, vehicleUI));
 
 	matrix.m_posit.m_z -= 12.0f;
-	//ndSharedPtr<ndModel> vehicle2(new ndTractorVehicle(scene, tractorDesc, matrix, vehicleUI));
+	ndSharedPtr<ndModel> vehicle2(CreateTractor(scene, tractorDesc, matrix, vehicleUI));
 
 	//world->AddModel(vehicle0);
-	world->AddModel(vehicle1);
-	//world->AddModel(vehicle2);
+	//world->AddModel(vehicle1);
+	world->AddModel(vehicle2);
 
-	ndVehicleCommonNotify* const notifyCallback = (ndVehicleCommonNotify*)*vehicle1->GetNotifyCallback();
+	ndVehicleCommonNotify* const notifyCallback = (ndVehicleCommonNotify*)*vehicle2->GetNotifyCallback();
 	notifyCallback->SetAsPlayer(scene);
 	
 	matrix.m_posit.m_x += 25.0f;
