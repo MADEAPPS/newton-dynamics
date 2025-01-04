@@ -793,48 +793,6 @@ static ndMultiBodyVehicle* CreateTractor(ndDemoEntityManager* const scene, const
 		virtual void ApplyInputs(ndWorld* const world, ndFloat32 timestep) override
 		{
 			ndVehicleCommonNotify::ApplyInputs(world, timestep);
-
-			//if (m_turretEffector && m_isPlayer)
-			//{
-			//	ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
-			//	ndFixSizeArray<char, 32> buttons;
-			//	scene->GetJoystickButtons(buttons);
-			//
-			//	bool wakeUpVehicle = false;
-			//	if (buttons[2])
-			//	{
-			//		wakeUpVehicle = true;
-			//		m_turretAngle += 5.0e-3f;
-			//	}
-			//	else if (buttons[1])
-			//	{
-			//		wakeUpVehicle = true;
-			//		m_turretAngle -= 5.0e-3f;
-			//	}
-			//
-			//	if (buttons[0])
-			//	{
-			//		wakeUpVehicle = true;
-			//		m_cannonHigh -= 2.0e-3f;
-			//	}
-			//	else if (buttons[3])
-			//	{
-			//		wakeUpVehicle = true;
-			//		m_cannonHigh += 2.0e-3f;
-			//	}
-			//
-			//	m_cannonHigh = ndClamp(m_cannonHigh, -ndFloat32(0.1f), ndFloat32(0.5f));
-			//	m_turretAngle = ndClamp(m_turretAngle, -ndFloat32(2.0f) * ndPi, ndFloat32(2.0f) * ndPi);
-			//
-			//	if (wakeUpVehicle)
-			//	{
-			//		ndMatrix effectorMatrix(ndPitchMatrix(m_turretAngle));
-			//		effectorMatrix.m_posit.m_x = m_cannonHigh;
-			//		m_turretEffector->SetOffsetMatrix(effectorMatrix);
-			//		ndMultiBodyVehicle* const vehicle = (ndMultiBodyVehicle*)GetModel();
-			//		vehicle->GetChassis()->SetSleepState(false);
-			//	}
-			//}
 		}
 
 		//ndIk6DofEffector* m_turretEffector;
@@ -869,6 +827,58 @@ static ndMultiBodyVehicle* CreateTractor(ndDemoEntityManager* const scene, const
 	com += localFrame.m_front.Scale(configuration.m_comDisplacement.m_x);
 	com += localFrame.m_right.Scale(configuration.m_comDisplacement.m_z);
 	chassis->SetCentreOfMass(com);
+
+	//2- add all tires
+	ndVehicleDectriptor::ndTireDefinition r0_tireConfiguration(configuration.m_rearTire);
+	ndVehicleDectriptor::ndTireDefinition r1_tireConfiguration(configuration.m_rearTire);
+	ndSharedPtr<ndBody> rr_tire0_body(notifyCallback->CreateTireBody(scene, chassis, r0_tireConfiguration, "rr_tire"));
+	ndSharedPtr<ndBody> rl_tire0_body(notifyCallback->CreateTireBody(scene, chassis, r1_tireConfiguration, "rl_tire"));
+	ndMultiBodyVehicleTireJoint* const rr_tire0 = vehicle->AddTire(r0_tireConfiguration, rr_tire0_body);
+	ndMultiBodyVehicleTireJoint* const rl_tire0 = vehicle->AddTire(r1_tireConfiguration, rl_tire0_body);
+
+	auto MakeFronAxel = [vehicle, chassis, notifyCallback, scene]()
+	{
+		const ndVehicleDectriptor& configuration = notifyCallback->m_desc;
+		ndSharedPtr<ndBody> axleBody(MakeChildPart(scene, chassis, "front_axel", configuration.m_chassisMass * 0.2f));
+
+		// connect the part to the main body with a hinge
+		const ndMatrix localFrame(vehicle->GetLocalFrame());
+		const ndMatrix hingeFrame(localFrame * axleBody->GetMatrix());
+		ndJointHinge* const hinge = new ndJointHinge(hingeFrame, axleBody->GetAsBodyKinematic(), chassis);
+		hinge->SetLimitState(true);
+		hinge->SetLimits(-15.0f * ndDegreeToRad, 15.0f * ndDegreeToRad);
+		ndSharedPtr<ndJointBilateralConstraint> hingePtr(hinge);
+		vehicle->AddLimb(vehicle->GetRoot(), axleBody, hingePtr);
+		return axleBody;
+	};
+
+	ndVehicleDectriptor::ndTireDefinition f0_tireConfiguration(configuration.m_frontTire);
+	ndVehicleDectriptor::ndTireDefinition f1_tireConfiguration(configuration.m_frontTire);
+	ndSharedPtr<ndBody> frontAxel_body(MakeFronAxel());
+	ndSharedPtr<ndBody> fr_tire0_body(notifyCallback->CreateTireBody(scene, frontAxel_body->GetAsBodyDynamic(), f0_tireConfiguration, "fr_tire"));
+	ndSharedPtr<ndBody> fl_tire0_body(notifyCallback->CreateTireBody(scene, frontAxel_body->GetAsBodyDynamic(), f1_tireConfiguration, "fl_tire"));
+	ndMultiBodyVehicleTireJoint* const fr_tire0 = vehicle->AddAxleTire(f0_tireConfiguration, fr_tire0_body, frontAxel_body);
+	ndMultiBodyVehicleTireJoint* const fl_tire0 = vehicle->AddAxleTire(f1_tireConfiguration, fl_tire0_body, frontAxel_body);
+
+	// 3- add 4 x 4 the slip differential
+	// this vehicle is rear wheel drive but has four wheels instead of two.
+	// we link each wheel pair with one slip differetial, 
+	// the each differential is linke to one master slip differential
+	ndMultiBodyVehicleDifferential* const rearDifferential = vehicle->AddDifferential(configuration.m_differentialMass, configuration.m_differentialRadius, rl_tire0, rr_tire0, configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
+	ndMultiBodyVehicleDifferential* const frontDifferential = vehicle->AddDifferential(configuration.m_differentialMass, configuration.m_differentialRadius, fl_tire0, fr_tire0, configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
+	ndMultiBodyVehicleDifferential* const differential = vehicle->AddDifferential(configuration.m_differentialMass, configuration.m_differentialRadius, rearDifferential, frontDifferential, configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
+	differential->SetSlipOmega(2.0f * differential->GetSlipOmega());
+
+	// 4- add a motor
+	ndMultiBodyVehicleMotor* const motor = vehicle->AddMotor(configuration.m_motorMass, configuration.m_motorRadius);
+	motor->SetMaxRpm(configuration.m_engine.GetRedLineRadPerSec()* dRadPerSecToRpm);
+
+	// 5- add the gear box
+	ndMultiBodyVehicleGearBox* const gearBox = vehicle->AddGearBox(differential);
+	gearBox->SetIdleOmega(configuration.m_engine.GetIdleRadPerSec()* dRadPerSecToRpm);
+
+	//// add the bucket joints
+	//CreateTractorBucket(scene);
 
 
 	notifyCallback->m_currentGear = sizeof(configuration.m_transmission.m_forwardRatios) / sizeof(configuration.m_transmission.m_forwardRatios[0]) + 1;
