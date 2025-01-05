@@ -176,7 +176,6 @@ class ndVehicleSelector : public ndModel
 	ndDemoEntityManager::ndKeyTrigger m_changeVehicle;
 };
 
-
 class ndVehicleEntityNotify : public ndDemoEntityNotify
 {
 	public:
@@ -188,69 +187,9 @@ class ndVehicleEntityNotify : public ndDemoEntityNotify
 	ndMultiBodyVehicle* m_vehicle;
 };
 
-class ndVehicleCommon : public ndMultiBodyVehicle
-{
-	public:
-	enum ndInputButtons
-	{
-		m_handBreakButton = ndGameControllerInputs::m_button_00,
-		m_upGearButton = ndGameControllerInputs::m_button_01,
-		m_downGearButton = ndGameControllerInputs::m_button_02,
-		m_neutralGearButton = ndGameControllerInputs::m_button_03,
-		m_ignitionButton = ndGameControllerInputs::m_button_04,
-		m_reverseGearButton = ndGameControllerInputs::m_button_05,
-		m_automaticGearBoxButton = ndGameControllerInputs::m_button_06,
-		m_parkingButton = ndGameControllerInputs::m_button_07,
-		m_isplayerButton = ndGameControllerInputs::m_button_08,
-	};
-
-	enum ndInputAxis
-	{
-		m_steeringWheel = ndGameControllerInputs::m_azis_00,
-		m_gasPedal = ndGameControllerInputs::m_azis_01,
-		m_brakePedal = ndGameControllerInputs::m_azis_02,
-		m_clutch = ndGameControllerInputs::m_azis_03,
-	};
-
-	D_CLASS_REFLECTION(ndVehicleCommon, ndMultiBodyVehicle)
-
-	ndVehicleCommon(const ndVehicleDectriptor& desc);
-	virtual ~ndVehicleCommon();
-
-	bool IsPlayer() const;
-	virtual void SetAsPlayer(ndDemoEntityManager* const scene, bool mode = true);
-
-
-	void ApplyInputs(ndWorld* const world, ndFloat32 timestep);
-
-	protected:
-	void Update(ndWorld* const world, ndFloat32 timestep);
-	void PostUpdate(ndWorld* const world, ndFloat32 timestep);
-	void CalculateTireDimensions(const char* const tireName, ndFloat32& width, ndFloat32& radius, ndDemoEntity* const vehEntity) const;
-	ndBodyKinematic* CreateTireBody(ndDemoEntityManager* const scene, ndBodyKinematic* const parentBody, ndVehicleDectriptor::ndTireDefinition& definition, const char* const tireName) const;
-
-	ndGameControllerInputs m_inputs;
-	ndVehicleDectriptor m_configuration;
-	ndDemoEntityManager::ndKeyTrigger m_parking;
-	ndDemoEntityManager::ndKeyTrigger m_ignition;
-	ndDemoEntityManager::ndKeyTrigger m_neutralGear;
-	ndDemoEntityManager::ndKeyTrigger m_reverseGear;
-	ndDemoEntityManager::ndKeyTrigger m_forwardGearUp;
-	ndDemoEntityManager::ndKeyTrigger m_forwardGearDown;
-	ndDemoEntityManager::ndKeyTrigger m_manualTransmission;
-
-	ndInt32 m_currentGear;
-	ndInt32 m_autoGearShiftTimer;
-	bool m_isPlayer;
-	bool m_isParked;
-	bool m_startEngine;
-	bool m_isManualTransmission;
-
-	friend class ndVehicleUI;
-};
-
 class ndVehicleCommonNotify : public ndModelNotify
 {
+	public:
 	enum ndInputButtons
 	{
 		m_handBreakButton = ndGameControllerInputs::m_button_00,
@@ -261,7 +200,7 @@ class ndVehicleCommonNotify : public ndModelNotify
 		m_reverseGearButton = ndGameControllerInputs::m_button_05,
 		m_automaticGearBoxButton = ndGameControllerInputs::m_button_06,
 		m_parkingButton = ndGameControllerInputs::m_button_07,
-		m_isplayerButton = ndGameControllerInputs::m_button_08,
+		m_playerButton = ndGameControllerInputs::m_button_08,
 	};
 
 	enum ndInputAxis
@@ -271,8 +210,7 @@ class ndVehicleCommonNotify : public ndModelNotify
 		m_brakePedal = ndGameControllerInputs::m_azis_02,
 		m_clutch = ndGameControllerInputs::m_azis_03,
 	};
-
-	public:
+	
 	ndVehicleCommonNotify(const ndVehicleDectriptor& desc, ndMultiBodyVehicle* const vehicle, ndVehicleUI* const ui);
 	
 	virtual void ApplyInputs(ndWorld* const world, ndFloat32 timestep);

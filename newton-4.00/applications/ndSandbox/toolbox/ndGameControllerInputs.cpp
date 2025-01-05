@@ -107,7 +107,7 @@ void ndGameControllerInputs::GetJoystickInputs(ndDemoEntityManager* const scene)
 			buttonMapping[4] = m_button_05;		//m_reverseGearButton
 			buttonMapping[11] = m_button_06;	//m_automaticGearBoxButton
 			buttonMapping[1] = m_button_07;		//m_parkingButton
-			buttonMapping[8] = m_button_08;		//m_isplayerButton
+			buttonMapping[8] = m_button_08;		//m_playerButton
 		}
 	}
 
@@ -171,7 +171,7 @@ void ndGameControllerInputs::GetXboxJoystickInputs(ndDemoEntityManager* const sc
 			buttonMapping[13] = m_button_05; //m_reverseGearButton
 			buttonMapping[8] = m_button_06;  //m_automaticGearBoxButton
 			buttonMapping[10] = m_button_07; //m_parkingButton
-			buttonMapping[6] = m_button_08;  //m_isplayerButton
+			buttonMapping[6] = m_button_08;  //m_playerButton
 		}
 	}
 
@@ -236,7 +236,7 @@ void ndGameControllerInputs::GetWheelJoystickInputs(ndDemoEntityManager* const s
 			buttonMapping[8] = m_button_05;		//m_reverseGearButton
 			buttonMapping[9] = m_button_06;		//m_automaticGearBoxButton
 			buttonMapping[20] = m_button_07;	//m_parkingButton
-			buttonMapping[7] = m_button_08;		//m_isplayerButton
+			buttonMapping[7] = m_button_08;		//m_playerButton
 		}										
 	}
 

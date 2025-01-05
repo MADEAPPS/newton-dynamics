@@ -221,13 +221,13 @@ void ndVehicleSelector::SelectNext(ndWorld* const world)
 	const ndModelList& modelList = world->GetModelList();
 
 	//ndInt32 vehiclesCount = 0;
-	ndFixSizeArray<ndVehicleCommon*, 1024> vehicleArray;
+	ndFixSizeArray<ndMultiBodyVehicle*, 1024> vehicleArray;
 	for (ndModelList::ndNode* node = modelList.GetFirst(); node; node = node->GetNext())
 	{
 		ndModel* const model = *node->GetInfo();
 		if (model->GetAsMultiBodyVehicle())
 		{
-			vehicleArray.PushBack((ndVehicleCommon*)model->GetAsMultiBodyVehicle());
+			vehicleArray.PushBack((ndMultiBodyVehicle*)model->GetAsMultiBodyVehicle());
 		}
 	}
 
@@ -235,11 +235,12 @@ void ndVehicleSelector::SelectNext(ndWorld* const world)
 	{
 		for (ndInt32 i = 0; i < vehicleArray.GetCount(); ++i)
 		{
-			if (vehicleArray[i]->IsPlayer())
+			ndVehicleCommonNotify* const notify = (ndVehicleCommonNotify*)*vehicleArray[i]->GetNotifyCallback();
+			if (notify->m_isPlayer)
 			{
-				ndVehicleCommon* const nexVehicle = vehicleArray[(i + 1) % vehicleArray.GetCount()];
-				vehicleArray[i]->SetAsPlayer(scene, false);
-				nexVehicle->SetAsPlayer(scene, true);
+				ndVehicleCommonNotify* const nextNotify = (ndVehicleCommonNotify*)*vehicleArray[(i + 1) % vehicleArray.GetCount()]->GetNotifyCallback();
+				notify->SetAsPlayer(scene, false);
+				nextNotify->SetAsPlayer(scene, true);
 				break;
 			}
 		}
@@ -253,7 +254,7 @@ void ndVehicleSelector::PostUpdate(ndWorld* const world, ndFloat32)
 	ndGameControllerInputs inputs;
 	inputs.Update(scene);
 		
-	if (m_changeVehicle.Update(inputs.m_buttons[ndVehicleCommon::m_isplayerButton] ? true : false))
+	if (m_changeVehicle.Update(inputs.m_buttons[ndVehicleCommonNotify::m_playerButton] ? true : false))
 	{
 		SelectNext(world);
 	}	
@@ -305,323 +306,6 @@ void ndVehicleMaterial::OnContactCallback(const ndContact* const joint, ndFloat3
 		material.m_dynamicFriction1 = matetial->m_dynamicFriction1;
 	}
 }
-
-ndVehicleCommon::ndVehicleCommon(const ndVehicleDectriptor& desc)
-	:ndMultiBodyVehicle()
-	,m_inputs()
-	,m_configuration(desc)
-	,m_parking()
-	,m_ignition()
-	,m_neutralGear()
-	,m_reverseGear()
-	,m_forwardGearUp()
-	,m_forwardGearDown()
-	,m_manualTransmission()
-	,m_currentGear(0)
-	,m_autoGearShiftTimer(0)
-	,m_isPlayer(false)
-	,m_isParked(true)
-	,m_startEngine(false)
-	,m_isManualTransmission(desc.m_transmission.m_manual)
-{
-}
-
-ndVehicleCommon::~ndVehicleCommon()
-{
-}
-
-void ndVehicleCommon::SetAsPlayer(ndDemoEntityManager* const, bool mode)
-{
-	m_isPlayer = mode;
-}
-
-bool ndVehicleCommon::IsPlayer() const
-{
-	return m_isPlayer;
-}
-
-void ndVehicleCommon::CalculateTireDimensions(const char* const tireName, ndFloat32& width, ndFloat32& radius, ndDemoEntity* const vehEntity) const
-{
-	// find the the tire visual mesh 
-	ndDemoEntity* const tirePart = vehEntity->Find(tireName);
-	ndAssert(tirePart);
-
-	// make a convex hull collision shape to assist in calculation of the tire shape size
-	ndDemoMesh* const tireMesh = (ndDemoMesh*)*tirePart->GetMesh();
-	ndAssert(tireMesh);
-
-	const ndMatrix matrix(tirePart->GetMeshMatrix());
-
-	ndArray<ndVector> temp;
-	tireMesh->GetVertexArray(temp);
-
-	ndVector minVal(1.0e10f);
-	ndVector maxVal(-1.0e10f);
-	for (ndInt32 i = 0; i < temp.GetCount(); ++i)
-	{
-		ndVector p(matrix.TransformVector(temp[i]));
-		minVal = minVal.GetMin(p);
-		maxVal = maxVal.GetMax(p);
-	}
-
-	ndVector size(maxVal - minVal);
-	width = size.m_x;
-	radius = size.m_y * 0.5f;
-}
-
-ndBodyKinematic* ndVehicleCommon::CreateTireBody(ndDemoEntityManager* const scene, ndBodyKinematic* const parentBody, ndVehicleDectriptor::ndTireDefinition& definition, const char* const tireName) const
-{
-	ndFloat32 width;
-	ndFloat32 radius;
-	ndDemoEntity* const parentEntity = (ndDemoEntity*)parentBody->GetNotifyCallback()->GetUserData();
-	CalculateTireDimensions(tireName, width, radius, parentEntity);
-
-	definition.m_radios = radius;
-	ndShapeInstance tireCollision(CreateTireShape(radius, width));
-
-	ndDemoEntity* const tireEntity = parentEntity->Find(tireName);
-	ndMatrix matrix(tireEntity->CalculateGlobalMatrix(nullptr));
-
-	const ndBodyKinematic* const chassis = m_chassis;
-	ndAssert(chassis);
-
-	const ndMatrix chassisMatrix(m_localFrame * chassis->GetMatrix());
-	matrix.m_posit += chassisMatrix.m_up.Scale(definition.m_verticalOffset);
-
-	ndBodyKinematic* const tireBody = new ndBodyDynamic();
-	//tireBody->SetNotifyCallback(new ndDemoEntityNotify(scene, tireEntity, parentBody));
-	ndVehicleCommon* const me = (ndVehicleCommon*) this;
-	tireBody->SetNotifyCallback(new ndVehicleEntityNotify(me, scene, tireEntity, parentBody));
-	tireBody->SetMatrix(matrix);
-	tireBody->SetCollisionShape(tireCollision);
-	tireBody->SetMassMatrix(definition.m_mass, tireCollision);
-
-	ndShapeInstance& instanceShape = tireBody->GetCollisionShape();
-	instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_vehicleTirePart;
-	instanceShape.m_shapeMaterial.m_userParam[ndDemoContactCallback::m_modelPointer].m_ptrData = (void*)this;
-
-	return tireBody;
-}
-
-void ndVehicleCommon::Update(ndWorld* const world, ndFloat32 timestep)
-{
-	ndMultiBodyVehicle::Update(world, timestep);
-}
-
-void ndVehicleCommon::PostUpdate(ndWorld* const world, ndFloat32 timestep)
-{
-	ndMultiBodyVehicle::PostUpdate(world, timestep);
-
-	// this is debug code wind tunnel for calibration
-	//ndMatrix matrix(ndGetIdentityMatrix());
-	//matrix.m_posit = m_chassis->GetMatrix().m_posit;
-	//matrix.m_posit.m_y = 0.0f;
-	//matrix = matrix.Inverse();
-	//m_chassis->SetMatrix(m_chassis->GetMatrix() * matrix);
-	//
-	//ndMatrix chassisMatrix(m_chassis->GetMatrix());
-	//for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
-	//{
-	//	ndMultiBodyVehicleTireJoint* const joint = node->GetInfo();
-	//	ndBodyKinematic* const tireBody = joint->GetBody0();
-	//	
-	//	ndMatrix timeHubMatrix(joint->CalculateBaseFrame());
-	//	ndVector tireVeloc(tireBody->GetVelocity());
-	//	ndFloat32 speed = tireVeloc.DotProduct(timeHubMatrix.m_right).GetScalar();
-	//
-	//	ndMatrix tireMatrix(tireBody->GetMatrix());
-	//	ndFloat32 sign = -ndSign(tireMatrix.m_front.DotProduct(chassisMatrix.m_right).GetScalar());
-	//
-	//	ndFloat32 angle = sign * speed * timestep / joint->GetInfo().m_radios;
-	//	ndMatrix pitchMatrix(ndPitchMatrix(angle));
-	//	
-	//	tireBody->SetMatrix(pitchMatrix * tireMatrix * matrix);
-	//}
-	
-	//for (ndList<ndMultiBodyVehicleDifferential*>::ndNode* node = m_differentialList.GetFirst(); node; node = node->GetNext())
-	//{
-	//	ndMultiBodyVehicleDifferential* const joint = node->GetInfo();
-	//	joint->GetBody0()->SetMatrix(joint->GetBody0()->GetMatrix() * matrix);
-	//}
-	//
-	//for (ndList<ndBodyDynamic*>::ndNode* node = m_extraBodiesAttachmentList.GetFirst(); node; node = node->GetNext())
-	//{
-	//	ndBodyDynamic* const body = node->GetInfo();
-	//	body->SetMatrix(body->GetMatrix() * matrix);
-	//}
-	//
-	//if (m_motor)
-	//{
-	//	m_motor->GetBody0()->SetMatrix(m_motor->GetBody0()->GetMatrix() * matrix);
-	//}
-}
-
-void ndVehicleCommon::ApplyInputs(ndWorld* const world, ndFloat32)
-{
-	if (m_isPlayer && m_motor)
-	{
-		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
-	
-		m_inputs.Update(scene);
-		const ndFixSizeArray<ndFloat32, 8>& axis = m_inputs.m_axis;
-		const ndFixSizeArray<char, 32>& buttons = m_inputs.m_buttons;
-		
-		ndFloat32 brake = axis[m_brakePedal];
-		ndFloat32 throttle = axis[m_gasPedal];
-		ndFloat32 steerAngle = axis[m_steeringWheel];
-		ndFloat32 handBrake = buttons[m_handBreakButton] ? 1.0f : 0.0f;
-
-		//for (int i = 0; i < buttons.GetCount(); ++i)
-		//{
-		//	if (buttons[i])
-		//	{
-		//		ndTrace(("button %d\n", i));
-		//	}
-		//}
-	
-		if (m_parking.Update(buttons[m_parkingButton] ? true : false))
-		{
-			m_isParked = !m_isParked;
-		}
-	
-		if (m_ignition.Update(buttons[m_ignitionButton] ? true : false))
-		{
-			m_startEngine = !m_startEngine;
-		}
-	
-		if (m_manualTransmission.Update(buttons[m_automaticGearBoxButton] ? true : false))
-		{
-			m_isManualTransmission = !m_isManualTransmission;
-		}
-	
-		// transmission front gear up
-		if (m_forwardGearUp.Update(buttons[m_upGearButton] ? true : false))
-		{
-			m_isParked = false;
-			if (m_currentGear > m_configuration.m_transmission.m_gearsCount)
-			{
-				m_currentGear = 0;
-			}
-			else
-			{
-				m_currentGear++;
-				if (m_currentGear >= m_configuration.m_transmission.m_gearsCount)
-				{
-					m_currentGear = m_configuration.m_transmission.m_gearsCount - 1;
-				}
-			}
-			ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
-			m_gearBox->SetRatio(gearGain);
-			m_autoGearShiftTimer = m_configuration.m_transmission.m_gearShiftDelayTicks;
-		}
-	
-		// transmission front gear down
-		if (m_forwardGearDown.Update(buttons[m_downGearButton] ? true : false))
-		{
-			m_isParked = false;
-			if (m_currentGear > m_configuration.m_transmission.m_gearsCount)
-			{
-				m_currentGear = 0;
-			}
-			else
-			{
-				m_currentGear--;
-				if (m_currentGear <= 0)
-				{
-					m_currentGear = 0;
-				}
-			}
-			ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
-			m_gearBox->SetRatio(gearGain);
-			m_autoGearShiftTimer = m_configuration.m_transmission.m_gearShiftDelayTicks;
-		}
-	
-		const ndFloat32 omega = m_motor->GetRpm() / dRadPerSecToRpm;
-		if (!m_isManualTransmission && (m_autoGearShiftTimer < 0))
-		{
-			if (m_currentGear < m_configuration.m_transmission.m_gearsCount)
-			{
-				if (omega < m_configuration.m_engine.GetLowGearShiftRadPerSec())
-				{
-					if (m_currentGear > 0)
-					{
-						m_currentGear--;
-						ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
-						m_gearBox->SetRatio(gearGain);
-						m_autoGearShiftTimer = m_configuration.m_transmission.m_gearShiftDelayTicks;
-					}
-				}
-				else if (omega > m_configuration.m_engine.GetHighGearShiftRadPerSec())
-				{
-					if (m_currentGear < (m_configuration.m_transmission.m_gearsCount - 1))
-					{
-						m_currentGear++;
-						ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
-						m_gearBox->SetRatio(gearGain);
-						m_autoGearShiftTimer = m_configuration.m_transmission.m_gearShiftDelayTicks;
-					}
-				}
-			}
-		}
-		m_autoGearShiftTimer--;
-		//ndTrace(("gear:%d gearGain:%f\n", m_currentGear, m_configuration.m_transmission.m_forwardRatios[m_currentGear]));
-	
-		// neural gear
-		if (m_neutralGear.Update(buttons[m_neutralGearButton] ? true : false))
-		{
-			m_currentGear = sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1;
-			m_gearBox->SetRatio(0.0f);
-		}
-	
-		// reverse gear
-		if (m_reverseGear.Update(buttons[m_reverseGearButton] ? true : false))
-		{
-			m_isParked = false;
-			m_currentGear = sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]);
-	
-			ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
-			m_gearBox->SetRatio(gearGain);
-		}
-	
-		if (m_isParked)
-		{
-			brake = 1.0f;
-		}
-	
-		for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
-		{
-			ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
-			tire->SetBrake(brake);
-			tire->SetSteering(steerAngle);
-			tire->SetHandBrake(handBrake);
-		}
-	
-		// set the transmission Torque converter when the power reverses.
-		m_gearBox->SetInternalTorqueLoss(m_configuration.m_transmission.m_torqueConverter);
-		if (omega <= (m_configuration.m_engine.GetIdleRadPerSec() * 1.01f))
-		{
-			m_gearBox->SetClutchTorque(m_configuration.m_transmission.m_idleClutchTorque);
-		}
-		else
-		{
-			m_gearBox->SetClutchTorque(m_configuration.m_transmission.m_lockedClutchTorque);
-		}
-	
-		if (m_startEngine)
-		{
-			ndFloat32 currentOmega = m_motor->GetRpm() / dRadPerSecToRpm;
-			ndFloat32 desiredOmega = ndMax(m_configuration.m_engine.GetIdleRadPerSec(), throttle * m_configuration.m_engine.GetRedLineRadPerSec());
-			ndFloat32 torqueFromCurve = m_configuration.m_engine.GetTorque(currentOmega);
-			m_motor->SetTorqueAndRpm(torqueFromCurve, desiredOmega * dRadPerSecToRpm);
-			m_chassis->SetSleepState(false);
-		}
-		else
-		{
-			m_motor->SetTorqueAndRpm(0.0f, 0.0f);
-		}
-	}
-}
-
 
 //***************************************************************************************************
 // 
