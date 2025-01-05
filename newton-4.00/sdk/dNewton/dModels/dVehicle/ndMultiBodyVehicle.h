@@ -85,6 +85,7 @@ class ndMultiBodyVehicle : public ndModelArticulation
 	D_NEWTON_API ndBodyDynamic* GetChassis() const;
 	D_NEWTON_API ndMultiBodyVehicleMotor* GetMotor() const;
 	D_NEWTON_API ndMultiBodyVehicleGearBox* GetGearBox() const;
+	D_NEWTON_API ndMultiBodyVehicle* GetAsMultiBodyVehicle();
 	D_NEWTON_API const ndList<ndMultiBodyVehicleTireJoint*>& GetTireList() const;
 
 	D_NEWTON_API bool IsSleeping() const;

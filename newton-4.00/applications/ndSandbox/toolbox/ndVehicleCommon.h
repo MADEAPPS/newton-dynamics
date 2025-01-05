@@ -163,17 +163,7 @@ class ndVehicleSelector : public ndModel
 {
 	public:
 	D_CLASS_REFLECTION(ndVehicleSelector, ndModel)
-		ndVehicleSelector();
-
-	virtual void OnAddToWorld() {}
-	virtual void OnRemoveFromToWorld() {}
-
-	void Update(ndWorld* const, ndFloat32) {}
-	void PostUpdate(ndWorld* const world, ndFloat32);
-
-	void SelectNext(ndWorld* const world);
-
-	ndDemoEntityManager::ndKeyTrigger m_changeVehicle;
+	ndVehicleSelector();
 };
 
 class ndVehicleEntityNotify : public ndDemoEntityNotify

@@ -43,6 +43,10 @@ ndVehicleEntityNotify::~ndVehicleEntityNotify()
 {
 }
 
+//***************************************************************************************************
+// 
+// 
+//***************************************************************************************************
 ndVehicleDectriptor::ndEngineTorqueCurve::ndEngineTorqueCurve()
 {
 	// take from the data sheet of a 2005 dodge viper, 
@@ -209,57 +213,73 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_useHardSolverMode = true;
 }
 
+//***************************************************************************************************
+// 
+// 
+//***************************************************************************************************
 ndVehicleSelector::ndVehicleSelector()
 	:ndModel()
-	,m_changeVehicle()
 {
-}
-
-void ndVehicleSelector::SelectNext(ndWorld* const world)
-{
-	ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
-	const ndModelList& modelList = world->GetModelList();
-
-	//ndInt32 vehiclesCount = 0;
-	ndFixSizeArray<ndMultiBodyVehicle*, 1024> vehicleArray;
-	for (ndModelList::ndNode* node = modelList.GetFirst(); node; node = node->GetNext())
+	class ndVehicleSelectorNotify : public ndModelNotify
 	{
-		ndModel* const model = *node->GetInfo();
-		if (model->GetAsMultiBodyVehicle())
+		public:
+		ndVehicleSelectorNotify(ndVehicleSelector* const model)
+			:ndModelNotify()
+			,m_changeVehicle()
 		{
-			vehicleArray.PushBack((ndMultiBodyVehicle*)model->GetAsMultiBodyVehicle());
+			SetModel(model);
 		}
-	}
 
-	if (vehicleArray.GetCount() > 1)
-	{
-		for (ndInt32 i = 0; i < vehicleArray.GetCount(); ++i)
+		void SelectNext(ndWorld* const world)
 		{
-			ndVehicleCommonNotify* const notify = (ndVehicleCommonNotify*)*vehicleArray[i]->GetNotifyCallback();
-			if (notify->m_isPlayer)
+			ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
+			const ndModelList& modelList = world->GetModelList();
+
+			ndFixSizeArray<ndMultiBodyVehicle*, 1024> vehicleArray;
+			for (ndModelList::ndNode* node = modelList.GetFirst(); node; node = node->GetNext())
 			{
-				ndVehicleCommonNotify* const nextNotify = (ndVehicleCommonNotify*)*vehicleArray[(i + 1) % vehicleArray.GetCount()]->GetNotifyCallback();
-				notify->SetAsPlayer(scene, false);
-				nextNotify->SetAsPlayer(scene, true);
-				break;
+				ndModel* const model = *node->GetInfo();
+				if (model->GetAsMultiBodyVehicle())
+				{
+					vehicleArray.PushBack((ndMultiBodyVehicle*)model->GetAsMultiBodyVehicle());
+				}
+			}
+
+			for (ndInt32 i = 0; i < vehicleArray.GetCount(); ++i)
+			{
+				ndVehicleCommonNotify* const notify = (ndVehicleCommonNotify*)*vehicleArray[i]->GetNotifyCallback();
+				if (notify->m_isPlayer)
+				{
+					ndVehicleCommonNotify* const nextNotify = (ndVehicleCommonNotify*)*vehicleArray[(i + 1) % vehicleArray.GetCount()]->GetNotifyCallback();
+					notify->SetAsPlayer(scene, false);
+					nextNotify->SetAsPlayer(scene, true);
+					break;
+				}
 			}
 		}
-	}
+
+		void PostUpdate(ndWorld* const world, ndFloat32) override
+		{
+			ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
+
+			ndGameControllerInputs inputs;
+			inputs.Update(scene);
+			if (m_changeVehicle.Update(inputs.m_buttons[ndVehicleCommonNotify::m_playerButton] ? true : false))
+			{
+				SelectNext(world);
+			}
+		}
+
+		ndDemoEntityManager::ndKeyTrigger m_changeVehicle;
+	};
+
+	SetNotifyCallback(ndSharedPtr<ndModelNotify>(new ndVehicleSelectorNotify(this)));
 }
 
-void ndVehicleSelector::PostUpdate(ndWorld* const world, ndFloat32)
-{
-	ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
-
-	ndGameControllerInputs inputs;
-	inputs.Update(scene);
-		
-	if (m_changeVehicle.Update(inputs.m_buttons[ndVehicleCommonNotify::m_playerButton] ? true : false))
-	{
-		SelectNext(world);
-	}	
-}
-
+//***************************************************************************************************
+// 
+// 
+//***************************************************************************************************
 ndVehicleMaterial::ndVehicleMaterial()
 	:ndApplicationMaterial()
 {

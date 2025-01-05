@@ -322,6 +322,11 @@ const ndList<ndMultiBodyVehicleTireJoint*>& ndMultiBodyVehicle::GetTireList() co
 	return m_tireList;
 }
 
+ndMultiBodyVehicle* ndMultiBodyVehicle::GetAsMultiBodyVehicle()
+{
+	return this;
+}
+
 ndFloat32 ndMultiBodyVehicle::GetSpeed() const
 {
 	const ndVector dir(m_chassis->GetMatrix().RotateVector(m_localFrame.m_front));
