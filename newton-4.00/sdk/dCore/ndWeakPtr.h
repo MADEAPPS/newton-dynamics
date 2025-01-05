@@ -28,7 +28,7 @@ class ndWeakPtr: public ndSharedPtr<T>
 
 template <typename T>
 ndWeakPtr<T>::ndWeakPtr()
-	:ndSharedPtr()
+	:ndSharedPtr<T>()
 {
 	ndAssert(0);
 	ndAssert(m_references);
@@ -36,7 +36,7 @@ ndWeakPtr<T>::ndWeakPtr()
 
 template <typename T>
 ndWeakPtr<T>::ndWeakPtr(const ndWeakPtr<T>& other)
-	:ndSharedPtr(other)
+	:ndSharedPtr<T>(other)
 {
 	ndAssert(0);
 	ndAssert(m_references);
@@ -45,7 +45,7 @@ ndWeakPtr<T>::ndWeakPtr(const ndWeakPtr<T>& other)
 
 template <typename T>
 ndWeakPtr<T>::ndWeakPtr(const ndSharedPtr<T>& ptr)
-	:ndSharedPtr(ptr)
+	:ndSharedPtr<T>(ptr)
 {
 	ndAssert(0);
 	ndAssert(m_references);
