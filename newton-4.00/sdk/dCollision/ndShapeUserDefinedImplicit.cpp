@@ -40,7 +40,8 @@ void ndShapeUserDefinedImplicit::MassProperties()
 	ndAssert(0);
 }
 
-void ndShapeUserDefinedImplicit::CalculateAabb(const ndMatrix& matrix, ndVector &p0, ndVector &p1) const
+//void ndShapeUserDefinedImplicit::CalculateAabb(const ndMatrix& matrix, ndVector &p0, ndVector &p1) const
+void ndShapeUserDefinedImplicit::CalculateAabb(const ndMatrix&, ndVector&, ndVector&) const
 {
 	ndAssert(0);
 	//ndVector size(m_radius);
@@ -48,7 +49,8 @@ void ndShapeUserDefinedImplicit::CalculateAabb(const ndMatrix& matrix, ndVector 
 	//p1 = (matrix[3] + size) & ndVector::m_triplexMask;
 }
 
-ndVector ndShapeUserDefinedImplicit::SupportVertexSpecialProjectPoint(const ndVector&, const ndVector& dir) const
+//ndVector ndShapeUserDefinedImplicit::SupportVertexSpecialProjectPoint(const ndVector&, const ndVector& dir) const
+ndVector ndShapeUserDefinedImplicit::SupportVertexSpecialProjectPoint(const ndVector&, const ndVector&) const
 {
 	ndAssert(0);
 	return ndVector::m_zero;
@@ -61,7 +63,8 @@ ndVector ndShapeUserDefinedImplicit::SupportVertexSpecial(const ndVector&, ndFlo
 	return ndVector::m_zero;
 }
 
-ndVector ndShapeUserDefinedImplicit::SupportVertex(const ndVector& dir) const
+//ndVector ndShapeUserDefinedImplicit::SupportVertex(const ndVector& dir) const
+ndVector ndShapeUserDefinedImplicit::SupportVertex(const ndVector&) const
 {
 	ndAssert(0);
 	return ndVector::m_zero;
@@ -80,10 +83,11 @@ ndInt32 ndShapeUserDefinedImplicit::CalculatePlaneIntersection(const ndVector& n
 	return 1;
 }
 
-ndFloat32 ndShapeUserDefinedImplicit::RayCast(ndRayCastNotify&, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const, ndContactPoint& contactOut) const
+//ndFloat32 ndShapeUserDefinedImplicit::RayCast(ndRayCastNotify&, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const, ndContactPoint& contactOut) const
+ndFloat32 ndShapeUserDefinedImplicit::RayCast(ndRayCastNotify&, const ndVector&, const ndVector&, ndFloat32, const ndBody* const, ndContactPoint&) const
 {
 	ndAssert(0);
-	return 0;
+	return 0.0f;
 	//ndFloat32 t = ndRayCastSphere(localP0, localP1, ndVector::m_zero, m_radius);
 	//if (t < maxT) 
 	//{
@@ -104,7 +108,8 @@ ndShapeInfo ndShapeUserDefinedImplicit::GetShapeInfo() const
 	return info;
 }
 
-void ndShapeUserDefinedImplicit::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const
+//void ndShapeUserDefinedImplicit::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const
+void ndShapeUserDefinedImplicit::DebugShape(const ndMatrix&, ndShapeDebugNotify&) const
 {
 	ndAssert(0);
 	//ndVector tmpVectex[1024 * 2];

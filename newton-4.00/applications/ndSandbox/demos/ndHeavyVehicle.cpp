@@ -735,17 +735,17 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	ndSharedPtr<ndUIEntity> vehicleUIPtr(vehicleUI);
 	scene->Set2DDisplayRenderFunction(vehicleUIPtr);
 	
-	//ndSharedPtr<ndModel> vehicle0(CreateFlatBedTruck(scene, bigRigDesc, matrix, vehicleUI));
+	ndSharedPtr<ndModel> vehicle0(CreateFlatBedTruck(scene, bigRigDesc, matrix, vehicleUI));
 	
 	matrix.m_posit.m_x += 6.0f;
 	matrix.m_posit.m_z += 6.0f;
-	//ndSharedPtr<ndModel> vehicle1(CreateLav25Vehicle(scene, lav25Desc, matrix, vehicleUI));
+	ndSharedPtr<ndModel> vehicle1(CreateLav25Vehicle(scene, lav25Desc, matrix, vehicleUI));
 
 	matrix.m_posit.m_z -= 12.0f;
 	ndSharedPtr<ndModel> vehicle2(CreateTractor(scene, tractorDesc, matrix, vehicleUI));
 
-	//world->AddModel(vehicle0);
-	//world->AddModel(vehicle1);
+	world->AddModel(vehicle0);
+	world->AddModel(vehicle1);
 	world->AddModel(vehicle2);
 
 	ndVehicleCommonNotify* const notifyCallback = (ndVehicleCommonNotify*)*vehicle2->GetNotifyCallback();

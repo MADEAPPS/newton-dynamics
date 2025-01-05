@@ -20,7 +20,6 @@ ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDem
 	,m_entity(entity)
 	,m_manager(manager)
 {
-	//static ndDemoEntityNotifyFileLoadSave registerClass;
 }
 
 ndDemoEntityNotify::ndDemoEntityNotify(const ndDemoEntityNotify& notify)
@@ -40,16 +39,11 @@ ndDemoEntityNotify::~ndDemoEntityNotify()
 		}
 		else
 		{
-			// it is a child mesh, probably and instance
+			// it is a child mesh, probably an instance
 			delete m_entity;
 		}
 	}
 }
-
-//void ndDemoEntityNotify::OnObjectPick() const
-//{
-//	ndTrace(("picked body id: %d\n", GetBody()->GetId()));
-//}
 
 void ndDemoEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
 {
