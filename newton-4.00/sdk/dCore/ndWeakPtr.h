@@ -39,8 +39,8 @@ ndWeakPtr<T>::ndWeakPtr(const ndWeakPtr<T>& other)
 	:ndSharedPtr<T>(other)
 {
 	ndAssert(0);
-	ndAssert(m_references);
-	m_references->m_weakRef.fetch_add(1);
+	ndAssert(ndSharedPtr<T>::m_references);
+	ndSharedPtr<T>::m_references->m_weakRef.fetch_add(1);
 }
 
 template <typename T>
@@ -48,16 +48,16 @@ ndWeakPtr<T>::ndWeakPtr(const ndSharedPtr<T>& ptr)
 	:ndSharedPtr<T>(ptr)
 {
 	ndAssert(0);
-	ndAssert(m_references);
+	ndAssert(ndSharedPtr<T>::m_references);
 }
 
 template <typename T>
 ndWeakPtr<T>::~ndWeakPtr()
 {
 	ndAssert(0);
-	m_references->m_weakRef.fetch_add(-1);
+	ndAssert(ndSharedPtr<T>::m_references);
+	ndSharedPtr<T>::m_references->m_weakRef.fetch_add(-1);
 }
-
 
 template <typename T>
 ndWeakPtr<T>& ndWeakPtr<T>::operator=(const ndWeakPtr<T>& other)
