@@ -54,6 +54,10 @@ int main(int, char**)
 	//ndArray<ndInt32> triangles;
 	//ndTriangulatePolygon(points, 5, triangles);
 
+	ndSharedPtr<int> strong(new int);
+	ndWeakPtr<int> weak(strong);
+
+
 	ndDemoEntityManager demos;
 	demos.Run();
 	return 0;
