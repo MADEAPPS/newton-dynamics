@@ -220,12 +220,12 @@ ndVector ndQuaternion::GetEulerAngles(ndVector& euler) const
 
 ndVector ndQuaternion::RotateVector(const ndVector& point) const
 {
-	ndMatrix matrix(ndCalculateMatrix(*this));
+	const ndMatrix matrix(ndCalculateMatrix(*this));
 	return matrix.RotateVector(point);
 }
 
 ndVector ndQuaternion::UnrotateVector(const ndVector& point) const
 {
-	ndMatrix matrix(ndCalculateMatrix(*this));
+	const ndMatrix matrix(ndCalculateMatrix(*this));
 	return matrix.UnrotateVector(point);
 }
