@@ -279,6 +279,92 @@ void ndJointKinematicController::CheckSleep() const
 	//}
 }
 
+
+void ndJointKinematicController::SetControlMode(ndControlModes mode)
+{
+	m_controlMode = mode;
+}
+
+void ndJointKinematicController::SetMaxSpeed(ndFloat32 speedInMetersPerSeconds)
+{
+	m_maxSpeed = ndAbs(speedInMetersPerSeconds);
+}
+
+void ndJointKinematicController::SetMaxLinearFriction(ndFloat32 frictionForce)
+{
+	m_maxLinearFriction = ndAbs(frictionForce);
+}
+
+void ndJointKinematicController::SetMaxAngularFriction(ndFloat32 frictionTorque)
+{
+	m_maxAngularFriction = ndAbs(frictionTorque);
+}
+
+void ndJointKinematicController::SetMaxOmega(ndFloat32 speedInRadiansPerSeconds)
+{
+	m_maxOmega = ndAbs(speedInRadiansPerSeconds);
+}
+
+void ndJointKinematicController::SetAngularViscousFrictionCoefficient(ndFloat32 coefficient)
+{
+	ndVector mass(GetBody0()->GetMassMatrix());
+	m_angularFrictionCoefficient = ndAbs(coefficient) * ndMax(mass.m_x, ndMax(mass.m_y, mass.m_z));
+}
+
+void ndJointKinematicController::SetTargetPosit(const ndVector& posit)
+{
+	ndMatrix matrix(m_localMatrix1);
+	matrix.m_posit = posit;
+	SetTargetMatrix(matrix);
+}
+
+void ndJointKinematicController::SetTargetRotation(const ndQuaternion& rotation)
+{
+	ndMatrix matrix(ndCalculateMatrix(rotation, m_localMatrix1.m_posit));
+	SetTargetMatrix(matrix);
+}
+
+ndMatrix ndJointKinematicController::GetTargetMatrix() const
+{
+	ndAssert(0);
+	return m_localMatrix0;
+}
+
+bool ndJointKinematicController::IsBilateral() const
+{
+	return true;
+}
+
+ndFloat32 ndJointKinematicController::GetMaxSpeed() const
+{
+	return m_maxSpeed;
+}
+
+ndFloat32 ndJointKinematicController::GetMaxOmega() const
+{
+	return m_maxOmega;
+}
+
+ndJointKinematicController::ndControlModes ndJointKinematicController::GetControlMode() const
+{
+	return m_controlMode;
+}
+
+ndFloat32 ndJointKinematicController::GetMaxLinearFriction() const
+{
+	return m_maxLinearFriction;
+}
+
+ndFloat32 ndJointKinematicController::GetMaxAngularFriction() const
+{
+	return m_maxAngularFriction;
+}
+
+ndFloat32 ndJointKinematicController::GetAngularViscousFrictionCoefficient() const
+{
+	return m_angularFrictionCoefficient;
+}
+
 void ndJointKinematicController::SetTargetMatrix(const ndMatrix& matrix)
 {
 	const ndVector maxStep(ndVector(m_maxSpeed * D_NOMINAL_TIMESTEP));

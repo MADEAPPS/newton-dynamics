@@ -27,8 +27,8 @@ class ndJointSlider: public ndJointBilateralConstraint
 
 	D_NEWTON_API ndFloat32 GetSpeed() const;
 	D_NEWTON_API ndFloat32 GetPosit() const;
-	D_NEWTON_API ndFloat32 GetOffsetPosit() const;
-	D_NEWTON_API void SetOffsetPosit(ndFloat32 offset);
+	D_NEWTON_API ndFloat32 GetTargetPosit() const;
+	D_NEWTON_API void SetTargetPosit(ndFloat32 offset);
 	D_NEWTON_API bool GetLimitState() const;
 	D_NEWTON_API void SetLimitState(bool state);
 	D_NEWTON_API void SetLimits(ndFloat32 minLimit, ndFloat32 maxLimit);

@@ -87,7 +87,7 @@ ndBodyKinematic* MousePickBody(ndWorld* const world, const ndVector& origin, con
 		paramterOut = rayCaster.m_param;
 		positionOut = rayCaster.m_contact.m_point;
 		normalOut = rayCaster.m_contact.m_normal;
-		return (ndBodyKinematic* )rayCaster.m_contact.m_body0;
+		return ((ndBody*)rayCaster.m_contact.m_body0)->GetAsBodyKinematic();
 	}
 
 	return nullptr;

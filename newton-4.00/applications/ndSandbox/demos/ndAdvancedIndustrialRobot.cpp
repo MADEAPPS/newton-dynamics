@@ -673,8 +673,8 @@ namespace ndAdvancedRobot
 
 			GetModel()->GetAsModelArticulation()->ClearMemory();
 
-			m_leftGripper->SetOffsetPosit(0.0f);
-			m_rightGripper->SetOffsetPosit(0.0f);
+			m_leftGripper->SetTargetPosit(0.0f);
+			m_rightGripper->SetTargetPosit(0.0f);
 
 			m_targetLocation.m_x = ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND);
 			m_targetLocation.m_z = ND_MIN_Z_SPAND + ndRand() * (ND_MAX_Z_SPAND - ND_MIN_Z_SPAND);

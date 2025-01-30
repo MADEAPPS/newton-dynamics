@@ -187,12 +187,12 @@ ndFloat32 ndJointRoller::GetPosit() const
 	return m_posit;
 }
 
-ndFloat32 ndJointRoller::GetOffsetPosit() const
+ndFloat32 ndJointRoller::GetTargetPosit() const
 {
 	return m_offsetPosit;
 }
 
-void ndJointRoller::SetOffsetPosit(ndFloat32 offset)
+void ndJointRoller::SetTargetPosit(ndFloat32 offset)
 {
 	m_offsetPosit = offset;
 }

@@ -385,7 +385,8 @@ ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddTire(const ndMultiBodyVehicl
 	tireFrame.m_front = ndVector(0.0f, 0.0f, 1.0f, 0.0f);
 	tireFrame.m_up = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
 	tireFrame.m_right = ndVector(-1.0f, 0.0f, 0.0f, 0.0f);
-	ndMatrix matrix(tireFrame * m_localFrame * m_chassis->GetMatrix());
+	const ndMatrix chassiMatrix(m_chassis->GetMatrix());
+	ndMatrix matrix(tireFrame * m_localFrame * chassiMatrix);
 	matrix.m_posit = tire->GetMatrix().m_posit;
 	
 	ndBodyDynamic* const tireBody = tire->GetAsBodyDynamic();
@@ -1042,19 +1043,8 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	{
 		ndMultiBodyVehicleTireJoint* const tireJoint = node->GetInfo();
 		ndBodyKinematic* const tireBody = tireJoint->GetBody0()->GetAsBodyDynamic();
-	
-		// draw upper bumper
-		ndMatrix upperBumberMatrix(tireJoint->CalculateUpperBumperMatrix());
-		//context.DrawFrame(tireJoint->CalculateUpperBumperMatrix());
-	
-		ndMatrix tireBaseFrame(tireJoint->CalculateBaseFrame());
-		//context.DrawFrame(tireBaseFrame);
-	
-		// show tire center of mass;
-		ndMatrix tireFrame(tireBody->GetMatrix());
-		//context.DrawFrame(tireFrame);
-		upperBumberMatrix.m_posit = tireFrame.m_posit;
-		//context.DrawFrame(upperBumberMatrix);
+
+		tireJoint->DebugJoint(context);
 	
 		// draw tire forces
 		const ndBodyKinematic::ndContactMap& contactMap = tireBody->GetContactMap();

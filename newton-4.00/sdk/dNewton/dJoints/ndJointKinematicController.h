@@ -32,31 +32,30 @@ class ndJointKinematicController: public ndJointBilateralConstraint
 	D_NEWTON_API ndJointKinematicController(ndBodyKinematic* const referenceBody, ndBodyKinematic* const body, const ndMatrix& attachmentMatrixInGlobalSpace);
 	D_NEWTON_API virtual ~ndJointKinematicController();
 
-	virtual bool IsBilateral() const;
-	void SetControlMode(ndControlModes mode);
-	void SetMaxSpeed(ndFloat32 speedInMetersPerSeconds);
-	void SetMaxOmega(ndFloat32 speedInRadiansPerSeconds);
-	void SetMaxLinearFriction(ndFloat32 force);
-	void SetMaxAngularFriction(ndFloat32 torque);
-	void SetAngularViscousFrictionCoefficient(ndFloat32 coefficient);
+	D_NEWTON_API virtual bool IsBilateral() const;
+	D_NEWTON_API void SetControlMode(ndControlModes mode);
+	D_NEWTON_API void SetMaxSpeed(ndFloat32 speedInMetersPerSeconds);
+	D_NEWTON_API void SetMaxOmega(ndFloat32 speedInRadiansPerSeconds);
+	D_NEWTON_API void SetMaxLinearFriction(ndFloat32 force);
+	D_NEWTON_API void SetMaxAngularFriction(ndFloat32 torque);
+	D_NEWTON_API void SetAngularViscousFrictionCoefficient(ndFloat32 coefficient);
 
-	ndFloat32 GetMaxSpeed() const;
-	ndFloat32 GetMaxOmega() const;
-	ndControlModes GetControlMode() const;
-	ndFloat32 GetMaxLinearFriction() const;
-	ndFloat32 GetMaxAngularFriction() const;
-	ndFloat32 GetAngularViscousFrictionCoefficient() const;
+	D_NEWTON_API ndFloat32 GetMaxSpeed() const;
+	D_NEWTON_API ndFloat32 GetMaxOmega() const;
+	D_NEWTON_API ndControlModes GetControlMode() const;
+	D_NEWTON_API ndFloat32 GetMaxLinearFriction() const;
+	D_NEWTON_API ndFloat32 GetMaxAngularFriction() const;
+	D_NEWTON_API ndFloat32 GetAngularViscousFrictionCoefficient() const;
 
-	ndMatrix GetTargetMatrix() const;
-	void SetTargetPosit(const ndVector& posit);
-	void SetTargetRotation(const ndQuaternion& rotation);
+	D_NEWTON_API void SetTargetPosit(const ndVector& posit);
+	D_NEWTON_API void SetTargetRotation(const ndQuaternion& rotation);
 
+	D_NEWTON_API ndMatrix GetTargetMatrix() const;
 	D_NEWTON_API void SetTargetMatrix(const ndMatrix& matrix);
 
 	protected:
-	void Init(const ndMatrix& matrix);
-
 	D_NEWTON_API void CheckSleep() const;
+	D_NEWTON_API void Init(const ndMatrix& matrix);
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 
 	private:
@@ -69,90 +68,6 @@ class ndJointKinematicController: public ndJointBilateralConstraint
 	bool m_autoSleepState;
 };
 
-inline void ndJointKinematicController::SetControlMode(ndControlModes mode)
-{
-	m_controlMode = mode;
-}
-
-inline void ndJointKinematicController::SetMaxSpeed(ndFloat32 speedInMetersPerSeconds)
-{
-	m_maxSpeed = ndAbs(speedInMetersPerSeconds);
-}
-
-inline void ndJointKinematicController::SetMaxLinearFriction(ndFloat32 frictionForce)
-{
-	m_maxLinearFriction = ndAbs(frictionForce);
-}
-
-inline void ndJointKinematicController::SetMaxAngularFriction(ndFloat32 frictionTorque)
-{
-	m_maxAngularFriction = ndAbs(frictionTorque);
-}
-
-inline void ndJointKinematicController::SetMaxOmega(ndFloat32 speedInRadiansPerSeconds)
-{
-	m_maxOmega = ndAbs(speedInRadiansPerSeconds);
-}
-
-inline void ndJointKinematicController::SetAngularViscousFrictionCoefficient(ndFloat32 coefficient)
-{
-	ndVector mass (GetBody0()->GetMassMatrix());
-	m_angularFrictionCoefficient = ndAbs(coefficient) * ndMax(mass.m_x, ndMax(mass.m_y, mass.m_z));
-}
-
-inline void ndJointKinematicController::SetTargetPosit(const ndVector& posit)
-{
-	ndMatrix matrix(m_localMatrix1);
-	matrix.m_posit = posit;
-	SetTargetMatrix(matrix);
-}
-
-inline void ndJointKinematicController::SetTargetRotation(const ndQuaternion& rotation)
-{
-	ndMatrix matrix(ndCalculateMatrix(rotation, m_localMatrix1.m_posit));
-	SetTargetMatrix(matrix);
-}
-
-inline ndMatrix ndJointKinematicController::GetTargetMatrix() const
-{
-	ndAssert(0);
-	return m_localMatrix0;
-}
-
-inline bool ndJointKinematicController::IsBilateral() const
-{
-	return true;
-}
-
-inline ndFloat32 ndJointKinematicController::GetMaxSpeed() const
-{
-	return m_maxSpeed;
-}
-
-inline ndFloat32 ndJointKinematicController::GetMaxOmega() const
-{
-	return m_maxOmega;
-}
-
-inline ndJointKinematicController::ndControlModes ndJointKinematicController::GetControlMode() const
-{
-	return m_controlMode;
-}
-
-inline ndFloat32 ndJointKinematicController::GetMaxLinearFriction() const
-{
-	return m_maxLinearFriction;
-}
-
-inline ndFloat32 ndJointKinematicController::GetMaxAngularFriction() const
-{
-	return m_maxAngularFriction;
-}
-
-inline ndFloat32 ndJointKinematicController::GetAngularViscousFrictionCoefficient() const
-{
-	return m_angularFrictionCoefficient;
-}
 
 #endif 
 

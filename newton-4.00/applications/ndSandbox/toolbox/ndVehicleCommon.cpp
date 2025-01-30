@@ -402,7 +402,7 @@ ndBodyKinematic* ndVehicleCommonNotify::CreateTireBody(ndDemoEntityManager* cons
 	
 	ndMultiBodyVehicle* const vehicle = (ndMultiBodyVehicle*)GetModel();
 
-	definition.m_radios = radius;
+	//definition.m_radios = radius;
 	ndShapeInstance tireCollision(vehicle->CreateTireShape(radius, width));
 	
 	ndDemoEntity* const tireEntity = parentEntity->Find(tireName);

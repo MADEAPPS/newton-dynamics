@@ -185,12 +185,12 @@ ndFloat32 ndJointCylinder::GetPosit() const
 	return m_posit;
 }
 
-ndFloat32 ndJointCylinder::GetOffsetPosit() const
+ndFloat32 ndJointCylinder::GetTargetPosit() const
 {
 	return m_offsetPosit;
 }
 
-void ndJointCylinder::SetOffsetPosit(ndFloat32 offset)
+void ndJointCylinder::SetTargetPosit(ndFloat32 offset)
 {
 	m_offsetPosit = offset;
 }

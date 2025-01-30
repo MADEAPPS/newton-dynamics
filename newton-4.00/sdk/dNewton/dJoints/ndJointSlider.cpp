@@ -76,12 +76,12 @@ ndFloat32 ndJointSlider::GetPosit() const
 	return m_posit;
 }
 
-ndFloat32 ndJointSlider::GetOffsetPosit() const
+ndFloat32 ndJointSlider::GetTargetPosit() const
 {
 	return m_positOffset;
 }
 
-void ndJointSlider::SetOffsetPosit(ndFloat32 offset)
+void ndJointSlider::SetTargetPosit(ndFloat32 offset)
 {
 	m_positOffset = offset;
 }

@@ -310,8 +310,8 @@ namespace ndSimpleRobot
 				m_z = localPosit.m_z - 0.001f * ndSign(localPosit.m_z);
 			}
 
-			m_leftGripper->SetOffsetPosit(-m_gripperPosit * 0.5f);
-			m_rightGripper->SetOffsetPosit(-m_gripperPosit * 0.5f);
+			m_leftGripper->SetTargetPosit(-m_gripperPosit * 0.5f);
+			m_rightGripper->SetTargetPosit(-m_gripperPosit * 0.5f);
 
 			const ndMatrix targetMatrix(CalculateNextTargetMatrix());
 			m_effector->SetOffsetMatrix(targetMatrix);

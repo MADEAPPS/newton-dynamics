@@ -461,7 +461,7 @@ static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin
 		{
 			m_angle += ndFmod(5.0f * desc.m_timestep, 2.0f * ndPi);
 			ndFloat32 dist = 0.9f * ndSin(m_angle);
-			SetOffsetPosit(dist);
+			SetTargetPosit(dist);
 			ndJointSlider::JacobianDerivative(desc);
 		}
 	

@@ -30,7 +30,6 @@ ndJointWheel::ndJointWheel()
 
 ndJointWheel::ndJointWheel(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& info)
 	:ndJointBilateralConstraint(7, child, parent, pinAndPivotFrame)
-	//,ndJointBilateralConstraint::ndIkInterface()
 	,m_baseFrame(m_localMatrix1)
 	,m_info(info)
 	,m_posit(ndFloat32 (0.0f))
@@ -178,3 +177,26 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 }
 
+
+void ndJointWheel::DebugJoint(ndConstraintDebugCallback& context) const
+{
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	//draw reference frame
+	context.DrawFrame(matrix1);
+
+	// draw upper bumper
+	ndMatrix upperBumberMatrix(CalculateUpperBumperMatrix());
+	ndMatrix tireBaseFrame(CalculateBaseFrame());
+	context.DrawFrame(tireBaseFrame);
+
+	// show tire center of mass;
+	ndBodyKinematic* const tireBody = GetBody0()->GetAsBodyKinematic();
+	ndMatrix tireFrame(tireBody->GetMatrix());
+	context.DrawFrame(tireFrame);
+	upperBumberMatrix.m_posit = tireFrame.m_posit;
+	context.DrawFrame(upperBumberMatrix);
+
+}
