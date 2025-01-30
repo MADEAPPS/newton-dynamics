@@ -55,8 +55,8 @@ class ndVehicleDectriptorLav25: public ndVehicleDectriptor
 		m_frontTire.m_springK = 500.0f;
 		m_frontTire.m_damperC = 50.0f;
 		m_frontTire.m_regularizer = 0.2f;
-		m_frontTire.m_upperStop = -0.05f;
-		m_frontTire.m_lowerStop = 0.4f;
+		m_frontTire.m_lowerStop = -0.05f;
+		m_frontTire.m_upperStop = 0.4f;
 		m_frontTire.m_verticalOffset = -0.1f;
 		m_frontTire.m_brakeTorque = 1000.0f;
 		m_frontTire.m_laterialStiffness = 20.0f * DEMO_GRAVITY;
@@ -67,8 +67,8 @@ class ndVehicleDectriptorLav25: public ndVehicleDectriptor
 		m_rearTire.m_springK = 500.0f;
 		m_rearTire.m_damperC = 50.0f;
 		m_rearTire.m_regularizer = 0.2f;
-		m_rearTire.m_upperStop = -0.05f;
-		m_rearTire.m_lowerStop = 0.4f;
+		m_rearTire.m_lowerStop = -0.05f;
+		m_rearTire.m_upperStop = 0.4f;
 		m_rearTire.m_verticalOffset = -0.1f;
 		m_rearTire.m_brakeTorque = 2500.0f;
 		m_rearTire.m_laterialStiffness = 20.0f * DEMO_GRAVITY;
@@ -116,8 +116,8 @@ class ndVehicleDectriptorTractor : public ndVehicleDectriptor
 		m_frontTire.m_springK = 1000.0f;
 		m_frontTire.m_damperC = 25.0f;
 		m_frontTire.m_regularizer = 0.01f;
-		m_frontTire.m_upperStop = -0.05f;
-		m_frontTire.m_lowerStop = 0.4f;
+		m_frontTire.m_lowerStop = -0.05f;
+		m_frontTire.m_upperStop = 0.4f;
 		m_frontTire.m_verticalOffset = -0.1f;
 		m_frontTire.m_brakeTorque = 1000.0f;
 		m_frontTire.m_laterialStiffness = 20.0f * DEMO_GRAVITY;
@@ -128,8 +128,8 @@ class ndVehicleDectriptorTractor : public ndVehicleDectriptor
 		m_rearTire.m_springK = 1000.0f;
 		m_rearTire.m_damperC = 25.0f;
 		m_rearTire.m_regularizer = 0.01f;
-		m_rearTire.m_upperStop = -0.05f;
-		m_rearTire.m_lowerStop = 0.4f;
+		m_rearTire.m_lowerStop = -0.05f;
+		m_rearTire.m_upperStop = 0.4f;
 		m_rearTire.m_verticalOffset = -0.1f;
 		m_rearTire.m_brakeTorque = 2500.0f;
 		m_rearTire.m_laterialStiffness = 20.0f * DEMO_GRAVITY;
@@ -174,8 +174,8 @@ class ndVehicleDectriptorBigRig : public ndVehicleDectriptor
 		m_frontTire.m_springK = 500.0f;
 		m_frontTire.m_damperC = 50.0f;
 		m_frontTire.m_regularizer = 0.2f;
-		m_frontTire.m_upperStop = -0.05f;
-		m_frontTire.m_lowerStop = 0.4f;
+		m_frontTire.m_lowerStop = -0.05f;
+		m_frontTire.m_upperStop = 0.4f;
 		m_frontTire.m_brakeTorque = 1000.0f;
 		m_frontTire.m_laterialStiffness = 20.0f * DEMO_GRAVITY;
 		m_frontTire.m_longitudinalStiffness = 10.0f * DEMO_GRAVITY;
@@ -186,8 +186,8 @@ class ndVehicleDectriptorBigRig : public ndVehicleDectriptor
 		m_rearTire.m_springK = 500.0f;
 		m_rearTire.m_damperC = 50.0f;
 		m_rearTire.m_regularizer = 0.2f;
-		m_rearTire.m_upperStop = -0.05f;
-		m_rearTire.m_lowerStop = 0.4f;
+		m_rearTire.m_lowerStop = -0.05f;
+		m_rearTire.m_upperStop = 0.4f;
 		m_rearTire.m_brakeTorque = 2500.0f;
 		m_rearTire.m_laterialStiffness = 20.0f * DEMO_GRAVITY;
 		m_rearTire.m_longitudinalStiffness = 10.0f * DEMO_GRAVITY;

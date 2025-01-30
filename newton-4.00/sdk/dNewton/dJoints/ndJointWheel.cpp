@@ -79,7 +79,7 @@ void ndJointWheel::UpdateTireSteeringAngleMatrix()
 
 	CalculateGlobalMatrix(tireMatrix, chassisMatrix);
 	const ndVector localRelPosit(chassisMatrix.UntransformVector(tireMatrix.m_posit));
-	const ndFloat32 distance = ndClamp(localRelPosit.m_y, m_info.m_upperStop, m_info.m_lowerStop);
+	const ndFloat32 distance = ndClamp(localRelPosit.m_y, m_info.m_lowerStop, m_info.m_upperStop);
 
 	const ndFloat32 spinAngle = -CalculateAngle(tireMatrix.m_up, chassisMatrix.m_up, chassisMatrix.m_front);
 	ndMatrix newTireMatrix(ndPitchMatrix(spinAngle) * chassisMatrix);
@@ -97,7 +97,8 @@ ndMatrix ndJointWheel::CalculateBaseFrame() const
 ndMatrix ndJointWheel::CalculateUpperBumperMatrix() const
 {
 	ndMatrix matrix(m_localMatrix1 * m_body1->GetMatrix());
-	matrix.m_posit += matrix.m_up.Scale(m_info.m_lowerStop);
+	//matrix.m_posit += matrix.m_up.Scale(m_info.m_lowerStop);
+	matrix.m_posit += matrix.m_up.Scale(m_info.m_upperStop);
 	return matrix;
 }
 
@@ -161,14 +162,16 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 
 	// add suspension limits alone the vertical axis 
 	const ndFloat32 x = m_posit + m_speed * desc.m_timestep;
-	if (x < m_info.m_upperStop)
+	//if (x < m_info.m_upperStop)
+	if (x >= m_info.m_upperStop)
 	{
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
 		const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 		SetMotorAcceleration(desc, stopAccel);
 		SetLowerFriction(desc, ndFloat32(0.0f));
 	}
-	else if (x > m_info.m_lowerStop)
+	//else if (x > m_info.m_lowerStop)
+	else if (x <= m_info.m_lowerStop)
 	{
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
 		const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);

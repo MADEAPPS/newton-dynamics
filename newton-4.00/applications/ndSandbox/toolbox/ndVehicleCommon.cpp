@@ -166,8 +166,8 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_frontTire.m_springK = 1000.0f;
 	m_frontTire.m_damperC = 20.0f;
 	m_frontTire.m_regularizer = 0.1f;
-	m_frontTire.m_upperStop = -0.05f;
-	m_frontTire.m_lowerStop = 0.2f;
+	m_frontTire.m_lowerStop = -0.05f;
+	m_frontTire.m_upperStop = 0.2f;
 	m_frontTire.m_verticalOffset = 0.0f;
 	m_frontTire.m_brakeTorque = 1500.0f;
 	m_frontTire.m_handBrakeTorque = 1500.0f;
@@ -177,8 +177,8 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_rearTire.m_springK = 1000.0f;
 	m_rearTire.m_damperC = 20.0f;
 	m_rearTire.m_regularizer = 0.1f;
-	m_rearTire.m_upperStop = -0.05f;
-	m_rearTire.m_lowerStop = 0.2f;
+	m_rearTire.m_lowerStop = -0.05f;
+	m_rearTire.m_upperStop = 0.2f;
 	m_rearTire.m_steeringAngle = 0.0f;
 	m_rearTire.m_verticalOffset = 0.0f;
 	m_rearTire.m_brakeTorque = 1500.0f;

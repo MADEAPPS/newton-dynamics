@@ -86,8 +86,8 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_frontTire.m_springK = 800.0f;
 		m_frontTire.m_damperC = 50.0f;
 		m_frontTire.m_regularizer = 0.3f;
-		m_frontTire.m_upperStop = -0.05f;
-		m_frontTire.m_lowerStop = 0.4f;
+		m_frontTire.m_lowerStop = -0.05f;
+		m_frontTire.m_upperStop = 0.4f;
 		m_frontTire.m_brakeTorque = 1500.0f;
 		m_frontTire.m_handBrakeTorque = 0.0f;
 
@@ -97,8 +97,8 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_rearTire.m_springK = 800.0f;
 		m_rearTire.m_damperC = 50.0f;
 		m_rearTire.m_regularizer = 0.3f;
-		m_rearTire.m_upperStop = -0.05f;
-		m_rearTire.m_lowerStop = 0.4f;
+		m_rearTire.m_lowerStop = -0.05f;
+		m_rearTire.m_upperStop = 0.4f;
 		m_rearTire.m_brakeTorque = 3000.0f;
 		m_rearTire.m_handBrakeTorque = 100000.0f;
 		m_torsionBarType = m_fourWheelAxle;
@@ -137,8 +137,8 @@ class ndVehicleDectriptorMonsterTruck0: public ndVehicleDectriptor
 		m_frontTire.m_springK = 500.0f;
 		m_frontTire.m_damperC = 50.0f;
 		m_frontTire.m_regularizer = 0.2f;
-		m_frontTire.m_upperStop = -0.05f;
-		m_frontTire.m_lowerStop = 0.4f;
+		m_frontTire.m_lowerStop = -0.05f;
+		m_frontTire.m_upperStop = 0.4f;
 		m_frontTire.m_brakeTorque = 1000.0f;
 		m_frontTire.m_handBrakeTorque = 0.0f;
 
@@ -148,8 +148,8 @@ class ndVehicleDectriptorMonsterTruck0: public ndVehicleDectriptor
 		m_rearTire.m_springK = 500.0f;
 		m_rearTire.m_damperC = 50.0f;
 		m_rearTire.m_regularizer = 0.2f;
-		m_rearTire.m_upperStop = -0.05f;
-		m_rearTire.m_lowerStop = 0.4f;
+		m_rearTire.m_lowerStop = -0.05f;
+		m_rearTire.m_upperStop = 0.4f;
 		m_rearTire.m_brakeTorque = 5000.0f;
 		m_rearTire.m_handBrakeTorque = 1000000.0f;
 		m_torsionBarType = m_fourWheelAxle;
@@ -196,8 +196,8 @@ class ndVehicleDectriptorMonsterTruck1 : public ndVehicleDectriptor
 		m_frontTire.m_springK = 500.0f;
 		m_frontTire.m_damperC = 50.0f;
 		m_frontTire.m_regularizer = 0.2f;
-		m_frontTire.m_upperStop = -0.05f;
-		m_frontTire.m_lowerStop = 0.4f;
+		m_frontTire.m_lowerStop = -0.05f;
+		m_frontTire.m_upperStop = 0.4f;
 		m_frontTire.m_brakeTorque = 10000.0f;
 		m_frontTire.m_handBrakeTorque = 0.0f;
 
@@ -207,8 +207,8 @@ class ndVehicleDectriptorMonsterTruck1 : public ndVehicleDectriptor
 		m_rearTire.m_springK = 500.0f;
 		m_rearTire.m_damperC = 50.0f;
 		m_rearTire.m_regularizer = 0.2f;
-		m_rearTire.m_upperStop = -0.05f;
-		m_rearTire.m_lowerStop = 0.4f;
+		m_rearTire.m_lowerStop = -0.05f;
+		m_rearTire.m_upperStop = 0.4f;
 		m_rearTire.m_brakeTorque = 10000.0f;
 		m_rearTire.m_handBrakeTorque = 50000.0f;
 		m_torsionBarType = m_fourWheelAxle;
