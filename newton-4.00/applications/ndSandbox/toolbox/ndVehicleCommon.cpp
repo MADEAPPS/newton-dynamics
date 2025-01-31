@@ -579,7 +579,6 @@ void ndVehicleCommonNotify::ApplyInputs(ndWorld* const world, ndFloat32)
 
 		ndFloat32 steerAngle = axis[m_steeringWheel];
 		ndFloat32 handBrake = buttons[m_handBreakButton] ? 1.0f : 0.0f;
-		//const ndList<ndMultiBodyVehicleTireJoint*>& tireList = vehicle->GetTireList();
 		for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = vehicle->GetTireList().GetFirst(); node; node = node->GetNext())
 		{
 			ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
@@ -617,7 +616,6 @@ void ndVehicleCommonNotify::ApplyInputs(ndWorld* const world, ndFloat32)
 
 void ndVehicleCommonNotify::Update(ndWorld* const world, ndFloat32 timestep)
 {
-	ndModelNotify::Update(world, timestep);
 	ndMultiBodyVehicle* const vehicle = (ndMultiBodyVehicle*)GetModel();
 	m_sleepingState = true;
 	if (vehicle && !vehicle->IsSleeping())
@@ -626,6 +624,7 @@ void ndVehicleCommonNotify::Update(ndWorld* const world, ndFloat32 timestep)
 		ApplyInputs(world, timestep);
 		vehicle->Update(world, timestep);
 	}
+	ndModelNotify::Update(world, timestep);
 }
 
 void ndVehicleCommonNotify::PostUpdate(ndWorld* const world, ndFloat32 timestep)

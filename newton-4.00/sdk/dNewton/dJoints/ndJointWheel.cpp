@@ -22,6 +22,7 @@ ndJointWheel::ndJointWheel()
 	,m_regularizer(m_info.m_regularizer)
 	,m_normalizedBrake(ndFloat32(0.0f))
 	,m_normalidedSteering(ndFloat32(0.0f))
+	,m_normalidedSteering0(ndFloat32(0.0f))
 	,m_normalizedHandBrake(ndFloat32(0.0f))
 	,m_vcdMode(false)
 {
@@ -37,6 +38,7 @@ ndJointWheel::ndJointWheel(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* co
 	,m_regularizer(info.m_regularizer)
 	,m_normalizedBrake(ndFloat32(0.0f))
 	,m_normalidedSteering(ndFloat32(0.0f))
+	,m_normalidedSteering0(ndFloat32(0.0f))
 	,m_normalizedHandBrake(ndFloat32(0.0f))
 	,m_vcdMode(false)
 {
@@ -209,7 +211,6 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 
 	// add suspension limits alone the vertical axis 
 	const ndFloat32 x = m_posit + m_speed * desc.m_timestep;
-	//if (x < m_info.m_upperStop)
 	if (x >= m_info.m_upperStop)
 	{
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
@@ -217,7 +218,6 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 		SetMotorAcceleration(desc, stopAccel);
 		SetLowerFriction(desc, ndFloat32(0.0f));
 	}
-	//else if (x > m_info.m_lowerStop)
 	else if (x <= m_info.m_lowerStop)
 	{
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);

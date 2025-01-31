@@ -81,6 +81,7 @@ class ndJointWheel : public ndJointBilateralConstraint
 	ndFloat32 m_regularizer;
 	ndFloat32 m_normalizedBrake;
 	ndFloat32 m_normalidedSteering;
+	ndFloat32 m_normalidedSteering0;
 	ndFloat32 m_normalizedHandBrake;
 	bool m_vcdMode;
 	friend class ndMultiBodyVehicle;

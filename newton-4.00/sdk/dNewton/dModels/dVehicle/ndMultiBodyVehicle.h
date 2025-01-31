@@ -110,11 +110,13 @@ class ndMultiBodyVehicle : public ndModelArticulation
 
 #endif
 	private:
+	void ApplyVehicleDynamicControl();
 	void ApplyAlignmentAndBalancing();
 	void ApplyTireModel(ndWorld* const world, ndFloat32 timestep);
 	void ApplyAerodynamics(ndWorld* const world, ndFloat32 timestep);
 	ndBodyKinematic* CreateInternalBodyPart(ndFloat32 mass, ndFloat32 radius) const;
 	void ApplyTireModel(ndFloat32 timestep, ndFixSizeArray<ndTireContactPair, 128>& tireContacts);
+	
 	//void ApplyVehicleDynamicControl(ndFloat32 timestep, ndFixSizeArray<ndTireContactPair, 128>& tireContacts);
 	void CalculateNormalizedAlgniningTorque(ndMultiBodyVehicleTireJoint* const tire, ndFloat32 sideSlipTangent) const;
 	void BrushTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const;
