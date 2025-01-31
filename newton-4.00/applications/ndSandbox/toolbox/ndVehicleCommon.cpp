@@ -583,9 +583,9 @@ void ndVehicleCommonNotify::ApplyInputs(ndWorld* const world, ndFloat32)
 		for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = vehicle->GetTireList().GetFirst(); node; node = node->GetNext())
 		{
 			ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
-			tire->SetBrake(brake);
+			tire->SetBreak(brake);
 			tire->SetSteering(steerAngle);
-			tire->SetHandBrake(handBrake);
+			tire->SetHandBreak(handBrake);
 		}
 		
 		// set the transmission Torque converter when the power reverses.

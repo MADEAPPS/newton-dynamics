@@ -51,8 +51,14 @@ class ndJointWheel : public ndJointBilateralConstraint
 	D_NEWTON_API ndJointWheel(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& desc);
 	D_NEWTON_API virtual ~ndJointWheel();
 
-	D_NEWTON_API void SetBrake(ndFloat32 normalizedTorque);
-	D_NEWTON_API void SetHandBrake(ndFloat32 normalizedTorque);
+	D_NEWTON_API ndFloat32 GetPosit() const;
+	D_NEWTON_API ndFloat32 SetSpeed() const;
+	D_NEWTON_API ndFloat32 GetBreak() const;
+	D_NEWTON_API ndFloat32 GetSteering() const;
+	D_NEWTON_API ndFloat32 GetHandBreak() const;
+
+	D_NEWTON_API void SetBreak(ndFloat32 normalizedTorque);
+	D_NEWTON_API void SetHandBreak(ndFloat32 normalizedTorque);
 	D_NEWTON_API void SetSteering(ndFloat32 normalidedSteering);
 	
 	D_NEWTON_API void UpdateTireSteeringAngleMatrix();

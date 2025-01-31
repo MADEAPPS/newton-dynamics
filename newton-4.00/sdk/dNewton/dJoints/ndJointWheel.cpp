@@ -56,12 +56,37 @@ void ndJointWheel::SetInfo(const ndWheelDescriptor& info)
 	m_info = info;
 }
 
-void ndJointWheel::SetBrake(ndFloat32 normalizedBrake)
+ndFloat32 ndJointWheel::GetPosit() const
+{
+	return m_posit;
+}
+
+ndFloat32 ndJointWheel::SetSpeed() const
+{
+	return m_speed;
+}
+
+ndFloat32 ndJointWheel::GetBreak() const
+{
+	return m_normalizedBrake;
+}
+
+ndFloat32 ndJointWheel::GetSteering() const
+{
+	return m_normalidedSteering;
+}
+
+ndFloat32 ndJointWheel::GetHandBreak() const
+{
+	return m_normalizedHandBrake;
+}
+
+void ndJointWheel::SetBreak(ndFloat32 normalizedBrake)
 {
 	m_normalizedBrake = ndClamp (normalizedBrake, ndFloat32 (0.0f), ndFloat32 (1.0f));
 }
 
-void ndJointWheel::SetHandBrake(ndFloat32 normalizedBrake)
+void ndJointWheel::SetHandBreak(ndFloat32 normalizedBrake)
 {
 	m_normalizedHandBrake = ndClamp(normalizedBrake, ndFloat32(0.0f), ndFloat32(1.0f));
 }
@@ -100,6 +125,28 @@ ndMatrix ndJointWheel::CalculateUpperBumperMatrix() const
 	//matrix.m_posit += matrix.m_up.Scale(m_info.m_lowerStop);
 	matrix.m_posit += matrix.m_up.Scale(m_info.m_upperStop);
 	return matrix;
+}
+
+void ndJointWheel::DebugJoint(ndConstraintDebugCallback& context) const
+{
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	//draw reference frame
+	context.DrawFrame(matrix1);
+
+	// draw upper bumper
+	ndMatrix upperBumberMatrix(CalculateUpperBumperMatrix());
+	ndMatrix tireBaseFrame(CalculateBaseFrame());
+	context.DrawFrame(tireBaseFrame);
+
+	// show tire center of mass;
+	ndBodyKinematic* const tireBody = GetBody0()->GetAsBodyKinematic();
+	ndMatrix tireFrame(tireBody->GetMatrix());
+	context.DrawFrame(tireFrame);
+	upperBumberMatrix.m_posit = tireFrame.m_posit;
+	context.DrawFrame(upperBumberMatrix);
 }
 
 void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
@@ -180,26 +227,3 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 }
 
-
-void ndJointWheel::DebugJoint(ndConstraintDebugCallback& context) const
-{
-	ndMatrix matrix0;
-	ndMatrix matrix1;
-	CalculateGlobalMatrix(matrix0, matrix1);
-
-	//draw reference frame
-	context.DrawFrame(matrix1);
-
-	// draw upper bumper
-	ndMatrix upperBumberMatrix(CalculateUpperBumperMatrix());
-	ndMatrix tireBaseFrame(CalculateBaseFrame());
-	context.DrawFrame(tireBaseFrame);
-
-	// show tire center of mass;
-	ndBodyKinematic* const tireBody = GetBody0()->GetAsBodyKinematic();
-	ndMatrix tireFrame(tireBody->GetMatrix());
-	context.DrawFrame(tireFrame);
-	upperBumberMatrix.m_posit = tireFrame.m_posit;
-	context.DrawFrame(upperBumberMatrix);
-
-}
