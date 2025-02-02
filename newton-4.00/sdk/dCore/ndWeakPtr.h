@@ -31,7 +31,7 @@ ndWeakPtr<T>::ndWeakPtr()
 	:ndSharedPtr<T>()
 {
 	ndAssert(0);
-	ndAssert(m_references);
+	ndAssert(ndSharedPtr<T>::m_references);
 }
 
 template <typename T>
