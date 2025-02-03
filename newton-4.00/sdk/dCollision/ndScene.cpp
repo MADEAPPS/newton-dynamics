@@ -76,6 +76,7 @@ ndScene::ndScene()
 	{
 		m_partialNewPairs[i].Resize(256);
 	}
+	ndAssert(ndMemory::CheckMemory(this));
 }
 
 ndScene::ndScene(const ndScene& src)
@@ -147,10 +148,12 @@ ndScene::ndScene(const ndScene& src)
 	{
 		m_partialNewPairs[i].Resize(256);
 	}
+	ndAssert(ndMemory::CheckMemory(this));
 }
 
 ndScene::~ndScene()
 {
+	ndAssert(ndMemory::CheckMemory(this));
 	Cleanup();
 	Finish();
 	if (m_contactNotifyCallback)
@@ -1293,7 +1296,7 @@ void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1
 		const ndJointBilateralConstraint* const bilateral = FindBilateralJoint(body0, body1);
 		const bool isCollidable = bilateral ? bilateral->IsCollidable() : true;
 		if (isCollidable)
-		{	
+		{
 			bool selfSkelCollidable = body0->GetSeletonSelfCollision() && body1->GetSeletonSelfCollision();
 			if (!selfSkelCollidable)
 			{

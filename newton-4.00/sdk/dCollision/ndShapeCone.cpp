@@ -32,10 +32,12 @@ ndShapeCone::ndShapeCone(ndFloat32 radius, ndFloat32 height)
 	:ndShapeConvex(m_cone)
 {
 	Init(radius, height);
+	ndAssert(ndMemory::CheckMemory(this));
 }
 
 ndShapeCone::~ndShapeCone()
 {
+	ndAssert(ndMemory::CheckMemory(this));
 	m_shapeRefCount--;
 	ndAssert(m_shapeRefCount >= 0);
 	ndShapeConvex::m_vertex = nullptr;

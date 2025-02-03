@@ -32,6 +32,7 @@ ndShapeCylinder::ndShapeCylinder(ndFloat32 radius0, ndFloat32 radius1, ndFloat32
 	:ndShapeConvex(m_cylinder)
 {
 	Init(radius0, radius1, height);
+	ndAssert(ndMemory::CheckMemory(this));
 }
 
 ndShapeCylinder::~ndShapeCylinder()
@@ -40,6 +41,7 @@ ndShapeCylinder::~ndShapeCylinder()
 	ndAssert(m_shapeRefCount >= 0);
 	ndShapeConvex::m_vertex = nullptr;
 	ndShapeConvex::m_simplex = nullptr;
+	ndAssert(ndMemory::CheckMemory(this));
 }
 
 void ndShapeCylinder::Init(ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height)

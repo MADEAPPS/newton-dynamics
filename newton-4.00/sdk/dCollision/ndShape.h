@@ -271,13 +271,15 @@ class ndShape: public ndContainersFreeListAlloc<ndShape>
 	D_COLLISION_API ndShape(ndShapeID id);
 	D_COLLISION_API ndShape (const ndShape& source);
 
+	mutable ndAtomic<ndInt32> m_refCount;
+	ndShapeID m_collisionId;
+
 	ndVector m_inertia;	
 	ndVector m_crossInertia;	
 	ndVector m_centerOfMass;
 	ndVector m_boxSize;
 	ndVector m_boxOrigin;
-	mutable ndAtomic<ndInt32> m_refCount;
-	ndShapeID m_collisionId;
+	ndBigVector m_menLayoutPadding; // moronic unreal uses 16 alignment and the subclasses are off.
 	static ndVector m_flushZero;
 } D_GCC_NEWTON_ALIGN_32;
 

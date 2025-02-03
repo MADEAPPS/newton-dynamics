@@ -29,6 +29,7 @@ class ndBodyKinematic;
 
 #define D_COMPOUND_STACK_DEPTH	256
 
+D_MSV_NEWTON_ALIGN_32
 class ndShapeCompound: public ndShape
 {
 	public:
@@ -100,7 +101,6 @@ class ndShapeCompound: public ndShape
 	ndFloat32 m_boxMinRadius;
 	ndFloat32 m_boxMaxRadius;
 	ndNodeBase* m_root;
-	//const ndShapeInstance* m_ownerInstance;
 	ndInt32 m_idIndex;
 
 	friend class ndBodyKinematic;
@@ -140,8 +140,7 @@ class ndShapeCompound::ndNodeBase: public ndClassAlloc
 	friend class ndContactSolver;
 	friend class ndShapeCompound;
 	friend class ndStackBvhStackEntry;
-};
-
+} D_GCC_NEWTON_ALIGN_32;
 
 #endif 
 

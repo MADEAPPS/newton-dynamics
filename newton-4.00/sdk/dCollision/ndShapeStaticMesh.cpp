@@ -29,10 +29,12 @@
 ndShapeStaticMesh::ndShapeStaticMesh(ndShapeID id)
 	:ndShape(id)
 {
+	ndAssert(ndMemory::CheckMemory(this));
 }
 
 ndShapeStaticMesh::~ndShapeStaticMesh()
 {
+	ndAssert(ndMemory::CheckMemory(this));
 }
 
 ndFloat32 ndShapeStaticMesh::GetVolume() const

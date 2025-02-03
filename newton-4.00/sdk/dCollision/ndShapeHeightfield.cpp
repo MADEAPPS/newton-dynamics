@@ -41,8 +41,6 @@ ndShapeHeightfield::ndShapeHeightfield(
 	ndInt32 width, ndInt32 height, ndGridConstruction constructionMode,
 	ndFloat32 horizontalScale_x, ndFloat32 horizontalScale_z)
 	:ndShapeStaticMesh(m_heightField)
-	,m_minBox(ndVector::m_zero)
-	,m_maxBox(ndVector::m_zero)
 	,m_attributeMap(width * height)
 	,m_elevationMap(width * height)
 	,m_horizontalScale_x(horizontalScale_x)
@@ -52,20 +50,29 @@ ndShapeHeightfield::ndShapeHeightfield(
 	,m_width(width)
 	,m_height(height)
 	,m_diagonalMode(constructionMode)
+	,m_minBox(ndVector::m_zero)
+	,m_maxBox(ndVector::m_zero)
 {
 	ndAssert(width >= 2);
 	ndAssert(height >= 2);
 	m_attributeMap.SetCount(width * height);
 	m_elevationMap.SetCount(width * height);
 
+	int xxxx0 = sizeof(ndShape);
+	int xxxx1 = sizeof(ndShapeStaticMesh);
+	int xxxx2 = sizeof(ndShapeHeightfield);
+
 	ndMemSet(&m_attributeMap[0], ndInt8(0), m_attributeMap.GetCount());
 	ndMemSet(&m_elevationMap[0], ndReal(0.0f), m_elevationMap.GetCount());
 
 	CalculateLocalObb();
+
+	ndAssert(ndMemory::CheckMemory(this));
 }
 
 ndShapeHeightfield::~ndShapeHeightfield(void)
 {
+	ndAssert(ndMemory::CheckMemory(this));
 }
 
 ndShapeInfo ndShapeHeightfield::GetShapeInfo() const

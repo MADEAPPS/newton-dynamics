@@ -1296,7 +1296,7 @@ void ndBvhSceneManager::BuildBvhGenerateLayerGrids(ndThreadPool& threadPool)
 							ndAssert(root->m_depthLevel == 0);
 							class StackLevel
 							{
-								public:
+							public:
 								ndBvhInternalNode* m_node;
 								ndInt32 m_depthLevel;
 							};

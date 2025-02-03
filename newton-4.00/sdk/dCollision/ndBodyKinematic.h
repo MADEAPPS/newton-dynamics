@@ -194,16 +194,6 @@ class ndBodyKinematic : public ndBody
 	D_COLLISION_API virtual void SetAcceleration(const ndVector& accel, const ndVector& alpha);
 	D_COLLISION_API virtual void EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeAccel2);
 
-	ndMatrix m_inertiaPrincipalAxis;
-	ndMatrix m_invWorldInertiaMatrix;
-	ndShapeInstance m_shapeInstance;
-	ndVector m_mass;
-	ndVector m_invMass;
-	ndVector m_accel;
-	ndVector m_alpha;
-	ndVector m_gyroAlpha;
-	ndVector m_gyroTorque;
-	ndQuaternion m_gyroRotation;
 	ndJointList m_jointList;
 	ndContactMap m_contactList;
 	mutable ndSpinLock m_lock;
@@ -222,6 +212,17 @@ class ndBodyKinematic : public ndBody
 	ndInt32 m_sceneNodeIndex;
 	ndInt32 m_buildBodyNodeIndex;
 	ndInt32 m_buildSceneNodeIndex;
+
+	ndMatrix m_inertiaPrincipalAxis;
+	ndMatrix m_invWorldInertiaMatrix;
+	ndShapeInstance m_shapeInstance;
+	ndVector m_mass;
+	ndVector m_invMass;
+	ndVector m_accel;
+	ndVector m_alpha;
+	ndVector m_gyroAlpha;
+	ndVector m_gyroTorque;
+	ndQuaternion m_gyroRotation;
 
 	D_COLLISION_API static ndVector m_velocTol;
 

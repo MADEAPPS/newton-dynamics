@@ -269,6 +269,8 @@ class ndAabbPolygonSoup: public ndPolygonSoupDatabase
 	ndInt32* m_indices;
 	ndInt32 m_nodesCount;
 	ndInt32 m_indexCount;
+
+	ndBigVector m_menLayoutPadding; // moronic unreal uses 16 alignment and the subclasses are off.
 	friend class ndContactSolver;
 };
 

@@ -59,6 +59,7 @@ ndShapeStatic_bvh::ndShapeStatic_bvh()
 	,ndAabbPolygonSoup()
 	,m_trianglesCount(0)
 {
+	ndAssert(ndMemory::CheckMemory(this));
 }
 
 ndShapeStatic_bvh::ndShapeStatic_bvh(const ndPolygonSoupBuilder& builder)
@@ -84,10 +85,13 @@ ndShapeStatic_bvh::ndShapeStatic_bvh(const ndPolygonSoupBuilder& builder)
 	ndFastAabb box(ndGetIdentityMatrix(), ndVector(ndFloat32(1.0e15f)));
 	ForAllSectors(box, zero, ndFloat32(1.0f), GetTriangleCount, &data);
 	m_trianglesCount = data.m_triangleCount;
+
+	ndAssert(ndMemory::CheckMemory(this));
 }
 
 ndShapeStatic_bvh::~ndShapeStatic_bvh(void)
 {
+	ndAssert(ndMemory::CheckMemory(this));
 }
 
 void* ndShapeStatic_bvh::operator new (size_t size)

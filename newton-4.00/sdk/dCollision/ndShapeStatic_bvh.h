@@ -25,6 +25,7 @@
 #include "ndCollisionStdafx.h"
 #include "ndShapeStaticMesh.h"
 
+D_MSV_NEWTON_ALIGN_32
 class ndShapeStatic_bvh: public ndShapeStaticMesh, public ndAabbPolygonSoup
 {
 	public:
@@ -56,8 +57,8 @@ class ndShapeStatic_bvh: public ndShapeStaticMesh, public ndAabbPolygonSoup
 			const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32 hitDistance);
 
 	ndInt32 m_trianglesCount;
-
+	ndBigVector m_menLayoutPadding; // moronic unreal uses 16 alignment and the subclasses are off.
 	friend class ndContactSolver;
-};
+} D_GCC_NEWTON_ALIGN_32;
 
 #endif

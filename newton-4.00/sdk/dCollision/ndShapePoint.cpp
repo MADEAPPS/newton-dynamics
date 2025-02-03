@@ -28,6 +28,7 @@
 ndShapePoint::ndShapePoint()
 	:ndShapeConvex(m_pointCollision)
 {
+	//ndAssert(ndMemory::CheckMemory(this));
 }
 
 ndShapePoint::~ndShapePoint()

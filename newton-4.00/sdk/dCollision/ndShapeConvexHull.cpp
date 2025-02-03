@@ -65,10 +65,12 @@ ndShapeConvexHull::ndShapeConvexHull (ndInt32 count, ndInt32 strideInBytes, ndFl
 	//	ndAssert(m_faceCount > 0);
 	//	Create(count, strideInBytes, vertexArray, tolerance);
 	//}
+	ndAssert(ndMemory::CheckMemory(this));
 }
 
 ndShapeConvexHull::~ndShapeConvexHull()
 {
+	ndAssert(ndMemory::CheckMemory(this));
 	if (m_vertexToEdgeMapping) 
 	{
 		ndMemory::Free(m_vertexToEdgeMapping);

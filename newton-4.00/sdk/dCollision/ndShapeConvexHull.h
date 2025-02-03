@@ -57,11 +57,12 @@ class ndShapeConvexHull : public ndShapeConvex
 	ndVector* m_soa_y;
 	ndVector* m_soa_z;
 	ndVector* m_soa_index;
-
 	const ndConvexSimplexEdge** m_vertexToEdgeMapping;
 	ndInt32 m_faceCount;
 	ndInt32 m_soaVertexCount;
 	ndInt32 m_supportTreeCount;
+
+	ndBigVector m_menLayoutPadding; // moronic unreal uses 16 alignment and the subclasses are off.
 } D_GCC_NEWTON_ALIGN_32;
 
 #endif 

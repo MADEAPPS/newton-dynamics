@@ -78,12 +78,13 @@ class ndShapeConvex: public ndShape
 
 	ndVector* m_vertex;
 	ndConvexSimplexEdge* m_simplex;
-
 	ndFloat32 m_boxMinRadius;
 	ndFloat32 m_boxMaxRadius;
 	ndFloat32 m_simplexVolume;
 	ndUnsigned16 m_edgeCount;
 	ndUnsigned16 m_vertexCount;
+
+	ndBigVector m_menLayoutPadding; // moronic unreal uses 16 alignment and the subclasses are off.
 	friend class ndMeshEffect;
 	friend class ndContactSolver;
 } D_GCC_NEWTON_ALIGN_32 ;

@@ -95,14 +95,6 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	virtual void DetachContact(ndContact* const) {}
 	virtual ndContact* FindContact(const ndBody* const) const { return nullptr; }
 
-	ndMatrix m_matrix;
-	ndVector m_veloc;
-	ndVector m_omega;
-	ndVector m_localCentreOfMass;
-	ndVector m_globalCentreOfMass;
-	ndVector m_minAabb;
-	ndVector m_maxAabb;
-	ndQuaternion m_rotation;
 	ndBodyNotify* m_notifyCallback;
 	ndSpecialList<ndBody>::ndNode* m_deletedNode;
 
@@ -133,6 +125,15 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	ndUnsigned8 m_sceneEquilibrium;
 	ndUnsigned8 m_skeletonSelfCollision;
 	
+	ndMatrix m_matrix;
+	ndQuaternion m_rotation;
+	ndVector m_veloc;
+	ndVector m_omega;
+	ndVector m_localCentreOfMass;
+	ndVector m_globalCentreOfMass;
+	ndVector m_minAabb;
+	ndVector m_maxAabb;
+
 	D_COLLISION_API static ndUnsigned32 m_uniqueIdCount;
 
 	friend class ndWorld;

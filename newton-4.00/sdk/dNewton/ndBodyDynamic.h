@@ -79,6 +79,7 @@ class ndBodyDynamic: public ndBodyKinematic
 	D_NEWTON_API virtual ndJacobian IntegrateForceAndToque(const ndVector& force, const ndVector& torque, const ndVector& timestep) const;
 	D_NEWTON_API virtual void EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeAccel2);
 
+	ndFloat32 m_cachedTimeStep;
 	ndVector m_externalForce;
 	ndVector m_externalTorque;
 	ndVector m_impulseForce;
@@ -88,7 +89,7 @@ class ndBodyDynamic: public ndBodyKinematic
 	ndVector m_dampCoef;
 	ndVector m_cachedDampCoef;
 	ndVector m_sleepAccelTest2;
-	ndFloat32 m_cachedTimeStep;
+
 	static ndVector m_sleepAccelTestScale2;
 
 	friend class ndDynamicsUpdate;

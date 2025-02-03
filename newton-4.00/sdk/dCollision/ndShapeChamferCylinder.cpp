@@ -34,6 +34,7 @@ ndShapeChamferCylinder::ndShapeChamferCylinder(ndFloat32 radius, ndFloat32 heigh
 	:ndShapeConvex(m_chamferCylinder)
 {
 	Init (radius, height);
+	ndAssert(ndMemory::CheckMemory(this));
 }
 
 ndShapeChamferCylinder::~ndShapeChamferCylinder()
@@ -43,6 +44,7 @@ ndShapeChamferCylinder::~ndShapeChamferCylinder()
 
 	ndShapeConvex::m_simplex = nullptr;
 	ndShapeConvex::m_vertex = nullptr;
+	ndAssert(ndMemory::CheckMemory(this));
 }
 
 void ndShapeChamferCylinder::Init (ndFloat32 radius, ndFloat32 height)

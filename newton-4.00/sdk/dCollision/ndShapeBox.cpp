@@ -47,10 +47,12 @@ ndShapeBox::ndShapeBox(ndFloat32 size_x, ndFloat32 size_y, ndFloat32 size_z)
 	:ndShapeConvex(m_box)
 {
 	Init(size_x, size_y, size_z);
+	ndAssert(ndMemory::CheckMemory(this));
 }
 
 ndShapeBox::~ndShapeBox()
 {
+	ndAssert(ndMemory::CheckMemory(this));
 	ndShapeConvex::m_simplex = nullptr;
 	ndShapeConvex::m_vertex = nullptr;
 }

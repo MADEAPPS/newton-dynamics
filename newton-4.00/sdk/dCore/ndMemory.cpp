@@ -21,12 +21,15 @@
 
 #include "ndCoreStdafx.h"
 #include "ndTypes.h"
+#include "ndUtils.h"
 #include "ndMemory.h"
 
 ndAtomic<ndUnsigned64> ndMemory::m_memoryUsed(0);
 
 static ndMemFreeCallback m_freeMemory = free;
 static ndMemAllocCallback m_allocMemory = malloc;
+
+#define ND_CHECK_CORRUPT_MEM 0x0a
 
 class ndMemoryHeader
 {
@@ -40,24 +43,39 @@ class ndMemoryHeader
 
 size_t ndMemory::CalculateBufferSize(size_t size)
 {
+	#if defined (D_MEMORY_SANITY_CHECK) && defined(_DEBUG)
+	size += D_MEMORY_SAFE_GUARD * 2;
+	#endif
 	return size + ndGetBufferPaddingInBytes;
 }
 
 void* ndMemory::Malloc(size_t size)
 {
 	ndIntPtr metToVal;
+	#if defined (D_MEMORY_SANITY_CHECK) && defined(_DEBUG)
+	size += D_MEMORY_SAFE_GUARD * 2;
+	#endif
+
 	size_t bufferSize = size + ndGetBufferPaddingInBytes;
 	metToVal.m_ptr = m_allocMemory(bufferSize);
 	ndUnsigned64 val = ndUnsigned64(metToVal.m_int) + ndGetBufferPaddingInBytes;
 	ndInt64 mask = -ndInt64(D_MEMORY_ALIGMNET);
 	val = val & mask;
-	ndMemoryHeader* const ret = (ndMemoryHeader*)val;
+	ndMemoryHeader* ret = (ndMemoryHeader*)val;
 	ndMemoryHeader* const info = ret - 1;
 	ndAssert((char*)info >= (char*)metToVal.m_ptr);
 	info->m_ptr = metToVal.m_ptr;
 	info->m_bufferSize = ndUnsigned32 (bufferSize);
 	info->m_requestedSize = ndUnsigned32(size);
 	m_memoryUsed.fetch_add(bufferSize);
+
+	#if defined (D_MEMORY_SANITY_CHECK) && defined(_DEBUG)
+	char code = ND_CHECK_CORRUPT_MEM;
+	char* const ptr = (char*)ret;
+	ndMemSet(ptr, code, D_MEMORY_SAFE_GUARD);
+	ndMemSet(ptr + size - D_MEMORY_SAFE_GUARD, code, D_MEMORY_SAFE_GUARD);
+	ret = (ndMemoryHeader*) (ptr + D_MEMORY_SAFE_GUARD);
+	#endif
 	return ret;
 }
 
@@ -65,21 +83,63 @@ void ndMemory::Free(void* const ptr)
 {
 	if (ptr)
 	{
+		#if defined (D_MEMORY_SANITY_CHECK) && defined(_DEBUG)
+		ndAssert(CheckMemory(ptr));
+		const char* const mem = ((char*)ptr) - D_MEMORY_SAFE_GUARD;
+		ndMemoryHeader* const info = ((ndMemoryHeader*)mem) - 1;
+		#else
 		ndMemoryHeader* const info = ((ndMemoryHeader*)ptr) - 1;
+		#endif		
+		
 		m_memoryUsed.fetch_sub(ndUnsigned64(info->m_bufferSize));
 		m_freeMemory(info->m_ptr);
 	}
 }
 
+bool ndMemory::CheckMemory(const void* const ptr)
+{
+#if defined (D_MEMORY_SANITY_CHECK) && defined(_DEBUG)
+	const char* const mem0 = ((char*)ptr) - D_MEMORY_SAFE_GUARD;
+	ndMemoryHeader* const info = ((ndMemoryHeader*)mem0) - 1;
+	const char* const mem1 = mem0 + info->m_requestedSize - D_MEMORY_SAFE_GUARD;
+	
+	for (ndInt32 i = 0; i < D_MEMORY_SAFE_GUARD; ++i)
+	{
+		if (mem0[i] != ND_CHECK_CORRUPT_MEM)
+		{
+			return false;
+		}
+		if (mem1[i] != ND_CHECK_CORRUPT_MEM)
+		{
+			return false;
+		}
+	}
+#endif
+	return true;
+}
+
 size_t ndMemory::GetSize(void* const ptr)
 {
+	#if defined (D_MEMORY_SANITY_CHECK) && defined(_DEBUG)
+	ndAssert(CheckMemory(ptr));
+	const char* const mem = ((char*)ptr) - D_MEMORY_SAFE_GUARD;
+	ndMemoryHeader* const info = ((ndMemoryHeader*)mem) - 1;
+	#else
 	ndMemoryHeader* const info = ((ndMemoryHeader*)ptr) - 1;
+	#endif
+	
 	return info->m_bufferSize;
 }
 
 size_t ndMemory::GetOriginalSize(void* const ptr)
 {
+#if defined (D_MEMORY_SANITY_CHECK) && defined(_DEBUG)
+	ndAssert(CheckMemory(ptr));
+	const char* const mem = ((char*)ptr) - D_MEMORY_SAFE_GUARD;
+	ndMemoryHeader* const info = ((ndMemoryHeader*)mem) - 1;
+#else
 	ndMemoryHeader* const info = ((ndMemoryHeader*)ptr) - 1;
+#endif
 	return info->m_requestedSize;
 }
 

@@ -27,6 +27,11 @@
 #include "ndThreadSyncUtils.h"
 
 #define D_MEMORY_ALIGMNET	32
+
+#ifdef D_MEMORY_SANITY_CHECK
+	#define D_MEMORY_SAFE_GUARD 128
+#endif
+
 typedef void* (*ndMemAllocCallback) (size_t size);
 typedef void (*ndMemFreeCallback) (void* const ptr);
 
@@ -52,6 +57,9 @@ class ndMemory
 
 	/// Return the total memory allocated by the newton engine and tools.
 	D_CORE_API static ndUnsigned64 GetMemoryUsed();
+
+	/// Return true is the pointer isn't curroted. thsi funtion onle work in debug and when D_MEMORY_SANITY_CHECK is defined
+	D_CORE_API static bool CheckMemory(const void* const ptr);
 
 	/// Install low level system memory allocation functions.
 	/// \param ndMemAllocCallback alloc: is a function pointer callback to allocate a memory chunk.

@@ -28,6 +28,7 @@ ndVector ndBodyDynamic::m_sleepAccelTestScale2(ndFloat32 (0.0625f));
 
 ndBodyDynamic::ndBodyDynamic()
 	:ndBodyKinematic()
+	,m_cachedTimeStep(ndFloat32(0.0f))
 	,m_externalForce(ndVector::m_zero)
 	,m_externalTorque(ndVector::m_zero)
 	,m_impulseForce(ndVector::m_zero)
@@ -37,7 +38,6 @@ ndBodyDynamic::ndBodyDynamic()
 	,m_dampCoef(ndVector::m_zero)
 	,m_cachedDampCoef(ndVector::m_one)
 	,m_sleepAccelTest2(D_SOLVER_MAX_ACCEL_ERROR * D_SOLVER_MAX_ACCEL_ERROR)
-	,m_cachedTimeStep(ndFloat32 (0.0f))
 {
 	m_isDynamics = 1;
 }

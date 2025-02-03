@@ -27,25 +27,25 @@ ndVector ndShape::m_flushZero(ndFloat32(1.0e-7f));
 
 ndShape::ndShape(ndShapeID id)
 	:ndContainersFreeListAlloc<ndShape>()
+	,m_refCount(0)
+	,m_collisionId(id)
 	,m_inertia(ndVector::m_zero)
 	,m_crossInertia(ndVector::m_zero)
 	,m_centerOfMass(ndVector::m_zero)
 	,m_boxSize(ndVector::m_zero)
 	,m_boxOrigin(ndVector::m_zero)
-	,m_refCount(0)
-	,m_collisionId(id)
 {
 }
 
 ndShape::ndShape(const ndShape& source)
 	:ndContainersFreeListAlloc<ndShape>()
+	,m_refCount(0)
+	,m_collisionId(source.m_collisionId)
 	,m_inertia(source.m_inertia)
 	,m_crossInertia(source.m_crossInertia)
 	,m_centerOfMass(source.m_centerOfMass)
 	,m_boxSize(source.m_boxSize)
 	,m_boxOrigin(source.m_boxOrigin)
-	,m_refCount(0)
-	,m_collisionId(source.m_collisionId)
 {
 }
 
@@ -62,7 +62,7 @@ ndShapeInfo::ndShapeInfo()
 {
 	for (ndInt32 i = 0; i < sizeof(m_paramArray) / sizeof(m_paramArray[0]); ++i)
 	{
-		m_paramArray[i] = ndFloat32(0);
+		m_paramArray[i] = ndFloat32(0.0f);
 	}
 }
 

@@ -125,19 +125,19 @@
     #endif
 #endif
 
-// uncomment out D_FORCE_PROFILE_PHYSICS to enable profiler frame capture profiler traces
-// alternatively the end application can use a command line option to enable this define
-//#define D_FORCE_PROFILE_PHYSICS
+// uncommemt this line to enable memory corruption checks, (very slow and use lots of memory)
+#define D_MEMORY_SANITY_CHECK
 
-#ifdef D_FORCE_PROFILE_PHYSICS
-	#ifndef D_PROFILER
-		#define D_PROFILER
-	#endif
-#endif
+// uncomment this to inforce double precision 
+//#define D_NEWTON_USE_DOUBLE
 
 // uncomment this for Scalar floating point 
 // alternatively the end application can use a command line option to enable this define
 //#define D_SCALAR_VECTOR_CLASS
+
+// uncomment out D_FORCE_PROFILE_PHYSICS to enable profiler frame capture profiler traces
+// alternatively the end application can use a command line option to enable this define
+//#define D_FORCE_PROFILE_PHYSICS
 
 // uncomment this for Scalar floating point 
 // alternatively the end application can use a command line option to enable this define
@@ -152,6 +152,12 @@
 #ifdef D_USE_FORCE_THREAD_EMULATION
 	#ifndef D_USE_THREAD_EMULATION
 		#define D_USE_THREAD_EMULATION
+	#endif
+#endif
+
+#ifdef D_FORCE_PROFILE_PHYSICS
+	#ifndef D_PROFILER
+		#define D_PROFILER
 	#endif
 #endif
 

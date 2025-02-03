@@ -25,6 +25,7 @@
 #include "ndCollisionStdafx.h"
 #include "ndShapeStaticMesh.h"
 
+D_MSV_NEWTON_ALIGN_32
 class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 {
 	public:
@@ -71,7 +72,7 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 
 	private:
 	friend class ndContactSolver;
-};
+} D_GCC_NEWTON_ALIGN_32;
 
 inline void ndShapeStaticProceduralMesh::GetCollidingFaces(const ndVector&, const ndVector&, ndArray<ndVector>&, ndArray<ndInt32>&, ndArray<ndInt32>&, ndArray<ndInt32>&) const
 {

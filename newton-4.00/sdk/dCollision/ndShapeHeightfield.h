@@ -25,6 +25,7 @@
 #include "ndCollisionStdafx.h"
 #include "ndShapeStaticMesh.h"
 
+D_MSV_NEWTON_ALIGN_32
 class ndShapeHeightfield: public ndShapeStaticMesh
 {
 	public:
@@ -69,12 +70,12 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	D_COLLISION_API void GetLocalAabb(const ndVector& p0, const ndVector& p1, ndVector& boxP0, ndVector& boxP1) const;
 
 	protected:
-	virtual ndShapeInfo GetShapeInfo() const;
-	virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const;
-	virtual ndShapeHeightfield* GetAsShapeHeightfield() { return this; }
-	virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
-	virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
-	virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
+	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
+	D_COLLISION_API virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const;
+	D_COLLISION_API virtual ndShapeHeightfield* GetAsShapeHeightfield() { return this; }
+	D_COLLISION_API virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
+	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+	D_COLLISION_API virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
 
 	private: 
 	void CalculateLocalObb();
@@ -85,8 +86,6 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	ndFloat32 RayCastCell(const ndFastRay& ray, ndInt32 xIndex0, ndInt32 zIndex0, ndVector& normalOut, ndFloat32 maxT) const;
 	void CalculateMinAndMaxElevation(ndInt32 x0, ndInt32 x1, ndInt32 z0, ndInt32 z1, ndFloat32& minHeight, ndFloat32& maxHeight) const;
 
-	ndVector m_minBox;
-	ndVector m_maxBox;
 	ndArray<ndInt8> m_attributeMap;
 	ndArray<ndReal> m_elevationMap;
 	ndFloat32 m_horizontalScale_x;
@@ -97,13 +96,15 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	ndInt32 m_height;
 	ndGridConstruction m_diagonalMode;
 
+	ndVector m_minBox;
+	ndVector m_maxBox;
+
 	static ndVector m_yMask;
 	static ndVector m_padding;
 	static ndVector m_elevationPadding;
 	static ndInt32 m_cellIndices[][4];
 
 	friend class ndContactSolver;
-};
-
+} D_GCC_NEWTON_ALIGN_32;
 
 #endif

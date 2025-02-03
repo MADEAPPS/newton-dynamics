@@ -41,19 +41,11 @@ ndShapeInstance::ndShapeInstance(ndShape* const shape)
 	,m_shape(shape ? shape->AddRef() : shape)
 	,m_ownerBody(nullptr)
 	,m_subCollisionHandle(nullptr)
-	//,m_parent____(nullptr)
 	,m_skinMargin(ndFloat32(0.0f))
 	,m_scaleType(m_unit)
 	,m_collisionMode(true)
 {
-	//if (shape)
-	//{
-	//	ndShapeCompound* const compound = shape->GetAsShapeCompound();
-	//	if (compound)
-	//	{
-	//		compound->SetOwner(this);
-	//	}
-	//}
+	ndAssert(!m_shape || ndMemory::CheckMemory(m_shape));
 }
 
 ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance)
@@ -68,7 +60,6 @@ ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance)
 	,m_shape(instance.m_shape->AddRef())
 	,m_ownerBody(instance.m_ownerBody)
 	,m_subCollisionHandle(instance.m_subCollisionHandle)
-	//,m_parent____(instance.m_parent____)
 	,m_skinMargin(instance.m_skinMargin)
 	,m_scaleType(instance.m_scaleType)
 	,m_collisionMode(instance.m_collisionMode)
@@ -80,6 +71,7 @@ ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance)
 		m_shape = new ndShapeCompound(*compound);
 		m_shape->AddRef();
 	}
+	ndAssert(!m_shape || ndMemory::CheckMemory(m_shape));
 }
 
 ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance, ndShape* const shape)
@@ -94,15 +86,16 @@ ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance, ndShape* const
 	,m_shape(shape->AddRef())
 	,m_ownerBody(instance.m_ownerBody)
 	,m_subCollisionHandle(instance.m_subCollisionHandle)
-	//,m_parent____(instance.m_parent____)
 	,m_skinMargin(instance.m_skinMargin)
 	,m_scaleType(instance.m_scaleType)
 	,m_collisionMode(instance.m_collisionMode)
 {
+	ndAssert(!m_shape || ndMemory::CheckMemory(m_shape));
 }
 
 ndShapeInstance::~ndShapeInstance()
 {
+	ndAssert(!m_shape || ndMemory::CheckMemory(m_shape));
 	if (m_shape)
 	{
 		m_shape->Release();

@@ -32,6 +32,7 @@ ndShapeCapsule::ndShapeCapsule(ndFloat32 radius0, ndFloat32 radius1, ndFloat32 h
 	:ndShapeConvex(m_capsule)
 {
 	Init(radius0, radius1, height);
+	ndAssert(ndMemory::CheckMemory(this));
 }
 
 void ndShapeCapsule::Init(ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height)
@@ -193,6 +194,7 @@ void ndShapeCapsule::Init(ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height)
 		ptr->m_twin = &m_simplex[edge->m_twin->m_userData];
 	}
 	SetVolumeAndCG();
+	ndAssert(ndMemory::CheckMemory(this));
 }
 
 ndShapeInfo ndShapeCapsule::GetShapeInfo() const

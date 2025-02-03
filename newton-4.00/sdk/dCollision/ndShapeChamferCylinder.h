@@ -28,6 +28,7 @@
 #define DG_CHAMFERCYLINDER_BRAKES		  8
 #define DG_MAX_CHAMFERCYLINDER_DIR_COUNT  8
 
+D_MSV_NEWTON_ALIGN_32
 class ndShapeChamferCylinder: public ndShapeConvex
 {
 	public:
@@ -61,7 +62,7 @@ class ndShapeChamferCylinder: public ndShapeConvex
 	static ndConvexSimplexEdge m_edgeArray[];
 	static ndVector m_shapesDirs[];
 	static ndVector m_yzMask;
-};
+} D_GCC_NEWTON_ALIGN_32;
 
 #endif 
 
