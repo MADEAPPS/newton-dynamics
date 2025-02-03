@@ -473,7 +473,7 @@ namespace ndAdvancedRobot
 
 			ndFloat32 dx = m_targetLocation.m_x - localPosit.m_x;
 			ndFloat32 dz = m_targetLocation.m_z - localPosit.m_z;
-			ndFloat32 deltaAzimuth = ndAnglesSub(m_targetLocation.m_azimuth, azimuth);
+			ndFloat32 deltaAzimuth = ndAnglesSub(ndFloat32(m_targetLocation.m_azimuth), azimuth);
 			return ndVector(dx, ndFloat32 (0.0f), dz, deltaAzimuth);
 		}
 
@@ -555,7 +555,7 @@ namespace ndAdvancedRobot
 			}
 			//return angularReward + posit_xReward + posit_zReward + azimuthReward;
 			//return GaussianReward((angleError + 1.0f) * 0.5f);;
-			return reward;
+			return ndReal(reward);
 		}
 
 		#pragma optimize( "", off )
@@ -676,9 +676,9 @@ namespace ndAdvancedRobot
 			m_leftGripper->SetTargetPosit(0.0f);
 			m_rightGripper->SetTargetPosit(0.0f);
 
-			m_targetLocation.m_x = ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND);
-			m_targetLocation.m_z = ND_MIN_Z_SPAND + ndRand() * (ND_MAX_Z_SPAND - ND_MIN_Z_SPAND);
-			m_targetLocation.m_azimuth = (2.0f * ndRand() - 1.0f) * ndPi;
+			m_targetLocation.m_x = ndReal(ND_MIN_X_SPAND + ndRand() * (ND_MAX_X_SPAND - ND_MIN_X_SPAND));
+			m_targetLocation.m_z = ndReal(ND_MIN_Z_SPAND + ndRand() * (ND_MAX_Z_SPAND - ND_MIN_Z_SPAND));
+			m_targetLocation.m_azimuth = ndReal((2.0f * ndRand() - 1.0f) * ndPi);
 
 			m_targetLocation.m_x = ndClamp(m_targetLocation.m_x, ndReal(ND_MIN_X_SPAND + 0.05f), ndReal(ND_MAX_X_SPAND - 0.05f));
 			m_targetLocation.m_z = ndClamp(m_targetLocation.m_z, ndReal(ND_MIN_Z_SPAND + 0.05f), ndReal(ND_MAX_Z_SPAND - 0.05f));
@@ -695,9 +695,9 @@ namespace ndAdvancedRobot
 			//roll = 0.0f * ndDegreeToRad;
 			//pitch = 0.0f * ndDegreeToRad;
 
-			m_targetLocation.m_yaw = yaw;
-			m_targetLocation.m_roll = roll;
-			m_targetLocation.m_pitch = pitch;
+			m_targetLocation.m_yaw = ndReal(yaw);
+			m_targetLocation.m_roll = ndReal(roll);
+			m_targetLocation.m_pitch = ndReal(pitch);
 
 			const ndMatrix effectorMatrix(m_effectorLocalTarget * m_arm_4->GetBody0()->GetMatrix());
 			const ndMatrix baseMatrix(m_effectorLocalBase * m_base_rotator->GetBody1()->GetMatrix());

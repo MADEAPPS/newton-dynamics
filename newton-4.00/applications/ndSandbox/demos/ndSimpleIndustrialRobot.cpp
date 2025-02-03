@@ -304,10 +304,10 @@ namespace ndSimpleRobot
 			if (m_baseLimitJoint->GetJointHitLimits() || m_elbowLimitJoint->GetJointHitLimits())
 			{
 				const ndMatrix currentEffectorMatrix(m_effector->GetEffectorMatrix());
-				m_azimuth = -ndAtan2(currentEffectorMatrix.m_posit.m_y, currentEffectorMatrix.m_posit.m_z);
+				m_azimuth = -ndReal(ndAtan2(currentEffectorMatrix.m_posit.m_y, currentEffectorMatrix.m_posit.m_z));
 				const ndVector localPosit(ndPitchMatrix(-m_azimuth).RotateVector(currentEffectorMatrix.m_posit) - m_effectorReference.m_posit);
-				m_x = localPosit.m_x - 0.001f * ndSign(localPosit.m_x);
-				m_z = localPosit.m_z - 0.001f * ndSign(localPosit.m_z);
+				m_x = ndReal(localPosit.m_x - ndFloat32 (0.001f) * ndSign(localPosit.m_x));
+				m_z = ndReal(localPosit.m_z - ndFloat32 (0.001f) * ndSign(localPosit.m_z));
 			}
 
 			m_leftGripper->SetTargetPosit(-m_gripperPosit * 0.5f);
@@ -417,16 +417,16 @@ namespace ndSimpleRobot
 				ndFloat32 azimuth = -ndAtan2(matrix.m_posit.m_y, matrix.m_posit.m_z);
 				const ndVector localPosit(ndPitchMatrix(-azimuth).RotateVector(matrix.m_posit) - m_robot->m_effectorReference.m_posit);
 				
-				m_robot->m_azimuth = azimuth;
-				m_robot->m_x = localPosit.m_x;
-				m_robot->m_z = localPosit.m_z;
+				m_robot->m_azimuth = ndReal(azimuth);
+				m_robot->m_x = ndReal(localPosit.m_x);
+				m_robot->m_z = ndReal(localPosit.m_z);
 
 				ndVector euler1;
 				ndVector euler(matrix.CalcPitchYawRoll(euler1));
 				
-				m_robot->m_yaw = euler.m_y;
-				m_robot->m_roll = euler.m_z;
-				m_robot->m_pitch = euler.m_x;
+				m_robot->m_yaw = ndReal(euler.m_y);
+				m_robot->m_roll = ndReal(euler.m_z);
+				m_robot->m_pitch = ndReal(euler.m_x);
 			}
 
 			if (change)
