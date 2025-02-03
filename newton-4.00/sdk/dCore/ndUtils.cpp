@@ -385,3 +385,40 @@ ndInt32 ndVertexListToIndexList(ndFloat64* const vertList, ndInt32 strideInBytes
 	ndInt32 count = QuickSortVertices(vertList, stride, compareCount, vertexCount, indexListOut, tolerance);
 	return count;
 }
+
+//ndInt32 ndVertexListToIndexList(ndFloat64* const vertexList, ndInt32 strideInBytes, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, ndFloat64 tolerance)
+//{
+//	//ndInt32 count = ndVertexListToIndexListInternal(vertexList, strideInBytes, compareCount, vertexCount, indexListOut, ndFloat64(tolerance));
+//	return count;
+//}
+
+ndInt32 ndVertexListToIndexList(ndReal* const vertexList, ndInt32 strideInBytes, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, ndFloat64 tolerance)
+{
+	ndInt32 stride = ndInt32(strideInBytes / sizeof(ndReal));
+	ndStack<ndFloat64> pool(vertexCount * stride);
+
+	ndFloat64* const data = &pool[0];
+	for (ndInt32 i = 0; i < vertexCount; ++i)
+	{
+		ndFloat64* const dst = &data[i * stride];
+		const ndReal* const src = &vertexList[i * stride];
+		for (ndInt32 j = 0; j < stride; ++j)
+		{
+			dst[j] = src[j];
+		}
+	}
+
+	//ndInt32 count = ndVertexListToIndexListInternal(data, ndInt32(stride * sizeof(ndFloat64)), compareCount, vertexCount, indexListOut, ndFloat64(tolerance));
+	ndInt32 count = ndVertexListToIndexList(data, ndInt32(stride * sizeof(ndFloat64)), compareCount, vertexCount, indexListOut, ndFloat64(tolerance));
+	for (ndInt32 i = 0; i < count; ++i)
+	{
+		const ndFloat64* const src = &data[i * stride];
+		ndReal* const dst = &vertexList[i * stride];
+		for (ndInt32 j = 0; j < stride; ++j)
+		{
+			dst[j] = ndReal(src[j]);
+		}
+	}
+
+	return count;
+}

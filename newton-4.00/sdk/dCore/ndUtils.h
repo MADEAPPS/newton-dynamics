@@ -215,39 +215,11 @@ D_CORE_API ndUnsigned64 ndGetTimeInMicroseconds();
 D_CORE_API ndFloat64 ndRoundToFloat(ndFloat64 val);
 
 /// removed all duplicate points from an array and place the location in the index array
-D_CORE_API ndInt32 ndVertexListToIndexList(ndFloat64* const vertexList, ndInt32 strideInBytes, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, ndFloat64 tolerance = ndEpsilon);
+D_CORE_API ndInt32 ndVertexListToIndexList(ndReal* const vertexList, ndInt32 strideInBytes, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, ndFloat64 tolerance = ndEpsilon);
 
 /// removed all duplicate points from an array and place the location in the index array
-template <class T>
-ndInt32 ndVertexListToIndexList(T* const vertexList, ndInt32 strideInBytes, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, T tolerance = ndEpsilon)
-{
-	ndInt32 stride = ndInt32(strideInBytes / sizeof(T));
-	ndStack<ndFloat64> pool(vertexCount * stride);
+D_CORE_API ndInt32 ndVertexListToIndexList(ndFloat64* const vertexList, ndInt32 strideInBytes, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, ndFloat64 tolerance = ndEpsilon);
 
-	ndFloat64* const data = &pool[0];
-	for (ndInt32 i = 0; i < vertexCount; ++i)
-	{
-		ndFloat64* const dst = &data[i * stride];
-		const T* const src = &vertexList[i * stride];
-		for (ndInt32 j = 0; j < stride; ++j)
-		{
-			dst[j] = src[j];
-		}
-	}
-
-	ndInt32 count = ndVertexListToIndexList(data, ndInt32(stride * sizeof(ndFloat64)), compareCount, vertexCount, indexListOut, ndFloat64(tolerance));
-	for (ndInt32 i = 0; i < count; ++i)
-	{
-		const ndFloat64* const src = &data[i * stride];
-		T* const dst = &vertexList[i * stride];
-		for (ndInt32 j = 0; j < stride; ++j)
-		{
-			dst[j] = T(src[j]);
-		}
-	}
-
-	return count;
-}
 
 /// Simple moving average class, useful for stuff like frame rate smoothing
 template <ndInt32 size>

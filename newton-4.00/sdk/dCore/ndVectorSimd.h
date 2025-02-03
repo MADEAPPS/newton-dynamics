@@ -22,545 +22,9 @@
 #ifndef __ND_VECTOR_X86_SIMD_H__
 #define __ND_VECTOR_X86_SIMD_H__
 
-#ifndef D_SCALAR_VECTOR_CLASS
+#include "ndTypes.h"
 
-#ifdef D_NEWTON_USE_DOUBLE
-	#define ndVector ndBigVector
-#else
-
-class ndBigVector;
-// *****************************************************************************************
-//
-// 4 x 1 single precision SSE vector class declaration
-//
-// *****************************************************************************************
-D_MSV_NEWTON_ALIGN_16
-class ndVector
-{
-	#define PERMUTE_MASK(w, z, y, x) _MM_SHUFFLE (w, z, y, x)
-	public:
-	D_OPERATOR_NEW_AND_DELETE
-
-	inline ndVector() 
-	{
-	}
-
-	inline ndVector(const __m128i type)
-		:m_typeInt (type)
-	{
-	}
-
-	inline ndVector(const __m128 type)
-		:m_type(type)
-	{
-	}
-
-	inline ndVector (const ndFloat32 a)
-		:m_type(_mm_set1_ps( a))
-	{
-	}
-
-	inline ndVector (const ndFloat32* const ptr)
-		:m_type(_mm_loadu_ps (ptr))
-	{
-	}
-
-	#ifdef D_NEWTON_USE_AVX2_OPTION
-	inline ndVector(const ndFloat32* const baseAddr, const ndInt32* const index)
-		:m_type(_mm_i32gather_ps(baseAddr, (__m128i&)* index, 4))
-	{
-		ndAssert(baseAddr[index[0]] == m_x);
-		ndAssert(baseAddr[index[1]] == m_y);
-		ndAssert(baseAddr[index[2]] == m_z);
-		ndAssert(baseAddr[index[3]] == m_w);
-	}
-	#else
-	// emulate gather instruction for non avx2 abi
-	inline ndVector(const ndFloat32* const baseAddr, const ndInt32* const index)
-		:m_x(baseAddr[index[0]])
-		,m_y(baseAddr[index[1]])
-		,m_z(baseAddr[index[2]])
-		,m_w(baseAddr[index[3]])
-	{
-	}
-	#endif
-#ifndef	D_NEWTON_USE_DOUBLE
-	inline ndVector(const ndFloat64* const ptr)
-		:m_x(ndFloat32(ptr[0]))
-		,m_y(ndFloat32(ptr[1]))
-		,m_z(ndFloat32(ptr[2]))
-		,m_w(ndFloat32(ptr[3]))
-	{
-	}
-
-	inline ndVector(ndFloat64 x, ndFloat64 y, ndFloat64 z, ndFloat64 w)
-		:m_type(_mm_set_ps(ndFloat32(w), ndFloat32(z), ndFloat32(y), ndFloat32(x)))
-	{
-	}
-#endif
-
-	inline ndVector (const ndVector& copy)
-		:m_type(copy.m_type)
-	{
-	}
-
-	inline ndVector (const ndBigVector& copy)
-		:m_type(_mm_shuffle_ps (_mm_cvtpd_ps (((__m128d*)&copy)[0]), _mm_cvtpd_ps (((__m128d*)&copy)[1]), PERMUTE_MASK(1, 0, 1, 0)))
-	{
-		ndAssert (ndCheckVector ((*this)));
-	}
-
-	inline ndVector (ndFloat32 x, ndFloat32 y, ndFloat32 z, ndFloat32 w)
-		:m_type(_mm_set_ps(w, z, y, x))
-	{
-	}
-
-	inline ndVector (ndInt32 x, ndInt32 y, ndInt32 z, ndInt32 w)
-		:m_typeInt(_mm_set_epi32(w, z, y, x))
-	{
-	}
-
-	inline ndFloat32 GetX() const
-	{
-		return m_x;
-	}
-
-	inline ndFloat32 GetY() const
-	{
-		return m_y;
-	}
-
-	inline ndFloat32 GetZ() const
-	{
-		return m_z;
-	}
-
-	inline ndFloat32 GetW() const
-	{
-		return m_w;
-	}
-
-	inline void SetX(ndFloat32 x)
-	{
-		m_x = x;
-	}
-
-	inline void SetY(ndFloat32 x)
-	{
-		m_y = x;
-	}
-
-	inline void SetZ(ndFloat32 x)
-	{
-		m_z = x;
-	}
-
-	inline void SetW(ndFloat32 x)
-	{
-		m_w = x;
-	}
-
-	//return the x component
-	inline ndFloat32 GetScalar () const
-	{
-		return _mm_cvtss_f32 (m_type);
-	}
-
-	inline void Store (ndFloat32* const dst) const
-	{
-		_mm_storeu_ps(dst, m_type);
-	}
-
-	inline ndVector BroadcastX () const
-	{
-		return _mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(0, 0, 0, 0));
-	}
-
-	inline ndVector BroadcastY () const
-	{
-		return _mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(1, 1, 1, 1));
-	}
-
-	inline ndVector BroadcastZ () const
-	{
-		return _mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(2, 2, 2, 2));
-	}
-
-	inline ndVector BroadcastW () const
-	{
-		return _mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(3, 3, 3, 3));
-	}
-
-	inline ndVector Scale (ndFloat32 s) const
-	{
-		return _mm_mul_ps (m_type, _mm_set_ps1(s));
-	}
-
-	inline ndVector& operator= (const ndVector& A)
-	{
-		m_type = A.m_type;
-		return *this;
-	}
-
-	inline ndFloat32& operator[] (ndInt32 i)
-	{
-		ndAssert (i < 4);
-		ndAssert (i >= 0);
-		return m_f[i];
-	}
-
-	inline const ndFloat32& operator[] (ndInt32 i) const
-	{
-		ndAssert (i < 4);
-		ndAssert (i >= 0);
-		return m_f[i];
-	}
-
-	inline ndVector operator+ (const ndVector& A) const
-	{
-		return _mm_add_ps (m_type, A.m_type);	
-	}
-
-	inline ndVector operator- (const ndVector& A) const 
-	{
-		return _mm_sub_ps (m_type, A.m_type);	
-	}
-
-	inline ndVector operator* (const ndVector& A) const
-	{
-		return _mm_mul_ps(m_type, A.m_type);
-	}
-
-	inline ndVector& operator+= (const ndVector& A)
-	{
-		return (*this = _mm_add_ps (m_type, A.m_type));
-	}
-
-	inline ndVector& operator-= (const ndVector& A)
-	{
-		return (*this = _mm_sub_ps (m_type, A.m_type));
-	}
-
-	inline ndVector& operator*= (const ndVector& A)
-	{
-		return (*this = _mm_mul_ps(m_type, A.m_type));
-	}
-
-	// return 4d dot product
-	inline ndVector DotProduct(const ndVector& A) const
-	{
-		#ifdef D_NEWTON_USE_AVX2_OPTION
-			return _mm_dp_ps(m_type, A.m_type, 0xff);
-		#else
-			return (*this * A).AddHorizontal();
-		#endif
-	}
-
-	// return 3d cross product
-	inline ndVector CrossProduct (const ndVector& B) const
-	{
-		__m128 tmp0 = _mm_shuffle_ps(  m_type,   m_type, _MM_SHUFFLE(3, 0, 2, 1));
-		__m128 tmp1 = _mm_shuffle_ps(B.m_type, B.m_type, _MM_SHUFFLE(3, 1, 0, 2));
-		__m128 tmp2 = _mm_mul_ps(tmp0, B.m_type);
-		__m128 tmp3 = _mm_mul_ps(tmp0, tmp1);
-		__m128 tmp4 = _mm_shuffle_ps(tmp2, tmp2, _MM_SHUFFLE(3, 0, 2, 1));
-		return _mm_sub_ps(tmp3, tmp4);
-	}
-
-	// return 4d cross product
-	inline ndVector CrossProduct (const ndVector& A, const ndVector& B) const
-	{
-		ndFloat32 array[4][4];
-		ndFloat32 cofactor[3][3];
-
-		const ndVector& me = *this;
-		for (ndInt32 i = 0; i < 4; ++i) 
-		{
-			array[0][i] = me[i];
-			array[1][i] = A[i];
-			array[2][i] = B[i];
-			array[3][i] = ndFloat32 (1.0f);
-		}
-
-		ndVector normal;
-		ndFloat32  sign = ndFloat32 (-1.0f);
-		for (ndInt32 i = 0; i < 4; ++i)  
-		{
-			for (ndInt32 j = 0; j < 3; ++j) 
-			{
-				ndInt32 k0 = 0;
-				for (ndInt32 k = 0; k < 4; ++k) 
-				{
-					if (k != i) 
-					{
-						cofactor[j][k0] = array[j][k];
-						k0 ++;
-					}
-				}
-			}
-			ndFloat32  x = cofactor[0][0] * (cofactor[1][1] * cofactor[2][2] - cofactor[1][2] * cofactor[2][1]);
-			ndFloat32  y = cofactor[0][1] * (cofactor[1][2] * cofactor[2][0] - cofactor[1][0] * cofactor[2][2]);
-			ndFloat32  z = cofactor[0][2] * (cofactor[1][0] * cofactor[2][1] - cofactor[1][1] * cofactor[2][0]);
-			ndFloat32  det = x + y + z;
-
-			normal[i] = sign * det;
-			sign *= ndFloat32 (-1.0f);
-		}
-
-		return normal;
-	}
-
-	inline ndVector Divide(const ndVector& denominator) const
-	{
-		return _mm_div_ps(m_type, denominator.m_type);
-	}
-
-	inline ndVector Reciproc () const
-	{
-		return _mm_div_ps (m_one.m_type, m_type);
-	}
-
-	inline ndVector MulAdd(const ndVector& A, const ndVector& B) const
-	{
-		return _mm_add_ps(m_type, _mm_mul_ps(A.m_type, B.m_type));
-	}
-
-	inline ndVector MulSub(const ndVector& A, const ndVector& B) const
-	{
-		return _mm_sub_ps(m_type, _mm_mul_ps(A.m_type, B.m_type));
-	}
-
-	inline ndVector AddHorizontal () const
-	{
-		__m128 tmp (_mm_hadd_ps (m_type, m_type));
-		return _mm_hadd_ps (tmp, tmp);
-	}
-
-	inline ndVector Abs () const
-	{
-		return _mm_and_ps (m_type, m_signMask.m_type);
-	}
-
-	inline ndVector GetMax() const
-	{
-		__m128 tmp(_mm_max_ps(m_type, _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(1, 0, 3, 2))));
-		return _mm_max_ps(tmp, _mm_shuffle_ps(tmp, tmp, PERMUTE_MASK(2, 3, 0, 1)));
-	}
-
-	inline ndVector GetMax (const ndVector& data) const
-	{
-		return _mm_max_ps (m_type, data.m_type);
-	}
-
-	inline ndVector GetMin (const ndVector& data) const
-	{
-		return _mm_min_ps (m_type, data.m_type);
-	}
-
-	inline ndVector TestZero() const
-	{
-		return m_negOne & (*this == m_zero);
-	}
-
-	inline ndVector Floor () const
-	{
-		#ifdef D_NEWTON_USE_AVX2_OPTION
-			return _mm_floor_ps(m_type);
-		#else
-			ndVector truncated(_mm_cvtepi32_ps(_mm_cvttps_epi32(m_type)));
-			ndVector ret(truncated - (ndVector::m_one & (*this < truncated)));
-			ndAssert(ret.m_f[0] == ndFloor(m_f[0]));
-			ndAssert(ret.m_f[1] == ndFloor(m_f[1]));
-			ndAssert(ret.m_f[2] == ndFloor(m_f[2]));
-			ndAssert(ret.m_f[3] == ndFloor(m_f[3]));
-			return ret;
-		#endif
-	}
-
-	inline ndVector GetInt() const
-	{
-		return ndVector(_mm_cvtps_epi32(Floor().m_type));
-	}
-
-	inline ndVector Sqrt () const
-	{
-		return _mm_sqrt_ps(m_type);
-	}
-
-	inline ndVector InvSqrt () const
-	{
-		ndVector tmp0 (_mm_rsqrt_ps(m_type));
-		return m_half * tmp0 * (m_three - *this * tmp0 * tmp0);
-	}
-
-	inline ndVector InvMagSqrt () const
-	{
-		return DotProduct(*this).InvSqrt();
-	}
-
-	inline ndVector Normalize () const
-	{
-		return Scale(ndFloat32(1.0f) / ndSqrt(DotProduct(*this).GetScalar()));
-	}
-
-	// relational operators
-	inline ndVector operator> (const ndVector& data) const
-	{
-		return _mm_cmpgt_ps (m_type, data.m_type);	
-	}
-
-	inline ndVector operator== (const ndVector& data) const
-	{
-		return _mm_cmpeq_ps (m_type, data.m_type);	
-	}
-
-	inline ndVector operator< (const ndVector& data) const
-	{
-		return _mm_cmplt_ps (m_type, data.m_type);	
-	}
-
-	inline ndVector operator>= (const ndVector& data) const
-	{
-		return _mm_cmpge_ps (m_type, data.m_type);	
-	}
-
-	inline ndVector operator<= (const ndVector& data) const
-	{
-		return _mm_cmple_ps (m_type, data.m_type);	
-	}
-
-	// logical operations
-	inline ndVector operator& (const ndVector& data) const
-	{
-		return _mm_and_ps (m_type, data.m_type);	
-	}
-
-	inline ndVector operator| (const ndVector& data) const
-	{
-		return _mm_or_ps (m_type, data.m_type);	
-	}
-
-	inline ndVector operator^ (const ndVector& data) const
-	{
-		return _mm_xor_ps (m_type, data.m_type);	
-	}
-
-	inline ndVector AndNot(const ndVector& data) const
-	{
-		return _mm_andnot_ps(data.m_type, m_type);
-	}
-
-	inline ndVector Select(const ndVector& data, const ndVector& mask) const
-	{
-		// (((b ^ a) & mask)^a)
-		//return  _mm_or_ps (_mm_and_ps (mask.m_type, data.m_type), _mm_andnot_ps(mask.m_type, m_type));
-		return  _mm_xor_ps(m_type, _mm_and_ps (mask.m_type, _mm_xor_ps(m_type, data.m_type)));
-	}
-
-	inline ndInt32 GetSignMask() const
-	{
-		return _mm_movemask_ps(m_type);
-	} 
-
-	inline ndVector ShiftRight() const
-	{
-		return _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(2, 1, 0, 3));
-	}
-
-	inline ndVector ShiftTripleRight () const
-	{
-		return _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(3, 1, 0, 2));
-	}
-
-	inline ndVector ShiftTripleLeft () const
-	{
-		return _mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(3, 0, 2, 1));
-	}
-
-	inline ndVector ShiftRightLogical (ndInt32 bits) const
-	{
-		return ndVector (_mm_srli_epi32(m_typeInt, bits)); 
-	}
-
-	inline ndVector OptimizedVectorUnrotate(const ndVector& front, const ndVector& up, const ndVector& right) const
-	{
-#if 0
-		return ndVector(
-			m_x * front.m_x + m_y * front.m_y + m_z * front.m_z,
-			m_x * up.m_x + m_y * up.m_y + m_z * up.m_z,
-			m_x * right.m_x + m_y * right.m_y + m_z * right.m_z,
-			ndFloat32(0.0f));
-#else
-		__m128 tmp0(_mm_mul_ps(m_type, front.m_type));
-		__m128 tmp1(_mm_mul_ps(m_type, up.m_type));
-		__m128 tmp2(_mm_unpacklo_ps(tmp0, tmp1));
-		__m128 tmp3(_mm_unpackhi_ps(tmp0, tmp1));
-		__m128 tmp4(_mm_add_ps(tmp2, tmp3));
-
-		__m128 tmp5(_mm_mul_ps(m_type, right.m_type));
-		__m128 tmp6(_mm_shuffle_ps(tmp5, tmp5, PERMUTE_MASK(3, 2, 3, 0)));
-		__m128 tmp7(_mm_shuffle_ps(tmp5, tmp5, PERMUTE_MASK(3, 3, 3, 1)));
-		__m128 tmp8(_mm_add_ps(tmp6, tmp7));
-
-		__m128 tmp9(_mm_movelh_ps(tmp4, tmp8));
-		__m128 tmp10(_mm_movehl_ps(tmp8, tmp4));
-		return _mm_add_ps(tmp9, tmp10);
-#endif
-	}
-
-	inline static void Transpose4x4 (ndVector& dst0, ndVector& dst1, ndVector& dst2, ndVector& dst3, const ndVector& src0, const ndVector& src1, const ndVector& src2, const ndVector& src3)
-	{
-		__m128 tmp0 (_mm_unpacklo_ps (src0.m_type, src1.m_type));
-		__m128 tmp1 (_mm_unpacklo_ps (src2.m_type, src3.m_type));
-		__m128 tmp2 (_mm_unpackhi_ps (src0.m_type, src1.m_type));
-		__m128 tmp3 (_mm_unpackhi_ps (src2.m_type, src3.m_type));
-
-		dst0 = ndVector (_mm_movelh_ps (tmp0, tmp1));
-		dst1 = ndVector (_mm_movehl_ps (tmp1, tmp0));
-		dst2 = ndVector (_mm_movelh_ps (tmp2, tmp3));
-		dst3 = ndVector (_mm_movehl_ps (tmp3, tmp2));
-	}
-
-	union 
-	{
-		ndFloat32 m_f[4];
-		ndInt32 m_i[4];
-		__m128 m_type;
-		__m128i m_typeInt;
-		struct 
-		{
-			ndFloat32 m_x;
-			ndFloat32 m_y;
-			ndFloat32 m_z;
-			ndFloat32 m_w;
-		};
-		struct 
-		{
-			ndInt32 m_ix;
-			ndInt32 m_iy;
-			ndInt32 m_iz;
-			ndInt32 m_iw;
-		};
-	};
-
-	D_CORE_API static ndVector m_zero;
-	D_CORE_API static ndVector m_one;
-	D_CORE_API static ndVector m_wOne;
-	D_CORE_API static ndVector m_two;
-	D_CORE_API static ndVector m_half;
-	D_CORE_API static ndVector m_three;
-	D_CORE_API static ndVector m_negOne;
-	D_CORE_API static ndVector m_xMask;
-	D_CORE_API static ndVector m_yMask;
-	D_CORE_API static ndVector m_zMask;
-	D_CORE_API static ndVector m_wMask;
-	D_CORE_API static ndVector m_xyzwMask;
-	D_CORE_API static ndVector m_epsilon;
-	D_CORE_API static ndVector m_signMask;
-	D_CORE_API static ndVector m_triplexMask;
-} D_GCC_NEWTON_ALIGN_16 ;
-#endif
-
+class ndVector;
 // *****************************************************************************************
 //
 // 4 x 1 double precision SSE2 vector class declaration
@@ -614,12 +78,7 @@ class ndBigVector
 	{
 	}
 #else
-
-	inline ndBigVector(const ndVector& v)
-		:m_type(_mm256_cvtps_pd (v.m_type))
-	{
-		ndAssert(ndCheckVector((*this)));
-	}
+	inline ndBigVector(const ndVector& v);
 
 	inline ndBigVector(const ndFloat64* const ptr)
 		:m_type(_mm256_loadu_pd(ptr))
@@ -1107,6 +566,10 @@ class ndBigVector
 	{
 	}
 
+#ifndef D_NEWTON_USE_DOUBLE
+	inline ndBigVector(const ndVector& v);
+#endif
+
 	inline ndBigVector(const __m128d typeLow, const __m128d typeHigh)
 		:m_typeLow(typeLow)
 		,m_typeHigh(typeHigh)
@@ -1140,13 +603,6 @@ class ndBigVector
 	{
 	}
 #else
-
-	inline ndBigVector(const ndVector& v)
-		:m_typeLow(_mm_cvtps_pd(v.m_type))
-		,m_typeHigh(_mm_cvtps_pd(_mm_shuffle_ps(v.m_type, v.m_type, PERMUTE_MASK(3, 2, 3, 2))))
-	{
-		ndAssert(ndCheckVector((*this)));
-	}
 
 	inline ndBigVector(const ndFloat64* const ptr)
 		:m_typeLow(_mm_loadu_pd(ptr))
@@ -1629,5 +1085,564 @@ class ndBigVector
 
 #endif
 
+
+
+#ifdef D_NEWTON_USE_DOUBLE
+	//typedef ndBigVector ndVector;
+	#define ndVector ndBigVector
+#else
+
+// *****************************************************************************************
+//
+// 4 x 1 single precision SSE vector class declaration
+//
+// *****************************************************************************************
+D_MSV_NEWTON_ALIGN_16
+class ndVector
+{
+	#define PERMUTE_MASK(w, z, y, x) _MM_SHUFFLE (w, z, y, x)
+	public:
+	D_OPERATOR_NEW_AND_DELETE
+
+	inline ndVector()
+	{
+	}
+
+	inline ndVector(const __m128i type)
+		:m_typeInt(type)
+	{
+	}
+
+	inline ndVector(const __m128 type)
+		:m_type(type)
+	{
+	}
+
+	inline ndVector(const ndFloat32 a)
+		:m_type(_mm_set1_ps(a))
+	{
+	}
+
+	inline ndVector(const ndFloat32* const ptr)
+		:m_type(_mm_loadu_ps(ptr))
+	{
+	}
+
+#ifdef D_NEWTON_USE_AVX2_OPTION
+	inline ndVector(const ndFloat32* const baseAddr, const ndInt32* const index)
+		: m_type(_mm_i32gather_ps(baseAddr, (__m128i&)* index, 4))
+	{
+		ndAssert(baseAddr[index[0]] == m_x);
+		ndAssert(baseAddr[index[1]] == m_y);
+		ndAssert(baseAddr[index[2]] == m_z);
+		ndAssert(baseAddr[index[3]] == m_w);
+	}
+#else
+	// emulate gather instruction for non avx2 abi
+	inline ndVector(const ndFloat32* const baseAddr, const ndInt32* const index)
+		:m_x(baseAddr[index[0]])
+		,m_y(baseAddr[index[1]])
+		,m_z(baseAddr[index[2]])
+		,m_w(baseAddr[index[3]])
+	{
+	}
+#endif
+#ifndef	D_NEWTON_USE_DOUBLE
+	inline ndVector(const ndFloat64* const ptr)
+		:m_x(ndFloat32(ptr[0]))
+		,m_y(ndFloat32(ptr[1]))
+		,m_z(ndFloat32(ptr[2]))
+		,m_w(ndFloat32(ptr[3]))
+	{
+	}
+
+	inline ndVector(ndFloat64 x, ndFloat64 y, ndFloat64 z, ndFloat64 w)
+		:m_type(_mm_set_ps(ndFloat32(w), ndFloat32(z), ndFloat32(y), ndFloat32(x)))
+	{
+	}
+#endif
+
+	inline ndVector(const ndVector& copy)
+		:m_type(copy.m_type)
+	{
+	}
+
+	inline ndVector(const ndBigVector& copy)
+		:m_type(_mm_shuffle_ps(_mm_cvtpd_ps(((__m128d*)& copy)[0]), _mm_cvtpd_ps(((__m128d*)& copy)[1]), PERMUTE_MASK(1, 0, 1, 0)))
+	{
+		ndAssert(ndCheckVector((*this)));
+	}
+
+	inline ndVector(ndFloat32 x, ndFloat32 y, ndFloat32 z, ndFloat32 w)
+		:m_type(_mm_set_ps(w, z, y, x))
+	{
+	}
+
+	inline ndVector(ndInt32 x, ndInt32 y, ndInt32 z, ndInt32 w)
+		:m_typeInt(_mm_set_epi32(w, z, y, x))
+	{
+	}
+
+	inline ndFloat32 GetX() const
+	{
+		return m_x;
+	}
+
+	inline ndFloat32 GetY() const
+	{
+		return m_y;
+	}
+
+	inline ndFloat32 GetZ() const
+	{
+		return m_z;
+	}
+
+	inline ndFloat32 GetW() const
+	{
+		return m_w;
+	}
+
+	inline void SetX(ndFloat32 x)
+	{
+		m_x = x;
+	}
+
+	inline void SetY(ndFloat32 x)
+	{
+		m_y = x;
+	}
+
+	inline void SetZ(ndFloat32 x)
+	{
+		m_z = x;
+	}
+
+	inline void SetW(ndFloat32 x)
+	{
+		m_w = x;
+	}
+
+	//return the x component
+	inline ndFloat32 GetScalar() const
+	{
+		return _mm_cvtss_f32(m_type);
+	}
+
+	inline void Store(ndFloat32* const dst) const
+	{
+		_mm_storeu_ps(dst, m_type);
+	}
+
+	inline ndVector BroadcastX() const
+	{
+		return _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(0, 0, 0, 0));
+	}
+
+	inline ndVector BroadcastY() const
+	{
+		return _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(1, 1, 1, 1));
+	}
+
+	inline ndVector BroadcastZ() const
+	{
+		return _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(2, 2, 2, 2));
+	}
+
+	inline ndVector BroadcastW() const
+	{
+		return _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(3, 3, 3, 3));
+	}
+
+	inline ndVector Scale(ndFloat32 s) const
+	{
+		return _mm_mul_ps(m_type, _mm_set_ps1(s));
+	}
+
+	inline ndVector& operator= (const ndVector& A)
+	{
+		m_type = A.m_type;
+		return *this;
+	}
+
+	inline ndFloat32& operator[] (ndInt32 i)
+	{
+		ndAssert(i < 4);
+		ndAssert(i >= 0);
+		return m_f[i];
+	}
+
+	inline const ndFloat32& operator[] (ndInt32 i) const
+	{
+		ndAssert(i < 4);
+		ndAssert(i >= 0);
+		return m_f[i];
+	}
+
+	inline ndVector operator+ (const ndVector& A) const
+	{
+		return _mm_add_ps(m_type, A.m_type);
+	}
+
+	inline ndVector operator- (const ndVector& A) const
+	{
+		return _mm_sub_ps(m_type, A.m_type);
+	}
+
+	inline ndVector operator* (const ndVector& A) const
+	{
+		return _mm_mul_ps(m_type, A.m_type);
+	}
+
+	inline ndVector& operator+= (const ndVector& A)
+	{
+		return (*this = _mm_add_ps(m_type, A.m_type));
+	}
+
+	inline ndVector& operator-= (const ndVector& A)
+	{
+		return (*this = _mm_sub_ps(m_type, A.m_type));
+	}
+
+	inline ndVector& operator*= (const ndVector& A)
+	{
+		return (*this = _mm_mul_ps(m_type, A.m_type));
+	}
+
+	// return 4d dot product
+	inline ndVector DotProduct(const ndVector& A) const
+	{
+#ifdef D_NEWTON_USE_AVX2_OPTION
+		return _mm_dp_ps(m_type, A.m_type, 0xff);
+#else
+		return (*this * A).AddHorizontal();
+#endif
+	}
+
+	// return 3d cross product
+	inline ndVector CrossProduct(const ndVector& B) const
+	{
+		__m128 tmp0 = _mm_shuffle_ps(m_type, m_type, _MM_SHUFFLE(3, 0, 2, 1));
+		__m128 tmp1 = _mm_shuffle_ps(B.m_type, B.m_type, _MM_SHUFFLE(3, 1, 0, 2));
+		__m128 tmp2 = _mm_mul_ps(tmp0, B.m_type);
+		__m128 tmp3 = _mm_mul_ps(tmp0, tmp1);
+		__m128 tmp4 = _mm_shuffle_ps(tmp2, tmp2, _MM_SHUFFLE(3, 0, 2, 1));
+		return _mm_sub_ps(tmp3, tmp4);
+	}
+
+	// return 4d cross product
+	inline ndVector CrossProduct(const ndVector& A, const ndVector& B) const
+	{
+		ndFloat32 array[4][4];
+		ndFloat32 cofactor[3][3];
+
+		const ndVector& me = *this;
+		for (ndInt32 i = 0; i < 4; ++i)
+		{
+			array[0][i] = me[i];
+			array[1][i] = A[i];
+			array[2][i] = B[i];
+			array[3][i] = ndFloat32(1.0f);
+		}
+
+		ndVector normal;
+		ndFloat32  sign = ndFloat32(-1.0f);
+		for (ndInt32 i = 0; i < 4; ++i)
+		{
+			for (ndInt32 j = 0; j < 3; ++j)
+			{
+				ndInt32 k0 = 0;
+				for (ndInt32 k = 0; k < 4; ++k)
+				{
+					if (k != i)
+					{
+						cofactor[j][k0] = array[j][k];
+						k0++;
+					}
+				}
+			}
+			ndFloat32  x = cofactor[0][0] * (cofactor[1][1] * cofactor[2][2] - cofactor[1][2] * cofactor[2][1]);
+			ndFloat32  y = cofactor[0][1] * (cofactor[1][2] * cofactor[2][0] - cofactor[1][0] * cofactor[2][2]);
+			ndFloat32  z = cofactor[0][2] * (cofactor[1][0] * cofactor[2][1] - cofactor[1][1] * cofactor[2][0]);
+			ndFloat32  det = x + y + z;
+
+			normal[i] = sign * det;
+			sign *= ndFloat32(-1.0f);
+		}
+
+		return normal;
+	}
+
+	inline ndVector Divide(const ndVector& denominator) const
+	{
+		return _mm_div_ps(m_type, denominator.m_type);
+	}
+
+	inline ndVector Reciproc() const
+	{
+		return _mm_div_ps(m_one.m_type, m_type);
+	}
+
+	inline ndVector MulAdd(const ndVector& A, const ndVector& B) const
+	{
+		return _mm_add_ps(m_type, _mm_mul_ps(A.m_type, B.m_type));
+	}
+
+	inline ndVector MulSub(const ndVector& A, const ndVector& B) const
+	{
+		return _mm_sub_ps(m_type, _mm_mul_ps(A.m_type, B.m_type));
+	}
+
+	inline ndVector AddHorizontal() const
+	{
+		__m128 tmp(_mm_hadd_ps(m_type, m_type));
+		return _mm_hadd_ps(tmp, tmp);
+	}
+
+	inline ndVector Abs() const
+	{
+		return _mm_and_ps(m_type, m_signMask.m_type);
+	}
+
+	inline ndVector GetMax() const
+	{
+		__m128 tmp(_mm_max_ps(m_type, _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(1, 0, 3, 2))));
+		return _mm_max_ps(tmp, _mm_shuffle_ps(tmp, tmp, PERMUTE_MASK(2, 3, 0, 1)));
+	}
+
+	inline ndVector GetMax(const ndVector& data) const
+	{
+		return _mm_max_ps(m_type, data.m_type);
+	}
+
+	inline ndVector GetMin(const ndVector& data) const
+	{
+		return _mm_min_ps(m_type, data.m_type);
+	}
+
+	inline ndVector TestZero() const
+	{
+		return m_negOne & (*this == m_zero);
+	}
+
+	inline ndVector Floor() const
+	{
+#ifdef D_NEWTON_USE_AVX2_OPTION
+		return _mm_floor_ps(m_type);
+#else
+		ndVector truncated(_mm_cvtepi32_ps(_mm_cvttps_epi32(m_type)));
+		ndVector ret(truncated - (ndVector::m_one & (*this < truncated)));
+		ndAssert(ret.m_f[0] == ndFloor(m_f[0]));
+		ndAssert(ret.m_f[1] == ndFloor(m_f[1]));
+		ndAssert(ret.m_f[2] == ndFloor(m_f[2]));
+		ndAssert(ret.m_f[3] == ndFloor(m_f[3]));
+		return ret;
+#endif
+	}
+
+	inline ndVector GetInt() const
+	{
+		return ndVector(_mm_cvtps_epi32(Floor().m_type));
+	}
+
+	inline ndVector Sqrt() const
+	{
+		return _mm_sqrt_ps(m_type);
+	}
+
+	inline ndVector InvSqrt() const
+	{
+		ndVector tmp0(_mm_rsqrt_ps(m_type));
+		return m_half * tmp0 * (m_three - *this * tmp0 * tmp0);
+	}
+
+	inline ndVector InvMagSqrt() const
+	{
+		return DotProduct(*this).InvSqrt();
+	}
+
+	inline ndVector Normalize() const
+	{
+		return Scale(ndFloat32(1.0f) / ndSqrt(DotProduct(*this).GetScalar()));
+	}
+
+	// relational operators
+	inline ndVector operator> (const ndVector& data) const
+	{
+		return _mm_cmpgt_ps(m_type, data.m_type);
+	}
+
+	inline ndVector operator== (const ndVector& data) const
+	{
+		return _mm_cmpeq_ps(m_type, data.m_type);
+	}
+
+	inline ndVector operator< (const ndVector& data) const
+	{
+		return _mm_cmplt_ps(m_type, data.m_type);
+	}
+
+	inline ndVector operator>= (const ndVector& data) const
+	{
+		return _mm_cmpge_ps(m_type, data.m_type);
+	}
+
+	inline ndVector operator<= (const ndVector& data) const
+	{
+		return _mm_cmple_ps(m_type, data.m_type);
+	}
+
+	// logical operations
+	inline ndVector operator& (const ndVector& data) const
+	{
+		return _mm_and_ps(m_type, data.m_type);
+	}
+
+	inline ndVector operator| (const ndVector& data) const
+	{
+		return _mm_or_ps(m_type, data.m_type);
+	}
+
+	inline ndVector operator^ (const ndVector& data) const
+	{
+		return _mm_xor_ps(m_type, data.m_type);
+	}
+
+	inline ndVector AndNot(const ndVector& data) const
+	{
+		return _mm_andnot_ps(data.m_type, m_type);
+	}
+
+	inline ndVector Select(const ndVector& data, const ndVector& mask) const
+	{
+		// (((b ^ a) & mask)^a)
+		//return  _mm_or_ps (_mm_and_ps (mask.m_type, data.m_type), _mm_andnot_ps(mask.m_type, m_type));
+		return  _mm_xor_ps(m_type, _mm_and_ps(mask.m_type, _mm_xor_ps(m_type, data.m_type)));
+	}
+
+	inline ndInt32 GetSignMask() const
+	{
+		return _mm_movemask_ps(m_type);
+	}
+
+	inline ndVector ShiftRight() const
+	{
+		return _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(2, 1, 0, 3));
+	}
+
+	inline ndVector ShiftTripleRight() const
+	{
+		return _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(3, 1, 0, 2));
+	}
+
+	inline ndVector ShiftTripleLeft() const
+	{
+		return _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(3, 0, 2, 1));
+	}
+
+	inline ndVector ShiftRightLogical(ndInt32 bits) const
+	{
+		return ndVector(_mm_srli_epi32(m_typeInt, bits));
+	}
+
+	inline ndVector OptimizedVectorUnrotate(const ndVector& front, const ndVector& up, const ndVector& right) const
+	{
+#if 0
+		return ndVector(
+			m_x * front.m_x + m_y * front.m_y + m_z * front.m_z,
+			m_x * up.m_x + m_y * up.m_y + m_z * up.m_z,
+			m_x * right.m_x + m_y * right.m_y + m_z * right.m_z,
+			ndFloat32(0.0f));
+#else
+		__m128 tmp0(_mm_mul_ps(m_type, front.m_type));
+		__m128 tmp1(_mm_mul_ps(m_type, up.m_type));
+		__m128 tmp2(_mm_unpacklo_ps(tmp0, tmp1));
+		__m128 tmp3(_mm_unpackhi_ps(tmp0, tmp1));
+		__m128 tmp4(_mm_add_ps(tmp2, tmp3));
+
+		__m128 tmp5(_mm_mul_ps(m_type, right.m_type));
+		__m128 tmp6(_mm_shuffle_ps(tmp5, tmp5, PERMUTE_MASK(3, 2, 3, 0)));
+		__m128 tmp7(_mm_shuffle_ps(tmp5, tmp5, PERMUTE_MASK(3, 3, 3, 1)));
+		__m128 tmp8(_mm_add_ps(tmp6, tmp7));
+
+		__m128 tmp9(_mm_movelh_ps(tmp4, tmp8));
+		__m128 tmp10(_mm_movehl_ps(tmp8, tmp4));
+		return _mm_add_ps(tmp9, tmp10);
+#endif
+	}
+
+	inline static void Transpose4x4(ndVector& dst0, ndVector& dst1, ndVector& dst2, ndVector& dst3, const ndVector& src0, const ndVector& src1, const ndVector& src2, const ndVector& src3)
+	{
+		__m128 tmp0(_mm_unpacklo_ps(src0.m_type, src1.m_type));
+		__m128 tmp1(_mm_unpacklo_ps(src2.m_type, src3.m_type));
+		__m128 tmp2(_mm_unpackhi_ps(src0.m_type, src1.m_type));
+		__m128 tmp3(_mm_unpackhi_ps(src2.m_type, src3.m_type));
+
+		dst0 = ndVector(_mm_movelh_ps(tmp0, tmp1));
+		dst1 = ndVector(_mm_movehl_ps(tmp1, tmp0));
+		dst2 = ndVector(_mm_movelh_ps(tmp2, tmp3));
+		dst3 = ndVector(_mm_movehl_ps(tmp3, tmp2));
+	}
+
+	union
+	{
+		ndFloat32 m_f[4];
+		ndInt32 m_i[4];
+		__m128 m_type;
+		__m128i m_typeInt;
+		struct
+		{
+			ndFloat32 m_x;
+			ndFloat32 m_y;
+			ndFloat32 m_z;
+			ndFloat32 m_w;
+		};
+		struct
+		{
+			ndInt32 m_ix;
+			ndInt32 m_iy;
+			ndInt32 m_iz;
+			ndInt32 m_iw;
+		};
+	};
+
+	D_CORE_API static ndVector m_zero;
+	D_CORE_API static ndVector m_one;
+	D_CORE_API static ndVector m_wOne;
+	D_CORE_API static ndVector m_two;
+	D_CORE_API static ndVector m_half;
+	D_CORE_API static ndVector m_three;
+	D_CORE_API static ndVector m_negOne;
+	D_CORE_API static ndVector m_xMask;
+	D_CORE_API static ndVector m_yMask;
+	D_CORE_API static ndVector m_zMask;
+	D_CORE_API static ndVector m_wMask;
+	D_CORE_API static ndVector m_xyzwMask;
+	D_CORE_API static ndVector m_epsilon;
+	D_CORE_API static ndVector m_signMask;
+	D_CORE_API static ndVector m_triplexMask;
+} D_GCC_NEWTON_ALIGN_16;
+#endif
+
+
+#ifndef D_NEWTON_USE_DOUBLE
+	#ifdef D_NEWTON_USE_AVX2_OPTION
+		inline ndBigVector::ndBigVector(const ndVector& v)
+			:m_type(_mm256_cvtps_pd(v.m_type))
+		{
+			ndAssert(ndCheckVector((*this)));
+		}
+	#else
+		inline ndBigVector::ndBigVector(const ndVector& v)
+			:m_typeLow(_mm_cvtps_pd(v.m_type))
+			,m_typeHigh(_mm_cvtps_pd(_mm_shuffle_ps(v.m_type, v.m_type, PERMUTE_MASK(3, 2, 3, 2))))
+		{
+			ndAssert(ndCheckVector((*this)));
+		}
 #endif
 #endif
+
+
+
+#endif
+
