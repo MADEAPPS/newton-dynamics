@@ -238,7 +238,7 @@ class ndShape: public ndContainersFreeListAlloc<ndShape>
 	virtual ndShapeStaticMesh* GetAsShapeStaticMesh() { return nullptr; }
 	virtual ndShapeConvexHull* GetAsShapeConvexHull() { return nullptr; }
 	virtual ndShapeHeightfield* GetAsShapeHeightfield() { return nullptr; }
-	virtual ndShapeConvexPolygon* GetAsShapeAsConvexPolygon() { return nullptr; }
+	virtual ndShapeConvexPolygon* GetAsShapeConvexPolygon() { return nullptr; }
 	virtual ndShapeChamferCylinder* GetAsShapeChamferCylinder() { return nullptr; }
 	virtual ndShapeUserDefinedImplicit* GetAsShapeUserDefinedImplicit() { return nullptr; }
 	virtual ndShapeStaticProceduralMesh* GetAsShapeStaticProceduralMesh() { return nullptr; }

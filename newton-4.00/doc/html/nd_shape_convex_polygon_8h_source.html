@@ -142,7 +142,7 @@ $(document).ready(function(){initNavTree('nd_shape_convex_polygon_8h_source.html
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <a class="code" href="classnd_shape_convex_polygon.html">ndShapeConvexPolygon</a> ();</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    ~<a class="code" href="classnd_shape_convex_polygon.html">ndShapeConvexPolygon</a> ();</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_convex_polygon.html">ndShapeConvexPolygon</a>* GetAsShapeAsConvexPolygon();</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_convex_polygon.html">ndShapeConvexPolygon</a>* GetAsShapeConvexPolygon();</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <a class="code" href="classnd_vector.html">ndVector</a> CalculateGlobalNormal(<span class="keyword">const</span> <a class="code" href="classnd_shape_instance.html">ndShapeInstance</a>* <span class="keyword">const</span> parentMesh, <span class="keyword">const</span> <a class="code" href="classnd_vector.html">ndVector</a>&amp; localNormal) <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    ndInt32 CalculateContactToConvexHullDescrete(<span class="keyword">const</span> <a class="code" href="classnd_shape_instance.html">ndShapeInstance</a>* <span class="keyword">const</span> parentMesh, <a class="code" href="classnd_contact_solver.html">ndContactSolver</a>&amp; proxy);</div>
@@ -175,7 +175,7 @@ $(document).ready(function(){initNavTree('nd_shape_convex_polygon_8h_source.html
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keyword">const</span> ndInt32* m_adjacentFaceEdgeNormalIndex;</div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;} D_GCC_NEWTON_ALIGN_32;</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="keyword">inline</span> <a class="code" href="classnd_shape_convex_polygon.html">ndShapeConvexPolygon</a>* ndShapeConvexPolygon::GetAsShapeAsConvexPolygon()</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="keyword">inline</span> <a class="code" href="classnd_shape_convex_polygon.html">ndShapeConvexPolygon</a>* ndShapeConvexPolygon::GetAsShapeConvexPolygon()</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;{</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">this</span>; </div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;}</div>

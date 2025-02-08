@@ -43,7 +43,7 @@ class ndShapeConvexPolygon: public ndShapeConvex
 	ndShapeConvexPolygon ();
 	~ndShapeConvexPolygon ();
 
-	virtual ndShapeConvexPolygon* GetAsShapeAsConvexPolygon();
+	virtual ndShapeConvexPolygon* GetAsShapeConvexPolygon();
 
 	ndVector CalculateGlobalNormal(const ndShapeInstance* const parentMesh, const ndVector& localNormal) const;
 	ndInt32 CalculateContactToConvexHullDescrete(const ndShapeInstance* const parentMesh, ndContactSolver& proxy);
@@ -77,7 +77,7 @@ class ndShapeConvexPolygon: public ndShapeConvex
 	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
-inline ndShapeConvexPolygon* ndShapeConvexPolygon::GetAsShapeAsConvexPolygon()
+inline ndShapeConvexPolygon* ndShapeConvexPolygon::GetAsShapeConvexPolygon()
 {
 	return this; 
 }

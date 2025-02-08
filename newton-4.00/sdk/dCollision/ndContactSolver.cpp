@@ -2562,7 +2562,7 @@ ndInt32 ndContactSolver::ConvexToConvexContactsDiscrete()
 			{
 				count = CalculateContacts(m_closestPoint0, m_closestPoint1, m_separatingVector * ndVector::m_negOne);
 				// skip convex shape polygon because they could have a skirt
-				ndShapeConvexPolygon* const convexPolygon = m_instance1.GetShape()->GetAsShapeAsConvexPolygon();
+				ndShapeConvexPolygon* const convexPolygon = m_instance1.GetShape()->GetAsShapeConvexPolygon();
 				if (!(count || convexPolygon))
 				{
 					// poly line failed probably because of rounding error
@@ -4344,7 +4344,7 @@ ndInt32 ndContactSolver::CalculateContacts(const ndVector& point0, const ndVecto
 	ndVector* const shape1 = &contactsOut[baseCount];
 	ndAssert(normal.m_w == ndFloat32(0.0f));
 
-	ndVector origin(m_instance1.GetShape()->GetAsShapeAsConvexPolygon() ? point1 : (point0 + point1).Scale(ndFloat32(0.5f)));
+	ndVector origin(m_instance1.GetShape()->GetAsShapeConvexPolygon() ? point1 : (point0 + point1).Scale(ndFloat32(0.5f)));
 	const ndMatrix& matrix1 = m_instance1.m_globalMatrix;
 	ndVector pointOnInstance1(matrix1.UntransformVector(origin));
 	ndVector normalOnInstance1(matrix1.UnrotateVector(normal));
@@ -4424,7 +4424,7 @@ ndInt32 ndContactSolver::CalculateContacts(const ndVector& point0, const ndVecto
 			{
 				count = 1;
 				contactsOut[0] = shape1[0];
-				if (m_instance1.GetShape()->GetAsShapeAsConvexPolygon())
+				if (m_instance1.GetShape()->GetAsShapeConvexPolygon())
 				{
 					ndInt32 i0 = count0 - 1;
 					const ndVector p (shape1[0]);

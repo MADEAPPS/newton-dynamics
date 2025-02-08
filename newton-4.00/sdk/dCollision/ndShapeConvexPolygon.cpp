@@ -552,7 +552,7 @@ bool ndShapeConvexPolygon::BeamClipping(const ndVector& origin, ndFloat32 dist, 
 ndInt32 ndShapeConvexPolygon::CalculateContactToConvexHullContinue(const ndShapeInstance* const parentMesh, ndContactSolver& contactSolver)
 {
 	ndAssert(contactSolver.m_instance0.GetShape()->GetAsShapeConvex());
-	ndAssert(contactSolver.m_instance1.GetShape()->GetAsShapeAsConvexPolygon());
+	ndAssert(contactSolver.m_instance1.GetShape()->GetAsShapeConvexPolygon());
 	ndAssert(contactSolver.m_instance1.GetGlobalMatrix().TestIdentity());
 	ndAssert(this == contactSolver.m_instance1.GetShape());
 	ndAssert(m_count);
@@ -714,7 +714,7 @@ ndInt32 ndShapeConvexPolygon::CalculateContactToConvexHullContinue(const ndShape
 ndInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShapeInstance* const parentMesh, ndContactSolver& contactSolver)
 {
 	ndAssert(contactSolver.m_instance0.GetShape()->GetAsShapeConvex());
-	ndAssert(contactSolver.m_instance1.GetShape()->GetAsShapeAsConvexPolygon());
+	ndAssert(contactSolver.m_instance1.GetShape()->GetAsShapeConvexPolygon());
 	ndAssert(contactSolver.m_instance1.GetGlobalMatrix().TestIdentity());
 	ndAssert(this == contactSolver.m_instance1.GetShape());
 	ndAssert(m_count);

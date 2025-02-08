@@ -470,8 +470,8 @@ class ndShape(object):
     def GetAsShapeHeightfield(self):
         return _newton.ndShape_GetAsShapeHeightfield(self)
 
-    def GetAsShapeAsConvexPolygon(self):
-        return _newton.ndShape_GetAsShapeAsConvexPolygon(self)
+    def GetAsShapeConvexPolygon(self):
+        return _newton.ndShape_GetAsShapeConvexPolygon(self)
 
     def GetAsShapeChamferCylinder(self):
         return _newton.ndShape_GetAsShapeChamferCylinder(self)
