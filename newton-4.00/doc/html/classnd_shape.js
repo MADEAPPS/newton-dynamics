@@ -11,7 +11,7 @@ var classnd_shape =
     [ "CalculateVolumeIntegral", "classnd_shape.html#a72def6e2f9e27d2a1eeaa3b7c853d6b5", null ],
     [ "D_CLASS_REFLECTION", "classnd_shape.html#a2016b736297c8342dbf2bded2b6ef81b", null ],
     [ "DebugShape", "classnd_shape.html#ad3eb55c1668c1950c32bb56af3b2e010", null ],
-    [ "GetAsShapeAsConvexPolygon", "classnd_shape.html#ac5ec9938caabde0cc23db4ebec9d6a16", null ],
+    [ "GetAsShapeConvexPolygon", "classnd_shape.html#ac5ec9938caabde0cc23db4ebec9d6a16", null ],
     [ "GetAsShapeBox", "classnd_shape.html#ade4df021c83d95f7f0af3e32b8ed5318", null ],
     [ "GetAsShapeCapsule", "classnd_shape.html#ae2af2eaf3650c3dff55299289e61ebed", null ],
     [ "GetAsShapeChamferCylinder", "classnd_shape.html#a02a7d6f01d5c8ce339bf6b411dc16c05", null ],

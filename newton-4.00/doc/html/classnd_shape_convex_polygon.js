@@ -9,7 +9,7 @@ var classnd_shape_convex_polygon =
     [ "CalculateGlobalNormal", "classnd_shape_convex_polygon.html#aa362ee3dc05b8da68c898cea01b5dc0d", null ],
     [ "CalculatePlaneIntersection", "classnd_shape_convex_polygon.html#afe895f919e5bf7151bd78f6e8e739ede", null ],
     [ "GenerateConvexCap", "classnd_shape_convex_polygon.html#a509cbdd2c3dc03b741d7943205da4fc4", null ],
-    [ "GetAsShapeAsConvexPolygon", "classnd_shape_convex_polygon.html#a7d6659db1451bd15cf1ab6bb13123bae", null ],
+    [ "GetAsShapeConvexPolygon", "classnd_shape_convex_polygon.html#a7d6659db1451bd15cf1ab6bb13123bae", null ],
     [ "GetBoxMaxRadius", "classnd_shape_convex_polygon.html#a2be10113bd966999d71945ec1a0cf661", null ],
     [ "GetBoxMinRadius", "classnd_shape_convex_polygon.html#a7a199c31ecf297763dae29dff1c772a9", null ],
     [ "GetVolume", "classnd_shape_convex_polygon.html#aca84f1a371a173186401fae376c71455", null ],
