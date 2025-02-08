@@ -83,8 +83,8 @@ class ndShapeConvex: public ndShape
 	ndFloat32 m_simplexVolume;
 	ndUnsigned16 m_edgeCount;
 	ndUnsigned16 m_vertexCount;
+	D_MEMORY_ALIGN_FIXUP
 
-	ndBigVector m_menLayoutPadding; // moronic unreal uses 16 alignment and the subclasses are off.
 	friend class ndMeshEffect;
 	friend class ndContactSolver;
 } D_GCC_NEWTON_ALIGN_32 ;

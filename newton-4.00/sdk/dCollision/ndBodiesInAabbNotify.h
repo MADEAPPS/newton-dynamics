@@ -49,6 +49,7 @@ class ndBodiesInAabbNotify : public ndClassAlloc
 	}
 
 	ndArray<const ndBody*> m_bodyArray;
+	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 

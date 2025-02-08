@@ -89,6 +89,7 @@ class ndBodyDynamic: public ndBodyKinematic
 	ndVector m_dampCoef;
 	ndVector m_cachedDampCoef;
 	ndVector m_sleepAccelTest2;
+	D_MEMORY_ALIGN_FIXUP
 
 	static ndVector m_sleepAccelTestScale2;
 

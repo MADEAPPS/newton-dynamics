@@ -107,17 +107,17 @@ class ndMultiBodyVehicle : public ndModelArticulation
 #if 0
 	D_NEWTON_API ndMultiBodyVehicleTorsionBar* AddTorsionBar(ndBodyKinematic* const sentinel);
 	D_NEWTON_API ndMultiBodyVehicle* GetAsMultiBodyVehicle();
-
 #endif
+
 	private:
-	void ApplyVehicleDynamicControl();
 	void ApplyAlignmentAndBalancing();
+	void ApplyVehicleStabilityControl();
 	void ApplyTireModel(ndWorld* const world, ndFloat32 timestep);
 	void ApplyAerodynamics(ndWorld* const world, ndFloat32 timestep);
 	ndBodyKinematic* CreateInternalBodyPart(ndFloat32 mass, ndFloat32 radius) const;
 	void ApplyTireModel(ndFloat32 timestep, ndFixSizeArray<ndTireContactPair, 128>& tireContacts);
 	
-	//void ApplyVehicleDynamicControl(ndFloat32 timestep, ndFixSizeArray<ndTireContactPair, 128>& tireContacts);
+	//void ApplyVehicleStabilityControl(ndFloat32 timestep, ndFixSizeArray<ndTireContactPair, 128>& tireContacts);
 	void CalculateNormalizedAlgniningTorque(ndMultiBodyVehicleTireJoint* const tire, ndFloat32 sideSlipTangent) const;
 	void BrushTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const;
 	void CoulombTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const;
@@ -134,6 +134,9 @@ class ndMultiBodyVehicle : public ndModelArticulation
 	ndList<ndMultiBodyVehicleTireJoint*> m_tireList;
 	ndList<ndMultiBodyVehicleDifferential*> m_differentialList;
 	ndDownForce m_downForce;
+	ndFloat32 m_steeringRate;
+	ndFloat32 m_maxSideslipRate;
+	ndFloat32 m_maxSideslipAngle;
 	
 	friend class ndMultiBodyVehicleMotor;
 	//friend class ndMultiBodyVehicleGearBox;

@@ -49,10 +49,10 @@ class ndShapeBox: public ndShapeConvex
 	D_COLLISION_API const ndConvexSimplexEdge** GetVertexToEdgeMapping() const;
 	D_COLLISION_API virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
 
-
 	virtual ndVector SupportFeatureVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
 	ndVector m_size[2];
 	ndVector m_vertex[8];
+	D_MEMORY_ALIGN_FIXUP
 
 	static ndInt32 m_initSimplex;
 	static ndInt32 m_faces[][4];

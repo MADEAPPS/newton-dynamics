@@ -61,6 +61,7 @@ class ndBodyParticleSet: public ndBody, public ndBackgroundTask
 	ndFloat32 m_radius;
 	ndFloat32 m_timestep;
 	bool m_updateInBackground;
+	D_MEMORY_ALIGN_FIXUP
 	friend class ndWorld;
 	friend class ndScene;
 } D_GCC_NEWTON_ALIGN_32 ;

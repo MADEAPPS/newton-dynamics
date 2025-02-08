@@ -51,6 +51,7 @@ class ndBvhRay: public ndFastRay
 	ndRayCastNotify* m_callback;
 	const ndBodyKinematic* m_myBody;
 	const ndShapeStatic_bvh* m_me;
+	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 

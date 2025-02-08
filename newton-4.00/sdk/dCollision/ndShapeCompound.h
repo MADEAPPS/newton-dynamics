@@ -135,6 +135,7 @@ class ndShapeCompound::ndNodeBase: public ndClassAlloc
 	ndNodeBase* m_parent;
 	ndTreeArray::ndNode* m_myNode;
 	ndShapeInstance* m_shapeInstance;
+	D_MEMORY_ALIGN_FIXUP
 
 	friend class ndStackEntry;
 	friend class ndContactSolver;

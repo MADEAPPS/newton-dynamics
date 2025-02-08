@@ -51,6 +51,7 @@ class ndRayCastNotify : public ndClassAlloc
 
 	ndContactPoint m_contact;
 	ndFloat32 m_param;
+	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32

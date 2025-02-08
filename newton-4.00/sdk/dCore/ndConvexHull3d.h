@@ -100,6 +100,7 @@ class ndConvexHull3d: public ndList<ndConvexHull3dFace>
 	ndBigVector m_aabbP1;
 	ndFloat64 m_diag;
 	ndArray<ndBigVector> m_points;
+	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 inline const ndArray<ndBigVector>& ndConvexHull3d::GetVertexPool() const

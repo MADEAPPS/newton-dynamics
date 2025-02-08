@@ -180,6 +180,7 @@ class ndScene : public ndThreadPool
 	ndUnsigned32 m_frameNumber;
 	ndUnsigned32 m_subStepNumber;
 	ndUnsigned32 m_forceBalanceSceneCounter;
+	D_MEMORY_ALIGN_FIXUP
 
 	static ndVector m_velocTol;
 	static ndVector m_linearContactError2;

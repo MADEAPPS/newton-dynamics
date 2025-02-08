@@ -45,6 +45,7 @@ class ndRay: public ndClassAlloc
 
 	const ndVector m_p0;
 	const ndVector m_p1;
+	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 
@@ -67,6 +68,7 @@ class ndFastRay: public ndRay
 	ndVector m_maxT;
 	ndVector m_unitDir;
 	ndVector m_isParallel;
+	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline ndFastRay::ndFastRay(const ndVector& l0, const ndVector& l1)

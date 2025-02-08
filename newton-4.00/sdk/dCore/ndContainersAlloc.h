@@ -64,9 +64,9 @@ class ndContainersFreeListAlloc: public ndFreeListAlloc
 	{
 	}
 
-	~ndContainersFreeListAlloc()
-	{
-	}
+	//~ndContainersFreeListAlloc()
+	//{
+	//}
 
 	static void FlushFreeList(ndInt32 size)
 	{

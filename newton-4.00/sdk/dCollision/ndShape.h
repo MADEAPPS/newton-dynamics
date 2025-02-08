@@ -211,6 +211,7 @@ class ndShapeInfo
 		ndChamferCylinderInfo m_chamferCylinder;
 		ndFloat32 m_paramArray[32];
 	};
+	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
@@ -279,7 +280,7 @@ class ndShape: public ndContainersFreeListAlloc<ndShape>
 	ndVector m_centerOfMass;
 	ndVector m_boxSize;
 	ndVector m_boxOrigin;
-	ndBigVector m_menLayoutPadding; // moronic unreal uses 16 alignment and the subclasses are off.
+	D_MEMORY_ALIGN_FIXUP
 	static ndVector m_flushZero;
 } D_GCC_NEWTON_ALIGN_32;
 

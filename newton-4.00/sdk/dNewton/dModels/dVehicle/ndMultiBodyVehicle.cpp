@@ -33,9 +33,15 @@
 #include "ndMultiBodyVehicleDifferential.h"
 #include "ndMultiBodyVehicleDifferentialAxle.h"
 
-#define D_MAX_CONTACT_SPEED_TRESHOLD  ndFloat32 (0.25f)
-#define D_MAX_CONTACT_PENETRATION	  ndFloat32 (1.0e-2f)
-#define D_MIN_CONTACT_CLOSE_DISTANCE2 ndFloat32 (5.0e-2f * 5.0e-2f)
+#define D_MAX_CONTACT_SPEED_TRESHOLD	ndFloat32 (0.25f)
+#define D_MAX_CONTACT_PENETRATION		ndFloat32 (1.0e-2f)
+#define D_MIN_CONTACT_CLOSE_DISTANCE2	ndFloat32 (5.0e-2f * 5.0e-2f)
+
+#define D_MAX_SIDESLIP_ANGLE			ndFloat32(15.0f)
+//#define D_MAX_SIDESLIP_ANGLE			ndFloat32(5.0f)
+#define D_MAX_STEERING_RATE				ndFloat32(0.03f)
+#define D_MAX_SIZE_SLIP_RATE			ndFloat32(2.0f)
+
 
 ndMultiBodyVehicle::ndDownForce::ndDownForce()
 	:m_gravity(ndFloat32(-10.0f))
@@ -90,14 +96,6 @@ ndFloat32 ndMultiBodyVehicle::ndDownForce::GetDownforceFactor(ndFloat32 speed) c
 
 
 #if 0
-ndMultiBodyVehicle* ndMultiBodyVehicle::GetAsMultiBodyVehicle()
-{
-	return this;
-}
-
-
-
-//ndMultiBodyVehicleTorsionBar* ndMultiBodyVehicle::AddTorsionBar(ndBodyKinematic* const sentinel)
 ndMultiBodyVehicleTorsionBar* ndMultiBodyVehicle::AddTorsionBar(ndBodyKinematic* const)
 {
 	ndAssert(0);
@@ -119,6 +117,10 @@ ndMultiBodyVehicle::ndMultiBodyVehicle()
 	m_gearBox = nullptr;
 	m_chassis = nullptr;
 	m_torsionBar = nullptr;
+
+	m_steeringRate = D_MAX_STEERING_RATE;
+	m_maxSideslipRate = D_MAX_SIZE_SLIP_RATE;
+	m_maxSideslipAngle = D_MAX_SIDESLIP_ANGLE;
 
 	m_tireShape->AddRef();
 }
@@ -609,7 +611,7 @@ void ndMultiBodyVehicle::Update(ndWorld* const world, ndFloat32 timestep)
 }
 
 
-//void ndMultiBodyVehicle::ApplyVehicleDynamicControl(ndFloat32 timestep, ndFixSizeArray<ndTireContactPair, 128>& tireContacts)
+//void ndMultiBodyVehicle::ApplyVehicleStabilityControl(ndFloat32 timestep, ndFixSizeArray<ndTireContactPair, 128>& tireContacts)
 //{
 //	contactCount = 0;
 //	for (ndInt32 i = contactCount - 1; i >= 0; --i)
@@ -721,7 +723,7 @@ void ndMultiBodyVehicle::ApplyTireModel(ndWorld* const, ndFloat32 timestep)
 		}
 	}
 
-	//ApplyVehicleDynamicControl(timestep, tireContacts);
+	//ApplyVehicleStabilityControl(timestep, tireContacts);
 	ApplyTireModel(timestep, tireContacts);
 
 	// save the steering
@@ -835,21 +837,22 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 	}
 }
 
-void ndMultiBodyVehicle::ApplyVehicleDynamicControl()
+void ndMultiBodyVehicle::ApplyVehicleStabilityControl()
 {
-	const ndFloat32 maxBetaRate = ndFloat32(2.0f);
-	const ndFloat32 maxSizeSlip = ndFloat32(15.0f);
-	const ndFloat32 steerinStep = ndFloat32(0.03f);
+	ndAssert(m_chassis);
+	//const ndFloat32 maxBetaRate = ndFloat32(2.0f);
+	//const ndFloat32 maxSizeSlip = ndFloat32(15.0f);
+	//const ndFloat32 steerinStep = ndFloat32(0.03f);
 
 	const ndBodyKinematic* const chassis = m_chassis;
-	ndAssert(chassis);
 	const ndVector veloc(chassis->GetVelocity());
 	const ndMatrix chassisMatrix(chassis->GetMatrix());
 	const ndVector localVeloc(chassisMatrix.UnrotateVector(m_localFrame.UnrotateVector(veloc)));
 	if (ndAbs(localVeloc.m_x) > ndFloat32(1.0f))
 	{
 		ndFloat32 sideslip = ndAtan2(localVeloc.m_z, localVeloc.m_x);
-		if (ndAbs(sideslip * ndRadToDegree) > maxSizeSlip)
+		//if (ndAbs(sideslip * ndRadToDegree) > maxSizeSlip)
+		if (ndAbs(sideslip * ndRadToDegree) > m_maxSideslipAngle)
 		{
 			const ndVector omega(chassis->GetOmega());
 			const ndVector accel(chassis->GetAccel());
@@ -859,16 +862,19 @@ void ndMultiBodyVehicle::ApplyVehicleDynamicControl()
 			ndFloat32 sideslipRate = localAccel.m_z / localVeloc.m_x;
 			ndFloat32 betaRate = sideslipRate - localOmega.m_y;
 			
-			if (ndAbs(betaRate) > maxBetaRate)
+			//if (ndAbs(betaRate) > maxBetaRate)
+			if (ndAbs(betaRate) > m_maxSideslipRate)
 			{
-				ndFloat32 targeRate = (betaRate > maxBetaRate) ? 1.0f : -1.0f;
+				//ndFloat32 targeRate = (betaRate > maxBetaRate) ? 1.0f : -1.0f;
+				ndFloat32 targeRate = (betaRate > m_maxSideslipRate) ? ndFloat32 (1.0f) : ndFloat32(-1.0f);
 				//ndTrace(("a=%f b=%f b'=%f fz=%f w=%f steer=(", localAccel.m_z, sideslip * ndRadToDegree, betaRate, sideslipRate, localOmega.m_y));
 				for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = GetTireList().GetFirst(); node; node = node->GetNext())
 				{
 					ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
 					if (tire->m_info.m_steeringAngle != 0)
 					{
-						ndFloat32 steering = tire->m_normalidedSteering0 + (targeRate - tire->m_normalidedSteering0) * steerinStep;
+						//ndFloat32 steering = tire->m_normalidedSteering0 + (targeRate - tire->m_normalidedSteering0) * steerinStep;
+						ndFloat32 steering = tire->m_normalidedSteering0 + (targeRate - tire->m_normalidedSteering0) * m_steeringRate;
 						//ndTrace(("(s1=%f s0=%f) ", steering, tire->m_normalidedSteering0));
 						tire->m_normalidedSteering = steering;
 						//ndTrace(("a=%f s=%f b'=%f\n", localAccel.m_z, steering * tire->m_info.m_steeringAngle * ndRadToDegree, betaRate));
@@ -885,7 +891,8 @@ void ndMultiBodyVehicle::ApplyVehicleDynamicControl()
 					ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
 					if (tire->m_info.m_steeringAngle != 0)
 					{
-						ndFloat32 steering = tire->m_normalidedSteering0 + (tire->m_normalidedSteering - tire->m_normalidedSteering0) * steerinStep;
+						//ndFloat32 steering = tire->m_normalidedSteering0 + (tire->m_normalidedSteering - tire->m_normalidedSteering0) * steerinStep;
+						ndFloat32 steering = tire->m_normalidedSteering0 + (tire->m_normalidedSteering - tire->m_normalidedSteering0) * m_steeringRate;
 						//ndTrace(("(s1=%f s0=%f) ", steering, tire->m_normalidedSteering0));
 						tire->m_normalidedSteering = steering;
 						//ndTrace(("a=%f s=%f b'=%f\n", localAccel.m_z, steering * tire->m_info.m_steeringAngle * ndRadToDegree, betaRate));
@@ -941,8 +948,7 @@ void ndMultiBodyVehicle::ApplyTireModel(ndFloat32 timestep, ndFixSizeArray<ndTir
 
 	if (tireContacts.GetCount() == savedContactCount)
 	{
-
-		ApplyVehicleDynamicControl();
+		ApplyVehicleStabilityControl();
 		for (ndInt32 i = tireContacts.GetCount() - 1; i >= 0; --i)
 		{
 			ndContact* const contact = tireContacts[i].m_contact;

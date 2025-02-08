@@ -2432,18 +2432,23 @@ bool ndContactSolver::CalculateClosestPoints()
 ndInt32 ndContactSolver::CalculateContactsDiscrete()
 {
 	ndInt32 count = 0;
-	if (m_instance0.GetShape()->GetAsShapeCompound() || m_instance1.GetShape()->GetAsShapeCompound())
+	ndShape* const shape0 = m_instance0.GetShape();
+	ndShape* const shape1 = m_instance1.GetShape();
+	if (!(shape0->GetAsShapeNull() || shape1->GetAsShapeNull()))
 	{
-		count = CompoundContactsDiscrete();
-	}
-	else if (m_instance0.GetShape()->GetAsShapeConvex())
-	{
-		count = ConvexContactsDiscrete();
-	}
-	else
-	{
-		//ndTrace(("Fix compound contact for pair: %s %s\n", m_instance0.GetShape()->ClassName(), m_instance1.GetShape()->ClassName()));
-		//ndAssert(0);
+		if (shape0->GetAsShapeCompound() || shape1->GetAsShapeCompound())
+		{
+			count = CompoundContactsDiscrete();
+		}
+		else if (shape0->GetAsShapeConvex())
+		{
+			count = ConvexContactsDiscrete();
+		}
+		else
+		{
+			//ndTrace(("Fix compound contact for pair: %s %s\n", m_instance0.GetShape()->ClassName(), m_instance1.GetShape()->ClassName()));
+			//ndAssert(0);
+		}
 	}
 
 	m_contact->m_timeOfImpact = m_timestep;
@@ -2622,47 +2627,49 @@ ndInt32 ndContactSolver::ConvexToConvexContactsDiscrete()
 
 ndInt32 ndContactSolver::CompoundContactsDiscrete()
 {
-	if (!m_instance1.GetShape()->GetAsShapeCompound())
+	ndShape* const shape0 = m_instance0.GetShape();
+	ndShape* const shape1 = m_instance1.GetShape();
+	if (!shape1->GetAsShapeCompound())
 	{
-		ndAssert(m_instance0.GetShape()->GetAsShapeCompound());
-		if (m_instance1.GetShape()->GetAsShapeConvex())
+		ndAssert(shape0->GetAsShapeCompound());
+		if (shape1->GetAsShapeConvex())
 		{
 			return CompoundToConvexContactsDiscrete();
 		}
-		else if (m_instance1.GetShape()->GetAsShapeStaticBVH())
+		else if (shape1->GetAsShapeStaticBVH())
 		{
 			return CompoundToShapeStaticBvhContactsDiscrete();
 		}
-		else if (m_instance1.GetShape()->GetAsShapeHeightfield())
+		else if (shape1->GetAsShapeHeightfield())
 		{
 			return CompoundToStaticHeightfieldContactsDiscrete();
 		}
-		else if (m_instance1.GetShape()->GetAsShapeStaticProceduralMesh())
+		else if (shape1->GetAsShapeStaticProceduralMesh())
 		{
 			return CompoundToStaticProceduralMesh();
 		}
 		else
 		{
-			ndTrace(("Fix compound contact for pair: %s %s\n", m_instance0.GetShape()->ClassName(), m_instance1.GetShape()->ClassName()));
+			ndTrace(("Fix compound contact for pair: %s %s\n", shape0->ClassName(), shape1->ClassName()));
 			ndAssert(0);
 		}
 	}
-	else if (!m_instance0.GetShape()->GetAsShapeCompound())
+	else if (!shape0->GetAsShapeCompound())
 	{
-		ndAssert(m_instance1.GetShape()->GetAsShapeCompound());
-		if (m_instance0.GetShape()->GetAsShapeConvex())
+		ndAssert(shape1->GetAsShapeCompound());
+		if (shape0->GetAsShapeConvex())
 		{
 			return ConvexToCompoundContactsDiscrete();
 		}
 		else
 		{
-			ndTrace(("Fix compound contact for pair: %s %s\n", m_instance0.GetShape()->ClassName(), m_instance1.GetShape()->ClassName()));
+			ndTrace(("Fix compound contact for pair: %s %s\n", shape0->ClassName(), shape1->ClassName()));
 			ndAssert(0);
 		}
 	}
 	else
 	{
-		ndAssert(m_instance0.GetShape()->GetAsShapeCompound() && m_instance1.GetShape()->GetAsShapeCompound());
+		ndAssert(shape0->GetAsShapeCompound() && shape1->GetAsShapeCompound());
 		return CompoundToCompoundContactsDiscrete();
 	}
 	return 0;

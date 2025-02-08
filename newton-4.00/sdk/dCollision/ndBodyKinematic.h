@@ -223,6 +223,7 @@ class ndBodyKinematic : public ndBody
 	ndVector m_gyroAlpha;
 	ndVector m_gyroTorque;
 	ndQuaternion m_gyroRotation;
+	D_MEMORY_ALIGN_FIXUP
 
 	D_COLLISION_API static ndVector m_velocTol;
 

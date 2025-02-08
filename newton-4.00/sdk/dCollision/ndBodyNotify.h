@@ -55,6 +55,7 @@ class ndBodyNotify : public ndContainersFreeListAlloc<ndBodyNotify>
 	private:
 	ndVector m_defaultGravity;
 	ndBody* m_body;
+	D_MEMORY_ALIGN_FIXUP
 	friend class ndBody;
 } D_GCC_NEWTON_ALIGN_32;
 

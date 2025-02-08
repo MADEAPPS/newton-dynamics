@@ -55,6 +55,7 @@ class ndFastAabb : public ndMatrix
 	ndVector m_p1;
 	ndVector m_size;
 	mutable ndVector m_separationDistance;
+	D_MEMORY_ALIGN_FIXUP
 
 	friend class ndAabbPolygonSoup;
 } D_GCC_NEWTON_ALIGN_32 ;

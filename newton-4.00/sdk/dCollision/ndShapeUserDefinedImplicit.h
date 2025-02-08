@@ -24,8 +24,6 @@
 
 #include "ndShapeConvex.h"
 
-
-
 D_MSV_NEWTON_ALIGN_32
 class ndShapeUserDefinedImplicit: public ndShapeConvex
 {

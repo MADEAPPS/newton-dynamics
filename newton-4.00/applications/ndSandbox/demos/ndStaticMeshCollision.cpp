@@ -131,10 +131,11 @@ class CConvexCasterModelNotify : public ndModelNotify
 
 	virtual void Debug(ndConstraintDebugCallback&) const override
 	{
-		ndWireFrameDebugMesh sharedEdgeMesh (m_pScene->GetShaderCache(), &m_CastShape);
-		const ndVector color(0.5f, 0.5f, 0.5f, 1.0f);
-		sharedEdgeMesh.SetColor(color);
-		sharedEdgeMesh.Render(m_pScene, ndGetIdentityMatrix());
+		// this is a mistake, because it render from outsize the renmder thread.
+		//ndWireFrameDebugMesh sharedEdgeMesh (m_pScene->GetShaderCache(), &m_CastShape);
+		//const ndVector color(0.5f, 0.5f, 0.5f, 1.0f);
+		//sharedEdgeMesh.SetColor(color);
+		//sharedEdgeMesh.Render(m_pScene, ndGetIdentityMatrix());
 	}
 
 	virtual void Update(ndWorld* const world, ndFloat32) override

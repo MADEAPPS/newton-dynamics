@@ -45,7 +45,7 @@ class ndMaterial : public ndContainersFreeListAlloc<ndMaterial>
 	ndFloat32 m_softness;
 	ndUnsigned32 m_flags;
 	ndUnsigned32 m_userFlags;
-	ndBigVector m_menLayoutPadding; // moronic unreal uses 16 alignment and the subclasses are off.
+	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
@@ -67,7 +67,7 @@ class ndContactNotify: public ndClassAlloc
 
 	private:
 	ndScene* m_scene;
-	ndBigVector m_menLayoutPadding; // moronic unreal uses 16 alignment and the subclasses are off.
+	D_MEMORY_ALIGN_FIXUP
 
 	friend class ndScene;
 	friend class ndContactSolver;

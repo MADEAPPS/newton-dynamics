@@ -58,10 +58,6 @@ ndShapeHeightfield::ndShapeHeightfield(
 	m_attributeMap.SetCount(width * height);
 	m_elevationMap.SetCount(width * height);
 
-	int xxxx0 = sizeof(ndShape);
-	int xxxx1 = sizeof(ndShapeStaticMesh);
-	int xxxx2 = sizeof(ndShapeHeightfield);
-
 	ndMemSet(&m_attributeMap[0], ndInt8(0), m_attributeMap.GetCount());
 	ndMemSet(&m_elevationMap[0], ndReal(0.0f), m_elevationMap.GetCount());
 

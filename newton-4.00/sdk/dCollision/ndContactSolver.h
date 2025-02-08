@@ -31,16 +31,17 @@ class ndBodyKinematic;
 class ndContactNotify;
 class ndPolygonMeshDesc;
 
-D_MSV_NEWTON_ALIGN_32
+//D_MSV_NEWTON_ALIGN_32
 class ndMinkFace
 {
-	public:
+public:
 	ndPlane m_plane;
 	ndMinkFace* m_twin[3];
 	ndInt16 m_vertex[3];
 	ndInt8 m_mark;
 	ndInt8 m_alive;
-} D_GCC_NEWTON_ALIGN_32 ;
+	//} D_GCC_NEWTON_ALIGN_32 ;
+};
 
 #define D_SEPARATION_PLANES_ITERATIONS	8
 #define D_CONVEX_MINK_STACK_SIZE		64
@@ -178,6 +179,7 @@ class ndContactSolver: public ndDownHeap<ndMinkFace *, ndFloat32>
 
 	static ndVector m_hullDirs[14]; 
 	static ndInt32 m_rayCastSimplex[4][4];
+	D_MEMORY_ALIGN_FIXUP
 
 	friend class ndScene;
 	friend class ndShapeConvex;

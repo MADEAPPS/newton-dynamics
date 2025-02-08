@@ -62,6 +62,7 @@ class ndBvhNode : public ndContainersFreeListAlloc<ndBvhNode>
 	ndInt32 m_nodeId;
 #endif
 
+	D_MEMORY_ALIGN_FIXUP
 	static ndVector m_aabbQuantization;
 	static ndVector m_aabbInvQuantization;
 } D_GCC_NEWTON_ALIGN_32 ;

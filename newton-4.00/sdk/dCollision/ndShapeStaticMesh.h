@@ -66,6 +66,7 @@ class ndShapeStaticMesh: public ndShape
 		ndInt32 m_vertexCount;
 		ndInt32 m_vertexStrideInBytes;
 	} D_GCC_NEWTON_ALIGN_32;
+
 } D_GCC_NEWTON_ALIGN_32;
 
 

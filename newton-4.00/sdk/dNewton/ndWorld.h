@@ -189,6 +189,7 @@ class ndWorld: public ndClassAlloc
 	ndSolverModes m_solverMode;
 	ndInt32 m_solverIterations;
 	bool m_inUpdate;
+	D_MEMORY_ALIGN_FIXUP
 	
 	friend class ndScene;
 	friend class ndIkSolver;

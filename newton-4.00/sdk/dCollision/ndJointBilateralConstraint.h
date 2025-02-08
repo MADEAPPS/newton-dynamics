@@ -160,6 +160,7 @@ class ndJointBilateralConstraint : public ndConstraint
 	ndInt8 m_rowIsMotor;
 	ndInt8 m_hitLimits;
 	ndJointBilateralSolverModel m_solverModel;
+	D_MEMORY_ALIGN_FIXUP
 
 	friend class ndWorld;
 	friend class ndIkSolver;

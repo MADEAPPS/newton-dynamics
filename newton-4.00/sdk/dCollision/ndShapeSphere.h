@@ -55,6 +55,7 @@ class ndShapeSphere: public ndShapeConvex
 
 	ndVector m_vertex[D_SPHERE_VERTEX_COUNT];
 	ndFloat32 m_radius;
+	D_MEMORY_ALIGN_FIXUP
 
 	static ndInt32 m_shapeRefCount;
 	static ndVector m_unitSphere[];

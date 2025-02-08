@@ -96,9 +96,9 @@ void ndMemory::Free(void* const ptr)
 	}
 }
 
+#if defined (D_MEMORY_SANITY_CHECK) && defined(_DEBUG)
 bool ndMemory::CheckMemory(const void* const ptr)
 {
-#if defined (D_MEMORY_SANITY_CHECK) && defined(_DEBUG)
 	const char* const mem0 = ((char*)ptr) - D_MEMORY_SAFE_GUARD;
 	ndMemoryHeader* const info = ((ndMemoryHeader*)mem0) - 1;
 	const char* const mem1 = mem0 + info->m_requestedSize - D_MEMORY_SAFE_GUARD;
@@ -114,9 +114,14 @@ bool ndMemory::CheckMemory(const void* const ptr)
 			return false;
 		}
 	}
-#endif
 	return true;
 }
+#else
+bool ndMemory::CheckMemory(const void* const)
+{
+	return true;
+}
+#endif
 
 size_t ndMemory::GetSize(void* const ptr)
 {

@@ -82,6 +82,7 @@ class ndConstraintDebugCallback: public ndClassAlloc
 	}
 		
 	ndFloat32 m_debugScale;
+	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
@@ -247,6 +248,7 @@ class ndConstraint: public ndContainersFreeListAlloc<ndConstraint>
 	ndUnsigned8 m_fence1;
 	ndUnsigned8 m_resting;   // this should be identical to m_fence0, should be removed. 
 	ndUnsigned8 m_isInSkeletonLoop;
+	D_MEMORY_ALIGN_FIXUP
 
 	friend class ndIkSolver;
 	friend class ndBodyKinematic;

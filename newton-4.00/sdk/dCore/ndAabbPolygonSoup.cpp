@@ -115,6 +115,7 @@ class ndAabbPolygonSoup::ndNodeBuilder: public ndAabbPolygonSoup::ndNode
 	ndInt32 m_faceIndex;
 	ndInt32 m_indexCount;
 	const ndInt32* m_faceIndices;
+	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 class ndAabbPolygonSoup::ndSplitInfo

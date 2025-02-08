@@ -78,8 +78,8 @@ class ndBodySphFluid: public ndBodyParticleSet
 	ndFloat32 m_viscosity;
 	ndFloat32 m_restDensity;
 	ndFloat32 m_gasConstant;
-	
-} D_GCC_NEWTON_ALIGN_32 ;
+	D_MEMORY_ALIGN_FIXUP
+} D_GCC_NEWTON_ALIGN_32;
 
 inline bool ndBodySphFluid::RayCast(ndRayCastNotify&, const ndFastRay&, const ndFloat32) const
 {

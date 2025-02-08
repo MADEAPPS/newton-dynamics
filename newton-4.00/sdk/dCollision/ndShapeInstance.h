@@ -55,6 +55,7 @@ class ndShapeDebugNotify : public ndClassAlloc
 	virtual void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceArray, const ndEdgeType* const edgeType) = 0;
 
 	const ndShapeInstance* m_instance;
+	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
@@ -178,10 +179,10 @@ class ndShapeInstance: public ndContainersFreeListAlloc<ndShapeInstance>
 	const ndShape* m_shape;
 	const ndBody* m_ownerBody;
 	const void* m_subCollisionHandle;
-	//const ndShapeInstance* m_parent____;
 	ndFloat32 m_skinMargin;
 	ndScaleType m_scaleType;
 	bool m_collisionMode;
+	D_MEMORY_ALIGN_FIXUP
 
 	private:
 	static ndVector m_padding;
