@@ -62,7 +62,7 @@ class ndDynamicsUpdateAvx2: public ndDynamicsUpdate
 	ndArray<ndJacobian> m_jointMask;
 	ndArray<ndInt32> m_avxJointRows;
 	ndAvxMatrixArray* m_avxMassMatrixArray;
-
+	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 #endif

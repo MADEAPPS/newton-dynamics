@@ -24,6 +24,8 @@
 
 #include "ndNewtonStdafx.h"
 
+class ndModel;
+
 D_MSV_NEWTON_ALIGN_32
 class ndModelNotify : public ndContainersFreeListAlloc<ndModelNotify>
 {

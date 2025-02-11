@@ -123,22 +123,25 @@ ndModelArticulation::ndNode* ndModelArticulation::GetRoot() const
 
 void ndModelArticulation::ClearMemory()
 {
-	for (ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
+	if (m_rootNode)
 	{
-		ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
-
-		ndBodyKinematic::ndJointList& jointList = body->GetJointList();
-		for (ndBodyKinematic::ndJointList::ndNode* jointNode = jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
+		for (ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
 		{
-			jointNode->GetInfo()->ClearMemory();
-		}
+			ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
 
-		ndBodyKinematic::ndContactMap& contactMap = body->GetContactMap();
-		ndBodyKinematic::ndContactMap::Iterator it(contactMap);
-		for (it.Begin(); it; it++)
-		{
-			ndContact* const contact = it.GetNode()->GetInfo();
-			contact->ClearMemory();
+			ndBodyKinematic::ndJointList& jointList = body->GetJointList();
+			for (ndBodyKinematic::ndJointList::ndNode* jointNode = jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
+			{
+				jointNode->GetInfo()->ClearMemory();
+			}
+
+			ndBodyKinematic::ndContactMap& contactMap = body->GetContactMap();
+			ndBodyKinematic::ndContactMap::Iterator it(contactMap);
+			for (it.Begin(); it; it++)
+			{
+				ndContact* const contact = it.GetNode()->GetInfo();
+				contact->ClearMemory();
+			}
 		}
 	}
 
@@ -166,8 +169,8 @@ void ndModelArticulation::ClearMemory()
 ndModelArticulation::ndNode* ndModelArticulation::AddRootBody(const ndSharedPtr<ndBody>& rootBody)
 {
 	ndAssert(!m_rootNode);
-	ndSharedPtr <ndJointBilateralConstraint> dommyJoint;
-	m_rootNode = new ndNode(rootBody, dommyJoint, nullptr);
+	ndSharedPtr <ndJointBilateralConstraint> dummyJoint;
+	m_rootNode = new ndNode(rootBody, dummyJoint, nullptr);
 	return m_rootNode;
 }
 
@@ -255,38 +258,36 @@ void ndModelArticulation::OnRemoveFromToWorld()
 void ndModelArticulation::AddCloseLoop(const ndSharedPtr<ndJointBilateralConstraint>& joint, const char* const name)
 {
 	#ifdef _DEBUG
-
-	auto Check = [&](const ndBodyKinematic* const body)
-	{
-		if (body->GetInvMass() == ndFloat32(0.0f))
+		auto Check = [&](const ndBodyKinematic* const body)
 		{
+			if (body->GetInvMass() == ndFloat32(0.0f))
+			{
+				return false;
+			}
+			ndFixSizeArray<ndNode*, 256> stack;
+			stack.PushBack(m_rootNode);
+			while (stack.GetCount())
+			{
+				ndInt32 index = stack.GetCount() - 1;
+				ndNode* const node = stack[index];
+				stack.SetCount(index);
+				if (node->m_body->GetAsBodyKinematic() == body)
+				{
+					return true;
+				}
+
+				for (ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
+				{
+					stack.PushBack(child);
+				}
+			}
+
 			return false;
-		}
-		ndFixSizeArray<ndNode*, 256> stack;
-		stack.PushBack(m_rootNode);
-		while (stack.GetCount())
-		{
-			ndInt32 index = stack.GetCount() - 1;
-			ndNode* const node = stack[index];
-			stack.SetCount(index);
-			if (node->m_body->GetAsBodyKinematic() == body)
-			{
-				return true;
-			}
+		};
 
-			for (ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
-			{
-				stack.PushBack(child);
-			}
-		}
-
-		return false;
-	};
-
-	ndAssert(Check(joint->GetBody0()) || Check(joint->GetBody1()));
+		ndAssert(Check(joint->GetBody0()) || Check(joint->GetBody1()));
 	#endif
 
-	//for (ndSharedList<ndJointBilateralConstraint>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())
 	for (ndList<ndNode>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())
 	{
 		//if (*node->GetInfo() == *joint)
@@ -310,12 +311,15 @@ void ndModelArticulation::AddCloseLoop(const ndSharedPtr<ndJointBilateralConstra
 
 void ndModelArticulation::AddToWorld(ndWorld* const world)
 {
-	for (ndModelArticulation::ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
+	if (m_rootNode)
 	{
-		world->AddBody(node->m_body);
-		if (node->m_joint)
+		for (ndModelArticulation::ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
 		{
-			world->AddJoint(node->m_joint);
+			world->AddBody(node->m_body);
+			if (node->m_joint)
+			{
+				world->AddJoint(node->m_joint);
+			}
 		}
 	}
 	world->AddModel(this);
@@ -323,11 +327,14 @@ void ndModelArticulation::AddToWorld(ndWorld* const world)
 
 ndModelArticulation::ndNode* ndModelArticulation::FindByBody(const ndBody* const body) const
 {
-	for (ndModelArticulation::ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
+	if (m_rootNode)
 	{
-		if (*node->m_body == body)
+		for (ndModelArticulation::ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
 		{
-			return node;
+			if (*node->m_body == body)
+			{
+				return node;
+			}
 		}
 	}
 
@@ -336,11 +343,14 @@ ndModelArticulation::ndNode* ndModelArticulation::FindByBody(const ndBody* const
 
 ndModelArticulation::ndNode* ndModelArticulation::FindByName(const char* const name) const
 {
-	for (ndModelArticulation::ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
+	if (m_rootNode)
 	{
-		if (strcmp(node->m_name.GetStr(), name) == 0)
+		for (ndModelArticulation::ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
 		{
-			return node;
+			if (strcmp(node->m_name.GetStr(), name) == 0)
+			{
+				return node;
+			}
 		}
 	}
 
@@ -349,11 +359,14 @@ ndModelArticulation::ndNode* ndModelArticulation::FindByName(const char* const n
 
 ndModelArticulation::ndNode* ndModelArticulation::FindLoopByName(const char* const name) const
 {
-	for (ndList<ndNode>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())
+	if (m_rootNode)
 	{
-		if (strcmp(node->GetInfo().m_name.GetStr(), name) == 0)
+		for (ndList<ndNode>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())
 		{
-			return &node->GetInfo();
+			if (strcmp(node->GetInfo().m_name.GetStr(), name) == 0)
+			{
+				return &node->GetInfo();
+			}
 		}
 	}
 
@@ -362,11 +375,14 @@ ndModelArticulation::ndNode* ndModelArticulation::FindLoopByName(const char* con
 
 void ndModelArticulation::SetTransform(const ndMatrix& matrix)
 {
-	const ndMatrix offset(m_rootNode->m_body->GetMatrix().OrthoInverse() * matrix);
-	for (ndModelArticulation::ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
+	if (m_rootNode)
 	{
-		ndSharedPtr<ndBody> body(node->m_body);
-		body->SetMatrix(body->GetMatrix() * offset);
+		const ndMatrix offset(m_rootNode->m_body->GetMatrix().OrthoInverse() * matrix);
+		for (ndModelArticulation::ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
+		{
+			ndSharedPtr<ndBody> body(node->m_body);
+			body->SetMatrix(body->GetMatrix() * offset);
+		}
 	}
 }
 
@@ -383,6 +399,11 @@ void ndModelArticulation::ConvertToUrdf()
 		ndMatrix m_jointMatrix1;
 		ndJointBilateralConstraint* m_joint;
 	};
+
+	if (!m_rootNode)
+	{
+		return;
+	}
 
 	ndTree<BodyInfo, ndModelArticulation::ndNode*> map;
 	for (ndModelArticulation::ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())

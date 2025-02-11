@@ -177,9 +177,14 @@ ndFloat32 ndMultiBodyVehicle::GetSpeed() const
 
 void ndMultiBodyVehicle::AddChassis(const ndSharedPtr<ndBody>& chassis)
 {
-	AddRootBody(chassis);
 	m_chassis = chassis->GetAsBodyDynamic();
 	ndAssert(m_chassis);
+
+	ndAssert(!GetRoot() || (GetRoot()->m_body == chassis));
+	if (!FindByBody(m_chassis))
+	{
+		AddRootBody(m_chassis);
+	}
 }
 
 void ndMultiBodyVehicle::SetVehicleSolverModel(bool hardJoint)

@@ -28,7 +28,6 @@
 #include "ndBodyListView.h"
 
 class ndScene;
-class ndModel;
 class ndSkeletonContainer;
 class ndJointBilateralConstraint;
 

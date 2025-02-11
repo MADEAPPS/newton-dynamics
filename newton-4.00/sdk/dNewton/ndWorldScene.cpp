@@ -39,6 +39,12 @@ ndWorldScene::~ndWorldScene()
 {
 }
 
+ndWorld* ndWorldScene::GetWorld() const
+{
+	return m_world;
+}
+
+
 void ndWorldScene::ThreadFunction()
 {
 	m_world->ThreadFunction();

@@ -25,6 +25,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
 
+D_MSV_NEWTON_ALIGN_32
 class ndWorldScene : public ndScene
 {
 	public:
@@ -33,16 +34,13 @@ class ndWorldScene : public ndScene
 	D_NEWTON_API virtual ~ndWorldScene();
 
 	protected:
-	virtual void ThreadFunction();
-
-	virtual ndWorld* GetWorld() const;
+	D_NEWTON_API virtual void ThreadFunction();
+	D_NEWTON_API virtual ndWorld* GetWorld() const;
 
 	ndWorld* m_world;
-};
 
-inline ndWorld* ndWorldScene::GetWorld() const
-{
-	return m_world;
-}
+	D_MEMORY_ALIGN_FIXUP
+} D_GCC_NEWTON_ALIGN_32;
+
 
 #endif
