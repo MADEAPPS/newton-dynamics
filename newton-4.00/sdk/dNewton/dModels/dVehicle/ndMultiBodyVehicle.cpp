@@ -181,9 +181,9 @@ void ndMultiBodyVehicle::AddChassis(const ndSharedPtr<ndBody>& chassis)
 	ndAssert(m_chassis);
 
 	ndAssert(!GetRoot() || (GetRoot()->m_body == chassis));
-	if (!FindByBody(m_chassis))
+	if (!FindByBody(*chassis))
 	{
-		AddRootBody(m_chassis);
+		AddRootBody(chassis);
 	}
 }
 
