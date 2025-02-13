@@ -1687,7 +1687,7 @@ ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
 	ndVector origin(ndVector::m_zero);
 	ndContactPoint* const contactArray = m_contactBuffer;
 
-	for (ndInt32 i = 0; i < count; ++i) 
+	for (ndInt32 i = count - 1; i >= 0; --i)
 	{
 		origin += contactArray[i].m_point;
 	}
@@ -1696,7 +1696,7 @@ ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
 	origin.m_w = ndFloat32(1.0f);
 
 	ndMatrix covariance(ndGetZeroMatrix());
-	for (ndInt32 i = 0; i < count; ++i) 
+	for (ndInt32 i = count - 1; i >= 0; --i)
 	{
 		ndVector p((contactArray[i].m_point - origin) & ndVector::m_triplexMask);
 		ndAssert(p.m_w == ndFloat32(0.0f));
@@ -1747,28 +1747,33 @@ ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
 			ndSwap(covariance[i][1], covariance[i][2]);
 		}
 	}
+	ndAssert(eigen[1] >= eigen[2]);
+	ndAssert(eigen[0] >= eigen[1]);
+	//const ndFloat32 eigenValueError = ndFloat32(1.0e-4f);
 
-	const ndFloat32 eigenValueError = ndFloat32(1.0e-4f);
-	if (eigen[2] > eigenValueError) 
+	//if (eigen[2] > eigenValueError) 
+	if (ndFloat32 (16.0f) * eigen[2] > eigen[0])
 	{
 		// 3d convex Hull
 		return Prune3dContacts(covariance, count, contactArray, maxCount);
 	}
-	else if (eigen[1] > eigenValueError) 
+	//else if (eigen[1] > eigenValueError) 
+	if (ndFloat32(16.0f) * eigen[1] > eigen[0])
 	{
 		// is a 2d or 1d convex hull
 		return Prune2dContacts(covariance, count, contactArray, maxCount);
 	}
-	else if (eigen[0] > eigenValueError) 
+	else if (eigen[0] > ndFloat32(1.0e-4f))
 	{
 		// is a line or a point convex hull
 		if (count > 2) 
 		{
-			ndFloat32 maxValue = ndFloat32(-1.0e10f);
-			ndFloat32 minValue = ndFloat32(-1.0e10f);
 			ndInt32 j0 = 0;
 			ndInt32 j1 = 0;
-			for (ndInt32 i = 0; i < count; ++i) 
+			ndFloat32 maxValue = ndFloat32(-1.0e10f);
+			//ndFloat32 minValue = ndFloat32(-1.0e10f);
+			ndFloat32 minValue = ndFloat32(1.0e10f);
+			for (ndInt32 i = count-1; i >= 0 ; --i)
 			{
 				ndFloat32 dist = contactArray[i].m_point.DotProduct(covariance.m_front).GetScalar();
 				if (dist > maxValue) 
@@ -1776,10 +1781,11 @@ ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
 					j0 = i;
 					maxValue = dist;
 				}
-				if (-dist > minValue) 
+				ndFloat32 distNeg = dist * ndFloat32(1.0f);
+				if (distNeg < minValue)
 				{
 					j1 = i;
-					minValue = -dist;
+					minValue = distNeg;
 				}
 			}
 			ndContactPoint c0(contactArray[j0]);
@@ -2584,8 +2590,8 @@ ndInt32 ndContactSolver::ConvexToConvexContactsDiscrete()
 					for (ndInt32 i = count - 1; i >= 0; --i)
 					{
 						//ndBigVector point(m_buffer[i]);
-						ndBigVector point(m_buffer[i] - convexPolygon->m_normal * (m_buffer[i] - poly[0]).DotProduct(convexPolygon->m_normal));
-						ndBigVector pointInPoly(ndPointToPolygonDistance(point, &poly[0], convexPolygon->m_count));
+						const ndBigVector point(m_buffer[i] - convexPolygon->m_normal * (m_buffer[i] - poly[0]).DotProduct(convexPolygon->m_normal));
+						const ndBigVector pointInPoly(ndPointToPolygonDistance(point, &poly[0], convexPolygon->m_count));
 
 						const ndBigVector error(point - pointInPoly);
 						ndFloat64 dist2 = error.DotProduct(error & ndBigVector::m_triplexMask).GetScalar();
@@ -2601,23 +2607,27 @@ ndInt32 ndContactSolver::ConvexToConvexContactsDiscrete()
 		}
 
 		count = ndMin(m_maxCount, count);
-		ndContactPoint* const contactOut = m_contactBuffer;
-
-		ndBodyKinematic* const body0 = m_contact->GetBody0();
-		ndBodyKinematic* const body1 = m_contact->GetBody1();
-		ndShapeInstance* const instance0 = &body0->GetCollisionShape();
-		ndShapeInstance* const instance1 = &body1->GetCollisionShape();
-
-		ndVector normal(m_separatingVector * ndVector::m_negOne);
-		for (ndInt32 i = count - 1; i >= 0; --i)
+		if (count)
 		{
-			contactOut[i].m_point = m_buffer[i];
-			contactOut[i].m_normal = normal;
-			contactOut[i].m_body0 = body0;
-			contactOut[i].m_body1 = body1;
-			contactOut[i].m_shapeInstance0 = instance0;
-			contactOut[i].m_shapeInstance1 = instance1;
-			contactOut[i].m_penetration = -penetration;
+			ndContactPoint* const contactOut = m_contactBuffer;
+
+			ndBodyKinematic* const body0 = m_contact->GetBody0();
+			ndBodyKinematic* const body1 = m_contact->GetBody1();
+			ndShapeInstance* const instance0 = &body0->GetCollisionShape();
+			ndShapeInstance* const instance1 = &body1->GetCollisionShape();
+
+			const ndVector normal(m_separatingVector * ndVector::m_negOne);
+
+			for (ndInt32 i = count - 1; i >= 0; --i)
+			{
+				contactOut[i].m_point = m_buffer[i];
+				contactOut[i].m_normal = normal;
+				contactOut[i].m_body0 = body0;
+				contactOut[i].m_body1 = body1;
+				contactOut[i].m_shapeInstance0 = instance0;
+				contactOut[i].m_shapeInstance1 = instance1;
+				contactOut[i].m_penetration = -penetration;
+			}
 		}
 	}
 

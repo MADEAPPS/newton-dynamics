@@ -19,9 +19,8 @@ class ndWheelDescriptor
 {
 	public:
 	ndWheelDescriptor()
-		:m_radios(ndFloat32(0.5f))
-		,m_springK(ndFloat32(1.0f))
-		,m_damperC(ndFloat32(0.0f))
+		:m_springK(ndFloat32(2000.0f))
+		,m_damperC(ndFloat32(50.0f))
 		,m_upperStop(ndFloat32(0.2f))
 		,m_lowerStop(ndFloat32(-0.1f))
 		,m_regularizer(ndFloat32(0.1f))
@@ -31,7 +30,6 @@ class ndWheelDescriptor
 	{
 	}
 	
-	ndFloat32 m_radios;
 	ndFloat32 m_springK;
 	ndFloat32 m_damperC;
 	ndFloat32 m_upperStop;
@@ -83,7 +81,7 @@ class ndJointWheel : public ndJointBilateralConstraint
 	ndFloat32 m_normalidedSteering;
 	ndFloat32 m_normalidedSteering0;
 	ndFloat32 m_normalizedHandBrake;
-	bool m_vcdMode;
+	//bool m_vcdMode;
 	friend class ndMultiBodyVehicle;
 };
 

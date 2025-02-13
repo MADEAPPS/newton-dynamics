@@ -24,7 +24,7 @@ ndJointWheel::ndJointWheel()
 	,m_normalidedSteering(ndFloat32(0.0f))
 	,m_normalidedSteering0(ndFloat32(0.0f))
 	,m_normalizedHandBrake(ndFloat32(0.0f))
-	,m_vcdMode(false)
+	//,m_vcdMode(false)
 {
 	m_maxDof = 7;
 }
@@ -40,7 +40,7 @@ ndJointWheel::ndJointWheel(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* co
 	,m_normalidedSteering(ndFloat32(0.0f))
 	,m_normalidedSteering0(ndFloat32(0.0f))
 	,m_normalizedHandBrake(ndFloat32(0.0f))
-	,m_vcdMode(false)
+	//,m_vcdMode(false)
 {
 }
 
@@ -204,10 +204,10 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 		SetHighFriction(desc, brakeFrictionTorque);
 		SetLowerFriction(desc, -brakeFrictionTorque);
 	}
-	else if (m_vcdMode)
-	{
-		ndAssert(0);
-	}
+	//else if (m_vcdMode)
+	//{
+	//	ndAssert(0);
+	//}
 
 	// add suspension limits alone the vertical axis 
 	const ndFloat32 x = m_posit + m_speed * desc.m_timestep;

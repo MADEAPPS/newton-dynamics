@@ -65,6 +65,7 @@ class ndModelArticulation: public ndModel
 	D_NEWTON_API ndNode* FindByName(const char* const name) const;
 	D_NEWTON_API ndNode* FindByBody(const ndBody* const body) const;
 	D_NEWTON_API ndNode* FindLoopByName(const char* const name) const;
+	D_NEWTON_API ndNode* FindLoopByJoint(const ndJointBilateralConstraint* const joint) const;
 
 	D_NEWTON_API void ClearMemory();
 	D_NEWTON_API void AddToWorld(ndWorld* const world);
