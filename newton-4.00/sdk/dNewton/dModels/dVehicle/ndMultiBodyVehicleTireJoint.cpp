@@ -41,6 +41,16 @@ ndMultiBodyVehicleTireJoint::~ndMultiBodyVehicleTireJoint()
 {
 }
 
+void ndMultiBodyVehicleTireJoint::SetVehicle(ndMultiBodyVehicle* const vehicle)
+{
+	m_vehicle = vehicle;
+}
+
+ndMultiBodyVehicleTireJointInfo ndMultiBodyVehicleTireJoint::GetInfo() const
+{
+	return ndMultiBodyVehicleTireJointInfo (ndJointWheel::GetInfo(), m_frictionModel);
+}
+
 ndFloat32 ndMultiBodyVehicleTireJoint::GetSideSlip() const
 {
 	return m_lateralSlip;

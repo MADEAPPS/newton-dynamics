@@ -27,8 +27,8 @@ class ndTireFrictionModel
 	};
 
 	ndTireFrictionModel()
-		:m_laterialStiffness(ndFloat32(10.0f))
-		,m_longitudinalStiffness(ndFloat32(10.0f))
+		:m_laterialStiffness(ndFloat32(-100.0f))
+		,m_longitudinalStiffness(ndFloat32(-100.0f))
 		,m_frictionModel(m_brushModel)
 	{
 	}
@@ -46,6 +46,12 @@ class ndMultiBodyVehicleTireJointInfo : public ndWheelDescriptor, public ndTireF
 		,ndTireFrictionModel()
 	{
 	}
+
+	ndMultiBodyVehicleTireJointInfo(const ndWheelDescriptor& info, const ndTireFrictionModel& frictionModel)
+		:ndWheelDescriptor(info)
+		,ndTireFrictionModel(frictionModel)
+	{
+	}
 };
 
 class ndMultiBodyVehicleTireJoint: public ndJointWheel
@@ -59,7 +65,9 @@ class ndMultiBodyVehicleTireJoint: public ndJointWheel
 
 	D_NEWTON_API ndFloat32 GetSideSlip() const;
 	D_NEWTON_API ndFloat32 GetLongitudinalSlip() const;
+	D_NEWTON_API ndMultiBodyVehicleTireJointInfo GetInfo() const;
 
+	D_NEWTON_API void SetVehicle(ndMultiBodyVehicle* const vehicle);
 	D_NEWTON_API const ndTireFrictionModel& GetFrictionModel() const;
 
 	protected:
