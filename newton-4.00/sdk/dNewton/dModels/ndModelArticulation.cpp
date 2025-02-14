@@ -255,6 +255,11 @@ void ndModelArticulation::OnRemoveFromToWorld()
 	}
 }
 
+const ndList<ndModelArticulation::ndNode>& ndModelArticulation::GetCloseLoops() const
+{
+	return m_closeLoops;
+}
+
 void ndModelArticulation::AddCloseLoop(const ndSharedPtr<ndJointBilateralConstraint>& joint, const char* const name)
 {
 	#ifdef _DEBUG
@@ -378,7 +383,7 @@ ndModelArticulation::ndNode* ndModelArticulation::FindLoopByJoint(const ndJointB
 	{
 		for (ndList<ndNode>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())
 		{
-			if (*node->GetInfo().m_joint, joint)
+			if (*node->GetInfo().m_joint == joint)
 			{
 				return &node->GetInfo();
 			}

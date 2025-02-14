@@ -55,6 +55,7 @@ class ndModelArticulation: public ndModel
 	D_NEWTON_API ndNode* AddRootBody(const ndSharedPtr<ndBody>& rootBody);
 	D_NEWTON_API ndNode* AddLimb(ndNode* const parent, const ndSharedPtr<ndBody>& body, const ndSharedPtr<ndJointBilateralConstraint>& joint);
 
+	D_NEWTON_API const ndList<ndModelArticulation::ndNode>& GetCloseLoops() const;
 	D_NEWTON_API void AddCloseLoop(const ndSharedPtr<ndJointBilateralConstraint>& joint, const char* const name = nullptr);
 
 	D_NEWTON_API virtual void OnAddToWorld();
