@@ -33,7 +33,10 @@ class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 	D_CLASS_REFLECTION(ndMultiBodyVehicleMotor, ndJointBilateralConstraint)
 
 	D_NEWTON_API ndMultiBodyVehicleMotor();
+	D_NEWTON_API ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndBodyKinematic* const chassis);
 	D_NEWTON_API ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndMultiBodyVehicle* const vehicelModel);
+
+	D_NEWTON_API void SetVehicleOwner(ndMultiBodyVehicle* const vehicle);
 
 	D_NEWTON_API ndFloat32 GetRpm() const;
 	D_NEWTON_API void SetMaxRpm(ndFloat32 redLineRpm);
@@ -55,7 +58,7 @@ class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 	ndFloat32 m_engineTorque;
 	ndFloat32 m_internalFriction;
 	
-	ndMultiBodyVehicle* m_vehicelModel;
+	ndMultiBodyVehicle* m_vehicle;
 	friend class ndMultiBodyVehicle;
 	friend class ndMultiBodyVehicleGearBox;
 };

@@ -41,7 +41,7 @@ ndMultiBodyVehicleTireJoint::~ndMultiBodyVehicleTireJoint()
 {
 }
 
-void ndMultiBodyVehicleTireJoint::SetVehicle(ndMultiBodyVehicle* const vehicle)
+void ndMultiBodyVehicleTireJoint::SetVehicleOwner(ndMultiBodyVehicle* const vehicle)
 {
 	m_vehicle = vehicle;
 }

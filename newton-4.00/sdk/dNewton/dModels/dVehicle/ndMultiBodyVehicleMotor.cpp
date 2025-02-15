@@ -36,8 +36,7 @@ ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor()
 	,m_targetOmega(ndFloat32(0.0f))
 	,m_engineTorque(ndFloat32(0.0f))
 	,m_internalFriction(ndFloat32(100.0f))
-	//,m_vehicelModel(vehicelModel)
-	,m_vehicelModel(nullptr)
+	,m_vehicle(nullptr)
 {
 	m_maxDof = 3;
 	ndAssert(0);
@@ -51,8 +50,25 @@ ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, n
 	,m_targetOmega(ndFloat32(0.0f))
 	,m_engineTorque(ndFloat32(0.0f))
 	,m_internalFriction(ndFloat32(100.0f))
-	,m_vehicelModel(vehicelModel)
+	,m_vehicle(vehicelModel)
 {
+}
+
+ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndBodyKinematic* const chassis)
+	:ndJointBilateralConstraint(3, motor, chassis, motor->GetMatrix())
+	,m_omega(ndFloat32(0.0f))
+	,m_maxOmega(ndFloat32(100.0f))
+	,m_omegaStep(ndFloat32(16.0f))
+	,m_targetOmega(ndFloat32(0.0f))
+	,m_engineTorque(ndFloat32(0.0f))
+	,m_internalFriction(ndFloat32(100.0f))
+	,m_vehicle(nullptr)
+{
+}
+
+void ndMultiBodyVehicleMotor::SetVehicleOwner(ndMultiBodyVehicle* const vehicle)
+{
+	m_vehicle = vehicle;
 }
 
 void ndMultiBodyVehicleMotor::AlignMatrix()
@@ -144,8 +160,7 @@ void ndMultiBodyVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
 	SetDiagonalRegularizer(desc, ndFloat32(0.1f));
 	
 	// add torque coupling to chassis.
-	ndMultiBodyVehicleGearBox* const gearBox = m_vehicelModel->m_gearBox;
-	ndAssert(gearBox);
+	ndMultiBodyVehicleGearBox* const gearBox = m_vehicle->m_gearBox;
 	if (gearBox && ndAbs(gearBox->GetRatio()) > ndFloat32(0.0f))
 	{
 		ndJacobian& chassisJacobian = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
