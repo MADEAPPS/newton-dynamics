@@ -39,6 +39,7 @@ class ndMultiBodyVehicleDifferentialAxle;
 
 #define dRadPerSecToRpm ndFloat32(9.55f)
 
+D_MSV_NEWTON_ALIGN_32
 class ndMultiBodyVehicle : public ndModelArticulation
 {
 	public:
@@ -82,10 +83,12 @@ class ndMultiBodyVehicle : public ndModelArticulation
 	D_NEWTON_API const ndMatrix& GetLocalFrame() const;
 	D_NEWTON_API void SetLocalFrame(const ndMatrix& localframe);
 
+	D_NEWTON_API ndMultiBodyVehicle* GetAsMultiBodyVehicle();
+
 	D_NEWTON_API ndBodyDynamic* GetChassis() const;
 	D_NEWTON_API ndMultiBodyVehicleMotor* GetMotor() const;
 	D_NEWTON_API ndMultiBodyVehicleGearBox* GetGearBox() const;
-	D_NEWTON_API ndMultiBodyVehicle* GetAsMultiBodyVehicle();
+	
 	D_NEWTON_API const ndList<ndMultiBodyVehicleTireJoint*>& GetTireList() const;
 
 	D_NEWTON_API bool IsSleeping() const;
@@ -100,6 +103,7 @@ class ndMultiBodyVehicle : public ndModelArticulation
 	D_NEWTON_API void AddMotor(const ndSharedPtr<ndBody>& motorBody, const ndSharedPtr<ndJointBilateralConstraint>& motorJoint);
 	D_NEWTON_API void AddDifferential(const ndSharedPtr<ndBody>& differentialBody, const ndSharedPtr<ndJointBilateralConstraint>& differentialJoint);
 
+	D_NEWTON_API void AddGearBox(const ndSharedPtr<ndJointBilateralConstraint>& gearBoxJoint);
 	D_NEWTON_API void AddDifferentialAxle(const ndSharedPtr<ndJointBilateralConstraint>& differentialAxleJoint);
 
 	D_NEWTON_API ndMultiBodyVehicleTireJoint* AddTire(const ndMultiBodyVehicleTireJointInfo& desc, const ndSharedPtr<ndBody>& tire);
@@ -144,12 +148,13 @@ class ndMultiBodyVehicle : public ndModelArticulation
 	ndFloat32 m_steeringRate;
 	ndFloat32 m_maxSideslipRate;
 	ndFloat32 m_maxSideslipAngle;
-	
+	D_MEMORY_ALIGN_FIXUP
+
 	friend class ndMultiBodyVehicleMotor;
 	//friend class ndMultiBodyVehicleGearBox;
 	friend class ndMultiBodyVehicleTireJoint;
 	//friend class ndMultiBodyVehicleTorsionBar;
-};
+} D_GCC_NEWTON_ALIGN_32;
 
 
 #endif

@@ -15,6 +15,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
+D_MSV_NEWTON_ALIGN_32
 class ndJointRoller: public ndJointBilateralConstraint
 {
 	public:
@@ -79,7 +80,9 @@ class ndJointRoller: public ndJointBilateralConstraint
 
 	ndInt8 m_limitStatePosit;
 	ndInt8 m_limitStateAngle;
-};
+	D_MEMORY_ALIGN_FIXUP
+} D_GCC_NEWTON_ALIGN_32;
+
 
 #endif 
 

@@ -37,6 +37,17 @@ ndMultiBodyVehicleDifferential::ndMultiBodyVehicleDifferential(ndBodyKinematic* 
 	ndAssert(slipOmegaLock >= 0.0f);
 }
 
+ndFloat32 ndMultiBodyVehicleDifferential::GetSlipOmega() const
+{
+	return m_limitedSlipOmega;
+}
+
+void ndMultiBodyVehicleDifferential::SetSlipOmega(ndFloat32 omega)
+{
+	m_limitedSlipOmega = ndMax(D_MINIMUM_SLIP_OMEGA, ndAbs(omega));
+}
+
+
 void ndMultiBodyVehicleDifferential::AlignMatrix()
 {
 	ndMatrix matrix0;

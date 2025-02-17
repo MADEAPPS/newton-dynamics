@@ -25,6 +25,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
+D_MSV_NEWTON_ALIGN_32
 class ndMultiBodyVehicleDifferentialAxle : public ndJointBilateralConstraint
 {
 	public:
@@ -38,6 +39,7 @@ class ndMultiBodyVehicleDifferentialAxle : public ndJointBilateralConstraint
 	protected:
 	void JacobianDerivative(ndConstraintDescritor& desc);
 	void DebugJoint(ndConstraintDebugCallback&) const {}
-};
+	D_MEMORY_ALIGN_FIXUP
+} D_GCC_NEWTON_ALIGN_32;
 
 #endif

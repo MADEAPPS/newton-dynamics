@@ -27,6 +27,7 @@
 
 #define D_MINIMUM_SLIP_OMEGA ndFloat32 (2.0f)
 
+D_MSV_NEWTON_ALIGN_32
 class ndMultiBodyVehicleDifferential : public ndJointBilateralConstraint
 {
 	public:
@@ -35,26 +36,18 @@ class ndMultiBodyVehicleDifferential : public ndJointBilateralConstraint
 	D_NEWTON_API ndMultiBodyVehicleDifferential();
 	D_NEWTON_API ndMultiBodyVehicleDifferential(ndBodyKinematic* const differential, ndBodyKinematic* const chassis, ndFloat32 slipOmegaLock);
 
-	ndFloat32 GetSlipOmega() const;
-	void SetSlipOmega(ndFloat32 speed);
+	D_NEWTON_API ndFloat32 GetSlipOmega() const;
+	D_NEWTON_API void SetSlipOmega(ndFloat32 speed);
 
 	protected:
 	void AlignMatrix();
 	void DebugJoint(ndConstraintDebugCallback&) const {}
 	void JacobianDerivative(ndConstraintDescritor& desc);
 
-	friend class ndMultiBodyVehicle;
 	ndFloat32 m_limitedSlipOmega;
-};
 
-inline ndFloat32 ndMultiBodyVehicleDifferential::GetSlipOmega() const
-{
-	return m_limitedSlipOmega;
-}
-
-inline void ndMultiBodyVehicleDifferential::SetSlipOmega(ndFloat32 omega)
-{
-	m_limitedSlipOmega = ndMax(D_MINIMUM_SLIP_OMEGA, ndAbs(omega));
-}
+	D_MEMORY_ALIGN_FIXUP
+	friend class ndMultiBodyVehicle;
+} D_GCC_NEWTON_ALIGN_32;
 
 #endif

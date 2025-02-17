@@ -27,6 +27,7 @@
 
 class ndMultiBodyVehicle;
 
+D_MSV_NEWTON_ALIGN_32
 class ndMultiBodyVehicleGearBox : public ndJointGear
 {
 	public: 
@@ -51,7 +52,9 @@ class ndMultiBodyVehicleGearBox : public ndJointGear
 	ndFloat32 m_idleOmega;
 	ndFloat32 m_clutchTorque;
 	ndFloat32 m_driveTrainResistanceTorque;
+	D_MEMORY_ALIGN_FIXUP
+
 	friend class ndMultiBodyVehicle;
-};
+} D_GCC_NEWTON_ALIGN_32;
 
 #endif

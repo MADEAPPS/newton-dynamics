@@ -357,6 +357,16 @@ void ndMultiBodyVehicle::AddDifferentialAxle(const ndSharedPtr<ndJointBilateralC
 	}
 }
 
+void ndMultiBodyVehicle::AddGearBox(const ndSharedPtr<ndJointBilateralConstraint>& gearBoxJoint)
+{
+	ndNode* const node = FindLoopByJoint(*gearBoxJoint);
+	m_gearBox = (ndMultiBodyVehicleGearBox*)*gearBoxJoint;
+	if (!node)
+	{
+		AddCloseLoop(gearBoxJoint);
+	}
+}
+
 ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndFloat32 mass, ndFloat32 radius, ndMultiBodyVehicleTireJoint* const leftTire, ndMultiBodyVehicleTireJoint* const rightTire, ndFloat32 slipOmegaLock)
 {
 	ndAssert(m_chassis);
@@ -402,8 +412,6 @@ ndMultiBodyVehicleMotor* ndMultiBodyVehicle::AddMotor(ndFloat32 mass, ndFloat32 
 	ndAssert(m_chassis);
 	ndSharedPtr<ndBody> motorBody (CreateInternalBodyPart(mass, radius));
 	ndSharedPtr<ndJointBilateralConstraint> motorJoint(new ndMultiBodyVehicleMotor(motorBody->GetAsBodyKinematic(), this));
-	//AddLimb(GetRoot(), motorBody, motorJoint);
-	//m_motor = (ndMultiBodyVehicleMotor*)*motorJoint;
 	AddMotor(motorBody, motorJoint);
 	return m_motor;
 }
@@ -412,8 +420,9 @@ ndMultiBodyVehicleGearBox* ndMultiBodyVehicle::AddGearBox(ndMultiBodyVehicleDiff
 {
 	ndAssert(m_motor);
 	ndSharedPtr<ndJointBilateralConstraint> gearBox(new ndMultiBodyVehicleGearBox(m_motor->GetBody0(), differential->GetBody0(), this));
-	AddCloseLoop(gearBox);
-	m_gearBox = (ndMultiBodyVehicleGearBox*)*gearBox;
+	AddGearBox(gearBox);
+	//AddCloseLoop(gearBox);
+	//m_gearBox = (ndMultiBodyVehicleGearBox*)*gearBox;
 	return m_gearBox;
 }
 

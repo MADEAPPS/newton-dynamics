@@ -27,6 +27,7 @@
 
 class ndMultiBodyVehicle;
 
+D_MSV_NEWTON_ALIGN_32
 class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 {
 	public:
@@ -51,15 +52,17 @@ class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 	ndFloat32 CalculateAcceleration(ndConstraintDescritor& desc);
 
 	protected:
+	ndMultiBodyVehicle* m_vehicle;
 	ndFloat32 m_omega;
 	ndFloat32 m_maxOmega;
 	ndFloat32 m_omegaStep;
 	ndFloat32 m_targetOmega;
 	ndFloat32 m_engineTorque;
 	ndFloat32 m_internalFriction;
-	
-	ndMultiBodyVehicle* m_vehicle;
+
+	D_MEMORY_ALIGN_FIXUP
 	friend class ndMultiBodyVehicle;
 	friend class ndMultiBodyVehicleGearBox;
-};
+} D_GCC_NEWTON_ALIGN_32;
+
 #endif

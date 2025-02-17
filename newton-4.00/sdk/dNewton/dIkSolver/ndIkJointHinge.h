@@ -18,6 +18,7 @@
 // setting to a value larger that D_IK_HINGE_MAX_TORQUE, disable torque limit
 #define D_IK_HINGE_MAX_TORQUE ndFloat32 (1.0e10f)
 
+D_MSV_NEWTON_ALIGN_32
 class ndIkJointHinge: public ndJointHinge, public ndJointBilateralConstraint::ndIkInterface
 {
 	public:
@@ -38,7 +39,8 @@ class ndIkJointHinge: public ndJointHinge, public ndJointBilateralConstraint::nd
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 
 	ndFloat32 m_maxTorque;
-};
+	D_MEMORY_ALIGN_FIXUP
+} D_GCC_NEWTON_ALIGN_32;
 
 #endif 
 

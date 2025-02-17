@@ -54,6 +54,7 @@ class ndMultiBodyVehicleTireJointInfo : public ndWheelDescriptor, public ndTireF
 	}
 };
 
+D_MSV_NEWTON_ALIGN_32
 class ndMultiBodyVehicleTireJoint: public ndJointWheel
 {
 	public:
@@ -78,8 +79,9 @@ class ndMultiBodyVehicleTireJoint: public ndJointWheel
 	ndFloat32 m_lateralSlip;
 	ndFloat32 m_longitudinalSlip;
 	ndFloat32 m_normalizedAligningTorque;
+	D_MEMORY_ALIGN_FIXUP
 	friend class ndMultiBodyVehicle;
-};
+} D_GCC_NEWTON_ALIGN_32;
 
 
 #endif 

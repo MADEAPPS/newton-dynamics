@@ -27,6 +27,9 @@
 #include "ndModel.h"
 #include "dIkSolver/ndIkSolver.h"
 
+class ndMultiBodyVehicle;
+
+D_MSV_NEWTON_ALIGN_32
 class ndModelArticulation: public ndModel
 {
 	public: 
@@ -79,8 +82,9 @@ class ndModelArticulation: public ndModel
 	ndNode* m_rootNode;
 	ndList<ndNode> m_closeLoops;
 
+	D_MEMORY_ALIGN_FIXUP
 	friend class ndUrdfFile;
-};
+} D_GCC_NEWTON_ALIGN_32;
 
 #endif 
 
