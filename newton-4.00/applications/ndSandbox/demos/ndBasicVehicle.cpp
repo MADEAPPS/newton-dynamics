@@ -48,15 +48,17 @@ class ndVehicleDectriptorViper : public ndVehicleDectriptor
 		m_engine.Init(idleTorquePoundFoot, idleRmp, 
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
+		m_frontTire.m_mass = 25.0f;
 		m_frontTire.m_handBrakeTorque = 0.0f;
-		m_rearTire.m_handBrakeTorque = 100000.0f;
-
-		m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
 		m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		m_rearTire.m_longitudinalStiffness = 10.0f * DEMO_GRAVITY;
 		m_frontTire.m_longitudinalStiffness = 10.0f * DEMO_GRAVITY;
-		m_rearTire.m_laterialStiffness = 2.0f * m_rearTire.m_longitudinalStiffness;
 		m_frontTire.m_laterialStiffness = 2.0f * m_frontTire.m_longitudinalStiffness;
+
+		m_rearTire.m_mass = 25.0f;
+		m_rearTire.m_handBrakeTorque = 100000.0f;
+		m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
+		m_rearTire.m_longitudinalStiffness = 10.0f * DEMO_GRAVITY;
+		m_rearTire.m_laterialStiffness = 2.0f * m_rearTire.m_longitudinalStiffness;
 	}
 };
 
@@ -80,23 +82,23 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_engine.Init(idleTorquePoundFoot, idleRmp, 
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
-		m_frontTire.m_mass = 100.0f;
+		m_frontTire.m_mass = 25.0f;
 		m_frontTire.m_verticalOffset = -0.15f;
 		m_frontTire.m_steeringAngle = 35.0f * ndDegreeToRad;
 		m_frontTire.m_springK = 800.0f;
 		m_frontTire.m_damperC = 50.0f;
-		m_frontTire.m_regularizer = 0.3f;
+		m_frontTire.m_regularizer = 0.1f;
 		m_frontTire.m_lowerStop = -0.05f;
 		m_frontTire.m_upperStop = 0.4f;
 		m_frontTire.m_brakeTorque = 1500.0f;
 		m_frontTire.m_handBrakeTorque = 0.0f;
 
-		m_rearTire.m_mass = 100.0f;
+		m_rearTire.m_mass = 25.0f;
 		m_rearTire.m_verticalOffset = -0.15f;
 		m_rearTire.m_steeringAngle = 0.0f;
 		m_rearTire.m_springK = 800.0f;
 		m_rearTire.m_damperC = 50.0f;
-		m_rearTire.m_regularizer = 0.3f;
+		m_rearTire.m_regularizer = 0.1f;
 		m_rearTire.m_lowerStop = -0.05f;
 		m_rearTire.m_upperStop = 0.4f;
 		m_rearTire.m_brakeTorque = 3000.0f;
@@ -458,6 +460,11 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//world->AddModel(vehicle1);
 	//world->AddModel(vehicle2);
 	//world->AddModel(vehicle3);
+
+//ndMatrix matrix1(vehicle0->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix());
+//matrix1.m_posit = vehicle0->GetAsModelArticulation()->GetRoot()->m_body->GetGlobalGetCentreOfMass();
+//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(matrix1, vehicle0->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
+//world->AddJoint(fixJoint);
 
 	//ndBasicMultiBodyVehicle* const vehicle = (ndBasicMultiBodyVehicle*)*vehicle3;
 	//ndBasicMultiBodyVehicle* const vehicle = (ndBasicMultiBodyVehicle*)*vehicle0;

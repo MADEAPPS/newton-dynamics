@@ -196,9 +196,12 @@ void ndMultiBodyVehicle::SetVehicleSolverModel(bool hardJoint)
 		{
 			ndJointBilateralConstraint* const joint = *node->m_joint;
 			const char* const className = joint->ClassName();
-			if (!strcmp(className, "ndMultiBodyVehicleTireJoint") ||
-				!strcmp(className, "ndMultiBodyVehicleDifferential") ||
-				!strcmp(className, "ndMultiBodyVehicleMotor"))
+			//if (!strcmp(className, "ndMultiBodyVehicleTireJoint") ||
+			//	!strcmp(className, "ndMultiBodyVehicleDifferential") ||
+			//	!strcmp(className, "ndMultiBodyVehicleMotor"))
+			if (!strcmp(className, ndMultiBodyVehicleTireJoint::StaticClassName()) ||
+				!strcmp(className, ndMultiBodyVehicleDifferential::StaticClassName()) ||
+				!strcmp(className, ndMultiBodyVehicleMotor::StaticClassName()))
 			{
 				joint->SetSolverModel(openLoopMode);
 			}
@@ -211,7 +214,8 @@ void ndMultiBodyVehicle::SetVehicleSolverModel(bool hardJoint)
 		ndModelArticulation::ndNode& closeLoop = node->GetInfo();
 		ndJointBilateralConstraint* const joint = *closeLoop.m_joint;
 		const char* const clasName = joint->ClassName();
-		if (strcmp(clasName, "ndMultiBodyVehicleDifferential") || strcmp(clasName, "ndMultiBodyVehicleGearBox"))
+		//if (strcmp(clasName, "ndMultiBodyVehicleDifferential") || strcmp(clasName, "ndMultiBodyVehicleGearBox"))
+		if (strcmp(clasName, ndMultiBodyVehicleDifferential::StaticClassName()) || strcmp(clasName, ndMultiBodyVehicleGearBox::StaticClassName()))
 		{
 			joint->SetSolverModel(driveTrainMode);
 		}
