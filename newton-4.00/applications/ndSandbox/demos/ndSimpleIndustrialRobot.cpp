@@ -196,70 +196,116 @@ namespace ndSimpleRobot
 
 		const ndVector CalculateTargetPosit() const
 		{
-			const ndMatrix currentEffectorMatrix(m_effector->GetEffectorMatrix());
+			// old method too complicated
+			//const ndMatrix currentEffectorMatrix(m_effector->GetEffectorMatrix());
+			//const ndMatrix pitchRotation(ndPitchMatrix(m_azimuth));
+			//const ndVector referencePoint(m_effectorReference.m_posit);
+			//const ndVector step(m_x, ndFloat32(0.0f), m_z, ndFloat32(0.0f));
+			//const ndVector source(currentEffectorMatrix.m_posit);
+			//const ndVector target(pitchRotation.RotateVector(referencePoint + step));
+			//const ndVector upPin(1.0f, 0.0f, 0.0f, 0.0f);
+			//
+			//ndFloat32 longitudinalStep = 0.05f;
+			//ndFloat32 angularStep = 2.0f * ndDegreeToRad;
+			//
+			//const ndVector src(source & ndVector::m_triplexMask);
+			//const ndVector dst(target & ndVector::m_triplexMask);
+			//const ndVector src1(src - upPin * (src.DotProduct(upPin)));
+			//const ndVector dst1(dst - upPin * (dst.DotProduct(upPin)));
+			//const ndVector srcDir(src1.Normalize());
+			//const ndVector dstDir(dst1.Normalize());
+			//ndFloat32 cosAngle(ndClamp(srcDir.DotProduct(dstDir).GetScalar(), ndFloat32(-1.0f), ndFloat32(1.0f)));
+			//ndFloat32 angle = ndAcos(cosAngle);
+			//
+			//ndVector result(src);
+			//if (ndAbs(angle) > angularStep)
+			//{
+			//	const ndVector pin(srcDir.CrossProduct(dstDir).Normalize());
+			//	const ndQuaternion rotation(pin, angularStep);
+			//	result = rotation.RotateVector(result);
+			//}
+			//
+			//auto PlaneRotation = [&result, &dst, &upPin, longitudinalStep]()
+			//{
+			//	const ndVector src1(result - upPin * (result.DotProduct(upPin)));
+			//	const ndVector dst1(dst - upPin * (dst.DotProduct(upPin)));
+			//	const ndVector srcDir(src1.Normalize());
+			//	const ndVector dstDir(dst1.Normalize());
+			//	ndFloat32 cosAngle(ndClamp(srcDir.DotProduct(dstDir).GetScalar(), ndFloat32(-1.0f), ndFloat32(1.0f)));
+			//	ndFloat32 angle = ndAcos(cosAngle);
+			//
+			//	ndVector target(dst);
+			//	if (ndAbs(angle) > ndFloat32(1.0e-3f))
+			//	{
+			//		const ndVector pin(srcDir.CrossProduct(dstDir).Normalize());
+			//		const ndQuaternion rotation(pin, angle);
+			//		target = rotation.UnrotateVector(target);
+			//	}
+			//
+			//	for (ndInt32 i = 0; i < 3; ++i)
+			//	{
+			//		ndFloat32 step = target[i] - result[i];
+			//		if (ndAbs(step) > longitudinalStep)
+			//		{
+			//			result[i] += longitudinalStep * ndSign(step);
+			//		}
+			//		else
+			//		{
+			//			result[i] = target[i];
+			//		}
+			//	}
+			//	return result;
+			//};
+			//
+			//result = PlaneRotation();
+			//result.m_w = ndFloat32(1.0f);
+			//return result;
 
-			const ndMatrix pitchRotation(ndPitchMatrix(m_azimuth));
-			const ndVector referencePoint(m_effectorReference.m_posit);
-			const ndVector step(m_x, ndFloat32(0.0f), m_z, ndFloat32(0.0f));
-			const ndVector source(currentEffectorMatrix.m_posit);
-			const ndVector target(pitchRotation.RotateVector(referencePoint + step));
-			const ndVector upPin(1.0f, 0.0f, 0.0f, 0.0f);
+			const ndMatrix similarRotation(ndPitchMatrix(-ndAtan2(m_effectorReference.m_posit.m_y, m_effectorReference.m_posit.m_z)));
+			const ndVector localPosit(similarRotation.UnrotateVector(m_effectorReference.m_posit));
+			const ndVector planePosition(m_x, ndFloat32(0.0f), m_z, ndFloat32(0.0f));
+			const ndVector destination(localPosit + planePosition);
 
-			ndFloat32 longitudinalStep = 0.05f;
-			ndFloat32 angularStep = 2.0f * ndDegreeToRad;
+			const ndMatrix currentMatrix(m_effector->GetOffsetMatrix());
+			const ndVector effectorPosit(similarRotation.UnrotateVector(currentMatrix.m_posit));
+			ndFloat32 effectorAzimuth = -ndAtan2(effectorPosit.m_y, effectorPosit.m_z);
+			const ndMatrix effectorAzimuthRotation(ndPitchMatrix(effectorAzimuth));
+			ndVector currentPosit(effectorAzimuthRotation.UnrotateVector(effectorPosit));
 
-			const ndVector src(source & ndVector::m_triplexMask);
-			const ndVector dst(target & ndVector::m_triplexMask);
-			const ndVector src1(src - upPin * (src.DotProduct(upPin)));
-			const ndVector dst1(dst - upPin * (dst.DotProduct(upPin)));
-			const ndVector srcDir(src1.Normalize());
-			const ndVector dstDir(dst1.Normalize());
-			ndFloat32 cosAngle(ndClamp(srcDir.DotProduct(dstDir).GetScalar(), ndFloat32(-1.0f), ndFloat32(1.0f)));
-			ndFloat32 angle = ndAcos(cosAngle);
-
-			ndVector result(src);
-			if (ndAbs(angle) > angularStep)
+			ndFloat32 linearStep = 0.05f;
+			for (ndInt32 i = 0; i < 3; ++i)
 			{
-				const ndVector pin(srcDir.CrossProduct(dstDir).Normalize());
-				const ndQuaternion rotation(pin, angularStep);
-				result = rotation.RotateVector(result);
+				ndFloat32 step = destination[i] - currentPosit[i];
+				if (ndAbs(step) > linearStep)
+				{
+					currentPosit[i] += linearStep * ndSign(step);
+				}
+				else
+				{
+					currentPosit[i] = destination[i];
+				}
+			}
+			currentPosit = effectorAzimuthRotation.RotateVector(currentPosit);
+
+			ndFloat32 slowAngularStep = ndDegreeToRad * 0.25f;
+			ndFloat32 fastAngularStep = slowAngularStep * 2.0f;
+			ndFloat32 deltaAzimuth = m_azimuth - effectorAzimuth;
+
+			ndFloat32 azimuth = 0.0f;
+			if (ndAbs(deltaAzimuth) > fastAngularStep)
+			{
+				azimuth = ndSign(deltaAzimuth) * fastAngularStep;
+			}
+			else if (ndAbs(deltaAzimuth) > slowAngularStep)
+			{
+				azimuth = ndSign(deltaAzimuth) * slowAngularStep;
 			}
 
-			auto PlaneRotation = [&result, &dst, &upPin, longitudinalStep]()
-			{
-				const ndVector src1(result - upPin * (result.DotProduct(upPin)));
-				const ndVector dst1(dst - upPin * (dst.DotProduct(upPin)));
-				const ndVector srcDir(src1.Normalize());
-				const ndVector dstDir(dst1.Normalize());
-				ndFloat32 cosAngle(ndClamp(srcDir.DotProduct(dstDir).GetScalar(), ndFloat32(-1.0f), ndFloat32(1.0f)));
-				ndFloat32 angle = ndAcos(cosAngle);
-
-				ndVector target(dst);
-				if (ndAbs(angle) > ndFloat32(1.0e-3f))
-				{
-					const ndVector pin(srcDir.CrossProduct(dstDir).Normalize());
-					const ndQuaternion rotation(pin, angle);
-					target = rotation.UnrotateVector(target);
-				}
-
-				for (ndInt32 i = 0; i < 3; ++i)
-				{
-					ndFloat32 step = target[i] - result[i];
-					if (ndAbs(step) > longitudinalStep)
-					{
-						result[i] += longitudinalStep * ndSign(step);
-					}
-					else
-					{
-						result[i] = target[i];
-					}
-				}
-				return result;
-			};
-
-			result = PlaneRotation();
-			result.m_w = ndFloat32(1.0f);
-			return result;
+			const ndMatrix azimuthRotation(ndPitchMatrix(azimuth));
+			currentPosit = azimuthRotation.RotateVector(currentPosit);
+			currentPosit = similarRotation.RotateVector(currentPosit);
+			currentPosit.m_w = 1.0f;
+			return currentPosit;
 		}
 
 		const ndQuaternion CalculateTargetRotation() const
@@ -606,15 +652,22 @@ namespace ndSimpleRobot
 	void AddBackgroundScene(ndDemoEntityManager* const scene, const ndMatrix& matrix, ndFixSizeArray<ndBodyKinematic*, 16>& bodyList)
 	{
 		ndMatrix location(matrix);
-		location.m_posit.m_x -= 1.0f;
-		location.m_posit.m_z += 2.5f;
+		location.m_posit.m_x -= 0.5f;
+		location.m_posit.m_z += 2.0f;
 		bodyList.PushBack(AddBox(scene, location, 2.0f, 0.3f, 0.4f, 0.7f));
+
+		location.m_posit.m_x += -1.0f;
+		location.m_posit.m_z +=  1.0f;
 		bodyList.PushBack(AddBox(scene, location, 1.0f, 0.3f, 0.4f, 0.7f));
 		
+		location = matrix;
 		location = ndYawMatrix(90.0f * ndDegreeToRad) * location;
-		location.m_posit.m_x += 1.0f;
-		location.m_posit.m_z += 0.5f;
+		location.m_posit.m_x -= 0.5f;
+		location.m_posit.m_z += 3.0f;
 		bodyList.PushBack(AddBox(scene, location, 8.0f, 0.3f, 0.4f, 0.7f));
+		
+		location.m_posit.m_x += -1.0f;
+		location.m_posit.m_z += -1.0f;
 		bodyList.PushBack(AddBox(scene, location, 4.0f, 0.3f, 0.4f, 0.7f));
 	}
 }

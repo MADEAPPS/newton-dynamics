@@ -34,7 +34,7 @@ class ndMultiBodyVehicleGearBox : public ndJointGear
 	D_CLASS_REFLECTION(ndMultiBodyVehicleGearBox, ndJointGear)
 
 	D_NEWTON_API ndMultiBodyVehicleGearBox();
-	D_NEWTON_API ndMultiBodyVehicleGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential, ndMultiBodyVehicle* const chassis);
+	D_NEWTON_API ndMultiBodyVehicleGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential, ndMultiBodyVehicle* const chassis, bool reverseSpin = false);
 
 	D_NEWTON_API void SetIdleOmega(ndFloat32 rpm);
 	D_NEWTON_API void SetClutchTorque(ndFloat32 torqueInNewtonMeters);

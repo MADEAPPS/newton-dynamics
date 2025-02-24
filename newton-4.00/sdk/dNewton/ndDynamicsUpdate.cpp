@@ -891,8 +891,8 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 
 				ndFloat32 diag = tmpDiag.AddHorizontal().GetScalar();
 				ndAssert(diag > ndFloat32(0.0f));
-				ndAssert(diag <= ndFloat32(1.0f));
 				rhs->m_diagDamp = diag * rhs->m_diagonalRegularizer;
+				ndAssert(rhs->m_diagDamp <= ndFloat32(1.0f));
 
 				diag *= (ndFloat32(1.0f) + rhs->m_diagonalRegularizer);
 				rhs->m_invJinvMJt = ndFloat32(1.0f) / diag;
