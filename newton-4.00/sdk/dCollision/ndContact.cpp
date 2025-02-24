@@ -49,12 +49,48 @@ ndContact::ndContact()
 	,m_isIntersetionTestOnly(0)
 	//,m_skeletonIntraCollision(1)
 	,m_skeletonSelftCollision(1)
+	,m_skeletonExtraContact(0)
 {
 	m_active = 0;
 }
 
 ndContact::~ndContact()
 {
+}
+
+ndContact* ndContact::GetAsContact()
+{
+	return this;
+}
+
+const ndMaterial* ndContact::GetMaterial() const
+{
+	return m_material;
+}
+
+ndContactPointList& ndContact::GetContactPoints()
+{
+	return m_contacPointsList;
+}
+
+const ndContactPointList& ndContact::GetContactPoints() const
+{
+	return m_contacPointsList;
+}
+
+bool ndContact::IsSkeletonSelftCollision() const
+{
+	return m_skeletonSelftCollision ? true : false;
+}
+
+bool ndContact::IsInTrigger() const
+{
+	return m_inTrigger;
+}
+
+bool ndContact::IsTestOnly() const
+{
+	return m_isIntersetionTestOnly ? true : false;
 }
 
 void ndContact::SetBodies(ndBodyKinematic* const body0, ndBodyKinematic* const body1)

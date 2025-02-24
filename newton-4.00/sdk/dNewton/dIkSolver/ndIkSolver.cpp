@@ -333,7 +333,7 @@ void ndIkSolver::BuildMassMatrix()
 	};
 
 	// add close loop 
-	for (ndInt32 i = m_skeleton->m_dynamicsLoopCount + m_skeleton->m_loopCount - 1; i >= 0; --i)
+	for (ndInt32 i = m_skeleton->m_contactsLoopCount + m_skeleton->m_jointsLoopCount - 1; i >= 0; --i)
 	{
 		ndConstraint* const joint = m_skeleton->m_loopingJoints[i];
 		ndBodyKinematic* const body0 = joint->GetBody0();
@@ -467,7 +467,7 @@ void ndIkSolver::BuildMassMatrix()
 		BuildJacobianMatrix(joint);
 	}
 	
-	const ndInt32 loops = m_skeleton->m_dynamicsLoopCount + m_skeleton->m_loopCount;
+	const ndInt32 loops = m_skeleton->m_contactsLoopCount + m_skeleton->m_jointsLoopCount;
 	for (ndInt32 i = 0; i < loops; ++i)
 	{
 		ndConstraint* const joint = m_skeleton->m_loopingJoints[i];

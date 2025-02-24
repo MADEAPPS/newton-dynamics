@@ -42,57 +42,6 @@
 	#include "ndDynamicsUpdateCuda.h"
 #endif
 
-class ndSkeletonQueue : public ndFixSizeArray<ndSkeletonContainer::ndNode*, 1024 * 4>
-{
-	public:
-	ndSkeletonQueue()
-		:ndFixSizeArray<ndSkeletonContainer::ndNode*, 1024 * 4>()
-		,m_mod(sizeof(m_array) / sizeof(m_array[0]))
-	{
-		m_lastIndex = 0;
-		m_firstIndex = 0;
-	}
-
-	void Push(ndSkeletonContainer::ndNode* const node)
-	{
-		m_firstIndex++;
-		if (node->m_joint->GetSolverModel() != m_jointkinematicOpenLoop)
-		{
-			m_array[m_firstIndex-1] = node;
-		}
-		else
-		{
-			const ndInt32 count = m_firstIndex - m_lastIndex;
-			ndInt32 slot = count - 1;
-			for (; (slot > 0) && (m_array[m_lastIndex + slot - 1]->m_joint->GetSolverModel() != m_jointkinematicOpenLoop); slot--)
-			{
-				m_array[m_lastIndex + slot] = m_array[m_lastIndex + slot - 1];
-			}
-			m_array[m_lastIndex + slot] = node;
-		}
-
-		if (m_firstIndex >= m_mod)
-		{
-			m_firstIndex = 0;
-		}
-		ndAssert(m_firstIndex != m_lastIndex);
-	}
-
-	void Reset()
-	{
-		m_lastIndex = m_firstIndex;
-	}
-
-	bool IsEmpty() const
-	{
-		return (m_firstIndex == m_lastIndex);
-	}
-
-	ndInt32 m_lastIndex;
-	ndInt32 m_firstIndex;
-	ndInt32 m_mod;
-};
-
 ndWorld::ndWorld()
 	:ndClassAlloc()
 	,m_scene(nullptr)
@@ -762,7 +711,7 @@ void ndWorld::UpdateSkeletons()
 		ndInt32 skeletonsId = 0;
 		for (ndInt32 i = 0; i < inslandCount; ++i)
 		{
-			ndSkeletonQueue queuePool;
+			ndSkeletonContainer::ndQueue queuePool;
 			ndFixSizeArray<ndBodyKinematic*, 512> stack;
 
 			stack.PushBack(islands[i].m_body);

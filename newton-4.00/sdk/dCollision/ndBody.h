@@ -111,6 +111,7 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 			ndUnsigned32 m_contactTestOnly : 1;
 			ndUnsigned32 m_transformIsDirty : 1;
 			ndUnsigned32 m_equilibriumOverride : 1;
+			ndUnsigned32 m_skeletonExtraContact : 1;
 		};
 	};
 

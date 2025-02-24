@@ -73,8 +73,6 @@ ndModelArticulation::ndModelArticulation(const ndModelArticulation& src)
 	while (stack.GetCount())
 	{
 		ndNode* const node = stack.Pop();
-		//ndBodyDynamic* xxx = node->m_body->GetAsBodyDynamic();
-		//ndBodyDynamic* xxx1 = new ndBodyDynamic(*xxx);
 		AddRootBody(new ndBodyDynamic(*node->m_body->GetAsBodyDynamic()));
 		if (*node->m_joint)
 		{

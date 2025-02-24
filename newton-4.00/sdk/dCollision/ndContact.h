@@ -103,20 +103,15 @@ class ndContact: public ndConstraint
 
 	D_COLLISION_API void AttachToBodies();
 	D_COLLISION_API void DetachFromBodies();
-	
-	const ndMaterial* GetMaterial() const;
-
-	virtual ndContact* GetAsContact();
-	virtual void JacobianDerivative(ndConstraintDescritor& desc);
-	virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc);
-	
-	ndContactPointList& GetContactPoints();
-	const ndContactPointList& GetContactPoints() const;
-
-	bool IsTestOnly() const;
-	bool IsInTrigger() const;
-	bool IsSkeletonSelftCollision() const;
-
+	D_COLLISION_API bool IsTestOnly() const;
+	D_COLLISION_API bool IsInTrigger() const;
+	D_COLLISION_API virtual ndContact* GetAsContact();
+	D_COLLISION_API const ndMaterial* GetMaterial() const;
+	D_COLLISION_API bool IsSkeletonSelftCollision() const;
+	D_COLLISION_API ndContactPointList& GetContactPoints();
+	D_COLLISION_API const ndContactPointList& GetContactPoints() const;
+	D_COLLISION_API virtual void JacobianDerivative(ndConstraintDescritor& desc);
+	D_COLLISION_API virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc);
 	D_COLLISION_API void InitSurrogateContact(ndContact* const surrogate, ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
 	
 	private:
@@ -138,6 +133,7 @@ class ndContact: public ndConstraint
 	ndUnsigned32 m_isAttached : 1;
 	ndUnsigned32 m_isIntersetionTestOnly : 1;
 	ndUnsigned32 m_skeletonSelftCollision : 1;
+	ndUnsigned32 m_skeletonExtraContact : 1;
 
 	D_MEMORY_ALIGN_FIXUP
 	static ndVector m_initialSeparatingVector;
@@ -149,50 +145,12 @@ class ndContact: public ndConstraint
 	friend class ndContactSolver;
 	friend class ndShapeInstance;
 	friend class ndConvexCastNotify;
+	friend class ndSkeletonContainer;
 	friend class ndModelArticulation;
 	friend class ndShapeConvexPolygon;
 	friend class ndBodyPlayerCapsuleContactSolver;
 } D_GCC_NEWTON_ALIGN_32 ;
 
-inline ndContact* ndContact::GetAsContact()
-{
-	return this;
-}
-
-inline const ndMaterial* ndContact::GetMaterial() const
-{
-	return m_material;
-}
-
-//inline ndUnsigned32 ndContact::GetRowsCount() const
-//{
-//	return m_maxDOF;
-//}
-
-inline ndContactPointList& ndContact::GetContactPoints()
-{
-	return m_contacPointsList;
-}
-
-inline const ndContactPointList& ndContact::GetContactPoints() const
-{
-	return m_contacPointsList;
-}
-
-inline bool ndContact::IsSkeletonSelftCollision() const
-{
-	return m_skeletonSelftCollision ? true : false;
-}
-
-inline bool ndContact::IsInTrigger() const
-{
-	return m_inTrigger;
-}
-
-inline bool ndContact::IsTestOnly() const
-{
-	return m_isIntersetionTestOnly ? true : false;
-}
 
 #endif 
 

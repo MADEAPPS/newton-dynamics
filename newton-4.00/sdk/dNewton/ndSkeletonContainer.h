@@ -32,9 +32,11 @@ class ndSkeletonContainer
 	public:
 	class ndNodeList;
 
-	ndSkeletonContainer();
-	~ndSkeletonContainer();
-	ndInt32 GetId() const;
+	D_NEWTON_API ndSkeletonContainer();
+	D_NEWTON_API ~ndSkeletonContainer();
+	D_NEWTON_API ndInt32 GetId() const;
+	D_NEWTON_API bool GetContactModel() const;
+	D_NEWTON_API void SetContactModel(bool fullContactModel);
 
 	const ndNodeList& GetNodeList() const;
 	ndInt32 FindBoneIndex(const ndBodyKinematic* const body) const;
@@ -120,7 +122,7 @@ class ndSkeletonContainer
 		ndInt8 m_swapJacobianBodiesIndex;
 	};
 
-	class ndNodeList : public ndList<ndNode, ndContainersFreeListAlloc<ndSkeletonContainer::ndNode> >
+	class ndNodeList : public ndList<ndSkeletonContainer::ndNode, ndContainersFreeListAlloc<ndSkeletonContainer::ndNode> >
 	{
 		public:
 		ndNodeList()
@@ -141,6 +143,57 @@ class ndSkeletonContainer
 			}
 			return node;
 		}
+	};
+
+	class ndQueue: public ndFixSizeArray<ndSkeletonContainer::ndNode*, 1024 * 4>
+	{
+		public:
+		ndQueue()
+			:ndFixSizeArray<ndSkeletonContainer::ndNode*, 1024 * 4>()
+			,m_mod(sizeof(m_array) / sizeof(m_array[0]))
+		{
+			m_lastIndex = 0;
+			m_firstIndex = 0;
+		}
+
+		void Push(ndSkeletonContainer::ndNode* const node)
+		{
+			m_firstIndex++;
+			if (node->m_joint->GetSolverModel() != m_jointkinematicOpenLoop)
+			{
+				m_array[m_firstIndex - 1] = node;
+			}
+			else
+			{
+				const ndInt32 count = m_firstIndex - m_lastIndex;
+				ndInt32 slot = count - 1;
+				for (; (slot > 0) && (m_array[m_lastIndex + slot - 1]->m_joint->GetSolverModel() != m_jointkinematicOpenLoop); slot--)
+				{
+					m_array[m_lastIndex + slot] = m_array[m_lastIndex + slot - 1];
+				}
+				m_array[m_lastIndex + slot] = node;
+			}
+
+			if (m_firstIndex >= m_mod)
+			{
+				m_firstIndex = 0;
+			}
+			ndAssert(m_firstIndex != m_lastIndex);
+		}
+
+		void Reset()
+		{
+			m_lastIndex = m_firstIndex;
+		}
+
+		bool IsEmpty() const
+		{
+			return (m_firstIndex == m_lastIndex);
+		}
+
+		ndInt32 m_lastIndex;
+		ndInt32 m_firstIndex;
+		ndInt32 m_mod;
 	};
 
 	private:
@@ -198,14 +251,14 @@ class ndSkeletonContainer
 	ndInt32 m_rowCount;
 	ndInt32 m_loopRowCount;
 	ndInt32 m_auxiliaryRowCount;
-	ndInt32 m_loopCount;
-	ndInt32 m_dynamicsLoopCount;
+	ndInt32 m_jointsLoopCount;
+	ndInt32 m_contactsLoopCount;
 	ndUnsigned8 m_isResting;
+	ndUnsigned8 m_useFullContactModel;
 
 	friend class ndWorld;
 	friend class ndIkSolver;
 	friend class ndSkeletonList;
-	friend class ndSkeletonQueue;
 	friend class ndDynamicsUpdate;
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;

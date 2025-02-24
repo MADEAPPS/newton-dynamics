@@ -22,6 +22,7 @@
 #include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
+#include "ndContact.h"
 #include "ndBodyDynamic.h"
 #include "ndDynamicsUpdate.h"
 #include "ndSkeletonContainer.h"
@@ -356,23 +357,29 @@ ndSkeletonContainer::ndSkeletonContainer()
 	,m_massMatrix10(nullptr)
 	,m_deltaForce(nullptr)
 	,m_nodeList()
-	,m_loopingJoints(32)
-	,m_auxiliaryMemoryBuffer(1024 * 8)
+	,m_loopingJoints()
+	,m_auxiliaryMemoryBuffer()
 	,m_lock()
 	,m_id(0)
 	,m_blockSize(0)
 	,m_rowCount(0)
 	,m_loopRowCount(0)
 	,m_auxiliaryRowCount(0)
-	,m_loopCount(0)
-	,m_dynamicsLoopCount(0)
+	,m_jointsLoopCount(0)
+	,m_contactsLoopCount(0)
 	,m_isResting(0)
+	,m_useFullContactModel(0)
 {
+	m_loopingJoints.SetCount(16);
+	m_auxiliaryMemoryBuffer.SetCount(1024 * 8);
+
+	m_loopingJoints.SetCount(0);
+	m_auxiliaryMemoryBuffer.SetCount(0);
 }
 
 ndSkeletonContainer::~ndSkeletonContainer()
 {
-	for (ndInt32 i = 0; i < m_loopCount; ++i) 
+	for (ndInt32 i = 0; i < m_jointsLoopCount; ++i) 
 	{
 		ndJointBilateralConstraint* const joint = m_loopingJoints[i]->GetAsBilateral();
 		if (joint)
@@ -399,6 +406,17 @@ ndInt32 ndSkeletonContainer::GetId() const
 	return m_id;
 }
 
+bool ndSkeletonContainer::GetContactModel() const
+{
+	return m_useFullContactModel ? true : false;
+}
+
+void ndSkeletonContainer::SetContactModel(bool fullContactModel)
+{
+	m_useFullContactModel = fullContactModel ? true : false;
+}
+
+
 ndSkeletonContainer::ndNode* ndSkeletonContainer::GetRoot() const
 {
 	return m_skeleton;
@@ -411,7 +429,7 @@ const ndSkeletonContainer::ndNodeList& ndSkeletonContainer::GetNodeList() const
 
 void ndSkeletonContainer::Clear()
 {
-	for (ndInt32 i = 0; i < m_loopCount; ++i)
+	for (ndInt32 i = 0; i < m_jointsLoopCount; ++i)
 	{
 		ndJointBilateralConstraint* const joint = m_loopingJoints[i]->GetAsBilateral();
 		if (joint)
@@ -420,8 +438,8 @@ void ndSkeletonContainer::Clear()
 		}
 	}
 
-	m_loopCount = 0;
-	m_dynamicsLoopCount = 0;
+	m_jointsLoopCount = 0;
+	m_contactsLoopCount = 0;
 }
 
 void ndSkeletonContainer::Init(ndBodyKinematic* const rootBody, ndInt32 id)
@@ -494,24 +512,32 @@ void ndSkeletonContainer::Finalize(ndInt32 loopJointsCount, ndJointBilateralCons
 		ndJointBilateralConstraint* const joint = loopJointArray[i];
 		joint->m_isInSkeleton = true;
 		m_loopingJoints.PushBack(joint);
-		m_loopCount++;
+		m_jointsLoopCount++;
 	}
 }
 
 void ndSkeletonContainer::ClearCloseLoopJoints()
 {
-	m_dynamicsLoopCount = 0;
+	for (ndInt32 i = m_contactsLoopCount + m_jointsLoopCount - 1; i >= m_jointsLoopCount; --i)
+	{
+		ndContact* const contact = m_loopingJoints[i]->GetAsContact();
+		ndAssert(contact);
+		contact->m_skeletonExtraContact = 0;
+		contact->GetBody0()->m_skeletonExtraContact = 0;
+		contact->GetBody1()->m_skeletonExtraContact = 1;
+	}
+	m_contactsLoopCount = 0;
 }
 
 void ndSkeletonContainer::AddCloseLoopJoint(ndConstraint* const joint)
 {
 	ndScopeSpinLock lock(m_lock);
-	if (m_loopingJoints.GetCount() < (m_loopCount + m_dynamicsLoopCount + 1)) 
+	if (m_loopingJoints.GetCount() < (m_jointsLoopCount + m_contactsLoopCount + 1)) 
 	{
-		m_loopingJoints.SetCount(2 * (m_loopCount + m_dynamicsLoopCount + 1));
+		m_loopingJoints.SetCount(2 * (m_jointsLoopCount + m_contactsLoopCount + 1));
 	}
-	m_loopingJoints[m_loopCount + m_dynamicsLoopCount] = joint;
-	m_dynamicsLoopCount++;
+	m_loopingJoints[m_jointsLoopCount + m_contactsLoopCount] = joint;
+	m_contactsLoopCount++;
 }
 
 void ndSkeletonContainer::CheckSleepState()
@@ -526,7 +552,7 @@ void ndSkeletonContainer::CheckSleepState()
 
 	if (equilibrium)
 	{
-		const ndInt32 loopCount = m_loopCount + m_dynamicsLoopCount;
+		const ndInt32 loopCount = m_jointsLoopCount + m_contactsLoopCount;
 		for (ndInt32 i = 0; i < loopCount; ++i)
 		{
 			const ndConstraint* const joint = m_loopingJoints[i];
@@ -548,7 +574,7 @@ void ndSkeletonContainer::CheckSleepState()
 			}
 		}
 
-		const ndInt32 loopCount = m_loopCount + m_dynamicsLoopCount;
+		const ndInt32 loopCount = m_jointsLoopCount + m_contactsLoopCount;
 		for (ndInt32 i = 0; i < loopCount; ++i)
 		{
 			const ndConstraint* const joint = m_loopingJoints[i];
@@ -600,7 +626,7 @@ void ndSkeletonContainer::CalculateBufferSizeInBytes()
 	}
 
 	ndInt32 extraAuxiliaryRows = 0;
-	const ndInt32 loopCount = m_loopCount + m_dynamicsLoopCount;
+	const ndInt32 loopCount = m_jointsLoopCount + m_contactsLoopCount;
 	for (ndInt32 j = 0; j < loopCount; ++j)  
 	{
 		const ndConstraint* const joint = m_loopingJoints[j];
@@ -935,7 +961,7 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 	}
 	ndAssert(m_loopRowCount == (m_auxiliaryRowCount - auxiliaryIndex));
 
-	const ndInt32 loopCount = m_loopCount + m_dynamicsLoopCount;
+	const ndInt32 loopCount = m_jointsLoopCount + m_contactsLoopCount;
 	for (ndInt32 j = 0; j < loopCount; ++j)  
 	{
 		const ndConstraint* const joint = m_loopingJoints[j];
@@ -970,7 +996,7 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 		ndInt32 tmpMatrixRowsIndex = m_matrixRowsIndex[primaryCount + i];
 
 		ndInt32 j = i;
-		for (; j && (boundRow[j - 1] < tmpBoundRow); j--) 
+		for (; j && (boundRow[j - 1] < tmpBoundRow); --j) 
 		{
 			ndAssert(j > 0);
 			boundRow[j] = boundRow[j - 1];
@@ -987,6 +1013,9 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 	ndFloat32* const diagDamp = ndAlloca(ndFloat32, m_auxiliaryRowCount);
 	ndMemSet(m_massMatrix10, ndFloat32(0.0f), primaryCount * m_auxiliaryRowCount);
 	ndMemSet(m_massMatrix11, ndFloat32(0.0f), m_auxiliaryRowCount * m_auxiliaryRowCount);
+
+if (m_contactsLoopCount > 1)
+m_contactsLoopCount *= 1;
 
 	CalculateLoopMassMatrixCoefficients(diagDamp);
 	ConditionMassMatrix();
@@ -1151,98 +1180,6 @@ void ndSkeletonContainer::UpdateForces(ndJacobian* const internalForces, const n
 	}
 }
 
-/*
-void ndSkeletonContainer::SolveLcp0(ndInt32 stride, ndInt32 size, const ndFloat32* const matrix, const ndFloat32* const x0, ndFloat32* const x, const ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex) const
-{
-	D_TRACKTIME();
-	const ndFloat32 sor = ndFloat32(1.125f);
-	const ndFloat32 tol2 = ndFloat32(0.25f);
-	const ndInt32 maxIterCount = 64;
-
-	ndFloat32* const invDiag1 = ndAlloca(ndFloat32, size);
-	ndFloat32* const residual = ndAlloca(ndFloat32, size);
-
-	ndInt32 base = 0;
-	for (ndInt32 i = 0; i < size; ++i)
-	{
-		const ndInt32 index = normalIndex[i];
-		const ndInt32 mask = index >> 31;
-		const ndInt32 index0 = i + index;
-		const ndInt32 index1 = (~mask & size) | (mask & index0);
-		const ndFloat32 coefficient = x[index1] + x0[index1];
-
-		const ndFloat32 l = low[i] * coefficient - x0[i];
-		const ndFloat32 h = high[i] * coefficient - x0[i];
-		x[i] = ndClamp(ndFloat32(0.0f), l, h);
-		invDiag1[i] = ndFloat32(1.0f) / matrix[base + i];
-		base += stride;
-	}
-
-	base = 0;
-	for (ndInt32 i = 0; i < size; ++i)
-	{
-		const ndFloat32* const row = &matrix[base];
-		residual[i] = b[i] - dDotProduct(size, row, x);
-		base += stride;
-	}
-
-	ndInt32 iterCount = 0;
-	ndFloat32 tolerance(tol2 * ndFloat32(2.0f));
-	const ndFloat32* const invDiag = invDiag1;
-	for (ndInt32 k = 0; (k < maxIterCount) && (tolerance > tol2); ++k)
-	{
-		base = 0;
-		iterCount++;
-		tolerance = ndFloat32(0.0f);
-		for (ndInt32 i = 0; i < size; ++i)
-		{
-			const ndFloat32 r = residual[i];
-			const ndInt32 index = normalIndex[i];
-
-			const ndInt32 mask = index >> 31;
-			const ndInt32 index0 = i + index;
-			const ndInt32 index1 = (~mask & size) | (mask & index0);
-			const ndFloat32 coefficient = x[index1] + x0[index1];
-
-			const ndFloat32 l = low[i] * coefficient - x0[i];
-			const ndFloat32 h = high[i] * coefficient - x0[i];
-
-			const ndFloat32* const row = &matrix[base];
-#if 0
-			ndFloat32 f = x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor;
-			if (f > h)
-			{
-				f = h;
-			}
-			else if (f < l)
-			{
-				f = l;
-			}
-			else
-			{
-				tolerance += r * r;
-			}
-			const ndFloat32 dx = f - x[i];
-#else
-			const ndFloat32 f = ndClamp(x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor, l, h);
-			const ndFloat32 dx = f - x[i];
-			const ndFloat32 dr = dx * row[i];
-			tolerance += dr * dr;
-#endif
-			x[i] = f;
-			if (ndAbs(dx) > ndFloat32(1.0e-6f))
-			{
-				for (ndInt32 j = 0; j < size; ++j) 
-				{
-					residual[j] -= row[j] * dx;
-				}
-			}
-			base += stride;
-		}
-	}
-}
-*/
-
 void ndSkeletonContainer::SolveLcp(ndInt32 stride, ndInt32 size, const ndFloat32* const matrix, const ndFloat32* const x0, ndFloat32* const x, const ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex, ndFloat32 accelTol) const
 {
 	D_TRACKTIME();
@@ -1303,6 +1240,12 @@ void ndSkeletonContainer::SolveLcp(ndInt32 stride, ndInt32 size, const ndFloat32
 			tolerance += dr * dr;
 
 			x[i] = f;
+#if 1
+			for (ndInt32 j = 0; j < size; ++j)
+			{
+				residual[j] -= row[j] * dx;
+			}
+#else
 			if (ndAbs(dx) > ndFloat32(1.0e-6f))
 			{
 				for (ndInt32 j = 0; j < size; ++j) 
@@ -1310,6 +1253,7 @@ void ndSkeletonContainer::SolveLcp(ndInt32 stride, ndInt32 size, const ndFloat32
 					residual[j] -= row[j] * dx;
 				}
 			}
+#endif
 			base += stride;
 		}
 	}
@@ -1440,6 +1384,55 @@ void ndSkeletonContainer::InitMassMatrix(const ndLeftHandSide* const leftHandSid
 	{
 		return;
 	}
+
+	if (m_useFullContactModel && m_contactsLoopCount)
+	{
+		ndFixSizeArray<ndBodyKinematic*, 1024> queue;
+		queue.SetCount(queue.GetCapacity());
+
+		ndInt32 head = 0;
+		ndInt32 tail = 0;
+		for (ndInt32 i = m_contactsLoopCount + m_jointsLoopCount - 1; i >= m_jointsLoopCount; --i)
+		{
+			ndContact* const contact = m_loopingJoints[i]->GetAsContact();
+			ndAssert(contact);
+			ndAssert(contact->IsActive());
+			contact->m_skeletonExtraContact = 1;
+			ndBodyKinematic* const body = (contact->GetBody0()->GetSkeleton() == this) ? contact->GetBody1() : contact->GetBody0();
+			if (!body->m_skeletonExtraContact && (body->GetInvMass() != ndFloat32(0.0f)))
+			{
+				queue[head] = body;
+				head++;
+				ndAssert(head < queue.GetCapacity());
+				body->m_skeletonExtraContact = 1;
+			}
+		}
+
+		const ndInt32 mask = ndInt32(queue.GetCapacity() - 1);
+		while (head != tail)
+		{
+			ndBodyKinematic* const body = queue[tail];
+			tail = (tail + 1) & mask;
+			ndBodyKinematic::ndContactMap::Iterator it(body->GetContactMap());
+			for (it.Begin(); it; it++)
+			{
+				ndContact* const contact = *it;
+				if (contact->IsActive() && !contact->m_skeletonExtraContact)
+				{
+					contact->m_skeletonExtraContact = 1;
+					AddCloseLoopJoint(contact);
+					ndBodyKinematic* const child = (contact->GetBody0() == body) ? contact->GetBody1() : contact->GetBody0();
+					if (child->GetInvMass() > ndFloat32(0.0f))
+					{
+						queue[head] = child;
+						head = (head + 1) & mask;
+						child->m_skeletonExtraContact = 1;
+					}
+				}
+			}
+		}
+	}
+
 	ndInt32 rowCount = 0;
 	ndInt32 auxiliaryCount = 0;
 	m_leftHandSide = leftHandSide;
@@ -1463,7 +1456,7 @@ void ndSkeletonContainer::InitMassMatrix(const ndLeftHandSide* const leftHandSid
 	m_auxiliaryRowCount = auxiliaryCount;
 
 	ndInt32 loopRowCount = 0;
-	const ndInt32 loopCount = m_loopCount + m_dynamicsLoopCount;
+	const ndInt32 loopCount = m_jointsLoopCount + m_contactsLoopCount;
 	for (ndInt32 j = 0; j < loopCount; ++j) 
 	{
 		const ndConstraint* const joint = m_loopingJoints[j];
