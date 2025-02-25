@@ -55,16 +55,6 @@ void ndModelNotify::SetModel(ndModel* const model)
 	m_model = model;
 }
 
-bool ndModelNotify::GetContactModel() const
-{
-	return m_contactModel;
-}
-
-void ndModelNotify::SetContactModel(bool fullContactModel)
-{
-	m_contactModel = fullContactModel;
-}
-
 void ndModelNotify::Debug(ndConstraintDebugCallback&) const
 {
 }

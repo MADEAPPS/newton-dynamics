@@ -35,8 +35,6 @@ class ndSkeletonContainer
 	D_NEWTON_API ndSkeletonContainer();
 	D_NEWTON_API ~ndSkeletonContainer();
 	D_NEWTON_API ndInt32 GetId() const;
-	D_NEWTON_API bool GetContactModel() const;
-	D_NEWTON_API void SetContactModel(bool fullContactModel);
 
 	const ndNodeList& GetNodeList() const;
 	ndInt32 FindBoneIndex(const ndBodyKinematic* const body) const;
@@ -217,8 +215,8 @@ class ndSkeletonContainer
 	void CalculateLoopMassMatrixCoefficients(ndFloat32* const diagDamp);
 	void FactorizeMatrix(ndInt32 size, ndInt32 stride, ndFloat32* const matrix, ndFloat32* const diagDamp) const;
 	void SolveAuxiliary(ndJacobian* const internalForces, const ndForcePair* const accel, ndForcePair* const force) const;
-	void SolveBlockLcp(ndInt32 size, ndInt32 blockSize, const ndFloat32* const x0, ndFloat32* const x, ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex, ndFloat32 accelTol) const;
-	void SolveLcp(ndInt32 stride, ndInt32 size, const ndFloat32* const matrix, const ndFloat32* const x0, ndFloat32* const x, const ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex, ndFloat32 accelTol) const;
+	void SolveBlockLcp(ndInt32 size, ndInt32 blockSize, ndFloat32* const x, ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex, ndFloat32 accelTol) const;
+	void SolveLcp(ndInt32 stride, ndInt32 size, const ndFloat32* const matrix, ndFloat32* const x, const ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex, ndFloat32 accelTol) const;
 
 	inline void SolveBackward(ndForcePair* const force) const;
 	inline void CalculateForce(ndForcePair* const force, const ndForcePair* const accel) const;
@@ -254,7 +252,6 @@ class ndSkeletonContainer
 	ndInt32 m_jointsLoopCount;
 	ndInt32 m_contactsLoopCount;
 	ndUnsigned8 m_isResting;
-	ndUnsigned8 m_useFullContactModel;
 
 	friend class ndWorld;
 	friend class ndIkSolver;

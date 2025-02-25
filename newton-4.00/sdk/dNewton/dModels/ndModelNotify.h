@@ -40,9 +40,6 @@ class ndModelNotify : public ndContainersFreeListAlloc<ndModelNotify>
 	D_NEWTON_API ndModel* GetModel() const;
 	D_NEWTON_API void SetModel(ndModel* const model);
 
-	D_NEWTON_API bool GetContactModel() const;
-	D_NEWTON_API void SetContactModel(bool fullContactModel);
-
 	D_NEWTON_API virtual ndModelNotify* Clone() const;
 	D_NEWTON_API virtual void Update(ndWorld* const world, ndFloat32 timestep);
 	D_NEWTON_API virtual void PostUpdate(ndWorld* const world, ndFloat32 timestep);
@@ -52,7 +49,6 @@ class ndModelNotify : public ndContainersFreeListAlloc<ndModelNotify>
 
 	private:
 	ndModel* m_model;
-	bool m_contactModel;
 
 	D_MEMORY_ALIGN_FIXUP
 	friend class ndModel;
