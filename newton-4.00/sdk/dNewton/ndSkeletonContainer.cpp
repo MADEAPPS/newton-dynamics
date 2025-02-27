@@ -509,11 +509,15 @@ void ndSkeletonContainer::ClearCloseLoopJoints()
 {
 	for (ndInt32 i = m_contactsLoopCount + m_jointsLoopCount - 1; i >= m_jointsLoopCount; --i)
 	{
-		ndContact* const contact = m_loopingJoints[i]->GetAsContact();
-		ndAssert(contact);
-		contact->m_skeletonExtraContact = 0;
-		contact->GetBody0()->m_skeletonExtraContact = 0;
-		contact->GetBody1()->m_skeletonExtraContact = 1;
+		ndConstraint* const joint = m_loopingJoints[i];
+		ndAssert(joint);
+		ndContact* const contact = joint->GetAsContact();
+		if (contact)
+		{
+			contact->m_skeletonExtraContact = 0;
+		}
+		joint->GetBody0()->m_skeletonExtraContact = 0;
+		joint->GetBody1()->m_skeletonExtraContact = 1;
 	}
 	m_contactsLoopCount = 0;
 }
@@ -1480,15 +1484,17 @@ void ndSkeletonContainer::InitMassMatrix(const ndLeftHandSide* const leftHandSid
 		for (ndInt32 i = m_contactsLoopCount + m_jointsLoopCount - 1; i >= m_jointsLoopCount; --i)
 		{
 			ndContact* const contact = m_loopingJoints[i]->GetAsContact();
-			ndAssert(contact);
-			ndAssert(contact->IsActive());
-			contact->m_skeletonExtraContact = 1;
-			ndBodyKinematic* const body = (contact->GetBody0()->GetSkeleton() == this) ? contact->GetBody1() : contact->GetBody0();
-			if (!body->m_skeletonExtraContact && (body->GetInvMass() != ndFloat32(0.0f)))
+			if (contact)
 			{
-				queue.PushBack(body);
-				body->m_equilibrium = 0;
-				body->m_skeletonExtraContact = 1;
+				ndAssert(contact->IsActive());
+				contact->m_skeletonExtraContact = 1;
+				ndBodyKinematic* const body = (contact->GetBody0()->GetSkeleton() == this) ? contact->GetBody1() : contact->GetBody0();
+				if (!body->m_skeletonExtraContact && (body->GetInvMass() != ndFloat32(0.0f)))
+				{
+					queue.PushBack(body);
+					body->m_equilibrium = 0;
+					body->m_skeletonExtraContact = 1;
+				}
 			}
 		}
 
