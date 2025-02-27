@@ -242,7 +242,10 @@ class ndSkeletonContainer
 	ndFloat32* m_deltaForce;
 
 	ndNodeList m_nodeList;
-	ndArray<ndConstraint*> m_loopingJoints;
+	ndArray<ndContact*> m_transientLoopingContacts;
+	ndArray<ndJointBilateralConstraint*> m_transientLoopingJoints;
+	ndArray<ndJointBilateralConstraint*> m_permanentLoopingJoints;
+
 	ndArray<ndInt8> m_auxiliaryMemoryBuffer;
 	ndSpinLock m_lock;
 	ndInt32 m_id;
@@ -250,9 +253,6 @@ class ndSkeletonContainer
 	ndInt32 m_rowCount;
 	ndInt32 m_loopRowCount;
 	ndInt32 m_auxiliaryRowCount;
-	ndInt32 m_jointsLoopCount;
-	ndInt32 m_contactsLoopCount;
-	ndInt32 m_contactsLoopStartCount;
 	ndUnsigned8 m_isResting;
 
 	friend class ndWorld;
