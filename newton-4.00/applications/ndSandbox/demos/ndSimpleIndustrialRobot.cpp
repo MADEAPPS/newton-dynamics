@@ -656,12 +656,12 @@ namespace ndSimpleRobot
 		location.m_posit.m_z += 2.5f;
 		bodyList.PushBack(AddBox(scene, location, 2.0f, 0.3f, 0.4f, 0.7f));
 
-		bodyList.PushBack(AddBox(scene, location, 2.0f, 0.3f, 0.4f, 0.7f));
-		bodyList.PushBack(AddBox(scene, location, 2.0f, 0.3f, 0.4f, 0.7f));
+		//bodyList.PushBack(AddBox(scene, location, 2.0f, 0.3f, 0.4f, 0.7f));
+		//bodyList.PushBack(AddBox(scene, location, 2.0f, 0.3f, 0.4f, 0.7f));
 
 		location.m_posit.m_x += -1.0f;
 		location.m_posit.m_z +=  1.0f;
-		//bodyList.PushBack(AddBox(scene, location, 1.0f, 0.3f, 0.4f, 0.7f));
+		bodyList.PushBack(AddBox(scene, location, 1.0f, 0.3f, 0.4f, 0.7f));
 		
 		location = matrix;
 		location = ndYawMatrix(90.0f * ndDegreeToRad) * location;
@@ -671,7 +671,7 @@ namespace ndSimpleRobot
 		
 		location.m_posit.m_x += -1.0f;
 		location.m_posit.m_z += -1.0f;
-		//bodyList.PushBack(AddBox(scene, location, 4.0f, 0.3f, 0.4f, 0.7f));
+		bodyList.PushBack(AddBox(scene, location, 4.0f, 0.3f, 0.4f, 0.7f));
 	}
 }
 
