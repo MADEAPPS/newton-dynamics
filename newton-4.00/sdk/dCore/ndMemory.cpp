@@ -39,7 +39,8 @@ class ndMemoryHeader
 	ndUnsigned32 m_requestedSize;
 };
 
-#define ndGetBufferPaddingInBytes size_t(D_MEMORY_ALIGMNET - 1 + sizeof (ndMemoryHeader))
+#define D_MEMORY_ALIGMNET			32
+#define ndGetBufferPaddingInBytes	size_t(D_MEMORY_ALIGMNET - 1 + sizeof (ndMemoryHeader))
 
 size_t ndMemory::CalculateBufferSize(size_t size)
 {

@@ -26,14 +26,16 @@
 #include "ndTypes.h"
 #include "ndThreadSyncUtils.h"
 
-#define D_MEMORY_ALIGMNET	32
-
 #ifdef D_MEMORY_SANITY_CHECK
 	#define D_MEMORY_SAFE_GUARD		64
 #endif
 
-//#define D_MEMORY_ALIGN_FIXUP	;
-#define D_MEMORY_ALIGN_FIXUP ndBigVector m_alignmentFixup;
+#ifdef ND_ENFORCE_ALIGNMENT
+	#define D_MEMORY_ALIGN_FIXUP ndBigVector m_alignmentFixup;
+#else
+	#define D_MEMORY_ALIGN_FIXUP							   ;
+#endif
+
 
 typedef void* (*ndMemAllocCallback) (size_t size);
 typedef void (*ndMemFreeCallback) (void* const ptr);
