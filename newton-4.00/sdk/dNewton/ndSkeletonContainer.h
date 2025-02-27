@@ -204,6 +204,7 @@ class ndSkeletonContainer
 	void Finalize(ndInt32 loopJoints, ndJointBilateralConstraint** const loopJointArray);
 
 	void InitLoopMassMatrix();
+	void RegularizeLcp() const;
 	void ClearCloseLoopJoints();
 	void AddCloseLoopJoint(ndConstraint* const joint);
 	void CalculateReactionForces(ndJacobian* const internalForces);
@@ -216,7 +217,7 @@ class ndSkeletonContainer
 	void FactorizeMatrix(ndInt32 size, ndInt32 stride, ndFloat32* const matrix, ndFloat32* const diagDamp) const;
 	void SolveAuxiliary(ndJacobian* const internalForces, const ndForcePair* const accel, ndForcePair* const force) const;
 	void SolveBlockLcp(ndInt32 size, ndInt32 blockSize, ndFloat32* const x, ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex, ndFloat32 accelTol) const;
-	void SolveLcp(ndInt32 stride, ndInt32 size, const ndFloat32* const matrix, ndFloat32* const x, const ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex, ndFloat32 accelTol) const;
+	void SolveLcp(ndInt32 stride, ndInt32 size, ndFloat32* const x, const ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex, ndFloat32 accelTol) const;
 
 	inline void SolveBackward(ndForcePair* const force) const;
 	inline void CalculateForce(ndForcePair* const force, const ndForcePair* const accel) const;
@@ -251,6 +252,7 @@ class ndSkeletonContainer
 	ndInt32 m_auxiliaryRowCount;
 	ndInt32 m_jointsLoopCount;
 	ndInt32 m_contactsLoopCount;
+	ndInt32 m_contactsLoopStartCount;
 	ndUnsigned8 m_isResting;
 
 	friend class ndWorld;

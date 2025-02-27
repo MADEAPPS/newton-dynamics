@@ -141,37 +141,41 @@ bool ndCholeskyFactorization(ndInt32 size, ndInt32 stride, T* const psdMatrix)
 }
 
 template<class T>
-bool ndTestPSDmatrix(ndInt32 size, ndInt32 stride, T* const matrix)
+bool ndTestPSDmatrix(ndInt32 size, ndInt32 stride, const T* const matrix)
 {
-	ndInt32 row = 0;
+	ndInt32 srcRow = 0;
+	ndInt32 dstRow = 0;
 	T* const copy = ndAlloca(T, size * size);
 	for (ndInt32 i = 0; i < size; ++i) 
 	{
-		ndMemCpy(&copy[i * size], &matrix[row], size);
-		row += stride;
+		ndMemCpy(&copy[dstRow], &matrix[srcRow], ndInt64(size));
+
+		dstRow += size;
+		srcRow += stride;
 	}
 	return ndCholeskyFactorization(size, size, copy);
 }
 
-template<class T>
-void ndCholeskyApplyRegularizer (ndInt32 size, ndInt32 stride, T* const psdMatrix, T* const regularizer)
-{
-	bool isPsdMatrix = false;
-	ndFloat32* const lowerTriangule = ndAlloca(ndFloat32, stride * stride);
-	do 
-	{
-		ndMemCpy(lowerTriangule, psdMatrix, stride * stride);
-		isPsdMatrix = ndCholeskyFactorization(size, stride, lowerTriangule);
-		if (!isPsdMatrix) 
-		{
-			for (ndInt32 i = 0; i < size; ++i) 
-			{
-				regularizer[i] *= ndFloat32(4.0f);
-				psdMatrix[i * stride + i] += regularizer[i];
-			}
-		}
-	} while (!isPsdMatrix);
-}
+//template<class T>
+//void ndCholeskyApplyRegularizer (ndInt32 size, ndInt32 stride, T* const psdMatrix, T* const regularizer)
+//{
+//	bool isPsdMatrix = false;
+//	//ndFloat32* const lowerTriangule = ndAlloca(ndFloat32, stride * stride);
+//	T* const lowerTriangule = ndAlloca(T, stride * stride);
+//	do 
+//	{
+//		ndMemCpy(lowerTriangule, psdMatrix, stride * stride);
+//		isPsdMatrix = ndCholeskyFactorization(size, stride, lowerTriangule);
+//		if (!isPsdMatrix) 
+//		{
+//			for (ndInt32 i = 0; i < size; ++i) 
+//			{
+//				regularizer[i] *= ndFloat32(4.0f);
+//				psdMatrix[i * stride + i] += regularizer[i];
+//			}
+//		}
+//	} while (!isPsdMatrix);
+//}
 
 template<class T>
 void ndSolveCholesky(ndInt32 size, ndInt32 stride, const T* const choleskyMatrix, T* const x, const T* const b)

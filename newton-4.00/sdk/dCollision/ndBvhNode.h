@@ -67,6 +67,7 @@ class ndBvhNode : public ndContainersFreeListAlloc<ndBvhNode>
 	static ndVector m_aabbInvQuantization;
 } D_GCC_NEWTON_ALIGN_32 ;
 
+D_MSV_NEWTON_ALIGN_32
 class ndBvhInternalNode: public ndBvhNode
 {
 	public:
@@ -85,6 +86,7 @@ class ndBvhInternalNode: public ndBvhNode
 	ndBvhNode* m_right;
 } D_GCC_NEWTON_ALIGN_32;
 
+D_MSV_NEWTON_ALIGN_32
 class ndBvhLeafNode : public ndBvhNode
 {
 	public:
@@ -97,7 +99,7 @@ class ndBvhLeafNode : public ndBvhNode
 	virtual ndBvhLeafNode* GetAsSceneBodyNode() const;
 
 	ndBodyKinematic* m_body;
-};
+} D_GCC_NEWTON_ALIGN_32;
 
 class ndBottomUpCell
 {

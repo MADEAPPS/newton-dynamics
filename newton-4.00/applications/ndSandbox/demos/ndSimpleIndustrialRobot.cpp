@@ -629,8 +629,8 @@ namespace ndSimpleRobot
 						effectorJoint->EnableRotationAxis(ndIk6DofEffector::m_shortestPath);
 						effectorJoint->SetLinearSpringDamper(relaxation, 10000.0f, 500.0f);
 						effectorJoint->SetAngularSpringDamper(relaxation, 10000.0f, 500.0f);
-						effectorJoint->SetMaxForce(10000.0f);
-						effectorJoint->SetMaxTorque(10000.0f);
+						effectorJoint->SetMaxForce(2000.0f);
+						effectorJoint->SetMaxTorque(5000.0f);
 						
 						// the effector is part of the rig
 						model->AddCloseLoop(effector, "effector");
@@ -652,8 +652,8 @@ namespace ndSimpleRobot
 	void AddBackgroundScene(ndDemoEntityManager* const scene, const ndMatrix& matrix, ndFixSizeArray<ndBodyKinematic*, 16>& bodyList)
 	{
 		ndMatrix location(matrix);
-		location.m_posit.m_x -= 0.0f;
-		location.m_posit.m_z += 2.0f;
+		location.m_posit.m_x += 0.0f;
+		location.m_posit.m_z += 2.5f;
 		bodyList.PushBack(AddBox(scene, location, 2.0f, 0.3f, 0.4f, 0.7f));
 
 		bodyList.PushBack(AddBox(scene, location, 2.0f, 0.3f, 0.4f, 0.7f));
@@ -665,8 +665,8 @@ namespace ndSimpleRobot
 		
 		location = matrix;
 		location = ndYawMatrix(90.0f * ndDegreeToRad) * location;
-		location.m_posit.m_x -= 0.0f;
-		location.m_posit.m_z += 3.0f;
+		location.m_posit.m_x += 0.0f;
+		location.m_posit.m_z += 3.5f;
 		bodyList.PushBack(AddBox(scene, location, 8.0f, 0.3f, 0.4f, 0.7f));
 		
 		location.m_posit.m_x += -1.0f;

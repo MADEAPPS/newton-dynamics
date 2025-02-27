@@ -64,5 +64,4 @@ class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 	friend class ndMultiBodyVehicle;
 	friend class ndMultiBodyVehicleGearBox;
 } D_GCC_NEWTON_ALIGN_32;
-
 #endif

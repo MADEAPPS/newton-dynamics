@@ -171,7 +171,7 @@ class ndJointBilateralConstraint : public ndConstraint
 	friend class ndDynamicsUpdateAvx2;
 	friend class ndDynamicsUpdateSycl;
 	friend class ndDynamicsUpdateCuda;
-};
+} D_GCC_NEWTON_ALIGN_32;
 
 
 #endif

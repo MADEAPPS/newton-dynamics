@@ -263,53 +263,17 @@ void ndIk6DofEffector::SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix&
 	const ndVector posit0(matrix0.m_posit);
 	const ndVector posit1(matrix1.TransformVector(m_targetFrame.m_posit));
 	
-#if 1
 	for (ndInt32 i = 0; i < 3; ++i)
 	{
 		if (m_controlDofOptions & (1 << i))
 		{
 			const ndVector pin = axisDir[i];
 			AddLinearRowJacobian(desc, posit0, posit1, pin);
-
-			//m_linearMaxSpringRamp = 0.1f;
-			//ndFloat32 springError = ndClamp (GetJointErrorPosit(desc), -m_linearMaxSpringRamp, m_linearMaxSpringRamp);
-			//SetJointErrorPosit(desc, springError);
 			SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
-			
-			//ndTrace(("xxxxxxxxxx %f %f\n", springError, GetMotorAcceleration(desc)));
-
 			SetLowerFriction(desc, -m_linearMaxForce);
 			SetHighFriction(desc, m_linearMaxForce);
 		}
 	}
-#else
-
-	const ndBodyKinematic* const body0 = GetBody0();
-	const ndBodyKinematic* const body1 = GetBody1();
-
-	const ndVector omega0(body0->GetOmega());
-	const ndVector omega1(body1->GetOmega());
-	const ndVector veloc0 (body0->GetVelocity());
-	const ndVector veloc1 (body1->GetVelocity());
-
-	for (ndInt32 i = 0; i < 3; ++i)
-	{
-		if (m_controlDofOptions & (1 << i))
-		{
-			const ndVector pin = axisDir[i];
-			AddLinearRowJacobian(desc, posit0, posit1, pin);
-			const ndInt32 index = desc.m_rowsCount - 1;
-			const ndJacobian& jacobian0 = desc.m_jacobian[index].m_jacobianM0;
-			const ndJacobian& jacobian1 = desc.m_jacobian[index].m_jacobianM1;
-			const ndFloat32 relPosit = (jacobian0.m_linear * posit0 + jacobian1.m_linear * posit1).AddHorizontal().GetScalar();
-			const ndFloat32 relVeloc = (jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
-			const ndFloat32 accel = CalculateSpringDamperAcceleration(desc.m_timestep, m_linearSpring, relPosit, m_linearDamper, relVeloc);
-			SetMotorAcceleration(desc, accel);
-			SetLowerFriction(desc, -m_linearMaxForce);
-			SetHighFriction(desc, m_linearMaxForce);
-		}
-	}
-#endif
 }
 
 void ndIk6DofEffector::JacobianDerivative(ndConstraintDescritor& desc)
