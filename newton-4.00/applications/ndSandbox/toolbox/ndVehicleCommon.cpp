@@ -618,7 +618,7 @@ void ndVehicleCommonNotify::Update(ndWorld* const world, ndFloat32 timestep)
 {
 	ndMultiBodyVehicle* const vehicle = (ndMultiBodyVehicle*)GetModel();
 	m_sleepingState = true;
-	if (vehicle && !vehicle->IsSleeping())
+	if (m_isPlayer || (vehicle && !vehicle->IsSleeping()))
 	{
 		m_sleepingState = false;
 		ApplyInputs(world, timestep);

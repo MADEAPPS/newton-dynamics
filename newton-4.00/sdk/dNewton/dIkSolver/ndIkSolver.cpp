@@ -467,8 +467,6 @@ void ndIkSolver::BuildMassMatrix()
 		BuildJacobianMatrix(joint);
 	}
 	
-	//const ndInt32 loops = m_skeleton->m_contactsLoopCount + m_skeleton->m_jointsLoopCount;
-	//for (ndInt32 i = 0; i < loops; ++i)
 	for (ndInt32 i = ndInt32 (m_skeleton->m_permanentLoopingJoints.GetCount() - 1); i >= 0; --i)
 	{
 		ndConstraint* const joint = m_skeleton->m_permanentLoopingJoints[i];
