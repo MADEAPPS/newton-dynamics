@@ -844,7 +844,8 @@ namespace nd_
 
 	void VHACD::MergeConvexHulls(const Parameters& params)
 	{
-		if (GetCancel()) {
+		if (GetCancel() || (m_convexHulls.Size() <= 1)) 
+		{
 			return;
 		}
 		m_timer.Tic();
@@ -966,7 +967,6 @@ namespace nd_
 					int j0 = int(j);
 					ConvexKey key(i0, j0);
 					hullGraph.insert(key);
-					//convexPairArray[pairsCount] = ConvexPair(i, j);
 					convexPairArray[pairsCount] = ConvexPair(i0, j0);
 					pairsCount++;
 				}
@@ -980,9 +980,6 @@ namespace nd_
 			size_t bashSize = pairsCount / (VHACD_WORKERS_THREADS * 4);
 			for (size_t j = 0; j < VHACD_WORKERS_THREADS * 4; ++j)
 			{
-				//size_t i = j * bashSize;
-				//size_t count = ((i + bashSize) <= pairsCount) ? bashSize : pairsCount - i;
-				//size_t count = ((i + bashSize) <= pairsCount) ? bashSize : pairsCount - i;
 				size_t count = (j + 1) * bashSize - start;
 				if (count > 0)
 				{

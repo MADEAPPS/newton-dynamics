@@ -104,7 +104,7 @@ namespace nd_
 				Parameters(void) { Init(); }
 				void Init(void)
 				{
-					m_resolution = 400000;
+					m_resolution = 1000000;
 					m_concavity = 0.001;
 					m_minMergeToleranace = 0.5e-3f;
 					m_concavityToVolumeWeigh = 1.0f;
