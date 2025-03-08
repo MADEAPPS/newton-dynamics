@@ -352,11 +352,11 @@ namespace nd_
 			Vec3<double> boxcenter;
 			Vec3<double> pt;
 			const Vec3<double> boxhalfsize(0.5, 0.5, 0.5);
-			for (size_t t = 0, ti = 0; t < nTriangles; ++t, ti += strideTriangles) {
-				Vec3<int32_t> tri(triangles[ti + 0],
-					triangles[ti + 1],
-					triangles[ti + 2]);
-				for (size_t c = 0; c < 3; ++c) {
+			for (size_t t = 0, ti = 0; t < nTriangles; ++t, ti += strideTriangles) 
+			{
+				Vec3<int32_t> tri(triangles[ti + 0], triangles[ti + 1], triangles[ti + 2]);
+				for (size_t c = 0; c < 3; ++c) 
+				{
 					ComputeAlignedPoint(points, tri[c] * stridePoints, barycenter, rot, pt);
 					p[c][0] = (pt[0] - m_minBB[0]) * invScale;
 					p[c][1] = (pt[1] - m_minBB[1]) * invScale;
@@ -366,12 +366,14 @@ namespace nd_
 					k_ = static_cast<size_t>(p[c][2] + 0.5);
 					assert(i_ < m_dim[0] && i_ >= 0 && j_ < m_dim[1] && j_ >= 0 && k_ < m_dim[2] && k_ >= 0);
 
-					if (c == 0) {
+					if (c == 0) 
+					{
 						i0 = i1 = i_;
 						j0 = j1 = j_;
 						k0 = k1 = k_;
 					}
-					else {
+					else 
+					{
 						if (i_ < i0)
 							i0 = i_;
 						if (j_ < j0)

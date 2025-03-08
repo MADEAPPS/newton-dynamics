@@ -864,11 +864,15 @@ namespace nd_
 			const size_t i0 = m_dim[0];
 			const size_t j0 = m_dim[1];
 			const size_t k0 = m_dim[2];
-			for (size_t i = 0; i < i0; ++i) {
-				for (size_t j = 0; j < j0; ++j) {
-					for (size_t k = 0; k < k0; ++k) {
+			for (size_t k = 0; k < k0; ++k) 
+			{
+				for (size_t j = 0; j < j0; ++j) 
+				{
+					for (size_t i = 0; i < i0; ++i) 
+					{
 						unsigned char& v = GetVoxel(i, j, k);
-						if (v == PRIMITIVE_UNDEFINED) {
+						if (v == PRIMITIVE_UNDEFINED) 
+						{
 							v = PRIMITIVE_INSIDE_SURFACE;
 							++m_numVoxelsInsideSurface;
 						}
