@@ -935,8 +935,10 @@ void ndMultiBodyVehicle::ApplyTireModel(ndFloat32 timestep, ndFixSizeArray<ndTir
 				ndFloat32 contactPatch = tireBasisMatrix.m_up.DotProduct(dir.Normalize()).GetScalar();
 				if (useCoulombModel || (contactPatch > ndFloat32(-0.71f)))
 				{
+					// remove this contact
 					tireContacts[i] = tireContacts[tireContacts.GetCount() - 1];
 					tireContacts.Pop();
+					break;
 				}
 			}
 		}
