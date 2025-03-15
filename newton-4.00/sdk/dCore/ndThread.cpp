@@ -65,16 +65,16 @@ ndThread::ndThread()
 	}
 #else
 	// do the same for posit systems.
-	int policy;
-	sched_param param;
-	native_handle_type nativeHandle = native_handle();
-	pthread_getschedparam(nativeHandle, &policy, &param);
-	int32_t priority = sched_get_priority_min(policy);
-	if (param.sched_priority == priority)
-	{
-		param.sched_priority = priority + 1;
-		pthread_setschedparam(pthread_self(), policy, &param);
-	}
+	//int policy;
+	//sched_param param;
+	//native_handle_type nativeHandle = native_handle();
+	//pthread_getschedparam(nativeHandle, &policy, &param);
+	//int32_t priority = sched_get_priority_min(policy);
+	//if (param.sched_priority == priority)
+	//{
+	//	param.sched_priority = priority + 1;
+	//	pthread_setschedparam(pthread_self(), policy, &param);
+	//}
 #endif
 }
 
