@@ -165,12 +165,14 @@ void ndIkSolver::GetJacobianDerivatives(ndConstraint* const joint)
 		rhs->m_lowerBoundFrictionCoefficent = constraintParam.m_forceBounds[i].m_low;
 		rhs->m_upperBoundFrictionCoefficent = constraintParam.m_forceBounds[i].m_upper;
 		rhs->m_jointFeebackForce = constraintParam.m_forceBounds[i].m_jointForce;
-
 		ndAssert(constraintParam.m_forceBounds[i].m_normalIndex >= -1);
 		const ndInt32 frictionIndex = constraintParam.m_forceBounds[i].m_normalIndex;
 		const ndInt32 mask = frictionIndex >> 31;
 		rhs->m_normalForceIndex = frictionIndex;
 		rhs->m_normalForceIndexFlat = ~mask & (frictionIndex + baseIndex);
+
+		rhs->SetSanityCheck(joint);
+		ndAssert(rhs->SanityCheck());
 	}
 }
 

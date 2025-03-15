@@ -203,6 +203,7 @@ class ndSkeletonContainer
 	ndNode* AddChild(ndJointBilateralConstraint* const joint, ndNode* const parent);
 	void Finalize(ndInt32 loopJoints, ndJointBilateralConstraint** const loopJointArray);
 
+	void AddExtraContacts();
 	void InitLoopMassMatrix();
 	void RegularizeLcp() const;
 	void ClearCloseLoopJoints();

@@ -440,7 +440,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	callback->RegisterMaterial(material, ndDemoContactCallback::m_vehicleTirePart, ndDemoContactCallback::m_modelPart);
 	callback->RegisterMaterial(material, ndDemoContactCallback::m_vehicleTirePart, ndDemoContactCallback::m_vehicleTirePart);
 
-	material.m_flags = material.m_flags | m_useBrushTireModel;
+	//material.m_flags = material.m_flags | m_useBrushTireModel____;
 	callback->RegisterMaterial(material, ndDemoContactCallback::m_vehicleTirePart, ndDemoContactCallback::m_default);
 
 	// add a model for general controls

@@ -212,6 +212,7 @@ void ndJointBilateralConstraint::SetLowerFriction(ndConstraintDescritor& desc, n
 	ndAssert(index >= 0);
 	ndAssert(index < ndInt32(m_maxDof));
 	desc.m_forceBounds[index].m_low = ndClamp(friction, ndFloat32(D_MIN_BOUND), ndFloat32(-0.001f));
+	//ndAssert(desc.m_forceBounds[index].m_normalIndex == D_INDEPENDENT_ROW);
 	ndAssert(desc.m_forceBounds[index].m_normalIndex == D_INDEPENDENT_ROW);
 
 #ifdef _DEBUG

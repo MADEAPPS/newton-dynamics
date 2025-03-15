@@ -1115,8 +1115,15 @@ void ndDynamicsUpdateAvx2::GetJacobianDerivatives(ndConstraint* const joint)
 		rhs->m_upperBoundFrictionCoefficent = constraintParam.m_forceBounds[i].m_upper;
 		rhs->m_jointFeebackForce = constraintParam.m_forceBounds[i].m_jointForce;
 
-		ndAssert(constraintParam.m_forceBounds[i].m_normalIndex >= -1);
+		ndAssert(constraintParam.m_forceBounds[i].m_normalIndex >= -2);
 		rhs->m_normalForceIndex = constraintParam.m_forceBounds[i].m_normalIndex;
+
+		rhs->SetSanityCheck(joint);
+		ndAssert(rhs->SanityCheck());
+		if (rhs->m_normalForceIndex == D_OVERRIDE_FRICTION_ROW)
+		{
+			rhs->m_normalForceIndex = D_INDEPENDENT_ROW;
+		}
 	}
 }
 
@@ -1177,6 +1184,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 				ndAssert(rhs->m_jointFeebackForce);
 				const ndFloat32 force = rhs->m_jointFeebackForce->GetInitialGuess();
 
+				ndAssert(rhs->SanityCheck());
 				rhs->m_force = isBilateral ? ndClamp(force, rhs->m_lowerBoundFrictionCoefficent, rhs->m_upperBoundFrictionCoefficent) : force;
 				rhs->m_maxImpact = ndFloat32(0.0f);
 
@@ -1430,6 +1438,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 							normalIndex[n] = (rhs->m_normalForceIndex + 1) * D_AVX_WORK_GROUP + n;
 							row.m_lowerBoundFrictionCoefficent[n] = rhs->m_lowerBoundFrictionCoefficent;
 							row.m_upperBoundFrictionCoefficent[n] = rhs->m_upperBoundFrictionCoefficent;
+							ndAssert(rhs->SanityCheck());
 						}
 					}
 				}
@@ -1524,6 +1533,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 								normalIndex[k] = (rhs->m_normalForceIndex + 1) * D_AVX_WORK_GROUP + k;
 								row.m_lowerBoundFrictionCoefficent[k] = rhs->m_lowerBoundFrictionCoefficent;
 								row.m_upperBoundFrictionCoefficent[k] = rhs->m_upperBoundFrictionCoefficent;
+								ndAssert(rhs->SanityCheck());
 							}
 						}
 					}
@@ -1627,6 +1637,14 @@ void ndDynamicsUpdateAvx2::InitSkeletons()
 
 	if (activeSkeletons.GetCount())
 	{
+		for (ndInt32 i = ndInt32(activeSkeletons.GetCount()) - 1; i >= 0; --i)
+		{
+			ndSkeletonContainer* const skeleton = activeSkeletons[i];
+			if (skeleton->m_transientLoopingContacts.GetCount())
+			{
+				skeleton->AddExtraContacts();
+			}
+		}
 		scene->ParallelExecute(InitSkeletons);
 	}
 }
