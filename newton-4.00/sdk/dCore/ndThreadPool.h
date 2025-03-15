@@ -58,9 +58,14 @@ class ndStartEnd
 class ndTask
 {
 	public:
-	ndTask(){}
+	ndTask(ndInt32 threadIndex)
+		:m_threadIndex(threadIndex) 
+	{
+	}
 	virtual ~ndTask(){}
 	virtual void Execute() const = 0;
+
+	const ndInt32 m_threadIndex;
 };
 
 class ndThreadPool: public ndSyncMutex, public ndThread
@@ -75,6 +80,7 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 		D_CORE_API void ExecuteTask(ndTask* const task);
 	
 		private:
+		void TaskUpdate();
 		virtual void ThreadFunction();
 
 		ndThreadPool* m_owner;
@@ -95,9 +101,10 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 	D_CORE_API ndThreadPool(const char* const baseName);
 	D_CORE_API virtual ~ndThreadPool();
 
-	ndInt32 GetThreadCount() const;
+	D_CORE_API ndInt32 GetThreadCount() const;
 	D_CORE_API static ndInt32 GetMaxThreads();
 	D_CORE_API void SetThreadCount(ndInt32 count);
+	D_CORE_API virtual void WorkerUpdate(ndInt32 threadIndex);
 
 	D_CORE_API void TickOne();
 	D_CORE_API void Begin();
@@ -105,6 +112,8 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 
 	template <typename Function>
 	void ParallelExecute(const Function& ndFunction);
+
+	D_CORE_API void TaskUpdate(ndInt32 threadIndex);
 
 	private:
 	D_CORE_API virtual void Release();
@@ -114,11 +123,6 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 	ndInt32 m_count;
 	char m_baseName[32];
 };
-
-inline ndInt32 ndThreadPool::GetThreadCount() const
-{
-	return m_count + 1;
-}
 
 template <typename Type, typename ... Args>
 class ndFunction
@@ -157,10 +161,9 @@ class ndTaskImplement : public ndTask
 {
 	public:
 	ndTaskImplement(ndInt32 threadIndex, ndThreadPool* const threadPool, const Function& ndFunction)
-		:ndTask()
+		:ndTask(threadIndex)
 		,m_function(ndFunction)
 		,m_threadPool(threadPool)
-		,m_threadIndex(threadIndex)
 		,m_threadCount(threadPool->GetThreadCount())
 	{
 	}
@@ -177,7 +180,6 @@ class ndTaskImplement : public ndTask
 
 	Function m_function;
 	ndThreadPool* m_threadPool;
-	const ndInt32 m_threadIndex;
 	const ndInt32 m_threadCount;
 	friend class ndThreadPool;
 };
@@ -194,24 +196,25 @@ void ndThreadPool::ParallelExecute(const Function& callback)
 		new (job) ndTaskImplement<Function>(i, this, callback);
 	}
 
-	if (m_count > 0)
+	ndInt32 workerCount = threadCount - 1;
+	if (workerCount > 0)
 	{
 		#ifdef	D_USE_THREAD_EMULATION
-		for (ndInt32 i = 0; i < threadCount; ++i)
-		{
-			ndTaskImplement<Function>* const job = &jobsArray[i];
-			callback(job->m_threadIndex, job->m_threadCount);
-		}
+			for (ndInt32 i = 0; i < threadCount; ++i)
+			{
+				ndTaskImplement<Function>* const job = &jobsArray[i];
+				callback(job->m_threadIndex, job->m_threadCount);
+			}
 		#else
-		for (ndInt32 i = 0; i < m_count; ++i)
-		{
-			ndTaskImplement<Function>* const job = &jobsArray[i + 1];
-			m_workers[i].ExecuteTask(job);
-		}
+			for (ndInt32 i = 0; i < workerCount; ++i)
+			{
+				ndTaskImplement<Function>* const job = &jobsArray[i + 1];
+				m_workers[i].ExecuteTask(job);
+			}
 	
-		ndTaskImplement<Function>* const job = &jobsArray[0];
-		callback(job->m_threadIndex, job->m_threadCount);
-		WaitForWorkers();
+			ndTaskImplement<Function>* const job = &jobsArray[0];
+			callback(job->m_threadIndex, job->m_threadCount);
+			WaitForWorkers();
 		#endif
 	}
 	else

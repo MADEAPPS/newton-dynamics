@@ -437,13 +437,19 @@ void ndWorld::DeleteDeferredObjects()
 	}
 }
 
-void ndWorld::ThreadFunction()
+void ndWorld::WorkerUpdate(ndInt32 threadIndex)
+{
+	m_scene->TaskUpdate(threadIndex);
+}
+
+void ndWorld::MainUpdate()
 {
 	D_TRACKTIME();
 	ndUnsigned64 timeAcc = ndGetTimeInMicroseconds();
 
 	m_inUpdate = true;
 	m_scene->Begin();
+
 	DeleteDeferredObjects();
 
 	//m_inUpdate = true;
@@ -461,18 +467,23 @@ void ndWorld::ThreadFunction()
 	}
 
 	m_scene->SetTimestep(m_timestep);
-		
+
 	ParticleUpdate(m_timestep);
-		
+
 	UpdateTransforms();
 	PostModelTransform();
 	PostUpdate(m_timestep);
 	m_inUpdate = false;
 
 	m_scene->End();
-	
+
 	m_lastExecutionTime = (ndFloat32)(ndGetTimeInMicroseconds() - timeAcc) * ndFloat32(1.0e-6f);
 	CalculateAverageUpdateTime();
+}
+
+void ndWorld::ThreadFunction()
+{
+	MainUpdate();
 }
 
 void ndWorld::CalculateAverageUpdateTime()

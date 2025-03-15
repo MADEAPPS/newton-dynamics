@@ -1574,37 +1574,39 @@ void ndScene::CreateNewContacts()
 	m_scratchBuffer.SetCount(ndInt32((contactCount + m_newPairs.GetCount() + 16) * sizeof(ndContact*)));
 
 	ndContact** const tmpJointsArray = (ndContact**)&m_scratchBuffer[0];
-
-	ndAtomic<ndInt32> iterator(0);
-	auto CreateNewContacts = ndMakeObject::ndFunction([this, &iterator, tmpJointsArray](ndInt32, ndInt32)
-	{
-		D_TRACKTIME_NAMED(CreateNewContacts);
-		const ndArray<ndContactPairs>& newPairs = m_newPairs;
-		ndBodyKinematic** const bodyArray = &GetActiveBodyArray()[0];
-
-		const ndInt32 count = ndInt32(newPairs.GetCount());
-		for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
+	if (m_newPairs.GetCount())
+	{ 
+		ndAtomic<ndInt32> iterator(0);
+		auto CreateNewContacts = ndMakeObject::ndFunction([this, &iterator, tmpJointsArray](ndInt32, ndInt32)
 		{
-			const ndInt32 maxSpan = ((count - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : count - i;
-			for (ndInt32 j = 0; j < maxSpan; ++j)
+			D_TRACKTIME_NAMED(CreateNewContacts);
+			const ndArray<ndContactPairs>& newPairs = m_newPairs;
+			ndBodyKinematic** const bodyArray = &GetActiveBodyArray()[0];
+
+			const ndInt32 count = ndInt32(newPairs.GetCount());
+			for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
 			{
-				const ndContactPairs& pair = newPairs[i + j];
-				ndBodyKinematic* const body0 = bodyArray[pair.m_body0];
-				ndBodyKinematic* const body1 = bodyArray[pair.m_body1];
-				ndAssert(ndUnsigned32(body0->m_index) == pair.m_body0);
-				ndAssert(ndUnsigned32(body1->m_index) == pair.m_body1);
+				const ndInt32 maxSpan = ((count - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : count - i;
+				for (ndInt32 j = 0; j < maxSpan; ++j)
+				{
+					const ndContactPairs& pair = newPairs[i + j];
+					ndBodyKinematic* const body0 = bodyArray[pair.m_body0];
+					ndBodyKinematic* const body1 = bodyArray[pair.m_body1];
+					ndAssert(ndUnsigned32(body0->m_index) == pair.m_body0);
+					ndAssert(ndUnsigned32(body1->m_index) == pair.m_body1);
 
-				ndContact* const contact = new ndContact;
-				contact->SetBodies(body0, body1);
-				contact->AttachToBodies();
+					ndContact* const contact = new ndContact;
+					contact->SetBodies(body0, body1);
+					contact->AttachToBodies();
 
-				ndAssert(contact->m_body0->GetInvMass() != ndFloat32(0.0f));
-				contact->m_material = m_contactNotifyCallback->GetMaterial(contact, body0->GetCollisionShape(), body1->GetCollisionShape());
-				tmpJointsArray[i + j] = contact;
+					ndAssert(contact->m_body0->GetInvMass() != ndFloat32(0.0f));
+					contact->m_material = m_contactNotifyCallback->GetMaterial(contact, body0->GetCollisionShape(), body1->GetCollisionShape());
+					tmpJointsArray[i + j] = contact;
+				}
 			}
-		}
-	});
-	ParallelExecute(CreateNewContacts);
+		});
+		ParallelExecute(CreateNewContacts);
+	}
 
 	if (contactCount)
 	{

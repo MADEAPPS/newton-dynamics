@@ -44,6 +44,10 @@ ndWorld* ndWorldScene::GetWorld() const
 	return m_world;
 }
 
+void ndWorldScene::WorkerUpdate(ndInt32 threadIndex)
+{
+	m_world->WorkerUpdate(threadIndex);
+}
 
 void ndWorldScene::ThreadFunction()
 {
