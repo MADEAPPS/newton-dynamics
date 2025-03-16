@@ -36,6 +36,7 @@ class ndWorldScene : public ndScene
 	protected:
 	D_NEWTON_API virtual void ThreadFunction();
 	D_NEWTON_API virtual ndWorld* GetWorld() const;
+	D_NEWTON_API virtual void WorkerUpdate(ndInt32 threadIndex);
 
 	ndWorld* m_world;
 

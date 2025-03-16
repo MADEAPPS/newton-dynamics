@@ -51,10 +51,9 @@ class ndBrainTaskImplement: public ndTask
 {
 	public:
 	ndBrainTaskImplement(ndInt32 threadIndex, ndBrainThreadPool* const threadPool, const Function& ndFunction)
-		:ndTask()
+		:ndTask(threadIndex)
 		,m_function(ndFunction)
 		,m_threadPool(threadPool)
-		,m_threadIndex(threadIndex)
 		,m_threadCount(threadPool->GetThreadCount())
 	{
 	}
@@ -71,7 +70,6 @@ class ndBrainTaskImplement: public ndTask
 
 	Function m_function;
 	ndBrainThreadPool* m_threadPool;
-	const ndInt32 m_threadIndex;
 	const ndInt32 m_threadCount;
 	friend class ndBrainThreadPool;
 };

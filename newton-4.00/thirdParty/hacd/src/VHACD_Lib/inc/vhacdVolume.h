@@ -148,67 +148,6 @@ namespace nd_
 			Vec3<double> m_barycenterPCA;
 		};
 
-		struct Tetrahedron {
-		public:
-			Vec3<double> m_pts[4];
-			unsigned char m_data;
-		};
-
-		//!
-		class TetrahedronSet : public PrimitiveSet {
-			friend class Volume;
-
-			public:
-			//! Destructor.
-			~TetrahedronSet(void);
-			//! Constructor.
-			TetrahedronSet();
-
-			size_t GetNPrimitives() const { return m_tetrahedra.Size(); }
-			size_t GetNPrimitivesOnSurf() const { return m_numTetrahedraOnSurface; }
-			size_t GetNPrimitivesInsideSurf() const { return m_numTetrahedraInsideSurface; }
-			const Vec3<double>& GetMinBB() const { return m_minBB; }
-			const Vec3<double>& GetMaxBB() const { return m_maxBB; }
-			const Vec3<double>& GetBarycenter() const { return m_barycenter; }
-			double GetEigenValue(AXIS axis) const { return m_D[axis][axis]; }
-			double GetSacle() const { return m_scale; }
-			double ComputeVolume() const;
-			double ComputeMaxVolumeError() const;
-			void ComputeConvexHull(Mesh& meshCH, const size_t sampling = 1) const;
-			void ComputePrincipalAxes();
-			void AlignToPrincipalAxes();
-			void RevertAlignToPrincipalAxes();
-			void Clip(const Plane& plane, PrimitiveSet* const positivePart, PrimitiveSet* const negativePart) const;
-			void Intersect(const Plane& plane, SArray<Vec3<double> >* const positivePts,
-				SArray<Vec3<double> >* const negativePts, const size_t sampling) const;
-			void ComputeExteriorPoints(const Plane& plane, const Mesh& mesh,
-				SArray<Vec3<double> >* const exteriorPts) const;
-			void ComputeClippedVolumes(const Plane& plane, double& positiveVolume, double& negativeVolume) const;
-			void SelectOnSurface(PrimitiveSet* const onSurfP) const;
-			void ComputeBB();
-			void Convert(Mesh& mesh, const VOXEL_VALUE value) const;
-			inline bool Add(Tetrahedron& tetrahedron);
-			PrimitiveSet* Create() const
-			{
-				return new TetrahedronSet();
-			}
-			static const double EPS;
-
-			private:
-			void GetPointArray(std::vector<Vec3<double> >& points) const;
-			void AddClippedTetrahedra(const Vec3<double>(&pts)[10], const int32_t nPts);
-
-			size_t m_numTetrahedraOnSurface;
-			size_t m_numTetrahedraInsideSurface;
-			double m_scale;
-			Vec3<double> m_minBB;
-			Vec3<double> m_maxBB;
-			Vec3<double> m_barycenter;
-			SArray<Tetrahedron, 8> m_tetrahedra;
-			double m_Q[3][3];
-			double m_D[3][3];
-		};
-
 		//!
 		class Volume {
 			public:
@@ -241,7 +180,6 @@ namespace nd_
 			size_t GetNPrimitivesInsideSurf() const { return m_numVoxelsInsideSurface; }
 			void Convert(Mesh& mesh, const VOXEL_VALUE value) const;
 			void Convert(VoxelSet& vset) const;
-			void Convert(TetrahedronSet& tset) const;
 			void AlignToPrincipalAxes(double(&rot)[3][3]) const;
 
 			private:
@@ -352,11 +290,11 @@ namespace nd_
 			Vec3<double> boxcenter;
 			Vec3<double> pt;
 			const Vec3<double> boxhalfsize(0.5, 0.5, 0.5);
-			for (size_t t = 0, ti = 0; t < nTriangles; ++t, ti += strideTriangles) {
-				Vec3<int32_t> tri(triangles[ti + 0],
-					triangles[ti + 1],
-					triangles[ti + 2]);
-				for (size_t c = 0; c < 3; ++c) {
+			for (size_t t = 0, ti = 0; t < nTriangles; ++t, ti += strideTriangles) 
+			{
+				Vec3<int32_t> tri(triangles[ti + 0], triangles[ti + 1], triangles[ti + 2]);
+				for (size_t c = 0; c < 3; ++c) 
+				{
 					ComputeAlignedPoint(points, tri[c] * stridePoints, barycenter, rot, pt);
 					p[c][0] = (pt[0] - m_minBB[0]) * invScale;
 					p[c][1] = (pt[1] - m_minBB[1]) * invScale;
@@ -366,12 +304,14 @@ namespace nd_
 					k_ = static_cast<size_t>(p[c][2] + 0.5);
 					assert(i_ < m_dim[0] && i_ >= 0 && j_ < m_dim[1] && j_ >= 0 && k_ < m_dim[2] && k_ >= 0);
 
-					if (c == 0) {
+					if (c == 0) 
+					{
 						i0 = i1 = i_;
 						j0 = j1 = j_;
 						k0 = k1 = k_;
 					}
-					else {
+					else 
+					{
 						if (i_ < i0)
 							i0 = i_;
 						if (j_ < j0)
@@ -398,15 +338,19 @@ namespace nd_
 					++j1;
 				if (k1 < m_dim[2])
 					++k1;
-				for (size_t i = i0; i < i1; ++i) {
+				for (size_t i = i0; i < i1; ++i) 
+				{
 					boxcenter[0] = (double)i;
-					for (size_t j = j0; j < j1; ++j) {
+					for (size_t j = j0; j < j1; ++j) 
+					{
 						boxcenter[1] = (double)j;
-						for (size_t k = k0; k < k1; ++k) {
+						for (size_t k = k0; k < k1; ++k) 
+						{
 							boxcenter[2] = (double)k;
 							int32_t res = TriBoxOverlap(boxcenter, boxhalfsize, p[0], p[1], p[2]);
 							unsigned char& value = GetVoxel(i, j, k);
-							if (res == 1 && value == PRIMITIVE_UNDEFINED) {
+							if (res == 1 && value == PRIMITIVE_UNDEFINED) 
+							{
 								value = PRIMITIVE_ON_SURFACE;
 								++m_numVoxelsOnSurface;
 							}
@@ -414,6 +358,7 @@ namespace nd_
 					}
 				}
 			}
+
 			FillOutsideSurface(0, 0, 0, m_dim[0], m_dim[1], 1);
 			FillOutsideSurface(0, 0, m_dim[2] - 1, m_dim[0], m_dim[1], m_dim[2]);
 			FillOutsideSurface(0, 0, 0, m_dim[0], 1, m_dim[2]);

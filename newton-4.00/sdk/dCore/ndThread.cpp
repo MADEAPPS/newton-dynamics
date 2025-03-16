@@ -41,8 +41,39 @@ ndThread::ndThread()
 #endif
 {
 	strcpy (m_name.m_name, "newtonWorker");
+
 #ifndef D_USE_THREAD_EMULATION
 	store(false);
+	#ifdef WIN32
+		native_handle_type nativeHandle = native_handle();
+		ndInt32 priority = GetThreadPriority(nativeHandle);
+		switch (priority)
+		{
+			case THREAD_PRIORITY_IDLE:
+			case THREAD_PRIORITY_LOWEST:
+			case THREAD_PRIORITY_NORMAL:
+			case THREAD_PRIORITY_BELOW_NORMAL:
+				SetThreadPriority(native_handle(), THREAD_PRIORITY_ABOVE_NORMAL);
+				break;
+
+			case THREAD_PRIORITY_HIGHEST:
+			case THREAD_PRIORITY_ABOVE_NORMAL:
+			case THREAD_PRIORITY_TIME_CRITICAL:
+			default:;
+		}
+	#else
+		// do the same for posit systems.
+		//int policy;
+		//sched_param param;
+		//native_handle_type nativeHandle = native_handle();
+		//pthread_getschedparam(nativeHandle, &policy, &param);
+		//int32_t priority = sched_get_priority_min(policy);
+		//if (param.sched_priority == priority)
+		//{
+		//	param.sched_priority = priority + 1;
+		//	pthread_setschedparam(pthread_self(), policy, &param);
+		//}
+	#endif
 #endif
 }
 

@@ -165,12 +165,14 @@ void ndIkSolver::GetJacobianDerivatives(ndConstraint* const joint)
 		rhs->m_lowerBoundFrictionCoefficent = constraintParam.m_forceBounds[i].m_low;
 		rhs->m_upperBoundFrictionCoefficent = constraintParam.m_forceBounds[i].m_upper;
 		rhs->m_jointFeebackForce = constraintParam.m_forceBounds[i].m_jointForce;
-
 		ndAssert(constraintParam.m_forceBounds[i].m_normalIndex >= -1);
 		const ndInt32 frictionIndex = constraintParam.m_forceBounds[i].m_normalIndex;
 		const ndInt32 mask = frictionIndex >> 31;
 		rhs->m_normalForceIndex = frictionIndex;
 		rhs->m_normalForceIndexFlat = ~mask & (frictionIndex + baseIndex);
+
+		rhs->SetSanityCheck(joint);
+		ndAssert(rhs->SanityCheck());
 	}
 }
 
@@ -332,10 +334,10 @@ void ndIkSolver::BuildMassMatrix()
 		}
 	};
 
-	// add close loop 
-	for (ndInt32 i = m_skeleton->m_contactsLoopCount + m_skeleton->m_jointsLoopCount - 1; i >= 0; --i)
+	// add closed loop 
+	for (ndInt32 i = ndInt32 (m_skeleton->m_permanentLoopingJoints.GetCount() - 1); i >= 0; --i)
 	{
-		ndConstraint* const joint = m_skeleton->m_loopingJoints[i];
+		ndConstraint* const joint = m_skeleton->m_permanentLoopingJoints[i];
 		ndBodyKinematic* const body0 = joint->GetBody0();
 		ndBodyKinematic* const body1 = joint->GetBody1();
 
@@ -467,10 +469,9 @@ void ndIkSolver::BuildMassMatrix()
 		BuildJacobianMatrix(joint);
 	}
 	
-	const ndInt32 loops = m_skeleton->m_contactsLoopCount + m_skeleton->m_jointsLoopCount;
-	for (ndInt32 i = 0; i < loops; ++i)
+	for (ndInt32 i = ndInt32 (m_skeleton->m_permanentLoopingJoints.GetCount() - 1); i >= 0; --i)
 	{
-		ndConstraint* const joint = m_skeleton->m_loopingJoints[i];
+		ndConstraint* const joint = m_skeleton->m_permanentLoopingJoints[i];
 		GetJacobianDerivatives(joint);
 		BuildJacobianMatrix(joint);
 	}

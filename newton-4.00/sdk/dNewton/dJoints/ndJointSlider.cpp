@@ -26,7 +26,9 @@ ndJointSlider::ndJointSlider()
 	,m_maxLimit(ndFloat32(1.0e10f))
 	,m_positOffset(ndFloat32(0.0f))
 	,m_springDamperRegularizer(ndFloat32(0.1f))
+	,m_maxForce(D_LCP_MAX_VALUE)
 	,m_limitState(0)
+	,m_forceState(0)
 {
 	m_maxDof = 7;
 }
@@ -41,7 +43,9 @@ ndJointSlider::ndJointSlider(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* 
 	,m_maxLimit(ndFloat32(1.0e10f))
 	,m_positOffset(ndFloat32(0.0f))
 	,m_springDamperRegularizer(ndFloat32(0.1f))
+	,m_maxForce(D_LCP_MAX_VALUE)
 	,m_limitState(0)
+	,m_forceState(0)
 {
 }
 
@@ -55,7 +59,9 @@ ndJointSlider::ndJointSlider(const ndMatrix& pinAndPivotInChild, const ndMatrix&
 	,m_maxLimit(ndFloat32(1.0e10f))
 	,m_positOffset(ndFloat32(0.0f))
 	,m_springDamperRegularizer(ndFloat32(0.1f))
+	,m_maxForce(D_LCP_MAX_VALUE)
 	,m_limitState(0)
+	,m_forceState(0)
 {
 	ndMatrix tmp;
 	CalculateLocalMatrix(pinAndPivotInChild, m_localMatrix0, tmp);
@@ -129,6 +135,26 @@ void ndJointSlider::GetLimits(ndFloat32& minLimit, ndFloat32& maxLimit) const
 {
 	minLimit = m_minLimit;
 	maxLimit = m_maxLimit;
+}
+
+bool ndJointSlider::GetMaxForceState() const
+{
+	return m_forceState ? true : false;
+}
+
+void ndJointSlider::SetMaxForceState(bool state)
+{
+	m_forceState = state ? true : false;
+}
+
+ndFloat32 ndJointSlider::GetMaxForce() const
+{
+	return m_maxForce;
+}
+
+void ndJointSlider::SetMaxForce(ndFloat32 force)
+{
+	m_maxForce = ndClamp(force, ndFloat32(0.1f), D_LCP_MAX_VALUE);
 }
 
 void ndJointSlider::SetAsSpringDamper(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
@@ -232,6 +258,11 @@ void ndJointSlider::SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatr
 	const ndVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_positOffset));
 	AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
 	SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
+	if (m_forceState)
+	{
+		SetHighFriction(desc, m_maxForce);
+		SetLowerFriction(desc, -m_maxForce);
+	}
 }
 
 void ndJointSlider::ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)

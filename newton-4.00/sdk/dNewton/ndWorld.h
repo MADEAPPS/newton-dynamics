@@ -121,6 +121,9 @@ class ndWorld: public ndClassAlloc
 
 	D_NEWTON_API void CalculateJointContacts(ndContact* const contact);
 
+	D_NEWTON_API virtual void MainUpdate();
+	D_NEWTON_API virtual void WorkerUpdate(ndInt32 threadIndex);
+
 	private:
 	void ThreadFunction();
 	void DeleteDeferredObjects();

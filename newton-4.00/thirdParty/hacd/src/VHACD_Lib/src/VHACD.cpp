@@ -78,16 +78,9 @@ namespace nd_
 		}
 
 		Update(0.0, 0.0, params);
-		if (params.m_mode == 0) {
-			VoxelSet* vset = new VoxelSet;
-			m_volume->Convert(*vset);
-			m_pset = vset;
-		}
-		else {
-			TetrahedronSet* tset = new TetrahedronSet;
-			m_volume->Convert(*tset);
-			m_pset = tset;
-		}
+		VoxelSet* vset = new VoxelSet;
+		m_volume->Convert(*vset);
+		m_pset = vset;
 
 		delete m_volume;
 		m_volume = 0;
@@ -192,50 +185,7 @@ namespace nd_
 			planes.PushBack(plane);
 		}
 	}
-	void ComputeAxesAlignedClippingPlanes(const TetrahedronSet& tset, const short downsampling, SArray<Plane>& planes)
-	{
-		const Vec3<double> minV = tset.GetMinBB();
-		const Vec3<double> maxV = tset.GetMaxBB();
-		const double scale = tset.GetSacle();
-		const short i0 = 0;
-		const short j0 = 0;
-		const short k0 = 0;
-		const short i1 = static_cast<short>((maxV[0] - minV[0]) / scale + 0.5);
-		const short j1 = static_cast<short>((maxV[1] - minV[1]) / scale + 0.5);
-		const short k1 = static_cast<short>((maxV[2] - minV[2]) / scale + 0.5);
 
-		Plane plane;
-		plane.m_a = 1.0;
-		plane.m_b = 0.0;
-		plane.m_c = 0.0;
-		plane.m_axis = AXIS_X;
-		for (short i = i0; i <= i1; i += downsampling) {
-			double x = minV[0] + scale * i;
-			plane.m_d = -x;
-			plane.m_index = i;
-			planes.PushBack(plane);
-		}
-		plane.m_a = 0.0;
-		plane.m_b = 1.0;
-		plane.m_c = 0.0;
-		plane.m_axis = AXIS_Y;
-		for (short j = j0; j <= j1; j += downsampling) {
-			double y = minV[1] + scale * j;
-			plane.m_d = -y;
-			plane.m_index = j;
-			planes.PushBack(plane);
-		}
-		plane.m_a = 0.0;
-		plane.m_b = 0.0;
-		plane.m_c = 1.0;
-		plane.m_axis = AXIS_Z;
-		for (short k = k0; k <= k1; k += downsampling) {
-			double z = minV[2] + scale * k;
-			plane.m_d = -z;
-			plane.m_index = k;
-			planes.PushBack(plane);
-		}
-	}
 	void RefineAxesAlignedClippingPlanes(const VoxelSet& vset, const Plane& bestPlane, const short downsampling,
 		SArray<Plane>& planes)
 	{
@@ -287,57 +237,7 @@ namespace nd_
 			}
 		}
 	}
-	void RefineAxesAlignedClippingPlanes(const TetrahedronSet& tset, const Plane& bestPlane, const short downsampling,
-		SArray<Plane>& planes)
-	{
-		const Vec3<double> minV = tset.GetMinBB();
-		const Vec3<double> maxV = tset.GetMaxBB();
-		const double scale = tset.GetSacle();
-		Plane plane;
 
-		if (bestPlane.m_axis == AXIS_X) {
-			const short i0 = MAX(0, bestPlane.m_index - downsampling);
-			const short i1 = static_cast<short>(MIN((maxV[0] - minV[0]) / scale + 0.5, bestPlane.m_index + downsampling));
-			plane.m_a = 1.0;
-			plane.m_b = 0.0;
-			plane.m_c = 0.0;
-			plane.m_axis = AXIS_X;
-			for (short i = i0; i <= i1; ++i) {
-				double x = minV[0] + scale * i;
-				plane.m_d = -x;
-				plane.m_index = i;
-				planes.PushBack(plane);
-			}
-		}
-		else if (bestPlane.m_axis == AXIS_Y) {
-			const short j0 = MAX(0, bestPlane.m_index - downsampling);
-			const short j1 = static_cast<short>(MIN((maxV[1] - minV[1]) / scale + 0.5, bestPlane.m_index + downsampling));
-			plane.m_a = 0.0;
-			plane.m_b = 1.0;
-			plane.m_c = 0.0;
-			plane.m_axis = AXIS_Y;
-			for (short j = j0; j <= j1; ++j) {
-				double y = minV[1] + scale * j;
-				plane.m_d = -y;
-				plane.m_index = j;
-				planes.PushBack(plane);
-			}
-		}
-		else {
-			const short k0 = MAX(0, bestPlane.m_index - downsampling);
-			const short k1 = static_cast<short>(MIN((maxV[2] - minV[2]) / scale + 0.5, bestPlane.m_index + downsampling));
-			plane.m_a = 0.0;
-			plane.m_b = 0.0;
-			plane.m_c = 1.0;
-			plane.m_axis = AXIS_Z;
-			for (short k = k0; k <= k1; ++k) {
-				double z = minV[2] + scale * k;
-				plane.m_d = -z;
-				plane.m_index = k;
-				planes.PushBack(plane);
-			}
-		}
-	}
 	inline double ComputeLocalConcavity(const double volume, const double volumeCH)
 	{
 		return fabs(volumeCH - volume) / volumeCH;
@@ -642,14 +542,9 @@ namespace nd_
 					Vec3<double> preferredCuttingDirection;
 					double w = ComputePreferredCuttingDirection(pset, preferredCuttingDirection);
 					planes.Resize(0);
-					if (params.m_mode == 0) {
-						VoxelSet* vset = (VoxelSet*)pset;
-						ComputeAxesAlignedClippingPlanes(*vset, short(params.m_planeDownsampling), planes);
-					}
-					else {
-						TetrahedronSet* tset = (TetrahedronSet*)pset;
-						ComputeAxesAlignedClippingPlanes(*tset, short(params.m_planeDownsampling), planes);
-					}
+
+					//VoxelSet* vset = (VoxelSet*)pset;
+					ComputeAxesAlignedClippingPlanes(*((VoxelSet*)pset), short(params.m_planeDownsampling), planes);
 
 					if (params.m_logger) {
 						msg.str("");
@@ -675,14 +570,8 @@ namespace nd_
 					if (!m_cancel && (params.m_planeDownsampling > 1 || params.m_convexhullDownsampling > 1)) {
 						planesRef.Resize(0);
 
-						if (params.m_mode == 0) {
-							VoxelSet* vset = (VoxelSet*)pset;
-							RefineAxesAlignedClippingPlanes(*vset, bestPlane, short(params.m_planeDownsampling), planesRef);
-						}
-						else {
-							TetrahedronSet* tset = (TetrahedronSet*)pset;
-							RefineAxesAlignedClippingPlanes(*tset, bestPlane, short(params.m_planeDownsampling), planesRef);
-						}
+						//VoxelSet* vset = (VoxelSet*)pset;
+						RefineAxesAlignedClippingPlanes(*((VoxelSet*)pset), bestPlane, short(params.m_planeDownsampling), planesRef);
 
 						if (params.m_logger) {
 							msg.str("");
@@ -844,7 +733,8 @@ namespace nd_
 
 	void VHACD::MergeConvexHulls(const Parameters& params)
 	{
-		if (GetCancel()) {
+		if (GetCancel() || (m_convexHulls.Size() <= 1)) 
+		{
 			return;
 		}
 		m_timer.Tic();
@@ -966,7 +856,6 @@ namespace nd_
 					int j0 = int(j);
 					ConvexKey key(i0, j0);
 					hullGraph.insert(key);
-					//convexPairArray[pairsCount] = ConvexPair(i, j);
 					convexPairArray[pairsCount] = ConvexPair(i0, j0);
 					pairsCount++;
 				}
@@ -980,9 +869,6 @@ namespace nd_
 			size_t bashSize = pairsCount / (VHACD_WORKERS_THREADS * 4);
 			for (size_t j = 0; j < VHACD_WORKERS_THREADS * 4; ++j)
 			{
-				//size_t i = j * bashSize;
-				//size_t count = ((i + bashSize) <= pairsCount) ? bashSize : pairsCount - i;
-				//size_t count = ((i + bashSize) <= pairsCount) ? bashSize : pairsCount - i;
 				size_t count = (j + 1) * bashSize - start;
 				if (count > 0)
 				{

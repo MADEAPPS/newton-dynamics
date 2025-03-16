@@ -501,19 +501,25 @@ ndVector ndMatrix::EigenVectors ()
 	return d;
 }
 
+static ndMatrix identityMatrix(
+	ndVector(ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
+
+static ndMatrix zeroMatrix(
+	ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f)));
+
 const ndMatrix& ndGetIdentityMatrix()
 {
-	static ndMatrix identityMatrix(
-		ndVector(ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f)),
-		ndVector(ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f)),
-		ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f)),
-		ndVector::m_wOne);
 	return identityMatrix;
 }
 
 const ndMatrix& ndGetZeroMatrix()
 {
-	static ndMatrix zeroMatrix(ndVector::m_zero, ndVector::m_zero, ndVector::m_zero, ndVector::m_zero);
 	return zeroMatrix;
 }
 

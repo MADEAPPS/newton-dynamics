@@ -104,7 +104,7 @@ namespace nd_
 				Parameters(void) { Init(); }
 				void Init(void)
 				{
-					m_resolution = 400000;
+					m_resolution = 1000000;
 					m_concavity = 0.001;
 					m_minMergeToleranace = 0.5e-3f;
 					m_concavityToVolumeWeigh = 1.0f;
@@ -113,7 +113,6 @@ namespace nd_
 					m_alpha = 0.05;
 					m_beta = 0.05;
 					m_pca = 0;
-					m_mode = 0; // 0: voxel-based (recommended), 1: tetrahedron-based
 					m_maxNumVerticesPerCH = 64;
 					m_minVolumePerCH = 0.0001;
 					m_callback = 0;
@@ -138,7 +137,6 @@ namespace nd_
 				uint32_t m_planeDownsampling;
 				uint32_t m_convexhullDownsampling;
 				uint32_t m_pca;
-				uint32_t m_mode;
 				uint32_t m_convexhullApproximation;
 				uint32_t m_maxConvexHulls;
 				bool m_projectHullVertices;

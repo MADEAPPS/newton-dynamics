@@ -37,7 +37,7 @@ enum ndContactOptions
 	m_overrideNormalAccel = 1 << 8,
 	m_resetSkeletonSelfCollision = 1 << 9,
 	m_resetSkeletonIntraCollision = 1 << 10,
-	m_useBrushTireModel = 1 << 11,
+	//m_useBrushTireModel____ = 1 << 11,
 };
 
 #endif 

@@ -65,6 +65,40 @@ void ndThreadPool::ndWorker::ExecuteTask(ndTask* const task)
 #endif
 }
 
+void ndThreadPool::ndWorker::TaskUpdate()
+{
+	m_begin = 1;
+	ndInt32 iterations = 0;
+	while (m_begin)
+	{
+		if (m_taskReady)
+		{
+			//D_TRACKTIME();
+			if (m_task)
+			{
+				ndAssert(m_task->m_threadIndex == m_threadIndex);
+				m_task->Execute();
+			}
+			iterations = 0;
+			m_taskReady = 0;
+		}
+		else
+		{
+			if (iterations == 32)
+			{
+				// make sure that OS has the chance to task switch
+				ndThreadYield();
+				iterations = 0;
+			}
+			else
+			{
+				ndThreadPause();
+			}
+			iterations++;
+		}
+	}
+}
+
 void ndThreadPool::ndWorker::ThreadFunction()
 {
 #ifndef	D_USE_THREAD_EMULATION
@@ -78,33 +112,8 @@ void ndThreadPool::ndWorker::ThreadFunction()
 		m_task = nullptr;
 	}
 #else
-	m_begin = 1;
-	ndInt32 iterations = 0;
-	while (m_begin)
-	{
-		if (m_taskReady)
-		{
-			//D_TRACKTIME();
-			if (m_task)
-			{
-				m_task->Execute();
-			}
-			iterations = 0;
-			m_taskReady = 0;
-		}
-		else
-		{
-			if (iterations == 32)
-			{
-				ndThreadYield();
-			}
-			else
-			{
-				ndThreadPause();
-			}
-			iterations++;
-		}
-	}
+
+	m_owner->WorkerUpdate(m_threadIndex);
 #endif
 	m_stillLooping = 0;
 #endif
@@ -136,6 +145,24 @@ ndInt32 ndThreadPool::GetMaxThreads()
 	#endif
 }
 
+void ndThreadPool::TaskUpdate(ndInt32 threadIndex)
+{
+	ndAssert(threadIndex >= 1);
+	ndAssert(threadIndex <= m_count);
+	m_workers[threadIndex - 1].TaskUpdate();
+}
+
+void ndThreadPool::WorkerUpdate(ndInt32 threadIndex)
+{
+	ndAssert(0);
+	TaskUpdate(threadIndex);
+}
+
+ndInt32 ndThreadPool::GetThreadCount() const
+{
+	return m_count + 1;
+}
+
 void ndThreadPool::SetThreadCount(ndInt32 count)
 {
 #ifdef D_USE_THREAD_EMULATION
@@ -159,7 +186,7 @@ void ndThreadPool::SetThreadCount(ndInt32 count)
 			{
 				char name[256];
 				m_workers[i].m_owner = this;
-				m_workers[i].m_threadIndex = i;
+				m_workers[i].m_threadIndex = i + 1;
 				snprintf(name, sizeof(name), "%s_%d", m_baseName, i + 1);
 				m_workers[i].SetName(name);
 			}

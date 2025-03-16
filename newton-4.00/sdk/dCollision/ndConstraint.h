@@ -24,10 +24,11 @@
 
 #include "ndCollisionStdafx.h"
 
-#define D_MAX_BOUND					D_LCP_MAX_VALUE
-#define D_MIN_BOUND					(-D_LCP_MAX_VALUE)
-#define D_INDEPENDENT_ROW			-1 
-#define D_CONSTRAINT_MAX_ROWS		(3 * 16)
+#define D_MAX_BOUND				D_LCP_MAX_VALUE
+#define D_MIN_BOUND				(-D_LCP_MAX_VALUE)
+#define D_INDEPENDENT_ROW		-1 
+#define D_OVERRIDE_FRICTION_ROW	-2 
+#define D_CONSTRAINT_MAX_ROWS	(3 * 16)
 
 class ndBody;
 class ndContact;
@@ -179,6 +180,57 @@ D_MSV_NEWTON_ALIGN_32
 class ndRightHandSide
 {
 	public:
+	enum ndDebugCheck
+	{
+		m_bilateral,
+		m_contact,
+		m_friction
+	};
+
+	void SetSanityCheck(const ndConstraint* const joint);
+	bool SanityCheck() const
+	{
+		#ifdef _DEBUG
+			if (m_debugCheck == m_friction)
+			{
+				if (m_lowerBoundFrictionCoefficent > ndFloat32(0.0f))
+				{
+					return false;
+				}
+				if (m_lowerBoundFrictionCoefficent < ndFloat32(-2.0f)) // allow for high that one friction
+				{
+					return false;
+				}
+				if (m_upperBoundFrictionCoefficent < ndFloat32(0.0f))
+				{
+					return false;
+				}
+				if (m_lowerBoundFrictionCoefficent > ndFloat32 (2.0f)) // allow for high that one friction
+				{
+					return false;
+				}
+			}
+			else if (m_debugCheck == m_contact)
+			{
+				if (m_lowerBoundFrictionCoefficent != ndFloat32(0.0f))
+				{
+					return false;
+				}
+				if (m_upperBoundFrictionCoefficent < ndFloat32(0.0f))
+				{
+					return false;
+				}
+				if (m_lowerBoundFrictionCoefficent > ndFloat32(D_MAX_BOUND * 0.1f)) 
+				{
+					return false;
+				}
+			}
+			return true;
+		#else
+		return true;
+		#endif
+	}
+
 	ndFloat32 m_force;
 	ndFloat32 m_diagDamp;
 	ndFloat32 m_invJinvMJt;
@@ -197,6 +249,9 @@ class ndRightHandSide
 	ndForceImpactPair* m_jointFeebackForce;
 	ndInt32 m_normalForceIndex;
 	ndInt32 m_normalForceIndexFlat;
+#ifdef _DEBUG
+	ndDebugCheck m_debugCheck;
+#endif
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
@@ -257,6 +312,28 @@ class ndConstraint: public ndContainersFreeListAlloc<ndConstraint>
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
 } D_GCC_NEWTON_ALIGN_32 ;
+
+#ifdef _DEBUG
+inline void ndRightHandSide::SetSanityCheck(const ndConstraint* const joint)
+{
+	m_debugCheck = m_bilateral;
+	if (!joint->IsBilateral())
+	{
+		if (m_normalForceIndex == D_INDEPENDENT_ROW)
+		{
+			m_debugCheck = m_contact;
+		}
+		else if (m_normalForceIndex != D_OVERRIDE_FRICTION_ROW)
+		{
+			m_debugCheck = m_friction;
+		}
+	}
+}
+#else
+inline void ndRightHandSide::SetSanityCheck(const ndConstraint* const)
+{
+}
+#endif
 
 inline ndConstraint::~ndConstraint()
 {

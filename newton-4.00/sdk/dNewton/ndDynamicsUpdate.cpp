@@ -810,11 +810,13 @@ void ndDynamicsUpdate::GetJacobianDerivatives(ndConstraint* const joint)
 		rhs->m_upperBoundFrictionCoefficent = constraintParam.m_forceBounds[i].m_upper;
 		rhs->m_jointFeebackForce = constraintParam.m_forceBounds[i].m_jointForce;
 
-		ndAssert(constraintParam.m_forceBounds[i].m_normalIndex >= -1);
 		const ndInt32 frictionIndex = constraintParam.m_forceBounds[i].m_normalIndex;
 		const ndInt32 mask = frictionIndex >> 31;
 		rhs->m_normalForceIndex = frictionIndex;
 		rhs->m_normalForceIndexFlat = ~mask & (frictionIndex + baseIndex);
+
+		rhs->SetSanityCheck(joint);
+		ndAssert(rhs->SanityCheck());
 	}
 }
 
@@ -882,6 +884,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 
 				rhs->m_force = isBilateral ? ndClamp(force, rhs->m_lowerBoundFrictionCoefficent, rhs->m_upperBoundFrictionCoefficent) : force;
 				rhs->m_maxImpact = ndFloat32(0.0f);
+				ndAssert(rhs->SanityCheck());
 
 				const ndJacobian& JtM0 = row->m_Jt.m_jacobianM0;
 				const ndJacobian& JtM1 = row->m_Jt.m_jacobianM1;
@@ -892,7 +895,6 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 				ndFloat32 diag = tmpDiag.AddHorizontal().GetScalar();
 				ndAssert(diag > ndFloat32(0.0f));
 				rhs->m_diagDamp = diag * rhs->m_diagonalRegularizer;
-				ndAssert(rhs->m_diagDamp <= ndFloat32(1.0f));
 
 				diag *= (ndFloat32(1.0f) + rhs->m_diagonalRegularizer);
 				rhs->m_invJinvMJt = ndFloat32(1.0f) / diag;
@@ -1258,6 +1260,14 @@ void ndDynamicsUpdate::InitSkeletons()
 
 	if (activeSkeletons.GetCount())
 	{
+		for (ndInt32 i = ndInt32(activeSkeletons.GetCount()) - 1; i >= 0; --i)
+		{
+			ndSkeletonContainer* const skeleton = activeSkeletons[i];
+			if (skeleton->m_transientLoopingContacts.GetCount())
+			{
+				skeleton->AddExtraContacts();
+			}
+		}
 		scene->ParallelExecute(InitSkeletons);
 	}
 }
@@ -1347,6 +1357,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 					const ndFloat32 frictionNormal = m_rightHandSide[frictionIndex].m_force;
 					const ndVector lowerFrictionForce(frictionNormal * rhs->m_lowerBoundFrictionCoefficent);
 					const ndVector upperFrictionForce(frictionNormal * rhs->m_upperBoundFrictionCoefficent);
+					ndAssert(rhs->SanityCheck());
 
 					a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
 					accNorm = accNorm.MulAdd(a, a);
@@ -1389,6 +1400,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 
 						const ndVector lowerFrictionForce(frictionNormal * rhs->m_lowerBoundFrictionCoefficent);
 						const ndVector upperFrictionForce(frictionNormal * rhs->m_upperBoundFrictionCoefficent);
+						ndAssert(rhs->SanityCheck());
 
 						a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
 						maxAccel = maxAccel.MulAdd(a, a);
