@@ -1069,6 +1069,7 @@ void ndSkeletonContainer::SolveLcp(ndInt32 stride, ndInt32 size, ndFloat32* cons
 		for (ndInt32 i = 0; i < size; ++i)
 		{
 			const ndFloat32* const row = &matrix[base];
+			//ndFloat32 r = b[i] - ndDotProduct(size, row, x);
 			ndFloat32 r = b[i];
 			for (ndInt32 k = 0; k < size; ++k)
 			{

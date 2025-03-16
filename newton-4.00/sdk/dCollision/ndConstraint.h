@@ -313,9 +313,9 @@ class ndConstraint: public ndContainersFreeListAlloc<ndConstraint>
 	friend class ndDynamicsUpdateAvx2;
 } D_GCC_NEWTON_ALIGN_32 ;
 
+#ifdef _DEBUG
 inline void ndRightHandSide::SetSanityCheck(const ndConstraint* const joint)
 {
-#ifdef _DEBUG
 	m_debugCheck = m_bilateral;
 	if (!joint->IsBilateral())
 	{
@@ -328,8 +328,12 @@ inline void ndRightHandSide::SetSanityCheck(const ndConstraint* const joint)
 			m_debugCheck = m_friction;
 		}
 	}
-#endif
 }
+#else
+inline void ndRightHandSide::SetSanityCheck(const ndConstraint* const)
+{
+}
+#endif
 
 inline ndConstraint::~ndConstraint()
 {
