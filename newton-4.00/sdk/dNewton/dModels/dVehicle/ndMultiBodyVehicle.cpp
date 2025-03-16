@@ -187,44 +187,6 @@ void ndMultiBodyVehicle::AddChassis(const ndSharedPtr<ndBody>& chassis)
 	}
 }
 
-void ndMultiBodyVehicle::SetVehicleSolverModel(bool hardJoint)
-{
-	ndJointBilateralSolverModel openLoopMode = hardJoint ? m_jointkinematicOpenLoop : m_jointIterativeSoft;
-	if (GetRoot())
-	{
-		for (ndNode* node = GetRoot()->GetFirstChild(); node; node = node->GetNext())
-		{
-			ndJointBilateralConstraint* const joint = *node->m_joint;
-			const char* const className = joint->ClassName();
-			if (!strcmp(className, ndMultiBodyVehicleMotor::StaticClassName()) ||
-				!strcmp(className, ndMultiBodyVehicleTireJoint::StaticClassName()) ||
-				!strcmp(className, ndMultiBodyVehicleDifferential::StaticClassName()))
-			{
-				joint->SetSolverModel(openLoopMode);
-			}
-		}
-	}
-	
-	ndJointBilateralSolverModel driveTrainMode = hardJoint ? m_jointkinematicCloseLoop : m_jointIterativeSoft;
-	for (ndList<ndNode>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())
-	{
-		ndModelArticulation::ndNode& closeLoop = node->GetInfo();
-		ndJointBilateralConstraint* const joint = *closeLoop.m_joint;
-		const char* const clasName = joint->ClassName();
-		//if (strcmp(clasName, "ndMultiBodyVehicleDifferential") || strcmp(clasName, "ndMultiBodyVehicleGearBox"))
-		if (strcmp(clasName, ndMultiBodyVehicleDifferential::StaticClassName()) || strcmp(clasName, ndMultiBodyVehicleGearBox::StaticClassName()))
-		{
-			joint->SetSolverModel(driveTrainMode);
-		}
-	}
-	
-	if (m_torsionBar)
-	{
-		ndAssert(0);
-		//m_torsionBar->SetSolverModel(driveTrainMode);
-	}
-}
-
 void ndMultiBodyVehicle::AddTire(const ndSharedPtr<ndBody>& tireBody, const ndSharedPtr<ndJointBilateralConstraint>& tireJoint)
 {
 	ndAssert(!strcmp(tireJoint->ClassName(), "ndMultiBodyVehicleTireJoint"));
@@ -238,21 +200,6 @@ void ndMultiBodyVehicle::AddTire(const ndSharedPtr<ndBody>& tireBody, const ndSh
 		AddLimb(GetRoot(), tireBody, tireJoint);
 	}
 	tireBody->GetAsBodyDynamic()->SetDebugMaxLinearAndAngularIntegrationStep(ndFloat32(2.0f * 360.0f) * ndDegreeToRad, ndFloat32(10.0f));
-}
-
-void ndMultiBodyVehicle::AddDifferential(const ndSharedPtr<ndBody>& differentialBody, const ndSharedPtr<ndJointBilateralConstraint>& differentialJoint)
-{
-	ndAssert(!strcmp(differentialJoint->ClassName(), "ndMultiBodyVehicleDifferential"));
-	m_differentialList.Append((ndMultiBodyVehicleDifferential*)*differentialJoint);
-
-	ndNode* const node = FindByBody(*differentialBody);
-	ndAssert(!node || ((node->m_body->GetAsBody() == *differentialBody) && ((*node->m_joint == *differentialJoint))));
-	if (!node)
-	{
-		ndAssert(differentialJoint->GetBody1() == GetRoot()->m_body->GetAsBody());
-		AddLimb(GetRoot(), differentialBody, differentialJoint);
-	}
-	differentialBody->GetAsBodyDynamic()->SetDebugMaxLinearAndAngularIntegrationStep(ndFloat32(2.0f * 360.0f) * ndDegreeToRad, ndFloat32(10.0f));
 }
 
 void ndMultiBodyVehicle::AddMotor(const ndSharedPtr<ndBody>& motorBody, const ndSharedPtr<ndJointBilateralConstraint>& motorJoint)
@@ -349,25 +296,6 @@ ndBodyKinematic* ndMultiBodyVehicle::CreateInternalBodyPart(ndFloat32 mass, ndFl
 	return body;
 }
 
-void ndMultiBodyVehicle::AddDifferentialAxle(const ndSharedPtr<ndJointBilateralConstraint>& differentialAxleJoint)
-{
-	ndNode* const node = FindLoopByJoint(*differentialAxleJoint);
-	if (!node)
-	{
-		AddCloseLoop(differentialAxleJoint);
-	}
-}
-
-void ndMultiBodyVehicle::AddGearBox(const ndSharedPtr<ndJointBilateralConstraint>& gearBoxJoint)
-{
-	ndNode* const node = FindLoopByJoint(*gearBoxJoint);
-	m_gearBox = (ndMultiBodyVehicleGearBox*)*gearBoxJoint;
-	if (!node)
-	{
-		AddCloseLoop(gearBoxJoint);
-	}
-}
-
 ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndFloat32 mass, ndFloat32 radius, ndMultiBodyVehicleTireJoint* const leftTire, ndMultiBodyVehicleTireJoint* const rightTire, ndFloat32 slipOmegaLock)
 {
 	ndAssert(m_chassis);
@@ -422,8 +350,6 @@ ndMultiBodyVehicleGearBox* ndMultiBodyVehicle::AddGearBox(ndMultiBodyVehicleDiff
 	ndAssert(m_motor);
 	ndSharedPtr<ndJointBilateralConstraint> gearBox(new ndMultiBodyVehicleGearBox(m_motor->GetBody0(), differential->GetBody0(), this));
 	AddGearBox(gearBox);
-	//AddCloseLoop(gearBox);
-	//m_gearBox = (ndMultiBodyVehicleGearBox*)*gearBox;
 	return m_gearBox;
 }
 
@@ -655,20 +581,6 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	context.DrawFrame(chassisMatrix);
 }
 
-void ndMultiBodyVehicle::PostUpdate(ndWorld* const, ndFloat32)
-{
-	ApplyAlignmentAndBalancing();
-}
-
-void ndMultiBodyVehicle::Update(ndWorld* const world, ndFloat32 timestep)
-{
-	//ndAssert(!IsSleeping());
-	// apply down force
-	ApplyAerodynamics(world, timestep);
-	// apply tire model
-	ApplyTireModel(world, timestep);
-}
-
 void ndMultiBodyVehicle::ApplyTireModel(ndWorld* const, ndFloat32 timestep)
 {
 	ndFixSizeArray<ndTireContactPair, 128> tireContacts;
@@ -730,13 +642,6 @@ void ndMultiBodyVehicle::ApplyTireModel(ndWorld* const, ndFloat32 timestep)
 void ndMultiBodyVehicle::CoulombTireModel(ndMultiBodyVehicleTireJoint* const, ndContactMaterial& contactPoint, ndFloat32) const
 {
 	const ndFloat32 frictionCoefficient = contactPoint.m_material.m_staticFriction0;
-	//const ndFloat32 normalForce = contactPoint.m_normal_Force.GetInitialGuess() + ndFloat32(1.0f);
-	//const ndFloat32 maxForceForce = frictionCoefficient * normalForce;
-	//contactPoint.m_material.m_staticFriction0 = maxForceForce;
-	//contactPoint.m_material.m_dynamicFriction0 = maxForceForce;
-	//contactPoint.m_material.m_staticFriction1 = maxForceForce;
-	//contactPoint.m_material.m_dynamicFriction1 = maxForceForce;
-	//contactPoint.m_material.m_flags = contactPoint.m_material.m_flags | m_override0Friction | m_override1Friction;
 
 	contactPoint.m_material.m_staticFriction0 = frictionCoefficient;
 	contactPoint.m_material.m_dynamicFriction0 = frictionCoefficient;
@@ -1003,5 +908,93 @@ void ndMultiBodyVehicle::ApplyTireModel(ndFloat32 timestep, ndFixSizeArray<ndTir
 				}
 			}
 		}
+	}
+}
+
+
+void ndMultiBodyVehicle::SetVehicleSolverModel(bool hardJoint)
+{
+	ndJointBilateralSolverModel openLoopMode = hardJoint ? m_jointkinematicOpenLoop : m_jointIterativeSoft;
+	if (GetRoot())
+	{
+		for (ndNode* node = GetRoot()->GetFirstChild(); node; node = node->GetNext())
+		{
+			ndJointBilateralConstraint* const joint = *node->m_joint;
+			const char* const className = joint->ClassName();
+			if (!strcmp(className, ndMultiBodyVehicleMotor::StaticClassName()) ||
+				!strcmp(className, ndMultiBodyVehicleTireJoint::StaticClassName()) ||
+				!strcmp(className, ndMultiBodyVehicleDifferential::StaticClassName()))
+			{
+				joint->SetSolverModel(openLoopMode);
+			}
+		}
+	}
+	
+	ndJointBilateralSolverModel driveTrainMode = hardJoint ? m_jointkinematicCloseLoop : m_jointIterativeSoft;
+	for (ndList<ndNode>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())
+	{
+		ndModelArticulation::ndNode& closeLoop = node->GetInfo();
+		ndJointBilateralConstraint* const joint = *closeLoop.m_joint;
+		const char* const clasName = joint->ClassName();
+		//if (strcmp(clasName, "ndMultiBodyVehicleDifferential") || strcmp(clasName, "ndMultiBodyVehicleGearBox"))
+		if (strcmp(clasName, ndMultiBodyVehicleDifferential::StaticClassName()) || strcmp(clasName, ndMultiBodyVehicleGearBox::StaticClassName()))
+		{
+			joint->SetSolverModel(driveTrainMode);
+		}
+	}
+	
+	if (m_torsionBar)
+	{
+		ndAssert(0);
+		//m_torsionBar->SetSolverModel(driveTrainMode);
+	}
+}
+
+void ndMultiBodyVehicle::PostUpdate(ndWorld* const, ndFloat32)
+{
+	ApplyAlignmentAndBalancing();
+}
+
+void ndMultiBodyVehicle::Update(ndWorld* const world, ndFloat32 timestep)
+{
+	//ndAssert(!IsSleeping());
+	// apply down force
+	ApplyAerodynamics(world, timestep);
+	// apply tire model
+	ApplyTireModel(world, timestep);
+}
+
+
+void ndMultiBodyVehicle::AddDifferential(const ndSharedPtr<ndBody>& differentialBody, const ndSharedPtr<ndJointBilateralConstraint>& differentialJoint)
+{
+	ndAssert(!strcmp(differentialJoint->ClassName(), "ndMultiBodyVehicleDifferential"));
+	m_differentialList.Append((ndMultiBodyVehicleDifferential*)*differentialJoint);
+
+	ndNode* const node = FindByBody(*differentialBody);
+	ndAssert(!node || ((node->m_body->GetAsBody() == *differentialBody) && ((*node->m_joint == *differentialJoint))));
+	if (!node)
+	{
+		ndAssert(differentialJoint->GetBody1() == GetRoot()->m_body->GetAsBody());
+		AddLimb(GetRoot(), differentialBody, differentialJoint);
+	}
+	differentialBody->GetAsBodyDynamic()->SetDebugMaxLinearAndAngularIntegrationStep(ndFloat32(2.0f * 360.0f) * ndDegreeToRad, ndFloat32(10.0f));
+}
+
+void ndMultiBodyVehicle::AddDifferentialAxle(const ndSharedPtr<ndJointBilateralConstraint>& differentialAxleJoint)
+{
+	ndNode* const node = FindLoopByJoint(*differentialAxleJoint);
+	if (!node)
+	{
+		AddCloseLoop(differentialAxleJoint);
+	}
+}
+
+void ndMultiBodyVehicle::AddGearBox(const ndSharedPtr<ndJointBilateralConstraint>& gearBoxJoint)
+{
+	ndNode* const node = FindLoopByJoint(*gearBoxJoint);
+	m_gearBox = (ndMultiBodyVehicleGearBox*)*gearBoxJoint;
+	if (!node)
+	{
+		AddCloseLoop(gearBoxJoint);
 	}
 }

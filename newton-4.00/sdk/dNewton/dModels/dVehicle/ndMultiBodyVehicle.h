@@ -93,7 +93,6 @@ class ndMultiBodyVehicle : public ndModelArticulation
 
 	D_NEWTON_API bool IsSleeping() const;
 	D_NEWTON_API ndFloat32 GetSpeed() const;
-	D_NEWTON_API void SetVehicleSolverModel(bool hardJoint);
 	D_NEWTON_API void AddChassis(const ndSharedPtr<ndBody>& chassis);
 	D_NEWTON_API ndMultiBodyVehicleMotor* AddMotor(ndFloat32 mass, ndFloat32 radius);
 	D_NEWTON_API ndShapeInstance CreateTireShape(ndFloat32 radius, ndFloat32 width) const;
@@ -120,6 +119,9 @@ class ndMultiBodyVehicle : public ndModelArticulation
 	D_NEWTON_API ndMultiBodyVehicle* GetAsMultiBodyVehicle();
 #endif
 
+	D_NEWTON_API void SetVehicleSolverModel(bool hardJoint);
+	protected:
+
 	private:
 	void ApplyAlignmentAndBalancing();
 	void ApplyVehicleStabilityControl();
@@ -135,7 +137,6 @@ class ndMultiBodyVehicle : public ndModelArticulation
 	void PacejkaTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const;
 	void CoulombFrictionCircleTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const;
 
-	protected:
 	ndMatrix m_localFrame;
 	ndBodyDynamic* m_chassis;
 	ndMultiBodyVehicleMotor* m_motor;
@@ -151,9 +152,7 @@ class ndMultiBodyVehicle : public ndModelArticulation
 	D_MEMORY_ALIGN_FIXUP
 
 	friend class ndMultiBodyVehicleMotor;
-	//friend class ndMultiBodyVehicleGearBox;
 	friend class ndMultiBodyVehicleTireJoint;
-	//friend class ndMultiBodyVehicleTorsionBar;
 } D_GCC_NEWTON_ALIGN_32;
 
 
