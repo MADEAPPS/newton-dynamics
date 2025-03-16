@@ -1631,7 +1631,7 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 			m_pairs[auxiliaryIndex + primaryCount].m_joint = joint;
 			m_matrixRowsIndex[auxiliaryIndex + primaryCount] = first + i;
 			m_frictionIndex[auxiliaryIndex + primaryCount] = (rhs->m_normalForceIndex < 0) ? m_auxiliaryRowCount - auxiliaryIndex : rhs->m_normalForceIndex - i;
-			const ndInt32 boundIndex = (rhs->m_lowerBoundFrictionCoefficent <= ndFloat32(-D_MAX_SKELETON_LCP_VALUE)) && (rhs->m_upperBoundFrictionCoefficent >= ndFloat32(D_MAX_SKELETON_LCP_VALUE)) ? 1 : 0;
+			ndInt32 boundIndex = (rhs->m_lowerBoundFrictionCoefficent <= ndFloat32(-D_MAX_SKELETON_LCP_VALUE)) && (rhs->m_upperBoundFrictionCoefficent >= ndFloat32(D_MAX_SKELETON_LCP_VALUE)) ? 1 : 0;
 			ndAssert(rhs->SanityCheck());
 			boundRow[auxiliaryIndex] = boundIndex;
 			m_blockSize += boundIndex;
@@ -1678,8 +1678,9 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 		ndInt32 j = i;
 		for (; j && (boundRow[j - 1] < tmpBoundRow); --j)
 		{
-			ndAssert(0);
 			ndAssert(j > 0);
+			ndAssert(m_frictionIndex[primaryCount + j - 1] > 0);
+
 			boundRow[j] = boundRow[j - 1];
 			m_pairs[primaryCount + j] = m_pairs[primaryCount + j - 1];
 			m_matrixRowsIndex[primaryCount + j] = m_matrixRowsIndex[primaryCount + j - 1];
