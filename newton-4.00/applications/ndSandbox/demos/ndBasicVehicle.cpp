@@ -51,13 +51,13 @@ class ndVehicleDectriptorViper : public ndVehicleDectriptor
 		m_frontTire.m_mass = 25.0f;
 		m_frontTire.m_handBrakeTorque = 0.0f;
 		m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		m_frontTire.m_longitudinalStiffness = 10.0f * DEMO_GRAVITY;
+		m_frontTire.m_longitudinalStiffness = 1.0f * DEMO_GRAVITY;
 		m_frontTire.m_laterialStiffness = 2.0f * m_frontTire.m_longitudinalStiffness;
 
 		m_rearTire.m_mass = 25.0f;
 		m_rearTire.m_handBrakeTorque = 100000.0f;
 		m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		m_rearTire.m_longitudinalStiffness = 10.0f * DEMO_GRAVITY;
+		m_rearTire.m_longitudinalStiffness = 1.0f * DEMO_GRAVITY;
 		m_rearTire.m_laterialStiffness = 2.0f * m_rearTire.m_longitudinalStiffness;
 	}
 };
@@ -475,7 +475,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	
 	matrix.m_posit.m_x += 20.0f;
 	matrix.m_posit.m_z += 5.0f;
-	AddPlanks(scene, matrix, 60.0f, 5);
+	//AddPlanks(scene, matrix, 60.0f, 5);
 
 	ndQuaternion rot;
 	ndVector origin(-10.0f, 2.0f, -10.0f, 1.0f);
