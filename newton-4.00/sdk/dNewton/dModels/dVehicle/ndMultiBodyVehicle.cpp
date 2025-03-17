@@ -768,11 +768,7 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 		const ndVector contactVeloc(tireBody->GetVelocityAtPoint(contactPoint.m_point) - contactVeloc1);
 
 		const ndFloat32 vr = -contactVeloc.DotProduct(longitudDir).GetScalar();
-		//const ndFloat32 longitudialSlip = ndAbs(vr) / relSpeed;
-		const ndFloat32 longitudialSlip = ndClamp(vr / relSpeed, ndFloat32(-0.9f), ndFloat32(10.0f));
-		ndAssert(longitudialSlip > ndFloat32(-1.0f));
-		//if (longitudialSlip > 0.8f)
-		//xxxxx *= 1;
+		const ndFloat32 longitudialSlip = ndClamp(vr / relSpeed, ndFloat32(-0.9f), ndFloat32(20.0f));
 
 		const ndVector lateralDir(contactPoint.m_dir1);
 		const ndFloat32 sideSpeed = relVeloc.DotProduct(lateralDir).GetScalar();
@@ -790,8 +786,8 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 
 		const ndTireFrictionModel& info = tire->m_frictionModel;
 		const ndFloat32 vehicleMass = chassis->GetMassMatrix().m_w;
-		const ndFloat32 cz = vehicleMass * info.m_laterialStiffness * v;
-		const ndFloat32 cx = vehicleMass * info.m_longitudinalStiffness * u;
+		const ndFloat32 cz = ndAbs(vehicleMass * info.m_laterialStiffness * v);
+		const ndFloat32 cx = ndAbs(vehicleMass * info.m_longitudinalStiffness * u);
 
 		const ndFloat32 gamma = ndMax(ndSqrt(cx * cx + cz * cz), ndFloat32(1.0e-8f));
 		const ndFloat32 frictionCoefficient = contactPoint.m_material.m_staticFriction0;
@@ -812,12 +808,10 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 		if (tireBody->GetId() == 3 || tireBody->GetId() == 4)
 			ndTrace(("(%d: u=%f f1=%f f2=%f)  ", tireBody->GetId(), longitudialSlip, longitudinalForce, lateralForce));
 
-		//contactPoint.OverrideFriction0Accel(vr / timestep);
-		//contactPoint.OverrideFriction0Accel(0.0f);
-		contactPoint.m_material.m_staticFriction0 = ndAbs(longitudinalForce);
-		contactPoint.m_material.m_dynamicFriction0 = ndAbs(longitudinalForce);
-		contactPoint.m_material.m_staticFriction1 = ndAbs(lateralForce);
-		contactPoint.m_material.m_dynamicFriction1 = ndAbs(lateralForce);
+		contactPoint.m_material.m_staticFriction1 = lateralForce;
+		contactPoint.m_material.m_dynamicFriction1 = lateralForce;
+		contactPoint.m_material.m_staticFriction0 = longitudinalForce;
+		contactPoint.m_material.m_dynamicFriction0 = longitudinalForce;
 		ndUnsigned32 newFlags = contactPoint.m_material.m_flags | m_override0Friction | m_override1Friction;
 		contactPoint.m_material.m_flags = newFlags;
 	}
