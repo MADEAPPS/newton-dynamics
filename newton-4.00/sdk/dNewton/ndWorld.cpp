@@ -879,16 +879,8 @@ void ndWorld::UpdateSkeletons()
 					}
 				}
 				skeleton->Finalize(loopCount, loopJoints);
-				//ndTrace(("\n"));
 			}
 		}
-	
-		//for (ndInt32 i = ndInt32(bodyArray.GetCount()) - 1; i >= 0; i--)
-		//{
-		//	ndBodyKinematic* const body = bodyArray[i];
-		//	body->PrepareStep(i);
-		//	ndAssert (bodyArray[i] == body);
-		//}
 	
 		m_activeSkeletons.SetCount(0);
 		ndSkeletonList::Iterator iter(m_skeletonList);

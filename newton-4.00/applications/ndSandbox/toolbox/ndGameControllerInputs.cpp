@@ -246,24 +246,6 @@ void ndGameControllerInputs::GetWheelJoystickInputs(ndDemoEntityManager* const s
 		m_buttons[buttonMapping[i]] = unmappedButtons[i];
 	}
 
-//static int frame;
-//frame++;
-//bool check = false;
-//for (ndInt32 i = 0; i < m_buttons.GetCount(); ++i)
-//{
-//	if (m_buttons[i])
-//		check = true;
-//}
-//if (check)
-//{
-//	ndTrace(("\n%d: ", frame));
-//	for (ndInt32 i = 0; i < m_buttons.GetCount(); ++i)
-//	{
-//		if (m_buttons[i])
-//			ndTrace(("(%d %d) ", i, m_buttons[i]));
-//	}
-//}
-
 	if (!axisMapping.GetCount())
 	{
 		for (ndInt32 i = 0; i < axisMapping.GetCapacity(); ++i)
@@ -280,9 +262,10 @@ void ndGameControllerInputs::GetWheelJoystickInputs(ndDemoEntityManager* const s
 	{
 		m_axis[axisMapping[i]] = unmappedAxis[i];
 	}
-	m_axis[m_azis_00] = -m_axis[m_azis_00] * 2.0f;
+	m_axis[m_azis_00] = -m_axis[m_azis_00]; 
 	m_axis[m_azis_01] = (1.0f - m_axis[m_azis_01]) * 0.5f;
 	m_axis[m_azis_02] = (1.0f - m_axis[m_azis_02]) * 0.5f;
+	//ndTrace(("%f %f %f  %f\n", m_axis[m_azis_00], m_axis[m_azis_01], m_axis[m_azis_02], (1.0f - m_axis[m_azis_02]) * 0.5f));
 }
 
 void ndGameControllerInputs::Update(ndDemoEntityManager* const scene)
