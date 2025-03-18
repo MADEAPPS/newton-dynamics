@@ -15,7 +15,7 @@
 #include "ndNewtonStdafx.h"
 #include "dJoints/ndJointSpherical.h"
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndIkJointSpherical: public ndJointSpherical, public ndJointBilateralConstraint::ndIkInterface
 {
 	public:
@@ -34,7 +34,7 @@ class ndIkJointSpherical: public ndJointSpherical, public ndJointBilateralConstr
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 
 	D_NEWTON_API ndInt32 GetKinematicState(ndKinematicState* const state) const;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 
 #endif 

@@ -25,7 +25,7 @@
 #include "ndCollisionStdafx.h"
 
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndBodiesInAabbNotify : public ndClassAlloc
 {
 	public: 
@@ -48,7 +48,7 @@ class ndBodiesInAabbNotify : public ndClassAlloc
 		m_bodyArray.PushBack(body);
 	}
 	ndArray<const ndBody*> m_bodyArray;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 
 #endif

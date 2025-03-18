@@ -24,7 +24,7 @@
 
 #include "ndShapeConvex.h"
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndShapeCapsule : public ndShapeConvex
 {
 	public:
@@ -55,7 +55,7 @@ class ndShapeCapsule : public ndShapeConvex
 	ndFloat32 m_height;
 	ndFloat32 m_radius0;
 	ndFloat32 m_radius1;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif 
 

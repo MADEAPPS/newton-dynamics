@@ -27,7 +27,7 @@
 
 class ndMultiBodyVehicle;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 {
 	public:
@@ -62,5 +62,5 @@ class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 
 	friend class ndMultiBodyVehicle;
 	friend class ndMultiBodyVehicleGearBox;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 #endif

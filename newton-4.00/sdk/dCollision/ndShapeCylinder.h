@@ -26,7 +26,7 @@
 
 #define D_TAPED_CYLINDER_SEGMENTS 12
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndShapeCylinder : public ndShapeConvex
 {
 	public:
@@ -58,7 +58,7 @@ class ndShapeCylinder : public ndShapeConvex
 
 	static ndInt32 m_shapeRefCount;
 	static ndConvexSimplexEdge m_edgeArray[];
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif 
 

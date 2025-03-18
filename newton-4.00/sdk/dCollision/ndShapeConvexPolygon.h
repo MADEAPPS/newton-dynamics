@@ -27,7 +27,7 @@ class ndShapeInstance;
 
 #define D_CONVEX_POLYGON_MAX_VERTEX_COUNT	64
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndShapeConvexPolygon: public ndShapeConvex
 {
 	public:
@@ -74,7 +74,7 @@ class ndShapeConvexPolygon: public ndShapeConvex
 	const ndFloat32* m_vertex;
 	const ndInt32* m_vertexIndex;
 	const ndInt32* m_adjacentFaceEdgeNormalIndex;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 inline ndShapeConvexPolygon* ndShapeConvexPolygon::GetAsShapeConvexPolygon()
 {

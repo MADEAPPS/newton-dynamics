@@ -29,7 +29,7 @@ class ndBody;
 class ndScene;
 class ndShapeInstance;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndConvexCastNotify : public ndClassAlloc
 {
 	public: 
@@ -83,6 +83,6 @@ class ndConvexCastNotify : public ndClassAlloc
 	ndFloat32 m_param;
 	ndScene* m_cachedScene;
 
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif

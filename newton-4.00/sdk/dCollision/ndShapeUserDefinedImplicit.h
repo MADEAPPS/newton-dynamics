@@ -24,7 +24,7 @@
 
 #include "ndShapeConvex.h"
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndShapeUserDefinedImplicit: public ndShapeConvex
 {
 	public:
@@ -48,7 +48,7 @@ class ndShapeUserDefinedImplicit: public ndShapeConvex
 	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 	D_COLLISION_API virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
 
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 
 #endif 

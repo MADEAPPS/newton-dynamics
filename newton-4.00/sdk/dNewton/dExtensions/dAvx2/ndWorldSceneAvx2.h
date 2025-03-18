@@ -24,7 +24,7 @@
 
 #include <ndNewton.h>
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndWorldSceneAvx2 : public ndWorldScene
 {
 	public:
@@ -32,6 +32,6 @@ class ndWorldSceneAvx2 : public ndWorldScene
 	virtual ~ndWorldSceneAvx2();
 
 	virtual void ParticleUpdate(ndFloat32 timestep);
-}D_GCC_NEWTON_ALIGN_32;
+}D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif

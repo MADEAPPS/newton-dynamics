@@ -27,7 +27,7 @@
 #define D_CONVEX_VERTEX_SPLIT_BOX			8
 #define D_CONVEX_VERTEX_BRUTE_FORCE_SPLIT	(3 * D_CONVEX_VERTEX_SPLIT_BOX)
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndShapeConvexHull::ndConvexBox
 {
 	public:
@@ -38,7 +38,7 @@ class ndShapeConvexHull::ndConvexBox
 	ndInt32 m_soaVertexCount;
 	ndInt32 m_leftBox;
 	ndInt32 m_rightBox;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 
 ndShapeConvexHull::ndShapeConvexHull (ndInt32 count, ndInt32 strideInBytes, ndFloat32 tolerance, const ndFloat32* const vertexArray, ndInt32 maxPointsOut)

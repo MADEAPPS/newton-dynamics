@@ -15,7 +15,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndJointPulley: public ndJointBilateralConstraint
 {
 	public:
@@ -34,7 +34,7 @@ class ndJointPulley: public ndJointBilateralConstraint
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 
 	ndFloat32 m_gearRatio;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 
 #endif 

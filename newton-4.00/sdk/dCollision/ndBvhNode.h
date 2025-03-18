@@ -28,7 +28,7 @@ class ndBodyKinematic;
 class ndBvhLeafNode;
 class ndBvhInternalNode;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndBvhNode : public ndContainersFreeListAlloc<ndBvhNode>
 {
 	public:
@@ -64,9 +64,9 @@ class ndBvhNode : public ndContainersFreeListAlloc<ndBvhNode>
 
 	static ndVector m_aabbQuantization;
 	static ndVector m_aabbInvQuantization;
-} D_GCC_NEWTON_ALIGN_32 ;
+} D_GCC_NEWTON_CLASS_ALIGN_32 ;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndBvhInternalNode: public ndBvhNode
 {
 	public:
@@ -83,9 +83,9 @@ class ndBvhInternalNode: public ndBvhNode
 
 	ndBvhNode* m_left;
 	ndBvhNode* m_right;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndBvhLeafNode : public ndBvhNode
 {
 	public:
@@ -98,7 +98,7 @@ class ndBvhLeafNode : public ndBvhNode
 	virtual ndBvhLeafNode* GetAsSceneBodyNode() const;
 
 	ndBodyKinematic* m_body;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 class ndBottomUpCell
 {

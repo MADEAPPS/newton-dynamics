@@ -39,7 +39,7 @@ class ndConvexCastNotify;
 class ndBodiesInAabbNotify;
 class ndJointBilateralConstraint;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndSceneTreeNotiFy : public ndClassAlloc
 {
 	public:
@@ -52,9 +52,9 @@ class ndSceneTreeNotiFy : public ndClassAlloc
 	}
 
 	virtual void OnDebugNode(const ndBvhNode* const node) = 0;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndScene : public ndThreadPool
 {
 	protected:
@@ -191,7 +191,7 @@ class ndScene : public ndThreadPool
 	friend class ndPolygonMeshDesc;
 	friend class ndConvexCastNotify;
 	friend class ndSkeletonContainer;
-} D_GCC_NEWTON_ALIGN_32 ;
+} D_GCC_NEWTON_CLASS_ALIGN_32 ;
 
 inline void ndScene::PrepareCleanup()
 {

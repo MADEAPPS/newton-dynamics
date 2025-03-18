@@ -30,7 +30,7 @@
 	#define ndPlane ndBigPlane
 #else 
 
-D_MSV_NEWTON_ALIGN_16
+D_MSV_NEWTON_CLASS_ALIGN_16
 class ndPlane: public ndVector
 {
 	public:
@@ -42,7 +42,7 @@ class ndPlane: public ndVector
 	ndPlane Scale (ndFloat32 s) const;
 	ndFloat32 Evalue (const ndFloat32* const point) const;
 	ndFloat32 Evalue (const ndVector &point) const;
-} D_GCC_NEWTON_ALIGN_32 ;
+} D_GCC_NEWTON_CLASS_ALIGN_32 ;
 
 #endif
 

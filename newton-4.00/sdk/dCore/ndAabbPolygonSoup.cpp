@@ -31,7 +31,7 @@
 
 #define DG_STACK_DEPTH 512
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndAabbPolygonSoup::ndNodeBuilder: public ndAabbPolygonSoup::ndNode
 {
 	public:
@@ -115,7 +115,7 @@ class ndAabbPolygonSoup::ndNodeBuilder: public ndAabbPolygonSoup::ndNode
 	ndInt32 m_faceIndex;
 	ndInt32 m_indexCount;
 	const ndInt32* m_faceIndices;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 class ndAabbPolygonSoup::ndSplitInfo
 {

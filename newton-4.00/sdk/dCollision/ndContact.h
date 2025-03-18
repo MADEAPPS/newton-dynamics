@@ -34,7 +34,7 @@ class ndShapeInstance;
 #define D_CONSTRAINT_MAX_ROWS			(3 * 16)
 #define D_RESTING_CONTACT_PENETRATION	(D_PENETRATION_TOL + ndFloat32 (1.0f / 1024.0f))
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndContactPoint
 {
 	public:
@@ -48,9 +48,9 @@ class ndContactPoint
 	ndInt64 m_shapeId1;
 	ndFloat32 m_penetration;
 
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndContactMaterial: public ndContactPoint
 {
 	public:
@@ -82,7 +82,7 @@ class ndContactMaterial: public ndContactPoint
 	ndForceImpactPair m_dir0_Force;
 	ndForceImpactPair m_dir1_Force;
 	ndMaterial m_material;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 class ndContactPointList : public ndList<ndContactMaterial, ndContainersFreeListAlloc<ndContactMaterial>>
 {
@@ -93,7 +93,7 @@ class ndContactPointList : public ndList<ndContactMaterial, ndContainersFreeList
 	}
 };
 
-D_MSV_NEWTON_ALIGN_32 
+D_MSV_NEWTON_CLASS_ALIGN_32 
 class ndContact: public ndConstraint
 {
 	public:
@@ -147,7 +147,7 @@ class ndContact: public ndConstraint
 	friend class ndModelArticulation;
 	friend class ndShapeConvexPolygon;
 	friend class ndBodyPlayerCapsuleContactSolver;
-} D_GCC_NEWTON_ALIGN_32 ;
+} D_GCC_NEWTON_CLASS_ALIGN_32 ;
 
 
 #endif 

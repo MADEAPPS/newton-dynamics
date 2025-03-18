@@ -33,7 +33,7 @@ class ndContactPoint;
 class ndShapeInstance;
 class ndRayCastNotify;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndShapeDebugNotify : public ndClassAlloc
 {
 	public: 
@@ -56,9 +56,9 @@ class ndShapeDebugNotify : public ndClassAlloc
 
 	const ndShapeInstance* m_instance;
 
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndShapeInstance: public ndContainersFreeListAlloc<ndShapeInstance>
 {
 	public:
@@ -185,7 +185,7 @@ class ndShapeInstance: public ndContainersFreeListAlloc<ndShapeInstance>
 
 	private:
 	static ndVector m_padding;
-} D_GCC_NEWTON_ALIGN_32 ;
+} D_GCC_NEWTON_CLASS_ALIGN_32 ;
 
 #endif 
 

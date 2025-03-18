@@ -28,7 +28,7 @@
 #include "ndVector.h"
 #include "ndClassAlloc.h"
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndPolygonSoupDatabase: public ndClassAlloc
 {
 	public:
@@ -47,7 +47,7 @@ class ndPolygonSoupDatabase: public ndClassAlloc
 	ndFloat32* m_localVertex;
 	ndInt32 m_vertexCount;
 	ndInt32 m_strideInBytes;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif
 

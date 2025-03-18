@@ -15,7 +15,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 {
 	public:
@@ -83,7 +83,7 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	ndFloat32 m_minWorkSpaceRadio;
 	ndFloat32 m_maxWorkSpaceRadio;
 	bool m_enableSwivelControl;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 
 #endif 

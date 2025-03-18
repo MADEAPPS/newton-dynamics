@@ -39,7 +39,7 @@ class ndBodyPlayerCapsule;
 class ndBodyKinematicBase;
 class ndJointBilateralConstraint;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndBody : public ndContainersFreeListAlloc<ndBody>
 {
 	public:
@@ -140,7 +140,7 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	friend class ndScene;
 	friend class ndConstraint;
 	friend class ndBodyPlayerCapsuleImpulseSolver;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif 
 

@@ -15,7 +15,7 @@
 #include "ndNewtonStdafx.h"
 #include "dJoints/ndJointDoubleHinge.h"
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndIkJointDoubleHinge: public ndJointDoubleHinge, public ndJointBilateralConstraint::ndIkInterface
 {
 	public:
@@ -30,7 +30,7 @@ class ndIkJointDoubleHinge: public ndJointDoubleHinge, public ndJointBilateralCo
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif 
 

@@ -28,7 +28,7 @@
 class ndMultiBodyVehicle;
 
 #if 0
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndMultiBodyVehicleTorsionBar : public ndJointBilateralConstraint
 {
 	public:
@@ -66,7 +66,7 @@ class ndMultiBodyVehicleTorsionBar : public ndJointBilateralConstraint
 	ndFloat32 m_springDamperRegularizer;
 	friend class ndMultiBodyVehicle;
 
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 #endif
 
 #endif

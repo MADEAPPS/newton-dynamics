@@ -25,7 +25,7 @@
 #include "ndCollisionStdafx.h"
 #include "ndShapeStaticMesh.h"
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndShapeHeightfield: public ndShapeStaticMesh
 {
 	public:
@@ -105,6 +105,6 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	static ndInt32 m_cellIndices[][4];
 
 	friend class ndContactSolver;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif

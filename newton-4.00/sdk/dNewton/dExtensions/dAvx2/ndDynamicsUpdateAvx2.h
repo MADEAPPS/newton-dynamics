@@ -26,7 +26,7 @@
 
 class ndAvxMatrixArray;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndDynamicsUpdateAvx2: public ndDynamicsUpdate
 {
 	public:
@@ -62,7 +62,7 @@ class ndDynamicsUpdateAvx2: public ndDynamicsUpdate
 	ndArray<ndJacobian> m_jointMask;
 	ndArray<ndInt32> m_avxJointRows;
 	ndAvxMatrixArray* m_avxMassMatrixArray;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif
 

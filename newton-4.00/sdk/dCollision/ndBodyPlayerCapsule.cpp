@@ -36,7 +36,7 @@
 #define D_SLOP_JUMP_ANGLE			ndFloat32(0.8f)
 #define D_MAX_COLLISION_PENETRATION	ndFloat32 (5.0e-3f)
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndBodyPlayerCapsuleContactSolver
 {
 	public:
@@ -47,9 +47,9 @@ class ndBodyPlayerCapsuleContactSolver
 	ndBodyPlayerCapsule* m_player;
 	ndInt32 m_contactCount;
 
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndBodyPlayerCapsuleImpulseSolver
 {
 	public:
@@ -76,7 +76,7 @@ class ndBodyPlayerCapsuleImpulseSolver
 	ndFloat32 m_invMass;
 	ndInt32 m_rowCount;
 	
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 ndBodyPlayerCapsule::ndBodyPlayerCapsule()
 	:ndBodyKinematicBase()

@@ -34,7 +34,7 @@ class ndJointBilateralConstraint;
 #define	D_FREEZZING_VELOCITY_DRAG	ndFloat32 (0.9f)
 #define	D_SOLVER_MAX_ACCEL_ERROR	(D_FREEZE_MAG * ndFloat32 (0.5f))
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndBodyKinematic : public ndBody
 {
 	class ndContactkey
@@ -240,7 +240,7 @@ class ndBodyKinematic : public ndBody
 	friend class ndDynamicsUpdateSycl;
 	friend class ndDynamicsUpdateCuda;
 	friend class ndJointBilateralConstraint;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 
 class ndBodySentinel : public ndBodyKinematic

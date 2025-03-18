@@ -184,7 +184,7 @@ struct ndHeighfieldInfo
 	ndInt8* m_atributes;
 };
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndShapeInfo
 {
 	public:
@@ -211,9 +211,9 @@ class ndShapeInfo
 		ndChamferCylinderInfo m_chamferCylinder;
 		ndFloat32 m_paramArray[32];
 	};
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndShape: public ndContainersFreeListAlloc<ndShape>
 {
 	public:
@@ -281,7 +281,7 @@ class ndShape: public ndContainersFreeListAlloc<ndShape>
 	ndShapeID m_collisionId;
 
 	static ndVector m_flushZero;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif 
 

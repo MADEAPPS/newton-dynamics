@@ -54,7 +54,7 @@ class ndEdge
 	ndEdge* m_prev;
 	ndEdge* m_twin;
 	ndInt32 m_mark;
-} D_GCC_NEWTON_ALIGN_32 ;
+} D_GCC_NEWTON_CLASS_ALIGN_32 ;
 
 class ndPolyhedra: public ndTree <ndEdge, ndEdgeKey>
 {

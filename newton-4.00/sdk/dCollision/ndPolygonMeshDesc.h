@@ -30,7 +30,7 @@ class ndShapeInstance;
 class ndContactSolver;
 class ndShapeStaticMesh;
 
-D_MSV_NEWTON_ALIGN_32 
+D_MSV_NEWTON_CLASS_ALIGN_32 
 class ndPolygonMeshDesc: public ndFastAabb
 {
 	public:
@@ -111,7 +111,7 @@ class ndPolygonMeshDesc: public ndFastAabb
 	ndInt32 m_threadId;
 	bool m_doContinueCollisionTest;
 
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 
 //class ndPolygonMeshLocalDesc : public ndPolygonMeshDesc

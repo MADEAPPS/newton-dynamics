@@ -31,7 +31,7 @@ class ndMultiBodyVehicle;
 class ndModelArticulation;
 class ndConstraintDebugCallback;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndModel: public ndContainersFreeListAlloc<ndModel>
 {
 	public:
@@ -65,7 +65,7 @@ class ndModel: public ndContainersFreeListAlloc<ndModel>
 	friend class ndWorld;
 	friend class ndLoadSave;
 	friend class ndModelList;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif 
 

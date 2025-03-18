@@ -39,7 +39,7 @@ class ndMultiBodyVehicleDifferentialAxle;
 
 #define dRadPerSecToRpm ndFloat32(9.55f)
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndMultiBodyVehicle : public ndModelArticulation
 {
 	public:
@@ -151,7 +151,7 @@ class ndMultiBodyVehicle : public ndModelArticulation
 
 	friend class ndMultiBodyVehicleMotor;
 	friend class ndMultiBodyVehicleTireJoint;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 
 #endif

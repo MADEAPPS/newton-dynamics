@@ -28,7 +28,7 @@
 class ndShapeInstance;
 class ndPolygonMeshDesc;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndShapeStaticMesh: public ndShape
 {
 	public:
@@ -54,7 +54,7 @@ class ndShapeStaticMesh: public ndShape
 	D_COLLISION_API virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const;
 	D_COLLISION_API ndInt32 CalculatePlaneIntersection(const ndFloat32* const vertex, const ndInt32* const index, ndInt32 indexCount, ndInt32 strideInFloat, const ndPlane& localPlane, ndVector* const contactsOut) const;
 
-	D_MSV_NEWTON_ALIGN_32 
+	D_MSV_NEWTON_CLASS_ALIGN_32 
 	class ndMeshVertexListIndexList
 	{
 		public:
@@ -65,9 +65,9 @@ class ndShapeStaticMesh: public ndShape
 		ndInt32 m_maxIndexCount;
 		ndInt32 m_vertexCount;
 		ndInt32 m_vertexStrideInBytes;
-	} D_GCC_NEWTON_ALIGN_32;
+	} D_GCC_NEWTON_CLASS_ALIGN_32;
 
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 
 #endif 

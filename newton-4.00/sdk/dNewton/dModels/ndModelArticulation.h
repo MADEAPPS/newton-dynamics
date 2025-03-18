@@ -29,7 +29,7 @@
 
 class ndMultiBodyVehicle;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndModelArticulation: public ndModel
 {
 	public: 
@@ -83,7 +83,7 @@ class ndModelArticulation: public ndModel
 	ndList<ndNode> m_closeLoops;
 
 	friend class ndUrdfFile;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif 
 

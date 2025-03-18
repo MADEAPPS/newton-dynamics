@@ -26,7 +26,7 @@
 #include "ndBody.h"
 #include "ndContact.h"
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndRayCastNotify : public ndClassAlloc
 {
 	public: 
@@ -52,9 +52,9 @@ class ndRayCastNotify : public ndClassAlloc
 	ndContactPoint m_contact;
 	ndFloat32 m_param;
 
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndRayCastClosestHitCallback: public ndRayCastNotify
 {
 	public:
@@ -78,7 +78,7 @@ class ndRayCastClosestHitCallback: public ndRayCastNotify
 		}
 		return intersetParam;
 	}
-} D_GCC_NEWTON_ALIGN_32 ;
+} D_GCC_NEWTON_CLASS_ALIGN_32 ;
 
 
 #endif

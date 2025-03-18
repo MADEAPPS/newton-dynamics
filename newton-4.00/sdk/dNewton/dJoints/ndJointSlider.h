@@ -15,7 +15,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndJointSlider: public ndJointBilateralConstraint
 {
 	public:
@@ -66,7 +66,7 @@ class ndJointSlider: public ndJointBilateralConstraint
 	ndFloat32 m_maxForce;
 	ndInt8 m_limitState;
 	ndInt8 m_forceState;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 
 #endif 

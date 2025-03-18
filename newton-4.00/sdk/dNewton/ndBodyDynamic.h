@@ -37,7 +37,7 @@
 #define D_ERR_TOLERANCE		ndFloat32(1.0e-2f)
 #define D_ERR_TOLERANCE2	(D_ERR_TOLERANCE * D_ERR_TOLERANCE)
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndBodyDynamic: public ndBodyKinematic
 {
 	public:
@@ -97,7 +97,7 @@ class ndBodyDynamic: public ndBodyKinematic
 	friend class ndDynamicsUpdateAvx2;
 	friend class ndDynamicsUpdateSycl;
 	friend class ndDynamicsUpdateCuda;
-} D_GCC_NEWTON_ALIGN_32 ;
+} D_GCC_NEWTON_CLASS_ALIGN_32 ;
 
 inline ndVector ndBodyDynamic::GetForce() const
 {

@@ -40,7 +40,7 @@ D_CORE_API ndMatrix ndGramSchmidtMatrix(const ndVector& dir);
 D_CORE_API ndMatrix ndCovarianceMatrix(const ndVector& p, const ndVector& q);
 D_CORE_API ndMatrix ndCalculateMatrix(const ndQuaternion& rotation, const ndVector& position = ndVector::m_wOne);
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndMatrix
 {
 	public:
@@ -112,7 +112,7 @@ class ndMatrix
 	ndVector m_up;
 	ndVector m_right;
 	ndVector m_posit;
-} D_GCC_NEWTON_ALIGN_32 ;
+} D_GCC_NEWTON_CLASS_ALIGN_32 ;
 
 inline ndMatrix::ndMatrix ()
 {

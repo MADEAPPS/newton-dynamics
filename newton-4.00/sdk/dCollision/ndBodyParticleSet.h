@@ -28,7 +28,7 @@
 
 //#define D_USE_NEW_FLUID
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndBodyParticleSet: public ndBody, public ndBackgroundTask
 {
 	public:
@@ -64,7 +64,7 @@ class ndBodyParticleSet: public ndBody, public ndBackgroundTask
 	
 	friend class ndWorld;
 	friend class ndScene;
-} D_GCC_NEWTON_ALIGN_32 ;
+} D_GCC_NEWTON_CLASS_ALIGN_32 ;
 
 inline ndBodyParticleSet* ndBodyParticleSet::GetAsBodyParticleSet() 
 { 

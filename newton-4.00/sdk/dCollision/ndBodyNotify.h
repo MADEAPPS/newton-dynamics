@@ -27,7 +27,7 @@
 class ndBody;
 class ndUrdfBodyNotify;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndBodyNotify : public ndContainersFreeListAlloc<ndBodyNotify>
 {
 	public:  
@@ -57,7 +57,7 @@ class ndBodyNotify : public ndContainersFreeListAlloc<ndBodyNotify>
 	ndBody* m_body;
 
 	friend class ndBody;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif 
 

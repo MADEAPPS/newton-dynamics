@@ -54,7 +54,7 @@ class ndMultiBodyVehicleTireJointInfo : public ndWheelDescriptor, public ndTireF
 	}
 };
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndMultiBodyVehicleTireJoint: public ndJointWheel
 {
 	public:
@@ -82,7 +82,7 @@ class ndMultiBodyVehicleTireJoint: public ndJointWheel
 	bool m_hasVSC;
 
 	friend class ndMultiBodyVehicle;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 
 #endif 

@@ -27,7 +27,7 @@
 #include "ndVector.h"
 #include "ndMatrix.h"
 
-D_MSV_NEWTON_ALIGN_32 
+D_MSV_NEWTON_CLASS_ALIGN_32 
 class ndFastAabb : public ndMatrix
 {
 	public:
@@ -57,7 +57,7 @@ class ndFastAabb : public ndMatrix
 	mutable ndVector m_separationDistance;
 
 	friend class ndAabbPolygonSoup;
-} D_GCC_NEWTON_ALIGN_32 ;
+} D_GCC_NEWTON_CLASS_ALIGN_32 ;
 
 
 #endif

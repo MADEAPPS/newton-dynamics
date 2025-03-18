@@ -35,7 +35,7 @@ class ndCollisionBvhShowPolyContext
 	ndShapeDebugNotify* m_callback;
 };
 
-D_MSV_NEWTON_ALIGN_32 
+D_MSV_NEWTON_CLASS_ALIGN_32 
 class ndBvhRay: public ndFastRay 
 {
 	public:
@@ -51,7 +51,7 @@ class ndBvhRay: public ndFastRay
 	ndRayCastNotify* m_callback;
 	const ndBodyKinematic* m_myBody;
 	const ndShapeStatic_bvh* m_me;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 ndShapeStatic_bvh::ndShapeStatic_bvh()
 	:ndShapeStaticMesh(m_boundingBoxHierachy)
