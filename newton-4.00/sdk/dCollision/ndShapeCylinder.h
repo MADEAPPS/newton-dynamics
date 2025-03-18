@@ -55,7 +55,6 @@ class ndShapeCylinder : public ndShapeConvex
 	ndFloat32 m_radius0;
 	ndFloat32 m_radius1;
 	ndFloat32 m_height;
-	D_MEMORY_ALIGN_FIXUP
 
 	static ndInt32 m_shapeRefCount;
 	static ndConvexSimplexEdge m_edgeArray[];

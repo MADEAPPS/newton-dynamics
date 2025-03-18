@@ -82,7 +82,6 @@ class ndModelArticulation: public ndModel
 	ndNode* m_rootNode;
 	ndList<ndNode> m_closeLoops;
 
-	D_MEMORY_ALIGN_FIXUP
 	friend class ndUrdfFile;
 } D_GCC_NEWTON_ALIGN_32;
 

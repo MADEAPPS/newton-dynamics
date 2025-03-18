@@ -46,7 +46,7 @@ class ndBodyPlayerCapsuleContactSolver
 	ndContactPoint m_contactBuffer[D_PLAYER_MAX_ROWS];
 	ndBodyPlayerCapsule* m_player;
 	ndInt32 m_contactCount;
-	D_MEMORY_ALIGN_FIXUP
+
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
@@ -75,7 +75,7 @@ class ndBodyPlayerCapsuleImpulseSolver
 	ndFloat32 m_mass;
 	ndFloat32 m_invMass;
 	ndInt32 m_rowCount;
-	D_MEMORY_ALIGN_FIXUP
+	
 } D_GCC_NEWTON_ALIGN_32;
 
 ndBodyPlayerCapsule::ndBodyPlayerCapsule()

@@ -66,7 +66,6 @@ class ndMultiBodyVehicleTorsionBar : public ndJointBilateralConstraint
 	ndFloat32 m_springDamperRegularizer;
 	friend class ndMultiBodyVehicle;
 
-	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 #endif
 

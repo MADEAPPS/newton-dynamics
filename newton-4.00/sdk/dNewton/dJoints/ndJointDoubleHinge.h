@@ -73,7 +73,6 @@ class ndJointDoubleHinge: public ndJointBilateralConstraint
 
 	ndAxisParam m_axis0;
 	ndAxisParam m_axis1;
-	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 

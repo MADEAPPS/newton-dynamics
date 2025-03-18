@@ -83,7 +83,6 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	ndFloat32 m_minWorkSpaceRadio;
 	ndFloat32 m_maxWorkSpaceRadio;
 	bool m_enableSwivelControl;
-	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 

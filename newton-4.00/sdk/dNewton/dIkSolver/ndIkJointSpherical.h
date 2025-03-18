@@ -34,7 +34,6 @@ class ndIkJointSpherical: public ndJointSpherical, public ndJointBilateralConstr
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 
 	D_NEWTON_API ndInt32 GetKinematicState(ndKinematicState* const state) const;
-	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 

@@ -54,7 +54,6 @@ class ndShapeCone : public ndShapeConvex
 	ndFloat32 m_height;
 	ndFloat32 m_radius;
 	ndVector m_vertex[D_CONE_SEGMENTS + 1];
-	D_MEMORY_ALIGN_FIXUP
 
 	static ndInt32 m_shapeRefCount;
 	static ndConvexSimplexEdge m_edgeArray[];

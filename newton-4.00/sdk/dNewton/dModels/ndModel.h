@@ -61,7 +61,6 @@ class ndModel: public ndContainersFreeListAlloc<ndModel>
 	ndModelList::ndNode* m_worldNode;
 	ndSpecialList<ndModel>::ndNode* m_deletedNode;
 	ndSharedPtr<ndModelNotify> m_notifyCallback;
-	D_MEMORY_ALIGN_FIXUP
 
 	friend class ndWorld;
 	friend class ndLoadSave;

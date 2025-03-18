@@ -83,7 +83,6 @@ class ndShapeConvex: public ndShape
 	ndFloat32 m_simplexVolume;
 	ndUnsigned16 m_edgeCount;
 	ndUnsigned16 m_vertexCount;
-	D_MEMORY_ALIGN_FIXUP
 
 	friend class ndMeshEffect;
 	friend class ndContactSolver;

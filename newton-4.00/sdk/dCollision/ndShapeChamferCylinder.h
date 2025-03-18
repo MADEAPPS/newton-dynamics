@@ -62,7 +62,6 @@ class ndShapeChamferCylinder: public ndShapeConvex
 	static ndConvexSimplexEdge m_edgeArray[];
 	static ndVector m_shapesDirs[];
 	static ndVector m_yzMask;
-	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 #endif 

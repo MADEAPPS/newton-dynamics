@@ -179,7 +179,6 @@ class ndContactSolver: public ndDownHeap<ndMinkFace *, ndFloat32>
 
 	static ndVector m_hullDirs[14]; 
 	static ndInt32 m_rayCastSimplex[4][4];
-	D_MEMORY_ALIGN_FIXUP
 
 	friend class ndScene;
 	friend class ndShapeConvex;

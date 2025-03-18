@@ -39,8 +39,6 @@ class ndWorldScene : public ndScene
 	D_NEWTON_API virtual void WorkerUpdate(ndInt32 threadIndex);
 
 	ndWorld* m_world;
-
-	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 

@@ -42,7 +42,6 @@ class ndJointDryRollingFriction: public ndJointBilateralConstraint
 
 	ndFloat32 m_coefficient;
 	ndFloat32 m_contactTrail;
-	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 #endif 

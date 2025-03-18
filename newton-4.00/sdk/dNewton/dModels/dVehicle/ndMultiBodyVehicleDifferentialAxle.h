@@ -39,7 +39,7 @@ class ndMultiBodyVehicleDifferentialAxle : public ndJointBilateralConstraint
 	protected:
 	void JacobianDerivative(ndConstraintDescritor& desc);
 	void DebugJoint(ndConstraintDebugCallback&) const {}
-	D_MEMORY_ALIGN_FIXUP
+
 } D_GCC_NEWTON_ALIGN_32;
 
 #endif

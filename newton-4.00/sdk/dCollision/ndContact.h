@@ -47,7 +47,7 @@ class ndContactPoint
 	ndInt64 m_shapeId0;
 	ndInt64 m_shapeId1;
 	ndFloat32 m_penetration;
-	D_MEMORY_ALIGN_FIXUP
+
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
@@ -82,7 +82,6 @@ class ndContactMaterial: public ndContactPoint
 	ndForceImpactPair m_dir0_Force;
 	ndForceImpactPair m_dir1_Force;
 	ndMaterial m_material;
-	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 class ndContactPointList : public ndList<ndContactMaterial, ndContainersFreeListAlloc<ndContactMaterial>>
@@ -135,7 +134,6 @@ class ndContact: public ndConstraint
 	ndUnsigned32 m_skeletonSelftCollision : 1;
 	ndUnsigned32 m_skeletonExtraContact : 1;
 
-	D_MEMORY_ALIGN_FIXUP
 	static ndVector m_initialSeparatingVector;
 
 	friend class ndScene;

@@ -627,7 +627,6 @@ void ndMultiBodyVehicle::ApplyTireModel(ndWorld* const, ndFloat32 timestep)
 		}
 	}
 
-	//ApplyVehicleStabilityControl(timestep, tireContacts);
 	ApplyTireModel(timestep, tireContacts);
 
 	// save the steering
@@ -661,7 +660,6 @@ void ndMultiBodyVehicle::CoulombFrictionCircleTireModel(ndMultiBodyVehicleTireJo
 	BrushTireModel(tire, contactPoint, timestep);
 }
 
-static int xxxxx;
 void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const
 {
 	// calculate longitudinal slip ratio
@@ -682,10 +680,8 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 	const ndVector longitudDir(contactPoint.m_dir0);
 	const ndFloat32 relSpeed = relVeloc.DotProduct(longitudDir).GetScalar();
 
-ndVector xxxxx0(tireBody->GetOmega());
 	if (ndAbs(relSpeed) > D_MAX_CONTACT_SPEED_TRESHOLD)
 	{
-		xxxxx += 1;
 		// tire is in breaking and traction mode.
 		const ndVector contactVeloc(tireBody->GetVelocityAtPoint(contactPoint.m_point) - contactVeloc1);
 
@@ -793,8 +789,6 @@ void ndMultiBodyVehicle::ApplyTireModel(ndFloat32 timestep, ndFixSizeArray<ndTir
 
 	if (tireContacts.GetCount() == savedContactCount)
 	{
-		xxxxx = 0;
-		ApplyVehicleStabilityControl();
 		for (ndInt32 i = tireContacts.GetCount() - 1; i >= 0; --i)
 		{
 			ndContact* const contact = tireContacts[i].m_contact;
@@ -832,11 +826,7 @@ void ndMultiBodyVehicle::ApplyTireModel(ndFloat32 timestep, ndFixSizeArray<ndTir
 				}
 			}
 		}
-
-		if (xxxxx)
-		{
-			ndTrace(("\n"));
-		}
+		ApplyStabilityControl();
 	}
 }
 
@@ -928,19 +918,16 @@ void ndMultiBodyVehicle::AddGearBox(const ndSharedPtr<ndJointBilateralConstraint
 	}
 }
 
-
-void ndMultiBodyVehicle::ApplyVehicleStabilityControl()
+void ndMultiBodyVehicle::ApplyStabilityControl()
 {
-return;
 	ndAssert(m_chassis);
-	//const ndFloat32 maxBetaRate = ndFloat32(2.0f);
-	//const ndFloat32 maxSizeSlip = ndFloat32(15.0f);
-	//const ndFloat32 steerinStep = ndFloat32(0.03f);
-
+#if 0
+	// control betea rate by manip[ulation the steering
+	// this may not be the be mode, but it does works;
 	const ndBodyKinematic* const chassis = m_chassis;
 	const ndVector veloc(chassis->GetVelocity());
 	const ndMatrix chassisMatrix(chassis->GetMatrix());
-	const ndVector localVeloc(chassisMatrix.UnrotateVector(m_localFrame.UnrotateVector(veloc)));
+	const ndVector localVeloc(m_localFrame.UnrotateVector(chassisMatrix.UnrotateVector(veloc)));
 	if (ndAbs(localVeloc.m_x) > ndFloat32(1.0f))
 	{
 		ndFloat32 sideslip = ndAtan2(localVeloc.m_z, localVeloc.m_x);
@@ -948,16 +935,17 @@ return;
 		{
 			const ndVector omega(chassis->GetOmega());
 			const ndVector accel(chassis->GetAccel());
-			const ndVector localOmega(chassisMatrix.UnrotateVector(m_localFrame.UnrotateVector(omega)));
-			const ndVector localAccel(chassisMatrix.UnrotateVector(m_localFrame.UnrotateVector(accel)));
+			const ndVector localOmega(m_localFrame.UnrotateVector(chassisMatrix.UnrotateVector(omega)));
+			const ndVector localAccel(m_localFrame.UnrotateVector(chassisMatrix.UnrotateVector(accel)));
 
+			// from Giancarlos Genta book Motor Vehicle Dynamics page: 231 equation 5.52
+			// lateralAcceleration = longitudinalSpeed * (betaRate + yawRate)
 			ndFloat32 sideslipRate = localAccel.m_z / localVeloc.m_x;
 			ndFloat32 betaRate = sideslipRate - localOmega.m_y;
 
-			//if (ndAbs(betaRate) > maxBetaRate)
+			ndTrace(("betaRate %f = %f + %f\n", betaRate, sideslipRate, localOmega.m_y));
 			if (ndAbs(betaRate) > m_maxSideslipRate)
 			{
-				//ndFloat32 targeRate = (betaRate > maxBetaRate) ? 1.0f : -1.0f;
 				ndFloat32 targeRate = (betaRate > m_maxSideslipRate) ? ndFloat32(1.0f) : ndFloat32(-1.0f);
 				//ndTrace(("a=%f b=%f b'=%f fz=%f w=%f steer=(", localAccel.m_z, sideslip * ndRadToDegree, betaRate, sideslipRate, localOmega.m_y));
 				for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = GetTireList().GetFirst(); node; node = node->GetNext())
@@ -965,34 +953,72 @@ return;
 					ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
 					if (tire->m_info.m_steeringAngle != 0)
 					{
-						//ndFloat32 steering = tire->m_normalidedSteering0 + (targeRate - tire->m_normalidedSteering0) * steerinStep;
 						ndFloat32 steering = tire->m_normalidedSteering0 + (targeRate - tire->m_normalidedSteering0) * m_steeringRate;
-						//ndTrace(("(s1=%f s0=%f) ", steering, tire->m_normalidedSteering0));
 						tire->m_normalidedSteering = steering;
-						//ndTrace(("a=%f s=%f b'=%f\n", localAccel.m_z, steering * tire->m_info.m_steeringAngle * ndRadToDegree, betaRate));
-						//ndTrace(("%f, %f, %f\n", localAccel.m_z, steering * tire->m_info.m_steeringAngle * ndRadToDegree, betaRate));
 					}
 				}
-				//ndTrace((")\n"));
 			}
 			else
 			{
-				//ndTrace(("aa=%f b=%f b'=%f fz=%f w=%f steer=(", localAccel.m_z, sideslip * ndRadToDegree, betaRate, sideslipRate, localOmega.m_y));
 				for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = GetTireList().GetFirst(); node; node = node->GetNext())
 				{
 					ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
 					if (tire->m_info.m_steeringAngle != 0)
 					{
-						//ndFloat32 steering = tire->m_normalidedSteering0 + (tire->m_normalidedSteering - tire->m_normalidedSteering0) * steerinStep;
 						ndFloat32 steering = tire->m_normalidedSteering0 + (tire->m_normalidedSteering - tire->m_normalidedSteering0) * m_steeringRate;
-						//ndTrace(("(s1=%f s0=%f) ", steering, tire->m_normalidedSteering0));
 						tire->m_normalidedSteering = steering;
-						//ndTrace(("a=%f s=%f b'=%f\n", localAccel.m_z, steering * tire->m_info.m_steeringAngle * ndRadToDegree, betaRate));
-						//ndTrace(("%f, %f, %f\n", localAccel.m_z, steering * tire->m_info.m_steeringAngle * ndRadToDegree, betaRate));
 					}
 				}
-				//ndTrace((")\n"));
 			}
 		}
 	}
+#else
+
+	const ndBodyKinematic* const chassis = m_chassis;
+	const ndVector omega(chassis->GetOmega());
+	const ndVector accel(chassis->GetAccel());
+	const ndVector alpha(chassis->GetAlpha());
+	const ndVector veloc(chassis->GetVelocity());
+	const ndMatrix chassisMatrix(chassis->GetMatrix());
+	const ndVector localVeloc(m_localFrame.UnrotateVector(chassisMatrix.UnrotateVector(veloc)));
+	const ndVector localOmega(m_localFrame.UnrotateVector(chassisMatrix.UnrotateVector(omega)));
+	const ndVector localAccel(m_localFrame.UnrotateVector(chassisMatrix.UnrotateVector(accel)));
+	const ndVector localAlpha(m_localFrame.UnrotateVector(chassisMatrix.UnrotateVector(alpha)));
+
+static int xxxxx;
+if (xxxxx >= 2000)
+xxxxx *= 1;
+
+	if (ndAbs(localVeloc.m_x) > ndFloat32(1.0f))
+	{
+		ndFloat32 sideslipRate = localAccel.m_z / localVeloc.m_x;
+		ndFloat32 betaRate = sideslipRate + localOmega.m_y;
+		//if (ndAbs(betaRate) > D_MAX_SIZE_SLIP_RATE)
+		//if (ndAbs(betaRate) > ndFloat32 (0.15f))
+		{
+			ndTrace(("%d: betaRate %f = %f + %f;  YawRate = %f\n", xxxxx, betaRate, sideslipRate, localOmega.m_y, localAlpha.m_y));
+
+			const ndMatrix vehicleMatrix(m_chassis->GetMatrix());
+			const ndVector com(vehicleMatrix.TransformVector(m_chassis->GetCentreOfMass()));
+			for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+			{
+				ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
+				const ndMatrix hubMatrix(tire->CalculateBaseFrame());
+				const ndVector hubPosit(hubMatrix.m_posit - com);
+				const ndVector tireTorque(hubPosit.CrossProduct(tire->GetForceBody1()));
+				const ndVector locaTorque(m_localFrame.UnrotateVector(vehicleMatrix.UnrotateVector(tireTorque)));
+
+				ndVector xxx(tire->GetForceBody1());
+				ndVector force1(m_localFrame.UnrotateVector(hubMatrix.UnrotateVector(tire->GetForceBody1())));
+				ndVector force0(tire->GetForceBody0());
+
+				if (tire->GetBody0()->GetId() == 3)
+				{
+					tire->SetHandBreak(0.5f);
+				}
+			}
+		}
+		xxxxx++;
+	}
+#endif
 }

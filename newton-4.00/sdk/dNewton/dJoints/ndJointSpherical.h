@@ -55,7 +55,6 @@ class ndJointSpherical: public ndJointBilateralConstraint
 	ndFloat32 m_minTwistAngle;
 	ndFloat32 m_maxTwistAngle;
 	ndFloat32 m_springDamperRegularizer;
-	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 

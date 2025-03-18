@@ -67,7 +67,6 @@ class ndJointKinematicController: public ndJointBilateralConstraint
 	ndFloat32 m_angularFrictionCoefficient;
 	ndControlModes m_controlMode;
 	bool m_autoSleepState;
-	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 

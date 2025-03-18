@@ -98,7 +98,6 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 
 	ndVector m_minBox;
 	ndVector m_maxBox;
-	D_MEMORY_ALIGN_FIXUP
 
 	static ndVector m_yMask;
 	static ndVector m_padding;

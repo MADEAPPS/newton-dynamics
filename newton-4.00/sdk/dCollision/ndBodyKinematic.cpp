@@ -92,23 +92,6 @@ void ndBodyKinematic::ndContactMap::DetachContact(ndContact* const contact)
 
 ndBodyKinematic::ndBodyKinematic()
 	:ndBody()
-	,m_jointList()
-	,m_contactList()
-	,m_lock()
-	,m_scene(nullptr)
-	,m_islandParent(nullptr)
-	,m_sceneNode(nullptr)
-	,m_skeletonContainer(nullptr)
-	,m_spetialUpdateNode(nullptr)
-	,m_maxAngleStep(ndFloat32(90.0f)* ndDegreeToRad)
-	,m_maxLinearStep(ndFloat32(1.0f))
-	,m_weigh(ndFloat32(0.0f))
-	,m_index(0)
-	,m_bodyNodeIndex(-1)
-	,m_buildSkelIndex(0)
-	,m_sceneNodeIndex(-1)
-	,m_buildBodyNodeIndex(-1)
-	,m_buildSceneNodeIndex(-1)
 	,m_inertiaPrincipalAxis(ndGetIdentityMatrix())
 	,m_invWorldInertiaMatrix(ndGetZeroMatrix())
 	,m_shapeInstance(new ndShapeNull)
@@ -119,14 +102,6 @@ ndBodyKinematic::ndBodyKinematic()
 	,m_gyroAlpha(ndVector::m_zero)
 	,m_gyroTorque(ndVector::m_zero)
 	,m_gyroRotation()
-{
-	m_invWorldInertiaMatrix[3][3] = ndFloat32(1.0f);
-	m_shapeInstance.m_ownerBody = this;
-	SetMassMatrix(ndVector::m_zero);
-}
-
-ndBodyKinematic::ndBodyKinematic(const ndBodyKinematic& src)
-	:ndBody(src)
 	,m_jointList()
 	,m_contactList()
 	,m_lock()
@@ -144,6 +119,14 @@ ndBodyKinematic::ndBodyKinematic(const ndBodyKinematic& src)
 	,m_sceneNodeIndex(-1)
 	,m_buildBodyNodeIndex(-1)
 	,m_buildSceneNodeIndex(-1)
+{
+	m_invWorldInertiaMatrix[3][3] = ndFloat32(1.0f);
+	m_shapeInstance.m_ownerBody = this;
+	SetMassMatrix(ndVector::m_zero);
+}
+
+ndBodyKinematic::ndBodyKinematic(const ndBodyKinematic& src)
+	:ndBody(src)
 	,m_inertiaPrincipalAxis(src.m_inertiaPrincipalAxis)
 	,m_invWorldInertiaMatrix(src.m_invWorldInertiaMatrix)
 	,m_shapeInstance(src.m_shapeInstance)
@@ -154,6 +137,23 @@ ndBodyKinematic::ndBodyKinematic(const ndBodyKinematic& src)
 	,m_gyroAlpha(ndVector::m_zero)
 	,m_gyroTorque(ndVector::m_zero)
 	,m_gyroRotation()
+	,m_jointList()
+	,m_contactList()
+	,m_lock()
+	,m_scene(nullptr)
+	,m_islandParent(nullptr)
+	,m_sceneNode(nullptr)
+	,m_skeletonContainer(nullptr)
+	,m_spetialUpdateNode(nullptr)
+	,m_maxAngleStep(ndFloat32(90.0f)* ndDegreeToRad)
+	,m_maxLinearStep(ndFloat32(1.0f))
+	,m_weigh(ndFloat32(0.0f))
+	,m_index(0)
+	,m_bodyNodeIndex(-1)
+	,m_buildSkelIndex(0)
+	,m_sceneNodeIndex(-1)
+	,m_buildBodyNodeIndex(-1)
+	,m_buildSceneNodeIndex(-1)
 {
 }
 

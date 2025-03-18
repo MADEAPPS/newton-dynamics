@@ -66,7 +66,6 @@ class ndJointSlider: public ndJointBilateralConstraint
 	ndFloat32 m_maxForce;
 	ndInt8 m_limitState;
 	ndInt8 m_forceState;
-	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 

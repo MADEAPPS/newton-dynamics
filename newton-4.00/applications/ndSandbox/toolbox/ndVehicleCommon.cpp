@@ -451,17 +451,32 @@ void ndVehicleCommonNotify::ApplyInputs(ndWorld* const world, ndFloat32)
 		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
 
 		m_inputs.Update(scene);
-		const ndFixSizeArray<ndFloat32, 8>& axis = m_inputs.m_axis;
-		const ndFixSizeArray<char, 32>& buttons = m_inputs.m_buttons;
-		
-		//ndFloat32 brake = axis[m_brakePedal];
-		//for (int i = 0; i < buttons.GetCount(); ++i)
-		//{
-		//	if (buttons[i])
-		//	{
-		//		ndTrace(("button %d\n", i));
-		//	}
-		//}
+		ndFixSizeArray<ndFloat32, 8>& axis = m_inputs.m_axis;
+		ndFixSizeArray<char, 32>& buttons = m_inputs.m_buttons;
+	
+#define ENABLE_REPLAY
+//#define REPLAY_RECORD
+#ifdef ENABLE_REPLAY
+		static FILE* m_replayLogFile;
+		if (!m_replayLogFile)
+		{
+			#ifdef REPLAY_RECORD
+				m_replayLogFile = fopen("replayLog.bin", "wb");
+			#else
+				m_replayLogFile = fopen("replayLog.bin", "rb");
+			#endif	
+		}
+
+		#ifdef REPLAY_RECORD
+			fwrite(&axis[0], sizeof(ndFloat32) * axis.GetCapacity(), 1, m_replayLogFile);
+			fwrite(&buttons[0], sizeof(char) * buttons.GetCapacity(), 1, m_replayLogFile);
+			fflush(m_replayLogFile);
+		#else
+			fread(&axis[0], sizeof(ndFloat32) * axis.GetCapacity(), 1, m_replayLogFile);
+			fread(&buttons[0], sizeof(char) * buttons.GetCapacity(), 1, m_replayLogFile);
+		#endif	
+
+#endif
 		
 		if (m_parking.Update(buttons[m_parkingButton] ? true : false))
 		{

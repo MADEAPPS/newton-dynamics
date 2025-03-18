@@ -46,7 +46,6 @@ class ndMultiBodyVehicleDifferential : public ndJointBilateralConstraint
 
 	ndFloat32 m_limitedSlipOmega;
 
-	D_MEMORY_ALIGN_FIXUP
 	friend class ndMultiBodyVehicle;
 } D_GCC_NEWTON_ALIGN_32;
 

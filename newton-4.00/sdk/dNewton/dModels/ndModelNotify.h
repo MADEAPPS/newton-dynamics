@@ -50,7 +50,6 @@ class ndModelNotify : public ndContainersFreeListAlloc<ndModelNotify>
 	private:
 	ndModel* m_model;
 
-	D_MEMORY_ALIGN_FIXUP
 	friend class ndModel;
 } D_GCC_NEWTON_ALIGN_32;
 

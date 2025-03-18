@@ -52,7 +52,6 @@ class ndShapeBox: public ndShapeConvex
 	virtual ndVector SupportFeatureVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
 	ndVector m_size[2];
 	ndVector m_vertex[8];
-	D_MEMORY_ALIGN_FIXUP
 
 	static ndInt32 m_initSimplex;
 	static ndInt32 m_faces[][4];

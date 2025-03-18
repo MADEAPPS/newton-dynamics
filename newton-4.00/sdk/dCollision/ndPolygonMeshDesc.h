@@ -109,9 +109,8 @@ class ndPolygonMeshDesc: public ndFastAabb
 	ndProceduralStaticMeshFaceQuery* m_proceduralStaticMeshFaceQuery;
 	ndFloat32 m_maxT;
 	ndInt32 m_threadId;
-	//bool m_ownTempBuffers;
 	bool m_doContinueCollisionTest;
-	D_MEMORY_ALIGN_FIXUP
+
 } D_GCC_NEWTON_ALIGN_32;
 
 

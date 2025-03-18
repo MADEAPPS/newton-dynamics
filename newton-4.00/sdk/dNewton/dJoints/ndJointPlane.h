@@ -32,7 +32,6 @@ class ndJointPlane: public ndJointBilateralConstraint
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	
 	bool m_enableControlRotation;
-	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 inline void ndJointPlane::EnableControlRotation(bool state)

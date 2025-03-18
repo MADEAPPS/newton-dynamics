@@ -123,14 +123,13 @@ class ndMultiBodyVehicle : public ndModelArticulation
 	protected:
 
 	private:
+	void ApplyStabilityControl();
 	void ApplyAlignmentAndBalancing();
-	void ApplyVehicleStabilityControl();
 	void ApplyTireModel(ndWorld* const world, ndFloat32 timestep);
 	void ApplyAerodynamics(ndWorld* const world, ndFloat32 timestep);
 	ndBodyKinematic* CreateInternalBodyPart(ndFloat32 mass, ndFloat32 radius) const;
 	void ApplyTireModel(ndFloat32 timestep, ndFixSizeArray<ndTireContactPair, 128>& tireContacts);
-	
-	//void ApplyVehicleStabilityControl(ndFloat32 timestep, ndFixSizeArray<ndTireContactPair, 128>& tireContacts);
+
 	void CalculateNormalizedAlgniningTorque(ndMultiBodyVehicleTireJoint* const tire, ndFloat32 sideSlipTangent) const;
 	void BrushTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const;
 	void CoulombTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const;
@@ -149,7 +148,6 @@ class ndMultiBodyVehicle : public ndModelArticulation
 	ndFloat32 m_steeringRate;
 	ndFloat32 m_maxSideslipRate;
 	ndFloat32 m_maxSideslipAngle;
-	D_MEMORY_ALIGN_FIXUP
 
 	friend class ndMultiBodyVehicleMotor;
 	friend class ndMultiBodyVehicleTireJoint;

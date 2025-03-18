@@ -211,7 +211,6 @@ class ndShapeInfo
 		ndChamferCylinderInfo m_chamferCylinder;
 		ndFloat32 m_paramArray[32];
 	};
-	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
@@ -272,15 +271,15 @@ class ndShape: public ndContainersFreeListAlloc<ndShape>
 	D_COLLISION_API ndShape(ndShapeID id);
 	D_COLLISION_API ndShape (const ndShape& source);
 
-	mutable ndAtomic<ndInt32> m_refCount;
-	ndShapeID m_collisionId;
-
-	ndVector m_inertia;	
-	ndVector m_crossInertia;	
+	ndVector m_inertia;
+	ndVector m_crossInertia;
 	ndVector m_centerOfMass;
 	ndVector m_boxSize;
 	ndVector m_boxOrigin;
-	D_MEMORY_ALIGN_FIXUP
+
+	mutable ndAtomic<ndInt32> m_refCount;
+	ndShapeID m_collisionId;
+
 	static ndVector m_flushZero;
 } D_GCC_NEWTON_ALIGN_32;
 

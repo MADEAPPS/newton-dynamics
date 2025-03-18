@@ -74,7 +74,6 @@ class ndShapeConvexPolygon: public ndShapeConvex
 	const ndFloat32* m_vertex;
 	const ndInt32* m_vertexIndex;
 	const ndInt32* m_adjacentFaceEdgeNormalIndex;
-	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 inline ndShapeConvexPolygon* ndShapeConvexPolygon::GetAsShapeConvexPolygon()

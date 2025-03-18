@@ -47,9 +47,7 @@ class ndBodiesInAabbNotify : public ndClassAlloc
 	{
 		m_bodyArray.PushBack(body);
 	}
-
 	ndArray<const ndBody*> m_bodyArray;
-	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 

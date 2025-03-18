@@ -44,10 +44,9 @@ class ndPolygonSoupDatabase: public ndClassAlloc
 	D_CORE_API ndPolygonSoupDatabase(const char* const name = nullptr);
 	D_CORE_API virtual ~ndPolygonSoupDatabase ();
 
+	ndFloat32* m_localVertex;
 	ndInt32 m_vertexCount;
 	ndInt32 m_strideInBytes;
-	ndFloat32* m_localVertex;
-	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 #endif

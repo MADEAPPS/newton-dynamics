@@ -34,7 +34,6 @@ class ndJointPulley: public ndJointBilateralConstraint
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 
 	ndFloat32 m_gearRatio;
-	D_MEMORY_ALIGN_FIXUP
 } D_GCC_NEWTON_ALIGN_32;
 
 

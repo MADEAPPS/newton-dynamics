@@ -57,7 +57,6 @@ class ndShapeStatic_bvh: public ndShapeStaticMesh, public ndAabbPolygonSoup
 			const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32 hitDistance);
 
 	ndInt32 m_trianglesCount;
-	D_MEMORY_ALIGN_FIXUP
 	friend class ndContactSolver;
 } D_GCC_NEWTON_ALIGN_32;
 
