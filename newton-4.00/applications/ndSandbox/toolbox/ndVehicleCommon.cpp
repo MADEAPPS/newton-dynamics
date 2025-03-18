@@ -456,6 +456,7 @@ void ndVehicleCommonNotify::ApplyInputs(ndWorld* const world, ndFloat32)
 	
 #define ENABLE_REPLAY
 //#define REPLAY_RECORD
+
 #ifdef ENABLE_REPLAY
 		static FILE* m_replayLogFile;
 		if (!m_replayLogFile)

@@ -37,7 +37,7 @@
 #define D_MAX_CONTACT_PENETRATION		ndFloat32 (1.0e-2f)
 #define D_MIN_CONTACT_CLOSE_DISTANCE2	ndFloat32 (5.0e-2f * 5.0e-2f)
 
-#define D_MAX_SIDESLIP_ANGLE			ndFloat32(30.0f)
+#define D_MAX_SIDESLIP_ANGLE			ndFloat32(20.0f)
 #define D_MAX_STEERING_RATE				ndFloat32(0.03f)
 #define D_MAX_SIZE_SLIP_RATE			ndFloat32(2.0f)
 
@@ -830,45 +830,6 @@ void ndMultiBodyVehicle::ApplyTireModel(ndFloat32 timestep, ndFixSizeArray<ndTir
 	}
 }
 
-void ndMultiBodyVehicle::SetVehicleSolverModel(bool hardJoint)
-{
-hardJoint = true;
-	if (GetRoot())	
-	{
-		ndJointBilateralSolverModel useSoftSolver = hardJoint ? m_jointkinematicOpenLoop : m_jointIterativeSoft;
-
-		for (ndNode* node = GetRoot()->GetFirstChild(); node; node = node->GetNext())
-		{
-			ndJointBilateralConstraint* const joint = *node->m_joint;
-			const char* const className = joint->ClassName();
-			if (!strcmp(className, ndMultiBodyVehicleMotor::StaticClassName()) ||
-				!strcmp(className, ndMultiBodyVehicleTireJoint::StaticClassName()) ||
-				!strcmp(className, ndMultiBodyVehicleDifferential::StaticClassName()))
-			{
-				joint->SetSolverModel(useSoftSolver);
-			}
-		}
-	
-		ndJointBilateralSolverModel driveTrainMode = hardJoint ? m_jointkinematicCloseLoop : m_jointIterativeSoft;
-		for (ndList<ndNode>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())
-		{
-			ndModelArticulation::ndNode& closeLoop = node->GetInfo();
-			ndJointBilateralConstraint* const joint = *closeLoop.m_joint;
-			const char* const clasName = joint->ClassName();
-			if (strcmp(clasName, ndMultiBodyVehicleDifferential::StaticClassName()) || strcmp(clasName, ndMultiBodyVehicleGearBox::StaticClassName()))
-			{
-				joint->SetSolverModel(driveTrainMode);
-			}
-		}
-	
-		if (m_torsionBar)
-		{
-			ndAssert(0);
-			//m_torsionBar->SetSolverModel(driveTrainMode);
-		}
-	}
-}
-
 void ndMultiBodyVehicle::PostUpdate(ndWorld* const, ndFloat32)
 {
 	ApplyAlignmentAndBalancing();
@@ -882,7 +843,6 @@ void ndMultiBodyVehicle::Update(ndWorld* const world, ndFloat32 timestep)
 	// apply tire model
 	ApplyTireModel(world, timestep);
 }
-
 
 void ndMultiBodyVehicle::AddDifferential(const ndSharedPtr<ndBody>& differentialBody, const ndSharedPtr<ndJointBilateralConstraint>& differentialJoint)
 {
@@ -918,15 +878,97 @@ void ndMultiBodyVehicle::AddGearBox(const ndSharedPtr<ndJointBilateralConstraint
 	}
 }
 
+void ndMultiBodyVehicle::SetVehicleSolverModel(bool hardJoint)
+{
+	hardJoint = true;
+	//hardJoint = false;
+	if (GetRoot())
+	{
+		ndJointBilateralSolverModel useSoftSolver = hardJoint ? m_jointkinematicOpenLoop : m_jointIterativeSoft;
+
+		for (ndNode* node = GetRoot()->GetFirstChild(); node; node = node->GetNext())
+		{
+			ndJointBilateralConstraint* const joint = *node->m_joint;
+			const char* const className = joint->ClassName();
+			if (!strcmp(className, ndMultiBodyVehicleMotor::StaticClassName()) ||
+				!strcmp(className, ndMultiBodyVehicleTireJoint::StaticClassName()) ||
+				!strcmp(className, ndMultiBodyVehicleDifferential::StaticClassName()))
+			{
+				joint->SetSolverModel(useSoftSolver);
+			}
+		}
+
+		ndJointBilateralSolverModel driveTrainMode = hardJoint ? m_jointkinematicCloseLoop : m_jointIterativeSoft;
+		for (ndList<ndNode>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())
+		{
+			ndModelArticulation::ndNode& closeLoop = node->GetInfo();
+			ndJointBilateralConstraint* const joint = *closeLoop.m_joint;
+			const char* const clasName = joint->ClassName();
+			if (strcmp(clasName, ndMultiBodyVehicleDifferential::StaticClassName()) || strcmp(clasName, ndMultiBodyVehicleGearBox::StaticClassName()))
+			{
+				joint->SetSolverModel(driveTrainMode);
+			}
+		}
+
+		if (m_torsionBar)
+		{
+			ndAssert(0);
+			//m_torsionBar->SetSolverModel(driveTrainMode);
+		}
+	}
+}
+
 void ndMultiBodyVehicle::ApplyStabilityControl()
 {
 	ndAssert(m_chassis);
-#if 0
-	// control betea rate by manip[ulation the steering
-	// this may not be the be mode, but it does works;
 	const ndBodyKinematic* const chassis = m_chassis;
 	const ndVector veloc(chassis->GetVelocity());
 	const ndMatrix chassisMatrix(chassis->GetMatrix());
+
+	static int xxxxx;
+
+#if 0
+	// control sideslip beta by manipulation the steering
+	// ignoring beta rate
+
+	// this is really terrible
+	const ndVector localVeloc(m_localFrame.UnrotateVector(chassisMatrix.UnrotateVector(veloc)));
+	if (ndAbs(localVeloc.m_x) > ndFloat32(1.0f))
+	{
+		ndFloat32 sideslip = ndAtan2(localVeloc.m_z, localVeloc.m_x);
+		if (ndAbs(sideslip * ndRadToDegree) > m_maxSideslipAngle)
+		{
+			ndFloat32 targetSteering = (sideslip > 0.0f) ? ndFloat32(-1.0f) : ndFloat32(1.0f);
+			for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = GetTireList().GetFirst(); node; node = node->GetNext())
+			{
+				ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
+				if (tire->m_info.m_steeringAngle != 0)
+				{
+					//ndFloat32 steering = tire->m_normalidedSteering0 + (targetSteering - tire->m_normalidedSteering0) * m_steeringRate;
+					ndFloat32 steering = tire->m_normalidedSteering0 + (targetSteering - tire->m_normalidedSteering0) * 0.002;
+					tire->m_normalidedSteering = steering;
+				}
+			}
+		}
+		else
+		{
+			for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = GetTireList().GetFirst(); node; node = node->GetNext())
+			{
+				ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
+				if (tire->m_info.m_steeringAngle != 0)
+				{
+					ndFloat32 steering = tire->m_normalidedSteering0 + (tire->m_normalidedSteering - tire->m_normalidedSteering0) * m_steeringRate;
+					tire->m_normalidedSteering = steering;
+				}
+			}
+		}
+	}
+
+#elif 1
+	// control beta rate by manipulation the steering
+	// this may not be the be mode, but it does works;
+
+	// this seem to be the best controller I got, but I really need a closed loop control
 	const ndVector localVeloc(m_localFrame.UnrotateVector(chassisMatrix.UnrotateVector(veloc)));
 	if (ndAbs(localVeloc.m_x) > ndFloat32(1.0f))
 	{
@@ -938,22 +980,32 @@ void ndMultiBodyVehicle::ApplyStabilityControl()
 			const ndVector localOmega(m_localFrame.UnrotateVector(chassisMatrix.UnrotateVector(omega)));
 			const ndVector localAccel(m_localFrame.UnrotateVector(chassisMatrix.UnrotateVector(accel)));
 
-			// from Giancarlos Genta book Motor Vehicle Dynamics page: 231 equation 5.52
-			// lateralAcceleration = longitudinalSpeed * (betaRate + yawRate)
-			ndFloat32 sideslipRate = localAccel.m_z / localVeloc.m_x;
-			ndFloat32 betaRate = sideslipRate - localOmega.m_y;
+			// From Giancarlo Genta's book *Motor Vehicle Dynamics* (page 231, equation 5.52)
+			// Original equation:
+			// lateralAcceleration = longitudinalSpeed * (betaRate + yawRate) + beta * longitudinalAcceleration
+			//
+			// Note: When deriving the equation in a y-up coordinate system, it transforms into:
+			// lateralAcceleration = longitudinalSpeed * (betaRate - yawRate) + beta * longitudinalAcceleration
+			// 
+			// In my opinion, this version makes more sense.
+			//
+			// Assuming constant longitudinal velocity, the term beta * longitudinalAcceleration becomes zero:
+			// lateralAcceleration = longitudinalSpeed * (betaRate - yawRate)
+			// from where we can get the beta rate
+			// betaRate = lateralAcceleration / longitudinalSpeed + yawRate;
+			ndFloat32 betaRate = localAccel.m_z / localVeloc.m_x + localOmega.m_y;
 
-			ndTrace(("betaRate %f = %f + %f\n", betaRate, sideslipRate, localOmega.m_y));
+			ndTrace(("%d: betaRate %f = %f + %f\n", xxxxx, betaRate, localAccel.m_z / localVeloc.m_x, localOmega.m_y));
 			if (ndAbs(betaRate) > m_maxSideslipRate)
 			{
-				ndFloat32 targeRate = (betaRate > m_maxSideslipRate) ? ndFloat32(1.0f) : ndFloat32(-1.0f);
+				ndFloat32 targetSteering = (betaRate > m_maxSideslipRate) ? ndFloat32(1.0f) : ndFloat32(-1.0f);
 				//ndTrace(("a=%f b=%f b'=%f fz=%f w=%f steer=(", localAccel.m_z, sideslip * ndRadToDegree, betaRate, sideslipRate, localOmega.m_y));
 				for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = GetTireList().GetFirst(); node; node = node->GetNext())
 				{
 					ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
 					if (tire->m_info.m_steeringAngle != 0)
 					{
-						ndFloat32 steering = tire->m_normalidedSteering0 + (targeRate - tire->m_normalidedSteering0) * m_steeringRate;
+						ndFloat32 steering = tire->m_normalidedSteering0 + (targetSteering - tire->m_normalidedSteering0) * m_steeringRate * 0.5f;
 						tire->m_normalidedSteering = steering;
 					}
 				}
@@ -972,32 +1024,36 @@ void ndMultiBodyVehicle::ApplyStabilityControl()
 			}
 		}
 	}
+
 #else
 
-	const ndBodyKinematic* const chassis = m_chassis;
 	const ndVector omega(chassis->GetOmega());
 	const ndVector accel(chassis->GetAccel());
 	const ndVector alpha(chassis->GetAlpha());
-	const ndVector veloc(chassis->GetVelocity());
-	const ndMatrix chassisMatrix(chassis->GetMatrix());
 	const ndVector localVeloc(m_localFrame.UnrotateVector(chassisMatrix.UnrotateVector(veloc)));
 	const ndVector localOmega(m_localFrame.UnrotateVector(chassisMatrix.UnrotateVector(omega)));
 	const ndVector localAccel(m_localFrame.UnrotateVector(chassisMatrix.UnrotateVector(accel)));
 	const ndVector localAlpha(m_localFrame.UnrotateVector(chassisMatrix.UnrotateVector(alpha)));
 
-static int xxxxx;
-if (xxxxx >= 2000)
-xxxxx *= 1;
-
-	if (ndAbs(localVeloc.m_x) > ndFloat32(1.0f))
+	if (ndAbs(localVeloc.m_x) > ndFloat32(3.0f))
 	{
-		ndFloat32 sideslipRate = localAccel.m_z / localVeloc.m_x;
-		ndFloat32 betaRate = sideslipRate + localOmega.m_y;
+		// From Giancarlo Genta's book *Motor Vehicle Dynamics* (page 231, equation 5.52)
+		// Original equation:
+		// lateralAcceleration = longitudinalSpeed * (betaRate + yawRate) + beta * longitudinalAcceleration
+		//
+		// Note: When deriving the equation in a y-up coordinate system, it transforms into:
+		// lateralAcceleration = longitudinalSpeed * (betaRate - yawRate) + beta * longitudinalAcceleration
+		// 
+		// In my opinion, this version makes more sense.
+		//
+		// Assuming constant longitudinal velocity, the term beta * longitudinalAcceleration becomes zero:
+		// lateralAcceleration = longitudinalSpeed * (betaRate - yawRate)
+		// from where we can get the beta rate
+		// betaRate = lateralAcceleration / longitudinalSpeed + yawRate;
+		ndFloat32 betaRate = localAccel.m_z / localVeloc.m_x + localOmega.m_y;
 		//if (ndAbs(betaRate) > D_MAX_SIZE_SLIP_RATE)
-		//if (ndAbs(betaRate) > ndFloat32 (0.15f))
+		if (ndAbs(betaRate) > ndFloat32 (0.15f))
 		{
-			ndTrace(("%d: betaRate %f = %f + %f;  YawRate = %f\n", xxxxx, betaRate, sideslipRate, localOmega.m_y, localAlpha.m_y));
-
 			const ndMatrix vehicleMatrix(m_chassis->GetMatrix());
 			const ndVector com(vehicleMatrix.TransformVector(m_chassis->GetCentreOfMass()));
 			for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
@@ -1012,13 +1068,27 @@ xxxxx *= 1;
 				ndVector force1(m_localFrame.UnrotateVector(hubMatrix.UnrotateVector(tire->GetForceBody1())));
 				ndVector force0(tire->GetForceBody0());
 
-				if (tire->GetBody0()->GetId() == 3)
+				if (betaRate < 0.0f)
 				{
-					tire->SetHandBreak(0.5f);
+					if (tire->GetBody0()->GetId() == 4)
+					{
+						ndTrace(("applyBreakControl: "));
+						tire->SetHandBreak(0.02f);
+					}
+				}
+				else
+				{
+					if (tire->GetBody0()->GetId() == 3)
+					{
+						ndTrace(("applyBreakControl: "));
+						tire->SetHandBreak(0.02f);
+					}
 				}
 			}
 		}
-		xxxxx++;
+		ndTrace(("%d: betaRate %f = %f - %f;  YawRate = %f\n", xxxxx, betaRate, localAccel.m_z / localVeloc.m_x, localOmega.m_y, localAlpha.m_y));
 	}
 #endif
+
+	xxxxx++;
 }
