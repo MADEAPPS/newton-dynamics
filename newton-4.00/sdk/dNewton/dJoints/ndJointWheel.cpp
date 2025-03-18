@@ -126,7 +126,6 @@ ndMatrix ndJointWheel::CalculateBaseFrame() const
 ndMatrix ndJointWheel::CalculateUpperBumperMatrix() const
 {
 	ndMatrix matrix(m_localMatrix1 * m_body1->GetMatrix());
-	//matrix.m_posit += matrix.m_up.Scale(m_info.m_lowerStop);
 	matrix.m_posit += matrix.m_up.Scale(m_info.m_upperStop);
 	return matrix;
 }

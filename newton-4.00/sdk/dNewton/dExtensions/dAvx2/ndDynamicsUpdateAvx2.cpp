@@ -1579,34 +1579,25 @@ void ndDynamicsUpdateAvx2::UpdateForceFeedback()
 				const ndInt32 rows = joint->m_rowCount;
 				const ndInt32 first = joint->m_rowStart;
 
+				ndAvxFloat force0(zero);
+				ndAvxFloat force1(zero);
 				for (ndInt32 k = 0; k < rows; ++k)
 				{
+					const ndLeftHandSide* const lhs = &leftHandSide[k + first];
 					const ndRightHandSide* const rhs = &rightHandSide[k + first];
 					ndAssert(ndCheckFloat(rhs->m_force));
 					rhs->m_jointFeebackForce->Push(rhs->m_force);
 					rhs->m_jointFeebackForce->m_force = rhs->m_force;
 					rhs->m_jointFeebackForce->m_impact = rhs->m_maxImpact * timestepRK;
-				}
 
-				//if (joint->GetAsBilateral())
-				{
-					ndAvxFloat force0(zero);
-					ndAvxFloat force1(zero);
-
-					for (ndInt32 k = 0; k < rows; ++k)
-					{
-						const ndRightHandSide* const rhs = &rightHandSide[k + first];
-						const ndLeftHandSide* const lhs = &leftHandSide[k + first];
-						const ndAvxFloat f(rhs->m_force);
-						force0 = force0.MulAdd((ndAvxFloat&)lhs->m_Jt.m_jacobianM0, f);
-						force1 = force1.MulAdd((ndAvxFloat&)lhs->m_Jt.m_jacobianM1, f);
-					}
-					//ndJointBilateralConstraint* const bilateral = (ndJointBilateralConstraint*)joint;
-					joint->m_forceBody0 = force0.GetLow();
-					joint->m_torqueBody0 = force0.GetHigh();
-					joint->m_forceBody1 = force1.GetLow();
-					joint->m_torqueBody1 = force1.GetHigh();
+					const ndAvxFloat f(rhs->m_force);
+					force0 = force0.MulAdd((ndAvxFloat&)lhs->m_Jt.m_jacobianM0, f);
+					force1 = force1.MulAdd((ndAvxFloat&)lhs->m_Jt.m_jacobianM1, f);
 				}
+				joint->m_forceBody0 = force0.GetLow();
+				joint->m_torqueBody0 = force0.GetHigh();
+				joint->m_forceBody1 = force1.GetLow();
+				joint->m_torqueBody1 = force1.GetHigh();
 			}
 		}
 	});
