@@ -288,8 +288,6 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	ndVector m_diretionalLightDir;
 	ndRenderPass* m_colorRenderPass;
 	ndRenderPass* m_shadowRenderPass;
-
-	FILE* m_replayLogFile;
 	static SDKDemos m_demosSelection[];
 
 	friend class ndPhysicsWorld;

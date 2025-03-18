@@ -32,11 +32,6 @@
 #include "ndHighResolutionTimer.h"
 #include "ndShadowsMapRenderPass.h"
 
-//#define ENABLE_REPLAY
-#ifdef ENABLE_REPLAY
-	//#define REPLAY_RECORD
-#endif
-
 //#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
@@ -429,7 +424,6 @@ ndDemoEntityManager::ndDemoEntityManager()
 	,m_solverMode(ndWorld::ndSimdSoaSolver)
 	,m_colorRenderPass(new ndColorRenderPass())
 	,m_shadowRenderPass(new ndShadowMapRenderPass())
-	,m_replayLogFile(nullptr)
 {
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
@@ -593,14 +587,6 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	m_diretionalLightDir = ndVector(-1.0f, 1.0f, 1.0f, 0.0f).Normalize();
 
-	#ifdef ENABLE_REPLAY
-		#ifdef REPLAY_RECORD
-			m_replayLogFile = fopen("replayLog.bin", "wb");
-		#else 
-			m_replayLogFile = fopen("replayLog.bin", "rb");
-		#endif
-	#endif
-
 	//Test0__();
 	//Test1__();
 	//TestVulkanStuff();
@@ -611,11 +597,6 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 ndDemoEntityManager::~ndDemoEntityManager ()
 {
-	if (m_replayLogFile)
-	{
-		fclose(m_replayLogFile);
-	}
-
 	Cleanup ();
 
 	if (m_cameraManager)
@@ -716,17 +697,6 @@ bool ndDemoEntityManager::GetKeyState(ndInt32 key) const
 {
 	const ImGuiIO& io = ImGui::GetIO();
 	bool state = io.KeysDown[key];
-#ifdef ENABLE_REPLAY
-	#ifdef REPLAY_RECORD
-		ndInt32 value = state;
-		fwrite(&value, sizeof(ndInt32), 1, m_replayLogFile);
-		fflush(m_replayLogFile);
-	#else
-		ndInt32 value;
-		fread(&value, sizeof(ndInt32), 1, m_replayLogFile);
-		state = value ? 1 : 0;
-	#endif	
-#endif
 	return state;
 }
 
@@ -804,17 +774,6 @@ void ndDemoEntityManager::GetJoystickAxis (ndFixSizeArray<ndFloat32, 8>& axisVal
 		{
 			axisValues.PushBack(axis[i]);
 		}
-
-		#ifdef ENABLE_REPLAY
-			#ifdef REPLAY_RECORD
-					fwrite(&axisCount, sizeof(axisCount), 1, m_replayLogFile);
-					fwrite(&axisValues[0], sizeof(ndFloat32) * axisValues.GetCapacity(), 1, m_replayLogFile);
-					fflush(m_replayLogFile);
-			#else 
-					fread(&axisCount, sizeof(axisCount), 1, m_replayLogFile);
-					fread(&axisValues[0], sizeof(ndFloat32) * axisValues.GetCapacity(), 1, m_replayLogFile);
-			#endif
-		#endif
 	}
 }
 
@@ -831,19 +790,7 @@ void ndDemoEntityManager::GetJoystickButtons(ndFixSizeArray<char, 32>& axisbutto
 		for (ndInt32 i = 0; i < buttonsCount; ++i)
 		{
 			axisbuttons.PushBack(char(buttons[i]));
-			//if (buttons[i]) ndTrace(("%d %d\n", i, buttons[i]));
 		}
-
-		#ifdef ENABLE_REPLAY
-			#ifdef REPLAY_RECORD
-					fwrite(&buttonsCount, sizeof(buttonsCount), 1, m_replayLogFile);
-					fwrite(&axisbuttons[0], sizeof(axisbuttons.GetCapacity()), 1, m_replayLogFile);
-					fflush(m_replayLogFile);
-			#else 
-					fread(&buttonsCount, sizeof(buttonsCount), 1, m_replayLogFile);
-					fread(&axisbuttons[0], sizeof(axisbuttons.GetCapacity()), 1, m_replayLogFile);
-			#endif
-		#endif
 	}
 }
 
