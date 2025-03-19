@@ -368,7 +368,7 @@ static ndMultiBodyVehicle* CreateBasicVehicle(ndDemoEntityManager* const scene, 
 	//}
 
 	// set a soft or hard mode
-	vehicle->SetVehicleSolverModel(configuration.m_useHardSolverMode ? true : false);
+	//vehicle->SetVehicleSolverModel(configuration.m_useHardSolverMode ? true : false);
 	return vehicle;
 }
 
@@ -451,13 +451,13 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	ndSharedPtr<ndUIEntity> vehicleUIPtr(vehicleUI);
 	scene->Set2DDisplayRenderFunction(vehicleUIPtr);
 	
-	//ndSharedPtr<ndModel> vehicle0 (CreateBasicVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f)), vehicleUI));
-	ndSharedPtr<ndModel> vehicle1 (CreateBasicVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -6.0f, 0.0f)), vehicleUI));
+	ndSharedPtr<ndModel> vehicle0 (CreateBasicVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f)), vehicleUI));
+	//ndSharedPtr<ndModel> vehicle1 (CreateBasicVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -6.0f, 0.0f)), vehicleUI));
 	//ndSharedPtr<ndModel> vehicle2 (CreateBasicVehicle(scene, monterTruckDesc0, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 6.0f, 0.0f)), vehicleUI));
 	//ndSharedPtr<ndModel> vehicle3 (CreateBasicVehicle(scene, monterTruckDesc1, ndPlacementMatrix (matrix, ndVector(0.0f, 0.0f, 0.0f, 0.0f)), vehicleUI));
 
-	//world->AddModel(vehicle0);
-	world->AddModel(vehicle1);
+	world->AddModel(vehicle0);
+	//world->AddModel(vehicle1);
 	//world->AddModel(vehicle2);
 	//world->AddModel(vehicle3);
 
@@ -467,8 +467,9 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 //world->AddJoint(fixJoint);
 
 	//ndBasicMultiBodyVehicle* const vehicle = (ndBasicMultiBodyVehicle*)*vehicle3;
-	//ndBasicMultiBodyVehicle* const vehicle = (ndBasicMultiBodyVehicle*)*vehicle0;
-	ndVehicleCommonNotify* const notifyCallback = (ndVehicleCommonNotify*)*vehicle1->GetNotifyCallback();
+	ndSharedPtr<ndModel> vehicle(vehicle0);
+
+	ndVehicleCommonNotify* const notifyCallback = (ndVehicleCommonNotify*)*vehicle->GetNotifyCallback();
 	notifyCallback->SetAsPlayer(scene);
 	matrix.m_posit.m_x += 5.0f;
 	TestPlayerCapsuleInteraction(scene, matrix);

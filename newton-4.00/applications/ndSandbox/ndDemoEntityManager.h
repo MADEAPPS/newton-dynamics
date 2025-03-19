@@ -29,6 +29,7 @@ class ndDemoCameraManager;
 class ndShadowMapRenderPass;
 
 class ndDemoEntityManager: public ndList <ndDemoEntity*>
+//class ndDemoEntityManager : public ndList <ndSharedPtr<ndDemoEntity>>
 {
 	public:
 	typedef void (*LaunchSDKDemoCallback) (ndDemoEntityManager* const scene);

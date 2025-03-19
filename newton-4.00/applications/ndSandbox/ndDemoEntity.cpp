@@ -16,6 +16,8 @@
 #include "ndDemoCamera.h"
 #include "ndDemoSkinMesh.h"
 
+static int xxxxxxxx;
+
 ndDemoEntity::ndDemoEntity(const ndMatrix& matrix, ndDemoEntity* const parent)
 	:ndNodeHierarchy<ndDemoEntity>()
 	,m_matrix(matrix) 

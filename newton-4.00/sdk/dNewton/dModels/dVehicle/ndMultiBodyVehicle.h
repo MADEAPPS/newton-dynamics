@@ -119,8 +119,9 @@ class ndMultiBodyVehicle : public ndModelArticulation
 	D_NEWTON_API ndMultiBodyVehicle* GetAsMultiBodyVehicle();
 #endif
 
-	D_NEWTON_API void SetVehicleSolverModel(bool hardJoint);
+	//D_NEWTON_API void SetVehicleSolverModel(bool hardJoint);
 	protected:
+	D_NEWTON_API virtual void OnAddToWorld();
 
 	private:
 	void ApplyStabilityControl();
@@ -144,6 +145,8 @@ class ndMultiBodyVehicle : public ndModelArticulation
 	ndMultiBodyVehicleTorsionBar* m_torsionBar;
 	ndList<ndMultiBodyVehicleTireJoint*> m_tireList;
 	ndList<ndMultiBodyVehicleDifferential*> m_differentialList;
+
+	//ndIkSolver m_dynamicSolver;
 	ndDownForce m_downForce;
 	ndFloat32 m_steeringRate;
 	ndFloat32 m_maxSideslipRate;
