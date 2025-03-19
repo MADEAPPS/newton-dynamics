@@ -26,7 +26,7 @@
 
 #ifndef D_USE_NEW_FLUID
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndBodySphFluid: public ndBodyParticleSet
 {
 	public:
@@ -78,8 +78,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 	ndFloat32 m_viscosity;
 	ndFloat32 m_restDensity;
 	ndFloat32 m_gasConstant;
-	D_MEMORY_ALIGN_FIXUP
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 inline bool ndBodySphFluid::RayCast(ndRayCastNotify&, const ndFastRay&, const ndFloat32) const
 {

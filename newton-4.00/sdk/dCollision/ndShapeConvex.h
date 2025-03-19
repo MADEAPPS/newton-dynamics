@@ -29,7 +29,7 @@
 #define D_CLIP_MAX_POINT_COUNT			64
 #define D_MIN_CONVEX_SHAPE_SIZE			ndFloat32 (1.0f/128.0f)
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndShapeConvex: public ndShape
 {
 	public:
@@ -83,11 +83,10 @@ class ndShapeConvex: public ndShape
 	ndFloat32 m_simplexVolume;
 	ndUnsigned16 m_edgeCount;
 	ndUnsigned16 m_vertexCount;
-	D_MEMORY_ALIGN_FIXUP
 
 	friend class ndMeshEffect;
 	friend class ndContactSolver;
-} D_GCC_NEWTON_ALIGN_32 ;
+} D_GCC_NEWTON_CLASS_ALIGN_32 ;
 
 #endif 
 

@@ -31,7 +31,7 @@ class ndVector;
 //
 // *****************************************************************************************
 #ifdef D_NEWTON_USE_AVX2_OPTION
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndBigVector
 {
 	#define PERMUT_MASK_DOUBLE(y, x) _MM_SHUFFLE2 (y, x)
@@ -544,11 +544,11 @@ class ndBigVector
 	D_CORE_API static ndBigVector m_epsilon;
 	D_CORE_API static ndBigVector m_signMask;
 	D_CORE_API static ndBigVector m_triplexMask;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #else
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndBigVector
 {
 	#define PERMUT_MASK_DOUBLE(y, x) _MM_SHUFFLE2 (y, x)
@@ -1081,7 +1081,7 @@ class ndBigVector
 	D_CORE_API static ndBigVector m_epsilon;
 	D_CORE_API static ndBigVector m_signMask;
 	D_CORE_API static ndBigVector m_triplexMask;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif
 
@@ -1097,7 +1097,7 @@ class ndBigVector
 // 4 x 1 single precision SSE vector class declaration
 //
 // *****************************************************************************************
-D_MSV_NEWTON_ALIGN_16
+D_MSV_NEWTON_CLASS_ALIGN_16
 class ndVector
 {
 	#define PERMUTE_MASK(w, z, y, x) _MM_SHUFFLE (w, z, y, x)
@@ -1621,7 +1621,7 @@ class ndVector
 	D_CORE_API static ndVector m_epsilon;
 	D_CORE_API static ndVector m_signMask;
 	D_CORE_API static ndVector m_triplexMask;
-} D_GCC_NEWTON_ALIGN_16;
+} D_GCC_NEWTON_CLASS_ALIGN_16;
 #endif
 
 

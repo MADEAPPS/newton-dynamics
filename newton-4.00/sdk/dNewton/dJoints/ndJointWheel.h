@@ -40,7 +40,7 @@ class ndWheelDescriptor
 	ndFloat32 m_handBrakeTorque;
 };
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndJointWheel : public ndJointBilateralConstraint
 {
 	public:
@@ -82,11 +82,10 @@ class ndJointWheel : public ndJointBilateralConstraint
 	ndFloat32 m_normalidedSteering;
 	ndFloat32 m_normalidedSteering0;
 	ndFloat32 m_normalizedHandBrake;
-	//bool m_vcdMode;
+	bool m_IsAapplyingBreaks;
 
-	D_MEMORY_ALIGN_FIXUP
 	friend class ndMultiBodyVehicle;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif 
 

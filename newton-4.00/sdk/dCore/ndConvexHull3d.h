@@ -56,7 +56,7 @@ class ndConvexHull3dFace
 	friend class ndConvexHull3d;
 };
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndConvexHull3d: public ndList<ndConvexHull3dFace>
 {
 #ifdef	D_OLD_CONVEXHULL_3D
@@ -100,8 +100,7 @@ class ndConvexHull3d: public ndList<ndConvexHull3dFace>
 	ndBigVector m_aabbP1;
 	ndFloat64 m_diag;
 	ndArray<ndBigVector> m_points;
-	D_MEMORY_ALIGN_FIXUP
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 inline const ndArray<ndBigVector>& ndConvexHull3d::GetVertexPool() const
 {

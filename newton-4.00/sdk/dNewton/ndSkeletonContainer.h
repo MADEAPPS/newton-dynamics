@@ -62,29 +62,29 @@ class ndSkeletonContainer
 		ndInt32 m_m1;
 	};
 
-	D_MSV_NEWTON_ALIGN_32
+	D_MSV_NEWTON_CLASS_ALIGN_32
 	class ndForcePair
 	{
 		public:
 		ndSpatialVector m_body;
 		ndSpatialVector m_joint;
-	} D_GCC_NEWTON_ALIGN_32;
+	} D_GCC_NEWTON_CLASS_ALIGN_32;
 
-	D_MSV_NEWTON_ALIGN_32
+	D_MSV_NEWTON_CLASS_ALIGN_32
 	class ndMatriData
 	{
 		public:
 		ndSpatialMatrix m_jt;
 		ndSpatialMatrix m_invMass;
-	} D_GCC_NEWTON_ALIGN_32;
+	} D_GCC_NEWTON_CLASS_ALIGN_32;
 
-	D_MSV_NEWTON_ALIGN_32
+	D_MSV_NEWTON_CLASS_ALIGN_32
 	class ndBodyJointMatrixDataPair
 	{
 		public:
 		ndMatriData m_body;
 		ndMatriData m_joint;
-	} D_GCC_NEWTON_ALIGN_32;
+	} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 	public:
 	class ndNode

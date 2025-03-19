@@ -51,13 +51,13 @@ class ndVehicleDectriptorViper : public ndVehicleDectriptor
 		m_frontTire.m_mass = 25.0f;
 		m_frontTire.m_handBrakeTorque = 0.0f;
 		m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		m_frontTire.m_longitudinalStiffness = 10.0f * DEMO_GRAVITY;
+		m_frontTire.m_longitudinalStiffness = 1.0f * DEMO_GRAVITY;
 		m_frontTire.m_laterialStiffness = 2.0f * m_frontTire.m_longitudinalStiffness;
 
 		m_rearTire.m_mass = 25.0f;
 		m_rearTire.m_handBrakeTorque = 100000.0f;
 		m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		m_rearTire.m_longitudinalStiffness = 10.0f * DEMO_GRAVITY;
+		m_rearTire.m_longitudinalStiffness = 1.0f * DEMO_GRAVITY;
 		m_rearTire.m_laterialStiffness = 2.0f * m_rearTire.m_longitudinalStiffness;
 	}
 };
@@ -451,13 +451,13 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	ndSharedPtr<ndUIEntity> vehicleUIPtr(vehicleUI);
 	scene->Set2DDisplayRenderFunction(vehicleUIPtr);
 	
-	ndSharedPtr<ndModel> vehicle0 (CreateBasicVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f)), vehicleUI));
-	//ndSharedPtr<ndModel> vehicle1 (CreateBasicVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -6.0f, 0.0f)), vehicleUI));
+	//ndSharedPtr<ndModel> vehicle0 (CreateBasicVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f)), vehicleUI));
+	ndSharedPtr<ndModel> vehicle1 (CreateBasicVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -6.0f, 0.0f)), vehicleUI));
 	//ndSharedPtr<ndModel> vehicle2 (CreateBasicVehicle(scene, monterTruckDesc0, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 6.0f, 0.0f)), vehicleUI));
 	//ndSharedPtr<ndModel> vehicle3 (CreateBasicVehicle(scene, monterTruckDesc1, ndPlacementMatrix (matrix, ndVector(0.0f, 0.0f, 0.0f, 0.0f)), vehicleUI));
 
-	world->AddModel(vehicle0);
-	//world->AddModel(vehicle1);
+	//world->AddModel(vehicle0);
+	world->AddModel(vehicle1);
 	//world->AddModel(vehicle2);
 	//world->AddModel(vehicle3);
 
@@ -468,14 +468,14 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 
 	//ndBasicMultiBodyVehicle* const vehicle = (ndBasicMultiBodyVehicle*)*vehicle3;
 	//ndBasicMultiBodyVehicle* const vehicle = (ndBasicMultiBodyVehicle*)*vehicle0;
-	ndVehicleCommonNotify* const notifyCallback = (ndVehicleCommonNotify*)*vehicle0->GetNotifyCallback();
+	ndVehicleCommonNotify* const notifyCallback = (ndVehicleCommonNotify*)*vehicle1->GetNotifyCallback();
 	notifyCallback->SetAsPlayer(scene);
 	matrix.m_posit.m_x += 5.0f;
 	TestPlayerCapsuleInteraction(scene, matrix);
 	
 	matrix.m_posit.m_x += 20.0f;
 	matrix.m_posit.m_z += 5.0f;
-	AddPlanks(scene, matrix, 60.0f, 5);
+	//AddPlanks(scene, matrix, 60.0f, 5);
 
 	ndQuaternion rot;
 	ndVector origin(-10.0f, 2.0f, -10.0f, 1.0f);

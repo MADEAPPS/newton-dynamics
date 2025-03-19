@@ -30,13 +30,6 @@
 	#define D_MEMORY_SAFE_GUARD		64
 #endif
 
-#ifdef ND_ENFORCE_ALIGNMENT
-	#define D_MEMORY_ALIGN_FIXUP ndBigVector m_alignmentFixup;
-#else
-	#define D_MEMORY_ALIGN_FIXUP							   ;
-#endif
-
-
 typedef void* (*ndMemAllocCallback) (size_t size);
 typedef void (*ndMemFreeCallback) (void* const ptr);
 

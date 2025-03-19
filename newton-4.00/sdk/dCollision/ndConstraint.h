@@ -38,7 +38,7 @@ class ndRightHandSide;
 class ndBodyKinematic;
 class ndJointBilateralConstraint;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndConstraintDebugCallback: public ndClassAlloc
 {
 	public:
@@ -83,10 +83,10 @@ class ndConstraintDebugCallback: public ndClassAlloc
 	}
 		
 	ndFloat32 m_debugScale;
-	D_MEMORY_ALIGN_FIXUP
-} D_GCC_NEWTON_ALIGN_32;
 
-D_MSV_NEWTON_ALIGN_32
+} D_GCC_NEWTON_CLASS_ALIGN_32;
+
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndPointParam
 {
 	public:
@@ -94,23 +94,23 @@ class ndPointParam
 	ndVector m_r1;
 	ndVector m_posit0;
 	ndVector m_posit1;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndJacobian
 {
 	public:
 	ndVector m_linear;
 	ndVector m_angular;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndJacobianPair
 {
 	public:
 	ndJacobian m_jacobianM0;
 	ndJacobian m_jacobianM1;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 class ndForceImpactPair
 {
@@ -149,7 +149,7 @@ class ndBilateralBounds
 	ndInt32 m_normalIndex;
 };
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndConstraintDescritor
 {
 	public:
@@ -166,17 +166,17 @@ class ndConstraintDescritor
 	ndFloat32 m_timestep;
 	ndFloat32 m_invTimestep;
 	ndInt32 m_rowsCount;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndLeftHandSide
 {
 	public:
 	ndJacobianPair m_Jt;
 	ndJacobianPair m_JMinv;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndRightHandSide
 {
 	public:
@@ -252,9 +252,9 @@ class ndRightHandSide
 #ifdef _DEBUG
 	ndDebugCheck m_debugCheck;
 #endif
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndConstraint: public ndContainersFreeListAlloc<ndConstraint>
 {
 	public:
@@ -303,7 +303,7 @@ class ndConstraint: public ndContainersFreeListAlloc<ndConstraint>
 	ndUnsigned8 m_fence1;
 	ndUnsigned8 m_resting;   // this should be identical to m_fence0, should be removed. 
 	ndUnsigned8 m_isInSkeletonLoop;
-	D_MEMORY_ALIGN_FIXUP
+
 
 	friend class ndIkSolver;
 	friend class ndBodyKinematic;
@@ -311,7 +311,7 @@ class ndConstraint: public ndContainersFreeListAlloc<ndConstraint>
 	friend class ndSkeletonContainer;
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
-} D_GCC_NEWTON_ALIGN_32 ;
+} D_GCC_NEWTON_CLASS_ALIGN_32 ;
 
 #ifdef _DEBUG
 inline void ndRightHandSide::SetSanityCheck(const ndConstraint* const joint)

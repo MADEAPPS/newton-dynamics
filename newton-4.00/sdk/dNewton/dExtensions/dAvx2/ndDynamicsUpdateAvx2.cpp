@@ -25,7 +25,7 @@
 #define D_AVX_DEFAULT_BUFFER_SIZE	1024
 
 #ifdef D_NEWTON_USE_DOUBLE
-	D_MSV_NEWTON_ALIGN_32
+	D_MSV_NEWTON_CLASS_ALIGN_32
 	class ndAvxFloat
 	{
 		public:
@@ -257,10 +257,10 @@
 		static ndAvxFloat m_zero;
 		static ndAvxFloat m_mask;
 		static ndAvxFloat m_ordinals;
-	} D_GCC_NEWTON_ALIGN_32;
+	} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #else
-	D_MSV_NEWTON_ALIGN_32
+	D_MSV_NEWTON_CLASS_ALIGN_32
 	class ndAvxFloat
 	{
 		public:
@@ -475,7 +475,7 @@
 		static ndAvxFloat m_zero;
 		static ndAvxFloat m_mask;
 		static ndAvxFloat m_ordinals;
-	} D_GCC_NEWTON_ALIGN_32;
+	} D_GCC_NEWTON_CLASS_ALIGN_32;
 #endif
 
 ndAvxFloat ndAvxFloat::m_one(ndFloat32(1.0f));
@@ -483,32 +483,32 @@ ndAvxFloat ndAvxFloat::m_zero(ndFloat32 (0.0f));
 ndAvxFloat ndAvxFloat::m_ordinals(ndVector(0, 1, 2, 3), ndVector(4, 5, 6, 7));
 ndAvxFloat ndAvxFloat::m_mask(ndVector(-1, -1, -1, -1), ndVector(-1, -1, -1, -1));
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndAvxVector3
 {
 	public:
 	ndAvxFloat m_x;
 	ndAvxFloat m_y;
 	ndAvxFloat m_z;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndAvxVector6
 {
 	public:
 	ndAvxVector3 m_linear;
 	ndAvxVector3 m_angular;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndOpenclJacobianPair
 {
 	public:
 	ndAvxVector6 m_jacobianM0;
 	ndAvxVector6 m_jacobianM1;
-}D_GCC_NEWTON_ALIGN_32;
+}D_GCC_NEWTON_CLASS_ALIGN_32;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndSoaMatrixElement
 {
 	public:
@@ -522,7 +522,7 @@ class ndSoaMatrixElement
 	ndAvxFloat m_normalForceIndex;
 	ndAvxFloat m_lowerBoundFrictionCoefficent;
 	ndAvxFloat m_upperBoundFrictionCoefficent;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 class ndAvxMatrixArray : public ndArray<ndSoaMatrixElement>
 {
@@ -1579,34 +1579,25 @@ void ndDynamicsUpdateAvx2::UpdateForceFeedback()
 				const ndInt32 rows = joint->m_rowCount;
 				const ndInt32 first = joint->m_rowStart;
 
+				ndAvxFloat force0(zero);
+				ndAvxFloat force1(zero);
 				for (ndInt32 k = 0; k < rows; ++k)
 				{
+					const ndLeftHandSide* const lhs = &leftHandSide[k + first];
 					const ndRightHandSide* const rhs = &rightHandSide[k + first];
 					ndAssert(ndCheckFloat(rhs->m_force));
 					rhs->m_jointFeebackForce->Push(rhs->m_force);
 					rhs->m_jointFeebackForce->m_force = rhs->m_force;
 					rhs->m_jointFeebackForce->m_impact = rhs->m_maxImpact * timestepRK;
-				}
 
-				//if (joint->GetAsBilateral())
-				{
-					ndAvxFloat force0(zero);
-					ndAvxFloat force1(zero);
-
-					for (ndInt32 k = 0; k < rows; ++k)
-					{
-						const ndRightHandSide* const rhs = &rightHandSide[k + first];
-						const ndLeftHandSide* const lhs = &leftHandSide[k + first];
-						const ndAvxFloat f(rhs->m_force);
-						force0 = force0.MulAdd((ndAvxFloat&)lhs->m_Jt.m_jacobianM0, f);
-						force1 = force1.MulAdd((ndAvxFloat&)lhs->m_Jt.m_jacobianM1, f);
-					}
-					//ndJointBilateralConstraint* const bilateral = (ndJointBilateralConstraint*)joint;
-					joint->m_forceBody0 = force0.GetLow();
-					joint->m_torqueBody0 = force0.GetHigh();
-					joint->m_forceBody1 = force1.GetLow();
-					joint->m_torqueBody1 = force1.GetHigh();
+					const ndAvxFloat f(rhs->m_force);
+					force0 = force0.MulAdd((ndAvxFloat&)lhs->m_Jt.m_jacobianM0, f);
+					force1 = force1.MulAdd((ndAvxFloat&)lhs->m_Jt.m_jacobianM1, f);
 				}
+				joint->m_forceBody0 = force0.GetLow();
+				joint->m_torqueBody0 = force0.GetHigh();
+				joint->m_forceBody1 = force1.GetLow();
+				joint->m_torqueBody1 = force1.GetHigh();
 			}
 		}
 	});

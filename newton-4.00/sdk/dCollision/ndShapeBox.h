@@ -24,7 +24,7 @@
 
 #include "ndShapeConvex.h"
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndShapeBox: public ndShapeConvex
 {
 	public:
@@ -52,7 +52,6 @@ class ndShapeBox: public ndShapeConvex
 	virtual ndVector SupportFeatureVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
 	ndVector m_size[2];
 	ndVector m_vertex[8];
-	D_MEMORY_ALIGN_FIXUP
 
 	static ndInt32 m_initSimplex;
 	static ndInt32 m_faces[][4];
@@ -61,7 +60,7 @@ class ndShapeBox: public ndShapeConvex
 	static ndConvexSimplexEdge m_edgeArray[];
 	static ndConvexSimplexEdge* m_edgeEdgeMap[];
 	static ndConvexSimplexEdge* m_vertexToEdgeMap[];
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif 
 

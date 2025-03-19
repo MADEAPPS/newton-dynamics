@@ -39,7 +39,7 @@ class ndBodyPlayerCapsule;
 class ndBodyKinematicBase;
 class ndJointBilateralConstraint;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndBody : public ndContainersFreeListAlloc<ndBody>
 {
 	public:
@@ -95,6 +95,15 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	virtual void DetachContact(ndContact* const) {}
 	virtual ndContact* FindContact(const ndBody* const) const { return nullptr; }
 
+	ndMatrix m_matrix;
+	ndQuaternion m_rotation;
+	ndVector m_veloc;
+	ndVector m_omega;
+	ndVector m_localCentreOfMass;
+	ndVector m_globalCentreOfMass;
+	ndVector m_minAabb;
+	ndVector m_maxAabb;
+
 	ndBodyNotify* m_notifyCallback;
 	ndSpecialList<ndBody>::ndNode* m_deletedNode;
 
@@ -125,24 +134,13 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	ndUnsigned8 m_sceneForceUpdate;
 	ndUnsigned8 m_sceneEquilibrium;
 	ndUnsigned8 m_skeletonSelfCollision;
-	
-	ndMatrix m_matrix;
-	ndQuaternion m_rotation;
-	ndVector m_veloc;
-	ndVector m_omega;
-	ndVector m_localCentreOfMass;
-	ndVector m_globalCentreOfMass;
-	ndVector m_minAabb;
-	ndVector m_maxAabb;
-	D_MEMORY_ALIGN_FIXUP
-
 	D_COLLISION_API static ndUnsigned32 m_uniqueIdCount;
 
 	friend class ndWorld;
 	friend class ndScene;
 	friend class ndConstraint;
 	friend class ndBodyPlayerCapsuleImpulseSolver;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif 
 

@@ -26,7 +26,7 @@
 
 #define D_SPHERE_VERTEX_COUNT 18
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndShapeSphere: public ndShapeConvex
 {
 	public:
@@ -55,12 +55,11 @@ class ndShapeSphere: public ndShapeConvex
 
 	ndVector m_vertex[D_SPHERE_VERTEX_COUNT];
 	ndFloat32 m_radius;
-	D_MEMORY_ALIGN_FIXUP
 
 	static ndInt32 m_shapeRefCount;
 	static ndVector m_unitSphere[];
 	static ndConvexSimplexEdge m_edgeArray[];
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 
 #endif 

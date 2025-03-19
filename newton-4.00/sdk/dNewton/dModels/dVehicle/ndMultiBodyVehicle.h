@@ -39,7 +39,7 @@ class ndMultiBodyVehicleDifferentialAxle;
 
 #define dRadPerSecToRpm ndFloat32(9.55f)
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndMultiBodyVehicle : public ndModelArticulation
 {
 	public:
@@ -93,7 +93,6 @@ class ndMultiBodyVehicle : public ndModelArticulation
 
 	D_NEWTON_API bool IsSleeping() const;
 	D_NEWTON_API ndFloat32 GetSpeed() const;
-	D_NEWTON_API void SetVehicleSolverModel(bool hardJoint);
 	D_NEWTON_API void AddChassis(const ndSharedPtr<ndBody>& chassis);
 	D_NEWTON_API ndMultiBodyVehicleMotor* AddMotor(ndFloat32 mass, ndFloat32 radius);
 	D_NEWTON_API ndShapeInstance CreateTireShape(ndFloat32 radius, ndFloat32 width) const;
@@ -120,22 +119,23 @@ class ndMultiBodyVehicle : public ndModelArticulation
 	D_NEWTON_API ndMultiBodyVehicle* GetAsMultiBodyVehicle();
 #endif
 
+	D_NEWTON_API void SetVehicleSolverModel(bool hardJoint);
+	protected:
+
 	private:
+	void ApplyStabilityControl();
 	void ApplyAlignmentAndBalancing();
-	void ApplyVehicleStabilityControl();
 	void ApplyTireModel(ndWorld* const world, ndFloat32 timestep);
 	void ApplyAerodynamics(ndWorld* const world, ndFloat32 timestep);
 	ndBodyKinematic* CreateInternalBodyPart(ndFloat32 mass, ndFloat32 radius) const;
 	void ApplyTireModel(ndFloat32 timestep, ndFixSizeArray<ndTireContactPair, 128>& tireContacts);
-	
-	//void ApplyVehicleStabilityControl(ndFloat32 timestep, ndFixSizeArray<ndTireContactPair, 128>& tireContacts);
+
 	void CalculateNormalizedAlgniningTorque(ndMultiBodyVehicleTireJoint* const tire, ndFloat32 sideSlipTangent) const;
 	void BrushTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const;
 	void CoulombTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const;
 	void PacejkaTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const;
 	void CoulombFrictionCircleTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const;
 
-	protected:
 	ndMatrix m_localFrame;
 	ndBodyDynamic* m_chassis;
 	ndMultiBodyVehicleMotor* m_motor;
@@ -148,13 +148,10 @@ class ndMultiBodyVehicle : public ndModelArticulation
 	ndFloat32 m_steeringRate;
 	ndFloat32 m_maxSideslipRate;
 	ndFloat32 m_maxSideslipAngle;
-	D_MEMORY_ALIGN_FIXUP
 
 	friend class ndMultiBodyVehicleMotor;
-	//friend class ndMultiBodyVehicleGearBox;
 	friend class ndMultiBodyVehicleTireJoint;
-	//friend class ndMultiBodyVehicleTorsionBar;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 
 #endif

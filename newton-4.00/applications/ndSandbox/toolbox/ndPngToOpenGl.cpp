@@ -211,6 +211,17 @@ GLuint LoadTexture(const char* const filename)
 		unsigned char* pBits;
 		lodepng_decode_file(&pBits, &width, &height, fullPathName, LCT_RGBA, 8);
 
+		unsigned* const buffer = (unsigned*)pBits;
+		for (ndInt32 i = 0; i < ndInt32(height / 2); i++)
+		{
+			unsigned* const row0 = &buffer[i * width];
+			unsigned* const row1 = &buffer[(height - 1 - i) * width];
+			for (ndInt32 j = 0; j < ndInt32(width); ++j)
+			{
+				ndSwap(row0[j], row1[j]);
+			}
+		}
+
 		GLuint textureId = LoadGpuImage(pBits, int(width), int(height), m_rgba);
 		lodepng_free(pBits);
 

@@ -31,7 +31,7 @@ class ndVector;
 // 4 x 1 double precision SSE2 vector class declaration
 //
 // *****************************************************************************************
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndBigVector
 {
 	public:
@@ -529,7 +529,7 @@ class ndBigVector
 	D_CORE_API static ndBigVector m_epsilon;
 	D_CORE_API static ndBigVector m_signMask;
 	D_CORE_API static ndBigVector m_triplexMask;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 
 
@@ -548,7 +548,7 @@ class ndBigVector
 // 4 x 1 single precision SSE vector class declaration
 //
 // *****************************************************************************************
-D_MSV_NEWTON_ALIGN_16
+D_MSV_NEWTON_CLASS_ALIGN_16
 class ndVector
 {
 	public:
@@ -1072,7 +1072,7 @@ class ndVector
 	D_CORE_API static ndVector m_epsilon;
 	D_CORE_API static ndVector m_signMask;
 	D_CORE_API static ndVector m_triplexMask;
-} D_GCC_NEWTON_ALIGN_16;
+} D_GCC_NEWTON_CLASS_ALIGN_16;
 
 #endif
 

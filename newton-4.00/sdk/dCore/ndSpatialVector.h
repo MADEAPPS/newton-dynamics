@@ -26,7 +26,7 @@
 #include "ndTypes.h"
 #include "ndVector.h"
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndSpatialVector
 {
 	public:
@@ -131,6 +131,6 @@ class ndSpatialVector
 	};
 
 	D_CORE_API static ndSpatialVector m_zero;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif

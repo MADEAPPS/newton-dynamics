@@ -65,7 +65,7 @@ ndInt32 ndContactSolver::m_rayCastSimplex[4][4] =
 	{ 1, 0, 3, 2 },
 };
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndContactSolver::ndBoxBoxDistance2
 {
 	public:
@@ -225,7 +225,7 @@ class ndContactSolver::ndBoxBoxDistance2
 	ndMatrix m_localMatrixAbs1;
 
 	ndVector m_crossAxis[9];
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 class ndStackBvhStackEntry
 {

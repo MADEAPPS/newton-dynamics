@@ -27,7 +27,7 @@
 #include "ndVector.h"
 #include "ndClassAlloc.h"
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndRay: public ndClassAlloc
 {
 	public:
@@ -45,11 +45,9 @@ class ndRay: public ndClassAlloc
 
 	const ndVector m_p0;
 	const ndVector m_p1;
-	D_MEMORY_ALIGN_FIXUP
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
-
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndFastRay: public ndRay
 {
 	public:
@@ -68,8 +66,7 @@ class ndFastRay: public ndRay
 	ndVector m_maxT;
 	ndVector m_unitDir;
 	ndVector m_isParallel;
-	D_MEMORY_ALIGN_FIXUP
-} D_GCC_NEWTON_ALIGN_32 ;
+} D_GCC_NEWTON_CLASS_ALIGN_32 ;
 
 inline ndFastRay::ndFastRay(const ndVector& l0, const ndVector& l1)
 	:ndRay(l0, l1)

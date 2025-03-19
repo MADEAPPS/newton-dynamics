@@ -19,7 +19,7 @@
 #define D_MAX_SPHERICAL_PENETRATION		(ndFloat32 (4.0f) * ndDegreeToRad)
 #define D_MAX_SPHERICAL_CONE_ANGLE		(ndFloat32 (150.0f) * ndDegreeToRad)
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndJointSpherical: public ndJointBilateralConstraint
 {
 	public:
@@ -55,8 +55,7 @@ class ndJointSpherical: public ndJointBilateralConstraint
 	ndFloat32 m_minTwistAngle;
 	ndFloat32 m_maxTwistAngle;
 	ndFloat32 m_springDamperRegularizer;
-	D_MEMORY_ALIGN_FIXUP
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 
 #endif 

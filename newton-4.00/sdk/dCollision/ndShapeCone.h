@@ -26,7 +26,7 @@
 
 #define D_CONE_SEGMENTS 12
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndShapeCone : public ndShapeConvex
 {
 	public:
@@ -54,12 +54,11 @@ class ndShapeCone : public ndShapeConvex
 	ndFloat32 m_height;
 	ndFloat32 m_radius;
 	ndVector m_vertex[D_CONE_SEGMENTS + 1];
-	D_MEMORY_ALIGN_FIXUP
 
 	static ndInt32 m_shapeRefCount;
 	static ndConvexSimplexEdge m_edgeArray[];
 
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif 
 

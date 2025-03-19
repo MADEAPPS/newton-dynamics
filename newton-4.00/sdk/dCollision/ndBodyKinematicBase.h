@@ -25,7 +25,7 @@
 #include "ndCollisionStdafx.h"
 #include "ndBodyKinematic.h"
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndBodyKinematicBase : public ndBodyKinematic
 {
 	public:
@@ -35,7 +35,7 @@ class ndBodyKinematicBase : public ndBodyKinematic
 
 	void SpecialUpdate(ndFloat32 timestep);
 	ndBodyKinematicBase* GetAsBodyKinematicSpecial();
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 inline ndBodyKinematicBase* ndBodyKinematicBase::GetAsBodyKinematicSpecial()
 { 

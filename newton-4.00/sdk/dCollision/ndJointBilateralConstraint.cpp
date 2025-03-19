@@ -44,8 +44,6 @@ ndJointBilateralConstraint::ndJointBilateralConstraint()
 	m_solverModel = m_jointkinematicOpenLoop;
 	m_defualtDiagonalRegularizer = ndFloat32(0.0f);
 
-	//memset(m_jointForce, 0, sizeof(m_jointForce));
-	//memset(m_motorAcceleration, 0, sizeof(m_motorAcceleration));
 	ndMemSet(m_jointForce, ndForceImpactPair(), sizeof(m_jointForce) / sizeof(m_jointForce[0]));
 	ndMemSet(m_motorAcceleration, ndFloat32 (0.0f), sizeof(m_motorAcceleration) / sizeof (m_motorAcceleration[0]));
 }
@@ -80,8 +78,6 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKin
 	m_solverModel = m_jointkinematicOpenLoop;
 	m_defualtDiagonalRegularizer = ndFloat32(0.0f);
 	
-	//memset(m_jointForce, 0, sizeof(m_jointForce));
-	//memset(m_motorAcceleration, 0, sizeof(m_motorAcceleration));
 	ndMemSet(m_jointForce, ndForceImpactPair(), sizeof(m_jointForce) / sizeof(m_jointForce[0]));
 	ndMemSet(m_motorAcceleration, ndFloat32(0.0f), sizeof(m_motorAcceleration) / sizeof(m_motorAcceleration[0]));
 }
@@ -119,8 +115,6 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKin
 	m_solverModel = m_jointkinematicOpenLoop;
 	m_defualtDiagonalRegularizer = ndFloat32(0.0f);
 
-	//memset(m_jointForce, 0, sizeof(m_jointForce));
-	//memset(m_motorAcceleration, 0, sizeof(m_motorAcceleration));
 	ndMemSet(m_jointForce, ndForceImpactPair(), sizeof(m_jointForce) / sizeof(m_jointForce[0]));
 	ndMemSet(m_motorAcceleration, ndFloat32(0.0f), sizeof(m_motorAcceleration) / sizeof(m_motorAcceleration[0]));
 }
@@ -526,11 +520,6 @@ void ndJointBilateralConstraint::AddLinearRowJacobian(ndConstraintDescritor& des
 	const ndVector gyroAlpha1(m_body1->GetGyroAlpha());
 	const ndVector centripetal0(omega0.CrossProduct(omega0.CrossProduct(m_r0[index])));
 	const ndVector centripetal1(omega1.CrossProduct(omega1.CrossProduct(m_r1[index])));
-	
-	//const ndVector positError(param.m_posit1 - param.m_posit0);
-	//ndFloat32 relPosit = positError.DotProduct(dir).GetScalar();
-	//ndFloat32 relPosit___ = -(jacobian0.m_linear * param.m_posit0 + jacobian1.m_linear * param.m_posit1).AddHorizontal().GetScalar();
-	//ndAssert(ndAbs (relPosit___ - relPosit) < ndFloat32(1.0e-7f));
 
 	const ndFloat32 relGyro = (jacobian0.m_angular * gyroAlpha0 + jacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
 	const ndFloat32 relCentr = -(jacobian0.m_linear * centripetal0 + jacobian1.m_linear * centripetal1).AddHorizontal().GetScalar();

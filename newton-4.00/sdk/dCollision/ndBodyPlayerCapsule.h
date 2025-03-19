@@ -28,7 +28,7 @@
 class ndBodyPlayerCapsuleContactSolver;
 class ndBodyPlayerCapsuleImpulseSolver;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndBodyPlayerCapsule : public ndBodyKinematicBase
 {
 	public:
@@ -92,8 +92,8 @@ class ndBodyPlayerCapsule : public ndBodyKinematicBase
 	bool m_isAirbone;
 	bool m_isOnFloor;
 	bool m_isCrouched;
-	D_MEMORY_ALIGN_FIXUP
-} D_GCC_NEWTON_ALIGN_32;
+	
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 inline ndBodyPlayerCapsule* ndBodyPlayerCapsule::GetAsBodyPlayerCapsule()
 { 

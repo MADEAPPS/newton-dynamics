@@ -33,7 +33,7 @@ class ndContactPoint;
 class ndShapeInstance;
 class ndRayCastNotify;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndShapeDebugNotify : public ndClassAlloc
 {
 	public: 
@@ -55,10 +55,10 @@ class ndShapeDebugNotify : public ndClassAlloc
 	virtual void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceArray, const ndEdgeType* const edgeType) = 0;
 
 	const ndShapeInstance* m_instance;
-	D_MEMORY_ALIGN_FIXUP
-} D_GCC_NEWTON_ALIGN_32;
 
-D_MSV_NEWTON_ALIGN_32
+} D_GCC_NEWTON_CLASS_ALIGN_32;
+
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndShapeInstance: public ndContainersFreeListAlloc<ndShapeInstance>
 {
 	public:
@@ -182,11 +182,10 @@ class ndShapeInstance: public ndContainersFreeListAlloc<ndShapeInstance>
 	ndFloat32 m_skinMargin;
 	ndScaleType m_scaleType;
 	bool m_collisionMode;
-	D_MEMORY_ALIGN_FIXUP
 
 	private:
 	static ndVector m_padding;
-} D_GCC_NEWTON_ALIGN_32 ;
+} D_GCC_NEWTON_CLASS_ALIGN_32 ;
 
 #endif 
 

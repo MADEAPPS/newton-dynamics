@@ -26,7 +26,7 @@
 
 class ndModel;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndModelNotify : public ndContainersFreeListAlloc<ndModelNotify>
 {
 	public:  
@@ -50,9 +50,8 @@ class ndModelNotify : public ndContainersFreeListAlloc<ndModelNotify>
 	private:
 	ndModel* m_model;
 
-	D_MEMORY_ALIGN_FIXUP
 	friend class ndModel;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif 
 

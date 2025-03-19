@@ -51,7 +51,7 @@ virtual void SetIkSetAccel(const ndJacobian& body0Accel, const ndJacobian& body1
 	m_accel1 = body1Accel;																\
 }
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndJointBilateralConstraint : public ndConstraint
 {
 	public:
@@ -160,8 +160,7 @@ class ndJointBilateralConstraint : public ndConstraint
 	ndInt8 m_rowIsMotor;
 	ndInt8 m_hitLimits;
 	ndJointBilateralSolverModel m_solverModel;
-	D_MEMORY_ALIGN_FIXUP
-
+	
 	friend class ndWorld;
 	friend class ndIkSolver;
 	friend class ndDynamicsUpdate;
@@ -171,7 +170,7 @@ class ndJointBilateralConstraint : public ndConstraint
 	friend class ndDynamicsUpdateAvx2;
 	friend class ndDynamicsUpdateSycl;
 	friend class ndDynamicsUpdateCuda;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 
 #endif

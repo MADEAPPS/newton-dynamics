@@ -25,7 +25,7 @@
 #include "ndCollisionStdafx.h"
 #include "ndBodyKinematicBase.h"
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndBodyTriggerVolume : public ndBodyKinematicBase
 {
 	public:
@@ -44,7 +44,7 @@ class ndBodyTriggerVolume : public ndBodyKinematicBase
 	private:
 	virtual void IntegrateExternalForce(ndFloat32 timestep);
 
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 inline ndBodyTriggerVolume* ndBodyTriggerVolume::GetAsBodyTriggerVolume()
 { 

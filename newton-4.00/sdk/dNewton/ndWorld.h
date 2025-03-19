@@ -42,7 +42,7 @@ class ndJointBilateralConstraint;
 
 #define D_SLEEP_ENTRIES			8
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndWorld: public ndClassAlloc
 {
 	public:
@@ -192,7 +192,6 @@ class ndWorld: public ndClassAlloc
 	ndSolverModes m_solverMode;
 	ndInt32 m_solverIterations;
 	bool m_inUpdate;
-	D_MEMORY_ALIGN_FIXUP
 	
 	friend class ndScene;
 	friend class ndIkSolver;
@@ -204,6 +203,6 @@ class ndWorld: public ndClassAlloc
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
 	friend class ndDynamicsUpdateCuda;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif

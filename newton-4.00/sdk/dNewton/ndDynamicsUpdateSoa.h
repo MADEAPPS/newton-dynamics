@@ -65,7 +65,7 @@ namespace ndSoa
 	};
 }
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndDynamicsUpdateSoa: public ndDynamicsUpdate
 {
 	public:
@@ -103,7 +103,7 @@ class ndDynamicsUpdateSoa: public ndDynamicsUpdate
 	ndArray<ndInt32> m_soaJointRows;
 	ndArray<ndSoa::ndSoaMatrixElement> m_soaMassMatrix;
 
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif
 

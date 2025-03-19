@@ -15,7 +15,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndJointKinematicController: public ndJointBilateralConstraint
 {
 	public:
@@ -67,8 +67,7 @@ class ndJointKinematicController: public ndJointBilateralConstraint
 	ndFloat32 m_angularFrictionCoefficient;
 	ndControlModes m_controlMode;
 	bool m_autoSleepState;
-	D_MEMORY_ALIGN_FIXUP
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 
 

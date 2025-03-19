@@ -30,7 +30,7 @@ class ndContact;
 class ndBodyKinematic;
 class ndShapeInstance;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndMaterial : public ndContainersFreeListAlloc<ndMaterial>
 {
 	public:
@@ -45,10 +45,9 @@ class ndMaterial : public ndContainersFreeListAlloc<ndMaterial>
 	ndFloat32 m_softness;
 	ndUnsigned32 m_flags;
 	ndUnsigned32 m_userFlags;
-	D_MEMORY_ALIGN_FIXUP
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndContactNotify: public ndClassAlloc
 {
 	public:
@@ -67,11 +66,10 @@ class ndContactNotify: public ndClassAlloc
 
 	private:
 	ndScene* m_scene;
-	D_MEMORY_ALIGN_FIXUP
 
 	friend class ndScene;
 	friend class ndContactSolver;
 	friend class ndPolygonMeshDesc;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif

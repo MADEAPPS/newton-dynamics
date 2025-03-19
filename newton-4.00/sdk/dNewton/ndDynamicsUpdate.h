@@ -40,7 +40,7 @@
 
 class ndWorld;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndDynamicsUpdate : public ndClassAlloc
 {
 	public:
@@ -141,7 +141,7 @@ class ndDynamicsUpdate : public ndClassAlloc
 
 	friend class ndWorld;
 	friend class ndSkeletonContainer;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 inline ndVector ndDynamicsUpdate::GetVelocTol() const
 {

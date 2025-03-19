@@ -24,6 +24,7 @@ ndJointWheel::ndJointWheel()
 	,m_normalidedSteering(ndFloat32(0.0f))
 	,m_normalidedSteering0(ndFloat32(0.0f))
 	,m_normalizedHandBrake(ndFloat32(0.0f))
+	,m_IsAapplyingBreaks(false)
 	//,m_vcdMode(false)
 {
 	m_maxDof = 7;
@@ -40,6 +41,7 @@ ndJointWheel::ndJointWheel(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* co
 	,m_normalidedSteering(ndFloat32(0.0f))
 	,m_normalidedSteering0(ndFloat32(0.0f))
 	,m_normalizedHandBrake(ndFloat32(0.0f))
+	,m_IsAapplyingBreaks(false)
 	//,m_vcdMode(false)
 {
 }
@@ -124,7 +126,6 @@ ndMatrix ndJointWheel::CalculateBaseFrame() const
 ndMatrix ndJointWheel::CalculateUpperBumperMatrix() const
 {
 	ndMatrix matrix(m_localMatrix1 * m_body1->GetMatrix());
-	//matrix.m_posit += matrix.m_up.Scale(m_info.m_lowerStop);
 	matrix.m_posit += matrix.m_up.Scale(m_info.m_upperStop);
 	return matrix;
 }
@@ -183,9 +184,11 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
 	SetMassSpringDamperAcceleration(desc, m_regularizer, m_info.m_springK, m_info.m_damperC);
 
+	m_IsAapplyingBreaks = false;
 	const ndFloat32 brakeFrictionTorque = ndMax(m_normalizedBrake * m_info.m_brakeTorque, m_normalizedHandBrake * m_info.m_handBrakeTorque);
 	if (brakeFrictionTorque > ndFloat32(0.0f))
 	{
+		m_IsAapplyingBreaks = true;
 		const ndFloat32 brakesToChassisInfluence = ndFloat32 (0.125f);
 
 		AddAngularRowJacobian(desc, matrix1.m_front, ndFloat32(0.0f));
@@ -204,10 +207,6 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 		SetHighFriction(desc, brakeFrictionTorque);
 		SetLowerFriction(desc, -brakeFrictionTorque);
 	}
-	//else if (m_vcdMode)
-	//{
-	//	ndAssert(0);
-	//}
 
 	// add suspension limits alone the vertical axis 
 	const ndFloat32 x = m_posit + m_speed * desc.m_timestep;

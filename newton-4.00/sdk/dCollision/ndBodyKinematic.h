@@ -34,7 +34,7 @@ class ndJointBilateralConstraint;
 #define	D_FREEZZING_VELOCITY_DRAG	ndFloat32 (0.9f)
 #define	D_SOLVER_MAX_ACCEL_ERROR	(D_FREEZE_MAG * ndFloat32 (0.5f))
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndBodyKinematic : public ndBody
 {
 	class ndContactkey
@@ -193,6 +193,17 @@ class ndBodyKinematic : public ndBody
 	D_COLLISION_API virtual void SetAcceleration(const ndVector& accel, const ndVector& alpha);
 	D_COLLISION_API virtual void EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeAccel2);
 
+	ndMatrix m_inertiaPrincipalAxis;
+	ndMatrix m_invWorldInertiaMatrix;
+	ndShapeInstance m_shapeInstance;
+	ndVector m_mass;
+	ndVector m_invMass;
+	ndVector m_accel;
+	ndVector m_alpha;
+	ndVector m_gyroAlpha;
+	ndVector m_gyroTorque;
+	ndQuaternion m_gyroRotation;
+
 	ndJointList m_jointList;
 	ndContactMap m_contactList;
 	mutable ndSpinLock m_lock;
@@ -211,19 +222,6 @@ class ndBodyKinematic : public ndBody
 	ndInt32 m_sceneNodeIndex;
 	ndInt32 m_buildBodyNodeIndex;
 	ndInt32 m_buildSceneNodeIndex;
-
-	ndMatrix m_inertiaPrincipalAxis;
-	ndMatrix m_invWorldInertiaMatrix;
-	ndShapeInstance m_shapeInstance;
-	ndVector m_mass;
-	ndVector m_invMass;
-	ndVector m_accel;
-	ndVector m_alpha;
-	ndVector m_gyroAlpha;
-	ndVector m_gyroTorque;
-	ndQuaternion m_gyroRotation;
-	D_MEMORY_ALIGN_FIXUP
-
 	D_COLLISION_API static ndVector m_velocTol;
 
 	friend class ndWorld;
@@ -242,7 +240,7 @@ class ndBodyKinematic : public ndBody
 	friend class ndDynamicsUpdateSycl;
 	friend class ndDynamicsUpdateCuda;
 	friend class ndJointBilateralConstraint;
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 
 class ndBodySentinel : public ndBodyKinematic

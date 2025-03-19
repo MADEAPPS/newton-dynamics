@@ -18,7 +18,7 @@
 #define D_MAX_DOUBLE_HINGE_RECOVERY_SPEED	ndFloat32 (0.25f)
 #define D_MAX_DOUBLE_HINGE_PENETRATION		(ndFloat32 (4.0f) * ndDegreeToRad)
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndJointDoubleHinge: public ndJointBilateralConstraint
 {
 	public:
@@ -73,8 +73,7 @@ class ndJointDoubleHinge: public ndJointBilateralConstraint
 
 	ndAxisParam m_axis0;
 	ndAxisParam m_axis1;
-	D_MEMORY_ALIGN_FIXUP
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 
 #endif 

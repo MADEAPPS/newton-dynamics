@@ -15,7 +15,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndIk6DofEffector: public ndJointBilateralConstraint
 {
 	public:
@@ -90,8 +90,7 @@ class ndIk6DofEffector: public ndJointBilateralConstraint
 			ndUnsigned8 m_axisZ	: 1;
 		};
 	};
-	D_MEMORY_ALIGN_FIXUP
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif 
 

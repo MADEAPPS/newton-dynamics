@@ -25,7 +25,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndWorldScene : public ndScene
 {
 	public:
@@ -39,9 +39,7 @@ class ndWorldScene : public ndScene
 	D_NEWTON_API virtual void WorkerUpdate(ndInt32 threadIndex);
 
 	ndWorld* m_world;
-
-	D_MEMORY_ALIGN_FIXUP
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 
 #endif

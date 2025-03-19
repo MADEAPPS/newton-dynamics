@@ -21,7 +21,7 @@
 // normally this is not important for non spherical objects, but for games like 
 // poll, pinball, bolling, golf or any other where the movement of balls is the main objective
 // the rolling friction is a real big problem.
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndJointDryRollingFriction: public ndJointBilateralConstraint
 {
 	public:
@@ -42,8 +42,7 @@ class ndJointDryRollingFriction: public ndJointBilateralConstraint
 
 	ndFloat32 m_coefficient;
 	ndFloat32 m_contactTrail;
-	D_MEMORY_ALIGN_FIXUP
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif 
 

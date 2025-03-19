@@ -24,7 +24,7 @@
 
 #include "ndShapeConvex.h"
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndShapeConvexHull : public ndShapeConvex
 {
 	class ndConvexBox;
@@ -62,8 +62,7 @@ class ndShapeConvexHull : public ndShapeConvex
 	ndInt32 m_soaVertexCount;
 	ndInt32 m_supportTreeCount;
 
-	D_MEMORY_ALIGN_FIXUP
-} D_GCC_NEWTON_ALIGN_32;
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif 
 
