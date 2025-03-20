@@ -60,7 +60,8 @@ ndWeakPtr<T>::~ndWeakPtr()
 }
 
 template <typename T>
-ndWeakPtr<T>& ndWeakPtr<T>::operator=(const ndWeakPtr<T>& other)
+//ndWeakPtr<T>& ndWeakPtr<T>::operator=(const ndWeakPtr<T>& other)
+ndWeakPtr<T>& ndWeakPtr<T>::operator=(const ndWeakPtr<T>&)
 {
 	ndAssert(0);
 	//sharedPtr = other.sharedPtr;

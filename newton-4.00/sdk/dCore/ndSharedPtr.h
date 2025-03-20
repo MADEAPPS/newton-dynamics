@@ -96,7 +96,7 @@ ndSharedPtr<T>::ndSharedPtr(const ndSharedPtr<T>& sp)
 template <typename T>
 ndSharedPtr<T>::~ndSharedPtr()
 {
-	int ref = m_references->Release();
+	ndInt32 ref = m_references->Release();
 	if (ref == 0)
 	{
 		if (m_ptr)
