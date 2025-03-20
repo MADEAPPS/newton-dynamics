@@ -45,22 +45,22 @@ ndThread::ndThread()
 #ifndef D_USE_THREAD_EMULATION
 	store(false);
 	#ifdef WIN32
-		native_handle_type nativeHandle = native_handle();
-		ndInt32 priority = GetThreadPriority(nativeHandle);
-		switch (priority)
-		{
-			case THREAD_PRIORITY_IDLE:
-			case THREAD_PRIORITY_LOWEST:
-			case THREAD_PRIORITY_NORMAL:
-			case THREAD_PRIORITY_BELOW_NORMAL:
-				SetThreadPriority(native_handle(), THREAD_PRIORITY_ABOVE_NORMAL);
-				break;
-
-			case THREAD_PRIORITY_HIGHEST:
-			case THREAD_PRIORITY_ABOVE_NORMAL:
-			case THREAD_PRIORITY_TIME_CRITICAL:
-			default:;
-		}
+		//native_handle_type nativeHandle = native_handle();
+		//ndInt32 priority = GetThreadPriority(nativeHandle);
+		//switch (priority)
+		//{
+		//	case THREAD_PRIORITY_IDLE:
+		//	case THREAD_PRIORITY_LOWEST:
+		//	case THREAD_PRIORITY_NORMAL:
+		//	case THREAD_PRIORITY_BELOW_NORMAL:
+		//		SetThreadPriority(native_handle(), THREAD_PRIORITY_ABOVE_NORMAL);
+		//		break;
+		//
+		//	case THREAD_PRIORITY_HIGHEST:
+		//	case THREAD_PRIORITY_ABOVE_NORMAL:
+		//	case THREAD_PRIORITY_TIME_CRITICAL:
+		//	default:;
+		//}
 	#else
 		// do the same for posit systems.
 		//int policy;
