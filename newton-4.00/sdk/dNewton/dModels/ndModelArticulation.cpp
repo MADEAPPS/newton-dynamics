@@ -303,7 +303,8 @@ void ndModelArticulation::AddCloseLoop(const ndSharedPtr<ndJointBilateralConstra
 	snprintf(loopName, sizeof (loopName), "loop_%d", m_closeLoops.GetCount());
 	if (name)
 	{
-		snprintf(loopName, sizeof(loopName), name);
+		ndAssert(0);
+		snprintf(loopName, sizeof(loopName), "loop_%s", name);
 	}
 
 	ndSharedPtr<ndBody> body;
