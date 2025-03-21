@@ -69,7 +69,7 @@ ndSharedNodeHierarchy<T>::~ndSharedNodeHierarchy ()
 {
 	while (m_children.GetCount())
 	{
-		ndList<ndSharedPtr<T>>::ndNode* const node = m_children.GetLast();
+		typename ndList<ndSharedPtr<T>>::ndNode* const node = m_children.GetLast();
 		T* const childParerent = *node->GetInfo();
 		childParerent->m_parent = nullptr;
 		m_children.Remove(node);
@@ -120,7 +120,6 @@ const T* ndSharedNodeHierarchy<T>::GetRoot() const
 }
 
 template<class T>
-//const ndSharedPtr<T>& ndSharedNodeHierarchy<T>::GetParent() const
 const T* ndSharedNodeHierarchy<T>::GetParent() const
 {
 	return m_parent;
