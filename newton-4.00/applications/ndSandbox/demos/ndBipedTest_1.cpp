@@ -23,6 +23,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
+#if 0
 namespace biped_1
 {
 	class ndDefinition
@@ -866,3 +867,4 @@ void ndBipedTest_1(ndDemoEntityManager* const scene)
 	origin.m_posit.m_y = 2.0f;
 	scene->SetCameraMatrix(rot, origin.m_posit);
 }
+#endif

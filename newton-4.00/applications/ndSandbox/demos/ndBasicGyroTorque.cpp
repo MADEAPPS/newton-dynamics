@@ -41,8 +41,9 @@ static void TippeTop(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat32
 	
 	ndMeshLoader loader;
 	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("tippeTop.fbx", scene));
+	//ndSharedPtr<ndDemoMeshInterface> mesh (modelMesh->GetFirstChild()->GetMesh());
+	ndSharedPtr<ndDemoMeshInterface> mesh(modelMesh->GetChildren().GetFirst()->GetInfo()->GetMesh());
 
-	ndSharedPtr<ndDemoMeshInterface> mesh (modelMesh->GetFirstChild()->GetMesh());
 	ndArray<ndVector> meshPoints;
 	((ndDemoMesh*)(*mesh))->GetVertexArray(meshPoints);
 	//ndArray<ndBigVector> points;
@@ -56,29 +57,27 @@ static void TippeTop(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat32
 	ndShapeInstance shape(new ndShapeConvexHull(ndInt32 (meshPoints.GetCount()), sizeof (ndVector), 0.0f, &meshPoints[0].m_x));
 	
 	ndVector omega(matrix.m_up.Scale (angularSpeed));
-	ndBodyKinematic* const body = new ndBodyDynamic();
-	ndDemoEntity* const entity = modelMesh->CreateClone();
+	ndSharedPtr<ndBody> body (new ndBodyDynamic());
+	ndSharedPtr<ndDemoEntity>entity (modelMesh->CreateClone());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	
 	body->SetOmega(omega);
 	body->SetMatrix(matrix);
-	body->SetCollisionShape(shape);
-	body->SetMassMatrix(mass, shape);
+	body->GetAsBodyDynamic()->SetCollisionShape(shape);
+	body->GetAsBodyDynamic()->SetMassMatrix(mass, shape);
 
-	ndVector inertia (body->GetMassMatrix());
+	ndVector inertia (body->GetAsBodyDynamic()->GetMassMatrix());
 	inertia.m_y *= .5f;
 	//inertia.m_x *= 1.75f;
 	//inertia.m_z *= 1.75f;
-	body->SetMassMatrix(inertia);
+	body->GetAsBodyDynamic()->SetMassMatrix(inertia);
 
 	ndVector com(body->GetCentreOfMass());
 	com.m_y -= 0.2f;
 	body->SetCentreOfMass(com);
 	
-	ndSharedPtr<ndBody> bodyPtr(body);
-	
 	ndPhysicsWorld* const world = scene->GetWorld();
-	world->AddBody(bodyPtr);
+	world->AddBody(body);
 	scene->AddEntity(entity);
 }
 
@@ -95,18 +94,17 @@ static void DzhanibekovEffect(ndDemoEntityManager* const scene, ndFloat32 mass, 
 	ndSharedPtr<ndDemoMeshInterface> mesh (new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.png", "marble.png", "marble.png"));
 
 	ndVector omega(0.1f, 0.0f, angularSpeed, 0.0f);
-	ndBodyKinematic* const body = new ndBodyDynamic();
-	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
+	ndSharedPtr<ndBody> body (new ndBodyDynamic());
+	ndSharedPtr<ndDemoEntity>entity (new ndDemoEntity(matrix));
 	entity->SetMesh(mesh);
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity, nullptr, 0.0f));
 
 	body->SetOmega(omega);
 	body->SetMatrix(matrix);
-	body->SetCollisionShape(shape);
-	body->SetMassMatrix(mass, shape);
+	body->GetAsBodyDynamic()->SetCollisionShape(shape);
+	body->GetAsBodyDynamic()->SetMassMatrix(mass, shape);
 
-	ndSharedPtr<ndBody> bodyPtr(body);
-	world->AddBody(bodyPtr);
+	world->AddBody(body);
 	scene->AddEntity(entity);
 }
 
@@ -125,18 +123,17 @@ static void Phitop(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat32 a
 	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.png", "marble.png", "marble.png"));
 
 	ndVector omega(0.0f, angularSpeed, 0.0f, 0.0f);
-	ndBodyKinematic* const body = new ndBodyDynamic();
-	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
+	ndSharedPtr<ndBody> body (new ndBodyDynamic());
+	ndSharedPtr<ndDemoEntity> entity (new ndDemoEntity(matrix));
 	entity->SetMesh(mesh);
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 
 	body->SetOmega(omega);
 	body->SetMatrix(matrix);
-	body->SetCollisionShape(shape);
-	body->SetMassMatrix(mass, shape);
+	body->GetAsBodyDynamic()->SetCollisionShape(shape);
+	body->GetAsBodyDynamic()->SetMassMatrix(mass, shape);
 
-	ndSharedPtr<ndBody> bodyPtr(body);
-	world->AddBody(bodyPtr);
+	world->AddBody(body);
 	scene->AddEntity(entity);
 }
 
@@ -157,23 +154,22 @@ static void RattleBack(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat
 
 	matrix = FindFloor(*world, matrix, shape, 200.0f);
 
-	ndBodyKinematic* const body = new ndBodyDynamic();
-	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
+	ndSharedPtr<ndBody> body (new ndBodyDynamic());
+	ndSharedPtr<ndDemoEntity> entity (new ndDemoEntity(matrix));
 	entity->SetMesh(mesh);
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 
 	body->SetMatrix(matrix);
-	body->SetCollisionShape(shape);
+	body->GetAsBodyDynamic()->SetCollisionShape(shape);
 	// skew the inertia matrix for rattle effect
 	shape.SetLocalMatrix(shapeMatrix);
-	body->SetMassMatrix(mass, shape, true);
+	body->GetAsBodyDynamic()->SetMassMatrix(mass, shape, true);
 	body->SetCentreOfMass(ndVector(0.0f, -0.1f, 0.0f, 0.0f));
 
 	ndVector omega(0.0f, speed, 0.0f, 0.0f);
 	body->SetOmega(omega);
 
-	ndSharedPtr<ndBody> bodyPtr(body);
-	world->AddBody(bodyPtr);
+	world->AddBody(body);
 	scene->AddEntity(entity);
 }
 
@@ -190,20 +186,19 @@ static void PrecessingTop(ndDemoEntityManager* const scene, const ndVector& orig
 
 	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.png", "marble.png", "marble.png"));
 
-	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
+	ndSharedPtr<ndDemoEntity> entity (new ndDemoEntity(matrix));
 	entity->SetMesh(mesh);
 	matrix.m_posit.m_y += 1.0f;
 
 	const ndFloat32 mass = 1.0f;
-	ndBodyKinematic* const body = new ndBodyDynamic();
+	ndSharedPtr<ndBody> body (new ndBodyDynamic());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
-	body->SetCollisionShape(shape);
-	body->SetMassMatrix(mass, shape);
+	body->GetAsBodyDynamic()->SetCollisionShape(shape);
+	body->GetAsBodyDynamic()->SetMassMatrix(mass, shape);
 	body->SetOmega(matrix.m_up.Scale(40.0f));
 
-	ndSharedPtr<ndBody> bodyPtr(body);
-	world->AddBody(bodyPtr);
+	world->AddBody(body);
 	scene->AddEntity(entity);
 }
 
@@ -231,26 +226,25 @@ static void CreateFlyWheel(ndDemoEntityManager* const scene, const ndVector& ori
 	matrix.m_posit.m_y += 5.0f;
 	matrix.m_posit.m_w = 1.0f;
 	
-	ndDemoEntity* const entity = new ndDemoEntity(ndGetIdentityMatrix(), nullptr);
+	ndSharedPtr<ndDemoEntity> entity (new ndDemoEntity(ndGetIdentityMatrix()));
 	
 	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("primitive", scene->GetShaderCache(), &flyWheelShape, "smilli.png", "smilli.png", "smilli.png"));
 	entity->SetMesh(mesh);
 	
-	ndBodyKinematic* const body = new ndBodyDynamic();
+	ndSharedPtr<ndBody> body (new ndBodyDynamic());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
-	body->SetCollisionShape(flyWheelShape);
-	body->SetMassMatrix(mass, flyWheelShape);
+	body->GetAsBodyDynamic()->SetCollisionShape(flyWheelShape);
+	body->GetAsBodyDynamic()->SetMassMatrix(mass, flyWheelShape);
 	
 	ndVector omega(matrix.m_front.Scale (speed));
 	body->SetOmega(omega);
 	
 	matrix.m_posit -= matrix.m_front.Scale(lenght * 0.5f);
 	//ndJointSpherical* const joint = new ndJointSpherical(matrix, *body, world->GetSentinelBody());
-	ndSharedPtr<ndJointBilateralConstraint> joint (new ndJointSpherical(matrix, body, world->GetSentinelBody()));
+	ndSharedPtr<ndJointBilateralConstraint> joint (new ndJointSpherical(matrix, body->GetAsBodyDynamic(), world->GetSentinelBody()));
 	
-	ndSharedPtr<ndBody> bodyPtr(body);
-	world->AddBody(bodyPtr);
+	world->AddBody(body);
 	world->AddJoint(joint);
 	scene->AddEntity(entity);
 }

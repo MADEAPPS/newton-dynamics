@@ -16,6 +16,7 @@
 #include "ndDemoDebrisEntity.h"
 #include "ndDemoEntityManager.h"
 
+#if 0
 ndDemoDebrisMesh::ndDemoDebrisMesh(ndDemoDebrisMesh* const srcMesh, const ndArray<glDebrisPoint>& vertexArray)
 	:ndDemoMesh("vertexBufferMesh")
 {
@@ -275,3 +276,5 @@ void ndDemoDebrisRootEntity::Render(ndFloat32 timestep, ndDemoEntityManager* con
 	glBindVertexArray(0);
 	glUseProgram(0);
 }
+
+#endif

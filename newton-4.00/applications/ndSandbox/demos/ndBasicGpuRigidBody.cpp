@@ -23,19 +23,21 @@
 
 
 static void AddShape(ndDemoEntityManager* const scene, const ndMatrix& location,
-	ndDemoInstanceEntity* const rootEntity,
+	//ndDemoInstanceEntity* const rootEntity,
+	ndSharedPtr<ndDemoEntity>& root,
 	const ndShapeInstance& shape, ndFloat32 mass, ndFloat32 density)
 {
 	ndMatrix matrix(location);
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	ndBodyKinematic* const body = new ndBodyDynamic();
-	ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
+	ndSharedPtr<ndBody> body (new ndBodyDynamic());
+	ndSharedPtr<ndDemoEntity> entity (new ndDemoEntity(matrix));
+	root->AddChild(entity);
 
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
-	body->SetCollisionShape(shape);
-	body->SetMassMatrix(mass, shape);
+	body->GetAsBodyDynamic()->SetCollisionShape(shape);
+	body->GetAsBodyDynamic()->SetMassMatrix(mass, shape);
 
 	const ndVector omega(ndGaussianRandom(0.0f, 2.0f), ndGaussianRandom(0.0f, 4.0f), ndGaussianRandom(0.0f, 3.0f), 0.0f);
 	body->SetOmega(omega);
@@ -46,10 +48,9 @@ static void AddShape(ndDemoEntityManager* const scene, const ndMatrix& location,
 	// save the density with the body shape.
 	ndShapeMaterial material;
 	material.m_userParam[ndDemoContactCallback::m_density].m_floatData = density;
-	body->GetCollisionShape().SetMaterial(material);
+	body->GetAsBodyDynamic()->GetCollisionShape().SetMaterial(material);
 
-	ndSharedPtr<ndBody> bodyPtr(body);
-	world->AddBody(bodyPtr);
+	world->AddBody(body);
 }
 
 //static void AddSphere(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 density)
@@ -105,7 +106,8 @@ static void AddBox(ndDemoEntityManager* const scene, const ndVector& origin, ndF
 
 	ndSharedPtr<ndDemoMeshIntance> geometry (new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.png", "marble.png", "marble.png"));
 
-	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
+	//ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
+	ndSharedPtr<ndDemoEntity>rootEntity(new ndDemoInstanceEntity(geometry));
 	scene->AddEntity(rootEntity);
 
 	ndFloat32 step = 4.0f;

@@ -21,11 +21,12 @@ class ndShaderCache;
 class ndDemoMeshInterface;
 class ndShadowMapRenderPass;
 
-class ndDemoEntity: public ndNodeHierarchy<ndDemoEntity>
+//class ndDemoEntity: public ndNodeHierarchy<ndDemoEntity>
+class ndDemoEntity : public ndSharedNodeHierarchy<ndDemoEntity>
 {
 	public:
+	ndDemoEntity(const ndMatrix& matrix);
 	ndDemoEntity(const ndDemoEntity& copyFrom);
-	ndDemoEntity(const ndMatrix& matrix, ndDemoEntity* const parent);
 	ndDemoEntity(ndDemoEntityManager* const scene, ndMesh* const meshEffect);
 	virtual ~ndDemoEntity(void);
 
@@ -57,8 +58,9 @@ class ndDemoEntity: public ndNodeHierarchy<ndDemoEntity>
 	void RenderSkeleton(ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
 	virtual void Render(ndFloat32 timeStep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
 
-	ndDemoEntity* Find(const char* const name) const;
+	//ndDemoEntity* Find(const char* const name) const;
 	ndDemoEntity* FindBySubString(const char* const subString) const;
+	ndSharedPtr<ndDemoEntity> Find(const ndSharedPtr<ndDemoEntity>& self, const char* const name) const;
 
 	const ndString& GetName() const;
 	void SetName(const ndString& name);
@@ -80,7 +82,7 @@ class ndDemoEntity: public ndNodeHierarchy<ndDemoEntity>
 
 	ndMatrix m_meshMatrix;
 	ndSharedPtr<ndDemoMeshInterface> m_mesh;
-	ndList <ndDemoEntity*>::ndNode* m_rootNode;
+	ndList <ndSharedPtr<ndDemoEntity>>::ndNode* m_rootNode;
 	ndString m_name;
 	ndSpinLock m_lock;
 	bool m_isDead;

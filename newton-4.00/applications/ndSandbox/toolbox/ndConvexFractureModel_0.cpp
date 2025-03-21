@@ -21,6 +21,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndConvexFractureModel_0.h"
 
+#if 0
 class ndFaceArrayDatabase : public ndShapeDebugNotify
 {
 	public:
@@ -448,3 +449,5 @@ else
 		}
 	}
 }
+
+#endif

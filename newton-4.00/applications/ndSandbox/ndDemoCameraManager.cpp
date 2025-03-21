@@ -73,7 +73,7 @@ ndDemoCameraManager::~ndDemoCameraManager()
 	{
 		ResetPickBody();
 	}
-	delete m_camera;
+	//delete m_camera;
 }
 
 void ndDemoCameraManager::SetCameraMatrix(const ndQuaternion& rotation, const ndVector& position)
@@ -229,7 +229,7 @@ void ndDemoCameraManager::InterpolateMatrices (ndDemoEntityManager* const scene,
 
 	for (ndDemoEntityManager::ndNode* node = scene->GetFirst(); node; node = node->GetNext()) 
 	{
-		ndDemoEntity* const entity = node->GetInfo();
+		ndDemoEntity* const entity = *node->GetInfo();
 		entity->InterpolateMatrix(param);
 	}
 

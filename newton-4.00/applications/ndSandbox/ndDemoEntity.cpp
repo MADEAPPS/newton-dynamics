@@ -16,15 +16,13 @@
 #include "ndDemoCamera.h"
 #include "ndDemoSkinMesh.h"
 
-static int xxxxxxxx;
-
-ndDemoEntity::ndDemoEntity(const ndMatrix& matrix, ndDemoEntity* const parent)
-	:ndNodeHierarchy<ndDemoEntity>()
-	,m_matrix(matrix) 
-	,m_curPosition (matrix.m_posit)
-	,m_nextPosition (matrix.m_posit)
-	,m_curRotation (matrix)
-	,m_nextRotation (matrix)
+ndDemoEntity::ndDemoEntity(const ndMatrix& matrix)
+	:ndSharedNodeHierarchy<ndDemoEntity>()
+	,m_matrix(matrix)
+	,m_curPosition(matrix.m_posit)
+	,m_nextPosition(matrix.m_posit)
+	,m_curRotation(matrix)
+	,m_nextRotation(matrix)
 	,m_meshMatrix(ndGetIdentityMatrix())
 	,m_mesh()
 	,m_rootNode(nullptr)
@@ -34,14 +32,10 @@ ndDemoEntity::ndDemoEntity(const ndMatrix& matrix, ndDemoEntity* const parent)
 	,m_isVisible(true)
 	,m_castShadow(true)
 {
-	if (parent) 
-	{
-		Attach(parent);
-	}
 }
 
 ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMesh* const meshEffectNode)
-	:ndNodeHierarchy<ndDemoEntity>()
+	:ndSharedNodeHierarchy<ndDemoEntity>()
 	,m_matrix(meshEffectNode->m_matrix)
 	,m_curPosition(meshEffectNode->m_matrix.m_posit)
 	,m_nextPosition(meshEffectNode->m_matrix.m_posit)
@@ -56,9 +50,9 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMesh* const meshE
 	,m_isVisible(true)
 	,m_castShadow(true)
 {
-	ndInt32 stack = 1;
-	ndMesh* effectNodeBuffer[256];
-	ndDemoEntity* parentEntityBuffer[256];
+	ndFixSizeArray<ndMesh*, 1024> effectNodeBuffer;
+	ndFixSizeArray<ndDemoEntity*, 1024> parentEntityBuffer;
+
 	struct EntityMeshPair
 	{
 		EntityMeshPair()
@@ -66,25 +60,30 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMesh* const meshE
 		}
 
 		EntityMeshPair(ndDemoEntity* const entity, ndMesh* const effectNode)
-			:m_entity(entity)
-			,m_effectNode(effectNode)
+			:m_effectNode(effectNode)
+			,m_entity(entity)
 		{
 		}
-		ndDemoEntity* m_entity;
+
 		ndMesh* m_effectNode;
+		ndDemoEntity* m_entity;
 	};
-	ndFixSizeArray<EntityMeshPair, 1024> meshArray;
+	ndFixSizeArray<EntityMeshPair, 1024> meshList;
 
 	bool isRoot = true;
-	effectNodeBuffer[0] = meshEffectNode;
-	parentEntityBuffer[0] = nullptr;
-	while (stack)
+	parentEntityBuffer.PushBack(nullptr);
+	effectNodeBuffer.PushBack(meshEffectNode);
+	while (effectNodeBuffer.GetCount())
 	{
-		stack--;
-		ndDemoEntity* const parent = parentEntityBuffer[stack];
-		ndMesh* const effectNode = effectNodeBuffer[stack];
+		ndMesh* const effectNode = effectNodeBuffer.Pop();
+		ndDemoEntity* const parent = parentEntityBuffer.Pop();
 
-		ndDemoEntity* const entity = isRoot ? this : new ndDemoEntity(effectNode->m_matrix, parent);
+		ndDemoEntity* entity = isRoot ? this : new ndDemoEntity(effectNode->m_matrix);
+		if (!isRoot)
+		{
+			ndSharedPtr<ndDemoEntity> sharedEnt(entity);
+			parent->AddChild(sharedEnt);
+		}
 		isRoot = false;
 
 		entity->SetName(effectNode->GetName().GetStr());
@@ -92,28 +91,28 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMesh* const meshE
 		ndSharedPtr<ndMeshEffect> meshEffect (effectNode->GetMesh());
 		if (*meshEffect)
 		{
-			meshArray.PushBack(EntityMeshPair(entity, effectNode));
+			meshList.PushBack(EntityMeshPair(entity, effectNode));
 		}
 
 		for (ndMesh* child = effectNode->GetLastChild(); child; child = child->GetPrev())
 		{
-			effectNodeBuffer[stack] = child;
-			parentEntityBuffer[stack] = entity;
-			stack++;
+			effectNodeBuffer.PushBack(child);
+			parentEntityBuffer.PushBack(entity);
 		}
 	}
 
-	for (ndInt32 i = 0; i < meshArray.GetCount(); ++i)
+	for (ndInt32 i = 0; i < meshList.GetCount(); ++i)
 	{
 		ndDemoMeshInterface* mesh = nullptr;
-		ndDemoEntity* const entity = meshArray[i].m_entity;
-		ndMesh* const effectNode = meshArray[i].m_effectNode;
+		ndDemoEntity* const entity = meshList[i].m_entity;
+		ndMesh* const effectNode = meshList[i].m_effectNode;
 
 		ndAssert(effectNode);
 		ndSharedPtr<ndMeshEffect> meshEffect (effectNode->GetMesh());
 		if (meshEffect->GetVertexWeights().GetCount())
 		{
-			mesh = new ndDemoSkinMesh(entity, *meshEffect, scene->GetShaderCache());
+			ndAssert(0);
+			//mesh = new ndDemoSkinMesh(entity, *meshEffect, scene->GetShaderCache());
 		}
 		else
 		{
@@ -131,7 +130,7 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMesh* const meshE
 }
 
 ndDemoEntity::ndDemoEntity(const ndDemoEntity& copyFrom)
-	:ndNodeHierarchy<ndDemoEntity>(copyFrom)
+	:ndSharedNodeHierarchy<ndDemoEntity>(copyFrom)
 	,m_matrix(copyFrom.m_matrix)
 	,m_curPosition(copyFrom.m_curPosition)
 	,m_nextPosition(copyFrom.m_nextPosition)
@@ -229,22 +228,36 @@ ndMatrix ndDemoEntity::GetNextMatrix () const
 
 ndMatrix ndDemoEntity::CalculateGlobalMatrix (const ndDemoEntity* const root) const
 {
-	ndMatrix matrix (ndGetIdentityMatrix());
-	for (const ndDemoEntity* ptr = this; ptr != root; ptr = ptr->GetParent()) 
+	//ndMatrix matrix (ndGetIdentityMatrix());
+	//for (const ndDemoEntity* ptr = this; ptr != root; ptr = ptr->GetParent()) 
+	//{
+	//	matrix = matrix * ptr->GetCurrentMatrix ();
+	//}
+
+	ndMatrix matrix(GetCurrentMatrix());
+	if (this != root)
 	{
-		matrix = matrix * ptr->GetCurrentMatrix ();
+		for (const ndDemoEntity* ptr = GetParent(); ptr != root; ptr = ptr->GetParent())
+		{
+			matrix = matrix * ptr->GetCurrentMatrix();
+		}
 	}
 	return matrix;
 }
 
-ndMatrix ndDemoEntity::CalculateInterpolatedGlobalMatrix (const ndDemoEntity* const root) const
+//ndMatrix ndDemoEntity::CalculateInterpolatedGlobalMatrix (const ndDemoEntity* const root) const
+ndMatrix ndDemoEntity::CalculateInterpolatedGlobalMatrix(const ndDemoEntity* const) const
 {
+	ndAssert(0);
+	return ndMatrix();
+#if 0
 	ndMatrix matrix (ndGetIdentityMatrix());
 	for (const ndDemoEntity* ptr = this; ptr != root; ptr = ptr->GetParent()) 
 	{
 		matrix = matrix * ptr->m_matrix;
 	}
 	return matrix;
+#endif
 }
 
 void ndDemoEntity::SetMatrix(const ndQuaternion& rotation, const ndVector& position)
@@ -292,9 +305,10 @@ void ndDemoEntity::InterpolateMatrix(ndFloat32 param)
 		m_matrix = ndCalculateMatrix(rotation, posit);
 	}
 
-	for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext()) 
+	//for (ndSharedPtr<ndDemoEntity> child(GetFirstChild()); *child; child = child->GetNext())
+	for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = GetChildren().GetFirst(); node; node = node->GetNext())
 	{
-		child->InterpolateMatrix(param);
+		node->GetInfo()->InterpolateMatrix(param);
 	}
 }
 
@@ -311,7 +325,8 @@ const ndMatrix& ndDemoEntity::GetRenderMatrix () const
 	return m_matrix;
 }
 
-void ndDemoEntity::RenderBone(ndDemoEntityManager* const scene, const ndMatrix& nodeMatrix) const
+//void ndDemoEntity::RenderBone(ndDemoEntityManager* const scene, const ndMatrix& nodeMatrix) const
+void ndDemoEntity::RenderBone(ndDemoEntityManager* const, const ndMatrix&) const
 {
 	class ndSkelDebug : public ndConstraintDebugCallback
 	{
@@ -374,6 +389,9 @@ void ndDemoEntity::RenderBone(ndDemoEntityManager* const scene, const ndMatrix& 
 		glVector3 m_line[2];
 	};
 
+	ndAssert(0);
+
+#if 0
 	ndSkelDebug debug(scene);
 	ndDemoEntity* const parent = GetParent();
 	if (parent)
@@ -387,43 +405,70 @@ void ndDemoEntity::RenderBone(ndDemoEntityManager* const scene, const ndMatrix& 
 		debug.SetScale(0.125f);
 		debug.DrawFrame(nodeMatrix);
 	}
+#endif
 }
 
 void ndDemoEntity::RenderSkeleton(ndDemoEntityManager* const scene, const ndMatrix& matrix) const
 {
 	ndMatrix nodeMatrix(m_matrix * matrix);
 	RenderBone(scene, nodeMatrix);
+
+	ndAssert(0);
+#if 0
 	for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
 	{
 		child->RenderSkeleton(scene, nodeMatrix);
 	}
+#endif
 }
 
+//ndDemoEntity* ndDemoEntity::Find(const char* const name) const
+//{
+//	ndAssert(0);
+//	ndString string(name);
+//
+//	ndFixSizeArray<const ndDemoEntity*, 1024> pool;
+//	pool.PushBack(this);
+//	while (pool.GetCount())
+//	{
+//		const ndDemoEntity* const entity = pool.Pop();
+//		const ndString& entName = entity->GetName();
+//		if (entName == string)
+//		{
+//			return (ndDemoEntity*) entity;
+//		}
+//
+//		for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = entity->GetChildren().GetFirst(); node; node = node->GetNext())
+//		{
+//			pool.PushBack(*node->GetInfo());
+//		}
+//	}
+//	return nullptr;
+//}
 
-ndDemoEntity* ndDemoEntity::Find(const char* const name) const
+ndSharedPtr<ndDemoEntity> ndDemoEntity::Find(const ndSharedPtr<ndDemoEntity>& self, const char* const name) const
 {
 	ndString string(name);
+	ndAssert(this == *self);
 
-	ndInt32 stack = 1;
-	const ndDemoEntity* pool[1024 * 4];
-	pool[0] = this;
-	while (stack)
+	ndList<ndSharedPtr<ndDemoEntity>> stack;
+	stack.Append(self);
+	while (stack.GetCount())
 	{
-		stack--;
-		const ndDemoEntity* const entity = pool[stack];
-		if (entity->GetName() == string)
+		ndSharedPtr<ndDemoEntity> entity = stack.GetLast()->GetInfo();
+		stack.Remove(stack.GetLast());
+		const ndString& entName = entity->GetName();
+		if (entName == string)
 		{
-			return (ndDemoEntity*) entity;
+			return entity;
 		}
-
-		for (ndDemoEntity* child = entity->GetFirstChild(); child; child = child->GetNext())
+	
+		for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = entity->GetChildren().GetFirst(); node; node = node->GetNext())
 		{
-			pool[stack] = child;
-			stack++;
-			ndAssert(stack < sizeof(pool) / sizeof(pool[0]));
+			stack.Append(node->GetInfo());
 		}
 	}
-	return nullptr;
+	return ndSharedPtr<ndDemoEntity>();
 }
 
 ndDemoEntity* ndDemoEntity::FindBySubString(const char* const subString) const
@@ -454,12 +499,15 @@ ndDemoEntity* ndDemoEntity::FindBySubString(const char* const subString) const
 			return (ndDemoEntity*)entity;
 		}
 
+		ndAssert(0);
+#if 0
 		for (ndDemoEntity* child = entity->GetFirstChild(); child; child = child->GetNext())
 		{
 			pool[stack] = child;
 			stack++;
 			ndAssert(stack < sizeof(pool) / sizeof(pool[0]));
 		}
+#endif
 	}
 
 	
@@ -533,15 +581,16 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 	ndArray<ndVector> points;
 	
 	shapeArray.PushBack(nullptr);
-	for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
+	//for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
+	for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = GetChildren().GetFirst(); node; node = node->GetNext())
 	{
-		ndString tmpName(child->GetName());
+		ndString tmpName(node->GetInfo()->GetName());
 		tmpName.ToLower();
 		const char* const name = tmpName.GetStr();
 	
 		if (strstr (name, "sphere")) 
 		{
-			ndDemoMesh* const mesh = (ndDemoMesh*)*child->GetMesh();
+			ndDemoMesh* const mesh = (ndDemoMesh*)*node->GetInfo()->GetMesh();
 			ndAssert(mesh);
 			mesh->GetVertexArray(points);
 
@@ -557,13 +606,13 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 			alighMatrix.m_posit = ndVector::m_half * (maxP + minP);
 			alighMatrix.m_posit.m_w = ndFloat32(1.0f);
 
-			const ndMatrix matrix(alighMatrix * child->GetMeshMatrix() * child->GetCurrentMatrix());
+			const ndMatrix matrix(alighMatrix * node->GetInfo()->GetMeshMatrix() * node->GetInfo()->GetCurrentMatrix());
 			shapeArray.PushBack(new ndShapeInstance(new ndShapeSphere(size.m_x)));
 			shapeArray[shapeArray.GetCount()-1]->SetLocalMatrix(matrix);
 		} 
 		else if (strstr (name, "box")) 
 		{
-			ndDemoMesh* const mesh = (ndDemoMesh*)*child->GetMesh();
+			ndDemoMesh* const mesh = (ndDemoMesh*)*node->GetInfo()->GetMesh();
 			ndAssert(mesh);
 			mesh->GetVertexArray(points);
 			
@@ -582,12 +631,12 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 			alighMatrix.m_posit = ndVector::m_half * (maxP + minP);
 			alighMatrix.m_posit.m_w = ndFloat32(1.0f);
 
-			const ndMatrix matrix(alighMatrix * child->GetMeshMatrix() * child->GetCurrentMatrix());
+			const ndMatrix matrix(alighMatrix * node->GetInfo()->GetMeshMatrix() * node->GetInfo()->GetCurrentMatrix());
 			shapeArray[shapeArray.GetCount() - 1]->SetLocalMatrix(matrix);
 		} 
 		else if (strstr (name, "capsule")) 
 		{
-			ndDemoMesh* const mesh = (ndDemoMesh*)*child->GetMesh();
+			ndDemoMesh* const mesh = (ndDemoMesh*)*node->GetInfo()->GetMesh();
 			ndAssert(mesh);
 			mesh->GetVertexArray(points);
 			ndVector minP(ndFloat32(1.0e10f));
@@ -604,24 +653,24 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 			alighMatrix.m_posit = origin;
 			alighMatrix.m_posit.m_w = ndFloat32(1.0f);
 
-			const ndMatrix matrix(alighMatrix * child->GetMeshMatrix() * child->GetCurrentMatrix());
+			const ndMatrix matrix(alighMatrix * node->GetInfo()->GetMeshMatrix() * node->GetInfo()->GetCurrentMatrix());
 
 			shapeArray.PushBack(new ndShapeInstance(new ndShapeCapsule(size.m_x, size.m_x, high)));
 			shapeArray[shapeArray.GetCount() - 1]->SetLocalMatrix(matrix);
 		} 
 		else if (strstr(name, "convexhull")) 
 		{
-			ndDemoMesh* const mesh = (ndDemoMesh*)*child->GetMesh();
+			ndDemoMesh* const mesh = (ndDemoMesh*)*node->GetInfo()->GetMesh();
 			ndAssert(mesh);
 			mesh->GetVertexArray(points);
 			shapeArray.PushBack(new ndShapeInstance(new ndShapeConvexHull(mesh->m_vertexCount, sizeof(ndVector), 0.01f, &points[0].m_x)));
-			const ndMatrix matrix(child->GetMeshMatrix() * child->GetCurrentMatrix());
+			const ndMatrix matrix(node->GetInfo()->GetMeshMatrix() * node->GetInfo()->GetCurrentMatrix());
 			shapeArray[shapeArray.GetCount() - 1]->SetLocalMatrix(matrix);
 		}
 		else if (strstr(name, "vhacd"))
 		{
 			ndArray<ndInt32> indices;
-			ndDemoMesh* const mesh = (ndDemoMesh*)*child->GetMesh();
+			ndDemoMesh* const mesh = (ndDemoMesh*)*node->GetInfo()->GetMesh();
 			ndAssert(mesh);
 			mesh->GetVertexArray(points);
 			mesh->GetIndexArray(indices);
@@ -656,7 +705,7 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 					convexMeshPoints[j] = p;
 				}
 				shapeArray.PushBack(new ndShapeInstance(new ndShapeConvexHull(ndInt32(convexMeshPoints.GetCount()), sizeof(ndVector), 0.01f, &convexMeshPoints[0].m_x)));
-				const ndMatrix matrix(child->GetMeshMatrix() * child->GetCurrentMatrix());
+				const ndMatrix matrix(node->GetInfo()->GetMeshMatrix() * node->GetInfo()->GetCurrentMatrix());
 				shapeArray[shapeArray.GetCount() - 1]->SetLocalMatrix(matrix);
 			}
 
@@ -698,9 +747,11 @@ void ndDemoEntity::Render(ndFloat32 timestep, ndDemoEntityManager* const scene, 
 	}
 
 	//RenderBone(scene, nodeMatrix);
-	for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
+	//for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
+	//for (ndSharedPtr<ndDemoEntity> child(GetFirstChild()); *child; child = child->GetNext())
+	for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = GetChildren().GetFirst(); node; node = node->GetNext())
 	{
-		child->Render(timestep, scene, nodeMatrix);
+		node->GetInfo()->Render(timestep, scene, nodeMatrix);
 	}
 }
 
@@ -716,8 +767,10 @@ void ndDemoEntity::RenderShadowMap(ndShadowMapRenderPass* const shadowMap, const
 		mesh->RenderShadowMap(shadowMap, modelMatrix);
 	}
 
-	for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
+	//for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
+	//for (ndSharedPtr<ndDemoEntity> child(GetFirstChild()); *child; child = child->GetNext())
+	for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = GetChildren().GetFirst(); node; node = node->GetNext())
 	{
-		child->RenderShadowMap(shadowMap, nodeMatrix);
+		node->GetInfo()->RenderShadowMap(shadowMap, nodeMatrix);
 	}
 }

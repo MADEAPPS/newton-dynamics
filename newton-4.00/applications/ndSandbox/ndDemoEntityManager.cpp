@@ -44,8 +44,8 @@
 //#define DEFAULT_SCENE	9		// static mesh collision 
 //#define DEFAULT_SCENE	10		// static user mesh collision 
 //#define DEFAULT_SCENE	11		// basic joints
-#define DEFAULT_SCENE	12		// basic vehicle
-//#define DEFAULT_SCENE	13		// heavy vehicle
+//#define DEFAULT_SCENE	12		// basic vehicle
+#define DEFAULT_SCENE	13		// heavy vehicle
 //#define DEFAULT_SCENE	14		// background vehicle prop
 //#define DEFAULT_SCENE	15		// basic player
 //#define DEFAULT_SCENE	16		// rag doll
@@ -117,24 +117,24 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic joints", ndBasicJoints },
 	{ "basic vehicle", ndBasicVehicle },
 	{ "heavy vehicle", ndHeavyVehicle },
-	{ "low lod vehicle", ndBagroundLowLodVehicle },
-	{ "basic player", ndPlayerCapsuleDemo },
-	{ "rag doll", ndRagdollTest },
-	{ "cartpole discrete controller", ndCartpoleDiscrete },
-	{ "cartpole continue controller", ndCartpoleContinue },
-	{ "unicycle controller", ndUnicycleController },
-	{ "simple industrial robot", ndSimpleIndustrialRobot },
-	{ "advanced industrial robot", ndAdvancedIndustrialRobot },
-	{ "quadruped test one", ndQuadrupedTest_1 },
-	{ "quadruped test two", ndQuadrupedTest_2 },
-	{ "quadruped test three", ndQuadrupedTest_3},
-	{ "biped test one", ndBipedTest_1 },
-	{ "biped test two", ndBipedTest_2 },
-	{ "train biped test two", ndBipedTest_2Trainer },
-	{ "simple convex fracture", ndBasicExplodeConvexShape },
-	//{ "basic convex fracture", ndBasicFracture_0 },
-	//{ "linked convex fracture", ndBasicFracture_2 },
-	//{ "simple skin peeling fracture", ndBasicFracture_4 },
+//	{ "low lod vehicle", ndBagroundLowLodVehicle },
+//	{ "basic player", ndPlayerCapsuleDemo },
+//	{ "rag doll", ndRagdollTest },
+//	{ "cartpole discrete controller", ndCartpoleDiscrete },
+//	{ "cartpole continue controller", ndCartpoleContinue },
+//	{ "unicycle controller", ndUnicycleController },
+//	{ "simple industrial robot", ndSimpleIndustrialRobot },
+//	{ "advanced industrial robot", ndAdvancedIndustrialRobot },
+//	{ "quadruped test one", ndQuadrupedTest_1 },
+//	{ "quadruped test two", ndQuadrupedTest_2 },
+//	{ "quadruped test three", ndQuadrupedTest_3},
+//	{ "biped test one", ndBipedTest_1 },
+//	{ "biped test two", ndBipedTest_2 },
+//	{ "train biped test two", ndBipedTest_2Trainer },
+//	{ "simple convex fracture", ndBasicExplodeConvexShape },
+//	//{ "basic convex fracture", ndBasicFracture_0 },
+//	//{ "linked convex fracture", ndBasicFracture_2 },
+//	//{ "simple skin peeling fracture", ndBasicFracture_4 },
 };
 
 ndDemoEntityManager::ButtonKey::ButtonKey (bool state)
@@ -800,18 +800,18 @@ void ndDemoEntityManager::ResetTimer()
 	m_microsecunds = ndGetTimeInMicroseconds ();
 }
 
-void ndDemoEntityManager::AddEntity(ndDemoEntity* const ent)
+void ndDemoEntityManager::AddEntity(const ndSharedPtr<ndDemoEntity>& entity)
 {
 	ndScopeSpinLock lock(m_addDeleteLock);
-	ndAssert(!ent->m_rootNode);
-	ent->m_rootNode = Append(ent);
+	ndAssert(!entity->m_rootNode);
+	entity->m_rootNode = Append(entity);
 }
 
-void ndDemoEntityManager::RemoveEntity (ndDemoEntity* const ent)
+void ndDemoEntityManager::RemoveEntity (const ndSharedPtr<ndDemoEntity>& entity)
 {
 	ndScopeSpinLock lock(m_addDeleteLock);
-	ndAssert(ent->m_rootNode);
-	Remove(ent->m_rootNode);
+	ndAssert(entity->m_rootNode);
+	Remove(entity->m_rootNode);
 }
 
 void ndDemoEntityManager::Cleanup ()
@@ -870,9 +870,7 @@ void ndDemoEntityManager::Cleanup ()
 	// destroy all remaining visual objects
 	while (GetFirst())
 	{
-		ndDemoEntity* const ent = GetFirst()->GetInfo();
-		RemoveEntity(ent);
-		delete ent;
+		RemoveEntity(GetFirst()->GetInfo());
 	}
 	
 	// create the newton world

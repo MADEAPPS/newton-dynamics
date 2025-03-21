@@ -24,6 +24,7 @@
 #include "ndHeightFieldPrimitive.h"
 #include "ndMakeProceduralStaticMap.h"
 
+#if 0
 #define D_HEIGHTFIELD_GRID_SIZE     2.0f
 #define D_HEIGHTFIELD_WIDTH			16
 #define D_HEIGHTFIELD_HEIGHT		16
@@ -299,3 +300,4 @@ void ndBagroundLowLodVehicle(ndDemoEntityManager* const scene)
 	
 	AddAiVehicle(scene);
 }
+#endif

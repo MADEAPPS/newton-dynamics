@@ -39,16 +39,15 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 	matrix.m_posit.m_w = 1.0f;
 	matrix.m_posit.m_y += 2.0f;
 
-	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
+	ndSharedPtr<ndDemoEntity>entity = new ndDemoEntity(matrix);
 	entity->SetMesh(geometry);
 
-	ndBodyKinematic* body = new ndArchimedesBuoyancyVolume();
+	ndSharedPtr<ndBody> body (new ndArchimedesBuoyancyVolume());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
-	body->SetCollisionShape(box);
+	body->GetAsBodyKinematic()->SetCollisionShape(box);
 
-	ndSharedPtr<ndBody> bodyPtr(body);
-	world->AddBody(bodyPtr);
+	world->AddBody(body);
 	scene->AddEntity(entity);
 }
 

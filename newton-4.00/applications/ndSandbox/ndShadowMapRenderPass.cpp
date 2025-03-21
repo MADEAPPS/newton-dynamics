@@ -339,9 +339,9 @@ void ndShadowMapRenderPass::RenderScene(ndFloat32)
 		m_lighProjectionMatrix[i] = glMatrix(lightSpaceMatrix * m_lightProjectToTextureSpace * tileMatrix);
 
 		glViewport(vp_x, vp_y, m_width, m_height);
-		for (ndList<ndDemoEntity*>::ndNode* node = m_manager->GetFirst(); node; node = node->GetNext())
+		for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = m_manager->GetFirst(); node; node = node->GetNext())
 		{
-			ndDemoEntity* const entity = node->GetInfo();
+			ndDemoEntity* const entity = *node->GetInfo();
 			if (entity->CastShadow())
 			{
 				//if (i==3)

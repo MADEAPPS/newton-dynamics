@@ -310,7 +310,7 @@ ndDemoInstanceEntity::ndDemoInstanceEntity(const ndDemoInstanceEntity& copyFrom)
 }
 
 ndDemoInstanceEntity::ndDemoInstanceEntity(ndSharedPtr<ndDemoMeshIntance> instanceMesh)
-	:ndDemoEntity(ndGetIdentityMatrix(), nullptr)
+	:ndDemoEntity(ndGetIdentityMatrix())
 	,m_instanceMesh(instanceMesh)
 {
 }
@@ -330,7 +330,9 @@ void ndDemoInstanceEntity::Render(ndFloat32, ndDemoEntityManager* const scene, c
 	D_TRACKTIME();
 	//count active instances 
 	ndInt32 count = 0;
-	for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
+	//for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
+	//for (ndSharedPtr<ndDemoEntity> child(GetFirstChild()); *child; child = child->GetNext())
+	for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = GetChildren().GetFirst(); node; node = node->GetNext())
 	{
 		count++;
 	}
@@ -342,9 +344,11 @@ void ndDemoInstanceEntity::Render(ndFloat32, ndDemoEntityManager* const scene, c
 		ndArray<ndMatrix>& matrixStack = GetMatrixStack();
 		matrixStack.SetCount(count);
 
-		for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
+		//for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
+		//for (ndSharedPtr<ndDemoEntity> child(GetFirstChild()); *child; child = child->GetNext())
+		for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = GetChildren().GetFirst(); node; node = node->GetNext())
 		{
-			matrixStack[index] = child->GetCurrentMatrix();
+			matrixStack[index] = node->GetInfo()->GetCurrentMatrix();
 			index++;
 		}
 
@@ -359,7 +363,9 @@ void ndDemoInstanceEntity::Render(ndFloat32, ndDemoEntityManager* const scene, c
 void ndDemoInstanceEntity::RenderShadowMap(ndShadowMapRenderPass* const shadowMap, const ndMatrix& matrix)
 {
 	ndInt32 count = 0;
-	for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
+	//for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
+	//for (ndSharedPtr<ndDemoEntity> child(GetFirstChild()); *child; child = child->GetNext())
+	for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = GetChildren().GetFirst(); node; node = node->GetNext())
 	{
 		count++;
 	}
@@ -371,9 +377,11 @@ void ndDemoInstanceEntity::RenderShadowMap(ndShadowMapRenderPass* const shadowMa
 		ndArray<ndMatrix>& matrixStack = GetMatrixStack();
 		matrixStack.SetCount(count);
 
-		for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
+		//for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
+		//for (ndSharedPtr<ndDemoEntity> child(GetFirstChild()); *child; child = child->GetNext())
+		for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = GetChildren().GetFirst(); node; node = node->GetNext())
 		{
-			matrixStack[index] = child->GetCurrentMatrix();
+			matrixStack[index] = node->GetInfo()->GetCurrentMatrix();
 			index++;
 		}
 

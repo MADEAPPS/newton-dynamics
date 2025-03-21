@@ -15,34 +15,22 @@
 #include "ndPhysicsWorld.h"
 #include "ndDemoEntityNotify.h"
 
-ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyKinematic* const parentBody, ndFloat32 gravity)
+ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, const ndSharedPtr<ndDemoEntity>& entity, ndBodyKinematic* const parentBody, ndFloat32 gravity)
 	:ndModelBodyNotify(parentBody, ndVector(0.0f, gravity, 0.0f, 0.0f))
-	,m_entity(entity)
 	,m_manager(manager)
+	,m_entity(entity)
 {
 }
 
 ndDemoEntityNotify::ndDemoEntityNotify(const ndDemoEntityNotify& notify)
 	:ndModelBodyNotify(notify)
-	,m_entity(notify.m_entity)
 	,m_manager(notify.m_manager)
+	,m_entity(notify.m_entity)
 {
 }
 
 ndDemoEntityNotify::~ndDemoEntityNotify()
 {
-	if (m_entity)
-	{
-		if (m_entity->m_rootNode)
-		{
-			m_manager->GetWorld()->RemoveEntity(m_entity);
-		}
-		else
-		{
-			// it is a child mesh, probably an instance
-			delete m_entity;
-		}
-	}
 }
 
 void ndDemoEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)

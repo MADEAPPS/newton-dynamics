@@ -38,7 +38,7 @@ class ndDebugNotify : public ndShapeDebugNotify
 
 inline void RenderParticles(ndDemoEntityManager* const )
 {
-	ndAssert(0);
+	//ndAssert(0);
 }
 
 class ndDebugDisplay

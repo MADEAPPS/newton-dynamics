@@ -24,7 +24,7 @@ ndMatrix ndDemoCamera::m_worldToOpenGl(
 	ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32( 0.0f), ndFloat32(1.0f)));
 
 ndDemoCamera::ndDemoCamera()
-	:ndDemoEntity (ndGetIdentityMatrix(), nullptr) 
+	:ndDemoEntity (ndGetIdentityMatrix()) 
 	,m_viewMatrix(ndGetIdentityMatrix())
 	,m_invViewMatrix(ndGetIdentityMatrix())
 	,m_projectionMatrix(ndGetIdentityMatrix())

@@ -19,11 +19,12 @@
 #include "ndCompoundScene.h"
 #include "ndMakeStaticMap.h"
 #include "ndDemoDebugMesh.h"
+#include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndBasicPlayerCapsule.h"
 #include "ndHeightFieldPrimitive.h"
 
-#if 0
+#if 1
 void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 {
 	ndMatrix heighfieldLocation (ndGetIdentityMatrix());
@@ -39,8 +40,8 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	//BuildStaticMesh(scene, "track.fbx", false);
 	//BuildStaticMesh(scene, "testObject.fbx", false);
 	//BuildStaticMesh(scene, "marine_rocks_corsica.fbx", false);
-	BuildStaticMesh(scene, "marineRocks1.fbx", false);
-	//BuildStaticMesh(scene, "marineRocks2.fbx", false);
+	//BuildStaticMesh(scene, "marineRocks1.fbx", false);
+	BuildStaticMesh(scene, "marineRocks2.fbx", false);
 
 	ndMatrix location(ndGetIdentityMatrix());
 	location.m_posit.m_y += 2.0f;
@@ -95,7 +96,7 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	scene->SetCameraMatrix(rot, origin);
 }
 
-#elif 1
+#elif 0
 
 class CConvexCasterModelNotify : public ndModelNotify
 {
@@ -103,7 +104,7 @@ class CConvexCasterModelNotify : public ndModelNotify
 	{
 		public:
 		CConvexCastCallBack()
-			: ndConvexCastNotify()
+			:ndConvexCastNotify()
 		{}
 	
 		virtual ndUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const) override
@@ -195,16 +196,16 @@ static ndBodyKinematic* BuildHeightField(ndDemoEntityManager* const scene)
 
 	ndSharedPtr<ndDemoMeshInterface>geometry(new ndDemoMesh("box", scene->GetShaderCache(), &shape, "marbleCheckBoard.png", "marbleCheckBoard.png", "marbleCheckBoard.png", 1.0f, uvMatrix, false));
 	ndMatrix location(ndGetIdentityMatrix());
-	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
+	ndSharedPtr<ndDemoEntity>entity = new ndDemoEntity(location);
 	entity->SetMesh(geometry);
 
-	ndBodyKinematic* const body = new ndBodyDynamic();
+	ndSharedPtr<ndBody> body (new ndBodyDynamic());
 	body->SetMatrix(location);
-	body->SetCollisionShape(shape);
-	ndSharedPtr<ndBody> bodyPtr(body);
-	scene->GetWorld()->AddBody(bodyPtr);
+	body->GetAsBodyDynamic()->SetCollisionShape(shape);
+
+	scene->GetWorld()->AddBody(body);
 	scene->AddEntity(entity);
-	return body;
+	return body->GetAsBodyDynamic();
 }
 
 static void AddBody(ndDemoEntityManager* const scene)
@@ -224,7 +225,7 @@ void ndStaticMeshCollisionDemo(ndDemoEntityManager* const scene)
 	auto pFloorBody = BuildHeightField(scene);
 	AddBody(scene);
 
-	ndModel* const model = new ndModel();
+	ndSharedPtr<ndModel> model (new ndModel());
 	model->SetNotifyCallback(new CConvexCasterModelNotify(scene, pFloorBody));
 	//ndSharedPtr<ndModel> convexCaster(new CConvexCaster(scene, pFloorBody));
 	//scene->GetWorld()->AddModel(convexCaster);
@@ -236,6 +237,27 @@ void ndStaticMeshCollisionDemo(ndDemoEntityManager* const scene)
 }
 
 #else
+
+static ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInstance& shape, const ndMatrix& location, ndFloat32 mass, const char* const textName)
+{
+	ndPhysicsWorld* const world = scene->GetWorld();
+
+	ndMatrix matrix(FindFloor(*world, location, shape, 200.0f));
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, textName, textName, textName));
+
+	ndSharedPtr<ndBody> kinBody (new ndBodyDynamic());
+	ndSharedPtr<ndDemoEntity>entity(new ndDemoEntity(matrix));
+	entity->SetMesh(mesh);
+
+	kinBody->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+	kinBody->SetMatrix(matrix);
+	kinBody->GetAsBodyDynamic()->SetCollisionShape(shape);
+	kinBody->GetAsBodyDynamic()->SetMassMatrix(mass, shape);
+
+	world->AddBody(kinBody);
+	scene->AddEntity(entity);
+	return kinBody->GetAsBodyDynamic();
+}
 
 ndBodyKinematic* AddChamferCylinder(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius, ndFloat32 width, const char* const textName)
 {
@@ -270,14 +292,14 @@ static void BuildHeightField(ndDemoEntityManager* const scene)
 
 	ndSharedPtr<ndDemoMeshInterface>geometry(new ndDemoMesh("box", scene->GetShaderCache(), &shape, "marbleCheckBoard.png", "marbleCheckBoard.png", "marbleCheckBoard.png", 1.0f, uvMatrix, false));
 	ndMatrix location(ndGetIdentityMatrix());
-	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
+	ndSharedPtr<ndDemoEntity> entity (new ndDemoEntity(location));
 	entity->SetMesh(geometry);
 
-	ndBodyKinematic* const body = new ndBodyDynamic();
+	ndSharedPtr<ndBody> body (new ndBodyDynamic());
 	body->SetMatrix(location);
-	body->SetCollisionShape(shape);
-	ndSharedPtr<ndBody> bodyPtr(body);
-	scene->GetWorld()->AddBody(bodyPtr);
+	body->GetAsBodyDynamic()->SetCollisionShape(shape);
+	
+	scene->GetWorld()->AddBody(body);
 	scene->AddEntity(entity);
 }
 

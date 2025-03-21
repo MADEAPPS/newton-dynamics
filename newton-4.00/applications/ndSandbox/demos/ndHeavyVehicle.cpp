@@ -209,15 +209,16 @@ static ndDemoEntity* LoadVehicleMeshModel(ndDemoEntityManager* const scene, cons
 {
 	ndMeshLoader loader;
 	ndDemoEntity* const vehicleEntity = loader.LoadEntity(filename, scene);
-	scene->AddEntity(vehicleEntity);
 	return vehicleEntity;
 }
 
 static ndBodyKinematic* MakeChildPart(ndDemoEntityManager* const scene, ndBodyKinematic* const parentBody, const char* const partName, ndFloat32 mass)
 {
-	ndDemoEntity* const parentEntity = (ndDemoEntity*)parentBody->GetNotifyCallback()->GetUserData();
+	//ndDemoEntity* const parentEntity = (ndDemoEntity*)parentBody->GetNotifyCallback()->GetUserData();
+	ndVehicleEntityNotify* const notify = (ndVehicleEntityNotify*)parentBody->GetNotifyCallback();
+	ndSharedPtr<ndDemoEntity> parentEntity (notify->m_entity);
 
-	ndDemoEntity* const vehPart = parentEntity->Find(partName);
+	ndSharedPtr<ndDemoEntity> vehPart (parentEntity->Find(parentEntity, partName));
 	ndShapeInstance* const vehCollision = vehPart->CreateCollisionFromChildren();
 	ndSharedPtr<ndShapeInstance> vehCollisionPtr(vehCollision);
 
@@ -237,16 +238,17 @@ static ndMultiBodyVehicle* CreateFlatBedTruck(ndDemoEntityManager* const scene, 
 	vehicle->SetNotifyCallback(ndSharedPtr<ndModelNotify>(new ndVehicleCommonNotify(desc, vehicle, vehicleUI)));
 	ndVehicleCommonNotify* const notifyCallback = (ndVehicleCommonNotify*)*vehicle->GetNotifyCallback();
 
-	ndDemoEntity* const vehicleEntityDummyRoot = LoadVehicleMeshModel(scene, desc.m_name);
+	ndSharedPtr<ndDemoEntity> rootEntity (LoadVehicleMeshModel(scene, desc.m_name));
+	scene->AddEntity(rootEntity);
 
-	ndDemoEntity* const vehicleEntity = vehicleEntityDummyRoot->GetFirstChild();
-	vehicleEntity->ResetMatrix(vehicleEntity->CalculateGlobalMatrix() * matrix);
+	ndSharedPtr<ndDemoEntity> chassisEntity(rootEntity->GetChildren().GetFirst()->GetInfo());
+	chassisEntity->ResetMatrix(chassisEntity->CalculateGlobalMatrix() * matrix);
 
 	// 1- add chassis to the vehicle model 
 	// create the vehicle chassis as a normal rigid body
 	const ndVehicleDectriptor& configuration = notifyCallback->m_desc;
 
-	ndSharedPtr<ndBody> chassisBody(notifyCallback->CreateChassis(scene, vehicleEntity, configuration.m_chassisMass));
+	ndSharedPtr<ndBody> chassisBody(notifyCallback->CreateChassis(scene, chassisEntity, configuration.m_chassisMass));
 	vehicle->AddChassis(chassisBody);
 
 	ndBodyDynamic* const chassis = vehicle->GetChassis();
@@ -372,16 +374,17 @@ static ndMultiBodyVehicle* CreateLav25Vehicle(ndDemoEntityManager* const scene, 
 	vehicle->SetNotifyCallback(ndSharedPtr<ndModelNotify>(new TranspoterController(desc, vehicle, vehicleUI)));
 	TranspoterController* const notifyCallback = (TranspoterController*)*vehicle->GetNotifyCallback();
 
-	ndDemoEntity* const vehicleEntityDummyRoot = LoadVehicleMeshModel(scene, desc.m_name);
+	ndSharedPtr<ndDemoEntity> rootEntity(LoadVehicleMeshModel(scene, desc.m_name));
+	scene->AddEntity(rootEntity);
 
-	ndDemoEntity* const vehicleEntity = vehicleEntityDummyRoot->GetFirstChild();
-	vehicleEntity->ResetMatrix(vehicleEntity->CalculateGlobalMatrix() * matrix);
+	ndSharedPtr<ndDemoEntity> chassisEntity(rootEntity->GetChildren().GetFirst()->GetInfo());
+	chassisEntity->ResetMatrix(chassisEntity->CalculateGlobalMatrix() * matrix);
 
 	// 1- add chassis to the vehicle model 
 	// create the vehicle chassis as a normal rigid body
 	const ndVehicleDectriptor& configuration = notifyCallback->m_desc;
 
-	ndSharedPtr<ndBody> chassisBody(notifyCallback->CreateChassis(scene, vehicleEntity, configuration.m_chassisMass));
+	ndSharedPtr<ndBody> chassisBody(notifyCallback->CreateChassis(scene, chassisEntity, configuration.m_chassisMass));
 	vehicle->AddChassis(chassisBody);
 
 	ndBodyDynamic* const chassis = vehicle->GetChassis();
@@ -464,8 +467,9 @@ static ndMultiBodyVehicle* CreateLav25Vehicle(ndDemoEntityManager* const scene, 
 		vehicle->AddLimb(turretNode, canonBody, cannonHinge);
 		
 		// link the effector for controlling the turret
-		ndDemoEntity* const turretEntity = (ndDemoEntity*)turretBody->GetNotifyCallback()->GetUserData();
-		ndDemoEntity* const effectorEntity = turretEntity->Find("effector");
+		ndVehicleEntityNotify* const notify = (ndVehicleEntityNotify*)turretBody->GetNotifyCallback();
+		ndSharedPtr<ndDemoEntity> turretEntity(notify->m_entity);
+		ndSharedPtr<ndDemoEntity> effectorEntity = turretEntity->Find(turretEntity, "effector");
 		ndMatrix effectorMatrix(localFrame * effectorEntity->CalculateGlobalMatrix(nullptr));
 		effectorMatrix.m_posit = turretBody->GetMatrix().m_posit;
 		
@@ -558,16 +562,17 @@ static ndMultiBodyVehicle* CreateTractor(ndDemoEntityManager* const scene, const
 	vehicle->SetNotifyCallback(ndSharedPtr<ndModelNotify>(new TractorController(desc, vehicle, vehicleUI)));
 	TractorController* const notifyCallback = (TractorController*)*vehicle->GetNotifyCallback();
 
-	ndDemoEntity* const vehicleEntityDummyRoot = LoadVehicleMeshModel(scene, desc.m_name);
+	ndSharedPtr<ndDemoEntity> rootEntity(LoadVehicleMeshModel(scene, desc.m_name));
+	scene->AddEntity(rootEntity);
 
-	ndDemoEntity* const vehicleEntity = vehicleEntityDummyRoot->GetFirstChild();
-	vehicleEntity->ResetMatrix(vehicleEntity->CalculateGlobalMatrix()* matrix);
+	ndSharedPtr<ndDemoEntity> chassisEntity(rootEntity->GetChildren().GetFirst()->GetInfo());
+	chassisEntity->ResetMatrix(chassisEntity->CalculateGlobalMatrix()* matrix);
 
 	// 1- add chassis to the vehicle model 
 	// create the vehicle chassis as a normal rigid body
 	const ndVehicleDectriptor& configuration = notifyCallback->m_desc;
 
-	ndSharedPtr<ndBody> chassisBody(notifyCallback->CreateChassis(scene, vehicleEntity, configuration.m_chassisMass));
+	ndSharedPtr<ndBody> chassisBody(notifyCallback->CreateChassis(scene, chassisEntity, configuration.m_chassisMass));
 	vehicle->AddChassis(chassisBody);
 
 	ndBodyDynamic* const chassis = vehicle->GetChassis();
@@ -667,18 +672,19 @@ static ndMultiBodyVehicle* CreateTractor(ndDemoEntityManager* const scene, const
 			ndSharedPtr<ndJointBilateralConstraint>boomJoint(new ndJointSlider(matrix1, boomBody->GetAsBodyKinematic(), baseBody->GetAsBodyKinematic()));
 			vehicle->AddLimb(hingeNode, boomBody, boomJoint);
 			
-			ndBodyDynamic* const chassis = vehicle->GetChassis();
-			ndDemoEntity* const parentEntity = (ndDemoEntity*)chassis->GetNotifyCallback()->GetUserData();
-			ndDemoEntity* const attachmentNode = parentEntity->Find(attachement);
-			matrix0.m_posit = attachmentNode->CalculateGlobalMatrix().m_posit;
-			
-			ndIk6DofEffector* const attachementJoint = new ndIk6DofEffector(matrix0, matrix0, boomBody->GetAsBodyKinematic(), attachmentBody);
-			attachementJoint->EnableAxisX(false);
-			attachementJoint->EnableAxisY(true);
-			attachementJoint->EnableAxisZ(true);
-			attachementJoint->EnableRotationAxis(ndIk6DofEffector::m_disabled);
-			ndSharedPtr<ndJointBilateralConstraint> attachementJointPtr(attachementJoint);
-			vehicle->AddCloseLoop(attachementJointPtr);
+			ndAssert(0);
+			//ndBodyDynamic* const chassis = vehicle->GetChassis();
+			//ndDemoEntity* const parentEntity = (ndDemoEntity*)chassis->GetNotifyCallback()->GetUserData();
+			//ndDemoEntity* const attachmentNode = parentEntity->Find(attachement);
+			//matrix0.m_posit = attachmentNode->CalculateGlobalMatrix().m_posit;
+			//
+			//ndIk6DofEffector* const attachementJoint = new ndIk6DofEffector(matrix0, matrix0, boomBody->GetAsBodyKinematic(), attachmentBody);
+			//attachementJoint->EnableAxisX(false);
+			//attachementJoint->EnableAxisY(true);
+			//attachementJoint->EnableAxisZ(true);
+			//attachementJoint->EnableRotationAxis(ndIk6DofEffector::m_disabled);
+			//ndSharedPtr<ndJointBilateralConstraint> attachementJointPtr(attachementJoint);
+			//vehicle->AddCloseLoop(attachementJointPtr);
 		};
 
 		AddHydraulic(chassis, "armHydraulicPiston_left", "armHydraulic_left", armBody->GetAsBodyKinematic(), "attach0_left");
@@ -731,24 +737,23 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	ndSharedPtr<ndModel> controls(new ndVehicleSelector());
 	world->AddModel(controls);
 
-	ndVehicleUI* const vehicleUI = new ndVehicleUI(scene);
-	ndSharedPtr<ndUIEntity> vehicleUIPtr(vehicleUI);
-	scene->Set2DDisplayRenderFunction(vehicleUIPtr);
+	ndSharedPtr<ndUIEntity> vehicleUI(new ndVehicleUI(scene));
+	scene->Set2DDisplayRenderFunction(vehicleUI);
 	
-	ndSharedPtr<ndModel> vehicle0(CreateFlatBedTruck(scene, bigRigDesc, matrix, vehicleUI));
+	ndSharedPtr<ndModel> vehicle0(CreateFlatBedTruck(scene, bigRigDesc, matrix, (ndVehicleUI*)*vehicleUI));
 	
 	matrix.m_posit.m_x += 6.0f;
 	matrix.m_posit.m_z += 6.0f;
-	ndSharedPtr<ndModel> vehicle1(CreateLav25Vehicle(scene, lav25Desc, matrix, vehicleUI));
+	ndSharedPtr<ndModel> vehicle1(CreateLav25Vehicle(scene, lav25Desc, matrix, (ndVehicleUI*)*vehicleUI));
 
 	matrix.m_posit.m_z -= 12.0f;
-	ndSharedPtr<ndModel> vehicle2(CreateTractor(scene, tractorDesc, matrix, vehicleUI));
+	//ndSharedPtr<ndModel> vehicle2(CreateTractor(scene, tractorDesc, matrix, (ndVehicleUI*)*vehicleUI));
 
 	world->AddModel(vehicle0);
 	world->AddModel(vehicle1);
-	world->AddModel(vehicle2);
+	//world->AddModel(vehicle2);
 
-	ndVehicleCommonNotify* const notifyCallback = (ndVehicleCommonNotify*)*vehicle2->GetNotifyCallback();
+	ndVehicleCommonNotify* const notifyCallback = (ndVehicleCommonNotify*)*vehicle0->GetNotifyCallback();
 	notifyCallback->SetAsPlayer(scene);
 	
 	matrix.m_posit.m_x += 25.0f;

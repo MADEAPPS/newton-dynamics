@@ -34,6 +34,7 @@ void ndStaticUserMeshCollisionDemo (ndDemoEntityManager* const scene)
 	localAxis[1] = ndVector(1.0f, 0.0f, 0.0f, 0.0f);
 	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
 
+#if 0
 	ndMeshLoader loader;
 	ndSharedPtr<ndDemoEntity> man (loader.LoadEntity("walker.fbx", scene));
 
@@ -48,6 +49,7 @@ void ndStaticUserMeshCollisionDemo (ndDemoEntityManager* const scene)
 	
 	location.m_posit.m_z += 4.0f;
 	new ndBasicPlayerCapsule(scene, loader, *man, localAxis, location, mass, radio, height, height / 4.0f);
+#endif
 
 	class PlaceMatrix: public ndMatrix
 	{

@@ -60,7 +60,7 @@ class NewtonPhantom : public ndModelNotify
 	{
 		public:
 		PhantomPlacement(ndDemoEntityManager* const scene)
-			:ndDemoEntity(ndGetIdentityMatrix(), nullptr)
+			:ndDemoEntity(ndGetIdentityMatrix())
 		{
 			//dAssert (0);
 	
@@ -124,9 +124,10 @@ class NewtonPhantom : public ndModelNotify
 			ndMatrix parentMatrix[32];
 			ndDemoEntity* stackMem[32];
 			ndInt32 stack = 0;
-			for (ndDemoEntity* child = entity->GetFirstChild(); child; child = child->GetNext())
+			//for (ndDemoEntity* child = entity->GetFirstChild(); child; child = child->GetNext())
+			for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = entity->GetChildren().GetFirst(); node; node = node->GetNext())
 			{
-				stackMem[stack] = child;
+				stackMem[stack] = *node->GetInfo();
 				parentMatrix[stack] = ndGetIdentityMatrix();
 				stack++;
 			}
@@ -147,9 +148,10 @@ class NewtonPhantom : public ndModelNotify
 					points.PushBack(p);
 				}
 
-				for (ndDemoEntity* child = ent->GetFirstChild(); child; child = child->GetNext())
+				//for (ndDemoEntity* child = ent->GetFirstChild(); child; child = child->GetNext())
+				for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = ent->GetChildren().GetFirst(); node; node = node->GetNext())
 				{
-					stackMem[stack] = child;
+					stackMem[stack] = *node->GetInfo();
 					parentMatrix[stack] = matrix;
 					stack++;
 				}
@@ -214,9 +216,9 @@ class NewtonPhantom : public ndModelNotify
 		//,phantomShape(new ndShapeBox(1.0f, 1.0f, 1.0f))
 		,worldMatrix(ndGetIdentityMatrix())
 		//,notification(scene)
+		,m_phantomEntity(ndSharedPtr<ndDemoEntity>(new PhantomPlacement(scene)))
 	{
 		//contactPoint = ndVector(1.0e20f);
-		m_phantomEntity = new PhantomPlacement(scene);
 		scene->AddEntity(m_phantomEntity);
 	}
 
@@ -263,7 +265,8 @@ class NewtonPhantom : public ndModelNotify
 				worldMatrix.m_posit = p0 + (p1 - p0).Scale(rayCaster.m_param);
 				worldMatrix.m_posit.m_w = 1.0f;
 
-				m_phantomEntity->SetMesh(m_phantomEntity->m_blueMesh, ndGetIdentityMatrix());
+				PhantomPlacement* const phatom = (PhantomPlacement*)*m_phantomEntity;
+				m_phantomEntity->SetMesh(phatom->m_blueMesh, ndGetIdentityMatrix());
 				
 				//// calc the current AABB in world space
 				//ndVector boxMin;
@@ -325,9 +328,10 @@ class NewtonPhantom : public ndModelNotify
 
 	private:
 	//ndShapeInstance phantomShape;
-	PhantomPlacement* m_phantomEntity;
-
+	//PhantomPlacement* m_phantomEntity;
 	ndMatrix worldMatrix;
+	ndSharedPtr<ndDemoEntity> m_phantomEntity;
+
 	//ndContactNotify notification;
 	//ndInt32 contactCount = 0;
 	//ndVector contactPoint;

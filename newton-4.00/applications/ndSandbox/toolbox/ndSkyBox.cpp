@@ -15,7 +15,7 @@
 #include "ndPngToOpenGl.h"
 
 ndSkyBox::ndSkyBox(GLuint shader)
-	:ndDemoEntity(ndGetIdentityMatrix(), nullptr)
+	:ndDemoEntity(ndGetIdentityMatrix())
 	,m_textureMatrix(ndGetIdentityMatrix())
 	,m_shader(shader)
 	,m_indexBuffer(0)

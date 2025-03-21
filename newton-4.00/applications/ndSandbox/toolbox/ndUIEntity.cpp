@@ -14,7 +14,7 @@
 
 
 ndUIEntity::ndUIEntity(ndDemoEntityManager* const scene)
-	:ndDemoEntity(ndGetIdentityMatrix(), nullptr)
+	:ndDemoEntity(ndGetIdentityMatrix())
 	,m_scene(scene)
 {
 }

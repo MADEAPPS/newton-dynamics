@@ -28,7 +28,8 @@ class ndSharedNodeHierarchy: public ndContainersFreeListAlloc<T>
 	virtual T* CreateClone() const;
 	
 	void Detach();
-	void Attach(ndSharedPtr<T>& self, ndSharedPtr<T>& parent);
+	//void Attach(ndSharedPtr<T>& self, T* const parent);
+	void AddChild(const ndSharedPtr<T>& child);
 
 	const T* GetRoot() const;
 	const T* GetParent() const;
@@ -56,30 +57,23 @@ ndSharedNodeHierarchy<T>::ndSharedNodeHierarchy (const ndSharedNodeHierarchy<T>&
 	,m_children()
 	,m_parent(nullptr)
 {
-	ndAssert(0);
-	//for (ndSharedNodeHierarchy<T>* obj = clone.m_firstChild; obj; obj = obj->m_next)
-	//{
-	//	T* const child = obj->CreateClone();
-	//	child->Attach(this);
-	//}
+	for (ndList<ndSharedPtr<T>>::ndNode* node = src.m_children.GetFirst(); node; node = node->GetNext())
+	{
+		ndSharedPtr<T> child(node->GetInfo()->CreateClone());
+		AddChild(child);
+	}
 }
 
 template<class T>
 ndSharedNodeHierarchy<T>::~ndSharedNodeHierarchy () 
 {
-	//m_parent = ndWeakPtr<T>();
-	//if (m_parent)
-	//{
-	//	for (ndList<ndSharedPtr<T>>::ndNode* node = m_parent->m_children.GetFirst(); node; node = node->GetNext())
-	//	{
-	//		if (*node->GetInfo() == this)
-	//		{
-	//			m_parent->m_children->Remove()
-	//			break;
-	//		}
-	//	}
-	//}
-	//m_parent = nullptr;
+	while (m_children.GetCount())
+	{
+		ndList<ndSharedPtr<T>>::ndNode* const node = m_children.GetLast();
+		T* const childParerent = *node->GetInfo();
+		childParerent->m_parent = nullptr;
+		m_children.Remove(node);
+	}
 }
 
 template<class T>
@@ -90,16 +84,23 @@ T* ndSharedNodeHierarchy<T>::CreateClone() const
 	//return (T*) new ndSharedNodeHierarchy<T>(*this);
 }
 
+//template<class T>
+//void ndSharedNodeHierarchy<T>::Attach(ndSharedPtr<T>& self, T* const parent)
+//{
+//	ndAssert(parent);
+//	ndAssert(!m_parent);
+//	ndAssert(*self == this);
+//
+//	m_parent = parent;
+//	m_parent->m_children.Append(self);
+//}
 
 template<class T>
-void ndSharedNodeHierarchy<T>::Attach(ndSharedPtr<T>& self, ndSharedPtr<T>& parent)
+void ndSharedNodeHierarchy<T>::AddChild(const ndSharedPtr<T>& child)
 {
-	ndAssert(*parent);
-	ndAssert(!m_parent);
-	ndAssert(*self == this);
-
-	m_parent = *parent;
-	m_parent->m_children.Append(self);
+	ndAssert(!child->m_parent);
+	child->m_parent = (T*)this;
+	m_children.Append(child);
 }
 
 template<class T>

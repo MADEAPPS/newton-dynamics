@@ -21,6 +21,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
+#if 0
 namespace ndQuadruped_2
 {
 	#define ND_TRAIN_MODEL
@@ -1677,3 +1678,4 @@ void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
+#endif

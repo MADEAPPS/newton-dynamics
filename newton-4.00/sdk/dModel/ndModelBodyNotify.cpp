@@ -22,7 +22,6 @@ ndModelBodyNotify::ndModelBodyNotify(ndBodyKinematic* const parentBody, ndVector
 	:ndBodyNotify(gravity)
 	,m_parentBody(parentBody)
 {
-	//static ndModelBodyNotifyFileLoadSave registerClass;
 }
 
 ndModelBodyNotify::~ndModelBodyNotify()

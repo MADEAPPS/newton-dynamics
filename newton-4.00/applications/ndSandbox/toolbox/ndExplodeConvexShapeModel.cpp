@@ -21,6 +21,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndExplodeConvexShapeModel.h"
 
+#if 0
 ndExplodeConvexShapeModel::ndAtom::ndAtom()
 	:m_centerOfMass(0.0f)
 	,m_momentOfInertia(0.0f)
@@ -323,3 +324,4 @@ void ndExplodeConvexShapeModel::UpdateEffect(ndWorld* const world, ndEffect& eff
 		body->SetVelocity(debriVeloc);
 	}
 }
+#endif

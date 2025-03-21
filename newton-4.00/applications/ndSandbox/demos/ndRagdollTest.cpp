@@ -22,6 +22,7 @@
 #include "ndDemoInstanceEntity.h"
 #include "ndBasicPlayerCapsule.h"
 
+#if 0
 namespace ndRagdoll
 {
 	class ndDefinition
@@ -291,3 +292,4 @@ void ndRagdollTest (ndDemoEntityManager* const scene)
 	origin.m_z += -0.0f;
 	scene->SetCameraMatrix(playerMatrix, origin);
 }
+#endif

@@ -28,8 +28,8 @@ class ndDemoMeshInterface;
 class ndDemoCameraManager;
 class ndShadowMapRenderPass;
 
-class ndDemoEntityManager: public ndList <ndDemoEntity*>
-//class ndDemoEntityManager : public ndList <ndSharedPtr<ndDemoEntity>>
+//class ndDemoEntityManager: public ndList <ndDemoEntity*>
+class ndDemoEntityManager : public ndList <ndSharedPtr<ndDemoEntity>>
 {
 	public:
 	typedef void (*LaunchSDKDemoCallback) (ndDemoEntityManager* const scene);
@@ -142,8 +142,8 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 
 	void Run();
 
-	void AddEntity(ndDemoEntity* const ent);
-	void RemoveEntity(ndDemoEntity* const ent);
+	void AddEntity(const ndSharedPtr<ndDemoEntity>& entity);
+	void RemoveEntity(const ndSharedPtr<ndDemoEntity>& entity);
 
 	ndInt32 GetWidth() const;
 	ndInt32 GetHeight() const;

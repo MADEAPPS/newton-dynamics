@@ -98,7 +98,7 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 	BuildFlatPlane(scene, true);
 
 	ndMatrix matrix(ndGetIdentityMatrix());
-
+#if 0
 	ndWorld* const world = scene->GetWorld();
 
 	ndR2D2Material material;
@@ -117,18 +117,18 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 		}
 	};
 
-	char fileName[256];
-	ndGetWorkingFileName("r2d2.urdf", fileName);
-	ndUrdfFile urdf;
-	ndModelArticulation* const r2d2 = urdf.Import(fileName);
-	
-	ndMatrix modelMatrix(r2d2->GetRoot()->m_body->GetMatrix());
-	modelMatrix.m_posit.m_y = 0.5f;
-	r2d2->SetTransform(modelMatrix);
-	r2d2->AddToWorld(world);
-	r2d2->SetNotifyCallback(new R2D2ModelNotify);
-	SetModelVisualMesh(scene, r2d2);
-	SetMaterial(r2d2);
+	//char fileName[256];
+	//ndGetWorkingFileName("r2d2.urdf", fileName);
+	//ndUrdfFile urdf;
+	//ndModelArticulation* const r2d2 = urdf.Import(fileName);
+	//
+	//ndMatrix modelMatrix(r2d2->GetRoot()->m_body->GetMatrix());
+	//modelMatrix.m_posit.m_y = 0.5f;
+	//r2d2->SetTransform(modelMatrix);
+	//r2d2->AddToWorld(world);
+	//r2d2->SetNotifyCallback(new R2D2ModelNotify);
+	//SetModelVisualMesh(scene, r2d2);
+	//SetMaterial(r2d2);
 
 #if 0
 	{
@@ -150,12 +150,13 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 		SetMaterial(r2d3);
 	}
 #endif
+#endif
 
 	ndMatrix origin1(ndGetIdentityMatrix());
 	origin1.m_posit.m_x = 20.0f;
 
 	//AddSphere(scene, origin1, 1.0f, 0.5f);
-	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 1, 2, 7);
+	AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 1, 2, 7);
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 4, 4, 4);
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 2, 2, 7);

@@ -39,7 +39,8 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 	ndDemoEntity* root = owner;
 	while (root->GetParent()) 
 	{
-		root = root->GetParent();
+		ndAssert(0);
+		//root = root->GetParent();
 	}
 
 	ndInt32 stack = 1;
@@ -66,9 +67,12 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 		entityArray.PushBack(entity);
 		bindMatrixArray.PushBack(palleteMatrix);
 
-		for (ndDemoEntity* node = entity->GetFirstChild(); node; node = node->GetNext()) 
+		//for (ndDemoEntity* node = entity->GetFirstChild(); node; node = node->GetNext()) 
+		//for (ndSharedPtr<ndDemoEntity> node(entity->GetFirstChild()); *node; node = node->GetNext())
+		//for (const ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = entity->GetChildren().GetFirst() * node; node = node->GetNext())
+		for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = entity->GetChildren().GetFirst(); node; node = node->GetNext())
 		{
-			pool[stack] = node;
+			pool[stack] = *node->GetInfo();
 			parentMatrix[stack] = boneMatrix;
 			stack++;
 			ndAssert(stack < sizeof(pool) / sizeof(pool[0]));
@@ -276,7 +280,8 @@ ndInt32 ndDemoSkinMesh::CalculateMatrixPalette(ndMatrix* const bindMatrix) const
 	ndDemoEntity* root = m_ownerEntity;
 	while (root->GetParent()) 
 	{
-		root = root->GetParent();
+		ndAssert(0);
+		//root = root->GetParent();
 	}
 
 	int count = 0;
@@ -293,9 +298,11 @@ ndInt32 ndDemoSkinMesh::CalculateMatrixPalette(ndMatrix* const bindMatrix) const
 		count++;
 		ndAssert(count <= 128);
 		ndAssert(count <= m_nodeCount);
-		for (ndDemoEntity* node = entity->GetFirstChild(); node; node = node->GetNext()) 
+		//for (ndDemoEntity* node = entity->GetFirstChild(); node; node = node->GetNext()) 
+		//for (ndSharedPtr<ndDemoEntity> node(entity->GetFirstChild()); *node; node = node->GetNext())
+		for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = entity->GetChildren().GetFirst(); node; node = node->GetNext())
 		{
-			pool[stack] = node;
+			pool[stack] = *node->GetInfo();
 			parentMatrix[stack] = boneMatrix;
 			stack++;
 		}

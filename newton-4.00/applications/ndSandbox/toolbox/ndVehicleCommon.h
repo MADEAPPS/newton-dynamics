@@ -169,7 +169,7 @@ class ndVehicleSelector : public ndModel
 class ndVehicleEntityNotify : public ndDemoEntityNotify
 {
 	public:
-	ndVehicleEntityNotify(ndMultiBodyVehicle* const me, ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyKinematic* const parentBody);
+	ndVehicleEntityNotify(ndMultiBodyVehicle* const me, ndDemoEntityManager* const manager, const ndSharedPtr<ndDemoEntity>& entity, ndBodyKinematic* const parentBody);
 	~ndVehicleEntityNotify();
 
 	void OnTransform(ndInt32 thread, const ndMatrix& matrix);
@@ -211,8 +211,8 @@ class ndVehicleCommonNotify : public ndModelNotify
 	void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep) override;
 
 	void SetAsPlayer(ndDemoEntityManager* const scene, bool mode = true);
-	ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, ndDemoEntity* const chassisEntity, ndFloat32 mass);
-	void CalculateTireDimensions(const char* const tireName, ndFloat32& width, ndFloat32& radius, ndDemoEntity* const vehEntity) const;
+	ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, const ndSharedPtr<ndDemoEntity>& chassisEntity, ndFloat32 mass);
+	void CalculateTireDimensions(const char* const tireName, ndFloat32& width, ndFloat32& radius, const ndSharedPtr<ndDemoEntity>& vehEntityvehEntity) const;
 	ndBodyKinematic* CreateTireBody(ndDemoEntityManager* const scene, ndBodyKinematic* const parentBody, ndVehicleDectriptor::ndTireDefinition& definition, const char* const tireName) const;
 
 	void SetCamera(ndDemoEntityManager* const manager, ndFloat32 timestep);

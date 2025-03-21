@@ -28,17 +28,17 @@
 static ndBodyDynamic* AddRigidBody(
 	ndDemoEntityManager* const scene,
 	const ndMatrix& matrix, const ndShapeInstance& shape,
-	ndDemoEntity* const entity, ndFloat32 mass)
+	const ndSharedPtr<ndDemoEntity>& entity, ndFloat32 mass)
 {
-	ndBodyKinematic* const body = new ndBodyDynamic();
+	ndSharedPtr<ndBody> body (new ndBodyDynamic());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
-	body->SetCollisionShape(shape);
-	body->SetMassMatrix(mass, shape);
+	body->GetAsBodyDynamic()->SetCollisionShape(shape);
+	body->GetAsBodyDynamic()->SetMassMatrix(mass, shape);
 
 	ndWorld* const world = scene->GetWorld();
-	ndSharedPtr<ndBody> bodyPtr(body);
-	world->AddBody(bodyPtr);
+
+	world->AddBody(body);
 	scene->AddEntity(entity);
 	return body->GetAsBodyDynamic();
 }
@@ -84,19 +84,18 @@ static void AddSphere(ndDemoEntityManager* const scene)
 	ndShapeInstance originShape(new ndShapeSphere(0.125f));
 	ndSharedPtr<ndDemoMeshInterface> origGeometry (new ndDemoMesh("origShape", scene->GetShaderCache(), &originShape, "earthmap.png", "earthmap.png", "earthmap.png"));
 
-	ndDemoEntity* const origEntity = new ndDemoEntity(ndGetIdentityMatrix(), nullptr);
+	ndSharedPtr<ndDemoEntity>origEntity(new ndDemoEntity(ndGetIdentityMatrix()));
 	origEntity->SetMesh(origGeometry);
 
 	ndMatrix mOrigMatrix = ndGetIdentityMatrix();
 	mOrigMatrix.m_posit.m_x = 2.0f;
 	for (ndInt32 i = 0; i < 4; ++i)
 	{
-		ndDemoEntity* const entity = origEntity->CreateClone();
+		ndSharedPtr<ndDemoEntity> entity (origEntity->CreateClone());
 		ndVector floor(FindFloor(*scene->GetWorld(), mOrigMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		mOrigMatrix.m_posit.m_y = floor.m_y + 1.0f;
 		AddRigidBody(scene, mOrigMatrix, originShape, entity, 1.0);
 	}
-	delete origEntity;
 }
 
 static void AddEmptyBox(ndDemoEntityManager* const scene)
@@ -105,13 +104,13 @@ static void AddEmptyBox(ndDemoEntityManager* const scene)
 	CreateBoxCompoundShape(compoundShapeInstance);
 
 	ndSharedPtr<ndDemoMeshInterface> compGeometry (new ndDemoMesh("compoundShape", scene->GetShaderCache(), &compoundShapeInstance, "earthmap.png", "earthmap.png", "earthmap.png"));
-	ndDemoEntity* const compEntity = new ndDemoEntity(ndGetIdentityMatrix(), nullptr);
+	ndSharedPtr<ndDemoEntity>compEntity(new ndDemoEntity(ndGetIdentityMatrix()));
 	compEntity->SetMesh(compGeometry);
 
 	ndMatrix mBodyMatrix = ndGetIdentityMatrix();
 	mBodyMatrix.m_posit = ndVector(-2.0f, 5.0f, -5.0f, 1.0f);
 	ndVector floor(FindFloor(*scene->GetWorld(), mBodyMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	mBodyMatrix.m_posit.m_y = floor.m_y + 1.0f;
+	mBodyMatrix.m_posit.m_y = floor.m_y + 1.5f;
 
 	AddRigidBody(scene, mBodyMatrix, compoundShapeInstance, compEntity, 10.0);
 }
@@ -119,9 +118,9 @@ static void AddEmptyBox(ndDemoEntityManager* const scene)
 static void AddSimpleConcaveMesh(ndDemoEntityManager* const scene, const ndMatrix& matrix, const char* const meshName, int count = 1)
 {
 	ndMeshLoader loader;
-	ndDemoEntity* const rootEntity = loader.LoadEntity(meshName, scene);
-	ndDemoEntity* const childEntity = rootEntity->GetFirstChild();
-	ndShapeInstance* const compoundShapeInstance = childEntity->CreateCompoundFromMesh();
+	ndSharedPtr<ndDemoEntity> rootEntity (loader.LoadEntity(meshName, scene));
+	ndSharedPtr<ndDemoEntity> childEntity (rootEntity->GetChildren().GetFirst()->GetInfo());
+	ndSharedPtr<ndShapeInstance>compoundShapeInstance (childEntity->CreateCompoundFromMesh());
 	
 	ndMatrix originMatrix (matrix);
 	for (ndInt32 i = 0; i < count; ++i)
@@ -130,11 +129,8 @@ static void AddSimpleConcaveMesh(ndDemoEntityManager* const scene, const ndMatri
 		originMatrix.m_posit.m_z += 2.0f;
 		ndVector floor(FindFloor(*scene->GetWorld(), originMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		originMatrix.m_posit.m_y = floor.m_y + 2.0f;
-		AddRigidBody(scene, originMatrix, *compoundShapeInstance, entity, 5.0f);
+		AddRigidBody(scene, originMatrix, *(*compoundShapeInstance), entity, 5.0f);
 	}
-	
-	delete compoundShapeInstance;
-	delete rootEntity;
 }
 
 void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
@@ -154,9 +150,9 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 
 	ndMatrix location(ndGetIdentityMatrix());
 
-	//AddSphere(scene);
-	//AddEmptyBox(scene);
-	
+	AddSphere(scene);
+	AddEmptyBox(scene);
+
 	location.m_posit.m_y = 0.5f;
 	location.m_posit.m_z = -3.0f;
 	//AddSimpleConcaveMesh(scene, location, "bowl.fbx", 4);

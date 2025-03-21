@@ -24,7 +24,7 @@ class ndDemoEntityNotify : public ndModelBodyNotify
 {
 	public:
 	ndDemoEntityNotify(const ndDemoEntityNotify& notify);
-	ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyKinematic* const parentBody = nullptr, ndFloat32 gravity = DEMO_GRAVITY);
+	ndDemoEntityNotify(ndDemoEntityManager* const manager, const ndSharedPtr<ndDemoEntity>& entity, ndBodyKinematic* const parentBody = nullptr, ndFloat32 gravity = DEMO_GRAVITY);
 
 	ndBodyNotify* Clone() const
 	{
@@ -35,7 +35,8 @@ class ndDemoEntityNotify : public ndModelBodyNotify
 
 	void* GetUserData() const
 	{
-		return m_entity;
+		const ndDemoEntity* const ent = *m_entity;
+		return (void*)ent;
 	}
 
 	//virtual void OnObjectPick() const;
@@ -47,8 +48,8 @@ class ndDemoEntityNotify : public ndModelBodyNotify
 		return matrix.m_posit.m_y > -100.0f;
 	}
 
-	ndDemoEntity* m_entity;
 	ndDemoEntityManager* m_manager;
+	ndSharedPtr<ndDemoEntity> m_entity;
 };
 
 class ndBindingRagdollEntityNotify : public ndDemoEntityNotify

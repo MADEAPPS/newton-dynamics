@@ -20,6 +20,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndHeightFieldPrimitive.h"
 
+
 #define D_TERRAIN_WIDTH				1024
 #define D_TERRAIN_HEIGHT			1024
 #define D_TERRAIN_NOISE_OCTAVES		8
@@ -43,6 +44,7 @@ class ndHeightfieldMesh : public ndDemoMesh
 		ndArray<ndInt32> indexList(6 * D_TERRAIN_WIDTH * D_TERRAIN_WIDTH + 1024);
 
 		m_shader = shaderCache.m_diffuseEffect;
+		m_shaderShadow = shaderCache.m_diffuseShadowEffect;
 
 		BuildTilesArray(indexList, "texture1.png");
 		BuildVertexAndNormals(indexList, heightfield, points);
@@ -170,53 +172,14 @@ static void MakeNoiseHeightfield(ndArray<ndVector>& heightfield)
 	}
 }
 
-ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene, const ndMatrix& location)
-{
-	ndArray<ndVector> heightfield(D_TERRAIN_WIDTH * D_TERRAIN_HEIGHT);
-	MakeNoiseHeightfield(heightfield);
-
-	// create the visual mesh
-	ndSharedPtr<ndDemoMeshInterface> mesh (new ndHeightfieldMesh(heightfield, scene->GetShaderCache()));
-	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
-	entity->SetShadowMode(false); 
-
-	entity->SetMesh(mesh);
-	scene->AddEntity(entity);
-
-	// create the height field collision and rigid body
-	ndShapeInstance heighfieldInstance(
-		new ndShapeHeightfield(D_TERRAIN_WIDTH, D_TERRAIN_WIDTH,
-		ndShapeHeightfield::m_invertedDiagonals,
-		D_TERRAIN_GRID_SIZE, D_TERRAIN_GRID_SIZE));
-
-	ndShapeHeightfield* const shape = heighfieldInstance.GetShape()->GetAsShapeHeightfield();
-	ndArray<ndReal>& hightMap = shape->GetElevationMap();
-	ndAssert(hightMap.GetCount() == heightfield.GetCount());
-	for (ndInt32 i = 0; i < heightfield.GetCount(); ++i)
-	{
-		ndFloat32 high = heightfield[i].m_y;
-		hightMap[i] = ndReal(high);
-	}
-	shape->UpdateElevationMapAabb();
-
-	ndPhysicsWorld* const world = scene->GetWorld();
-	ndBodyKinematic* const body = new ndBodyDynamic();
-	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-	body->SetMatrix(location);
-	body->SetCollisionShape(heighfieldInstance);
-
-	ndSharedPtr<ndBody> bodyPtr(body);
-	world->AddBody(bodyPtr);
-	return body;
-}
-
-void AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sceneInstance, ndDemoEntity* const rootEntity, const ndMatrix& matrix)
+void AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sceneInstance, const ndSharedPtr<ndDemoEntity>& rootEntity, const ndMatrix& matrix)
 {
 	ndArray<ndVector> heightfield(D_TERRAIN_WIDTH * D_TERRAIN_HEIGHT);
 	MakeNoiseHeightfield(heightfield);
 
 	ndSharedPtr<ndDemoMeshInterface> mesh (new ndHeightfieldMesh(heightfield, scene->GetShaderCache()));
-	ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
+	ndSharedPtr<ndDemoEntity>entity (new ndDemoEntity(matrix));
+	rootEntity->AddChild(entity);
 	entity->SetMesh(mesh);
 	entity->SetShadowMode(false);
 
@@ -237,10 +200,48 @@ void AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShapeInstance& s
 
 	// save the entity  with the sub shape
 	ndShapeMaterial material(heighfieldInstance.GetMaterial());
-	material.m_data.m_userData = entity;
+	material.m_data.m_userData = *entity;
 	heighfieldInstance.SetMaterial(material);
 	heighfieldInstance.SetLocalMatrix(matrix);
 	
 	ndShapeCompound* const compound = sceneInstance.GetShape()->GetAsShapeCompound();
 	compound->AddCollision(&heighfieldInstance);
+}
+
+ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene, const ndMatrix& location)
+{
+	ndArray<ndVector> heightfield(D_TERRAIN_WIDTH * D_TERRAIN_HEIGHT);
+	MakeNoiseHeightfield(heightfield);
+
+	// create the visual mesh
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndHeightfieldMesh(heightfield, scene->GetShaderCache()));
+	ndSharedPtr<ndDemoEntity> entity (new ndDemoEntity(location));
+	entity->SetShadowMode(false);
+	entity->SetMesh(mesh);
+
+	// create the height field collision and rigid body
+	ndShapeInstance heighfieldInstance(
+		new ndShapeHeightfield(D_TERRAIN_WIDTH, D_TERRAIN_WIDTH,
+			ndShapeHeightfield::m_invertedDiagonals,
+			D_TERRAIN_GRID_SIZE, D_TERRAIN_GRID_SIZE));
+
+	ndShapeHeightfield* const shape = heighfieldInstance.GetShape()->GetAsShapeHeightfield();
+	ndArray<ndReal>& hightMap = shape->GetElevationMap();
+	ndAssert(hightMap.GetCount() == heightfield.GetCount());
+	for (ndInt32 i = 0; i < heightfield.GetCount(); ++i)
+	{
+		ndFloat32 high = heightfield[i].m_y;
+		hightMap[i] = ndReal(high);
+	}
+	shape->UpdateElevationMapAabb();
+
+	ndPhysicsWorld* const world = scene->GetWorld();
+	ndSharedPtr<ndBody> body (new ndBodyDynamic());
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+	body->SetMatrix(location);
+	body->GetAsBodyDynamic()->SetCollisionShape(heighfieldInstance);
+
+	world->AddBody(body);
+	scene->AddEntity(entity);
+	return body->GetAsBodyDynamic();
 }

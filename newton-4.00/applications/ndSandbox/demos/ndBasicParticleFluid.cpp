@@ -131,6 +131,7 @@ class ndIsoSurfaceMesh : public ndDemoMesh
 		,m_parentMesh(parentMesh)
 	{
 		m_shader = shaderCache.m_diffuseEffect;
+		m_shaderShadow = shaderCache.m_diffuseShadowEffect;
 
 		ndDemoSubMesh* const segment = AddSubMesh();
 		GLuint tex = LoadTexture("default.png");
@@ -175,7 +176,7 @@ class ndWaterVolumeEntity : public ndDemoEntity
 {
 	public:
 	ndWaterVolumeEntity(ndDemoEntityManager* const scene, const ndMatrix& location, const ndVector&, ndIsoSurfaceParticleVolume* const fluidBody)
-		:ndDemoEntity(location, nullptr)
+		:ndDemoEntity(location)
 		,m_fluidBody(fluidBody)
 		,m_isoSurfaceMesh0()
 		,m_isoSurfaceMesh1()
@@ -247,7 +248,7 @@ class ndWaterVolumeEntity : public ndDemoEntity
 class ndWaterVolumeCallback: public ndDemoEntityNotify
 {
 	public:
-	ndWaterVolumeCallback(ndDemoEntityManager* const manager, ndDemoEntity* const entity)
+	ndWaterVolumeCallback(ndDemoEntityManager* const manager, const ndSharedPtr<ndDemoEntity>& entity)
 		:ndDemoEntityNotify(manager, entity)
 	{
 	}
@@ -369,7 +370,8 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 	//ndFloat32 diameter = 0.125f;
 	ndFloat32 diameter = 1.0f;
 	ndIsoSurfaceParticleVolume* const fluidObject = new ndIsoSurfaceParticleVolume(diameter * 0.5f);
-	ndWaterVolumeEntity* const entity = new ndWaterVolumeEntity(scene, matrix, ndVector(20.0f, 10.0f, 20.0f, 0.0f), fluidObject);
+	//ndWaterVolumeEntity* const entity = new ndWaterVolumeEntity(scene, matrix, ndVector(20.0f, 10.0f, 20.0f, 0.0f), fluidObject);
+	ndSharedPtr<ndDemoEntity>entity (new ndWaterVolumeEntity(scene, matrix, ndVector(20.0f, 10.0f, 20.0f, 0.0f), fluidObject));
 
 	fluidObject->SetNotifyCallback(new ndWaterVolumeCallback(scene, entity));
 	fluidObject->SetMatrix(matrix);
@@ -416,7 +418,7 @@ void ndBasicParticleFluid (ndDemoEntityManager* const scene)
 	ndMatrix location(ndGetIdentityMatrix());
 
 	// adding a water volume
-	AddWaterVolume(scene, location);
+	//AddWaterVolume(scene, location);
 
 	ndQuaternion rot;
 	ndVector origin(-10.0f, 5.0f, 3.0f, 1.0f);

@@ -34,7 +34,7 @@
 class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 {
 	public:
-	ndBasicPlayerCapsuleNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity)
+	ndBasicPlayerCapsuleNotify(ndDemoEntityManager* const manager, const ndSharedPtr<ndDemoEntity>& entity)
 		:ndDemoEntityNotify(manager, entity)
 		,m_meshOrigin(entity->GetRenderMatrix().m_posit)
 		,m_localRotation(entity->GetRenderMatrix())
@@ -111,7 +111,7 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y;
 	
-	ndDemoEntity* const entity = modelEntity->CreateClone();
+	ndSharedPtr<ndDemoEntity> entity (modelEntity->CreateClone());
 
 	SetMatrix(matrix);
 	scene->AddEntity(entity);
@@ -133,11 +133,12 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	const ndList<ndAnimationKeyFramesTrack>& tracks = idleSequence->GetTracks();
 	for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = tracks.GetFirst(); node; node = node->GetNext())
 	{
-		ndAnimationKeyFramesTrack& track = node->GetInfo();
-		ndDemoEntity* const ent = entity->Find(track.GetName().GetStr());
-		ndAnimKeyframe keyFrame;
-		keyFrame.m_userData = ent;
-		m_output.PushBack(keyFrame);
+		ndAssert(0);
+		//ndAnimationKeyFramesTrack& track = node->GetInfo();
+		//ndDemoEntity* const ent = entity->Find(track.GetName().GetStr());
+		//ndAnimKeyframe keyFrame;
+		//keyFrame.m_userData = ent;
+		//m_output.PushBack(keyFrame);
 	}
 
 	ndAnimationSequencePlayer* const idle = new ndAnimationSequencePlayer(idleSequence);

@@ -19,6 +19,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndExplodeConvexShapeModel.h"
 
+#if 0
 static void makePointCloud(ndExplodeConvexShapeModel::ndDesc& desc)
 {
 	ndVector pMin;
@@ -212,3 +213,4 @@ void ndBasicExplodeConvexShape(ndDemoEntityManager* const scene)
 	ndVector origin(-10.0f, 5.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
+#endif

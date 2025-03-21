@@ -22,6 +22,7 @@
 
 #define DEBRI_EXPLODE_LOCATION
 
+#if 0
 ndConvexFractureModel_2::ndAtom::ndAtom()
 	:m_centerOfMass(0.0f)
 	,m_momentOfInertia(0.0f)
@@ -339,3 +340,5 @@ void ndConvexFractureModel_2::UpdateEffect(ndWorld* const world, ndEffect& effec
 #endif
 	}
 }
+
+#endif

@@ -24,9 +24,9 @@ class ndDemoCameraManager: public ndClassAlloc
 	ndDemoCameraManager(ndDemoEntityManager* const scene);
 	~ndDemoCameraManager();
 
-	ndDemoCamera* GetCamera() const 
+	ndDemoCamera* GetCamera()
 	{
-		return m_camera;
+		return *m_camera;
 	}
 
 	void SetCameraMatrix (const ndQuaternion& rotation, const ndVector& position);
@@ -51,7 +51,8 @@ class ndDemoCameraManager: public ndClassAlloc
 	ndVector m_pickedBodyLocalAtachmentPoint;
 	ndVector m_pickedBodyLocalAtachmentNormal;
 
-	ndDemoCamera* m_camera;
+	//ndDemoCamera* m_camera;
+	ndSharedPtr<ndDemoCamera> m_camera;
 	ndSharedPtr<ndJointBilateralConstraint> m_pickJoint;
 	ndFloat32 m_mousePosX;
 	ndFloat32 m_mousePosY;

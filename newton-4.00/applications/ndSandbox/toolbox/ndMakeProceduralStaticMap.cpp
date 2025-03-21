@@ -153,7 +153,7 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 	ndFloat32 m_invGridSize;
 };
 
-ndDemoEntity* BuildVisualEntity(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation)
+static ndSharedPtr<ndDemoEntity> BuildVisualEntity(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation)
 {
 	ndVector origin(-(ndFloat32)grids * gridSize * 0.5f, 0.0f, -(ndFloat32)grids * gridSize * 0.5f, 1.0f);
 
@@ -226,7 +226,7 @@ ndDemoEntity* BuildVisualEntity(ndDemoEntityManager* const scene, ndInt32 grids,
 	ndSharedPtr<ndDemoMeshInterface>geometry (new ndDemoMesh("plane", &meshEffect, scene->GetShaderCache()));
 
 	ndMatrix matrix(ndGetIdentityMatrix());
-	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
+	ndSharedPtr<ndDemoEntity>entity (new ndDemoEntity(matrix));
 	entity->SetMesh(geometry);
 	entity->SetShadowMode(false);
 
@@ -242,12 +242,12 @@ ndBodyKinematic* BuildProceduralMap(ndDemoEntityManager* const scene, ndInt32 gr
 	ndMatrix matrix(ndGetIdentityMatrix());
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	ndBodyKinematic* const body = new ndBodyDynamic();
+	ndSharedPtr<ndBody> body (new ndBodyDynamic());
 	body->SetMatrix(matrix);
-	body->SetCollisionShape(plane);
+	body->GetAsBodyDynamic()->SetCollisionShape(plane);
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, BuildVisualEntity(scene, grids, gridSize, perturbation)));
-	ndSharedPtr<ndBody> bodyPtr(body);
-	world->AddBody(bodyPtr);
-	return body;
+
+	world->AddBody(body);
+	return body->GetAsBodyDynamic();
 }
 

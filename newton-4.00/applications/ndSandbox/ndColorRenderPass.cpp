@@ -90,7 +90,7 @@ void ndColorRenderPass::RenderScene(ndFloat32 timestep)
 	{
 		for (ndDemoEntityManager::ndNode* node = m_manager->GetFirst(); node; node = node->GetNext())
 		{
-			ndDemoEntity* const entity = node->GetInfo();
+			ndDemoEntity* const entity = *node->GetInfo();
 			entity->Render(timestep, m_manager, globalMatrix);
 		}
 	

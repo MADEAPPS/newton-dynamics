@@ -19,7 +19,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndGameControlerInputs.h"
 
-ndVehicleEntityNotify::ndVehicleEntityNotify(ndMultiBodyVehicle* const me, ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyKinematic* const parentBody)
+ndVehicleEntityNotify::ndVehicleEntityNotify(ndMultiBodyVehicle* const me, ndDemoEntityManager* const manager, const ndSharedPtr<ndDemoEntity>& entity, ndBodyKinematic* const parentBody)
 	:ndDemoEntityNotify(manager, entity, parentBody)
 	,m_vehicle(me)
 {
@@ -364,11 +364,11 @@ void ndVehicleCommonNotify::UpdateCameraCallback(ndDemoEntityManager* const mana
 	me->SetCamera(manager, timestep);
 }
 
-void ndVehicleCommonNotify::CalculateTireDimensions(const char* const tireName, ndFloat32& width, ndFloat32& radius, ndDemoEntity* const vehEntity) const
+void ndVehicleCommonNotify::CalculateTireDimensions(const char* const tireName, ndFloat32& width, ndFloat32& radius, const ndSharedPtr<ndDemoEntity>& vehEntity) const
 {
 	// find the the tire visual mesh 
-	ndDemoEntity* const tirePart = vehEntity->Find(tireName);
-	ndAssert(tirePart);
+	ndSharedPtr<ndDemoEntity> tirePart (vehEntity->Find(vehEntity, tireName));
+	ndAssert(*tirePart);
 
 	// make a convex hull collision shape to assist in calculation of the tire shape size
 	ndDemoMesh* const tireMesh = (ndDemoMesh*)*tirePart->GetMesh();
@@ -397,15 +397,16 @@ ndBodyKinematic* ndVehicleCommonNotify::CreateTireBody(ndDemoEntityManager* cons
 {
 	ndFloat32 width;
 	ndFloat32 radius;
-	ndDemoEntity* const parentEntity = (ndDemoEntity*)parentBody->GetNotifyCallback()->GetUserData();
+	ndVehicleEntityNotify* const notify = (ndVehicleEntityNotify*)parentBody->GetNotifyCallback();
+	ndSharedPtr<ndDemoEntity> parentEntity = notify->m_entity;
 	CalculateTireDimensions(tireName, width, radius, parentEntity);
 	
 	ndMultiBodyVehicle* const vehicle = (ndMultiBodyVehicle*)GetModel();
-
+	
 	//definition.m_radios = radius;
 	ndShapeInstance tireCollision(vehicle->CreateTireShape(radius, width));
 	
-	ndDemoEntity* const tireEntity = parentEntity->Find(tireName);
+	ndSharedPtr<ndDemoEntity> tireEntity (parentEntity->Find(parentEntity, tireName));
 	ndMatrix matrix(tireEntity->CalculateGlobalMatrix(nullptr));
 	
 	const ndBodyKinematic* const chassis = vehicle->GetChassis();
@@ -426,7 +427,7 @@ ndBodyKinematic* ndVehicleCommonNotify::CreateTireBody(ndDemoEntityManager* cons
 	return tireBody;
 }
 
-ndBodyDynamic* ndVehicleCommonNotify::CreateChassis(ndDemoEntityManager* const scene, ndDemoEntity* const chassisEntity, ndFloat32 mass)
+ndBodyDynamic* ndVehicleCommonNotify::CreateChassis(ndDemoEntityManager* const scene, const ndSharedPtr<ndDemoEntity>& chassisEntity, ndFloat32 mass)
 {
 	ndMatrix matrix(chassisEntity->CalculateGlobalMatrix(nullptr));
 	ndSharedPtr<ndShapeInstance> chassisCollision(chassisEntity->CreateCollisionFromChildren());

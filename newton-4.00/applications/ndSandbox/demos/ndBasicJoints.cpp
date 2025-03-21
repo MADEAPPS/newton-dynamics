@@ -21,6 +21,24 @@
 #include "ndDemoSplinePathMesh.h"
 #include "ndDemoInstanceEntity.h"
 
+static ndBodyDynamic* MakePrimitive(ndDemoEntityManager* const scene, const ndMatrix& matrix, const ndShapeInstance& shape, ndSharedPtr<ndDemoMeshInterface> mesh, ndFloat32 mass)
+{
+	ndPhysicsWorld* const world = scene->GetWorld();
+	ndSharedPtr<ndDemoEntity> entity (new ndDemoEntity(matrix));
+
+	entity->SetMesh(mesh);
+	ndSharedPtr<ndBody> body (new ndBodyDynamic());
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+	body->SetMatrix(matrix);
+	body->GetAsBodyDynamic()->SetCollisionShape(shape);
+	body->GetAsBodyDynamic()->SetMassMatrix(mass, shape);
+
+	world->AddBody(body);
+	scene->AddEntity(entity);
+	return body->GetAsBodyDynamic();
+}
+
+
 class ndSplinePathBody : public ndBodyDynamic
 {
 	public:
@@ -37,15 +55,12 @@ class ndSplinePathBody : public ndBodyDynamic
 		// create a Bezier Spline path for AI car to drive
 		ndShapeInstance box(new ndShapeBox(1.0f, 1.0f, 1.0f));
 		
-		ndPhysicsWorld* const world = scene->GetWorld();
-		ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
+		//ndPhysicsWorld* const world = scene->GetWorld();
+		ndSharedPtr<ndDemoEntity> entity (new ndDemoEntity(matrix));
 		SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 		SetMatrix(matrix);
 		SetCollisionShape(box);
 		scene->AddEntity(entity);
-
-		ndSharedPtr<ndBody> bodyPtr(this);
-		world->AddBody(bodyPtr);
 		
 		// create a Bezier Spline path for AI car to drive
 		CreateSplinePath();
@@ -106,724 +121,18 @@ class ndJointFollowSplinePath : public ndJointFollowPath
 	}
 };
 
-static ndBodyDynamic* MakePrimitive(ndDemoEntityManager* const scene, const ndMatrix& matrix, const ndShapeInstance& shape, ndSharedPtr<ndDemoMeshInterface> mesh, ndFloat32 mass)
-{
-	ndPhysicsWorld* const world = scene->GetWorld();
-	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(mesh);
-	ndBodyKinematic* const body = new ndBodyDynamic();
-	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-	body->SetMatrix(matrix);
-	body->SetCollisionShape(shape);
-	body->SetMassMatrix(mass, shape);
-	ndSharedPtr<ndBody> bodyPtr(body);
-	world->AddBody(bodyPtr);
-	scene->AddEntity(entity);
-	return body->GetAsBodyDynamic();
-}
-
-#if 0
-static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& origin)
-{
-	class ndJointSphericalMotor : public ndJointSpherical
-	{
-		public:
-		D_CLASS_REFLECTION(ndJointSphericalMotor, ndJointSpherical)
-
-			ndJointSphericalMotor(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-			:ndJointSpherical(pinAndPivotFrame, child, parent)
-			,m_rollAngle(0.0f)
-			,m_pitchAngle(0.0f)
-			,m_rollOmega(5.0f)
-			,m_pitchOmega(6.0f)
-		{
-			ndFloat32 friction = 10.0f;
-			ndFloat32 spring = 1500.0f;
-			ndFloat32 regularizer = 0.01f;
-			SetAsSpringDamper(regularizer, spring, friction);
-		}
-
-		void JacobianDerivative(ndConstraintDescritor& desc)
-		{
-			m_rollAngle = ndFmod(m_rollAngle + m_rollOmega * desc.m_timestep, 2.0f * ndPi);
-			m_pitchAngle = ndFmod(m_pitchAngle + m_pitchOmega * desc.m_timestep, 2.0f * ndPi);
-
-			const ndMatrix rotaion(ndPitchMatrix(m_pitchAngle) * ndRollMatrix(m_rollAngle));
-			SetOffsetRotation(rotaion);
-			ndJointSpherical::JacobianDerivative(desc);
-		}
-
-		ndFloat32 m_rollAngle;
-		ndFloat32 m_pitchAngle;
-		ndFloat32 m_rollOmega;
-		ndFloat32 m_pitchOmega;
-	};
-
-	ndFloat32 mass = 1.0f;
-	ndFloat32 diameter = 0.5f;
-	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.25f, diameter * 0.25f, diameter * 1.0f));
-	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
-
-	ndPhysicsWorld* const world = scene->GetWorld();
-	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-	//ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	{
-		// add a spherical motor.
-		matrix.m_posit.m_y = 0.0f;//floor.m_y;
-		matrix.m_posit.m_y += diameter;
-		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-		ndMatrix pinAlign(ndRollMatrix(180.0f * ndDegreeToRad));
-		ndMatrix bodyMatrix0(pinAlign * body->GetMatrix());
-		bodyMatrix0.m_posit.m_y += diameter * 0.5f + diameter * 0.25f;
-		ndBodyKinematic* const fixBody = world->GetSentinelBody();
-		ndSharedPtr<ndJointBilateralConstraint> joint(new ndJointSphericalMotor(bodyMatrix0, body, fixBody));
-		world->AddJoint(joint);
-	}
-
-	if (0)
-	{
-		const ndInt32 count = 6;
-		// add flexible chain with spring damper.
-		matrix.m_posit.m_z -= 2.0f;
-		matrix.m_posit.m_y = 0.0f;//floor.m_y;
-		ndBodyDynamic* array[count];
-		for (ndInt32 i = 0; i < count; ++i)
-		{
-			matrix.m_posit.m_y += diameter;
-			ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-			array[i] = body;
-		}
-
-		ndFloat32 friction = 10.0f;
-		ndFloat32 spring = 1500.0f;
-		ndFloat32 regularizer = 0.01f;
-
-		ndMatrix pinAlign(ndRollMatrix(180.0f * ndDegreeToRad));
-		for (ndInt32 i = 1; i < count; ++i)
-		{
-			ndMatrix bodyMatrix0(array[i - 1]->GetMatrix());
-			ndMatrix bodyMatrix1(array[i - 0]->GetMatrix());
-			ndMatrix pinMatrix(pinAlign * bodyMatrix0);
-			pinMatrix.m_posit = (bodyMatrix0.m_posit + bodyMatrix1.m_posit).Scale(0.5f);
-			ndJointSpherical* const joint = new ndJointSpherical(pinMatrix, array[i - 1], array[i - 0]);
-			joint->SetAsSpringDamper(regularizer, spring, friction);
-			ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
-			world->AddJoint(jointPtr);
-		}
-
-		ndMatrix bodyMatrix0(pinAlign * array[count - 1]->GetMatrix());
-		bodyMatrix0.m_posit.m_y += diameter * 0.5f + diameter * 0.25f;
-		ndBodyKinematic* const fixBody = world->GetSentinelBody();
-		ndJointSpherical* const joint = new ndJointSpherical(bodyMatrix0, array[count - 1], fixBody);
-		joint->SetAsSpringDamper(regularizer, spring, friction);
-		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
-		world->AddJoint(jointPtr);
-	}
-
-	if (0)
-	{
-		// add a chain with viscous friction.
-		const ndInt32 count = 6;
-		matrix.m_posit.m_z -= 2.0f;
-		matrix.m_posit.m_y = 0.0f;//floor.m_y;
-		ndBodyDynamic* array[count];
-		for (ndInt32 i = 0; i < count; ++i)
-		{
-			matrix.m_posit.m_y += diameter;
-			ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-			//ndVector inertia(body->GetMassMatrix());
-			//ndFloat32 maxI(dMax(dMax(inertia.m_x, inertia.m_z), inertia.m_z));
-			//inertia.m_x = maxI;
-			//inertia.m_y = maxI;
-			//inertia.m_z = maxI;
-			//body->SetMassMatrix(inertia);
-			array[i] = body;
-		}
-
-		ndFloat32 friction = 10.0f;
-		ndFloat32 regularizer = 0.1f;
-
-		ndMatrix pinAlign(ndRollMatrix(180.0f * ndDegreeToRad));
-		for (ndInt32 i = 1; i < count; ++i)
-		{
-			ndMatrix bodyMatrix0(array[i - 1]->GetMatrix());
-			ndMatrix bodyMatrix1(array[i - 0]->GetMatrix());
-			ndMatrix pinMatrix(pinAlign * bodyMatrix0);
-			pinMatrix.m_posit = (bodyMatrix0.m_posit + bodyMatrix1.m_posit).Scale(0.5f);
-			ndJointSpherical* const joint = new ndJointSpherical(pinMatrix, array[i - 1], array[i - 0]);
-			joint->SetAsSpringDamper(regularizer, ndFloat32(0.0f), friction);
-			joint->SetConeLimit(60.0f * ndDegreeToRad);
-			joint->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
-			ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
-			world->AddJoint(jointPtr);
-		}
-
-		ndMatrix bodyMatrix0(pinAlign * array[count - 1]->GetMatrix());
-		bodyMatrix0.m_posit.m_y += diameter * 0.5f + diameter * 0.25f;
-		ndBodyKinematic* const fixBody = world->GetSentinelBody();
-		ndJointSpherical* const joint = new ndJointSpherical(bodyMatrix0, array[count - 1], fixBody);
-		joint->SetAsSpringDamper(regularizer, ndFloat32(0.0f), friction);
-		joint->SetConeLimit(60.0f * ndDegreeToRad);
-		joint->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
-		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
-		world->AddJoint(jointPtr);
-	}
-}
-
-#else
-static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& origin)
-{
-	class ndJointSphericalMotor : public ndJointSpherical
-	{
-		public:
-		D_CLASS_REFLECTION(ndJointSphericalMotor, ndJointSpherical)
-
-		ndJointSphericalMotor(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-			:ndJointSpherical(pinAndPivotFrame, child, parent)
-			,m_rollAngle(0.0f)
-			,m_pitchAngle(0.0f)
-			,m_rollOmega(5.0f)
-			,m_pitchOmega(6.0f)
-		{
-			ndFloat32 friction = 10.0f;
-			ndFloat32 spring = 1500.0f;
-			ndFloat32 regularizer = 0.01f;
-			SetAsSpringDamper(regularizer, spring, friction);
-		}
-	
-		void JacobianDerivative(ndConstraintDescritor& desc)
-		{
-			m_rollAngle = ndFmod(m_rollAngle + m_rollOmega * desc.m_timestep, 2.0f * ndPi);
-			m_pitchAngle = ndFmod(m_pitchAngle + m_pitchOmega * desc.m_timestep, 2.0f * ndPi);
-	
-			const ndMatrix rotaion(ndPitchMatrix(m_pitchAngle) * ndRollMatrix(m_rollAngle));
-			SetOffsetRotation(rotaion);
-			ndJointSpherical::JacobianDerivative(desc);
-		}
-	
-		ndFloat32 m_rollAngle;
-		ndFloat32 m_pitchAngle;
-		ndFloat32 m_rollOmega;
-		ndFloat32 m_pitchOmega;
-	};
-
-	ndFloat32 mass = 1.0f;
-	ndFloat32 diameter = 0.5f;
-	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.25f, diameter * 0.25f, diameter * 1.0f));
-	ndSharedPtr<ndDemoMeshInterface> mesh (new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
-	
-	ndPhysicsWorld* const world = scene->GetWorld();
-	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	{
-		// add a spherical motor.
-		matrix.m_posit.m_y = floor.m_y;
-		matrix.m_posit.m_y += diameter;
-		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-		ndMatrix pinAlign(ndRollMatrix(180.0f * ndDegreeToRad));
-		ndMatrix bodyMatrix0(pinAlign * body->GetMatrix());
-		bodyMatrix0.m_posit.m_y += diameter * 0.5f + diameter * 0.25f;
-		ndBodyKinematic* const fixBody = world->GetSentinelBody();
-		ndSharedPtr<ndJointBilateralConstraint> joint (new ndJointSphericalMotor(bodyMatrix0, body, fixBody));
-		world->AddJoint(joint);
-	}
-	
-	if (1)
-	{
-		const ndInt32 count = 6;
-		// add flexible chain with spring damper.
-		matrix.m_posit.m_z -= 2.0f;
-		matrix.m_posit.m_y = floor.m_y;
-		ndBodyDynamic* array[count];
-		for (ndInt32 i = 0; i < count; ++i)
-		{
-			matrix.m_posit.m_y += diameter;
-			ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-			array[i] = body;
-		}
-	
-		ndFloat32 friction = 10.0f;
-		ndFloat32 spring = 1500.0f;
-		ndFloat32 regularizer = 0.01f;
-	
-		ndMatrix pinAlign(ndRollMatrix(180.0f * ndDegreeToRad));
-		for (ndInt32 i = 1; i < count; ++i)
-		{
-			ndMatrix bodyMatrix0(array[i - 1]->GetMatrix());
-			ndMatrix bodyMatrix1(array[i - 0]->GetMatrix());
-			ndMatrix pinMatrix(pinAlign * bodyMatrix0);
-			pinMatrix.m_posit = (bodyMatrix0.m_posit + bodyMatrix1.m_posit).Scale(0.5f);
-			ndJointSpherical* const joint = new ndJointSpherical(pinMatrix, array[i - 1], array[i - 0]);
-			joint->SetAsSpringDamper(regularizer, spring, friction);
-			ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
-			world->AddJoint(jointPtr);
-		}
-	
-		ndMatrix bodyMatrix0(pinAlign * array[count - 1]->GetMatrix());
-		bodyMatrix0.m_posit.m_y += diameter * 0.5f + diameter * 0.25f;
-		ndBodyKinematic* const fixBody = world->GetSentinelBody();
-		ndJointSpherical* const joint = new ndJointSpherical(bodyMatrix0, array[count - 1], fixBody);
-		joint->SetAsSpringDamper(regularizer, spring, friction);
-		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
-		world->AddJoint(jointPtr);
-	}
-	
-	if (1)
-	{
-		// add a chain with viscous friction.
-		const ndInt32 count = 6;
-		matrix.m_posit.m_z -= 2.0f;
-		matrix.m_posit.m_y = floor.m_y;
-		ndBodyDynamic* array[count];
-		for (ndInt32 i = 0; i < count; ++i)
-		{
-			matrix.m_posit.m_y += diameter;
-			ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-			//ndVector inertia(body->GetMassMatrix());
-			//ndFloat32 maxI(dMax(dMax(inertia.m_x, inertia.m_z), inertia.m_z));
-			//inertia.m_x = maxI;
-			//inertia.m_y = maxI;
-			//inertia.m_z = maxI;
-			//body->SetMassMatrix(inertia);
-			array[i] = body;
-		}
-	
-		ndFloat32 friction = 10.0f;
-		ndFloat32 regularizer = 0.1f;
-	
-		ndMatrix pinAlign(ndRollMatrix(180.0f * ndDegreeToRad));
-		for (ndInt32 i = 1; i < count; ++i)
-		{
-			ndMatrix bodyMatrix0(array[i - 1]->GetMatrix());
-			ndMatrix bodyMatrix1(array[i - 0]->GetMatrix());
-			ndMatrix pinMatrix(pinAlign * bodyMatrix0);
-			pinMatrix.m_posit = (bodyMatrix0.m_posit + bodyMatrix1.m_posit).Scale(0.5f);
-			ndJointSpherical* const joint = new ndJointSpherical(pinMatrix, array[i - 1], array[i - 0]);
-			joint->SetAsSpringDamper(regularizer, ndFloat32(0.0f), friction);
-			joint->SetConeLimit(60.0f * ndDegreeToRad);
-			joint->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
-			ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
-			world->AddJoint(jointPtr);
-		}
-	
-		ndMatrix bodyMatrix0(pinAlign * array[count - 1]->GetMatrix());
-		bodyMatrix0.m_posit.m_y += diameter * 0.5f + diameter * 0.25f;
-		ndBodyKinematic* const fixBody = world->GetSentinelBody();
-		ndJointSpherical* const joint = new ndJointSpherical(bodyMatrix0, array[count - 1], fixBody);
-		joint->SetAsSpringDamper(regularizer, ndFloat32(0.0f), friction);
-		joint->SetConeLimit(60.0f * ndDegreeToRad);
-		joint->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
-		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
-		world->AddJoint(jointPtr);
-	}
-}
-#endif
-
-static void BuildRollingFriction(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
-{
-	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-	
-	ndShapeInstance shape2(new ndShapeSphere(diameter * 0.5f));
-	ndSharedPtr<ndDemoMeshInterface> mesh2(new ndDemoMesh("shape2", scene->GetShaderCache(), &shape2, "earthmap.png", "earthmap.png", "earthmap.png"));
-	matrix.m_posit.m_y += 5.0f;
-	
-	ndPhysicsWorld* const world = scene->GetWorld();
-	ndVector posit(matrix.m_posit);
-	for (ndInt32 i = 0; i < 8; ++i)
-	{
-		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape2, mesh2, mass);
-		ndJointBilateralConstraint* const joint = new ndJointDryRollingFriction(body, world->GetSentinelBody(), 0.5f);
-		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
-		world->AddJoint(jointPtr);
-		posit.m_y += diameter * 1.5f;
-		matrix.m_posit = posit + ndVector(ndGaussianRandom(0.0f, 0.01f), 0.0f, ndGaussianRandom(0.0f, 0.01f), 0.0f);
-	}
-}
-
-static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
-{
-	class ndJointSliderOscillator : public ndJointSlider
-	{
-		public:
-		ndJointSliderOscillator(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-			:ndJointSlider(pinAndPivotFrame, child, parent)
-			, m_angle(0.0f)
-		{
-		}
-	
-		void JacobianDerivative(ndConstraintDescritor& desc)
-		{
-			m_angle += ndFmod(5.0f * desc.m_timestep, 2.0f * ndPi);
-			ndFloat32 dist = 0.9f * ndSin(m_angle);
-			SetTargetPosit(dist);
-			ndJointSlider::JacobianDerivative(desc);
-		}
-	
-		ndFloat32 m_angle;
-	};
-	
-	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
-	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
-	
-	ndMatrix matrix(ndGetIdentityMatrix());
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-	
-	ndPhysicsWorld* const world = scene->GetWorld();
-	
-	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y = floor.m_y;
-	
-	ndBodyKinematic* const fixBody = world->GetSentinelBody();
-	{
-		// spring damper slider with limits
-		matrix.m_posit.m_y += 2.0f;
-		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-		ndJointSlider* const joint = new ndJointSlider(ndYawMatrix(90.0f * ndDegreeToRad) * matrix, body, fixBody);
-		joint->SetAsSpringDamper(0.1f, 100.0f, 5.0f);
-		joint->SetLimits(-1.0f, 1.0f);
-		joint->SetLimitState(true);
-		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
-		world->AddJoint(jointPtr);
-	}
-	
-	{
-		// viscous damper slider with limits
-		matrix.m_posit.m_y += 1.2f;
-		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-		ndJointSlider* const joint = new ndJointSlider(ndYawMatrix(90.0f * ndDegreeToRad) * matrix, body, fixBody);
-		joint->SetAsSpringDamper(0.1f, 0.0f, 10.0f);
-		joint->SetLimits(-1.0f, 1.0f);
-		joint->SetLimitState(true);
-		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
-		world->AddJoint(jointPtr);
-	}
-	
-	{
-		// proportional derivative slider oscillator with limits
-		matrix.m_posit.m_y += 1.2f;
-		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-		ndJointSlider* const joint = new ndJointSliderOscillator(ndYawMatrix(90.0f * ndDegreeToRad) * matrix, body, fixBody);
-		joint->SetAsSpringDamper(0.1f, 500.0f, 10.0f);
-		joint->SetLimits(-1.0f, 1.0f);
-		joint->SetLimitState(true);
-		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
-		world->AddJoint(jointPtr);
-	}
-}
-
-static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
-{
-	class ndJointHingeOscillator : public ndJointHinge
-	{
-		public:
-		ndJointHingeOscillator(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-			:ndJointHinge(pinAndPivotFrame, child, parent)
-			,m_angle(0.0f)
-		{
-		}
-	
-		void JacobianDerivative(ndConstraintDescritor& desc)
-		{
-			m_angle += ndFmod(5.0f * desc.m_timestep, 2.0f * ndPi);
-			ndFloat32 dist = 150.0f * ndDegreeToRad * ndSin(m_angle);
-			SetTargetAngle(dist);
-			ndJointHinge::JacobianDerivative(desc);
-		}
-	
-		ndFloat32 m_angle;
-	};
-	
-	class ndJointHingeMotor : public ndJointHinge
-	{
-		public:
-		ndJointHingeMotor(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-			:ndJointHinge(pinAndPivotFrame, child, parent)
-			,m_speed(10.0f)
-		{
-		}
-	
-		void JacobianDerivative(ndConstraintDescritor& desc)
-		{
-			ndFloat32 angle = GetAngle();
-			SetTargetAngle(angle + m_speed * desc.m_timestep);
-			ndJointHinge::JacobianDerivative(desc);
-		}
-		ndFloat32 m_speed;
-	};
-	
-	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
-	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
-	
-	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-	
-	ndPhysicsWorld* const world = scene->GetWorld();
-	
-	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y = floor.m_y;
-	
-	ndBodyKinematic* const fixBody = world->GetSentinelBody();
-	{
-		// spring damper and limits
-		matrix.m_posit.m_y += 2.0f;
-		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-		ndJointHinge* const joint = new ndJointHinge(matrix, body, fixBody);
-		joint->SetAsSpringDamper(0.1f, 20.0f, 1.0f);
-		joint->SetLimits(-3.0f, 3.0f);
-		joint->SetLimitState(true);
-		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
-		world->AddJoint(jointPtr);
-	}
-	
-	{
-		// viscous friction and limits
-		matrix.m_posit.m_y += 1.2f;
-		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-		ndJointHinge* const joint = new ndJointHinge(matrix, body, fixBody);
-		joint->SetAsSpringDamper(0.1f, 0.0f, 1.0f);
-		joint->SetLimits(-10.0f, 15.0f);
-		joint->SetLimitState(true);
-		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
-		world->AddJoint(jointPtr);
-	}
-	
-	{
-		// proportional derivative hinge oscillator with limits
-		matrix.m_posit.m_y += 1.2f;
-		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-		ndJointHinge* const joint = new ndJointHingeOscillator(matrix, body, fixBody);
-		joint->SetAsSpringDamper(0.1f, 1500.0f, 10.0f);
-		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
-		world->AddJoint(jointPtr);
-	}
-	
-	{
-		// proportional derivative hinge motor with limits
-		matrix.m_posit.m_y += 1.2f;
-		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-		ndJointHinge* const joint = new ndJointHingeMotor(matrix, body, fixBody);
-		joint->SetAsSpringDamper(0.1f, 1500.0f, 10.0f);
-		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
-		world->AddJoint(jointPtr);
-	}
-}
-
-static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
-{
-	class ndJointDoubleHingeMotor : public ndJointDoubleHinge
-	{
-		public:
-		ndJointDoubleHingeMotor(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-			:ndJointDoubleHinge(pinAndPivotFrame, child, parent)
-			,m_angle(0.0f)
-			,m_speed(10.0f)
-		{
-		}
-	
-		void JacobianDerivative(ndConstraintDescritor& desc)
-		{
-			m_angle += ndFmod(5.0f * desc.m_timestep, 2.0f * ndPi);
-			ndFloat32 dist = 150.0f * ndDegreeToRad * ndSin(m_angle);
-			SetOffsetAngle0(dist);
-	
-			ndFloat32 angle = GetAngle1();
-			SetOffsetAngle1(angle + m_speed * desc.m_timestep);
-	
-			ndJointDoubleHinge::JacobianDerivative(desc);
-		}
-	
-		ndFloat32 m_angle;
-		ndFloat32 m_speed;
-	};
-	
-	ndShapeInstance shape(new ndShapeCylinder(diameter, diameter, diameter * 0.5f));
-	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
-	
-	ndMatrix matrix(ndYawMatrix(90.0f * ndDegreeToRad));
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-	
-	ndPhysicsWorld* const world = scene->GetWorld();
-	
-	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y = floor.m_y;
-	
-	matrix.m_posit.m_y += 2.0f;
-	
-	ndBodyKinematic* const fixBody = world->GetSentinelBody();
-	{
-		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-		body->SetOmega(ndVector(0.0f, 10.0f, 20.0f, 0.0f));
-		
-		ndJointDoubleHinge* const joint = new ndJointDoubleHinge(matrix, body, fixBody);
-		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
-		world->AddJoint(jointPtr);
-	}
-	
-	{
-		// proportional derivative double hinge motor
-		matrix.m_posit.m_z += 1.8f;
-		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-		ndJointDoubleHinge* const joint = new ndJointDoubleHingeMotor(matrix, body, fixBody);
-		joint->SetAsSpringDamper0(0.1f, 1500.0f, 10.0f);
-		joint->SetAsSpringDamper1(0.1f, 1500.0f, 10.0f);
-		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
-		world->AddJoint(jointPtr);
-	}
-}
-
-static void BuildRoller(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
-{
-	ndShapeInstance shape(new ndShapeChamferCylinder(diameter * 0.5f, diameter));
-	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
-	
-	ndMatrix matrix(ndGetIdentityMatrix());
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-	
-	ndPhysicsWorld* const world = scene->GetWorld();
-	
-	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y = floor.m_y;
-	
-	ndBodyKinematic* const fixBody = world->GetSentinelBody();
-	{
-		// spring damper slider with limits
-		matrix.m_posit.m_y += 2.0f;
-		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-		ndJointRoller* const joint = new ndJointRoller(ndPitchMatrix(90.0f * ndDegreeToRad) * matrix, body, fixBody);
-		joint->SetAsSpringDamperPosit(0.1f, 100.0f, 5.0f);
-		joint->SetLimitsPosit(-1.0f, 1.0f);
-		joint->SetLimitStatePosit(true);
-		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
-		world->AddJoint(jointPtr);
-	}
-}
-
-static void BuildCylindrical(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
-{
-	ndShapeInstance shape(new ndShapeChamferCylinder(diameter * 0.5f, diameter));
-	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
-	
-	ndMatrix matrix(ndYawMatrix(90.0f * ndDegreeToRad));
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-	
-	ndPhysicsWorld* const world = scene->GetWorld();
-	
-	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y = floor.m_y;
-	
-	ndBodyKinematic* const fixBody = world->GetSentinelBody();
-	{
-		// spring damper slider with limits
-		matrix.m_posit.m_y += 2.0f;
-		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
-		ndJointCylinder* const joint = new ndJointCylinder(matrix, body, fixBody);
-		joint->SetAsSpringDamperPosit(0.1f, 100.0f, 5.0f);
-		joint->SetLimitsPosit(-1.0f, 1.0f);
-		joint->SetLimitStatePosit(true);
-		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
-		world->AddJoint(jointPtr);
-	}
-}
-
-void BuildFixDistanceJoints(ndDemoEntityManager* const scene, const ndVector& origin)
-{
-	ndShapeInstance shape(new ndShapeSphere(0.25f));
-	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "earthmap.png", "earthmap.png", "earthmap.png"));
-	
-	ndMatrix matrix(ndGetIdentityMatrix());
-	
-	ndBodyDynamic* bodies[8];
-	
-	matrix.m_posit = origin + ndVector(0.0f, 4.0f, 0.0f, 0.0f);
-	bodies[0] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
-	
-	matrix.m_posit = origin + ndVector(2.0f, 4.0f, 0.0f, 0.0f);
-	bodies[1] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
-	
-	matrix.m_posit = origin + ndVector(2.0f, 4.0f, 2.0f, 0.0f);
-	bodies[2] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
-	
-	matrix.m_posit = origin + ndVector(0.0f, 4.0f, 2.0f, 0.0f);
-	bodies[3] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
-	
-	matrix.m_posit = origin + ndVector(0.0f, 6.0f, 0.0f, 0.0f);
-	bodies[4] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
-	
-	matrix.m_posit = origin + ndVector(2.0f, 6.0f, 0.0f, 0.0f);
-	bodies[5] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
-	
-	matrix.m_posit = origin + ndVector(2.0f, 6.0f, 2.0f, 0.0f);
-	bodies[6] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
-	
-	matrix.m_posit = origin + ndVector(0.0f, 6.0f, 2.0f, 0.0f);
-	bodies[7] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
-	
-	ndWorld* world = scene->GetWorld();
-	for (ndInt32 i = 0; i < 8; ++i)
-	{
-		ndBodyDynamic* const body0 = bodies[i];
-		for (ndInt32 j = i + 1; j < 8; ++j)
-		{
-			ndBodyDynamic* const body1 = bodies[j];
-			ndJointFixDistance* const joint = new ndJointFixDistance(body0->GetMatrix().m_posit, body1->GetMatrix().m_posit, body0, body1);
-			ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
-			world->AddJoint(jointPtr);
-		}
-	}
-}
-
-static void BuildGear(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
-{
-	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
-	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
-	
-	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-	
-	ndPhysicsWorld* const world = scene->GetWorld();
-	
-	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y = floor.m_y;
-	
-	matrix.m_posit.m_y += 2.0f;
-	
-	ndBodyKinematic* const fixBody = world->GetSentinelBody();
-	ndBodyDynamic* const body0 = MakePrimitive(scene, matrix, shape, mesh, mass);
-	
-	matrix.m_posit.m_y += diameter * 1.5f;
-	ndBodyDynamic* const body1 = MakePrimitive(scene, matrix, shape, mesh, mass);
-	
-	ndVector pin(matrix.m_front);
-	ndSharedPtr<ndJointBilateralConstraint> joint0(new ndJointHinge(matrix, body0, fixBody));
-	ndSharedPtr<ndJointBilateralConstraint> joint1(new ndJointHinge(matrix, body1, fixBody));
-	ndSharedPtr<ndJointBilateralConstraint> joint2(new ndJointGear(4.0f, pin, body0, pin, body1));
-
-	world->AddJoint(joint0);
-	world->AddJoint(joint1);
-	world->AddJoint(joint2);
-}
 
 static void BuildPathFollow(ndDemoEntityManager* const scene, const ndVector& origin)
 {
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit = origin;
-	
-	ndSplinePathBody* const pathBody = new ndSplinePathBody(scene, matrix);
+	ndPhysicsWorld* const world = scene->GetWorld();
+
+	ndSharedPtr<ndBody> pathBody (new ndSplinePathBody(scene, matrix));
+	world->AddBody(pathBody);
 	ndDemoEntity* const rollerCosterPath = (ndDemoEntity*)pathBody->GetNotifyCallback()->GetUserData();
 	
-	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoSplinePathMesh(pathBody->m_spline, scene->GetShaderCache(), 500));
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoSplinePathMesh(((ndSplinePathBody*)*pathBody)->m_spline, scene->GetShaderCache(), 500));
 	rollerCosterPath->SetMesh(mesh);
 	mesh->SetVisible(true);
 	
@@ -849,11 +158,10 @@ static void BuildPathFollow(ndDemoEntityManager* const scene, const ndVector& or
 	
 	ndShapeInstance shape(new ndShapeChamferCylinder(0.5f, 0.5f));
 	ndSharedPtr<ndDemoMeshIntance> instanceMesh (new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
-	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(instanceMesh);
+	ndSharedPtr<ndDemoEntity> rootEntity (new ndDemoInstanceEntity(instanceMesh));
 	scene->AddEntity(rootEntity);
 	
 	ndBodyDynamic* bodies[count];
-	ndPhysicsWorld* const world = scene->GetWorld();
 	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		ndVector location0(positions[i + 0].m_x, positions[i + 0].m_y, positions[i + 0].m_z, ndFloat32 (0.0f));
@@ -871,21 +179,21 @@ static void BuildPathFollow(ndDemoEntityManager* const scene, const ndVector& or
 		matrix.m_posit = pathBodyMatrix.TransformVector(ndVector(positions[i].m_x, positions[i].m_y - attachmentOffset, positions[i].m_z, ndFloat32(1.0f)));
 		ndMatrix matrix1(ndYawMatrix(0.5f * ndPi) * matrix);
 		
-		ndBodyKinematic* const body = new ndBodyDynamic();
-		ndDemoEntity* const entity = new ndDemoEntity(matrix1, rootEntity);
+		ndSharedPtr<ndBody> body (new ndBodyDynamic());
+		ndSharedPtr<ndDemoEntity> entity (new ndDemoEntity(matrix1));
+		rootEntity->AddChild(entity);
 		
 		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 		body->SetMatrix(matrix1);
-		body->SetCollisionShape(shape);
-		body->SetMassMatrix(1.0f, shape);
+		body->GetAsBodyDynamic()->SetCollisionShape(shape);
+		body->GetAsBodyDynamic()->SetMassMatrix(1.0f, shape);
 		
-		ndSharedPtr<ndBody> bodyPtr(body);
-		world->AddBody(bodyPtr);
+		world->AddBody(body);
 		
 		bodies[i] = body->GetAsBodyDynamic();
 		matrix.m_posit = pathBodyMatrix.TransformVector(ndVector(positions[i].m_x, positions[i].m_y, positions[i].m_z, ndFloat32(1.0f)));
-
-		ndJointFollowSplinePath* const joint = new ndJointFollowSplinePath(matrix, body->GetAsBodyDynamic(), pathBody);
+	
+		ndJointFollowSplinePath* const joint = new ndJointFollowSplinePath(matrix, body->GetAsBodyDynamic(), pathBody->GetAsBodyDynamic());
 		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
 		world->AddJoint(jointPtr);
 		
@@ -910,6 +218,548 @@ static void BuildPathFollow(ndDemoEntityManager* const scene, const ndVector& or
 	}
 }
 
+
+static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& origin)
+{
+	class ndJointSphericalMotor : public ndJointSpherical
+	{
+		public:
+		D_CLASS_REFLECTION(ndJointSphericalMotor, ndJointSpherical)
+
+		ndJointSphericalMotor(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+			:ndJointSpherical(pinAndPivotFrame, child, parent)
+			,m_rollAngle(0.0f)
+			,m_pitchAngle(0.0f)
+			,m_rollOmega(5.0f)
+			,m_pitchOmega(6.0f)
+		{
+			ndFloat32 friction = 10.0f;
+			ndFloat32 spring = 1500.0f;
+			ndFloat32 regularizer = 0.01f;
+			SetAsSpringDamper(regularizer, spring, friction);
+		}
+
+		void JacobianDerivative(ndConstraintDescritor& desc)
+		{
+			m_rollAngle = ndFmod(m_rollAngle + m_rollOmega * desc.m_timestep, 2.0f * ndPi);
+			m_pitchAngle = ndFmod(m_pitchAngle + m_pitchOmega * desc.m_timestep, 2.0f * ndPi);
+
+			const ndMatrix rotaion(ndPitchMatrix(m_pitchAngle) * ndRollMatrix(m_rollAngle));
+			SetOffsetRotation(rotaion);
+			ndJointSpherical::JacobianDerivative(desc);
+		}
+
+		ndFloat32 m_rollAngle;
+		ndFloat32 m_pitchAngle;
+		ndFloat32 m_rollOmega;
+		ndFloat32 m_pitchOmega;
+	};
+
+	ndFloat32 mass = 1.0f;
+	ndFloat32 diameter = 0.5f;
+	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.25f, diameter * 0.25f, diameter * 1.0f));
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
+
+	ndPhysicsWorld* const world = scene->GetWorld();
+	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	{
+		// add a spherical motor.
+		matrix.m_posit.m_y = floor.m_y;
+		matrix.m_posit.m_y += diameter;
+		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+		ndMatrix pinAlign(ndRollMatrix(180.0f * ndDegreeToRad));
+		ndMatrix bodyMatrix0(pinAlign * body->GetMatrix());
+		bodyMatrix0.m_posit.m_y += diameter * 0.5f + diameter * 0.25f;
+		ndBodyKinematic* const fixBody = world->GetSentinelBody();
+		ndSharedPtr<ndJointBilateralConstraint> joint(new ndJointSphericalMotor(bodyMatrix0, body, fixBody));
+		world->AddJoint(joint);
+	}
+
+	if (1)
+	{
+		const ndInt32 count = 6;
+		// add flexible chain with spring damper.
+		matrix.m_posit.m_z -= 2.0f;
+		matrix.m_posit.m_y = floor.m_y;
+		ndBodyDynamic* array[count];
+		for (ndInt32 i = 0; i < count; ++i)
+		{
+			matrix.m_posit.m_y += diameter;
+			ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+			array[i] = body;
+		}
+
+		ndFloat32 friction = 10.0f;
+		ndFloat32 spring = 1500.0f;
+		ndFloat32 regularizer = 0.01f;
+
+		ndMatrix pinAlign(ndRollMatrix(180.0f * ndDegreeToRad));
+		for (ndInt32 i = 1; i < count; ++i)
+		{
+			ndMatrix bodyMatrix0(array[i - 1]->GetMatrix());
+			ndMatrix bodyMatrix1(array[i - 0]->GetMatrix());
+			ndMatrix pinMatrix(pinAlign * bodyMatrix0);
+			pinMatrix.m_posit = (bodyMatrix0.m_posit + bodyMatrix1.m_posit).Scale(0.5f);
+			ndJointSpherical* const joint = new ndJointSpherical(pinMatrix, array[i - 1], array[i - 0]);
+			joint->SetAsSpringDamper(regularizer, spring, friction);
+			ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
+			world->AddJoint(jointPtr);
+		}
+
+		ndMatrix bodyMatrix0(pinAlign * array[count - 1]->GetMatrix());
+		bodyMatrix0.m_posit.m_y += diameter * 0.5f + diameter * 0.25f;
+		ndBodyKinematic* const fixBody = world->GetSentinelBody();
+		ndJointSpherical* const joint = new ndJointSpherical(bodyMatrix0, array[count - 1], fixBody);
+		joint->SetAsSpringDamper(regularizer, spring, friction);
+		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
+		world->AddJoint(jointPtr);
+	}
+
+	if (1)
+	{
+		// add a chain with viscous friction.
+		const ndInt32 count = 6;
+		matrix.m_posit.m_z -= 2.0f;
+		matrix.m_posit.m_y = floor.m_y;
+		ndBodyDynamic* array[count];
+		for (ndInt32 i = 0; i < count; ++i)
+		{
+			matrix.m_posit.m_y += diameter;
+			ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+			//ndVector inertia(body->GetMassMatrix());
+			//ndFloat32 maxI(dMax(dMax(inertia.m_x, inertia.m_z), inertia.m_z));
+			//inertia.m_x = maxI;
+			//inertia.m_y = maxI;
+			//inertia.m_z = maxI;
+			//body->SetMassMatrix(inertia);
+			array[i] = body;
+		}
+
+		ndFloat32 friction = 10.0f;
+		ndFloat32 regularizer = 0.1f;
+
+		ndMatrix pinAlign(ndRollMatrix(180.0f * ndDegreeToRad));
+		for (ndInt32 i = 1; i < count; ++i)
+		{
+			ndMatrix bodyMatrix0(array[i - 1]->GetMatrix());
+			ndMatrix bodyMatrix1(array[i - 0]->GetMatrix());
+			ndMatrix pinMatrix(pinAlign * bodyMatrix0);
+			pinMatrix.m_posit = (bodyMatrix0.m_posit + bodyMatrix1.m_posit).Scale(0.5f);
+			ndJointSpherical* const joint = new ndJointSpherical(pinMatrix, array[i - 1], array[i - 0]);
+			joint->SetAsSpringDamper(regularizer, ndFloat32(0.0f), friction);
+			joint->SetConeLimit(60.0f * ndDegreeToRad);
+			joint->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
+			ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
+			world->AddJoint(jointPtr);
+		}
+
+		ndMatrix bodyMatrix0(pinAlign * array[count - 1]->GetMatrix());
+		bodyMatrix0.m_posit.m_y += diameter * 0.5f + diameter * 0.25f;
+		ndBodyKinematic* const fixBody = world->GetSentinelBody();
+		ndJointSpherical* const joint = new ndJointSpherical(bodyMatrix0, array[count - 1], fixBody);
+		joint->SetAsSpringDamper(regularizer, ndFloat32(0.0f), friction);
+		joint->SetConeLimit(60.0f * ndDegreeToRad);
+		joint->SetTwistLimits(-90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
+		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
+		world->AddJoint(jointPtr);
+	}
+}
+
+static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
+{
+	class ndJointHingeOscillator : public ndJointHinge
+	{
+		public:
+		ndJointHingeOscillator(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+			:ndJointHinge(pinAndPivotFrame, child, parent)
+			,m_angle(0.0f)
+		{
+		}
+
+		void JacobianDerivative(ndConstraintDescritor& desc)
+		{
+			m_angle += ndFmod(5.0f * desc.m_timestep, 2.0f * ndPi);
+			ndFloat32 dist = 150.0f * ndDegreeToRad * ndSin(m_angle);
+			SetTargetAngle(dist);
+			ndJointHinge::JacobianDerivative(desc);
+		}
+
+		ndFloat32 m_angle;
+	};
+
+	class ndJointHingeMotor : public ndJointHinge
+	{
+		public:
+		ndJointHingeMotor(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+			:ndJointHinge(pinAndPivotFrame, child, parent)
+			,m_speed(10.0f)
+		{
+		}
+
+		void JacobianDerivative(ndConstraintDescritor& desc)
+		{
+			ndFloat32 angle = GetAngle();
+			SetTargetAngle(angle + m_speed * desc.m_timestep);
+			ndJointHinge::JacobianDerivative(desc);
+		}
+		ndFloat32 m_speed;
+	};
+
+	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
+
+	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+
+	ndPhysicsWorld* const world = scene->GetWorld();
+
+	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	matrix.m_posit.m_y = floor.m_y;
+
+	ndBodyKinematic* const fixBody = world->GetSentinelBody();
+	{
+		// spring damper and limits
+		matrix.m_posit.m_y += 2.0f;
+		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+		ndJointHinge* const joint = new ndJointHinge(matrix, body, fixBody);
+		joint->SetAsSpringDamper(0.1f, 20.0f, 1.0f);
+		joint->SetLimits(-3.0f, 3.0f);
+		joint->SetLimitState(true);
+		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
+		world->AddJoint(jointPtr);
+	}
+
+	{
+		// viscous friction and limits
+		matrix.m_posit.m_y += 1.2f;
+		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+		ndJointHinge* const joint = new ndJointHinge(matrix, body, fixBody);
+		joint->SetAsSpringDamper(0.1f, 0.0f, 1.0f);
+		joint->SetLimits(-10.0f, 15.0f);
+		joint->SetLimitState(true);
+		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
+		world->AddJoint(jointPtr);
+	}
+
+	{
+		// proportional derivative hinge oscillator with limits
+		matrix.m_posit.m_y += 1.2f;
+		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+		ndJointHinge* const joint = new ndJointHingeOscillator(matrix, body, fixBody);
+		joint->SetAsSpringDamper(0.1f, 1500.0f, 10.0f);
+		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
+		world->AddJoint(jointPtr);
+	}
+
+	{
+		// proportional derivative hinge motor with limits
+		matrix.m_posit.m_y += 1.2f;
+		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+		ndJointHinge* const joint = new ndJointHingeMotor(matrix, body, fixBody);
+		joint->SetAsSpringDamper(0.1f, 1500.0f, 10.0f);
+		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
+		world->AddJoint(jointPtr);
+	}
+}
+
+static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
+{
+	class ndJointSliderOscillator : public ndJointSlider
+	{
+		public:
+		ndJointSliderOscillator(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+			:ndJointSlider(pinAndPivotFrame, child, parent)
+			,m_angle(0.0f)
+		{
+		}
+
+		void JacobianDerivative(ndConstraintDescritor& desc)
+		{
+			m_angle += ndFmod(5.0f * desc.m_timestep, 2.0f * ndPi);
+			ndFloat32 dist = 0.9f * ndSin(m_angle);
+			SetTargetPosit(dist);
+			ndJointSlider::JacobianDerivative(desc);
+		}
+
+		ndFloat32 m_angle;
+	};
+
+	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
+
+	ndMatrix matrix(ndGetIdentityMatrix());
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+
+	ndPhysicsWorld* const world = scene->GetWorld();
+
+	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	matrix.m_posit.m_y = floor.m_y;
+
+	ndBodyKinematic* const fixBody = world->GetSentinelBody();
+	{
+		// spring damper slider with limits
+		matrix.m_posit.m_y += 2.0f;
+		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+		ndJointSlider* const joint = new ndJointSlider(ndYawMatrix(90.0f * ndDegreeToRad) * matrix, body, fixBody);
+		joint->SetAsSpringDamper(0.1f, 100.0f, 5.0f);
+		joint->SetLimits(-1.0f, 1.0f);
+		joint->SetLimitState(true);
+		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
+		world->AddJoint(jointPtr);
+	}
+
+	{
+		// viscous damper slider with limits
+		matrix.m_posit.m_y += 1.2f;
+		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+		ndJointSlider* const joint = new ndJointSlider(ndYawMatrix(90.0f * ndDegreeToRad) * matrix, body, fixBody);
+		joint->SetAsSpringDamper(0.1f, 0.0f, 10.0f);
+		joint->SetLimits(-1.0f, 1.0f);
+		joint->SetLimitState(true);
+		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
+		world->AddJoint(jointPtr);
+	}
+
+	{
+		// proportional derivative slider oscillator with limits
+		matrix.m_posit.m_y += 1.2f;
+		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+		ndJointSlider* const joint = new ndJointSliderOscillator(ndYawMatrix(90.0f * ndDegreeToRad) * matrix, body, fixBody);
+		joint->SetAsSpringDamper(0.1f, 500.0f, 10.0f);
+		joint->SetLimits(-1.0f, 1.0f);
+		joint->SetLimitState(true);
+		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
+		world->AddJoint(jointPtr);
+	}
+}
+
+static void BuildGear(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
+{
+	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
+
+	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+
+	ndPhysicsWorld* const world = scene->GetWorld();
+
+	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	matrix.m_posit.m_y = floor.m_y;
+
+	matrix.m_posit.m_y += 2.0f;
+
+	ndBodyKinematic* const fixBody = world->GetSentinelBody();
+	ndBodyDynamic* const body0 = MakePrimitive(scene, matrix, shape, mesh, mass);
+
+	matrix.m_posit.m_y += diameter * 1.5f;
+	ndBodyDynamic* const body1 = MakePrimitive(scene, matrix, shape, mesh, mass);
+
+	ndVector pin(matrix.m_front);
+	ndSharedPtr<ndJointBilateralConstraint> joint0(new ndJointHinge(matrix, body0, fixBody));
+	ndSharedPtr<ndJointBilateralConstraint> joint1(new ndJointHinge(matrix, body1, fixBody));
+	ndSharedPtr<ndJointBilateralConstraint> joint2(new ndJointGear(4.0f, pin, body0, pin, body1));
+
+	world->AddJoint(joint0);
+	world->AddJoint(joint1);
+	world->AddJoint(joint2);
+}
+
+static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
+{
+	class ndJointDoubleHingeMotor : public ndJointDoubleHinge
+	{
+		public:
+		ndJointDoubleHingeMotor(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+			:ndJointDoubleHinge(pinAndPivotFrame, child, parent)
+			,m_angle(0.0f)
+			,m_speed(10.0f)
+		{
+		}
+
+		void JacobianDerivative(ndConstraintDescritor& desc)
+		{
+			m_angle += ndFmod(5.0f * desc.m_timestep, 2.0f * ndPi);
+			ndFloat32 dist = 150.0f * ndDegreeToRad * ndSin(m_angle);
+			SetOffsetAngle0(dist);
+
+			ndFloat32 angle = GetAngle1();
+			SetOffsetAngle1(angle + m_speed * desc.m_timestep);
+
+			ndJointDoubleHinge::JacobianDerivative(desc);
+		}
+
+		ndFloat32 m_angle;
+		ndFloat32 m_speed;
+	};
+
+	ndShapeInstance shape(new ndShapeCylinder(diameter, diameter, diameter * 0.5f));
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
+
+	ndMatrix matrix(ndYawMatrix(90.0f * ndDegreeToRad));
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+
+	ndPhysicsWorld* const world = scene->GetWorld();
+
+	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	matrix.m_posit.m_y = floor.m_y;
+
+	matrix.m_posit.m_y += 2.0f;
+
+	ndBodyKinematic* const fixBody = world->GetSentinelBody();
+	{
+		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+		body->SetOmega(ndVector(0.0f, 10.0f, 20.0f, 0.0f));
+
+		ndJointDoubleHinge* const joint = new ndJointDoubleHinge(matrix, body, fixBody);
+		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
+		world->AddJoint(jointPtr);
+	}
+
+	{
+		// proportional derivative double hinge motor
+		matrix.m_posit.m_z += 1.8f;
+		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+		ndJointDoubleHinge* const joint = new ndJointDoubleHingeMotor(matrix, body, fixBody);
+		joint->SetAsSpringDamper0(0.1f, 1500.0f, 10.0f);
+		joint->SetAsSpringDamper1(0.1f, 1500.0f, 10.0f);
+		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
+		world->AddJoint(jointPtr);
+	}
+}
+
+static void BuildRoller(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
+{
+	ndShapeInstance shape(new ndShapeChamferCylinder(diameter * 0.5f, diameter));
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
+
+	ndMatrix matrix(ndGetIdentityMatrix());
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+
+	ndPhysicsWorld* const world = scene->GetWorld();
+
+	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	matrix.m_posit.m_y = floor.m_y;
+
+	ndBodyKinematic* const fixBody = world->GetSentinelBody();
+	{
+		// spring damper slider with limits
+		matrix.m_posit.m_y += 2.0f;
+		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+		ndJointRoller* const joint = new ndJointRoller(ndPitchMatrix(90.0f * ndDegreeToRad) * matrix, body, fixBody);
+		joint->SetAsSpringDamperPosit(0.1f, 100.0f, 5.0f);
+		joint->SetLimitsPosit(-1.0f, 1.0f);
+		joint->SetLimitStatePosit(true);
+		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
+		world->AddJoint(jointPtr);
+	}
+}
+
+static void BuildCylindrical(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
+{
+	ndShapeInstance shape(new ndShapeChamferCylinder(diameter * 0.5f, diameter));
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
+
+	ndMatrix matrix(ndYawMatrix(90.0f * ndDegreeToRad));
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+
+	ndPhysicsWorld* const world = scene->GetWorld();
+
+	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	matrix.m_posit.m_y = floor.m_y;
+
+	ndBodyKinematic* const fixBody = world->GetSentinelBody();
+	{
+		// spring damper slider with limits
+		matrix.m_posit.m_y += 2.0f;
+		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+		ndJointCylinder* const joint = new ndJointCylinder(matrix, body, fixBody);
+		joint->SetAsSpringDamperPosit(0.1f, 100.0f, 5.0f);
+		joint->SetLimitsPosit(-1.0f, 1.0f);
+		joint->SetLimitStatePosit(true);
+		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
+		world->AddJoint(jointPtr);
+	}
+}
+
+void BuildFixDistanceJoints(ndDemoEntityManager* const scene, const ndVector& origin)
+{
+	ndShapeInstance shape(new ndShapeSphere(0.25f));
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "earthmap.png", "earthmap.png", "earthmap.png"));
+
+	ndMatrix matrix(ndGetIdentityMatrix());
+
+	ndBodyDynamic* bodies[8];
+
+	matrix.m_posit = origin + ndVector(0.0f, 4.0f, 0.0f, 0.0f);
+	bodies[0] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
+
+	matrix.m_posit = origin + ndVector(2.0f, 4.0f, 0.0f, 0.0f);
+	bodies[1] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
+
+	matrix.m_posit = origin + ndVector(2.0f, 4.0f, 2.0f, 0.0f);
+	bodies[2] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
+
+	matrix.m_posit = origin + ndVector(0.0f, 4.0f, 2.0f, 0.0f);
+	bodies[3] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
+
+	matrix.m_posit = origin + ndVector(0.0f, 6.0f, 0.0f, 0.0f);
+	bodies[4] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
+
+	matrix.m_posit = origin + ndVector(2.0f, 6.0f, 0.0f, 0.0f);
+	bodies[5] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
+
+	matrix.m_posit = origin + ndVector(2.0f, 6.0f, 2.0f, 0.0f);
+	bodies[6] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
+
+	matrix.m_posit = origin + ndVector(0.0f, 6.0f, 2.0f, 0.0f);
+	bodies[7] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
+
+	ndWorld* world = scene->GetWorld();
+	for (ndInt32 i = 0; i < 8; ++i)
+	{
+		ndBodyDynamic* const body0 = bodies[i];
+		for (ndInt32 j = i + 1; j < 8; ++j)
+		{
+			ndBodyDynamic* const body1 = bodies[j];
+			ndJointFixDistance* const joint = new ndJointFixDistance(body0->GetMatrix().m_posit, body1->GetMatrix().m_posit, body0, body1);
+			ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
+			world->AddJoint(jointPtr);
+		}
+	}
+}
+
+static void BuildRollingFriction(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 diameter)
+{
+	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+
+	ndShapeInstance shape2(new ndShapeSphere(diameter * 0.5f));
+	ndSharedPtr<ndDemoMeshInterface> mesh2(new ndDemoMesh("shape2", scene->GetShaderCache(), &shape2, "earthmap.png", "earthmap.png", "earthmap.png"));
+	matrix.m_posit.m_y += 5.0f;
+
+	ndPhysicsWorld* const world = scene->GetWorld();
+	ndVector posit(matrix.m_posit);
+	for (ndInt32 i = 0; i < 8; ++i)
+	{
+		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape2, mesh2, mass);
+		ndJointBilateralConstraint* const joint = new ndJointDryRollingFriction(body, world->GetSentinelBody(), 0.5f);
+		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
+		world->AddJoint(jointPtr);
+		posit.m_y += diameter * 1.5f;
+		matrix.m_posit = posit + ndVector(ndGaussianRandom(0.0f, 0.01f), 0.0f, ndGaussianRandom(0.0f, 0.01f), 0.0f);
+	}
+}
+
 void ndBasicJoints (ndDemoEntityManager* const scene)
 {
 	// build a floor
@@ -928,7 +778,6 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	
 	ndQuaternion rot;
 	ndVector origin(-20.0f, 5.0f, 0.0f, 1.0f);
-
 
 	scene->SetCameraMatrix(rot, origin);
 }
