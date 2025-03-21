@@ -113,9 +113,8 @@ void ndSharedNodeHierarchy<T>::Detach()
 template<class T>
 const T* ndSharedNodeHierarchy<T>::GetRoot() const
 {
-	ndAssert(0);
-	const T* root;
-	for (root = this; root; root = root->m_parent);
+	const T* root = (T*)this;
+	for (; root->m_parent; root = root->m_parent);
 	return root;
 }
 

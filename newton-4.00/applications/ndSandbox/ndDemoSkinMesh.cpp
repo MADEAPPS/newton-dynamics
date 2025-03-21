@@ -36,46 +36,31 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 	m_name = owner->GetName();
 	m_shader = shaderCache.m_skinningDiffuseEffect;
 
-	ndDemoEntity* root = owner;
-	while (root->GetParent()) 
-	{
-		ndAssert(0);
-		//root = root->GetParent();
-	}
+	ndFixSizeArray<ndDemoEntity*, 128> pool;
+	ndFixSizeArray<ndMatrix, 128> parentMatrix;
+	ndFixSizeArray<ndMatrix, 128> bindMatrixArray;
+	ndFixSizeArray<ndDemoEntity*, 128> entityArray;
 
-	ndInt32 stack = 1;
-	ndDemoEntity* pool[128];
-	ndMatrix parentMatrix[128];
-	ndArray<ndMatrix> bindMatrixArray;
-	ndArray<ndDemoEntity*> entityArray;
-
-	pool[0] = root;
-	parentMatrix[0] = ndGetIdentityMatrix();
+	parentMatrix.PushBack(ndGetIdentityMatrix());
+	pool.PushBack((ndDemoEntity*)owner->GetRoot());
 	ndMatrix shapeBindMatrix(m_ownerEntity->GetMeshMatrix() * m_ownerEntity->CalculateGlobalMatrix());
 	
 	ndTree<ndInt32, ndInt32> boneHashIdMap;
-	while (stack) 
+	while (pool.GetCount())
 	{
-		stack--;
-		ndDemoEntity* const entity = pool[stack];
-
+		ndDemoEntity* const entity = pool.Pop();
 		ndInt32 hash = ndInt32(ndCRC64(entity->GetName().GetStr()) & 0xffffffff);
 		boneHashIdMap.Insert(ndInt32(entityArray.GetCount()), hash);
 
-		const ndMatrix boneMatrix(entity->GetCurrentMatrix() * parentMatrix[stack]);
+		const ndMatrix boneMatrix(entity->GetCurrentMatrix() * parentMatrix.Pop());
 		const ndMatrix palleteMatrix(shapeBindMatrix * boneMatrix.OrthoInverse());
 		entityArray.PushBack(entity);
 		bindMatrixArray.PushBack(palleteMatrix);
 
-		//for (ndDemoEntity* node = entity->GetFirstChild(); node; node = node->GetNext()) 
-		//for (ndSharedPtr<ndDemoEntity> node(entity->GetFirstChild()); *node; node = node->GetNext())
-		//for (const ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = entity->GetChildren().GetFirst() * node; node = node->GetNext())
 		for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = entity->GetChildren().GetFirst(); node; node = node->GetNext())
 		{
-			pool[stack] = *node->GetInfo();
-			parentMatrix[stack] = boneMatrix;
-			stack++;
-			ndAssert(stack < sizeof(pool) / sizeof(pool[0]));
+			pool.PushBack(*node->GetInfo());
+			parentMatrix.PushBack(boneMatrix);
 		}
 	}
 	
@@ -273,38 +258,26 @@ void ndDemoSkinMesh::CreateRenderMesh(
 
 ndInt32 ndDemoSkinMesh::CalculateMatrixPalette(ndMatrix* const bindMatrix) const
 {
-	int stack = 1;
-	ndDemoEntity* pool[128];
-	ndMatrix parentMatrix[128];
+	ndFixSizeArray <ndDemoEntity*, 128> pool;
+	ndFixSizeArray <ndMatrix, 128> parentMatrix;
 
-	ndDemoEntity* root = m_ownerEntity;
-	while (root->GetParent()) 
-	{
-		ndAssert(0);
-		//root = root->GetParent();
-	}
-
-	int count = 0;
-	pool[0] = root;
-	parentMatrix[0] = ndGetIdentityMatrix();
+	ndInt32 count = 0;
+	parentMatrix.PushBack(ndGetIdentityMatrix());
+	pool.PushBack ((ndDemoEntity*)m_ownerEntity->GetRoot());
 	ndMatrix shapeBindMatrix((m_ownerEntity->GetMeshMatrix() * m_ownerEntity->CalculateGlobalMatrix()).OrthoInverse());
-	while (stack) 
+	while (pool.GetCount())
 	{
-		stack--;
-		ndDemoEntity* const entity = pool[stack];
-		ndMatrix boneMatrix(entity->GetCurrentMatrix() * parentMatrix[stack]);
+		ndDemoEntity* const entity = pool.Pop();
+		ndMatrix boneMatrix(entity->GetCurrentMatrix() * parentMatrix.Pop());
 		bindMatrix[count] = m_bindingMatrixArray[count] * boneMatrix * shapeBindMatrix;
 
 		count++;
 		ndAssert(count <= 128);
 		ndAssert(count <= m_nodeCount);
-		//for (ndDemoEntity* node = entity->GetFirstChild(); node; node = node->GetNext()) 
-		//for (ndSharedPtr<ndDemoEntity> node(entity->GetFirstChild()); *node; node = node->GetNext())
 		for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = entity->GetChildren().GetFirst(); node; node = node->GetNext())
 		{
-			pool[stack] = *node->GetInfo();
-			parentMatrix[stack] = boneMatrix;
-			stack++;
+			pool.PushBack(*node->GetInfo());
+			parentMatrix.PushBack(boneMatrix);
 		}
 	}
 	return count;

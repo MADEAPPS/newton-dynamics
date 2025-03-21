@@ -111,8 +111,7 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager* const scene, ndMesh* const meshE
 		ndSharedPtr<ndMeshEffect> meshEffect (effectNode->GetMesh());
 		if (meshEffect->GetVertexWeights().GetCount())
 		{
-			ndAssert(0);
-			//mesh = new ndDemoSkinMesh(entity, *meshEffect, scene->GetShaderCache());
+			mesh = new ndDemoSkinMesh(entity, *meshEffect, scene->GetShaderCache());
 		}
 		else
 		{

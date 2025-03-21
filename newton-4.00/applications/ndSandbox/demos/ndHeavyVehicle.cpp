@@ -658,7 +658,8 @@ static ndMultiBodyVehicle* CreateTractor(ndDemoEntityManager* const scene, const
 		notifyCallback->m_bucketHinge->SetAsSpringDamper(0.01f, 1500.0f, 20.0f);
 		vehicle->AddLimb(armNode, frontBucketBody, bucketHinge);
 
-		auto AddHydraulic = [vehicle, notifyCallback, scene](ndBodyDynamic* const parentBody, const char* const name0, const char* const name1, ndBodyKinematic* const attachmentBody, const char* const attachement)
+		//auto AddHydraulic = [vehicle, notifyCallback, scene](ndBodyDynamic* const parentBody, const char* const name0, const char* const name1, ndBodyKinematic* const attachmentBody, const char* const attachement)
+		auto AddHydraulic = [vehicle, notifyCallback, scene](ndBodyDynamic* const parentBody, const char* const name0, const char* const name1, ndBodyKinematic* const, const char* const)
 		{
 			const ndMatrix localFrame(vehicle->GetLocalFrame());
 			const ndVehicleDectriptor& configuration = notifyCallback->m_desc;

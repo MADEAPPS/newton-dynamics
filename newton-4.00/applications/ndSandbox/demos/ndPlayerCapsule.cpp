@@ -177,9 +177,10 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 	ndSharedPtr<ndBody> player0(new ndBasicPlayerCapsule(scene, loader, *entity, localAxis, location, mass, radio, height, height / 4.0f, true));
 	world->AddBody(player0);
 
+#if 0	
 	ndSharedPtr<ndBody> player1(new ndBasicPlayerCapsule(scene, loader, *entity, localAxis, location, mass, radio, height, height/4.0f));
 	//world->AddBody(player1);
-
+	
 	location.m_posit.m_z += 2.0f;
 	ndSharedPtr<ndBody> player2(new ndBasicPlayerCapsule(scene, loader, *entity, localAxis, location, mass, radio, height, height / 4.0f));
 	//world->AddBody(player2);
@@ -187,6 +188,7 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 	location.m_posit.m_z += 2.0f;
 	ndSharedPtr<ndBody> player3(new ndBasicPlayerCapsule(scene, loader, *entity, localAxis, location, mass, radio, height, height / 4.0f));
 	//world->AddBody(player3);
+#endif
 
 	class PlaceMatrix : public ndMatrix
 	{

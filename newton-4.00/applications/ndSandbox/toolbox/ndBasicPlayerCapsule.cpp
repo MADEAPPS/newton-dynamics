@@ -133,12 +133,12 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	const ndList<ndAnimationKeyFramesTrack>& tracks = idleSequence->GetTracks();
 	for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = tracks.GetFirst(); node; node = node->GetNext())
 	{
-		ndAssert(0);
-		//ndAnimationKeyFramesTrack& track = node->GetInfo();
-		//ndDemoEntity* const ent = entity->Find(track.GetName().GetStr());
-		//ndAnimKeyframe keyFrame;
-		//keyFrame.m_userData = ent;
-		//m_output.PushBack(keyFrame);
+		ndAnimationKeyFramesTrack& track = node->GetInfo();
+		const ndString& name = track.GetName();
+		ndSharedPtr<ndDemoEntity> ent (entity->Find(entity, name.GetStr()));
+		ndAnimKeyframe keyFrame;
+		keyFrame.m_userData = *ent;
+		m_output.PushBack(keyFrame);
 	}
 
 	ndAnimationSequencePlayer* const idle = new ndAnimationSequencePlayer(idleSequence);
@@ -192,7 +192,7 @@ void ndBasicPlayerCapsule::SetCamera(ndDemoEntityManager* const scene)
 		ndMatrix camMatrix(camera->GetNextMatrix());
 
 		ndBasicPlayerCapsuleNotify* const notify = (ndBasicPlayerCapsuleNotify*)GetNotifyCallback();
-		ndDemoEntity* const player = (ndDemoEntity*)notify->GetUserData();
+		ndDemoEntity* const player = *notify->m_entity;
 		ndMatrix playerMatrix(player->GetNextMatrix());
 
 		const ndFloat32 height = m_height;
