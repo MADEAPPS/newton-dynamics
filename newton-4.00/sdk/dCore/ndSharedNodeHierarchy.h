@@ -57,7 +57,7 @@ ndSharedNodeHierarchy<T>::ndSharedNodeHierarchy (const ndSharedNodeHierarchy<T>&
 	,m_children()
 	,m_parent(nullptr)
 {
-	for (ndList<ndSharedPtr<T>>::ndNode* node = src.m_children.GetFirst(); node; node = node->GetNext())
+	for (typename ndList<ndSharedPtr<T>>::ndNode* node = src.m_children.GetFirst(); node; node = node->GetNext())
 	{
 		ndSharedPtr<T> child(node->GetInfo()->CreateClone());
 		AddChild(child);
