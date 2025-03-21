@@ -45,8 +45,8 @@
 //#define DEFAULT_SCENE	10		// static user mesh collision 
 //#define DEFAULT_SCENE	11		// basic joints
 //#define DEFAULT_SCENE	12		// basic vehicle
-#define DEFAULT_SCENE	13		// heavy vehicle
-//#define DEFAULT_SCENE	14		// background vehicle prop
+//#define DEFAULT_SCENE	13		// heavy vehicle
+#define DEFAULT_SCENE	14		// background vehicle prop
 //#define DEFAULT_SCENE	15		// basic player
 //#define DEFAULT_SCENE	16		// rag doll
 //#define DEFAULT_SCENE	17		// cart pole discrete controller
@@ -117,7 +117,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic joints", ndBasicJoints },
 	{ "basic vehicle", ndBasicVehicle },
 	{ "heavy vehicle", ndHeavyVehicle },
-//	{ "low lod vehicle", ndBagroundLowLodVehicle },
+	{ "low lod vehicle", ndBagroundLowLodVehicle },
 //	{ "basic player", ndPlayerCapsuleDemo },
 //	{ "rag doll", ndRagdollTest },
 //	{ "cartpole discrete controller", ndCartpoleDiscrete },

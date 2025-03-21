@@ -137,7 +137,7 @@ static ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndSha
 	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, textName, textName, textName));
 
 	ndBodyKinematic* const kinBody = new ndBodyDynamic();
-	ndSharedPtr<ndDemoEntity>entity(new ndDemoEntity(matrix));
+	ndSharedPtr<ndDemoEntity> entity(new ndDemoEntity(matrix));
 	entity->SetMesh(mesh);
 
 	kinBody->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
