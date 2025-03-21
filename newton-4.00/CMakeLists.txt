@@ -8,7 +8,7 @@
 # including commercial applications, and to alter it and redistribute it
 # freely.
 
-cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR)
 
 option("NEWTON_BUILD_SANDBOX_DEMOS" "generates demos projects" ON)
 #option("NEWTON_BUILD_PHYSIC_EDITOR" "generates authoring tool" OFF)
