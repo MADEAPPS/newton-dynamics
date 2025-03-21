@@ -126,7 +126,7 @@ const T* ndSharedNodeHierarchy<T>::GetParent() const
 }
 
 template<class T>
-typename const ndList<ndSharedPtr<T>>& ndSharedNodeHierarchy<T>::GetChildren() const
+const typename ndList<ndSharedPtr<T>>& ndSharedNodeHierarchy<T>::GetChildren() const
 {
 	return m_children;
 }
