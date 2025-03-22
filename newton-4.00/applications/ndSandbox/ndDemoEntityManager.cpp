@@ -47,8 +47,8 @@
 //#define DEFAULT_SCENE	12		// basic vehicle
 //#define DEFAULT_SCENE	13		// heavy vehicle
 //#define DEFAULT_SCENE	14		// background vehicle prop
-#define DEFAULT_SCENE	15		// basic player
-//#define DEFAULT_SCENE	16		// rag doll
+//#define DEFAULT_SCENE	15		// basic player
+#define DEFAULT_SCENE	16		// rag doll
 //#define DEFAULT_SCENE	17		// cart pole discrete controller
 //#define DEFAULT_SCENE	18		// cart pole continue controller
 //#define DEFAULT_SCENE	19		// unit cycle controller
@@ -119,7 +119,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "heavy vehicle", ndHeavyVehicle },
 	{ "low lod vehicle", ndBagroundLowLodVehicle },
 	{ "basic player", ndPlayerCapsuleDemo },
-//	{ "rag doll", ndRagdollTest },
+	{ "rag doll", ndRagdollTest },
 //	{ "cartpole discrete controller", ndCartpoleDiscrete },
 //	{ "cartpole continue controller", ndCartpoleContinue },
 //	{ "unicycle controller", ndUnicycleController },
@@ -851,17 +851,6 @@ void ndDemoEntityManager::Cleanup ()
 	// destroy the Newton world
 	if (m_world) 
 	{
-		const ndBodyListView& bodyList = m_world->GetBodyList();
-		for (ndBodyListView::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
-		{
-			ndBodyKinematic* const body = bodyNode->GetInfo()->GetAsBodyKinematic();
-			ndDemoEntityNotify* const callback = (ndDemoEntityNotify*)body->GetNotifyCallback();
-			if (callback)
-			{
-				callback->m_entity = nullptr;
-			}
-		}
-		
 		// get serialization call back before destroying the world
 		m_world->CleanUp();
 		delete m_world;

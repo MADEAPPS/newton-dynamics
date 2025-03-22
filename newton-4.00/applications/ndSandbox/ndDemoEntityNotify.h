@@ -55,7 +55,7 @@ class ndDemoEntityNotify : public ndModelBodyNotify
 class ndBindingRagdollEntityNotify : public ndDemoEntityNotify
 {
 	public:
-	ndBindingRagdollEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parentBody, ndFloat32 campSpeed);
+	ndBindingRagdollEntityNotify(ndDemoEntityManager* const manager, const ndSharedPtr<ndDemoEntity>& entity, ndBodyDynamic* const parentBody, ndFloat32 campSpeed);
 	~ndBindingRagdollEntityNotify();
 
 	void OnTransform(ndInt32, const ndMatrix& matrix);

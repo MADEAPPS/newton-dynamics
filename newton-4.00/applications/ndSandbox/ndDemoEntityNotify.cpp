@@ -58,29 +58,17 @@ void ndDemoEntityNotify::RemoveBody()
 	world->RemoveBody(body);
 }
 
-ndBindingRagdollEntityNotify::ndBindingRagdollEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parentBody, ndFloat32 capSpeed)
+ndBindingRagdollEntityNotify::ndBindingRagdollEntityNotify(ndDemoEntityManager* const manager, const ndSharedPtr<ndDemoEntity>& entity, ndBodyDynamic* const parentBody, ndFloat32 capSpeed)
 	:ndDemoEntityNotify(manager, entity, parentBody)
 	,m_bindMatrix(ndGetIdentityMatrix())
 	,m_capSpeed(capSpeed)
 {
-	//static ndBindingRagdollEntityNotifyFileSaveLoad registerClass;
 	ndDemoEntity* const parentEntity = m_parentBody ? (ndDemoEntity*)(parentBody->GetNotifyCallback()->GetUserData()) : nullptr;
 	m_bindMatrix = entity->GetParent()->CalculateGlobalMatrix(parentEntity).OrthoInverse();
 }
 
 ndBindingRagdollEntityNotify::~ndBindingRagdollEntityNotify()
 {
-	if (m_entity)
-	{
-		if (m_entity->GetParent())
-		{
-			m_entity = nullptr;
-		}
-		else
-		{
-			ndAssert(0);
-		}
-	}
 }
 
 void ndBindingRagdollEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
