@@ -212,6 +212,7 @@ namespace ndRagdoll
 			ndSharedPtr<ndDemoEntity> childEntity = stackNode->GetInfo().childEntity;
 			ndModelPassiveRagdoll::ndNode* parentBone = stackNode->GetInfo().parentBone;
 			stack.Remove(stackNode);
+
 			const char* const name = childEntity->GetName().GetStr();
 			//ndTrace(("name: %s\n", name));
 

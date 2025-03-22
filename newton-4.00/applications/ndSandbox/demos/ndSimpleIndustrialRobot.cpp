@@ -22,7 +22,6 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-#if 0
 namespace ndSimpleRobot
 {
 	class ndDefinition
@@ -65,7 +64,7 @@ namespace ndSimpleRobot
 	class ndRobotBodyNotify : public ndDemoEntityNotify
 	{
 		public:
-		ndRobotBodyNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyKinematic* const parentBody = nullptr)
+		ndRobotBodyNotify(ndDemoEntityManager* const manager, const ndSharedPtr<ndDemoEntity>& entity, ndBodyKinematic* const parentBody = nullptr)
 			:ndDemoEntityNotify(manager, entity, parentBody)
 		{
 		}
@@ -148,10 +147,11 @@ namespace ndSimpleRobot
 			m_elbowLimitJoint = (ndJointHinge*)robot->FindByName("arm_1")->m_joint->GetAsBilateral();
 
 			ndBodyDynamic* const rootBody = robot->GetRoot()->m_body->GetAsBodyDynamic();
-			ndDemoEntity* const rootEntity = (ndDemoEntity*)rootBody->GetNotifyCallback()->GetUserData();
-			ndDemoEntity* const effectorEntity = rootEntity->Find("effector");
+			ndDemoEntityNotify* const userData = (ndDemoEntityNotify*)rootBody->GetNotifyCallback();
+			ndSharedPtr<ndDemoEntity> rootEntity (userData->m_entity);
+			ndSharedPtr<ndDemoEntity> effectorEntity (rootEntity->Find(rootEntity, "effector"));
 
-			const ndMatrix referenceFrame(rootEntity->Find("referenceFrame")->CalculateGlobalMatrix());
+			const ndMatrix referenceFrame(rootEntity->Find(rootEntity, "referenceFrame")->CalculateGlobalMatrix());
 			const ndMatrix effectorFrame(effectorEntity->CalculateGlobalMatrix());
 
 			m_effectorLocalBase = referenceFrame * m_effector->GetBody1()->GetMatrix().OrthoInverse();
@@ -487,7 +487,7 @@ namespace ndSimpleRobot
 		RobotModelNotify* m_robot;
 	};
 
-	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndFloat32 mass, ndBodyDynamic* const parentBone)
+	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, const ndSharedPtr<ndDemoEntity>& entityPart, ndFloat32 mass, ndBodyDynamic* const parentBone)
 	{
 		ndSharedPtr<ndShapeInstance> shapePtr(entityPart->CreateCollisionFromChildren());
 		ndShapeInstance* const shape = *shapePtr;
@@ -538,10 +538,10 @@ namespace ndSimpleRobot
 		ndModelArticulation* const model = new ndModelArticulation();
 
 		ndWorld* const world = scene->GetWorld();
-		ndDemoEntity* const entity = modelMesh->CreateClone();
+		ndSharedPtr<ndDemoEntity> entity (modelMesh->CreateClone());
 		scene->AddEntity(entity);
 
-		ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(jointsDefinition[0].m_boneName);
+		ndSharedPtr<ndDemoEntity> rootEntity (entity->Find(entity, jointsDefinition[0].m_boneName));
 		ndMatrix matrix(rootEntity->CalculateGlobalMatrix() * location);
 
 		// find the floor location 
@@ -558,19 +558,27 @@ namespace ndSimpleRobot
 		// add the root body to the model
 		ndModelArticulation::ndNode* const modelNode = model->AddRootBody(rootBody);
 		
-		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
-		ndFixSizeArray<ndModelArticulation::ndNode*, 32> parentBones;
-		for (ndDemoEntity* child = rootEntity->GetFirstChild(); child; child = child->GetNext())
+		struct StackData
 		{
-			childEntities.PushBack(child);
-			parentBones.PushBack(modelNode);
+			ndSharedPtr<ndDemoEntity> childEntity;
+			ndModelPassiveRagdoll::ndNode* parentBone;
+		};
+		ndList<StackData> stack;
+
+		for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = rootEntity->GetChildren().GetFirst(); node; node = node->GetNext())
+		{
+			ndList<StackData>::ndNode* const stackNode = stack.Append();
+			stackNode->GetInfo().parentBone = modelNode;
+			stackNode->GetInfo().childEntity = node->GetInfo();
 		}
 		
 		const ndInt32 definitionCount = ndInt32(sizeof(jointsDefinition) / sizeof(jointsDefinition[0]));
-		while (parentBones.GetCount())
+		while (stack.GetCount())
 		{
-			ndDemoEntity* const childEntity = childEntities.Pop();
-			ndModelArticulation::ndNode* parentBone = parentBones.Pop();
+			ndList<StackData>::ndNode* const stackNode = stack.GetLast();
+			ndSharedPtr<ndDemoEntity> childEntity = stackNode->GetInfo().childEntity;
+			ndModelPassiveRagdoll::ndNode* parentBone = stackNode->GetInfo().parentBone;
+			stack.Remove(stackNode);
 
 			const char* const name = childEntity->GetName().GetStr();
 			for (ndInt32 i = 0; i < definitionCount; ++i)
@@ -621,7 +629,7 @@ namespace ndSimpleRobot
 					{
 						ndBodyDynamic* const childBody = parentBone->m_body->GetAsBodyDynamic();
 						
-						const ndMatrix pivotFrame(rootEntity->Find("referenceFrame")->CalculateGlobalMatrix());
+						const ndMatrix pivotFrame(rootEntity->Find(rootEntity, "referenceFrame")->CalculateGlobalMatrix());
 						const ndMatrix effectorFrame(childEntity->CalculateGlobalMatrix());
 						ndSharedPtr<ndJointBilateralConstraint> effector (new ndIk6DofEffector(effectorFrame, pivotFrame, childBody, modelNode->m_body->GetAsBodyKinematic()));
 						
@@ -640,10 +648,12 @@ namespace ndSimpleRobot
 				}
 			}
 		
-			for (ndDemoEntity* child = childEntity->GetFirstChild(); child; child = child->GetNext())
+			//for (ndDemoEntity* child = childEntity->GetFirstChild(); child; child = child->GetNext())
+			for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = childEntity->GetChildren().GetFirst(); node; node = node->GetNext())
 			{
-				childEntities.PushBack(child);
-				parentBones.PushBack(parentBone);
+				ndList<StackData>::ndNode* const stackChildNode = stack.Append();
+				stackChildNode->GetInfo().parentBone = parentBone;
+				stackChildNode->GetInfo().childEntity = node->GetInfo();
 			}
 		}
 		NormalizeInertia(model);
@@ -714,4 +724,3 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
-#endif

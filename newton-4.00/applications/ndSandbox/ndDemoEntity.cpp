@@ -767,8 +767,6 @@ void ndDemoEntity::RenderShadowMap(ndShadowMapRenderPass* const shadowMap, const
 		mesh->RenderShadowMap(shadowMap, modelMatrix);
 	}
 
-	//for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
-	//for (ndSharedPtr<ndDemoEntity> child(GetFirstChild()); *child; child = child->GetNext())
 	for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = GetChildren().GetFirst(); node; node = node->GetNext())
 	{
 		node->GetInfo()->RenderShadowMap(shadowMap, nodeMatrix);

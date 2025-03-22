@@ -21,10 +21,10 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-#if 0
+
 namespace ndUnicycle
 {
-	//#define ND_TRAIN_AGENT
+	#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME			"unicycle-vpg.dnn"
 
 	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (10.0f))
@@ -574,11 +574,11 @@ namespace ndUnicycle
 				instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
 			
 				ndDemoEntityNotify* const originalNotify = (ndDemoEntityNotify*)body->GetNotifyCallback();
-				void* const useData = originalNotify->m_entity;
-				originalNotify->m_entity = nullptr;
+				ndSharedPtr<ndDemoEntity> userData(originalNotify->m_entity);
+				originalNotify->m_entity = ndSharedPtr<ndDemoEntity>();
 				InvisibleBodyNotify* const notify = new InvisibleBodyNotify((InvisibleBodyNotify*)body->GetNotifyCallback());
 				body->SetNotifyCallback(notify);
-				notify->m_entity = (ndDemoEntity*)useData;
+				notify->m_entity = userData;
 			
 				for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
 				{
@@ -607,7 +607,7 @@ namespace ndUnicycle
 				ndModelArticulation::ndNode* const node = stackMem[stack];
 				ndBody* const body = *node->m_body;
 				ndDemoEntityNotify* const userData = (ndDemoEntityNotify*)body->GetNotifyCallback();
-				ndDemoEntity* const ent = userData->m_entity;
+				ndDemoEntity* const ent = *userData->m_entity;
 				mode ? ent->Hide() : ent->UnHide();
 			
 				for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
@@ -738,4 +738,3 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
-#endif
