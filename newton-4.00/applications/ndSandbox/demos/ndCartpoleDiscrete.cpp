@@ -29,7 +29,7 @@ namespace ndCarpole_0
 
 	//#define CONTROLLER_RESUME_TRAINING
 
-	#define D_PUSH_ACCEL		ndFloat32 (15.0f)
+	#define D_PUSH_ACCEL		ndFloat32 (5.0f)
 	#define D_REWARD_MIN_ANGLE	ndFloat32 (20.0f * ndDegreeToRad)
 
 	enum ndActionSpace
