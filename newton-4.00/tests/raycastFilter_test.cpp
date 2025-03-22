@@ -77,7 +77,7 @@ class NotifyClientNode : public ndBodyNotify
 	}
 
 	// user data is a pointer to our client node
-	void* GetUserData() const override
+	void* GetUserData() const
 	{
 		return node.get();
 	}
@@ -123,7 +123,8 @@ public:
 		ndBody* const nbody = const_cast<ndBody*> (body);
 		ndBodyKinematic* const kBody = nbody->GetAsBodyKinematic();
 
-		ClientNodePtr node = static_cast<ClientNode*> (kBody->GetNotifyCallback()->GetUserData())->getPtr();
+		NotifyClientNode* const notify = (NotifyClientNode*)kBody->GetNotifyCallback();
+		ClientNodePtr node = static_cast<ClientNode*> (notify->GetUserData())->getPtr();
 		if (!node) return 0;
 
 		// pass through the body if it is not in the pickable state
@@ -151,7 +152,9 @@ static void rayCast(ndWorld& world, PickInfo& info)
 		info.position = rayCaster.m_contact.m_point;
 		info.normal = rayCaster.m_contact.m_normal;
 		info.pickedBody = (ndBodyKinematic*)rayCaster.m_contact.m_body0;
-		info.pickedNode = static_cast<ClientNode*> (info.pickedBody->GetNotifyCallback()->GetUserData())->getPtr();
+
+		NotifyClientNode* const notify = (NotifyClientNode*)info.pickedBody->GetNotifyCallback();
+		info.pickedNode = static_cast<ClientNode*> (notify->GetUserData())->getPtr();
 	}
 }
 

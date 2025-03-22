@@ -68,8 +68,6 @@ ndBindingRagdollEntityNotify::ndBindingRagdollEntityNotify(ndDemoEntityManager* 
 		ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)parentBody->GetNotifyCallback();
 		const ndDemoEntity* const parentEntity = *notify->m_entity;
 
-		const ndDemoEntity* const xxxx = entity->GetParent();
-
 		ndMatrix matrix(ndGetIdentityMatrix());
 		for (const ndDemoEntity* parent = entity->GetParent(); parent != parentEntity; parent = parent->GetParent())
 		{
