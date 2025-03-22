@@ -48,8 +48,8 @@
 //#define DEFAULT_SCENE	13		// heavy vehicle
 //#define DEFAULT_SCENE	14		// background vehicle prop
 //#define DEFAULT_SCENE	15		// basic player
-#define DEFAULT_SCENE	16		// rag doll
-//#define DEFAULT_SCENE	17		// cart pole discrete controller
+//#define DEFAULT_SCENE	16		// rag doll
+#define DEFAULT_SCENE	17		// cart pole discrete controller
 //#define DEFAULT_SCENE	18		// cart pole continue controller
 //#define DEFAULT_SCENE	19		// unit cycle controller
 //#define DEFAULT_SCENE	20		// simple industrial robot
@@ -120,7 +120,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "low lod vehicle", ndBagroundLowLodVehicle },
 	{ "basic player", ndPlayerCapsuleDemo },
 	{ "rag doll", ndRagdollTest },
-//	{ "cartpole discrete controller", ndCartpoleDiscrete },
+	{ "cartpole discrete controller", ndCartpoleDiscrete },
 //	{ "cartpole continue controller", ndCartpoleContinue },
 //	{ "unicycle controller", ndUnicycleController },
 //	{ "simple industrial robot", ndSimpleIndustrialRobot },

@@ -107,7 +107,6 @@ void AddPlanks(ndDemoEntityManager* const scene, const ndMatrix& location, ndFlo
 	}
 }
 
-#if 0
 void SetModelVisualMesh(ndDemoEntityManager* const scene, ndModelArticulation* const model)
 {
 	for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
@@ -118,16 +117,15 @@ void SetModelVisualMesh(ndDemoEntityManager* const scene, ndModelArticulation* c
 		if (urdfNotify)
 		{
 			ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("urdfMesh", *urdfNotify->m_mesh, scene->GetShaderCache()));
-			ndDemoEntity* const entity = new ndDemoEntity(body->GetMatrix(), nullptr);
+			ndSharedPtr<ndDemoEntity> entity (new ndDemoEntity(body->GetMatrix()));
 			entity->SetMesh(mesh);
 			entity->SetMeshMatrix(urdfNotify->m_offset);
+
 			scene->AddEntity(entity);
 			body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 		}
 	}
 }
-
-#endif
 
 static ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInstance& shape, const ndMatrix& location, ndFloat32 mass, const char* const textName)
 {
