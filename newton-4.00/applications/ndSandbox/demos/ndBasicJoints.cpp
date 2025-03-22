@@ -130,7 +130,8 @@ static void BuildPathFollow(ndDemoEntityManager* const scene, const ndVector& or
 
 	ndSharedPtr<ndBody> pathBody (new ndSplinePathBody(scene, matrix));
 	world->AddBody(pathBody);
-	ndDemoEntity* const rollerCosterPath = (ndDemoEntity*)pathBody->GetNotifyCallback()->GetUserData();
+	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)pathBody->GetNotifyCallback();
+	ndDemoEntity* const rollerCosterPath = *notify->m_entity;
 	
 	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoSplinePathMesh(((ndSplinePathBody*)*pathBody)->m_spline, scene->GetShaderCache(), 500));
 	rollerCosterPath->SetMesh(mesh);

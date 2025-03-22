@@ -676,7 +676,8 @@ void ndVehicleCommonNotify::SetCamera(ndDemoEntityManager* const manager, ndFloa
 	if (vehicle->GetRoot())
 	{
 		ndDemoCamera* const camera = manager->GetCamera();
-		ndDemoEntity* const chassisEntity = (ndDemoEntity*)vehicle->GetChassis()->GetNotifyCallback()->GetUserData();
+		ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)vehicle->GetChassis()->GetNotifyCallback();
+		ndDemoEntity* const chassisEntity = *notify->m_entity;
 		ndMatrix camMatrix(camera->GetNextMatrix());
 		ndMatrix playerMatrix(chassisEntity->GetNextMatrix());
 

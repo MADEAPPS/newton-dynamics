@@ -58,11 +58,6 @@ const ndBody* ndBodyNotify::GetBody() const
 	return m_body; 
 }
 
-void* ndBodyNotify::GetUserData() const
-{ 
-	return nullptr; 
-}
-
 ndBodyNotify* ndBodyNotify::GetAsBodyNotify()
 {
 	return this;

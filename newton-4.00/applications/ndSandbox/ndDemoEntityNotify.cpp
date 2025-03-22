@@ -63,8 +63,26 @@ ndBindingRagdollEntityNotify::ndBindingRagdollEntityNotify(ndDemoEntityManager* 
 	,m_bindMatrix(ndGetIdentityMatrix())
 	,m_capSpeed(capSpeed)
 {
-	ndDemoEntity* const parentEntity = m_parentBody ? (ndDemoEntity*)(parentBody->GetNotifyCallback()->GetUserData()) : nullptr;
-	m_bindMatrix = entity->GetParent()->CalculateGlobalMatrix(parentEntity).OrthoInverse();
+	if (m_parentBody)
+	{
+		ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)parentBody->GetNotifyCallback();
+		const ndDemoEntity* const parentEntity = *notify->m_entity;
+
+		const ndDemoEntity* const xxxx = entity->GetParent();
+
+		ndMatrix matrix(ndGetIdentityMatrix());
+		for (const ndDemoEntity* parent = entity->GetParent(); parent != parentEntity; parent = parent->GetParent())
+		{
+			const ndMatrix parentMatrix(parent->GetCurrentMatrix());
+			matrix = matrix * parentMatrix;
+		}
+		m_bindMatrix = matrix;
+	}
+	else
+	{
+		const ndMatrix parentMatrix(entity->GetParent()->CalculateGlobalMatrix());
+		m_bindMatrix = parentMatrix.OrthoInverse();
+	}
 }
 
 ndBindingRagdollEntityNotify::~ndBindingRagdollEntityNotify()
@@ -81,8 +99,11 @@ void ndBindingRagdollEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
 	}
 	else
 	{
-		const ndMatrix parentMatrix(m_parentBody->GetMatrix());
-		const ndMatrix localMatrix(matrix * parentMatrix.OrthoInverse() * m_bindMatrix);
+		//const ndMatrix parentMatrix(m_parentBody->GetMatrix());
+		//const ndMatrix localMatrix(matrix * parentMatrix.OrthoInverse() * m_bindMatrix);
+		const ndMatrix parentMatrix(m_bindMatrix * m_parentBody->GetMatrix());
+		const ndMatrix localMatrix(matrix * parentMatrix.OrthoInverse());
+
 		const ndQuaternion rot(localMatrix);
 		m_entity->SetMatrix(rot, localMatrix.m_posit);
 	}

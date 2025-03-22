@@ -236,9 +236,10 @@ ndMatrix ndDemoEntity::CalculateGlobalMatrix (const ndDemoEntity* const root) co
 	ndMatrix matrix(GetCurrentMatrix());
 	if (this != root)
 	{
-		for (const ndDemoEntity* ptr = GetParent(); ptr != root; ptr = ptr->GetParent())
+		for (const ndDemoEntity* parent = GetParent(); parent != root; parent = parent->GetParent())
 		{
-			matrix = matrix * ptr->GetCurrentMatrix();
+			const ndMatrix parentMatrix(parent->GetCurrentMatrix());
+			matrix = matrix * parentMatrix;
 		}
 	}
 	return matrix;
