@@ -21,10 +21,10 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-#if 0
+
 namespace ndCarpole_1
 {
-	//#define ND_TRAIN_AGENT
+	#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME			"cartpoleContinue"
 
 	//#define CONTROLLER_RESUME_TRAINING
@@ -53,7 +53,8 @@ namespace ndCarpole_1
 		ndModelArticulation* const cartPole = urdf.Import(fileName);
 
 		SetModelVisualMesh(scene, cartPole);
-		ndMatrix matrix(cartPole->GetRoot()->m_body->GetMatrix() * location * ndPitchMatrix(-ndPi * 0.5f));
+		//ndMatrix matrix(cartPole->GetRoot()->m_body->GetMatrix() * location * ndPitchMatrix(-ndPi * 0.5f));
+		ndMatrix matrix(cartPole->GetRoot()->m_body->GetMatrix() * location);
 		matrix.m_posit = location.m_posit;
 		cartPole->SetTransform(matrix);
 
@@ -388,7 +389,7 @@ namespace ndCarpole_1
 				ndModelArticulation::ndNode* const node = stackMem[stack];
 				ndBody* const body = *node->m_body;
 				ndDemoEntityNotify* const userData = (ndDemoEntityNotify*)body->GetNotifyCallback();
-				ndDemoEntity* const ent = userData->m_entity;
+				ndDemoEntity* const ent = *userData->m_entity;
 				ent->Hide();
 
 				for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
@@ -443,11 +444,11 @@ namespace ndCarpole_1
 				instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
 
 				ndDemoEntityNotify* const originalNotify = (ndDemoEntityNotify*)body->GetNotifyCallback();
-				void* const useData = originalNotify->m_entity;
-				originalNotify->m_entity = nullptr;
+				ndSharedPtr<ndDemoEntity> userData(originalNotify->m_entity);
+				originalNotify->m_entity = ndSharedPtr<ndDemoEntity>();
 				InvisibleBodyNotify* const notify = new InvisibleBodyNotify((InvisibleBodyNotify*)body->GetNotifyCallback());
 				body->SetNotifyCallback(notify);
-				notify->m_entity = (ndDemoEntity*)useData;
+				notify->m_entity = userData;
 
 				for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
 				{
@@ -571,4 +572,3 @@ void ndCartpoleContinue(ndDemoEntityManager* const scene)
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
-#endif

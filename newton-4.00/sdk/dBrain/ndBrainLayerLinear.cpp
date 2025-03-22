@@ -99,11 +99,12 @@ bool ndBrainLayerLinear::HasParameters() const
 
 void ndBrainLayerLinear::InitWeights()
 {
-	m_bias.Set(ndBrainFloat(0.0f));
+	//m_bias.Set(ndBrainFloat(0.0f));
 	ndBrainFloat variance = ndBrainFloat(ndSqrt(ndFloat32(1.0f) / ndFloat32(GetOutputSize())));
 	for (ndInt32 i = ndInt32(m_weights.GetCount() - 1); i >= 0; --i)
 	{
 		m_weights[i].InitGaussianWeights(variance);
+		m_bias[i] = ndBrainFloat(ndGaussianRandom(ndFloat32(0.0f), 0.01f));
 	}
 }
 
