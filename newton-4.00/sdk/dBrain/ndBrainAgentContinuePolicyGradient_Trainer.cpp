@@ -28,7 +28,7 @@
 #include "ndBrainAgentContinuePolicyGradient_Trainer.h"
 
 #define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE	(1024 * 128)
-#define ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA	ndBrainFloat(1.0e-1f)
+#define ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA	ndBrainFloat(1.0e-2f)
 
 //*********************************************************************************************
 //
@@ -534,13 +534,6 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizePolicy()
 					bool m_stop = false;
 				};
 
-				input.Set(0.0f);
-				for (ndInt32 i = 0; i < output.GetCount() / 2; ++i)
-				{
-					output[i] = ndBrainFloat(0.0f);
-					output[i + output.GetCount() / 2] = ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA;
-
-				}
 				ndBrainTrainer& trainer = *(*m_trainer);
 				PolicyLoss loss(m_brain.GetOutputSize());
 				loss.SetTruth(output);
@@ -550,6 +543,16 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizePolicy()
 
 			ndBrainOptimizerSgd optimizer;
 			optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));
+
+			LastActivationLayer* const lastLayer = (LastActivationLayer*)m_brain[m_brain.GetCount() - 1];
+			ndBrainFloat sigma = lastLayer->m_minimumSigma * ndBrainFloat(4.0f);
+			input.Set(0.0f);
+			for (ndInt32 i = 0; i < output.GetCount() / 2; ++i)
+			{
+				output[i] = ndBrainFloat(0.0f);
+				output[i + output.GetCount() / 2] = sigma;
+			}
+
 
 			for (ndInt32 i = 0; (i < 10000) && !stops; ++i)
 			{

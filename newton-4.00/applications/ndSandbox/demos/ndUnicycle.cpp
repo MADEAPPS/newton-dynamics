@@ -533,7 +533,7 @@ namespace ndUnicycle
 			for (ndInt32 i = 0; i < countX; ++i)
 			{
 				ndMatrix location(matrix);
-				ndFloat32 step = 3.0f * (ndRand() - 0.5f);
+				ndFloat32 step = 6.0f * (ndRand() - 0.5f);
 				location.m_posit.m_x += step;
 			 
 				ndSharedPtr<ndModel>model (CreateModel(scene, location));
@@ -670,7 +670,7 @@ namespace ndUnicycle
 				}
 			}
 
-			if ((stopTraining >= m_stopTraining) || (100.0f * m_master->GetAverageScore() / m_horizon > 96.0f))
+			if ((stopTraining >= m_stopTraining) || (100.0f * m_master->GetAverageScore() / m_horizon > 98.0f))
 			{
 				char fileName[1024];
 				m_modelIsTrained = true;
