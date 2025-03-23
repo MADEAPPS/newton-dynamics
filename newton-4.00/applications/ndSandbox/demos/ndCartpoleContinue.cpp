@@ -225,8 +225,14 @@ namespace ndCarpole_1
 			{
 				return ndReal(0.0f);
 			}
+
+			const ndVector veloc(m_cart->GetVelocity());
 			ndFloat32 sinAngle = GetPoleAngle();
-			ndFloat32 reward = ndReal(ndExp(-ndFloat32(2000.0f) * sinAngle * sinAngle));
+			//ndFloat32 reward = ndReal(ndExp(-ndFloat32(2000.0f) * sinAngle * sinAngle));
+			ndFloat32 angularReward = ndReal(ndExp(-ndFloat32(1000.0f) * sinAngle * sinAngle));
+			ndFloat32 linearReward = ndReal(ndExp(-ndFloat32(100.0f) * veloc.m_x * veloc.m_x));
+
+			ndFloat32 reward = 0.8f * angularReward + 0.2f * linearReward;
 			return ndReal(reward);
 		}
 
@@ -510,7 +516,7 @@ namespace ndCarpole_1
 				}
 			}
 
-			if ((stopTraining >= m_stopTraining) || (100.0f * m_master->GetAverageScore() / m_horizon > 96.0f))
+			if ((stopTraining >= m_stopTraining) || (100.0f * m_master->GetAverageScore() / m_horizon > 98.0f))
 			{
 				char fileName[1024];
 				m_modelIsTrained = true;
@@ -557,7 +563,8 @@ void ndCartpoleContinue(ndDemoEntityManager* const scene)
 #else
 	ndWorld* const world = scene->GetWorld();
 	ndModelArticulation* const model = CreateModel(scene, matrix);
-	model->AddToWorld(world);
+	world->AddModel(model);
+	model->AddBodiesAndJointsToWorld();
 
 	// add the deep learning controller
 	char name[256];
