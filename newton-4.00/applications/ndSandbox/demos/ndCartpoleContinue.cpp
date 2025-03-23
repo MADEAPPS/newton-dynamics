@@ -230,9 +230,9 @@ namespace ndCarpole_1
 			ndFloat32 sinAngle = GetPoleAngle();
 			//ndFloat32 reward = ndReal(ndExp(-ndFloat32(2000.0f) * sinAngle * sinAngle));
 			ndFloat32 angularReward = ndReal(ndExp(-ndFloat32(1000.0f) * sinAngle * sinAngle));
-			ndFloat32 linearReward = ndReal(ndExp(-ndFloat32(100.0f) * veloc.m_x * veloc.m_x));
+			ndFloat32 linearReward = ndReal(ndExp(-ndFloat32(400.0f) * veloc.m_x * veloc.m_x));
 
-			ndFloat32 reward = 0.8f * angularReward + 0.2f * linearReward;
+			ndFloat32 reward = 0.6f * angularReward + 0.4f * linearReward;
 			return ndReal(reward);
 		}
 
