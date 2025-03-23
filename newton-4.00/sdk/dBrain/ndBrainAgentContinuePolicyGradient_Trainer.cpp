@@ -23,6 +23,7 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainTrainer.h"
 #include "ndBrainLayerLinear.h"
+#include "ndBrainOptimizerSgd.h"
 #include "ndBrainOptimizerAdam.h"
 #include "ndBrainAgentContinuePolicyGradient_Trainer.h"
 
@@ -93,16 +94,8 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : pu
 		#else
 			for (ndInt32 i = m_neurons / 2 - 1; i >= 0; --i)
 			{
-				//output[i + m_neurons / 2] = ndMax(input[i + m_neurons / 2], m_minimumSigma);
-				// 
-				//ndBrainFloat value = ndClamp(input[i + m_neurons / 2], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
-				//ndBrainFloat x = ndBrainFloat(ndExp(-value));
-				//output[i + m_neurons / 2] = m_minimumSigma + ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) + x);
-				//ndAssert(ndCheckFloat(output[i]));
-				//ndAssert(output[i] <= (ndBrainFloat(1.0f) + m_minimumSigma));
-				//ndAssert(output[i] >= m_minimumSigma);
-
-				output[i + m_neurons / 2] = m_minimumSigma * 0.5f * output[i + m_neurons / 2];
+				ndBrainFloat sigma = ndMax(input[i + m_neurons / 2], m_minimumSigma);
+				output[i + m_neurons / 2] = sigma;
 			}
 		#endif
 	}
@@ -429,6 +422,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 	}
 
 	m_policy.InitWeights();
+	NormalizePolicy();
 	//ndAssert(!strcmp((m_policy[m_policy.GetCount() - 1])->GetLabelId(), "ndBrainLayerActivationTanh"));
 
 	m_trainers.SetCount(0);
@@ -462,6 +456,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 		m_value.AddLayer(layers[i]);
 	}
 	m_value.InitWeights();
+	NormalizeCritic();
 	
 	ndAssert(m_value.GetOutputSize() == 1);
 	ndAssert(m_value.GetInputSize() == m_policy.GetInputSize());
@@ -499,6 +494,94 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::~ndBrainAgentContinuePolicyGra
 
 	delete m_baseLineValueOptimizer;
 	delete[] m_randomGenerator;
+}
+
+void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizePolicy()
+{
+	// using supevised learning make sure that the m_policy has zero mean and standar deviation 
+	class SupervisedTrainer : public ndBrainThreadPool
+	{
+		public:
+		SupervisedTrainer(ndBrain* const brain)
+			:ndBrainThreadPool()
+			,m_brain(*brain)
+			,m_trainer(new ndBrainTrainer(&m_brain))
+			,m_learnRate(ndReal(5.0e-4f))
+		{
+			SetThreadCount(1);
+			m_partialGradients.PushBack(*m_trainer);
+		}
+
+		void Optimize()
+		{
+			ndAtomic<ndInt32> iterator(0);
+
+			ndBrainFloat* const inMemory = ndAlloca(ndBrainFloat, m_brain.GetInputSize());
+			ndBrainFloat* const outMemory = ndAlloca(ndBrainFloat, m_brain.GetOutputSize());
+			ndBrainMemVector input(inMemory, m_brain.GetInputSize());
+			ndBrainMemVector output(outMemory, m_brain.GetOutputSize());
+
+			bool stops = false;
+			auto BackPropagateBash = ndMakeObject::ndFunction([this, &iterator, &stops, &input, &output](ndInt32, ndInt32)
+			{
+				class PolicyLoss : public ndBrainLossLeastSquaredError
+				{
+					public:
+					PolicyLoss(ndInt32 size)
+						:ndBrainLossLeastSquaredError(size)
+						,m_stop (false)
+					{
+					}
+			
+					void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
+					{
+						ndBrainLossLeastSquaredError::GetLoss(output, loss);
+
+						ndBrainFloat error2 = ndBrainFloat(0.0f);
+						for (ndInt32 i = 0; i < loss.GetCount() / 2; ++i)
+						{
+							error2 += loss[i] * loss[i];
+						}
+						m_stop = error2 < ndBrainFloat(1.0e-8f);
+					}
+
+					bool m_stop = false;
+				};
+
+				input.Set(0.0f);
+				for (ndInt32 i = 0; i < output.GetCount() / 2; ++i)
+				{
+					output[i] = ndBrainFloat(0.0f);
+					output[i + output.GetCount() / 2] = ND_CONTINUE_POLICY_GRADIENT_MIN_VARIANCE;
+
+				}
+				ndBrainTrainer& trainer = *(*m_trainer);
+				PolicyLoss loss(m_brain.GetOutputSize());
+				loss.SetTruth(output);
+				trainer.BackPropagate(input, loss);
+				stops = loss.m_stop;
+			});
+
+			ndBrainOptimizerSgd optimizer;
+			optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));
+
+			for (ndInt32 i = 0; (i < 10000) && !stops; ++i)
+			{
+				ndBrainThreadPool::ParallelExecute(BackPropagateBash);
+				optimizer.Update(this, m_partialGradients, m_learnRate);
+			}
+			//m_brain.MakePrediction(input, output);
+			//m_brain.MakePrediction(input, output);
+		}
+
+		ndBrain& m_brain;
+		ndSharedPtr<ndBrainTrainer> m_trainer;
+		ndArray<ndBrainTrainer*> m_partialGradients;
+		ndReal m_learnRate;
+	};
+
+	SupervisedTrainer optimizer(&m_policy);
+	optimizer.Optimize();
 }
 
 ndBrain* ndBrainAgentContinuePolicyGradient_TrainerMaster::GetPolicyNetwork()
@@ -660,6 +743,92 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 	m_optimizer->AccumulateGradients(this, m_trainers);
 	m_weightedTrainer[0]->ScaleWeights(ndBrainFloat(1.0f) / ndBrainFloat(m_trajectoryAccumulator.GetCount()));
 	m_optimizer->Update(this, m_weightedTrainer, -m_policyLearnRate);
+}
+
+void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizeCritic()
+{
+	// using supevised learning make sure that the m_policy has zero mean and standar deviation 
+	class SupervisedTrainer : public ndBrainThreadPool
+	{
+		public:
+		SupervisedTrainer(ndBrain* const brain)
+			:ndBrainThreadPool()
+			,m_brain(*brain)
+			,m_trainer(new ndBrainTrainer(&m_brain))
+			,m_learnRate(ndReal(5.0e-4f))
+		{
+			SetThreadCount(1);
+			m_partialGradients.PushBack(*m_trainer);
+		}
+
+		void Optimize()
+		{
+			ndAtomic<ndInt32> iterator(0);
+
+			ndBrainFloat* const inMemory = ndAlloca(ndBrainFloat, m_brain.GetInputSize());
+			ndBrainFloat* const outMemory = ndAlloca(ndBrainFloat, m_brain.GetOutputSize());
+			ndBrainMemVector input(inMemory, m_brain.GetInputSize());
+			ndBrainMemVector output(outMemory, m_brain.GetOutputSize());
+
+			bool stops = false;
+			auto BackPropagateBash = ndMakeObject::ndFunction([this, &iterator, &stops, &input, &output](ndInt32, ndInt32)
+			{
+				class PolicyLoss : public ndBrainLossLeastSquaredError
+				{
+					public:
+					PolicyLoss(ndInt32 size)
+						:ndBrainLossLeastSquaredError(size)
+						,m_stop(false)
+					{
+					}
+
+					void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
+					{
+						ndBrainLossLeastSquaredError::GetLoss(output, loss);
+
+						ndBrainFloat error2 = ndBrainFloat(0.0f);
+						for (ndInt32 i = 0; i < loss.GetCount(); ++i)
+						{
+							error2 += loss[i] * loss[i];
+						}
+						m_stop = error2 < ndBrainFloat(1.0e-8f);
+					}
+
+					bool m_stop = false;
+				};
+
+				input.Set(0.0f);
+				for (ndInt32 i = 0; i < output.GetCount(); ++i)
+				{
+					output[i] = ndBrainFloat(0.0f);
+				}
+				ndBrainTrainer& trainer = *(*m_trainer);
+				PolicyLoss loss(m_brain.GetOutputSize());
+				loss.SetTruth(output);
+				trainer.BackPropagate(input, loss);
+				stops = loss.m_stop;
+			});
+
+			ndBrainOptimizerSgd optimizer;
+			optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));
+
+			for (ndInt32 i = 0; (i < 10000) && !stops; ++i)
+			{
+				ndBrainThreadPool::ParallelExecute(BackPropagateBash);
+				optimizer.Update(this, m_partialGradients, m_learnRate);
+			}
+			//m_brain.MakePrediction(input, output);
+			//m_brain.MakePrediction(input, output);
+		}
+
+		ndBrain& m_brain;
+		ndSharedPtr<ndBrainTrainer> m_trainer;
+		ndArray<ndBrainTrainer*> m_partialGradients;
+		ndReal m_learnRate;
+	};
+
+	SupervisedTrainer optimizer(&m_value);
+	optimizer.Optimize();
 }
 
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()

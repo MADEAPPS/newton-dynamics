@@ -587,7 +587,6 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	m_diretionalLightDir = ndVector(-1.0f, 1.0f, 1.0f, 0.0f).Normalize();
 
-	//Test0__();
 	//Test1__();
 	//TestVulkanStuff();
 	ndHandWrittenDigits();
