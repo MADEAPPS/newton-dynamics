@@ -51,6 +51,9 @@ class ndModel: public ndContainersFreeListAlloc<ndModel>
 	D_NEWTON_API ndSharedPtr<ndModelNotify>& GetNotifyCallback();
 	D_NEWTON_API void SetNotifyCallback(const ndSharedPtr<ndModelNotify>& notifyCallback);
 
+	D_NEWTON_API virtual void AddBodiesAndJointsToWorld() {}
+	D_NEWTON_API virtual void RemoveBodiesAndJointsFromWorld() {}
+
 	protected:
 	virtual void OnAddToWorld() {}
 	virtual void OnRemoveFromToWorld() {}
@@ -59,7 +62,7 @@ class ndModel: public ndContainersFreeListAlloc<ndModel>
 
 	private:
 	ndModelList::ndNode* m_worldNode;
-	ndSpecialList<ndModel>::ndNode* m_deletedNode;
+	//ndSpecialList<ndModel>::ndNode* m_deletedNode;
 	ndSharedPtr<ndModelNotify> m_notifyCallback;
 
 	friend class ndWorld;

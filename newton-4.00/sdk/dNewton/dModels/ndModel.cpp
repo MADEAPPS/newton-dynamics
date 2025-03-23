@@ -29,7 +29,7 @@ ndModel::ndModel()
 	:ndContainersFreeListAlloc<ndModel>()
 	,m_world(nullptr)
 	,m_worldNode(nullptr)
-	,m_deletedNode(nullptr)
+	//,m_deletedNode(nullptr)
 	,m_notifyCallback()
 {
 }
@@ -38,15 +38,15 @@ ndModel::ndModel(const ndModel& src)
 	:ndContainersFreeListAlloc<ndModel>()
 	,m_world(nullptr)
 	,m_worldNode(nullptr)
-	,m_deletedNode(nullptr)
+	//,m_deletedNode(nullptr)
 	,m_notifyCallback(*src.m_notifyCallback ? src.m_notifyCallback->Clone() : nullptr)
 {
 }
 
 ndModel::~ndModel()
 {
-	ndAssert(!m_worldNode);
-	ndAssert(!m_deletedNode);
+	//ndAssert(!m_worldNode);
+	//ndAssert(!m_deletedNode);
 }
 
 ndModel* ndModel::Clone() const

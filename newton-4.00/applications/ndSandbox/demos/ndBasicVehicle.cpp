@@ -261,6 +261,7 @@ static ndMultiBodyVehicle* CreateBasicVehicle(ndDemoEntityManager* const scene, 
 	const ndVehicleDectriptor& configuration = notifyCallback->m_desc;
 	vehicle->AddChassis(ndSharedPtr<ndBody>(notifyCallback->CreateChassis(scene, chassisEntity, configuration.m_chassisMass)));
 
+#if 1
 	ndBodyDynamic* const chassis = vehicle->GetChassis();
 	chassis->SetAngularDamping(ndVector(configuration.m_chassisAngularDrag));
 	
@@ -368,6 +369,7 @@ static ndMultiBodyVehicle* CreateBasicVehicle(ndDemoEntityManager* const scene, 
 	
 	// set a soft or hard mode
 	//vehicle->SetVehicleSolverModel(configuration.m_useHardSolverMode ? true : false);
+#endif
 	return vehicle;
 }
 
@@ -456,8 +458,14 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 
 	world->AddModel(vehicle0);
 	world->AddModel(vehicle1);
-	world->AddModel(vehicle2);
-	world->AddModel(vehicle3);
+	//world->AddModel(vehicle2);
+	//world->AddModel(vehicle3);
+
+	vehicle0->AddBodiesAndJointsToWorld();
+	vehicle1->AddBodiesAndJointsToWorld();
+
+	vehicle1->RemoveBodiesAndJointsFromWorld();
+	world->RemoveModel(*vehicle1);
 
 //ndMatrix matrix1(vehicle0->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix());
 //matrix1.m_posit = vehicle0->GetAsModelArticulation()->GetRoot()->m_body->GetGlobalGetCentreOfMass();

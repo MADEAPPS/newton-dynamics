@@ -105,7 +105,7 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	ndVector m_maxAabb;
 
 	ndBodyNotify* m_notifyCallback;
-	ndSpecialList<ndBody>::ndNode* m_deletedNode;
+	//ndSpecialList<ndBody>::ndNode* m_deletedNode;
 
 	ndUnsigned32 m_uniqueId;
 	union

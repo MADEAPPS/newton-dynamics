@@ -150,7 +150,7 @@ class ndJointBilateralConstraint : public ndConstraint
 	ndJointList::ndNode* m_worldNode;
 	ndBodyKinematic::ndJointList::ndNode* m_body0Node;
 	ndBodyKinematic::ndJointList::ndNode* m_body1Node;
-	ndSpecialList<ndJointBilateralConstraint>::ndNode* m_deletedNode;
+	//ndSpecialList<ndJointBilateralConstraint>::ndNode* m_deletedNode;
 
 	ndFloat32 m_defualtDiagonalRegularizer;
 	ndUnsigned32 m_mark0			: 1;

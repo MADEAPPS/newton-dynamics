@@ -60,7 +60,7 @@ void ndModelList::AddModel(const ndSharedPtr<ndModel>& model, ndWorld* const wor
 	}
 }
 
-void ndModelList::RemoveModel(const ndSharedPtr<ndModel>& model)
+void ndModelList::RemoveModel(ndModel* const model)
 {
 	ndNode* const node = model->m_worldNode;
 	if (node)

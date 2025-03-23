@@ -918,46 +918,6 @@ void ndMultiBodyVehicle::AddGearBox(const ndSharedPtr<ndJointBilateralConstraint
 //	}
 //}
 
-void ndMultiBodyVehicle::OnAddToWorld()
-{
-	//hardJoint = true;
-	//bool hardJoint = false;
-	//if (GetRoot())
-	//{
-	//	//ndJointBilateralSolverModel useSoftSolver = hardJoint ? m_jointkinematicOpenLoop : m_jointIterativeSoft;
-	//	//for (ndNode* node = GetRoot()->GetFirstChild(); node; node = node->GetNext())
-	//	//{
-	//	//	ndJointBilateralConstraint* const joint = *node->m_joint;
-	//	//	const char* const className = joint->ClassName();
-	//	//	if (!strcmp(className, ndMultiBodyVehicleMotor::StaticClassName()) ||
-	//	//		!strcmp(className, ndMultiBodyVehicleTireJoint::StaticClassName()) ||
-	//	//		!strcmp(className, ndMultiBodyVehicleDifferential::StaticClassName()))
-	//	//	{
-	//	//		joint->SetSolverModel(useSoftSolver);
-	//	//	}
-	//	//}
-	//
-	//	ndJointBilateralSolverModel driveTrainMode = hardJoint ? m_jointkinematicCloseLoop : m_jointIterativeSoft;
-	//	for (ndList<ndNode>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())
-	//	{
-	//		ndModelArticulation::ndNode& closeLoop = node->GetInfo();
-	//		ndJointBilateralConstraint* const joint = *closeLoop.m_joint;
-	//		const char* const clasName = joint->ClassName();
-	//		if (strcmp(clasName, ndMultiBodyVehicleDifferential::StaticClassName()) || strcmp(clasName, ndMultiBodyVehicleGearBox::StaticClassName()))
-	//		{
-	//			joint->SetSolverModel(driveTrainMode);
-	//		}
-	//	}
-	//
-	//	if (m_torsionBar)
-	//	{
-	//		ndAssert(0);
-	//		//m_torsionBar->SetSolverModel(driveTrainMode);
-	//	}
-	//}
-	ndModelArticulation::OnAddToWorld();
-}
-
 void ndMultiBodyVehicle::ApplyStabilityControl()
 {
 	ndAssert(m_chassis);

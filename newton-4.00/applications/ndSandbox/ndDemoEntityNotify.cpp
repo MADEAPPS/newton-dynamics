@@ -44,19 +44,19 @@ void ndDemoEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
 		m_entity->SetMatrix(rot, posit);
 	}
 
-	if (!CheckInWorld(matrix))
-	{
-		RemoveBody();
-	}
+	//if (!CheckInWorld(matrix))
+	//{
+	//	RemoveBody();
+	//}
 }
 
-void ndDemoEntityNotify::RemoveBody()
-{
-	// check world bounds
-	ndBody* const body = GetBody();
-	ndPhysicsWorld* const world = m_manager->GetWorld();
-	world->RemoveBody(body);
-}
+//void ndDemoEntityNotify::RemoveBody()
+//{
+//	// check world bounds
+//	ndBody* const body = GetBody();
+//	ndPhysicsWorld* const world = m_manager->GetWorld();
+//	world->RemoveBody(body);
+//}
 
 ndBindingRagdollEntityNotify::ndBindingRagdollEntityNotify(ndDemoEntityManager* const manager, const ndSharedPtr<ndDemoEntity>& entity, ndBodyDynamic* const parentBody, ndFloat32 capSpeed)
 	:ndDemoEntityNotify(manager, entity, parentBody)
@@ -97,8 +97,6 @@ void ndBindingRagdollEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
 	}
 	else
 	{
-		//const ndMatrix parentMatrix(m_parentBody->GetMatrix());
-		//const ndMatrix localMatrix(matrix * parentMatrix.OrthoInverse() * m_bindMatrix);
 		const ndMatrix parentMatrix(m_bindMatrix * m_parentBody->GetMatrix());
 		const ndMatrix localMatrix(matrix * parentMatrix.OrthoInverse());
 
@@ -106,10 +104,10 @@ void ndBindingRagdollEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
 		m_entity->SetMatrix(rot, localMatrix.m_posit);
 	}
 
-	if (!CheckInWorld(matrix))
-	{
-		RemoveBody();
-	}
+	//if (!CheckInWorld(matrix))
+	//{
+	//	RemoveBody();
+	//}
 }
 
 void ndBindingRagdollEntityNotify::OnApplyExternalForce(ndInt32 thread, ndFloat32 timestep)

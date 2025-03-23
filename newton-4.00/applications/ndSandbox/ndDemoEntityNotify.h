@@ -42,12 +42,6 @@ class ndDemoEntityNotify : public ndModelBodyNotify
 	//virtual void OnObjectPick() const;
 	virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix);
 
-	void RemoveBody();
-	bool CheckInWorld(const ndMatrix& matrix) const
-	{
-		return matrix.m_posit.m_y > -100.0f;
-	}
-
 	ndDemoEntityManager* m_manager;
 	ndSharedPtr<ndDemoEntity> m_entity;
 };

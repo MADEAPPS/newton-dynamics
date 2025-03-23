@@ -262,6 +262,7 @@ void ndRagdollTest (ndDemoEntityManager* const scene)
 
 	ndSharedPtr<ndModel> model(BuildModel(scene, *modelMesh, matrix));
 	scene->GetWorld()->AddModel(model);
+	model->AddBodiesAndJointsToWorld();
 	
 	//matrix.m_posit.m_x += 1.4f;
 	//TestPlayerCapsuleInteraction(scene, matrix);

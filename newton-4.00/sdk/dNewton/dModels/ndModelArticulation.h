@@ -61,8 +61,11 @@ class ndModelArticulation: public ndModel
 	D_NEWTON_API const ndList<ndModelArticulation::ndNode>& GetCloseLoops() const;
 	D_NEWTON_API void AddCloseLoop(const ndSharedPtr<ndJointBilateralConstraint>& joint, const char* const name = nullptr);
 
-	D_NEWTON_API virtual void OnAddToWorld();
-	D_NEWTON_API virtual void OnRemoveFromToWorld();
+	D_NEWTON_API virtual void OnAddToWorld() override;
+	D_NEWTON_API virtual void OnRemoveFromToWorld() override;
+
+	D_NEWTON_API virtual void AddBodiesAndJointsToWorld() override;
+	D_NEWTON_API virtual void RemoveBodiesAndJointsFromWorld() override;
 
 	D_NEWTON_API const ndString& GetName() const;
 	D_NEWTON_API void SetName(const ndString& name);

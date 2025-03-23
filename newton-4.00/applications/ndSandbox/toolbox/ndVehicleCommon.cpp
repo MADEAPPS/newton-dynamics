@@ -27,16 +27,7 @@ ndVehicleEntityNotify::ndVehicleEntityNotify(ndMultiBodyVehicle* const me, ndDem
 
 void ndVehicleEntityNotify::OnTransform(ndInt32 thread, const ndMatrix& matrix)
 {
-	bool test = CheckInWorld(matrix);
-	if (test)
-	{
-		ndDemoEntityNotify::OnTransform(thread, matrix);
-	}
-	else
-	{
-		ndPhysicsWorld* const world = m_manager->GetWorld();
-		world->RemoveModel(m_vehicle);
-	}
+	ndDemoEntityNotify::OnTransform(thread, matrix);
 }
 
 ndVehicleEntityNotify::~ndVehicleEntityNotify()

@@ -120,8 +120,6 @@ class ndMultiBodyVehicle : public ndModelArticulation
 #endif
 
 	//D_NEWTON_API void SetVehicleSolverModel(bool hardJoint);
-	protected:
-	D_NEWTON_API virtual void OnAddToWorld();
 
 	private:
 	void ApplyStabilityControl();

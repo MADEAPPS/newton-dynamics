@@ -126,7 +126,6 @@ class ndWorld: public ndClassAlloc
 
 	private:
 	void ThreadFunction();
-	void DeleteDeferredObjects();
 	
 	protected:
 	D_NEWTON_API virtual void UpdateSkeletons();
@@ -140,9 +139,8 @@ class ndWorld: public ndClassAlloc
 	D_NEWTON_API virtual void OnSubStepPostUpdate(ndFloat32 timestep);
 
 	private:
-	//void RemoveModel(ndSharedPtr<ndModel>& model);
-	void RemoveBody(ndSharedPtr<ndBody>& body);
-	void RemoveJoint(ndSharedPtr<ndJointBilateralConstraint>& joint);
+	//void RemoveBody(ndSharedPtr<ndBody>& body);
+	//void RemoveJoint(ndSharedPtr<ndJointBilateralConstraint>& joint);
 
 	class dgSolverProgressiveSleepEntry
 	{
@@ -173,11 +171,10 @@ class ndWorld: public ndClassAlloc
 	ndJointList m_jointList;
 	ndModelList m_modelList;
 	ndSkeletonList m_skeletonList;
-	ndSpecialList<ndBody> m_deletedBodies;
-	ndSpecialList<ndModel> m_deletedModels;
-	ndSpecialList<ndJointBilateralConstraint> m_deletedJoints;
 	ndArray<ndSkeletonContainer*> m_activeSkeletons;
-	ndSpinLock m_deletedLock;
+	ndSpinLock m_addRemoveBodiesLock;
+	ndSpinLock m_addRemoveJointsLock;
+	ndSpinLock m_addRemoveModelsLock;
 
 	ndFloat32 m_timestep;
 	ndFloat32 m_freezeAccel2;

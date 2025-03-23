@@ -131,6 +131,35 @@ void ndPhysicsWorld::PreUpdate(ndFloat32 timestep)
 void ndPhysicsWorld::PostUpdate(ndFloat32 timestep)
 {
 	ndWorld::PostUpdate(timestep);
+
+	const ndBodyListView& bodyList = GetBodyList();
+	ndTree<ndInt32, ndBodyKinematic*> deadBodies;
+	for (ndBodyListView::ndNode* node = bodyList.GetFirst(); node; )
+	{
+		ndBodyKinematic* const body = node->GetInfo()->GetAsBodyKinematic();
+		node = node->GetNext();
+
+		const ndMatrix matrix = body->GetMatrix();
+		if (matrix.m_posit.m_y < -100.0f)
+		{
+			deadBodies.Insert(0, body);
+			//RemoveBody(body);
+		}
+	}
+
+	while (deadBodies.GetCount())
+	{
+		ndTree<ndInt32, ndBodyKinematic*>::ndNode* const node = deadBodies.GetRoot();
+		if (node->GetKey())
+		{
+			deadBodies.Remove(node);
+		}
+		else
+		{
+			node->GetInfo() = 1;
+		}
+	}
+
 	m_manager->m_cameraManager->FixUpdate(m_manager, timestep);
 	if (m_manager->m_updateCamera)
 	{
