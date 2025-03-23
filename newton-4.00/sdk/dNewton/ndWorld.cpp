@@ -1031,9 +1031,11 @@ void ndWorld::RemoveBody(ndBody* const body)
 	ndAssert(kinematicBody != GetSentinelBody());
 	if (kinematicBody->m_sceneNode)
 	{
-		for (ndBodyKinematic::ndJointList::ndNode* jointNode = kinematicBody->GetJointList().GetFirst(); jointNode; jointNode = jointNode->GetNext())
+		const ndBodyKinematic::ndJointList& jointList = kinematicBody->GetJointList();
+		for (ndBodyKinematic::ndJointList::ndNode* jointNode = jointList.GetFirst(); jointNode; )
 		{
 			ndJointBilateralConstraint* const joint = jointNode->GetInfo();
+			jointNode = jointNode->GetNext();
 			RemoveJoint(joint);
 		}
 		ndSharedPtr<ndBody> sharedBody(GetBody(body));

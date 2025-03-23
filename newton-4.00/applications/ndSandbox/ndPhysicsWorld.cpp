@@ -114,24 +114,10 @@ ndSoundManager* ndPhysicsWorld::GetSoundManager() const
 void ndPhysicsWorld::PreUpdate(ndFloat32 timestep)
 {
 	ndWorld::PreUpdate(timestep);
-
-	static ndInt32 xxxx = 0;
-	xxxx++;
-	if (xxxx % 200 == 0)
-	{
-		const ndBodyListView& bodyList = GetBodyList();
-		if (bodyList.GetCount() > 1)
-		{
-			//ndInt32 index = ndInt32(ndRandInt() % (bodyList.GetCount() - 1) + 1);
-			//RemoveBody(bodyList.GetView()[index]);
-		}
-	}
 }
 
-void ndPhysicsWorld::PostUpdate(ndFloat32 timestep)
+void ndPhysicsWorld::RemoveDeadBodies()
 {
-	ndWorld::PostUpdate(timestep);
-
 	const ndBodyListView& bodyList = GetBodyList();
 	ndTree<ndInt32, ndBodyKinematic*> deadBodies;
 	for (ndBodyListView::ndNode* node = bodyList.GetFirst(); node; )
@@ -143,23 +129,62 @@ void ndPhysicsWorld::PostUpdate(ndFloat32 timestep)
 		if (matrix.m_posit.m_y < -100.0f)
 		{
 			deadBodies.Insert(0, body);
-			//RemoveBody(body);
 		}
 	}
 
 	while (deadBodies.GetCount())
 	{
-		ndAssert(0);
 		ndTree<ndInt32, ndBodyKinematic*>::ndNode* const node = deadBodies.GetRoot();
-		if (node->GetKey())
+		if (node->GetInfo())
 		{
+			ndBodyKinematic* const body = node->GetKey();
+			RemoveBody(body);
 			deadBodies.Remove(node);
 		}
 		else
 		{
+			ndTree<ndInt32, ndBodyKinematic*> filter;
+			ndFixSizeArray<ndBodyKinematic*, 1024> array;
+			array.PushBack(node->GetKey());
+			filter.Insert(0, node->GetKey());
+			for (ndInt32 i = 0; i < array.GetCount(); ++i)
+			{
+				ndBodyKinematic* const body = array[i];
+				if (body->GetInvMass() > ndFloat32(0.0f))
+				{
+					const ndBodyKinematic::ndJointList& joints = body->GetJointList();
+					for (ndBodyKinematic::ndJointList::ndNode* jointNode = joints.GetFirst(); jointNode; jointNode = jointNode->GetNext())
+					{
+						ndJointBilateralConstraint* const joint = jointNode->GetInfo();
+						ndBodyKinematic* const body1 = (joint->GetBody0() == body) ? joint->GetBody1() : joint->GetBody0();
+						ndTree<ndInt32, ndBodyKinematic*>::ndNode* const deadNode = filter.Insert(0, body1);
+						if (deadNode)
+						{
+							array.PushBack(body1);
+						}
+					}
+				}
+			}
+
 			node->GetInfo() = 1;
+			for (ndInt32 i = 1; i < array.GetCount(); ++i)
+			{
+				ndBodyKinematic* const body = array[i];
+				ndTree<ndInt32, ndBodyKinematic*>::ndNode* deadNode = deadBodies.Insert(1, body);
+				if (!deadNode)
+				{
+					deadNode = deadBodies.Find(body);
+					deadNode->GetInfo() = 1;
+				}
+			}
 		}
 	}
+}
+
+void ndPhysicsWorld::PostUpdate(ndFloat32 timestep)
+{
+	ndWorld::PostUpdate(timestep);
+	RemoveDeadBodies();
 
 	m_manager->m_cameraManager->FixUpdate(m_manager, timestep);
 	if (m_manager->m_updateCamera)

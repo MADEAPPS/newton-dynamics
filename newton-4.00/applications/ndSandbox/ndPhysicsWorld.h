@@ -84,8 +84,9 @@ class ndPhysicsWorld: public ndWorld
 	private:
 	void PreUpdate(ndFloat32 timestep);
 	void PostUpdate(ndFloat32 timestep);
-
 	void OnSubStepPostUpdate(ndFloat32 timestep);
+
+	void RemoveDeadBodies();
 
 	ndDemoEntityManager* m_manager;
 	ndSoundManager* m_soundManager;
