@@ -75,7 +75,7 @@ class ndModelArticulation: public ndModel
 	D_NEWTON_API ndNode* FindLoopByJoint(const ndJointBilateralConstraint* const joint) const;
 
 	D_NEWTON_API void ClearMemory();
-	D_NEWTON_API void AddToWorld(ndWorld* const world);
+	//D_NEWTON_API void AddToWorld(ndWorld* const world);
 	D_NEWTON_API void SetTransform(const ndMatrix& matrix);
 
 	protected:

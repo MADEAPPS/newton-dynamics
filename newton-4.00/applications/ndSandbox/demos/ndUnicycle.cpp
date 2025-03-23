@@ -517,15 +517,16 @@ namespace ndUnicycle
 			
 			m_master->SetName(CONTROLLER_NAME);
 			
-			ndModelArticulation* const visualModel = CreateModel(scene, matrix);
-			visualModel->AddToWorld(world);
-
-			ndBodyKinematic* const rootBody = visualModel->GetRoot()->m_body->GetAsBodyKinematic();
+			ndSharedPtr<ndModel>visualModel (CreateModel(scene, matrix));
+			ndBodyKinematic* const rootBody = visualModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic();
 			ndSharedPtr<ndJointBilateralConstraint> visualPlaneJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
 			world->AddJoint(visualPlaneJoint);
 
-			visualModel->SetNotifyCallback(new RobotModelNotify(m_master, visualModel));
-			SetMaterial(visualModel);
+			visualModel->SetNotifyCallback(new RobotModelNotify(m_master, visualModel->GetAsModelArticulation()));
+			SetMaterial(visualModel->GetAsModelArticulation());
+
+			world->AddModel(visualModel);
+			visualModel->AddBodiesAndJointsToWorld();
 			
 			// add a hidden battery of model to generate trajectories in parallel
 			const ndInt32 countX = 32;
@@ -535,17 +536,18 @@ namespace ndUnicycle
 				ndFloat32 step = 3.0f * (ndRand() - 0.5f);
 				location.m_posit.m_x += step;
 			 
-				ndModelArticulation* const model = CreateModel(scene, location);
-				model->AddToWorld(world);
-
-				ndBodyKinematic* const body = model->GetRoot()->m_body->GetAsBodyKinematic();
+				ndSharedPtr<ndModel>model (CreateModel(scene, location));
+				ndBodyKinematic* const body = model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic();
 				ndSharedPtr<ndJointBilateralConstraint> planeJoint(new ndJointPlane(body->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), body, world->GetSentinelBody()));
 				world->AddJoint(planeJoint);
 
-				model->SetNotifyCallback(new RobotModelNotify(m_master, model));
-				//HideModel(model);
-				SetMaterial(model);
-				m_models.Append(model);
+				model->SetNotifyCallback(new RobotModelNotify(m_master, model->GetAsModelArticulation()));
+				SetMaterial(model->GetAsModelArticulation());
+
+				world->AddModel(model);
+				model->AddBodiesAndJointsToWorld();
+
+				m_models.Append(model->GetAsModelArticulation());
 			}
 
 			scene->SetAcceleratedUpdate();

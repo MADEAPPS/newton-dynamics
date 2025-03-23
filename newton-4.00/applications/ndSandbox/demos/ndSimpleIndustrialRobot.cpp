@@ -704,17 +704,20 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	auto SpawnModel = [scene, &modelMesh, floor, &backGround](const ndMatrix& matrix)
 	{
 		ndWorld* const world = scene->GetWorld();
-		ndModelArticulation* const model = CreateModel(scene, *modelMesh, matrix);
-		model->SetNotifyCallback(new RobotModelNotify(model, true, backGround));
-		model->AddToWorld(world);
+		ndSharedPtr<ndModel>model (CreateModel(scene, *modelMesh, matrix));
+		model->SetNotifyCallback(new RobotModelNotify(model->GetAsModelArticulation(), true, backGround));
 		((RobotModelNotify*)*model->GetNotifyCallback())->ResetModel();
 
-		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetRoot()->m_body->GetMatrix(), model->GetRoot()->m_body->GetAsBodyKinematic(), floor));
+		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), floor));
 		world->AddJoint(fixJoint);
 		return model;
 	};
 
-	ndModelArticulation* const visualModel = SpawnModel(matrix);
+	ndWorld* const world = scene->GetWorld();
+	ndSharedPtr<ndModel>visualModel (SpawnModel(matrix));
+	world->AddModel(visualModel);
+	visualModel->AddBodiesAndJointsToWorld();
+
 	ndSharedPtr<ndUIEntity> robotUI(new ndRobotUI(scene, (RobotModelNotify*)*visualModel->GetNotifyCallback()));
 	scene->Set2DDisplayRenderFunction(robotUI);
 

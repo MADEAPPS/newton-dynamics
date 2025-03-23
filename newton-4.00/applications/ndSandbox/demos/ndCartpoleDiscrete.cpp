@@ -389,10 +389,12 @@ namespace ndCarpole_0
 			#endif
 
 			ndWorld* const world = scene->GetWorld();
-			ndModelArticulation* const visualModel = CreateModel(scene, matrix);
-			visualModel->AddToWorld(world);
-			visualModel->SetNotifyCallback(new RobotModelNotify(m_master, visualModel));
-			SetMaterial(visualModel);
+			ndSharedPtr<ndModel>visualModel (CreateModel(scene, matrix));
+			world->AddModel(visualModel);
+			visualModel->AddBodiesAndJointsToWorld();
+
+			visualModel->SetNotifyCallback(new RobotModelNotify(m_master, visualModel->GetAsModelArticulation()));
+			SetMaterial(visualModel->GetAsModelArticulation());
 
 			// add a hidden battery of model to generate trajectories in parallel
 			const ndInt32 countX = 32;
@@ -400,10 +402,11 @@ namespace ndCarpole_0
 			{
 				ndMatrix location(matrix);
 				location.m_posit.m_x += 3.0f * (ndRand() - 0.5f);
-				ndModelArticulation* const model = CreateModel(scene, location);
-				model->AddToWorld(world);
-				model->SetNotifyCallback(new RobotModelNotify(m_master, model));
-				SetMaterial(model);
+				ndSharedPtr<ndModel>model (CreateModel(scene, location));
+				world->AddModel (model);
+				model->AddBodiesAndJointsToWorld();
+				model->SetNotifyCallback(new RobotModelNotify(m_master, model->GetAsModelArticulation()));
+				SetMaterial(model->GetAsModelArticulation());
 			}
 			scene->SetAcceleratedUpdate();
 		}

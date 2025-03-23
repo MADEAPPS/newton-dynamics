@@ -149,6 +149,7 @@ void ndPhysicsWorld::PostUpdate(ndFloat32 timestep)
 
 	while (deadBodies.GetCount())
 	{
+		ndAssert(0);
 		ndTree<ndInt32, ndBodyKinematic*>::ndNode* const node = deadBodies.GetRoot();
 		if (node->GetKey())
 		{

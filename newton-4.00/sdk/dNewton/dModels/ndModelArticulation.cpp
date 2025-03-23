@@ -240,21 +240,21 @@ void ndModelArticulation::AddCloseLoop(const ndSharedPtr<ndJointBilateralConstra
 	node->GetInfo().m_name = loopName;
 }
 
-void ndModelArticulation::AddToWorld(ndWorld* const world)
-{
-	if (m_rootNode)
-	{
-		for (ndModelArticulation::ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
-		{
-			world->AddBody(node->m_body);
-			if (node->m_joint)
-			{
-				world->AddJoint(node->m_joint);
-			}
-		}
-	}
-	world->AddModel(this);
-}
+//void ndModelArticulation::AddToWorld(ndWorld* const world)
+//{
+//	if (m_rootNode)
+//	{
+//		for (ndModelArticulation::ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
+//		{
+//			world->AddBody(node->m_body);
+//			if (node->m_joint)
+//			{
+//				world->AddJoint(node->m_joint);
+//			}
+//		}
+//	}
+//	world->AddModel(this);
+//}
 
 ndModelArticulation::ndNode* ndModelArticulation::FindByBody(const ndBody* const body) const
 {
