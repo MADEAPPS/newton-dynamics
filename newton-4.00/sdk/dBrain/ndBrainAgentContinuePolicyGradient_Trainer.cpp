@@ -84,31 +84,27 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : pu
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 	{
 		ndBrainLayerActivationTanh::MakePrediction(input, output);
-		for (ndInt32 i = m_neurons / 2 - 1; i >= 0; --i)
+		for (ndInt32 j = m_neurons / 2 - 1; j >= 0; --j)
 		{
-			ndBrainFloat sigma = ndMax(input[i + m_neurons / 2], m_minimumSigma);
-			output[i + m_neurons / 2] = sigma;
+			ndInt32 i = j + m_neurons / 2;
+			ndBrainFloat sigma = ndMax(input[i], m_minimumSigma);
+			output[i] = sigma;
 		}
 	}
 
 	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 	{
 		ndBrainLayerActivationTanh::InputDerivative(input, output, outputDerivative, inputDerivative);
-		for (ndInt32 i = m_neurons / 2 - 1; i >= 0; --i)
+		for (ndInt32 j = m_neurons / 2 - 1; j >= 0; --j)
 		{
-			// when sigmas are constant its derivative should be zero. 
-			// this is a huge bug, that might explains the divergent I saw when training more complex models. 
-			//ndBrainFloat out = output[i + m_neurons / 2] - (ndBrainFloat(0.5f) + m_minimumSigma);
-			//ndBrainFloat derivative = ndBrainFloat(0.5f) - ndBrainFloat(2.0f) * out * out;
-
+			ndInt32 i = j + m_neurons / 2;
 			// this is the proper calculation.
 			ndBrainFloat derivative = ndBrainFloat(0.0f);
 			if (input[i] > m_minimumSigma)
 			{
-				ndBrainFloat out = output[i + m_neurons / 2] - (ndBrainFloat(0.5f) + m_minimumSigma);
-				derivative = ndBrainFloat(0.5f) - ndBrainFloat(2.0f) * out * out;
+				derivative = ndBrainFloat(1.0f);
 			}
-			inputDerivative[i + m_neurons / 2] = outputDerivative[i + m_neurons / 2] * derivative;
+			inputDerivative[i] = outputDerivative[i] * derivative;
 		}
 	}
 
@@ -541,7 +537,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizePolicy()
 			optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));
 
 			LastActivationLayer* const lastLayer = (LastActivationLayer*)m_brain[m_brain.GetCount() - 1];
-			ndBrainFloat sigma = ndMin (lastLayer->m_minimumSigma * ndBrainFloat(10.0f), ndBrainFloat(0.1f));
+			ndBrainFloat sigma = lastLayer->m_minimumSigma;
 			input.Set(0.0f);
 			for (ndInt32 i = 0; i < output.GetCount() / 2; ++i)
 			{
