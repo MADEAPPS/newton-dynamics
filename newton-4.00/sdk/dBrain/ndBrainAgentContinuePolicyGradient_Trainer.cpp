@@ -97,7 +97,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : pu
 		for (ndInt32 i = m_neurons / 2 - 1; i >= 0; --i)
 		{
 			// when sigmas are constant its derivative should be zero. 
-			// this is a huge bug, that migh explai teh divergent I saw when training more complex models. 
+			// this is a huge bug, that might explains the divergent I saw when training more complex models. 
 			//ndBrainFloat out = output[i + m_neurons / 2] - (ndBrainFloat(0.5f) + m_minimumSigma);
 			//ndBrainFloat derivative = ndBrainFloat(0.5f) - ndBrainFloat(2.0f) * out * out;
 
@@ -484,7 +484,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::~ndBrainAgentContinuePolicyGra
 
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizePolicy()
 {
-	// using supevised learning make sure that the m_policy has zero mean and standar deviation 
+	// using supervised learning make sure that the m_policy has zero mean and standard deviation 
 	class SupervisedTrainer : public ndBrainThreadPool
 	{
 		public:
@@ -523,11 +523,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizePolicy()
 					{
 						ndBrainLossLeastSquaredError::GetLoss(output, loss);
 
-						ndBrainFloat error2 = ndBrainFloat(0.0f);
-						for (ndInt32 i = 0; i < loss.GetCount() / 2; ++i)
-						{
-							error2 += loss[i] * loss[i];
-						}
+						ndBrainFloat error2 = loss.Dot(loss);
 						m_stop = error2 < ndBrainFloat(1.0e-8f);
 					}
 
@@ -545,7 +541,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizePolicy()
 			optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));
 
 			LastActivationLayer* const lastLayer = (LastActivationLayer*)m_brain[m_brain.GetCount() - 1];
-			ndBrainFloat sigma = lastLayer->m_minimumSigma * ndBrainFloat(4.0f);
+			ndBrainFloat sigma = ndMin (lastLayer->m_minimumSigma * ndBrainFloat(10.0f), ndBrainFloat(0.1f));
 			input.Set(0.0f);
 			for (ndInt32 i = 0; i < output.GetCount() / 2; ++i)
 			{
@@ -553,14 +549,13 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizePolicy()
 				output[i + output.GetCount() / 2] = sigma;
 			}
 
-
 			for (ndInt32 i = 0; (i < 10000) && !stops; ++i)
 			{
 				ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 				optimizer.Update(this, m_partialGradients, m_learnRate);
 			}
-			//m_brain.MakePrediction(input, output);
-			//m_brain.MakePrediction(input, output);
+			m_brain.MakePrediction(input, output);
+			sigma *= 1.0f;
 		}
 
 		ndBrain& m_brain;
