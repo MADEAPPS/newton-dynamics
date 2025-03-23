@@ -70,7 +70,7 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 	{
 		//m_useHardSolverMode = true;
 		m_useHardSolverMode = false;
-		m_comDisplacement = ndVector(0.0f, -0.50f, 0.0f, 0.0f);
+		m_comDisplacement = ndVector(0.0f, -0.6f, 0.0f, 0.0f);
 
 		ndFloat32 idleTorquePoundFoot = 200.0f;
 		ndFloat32 idleRmp = 800.0f;
@@ -172,7 +172,7 @@ class ndVehicleDectriptorMonsterTruck1 : public ndVehicleDectriptor
 	ndVehicleDectriptorMonsterTruck1()
 		:ndVehicleDectriptor("monsterTruck1.fbx")
 	{
-		m_comDisplacement = ndVector(0.0f, -0.7f, 0.0f, 0.0f);
+		m_comDisplacement = ndVector(0.0f, -1.1f, 0.0f, 0.0f);
 
 		// reset gear box ratios
 		m_transmission.m_gearsCount = 4;
