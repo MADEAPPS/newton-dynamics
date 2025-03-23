@@ -196,7 +196,6 @@ ndInt32 ndJointSlider::GetKinematicState(ndKinematicState* const state) const
 	return 1;
 }
 
-//#pragma optimize( "", off )
 void ndJointSlider::ClearMemory()
 {
 	ndMatrix matrix0;

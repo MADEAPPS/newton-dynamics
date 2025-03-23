@@ -225,7 +225,6 @@ ndFloat32 ndJointHinge::PenetrationOmega(ndFloat32 penetration) const
 	return omega;
 }
 
-//#pragma optimize( "", off )
 void ndJointHinge::ClearMemory()
 {
 	ndMatrix matrix0;

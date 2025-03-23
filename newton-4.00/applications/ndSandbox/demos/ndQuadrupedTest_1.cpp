@@ -668,7 +668,6 @@ namespace ndQuadruped_1
 			}
 		}
 
-		//#pragma optimize( "", off )
 		bool IsTerminal() const
 		{
 			if (!m_modelAlive)
@@ -759,7 +758,6 @@ namespace ndQuadruped_1
 			return reward;
 		}
 
-		//#pragma optimize( "", off )
 		bool CalculateExplosionReward() const
 		{
 			bool isAlive = true;
@@ -780,7 +778,6 @@ namespace ndQuadruped_1
 			return isAlive;
 		}
 
-		//#pragma optimize( "", off )
 		ndReal GetReward() const
 		{
 			ndBrainFloat dstReward = 0.0f;

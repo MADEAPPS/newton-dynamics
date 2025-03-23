@@ -136,7 +136,6 @@ namespace ndAdvancedRobot
 		{
 		}
 
-		#pragma optimize( "", off )
 		virtual bool OnSceneAabbOverlap(const ndBody* const otherBody) const
 		{
 			const ndBodyKinematic* const body0 = ((ndBody*)GetBody())->GetAsBodyKinematic();
@@ -249,7 +248,6 @@ namespace ndAdvancedRobot
 				return m_robot->IsTerminal();
 			}
 
-			//#pragma optimize( "", off )
 			void SaveTrajectory()
 			{
 				ndInt32 index = m_trajectory.GetCount() - 1;
@@ -435,7 +433,6 @@ namespace ndAdvancedRobot
 			return false;
 		}
 
-		#pragma optimize( "", off )
 		bool IsTerminal() const
 		{
 			//ndAssert(0);
@@ -486,7 +483,6 @@ namespace ndAdvancedRobot
 			return angleCos;
 		}
 
-		#pragma optimize( "", off )
 		ndReal GetReward() const
 		{
 			if (IsTerminal())
@@ -559,7 +555,6 @@ namespace ndAdvancedRobot
 			return ndReal(reward);
 		}
 
-		#pragma optimize( "", off )
 		void GetObservation(ndBrainFloat* const inputObservations)
 		{
 			ndObservationVector* const observation = (ndObservationVector*)inputObservations;
@@ -607,7 +602,6 @@ namespace ndAdvancedRobot
 
 		}
 
-		//#pragma optimize( "", off )
 		void ApplyActions(ndBrainFloat* const actions)
 		{
 			auto SetParamter = [this, actions](ndJointHinge* const hinge, ndInt32 index)
@@ -658,7 +652,6 @@ namespace ndAdvancedRobot
 			}
 		}
 
-		//#pragma optimize( "", off )
 		void ResetModel()
 		{
 			m_modelAlive = true;

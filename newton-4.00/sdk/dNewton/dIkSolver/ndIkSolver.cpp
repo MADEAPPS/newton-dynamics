@@ -527,7 +527,6 @@ void ndIkSolver::SolverEnd()
 	}
 }
 
-//#pragma optimize( "", off )
 void ndIkSolver::Solve()
 {
 	ndAssert(m_skeleton);

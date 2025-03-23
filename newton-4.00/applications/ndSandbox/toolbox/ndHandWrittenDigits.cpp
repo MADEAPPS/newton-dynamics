@@ -222,7 +222,6 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 	ndExpandTraceMessage("success rate %f%%\n", (ndFloat32)(testDigits->GetCount() - failCount) * 100.0f / (ndFloat32)testDigits->GetCount());
 }
 
-//#pragma optimize( "", off )
 static void MnistTrainingSet()
 {
 	//#define USE_CONVOLUTIONAL_LAYERS

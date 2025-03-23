@@ -692,7 +692,6 @@ namespace ndQuadruped_2
 			}
 		}
 
-		//#pragma optimize( "", off )
 		bool IsTerminal() const
 		{
 			if (!m_modelAlive)
@@ -824,7 +823,6 @@ namespace ndQuadruped_2
 			return reward;
 		}
 
-		//#pragma optimize( "", off )
 		ndReal CalculatePoseMatchReward() const
 		{
 			ndVector errorAcc (ndVector::m_zero);
@@ -861,7 +859,6 @@ namespace ndQuadruped_2
 			return reward;
 		}
 
-		//#pragma optimize( "", off )
 		bool CalculateHolonomicReward() const
 		{
 			ndAssert(0);

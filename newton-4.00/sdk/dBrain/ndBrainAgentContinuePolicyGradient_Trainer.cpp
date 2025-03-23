@@ -82,7 +82,6 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : pu
 		return new LastActivationLayer(*this);
 	}
 
-	#pragma optimize( "", off )
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 	{
 		ndBrainLayerActivationTanh::MakePrediction(input, output);
@@ -108,7 +107,6 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : pu
 		#endif
 	}
 
-	#pragma optimize( "", off )
 	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 	{
 		ndBrainLayerActivationTanh::InputDerivative(input, output, outputDerivative, inputDerivative);
@@ -554,7 +552,6 @@ ndFloat32 ndBrainAgentContinuePolicyGradient_TrainerMaster::GetAverageScore() co
 	return m_averageScore.GetAverage();
 }
 
-#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 {
 	ndAtomic<ndInt32> iterator(0);
@@ -665,7 +662,6 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 	m_optimizer->Update(this, m_weightedTrainer, -m_policyLearnRate);
 }
 
-//#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 {
 	UpdateBaseLineValue();
@@ -721,7 +717,6 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::Optimize()
 	OptimizePolicy();
 }
 
-//#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 {
 	m_randomPermutation.SetCount(m_trajectoryAccumulator.GetCount());
@@ -803,7 +798,6 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 	}
 }
 
-//#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeStep()
 {
 	for (ndList<ndBrainAgentContinuePolicyGradient_Trainer*>::ndNode* node = m_agents.GetFirst(); node; node = node->GetNext())
