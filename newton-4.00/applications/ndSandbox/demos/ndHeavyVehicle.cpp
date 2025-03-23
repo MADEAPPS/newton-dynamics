@@ -704,10 +704,10 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 {
 	ndMatrix sceneLocation(ndGetIdentityMatrix());
 	//BuildFloorBox(scene, sceneLocation);
-	BuildFlatPlane(scene, true);
+	//BuildFlatPlane(scene, true);
 	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
 	//BuildStaticMesh(scene, "track.fbx", true);
-	//BuildCompoundScene(scene, sceneLocation);
+	BuildCompoundScene(scene, sceneLocation);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
 	//BuildSplineTrack(scene, "playerarena.fbx", true);
 	//sceneLocation.m_posit.m_x = -200.0f;
@@ -751,8 +751,13 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	//ndSharedPtr<ndModel> vehicle2(CreateTractor(scene, tractorDesc, matrix, (ndVehicleUI*)*vehicleUI));
 
 	world->AddModel(vehicle0);
+	vehicle0->AddBodiesAndJointsToWorld();
+
 	world->AddModel(vehicle1);
+	vehicle1->AddBodiesAndJointsToWorld();
+
 	//world->AddModel(vehicle2);
+	//vehicle2->AddBodiesAndJointsToWorld();
 
 	ndVehicleCommonNotify* const notifyCallback = (ndVehicleCommonNotify*)*vehicle0->GetNotifyCallback();
 	notifyCallback->SetAsPlayer(scene);
