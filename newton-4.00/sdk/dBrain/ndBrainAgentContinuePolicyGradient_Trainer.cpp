@@ -96,8 +96,18 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : pu
 		ndBrainLayerActivationTanh::InputDerivative(input, output, outputDerivative, inputDerivative);
 		for (ndInt32 i = m_neurons / 2 - 1; i >= 0; --i)
 		{
-			ndBrainFloat out = output[i + m_neurons / 2] - (ndBrainFloat(0.5f) + m_minimumSigma);
-			ndBrainFloat derivative = ndBrainFloat(0.5f) - ndBrainFloat(2.0f) * out * out;
+			// when sigmas are constant its derivative should be zero. 
+			// this is a huge bug, that migh explai teh divergent I saw when training more complex models. 
+			//ndBrainFloat out = output[i + m_neurons / 2] - (ndBrainFloat(0.5f) + m_minimumSigma);
+			//ndBrainFloat derivative = ndBrainFloat(0.5f) - ndBrainFloat(2.0f) * out * out;
+
+			// this is the proper calculation.
+			ndBrainFloat derivative = ndBrainFloat(0.0f);
+			if (input[i] > m_minimumSigma)
+			{
+				ndBrainFloat out = output[i + m_neurons / 2] - (ndBrainFloat(0.5f) + m_minimumSigma);
+				derivative = ndBrainFloat(0.5f) - ndBrainFloat(2.0f) * out * out;
+			}
 			inputDerivative[i + m_neurons / 2] = outputDerivative[i + m_neurons / 2] * derivative;
 		}
 	}
