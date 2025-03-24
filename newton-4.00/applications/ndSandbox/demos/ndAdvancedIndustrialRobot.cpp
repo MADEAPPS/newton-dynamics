@@ -1242,17 +1242,20 @@ namespace ndAdvancedRobot
 }
 
 using namespace ndAdvancedRobot;
+#endif
+
 void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 {
 	// build a floor
-	ndBodyKinematic* const floor = BuildFloorBox(scene, ndGetIdentityMatrix());
+	//ndBodyKinematic* const floor = BuildFloorBox(scene, ndGetIdentityMatrix());
+	BuildFloorBox(scene, ndGetIdentityMatrix());
 	//BuildFloorBox(scene, ndGetIdentityMatrix());
 
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
 	ndMeshLoader loader;
 	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("robot.fbx", scene));
 	ndMatrix matrix(ndYawMatrix(-ndPi * 0.5f));
-
+#if 0
 #ifdef ND_TRAIN_MODEL
 	scene->RegisterPostUpdate(new TrainingUpdata(scene, matrix, modelMesh, floor));
 #else
@@ -1297,11 +1300,11 @@ void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene)
 		}
 	}
 #endif
-	
+
+#endif
 	matrix.m_posit.m_x -= 7.0f;
 	matrix.m_posit.m_y += 2.5f;
 	matrix.m_posit.m_z += 0.25f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), ndPi * 0.0f);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
-#endif
