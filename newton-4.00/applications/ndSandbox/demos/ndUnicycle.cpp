@@ -496,7 +496,7 @@ namespace ndUnicycle
 			,m_discountFactor(0.99f)
 			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(0xffffffff)
-			,m_stopTraining(200 * 1000000)
+			,m_stopTraining(500 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
@@ -722,7 +722,8 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 	ndWorld* const world = scene->GetWorld();
 	
 	ndModelArticulation* model = CreateModel(scene, matrix);
-	model->AddToWorld(world);
+	world->AddModel(model);
+	model->AddBodiesAndJointsToWorld();
 
 	ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
 	ndSharedPtr<ndJointBilateralConstraint> planeJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
