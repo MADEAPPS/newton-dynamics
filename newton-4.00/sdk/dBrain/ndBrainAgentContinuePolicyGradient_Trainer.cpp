@@ -61,18 +61,18 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 //*********************************************************************************************
 //
 //*********************************************************************************************
-class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : public ndBrainLayerActivationTanh
+class ndBrainAgentContinuePolicyGradient_TrainerMaster::ndPolicyGradientActivation : public ndBrainLayerActivationTanh
 {
 	public:
 	//#define USE_TANH_FOR_SIGMA
 
-	LastActivationLayer(ndInt32 neurons)
+	ndPolicyGradientActivation(ndInt32 neurons)
 		:ndBrainLayerActivationTanh(neurons * 2)
 		,m_minimumSigma(ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA)
 	{
 	}
 
-	LastActivationLayer(const LastActivationLayer& src)
+	ndPolicyGradientActivation(const ndPolicyGradientActivation& src)
 		:ndBrainLayerActivationTanh(src)
 		,m_minimumSigma(src.m_minimumSigma)
 	{
@@ -80,7 +80,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : pu
 
 	ndBrainLayer* Clone() const
 	{
-		return new LastActivationLayer(*this);
+		return new ndPolicyGradientActivation(*this);
 	}
 
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
@@ -392,21 +392,17 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 	SetThreadCount(hyperParameters.m_threadsCount);
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 
-	#define ACTIVATION_VPG_TYPE ndBrainLayerActivationTanh
-	//#define ACTIVATION_VPG_TYPE ndBrainLayerActivationElu
-	//#define ACTIVATION_VPG_TYPE ndBrainLayerActivationSigmoidLinear
-	
 	layers.SetCount(0);
 	layers.PushBack(new ndBrainLayerLinear(m_numberOfObservations, hyperParameters.m_neuronPerLayers));
-	layers.PushBack(new ACTIVATION_VPG_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 	for (ndInt32 i = 1; i < hyperParameters.m_numberOfLayers; ++i)
 	{
 		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == hyperParameters.m_neuronPerLayers);
 		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_neuronPerLayers, hyperParameters.m_neuronPerLayers));
-		layers.PushBack(new ACTIVATION_VPG_TYPE(hyperParameters.m_neuronPerLayers));
+		layers.PushBack(new ndBrainLayerActivationTanh(hyperParameters.m_neuronPerLayers));
 	}
 	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_neuronPerLayers, m_numberOfActions * 2));
-	layers.PushBack(new LastActivationLayer(m_numberOfActions));
+	layers.PushBack(new ndPolicyGradientActivation(m_numberOfActions));
 
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
@@ -415,7 +411,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 
 	m_policy.InitWeights();
 	NormalizePolicy();
-	//ndAssert(!strcmp((m_policy[m_policy.GetCount() - 1])->GetLabelId(), "ndBrainLayerActivationTanh"));
+	ndAssert(!strcmp((m_policy[m_policy.GetCount() - 1])->GetLabelId(), "ndBrainLayerActivationTanh"));
 
 	m_trainers.SetCount(0);
 	m_auxiliaryTrainers.SetCount(0);
@@ -435,12 +431,12 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 	// build state value critic neural net
 	layers.SetCount(0);
 	layers.PushBack(new ndBrainLayerLinear(m_numberOfObservations, hyperParameters.m_neuronPerLayers * 2));
-	layers.PushBack(new ACTIVATION_VPG_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 	for (ndInt32 i = 1; i < hyperParameters.m_numberOfLayers; ++i)
 	{
 		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == hyperParameters.m_neuronPerLayers * 2);
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hyperParameters.m_neuronPerLayers * 2));
-		layers.PushBack(new ACTIVATION_VPG_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 	}
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
@@ -546,7 +542,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizePolicy()
 			ndBrainOptimizerSgd optimizer;
 			optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));
 
-			LastActivationLayer* const lastLayer = (LastActivationLayer*)m_brain[m_brain.GetCount() - 1];
+			ndPolicyGradientActivation* const lastLayer = (ndPolicyGradientActivation*)m_brain[m_brain.GetCount() - 1];
 			ndBrainFloat sigma = lastLayer->m_minimumSigma;
 			input.Set(0.0f);
 			for (ndInt32 i = 0; i < groundTruth.GetCount() / 2; ++i)
@@ -725,7 +721,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizeCritic()
 {
-	// using supevised learning make sure that the m_policy has zero mean and standar deviation 
+	// using supervised learning make sure that the m_policy has zero mean and standard deviation 
 	class SupervisedTrainer : public ndBrainThreadPool
 	{
 		public:
@@ -790,6 +786,8 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizeCritic()
 			}
 			ndBrainFloat* const outMemory1 = ndAlloca(ndBrainFloat, m_brain.GetOutputSize());
 			ndBrainMemVector output1(outMemory1, m_brain.GetOutputSize());
+			m_brain.MakePrediction(input, output1);
+			m_brain.MakePrediction(input, output1);
 		}
 
 		ndBrain& m_brain;

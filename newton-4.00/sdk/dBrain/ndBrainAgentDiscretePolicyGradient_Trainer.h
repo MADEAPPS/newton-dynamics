@@ -155,6 +155,7 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	void OptimizePolicy();
 	void OptimizeCritic();
 	void UpdateBaseLineValue();
+	void Normalize(ndBrain& actor);
 	ndBrainAgentDiscretePolicyGradient_Trainer::ndRandomGenerator* GetRandomGenerator();
 
 	ndBrain m_policy;

@@ -21,7 +21,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-#if 0
+
 namespace ndQuadruped_1
 {
 	#define ND_TRAIN_MODEL
@@ -1278,23 +1278,27 @@ namespace ndQuadruped_1
 
 			auto SpawnModel = [this, scene](const ndMatrix& matrix, bool debug)
 			{
-				ndWorld* const world = scene->GetWorld();
+				//ndWorld* const world = scene->GetWorld();
 				ndModelArticulation* const model = CreateModel(scene, matrix);
 				SetMaterial(model);
 				model->SetNotifyCallback(new RobotModelNotify(m_master, model, debug));
-				model->AddToWorld(world);
+				
 				((RobotModelNotify*)*model->GetNotifyCallback())->ResetModel();
 				return model;
 			};
 
-			ndModelArticulation* const visualModel = SpawnModel(matrix, true);
+			ndWorld* const world = scene->GetWorld();
+			ndSharedPtr<ndModel> visualModel (SpawnModel(matrix, true));
+			world->AddModel(visualModel);
+			visualModel->AddBodiesAndJointsToWorld();
+
 			ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, (RobotModelNotify*)*visualModel->GetNotifyCallback()));
 			scene->Set2DDisplayRenderFunction(quadrupedUI);
 
 			ndInt32 countX = 22;
 			ndInt32 countZ = 23;
-			//countX = 1;
-			//countZ = 1;
+			countX = 1;
+			countZ = 1;
 
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
@@ -1305,8 +1309,11 @@ namespace ndQuadruped_1
 					location.m_posit.m_x += 20.0f * (ndRand() - 0.5f);
 					location.m_posit.m_z += 20.0f * (ndRand() - 0.5f);
 
-					ndModelArticulation* const model = SpawnModel(location, false);
-					m_models.Append(model);
+					ndSharedPtr<ndModel> model (SpawnModel(location, false));
+					world->AddModel(model);
+					model->AddBodiesAndJointsToWorld();
+
+					m_models.Append(model->GetAsModelArticulation());
 				}
 			}
 			scene->SetAcceleratedUpdate();
@@ -1331,7 +1338,7 @@ namespace ndQuadruped_1
 				ndModelArticulation::ndNode* const node = stackMem[stack];
 				ndBody* const body = *node->m_body;
 				ndDemoEntityNotify* const userData = (ndDemoEntityNotify*)body->GetNotifyCallback();
-				ndDemoEntity* const ent = userData->m_entity;
+				ndDemoEntity* const ent = *userData->m_entity;
 				mode ? ent->Hide() : ent->UnHide();
 
 				for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
@@ -1382,11 +1389,11 @@ namespace ndQuadruped_1
 				instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
 			
 				ndDemoEntityNotify* const originalNotify = (ndDemoEntityNotify*)body->GetNotifyCallback();
-				void* const useData = originalNotify->m_entity;
-				originalNotify->m_entity = nullptr;
+				ndSharedPtr<ndDemoEntity> userData (originalNotify->m_entity);
+				originalNotify->m_entity = ndSharedPtr<ndDemoEntity>();
 				TrainingRobotBodyNotify* const notify = new TrainingRobotBodyNotify((ndDemoEntityNotify*)body->GetNotifyCallback());
 				body->SetNotifyCallback(notify);
-				notify->m_entity = (ndDemoEntity*)useData;
+				notify->m_entity = userData;
 			
 				for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
 				{
@@ -1466,7 +1473,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	BuildFloorBox(scene, ndGetIdentityMatrix());
 	//BuildFlatPlane(scene, true);
 
-//	ExportUrdfModel(scene);
+	//ExportUrdfModel(scene);
 
 	// register a zero restitution and high friction material for the feet
 	ndApplicationMaterial material;
@@ -1485,8 +1492,9 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 		scene->RegisterPostUpdate(new TrainingUpdata(scene, matrix));
 	#else
 		ndWorld* const world = scene->GetWorld();
-		ndModelArticulation* const referenceModel = CreateModel(scene, matrix);
-		referenceModel->AddToWorld(world);
+		ndSharedPtr<ndModel> referenceModel (CreateModel(scene, matrix));
+		world->AddModel(referenceModel);
+		referenceModel->AddBodiesAndJointsToWorld();
 
 		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
 		//world->AddJoint(fixJoint);
@@ -1494,7 +1502,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 		char fileName[256];
 		ndGetWorkingFileName(CONTROLLER_NAME, fileName);
 		ndSharedPtr<ndBrain> policy(ndBrainLoad::Load(fileName));
-		referenceModel->SetNotifyCallback(new RobotModelNotify(policy, referenceModel, true));
+		referenceModel->SetNotifyCallback(new RobotModelNotify(policy, referenceModel->GetAsModelArticulation(), true));
 
 		ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, (RobotModelNotify*)*referenceModel->GetNotifyCallback()));
 		scene->Set2DDisplayRenderFunction(quadrupedUI);
@@ -1513,9 +1521,10 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 				ndMatrix location(matrix);
 				location.m_posit.m_x += 3.0f * ndFloat32 (j - countX/2);
 				location.m_posit.m_z += 3.0f * ndFloat32 (i - countZ/2);
-				ndModelArticulation* const model = CreateModel(scene, location);
-				model->SetNotifyCallback(new RobotModelNotify(brain, model, false));
-				model->AddToWorld(world);
+				ndSharedPtr<ndModel> model (CreateModel(scene, location));
+				model->SetNotifyCallback(new RobotModelNotify(policy, model->GetAsModelArticulation(), false));
+				world->AddModel(model);
+				model->AddBodiesAndJointsToWorld();
 				//m_models.Append(model);
 				//SetMaterial(model);
 			}
@@ -1529,4 +1538,3 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
-#endif
