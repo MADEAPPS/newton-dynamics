@@ -563,9 +563,6 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizePolicy()
 			{
 				ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 				optimizer.Update(this, m_partialGradients, m_learnRate);
-
-				m_brain.MakePrediction(input, output1);
-				m_brain.MakePrediction(input, output1);
 			}
 			m_brain.MakePrediction(input, output1);
 			sigma *= 1.0f;
@@ -794,8 +791,6 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizeCritic()
 			}
 			ndBrainFloat* const outMemory1 = ndAlloca(ndBrainFloat, m_brain.GetOutputSize());
 			ndBrainMemVector output1(outMemory1, m_brain.GetOutputSize());
-			m_brain.MakePrediction(input, output1);
-			m_brain.MakePrediction(input, output1);
 		}
 
 		ndBrain& m_brain;
