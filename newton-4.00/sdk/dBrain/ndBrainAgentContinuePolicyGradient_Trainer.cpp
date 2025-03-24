@@ -28,7 +28,7 @@
 #include "ndBrainAgentContinuePolicyGradient_Trainer.h"
 
 #define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE	(1024 * 128)
-#define ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA	ndBrainFloat(1.0e-2f)
+#define ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA	ndBrainFloat(1.0e-1f)
 
 //*********************************************************************************************
 //
