@@ -64,7 +64,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : public ndBrainLayerActivationTanh
 {
 	public:
-	//#define USE_TANH
+	#define USE_TANH
 	LastActivationLayer(ndInt32 neurons)
 		:ndBrainLayerActivationTanh(neurons * 2)
 		,m_minimumSigma(ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA)
@@ -499,7 +499,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizePolicy()
 			:ndBrainThreadPool()
 			,m_brain(*brain)
 			,m_trainer(new ndBrainTrainer(&m_brain))
-			,m_learnRate(ndReal(5.0e-1f))
+			,m_learnRate(ndReal(1.0e-2f))
 		{
 			SetThreadCount(1);
 			m_partialGradients.PushBack(*m_trainer);
@@ -556,17 +556,18 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizePolicy()
 				groundTruth[i + groundTruth.GetCount() / 2] = sigma;
 			}
 
+			ndBrainFloat* const outMemory1 = ndAlloca(ndBrainFloat, m_brain.GetOutputSize());
+			ndBrainMemVector output1(outMemory1, m_brain.GetOutputSize());
+
 			for (ndInt32 i = 0; (i < 10000) && !stops; ++i)
 			{
 				ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 				optimizer.Update(this, m_partialGradients, m_learnRate);
 
-				//m_brain.MakePrediction(input, output1);
-				//m_brain.MakePrediction(input, output1);
+				m_brain.MakePrediction(input, output1);
+				m_brain.MakePrediction(input, output1);
 			}
-			//ndBrainFloat* const outMemory1 = ndAlloca(ndBrainFloat, m_brain.GetOutputSize());
-			//ndBrainMemVector output1(outMemory1, m_brain.GetOutputSize());
-			//m_brain.MakePrediction(input, output1);
+			m_brain.MakePrediction(input, output1);
 			sigma *= 1.0f;
 		}
 
