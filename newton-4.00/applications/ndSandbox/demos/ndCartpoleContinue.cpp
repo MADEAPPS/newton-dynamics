@@ -24,7 +24,7 @@
 
 namespace ndCarpole_1
 {
-	#define ND_TRAIN_AGENT
+	//#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME			"cartpoleContinue"
 
 	//#define CONTROLLER_RESUME_TRAINING
@@ -230,9 +230,9 @@ namespace ndCarpole_1
 			ndFloat32 sinAngle = GetPoleAngle();
 			//ndFloat32 reward = ndReal(ndExp(-ndFloat32(2000.0f) * sinAngle * sinAngle));
 			ndFloat32 angularReward = ndReal(ndExp(-ndFloat32(1000.0f) * sinAngle * sinAngle));
-			ndFloat32 linearReward = ndReal(ndExp(-ndFloat32(400.0f) * veloc.m_x * veloc.m_x));
+			ndFloat32 linearReward = ndReal(ndExp(-ndFloat32(1000.0f) * veloc.m_x * veloc.m_x));
 
-			ndFloat32 reward = 0.6f * angularReward + 0.4f * linearReward;
+			ndFloat32 reward = 0.7f * angularReward + 0.3f * linearReward;
 			return ndReal(reward);
 		}
 
@@ -320,7 +320,7 @@ namespace ndCarpole_1
 			,m_discountFactor(0.99f)
 			//,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(0xfffffff)
-			,m_stopTraining(100 * 1000000)
+			,m_stopTraining(200 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			char name[256];
