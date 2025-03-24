@@ -718,7 +718,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizeCritic()
 			:ndBrainThreadPool()
 			,m_brain(*brain)
 			,m_trainer(new ndBrainTrainer(&m_brain))
-			,m_learnRate(ndReal(5.0e-4f))
+			,m_learnRate(ndReal(1.0e-3f))
 		{
 			SetThreadCount(1);
 			m_partialGradients.PushBack(*m_trainer);
@@ -775,7 +775,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizeCritic()
 			ndBrainOptimizerSgd optimizer;
 			optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));
 
-			for (ndInt32 i = 0; (i < 10000) && !stops; ++i)
+			for (ndInt32 i = 0; (i < 50000) && !stops; ++i)
 			{
 				ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 				optimizer.Update(this, m_partialGradients, m_learnRate);
