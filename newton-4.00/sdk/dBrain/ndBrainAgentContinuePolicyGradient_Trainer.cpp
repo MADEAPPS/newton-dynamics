@@ -90,6 +90,9 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : pu
 			//ndBrainFloat sigma = ndMax(input[i], m_minimumSigma);
 			//output[i] = sigma;
 
+			//ndBrainFloat value = ndClamp(input[i], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
+			//ndBrainFloat x0 = m_minimumSigma + 0.5f + 0.5f * ndBrainFloat(ndTanh(value));
+			//ndBrainFloat x1 = m_minimumSigma + ndBrainFloat(0.5f) * (ndBrainFloat(1.0f) + output[i]);
 			output[i] = m_minimumSigma + ndBrainFloat(0.5f) * (ndBrainFloat(1.0f) + output[i]);
 		}
 	}
@@ -101,7 +104,10 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : pu
 		{
 			ndInt32 i = j + m_neurons / 2;
 			
-			ndBrainFloat derivative = ndBrainFloat(0.5f) * (ndBrainFloat(1.0f) - output[i] * output[i]);
+			//ndBrainFloat derivative = ndBrainFloat(0.5f) * (ndBrainFloat(1.0f) - output[i] * output[i]);
+
+			ndBrainFloat x = output[i] - m_minimumSigma - ndBrainFloat(0.5f);
+			ndBrainFloat derivative = ndBrainFloat(0.5f) - ndBrainFloat(2.0f) * x * x;
 			inputDerivative[i] = outputDerivative[i] * derivative;
 		}
 	}
