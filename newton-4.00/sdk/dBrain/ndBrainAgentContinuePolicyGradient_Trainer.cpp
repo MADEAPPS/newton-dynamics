@@ -64,7 +64,8 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : public ndBrainLayerActivationTanh
 {
 	public:
-	#define USE_TANH
+	//#define USE_TANH_FOR_SIGMA
+
 	LastActivationLayer(ndInt32 neurons)
 		:ndBrainLayerActivationTanh(neurons * 2)
 		,m_minimumSigma(ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA)
@@ -88,16 +89,14 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : pu
 		for (ndInt32 j = m_neurons / 2 - 1; j >= 0; --j)
 		{
 			ndInt32 i = j + m_neurons / 2;
-			//ndBrainFloat sigma = ndMax(input[i], m_minimumSigma);
-			//output[i] = sigma;
 
-			#ifdef USE_TANH
-			//ndBrainFloat value = ndClamp(input[i], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
-			//ndBrainFloat x0 = m_minimumSigma + 0.5f + 0.5f * ndBrainFloat(ndTanh(value));
-			//ndBrainFloat x1 = m_minimumSigma + ndBrainFloat(0.5f) * (ndBrainFloat(1.0f) + output[i]);
-			output[i] = m_minimumSigma + ndBrainFloat(0.5f) * (ndBrainFloat(1.0f) + output[i]);
+			#ifdef USE_TANH_FOR_SIGMA
+				//ndBrainFloat value = ndClamp(input[i], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
+				//ndBrainFloat x0 = m_minimumSigma + 0.5f + 0.5f * ndBrainFloat(ndTanh(value));
+				//ndBrainFloat x1 = m_minimumSigma + ndBrainFloat(0.5f) * (ndBrainFloat(1.0f) + output[i]);
+				output[i] = m_minimumSigma + ndBrainFloat(0.5f) * (ndBrainFloat(1.0f) + output[i]);
 			#else
-			output[i] = m_minimumSigma + ndBrainFloat(ndExp(input[i]));
+				output[i] = ndMax(input[i], m_minimumSigma);
 			#endif
 		}
 	}
@@ -109,11 +108,11 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : pu
 		{
 			ndInt32 i = j + m_neurons / 2;
 			
-			#ifdef USE_TANH
-			ndBrainFloat x = output[i] - m_minimumSigma - ndBrainFloat(0.5f);
-			ndBrainFloat derivative = ndBrainFloat(0.5f) - ndBrainFloat(2.0f) * x * x;
+			#ifdef USE_TANH_FOR_SIGMA
+				ndBrainFloat x = output[i] - m_minimumSigma - ndBrainFloat(0.5f);
+				ndBrainFloat derivative = ndBrainFloat(0.5f) - ndBrainFloat(2.0f) * x * x;
 			#else
-			ndBrainFloat derivative = output[i] - m_minimumSigma;
+				ndBrainFloat derivative = (input[i] >= ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
 			#endif
 			inputDerivative[i] = outputDerivative[i] * derivative;
 		}
