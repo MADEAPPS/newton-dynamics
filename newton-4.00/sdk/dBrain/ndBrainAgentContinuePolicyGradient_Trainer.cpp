@@ -87,8 +87,10 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : pu
 		for (ndInt32 j = m_neurons / 2 - 1; j >= 0; --j)
 		{
 			ndInt32 i = j + m_neurons / 2;
-			ndBrainFloat sigma = ndMax(input[i], m_minimumSigma);
-			output[i] = sigma;
+			//ndBrainFloat sigma = ndMax(input[i], m_minimumSigma);
+			//output[i] = sigma;
+
+			output[i] = m_minimumSigma + ndBrainFloat(0.5f) * (ndBrainFloat(1.0f) + output[i]);
 		}
 	}
 
@@ -98,12 +100,8 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster::LastActivationLayer : pu
 		for (ndInt32 j = m_neurons / 2 - 1; j >= 0; --j)
 		{
 			ndInt32 i = j + m_neurons / 2;
-			// this is the proper calculation.
-			ndBrainFloat derivative = ndBrainFloat(0.0f);
-			if (input[i] > m_minimumSigma)
-			{
-				derivative = ndBrainFloat(1.0f);
-			}
+			
+			ndBrainFloat derivative = ndBrainFloat(0.5f) * (ndBrainFloat(1.0f) - output[i] * output[i]);
 			inputDerivative[i] = outputDerivative[i] * derivative;
 		}
 	}
@@ -488,7 +486,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizePolicy()
 			:ndBrainThreadPool()
 			,m_brain(*brain)
 			,m_trainer(new ndBrainTrainer(&m_brain))
-			,m_learnRate(ndReal(5.0e-4f))
+			,m_learnRate(ndReal(1.0e-3f))
 		{
 			SetThreadCount(1);
 			m_partialGradients.PushBack(*m_trainer);
@@ -545,7 +543,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizePolicy()
 				output[i + output.GetCount() / 2] = sigma;
 			}
 
-			for (ndInt32 i = 0; (i < 10000) && !stops; ++i)
+			for (ndInt32 i = 0; (i < 50000) && !stops; ++i)
 			{
 				ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 				optimizer.Update(this, m_partialGradients, m_learnRate);
