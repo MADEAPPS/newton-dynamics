@@ -8,7 +8,8 @@
 # including commercial applications, and to alter it and redistribute it
 # freely.
 
-cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
+
+cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR)
 
 if(NEWTON_TEST_NEW_V_HACD)
 	add_subdirectory(hacdNew)
