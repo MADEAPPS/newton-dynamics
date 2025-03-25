@@ -371,7 +371,7 @@ namespace ndCarpole_0
 			,m_saveScore(m_maxScore)
 			,m_discountFactor(0.99f)
 			,m_lastEpisode(0xffffffff)
-			,m_stopTraining(200 * 1000000)
+			,m_stopTraining(400 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			char name[256];
