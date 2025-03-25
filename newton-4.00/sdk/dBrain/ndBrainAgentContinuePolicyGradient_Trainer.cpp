@@ -310,11 +310,11 @@ void ndBrainAgentContinuePolicyGradient_Trainer::Step()
 	 
 	SelectAction(actions);
 	ApplyActions(&actions[0]);
-	m_trajectory.SetTerminalState(entryIndex, IsTerminal());
 
 	ndBrainFloat reward = CalculateReward();
 	m_trajectory.SetReward(entryIndex, reward);
 	m_trajectory.SetAdvantage(entryIndex, reward);
+	m_trajectory.SetTerminalState(entryIndex, IsTerminal());
 }
 
 void ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory()
@@ -323,6 +323,8 @@ void ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory()
 	{
 		m_master->m_bashTrajectoryIndex++;
 		
+		m_trajectory.SetTerminalState(m_trajectory.GetCount() - 1, true);
+
 		// using the Bellman equation to calculate trajectory rewards. (Monte Carlo method)
 		ndBrainFloat gamma = m_master->m_gamma;
 		for (ndInt32 i = m_trajectory.GetCount() - 2; i >= 0; --i)
@@ -364,7 +366,6 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 	,m_auxiliaryTrainers()
 	,m_baseLineValueOptimizer(nullptr)
 	,m_baseLineValueTrainers()
-	//,m_stateValues(hyperParameters.m_numberOfObservations)
 	,m_randomPermutation()
 	,m_trajectoryAccumulator(hyperParameters.m_numberOfActions, hyperParameters.m_numberOfObservations)
 	,m_gamma(hyperParameters.m_discountFactor)
@@ -382,8 +383,6 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 	,m_bashTrajectoryCount(hyperParameters.m_bashTrajectoryCount)
 	,m_bashTrajectorySteps(hyperParameters.m_bashTrajectoryCount * m_maxTrajectorySteps)
 	,m_baseValueWorkingBufferSize(0)
-	//,m_memoryStateIndex(0)
-	//,m_memoryStateIndexFull(0)
 	,m_randomSeed(hyperParameters.m_randomSeed)
 	,m_workingBuffer()
 	,m_averageScore()
@@ -849,21 +848,6 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 		}
 	});
 	ndBrainThreadPool::ParallelExecute(CalculateAdvantage);
-	
-	//ndFloat64 advantageVariance2 = ndBrainFloat(0.0f);
-	//for (ndInt32 i = stepNumber - 1; i >= 0; --i)
-	//{
-	//	ndBrainFloat advantage = m_trajectoryAccumulator.GetAdvantage(i);
-	//	advantageVariance2 += advantage * advantage;
-	//}
-	//
-	//advantageVariance2 /= ndBrainFloat(stepNumber);
-	//ndBrainFloat invVariance = ndBrainFloat(1.0f) / ndBrainFloat(ndSqrt(advantageVariance2 + ndBrainFloat(1.0e-4f)));
-	//for (ndInt32 i = stepNumber - 1; i >= 0; --i)
-	//{
-	//	const ndBrainFloat normalizedAdvantage = m_trajectoryAccumulator.GetAdvantage(i) * invVariance;
-	//	m_trajectoryAccumulator.SetAdvantage(i, normalizedAdvantage);
-	//}
 }
 
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::Optimize()
@@ -874,8 +858,10 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::Optimize()
 
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 {
+	m_trajectoryAccumulator.SetTerminalState(m_trajectoryAccumulator.GetCount() - 2, true);
+
 	m_randomPermutation.SetCount(m_trajectoryAccumulator.GetCount() - 1);
-	for (ndInt32 i = ndInt32(m_trajectoryAccumulator.GetCount()) - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(m_randomPermutation.GetCount()) - 1; i >= 0; --i)
 	{
 		m_randomPermutation[i] = i;
 	}
@@ -905,15 +891,6 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 				ndBrainTrainer& trainer = *m_baseLineValueTrainers[i];
 					
 				stateValue[0] = ndBrainFloat(0.0f);
-				//bool isTerminal = m_trajectoryAccumulator.GetTerminalState(index) || m_trajectoryAccumulator.GetTerminalState(index + 1);
-				//if (!isTerminal)
-				//{ 
-				//	ndBrainFloat reward = 0.0f;
-				//	reward = m_trajectoryAccumulator.GetReward(index);
-				//	const ndBrainMemVector qObservation(m_trajectoryAccumulator.GetObservations(index + 1), m_numberOfObservations);
-				//	m_critic.MakePrediction(qObservation, stateQValue);
-				//	stateValue[0] = reward + m_gamma * stateQValue[0];
-				//}
 				if (!m_trajectoryAccumulator.GetTerminalState(index))
 				{
 					stateValue[0] = m_trajectoryAccumulator.GetReward(index);
@@ -947,7 +924,6 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeStep()
 		bool isTeminal = agent->IsTerminal() || (agent->m_trajectory.GetCount() >= (m_extraTrajectorySteps + m_maxTrajectorySteps));
 		if (isTeminal)
 		{
-			agent->m_trajectory.SetTerminalState(agent->m_trajectory.GetCount() - 1, true);
 			agent->SaveTrajectory();
 			agent->ResetModel();
 			agent->m_randomGenerator = GetRandomGenerator();

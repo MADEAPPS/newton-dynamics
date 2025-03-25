@@ -54,9 +54,13 @@ class ndBrainAgentDiscretePolicyGradient_Trainer : public ndBrainAgent
 		ndBrainFloat GetReward(ndInt32 entry) const;
 		void SetReward(ndInt32 entry, ndBrainFloat reward);
 
+		bool GetTerminalState(ndInt32 entry) const;
+		void SetTerminalState(ndInt32 entry, bool isTernimal);
+
 		ndBrainFloat GetAdvantage(ndInt32 entry) const;
 		void SetAdvantage(ndInt32 entry, ndBrainFloat advantage);
 
+		void Clear(ndInt32 entry);
 		ndBrainFloat* GetObservations(ndInt32 entry);
 
 		ndInt64 m_obsevationsSize;
@@ -159,7 +163,7 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndBrainAgentDiscretePolicyGradient_Trainer::ndRandomGenerator* GetRandomGenerator();
 
 	ndBrain m_policy;
-	ndBrain m_value;
+	ndBrain m_critic;
 	ndBrainOptimizerAdam* m_optimizer;
 	ndArray<ndBrainTrainer*> m_trainers;
 	ndArray<ndBrainTrainer*> m_weightedTrainer;
@@ -167,7 +171,6 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndBrainOptimizerAdam* m_baseLineValueOptimizer;
 	ndArray<ndBrainTrainer*> m_baseLineValueTrainers;
 
-	MemoryStateValues m_stateValues;
 	ndArray<ndInt32> m_randomPermutation;
 	ndBrainAgentDiscretePolicyGradient_Trainer::ndRandomGenerator* m_randomGenerator;
 	ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep m_trajectoryAccumulator;
@@ -186,8 +189,6 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndInt32 m_bashTrajectoryIndex;
 	ndInt32 m_bashTrajectoryCount;
 	ndInt32 m_bashTrajectorySteps;
-	ndInt32 m_memoryStateIndex;
-	ndInt32 m_memoryStateIndexFull;
 	ndInt32 m_baseValueWorkingBufferSize;
 	ndUnsigned32 m_randomSeed;
 	ndBrainVector m_workingBuffer;

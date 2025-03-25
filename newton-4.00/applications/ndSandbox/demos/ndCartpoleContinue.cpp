@@ -24,7 +24,7 @@
 
 namespace ndCarpole_1
 {
-	#define ND_TRAIN_AGENT
+	//#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME			"cartpoleContinue"
 
 	//#define CONTROLLER_RESUME_TRAINING
@@ -232,7 +232,7 @@ namespace ndCarpole_1
 			ndFloat32 angularReward = ndReal(ndExp(-ndFloat32(1000.0f) * sinAngle * sinAngle));
 			ndFloat32 linearReward = ndReal(ndExp(-ndFloat32(1000.0f) * veloc.m_x * veloc.m_x));
 
-			ndFloat32 reward = 0.7f * angularReward + 0.3f * linearReward;
+			ndFloat32 reward = 0.5f * angularReward + 0.5f * linearReward;
 			return ndReal(reward);
 		}
 

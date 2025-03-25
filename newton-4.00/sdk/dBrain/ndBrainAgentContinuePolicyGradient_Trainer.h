@@ -173,7 +173,6 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndBrainOptimizerAdam* m_baseLineValueOptimizer;
 	ndArray<ndBrainTrainer*> m_baseLineValueTrainers;
 
-	//MemoryStateValues m_stateValues;
 	ndArray<ndInt32> m_randomPermutation;
 	ndBrainAgentContinuePolicyGradient_Trainer::ndRandomGenerator* m_randomGenerator;
 	ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryStep m_trajectoryAccumulator;
@@ -193,8 +192,6 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndInt32 m_bashTrajectoryCount;
 	ndInt32 m_bashTrajectorySteps;
 	ndInt32 m_baseValueWorkingBufferSize;
-	//ndInt32 m_memoryStateIndex;
-	//ndInt32 m_memoryStateIndexFull;
 	ndUnsigned32 m_randomSeed;
 	ndBrainVector m_workingBuffer;
 	ndMovingAverage<8> m_averageScore;
