@@ -131,6 +131,28 @@ void ndBrainVector::GaussianNormalize()
 	}
 }
 
+void ndBrainVector::SoftMaxNormalize()
+{
+	ndBrainFloat max = ndBrainFloat(0.0f);
+	for (ndInt32 i = ndInt32(GetCount() - 1); i >= 0; --i)
+	{
+		max = ndMax((*this)[i], max);
+	}
+
+	ndBrainFloat acc = ndBrainFloat(0.0f);
+	for (ndInt32 i = ndInt32(GetCount() - 1); i >= 0; --i)
+	{
+		ndBrainFloat in = ndMax(((*this)[i] - max), ndBrainFloat(-30.0f));
+		ndAssert(in <= ndBrainFloat(0.0f));
+		ndBrainFloat prob = ndBrainFloat(ndExp(in));
+		(*this)[i] = prob;
+		acc += prob;
+	}
+
+	ndAssert(acc > ndBrainFloat(0.0f));
+	Scale(ndBrainFloat(1.0f) / acc);
+}
+
 void ndBrainVector::Scale(ndBrainFloat scale)
 {
 	ndAssert(GetCount() < (1ll << 32));

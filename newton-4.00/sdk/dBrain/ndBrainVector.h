@@ -42,6 +42,7 @@ class ndBrainVector: public ndArray<ndBrainFloat>
 	void Mul(const ndBrainVector& a);
 
 	void FlushToZero();
+	void SoftMaxNormalize();
 	void GaussianNormalize();
 	void Clamp(ndBrainFloat min, ndBrainFloat max);
 	void InitGaussianWeights(ndBrainFloat variance);
