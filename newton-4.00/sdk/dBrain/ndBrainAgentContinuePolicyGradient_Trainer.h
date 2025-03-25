@@ -83,12 +83,12 @@ class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
 	virtual void OptimizeStep() { ndAssert(0); }
 	void Save(ndBrainSave* const) { ndAssert(0); }
 	bool IsTrainer() const { ndAssert(0); return true; }
-	ndInt32 GetEpisodeFrames() const { ndAssert(0); return 0; }
 	void InitWeights(ndBrainFloat, ndBrainFloat) { ndAssert(0); }
 
 	virtual void Step();
 	virtual void SaveTrajectory();
 	virtual bool IsTerminal() const;
+	ndInt32 GetEpisodeFrames() const;
 
 	ndBrainVector m_workingBuffer;
 	ndTrajectoryStep m_trajectory;
