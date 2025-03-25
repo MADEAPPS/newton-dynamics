@@ -364,16 +364,18 @@ namespace ndCarpole_1
 			visualModel->AddBodiesAndJointsToWorld();
 
 			// add a hidden battery of model to generate trajectories in parallel
-			const ndInt32 countX = 32;
+			const ndInt32 countX = 100;
 			for (ndInt32 i = 0; i < countX; ++i)
 			{
 				ndMatrix location(matrix);
-				location.m_posit.m_x += 3.0f * (ndRand() - 0.5f);
+				location.m_posit.m_x += 10.0f * (ndRand() - 0.5f);
 				ndSharedPtr<ndModel>model (CreateModel(scene, location));
 				world->AddModel(model);
 				model->AddBodiesAndJointsToWorld();
 				model->SetNotifyCallback(new RobotModelNotify(m_master, model->GetAsModelArticulation()));
 				SetMaterial(model->GetAsModelArticulation());
+
+				m_models.Append(model->GetAsModelArticulation());
 			}
 			scene->SetAcceleratedUpdate();
 		}
@@ -386,7 +388,7 @@ namespace ndCarpole_1
 			}
 		}
 
-		void HideModel(ndModelArticulation* const model) const
+		void HideModel(ndModelArticulation* const model, bool mode) const
 		{
 			ndModelArticulation::ndNode* stackMem[128];
 			ndInt32 stack = 1;
@@ -398,13 +400,22 @@ namespace ndCarpole_1
 				ndBody* const body = *node->m_body;
 				ndDemoEntityNotify* const userData = (ndDemoEntityNotify*)body->GetNotifyCallback();
 				ndDemoEntity* const ent = *userData->m_entity;
-				ent->Hide();
+				//ent->Hide();
+				mode ? ent->Hide() : ent->UnHide();
 
 				for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
 				{
 					stackMem[stack] = child;
 					stack++;
 				}
+			}
+		}
+
+		void OnDebug(ndDemoEntityManager* const, bool mode)
+		{
+			for (ndList<ndModelArticulation*>::ndNode* node = m_models.GetFirst(); node; node = node->GetNext())
+			{
+				HideModel(node->GetInfo(), mode);
 			}
 		}
 
@@ -534,6 +545,7 @@ namespace ndCarpole_1
 
 		ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
 		ndSharedPtr<ndBrain> m_bestActor;
+		ndList<ndModelArticulation*> m_models;
 		FILE* m_outFile;
 		ndUnsigned64 m_timer;
 		ndFloat32 m_maxScore;

@@ -29,14 +29,16 @@ namespace ndCarpole_0
 
 	//#define CONTROLLER_RESUME_TRAINING
 
-	#define D_PUSH_ACCEL		ndFloat32 (-0.25f * DEMO_GRAVITY)
+	#define D_PUSH_ACCEL		ndFloat32 (-0.125f * DEMO_GRAVITY)
 	#define D_REWARD_MIN_ANGLE	ndFloat32 (20.0f * ndDegreeToRad)
 
 	enum ndActionSpace
 	{
 		m_doNoting,
-		m_pushLeft,
-		m_pushRight,
+		m_pushLeft0,
+		m_pushLeft1,
+		m_pushRight0,
+		m_pushRight1,
 		m_actionsSize
 	};
 
@@ -286,15 +288,32 @@ namespace ndCarpole_0
 		void ApplyActions(ndBrainFloat* const actions)
 		{
 			ndVector force(m_cart->GetForce());
-			ndInt32 action = ndInt32(actions[0]);
-			if (action == m_pushLeft)
+
+			switch (ndInt32(actions[0]))
 			{
-				force.m_x = -m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
+				case m_pushLeft0:
+				{
+					force.m_x = -m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
+					break;
+				}
+				case m_pushRight0:
+				{
+					force.m_x = m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
+					break;
+				}
+
+				case m_pushLeft1:
+				{
+					force.m_x = -m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL * ndBrainFloat(2.0f);
+					break;
+				}
+				case m_pushRight1:
+				{
+					force.m_x = m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL * ndBrainFloat(2.0f);
+					break;
+				}
 			}
-			else if (action == m_pushRight)
-			{
-				force.m_x = m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
-			}
+
 			m_cart->SetForce(force);
 		}
 
@@ -397,16 +416,18 @@ namespace ndCarpole_0
 			SetMaterial(visualModel->GetAsModelArticulation());
 
 			// add a hidden battery of model to generate trajectories in parallel
-			const ndInt32 countX = 32;
+			const ndInt32 countX = 100;
 			for (ndInt32 i = 0; i < countX; ++i)
 			{
 				ndMatrix location(matrix);
-				location.m_posit.m_x += 3.0f * (ndRand() - 0.5f);
+				location.m_posit.m_x += 10.0f * (ndRand() - 0.5f);
 				ndSharedPtr<ndModel>model (CreateModel(scene, location));
 				world->AddModel (model);
 				model->AddBodiesAndJointsToWorld();
 				model->SetNotifyCallback(new RobotModelNotify(m_master, model->GetAsModelArticulation()));
 				SetMaterial(model->GetAsModelArticulation());
+
+				m_models.Append(model->GetAsModelArticulation());
 			}
 			scene->SetAcceleratedUpdate();
 		}
@@ -419,7 +440,7 @@ namespace ndCarpole_0
 			}
 		}
 
-		void HideModel(ndModelArticulation* const model) const
+		void HideModel(ndModelArticulation* const model, bool mode) const
 		{
 			ndModelArticulation::ndNode* stackMem[128];
 			ndInt32 stack = 1;
@@ -431,13 +452,22 @@ namespace ndCarpole_0
 				ndBody* const body = *node->m_body;
 				ndDemoEntityNotify* const userData = (ndDemoEntityNotify*)body->GetNotifyCallback();
 				ndDemoEntity* const ent = *userData->m_entity;
-				ent->Hide();
+				//ent->Hide();
+				mode ? ent->Hide() : ent->UnHide();
 		
 				for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
 				{
 					stackMem[stack] = child;
 					stack++;
 				}
+			}
+		}
+
+		void OnDebug(ndDemoEntityManager* const, bool mode)
+		{
+			for (ndList<ndModelArticulation*>::ndNode* node = m_models.GetFirst(); node; node = node->GetNext())
+			{
+				HideModel(node->GetInfo(), mode);
 			}
 		}
 
@@ -567,6 +597,7 @@ namespace ndCarpole_0
 
 		ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster> m_master;
 		ndSharedPtr<ndBrain> m_bestActor;
+		ndList<ndModelArticulation*> m_models;
 		FILE* m_outFile;
 		ndUnsigned64 m_timer;
 		ndFloat32 m_maxScore;
@@ -610,7 +641,7 @@ void ndCartpoleDiscrete(ndDemoEntityManager* const scene)
 #endif
 	
 	matrix.m_posit.m_y = 0.5f;
-	matrix.m_posit.m_z = 2.0f;
+	matrix.m_posit.m_z = 5.0f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
