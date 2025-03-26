@@ -78,7 +78,8 @@ ndBindingRagdollEntityNotify::ndBindingRagdollEntityNotify(ndDemoEntityManager* 
 	}
 	else
 	{
-		const ndMatrix parentMatrix(entity->GetParent()->CalculateGlobalMatrix());
+		//const ndMatrix parentMatrix(entity->GetParent()->CalculateGlobalMatrix());
+		const ndMatrix parentMatrix(entity->GetParent() ? entity->GetParent()->CalculateGlobalMatrix() : ndGetIdentityMatrix());
 		m_bindMatrix = parentMatrix.OrthoInverse();
 	}
 }

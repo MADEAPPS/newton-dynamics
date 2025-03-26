@@ -31,6 +31,7 @@ class ndDemoEntity : public ndSharedNodeHierarchy<ndDemoEntity>
 	virtual ~ndDemoEntity(void);
 
 	ndSharedPtr<ndDemoMeshInterface> GetMesh();
+	ndSharedPtr<ndDemoMeshInterface> GetMesh() const;
 	void SetMesh(ndSharedPtr<ndDemoMeshInterface> mesh, const ndMatrix& meshMatrix = ndGetIdentityMatrix());
 
 	const ndMatrix& GetMeshMatrix() const;  
@@ -52,13 +53,13 @@ class ndDemoEntity : public ndSharedNodeHierarchy<ndDemoEntity>
 
 	void RenderBone(ndDemoEntityManager* const scene, const ndMatrix& nodeMatrix) const;
 
+	ndShapeInstance* CreateCollision() const;
 	ndShapeInstance* CreateCollisionFromChildren() const;
 	ndShapeInstance* CreateCompoundFromMesh(bool lowDetail = false);
 
 	void RenderSkeleton(ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
 	virtual void Render(ndFloat32 timeStep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
 
-	//ndDemoEntity* Find(const char* const name) const;
 	ndDemoEntity* FindBySubString(const char* const subString) const;
 	ndSharedPtr<ndDemoEntity> Find(const ndSharedPtr<ndDemoEntity>& self, const char* const name) const;
 

@@ -13,6 +13,7 @@
 #include "ndSkyBox.h"
 #include "ndUIEntity.h"
 #include "ndDemoMesh.h"
+#include "ndMeshLoader.h"
 #include "ndDemoCamera.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
@@ -24,7 +25,7 @@
 
 namespace ndQuadruped_1
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_1-vpg.dnn"
 
 	class ndLegObservation
@@ -62,104 +63,7 @@ namespace ndQuadruped_1
 	#define D_SWING_STEP			ndReal(0.005f)
 	#define D_MODEL_DEAD_ANGLE		ndReal(0.2f)
 	#define D_MIN_TRAIN_ANIM_SPEED	ndReal(0.1f)
-
-	void ExportUrdfModel(ndDemoEntityManager* const scene)
-	{
-		ndFloat32 mass = 20.0f;
-		ndFloat32 radius = 0.25f;
-		ndFloat32 limbMass = 0.25f;
-		ndFloat32 limbLength = 0.3f;
-		ndFloat32 limbRadios = 0.05f;
-
-		ndSharedPtr<ndModelArticulation> model(new ndModelArticulation);
-
-		ndBodyKinematic* const torso = CreateSphere(scene, ndGetIdentityMatrix(), mass, radius, "smilli.png");
-		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(torso);
-		torso->SetMatrix(ndGetIdentityMatrix());
-
-		ndMatrix matrix(ndRollMatrix(45.0f * ndDegreeToRad));
-		matrix.m_posit.m_x = radius * 0.9f;
-		matrix.m_posit.m_y = -radius * 0.5f;
-
-		ndFloat32 angles[] = { 300.0f, 240.0f, 120.0f, 60.0f };
-
-		//for (ndInt32 i = 0; i < 1; ++i)
-		for (ndInt32 i = 0; i < 4; ++i)
-		{
-			ndMatrix limbPivotLocation(matrix * ndYawMatrix(angles[i] * ndDegreeToRad));
-
-			ndModelArticulation::ndNode* thighNode = nullptr;
-			{
-				ndMatrix bodyMatrix(limbPivotLocation);
-				bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(limbLength * 0.5f);
-
-				ndBodyKinematic* const thigh = CreateCapsule(scene, bodyMatrix, limbMass, limbRadios, limbRadios, limbLength);
-				thigh->SetMatrix(bodyMatrix);
-				ndJointBilateralConstraint* const ballJoint = new ndIkJointSpherical(limbPivotLocation, thigh, torso);
-				thighNode = model->AddLimb(modelRoot, thigh, ballJoint);
-				thighNode->m_name = ndString ("thigh_") + i;
-
-				limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(limbLength);
-			}
-
-			// add calf0
-			ndModelArticulation::ndNode* calfNode = nullptr;
-			{
-				limbPivotLocation = ndRollMatrix(-90.0f * ndDegreeToRad) * limbPivotLocation;
-			
-				ndMatrix bodyMatrix(limbPivotLocation);
-				bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(limbLength * 0.5f);
-				ndBodyKinematic* const calf0 = CreateCapsule(scene, bodyMatrix, limbMass * 0.25f, limbRadios, limbRadios, limbLength);
-				calf0->SetMatrix(bodyMatrix);
-			
-				ndMatrix caffPinAndPivotFrame(ndGetIdentityMatrix());
-				ndFloat32 sign = angles[i] > 180.0f ? -1.0f : 1.0f;
-				caffPinAndPivotFrame.m_front = limbPivotLocation.m_right.Scale(sign);
-				caffPinAndPivotFrame.m_up = limbPivotLocation.m_front;
-				caffPinAndPivotFrame.m_right = caffPinAndPivotFrame.m_front.CrossProduct(caffPinAndPivotFrame.m_up);
-				caffPinAndPivotFrame.m_posit = limbPivotLocation.m_posit;
-				ndIkJointHinge* const hinge = new ndIkJointHinge(caffPinAndPivotFrame, calf0->GetAsBodyKinematic(), thighNode->m_body->GetAsBodyKinematic());
-			
-				hinge->SetLimitState(true);
-				//hinge->SetLimits(-60.0f * ndDegreeToRad, 60.0f * ndDegreeToRad);
-				hinge->SetLimits(-70.0f * ndDegreeToRad, 70.0f * ndDegreeToRad);
-				calfNode = model->AddLimb(thighNode, calf0, hinge);
-				calfNode->m_name = ndString("calf_") + i;
-			
-				limbPivotLocation.m_posit += limbPivotLocation.m_front.Scale(limbLength);
-			}
-			
-			// add calf1
-			{
-				ndFloat32 lenght = limbLength * 0.5f;
-				limbPivotLocation = ndRollMatrix(-45.0f * ndDegreeToRad) * limbPivotLocation;
-				ndMatrix bodyMatrix(limbPivotLocation);
-				bodyMatrix.m_posit += limbPivotLocation.m_front.Scale(lenght * 0.5f);
-			
-				ndBodyKinematic* const foot = CreateCapsule(scene, bodyMatrix, limbMass * 0.25f, limbRadios, limbRadios, lenght);
-				foot->SetMatrix(bodyMatrix);
-			
-				ndMatrix footPinAndPivotFrame(ndGetIdentityMatrix());
-				footPinAndPivotFrame.m_front = limbPivotLocation.m_right;
-				footPinAndPivotFrame.m_up = limbPivotLocation.m_front.Scale(-1.0f);
-				footPinAndPivotFrame.m_right = footPinAndPivotFrame.m_front.CrossProduct(footPinAndPivotFrame.m_up);
-				footPinAndPivotFrame.m_posit = limbPivotLocation.m_posit;
-			
-				// add joint limit to prevent knee from flipping
-				ndJointHinge* const footHinge = new ndJointHinge(footPinAndPivotFrame, foot->GetAsBodyKinematic(), calfNode->m_body->GetAsBodyKinematic());
-				footHinge->SetAsSpringDamper(0.001f, 2000.0f, 50.0f);
-				ndModelArticulation::ndNode* const footNode = model->AddLimb(calfNode, foot, footHinge);
-
-				footNode->m_name = ndString("foot_") + i;
-			}
-		}
-
-		ndUrdfFile urdf;
-		char fileName[256];
-		ndGetWorkingFileName("quadSpider.urdf", fileName);
-		urdf.Export(fileName, *model);
-	}
-
+		
 	void NormalizeMassRatios(ndModelArticulation* const model)
 	{
 		ndFloat32 totalVolume = 0.0f;
@@ -202,19 +106,58 @@ namespace ndQuadruped_1
 		}
 	}
 
-	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location)
+	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndSharedPtr<ndDemoEntity>& modelMesh)
 	{
-		ndUrdfFile urdf;
-		char fileName[256];
-		ndGetWorkingFileName("quadSpider.urdf", fileName);
-		ndModelArticulation* const model = urdf.Import(fileName);
+		ndModelArticulation* const model = new ndModelArticulation();
 
-		SetModelVisualMesh(scene, model);
-		ndMatrix matrix(model->GetRoot()->m_body->GetMatrix() * location);
-		matrix.m_posit = location.m_posit;
-		model->SetTransform(matrix);
+		ndSharedPtr<ndDemoEntity> entity(modelMesh->GetChildren().GetFirst()->GetInfo()->CreateClone());
+		scene->AddEntity(entity);
 
-		NormalizeMassRatios(model);
+		auto CreateRigidBody = [scene](ndSharedPtr<ndDemoEntity>& entity, const ndMatrix& matrix, ndFloat32 mass, ndBodyDynamic* const parentBody)
+		{
+			ndSharedPtr<ndShapeInstance> shape (entity->CreateCollision());
+
+			ndBodyKinematic* const body = new ndBodyDynamic();
+			//body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+			body->SetNotifyCallback(new ndBindingRagdollEntityNotify(scene, entity, parentBody, 100.0f));
+			body->SetMatrix(matrix);
+			body->SetCollisionShape(*(*shape));
+			body->GetAsBodyDynamic()->SetMassMatrix(mass, *(*shape));
+			return body;
+		};
+
+		ndFloat32 mass = 20.0f;
+		//ndFloat32 radius = 0.25f;
+		ndFloat32 limbMass = 0.25f;
+		//ndFloat32 limbLength = 0.3f;
+		//ndFloat32 limbRadios = 0.05f;
+
+		ndMatrix matrix(entity->GetCurrentMatrix() * location);
+
+		ndSharedPtr<ndBody> rootBody(CreateRigidBody(entity, matrix, mass, nullptr));
+		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(rootBody);
+
+		// build all for legs
+		for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = entity->GetChildren().GetFirst(); node; node = node->GetNext())
+		{
+			ndSharedPtr<ndDemoEntity> thighEntity(node->GetInfo());
+
+			const ndMatrix thighMatrix(thighEntity->GetCurrentMatrix() * matrix);
+			ndSharedPtr<ndBody> thigh(CreateRigidBody(thighEntity, thighMatrix, limbMass, rootBody->GetAsBodyDynamic()));
+
+			ndJointBilateralConstraint* const ballJoint = new ndIkJointSpherical(thighMatrix, thigh->GetAsBodyKinematic(), rootBody->GetAsBodyKinematic());
+			ndModelArticulation::ndNode* const thighNode = model->AddLimb(modelRoot, thigh, ballJoint);
+
+
+
+
+//			break;
+		}
+
+		//ndMatrix matrix(rootBody->GetMatrix() * location);
+		//matrix.m_posit = location.m_posit;
+		//model->SetTransform(matrix);
+		//NormalizeMassRatios(model);
 		return model;
 	}
 
@@ -231,7 +174,7 @@ namespace ndQuadruped_1
 
 			ndController(const ndController& src)
 				:ndBrainAgentContinuePolicyGradient(src.m_policy)
-				, m_robot(nullptr)
+				,m_robot(nullptr)
 			{
 			}
 
@@ -1258,65 +1201,66 @@ namespace ndQuadruped_1
 			,m_stopTraining(500 * 1000000)
 			,m_modelIsTrained(false)
 		{
+			ndAssert(0);
 			//ndWorld* const world = scene->GetWorld();
-			m_outFile = fopen("quadruped_1-vpg.csv", "wb");
-			fprintf(m_outFile, "vpg\n");
-			
-			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
-			
-			//hyperParameters.m_threadsCount = 1;
-			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
-			hyperParameters.m_extraTrajectorySteps = 1024 * 2;
-			//hyperParameters.m_bashTrajectoryCount = 1000;
-			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
-			hyperParameters.m_numberOfActions = ND_AGENT_OUTPUT_SIZE;
-			hyperParameters.m_numberOfObservations = ND_AGENT_INPUT_SIZE;
-			
-			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
-			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
-			m_master->SetName(CONTROLLER_NAME);
-
-			auto SpawnModel = [this, scene](const ndMatrix& matrix, bool debug)
-			{
-				//ndWorld* const world = scene->GetWorld();
-				ndModelArticulation* const model = CreateModel(scene, matrix);
-				SetMaterial(model);
-				model->SetNotifyCallback(new RobotModelNotify(m_master, model, debug));
-				
-				((RobotModelNotify*)*model->GetNotifyCallback())->ResetModel();
-				return model;
-			};
-
-			ndWorld* const world = scene->GetWorld();
-			ndSharedPtr<ndModel> visualModel (SpawnModel(matrix, true));
-			world->AddModel(visualModel);
-			visualModel->AddBodiesAndJointsToWorld();
-
-			ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, (RobotModelNotify*)*visualModel->GetNotifyCallback()));
-			scene->Set2DDisplayRenderFunction(quadrupedUI);
-
-			ndInt32 countX = 22;
-			ndInt32 countZ = 23;
-			countX = 1;
-			countZ = 1;
-
-			// add a hidden battery of model to generate trajectories in parallel
-			for (ndInt32 i = 0; i < countZ; ++i)
-			{
-				for (ndInt32 j = 0; j < countX; ++j)
-				{
-					ndMatrix location(matrix);
-					location.m_posit.m_x += 20.0f * (ndRand() - 0.5f);
-					location.m_posit.m_z += 20.0f * (ndRand() - 0.5f);
-
-					ndSharedPtr<ndModel> model (SpawnModel(location, false));
-					world->AddModel(model);
-					model->AddBodiesAndJointsToWorld();
-
-					m_models.Append(model->GetAsModelArticulation());
-				}
-			}
-			scene->SetAcceleratedUpdate();
+			//m_outFile = fopen("quadruped_1-vpg.csv", "wb");
+			//fprintf(m_outFile, "vpg\n");
+			//
+			//ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
+			//
+			////hyperParameters.m_threadsCount = 1;
+			//hyperParameters.m_maxTrajectorySteps = 1024 * 8;
+			//hyperParameters.m_extraTrajectorySteps = 1024 * 2;
+			////hyperParameters.m_bashTrajectoryCount = 1000;
+			//hyperParameters.m_discountFactor = ndReal(m_discountFactor);
+			//hyperParameters.m_numberOfActions = ND_AGENT_OUTPUT_SIZE;
+			//hyperParameters.m_numberOfObservations = ND_AGENT_INPUT_SIZE;
+			//
+			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
+			//m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
+			//m_master->SetName(CONTROLLER_NAME);
+			//
+			//auto SpawnModel = [this, scene](const ndMatrix& matrix, bool debug)
+			//{
+			//	//ndWorld* const world = scene->GetWorld();
+			//	ndModelArticulation* const model = CreateModel(scene, matrix);
+			//	SetMaterial(model);
+			//	model->SetNotifyCallback(new RobotModelNotify(m_master, model, debug));
+			//	
+			//	((RobotModelNotify*)*model->GetNotifyCallback())->ResetModel();
+			//	return model;
+			//};
+			//
+			//ndWorld* const world = scene->GetWorld();
+			//ndSharedPtr<ndModel> visualModel (SpawnModel(matrix, true));
+			//world->AddModel(visualModel);
+			//visualModel->AddBodiesAndJointsToWorld();
+			//
+			//ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, (RobotModelNotify*)*visualModel->GetNotifyCallback()));
+			//scene->Set2DDisplayRenderFunction(quadrupedUI);
+			//
+			//ndInt32 countX = 22;
+			//ndInt32 countZ = 23;
+			//countX = 1;
+			//countZ = 1;
+			//
+			//// add a hidden battery of model to generate trajectories in parallel
+			//for (ndInt32 i = 0; i < countZ; ++i)
+			//{
+			//	for (ndInt32 j = 0; j < countX; ++j)
+			//	{
+			//		ndMatrix location(matrix);
+			//		location.m_posit.m_x += 20.0f * (ndRand() - 0.5f);
+			//		location.m_posit.m_z += 20.0f * (ndRand() - 0.5f);
+			//
+			//		ndSharedPtr<ndModel> model (SpawnModel(location, false));
+			//		world->AddModel(model);
+			//		model->AddBodiesAndJointsToWorld();
+			//
+			//		m_models.Append(model->GetAsModelArticulation());
+			//	}
+			//}
+			//scene->SetAcceleratedUpdate();
 		}
 
 		~TrainingUpdata()
@@ -1473,8 +1417,6 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	BuildFloorBox(scene, ndGetIdentityMatrix());
 	//BuildFlatPlane(scene, true);
 
-	//ExportUrdfModel(scene);
-
 	// register a zero restitution and high friction material for the feet
 	ndApplicationMaterial material;
 	material.m_restitution = 0.0f;
@@ -1485,6 +1427,10 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
 	callback->RegisterMaterial(material, ndDemoContactCallback::m_frictionTest, ndDemoContactCallback::m_default);
 
+	ndMeshLoader loader;
+	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("quadrupeSpider.fbx", scene));
+
+
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.6f;
 
@@ -1492,43 +1438,45 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 		scene->RegisterPostUpdate(new TrainingUpdata(scene, matrix));
 	#else
 		ndWorld* const world = scene->GetWorld();
-		ndSharedPtr<ndModel> referenceModel (CreateModel(scene, matrix));
+
+		matrix.m_posit.m_y += 1.0f;
+		ndSharedPtr<ndModel> referenceModel (CreateModel(scene, matrix, modelMesh));
 		world->AddModel(referenceModel);
 		referenceModel->AddBodiesAndJointsToWorld();
-
+		
 		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-		//world->AddJoint(fixJoint);
-
-		char fileName[256];
-		ndGetWorkingFileName(CONTROLLER_NAME, fileName);
-		ndSharedPtr<ndBrain> policy(ndBrainLoad::Load(fileName));
-		referenceModel->SetNotifyCallback(new RobotModelNotify(policy, referenceModel->GetAsModelArticulation(), true));
-
-		ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, (RobotModelNotify*)*referenceModel->GetNotifyCallback()));
-		scene->Set2DDisplayRenderFunction(quadrupedUI);
-
-		matrix.m_posit.m_z += 1.5f;
-
-		ndInt32 countZ = 5;
-		ndInt32 countX = 5;
-
-		//countZ = 0;
-		//countX = 0;
-		for (ndInt32 i = 0; i < countZ; ++i)
-		{
-			for (ndInt32 j = 0; j < countX; ++j)
-			{
-				ndMatrix location(matrix);
-				location.m_posit.m_x += 3.0f * ndFloat32 (j - countX/2);
-				location.m_posit.m_z += 3.0f * ndFloat32 (i - countZ/2);
-				ndSharedPtr<ndModel> model (CreateModel(scene, location));
-				model->SetNotifyCallback(new RobotModelNotify(policy, model->GetAsModelArticulation(), false));
-				world->AddModel(model);
-				model->AddBodiesAndJointsToWorld();
-				//m_models.Append(model);
-				//SetMaterial(model);
-			}
-		}
+		world->AddJoint(fixJoint);
+		
+		//char fileName[256];
+		//ndGetWorkingFileName(CONTROLLER_NAME, fileName);
+		//ndSharedPtr<ndBrain> policy(ndBrainLoad::Load(fileName));
+		//referenceModel->SetNotifyCallback(new RobotModelNotify(policy, referenceModel->GetAsModelArticulation(), true));
+		//
+		//ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, (RobotModelNotify*)*referenceModel->GetNotifyCallback()));
+		//scene->Set2DDisplayRenderFunction(quadrupedUI);
+		//
+		//matrix.m_posit.m_z += 1.5f;
+		//
+		//ndInt32 countZ = 5;
+		//ndInt32 countX = 5;
+		//
+		////countZ = 0;
+		////countX = 0;
+		//for (ndInt32 i = 0; i < countZ; ++i)
+		//{
+		//	for (ndInt32 j = 0; j < countX; ++j)
+		//	{
+		//		ndMatrix location(matrix);
+		//		location.m_posit.m_x += 3.0f * ndFloat32 (j - countX/2);
+		//		location.m_posit.m_z += 3.0f * ndFloat32 (i - countZ/2);
+		//		ndSharedPtr<ndModel> model (CreateModel(scene, location));
+		//		model->SetNotifyCallback(new RobotModelNotify(policy, model->GetAsModelArticulation(), false));
+		//		world->AddModel(model);
+		//		model->AddBodiesAndJointsToWorld();
+		//		//m_models.Append(model);
+		//		//SetMaterial(model);
+		//	}
+		//}
 
 	#endif
 	

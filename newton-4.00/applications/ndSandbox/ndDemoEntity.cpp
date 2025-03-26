@@ -194,6 +194,11 @@ ndSharedPtr<ndDemoMeshInterface> ndDemoEntity::GetMesh()
 	return m_mesh;
 }
 
+ndSharedPtr<ndDemoMeshInterface> ndDemoEntity::GetMesh() const
+{
+	return m_mesh;
+}
+
 void ndDemoEntity::SetMesh(ndSharedPtr<ndDemoMeshInterface> mesh, const ndMatrix& meshMatrix)
 {
 	m_mesh = mesh;
@@ -574,6 +579,147 @@ ndShapeInstance* ndDemoEntity::CreateCompoundFromMesh(bool lowDetail)
 	return compoundShapeInstance;
 }
 
+ndShapeInstance* ndDemoEntity::CreateCollision() const
+{
+	ndString tmpName(GetName());
+	tmpName.ToLower();
+	const char* const name = tmpName.GetStr();
+
+	ndShapeInstance* instance = nullptr;
+	ndArray<ndVector> points;
+	if (strstr(name, "sphere"))
+	{
+		ndDemoMesh* const mesh = (ndDemoMesh*)*GetMesh();
+		ndAssert(mesh);
+		mesh->GetVertexArray(points);
+
+		ndVector minP(ndFloat32(1.0e10f));
+		ndVector maxP(ndFloat32(-1.0e10f));
+		for (ndInt32 i = 0; i < mesh->m_vertexCount; ++i)
+		{
+			minP = minP.GetMin(points[i]);
+			maxP = maxP.GetMax(points[i]);
+		}
+		ndVector size(ndVector::m_half * (maxP - minP));
+		ndMatrix alighMatrix(ndGetIdentityMatrix());
+		alighMatrix.m_posit = ndVector::m_half * (maxP + minP);
+		alighMatrix.m_posit.m_w = ndFloat32(1.0f);
+
+		const ndMatrix matrix(alighMatrix * GetMeshMatrix() * GetCurrentMatrix());
+		instance = new ndShapeInstance(new ndShapeSphere(size.m_x));
+		instance->SetLocalMatrix(matrix);
+	}
+	//else if (strstr(name, "box"))
+	//{
+	//	ndDemoMesh* const mesh = (ndDemoMesh*)*node->GetInfo()->GetMesh();
+	//	ndAssert(mesh);
+	//	mesh->GetVertexArray(points);
+	//
+	//	ndVector minP(ndFloat32(1.0e10f));
+	//	ndVector maxP(ndFloat32(-1.0e10f));
+	//	for (ndInt32 i = 0; i < mesh->m_vertexCount; ++i)
+	//	{
+	//		minP = minP.GetMin(points[i]);
+	//		maxP = maxP.GetMax(points[i]);
+	//	}
+	//	ndVector size(maxP - minP);
+	//	shapeArray.PushBack(new ndShapeInstance(new ndShapeBox(size.m_x, size.m_y, size.m_z)));
+	//
+	//	const ndVector origin((maxP + minP).Scale(ndFloat32(0.5f)));
+	//	ndMatrix alighMatrix(ndGetIdentityMatrix());
+	//	alighMatrix.m_posit = ndVector::m_half * (maxP + minP);
+	//	alighMatrix.m_posit.m_w = ndFloat32(1.0f);
+	//
+	//	const ndMatrix matrix(alighMatrix * node->GetInfo()->GetMeshMatrix() * node->GetInfo()->GetCurrentMatrix());
+	//	shapeArray[shapeArray.GetCount() - 1]->SetLocalMatrix(matrix);
+	//}
+	else if (strstr(name, "capsule"))
+	{
+		ndDemoMesh* const mesh = (ndDemoMesh*)*GetMesh();
+		ndAssert(mesh);
+		mesh->GetVertexArray(points);
+		ndVector minP(ndFloat32(1.0e10f));
+		ndVector maxP(ndFloat32(-1.0e10f));
+		for (ndInt32 i = 0; i < mesh->m_vertexCount; ++i)
+		{
+			minP = minP.GetMin(points[i]);
+			maxP = maxP.GetMax(points[i]);
+		}
+		ndVector size(ndVector::m_half * (maxP - minP));
+		ndVector origin(ndVector::m_half * (maxP + minP));
+		ndFloat32 high = 2.0f * ndMax(size.m_y - size.m_x, ndFloat32(0.05f));
+		ndMatrix alighMatrix(ndRollMatrix(90.0f * ndDegreeToRad));
+		alighMatrix.m_posit = origin;
+		alighMatrix.m_posit.m_w = ndFloat32(1.0f);
+	
+		//const ndMatrix matrix(alighMatrix * GetMeshMatrix() * GetCurrentMatrix());
+		const ndMatrix matrix(alighMatrix * GetMeshMatrix());
+	
+		instance = new ndShapeInstance(new ndShapeCapsule(size.m_x, size.m_x, high));
+		instance->SetLocalMatrix(matrix);
+	}
+	//else if (strstr(name, "convexhull"))
+	//{
+	//	ndDemoMesh* const mesh = (ndDemoMesh*)*node->GetInfo()->GetMesh();
+	//	ndAssert(mesh);
+	//	mesh->GetVertexArray(points);
+	//	shapeArray.PushBack(new ndShapeInstance(new ndShapeConvexHull(mesh->m_vertexCount, sizeof(ndVector), 0.01f, &points[0].m_x)));
+	//	const ndMatrix matrix(node->GetInfo()->GetMeshMatrix() * node->GetInfo()->GetCurrentMatrix());
+	//	shapeArray[shapeArray.GetCount() - 1]->SetLocalMatrix(matrix);
+	//}
+	//else if (strstr(name, "vhacd"))
+	//{
+	//	ndArray<ndInt32> indices;
+	//	ndDemoMesh* const mesh = (ndDemoMesh*)*node->GetInfo()->GetMesh();
+	//	ndAssert(mesh);
+	//	mesh->GetVertexArray(points);
+	//	mesh->GetIndexArray(indices);
+	//
+	//	ndArray<ndTriplex> meshPoints;
+	//	for (ndInt32 i = 0; i < points.GetCount(); ++i)
+	//	{
+	//		ndTriplex p;
+	//		p.m_x = points[i].m_x;
+	//		p.m_y = points[i].m_y;
+	//		p.m_z = points[i].m_z;
+	//		meshPoints.PushBack(p);
+	//	}
+	//	nd_::VHACD::IVHACD* const interfaceVHACD = nd_::VHACD::CreateVHACD();
+	//
+	//	nd_::VHACD::IVHACD::Parameters paramsVHACD;
+	//	//paramsVHACD.m_concavityToVolumeWeigh = 1.0;
+	//	paramsVHACD.m_concavityToVolumeWeigh = 0.5f;
+	//	interfaceVHACD->Compute(&meshPoints[0].m_x, uint32_t(points.GetCount()),
+	//		(uint32_t*)&indices[0], uint32_t(indices.GetCount()) / 3, paramsVHACD);
+	//
+	//	ndInt32 hullCount = ndInt32(interfaceVHACD->GetNConvexHulls());
+	//	ndArray<ndVector> convexMeshPoints;
+	//	for (ndInt32 i = 0; i < hullCount; ++i)
+	//	{
+	//		nd_::VHACD::IVHACD::ConvexHull ch;
+	//		interfaceVHACD->GetConvexHull(uint32_t(i), ch);
+	//		convexMeshPoints.SetCount(ndInt32(ch.m_nPoints));
+	//		for (ndInt32 j = 0; j < ndInt32(ch.m_nPoints); ++j)
+	//		{
+	//			ndVector p(ndFloat32(ch.m_points[j * 3 + 0]), ndFloat32(ch.m_points[j * 3 + 1]), ndFloat32(ch.m_points[j * 3 + 2]), ndFloat32(0.0f));
+	//			convexMeshPoints[j] = p;
+	//		}
+	//		shapeArray.PushBack(new ndShapeInstance(new ndShapeConvexHull(ndInt32(convexMeshPoints.GetCount()), sizeof(ndVector), 0.01f, &convexMeshPoints[0].m_x)));
+	//		const ndMatrix matrix(node->GetInfo()->GetMeshMatrix() * node->GetInfo()->GetCurrentMatrix());
+	//		shapeArray[shapeArray.GetCount() - 1]->SetLocalMatrix(matrix);
+	//	}
+	//
+	//	interfaceVHACD->Clean();
+	//	interfaceVHACD->Release();
+	//}
+	else
+	{
+		ndAssert(0);
+	}
+
+	return instance;
+}
+
 ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 {
 	ndFixSizeArray<ndShapeInstance*, 128> shapeArray;
@@ -581,13 +727,12 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 	ndArray<ndVector> points;
 	
 	shapeArray.PushBack(nullptr);
-	//for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
 	for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = GetChildren().GetFirst(); node; node = node->GetNext())
 	{
 		ndString tmpName(node->GetInfo()->GetName());
 		tmpName.ToLower();
 		const char* const name = tmpName.GetStr();
-	
+
 		if (strstr (name, "sphere")) 
 		{
 			ndDemoMesh* const mesh = (ndDemoMesh*)*node->GetInfo()->GetMesh();
@@ -615,7 +760,7 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 			ndDemoMesh* const mesh = (ndDemoMesh*)*node->GetInfo()->GetMesh();
 			ndAssert(mesh);
 			mesh->GetVertexArray(points);
-			
+
 			ndVector minP(ndFloat32(1.0e10f));
 			ndVector maxP(ndFloat32(-1.0e10f));
 			for (ndInt32 i = 0; i < mesh->m_vertexCount; ++i)
@@ -625,7 +770,7 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 			}
 			ndVector size(maxP - minP);
 			shapeArray.PushBack(new ndShapeInstance(new ndShapeBox(size.m_x, size.m_y, size.m_z)));
-
+		
 			const ndVector origin((maxP + minP).Scale (ndFloat32 (0.5f)));
 			ndMatrix alighMatrix(ndGetIdentityMatrix());
 			alighMatrix.m_posit = ndVector::m_half * (maxP + minP);
@@ -685,13 +830,13 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 				meshPoints.PushBack(p);
 			}
 			nd_::VHACD::IVHACD* const interfaceVHACD = nd_::VHACD::CreateVHACD();
-
+		
 			nd_::VHACD::IVHACD::Parameters paramsVHACD;
 			//paramsVHACD.m_concavityToVolumeWeigh = 1.0;
 			paramsVHACD.m_concavityToVolumeWeigh = 0.5f;
 			interfaceVHACD->Compute(&meshPoints[0].m_x, uint32_t(points.GetCount()),
 				(uint32_t*)&indices[0], uint32_t(indices.GetCount()) / 3, paramsVHACD);
-
+		
 			ndInt32 hullCount = ndInt32(interfaceVHACD->GetNConvexHulls());
 			ndArray<ndVector> convexMeshPoints;
 			for (ndInt32 i = 0; i < hullCount; ++i)
@@ -708,7 +853,7 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromChildren() const
 				const ndMatrix matrix(node->GetInfo()->GetMeshMatrix() * node->GetInfo()->GetCurrentMatrix());
 				shapeArray[shapeArray.GetCount() - 1]->SetLocalMatrix(matrix);
 			}
-
+		
 			interfaceVHACD->Clean();
 			interfaceVHACD->Release();
 		}
@@ -747,8 +892,6 @@ void ndDemoEntity::Render(ndFloat32 timestep, ndDemoEntityManager* const scene, 
 	}
 
 	//RenderBone(scene, nodeMatrix);
-	//for (ndDemoEntity* child = GetFirstChild(); child; child = child->GetNext())
-	//for (ndSharedPtr<ndDemoEntity> child(GetFirstChild()); *child; child = child->GetNext())
 	for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = GetChildren().GetFirst(); node; node = node->GetNext())
 	{
 		node->GetInfo()->Render(timestep, scene, nodeMatrix);

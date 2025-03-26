@@ -134,15 +134,15 @@ static ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndSha
 	ndMatrix matrix(FindFloor(*world, location, shape, 200.0f));
 	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, textName, textName, textName));
 
-	ndBodyKinematic* const kinBody = new ndBodyDynamic();
+	ndBodyKinematic* const body = new ndBodyDynamic();
 	ndSharedPtr<ndDemoEntity> entity(new ndDemoEntity(matrix));
 	entity->SetMesh(mesh);
 
-	kinBody->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-	kinBody->SetMatrix(matrix);
-	kinBody->SetCollisionShape(shape);
-	kinBody->SetMassMatrix(mass, shape);
-	return kinBody;
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+	body->SetMatrix(matrix);
+	body->SetCollisionShape(shape);
+	body->SetMassMatrix(mass, shape);
+	return body;
 }
 
 ndBodyKinematic* CreateSphere(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius, const char* const textName)
