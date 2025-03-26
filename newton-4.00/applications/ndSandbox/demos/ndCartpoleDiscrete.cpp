@@ -29,15 +29,17 @@ namespace ndCarpole_0
 
 	//#define CONTROLLER_RESUME_TRAINING
 
-	#define D_PUSH_ACCEL		ndFloat32 (-0.125f * DEMO_GRAVITY)
+	#define D_PUSH_ACCEL		ndFloat32 (-1.0f * DEMO_GRAVITY)
 	#define D_REWARD_MIN_ANGLE	ndFloat32 (20.0f * ndDegreeToRad)
 
 	enum ndActionSpace
 	{
 		m_doNoting,
+
 		m_pushLeft0,
-		m_pushLeft1,
 		m_pushRight0,
+
+		m_pushLeft1,
 		m_pushRight1,
 		m_actionsSize
 	};
@@ -272,8 +274,9 @@ namespace ndCarpole_0
 			{
 				return ndReal(0.0f);
 			}
-			ndFloat32 sinAngle = GetPoleAngle();
-			ndFloat32 reward = ndReal(ndExp(-ndFloat32(2000.0f) * sinAngle * sinAngle));
+			ndFloat32 angle = GetPoleAngle();
+
+			ndFloat32 reward = ndReal(ndExp(-ndFloat32(2000.0f) * angle * angle));
 			return ndReal(reward);
 		}
 
@@ -283,12 +286,15 @@ namespace ndCarpole_0
 			ndFloat32 angle = GetPoleAngle();
 			state[m_poleAngle] = ndReal(angle);
 			state[m_poleOmega] = ndReal(omega.m_z);
+
+			//ndTrace(("%f ", angle * ndRadToDegree));
 		}
 
 		void ApplyActions(ndBrainFloat* const actions)
 		{
 			ndVector force(m_cart->GetForce());
 
+			//ndTrace(("%d ", ndInt32(actions[0])));
 			switch (ndInt32(actions[0]))
 			{
 				case m_pushLeft0:
@@ -304,12 +310,12 @@ namespace ndCarpole_0
 
 				case m_pushLeft1:
 				{
-					force.m_x = -m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL * ndBrainFloat(2.0f);
+					force.m_x = -m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL * ndBrainFloat(4.0f);
 					break;
 				}
 				case m_pushRight1:
 				{
-					force.m_x = m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL * ndBrainFloat(2.0f);
+					force.m_x = m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL * ndBrainFloat(4.0f);
 					break;
 				}
 			}
@@ -319,6 +325,7 @@ namespace ndCarpole_0
 
 		void ResetModel()
 		{
+			//ndTrace(("\n"));
 			m_cart->SetMatrix(m_cartMatrix);
 			m_pole->SetMatrix(m_poleMatrix);
 
@@ -417,6 +424,7 @@ namespace ndCarpole_0
 
 			// add a hidden battery of model to generate trajectories in parallel
 			const ndInt32 countX = 100;
+			//const ndInt32 countX = 0;
 			for (ndInt32 i = 0; i < countX; ++i)
 			{
 				ndMatrix location(matrix);
