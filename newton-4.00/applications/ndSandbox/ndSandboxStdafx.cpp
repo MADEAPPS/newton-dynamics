@@ -48,7 +48,8 @@ void ndGetWorkingFileName (const char* const name, char* const outPathName)
 		ret = 0;
 		char* const end = strstr (appPath, "applications");
 		*end = 0;
-		snprintf (outPathName, 256, "%sapplications/media/%s", appPath, name);
+		char* const ptr = &appPath[0];
+		snprintf (outPathName, sizeof(appPath), "%sapplications/media/%s", ptr, name);
 	#else
 		#error  "error: need to implement \"dGetWorkingFileName\" here for this platform"
 	#endif
