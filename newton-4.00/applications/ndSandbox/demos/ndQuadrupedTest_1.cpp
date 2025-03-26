@@ -135,23 +135,36 @@ namespace ndQuadruped_1
 		ndMatrix matrix(entity->GetCurrentMatrix() * location);
 
 		ndSharedPtr<ndBody> rootBody(CreateRigidBody(entity, matrix, mass, nullptr));
-		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(rootBody);
+		ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(rootBody);
 
 		// build all for legs
 		for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = entity->GetChildren().GetFirst(); node; node = node->GetNext())
 		{
+			// build thig
 			ndSharedPtr<ndDemoEntity> thighEntity(node->GetInfo());
-
 			const ndMatrix thighMatrix(thighEntity->GetCurrentMatrix() * matrix);
 			ndSharedPtr<ndBody> thigh(CreateRigidBody(thighEntity, thighMatrix, limbMass, rootBody->GetAsBodyDynamic()));
 
-			ndJointBilateralConstraint* const ballJoint = new ndIkJointSpherical(thighMatrix, thigh->GetAsBodyKinematic(), rootBody->GetAsBodyKinematic());
-			ndModelArticulation::ndNode* const thighNode = model->AddLimb(modelRoot, thigh, ballJoint);
+			ndSharedPtr<ndJointBilateralConstraint> ballJoint (new ndIkJointSpherical(thighMatrix, thigh->GetAsBodyKinematic(), rootBody->GetAsBodyKinematic()));
+			ndModelArticulation::ndNode* const thighNode = model->AddLimb(modelRootNode, thigh, ballJoint);
 
+			// build calf
+			ndSharedPtr<ndDemoEntity> calfEntity(thighEntity->GetChildren().GetFirst()->GetInfo());
+			const ndMatrix calfMatrix(calfEntity->GetCurrentMatrix() * thighMatrix);
+			ndSharedPtr<ndBody> calf(CreateRigidBody(calfEntity, calfMatrix, limbMass, thigh->GetAsBodyDynamic()));
 
+			ndSharedPtr<ndJointBilateralConstraint> calfHinge (new ndIkJointHinge(calfMatrix, calf->GetAsBodyKinematic(), thigh->GetAsBodyKinematic()));
+			ndModelArticulation::ndNode* const calfNode = model->AddLimb(thighNode, calf, calfHinge);
 
+			// build heel
+			ndSharedPtr<ndDemoEntity> heelEntity(calfEntity->GetChildren().GetFirst()->GetInfo());
+			const ndMatrix heelMatrix(heelEntity->GetCurrentMatrix() * calfMatrix);
+			ndSharedPtr<ndBody> heel(CreateRigidBody(heelEntity, heelMatrix, limbMass, calf->GetAsBodyDynamic()));
 
-//			break;
+			ndSharedPtr<ndJointBilateralConstraint> heelHinge(new ndJointHinge(heelMatrix, heel->GetAsBodyKinematic(), calf->GetAsBodyKinematic()));
+			ndModelArticulation::ndNode* const heelNode = model->AddLimb(calfNode, heel, heelHinge);
+
+			break;
 		}
 
 		//ndMatrix matrix(rootBody->GetMatrix() * location);
