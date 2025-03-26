@@ -59,7 +59,6 @@ ndBrainLayer* ndBrainLayerActivationSoftmax::Load(const ndBrainLoad* const loadS
 void ndBrainLayerActivationSoftmax::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == output.GetCount());
-	//ndBrainFloat max = ndBrainFloat(1.0e-16f);
 	ndBrainFloat max = ndBrainFloat(0.0f);
 	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
 	{

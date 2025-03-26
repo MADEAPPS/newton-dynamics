@@ -696,7 +696,6 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 	ndMeshLoader loader;
 	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("robot.fbx", scene));
 	ndMatrix matrix(ndYawMatrix(-ndPi * 0.5f));
-	//ndMatrix matrix(ndYawMatrix(0.0f * ndDegreeToRad));
 
 	ndFixSizeArray<ndBodyKinematic*, 16> backGround;
 	AddBackgroundScene(scene, matrix, backGround);

@@ -25,8 +25,6 @@
 #include "ndBrainOptimizerSgd.h"
 #include "ndBrainOptimizerAdam.h"
 #include "ndBrainLayerActivationSoftmax.h"
-#include "ndBrainLossCategoricalCrossEntropy.h"
-#include "ndBrainLayerActivationCategoricalSoftmax.h"
 #include "ndBrainAgentDiscretePolicyGradient_Trainer.h"
 
 //#define ND_DISCRETE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 128)
@@ -374,7 +372,6 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::ndBrainAgentDiscretePolicyGrad
 	}
 	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_neuronPerLayers, m_numberOfActions));
 	layers.PushBack(new ndBrainLayerActivationSoftmax(m_numberOfActions));
-	//layers.PushBack(new ndBrainLayerActivationCategoricalSoftmax(m_numberOfActions));
 
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
@@ -604,7 +601,6 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::OptimizePolicy()
 	{
 		auto CalculateGradients = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
 		{
-#if 1
 			class Loss : public ndBrainLossLeastSquaredError
 			{
 				public:
@@ -620,54 +616,24 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::OptimizePolicy()
 				{
 					ndInt32 actionIndex = ndInt32(m_agent->m_trajectoryAccumulator.GetAction(m_index));
 			
-					//loss.Set(output);
-					//ndBrainFloat negLogProb = ndBrainFloat(-ndLog(output[actionIndex]));
-					//loss[actionIndex] = negLogProb * m_agent->m_trajectoryAccumulator.GetAdvantage(m_index);
+					ndBrainFloat advantage = m_agent->m_trajectoryAccumulator.GetAdvantage(m_index);
+					//for (ndInt32 i = ndInt32 (loss.GetCount()) - 1; i >= 0 ; --i)
+					//{
+					//	ndBrainFloat logProb = ndBrainFloat(-ndLog(output[i]));
+					//	loss[i] = logProb * advantage;
+					//}
 					//loss.SoftMaxNormalize();
 
-					ndBrainFloat advantage = m_agent->m_trajectoryAccumulator.GetAdvantage(m_index);
-					for (ndInt32 i = ndInt32 (loss.GetCount()) - 1; i >= 0 ; --i)
-					{
-						ndBrainFloat negLogProb = ndBrainFloat(-ndLog(output[i]));
-						loss[actionIndex] = negLogProb * advantage;
-						//loss.SoftMaxNormalize();
-					}
-				}
-			
-				ndBrainTrainer& m_trainer;
-				ndBrainAgentDiscretePolicyGradient_TrainerMaster* m_agent;
-				ndInt32 m_index;
-			};
-#else
-			class Loss: public ndBrainLossCategoricalCrossEntropy
-			{
-				public:
-				Loss(ndBrainTrainer& trainer, ndBrainAgentDiscretePolicyGradient_TrainerMaster* const agent, ndInt32 index)
-					:ndBrainLossCategoricalCrossEntropy(trainer.GetBrain()->GetOutputSize())
-					,m_trainer(trainer)
-					,m_agent(agent)
-					,m_index(index)
-				{
-				}
-			
-				void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
-				{
-					ndInt32 actionIndex = ndInt32(m_agent->m_trajectoryAccumulator.GetAction(m_index));
-					
 					loss.Set(ndBrainFloat(0.0f));
-					//loss.Set(output);
-					ndBrainFloat negLogProb = ndBrainFloat(-ndLog(output[actionIndex]));
-					loss[actionIndex] = negLogProb * m_agent->m_trajectoryAccumulator.GetAdvantage(m_index);
-
-					loss.SoftMaxNormalize();
-					//ndBrainLossCategoricalCrossEntropy::GetLoss(output, loss);
+					ndBrainFloat logProb = ndBrainFloat(-ndLog(output[actionIndex]));
+					loss[actionIndex] = logProb * advantage;
 				}
 			
 				ndBrainTrainer& m_trainer;
 				ndBrainAgentDiscretePolicyGradient_TrainerMaster* m_agent;
 				ndInt32 m_index;
 			};
-#endif
+
 			for (ndInt32 i = iterator++; i < m_bashBufferSize; i = iterator++)
 			{
 				ndBrainTrainer& trainer = *m_auxiliaryTrainers[i];

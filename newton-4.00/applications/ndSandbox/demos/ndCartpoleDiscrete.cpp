@@ -371,7 +371,7 @@ namespace ndCarpole_0
 			,m_saveScore(m_maxScore)
 			,m_discountFactor(0.99f)
 			,m_lastEpisode(0xffffffff)
-			,m_stopTraining(400 * 1000000)
+			,m_stopTraining(500 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			char name[256];
@@ -628,7 +628,8 @@ void ndCartpoleDiscrete(ndDemoEntityManager* const scene)
 #else
 	ndWorld* const world = scene->GetWorld();
 	ndModelArticulation* const model = CreateModel(scene, matrix);
-	model->AddToWorld(world);
+	world->AddModel(model);
+	model->AddBodiesAndJointsToWorld();
 	
 	// add the deep learning controller
 	char name[256];
