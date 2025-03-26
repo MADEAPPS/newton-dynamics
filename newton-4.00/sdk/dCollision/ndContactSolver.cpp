@@ -2710,7 +2710,7 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsDiscrete()
 
 	stackPool[0] = compoundShape->m_root;
 	stackDistance[0] = data.CalculateDistance2(origin, size, compoundShape->m_root->m_origin, compoundShape->m_root->m_size);
-	ndFloat32 closestDist = (stackDistance[0] > ndFloat32(0.0f)) ? stackDistance[0] : ndFloat32(1.0e10f);
+	ndFloat32 closestDist2 = (stackDistance[0] > ndFloat32(0.0f)) ? stackDistance[0] : ndFloat32(1.0e10f);
 
 	while (stack)
 	{
@@ -2719,7 +2719,7 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsDiscrete()
 		ndFloat32 dist2 = stackDistance[stack];
 		if (dist2 > ndFloat32(0.0f))
 		{
-			closestDist = ndMin (closestDist, dist2);
+			closestDist2 = ndMin (closestDist2, dist2);
 			break;
 		}
 
@@ -2744,7 +2744,7 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsDiscrete()
 
 					ndInt32 count = contactSolver.ConvexContactsDiscrete();
 					ndFloat32 dist = ndMax(contactSolver.m_separationDistance, ndFloat32(0.0f));
-					closestDist = ndMin(closestDist, dist * dist);
+					closestDist2 = ndMin(closestDist2, dist * dist);
 					if (!m_intersectionTestOnly)
 					{
 						for (ndInt32 i = 0; i < count; ++i)
@@ -2802,8 +2802,8 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsDiscrete()
 		contactCount = PruneContacts(contactCount, 16);
 	}
 
-	ndAssert(closestDist < ndFloat32(1.0e6f));
-	m_separationDistance = ndSqrt (closestDist);
+	ndAssert(closestDist2 < ndFloat32(1.0e6f));
+	m_separationDistance = ndSqrt (closestDist2);
 	return contactCount;
 }
 
@@ -2833,7 +2833,7 @@ ndInt32 ndContactSolver::CompoundToConvexContactsDiscrete()
 	ndInt32 contactCount = 0;
 	stackPool[0] = compoundShape->m_root;
 	stackDistance[0] = data.CalculateDistance2(compoundShape->m_root->m_origin, compoundShape->m_root->m_size, origin, size);
-	ndFloat32 closestDist = (stackDistance[0] > ndFloat32(0.0f)) ? stackDistance[0] : ndFloat32(1.0e10f);
+	ndFloat32 closestDist2 = (stackDistance[0] > ndFloat32(0.0f)) ? stackDistance[0] : ndFloat32(1.0e10f);
 
 	while (stack)
 	{
@@ -2842,7 +2842,7 @@ ndInt32 ndContactSolver::CompoundToConvexContactsDiscrete()
 		ndFloat32 dist2 = stackDistance[stack];
 		if (dist2 > ndFloat32(0.0f))
 		{
-			closestDist = ndMin(closestDist, dist2);
+			closestDist2 = ndMin(closestDist2, dist2);
 			break;
 		}
 		const ndShapeCompound::ndNodeBase* const node = stackPool[stack];
@@ -2866,7 +2866,7 @@ ndInt32 ndContactSolver::CompoundToConvexContactsDiscrete()
 
 					ndInt32 count = contactSolver.ConvexContactsDiscrete();
 					ndFloat32 dist = ndMax(contactSolver.m_separationDistance, ndFloat32(0.0f));
-					closestDist = ndMin(closestDist, dist * dist);
+					closestDist2 = ndMin(closestDist2, dist * dist);
 					if (!m_intersectionTestOnly)
 					{
 						for (ndInt32 i = 0; i < count; ++i)
@@ -2924,8 +2924,8 @@ ndInt32 ndContactSolver::CompoundToConvexContactsDiscrete()
 		contactCount = PruneContacts(contactCount, 16);
 	}
 
-	ndAssert(closestDist < ndFloat32(1.0e6f));
-	m_separationDistance = ndSqrt(closestDist);
+	ndAssert(closestDist2 < ndFloat32(1.0e6f));
+	m_separationDistance = ndSqrt(closestDist2);
 	return contactCount;
 }
 
@@ -2955,7 +2955,7 @@ ndInt32 ndContactSolver::CompoundToCompoundContactsDiscrete()
 	stackPool[0].m_node1 = compoundShape1->m_root;
 	stackPool[0].m_dist2 = data.CalculateDistance2(compoundShape0->m_root->m_origin, compoundShape0->m_root->m_size, compoundShape1->m_root->m_origin, compoundShape1->m_root->m_size);
 
-	ndFloat32 closestDist = (stackPool[0].m_dist2 > ndFloat32(0.0f)) ? stackPool[0].m_dist2 : ndFloat32(1.0e10f);
+	ndFloat32 closestDist2 = (stackPool[0].m_dist2 > ndFloat32(0.0f)) ? stackPool[0].m_dist2 : ndFloat32(1.0e10f);
 
 	ndStackEntry callback;
 	while (stack)
@@ -2964,7 +2964,7 @@ ndInt32 ndContactSolver::CompoundToCompoundContactsDiscrete()
 		ndFloat32 dist2 = stackPool[stack].m_dist2;
 		if (dist2 > ndFloat32(0.0f))
 		{
-			closestDist = ndMin(closestDist, dist2);
+			closestDist2 = ndMin(closestDist2, dist2);
 			break;
 		}
 
@@ -2994,7 +2994,7 @@ ndInt32 ndContactSolver::CompoundToCompoundContactsDiscrete()
 
 					ndInt32 count = contactSolver.ConvexContactsDiscrete();
 					ndFloat32 dist = ndMax(contactSolver.m_separationDistance, ndFloat32(0.0f));
-					closestDist = ndMin(closestDist, dist * dist);
+					closestDist2 = ndMin(closestDist2, dist * dist);
 					if (!m_intersectionTestOnly)
 					{
 						for (ndInt32 i = 0; i < count; ++i)
@@ -3076,8 +3076,8 @@ ndInt32 ndContactSolver::CompoundToCompoundContactsDiscrete()
 		contactCount = PruneContacts(contactCount, 16);
 	}
 
-	ndAssert(closestDist < ndFloat32(1.0e6f));
-	m_separationDistance = ndSqrt(closestDist);
+	ndAssert(closestDist2 < ndFloat32(1.0e6f));
+	m_separationDistance = ndSqrt(closestDist2);
 	return contactCount;
 }
 
@@ -3116,7 +3116,7 @@ ndInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 	stackPool[0].m_dist2 = data.CalculateDistance2(compoundShape->m_root->m_origin, compoundShape->m_root->m_size, bvhOrigin, bvhSize);
 
 	ndStackBvhStackEntry callback;
-	ndFloat32 closestDist = (stackPool[0].m_dist2 > ndFloat32(0.0f)) ? stackPool[0].m_dist2 : ndFloat32(1.0e10f);
+	ndFloat32 closestDist2 = (stackPool[0].m_dist2 > ndFloat32(0.0f)) ? stackPool[0].m_dist2 : ndFloat32(1.0e10f);
 	while (stack)
 	{
 		stack--;
@@ -3124,7 +3124,7 @@ ndInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 		ndFloat32 dist2 = stackPool[stack].m_dist2;
 		if (dist2 > ndFloat32(0.0f))
 		{
-			closestDist = ndMin(closestDist, dist2);
+			closestDist2 = ndMin(closestDist2, dist2);
 			break;
 		}
 
@@ -3152,7 +3152,7 @@ ndInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 
 					ndInt32 count = contactSolver.ConvexToSaticStaticBvhContactsNodeDescrete(collisionTreeNode);
 					ndFloat32 dist = ndMax(contactSolver.m_separationDistance, ndFloat32(0.0f));
-					closestDist = ndMin(closestDist, dist * dist);
+					closestDist2 = ndMin(closestDist2, dist * dist);
 					if (!m_intersectionTestOnly)
 					{
 						for (ndInt32 i = 0; i < count; ++i)
@@ -3255,8 +3255,8 @@ ndInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 		contactCount = PruneContacts(contactCount, 16);
 	}
 
-	ndAssert(closestDist < ndFloat32(1000.0f));
-	m_separationDistance = closestDist;
+	ndAssert(closestDist2 < ndFloat32(1000.0f));
+	m_separationDistance = ndSqrt (closestDist2);
 	return contactCount;
 }
 
@@ -3288,7 +3288,7 @@ ndInt32 ndContactSolver::CompoundToStaticHeightfieldContactsDiscrete()
 	ndInt32 contactCount = 0;
 	stackPool[0] = compoundShape->m_root;
 	stackDistance[0] = callback.CalculateHeighfieldDist2(data, compoundShape->m_root, heightfieldInstance);
-	ndFloat32 closestDist = (stackDistance[0] > ndFloat32(0.0f)) ? stackDistance[0] : ndFloat32(1.0e10f);
+	ndFloat32 closestDist2 = (stackDistance[0] > ndFloat32(0.0f)) ? stackDistance[0] : ndFloat32(1.0e10f);
 
 	while (stack)
 	{
@@ -3297,7 +3297,7 @@ ndInt32 ndContactSolver::CompoundToStaticHeightfieldContactsDiscrete()
 		ndFloat32 dist2 = stackDistance[stack];
 		if (dist2 > ndFloat32(0.0f))
 		{
-			closestDist = ndMin(closestDist, dist2);
+			closestDist2 = ndMin(closestDist2, dist2);
 			break;
 		}
 
@@ -3321,9 +3321,8 @@ ndInt32 ndContactSolver::CompoundToStaticHeightfieldContactsDiscrete()
 					contactSolver.m_contactBuffer += contactCount;
 
 					ndInt32 count = contactSolver.ConvexContactsDiscrete();
-					//closestDist = ndMin(closestDist, contactSolver.m_separationDistance);
 					ndFloat32 dist = ndMax(contactSolver.m_separationDistance, ndFloat32(0.0f));
-					closestDist = ndMin(closestDist, dist * dist);
+					closestDist2 = ndMin(closestDist2, dist * dist);
 					if (!m_intersectionTestOnly)
 					{
 						for (ndInt32 i = 0; i < count; ++i)
@@ -3380,8 +3379,8 @@ ndInt32 ndContactSolver::CompoundToStaticHeightfieldContactsDiscrete()
 	{
 		contactCount = PruneContacts(contactCount, 16);
 	}
-	ndAssert(closestDist < ndFloat32(1.0e6f));
-	m_separationDistance = ndSqrt(closestDist);
+	ndAssert(closestDist2 < ndFloat32(1.0e6f));
+	m_separationDistance = ndSqrt(closestDist2);
 	return contactCount;
 }
 
@@ -3413,7 +3412,7 @@ ndInt32 ndContactSolver::CompoundToStaticProceduralMesh()
 	ndInt32 contactCount = 0;
 	stackPool[0] = compoundShape->m_root;
 	stackDistance[0] = callback.CalculateProceduralDist2(data, compoundShape->m_root, ProceduralInstance);
-	ndFloat32 closestDist = (stackDistance[0] > ndFloat32(0.0f)) ? stackDistance[0] : ndFloat32(1.0e10f);
+	ndFloat32 closestDist2 = (stackDistance[0] > ndFloat32(0.0f)) ? stackDistance[0] : ndFloat32(1.0e10f);
 
 	while (stack)
 	{
@@ -3422,7 +3421,7 @@ ndInt32 ndContactSolver::CompoundToStaticProceduralMesh()
 		ndFloat32 dist2 = stackDistance[stack];
 		if (dist2 > ndFloat32(0.0f))
 		{
-			closestDist = ndMin(closestDist, dist2);
+			closestDist2 = ndMin(closestDist2, dist2);
 			break;
 		}
 
@@ -3447,7 +3446,7 @@ ndInt32 ndContactSolver::CompoundToStaticProceduralMesh()
 
 					ndInt32 count = contactSolver.ConvexContactsDiscrete();
 					ndFloat32 dist = ndMax(contactSolver.m_separationDistance, ndFloat32(0.0f));
-					closestDist = ndMin(closestDist, dist * dist);
+					closestDist2 = ndMin(closestDist2, dist * dist);
 					if (!m_intersectionTestOnly)
 					{
 						for (ndInt32 i = 0; i < count; ++i)
@@ -3504,8 +3503,8 @@ ndInt32 ndContactSolver::CompoundToStaticProceduralMesh()
 	{
 		contactCount = PruneContacts(contactCount, 16);
 	}
-	ndAssert(closestDist < ndFloat32(1.0e6f));
-	m_separationDistance = ndSqrt(closestDist);
+	ndAssert(closestDist2 < ndFloat32(1.0e6f));
+	m_separationDistance = ndSqrt(closestDist2);
 	return contactCount;
 }
 
