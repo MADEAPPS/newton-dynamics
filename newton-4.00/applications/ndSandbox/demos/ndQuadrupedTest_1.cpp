@@ -1307,11 +1307,15 @@ namespace ndQuadruped_1
 
 	class RobotModelNotify : public ndModelNotify
 	{
-
+		public:
 		class ndEffectorInfo
 		{
 			public:
 			ndEffectorInfo()
+				:m_calf(nullptr)
+				,m_heel(nullptr)
+				,m_thigh(nullptr)
+				,m_effector(nullptr)
 			{
 			}
 
@@ -1320,22 +1324,164 @@ namespace ndQuadruped_1
 				ndJointHinge* const calf,
 				ndJointHinge* const foot,
 				ndIkSwivelPositionEffector* const effector)
-				:m_thigh(thigh)
-				,m_calf(calf)
+				:m_calf(calf)
 				,m_heel(foot)
+				,m_thigh(thigh)
 				,m_effector(effector)
-				//,m_effectRefPoint(ndVector::m_zero)
 			{
 			}
 
-			ndJointSpherical* m_thigh;
 			ndJointHinge* m_calf;
 			ndJointHinge* m_heel;
+			ndJointSpherical* m_thigh;
 			ndIkSwivelPositionEffector* m_effector;
-			//ndVector m_effectRefPoint;
 		};
 
-		public:
+		class ndPoseGenerator : public ndAnimationSequence
+		{
+			public:
+			ndPoseGenerator(const ndFloat32* const phase)
+				:ndAnimationSequence()
+				,m_amp(0.27f)
+				,m_stride_x(0.3f)
+				,m_stride_z(0.3f)
+			{
+				m_duration = ndFloat32(4.0f);
+				for (ndInt32 i = 0; i < 4; i++)
+				{
+					m_phase[i] = phase[i];
+					m_offset[i] = ndVector::m_zero;
+					m_currentPose[i] = BasePose(i);
+				}
+			}
+
+			ndVector GetTranslation(ndFloat32) const
+			{
+				return ndVector::m_zero;
+			}
+
+			ndVector BasePose(ndInt32 index) const
+			{
+				ndVector base(ndVector::m_wOne);
+				base.m_x = m_offset[index].m_x;
+				base.m_z = m_offset[index].m_z;
+				base.m_y = m_offset[index].m_y;
+				return base;
+			}
+
+			void CalculatePose(ndAnimationPose& output, ndFloat32 param) const
+			{
+				// generate a procedural in place march gait
+				ndAssert(param >= ndFloat32(0.0f));
+				ndAssert(param <= ndFloat32(1.0f));
+
+				ndFloat32 gaitFraction = 0.25f;
+				ndFloat32 gaitGuard = gaitFraction * 0.25f;
+				ndFloat32 omega = ndPi / (gaitFraction - gaitGuard);
+
+				for (ndInt32 i = 0; i < output.GetCount(); i++)
+				{
+					output[i].m_userParamFloat = 0.0f;
+					output[i].m_posit = BasePose(i);
+				}
+
+				for (ndInt32 i = 0; i < output.GetCount(); i++)
+				{
+					ndFloat32 stride_x = m_stride_x;
+					if ((i == 2) || (i == 3))
+					{
+						stride_x *= -1;
+					}
+
+					ndFloat32 stride_z = m_stride_z;
+					if ((i == 2) || (i == 3))
+					{
+						stride_z *= -1;
+					}
+
+					ndFloat32 t = ndMod(param - m_phase[i] + ndFloat32(1.0f), ndFloat32(1.0f));
+					if ((t >= gaitGuard) && (t <= gaitFraction))
+					{
+						output[i].m_posit.m_y += m_amp * ndSin(omega * (t - gaitGuard));
+						output[i].m_userParamFloat = 1.0f;
+
+						ndFloat32 num = t - gaitGuard;
+						ndFloat32 den = gaitFraction - gaitGuard;
+
+						ndFloat32 t0 = num / den;
+						//output[i].m_posit.m_x += stride_x * t0 - stridem_x * 0.5f;
+						output[i].m_posit.m_z += -(stride_z * t0 - stride_z * 0.5f);
+					}
+					else
+					{
+						if (t <= gaitGuard)
+						{
+							t += 1.0f;
+							output[i].m_userParamFloat = 0.5f;
+						}
+
+						ndFloat32 num = t - gaitFraction;
+						ndFloat32 den = 1.0f - (gaitFraction - gaitGuard);
+						ndFloat32 t0 = num / den;
+						//output[i].m_posit.m_x += -(stride_x * t0 - stridem_x * 0.5f + );
+						output[i].m_posit.m_z += (stride_z * t0 - stride_z * 0.5f);
+					}
+
+					m_currentPose[i] = output[i].m_posit;
+				}
+			}
+
+			mutable ndVector m_currentPose[4];
+			ndVector m_offset[4];
+			ndFloat32 m_phase[4];
+			ndFloat32 m_amp;
+			ndFloat32 m_stride_x;
+			ndFloat32 m_stride_z;
+		};
+
+		void Init()
+		{
+			//static ndInt32 modelId = 0;
+			//m_modelId = modelId++;
+			
+			ndFloat32 phase[] = { 0.0f, 0.75f, 0.25f, 0.5f };
+			ndSharedPtr<ndAnimationSequence> sequence(new ndPoseGenerator(phase));
+			
+			m_poseGenerator = ndSharedPtr<ndAnimationBlendTreeNode>(new ndAnimationSequencePlayer(sequence));
+			//m_control = new ndUIControlNode(m_poseGenerator);
+			//m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(m_control);
+			m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(m_poseGenerator);
+			
+			ndFloat32 duration = ((ndAnimationSequencePlayer*)*m_poseGenerator)->GetSequence()->GetDuration();
+			m_animBlendTree->SetTime(duration * ndRand());
+			
+			ndFloat32 offset_x[] = { 0.2f, 0.2f, 0.2f, 0.2f };
+			ndFloat32 offset_z[] = { -0.3f, 0.3f, -0.3f, 0.3f };
+			ndFloat32 offset_y[] = { D_POSE_REST_POSITION_Y, D_POSE_REST_POSITION_Y, D_POSE_REST_POSITION_Y, D_POSE_REST_POSITION_Y };
+			
+			//ndFloat32 angles[] = { -90.0f, -90.0f, 90.0f, 90.0f };
+			//const char* effectorNames[] = { "foot_0",  "foot_1",  "foot_2",  "foot_3" };
+			
+			ndPoseGenerator* const poseGenerator = (ndPoseGenerator*)*sequence;
+			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
+			{
+				ndEffectorInfo& leg = m_legs[i];
+				ndAnimKeyframe keyFrame;
+					keyFrame.m_userData = &leg;
+				m_animPose.PushBack(keyFrame);
+				poseGenerator->AddTrack();
+				poseGenerator->m_phase[i] = phase[i];
+				poseGenerator->m_offset[i].m_x = offset_x[i];
+				poseGenerator->m_offset[i].m_y = offset_y[i];
+				poseGenerator->m_offset[i].m_z = offset_z[i];
+			}
+			
+			//for (ndModelArticulation::ndNode* node = robot->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+			//{
+			//	m_controllerTrainer->m_basePose.PushBack(node->m_body->GetAsBodyDynamic());
+			//}
+		}
+
 		//RobotModelNotify(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot, bool showDebug)
 		RobotModelNotify(ndModelArticulation* const robot)
 			:ndModelNotify()
@@ -1350,7 +1496,6 @@ namespace ndQuadruped_1
 			SetModel(robot);
 			//m_controllerTrainer = new ndControllerTrainer(master);
 			//m_controllerTrainer->m_robot = this;
-			//Init(robot);
 		}
 
 		void PostUpdate(ndFloat32)
@@ -1373,7 +1518,7 @@ namespace ndQuadruped_1
 			}
 		}
 
-		void Update(ndFloat32)
+		void Update(ndFloat32 timestep)
 		{
 			//m_world = world;
 			//m_timestep = timestep;
@@ -1389,28 +1534,35 @@ namespace ndQuadruped_1
 			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 			ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
 
-			const ndVector upVector(rootBody->GetMatrix().m_up);
-			for (ndList<ndModelArticulation::ndNode>::ndNode* effectorNode = model->GetCloseLoops().GetFirst(); effectorNode; effectorNode = effectorNode->GetNext())
-			{
-				ndModelArticulation::ndNode* const node = &effectorNode->GetInfo();
-				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*node->m_joint;
-				ndFloat32 swivelAngle = effector->CalculateLookAtSwivelAngle(upVector);
+			//ndFloat32 animSpeed = 2.0f * m_control->m_animSpeed;
+			ndFloat32 animSpeed = 1.0f;
+			m_animBlendTree->Update(timestep * animSpeed);
 
-				//ndVector posit (effector->GetRestPosit());
+			const ndVector upVector(rootBody->GetMatrix().m_up);
+			for (ndInt32 i = 0; i < m_legs.GetCount(); ++ i)
+			{
+				ndEffectorInfo& leg = m_legs[i];
+				ndIkSwivelPositionEffector* const effector = leg.m_effector;
+
+				const ndVector posit(m_animPose[i].m_posit);
+				ndFloat32 swivelAngle = effector->CalculateLookAtSwivelAngle(upVector);
+				
 				effector->SetSwivelAngle(swivelAngle);
+				effector->SetLocalTargetPosition(posit);
 			}
 		}
 
+		ndAnimationPose m_animPose;
 		ndFixSizeArray<ndEffectorInfo, 4> m_legs;
+		ndSharedPtr<ndAnimationBlendTreeNode> m_poseGenerator;
+		ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
 	};
 
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndSharedPtr<ndDemoEntity>& modelMesh)
 	{
 		ndModelArticulation* const model = new ndModelArticulation();
 		RobotModelNotify* const notify = new RobotModelNotify(model);
-
 		model->SetNotifyCallback(notify);
-
 
 		ndSharedPtr<ndDemoEntity> entity(modelMesh->GetChildren().GetFirst()->GetInfo()->CreateClone());
 		scene->AddEntity(entity);
@@ -1490,15 +1642,18 @@ namespace ndQuadruped_1
 			name += index;
 			model->AddCloseLoop(effector, name.GetStr());
 
-			notify->m_legs[index].m_calf = (ndJointHinge*)*calfHinge;
-			notify->m_legs[index].m_heel = (ndJointHinge*)*heelHinge;
-			notify->m_legs[index].m_thigh = (ndJointSpherical*)*ballJoint;
-			notify->m_legs[index].m_effector = (ndIkSwivelPositionEffector*)*effector;
-			//notify->m_legs[index].m_effectRefPoint = notify->m_legs[index].m_effector
+			RobotModelNotify::ndEffectorInfo leg;
+			leg.m_calf = (ndJointHinge*)*calfHinge;
+			leg.m_heel = (ndJointHinge*)*heelHinge;
+			leg.m_thigh = (ndJointSpherical*)*ballJoint;
+			leg.m_effector = (ndIkSwivelPositionEffector*)*effector;
+			notify->m_legs.PushBack(leg);
 
 			index++;
-		}
 
+break;
+		}
+		notify->Init();
 		return model;
 	}
 }
@@ -1542,7 +1697,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 		referenceModel->AddBodiesAndJointsToWorld();
 		
 		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-		//world->AddJoint(fixJoint);
+		world->AddJoint(fixJoint);
 		
 		//char fileName[256];
 		//ndGetWorkingFileName(CONTROLLER_NAME, fileName);

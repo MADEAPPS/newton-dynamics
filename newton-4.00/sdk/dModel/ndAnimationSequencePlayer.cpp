@@ -15,7 +15,7 @@
 #include "ndAnimationSequencePlayer.h"
 
 ndAnimationSequencePlayer::ndAnimationSequencePlayer(ndSharedPtr<ndAnimationSequence>& sequence)
-	:ndAnimationBlendTreeNode(nullptr)
+	:ndAnimationBlendTreeNode(ndSharedPtr<ndAnimationBlendTreeNode>(nullptr))
 	,m_sequence(sequence)
 	,m_veloc(ndVector::m_zero)
 	,m_time(ndFloat32 (0.0f))

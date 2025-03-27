@@ -17,14 +17,15 @@ class ndAnimationPose;
 class ndAnimationBlendTreeNode: public ndContainersFreeListAlloc<ndAnimationBlendTreeNode>
 {
 	public:
-	ndAnimationBlendTreeNode(ndAnimationBlendTreeNode* const input);
+	ndAnimationBlendTreeNode(const ndSharedPtr<ndAnimationBlendTreeNode>& input);
 	virtual ~ndAnimationBlendTreeNode();
 
 	virtual void SetTime(ndFloat32 dt);
 	virtual void Update(ndFloat32 dt);
 	virtual void Evaluate(ndAnimationPose& output, ndVector& veloc);
 
-	ndAnimationBlendTreeNode* m_input;
+	//ndAnimationBlendTreeNode* m_input;
+	ndSharedPtr<ndAnimationBlendTreeNode> m_input;
 };
 
 #endif

@@ -13,7 +13,7 @@
 #include "ndAnimationPose.h"
 #include "ndAnimationBlendTreeNode.h"
 
-ndAnimationBlendTreeNode::ndAnimationBlendTreeNode(ndAnimationBlendTreeNode* const child)
+ndAnimationBlendTreeNode::ndAnimationBlendTreeNode(const ndSharedPtr<ndAnimationBlendTreeNode>& child)
 	:ndContainersFreeListAlloc<ndAnimationBlendTreeNode>()
 	,m_input(child)
 {
@@ -21,10 +21,10 @@ ndAnimationBlendTreeNode::ndAnimationBlendTreeNode(ndAnimationBlendTreeNode* con
 
 ndAnimationBlendTreeNode::~ndAnimationBlendTreeNode()
 {
-	if (m_input) 
-	{
-		delete m_input;
-	}
+	//if (m_input) 
+	//{
+	//	delete m_input;
+	//}
 }
 
 void ndAnimationBlendTreeNode::SetTime(ndFloat32 dt)
