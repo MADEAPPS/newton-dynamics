@@ -317,13 +317,13 @@ static ndMultiBodyVehicle* CreateLav25Vehicle(ndDemoEntityManager* const scene, 
 			m_turretAngle = 0.0f;
 		}
 
-		virtual void ApplyInputs(ndWorld* const world, ndFloat32 timestep) override
+		virtual void ApplyInputs(ndFloat32 timestep) override
 		{
-			ndVehicleCommonNotify::ApplyInputs(world, timestep);
-
+			ndVehicleCommonNotify::ApplyInputs(timestep);
 			if (m_turretEffector && m_isPlayer)
 			{
-				ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
+				ndPhysicsWorld* const world = (ndPhysicsWorld*)GetModel()->GetWorld();
+				ndDemoEntityManager* const scene = world->GetManager();
 				ndFixSizeArray<char, 32> buttons;
 				scene->GetJoystickButtons(buttons);
 
@@ -505,12 +505,13 @@ static ndMultiBodyVehicle* CreateTractor(ndDemoEntityManager* const scene, const
 			m_bucketAngle = 0.0f;
 		}
 
-		virtual void ApplyInputs(ndWorld* const world, ndFloat32 timestep) override
+		virtual void ApplyInputs(ndFloat32 timestep) override
 		{
-			ndVehicleCommonNotify::ApplyInputs(world, timestep);
+			ndVehicleCommonNotify::ApplyInputs(timestep);
 
 			if (m_isPlayer)
 			{
+				ndPhysicsWorld* const world = (ndPhysicsWorld*)GetModel()->GetWorld();
 				ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
 				ndFixSizeArray<char, 32> buttons;
 

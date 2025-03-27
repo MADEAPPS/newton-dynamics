@@ -240,9 +240,10 @@ class NewtonPhantom : public ndModelNotify
 	//ndInt32 getContactCount() const { return contactCount; }
 	//ndVector getContactPoint() const { return contactPoint; }
 
-	void Update(ndWorld* const world, ndFloat32) override
+	void Update(ndFloat32) override
 	{
-		ndDemoEntityManager* scene = ((ndPhysicsWorld*)world)->GetManager();
+		ndPhysicsWorld* const world = (ndPhysicsWorld*)GetModel()->GetWorld();
+		ndDemoEntityManager* const scene = world->GetManager();
 		ndDemoCamera* const camera = scene->GetCamera();
 
 		ndFloat32 mouseX;
@@ -317,11 +318,11 @@ class NewtonPhantom : public ndModelNotify
 		}
 	}
 
-	void PostUpdate(ndWorld* const, ndFloat32) override
+	void PostUpdate(ndFloat32) override
 	{
 	}
 
-	void PostTransformUpdate(ndWorld* const, ndFloat32) override
+	void PostTransformUpdate(ndFloat32) override
 	{
 		m_phantomEntity->SetMatrix(ndQuaternion(worldMatrix), worldMatrix.m_posit);
 	}

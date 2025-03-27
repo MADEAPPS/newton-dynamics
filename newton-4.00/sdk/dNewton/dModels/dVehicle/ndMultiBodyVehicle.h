@@ -110,9 +110,9 @@ class ndMultiBodyVehicle : public ndModelArticulation
 	D_NEWTON_API ndMultiBodyVehicleDifferential* AddDifferential(ndFloat32 mass, ndFloat32 radius, ndMultiBodyVehicleTireJoint* const leftTire, ndMultiBodyVehicleTireJoint* const rightTire, ndFloat32 slipOmegaLock);
 	D_NEWTON_API ndMultiBodyVehicleDifferential* AddDifferential(ndFloat32 mass, ndFloat32 radius, ndMultiBodyVehicleDifferential* const leftDifferential, ndMultiBodyVehicleDifferential* const rightDifferential, ndFloat32 slipOmegaLock);
 
+	D_NEWTON_API virtual void Update(ndFloat32 timestep);
+	D_NEWTON_API virtual void PostUpdate(ndFloat32 timestep);
 	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;
-	D_NEWTON_API virtual void Update(ndWorld* const world, ndFloat32 timestep);
-	D_NEWTON_API virtual void PostUpdate(ndWorld* const world, ndFloat32 timestep);
 
 #if 0
 	D_NEWTON_API ndMultiBodyVehicleTorsionBar* AddTorsionBar(ndBodyKinematic* const sentinel);
@@ -124,8 +124,8 @@ class ndMultiBodyVehicle : public ndModelArticulation
 	private:
 	void ApplyStabilityControl();
 	void ApplyAlignmentAndBalancing();
-	void ApplyTireModel(ndWorld* const world, ndFloat32 timestep);
-	void ApplyAerodynamics(ndWorld* const world, ndFloat32 timestep);
+	void ApplyTireModel(ndFloat32 timestep);
+	void ApplyAerodynamics(ndFloat32 timestep);
 	ndBodyKinematic* CreateInternalBodyPart(ndFloat32 mass, ndFloat32 radius) const;
 	void ApplyTireModel(ndFloat32 timestep, ndFixSizeArray<ndTireContactPair, 128>& tireContacts);
 

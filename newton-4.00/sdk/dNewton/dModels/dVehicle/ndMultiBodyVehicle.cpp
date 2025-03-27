@@ -366,7 +366,7 @@ bool ndMultiBodyVehicle::IsSleeping() const
 	return sleeping;
 }
 
-void ndMultiBodyVehicle::ApplyAerodynamics(ndWorld* const, ndFloat32)
+void ndMultiBodyVehicle::ApplyAerodynamics(ndFloat32)
 {
 	m_downForce.m_suspensionStiffnessModifier = ndFloat32(1.0f);
 	ndFloat32 gravity = m_downForce.GetDownforceFactor(GetSpeed());
@@ -580,7 +580,7 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	context.DrawFrame(chassisMatrix);
 }
 
-void ndMultiBodyVehicle::ApplyTireModel(ndWorld* const, ndFloat32 timestep)
+void ndMultiBodyVehicle::ApplyTireModel(ndFloat32 timestep)
 {
 	ndFixSizeArray<ndTireContactPair, 128> tireContacts;
 	for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
@@ -830,18 +830,18 @@ void ndMultiBodyVehicle::ApplyTireModel(ndFloat32 timestep, ndFixSizeArray<ndTir
 	}
 }
 
-void ndMultiBodyVehicle::PostUpdate(ndWorld* const, ndFloat32)
+void ndMultiBodyVehicle::PostUpdate(ndFloat32)
 {
 	ApplyAlignmentAndBalancing();
 }
 
-void ndMultiBodyVehicle::Update(ndWorld* const world, ndFloat32 timestep)
+void ndMultiBodyVehicle::Update(ndFloat32 timestep)
 {
 	//ndAssert(!IsSleeping());
 	// apply down force
-	ApplyAerodynamics(world, timestep);
+	ApplyAerodynamics(timestep);
 	// apply tire model
-	ApplyTireModel(world, timestep);
+	ApplyTireModel(timestep);
 }
 
 void ndMultiBodyVehicle::AddDifferential(const ndSharedPtr<ndBody>& differentialBody, const ndSharedPtr<ndJointBilateralConstraint>& differentialJoint)

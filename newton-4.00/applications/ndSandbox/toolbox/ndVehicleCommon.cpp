@@ -249,9 +249,10 @@ ndVehicleSelector::ndVehicleSelector()
 			}
 		}
 
-		void PostUpdate(ndWorld* const world, ndFloat32) override
+		void PostUpdate(ndFloat32) override
 		{
-			ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
+			ndPhysicsWorld* const world = (ndPhysicsWorld*)GetModel()->GetWorld();
+			ndDemoEntityManager* const scene = world->GetManager();
 
 			ndGameControllerInputs inputs;
 			inputs.Update(scene);
@@ -433,14 +434,15 @@ ndBodyDynamic* ndVehicleCommonNotify::CreateChassis(ndDemoEntityManager* const s
 	return body;
 }
 
-void ndVehicleCommonNotify::ApplyInputs(ndWorld* const world, ndFloat32)
+void ndVehicleCommonNotify::ApplyInputs(ndFloat32)
 {
 	ndMultiBodyVehicle* const vehicle = (ndMultiBodyVehicle*)GetModel();
 	ndMultiBodyVehicleMotor* const motor = vehicle->GetMotor();
 
 	if (m_isPlayer && motor)
 	{
-		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
+		ndPhysicsWorld* const world = (ndPhysicsWorld*)GetModel()->GetWorld();
+		ndDemoEntityManager* const scene = world->GetManager();
 
 		m_inputs.Update(scene);
 		ndFixSizeArray<ndFloat32, 8>& axis = m_inputs.m_axis;
@@ -622,30 +624,30 @@ void ndVehicleCommonNotify::ApplyInputs(ndWorld* const world, ndFloat32)
 	}
 }
 
-void ndVehicleCommonNotify::Update(ndWorld* const world, ndFloat32 timestep)
+void ndVehicleCommonNotify::Update(ndFloat32 timestep)
 {
 	ndMultiBodyVehicle* const vehicle = (ndMultiBodyVehicle*)GetModel();
 	m_sleepingState = true;
 	if (m_isPlayer || (vehicle && !vehicle->IsSleeping()))
 	{
 		m_sleepingState = false;
-		ApplyInputs(world, timestep);
-		vehicle->Update(world, timestep);
+		ApplyInputs(timestep);
+		vehicle->Update(timestep);
 	}
-	ndModelNotify::Update(world, timestep);
+	ndModelNotify::Update(timestep);
 }
 
-void ndVehicleCommonNotify::PostUpdate(ndWorld* const world, ndFloat32 timestep)
+void ndVehicleCommonNotify::PostUpdate(ndFloat32 timestep)
 {
-	ndModelNotify::PostUpdate(world, timestep);
+	ndModelNotify::PostUpdate(timestep);
 	ndMultiBodyVehicle* const vehicle = (ndMultiBodyVehicle*)GetModel();
 	if (vehicle && !m_sleepingState)
 	{
-		vehicle->PostUpdate(world, timestep);
+		vehicle->PostUpdate(timestep);
 	}
 }
 
-void ndVehicleCommonNotify::PostTransformUpdate(ndWorld* const, ndFloat32)
+void ndVehicleCommonNotify::PostTransformUpdate(ndFloat32)
 {
 	// play body part animations here.
 }

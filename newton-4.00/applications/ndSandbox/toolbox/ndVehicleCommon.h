@@ -203,12 +203,12 @@ class ndVehicleCommonNotify : public ndModelNotify
 	
 	ndVehicleCommonNotify(const ndVehicleDectriptor& desc, ndMultiBodyVehicle* const vehicle, ndVehicleUI* const ui);
 	
-	virtual void ApplyInputs(ndWorld* const world, ndFloat32 timestep);
+	virtual void ApplyInputs(ndFloat32 timestep);
 
 	void Debug(ndConstraintDebugCallback& context) const override;
-	void Update(ndWorld* const world, ndFloat32 timestep) override;
-	void PostUpdate(ndWorld* const world, ndFloat32 timestep) override;
-	void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep) override;
+	void Update(ndFloat32 timestep) override;
+	void PostUpdate(ndFloat32 timestep) override;
+	void PostTransformUpdate(ndFloat32 timestep) override;
 
 	void SetAsPlayer(ndDemoEntityManager* const scene, bool mode = true);
 	ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, const ndSharedPtr<ndDemoEntity>& chassisEntity, ndFloat32 mass);

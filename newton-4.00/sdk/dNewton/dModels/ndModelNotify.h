@@ -41,9 +41,9 @@ class ndModelNotify : public ndContainersFreeListAlloc<ndModelNotify>
 	D_NEWTON_API void SetModel(ndModel* const model);
 
 	D_NEWTON_API virtual ndModelNotify* Clone() const;
-	D_NEWTON_API virtual void Update(ndWorld* const world, ndFloat32 timestep);
-	D_NEWTON_API virtual void PostUpdate(ndWorld* const world, ndFloat32 timestep);
-	D_NEWTON_API virtual void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep);
+	D_NEWTON_API virtual void Update(ndFloat32 timestep);
+	D_NEWTON_API virtual void PostUpdate(ndFloat32 timestep);
+	D_NEWTON_API virtual void PostTransformUpdate(ndFloat32 timestep);
 
 	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;
 

@@ -34,7 +34,9 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector()
 	m_maxDof = 6;
 }
 
-ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(const ndVector& childPivotInGlobalSpace, const ndMatrix& pinAndPivotParentInGlobalSpace, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(
+	const ndMatrix& pinAndPivotParentInGlobalSpace, ndBodyKinematic* const parent,
+	const ndVector& childPivotInGlobalSpace, ndBodyKinematic* const child)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotParentInGlobalSpace)
 	,m_restPosition(ndVector::m_wOne)
 	,m_localTargetPosit(ndVector::m_wOne)
@@ -281,6 +283,7 @@ void ndIkSwivelPositionEffector::DebugJoint(ndConstraintDebugCallback& debugCall
 
 	//debugCallback.DrawFrame(matrix0);
 	//debugCallback.DrawFrame(matrix1);
+
 	debugCallback.DrawLine(matrix0.m_posit, matrix1.m_posit, ndVector(ndFloat32(0.89f), ndFloat32(0.70f), ndFloat32(0.13f), ndFloat32(1.0f)));
 	
 	const ndVector origin((matrix0.m_posit + matrix1.m_posit) * ndVector::m_half);

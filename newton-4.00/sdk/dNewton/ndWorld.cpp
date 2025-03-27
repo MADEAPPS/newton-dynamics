@@ -478,7 +478,7 @@ void ndWorld::ModelUpdate()
 			ndModel* const model = modelList[i];
 			if (*model->m_notifyCallback)
 			{
-				model->m_notifyCallback->Update(this, timestep);
+				model->m_notifyCallback->Update(timestep);
 			}
 		}
 	});
@@ -503,7 +503,7 @@ void ndWorld::ModelPostUpdate()
 			ndModel* const model = modelList[i];
 			if (*model->m_notifyCallback)
 			{
-				model->m_notifyCallback->PostUpdate(this, timestep);
+				model->m_notifyCallback->PostUpdate(timestep);
 			}
 		}
 	});
@@ -526,7 +526,7 @@ void ndWorld::PostModelTransform()
 			ndModel* const model = modelList[i];
 			if (*model->m_notifyCallback)
 			{
-				model->m_notifyCallback->PostTransformUpdate(this, timestep);
+				model->m_notifyCallback->PostTransformUpdate(timestep);
 			}
 		}
 	});

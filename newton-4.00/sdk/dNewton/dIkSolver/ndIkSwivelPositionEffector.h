@@ -22,7 +22,9 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	D_CLASS_REFLECTION(ndIkSwivelPositionEffector, ndJointBilateralConstraint)
 
 	D_NEWTON_API ndIkSwivelPositionEffector();
-	D_NEWTON_API ndIkSwivelPositionEffector(const ndVector& childPivotInGlobalSpace, const ndMatrix& pinAndPivotParentInGlobalSpace, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API ndIkSwivelPositionEffector(
+		const ndMatrix& pinAndPivotParentInGlobalSpace, ndBodyKinematic* const parent,
+		const ndVector& childPivotInGlobalSpace, ndBodyKinematic* const child);
 	D_NEWTON_API virtual ~ndIkSwivelPositionEffector();
 
 	D_NEWTON_API ndVector GetLocalTargetPosition() const;

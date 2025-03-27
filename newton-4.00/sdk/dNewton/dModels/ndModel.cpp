@@ -55,14 +55,14 @@ ndModel* ndModel::Clone() const
 	return nullptr;
 }
 
+ndWorld* ndModel::GetWorld() const
+{
+	return m_world;
+}
+
 ndModel* ndModel::GetAsModel()
 {
 	return this;
-}
-
-ndModelBase* ndModel::GetAsModelBase()
-{
-	return nullptr;
 }
 
 ndMultiBodyVehicle* ndModel::GetAsMultiBodyVehicle()

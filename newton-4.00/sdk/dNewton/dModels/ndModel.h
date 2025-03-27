@@ -42,9 +42,9 @@ class ndModel: public ndContainersFreeListAlloc<ndModel>
 
 	D_NEWTON_API virtual ~ndModel ();
 	D_NEWTON_API virtual ndModel* Clone() const;
+	D_NEWTON_API virtual ndWorld* GetWorld() const;
 
 	D_NEWTON_API virtual ndModel* GetAsModel();
-	D_NEWTON_API virtual ndModelBase* GetAsModelBase();
 	D_NEWTON_API virtual ndMultiBodyVehicle* GetAsMultiBodyVehicle();
 	D_NEWTON_API virtual ndModelArticulation* GetAsModelArticulation();
 

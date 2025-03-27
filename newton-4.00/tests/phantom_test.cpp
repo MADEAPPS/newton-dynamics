@@ -65,17 +65,17 @@ class NewtonPhantom : public ndModel
 			return new NewtonPhantomModelNotify(*this);
 		}
 
-		void Update(ndWorld* const world, ndFloat32)
+		void Update(ndFloat32)
 		{
 			NewtonPhantom* const model = (NewtonPhantom*)GetModel();
-			model->Update(world);
+			model->Update();
 		}
 
-		void PostUpdate(ndWorld* const, ndFloat32)
+		void PostUpdate(ndFloat32)
 		{
 		}
 
-		void PostTransformUpdate(ndWorld* const, ndFloat32)
+		void PostTransformUpdate(ndFloat32)
 		{
 		}
 	};
@@ -110,7 +110,7 @@ class NewtonPhantom : public ndModel
 	ndInt32 getContactCount() const { return contactCount; }
 	ndVector getContactPoint() const { return contactPoint; }
 
-	void Update(ndWorld* const world)
+	void Update()
 	{
 		// calc the current AABB in world space
 		ndVector boxMin;
@@ -118,6 +118,7 @@ class NewtonPhantom : public ndModel
 		phantomShape.CalculateAabb(worldMatrix, boxMin, boxMax);
 	
 		ndBodiesInAabbNotify notifyCallback;
+		ndWorld* const const world = GetWorld();
 		world->BodiesInAabb(notifyCallback, boxMin, boxMax);
 	
 		for (ndInt32 i = 0; i < notifyCallback.m_bodyArray.GetCount(); ++i)
