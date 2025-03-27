@@ -1453,7 +1453,8 @@ namespace ndQuadruped_1
 			m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(m_poseGenerator);
 			
 			ndFloat32 duration = ((ndAnimationSequencePlayer*)*m_poseGenerator)->GetSequence()->GetDuration();
-			m_animBlendTree->SetTime(duration * ndRand());
+			//m_animBlendTree->SetTime(duration * ndRand());
+			m_animBlendTree->SetTime(0.0f);
 			
 			ndFloat32 offset_x[] = { 0.2f, 0.2f, 0.2f, 0.2f };
 			ndFloat32 offset_z[] = { -0.3f, 0.3f, -0.3f, 0.3f };
@@ -1520,7 +1521,6 @@ namespace ndQuadruped_1
 
 		void Update(ndFloat32 timestep)
 		{
-			//m_world = world;
 			//m_timestep = timestep;
 			//if (m_controllerTrainer)
 			//{
@@ -1537,6 +1537,9 @@ namespace ndQuadruped_1
 			//ndFloat32 animSpeed = 2.0f * m_control->m_animSpeed;
 			ndFloat32 animSpeed = 1.0f;
 			m_animBlendTree->Update(timestep * animSpeed);
+
+			ndVector veloc;
+			m_animBlendTree->Evaluate(m_animPose, veloc);
 
 			const ndVector upVector(rootBody->GetMatrix().m_up);
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++ i)
@@ -1591,6 +1594,10 @@ namespace ndQuadruped_1
 		for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = entity->GetChildren().GetFirst(); node; node = node->GetNext())
 		{
 			// build thig
+			index++;
+			if (index != 2)
+				continue;
+
 			ndSharedPtr<ndDemoEntity> thighEntity(node->GetInfo());
 			const ndMatrix thighMatrix(thighEntity->GetCurrentMatrix() * matrix);
 			ndSharedPtr<ndBody> thigh(CreateRigidBody(thighEntity, thighMatrix, limbMass, rootBody->GetAsBodyDynamic()));
@@ -1638,9 +1645,9 @@ namespace ndQuadruped_1
 			((ndIkSwivelPositionEffector*)*effector)->SetMaxForce(effectorStrength);
 			((ndIkSwivelPositionEffector*)*effector)->SetMaxTorque(effectorStrength);
 			
-			ndString name("effector_");
-			name += index;
-			model->AddCloseLoop(effector, name.GetStr());
+			//ndString name("effector_");
+			//name += index;
+			model->AddCloseLoop(effector);
 
 			RobotModelNotify::ndEffectorInfo leg;
 			leg.m_calf = (ndJointHinge*)*calfHinge;
@@ -1648,10 +1655,6 @@ namespace ndQuadruped_1
 			leg.m_thigh = (ndJointSpherical*)*ballJoint;
 			leg.m_effector = (ndIkSwivelPositionEffector*)*effector;
 			notify->m_legs.PushBack(leg);
-
-			index++;
-
-break;
 		}
 		notify->Init();
 		return model;
