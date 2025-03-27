@@ -118,7 +118,7 @@ class NewtonPhantom : public ndModel
 		phantomShape.CalculateAabb(worldMatrix, boxMin, boxMax);
 	
 		ndBodiesInAabbNotify notifyCallback;
-		ndWorld* const const world = GetWorld();
+		ndWorld* const world = GetWorld();
 		world->BodiesInAabb(notifyCallback, boxMin, boxMax);
 	
 		for (ndInt32 i = 0; i < notifyCallback.m_bodyArray.GetCount(); ++i)
