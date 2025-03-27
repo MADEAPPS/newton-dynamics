@@ -473,9 +473,9 @@ namespace biped_1
 			}
 		}
 
-		void Update(ndWorld* const world, ndFloat32 timestep)
+		void Update(ndFloat32 timestep)
 		{
-			ndModel::Update(world, timestep);
+			ndModel::Update(timestep);
 			for (ndInt32 i = 0; i < m_effectors.GetCount(); ++i)
 			{
 				ndEffectorInfo& info = m_effectors[i];
@@ -508,14 +508,14 @@ namespace biped_1
 			}
 		}
 
-		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
+		void PostUpdate(ndFloat32 timestep)
 		{
-			ndModel::PostUpdate(world, timestep);
+			ndModel::PostUpdate(timestep);
 		}
 
-		void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep)
+		void PostTransformUpdate(ndFloat32 timestep)
 		{
-			ndModel::PostTransformUpdate(world, timestep);
+			ndModel::PostTransformUpdate(timestep);
 		}
 
 		ndIkSolver m_invDynamicsSolver;

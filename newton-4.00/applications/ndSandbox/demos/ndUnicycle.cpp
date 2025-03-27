@@ -447,7 +447,7 @@ namespace ndUnicycle
 			ndBodyKinematic* const body = model->GetRoot()->m_body->GetAsBodyKinematic();
 			return ndAbs(body->GetMatrix().m_posit.m_x) > ndFloat32(30.0f);
 		}
-		void Update(ndWorld* const, ndFloat32 timestep)
+		void Update(ndFloat32 timestep)
 		{
 			m_timestep = timestep;
 			if (m_controllerTrainer)
@@ -460,7 +460,7 @@ namespace ndUnicycle
 			}
 		}
 
-		void PostUpdate(ndWorld* const, ndFloat32)
+		void PostUpdate(ndFloat32)
 		{
 			if (IsOutOfBounds())
 			{
@@ -468,7 +468,7 @@ namespace ndUnicycle
 			}
 		}
 
-		void PostTransformUpdate(ndWorld* const, ndFloat32)
+		void PostTransformUpdate(ndFloat32)
 		{
 		}
 

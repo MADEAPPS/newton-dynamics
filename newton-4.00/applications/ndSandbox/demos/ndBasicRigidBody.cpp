@@ -78,15 +78,15 @@ class R2D2ModelNotify : public ndModelNotify
 		return new R2D2ModelNotify(*this);
 	}
 
-	void Update(ndWorld* const, ndFloat32)
+	void Update(ndFloat32)
 	{
 	}
 
-	void PostUpdate(ndWorld* const, ndFloat32)
+	void PostUpdate(ndFloat32)
 	{
 	}
 
-	void PostTransformUpdate(ndWorld* const, ndFloat32)
+	void PostTransformUpdate(ndFloat32)
 	{
 	}
 };

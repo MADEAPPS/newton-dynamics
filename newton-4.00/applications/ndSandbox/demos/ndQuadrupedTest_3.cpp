@@ -1085,24 +1085,24 @@ namespace ndQuadruped_3
 			return reward;
 		}
 
-		void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep)
+		void PostTransformUpdate(ndFloat32 timestep)
 		{
-			ndModelArticulation::PostTransformUpdate(world, timestep);
+			ndModelArticulation::PostTransformUpdate(timestep);
 		}
 
-		void Update(ndWorld* const world, ndFloat32 timestep)
+		void Update(ndFloat32 timestep)
 		{
-			ndModelArticulation::Update(world, timestep);
+			ndModelArticulation::Update(timestep);
 
 			m_timestep = timestep;
 			m_agent->Step();
 		}
 
-		void PostUpdate(ndWorld* const world, ndFloat32 timestep)
+		void PostUpdate(ndFloat32 timestep)
 		{
 			ndFloat32 animSpeed = 0.5f * m_control->m_animSpeed;
 			m_animBlendTree->Update(timestep * animSpeed);
-			ndModelArticulation::PostUpdate(world, timestep);
+			ndModelArticulation::PostUpdate(timestep);
 		}
 
 		ndAnimationPose m_animPose;

@@ -734,7 +734,7 @@ namespace ndAdvancedRobot
 			context.DrawPoint(effectorMatrix.m_posit, color, ndFloat32(5.0f));
 		}
 
-		void Update(ndWorld* const world, ndFloat32 timestep)
+		void Update(ndFloat32 timestep)
 		{
 			m_world = world;
 			m_timestep = timestep;
@@ -748,11 +748,11 @@ namespace ndAdvancedRobot
 			}
 		}
 
-		void PostUpdate(ndWorld* const, ndFloat32)
+		void PostUpdate(ndFloat32)
 		{
 		}
 
-		void PostTransformUpdate(ndWorld* const, ndFloat32)
+		void PostTransformUpdate(ndFloat32)
 		{
 		}
 

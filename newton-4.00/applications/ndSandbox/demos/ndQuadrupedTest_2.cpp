@@ -1299,7 +1299,7 @@ namespace ndQuadruped_2
 			}
 		}
 
-		void Update(ndWorld* const world, ndFloat32 timestep)
+		void Update(ndFloat32 timestep)
 		{
 			m_world = world;
 			m_timestep = timestep;
@@ -1313,14 +1313,14 @@ namespace ndQuadruped_2
 			}
 		}
 
-		void PostUpdate(ndWorld* const, ndFloat32 timestep)
+		void PostUpdate(ndFloat32 timestep)
 		{
 			//ndFloat32 animSpeed = (m_control->m_animSpeed > 0.01f) ? (1.0f + 1.0f * m_control->m_animSpeed) : 0.0f;
 			ndFloat32 animSpeed = 2.0f * m_control->m_animSpeed;
 			m_animBlendTree->Update(timestep * animSpeed);
 		}
 
-		void PostTransformUpdate(ndWorld* const, ndFloat32)
+		void PostTransformUpdate(ndFloat32)
 		{
 		}
 

@@ -85,7 +85,7 @@ class BackGroundVehicleController : public ndModel
 			m_dCombinedMaximumForce = body->GetAsBodyDynamic()->GetMassMatrix().m_w * ndFloat32(6.0);
 		}
 
-		void Update(ndWorld* const, ndFloat32 timestep)
+		void Update(ndFloat32 timestep)
 		{
 			ndBodyDynamic* const pAiBody = m_pAiBody->GetAsBodyDynamic();
 			ndMatrix mMatrix(ndCalculateMatrix(m_pAiBody->GetRotation(), ndVector::m_wOne));

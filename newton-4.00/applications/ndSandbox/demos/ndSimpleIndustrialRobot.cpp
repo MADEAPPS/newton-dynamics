@@ -343,9 +343,8 @@ namespace ndSimpleRobot
 			return matrix;
 		}
 
-		void Update(ndWorld* const world, ndFloat32 timestep)
+		void Update(ndFloat32 timestep)
 		{
-			m_world = world;
 			m_timestep = timestep;
 
 			if (m_baseLimitJoint->GetJointHitLimits() || m_elbowLimitJoint->GetJointHitLimits())
@@ -364,11 +363,11 @@ namespace ndSimpleRobot
 			m_effector->SetOffsetMatrix(targetMatrix);
 		}
 
-		void PostUpdate(ndWorld* const, ndFloat32)
+		void PostUpdate(ndFloat32)
 		{
 		}
 
-		void PostTransformUpdate(ndWorld* const, ndFloat32)
+		void PostTransformUpdate(ndFloat32)
 		{
 		}
 

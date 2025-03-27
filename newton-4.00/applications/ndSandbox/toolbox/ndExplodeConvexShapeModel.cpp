@@ -187,7 +187,7 @@ ndExplodeConvexShapeModel::~ndExplodeConvexShapeModel()
 {
 }
 
-void ndExplodeConvexShapeModel::Update(ndWorld* const, ndFloat32)
+void ndExplodeConvexShapeModel::Update(ndFloat32)
 {
 	ndList<ndEffect>::ndNode* nextNody;
 	for (ndList<ndEffect>::ndNode* node = m_effectList.GetFirst(); node; node = nextNody)
@@ -226,7 +226,7 @@ void ndExplodeConvexShapeModel::Update(ndWorld* const, ndFloat32)
 	}
 }
 
-void ndExplodeConvexShapeModel::PostUpdate(ndWorld* const world, ndFloat32)
+void ndExplodeConvexShapeModel::PostUpdate(ndFloat32)
 {
 	if (m_pendingEffect.GetCount())
 	{

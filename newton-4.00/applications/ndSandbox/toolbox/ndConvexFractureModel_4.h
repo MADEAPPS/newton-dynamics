@@ -80,10 +80,10 @@ class ndConvexFractureModel_4: public ndModel
 
 	void AddEffect(const ndEffect& effect, ndFloat32 mass, const ndMatrix& location);
 
-	virtual void Update(ndWorld* const world, ndFloat32 timestep);
-	virtual void PostUpdate(ndWorld* const world, ndFloat32 timestep);
+	virtual void Update(ndFloat32 timestep);
+	virtual void PostUpdate(ndFloat32 timestep);
 
-	void UpdateEffect(ndWorld* const world, ndEffect& effect);
+	void UpdateEffect(ndEffect& effect);
 
 	void ExplodeLocation(ndBodyDynamic* const body, const ndMatrix& matrix, ndFloat32 factor) const;
 

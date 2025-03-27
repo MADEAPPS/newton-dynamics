@@ -336,7 +336,7 @@ namespace ndCarpole_0
 			m_cart->SetVelocity(ndVector::m_zero);
 		}
 
-		void Update(ndWorld* const, ndFloat32)
+		void Update(ndFloat32)
 		{
 			if (m_controllerTrainer)
 			{
@@ -348,11 +348,11 @@ namespace ndCarpole_0
 			}
 		}
 
-		void PostUpdate(ndWorld* const, ndFloat32)
+		void PostUpdate(ndFloat32)
 		{
 		}
 
-		void PostTransformUpdate(ndWorld* const, ndFloat32)
+		void PostTransformUpdate(ndFloat32)
 		{
 		}
 

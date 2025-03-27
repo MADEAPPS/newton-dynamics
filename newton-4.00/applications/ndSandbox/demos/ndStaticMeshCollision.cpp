@@ -139,7 +139,7 @@ class CConvexCasterModelNotify : public ndModelNotify
 		//sharedEdgeMesh.Render(m_pScene, ndGetIdentityMatrix());
 	}
 
-	virtual void Update(ndWorld* const world, ndFloat32) override
+	virtual void Update(ndFloat32) override
 	{
 		CConvexCastCallBack castCallback;
 		
