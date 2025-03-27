@@ -63,117 +63,9 @@ namespace ndQuadruped_1
 	#define D_SWING_STEP			ndReal(0.005f)
 	#define D_MODEL_DEAD_ANGLE		ndReal(0.2f)
 	#define D_MIN_TRAIN_ANIM_SPEED	ndReal(0.1f)
-		
-	void NormalizeMassRatios(ndModelArticulation* const model)
-	{
-		ndFloat32 totalVolume = 0.0f;
-		ndFixSizeArray<ndBodyKinematic*, 256> bodyArray;
-		for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-		{
-			ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
-			ndFloat32 volume = body->GetCollisionShape().GetVolume();
-			if (node->m_name != "base_link")
-			{
-				volume *= 4.0f;
-			}
-			totalVolume += volume;
-			bodyArray.PushBack(body);
-		}
+	
 
-		ndFloat32 totalMass = 25.0f;
-		ndFloat32 density = totalMass / totalVolume;
-		for (ndInt32 i = 0; i < bodyArray.GetCount(); ++i)
-		{
-			ndBodyKinematic* const body = bodyArray[i];
-			ndFloat32 volume = body->GetCollisionShape().GetVolume();
-			ndFloat32 mass = density * volume;
-			body->SetMassMatrix(mass, body->GetCollisionShape());
-			ndVector inertia(body->GetMassMatrix());
-			ndFloat32 maxInertia = ndMax(ndMax(inertia.m_x, inertia.m_y), inertia.m_z);
-			ndFloat32 minInertia = ndMin(ndMin(inertia.m_x, inertia.m_y), inertia.m_z);
-			if (minInertia < maxInertia * 0.125f)
-			{
-				minInertia = maxInertia * 0.125f;
-				for (ndInt32 j = 0; j < 3; ++j)
-				{
-					if (inertia[j] < minInertia)
-					{
-						inertia[j] = minInertia;
-					}
-				}
-			}
-			body->SetMassMatrix(inertia);
-		}
-	}
-
-	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndSharedPtr<ndDemoEntity>& modelMesh)
-	{
-		ndModelArticulation* const model = new ndModelArticulation();
-
-		ndSharedPtr<ndDemoEntity> entity(modelMesh->GetChildren().GetFirst()->GetInfo()->CreateClone());
-		scene->AddEntity(entity);
-
-		auto CreateRigidBody = [scene](ndSharedPtr<ndDemoEntity>& entity, const ndMatrix& matrix, ndFloat32 mass, ndBodyDynamic* const parentBody)
-		{
-			ndSharedPtr<ndShapeInstance> shape (entity->CreateCollision());
-
-			ndBodyKinematic* const body = new ndBodyDynamic();
-			//body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-			body->SetNotifyCallback(new ndBindingRagdollEntityNotify(scene, entity, parentBody, 100.0f));
-			body->SetMatrix(matrix);
-			body->SetCollisionShape(*(*shape));
-			body->GetAsBodyDynamic()->SetMassMatrix(mass, *(*shape));
-			return body;
-		};
-
-		ndFloat32 mass = 20.0f;
-		//ndFloat32 radius = 0.25f;
-		ndFloat32 limbMass = 0.25f;
-		//ndFloat32 limbLength = 0.3f;
-		//ndFloat32 limbRadios = 0.05f;
-
-		ndMatrix matrix(entity->GetCurrentMatrix() * location);
-
-		ndSharedPtr<ndBody> rootBody(CreateRigidBody(entity, matrix, mass, nullptr));
-		ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(rootBody);
-
-		// build all for legs
-		for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = entity->GetChildren().GetFirst(); node; node = node->GetNext())
-		{
-			// build thig
-			ndSharedPtr<ndDemoEntity> thighEntity(node->GetInfo());
-			const ndMatrix thighMatrix(thighEntity->GetCurrentMatrix() * matrix);
-			ndSharedPtr<ndBody> thigh(CreateRigidBody(thighEntity, thighMatrix, limbMass, rootBody->GetAsBodyDynamic()));
-
-			ndSharedPtr<ndJointBilateralConstraint> ballJoint (new ndIkJointSpherical(thighMatrix, thigh->GetAsBodyKinematic(), rootBody->GetAsBodyKinematic()));
-			ndModelArticulation::ndNode* const thighNode = model->AddLimb(modelRootNode, thigh, ballJoint);
-
-			// build calf
-			ndSharedPtr<ndDemoEntity> calfEntity(thighEntity->GetChildren().GetFirst()->GetInfo());
-			const ndMatrix calfMatrix(calfEntity->GetCurrentMatrix() * thighMatrix);
-			ndSharedPtr<ndBody> calf(CreateRigidBody(calfEntity, calfMatrix, limbMass, thigh->GetAsBodyDynamic()));
-
-			ndSharedPtr<ndJointBilateralConstraint> calfHinge (new ndIkJointHinge(calfMatrix, calf->GetAsBodyKinematic(), thigh->GetAsBodyKinematic()));
-			ndModelArticulation::ndNode* const calfNode = model->AddLimb(thighNode, calf, calfHinge);
-
-			// build heel
-			ndSharedPtr<ndDemoEntity> heelEntity(calfEntity->GetChildren().GetFirst()->GetInfo());
-			const ndMatrix heelMatrix(heelEntity->GetCurrentMatrix() * calfMatrix);
-			ndSharedPtr<ndBody> heel(CreateRigidBody(heelEntity, heelMatrix, limbMass, calf->GetAsBodyDynamic()));
-
-			ndSharedPtr<ndJointBilateralConstraint> heelHinge(new ndJointHinge(heelMatrix, heel->GetAsBodyKinematic(), calf->GetAsBodyKinematic()));
-			ndModelArticulation::ndNode* const heelNode = model->AddLimb(calfNode, heel, heelHinge);
-
-			break;
-		}
-
-		//ndMatrix matrix(rootBody->GetMatrix() * location);
-		//matrix.m_posit = location.m_posit;
-		//model->SetTransform(matrix);
-		//NormalizeMassRatios(model);
-		return model;
-	}
-
+#if 0
 	class RobotModelNotify : public ndModelNotify
 	{
 		class ndController : public ndBrainAgentContinuePolicyGradient
@@ -578,35 +470,32 @@ namespace ndQuadruped_1
 			const ndMatrix rootMatrix(robot->GetRoot()->m_body->GetMatrix());
 			for (ndInt32 i = 0; i < 4; ++i)
 			{
-				ndModelArticulation::ndNode* const footNode = robot->FindByName(effectorNames[i]);
-				if (footNode)
+				ndModelArticulation::ndNode* const heelNode = robot->FindByName(effectorNames[i]);
+				if (heelNode)
 				{
-					ndModelArticulation::ndNode* const calfNode = footNode->GetParent();
+					ndModelArticulation::ndNode* const calfNode = heelNode->GetParent();
 					ndModelArticulation::ndNode* const thighNode = calfNode->GetParent();
 
-					ndBodyKinematic* const footBody = footNode->m_body->GetAsBodyKinematic();
+					ndBodyKinematic* const heelBody = heelNode->m_body->GetAsBodyKinematic();
+					ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)heelBody->GetNotifyCallback();
+					ndDemoEntity* const heelEntirty = *notify->m_entity;
+					ndSharedPtr<ndDemoEntity> footEntity(heelEntirty->GetChildren().GetFirst()->GetInfo());
 
-					const ndShapeInstance& footCollision = footBody->GetCollisionShape();
-					ndMatrix effectorMatrix(footCollision.GetLocalMatrix() * footBody->GetMatrix());
-
-					ndShapeInfo shapeInfo (footCollision.GetShapeInfo());
-					effectorMatrix.m_posit += effectorMatrix.m_front.Scale(shapeInfo.m_capsule.m_height * 0.5f);
-
-					ndMatrix effectorRefFrame(ndYawMatrix(angles[i] * ndDegreeToRad));
+					ndMatrix effectorMatrix(footEntity->GetCurrentMatrix() * heelBody->GetMatrix());
+					ndMatrix effectorRefFrame(ndGetIdentityMatrix());
 					effectorRefFrame.m_posit = rootMatrix.TransformVector(thighNode->m_joint->GetLocalMatrix1().m_posit);
 
 					ndFloat32 regularizer = 0.001f;
-					ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorMatrix.m_posit, effectorRefFrame, footBody, robot->GetRoot()->m_body->GetAsBodyKinematic());
+					ndIkSwivelPositionEffector* const effector = new ndIkSwivelPositionEffector(effectorMatrix.m_posit, effectorRefFrame, heelBody, robot->GetRoot()->m_body->GetAsBodyKinematic());
 					effector->SetLinearSpringDamper(regularizer, 4000.0f, 50.0f);
 					effector->SetAngularSpringDamper(regularizer, 4000.0f, 50.0f);
-					//effector->SetWorkSpaceConstraints(0.0f, workSpace * 0.9f);
 					effector->SetWorkSpaceConstraints(0.0f, 0.75f * 0.9f);
 					effector->SetMaxForce(effectorStrength);
 					effector->SetMaxTorque(effectorStrength);
-
-					ndEffectorInfo info(thighNode->m_joint, calfNode->m_joint, footNode->m_joint, ndSharedPtr<ndJointBilateralConstraint>(effector));
+					
+					ndEffectorInfo info(thighNode->m_joint, calfNode->m_joint, heelNode->m_joint, ndSharedPtr<ndJointBilateralConstraint>(effector));
 					m_effectorsInfo.PushBack(info);
-
+					
 					ndAnimKeyframe keyFrame;
 					keyFrame.m_userData = &m_effectorsInfo[m_effectorsInfo.GetCount() - 1];
 					m_animPose.PushBack(keyFrame);
@@ -708,7 +597,7 @@ namespace ndQuadruped_1
 			}
 			else
 			{
-				ndAssert(0);
+				//ndAssert(0);
 			}
 
 			return reward;
@@ -1201,7 +1090,7 @@ namespace ndQuadruped_1
 	class TrainingUpdata : public ndDemoEntityManager::OnPostUpdate
 	{
 		public:
-		TrainingUpdata(ndDemoEntityManager* const scene, const ndMatrix& matrix)
+		TrainingUpdata(ndDemoEntityManager* const scene, const ndMatrix& matrix, const ndSharedPtr<ndDemoEntity>& modelMesh)
 			:OnPostUpdate()
 			,m_master()
 			,m_bestActor()
@@ -1214,44 +1103,40 @@ namespace ndQuadruped_1
 			,m_stopTraining(500 * 1000000)
 			,m_modelIsTrained(false)
 		{
-			ndAssert(0);
-			//ndWorld* const world = scene->GetWorld();
-			//m_outFile = fopen("quadruped_1-vpg.csv", "wb");
-			//fprintf(m_outFile, "vpg\n");
-			//
-			//ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
-			//
-			////hyperParameters.m_threadsCount = 1;
-			//hyperParameters.m_maxTrajectorySteps = 1024 * 8;
-			//hyperParameters.m_extraTrajectorySteps = 1024 * 2;
-			////hyperParameters.m_bashTrajectoryCount = 1000;
-			//hyperParameters.m_discountFactor = ndReal(m_discountFactor);
-			//hyperParameters.m_numberOfActions = ND_AGENT_OUTPUT_SIZE;
-			//hyperParameters.m_numberOfObservations = ND_AGENT_INPUT_SIZE;
-			//
-			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
-			//m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
-			//m_master->SetName(CONTROLLER_NAME);
-			//
-			//auto SpawnModel = [this, scene](const ndMatrix& matrix, bool debug)
-			//{
-			//	//ndWorld* const world = scene->GetWorld();
-			//	ndModelArticulation* const model = CreateModel(scene, matrix);
-			//	SetMaterial(model);
-			//	model->SetNotifyCallback(new RobotModelNotify(m_master, model, debug));
-			//	
-			//	((RobotModelNotify*)*model->GetNotifyCallback())->ResetModel();
-			//	return model;
-			//};
-			//
-			//ndWorld* const world = scene->GetWorld();
-			//ndSharedPtr<ndModel> visualModel (SpawnModel(matrix, true));
-			//world->AddModel(visualModel);
-			//visualModel->AddBodiesAndJointsToWorld();
-			//
-			//ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, (RobotModelNotify*)*visualModel->GetNotifyCallback()));
-			//scene->Set2DDisplayRenderFunction(quadrupedUI);
-			//
+			m_outFile = fopen("quadruped_1-vpg.csv", "wb");
+			fprintf(m_outFile, "vpg\n");
+			
+			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
+			
+			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
+			hyperParameters.m_extraTrajectorySteps = 1024 * 2;
+			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
+			hyperParameters.m_numberOfActions = ND_AGENT_OUTPUT_SIZE;
+			hyperParameters.m_numberOfObservations = ND_AGENT_INPUT_SIZE;
+			
+			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
+			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
+			m_master->SetName(CONTROLLER_NAME);
+			
+			auto SpawnModel = [this, scene, &modelMesh](const ndMatrix& matrix, bool debug)
+			{
+				ndModelArticulation* const model = CreateModel(scene, matrix, modelMesh);
+				SetMaterial(model);
+				model->SetNotifyCallback(new RobotModelNotify(m_master, model, debug));
+				
+				((RobotModelNotify*)*model->GetNotifyCallback())->ResetModel();
+				return model;
+			};
+			
+			ndSharedPtr<ndModel> visualModel (SpawnModel(matrix, true));
+
+			ndWorld* const world = scene->GetWorld();
+			world->AddModel(visualModel);
+			visualModel->AddBodiesAndJointsToWorld();
+			
+			ndSharedPtr<ndUIEntity> quadrupedUI(new ndModelUI(scene, (RobotModelNotify*)*visualModel->GetNotifyCallback()));
+			scene->Set2DDisplayRenderFunction(quadrupedUI);
+			
 			//ndInt32 countX = 22;
 			//ndInt32 countZ = 23;
 			//countX = 1;
@@ -1294,8 +1179,8 @@ namespace ndQuadruped_1
 				stack--;
 				ndModelArticulation::ndNode* const node = stackMem[stack];
 				ndBody* const body = *node->m_body;
-				ndDemoEntityNotify* const userData = (ndDemoEntityNotify*)body->GetNotifyCallback();
-				ndDemoEntity* const ent = *userData->m_entity;
+				ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)body->GetNotifyCallback();
+				ndDemoEntity* const ent = *notify->m_entity;
 				mode ? ent->Hide() : ent->UnHide();
 
 				for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
@@ -1418,6 +1303,204 @@ namespace ndQuadruped_1
 		ndUnsigned32 m_stopTraining;
 		bool m_modelIsTrained;
 	};
+#endif
+
+	class RobotModelNotify : public ndModelNotify
+	{
+
+		class ndEffectorInfo
+		{
+			public:
+			ndEffectorInfo()
+			{
+			}
+
+			ndEffectorInfo(
+				ndJointSpherical* const thigh,
+				ndJointHinge* const calf,
+				ndJointHinge* const foot,
+				ndIkSwivelPositionEffector* const effector)
+				:m_thigh(thigh)
+				,m_calf(calf)
+				,m_heel(foot)
+				,m_effector(effector)
+				//,m_effectRefPoint(ndVector::m_zero)
+			{
+			}
+
+			ndJointSpherical* m_thigh;
+			ndJointHinge* m_calf;
+			ndJointHinge* m_heel;
+			ndIkSwivelPositionEffector* m_effector;
+			//ndVector m_effectRefPoint;
+		};
+
+		public:
+		//RobotModelNotify(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot, bool showDebug)
+		RobotModelNotify(ndModelArticulation* const robot)
+			:ndModelNotify()
+			//, m_invDynamicsSolver()
+			//, m_controller(nullptr)
+			//, m_controllerTrainer(nullptr)
+			//, m_world(nullptr)
+			//, m_timestep(ndFloat32(0.0f))
+			//, m_modelAlive(true)
+			//, m_showDebug(showDebug)
+		{
+			SetModel(robot);
+			//m_controllerTrainer = new ndControllerTrainer(master);
+			//m_controllerTrainer->m_robot = this;
+			//Init(robot);
+		}
+
+		void PostUpdate(ndFloat32)
+		{
+			//ndFloat32 animSpeed = 2.0f * m_control->m_animSpeed;
+			//m_animBlendTree->Update(timestep * animSpeed);
+		}
+
+		void PostTransformUpdate(ndFloat32)
+		{
+		}
+
+		virtual void Debug(ndConstraintDebugCallback& context) const
+		{
+			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
+			for (ndList<ndModelArticulation::ndNode>::ndNode* effectorNode = model->GetCloseLoops().GetFirst(); effectorNode; effectorNode = effectorNode->GetNext())
+			{
+				ndModelArticulation::ndNode* const node = &effectorNode->GetInfo();
+				node->m_joint->DebugJoint(context);
+			}
+		}
+
+		void Update(ndFloat32)
+		{
+			//m_world = world;
+			//m_timestep = timestep;
+			//if (m_controllerTrainer)
+			//{
+			//	m_controllerTrainer->Step();
+			//}
+			//else
+			//{
+			//	m_controller->Step();
+			//}
+
+			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
+			ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
+
+			const ndVector upVector(rootBody->GetMatrix().m_up);
+			for (ndList<ndModelArticulation::ndNode>::ndNode* effectorNode = model->GetCloseLoops().GetFirst(); effectorNode; effectorNode = effectorNode->GetNext())
+			{
+				ndModelArticulation::ndNode* const node = &effectorNode->GetInfo();
+				ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)*node->m_joint;
+				ndFloat32 swivelAngle = effector->CalculateLookAtSwivelAngle(upVector);
+
+				//ndVector posit (effector->GetRestPosit());
+				effector->SetSwivelAngle(swivelAngle);
+			}
+		}
+
+		ndFixSizeArray<ndEffectorInfo, 4> m_legs;
+	};
+
+	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndSharedPtr<ndDemoEntity>& modelMesh)
+	{
+		ndModelArticulation* const model = new ndModelArticulation();
+		RobotModelNotify* const notify = new RobotModelNotify(model);
+
+		model->SetNotifyCallback(notify);
+
+
+		ndSharedPtr<ndDemoEntity> entity(modelMesh->GetChildren().GetFirst()->GetInfo()->CreateClone());
+		scene->AddEntity(entity);
+
+		auto CreateRigidBody = [scene](ndSharedPtr<ndDemoEntity>& entity, const ndMatrix& matrix, ndFloat32 mass, ndBodyDynamic* const parentBody)
+		{
+			ndSharedPtr<ndShapeInstance> shape(entity->CreateCollision());
+
+			ndBodyKinematic* const body = new ndBodyDynamic();
+			body->SetNotifyCallback(new ndBindingRagdollEntityNotify(scene, entity, parentBody, 100.0f));
+			body->SetMatrix(matrix);
+			body->SetCollisionShape(*(*shape));
+			body->GetAsBodyDynamic()->SetMassMatrix(mass, *(*shape));
+			return body;
+		};
+
+		ndFloat32 mass = 20.0f;
+		ndFloat32 limbMass = 0.25f;
+		ndMatrix matrix(entity->GetCurrentMatrix() * location);
+
+		ndSharedPtr<ndBody> rootBody(CreateRigidBody(entity, matrix, mass, nullptr));
+		ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(rootBody);
+
+		// build all for legs
+		ndInt32 index = 0;
+		for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = entity->GetChildren().GetFirst(); node; node = node->GetNext())
+		{
+			// build thig
+			ndSharedPtr<ndDemoEntity> thighEntity(node->GetInfo());
+			const ndMatrix thighMatrix(thighEntity->GetCurrentMatrix() * matrix);
+			ndSharedPtr<ndBody> thigh(CreateRigidBody(thighEntity, thighMatrix, limbMass, rootBody->GetAsBodyDynamic()));
+
+			//ndSharedPtr<ndJointBilateralConstraint> ballJoint(new ndIkJointSpherical(thighMatrix, thigh->GetAsBodyKinematic(), rootBody->GetAsBodyKinematic()));
+			ndSharedPtr<ndJointBilateralConstraint> ballJoint(new ndJointSpherical(thighMatrix, thigh->GetAsBodyKinematic(), rootBody->GetAsBodyKinematic()));
+			ndModelArticulation::ndNode* const thighNode = model->AddLimb(modelRootNode, thigh, ballJoint);
+
+			// build calf
+			ndSharedPtr<ndDemoEntity> calfEntity(thighEntity->GetChildren().GetFirst()->GetInfo());
+			const ndMatrix calfMatrix(calfEntity->GetCurrentMatrix() * thighMatrix);
+			ndSharedPtr<ndBody> calf(CreateRigidBody(calfEntity, calfMatrix, limbMass, thigh->GetAsBodyDynamic()));
+
+			//ndSharedPtr<ndJointBilateralConstraint> calfHinge(new ndIkJointHinge(calfMatrix, calf->GetAsBodyKinematic(), thigh->GetAsBodyKinematic()));
+			ndSharedPtr<ndJointBilateralConstraint> calfHinge(new ndJointHinge(calfMatrix, calf->GetAsBodyKinematic(), thigh->GetAsBodyKinematic()));
+			ndModelArticulation::ndNode* const calfNode = model->AddLimb(thighNode, calf, calfHinge);
+
+			((ndIkJointHinge*)*calfHinge)->SetLimitState(true);
+			((ndIkJointHinge*)*calfHinge)->SetLimits(-70.0f * ndDegreeToRad, 10.0f * ndDegreeToRad);
+
+			// build heel
+			ndSharedPtr<ndDemoEntity> heelEntity(calfEntity->GetChildren().GetFirst()->GetInfo());
+			const ndMatrix heelMatrix(heelEntity->GetCurrentMatrix() * calfMatrix);
+			ndSharedPtr<ndBody> heel(CreateRigidBody(heelEntity, heelMatrix, limbMass, calf->GetAsBodyDynamic()));
+
+			ndSharedPtr<ndJointBilateralConstraint> heelHinge(new ndJointHinge(heelMatrix, heel->GetAsBodyKinematic(), calf->GetAsBodyKinematic()));
+			//ndModelArticulation::ndNode* const heelNode = model->AddLimb(calfNode, heel, heelHinge);
+			model->AddLimb(calfNode, heel, heelHinge);
+			((ndJointHinge*)*heelHinge)->SetAsSpringDamper(0.001f, 2000.0f, 50.0f);
+
+			// create effector
+			ndSharedPtr<ndDemoEntity> footEntity(heelEntity->GetChildren().GetFirst()->GetInfo());
+			ndMatrix footMatrix(matrix);
+			footMatrix.m_posit = (footEntity->GetCurrentMatrix() * heelMatrix).m_posit;
+
+			ndMatrix effectorRefFrame(footMatrix);
+			effectorRefFrame.m_posit = thighMatrix.m_posit;
+
+			ndFloat32 regularizer = 0.001f;
+			ndFloat32 effectorStrength = 20.0f * 10.0f * 500.0f;
+			ndSharedPtr<ndJointBilateralConstraint> effector (new ndIkSwivelPositionEffector(effectorRefFrame, rootBody->GetAsBodyKinematic(), footMatrix.m_posit, heel->GetAsBodyKinematic()));
+			((ndIkSwivelPositionEffector*)*effector)->SetLinearSpringDamper(regularizer, 4000.0f, 50.0f);
+			((ndIkSwivelPositionEffector*)*effector)->SetAngularSpringDamper(regularizer, 4000.0f, 50.0f);
+			((ndIkSwivelPositionEffector*)*effector)->SetWorkSpaceConstraints(0.0f, 0.75f * 0.9f);
+			((ndIkSwivelPositionEffector*)*effector)->SetMaxForce(effectorStrength);
+			((ndIkSwivelPositionEffector*)*effector)->SetMaxTorque(effectorStrength);
+			
+			ndString name("effector_");
+			name += index;
+			model->AddCloseLoop(effector, name.GetStr());
+
+			notify->m_legs[index].m_calf = (ndJointHinge*)*calfHinge;
+			notify->m_legs[index].m_heel = (ndJointHinge*)*heelHinge;
+			notify->m_legs[index].m_thigh = (ndJointSpherical*)*ballJoint;
+			notify->m_legs[index].m_effector = (ndIkSwivelPositionEffector*)*effector;
+			//notify->m_legs[index].m_effectRefPoint = notify->m_legs[index].m_effector
+
+			index++;
+		}
+
+		return model;
+	}
 }
 
 using namespace ndQuadruped_1;
@@ -1447,18 +1530,19 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.6f;
 
+	//matrix.m_posit.m_y += 5.0f;
+	matrix.m_posit.m_y = 1.0f;
 	#ifdef ND_TRAIN_MODEL
-		scene->RegisterPostUpdate(new TrainingUpdata(scene, matrix));
+		scene->RegisterPostUpdate(new TrainingUpdata(scene, matrix, modelMesh));
 	#else
 		ndWorld* const world = scene->GetWorld();
 
-		matrix.m_posit.m_y += 1.0f;
 		ndSharedPtr<ndModel> referenceModel (CreateModel(scene, matrix, modelMesh));
 		world->AddModel(referenceModel);
 		referenceModel->AddBodiesAndJointsToWorld();
 		
 		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-		world->AddJoint(fixJoint);
+		//world->AddJoint(fixJoint);
 		
 		//char fileName[256];
 		//ndGetWorkingFileName(CONTROLLER_NAME, fileName);
