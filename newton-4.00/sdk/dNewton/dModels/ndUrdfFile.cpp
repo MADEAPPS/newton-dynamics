@@ -678,8 +678,9 @@ void ndUrdfFile::ImportVisual(const nd::TiXmlNode* const linkNode, ndBodyDynamic
 		meshMaterial.m_diffuse = m_materials[i].m_color;
 		//meshMaterial.m_ambient = materials[i].m_color;
 		//strcpy(meshMaterial.m_textureName, "wood_0.png");
-		const char* texture = &m_materials[i].m_texture[0];
-		snprintf(meshMaterial.m_textureName, sizeof (meshMaterial.m_textureName), "%s", texture);
+		//const char* texture = &m_materials[i].m_texture[0];
+		//snprintf(meshMaterial.m_textureName, sizeof (meshMaterial.m_textureName), "%s", texture);
+		strncpy(meshMaterial.m_textureName, m_materials[i].m_texture, sizeof(meshMaterial.m_textureName));
 		meshEffect->GetMaterials().PushBack(meshMaterial);
 	}
 
