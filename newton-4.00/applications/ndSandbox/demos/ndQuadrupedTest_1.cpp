@@ -96,31 +96,6 @@ namespace ndQuadruped_1
 			RobotModelNotify* m_robot;
 		};
 
-		class ndEffectorInfo
-		{
-			public:
-			ndEffectorInfo()
-			{
-			}
-
-			ndEffectorInfo(
-				const ndSharedPtr<ndJointBilateralConstraint>& thigh,
-				const ndSharedPtr<ndJointBilateralConstraint>& calf,
-				const ndSharedPtr<ndJointBilateralConstraint>& foot,
-				const ndSharedPtr<ndJointBilateralConstraint>& effector)
-				:m_thigh(thigh)
-				,m_calf(calf)
-				,m_foot(foot)
-				,m_effector(effector)
-			{
-			}
-
-			ndSharedPtr<ndJointBilateralConstraint> m_thigh;
-			ndSharedPtr<ndJointBilateralConstraint> m_calf;
-			ndSharedPtr<ndJointBilateralConstraint> m_foot;
-			ndSharedPtr<ndJointBilateralConstraint> m_effector;
-		};
-
 		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Trainer
 		{
 			public:
@@ -1340,7 +1315,7 @@ namespace ndQuadruped_1
 		class ndPoseGenerator : public ndAnimationSequence
 		{
 			public:
-			ndPoseGenerator(const ndFloat32* const phase)
+			ndPoseGenerator()
 				:ndAnimationSequence()
 				,m_amp(0.27f)
 				,m_stride_x(0.3f)
@@ -1349,9 +1324,7 @@ namespace ndQuadruped_1
 				m_duration = ndFloat32(4.0f);
 				for (ndInt32 i = 0; i < 4; i++)
 				{
-					m_phase[i] = phase[i];
-					m_offset[i] = ndVector::m_zero;
-					m_currentPose[i] = BasePose(i);
+					m_currentPose[i] = ndVector::m_zero;
 				}
 			}
 
@@ -1359,16 +1332,7 @@ namespace ndQuadruped_1
 			{
 				return ndVector::m_zero;
 			}
-
-			ndVector BasePose(ndInt32 index) const
-			{
-				ndVector base(ndVector::m_wOne);
-				base.m_x = m_offset[index].m_x;
-				base.m_z = m_offset[index].m_z;
-				base.m_y = m_offset[index].m_y;
-				return base;
-			}
-
+			
 			void CalculatePose(ndAnimationPose& output, ndFloat32 param) const
 			{
 				// generate a procedural in place march gait
@@ -1381,25 +1345,31 @@ namespace ndQuadruped_1
 
 				for (ndInt32 i = 0; i < output.GetCount(); i++)
 				{
+					const ndEffectorInfo& leg = *(ndEffectorInfo*)output[i].m_userData;;
 					output[i].m_userParamFloat = 0.0f;
-					output[i].m_posit = BasePose(i);
+					output[i].m_posit = leg.m_effector->GetRestPosit();
 				}
 
 				for (ndInt32 i = 0; i < output.GetCount(); i++)
 				{
+					const ndEffectorInfo& leg = *(ndEffectorInfo*)output[i].m_userData;;
+					const ndVector localPosit(leg.m_effector->GetRestPosit());
 					ndFloat32 stride_x = m_stride_x;
-					if ((i == 2) || (i == 3))
+					//ndFloat32 stride_z = m_stride_z;
+					ndFloat32 phase = 0.0f;
+					if (localPosit.m_x > 0.0f)
 					{
-						stride_x *= -1;
+						phase = (localPosit.m_z > 0.0f) ? 0.0f : 0.50f;
+					}
+					else
+					{
+						phase = (localPosit.m_z > 0.0f) ? 0.75f : 0.25f;
 					}
 
-					ndFloat32 stride_z = m_stride_z;
-					if ((i == 2) || (i == 3))
-					{
-						stride_z *= -1;
-					}
+					//stride_x = 0.0f;
+					//stride_z = 0.0f;
 
-					ndFloat32 t = ndMod(param - m_phase[i] + ndFloat32(1.0f), ndFloat32(1.0f));
+					ndFloat32 t = ndMod(param - phase + ndFloat32(1.0f), ndFloat32(1.0f));
 					if ((t >= gaitGuard) && (t <= gaitFraction))
 					{
 						output[i].m_posit.m_y += m_amp * ndSin(omega * (t - gaitGuard));
@@ -1409,8 +1379,8 @@ namespace ndQuadruped_1
 						ndFloat32 den = gaitFraction - gaitGuard;
 
 						ndFloat32 t0 = num / den;
-						//output[i].m_posit.m_x += stride_x * t0 - stridem_x * 0.5f;
-						output[i].m_posit.m_z += -(stride_z * t0 - stride_z * 0.5f);
+						output[i].m_posit.m_x += stride_x * t0 - stride_x * 0.5f;
+						//output[i].m_posit.m_z += -(stride_z * t0 - stride_z * 0.5f);
 					}
 					else
 					{
@@ -1423,8 +1393,8 @@ namespace ndQuadruped_1
 						ndFloat32 num = t - gaitFraction;
 						ndFloat32 den = 1.0f - (gaitFraction - gaitGuard);
 						ndFloat32 t0 = num / den;
-						//output[i].m_posit.m_x += -(stride_x * t0 - stridem_x * 0.5f + );
-						output[i].m_posit.m_z += (stride_z * t0 - stride_z * 0.5f);
+						output[i].m_posit.m_x += -(stride_x * t0 - stride_x * 0.5f);
+						//output[i].m_posit.m_z += (stride_z * t0 - stride_z * 0.5f);
 					}
 
 					m_currentPose[i] = output[i].m_posit;
@@ -1432,8 +1402,6 @@ namespace ndQuadruped_1
 			}
 
 			mutable ndVector m_currentPose[4];
-			ndVector m_offset[4];
-			ndFloat32 m_phase[4];
 			ndFloat32 m_amp;
 			ndFloat32 m_stride_x;
 			ndFloat32 m_stride_z;
@@ -1444,8 +1412,7 @@ namespace ndQuadruped_1
 			//static ndInt32 modelId = 0;
 			//m_modelId = modelId++;
 			
-			ndFloat32 phase[] = { 0.0f, 0.75f, 0.25f, 0.5f };
-			ndSharedPtr<ndAnimationSequence> sequence(new ndPoseGenerator(phase));
+			ndSharedPtr<ndAnimationSequence> sequence(new ndPoseGenerator());
 			
 			m_poseGenerator = ndSharedPtr<ndAnimationBlendTreeNode>(new ndAnimationSequencePlayer(sequence));
 			//m_control = new ndUIControlNode(m_poseGenerator);
@@ -1468,13 +1435,13 @@ namespace ndQuadruped_1
 			{
 				ndEffectorInfo& leg = m_legs[i];
 				ndAnimKeyframe keyFrame;
-					keyFrame.m_userData = &leg;
+				keyFrame.m_userData = &leg;
 				m_animPose.PushBack(keyFrame);
 				poseGenerator->AddTrack();
-				poseGenerator->m_phase[i] = phase[i];
-				poseGenerator->m_offset[i].m_x = offset_x[i];
-				poseGenerator->m_offset[i].m_y = offset_y[i];
-				poseGenerator->m_offset[i].m_z = offset_z[i];
+				//poseGenerator->m_phase[i] = phase[i];
+				//poseGenerator->m_offset[i].m_x = offset_x[i];
+				//poseGenerator->m_offset[i].m_y = offset_y[i];
+				//poseGenerator->m_offset[i].m_z = offset_z[i];
 			}
 			
 			//for (ndModelArticulation::ndNode* node = robot->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
@@ -1533,6 +1500,7 @@ namespace ndQuadruped_1
 
 			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 			ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
+			rootBody->SetSleepState(false);
 
 			//ndFloat32 animSpeed = 2.0f * m_control->m_animSpeed;
 			ndFloat32 animSpeed = 1.0f;
@@ -1588,6 +1556,7 @@ namespace ndQuadruped_1
 
 		ndSharedPtr<ndBody> rootBody(CreateRigidBody(entity, matrix, mass, nullptr));
 		ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(rootBody);
+	
 
 		// build all for legs
 		ndInt32 index = 0;
@@ -1595,8 +1564,9 @@ namespace ndQuadruped_1
 		{
 			// build thig
 			index++;
-			if (index != 2)
-				continue;
+			//if (!((index == 4) || (index == 1)))
+			//if (!(index == 4))
+			//	continue;
 
 			ndSharedPtr<ndDemoEntity> thighEntity(node->GetInfo());
 			const ndMatrix thighMatrix(thighEntity->GetCurrentMatrix() * matrix);
@@ -1700,7 +1670,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 		referenceModel->AddBodiesAndJointsToWorld();
 		
 		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-		world->AddJoint(fixJoint);
+		//world->AddJoint(fixJoint);
 		
 		//char fileName[256];
 		//ndGetWorkingFileName(CONTROLLER_NAME, fileName);
