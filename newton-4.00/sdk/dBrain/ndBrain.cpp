@@ -51,6 +51,16 @@ ndBrain::~ndBrain()
 	}
 }
 
+ndBrain& ndBrain::operator=(const ndBrain& src)
+{
+	for (ndInt32 i = 0; i < ndInt32 (src.GetCount()); ++i)
+	{
+		PushBack(src[i]->Clone());
+	}
+
+	return *this;
+}
+
 void ndBrain::SaveToFile(const char* const pathFilename)
 {
 	ndSaveToFile saveBrain(pathFilename);

@@ -30,6 +30,7 @@
 //#define ND_DISCRETE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 128)
 #define ND_DISCRETE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 64)
 
+
 //*********************************************************************************************
 //
 //*********************************************************************************************
@@ -315,6 +316,9 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::ndBrainAgentDiscretePolicyGrad
 	:ndBrainThreadPool()
 	,m_policy()
 	,m_critic()
+#ifdef ND_DISCRETE_PROXIMA_POLICY_GRADIENT
+	,m_policyOld()
+#endif
 	,m_optimizer(nullptr)
 	,m_trainers()
 	,m_weightedTrainer()
@@ -381,6 +385,12 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::ndBrainAgentDiscretePolicyGrad
 	m_policy.InitWeights();
 	Normalize(m_policy);
 	ndAssert(!strcmp((m_policy[m_policy.GetCount() - 1])->GetLabelId(), "ndBrainLayerActivationSoftmax"));
+
+	#ifdef ND_DISCRETE_PROXIMA_POLICY_GRADIENT
+	{
+		m_policyOld = m_policy;
+	}
+	#endif
 	
 	m_trainers.SetCount(0);
 	m_auxiliaryTrainers.SetCount(0);

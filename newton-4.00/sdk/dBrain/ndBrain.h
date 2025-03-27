@@ -35,6 +35,8 @@ class ndBrain: public ndArray<ndBrainLayer*>
 	ndBrain(const ndBrain& src);
 	~ndBrain();
 
+	ndBrain& operator=(const ndBrain& src);
+
 	void Save(ndBrainSave* const loadSave);
 	void SaveToFile(const char* const pathFilename);
 
