@@ -27,8 +27,9 @@
 #include "ndBrainLayerActivationSoftmax.h"
 #include "ndBrainAgentDiscretePolicyGradient_Trainer.h"
 
-//#define ND_DISCRETE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 128)
+//#define ND_DISCRETE_POLICY_GRADIENT_BUFFER_SIZE	(1024 * 128)
 #define ND_DISCRETE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 128)
+#define ND_DISCRETE_POLICY_STATE_VALUE_ITERATIONS	10
 
 //*********************************************************************************************
 //
@@ -866,7 +867,7 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 	}
 
 	ndAtomic<ndInt32> iterator(0);
-	for (ndInt32 i = 0; i < 8; ++i)
+	for (ndInt32 i = 0; i < ND_DISCRETE_POLICY_STATE_VALUE_ITERATIONS; ++i)
 	{ 
 		for (ndInt32 base = 0; base < m_randomPermutation.GetCount(); base += m_bashBufferSize)
 		{

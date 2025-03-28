@@ -26,8 +26,8 @@
 #include "ndBrainOptimizerAdam.h"
 #include "ndBrainAgentContinuePolicyGradient_Trainer.h"
 
-//#define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE	(1024 * 128)
-#define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 64)
+#define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 128)
+#define ND_CONTINUE_POLICY_STATE_VALUE_ITERATIONS	10
 #define ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA		ndBrainFloat(1.0e-1f)
 
 //*********************************************************************************************
@@ -840,9 +840,11 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 	}
 
 	ndAtomic<ndInt32> iterator(0);
-	for (ndInt32 base = 0; base < m_randomPermutation.GetCount(); base += m_bashBufferSize)
-	{
-		auto BackPropagateBash = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
+	for (ndInt32 i = 0; i < ND_CONTINUE_POLICY_STATE_VALUE_ITERATIONS; ++i)
+	{ 
+		for (ndInt32 base = 0; base < m_randomPermutation.GetCount(); base += m_bashBufferSize)
+		{
+			auto BackPropagateBash = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
 			{
 				ndBrainLossLeastSquaredError loss(1);
 				ndBrainFixSizeVector<1> stateValue;
@@ -871,9 +873,11 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 				}
 			});
 
-		iterator = 0;
-		ndBrainThreadPool::ParallelExecute(BackPropagateBash);
-		m_baseLineValueOptimizer->Update(this, m_baseLineValueTrainers, m_criticLearnRate);
+			iterator = 0;
+			ndBrainThreadPool::ParallelExecute(BackPropagateBash);
+			m_baseLineValueOptimizer->Update(this, m_baseLineValueTrainers, m_criticLearnRate);
+		}
+		m_randomPermutation.RandomShuffle(m_randomPermutation.GetCount());
 	}
 }
 
