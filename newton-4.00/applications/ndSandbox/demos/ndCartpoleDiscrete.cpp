@@ -29,7 +29,7 @@ namespace ndCarpole_0
 
 	//#define CONTROLLER_RESUME_TRAINING
 
-	#define D_PUSH_ACCEL		ndFloat32 (-1.0f * DEMO_GRAVITY)
+	#define D_PUSH_ACCEL		ndFloat32 (-3.0f * DEMO_GRAVITY)
 	#define D_REWARD_MIN_ANGLE	ndFloat32 (20.0f * ndDegreeToRad)
 
 	enum ndActionSpace
@@ -48,6 +48,8 @@ namespace ndCarpole_0
 	{
 		m_poleAngle,
 		m_poleOmega,
+		m_carVeloc,
+		m_carAccel,
 		m_stateSize
 	};
 
@@ -284,6 +286,10 @@ namespace ndCarpole_0
 		{
 			ndVector omega(m_pole->GetOmega());
 			ndFloat32 angle = GetPoleAngle();
+			ndVector veloc(m_cart->GetVelocity());
+			ndVector accel(m_cart->GetAccel());
+			state[m_carAccel] = accel.m_x;
+			state[m_carVeloc] = veloc.m_x;
 			state[m_poleAngle] = ndReal(angle);
 			state[m_poleOmega] = ndReal(omega.m_z);
 
@@ -297,25 +303,31 @@ namespace ndCarpole_0
 			//ndTrace(("%d ", ndInt32(actions[0])));
 			switch (ndInt32(actions[0]))
 			{
+				case m_doNoting:
+				{
+					force.m_x = 0.0f;
+					break;
+				}
+
 				case m_pushLeft0:
 				{
-					force.m_x = -m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
+					force.m_x = -m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL * 0.5f;
 					break;
 				}
 				case m_pushRight0:
 				{
-					force.m_x = m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
+					force.m_x = m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL * 0.5f;
 					break;
 				}
 
 				case m_pushLeft1:
 				{
-					force.m_x = -m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL * ndBrainFloat(4.0f);
+					force.m_x = -m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
 					break;
 				}
 				case m_pushRight1:
 				{
-					force.m_x = m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL * ndBrainFloat(4.0f);
+					force.m_x = m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
 					break;
 				}
 			}

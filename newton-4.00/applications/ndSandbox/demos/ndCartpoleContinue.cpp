@@ -29,7 +29,7 @@ namespace ndCarpole_1
 
 	//#define CONTROLLER_RESUME_TRAINING
 
-	#define D_PUSH_ACCEL			ndBrainFloat (-1.5f * DEMO_GRAVITY)
+	#define D_PUSH_ACCEL			ndBrainFloat (-3.0f * DEMO_GRAVITY)
 	#define D_REWARD_MIN_ANGLE		ndBrainFloat (20.0f * ndDegreeToRad)
 
 	enum ndActionSpace
@@ -248,7 +248,7 @@ namespace ndCarpole_1
 		{
 			ndVector force(m_cart->GetForce());
 			ndBrainFloat action = actions[0];
-			force.m_x = ndFloat32(ndBrainFloat(2.0f) * action * (m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL));
+			force.m_x = ndFloat32(D_PUSH_ACCEL * action * (m_cart->GetMassMatrix().m_w));
 			m_cart->SetForce(force);
 		}
 

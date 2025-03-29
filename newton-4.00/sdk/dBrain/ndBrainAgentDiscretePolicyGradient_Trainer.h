@@ -46,7 +46,7 @@ class ndBrainAgentDiscretePolicyGradient_Trainer : public ndBrainAgent
 	class ndTrajectoryStep : protected ndBrainVector
 	{
 		public:
-		ndTrajectoryStep(ndInt32 obsevationsSize);
+		ndTrajectoryStep(ndInt32 obsevationsSize, ndInt32 actionsSize);
 
 		ndInt32 GetCount() const;
 		void SetCount(ndInt32 count);
@@ -64,10 +64,15 @@ class ndBrainAgentDiscretePolicyGradient_Trainer : public ndBrainAgent
 		void SetAdvantage(ndInt32 entry, ndBrainFloat advantage);
 
 		void Clear(ndInt32 entry);
+
 		ndBrainFloat* GetObservations(ndInt32 entry);
 		const ndBrainFloat* GetObservations(ndInt32 entry) const;
 
-		ndInt64 m_obsevationsSize;
+		ndBrainFloat* GetProbabilities(ndInt32 entry);
+		const ndBrainFloat* GetProbabilities(ndInt32 entry) const;
+
+		ndInt32 m_actionbsSize;
+		ndInt32 m_obsevationsSize;
 	};
 
 	class ndRandomGenerator
@@ -173,10 +178,6 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 
 	ndBrain m_policy;
 	ndBrain m_critic;
-#ifdef ND_DISCRETE_PROXIMA_POLICY_GRADIENT
-	ndBrain m_oldPolicy;
-#endif
-
 	ndBrainOptimizerAdam* m_optimizer;
 	ndArray<ndBrainTrainer*> m_trainers;
 	ndArray<ndBrainTrainer*> m_weightedTrainer;
