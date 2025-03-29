@@ -65,6 +65,7 @@ class ndBrainAgentDiscretePolicyGradient_Trainer : public ndBrainAgent
 
 		void Clear(ndInt32 entry);
 		ndBrainFloat* GetObservations(ndInt32 entry);
+		const ndBrainFloat* GetObservations(ndInt32 entry) const;
 
 		ndInt64 m_obsevationsSize;
 	};
@@ -167,7 +168,7 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 
 #ifdef ND_DISCRETE_PROXIMA_POLICY_GRADIENT
 	void OptimizePolicyPPOstep();
-	ndFloat32 CalculateKLdivergence() const;
+	ndBrainFloat CalculateKLdivergence() const;
 #endif
 
 	ndBrain m_policy;
