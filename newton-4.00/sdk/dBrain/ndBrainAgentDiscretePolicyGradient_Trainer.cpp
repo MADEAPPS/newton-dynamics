@@ -27,11 +27,10 @@
 #include "ndBrainLayerActivationSoftmax.h"
 #include "ndBrainAgentDiscretePolicyGradient_Trainer.h"
 
-//#define ND_DISCRETE_POLICY_GRADIENT_BUFFER_SIZE	(1024 * 128)
 #define ND_DISCRETE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 128)
 #define ND_DISCRETE_CRITIC_STATE_VALUE_ITERATIONS	10
-#define ND_DISCRETE_POLICY_PROXIMA_ITERATIONS		10
-#define ND_DISCRETE_POLICY_KL_DIVERGENCE			(1.0e-2f)
+#define ND_DISCRETE_POLICY_PROXIMA_ITERATIONS		20
+#define ND_DISCRETE_POLICY_KL_DIVERGENCE			ndBrainFloat(1.0e-3f)
 
 //*********************************************************************************************
 //
