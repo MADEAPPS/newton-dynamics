@@ -31,8 +31,11 @@
 #include "ndBrainLossLeastSquaredError.h"
 #include "ndBrainLayerActivationSigmoidLinear.h"
 
+//#define ND_CONTINUE_PROXIMA_POLICY_GRADIENT
+
 // this is an implementation of the vanilla policy Gradient as described in:
 // https://spinningup.openai.com/en/latest/algorithms/vpg.html
+// https://spinningup.openai.com/en/latest/algorithms/ppo.html
 
 class ndBrainOptimizerAdam;
 class ndBrainAgentContinuePolicyGradient_TrainerMaster;
@@ -161,11 +164,19 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	void NormalizePolicy();
 	void NormalizeCritic();
 	void UpdateBaseLineValue();
-	
 	ndBrainAgentContinuePolicyGradient_Trainer::ndRandomGenerator* GetRandomGenerator();
+
+#ifdef ND_CONTINUE_PROXIMA_POLICY_GRADIENT
+	void OptimizePolicyPPOstep();
+	ndFloat32 CalculateKLdivergence() const;
+#endif
 
 	ndBrain m_policy;
 	ndBrain m_critic;
+#ifdef ND_CONTINUE_PROXIMA_POLICY_GRADIENT
+	ndBrain m_oldPolicy;
+#endif
+
 	ndBrainOptimizerAdam* m_optimizer;
 	ndArray<ndBrainTrainer*> m_trainers;
 	ndArray<ndBrainTrainer*> m_weightedTrainer;
