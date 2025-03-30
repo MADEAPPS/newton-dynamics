@@ -173,7 +173,7 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 
 #ifdef ND_DISCRETE_PROXIMA_POLICY_GRADIENT
 	void OptimizePolicyPPOstep();
-	ndBrainFloat CalculateKLdivergence() const;
+	ndBrainFloat CalculateKLdivergence();
 #endif
 
 	ndBrain m_policy;

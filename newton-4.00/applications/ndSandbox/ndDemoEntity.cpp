@@ -609,30 +609,29 @@ ndShapeInstance* ndDemoEntity::CreateCollision() const
 		instance = new ndShapeInstance(new ndShapeSphere(size.m_x));
 		instance->SetLocalMatrix(matrix);
 	}
-	//else if (strstr(name, "box"))
-	//{
-	//	ndDemoMesh* const mesh = (ndDemoMesh*)*node->GetInfo()->GetMesh();
-	//	ndAssert(mesh);
-	//	mesh->GetVertexArray(points);
-	//
-	//	ndVector minP(ndFloat32(1.0e10f));
-	//	ndVector maxP(ndFloat32(-1.0e10f));
-	//	for (ndInt32 i = 0; i < mesh->m_vertexCount; ++i)
-	//	{
-	//		minP = minP.GetMin(points[i]);
-	//		maxP = maxP.GetMax(points[i]);
-	//	}
-	//	ndVector size(maxP - minP);
-	//	shapeArray.PushBack(new ndShapeInstance(new ndShapeBox(size.m_x, size.m_y, size.m_z)));
-	//
-	//	const ndVector origin((maxP + minP).Scale(ndFloat32(0.5f)));
-	//	ndMatrix alighMatrix(ndGetIdentityMatrix());
-	//	alighMatrix.m_posit = ndVector::m_half * (maxP + minP);
-	//	alighMatrix.m_posit.m_w = ndFloat32(1.0f);
-	//
-	//	const ndMatrix matrix(alighMatrix * node->GetInfo()->GetMeshMatrix() * node->GetInfo()->GetCurrentMatrix());
-	//	shapeArray[shapeArray.GetCount() - 1]->SetLocalMatrix(matrix);
-	//}
+	else if (strstr(name, "box"))
+	{
+		ndDemoMesh* const mesh = (ndDemoMesh*)*GetMesh();
+		ndAssert(mesh);
+		mesh->GetVertexArray(points);
+	
+		ndVector minP(ndFloat32(1.0e10f));
+		ndVector maxP(ndFloat32(-1.0e10f));
+		for (ndInt32 i = 0; i < mesh->m_vertexCount; ++i)
+		{
+			minP = minP.GetMin(points[i]);
+			maxP = maxP.GetMax(points[i]);
+		}
+		ndVector size(maxP - minP);
+		const ndVector origin((maxP + minP).Scale(ndFloat32(0.5f)));
+		ndMatrix alighMatrix(ndGetIdentityMatrix());
+		alighMatrix.m_posit = ndVector::m_half * (maxP + minP);
+		alighMatrix.m_posit.m_w = ndFloat32(1.0f);
+	
+		const ndMatrix matrix(alighMatrix * GetMeshMatrix() * GetCurrentMatrix());
+		instance = new ndShapeInstance(new ndShapeBox(size.m_x, size.m_y, size.m_z));
+		instance->SetLocalMatrix(matrix);
+	}
 	else if (strstr(name, "capsule"))
 	{
 		ndDemoMesh* const mesh = (ndDemoMesh*)*GetMesh();
@@ -651,8 +650,6 @@ ndShapeInstance* ndDemoEntity::CreateCollision() const
 		ndMatrix alighMatrix(ndRollMatrix(90.0f * ndDegreeToRad));
 		alighMatrix.m_posit = origin;
 		alighMatrix.m_posit.m_w = ndFloat32(1.0f);
-	
-		//const ndMatrix matrix(alighMatrix * GetMeshMatrix() * GetCurrentMatrix());
 		const ndMatrix matrix(alighMatrix * GetMeshMatrix());
 	
 		instance = new ndShapeInstance(new ndShapeCapsule(size.m_x, size.m_x, high));

@@ -104,7 +104,7 @@ void ndBrainLayerLinear::InitWeights()
 	for (ndInt32 i = ndInt32(m_weights.GetCount() - 1); i >= 0; --i)
 	{
 		m_weights[i].InitGaussianWeights(variance);
-		//m_bias[i] = ndBrainFloat(ndGaussianRandom(ndFloat32(0.0f), 0.01f));
+		m_bias[i] = ndBrainFloat(ndGaussianRandom(ndFloat32(0.0f), 0.01f));
 	}
 }
 

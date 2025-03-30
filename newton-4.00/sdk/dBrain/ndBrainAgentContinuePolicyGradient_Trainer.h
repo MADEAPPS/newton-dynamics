@@ -31,7 +31,7 @@
 #include "ndBrainLossLeastSquaredError.h"
 #include "ndBrainLayerActivationSigmoidLinear.h"
 
-//#define ND_CONTINUE_PROXIMA_POLICY_GRADIENT
+#define ND_CONTINUE_PROXIMA_POLICY_GRADIENT
 
 // this is an implementation of the vanilla policy Gradient as described in:
 // https://spinningup.openai.com/en/latest/algorithms/vpg.html
@@ -61,7 +61,13 @@ class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
 
 		void Clear(ndInt32 entry);
 		ndBrainFloat* GetActions(ndInt32 entry);
+		const ndBrainFloat* GetActions(ndInt32 entry) const;
+
 		ndBrainFloat* GetObservations(ndInt32 entry);
+		const ndBrainFloat* GetObservations(ndInt32 entry) const;
+
+		ndBrainFloat* GetProbabilities(ndInt32 entry);
+		const ndBrainFloat* GetProbabilities(ndInt32 entry) const;
 
 		ndInt64 m_actionsSize;
 		ndInt64 m_obsevationsSize;
@@ -168,15 +174,11 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 
 #ifdef ND_CONTINUE_PROXIMA_POLICY_GRADIENT
 	void OptimizePolicyPPOstep();
-	ndFloat32 CalculateKLdivergence() const;
+	ndBrainFloat CalculateKLdivergence();
 #endif
 
 	ndBrain m_policy;
 	ndBrain m_critic;
-#ifdef ND_CONTINUE_PROXIMA_POLICY_GRADIENT
-	ndBrain m_oldPolicy;
-#endif
-
 	ndBrainOptimizerAdam* m_optimizer;
 	ndArray<ndBrainTrainer*> m_trainers;
 	ndArray<ndBrainTrainer*> m_weightedTrainer;

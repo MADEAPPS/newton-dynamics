@@ -611,33 +611,52 @@ ndFloat32 ndBrainAgentDiscretePolicyGradient_TrainerMaster::GetAverageScore() co
 #ifdef ND_DISCRETE_PROXIMA_POLICY_GRADIENT
 
 //#pragma optimize( "", off )
-ndBrainFloat ndBrainAgentDiscretePolicyGradient_TrainerMaster::CalculateKLdivergence() const
+ndBrainFloat ndBrainAgentDiscretePolicyGradient_TrainerMaster::CalculateKLdivergence()
 {
-	ndBrainVector crossProbabilities;
-	crossProbabilities.SetCount(m_numberOfActions);
+	ndFloat64 partialEntropy[256];
+	ndFloat64 partialCrossEntropy[256];
+
+	ndAtomic<ndInt32> iterator(0);
+	auto ParcialDivergence = ndMakeObject::ndFunction([this, &iterator, &partialEntropy, &partialCrossEntropy](ndInt32 threadIndex, ndInt32)
+	{
+		ndFloat64 totalEntropy = ndFloat32(0.0f);
+		ndFloat64 totalCrossEntropy = ndFloat32(0.0f);
+		ndInt32 size = m_trajectoryAccumulator.GetCount();
+
+		ndBrainFloat crossProbabilitiesBuffer[256];
+		ndBrainMemVector crossProbabilities(&crossProbabilitiesBuffer[0], m_numberOfActions * 2);
+		for (ndInt32 i = iterator++; i < size; i = iterator++)
+		{
+			const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(i), m_numberOfObservations);
+			ndFloat32 entropy = ndFloat32(0.0f);
+			ndBrainMemVector entropyProbabilities(m_trajectoryAccumulator.GetProbabilities(i), m_numberOfActions);
+			for (ndInt32 j = m_numberOfActions - 1; j >= 0; --j)
+			{
+				entropy += entropyProbabilities[j] * ndLog(entropyProbabilities[j]);
+			}
+			totalEntropy += entropy;
+
+			ndFloat32 crossEntropy = ndFloat32(0.0f);
+			m_policy.MakePrediction(observation, crossProbabilities);
+			for (ndInt32 j = ndInt32(crossProbabilities.GetCount()) - 1; j >= 0; --j)
+			{
+				crossEntropy += entropyProbabilities[j] * ndLog(crossProbabilities[j]);
+			}
+			totalCrossEntropy += crossEntropy;
+		}
+		partialEntropy[threadIndex] = totalEntropy;
+		partialCrossEntropy[threadIndex] = totalCrossEntropy;
+	});
+	ndBrainThreadPool::ParallelExecute(ParcialDivergence);
 
 	ndFloat64 totalEntropy = ndFloat32(0.0f);
 	ndFloat64 totalCrossEntropy = ndFloat32(0.0f);
-	for (ndInt32 i = m_trajectoryAccumulator.GetCount() - 1; i >= 0; --i)
+	for (ndInt32 i = GetThreadCount() - 1; i >= 0; --i)
 	{
-		const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(i), m_numberOfObservations);
-
-		ndFloat32 entropy = ndFloat32(0.0f);
-		ndBrainMemVector entropyProbabilities(m_trajectoryAccumulator.GetProbabilities(i), m_numberOfActions);
-		for (ndInt32 j = m_numberOfActions - 1; j >= 0; --j)
-		{
-			entropy += entropyProbabilities[j] * ndLog(entropyProbabilities[j]);
-		}
-		totalEntropy += entropy;
-
-		ndFloat32 crossEntropy = ndFloat32(0.0f);
-		m_policy.MakePrediction(observation, crossProbabilities);
-		for (ndInt32 j = ndInt32(crossProbabilities.GetCount()) - 1; j >= 0; --j)
-		{
-			crossEntropy += entropyProbabilities[j] * ndLog(crossProbabilities[j]);
-		}
-		totalCrossEntropy += crossEntropy;
+		totalEntropy += partialEntropy[i];
+		totalCrossEntropy += partialCrossEntropy[i];
 	}
+
 	ndFloat32 divergence = ndFloat32((totalEntropy - totalCrossEntropy) / ndFloat64(m_trajectoryAccumulator.GetCount()));
 	ndAssert(divergence >= 0.0f);
 	return divergence;
@@ -1031,7 +1050,8 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::OptimizeStep()
 		m_framesAlive++;
 	}
 
-	if ((m_bashTrajectoryIndex >= (m_bashTrajectoryCount * 10)) || (m_trajectoryAccumulator.GetCount() >= m_bashTrajectorySteps))
+	//if ((m_bashTrajectoryIndex >= (m_bashTrajectoryCount * 10)) || (m_trajectoryAccumulator.GetCount() >= m_bashTrajectorySteps))
+	if ((m_bashTrajectoryIndex >= m_bashTrajectoryCount) && (m_trajectoryAccumulator.GetCount() >= m_bashTrajectorySteps))
 	{
 		Optimize();
 		m_eposideCount++;
