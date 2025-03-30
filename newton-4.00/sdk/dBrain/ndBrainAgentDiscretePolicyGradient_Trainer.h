@@ -68,8 +68,8 @@ class ndBrainAgentDiscretePolicyGradient_Trainer : public ndBrainAgent
 		ndBrainFloat* GetObservations(ndInt32 entry);
 		const ndBrainFloat* GetObservations(ndInt32 entry) const;
 
-		ndBrainFloat* GetProbabilities(ndInt32 entry);
-		const ndBrainFloat* GetProbabilities(ndInt32 entry) const;
+		ndBrainFloat* GetProbabilityDistribution(ndInt32 entry);
+		const ndBrainFloat* GetProbabilityDistribution(ndInt32 entry) const;
 
 		ndInt32 m_actionbsSize;
 		ndInt32 m_obsevationsSize;
