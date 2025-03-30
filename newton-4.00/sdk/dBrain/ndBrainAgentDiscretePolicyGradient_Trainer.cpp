@@ -624,7 +624,7 @@ ndBrainFloat ndBrainAgentDiscretePolicyGradient_TrainerMaster::CalculateKLdiverg
 		ndInt32 size = m_trajectoryAccumulator.GetCount();
 
 		ndBrainFloat crossProbabilitiesBuffer[256];
-		ndBrainMemVector crossProbabilities(&crossProbabilitiesBuffer[0], m_numberOfActions * 2);
+		ndBrainMemVector crossProbabilities(&crossProbabilitiesBuffer[0], m_numberOfActions);
 		for (ndInt32 i = iterator++; i < size; i = iterator++)
 		{
 			const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(i), m_numberOfObservations);
