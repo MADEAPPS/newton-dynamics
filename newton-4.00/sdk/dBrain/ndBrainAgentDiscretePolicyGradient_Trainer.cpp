@@ -624,7 +624,7 @@ ndBrainFloat ndBrainAgentDiscretePolicyGradient_TrainerMaster::CalculateKLdiverg
 		ndInt32 size = m_trajectoryAccumulator.GetCount();
 
 		ndBrainFloat crossProbabilitiesBuffer[256];
-		ndBrainMemVector crossProbabilities(&crossProbabilitiesBuffer[0], m_numberOfActions * 2);
+		ndBrainMemVector crossProbabilities(&crossProbabilitiesBuffer[0], m_numberOfActions);
 		for (ndInt32 i = iterator++; i < size; i = iterator++)
 		{
 			const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(i), m_numberOfObservations);
@@ -638,7 +638,7 @@ ndBrainFloat ndBrainAgentDiscretePolicyGradient_TrainerMaster::CalculateKLdiverg
 
 			ndFloat32 crossEntropy = ndFloat32(0.0f);
 			m_policy.MakePrediction(observation, crossProbabilities);
-			for (ndInt32 j = ndInt32(crossProbabilities.GetCount()) - 1; j >= 0; --j)
+			for (ndInt32 j = m_numberOfActions - 1; j >= 0; --j)
 			{
 				crossEntropy += entropyProbabilities[j] * ndLog(crossProbabilities[j]);
 			}
