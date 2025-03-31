@@ -241,6 +241,7 @@ bool ndBrainAgentDiscretePolicyGradient_Trainer::IsTerminal() const
 	return false;
 }
 
+//#pragma optimize( "", off )
 ndBrainFloat ndBrainAgentDiscretePolicyGradient_Trainer::SelectAction(const ndBrainVector& probabilities) const
 {
 	ndBrainFixSizeVector<256> pdf;
@@ -481,12 +482,12 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::Normalize(ndBrain& actor)
 	// using supervised learning make sure that the m_policy has zero mean and standard deviation 
 	class SupervisedTrainer : public ndBrainThreadPool
 	{
-	public:
+		public:
 		SupervisedTrainer(ndBrain* const brain)
 			:ndBrainThreadPool()
-			, m_brain(*brain)
-			, m_trainer(new ndBrainTrainer(&m_brain))
-			, m_learnRate(ndReal(1.0e-2f))
+			,m_brain(*brain)
+			,m_trainer(new ndBrainTrainer(&m_brain))
+			,m_learnRate(ndReal(1.0e-2f))
 		{
 			SetThreadCount(1);
 			m_partialGradients.PushBack(*m_trainer);
@@ -839,7 +840,6 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::OptimizePolicy()
 	m_weightedTrainer[0]->ScaleWeights(ndBrainFloat(1.0f) / ndBrainFloat(m_trajectoryAccumulator.GetCount()));
 	m_optimizer->Update(this, m_weightedTrainer, -m_policyLearnRate);
 }
-
 
 void ndBrainAgentDiscretePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 {

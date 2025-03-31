@@ -30,7 +30,7 @@ namespace ndDiscreteCarpole
 
 	//#define CONTROLLER_RESUME_TRAINING
 
-	#define D_PUSH_ACCEL		ndFloat32 (-3.0f * DEMO_GRAVITY)
+	#define D_PUSH_ACCEL		ndFloat32 (-0.25f * DEMO_GRAVITY)
 	#define D_REWARD_MIN_ANGLE	ndFloat32 (20.0f * ndDegreeToRad)
 
 	enum ndActionSpace
@@ -301,12 +301,12 @@ namespace ndDiscreteCarpole
 
 				case m_pushLeft1:
 				{
-					force.m_x = -m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
+					force.m_x = -m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL * 2.0f;
 					break;
 				}
 				case m_pushRight1:
 				{
-					force.m_x = m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
+					force.m_x = m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL * 2.0f;
 					break;
 				}
 			}
@@ -372,7 +372,7 @@ namespace ndDiscreteCarpole
 			,m_saveScore(m_maxScore)
 			,m_discountFactor(0.99f)
 			,m_lastEpisode(0xffffffff)
-			,m_stopTraining(100 * 1000000)
+			,m_stopTraining(250 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			char name[256];
