@@ -59,9 +59,9 @@ class ndJointDoubleHinge: public ndJointBilateralConstraint
 	D_NEWTON_API void GetLimits1(ndFloat32& minLimit, ndFloat32& maxLimit);
 	D_NEWTON_API void SetAsSpringDamper1(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
 	D_NEWTON_API void GetSpringDamper1(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const;
+	D_NEWTON_API void ClearMemory();
 
 	protected:
-	D_NEWTON_API void ClearMemory();
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API ndFloat32 PenetrationOmega(ndFloat32 penetartion) const;
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;

@@ -31,7 +31,7 @@
 #include "ndBrainLossLeastSquaredError.h"
 #include "ndBrainLayerActivationSigmoidLinear.h"
 
-#define ND_CONTINUE_PROXIMA_POLICY_GRADIENT
+//#define ND_CONTINUE_PROXIMA_POLICY_GRADIENT
 
 // this is an implementation of the vanilla policy Gradient as described in:
 // https://spinningup.openai.com/en/latest/algorithms/vpg.html

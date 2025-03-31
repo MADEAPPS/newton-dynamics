@@ -134,12 +134,12 @@ class ndJointBilateralConstraint : public ndConstraint
 
 	D_COLLISION_API void ReplaceSentinel(ndBodyKinematic* const sentinel);
 
-	protected:
 	// inverse dynamics interface
 	D_COLLISION_API virtual void ClearMemory();
 	D_COLLISION_API virtual void SetIkMode(bool mode);
 	D_COLLISION_API virtual void SetIkSetAccel(const ndJacobian& body0Accel, const ndJacobian& body1Accel);
 
+	protected:
 	ndMatrix m_localMatrix0;
 	ndMatrix m_localMatrix1;
 

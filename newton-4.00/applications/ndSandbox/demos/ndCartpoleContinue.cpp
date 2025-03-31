@@ -25,7 +25,7 @@
 
 namespace ndContinueCarpole
 {
-	#define ND_TRAIN_AGENT
+	//#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME			"cartpoleContinue"
 
 	//#define CONTROLLER_RESUME_TRAINING
@@ -245,19 +245,19 @@ namespace ndContinueCarpole
 			return fail;
 		}
 
+		#pragma optimize( "", off )
 		ndReal GetReward() const
 		{
-			if (IsTerminal())
+			ndFloat32 reward = 0.0f;
+			if (!IsTerminal())
 			{
-				return ndReal(0.0f);
+				const ndVector veloc(m_cart->GetVelocity());
+				ndFloat32 sinAngle = m_poleJoint->GetAngle();
+				ndFloat32 angularReward = ndReal(ndExp(-ndFloat32(1000.0f) * sinAngle * sinAngle));
+				ndFloat32 linearReward = ndReal(ndExp(-ndFloat32(200.0f) * veloc.m_x * veloc.m_x));
+
+				reward = 0.5f * angularReward + 0.5f * linearReward;
 			}
-
-			const ndVector veloc(m_cart->GetVelocity());
-			ndFloat32 sinAngle = m_poleJoint->GetAngle();
-			ndFloat32 angularReward = ndReal(ndExp(-ndFloat32(1000.0f) * sinAngle * sinAngle));
-			ndFloat32 linearReward = ndReal(ndExp(-ndFloat32(1000.0f) * veloc.m_x * veloc.m_x));
-
-			ndFloat32 reward = 0.5f * angularReward + 0.5f * linearReward;
 			return ndReal(reward);
 		}
 
@@ -290,6 +290,9 @@ namespace ndContinueCarpole
 
 			m_cart->SetOmega(ndVector::m_zero);
 			m_cart->SetVelocity(ndVector::m_zero);
+
+			GetModel()->GetAsModelArticulation()->ClearMemory();
+			//m_poleJoint->ClearMemory();
 		}
 
 		void RandomePush()

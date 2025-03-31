@@ -255,7 +255,7 @@ namespace ndDiscreteCarpole
 			const ndVector veloc(m_cart->GetVelocity());
 			ndFloat32 sinAngle = m_poleJoint->GetAngle();
 			ndFloat32 angularReward = ndReal(ndExp(-ndFloat32(1000.0f) * sinAngle * sinAngle));
-			ndFloat32 linearReward = ndReal(ndExp(-ndFloat32(1000.0f) * veloc.m_x * veloc.m_x));
+			ndFloat32 linearReward = ndReal(ndExp(-ndFloat32(200.0f) * veloc.m_x * veloc.m_x));
 
 			ndFloat32 reward = 0.5f * angularReward + 0.5f * linearReward;
 			return ndReal(reward);
@@ -325,6 +325,8 @@ namespace ndDiscreteCarpole
 
 			m_cart->SetOmega(ndVector::m_zero);
 			m_cart->SetVelocity(ndVector::m_zero);
+
+			GetModel()->GetAsModelArticulation()->ClearMemory();
 		}
 
 		void Update(ndFloat32)
@@ -370,7 +372,7 @@ namespace ndDiscreteCarpole
 			,m_saveScore(m_maxScore)
 			,m_discountFactor(0.99f)
 			,m_lastEpisode(0xffffffff)
-			,m_stopTraining(500 * 1000000)
+			,m_stopTraining(100 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			char name[256];
