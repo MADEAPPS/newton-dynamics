@@ -23,6 +23,10 @@
 #include "ndDemoInstanceEntity.h"
 
 
+// This model attempts to take animation poses and use a reward system to generate a policy  
+// that produces the animation.  
+// If this phase is successful, we will adapt the reward so that the robot can adjust  
+// to the environment with increasing complexity
 namespace ndQuadruped_2
 {
 	//#define ND_TRAIN_MODEL
@@ -63,7 +67,6 @@ namespace ndQuadruped_2
 	#define D_SWING_STEP			ndReal(0.005f)
 	#define D_MODEL_DEAD_ANGLE		ndReal(0.2f)
 	#define D_MIN_TRAIN_ANIM_SPEED	ndReal(0.1f)
-	
 
 #if 0
 	class RobotModelNotify : public ndModelNotify
@@ -1419,7 +1422,7 @@ namespace ndQuadruped_2
 			//m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(m_control);
 			m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(m_poseGenerator);
 			
-			ndFloat32 duration = ((ndAnimationSequencePlayer*)*m_poseGenerator)->GetSequence()->GetDuration();
+			//ndFloat32 duration = ((ndAnimationSequencePlayer*)*m_poseGenerator)->GetSequence()->GetDuration();
 			//m_animBlendTree->SetTime(duration * ndRand());
 			m_animBlendTree->SetTime(0.0f);
 			
