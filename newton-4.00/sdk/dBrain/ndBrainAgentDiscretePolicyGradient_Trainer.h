@@ -185,12 +185,14 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 
 	ndBrain m_policy;
 	ndBrain m_critic;
-	ndBrainOptimizerAdam* m_optimizer;
-	ndArray<ndBrainTrainer*> m_trainers;
-	ndArray<ndBrainTrainer*> m_weightedTrainer;
-	ndArray<ndBrainTrainer*> m_auxiliaryTrainers;
-	ndBrainOptimizerAdam* m_baseLineValueOptimizer;
-	ndArray<ndBrainTrainer*> m_baseLineValueTrainers;
+	
+	ndArray<ndBrainTrainer*> m_criticTrainers;
+	ndArray<ndBrainTrainer*> m_policyTrainers;
+	ndArray<ndBrainTrainer*> m_policyWeightedTrainer;
+	ndArray<ndBrainTrainer*> m_policyAuxiliaryTrainers;
+
+	ndBrainOptimizerAdam* m_criticOptimizer;
+	ndBrainOptimizerAdam* m_policyOptimizer;
 
 	ndArray<ndInt32> m_randomPermutation;
 	ndBrainAgentDiscretePolicyGradient_Trainer::ndRandomGenerator* m_randomGenerator;
