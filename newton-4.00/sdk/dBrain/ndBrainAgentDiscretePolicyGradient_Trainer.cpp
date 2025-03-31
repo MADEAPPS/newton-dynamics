@@ -881,18 +881,13 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 					const ndInt32 index = m_randomPermutation[base + i];
 					ndBrainTrainer& trainer = *m_criticTrainers[i];
 
-					stateValue[0] = ndBrainFloat(0.0f);
+					stateValue[0] = m_trajectoryAccumulator.GetReward(index);
 					if (!m_trajectoryAccumulator.GetTerminalState(index))
 					{
-						stateValue[0] = m_trajectoryAccumulator.GetReward(index);
-						if (!m_trajectoryAccumulator.GetTerminalState(index + 1))
-						{
-							const ndBrainMemVector qObservation(m_trajectoryAccumulator.GetObservations(index + 1), m_numberOfObservations);
-							m_critic.MakePrediction(qObservation, stateQValue);
-							stateValue[0] += m_gamma * stateQValue[0];
-						}
+						const ndBrainMemVector qObservation(m_trajectoryAccumulator.GetObservations(index + 1), m_numberOfObservations);
+						m_critic.MakePrediction(qObservation, stateQValue);
+						stateValue[0] += m_gamma * stateQValue[0];
 					}
-
 					loss.SetTruth(stateValue);
 
 					const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(index), m_numberOfObservations);

@@ -1038,6 +1038,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 	m_policyOptimizer->Update(this, m_policyWeightedTrainer, -m_policyLearnRate);
 }
 
+//#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 {
 	m_trajectoryAccumulator.SetTerminalState(m_trajectoryAccumulator.GetCount() - 2, true);
@@ -1074,16 +1075,12 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 					const ndInt32 index = m_randomPermutation[base + i];
 					ndBrainTrainer& trainer = *m_criticTrainers[i];
 
-					stateValue[0] = ndBrainFloat(0.0f);
+					stateValue[0] = m_trajectoryAccumulator.GetReward(index);
 					if (!m_trajectoryAccumulator.GetTerminalState(index))
 					{
-						stateValue[0] = m_trajectoryAccumulator.GetReward(index);
-						if (!m_trajectoryAccumulator.GetTerminalState(index + 1))
-						{
-							const ndBrainMemVector qObservation(m_trajectoryAccumulator.GetObservations(index + 1), m_numberOfObservations);
-							m_critic.MakePrediction(qObservation, stateQValue);
-							stateValue[0] += m_gamma * stateQValue[0];
-						}
+						const ndBrainMemVector qObservation(m_trajectoryAccumulator.GetObservations(index + 1), m_numberOfObservations);
+						m_critic.MakePrediction(qObservation, stateQValue);
+						stateValue[0] += m_gamma * stateQValue[0];
 					}
 
 					loss.SetTruth(stateValue);
@@ -1149,7 +1146,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::Optimize()
 #endif
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeStep()
 {
 	for (ndList<ndBrainAgentContinuePolicyGradient_Trainer*>::ndNode* node = m_agents.GetFirst(); node; node = node->GetNext())
