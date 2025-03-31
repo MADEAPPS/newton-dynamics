@@ -605,7 +605,7 @@ ndShapeInstance* ndDemoEntity::CreateCollision() const
 		alighMatrix.m_posit = ndVector::m_half * (maxP + minP);
 		alighMatrix.m_posit.m_w = ndFloat32(1.0f);
 
-		const ndMatrix matrix(alighMatrix * GetMeshMatrix() * GetCurrentMatrix());
+		const ndMatrix matrix(alighMatrix * GetMeshMatrix());
 		instance = new ndShapeInstance(new ndShapeSphere(size.m_x));
 		instance->SetLocalMatrix(matrix);
 	}
@@ -628,7 +628,7 @@ ndShapeInstance* ndDemoEntity::CreateCollision() const
 		alighMatrix.m_posit = ndVector::m_half * (maxP + minP);
 		alighMatrix.m_posit.m_w = ndFloat32(1.0f);
 	
-		const ndMatrix matrix(alighMatrix * GetMeshMatrix() * GetCurrentMatrix());
+		const ndMatrix matrix(alighMatrix * GetMeshMatrix());
 		instance = new ndShapeInstance(new ndShapeBox(size.m_x, size.m_y, size.m_z));
 		instance->SetLocalMatrix(matrix);
 	}
