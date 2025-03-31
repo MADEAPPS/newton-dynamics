@@ -245,20 +245,20 @@ namespace ndContinueCarpole
 			return fail;
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		ndReal GetReward() const
 		{
-			ndFloat32 reward = 0.0f;
-			if (!IsTerminal())
+			if (IsTerminal())
 			{
-				const ndVector veloc(m_cart->GetVelocity());
-				ndFloat32 sinAngle = m_poleJoint->GetAngle();
-				ndFloat32 angularReward = ndReal(ndExp(-ndFloat32(1000.0f) * sinAngle * sinAngle));
-				ndFloat32 linearReward = ndReal(ndExp(-ndFloat32(200.0f) * veloc.m_x * veloc.m_x));
-
-				reward = 0.5f * angularReward + 0.5f * linearReward;
+				return ndReal (-1.0f);
 			}
-			return ndReal(reward);
+			const ndVector veloc(m_cart->GetVelocity());
+			ndFloat32 sinAngle = m_poleJoint->GetAngle();
+			ndFloat32 angularReward = ndReal(ndExp(-ndFloat32(1000.0f) * sinAngle * sinAngle));
+			ndFloat32 linearReward = ndReal(ndExp(-ndFloat32(200.0f) * veloc.m_x * veloc.m_x));
+
+			ndReal reward = 0.5f * angularReward + 0.5f * linearReward;
+			return reward;
 		}
 
 		void GetObservation(ndBrainFloat* const state)

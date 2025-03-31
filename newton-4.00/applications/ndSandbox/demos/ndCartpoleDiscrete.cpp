@@ -247,10 +247,8 @@ namespace ndDiscreteCarpole
 		{
 			if (IsTerminal())
 			{
-				return ndReal(0.0f);
+				return ndReal(-1.0f);
 			}
-			//ndFloat32 angle = m_poleJoint->GetAngle();
-			//ndFloat32 reward = ndReal(ndExp(-ndFloat32(2000.0f) * angle * angle));
 
 			const ndVector veloc(m_cart->GetVelocity());
 			ndFloat32 sinAngle = m_poleJoint->GetAngle();
@@ -258,8 +256,6 @@ namespace ndDiscreteCarpole
 			ndFloat32 linearReward = ndReal(ndExp(-ndFloat32(200.0f) * veloc.m_x * veloc.m_x));
 
 			ndFloat32 reward = 0.5f * angularReward + 0.5f * linearReward;
-			return ndReal(reward);
-
 			return ndReal(reward);
 		}
 

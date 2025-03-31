@@ -299,7 +299,11 @@ void ndBrainAgentDiscretePolicyGradient_Trainer::SaveTrajectory()
 	{
 		m_master->m_bashTrajectoryIndex++;
 
-		m_trajectory.SetTerminalState(m_trajectory.GetCount() - 1, true);
+		while (m_trajectory.GetTerminalState(m_trajectory.GetCount() - 2))
+		{
+			m_trajectory.SetCount(m_trajectory.GetCount() - 1);
+		}
+		ndAssert(m_trajectory.GetTerminalState(m_trajectory.GetCount() - 1));
 
 		// using the Bellman equation to calculate trajectory rewards. (Monte Carlo method)
 		ndBrainFloat gamma = m_master->m_gamma;
@@ -958,7 +962,8 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::OptimizeStep()
 	{
 		ndBrainAgentDiscretePolicyGradient_Trainer* const agent = node->GetInfo();
 
-		bool isTeminal = agent->IsTerminal() || (agent->m_trajectory.GetCount() >= (m_extraTrajectorySteps + m_maxTrajectorySteps));
+		bool isTeminal = agent->m_trajectory.GetTerminalState(agent->m_trajectory.GetCount() - 1);
+		isTeminal = isTeminal || (agent->m_trajectory.GetCount() >= (m_extraTrajectorySteps + m_maxTrajectorySteps));
 		if (isTeminal)
 		{
 			agent->SaveTrajectory();
@@ -969,8 +974,8 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::OptimizeStep()
 		m_framesAlive++;
 	}
 
-	//if ((m_bashTrajectoryIndex >= (m_bashTrajectoryCount * 10)) || (m_trajectoryAccumulator.GetCount() >= m_bashTrajectorySteps))
-	if ((m_bashTrajectoryIndex >= m_bashTrajectoryCount) && (m_trajectoryAccumulator.GetCount() >= m_bashTrajectorySteps))
+	ndInt32 trajectoryAccumulatorCount = m_trajectoryAccumulator.GetCount();
+	if ((m_bashTrajectoryIndex >= m_bashTrajectoryCount) && (trajectoryAccumulatorCount >= m_bashTrajectorySteps))
 	{
 		Optimize();
 		m_eposideCount++;

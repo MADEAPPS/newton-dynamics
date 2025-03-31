@@ -367,6 +367,7 @@ namespace ndUnicycle
 			GetModel()->GetAsModelArticulation()->ClearMemory();
 		}
 
+		#pragma optimize( "", off )
 		ndBrainFloat CalculateReward()
 		{
 			//ndFloat32 legReward = ndReal(ndExp(-ndFloat32(10000.0f) * m_legJoint->GetAngle() * m_legJoint->GetAngle()));
@@ -390,6 +391,11 @@ namespace ndUnicycle
 			//	const ndFloat32 reward = (wheelReward + legReward) / 2.0f;
 			//	return ndReal(reward);
 			//}
+
+			if (IsTerminal())
+			{
+				return ndBrainFloat (-1.0f);
+			}
 
 			ndFloat32 legReward = ndReal(ndExp(-ndFloat32(5000.0f) * m_legJoint->GetAngle() * m_legJoint->GetAngle()));
 			if (HasSupportContact())

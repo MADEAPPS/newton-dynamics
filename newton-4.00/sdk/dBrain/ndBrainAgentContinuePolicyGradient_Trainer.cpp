@@ -328,6 +328,7 @@ void ndBrainAgentContinuePolicyGradient_Trainer::SelectAction(ndBrainVector& act
 	}
 }
 
+#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_Trainer::Step()
 {
 	ndInt32 entryIndex = m_trajectory.GetCount();
@@ -356,8 +357,11 @@ void ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory()
 	if (m_trajectory.GetCount())
 	{
 		m_master->m_bashTrajectoryIndex++;
-		
-		m_trajectory.SetTerminalState(m_trajectory.GetCount() - 1, true);
+		while (m_trajectory.GetTerminalState(m_trajectory.GetCount() - 2))
+		{
+			m_trajectory.SetCount(m_trajectory.GetCount() - 1);
+		}
+		ndAssert(m_trajectory.GetTerminalState(m_trajectory.GetCount() - 1));
 
 		// using the Bellman equation to calculate trajectory rewards. (Monte Carlo method)
 		ndBrainFloat gamma = m_master->m_gamma;
@@ -1145,14 +1149,15 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::Optimize()
 #endif
 }
 
-//#pragma optimize( "", off )
+#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeStep()
 {
 	for (ndList<ndBrainAgentContinuePolicyGradient_Trainer*>::ndNode* node = m_agents.GetFirst(); node; node = node->GetNext())
 	{
 		ndBrainAgentContinuePolicyGradient_Trainer* const agent = node->GetInfo();
 
-		bool isTeminal = agent->IsTerminal() || (agent->m_trajectory.GetCount() >= (m_extraTrajectorySteps + m_maxTrajectorySteps));
+		bool isTeminal = agent->m_trajectory.GetTerminalState(agent->m_trajectory.GetCount() - 1);
+		isTeminal = isTeminal || (agent->m_trajectory.GetCount() >= (m_extraTrajectorySteps + m_maxTrajectorySteps));
 		if (isTeminal)
 		{
 			agent->SaveTrajectory();
@@ -1163,7 +1168,8 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeStep()
 		m_framesAlive++;
 	}
 
-	if ((m_bashTrajectoryIndex >= m_bashTrajectoryCount) && (m_trajectoryAccumulator.GetCount() >= m_bashTrajectorySteps))
+	ndInt32 trajectoryAccumulatorCount = m_trajectoryAccumulator.GetCount();
+	if ((m_bashTrajectoryIndex >= m_bashTrajectoryCount) && (trajectoryAccumulatorCount >= m_bashTrajectorySteps))
 	{
 		Optimize();
 
