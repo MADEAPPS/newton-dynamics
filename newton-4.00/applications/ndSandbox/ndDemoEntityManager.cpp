@@ -49,21 +49,22 @@
 //#define DEFAULT_SCENE	14		// background vehicle prop
 //#define DEFAULT_SCENE	15		// basic player
 //#define DEFAULT_SCENE	16		// rag doll
-//#define DEFAULT_SCENE	17		// cart pole discrete controller
-#define DEFAULT_SCENE	18		// cart pole continue controller
+#define DEFAULT_SCENE	17		// cart pole discrete controller
+//#define DEFAULT_SCENE	18		// cart pole continue controller
 //#define DEFAULT_SCENE	19		// unit cycle controller
 //#define DEFAULT_SCENE	20		// simple industrial robot
 //#define DEFAULT_SCENE	21		// advanced industrial robot
 //#define DEFAULT_SCENE	22		// quadruped test 1
 //#define DEFAULT_SCENE	23		// quadruped test 2
 //#define DEFAULT_SCENE	24		// quadruped test 3
-//#define DEFAULT_SCENE	25		// biped test 1
-//#define DEFAULT_SCENE	26		// biped test 2
-//#define DEFAULT_SCENE	27		// train biped test 2
-//#define DEFAULT_SCENE	28		// simple fracture
-//#define DEFAULT_SCENE	29		// basic fracture
-//#define DEFAULT_SCENE	30		// linked fracture
-//#define DEFAULT_SCENE	31		// skin peel fracture
+//#define DEFAULT_SCENE	25		// quadruped test 4
+//#define DEFAULT_SCENE	26		// biped test 1
+//#define DEFAULT_SCENE	27		// biped test 2
+//#define DEFAULT_SCENE	28		// train biped test 2
+//#define DEFAULT_SCENE	29		// simple fracture
+//#define DEFAULT_SCENE	30		// basic fracture
+//#define DEFAULT_SCENE	31		// linked fracture
+//#define DEFAULT_SCENE	32		// skin peel fracture
 						 
 // demos forward declaration 
 void ndRagdollTest(ndDemoEntityManager* const scene);
@@ -79,6 +80,7 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_1(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_2(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_3(ndDemoEntityManager* const scene);
+void ndQuadrupedTest_4(ndDemoEntityManager* const scene);
 void ndObjectPlacement(ndDemoEntityManager* const scene);
 void ndBasicGpuRigidBody(ndDemoEntityManager* const scene);
 void ndBasicFrictionRamp(ndDemoEntityManager* const scene);
@@ -125,9 +127,10 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "unicycle controller", ndUnicycleController },
 	{ "simple industrial robot", ndSimpleIndustrialRobot },
 	{ "advanced industrial robot", ndAdvancedIndustrialRobot },
-	{ "quadruped test one", ndQuadrupedTest_1 },
-//	{ "quadruped test two", ndQuadrupedTest_2 },
-//	{ "quadruped test three", ndQuadrupedTest_3},
+	{ "quadruped test 1", ndQuadrupedTest_1 },
+//	{ "quadruped test 2", ndQuadrupedTest_2 },
+//	{ "quadruped test 3", ndQuadrupedTest_3},
+//	{ "quadruped test 4", ndQuadrupedTest_4},
 //	{ "biped test one", ndBipedTest_1 },
 //	{ "biped test two", ndBipedTest_2 },
 //	{ "train biped test two", ndBipedTest_2Trainer },

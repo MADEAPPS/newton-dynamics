@@ -290,12 +290,12 @@ namespace ndDiscreteCarpole
 
 				case m_pushLeft0:
 				{
-					force.m_x = -m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL * 0.5f;
+					force.m_x = -m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
 					break;
 				}
 				case m_pushRight0:
 				{
-					force.m_x = m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL * 0.5f;
+					force.m_x = m_cart->GetMassMatrix().m_w * D_PUSH_ACCEL;
 					break;
 				}
 
@@ -372,7 +372,7 @@ namespace ndDiscreteCarpole
 			,m_saveScore(m_maxScore)
 			,m_discountFactor(0.99f)
 			,m_lastEpisode(0xffffffff)
-			,m_stopTraining(250 * 1000000)
+			,m_stopTraining(500 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			char name[256];
