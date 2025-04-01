@@ -39,7 +39,8 @@
 ndVector ndContactSolver::m_pruneUpDir(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f));
 ndVector ndContactSolver::m_pruneSupportX(ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
 
-#define ND_MIN_DIST2 ndFloat32 (5.0e4f^2)
+#define ND_MIN_DIST ndFloat32 (5.0e4f)
+#define ND_MIN_DIST2 (ND_MIN_DIST * ND_MIN_DIST)
 
 ndVector ndContactSolver::m_hullDirs[] =
 {
