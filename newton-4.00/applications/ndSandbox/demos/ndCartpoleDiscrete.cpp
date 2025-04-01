@@ -25,7 +25,7 @@
 
 namespace ndDiscreteCarpole
 {
-	#define ND_TRAIN_AGENT
+	//#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME		"cartpoleDiscrete"
 
 	//#define CONTROLLER_RESUME_TRAINING
