@@ -28,7 +28,7 @@ namespace ndUnicycle
 	#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME			"unicycle-vpg.dnn"
 
-	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (50.0f))
+	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (10.0f))
 	#define ND_MAX_LEG_ANGLE_STEP	(ndFloat32 (4.0f) * ndDegreeToRad)
 	#define ND_MAX_LEG_JOINT_ANGLE	(ndFloat32 (30.0f) * ndDegreeToRad)
 
@@ -50,61 +50,6 @@ namespace ndUnicycle
 		m_stateSize
 	};
 
-	//void ExportUrdfModel(ndDemoEntityManager* const scene)
-	//{
-	//	ndFloat32 mass = 20.0f;
-	//	ndFloat32 limbMass = 1.0f;
-	//	ndFloat32 wheelMass = 1.0f;
-	//
-	//	ndFloat32 xSize = 0.25f;
-	//	ndFloat32 ySize = 0.40f;
-	//	ndFloat32 zSize = 0.30f;
-	//
-	//	ndSharedPtr<ndModelArticulation> model(new ndModelArticulation);
-	//
-	//	ndMatrix location(ndGetIdentityMatrix());
-	//	ndBodyKinematic* const hipBody = CreateBox(scene, ndGetIdentityMatrix(), mass, xSize, ySize, zSize, "wood_0.png");
-	//	ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(hipBody);
-	//	hipBody->SetMatrix(location);
-	//	modelRoot->m_name = "base_link";
-	//
-	//	// make single leg
-	//	ndFloat32 limbLength = 0.3f;
-	//	ndFloat32 limbRadio = 0.025f;
-	//	ndBodyKinematic* const legBody = CreateCapsule(scene, ndGetIdentityMatrix(), limbMass, limbRadio, limbRadio, limbLength, "wood_1.png");
-	//
-	//	ndMatrix legPivot(ndRollMatrix(ndPi * ndFloat32(0.5f)) * hipBody->GetMatrix());
-	//	legPivot.m_posit.m_y -= (limbLength * 0.5f + ySize * 0.5f);
-	//	legBody->SetMatrix(legPivot);
-	//
-	//	legPivot.m_posit.m_y += limbLength * 0.5f;
-	//	ndMatrix legJointMatrix(ndYawMatrix(-ndPi * ndFloat32(0.5f)) * legPivot);
-	//	ndJointHinge* const legJoint = new ndJointHinge(legJointMatrix, legBody, hipBody);
-	//	ndModelArticulation::ndNode* const legLimb = model->AddLimb(modelRoot, legBody, legJoint);
-	//	legJoint->SetAsSpringDamper(0.02f, 1500, 40.0f);
-	//
-	//	legLimb->m_name = "leg";
-	//
-	//	// make wheel
-	//	ndFloat32 wheelRadio = 4.0f * limbRadio;
-	//	ndBodyKinematic* const wheelBody = CreateSphere(scene, ndGetIdentityMatrix(), wheelMass, wheelRadio, "wood_0.png");
-	//	
-	//	ndMatrix wheelMatrix(legBody->GetMatrix());
-	//	wheelMatrix.m_posit.m_y -= limbLength * 0.5f;
-	//	wheelBody->SetMatrix(wheelMatrix);
-	//	ndMatrix wheelJointMatrix(ndYawMatrix(-ndPi * ndFloat32(0.5f)) * wheelMatrix);
-	//	ndJointHinge* const wheelJoint = new ndJointHinge(wheelJointMatrix, wheelBody, legBody);
-	//	ndModelArticulation::ndNode* const wheel = model->AddLimb(legLimb, wheelBody, wheelJoint);
-	//	wheelJoint->SetAsSpringDamper(0.02f, 0.0f, 0.2f);
-	//
-	//	wheel->m_name = "wheel";
-	//
-	//	ndUrdfFile urdf;
-	//	char fileName[256];
-	//	ndGetWorkingFileName("unicycle.urdf", fileName);
-	//	urdf.Export(fileName, *model);
-	//}
-
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndSharedPtr<ndDemoEntity>& modelMesh)
 	{
 		ndModelArticulation* const model = new ndModelArticulation();
@@ -123,9 +68,9 @@ namespace ndUnicycle
 			return body;
 		};
 
-		ndFloat32 boxMass = 10.0f;
+		ndFloat32 boxMass = 20.0f;
 		ndFloat32 poleMass = 1.0f;
-		ndFloat32 ballMass = 5.0f;
+		ndFloat32 ballMass = 1.0f;
 
 		ndMatrix matrix(entity->GetCurrentMatrix() * location);
 		matrix.m_posit = location.m_posit;
@@ -146,7 +91,7 @@ namespace ndUnicycle
 		ndSharedPtr<ndJointBilateralConstraint> ballHinge(new ndJointHinge(ballMatrix, ball->GetAsBodyKinematic(), pole->GetAsBodyKinematic()));
 		ndModelArticulation::ndNode* const ballLink = model->AddLimb(poleLink, ball, ballHinge);
 		ballLink->m_name = "wheel";
-		((ndJointHinge*)*ballHinge)->SetAsSpringDamper(0.02f, 0.0f, 0.2f);
+		//((ndJointHinge*)*ballHinge)->SetAsSpringDamper(0.2f, 0.0f, 0.001f);
 
 		//ndUrdfFile urdf;
 		//char fileName[256];
@@ -396,6 +341,7 @@ namespace ndUnicycle
 				const ndMatrix matrix(m_wheelJoint->GetLocalMatrix1() * m_wheelJoint->GetBody1()->GetMatrix());
 
 				ndVector torque(matrix.m_front.Scale(ndFloat32(actions[m_softWheelControl]) * ND_MAX_WHEEL_TORQUE));
+				//ndVector torque(0.0f, 0.0f, - ND_MAX_WHEEL_TORQUE, 0.0f);
 				wheelBody->SetTorque(torque);
 
 				//if (m_controllerTrainer)
@@ -545,6 +491,7 @@ namespace ndUnicycle
 
 			ndBodyKinematic* const rootBody = visualModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic();
 			ndSharedPtr<ndJointBilateralConstraint> visualPlaneJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
+			//ndSharedPtr<ndJointBilateralConstraint> visualPlaneJoint(new ndJointSlider(rootBody->GetMatrix(), rootBody->GetAsBodyKinematic(), world->GetSentinelBody()));
 			world->AddJoint(visualPlaneJoint);
 			
 			visualModel->SetNotifyCallback(new RobotModelNotify(m_master, visualModel->GetAsModelArticulation()));
@@ -552,10 +499,11 @@ namespace ndUnicycle
 			
 			// add a hidden battery of model to generate trajectories in parallel
 			const ndInt32 countX = 100;
+			//const ndInt32 countX = 0;
 			for (ndInt32 i = 0; i < countX; ++i)
 			{
 				ndMatrix location(matrix);
-				ndFloat32 step = 10.0f * (ndRand() - 0.5f);
+				ndFloat32 step = 20.0f * (ndRand() - 0.5f);
 				location.m_posit.m_x += step;
 			 	
 				ndSharedPtr<ndModel>model (CreateModel(scene, location, modelMesh));
@@ -733,7 +681,7 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 	ndSetRandSeed(42);
 
 	ndMatrix matrix(ndGetIdentityMatrix());
-	matrix.m_posit.m_y = 0.75f;
+	matrix.m_posit.m_y = 0.9f;
 
 	ndMeshLoader loader;
 	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("unicycle.fbx", scene));
