@@ -128,7 +128,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "simple industrial robot", ndSimpleIndustrialRobot },
 	{ "advanced industrial robot", ndAdvancedIndustrialRobot },
 	{ "quadruped test 1", ndQuadrupedTest_1 },
-//	{ "quadruped test 2", ndQuadrupedTest_2 },
+	{ "quadruped test 2", ndQuadrupedTest_2 },
 //	{ "quadruped test 3", ndQuadrupedTest_3},
 //	{ "quadruped test 4", ndQuadrupedTest_4},
 //	{ "biped test one", ndBipedTest_1 },

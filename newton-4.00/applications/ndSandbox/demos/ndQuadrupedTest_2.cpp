@@ -29,8 +29,53 @@
 // to the environment with increasing complexity
 namespace ndQuadruped_2
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_2-vpg.dnn"
+
+
+	enum ndActionSpace
+	{
+		m_leg0_x,
+		m_leg0_y,
+		m_leg0_z,
+
+		m_leg1_x,
+		m_leg1_y,
+		m_leg1_z,
+
+		m_leg2_x,
+		m_leg2_y,
+		m_leg2_z,
+
+		m_leg3_x,
+		m_leg3_y,
+		m_leg3_z,
+
+		m_actionsSize
+	};
+
+	enum ndStateSpace
+	{
+		m_leg0_posit_x,
+		m_leg0_posit_y,
+		m_leg0_posit_z,
+
+		m_leg1_posit_x,
+		m_leg1_posit_y,
+		m_leg1_posit_z,
+
+		m_leg2_posit_x,
+		m_leg2_posit_y,
+		m_leg2_posit_z,
+
+		m_leg3_posit_x,
+		m_leg3_posit_y,
+		m_leg3_posit_z,
+
+		m_frameTick,
+		m_stateSize
+	};
+
 
 	class ndLegObservation
 	{
@@ -1285,6 +1330,52 @@ namespace ndQuadruped_2
 
 	class RobotModelNotify : public ndModelNotify
 	{
+
+		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Trainer
+		{
+			public:
+			ndControllerTrainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
+				:ndBrainAgentContinuePolicyGradient_Trainer(master)
+				,m_robot(nullptr)
+			{
+			}
+
+			ndBrainFloat CalculateReward()
+			{
+				ndAssert(0); 
+				return 0;
+				//return m_robot->CalculateReward();
+			}
+
+			bool IsTerminal() const
+			{
+				ndAssert(0);
+				return false;
+				//return m_robot->IsTerminal();
+			}
+
+			void GetObservation(ndBrainFloat* const observation)
+			{
+				ndAssert(0);
+				//m_robot->GetObservation(observation);
+			}
+
+			virtual void ApplyActions(ndBrainFloat* const actions)
+			{
+				ndAssert(0);
+				//m_robot->ApplyActions(actions);
+			}
+
+			void ResetModel()
+			{
+				ndAssert(0);
+				//m_robot->ResetModel();
+			}
+
+			RobotModelNotify* m_robot;
+		};
+
+
 		public:
 		class ndEffectorInfo
 		{
@@ -1412,9 +1503,6 @@ namespace ndQuadruped_2
 
 		void Init()
 		{
-			//static ndInt32 modelId = 0;
-			//m_modelId = modelId++;
-			
 			ndSharedPtr<ndAnimationSequence> sequence(new ndPoseGenerator());
 			
 			m_poseGenerator = ndSharedPtr<ndAnimationBlendTreeNode>(new ndAnimationSequencePlayer(sequence));
@@ -1454,18 +1542,18 @@ namespace ndQuadruped_2
 		}
 
 		//RobotModelNotify(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot, bool showDebug)
-		RobotModelNotify(ndModelArticulation* const robot)
+		RobotModelNotify(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot)
 			:ndModelNotify()
 			//, m_invDynamicsSolver()
 			//, m_controller(nullptr)
-			//, m_controllerTrainer(nullptr)
+			,m_controllerTrainer(nullptr)
 			//, m_world(nullptr)
 			//, m_timestep(ndFloat32(0.0f))
 			//, m_modelAlive(true)
 			//, m_showDebug(showDebug)
 		{
 			SetModel(robot);
-			//m_controllerTrainer = new ndControllerTrainer(master);
+			m_controllerTrainer = new ndControllerTrainer(master);
 			//m_controllerTrainer->m_robot = this;
 		}
 
@@ -1530,12 +1618,13 @@ namespace ndQuadruped_2
 		ndFixSizeArray<ndEffectorInfo, 4> m_legs;
 		ndSharedPtr<ndAnimationBlendTreeNode> m_poseGenerator;
 		ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
+		ndControllerTrainer* m_controllerTrainer;
 	};
 
-	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndSharedPtr<ndDemoEntity>& modelMesh)
+	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndSharedPtr<ndDemoEntity>& modelMesh, ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
 	{
 		ndModelArticulation* const model = new ndModelArticulation();
-		RobotModelNotify* const notify = new RobotModelNotify(model);
+		RobotModelNotify* const notify = new RobotModelNotify(master, model);
 		model->SetNotifyCallback(notify);
 
 		ndSharedPtr<ndDemoEntity> entity(modelMesh->GetChildren().GetFirst()->GetInfo()->CreateClone());
@@ -1559,7 +1648,6 @@ namespace ndQuadruped_2
 
 		ndSharedPtr<ndBody> rootBody(CreateRigidBody(entity, matrix, mass, nullptr));
 		ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(rootBody);
-	
 
 		// build all for legs
 		ndInt32 index = 0;
@@ -1632,6 +1720,223 @@ namespace ndQuadruped_2
 		notify->Init();
 		return model;
 	}
+
+	class TrainingUpdata : public ndDemoEntityManager::OnPostUpdate
+	{
+		public:
+		TrainingUpdata(ndDemoEntityManager* const scene, const ndMatrix& matrix, const ndSharedPtr<ndDemoEntity>& modelMesh)
+			:OnPostUpdate()
+			,m_master()
+			,m_bestActor()
+			,m_outFile(nullptr)
+			,m_timer(ndGetTimeInMicroseconds())
+			,m_maxScore(ndFloat32(-1.0e10f))
+			,m_discountFactor(0.99f)
+			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor))
+			,m_lastEpisode(0xffffffff)
+			,m_stopTraining(500 * 1000000)
+			,m_modelIsTrained(false)
+		{
+			ndWorld* const world = scene->GetWorld();
+
+			m_outFile = fopen("ndQuadruped_2-vpg.csv", "wb");
+			fprintf(m_outFile, "vpg\n");
+
+			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
+
+			hyperParameters.m_extraTrajectorySteps = 256;
+			hyperParameters.m_maxTrajectorySteps = 1024 * 2;
+			hyperParameters.m_numberOfActions = m_actionsSize;
+			hyperParameters.m_numberOfObservations = m_stateSize;
+			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
+
+			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
+			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
+
+			m_master->SetName(CONTROLLER_NAME);
+
+			ndSharedPtr<ndModel>visualModel(CreateModel(scene, matrix, modelMesh, m_master));
+			world->AddModel(visualModel);
+			visualModel->AddBodiesAndJointsToWorld();
+
+			ndBodyKinematic* const rootBody = visualModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic();
+			ndSharedPtr<ndJointBilateralConstraint> visualPlaneJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
+			//ndSharedPtr<ndJointBilateralConstraint> visualPlaneJoint(new ndJointSlider(rootBody->GetMatrix(), rootBody->GetAsBodyKinematic(), world->GetSentinelBody()));
+			world->AddJoint(visualPlaneJoint);
+
+			visualModel->SetNotifyCallback(new RobotModelNotify(m_master, visualModel->GetAsModelArticulation()));
+			SetMaterial(visualModel->GetAsModelArticulation());
+
+			// add a hidden battery of model to generate trajectories in parallel
+			//const ndInt32 countX = 100;
+			const ndInt32 countX = 0;
+			for (ndInt32 i = 0; i < countX; ++i)
+			{
+				ndMatrix location(matrix);
+				ndFloat32 step = 20.0f * (ndRand() - 0.5f);
+				location.m_posit.m_x += step;
+
+				ndSharedPtr<ndModel>model(CreateModel(scene, location, modelMesh, m_master));
+				ndBodyKinematic* const body = model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic();
+				ndSharedPtr<ndJointBilateralConstraint> planeJoint(new ndJointPlane(body->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), body, world->GetSentinelBody()));
+				world->AddJoint(planeJoint);
+
+				model->SetNotifyCallback(new RobotModelNotify(m_master, model->GetAsModelArticulation()));
+				SetMaterial(model->GetAsModelArticulation());
+
+				world->AddModel(model);
+				model->AddBodiesAndJointsToWorld();
+
+				m_models.Append(model->GetAsModelArticulation());
+			}
+
+			scene->SetAcceleratedUpdate();
+		}
+
+		~TrainingUpdata()
+		{
+			if (m_outFile)
+			{
+				fclose(m_outFile);
+			}
+		}
+
+		void SetMaterial(ndModelArticulation* const robot) const
+		{
+			ndModelArticulation::ndNode* stackMem[128];
+			ndInt32 stack = 1;
+			stackMem[0] = robot->GetRoot();
+			while (stack)
+			{
+				stack--;
+				ndModelArticulation::ndNode* const node = stackMem[stack];
+				ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+
+				ndShapeInstance& instanceShape = body->GetCollisionShape();
+				instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
+
+				ndDemoEntityNotify* const originalNotify = (ndDemoEntityNotify*)body->GetNotifyCallback();
+				ndSharedPtr<ndDemoEntity> userData(originalNotify->m_entity);
+				originalNotify->m_entity = ndSharedPtr<ndDemoEntity>();
+				InvisibleBodyNotify* const notify = new InvisibleBodyNotify((InvisibleBodyNotify*)body->GetNotifyCallback());
+				body->SetNotifyCallback(notify);
+				notify->m_entity = userData;
+
+				for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
+				{
+					stackMem[stack] = child;
+					stack++;
+				}
+			}
+		}
+
+		void OnDebug(ndDemoEntityManager* const, bool mode)
+		{
+			for (ndList<ndModelArticulation*>::ndNode* node = m_models.GetFirst(); node; node = node->GetNext())
+			{
+				HideModel(node->GetInfo(), mode);
+			}
+		}
+
+		void HideModel(ndModelArticulation* const robot, bool mode) const
+		{
+			ndModelArticulation::ndNode* stackMem[128];
+			ndInt32 stack = 1;
+			stackMem[0] = robot->GetRoot();
+			while (stack)
+			{
+				stack--;
+				ndModelArticulation::ndNode* const node = stackMem[stack];
+				ndBody* const body = *node->m_body;
+				ndDemoEntityNotify* const userData = (ndDemoEntityNotify*)body->GetNotifyCallback();
+				ndDemoEntity* const ent = *userData->m_entity;
+				mode ? ent->Hide() : ent->UnHide();
+
+				for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
+				{
+					stackMem[stack] = child;
+					stack++;
+				}
+			}
+		}
+
+		class InvisibleBodyNotify : public ndDemoEntityNotify
+		{
+			public:
+			InvisibleBodyNotify(const ndDemoEntityNotify* const src)
+				:ndDemoEntityNotify(*src)
+			{
+			}
+
+			virtual bool OnSceneAabbOverlap(const ndBody* const otherBody) const
+			{
+				const ndBodyKinematic* const body0 = ((ndBody*)GetBody())->GetAsBodyKinematic();
+				const ndBodyKinematic* const body1 = ((ndBody*)otherBody)->GetAsBodyKinematic();
+				const ndShapeInstance& instanceShape0 = body0->GetCollisionShape();
+				const ndShapeInstance& instanceShape1 = body1->GetCollisionShape();
+				return instanceShape0.m_shapeMaterial.m_userId != instanceShape1.m_shapeMaterial.m_userId;
+			}
+		};
+
+		virtual void Update(ndDemoEntityManager* const manager, ndFloat32)
+		{
+			ndUnsigned32 stopTraining = m_master->GetFramesCount();
+			if (stopTraining <= m_stopTraining)
+			{
+				ndUnsigned32 episodeCount = m_master->GetEposideCount();
+				m_master->OptimizeStep();
+
+				episodeCount -= m_master->GetEposideCount();
+				ndFloat32 rewardTrajectory = m_master->GetAverageFrames() * m_master->GetAverageScore();
+				if (rewardTrajectory >= ndFloat32(m_maxScore))
+				{
+					if (m_lastEpisode != m_master->GetEposideCount())
+					{
+						m_maxScore = rewardTrajectory;
+						m_bestActor->CopyFrom(*m_master->GetPolicyNetwork());
+						ndExpandTraceMessage("best actor episode: %d\treward %f\ttrajectoryFrames: %f\n", m_master->GetEposideCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
+						m_lastEpisode = m_master->GetEposideCount();
+					}
+				}
+
+				if (episodeCount && !m_master->IsSampling())
+				{
+					ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", m_master->GetFramesCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
+					if (m_outFile)
+					{
+						fprintf(m_outFile, "%g\n", m_master->GetAverageScore());
+						fflush(m_outFile);
+					}
+				}
+			}
+
+			if ((stopTraining >= m_stopTraining) || (100.0f * m_master->GetAverageScore() / m_horizon > 98.0f))
+			{
+				char fileName[1024];
+				m_modelIsTrained = true;
+				m_master->GetPolicyNetwork()->CopyFrom(*(*m_bestActor));
+				ndGetWorkingFileName(m_master->GetName().GetStr(), fileName);
+				m_master->GetPolicyNetwork()->SaveToFile(fileName);
+				ndExpandTraceMessage("saving to file: %s\n", fileName);
+				ndExpandTraceMessage("training complete\n");
+				ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
+				ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+				manager->Terminate();
+			}
+		}
+
+		ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
+		ndSharedPtr<ndBrain> m_bestActor;
+		ndList<ndModelArticulation*> m_models;
+		FILE* m_outFile;
+		ndUnsigned64 m_timer;
+		ndFloat32 m_maxScore;
+		ndFloat32 m_discountFactor;
+		ndFloat32 m_horizon;
+		ndUnsigned32 m_lastEpisode;
+		ndUnsigned32 m_stopTraining;
+		bool m_modelIsTrained;
+	};
 }
 
 using namespace ndQuadruped_2;
@@ -1656,7 +1961,6 @@ void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
 
 	ndMeshLoader loader;
 	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("quadrupeSpider.fbx", scene));
-
 
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.6f;

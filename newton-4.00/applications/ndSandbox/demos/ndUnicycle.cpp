@@ -299,7 +299,7 @@ namespace ndUnicycle
 			GetModel()->GetAsModelArticulation()->ClearMemory();
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		ndBrainFloat CalculateReward()
 		{
 			if (IsTerminal())
@@ -481,7 +481,7 @@ namespace ndUnicycle
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 			
 			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
-			m_bestActor = ndSharedPtr< ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
+			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
 			
 			m_master->SetName(CONTROLLER_NAME);
 
