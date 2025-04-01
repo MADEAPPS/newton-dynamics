@@ -520,7 +520,7 @@ namespace ndUnicycle
 				m_models.Append(model->GetAsModelArticulation());
 			}
 
-			//scene->SetAcceleratedUpdate();
+			scene->SetAcceleratedUpdate();
 		}
 
 		~TrainingUpdata()
