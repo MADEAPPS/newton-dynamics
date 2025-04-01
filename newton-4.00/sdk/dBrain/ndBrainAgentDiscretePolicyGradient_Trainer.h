@@ -31,11 +31,14 @@
 #include "ndBrainLossLeastSquaredError.h"
 #include "ndBrainLayerActivationSigmoidLinear.h"
 
-//#define ND_DISCRETE_PROXIMA_POLICY_GRADIENT
-
 // this is an implementation of the vanilla policy Gradient as described in:
-// https://spinningup.openai.com/en/latest/algorithms/ppo.html
 // https://spinningup.openai.com/en/latest/algorithms/vpg.html
+// This is an implementation of the proxima policy Gradient as described in:
+// https://spinningup.openai.com/en/latest/algorithms/ppo.html
+// is is an impropment that allows multiple passes on the same data collection as 
+// a long as the two disrtribution are close.
+
+//#define ND_DISCRETE_PROXIMA_POLICY_GRADIENT
 
 class ndBrainOptimizerAdam;
 class ndBrainAgentDiscretePolicyGradient_TrainerMaster;

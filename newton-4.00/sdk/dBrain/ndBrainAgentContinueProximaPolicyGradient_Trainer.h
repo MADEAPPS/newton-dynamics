@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_AGENT_CONTINUE_POLICY_GRADIENT_TRAINER_H__
-#define _ND_AGENT_CONTINUE_POLICY_GRADIENT_TRAINER_H__
+#ifndef _ND_AGENT_CONTINUE_PROXIMA_POLICY_GRADIENT_TRAINER_H__
+#define _ND_AGENT_CONTINUE_PROXIMA_POLICY_GRADIENT_TRAINER_H__
 
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"
@@ -31,13 +31,18 @@
 #include "ndBrainLossLeastSquaredError.h"
 #include "ndBrainLayerActivationSigmoidLinear.h"
 
-// this is an implementation of the vanilla policy Gradient as described in:
-// https://spinningup.openai.com/en/latest/algorithms/vpg.html
+// This is an implementation of the proxima policy Gradient as described in:
+// https://spinningup.openai.com/en/latest/algorithms/ppo.html
+// it is an impropment that allows multiple passes on the same data collection as 
+// a long as the two disrtribution are close.
+
+// I have a huge misunderstanding of this algorithm.
+// no matter what I do I can't get it to work at all, in fact it is the worst trainer so far. 
 
 class ndBrainOptimizerAdam;
-class ndBrainAgentContinuePolicyGradient_TrainerMaster;
+class ndBrainAgentContinueProximaPolicyGradient_TrainerMaster;
 
-class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
+class ndBrainAgentContinueProximaPolicyGradient_Trainer : public ndBrainAgent
 {
 	class ndTrajectoryStep : protected ndBrainVector
 	{
@@ -86,8 +91,8 @@ class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
 	};
 
 	public:
-	ndBrainAgentContinuePolicyGradient_Trainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master);
-	~ndBrainAgentContinuePolicyGradient_Trainer();
+	ndBrainAgentContinueProximaPolicyGradient_Trainer(const ndSharedPtr<ndBrainAgentContinueProximaPolicyGradient_TrainerMaster>& master);
+	~ndBrainAgentContinueProximaPolicyGradient_Trainer();
 
 	ndBrain* GetActor();
 	void SelectAction(ndBrainVector& actions) const;
@@ -105,13 +110,13 @@ class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
 
 	ndBrainVector m_workingBuffer;
 	ndTrajectoryStep m_trajectory;
-	ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
+	ndSharedPtr<ndBrainAgentContinueProximaPolicyGradient_TrainerMaster> m_master;
 	ndRandomGenerator* m_randomGenerator;
 
-	friend class ndBrainAgentContinuePolicyGradient_TrainerMaster;
+	friend class ndBrainAgentContinueProximaPolicyGradient_TrainerMaster;
 };
 
-class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPool
+class ndBrainAgentContinueProximaPolicyGradient_TrainerMaster : public ndBrainThreadPool
 {
 	class ndPolicyGradientActivation;
 	public:
@@ -149,8 +154,8 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndInt32 m_obsevationsSize;
 	};
 
-	ndBrainAgentContinuePolicyGradient_TrainerMaster(const HyperParameters& hyperParameters);
-	virtual ~ndBrainAgentContinuePolicyGradient_TrainerMaster();
+	ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(const HyperParameters& hyperParameters);
+	virtual ~ndBrainAgentContinueProximaPolicyGradient_TrainerMaster();
 
 	ndBrain* GetValueNetwork();
 	ndBrain* GetPolicyNetwork();
@@ -174,9 +179,14 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	void NormalizePolicy();
 	void NormalizeCritic();
 	void UpdateBaseLineValue();
-	ndBrainAgentContinuePolicyGradient_Trainer::ndRandomGenerator* GetRandomGenerator();
+	void OptimizePolicyPPOstep();
+	ndBrainFloat CalculateKLdivergence();
+	ndBrainAgentContinueProximaPolicyGradient_Trainer::ndRandomGenerator* GetRandomGenerator();
+
 	ndBrain m_policy;
 	ndBrain m_critic;
+	ndBrain m_oldPolicy;
+	ndBrain m_tempPolicy;
 
 	ndArray<ndBrainTrainer*> m_criticTrainers;
 	ndArray<ndBrainTrainer*> m_policyTrainers;
@@ -187,8 +197,8 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndBrainOptimizerAdam* m_policyOptimizer;
 
 	ndArray<ndInt32> m_randomPermutation;
-	ndBrainAgentContinuePolicyGradient_Trainer::ndRandomGenerator* m_randomGenerator;
-	ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryStep m_trajectoryAccumulator;
+	ndBrainAgentContinueProximaPolicyGradient_Trainer::ndRandomGenerator* m_randomGenerator;
+	ndBrainAgentContinueProximaPolicyGradient_Trainer::ndTrajectoryStep m_trajectoryAccumulator;
 	
 	ndBrainFloat m_gamma;
 	ndBrainFloat m_policyLearnRate;
@@ -210,8 +220,8 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndMovingAverage<8> m_averageScore;
 	ndMovingAverage<8> m_averageFramesPerEpisodes;
 	ndString m_name;
-	ndList<ndBrainAgentContinuePolicyGradient_Trainer*> m_agents;
-	friend class ndBrainAgentContinuePolicyGradient_Trainer;
+	ndList<ndBrainAgentContinueProximaPolicyGradient_Trainer*> m_agents;
+	friend class ndBrainAgentContinueProximaPolicyGradient_Trainer;
 };
 
 #endif 

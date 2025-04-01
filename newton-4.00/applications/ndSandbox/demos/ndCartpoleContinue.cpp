@@ -25,7 +25,7 @@
 
 namespace ndContinueCarpole
 {
-	//#define ND_TRAIN_AGENT
+	#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME			"cartpoleContinue"
 
 	//#define CONTROLLER_RESUME_TRAINING
@@ -363,6 +363,12 @@ namespace ndContinueCarpole
 
 			hyperParameters.m_extraTrajectorySteps = 256;
 			hyperParameters.m_maxTrajectorySteps = 1024 * 4;
+
+	//hyperParameters.m_threadsCount = 1;
+	//hyperParameters.m_maxTrajectorySteps = 256;
+	//hyperParameters.m_extraTrajectorySteps = 60;
+	//hyperParameters.m_bashTrajectoryCount = 50;
+
 			hyperParameters.m_numberOfActions = m_actionsSize;
 			hyperParameters.m_numberOfObservations = m_stateSize;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);

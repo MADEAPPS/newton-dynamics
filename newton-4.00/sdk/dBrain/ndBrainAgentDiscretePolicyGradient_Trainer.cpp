@@ -303,7 +303,8 @@ void ndBrainAgentDiscretePolicyGradient_Trainer::SaveTrajectory()
 		{
 			m_trajectory.SetCount(m_trajectory.GetCount() - 1);
 		}
-		ndAssert(m_trajectory.GetTerminalState(m_trajectory.GetCount() - 1));
+		//ndAssert(m_trajectory.GetTerminalState(m_trajectory.GetCount() - 1));
+		m_trajectory.SetTerminalState(m_trajectory.GetCount() - 1, true);
 
 		// using the Bellman equation to calculate trajectory rewards. (Monte Carlo method)
 		ndBrainFloat gamma = m_master->m_gamma;

@@ -106,7 +106,7 @@ void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const, ndArray<ndBrainTrain
 	ndBrainFloat alphaWeight = ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) - m_alphaAcc);
 
 	ndBrainFloat regularizer = -GetRegularizer();
-	//ndBrainFloat regularizer = GetRegularizer();
+	//ndBrainFloat regularizer = GetRegularizer(); this is a big mistake
 	ndBrainFloat descendRate = learnRate * ndBrainFloat(-1.0f);
 	ndBrainFloat den = ndBrainFloat(1.0f) / ndBrainFloat(partialGradients.GetCount());
 
