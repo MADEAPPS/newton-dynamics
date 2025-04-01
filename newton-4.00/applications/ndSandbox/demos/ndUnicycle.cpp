@@ -28,7 +28,7 @@ namespace ndUnicycle
 	#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME			"unicycle-vpg.dnn"
 
-	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (20.0f))
+	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (50.0f))
 	#define ND_MAX_LEG_ANGLE_STEP	(ndFloat32 (4.0f) * ndDegreeToRad)
 	#define ND_MAX_LEG_JOINT_ANGLE	(ndFloat32 (30.0f) * ndDegreeToRad)
 
@@ -107,20 +107,6 @@ namespace ndUnicycle
 
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndSharedPtr<ndDemoEntity>& modelMesh)
 	{
-#if 0
-		ndUrdfFile urdf;
-		char fileName[256];
-		ndGetWorkingFileName("unicycle.urdf", fileName);
-		ndModelArticulation* const unicycle = urdf.Import(fileName);
-
-		SetModelVisualMesh(scene, unicycle);
-		ndMatrix matrix(unicycle->GetRoot()->m_body->GetMatrix() * location);
-		matrix.m_posit = location.m_posit;
-		unicycle->SetTransform(matrix);
-
-		return unicycle;
-#endif
-
 		ndModelArticulation* const model = new ndModelArticulation();
 		ndSharedPtr<ndDemoEntity> entity(modelMesh->GetChildren().GetFirst()->GetInfo()->CreateClone());
 		scene->AddEntity(entity);
@@ -139,7 +125,7 @@ namespace ndUnicycle
 
 		ndFloat32 boxMass = 10.0f;
 		ndFloat32 poleMass = 1.0f;
-		ndFloat32 ballMass = 2.0f;
+		ndFloat32 ballMass = 5.0f;
 
 		ndMatrix matrix(entity->GetCurrentMatrix() * location);
 		matrix.m_posit = location.m_posit;
@@ -543,7 +529,7 @@ namespace ndUnicycle
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 			
 			hyperParameters.m_extraTrajectorySteps = 256;
-			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
+			hyperParameters.m_maxTrajectorySteps = 1024 * 2;
 			hyperParameters.m_numberOfActions = m_actionsSize;
 			hyperParameters.m_numberOfObservations = m_stateSize;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
@@ -747,7 +733,7 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 	ndSetRandSeed(42);
 
 	ndMatrix matrix(ndGetIdentityMatrix());
-	matrix.m_posit.m_y = 0.8f;
+	matrix.m_posit.m_y = 0.75f;
 
 	ndMeshLoader loader;
 	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("unicycle.fbx", scene));
