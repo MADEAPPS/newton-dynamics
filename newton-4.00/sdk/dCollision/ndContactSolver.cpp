@@ -39,6 +39,8 @@
 ndVector ndContactSolver::m_pruneUpDir(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f));
 ndVector ndContactSolver::m_pruneSupportX(ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
 
+#define ND_MIN_DIST2 ndFloat32 (5.0e4f^2)
+
 ndVector ndContactSolver::m_hullDirs[] =
 {
 	ndVector(ndFloat32(0.577350f), ndFloat32(-0.577350f), ndFloat32(0.577350f), ndFloat32(0.0f)),
@@ -2802,7 +2804,7 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsDiscrete()
 		contactCount = PruneContacts(contactCount, 16);
 	}
 
-	ndAssert(closestDist2 < ndFloat32(1.0e6f));
+	ndAssert(closestDist2 < ND_MIN_DIST2);
 	m_separationDistance = ndSqrt (closestDist2);
 	return contactCount;
 }
@@ -2924,7 +2926,7 @@ ndInt32 ndContactSolver::CompoundToConvexContactsDiscrete()
 		contactCount = PruneContacts(contactCount, 16);
 	}
 
-	ndAssert(closestDist2 < ndFloat32(1.0e6f));
+	ndAssert(closestDist2 < ND_MIN_DIST2);
 	m_separationDistance = ndSqrt(closestDist2);
 	return contactCount;
 }
@@ -3076,7 +3078,7 @@ ndInt32 ndContactSolver::CompoundToCompoundContactsDiscrete()
 		contactCount = PruneContacts(contactCount, 16);
 	}
 
-	ndAssert(closestDist2 < ndFloat32(1.0e6f));
+	ndAssert(closestDist2 < ND_MIN_DIST2);
 	m_separationDistance = ndSqrt(closestDist2);
 	return contactCount;
 }
@@ -3255,7 +3257,7 @@ ndInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 		contactCount = PruneContacts(contactCount, 16);
 	}
 
-	ndAssert(closestDist2 < ndFloat32(1000.0f));
+	ndAssert(closestDist2 < ND_MIN_DIST2);
 	m_separationDistance = ndSqrt (closestDist2);
 	return contactCount;
 }
@@ -3379,7 +3381,7 @@ ndInt32 ndContactSolver::CompoundToStaticHeightfieldContactsDiscrete()
 	{
 		contactCount = PruneContacts(contactCount, 16);
 	}
-	ndAssert(closestDist2 < ndFloat32(1.0e6f));
+	ndAssert(closestDist2 < ND_MIN_DIST2);
 	m_separationDistance = ndSqrt(closestDist2);
 	return contactCount;
 }
@@ -3503,7 +3505,7 @@ ndInt32 ndContactSolver::CompoundToStaticProceduralMesh()
 	{
 		contactCount = PruneContacts(contactCount, 16);
 	}
-	ndAssert(closestDist2 < ndFloat32(1.0e6f));
+	ndAssert(closestDist2 < ND_MIN_DIST2);
 	m_separationDistance = ndSqrt(closestDist2);
 	return contactCount;
 }

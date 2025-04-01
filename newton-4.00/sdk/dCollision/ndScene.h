@@ -100,29 +100,28 @@ class ndScene : public ndThreadPool
 
 	D_COLLISION_API void SendBackgroundTask(ndBackgroundTask* const job);
 
-	ndInt32 GetThreadCount() const;
+	D_COLLISION_API ndInt32 GetThreadCount() const;
 
-	virtual ndWorld* GetWorld() const;
-	const ndBodyListView& GetBodyList() const;
-	const ndBodyList& GetParticleList() const;
+	D_COLLISION_API virtual ndWorld* GetWorld() const;
+	D_COLLISION_API const ndBodyListView& GetBodyList() const;
+	D_COLLISION_API const ndBodyList& GetParticleList() const;
 
-	ndArray<ndBodyKinematic*>& GetActiveBodyArray();
-	const ndArray<ndBodyKinematic*>& GetActiveBodyArray() const;
+	D_COLLISION_API ndArray<ndBodyKinematic*>& GetActiveBodyArray();
+	D_COLLISION_API const ndArray<ndBodyKinematic*>& GetActiveBodyArray() const;
 
-	ndArray<ndConstraint*>& GetActiveContactArray();
-	const ndArray<ndConstraint*>& GetActiveContactArray() const;
+	D_COLLISION_API ndArray<ndConstraint*>& GetActiveContactArray();
+	D_COLLISION_API const ndArray<ndConstraint*>& GetActiveContactArray() const;
 
-	ndArray<ndUnsigned8>& GetScratchBuffer();
-
-	ndFloat32 GetTimestep() const;
-	void SetTimestep(ndFloat32 timestep);
-	ndBodyKinematic* GetSentinelBody() const;
+	D_COLLISION_API ndFloat32 GetTimestep() const;
+	D_COLLISION_API void SetTimestep(ndFloat32 timestep);
+	D_COLLISION_API ndBodyKinematic* GetSentinelBody() const;
+	D_COLLISION_API ndArray<ndUnsigned8>& GetScratchBuffer();
 
 	protected:
 	D_COLLISION_API ndScene();
 	D_COLLISION_API ndScene(const ndScene& src);
 	bool ValidateContactCache(ndContact* const contact, const ndVector& timestep) const;
-
+	
 	const ndContactArray& GetContactArray() const;
 	void FindCollidingPairs(ndBodyKinematic* const body, ndInt32 threadId);
 	void FindCollidingPairsForward(ndBodyKinematic* const body, ndInt32 threadId);
@@ -193,84 +192,5 @@ class ndScene : public ndThreadPool
 	friend class ndSkeletonContainer;
 } D_GCC_NEWTON_CLASS_ALIGN_32 ;
 
-inline void ndScene::PrepareCleanup()
-{
-}
-
-inline bool ndScene::IsValid() const
-{
-	return true;
-}
-
-inline bool ndScene::IsHighPerformanceCompute() const
-{
-	return false;
-}
-
-inline ndWorld* ndScene::GetWorld() const
-{
-	return nullptr;
-}
-
-inline ndInt32 ndScene::GetThreadCount() const
-{
-	const ndThreadPool& pool = *this;
-	return pool.GetThreadCount();
-}
-
-inline ndArray<ndUnsigned8>& ndScene::GetScratchBuffer()
-{
-	return m_scratchBuffer;
-}
-
-inline const ndBodyList& ndScene::GetParticleList() const
-{
-	return m_particleSetList;
-}
-
-inline const ndBodyListView& ndScene::GetBodyList() const
-{
-	return m_bodyList;
-}
-
-inline ndArray<ndConstraint*>& ndScene::GetActiveContactArray()
-{
-	return m_activeConstraintArray;
-}
-
-inline const ndContactArray& ndScene::GetContactArray() const
-{
-	return m_contactArray;
-}
-
-inline const ndArray<ndConstraint*>& ndScene::GetActiveContactArray() const
-{
-	return m_activeConstraintArray;
-}
-
-inline ndArray<ndBodyKinematic*>& ndScene::GetActiveBodyArray()
-{
-	return m_bodyList.GetView();
-}
-
-inline const ndArray<ndBodyKinematic*>& ndScene::GetActiveBodyArray() const
-{
-	return m_bodyList.GetView();
-}
-
-inline ndFloat32 ndScene::GetTimestep() const
-{
-	return m_timestep;
-}
-
-inline void ndScene::SetTimestep(ndFloat32 timestep)
-{
-	m_timestep = timestep;
-}
-
-inline ndBodyKinematic* ndScene::GetSentinelBody() const
-{
-	return m_sentinelBody;
-}
 
 #endif

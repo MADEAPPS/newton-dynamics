@@ -163,6 +163,87 @@ ndScene::~ndScene()
 	ndFreeListAlloc::Flush();
 }
 
+void ndScene::PrepareCleanup()
+{
+}
+
+bool ndScene::IsValid() const
+{
+	return true;
+}
+
+bool ndScene::IsHighPerformanceCompute() const
+{
+	return false;
+}
+
+ndWorld* ndScene::GetWorld() const
+{
+	return nullptr;
+}
+
+ndInt32 ndScene::GetThreadCount() const
+{
+	const ndThreadPool& pool = *this;
+	return pool.GetThreadCount();
+}
+
+ndArray<ndUnsigned8>& ndScene::GetScratchBuffer()
+{
+	return m_scratchBuffer;
+}
+
+const ndBodyList& ndScene::GetParticleList() const
+{
+	return m_particleSetList;
+}
+
+const ndBodyListView& ndScene::GetBodyList() const
+{
+	return m_bodyList;
+}
+
+ndArray<ndConstraint*>& ndScene::GetActiveContactArray()
+{
+	return m_activeConstraintArray;
+}
+
+const ndContactArray& ndScene::GetContactArray() const
+{
+	return m_contactArray;
+}
+
+const ndArray<ndConstraint*>& ndScene::GetActiveContactArray() const
+{
+	return m_activeConstraintArray;
+}
+
+ndArray<ndBodyKinematic*>& ndScene::GetActiveBodyArray()
+{
+	return m_bodyList.GetView();
+}
+
+const ndArray<ndBodyKinematic*>& ndScene::GetActiveBodyArray() const
+{
+	return m_bodyList.GetView();
+}
+
+ndFloat32 ndScene::GetTimestep() const
+{
+	return m_timestep;
+}
+
+void ndScene::SetTimestep(ndFloat32 timestep)
+{
+	m_timestep = timestep;
+}
+
+ndBodyKinematic* ndScene::GetSentinelBody() const
+{
+	return m_sentinelBody;
+}
+
+
 void ndScene::Sync()
 {
 	ndThreadPool::Sync();
