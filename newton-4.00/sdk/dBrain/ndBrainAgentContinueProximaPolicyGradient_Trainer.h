@@ -23,13 +23,14 @@
 #define _ND_AGENT_CONTINUE_PROXIMA_POLICY_GRADIENT_TRAINER_H__
 
 #include "ndBrainStdafx.h"
-#include "ndBrain.h"
-#include "ndBrainAgent.h"
-#include "ndBrainThreadPool.h"
-#include "ndBrainLayerActivationRelu.h"
-#include "ndBrainLayerActivationTanh.h"
-#include "ndBrainLossLeastSquaredError.h"
-#include "ndBrainLayerActivationSigmoidLinear.h"
+#include "ndBrainAgentContinuePolicyGradient_Trainer.h"
+//#include "ndBrain.h"
+//#include "ndBrainAgent.h"
+//#include "ndBrainThreadPool.h"
+//#include "ndBrainLayerActivationRelu.h"
+//#include "ndBrainLayerActivationTanh.h"
+//#include "ndBrainLossLeastSquaredError.h"
+//#include "ndBrainLayerActivationSigmoidLinear.h"
 
 // This is an implementation of the proxima policy Gradient as described in:
 // https://spinningup.openai.com/en/latest/algorithms/ppo.html
@@ -39,189 +40,20 @@
 // I have a huge misunderstanding of this algorithm.
 // no matter what I do I can't get it to work at all, in fact it is the worst trainer so far. 
 
-class ndBrainOptimizerAdam;
-class ndBrainAgentContinueProximaPolicyGradient_TrainerMaster;
 
-class ndBrainAgentContinueProximaPolicyGradient_Trainer : public ndBrainAgent
+class ndBrainAgentContinueProximaPolicyGradient_TrainerMaster : public ndBrainAgentContinuePolicyGradient_TrainerMaster
 {
-	class ndTrajectoryStep : protected ndBrainVector
-	{
-		public:
-		ndTrajectoryStep(ndInt32 actionsSize, ndInt32 obsevationsSize);
-
-		ndInt32 GetCount() const;
-		void SetCount(ndInt32 count);
-
-		ndBrainFloat GetReward(ndInt32 entry) const;
-		void SetReward(ndInt32 entry, ndBrainFloat reward);
-
-		bool GetTerminalState(ndInt32 entry) const;
-		void SetTerminalState(ndInt32 entry, bool isTernimal);
-
-		ndBrainFloat GetAdvantage(ndInt32 entry) const;
-		void SetAdvantage(ndInt32 entry, ndBrainFloat advantage);
-
-		void Clear(ndInt32 entry);
-		ndBrainFloat* GetActions(ndInt32 entry);
-		const ndBrainFloat* GetActions(ndInt32 entry) const;
-
-		ndBrainFloat* GetObservations(ndInt32 entry);
-		const ndBrainFloat* GetObservations(ndInt32 entry) const;
-
-		ndBrainFloat* GetProbabilityDistribution(ndInt32 entry);
-		const ndBrainFloat* GetProbabilityDistribution(ndInt32 entry) const;
-
-		ndInt64 m_actionsSize;
-		ndInt64 m_obsevationsSize;
-	};
-
-	class ndRandomGenerator
-	{
-		public:
-		ndRandomGenerator()
-			:m_gen()
-			,m_rd()
-			,m_d(ndFloat32(0.0f), ndFloat32(1.0f))
-		{
-		}
-
-		std::mt19937 m_gen;
-		std::random_device m_rd;
-		std::normal_distribution<ndFloat32> m_d;
-	};
-
 	public:
-	ndBrainAgentContinueProximaPolicyGradient_Trainer(const ndSharedPtr<ndBrainAgentContinueProximaPolicyGradient_TrainerMaster>& master);
-	~ndBrainAgentContinueProximaPolicyGradient_Trainer();
-
-	ndBrain* GetActor();
-	void SelectAction(ndBrainVector& actions) const;
-
-	void InitWeights() { ndAssert(0); }
-	virtual void OptimizeStep() { ndAssert(0); }
-	void Save(ndBrainSave* const) { ndAssert(0); }
-	bool IsTrainer() const { ndAssert(0); return true; }
-	void InitWeights(ndBrainFloat, ndBrainFloat) { ndAssert(0); }
-
-	virtual void Step();
-	virtual void SaveTrajectory();
-	virtual bool IsTerminal() const;
-	ndInt32 GetEpisodeFrames() const;
-
-	ndBrainVector m_workingBuffer;
-	ndTrajectoryStep m_trajectory;
-	ndSharedPtr<ndBrainAgentContinueProximaPolicyGradient_TrainerMaster> m_master;
-	ndRandomGenerator* m_randomGenerator;
-
-	friend class ndBrainAgentContinueProximaPolicyGradient_TrainerMaster;
-};
-
-class ndBrainAgentContinueProximaPolicyGradient_TrainerMaster : public ndBrainThreadPool
-{
-	class ndPolicyGradientActivation;
-	public:
-	class HyperParameters
-	{
-		public:
-		HyperParameters();
-
-		ndBrainFloat m_policyLearnRate;
-		ndBrainFloat m_criticLearnRate;
-		ndBrainFloat m_regularizer;
-		ndBrainFloat m_discountFactor;
-
-		ndInt32 m_threadsCount;
-		ndInt32 m_numberOfActions;
-		ndInt32 m_numberOfObservations;
-
-		ndInt32 m_numberOfLayers;
-		ndInt32 m_bashBufferSize;
-		ndInt32 m_neuronPerLayers;
-		ndInt32 m_maxTrajectorySteps;
-		ndInt32 m_bashTrajectoryCount;
-		ndInt32 m_extraTrajectorySteps;
-		ndUnsigned32 m_randomSeed;
-	};
-
-	class MemoryStateValues: protected ndBrainVector
-	{
-		public:
-		MemoryStateValues(ndInt32 obsevationsSize);
-		ndBrainFloat GetReward(ndInt32 index) const;
-		const ndBrainFloat* GetObservations(ndInt32 index) const;
-		void SaveTransition(ndInt32 index, ndBrainFloat reward, const ndBrainFloat* const observations);
-
-		ndInt32 m_obsevationsSize;
-	};
-
 	ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(const HyperParameters& hyperParameters);
 	virtual ~ndBrainAgentContinueProximaPolicyGradient_TrainerMaster();
 
-	ndBrain* GetValueNetwork();
-	ndBrain* GetPolicyNetwork();
-
-	const ndString& GetName() const;
-	void SetName(const ndString& name);
-
-	ndUnsigned32 GetFramesCount() const;
-	ndUnsigned32 GetEposideCount() const;
-
-	bool IsSampling() const;
-	ndFloat32 GetAverageScore() const;
-	ndFloat32 GetAverageFrames() const;
-
-	void OptimizeStep();
-
+	virtual void Optimize();
 	private:
-	void Optimize();
-	void OptimizePolicy();
-	void OptimizeCritic();
-	void NormalizePolicy();
-	void NormalizeCritic();
-	void UpdateBaseLineValue();
 	void OptimizePolicyPPOstep();
 	ndBrainFloat CalculateKLdivergence();
-	ndBrainAgentContinueProximaPolicyGradient_Trainer::ndRandomGenerator* GetRandomGenerator();
-
-	ndBrain m_policy;
-	ndBrain m_critic;
+	
 	ndBrain m_oldPolicy;
 	ndBrain m_tempPolicy;
-
-	ndArray<ndBrainTrainer*> m_criticTrainers;
-	ndArray<ndBrainTrainer*> m_policyTrainers;
-	ndArray<ndBrainTrainer*> m_policyWeightedTrainer;
-	ndArray<ndBrainTrainer*> m_policyAuxiliaryTrainers;
-
-	ndBrainOptimizerAdam* m_criticOptimizer;
-	ndBrainOptimizerAdam* m_policyOptimizer;
-
-	ndArray<ndInt32> m_randomPermutation;
-	ndBrainAgentContinueProximaPolicyGradient_Trainer::ndRandomGenerator* m_randomGenerator;
-	ndBrainAgentContinueProximaPolicyGradient_Trainer::ndTrajectoryStep m_trajectoryAccumulator;
-	
-	ndBrainFloat m_gamma;
-	ndBrainFloat m_policyLearnRate;
-	ndBrainFloat m_criticLearnRate;
-	ndInt32 m_numberOfActions;
-	ndInt32 m_numberOfObservations;
-	ndInt32 m_framesAlive;
-	ndUnsigned32 m_frameCount;
-	ndUnsigned32 m_eposideCount;
-	ndInt32 m_bashBufferSize;
-	ndInt32 m_maxTrajectorySteps;
-	ndInt32 m_extraTrajectorySteps;
-	ndInt32 m_bashTrajectoryIndex;
-	ndInt32 m_bashTrajectoryCount;
-	ndInt32 m_bashTrajectorySteps;
-	ndInt32 m_baseValueWorkingBufferSize;
-	ndUnsigned32 m_randomSeed;
-	ndBrainVector m_workingBuffer;
-	ndMovingAverage<8> m_averageScore;
-	ndMovingAverage<8> m_averageFramesPerEpisodes;
-	ndString m_name;
-	ndList<ndBrainAgentContinueProximaPolicyGradient_Trainer*> m_agents;
-	friend class ndBrainAgentContinueProximaPolicyGradient_Trainer;
 };
 
 #endif 

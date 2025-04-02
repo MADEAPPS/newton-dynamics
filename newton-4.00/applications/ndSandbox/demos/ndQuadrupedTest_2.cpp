@@ -1270,7 +1270,7 @@ namespace ndQuadruped_2
 				}
 			}
 
-			if ((stopTraining >= m_stopTraining) || (100.0f * m_master->GetAverageScore() / m_horizon > 96.0f))
+			if ((stopTraining >= m_stopTraining) || (100.0f * m_master->GetAverageScore() / m_horizon > 95.0f))
 			{
 				char fileName[1024];
 				m_modelIsTrained = true;
@@ -1941,7 +1941,7 @@ namespace ndQuadruped_2
 				}
 			}
 
-			if ((stopTraining >= m_stopTraining) || (100.0f * m_master->GetAverageScore() / m_horizon > 98.0f))
+			if ((stopTraining >= m_stopTraining) || (100.0f * m_master->GetAverageScore() / m_horizon > 95.0f))
 			{
 				char fileName[1024];
 				m_modelIsTrained = true;

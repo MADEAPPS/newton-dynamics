@@ -167,8 +167,8 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 
 	void OptimizeStep();
 
-	private:
-	void Optimize();
+	protected:
+	virtual void Optimize();
 	void OptimizePolicy();
 	void OptimizeCritic();
 	void NormalizePolicy();
