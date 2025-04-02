@@ -115,6 +115,7 @@ class ndContact: public ndConstraint
 	
 	private:
 	virtual void ClearMemory();
+	void ClearSeparatingDistance();
 	void SetBodies(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
 	void CalculatePointDerivative(ndInt32 index, ndConstraintDescritor& desc, const ndVector& dir, const ndPointParam& param) const;
 	void JacobianContactDerivative(ndConstraintDescritor& desc, const ndContactMaterial& contact, ndInt32 normalIndex, ndInt32& frictionIndex);

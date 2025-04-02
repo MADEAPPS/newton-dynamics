@@ -723,6 +723,14 @@ void ndBodyKinematic::SetMatrixUpdateScene(const ndMatrix& matrix)
 	{
 		ndUnsigned8 sceneEquilibrium = 1;
 		ndUnsigned8 sceneForceUpdate = m_sceneForceUpdate;
+
+		ndContactMap::Iterator it(GetContactMap());
+		for (it.Begin(); it; it++)
+		{
+			ndContact* const contact = it.GetNode()->GetInfo();
+			contact->ClearSeparatingDistance();
+		}
+
 		if (ndUnsigned8(!m_equilibrium) | sceneForceUpdate)
 		{
 			ndBvhLeafNode* const bodyNode = scene->m_bvhSceneManager.GetLeafNode(this);

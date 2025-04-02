@@ -106,6 +106,11 @@ void ndContact::SetBodies(ndBodyKinematic* const body0, ndBodyKinematic* const b
 	ndAssert(m_body0->GetInvMass() > ndFloat32(0.0f));
 }
 
+void ndContact::ClearSeparatingDistance()
+{
+	m_separationDistance = 0;
+}
+
 void ndContact::ClearMemory()
 {
 	ndContactPointList& contacts = GetContactPoints();
