@@ -958,6 +958,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeStep()
 	{
 		ndBrainAgentContinuePolicyGradient_Trainer* const agent = node->GetInfo();
 
+		ndAssert(agent->m_trajectory.GetCount());
 		bool isTeminal = agent->m_trajectory.GetTerminalState(agent->m_trajectory.GetCount() - 1);
 		isTeminal = isTeminal || (agent->m_trajectory.GetCount() >= (m_extraTrajectorySteps + m_maxTrajectorySteps));
 		if (isTeminal)

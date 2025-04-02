@@ -182,10 +182,6 @@ namespace ndQuadruped_1
 				keyFrame.m_userData = &leg;
 				m_animPose.PushBack(keyFrame);
 				poseGenerator->AddTrack();
-				//poseGenerator->m_phase[i] = phase[i];
-				//poseGenerator->m_offset[i].m_x = offset_x[i];
-				//poseGenerator->m_offset[i].m_y = offset_y[i];
-				//poseGenerator->m_offset[i].m_z = offset_z[i];
 			}
 			
 			//for (ndModelArticulation::ndNode* node = robot->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
@@ -197,37 +193,16 @@ namespace ndQuadruped_1
 		//RobotModelNotify(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot, bool showDebug)
 		RobotModelNotify(ndModelArticulation* const robot)
 			:ndModelNotify()
-			//, m_invDynamicsSolver()
-			//, m_controller(nullptr)
-			//, m_controllerTrainer(nullptr)
-			//, m_world(nullptr)
-			//, m_timestep(ndFloat32(0.0f))
-			//, m_modelAlive(true)
-			//, m_showDebug(showDebug)
 		{
 			SetModel(robot);
-			//m_controllerTrainer = new ndControllerTrainer(master);
-			//m_controllerTrainer->m_robot = this;
 		}
 
 		void PostUpdate(ndFloat32)
 		{
-			//ndFloat32 animSpeed = 2.0f * m_control->m_animSpeed;
-			//m_animBlendTree->Update(timestep * animSpeed);
 		}
 
 		void PostTransformUpdate(ndFloat32)
 		{
-		}
-
-		virtual void Debug(ndConstraintDebugCallback& context) const
-		{
-			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
-			for (ndList<ndModelArticulation::ndNode>::ndNode* effectorNode = model->GetCloseLoops().GetFirst(); effectorNode; effectorNode = effectorNode->GetNext())
-			{
-				ndModelArticulation::ndNode* const node = &effectorNode->GetInfo();
-				node->m_joint->DebugJoint(context);
-			}
 		}
 
 		void Update(ndFloat32 timestep)
@@ -254,6 +229,16 @@ namespace ndQuadruped_1
 				
 				effector->SetSwivelAngle(swivelAngle);
 				effector->SetLocalTargetPosition(posit);
+			}
+		}
+
+		virtual void Debug(ndConstraintDebugCallback& context) const
+		{
+			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
+			for (ndList<ndModelArticulation::ndNode>::ndNode* effectorNode = model->GetCloseLoops().GetFirst(); effectorNode; effectorNode = effectorNode->GetNext())
+			{
+				ndModelArticulation::ndNode* const node = &effectorNode->GetInfo();
+				node->m_joint->DebugJoint(context);
 			}
 		}
 
