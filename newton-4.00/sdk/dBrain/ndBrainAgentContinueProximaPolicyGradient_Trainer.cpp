@@ -553,15 +553,13 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizePolicyPPOs
 						const ndBrainFloat mean = probabilityDistribution[i];
 						const ndBrainFloat sigma1 = probabilityDistribution[i + numberOfActions];
 						const ndBrainFloat sigma2 = sigma1 * sigma1;
-						const ndBrainFloat sigma3 = sigma2 * sigma1;
-						const ndBrainFloat num = (sampledProbability[i] - mean);
+						const ndBrainFloat num = sampledProbability[i] - mean;
 
-						// this was a huge bug, it is gradient ascend
-						ndBrainFloat meanGradient = -num / sigma2;
-						ndBrainFloat sigmaGradient = num * num / sigma3 - ndBrainFloat(1.0f) / sigma1;
+						ndBrainFloat meanGradient = num / sigma1;
+						ndBrainFloat sigmaGradient = ndBrainFloat(0.5f) * (num * num / sigma2 - ndBrainFloat(1.0f) / sigma1);
 
-						loss[i] = -meanGradient * advantage;
-						loss[i + numberOfActions] = -sigmaGradient * advantage;
+						loss[i] = meanGradient * advantage;
+						loss[i + numberOfActions] = sigmaGradient * advantage;
 					}
 				}
 
