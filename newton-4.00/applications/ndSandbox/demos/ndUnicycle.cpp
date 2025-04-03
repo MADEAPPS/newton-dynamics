@@ -693,18 +693,18 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 #else
 	ndWorld* const world = scene->GetWorld();
 	
-	ndModelArticulation* model = CreateModel(scene, matrix);
+	ndSharedPtr<ndModel> model (CreateModel(scene, matrix, modelMesh));
 	world->AddModel(model);
 	model->AddBodiesAndJointsToWorld();
 
-	ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
+	ndBodyKinematic* const rootBody = model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic();
 	ndSharedPtr<ndJointBilateralConstraint> planeJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
 	world->AddJoint(planeJoint);
 
 	char fileName[256];
 	ndGetWorkingFileName(CONTROLLER_NAME, fileName);
 	ndSharedPtr<ndBrain> policy(ndBrainLoad::Load(fileName));
-	model->SetNotifyCallback(new RobotModelNotify(policy, model));
+	model->SetNotifyCallback(new RobotModelNotify(policy, model->GetAsModelArticulation()));
 #endif
 	
 	matrix.m_posit.m_x -= 0.0f;
