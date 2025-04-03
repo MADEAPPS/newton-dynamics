@@ -44,9 +44,9 @@ namespace ndUnicycle
 		m_topBoxAngle,
 		m_topBoxOmega,
 		m_jointAngle,
-		m_wheelOmega,
-		m_isOnAir,
-		m_speed,
+		m_jointOmega,
+		//m_wheelOmega,
+		//m_speed,
 		m_stateSize
 	};
 
@@ -280,6 +280,7 @@ namespace ndUnicycle
 			return matrix.m_up.m_x;
 		}
 
+		#pragma optimize( "", off )
 		bool IsTerminal() const
 		{
 			#define D_REWARD_MIN_ANGLE	(ndFloat32 (20.0f) * ndDegreeToRad)
@@ -307,7 +308,7 @@ namespace ndUnicycle
 				return ndBrainFloat (-1.0f);
 			}
 
-			ndFloat32 legReward = ndReal(ndExp(-ndFloat32(5000.0f) * m_legJoint->GetAngle() * m_legJoint->GetAngle()));
+			//ndFloat32 legReward = ndReal(ndExp(-ndFloat32(5000.0f) * m_legJoint->GetAngle() * m_legJoint->GetAngle()));
 			//if (HasSupportContact())
 			{
 				ndModelArticulation* const model = (ndModelArticulation*)GetModel();
@@ -316,8 +317,9 @@ namespace ndUnicycle
 				const ndVector boxVeloc(boxBody->GetVelocity());
 				const ndFloat32 sinAngle = GetAngle();
 				const ndFloat32 boxReward = ndReal(ndExp(-ndFloat32(2000.0f) * sinAngle * sinAngle));
-				const ndFloat32 speedReward = ndReal(ndExp(-ndFloat32(1.0f) * boxVeloc.m_x * boxVeloc.m_x));
-				const ndFloat32 reward = 0.2f * speedReward + 0.5f * boxReward + 0.3f * legReward;
+				//const ndFloat32 speedReward = ndReal(ndExp(-ndFloat32(1.0f) * boxVeloc.m_x * boxVeloc.m_x));
+				//const ndFloat32 reward = 0.2f * speedReward + 0.5f * boxReward + 0.3f * legReward;
+				const ndFloat32 reward = boxReward;
 				return ndReal(reward);
 			}
 			//else
@@ -381,12 +383,13 @@ namespace ndUnicycle
 			const ndFloat32 sinAngle = ndClamp(GetAngle(), ndFloat32(-0.9f), ndFloat32(0.9f));
 			const ndFloat32 angle = ndAsin(sinAngle);
 
-			observation[m_speed] = ndBrainFloat(veloc.m_x);
+			//observation[m_speed] = ndBrainFloat(veloc.m_x);
 			observation[m_topBoxAngle] = ndBrainFloat(angle);
 			observation[m_topBoxOmega] = ndBrainFloat(omega.m_z);
-			observation[m_wheelOmega] = ndBrainFloat(wheelOmega.m_z);
-			observation[m_isOnAir] = HasSupportContact() ? ndBrainFloat(0.0f) : ndBrainFloat(1.0f);
+			//observation[m_wheelOmega] = ndBrainFloat(wheelOmega.m_z);
+			//observation[m_isOnAir] = HasSupportContact() ? ndBrainFloat(0.0f) : ndBrainFloat(1.0f);
 			observation[m_jointAngle] = ndBrainFloat(m_legJoint->GetAngle() / ND_MAX_LEG_JOINT_ANGLE);
+			observation[m_jointOmega] = ndBrainFloat(m_legJoint->GetOmega() / ND_MAX_LEG_JOINT_ANGLE);
 		}
 
 		void TelePort() const
