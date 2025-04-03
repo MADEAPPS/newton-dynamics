@@ -121,7 +121,8 @@ void ndBrainLayerActivationLinear::MakePrediction(const ndBrainVector& input, nd
 	ndAssert(m_slopes.GetCount() == m_biases.GetCount());
 
 	output.Set(input);
-	output.MulAdd(m_slopes, m_biases);
+	output.Mul(m_slopes);
+	output.Add(m_biases);
 }
 
 void ndBrainLayerActivationLinear::InputDerivative(const ndBrainVector&, const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const

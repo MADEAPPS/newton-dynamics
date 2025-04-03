@@ -29,7 +29,9 @@
 
 #define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 128)
 #define ND_CONTINUE_POLICY_STATE_VALUE_ITERATIONS	10
-#define ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA		ndBrainFloat(1.0e-1f)
+
+#define ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA_BIAS	ndBrainFloat(1.0e-1f)
+#define ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA_SLOPE	ndBrainFloat(1.0f)
 
 //*********************************************************************************************
 //
@@ -393,14 +395,13 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 
 	ndBrainVector activationBiases;
 	ndBrainVector activationSlopes;
-	ndBrainFloat sigmanSlope = ndBrainFloat(0.5f);
 	for (ndInt32 i = 0; i < m_numberOfActions; ++i)
 	{
 		activationSlopes.PushBack(ndBrainFloat(1.0f));
 	}
 	for (ndInt32 i = 0; i < m_numberOfActions; ++i)
 	{
-		activationSlopes.PushBack(sigmanSlope);
+		activationSlopes.PushBack(ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA_SLOPE);
 	}
 
 	for (ndInt32 i = 0; i < m_numberOfActions; ++i)
@@ -409,7 +410,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 	}
 	for (ndInt32 i = 0; i < m_numberOfActions; ++i)
 	{
-		activationBiases.PushBack(sigmanSlope + ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA);
+		activationBiases.PushBack(ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA_SLOPE + ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA_BIAS);
 	}
 	layers.PushBack(new ndBrainLayerActivationLinear(activationSlopes, activationBiases));
 
@@ -558,7 +559,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizePolicy()
 			optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));
 
 			//ndBrainLayerActivationLinear* const lastLayer = (ndBrainLayerActivationLinear*)m_brain[m_brain.GetCount() - 1];
-			ndBrainFloat sigma = ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA;
+			ndBrainFloat sigma = ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA_BIAS;
 			input.Set(0.0f);
 			const ndInt32 base = ndInt32 (groundTruth.GetCount()) / 2;
 			for (ndInt32 i = base - 1; i >= 0; --i)
@@ -654,10 +655,10 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizeCritic()
 				ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 				optimizer.Update(this, m_partialGradients, m_learnRate);
 			}
-			ndBrainFloat* const outMemory1 = ndAlloca(ndBrainFloat, m_brain.GetOutputSize());
-			ndBrainMemVector output1(outMemory1, m_brain.GetOutputSize());
-			m_brain.MakePrediction(input, output1);
-			m_brain.MakePrediction(input, output1);
+			//ndBrainFloat* const outMemory1 = ndAlloca(ndBrainFloat, m_brain.GetOutputSize());
+			//ndBrainMemVector output1(outMemory1, m_brain.GetOutputSize());
+			//m_brain.MakePrediction(input, output1);
+			//m_brain.MakePrediction(input, output1);
 		}
 
 		ndBrain& m_brain;
