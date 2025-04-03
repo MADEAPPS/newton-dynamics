@@ -75,24 +75,6 @@ namespace ndQuadruped_2
 		m_stateSize
 	};
 
-	//class ndLegObservation
-	//{
-	//	public:
-	//	ndBrainFloat m_state[2 * 5];
-	//	ndBrainFloat m_hasContact;
-	//	ndBrainFloat m_animSequence;
-	//};
-
-	//#define ND_AGENT_OUTPUT_SIZE	(sizeof (ndActionVector) / sizeof (ndBrainFloat))
-	//#define ND_AGENT_INPUT_SIZE		(sizeof (ndObservationVector) / sizeof (ndBrainFloat))
-
-	//#define D_MAX_SWING_DIST_X		ndReal(0.10f)
-	//#define D_MAX_SWING_DIST_Z		ndReal(0.15f)
-	//#define D_POSE_REST_POSITION_Y	ndReal(-0.3f)
-	//#define D_SWING_STEP			ndReal(0.01f)
-	//#define D_SWING_STEP			ndReal(0.005f)
-	//#define D_MODEL_DEAD_ANGLE		ndReal(0.2f)
-	//#define D_MIN_TRAIN_ANIM_SPEED	ndReal(0.1f)
 
 #if 0
 	class RobotModelNotify : public ndModelNotify
@@ -196,23 +178,6 @@ namespace ndQuadruped_2
 			void ResetModel()
 			{
 				m_robot->ResetModel();
-			}
-
-			void SaveTrajectory()
-			{
-				//ndInt32 stepsCount = 0;
-				//// if the model is dead, just skip this trajectory, not need to train on a dead model.
-				//for (ndInt32 i = 0; i < m_trajectory.GetCount(); ++i)
-				//{
-				//	if (m_trajectory.GetReward(i) > ndReal(0.05f))
-				//	{
-				//		// model is alive, break loop.
-				//		stepsCount = m_trajectory.GetCount();
-				//		break;
-				//	}
-				//}
-				//m_trajectory.SetCount(stepsCount);
-				ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory();
 			}
 
 			ndFixSizeArray<ndBasePose, 32> m_basePose;
@@ -419,14 +384,6 @@ namespace ndQuadruped_2
 			//Init(robot);
 			ndAssert(0);
 		}
-
-		//RobotModelNotify(const RobotModelNotify& src)
-		//	:ndModelNotify(src)
-		//	,m_controller(src.m_controller)
-		//{
-		//	//Init(robot);
-		//	ndAssert(0);
-		//}
 
 		~RobotModelNotify()
 		{
@@ -1414,8 +1371,9 @@ namespace ndQuadruped_2
 
 			void ResetModel()
 			{
-				ndAssert(0);
-				//m_robot->ResetModel();
+				m_robot->ResetModel();
+				m_animBlendTree->SetTime(0.0f);
+				m_animBlendTree->SetTime(0.0f);
 			}
 
 			void InitAnimation()
@@ -1550,6 +1508,40 @@ namespace ndQuadruped_2
 				observations[i * size + 1] = kinematicState[1].m_posit;
 				observations[i * size + 2] = kinematicState[2].m_posit;
 			}
+		}
+
+		void ResetModel()
+		{
+			//m_modelAlive = true;
+			//m_control->Reset();
+			//m_control->m_animSpeed = ndReal(D_MIN_TRAIN_ANIM_SPEED + (1.0f - D_MIN_TRAIN_ANIM_SPEED) * ndRand());
+			//ndMemSet(m_controllerTrainer->m_rewardsMemories, ndReal(1.0), sizeof(m_controllerTrainer->m_rewardsMemories) / sizeof(m_controllerTrainer->m_rewardsMemories[0]));
+
+			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
+			model->ClearMemory();
+
+			//const ndMatrix matrix(model->GetRoot()->m_body->GetMatrix());
+			//const ndVector& up = matrix.m_up;
+			//bool state = up.m_y < D_MODEL_DEAD_ANGLE;
+			//state = state || (matrix.m_posit.m_x > 20.0f);
+			//state = state || (matrix.m_posit.m_x < -20.0f);
+			//state = state || (matrix.m_posit.m_z > 20.0f);
+			//state = state || (matrix.m_posit.m_z < -20.0f);
+			//if (state)
+			//{
+			//	for (ndInt32 i = 0; i < m_controllerTrainer->m_basePose.GetCount(); i++)
+			//	{
+			//		m_controllerTrainer->m_basePose[i].SetPose();
+			//	}
+			//
+			//	ndFloat32 duration = m_poseGenerator->GetSequence()->GetDuration();
+			//
+			//	ndUnsigned32 index = ndRandInt() % 4;
+			//	m_animBlendTree->SetTime(0.25f * ndFloat32(index) * duration);
+			//}
+			//
+			//ndVector veloc;
+			//m_animBlendTree->Evaluate(m_animPose, veloc);
 		}
 
 		void ApplyActions(ndBrainFloat* const actions)
@@ -1772,36 +1764,40 @@ namespace ndQuadruped_2
 			m_master->SetName(CONTROLLER_NAME);
 
 			ndSharedPtr<ndModel>visualModel(CreateModel(scene, matrix, modelMesh, m_master));
+			SetMaterial(visualModel->GetAsModelArticulation());
 			world->AddModel(visualModel);
 			visualModel->AddBodiesAndJointsToWorld();
 
 			ndBodyKinematic* const rootBody = visualModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic();
 			ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(rootBody->GetMatrix(), rootBody, world->GetSentinelBody()));
-			world->AddJoint(fixJoint);
-
-			SetMaterial(visualModel->GetAsModelArticulation());
+			//world->AddJoint(fixJoint);
 
 			// add a hidden battery of model to generate trajectories in parallel
-			//const ndInt32 countX = 100;
-			const ndInt32 countX = 0;
-			for (ndInt32 i = 0; i < countX; ++i)
+
+			ndInt32 countX = 10;
+			ndInt32 countZ = 10;
+			//countX = 1;
+			//countZ = 1;
+			
+			// add a hidden battery of model to generate trajectories in parallel
+			for (ndInt32 i = 0; i < countZ; ++i)
 			{
-				ndMatrix location(matrix);
-				ndFloat32 step = 20.0f * (ndRand() - 0.5f);
-				location.m_posit.m_x += step;
+				for (ndInt32 j = 0; j < countX; ++j)
+				{
+					ndMatrix location(matrix);
+					location.m_posit.m_x += 20.0f * (ndRand() - 0.5f);
+					location.m_posit.m_z += 20.0f * (ndRand() - 0.5f);
 
-				ndSharedPtr<ndModel>model(CreateModel(scene, location, modelMesh, m_master));
-				ndBodyKinematic* const body = model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic();
-				ndSharedPtr<ndJointBilateralConstraint> planeJoint(new ndJointPlane(body->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), body, world->GetSentinelBody()));
-				world->AddJoint(planeJoint);
+					ndFloat32 step = 20.0f * (ndRand() - 0.5f);
+					location.m_posit.m_x += step;
 
-				model->SetNotifyCallback(new RobotModelNotify(m_master, model->GetAsModelArticulation()));
-				SetMaterial(model->GetAsModelArticulation());
+					ndSharedPtr<ndModel>model(CreateModel(scene, location, modelMesh, m_master));
+					SetMaterial(model->GetAsModelArticulation());
+					world->AddModel(model);
+					model->AddBodiesAndJointsToWorld();
 
-				world->AddModel(model);
-				model->AddBodiesAndJointsToWorld();
-
-				m_models.Append(model->GetAsModelArticulation());
+					m_models.Append(model->GetAsModelArticulation());
+				}
 			}
 
 			//scene->SetAcceleratedUpdate();
@@ -1977,10 +1973,8 @@ void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("quadrupeSpider.fbx", scene));
 
 	ndMatrix matrix(ndGetIdentityMatrix());
-	matrix.m_posit.m_y = 0.6f;
+	matrix.m_posit.m_y = 0.5f;
 
-	//matrix.m_posit.m_y += 5.0f;
-	matrix.m_posit.m_y = 1.0f;
 	#ifdef ND_TRAIN_MODEL
 		scene->RegisterPostUpdate(new TrainingUpdata(scene, matrix, modelMesh));
 	#else

@@ -218,6 +218,13 @@ ndVector ndIkSwivelPositionEffector::GetEffectorPosit() const
 	return posit;
 }
 
+void ndIkSwivelPositionEffector::ClearMemory()
+{
+	ndJointBilateralConstraint::ClearMemory();
+	m_swivelAngle = ndFloat32(0.0f);
+	SetLocalTargetPosition(m_restPosition);
+}
+
 ndInt32 ndIkSwivelPositionEffector::GetKinematicState(ndKinematicState* const state) const
 {
 	ndVector posit;
