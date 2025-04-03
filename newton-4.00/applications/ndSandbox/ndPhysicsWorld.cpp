@@ -200,15 +200,7 @@ void ndPhysicsWorld::PostUpdate(ndFloat32 timestep)
 	if (m_manager->m_onPostUpdate)
 	{
 		m_manager->m_onPostUpdate->Update(m_manager, timestep);
-	}
-
-	if (m_manager->m_hidePostUpdate ^ m_manager->m_hidePostUpdate0)
-	{
-		if (m_manager->m_onPostUpdate)
-		{
-			m_manager->m_onPostUpdate->OnDebug(m_manager, m_manager->m_hidePostUpdate);
-		}
-		m_manager->m_hidePostUpdate0 = m_manager->m_hidePostUpdate;
+		m_manager->m_onPostUpdate->OnDebug(m_manager, m_manager->m_hidePostUpdate);
 	}
 }
 

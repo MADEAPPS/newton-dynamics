@@ -483,8 +483,8 @@ namespace ndUnicycle
 			hyperParameters.m_numberOfObservations = m_stateSize;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 			
-			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
-			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
+			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
+			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
 			
 			m_master->SetName(CONTROLLER_NAME);
@@ -712,7 +712,7 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 	
 	matrix.m_posit.m_x -= 0.0f;
 	matrix.m_posit.m_y += 0.0f;
-	matrix.m_posit.m_z += 5.0f;
+	matrix.m_posit.m_z += 8.0f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
