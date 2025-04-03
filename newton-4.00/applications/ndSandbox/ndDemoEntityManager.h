@@ -276,8 +276,8 @@ class ndDemoEntityManager : public ndList <ndSharedPtr<ndDemoEntity>>
 	bool m_showJointDebugInfo;
 	bool m_showModelsDebugInfo;
 	bool m_showCollidingFaces;
-	bool m_showPostUpdate;
-	bool m_showPostUpdate0;
+	bool m_hidePostUpdate;
+	bool m_hidePostUpdate0;
 	bool m_suspendPhysicsUpdate;
 	bool m_synchronousPhysicsUpdate;
 	bool m_synchronousParticlesUpdate;

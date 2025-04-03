@@ -50,8 +50,8 @@
 //#define DEFAULT_SCENE	15		// basic player
 //#define DEFAULT_SCENE	16		// rag doll
 //#define DEFAULT_SCENE	17		// cart pole discrete controller
-//#define DEFAULT_SCENE	18		// cart pole continue controller
-#define DEFAULT_SCENE	19		// unit cycle controller
+#define DEFAULT_SCENE	18		// cart pole continue controller
+//#define DEFAULT_SCENE	19		// unit cycle controller
 //#define DEFAULT_SCENE	20		// simple industrial robot
 //#define DEFAULT_SCENE	21		// advanced industrial robot
 //#define DEFAULT_SCENE	22		// quadruped test 1
@@ -417,8 +417,8 @@ ndDemoEntityManager::ndDemoEntityManager()
 	,m_showJointDebugInfo(false)
 	,m_showModelsDebugInfo(false)
 	,m_showCollidingFaces(false)
-	,m_showPostUpdate(false)
-	,m_showPostUpdate0(false)
+	,m_hidePostUpdate(false)
+	,m_hidePostUpdate0(false)
 	,m_suspendPhysicsUpdate(false)
 	,m_synchronousPhysicsUpdate(false)
 	,m_synchronousParticlesUpdate(false)
@@ -556,11 +556,11 @@ ndDemoEntityManager::ndDemoEntityManager()
 	// initialized the physics world for the new scene
 	//m_showUI = false;
 	//m_showAABB = true;
-	//m_hideVisualMeshes = true;
 	//m_showScene = true;
 	//m_showConcaveEdge = true;
 	//m_showMeshSkeleton = true;
 	//m_autoSleepMode = false;
+	m_hidePostUpdate = true;
 	//m_hideVisualMeshes = true;
 	//m_solverMode = ndWorld::ndCudaSolver;
 	//m_solverMode = ndWorld::ndSimdSoaSolver;
@@ -1048,7 +1048,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("show aabb", &m_showAABB);
 			ImGui::Checkbox("show broad phase", &m_showScene);
 			ImGui::Checkbox("show concave edges", &m_showConcaveEdge);
-			ImGui::Checkbox("hide post update", &m_showPostUpdate);
+			ImGui::Checkbox("hide post update", &m_hidePostUpdate);
 			ImGui::Checkbox("hide visual meshes", &m_hideVisualMeshes);
 			ImGui::Checkbox("show mesh skeleton", &m_showMeshSkeleton);
 			ImGui::Checkbox("show contact points", &m_showContactPoints);
