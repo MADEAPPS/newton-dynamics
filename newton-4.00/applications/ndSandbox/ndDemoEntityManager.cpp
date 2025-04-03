@@ -50,14 +50,14 @@
 //#define DEFAULT_SCENE	15		// basic player
 //#define DEFAULT_SCENE	16		// rag doll
 //#define DEFAULT_SCENE	17		// cart pole discrete controller
-#define DEFAULT_SCENE	18		// cart pole continue controller
+//#define DEFAULT_SCENE	18		// cart pole continue controller
 //#define DEFAULT_SCENE	19		// unit cycle controller
-//#define DEFAULT_SCENE	20		// simple industrial robot
-//#define DEFAULT_SCENE	21		// advanced industrial robot
-//#define DEFAULT_SCENE	22		// quadruped test 1
-//#define DEFAULT_SCENE	23		// quadruped test 2
-//#define DEFAULT_SCENE	24		// quadruped test 3
-//#define DEFAULT_SCENE	25		// quadruped test 4
+//#define DEFAULT_SCENE	20		// quadruped test 1
+#define DEFAULT_SCENE	21		// quadruped test 2
+//#define DEFAULT_SCENE	22		// quadruped test 3
+//#define DEFAULT_SCENE	23		// quadruped test 4
+//#define DEFAULT_SCENE	24		// simple industrial robot
+//#define DEFAULT_SCENE	25		// advanced industrial robot
 //#define DEFAULT_SCENE	26		// biped test 1
 //#define DEFAULT_SCENE	27		// biped test 2
 //#define DEFAULT_SCENE	28		// train biped test 2
@@ -125,12 +125,12 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "cartpole discrete controller", ndCartpoleDiscrete },
 	{ "cartpole continue controller", ndCartpoleContinue },
 	{ "unicycle controller", ndUnicycleController },
-	{ "simple industrial robot", ndSimpleIndustrialRobot },
-	{ "advanced industrial robot", ndAdvancedIndustrialRobot },
 	{ "quadruped test 1", ndQuadrupedTest_1 },
 	{ "quadruped test 2", ndQuadrupedTest_2 },
 //	{ "quadruped test 3", ndQuadrupedTest_3},
 //	{ "quadruped test 4", ndQuadrupedTest_4},
+	{ "simple industrial robot", ndSimpleIndustrialRobot },
+	{ "advanced industrial robot", ndAdvancedIndustrialRobot },
 //	{ "biped test one", ndBipedTest_1 },
 //	{ "biped test two", ndBipedTest_2 },
 //	{ "train biped test two", ndBipedTest_2Trainer },
@@ -573,7 +573,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//m_showNormalForces = true;
 	//m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
-	m_showModelsDebugInfo = true;
+	//m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 1;
 	//m_collisionDisplayMode = 2;	
 	//m_collisionDisplayMode = 3;		// solid wire frame

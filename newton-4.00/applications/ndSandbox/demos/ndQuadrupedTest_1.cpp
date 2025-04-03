@@ -25,6 +25,10 @@
 // this model just plays the animation by injecting the poses to the end effectors
 namespace ndQuadruped_1
 {
+	#define D_CYCLE_PERIOD		ndFloat32(4.0f)
+	#define D_CYCLE_STRIDE_X	ndFloat32(0.3f)
+	#define D_CYCLE_STRIDE_Z	ndFloat32(0.3f)
+	#define D_CYCLE_AMPLITUDE	ndFloat32(0.27f)
 	#define D_POSE_REST_POSITION_Y	ndReal(-0.3f)
 
 	class RobotModelNotify : public ndModelNotify
@@ -64,9 +68,9 @@ namespace ndQuadruped_1
 			public:
 			ndPoseGenerator()
 				:ndAnimationSequence()
-				,m_amp(0.27f)
-				,m_stride_x(0.3f)
-				,m_stride_z(0.3f)
+				,m_amp(D_CYCLE_AMPLITUDE)
+				,m_stride_x(D_CYCLE_STRIDE_X)
+				,m_stride_z(D_CYCLE_STRIDE_Z)
 			{
 				m_duration = ndFloat32(4.0f);
 				for (ndInt32 i = 0; i < 4; i++)
@@ -229,16 +233,30 @@ namespace ndQuadruped_1
 				
 				effector->SetSwivelAngle(swivelAngle);
 				effector->SetLocalTargetPosition(posit);
+
+				// calculate lookAt angle
+				ndMatrix lookAtMatrix0;
+				ndMatrix lookAtMatrix1;
+				ndJointHinge* const heelHinge = leg.m_heel;
+				heelHinge->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
+
+				ndMatrix upMatrix(ndGetIdentityMatrix());
+				upMatrix.m_front = lookAtMatrix0.m_front;
+				upMatrix.m_right = (upVector.CrossProduct(upMatrix.m_front) & ndVector::m_triplexMask).Normalize();
+				upMatrix.m_up = upMatrix.m_right.CrossProduct(upMatrix.m_front);
+				upMatrix = upMatrix * lookAtMatrix0.OrthoInverse();
+				const ndFloat32 angle = ndAtan2(upMatrix.m_up.m_z, upMatrix.m_up.m_y);
+				heelHinge->SetTargetAngle(angle);
 			}
 		}
 
 		virtual void Debug(ndConstraintDebugCallback& context) const
 		{
-			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
-			for (ndList<ndModelArticulation::ndNode>::ndNode* effectorNode = model->GetCloseLoops().GetFirst(); effectorNode; effectorNode = effectorNode->GetNext())
+			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
-				ndModelArticulation::ndNode* const node = &effectorNode->GetInfo();
-				node->m_joint->DebugJoint(context);
+				const ndEffectorInfo& leg = m_legs[i];
+				leg.m_heel->DebugJoint(context);
+				//leg.m_effector->DebugJoint(context);
 			}
 		}
 
@@ -291,7 +309,6 @@ namespace ndQuadruped_1
 			const ndMatrix thighMatrix(thighEntity->GetCurrentMatrix() * matrix);
 			ndSharedPtr<ndBody> thigh(CreateRigidBody(thighEntity, thighMatrix, limbMass, rootBody->GetAsBodyDynamic()));
 
-			//ndSharedPtr<ndJointBilateralConstraint> ballJoint(new ndIkJointSpherical(thighMatrix, thigh->GetAsBodyKinematic(), rootBody->GetAsBodyKinematic()));
 			ndSharedPtr<ndJointBilateralConstraint> ballJoint(new ndJointSpherical(thighMatrix, thigh->GetAsBodyKinematic(), rootBody->GetAsBodyKinematic()));
 			ndModelArticulation::ndNode* const thighNode = model->AddLimb(modelRootNode, thigh, ballJoint);
 
@@ -300,7 +317,6 @@ namespace ndQuadruped_1
 			const ndMatrix calfMatrix(calfEntity->GetCurrentMatrix() * thighMatrix);
 			ndSharedPtr<ndBody> calf(CreateRigidBody(calfEntity, calfMatrix, limbMass, thigh->GetAsBodyDynamic()));
 
-			//ndSharedPtr<ndJointBilateralConstraint> calfHinge(new ndIkJointHinge(calfMatrix, calf->GetAsBodyKinematic(), thigh->GetAsBodyKinematic()));
 			ndSharedPtr<ndJointBilateralConstraint> calfHinge(new ndJointHinge(calfMatrix, calf->GetAsBodyKinematic(), thigh->GetAsBodyKinematic()));
 			ndModelArticulation::ndNode* const calfNode = model->AddLimb(thighNode, calf, calfHinge);
 
@@ -386,7 +402,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	referenceModel->AddBodiesAndJointsToWorld();
 		
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-	//world->AddJoint(fixJoint);
+	world->AddJoint(fixJoint);
 	
 	matrix.m_posit.m_x -= 8.0f;
 	matrix.m_posit.m_y += 1.5f;
