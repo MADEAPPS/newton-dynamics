@@ -25,7 +25,7 @@
 
 namespace ndContinueCarpole
 {
-	//#define ND_TRAIN_AGENT
+	#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME			"cartpoleContinue"
 
 	//#define CONTROLLER_RESUME_TRAINING
@@ -374,6 +374,7 @@ namespace ndContinueCarpole
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 
 			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
+			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyProximaGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
 			m_bestActor = ndSharedPtr< ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
 
 			snprintf(name, sizeof(name), "%s.dnn", CONTROLLER_NAME);
