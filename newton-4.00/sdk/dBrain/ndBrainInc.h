@@ -47,6 +47,7 @@
 #include <ndBrainLayerActivationElu.h>
 #include <ndBrainLayerActivationRelu.h>
 #include <ndBrainLayerActivationTanh.h>
+#include <ndBrainLayerActivationLinear.h>
 #include <ndBrainLayerImagePolling_2x2.h>
 #include <ndBrainLayerConvolutional_2d.h>
 #include <ndBrainLossLeastSquaredError.h>

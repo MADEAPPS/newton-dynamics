@@ -113,7 +113,6 @@ class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
 
 class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPool
 {
-	class ndPolicyGradientActivation;
 	public:
 	class HyperParameters
 	{

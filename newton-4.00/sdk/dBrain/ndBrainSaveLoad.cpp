@@ -26,6 +26,7 @@
 #include "ndBrainLayerActivationElu.h"
 #include "ndBrainLayerActivationRelu.h"
 #include "ndBrainLayerActivationTanh.h"
+#include "ndBrainLayerActivationLinear.h"
 #include "ndBrainLayerImagePolling_2x2.h"
 #include "ndBrainLayerConvolutional_2d.h"
 #include "ndBrainLayerActivationSoftmax.h"
@@ -110,6 +111,10 @@ ndBrain* ndBrainLoad::Load() const
 		else if (!strcmp(layerType, "ndBrainLayerActivationRelu"))
 		{
 			layer = ndBrainLayerActivationRelu::Load(this);
+		}
+		else if (!strcmp(layerType, "ndBrainLayerActivationLinear"))
+		{
+			layer = ndBrainLayerActivationLinear::Load(this);
 		}
 		else if (!strcmp(layerType, "ndBrainLayerActivationTanh"))
 		{
