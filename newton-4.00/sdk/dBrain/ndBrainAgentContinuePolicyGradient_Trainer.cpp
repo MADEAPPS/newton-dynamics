@@ -393,19 +393,24 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 
 	ndBrainVector activationBiases;
 	ndBrainVector activationSlopes;
-	for (ndInt32 i = 0; i < m_numberOfActions * 2; ++i)
+	ndBrainFloat sigmanSlope = ndBrainFloat(0.5f);
+	for (ndInt32 i = 0; i < m_numberOfActions; ++i)
 	{
 		activationSlopes.PushBack(ndBrainFloat(1.0f));
 	}
+	for (ndInt32 i = 0; i < m_numberOfActions; ++i)
+	{
+		activationSlopes.PushBack(sigmanSlope);
+	}
+
 	for (ndInt32 i = 0; i < m_numberOfActions; ++i)
 	{
 		activationBiases.PushBack(ndBrainFloat(0.0f));
 	}
 	for (ndInt32 i = 0; i < m_numberOfActions; ++i)
 	{
-		activationBiases.PushBack(ndBrainFloat(1.0f) + ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA);
+		activationBiases.PushBack(sigmanSlope + ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA);
 	}
-	//layers.PushBack(new ndPolicyGradientActivation(m_numberOfActions * 2));
 	layers.PushBack(new ndBrainLayerActivationLinear(activationSlopes, activationBiases));
 
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
