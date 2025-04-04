@@ -37,6 +37,25 @@
 class ndBrainOptimizerAdam;
 class ndBrainAgentContinuePolicyGradient_TrainerMaster;
 
+
+class ndPolicyGradientActivation : public ndBrainLayerActivationTanh
+{
+	public:
+	ndPolicyGradientActivation(ndInt32 neurons);
+	ndPolicyGradientActivation(const ndPolicyGradientActivation& src);
+	ndBrainLayer* Clone() const;
+
+	virtual const char* GetLabelId() const override;
+	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
+	virtual void Save(const ndBrainSave* const loadSave) const override;
+
+	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const override;
+	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const override;
+
+	ndBrainFloat m_minimumSigma;
+};
+
+
 class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
 {
 	class ndTrajectoryStep : protected ndBrainVector

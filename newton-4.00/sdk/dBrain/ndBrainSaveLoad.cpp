@@ -33,9 +33,10 @@
 #include "ndBrainLayerActivationSigmoid.h"
 //#include "ndBrainLayerLinearWithDropOut.h"
 #include "ndBrainLayerCrossCorrelation_2d.h"
-//#include "ndBrainLayerConvolutionalWithDropOut_2d.h"
 #include "ndBrainLayerActivationSigmoidLinear.h"
 #include "ndBrainLayerActivationCategoricalSoftmax.h"
+#include "ndBrainAgentContinuePolicyGradient_Trainer.h"
+//#include "ndBrainLayerConvolutionalWithDropOut_2d.h"
 
 ndBrain* ndBrainLoad::Load(const char* const pathName)
 {
@@ -151,6 +152,10 @@ ndBrain* ndBrainLoad::Load() const
 		else if (!strcmp(layerType, "ndBrainLayerImagePolling_2x2"))
 		{
 			layer = ndBrainLayerImagePolling_2x2::Load(this);
+		}
+		else if (!strcmp(layerType, "ndPolicyGradientActivation"))
+		{
+			layer = ndPolicyGradientActivation::Load(this);
 		}
 		else
 		{
