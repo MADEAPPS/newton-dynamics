@@ -27,8 +27,8 @@
 #include "ndBrainLayerActivationLinear.h"
 #include "ndBrainAgentContinuePolicyGradient_Trainer.h"
 
-#define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 128)
-#define ND_CONTINUE_POLICY_STATE_VALUE_ITERATIONS	10
+#define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 64)
+#define ND_CONTINUE_POLICY_STATE_VALUE_ITERATIONS	5
 #define ND_CONTINUE_POLICY_GRADIENT_SIGMA_SCALE		ndBrainFloat(2.0f)
 
 //*********************************************************************************************
