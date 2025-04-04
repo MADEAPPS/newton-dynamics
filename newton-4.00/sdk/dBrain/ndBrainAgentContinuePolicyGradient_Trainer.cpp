@@ -777,19 +777,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 	});
 	ndBrainThreadPool::ParallelExecute(ClearGradients);
 
-	//m_randomPermutation.SetCount(m_trajectoryAccumulator.GetCount());
-	//for (ndInt32 i = ndInt32(m_randomPermutation.GetCount()) - 1; i >= 0; --i)
-	//{
-	//	m_randomPermutation[i] = i;
-	//}
-	//m_randomPermutation.RandomShuffle(m_randomPermutation.GetCount());
-	//ndInt32 steps = ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE;
-	//if (m_randomPermutation.GetCount() < steps)
-	//{
-	//	steps = ndInt32(m_randomPermutation.GetCount()) & -m_bashBufferSize;
-	//}
 	const ndInt32 steps = ndInt32(m_trajectoryAccumulator.GetCount() - 1) & -m_bashBufferSize;
-
 	for (ndInt32 base = 0; base < steps; base += m_bashBufferSize)
 	{
 		auto CalculateGradients = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
@@ -836,9 +824,9 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 			for (ndInt32 i = iterator++; i < m_bashBufferSize; i = iterator++)
 			{
 				ndBrainTrainer& trainer = *m_policyAuxiliaryTrainers[i];
-				MaxLikelihoodLoss loss(trainer, this, base + i);
 				//ndInt32 index = m_randomPermutation[base + i];
 				ndInt32 index = base + i;
+				MaxLikelihoodLoss loss(trainer, this, index);
 				const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(index), m_numberOfObservations);
 				trainer.BackPropagate(observation, loss);
 			}
