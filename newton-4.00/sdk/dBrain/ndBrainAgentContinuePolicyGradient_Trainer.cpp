@@ -30,9 +30,9 @@
 #define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 128)
 #define ND_CONTINUE_POLICY_STATE_VALUE_ITERATIONS	10
 
-#define ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA		ndBrainFloat(1.0e-1f)
-#define ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA_BIAS	ndBrainFloat(1.0e-2f)
-#define ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA_SLOPE	ndBrainFloat(1.0f)
+#define ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA		ndBrainFloat(1.0e-2f)
+//#define ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA_BIAS	ndBrainFloat(1.0e-2f)
+//#define ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA_SLOPE	ndBrainFloat(1.0f)
 
 //*********************************************************************************************
 //
@@ -103,9 +103,10 @@ const char* ndPolicyGradientActivation::GetLabelId() const
 void ndPolicyGradientActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndBrainLayerActivationTanh::MakePrediction(input, output);
-	for (ndInt32 j = m_neurons / 2 - 1; j >= 0; --j)
+	const ndInt32 base = m_neurons / 2;
+	for (ndInt32 j = base - 1; j >= 0; --j)
 	{
-		ndInt32 i = j + m_neurons / 2;
+		ndInt32 i = j + base;
 		output[i] = ndMax(input[i], m_minimumSigma);
 	}
 }
@@ -113,9 +114,10 @@ void ndPolicyGradientActivation::MakePrediction(const ndBrainVector& input, ndBr
 void ndPolicyGradientActivation::InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	ndBrainLayerActivationTanh::InputDerivative(input, output, outputDerivative, inputDerivative);
-	for (ndInt32 j = m_neurons / 2 - 1; j >= 0; --j)
+	const ndInt32 base = m_neurons / 2;
+	for (ndInt32 j = base - 1; j >= 0; --j)
 	{
-		ndInt32 i = j + m_neurons / 2;
+		ndInt32 i = j + base;
 		ndBrainFloat derivative = (input[i] >= ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
 		inputDerivative[i] = outputDerivative[i] * derivative;
 	}
@@ -627,7 +629,8 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizePolicy()
 			optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));
 
 			//ndBrainLayerActivationLinear* const lastLayer = (ndBrainLayerActivationLinear*)m_brain[m_brain.GetCount() - 1];
-			ndBrainFloat sigma = ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA_BIAS;
+			//ndBrainFloat sigma = ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA_BIAS;
+			ndBrainFloat sigma = ND_CONTINUE_POLICY_GRADIENT_MIN_SIGMA;
 			input.Set(0.0f);
 			const ndInt32 base = ndInt32 (groundTruth.GetCount()) / 2;
 			for (ndInt32 i = base - 1; i >= 0; --i)
