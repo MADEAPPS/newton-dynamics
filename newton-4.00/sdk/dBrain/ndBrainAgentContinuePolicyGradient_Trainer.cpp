@@ -763,7 +763,7 @@ ndFloat32 ndBrainAgentContinuePolicyGradient_TrainerMaster::GetAverageScore() co
 	return m_averageScore.GetAverage();
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 {
 	ndAtomic<ndInt32> iterator(0);
@@ -777,7 +777,19 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 	});
 	ndBrainThreadPool::ParallelExecute(ClearGradients);
 
-	const ndInt32 steps = ndInt32(m_trajectoryAccumulator.GetCount());
+	//m_randomPermutation.SetCount(m_trajectoryAccumulator.GetCount());
+	//for (ndInt32 i = ndInt32(m_randomPermutation.GetCount()) - 1; i >= 0; --i)
+	//{
+	//	m_randomPermutation[i] = i;
+	//}
+	//m_randomPermutation.RandomShuffle(m_randomPermutation.GetCount());
+	//ndInt32 steps = ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE;
+	//if (m_randomPermutation.GetCount() < steps)
+	//{
+	//	steps = ndInt32(m_randomPermutation.GetCount()) & -m_bashBufferSize;
+	//}
+	const ndInt32 steps = ndInt32(m_trajectoryAccumulator.GetCount() - 1) & -m_bashBufferSize;
+
 	for (ndInt32 base = 0; base < steps; base += m_bashBufferSize)
 	{
 		auto CalculateGradients = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
@@ -825,15 +837,10 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 			{
 				ndBrainTrainer& trainer = *m_policyAuxiliaryTrainers[i];
 				MaxLikelihoodLoss loss(trainer, this, base + i);
-				if ((base + i) < m_trajectoryAccumulator.GetCount())
-				{
-					const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(base + i), m_numberOfObservations);
-					trainer.BackPropagate(observation, loss);
-				}
-				else
-				{
-					trainer.ClearGradients();
-				}
+				//ndInt32 index = m_randomPermutation[base + i];
+				ndInt32 index = base + i;
+				const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(index), m_numberOfObservations);
+				trainer.BackPropagate(observation, loss);
 			}
 		});
 
@@ -854,7 +861,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 	}
 
 	m_policyOptimizer->AccumulateGradients(this, m_policyTrainers);
-	m_policyWeightedTrainer[0]->ScaleWeights(ndBrainFloat(1.0f) / ndBrainFloat(m_trajectoryAccumulator.GetCount()));
+	m_policyWeightedTrainer[0]->ScaleWeights(ndBrainFloat(1.0f) / ndBrainFloat(steps));
 	m_policyOptimizer->Update(this, m_policyWeightedTrainer, -m_policyLearnRate);
 }
 
