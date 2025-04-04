@@ -101,12 +101,17 @@ void ndBrainLayerActivationSoftmax::InputDerivative(const ndBrainVector&, const 
 	//}
 
 	// better way to calculate the output derivative which is a the Jacobian matrix time the input
-	// y = (O * I - O * transp(O)) * x
-	ndBrainFloat s = -outputDerivative.Dot(output);
-	inputDerivative.Set(output);
-	inputDerivative.Scale(s);
-	inputDerivative.MulAdd(output, outputDerivative);
+	// y = (O * I - O * transp(O)) * InputDerivative
 
+	ndAssert(0);
+	ndBrainFloat* const tempBuffer = ndAlloca(ndBrainFloat, output.GetCount());
+	ndBrainMemVector tmp(tempBuffer, output.GetCount());
+	for (ndInt32 i = 0; i < output.GetCount(); ++i)
+	{
+		tmp.ScaleSet(output, output[i]);
+		tmp[i] = output[i] - tmp[i];
+		inputDerivative[i] = outputDerivative.Dot(tmp);
+	}
 	inputDerivative.FlushToZero();
 }
 
