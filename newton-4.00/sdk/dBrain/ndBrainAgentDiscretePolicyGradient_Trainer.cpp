@@ -38,7 +38,7 @@
 ndBrainAgentDiscretePolicyGradient_TrainerMaster::HyperParameters::HyperParameters()
 {
 	m_randomSeed = 47;
-	m_numberOfLayers = 4;
+	m_numberOfLayers = 3;
 	m_bashBufferSize = 256;
 	m_neuronPerLayers = 64;
 	m_maxTrajectorySteps = 4096;
@@ -395,7 +395,7 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::ndBrainAgentDiscretePolicyGrad
 	layers.SetCount(0);
 	layers.PushBack(new ndBrainLayerLinear(m_numberOfObservations, hyperParameters.m_neuronPerLayers));
 	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
-	for (ndInt32 i = 1; i < hyperParameters.m_numberOfLayers; ++i)
+	for (ndInt32 i = 0; i < hyperParameters.m_numberOfLayers; ++i)
 	{
 		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == hyperParameters.m_neuronPerLayers);
 		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_neuronPerLayers, hyperParameters.m_neuronPerLayers));
@@ -430,12 +430,13 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::ndBrainAgentDiscretePolicyGrad
 	
 	// build state value critic neural net
 	layers.SetCount(0);
-	layers.PushBack(new ndBrainLayerLinear(m_numberOfObservations, hyperParameters.m_neuronPerLayers * 2));
+	ndInt32 criticNeurons = hyperParameters.m_neuronPerLayers * 1;
+	layers.PushBack(new ndBrainLayerLinear(m_numberOfObservations, criticNeurons));
 	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
-	for (ndInt32 i = 1; i < hyperParameters.m_numberOfLayers; ++i)
+	for (ndInt32 i = 0; i < hyperParameters.m_numberOfLayers; ++i)
 	{
-		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == hyperParameters.m_neuronPerLayers * 2);
-		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hyperParameters.m_neuronPerLayers * 2));
+		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == criticNeurons);
+		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), criticNeurons));
 		layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 	}
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));

@@ -38,7 +38,7 @@ class ndBrainOptimizerAdam;
 class ndBrainAgentContinuePolicyGradient_TrainerMaster;
 
 
-class ndPolicyGradientActivation : public ndBrainLayerActivationTanh
+class ndPolicyGradientActivation : public ndBrainLayerActivation
 {
 	public:
 	ndPolicyGradientActivation(ndInt32 neurons);
@@ -51,8 +51,6 @@ class ndPolicyGradientActivation : public ndBrainLayerActivationTanh
 
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const override;
 	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const override;
-
-	ndBrainFloat m_minimumSigma;
 };
 
 
