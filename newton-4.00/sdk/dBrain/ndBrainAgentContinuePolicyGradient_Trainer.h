@@ -25,6 +25,7 @@
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"
 #include "ndBrainAgent.h"
+#include "ndBrainTrainer.h"
 #include "ndBrainThreadPool.h"
 #include "ndBrainLayerActivationRelu.h"
 #include "ndBrainLayerActivationTanh.h"
