@@ -428,6 +428,12 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 	ndAssert(m_numberOfObservations);
 	ndSetRandSeed(m_randomSeed);
 
+	m_policyLearnRateStop = m_policyLearnRate * 0.1f;
+	m_policyLearnRateAnnealing = m_policyLearnRate * (m_policyLearnRate - m_policyLearnRateStop) / 300.0f;
+
+	m_criticLearnRateStop = m_criticLearnRate * 0.1f;
+	m_criticLearnRateAnnealing = m_criticLearnRate * (m_criticLearnRate - m_criticLearnRateStop) / 300.0f;
+
 	m_randomGenerator = new ndBrainAgentContinuePolicyGradient_Trainer::ndRandomGenerator[size_t(hyperParameters.m_bashTrajectoryCount)];
 	for (ndInt32 i = 0; i < hyperParameters.m_bashTrajectoryCount; ++i)
 	{
@@ -988,6 +994,18 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeStep()
 			ndBrainAgentContinuePolicyGradient_Trainer* const agent = node->GetInfo();
 			agent->m_trajectory.SetCount(0);
 			agent->ResetModel();
+		}
+
+		m_policyLearnRate -= m_policyLearnRateAnnealing;
+		if (m_policyLearnRate < m_policyLearnRateStop)
+		{
+			m_policyLearnRate = m_policyLearnRateStop;
+		}
+
+		m_criticLearnRate -= m_criticLearnRateAnnealing;
+		if (m_criticLearnRate < m_criticLearnRateStop)
+		{
+			m_criticLearnRate = m_criticLearnRateStop;
 		}
 	}
 }

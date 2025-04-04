@@ -210,6 +210,11 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndBrainFloat m_gamma;
 	ndBrainFloat m_policyLearnRate;
 	ndBrainFloat m_criticLearnRate;
+	ndBrainFloat m_policyLearnRateStop;
+	ndBrainFloat m_criticLearnRateStop;
+	ndBrainFloat m_policyLearnRateAnnealing;
+	ndBrainFloat m_criticLearnRateAnnealing;
+
 	ndInt32 m_numberOfActions;
 	ndInt32 m_numberOfObservations;
 	ndInt32 m_framesAlive;
