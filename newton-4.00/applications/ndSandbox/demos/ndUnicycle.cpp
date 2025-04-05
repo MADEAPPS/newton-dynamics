@@ -45,6 +45,7 @@ namespace ndUnicycle
 		m_topBoxOmega,
 		m_jointAngle,
 		m_jointOmega,
+		m_wheelSpeed,
 		m_stateSize
 	};
 
@@ -307,10 +308,14 @@ namespace ndUnicycle
 			ndModelArticulation* const model = (ndModelArticulation*)GetModel();
 			ndBodyKinematic* const boxBody = model->GetRoot()->m_body->GetAsBodyKinematic();
 
-			const ndVector boxVeloc(boxBody->GetVelocity());
+			//const ndVector boxVeloc(boxBody->GetVelocity());
+			const ndVector wheelVeloc(m_wheel->GetVelocity());
 			const ndFloat32 sinAngle = GetAngle();
-			const ndFloat32 boxReward = ndReal(ndExp(-ndFloat32(2000.0f) * sinAngle * sinAngle));
-			const ndFloat32 reward = boxReward;
+
+			const ndFloat32 standingReward = ndReal(ndExp(-ndFloat32(2000.0f) * sinAngle * sinAngle));
+			ndFloat32 speedReward = ndReal(ndExp(-ndFloat32(100.0f) * wheelVeloc.m_x * wheelVeloc.m_x));
+
+			ndFloat32 reward = 0.5f * standingReward + 0.5f * speedReward;
 			return ndReal(reward);
 		}
 
@@ -331,15 +336,18 @@ namespace ndUnicycle
 		void GetObservation(ndBrainFloat* const observation)
 		{
 			ndModelArticulation* const model = (ndModelArticulation*)GetModel();
-			ndBodyKinematic* const body = model->GetRoot()->m_body->GetAsBodyKinematic();
-			const ndVector omega(body->GetOmega());
-			const ndVector veloc(body->GetVelocity());
-			const ndVector wheelOmega(m_wheel->GetOmega());
+			ndBodyKinematic* const boxBody = model->GetRoot()->m_body->GetAsBodyKinematic();
+			const ndVector boxOmega(boxBody->GetOmega());
+			//const ndVector veloc(body->GetVelocity());
+			//const ndVector wheelOmega(m_wheel->GetOmega());
 			const ndFloat32 sinAngle = ndClamp(GetAngle(), ndFloat32(-0.9f), ndFloat32(0.9f));
-			const ndFloat32 angle = ndAsin(sinAngle);
+			const ndFloat32 boxAngle = ndAsin(sinAngle);
 
-			observation[m_topBoxAngle] = ndBrainFloat(angle);
-			observation[m_topBoxOmega] = ndBrainFloat(omega.m_z);
+			const ndVector wheelVeloc(m_wheel->GetVelocity());
+
+			observation[m_topBoxAngle] = ndBrainFloat(boxAngle);
+			observation[m_topBoxOmega] = ndBrainFloat(boxOmega.m_z);
+			observation[m_wheelSpeed] = ndBrainFloat(wheelVeloc.m_x);
 			observation[m_jointAngle] = ndBrainFloat(m_legJoint->GetAngle() / ND_MAX_LEG_JOINT_ANGLE);
 			observation[m_jointOmega] = ndBrainFloat(m_legJoint->GetOmega() / ND_MAX_LEG_JOINT_ANGLE);
 		}

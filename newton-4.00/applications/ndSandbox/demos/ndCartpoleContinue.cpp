@@ -43,7 +43,7 @@ namespace ndContinueCarpole
 	{
 		m_poleAngle,
 		m_poleOmega,
-		m_carVeloc,
+		m_cartSpeed,
 		m_stateSize
 	};
 
@@ -265,11 +265,11 @@ namespace ndContinueCarpole
 		{
 			ndFloat32 angle = m_poleJoint->GetAngle();
 			ndFloat32 omega = m_poleJoint->GetOmega();
-			const ndVector veloc(m_cart->GetVelocity());
+			const ndVector cartVeloc(m_cart->GetVelocity());
 
 			state[m_poleAngle] = ndBrainFloat(angle);
 			state[m_poleOmega] = ndBrainFloat(omega);
-			state[m_carVeloc] = ndBrainFloat(veloc.m_x);
+			state[m_cartSpeed] = ndBrainFloat(cartVeloc.m_x);
 		}
 
 		void ApplyActions(ndBrainFloat* const actions)
@@ -293,14 +293,6 @@ namespace ndContinueCarpole
 
 			GetModel()->GetAsModelArticulation()->ClearMemory();
 			//m_poleJoint->ClearMemory();
-		}
-
-		void RandomePush()
-		{
-			ndVector impulsePush(ndVector::m_zero);
-			ndFloat32 randValue = ndClamp(ndGaussianRandom(0.0f, 0.5f), ndFloat32 (-1.0f), ndFloat32(1.0f));
-			impulsePush.m_x = 5.0f * randValue * m_cart->GetMassMatrix().m_w;
-			m_cart->ApplyImpulsePair(impulsePush, ndVector::m_zero, m_cart->GetScene()->GetTimestep());
 		}
 
 		bool IsOutOfBounds() const

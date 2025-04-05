@@ -49,7 +49,7 @@ namespace ndDiscreteCarpole
 	{
 		m_poleAngle,
 		m_poleOmega,
-		m_carVeloc,
+		m_cartSpeed,
 		m_stateSize
 	};
 
@@ -263,11 +263,11 @@ namespace ndDiscreteCarpole
 		{
 			ndFloat32 angle = m_poleJoint->GetAngle();
 			ndFloat32 omega = m_poleJoint->GetOmega();
-			const ndVector veloc(m_cart->GetVelocity());
+			const ndVector cartVeloc(m_cart->GetVelocity());
 
 			state[m_poleAngle] = ndBrainFloat(angle);
 			state[m_poleOmega] = ndBrainFloat(omega);
-			state[m_carVeloc] = ndBrainFloat(veloc.m_x);
+			state[m_cartSpeed] = ndBrainFloat(cartVeloc.m_x);
 			//ndTrace(("%f ", angle * ndRadToDegree));
 		}
 
