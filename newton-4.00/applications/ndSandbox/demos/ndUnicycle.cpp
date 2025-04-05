@@ -26,7 +26,7 @@
 namespace ndUnicycle
 {
 	#define ND_TRAIN_AGENT
-	#define CONTROLLER_NAME			"unicycle-vpg.dnn"
+	#define CONTROLLER_NAME			"unicycle.dnn"
 
 	#define ND_MAX_WHEEL_TORQUE		(ndFloat32 (10.0f))
 	#define ND_MAX_LEG_ANGLE_STEP	(ndFloat32 (4.0f) * ndDegreeToRad)
@@ -422,7 +422,7 @@ namespace ndUnicycle
 		{
 			ndWorld* const world = scene->GetWorld();
 			
-			m_outFile = fopen("unicycle-vpg.csv", "wb");
+			m_outFile = fopen("unicycle.csv", "wb");
 			fprintf(m_outFile, "vpg\n");
 			
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
@@ -433,8 +433,8 @@ namespace ndUnicycle
 			hyperParameters.m_numberOfObservations = m_stateSize;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 			
-			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
-			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
+			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
+			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
 			
 			m_master->SetName(CONTROLLER_NAME);
@@ -635,7 +635,7 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 	ndSetRandSeed(42);
 
 	ndMatrix matrix(ndGetIdentityMatrix());
-	matrix.m_posit.m_y = 1.9f;
+	matrix.m_posit.m_y = 1.8f;
 
 	ndMeshLoader loader;
 	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("unicycle.fbx", scene));
