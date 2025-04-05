@@ -28,7 +28,7 @@
 #include "ndBrainAgentContinuePolicyGradient_Trainer.h"
 
 #define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 64)
-#define ND_CONTINUE_POLICY_STATE_VALUE_ITERATIONS	5
+#define ND_CONTINUE_POLICY_STATE_VALUE_ITERATIONS	10
 #define ND_CONTINUE_POLICY_GRADIENT_SIGMA_SCALE		ndBrainFloat(2.0f)
 
 //*********************************************************************************************
@@ -919,6 +919,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 	}
 }
 
+//#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 {
 	UpdateBaseLineValue();
@@ -968,7 +969,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 	}
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::Optimize()
 {
 	OptimizeCritic();
@@ -1011,16 +1012,16 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeStep()
 			agent->ResetModel();
 		}
 
-		m_policyLearnRate -= m_policyLearnRateAnnealing;
-		if (m_policyLearnRate < m_policyLearnRateStop)
-		{
-			m_policyLearnRate = m_policyLearnRateStop;
-		}
-
-		m_criticLearnRate -= m_criticLearnRateAnnealing;
-		if (m_criticLearnRate < m_criticLearnRateStop)
-		{
-			m_criticLearnRate = m_criticLearnRateStop;
-		}
+		//m_policyLearnRate -= m_policyLearnRateAnnealing;
+		//if (m_policyLearnRate < m_policyLearnRateStop)
+		//{
+		//	m_policyLearnRate = m_policyLearnRateStop;
+		//}
+		//
+		//m_criticLearnRate -= m_criticLearnRateAnnealing;
+		//if (m_criticLearnRate < m_criticLearnRateStop)
+		//{
+		//	m_criticLearnRate = m_criticLearnRateStop;
+		//}
 	}
 }
