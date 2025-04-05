@@ -24,6 +24,8 @@
 
 #include <arm_neon.h>
 
+class ndVector;
+
 D_MSV_NEWTON_CLASS_ALIGN_32
 class ndBigVector
 {
@@ -39,10 +41,10 @@ class ndBigVector
 	{
 	}
 
-	inline ndBigVector(const ndBigVector& v)
-		: m_x(v.m_x), m_y(v.m_y), m_z(v.m_z), m_w(v.m_w)
-	{
-	}
+	//inline ndBigVector(const ndBigVector& v)
+	//	:m_x(v.m_x), m_y(v.m_y), m_z(v.m_z), m_w(v.m_w)
+	//{
+	//}
 
 #ifndef D_NEWTON_USE_DOUBLE
 	inline ndBigVector(const ndVector& v);
@@ -198,11 +200,10 @@ class ndBigVector
 		return *this + A * B;
 	}
 
-	inline ndBigVector MulSub(const ndVector& A, const ndBigVector& B) const
+	inline ndBigVector MulSub(const ndBigVector& A, const ndBigVector& B) const
 	{
 		return *this - A * B;
 	}
-
 
 	inline ndBigVector AddHorizontal() const
 	{
@@ -436,7 +437,7 @@ class ndBigVector
 		return (((a[0] >> 63) ? 1 : 0) | ((a[1] >> 63) ? 2 : 0) | ((a[2] >> 63) ? 4 : 0) | ((a[3] >> 63) ? 8 : 0));
 	}
 
-	inline ndVector ShiftRight() const
+	inline ndBigVector ShiftRight() const
 	{
 		return ndBigVector(m_w, m_x, m_y, m_z);
 	}
