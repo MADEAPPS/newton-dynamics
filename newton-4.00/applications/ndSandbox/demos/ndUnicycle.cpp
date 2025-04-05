@@ -305,12 +305,8 @@ namespace ndUnicycle
 				return ndBrainFloat (-1.0f);
 			}
 
-			ndModelArticulation* const model = (ndModelArticulation*)GetModel();
-			ndBodyKinematic* const boxBody = model->GetRoot()->m_body->GetAsBodyKinematic();
-
-			//const ndVector boxVeloc(boxBody->GetVelocity());
-			const ndVector wheelVeloc(m_wheel->GetVelocity());
 			const ndFloat32 sinAngle = GetAngle();
+			const ndVector wheelVeloc(m_wheel->GetVelocity());
 
 			const ndFloat32 standingReward = ndReal(ndExp(-ndFloat32(2000.0f) * sinAngle * sinAngle));
 			ndFloat32 speedReward = ndReal(ndExp(-ndFloat32(100.0f) * wheelVeloc.m_x * wheelVeloc.m_x));

@@ -253,8 +253,8 @@ namespace ndContinueCarpole
 				return ndReal (-1.0f);
 			}
 			const ndVector veloc(m_cart->GetVelocity());
-			ndFloat32 sinAngle = m_poleJoint->GetAngle();
-			ndFloat32 angularReward = ndReal(ndExp(-ndFloat32(1000.0f) * sinAngle * sinAngle));
+			ndFloat32 angle = m_poleJoint->GetAngle();
+			ndFloat32 angularReward = ndReal(ndExp(-ndFloat32(1000.0f) * angle * angle));
 			ndFloat32 linearReward = ndReal(ndExp(-ndFloat32(200.0f) * veloc.m_x * veloc.m_x));
 
 			ndReal reward = 0.5f * angularReward + 0.5f * linearReward;
@@ -263,13 +263,21 @@ namespace ndContinueCarpole
 
 		void GetObservation(ndBrainFloat* const state)
 		{
-			ndFloat32 angle = m_poleJoint->GetAngle();
-			ndFloat32 omega = m_poleJoint->GetOmega();
+			//ndFloat32 poleAngle = m_poleJoint->GetAngle();
+			//ndFloat32 omega = m_poleJoint->GetOmega();
 			const ndVector cartVeloc(m_cart->GetVelocity());
 
-			state[m_poleAngle] = ndBrainFloat(angle);
-			state[m_poleOmega] = ndBrainFloat(omega);
-			state[m_cartSpeed] = ndBrainFloat(cartVeloc.m_x);
+			ndFloat32 speed = ndClamp(ndFloat32(cartVeloc.m_x / 10.0f), ndFloat32(-1.0f), ndFloat32(1.0f));
+			ndFloat32 poleAngle = ndClamp(m_poleJoint->GetAngle() / (D_REWARD_MIN_ANGLE * ndFloat32(2.0f)), ndFloat32(-1.0f), ndFloat32(1.0f));
+			ndFloat32 poleOmega = ndClamp(m_poleJoint->GetOmega() / ndFloat32(2.0f), ndFloat32(-1.0f), ndFloat32(1.0f));
+
+			//ndTrace(("%f %f\n", cartVeloc.m_x, speed));
+			//ndTrace(("%f %f\n", m_poleJoint->GetAngle(), poleAngle));
+			//ndTrace(("%f %f\n", m_poleJoint->GetOmega(), poleOmega));
+
+			state[m_cartSpeed] = speed;
+			state[m_poleAngle] = poleAngle;
+			state[m_poleOmega] = poleOmega;
 		}
 
 		void ApplyActions(ndBrainFloat* const actions)
