@@ -571,7 +571,9 @@ namespace ndUnicycle
 				m_master->OptimizeStep();
 
 				episodeCount -= m_master->GetEposideCount();
-				ndFloat32 rewardTrajectory = m_master->GetAverageFrames() * m_master->GetAverageScore();
+				ndFloat32 trajectoryLog = ndLog(m_master->GetAverageFrames() + 0.001f);
+				ndFloat32 rewardTrajectory = m_master->GetAverageScore() * trajectoryLog;
+
 				if (rewardTrajectory >= ndFloat32(m_maxScore))
 				{
 					if (m_lastEpisode != m_master->GetEposideCount())

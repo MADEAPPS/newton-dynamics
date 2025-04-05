@@ -350,7 +350,7 @@ namespace ndContinueCarpole
 			,m_saveScore(m_maxScore)
 			,m_discountFactor(0.99f)
 			,m_lastEpisode(0xfffffff)
-			,m_stopTraining(300 * 1000000)
+			,m_stopTraining(500 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			char name[256];
@@ -374,7 +374,7 @@ namespace ndContinueCarpole
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 
 			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
-			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyProximaGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
+			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
 			m_bestActor = ndSharedPtr< ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
 
 			snprintf(name, sizeof(name), "%s.dnn", CONTROLLER_NAME);
@@ -524,7 +524,8 @@ namespace ndContinueCarpole
 				m_master->OptimizeStep();
 
 				episodeCount -= m_master->GetEposideCount();
-				ndFloat32 rewardTrajectory = m_master->GetAverageFrames() * m_master->GetAverageScore();
+				ndFloat32 trajectoryLog = ndLog(m_master->GetAverageFrames() + 0.001f);
+				ndFloat32 rewardTrajectory = m_master->GetAverageScore() * trajectoryLog;
 				if (rewardTrajectory >= ndFloat32(m_maxScore))
 				{
 					if (m_lastEpisode != m_master->GetEposideCount())
