@@ -951,6 +951,21 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 		}
 	});
 	ndBrainThreadPool::ParallelExecute(CalculateAdvantage);
+
+	ndFloat64 advantageVariance2 = ndBrainFloat(0.0f);
+	for (ndInt32 i = stepNumber - 1; i >= 0; --i)
+	{
+		ndBrainFloat advantage = m_trajectoryAccumulator.GetAdvantage(i);
+		advantageVariance2 += advantage * advantage;
+	}
+
+	advantageVariance2 /= ndBrainFloat(stepNumber);
+	ndBrainFloat invVariance = ndBrainFloat(1.0f) / ndBrainFloat(ndSqrt(advantageVariance2 + ndBrainFloat(1.0e-1f)));
+	for (ndInt32 i = stepNumber - 1; i >= 0; --i)
+	{
+		const ndBrainFloat normalizedAdvantage = m_trajectoryAccumulator.GetAdvantage(i) * invVariance;
+		m_trajectoryAccumulator.SetAdvantage(i, normalizedAdvantage);
+	}
 }
 
 #pragma optimize( "", off )
