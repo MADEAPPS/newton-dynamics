@@ -26,8 +26,8 @@
 #include "ndBrainOptimizerAdam.h"
 #include "ndBrainAgentContinueProximaPolicyGradient_Trainer.h"
 
-#define ND_CONTINUE_PROXIMA_POLICY_ITERATIONS			5
-#define ND_CONTINUE_PROXIMA_POLICY_KL_DIVERGENCE		ndBrainFloat(0.01f)
+#define ND_CONTINUE_PROXIMA_POLICY_ITERATIONS			10
+#define ND_CONTINUE_PROXIMA_POLICY_KL_DIVERGENCE		ndBrainFloat(0.001f)
 #define ND_CONTINUE_PROXIMA_POLICY_CLIP_EPSILON			ndBrainFloat(0.2f)
 //#define ND_CONTINUE_PROXIMA_POLICY_MIN_SIGMA			ndBrainFloat(1.0e-1f)
 #define ND_CONTINUE_PROXIMA_POLICY_GRADIENT_BUFFER_SIZE	(1024 * 64)
@@ -103,7 +103,7 @@ ndBrainFloat ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateK
 	return ndBrainFloat(divergence);
 }
 
-//#pragma optimize( "", off )
+#pragma optimize( "", off )
 void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizePolicyPPOstep()
 {
 	ndAtomic<ndInt32> iterator(0);
@@ -159,31 +159,31 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizePolicyPPOs
 					const ndBrainMemVector observation(m_agent->m_trajectoryAccumulator.GetObservations(m_index), m_agent->m_numberOfObservations);
 					m_agent->m_tempPolicy.MakePrediction(observation, newPolicyDistribution);
 
-					ndFloat32 det_p = ndFloat32(1.0f);
-					ndFloat32 det_q = ndFloat32(1.0f);
-					ndFloat32 exp_p = ndFloat32(0.0f);
-					ndFloat32 exp_q = ndFloat32(0.0f);
+					ndFloat32 oldDet = ndFloat32(1.0f);
+					ndFloat32 oldExp = ndFloat32(0.0f);
+
+					ndFloat32 newDet = ndFloat32(1.0f);
+					ndFloat32 newExp = ndFloat32(0.0f);
 					for (ndInt32 i = numberOfActions - 1; i >= 0; --i)
 					{
-						ndFloat32 prob_p = sampledProbability[i] - oldProbabilityDistribution[i];
-						ndFloat32 sigma_p = oldProbabilityDistribution[i + numberOfActions];
-						det_p *= sigma_p;
-						exp_p += prob_p * sigma_p * prob_p;
+						ndFloat32 oldProb = sampledProbability[i] - oldProbabilityDistribution[i];
+						ndFloat32 oldSigma = oldProbabilityDistribution[i + numberOfActions];
+						oldDet *= oldSigma;
+						oldExp += oldProb * oldSigma * oldProb;
 
-						ndFloat32 prob_q = sampledProbability[i] - newPolicyDistribution[i];
-						ndFloat32 sigma_q = newPolicyDistribution[i + numberOfActions];
-						det_q *= sigma_q;
-						exp_q += prob_q * sigma_q * prob_q;
+						ndFloat32 newProb = sampledProbability[i] - newPolicyDistribution[i];
+						ndFloat32 newSigma = newPolicyDistribution[i + numberOfActions];
+						newDet *= newSigma;
+						newExp += newProb * newSigma * newProb;
 					}
 
-					//ndFloat32 prob_p = ndExp(-exp_p * 0.5f) / ndSqrt(((2.0f * ndPi) ^ numberOfActions) * det_p);
+					//ndFloat32 prob_p = [1.0 / ndSqrt(((2.0f * ndPi) ^ numberOfActions)] * (1.0 / det) * ndExp(-newExp * 0.5f) ;
 					//the constant ((2.0f * ndPi) ^ numberOfActions) cancel each other in the ratio
-					ndFloat32 prob_p = ndExp(-exp_p * ndFloat32(0.5f)) / ndSqrt(det_p);
-					ndFloat32 prob_q = ndExp(-exp_q * ndFloat32(0.5f)) / ndSqrt(det_q);
+					ndFloat32 newProb = ndExp(-newExp * ndFloat32(0.5f)) / ndSqrt(newDet);
+					ndFloat32 oldProb = ndExp(-oldExp * ndFloat32(0.5f)) / ndSqrt(oldDet);
 
 					ndBrainFloat rawAdvantage = m_agent->m_trajectoryAccumulator.GetAdvantage(m_index);
-					ndBrainFloat r = prob_p / prob_q;
-					//ndBrainFloat r = prob_q / prob_p; // this is fucking wrong
+					ndBrainFloat r = newProb / oldProb;
 					ndBrainFloat g = (rawAdvantage > ndBrainFloat(0.0f)) ? ndBrainFloat(1.0 + ND_CONTINUE_PROXIMA_POLICY_CLIP_EPSILON) : ndBrainFloat(1.0 - ND_CONTINUE_PROXIMA_POLICY_CLIP_EPSILON);
 					// calculate clipped advantage
 					ndBrainFloat advantage = ndMin(r * rawAdvantage, g * rawAdvantage);
@@ -339,12 +339,11 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizePolicyPPO(
 		iterator = 0;
 		ndBrainThreadPool::ParallelExecute(AddGradients);
 	}
-
+	
 	m_policyOptimizer->AccumulateGradients(this, m_policyTrainers);
 	m_policyWeightedTrainer[0]->ScaleWeights(ndBrainFloat(1.0f) / ndBrainFloat(steps));
 	m_policyOptimizer->Update(this, m_policyWeightedTrainer, -m_policyLearnRate);
 }
-
 
 void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::Optimize()
 {
@@ -352,7 +351,7 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::Optimize()
 
 	OptimizeCritic();
 	OptimizePolicyPPO();
-	for (ndInt32 i = 0; (i < ND_CONTINUE_PROXIMA_POLICY_ITERATIONS) && (CalculateKLdivergence() < ND_CONTINUE_PROXIMA_POLICY_KL_DIVERGENCE); ++i)
+	for (ndInt32 i = ND_CONTINUE_PROXIMA_POLICY_ITERATIONS; (i >= 0) && (CalculateKLdivergence() < ND_CONTINUE_PROXIMA_POLICY_KL_DIVERGENCE); --i)
 	{
 		OptimizePolicyPPOstep();
 	}

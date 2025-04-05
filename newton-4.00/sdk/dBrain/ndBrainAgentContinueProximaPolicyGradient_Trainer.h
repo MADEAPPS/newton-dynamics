@@ -24,22 +24,11 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainAgentContinuePolicyGradient_Trainer.h"
-//#include "ndBrain.h"
-//#include "ndBrainAgent.h"
-//#include "ndBrainThreadPool.h"
-//#include "ndBrainLayerActivationRelu.h"
-//#include "ndBrainLayerActivationTanh.h"
-//#include "ndBrainLossLeastSquaredError.h"
-//#include "ndBrainLayerActivationSigmoidLinear.h"
 
 // This is an implementation of the proxima policy Gradient as described in:
 // https://spinningup.openai.com/en/latest/algorithms/ppo.html
 // it is an impropment that allows multiple passes on the same data collection as 
 // a long as the two disrtribution are close.
-
-// I have a huge misunderstanding of this algorithm.
-// no matter what I do I can't get it to work at all, in fact it is the worst trainer so far. 
-
 
 class ndBrainAgentContinueProximaPolicyGradient_TrainerMaster : public ndBrainAgentContinuePolicyGradient_TrainerMaster
 {
