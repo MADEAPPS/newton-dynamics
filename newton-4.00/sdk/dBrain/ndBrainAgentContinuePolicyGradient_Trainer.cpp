@@ -46,8 +46,9 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 
 	m_numberOfActions = 0;
 	m_numberOfObservations = 0;
-	m_policyLearnRate = ndBrainFloat(1.0e-4f);
-	m_criticLearnRate = m_policyLearnRate * ndBrainFloat(2.0f);
+	//m_policyLearnRate = ndBrainFloat(5.0e-4f);
+	m_policyLearnRate = ndBrainFloat(1.0e-3f);
+	m_criticLearnRate = m_policyLearnRate * ndBrainFloat(1.0f);
 
 	m_regularizer = ndBrainFloat(1.0e-5f);
 	m_discountFactor = ndBrainFloat(0.99f);
