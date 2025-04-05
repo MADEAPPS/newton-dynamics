@@ -267,15 +267,15 @@ namespace ndContinueCarpole
 			//ndFloat32 omega = m_poleJoint->GetOmega();
 			const ndVector cartVeloc(m_cart->GetVelocity());
 
-			ndFloat32 speed = ndClamp(ndFloat32(cartVeloc.m_x / 10.0f), ndFloat32(-1.0f), ndFloat32(1.0f));
-			ndFloat32 poleAngle = ndClamp(m_poleJoint->GetAngle() / (D_REWARD_MIN_ANGLE * ndFloat32(2.0f)), ndFloat32(-1.0f), ndFloat32(1.0f));
-			ndFloat32 poleOmega = ndClamp(m_poleJoint->GetOmega() / ndFloat32(2.0f), ndFloat32(-1.0f), ndFloat32(1.0f));
+			ndFloat32 cartSpeed = cartVeloc.m_x / ndFloat32(10.0f);
+			ndFloat32 poleOmega = m_poleJoint->GetOmega() / ndFloat32(2.0f);
+			ndFloat32 poleAngle = m_poleJoint->GetAngle() / (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
 
 			//ndTrace(("%f %f\n", cartVeloc.m_x, speed));
 			//ndTrace(("%f %f\n", m_poleJoint->GetAngle(), poleAngle));
 			//ndTrace(("%f %f\n", m_poleJoint->GetOmega(), poleOmega));
 
-			state[m_cartSpeed] = speed;
+			state[m_cartSpeed] = cartSpeed;
 			state[m_poleAngle] = poleAngle;
 			state[m_poleOmega] = poleOmega;
 		}

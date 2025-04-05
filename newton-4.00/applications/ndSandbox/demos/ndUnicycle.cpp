@@ -272,19 +272,19 @@ namespace ndUnicycle
 			return false;
 		}
 
-		ndFloat32 GetAngle() const
+		ndFloat32 GetBoxAngle() const
 		{
 			ndModelArticulation* const model = (ndModelArticulation*)GetModel();
 			const ndMatrix& matrix = model->GetRoot()->m_body->GetMatrix();
-			return matrix.m_up.m_x;
+			ndFloat32 sinAngle = ndClamp(matrix.m_up.m_x, ndFloat32(-0.9f), ndFloat32(0.9f));
+			return ndAsin (sinAngle);
 		}
 
 		#pragma optimize( "", off )
 		bool IsTerminal() const
 		{
 			#define D_REWARD_MIN_ANGLE	(ndFloat32 (20.0f) * ndDegreeToRad)
-			ndFloat32 sinAngle = ndClamp(GetAngle(), ndFloat32(-0.9f), ndFloat32(0.9f));
-			bool fail = ndAbs(ndAsin(sinAngle)) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
+			bool fail = ndAbs(GetBoxAngle()) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
 			return fail;
 		}
 
@@ -305,10 +305,10 @@ namespace ndUnicycle
 				return ndBrainFloat (-1.0f);
 			}
 
-			const ndFloat32 sinAngle = GetAngle();
+			const ndFloat32 boxAngle = GetBoxAngle();
 			const ndVector wheelVeloc(m_wheel->GetVelocity());
 
-			const ndFloat32 standingReward = ndReal(ndExp(-ndFloat32(2000.0f) * sinAngle * sinAngle));
+			const ndFloat32 standingReward = ndReal(ndExp(-ndFloat32(2000.0f) * boxAngle * boxAngle));
 			ndFloat32 speedReward = ndReal(ndExp(-ndFloat32(100.0f) * wheelVeloc.m_x * wheelVeloc.m_x));
 
 			ndFloat32 reward = 0.5f * standingReward + 0.5f * speedReward;
@@ -334,18 +334,22 @@ namespace ndUnicycle
 			ndModelArticulation* const model = (ndModelArticulation*)GetModel();
 			ndBodyKinematic* const boxBody = model->GetRoot()->m_body->GetAsBodyKinematic();
 			const ndVector boxOmega(boxBody->GetOmega());
-			//const ndVector veloc(body->GetVelocity());
-			//const ndVector wheelOmega(m_wheel->GetOmega());
-			const ndFloat32 sinAngle = ndClamp(GetAngle(), ndFloat32(-0.9f), ndFloat32(0.9f));
-			const ndFloat32 boxAngle = ndAsin(sinAngle);
-
 			const ndVector wheelVeloc(m_wheel->GetVelocity());
+			
 
-			observation[m_topBoxAngle] = ndBrainFloat(boxAngle);
-			observation[m_topBoxOmega] = ndBrainFloat(boxOmega.m_z);
-			observation[m_wheelSpeed] = ndBrainFloat(wheelVeloc.m_x);
-			observation[m_jointAngle] = ndBrainFloat(m_legJoint->GetAngle() / ND_MAX_LEG_JOINT_ANGLE);
-			observation[m_jointOmega] = ndBrainFloat(m_legJoint->GetOmega() / ND_MAX_LEG_JOINT_ANGLE);
+			ndFloat32 wheelSpeed = wheelVeloc.m_x / ndFloat32(10.0f);
+			ndFloat32 boxAngularSpeed = boxOmega.m_z / ndFloat32(2.0f);
+			ndFloat32 boxAngle = GetBoxAngle() / (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
+			ndFloat32 legAngle = ndBrainFloat(m_legJoint->GetAngle()) / ND_MAX_LEG_JOINT_ANGLE;
+			ndFloat32 legAngularSpeed = ndBrainFloat(m_legJoint->GetOmega()) / ndFloat32(2.0f);
+
+			//ndTrace(("%f %f %f %f %f\n", wheelSpeed, boxAngularSpeed, boxAngle, legAngle, legAngularSpeed));
+
+			observation[m_wheelSpeed] = wheelSpeed;
+			observation[m_jointAngle] = legAngle;
+			observation[m_topBoxAngle] = boxAngle;
+			observation[m_jointOmega] = legAngularSpeed;
+			observation[m_topBoxOmega] = boxAngularSpeed;
 		}
 
 		void TelePort() const
@@ -437,8 +441,8 @@ namespace ndUnicycle
 			hyperParameters.m_numberOfObservations = m_stateSize;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 			
-			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
-			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
+			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
+			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
 			
 			m_master->SetName(CONTROLLER_NAME);
@@ -641,7 +645,7 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 	ndSetRandSeed(42);
 
 	ndMatrix matrix(ndGetIdentityMatrix());
-	matrix.m_posit.m_y = 1.7f;
+	matrix.m_posit.m_y = 3.05f;
 
 	ndMeshLoader loader;
 	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("unicycle.fbx", scene));
