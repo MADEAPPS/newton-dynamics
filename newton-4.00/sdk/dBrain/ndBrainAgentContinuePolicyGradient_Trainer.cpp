@@ -31,7 +31,7 @@
 #define ND_CONTINUE_POLICY_STATE_VALUE_ITERATIONS	10
 #define ND_CONTINUE_POLICY_GRADIENT_SIGMA_SCALE		ndBrainFloat(2.0f)
 
-#define ND_CONTINUE_POLICY_MIN_SIGMA				ndBrainFloat(0.05f)
+#define ND_CONTINUE_POLICY_MIN_SIGMA				ndBrainFloat(0.001f)
 
 //*********************************************************************************************
 //
@@ -115,14 +115,20 @@ void ndPolicyGradientActivation::MakePrediction(const ndBrainVector& input, ndBr
 	}
 }
 
-void ndPolicyGradientActivation::InputDerivative(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+#pragma optimize( "", off )
+void ndPolicyGradientActivation::InputDerivative(const ndBrainVector& input, const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	const ndInt32 base = m_neurons / 2;
 	for (ndInt32 i = base - 1; i >= 0; --i)
 	{
 		inputDerivative[i] = ndBrainFloat(1.0f);
-		inputDerivative[i + base] = (output[i + base] >= GetMinSigma()) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+		inputDerivative[i + base] = (input[i + base] >= ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
 		//inputDerivative[i + base] = output[i + base];
+
+		if (input[i + base] >= ndBrainFloat(0.0f))
+		{
+			inputDerivative[i + base] *= 1.0f;
+		}
 	}
 	inputDerivative.Mul(outputDerivative);
 }
