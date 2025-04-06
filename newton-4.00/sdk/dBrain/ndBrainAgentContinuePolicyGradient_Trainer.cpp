@@ -31,7 +31,7 @@
 #define ND_CONTINUE_POLICY_STATE_VALUE_ITERATIONS	5
 #define ND_CONTINUE_POLICY_GRADIENT_SIGMA_SCALE		ndBrainFloat(2.0f)
 
-#define ND_CONTINUE_POLICY_MIN_SIGMA				ndBrainFloat(0.0025f)
+#define ND_CONTINUE_POLICY_MIN_SIGMA				ndBrainFloat(0.005f)
 
 //*********************************************************************************************
 //
@@ -117,7 +117,7 @@ void ndPolicyGradientActivation::MakePrediction(const ndBrainVector& input, ndBr
 	}
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndPolicyGradientActivation::InputDerivative(const ndBrainVector& input, const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	const ndInt32 base = m_neurons / 2;
@@ -126,11 +126,6 @@ void ndPolicyGradientActivation::InputDerivative(const ndBrainVector& input, con
 		inputDerivative[i] = ndBrainFloat(1.0f);
 		inputDerivative[i + base] = (input[i + base] >= ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
 		//inputDerivative[i + base] = output[i + base];
-
-		if (input[i + base] >= ndBrainFloat(0.0f))
-		{
-			inputDerivative[i + base] *= 1.0f;
-		}
 	}
 	inputDerivative.Mul(outputDerivative);
 }
@@ -588,7 +583,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::~ndBrainAgentContinuePolicyGra
 	delete[] m_randomGenerator;
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizePolicy()
 {
 	// using supervised learning make sure that the m_policy has zero mean and standard deviation 
@@ -994,7 +989,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::CalculateAdvange()
 {
 	ndBrainFloat averageSum = ndBrainFloat(0.0f);
@@ -1010,6 +1005,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::CalculateAdvange()
 	m_workingBuffer.SetCount(m_baseValueWorkingBufferSize * GetThreadCount());
 	auto CalculateAdvantage = ndMakeObject::ndFunction([this, &iterator](ndInt32 threadIndex, ndInt32)
 	{
+#if 0
 		ndBrainFixSizeVector<1> actions;
 		ndBrainMemVector workingBuffer(&m_workingBuffer[threadIndex * m_baseValueWorkingBufferSize], m_baseValueWorkingBufferSize);
 	
@@ -1024,40 +1020,33 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::CalculateAdvange()
 			m_trajectoryAccumulator.SetAdvantage(i, advantage);
 			m_trajectoryAccumulator.SetStateValue(i, stateValue);
 		}
+#else
+		ndBrainFixSizeVector<1> actions;
+		ndBrainMemVector workingBuffer(&m_workingBuffer[threadIndex * m_baseValueWorkingBufferSize], m_baseValueWorkingBufferSize);
+
+		ndInt32 const count = m_trajectoryAccumulator.GetCount();
+		for (ndInt32 i = iterator++; i < count; i = iterator++)
+		{
+			const ndBrainMemVector observation0(m_trajectoryAccumulator.GetObservations(i), m_numberOfObservations);
+			m_critic.MakePrediction(observation0, actions, workingBuffer);
+
+			ndBrainFloat stateValue0 = actions[0];
+			ndBrainFloat stateReward = m_trajectoryAccumulator.GetReward(i);
+			ndBrainFloat stateValue1 = ndBrainFloat(0.0f);
+			if (!m_trajectoryAccumulator.GetTerminalState(i))
+			{
+				const ndBrainMemVector observation1(m_trajectoryAccumulator.GetObservations(i + 1), m_numberOfObservations);
+				m_critic.MakePrediction(observation1, actions);
+				stateValue1 = actions[0];
+			}
+
+			ndBrainFloat advantage = stateReward + m_gamma * stateValue1 - stateValue0;
+			m_trajectoryAccumulator.SetAdvantage(i, advantage);
+			m_trajectoryAccumulator.SetStateValue(i, stateValue0);
+		}
+#endif
 	});
 	ndBrainThreadPool::ParallelExecute(CalculateAdvantage);
-
-	for (ndInt32 i = 0; i < stepNumber; ++i)
-	{
-		const ndBrainFloat* a = m_trajectoryAccumulator.GetActions(i);
-		const ndBrainFloat* v = m_trajectoryAccumulator.GetProbabilityDistribution(i);
-
-		if (a[2] > 0.5f)
-		{
-			i *= 1;
-		}
-		if (a[3] > 0.5f)
-		{
-			i *= 1;
-		}
-
-		if (a[2] < ND_CONTINUE_POLICY_MIN_SIGMA)
-		{
-			i *= 1;
-		}
-		if (a[3] < ND_CONTINUE_POLICY_MIN_SIGMA)
-		{
-			i *= 1;
-		}
-		if (v[2] < ND_CONTINUE_POLICY_MIN_SIGMA)
-		{
-			i *= 1;
-		}
-		if (v[3] < ND_CONTINUE_POLICY_MIN_SIGMA)
-		{
-			i *= 1;
-		}
-	}
 
 #if 0
 	ndFloat64 advantageVariance2 = ndBrainFloat(0.0f);
