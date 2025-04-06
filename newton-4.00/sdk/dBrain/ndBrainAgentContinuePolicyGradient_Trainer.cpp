@@ -27,8 +27,8 @@
 #include "ndBrainLayerActivationLinear.h"
 #include "ndBrainAgentContinuePolicyGradient_Trainer.h"
 
-#define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 128)
-#define ND_CONTINUE_POLICY_STATE_VALUE_ITERATIONS	10
+#define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 256)
+#define ND_CONTINUE_POLICY_STATE_VALUE_ITERATIONS	5
 #define ND_CONTINUE_POLICY_GRADIENT_SIGMA_SCALE		ndBrainFloat(2.0f)
 
 #define ND_CONTINUE_POLICY_MIN_SIGMA				ndBrainFloat(0.0025f)
@@ -910,9 +910,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 		m_randomPermutation[i] = i;
 	}
 
-#if 0
-	m_randomPermutation.RandomShuffle(m_randomPermutation.GetCount());
-
+#if 1
 	// using value functions, seem very noisy
 	if (m_randomPermutation.GetCount() > ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE)
 	{
@@ -920,13 +918,13 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 	}
 	else
 	{
-		ndInt32 smallSize = ndInt32(m_randomPermutation.GetCount()) & -m_bashBufferSize;
-		m_randomPermutation.SetCount(smallSize);
+		m_randomPermutation.SetCount((m_randomPermutation.GetCount() - 1) & -m_bashBufferSize);
 	}
 
 	ndAtomic<ndInt32> iterator(0);
 	for (ndInt32 i = 0; i < ND_CONTINUE_POLICY_STATE_VALUE_ITERATIONS; ++i)
 	{ 
+		m_randomPermutation.RandomShuffle(m_randomPermutation.GetCount());
 		for (ndInt32 base = 0; base < m_randomPermutation.GetCount(); base += m_bashBufferSize)
 		{
 			auto BackPropagateBash = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
@@ -958,10 +956,8 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 			ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 			m_criticOptimizer->Update(this, m_criticTrainers, m_criticLearnRate);
 		}
-		m_randomPermutation.RandomShuffle(m_randomPermutation.GetCount());
 	}
 #else
-
 
 	m_randomPermutation.SetCount((m_randomPermutation.GetCount() - 1) & -m_bashBufferSize);
 
@@ -969,7 +965,6 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 	for (ndInt32 i = 0; i < 1; ++i)
 	{
 		m_randomPermutation.RandomShuffle(m_randomPermutation.GetCount());
-
 		for (ndInt32 base = 0; base < m_randomPermutation.GetCount(); base += m_bashBufferSize)
 		{
 			auto BackPropagateBash = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
@@ -999,7 +994,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 
 }
 
-//#pragma optimize( "", off )
+#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::CalculateAdvange()
 {
 	ndBrainFloat averageSum = ndBrainFloat(0.0f);
@@ -1031,6 +1026,38 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::CalculateAdvange()
 		}
 	});
 	ndBrainThreadPool::ParallelExecute(CalculateAdvantage);
+
+	for (ndInt32 i = 0; i < stepNumber; ++i)
+	{
+		const ndBrainFloat* a = m_trajectoryAccumulator.GetActions(i);
+		const ndBrainFloat* v = m_trajectoryAccumulator.GetProbabilityDistribution(i);
+
+		if (a[2] > 0.5f)
+		{
+			i *= 1;
+		}
+		if (a[3] > 0.5f)
+		{
+			i *= 1;
+		}
+
+		if (a[2] < ND_CONTINUE_POLICY_MIN_SIGMA)
+		{
+			i *= 1;
+		}
+		if (a[3] < ND_CONTINUE_POLICY_MIN_SIGMA)
+		{
+			i *= 1;
+		}
+		if (v[2] < ND_CONTINUE_POLICY_MIN_SIGMA)
+		{
+			i *= 1;
+		}
+		if (v[3] < ND_CONTINUE_POLICY_MIN_SIGMA)
+		{
+			i *= 1;
+		}
+	}
 
 #if 0
 	ndFloat64 advantageVariance2 = ndBrainFloat(0.0f);
