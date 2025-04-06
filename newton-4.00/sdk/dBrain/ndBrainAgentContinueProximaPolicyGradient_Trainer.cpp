@@ -349,10 +349,11 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::Optimize()
 {
 	m_oldPolicy.CopyFrom(m_policy);
 
-	OptimizeCritic();
+	CalculateAdvange();
 	OptimizePolicyPPO();
 	for (ndInt32 i = ND_CONTINUE_PROXIMA_POLICY_ITERATIONS; (i >= 0) && (CalculateKLdivergence() < ND_CONTINUE_PROXIMA_POLICY_KL_DIVERGENCE); --i)
 	{
 		OptimizePolicyPPOstep();
 	}
+	OptimizeCritic();
 }

@@ -190,7 +190,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	void OptimizeCritic();
 	void NormalizePolicy();
 	void NormalizeCritic();
-	void UpdateBaseLineValue();
+	void CalculateAdvange();
 	ndBrainAgentContinuePolicyGradient_Trainer::ndRandomGenerator* GetRandomGenerator();
 	ndBrain m_policy;
 	ndBrain m_critic;

@@ -46,13 +46,13 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 
 	m_numberOfActions = 0;
 	m_numberOfObservations = 0;
-	m_policyLearnRate = ndBrainFloat(2.0e-5f);
-	m_criticLearnRate = m_policyLearnRate * ndBrainFloat(2.0f);
+	m_policyLearnRate = ndBrainFloat(1.0e-5f);
+	m_criticLearnRate = m_policyLearnRate * ndBrainFloat(1.0f);
 
 	m_regularizer = ndBrainFloat(1.0e-5f);
 	m_discountFactor = ndBrainFloat(0.99f);
 	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize);
-//m_threadsCount = 1;
+m_threadsCount = 1;
 }
 
 //*********************************************************************************************
@@ -343,6 +343,7 @@ void ndBrainAgentContinuePolicyGradient_Trainer::Step()
 	m_trajectory.SetTerminalState(entryIndex, IsTerminal());
 }
 
+//#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory()
 {
 	if (m_trajectory.GetCount())
@@ -352,7 +353,6 @@ void ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory()
 		{
 			m_trajectory.SetCount(m_trajectory.GetCount() - 1);
 		}
-		//ndAssert(m_trajectory.GetTerminalState(m_trajectory.GetCount() - 1));
 		m_trajectory.SetTerminalState(m_trajectory.GetCount() - 1, true);
 
 		// using the Bellman equation to calculate trajectory rewards. (Monte Carlo method)
@@ -860,10 +860,8 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 }
 
 //#pragma optimize( "", off )
-void ndBrainAgentContinuePolicyGradient_TrainerMaster::UpdateBaseLineValue()
+void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 {
-	m_trajectoryAccumulator.SetTerminalState(m_trajectoryAccumulator.GetCount() - 2, true);
-
 	m_randomPermutation.SetCount(m_trajectoryAccumulator.GetCount() - 1);
 	for (ndInt32 i = ndInt32(m_randomPermutation.GetCount()) - 1; i >= 0; --i)
 	{
@@ -920,10 +918,8 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 }
 
 //#pragma optimize( "", off )
-void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
+void ndBrainAgentContinuePolicyGradient_TrainerMaster::CalculateAdvange()
 {
-	UpdateBaseLineValue();
-
 	ndBrainFloat averageSum = ndBrainFloat(0.0f);
 	const ndInt32 stepNumber = m_trajectoryAccumulator.GetCount();
 	for (ndInt32 i = stepNumber - 1; i >= 0; --i)
@@ -972,8 +968,9 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 //#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::Optimize()
 {
-	OptimizeCritic();
+	CalculateAdvange();
 	OptimizePolicy();
+	OptimizeCritic();
 }
 
 //#pragma optimize( "", off )
