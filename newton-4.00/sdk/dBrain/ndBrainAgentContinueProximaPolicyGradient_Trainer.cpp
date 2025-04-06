@@ -30,7 +30,7 @@
 #define ND_CONTINUE_PROXIMA_POLICY_KL_DIVERGENCE		ndBrainFloat(0.001f)
 #define ND_CONTINUE_PROXIMA_POLICY_CLIP_EPSILON			ndBrainFloat(0.2f)
 //#define ND_CONTINUE_PROXIMA_POLICY_MIN_SIGMA			ndBrainFloat(1.0e-1f)
-#define ND_CONTINUE_PROXIMA_POLICY_GRADIENT_BUFFER_SIZE	(1024 * 64)
+//#define ND_CONTINUE_PROXIMA_POLICY_GRADIENT_BUFFER_SIZE	(1024 * 64)
 
 ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(const HyperParameters& hyperParameters)
 	:ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters)
@@ -47,7 +47,7 @@ ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::~ndBrainAgentContinuePr
 ndBrainFloat ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateKLdivergence()
 {
 	//https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
-	// since I am using a diagonal sigma, I do not have to use cholesky 
+	// since I am using a diagonal sigma, I do not have to use Cholesky 
 
 	ndAtomic<ndInt32> iterator(0);
 	ndFloat64 partialDivergence[256];

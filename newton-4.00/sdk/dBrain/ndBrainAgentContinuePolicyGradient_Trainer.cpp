@@ -31,7 +31,7 @@
 #define ND_CONTINUE_POLICY_STATE_VALUE_ITERATIONS	10
 #define ND_CONTINUE_POLICY_GRADIENT_SIGMA_SCALE		ndBrainFloat(2.0f)
 
-#define ND_CONTINUE_POLICY_MIN_SIGMA				ndBrainFloat(0.001f)
+#define ND_CONTINUE_POLICY_MIN_SIGMA				ndBrainFloat(0.0025f)
 
 //*********************************************************************************************
 //
