@@ -107,10 +107,12 @@ const char* ndPolicyGradientActivation::GetLabelId() const
 void ndPolicyGradientActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	const ndInt32 base = m_neurons / 2;
+
+	ndBrainFloat minSigma = GetMinSigma();
 	for (ndInt32 i = base - 1; i >= 0; --i)
 	{
 		output[i] = input[i];
-		output[i + base] = (input[i + base] >= ndBrainFloat(0.0f)) ? input[i + base] : GetMinSigma();
+		output[i + base] = (input[i + base] >= ndBrainFloat(0.0f)) ? input[i + base] + minSigma : minSigma;
 		//output[i + base] = ndExp(ND_CONTINUE_POLICY_GRADIENT_SIGMA_SCALE * input[i + base]) / ND_CONTINUE_POLICY_GRADIENT_SIGMA_SCALE;
 	}
 }
