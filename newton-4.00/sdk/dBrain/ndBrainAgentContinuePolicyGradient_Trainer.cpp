@@ -31,6 +31,8 @@
 #define ND_CONTINUE_POLICY_STATE_VALUE_ITERATIONS	10
 #define ND_CONTINUE_POLICY_GRADIENT_SIGMA_SCALE		ndBrainFloat(2.0f)
 
+#define ND_CONTINUE_POLICY_MIN_SIGMA				ndBrainFloat(0.05f)
+
 //*********************************************************************************************
 //
 //*********************************************************************************************
@@ -46,7 +48,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 
 	m_numberOfActions = 0;
 	m_numberOfObservations = 0;
-	m_policyLearnRate = ndBrainFloat(1.0e-5f);
+	m_policyLearnRate = ndBrainFloat(1.0e-4f);
 	m_criticLearnRate = m_policyLearnRate * ndBrainFloat(1.0f);
 
 	m_policyRegularizer = ndBrainFloat(1.0e-5f);
@@ -80,6 +82,11 @@ void ndPolicyGradientActivation::Save(const ndBrainSave* const loadSave) const
 	ndBrainLayerActivation::Save(loadSave);
 }
 
+ndBrainFloat ndPolicyGradientActivation::GetMinSigma() const
+{
+	return ND_CONTINUE_POLICY_MIN_SIGMA;
+}
+
 ndBrainLayer* ndPolicyGradientActivation::Load(const ndBrainLoad* const loadSave)
 {
 	char buffer[1024];
@@ -103,7 +110,8 @@ void ndPolicyGradientActivation::MakePrediction(const ndBrainVector& input, ndBr
 	for (ndInt32 i = base - 1; i >= 0; --i)
 	{
 		output[i] = input[i];
-		output[i + base] = ndExp(ND_CONTINUE_POLICY_GRADIENT_SIGMA_SCALE * input[i + base]) / ND_CONTINUE_POLICY_GRADIENT_SIGMA_SCALE;
+		output[i + base] = (input[i + base] >= ndBrainFloat(0.0f)) ? input[i + base] : GetMinSigma();
+		//output[i + base] = ndExp(ND_CONTINUE_POLICY_GRADIENT_SIGMA_SCALE * input[i + base]) / ND_CONTINUE_POLICY_GRADIENT_SIGMA_SCALE;
 	}
 }
 
@@ -113,7 +121,8 @@ void ndPolicyGradientActivation::InputDerivative(const ndBrainVector&, const ndB
 	for (ndInt32 i = base - 1; i >= 0; --i)
 	{
 		inputDerivative[i] = ndBrainFloat(1.0f);
-		inputDerivative[i + base] = output[i + base];
+		inputDerivative[i + base] = (output[i + base] >= GetMinSigma()) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+		//inputDerivative[i + base] = output[i + base];
 	}
 	inputDerivative.Mul(outputDerivative);
 }
@@ -571,6 +580,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::~ndBrainAgentContinuePolicyGra
 	delete[] m_randomGenerator;
 }
 
+#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizePolicy()
 {
 	// using supervised learning make sure that the m_policy has zero mean and standard deviation 
@@ -611,16 +621,8 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizePolicy()
 					void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
 					{
 						ndBrainLossLeastSquaredError::GetLoss(output, loss);
-
-						//ndBrainFloat error2 = ndBrainFloat(0.0f);
-						//const ndInt32 base = ndInt32(loss.GetCount()) / 2;
-						//for (ndInt32 i = base - 1; i >= 0; --i)
-						//{
-						//	error2 += loss[i] * loss[i];
-						//}
 						ndBrainFloat error2 = loss.Dot(loss);
 						m_stop = error2 < ndBrainFloat(1.0e-8f);
-						//ndAssert(!m_stop);
 					}
 
 					bool m_stop;
@@ -641,7 +643,8 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizePolicy()
 			for (ndInt32 i = base - 1; i >= 0; --i)
 			{
 				groundTruth[i] = ndBrainFloat(0.0f);
-				groundTruth[i + base] = ndBrainFloat(1.0f/ ND_CONTINUE_POLICY_GRADIENT_SIGMA_SCALE);
+				//groundTruth[i + base] = ndBrainFloat(1.0f/ ND_CONTINUE_POLICY_GRADIENT_SIGMA_SCALE);
+				groundTruth[i + base] = ((ndPolicyGradientActivation*) m_brain[m_brain.GetCount() - 1])->GetMinSigma();
 			}
 
 			int xxxxx = 0;

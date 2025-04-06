@@ -46,6 +46,7 @@ class ndPolicyGradientActivation : public ndBrainLayerActivation
 	ndPolicyGradientActivation(const ndPolicyGradientActivation& src);
 	ndBrainLayer* Clone() const;
 
+	ndBrainFloat GetMinSigma() const;
 	virtual const char* GetLabelId() const override;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 	virtual void Save(const ndBrainSave* const loadSave) const override;
