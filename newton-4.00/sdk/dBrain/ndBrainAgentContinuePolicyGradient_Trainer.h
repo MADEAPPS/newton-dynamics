@@ -57,13 +57,26 @@ class ndPolicyGradientActivation : public ndBrainLayerActivation
 
 class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
 {
-	class ndTrajectoryStep : protected ndBrainVector
+	class ndTrajectoryTransition : protected ndBrainVector
 	{
 		public:
-		ndTrajectoryStep(ndInt32 actionsSize, ndInt32 obsevationsSize);
+		enum ndMemberIndex
+		{
+			m_reward,
+			m_stateValue,
+			m_stateReward,
+			m_stateAdvantage,
+			m_isterminalState,
+			m_transitionSize
+		};
+
+		ndTrajectoryTransition(ndInt32 actionsSize, ndInt32 obsevationsSize);
 
 		ndInt32 GetCount() const;
 		void SetCount(ndInt32 count);
+
+		void Clear(ndInt32 entry);
+		void CopyFrom(ndInt32 entry, ndTrajectoryTransition& src, ndInt32 srcEntry);
 
 		ndBrainFloat GetReward(ndInt32 entry) const;
 		void SetReward(ndInt32 entry, ndBrainFloat reward);
@@ -71,10 +84,15 @@ class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
 		bool GetTerminalState(ndInt32 entry) const;
 		void SetTerminalState(ndInt32 entry, bool isTernimal);
 
+		ndBrainFloat GetStateReward(ndInt32 entry) const;
+		void SetStateReward(ndInt32 entry, ndBrainFloat advantage);
+
+		ndBrainFloat GetStateValue(ndInt32 entry) const;
+		void SetStateValue(ndInt32 entry, ndBrainFloat advantage);
+
 		ndBrainFloat GetAdvantage(ndInt32 entry) const;
 		void SetAdvantage(ndInt32 entry, ndBrainFloat advantage);
 
-		void Clear(ndInt32 entry);
 		ndBrainFloat* GetActions(ndInt32 entry);
 		const ndBrainFloat* GetActions(ndInt32 entry) const;
 
@@ -122,7 +140,7 @@ class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
 	ndInt32 GetEpisodeFrames() const;
 
 	ndBrainVector m_workingBuffer;
-	ndTrajectoryStep m_trajectory;
+	ndTrajectoryTransition m_trajectory;
 	ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
 	ndRandomGenerator* m_randomGenerator;
 
@@ -139,7 +157,8 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 
 		ndBrainFloat m_policyLearnRate;
 		ndBrainFloat m_criticLearnRate;
-		ndBrainFloat m_regularizer;
+		ndBrainFloat m_policyRegularizer;
+		ndBrainFloat m_criticRegularizer;
 		ndBrainFloat m_discountFactor;
 
 		ndInt32 m_threadsCount;
@@ -205,7 +224,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 
 	ndArray<ndInt32> m_randomPermutation;
 	ndBrainAgentContinuePolicyGradient_Trainer::ndRandomGenerator* m_randomGenerator;
-	ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryStep m_trajectoryAccumulator;
+	ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryTransition m_trajectoryAccumulator;
 	
 	ndBrainFloat m_gamma;
 	ndBrainFloat m_policyLearnRate;

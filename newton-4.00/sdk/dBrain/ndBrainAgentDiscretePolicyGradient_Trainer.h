@@ -46,10 +46,10 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster;
 class ndBrainAgentDiscretePolicyGradient_Trainer : public ndBrainAgent
 {
 	public:
-	class ndTrajectoryStep : protected ndBrainVector
+	class ndTrajectoryTransition : protected ndBrainVector
 	{
 		public:
-		ndTrajectoryStep(ndInt32 obsevationsSize, ndInt32 actionsSize);
+		ndTrajectoryTransition(ndInt32 obsevationsSize, ndInt32 actionsSize);
 
 		ndInt32 GetCount() const;
 		void SetCount(ndInt32 count);
@@ -111,7 +111,7 @@ class ndBrainAgentDiscretePolicyGradient_Trainer : public ndBrainAgent
 	virtual bool IsTerminal() const;
 
 	ndBrainVector m_workingBuffer;
-	ndTrajectoryStep m_trajectory;
+	ndTrajectoryTransition m_trajectory;
 	ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster> m_master;
 	ndRandomGenerator* m_randomGenerator;
 
@@ -199,7 +199,7 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 
 	ndArray<ndInt32> m_randomPermutation;
 	ndBrainAgentDiscretePolicyGradient_Trainer::ndRandomGenerator* m_randomGenerator;
-	ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep m_trajectoryAccumulator;
+	ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryTransition m_trajectoryAccumulator;
 
 	ndBrainFloat m_gamma;
 	ndBrainFloat m_policyLearnRate;

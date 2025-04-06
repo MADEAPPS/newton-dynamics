@@ -64,112 +64,112 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 //
 //*********************************************************************************************
 #define ND_EXTRA_MEMBERS 4
-ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::ndTrajectoryStep(ndInt32 obsevationsSize, ndInt32 actionsSize)
+ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryTransition::ndTrajectoryTransition(ndInt32 obsevationsSize, ndInt32 actionsSize)
 	:ndBrainVector()
 	,m_actionbsSize(actionsSize)
 	,m_obsevationsSize(obsevationsSize)
 {
 }
 
-ndInt32 ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::GetCount() const
+ndInt32 ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryTransition::GetCount() const
 {
 	ndInt64 stride = ND_EXTRA_MEMBERS + m_obsevationsSize + m_actionbsSize;
 	return ndInt32(ndBrainVector::GetCount() / stride);
 }
 
-void ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::SetCount(ndInt32 count)
+void ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryTransition::SetCount(ndInt32 count)
 {
 	ndInt64 stride = ND_EXTRA_MEMBERS + m_obsevationsSize + m_actionbsSize;
 	ndBrainVector::SetCount(stride * count);
 }
 
-ndBrainFloat ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::GetReward(ndInt32 entry) const
+ndBrainFloat ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryTransition::GetReward(ndInt32 entry) const
 {
-	const ndTrajectoryStep& me = *this;
+	const ndTrajectoryTransition& me = *this;
 	ndInt64 stride = ND_EXTRA_MEMBERS + m_obsevationsSize + m_actionbsSize;
 	return me[stride * entry];
 }
 
-void ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::SetReward(ndInt32 entry, ndBrainFloat reward)
+void ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryTransition::SetReward(ndInt32 entry, ndBrainFloat reward)
 {
-	ndTrajectoryStep& me = *this;
+	ndTrajectoryTransition& me = *this;
 	ndInt64 stride = ND_EXTRA_MEMBERS + m_obsevationsSize + m_actionbsSize;
 	me[stride * entry] = reward;
 }
 
-ndBrainFloat ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::GetAdvantage(ndInt32 entry) const
+ndBrainFloat ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryTransition::GetAdvantage(ndInt32 entry) const
 {
-	const ndTrajectoryStep& me = *this;
+	const ndTrajectoryTransition& me = *this;
 	ndInt64 stride = ND_EXTRA_MEMBERS + m_obsevationsSize + m_actionbsSize;
 	return me[stride * entry + 1];
 }
 
-void ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::SetAdvantage(ndInt32 entry, ndBrainFloat advantage)
+void ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryTransition::SetAdvantage(ndInt32 entry, ndBrainFloat advantage)
 {
-	ndTrajectoryStep& me = *this;
+	ndTrajectoryTransition& me = *this;
 	ndInt64 stride = ND_EXTRA_MEMBERS + m_obsevationsSize + m_actionbsSize;
 	me[stride * entry + 1] = advantage;
 }
 
-bool ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::GetTerminalState(ndInt32 entry) const
+bool ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryTransition::GetTerminalState(ndInt32 entry) const
 {
-	const ndTrajectoryStep& me = *this;
+	const ndTrajectoryTransition& me = *this;
 	ndInt64 stride = ND_EXTRA_MEMBERS + m_obsevationsSize + m_actionbsSize;
 	return (me[stride * entry + 2] == ndBrainFloat(100.0f)) ? true : false;
 }
 
-void ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::SetTerminalState(ndInt32 entry, bool isTernimal)
+void ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryTransition::SetTerminalState(ndInt32 entry, bool isTernimal)
 {
-	ndTrajectoryStep& me = *this;
+	ndTrajectoryTransition& me = *this;
 	ndInt64 stride = ND_EXTRA_MEMBERS + m_obsevationsSize + m_actionbsSize;
 	me[stride * entry + 2] = isTernimal ? ndBrainFloat(100.0f) : ndBrainFloat(-100.0f);
 }
 
-ndBrainFloat ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::GetAction(ndInt32 entry) const
+ndBrainFloat ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryTransition::GetAction(ndInt32 entry) const
 {
-	const ndTrajectoryStep& me = *this;
+	const ndTrajectoryTransition& me = *this;
 	ndInt64 stride = ND_EXTRA_MEMBERS + m_obsevationsSize + m_actionbsSize;
 	return me[stride * entry + 3];
 }
 
-void ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::Clear(ndInt32 entry)
+void ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryTransition::Clear(ndInt32 entry)
 {
-	ndTrajectoryStep& me = *this;
+	ndTrajectoryTransition& me = *this;
 	ndInt64 stride = ND_EXTRA_MEMBERS + m_obsevationsSize + m_actionbsSize;
 	ndMemSet(&me[stride * entry], ndBrainFloat(0.0f), stride);
 }
 
-void ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::SetAction(ndInt32 entry, ndBrainFloat actionIndex)
+void ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryTransition::SetAction(ndInt32 entry, ndBrainFloat actionIndex)
 {
-	ndTrajectoryStep& me = *this;
+	ndTrajectoryTransition& me = *this;
 	ndInt64 stride = ND_EXTRA_MEMBERS + m_obsevationsSize + m_actionbsSize;
 	me[stride * entry + 3] = actionIndex;
 }
 
-ndBrainFloat* ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::GetObservations(ndInt32 entry)
+ndBrainFloat* ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryTransition::GetObservations(ndInt32 entry)
 {
-	ndTrajectoryStep& me = *this;
+	ndTrajectoryTransition& me = *this;
 	ndInt64 stride = ND_EXTRA_MEMBERS + m_obsevationsSize + m_actionbsSize;
 	return &me[stride * entry + ND_EXTRA_MEMBERS];
 }
 
-const ndBrainFloat* ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::GetObservations(ndInt32 entry) const
+const ndBrainFloat* ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryTransition::GetObservations(ndInt32 entry) const
 {
-	const ndTrajectoryStep& me = *this;
+	const ndTrajectoryTransition& me = *this;
 	ndInt64 stride = ND_EXTRA_MEMBERS + m_obsevationsSize + m_actionbsSize;
 	return &me[stride * entry + ND_EXTRA_MEMBERS];
 }
 
-ndBrainFloat* ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::GetProbabilityDistribution(ndInt32 entry)
+ndBrainFloat* ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryTransition::GetProbabilityDistribution(ndInt32 entry)
 {
-	ndTrajectoryStep& me = *this;
+	ndTrajectoryTransition& me = *this;
 	ndInt64 stride = ND_EXTRA_MEMBERS + m_obsevationsSize + m_actionbsSize;
 	return &me[stride * entry + ND_EXTRA_MEMBERS + m_obsevationsSize];
 }
 
-const ndBrainFloat* ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryStep::GetProbabilityDistribution(ndInt32 entry) const
+const ndBrainFloat* ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryTransition::GetProbabilityDistribution(ndInt32 entry) const
 {
-	const ndTrajectoryStep& me = *this;
+	const ndTrajectoryTransition& me = *this;
 	ndInt64 stride = ND_EXTRA_MEMBERS + m_obsevationsSize + m_actionbsSize;
 	return &me[stride * entry + ND_EXTRA_MEMBERS + m_obsevationsSize];
 }
@@ -318,7 +318,7 @@ void ndBrainAgentDiscretePolicyGradient_Trainer::SaveTrajectory()
 		// get the max trajectory steps
 		const ndInt32 maxSteps = ndMin(m_trajectory.GetCount(), m_master->m_maxTrajectorySteps);
 		ndAssert(maxSteps > 0);
-		ndTrajectoryStep& trajectoryAccumulator = m_master->m_trajectoryAccumulator;
+		ndTrajectoryTransition& trajectoryAccumulator = m_master->m_trajectoryAccumulator;
 		for (ndInt32 i = 0; i < maxSteps; ++i)
 		{
 			ndInt32 index = trajectoryAccumulator.GetCount();
