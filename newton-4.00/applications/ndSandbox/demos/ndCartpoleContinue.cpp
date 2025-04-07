@@ -47,8 +47,65 @@ namespace ndContinueCarpole
 		m_stateSize
 	};
 
+	//ndModelArticulation* BuildModelOldModel(ndRobot* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
+	ndModelArticulation* BuildModelOldModel(ndDemoEntityManager* const scene, const ndMatrix& location)
+	{
+		ndFloat32 xSize = 0.25f;
+		ndFloat32 ySize = 0.125f;
+		ndFloat32 zSize = 0.15f;
+		ndFloat32 cartMass = 5.0f;
+		ndFloat32 poleMass = 10.0f;
+		ndFloat32 poleLength = 0.4f;
+		ndFloat32 poleRadio = 0.05f;
+		ndPhysicsWorld* const world = scene->GetWorld();
+
+		ndModelArticulation* const model = new ndModelArticulation();
+
+		// make cart
+		ndSharedPtr<ndBody> cartBody(world->GetBody(AddBox(scene, location, cartMass, xSize, ySize, zSize, "wood_0.png")));
+		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(cartBody);
+		ndMatrix matrix(location);
+		matrix.m_posit.m_y += ySize / 2.0f + 0.05f;
+		cartBody->SetMatrix(matrix);
+		cartBody->GetAsBodyDynamic()->SetSleepAccel(cartBody->GetAsBodyDynamic()->GetSleepAccel() * ndFloat32(0.1f));
+
+		matrix.m_posit.m_y += ySize / 2.0f;
+
+		// make pole leg
+		ndSharedPtr<ndBody> poleBody(world->GetBody(AddCapsule(scene, ndGetIdentityMatrix(), poleMass, poleRadio, poleRadio, poleLength, "smilli.png")));
+		ndMatrix poleLocation(ndRollMatrix(90.0f * ndDegreeToRad) * matrix);
+		poleLocation.m_posit.m_y += poleLength * 0.5f;
+		poleBody->SetMatrix(poleLocation);
+		poleBody->GetAsBodyDynamic()->SetSleepAccel(poleBody->GetAsBodyDynamic()->GetSleepAccel() * ndFloat32(0.1f));
+
+		// link cart and body with a hinge
+		ndMatrix polePivot(ndYawMatrix(90.0f * ndDegreeToRad) * poleLocation);
+		polePivot.m_posit.m_y -= poleLength * 0.5f;
+		ndSharedPtr<ndJointBilateralConstraint> poleJoint(new ndJointHinge(polePivot, poleBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
+
+		// make the car move alone the z axis only (2d problem)
+		ndSharedPtr<ndJointBilateralConstraint> xDirSlider(new ndJointSlider(cartBody->GetMatrix(), cartBody->GetAsBodyDynamic(), world->GetSentinelBody()));
+		world->AddJoint(xDirSlider);
+
+		// add path to the model
+		world->AddJoint(poleJoint);
+		model->AddLimb(modelRoot, poleBody, poleJoint);
+
+		// save some useful data
+		//model->m_cart = cartBody->GetAsBodyDynamic();
+		//model->m_pole = poleBody->GetAsBodyDynamic();
+		//model->m_cartMatrix = cartBody->GetMatrix();
+		//model->m_poleMatrix = poleBody->GetMatrix();
+
+		return model;
+	}
+
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndSharedPtr<ndDemoEntity>& modelMesh)
 	{
+#if 1
+		ndModelArticulation* const model = BuildModelOldModel(scene, location);
+#else
+		
 		ndModelArticulation* const model = new ndModelArticulation();
 		ndSharedPtr<ndDemoEntity> entity(modelMesh->GetChildren().GetFirst()->GetInfo()->CreateClone());
 		scene->AddEntity(entity);
@@ -88,6 +145,7 @@ namespace ndContinueCarpole
 		//char fileName[256];
 		//ndGetWorkingFileName("cartpole.urdf", fileName);
 		//urdf.Export(fileName, model->GetAsModelArticulation());
+#endif
 
 		return model;
 	}
@@ -230,18 +288,55 @@ namespace ndContinueCarpole
 			m_poleMatrix = m_pole->GetMatrix();
 		}
 
-		//ndFloat32 GetPoleAngle() const
-		//{
-		//	//const ndMatrix& matrix = m_poleJoint->GetLocalMatrix0() * m_pole->GetMatrix();
-		//	//ndFloat32 angle = ndAsin(matrix.m_right.m_x);
-		//	ndFloat32 angle = GetPoleAngle();
-		//	return angle;
-		//}
+#if 1
+		bool IsTerminal() const
+		{
+			const ndMatrix& matrix = m_pole->GetMatrix();
+			// agent dies if the angle is larger than D_REWARD_MIN_ANGLE * ndFloat32 (2.0f) degrees
+			ndFloat32 sinAngle = matrix.m_front.m_x;
+			ndFloat32 angle = ndAsin(sinAngle);
+			bool fail = ndAbs(angle) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
+			return fail;
+		}
 
+		ndReal GetReward() const
+		{
+			if (IsTerminal())
+			{
+				return ndReal(0.0f);
+			}
+			const ndMatrix& matrix = m_pole->GetMatrix();
+			ndFloat32 sinAngle = matrix.m_front.m_x;
+			ndFloat32 angle = ndAsin(sinAngle);
+			//ndFloat32 angularReward = ndReal(ndExp(-ndFloat32(1000.0f) * sinAngle * sinAngle));
+			ndFloat32 angularReward = ndReal(ndExp(-ndFloat32(1000.0f) * angle * angle));
+
+			const ndVector veloc(m_cart->GetVelocity());
+			ndFloat32 linearReward = ndReal(ndExp(-ndFloat32(200.0f) * veloc.m_x * veloc.m_x));
+
+			ndReal reward = 0.5f * angularReward + 0.5f * linearReward;
+			return ndReal(reward);
+		}
+
+		void GetObservation(ndBrainFloat* const observation)
+		{
+			ndVector omega(m_pole->GetOmega());
+			const ndMatrix& matrix = m_pole->GetMatrix();
+			ndFloat32 angle = ndAsin(matrix.m_front.m_x);
+			observation[m_poleAngle] = ndReal(angle);
+			observation[m_poleOmega] = ndReal(omega.m_z);
+
+			const ndVector cartVeloc(m_cart->GetVelocity());
+			ndFloat32 cartSpeed = cartVeloc.m_x;
+			observation[m_cartSpeed] = cartSpeed;
+		}
+
+#else
 		bool IsTerminal() const
 		{
 			// agent dies if the angle is larger than D_REWARD_MIN_ANGLE * ndFloat32 (2.0f) degrees
-			bool fail = ndAbs(m_poleJoint->GetAngle()) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
+			ndFloat32 angle = m_poleJoint->GetAngle();
+			bool fail = ndAbs(angle) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
 			return fail;
 		}
 
@@ -255,30 +350,24 @@ namespace ndContinueCarpole
 			const ndVector veloc(m_cart->GetVelocity());
 			ndFloat32 angle = m_poleJoint->GetAngle();
 			ndFloat32 angularReward = ndReal(ndExp(-ndFloat32(1000.0f) * angle * angle));
-			ndFloat32 linearReward = ndReal(ndExp(-ndFloat32(200.0f) * veloc.m_x * veloc.m_x));
-
-			ndReal reward = 0.5f * angularReward + 0.5f * linearReward;
+			//ndFloat32 linearReward = ndReal(ndExp(-ndFloat32(200.0f) * veloc.m_x * veloc.m_x));
+			//ndReal reward = 0.5f * angularReward + 0.5f * linearReward;
+			ndReal reward = angularReward;
 			return reward;
 		}
 
 		void GetObservation(ndBrainFloat* const state)
 		{
-			//ndFloat32 poleAngle = m_poleJoint->GetAngle();
-			//ndFloat32 omega = m_poleJoint->GetOmega();
 			const ndVector cartVeloc(m_cart->GetVelocity());
-
-			ndFloat32 cartSpeed = cartVeloc.m_x / ndFloat32(10.0f);
+			//ndFloat32 cartSpeed = cartVeloc.m_x / ndFloat32(10.0f);
 			ndFloat32 poleOmega = m_poleJoint->GetOmega() / ndFloat32(2.0f);
 			ndFloat32 poleAngle = m_poleJoint->GetAngle() / (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
 
-			//ndTrace(("%f %f\n", cartVeloc.m_x, speed));
-			//ndTrace(("%f %f\n", m_poleJoint->GetAngle(), poleAngle));
-			//ndTrace(("%f %f\n", m_poleJoint->GetOmega(), poleOmega));
-
-			state[m_cartSpeed] = cartSpeed;
+			//state[m_cartSpeed] = cartSpeed;
 			state[m_poleAngle] = poleAngle;
 			state[m_poleOmega] = poleOmega;
 		}
+#endif
 
 		void ApplyActions(ndBrainFloat* const actions)
 		{
@@ -300,7 +389,6 @@ namespace ndContinueCarpole
 			m_cart->SetVelocity(ndVector::m_zero);
 
 			GetModel()->GetAsModelArticulation()->ClearMemory();
-			//m_poleJoint->ClearMemory();
 		}
 
 		bool IsOutOfBounds() const
@@ -350,7 +438,7 @@ namespace ndContinueCarpole
 			,m_saveScore(m_maxScore)
 			,m_discountFactor(0.99f)
 			,m_lastEpisode(0xfffffff)
-			,m_stopTraining(500 * 1000000)
+			,m_stopTraining(50 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			char name[256];
@@ -362,13 +450,7 @@ namespace ndContinueCarpole
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 
 			hyperParameters.m_extraTrajectorySteps = 256;
-			hyperParameters.m_maxTrajectorySteps = 1024 * 4;
-
-	//hyperParameters.m_threadsCount = 1;
-	//hyperParameters.m_maxTrajectorySteps = 256;
-	//hyperParameters.m_extraTrajectorySteps = 60;
-	//hyperParameters.m_bashTrajectoryCount = 50;
-
+			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
 			hyperParameters.m_numberOfActions = m_actionsSize;
 			hyperParameters.m_numberOfObservations = m_stateSize;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
@@ -403,6 +485,7 @@ namespace ndContinueCarpole
 
 			// add a hidden battery of model to generate trajectories in parallel
 			const ndInt32 countX = 100;
+			//const ndInt32 countX = 0;
 			for (ndInt32 i = 0; i < countX; ++i)
 			{
 				ndMatrix location(matrix);
@@ -630,8 +713,9 @@ void ndCartpoleContinue(ndDemoEntityManager* const scene)
 	model->SetNotifyCallback(new RobotModelNotify(policy, model));
 #endif
 
-	matrix.m_posit.m_y = 0.5f;
-	matrix.m_posit.m_z = 5.0f;
+	matrix.m_posit.m_x -= 0.0f;
+	matrix.m_posit.m_y += 0.5f;
+	matrix.m_posit.m_z += 2.0f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }

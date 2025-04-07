@@ -29,14 +29,15 @@
 #define ND_CONTINUE_PROXIMA_POLICY_ITERATIONS			10
 #define ND_CONTINUE_PROXIMA_POLICY_KL_DIVERGENCE		ndBrainFloat(0.001f)
 #define ND_CONTINUE_PROXIMA_POLICY_CLIP_EPSILON			ndBrainFloat(0.2f)
-//#define ND_CONTINUE_PROXIMA_POLICY_MIN_SIGMA			ndBrainFloat(1.0e-1f)
-//#define ND_CONTINUE_PROXIMA_POLICY_GRADIENT_BUFFER_SIZE	(1024 * 64)
 
 ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(const HyperParameters& hyperParameters)
 	:ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters)
 	,m_oldPolicy(m_policy)
 	,m_tempPolicy(m_policy)
 {
+	m_policyLearnRate *= 1.0f / ND_CONTINUE_PROXIMA_POLICY_ITERATIONS;
+	m_criticLearnRate *= 1.0f / ND_CONTINUE_PROXIMA_POLICY_ITERATIONS;
+
 }
 
 ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::~ndBrainAgentContinueProximaPolicyGradient_TrainerMaster()
@@ -99,7 +100,6 @@ ndBrainFloat ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateK
 	}
 	ndAssert(divergence >= 0.0f);
 	divergence /= ndFloat64(m_trajectoryAccumulator.GetCount());
-	//divergence = 0;
 	return ndBrainFloat(divergence);
 }
 

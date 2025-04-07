@@ -29,9 +29,7 @@
 
 #define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 256)
 #define ND_CONTINUE_POLICY_STATE_VALUE_ITERATIONS	5
-#define ND_CONTINUE_POLICY_GRADIENT_SIGMA_SCALE		ndBrainFloat(2.0f)
-
-#define ND_CONTINUE_POLICY_MIN_SIGMA				ndBrainFloat(0.005f)
+#define ND_CONTINUE_POLICY_MIN_SIGMA				ndBrainFloat(0.125f)
 
 //*********************************************************************************************
 //
@@ -63,12 +61,12 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 //
 //*********************************************************************************************
 ndPolicyGradientActivation::ndPolicyGradientActivation(ndInt32 neurons)
-	:ndBrainLayerActivation(neurons)
+	:ndBrainLayerActivationTanh(neurons)
 {
 }
 
 ndPolicyGradientActivation::ndPolicyGradientActivation(const ndPolicyGradientActivation& src)
-	:ndBrainLayerActivation(src)
+	:ndBrainLayerActivationTanh(src)
 {
 }
 
@@ -104,30 +102,31 @@ const char* ndPolicyGradientActivation::GetLabelId() const
 	return "ndPolicyGradientActivation";
 }
 
+#pragma optimize( "", off )
 void ndPolicyGradientActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
+	ndBrainLayerActivationTanh::MakePrediction(input, output);
 	const ndInt32 base = m_neurons / 2;
-
 	ndBrainFloat minSigma = GetMinSigma();
 	for (ndInt32 i = base - 1; i >= 0; --i)
 	{
-		output[i] = input[i];
-		output[i + base] = (input[i + base] >= ndBrainFloat(0.0f)) ? input[i + base] + minSigma : minSigma;
-		//output[i + base] = ndExp(ND_CONTINUE_POLICY_GRADIENT_SIGMA_SCALE * input[i + base]) / ND_CONTINUE_POLICY_GRADIENT_SIGMA_SCALE;
+		// this is fucking wrong, but it is yeding better results than teh correct version.
+		output[i + base] = ndMax(input[i + base], minSigma);
+		// correct version, but les has less performance, it need to test this more.
+		//output[i + base] = (input[i + base] >= ndBrainFloat(0.0f)) ? input[i + base] + minSigma : minSigma;
 	}
 }
 
-//#pragma optimize( "", off )
-void ndPolicyGradientActivation::InputDerivative(const ndBrainVector& input, const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+#pragma optimize( "", off )
+void ndPolicyGradientActivation::InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
+	ndBrainLayerActivationTanh::InputDerivative(input, output, outputDerivative, inputDerivative);
 	const ndInt32 base = m_neurons / 2;
 	for (ndInt32 i = base - 1; i >= 0; --i)
 	{
-		inputDerivative[i] = ndBrainFloat(1.0f);
-		inputDerivative[i + base] = (input[i + base] >= ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
-		//inputDerivative[i + base] = output[i + base];
+		ndBrainFloat x = (input[i + base] >= ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+		inputDerivative[i + base] = outputDerivative[i + base] * x;
 	}
-	inputDerivative.Mul(outputDerivative);
 }
 
 //*********************************************************************************************
@@ -471,19 +470,13 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 	ndAssert(m_numberOfObservations);
 	ndSetRandSeed(m_randomSeed);
 
-	m_policyLearnRateStop = m_policyLearnRate * 0.1f;
-	m_policyLearnRateAnnealing = m_policyLearnRate * (m_policyLearnRate - m_policyLearnRateStop) / 300.0f;
-
-	m_criticLearnRateStop = m_criticLearnRate * 0.1f;
-	m_criticLearnRateAnnealing = m_criticLearnRate * (m_criticLearnRate - m_criticLearnRateStop) / 300.0f;
-
 	m_randomGenerator = new ndBrainAgentContinuePolicyGradient_Trainer::ndRandomGenerator[size_t(hyperParameters.m_bashTrajectoryCount)];
-	for (ndInt32 i = 0; i < hyperParameters.m_bashTrajectoryCount; ++i)
-	{
-		m_randomSeed++;
-		m_randomGenerator[i].m_gen.seed(m_randomSeed);
-	}
-	m_randomSeed = 0;
+	//for (ndInt32 i = 0; i < hyperParameters.m_bashTrajectoryCount; ++i)
+	//{
+	//	m_randomSeed++;
+	//	m_randomGenerator[i].m_gen.seed(m_randomSeed);
+	//}
+	//m_randomSeed = 47;
 
 	// build policy neural net
 	SetThreadCount(hyperParameters.m_threadsCount);
@@ -499,7 +492,6 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 		layers.PushBack(new ndBrainLayerActivationTanh(hyperParameters.m_neuronPerLayers));
 	}
 	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_neuronPerLayers, m_numberOfActions * 2));
-	layers.PushBack(new ndBrainLayerActivationTanh(m_numberOfActions * 2));
 	layers.PushBack(new ndPolicyGradientActivation(m_numberOfActions * 2));
 
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
@@ -508,8 +500,8 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 	}
 
 	m_policy.InitWeights();
-	NormalizePolicy();
-	
+
+	//NormalizePolicy();
 	//m_policy.SaveToFile("xxxx.dnn");
 	//ndSharedPtr<ndBrain> xxx(ndBrainLoad::Load("xxxx.dnn"));
 
@@ -545,7 +537,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 		m_critic.AddLayer(layers[i]);
 	}
 	m_critic.InitWeights();
-	NormalizeCritic();
+	//NormalizeCritic();
 	
 	ndAssert(m_critic.GetOutputSize() == 1);
 	ndAssert(m_critic.GetInputSize() == m_policy.GetInputSize());
@@ -646,7 +638,6 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::NormalizePolicy()
 			for (ndInt32 i = base - 1; i >= 0; --i)
 			{
 				groundTruth[i] = ndBrainFloat(0.0f);
-				//groundTruth[i + base] = ndBrainFloat(1.0f/ ND_CONTINUE_POLICY_GRADIENT_SIGMA_SCALE);
 				groundTruth[i + base] = ((ndPolicyGradientActivation*) m_brain[m_brain.GetCount() - 1])->GetMinSigma();
 			}
 
@@ -777,8 +768,10 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::SetName(const ndString& n
 
 ndBrainAgentContinuePolicyGradient_Trainer::ndRandomGenerator* ndBrainAgentContinuePolicyGradient_TrainerMaster::GetRandomGenerator()
 {
-	m_randomSeed = (m_randomSeed + 1) % m_bashTrajectoryCount;
-	return &m_randomGenerator[m_randomSeed];
+	ndInt32 index = m_agents.GetCount() - 1;
+	m_randomGenerator[index].m_gen.seed(m_randomSeed);
+	m_randomSeed ++;
+	return &m_randomGenerator[index];
 }
 
 ndUnsigned32 ndBrainAgentContinuePolicyGradient_TrainerMaster::GetFramesCount() const
@@ -1110,17 +1103,5 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeStep()
 			agent->m_trajectory.SetCount(0);
 			agent->ResetModel();
 		}
-
-		//m_policyLearnRate -= m_policyLearnRateAnnealing;
-		//if (m_policyLearnRate < m_policyLearnRateStop)
-		//{
-		//	m_policyLearnRate = m_policyLearnRateStop;
-		//}
-		//
-		//m_criticLearnRate -= m_criticLearnRateAnnealing;
-		//if (m_criticLearnRate < m_criticLearnRateStop)
-		//{
-		//	m_criticLearnRate = m_criticLearnRateStop;
-		//}
 	}
 }
