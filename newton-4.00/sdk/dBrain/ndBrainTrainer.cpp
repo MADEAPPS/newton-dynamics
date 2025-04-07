@@ -66,6 +66,14 @@ class ndBrainTrainer::ndLayerData : public ndClassAlloc
 		}
 	}
 
+	void Copy(const ndLayerData& src)
+	{
+		if (m_layer->HasParameters())
+		{
+			m_gradient->Set(*src.m_gradient);
+		}
+	}
+
 	void Scale(ndBrainFloat s)
 	{
 		if (m_layer->HasParameters())
@@ -176,6 +184,14 @@ void ndBrainTrainer::AddGradients(const ndBrainTrainer* const src)
 	for (ndInt32 i = ndInt32(m_data.GetCount() - 1); i >= 0; --i)
 	{
 		m_data[i]->Add(*src->m_data[i]);
+	}
+}
+
+void ndBrainTrainer::CopyGradients(const ndBrainTrainer* const src)
+{
+	for (ndInt32 i = ndInt32(m_data.GetCount() - 1); i >= 0; --i)
+	{
+		m_data[i]->Copy(*src->m_data[i]);
 	}
 }
 

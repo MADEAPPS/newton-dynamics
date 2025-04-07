@@ -25,7 +25,7 @@
 
 namespace ndContinueCarpole
 {
-	#define ND_TRAIN_AGENT
+	//#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME			"cartpoleContinue"
 
 	//#define CONTROLLER_RESUME_TRAINING
@@ -286,7 +286,7 @@ namespace ndContinueCarpole
 		ndFloat32 GetPoleAngle() const
 		{
 			const ndMatrix matrix(m_poleJoint->CalculateGlobalMatrix0());
-			ndFloat32 sinAngle = matrix.m_up.m_x;
+			ndFloat32 sinAngle = ndClamp (matrix.m_up.m_x, ndFloat32 (-0.99f), ndFloat32(0.99f));
 			ndFloat32 angle = ndAsin(sinAngle);
 			return angle;
 		}
@@ -437,7 +437,7 @@ namespace ndContinueCarpole
 			,m_saveScore(m_maxScore)
 			,m_discountFactor(0.99f)
 			,m_lastEpisode(0xfffffff)
-			,m_stopTraining(50 * 1000000)
+			,m_stopTraining(100 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			char name[256];
