@@ -102,7 +102,7 @@ const char* ndPolicyGradientActivation::GetLabelId() const
 	return "ndPolicyGradientActivation";
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndPolicyGradientActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndBrainLayerActivationTanh::MakePrediction(input, output);
@@ -117,7 +117,7 @@ void ndPolicyGradientActivation::MakePrediction(const ndBrainVector& input, ndBr
 	}
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndPolicyGradientActivation::InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	ndBrainLayerActivationTanh::InputDerivative(input, output, outputDerivative, inputDerivative);
