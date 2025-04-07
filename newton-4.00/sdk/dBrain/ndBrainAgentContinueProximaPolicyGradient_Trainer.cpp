@@ -35,15 +35,15 @@ ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::ndBrainAgentContinuePro
 	,m_oldPolicy(m_policy)
 	,m_tempPolicy(m_policy)
 {
-	m_policyLearnRate *= 0.25f;
-	m_criticLearnRate *= 0.25f;
+	//m_policyLearnRate *= 1.0f / ND_CONTINUE_PROXIMA_POLICY_ITERATIONS;
+	//m_criticLearnRate *= 1.0f / ND_CONTINUE_PROXIMA_POLICY_ITERATIONS;
 }
 
 ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::~ndBrainAgentContinueProximaPolicyGradient_TrainerMaster()
 {
 }
 
-//#pragma optimize( "", off )
+#pragma optimize( "", off )
 ndBrainFloat ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateKLdivergence()
 {
 	//https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
@@ -66,9 +66,9 @@ ndBrainFloat ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateK
 			//m_tempPolicy.MakePrediction(observation, crossProbabilities);
 			ndBrainMemVector entropyProbabilities(m_trajectoryAccumulator.GetProbabilityDistribution(i), m_numberOfActions * 2);
 
-			// caculate t0 = trace(inv(Sigma_q) * Sigma_p
-			// caculate t1 = trans(Uq - Up) * inv(Sigma_q) * (Uq - Up)
-			// caculate t2 = log(det(Sigma_q) /det(Sigma_p))
+			// calculate t0 = trace(inv(Sigma_q) * Sigma_p
+			// calculate t1 = trans(Uq - Up) * inv(Sigma_q) * (Uq - Up)
+			// calculate t2 = log(det(Sigma_q) /det(Sigma_p))
 			ndFloat64 t0 = 0.0f;
 			ndFloat64 t1 = 0.0f;
 			ndFloat64 det_p = 1.0f;
@@ -102,7 +102,7 @@ ndBrainFloat ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateK
 	return ndBrainFloat(divergence);
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizePolicyPPOstep()
 {
 	ndAtomic<ndInt32> iterator(0);
@@ -151,6 +151,7 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizePolicyPPOs
 				{
 					// basically this fits a multivariate Gaussian process with zero cross covariance to the actions.
 					const ndInt32 numberOfActions = m_agent->m_numberOfActions;
+#if 0
 					const ndBrainMemVector sampledProbability(m_agent->m_trajectoryAccumulator.GetActions(m_index), numberOfActions * 2);
 					const ndBrainMemVector oldProbabilityDistribution(m_agent->m_trajectoryAccumulator.GetProbabilityDistribution(m_index), numberOfActions * 2);
 
@@ -186,6 +187,11 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizePolicyPPOs
 					ndBrainFloat g = (rawAdvantage > ndBrainFloat(0.0f)) ? ndBrainFloat(1.0 + ND_CONTINUE_PROXIMA_POLICY_CLIP_EPSILON) : ndBrainFloat(1.0 - ND_CONTINUE_PROXIMA_POLICY_CLIP_EPSILON);
 					// calculate clipped advantage
 					ndBrainFloat advantage = ndMin(r * rawAdvantage, g * rawAdvantage);
+#else
+					const ndBrainMemVector sampledProbability(m_agent->m_trajectoryAccumulator.GetActions(m_index), numberOfActions * 2);
+					ndBrainFloat advantage = m_agent->m_trajectoryAccumulator.GetAdvantage(m_index);
+#endif
+
 
 					for (ndInt32 i = numberOfActions - 1; i >= 0; --i)
 					{
