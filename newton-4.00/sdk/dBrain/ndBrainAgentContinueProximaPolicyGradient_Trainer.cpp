@@ -35,9 +35,8 @@ ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::ndBrainAgentContinuePro
 	,m_oldPolicy(m_policy)
 	,m_tempPolicy(m_policy)
 {
-	m_policyLearnRate *= 1.0f / ND_CONTINUE_PROXIMA_POLICY_ITERATIONS;
-	m_criticLearnRate *= 1.0f / ND_CONTINUE_PROXIMA_POLICY_ITERATIONS;
-
+	m_policyLearnRate *= 0.25f;
+	m_criticLearnRate *= 0.25f;
 }
 
 ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::~ndBrainAgentContinueProximaPolicyGradient_TrainerMaster()

@@ -47,7 +47,6 @@ namespace ndContinueCarpole
 		m_stateSize
 	};
 
-	//ndModelArticulation* BuildModelOldModel(ndRobot* const model, ndDemoEntityManager* const scene, const ndMatrix& location)
 	ndModelArticulation* BuildModelOldModel(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
 		ndFloat32 xSize = 0.25f;
@@ -79,7 +78,7 @@ namespace ndContinueCarpole
 		poleBody->GetAsBodyDynamic()->SetSleepAccel(poleBody->GetAsBodyDynamic()->GetSleepAccel() * ndFloat32(0.1f));
 
 		// link cart and body with a hinge
-		ndMatrix polePivot(ndYawMatrix(90.0f * ndDegreeToRad) * poleLocation);
+		ndMatrix polePivot(ndPitchMatrix(90.0f * ndDegreeToRad) * ndYawMatrix(90.0f * ndDegreeToRad) * poleLocation);
 		polePivot.m_posit.m_y -= poleLength * 0.5f;
 		ndSharedPtr<ndJointBilateralConstraint> poleJoint(new ndJointHinge(polePivot, poleBody->GetAsBodyKinematic(), modelRoot->m_body->GetAsBodyKinematic()));
 
@@ -91,18 +90,12 @@ namespace ndContinueCarpole
 		world->AddJoint(poleJoint);
 		model->AddLimb(modelRoot, poleBody, poleJoint);
 
-		// save some useful data
-		//model->m_cart = cartBody->GetAsBodyDynamic();
-		//model->m_pole = poleBody->GetAsBodyDynamic();
-		//model->m_cartMatrix = cartBody->GetMatrix();
-		//model->m_poleMatrix = poleBody->GetMatrix();
-
 		return model;
 	}
 
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndSharedPtr<ndDemoEntity>& modelMesh)
 	{
-#if 1
+#if 0
 		ndModelArticulation* const model = BuildModelOldModel(scene, location);
 #else
 		
@@ -122,8 +115,8 @@ namespace ndContinueCarpole
 			return body;
 		};
 
-		ndFloat32 cartMass = 20.0f;
-		ndFloat32 poleMass = 5.0f;
+		ndFloat32 cartMass = 5.0f;
+		ndFloat32 poleMass = 10.0f;
 
 		ndMatrix matrix(entity->GetCurrentMatrix() * location);
 		matrix.m_posit = location.m_posit;
@@ -289,25 +282,31 @@ namespace ndContinueCarpole
 		}
 
 #if 1
+		#pragma optimize( "", off )
+		ndFloat32 GetPoleAngle() const
+		{
+			const ndMatrix matrix(m_poleJoint->CalculateGlobalMatrix0());
+			ndFloat32 sinAngle = matrix.m_up.m_x;
+			ndFloat32 angle = ndAsin(sinAngle);
+			return angle;
+		}
+
+		#pragma optimize( "", off )
 		bool IsTerminal() const
 		{
-			const ndMatrix& matrix = m_pole->GetMatrix();
-			// agent dies if the angle is larger than D_REWARD_MIN_ANGLE * ndFloat32 (2.0f) degrees
-			ndFloat32 sinAngle = matrix.m_front.m_x;
-			ndFloat32 angle = ndAsin(sinAngle);
+			ndFloat32 angle = GetPoleAngle();
 			bool fail = ndAbs(angle) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
 			return fail;
 		}
 
+		#pragma optimize( "", off )
 		ndReal GetReward() const
 		{
 			if (IsTerminal())
 			{
 				return ndReal(0.0f);
 			}
-			const ndMatrix& matrix = m_pole->GetMatrix();
-			ndFloat32 sinAngle = matrix.m_front.m_x;
-			ndFloat32 angle = ndAsin(sinAngle);
+			ndFloat32 angle = GetPoleAngle();
 			//ndFloat32 angularReward = ndReal(ndExp(-ndFloat32(1000.0f) * sinAngle * sinAngle));
 			ndFloat32 angularReward = ndReal(ndExp(-ndFloat32(1000.0f) * angle * angle));
 
@@ -318,11 +317,11 @@ namespace ndContinueCarpole
 			return ndReal(reward);
 		}
 
+		#pragma optimize( "", off )
 		void GetObservation(ndBrainFloat* const observation)
 		{
 			ndVector omega(m_pole->GetOmega());
-			const ndMatrix& matrix = m_pole->GetMatrix();
-			ndFloat32 angle = ndAsin(matrix.m_front.m_x);
+			ndFloat32 angle = GetPoleAngle();
 			observation[m_poleAngle] = ndReal(angle);
 			observation[m_poleOmega] = ndReal(omega.m_z);
 
@@ -450,13 +449,13 @@ namespace ndContinueCarpole
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 
 			hyperParameters.m_extraTrajectorySteps = 256;
-			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
+			hyperParameters.m_maxTrajectorySteps = 1024 * 4;
 			hyperParameters.m_numberOfActions = m_actionsSize;
 			hyperParameters.m_numberOfObservations = m_stateSize;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 
-			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
-			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
+			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
+			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
 			m_bestActor = ndSharedPtr< ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
 
 			snprintf(name, sizeof(name), "%s.dnn", CONTROLLER_NAME);

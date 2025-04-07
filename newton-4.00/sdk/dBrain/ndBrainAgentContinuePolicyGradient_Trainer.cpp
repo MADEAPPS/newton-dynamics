@@ -1088,8 +1088,9 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeStep()
 		m_framesAlive++;
 	}
 
-	ndInt32 trajectoryAccumulatorCount = m_trajectoryAccumulator.GetCount();
-	if ((m_bashTrajectoryIndex >= m_bashTrajectoryCount) && (trajectoryAccumulatorCount >= m_bashTrajectorySteps))
+	//ndInt32 trajectoryAccumulatorCount = m_trajectoryAccumulator.GetCount();
+	//if ((m_bashTrajectoryIndex >= m_bashTrajectoryCount) && (trajectoryAccumulatorCount >= m_bashTrajectorySteps))
+	if (m_bashTrajectoryIndex >= m_bashTrajectoryCount)
 	{
 		Optimize();
 
