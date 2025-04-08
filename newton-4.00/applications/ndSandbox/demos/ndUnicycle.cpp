@@ -379,15 +379,15 @@ namespace ndUnicycle
 			const ndVector wheelVeloc(m_wheel->GetVelocity());
 			const ndVector boxVeloc(boxBody->GetVelocity());
 
-			//const ndFloat32 boxAngle = GetBoxAngle();
-			//ndFloat32 standingReward = ndFloat32(ndExp(-ndFloat32(2000.0f) * boxAngle * boxAngle));
+			const ndFloat32 boxAngle = GetBoxAngle();
+			ndFloat32 standingReward = ndFloat32(ndExp(-ndFloat32(2000.0f) * boxAngle * boxAngle));
 			//ndFloat32 speedReward = ndFloat32(ndExp(-ndFloat32(100.0f) * boxVeloc.m_x * boxVeloc.m_x));
 			ndFloat32 timeLineReward = ndFloat32(m_controllerTrainer->m_trajectory.GetCount()) / ndFloat32(ND_TRAJECTORY_STEPS);
 
 			//ndFloat32 reward = (standingReward + speedReward + timeLineReward) / ndFloat32(3.0f);
-			//ndFloat32 reward = (standingReward + timeLineReward) / ndFloat32(2.0f);
+			ndFloat32 reward = (standingReward + timeLineReward) / ndFloat32(2.0f);
 			//ndFloat32 reward = standingReward;
-			ndFloat32 reward = timeLineReward;
+			//ndFloat32 reward = timeLineReward;
 			return ndReal(reward);
 		}
 
@@ -404,9 +404,10 @@ namespace ndUnicycle
 			ndBodyDynamic* const wheelBody = m_wheelJoint->GetBody0()->GetAsBodyDynamic();
 			const ndMatrix matrix(m_wheelJoint->GetLocalMatrix1() * m_wheelJoint->GetBody1()->GetMatrix());
 			const ndVector wheelMass(wheelBody->GetMassMatrix());
-			const ndVector wheelAlpha(wheelBody->GetAlpha());
-			ndFloat32 wheelSpeedAlpha = wheelAlpha.m_z + actions[m_wheelControl] * ND_MAX_AlPHA_STEP;
-			wheelSpeedAlpha = ndClamp(wheelSpeedAlpha, -ND_MAX_WHEEL_ALPHA, ND_MAX_WHEEL_ALPHA);
+			//const ndVector wheelAlpha(wheelBody->GetAlpha());
+			//ndFloat32 wheelSpeedAlpha = wheelAlpha.m_z + actions[m_wheelControl] * ND_MAX_AlPHA_STEP;
+			//wheelSpeedAlpha = ndClamp(wheelSpeedAlpha, -ND_MAX_WHEEL_ALPHA, ND_MAX_WHEEL_ALPHA);
+			ndFloat32 wheelSpeedAlpha = actions[m_wheelControl] * ND_MAX_WHEEL_ALPHA;
 
 			//wheelSpeedAlpha = 0.0f;
 			ndVector torque(matrix.m_front.Scale(wheelSpeedAlpha * wheelMass.m_x));
@@ -516,7 +517,7 @@ namespace ndUnicycle
 			,m_outFile(nullptr)
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
-			,m_discountFactor(0.98f)
+			,m_discountFactor(0.99f)
 			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(0xffffffff)
 			,m_stopTraining(500 * 1000000)
