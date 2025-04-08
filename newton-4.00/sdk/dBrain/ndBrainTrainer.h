@@ -47,6 +47,7 @@ class ndBrainTrainer: public ndClassAlloc
 	void ClearGradients();
 	void ScaleWeights(const ndBrainFloat s);
 	void AddGradients(const ndBrainTrainer* const src);
+	void CopyGradients(const ndBrainTrainer* const src);
 
 	ndBrainVector& GetWorkingBuffer();
 
