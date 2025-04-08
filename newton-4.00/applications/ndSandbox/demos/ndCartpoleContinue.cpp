@@ -311,9 +311,9 @@ namespace ndContinueCarpole
 			const ndVector veloc(m_cart->GetVelocity());
 			ndFloat32 angularReward = ndReal(ndExp(-ndFloat32(1000.0f) * angle * angle));
 			ndFloat32 speedReward = ndReal(ndExp(-ndFloat32(200.0f) * veloc.m_x * veloc.m_x));
-			ndFloat32 aliveReward = ndFloat32(m_controllerTrainer->m_trajectory.GetCount()) / ndFloat32(ND_TRAJECTORY_STEPS);
+			ndFloat32 timeLineReward = ndFloat32(m_controllerTrainer->m_trajectory.GetCount()) / ndFloat32(ND_TRAJECTORY_STEPS);
 
-			ndFloat32 reward = (angularReward + speedReward + aliveReward) / ndFloat32(3.0f);
+			ndFloat32 reward = (angularReward + speedReward + timeLineReward) / ndFloat32(3.0f);
 			return ndReal(reward);
 		}
 

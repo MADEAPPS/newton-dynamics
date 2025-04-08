@@ -483,6 +483,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 
 	layers.SetCount(0);
+	//layers.PushBack(new ndBrainLayerActivationTanh(m_numberOfObservations));
 	layers.PushBack(new ndBrainLayerLinear(m_numberOfObservations, hyperParameters.m_neuronPerLayers));
 	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 	for (ndInt32 i = 0; i < hyperParameters.m_numberOfLayers; ++i)

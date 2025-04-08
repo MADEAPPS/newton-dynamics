@@ -45,9 +45,9 @@ namespace ndUnicycle
 	{
 		m_topBoxAngle,
 		m_topBoxOmega,
+		m_topBoxSpeed,
 		m_jointAngle,
 		m_jointOmega,
-		m_wheelSpeed,
 		m_stateSize
 	};
 
@@ -104,22 +104,8 @@ namespace ndUnicycle
 		ndModelArticulation::ndNode* const ballHingeNode = model->AddLimb(poleLink, ball, ballHinge);
 		ndJointHinge* const wheelMotor = (ndJointHinge*)*ballHinge;
 		wheelMotor->SetAsSpringDamper(0.02f, 0.0f, 0.2f);
-		//model->m_wheelJoint = wheelMotor;
 		ballHingeNode->m_name = "wheel";
-		//model->m_wheel = ball->GetAsBodyKinematic();
 
-		//// add model limbs
-		//ndModelArticulation::ndNode* const legLimb = model->AddLimb(modelRoot, pole, poleHinge);
-		//model->AddLimb(legLimb, ball, ballHinge);
-		//
-		//model->m_bodies.SetCount(0);
-		//model->m_basePose.SetCount(0);
-		//for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-		//{
-		//	ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
-		//	model->m_bodies.PushBack(body);
-		//	model->m_basePose.PushBack(body);
-		//}
 		return model;
 	}
 
@@ -167,7 +153,7 @@ namespace ndUnicycle
 		ndSharedPtr<ndJointBilateralConstraint> ballHinge(new ndJointHinge(ballMatrix, ball->GetAsBodyKinematic(), pole->GetAsBodyKinematic()));
 		ndModelArticulation::ndNode* const ballHingeNode = model->AddLimb(poleLink, ball, ballHinge);
 		ballHingeNode->m_name = "wheel";
-		//((ndJointHinge*)*ballHinge)->SetAsSpringDamper(0.2f, 0.0f, 0.001f);
+		((ndJointHinge*)*ballHinge)->SetAsSpringDamper(0.02f, 0.0f, 0.1f);
 
 		//ndUrdfFile urdf;
 		//char fileName[256];
@@ -385,13 +371,18 @@ namespace ndUnicycle
 			}
 
 			const ndFloat32 boxAngle = GetBoxAngle();
+			ndModelArticulation* const model = (ndModelArticulation*)GetModel();
+			ndBodyKinematic* const boxBody = model->GetRoot()->m_body->GetAsBodyKinematic();
 			const ndVector wheelVeloc(m_wheel->GetVelocity());
+			const ndVector boxVeloc(boxBody->GetVelocity());
 
 			ndFloat32 standingReward = ndFloat32(ndExp(-ndFloat32(2000.0f) * boxAngle * boxAngle));
-			ndFloat32 speedReward = ndFloat32(ndExp(-ndFloat32(200.0f) * wheelVeloc.m_x * wheelVeloc.m_x));
-			ndFloat32 aliveReward = ndFloat32(m_controllerTrainer->m_trajectory.GetCount()) / ndFloat32(ND_TRAJECTORY_STEPS);
+			//ndFloat32 speedReward = ndFloat32(ndExp(-ndFloat32(100.0f) * boxVeloc.m_x * boxVeloc.m_x));
+			//ndFloat32 timeLineReward = ndFloat32(m_controllerTrainer->m_trajectory.GetCount()) / ndFloat32(ND_TRAJECTORY_STEPS);
 
-			ndFloat32 reward = (standingReward + speedReward + aliveReward) / ndFloat32(3.0f);
+			//ndFloat32 reward = (standingReward + speedReward + timeLineReward) / ndFloat32(3.0f);
+			//ndFloat32 reward = (standingReward + timeLineReward) / ndFloat32(2.0f);
+			ndFloat32 reward = standingReward;
 			return ndReal(reward);
 		}
 
@@ -407,32 +398,32 @@ namespace ndUnicycle
 			wheelBody->SetTorque(torque);
 		}
 
+		#pragma optimize( "", off )
 		void GetObservation(ndBrainFloat* const observation)
 		{
 			ndModelArticulation* const model = (ndModelArticulation*)GetModel();
 			ndBodyKinematic* const boxBody = model->GetRoot()->m_body->GetAsBodyKinematic();
 			const ndVector boxOmega(boxBody->GetOmega());
 			const ndVector wheelVeloc(m_wheel->GetVelocity());
+			const ndVector boxVeloc(boxBody->GetVelocity());
 			
-			//ndFloat32 wheelSpeed = wheelVeloc.m_x / ndFloat32(10.0f);
-			ndFloat32 wheelSpeed = wheelVeloc.m_x / ndFloat32(5.0f);
+			ndFloat32 wheelSpeed = wheelVeloc.m_x / ndFloat32(10.0f);
+			//ndFloat32 boxSpeed = boxVeloc.m_x / ndFloat32(1.0f);
 
-			//ndFloat32 boxAngularSpeed = boxOmega.m_z / ndFloat32(2.0f);
-			ndFloat32 boxAngularSpeed = boxOmega.m_z;
-
-			//ndFloat32 boxAngle = GetBoxAngle() / (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
-			ndFloat32 boxAngle = GetBoxAngle() / D_REWARD_MIN_ANGLE;
+			ndFloat32 boxAngularSpeed = boxOmega.m_z / ndFloat32(2.0f);
+			ndFloat32 boxAngle = GetBoxAngle() / (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
 
 			ndFloat32 legAngle = ndBrainFloat(m_legJoint->GetAngle()) / ND_MAX_LEG_JOINT_ANGLE;
-			//ndFloat32 legAngularSpeed = ndBrainFloat(m_legJoint->GetOmega()) / ndFloat32(2.0f);
-			ndFloat32 legAngularSpeed = m_legJoint->GetOmega();
+			ndFloat32 legAngularSpeed = ndBrainFloat(m_legJoint->GetOmega()) / ndFloat32(2.0f);
 
 			//ndTrace(("%f %f %f %f %f\n", wheelSpeed, boxAngularSpeed, boxAngle, legAngle, legAngularSpeed));
 
-			observation[m_wheelSpeed] = wheelSpeed;
 			observation[m_jointAngle] = legAngle;
-			observation[m_topBoxAngle] = boxAngle;
 			observation[m_jointOmega] = legAngularSpeed;
+
+			//observation[m_topBoxSpeed] = boxSpeed;
+			observation[m_topBoxSpeed] = wheelSpeed;
+			observation[m_topBoxAngle] = boxAngle;
 			observation[m_topBoxOmega] = boxAngularSpeed;
 		}
 
