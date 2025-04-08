@@ -45,7 +45,7 @@ ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::~ndBrainAgentContinuePr
 {
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 ndBrainFloat ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateKLdivergence()
 {
 	//https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
@@ -367,7 +367,7 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::Optimize()
 
 #else
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateGradients()
 {
 	ndAtomic<ndInt32> iterator(0);
@@ -471,7 +471,7 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateGradients
 	//m_policyOptimizer->Update(this, m_policyWeightedTrainer, -m_policyLearnRate);
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::Optimize()
 {
 	CalculateAdvange();
