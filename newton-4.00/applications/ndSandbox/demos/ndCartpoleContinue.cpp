@@ -435,7 +435,8 @@ namespace ndContinueCarpole
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
 			,m_saveScore(m_maxScore)
-			,m_discountFactor(0.99f)
+			,m_discountFactor(0.98f)
+			,m_horizon (ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(0xfffffff)
 			,m_stopTraining(100 * 1000000)
 			,m_modelIsTrained(false)
@@ -445,10 +446,20 @@ namespace ndContinueCarpole
 			m_outFile = fopen(name, "wb");
 			fprintf(m_outFile, "vpg\n");
 
-			m_horizon = ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor);
+
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 
-			hyperParameters.m_extraTrajectorySteps = 256;
+			float xxxx = 0;
+			float xxxx1 = 1.0;
+			int n = 0;
+			for (; xxxx < 0.99f * m_horizon; n++)
+			{
+				xxxx += xxxx1;
+				xxxx1 *= m_discountFactor;
+			}
+
+
+			hyperParameters.m_extraTrajectorySteps = 512;
 			hyperParameters.m_maxTrajectorySteps = ND_TRAJECTORY_STEPS;
 			hyperParameters.m_numberOfActions = m_actionsSize;
 			hyperParameters.m_numberOfObservations = m_stateSize;
