@@ -1042,7 +1042,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::CalculateAdvange()
 	});
 	ndBrainThreadPool::ParallelExecute(CalculateAdvantage);
 
-#if 0
+#if 1
 	ndFloat64 advantageVariance2 = ndBrainFloat(0.0f);
 	for (ndInt32 i = stepNumber - 1; i >= 0; --i)
 	{
@@ -1051,7 +1051,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::CalculateAdvange()
 	}
 
 	advantageVariance2 /= ndBrainFloat(stepNumber);
-	advantageVariance2 = ndMax(advantageVariance2, ndFloat64(1.0e2f));
+	advantageVariance2 = ndMax(advantageVariance2, ndFloat64(1.0e-2f));
 	ndBrainFloat invVariance = ndBrainFloat(1.0f) / ndBrainFloat(ndSqrt(advantageVariance2));
 	for (ndInt32 i = stepNumber - 1; i >= 0; --i)
 	{
@@ -1065,8 +1065,8 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::CalculateAdvange()
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::Optimize()
 {
 	CalculateAdvange();
-	OptimizePolicy();
 	OptimizeCritic();
+	OptimizePolicy();
 }
 
 #pragma optimize( "", off )
@@ -1089,9 +1089,8 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeStep()
 		m_framesAlive++;
 	}
 
-	//ndInt32 trajectoryAccumulatorCount = m_trajectoryAccumulator.GetCount();
-	//if ((m_bashTrajectoryIndex >= m_bashTrajectoryCount) && (trajectoryAccumulatorCount >= m_bashTrajectorySteps))
 	if (m_bashTrajectoryIndex >= m_bashTrajectoryCount)
+	//if ((m_bashTrajectoryIndex >= m_bashTrajectoryCount) && (m_trajectoryAccumulator.GetCount() >= m_bashTrajectorySteps))
 	{
 		Optimize();
 
