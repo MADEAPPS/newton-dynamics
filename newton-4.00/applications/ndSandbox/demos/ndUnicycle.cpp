@@ -32,6 +32,8 @@ namespace ndUnicycle
 	#define ND_MAX_LEG_ANGLE_STEP	(ndFloat32 (4.0f) * ndDegreeToRad)
 	#define ND_MAX_LEG_JOINT_ANGLE	(ndFloat32 (30.0f) * ndDegreeToRad)
 
+	#define ND_TRAJECTORY_STEPS		(1024 * 4)
+
 	enum ndActionSpace
 	{
 		m_legControl,
@@ -49,8 +51,83 @@ namespace ndUnicycle
 		m_stateSize
 	};
 
+	ndModelArticulation* BuildModelOldModel(ndDemoEntityManager* const scene, const ndMatrix& location)
+	{
+		ndModelArticulation* const model = new ndModelArticulation();
+
+		ndFloat32 mass = 10.0f;
+		ndFloat32 limbMass = 1.0f;
+		ndFloat32 wheelMass = 1.0f;
+
+		ndFloat32 xSize = 0.25f;
+		ndFloat32 ySize = 0.40f;
+		ndFloat32 zSize = 0.30f;
+		ndPhysicsWorld* const world = scene->GetWorld();
+
+		// add hip body
+		ndSharedPtr<ndBody> hipBody(world->GetBody(AddBox(scene, location, mass, xSize, ySize, zSize, "wood_0.png")));
+		ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(hipBody);
+
+		ndMatrix matrix(location);
+		matrix.m_posit.m_y += -1.21f;
+		hipBody->SetMatrix(matrix);
+
+		ndMatrix limbLocation(matrix);
+		limbLocation.m_posit.m_z += zSize * 0.0f;
+		limbLocation.m_posit.m_y -= ySize * 0.5f;
+
+		// make single leg
+		ndFloat32 limbLength = 0.3f;
+		ndFloat32 limbRadio = 0.025f;
+
+		ndSharedPtr<ndBody> pole(world->GetBody(AddCapsule(scene, ndGetIdentityMatrix(), limbMass, limbRadio, limbRadio, limbLength, "wood_1.png")));
+		//ndMatrix legLocation(ndRollMatrix(180.0f * ndDegreeToRad) * ndYawMatrix(90.0f * ndDegreeToRad) * limbLocation);
+		ndMatrix legLocation(ndRollMatrix(-90.0f * ndDegreeToRad) * limbLocation);
+		legLocation.m_posit.m_y -= limbLength * 0.5f;
+		pole->SetMatrix(legLocation);
+		ndMatrix legPivot(ndYawMatrix(90.0f * ndDegreeToRad) * ndRollMatrix(-90.0f * ndDegreeToRad) * legLocation);
+		legPivot.m_posit.m_y += limbLength * 0.5f;
+		ndSharedPtr<ndJointBilateralConstraint> poleHinge(new ndJointHinge(legPivot, pole->GetAsBodyKinematic(), modelRootNode->m_body->GetAsBodyKinematic()));
+		ndModelArticulation::ndNode* const poleLink = model->AddLimb(modelRootNode, pole, poleHinge);
+		poleLink->m_name = "leg";
+		ndJointHinge* const hinge = (ndJointHinge*)*poleHinge;
+		hinge->SetAsSpringDamper(0.02f, 1500, 40.0f);
+		//model->m_legJoint = hinge;
+
+		// make wheel
+		ndFloat32 wheelRadio = 4.0f * limbRadio;
+		ndSharedPtr<ndBody> ball(world->GetBody(AddSphere(scene, ndGetIdentityMatrix(), wheelMass, wheelRadio, "wood_0.png")));
+		ndMatrix wheelMatrix(legPivot);
+		wheelMatrix.m_posit.m_y -= limbLength;
+		ball->SetMatrix(wheelMatrix);
+		ndSharedPtr<ndJointBilateralConstraint> ballHinge(new ndJointHinge(wheelMatrix, ball->GetAsBodyKinematic(), pole->GetAsBodyKinematic()));
+		ndModelArticulation::ndNode* const ballHingeNode = model->AddLimb(poleLink, ball, ballHinge);
+		ndJointHinge* const wheelMotor = (ndJointHinge*)*ballHinge;
+		wheelMotor->SetAsSpringDamper(0.02f, 0.0f, 0.2f);
+		//model->m_wheelJoint = wheelMotor;
+		ballHingeNode->m_name = "wheel";
+		//model->m_wheel = ball->GetAsBodyKinematic();
+
+		//// add model limbs
+		//ndModelArticulation::ndNode* const legLimb = model->AddLimb(modelRoot, pole, poleHinge);
+		//model->AddLimb(legLimb, ball, ballHinge);
+		//
+		//model->m_bodies.SetCount(0);
+		//model->m_basePose.SetCount(0);
+		//for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+		//{
+		//	ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
+		//	model->m_bodies.PushBack(body);
+		//	model->m_basePose.PushBack(body);
+		//}
+		return model;
+	}
+
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndSharedPtr<ndDemoEntity>& modelMesh)
 	{
+#if 0
+		ndModelArticulation* const model = BuildModelOldModel(scene, location);
+#else
 		ndModelArticulation* const model = new ndModelArticulation();
 		ndSharedPtr<ndDemoEntity> entity(modelMesh->GetChildren().GetFirst()->GetInfo()->CreateClone());
 		scene->AddEntity(entity);
@@ -67,7 +144,7 @@ namespace ndUnicycle
 			return body;
 		};
 
-		ndFloat32 boxMass = 20.0f;
+		ndFloat32 boxMass = 10.0f;
 		ndFloat32 poleMass = 1.0f;
 		ndFloat32 ballMass = 1.0f;
 
@@ -88,14 +165,15 @@ namespace ndUnicycle
 		const ndMatrix ballMatrix(ballEntity->GetCurrentMatrix() * poleMatrix);
 		ndSharedPtr<ndBody> ball(CreateRigidBody(ballEntity, ballMatrix, ballMass, pole->GetAsBodyDynamic()));
 		ndSharedPtr<ndJointBilateralConstraint> ballHinge(new ndJointHinge(ballMatrix, ball->GetAsBodyKinematic(), pole->GetAsBodyKinematic()));
-		ndModelArticulation::ndNode* const ballLink = model->AddLimb(poleLink, ball, ballHinge);
-		ballLink->m_name = "wheel";
+		ndModelArticulation::ndNode* const ballHingeNode = model->AddLimb(poleLink, ball, ballHinge);
+		ballHingeNode->m_name = "wheel";
 		//((ndJointHinge*)*ballHinge)->SetAsSpringDamper(0.2f, 0.0f, 0.001f);
 
 		//ndUrdfFile urdf;
 		//char fileName[256];
 		//ndGetWorkingFileName("unicycle.urdf", fileName);
 		//urdf.Export(fileName, model->GetAsModelArticulation());
+#endif
 
 		return model;
 	}
@@ -272,12 +350,13 @@ namespace ndUnicycle
 			return false;
 		}
 
+		#pragma optimize( "", off )
 		ndFloat32 GetBoxAngle() const
 		{
-			ndModelArticulation* const model = (ndModelArticulation*)GetModel();
-			const ndMatrix& matrix = model->GetRoot()->m_body->GetMatrix();
+			const ndMatrix matrix (m_legJoint->CalculateGlobalMatrix1());
 			ndFloat32 sinAngle = ndClamp(matrix.m_up.m_x, ndFloat32(-0.9f), ndFloat32(0.9f));
-			return ndAsin (sinAngle);
+			ndFloat32 angle = ndAsin (sinAngle);
+			return angle;
 		}
 
 		#pragma optimize( "", off )
@@ -297,7 +376,7 @@ namespace ndUnicycle
 			GetModel()->GetAsModelArticulation()->ClearMemory();
 		}
 
-		//#pragma optimize( "", off )
+		#pragma optimize( "", off )
 		ndBrainFloat CalculateReward()
 		{
 			if (IsTerminal())
@@ -308,10 +387,11 @@ namespace ndUnicycle
 			const ndFloat32 boxAngle = GetBoxAngle();
 			const ndVector wheelVeloc(m_wheel->GetVelocity());
 
-			const ndFloat32 standingReward = ndReal(ndExp(-ndFloat32(2000.0f) * boxAngle * boxAngle));
-			ndFloat32 speedReward = ndReal(ndExp(-ndFloat32(100.0f) * wheelVeloc.m_x * wheelVeloc.m_x));
+			ndFloat32 standingReward = ndFloat32(ndExp(-ndFloat32(2000.0f) * boxAngle * boxAngle));
+			ndFloat32 speedReward = ndFloat32(ndExp(-ndFloat32(200.0f) * wheelVeloc.m_x * wheelVeloc.m_x));
+			ndFloat32 aliveReward = ndFloat32(m_controllerTrainer->m_trajectory.GetCount()) / ndFloat32(ND_TRAJECTORY_STEPS);
 
-			ndFloat32 reward = 0.5f * standingReward + 0.5f * speedReward;
+			ndFloat32 reward = (standingReward + speedReward + aliveReward) / ndFloat32(3.0f);
 			return ndReal(reward);
 		}
 
@@ -334,12 +414,18 @@ namespace ndUnicycle
 			const ndVector boxOmega(boxBody->GetOmega());
 			const ndVector wheelVeloc(m_wheel->GetVelocity());
 			
+			//ndFloat32 wheelSpeed = wheelVeloc.m_x / ndFloat32(10.0f);
+			ndFloat32 wheelSpeed = wheelVeloc.m_x / ndFloat32(5.0f);
 
-			ndFloat32 wheelSpeed = wheelVeloc.m_x / ndFloat32(10.0f);
-			ndFloat32 boxAngularSpeed = boxOmega.m_z / ndFloat32(2.0f);
-			ndFloat32 boxAngle = GetBoxAngle() / (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
+			//ndFloat32 boxAngularSpeed = boxOmega.m_z / ndFloat32(2.0f);
+			ndFloat32 boxAngularSpeed = boxOmega.m_z;
+
+			//ndFloat32 boxAngle = GetBoxAngle() / (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
+			ndFloat32 boxAngle = GetBoxAngle() / D_REWARD_MIN_ANGLE;
+
 			ndFloat32 legAngle = ndBrainFloat(m_legJoint->GetAngle()) / ND_MAX_LEG_JOINT_ANGLE;
-			ndFloat32 legAngularSpeed = ndBrainFloat(m_legJoint->GetOmega()) / ndFloat32(2.0f);
+			//ndFloat32 legAngularSpeed = ndBrainFloat(m_legJoint->GetOmega()) / ndFloat32(2.0f);
+			ndFloat32 legAngularSpeed = m_legJoint->GetOmega();
 
 			//ndTrace(("%f %f %f %f %f\n", wheelSpeed, boxAngularSpeed, boxAngle, legAngle, legAngularSpeed));
 
@@ -434,13 +520,13 @@ namespace ndUnicycle
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 			
 			hyperParameters.m_extraTrajectorySteps = 256;
-			hyperParameters.m_maxTrajectorySteps = 1024 * 2;
+			hyperParameters.m_maxTrajectorySteps = ND_TRAJECTORY_STEPS;
 			hyperParameters.m_numberOfActions = m_actionsSize;
 			hyperParameters.m_numberOfObservations = m_stateSize;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 			
-			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
-			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
+			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
+			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
 			
 			m_master->SetName(CONTROLLER_NAME);

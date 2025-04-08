@@ -30,6 +30,7 @@ namespace ndContinueCarpole
 
 	//#define CONTROLLER_RESUME_TRAINING
 
+	#define ND_TRAJECTORY_STEPS		(1024 * 4)
 	#define D_PUSH_ACCEL			ndBrainFloat (-3.0f * DEMO_GRAVITY)
 	#define D_REWARD_MIN_ANGLE		ndBrainFloat (20.0f * ndDegreeToRad)
 
@@ -87,7 +88,7 @@ namespace ndContinueCarpole
 		world->AddJoint(xDirSlider);
 
 		// add path to the model
-		world->AddJoint(poleJoint);
+		//world->AddJoint(poleJoint);
 		model->AddLimb(modelRoot, poleBody, poleJoint);
 
 		return model;
@@ -307,13 +308,12 @@ namespace ndContinueCarpole
 				return ndReal(0.0f);
 			}
 			ndFloat32 angle = GetPoleAngle();
-			//ndFloat32 angularReward = ndReal(ndExp(-ndFloat32(1000.0f) * sinAngle * sinAngle));
-			ndFloat32 angularReward = ndReal(ndExp(-ndFloat32(1000.0f) * angle * angle));
-
 			const ndVector veloc(m_cart->GetVelocity());
-			ndFloat32 linearReward = ndReal(ndExp(-ndFloat32(200.0f) * veloc.m_x * veloc.m_x));
+			ndFloat32 angularReward = ndReal(ndExp(-ndFloat32(1000.0f) * angle * angle));
+			ndFloat32 speedReward = ndReal(ndExp(-ndFloat32(200.0f) * veloc.m_x * veloc.m_x));
+			ndFloat32 aliveReward = ndFloat32(m_controllerTrainer->m_trajectory.GetCount()) / ndFloat32(ND_TRAJECTORY_STEPS);
 
-			ndReal reward = 0.5f * angularReward + 0.5f * linearReward;
+			ndFloat32 reward = (angularReward + speedReward + aliveReward) / ndFloat32(3.0f);
 			return ndReal(reward);
 		}
 
@@ -349,8 +349,8 @@ namespace ndContinueCarpole
 			const ndVector veloc(m_cart->GetVelocity());
 			ndFloat32 angle = m_poleJoint->GetAngle();
 			ndFloat32 angularReward = ndReal(ndExp(-ndFloat32(1000.0f) * angle * angle));
-			//ndFloat32 linearReward = ndReal(ndExp(-ndFloat32(200.0f) * veloc.m_x * veloc.m_x));
-			//ndReal reward = 0.5f * angularReward + 0.5f * linearReward;
+			//ndFloat32 speedReward = ndReal(ndExp(-ndFloat32(200.0f) * veloc.m_x * veloc.m_x));
+			//ndReal reward = 0.5f * angularReward + 0.5f * speedReward;
 			ndReal reward = angularReward;
 			return reward;
 		}
@@ -449,7 +449,7 @@ namespace ndContinueCarpole
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 
 			hyperParameters.m_extraTrajectorySteps = 256;
-			hyperParameters.m_maxTrajectorySteps = 1024 * 4;
+			hyperParameters.m_maxTrajectorySteps = ND_TRAJECTORY_STEPS;
 			hyperParameters.m_numberOfActions = m_actionsSize;
 			hyperParameters.m_numberOfObservations = m_stateSize;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
