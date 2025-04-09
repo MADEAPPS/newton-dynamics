@@ -64,8 +64,8 @@ class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
 		enum ndMemberIndex
 		{
 			m_reward,
-			m_stateValue,
 			m_stateReward,
+			m_stateValue,
 			m_stateAdvantage,
 			m_isterminalState,
 			m_transitionSize
@@ -208,8 +208,6 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	virtual void Optimize();
 	void OptimizePolicy();
 	void OptimizeCritic();
-	void NormalizePolicy();
-	void NormalizeCritic();
 	void CalculateAdvange();
 	ndBrainAgentContinuePolicyGradient_Trainer::ndRandomGenerator* GetRandomGenerator();
 	ndBrain m_policy;
