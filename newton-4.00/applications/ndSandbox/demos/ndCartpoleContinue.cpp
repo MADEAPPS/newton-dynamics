@@ -322,7 +322,7 @@ namespace ndContinueCarpole
 			m_cart->SetForce(savedForce);
 			m_poleJoint->SetAsSpringDamper(ndFloat32(0.0), ndFloat32(0.0f), ndFloat32(0.0f));
 			ndFloat32 accelError = m_cart->GetInvMass() * savedForce.m_x - boxAccel.m_x;
-			ndFloat32 accelReward = ndReal(ndExp(-ndFloat32(1.0f) * accelError * accelError));
+			ndFloat32 accelReward = ndReal(ndExp(-ndFloat32(0.5f) * accelError * accelError));
 
 			ndFloat32 angle = GetPoleAngle();
 			const ndVector veloc(m_cart->GetVelocity());
