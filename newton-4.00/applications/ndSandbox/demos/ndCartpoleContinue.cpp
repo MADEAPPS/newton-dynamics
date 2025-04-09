@@ -179,8 +179,8 @@ namespace ndContinueCarpole
 			public:
 			ndControllerTrainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
 				:ndBrainAgentContinuePolicyGradient_Trainer(master)
-				,m_robot(nullptr)
 				,m_solver()
+				,m_robot(nullptr)
 			{
 			}
 
@@ -215,8 +215,8 @@ namespace ndContinueCarpole
 				m_robot->ResetModel();
 			}
 
-			RobotModelNotify* m_robot;
 			ndIkSolver m_solver;
+			RobotModelNotify* m_robot;
 		};
 
 		public:
@@ -306,9 +306,9 @@ namespace ndContinueCarpole
 			ndAssert(skeleton);
 
 			const ndVector savedForce(m_cart->GetForce());
-			ndVector zeroForce(m_cart->GetForce());
-			zeroForce.m_x = ndFloat32(0.0f);
-			m_cart->SetForce(zeroForce);
+			ndVector testForce(savedForce);
+			testForce.m_x = ndFloat32(0.0f);
+			m_cart->SetForce(testForce);
 			m_poleJoint->SetAsSpringDamper(ndFloat32(1.0e-3f), ndFloat32(10000.0f), ndFloat32(100.0f));
 
 			ndFloat32 targetAngle = m_poleJoint->GetAngle() * ndFloat32(0.25f);
