@@ -25,7 +25,7 @@
 
 namespace ndContinueCarpole
 {
-	//#define ND_TRAIN_AGENT
+	#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME			"cartpoleContinue"
 
 	//#define CONTROLLER_RESUME_TRAINING
@@ -180,6 +180,7 @@ namespace ndContinueCarpole
 			ndControllerTrainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
 				:ndBrainAgentContinuePolicyGradient_Trainer(master)
 				,m_robot(nullptr)
+				,m_solver()
 			{
 			}
 
@@ -215,6 +216,7 @@ namespace ndContinueCarpole
 			}
 
 			RobotModelNotify* m_robot;
+			ndIkSolver m_solver;
 		};
 
 		public:
@@ -246,14 +248,6 @@ namespace ndContinueCarpole
 			ndAssert(0);
 		}
 
-		//RobotModelNotify(const RobotModelNotify& src)
-		//	:ndModelNotify(src)
-		//	,m_controller(src.m_controller)
-		//{
-		//	//Init(robot);
-		//	ndAssert(0);
-		//}
-
 		~RobotModelNotify()
 		{
 			if (m_controller)
@@ -282,7 +276,6 @@ namespace ndContinueCarpole
 			m_poleMatrix = m_pole->GetMatrix();
 		}
 
-#if 1
 		#pragma optimize( "", off )
 		ndFloat32 GetPoleAngle() const
 		{
@@ -307,13 +300,38 @@ namespace ndContinueCarpole
 			{
 				return ndReal(0.0f);
 			}
+
+			ndIkSolver& solver = m_controllerTrainer->m_solver;
+			ndSkeletonContainer* const skeleton = m_cart->GetSkeleton();
+			ndAssert(skeleton);
+
+			const ndVector savedForce(m_cart->GetForce());
+			ndVector zeroForce(m_cart->GetForce());
+			zeroForce.m_x = ndFloat32(0.0f);
+			m_cart->SetForce(zeroForce);
+			m_poleJoint->SetAsSpringDamper(ndFloat32(1.0e-3f), ndFloat32(10000.0f), ndFloat32(100.0f));
+
+			ndFloat32 targetAngle = m_poleJoint->GetAngle() * ndFloat32(0.25f);
+			m_poleJoint->SetTargetAngle(targetAngle);
+
+			solver.SolverBegin(skeleton, nullptr, 0, GetModel()->GetWorld(), m_timestep);
+			solver.Solve();
+			ndVector boxAccel(m_cart->GetAccel());
+			solver.SolverEnd();
+
+			m_cart->SetForce(savedForce);
+			m_poleJoint->SetAsSpringDamper(ndFloat32(0.0), ndFloat32(0.0f), ndFloat32(0.0f));
+			ndFloat32 accelError = m_cart->GetInvMass() * savedForce.m_x - boxAccel.m_x;
+			ndFloat32 accelReward = ndReal(ndExp(-ndFloat32(1.0f) * accelError * accelError));
+
 			ndFloat32 angle = GetPoleAngle();
 			const ndVector veloc(m_cart->GetVelocity());
 			ndFloat32 angularReward = ndReal(ndExp(-ndFloat32(1000.0f) * angle * angle));
 			ndFloat32 speedReward = ndReal(ndExp(-ndFloat32(200.0f) * veloc.m_x * veloc.m_x));
-			ndFloat32 timeLineReward = ndFloat32(m_controllerTrainer->m_trajectory.GetCount()) / ndFloat32(ND_TRAJECTORY_STEPS);
-
-			ndFloat32 reward = (angularReward + speedReward + timeLineReward) / ndFloat32(3.0f);
+			//ndFloat32 timeLineReward = ndFloat32(m_controllerTrainer->m_trajectory.GetCount()) / ndFloat32(ND_TRAJECTORY_STEPS);
+			
+			//ndFloat32 reward = (angularReward + speedReward + timeLineReward) / ndFloat32(3.0f);
+			ndFloat32 reward = 0.25f * angularReward + 0.25f * speedReward + 0.5f * accelReward;
 			return ndReal(reward);
 		}
 
@@ -330,49 +348,13 @@ namespace ndContinueCarpole
 			observation[m_cartSpeed] = cartSpeed;
 		}
 
-#else
-		bool IsTerminal() const
-		{
-			// agent dies if the angle is larger than D_REWARD_MIN_ANGLE * ndFloat32 (2.0f) degrees
-			ndFloat32 angle = m_poleJoint->GetAngle();
-			bool fail = ndAbs(angle) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
-			return fail;
-		}
-
-		//#pragma optimize( "", off )
-		ndReal GetReward() const
-		{
-			if (IsTerminal())
-			{
-				return ndReal (-1.0f);
-			}
-			const ndVector veloc(m_cart->GetVelocity());
-			ndFloat32 angle = m_poleJoint->GetAngle();
-			ndFloat32 angularReward = ndReal(ndExp(-ndFloat32(1000.0f) * angle * angle));
-			//ndFloat32 speedReward = ndReal(ndExp(-ndFloat32(200.0f) * veloc.m_x * veloc.m_x));
-			//ndReal reward = 0.5f * angularReward + 0.5f * speedReward;
-			ndReal reward = angularReward;
-			return reward;
-		}
-
-		void GetObservation(ndBrainFloat* const state)
-		{
-			const ndVector cartVeloc(m_cart->GetVelocity());
-			//ndFloat32 cartSpeed = cartVeloc.m_x / ndFloat32(10.0f);
-			ndFloat32 poleOmega = m_poleJoint->GetOmega() / ndFloat32(2.0f);
-			ndFloat32 poleAngle = m_poleJoint->GetAngle() / (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
-
-			//state[m_cartSpeed] = cartSpeed;
-			state[m_poleAngle] = poleAngle;
-			state[m_poleOmega] = poleOmega;
-		}
-#endif
-
 		void ApplyActions(ndBrainFloat* const actions)
 		{
 			ndVector force(m_cart->GetForce());
 			ndBrainFloat action = actions[0];
-			force.m_x = ndFloat32(D_PUSH_ACCEL * action * (m_cart->GetMassMatrix().m_w));
+			//action = 0.5f;
+			ndBrainFloat accel = D_PUSH_ACCEL * action;
+			force.m_x = ndFloat32(accel * (m_cart->GetMassMatrix().m_w));
 			m_cart->SetForce(force);
 		}
 
@@ -395,8 +377,9 @@ namespace ndContinueCarpole
 			return ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(20.0f);
 		}
 
-		void Update(ndFloat32)
+		void Update(ndFloat32 timestep)
 		{
+			m_timestep = timestep;
 			if (m_controllerTrainer)
 			{
 				m_controllerTrainer->Step();
@@ -422,6 +405,7 @@ namespace ndContinueCarpole
 		ndBodyDynamic* m_cart;
 		ndBodyDynamic* m_pole;
 		ndJointHinge* m_poleJoint;
+		ndFloat32 m_timestep;
 	};
 
 	class TrainingUpdata : public ndDemoEntityManager::OnPostUpdate
