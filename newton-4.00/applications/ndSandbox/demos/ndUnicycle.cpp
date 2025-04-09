@@ -385,8 +385,8 @@ namespace ndUnicycle
 			ndFloat32 timeLineReward = ndFloat32(m_controllerTrainer->m_trajectory.GetCount()) / ndFloat32(ND_TRAJECTORY_STEPS);
 
 			//ndFloat32 reward = (standingReward + speedReward + timeLineReward) / ndFloat32(3.0f);
-			ndFloat32 reward = (standingReward + timeLineReward) / ndFloat32(2.0f);
-			//ndFloat32 reward = standingReward;
+			//ndFloat32 reward = (standingReward + timeLineReward) / ndFloat32(2.0f);
+			ndFloat32 reward = standingReward;
 			//ndFloat32 reward = timeLineReward;
 			return ndReal(reward);
 		}

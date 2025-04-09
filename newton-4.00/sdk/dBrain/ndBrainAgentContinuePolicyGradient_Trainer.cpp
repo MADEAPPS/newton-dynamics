@@ -49,8 +49,8 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 	m_policyLearnRate = ndBrainFloat(1.0e-4f);
 	m_criticLearnRate = m_policyLearnRate * ndBrainFloat(1.0f);
 
-	m_policyRegularizer = ndBrainFloat(1.0e-5f);
-	m_criticRegularizer = ndBrainFloat(1.0e-3f);
+	m_policyRegularizer = ndBrainFloat(1.0e-4f);
+	m_criticRegularizer = ndBrainFloat(5.0e-3f);
 
 	m_discountFactor = ndBrainFloat(0.99f);
 	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize);
