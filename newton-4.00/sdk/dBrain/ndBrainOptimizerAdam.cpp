@@ -31,42 +31,41 @@ class ndBrainOptimizerAdam::ndBrainOptimizerAdam::ndAdamData : public ndClassAll
 	public:
 	ndAdamData(ndBrainLayer* const layer)
 		:ndClassAlloc()
-		,m_u(nullptr)
-		,m_v(nullptr)
-		,m_v2(nullptr)
+		,m_vdw(nullptr)
+		,m_vdw2(nullptr)
+		,m_temp(nullptr)
+		,m_vdwCorrected(nullptr)
+		,m_vdw2Corrected(nullptr)
 	{
 		if (layer->HasParameters())
 		{
-			m_u = layer->Clone();
-			m_v = layer->Clone();
-			m_v2 = layer->Clone();
+			m_vdw = ndSharedPtr<ndBrainLayer>(layer->Clone());
+			m_vdw2 = ndSharedPtr<ndBrainLayer>(layer->Clone());
+			m_temp = ndSharedPtr<ndBrainLayer>(layer->Clone());
+			m_vdwCorrected = ndSharedPtr<ndBrainLayer>(layer->Clone());
+			m_vdw2Corrected = ndSharedPtr<ndBrainLayer>(layer->Clone());
 
-			m_u->Clear();
-			m_v->Clear();
-			m_v2->Clear();
+			m_vdw->Clear();
+			m_vdw2->Clear();
+
 		}
 	}
 
 	~ndAdamData()
 	{
-		if (m_u)
-		{
-			delete m_u;
-			delete m_v;
-			delete m_v2;
-		}
 	}
 
-	ndBrainLayer* m_u;
-	ndBrainLayer* m_v;
-	ndBrainLayer* m_v2;
+	ndSharedPtr<ndBrainLayer> m_vdw;
+	ndSharedPtr<ndBrainLayer> m_vdw2;
+	ndSharedPtr<ndBrainLayer> m_temp;
+	ndSharedPtr<ndBrainLayer> m_vdwCorrected;
+	ndSharedPtr<ndBrainLayer> m_vdw2Corrected;
 };
 
 ndBrainOptimizerAdam::ndBrainOptimizerAdam()
 	:ndBrainOptimizer()
-	,m_beta(0.999f)
-	,m_alpha(0.9f)
-	//,m_epsilon(1.0e-8f)
+	,m_beta(ndBrainFloat(0.999f))
+	,m_alpha(ndBrainFloat(0.9f))
 	,m_epsilon(1.0e-6f)
 	,m_betaAcc(m_beta)
 	,m_alphaAcc(m_alpha)
@@ -82,6 +81,7 @@ ndBrainOptimizerAdam::~ndBrainOptimizerAdam()
 	}
 }
 
+//#pragma optimize( "", off )
 void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const, ndArray<ndBrainTrainer*>& partialGradients, ndBrainFloat learnRate)
 {
 	ndBrainTrainer* const trainer = partialGradients[0];
@@ -102,11 +102,7 @@ void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const, ndArray<ndBrainTrain
 		trainer->AddGradients(src);
 	}
 
-	ndBrainFloat betaWeight = ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) - m_betaAcc);
-	ndBrainFloat alphaWeight = ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) - m_alphaAcc);
-
 	ndBrainFloat regularizer = -GetRegularizer();
-	//ndBrainFloat regularizer = GetRegularizer(); this is a big mistake
 	ndBrainFloat descendRate = learnRate * ndBrainFloat(-1.0f);
 	ndBrainFloat den = ndBrainFloat(1.0f) / ndBrainFloat(partialGradients.GetCount());
 
@@ -117,43 +113,47 @@ void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const, ndArray<ndBrainTrain
 			ndAssert(m_data[i]);
 			ndAdamData& data = *m_data[i];
 			ndBrainLayer& gradients = *trainer->GetGradientLayer(i);
-
 			gradients.Scale(den);
-			data.m_v->Scale(m_beta);
-			data.m_u->Scale(m_alpha);
-			data.m_v2->Set(gradients);
-			data.m_v2->Mul(gradients);
+			data.m_temp->Set(gradients);
 
-			data.m_u->ScaleAdd(gradients, ndBrainFloat(1.0f) - m_alpha);
-			data.m_v->ScaleAdd(*data.m_v2, ndBrainFloat(1.0f) - m_beta);
+			// calculate moving average
+			data.m_vdw->Scale(m_alpha);
+			data.m_vdw->ScaleAdd(*(*data.m_temp), ndBrainFloat(1.0) - m_alpha);
+
+			// caluate RMS
+			data.m_vdw2->Scale(m_beta);
+			data.m_temp->Mul(*(*data.m_temp));
+			data.m_vdw2->ScaleAdd(*(*data.m_temp), ndBrainFloat(1.0) - m_beta);
+
+			data.m_vdwCorrected->Set(*(*data.m_vdw));
+			data.m_vdw2Corrected->Set(*(*data.m_vdw2));
+			if (m_alphaAcc > ndBrainFloat(0.0f))
+			{
+				data.m_vdwCorrected->Scale(ndBrainFloat(1.0f / (1.0f - m_alphaAcc)));
+			}
 
 			if (m_betaAcc > ndBrainFloat(0.0f))
 			{
-				ndBrainLayer& vHat = gradients;
-				ndBrainLayer& uHat = *data.m_v2;
-
-				uHat.Set(*data.m_u);
-				vHat.Set(*data.m_v);
-				vHat.Scale(betaWeight);
-				uHat.Scale(alphaWeight);
-				gradients.AdamUpdate(uHat, vHat, m_epsilon);
+				data.m_vdw2Corrected->Scale(ndBrainFloat(1.0f / (1.0f - m_betaAcc)));
 			}
-			else
-			{
-				gradients.AdamUpdate(*data.m_u, *data.m_v, m_epsilon);
-			}
-
+		
+			gradients.AdamUpdate(*(*data.m_vdwCorrected), *(*data.m_vdw2Corrected), m_epsilon);
 			ndBrainLayer& weights = *trainer->GetWeightsLayer(i);
 			gradients.ScaleAdd(weights, regularizer);
 			weights.ScaleAdd(gradients, descendRate);
 			weights.FlushToZero();
 		}
 	}
-	
+
 	m_betaAcc = ndFlushToZero(m_betaAcc * m_beta);
 	m_alphaAcc = ndFlushToZero(m_alphaAcc * m_alpha);
 	if (m_betaAcc < ndBrainFloat(1.0e-6f))
 	{
 		m_betaAcc = ndBrainFloat(0.0f);
 	}
+	if (m_alphaAcc < ndBrainFloat(1.0e-6f))
+	{
+		m_alphaAcc = ndBrainFloat(0.0f);
+	}
 }
+
