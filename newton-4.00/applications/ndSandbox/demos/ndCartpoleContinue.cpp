@@ -25,7 +25,7 @@
 
 namespace ndContinueCarpole
 {
-	//#define ND_TRAIN_AGENT
+	#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME			"cartpoleContinue"
 
 	//#define CONTROLLER_RESUME_TRAINING
@@ -276,7 +276,7 @@ namespace ndContinueCarpole
 			m_poleMatrix = m_pole->GetMatrix();
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		ndFloat32 GetPoleAngle() const
 		{
 			const ndMatrix matrix(m_poleJoint->CalculateGlobalMatrix0());
@@ -285,7 +285,7 @@ namespace ndContinueCarpole
 			return angle;
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		bool IsTerminal() const
 		{
 			ndFloat32 angle = GetPoleAngle();
@@ -293,7 +293,7 @@ namespace ndContinueCarpole
 			return fail;
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		ndReal GetReward() const
 		{
 			if (IsTerminal())
@@ -335,7 +335,7 @@ namespace ndContinueCarpole
 			return ndReal(reward);
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		void GetObservation(ndBrainFloat* const observation)
 		{
 			ndVector omega(m_pole->GetOmega());

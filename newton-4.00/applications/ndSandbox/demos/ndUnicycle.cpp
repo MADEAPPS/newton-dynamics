@@ -25,7 +25,7 @@
 
 namespace ndUnicycle
 {
-	//#define ND_TRAIN_AGENT
+	#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME			"unicycle.dnn"
 
 	//#define ND_MAX_LEG_ANGLE_STEP	(ndFloat32 (8.0f) * ndDegreeToRad)
@@ -38,8 +38,7 @@ namespace ndUnicycle
 
 	enum ndActionSpace
 	{
-		//m_legControl,
-		m_wheelControl,
+		m_wheelTorque,
 		m_actionsSize
 	};
 
@@ -139,7 +138,7 @@ namespace ndUnicycle
 		matrix.m_posit = location.m_posit;
 		ndSharedPtr<ndBody> rootBody(CreateRigidBody(entity, matrix, boxMass, nullptr));
 		ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(rootBody);
-		rootBody->GetAsBodyKinematic()->SetAngularDamping(ndVector(0.01f));
+		rootBody->GetAsBodyKinematic()->SetAngularDamping(ndVector(0.25f));
 
 		ndSharedPtr<ndDemoEntity> poleEntity(entity->GetChildren().GetFirst()->GetInfo());
 		const ndMatrix poleMatrix(poleEntity->GetCurrentMatrix() * matrix);
@@ -155,6 +154,7 @@ namespace ndUnicycle
 		ndSharedPtr<ndJointBilateralConstraint> ballHinge(new ndJointHinge(ballMatrix, ball->GetAsBodyKinematic(), pole->GetAsBodyKinematic()));
 		ndModelArticulation::ndNode* const ballHingeNode = model->AddLimb(poleLink, ball, ballHinge);
 		ballHingeNode->m_name = "wheel";
+		//ball->GetAsBodyKinematic()->SetAngularDamping(ndVector(0.5f));
 		//((ndJointHinge*)*ballHinge)->SetAsSpringDamper(0.02f, 0.0f, 0.1f);
 
 		//ndUrdfFile urdf;
@@ -344,7 +344,7 @@ namespace ndUnicycle
 		}
 
 		#pragma optimize( "", off )
-		ndFloat32 GetBoxAngle____() const
+		ndFloat32 GetBoxAngle() const
 		{
 			const ndMatrix matrix (m_poleJoint->CalculateGlobalMatrix1());
 			ndFloat32 sinAngle = ndClamp(matrix.m_up.m_x, ndFloat32(-0.9f), ndFloat32(0.9f));
@@ -422,11 +422,17 @@ namespace ndUnicycle
 			ndFloat32 alphaReward = ndReal(ndExp(-ndFloat32(1.0e-1f) * alphaError * alphaError));
 
 			ndFloat32 poleAngle = GetPoleAngle();
-			//ndFloat32 poleReward = ndFloat32(ndExp(-ndFloat32(2000.0f) * poleAngle * poleAngle));
 			ndFloat32 poleReward = ndFloat32(ndExp(-ndFloat32(500.0f) * poleAngle * poleAngle));
 
-			//ndFloat32 reward = timeLineReward;
-			//ndFloat32 speedReward = ndFloat32(ndExp(-ndFloat32(100.0f) * boxVeloc.m_x * boxVeloc.m_x));
+			//ndFloat32 speedReward = ndFloat32(1.0f);
+			//if ((alphaReward > ndFloat32(0.98f)) && (poleReward > ndFloat32(0.98f)))
+			//{
+			//	const ndVector velocDir(poleMatrix.m_front.CrossProduct(ndVector(0.0f, 1.0f, 0.0f, 0.0f)));
+			//	ndFloat32 wheelSpeed = m_wheel->GetVelocity().DotProduct(velocDir).GetScalar();
+			//	//speedReward = ndFloat32(ndExp(-ndFloat32(10.0f) * wheelSpeed * wheelSpeed));
+			//}
+			//ndFloat32 reward = 0.25f * poleReward + 0.25f * speedReward + 0.5f * alphaReward;
+
 			ndFloat32 reward = 0.5f * poleReward + 0.5f * alphaReward;
 			return ndReal(reward);
 		}
@@ -441,7 +447,7 @@ namespace ndUnicycle
 
 			const ndVector wheelMass(m_wheel->GetMassMatrix());
 			const ndMatrix wheelMatrix(m_wheelJoint->CalculateGlobalMatrix0());
-			ndFloat32 wheelSpeedAlpha = actions[m_wheelControl] * ND_MAX_WHEEL_ALPHA;
+			ndFloat32 wheelSpeedAlpha = actions[m_wheelTorque] * ND_MAX_WHEEL_ALPHA;
 			ndVector torque(wheelMatrix.m_front.Scale(wheelSpeedAlpha * wheelMass.m_z));
 			m_wheel->SetTorque(torque);
 		}
@@ -535,7 +541,7 @@ namespace ndUnicycle
 			,m_discountFactor(0.99f)
 			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(0xffffffff)
-			,m_stopTraining(300 * 1000000)
+			,m_stopTraining(100 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();

@@ -26,7 +26,7 @@
 #include "ndBrainOptimizerAdam.h"
 #include "ndBrainAgentContinueProximaPolicyGradient_Trainer.h"
 
-#define ND_CONTINUE_PROXIMA_POLICY_ITERATIONS			10
+#define ND_CONTINUE_PROXIMA_POLICY_ITERATIONS			100
 #define ND_CONTINUE_PROXIMA_POLICY_KL_DIVERGENCE		ndBrainFloat(0.001f)
 #define ND_CONTINUE_PROXIMA_POLICY_CLIP_EPSILON			ndBrainFloat(0.2f)
 
@@ -37,15 +37,15 @@ ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::ndBrainAgentContinuePro
 {
 	//m_policyLearnRate *= 1.0f / ND_CONTINUE_PROXIMA_POLICY_ITERATIONS;
 	//m_criticLearnRate *= 1.0f / ND_CONTINUE_PROXIMA_POLICY_ITERATIONS;
-	m_policyLearnRate *= 0.5f;
-	m_criticLearnRate *= 0.5f;
+	m_policyLearnRate *= 0.25f;
+	m_criticLearnRate *= 0.25f;
 }
 
 ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::~ndBrainAgentContinueProximaPolicyGradient_TrainerMaster()
 {
 }
 
-//#pragma optimize( "", off )
+#pragma optimize( "", off )
 ndBrainFloat ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateKLdivergence()
 {
 	//https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
