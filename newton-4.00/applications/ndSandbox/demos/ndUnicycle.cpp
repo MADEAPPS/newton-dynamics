@@ -25,31 +25,30 @@
 
 namespace ndUnicycle
 {
-	#define ND_TRAIN_AGENT
+	//#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME			"unicycle.dnn"
 
-	#define ND_MAX_LEG_ANGLE_STEP	(ndFloat32 (8.0f) * ndDegreeToRad)
-	#define ND_MAX_LEG_JOINT_ANGLE	(ndFloat32 (30.0f) * ndDegreeToRad)
+	//#define ND_MAX_LEG_ANGLE_STEP	(ndFloat32 (8.0f) * ndDegreeToRad)
+	#define ND_MAX_LEG_JOINT_ANGLE	(ndFloat32 (45.0f) * ndDegreeToRad)
 
-	#define ND_MAX_WHEEL_ALPHA		(ndFloat32 (100.0f))
+	#define ND_MAX_WHEEL_ALPHA		(ndFloat32 (500.0f))
 
 	#define ND_TERMINATION_ANGLE	(ndFloat32 (45.0f) * ndDegreeToRad)
 	#define ND_TRAJECTORY_STEPS		(1024 * 4)
 
 	enum ndActionSpace
 	{
-		m_legControl,
+		//m_legControl,
 		m_wheelControl,
 		m_actionsSize
 	};
 
 	enum ndStateSpace
 	{
-		//m_boxAngle,
-		//m_boxOmega,
 		m_poleAngle,
 		m_poleOmega,
 		m_wheelOmega,
+		//m_wheelVeloc,
 		m_stateSize
 	};
 
@@ -83,7 +82,6 @@ namespace ndUnicycle
 		ndFloat32 limbRadio = 0.025f;
 
 		ndSharedPtr<ndBody> pole(world->GetBody(AddCapsule(scene, ndGetIdentityMatrix(), limbMass, limbRadio, limbRadio, limbLength, "wood_1.png")));
-		//ndMatrix legLocation(ndRollMatrix(180.0f * ndDegreeToRad) * ndYawMatrix(90.0f * ndDegreeToRad) * limbLocation);
 		ndMatrix legLocation(ndRollMatrix(-90.0f * ndDegreeToRad) * limbLocation);
 		legLocation.m_posit.m_y -= limbLength * 0.5f;
 		pole->SetMatrix(legLocation);
@@ -141,6 +139,7 @@ namespace ndUnicycle
 		matrix.m_posit = location.m_posit;
 		ndSharedPtr<ndBody> rootBody(CreateRigidBody(entity, matrix, boxMass, nullptr));
 		ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(rootBody);
+		rootBody->GetAsBodyKinematic()->SetAngularDamping(ndVector(0.01f));
 
 		ndSharedPtr<ndDemoEntity> poleEntity(entity->GetChildren().GetFirst()->GetInfo());
 		const ndMatrix poleMatrix(poleEntity->GetCurrentMatrix() * matrix);
@@ -306,6 +305,7 @@ namespace ndUnicycle
 
 		void Init(ndModelArticulation* const model)
 		{
+			SetModel(model);
 			m_poleJoint = (ndJointHinge*)*model->FindByName("leg")->m_joint;
 			m_wheelJoint = (ndJointHinge*)*model->FindByName("wheel")->m_joint;
 			m_wheel = model->FindByName("wheel")->m_body->GetAsBodyDynamic();
@@ -319,6 +319,7 @@ namespace ndUnicycle
 				m_bodies.PushBack(body);
 				m_basePose.PushBack(body);
 			}
+			ResetModel();
 		}
 
 		ndModelNotify* Clone() const
@@ -375,6 +376,10 @@ namespace ndUnicycle
 				m_basePose[i].SetPose();
 			}
 			GetModel()->GetAsModelArticulation()->ClearMemory();
+
+			const ndMatrix randomRollMatrix(ndRollMatrix((ndRand() - 0.5f) * 25.0f * ndDegreeToRad));
+			const ndMatrix matrix(randomRollMatrix * GetModel()->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix());
+			GetModel()->GetAsModelArticulation()->SetTransform(matrix);
 		}
 
 		#pragma optimize( "", off )
@@ -396,7 +401,11 @@ namespace ndUnicycle
 			testTorque.m_z = ndFloat32(0.0f);
 			m_wheel->SetTorque(testTorque);
 
-			ndFloat32 targetAngle = m_wheelJoint->GetAngle() * ndFloat32(0.25f);
+			const ndMatrix poleMatrix(m_wheelJoint->CalculateGlobalMatrix1());
+			ndFloat32 sinPoleAngle = ndClamp(poleMatrix.m_up.m_x, ndFloat32(-0.9f), ndFloat32(0.9f));
+			ndFloat32 wheelPoleAngle = ndAsin(sinPoleAngle);
+			ndFloat32 deltaWheelPoleAngle = wheelPoleAngle * ndFloat32(0.25f);
+			ndFloat32 targetAngle = m_wheelJoint->GetAngle() - deltaWheelPoleAngle;
 			m_wheelJoint->SetTargetAngle(targetAngle);
 			m_wheelJoint->SetAsSpringDamper(ndFloat32(1.0e-3f), ndFloat32(10000.0f), ndFloat32(100.0f));
 
@@ -413,7 +422,8 @@ namespace ndUnicycle
 			ndFloat32 alphaReward = ndReal(ndExp(-ndFloat32(1.0e-1f) * alphaError * alphaError));
 
 			ndFloat32 poleAngle = GetPoleAngle();
-			ndFloat32 poleReward = ndFloat32(ndExp(-ndFloat32(2000.0f) * poleAngle * poleAngle));
+			//ndFloat32 poleReward = ndFloat32(ndExp(-ndFloat32(2000.0f) * poleAngle * poleAngle));
+			ndFloat32 poleReward = ndFloat32(ndExp(-ndFloat32(500.0f) * poleAngle * poleAngle));
 
 			//ndFloat32 reward = timeLineReward;
 			//ndFloat32 speedReward = ndFloat32(ndExp(-ndFloat32(100.0f) * boxVeloc.m_x * boxVeloc.m_x));
@@ -424,17 +434,14 @@ namespace ndUnicycle
 		#pragma optimize( "", off )
 		void ApplyActions(ndBrainFloat* const actions)
 		{
-			ndFloat32 poleAngle = m_poleJoint->GetAngle();
-			ndFloat32 newPolegAngle = poleAngle + ndFloat32(actions[m_legControl]) * ND_MAX_LEG_ANGLE_STEP;
-			newPolegAngle = ndClamp(newPolegAngle, -ND_MAX_LEG_JOINT_ANGLE, ND_MAX_LEG_JOINT_ANGLE);
-
-			m_poleJoint->SetTargetAngle(newPolegAngle);
+			//ndFloat32 poleAngle = m_poleJoint->GetAngle();
+			//ndFloat32 newPolegAngle = poleAngle + ndFloat32(actions[m_legControl]) * ND_MAX_LEG_ANGLE_STEP;
+			//newPolegAngle = ndClamp(newPolegAngle, -ND_MAX_LEG_JOINT_ANGLE, ND_MAX_LEG_JOINT_ANGLE);
+			//m_poleJoint->SetTargetAngle(newPolegAngle);
 
 			const ndVector wheelMass(m_wheel->GetMassMatrix());
 			const ndMatrix wheelMatrix(m_wheelJoint->CalculateGlobalMatrix0());
 			ndFloat32 wheelSpeedAlpha = actions[m_wheelControl] * ND_MAX_WHEEL_ALPHA;
-
-			//wheelSpeedAlpha = ND_MAX_WHEEL_ALPHA * 1.0f;
 			ndVector torque(wheelMatrix.m_front.Scale(wheelSpeedAlpha * wheelMass.m_z));
 			m_wheel->SetTorque(torque);
 		}
@@ -442,31 +449,6 @@ namespace ndUnicycle
 		#pragma optimize( "", off )
 		void GetObservation(ndBrainFloat* const observation)
 		{
-			//ndModelArticulation* const model = (ndModelArticulation*)GetModel();
-			//ndBodyKinematic* const boxBody = model->GetRoot()->m_body->GetAsBodyKinematic();
-			//const ndVector boxOmega(boxBody->GetOmega());
-			//const ndVector wheelVeloc(m_wheel->GetVelocity());
-			//const ndVector boxVeloc(boxBody->GetVelocity());
-			
-			////ndFloat32 wheelSpeed = wheelVeloc.m_x / ndFloat32(10.0f);
-			////ndFloat32 boxSpeed = boxVeloc.m_x / ndFloat32(1.0f);
-			//
-			//ndFloat32 boxAngularSpeed = boxOmega.m_z / ndFloat32(2.0f);
-			//ndFloat32 boxAngle = GetBoxAngle____() / ND_TERMINATION_ANGLE;
-			//
-			//ndFloat32 poleAngle = ndBrainFloat(m_poleJoint->GetAngle()) / ND_MAX_LEG_JOINT_ANGLE;
-			//ndFloat32 poleAngularSpeed = ndBrainFloat(m_poleJoint->GetOmega()) / ndFloat32(2.0f);
-			//
-			//ndFloat32 m_wheelAphaScale = wheelAlpha.m_z / ND_MAX_WHEEL_ALPHA;
-			//
-			////ndTrace(("%f %f %f %f %f\n", wheelSpeed, boxAngularSpeed, boxAngle, poleAngle, poleAngularSpeed));
-
-			//observation[m_poleAngle] = poleAngle;
-			//observation[m_poleOmega] = poleAngularSpeed;
-			//observation[m_wheelAlpha] = m_wheelAphaScale;
-			//observation[m_boxAngle] = boxAngle;
-			//observation[m_boxOmega] = boxAngularSpeed;
-
 			const ndMatrix poleMatrix(m_wheelJoint->CalculateGlobalMatrix1());
 			ndFloat32 sinPoleAngle = ndClamp(poleMatrix.m_up.m_x, ndFloat32(-0.9f), ndFloat32(0.9f));
 			ndFloat32 poleAngle = ndAsin(sinPoleAngle) / ND_MAX_LEG_JOINT_ANGLE;
@@ -553,7 +535,7 @@ namespace ndUnicycle
 			,m_discountFactor(0.99f)
 			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(0xffffffff)
-			,m_stopTraining(500 * 1000000)
+			,m_stopTraining(300 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();

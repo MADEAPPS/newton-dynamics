@@ -632,6 +632,16 @@ ndShapeInstance* ndDemoEntity::CreateCollision() const
 		instance = new ndShapeInstance(new ndShapeBox(size.m_x, size.m_y, size.m_z));
 		instance->SetLocalMatrix(matrix);
 	}
+	else if (strstr(name, "convexhull"))
+	{
+		ndDemoMesh* const mesh = (ndDemoMesh*)*GetMesh();
+		ndAssert(mesh);
+		mesh->GetVertexArray(points);
+
+		const ndMatrix matrix(GetMeshMatrix());
+		instance = new ndShapeInstance(new ndShapeConvexHull(mesh->m_vertexCount, sizeof(ndVector), 0.001f, &points[0].m_x));
+		instance->SetLocalMatrix(matrix);
+	}
 	else if (strstr(name, "capsule"))
 	{
 		ndDemoMesh* const mesh = (ndDemoMesh*)*GetMesh();
@@ -655,15 +665,6 @@ ndShapeInstance* ndDemoEntity::CreateCollision() const
 		instance = new ndShapeInstance(new ndShapeCapsule(size.m_x, size.m_x, high));
 		instance->SetLocalMatrix(matrix);
 	}
-	//else if (strstr(name, "convexhull"))
-	//{
-	//	ndDemoMesh* const mesh = (ndDemoMesh*)*node->GetInfo()->GetMesh();
-	//	ndAssert(mesh);
-	//	mesh->GetVertexArray(points);
-	//	shapeArray.PushBack(new ndShapeInstance(new ndShapeConvexHull(mesh->m_vertexCount, sizeof(ndVector), 0.01f, &points[0].m_x)));
-	//	const ndMatrix matrix(node->GetInfo()->GetMeshMatrix() * node->GetInfo()->GetCurrentMatrix());
-	//	shapeArray[shapeArray.GetCount() - 1]->SetLocalMatrix(matrix);
-	//}
 	//else if (strstr(name, "vhacd"))
 	//{
 	//	ndArray<ndInt32> indices;
