@@ -153,6 +153,30 @@ void ndBrainLayerLinear::ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale)
 	m_weights.ScaleAdd(linearSrc.m_weights, scale);
 }
 
+void ndBrainLayerLinear::AddReqularizerL2(const ndBrainLayer& weights, ndBrainFloat regularizer)
+{
+	ScaleAdd(weights, regularizer);
+}
+
+void ndBrainLayerLinear::AddReqularizerL1(const ndBrainLayer& weights, ndBrainFloat regularizer)
+{
+	ScaleAdd(weights, regularizer);
+
+	ndBrainFloat negativeRegularizer = -regularizer;
+	for (ndInt32 i = ndInt32(m_bias.GetCount()) - 1; i >= 0; --i)
+	{
+		ndBrainFloat b = m_bias[i];
+		m_bias[i] += (b > ndFloat32(0.0f)) ? regularizer : negativeRegularizer;
+
+		ndBrainMemVector& row = m_weights[i];
+		for (ndInt32 j = ndInt32(row.GetCount()) - 1; j >= 0; --j)
+		{
+			ndBrainFloat w = row[j];
+			row[j] += (w > ndFloat32(0.0f)) ? regularizer : negativeRegularizer;
+		}
+	}
+}
+
 void ndBrainLayerLinear::Blend(const ndBrainLayer& src, ndBrainFloat blend)
 {
 	const ndBrainLayerLinear& linearSrc = (ndBrainLayerLinear&)src;
@@ -177,10 +201,13 @@ void ndBrainLayerLinear::AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v
 	const ndBrainMatrix& weight_V = linear_V.m_weights;
 	for (ndInt32 i = m_weights.GetRows() - 1; i >= 0; --i)
 	{
-		for (ndInt32 j = ndInt32(m_weights[i].GetCount() - 1); j >= 0; --j)
+		ndBrainMemVector& row = m_weights[i];
+		const ndBrainMemVector& row_U = weight_U[i];
+		const ndBrainMemVector& row_V = weight_V[i];
+		for (ndInt32 j = ndInt32(row.GetCount() - 1); j >= 0; --j)
 		{
-			ndBrainFloat weight_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(weight_V[i][j])) + epsilon);
-			m_weights[i][j] = weight_U[i][j] * weight_den;
+			ndBrainFloat weight_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(row_V[j])) + epsilon);
+			row[j] = row_U[j] * weight_den;
 		}
 	}
 }

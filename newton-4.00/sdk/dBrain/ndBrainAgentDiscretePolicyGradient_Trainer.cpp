@@ -426,7 +426,7 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::ndBrainAgentDiscretePolicyGrad
 	
 	m_policyWeightedTrainer.PushBack(m_policyTrainers[0]);
 	m_policyOptimizer = new ndBrainOptimizerAdam();
-	m_policyOptimizer->SetRegularizer(hyperParameters.m_regularizer);
+	m_policyOptimizer->SetRegularizer(ndBrainOptimizer::m_Ridge, hyperParameters.m_regularizer);
 	
 	// build state value critic neural net
 	layers.SetCount(0);
@@ -459,7 +459,7 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::ndBrainAgentDiscretePolicyGrad
 	}
 	
 	m_criticOptimizer = new ndBrainOptimizerAdam();
-	m_criticOptimizer->SetRegularizer(ndBrainFloat(1.0e-3f));
+	m_criticOptimizer->SetRegularizer(ndBrainOptimizer::m_Ridge, ndBrainFloat(1.0e-3f));
 	
 	m_baseValueWorkingBufferSize = m_critic.CalculateWorkingBufferSize();
 	m_workingBuffer.SetCount(m_baseValueWorkingBufferSize * hyperParameters.m_threadsCount);
@@ -539,7 +539,7 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::Normalize(ndBrain& actor)
 			});
 
 			ndBrainOptimizerSgd optimizer;
-			optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));
+			optimizer.SetRegularizer(ndBrainOptimizer::m_Ridge, ndBrainFloat(1.0e-5f));
 
 			input.Set(0.0f);
 			groundTruth.Set(0.0f);

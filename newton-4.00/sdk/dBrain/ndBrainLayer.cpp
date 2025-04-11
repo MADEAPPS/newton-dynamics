@@ -149,6 +149,16 @@ void ndBrainLayer::ScaleAdd(const ndBrainLayer&, ndBrainFloat)
 	ndAssert(0);
 }
 
+void ndBrainLayer::AddReqularizerL1(const ndBrainLayer&, ndBrainFloat)
+{
+	ndAssert(0);
+}
+
+void ndBrainLayer::AddReqularizerL2(const ndBrainLayer&, ndBrainFloat)
+{
+	ndAssert(0);
+}
+
 void ndBrainLayer::Blend(const ndBrainLayer&, ndBrainFloat)
 {
 	ndAssert(0);

@@ -67,6 +67,8 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void Mul(const ndBrainLayer& src);
 	virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend);
 	virtual void ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale);
+	virtual void AddReqularizerL1(const ndBrainLayer& weights, ndBrainFloat regularizer);
+	virtual void AddReqularizerL2(const ndBrainLayer& weights, ndBrainFloat regularizer);
 
 	virtual void UpdateDropOut();
 	virtual void EnableDropOut(bool state);

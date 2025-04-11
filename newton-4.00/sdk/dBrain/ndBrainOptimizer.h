@@ -30,16 +30,25 @@ class ndBrainThreadPool;
 class ndBrainOptimizer : public ndClassAlloc
 {
 	public: 
+	enum ndRegularizerType
+	{
+		m_None,
+		m_Ridge,
+		m_Lasso,
+	};
+
 	ndBrainOptimizer();
 	virtual ~ndBrainOptimizer();
+	
 
 	ndBrainFloat GetRegularizer() const;
-	void SetRegularizer(ndBrainFloat regularizer);
+	void SetRegularizer(ndRegularizerType type, ndBrainFloat regularizer);
 	virtual void Update(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients, ndBrainFloat learnRate);
 
 	void AccumulateGradients(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients) const;
 	protected:
 	ndBrainFloat m_weighDecayRegularizer;
+	ndRegularizerType m_regularizerType;
 };
 
 

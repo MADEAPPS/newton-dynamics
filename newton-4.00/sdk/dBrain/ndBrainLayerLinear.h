@@ -55,14 +55,17 @@ class ndBrainLayerLinear : public ndBrainLayer
 	virtual void Save(const ndBrainSave* const loadSave) const;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 	
-	void Clear();
-	void FlushToZero();
-	void Scale(ndBrainFloat scale);
-	void Set(const ndBrainLayer& src);
-	void Add(const ndBrainLayer& src);
-	void Mul(const ndBrainLayer& src);
-	void Blend(const ndBrainLayer& src, ndBrainFloat blend);
-	void ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale);
+	void Clear() override;
+	void FlushToZero() override;
+	void Scale(ndBrainFloat scale) override;
+	void Set(const ndBrainLayer& src) override;
+	void Add(const ndBrainLayer& src) override;
+	void Mul(const ndBrainLayer& src) override;
+	void Blend(const ndBrainLayer& src, ndBrainFloat blend) override;
+	void ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale) override;
+
+	void AddReqularizerL1(const ndBrainLayer& weights, ndBrainFloat regularizer);
+	void AddReqularizerL2(const ndBrainLayer& weights, ndBrainFloat regularizer);
 
 	protected:
 	void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);

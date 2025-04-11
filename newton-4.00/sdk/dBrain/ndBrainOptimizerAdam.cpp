@@ -102,7 +102,6 @@ void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const threadPool, ndArray<n
 		trainer->AddGradients(src);
 	}
 
-
 #if 0
 	ndBrainFloat descendRate = -learnRate;
 	ndBrainFloat regularizer = -GetRegularizer();
@@ -141,7 +140,20 @@ void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const threadPool, ndArray<n
 		
 			gradients.AdamUpdate(*(*data.m_vdwCorrected), *(*data.m_vdw2Corrected), m_epsilon);
 			ndBrainLayer& weights = *trainer->GetWeightsLayer(i);
-			gradients.ScaleAdd(weights, regularizer);
+			//gradients.ScaleAdd(weights, regularizer);
+			switch (m_regularizerType)
+			{
+				case m_Lasso:
+					gradients.AddReqularizerL1(weights, regularizer);
+					break;
+
+				case m_Ridge:
+					gradients.AddReqularizerL2(weights, regularizer);
+					break;
+
+				case m_None:;
+			}
+	
 			weights.ScaleAdd(gradients, descendRate);
 			weights.FlushToZero();
 		}
@@ -189,7 +201,20 @@ void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const threadPool, ndArray<n
 
 				gradients.AdamUpdate(*(*data.m_vdwCorrected), *(*data.m_vdw2Corrected), m_epsilon);
 				ndBrainLayer& weights = *trainer->GetWeightsLayer(i);
-				gradients.ScaleAdd(weights, regularizer);
+				//gradients.ScaleAdd(weights, regularizer);
+				switch (m_regularizerType)
+				{
+					case m_Lasso:
+						gradients.AddReqularizerL1(weights, regularizer);
+						break;
+
+					case m_Ridge:
+						gradients.AddReqularizerL2(weights, regularizer);
+						break;
+
+					case m_None:;
+				}
+
 				weights.ScaleAdd(gradients, descendRate);
 				weights.FlushToZero();
 			}

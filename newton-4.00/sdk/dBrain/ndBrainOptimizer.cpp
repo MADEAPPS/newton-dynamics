@@ -28,7 +28,7 @@
 ndBrainOptimizer::ndBrainOptimizer()
 	:ndClassAlloc()
 	,m_weighDecayRegularizer(ndBrainFloat(0.0f))
-	//,m_weighDecayRegularizer(ndBrainFloat(1.0e-5f))
+	,m_regularizerType(m_None)
 {
 }
 
@@ -41,8 +41,9 @@ ndBrainFloat ndBrainOptimizer::GetRegularizer() const
 	return m_weighDecayRegularizer;
 }
 
-void ndBrainOptimizer::SetRegularizer(ndBrainFloat regularizer)
+void ndBrainOptimizer::SetRegularizer(ndRegularizerType type, ndBrainFloat regularizer)
 {
+	m_regularizerType = type;
 	m_weighDecayRegularizer = ndClamp(regularizer, ndBrainFloat(0.0f), ndBrainFloat(0.01f));
 }
 
