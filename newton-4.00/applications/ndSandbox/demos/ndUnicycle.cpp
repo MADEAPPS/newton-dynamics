@@ -138,7 +138,7 @@ namespace ndUnicycle
 		matrix.m_posit = location.m_posit;
 		ndSharedPtr<ndBody> rootBody(CreateRigidBody(entity, matrix, boxMass, nullptr));
 		ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(rootBody);
-		rootBody->GetAsBodyKinematic()->SetAngularDamping(ndVector(0.25f));
+		rootBody->GetAsBodyKinematic()->SetAngularDamping(ndVector(0.5f));
 
 		ndSharedPtr<ndDemoEntity> poleEntity(entity->GetChildren().GetFirst()->GetInfo());
 		const ndMatrix poleMatrix(poleEntity->GetCurrentMatrix() * matrix);
@@ -433,9 +433,31 @@ namespace ndUnicycle
 			m_wheel->SetTorque(savedTorque);
 			m_wheelJoint->SetAsSpringDamper(ndFloat32(0.0), ndFloat32(0.0f), ndFloat32(0.0f));
 
+			auto AccelerationRewardLinearPenalty = [](ndFloat32 alpha)
+			{
+				ndFloat32 reward = ndFloat32(1.0f) - ndAbs(alpha) / ndFloat32(5.0f);
+				if (reward < ndFloat32(0.0f))
+				{
+					reward = ndFloat32(0.0f);
+				}
+				if (reward > ndFloat32(1.0f))
+				{
+					reward = ndFloat32(1.0f);
+				}
+				return reward;
+			};
+
+			auto AccelerationRewardGaussianPenalty = [](ndFloat32 alpha)
+			{
+				//ndFloat32 reward = ndReal(ndExp(-ndFloat32(1.0e-1f) * alpha * alpha));
+				ndFloat32 reward = ndReal(ndExp(-ndFloat32(0.5f) * alpha * alpha));
+				return reward;
+			};
+
 			const ndVector wheelMass(m_wheel->GetMassMatrix());
 			ndFloat32 alphaError = savedTorque.m_z / wheelMass.m_z - wheelAlpha.m_z;
-			ndFloat32 alphaReward = ndReal(ndExp(-ndFloat32(1.0e-1f) * alphaError * alphaError));
+			//ndFloat32 alphaReward = AccelerationRewardGaussianPenalty(alphaError);
+			ndFloat32 alphaReward = AccelerationRewardLinearPenalty(alphaError);
 
 			ndFloat32 poleAngle = GetPoleAngle();
 			ndFloat32 poleReward = ndFloat32(ndExp(-ndFloat32(500.0f) * poleAngle * poleAngle));
@@ -510,7 +532,7 @@ namespace ndUnicycle
 		{
 			ndModelArticulation* const model = (ndModelArticulation*)GetModel();
 			ndBodyKinematic* const body = model->GetRoot()->m_body->GetAsBodyKinematic();
-			return ndAbs(body->GetMatrix().m_posit.m_x) > ndFloat32(30.0f);
+			return ndAbs(body->GetMatrix().m_posit.m_x) > ndFloat32(40.0f);
 		}
 		void Update(ndFloat32 timestep)
 		{
@@ -562,7 +584,7 @@ namespace ndUnicycle
 			,m_discountFactor(0.99f)
 			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(0xffffffff)
-			,m_stopTraining(100 * 1000000)
+			,m_stopTraining(50 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
