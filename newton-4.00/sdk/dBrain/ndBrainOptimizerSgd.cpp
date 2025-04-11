@@ -53,8 +53,7 @@ void ndBrainOptimizerSgd::Update(ndBrainThreadPool* const threadPool, ndArray<nd
 	{
 		ndBrainTrainer* const trainer = partialGradients[0];
 		ndBrainFloat regularizer = -GetRegularizer();
-		//ndBrainFloat regularizer = GetRegularizer();
-		ndBrainFloat denScale = -learnRate / ndBrainFloat(partialGradients.GetCount());
+		ndBrainFloat descendRate = -learnRate / ndBrainFloat(partialGradients.GetCount());
 
 		const ndStartEnd startEnd(paramLayer.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
@@ -71,7 +70,7 @@ void ndBrainOptimizerSgd::Update(ndBrainThreadPool* const threadPool, ndArray<nd
 				trainer->AcculumateGradients(*src, index);
 			}
 			
-			gradients.Scale(denScale);
+			gradients.Scale(descendRate);
 			gradients.ScaleAdd(weights, regularizer);
 			weights.Add(gradients);
 			weights.FlushToZero();

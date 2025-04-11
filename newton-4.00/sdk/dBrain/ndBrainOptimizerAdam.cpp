@@ -104,8 +104,8 @@ void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const threadPool, ndArray<n
 
 
 #if 0
+	ndBrainFloat descendRate = -learnRate;
 	ndBrainFloat regularizer = -GetRegularizer();
-	ndBrainFloat descendRate = learnRate * ndBrainFloat(-1.0f);
 	ndBrainFloat den = ndBrainFloat(1.0f) / ndBrainFloat(partialGradients.GetCount());
 
 	for (ndInt32 i = 0; i < brain.GetCount(); ++i)
@@ -152,8 +152,8 @@ void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const threadPool, ndArray<n
 	ndAtomic<ndInt32> iterator(0);
 	auto CalculateLayerGradients = ndMakeObject::ndFunction([this, learnRate, &partialGradients, &brain, trainer, &iterator](ndInt32, ndInt32)
 	{
+		ndBrainFloat descendRate = -learnRate;
 		ndBrainFloat regularizer = -GetRegularizer();
-		ndBrainFloat descendRate = learnRate * ndBrainFloat(-1.0f);
 		ndBrainFloat den = ndBrainFloat(1.0f) / ndBrainFloat(partialGradients.GetCount());
 
 		for (ndInt32 i = iterator++; i < brain.GetCount(); i = iterator++)
