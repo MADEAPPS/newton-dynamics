@@ -25,7 +25,7 @@
 
 namespace ndUnicycle
 {
-	#define ND_TRAIN_AGENT
+	//#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME			"unicycle.dnn"
 
 	//#define ND_MAX_LEG_ANGLE_STEP	(ndFloat32 (8.0f) * ndDegreeToRad)
@@ -362,6 +362,22 @@ namespace ndUnicycle
 		}
 
 		#pragma optimize( "", off )
+		ndFloat32 CalculateComSpeed() const
+		{
+			ndFloat32 totalMass = 0.0f;
+			ndVector totalMomentum(ndVector::m_zero);
+			for (ndModelArticulation::ndNode* node = GetModel()->GetAsModelArticulation()->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+			{
+				ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
+				ndFloat32 mass = body->GetMassMatrix().m_w;
+				totalMass += mass;
+				totalMomentum += body->GetVelocity().Scale(mass);
+			}
+			totalMomentum = totalMomentum.Scale(1.0f / totalMass);
+			return totalMomentum.m_x;
+		}
+
+		#pragma optimize( "", off )
 		bool IsTerminal() const
 		{
 			//bool fail = ndAbs(GetBoxAngle()) > ND_TERMINATION_ANGLE;
@@ -433,6 +449,11 @@ namespace ndUnicycle
 			//}
 			//ndFloat32 reward = 0.25f * poleReward + 0.25f * speedReward + 0.5f * alphaReward;
 
+			//ndFloat32 robotSpeed = CalculateComSpeed();
+			//ndFloat32 speedReward = ndFloat32(ndExp(-ndFloat32(100.0f) * robotSpeed * robotSpeed));
+			//poleReward = 0.0f;
+
+			//ndFloat32 reward = 0.25f * poleReward + 0.25f * speedReward + 0.5f * alphaReward;
 			ndFloat32 reward = 0.5f * poleReward + 0.5f * alphaReward;
 			return ndReal(reward);
 		}
@@ -566,8 +587,8 @@ namespace ndUnicycle
 			hyperParameters.m_numberOfObservations = m_stateSize;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 			
-			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
-			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
+			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
+			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
 			
 			m_master->SetName(CONTROLLER_NAME);
