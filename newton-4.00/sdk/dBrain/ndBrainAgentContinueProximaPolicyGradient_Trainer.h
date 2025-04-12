@@ -41,12 +41,14 @@ class ndBrainAgentContinueProximaPolicyGradient_TrainerMaster : public ndBrainAg
 	void OptimizePolicyPPO();
 	void OptimizePolicyPPOstep();
 	ndBrainFloat CalculateKLdivergence();
+	ndBrainFloat CalculateKLdivergenceOld();
 
 
 	void CalculateGradients();
 	
-	ndBrain m_oldPolicy;
-	ndBrain m_tempPolicy;
+	//ndBrain m_oldPolicy;
+	//ndBrain m_tempPolicy;
+	ndBrainVector m_policyActions;
 };
 
 #endif 
