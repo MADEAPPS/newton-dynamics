@@ -39,10 +39,13 @@ class ndBrainOptimizer : public ndClassAlloc
 
 	ndBrainOptimizer();
 	virtual ~ndBrainOptimizer();
-	
 
 	ndBrainFloat GetRegularizer() const;
-	void SetRegularizer(ndRegularizerType type, ndBrainFloat regularizer);
+	ndRegularizerType GetRegularizerType() const;
+
+	void SetRegularizer(ndBrainFloat regularizer);
+	void SetRegularizerType(ndRegularizerType type);
+
 	virtual void Update(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients, ndBrainFloat learnRate);
 
 	void AccumulateGradients(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients) const;

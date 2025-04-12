@@ -314,7 +314,7 @@ static void Cifar10TrainingSet()
 			//batches = 1;
 
 			// so far best training result on the cifar-10 data set
-			optimizer.SetRegularizer(ndBrainOptimizer::m_None, ndBrainFloat(0.0f));		// with dropout out train score (99.838%)
+			optimizer.SetRegularizer(ndBrainFloat(0.0f));		// with dropout out train score (99.838%)
 			//optimizer.SetRegularizer(ndBrainFloat(0.0f));		// base score train score       (99.540%)
 			//optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// with dropout out train score (99.784%)
 			//optimizer.SetRegularizer(ndBrainFloat(1.0e-3f));	// with dropout out train score (99.722%)

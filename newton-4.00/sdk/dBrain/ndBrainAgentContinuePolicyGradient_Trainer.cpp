@@ -51,6 +51,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 
 	m_policyRegularizer = ndBrainFloat(1.0e-4f);
 	m_criticRegularizer = ndBrainFloat(5.0e-3f);
+	m_regularizerType = ndBrainOptimizer::m_Ridge;
 
 	m_discountFactor = ndBrainFloat(0.99f);
 	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize);
@@ -517,8 +518,8 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 	
 	m_policyWeightedTrainer.PushBack(m_policyTrainers[0]);
 	m_policyOptimizer = new ndBrainOptimizerAdam();
-	//m_policyOptimizer->SetRegularizer(ndBrainOptimizer::m_Ridge, hyperParameters.m_policyRegularizer);
-	m_policyOptimizer->SetRegularizer(ndBrainOptimizer::m_Lasso, hyperParameters.m_policyRegularizer);
+	m_policyOptimizer->SetRegularizer(hyperParameters.m_policyRegularizer);
+	m_policyOptimizer->SetRegularizerType(hyperParameters.m_regularizerType);
 
 	// build state value critic neural net
 	layers.SetCount(0);
@@ -550,7 +551,8 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 	}
 	
 	m_criticOptimizer = new ndBrainOptimizerAdam();
-	m_criticOptimizer->SetRegularizer(ndBrainOptimizer::m_Ridge, hyperParameters.m_criticRegularizer);
+	m_criticOptimizer->SetRegularizer(hyperParameters.m_criticRegularizer);
+	m_criticOptimizer->SetRegularizerType(hyperParameters.m_regularizerType);
 	
 	m_baseValueWorkingBufferSize = m_critic.CalculateWorkingBufferSize();
 	m_workingBuffer.SetCount(m_baseValueWorkingBufferSize * hyperParameters.m_threadsCount);

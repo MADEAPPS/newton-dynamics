@@ -498,7 +498,7 @@ static void MnistTrainingSet()
 			ndInt32 batches = m_minTrainingFail / m_bashBufferSize;
 
 			// so far best training result on the mnist data set
-			optimizer.SetRegularizer(ndBrainOptimizer::m_None, ndBrainFloat(0.0f));		//         training(100.0%) test(99.35%) 
+			optimizer.SetRegularizer(ndBrainFloat(0.0f));		//         training(100.0%) test(99.35%) 
 			//optimizer.SetRegularizer(ndBrainFloat(0.0f));		// dropout training(99.998%) test(99.4%) 
 			//optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// 
 			//optimizer.SetRegularizer(ndBrainFloat(2.0e-5f));	// 
