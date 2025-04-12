@@ -595,17 +595,16 @@ namespace ndUnicycle
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 			
 			//hyperParameters.m_threadsCount = 1;
-			hyperParameters.m_extraTrajectorySteps = 512;
-			hyperParameters.m_maxTrajectorySteps = ND_TRAJECTORY_STEPS;
 			hyperParameters.m_numberOfActions = m_actionsSize;
 			hyperParameters.m_numberOfObservations = m_stateSize;
+			hyperParameters.m_maxTrajectorySteps = ND_TRAJECTORY_STEPS;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 			hyperParameters.m_regularizerType = ndBrainOptimizer::m_Lasso;
 			
 			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
 			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
+
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
-			
 			m_master->SetName(CONTROLLER_NAME);
 
 			ndSharedPtr<ndModel>visualModel (CreateModel(scene, matrix, modelMesh));

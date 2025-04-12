@@ -1754,8 +1754,7 @@ namespace ndQuadruped_2
 
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 
-			hyperParameters.m_extraTrajectorySteps = 256;
-			hyperParameters.m_maxTrajectorySteps = 1024 * 2;
+			hyperParameters.m_maxTrajectorySteps = 1024 * 4;
 			hyperParameters.m_numberOfActions = m_actionsSize;
 			hyperParameters.m_numberOfObservations = m_stateSize;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);

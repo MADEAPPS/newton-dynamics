@@ -172,7 +172,6 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndInt32 m_neuronPerLayers;
 		ndInt32 m_maxTrajectorySteps;
 		ndInt32 m_bashTrajectoryCount;
-		ndInt32 m_extraTrajectorySteps;
 		ndUnsigned32 m_randomSeed;
 		ndBrainOptimizer::ndRegularizerType m_regularizerType;
 	};

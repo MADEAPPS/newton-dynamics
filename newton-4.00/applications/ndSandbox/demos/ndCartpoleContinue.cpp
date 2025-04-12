@@ -430,13 +430,11 @@ namespace ndContinueCarpole
 			m_outFile = fopen(name, "wb");
 			fprintf(m_outFile, "vpg\n");
 
-
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 
-			hyperParameters.m_extraTrajectorySteps = 512;
-			hyperParameters.m_maxTrajectorySteps = ND_TRAJECTORY_STEPS;
 			hyperParameters.m_numberOfActions = m_actionsSize;
 			hyperParameters.m_numberOfObservations = m_stateSize;
+			hyperParameters.m_maxTrajectorySteps = ND_TRAJECTORY_STEPS;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 
 			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
