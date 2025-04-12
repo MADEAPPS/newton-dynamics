@@ -25,7 +25,7 @@
 
 namespace ndUnicycle
 {
-	//#define ND_TRAIN_AGENT
+	#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME			"unicycle.dnn"
 
 	//#define ND_MAX_LEG_ANGLE_STEP	(ndFloat32 (8.0f) * ndDegreeToRad)
@@ -593,16 +593,8 @@ namespace ndUnicycle
 			fprintf(m_outFile, "vpg\n");
 			
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
-
-			float xxxx = 0;
-			float xxxx1= 1.0;
-			int n = 0;
-			for (; xxxx < 0.99f * m_horizon; n++)
-			{
-				xxxx += xxxx1;
-				xxxx1 *= m_discountFactor;
-			}
 			
+			//hyperParameters.m_threadsCount = 1;
 			hyperParameters.m_extraTrajectorySteps = 512;
 			hyperParameters.m_maxTrajectorySteps = ND_TRAJECTORY_STEPS;
 			hyperParameters.m_numberOfActions = m_actionsSize;

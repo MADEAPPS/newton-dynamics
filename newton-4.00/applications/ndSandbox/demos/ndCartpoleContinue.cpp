@@ -433,16 +433,6 @@ namespace ndContinueCarpole
 
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 
-			float xxxx = 0;
-			float xxxx1 = 1.0;
-			int n = 0;
-			for (; xxxx < 0.99f * m_horizon; n++)
-			{
-				xxxx += xxxx1;
-				xxxx1 *= m_discountFactor;
-			}
-
-
 			hyperParameters.m_extraTrajectorySteps = 512;
 			hyperParameters.m_maxTrajectorySteps = ND_TRAJECTORY_STEPS;
 			hyperParameters.m_numberOfActions = m_actionsSize;

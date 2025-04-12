@@ -55,7 +55,6 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 
 	m_discountFactor = ndBrainFloat(0.99f);
 	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize);
-//m_threadsCount = 1;
 }
 
 //*********************************************************************************************
@@ -445,6 +444,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 	,m_criticOptimizer(nullptr)
 	,m_policyOptimizer(nullptr)
 	,m_randomPermutation()
+	,m_randomGenerator()
 	,m_trajectoryAccumulator(hyperParameters.m_numberOfActions, hyperParameters.m_numberOfObservations)
 	,m_gamma(hyperParameters.m_discountFactor)
 	,m_policyLearnRate(hyperParameters.m_policyLearnRate)
@@ -470,14 +470,6 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 	ndAssert(m_numberOfActions);
 	ndAssert(m_numberOfObservations);
 	ndSetRandSeed(m_randomSeed);
-
-	m_randomGenerator = new ndBrainAgentContinuePolicyGradient_Trainer::ndRandomGenerator[size_t(hyperParameters.m_bashTrajectoryCount)];
-	//for (ndInt32 i = 0; i < hyperParameters.m_bashTrajectoryCount; ++i)
-	//{
-	//	m_randomSeed++;
-	//	m_randomGenerator[i].m_gen.seed(m_randomSeed);
-	//}
-	//m_randomSeed = 47;
 
 	// build policy neural net
 	SetThreadCount(hyperParameters.m_threadsCount);
@@ -572,8 +564,6 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::~ndBrainAgentContinuePolicyGra
 		delete m_criticTrainers[i];
 	}
 	delete m_criticOptimizer;
-
-	delete[] m_randomGenerator;
 }
 
 ndBrain* ndBrainAgentContinuePolicyGradient_TrainerMaster::GetPolicyNetwork()
@@ -596,12 +586,14 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::SetName(const ndString& n
 	m_name = name;
 }
 
+#pragma optimize( "", off )
 ndBrainAgentContinuePolicyGradient_Trainer::ndRandomGenerator* ndBrainAgentContinuePolicyGradient_TrainerMaster::GetRandomGenerator()
 {
-	ndInt32 index = m_agents.GetCount() - 1;
-	m_randomGenerator[index].m_gen.seed(m_randomSeed);
+	ndList<ndBrainAgentContinuePolicyGradient_Trainer::ndRandomGenerator>::ndNode* const node = m_randomGenerator.Append();
+	ndBrainAgentContinuePolicyGradient_Trainer::ndRandomGenerator* const generator = &node->GetInfo();
+	generator->m_gen.seed(m_randomSeed);
 	m_randomSeed ++;
-	return &m_randomGenerator[index];
+	return generator;
 }
 
 ndUnsigned32 ndBrainAgentContinuePolicyGradient_TrainerMaster::GetFramesCount() const
@@ -908,19 +900,17 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeStep()
 
 		ndAssert(agent->m_trajectory.GetCount());
 		bool isTeminal = agent->m_trajectory.GetTerminalState(agent->m_trajectory.GetCount() - 1);
-		isTeminal = isTeminal || (agent->m_trajectory.GetCount() >= (m_extraTrajectorySteps + m_maxTrajectorySteps));
+		isTeminal = isTeminal || (agent->m_trajectory.GetCount() >= (m_maxTrajectorySteps + m_extraTrajectorySteps));
 		if (isTeminal)
 		{
 			agent->SaveTrajectory();
 			agent->ResetModel();
-			agent->m_randomGenerator = GetRandomGenerator();
 		}
 		m_frameCount++;
 		m_framesAlive++;
 	}
 
 	if (m_bashTrajectoryIndex >= m_bashTrajectoryCount)
-	//if ((m_bashTrajectoryIndex >= m_bashTrajectoryCount) && (m_trajectoryAccumulator.GetCount() >= m_bashTrajectorySteps))
 	{
 		Optimize();
 

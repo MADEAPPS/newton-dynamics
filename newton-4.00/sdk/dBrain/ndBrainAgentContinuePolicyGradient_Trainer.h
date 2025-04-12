@@ -59,6 +59,22 @@ class ndPolicyGradientActivation : public ndBrainLayerActivationTanh
 
 class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
 {
+	class ndRandomGenerator
+	{
+		public:
+		ndRandomGenerator()
+			:m_gen()
+			,m_rd()
+			,m_d(ndFloat32(0.0f), ndFloat32(1.0f))
+		{
+		}
+
+		std::mt19937 m_gen;
+		std::random_device m_rd;
+		std::normal_distribution<ndFloat32> m_d;
+	};
+
+	public:
 	class ndTrajectoryTransition : protected ndBrainVector
 	{
 		public:
@@ -108,22 +124,6 @@ class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
 		ndInt64 m_obsevationsSize;
 	};
 
-	class ndRandomGenerator
-	{
-		public:
-		ndRandomGenerator()
-			:m_gen()
-			,m_rd()
-			,m_d(ndFloat32(0.0f), ndFloat32(1.0f))
-		{
-		}
-
-		std::mt19937 m_gen;
-		std::random_device m_rd;
-		std::normal_distribution<ndFloat32> m_d;
-	};
-
-	public:
 	ndBrainAgentContinuePolicyGradient_Trainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master);
 	~ndBrainAgentContinuePolicyGradient_Trainer();
 
@@ -212,9 +212,9 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	void OptimizeCritic();
 	void CalculateAdvange();
 	ndBrainAgentContinuePolicyGradient_Trainer::ndRandomGenerator* GetRandomGenerator();
+
 	ndBrain m_policy;
 	ndBrain m_critic;
-
 	ndArray<ndBrainTrainer*> m_criticTrainers;
 	ndArray<ndBrainTrainer*> m_policyTrainers;
 	ndArray<ndBrainTrainer*> m_policyWeightedTrainer;
@@ -224,7 +224,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndBrainOptimizerAdam* m_policyOptimizer;
 
 	ndArray<ndInt32> m_randomPermutation;
-	ndBrainAgentContinuePolicyGradient_Trainer::ndRandomGenerator* m_randomGenerator;
+	ndList<ndBrainAgentContinuePolicyGradient_Trainer::ndRandomGenerator> m_randomGenerator;
 	ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryTransition m_trajectoryAccumulator;
 	
 	ndBrainFloat m_gamma;
