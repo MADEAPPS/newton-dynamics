@@ -25,7 +25,7 @@
 
 namespace ndUnicycle
 {
-	#define ND_TRAIN_AGENT
+	//#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME			"unicycle.dnn"
 
 	//#define ND_MAX_LEG_ANGLE_STEP	(ndFloat32 (8.0f) * ndDegreeToRad)
@@ -35,6 +35,8 @@ namespace ndUnicycle
 
 	#define ND_TERMINATION_ANGLE	(ndFloat32 (45.0f) * ndDegreeToRad)
 	#define ND_TRAJECTORY_STEPS		(1024 * 4)
+
+	//#define ND_SYMMETRIC_MDP
 
 	enum ndActionSpace
 	{
@@ -48,7 +50,7 @@ namespace ndUnicycle
 		m_poleOmega,
 		m_wheelOmega,
 		//m_wheelVeloc,
-		m_stateSize
+		m_observationsSize
 	};
 
 	ndModelArticulation* BuildModelOldModel(ndDemoEntityManager* const scene, const ndMatrix& location)
@@ -228,6 +230,7 @@ namespace ndUnicycle
 				:ndBrainAgentContinuePolicyGradient_Trainer(master)
 				,m_solver()
 				,m_robot(nullptr)
+				,m_symmetricTrajectory(m_actionsSize, m_observationsSize)
 			{
 			}
 
@@ -256,8 +259,34 @@ namespace ndUnicycle
 				m_robot->ResetModel();
 			}
 
+			#pragma optimize( "", off )
+			void SaveTrajectory()
+			{
+				#ifdef ND_SYMMETRIC_MDP
+					m_symmetricTrajectory.SetCount(m_trajectory.GetCount());
+					for (ndInt32 i = 0; i < m_trajectory.GetCount(); ++i)
+					{
+						m_symmetricTrajectory.CopyFrom(i, m_trajectory, i);
+						ndBrainMemVector action(m_symmetricTrajectory.GetActions(i), m_actionsSize);
+						ndBrainMemVector observation(m_symmetricTrajectory.GetObservations(i), m_observationsSize);
+			
+						action.Scale(-1.0f);
+						observation.Scale(-1.0f);
+					}
+					ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory();
+			
+					m_trajectory.SetCount(m_symmetricTrajectory.GetCount());
+					for (ndInt32 i = 0; i < m_symmetricTrajectory.GetCount(); ++i)
+					{
+						m_trajectory.CopyFrom(i, m_symmetricTrajectory, i);
+					}
+				#endif
+				ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory();
+			}
+
 			ndIkSolver m_solver;
 			RobotModelNotify* m_robot;
+			ndTrajectoryTransition m_symmetricTrajectory;
 		};
 
 		public:
@@ -385,6 +414,7 @@ namespace ndUnicycle
 			return fail;
 		}
 
+		#pragma optimize( "", off )
 		void ResetModel()
 		{
 			for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
@@ -393,7 +423,8 @@ namespace ndUnicycle
 			}
 			GetModel()->GetAsModelArticulation()->ClearMemory();
 
-			const ndMatrix randomRollMatrix(ndRollMatrix((ndRand() - 0.5f) * 25.0f * ndDegreeToRad));
+			ndFloat32 angle = (ndRand() - ndFloat32(0.5f)) * ndFloat32(20.0f);
+			const ndMatrix randomRollMatrix(ndRollMatrix(angle * ndDegreeToRad));
 			const ndMatrix matrix(randomRollMatrix * GetModel()->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix());
 			GetModel()->GetAsModelArticulation()->SetTransform(matrix);
 		}
@@ -487,6 +518,15 @@ namespace ndUnicycle
 			//ndFloat32 newPolegAngle = poleAngle + ndFloat32(actions[m_legControl]) * ND_MAX_LEG_ANGLE_STEP;
 			//newPolegAngle = ndClamp(newPolegAngle, -ND_MAX_LEG_JOINT_ANGLE, ND_MAX_LEG_JOINT_ANGLE);
 			//m_poleJoint->SetTargetAngle(newPolegAngle);
+
+			ndFloat32 rand = ndRand();
+			if (rand < 1.0e-3f)
+			{
+				ndBodyKinematic* const rootBody = GetModel()->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic();
+				ndFloat32 impulse = 2.0f * (ndRand() - 0.5f) * rootBody->GetMassMatrix().m_w;
+				ndVector linear(impulse, ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
+				rootBody->ApplyImpulsePair(linear, ndVector::m_zero, m_timestep);
+			}
 
 			const ndVector wheelMass(m_wheel->GetMassMatrix());
 			const ndMatrix wheelMatrix(m_wheelJoint->CalculateGlobalMatrix0());
@@ -584,7 +624,7 @@ namespace ndUnicycle
 			,m_discountFactor(0.99f)
 			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor))
 			,m_lastEpisode(0xffffffff)
-			,m_stopTraining(50 * 1000000)
+			,m_stopTraining(100 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
@@ -594,9 +634,12 @@ namespace ndUnicycle
 			
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 			
+			#ifdef ND_SYMMETRIC_MDP
+				hyperParameters.m_bashTrajectoryCount *= 2;
+			#endif	
 			//hyperParameters.m_threadsCount = 1;
 			hyperParameters.m_numberOfActions = m_actionsSize;
-			hyperParameters.m_numberOfObservations = m_stateSize;
+			hyperParameters.m_numberOfObservations = m_observationsSize;
 			hyperParameters.m_maxTrajectorySteps = ND_TRAJECTORY_STEPS;
 			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
 			hyperParameters.m_regularizerType = ndBrainOptimizer::m_Lasso;

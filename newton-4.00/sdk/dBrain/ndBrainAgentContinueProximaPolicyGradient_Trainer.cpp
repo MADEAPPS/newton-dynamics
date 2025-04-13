@@ -46,66 +46,7 @@ ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::~ndBrainAgentContinuePr
 {
 }
 
-#pragma optimize( "", off )
-ndBrainFloat ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateKLdivergenceOld()
-{
-	//https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
-	// since I am using a diagonal sigma, I do not have to use Cholesky 
-
-	ndAtomic<ndInt32> iterator(0);
-	ndFloat64 partialDivergence[256];
-
-	auto ParcialDivergence = ndMakeObject::ndFunction([this, &iterator, &partialDivergence](ndInt32 threadIndex, ndInt32)
-	{
-		ndFloat64 totalDivergece = ndFloat32(0.0f);
-		ndInt32 size = m_trajectoryAccumulator.GetCount();
-
-		ndBrainFloat crossProbabilitiesBuffer[256];
-		ndBrainMemVector crossProbabilities(&crossProbabilitiesBuffer[0], m_numberOfActions * 2);
-		for (ndInt32 i = iterator++; i < size; i = iterator++)
-		{
-			const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(i), m_numberOfObservations);
-			m_policy.MakePrediction(observation, crossProbabilities);
-			ndBrainMemVector entropyProbabilities(m_trajectoryAccumulator.GetProbabilityDistribution(i), m_numberOfActions * 2);
-
-			// calculate t0 = trace(inv(Sigma_q) * Sigma_p
-			// calculate t1 = trans(Uq - Up) * inv(Sigma_q) * (Uq - Up)
-			// calculate t2 = log(det(Sigma_q) /det(Sigma_p))
-			ndFloat64 t0 = 0.0f;
-			ndFloat64 t1 = 0.0f;
-			ndFloat64 det_p = 1.0f;
-			ndFloat64 det_q = 1.0f;
-			for (ndInt32 j = m_numberOfActions - 1; j >= 0; --j)
-			{
-				ndBrainFloat sigma_q = crossProbabilities[j + m_numberOfActions];
-				ndBrainFloat sigma_p = entropyProbabilities[j + m_numberOfActions];
-				ndBrainFloat invSigma_q = 1.0f / sigma_q;
-
-				det_p *= sigma_p;
-				det_q *= sigma_q;
-				t0 += sigma_p * invSigma_q;
-				ndBrainFloat meanError(crossProbabilities[j] - entropyProbabilities[j]);
-				t1 += meanError * invSigma_q * meanError;
-			}
-			ndFloat64 t2 = ndLog(det_q / det_p);
-			totalDivergece += ndBrainFloat(0.5f) * (t0 - ndBrainFloat(m_numberOfActions) + t1 + t2);
-		}
-		partialDivergence[threadIndex] = totalDivergece;
-	});
-	ndBrainThreadPool::ParallelExecute(ParcialDivergence);
-
-	ndFloat64 divergence = ndFloat32(0.0f);
-	for (ndInt32 i = GetThreadCount() - 1; i >= 0; --i)
-	{
-		divergence += partialDivergence[i];
-	}
-	ndAssert(divergence >= 0.0f);
-	divergence /= ndFloat64(m_trajectoryAccumulator.GetCount());
-	return ndBrainFloat(divergence);
-}
-
-
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 ndBrainFloat ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateKLdivergence()
 {
 	// https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
@@ -538,12 +479,19 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateGradients
 void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::Optimize()
 {
 	m_policyActions.SetCount(m_trajectoryAccumulator.GetCount() * m_numberOfActions * 2);
-	for (ndInt32 i = 0; i < m_trajectoryAccumulator.GetCount(); ++i)
+
+	ndAtomic<ndInt32> iterator(0);
+	auto CalculateActionsDistribution = ndMakeObject::ndFunction([this, &iterator](ndInt32, ndInt32)
 	{
-		ndBrainMemVector probabilities(&m_policyActions[i * m_numberOfActions * 2], m_numberOfActions * 2);
-		const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(i), m_numberOfObservations);
-		m_policy.MakePrediction(observation, probabilities);
-	}
+		const ndInt32 size = m_trajectoryAccumulator.GetCount();
+		for (ndInt32 i = iterator++; i < size; i = iterator++)
+		{
+			ndBrainMemVector probabilities(&m_policyActions[i * m_numberOfActions * 2], m_numberOfActions * 2);
+			const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(i), m_numberOfObservations);
+			m_policy.MakePrediction(observation, probabilities);
+		}
+	});
+	ndBrainThreadPool::ParallelExecute(CalculateActionsDistribution);
 
 	CalculateAdvange();
 	CalculateGradients();
