@@ -49,7 +49,7 @@ namespace ndUnicycle
 		m_poleAngle,
 		m_poleOmega,
 		m_wheelOmega,
-		//m_wheelVeloc,
+		m_hasSupportContact,
 		m_observationsSize
 	};
 
@@ -428,6 +428,21 @@ namespace ndUnicycle
 			const ndMatrix matrix(randomRollMatrix * GetModel()->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix());
 			GetModel()->GetAsModelArticulation()->SetTransform(matrix);
 		}
+		
+		ndFloat32 IsOnAir() const
+		{
+			ndBodyKinematic::ndContactMap& contacts = m_wheel->GetContactMap();
+			ndBodyKinematic::ndContactMap::Iterator it(contacts);
+			for (it.Begin(); it; it++)
+			{
+				ndContact* const contact = *it;
+				if (contact->IsActive())
+				{
+					return 0.0f;
+				}
+			}
+			return 1.0f;
+		};
 
 		#pragma optimize( "", off )
 		ndBrainFloat CalculateReward()
@@ -508,26 +523,18 @@ namespace ndUnicycle
 
 			//ndFloat32 reward = 0.25f * poleReward + 0.25f * speedReward + 0.5f * alphaReward;
 			ndFloat32 reward = 0.5f * poleReward + 0.5f * alphaReward;
+			if (IsOnAir())
+			{
+				ndVector wheelOmega(m_wheel->GetOmega());
+				reward = ndExp(-ndFloat32(100.0f) * wheelOmega.m_z * wheelOmega.m_z);
+			}
+
 			return ndReal(reward);
 		}
 
 		#pragma optimize( "", off )
 		void ApplyActions(ndBrainFloat* const actions)
 		{
-			//ndFloat32 poleAngle = m_poleJoint->GetAngle();
-			//ndFloat32 newPolegAngle = poleAngle + ndFloat32(actions[m_legControl]) * ND_MAX_LEG_ANGLE_STEP;
-			//newPolegAngle = ndClamp(newPolegAngle, -ND_MAX_LEG_JOINT_ANGLE, ND_MAX_LEG_JOINT_ANGLE);
-			//m_poleJoint->SetTargetAngle(newPolegAngle);
-
-			ndFloat32 rand = ndRand();
-			if (rand < 1.0e-3f)
-			{
-				ndBodyKinematic* const rootBody = GetModel()->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic();
-				ndFloat32 impulse = 2.0f * (ndRand() - 0.5f) * rootBody->GetMassMatrix().m_w;
-				ndVector linear(impulse, ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
-				rootBody->ApplyImpulsePair(linear, ndVector::m_zero, m_timestep);
-			}
-
 			const ndVector wheelMass(m_wheel->GetMassMatrix());
 			const ndMatrix wheelMatrix(m_wheelJoint->CalculateGlobalMatrix0());
 			ndFloat32 wheelSpeedAlpha = actions[m_wheelTorque] * ND_MAX_WHEEL_ALPHA;
@@ -548,6 +555,7 @@ namespace ndUnicycle
 			observation[m_poleAngle] = poleAngle;
 			observation[m_poleOmega] = poleOmega;
 			observation[m_wheelOmega] = wheelOmega;
+			observation[m_hasSupportContact] = IsOnAir();
 		}
 
 		void TelePort() const
