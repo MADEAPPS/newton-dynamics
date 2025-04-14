@@ -383,7 +383,6 @@ void ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory()
 		{
 			m_trajectory.SetCount(m_trajectory.GetCount() - 1);
 		}
-		m_trajectory.SetTerminalState(m_trajectory.GetCount() - 1, true);
 
 		// using the Bellman equation to calculate trajectory rewards. (Monte Carlo method)
 		ndBrainFloat gamma = m_master->m_gamma;
@@ -397,6 +396,8 @@ void ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory()
 		// get the max trajectory steps
 		const ndInt32 maxSteps = ndMin(m_trajectory.GetCount(), m_master->m_maxTrajectorySteps);
 		ndAssert(maxSteps > 0);
+		m_trajectory.SetTerminalState(maxSteps - 1, true);
+
 		ndTrajectoryTransition& trajectoryAccumulator = m_master->m_trajectoryAccumulator;
 		for (ndInt32 i = 0; i < maxSteps; ++i)
 		{
