@@ -142,6 +142,7 @@ class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
 	ndTrajectoryTransition m_trajectory;
 	ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
 	ndRandomGenerator* m_randomGenerator;
+	ndInt32 m_trajectoryCounter;
 
 	friend class ndBrainAgentContinuePolicyGradient_TrainerMaster;
 };
