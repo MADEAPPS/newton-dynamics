@@ -1374,8 +1374,10 @@ namespace ndQuadruped_2
 			void ResetModel()
 			{
 				m_robot->ResetModel();
-				m_animBlendTree->SetTime(0.0f);
-				m_animBlendTree->SetTime(0.0f);
+				ndUnsigned32 start = ndRandInt() & 3;
+				ndFloat32 duration = ((ndAnimationSequencePlayer*)*m_poseGenerator)->GetSequence();
+				m_animBlendTree->SetTime(duration * ndFloat32(start));
+				m_animBlendTree->SetTime(duration * ndFloat32(start));
 			}
 
 			void InitAnimation()
@@ -1407,6 +1409,8 @@ namespace ndQuadruped_2
 					m_animPose.PushBack(keyFrame);
 					poseGenerator->AddTrack();
 				}
+
+				ResetModel();
 			}
 
 			ndFloat32 GetPoseSequence() const
@@ -1419,13 +1423,13 @@ namespace ndQuadruped_2
 
 			virtual void Step() override
 			{
-				ndBrainAgentContinuePolicyGradient_Trainer::Step();
-
 				ndFloat32 animSpeed = 1.0f;
 				m_animBlendTree->Update(m_robot->m_timestep * animSpeed);
 
 				ndVector veloc;
 				m_animBlendTree->Evaluate(m_animPose, veloc);
+
+				ndBrainAgentContinuePolicyGradient_Trainer::Step();
 			}
 
 			RobotModelNotify* m_robot;
@@ -1464,12 +1468,6 @@ namespace ndQuadruped_2
 			ndIkSwivelPositionEffector* m_effector;
 		};
 
-		void Init()
-		{
-			m_controllerTrainer->InitAnimation();
-		}
-
-		//RobotModelNotify(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot, bool showDebug)
 		RobotModelNotify(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot)
 			:ndModelNotify()
 			//, m_controller(nullptr)
@@ -1487,31 +1485,63 @@ namespace ndQuadruped_2
 		{
 		}
 
+		void Init()
+		{
+			m_controllerTrainer->InitAnimation();
+		}
+
+		ndVector CalculatePositError(ndInt32 keyFrameIndex) const
+		{
+			ndJointBilateralConstraint::ndKinematicState kinematicState[4];
+			const ndAnimKeyframe keyFrame = m_controllerTrainer->m_animPose[keyFrameIndex];
+			const ndEffectorInfo* const leg = (ndEffectorInfo*)keyFrame.m_userData;
+
+			leg->m_effector->GetKinematicState(kinematicState);
+			const ndVector effectKinPosit(kinematicState[0].m_posit, kinematicState[1].m_posit, kinematicState[2].m_posit, ndFloat32(0.0f));
+			const ndVector effectPosit(leg->m_effector->GetRestPosit() + effectKinPosit);
+			const ndVector animPosit(keyFrame.m_posit);
+			const ndVector error(animPosit - effectPosit);
+			return error;
+		}
+
 		bool IsTerminal() const
 		{
+			for (ndInt32 i = 0; i < m_controllerTrainer->m_animPose.GetCount(); ++i)
+			{
+				const ndVector error(CalculatePositError(i));
+				const ndVector normalError(error * ndVector(1.0f / D_CYCLE_STRIDE_X, 1.0f / D_CYCLE_AMPLITUDE, 1.0f / D_CYCLE_STRIDE_Z, 1.0f));
+				if (ndAbs(normalError.m_x) > 1.0f)
+				{
+					return true;
+				}
+
+				if (ndAbs(normalError.m_y) > 1.0f)
+				{
+					return true;
+				}
+
+				if (ndAbs(normalError.m_z) > 1.0f)
+				{
+					return true;
+				}
+			}
+
 			return false;
 		}
 
 		ndBrainFloat CalculateReward() const
 		{
-			return 0.0f;
-		}
-
-		void GetObservation(ndBrainFloat* const observations)
-		{
-			ndInt32 size = m_leg1_posit_x - m_leg0_posit_x;
-			observations[m_frameTick] = m_controllerTrainer->GetPoseSequence();
-			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
+			ndFloat32 reward = 0.0f;
+			for (ndInt32 i = 0; i < m_controllerTrainer->m_animPose.GetCount(); ++i)
 			{
-				ndEffectorInfo& leg = m_legs[i];
-				ndJointBilateralConstraint::ndKinematicState kinematicState[4];
-				leg.m_effector->GetKinematicState(kinematicState);
-				observations[i * size + 0] = kinematicState[0].m_posit;
-				observations[i * size + 1] = kinematicState[1].m_posit;
-				observations[i * size + 2] = kinematicState[2].m_posit;
+				const ndVector error(CalculatePositError(i));
+				ndFloat32 error2 = error.DotProduct(error).GetScalar();
+				reward += ndExp(-20000.0f * error2);
 			}
+			return reward * 0.25f;
 		}
 
+		#pragma optimize( "", off )
 		void ResetModel()
 		{
 			//m_modelAlive = true;
@@ -1546,6 +1576,21 @@ namespace ndQuadruped_2
 			//m_animBlendTree->Evaluate(m_animPose, veloc);
 		}
 
+		void GetObservation(ndBrainFloat* const observations)
+		{
+			ndInt32 size = m_leg1_posit_x - m_leg0_posit_x;
+			observations[m_frameTick] = m_controllerTrainer->GetPoseSequence();
+			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
+			{
+				ndEffectorInfo& leg = m_legs[i];
+				ndJointBilateralConstraint::ndKinematicState kinematicState[4];
+				leg.m_effector->GetKinematicState(kinematicState);
+				observations[i * size + 0] = kinematicState[0].m_posit;
+				observations[i * size + 1] = kinematicState[1].m_posit;
+				observations[i * size + 2] = kinematicState[2].m_posit;
+			}
+		}
+
 		void ApplyActions(ndBrainFloat* const actions)
 		{
 			ndBodyKinematic* const rootBody = GetModel()->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic();
@@ -1562,11 +1607,6 @@ namespace ndQuadruped_2
 				ndFloat32 x = actions[size * i + 0] * D_CYCLE_STRIDE_X;
 				ndFloat32 z = actions[size * i + 2] * D_CYCLE_STRIDE_Z;
 				ndFloat32 y = actions[size * i + 1] * D_CYCLE_AMPLITUDE;
-
-				//if (i == 3)
-				//{
-				//	z = -1.0f * D_CYCLE_STRIDE_Z;
-				//}
 
 				posit.m_x += x;
 				posit.m_y += y;
@@ -1777,7 +1817,7 @@ namespace ndQuadruped_2
 
 			ndInt32 countX = 10;
 			ndInt32 countZ = 10;
-			//countX = 1;
+			//countX = 0;
 			//countZ = 1;
 			
 			// add a hidden battery of model to generate trajectories in parallel
@@ -1889,6 +1929,7 @@ namespace ndQuadruped_2
 			}
 		};
 
+		#pragma optimize( "", off )
 		virtual void Update(ndDemoEntityManager* const manager, ndFloat32)
 		{
 			ndUnsigned32 stopTraining = m_master->GetFramesCount();
