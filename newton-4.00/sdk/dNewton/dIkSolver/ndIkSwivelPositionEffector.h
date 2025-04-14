@@ -31,11 +31,11 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	D_NEWTON_API void SetLocalTargetPosition(const ndVector& posit);
 	
 	D_NEWTON_API ndVector GetEffectorPosit() const;
-	D_NEWTON_API ndVector GetGlobalPosition() const;
-
+	//D_NEWTON_API ndVector GetGlobalPosition() const;
+	
 	D_NEWTON_API ndVector GetRestPosit() const;
 	D_NEWTON_API void SetRestPosit(const ndVector& posit);
-
+	
 	D_NEWTON_API ndFloat32 GetSwivelAngle() const;
 	D_NEWTON_API void SetSwivelAngle(ndFloat32 angle);
 	D_NEWTON_API ndFloat32 CalculateLookAtSwivelAngle(const ndVector& lookAtDir) const;
@@ -45,22 +45,22 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	
 	D_NEWTON_API void SetAngularSpringDamper(ndFloat32 regularizer, ndFloat32 springConst, ndFloat32 damperConst);
 	D_NEWTON_API void GetAngularSpringDamper(ndFloat32& regularizer, ndFloat32& springConst, ndFloat32& damperConst) const;
-
+	
 	D_NEWTON_API void SetWorkSpaceConstraints(ndFloat32 minRadio, ndFloat32 maxRadio);
 	D_NEWTON_API void GetWorkSpaceConstraints(ndFloat32& minRadio, ndFloat32& maxRadio) const;
-
+	
 	D_NEWTON_API ndFloat32 GetMaxForce() const;
 	D_NEWTON_API void SetMaxForce(ndFloat32 force);
 
-	D_NEWTON_API bool GetSwivelMode() const;
-	D_NEWTON_API void SetSwivelMode(bool active);
-	
 	D_NEWTON_API ndFloat32 GetMaxTorque() const;
 	D_NEWTON_API void SetMaxTorque(ndFloat32 torque);
 
+	D_NEWTON_API bool GetSwivelMode() const;
+	D_NEWTON_API void SetSwivelMode(bool active);
+
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 	D_NEWTON_API ndInt32 GetKinematicState(ndKinematicState* const state) const;
-
+	
 	D_NEWTON_API void ClearMemory();
 
 	protected:

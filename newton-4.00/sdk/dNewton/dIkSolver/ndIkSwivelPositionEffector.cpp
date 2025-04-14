@@ -60,18 +60,26 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(
 	ndAssert((temp[0].DotProduct(m_localMatrix0[0]).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
 	ndAssert((temp[1].DotProduct(m_localMatrix0[1]).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
 	ndAssert((temp[2].DotProduct(m_localMatrix0[2]).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
-
+	
 	ndVector offset(pinAndPivotParentInGlobalSpace.UntransformVector(childPivotInGlobalSpace) & ndVector::m_triplexMask);
 	m_maxWorkSpaceRadio = ndFloat32(0.99f) * ndSqrt(offset.DotProduct(offset).GetScalar());
 	m_restPosition = offset.Normalize().Scale(m_maxWorkSpaceRadio) | ndVector::m_wOne;
 	SetLocalTargetPosition(m_restPosition);
-
+	
 	SetSolverModel(m_jointkinematicCloseLoop);
 }
 
 ndIkSwivelPositionEffector::~ndIkSwivelPositionEffector()
 {
 }
+
+#if 0
+
+ndVector ndIkSwivelPositionEffector::GetGlobalPosition() const
+{
+	return GetBody0()->GetMatrix().TransformVector(GetLocalMatrix0().m_posit);
+}
+#endif
 
 bool ndIkSwivelPositionEffector::GetSwivelMode() const
 {
@@ -126,11 +134,6 @@ void ndIkSwivelPositionEffector::SetLocalTargetPosition(const ndVector& posit)
 		target = target.Normalize().Scale(m_minWorkSpaceRadio);
 	}
 	m_localTargetPosit = target | ndVector::m_wOne;
-}
-
-ndVector ndIkSwivelPositionEffector::GetGlobalPosition() const
-{
-	return GetBody0()->GetMatrix().TransformVector(GetLocalMatrix0().m_posit);
 }
 
 void ndIkSwivelPositionEffector::SetWorkSpaceConstraints(ndFloat32 minRadio, ndFloat32 maxRadio)
@@ -233,7 +236,7 @@ ndInt32 ndIkSwivelPositionEffector::GetKinematicState(ndKinematicState* const st
 	ndMatrix matrix1;
 
 	CalculateGlobalMatrix(matrix0, matrix1);
-	matrix1.m_posit = matrix1.TransformVector(m_localTargetPosit);
+	//matrix1.m_posit = matrix1.TransformVector(m_localTargetPosit);
 
 	const ndMatrix& axisDir = matrix1;
 	const ndVector omega0(m_body0->GetOmega());

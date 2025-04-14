@@ -116,19 +116,19 @@ namespace ndQuadruped_1
 					{
 						phase = (localPosit.m_z > 0.0f) ? 0.75f : 0.25f;
 					}
-
+					
 					//stride_x = 0.0f;
 					//stride_z = 0.0f;
-
+					
 					ndFloat32 t = ndMod(param - phase + ndFloat32(1.0f), ndFloat32(1.0f));
 					if ((t >= gaitGuard) && (t <= gaitFraction))
 					{
 						output[i].m_posit.m_y += m_amp * ndSin(omega * (t - gaitGuard));
 						output[i].m_userParamFloat = 1.0f;
-
+					
 						ndFloat32 num = t - gaitGuard;
 						ndFloat32 den = gaitFraction - gaitGuard;
-
+					
 						ndFloat32 t0 = num / den;
 						output[i].m_posit.m_x += stride_x * t0 - stride_x * 0.5f;
 						//output[i].m_posit.m_z += -(stride_z * t0 - stride_z * 0.5f);
@@ -140,14 +140,14 @@ namespace ndQuadruped_1
 							t += 1.0f;
 							output[i].m_userParamFloat = 0.5f;
 						}
-
+					
 						ndFloat32 num = t - gaitFraction;
 						ndFloat32 den = 1.0f - (gaitFraction - gaitGuard);
 						ndFloat32 t0 = num / den;
 						output[i].m_posit.m_x += -(stride_x * t0 - stride_x * 0.5f);
 						//output[i].m_posit.m_z += (stride_z * t0 - stride_z * 0.5f);
 					}
-
+					
 					m_currentPose[i] = output[i].m_posit;
 				}
 			}
@@ -227,19 +227,19 @@ namespace ndQuadruped_1
 			{
 				ndEffectorInfo& leg = m_legs[i];
 				ndIkSwivelPositionEffector* const effector = leg.m_effector;
-
+				
 				const ndVector posit(m_animPose[i].m_posit);
 				ndFloat32 swivelAngle = effector->CalculateLookAtSwivelAngle(upVector);
 				
 				effector->SetSwivelAngle(swivelAngle);
 				effector->SetLocalTargetPosition(posit);
-
+				
 				// calculate lookAt angle
 				ndMatrix lookAtMatrix0;
 				ndMatrix lookAtMatrix1;
 				ndJointHinge* const heelHinge = leg.m_heel;
 				heelHinge->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
-
+				
 				ndMatrix upMatrix(ndGetIdentityMatrix());
 				upMatrix.m_front = lookAtMatrix0.m_front;
 				upMatrix.m_right = (upVector.CrossProduct(upMatrix.m_front) & ndVector::m_triplexMask).Normalize();
@@ -350,8 +350,6 @@ namespace ndQuadruped_1
 			((ndIkSwivelPositionEffector*)*effector)->SetMaxForce(effectorStrength);
 			((ndIkSwivelPositionEffector*)*effector)->SetMaxTorque(effectorStrength);
 			
-			//ndString name("effector_");
-			//name += index;
 			model->AddCloseLoop(effector);
 
 			RobotModelNotify::ndEffectorInfo leg;
