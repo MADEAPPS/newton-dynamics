@@ -1250,6 +1250,38 @@ namespace ndQuadruped_2
 		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Trainer
 		{
 			public:
+			class ndBasePose
+			{
+				public:
+				ndBasePose()
+					:m_body(nullptr)
+				{
+				}
+
+				ndBasePose(ndBodyDynamic* const body)
+					:m_veloc(body->GetVelocity())
+					,m_omega(body->GetOmega())
+					,m_posit(body->GetPosition())
+					,m_rotation(body->GetRotation())
+					,m_body(body)
+				{
+				}
+
+				void SetPose() const
+				{
+					const ndMatrix matrix(ndCalculateMatrix(m_rotation, m_posit));
+					m_body->SetMatrix(matrix);
+					m_body->SetOmega(m_omega);
+					m_body->SetVelocity(m_veloc);
+				}
+
+				ndVector m_veloc;
+				ndVector m_omega;
+				ndVector m_posit;
+				ndQuaternion m_rotation;
+				ndBodyDynamic* m_body;
+			};
+
 			class ndPoseGenerator : public ndAnimationSequence
 			{
 				public:
@@ -1397,9 +1429,6 @@ namespace ndQuadruped_2
 				ndFloat32 offset_z[] = { -0.3f, 0.3f, -0.3f, 0.3f };
 				ndFloat32 offset_y[] = { D_POSE_REST_POSITION_Y, D_POSE_REST_POSITION_Y, D_POSE_REST_POSITION_Y, D_POSE_REST_POSITION_Y };
 
-				//ndFloat32 angles[] = { -90.0f, -90.0f, 90.0f, 90.0f };
-				//const char* effectorNames[] = { "foot_0",  "foot_1",  "foot_2",  "foot_3" };
-
 				ndPoseGenerator* const poseGenerator = (ndPoseGenerator*)*sequence;
 				for (ndInt32 i = 0; i < m_robot->m_legs.GetCount(); ++i)
 				{
@@ -1408,6 +1437,12 @@ namespace ndQuadruped_2
 					keyFrame.m_userData = &leg;
 					m_animPose.PushBack(keyFrame);
 					poseGenerator->AddTrack();
+				}
+
+				ndModelArticulation* const robot = m_robot->GetModel()->GetAsModelArticulation();
+				for (ndModelArticulation::ndNode* node = robot->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+				{
+					m_basePose.PushBack(node->m_body->GetAsBodyDynamic());
 				}
 
 				ResetModel();
@@ -1436,6 +1471,7 @@ namespace ndQuadruped_2
 			ndAnimationPose m_animPose;
 			ndSharedPtr<ndAnimationBlendTreeNode> m_poseGenerator;
 			ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
+			ndFixSizeArray<ndBasePose, 32> m_basePose;
 		};
 
 		public:
@@ -1544,42 +1580,21 @@ namespace ndQuadruped_2
 		#pragma optimize( "", off )
 		void ResetModel()
 		{
-			//m_modelAlive = true;
-			//m_control->Reset();
-			//m_control->m_animSpeed = ndReal(D_MIN_TRAIN_ANIM_SPEED + (1.0f - D_MIN_TRAIN_ANIM_SPEED) * ndRand());
-			//ndMemSet(m_controllerTrainer->m_rewardsMemories, ndReal(1.0), sizeof(m_controllerTrainer->m_rewardsMemories) / sizeof(m_controllerTrainer->m_rewardsMemories[0]));
-
 			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
-			model->ClearMemory();
+			for (ndInt32 i = 0; i < m_controllerTrainer->m_basePose.GetCount(); i++)
+			{
+				m_controllerTrainer->m_basePose[i].SetPose();
+			}
 
-			//const ndMatrix matrix(model->GetRoot()->m_body->GetMatrix());
-			//const ndVector& up = matrix.m_up;
-			//bool state = up.m_y < D_MODEL_DEAD_ANGLE;
-			//state = state || (matrix.m_posit.m_x > 20.0f);
-			//state = state || (matrix.m_posit.m_x < -20.0f);
-			//state = state || (matrix.m_posit.m_z > 20.0f);
-			//state = state || (matrix.m_posit.m_z < -20.0f);
-			//if (state)
-			//{
-			//	for (ndInt32 i = 0; i < m_controllerTrainer->m_basePose.GetCount(); i++)
-			//	{
-			//		m_controllerTrainer->m_basePose[i].SetPose();
-			//	}
-			//
-			//	ndFloat32 duration = m_poseGenerator->GetSequence()->GetDuration();
-			//
-			//	ndUnsigned32 index = ndRandInt() % 4;
-			//	m_animBlendTree->SetTime(0.25f * ndFloat32(index) * duration);
-			//}
-			//
-			//ndVector veloc;
-			//m_animBlendTree->Evaluate(m_animPose, veloc);
+			model->ClearMemory();
 		}
 
+		#pragma optimize( "", off )
 		void GetObservation(ndBrainFloat* const observations)
 		{
 			ndInt32 size = m_leg1_posit_x - m_leg0_posit_x;
-			observations[m_frameTick] = m_controllerTrainer->GetPoseSequence();
+			ndFloat32 sequenceClock = m_controllerTrainer->GetPoseSequence();
+			observations[m_frameTick] = ndBrainFloat(sequenceClock);
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
 				ndEffectorInfo& leg = m_legs[i];
