@@ -71,6 +71,22 @@ namespace ndQuadruped_2
 		m_leg3_posit_y,
 		m_leg3_posit_z,
 
+		//m_leg0_veloc_x,
+		//m_leg0_veloc_y,
+		//m_leg0_veloc_z,
+		//
+		//m_leg1veloc_x,
+		//m_leg1veloc_y,
+		//m_leg1veloc_z,
+		//
+		//m_leg2_veloc_x,
+		//m_leg2_veloc_y,
+		//m_leg2_veloc_z,
+		//
+		//m_leg3_veloc_x,
+		//m_leg3_veloc_y,
+		//m_leg3_veloc_z,
+
 		m_frameTick,
 		m_stateSize
 	};
@@ -402,6 +418,22 @@ namespace ndQuadruped_2
 				}
 			}
 
+			for (ndInt32 i = 0; i < m_controllerTrainer->m_basePose.GetCount(); i++)
+			{
+				const ndBodyKinematic* const body = m_controllerTrainer->m_basePose[i].m_body;
+				ndVector veloc(body->GetVelocity());
+				ndVector omega(body->GetOmega());
+				if (veloc.DotProduct(veloc).GetScalar() > 1000.0f)
+				{
+					return true;
+				}
+				if (omega.DotProduct(omega).GetScalar() > 2000.0f)
+				{
+					return true;
+				}
+			}
+
+
 			return false;
 		}
 
@@ -444,9 +476,13 @@ namespace ndQuadruped_2
 				const ndVector restPosit(leg.m_effector->GetRestPosit());
 				const ndVector effectorPosit(kinematicState[0].m_posit, kinematicState[1].m_posit, kinematicState[2].m_posit, 0.0f);
 				const ndVector effectorRelPosit(effectorPosit - restPosit);
-				observations[i * size + 0] = effectorRelPosit.m_x;
-				observations[i * size + 1] = effectorRelPosit.m_y;
-				observations[i * size + 2] = effectorRelPosit.m_z;
+
+				observations[i * size + m_leg0_posit_x] = effectorRelPosit.m_x;
+				observations[i * size + m_leg0_posit_y] = effectorRelPosit.m_y;
+				observations[i * size + m_leg0_posit_z] = effectorRelPosit.m_z;
+				//observations[i * size + m_leg0_veloc_x] = kinematicState[0].m_velocity;
+				//observations[i * size + m_leg0_veloc_y] = kinematicState[1].m_velocity;
+				//observations[i * size + m_leg0_veloc_z] = kinematicState[2].m_velocity;
 			}
 		}
 
@@ -460,15 +496,6 @@ namespace ndQuadruped_2
 			{
 				ndEffectorInfo& leg = m_legs[i];
 				ndIkSwivelPositionEffector* const effector = leg.m_effector;
-				
-				//ndVector posit(leg.m_effector->GetRestPosit());
-				//ndFloat32 x = actions[size * i + 0] * D_CYCLE_STRIDE_X;
-				//ndFloat32 z = actions[size * i + 2] * D_CYCLE_STRIDE_Z;
-				//ndFloat32 y = actions[size * i + 1] * D_CYCLE_AMPLITUDE;
-				//
-				////posit.m_x += x;
-				////posit.m_y += y;
-				////posit.m_z += z;
 				
 				ndVector refPosit(leg.m_effector->GetRestPosit());
 				ndVector effectorPosit(leg.m_effector->GetEffectorPosit() - refPosit);
@@ -680,7 +707,7 @@ namespace ndQuadruped_2
 
 			ndInt32 countX = 10;
 			ndInt32 countZ = 10;
-			countX = 0;
+			//countX = 0;
 			//countZ = 1;
 			
 			// add a hidden battery of model to generate trajectories in parallel
