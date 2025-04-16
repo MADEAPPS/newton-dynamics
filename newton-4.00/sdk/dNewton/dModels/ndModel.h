@@ -62,7 +62,6 @@ class ndModel: public ndContainersFreeListAlloc<ndModel>
 
 	private:
 	ndModelList::ndNode* m_worldNode;
-	//ndSpecialList<ndModel>::ndNode* m_deletedNode;
 	ndSharedPtr<ndModelNotify> m_notifyCallback;
 
 	friend class ndWorld;

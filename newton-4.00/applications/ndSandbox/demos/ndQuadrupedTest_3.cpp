@@ -422,7 +422,7 @@ namespace ndQuadruped_3
 				return base;
 			}
 
-			void CalculatePose(ndAnimationPose& output, ndFloat32 param) const
+			void CalculatePose(ndAnimationPose& output, ndFloat32 param) override
 			{
 				// generate a procedural in place march gait
 				ndAssert(param >= ndFloat32(0.0f));
@@ -823,7 +823,7 @@ namespace ndQuadruped_3
 			return reward;
 		}
 
-		ndReal CalculatePoseMatchReward() const
+		ndReal CalculatePoseMatchReward() override
 		{
 			ndVector errorAcc (ndVector::m_zero);
 			ndFloat32 contactPenalty = 1.0f;

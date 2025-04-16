@@ -64,7 +64,7 @@ ndVector ndAnimationSequence::GetTranslation(ndFloat32 param) const
 	return translation;
 }
 
-void ndAnimationSequence::CalculatePose(ndAnimationPose& output, ndFloat32 param) const
+void ndAnimationSequence::CalculatePose(ndAnimationPose& output, ndFloat32 param)
 {
 	if (output.GetCount())
 	{

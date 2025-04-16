@@ -377,7 +377,7 @@ void ndBrainAgentContinuePolicyGradient_Trainer::Step()
 //#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory()
 {
-	if (m_trajectory.GetCount())
+	if (m_trajectory.GetCount() >= 4)
 	{
 		ndInt32 averageTrajectories = (m_master->m_bashTrajectoryCount + m_master->m_agents.GetCount() - 1) / m_master->m_agents.GetCount();
 		if (m_trajectoryCounter < averageTrajectories)

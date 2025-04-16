@@ -84,7 +84,7 @@ namespace ndQuadruped_1
 				return ndVector::m_zero;
 			}
 			
-			void CalculatePose(ndAnimationPose& output, ndFloat32 param) const
+			void CalculatePose(ndAnimationPose& output, ndFloat32 param) override
 			{
 				// generate a procedural in place march gait
 				ndAssert(param >= ndFloat32(0.0f));

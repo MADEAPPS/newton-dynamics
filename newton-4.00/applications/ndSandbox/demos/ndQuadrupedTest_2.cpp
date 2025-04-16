@@ -98,7 +98,7 @@ namespace ndQuadruped_2
 	#define D_CYCLE_AMPLITUDE	ndFloat32(0.27f)
 	#define D_POSE_REST_POSITION_Y	ndReal(-0.3f)
 
-	#define D_ACTION_SPEED		ndReal(0.1f)
+	#define D_ACTION_SPEED		ndReal(0.01f)
 
 	class RobotModelNotify : public ndModelNotify
 	{
@@ -147,10 +147,16 @@ namespace ndQuadruped_2
 					,m_stride_z(D_CYCLE_STRIDE_Z)
 				{
 					m_duration = D_CYCLE_PERIOD;
-					for (ndInt32 i = 0; i < 4; i++)
-					{
-						m_currentPose[i] = ndVector::m_zero;
-					}
+
+					m_poseBoundMin.m_x = - m_stride_x * 0.5f;
+					m_poseBoundMin.m_y = - m_amp * 0.0f;
+					m_poseBoundMin.m_z = - m_stride_z * 0.5f;
+					m_poseBoundMin.m_w = 1.0f;
+
+					m_poseBoundMax.m_x = m_stride_x * 0.5f;
+					m_poseBoundMax.m_y = m_amp * 1.0f;
+					m_poseBoundMax.m_z = m_stride_z * 0.5f;
+					m_poseBoundMax.m_w = 1.0f;
 				}
 
 				ndVector GetTranslation(ndFloat32) const
@@ -158,7 +164,8 @@ namespace ndQuadruped_2
 					return ndVector::m_zero;
 				}
 
-				void CalculatePose(ndAnimationPose& output, ndFloat32 param) const
+				//void CalculatePose(ndAnimationPose& output, ndFloat32 param) const
+				void CalculatePose(ndAnimationPose& output, ndFloat32 param) override
 				{
 					// generate a procedural in place march gait
 					ndAssert(param >= ndFloat32(0.0f));
@@ -177,6 +184,10 @@ namespace ndQuadruped_2
 
 					for (ndInt32 i = 0; i < output.GetCount(); i++)
 					{
+						if (i != 2)
+						{
+							continue;
+						}
 						const ndEffectorInfo& leg = *(ndEffectorInfo*)output[i].m_userData;;
 						const ndVector localPosit(leg.m_effector->GetRestPosit());
 						ndFloat32 stride_x = m_stride_x;
@@ -221,12 +232,13 @@ namespace ndQuadruped_2
 							output[i].m_posit.m_x += -(stride_x * t0 - stride_x * 0.5f);
 							//output[i].m_posit.m_z += (stride_z * t0 - stride_z * 0.5f);
 						}
-						
-						m_currentPose[i] = output[i].m_posit;
+						//m_currentPose[i] = output[i].m_posit;
 					}
 				}
 
-				mutable ndVector m_currentPose[4];
+				//ndVector m_currentPose[4];
+				ndVector m_poseBoundMin;
+				ndVector m_poseBoundMax;
 				ndFloat32 m_amp;
 				ndFloat32 m_stride_x;
 				ndFloat32 m_stride_z;
@@ -293,6 +305,7 @@ namespace ndQuadruped_2
 					m_animPose.PushBack(keyFrame);
 					poseGenerator->AddTrack();
 				}
+				//poseGenerator->SetBounds(m_animPose);
 
 				ndModelArticulation* const robot = m_robot->GetModel()->GetAsModelArticulation();
 				for (ndModelArticulation::ndNode* node = robot->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
@@ -398,10 +411,15 @@ namespace ndQuadruped_2
 		#pragma optimize( "", off )
 		bool IsTerminal() const
 		{
+			ndSharedPtr<ndAnimationBlendTreeNode> node = m_controllerTrainer->m_poseGenerator;
+			ndAnimationSequencePlayer* const sequencePlayer = (ndAnimationSequencePlayer*)*node;
+			ndControllerTrainer::ndPoseGenerator* const poseGenerator = (ndControllerTrainer::ndPoseGenerator*)*sequencePlayer->GetSequence();
+
+			ndVector normalize(poseGenerator->m_poseBoundMax.Reciproc());
 			for (ndInt32 i = 0; i < m_controllerTrainer->m_animPose.GetCount(); ++i)
 			{
 				const ndVector error(CalculatePositError(i));
-				const ndVector normalError(error * ndVector(1.0f / D_CYCLE_STRIDE_X, 1.0f / D_CYCLE_AMPLITUDE, 1.0f / D_CYCLE_STRIDE_Z, 1.0f));
+				const ndVector normalError(error * normalize);
 				if (ndAbs(normalError.m_x) > 1.0f)
 				{
 					return true;
@@ -492,16 +510,29 @@ namespace ndQuadruped_2
 
 			ndInt32 size = m_leg1_x - m_leg0_x;
 			const ndVector upVector(rootBody->GetMatrix().m_up);
+
+			ndSharedPtr<ndAnimationBlendTreeNode> node = m_controllerTrainer->m_poseGenerator;
+			ndAnimationSequencePlayer* const sequencePlayer = (ndAnimationSequencePlayer*)*node;
+			ndControllerTrainer::ndPoseGenerator* const poseGenerator = (ndControllerTrainer::ndPoseGenerator*)*sequencePlayer->GetSequence();
+
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
 				ndEffectorInfo& leg = m_legs[i];
 				ndIkSwivelPositionEffector* const effector = leg.m_effector;
 				
-				ndVector refPosit(leg.m_effector->GetRestPosit());
+				const ndVector refPosit(leg.m_effector->GetRestPosit());
 				ndVector effectorPosit(leg.m_effector->GetEffectorPosit() - refPosit);
-				effectorPosit.m_x = ndClamp(effectorPosit.m_x + actions[size * i + m_leg0_x] * D_ACTION_SPEED, -D_CYCLE_STRIDE_X, D_CYCLE_STRIDE_X);
-				effectorPosit.m_z = ndClamp(effectorPosit.m_z + actions[size * i + m_leg0_z] * D_ACTION_SPEED, -D_CYCLE_STRIDE_Z, D_CYCLE_STRIDE_Z);
-				effectorPosit.m_y = ndClamp(effectorPosit.m_y + actions[size * i + m_leg0_y] * D_ACTION_SPEED, 0.0f, D_CYCLE_AMPLITUDE);
+
+				ndFloat32 x = effectorPosit.m_x + actions[size * i + m_leg0_x] * D_ACTION_SPEED;
+				ndFloat32 y = effectorPosit.m_y + actions[size * i + m_leg0_y] * D_ACTION_SPEED;
+				ndFloat32 z = effectorPosit.m_z + actions[size * i + m_leg0_z] * D_ACTION_SPEED;
+				x = ndClamp(x, poseGenerator->m_poseBoundMin.m_x, poseGenerator->m_poseBoundMax.m_x);
+				y = ndClamp(y, poseGenerator->m_poseBoundMin.m_y, poseGenerator->m_poseBoundMax.m_y);
+				z = ndClamp(z, poseGenerator->m_poseBoundMin.m_z, poseGenerator->m_poseBoundMax.m_z);
+				effectorPosit.m_x = x;
+				effectorPosit.m_y = y;
+				effectorPosit.m_z = z;
+
 				effectorPosit += refPosit;
 				effector->SetLocalTargetPosition(effectorPosit);
 
@@ -701,14 +732,14 @@ namespace ndQuadruped_2
 
 			ndBodyKinematic* const rootBody = visualModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic();
 			ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(rootBody->GetMatrix(), rootBody, world->GetSentinelBody()));
-			//world->AddJoint(fixJoint);
+			world->AddJoint(fixJoint);
 
 			// add a hidden battery of model to generate trajectories in parallel
 
 			ndInt32 countX = 10;
 			ndInt32 countZ = 10;
 			//countX = 0;
-			//countZ = 1;
+			//countZ = 0;
 			
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
@@ -728,6 +759,11 @@ namespace ndQuadruped_2
 					model->AddBodiesAndJointsToWorld();
 
 					m_models.Append(model->GetAsModelArticulation());
+
+					ndBodyKinematic* const rootBody1 = model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic();
+					ndSharedPtr<ndJointBilateralConstraint> fixJoint1(new ndJointFix6dof(rootBody1->GetMatrix(), rootBody1, world->GetSentinelBody()));
+					world->AddJoint(fixJoint1);
+
 				}
 			}
 
