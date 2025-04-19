@@ -1059,13 +1059,13 @@ void ndSkeletonContainer::SolveLcp(ndInt32 stride, ndInt32 size, ndFloat32* cons
 		base1 += stride;
 	}
 
-	ndInt32 iterCount = 0;
+	//ndInt32 iterCount = 0;
 	ndFloat32 tolerance(tol2 * ndFloat32(2.0f));
 	for (ndInt32 m = 0; (m < maxIterCount) && (tolerance > tol2); ++m)
 	{
-		iterCount++;
-		tolerance = ndFloat32(0.0f);
+		//iterCount++;
 		ndInt32 base = 0;
+		tolerance = ndFloat32(0.0f);
 		for (ndInt32 i = 0; i < size; ++i)
 		{
 			const ndFloat32* const row = &matrix[base];

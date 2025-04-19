@@ -33,10 +33,62 @@ ndFloat32 ndAnimationSequencePlayer::GetTime() const
 
 void ndAnimationSequencePlayer::SetTime(ndFloat32 time)
 {
+	//ndFloat32 duration = m_sequence->GetDuration();
+	//ndFloat32 scale = ndFloat32(2.0f) * ndPi / duration;
+	//
+	//ndFloat32 angle1 = time * scale;
+	//ndFloat32 angle0 = m_time * scale;
+	//ndFloat32 deltaAngle = ndAnglesSub(angle1, angle0);
+	//
+	//ndFloat32 t0 = m_time;
+	//ndFloat32 angle = angle0 + deltaAngle;
+	//if (angle < 0.0f)
+	//{
+	//	angle += ndFloat32(2.0f) * ndPi;
+	//}
+	//ndFloat32 t1 = ndMod(angle, ndFloat32(2.0f) * ndPi) / scale;
+	//if (deltaAngle > ndFloat32(0.0f))
+	//{
+	//	if (t1 > t0)
+	//	{
+	//		ndVector p0(m_sequence->GetTranslation(t0));
+	//		ndVector p1(m_sequence->GetTranslation(t1));
+	//		m_veloc = (p1 - p0).Scale(ndFloat32 (1.0f) / (t1 - t0));
+	//	}
+	//	else
+	//	{
+	//		//ndAssert(0);
+	//	}
+	//}
+	//else if (deltaAngle < ndFloat32(0.0f))
+	//{
+	//	if (t1 < t0)
+	//	{
+	//		ndVector p0(m_sequence->GetTranslation(t0));
+	//		ndVector p1(m_sequence->GetTranslation(t1));
+	//		m_veloc = (p1 - p0).Scale(ndFloat32(1.0f) / (t0 - t1));
+	//	}
+	//	else
+	//	{
+	//		//ndAssert(0);
+	//	}
+	//}
+	//
+	//m_time = t1;
+	//ndAssert(m_time >= 0.0f);
+
+	ndFloat32 duration = m_sequence->GetDuration();
+	m_time = ndFmod(time, duration);
+}
+
+void ndAnimationSequencePlayer::Update(ndFloat32 timestep)
+{
+	//SetTime (m_time + timestep);
+
 	ndFloat32 duration = m_sequence->GetDuration();
 	ndFloat32 scale = ndFloat32(2.0f) * ndPi / duration;
 
-	ndFloat32 angle1 = time * scale;
+	ndFloat32 angle1 = timestep * scale;
 	ndFloat32 angle0 = m_time * scale;
 	ndFloat32 deltaAngle = ndAnglesSub(angle1, angle0);
 
@@ -53,7 +105,7 @@ void ndAnimationSequencePlayer::SetTime(ndFloat32 time)
 		{
 			ndVector p0(m_sequence->GetTranslation(t0));
 			ndVector p1(m_sequence->GetTranslation(t1));
-			m_veloc = (p1 - p0).Scale(ndFloat32 (1.0f) / (t1 - t0));
+			m_veloc = (p1 - p0).Scale(ndFloat32(1.0f) / (t1 - t0));
 		}
 		else
 		{
@@ -76,11 +128,6 @@ void ndAnimationSequencePlayer::SetTime(ndFloat32 time)
 
 	m_time = t1;
 	ndAssert(m_time >= 0.0f);
-}
-
-void ndAnimationSequencePlayer::Update(ndFloat32 timestep)
-{
-	SetTime (m_time + timestep);
 }
 
 ndSharedPtr<ndAnimationSequence>& ndAnimationSequencePlayer::GetSequence()
