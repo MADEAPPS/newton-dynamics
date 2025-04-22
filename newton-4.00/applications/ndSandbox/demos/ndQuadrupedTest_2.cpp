@@ -29,7 +29,7 @@
 // to the environment with increasing complexity
 namespace ndQuadruped_2
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_2-vpg.dnn"
 
 	enum ndActionSpace
@@ -313,6 +313,7 @@ namespace ndQuadruped_2
 
 				m_animBlendTree->SetTime(0.0f);
 				m_time = ndFmod (ndRand(), 1.0f);
+			m_time = 0.0f;
 				ndFloat32 animFrame = m_time * duration;
 				//m_animBlendTree->Update(time);
 				m_animBlendTree->SetTime(animFrame);
@@ -495,17 +496,21 @@ namespace ndQuadruped_2
 			return false;
 		}
 
+		#pragma optimize( "", off )
 		ndBrainFloat CalculateReward() const
 		{
 			ndFloat32 reward = 0.0f;
 			for (ndInt32 i = 0; i < m_controllerTrainer->m_animPose.GetCount(); ++i)
 			{
-				const ndVector error(CalculatePositError(i) & ndVector::m_triplexMask);
-				ndFloat32 error2 = error.DotProduct(error).GetScalar();
-				ndFloat32 legReward = ndExp(-10000.0f * error2);
-				reward += legReward;
+				const ndVector error(CalculatePositError(i));
+				for (ndInt32 j = 0; j < 3; ++j)
+				{
+					ndFloat32 error2 = error[j] * error[j];
+					ndFloat32 legReward = ndExp(-200000.0f * error2);
+					reward += legReward;
+				}
 			}
-			return reward * 0.25f;
+			return reward / 12.0f;
 		}
 
 		#pragma optimize( "", off )
