@@ -222,18 +222,18 @@ namespace ndAdvancedRobot
 			RobotModelNotify* m_robot;
 		};
 
-		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Trainer
+		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Agent
 		{
 			public:
 			ndControllerTrainer(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
-				:ndBrainAgentContinuePolicyGradient_Trainer(master)
+				:ndBrainAgentContinuePolicyGradient_Agent(master)
 				,m_robot(nullptr)
 			{
 				ndMemSet(m_rewardsMemories, ndReal(1.0), sizeof(m_rewardsMemories) / sizeof(m_rewardsMemories[0]));
 			}
 
 			ndControllerTrainer(const ndControllerTrainer& src)
-				:ndBrainAgentContinuePolicyGradient_Trainer(src.m_master)
+				:ndBrainAgentContinuePolicyGradient_Agent(src.m_master)
 				,m_robot(nullptr)
 			{
 			}
@@ -256,7 +256,7 @@ namespace ndAdvancedRobot
 					m_trajectory.SetReward(index, ND_DEAD_PENALTY * 4.0f);
 				}
 
-				ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory();
+				ndBrainAgentContinuePolicyGradient_Agent::SaveTrajectory();
 			}
 
 			void GetObservation(ndBrainFloat* const observation)

@@ -22,6 +22,31 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
+/*
+This demo trains a simple robot using a policy gradient method—
+either vanilla policy gradients, Proximal Policy Optimization(PPO), or a custom variant.
+
+While policy gradient methods tend to be more stable than Q value based methods, 
+they require collecting a large amount of data, which can be impractical on hardware with limited resources.
+As model complexity grows—from medium to large scale—the variance in the collected data increases exponentially.
+This happens because uncertainty in the data stems from all control outputs, 
+and any moderately complex robot typically deals with an input vector composed of dozens of signals.
+
+To manage this high variance,one common solution is to train thousands of agents in parallel.
+This approach is motivated by the theoretical foundation of policy gradient methods, 
+which update model parameters based on the expected reward over all possible trajectories.
+However, in practice, we must estimate this expectation from a finite set of sampled trajectories.
+The challenge arises because, while our ability to generate data grows linearly(or sublinearly) with system resources,
+the variance of that data increases exponentially with the size of the action vector.
+This becomes a major bottleneck for small to medium sized systems.
+
+In fact, even a high end single GPU system may struggle with this demand, 
+which often limits the practical use of policy gradient methods to organizations with access 
+to large scale computing resources such as supercomputers plus al large number of humans in the 
+loop to uspervise data generation.
+
+therefore, it is my opinion and conclusion that Q base mthos are more sutable for medium small systems.
+*/
 
 // This model attempts to take animation poses and use a reward system to generate a policy  
 // that produces the animation.  
@@ -130,7 +155,7 @@ namespace ndQuadruped_2
 			RobotModelNotify* m_robot;
 		};
 
-		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Trainer
+		class ndControllerAgent : public ndBrainAgentContinuePolicyGradient_Agent
 		{
 			public:
 			class ndBasePose
@@ -272,8 +297,8 @@ namespace ndQuadruped_2
 				ndFloat32 m_stride_z;
 			};
 
-			ndControllerTrainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, RobotModelNotify* const robot)
-				:ndBrainAgentContinuePolicyGradient_Trainer(master)
+			ndControllerAgent(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, RobotModelNotify* const robot)
+				:ndBrainAgentContinuePolicyGradient_Agent(master)
 				,m_robot(robot)
 				,m_animPose()
 				,m_poseGenerator()
@@ -421,7 +446,7 @@ namespace ndQuadruped_2
 
 		void SetControllerTrainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
 		{
-			m_controllerTrainer = ndSharedPtr<ndControllerTrainer>(new ndControllerTrainer(master, this));
+			m_controllerTrainer = ndSharedPtr<ndControllerAgent>(new ndControllerAgent(master, this));
 			m_controllerTrainer->InitAnimation();
 		}
 
@@ -471,7 +496,7 @@ namespace ndQuadruped_2
 
 			ndSharedPtr<ndAnimationBlendTreeNode> node = m_controllerTrainer->m_poseGenerator;
 			ndAnimationSequencePlayer* const sequencePlayer = (ndAnimationSequencePlayer*)*node;
-			ndControllerTrainer::ndPoseGenerator* const poseGenerator = (ndControllerTrainer::ndPoseGenerator*)*sequencePlayer->GetSequence();
+			ndControllerAgent::ndPoseGenerator* const poseGenerator = (ndControllerAgent::ndPoseGenerator*)*sequencePlayer->GetSequence();
 			ndVector normalize(poseGenerator->m_poseBoundMax.Reciproc());
 			for (ndInt32 i = 0; i < m_controllerTrainer->m_animPose.GetCount(); ++i)
 			{
@@ -557,7 +582,7 @@ namespace ndQuadruped_2
 
 			//ndSharedPtr<ndAnimationBlendTreeNode> node = m_controllerTrainer->m_poseGenerator;
 			//ndAnimationSequencePlayer* const sequencePlayer = (ndAnimationSequencePlayer*)*node;
-			//ndControllerTrainer::ndPoseGenerator* const poseGenerator = (ndControllerTrainer::ndPoseGenerator*)*sequencePlayer->GetSequence();
+			//ndControllerAgent::ndPoseGenerator* const poseGenerator = (ndControllerAgent::ndPoseGenerator*)*sequencePlayer->GetSequence();
 
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
@@ -634,7 +659,7 @@ namespace ndQuadruped_2
 		
 		ndFixSizeArray<ndEffectorInfo, 4> m_legs;
 		ndSharedPtr<ndController> m_controller;
-		ndSharedPtr<ndControllerTrainer> m_controllerTrainer;
+		ndSharedPtr<ndControllerAgent> m_controllerTrainer;
 		ndFloat32 m_timestep;
 		ndFloat32 m_animFrame;
 	};
@@ -645,7 +670,7 @@ namespace ndQuadruped_2
 		ndModelArticulation* const model = new ndModelArticulation();
 		//RobotModelNotify* const notify = new RobotModelNotify(master, model);
 		RobotModelNotify* const notify = new RobotModelNotify(model);
-		//m_controllerTrainer = ndSharedPtr<ndControllerTrainer>(new ndControllerTrainer(master, this));
+		//m_controllerTrainer = ndSharedPtr<ndControllerAgent>(new ndControllerAgent(master, this));
 		model->SetNotifyCallback(notify);
 
 		ndSharedPtr<ndDemoEntity> entity(modelMesh->GetChildren().GetFirst()->GetInfo()->CreateClone());

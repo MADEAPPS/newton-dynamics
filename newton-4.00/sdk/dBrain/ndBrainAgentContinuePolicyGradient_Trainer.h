@@ -56,8 +56,7 @@ class ndPolicyGradientActivation : public ndBrainLayerActivationTanh
 	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const override;
 };
 
-
-class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
+class ndBrainAgentContinuePolicyGradient_Agent : public ndBrainAgent
 {
 	class ndRandomGenerator
 	{
@@ -121,8 +120,8 @@ class ndBrainAgentContinuePolicyGradient_Trainer : public ndBrainAgent
 		ndInt64 m_obsevationsSize;
 	};
 
-	ndBrainAgentContinuePolicyGradient_Trainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master);
-	~ndBrainAgentContinuePolicyGradient_Trainer();
+	ndBrainAgentContinuePolicyGradient_Agent(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master);
+	~ndBrainAgentContinuePolicyGradient_Agent();
 
 	ndBrain* GetActor();
 	void SelectAction(ndBrainVector& actions) const;
@@ -208,7 +207,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	void OptimizePolicy();
 	void OptimizeCritic();
 	void CalculateAdvange();
-	ndBrainAgentContinuePolicyGradient_Trainer::ndRandomGenerator* GetRandomGenerator();
+	ndBrainAgentContinuePolicyGradient_Agent::ndRandomGenerator* GetRandomGenerator();
 
 	ndBrain m_policy;
 	ndBrain m_critic;
@@ -221,8 +220,8 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndBrainOptimizerAdam* m_policyOptimizer;
 
 	ndArray<ndInt32> m_randomPermutation;
-	ndList<ndBrainAgentContinuePolicyGradient_Trainer::ndRandomGenerator> m_randomGenerator;
-	ndBrainAgentContinuePolicyGradient_Trainer::ndTrajectoryTransition m_trajectoryAccumulator;
+	ndList<ndBrainAgentContinuePolicyGradient_Agent::ndRandomGenerator> m_randomGenerator;
+	ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition m_trajectoryAccumulator;
 	
 	ndBrainFloat m_gamma;
 	ndBrainFloat m_policyLearnRate;
@@ -244,8 +243,8 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndMovingAverage<8> m_averageScore;
 	ndMovingAverage<8> m_averageFramesPerEpisodes;
 	ndString m_name;
-	ndList<ndBrainAgentContinuePolicyGradient_Trainer*> m_agents;
-	friend class ndBrainAgentContinuePolicyGradient_Trainer;
+	ndList<ndBrainAgentContinuePolicyGradient_Agent*> m_agents;
+	friend class ndBrainAgentContinuePolicyGradient_Agent;
 };
 
 #endif 

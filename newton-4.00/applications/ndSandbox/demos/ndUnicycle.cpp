@@ -223,11 +223,11 @@ namespace ndUnicycle
 			RobotModelNotify* m_robot;
 		};
 
-		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Trainer
+		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Agent
 		{
 			public:
 			ndControllerTrainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
-				:ndBrainAgentContinuePolicyGradient_Trainer(master)
+				:ndBrainAgentContinuePolicyGradient_Agent(master)
 				,m_solver()
 				,m_robot(nullptr)
 				,m_symmetricTrajectory(m_actionsSize, m_observationsSize)
@@ -273,7 +273,7 @@ namespace ndUnicycle
 						action.Scale(-1.0f);
 						observation.Scale(-1.0f);
 					}
-					ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory();
+					ndBrainAgentContinuePolicyGradient_Agent::SaveTrajectory();
 			
 					m_trajectory.SetCount(m_symmetricTrajectory.GetCount());
 					for (ndInt32 i = 0; i < m_symmetricTrajectory.GetCount(); ++i)
@@ -281,7 +281,7 @@ namespace ndUnicycle
 						m_trajectory.CopyFrom(i, m_symmetricTrajectory, i);
 					}
 				#endif
-				ndBrainAgentContinuePolicyGradient_Trainer::SaveTrajectory();
+				ndBrainAgentContinuePolicyGradient_Agent::SaveTrajectory();
 			}
 
 			ndIkSolver m_solver;

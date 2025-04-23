@@ -53,18 +53,19 @@
 //#define DEFAULT_SCENE	18		// cart pole continue controller
 //#define DEFAULT_SCENE	19		// unit cycle controller
 //#define DEFAULT_SCENE	20		// quadruped test 1
-#define DEFAULT_SCENE	21		// quadruped test 2
-//#define DEFAULT_SCENE	22		// quadruped test 3
-//#define DEFAULT_SCENE	23		// quadruped test 4
-//#define DEFAULT_SCENE	24		// simple industrial robot
-//#define DEFAULT_SCENE	25		// advanced industrial robot
-//#define DEFAULT_SCENE	26		// biped test 1
-//#define DEFAULT_SCENE	27		// biped test 2
-//#define DEFAULT_SCENE	28		// train biped test 2
-//#define DEFAULT_SCENE	29		// simple fracture
-//#define DEFAULT_SCENE	30		// basic fracture
-//#define DEFAULT_SCENE	31		// linked fracture
-//#define DEFAULT_SCENE	32		// skin peel fracture
+//#define DEFAULT_SCENE	21		// quadruped test 2
+#define DEFAULT_SCENE	22		// quadruped test 3
+//#define DEFAULT_SCENE	23		// quadruped test 3
+//#define DEFAULT_SCENE	24		// quadruped test 4
+//#define DEFAULT_SCENE	25		// simple industrial robot
+//#define DEFAULT_SCENE	26		// advanced industrial robot
+//#define DEFAULT_SCENE	27		// biped test 1
+//#define DEFAULT_SCENE	28		// biped test 2
+//#define DEFAULT_SCENE	29		// train biped test 2
+//#define DEFAULT_SCENE	31		// simple fracture
+//#define DEFAULT_SCENE	32		// basic fracture
+//#define DEFAULT_SCENE	33		// linked fracture
+//#define DEFAULT_SCENE	34		// skin peel fracture
 						 
 // demos forward declaration 
 void ndRagdollTest(ndDemoEntityManager* const scene);
@@ -80,6 +81,7 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_1(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_2(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_3(ndDemoEntityManager* const scene);
+void ndQuadrupedTest_4(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_4(ndDemoEntityManager* const scene);
 void ndObjectPlacement(ndDemoEntityManager* const scene);
 void ndBasicGpuRigidBody(ndDemoEntityManager* const scene);
@@ -105,39 +107,40 @@ void ndStaticUserMeshCollisionDemo(ndDemoEntityManager* const scene);
 
 ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
 {
-	{ "basic rigidbody", ndBasicRigidBody },
-	{ "basic gpu rigidbody", ndBasicGpuRigidBody },
-	{ "basic friction ramp", ndBasicFrictionRamp },
-	{ "basic compound shapes", ndBasicCompoundShapeDemo },
-	{ "basic conservation of momentum", ndBasicAngularMomentum },
-	{ "basic stack", ndBasicStacks },
-	{ "basic trigger", ndBasicTrigger },
-	{ "basic object placement", ndObjectPlacement },
-	{ "basic particle fluid", ndBasicParticleFluid },
-	{ "static mesh", ndStaticMeshCollisionDemo },
-	{ "static user mesh", ndStaticUserMeshCollisionDemo },
-	{ "basic joints", ndBasicJoints },
-	{ "basic vehicle", ndBasicVehicle },
-	{ "heavy vehicle", ndHeavyVehicle },
-	{ "low lod vehicle", ndBagroundLowLodVehicle },
-	{ "basic player", ndPlayerCapsuleDemo },
-	{ "rag doll", ndRagdollTest },
-	{ "cartpole discrete controller", ndCartpoleDiscrete },
-	{ "cartpole continue controller", ndCartpoleContinue },
-	{ "unicycle controller", ndUnicycleController },
-	{ "quadruped test 1", ndQuadrupedTest_1 },
-	{ "quadruped test 2", ndQuadrupedTest_2 },
-//	{ "quadruped test 3", ndQuadrupedTest_3},
+	{ "basic rigidbody", ndBasicRigidBody},
+	{ "basic gpu rigidbody", ndBasicGpuRigidBody},
+	{ "basic friction ramp", ndBasicFrictionRamp},
+	{ "basic compound shapes", ndBasicCompoundShapeDemo},
+	{ "basic conservation of momentum", ndBasicAngularMomentum},
+	{ "basic stack", ndBasicStacks},
+	{ "basic trigger", ndBasicTrigger},
+	{ "basic object placement", ndObjectPlacement},
+	{ "basic particle fluid", ndBasicParticleFluid},
+	{ "static mesh", ndStaticMeshCollisionDemo},
+	{ "static user mesh", ndStaticUserMeshCollisionDemo},
+	{ "basic joints", ndBasicJoints},
+	{ "basic vehicle", ndBasicVehicle},
+	{ "heavy vehicle", ndHeavyVehicle},
+	{ "low lod vehicle", ndBagroundLowLodVehicle},
+	{ "basic player", ndPlayerCapsuleDemo},
+	{ "rag doll", ndRagdollTest},
+	{ "cartpole discrete controller", ndCartpoleDiscrete},
+	{ "cartpole continue controller", ndCartpoleContinue},
+	{ "unicycle controller", ndUnicycleController},
+	{ "quadruped test 1", ndQuadrupedTest_1},
+	{ "quadruped test 2", ndQuadrupedTest_2},
+	{ "quadruped test 3", ndQuadrupedTest_3},
 //	{ "quadruped test 4", ndQuadrupedTest_4},
-	{ "simple industrial robot", ndSimpleIndustrialRobot },
-	{ "advanced industrial robot", ndAdvancedIndustrialRobot },
-//	{ "biped test one", ndBipedTest_1 },
-//	{ "biped test two", ndBipedTest_2 },
-//	{ "train biped test two", ndBipedTest_2Trainer },
-//	{ "simple convex fracture", ndBasicExplodeConvexShape },
-//	//{ "basic convex fracture", ndBasicFracture_0 },
-//	//{ "linked convex fracture", ndBasicFracture_2 },
-//	//{ "simple skin peeling fracture", ndBasicFracture_4 },
+//	{ "quadruped test 5", ndQuadrupedTest_4},
+	{ "simple industrial robot", ndSimpleIndustrialRobot},
+	{ "advanced industrial robot", ndAdvancedIndustrialRobot},
+//	{ "biped test one", ndBipedTest_1},
+//	{ "biped test two", ndBipedTest_2},
+//	{ "train biped test two", ndBipedTest_2Trainer},
+//	{ "simple convex fracture", ndBasicExplodeConvexShape},
+//	//{ "basic convex fracture", ndBasicFracture_0},
+//	//{ "linked convex fracture", ndBasicFracture_2},
+//	//{ "simple skin peeling fracture", ndBasicFracture_4},
 };
 
 ndDemoEntityManager::ButtonKey::ButtonKey (bool state)

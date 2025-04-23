@@ -174,18 +174,18 @@ namespace ndContinueCarpole
 			RobotModelNotify* m_robot;
 		};
 
-		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Trainer
+		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Agent
 		{
 			public:
 			ndControllerTrainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
-				:ndBrainAgentContinuePolicyGradient_Trainer(master)
+				:ndBrainAgentContinuePolicyGradient_Agent(master)
 				,m_solver()
 				,m_robot(nullptr)
 			{
 			}
 
 			ndControllerTrainer(const ndControllerTrainer& src)
-				:ndBrainAgentContinuePolicyGradient_Trainer(src.m_master)
+				:ndBrainAgentContinuePolicyGradient_Agent(src.m_master)
 				,m_robot(nullptr)
 			{
 			}
