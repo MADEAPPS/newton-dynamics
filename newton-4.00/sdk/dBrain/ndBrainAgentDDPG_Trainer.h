@@ -38,6 +38,7 @@
 // this is an implementation of the vanilla deep deterministic 
 // policy gradient for continues control re enforcement learning.  
 // ddpg algorithm as described in: https://arxiv.org/pdf/1509.02971.pdf
+// https://spinningup.openai.com/en/latest/algorithms/ddpg.html
 
 class ndBrainOptimizerAdam;
 class ndBrainAgentDDPG_Trainer;
@@ -101,9 +102,6 @@ class ndBrainAgentDDPG_Agent: public ndBrainAgent
 	ndBrainAgentDDPG_Agent(const ndSharedPtr<ndBrainAgentDDPG_Trainer>& master);
 	~ndBrainAgentDDPG_Agent();
 
-	//ndBrain* GetActor();
-	//void SelectAction(ndBrainVector& actions) const;
-
 	virtual void Step();
 	virtual void InitWeights() { ndAssert(0); }
 	virtual void OptimizeStep() { ndAssert(0); }
@@ -111,13 +109,7 @@ class ndBrainAgentDDPG_Agent: public ndBrainAgent
 	virtual bool IsTrainer() const { ndAssert(0); return true; }
 	virtual ndInt32 GetEpisodeFrames() const;
 
-	//virtual bool IsTerminal() const;
-	//void InitWeights(ndBrainFloat, ndBrainFloat) { ndAssert(0); }
 	ndReal PerturbeAction(ndReal action) const;
-
-	//ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
-	//ndRandomGenerator* m_randomGenerator;
-	//ndInt32 m_trajectoryCounter;
 
 	ndSharedPtr<ndBrainAgentDDPG_Trainer> m_owner;
 	ndTrajectoryTransition m_trajectory;
@@ -133,28 +125,31 @@ class ndBrainAgentDDPG_Trainer : public ndBrainThreadPool
 		public:
 		HyperParameters();
 
-		//ndBrainFloat m_regularizer;
-		//ndBrainFloat m_discountFactor;
-		//ndBrainFloat m_actorLearnRate;
+		ndBrainFloat m_policyLearnRate;
 		ndBrainFloat m_criticLearnRate;
-		//ndBrainFloat m_softTargetFactor;
-		//ndBrainFloat m_criticRegularizer;
-		//ndBrainFloat m_actionNoiseVariance;
+		ndBrainFloat m_policyRegularizer;
+		ndBrainFloat m_criticRegularizer;
+		ndBrainFloat m_discountRewardFactor;
+		ndBrainFloat m_policyMovingAverageFactor;
+		ndBrainFloat m_criticMovingAverageFactor;
+
 		ndInt32 m_miniBatchSize;
 		ndInt32 m_numberOfActions;
 		ndInt32 m_numberOfObservations;
 
 		ndInt32 m_actorHiddenLayers;
-		ndInt32 m_actorHiddenLayersNeurons;
+		ndInt32 m_hiddenLayersNumberOfNeurons;
 
 		ndInt32 m_replayBufferSize;
 		ndInt32 m_maxTrajectorySteps;
 		ndInt32 m_replayBufferStartOptimizeSize;
 		
 		ndInt32 m_threadsCount;
-		//ndInt32 m_bashBufferSize;
-		//ndInt32 m_replayBufferSize;
-		//ndInt32 m_replayBufferPrefill;
+		ndInt32 m_criticUpdatesCount;
+		ndInt32 m_policyUpdatesCount;
+
+		ndBrainOptimizer::ndRegularizerType m_policyRegularizerType;
+		ndBrainOptimizer::ndRegularizerType m_criticRegularizerType;
 	};
 
 	ndBrainAgentDDPG_Trainer(const HyperParameters& parameters);
@@ -169,13 +164,17 @@ class ndBrainAgentDDPG_Trainer : public ndBrainThreadPool
 	ndUnsigned32 GetFramesCount() const;
 	ndUnsigned32 GetEposideCount() const;
 
+	ndFloat32 GetAverageScore() const;
+	ndFloat32 GetAverageFrames() const;
+
+
 	private:
 	void Optimize();
 	void SaveTrajectory();
-	void BuildActorClass();
+	void BuildPolicyClass();
 	void BuildCriticClass();
-	void LearnQvalueFuntion();
-	void LearnPolicyFuntion();
+	void LearnQvalueFunction();
+	void LearnPolicyFunction();
 
 	public:
 	HyperParameters m_parameters;
@@ -186,10 +185,15 @@ class ndBrainAgentDDPG_Trainer : public ndBrainThreadPool
 	ndString m_name;
 	ndBrainAgentDDPG_Agent::ndTrajectoryTransition m_replayBuffer;
 	ndBrainAgentDDPG_Agent* m_agent;
-	ndBrainOptimizerAdam* m_criticOptimizer;
+	ndSharedPtr<ndBrainOptimizerAdam> m_policyOptimizer;
+	ndSharedPtr<ndBrainOptimizerAdam> m_criticOptimizer;
+	ndArray<ndBrainTrainer*> m_policyTrainers;
 	ndArray<ndBrainTrainer*> m_criticTrainers;
 	ndArray<ndInt32> m_shuffleBuffer;
+	ndMovingAverage<8> m_averageScore;
+	ndMovingAverage<8> m_averageFramesPerEpisodes;
 	ndUnsigned32 m_frameCount;
+	ndUnsigned32 m_framesAlive;
 	ndUnsigned32 m_eposideCount;
 	ndInt32 m_replayBufferIndex;
 	bool m_startOptimization;

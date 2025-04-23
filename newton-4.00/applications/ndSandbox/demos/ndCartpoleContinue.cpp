@@ -419,8 +419,8 @@ namespace ndContinueCarpole
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
 			,m_saveScore(m_maxScore)
-			,m_discountFactor(0.99f)
-			,m_horizon (ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor))
+			,m_discountRewardFactor(0.99f)
+			,m_horizon (ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountRewardFactor))
 			,m_lastEpisode(0xfffffff)
 			,m_stopTraining(100 * 1000000)
 			,m_modelIsTrained(false)
@@ -435,7 +435,7 @@ namespace ndContinueCarpole
 			hyperParameters.m_numberOfActions = m_actionsSize;
 			hyperParameters.m_numberOfObservations = m_stateSize;
 			hyperParameters.m_maxTrajectorySteps = ND_TRAJECTORY_STEPS;
-			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
+			hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
 
 			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
 			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
@@ -654,7 +654,7 @@ namespace ndContinueCarpole
 		ndUnsigned64 m_timer;
 		ndFloat32 m_maxScore;
 		ndFloat32 m_saveScore;
-		ndFloat32 m_discountFactor;
+		ndFloat32 m_discountRewardFactor;
 		ndFloat32 m_horizon;
 		ndUnsigned32 m_lastEpisode;
 		ndUnsigned32 m_stopTraining;

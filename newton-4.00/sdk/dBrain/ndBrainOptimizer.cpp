@@ -28,7 +28,7 @@
 ndBrainOptimizer::ndBrainOptimizer()
 	:ndClassAlloc()
 	,m_weighDecayRegularizer(ndBrainFloat(0.0f))
-	,m_regularizerType(m_Ridge)
+	,m_regularizerType(m_ridge)
 {
 }
 

@@ -48,27 +48,27 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 			m_numberOfHiddenLayers = 3;
 			m_hiddenLayersNumberOfNeurons = 64;
 
-			m_bashBufferSize = 64;
+			m_batchBufferSize = 64;
 			m_replayBufferSize = 1024 * 512;
 			m_targetUpdatePeriod = 1000;
 			
 			m_learnRate = ndBrainFloat(0.0001f);
 			m_regularizer = ndBrainFloat(1.0e-6f);
-			m_discountFactor = ndBrainFloat(0.99f);
+			m_discountRewardFactor = ndBrainFloat(0.99f);
 			m_exploreMinProbability = ndBrainFloat(1.0f / 100.0f);
 			m_exploreAnnelining = (m_exploreMinProbability / ndBrainFloat(2.0f));
-			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize);
+			m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_batchBufferSize);
 			//m_threadsCount = 1;
 		}
 
 		ndBrainFloat m_learnRate;
 		ndBrainFloat m_regularizer;
-		ndBrainFloat m_discountFactor;
+		ndBrainFloat m_discountRewardFactor;
 		ndBrainFloat m_exploreAnnelining;
 		ndBrainFloat m_exploreMinProbability;
 
 		ndInt32 m_threadsCount;
-		ndInt32 m_bashBufferSize;
+		ndInt32 m_batchBufferSize;
 		ndInt32 m_replayBufferSize;
 		ndInt32 m_targetUpdatePeriod;
 		ndInt32 m_replayBufferPrefill;
@@ -118,7 +118,7 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	ndInt32 m_frameCount;
 	ndInt32 m_framesAlive;
 	ndInt32 m_eposideCount;
-	ndInt32 m_bashBufferSize;
+	ndInt32 m_batchBufferSize;
 	ndInt32 m_targetUpdatePeriod;
 	ndMovingAverage<1024> m_averageQvalue;
 	ndMovingAverage<64> m_averageFramesPerEpisodes;
@@ -133,7 +133,7 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const Hyp
 	,m_target()
 	,m_optimizer(nullptr)
 	,m_replayBuffer()
-	,m_gamma(hyperParameters.m_discountFactor)
+	,m_gamma(hyperParameters.m_discountRewardFactor)
 	,m_learnRate(hyperParameters.m_learnRate)
 	,m_explorationProbability(ndBrainFloat(1.0f))
 	,m_minExplorationProbability(hyperParameters.m_exploreMinProbability)
@@ -141,7 +141,7 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const Hyp
 	,m_frameCount(0)
 	,m_framesAlive(0)
 	,m_eposideCount(0)
-	,m_bashBufferSize(hyperParameters.m_bashBufferSize)
+	,m_batchBufferSize(hyperParameters.m_batchBufferSize)
 	,m_targetUpdatePeriod(hyperParameters.m_targetUpdatePeriod)
 	,m_averageQvalue()
 	,m_averageFramesPerEpisodes()
@@ -167,7 +167,7 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const Hyp
 
 	m_trainers.SetCount(0);
 	SetThreadCount(hyperParameters.m_threadsCount);
-	for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
+	for (ndInt32 i = 0; i < m_batchBufferSize; ++i)
 	{
 		ndBrainTrainer* const trainer = new ndBrainTrainer(&m_actor);
 		m_trainers.PushBack(trainer);
@@ -238,7 +238,7 @@ template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 {
 	ndUnsigned32 shuffleBuffer[1024];
-	for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
+	for (ndInt32 i = 0; i < m_batchBufferSize; ++i)
 	{
 		shuffleBuffer[i] = ndRandInt() % m_replayBuffer.GetCount();
 	}
@@ -286,8 +286,8 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 			ndInt32 m_index;
 		};
 
-		ndAssert(m_bashBufferSize == m_trainers.GetCount());
-		const ndStartEnd startEnd(m_bashBufferSize, threadIndex, threadCount);
+		ndAssert(m_batchBufferSize == m_trainers.GetCount());
+		const ndStartEnd startEnd(m_batchBufferSize, threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndBrainTrainer& trainer = *m_trainers[i];

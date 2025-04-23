@@ -172,54 +172,13 @@ ndInt32 ndBrain::CalculateWorkingBufferSize() const
 	return maxSize * 2 + 256;
 }
 
-void ndBrain::CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradients)
+
+void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
-	ndAssert(0);
-	ndFixSizeArray<ndInt32, 256> prefixScan;
-	const ndArray<ndBrainLayer*>& layers = *this;
-
-	ndInt32 maxSize = 0;
-	ndInt32 sizeAcc = (layers[0]->GetInputSize() + 7) & -8;
-
-	prefixScan.PushBack(0);
-	for (ndInt32 i = 0; i < GetCount(); ++i)
-	{
-		prefixScan.PushBack(sizeAcc);
-		sizeAcc += (layers[i]->GetOutputSize() + 7) & -8;
-		maxSize = ndMax(maxSize, layers[i]->GetOutputSize());
-	}
-	prefixScan.PushBack(sizeAcc);
-
-	const ndBrainFloat* const memBuffer = ndAlloca(ndBrainFloat, sizeAcc + 8);
-	const ndBrainFloat* const gradientBuffer = ndAlloca(ndBrainFloat, maxSize * 2 + 256);
-
-	ndBrainMemVector in0(memBuffer, input.GetCount());
-	in0.Set(input);
-	for (ndInt32 i = 0; i < GetCount(); ++i)
-	{
-		ndBrainMemVector in(memBuffer + prefixScan[i + 0], layers[i]->GetInputSize());
-		ndBrainMemVector out(memBuffer + prefixScan[i + 1], layers[i]->GetOutputSize());
-		layers[i]->MakePrediction(in, out);
-	}
-
-	ndBrainMemVector gradientIn(gradientBuffer, GetOutputSize());
-	ndBrainMemVector gradientOut(gradientBuffer + maxSize + 128, GetOutputSize());
-	gradientOut.Set(ndBrainFloat(1.0f));
-	for (ndInt32 i = ndInt32(layers.GetCount()) - 1; i >= 0; --i)
-	{
-		const ndBrainLayer* const layer = layers[i];
-		gradientIn.SetSize(layer->GetInputSize());
-		const ndBrainMemVector in(memBuffer + prefixScan[i + 0], layer->GetOutputSize());
-		const ndBrainMemVector out(memBuffer + prefixScan[i + 1], layer->GetOutputSize());
-		layer->InputDerivative(in, out, gradientOut, gradientIn);
-		gradientIn.Swap(gradientOut);
-	}
-	inputGradients.Set(gradientOut);
-}
-
-void ndBrain::CalculateInputGradient(const ndBrainVector&, ndBrainVector&, ndBrainVector&)
-{
-	ndAssert(0);
+	const ndInt32 maxMemory = CalculateWorkingBufferSize();
+	ndBrainFloat* const buffer = ndAlloca(ndBrainFloat, maxMemory + 256);
+	ndBrainMemVector workingBuffer(buffer, maxMemory + 256);
+	MakePrediction(input, output, workingBuffer);
 }
 
 void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output, ndBrainVector& workingBuffer) const
@@ -253,54 +212,69 @@ void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output, 
 	output.Set(in);
 }
 
-void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
+void ndBrain::CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradients, ndBrainLoss& loss)
 {
-	const ndInt32 maxMemory = CalculateWorkingBufferSize();
-	ndBrainFloat* const buffer = ndAlloca(ndBrainFloat, maxMemory + 256);
-	ndBrainMemVector workingBuffer(buffer, maxMemory + 256);
-	MakePrediction(input, output, workingBuffer);
+	ndFixSizeArray<ndInt32, 256> prefixScan;
+	const ndArray<ndBrainLayer*>& layers = *this;
+
+	ndInt32 maxSize = 0;
+	ndInt32 sizeAcc = (layers[0]->GetInputSize() + 7) & -8;
+
+	prefixScan.PushBack(0);
+	for (ndInt32 i = 0; i < GetCount(); ++i)
+	{
+		prefixScan.PushBack(sizeAcc);
+		ndInt32 ouputSize = (layers[i]->GetOutputSize() + 7) & -8;
+		sizeAcc += ouputSize;
+		maxSize = ndMax(maxSize, ouputSize);
+	}
+	prefixScan.PushBack(sizeAcc);
+
+	ndBrainFloat* const memBuffer = ndAlloca(ndBrainFloat, sizeAcc + 8);
+	ndBrainFloat* const gradientBuffer = ndAlloca(ndBrainFloat, maxSize * 2 + 256);
+
+	//ndBrainMemVector in0(memBuffer, input.GetCount());
+	//in0.Set(input);
+	ndMemCpy(memBuffer, &input[0], input.GetCount());
+	for (ndInt32 i = 0; i < GetCount(); ++i)
+	{
+		ndBrainMemVector in(memBuffer + prefixScan[i + 0], layers[i]->GetInputSize());
+		ndBrainMemVector out(memBuffer + prefixScan[i + 1], layers[i]->GetOutputSize());
+		layers[i]->MakePrediction(in, out);
+	}
+
+	ndBrainMemVector gradientIn(gradientBuffer, GetOutputSize());
+	ndBrainMemVector gradientOut(gradientBuffer + maxSize + 128, GetOutputSize());
+	//gradientOut.Set(ndBrainFloat(1.0f));
+	loss.GetLoss(gradientIn, gradientOut);
+
+	for (ndInt32 i = ndInt32(layers.GetCount()) - 1; i >= 0; --i)
+	{
+		const ndBrainLayer* const layer = layers[i];
+		gradientIn.SetSize(layer->GetInputSize());
+		const ndBrainMemVector in(memBuffer + prefixScan[i + 0], layer->GetOutputSize());
+		const ndBrainMemVector out(memBuffer + prefixScan[i + 1], layer->GetOutputSize());
+		layer->InputDerivative(in, out, gradientOut, gradientIn);
+		gradientIn.Swap(gradientOut);
+	}
+	inputGradients.Set(gradientOut);
 }
 
-void ndBrain::MakePrediction_____(const ndBrainVector& input, ndBrainVector& output, ndBrainVector& workingBuffer, const ndBrainVector workBufferGpu, const ndArray<ndInt32>& offsetsGpu)
+void ndBrain::CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradients)
 {
-	const ndArray<ndBrainLayer*>& layers = *this;
-	ndInt32 maxSize = layers[0]->GetInputSize();
-	for (ndInt32 i = 0; i < GetCount(); ++i)
+	class ndLoss : public ndBrainLoss
 	{
-		maxSize = ndMax(maxSize, layers[i]->GetOutputBufferSize());
-	}
-
-	const ndInt32 maxMemory = CalculateWorkingBufferSize();
-	if (maxMemory > workingBuffer.GetCapacity())
-	{
-		workingBuffer.SetCount(maxMemory);
-	}
-	workingBuffer.SetCount(maxMemory);
-
-	ndBrainMemVector in(&workingBuffer[0], input.GetCount());
-	ndBrainMemVector out(&workingBuffer[maxSize + 128], input.GetCount());
-
-	in.Set(input);
-	for (ndInt32 i = 0; i < GetCount(); ++i)
-	{
-		out.SetSize(layers[i]->GetOutputSize());
-		layers[i]->MakePrediction(in, out);
-
-		ndInt32 n0 = offsetsGpu[i + 0];
-		ndInt32 n1 = offsetsGpu[i + 1];
-		ndInt32 n2 = offsetsGpu[i + 2];
-		const ndBrainMemVector xxxx0(&workBufferGpu[n0], n1 - n0);
-		const ndBrainMemVector xxxx1(&workBufferGpu[n1], n2 - n1);
-		for (ndInt32 j = 0; j < out.GetCount(); ++j)
+		public:
+		ndLoss()
+			:ndBrainLoss()
 		{
-			ndFloat32 error;
-			error = ndAbs (out[j] - xxxx1[j]);
-			ndAssert(error < 1.0e-3f);
 		}
 
-		in.Swap(out);
-	}
-
-	ndAssert(in.GetCount() == output.GetCount());
-	output.Set(in);
+		void GetLoss(const ndBrainVector&, ndBrainVector& loss) override
+		{
+			loss.Set(ndBrainFloat(1.0f));
+		}
+	};
+	ndLoss loss;
+	CalculateInputGradient(input, inputGradients, loss);
 }

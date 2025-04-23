@@ -629,8 +629,8 @@ namespace ndUnicycle
 			,m_outFile(nullptr)
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
-			,m_discountFactor(0.99f)
-			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor))
+			,m_discountRewardFactor(0.99f)
+			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountRewardFactor))
 			,m_lastEpisode(0xffffffff)
 			,m_stopTraining(100 * 1000000)
 			,m_modelIsTrained(false)
@@ -649,8 +649,8 @@ namespace ndUnicycle
 			hyperParameters.m_numberOfActions = m_actionsSize;
 			hyperParameters.m_numberOfObservations = m_observationsSize;
 			hyperParameters.m_maxTrajectorySteps = ND_TRAJECTORY_STEPS;
-			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
-			hyperParameters.m_regularizerType = ndBrainOptimizer::m_Lasso;
+			hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
+			hyperParameters.m_regularizerType = ndBrainOptimizer::m_lasso;
 			
 			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
 			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
@@ -836,7 +836,7 @@ namespace ndUnicycle
 		FILE* m_outFile;
 		ndUnsigned64 m_timer;
 		ndFloat32 m_maxScore;
-		ndFloat32 m_discountFactor;
+		ndFloat32 m_discountRewardFactor;
 		ndFloat32 m_horizon;
 		ndUnsigned32 m_lastEpisode;
 		ndUnsigned32 m_stopTraining;

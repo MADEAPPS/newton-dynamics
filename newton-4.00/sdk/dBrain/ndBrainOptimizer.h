@@ -32,9 +32,9 @@ class ndBrainOptimizer : public ndClassAlloc
 	public: 
 	enum ndRegularizerType
 	{
-		m_None,
-		m_Ridge,
-		m_Lasso,
+		m_none,
+		m_ridge,
+		m_lasso,
 	};
 
 	ndBrainOptimizer();

@@ -273,18 +273,18 @@ static void MnistTrainingSet()
 			,m_brain(*brain)
 			,m_prioritySamples()
 			,m_learnRate(ndReal(5.0e-4f))
-			,m_bashBufferSize(BATCH_BUFFER_SIZE)
+			,m_batchBufferSize(BATCH_BUFFER_SIZE)
 		{
-			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize);
+			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_batchBufferSize);
 
 			//threadCount = 1;
 			SetThreadCount(threadCount);
-			for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
+			for (ndInt32 i = 0; i < m_batchBufferSize; ++i)
 			{
 				ndBrainTrainer* const trainer = new ndBrainTrainer(&m_brain);
 				m_trainers.PushBack(trainer);
 			}
-			m_prioritySamples.SetCount(m_bashBufferSize);
+			m_prioritySamples.SetCount(m_batchBufferSize);
 		}
 
 		~SupervisedTrainer()
@@ -479,7 +479,7 @@ static void MnistTrainingSet()
 					ndFixSizeArray<ndUnsigned32, 16>& m_priority;
 				};
 
-				for (ndInt32 i = iterator++; i < m_bashBufferSize; i = iterator++)
+				for (ndInt32 i = iterator++; i < m_batchBufferSize; i = iterator++)
 				{
 					ndBrainTrainer& trainer = *m_trainers[i];
 					ndUnsigned32 index = miniBashArray[i];
@@ -495,7 +495,7 @@ static void MnistTrainingSet()
 
 			m_minTestFail = ndInt32(testDigits->GetCount());
 			m_minTrainingFail = ndInt32(trainingDigits->GetCount());
-			ndInt32 batches = m_minTrainingFail / m_bashBufferSize;
+			ndInt32 batches = m_minTrainingFail / m_batchBufferSize;
 
 			// so far best training result on the mnist data set
 			optimizer.SetRegularizer(ndBrainFloat(0.0f));		//         training(100.0%) test(99.35%) 
@@ -528,10 +528,10 @@ static void MnistTrainingSet()
 				for (ndInt32 bash = 0; bash < batches; ++bash)
 				{
 					iterator = 0;
-					ndMemCpy(miniBashArray, &shuffleBuffer[start], m_bashBufferSize);
+					ndMemCpy(miniBashArray, &shuffleBuffer[start], m_batchBufferSize);
 					ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 					optimizer.Update(this, m_trainers, m_learnRate);
-					start += m_bashBufferSize;
+					start += m_batchBufferSize;
 				}
 				m_brain.DisableDropOut();
 
@@ -551,7 +551,7 @@ static void MnistTrainingSet()
 		ndArray<ndBrainTrainer*> m_trainers;
 		ndFixSizeArray<ndFixSizeArray<ndUnsigned32, 16>, BATCH_BUFFER_SIZE> m_prioritySamples;
 		ndReal m_learnRate;
-		ndInt32 m_bashBufferSize;
+		ndInt32 m_batchBufferSize;
 		ndInt32 m_minTestFail;
 		ndInt32 m_minTrainingFail;
 

@@ -129,14 +129,14 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndBrainFloat m_policyLearnRate;
 		ndBrainFloat m_criticLearnRate;
 		ndBrainFloat m_regularizer;
-		ndBrainFloat m_discountFactor;
+		ndBrainFloat m_discountRewardFactor;
 
 		ndInt32 m_threadsCount;
 		ndInt32 m_numberOfActions;
 		ndInt32 m_numberOfObservations;
 
 		ndInt32 m_numberOfLayers;
-		ndInt32 m_bashBufferSize;
+		ndInt32 m_batchBufferSize;
 		ndInt32 m_neuronPerLayers;
 		ndInt32 m_maxTrajectorySteps;
 		ndInt32 m_bashTrajectoryCount;
@@ -209,7 +209,7 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndInt32 m_framesAlive;
 	ndUnsigned32 m_frameCount;
 	ndUnsigned32 m_eposideCount;
-	ndInt32 m_bashBufferSize;
+	ndInt32 m_batchBufferSize;
 	ndInt32 m_maxTrajectorySteps;
 	ndInt32 m_extraTrajectorySteps;
 	ndInt32 m_bashTrajectoryIndex;

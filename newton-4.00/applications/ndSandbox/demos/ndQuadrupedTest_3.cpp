@@ -746,8 +746,8 @@ namespace ndQuadruped_3
 			,m_outFile(nullptr)
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
-			,m_discountFactor(0.99f)
-			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor))
+			,m_discountRewardFactor(0.99f)
+			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountRewardFactor))
 			,m_lastEpisode(0xffffffff)
 			,m_stopTraining(500 * 1000000)
 			,m_modelIsTrained(false)
@@ -761,7 +761,7 @@ namespace ndQuadruped_3
 
 			hyperParameters.m_numberOfActions = m_actionsSize;
 			hyperParameters.m_numberOfObservations = m_stateSize;
-			//hyperParameters.m_discountFactor = ndReal(m_discountFactor);
+			//hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
 
 			m_master = ndSharedPtr<ndBrainAgentDDPG_Trainer>(new ndBrainAgentDDPG_Trainer(hyperParameters));
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
@@ -913,18 +913,18 @@ namespace ndQuadruped_3
 				m_master->OptimizeStep();
 			
 				episodeCount -= m_master->GetEposideCount();
-			//	ndFloat32 rewardTrajectory = m_master->GetAverageFrames() * m_master->GetAverageScore();
-			//	if (rewardTrajectory >= ndFloat32(m_maxScore))
-			//	{
-			//		if (m_lastEpisode != m_master->GetEposideCount())
-			//		{
-			//			m_maxScore = rewardTrajectory;
-			//			m_bestActor->CopyFrom(*m_master->GetPolicyNetwork());
-			//			ndExpandTraceMessage("best actor episode: %d\treward %f\ttrajectoryFrames: %f\n", m_master->GetEposideCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
-			//			m_lastEpisode = m_master->GetEposideCount();
-			//		}
-			//	}
-			//
+				ndFloat32 rewardTrajectory = m_master->GetAverageFrames() * m_master->GetAverageScore();
+				if (rewardTrajectory >= ndFloat32(m_maxScore))
+				{
+					if (m_lastEpisode != m_master->GetEposideCount())
+					{
+						m_maxScore = rewardTrajectory;
+						m_bestActor->CopyFrom(*m_master->GetPolicyNetwork());
+						ndExpandTraceMessage("best actor episode: %d\treward %f\ttrajectoryFrames: %f\n", m_master->GetEposideCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
+						m_lastEpisode = m_master->GetEposideCount();
+					}
+				}
+			
 			//	if (episodeCount && !m_master->IsSampling())
 			//	{
 			//		ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", m_master->GetFramesCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
@@ -936,19 +936,19 @@ namespace ndQuadruped_3
 			//	}
 			}
 			
-			//if ((stopTraining >= m_stopTraining) || (100.0f * m_master->GetAverageScore() / m_horizon > 95.0f))
-			//{
-			//	char fileName[1024];
-			//	m_modelIsTrained = true;
-			//	m_master->GetPolicyNetwork()->CopyFrom(*(*m_bestActor));
-			//	ndGetWorkingFileName(m_master->GetName().GetStr(), fileName);
-			//	m_master->GetPolicyNetwork()->SaveToFile(fileName);
-			//	ndExpandTraceMessage("saving to file: %s\n", fileName);
-			//	ndExpandTraceMessage("training complete\n");
-			//	ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
-			//	ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
-			//	manager->Terminate();
-			//}
+			if ((stopTraining >= m_stopTraining) || (100.0f * m_master->GetAverageScore() / m_horizon > 95.0f))
+			{
+				char fileName[1024];
+				m_modelIsTrained = true;
+				m_master->GetPolicyNetwork()->CopyFrom(*(*m_bestActor));
+				ndGetWorkingFileName(m_master->GetName().GetStr(), fileName);
+				m_master->GetPolicyNetwork()->SaveToFile(fileName);
+				ndExpandTraceMessage("saving to file: %s\n", fileName);
+				ndExpandTraceMessage("training complete\n");
+				ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
+				ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+				manager->Terminate();
+			}
 		}
 
 		ndSharedPtr<ndBrainAgentDDPG_Trainer> m_master;
@@ -957,7 +957,7 @@ namespace ndQuadruped_3
 		FILE* m_outFile;
 		ndUnsigned64 m_timer;
 		ndFloat32 m_maxScore;
-		ndFloat32 m_discountFactor;
+		ndFloat32 m_discountRewardFactor;
 		ndFloat32 m_horizon;
 		ndUnsigned32 m_lastEpisode;
 		ndUnsigned32 m_stopTraining;

@@ -289,7 +289,6 @@ void ndBrainLayerLinear::MakePrediction(const ndBrainVector& input, ndBrainVecto
 
 void ndBrainLayerLinear::InputDerivative(const ndBrainVector&, const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
-	ndAssert(0);
 	m_weights.TransposeMul(outputDerivative, inputDerivative);
 }
 

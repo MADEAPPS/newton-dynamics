@@ -1319,8 +1319,8 @@ namespace ndQuadruped_5
 			,m_outFile(nullptr)
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
-			,m_discountFactor(0.99f)
-			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor))
+			,m_discountRewardFactor(0.99f)
+			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountRewardFactor))
 			,m_lastEpisode(0xffffffff)
 			,m_stopTraining(500 * 1000000)
 			,m_modelIsTrained(false)
@@ -1353,7 +1353,7 @@ namespace ndQuadruped_5
 			hyperParameters.m_bashTrajectoryCount = 500;
 			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
 			//hyperParameters.m_bashTrajectoryCount = 10;
-			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
+			hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
 			hyperParameters.m_numberOfActions = ND_AGENT_OUTPUT_SIZE;
 			hyperParameters.m_numberOfObservations = ND_AGENT_INPUT_SIZE;
 
@@ -1537,7 +1537,7 @@ namespace ndQuadruped_5
 		FILE* m_outFile;
 		ndUnsigned64 m_timer;
 		ndFloat32 m_maxScore;
-		ndFloat32 m_discountFactor;
+		ndFloat32 m_discountRewardFactor;
 		ndFloat32 m_horizon;
 		ndUnsigned32 m_lastEpisode;
 		ndUnsigned32 m_stopTraining;

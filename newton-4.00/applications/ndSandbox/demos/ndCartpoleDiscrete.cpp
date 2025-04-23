@@ -366,7 +366,7 @@ namespace ndDiscreteCarpole
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
 			,m_saveScore(m_maxScore)
-			,m_discountFactor(0.99f)
+			,m_discountRewardFactor(0.99f)
 			,m_lastEpisode(0xffffffff)
 			,m_stopTraining(500 * 1000000)
 			,m_modelIsTrained(false)
@@ -376,14 +376,14 @@ namespace ndDiscreteCarpole
 			m_outFile = fopen(name, "wb");
 			fprintf(m_outFile, "vpg\n");
 
-			m_horizon = ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountFactor);			
+			m_horizon = ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountRewardFactor);			
 			ndBrainAgentDiscretePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 			
 			hyperParameters.m_extraTrajectorySteps = 256;
 			hyperParameters.m_maxTrajectorySteps = 1024 * 4;
 			hyperParameters.m_numberOfActions = m_actionsSize;
 			hyperParameters.m_numberOfObservations = m_stateSize;
-			hyperParameters.m_discountFactor = ndReal(m_discountFactor);
+			hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
 			
 			m_master = ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster>(new ndBrainAgentDiscretePolicyGradient_TrainerMaster(hyperParameters));
 			m_bestActor = ndSharedPtr< ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
@@ -602,7 +602,7 @@ namespace ndDiscreteCarpole
 		ndUnsigned64 m_timer;
 		ndFloat32 m_maxScore;
 		ndFloat32 m_saveScore;
-		ndFloat32 m_discountFactor;
+		ndFloat32 m_discountRewardFactor;
 		ndFloat32 m_horizon;
 		ndUnsigned32 m_lastEpisode;
 		ndUnsigned32 m_stopTraining;

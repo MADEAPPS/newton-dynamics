@@ -228,12 +228,12 @@ static void Cifar10TrainingSet()
 			:ndBrainThreadPool()
 			,m_brain(*brain)
 			,m_learnRate(ndReal(5.0e-4f))
-			,m_bashBufferSize(BATCH_BUFFER_SIZE)
+			,m_batchBufferSize(BATCH_BUFFER_SIZE)
 		{
-			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize);
+			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_batchBufferSize);
 			//threadCount = 1;
 			SetThreadCount(threadCount);
-			for (ndInt32 i = 0; i < m_bashBufferSize; ++i)
+			for (ndInt32 i = 0; i < m_batchBufferSize; ++i)
 			{
 				ndBrainTrainer* const trainer = new ndBrainTrainer(&m_brain);
 				m_trainers.PushBack(trainer);
@@ -294,7 +294,7 @@ static void Cifar10TrainingSet()
 					ndUnsigned32* m_failCount;
 				};
 
-				for (ndInt32 i = iterator++; i < m_bashBufferSize; i = iterator++)
+				for (ndInt32 i = iterator++; i < m_batchBufferSize; i = iterator++)
 				{
 					ndBrainTrainer& trainer = *m_trainers[i];
 					ndUnsigned32 index = miniBashArray[i];
@@ -310,7 +310,7 @@ static void Cifar10TrainingSet()
 
 			ndInt32 minTestFail = ndInt32(testLabels->GetCount());
 			ndInt32 minTrainingFail = ndInt32(trainingLabels->GetCount());
-			ndInt32 batches = minTrainingFail / m_bashBufferSize;
+			ndInt32 batches = minTrainingFail / m_batchBufferSize;
 			//batches = 1;
 
 			// so far best training result on the cifar-10 data set
@@ -337,10 +337,10 @@ static void Cifar10TrainingSet()
 				for (ndInt32 bash = 0; bash < batches; ++bash)
 				{
 					iterator = 0;
-					ndMemCpy(miniBashArray, &shuffleBuffer[start], m_bashBufferSize);
+					ndMemCpy(miniBashArray, &shuffleBuffer[start], m_batchBufferSize);
 					ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 					optimizer.Update(this, m_trainers, m_learnRate);
-					start += m_bashBufferSize;
+					start += m_batchBufferSize;
 				}
 				m_brain.DisableDropOut();
 
@@ -401,7 +401,7 @@ static void Cifar10TrainingSet()
 					minTestFail = testFail;
 					minTrainingFail = trainFail;
 					bestBrain.CopyFrom(m_brain);
-					ndInt32 size = batches * m_bashBufferSize;
+					ndInt32 size = batches * m_batchBufferSize;
 					ndExpandTraceMessage("  epoch: %d", epoch);
 					ndExpandTraceMessage("  success rate:%f%%", (ndFloat32)(size - minTrainingFail) * 100.0f / (ndFloat32)size);
 					ndExpandTraceMessage("  training fail count:%d", minTrainingFail);
@@ -414,7 +414,7 @@ static void Cifar10TrainingSet()
 		ndBrain& m_brain;
 		ndArray<ndBrainTrainer*> m_trainers;
 		ndReal m_learnRate;
-		ndInt32 m_bashBufferSize;
+		ndInt32 m_batchBufferSize;
 	};
 	
 	if (trainingLabels && trainingImages)

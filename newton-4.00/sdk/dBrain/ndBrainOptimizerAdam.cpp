@@ -145,15 +145,15 @@ void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const threadPool, ndArray<n
 				//gradients.ScaleAdd(weights, regularizer);
 				switch (m_regularizerType)
 				{
-					case m_Lasso:
+					case m_lasso:
 						gradients.AddReqularizerL1(weights, regularizer);
 						break;
 
-					case m_Ridge:
+					case m_ridge:
 						gradients.AddReqularizerL2(weights, regularizer);
 						break;
 
-					case m_None:;
+					case m_none:;
 				}
 
 				weights.ScaleAdd(gradients, descendRate);
