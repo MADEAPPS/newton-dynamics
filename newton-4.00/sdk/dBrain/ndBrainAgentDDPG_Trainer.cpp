@@ -564,7 +564,7 @@ void ndBrainAgentDDPG_Trainer::LearnPolicyFunction()
 				{
 					ndMemCpy(&m_combinedActionObservation[0], &output[0], m_owner->m_parameters.m_numberOfActions);
 					ndMemCpy(&m_combinedActionObservation[m_owner->m_parameters.m_numberOfActions], m_owner->m_replayBuffer.GetNextObservations(m_index), m_owner->m_parameters.m_numberOfObservations);
-					m_owner->m_critic.CalculateInputGradient(output, m_combinedInputGradients);
+					m_owner->m_critic.CalculateInputGradient(m_combinedActionObservation, m_combinedInputGradients);
 					ndMemCpy(&loss[0], &m_combinedInputGradients[0], loss.GetCount());
 					loss.Scale(-1.0f);
 				}
