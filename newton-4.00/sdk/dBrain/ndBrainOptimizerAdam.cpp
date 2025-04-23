@@ -102,65 +102,6 @@ void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const threadPool, ndArray<n
 		trainer->AddGradients(src);
 	}
 
-#if 0
-	ndBrainFloat descendRate = -learnRate;
-	ndBrainFloat regularizer = -GetRegularizer();
-	ndBrainFloat den = ndBrainFloat(1.0f) / ndBrainFloat(partialGradients.GetCount());
-
-	for (ndInt32 i = 0; i < brain.GetCount(); ++i)
-	{
-		if (brain[i]->HasParameters())
-		{
-			ndAssert(m_data[i]);
-			ndAdamData& data = *m_data[i];
-			ndBrainLayer& gradients = *trainer->GetGradientLayer(i);
-			gradients.Scale(den);
-			data.m_temp->Set(gradients);
-
-			// calculate moving average
-			data.m_vdw->Scale(m_alpha);
-			data.m_vdw->ScaleAdd(*(*data.m_temp), ndBrainFloat(1.0) - m_alpha);
-
-			// caluate RMS
-			data.m_vdw2->Scale(m_beta);
-			data.m_temp->Mul(*(*data.m_temp));
-			data.m_vdw2->ScaleAdd(*(*data.m_temp), ndBrainFloat(1.0) - m_beta);
-
-			data.m_vdwCorrected->Set(*(*data.m_vdw));
-			data.m_vdw2Corrected->Set(*(*data.m_vdw2));
-			if (m_alphaAcc > ndBrainFloat(0.0f))
-			{
-				data.m_vdwCorrected->Scale(ndBrainFloat(1.0f / (1.0f - m_alphaAcc)));
-			}
-
-			if (m_betaAcc > ndBrainFloat(0.0f))
-			{
-				data.m_vdw2Corrected->Scale(ndBrainFloat(1.0f / (1.0f - m_betaAcc)));
-			}
-		
-			gradients.AdamUpdate(*(*data.m_vdwCorrected), *(*data.m_vdw2Corrected), m_epsilon);
-			ndBrainLayer& weights = *trainer->GetWeightsLayer(i);
-			//gradients.ScaleAdd(weights, regularizer);
-			switch (m_regularizerType)
-			{
-				case m_Lasso:
-					gradients.AddReqularizerL1(weights, regularizer);
-					break;
-
-				case m_Ridge:
-					gradients.AddReqularizerL2(weights, regularizer);
-					break;
-
-				case m_None:;
-			}
-	
-			weights.ScaleAdd(gradients, descendRate);
-			weights.FlushToZero();
-		}
-	}
-
-#else
-
 	ndAtomic<ndInt32> iterator(0);
 	auto CalculateLayerGradients = ndMakeObject::ndFunction([this, learnRate, &partialGradients, &brain, trainer, &iterator](ndInt32, ndInt32)
 	{
@@ -221,7 +162,6 @@ void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const threadPool, ndArray<n
 		}
 	});
 	threadPool->ndBrainThreadPool::ParallelExecute(CalculateLayerGradients);
-#endif
 
 	m_betaAcc = ndFlushToZero(m_betaAcc * m_beta);
 	m_alphaAcc = ndFlushToZero(m_alphaAcc * m_alpha);

@@ -22,16 +22,18 @@
 #include "ndBrainStdafx.h"
 
 #include "ndBrainLayer.h"
+#include "ndBrainTrainer.h"
 #include "ndBrainLayerLinear.h"
+#include "ndBrainOptimizerAdam.h"
 #include "ndBrainAgentDDPG_Trainer.h"
 #include "ndBrainLayerActivationTanh.h"
-
+#include "ndBrainLossLeastSquaredError.h"
 
 //#include "ndBrain.h"
 //#include "ndBrainAgent.h"
-//#include "ndBrainTrainer.h"
+
 //#include "ndBrainReplayBuffer.h"
-//#include "ndBrainLossLeastSquaredError.h"
+
 
 
 // this is an implementation of the vanilla deep deterministic 
@@ -58,12 +60,15 @@ ndBrainAgentDDPG_Trainer::HyperParameters::HyperParameters()
 	//m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_bashBufferSize);
 	m_threadsCount = 1;
 
+	m_miniBatchSize = 256;
 	m_numberOfActions = 0;
 	m_numberOfObservations = 0;
 	m_actorHiddenLayers = 3;
 	m_actorHiddenLayersNeurons = 64;
 	m_maxTrajectorySteps = 1024 * 4;
 	m_replayBufferSize = 1024 * 1024;
+
+	m_criticLearnRate = ndBrainFloat(1.0e-4f);
 	m_replayBufferStartOptimizeSize = 1024 * 32;
 
 m_replayBufferSize = 128 * 4 + 100;
@@ -208,20 +213,6 @@ void ndBrainAgentDDPG_Agent::Step()
 	ndInt32 entryIndex = m_trajectory.GetCount();
 	m_trajectory.SetCount(entryIndex + 1);
 	m_trajectory.Clear(entryIndex);
-	
-	//ndBrainMemVector actions(m_trajectory.GetActions(entryIndex), m_master->m_numberOfActions * 2);
-	//ndBrainMemVector observation(m_trajectory.GetObservations(entryIndex), m_master->m_numberOfObservations);
-	//
-	//GetObservation(&observation[0]);
-	//m_master->m_policy.MakePrediction(observation, actions, m_workingBuffer);
-	//
-	//SelectAction(actions);
-	//ApplyActions(&actions[0]);
-	//
-	//ndBrainFloat reward = CalculateReward();
-	//m_trajectory.SetReward(entryIndex, reward);
-	//m_trajectory.SetStateReward(entryIndex, reward);
-	//m_trajectory.SetTerminalState(entryIndex, IsTerminal());
 
 	ndBrainMemVector actions(m_trajectory.GetActions(entryIndex), m_owner->m_parameters.m_numberOfActions);
 	ndBrainMemVector observation(m_trajectory.GetObservations(entryIndex), m_owner->m_parameters.m_numberOfObservations);
@@ -259,14 +250,19 @@ ndBrainAgentDDPG_Trainer::ndBrainAgentDDPG_Trainer(const HyperParameters& parame
 	,m_parameters(parameters)
 	,m_policy()
 	,m_critic()
+	,m_referencePolicy()
+	,m_referenceCritic()
 	,m_name()
 	,m_replayBuffer(m_parameters.m_numberOfActions, m_parameters.m_numberOfObservations)
 	,m_agent(nullptr)
+	,m_criticOptimizer(nullptr)
+	,m_criticTrainers()
 	,m_shuffleBuffer()
 	,m_frameCount(0)
 	,m_eposideCount(0)
 	,m_replayBufferIndex(0)
 	,m_startOptimization(false)
+	,m_shuffleIndexBuffer(0)
 {
 	ndAssert(m_parameters.m_numberOfActions);
 	ndAssert(m_parameters.m_numberOfObservations);
@@ -278,6 +274,13 @@ ndBrainAgentDDPG_Trainer::ndBrainAgentDDPG_Trainer(const HyperParameters& parame
 	BuildActorClass();
 	BuildCriticClass();
 }
+
+ndBrainAgentDDPG_Trainer::~ndBrainAgentDDPG_Trainer()
+{
+
+	delete m_criticOptimizer;
+}
+
 
 ndBrain* ndBrainAgentDDPG_Trainer::GetPolicyNetwork()
 {
@@ -315,6 +318,8 @@ void ndBrainAgentDDPG_Trainer::BuildActorClass()
 		m_policy.AddLayer(layers[i]);
 	}
 	m_policy.InitWeights();
+
+	m_referencePolicy = m_policy;
 }
 
 void ndBrainAgentDDPG_Trainer::BuildCriticClass()
@@ -337,6 +342,19 @@ void ndBrainAgentDDPG_Trainer::BuildCriticClass()
 		m_critic.AddLayer(layers[i]);
 	}
 	m_critic.InitWeights();
+
+	m_criticOptimizer = new ndBrainOptimizerAdam();
+	//m_criticOptimizer->SetRegularizer(hyperParameters.m_criticRegularizer);
+	m_criticOptimizer->SetRegularizer(1.0e-4f);
+	//m_criticOptimizer->SetRegularizerType(hyperParameters.m_regularizerType);
+
+	m_criticTrainers.SetCount(0);
+	for (ndInt32 i = 0; i < m_parameters.m_miniBatchSize; ++i)
+	{
+		ndBrainTrainer* const trainer = new ndBrainTrainer(&m_critic);
+		m_criticTrainers.PushBack(trainer);
+	}
+	m_referenceCritic = m_critic;
 }
 
 ndUnsigned32 ndBrainAgentDDPG_Trainer::GetFramesCount() const
@@ -390,6 +408,7 @@ void ndBrainAgentDDPG_Trainer::SaveTrajectory()
 			{
 				m_startOptimization = true;
 				m_replayBufferIndex = 0;
+				m_shuffleIndexBuffer = 0;
 			}
 		}
 		else
@@ -412,9 +431,96 @@ void ndBrainAgentDDPG_Trainer::SaveTrajectory()
 	m_agent->ResetModel();
 }
 
-#pragma optimize( "", off )
 void ndBrainAgentDDPG_Trainer::Optimize()
 {
+	LearnQvalueFuntion();
+	LearnPolicyFuntion();
+}
+
+#pragma optimize( "", off )
+void ndBrainAgentDDPG_Trainer::LearnQvalueFuntion()
+{
+	ndAtomic<ndInt32> iterator(0);
+
+	ndFixSizeArray<ndInt32, 1024> indirectBuffer;
+	for (ndInt32 i = 0; i < m_parameters.m_miniBatchSize; ++i)
+	{
+		indirectBuffer.PushBack(m_shuffleBuffer[m_shuffleIndexBuffer]);
+		m_shuffleIndexBuffer = (m_shuffleIndexBuffer + 1) % ndInt32 (m_shuffleBuffer.GetCount());
+	}
+
+	auto BackPropagateBash = ndMakeObject::ndFunction([this, &iterator, &indirectBuffer](ndInt32, ndInt32)
+	{
+		class ndLoss : public ndBrainLossLeastSquaredError
+		{
+			public:
+			ndLoss(ndBrainAgentDDPG_Trainer* const owner, const ndInt32 index)
+				:ndBrainLossLeastSquaredError(1)
+				,m_owner(owner)
+				,m_criticQvalue()
+				,m_nexActionObservation()
+				,m_index(index)
+			{
+				m_gamma = 0.99f;
+				m_criticQvalue.SetCount(1);
+				m_nexActionObservation.SetCount(m_owner->m_parameters.m_numberOfObservations + m_owner->m_parameters.m_numberOfActions);
+			}
+
+			void GetLoss(const ndBrainVector& criticQvalue, ndBrainVector& loss)
+			{
+				ndBrainFloat reward = m_owner->m_replayBuffer.GetReward(m_index);
+				if (!m_owner->m_replayBuffer.GetTerminalState(m_index))
+				{
+					ndBrainMemVector nextAction(&m_nexActionObservation[0], m_owner->m_parameters.m_numberOfActions);
+					const ndBrainMemVector nextObservation(m_owner->m_replayBuffer.GetNextObservations(m_index), m_owner->m_parameters.m_numberOfObservations);
+					m_owner->m_referencePolicy.MakePrediction(nextObservation, nextAction);
+					ndMemCpy(&m_nexActionObservation[m_owner->m_parameters.m_numberOfActions], &nextObservation[0], nextObservation.GetCount());
+					m_owner->m_referenceCritic.MakePrediction(m_nexActionObservation, m_criticQvalue);
+					reward += m_gamma * m_criticQvalue[0];
+				}
+				m_criticQvalue[0] = reward;
+
+				SetTruth(m_criticQvalue);
+				ndBrainLossLeastSquaredError::GetLoss(criticQvalue, loss);
+			}
+
+			ndBrainAgentDDPG_Trainer* m_owner;
+			ndBrainFixSizeVector<1> m_criticQvalue;
+			ndBrainFixSizeVector<256> m_nexActionObservation;
+			ndBrainFloat m_gamma;
+			ndInt32 m_index;
+		};
+
+		ndBrainFixSizeVector<256> criticObservationAction;
+		criticObservationAction.SetCount(m_parameters.m_numberOfActions + m_parameters.m_numberOfObservations);
+		for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
+		{
+			const ndInt32 index = indirectBuffer[i];
+			ndBrainTrainer& trainer = *m_criticTrainers[i];
+
+			ndMemCpy(&criticObservationAction[0], m_replayBuffer.GetActions(index), m_parameters.m_numberOfActions);
+			ndMemCpy(&criticObservationAction[m_parameters.m_numberOfActions], m_replayBuffer.GetObservations(index), m_parameters.m_numberOfObservations);
+
+			ndLoss loss(this, index);
+			trainer.BackPropagate(criticObservationAction, loss);
+		}
+	});
+
+	ndBrainThreadPool::ParallelExecute(BackPropagateBash);
+	m_criticOptimizer->Update(this, m_criticTrainers, m_parameters.m_criticLearnRate);
+}
+
+#pragma optimize( "", off )
+void ndBrainAgentDDPG_Trainer::LearnPolicyFuntion()
+{
+	ndAtomic<ndInt32> iterator(0);
+
+	ndFixSizeArray<ndInt32, 1024> indirectBuffer;
+	for (ndInt32 i = 0; i < m_parameters.m_miniBatchSize; ++i)
+	{
+		indirectBuffer.PushBack(m_shuffleBuffer[m_shuffleIndexBuffer]);
+		m_shuffleIndexBuffer = (m_shuffleIndexBuffer + 1) % ndInt32(m_shuffleBuffer.GetCount());
+	}
 
 }
 

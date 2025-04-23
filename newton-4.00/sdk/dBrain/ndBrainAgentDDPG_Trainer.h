@@ -39,7 +39,7 @@
 // policy gradient for continues control re enforcement learning.  
 // ddpg algorithm as described in: https://arxiv.org/pdf/1509.02971.pdf
 
-
+class ndBrainOptimizerAdam;
 class ndBrainAgentDDPG_Trainer;
 
 class ndBrainAgentDDPG_Agent: public ndBrainAgent
@@ -136,10 +136,11 @@ class ndBrainAgentDDPG_Trainer : public ndBrainThreadPool
 		//ndBrainFloat m_regularizer;
 		//ndBrainFloat m_discountFactor;
 		//ndBrainFloat m_actorLearnRate;
-		//ndBrainFloat m_criticLearnRate;
+		ndBrainFloat m_criticLearnRate;
 		//ndBrainFloat m_softTargetFactor;
 		//ndBrainFloat m_criticRegularizer;
 		//ndBrainFloat m_actionNoiseVariance;
+		ndInt32 m_miniBatchSize;
 		ndInt32 m_numberOfActions;
 		ndInt32 m_numberOfObservations;
 
@@ -157,6 +158,7 @@ class ndBrainAgentDDPG_Trainer : public ndBrainThreadPool
 	};
 
 	ndBrainAgentDDPG_Trainer(const HyperParameters& parameters);
+	~ndBrainAgentDDPG_Trainer();
 
 	const ndString& GetName() const;
 	void SetName(const ndString& name);
@@ -172,19 +174,26 @@ class ndBrainAgentDDPG_Trainer : public ndBrainThreadPool
 	void SaveTrajectory();
 	void BuildActorClass();
 	void BuildCriticClass();
+	void LearnQvalueFuntion();
+	void LearnPolicyFuntion();
 
 	public:
 	HyperParameters m_parameters;
 	ndBrain m_policy;
 	ndBrain m_critic;
+	ndBrain m_referencePolicy;
+	ndBrain m_referenceCritic;
 	ndString m_name;
 	ndBrainAgentDDPG_Agent::ndTrajectoryTransition m_replayBuffer;
 	ndBrainAgentDDPG_Agent* m_agent;
+	ndBrainOptimizerAdam* m_criticOptimizer;
+	ndArray<ndBrainTrainer*> m_criticTrainers;
 	ndArray<ndInt32> m_shuffleBuffer;
 	ndUnsigned32 m_frameCount;
 	ndUnsigned32 m_eposideCount;
 	ndInt32 m_replayBufferIndex;
-	ndUnsigned32 m_startOptimization;
+	bool m_startOptimization;
+	ndUnsigned32 m_shuffleIndexBuffer;
 
 	friend class ndBrainAgentDDPG_Agent;
 };
