@@ -31,7 +31,6 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	D_NEWTON_API void SetLocalTargetPosition(const ndVector& posit);
 	
 	D_NEWTON_API ndVector GetEffectorPosit() const;
-	//D_NEWTON_API ndVector GetGlobalPosition() const;
 	
 	D_NEWTON_API ndVector GetRestPosit() const;
 	D_NEWTON_API void SetRestPosit(const ndVector& posit);
