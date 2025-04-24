@@ -43,8 +43,8 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 	m_neuronPerLayers = 64;
 	m_maxTrajectorySteps = 4096;
 	m_extraTrajectorySteps = 1024;
-	//m_bashTrajectoryCount = 100;
-	m_bashTrajectoryCount = 500;
+	//m_batchTrajectoryCount = 100;
+	m_batchTrajectoryCount = 500;
 
 	m_numberOfActions = 0;
 	m_numberOfObservations = 0;
@@ -297,7 +297,7 @@ void ndBrainAgentDiscretePolicyGradient_Trainer::SaveTrajectory()
 {
 	if (m_trajectory.GetCount())
 	{
-		m_master->m_bashTrajectoryIndex++;
+		m_master->m_batchTrajectoryIndex++;
 
 		while (m_trajectory.GetTerminalState(m_trajectory.GetCount() - 2))
 		{
@@ -365,9 +365,9 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::ndBrainAgentDiscretePolicyGrad
 	,m_batchBufferSize(hyperParameters.m_batchBufferSize)
 	,m_maxTrajectorySteps(hyperParameters.m_maxTrajectorySteps)
 	,m_extraTrajectorySteps(hyperParameters.m_extraTrajectorySteps)
-	,m_bashTrajectoryIndex(0)
-	,m_bashTrajectoryCount(hyperParameters.m_bashTrajectoryCount)
-	,m_bashTrajectorySteps(hyperParameters.m_bashTrajectoryCount* m_maxTrajectorySteps)
+	,m_batchTrajectoryIndex(0)
+	,m_batchTrajectoryCount(hyperParameters.m_batchTrajectoryCount)
+	,m_bashTrajectorySteps(hyperParameters.m_batchTrajectoryCount* m_maxTrajectorySteps)
 	,m_baseValueWorkingBufferSize(0)
 	,m_randomSeed(hyperParameters.m_randomSeed)
 	,m_workingBuffer()
@@ -379,8 +379,8 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::ndBrainAgentDiscretePolicyGrad
 	ndAssert(m_numberOfObservations);
 	ndSetRandSeed(m_randomSeed);
 	
-	m_randomGenerator = new ndBrainAgentDiscretePolicyGradient_Trainer::ndRandomGenerator[size_t(hyperParameters.m_bashTrajectoryCount)];
-	for (ndInt32 i = 0; i < hyperParameters.m_bashTrajectoryCount; ++i)
+	m_randomGenerator = new ndBrainAgentDiscretePolicyGradient_Trainer::ndRandomGenerator[size_t(hyperParameters.m_batchTrajectoryCount)];
+	for (ndInt32 i = 0; i < hyperParameters.m_batchTrajectoryCount; ++i)
 	{
 		m_randomSeed++;
 		m_randomGenerator[i].m_gen.seed(m_randomSeed);
@@ -586,7 +586,7 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::SetName(const ndString& n
 
 ndBrainAgentDiscretePolicyGradient_Trainer::ndRandomGenerator* ndBrainAgentDiscretePolicyGradient_TrainerMaster::GetRandomGenerator()
 {
-	m_randomSeed = (m_randomSeed + 1) % m_bashTrajectoryCount;
+	m_randomSeed = (m_randomSeed + 1) % m_batchTrajectoryCount;
 	return &m_randomGenerator[m_randomSeed];
 }
 
@@ -916,7 +916,7 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::OptimizeCritic()
 		averageSum += m_trajectoryAccumulator.GetAdvantage(i);
 	}
 	m_averageScore.Update(averageSum / ndBrainFloat(stepNumber));
-	m_averageFramesPerEpisodes.Update(ndBrainFloat(stepNumber) / ndBrainFloat(m_bashTrajectoryIndex));
+	m_averageFramesPerEpisodes.Update(ndBrainFloat(stepNumber) / ndBrainFloat(m_batchTrajectoryIndex));
 	
 	ndAtomic<ndInt32> iterator(0);
 	m_workingBuffer.SetCount(m_baseValueWorkingBufferSize * GetThreadCount());
@@ -972,12 +972,12 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::OptimizeStep()
 	}
 
 	ndInt32 trajectoryAccumulatorCount = m_trajectoryAccumulator.GetCount();
-	if ((m_bashTrajectoryIndex >= m_bashTrajectoryCount) && (trajectoryAccumulatorCount >= m_bashTrajectorySteps))
+	if ((m_batchTrajectoryIndex >= m_batchTrajectoryCount) && (trajectoryAccumulatorCount >= m_bashTrajectorySteps))
 	{
 		Optimize();
 		m_eposideCount++;
 		m_framesAlive = 0;
-		m_bashTrajectoryIndex = 0;
+		m_batchTrajectoryIndex = 0;
 		m_trajectoryAccumulator.SetCount(0);
 		for (ndList<ndBrainAgentDiscretePolicyGradient_Trainer*>::ndNode* node = m_agents.GetFirst(); node; node = node->GetNext())
 		{

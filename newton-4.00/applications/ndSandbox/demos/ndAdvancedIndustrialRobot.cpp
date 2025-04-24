@@ -1033,7 +1033,7 @@ namespace ndAdvancedRobot
 			//hyperParameters.m_threadsCount = 1;
 			hyperParameters.m_maxTrajectorySteps = 1024 * 4;
 			hyperParameters.m_extraTrajectorySteps = maxExtraSteps;
-			hyperParameters.m_bashTrajectoryCount = 1000;
+			hyperParameters.m_batchTrajectoryCount = 1000;
 			hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
 			hyperParameters.m_numberOfActions = ND_AGENT_OUTPUT_SIZE;
 			hyperParameters.m_numberOfObservations = ND_AGENT_INPUT_SIZE;

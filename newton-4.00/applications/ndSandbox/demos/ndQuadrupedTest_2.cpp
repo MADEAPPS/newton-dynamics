@@ -847,7 +847,7 @@ namespace ndQuadruped_2
 				}
 			}
 
-			//scene->SetAcceleratedUpdate();
+			scene->SetAcceleratedUpdate();
 		}
 
 		~TrainingUpdata()

@@ -1350,9 +1350,9 @@ namespace ndQuadruped_5
 
 			//hyperParameters.m_threadsCount = 1;
 			hyperParameters.m_randomSeed = 147;
-			hyperParameters.m_bashTrajectoryCount = 500;
+			hyperParameters.m_batchTrajectoryCount = 500;
 			hyperParameters.m_maxTrajectorySteps = 1024 * 8;
-			//hyperParameters.m_bashTrajectoryCount = 10;
+			//hyperParameters.m_batchTrajectoryCount = 10;
 			hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
 			hyperParameters.m_numberOfActions = ND_AGENT_OUTPUT_SIZE;
 			hyperParameters.m_numberOfObservations = ND_AGENT_INPUT_SIZE;

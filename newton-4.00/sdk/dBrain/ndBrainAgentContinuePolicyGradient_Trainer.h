@@ -39,8 +39,8 @@
 class ndBrainOptimizerAdam;
 class ndBrainAgentContinuePolicyGradient_TrainerMaster;
 
-
-class ndPolicyGradientActivation : public ndBrainLayerActivationTanh
+//class ndPolicyGradientActivation : public ndBrainLayerActivationTanh
+class ndPolicyGradientActivation : public ndBrainLayerActivation
 {
 	public:
 	ndPolicyGradientActivation(ndInt32 neurons);
@@ -168,7 +168,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndInt32 m_batchBufferSize;
 		ndInt32 m_neuronPerLayers;
 		ndInt32 m_maxTrajectorySteps;
-		ndInt32 m_bashTrajectoryCount;
+		ndInt32 m_batchTrajectoryCount;
 		ndUnsigned32 m_randomSeed;
 		ndBrainOptimizer::ndRegularizerType m_regularizerType;
 	};
@@ -207,36 +207,33 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	void OptimizePolicy();
 	void OptimizeCritic();
 	void CalculateAdvange();
+
+	void BuildPolicyClass();
+	void BuildCricticClass();
+
 	ndBrainAgentContinuePolicyGradient_Agent::ndRandomGenerator* GetRandomGenerator();
 
 	ndBrain m_policy;
 	ndBrain m_critic;
+	ndBrain m_referenceCritic;
+	const HyperParameters m_parameters;
 	ndArray<ndBrainTrainer*> m_criticTrainers;
 	ndArray<ndBrainTrainer*> m_policyTrainers;
 	ndArray<ndBrainTrainer*> m_policyWeightedTrainer;
 	ndArray<ndBrainTrainer*> m_policyAuxiliaryTrainers;
 
-	ndBrainOptimizerAdam* m_criticOptimizer;
-	ndBrainOptimizerAdam* m_policyOptimizer;
+	ndSharedPtr<ndBrainOptimizerAdam> m_criticOptimizer;
+	ndSharedPtr<ndBrainOptimizerAdam> m_policyOptimizer;
 
 	ndArray<ndInt32> m_randomPermutation;
 	ndList<ndBrainAgentContinuePolicyGradient_Agent::ndRandomGenerator> m_randomGenerator;
 	ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition m_trajectoryAccumulator;
 	
-	ndBrainFloat m_gamma;
-	ndBrainFloat m_policyLearnRate;
-	ndBrainFloat m_criticLearnRate;
-
-	ndInt32 m_numberOfActions;
-	ndInt32 m_numberOfObservations;
 	ndInt32 m_framesAlive;
 	ndUnsigned32 m_frameCount;
 	ndUnsigned32 m_eposideCount;
-	ndInt32 m_batchBufferSize;
-	ndInt32 m_maxTrajectorySteps;
 	ndInt32 m_extraTrajectorySteps;
-	ndInt32 m_bashTrajectoryIndex;
-	ndInt32 m_bashTrajectoryCount;
+	ndInt32 m_batchTrajectoryIndex;
 	ndInt32 m_baseValueWorkingBufferSize;
 	ndUnsigned32 m_randomSeed;
 	ndBrainVector m_workingBuffer;

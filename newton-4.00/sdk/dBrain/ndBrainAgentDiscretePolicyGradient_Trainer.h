@@ -139,7 +139,7 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndInt32 m_batchBufferSize;
 		ndInt32 m_neuronPerLayers;
 		ndInt32 m_maxTrajectorySteps;
-		ndInt32 m_bashTrajectoryCount;
+		ndInt32 m_batchTrajectoryCount;
 		ndInt32 m_extraTrajectorySteps;
 		ndUnsigned32 m_randomSeed;
 	};
@@ -212,8 +212,8 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndInt32 m_batchBufferSize;
 	ndInt32 m_maxTrajectorySteps;
 	ndInt32 m_extraTrajectorySteps;
-	ndInt32 m_bashTrajectoryIndex;
-	ndInt32 m_bashTrajectoryCount;
+	ndInt32 m_batchTrajectoryIndex;
+	ndInt32 m_batchTrajectoryCount;
 	ndInt32 m_bashTrajectorySteps;
 	ndInt32 m_baseValueWorkingBufferSize;
 	ndUnsigned32 m_randomSeed;

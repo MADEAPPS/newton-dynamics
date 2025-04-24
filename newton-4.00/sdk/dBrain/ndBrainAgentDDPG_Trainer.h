@@ -161,6 +161,8 @@ class ndBrainAgentDDPG_Trainer : public ndBrainThreadPool
 	ndBrain* GetPolicyNetwork();
 
 	void OptimizeStep();
+
+	bool IsSampling() const;
 	ndUnsigned32 GetFramesCount() const;
 	ndUnsigned32 GetEposideCount() const;
 

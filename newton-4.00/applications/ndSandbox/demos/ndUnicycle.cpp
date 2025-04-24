@@ -643,7 +643,7 @@ namespace ndUnicycle
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 			
 			#ifdef ND_SYMMETRIC_MDP
-				hyperParameters.m_bashTrajectoryCount *= 2;
+				hyperParameters.m_batchTrajectoryCount *= 2;
 			#endif	
 			//hyperParameters.m_threadsCount = 1;
 			hyperParameters.m_numberOfActions = m_actionsSize;
