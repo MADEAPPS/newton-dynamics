@@ -233,8 +233,6 @@ void ndBrain::CalculateInputGradient(const ndBrainVector& input, ndBrainVector& 
 	ndBrainFloat* const memBuffer = ndAlloca(ndBrainFloat, sizeAcc + 8);
 	ndBrainFloat* const gradientBuffer = ndAlloca(ndBrainFloat, maxSize * 2 + 256);
 
-	//ndBrainMemVector in0(memBuffer, input.GetCount());
-	//in0.Set(input);
 	ndMemCpy(memBuffer, &input[0], input.GetCount());
 	for (ndInt32 i = 0; i < GetCount(); ++i)
 	{
@@ -245,7 +243,6 @@ void ndBrain::CalculateInputGradient(const ndBrainVector& input, ndBrainVector& 
 
 	ndBrainMemVector gradientIn(gradientBuffer, GetOutputSize());
 	ndBrainMemVector gradientOut(gradientBuffer + maxSize + 128, GetOutputSize());
-	//gradientOut.Set(ndBrainFloat(1.0f));
 	loss.GetLoss(gradientIn, gradientOut);
 
 	for (ndInt32 i = ndInt32(layers.GetCount()) - 1; i >= 0; --i)

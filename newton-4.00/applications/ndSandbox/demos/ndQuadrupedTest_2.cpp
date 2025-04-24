@@ -591,7 +591,7 @@ namespace ndQuadruped_2
 				
 				const ndVector resPosit(leg.m_effector->GetRestPosit());
 				const ndVector effectorPosit(leg.m_effector->GetEffectorPosit());
-				ndVector relativePosit(leg.m_effector->GetEffectorPosit() - resPosit);
+				ndVector relativePosit(effectorPosit - resPosit);
 
 				relativePosit.m_x += actions[size * i + m_leg0_x] * D_ACTION_SPEED;
 				relativePosit.m_y += actions[size * i + m_leg0_y] * D_ACTION_SPEED;

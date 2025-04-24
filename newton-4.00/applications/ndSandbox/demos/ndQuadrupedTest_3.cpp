@@ -36,9 +36,9 @@ namespace ndQuadruped_3
 
 	enum ndActionSpace
 	{
-		//m_leg0_x,
+		m_leg0_x,
 		m_leg0_y,
-		//m_leg0_z,
+		m_leg0_z,
 
 		//m_leg1_x,
 		//m_leg1_y,
@@ -57,9 +57,9 @@ namespace ndQuadruped_3
 
 	enum ndStateSpace
 	{
-		//m_leg0_posit_x,
+		m_leg0_posit_x,
 		m_leg0_posit_y,
-		//m_leg0_posit_z,
+		m_leg0_posit_z,
 
 		//m_leg1_posit_x,
 		//m_leg1_posit_y,
@@ -511,9 +511,10 @@ namespace ndQuadruped_3
 					ndFloat32 legReward = ndExp(-200000.0f * error2);
 					reward += legReward;
 				}
+				break;
 			}
 			//return ndBrainFloat(reward / 12.0f);
-			return ndBrainFloat(1.0f);
+			return ndBrainFloat(reward / 3.0f);
 		}
 
 		#pragma optimize( "", off )
@@ -546,7 +547,9 @@ namespace ndQuadruped_3
 				//observations[i * size + m_leg0_posit_x] = effectorRelPosit.m_x;
 				//observations[i * size + m_leg0_posit_y] = effectorRelPosit.m_y;
 				//observations[i * size + m_leg0_posit_z] = effectorRelPosit.m_z;
-				observations[0] = effectorRelPosit.m_y;
+				observations[m_leg0_posit_x] = effectorRelPosit.m_x;
+				observations[m_leg0_posit_y] = effectorRelPosit.m_y;
+				observations[m_leg0_posit_z] = effectorRelPosit.m_z;
 			}
 		}
 
@@ -564,7 +567,7 @@ namespace ndQuadruped_3
 				
 				const ndVector resPosit(leg.m_effector->GetRestPosit());
 				const ndVector effectorPosit(leg.m_effector->GetEffectorPosit());
-				ndVector relativePosit(leg.m_effector->GetEffectorPosit() - resPosit);
+				ndVector relativePosit(effectorPosit - resPosit);
 			
 				//relativePosit.m_x += actions[size * i + m_leg0_x] * D_ACTION_SPEED;
 				//relativePosit.m_y += actions[size * i + m_leg0_y] * D_ACTION_SPEED;
@@ -572,7 +575,9 @@ namespace ndQuadruped_3
 
 				if (i == 0)
 				{
+					relativePosit.m_x += actions[3 * i + m_leg0_x] * D_ACTION_SPEED;
 					relativePosit.m_y += actions[3 * i + m_leg0_y] * D_ACTION_SPEED;
+					relativePosit.m_z += actions[3 * i + m_leg0_z] * D_ACTION_SPEED;
 					const ndVector newPosit(relativePosit + resPosit);
 					effector->SetLocalTargetPosition(newPosit);
 				}

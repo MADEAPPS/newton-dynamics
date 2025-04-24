@@ -58,8 +58,7 @@ ndBrainAgentDDPG_Trainer::HyperParameters::HyperParameters()
 
 m_threadsCount = 1;
 m_replayBufferSize /= 10;
-m_replayBufferStartOptimizeSize /= 10;
-
+m_replayBufferStartOptimizeSize /= 4;
 }
 
 ndBrainAgentDDPG_Agent::ndTrajectoryTransition::ndTrajectoryTransition(ndInt32 actionsSize, ndInt32 obsevationsSize)
@@ -533,8 +532,6 @@ void ndBrainAgentDDPG_Trainer::LearnQvalueFunction()
 	}
 	ndFloat32 averageExpectedReward = expectedRewardSum / ndFloat32(m_parameters.m_miniBatchSize * m_parameters.m_criticUpdatesCount);
 	m_averageScore.Update(averageExpectedReward);
-
-	//m_referenceCritic.CopyFrom(m_critic);
 }
 
 #pragma optimize( "", off )
@@ -550,34 +547,57 @@ void ndBrainAgentDDPG_Trainer::LearnPolicyFunction()
 			m_shuffleIndexBuffer = (m_shuffleIndexBuffer + 1) % ndInt32(m_shuffleBuffer.GetCount());
 		}
 		
-		auto BackPropagateBash = ndMakeObject::ndFunction([this, &iterator, &indirectBuffer](ndInt32, ndInt32)
+		auto BackPropagateBash = ndMakeObject::ndFunction([this, &iterator, &indirectBuffer](ndInt32 threadIndex, ndInt32)
 		{
 			class ndLoss : public ndBrainLossLeastSquaredError
 			{
 				public:
-				ndLoss(ndBrainAgentDDPG_Trainer* const owner, const ndInt32 index)
+				ndLoss(ndBrainAgentDDPG_Trainer* const owner, const ndInt32 index, ndInt32 m_threadIndex)
 					:ndBrainLossLeastSquaredError(1)
+					,m_criticLoss()
 					,m_owner(owner)
 					,m_combinedActionObservation()
 					,m_index(index)
+					,m_threadIndex(m_threadIndex)
 				{
 					m_combinedInputGradients.SetCount(m_owner->m_parameters.m_numberOfObservations + m_owner->m_parameters.m_numberOfActions);
 					m_combinedActionObservation.SetCount(m_owner->m_parameters.m_numberOfObservations + m_owner->m_parameters.m_numberOfActions);
 				}
 
+				class ndCriticLoss: public ndBrainLossLeastSquaredError
+				{
+					public:
+					ndCriticLoss()
+						:ndBrainLossLeastSquaredError(1)
+					{
+					}
+
+					void GetLoss(const ndBrainVector&, ndBrainVector& loss)
+					{
+						loss[0] = -1.0f;
+					}
+				};
+
 				void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
 				{
 					ndMemCpy(&m_combinedActionObservation[0], &output[0], m_owner->m_parameters.m_numberOfActions);
 					ndMemCpy(&m_combinedActionObservation[m_owner->m_parameters.m_numberOfActions], m_owner->m_replayBuffer.GetNextObservations(m_index), m_owner->m_parameters.m_numberOfObservations);
-					m_owner->m_critic.CalculateInputGradient(m_combinedActionObservation, m_combinedInputGradients);
+
+					//m_owner->m_critic.CalculateInputGradient(m_combinedActionObservation, m_combinedInputGradients);
+					//ndMemCpy(&loss[0], &m_combinedInputGradients[0], loss.GetCount());
+					//loss.Scale(-1.0f);
+
+					ndBrainTrainer& trainer = *m_owner->m_criticTrainers[m_threadIndex];
+					trainer.BackPropagate(m_combinedActionObservation, m_combinedInputGradients, m_criticLoss);
 					ndMemCpy(&loss[0], &m_combinedInputGradients[0], loss.GetCount());
-					loss.Scale(-1.0f);
 				}
 
+				ndCriticLoss m_criticLoss;
 				ndBrainAgentDDPG_Trainer* m_owner;
 				ndBrainFixSizeVector<256> m_combinedInputGradients;
 				ndBrainFixSizeVector<256> m_combinedActionObservation;
 				ndInt32 m_index;
+				ndInt32 m_threadIndex;
 			};
 
 			for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
@@ -586,7 +606,7 @@ void ndBrainAgentDDPG_Trainer::LearnPolicyFunction()
 				ndBrainTrainer& trainer = *m_policyTrainers[i];
 				const ndBrainMemVector observation(m_replayBuffer.GetObservations(index), m_parameters.m_numberOfObservations);
 
-				ndLoss loss(this, index);
+				ndLoss loss(this, index, threadIndex);
 				trainer.BackPropagate(observation, loss);
 			}
 		});
@@ -595,15 +615,14 @@ void ndBrainAgentDDPG_Trainer::LearnPolicyFunction()
 		ndBrainThreadPool::ParallelExecute(BackPropagateBash);
 		m_policyOptimizer->Update(this, m_policyTrainers, m_parameters.m_policyLearnRate);
 	}
+	//m_referencePolicy.SoftCopy(m_policy, m_parameters.m_policyMovingAverageFactor);
 }
 
 #pragma optimize( "", off )
 void ndBrainAgentDDPG_Trainer::Optimize()
 {
 	LearnQvalueFunction();
-	//LearnPolicyFunction();
-
-	m_referencePolicy.SoftCopy(m_policy, m_parameters.m_policyMovingAverageFactor);
+	LearnPolicyFunction();
 }
 
 #pragma optimize( "", off )
