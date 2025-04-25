@@ -101,6 +101,13 @@ ndBrainFloat ndBrainAgentDDPG_Agent::ndTrajectoryTransition::GetReward(ndInt32 e
 	return me[stride * entry + m_reward];
 }
 
+void ndBrainAgentDDPG_Agent::ndTrajectoryTransition::SetReward(ndInt32 entry, ndBrainFloat reward)
+{
+	ndTrajectoryTransition& me = *this;
+	ndInt64 stride = m_transitionSize + m_actionsSize + m_obsevationsSize * 2;
+	me[stride * entry + m_reward] = reward;
+}
+
 bool ndBrainAgentDDPG_Agent::ndTrajectoryTransition::GetTerminalState(ndInt32 entry) const
 {
 	const ndTrajectoryTransition& me = *this;
@@ -115,53 +122,46 @@ void ndBrainAgentDDPG_Agent::ndTrajectoryTransition::SetTerminalState(ndInt32 en
 	me[stride * entry + m_isterminalState] = isTernimal ? ndBrainFloat(999.0f) : ndBrainFloat(-999.0f);
 }
 
-void ndBrainAgentDDPG_Agent::ndTrajectoryTransition::SetReward(ndInt32 entry, ndBrainFloat reward)
-{
-	ndTrajectoryTransition& me = *this;
-	ndInt64 stride = m_transitionSize + m_actionsSize + m_obsevationsSize * 2;
-	me[stride * entry + m_reward] = reward;
-}
-
 ndBrainFloat* ndBrainAgentDDPG_Agent::ndTrajectoryTransition::GetActions(ndInt32 entry)
 {
 	ndTrajectoryTransition& me = *this;
 	ndInt64 stride = m_transitionSize + m_actionsSize + m_obsevationsSize * 2;
-	return &me[stride * entry + m_obsevationsSize + m_transitionSize];
+	return &me[stride * entry + m_transitionSize];
 }
 
 const ndBrainFloat* ndBrainAgentDDPG_Agent::ndTrajectoryTransition::GetActions(ndInt32 entry) const
 {
 	const ndTrajectoryTransition& me = *this;
 	ndInt64 stride = m_transitionSize + m_actionsSize + m_obsevationsSize * 2;
-	return &me[stride * entry + m_obsevationsSize + m_transitionSize];
+	return &me[stride * entry + m_transitionSize];
 }
 
 ndBrainFloat* ndBrainAgentDDPG_Agent::ndTrajectoryTransition::GetObservations(ndInt32 entry)
 {
 	ndTrajectoryTransition& me = *this;
 	ndInt64 stride = m_transitionSize + m_actionsSize + m_obsevationsSize * 2;
-	return &me[stride * entry + m_transitionSize];
+	return &me[stride * entry + m_transitionSize + m_actionsSize];
 }
 
 const ndBrainFloat* ndBrainAgentDDPG_Agent::ndTrajectoryTransition::GetObservations(ndInt32 entry) const
 {
 	const ndTrajectoryTransition& me = *this;
 	ndInt64 stride = m_transitionSize + m_actionsSize + m_obsevationsSize * 2;
-	return &me[stride * entry + m_transitionSize];
+	return &me[stride * entry + m_transitionSize + m_actionsSize];
 }
 
 ndBrainFloat* ndBrainAgentDDPG_Agent::ndTrajectoryTransition::GetNextObservations(ndInt32 entry)
 {
 	ndTrajectoryTransition& me = *this;
 	ndInt64 stride = m_transitionSize + m_actionsSize + m_obsevationsSize * 2;
-	return &me[stride * entry + m_transitionSize + m_obsevationsSize];
+	return &me[stride * entry + m_transitionSize + m_actionsSize + m_obsevationsSize];
 }
 
 const ndBrainFloat* ndBrainAgentDDPG_Agent::ndTrajectoryTransition::GetNextObservations(ndInt32 entry) const
 {
 	const ndTrajectoryTransition& me = *this;
 	ndInt64 stride = m_transitionSize + m_actionsSize + m_obsevationsSize * 2;
-	return &me[stride * entry + m_transitionSize + m_obsevationsSize];
+	return &me[stride * entry + m_transitionSize + m_actionsSize + m_obsevationsSize];
 }
 
 ndBrainAgentDDPG_Agent::ndBrainAgentDDPG_Agent(const ndSharedPtr<ndBrainAgentDDPG_Trainer>& master)
@@ -397,18 +397,22 @@ void ndBrainAgentDDPG_Trainer::SaveTrajectory()
 			// populate replay buffer
 			ndInt32 index = m_replayBuffer.GetCount();
 
-			// add last state, since it is unique
-			m_replayBuffer.SetCount(m_replayBuffer.GetCount() + 1);
-			m_replayBuffer.CopyFrom(index, m_agent->m_trajectory, m_agent->m_trajectory.GetCount() - 1);
-			m_shuffleBuffer.PushBack(index);
-			index++;
-			for (ndInt32 i = m_agent->m_trajectory.GetCount() - 2; (i >= 0) && (index < m_parameters.m_replayBufferSize); --i)
+			const ndInt32 numOfTranstrions = m_agent->m_trajectory.GetCount() - 1;
+			for (ndInt32 i = 0; (i < numOfTranstrions) && (index < m_parameters.m_replayBufferSize); ++i)
 			{
 				m_shuffleBuffer.PushBack(index);
 				m_replayBuffer.SetCount(m_replayBuffer.GetCount() + 1);
 				m_replayBuffer.CopyFrom(index, m_agent->m_trajectory, i);
+
+				ndBrainFloat reward = m_agent->m_trajectory.GetReward(i + 1);
+				m_replayBuffer.SetReward(index, reward);
+
+				bool terminalState = m_agent->m_trajectory.GetTerminalState(i + 1);
+				m_replayBuffer.SetTerminalState(index, terminalState);
+
 				ndBrainMemVector nextObservation(m_replayBuffer.GetNextObservations(index), m_parameters.m_numberOfObservations);
 				nextObservation.Set(ndBrainMemVector(m_agent->m_trajectory.GetObservations(i + 1), m_parameters.m_numberOfObservations));
+
 				index++;
 			}
 
@@ -422,14 +426,21 @@ void ndBrainAgentDDPG_Trainer::SaveTrajectory()
 		}
 		else
 		{
-			// overide old transitions.
-			m_replayBuffer.CopyFrom(m_replayBufferIndex, m_agent->m_trajectory, m_agent->m_trajectory.GetCount() - 1);
-			m_replayBufferIndex = (m_replayBufferIndex + 1) % m_parameters.m_replayBufferSize;
-			for (ndInt32 i = m_agent->m_trajectory.GetCount() - 2; i >= 0; --i)
+			// overide old replay buffer transitions.
+			const ndInt32 numOfTranstrions = m_agent->m_trajectory.GetCount() - 1;
+			for (ndInt32 i = 0; i < numOfTranstrions; ++i)
 			{
 				m_replayBuffer.CopyFrom(m_replayBufferIndex, m_agent->m_trajectory, i);
+
+				ndBrainFloat reward = m_agent->m_trajectory.GetReward(i + 1);
+				m_replayBuffer.SetReward(m_replayBufferIndex, reward);
+
+				bool terminalState = m_agent->m_trajectory.GetTerminalState(i + 1);
+				m_replayBuffer.SetTerminalState(m_replayBufferIndex, terminalState);
+
 				ndBrainMemVector nextObservation(m_replayBuffer.GetNextObservations(m_replayBufferIndex), m_parameters.m_numberOfObservations);
 				nextObservation.Set(ndBrainMemVector(m_agent->m_trajectory.GetObservations(i + 1), m_parameters.m_numberOfObservations));
+
 				m_replayBufferIndex = (m_replayBufferIndex + 1) % m_parameters.m_replayBufferSize;
 			}
 		}
