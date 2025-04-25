@@ -205,6 +205,7 @@ void ndBrainAgentDDPG_Agent::Step()
 	GetObservation(&observation[0]);
 	ndBrainFloat reward = CalculateReward();
 	m_trajectory.SetReward(entryIndex, reward);
+	m_trajectory.SetTerminalState(entryIndex, IsTerminal());
 
 	m_owner->m_policy.MakePrediction(observation, actions, m_workingBuffer);
 	// explore environment
@@ -212,9 +213,7 @@ void ndBrainAgentDDPG_Agent::Step()
 	{
 		actions[i] = PerturbeAction(actions[i]);
 	}
-	
 	ApplyActions(&actions[0]);
-	m_trajectory.SetTerminalState(entryIndex, IsTerminal());
 }
 
 ndBrainAgentDDPG_Trainer::ndBrainAgentDDPG_Trainer(const HyperParameters& parameters)
@@ -627,7 +626,6 @@ void ndBrainAgentDDPG_Trainer::LearnPolicyFunction()
 		ndBrainThreadPool::ParallelExecute(BackPropagateBatch);
 		m_policyOptimizer->Update(this, m_policyTrainers, m_parameters.m_policyLearnRate);
 	}
-	//m_referencePolicy.SoftCopy(m_policy, m_parameters.m_policyMovingAverageFactor);
 }
 
 #pragma optimize( "", off )
