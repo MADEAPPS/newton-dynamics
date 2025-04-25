@@ -100,7 +100,6 @@ namespace ndQuadruped_3
 	#define D_POSE_REST_POSITION_Y	ndReal(-0.3f)
 
 	#define D_ACTION_SPEED			ndReal(0.01f)
-	#define D_MIN_TRAJECTORY_FRAMES	256
 
 	class RobotModelNotify : public ndModelNotify
 	{
@@ -458,12 +457,6 @@ namespace ndQuadruped_3
 				{
 					return true;
 				}
-			}
-
-			ndInt32 minFrames = m_controllerTrainer->m_trajectory.GetCount();
-			if (minFrames < D_MIN_TRAJECTORY_FRAMES)
-			{
-				return false;
 			}
 
 			ndSharedPtr<ndAnimationBlendTreeNode> node = m_controllerTrainer->m_poseGenerator;

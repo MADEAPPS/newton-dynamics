@@ -453,7 +453,7 @@ void ndBrainAgentDDPG_Trainer::SaveTrajectory()
 	}
 
 	bool terminalState = m_agent->m_trajectory.GetTerminalState(m_agent->m_trajectory.GetCount() - 1);
-	if (terminalState)
+	if (terminalState || (m_agent->m_trajectoryBaseCount >= m_parameters.m_maxTrajectorySteps))
 	{
 		if (m_startOptimization)
 		{
@@ -649,16 +649,9 @@ void ndBrainAgentDDPG_Trainer::Optimize()
 	LearnPolicyFunction();
 }
 
-int xxxxxxxxxxxxxxxxxxx;
 #pragma optimize( "", off )
 void ndBrainAgentDDPG_Trainer::OptimizeStep()
 {
-	//ndExpandTraceMessage("xxxxxxx: %d\n", xxxxxxxxxxxxxxxxxxx);
-	if (xxxxxxxxxxxxxxxxxxx >= 8789)
-	{
-		xxxxxxxxxxxxxxxxxxx *= 1;
-	}
-	xxxxxxxxxxxxxxxxxxx++;
 	SaveTrajectory();
 	if (m_startOptimization)
 	{
