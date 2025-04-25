@@ -114,6 +114,7 @@ class ndBrainAgentDDPG_Agent: public ndBrainAgent
 	ndSharedPtr<ndBrainAgentDDPG_Trainer> m_owner;
 	ndTrajectoryTransition m_trajectory;
 	ndBrainVector m_workingBuffer;
+	ndInt32 m_trajectoryBaseCount;
 	friend class ndBrainAgentDDPG_Trainer;
 };
 

@@ -454,7 +454,7 @@ namespace ndQuadruped_3
 				{
 					return true;
 				}
-				if (omega.DotProduct(omega).GetScalar() > 10000.0f)
+				if (omega.DotProduct(omega).GetScalar() > 2000.0f)
 				{
 					return true;
 				}
