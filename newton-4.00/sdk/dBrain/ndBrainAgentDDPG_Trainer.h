@@ -176,22 +176,25 @@ class ndBrainAgentDDPG_Trainer : public ndBrainThreadPool
 	void SaveTrajectory();
 	void BuildPolicyClass();
 	void BuildCriticClass();
-	void LearnQvalueFunction();
 	void LearnPolicyFunction();
+	void CalculateExpectedRewards();
+	void LearnQvalueFunction(ndInt32 criticIndex);
 
 	public:
 	HyperParameters m_parameters;
 	ndBrain m_policy;
-	ndBrain m_critic;
+	ndBrain m_critic[2];
 	ndBrain m_referencePolicy;
-	ndBrain m_referenceCritic;
+	ndBrain m_referenceCritic[2];
 	ndString m_name;
+	ndBrainVector m_expectedRewards;
+	ndArray<ndInt32> m_expectedRewardsIndexBuffer;
 	ndBrainAgentDDPG_Agent::ndTrajectoryTransition m_replayBuffer;
 	ndBrainAgentDDPG_Agent* m_agent;
 	ndSharedPtr<ndBrainOptimizerAdam> m_policyOptimizer;
-	ndSharedPtr<ndBrainOptimizerAdam> m_criticOptimizer;
+	ndSharedPtr<ndBrainOptimizerAdam> m_criticOptimizer[2];
 	ndArray<ndBrainTrainer*> m_policyTrainers;
-	ndArray<ndBrainTrainer*> m_criticTrainers;
+	ndArray<ndBrainTrainer*> m_criticTrainers[2];
 	ndArray<ndInt32> m_shuffleBuffer;
 	ndMovingAverage<8> m_averageScore;
 	ndMovingAverage<32> m_averageFramesPerEpisodes;
