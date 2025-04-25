@@ -588,7 +588,8 @@ void ndBrainAgentDDPG_Trainer::LearnPolicyFunction()
 					//loss.Scale(-1.0f);
 
 					ndBrainTrainer& trainer = *m_owner->m_criticTrainers[m_threadIndex];
-					trainer.BackPropagate(m_combinedActionObservation, m_combinedInputGradients, m_criticLoss);
+					//trainer.BackPropagate(m_combinedActionObservation, m_criticLoss);
+					trainer.CalculateInputGradient(m_combinedActionObservation, m_combinedInputGradients, m_criticLoss);
 					ndMemCpy(&loss[0], &m_combinedInputGradients[0], loss.GetCount());
 				}
 

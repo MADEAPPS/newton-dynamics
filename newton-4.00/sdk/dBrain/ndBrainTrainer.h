@@ -40,7 +40,7 @@ class ndBrainTrainer: public ndClassAlloc
 	ndBrain* GetBrain() const;
 	void AcculumateGradients(const ndBrainTrainer& src, ndInt32 index);
 	void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss);
-	void BackPropagate(const ndBrainVector& input, ndBrainVector& inputGradientsOut, ndBrainLoss& loss);
+	void CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradientsOut, ndBrainLoss& loss);
 
 	ndBrainLayer* GetWeightsLayer(ndInt32 index) const;
 	ndBrainLayer* GetGradientLayer(ndInt32 index) const;
