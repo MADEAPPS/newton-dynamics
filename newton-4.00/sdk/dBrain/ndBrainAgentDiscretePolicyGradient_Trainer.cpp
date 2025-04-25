@@ -367,7 +367,7 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::ndBrainAgentDiscretePolicyGrad
 	,m_extraTrajectorySteps(hyperParameters.m_extraTrajectorySteps)
 	,m_batchTrajectoryIndex(0)
 	,m_batchTrajectoryCount(hyperParameters.m_batchTrajectoryCount)
-	,m_bashTrajectorySteps(hyperParameters.m_batchTrajectoryCount* m_maxTrajectorySteps)
+	,m_batchTrajectorySteps(hyperParameters.m_batchTrajectoryCount* m_maxTrajectorySteps)
 	,m_baseValueWorkingBufferSize(0)
 	,m_randomSeed(hyperParameters.m_randomSeed)
 	,m_workingBuffer()
@@ -509,7 +509,7 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::Normalize(ndBrain& actor)
 			ndBrainMemVector groundTruth(outMemory, m_brain.GetOutputSize());
 
 			bool stops = false;
-			auto BackPropagateBash = ndMakeObject::ndFunction([this, &iterator, &stops, &input, &groundTruth](ndInt32, ndInt32)
+			auto BackPropagateBatch = ndMakeObject::ndFunction([this, &iterator, &stops, &input, &groundTruth](ndInt32, ndInt32)
 			{
 				class PolicyLoss : public ndBrainLossLeastSquaredError
 				{
@@ -545,7 +545,7 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::Normalize(ndBrain& actor)
 			groundTruth.Set(0.0f);
 			for (ndInt32 i = 0; (i < 10000) && !stops; ++i)
 			{
-				ndBrainThreadPool::ParallelExecute(BackPropagateBash);
+				ndBrainThreadPool::ParallelExecute(BackPropagateBatch);
 				optimizer.Update(this, m_partialGradients, m_learnRate);
 			}
 			//ndBrainFloat* const outMemory1 = ndAlloca(ndBrainFloat, m_brain.GetOutputSize());
@@ -873,7 +873,7 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 	{ 
 		for (ndInt32 base = 0; base < m_randomPermutation.GetCount(); base += m_batchBufferSize)
 		{
-			auto BackPropagateBash = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
+			auto BackPropagateBatch = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
 			{
 				ndBrainFixSizeVector<1> stateValue;
 				ndBrainFixSizeVector<1> stateQValue;
@@ -898,7 +898,7 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 			});
 
 			iterator = 0;
-			ndBrainThreadPool::ParallelExecute(BackPropagateBash);
+			ndBrainThreadPool::ParallelExecute(BackPropagateBatch);
 			m_criticOptimizer->Update(this, m_criticTrainers, m_criticLearnRate);
 		}
 		m_randomPermutation.RandomShuffle(m_randomPermutation.GetCount());
@@ -972,7 +972,7 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::OptimizeStep()
 	}
 
 	ndInt32 trajectoryAccumulatorCount = m_trajectoryAccumulator.GetCount();
-	if ((m_batchTrajectoryIndex >= m_batchTrajectoryCount) && (trajectoryAccumulatorCount >= m_bashTrajectorySteps))
+	if ((m_batchTrajectoryIndex >= m_batchTrajectoryCount) && (trajectoryAccumulatorCount >= m_batchTrajectorySteps))
 	{
 		Optimize();
 		m_eposideCount++;

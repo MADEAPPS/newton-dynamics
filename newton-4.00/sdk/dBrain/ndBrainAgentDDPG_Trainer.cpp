@@ -312,7 +312,6 @@ void ndBrainAgentDDPG_Trainer::BuildPolicyClass()
 		ndBrainTrainer* const trainer = new ndBrainTrainer(&m_policy);
 		m_policyTrainers.PushBack(trainer);
 	}
-
 	m_referencePolicy = m_policy;
 }
 
@@ -468,7 +467,7 @@ void ndBrainAgentDDPG_Trainer::LearnQvalueFunction()
 			m_shuffleIndexBuffer = (m_shuffleIndexBuffer + 1) % ndInt32(m_shuffleBuffer.GetCount());
 		}
 		
-		auto BackPropagateBash = ndMakeObject::ndFunction([this, &iterator, &indirectBuffer, &expectedRewards](ndInt32 threadIndex, ndInt32)
+		auto BackPropagateBatch = ndMakeObject::ndFunction([this, &iterator, &indirectBuffer, &expectedRewards](ndInt32 threadIndex, ndInt32)
 		{
 			class ndLoss : public ndBrainLossLeastSquaredError
 			{
@@ -494,7 +493,8 @@ void ndBrainAgentDDPG_Trainer::LearnQvalueFunction()
 					{
 						ndBrainMemVector nextAction(&m_nexActionObservation[0], m_owner->m_parameters.m_numberOfActions);
 						const ndBrainMemVector nextObservation(m_owner->m_replayBuffer.GetNextObservations(m_index), m_owner->m_parameters.m_numberOfObservations);
-						m_owner->m_referencePolicy.MakePrediction(nextObservation, nextAction);
+						//m_owner->m_referencePolicy.MakePrediction(nextObservation, nextAction);
+						m_owner->m_policy.MakePrediction(nextObservation, nextAction);
 						ndMemCpy(&m_nexActionObservation[m_owner->m_parameters.m_numberOfActions], &nextObservation[0], nextObservation.GetCount());
 						m_owner->m_referenceCritic.MakePrediction(m_nexActionObservation, m_criticQvalue);
 						reward += m_gamma * m_criticQvalue[0];
@@ -531,7 +531,7 @@ void ndBrainAgentDDPG_Trainer::LearnQvalueFunction()
 		});
 
 		iterator = 0;
-		ndBrainThreadPool::ParallelExecute(BackPropagateBash);
+		ndBrainThreadPool::ParallelExecute(BackPropagateBatch);
 		m_criticOptimizer->Update(this, m_criticTrainers, m_parameters.m_criticLearnRate);
 		m_referenceCritic.CopyFrom(m_critic);
 	}
@@ -558,7 +558,7 @@ void ndBrainAgentDDPG_Trainer::LearnPolicyFunction()
 			m_shuffleIndexBuffer = (m_shuffleIndexBuffer + 1) % ndInt32(m_shuffleBuffer.GetCount());
 		}
 		
-		auto BackPropagateBash = ndMakeObject::ndFunction([this, &iterator, &indirectBuffer](ndInt32 threadIndex, ndInt32)
+		auto BackPropagateBatch = ndMakeObject::ndFunction([this, &iterator, &indirectBuffer](ndInt32 threadIndex, ndInt32)
 		{
 			class ndLoss : public ndBrainLossLeastSquaredError
 			{
@@ -624,7 +624,7 @@ void ndBrainAgentDDPG_Trainer::LearnPolicyFunction()
 		});
 
 		iterator = 0;
-		ndBrainThreadPool::ParallelExecute(BackPropagateBash);
+		ndBrainThreadPool::ParallelExecute(BackPropagateBatch);
 		m_policyOptimizer->Update(this, m_policyTrainers, m_parameters.m_policyLearnRate);
 	}
 	//m_referencePolicy.SoftCopy(m_policy, m_parameters.m_policyMovingAverageFactor);

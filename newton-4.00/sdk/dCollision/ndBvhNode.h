@@ -190,7 +190,7 @@ class ndBvhSceneManager
 	void BuildBvhTreeCalculateLeafBoxes(ndThreadPool& threadPool);
 	
 	ndBvhNode* BuildIncrementalBvhTree(ndThreadPool& threadPool);
-	ndInt32 BuildSmallBvhTree(ndThreadPool& threadPool, ndBvhNode** const parentsArray, ndInt32 bashCount);
+	ndInt32 BuildSmallBvhTree(ndThreadPool& threadPool, ndBvhNode** const parentsArray, ndInt32 batchCount);
 
 	ndBvhNodeArray m_workingArray;
 	ndBuildBvhTreeBuildState m_bvhBuildState;

@@ -214,7 +214,7 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndInt32 m_extraTrajectorySteps;
 	ndInt32 m_batchTrajectoryIndex;
 	ndInt32 m_batchTrajectoryCount;
-	ndInt32 m_bashTrajectorySteps;
+	ndInt32 m_batchTrajectorySteps;
 	ndInt32 m_baseValueWorkingBufferSize;
 	ndUnsigned32 m_randomSeed;
 	ndBrainVector m_workingBuffer;

@@ -31,7 +31,7 @@
 #include "ndShapeCompound.h"
 #include "ndShapeConvexHull.h"
 
-#define D_VERTEXLIST_INDEX_LIST_BASH (1024)
+#define D_VERTEXLIST_INDEX_LIST_BATCH (1024)
 
 #if 0
 void ndMeshEffect::dAttibutFormat::CopyFrom(const dAttibutFormat& source)
@@ -1829,7 +1829,7 @@ void ndMeshEffect::ndPointFormat::CompactVertexData(ndInt32* const indexList, nd
 		cluster.m_sum2 += x * x;
 	}
 
-	if (vertexCount > D_VERTEXLIST_INDEX_LIST_BASH)
+	if (vertexCount > D_VERTEXLIST_INDEX_LIST_BATCH)
 	{
 		ndSortCluster spliteStack[128];
 		spliteStack[0] = cluster;
@@ -1845,7 +1845,7 @@ void ndMeshEffect::ndPointFormat::CompactVertexData(ndInt32* const indexList, nd
 			const ndBigVector variance2(cluster.m_sum2.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count) - origin * origin);
 
 			ndFloat64 maxVariance2 = ndMax(ndMax(variance2.m_x, variance2.m_y), variance2.m_z);
-			if ((cluster.m_count <= D_VERTEXLIST_INDEX_LIST_BASH) || (stack > (ndInt32 (sizeof(spliteStack) / sizeof(spliteStack[0])) - 4)) || (maxVariance2 < ndFloat32(4.0f)))
+			if ((cluster.m_count <= D_VERTEXLIST_INDEX_LIST_BATCH) || (stack > (ndInt32 (sizeof(spliteStack) / sizeof(spliteStack[0])) - 4)) || (maxVariance2 < ndFloat32(4.0f)))
 			{
 				tmpFormat.CompressData(*this, indexList, remapIndex, cluster, tol);
 			}
@@ -2205,7 +2205,7 @@ void ndMeshEffect::ndAttibutFormat::CompactVertexData(const ndPointFormat& point
 		cluster.m_sum2 += x * x;
 	}
 
-	if (cluster.m_count > D_VERTEXLIST_INDEX_LIST_BASH)
+	if (cluster.m_count > D_VERTEXLIST_INDEX_LIST_BATCH)
 	{
 		ndSortCluster spliteStack[128];
 		spliteStack[0] = cluster;
@@ -2222,7 +2222,7 @@ void ndMeshEffect::ndAttibutFormat::CompactVertexData(const ndPointFormat& point
 			const ndBigVector variance2(cluster.m_sum2.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count) - origin * origin);
 			ndFloat64 maxVariance2 = ndMax(ndMax(variance2.m_x, variance2.m_y), variance2.m_z);
 
-			if ((cluster.m_count <= D_VERTEXLIST_INDEX_LIST_BASH) || (stack > (ndInt32 (sizeof (spliteStack) / sizeof (spliteStack[0])) - 4)) || (maxVariance2 < ndFloat32(4.0f)))
+			if ((cluster.m_count <= D_VERTEXLIST_INDEX_LIST_BATCH) || (stack > (ndInt32 (sizeof (spliteStack) / sizeof (spliteStack[0])) - 4)) || (maxVariance2 < ndFloat32(4.0f)))
 			{
 				tmpFormat.CompressData(*this, points, indexList, remapIndex, cluster, tol);
 			}

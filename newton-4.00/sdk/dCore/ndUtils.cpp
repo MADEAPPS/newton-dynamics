@@ -29,9 +29,9 @@
 #define D_USE_YZ_VARIANCE
 
 #ifdef D_USE_YZ_VARIANCE
-	#define D_VERTEXLIST_INDEX_LIST_BASH (1024 * 8)
+	#define D_VERTEXLIST_INDEX_LIST_BATCH (1024 * 8)
 #else
-	#define D_VERTEXLIST_INDEX_LIST_BASH (1024)
+	#define D_VERTEXLIST_INDEX_LIST_BATCH (1024)
 #endif
 
 ndFloat64 ndRoundToFloat(ndFloat64 val)
@@ -244,7 +244,7 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 	#endif
 
 	ndInt32 baseCount = 0;
-	if (cluster.m_count > D_VERTEXLIST_INDEX_LIST_BASH)
+	if (cluster.m_count > D_VERTEXLIST_INDEX_LIST_BATCH)
 	{
 		ndFixSizeArray<ndSortCluster, 128> spliteStack;
 		spliteStack.PushBack(cluster);
@@ -264,7 +264,7 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 				bool doSort = (maxNormalizedVariance < ndFloat32(1.0f/8.0f)) || (spliteStack.GetCount() > (spliteStack.GetCapacity() - 4));
 			#else
 				ndFloat64 maxVariance2 = ndMax(ndMax(variance2.m_x, variance2.m_y), variance2.m_z);
-				bool doSort = (cluster.m_count <= D_VERTEXLIST_INDEX_LIST_BASH) || (spliteStack.GetCount() > (spliteStack.GetCapacity() - 4)) || (maxVariance2 < ndFloat32(4.0f));
+				bool doSort = (cluster.m_count <= D_VERTEXLIST_INDEX_LIST_BATCH) || (spliteStack.GetCount() > (spliteStack.GetCapacity() - 4)) || (maxVariance2 < ndFloat32(4.0f));
 			#endif
 			if (doSort)
 			{

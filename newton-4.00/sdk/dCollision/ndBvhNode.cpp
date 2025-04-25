@@ -582,11 +582,11 @@ void ndBvhSceneManager::BuildBvhTreeCalculateLeafBoxes(ndThreadPool& threadPool)
 	m_bvhBuildState.m_size = ndVector::m_triplexMask & ndVector(minBoxSize);
 }
 
-ndInt32 ndBvhSceneManager::BuildSmallBvhTree(ndThreadPool& threadPool, ndBvhNode** const parentsArray, ndInt32 bashCount)
+ndInt32 ndBvhSceneManager::BuildSmallBvhTree(ndThreadPool& threadPool, ndBvhNode** const parentsArray, ndInt32 batchCount)
 {
 	ndInt32 depthLevel[D_MAX_THREADS_COUNT];
 	ndAtomic<ndInt32> iterator(0);
-	auto SmallBhvNodes = ndMakeObject::ndFunction([this, &iterator, parentsArray, bashCount, &depthLevel](ndInt32 threadIndex, ndInt32)
+	auto SmallBhvNodes = ndMakeObject::ndFunction([this, &iterator, parentsArray, batchCount, &depthLevel](ndInt32 threadIndex, ndInt32)
 	{
 		D_TRACKTIME_NAMED(SmallBhvNodes);
 
@@ -680,7 +680,7 @@ ndInt32 ndBvhSceneManager::BuildSmallBvhTree(ndThreadPool& threadPool, ndBvhNode
 		};
 
 		ndInt32 maxDepth = 0;
-		const ndInt32 count = bashCount;
+		const ndInt32 count = batchCount;
 		for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
 		{
 			const ndInt32 maxSpan = ((count - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : count - i;
@@ -1262,8 +1262,8 @@ void ndBvhSceneManager::BuildBvhGenerateLayerGrids(ndThreadPool& threadPool)
 		ndCountingSort<ndCellScanPrefix, ndSortCellCount, 1>(threadPool, m_bvhBuildState.m_cellCounts0, m_bvhBuildState.m_cellCounts1, prefixScan, nullptr);
 
 		ndUnsigned32 sum = 0;
-		const ndInt32 bashCount = ndInt32(prefixScan[1] - 1);
-		for (ndInt32 i = 0; i < bashCount; ++i)
+		const ndInt32 batchCount = ndInt32(prefixScan[1] - 1);
+		for (ndInt32 i = 0; i < batchCount; ++i)
 		{
 			const ndInt32 count = m_bvhBuildState.m_cellCounts0[i + 1].m_location - m_bvhBuildState.m_cellCounts0[i].m_location - 1;
 			m_bvhBuildState.m_cellCounts1[i].m_location = ndInt32(sum);
@@ -1271,8 +1271,8 @@ void ndBvhSceneManager::BuildBvhGenerateLayerGrids(ndThreadPool& threadPool)
 		}
 		if (sum)
 		{
-			m_bvhBuildState.m_cellCounts1[bashCount].m_location = ndInt32(sum);
-			ndInt32 subTreeDepth = BuildSmallBvhTree(threadPool, m_bvhBuildState.m_parentsArray, bashCount);
+			m_bvhBuildState.m_cellCounts1[batchCount].m_location = ndInt32(sum);
+			ndInt32 subTreeDepth = BuildSmallBvhTree(threadPool, m_bvhBuildState.m_parentsArray, batchCount);
 			m_bvhBuildState.m_depthLevel += subTreeDepth;
 
 			ndAtomic<ndInt32> iterator2(0);

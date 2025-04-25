@@ -825,7 +825,7 @@ namespace nd_
 			int m_pairsCount;
 		};
 
-		MergeConvexJob jobBashes[VHACD_WORKERS_THREADS * 4 + 1];
+		MergeConvexJob jobBatches[VHACD_WORKERS_THREADS * 4 + 1];
 
 		size_t pairsCount = 0;
 		convexPairArray.resize(((m_convexHulls.Size()* m_convexHulls.Size()) - m_convexHulls.Size()) >> 1);
@@ -866,28 +866,28 @@ namespace nd_
 		if (nConvexHulls > 1 && !m_cancel)
 		{
 			size_t start = 0;
-			size_t bashSize = pairsCount / (VHACD_WORKERS_THREADS * 4);
+			size_t batchSize = pairsCount / (VHACD_WORKERS_THREADS * 4);
 			for (size_t j = 0; j < VHACD_WORKERS_THREADS * 4; ++j)
 			{
-				size_t count = (j + 1) * bashSize - start;
+				size_t count = (j + 1) * batchSize - start;
 				if (count > 0)
 				{
-					jobBashes[j].m_pairs = &convexPairArray[start];
-					jobBashes[j].m_pairsCount = int(count);
-					jobBashes[j].m_volumeCH0 = m_volumeCH0;
-					jobBashes[j].m_convexHulls = &m_convexHulls[0];
-					m_parallelQueue.PushTask(&jobBashes[j]);
+					jobBatches[j].m_pairs = &convexPairArray[start];
+					jobBatches[j].m_pairsCount = int(count);
+					jobBatches[j].m_volumeCH0 = m_volumeCH0;
+					jobBatches[j].m_convexHulls = &m_convexHulls[0];
+					m_parallelQueue.PushTask(&jobBatches[j]);
 				}
-				start += bashSize;
+				start += batchSize;
 			}
 			size_t count = pairsCount - start;
 			if (count > 0)
 			{
-				jobBashes[VHACD_WORKERS_THREADS * 4].m_pairs = &convexPairArray[start];
-				jobBashes[VHACD_WORKERS_THREADS * 4].m_pairsCount = int(count);
-				jobBashes[VHACD_WORKERS_THREADS * 4].m_volumeCH0 = m_volumeCH0;
-				jobBashes[VHACD_WORKERS_THREADS * 4].m_convexHulls = &m_convexHulls[0];
-				m_parallelQueue.PushTask(&jobBashes[VHACD_WORKERS_THREADS * 4]);
+				jobBatches[VHACD_WORKERS_THREADS * 4].m_pairs = &convexPairArray[start];
+				jobBatches[VHACD_WORKERS_THREADS * 4].m_pairsCount = int(count);
+				jobBatches[VHACD_WORKERS_THREADS * 4].m_volumeCH0 = m_volumeCH0;
+				jobBatches[VHACD_WORKERS_THREADS * 4].m_convexHulls = &m_convexHulls[0];
+				m_parallelQueue.PushTask(&jobBatches[VHACD_WORKERS_THREADS * 4]);
 			}
 
 			m_parallelQueue.Sync();

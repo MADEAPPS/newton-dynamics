@@ -243,7 +243,7 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 		shuffleBuffer[i] = ndRandInt() % m_replayBuffer.GetCount();
 	}
 
-	auto PropagateBash = ndMakeObject::ndFunction([this, &shuffleBuffer](ndInt32 threadIndex, ndInt32 threadCount)
+	auto PropagateBatch = ndMakeObject::ndFunction([this, &shuffleBuffer](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		class Loss: public ndBrainLossLeastSquaredError
 		{
@@ -299,7 +299,7 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 		}
 	});
 
-	ndBrainThreadPool::ParallelExecute(PropagateBash);
+	ndBrainThreadPool::ParallelExecute(PropagateBatch);
 	m_optimizer->Update(this, m_trainers, m_learnRate);
 	
 	if ((m_frameCount % m_targetUpdatePeriod) == (m_targetUpdatePeriod - 1))
