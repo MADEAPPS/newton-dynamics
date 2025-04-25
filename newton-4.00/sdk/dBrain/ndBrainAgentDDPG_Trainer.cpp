@@ -216,18 +216,16 @@ void ndBrainAgentDDPG_Agent::Step()
 
 ndBrainAgentDDPG_Trainer::ndBrainAgentDDPG_Trainer(const HyperParameters& parameters)
 	:ndBrainThreadPool()
+	,m_name()
 	,m_parameters(parameters)
 	,m_policy()
 	,m_referencePolicy()
-	,m_name()
+	,m_policyTrainers()
+	,m_policyOptimizer()
 	,m_expectedRewards()
 	,m_expectedRewardsIndexBuffer()
 	,m_replayBuffer(m_parameters.m_numberOfActions, m_parameters.m_numberOfObservations)
 	,m_agent(nullptr)
-	,m_policyOptimizer()
-	,m_criticOptimizer()
-	,m_policyTrainers()
-	,m_criticTrainers()
 	,m_shuffleBuffer()
 	,m_averageScore()
 	,m_averageFramesPerEpisodes()
@@ -235,8 +233,9 @@ ndBrainAgentDDPG_Trainer::ndBrainAgentDDPG_Trainer(const HyperParameters& parame
 	,m_framesAlive(0)
 	,m_eposideCount(0)
 	,m_replayBufferIndex(0)
-	,m_startOptimization(false)
+	,ndPolycyDelayMod(0)
 	,m_shuffleIndexBuffer(0)
+	,m_startOptimization(false)
 {
 	ndAssert(m_parameters.m_numberOfActions);
 	ndAssert(m_parameters.m_numberOfObservations);
@@ -533,7 +532,7 @@ void ndBrainAgentDDPG_Trainer::CalculateExpectedRewards()
 			const ndInt32 size = (i + 32) < count ? i + 32 : count;
 			for (ndInt32 j = i; j < size; ++j)
 			{
-				ndBrainFixSizeVector<16> rewards;
+				ndBrainFixSizeVector<ND_NUMBER_OF_CRITICS> rewards;
 				rewards.SetCount(0);
 				const ndInt32 index = m_expectedRewardsIndexBuffer[j];
 				for (ndInt32 k = 0; k < sizeof(m_critic) / sizeof(m_critic[0]); ++k)
@@ -665,7 +664,12 @@ void ndBrainAgentDDPG_Trainer::Optimize()
 	{
 		LearnQvalueFunction(k);
 	}
-	LearnPolicyFunction();
+
+	if (!ndPolycyDelayMod)
+	{
+		LearnPolicyFunction();
+	}
+	ndPolycyDelayMod = (ndPolycyDelayMod + 1) % ND_POLICY_DELAY_MOD;
 }
 
 #pragma optimize( "", off )

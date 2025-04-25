@@ -27,18 +27,22 @@
 #include "ndBrain.h"
 #include "ndBrainAgent.h"
 #include "ndBrainThreadPool.h"
-//include "ndBrainLayer.h"
-
-//include "ndBrainTrainer.h"
-//include "ndBrainReplayBuffer.h"
-//include "ndBrainLayerLinear.h"
-//include "ndBrainLayerActivationTanh.h"
-//include "ndBrainLossLeastSquaredError.h"
 
 // this is an implementation of the vanilla deep deterministic 
 // policy gradient for continues control re enforcement learning.  
 // ddpg algorithm as described in: https://arxiv.org/pdf/1509.02971.pdf
 // https://spinningup.openai.com/en/latest/algorithms/ddpg.html
+// https://spinningup.openai.com/en/latest/algorithms/td3.html#pseudocode
+
+#define ND_USE_TDD3
+#ifdef ND_USE_TDD3
+	#define ND_NUMBER_OF_CRITICS	2
+#else
+	#define ND_NUMBER_OF_CRITICS	1
+#endif
+
+#define ND_POLICY_DELAY_MOD		2
+
 
 class ndBrainOptimizerAdam;
 class ndBrainAgentDDPG_Trainer;
@@ -181,20 +185,23 @@ class ndBrainAgentDDPG_Trainer : public ndBrainThreadPool
 	void LearnQvalueFunction(ndInt32 criticIndex);
 
 	public:
-	HyperParameters m_parameters;
-	ndBrain m_policy;
-	ndBrain m_critic[2];
-	ndBrain m_referencePolicy;
-	ndBrain m_referenceCritic[2];
 	ndString m_name;
+	HyperParameters m_parameters;
+
+	ndBrain m_policy;
+	ndBrain m_referencePolicy;
+	ndArray<ndBrainTrainer*> m_policyTrainers;
+	ndSharedPtr<ndBrainOptimizerAdam> m_policyOptimizer;
+
+	ndBrain m_critic[ND_NUMBER_OF_CRITICS];
+	ndBrain m_referenceCritic[ND_NUMBER_OF_CRITICS];
+	ndArray<ndBrainTrainer*> m_criticTrainers[ND_NUMBER_OF_CRITICS];
+	ndSharedPtr<ndBrainOptimizerAdam> m_criticOptimizer[ND_NUMBER_OF_CRITICS];
+
 	ndBrainVector m_expectedRewards;
 	ndArray<ndInt32> m_expectedRewardsIndexBuffer;
 	ndBrainAgentDDPG_Agent::ndTrajectoryTransition m_replayBuffer;
 	ndBrainAgentDDPG_Agent* m_agent;
-	ndSharedPtr<ndBrainOptimizerAdam> m_policyOptimizer;
-	ndSharedPtr<ndBrainOptimizerAdam> m_criticOptimizer[2];
-	ndArray<ndBrainTrainer*> m_policyTrainers;
-	ndArray<ndBrainTrainer*> m_criticTrainers[2];
 	ndArray<ndInt32> m_shuffleBuffer;
 	ndMovingAverage<8> m_averageScore;
 	ndMovingAverage<32> m_averageFramesPerEpisodes;
@@ -202,8 +209,9 @@ class ndBrainAgentDDPG_Trainer : public ndBrainThreadPool
 	ndUnsigned32 m_framesAlive;
 	ndUnsigned32 m_eposideCount;
 	ndInt32 m_replayBufferIndex;
-	bool m_startOptimization;
+	ndUnsigned32 ndPolycyDelayMod;
 	ndUnsigned32 m_shuffleIndexBuffer;
+	bool m_startOptimization;
 
 	friend class ndBrainAgentDDPG_Agent;
 };
