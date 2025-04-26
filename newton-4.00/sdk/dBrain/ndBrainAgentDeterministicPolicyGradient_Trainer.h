@@ -97,6 +97,8 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 		ndBrainFloat* GetNextObservations(ndInt32 entry);
 		const ndBrainFloat* GetNextObservations(ndInt32 entry) const;
 
+		ndInt32 CalculateStride() const;
+
 		ndInt32 m_actionsSize;
 		ndInt32 m_obsevationsSize;
 	};
@@ -203,7 +205,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
 	ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition m_replayBuffer;
 	ndBrainAgentDeterministicPolicyGradient_Agent* m_agent;
 	ndArray<ndInt32> m_shuffleBuffer;
-	ndMovingAverage<8> m_averageScore;
+	ndMovingAverage<8> m_averageExpectedRewards;
 	ndMovingAverage<32> m_averageFramesPerEpisodes;
 	ndUnsigned32 m_frameCount;
 	ndUnsigned32 m_framesAlive;

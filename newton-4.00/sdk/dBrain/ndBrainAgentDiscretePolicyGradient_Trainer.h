@@ -218,7 +218,7 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndInt32 m_baseValueWorkingBufferSize;
 	ndUnsigned32 m_randomSeed;
 	ndBrainVector m_workingBuffer;
-	ndMovingAverage<8> m_averageScore;
+	ndMovingAverage<8> m_averageExpectedRewards;
 	ndMovingAverage<8> m_averageFramesPerEpisodes;
 	ndString m_name;
 	ndList<ndBrainAgentDiscretePolicyGradient_Trainer*> m_agents;

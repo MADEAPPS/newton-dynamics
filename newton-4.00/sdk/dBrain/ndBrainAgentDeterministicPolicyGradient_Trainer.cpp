@@ -68,99 +68,104 @@ ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::ndTraject
 {
 }
 
+ndInt32 ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::CalculateStride() const
+{
+	return m_transitionSize + m_actionsSize + m_obsevationsSize * 2;
+}
+
 void ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::Clear(ndInt32 entry)
 {
 	ndTrajectoryTransition& me = *this;
-	ndInt64 stride = m_transitionSize + m_actionsSize + m_obsevationsSize * 2;
+	const ndInt64 stride = CalculateStride();
 	ndMemSet(&me[stride * entry], ndBrainFloat(0.0f), stride);
 }
 
 void ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::CopyFrom(ndInt32 entry, ndTrajectoryTransition& src, ndInt32 srcEntry)
 {
-	ndInt64 stride = m_transitionSize + m_actionsSize + m_obsevationsSize * 2;
 	ndTrajectoryTransition& me = *this;
+	const ndInt64 stride = CalculateStride();
 	ndMemCpy(&me[stride * entry], &src[stride * srcEntry], stride);
 }
 
 ndInt32 ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::GetCount() const
 {
-	ndInt64 stride = m_transitionSize + m_actionsSize + m_obsevationsSize * 2;
+	const ndInt64 stride = CalculateStride();
 	return ndInt32(ndBrainVector::GetCount() / stride);
 }
 
 void ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::SetCount(ndInt32 count)
 {
-	ndInt64 stride = m_transitionSize + m_actionsSize + m_obsevationsSize * 2;
+	const ndInt64 stride = CalculateStride();
 	ndBrainVector::SetCount(stride * count);
 }
 
 ndBrainFloat ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::GetReward(ndInt32 entry) const
 {
 	const ndTrajectoryTransition& me = *this;
-	ndInt64 stride = m_transitionSize + m_actionsSize + m_obsevationsSize * 2;
+	const ndInt64 stride = CalculateStride();
 	return me[stride * entry + m_reward];
 }
 
 void ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::SetReward(ndInt32 entry, ndBrainFloat reward)
 {
 	ndTrajectoryTransition& me = *this;
-	ndInt64 stride = m_transitionSize + m_actionsSize + m_obsevationsSize * 2;
+	const ndInt64 stride = CalculateStride();
 	me[stride * entry + m_reward] = reward;
 }
 
 bool ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::GetTerminalState(ndInt32 entry) const
 {
 	const ndTrajectoryTransition& me = *this;
-	ndInt64 stride = m_transitionSize + m_actionsSize + m_obsevationsSize * 2;
+	const ndInt64 stride = CalculateStride();
 	return (me[stride * entry + m_isterminalState] == ndBrainFloat(999.0f)) ? true : false;
 }
 
 void ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::SetTerminalState(ndInt32 entry, bool isTernimal)
 {
 	ndTrajectoryTransition& me = *this;
-	ndInt64 stride = m_transitionSize + m_actionsSize + m_obsevationsSize * 2;
+	const ndInt64 stride = CalculateStride();
 	me[stride * entry + m_isterminalState] = isTernimal ? ndBrainFloat(999.0f) : ndBrainFloat(-999.0f);
 }
 
 ndBrainFloat* ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::GetActions(ndInt32 entry)
 {
 	ndTrajectoryTransition& me = *this;
-	ndInt64 stride = m_transitionSize + m_actionsSize + m_obsevationsSize * 2;
+	const ndInt64 stride = CalculateStride();
 	return &me[stride * entry + m_transitionSize];
 }
 
 const ndBrainFloat* ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::GetActions(ndInt32 entry) const
 {
 	const ndTrajectoryTransition& me = *this;
-	ndInt64 stride = m_transitionSize + m_actionsSize + m_obsevationsSize * 2;
+	const ndInt64 stride = CalculateStride();
 	return &me[stride * entry + m_transitionSize];
 }
 
 ndBrainFloat* ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::GetObservations(ndInt32 entry)
 {
 	ndTrajectoryTransition& me = *this;
-	ndInt64 stride = m_transitionSize + m_actionsSize + m_obsevationsSize * 2;
+	const ndInt64 stride = CalculateStride();
 	return &me[stride * entry + m_transitionSize + m_actionsSize];
 }
 
 const ndBrainFloat* ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::GetObservations(ndInt32 entry) const
 {
 	const ndTrajectoryTransition& me = *this;
-	ndInt64 stride = m_transitionSize + m_actionsSize + m_obsevationsSize * 2;
+	const ndInt64 stride = CalculateStride();
 	return &me[stride * entry + m_transitionSize + m_actionsSize];
 }
 
 ndBrainFloat* ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::GetNextObservations(ndInt32 entry)
 {
 	ndTrajectoryTransition& me = *this;
-	ndInt64 stride = m_transitionSize + m_actionsSize + m_obsevationsSize * 2;
+	const ndInt64 stride = CalculateStride();
 	return &me[stride * entry + m_transitionSize + m_actionsSize + m_obsevationsSize];
 }
 
 const ndBrainFloat* ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::GetNextObservations(ndInt32 entry) const
 {
 	const ndTrajectoryTransition& me = *this;
-	ndInt64 stride = m_transitionSize + m_actionsSize + m_obsevationsSize * 2;
+	const ndInt64 stride = CalculateStride();
 	return &me[stride * entry + m_transitionSize + m_actionsSize + m_obsevationsSize];
 }
 
@@ -227,7 +232,7 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::ndBrainAgentDeterministicPolicy
 	,m_replayBuffer(m_parameters.m_numberOfActions, m_parameters.m_numberOfObservations)
 	,m_agent(nullptr)
 	,m_shuffleBuffer()
-	,m_averageScore()
+	,m_averageExpectedRewards()
 	,m_averageFramesPerEpisodes()
 	,m_frameCount(0)
 	,m_framesAlive(0)
@@ -368,7 +373,7 @@ ndUnsigned32 ndBrainAgentDeterministicPolicyGradient_Trainer::GetEposideCount() 
 
 ndFloat32 ndBrainAgentDeterministicPolicyGradient_Trainer::GetAverageScore() const
 {
-	return m_averageScore.GetAverage();
+	return m_averageExpectedRewards.GetAverage();
 }
 
 ndFloat32 ndBrainAgentDeterministicPolicyGradient_Trainer::GetAverageFrames() const
@@ -571,7 +576,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 		rewardSum += m_expectedRewards[i];
 	}
 	ndFloat32 averageReward = rewardSum / ndFloat32(m_expectedRewards.GetCount());
-	m_averageScore.Update(averageReward);
+	m_averageExpectedRewards.Update(averageReward);
 }
 
 

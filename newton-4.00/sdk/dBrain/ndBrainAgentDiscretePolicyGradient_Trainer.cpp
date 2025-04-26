@@ -371,7 +371,7 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::ndBrainAgentDiscretePolicyGrad
 	,m_baseValueWorkingBufferSize(0)
 	,m_randomSeed(hyperParameters.m_randomSeed)
 	,m_workingBuffer()
-	,m_averageScore()
+	,m_averageExpectedRewards()
 	,m_averageFramesPerEpisodes()
 	,m_agents()
 {
@@ -612,7 +612,7 @@ ndFloat32 ndBrainAgentDiscretePolicyGradient_TrainerMaster::GetAverageFrames() c
 
 ndFloat32 ndBrainAgentDiscretePolicyGradient_TrainerMaster::GetAverageScore() const
 {
-	return m_averageScore.GetAverage();
+	return m_averageExpectedRewards.GetAverage();
 }
 
 #ifdef ND_DISCRETE_PROXIMA_POLICY_GRADIENT
@@ -915,7 +915,7 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::OptimizeCritic()
 	{
 		averageSum += m_trajectoryAccumulator.GetAdvantage(i);
 	}
-	m_averageScore.Update(averageSum / ndBrainFloat(stepNumber));
+	m_averageExpectedRewards.Update(averageSum / ndBrainFloat(stepNumber));
 	m_averageFramesPerEpisodes.Update(ndBrainFloat(stepNumber) / ndBrainFloat(m_batchTrajectoryIndex));
 	
 	ndAtomic<ndInt32> iterator(0);

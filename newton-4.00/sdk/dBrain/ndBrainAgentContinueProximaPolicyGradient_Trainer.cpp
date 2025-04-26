@@ -151,25 +151,26 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateGradients
 
 				void GetLoss(const ndBrainVector& probabilityDistribution, ndBrainVector& loss)
 				{
-					// basically this fits a multivariate Gaussian process with zero cross covariance to the actions.
-					// calculate the log of prob of a multivariate Gaussian
-					const ndInt32 numberOfActions = m_agent->m_parameters.m_numberOfActions;
-					const ndBrainFloat advantage = m_agent->m_trajectoryAccumulator.GetAdvantage(m_index);
-					const ndBrainMemVector sampledProbability(m_agent->m_trajectoryAccumulator.GetActions(m_index), numberOfActions * 2);
-
-					for (ndInt32 i = numberOfActions - 1; i >= 0; --i)
-					{
-						const ndBrainFloat mean = probabilityDistribution[i];
-						const ndBrainFloat sigma1 = probabilityDistribution[i + numberOfActions];
-						const ndBrainFloat sigma2 = sigma1 * sigma1;
-						const ndBrainFloat num = sampledProbability[i] - mean;
-
-						ndBrainFloat meanGradient = num / sigma1;
-						ndBrainFloat sigmaGradient = ndBrainFloat(0.5f) * (num * num / sigma2 - ndBrainFloat(1.0f) / sigma1);
-
-						loss[i] = meanGradient * advantage;
-						loss[i + numberOfActions] = sigmaGradient * advantage;
-					}
+					ndAssert(0);
+					//// basically this fits a multivariate Gaussian process with zero cross covariance to the actions.
+					//// calculate the log of prob of a multivariate Gaussian
+					//const ndInt32 numberOfActions = m_agent->m_parameters.m_numberOfActions;
+					//const ndBrainFloat advantage = m_agent->m_trajectoryAccumulator.GetAdvantage(m_index);
+					//const ndBrainMemVector sampledProbability(m_agent->m_trajectoryAccumulator.GetActions(m_index), numberOfActions * 2);
+					//
+					//for (ndInt32 i = numberOfActions - 1; i >= 0; --i)
+					//{
+					//	const ndBrainFloat mean = probabilityDistribution[i];
+					//	const ndBrainFloat sigma1 = probabilityDistribution[i + numberOfActions];
+					//	const ndBrainFloat sigma2 = sigma1 * sigma1;
+					//	const ndBrainFloat num = sampledProbability[i] - mean;
+					//
+					//	ndBrainFloat meanGradient = num / sigma1;
+					//	ndBrainFloat sigmaGradient = ndBrainFloat(0.5f) * (num * num / sigma2 - ndBrainFloat(1.0f) / sigma1);
+					//
+					//	loss[i] = meanGradient * advantage;
+					//	loss[i + numberOfActions] = sigmaGradient * advantage;
+					//}
 				}
 
 				ndBrainTrainer& m_trainer;

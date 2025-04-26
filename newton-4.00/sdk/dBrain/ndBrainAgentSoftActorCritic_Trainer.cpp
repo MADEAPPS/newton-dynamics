@@ -227,7 +227,7 @@ ndBrainAgentSoftActorCritic_Trainer::ndBrainAgentSoftActorCritic_Trainer(const H
 	,m_replayBuffer(m_parameters.m_numberOfActions, m_parameters.m_numberOfObservations)
 	,m_agent(nullptr)
 	,m_shuffleBuffer()
-	,m_averageScore()
+	,m_averageExpectedRewards()
 	,m_averageFramesPerEpisodes()
 	,m_frameCount(0)
 	,m_framesAlive(0)
@@ -368,7 +368,7 @@ ndUnsigned32 ndBrainAgentSoftActorCritic_Trainer::GetEposideCount() const
 
 ndFloat32 ndBrainAgentSoftActorCritic_Trainer::GetAverageScore() const
 {
-	return m_averageScore.GetAverage();
+	return m_averageExpectedRewards.GetAverage();
 }
 
 ndFloat32 ndBrainAgentSoftActorCritic_Trainer::GetAverageFrames() const
@@ -571,7 +571,7 @@ void ndBrainAgentSoftActorCritic_Trainer::CalculateExpectedRewards()
 		rewardSum += m_expectedRewards[i];
 	}
 	ndFloat32 averageReward = rewardSum / ndFloat32(m_expectedRewards.GetCount());
-	m_averageScore.Update(averageReward);
+	m_averageExpectedRewards.Update(averageReward);
 }
 
 

@@ -60,9 +60,8 @@ class ndBrainAgentContinuePolicyGradient_Agent : public ndBrainAgent
 		enum ndMemberIndex
 		{
 			m_reward,
-			m_stateReward,
-			m_stateValue,
-			m_stateAdvantage,
+			m_expectedReward,
+			//m_stateAdvantage,
 			m_isterminalState,
 			m_transitionSize
 		};
@@ -78,23 +77,28 @@ class ndBrainAgentContinuePolicyGradient_Agent : public ndBrainAgent
 		ndBrainFloat GetReward(ndInt32 entry) const;
 		void SetReward(ndInt32 entry, ndBrainFloat reward);
 
+		ndBrainFloat GetExpectedReward(ndInt32 entry) const;
+		void SetExpectedReward(ndInt32 entry, ndBrainFloat reward);
+
 		bool GetTerminalState(ndInt32 entry) const;
 		void SetTerminalState(ndInt32 entry, bool isTernimal);
 
-		ndBrainFloat GetStateReward(ndInt32 entry) const;
-		void SetStateReward(ndInt32 entry, ndBrainFloat advantage);
+		//ndBrainFloat GetStateValue(ndInt32 entry) const;
+		//void SetStateValue(ndInt32 entry, ndBrainFloat advantage);
 
-		ndBrainFloat GetStateValue(ndInt32 entry) const;
-		void SetStateValue(ndInt32 entry, ndBrainFloat advantage);
-
-		ndBrainFloat GetAdvantage(ndInt32 entry) const;
-		void SetAdvantage(ndInt32 entry, ndBrainFloat advantage);
+		//ndBrainFloat GetAdvantage(ndInt32 entry) const;
+		//void SetAdvantage(ndInt32 entry, ndBrainFloat advantage);
 
 		ndBrainFloat* GetActions(ndInt32 entry);
 		const ndBrainFloat* GetActions(ndInt32 entry) const;
 
 		ndBrainFloat* GetObservations(ndInt32 entry);
 		const ndBrainFloat* GetObservations(ndInt32 entry) const;
+
+		ndBrainFloat* GetNextObservations(ndInt32 entry);
+		const ndBrainFloat* GetNextObservations(ndInt32 entry) const;
+
+		ndInt64 CalculateStride() const;
 
 		ndInt64 m_actionsSize;
 		ndInt64 m_obsevationsSize;
@@ -205,6 +209,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndSharedPtr<ndBrainOptimizerAdam> m_criticOptimizer;
 	ndSharedPtr<ndBrainOptimizerAdam> m_policyOptimizer;
 
+	ndBrainVector m_advantage;
 	ndArray<ndInt32> m_randomPermutation;
 	ndList<ndBrainAgentContinuePolicyGradient_Agent::ndRandomGenerator> m_randomGenerator;
 	ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition m_trajectoryAccumulator;
@@ -217,7 +222,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndInt32 m_baseValueWorkingBufferSize;
 	ndUnsigned32 m_randomSeed;
 	ndBrainVector m_workingBuffer;
-	ndMovingAverage<8> m_averageScore;
+	ndMovingAverage<8> m_averageExpectedRewards;
 	ndMovingAverage<8> m_averageFramesPerEpisodes;
 	ndString m_name;
 	ndList<ndBrainAgentContinuePolicyGradient_Agent*> m_agents;
