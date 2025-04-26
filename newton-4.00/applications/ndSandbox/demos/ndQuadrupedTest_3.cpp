@@ -131,7 +131,7 @@ namespace ndQuadruped_3
 			RobotModelNotify* m_robot;
 		};
 
-		class ndControllerAgent : public ndBrainAgentDDPG_Agent
+		class ndControllerAgent : public ndBrainAgentDeterministicPolicyGradient_Agent
 		{
 			public:
 			class ndBasePose
@@ -268,8 +268,8 @@ namespace ndQuadruped_3
 				ndFloat32 m_stride_z;
 			};
 
-			ndControllerAgent(const ndSharedPtr<ndBrainAgentDDPG_Trainer>& master, RobotModelNotify* const robot)
-				:ndBrainAgentDDPG_Agent(master)
+			ndControllerAgent(const ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>& master, RobotModelNotify* const robot)
+				:ndBrainAgentDeterministicPolicyGradient_Agent(master)
 				,m_robot(robot)
 				,m_animPose()
 				,m_poseGenerator()
@@ -415,7 +415,7 @@ namespace ndQuadruped_3
 		{
 		}
 
-		void SetControllerTrainer(const ndSharedPtr<ndBrainAgentDDPG_Trainer>& master)
+		void SetControllerTrainer(const ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>& master)
 		{
 			m_controllerTrainer = ndSharedPtr<ndControllerAgent>(new ndControllerAgent(master, this));
 			m_controllerTrainer->InitAnimation();
@@ -757,13 +757,13 @@ namespace ndQuadruped_3
 			m_outFile = fopen("ndQuadruped_3-vpg.csv", "wb");
 			fprintf(m_outFile, "vpg\n");
 
-			ndBrainAgentDDPG_Trainer::HyperParameters hyperParameters;
+			ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
 
 			hyperParameters.m_numberOfActions = m_actionsSize;
 			hyperParameters.m_numberOfObservations = m_stateSize;
 			//hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
 
-			m_master = ndSharedPtr<ndBrainAgentDDPG_Trainer>(new ndBrainAgentDDPG_Trainer(hyperParameters));
+			m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
 			m_master->SetName(CONTROLLER_NAME);
 
@@ -953,7 +953,7 @@ namespace ndQuadruped_3
 			}
 		}
 
-		ndSharedPtr<ndBrainAgentDDPG_Trainer> m_master;
+		ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer> m_master;
 		ndSharedPtr<ndBrain> m_bestActor;
 		ndList<ndModelArticulation*> m_models;
 		FILE* m_outFile;

@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_AGENT_DDPG_TRAINER_H__
-#define _ND_BRAIN_AGENT_DDPG_TRAINER_H__
+#ifndef _ND_BRAIN_AGENT_SOFT_ACTOR_CRITIC_TRAINER_H__
+#define _ND_BRAIN_AGENT_SOFT_ACTOR_CRITIC_TRAINER_H__
 
 #include "ndBrainStdafx.h"
 
@@ -44,9 +44,9 @@
 #define ND_POLICY_DELAY_MOD		1
 
 class ndBrainOptimizerAdam;
-class ndBrainAgentDDPG_Trainer;
+class ndBrainAgentSoftActorCritic_Trainer;
 
-class ndBrainAgentDDPG_Agent: public ndBrainAgent
+class ndBrainAgentSoftActorCritic_Agent: public ndBrainAgent
 {
 	//class ndRandomGenerator
 	//{
@@ -102,8 +102,8 @@ class ndBrainAgentDDPG_Agent: public ndBrainAgent
 	};
 
 	public:
-	ndBrainAgentDDPG_Agent(const ndSharedPtr<ndBrainAgentDDPG_Trainer>& master);
-	~ndBrainAgentDDPG_Agent();
+	ndBrainAgentSoftActorCritic_Agent(const ndSharedPtr<ndBrainAgentSoftActorCritic_Trainer>& master);
+	~ndBrainAgentSoftActorCritic_Agent();
 
 	virtual void Step();
 	virtual void InitWeights() { ndAssert(0); }
@@ -114,14 +114,14 @@ class ndBrainAgentDDPG_Agent: public ndBrainAgent
 
 	ndReal PerturbeAction(ndReal action) const;
 
-	ndSharedPtr<ndBrainAgentDDPG_Trainer> m_owner;
+	ndSharedPtr<ndBrainAgentSoftActorCritic_Trainer> m_owner;
 	ndTrajectoryTransition m_trajectory;
 	ndBrainVector m_workingBuffer;
 	ndInt32 m_trajectoryBaseCount;
-	friend class ndBrainAgentDDPG_Trainer;
+	friend class ndBrainAgentSoftActorCritic_Trainer;
 };
 
-class ndBrainAgentDDPG_Trainer : public ndBrainThreadPool
+class ndBrainAgentSoftActorCritic_Trainer : public ndBrainThreadPool
 {
 	public:
 	class HyperParameters
@@ -156,8 +156,8 @@ class ndBrainAgentDDPG_Trainer : public ndBrainThreadPool
 		ndBrainOptimizer::ndRegularizerType m_criticRegularizerType;
 	};
 
-	ndBrainAgentDDPG_Trainer(const HyperParameters& parameters);
-	~ndBrainAgentDDPG_Trainer();
+	ndBrainAgentSoftActorCritic_Trainer(const HyperParameters& parameters);
+	~ndBrainAgentSoftActorCritic_Trainer();
 
 	const ndString& GetName() const;
 	void SetName(const ndString& name);
@@ -199,8 +199,8 @@ class ndBrainAgentDDPG_Trainer : public ndBrainThreadPool
 
 	ndBrainVector m_expectedRewards;
 	ndArray<ndInt32> m_expectedRewardsIndexBuffer;
-	ndBrainAgentDDPG_Agent::ndTrajectoryTransition m_replayBuffer;
-	ndBrainAgentDDPG_Agent* m_agent;
+	ndBrainAgentSoftActorCritic_Agent::ndTrajectoryTransition m_replayBuffer;
+	ndBrainAgentSoftActorCritic_Agent* m_agent;
 	ndArray<ndInt32> m_shuffleBuffer;
 	ndMovingAverage<8> m_averageScore;
 	ndMovingAverage<32> m_averageFramesPerEpisodes;
@@ -212,7 +212,7 @@ class ndBrainAgentDDPG_Trainer : public ndBrainThreadPool
 	ndUnsigned32 m_shuffleIndexBuffer;
 	bool m_startOptimization;
 
-	friend class ndBrainAgentDDPG_Agent;
+	friend class ndBrainAgentSoftActorCritic_Agent;
 };
 
 #endif 

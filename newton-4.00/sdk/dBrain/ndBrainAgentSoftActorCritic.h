@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_DQN_BRAIN_AGENT_DDPG_H__
-#define _ND_DQN_BRAIN_AGENT_DDPG_H__
+#ifndef _ND_BRAIN_AGENT_SOFT_ACTOR_CRITIC_H__
+#define _ND_BRAIN_AGENT_SOFT_ACTOR_CRITIC_H__
 
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"
@@ -28,10 +28,10 @@
 #include "ndBrainReplayBuffer.h"
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-class ndBrainAgentDDPG: public ndBrainAgent
+class ndBrainAgentSoftActorCritic: public ndBrainAgent
 {
 	public:
-	ndBrainAgentDDPG(const ndSharedPtr<ndBrain>& actor);
+	ndBrainAgentSoftActorCritic(const ndSharedPtr<ndBrain>& actor);
 
 	void Step();
 
@@ -49,64 +49,64 @@ class ndBrainAgentDDPG: public ndBrainAgent
 };
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainAgentDDPG<statesDim, actionDim>::ndBrainAgentDDPG(const ndSharedPtr<ndBrain>& actor)
+ndBrainAgentSoftActorCritic<statesDim, actionDim>::ndBrainAgentSoftActorCritic(const ndSharedPtr<ndBrain>& actor)
 	:ndBrainAgent()
 	,m_actor(actor)
 {
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-bool ndBrainAgentDDPG<statesDim, actionDim>::IsTrainer() const
+bool ndBrainAgentSoftActorCritic<statesDim, actionDim>::IsTrainer() const
 {
 	return false;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-bool ndBrainAgentDDPG<statesDim, actionDim>::IsTerminal() const
+bool ndBrainAgentSoftActorCritic<statesDim, actionDim>::IsTerminal() const
 {
 	ndAssert(0);
 	return false;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainFloat ndBrainAgentDDPG<statesDim, actionDim>::CalculateReward()
+ndBrainFloat ndBrainAgentSoftActorCritic<statesDim, actionDim>::CalculateReward()
 {
 	ndAssert(0);
 	return ndBrainFloat(0.0f);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG<statesDim, actionDim>::ResetModel()
+void ndBrainAgentSoftActorCritic<statesDim, actionDim>::ResetModel()
 {
 	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG<statesDim, actionDim>::InitWeights()
+void ndBrainAgentSoftActorCritic<statesDim, actionDim>::InitWeights()
 {
 	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG<statesDim, actionDim>::Save(ndBrainSave* const)
+void ndBrainAgentSoftActorCritic<statesDim, actionDim>::Save(ndBrainSave* const)
 {
 	ndAssert(0);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-ndInt32 ndBrainAgentDDPG<statesDim, actionDim>::GetEpisodeFrames() const
+ndInt32 ndBrainAgentSoftActorCritic<statesDim, actionDim>::GetEpisodeFrames() const
 {
 	ndAssert(0);
 	return 0;
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG<statesDim, actionDim>::OptimizeStep()
+void ndBrainAgentSoftActorCritic<statesDim, actionDim>::OptimizeStep()
 {
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDDPG<statesDim, actionDim>::Step()
+void ndBrainAgentSoftActorCritic<statesDim, actionDim>::Step()
 {
 	ndBrainFixSizeVector<actionDim> actions;
 	ndBrainFixSizeVector<statesDim> observations;

@@ -33,7 +33,6 @@
 #include <ndBrainTrainer.h>
 #include <ndBrainSaveLoad.h>
 #include <ndBrainAgentDQN.h>
-#include <ndBrainAgentDDPG.h>
 #include <ndBrainOptimizer.h>
 #include <ndBrainThreadPool.h>
 #include <ndBrainLayerLinear.h>
@@ -42,7 +41,6 @@
 #include <ndBrainOptimizerAdam.h>
 #include <ndBrainLayerActivation.h>
 #include <ndBrainAgentDQN_Trainer.h>
-#include <ndBrainAgentDDPG_Trainer.h>
 #include <ndBrainLayerImagePadding.h>
 #include <ndBrainLayerActivationElu.h>
 #include <ndBrainLayerActivationRelu.h>
@@ -58,11 +56,14 @@
 #include <ndBrainAgentDiscretePolicyGradient.h>
 #include <ndBrainAgentContinuePolicyGradient.h>
 #include <ndBrainLossCategoricalCrossEntropy.h>
+#include <ndBrainAgentSoftActorCritic_Trainer.h>
 #include <ndBrainLayerActivationSigmoidLinear.h>
+#include <ndBrainAgentDeterministicPolicyGradient.h>
 #include <ndBrainLayerConvolutionalWithDropOut_2d.h>
 #include <ndBrainLayerActivationCategoricalSoftmax.h>
 #include <ndBrainAgentDiscretePolicyGradient_Trainer.h>
 #include <ndBrainAgentContinuePolicyGradient_Trainer.h>
+#include <ndBrainAgentDeterministicPolicyGradient_Trainer.h>
 #include <ndBrainAgentContinueProximaPolicyGradient_Trainer.h>
 
 #include <gpu/ndBrainGpuBuffer.h>
