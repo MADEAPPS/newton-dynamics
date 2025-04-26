@@ -25,6 +25,8 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainLayerActivation.h"
 
+#define ND_BRAIN_LAYER_ACTIVATION_LINEAR_NAME	"ndBrainLayerActivationLinear"
+
 class ndBrainLayerActivationLinear : public ndBrainLayerActivation
 {
 	public:

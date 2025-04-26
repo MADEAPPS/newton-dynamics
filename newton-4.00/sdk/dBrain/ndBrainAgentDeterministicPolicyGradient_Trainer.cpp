@@ -31,11 +31,12 @@
 
 ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameters()
 {
-	m_discountRewardFactor = ndBrainFloat(0.99f);
+	m_actionNoiseSigma = ndBrainFloat(0.01f);
 	m_policyLearnRate = ndBrainFloat(1.0e-4f);
 	m_criticLearnRate = ndBrainFloat(1.0e-4f);
 	m_policyRegularizer = ndBrainFloat(1.0e-4f);
 	m_criticRegularizer = ndBrainFloat(1.0e-4f);
+	m_discountRewardFactor = ndBrainFloat(0.99f);
 	m_policyMovingAverageFactor = ndBrainFloat(0.005f);
 	m_criticMovingAverageFactor = ndBrainFloat(0.005f);
 
@@ -187,8 +188,7 @@ ndInt32 ndBrainAgentDeterministicPolicyGradient_Agent::GetEpisodeFrames() const
 
 ndReal ndBrainAgentDeterministicPolicyGradient_Agent::PerturbeAction(ndReal action) const
 {
-	//ndReal actionNoise = ndReal(ndGaussianRandom(ndFloat32(action), ndFloat32(m_actionNoiseVariance)));
-	ndReal actionNoise = ndReal(ndGaussianRandom(ndFloat32(action), ndFloat32(0.01f)));
+	ndReal actionNoise = ndReal(ndGaussianRandom(ndFloat32(action), m_owner->m_parameters.m_actionNoiseSigma));
 	return ndClamp(actionNoise, ndReal(-1.0f), ndReal(1.0f));
 }
 

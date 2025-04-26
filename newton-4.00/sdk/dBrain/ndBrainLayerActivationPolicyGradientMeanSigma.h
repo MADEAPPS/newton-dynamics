@@ -19,29 +19,30 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_LAYER_TANH_ACTIVATION_H__
-#define _ND_BRAIN_LAYER_TANH_ACTIVATION_H__
+#ifndef _ND_BRAIN_LAYER_ACTIVATION_POLICY_GRADIENT_MEAN_SIGMA_H__
+#define _ND_BRAIN_LAYER_ACTIVATION_POLICY_GRADIENT_MEAN_SIGMA_H__
 
 #include "ndBrainStdafx.h"
 #include "ndBrainLayerActivation.h"
 
-typedef ndVector ndBrainVector4;
+#define ND_CONTINUE_POLICY_MIN_SIGMA						ndBrainFloat(0.01f)
+#define ND_BRAIN_LAYER_ACTIVATION_POLICY_MEAN_SIGMAN_NAME	"ndBrainLayerActivationPolicyGradientMeanSigma"
 
-#define ND_BRAIN_LAYER_ACTIVATION_TANGH_NAME	"ndBrainLayerActivationTanh"
-
-class ndBrainLayerActivationTanh : public ndBrainLayerActivation
+class ndBrainLayerActivationPolicyGradientMeanSigma : public ndBrainLayerActivation
 {
 	public:
-	ndBrainLayerActivationTanh(ndInt32 neurons);
-	ndBrainLayerActivationTanh(const ndBrainLayerActivationTanh& src);
+	ndBrainLayerActivationPolicyGradientMeanSigma(ndInt32 neurons);
+	ndBrainLayerActivationPolicyGradientMeanSigma(const ndBrainLayerActivationPolicyGradientMeanSigma& src);
 	ndBrainLayer* Clone() const;
-	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
-	const char* GetLabelId() const;
-	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
-	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
-	ndBrainGpuCommand* AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params);
+	ndBrainFloat GetMinSigma() const;
+	virtual const char* GetLabelId() const override;
+	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
+	virtual void Save(const ndBrainSave* const loadSave) const override;
+
+	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const override;
+	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const override;
 };
 
-#endif 
 
+#endif 

@@ -136,6 +136,7 @@ class ndBrainAgentSoftActorCritic_Trainer : public ndBrainThreadPool
 		ndBrainFloat m_discountRewardFactor;
 		ndBrainFloat m_policyMovingAverageFactor;
 		ndBrainFloat m_criticMovingAverageFactor;
+		ndBrainFloat m_actionNoiseSigma;
 
 		ndInt32 m_miniBatchSize;
 		ndInt32 m_numberOfActions;

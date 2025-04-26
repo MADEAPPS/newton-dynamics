@@ -22,14 +22,14 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainTrainer.h"
 #include "ndBrainLayerLinear.h"
-#include "ndBrainOptimizerSgd.h"
 #include "ndBrainOptimizerAdam.h"
+#include "ndBrainLayerActivationTanh.h"
 #include "ndBrainLayerActivationLinear.h"
 #include "ndBrainAgentContinuePolicyGradient_Trainer.h"
+#include "ndBrainLayerActivationPolicyGradientMeanSigma.h"
 
 #define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 256)
 #define ND_CONTINUE_POLICY_STATE_VALUE_ITERATIONS	5
-#define ND_CONTINUE_POLICY_MIN_SIGMA				ndBrainFloat(0.01f)
 
 //*********************************************************************************************
 //
@@ -54,78 +54,6 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 
 	m_discountRewardFactor = ndBrainFloat(0.99f);
 	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_batchBufferSize);
-}
-
-//*********************************************************************************************
-//
-//*********************************************************************************************
-ndPolicyGradientActivation::ndPolicyGradientActivation(ndInt32 neurons)
-	:ndBrainLayerActivation(neurons)
-{
-}
-
-ndPolicyGradientActivation::ndPolicyGradientActivation(const ndPolicyGradientActivation& src)
-	:ndBrainLayerActivation(src)
-{
-}
-
-ndBrainLayer* ndPolicyGradientActivation::Clone() const
-{
-	return new ndPolicyGradientActivation(*this);
-}
-
-void ndPolicyGradientActivation::Save(const ndBrainSave* const loadSave) const
-{
-	ndBrainLayerActivation::Save(loadSave);
-}
-
-ndBrainFloat ndPolicyGradientActivation::GetMinSigma() const
-{
-	return ND_CONTINUE_POLICY_MIN_SIGMA;
-}
-
-ndBrainLayer* ndPolicyGradientActivation::Load(const ndBrainLoad* const loadSave)
-{
-	char buffer[1024];
-	loadSave->ReadString(buffer);
-
-	loadSave->ReadString(buffer);
-	ndInt32 inputs = loadSave->ReadInt();
-	ndPolicyGradientActivation* const layer = new ndPolicyGradientActivation(inputs);
-	loadSave->ReadString(buffer);
-	return layer;
-}
-
-const char* ndPolicyGradientActivation::GetLabelId() const
-{
-	return "ndPolicyGradientActivation";
-}
-
-#pragma optimize( "", off )
-void ndPolicyGradientActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
-{
-	const ndInt32 base = m_neurons / 2;
-	ndBrainFloat minSigma = GetMinSigma();
-	for (ndInt32 i = base - 1; i >= 0; --i)
-	{
-		ndBrainFloat sigma = input[i + base] + minSigma;
-		output[i] = input[i];
-		output[i + base] = ndMax(sigma, minSigma);
-	}
-}
-
-#pragma optimize( "", off )
-void ndPolicyGradientActivation::InputDerivative(const ndBrainVector& input, const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
-{
-	const ndInt32 base = m_neurons / 2;
-	ndBrainFloat minSigma = GetMinSigma();
-	for (ndInt32 i = base - 1; i >= 0; --i)
-	{
-		ndBrainFloat sigma = input[i + base] + minSigma;
-		inputDerivative[i] = ndBrainFloat (1.0f);
-		inputDerivative[i + base] = (sigma >= minSigma) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
-	}
-	inputDerivative.Mul(outputDerivative);
 }
 
 //*********************************************************************************************
@@ -558,7 +486,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildPolicyClass()
 	layers.PushBack(new ndBrainLayerLinear(m_parameters.m_neuronPerLayers, m_parameters.m_numberOfActions * 2));
 	layers.PushBack(new ndBrainLayerActivationTanh(m_parameters.m_numberOfActions * 2));
 
-	layers.PushBack(new ndPolicyGradientActivation(m_parameters.m_numberOfActions * 2));
+	layers.PushBack(new ndBrainLayerActivationPolicyGradientMeanSigma(m_parameters.m_numberOfActions * 2));
 
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{

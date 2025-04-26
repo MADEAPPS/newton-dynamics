@@ -99,7 +99,7 @@ namespace ndQuadruped_3
 	#define D_CYCLE_AMPLITUDE		ndFloat32(0.27f)
 	#define D_POSE_REST_POSITION_Y	ndReal(-0.3f)
 
-	#define D_ACTION_SPEED			ndReal(0.01f)
+	#define D_ACTION_SPEED			ndReal(0.05f)
 
 	class RobotModelNotify : public ndModelNotify
 	{
@@ -206,7 +206,7 @@ namespace ndQuadruped_3
 						output[i].m_posit = leg.m_effector->GetRestPosit();
 					}
 
-					output[0].m_posit.m_y += 0.1f;
+					output[0].m_posit.m_y += 0.25f;
 
 					//ndFloat32 gaitFraction = 0.25f;
 					//ndFloat32 gaitGuard = gaitFraction * 0.25f;
@@ -749,7 +749,7 @@ namespace ndQuadruped_3
 			,m_discountRewardFactor(0.99f)
 			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountRewardFactor))
 			,m_lastEpisode(0xffffffff)
-			,m_stopTraining(150000)
+			,m_stopTraining(500000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();

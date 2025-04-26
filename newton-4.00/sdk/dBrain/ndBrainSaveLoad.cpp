@@ -36,6 +36,7 @@
 #include "ndBrainLayerActivationSigmoidLinear.h"
 #include "ndBrainLayerActivationCategoricalSoftmax.h"
 #include "ndBrainAgentContinuePolicyGradient_Trainer.h"
+#include "ndBrainLayerActivationPolicyGradientMeanSigma.h"
 //#include "ndBrainLayerConvolutionalWithDropOut_2d.h"
 
 ndBrain* ndBrainLoad::Load(const char* const pathName)
@@ -113,14 +114,6 @@ ndBrain* ndBrainLoad::Load() const
 		{
 			layer = ndBrainLayerActivationRelu::Load(this);
 		}
-		else if (!strcmp(layerType, "ndBrainLayerActivationLinear"))
-		{
-			layer = ndBrainLayerActivationLinear::Load(this);
-		}
-		else if (!strcmp(layerType, "ndBrainLayerActivationTanh"))
-		{
-			layer = ndBrainLayerActivationTanh::Load(this);
-		}
 		else if (!strcmp(layerType, "ndBrainLayerActivationSigmoid"))
 		{
 			layer = ndBrainLayerActivationSigmoid::Load(this);
@@ -153,9 +146,17 @@ ndBrain* ndBrainLoad::Load() const
 		{
 			layer = ndBrainLayerImagePolling_2x2::Load(this);
 		}
-		else if (!strcmp(layerType, "ndPolicyGradientActivation"))
+		else if (!strcmp(layerType, ND_BRAIN_LAYER_ACTIVATION_LINEAR_NAME))
 		{
-			layer = ndPolicyGradientActivation::Load(this);
+			layer = ndBrainLayerActivationLinear::Load(this);
+		}
+		else if (!strcmp(layerType, ND_BRAIN_LAYER_ACTIVATION_TANGH_NAME))
+		{
+			layer = ndBrainLayerActivationTanh::Load(this);
+		}
+		else if (!strcmp(layerType, ND_BRAIN_LAYER_ACTIVATION_POLICY_MEAN_SIGMAN_NAME))
+		{
+			layer = ndBrainLayerActivationPolicyGradientMeanSigma::Load(this);
 		}
 		else
 		{

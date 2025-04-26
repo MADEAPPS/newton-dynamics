@@ -44,7 +44,10 @@ class ndBrainFloat4
 	ndBrainFloat4 operator- (const ndBrainFloat4& A) const;
 	ndBrainFloat4 operator* (const ndBrainFloat4& A) const;
 
+	ndBrainFloat4 Tanh() const;
 	ndBrainFloat HorizontalAdd() const;
+	ndBrainFloat4 Min(const ndBrainFloat4& A) const;
+	ndBrainFloat4 Max(const ndBrainFloat4& A) const;
 	ndBrainFloat4 MulAdd(const ndBrainFloat4& A, const ndBrainFloat4& B) const;
 	ndBrainFloat4 MulSub(const ndBrainFloat4& A, const ndBrainFloat4& B) const;
 
@@ -159,6 +162,21 @@ inline ndBrainFloat4 ndBrainFloat4::MulAdd(const ndBrainFloat4& A, const ndBrain
 inline ndBrainFloat4 ndBrainFloat4::MulSub(const ndBrainFloat4& A, const ndBrainFloat4& B) const
 {
 	return _mm_sub_ps(m_type, _mm_mul_ps(A.m_type, B.m_type));
+}
+
+inline ndBrainFloat4 ndBrainFloat4::Min(const ndBrainFloat4& A) const
+{
+	return _mm_min_ps(m_type, A.m_type);
+}
+
+inline ndBrainFloat4 ndBrainFloat4::Max(const ndBrainFloat4& A) const
+{
+	return _mm_max_ps(m_type, A.m_type);
+}
+
+inline ndBrainFloat4 ndBrainFloat4::Tanh() const
+{
+	return _mm_tanh_ps(m_type);
 }
 
 inline ndBrainFloat4 ndBrainFloat4::operator& (const ndBrainFloat4& data) const

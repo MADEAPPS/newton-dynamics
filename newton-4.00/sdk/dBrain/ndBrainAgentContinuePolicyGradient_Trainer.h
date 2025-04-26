@@ -28,33 +28,13 @@
 #include "ndBrainTrainer.h"
 #include "ndBrainOptimizer.h"
 #include "ndBrainThreadPool.h"
-#include "ndBrainLayerActivationRelu.h"
-#include "ndBrainLayerActivationTanh.h"
 #include "ndBrainLossLeastSquaredError.h"
-#include "ndBrainLayerActivationSigmoidLinear.h"
 
 // this is an implementation of the vanilla policy Gradient as described in:
 // https://spinningup.openai.com/en/latest/algorithms/vpg.html
 
 class ndBrainOptimizerAdam;
 class ndBrainAgentContinuePolicyGradient_TrainerMaster;
-
-//class ndPolicyGradientActivation : public ndBrainLayerActivationTanh
-class ndPolicyGradientActivation : public ndBrainLayerActivation
-{
-	public:
-	ndPolicyGradientActivation(ndInt32 neurons);
-	ndPolicyGradientActivation(const ndPolicyGradientActivation& src);
-	ndBrainLayer* Clone() const;
-
-	ndBrainFloat GetMinSigma() const;
-	virtual const char* GetLabelId() const override;
-	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
-	virtual void Save(const ndBrainSave* const loadSave) const override;
-
-	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const override;
-	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const override;
-};
 
 class ndBrainAgentContinuePolicyGradient_Agent : public ndBrainAgent
 {

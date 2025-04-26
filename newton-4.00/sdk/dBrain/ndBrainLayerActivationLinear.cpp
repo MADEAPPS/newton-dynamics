@@ -47,7 +47,7 @@ ndBrainLayer* ndBrainLayerActivationLinear::Clone() const
 
 const char* ndBrainLayerActivationLinear::GetLabelId() const
 {
-	return "ndBrainLayerActivationLinear";
+	return ND_BRAIN_LAYER_ACTIVATION_LINEAR_NAME;
 }
 
 void ndBrainLayerActivationLinear::Save(const ndBrainSave* const loadSave) const
