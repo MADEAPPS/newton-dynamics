@@ -41,8 +41,7 @@
 	#define ND_NUMBER_OF_CRITICS	1
 #endif
 
-#define ND_POLICY_DELAY_MOD		2
-
+#define ND_POLICY_DELAY_MOD		1
 
 class ndBrainOptimizerAdam;
 class ndBrainAgentDDPG_Trainer;
