@@ -27,13 +27,13 @@
 #include <ndBrainLoss.h>
 #include <ndBrainAgent.h>
 #include <ndBrainLayer.h>
-#include <ndBrainFloat4.h>
 #include <ndBrainVector.h>
 #include <ndBrainMatrix.h>
 #include <ndBrainTrainer.h>
 #include <ndBrainSaveLoad.h>
 #include <ndBrainAgentDQN.h>
 #include <ndBrainOptimizer.h>
+#include <ndBrainSimdFloat8.h>
 #include <ndBrainThreadPool.h>
 #include <ndBrainLayerLinear.h>
 #include <ndBrainReplayBuffer.h>

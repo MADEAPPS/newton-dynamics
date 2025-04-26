@@ -20,7 +20,7 @@
 */
 
 #include "ndBrainStdafx.h"
-#include "ndBrainFloat4.h"
+//#include "ndBrainFloat4.h"
 #include "ndBrainSaveLoad.h"
 #include "gpu/ndBrainGpuBuffer.h"
 #include "gpu/ndBrainGpuBuffer.h"
@@ -378,35 +378,37 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 	// calculate filter weight gradients
 	auto CrossCorrelationGradient = [this](const ndBrainVector& input, ndInt32 y0, ndInt32 x0, const ndBrainVector& outputDerivative)
 	{
-		ndBrainFloat value = ndBrainFloat(0.0f);
-		ndBrainFloat4 valueSim (ndBrainFloat(0.0f));
-		ndInt32 inputDerivativeBase = 0;
-		ndInt32 inputBase = y0 * m_inputWidth + x0;
-
-		const ndInt32 outputWidthSimd = m_outputWidth & -4;
-		for (ndInt32 y = 0; y < m_outputHeight; ++y)
-		{
-			const ndBrainMemVector in(&input[inputBase], m_outputWidth);
-			const ndBrainMemVector outputGrad(&outputDerivative[inputDerivativeBase], m_outputWidth);
-			const ndBrainFloat4* const inSimd = (ndBrainFloat4*)&in[0];
-			const ndBrainFloat4* const outputGradSimd = (ndBrainFloat4*)&outputGrad[0];
-			ndInt32 indxSimd = 0;
-			for (ndInt32 x = 0; x < outputWidthSimd; x += 4)
-			{
-				valueSim = valueSim + inSimd[indxSimd] * outputGradSimd[indxSimd];
-				indxSimd++;
-			}
-			for (ndInt32 x = outputWidthSimd; x < m_outputWidth; ++x)
-			{
-				value += in[x] * outputGrad[x];
-			}
-
-			inputBase += m_inputWidth;
-			inputDerivativeBase += m_outputWidth;
-		}
-		//value += valueSim.m_x + valueSim.m_y + valueSim.m_z + valueSim.m_w;
-		value += valueSim.HorizontalAdd();
-		return value;
+		ndAssert(0);
+		return 0;
+		//ndBrainFloat value = ndBrainFloat(0.0f);
+		//ndBrainFloat4 valueSim (ndBrainFloat(0.0f));
+		//ndInt32 inputDerivativeBase = 0;
+		//ndInt32 inputBase = y0 * m_inputWidth + x0;
+		//
+		//const ndInt32 outputWidthSimd = m_outputWidth & -4;
+		//for (ndInt32 y = 0; y < m_outputHeight; ++y)
+		//{
+		//	const ndBrainMemVector in(&input[inputBase], m_outputWidth);
+		//	const ndBrainMemVector outputGrad(&outputDerivative[inputDerivativeBase], m_outputWidth);
+		//	const ndBrainFloat4* const inSimd = (ndBrainFloat4*)&in[0];
+		//	const ndBrainFloat4* const outputGradSimd = (ndBrainFloat4*)&outputGrad[0];
+		//	ndInt32 indxSimd = 0;
+		//	for (ndInt32 x = 0; x < outputWidthSimd; x += 4)
+		//	{
+		//		valueSim = valueSim + inSimd[indxSimd] * outputGradSimd[indxSimd];
+		//		indxSimd++;
+		//	}
+		//	for (ndInt32 x = outputWidthSimd; x < m_outputWidth; ++x)
+		//	{
+		//		value += in[x] * outputGrad[x];
+		//	}
+		//
+		//	inputBase += m_inputWidth;
+		//	inputDerivativeBase += m_outputWidth;
+		//}
+		////value += valueSim.m_x + valueSim.m_y + valueSim.m_z + valueSim.m_w;
+		//value += valueSim.HorizontalAdd();
+		//return value;
 	};
 
 	ndInt32 outputOffset = 0;
@@ -436,220 +438,228 @@ void ndBrainLayerConvolutional_2d::CalculateParamGradients(
 		outputOffset += outputSize;
 	}
 
+	ndAssert(0);
 	// calculate input gradients
-	ndBrainFloat4 convKernelSimd[64];
+	//ndBrainFloat4 convKernelSimd[64];
+	//
+	//const ndInt32 paddSizeWidth = m_inputWidth + m_kernelSize - 1;
+	//const ndInt32 paddSizeHeight = m_inputHeight + m_kernelSize - 1;
+	//ndBrainMemVector paddedGradientOut(&output[0] + GetOutputSize(), ndInt32 (paddSizeWidth * paddSizeHeight));
+	//paddedGradientOut.Set(ndBrainFloat(0.0f));
+	//
+	//auto RotateKernelSimd = [&convKernelSimd](const ndBrainVector& kernel)
+	//{
+	//	for (ndInt32 i = ndInt32(kernel.GetCount() - 1); i >= 0; --i)
+	//	{
+	//		ndAssert(0);
+	//		//convKernelSimd[i] = ndBrainFloat4(kernel[i]);
+	//	}
+	//};
+	//
+	//auto CopyOutput = [this, &outputDerivative, &paddedGradientOut](ndInt32 filter)
+	//{
+	//	ndInt32 srcOffset = 0;
+	//	ndInt32 dstWidth = m_inputWidth + m_kernelSize - 1;
+	//	ndInt32 outputSize = m_outputWidth * m_outputHeight;
+	//	ndInt32 dstOffset = dstWidth * (m_kernelSize - 1) + m_kernelSize - 1;
+	//	const ndBrainMemVector srcGrad(&outputDerivative[filter * outputSize], outputSize);
+	//	for (ndInt32 y = 0; y < m_outputHeight; ++y)
+	//	{
+	//		const ndBrainMemVector src(&srcGrad[srcOffset], m_outputWidth);
+	//		ndBrainMemVector dst(&paddedGradientOut[dstOffset], m_outputWidth);
+	//		dst.Set(src);
+	//		dstOffset += dstWidth;
+	//		srcOffset += m_outputWidth;
+	//	}
+	//};
+	//
+	//auto CrossCorrelationScalar = [this](const ndBrainVector& input, const ndBrainVector& filter)
+	//{
+	//	ndBrainFloat value = ndBrainFloat(0.0f);
+	//	for (ndInt32 i = 0; i < m_inputGradOffsets.GetCount(); ++i)
+	//	{
+	//		ndInt32 index = m_inputGradOffsets[i];
+	//		value += input[index] * filter[i];
+	//	}
+	//	return value;
+	//};
 
-	const ndInt32 paddSizeWidth = m_inputWidth + m_kernelSize - 1;
-	const ndInt32 paddSizeHeight = m_inputHeight + m_kernelSize - 1;
-	ndBrainMemVector paddedGradientOut(&output[0] + GetOutputSize(), ndInt32 (paddSizeWidth * paddSizeHeight));
-	paddedGradientOut.Set(ndBrainFloat(0.0f));
+	//auto CrossCorrelationSimd = [this, &convKernelSimd](const ndBrainVector& input)
+	//{
+	//	ndAssert(0);
+	//	//ndBrainFloat4 value(0.0f);
+	//	//for (ndInt32 i = 0; i < (m_inputGradOffsets.GetCount() & -4); i += 4)
+	//	//{
+	//	//	ndInt32 index = m_inputGradOffsets[i + 0];
+	//	//	value = value + ((ndBrainFloat4&)input[index]) * convKernelSimd[i + 0];
+	//	//
+	//	//	index = m_inputGradOffsets[i + 1];
+	//	//	value = value + ((ndBrainFloat4&)input[index]) * convKernelSimd[i + 1];
+	//	//
+	//	//	index = m_inputGradOffsets[i + 2];
+	//	//	value = value + ((ndBrainFloat4&)input[index]) * convKernelSimd[i + 2];
+	//	//
+	//	//	index = m_inputGradOffsets[i + 3];
+	//	//	value = value + ((ndBrainFloat4&)input[index]) * convKernelSimd[i + 3];
+	//	//}
+	//	//for (ndInt32 i = m_inputGradOffsets.GetCount() & -4; i < m_inputGradOffsets.GetCount(); ++i)
+	//	//{
+	//	//	ndInt32 index = m_inputGradOffsets[i];
+	//	//	const ndBrainFloat4* const src = (ndBrainFloat4*)&input[index];
+	//	//	value = value + src[0] * convKernelSimd[i];
+	//	//}
+	//	//return value;
+	//};
 
-	auto RotateKernelSimd = [&convKernelSimd](const ndBrainVector& kernel)
-	{
-		for (ndInt32 i = ndInt32(kernel.GetCount() - 1); i >= 0; --i)
-		{
-			convKernelSimd[i] = ndBrainFloat4(kernel[i]);
-		}
-	};
-
-	auto CopyOutput = [this, &outputDerivative, &paddedGradientOut](ndInt32 filter)
-	{
-		ndInt32 srcOffset = 0;
-		ndInt32 dstWidth = m_inputWidth + m_kernelSize - 1;
-		ndInt32 outputSize = m_outputWidth * m_outputHeight;
-		ndInt32 dstOffset = dstWidth * (m_kernelSize - 1) + m_kernelSize - 1;
-		const ndBrainMemVector srcGrad(&outputDerivative[filter * outputSize], outputSize);
-		for (ndInt32 y = 0; y < m_outputHeight; ++y)
-		{
-			const ndBrainMemVector src(&srcGrad[srcOffset], m_outputWidth);
-			ndBrainMemVector dst(&paddedGradientOut[dstOffset], m_outputWidth);
-			dst.Set(src);
-			dstOffset += dstWidth;
-			srcOffset += m_outputWidth;
-		}
-	};
-
-	auto CrossCorrelationScalar = [this](const ndBrainVector& input, const ndBrainVector& filter)
-	{
-		ndBrainFloat value = ndBrainFloat(0.0f);
-		for (ndInt32 i = 0; i < m_inputGradOffsets.GetCount(); ++i)
-		{
-			ndInt32 index = m_inputGradOffsets[i];
-			value += input[index] * filter[i];
-		}
-		return value;
-	};
-
-	auto CrossCorrelationSimd = [this, &convKernelSimd](const ndBrainVector& input)
-	{
-		ndBrainFloat4 value(0.0f);
-		for (ndInt32 i = 0; i < (m_inputGradOffsets.GetCount() & -4); i += 4)
-		{
-			ndInt32 index = m_inputGradOffsets[i + 0];
-			value = value + ((ndBrainFloat4&)input[index]) * convKernelSimd[i + 0];
-
-			index = m_inputGradOffsets[i + 1];
-			value = value + ((ndBrainFloat4&)input[index]) * convKernelSimd[i + 1];
-
-			index = m_inputGradOffsets[i + 2];
-			value = value + ((ndBrainFloat4&)input[index]) * convKernelSimd[i + 2];
-
-			index = m_inputGradOffsets[i + 3];
-			value = value + ((ndBrainFloat4&)input[index]) * convKernelSimd[i + 3];
-		}
-		for (ndInt32 i = m_inputGradOffsets.GetCount() & -4; i < m_inputGradOffsets.GetCount(); ++i)
-		{
-			ndInt32 index = m_inputGradOffsets[i];
-			const ndBrainFloat4* const src = (ndBrainFloat4*)&input[index];
-			value = value + src[0] * convKernelSimd[i];
-		}
-		return value;
-	};
-
-	kernelOffset = 0;
-	ndInt32 inputOffset = 0;
-	const ndInt32 gradInputWidth = m_inputWidth + m_kernelSize - 1;
-	const ndInt32 gradInputSize = gradInputWidth * m_kernelSize;
-	const ndInt32 roundedInputWith = m_inputWidth & -4;
-
-	inputGradient.Set(ndBrainFloat(0.0f));
-	for (ndInt32 filter = 0; filter < m_outputLayers; ++filter)
-	{
-		inputOffset = 0;
-		CopyOutput(filter);
-		for (ndInt32 channel = 0; channel < m_inputLayers; ++channel)
-		{
-			ndBrainMemVector inputGrad(&inputGradient[inputOffset], inputSize);
-			const ndBrainMemVector kernelGradients(&m_kernels[kernelOffset], kernelSize);
-
-			ndInt32 outOffset = 0;
-			ndInt32 gradInputOffset = 0;
-			RotateKernelSimd(kernelGradients);
-			for (ndInt32 y = 0; y < m_inputHeight; ++y)
-			{
-				ndInt32 outIndex = 0;
-				ndBrainFloat4* const out4 = (ndBrainFloat4*)&inputGrad[outOffset];
-				for (ndInt32 x = 0; x < roundedInputWith; x += 4)
-				{
-					const ndBrainMemVector in(&paddedGradientOut[gradInputOffset + x], gradInputSize);
-					out4[outIndex] = out4[outIndex] + CrossCorrelationSimd(in);
-					outIndex++;
-				}
-				outIndex *= 4;
-				for (ndInt32 x = roundedInputWith; x < m_inputWidth; ++x)
-				{
-					const ndBrainMemVector in(&paddedGradientOut[gradInputOffset + x], gradInputSize);
-					inputGrad[outOffset + outIndex] += CrossCorrelationScalar(in, kernelGradients);
-					outIndex++;
-				}
-				outOffset += m_inputWidth;
-				gradInputOffset += gradInputWidth;
-			}
-
-			inputOffset += inputSize;
-			kernelOffset += kernelSize;
-		}
-	}
+	//kernelOffset = 0;
+	//ndInt32 inputOffset = 0;
+	//const ndInt32 gradInputWidth = m_inputWidth + m_kernelSize - 1;
+	//const ndInt32 gradInputSize = gradInputWidth * m_kernelSize;
+	//const ndInt32 roundedInputWith = m_inputWidth & -4;
+	//
+	//inputGradient.Set(ndBrainFloat(0.0f));
+	//for (ndInt32 filter = 0; filter < m_outputLayers; ++filter)
+	//{
+	//	inputOffset = 0;
+	//	CopyOutput(filter);
+	//	for (ndInt32 channel = 0; channel < m_inputLayers; ++channel)
+	//	{
+	//		ndAssert(0);
+	//		//ndBrainMemVector inputGrad(&inputGradient[inputOffset], inputSize);
+	//		//const ndBrainMemVector kernelGradients(&m_kernels[kernelOffset], kernelSize);
+	//		//
+	//		//ndInt32 outOffset = 0;
+	//		//ndInt32 gradInputOffset = 0;
+	//		//RotateKernelSimd(kernelGradients);
+	//		//for (ndInt32 y = 0; y < m_inputHeight; ++y)
+	//		//{
+	//		//	ndInt32 outIndex = 0;
+	//		//	ndBrainFloat4* const out4 = (ndBrainFloat4*)&inputGrad[outOffset];
+	//		//	for (ndInt32 x = 0; x < roundedInputWith; x += 4)
+	//		//	{
+	//		//		const ndBrainMemVector in(&paddedGradientOut[gradInputOffset + x], gradInputSize);
+	//		//		out4[outIndex] = out4[outIndex] + CrossCorrelationSimd(in);
+	//		//		outIndex++;
+	//		//	}
+	//		//	outIndex *= 4;
+	//		//	for (ndInt32 x = roundedInputWith; x < m_inputWidth; ++x)
+	//		//	{
+	//		//		const ndBrainMemVector in(&paddedGradientOut[gradInputOffset + x], gradInputSize);
+	//		//		inputGrad[outOffset + outIndex] += CrossCorrelationScalar(in, kernelGradients);
+	//		//		outIndex++;
+	//		//	}
+	//		//	outOffset += m_inputWidth;
+	//		//	gradInputOffset += gradInputWidth;
+	//		//}
+	//		//
+	//		//inputOffset += inputSize;
+	//		//kernelOffset += kernelSize;
+	//	}
+	//}
 }
 
 void ndBrainLayerConvolutional_2d::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
-	ndAssert(input.GetCount() == GetInputSize());
-
-	const ndInt32 inputSize = m_inputWidth * m_inputHeight;
-	const ndInt32 kernelSize = m_kernelSize * m_kernelSize;
-	const ndInt32 outputSize = m_outputWidth * m_outputHeight;
-	const ndBrainFloat biasScale = ndBrainFloat(1.0f) / ndBrainFloat(m_inputLayers * outputSize);
-
-	ndBrainFloat4 convKernelSimd[64];
-
-	auto CrossCorrelationSimd = [this, &convKernelSimd](const ndBrainVector& input)
-	{
-		ndBrainFloat4 value(0.0f);
-		for (ndInt32 i = 0; i < (m_inputOffsets.GetCount() & -8); i += 8)
-		{
-			for (ndInt32 j = 0; j < 8; ++j)
-			{
-				ndInt32 index = m_inputOffsets[i + j];
-				const ndBrainFloat4& src = (ndBrainFloat4&)input[index];
-				value = value + src * convKernelSimd[i + j];
-			}
-		}
-		for (ndInt32 i = m_inputOffsets.GetCount() & -8; i < m_inputOffsets.GetCount(); ++i)
-		{
-			ndInt32 index = m_inputOffsets[i];
-			const ndBrainFloat4& src = (ndBrainFloat4&)input[index];
-			value = value + src * convKernelSimd[i];
-		}
-		return value;
-	};
-
-	auto CrossCorrelationScalar = [this](const ndBrainVector& input, const ndBrainVector& convKernel)
-	{
-		ndBrainFloat value = ndBrainFloat(0.0f);
-		ndInt32 flipIndex = 0;
-		for (ndInt32 i = m_inputOffsets.GetCount() - 1; i >= 0; --i)
-		{
-			ndInt32 index = m_inputOffsets[i];
-			ndAssert(convKernel[i] < ndBrainFloat(100.0f));
-			ndAssert(convKernel[i] > ndBrainFloat(-100.0f));
-			value += input[index] * convKernel[flipIndex];
-			flipIndex++;
-		}
-		return value;
-	};
-
-	auto RotateKernelSimd = [&convKernelSimd](const ndBrainVector& kernel)
-	{
-		for (ndInt32 i = ndInt32(kernel.GetCount() - 1); i >= 0; --i)
-		{
-			convKernelSimd[kernel.GetCount() - 1 - i] = ndBrainFloat4(kernel[i]);
-		}
-	};
-
-	ndInt32 outputOffset = 0;
-	ndInt32 kernelOffset = 0;
-	const ndInt32 roundedOuputWith = m_outputWidth & -4;
-
-	for (ndInt32 i = 0; i < m_outputLayers; ++i)
-	{
-		ndBrainMemVector out(&output[outputOffset], outputSize);
-
-		ndInt32 inputOffset = 0;
-		out.Set(m_bias[i] * biasScale);
-		for (ndInt32 channel = 0; channel < m_inputLayers; ++channel)
-		{
-			const ndBrainMemVector filter(&m_kernels[kernelOffset], kernelSize);
-			RotateKernelSimd(filter);
-
-			ndInt32 outOffset = 0;
-			ndInt32 inputBase = inputOffset;
-			for (ndInt32 y = 0; y < m_outputHeight; ++y)
-			{
-				ndInt32 outIndex = 0;
-				ndBrainFloat4* const out4 = (ndBrainFloat4*)&out[outOffset];
-				for (ndInt32 x = 0; x < roundedOuputWith; x += 4)
-				{
-					const ndBrainMemVector in(&input[inputBase + x], inputSize);
-					out4[outIndex] = out4[outIndex] + CrossCorrelationSimd(in);
-					outIndex++;
-				}
-				outIndex *= 4;
-				for (ndInt32 x = roundedOuputWith; x < m_outputWidth; ++x)
-				{
-					const ndBrainMemVector in(&input[inputBase + x], inputSize);
-					out[outOffset + outIndex] += CrossCorrelationScalar(in, filter);
-					outIndex++;
-				}
-				outOffset += m_outputWidth;
-				inputBase += m_inputWidth;
-			}
-
-			inputOffset += inputSize;
-			kernelOffset += kernelSize;
-		}
-		outputOffset += outputSize;
-	}
+	ndAssert(0);
+	//ndAssert(input.GetCount() == GetInputSize());
+	//
+	//const ndInt32 inputSize = m_inputWidth * m_inputHeight;
+	//const ndInt32 kernelSize = m_kernelSize * m_kernelSize;
+	//const ndInt32 outputSize = m_outputWidth * m_outputHeight;
+	//const ndBrainFloat biasScale = ndBrainFloat(1.0f) / ndBrainFloat(m_inputLayers * outputSize);
+	//
+	//ndBrainFloat4 convKernelSimd[64];
+	//
+	//auto CrossCorrelationSimd = [this, &convKernelSimd](const ndBrainVector& input)
+	//{
+	//	ndAssert(0);
+	//	//ndBrainFloat4 value(0.0f);
+	//	//for (ndInt32 i = 0; i < (m_inputOffsets.GetCount() & -8); i += 8)
+	//	//{
+	//	//	for (ndInt32 j = 0; j < 8; ++j)
+	//	//	{
+	//	//		ndInt32 index = m_inputOffsets[i + j];
+	//	//		const ndBrainFloat4& src = (ndBrainFloat4&)input[index];
+	//	//		value = value + src * convKernelSimd[i + j];
+	//	//	}
+	//	//}
+	//	//for (ndInt32 i = m_inputOffsets.GetCount() & -8; i < m_inputOffsets.GetCount(); ++i)
+	//	//{
+	//	//	ndInt32 index = m_inputOffsets[i];
+	//	//	const ndBrainFloat4& src = (ndBrainFloat4&)input[index];
+	//	//	value = value + src * convKernelSimd[i];
+	//	//}
+	//	//return value;
+	//};
+	//
+	//auto CrossCorrelationScalar = [this](const ndBrainVector& input, const ndBrainVector& convKernel)
+	//{
+	//	ndBrainFloat value = ndBrainFloat(0.0f);
+	//	ndInt32 flipIndex = 0;
+	//	for (ndInt32 i = m_inputOffsets.GetCount() - 1; i >= 0; --i)
+	//	{
+	//		ndInt32 index = m_inputOffsets[i];
+	//		ndAssert(convKernel[i] < ndBrainFloat(100.0f));
+	//		ndAssert(convKernel[i] > ndBrainFloat(-100.0f));
+	//		value += input[index] * convKernel[flipIndex];
+	//		flipIndex++;
+	//	}
+	//	return value;
+	//};
+	//
+	////auto RotateKernelSimd = [&convKernelSimd](const ndBrainVector& kernel)
+	////{
+	////	for (ndInt32 i = ndInt32(kernel.GetCount() - 1); i >= 0; --i)
+	////	{
+	////		ndAssert(0);
+	////		//convKernelSimd[kernel.GetCount() - 1 - i] = ndBrainFloat4(kernel[i]);
+	////	}
+	////};
+	//
+	//ndInt32 outputOffset = 0;
+	//ndInt32 kernelOffset = 0;
+	//const ndInt32 roundedOuputWith = m_outputWidth & -4;
+	//
+	//for (ndInt32 i = 0; i < m_outputLayers; ++i)
+	//{
+	//	ndBrainMemVector out(&output[outputOffset], outputSize);
+	//
+	//	ndInt32 inputOffset = 0;
+	//	out.Set(m_bias[i] * biasScale);
+	//	for (ndInt32 channel = 0; channel < m_inputLayers; ++channel)
+	//	{
+	//		ndAssert(0);
+	//		//const ndBrainMemVector filter(&m_kernels[kernelOffset], kernelSize);
+	//		//RotateKernelSimd(filter);
+	//		//
+	//		//ndInt32 outOffset = 0;
+	//		//ndInt32 inputBase = inputOffset;
+	//		//for (ndInt32 y = 0; y < m_outputHeight; ++y)
+	//		//{
+	//		//	ndInt32 outIndex = 0;
+	//		//	ndBrainFloat4* const out4 = (ndBrainFloat4*)&out[outOffset];
+	//		//	for (ndInt32 x = 0; x < roundedOuputWith; x += 4)
+	//		//	{
+	//		//		const ndBrainMemVector in(&input[inputBase + x], inputSize);
+	//		//		out4[outIndex] = out4[outIndex] + CrossCorrelationSimd(in);
+	//		//		outIndex++;
+	//		//	}
+	//		//	outIndex *= 4;
+	//		//	for (ndInt32 x = roundedOuputWith; x < m_outputWidth; ++x)
+	//		//	{
+	//		//		const ndBrainMemVector in(&input[inputBase + x], inputSize);
+	//		//		out[outOffset + outIndex] += CrossCorrelationScalar(in, filter);
+	//		//		outIndex++;
+	//		//	}
+	//		//	outOffset += m_outputWidth;
+	//		//	inputBase += m_inputWidth;
+	//		//}
+	//		//
+	//		//inputOffset += inputSize;
+	//		//kernelOffset += kernelSize;
+	//	}
+	//	outputOffset += outputSize;
+	//}
 }
 
 ndBrainGpuCommand* ndBrainLayerConvolutional_2d::AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params)

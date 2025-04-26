@@ -20,8 +20,8 @@
 */
 
 #include "ndBrainStdafx.h"
-#include "ndBrainFloat4.h"
 #include "ndBrainVector.h"
+#include "ndBrainSimdFloat8.h"
 
 void ndBrainVector::InitGaussianWeights(ndBrainFloat variance)
 {
@@ -171,21 +171,33 @@ void ndBrainVector::Clamp(ndBrainFloat min, ndBrainFloat max)
 void ndBrainVector::FlushToZero()
 {
 	//return (val > T(1.0e-16f)) ? val : ((val < T(-1.0e-16f)) ? val : T(0.0f));
-	const ndBrainFloat4 max(ndBrainFloat(1.0e-16f));
-	const ndBrainFloat4 min(ndBrainFloat(-1.0e-16f));
-	ndBrainFloat4* const ptrSimd =(ndBrainFloat4*) &(*this)[0];
 
-	const ndInt32 roundCount = (ndInt32 (GetCount()) & -4) / 4;
+#if 1
+	const ndBrainSimdFloat8 max(ndBrainFloat(1.0e-16f));
+	const ndBrainSimdFloat8 min(ndBrainFloat(-1.0e-16f));
+	ndBrainSimdFloat8* const ptrSimd = (ndBrainSimdFloat8*) &(*this)[0];
+	const ndInt32 roundCount = ndInt32(GetCount()) >> 3;
 	for (ndInt32 i = 0; i < roundCount; ++i)
 	{
-		const ndBrainFloat4 mask((ptrSimd[i] < min) | (ptrSimd[i] > max));
+		const ndBrainSimdFloat8 mask((ptrSimd[i] < min) | (ptrSimd[i] > max));
 		ptrSimd[i] = ptrSimd[i] & mask;
 	}
-	for (ndInt32 i = roundCount * 4; i < GetCount(); ++i)
+	for (ndInt32 i = ndInt32(GetCount() - 1); i >= (roundCount * 8); --i)
+	{
+		ndBrainFloat val = ptrSimd[roundCount].m_f[i];
+		ptrSimd[roundCount].m_f[i] = (val > max.m_f[0]) ? val : ((val < min.m_f[0]) ? val : ndBrainFloat(0.0f));
+	}
+
+#else
+	ndBrainFloat* const ptr = &(*this)[0];
+	const ndBrainFloat max = ndBrainFloat(1.0e-16f);
+	const ndBrainFloat min = ndBrainFloat(-1.0e-16f);
+	for (ndInt32 i = 0; i < ndInt32(GetCount()); ++i)
 	{
 		ndBrainFloat val = (*this)[i];
-		(*this)[i] = (val > max.m_x) ? val : ((val < min.m_x) ? val : ndBrainFloat(0.0f));
+		ptr[i] = (val > max) ? val : ((val < min) ? val : ndBrainFloat(0.0f));
 	}
+#endif
 }
 
 void ndBrainVector::ScaleSet(const ndBrainVector& a, ndBrainFloat b)

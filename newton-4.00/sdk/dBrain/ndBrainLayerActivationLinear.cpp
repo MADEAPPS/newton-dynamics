@@ -20,7 +20,7 @@
 */
 
 #include "ndBrainStdafx.h"
-#include "ndBrainFloat4.h"
+//#include "ndBrainFloat4.h"
 #include "ndBrainSaveLoad.h"
 #include "gpu/ndBrainGpuContext.h"
 #include "ndBrainLayerActivationLinear.h"

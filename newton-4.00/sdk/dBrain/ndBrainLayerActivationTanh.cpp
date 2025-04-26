@@ -20,8 +20,8 @@
 */
 
 #include "ndBrainStdafx.h"
-#include "ndBrainFloat4.h"
 #include "ndBrainSaveLoad.h"
+#include "ndBrainSimdFloat8.h"
 #include "gpu/ndBrainGpuContext.h"
 #include "ndBrainLayerActivationTanh.h"
 
@@ -61,30 +61,21 @@ void ndBrainLayerActivationTanh::MakePrediction(const ndBrainVector& input, ndBr
 {
 	ndAssert(input.GetCount() == output.GetCount());
 
-#ifdef D_NEWTON_USE_AVX2_OPTION
-	ndBrainFloat4 maxVal(30.0f);
-	ndBrainFloat4 minVal(-30.0f);
-	ndBrainFloat4* const dst = (ndBrainFloat4*)&output[0];
-	const ndBrainFloat4* const src = (ndBrainFloat4*)&input[0];
-	const ndInt32 count = ndInt32(input.GetCount()) >> 2;
-	for (ndInt32 i = 0; i < count; ++i)
+	ndBrainSimdFloat8 max(30.0f);
+	ndBrainSimdFloat8 min(-30.0f);
+	ndBrainSimdFloat8* const dst = (ndBrainSimdFloat8*)&output[0];
+	const ndBrainSimdFloat8* const src = (ndBrainSimdFloat8*)&input[0];
+	const ndInt32 roundCount = ndInt32(input.GetCount()) >> 3;
+	for (ndInt32 i = 0; i < roundCount; ++i)
 	{
-		ndBrainFloat4 value(maxVal.Min(minVal.Max(src[i])));
+		const ndBrainSimdFloat8 value(src[i].Clamp(min, max));
 		dst[i] = value.Tanh();
 	}
-	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= (count * 4); --i)
+	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= (roundCount * 8); --i)
 	{
 		ndBrainFloat value = ndClamp(input[i], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
 		output[i] = ndBrainFloat(ndTanh(value));
 	}
-#else
-	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
-	{
-		ndBrainFloat value = ndClamp(input[i], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
-		output[i] = ndBrainFloat(ndTanh(value));
-	}
-#endif
-
 	output.FlushToZero();
 }
 
