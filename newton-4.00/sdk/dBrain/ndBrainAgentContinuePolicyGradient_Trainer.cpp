@@ -801,10 +801,13 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::CalculateAdvange()
 	ndBrainThreadPool::ParallelExecute(CalculateAdvantage);
 	if (m_advantage.GetCount() < m_randomPermutation.GetCount())
 	{
-		ndInt32 mod = ndInt32(m_advantage.GetCount());
+		ndInt32 start = 0;
 		for (ndInt32 i = ndInt32(m_advantage.GetCount()); i < m_randomPermutation.GetCount(); ++i)
 		{
-			m_advantage.PushBack(m_advantage[i % mod]);
+			m_trajectoryAccumulator.SetCount(i + 1);
+			m_trajectoryAccumulator.CopyFrom(i, m_trajectoryAccumulator, start);
+			m_advantage.PushBack(m_advantage[start]);
+			start++;
 		}
 	}
 

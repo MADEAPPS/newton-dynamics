@@ -190,10 +190,9 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	virtual void Optimize();
 	void OptimizePolicy();
 	void OptimizeCritic();
-	void CalculateAdvange();
-
 	void BuildPolicyClass();
 	void BuildCricticClass();
+	virtual void CalculateAdvange();
 
 	ndBrainAgentContinuePolicyGradient_Agent::ndRandomGenerator* GetRandomGenerator();
 
