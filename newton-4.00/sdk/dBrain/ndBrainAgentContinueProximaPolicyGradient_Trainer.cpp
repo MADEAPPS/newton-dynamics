@@ -142,16 +142,21 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateGradients
 					
 					for (ndInt32 i = numberOfActions - 1; i >= 0; --i)
 					{
+						// as I undestand, this is just a special case of Maximun likelhodd optimization.
+						// given a multivariate Gaussian process with zero cross covariance to the actions.
+						// calculate the log of prob of a multivariate Gaussian
 						const ndBrainFloat mean = probabilityDistribution[i];
-						const ndBrainFloat sigma1 = probabilityDistribution[i + numberOfActions];
-						const ndBrainFloat sigma2 = sigma1 * sigma1;
-						const ndBrainFloat num = sampledProbability[i] - mean;
-					
-						ndBrainFloat meanGradient = num / sigma1;
-						ndBrainFloat sigmaGradient = ndBrainFloat(0.5f) * (num * num / sigma2 - ndBrainFloat(1.0f) / sigma1);
-					
-						loss[i] = meanGradient * advantage;
-						loss[i + numberOfActions] = sigmaGradient * advantage;
+						const ndBrainFloat sigma = probabilityDistribution[i + numberOfActions];
+						const ndBrainFloat sigma2 = sigma * sigma;
+						const ndBrainFloat sigma3 = sigma2 * sigma;
+						ndBrainFloat confidence = sampledProbability[i] - mean;
+
+						ndBrainFloat meanGradient = confidence / sigma2;
+						ndBrainFloat sigmaGradient = confidence * confidence / sigma3 - ndBrainFloat(1.0f) / sigma;
+
+						//negate the gradient for gradient ascend
+						loss[i] = -meanGradient * advantage;
+						loss[i + numberOfActions] = -sigmaGradient * advantage;
 					}
 				}
 
@@ -189,7 +194,6 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateGradients
 	m_policyOptimizer->AccumulateGradients(this, m_policyTrainers);
 	m_policyWeightedTrainer[0]->ScaleWeights(ndBrainFloat(1.0f) / ndBrainFloat(steps));
 	m_policyTrainers[1]->CopyGradients(m_policyWeightedTrainer[0]);
-	//m_policyOptimizer->Update(this, m_policyWeightedTrainer, -m_policyLearnRate);
 }
 
 void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateAdvange()
@@ -229,7 +233,7 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::Optimize()
 	OptimizeCritic();
 	CalculateAdvange();
 	CalculateGradients();
-	ndBrainFloat learnRate = -m_parameters.m_policyLearnRate * ND_CONTINUE_PROXIMA_POLICY_LEARN_SCALE;
+	ndBrainFloat learnRate = m_parameters.m_policyLearnRate * ND_CONTINUE_PROXIMA_POLICY_LEARN_SCALE;
 	m_policyOptimizer->Update(this, m_policyWeightedTrainer, learnRate);
 	for (ndInt32 i = ND_CONTINUE_PROXIMA_POLICY_ITERATIONS; (i >= 0) && (CalculateKLdivergence() < ND_CONTINUE_PROXIMA_POLICY_KL_DIVERGENCE); --i)
 	{
