@@ -1019,7 +1019,7 @@ void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("quadrupeSpider.fbx", scene));
 
 	ndMatrix matrix(ndGetIdentityMatrix());
-	matrix.m_posit.m_y = 0.5f;
+	matrix.m_posit.m_y = 0.75f;
 
 	#ifdef ND_TRAIN_MODEL
 		scene->RegisterPostUpdate(new TrainingUpdata(scene, matrix, modelMesh));
