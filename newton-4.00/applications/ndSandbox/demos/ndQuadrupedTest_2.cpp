@@ -122,7 +122,7 @@ namespace ndQuadruped_2
 	#define D_CYCLE_AMPLITUDE		ndFloat32(0.27f)
 	#define D_POSE_REST_POSITION_Y	ndReal(-0.3f)
 
-	#define D_ACTION_SPEED			ndReal(0.01f)
+	#define D_ACTION_SPEED			ndReal(0.05f)
 
 
 	class RobotModelNotify : public ndModelNotify
@@ -785,8 +785,8 @@ namespace ndQuadruped_2
 			hyperParameters.m_numberOfObservations = m_stateSize;
 			hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
 
-			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
-			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
+			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
+			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
 
 			m_master->SetName(CONTROLLER_NAME);
