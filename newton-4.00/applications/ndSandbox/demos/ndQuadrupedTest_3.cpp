@@ -31,7 +31,7 @@
 // to the environment with increasing complexity
 namespace ndQuadruped_3
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_3-ddpg.dnn"
 
 	enum ndActionSpace

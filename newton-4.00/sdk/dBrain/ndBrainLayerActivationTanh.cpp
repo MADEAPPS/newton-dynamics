@@ -65,7 +65,7 @@ void ndBrainLayerActivationTanh::MakePrediction(const ndBrainVector& input, ndBr
 	const ndBrainSimdFloat8 min(-30.0f);
 	ndBrainFloat* const dst = &output[0];
 	const ndBrainFloat* const src = &input[0];
-	const ndInt32 roundCount = (ndInt32(input.GetCount()) + 7) & -8;
+	const ndInt32 roundCount = ndInt32(input.GetCount()) & -8;
 	for (ndInt32 i = 0; i < roundCount; i += 8)
 	{
 		const ndBrainSimdFloat8 x(&src[i]);

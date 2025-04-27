@@ -172,7 +172,7 @@ void ndBrainVector::FlushToZero()
 {
 	const ndBrainSimdFloat8 max(ndBrainFloat(1.0e-16f));
 	const ndBrainSimdFloat8 min(ndBrainFloat(-1.0e-16f));
-	const ndInt32 roundCount = (ndInt32(GetCount()) + 7) & -8;
+	const ndInt32 roundCount = ndInt32(GetCount()) & -8;
 	ndBrainFloat* const data = &(*this)[0];
 	for (ndInt32 i = 0; i < roundCount; i += 8)
 	{
