@@ -491,7 +491,7 @@ namespace ndQuadruped_3
 		{
 			if (IsTerminal())
 			{
-				return ndBrainFloat(0.0f);
+				return ndBrainFloat(-1.0f);
 			}
 
 			ndFloat32 reward = 0.0f;

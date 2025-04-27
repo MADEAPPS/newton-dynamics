@@ -83,12 +83,6 @@ class ndBrainAgentContinuePolicyGradient_Agent : public ndBrainAgent
 		bool GetTerminalState(ndInt32 entry) const;
 		void SetTerminalState(ndInt32 entry, bool isTernimal);
 
-		//ndBrainFloat GetStateValue(ndInt32 entry) const;
-		//void SetStateValue(ndInt32 entry, ndBrainFloat advantage);
-
-		//ndBrainFloat GetAdvantage(ndInt32 entry) const;
-		//void SetAdvantage(ndInt32 entry, ndBrainFloat advantage);
-
 		ndBrainFloat* GetActions(ndInt32 entry);
 		const ndBrainFloat* GetActions(ndInt32 entry) const;
 
@@ -125,7 +119,7 @@ class ndBrainAgentContinuePolicyGradient_Agent : public ndBrainAgent
 	ndTrajectoryTransition m_trajectory;
 	ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
 	ndRandomGenerator* m_randomGenerator;
-	ndInt32 m_trajectoryCounter;
+	bool m_isDead;
 
 	friend class ndBrainAgentContinuePolicyGradient_TrainerMaster;
 };

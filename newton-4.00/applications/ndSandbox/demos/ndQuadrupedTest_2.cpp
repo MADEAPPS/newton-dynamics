@@ -518,6 +518,10 @@ namespace ndQuadruped_2
 		#pragma optimize( "", off )
 		ndBrainFloat CalculateReward() const
 		{
+			if (IsTerminal())
+			{
+				return -1.0f;
+			}
 			ndFloat32 reward = 0.0f;
 			for (ndInt32 i = 0; i < m_controllerTrainer->m_animPose.GetCount(); ++i)
 			{
@@ -785,8 +789,8 @@ namespace ndQuadruped_2
 			hyperParameters.m_numberOfObservations = m_stateSize;
 			hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
 
-			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
-			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
+			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
+			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
 
 			m_master->SetName(CONTROLLER_NAME);
