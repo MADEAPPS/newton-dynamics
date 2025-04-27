@@ -39,9 +39,10 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 	m_randomSeed = 47;
 	m_numberOfLayers = 3;
 	m_neuronPerLayers = 64;
+	m_criticNeuronScale = 2;
 	m_batchBufferSize = 256;
 	m_maxTrajectorySteps = 4096;
-	m_batchTrajectoryCount = 500;
+	m_batchTrajectoryCount = 1000;
 
 	m_numberOfActions = 0;
 	m_numberOfObservations = 0;
@@ -53,6 +54,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 	m_regularizerType = ndBrainOptimizer::m_ridge;
 
 	m_discountRewardFactor = ndBrainFloat(0.99f);
+	m_generalizedAdvangeDiscount = ndBrainFloat(0.99f);
 	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_batchBufferSize);
 
 //m_threadsCount = 1;
@@ -480,7 +482,6 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildPolicyClass()
 {
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 
-	//layers.PushBack(new ndBrainLayerActivationTanh(m_numberOfObservations));
 	layers.PushBack(new ndBrainLayerLinear(m_parameters.m_numberOfObservations, m_parameters.m_neuronPerLayers));
 	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 	for (ndInt32 i = 0; i < m_parameters.m_numberOfLayers; ++i)
@@ -525,7 +526,8 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildCricticClass()
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 	// build state value critic neural net
 	layers.SetCount(0);
-	ndInt32 criticNeurons = m_parameters.m_neuronPerLayers * 2;
+
+	ndInt32 criticNeurons = m_parameters.m_neuronPerLayers * m_parameters.m_criticNeuronScale;
 	layers.PushBack(new ndBrainLayerLinear(m_parameters.m_numberOfObservations, criticNeurons));
 	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 	for (ndInt32 i = 0; i < m_parameters.m_numberOfLayers; ++i)
@@ -579,7 +581,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 		}
 	}
 
-	// generalize state value function, in theory more noizy but yields better results than Montecarlos.
+	// generalize state value function, in theory more noisy but yields better results than Monte Carlos.
 	if (m_randomPermutation.GetCount() > ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE)
 	{
 		m_randomPermutation.SetCount(ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE);
@@ -600,7 +602,11 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 				ndBrainLossLeastSquaredError loss(1);
 				ndBrainFixSizeVector<1> stateValue;
 				ndBrainFixSizeVector<1> stateQValue;
-				ndFloat32 gamma = m_parameters.m_discountRewardFactor * 0.98f;
+
+				// calculate GAE(l, 1) // very, very noisy
+				// calculate GAE(l, 0) // too smooth, and does not work either
+				ndFloat32 gamma = m_parameters.m_discountRewardFactor * m_parameters.m_generalizedAdvangeDiscount;
+
 				for (ndInt32 i = iterator++; i < m_parameters.m_batchBufferSize; i = iterator++)
 				{
 					const ndInt32 index = m_randomPermutation[base + i];
@@ -659,11 +665,11 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::CalculateAdvange()
 			m_critic.MakePrediction(observation, actions, workingBuffer);
 			ndBrainFloat stateQValue = actions[0];
 
-			// calculate GAE(l, 1) // very, very noicy
+			// calculate GAE(l, 1) // very, very noisy
 			//ndBrainFloat trajectoryExpectedReward = m_trajectoryAccumulator.GetExpectedReward(i);
 			//ndBrainFloat advantage = trajectoryExpectedReward - stateValue;
 
-			// calculate GAE(l, 0) // too smoth, and does not work either
+			// calculate GAE(l, 0) // too smooth, and does not work either
 			const ndBrainMemVector nextObservation(m_trajectoryAccumulator.GetNextObservations(i), m_parameters.m_numberOfObservations);
 			//m_referenceCritic.MakePrediction(nextObservation, actions, workingBuffer);
 			m_critic.MakePrediction(nextObservation, actions, workingBuffer);
@@ -687,7 +693,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::CalculateAdvange()
 	}
 
 #if 0
-	// normalize advantage, not nesserary when using generalize advantage
+	// normalize advantage, not necessary when using generalize advantage
 	ndFloat64 advantageVariance2 = ndBrainFloat(0.0f);
 	for (ndInt32 i = stepNumber - 1; i >= 0; --i)
 	{
@@ -750,7 +756,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 
 				void GetLoss(const ndBrainVector& probabilityDistribution, ndBrainVector& loss)
 				{
-					// as I undestand it, this is just a special case of Maximun likelhodd optimization.
+					// as I understand it, this is just a special case of maximum likelihood optimization.
 					// given a multivariate Gaussian process with zero cross covariance to the actions.
 					// calculate the log of prob of a multivariate Gaussian
 					const ndInt32 numberOfActions = m_agent->m_parameters.m_numberOfActions;

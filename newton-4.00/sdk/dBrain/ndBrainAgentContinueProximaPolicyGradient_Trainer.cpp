@@ -142,7 +142,7 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateGradients
 					
 					for (ndInt32 i = numberOfActions - 1; i >= 0; --i)
 					{
-						// as I undestand, this is just a special case of Maximun likelhodd optimization.
+						// as I understand, this is just a special case of maximum likelihood optimization.
 						// given a multivariate Gaussian process with zero cross covariance to the actions.
 						// calculate the log of prob of a multivariate Gaussian
 						const ndBrainFloat mean = probabilityDistribution[i];

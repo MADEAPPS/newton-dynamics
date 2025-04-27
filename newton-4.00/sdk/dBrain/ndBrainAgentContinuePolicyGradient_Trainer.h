@@ -137,6 +137,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndBrainFloat m_policyRegularizer;
 		ndBrainFloat m_criticRegularizer;
 		ndBrainFloat m_discountRewardFactor;
+		ndBrainFloat m_generalizedAdvangeDiscount;
 
 		ndInt32 m_threadsCount;
 		ndInt32 m_numberOfActions;
@@ -145,6 +146,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndInt32 m_numberOfLayers;
 		ndInt32 m_batchBufferSize;
 		ndInt32 m_neuronPerLayers;
+		ndInt32 m_criticNeuronScale;
 		ndInt32 m_maxTrajectorySteps;
 		ndInt32 m_batchTrajectoryCount;
 		ndUnsigned32 m_randomSeed;
