@@ -170,34 +170,21 @@ void ndBrainVector::Clamp(ndBrainFloat min, ndBrainFloat max)
 
 void ndBrainVector::FlushToZero()
 {
-	//return (val > T(1.0e-16f)) ? val : ((val < T(-1.0e-16f)) ? val : T(0.0f));
-
-#if 1
 	const ndBrainSimdFloat8 max(ndBrainFloat(1.0e-16f));
 	const ndBrainSimdFloat8 min(ndBrainFloat(-1.0e-16f));
-	ndBrainSimdFloat8* const ptrSimd = (ndBrainSimdFloat8*) &(*this)[0];
-	const ndInt32 roundCount = ndInt32(GetCount()) >> 3;
-	for (ndInt32 i = 0; i < roundCount; ++i)
+	const ndInt32 roundCount = (ndInt32(GetCount()) + 7) & -8;
+	ndBrainFloat* const data = &(*this)[0];
+	for (ndInt32 i = 0; i < roundCount; i += 8)
 	{
-		const ndBrainSimdFloat8 mask((ptrSimd[i] < min) | (ptrSimd[i] > max));
-		ptrSimd[i] = ptrSimd[i] & mask;
+		const ndBrainSimdFloat8 x(&data[i]);
+		const ndBrainSimdFloat8 mask((x < min) | (x > max));
+		(x & mask).Store(&data[i]);
 	}
-	for (ndInt32 i = ndInt32(GetCount() - 1); i >= (roundCount * 8); --i)
+	for (ndInt32 i = ndInt32(GetCount() - 1); i >= roundCount; --i)
 	{
-		ndBrainFloat val = ptrSimd[roundCount].m_f[i];
-		ptrSimd[roundCount].m_f[i] = (val > max.m_f[0]) ? val : ((val < min.m_f[0]) ? val : ndBrainFloat(0.0f));
+		ndBrainFloat val = data[i];
+		data[i] = (val > max.m_f[0]) ? val : ((val < min.m_f[0]) ? val : ndBrainFloat(0.0f));
 	}
-
-#else
-	ndBrainFloat* const ptr = &(*this)[0];
-	const ndBrainFloat max = ndBrainFloat(1.0e-16f);
-	const ndBrainFloat min = ndBrainFloat(-1.0e-16f);
-	for (ndInt32 i = 0; i < ndInt32(GetCount()); ++i)
-	{
-		ndBrainFloat val = (*this)[i];
-		ptr[i] = (val > max) ? val : ((val < min) ? val : ndBrainFloat(0.0f));
-	}
-#endif
 }
 
 void ndBrainVector::ScaleSet(const ndBrainVector& a, ndBrainFloat b)

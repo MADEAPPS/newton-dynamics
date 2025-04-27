@@ -61,20 +61,21 @@ void ndBrainLayerActivationTanh::MakePrediction(const ndBrainVector& input, ndBr
 {
 	ndAssert(input.GetCount() == output.GetCount());
 
-	ndBrainSimdFloat8 max(30.0f);
-	ndBrainSimdFloat8 min(-30.0f);
-	ndBrainSimdFloat8* const dst = (ndBrainSimdFloat8*)&output[0];
-	const ndBrainSimdFloat8* const src = (ndBrainSimdFloat8*)&input[0];
-	const ndInt32 roundCount = ndInt32(input.GetCount()) >> 3;
-	for (ndInt32 i = 0; i < roundCount; ++i)
+	const ndBrainSimdFloat8 max(30.0f);
+	const ndBrainSimdFloat8 min(-30.0f);
+	ndBrainFloat* const dst = &output[0];
+	const ndBrainFloat* const src = &input[0];
+	const ndInt32 roundCount = (ndInt32(input.GetCount()) + 7) & -8;
+	for (ndInt32 i = 0; i < roundCount; i += 8)
 	{
-		const ndBrainSimdFloat8 value(src[i].Clamp(min, max));
-		dst[i] = value.Tanh();
+		const ndBrainSimdFloat8 x(&src[i]);
+		const ndBrainSimdFloat8 value(x.Clamp(min, max));
+		value.Tanh().Store(&dst[i]);
 	}
 	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= (roundCount * 8); --i)
 	{
-		ndBrainFloat value = ndClamp(input[i], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
-		output[i] = ndBrainFloat(ndTanh(value));
+		ndBrainFloat value = ndClamp(src[i], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
+		dst[i] = ndBrainFloat(ndTanh(value));
 	}
 	output.FlushToZero();
 }

@@ -35,11 +35,15 @@
 // use explicit simd code. 
 // This is much better since is let the compiler do other optimizations.
 
+D_MSV_NEWTON_CLASS_ALIGN_32
 class ndBrainSimdFloat8 
 {
 	public: 
 	ndBrainSimdFloat8();
 	ndBrainSimdFloat8(const ndBrainFloat a);
+	ndBrainSimdFloat8(const ndBrainFloat* const ptr);
+
+	void Store(ndBrainFloat* const ptr) const;
 
 	ndBrainSimdFloat8 Tanh() const;
 	ndBrainSimdFloat8 Min(const ndBrainSimdFloat8& src) const;
@@ -69,140 +73,39 @@ class ndBrainSimdFloat8
 	ndBrainSimdFloat8 operator> (const ndBrainSimdFloat8& data) const;
 	ndBrainSimdFloat8 operator< (const ndBrainSimdFloat8& data) const;
 
-//#ifdef D_NEWTON_USE_AVX2_OPTION
-#if 0
-	ndBrainSimdFloat8(const __m256 type);
-	union
-	{
-		ndBrainFloat m_f[8];
-
-		__m256 m_type;
-	};
-#else
 	union
 	{
 		ndBrainFloat m_f[8];
 		ndInt32 m_i[8];
 	};
-#endif
-};
+
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 inline ndBrainSimdFloat8::ndBrainSimdFloat8()
 {
 }
-
-//#ifdef D_NEWTON_USE_AVX2_OPTION
-#if 0
-inline ndBrainSimdFloat8::ndBrainSimdFloat8(const __m256 type)
-	:m_type(type)
-{
-}
-
-inline ndBrainSimdFloat8::ndBrainSimdFloat8(const ndBrainFloat a)
-	:m_type(_mm256_set1_ps(a))
-{
-}
-
-inline ndBrainSimdFloat8 ndBrainSimdFloat8::Max(const ndBrainSimdFloat8& src) const
-{
-	return _mm256_max_ps(m_type, src.m_type);
-}
-
-inline ndBrainSimdFloat8 ndBrainSimdFloat8::Clamp(const ndBrainSimdFloat8& min, const ndBrainSimdFloat8& max) const
-{
-	return _mm256_max_ps(_mm256_min_ps(m_type, max.m_type), min.m_type);
-}
-
-inline ndBrainSimdFloat8 ndBrainSimdFloat8::Tanh() const
-{
-	return _mm256_tanh_ps(m_type);
-}
-
-//inline ndBrainSimdFloat8::ndBrainSimdFloat8(ndInt32 x, ndInt32 y, ndInt32 z, ndInt32 w)
-//	:m_typeInt(_mm_set_epi32(w, z, y, x))
-//{
-//	ndAssert(0);
-//}
-//
-//inline ndBrainSimdFloat8::ndBrainSimdFloat8(ndBrainFloat x, ndBrainFloat y, ndBrainFloat z, ndBrainFloat w)
-//	:m_type(_mm_set_ps(w, z, y, x))
-//{
-//	ndAssert(0);
-//}
-//
-//inline ndBrainSimdFloat8::ndBrainSimdFloat8(const ndBrainFloat* const ptr)
-//	:m_type(_mm_loadu_ps(ptr))
-//{
-//}
-//
-//inline ndBrainSimdFloat8::~ndBrainSimdFloat8()
-//{
-//}
-//
-//inline ndBrainSimdFloat8& ndBrainSimdFloat8::operator= (const ndBrainSimdFloat8& A)
-//{
-//	m_type = A.m_type;
-//	return *this;
-//}
-//
-//inline ndBrainSimdFloat8 ndBrainSimdFloat8::operator+ (const ndBrainSimdFloat8& A) const
-//{
-//	return _mm_add_ps(m_type, A.m_type);
-//}
-//
-//inline ndBrainSimdFloat8 ndBrainSimdFloat8::operator- (const ndBrainSimdFloat8& A) const
-//{
-//	return _mm_sub_ps(m_type, A.m_type);
-//}
-//
-//inline ndBrainSimdFloat8 ndBrainSimdFloat8::operator* (const ndBrainSimdFloat8& A) const
-//{
-//	return _mm_mul_ps(m_type, A.m_type);
-//}
-//
-//inline ndBrainFloat ndBrainSimdFloat8::HorizontalAdd() const
-//{
-//	__m128 tmp(_mm_hadd_ps(m_type, m_type));
-//	return _mm_cvtss_f32(_mm_hadd_ps(tmp, tmp));
-//}
-//
-//inline ndBrainSimdFloat8 ndBrainSimdFloat8::MulAdd(const ndBrainSimdFloat8& A, const ndBrainSimdFloat8& B) const
-//{
-//	return _mm_add_ps(m_type, _mm_mul_ps(A.m_type, B.m_type));
-//}
-//
-//inline ndBrainSimdFloat8 ndBrainSimdFloat8::MulSub(const ndBrainSimdFloat8& A, const ndBrainSimdFloat8& B) const
-//{
-//	return _mm_sub_ps(m_type, _mm_mul_ps(A.m_type, B.m_type));
-//}
-//
-//inline ndBrainSimdFloat8 ndBrainSimdFloat8::operator& (const ndBrainSimdFloat8& data) const
-//{
-//	return _mm_and_ps(m_type, data.m_type);
-//}
-//
-//inline ndBrainSimdFloat8 ndBrainSimdFloat8::operator| (const ndBrainSimdFloat8& data) const
-//{
-//	return _mm_or_ps(m_type, data.m_type);
-//}
-//
-//inline ndBrainSimdFloat8 ndBrainSimdFloat8::operator> (const ndBrainSimdFloat8& data) const
-//{
-//	return _mm_cmpgt_ps(m_type, data.m_type);
-//}
-//
-//inline ndBrainSimdFloat8 ndBrainSimdFloat8::operator< (const ndBrainSimdFloat8& data) const
-//{
-//	return _mm_cmplt_ps(m_type, data.m_type);
-//}
-
-#else
 
 inline ndBrainSimdFloat8::ndBrainSimdFloat8(const ndBrainFloat a)
 {
 	for (ndInt32 i = 0; i < 8; ++i)
 	{
 		m_f[i] = a;
+	}
+}
+
+inline ndBrainSimdFloat8::ndBrainSimdFloat8(const ndBrainFloat* const ptr)
+{
+	for (ndInt32 i = 0; i < 8; ++i)
+	{
+		m_f[i] = ptr[i];
+	}
+}
+
+inline void ndBrainSimdFloat8::Store(ndBrainFloat* const ptr) const
+{
+	for (ndInt32 i = 0; i < 8; ++i)
+	{
+		ptr[i] = m_f[i];
 	}
 }
 
@@ -287,8 +190,5 @@ inline ndBrainSimdFloat8 ndBrainSimdFloat8::operator& (const ndBrainSimdFloat8& 
 	}
 	return tmp;
 }
-
-#endif
-
 
 #endif 
