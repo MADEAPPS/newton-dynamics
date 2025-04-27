@@ -45,7 +45,7 @@ void ndBrainLayerActivationPolicyGradientMeanSigma::Save(const ndBrainSave* cons
 
 ndBrainFloat ndBrainLayerActivationPolicyGradientMeanSigma::GetMinSigma() const
 {
-	return ND_CONTINUE_POLICY_MIN_SIGMA;
+	return ND_CONTINUE_POLICY_MIN_SIGMA2;
 }
 
 ndBrainLayer* ndBrainLayerActivationPolicyGradientMeanSigma::Load(const ndBrainLoad* const loadSave)

@@ -265,6 +265,7 @@ bool ndBrainAgentContinuePolicyGradient_Agent::IsTerminal() const
 	return false;
 }
 
+#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_Agent::SelectAction(ndBrainVector& actions) const
 {
 	const ndInt32 numberOfActions = m_master->m_parameters.m_numberOfActions;
@@ -272,7 +273,8 @@ void ndBrainAgentContinuePolicyGradient_Agent::SelectAction(ndBrainVector& actio
 	ndRandomGenerator& generator = *m_randomGenerator;
 	for (ndInt32 i = numberOfActions - 1; i >= 0; --i)
 	{
-		ndBrainFloat sample = ndBrainFloat(actions[i] + generator.m_d(generator.m_gen) * actions[i + numberOfActions]);
+		ndFloat32 sigma = ndSqrt(actions[i + numberOfActions]);
+		ndBrainFloat sample = ndBrainFloat(actions[i] + generator.m_d(generator.m_gen) * sigma);
 		ndBrainFloat squashedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
 		actions[i] = squashedAction;
 	}
@@ -773,8 +775,10 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 					for (ndInt32 i = numberOfActions - 1; i >= 0; --i)
 					{
 						const ndBrainFloat mean = probabilityDistribution[i];
-						const ndBrainFloat sigma = probabilityDistribution[i + numberOfActions];
-						const ndBrainFloat sigma2 = sigma * sigma;
+						//const ndBrainFloat sigma = probabilityDistribution[i + numberOfActions];
+						//const ndBrainFloat sigma2 = sigma * sigma;
+						//const ndBrainFloat sigma4 = sigma2 * sigma2;
+						const ndBrainFloat sigma2 = probabilityDistribution[i + numberOfActions];
 						const ndBrainFloat sigma4 = sigma2 * sigma2;
 						ndBrainFloat confidence = sampledProbability[i] - mean;
 
