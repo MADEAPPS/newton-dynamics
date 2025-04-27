@@ -23,13 +23,15 @@
 #include "ndBrainSaveLoad.h"
 #include "ndBrainLayerActivationPolicyGradientMeanSigma.h"
 
-ndBrainLayerActivationPolicyGradientMeanSigma::ndBrainLayerActivationPolicyGradientMeanSigma(ndInt32 neurons)
+ndBrainLayerActivationPolicyGradientMeanSigma::ndBrainLayerActivationPolicyGradientMeanSigma(ndInt32 neurons, bool constSigma2)
 	:ndBrainLayerActivation(neurons)
+	,m_constSigma2(constSigma2)
 {
 }
 
 ndBrainLayerActivationPolicyGradientMeanSigma::ndBrainLayerActivationPolicyGradientMeanSigma(const ndBrainLayerActivationPolicyGradientMeanSigma& src)
 	:ndBrainLayerActivation(src)
+	,m_constSigma2(src.m_constSigma2)
 {
 }
 
@@ -38,14 +40,18 @@ ndBrainLayer* ndBrainLayerActivationPolicyGradientMeanSigma::Clone() const
 	return new ndBrainLayerActivationPolicyGradientMeanSigma(*this);
 }
 
-void ndBrainLayerActivationPolicyGradientMeanSigma::Save(const ndBrainSave* const loadSave) const
-{
-	ndBrainLayerActivation::Save(loadSave);
-}
-
 ndBrainFloat ndBrainLayerActivationPolicyGradientMeanSigma::GetMinSigma() const
 {
 	return ND_CONTINUE_POLICY_MIN_SIGMA2;
+}
+
+void ndBrainLayerActivationPolicyGradientMeanSigma::Save(const ndBrainSave* const loadSave) const
+{
+	ndBrainLayerActivation::Save(loadSave);
+
+	char buffer[1024];
+	snprintf(buffer, sizeof(buffer), "\tinput_width %d\n", m_constSigma2 ? 1 : 0);
+	loadSave->WriteData(buffer);
 }
 
 ndBrainLayer* ndBrainLayerActivationPolicyGradientMeanSigma::Load(const ndBrainLoad* const loadSave)
@@ -55,7 +61,11 @@ ndBrainLayer* ndBrainLayerActivationPolicyGradientMeanSigma::Load(const ndBrainL
 
 	loadSave->ReadString(buffer);
 	ndInt32 inputs = loadSave->ReadInt();
-	ndBrainLayerActivationPolicyGradientMeanSigma* const layer = new ndBrainLayerActivationPolicyGradientMeanSigma(inputs);
+
+	loadSave->ReadString(buffer);
+	bool useConstSigma = loadSave->ReadInt() ? true : false;
+
+	ndBrainLayerActivationPolicyGradientMeanSigma* const layer = new ndBrainLayerActivationPolicyGradientMeanSigma(inputs, useConstSigma);
 	loadSave->ReadString(buffer);
 	return layer;
 }
@@ -65,27 +75,50 @@ const char* ndBrainLayerActivationPolicyGradientMeanSigma::GetLabelId() const
 	return ND_BRAIN_LAYER_ACTIVATION_POLICY_MEAN_SIGMAN_NAME;
 }
 
+#pragma optimize( "", off )
 void ndBrainLayerActivationPolicyGradientMeanSigma::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	const ndInt32 base = m_neurons / 2;
-	ndBrainFloat minSigma = GetMinSigma();
-	for (ndInt32 i = base - 1; i >= 0; --i)
+	if (m_constSigma2)
 	{
-		ndBrainFloat sigma = input[i + base] + minSigma;
-		output[i] = input[i];
-		output[i + base] = ndMax(sigma, minSigma);
+		for (ndInt32 i = base - 1; i >= 0; --i)
+		{
+			output[i] = input[i];
+			output[i + base] = ND_CONTINUE_POLICY_CONST_SIGMA2;
+		}
+	}
+	else
+	{
+		ndBrainFloat minSigma2 = GetMinSigma();
+		for (ndInt32 i = base - 1; i >= 0; --i)
+		{
+			output[i] = input[i];
+			ndBrainFloat sigma2 = input[i + base] + minSigma2;
+			output[i + base] = ndMax(sigma2, minSigma2);
+		}
 	}
 }
 
 void ndBrainLayerActivationPolicyGradientMeanSigma::InputDerivative(const ndBrainVector& input, const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	const ndInt32 base = m_neurons / 2;
-	ndBrainFloat minSigma = GetMinSigma();
-	for (ndInt32 i = base - 1; i >= 0; --i)
+	if (m_constSigma2)
 	{
-		ndBrainFloat sigma = input[i + base] + minSigma;
-		inputDerivative[i] = ndBrainFloat (1.0f);
-		inputDerivative[i + base] = (sigma >= minSigma) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+		for (ndInt32 i = base - 1; i >= 0; --i)
+		{
+			inputDerivative[i] = ndBrainFloat(1.0f);
+			inputDerivative[i + base] = ndBrainFloat(0.0f);
+		}
+	}
+	else
+	{
+		ndBrainFloat minSigma2 = GetMinSigma();
+		for (ndInt32 i = base - 1; i >= 0; --i)
+		{
+			inputDerivative[i] = ndBrainFloat(1.0f);
+			ndBrainFloat sigma2 = input[i + base] + minSigma2;
+			inputDerivative[i + base] = (sigma2 >= minSigma2) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+		}
 	}
 	inputDerivative.Mul(outputDerivative);
 }
