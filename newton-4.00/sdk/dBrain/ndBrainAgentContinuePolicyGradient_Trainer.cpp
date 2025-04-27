@@ -777,7 +777,6 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 						const ndBrainFloat mean = probabilityDistribution[i];
 						//const ndBrainFloat sigma = probabilityDistribution[i + numberOfActions];
 						//const ndBrainFloat sigma2 = sigma * sigma;
-						//const ndBrainFloat sigma4 = sigma2 * sigma2;
 						const ndBrainFloat sigma2 = probabilityDistribution[i + numberOfActions];
 						const ndBrainFloat sigma4 = sigma2 * sigma2;
 						ndBrainFloat confidence = sampledProbability[i] - mean;
