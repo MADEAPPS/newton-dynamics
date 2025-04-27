@@ -449,7 +449,7 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::ndBrainAgentDiscretePolicyGrad
 	
 	ndAssert(m_critic.GetOutputSize() == 1);
 	ndAssert(m_critic.GetInputSize() == m_policy.GetInputSize());
-	ndAssert(!strcmp((m_critic[m_critic.GetCount() - 1])->GetLabelId(), "ndBrainLayerLinear"));
+	ndAssert(!strcmp((m_critic[m_critic.GetCount() - 1])->GetLabelId(), ND_BRAIN_LAYER_LINEAR_NAME));
 	
 	m_criticTrainers.SetCount(0);
 	for (ndInt32 i = 0; i < m_batchBufferSize; ++i)

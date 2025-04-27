@@ -496,17 +496,17 @@ namespace ndQuadruped_2
 			{
 				const ndVector error(CalculatePositError(i));
 				const ndVector normalError(error * normalize);
-				if (ndAbs(normalError.m_x) > 1.0f)
+				if (ndAbs(normalError.m_x) > 2.5f)
 				{
 					return true;
 				}
 
-				if (ndAbs(normalError.m_y) > 1.0f)
+				if (ndAbs(normalError.m_y) > 2.5f)
 				{
 					return true;
 				}
 
-				if (ndAbs(normalError.m_z) > 1.0f)
+				if (ndAbs(normalError.m_z) > 2.5f)
 				{
 					return true;
 				}

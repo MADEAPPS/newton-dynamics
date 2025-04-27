@@ -27,6 +27,8 @@
 #include "ndBrainVector.h"
 #include "ndBrainMatrix.h"
 
+#define ND_BRAIN_LAYER_LINEAR_NAME	"ndBrainLayerLinear"
+
 class ndBrainLayerLinear : public ndBrainLayer
 {
 	public: 

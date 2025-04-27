@@ -52,8 +52,9 @@ ndBrainLayerLinearWithDropOut::~ndBrainLayerLinearWithDropOut()
 
 const char* ndBrainLayerLinearWithDropOut::GetLabelId() const
 {
-	//return "ndBrainLayerLinearWithDropOut";
-	return "ndBrainLayerLinear";
+	ndAssert(0);
+	return "ndBrainLayerLinearWithDropOut";
+	//return ND_BRAIN_LAYER_LINEAR_NAME;
 }
 
 ndBrainLayer* ndBrainLayerLinearWithDropOut::Clone() const

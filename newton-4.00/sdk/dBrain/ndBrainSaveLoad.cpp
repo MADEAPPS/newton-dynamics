@@ -106,45 +106,9 @@ ndBrain* ndBrainLoad::Load() const
 		ReadString(layerType);
 	
 		ndBrainLayer* layer = nullptr;
-		if (!strcmp(layerType, "ndBrainLayerLinear"))
+		if (!strcmp(layerType, ND_BRAIN_LAYER_LINEAR_NAME))
 		{
 			layer = ndBrainLayerLinear::Load(this);
-		}
-		else if (!strcmp(layerType, "ndBrainLayerActivationRelu"))
-		{
-			layer = ndBrainLayerActivationRelu::Load(this);
-		}
-		else if (!strcmp(layerType, "ndBrainLayerActivationSigmoid"))
-		{
-			layer = ndBrainLayerActivationSigmoid::Load(this);
-		}
-		else if (!strcmp(layerType, "ndBrainLayerActivationSigmoidLinear"))
-		{
-			layer = ndBrainLayerActivationSigmoidLinear::Load(this);
-		}
-		else if (!strcmp(layerType, "ndBrainLayerActivationElu"))
-		{
-			layer = ndBrainLayerActivationElu::Load(this);
-		}
-		else if (!strcmp(layerType, "ndBrainLayerActivationSoftmax"))
-		{
-			layer = ndBrainLayerActivationSoftmax::Load(this);
-		}
-		else if (!strcmp(layerType, "ndBrainLayerActivationCategoricalSoftmax"))
-		{
-			layer = ndBrainLayerActivationCategoricalSoftmax::Load(this);
-		}
-		else if (!strcmp(layerType, "ndBrainLayerConvolutional_2d"))
-		{
-			layer = ndBrainLayerConvolutional_2d::Load(this);
-		}
-		else if (!strcmp(layerType, "ndBrainLayerCrossCorrelation_2d"))
-		{
-			layer = ndBrainLayerCrossCorrelation_2d::Load(this);
-		}
-		else if (!strcmp(layerType, "ndBrainLayerImagePolling_2x2"))
-		{
-			layer = ndBrainLayerImagePolling_2x2::Load(this);
 		}
 		else if (!strcmp(layerType, ND_BRAIN_LAYER_ACTIVATION_LINEAR_NAME))
 		{
@@ -157,6 +121,51 @@ ndBrain* ndBrainLoad::Load() const
 		else if (!strcmp(layerType, ND_BRAIN_LAYER_ACTIVATION_POLICY_MEAN_SIGMAN_NAME))
 		{
 			layer = ndBrainLayerActivationPolicyGradientMeanSigma::Load(this);
+		}
+		else if (!strcmp(layerType, "ndBrainLayerActivationRelu"))
+		{
+			ndAssert(0);
+			layer = ndBrainLayerActivationRelu::Load(this);
+		}
+		else if (!strcmp(layerType, "ndBrainLayerActivationSigmoid"))
+		{
+			ndAssert(0);
+			layer = ndBrainLayerActivationSigmoid::Load(this);
+		}
+		else if (!strcmp(layerType, "ndBrainLayerActivationSigmoidLinear"))
+		{
+			ndAssert(0);
+			layer = ndBrainLayerActivationSigmoidLinear::Load(this);
+		}
+		else if (!strcmp(layerType, "ndBrainLayerActivationElu"))
+		{
+			ndAssert(0);
+			layer = ndBrainLayerActivationElu::Load(this);
+		}
+		else if (!strcmp(layerType, "ndBrainLayerActivationSoftmax"))
+		{
+			ndAssert(0);
+			layer = ndBrainLayerActivationSoftmax::Load(this);
+		}
+		else if (!strcmp(layerType, "ndBrainLayerActivationCategoricalSoftmax"))
+		{
+			ndAssert(0);
+			layer = ndBrainLayerActivationCategoricalSoftmax::Load(this);
+		}
+		else if (!strcmp(layerType, "ndBrainLayerConvolutional_2d"))
+		{
+			ndAssert(0);
+			layer = ndBrainLayerConvolutional_2d::Load(this);
+		}
+		else if (!strcmp(layerType, "ndBrainLayerCrossCorrelation_2d"))
+		{
+			ndAssert(0);
+			layer = ndBrainLayerCrossCorrelation_2d::Load(this);
+		}
+		else if (!strcmp(layerType, "ndBrainLayerImagePolling_2x2"))
+		{
+			ndAssert(0);
+			layer = ndBrainLayerImagePolling_2x2::Load(this);
 		}
 		else
 		{

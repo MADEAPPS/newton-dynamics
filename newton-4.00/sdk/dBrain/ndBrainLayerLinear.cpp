@@ -58,7 +58,7 @@ ndBrainLayerLinear::~ndBrainLayerLinear()
 
 const char* ndBrainLayerLinear::GetLabelId() const
 {
-	return "ndBrainLayerLinear";
+	return ND_BRAIN_LAYER_LINEAR_NAME;
 }
 
 ndBrainLayer* ndBrainLayerLinear::Clone() const
