@@ -145,18 +145,21 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateGradients
 						// as I understand, this is just a special case of maximum likelihood optimization.
 						// given a multivariate Gaussian process with zero cross covariance to the actions.
 						// calculate the log of prob of a multivariate Gaussian
+
 						const ndBrainFloat mean = probabilityDistribution[i];
-						const ndBrainFloat sigma = probabilityDistribution[i + numberOfActions];
-						const ndBrainFloat sigma2 = sigma * sigma;
-						const ndBrainFloat sigma3 = sigma2 * sigma;
+						//const ndBrainFloat sigma = probabilityDistribution[i + numberOfActions];
+						//const ndBrainFloat sigma2 = sigma * sigma;
+						const ndBrainFloat sigma2 = probabilityDistribution[i + numberOfActions];
+						const ndBrainFloat sigma4 = sigma2 * sigma2;
 						ndBrainFloat confidence = sampledProbability[i] - mean;
 
 						ndBrainFloat meanGradient = confidence / sigma2;
-						ndBrainFloat sigmaGradient = confidence * confidence / sigma3 - ndBrainFloat(1.0f) / sigma;
+						ndBrainFloat sigmaGradient = ndBrainFloat(0.5f) * (confidence * confidence / sigma4 - ndBrainFloat(1.0f) / sigma2);
 
-						//negate the gradient for gradient ascend
+						//negate the gradient for gradient ascend?
 						loss[i] = -meanGradient * advantage;
 						loss[i + numberOfActions] = -sigmaGradient * advantage;
+
 					}
 				}
 
