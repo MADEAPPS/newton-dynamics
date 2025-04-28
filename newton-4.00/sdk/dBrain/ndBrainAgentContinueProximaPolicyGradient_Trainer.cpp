@@ -29,7 +29,7 @@
 #define ND_CONTINUE_PROXIMA_POLICY_ITERATIONS			100
 #define ND_CONTINUE_PROXIMA_POLICY_KL_DIVERGENCE		ndBrainFloat(0.001f)
 //#define ND_CONTINUE_PROXIMA_POLICY_CLIP_EPSILON			ndBrainFloat(0.2f)
-#define ND_CONTINUE_PROXIMA_POLICY_LEARN_SCALE			ndBrainFloat(0.125f)
+#define ND_CONTINUE_PROXIMA_POLICY_LEARN_SCALE			ndBrainFloat(1.0f)
 
 ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(const HyperParameters& hyperParameters)
 	:ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters)
