@@ -25,6 +25,7 @@
 #include "ndBrainTrainer.h"
 #include "ndBrainLayerLinear.h"
 #include "ndBrainOptimizerAdam.h"
+#include "ndBrainLayerActivationPolicyGradientMeanSigma.h"
 #include "ndBrainAgentDeterministicPolicyGradient_Trainer.h"
 #include "ndBrainLayerActivationTanh.h"
 #include "ndBrainLossLeastSquaredError.h"
@@ -193,7 +194,8 @@ ndInt32 ndBrainAgentDeterministicPolicyGradient_Agent::GetEpisodeFrames() const
 
 ndReal ndBrainAgentDeterministicPolicyGradient_Agent::PerturbeAction(ndReal action) const
 {
-	ndReal actionNoise = ndReal(ndGaussianRandom(ndFloat32(action), m_owner->m_parameters.m_actionNoiseSigma));
+	ndFloat32 sigma = ndSqrt(ND_CONTINUE_POLICY_CONST_SIGMA2);
+	ndReal actionNoise = ndReal(ndGaussianRandom(ndFloat32(action), sigma));
 	return ndClamp(actionNoise, ndReal(-1.0f), ndReal(1.0f));
 }
 
@@ -210,9 +212,10 @@ void ndBrainAgentDeterministicPolicyGradient_Agent::Step()
 	m_trajectory.SetReward(entryIndex, reward);
 	m_trajectory.SetTerminalState(entryIndex, IsTerminal());
 
-	m_owner->m_policy.MakePrediction(observation, actions, m_workingBuffer);
+	const ndBrainAgentDeterministicPolicyGradient_Trainer* const owner = *m_owner;
+	owner->m_policy.MakePrediction(observation, actions, m_workingBuffer);
 	// explore environment
-	for (ndInt32 i = m_owner->m_parameters.m_numberOfActions - 1; i >= 0; --i)
+	for (ndInt32 i = owner->m_parameters.m_numberOfActions - 1; i >= 0; --i)
 	{
 		actions[i] = PerturbeAction(actions[i]);
 	}
