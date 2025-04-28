@@ -200,11 +200,20 @@ namespace ndUnicycle
 
 	class RobotModelNotify : public ndModelNotify
 	{
+#ifdef USE_DDPG
+		class ndController : public ndBrainAgentDeterministicPolicyGradient
+#else
 		class ndController : public ndBrainAgentContinuePolicyGradient
+#endif
 		{
 			public:
+#ifdef USE_DDPG
 			ndController(const ndSharedPtr<ndBrain>& brain)
-				:ndBrainAgentContinuePolicyGradient(brain)
+				:ndBrainAgentDeterministicPolicyGradient(brain)
+#else
+			ndController(const ndSharedPtr<ndBrain>& brain)
+				: ndBrainAgentContinuePolicyGradient(brain)
+#endif
 				, m_robot(nullptr)
 			{
 			}
@@ -626,6 +635,7 @@ namespace ndUnicycle
 			fprintf(m_outFile, "vpg\n");
 
 			#ifdef USE_DDPG
+				m_stopTraining = 1000000;
 				ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
 				hyperParameters.m_numberOfActions = m_actionsSize;
 				hyperParameters.m_numberOfObservations = m_observationsSize;
@@ -638,7 +648,7 @@ namespace ndUnicycle
 				hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
 				hyperParameters.m_regularizerType = ndBrainOptimizer::m_lasso;
 				m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
-				m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
+				//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
 			#endif
 
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
@@ -656,9 +666,10 @@ namespace ndUnicycle
 			visualModel->SetNotifyCallback(new RobotModelNotify(m_master, visualModel->GetAsModelArticulation()));
 			SetMaterial(visualModel->GetAsModelArticulation());
 			
+			#ifndef USE_DDPG
 			// add a hidden battery of model to generate trajectories in parallel
-			//const ndInt32 countX = 100;
-			const ndInt32 countX = 0;
+			//const ndInt32 countX = 0;
+			const ndInt32 countX = 100;
 			for (ndInt32 i = 0; i < countX; ++i)
 			{
 				ndMatrix location(matrix);
@@ -678,6 +689,7 @@ namespace ndUnicycle
 				
 				m_models.Append(model->GetAsModelArticulation());
 			}
+			#endif
 
 			scene->SetAcceleratedUpdate();
 		}

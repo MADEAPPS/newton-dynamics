@@ -41,6 +41,16 @@ ndBrainAgent::~ndBrainAgent()
 {
 }
 
+const ndString& ndBrainAgent::GetName() const
+{
+	return m_name;
+}
+
+void ndBrainAgent::SetName(const ndString& name)
+{
+	m_name = name;
+}
+
 void ndBrainAgent::SaveToFile(const char* const)
 {
 	ndAssert(0);

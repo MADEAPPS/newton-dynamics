@@ -203,30 +203,33 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateAdvange()
 {
 	ndBrainAgentContinuePolicyGradient_TrainerMaster::CalculateAdvange();
 
-	if (m_policyActions.GetCount() < m_advantage.GetCount() * m_parameters.m_numberOfActions * 2)
-	{
-		ndInt32 start = 0;
-		for (ndInt32 i = ndInt32(m_policyActions.GetCount()); i < m_advantage.GetCount() * m_parameters.m_numberOfActions * 2; ++i)
-		{
-			ndFloat32 x = m_policyActions[start];
-			m_policyActions.PushBack(x);
-			start++;
-		}
-	}
+	ndAssert(0);
+	//ndInt32 numberOfActions = m_policy.GetOutputSize();
+	//if (m_advantage.GetCount() < m_parameters.m)
+	//{
+	//	//ndAssert(0);
+	//	//ndInt32 start = 0;
+	//	//for (ndInt32 i = ndInt32(m_policyActions.GetCount()); i < m_advantage.GetCount() * numberOfActions; ++i)
+	//	//{
+	//	//	ndFloat32 x = m_policyActions[start];
+	//	//	m_policyActions.PushBack(x);
+	//	//	start++;
+	//	//}
+	//}
 }
 
 //#pragma optimize( "", off )
 void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::Optimize()
 {
 	ndAtomic<ndInt32> iterator(0);
-	//m_policyActions.SetCount(m_trajectoryAccumulator.GetCount() * m_parameters.m_numberOfActions * 2);
-	m_policyActions.SetCount(m_trajectoryAccumulator.GetCount() * m_parameters.m_numberOfActions * 2);
-	auto CalculateActionsDistribution = ndMakeObject::ndFunction([this, &iterator](ndInt32, ndInt32)
+	ndInt32 numberOfActions = m_policy.GetOutputSize();
+	m_policyActions.SetCount(m_trajectoryAccumulator.GetCount() * numberOfActions);
+	auto CalculateActionsDistribution = ndMakeObject::ndFunction([this, &iterator, numberOfActions](ndInt32, ndInt32)
 	{
 		const ndInt32 size = m_trajectoryAccumulator.GetCount();
 		for (ndInt32 i = iterator++; i < size; i = iterator++)
 		{
-			ndBrainMemVector probabilities(&m_policyActions[i * m_parameters.m_numberOfActions * 2], m_parameters.m_numberOfActions * 2);
+			ndBrainMemVector probabilities(&m_policyActions[i * numberOfActions], numberOfActions);
 			const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(i), m_parameters.m_numberOfObservations);
 			m_policy.MakePrediction(observation, probabilities);
 		}

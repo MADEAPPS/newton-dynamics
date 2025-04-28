@@ -40,7 +40,7 @@ ndBrainLayer* ndBrainLayerActivationPolicyGradientMeanSigma::Clone() const
 	return new ndBrainLayerActivationPolicyGradientMeanSigma(*this);
 }
 
-ndBrainFloat ndBrainLayerActivationPolicyGradientMeanSigma::GetMinSigma() const
+ndBrainFloat ndBrainLayerActivationPolicyGradientMeanSigma::GetMinSigma2() const
 {
 	return ND_CONTINUE_POLICY_MIN_SIGMA2;
 }
@@ -50,7 +50,7 @@ void ndBrainLayerActivationPolicyGradientMeanSigma::Save(const ndBrainSave* cons
 	ndBrainLayerActivation::Save(loadSave);
 
 	char buffer[1024];
-	snprintf(buffer, sizeof(buffer), "\tinput_width %d\n", m_constSigma2 ? 1 : 0);
+	snprintf(buffer, sizeof(buffer), "\tuse_const_sigma %d\n", m_constSigma2 ? 1 : 0);
 	loadSave->WriteData(buffer);
 }
 
@@ -78,6 +78,21 @@ const char* ndBrainLayerActivationPolicyGradientMeanSigma::GetLabelId() const
 #pragma optimize( "", off )
 void ndBrainLayerActivationPolicyGradientMeanSigma::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
+#if 1
+	output.Set(input);
+	ndInt32 count = ndInt32(input.GetCount()) - 1;
+	if (m_constSigma2)
+	{
+		output[count] = ND_CONTINUE_POLICY_CONST_SIGMA2;
+	}
+	else
+	{
+		ndBrainFloat minSigma2 = GetMinSigma2();
+		ndBrainFloat sigma2 = output[count] + minSigma2;
+		output[count] = ndMax(sigma2, minSigma2);
+	}
+
+#else
 	const ndInt32 base = m_neurons / 2;
 	if (m_constSigma2)
 	{
@@ -89,7 +104,7 @@ void ndBrainLayerActivationPolicyGradientMeanSigma::MakePrediction(const ndBrain
 	}
 	else
 	{
-		ndBrainFloat minSigma2 = GetMinSigma();
+		ndBrainFloat minSigma2 = GetMinSigma2();
 		for (ndInt32 i = base - 1; i >= 0; --i)
 		{
 			output[i] = input[i];
@@ -97,10 +112,27 @@ void ndBrainLayerActivationPolicyGradientMeanSigma::MakePrediction(const ndBrain
 			output[i + base] = ndMax(sigma2, minSigma2);
 		}
 	}
+#endif
 }
 
 void ndBrainLayerActivationPolicyGradientMeanSigma::InputDerivative(const ndBrainVector& input, const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
+#if 1
+
+	inputDerivative.Set(ndBrainFloat(1.0f));
+	ndInt32 count = ndInt32(input.GetCount()) - 1;
+	if (m_constSigma2)
+	{
+		inputDerivative[count] = ndBrainFloat(0.0f);
+	}
+	else
+	{
+		ndBrainFloat minSigma2 = GetMinSigma2();
+		ndBrainFloat sigma2 = input[count] + minSigma2;
+		inputDerivative[count] = (sigma2 >= minSigma2) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+	}
+
+#else
 	const ndInt32 base = m_neurons / 2;
 	if (m_constSigma2)
 	{
@@ -112,7 +144,7 @@ void ndBrainLayerActivationPolicyGradientMeanSigma::InputDerivative(const ndBrai
 	}
 	else
 	{
-		ndBrainFloat minSigma2 = GetMinSigma();
+		ndBrainFloat minSigma2 = GetMinSigma2();
 		for (ndInt32 i = base - 1; i >= 0; --i)
 		{
 			inputDerivative[i] = ndBrainFloat(1.0f);
@@ -120,5 +152,6 @@ void ndBrainLayerActivationPolicyGradientMeanSigma::InputDerivative(const ndBrai
 			inputDerivative[i + base] = (sigma2 >= minSigma2) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
 		}
 	}
+#endif
 	inputDerivative.Mul(outputDerivative);
 }

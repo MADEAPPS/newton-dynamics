@@ -53,15 +53,7 @@ class ndBrainAgent: public ndClassAlloc
 	ndString m_name;
 };
 
-inline const ndString& ndBrainAgent::GetName() const
-{
-	return m_name;
-}
 
-inline void ndBrainAgent::SetName(const ndString& name)
-{
-	m_name = name;
-}
 
 #endif 
 

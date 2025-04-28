@@ -61,7 +61,6 @@ class ndBrainAgentContinuePolicyGradient_Agent : public ndBrainAgent
 		{
 			m_reward,
 			m_expectedReward,
-			//m_stateAdvantage,
 			m_isterminalState,
 			m_transitionSize
 		};

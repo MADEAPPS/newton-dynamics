@@ -25,9 +25,7 @@
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"
 #include "ndBrainAgent.h"
-#include "ndBrainReplayBuffer.h"
 
-template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentDeterministicPolicyGradient: public ndBrainAgent
 {
 	public:
@@ -47,73 +45,5 @@ class ndBrainAgentDeterministicPolicyGradient: public ndBrainAgent
 	void InitWeights();
 	ndSharedPtr<ndBrain> m_actor;
 };
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainAgentDeterministicPolicyGradient<statesDim, actionDim>::ndBrainAgentDeterministicPolicyGradient(const ndSharedPtr<ndBrain>& actor)
-	:ndBrainAgent()
-	,m_actor(actor)
-{
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-bool ndBrainAgentDeterministicPolicyGradient<statesDim, actionDim>::IsTrainer() const
-{
-	return false;
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-bool ndBrainAgentDeterministicPolicyGradient<statesDim, actionDim>::IsTerminal() const
-{
-	ndAssert(0);
-	return false;
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-ndBrainFloat ndBrainAgentDeterministicPolicyGradient<statesDim, actionDim>::CalculateReward()
-{
-	ndAssert(0);
-	return ndBrainFloat(0.0f);
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDeterministicPolicyGradient<statesDim, actionDim>::ResetModel()
-{
-	ndAssert(0);
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDeterministicPolicyGradient<statesDim, actionDim>::InitWeights()
-{
-	ndAssert(0);
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDeterministicPolicyGradient<statesDim, actionDim>::Save(ndBrainSave* const)
-{
-	ndAssert(0);
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-ndInt32 ndBrainAgentDeterministicPolicyGradient<statesDim, actionDim>::GetEpisodeFrames() const
-{
-	ndAssert(0);
-	return 0;
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDeterministicPolicyGradient<statesDim, actionDim>::OptimizeStep()
-{
-}
-
-template<ndInt32 statesDim, ndInt32 actionDim>
-void ndBrainAgentDeterministicPolicyGradient<statesDim, actionDim>::Step()
-{
-	ndBrainFixSizeVector<actionDim> actions;
-	ndBrainFixSizeVector<statesDim> observations;
-
-	GetObservation(&observations[0]);
-	m_actor->MakePrediction(observations, actions);
-	ApplyActions(&actions[0]);
-}
 
 #endif 
