@@ -48,20 +48,20 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer;
 
 class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 {
-	//class ndRandomGenerator
-	//{
-	//	public:
-	//	ndRandomGenerator()
-	//		:m_gen()
-	//		,m_rd()
-	//		,m_d(ndFloat32(0.0f), ndFloat32(1.0f))
-	//	{
-	//	}
-	//
-	//	std::mt19937 m_gen;
-	//	std::random_device m_rd;
-	//	std::normal_distribution<ndFloat32> m_d;
-	//};
+	class ndRandomGenerator
+	{
+		public:
+		ndRandomGenerator()
+			:m_gen()
+			,m_rd()
+			,m_d(ndFloat32(0.0f), ndFloat32(1.0f))
+		{
+		}
+	
+		std::mt19937 m_gen;
+		std::random_device m_rd;
+		std::normal_distribution<ndFloat32> m_d;
+	};
 
 	public:
 	class ndTrajectoryTransition : protected ndBrainVector
@@ -114,12 +114,13 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 	virtual bool IsTrainer() const { ndAssert(0); return true; }
 	virtual ndInt32 GetEpisodeFrames() const;
 
-	ndReal SampleAction(ndReal action) const;
+	ndReal SampleAction(ndReal action);
 
 	ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer> m_owner;
 	ndTrajectoryTransition m_trajectory;
 	ndBrainVector m_workingBuffer;
 	ndInt32 m_trajectoryBaseCount;
+	ndRandomGenerator m_randomeGenerator;
 	friend class ndBrainAgentDeterministicPolicyGradient_Trainer;
 };
 
@@ -140,6 +141,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
 		ndBrainFloat m_criticMovingAverageFactor;
 		ndBrainFloat m_actionNoiseSigma;
 
+		ndUnsigned32 m_randomSeed;
 		ndInt32 m_miniBatchSize;
 		ndInt32 m_numberOfActions;
 		ndInt32 m_numberOfObservations;

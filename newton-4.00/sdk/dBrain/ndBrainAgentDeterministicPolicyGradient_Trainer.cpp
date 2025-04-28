@@ -48,6 +48,7 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 	m_numberOfActions = 0;
 	m_numberOfObservations = 0;
 
+	m_randomSeed = 47;
 	m_actorHiddenLayers = 3;
 	m_policyUpdatesCount = 16;
 	m_criticUpdatesCount = 16;
@@ -176,10 +177,10 @@ ndBrainAgentDeterministicPolicyGradient_Agent::ndBrainAgentDeterministicPolicyGr
 	,m_trajectory(m_owner->m_parameters.m_numberOfActions, m_owner->m_parameters.m_numberOfObservations)
 	,m_workingBuffer()
 	,m_trajectoryBaseCount(0)
+	,m_randomeGenerator()
 {
 	m_owner->m_agent = this;
-	//m_trajectory.SetCount(0);
-	//m_randomGenerator = m_master->GetRandomGenerator();
+	m_randomeGenerator.m_gen.seed(m_owner->m_parameters.m_randomSeed);
 }
 
 ndBrainAgentDeterministicPolicyGradient_Agent::~ndBrainAgentDeterministicPolicyGradient_Agent()
@@ -192,11 +193,13 @@ ndInt32 ndBrainAgentDeterministicPolicyGradient_Agent::GetEpisodeFrames() const
 	return 0;
 }
 
-ndReal ndBrainAgentDeterministicPolicyGradient_Agent::SampleAction(ndReal action) const
+ndReal ndBrainAgentDeterministicPolicyGradient_Agent::SampleAction(ndReal action)
 {
 	ndFloat32 sigma = ndSqrt(ND_CONTINUE_POLICY_CONST_SIGMA2);
-	ndReal actionNoise = ndReal(ndGaussianRandom(ndFloat32(action), sigma));
-	return ndClamp(actionNoise, ndReal(-1.0f), ndReal(1.0f));
+	ndBrainFloat unitVar = m_randomeGenerator.m_d(m_randomeGenerator.m_gen) * sigma;
+	ndBrainFloat sample = ndBrainFloat(action) + unitVar;
+	ndBrainFloat squashedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
+	return squashedAction;
 }
 
 void ndBrainAgentDeterministicPolicyGradient_Agent::Step()

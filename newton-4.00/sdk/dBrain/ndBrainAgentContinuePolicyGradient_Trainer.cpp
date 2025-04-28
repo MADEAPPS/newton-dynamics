@@ -266,7 +266,7 @@ bool ndBrainAgentContinuePolicyGradient_Agent::IsTerminal() const
 }
 
 #pragma optimize( "", off )
-void ndBrainAgentContinuePolicyGradient_Agent::SelectAction(ndBrainVector& actions) const
+void ndBrainAgentContinuePolicyGradient_Agent::SampleActions(ndBrainVector& actions) const
 {
 	const ndInt32 numberOfActions = m_master->m_parameters.m_numberOfActions;
 
@@ -293,7 +293,7 @@ void ndBrainAgentContinuePolicyGradient_Agent::Step()
 	GetObservation(&observation[0]);
 	m_master->m_policy.MakePrediction(observation, actions, m_workingBuffer);
 	 
-	SelectAction(actions);
+	SampleActions(actions);
 	ApplyActions(&actions[0]);
 
 	bool isDead = IsTerminal();

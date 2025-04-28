@@ -97,7 +97,7 @@ class ndBrainAgentDiscretePolicyGradient_Trainer : public ndBrainAgent
 	~ndBrainAgentDiscretePolicyGradient_Trainer();
 
 	ndBrain* GetActor();
-	ndBrainFloat SelectAction(const ndBrainVector& probabilities) const;
+	ndBrainFloat SampleActions(const ndBrainVector& probabilities) const;
 
 	void InitWeights() { ndAssert(0); }
 	virtual void OptimizeStep() { ndAssert(0); }

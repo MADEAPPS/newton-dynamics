@@ -102,7 +102,7 @@ class ndBrainAgentContinuePolicyGradient_Agent : public ndBrainAgent
 	~ndBrainAgentContinuePolicyGradient_Agent();
 
 	ndBrain* GetActor();
-	void SelectAction(ndBrainVector& actions) const;
+	void SampleActions(ndBrainVector& actions) const;
 
 	void InitWeights() { ndAssert(0); }
 	virtual void OptimizeStep() { ndAssert(0); }

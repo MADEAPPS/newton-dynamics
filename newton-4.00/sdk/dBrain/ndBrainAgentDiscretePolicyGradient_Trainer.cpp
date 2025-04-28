@@ -242,7 +242,7 @@ bool ndBrainAgentDiscretePolicyGradient_Trainer::IsTerminal() const
 }
 
 //#pragma optimize( "", off )
-ndBrainFloat ndBrainAgentDiscretePolicyGradient_Trainer::SelectAction(const ndBrainVector& probabilities) const
+ndBrainFloat ndBrainAgentDiscretePolicyGradient_Trainer::SampleActions(const ndBrainVector& probabilities) const
 {
 	ndBrainFixSizeVector<256> pdf;
 	
@@ -283,7 +283,7 @@ void ndBrainAgentDiscretePolicyGradient_Trainer::Step()
 	probability.SetCount(m_master->m_numberOfActions);
 	m_master->m_policy.MakePrediction(observation, probability, m_workingBuffer);
 
-	ndBrainFloat action = ndBrainFloat(SelectAction(probability));
+	ndBrainFloat action = ndBrainFloat(SampleActions(probability));
 	m_trajectory.SetAction(entryIndex, action);
 	ApplyActions(&action);
 
