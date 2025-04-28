@@ -157,9 +157,9 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateGradients
 						ndBrainFloat sigmaGradient = ndBrainFloat(0.5f) * (confidence * confidence / sigma4 - ndBrainFloat(1.0f) / sigma2);
 
 						//negate the gradient for gradient ascend?
-						loss[i] = -meanGradient * advantage;
-						loss[i + numberOfActions] = -sigmaGradient * advantage;
-
+						ndBrainFloat ascend = ndBrainFloat(1.0f);
+						loss[i] = meanGradient * advantage * ascend;
+						loss[i + numberOfActions] = sigmaGradient * advantage * ascend;
 					}
 				}
 
