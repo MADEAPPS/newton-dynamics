@@ -63,7 +63,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize);
 
 //m_threadsCount = 1;
-//m_batchTrajectoryCount = 1;
+//m_batchTrajectoryCount = 100;
 }
 
 //*********************************************************************************************

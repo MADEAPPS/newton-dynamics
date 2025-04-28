@@ -39,13 +39,12 @@ class ndBrainAgentContinueProximaPolicyGradient_TrainerMaster : public ndBrainAg
 	virtual void Optimize();
 
 	private:
-	void OptimizePolicyPPO();
-	void CalculateGradients();
-	void OptimizePolicyPPOstep();
+	void OptimizedSurrogate();
 	ndBrainFloat CalculateKLdivergence();
 	virtual void CalculateAdvange() override;
 	
 	ndBrainVector m_policyActions;
+	ndBrainVector m_referenceProbability;
 };
 
 #endif 
