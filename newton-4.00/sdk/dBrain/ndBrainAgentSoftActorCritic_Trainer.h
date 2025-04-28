@@ -112,7 +112,7 @@ class ndBrainAgentSoftActorCritic_Agent: public ndBrainAgent
 	virtual bool IsTrainer() const { ndAssert(0); return true; }
 	virtual ndInt32 GetEpisodeFrames() const;
 
-	ndReal PerturbeAction(ndReal action) const;
+	ndReal SampleAction(ndReal action) const;
 
 	ndSharedPtr<ndBrainAgentSoftActorCritic_Trainer> m_owner;
 	ndTrajectoryTransition m_trajectory;

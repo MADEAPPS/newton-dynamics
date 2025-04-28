@@ -192,7 +192,7 @@ ndInt32 ndBrainAgentDeterministicPolicyGradient_Agent::GetEpisodeFrames() const
 	return 0;
 }
 
-ndReal ndBrainAgentDeterministicPolicyGradient_Agent::PerturbeAction(ndReal action) const
+ndReal ndBrainAgentDeterministicPolicyGradient_Agent::SampleAction(ndReal action) const
 {
 	ndFloat32 sigma = ndSqrt(ND_CONTINUE_POLICY_CONST_SIGMA2);
 	ndReal actionNoise = ndReal(ndGaussianRandom(ndFloat32(action), sigma));
@@ -217,7 +217,7 @@ void ndBrainAgentDeterministicPolicyGradient_Agent::Step()
 	// explore environment
 	for (ndInt32 i = owner->m_parameters.m_numberOfActions - 1; i >= 0; --i)
 	{
-		actions[i] = PerturbeAction(actions[i]);
+		actions[i] = SampleAction(actions[i]);
 	}
 	ApplyActions(&actions[0]);
 }
