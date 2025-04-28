@@ -78,7 +78,6 @@ const char* ndBrainLayerActivationPolicyGradientMeanSigma::GetLabelId() const
 #pragma optimize( "", off )
 void ndBrainLayerActivationPolicyGradientMeanSigma::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
-#if 1
 	output.Set(input);
 	ndInt32 count = ndInt32(input.GetCount()) - 1;
 	if (m_constSigma2)
@@ -91,34 +90,10 @@ void ndBrainLayerActivationPolicyGradientMeanSigma::MakePrediction(const ndBrain
 		ndBrainFloat sigma2 = output[count] + minSigma2;
 		output[count] = ndMax(sigma2, minSigma2);
 	}
-
-#else
-	const ndInt32 base = m_neurons / 2;
-	if (m_constSigma2)
-	{
-		for (ndInt32 i = base - 1; i >= 0; --i)
-		{
-			output[i] = input[i];
-			output[i + base] = ND_CONTINUE_POLICY_CONST_SIGMA2;
-		}
-	}
-	else
-	{
-		ndBrainFloat minSigma2 = GetMinSigma2();
-		for (ndInt32 i = base - 1; i >= 0; --i)
-		{
-			output[i] = input[i];
-			ndBrainFloat sigma2 = input[i + base] + minSigma2;
-			output[i + base] = ndMax(sigma2, minSigma2);
-		}
-	}
-#endif
 }
 
 void ndBrainLayerActivationPolicyGradientMeanSigma::InputDerivative(const ndBrainVector& input, const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
-#if 1
-
 	inputDerivative.Set(ndBrainFloat(1.0f));
 	ndInt32 count = ndInt32(input.GetCount()) - 1;
 	if (m_constSigma2)
@@ -132,26 +107,5 @@ void ndBrainLayerActivationPolicyGradientMeanSigma::InputDerivative(const ndBrai
 		inputDerivative[count] = (sigma2 >= minSigma2) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
 	}
 
-#else
-	const ndInt32 base = m_neurons / 2;
-	if (m_constSigma2)
-	{
-		for (ndInt32 i = base - 1; i >= 0; --i)
-		{
-			inputDerivative[i] = ndBrainFloat(1.0f);
-			inputDerivative[i + base] = ndBrainFloat(0.0f);
-		}
-	}
-	else
-	{
-		ndBrainFloat minSigma2 = GetMinSigma2();
-		for (ndInt32 i = base - 1; i >= 0; --i)
-		{
-			inputDerivative[i] = ndBrainFloat(1.0f);
-			ndBrainFloat sigma2 = input[i + base] + minSigma2;
-			inputDerivative[i + base] = (sigma2 >= minSigma2) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
-		}
-	}
-#endif
 	inputDerivative.Mul(outputDerivative);
 }

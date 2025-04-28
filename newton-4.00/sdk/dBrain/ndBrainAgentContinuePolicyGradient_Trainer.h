@@ -150,6 +150,8 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndInt32 m_batchTrajectoryCount;
 		ndUnsigned32 m_randomSeed;
 		ndBrainOptimizer::ndRegularizerType m_regularizerType;
+		bool m_useConsActionsSigma;
+		bool m_useConstantBaseLineStateValue;
 	};
 
 	class MemoryStateValues: protected ndBrainVector
