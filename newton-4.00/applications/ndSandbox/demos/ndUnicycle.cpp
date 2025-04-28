@@ -22,7 +22,6 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-
 namespace ndUnicycle
 {
 	#define ND_TRAIN_AGENT
@@ -35,6 +34,8 @@ namespace ndUnicycle
 
 	#define ND_TERMINATION_ANGLE	(ndFloat32 (45.0f) * ndDegreeToRad)
 	#define ND_TRAJECTORY_STEPS		(1024 * 4)
+
+	//#define USE_DDPG
 
 	enum ndActionSpace
 	{
@@ -221,14 +222,20 @@ namespace ndUnicycle
 			RobotModelNotify* m_robot;
 		};
 
-		//class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Agent
+#ifdef USE_DDPG
 		class ndControllerTrainer : public ndBrainAgentDeterministicPolicyGradient_Agent
+#else
+		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Agent
+#endif
 		{
 			public:
-			//ndControllerTrainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
-				//:ndBrainAgentContinuePolicyGradient_Agent(master)
+#ifdef USE_DDPG
 			ndControllerTrainer(const ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>& master)
 				:ndBrainAgentDeterministicPolicyGradient_Agent(master)
+#else
+			ndControllerTrainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
+				:ndBrainAgentContinuePolicyGradient_Agent(master)
+#endif	
 				,m_solver()
 				,m_robot(nullptr)
 			{
@@ -264,8 +271,11 @@ namespace ndUnicycle
 		};
 
 		public:
-		//RobotModelNotify(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot)
+#ifdef USE_DDPG
 		RobotModelNotify(ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>& master, ndModelArticulation* const robot)
+#else
+		RobotModelNotify(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot)
+#endif
 			:ndModelNotify()
 			,m_controller(nullptr)
 			,m_controllerTrainer(nullptr)
@@ -614,21 +624,22 @@ namespace ndUnicycle
 			
 			m_outFile = fopen("unicycle.csv", "wb");
 			fprintf(m_outFile, "vpg\n");
-			
-			//ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
-			//hyperParameters.m_numberOfActions = m_actionsSize;
-			//hyperParameters.m_numberOfObservations = m_observationsSize;
-			//hyperParameters.m_maxTrajectorySteps = ND_TRAJECTORY_STEPS;
-			//hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
-			//hyperParameters.m_regularizerType = ndBrainOptimizer::m_lasso;
-			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
-			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
 
-
-			ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
-			hyperParameters.m_numberOfActions = m_actionsSize;
-			hyperParameters.m_numberOfObservations = m_observationsSize;
-			m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
+			#ifdef USE_DDPG
+				ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
+				hyperParameters.m_numberOfActions = m_actionsSize;
+				hyperParameters.m_numberOfObservations = m_observationsSize;
+				m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
+			#else
+				ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
+				hyperParameters.m_numberOfActions = m_actionsSize;
+				hyperParameters.m_numberOfObservations = m_observationsSize;
+				hyperParameters.m_maxTrajectorySteps = ND_TRAJECTORY_STEPS;
+				hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
+				hyperParameters.m_regularizerType = ndBrainOptimizer::m_lasso;
+				m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
+				m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
+			#endif
 
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
 			m_master->SetName(CONTROLLER_NAME);
@@ -805,8 +816,11 @@ namespace ndUnicycle
 			}
 		}
 
-		//ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
+#ifdef USE_DDPG
 		ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer> m_master;
+#else
+		ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
+#endif
 		ndSharedPtr<ndBrain> m_bestActor;
 		ndList<ndModelArticulation*> m_models;
 		FILE* m_outFile;
