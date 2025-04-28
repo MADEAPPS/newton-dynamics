@@ -143,7 +143,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndInt32 m_numberOfObservations;
 
 		ndInt32 m_numberOfLayers;
-		ndInt32 m_batchBufferSize;
+		ndInt32 m_miniBatchSize;
 		ndInt32 m_neuronPerLayers;
 		ndInt32 m_criticNeuronScale;
 		ndInt32 m_maxTrajectorySteps;

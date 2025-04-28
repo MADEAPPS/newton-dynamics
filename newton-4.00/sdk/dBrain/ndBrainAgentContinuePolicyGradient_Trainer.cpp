@@ -45,10 +45,10 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 	m_numberOfLayers = 3;
 	m_neuronPerLayers = 64;
 	m_criticNeuronScale = 2;
-	m_batchBufferSize = 256;
 	m_maxTrajectorySteps = 4096;
 	m_batchTrajectoryCount = 1000;
 
+	m_miniBatchSize = 256;
 	m_numberOfActions = 0;
 	m_numberOfObservations = 0;
 	m_policyLearnRate = ndBrainFloat(1.0e-4f);
@@ -60,10 +60,10 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 
 	m_discountRewardFactor = ndBrainFloat(0.99f);
 	m_generalizedAdvangeDiscount = ndBrainFloat(0.99f);
-	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_batchBufferSize);
+	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize);
 
 //m_threadsCount = 1;
-//m_batchTrajectoryCount = 8;
+//m_batchTrajectoryCount = 1;
 }
 
 //*********************************************************************************************
@@ -521,7 +521,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildPolicyClass()
 
 	m_policyTrainers.SetCount(0);
 	m_policyAuxiliaryTrainers.SetCount(0);
-	for (ndInt32 i = 0; i < m_parameters.m_batchBufferSize; ++i)
+	for (ndInt32 i = 0; i < m_parameters.m_miniBatchSize; ++i)
 	{
 		ndBrainTrainer* const trainer = new ndBrainTrainer(&m_policy);
 		m_policyTrainers.PushBack(trainer);
@@ -563,7 +563,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildCricticClass()
 	ndAssert(!strcmp((m_critic[m_critic.GetCount() - 1])->GetLabelId(), ND_BRAIN_LAYER_LINEAR_NAME));
 
 	m_criticTrainers.SetCount(0);
-	for (ndInt32 i = 0; i < m_parameters.m_batchBufferSize; ++i)
+	for (ndInt32 i = 0; i < m_parameters.m_miniBatchSize; ++i)
 	{
 		ndBrainTrainer* const trainer = new ndBrainTrainer(&m_critic);
 		m_criticTrainers.PushBack(trainer);
@@ -586,10 +586,10 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 	{
 		m_randomPermutation[i] = i;
 	}
-	if (m_randomPermutation.GetCount() < m_parameters.m_batchBufferSize)
+	if (m_randomPermutation.GetCount() < m_parameters.m_miniBatchSize)
 	{
 		ndInt32 mod = ndInt32(m_randomPermutation.GetCount());
-		ndInt32 padding = m_parameters.m_batchBufferSize - ndInt32(m_randomPermutation.GetCount());
+		ndInt32 padding = m_parameters.m_miniBatchSize - ndInt32(m_randomPermutation.GetCount());
 		for (ndInt32 i = 0; i < padding; ++i)
 		{
 			m_randomPermutation.PushBack(i % mod);
@@ -603,14 +603,14 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 	}
 	else
 	{
-		m_randomPermutation.SetCount(m_randomPermutation.GetCount() & -m_parameters.m_batchBufferSize);
+		m_randomPermutation.SetCount(m_randomPermutation.GetCount() & -m_parameters.m_miniBatchSize);
 	}
 
 	ndAtomic<ndInt32> iterator(0);
 	for (ndInt32 i = 0; i < ND_CONTINUE_POLICY_STATE_VALUE_ITERATIONS; ++i)
 	{ 
 		m_randomPermutation.RandomShuffle(m_randomPermutation.GetCount());
-		for (ndInt32 base = 0; base < m_randomPermutation.GetCount(); base += m_parameters.m_batchBufferSize)
+		for (ndInt32 base = 0; base < m_randomPermutation.GetCount(); base += m_parameters.m_miniBatchSize)
 		{
 			auto BackPropagateBatch = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
 			{
@@ -622,7 +622,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 				// calculate GAE(l, 0) // too smooth, and does not work either
 				ndFloat32 gamma = m_parameters.m_discountRewardFactor * m_parameters.m_generalizedAdvangeDiscount;
 
-				for (ndInt32 i = iterator++; i < m_parameters.m_batchBufferSize; i = iterator++)
+				for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
 				{
 					const ndInt32 index = m_randomPermutation[base + i];
 					ndBrainTrainer& trainer = *m_criticTrainers[i];
@@ -721,11 +721,10 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::CalculateAdvange()
 	ndBrainThreadPool::ParallelExecute(CalculateAdvantage);
 #endif
 
-	if (m_advantage.GetCount() < m_parameters.m_batchTrajectoryCount)
+	if (m_advantage.GetCount() < m_parameters.m_miniBatchSize)
 	{
-		ndAssert(0);
 		ndInt32 start = 0;
-		for (ndInt32 i = ndInt32(m_advantage.GetCount()); i < m_parameters.m_batchTrajectoryCount; ++i)
+		for (ndInt32 i = ndInt32(m_advantage.GetCount()); i < m_parameters.m_miniBatchSize; ++i)
 		{
 			m_trajectoryAccumulator.SetCount(i + 1);
 			m_trajectoryAccumulator.CopyFrom(i, m_trajectoryAccumulator, start);
@@ -741,7 +740,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 	ndAtomic<ndInt32> iterator(0);
 	auto ClearGradients = ndMakeObject::ndFunction([this, &iterator](ndInt32, ndInt32)
 	{
-		for (ndInt32 i = iterator++; i < m_parameters.m_batchBufferSize; i = iterator++)
+		for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
 		{
 			ndBrainTrainer* const trainer = m_policyTrainers[i];
 			trainer->ClearGradients();
@@ -749,9 +748,9 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 	});
 	ndBrainThreadPool::ParallelExecute(ClearGradients);
 
-	if (m_trajectoryAccumulator.GetCount() < m_parameters.m_batchBufferSize)
+	if (m_trajectoryAccumulator.GetCount() < m_parameters.m_miniBatchSize)
 	{
-		ndInt32 padTransitions = m_parameters.m_batchBufferSize - m_trajectoryAccumulator.GetCount();
+		ndInt32 padTransitions = m_parameters.m_miniBatchSize - m_trajectoryAccumulator.GetCount();
 		for (ndInt32 i = 0; i < padTransitions; ++i)
 		{
 			ndInt32 index = m_trajectoryAccumulator.GetCount();
@@ -763,8 +762,8 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 		}
 	}
 
-	const ndInt32 steps = m_trajectoryAccumulator.GetCount() & -m_parameters.m_batchBufferSize;
-	for (ndInt32 base = 0; base < steps; base += m_parameters.m_batchBufferSize)
+	const ndInt32 steps = m_trajectoryAccumulator.GetCount() & -m_parameters.m_miniBatchSize;
+	for (ndInt32 base = 0; base < steps; base += m_parameters.m_miniBatchSize)
 	{
 		auto CalculateGradients = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
 		{
@@ -815,7 +814,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 				ndInt32 m_index;
 			};
 
-			for (ndInt32 i = iterator++; i < m_parameters.m_batchBufferSize; i = iterator++)
+			for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
 			{
 				ndBrainTrainer& trainer = *m_policyAuxiliaryTrainers[i];
 				ndInt32 index = base + i;
@@ -827,7 +826,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 
 		auto AddGradients = ndMakeObject::ndFunction([this, &iterator](ndInt32, ndInt32)
 		{
-			for (ndInt32 i = iterator++; i < m_parameters.m_batchBufferSize; i = iterator++)
+			for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
 			{
 				ndBrainTrainer* const trainer = m_policyTrainers[i];
 				const ndBrainTrainer* const auxiliaryTrainer = m_policyAuxiliaryTrainers[i];

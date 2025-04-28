@@ -29,7 +29,7 @@
 #define ND_CONTINUE_PROXIMA_POLICY_ITERATIONS			100
 #define ND_CONTINUE_PROXIMA_POLICY_KL_DIVERGENCE		ndBrainFloat(0.001f)
 //#define ND_CONTINUE_PROXIMA_POLICY_CLIP_EPSILON			ndBrainFloat(0.2f)
-#define ND_CONTINUE_PROXIMA_POLICY_LEARN_SCALE			ndBrainFloat(0.25f)
+#define ND_CONTINUE_PROXIMA_POLICY_LEARN_SCALE			ndBrainFloat(0.125f)
 
 ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(const HyperParameters& hyperParameters)
 	:ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters)
@@ -108,7 +108,7 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateGradients
 	ndAtomic<ndInt32> iterator(0);
 	auto ClearGradients = ndMakeObject::ndFunction([this, &iterator](ndInt32, ndInt32)
 	{
-		for (ndInt32 i = iterator++; i < m_parameters.m_batchBufferSize; i = iterator++)
+		for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
 		{
 			ndBrainTrainer* const trainer = m_policyTrainers[i];
 			trainer->ClearGradients();
@@ -116,8 +116,8 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateGradients
 	});
 	ndBrainThreadPool::ParallelExecute(ClearGradients);
 
-	const ndInt32 steps = ndInt32(m_advantage.GetCount() + m_parameters.m_batchBufferSize - 1) & -m_parameters.m_batchBufferSize;
-	for (ndInt32 base = 0; base < steps; base += m_parameters.m_batchBufferSize)
+	const ndInt32 steps = ndInt32(m_advantage.GetCount() + m_parameters.m_miniBatchSize - 1) & -m_parameters.m_miniBatchSize;
+	for (ndInt32 base = 0; base < steps; base += m_parameters.m_miniBatchSize)
 	{
 		auto CalculateGradients = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
 		{
@@ -136,31 +136,30 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateGradients
 				{
 					// basically this fits a multivariate Gaussian process with zero cross covariance to the actions.
 					// calculate the log of prob of a multivariate Gaussian
-					const ndInt32 numberOfActions = m_agent->m_parameters.m_numberOfActions;
+					const ndInt32 numberOfActions = m_agent->m_policy.GetOutputSize();
 					const ndBrainFloat advantage = m_agent->m_advantage[m_index];
-					const ndBrainMemVector sampledProbability(m_agent->m_trajectoryAccumulator.GetActions(m_index), numberOfActions * 2);
-					
-					for (ndInt32 i = numberOfActions - 1; i >= 0; --i)
+					const ndBrainMemVector sampledProbability(m_agent->m_trajectoryAccumulator.GetActions(m_index), numberOfActions);
+
+					//negate the gradient for gradient ascend?
+					ndBrainFloat ascend = ndBrainFloat(-1.0f);
+					ndBrainFloat sigmaGrad2Z = ndBrainFloat(0.0f);
+					ndBrainFloat sigma2 = probabilityDistribution[numberOfActions - 1];
+					ndBrainFloat invSigma2 = ndBrainFloat(1.0f) / sigma2;
+					for (ndInt32 i = numberOfActions - 2; i >= 0; --i)
 					{
 						// as I understand, this is just a special case of maximum likelihood optimization.
 						// given a multivariate Gaussian process with zero cross covariance to the actions.
 						// calculate the log of prob of a multivariate Gaussian
 
 						const ndBrainFloat mean = probabilityDistribution[i];
-						//const ndBrainFloat sigma = probabilityDistribution[i + numberOfActions];
-						//const ndBrainFloat sigma2 = sigma * sigma;
-						const ndBrainFloat sigma2 = probabilityDistribution[i + numberOfActions];
-						const ndBrainFloat sigma4 = sigma2 * sigma2;
 						ndBrainFloat confidence = sampledProbability[i] - mean;
+						sigmaGrad2Z += confidence * confidence;
 
-						ndBrainFloat meanGradient = confidence / sigma2;
-						ndBrainFloat sigmaGradient = ndBrainFloat(0.5f) * (confidence * confidence / sigma4 - ndBrainFloat(1.0f) / sigma2);
-
-						//negate the gradient for gradient ascend?
-						ndBrainFloat ascend = ndBrainFloat(1.0f);
+						ndBrainFloat meanGradient = confidence * invSigma2;
 						loss[i] = meanGradient * advantage * ascend;
-						loss[i + numberOfActions] = sigmaGradient * advantage * ascend;
 					}
+					ndBrainFloat sigmaGrad = ndBrainFloat(0.5f) * invSigma2 * (sigmaGrad2Z * invSigma2 - ndBrainFloat(numberOfActions - 1));
+					loss[numberOfActions - 1] = sigmaGrad * advantage * ascend;
 				}
 
 				ndBrainTrainer& m_trainer;
@@ -168,7 +167,7 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateGradients
 				ndInt32 m_index;
 			};
 
-			for (ndInt32 i = iterator++; i < m_parameters.m_batchBufferSize; i = iterator++)
+			for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
 			{
 				ndInt32 index = base + i;
 				ndBrainTrainer& trainer = *m_policyAuxiliaryTrainers[i];
@@ -180,7 +179,7 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateGradients
 
 		auto AddGradients = ndMakeObject::ndFunction([this, &iterator](ndInt32, ndInt32)
 		{
-			for (ndInt32 i = iterator++; i < m_parameters.m_batchBufferSize; i = iterator++)
+			for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
 			{
 				ndBrainTrainer* const trainer = m_policyTrainers[i];
 				const ndBrainTrainer* const auxiliaryTrainer = m_policyAuxiliaryTrainers[i];
@@ -203,19 +202,17 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateAdvange()
 {
 	ndBrainAgentContinuePolicyGradient_TrainerMaster::CalculateAdvange();
 
-	ndAssert(0);
-	//ndInt32 numberOfActions = m_policy.GetOutputSize();
-	//if (m_advantage.GetCount() < m_parameters.m)
-	//{
-	//	//ndAssert(0);
-	//	//ndInt32 start = 0;
-	//	//for (ndInt32 i = ndInt32(m_policyActions.GetCount()); i < m_advantage.GetCount() * numberOfActions; ++i)
-	//	//{
-	//	//	ndFloat32 x = m_policyActions[start];
-	//	//	m_policyActions.PushBack(x);
-	//	//	start++;
-	//	//}
-	//}
+	ndInt32 numberOfActions = m_policy.GetOutputSize();
+	if (m_policyActions.GetCount() < m_parameters.m_miniBatchSize * numberOfActions)
+	{
+		ndInt32 start = 0;
+		for (ndInt32 i = ndInt32(m_policyActions.GetCount()); i < m_parameters.m_miniBatchSize * numberOfActions; ++i)
+		{
+			ndBrainFloat advantage = m_policyActions[start];
+			m_policyActions.PushBack(advantage);
+			start++;
+		}
+	}
 }
 
 //#pragma optimize( "", off )
