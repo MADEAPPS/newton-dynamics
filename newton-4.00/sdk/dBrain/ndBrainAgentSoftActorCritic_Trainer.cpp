@@ -186,7 +186,7 @@ ndInt32 ndBrainAgentSoftActorCritic_Agent::GetEpisodeFrames() const
 	return 0;
 }
 
-ndReal ndBrainAgentSoftActorCritic_Agent::PerturbeAction(ndReal action) const
+ndReal ndBrainAgentSoftActorCritic_Agent::SampleAction(ndReal action) const
 {
 	ndReal actionNoise = ndReal(ndGaussianRandom(ndFloat32(action), m_owner->m_parameters.m_actionNoiseSigma));
 	return ndClamp(actionNoise, ndReal(-1.0f), ndReal(1.0f));
@@ -209,7 +209,7 @@ void ndBrainAgentSoftActorCritic_Agent::Step()
 	// explore environment
 	for (ndInt32 i = m_owner->m_parameters.m_numberOfActions - 1; i >= 0; --i)
 	{
-		actions[i] = PerturbeAction(actions[i]);
+		actions[i] = SampleAction(actions[i]);
 	}
 	ApplyActions(&actions[0]);
 }

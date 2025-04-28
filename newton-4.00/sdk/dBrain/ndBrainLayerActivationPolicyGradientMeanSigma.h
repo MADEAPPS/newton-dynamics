@@ -25,8 +25,8 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainLayerActivation.h"
 
-#define ND_CONTINUE_POLICY_MIN_SIGMA2						ndBrainFloat(0.0001f)
-#define ND_CONTINUE_POLICY_CONST_SIGMA2						ndBrainFloat(0.01f)
+#define ND_CONTINUE_POLICY_MIN_SIGMA2						ndBrainFloat(0.01f)
+#define ND_CONTINUE_POLICY_CONST_SIGMA2						ndBrainFloat(0.25f)
 #define ND_BRAIN_LAYER_ACTIVATION_POLICY_MEAN_SIGMAN_NAME	"ndBrainLayerActivationPolicyGradientMeanSigma"
 
 class ndBrainLayerActivationPolicyGradientMeanSigma : public ndBrainLayerActivation
