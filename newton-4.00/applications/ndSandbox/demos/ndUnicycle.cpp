@@ -25,7 +25,7 @@
 
 namespace ndUnicycle
 {
-	//#define ND_TRAIN_AGENT
+	#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME			"unicycle.dnn"
 
 	//#define ND_MAX_LEG_ANGLE_STEP	(ndFloat32 (8.0f) * ndDegreeToRad)
@@ -35,8 +35,6 @@ namespace ndUnicycle
 
 	#define ND_TERMINATION_ANGLE	(ndFloat32 (45.0f) * ndDegreeToRad)
 	#define ND_TRAJECTORY_STEPS		(1024 * 4)
-
-	//#define ND_SYMMETRIC_MDP
 
 	enum ndActionSpace
 	{
@@ -223,14 +221,16 @@ namespace ndUnicycle
 			RobotModelNotify* m_robot;
 		};
 
-		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Agent
+		//class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Agent
+		class ndControllerTrainer : public ndBrainAgentDeterministicPolicyGradient_Agent
 		{
 			public:
-			ndControllerTrainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
-				:ndBrainAgentContinuePolicyGradient_Agent(master)
+			//ndControllerTrainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
+				//:ndBrainAgentContinuePolicyGradient_Agent(master)
+			ndControllerTrainer(const ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>& master)
+				:ndBrainAgentDeterministicPolicyGradient_Agent(master)
 				,m_solver()
 				,m_robot(nullptr)
-				,m_symmetricTrajectory(m_actionsSize, m_observationsSize)
 			{
 			}
 
@@ -259,38 +259,13 @@ namespace ndUnicycle
 				m_robot->ResetModel();
 			}
 
-			#pragma optimize( "", off )
-			void SaveTrajectory()
-			{
-				#ifdef ND_SYMMETRIC_MDP
-					m_symmetricTrajectory.SetCount(m_trajectory.GetCount());
-					for (ndInt32 i = 0; i < m_trajectory.GetCount(); ++i)
-					{
-						m_symmetricTrajectory.CopyFrom(i, m_trajectory, i);
-						ndBrainMemVector action(m_symmetricTrajectory.GetActions(i), m_actionsSize);
-						ndBrainMemVector observation(m_symmetricTrajectory.GetObservations(i), m_observationsSize);
-			
-						action.Scale(-1.0f);
-						observation.Scale(-1.0f);
-					}
-					ndBrainAgentContinuePolicyGradient_Agent::SaveTrajectory();
-			
-					m_trajectory.SetCount(m_symmetricTrajectory.GetCount());
-					for (ndInt32 i = 0; i < m_symmetricTrajectory.GetCount(); ++i)
-					{
-						m_trajectory.CopyFrom(i, m_symmetricTrajectory, i);
-					}
-				#endif
-				ndBrainAgentContinuePolicyGradient_Agent::SaveTrajectory();
-			}
-
 			ndIkSolver m_solver;
 			RobotModelNotify* m_robot;
-			ndTrajectoryTransition m_symmetricTrajectory;
 		};
 
 		public:
-		RobotModelNotify(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot)
+		//RobotModelNotify(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot)
+		RobotModelNotify(ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>& master, ndModelArticulation* const robot)
 			:ndModelNotify()
 			,m_controller(nullptr)
 			,m_controllerTrainer(nullptr)
@@ -640,20 +615,20 @@ namespace ndUnicycle
 			m_outFile = fopen("unicycle.csv", "wb");
 			fprintf(m_outFile, "vpg\n");
 			
-			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
-			
-			#ifdef ND_SYMMETRIC_MDP
-				hyperParameters.m_batchTrajectoryCount *= 2;
-			#endif	
-			//hyperParameters.m_threadsCount = 1;
+			//ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
+			//hyperParameters.m_numberOfActions = m_actionsSize;
+			//hyperParameters.m_numberOfObservations = m_observationsSize;
+			//hyperParameters.m_maxTrajectorySteps = ND_TRAJECTORY_STEPS;
+			//hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
+			//hyperParameters.m_regularizerType = ndBrainOptimizer::m_lasso;
+			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
+			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
+
+
+			ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
 			hyperParameters.m_numberOfActions = m_actionsSize;
 			hyperParameters.m_numberOfObservations = m_observationsSize;
-			hyperParameters.m_maxTrajectorySteps = ND_TRAJECTORY_STEPS;
-			hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
-			hyperParameters.m_regularizerType = ndBrainOptimizer::m_lasso;
-			
-			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
-			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
+			m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
 
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
 			m_master->SetName(CONTROLLER_NAME);
@@ -671,8 +646,8 @@ namespace ndUnicycle
 			SetMaterial(visualModel->GetAsModelArticulation());
 			
 			// add a hidden battery of model to generate trajectories in parallel
-			const ndInt32 countX = 100;
-			//const ndInt32 countX = 0;
+			//const ndInt32 countX = 100;
+			const ndInt32 countX = 0;
 			for (ndInt32 i = 0; i < countX; ++i)
 			{
 				ndMatrix location(matrix);
@@ -830,7 +805,8 @@ namespace ndUnicycle
 			}
 		}
 
-		ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
+		//ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
+		ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer> m_master;
 		ndSharedPtr<ndBrain> m_bestActor;
 		ndList<ndModelArticulation*> m_models;
 		FILE* m_outFile;
