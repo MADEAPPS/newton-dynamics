@@ -29,6 +29,7 @@
 #include "ndBrainLossLeastSquaredError.h"
 #include "ndBrainAgentSoftActorCritic_Trainer.h"
 
+#if 0
 ndBrainAgentSoftActorCritic_Trainer::HyperParameters::HyperParameters()
 {
 	m_actionNoiseSigma = ndBrainFloat(0.01f);
@@ -682,4 +683,16 @@ void ndBrainAgentSoftActorCritic_Trainer::OptimizeStep()
 	}
 	m_frameCount++;
 	m_framesAlive++;
+}
+
+#endif
+
+
+ndBrainAgentSoftActorCritic_Agent::ndBrainAgentSoftActorCritic_Agent(const HyperParameters& parameters)
+	:ndBrainAgentDeterministicPolicyGradient_Trainer(parameters)
+{
+}
+
+ndBrainAgentSoftActorCritic_Agent::~ndBrainAgentSoftActorCritic_Agent()
+{
 }

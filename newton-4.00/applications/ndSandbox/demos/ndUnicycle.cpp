@@ -366,7 +366,7 @@ namespace ndUnicycle
 			return false;
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		ndFloat32 GetBoxAngle() const
 		{
 			const ndMatrix matrix (m_poleJoint->CalculateGlobalMatrix1());
@@ -375,7 +375,7 @@ namespace ndUnicycle
 			return angle;
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		ndFloat32 GetPoleAngle() const
 		{
 			const ndMatrix matrix(m_poleJoint->CalculateGlobalMatrix0());
@@ -384,7 +384,7 @@ namespace ndUnicycle
 			return angle;
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		ndFloat32 CalculateComSpeed() const
 		{
 			ndFloat32 totalMass = 0.0f;
@@ -400,7 +400,7 @@ namespace ndUnicycle
 			return totalMomentum.m_x;
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		bool IsTerminal() const
 		{
 			//bool fail = ndAbs(GetBoxAngle()) > ND_TERMINATION_ANGLE;
@@ -408,7 +408,7 @@ namespace ndUnicycle
 			return fail;
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		void ResetModel()
 		{
 			for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
@@ -438,7 +438,7 @@ namespace ndUnicycle
 			return 1.0f;
 		};
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		ndBrainFloat CalculateReward()
 		{
 			if (IsTerminal())
@@ -526,7 +526,7 @@ namespace ndUnicycle
 			return ndReal(reward);
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		void ApplyActions(ndBrainFloat* const actions)
 		{
 			const ndVector wheelMass(m_wheel->GetMassMatrix());
@@ -536,7 +536,7 @@ namespace ndUnicycle
 			m_wheel->SetTorque(torque);
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		void GetObservation(ndBrainFloat* const observation)
 		{
 			const ndMatrix poleMatrix(m_wheelJoint->CalculateGlobalMatrix1());

@@ -162,7 +162,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
 	};
 
 	ndBrainAgentDeterministicPolicyGradient_Trainer(const HyperParameters& parameters);
-	~ndBrainAgentDeterministicPolicyGradient_Trainer();
+	virtual ~ndBrainAgentDeterministicPolicyGradient_Trainer();
 
 	const ndString& GetName() const;
 	void SetName(const ndString& name);
@@ -178,8 +178,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
 	ndFloat32 GetAverageScore() const;
 	ndFloat32 GetAverageFrames() const;
 
-
-	private:
+	protected:
 	void Optimize();
 	void SaveTrajectory();
 	void BuildPolicyClass();

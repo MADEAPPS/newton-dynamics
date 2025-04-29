@@ -25,10 +25,10 @@
 #include "ndBrainTrainer.h"
 #include "ndBrainLayerLinear.h"
 #include "ndBrainOptimizerAdam.h"
-#include "ndBrainLayerActivationPolicyGradientMeanSigma.h"
-#include "ndBrainAgentDeterministicPolicyGradient_Trainer.h"
 #include "ndBrainLayerActivationTanh.h"
 #include "ndBrainLossLeastSquaredError.h"
+#include "ndBrainLayerActivationPolicyGradientMeanSigma.h"
+#include "ndBrainAgentDeterministicPolicyGradient_Trainer.h"
 
 ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameters()
 {
@@ -387,7 +387,7 @@ ndFloat32 ndBrainAgentDeterministicPolicyGradient_Trainer::GetAverageFrames() co
 	return m_averageFramesPerEpisodes.GetAverage();
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainAgentDeterministicPolicyGradient_Trainer::SaveTrajectory()
 {
 	// remove all dead states except the last 
@@ -484,7 +484,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::SaveTrajectory()
 	}
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnQvalueFunction(ndInt32 criticIndex)
 {
 	ndInt32 base = 0;
@@ -520,7 +520,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnQvalueFunction(ndInt3
 	m_referenceCritic[criticIndex].SoftCopy(m_critic[criticIndex], m_parameters.m_criticMovingAverageFactor);
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 {
 	ndInt32 count = m_parameters.m_criticUpdatesCount * m_parameters.m_miniBatchSize;
@@ -585,8 +585,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 	m_averageExpectedRewards.Update(averageReward);
 }
 
-
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnPolicyFunction()
 {
 	ndAtomic<ndInt32> iterator(0);
@@ -667,7 +666,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnPolicyFunction()
 	m_referencePolicy.SoftCopy(m_policy, m_parameters.m_policyMovingAverageFactor);
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainAgentDeterministicPolicyGradient_Trainer::Optimize()
 {
 	CalculateExpectedRewards();
@@ -683,7 +682,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::Optimize()
 	ndPolycyDelayMod = (ndPolycyDelayMod + 1) % ND_POLICY_DELAY_MOD;
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainAgentDeterministicPolicyGradient_Trainer::OptimizeStep()
 {
 	SaveTrajectory();

@@ -36,7 +36,7 @@ class ndBrainAgentContinueProximaPolicyGradient_TrainerMaster : public ndBrainAg
 	ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(const HyperParameters& hyperParameters);
 	virtual ~ndBrainAgentContinueProximaPolicyGradient_TrainerMaster();
 
-	virtual void Optimize();
+	virtual void Optimize() override;
 
 	private:
 	void OptimizedSurrogate();

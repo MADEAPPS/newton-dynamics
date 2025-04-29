@@ -75,7 +75,7 @@ const char* ndBrainLayerActivationPolicyGradientMeanSigma::GetLabelId() const
 	return ND_BRAIN_LAYER_ACTIVATION_POLICY_MEAN_SIGMAN_NAME;
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainLayerActivationPolicyGradientMeanSigma::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	output.Set(input);

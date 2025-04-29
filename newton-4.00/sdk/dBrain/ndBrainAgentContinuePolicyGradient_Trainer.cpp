@@ -53,7 +53,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 	m_policyRegularizer = ndBrainFloat(1.0e-4f);
 	m_criticRegularizer = ndBrainFloat(5.0e-3f);
 	m_regularizerType = ndBrainOptimizer::m_ridge;
-	m_useConsActionsSigma = false;
+	m_useConsActionsSigma = true;
 	m_useConstantBaseLineStateValue = false;
 
 	m_discountRewardFactor = ndBrainFloat(0.99f);
@@ -61,7 +61,8 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize);
 
 //m_threadsCount = 1;
-//m_batchTrajectoryCount = 100;
+//m_batchTrajectoryCount = 10;
+//m_useConstantBaseLineStateValue = false;
 }
 
 //*********************************************************************************************
@@ -266,7 +267,7 @@ bool ndBrainAgentContinuePolicyGradient_Agent::IsTerminal() const
 	return false;
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_Agent::SampleActions(ndBrainVector& actions) const
 {
 	const ndInt32 numberOfActions = m_master->m_parameters.m_numberOfActions;
@@ -638,29 +639,89 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 			}
 		}
 	}
-
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::CalculateAdvange()
 {
 	if (m_parameters.m_useConstantBaseLineStateValue)
 	{
 		ndFloat64 averageSum = ndBrainFloat(0.0f);
-		ndFloat64 varianceSum2 = ndBrainFloat(0.0f);
 		const ndInt32 stepNumber = m_trajectoryAccumulator.GetCount();
 		for (ndInt32 i = 0; i < stepNumber; ++i)
 		{
 			ndFloat32 expectedReward = m_trajectoryAccumulator.GetExpectedReward(i);
 			averageSum += expectedReward;
-			varianceSum2 += expectedReward * expectedReward;
 		}
-
 		ndFloat32 baseLineReward = ndFloat32(averageSum / ndFloat32(stepNumber));
 		m_averageExpectedRewards.Update(baseLineReward);
 		m_averageFramesPerEpisodes.Update(ndFloat32(stepNumber) / ndFloat32(m_parameters.m_batchTrajectoryCount));
 
-		// normalize advantage, reduces variance 
+#if 0
+		// using minimum variance normalization. 
+		// I actually see far more oscilation of variace wit thsi method that just fiting a unit gaussian 	
+		ndAtomic<ndInt32> iterator(0);
+		m_advantage.SetCount(m_trajectoryAccumulator.GetCount());
+		auto CalculateMinimumVariaceBaseLine = ndMakeObject::ndFunction([this, &iterator](ndInt32, ndInt32)
+		{
+			ndBrainFixSizeVector<256> probabilities;
+			ndInt32 numberOfActions = m_policy.GetOutputSize();
+			ndInt32 numberOfObservations = m_policy.GetInputSize();
+			probabilities.SetCount(numberOfActions);
+
+			ndInt32 const count = m_trajectoryAccumulator.GetCount();
+			for (ndInt32 i = iterator.fetch_add(m_parameters.m_miniBatchSize); i < count; i = iterator.fetch_add(m_parameters.m_miniBatchSize))
+			{
+				const ndInt32 batchCount = ((i + m_parameters.m_miniBatchSize) < m_trajectoryAccumulator.GetCount()) ? m_parameters.m_miniBatchSize : m_trajectoryAccumulator.GetCount() - i;
+				for (ndInt32 k = 0; k < batchCount; ++k)
+				{
+					ndInt32 index = i + k;
+					const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(index), numberOfObservations);
+					m_policy.MakePrediction(observation, probabilities);
+
+					ndBrainFloat z2 = 0.0f;
+					const ndBrainMemVector sampledProbabilities(m_trajectoryAccumulator.GetActions(index), numberOfActions);
+					ndBrainFloat sigma2 = probabilities[numberOfActions - 1];
+					ndBrainFloat invSigma2 = ndBrainFloat(1.0f) / ndSqrt(2.0f * ndPi * sigma2);
+					ndBrainFloat invSigma2Det = ndBrainFloat(1.0f);
+					for (ndInt32 j = numberOfActions - 2; j >= 0; --j)
+					{
+						ndBrainFloat z = sampledProbabilities[j] - probabilities[j];
+						z2 += z * z;
+						invSigma2Det *= invSigma2;
+					}
+					ndBrainFloat exponent = ndBrainFloat(0.5f) * z2 / sigma2;
+					ndBrainFloat prob = invSigma2Det * ndExp(-exponent);
+					ndBrainFloat logProb = ndLog(prob);
+					m_advantage[index] = logProb * logProb;
+				}
+			}
+		});
+		ndBrainThreadPool::ParallelExecute(CalculateMinimumVariaceBaseLine);
+
+		ndBrainFloat logProbSum2 = 1.0e-4f;
+		ndBrainFloat logProbSum2Reward = 0.0f;
+		for (ndInt32 i = ndInt32(m_advantage.GetCount()) - 1; i >= 0; --i)
+		{
+			ndBrainFloat variace2 = m_advantage[i];
+			logProbSum2 += variace2;
+			logProbSum2Reward += variace2 * m_trajectoryAccumulator.GetExpectedReward(i);
+		}
+
+		ndBrainFloat baseLine = logProbSum2Reward / logProbSum2;
+		for (ndInt32 i = ndInt32(m_advantage.GetCount()) - 1; i >= 0; --i)
+		{
+			m_advantage[i] = m_trajectoryAccumulator.GetExpectedReward(i) - baseLine;
+		}
+#else
+		// just fit a unit gaussian, reduces variance, 
+		// so far, it seems more stable that all other methods.
+		ndFloat64 varianceSum2 = ndBrainFloat(0.0f);
+		for (ndInt32 i = 0; i < stepNumber; ++i)
+		{
+			ndFloat32 expectedReward = m_trajectoryAccumulator.GetExpectedReward(i);
+			varianceSum2 += expectedReward * expectedReward;
+		}
 		m_advantage.SetCount(0);
 		ndFloat32 variance = ndSqrt(ndMax(ndFloat32(varianceSum2 / ndFloat32(stepNumber)), ndFloat32(1.0e-4f)));
 		ndFloat32 invVariance = ndBrainFloat(1.0f) / variance;
@@ -669,6 +730,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::CalculateAdvange()
 			ndFloat32 expectedReward = m_trajectoryAccumulator.GetExpectedReward(i);
 			m_advantage.PushBack((expectedReward - baseLineReward) * invVariance);
 		}
+#endif
 	}
 	else
 	{
@@ -846,7 +908,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::Optimize()
 	OptimizePolicy();
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeStep()
 {
 	for (ndList<ndBrainAgentContinuePolicyGradient_Agent*>::ndNode* node = m_agents.GetFirst(); node; node = node->GetNext())

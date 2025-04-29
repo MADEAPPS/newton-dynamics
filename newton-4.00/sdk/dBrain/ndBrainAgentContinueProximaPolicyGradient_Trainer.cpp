@@ -270,7 +270,7 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::Optimize()
 	m_policyActions.SetCount(m_trajectoryAccumulator.GetCount() * numberOfActions);
 	auto CalculateActionsDistribution = ndMakeObject::ndFunction([this, &iterator, numberOfActions](ndInt32, ndInt32)
 	{
-		ndInt32 actionsSize = m_policy.GetOutputSize();
+		//ndInt32 actionsSize = m_policy.GetOutputSize();
 		ndInt32 observationSize = m_policy.GetInputSize();
 		const ndInt32 size = m_trajectoryAccumulator.GetCount();
 		for (ndInt32 i = iterator++; i < size; i = iterator++)
@@ -280,11 +280,11 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::Optimize()
 			m_policy.MakePrediction(observation, probabilities);
 
 			ndBrainFloat z2 = 0.0f;
-			const ndBrainMemVector sampledProbabilities(m_trajectoryAccumulator.GetActions(i), actionsSize);
-			ndBrainFloat sigma2 = probabilities[actionsSize - 1];
+			const ndBrainMemVector sampledProbabilities(m_trajectoryAccumulator.GetActions(i), numberOfActions);
+			ndBrainFloat sigma2 = probabilities[numberOfActions - 1];
 			ndBrainFloat invSigma2 = ndBrainFloat(1.0f) / ndSqrt(2.0f * ndPi * sigma2);
 			ndBrainFloat invSigma2Det = ndBrainFloat(1.0f);
-			for (ndInt32 j = actionsSize - 2; j >= 0; --j)
+			for (ndInt32 j = numberOfActions - 2; j >= 0; --j)
 			{
 				ndBrainFloat z = sampledProbabilities[j] - probabilities[j];
 				z2 += z * z;
