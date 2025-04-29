@@ -208,7 +208,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
 	ndBrainAgentDeterministicPolicyGradient_Agent* m_agent;
 	ndArray<ndInt32> m_shuffleBuffer;
 	ndMovingAverage<8> m_averageExpectedRewards;
-	ndMovingAverage<32> m_averageFramesPerEpisodes;
+	ndMovingAverage<8> m_averageFramesPerEpisodes;
 	ndUnsigned32 m_frameCount;
 	ndUnsigned32 m_framesAlive;
 	ndUnsigned32 m_eposideCount;
