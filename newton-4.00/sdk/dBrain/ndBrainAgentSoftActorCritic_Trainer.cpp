@@ -59,7 +59,7 @@ ndBrainFloat ndBrainAgentSoftActorCritic_Trainer::CalculatePolicyProbability(ndI
 	}
 	ndBrainFloat exponent = ndBrainFloat(0.5f) * z2 / sigma2;
 	ndBrainFloat prob = invSigma2Det * ndExp(-exponent);
-	return prob;
+	return ndMax(prob, ndBrainFloat(1.0e-4f));
 }
 
 #pragma optimize( "", off )
@@ -202,8 +202,6 @@ void ndBrainAgentSoftActorCritic_Trainer::LearnPolicyFunction()
 					{
 						ndBrainFloat criticQvalueGradient = ndBrainFloat(1.0f);
 						ndBrainFloat policyProbability = m_owner->CalculateReparametarizedPolicyProbability(m_index);
-
-						policyProbability = ndMax(policyProbability, ndBrainFloat(1.0e-4f));
 						ndBrainFloat policyGrad = m_owner->m_parameters.m_entropyRegularizerCoef / policyProbability;
 
 						// gradient ascend

@@ -45,7 +45,7 @@ namespace ndContinueCarpole
 		m_poleAngle,
 		m_poleOmega,
 		m_cartSpeed,
-		m_stateSize
+		m_observationsSize
 	};
 
 	ndModelArticulation* BuildModelOldModel(ndDemoEntityManager* const scene, const ndMatrix& location)
@@ -433,7 +433,7 @@ namespace ndContinueCarpole
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 
 			hyperParameters.m_numberOfActions = m_actionsSize;
-			hyperParameters.m_numberOfObservations = m_stateSize;
+			hyperParameters.m_numberOfObservations = m_observationsSize;
 			hyperParameters.m_maxTrajectorySteps = ND_TRAJECTORY_STEPS;
 			hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
 

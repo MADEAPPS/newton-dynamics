@@ -50,7 +50,7 @@ namespace ndDiscreteCarpole
 		m_poleAngle,
 		m_poleOmega,
 		m_cartSpeed,
-		m_stateSize
+		m_observationsSize
 	};
 
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndSharedPtr<ndDemoEntity>& modelMesh)
@@ -382,7 +382,7 @@ namespace ndDiscreteCarpole
 			hyperParameters.m_extraTrajectorySteps = 256;
 			hyperParameters.m_maxTrajectorySteps = 1024 * 4;
 			hyperParameters.m_numberOfActions = m_actionsSize;
-			hyperParameters.m_numberOfObservations = m_stateSize;
+			hyperParameters.m_numberOfObservations = m_observationsSize;
 			hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
 			
 			m_master = ndSharedPtr<ndBrainAgentDiscretePolicyGradient_TrainerMaster>(new ndBrainAgentDiscretePolicyGradient_TrainerMaster(hyperParameters));

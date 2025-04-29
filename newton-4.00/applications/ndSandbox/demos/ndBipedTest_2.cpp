@@ -159,7 +159,7 @@ namespace biped2
 		{
 			m_comSagittalSpeed,
 			m_comSagittalPosit,
-			m_stateSize,
+			m_observationsSize,
 		};
 
 		enum ndModelActionParam
@@ -900,8 +900,8 @@ namespace biped2
 			ndFloat32 sagittalComPosit = sagittalDir.DotProduct(sagittalDist).GetScalar();
 			ndFloat32 sagittalComSpeed = sagittalDir.DotProduct(modelState.m_centerOfMassVeloc).GetScalar();
 
-			//state.SetCount(ndHumanoidBrain::ndModelStateParam::m_stateSize);
-			ndAssert(state.GetCount() == ndHumanoidBrain::ndModelStateParam::m_stateSize);
+			//state.SetCount(ndHumanoidBrain::ndModelStateParam::m_observationsSize);
+			ndAssert(state.GetCount() == ndHumanoidBrain::ndModelStateParam::m_observationsSize);
 			state[ndHumanoidBrain::ndModelStateParam::m_comSagittalPosit] = ndReal(sagittalComPosit);
 			state[ndHumanoidBrain::ndModelStateParam::m_comSagittalSpeed] = ndReal(sagittalComSpeed);
 		}

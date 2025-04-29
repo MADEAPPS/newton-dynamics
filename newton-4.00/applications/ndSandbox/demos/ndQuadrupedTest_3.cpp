@@ -90,7 +90,7 @@ namespace ndQuadruped_3
 		//m_leg3_veloc_z,
 
 		//m_frameTick,
-		m_stateSize
+		m_observationsSize
 	};
 
 	#define D_CYCLE_PERIOD			ndFloat32(4.0f)
@@ -760,7 +760,7 @@ namespace ndQuadruped_3
 			ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
 
 			hyperParameters.m_numberOfActions = m_actionsSize;
-			hyperParameters.m_numberOfObservations = m_stateSize;
+			hyperParameters.m_numberOfObservations = m_observationsSize;
 			//hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
 
 			m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
