@@ -28,7 +28,11 @@
 ndBrainAgentDeterministicPolicyGradient::ndBrainAgentDeterministicPolicyGradient(const ndSharedPtr<ndBrain>& actor)
 	:ndBrainAgent()
 	,m_actor(actor)
+	,m_actions()
+	,m_observations()
 {
+	m_actions.SetCount(m_actor->GetOutputSize());
+	m_observations.SetCount(m_actor->GetInputSize());
 }
 
 bool ndBrainAgentDeterministicPolicyGradient::IsTrainer() const
@@ -77,13 +81,9 @@ void ndBrainAgentDeterministicPolicyGradient::OptimizeStep()
 
 void ndBrainAgentDeterministicPolicyGradient::Step()
 {
-	ndAssert(0);
-	ndBrainFixSizeVector<256> actions;
-	ndBrainFixSizeVector<256> observations;
-
-	GetObservation(&observations[0]);
-	m_actor->MakePrediction(observations, actions);
-	ApplyActions(&actions[0]);
+	GetObservation(&m_observations[0]);
+	m_actor->MakePrediction(m_observations, m_actions);
+	ApplyActions(&m_actions[0]);
 }
 
 

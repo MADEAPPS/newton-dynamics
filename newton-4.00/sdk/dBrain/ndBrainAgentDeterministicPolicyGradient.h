@@ -44,6 +44,8 @@ class ndBrainAgentDeterministicPolicyGradient: public ndBrainAgent
 
 	void InitWeights();
 	ndSharedPtr<ndBrain> m_actor;
+	ndBrainVector m_actions;
+	ndBrainVector m_observations;
 };
 
 #endif 
