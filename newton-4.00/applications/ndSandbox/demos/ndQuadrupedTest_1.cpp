@@ -294,17 +294,10 @@ namespace ndQuadruped_1
 		ndSharedPtr<ndBody> rootBody(CreateRigidBody(entity, matrix, mass, nullptr));
 		ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(rootBody);
 	
-
 		// build all for legs
-		ndInt32 index = 0;
 		for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = entity->GetChildren().GetFirst(); node; node = node->GetNext())
 		{
 			// build thig
-			index++;
-			//if (!((index == 4) || (index == 1)))
-			//if (!(index == 4))
-			//	continue;
-
 			ndSharedPtr<ndDemoEntity> thighEntity(node->GetInfo());
 			const ndMatrix thighMatrix(thighEntity->GetCurrentMatrix() * matrix);
 			ndSharedPtr<ndBody> thigh(CreateRigidBody(thighEntity, thighMatrix, limbMass, rootBody->GetAsBodyDynamic()));
