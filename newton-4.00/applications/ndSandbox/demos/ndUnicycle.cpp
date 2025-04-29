@@ -573,7 +573,7 @@ namespace ndUnicycle
 			fprintf(m_outFile, "vpg\n");
 
 			#ifdef USE_DDPG
-				m_stopTraining = 1000000;
+				m_stopTraining = 250000;
 				ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
 				hyperParameters.m_numberOfActions = m_actionsSize;
 				hyperParameters.m_numberOfObservations = m_observationsSize;
