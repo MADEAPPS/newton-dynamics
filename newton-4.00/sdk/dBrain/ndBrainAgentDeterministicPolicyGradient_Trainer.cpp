@@ -174,7 +174,7 @@ const ndBrainFloat* ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryT
 ndBrainAgentDeterministicPolicyGradient_Agent::ndBrainAgentDeterministicPolicyGradient_Agent(const ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>& master)
 	:ndBrainAgent()
 	,m_owner(master)
-	,m_trajectory(m_owner->m_parameters.m_numberOfActions, m_owner->m_parameters.m_numberOfObservations)
+	,m_trajectory(m_owner->m_policy.GetOutputSize(), m_owner->m_parameters.m_numberOfObservations)
 	,m_workingBuffer()
 	,m_trajectoryBaseCount(0)
 	,m_randomeGenerator()
@@ -208,7 +208,7 @@ void ndBrainAgentDeterministicPolicyGradient_Agent::Step()
 	m_trajectory.SetCount(entryIndex + 1);
 	m_trajectory.Clear(entryIndex);
 
-	ndBrainMemVector actions(m_trajectory.GetActions(entryIndex), m_owner->m_parameters.m_numberOfActions);
+	ndBrainMemVector actions(m_trajectory.GetActions(entryIndex), m_owner->m_policy.GetOutputSize());
 	ndBrainMemVector observation(m_trajectory.GetObservations(entryIndex), m_owner->m_parameters.m_numberOfObservations);
 	GetObservation(&observation[0]);
 	ndBrainFloat reward = CalculateReward();
@@ -218,7 +218,7 @@ void ndBrainAgentDeterministicPolicyGradient_Agent::Step()
 	const ndBrainAgentDeterministicPolicyGradient_Trainer* const owner = *m_owner;
 	owner->m_policy.MakePrediction(observation, actions, m_workingBuffer);
 	// explore environment
-	for (ndInt32 i = owner->m_parameters.m_numberOfActions - 1; i >= 0; --i)
+	for (ndInt32 i = owner->m_policy.GetOutputSize() - 1; i >= 0; --i)
 	{
 		actions[i] = SampleAction(actions[i]);
 	}
@@ -408,8 +408,8 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::SaveTrajectory()
 		bool terminalState = m_agent->m_trajectory.GetTerminalState(srcIndex + 1);
 		m_replayBuffer.SetTerminalState(dstIndex, terminalState);
 
-		ndBrainMemVector nextObservation(m_replayBuffer.GetNextObservations(dstIndex), m_parameters.m_numberOfObservations);
-		nextObservation.Set(ndBrainMemVector(m_agent->m_trajectory.GetObservations(srcIndex + 1), m_parameters.m_numberOfObservations));
+		ndBrainMemVector nextObservation(m_replayBuffer.GetNextObservations(dstIndex), m_policy.GetInputSize());
+		nextObservation.Set(ndBrainMemVector(m_agent->m_trajectory.GetObservations(srcIndex + 1), m_policy.GetInputSize()));
 	};
 
 	ndInt32 replayBufferCount = m_replayBuffer.GetCount();
@@ -460,8 +460,8 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::SaveTrajectory()
 			bool terminalState = m_agent->m_trajectory.GetTerminalState(i + 1);
 			m_replayBuffer.SetTerminalState(m_replayBufferIndex, terminalState);
 			
-			ndBrainMemVector nextObservation(m_replayBuffer.GetNextObservations(m_replayBufferIndex), m_parameters.m_numberOfObservations);
-			nextObservation.Set(ndBrainMemVector(m_agent->m_trajectory.GetObservations(i + 1), m_parameters.m_numberOfObservations));
+			ndBrainMemVector nextObservation(m_replayBuffer.GetNextObservations(m_replayBufferIndex), m_policy.GetInputSize());
+			nextObservation.Set(ndBrainMemVector(m_agent->m_trajectory.GetObservations(i + 1), m_policy.GetInputSize()));
 
 			m_replayBufferIndex = (m_replayBufferIndex + 1) % m_parameters.m_replayBufferSize;
 		}
@@ -494,7 +494,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnQvalueFunction(ndInt3
 		auto BackPropagateBatch = ndMakeObject::ndFunction([this, &iterator, base, criticIndex](ndInt32, ndInt32)
 		{
 			ndBrainFixSizeVector<256> criticObservationAction;
-			criticObservationAction.SetCount(m_parameters.m_numberOfActions + m_parameters.m_numberOfObservations);
+			criticObservationAction.SetCount(m_policy.GetOutputSize() + m_policy.GetInputSize());
 
 			ndBrainLossLeastSquaredError loss(1);
 			ndBrainFixSizeVector<1> groundTruth;
@@ -503,8 +503,8 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnQvalueFunction(ndInt3
 				const ndInt32 index = m_expectedRewardsIndexBuffer[i + base];
 				ndBrainTrainer& trainer = *m_criticTrainers[criticIndex][i];
 
-				ndMemCpy(&criticObservationAction[0], m_replayBuffer.GetActions(index), m_parameters.m_numberOfActions);
-				ndMemCpy(&criticObservationAction[m_parameters.m_numberOfActions], m_replayBuffer.GetObservations(index), m_parameters.m_numberOfObservations);
+				ndMemCpy(&criticObservationAction[0], m_replayBuffer.GetActions(index), m_policy.GetOutputSize());
+				ndMemCpy(&criticObservationAction[m_policy.GetOutputSize()], m_replayBuffer.GetObservations(index), m_policy.GetInputSize());
 
 				groundTruth[0] = m_expectedRewards[i + base];
 				loss.SetTruth(groundTruth);
@@ -538,7 +538,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 	{
 		const ndInt32 batchSize = 128;
 		ndBrainFixSizeVector<256> criticObservationAction;
-		criticObservationAction.SetCount(m_parameters.m_numberOfActions + m_parameters.m_numberOfObservations);
+		criticObservationAction.SetCount(m_policy.GetOutputSize() + m_policy.GetInputSize());
 		for (ndInt32 i = iterator.fetch_add(batchSize); i < count; i = iterator.fetch_add(batchSize))
 		{
 			const ndInt32 size = (i + batchSize) < count ? i + batchSize : count;
@@ -553,10 +553,10 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 				}
 				if (!m_replayBuffer.GetTerminalState(index))
 				{
-					ndBrainMemVector nextAction(&criticObservationAction[0], m_parameters.m_numberOfActions);
-					const ndBrainMemVector nextObservation(m_replayBuffer.GetNextObservations(index), m_parameters.m_numberOfObservations);
+					ndBrainMemVector nextAction(&criticObservationAction[0], m_policy.GetOutputSize());
+					const ndBrainMemVector nextObservation(m_replayBuffer.GetNextObservations(index), m_policy.GetInputSize());
 					m_referencePolicy.MakePrediction(nextObservation, nextAction);
-					ndMemCpy(&criticObservationAction[m_parameters.m_numberOfActions], &nextObservation[0], nextObservation.GetCount());
+					ndMemCpy(&criticObservationAction[m_policy.GetOutputSize()], &nextObservation[0], nextObservation.GetCount());
 
 					ndBrainFixSizeVector<1> criticQvalue;
 					for (ndInt32 k = 0; k < sizeof(m_critic) / sizeof(m_critic[0]); ++k)
@@ -612,8 +612,8 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnPolicyFunction()
 					,m_index(index)
 					,m_threadIndex(m_threadIndex)
 				{
-					m_combinedInputGradients.SetCount(m_owner->m_parameters.m_numberOfObservations + m_owner->m_parameters.m_numberOfActions);
-					m_combinedActionObservation.SetCount(m_owner->m_parameters.m_numberOfObservations + m_owner->m_parameters.m_numberOfActions);
+					m_combinedInputGradients.SetCount(m_owner->m_policy.GetInputSize() + m_owner->m_policy.GetOutputSize());
+					m_combinedActionObservation.SetCount(m_owner->m_policy.GetInputSize() + m_owner->m_policy.GetOutputSize());
 				}
 
 				class ndCriticLoss: public ndBrainLossLeastSquaredError
@@ -632,8 +632,8 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnPolicyFunction()
 
 				void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
 				{
-					ndMemCpy(&m_combinedActionObservation[0], &output[0], m_owner->m_parameters.m_numberOfActions);
-					ndMemCpy(&m_combinedActionObservation[m_owner->m_parameters.m_numberOfActions], m_owner->m_replayBuffer.GetNextObservations(m_index), m_owner->m_parameters.m_numberOfObservations);
+					ndMemCpy(&m_combinedActionObservation[0], &output[0], m_owner->m_policy.GetOutputSize());
+					ndMemCpy(&m_combinedActionObservation[m_owner->m_policy.GetOutputSize()], m_owner->m_replayBuffer.GetNextObservations(m_index), m_owner->m_policy.GetInputSize());
 					m_owner->m_referenceCritic[0].CalculateInputGradient(m_combinedActionObservation, m_combinedInputGradients, m_criticLoss);
 					
 					//ndBrainTrainer& trainer = *m_owner->m_criticTrainers[m_threadIndex];
