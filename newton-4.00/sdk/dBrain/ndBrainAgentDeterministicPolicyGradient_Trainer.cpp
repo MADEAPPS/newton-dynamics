@@ -32,7 +32,6 @@
 
 ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameters()
 {
-	m_actionNoiseSigma = ndBrainFloat(0.01f);
 	m_policyLearnRate = ndBrainFloat(1.0e-4f);
 	m_criticLearnRate = ndBrainFloat(1.0e-4f);
 	m_policyRegularizer = ndBrainFloat(1.0e-4f);
@@ -40,6 +39,8 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 	m_discountRewardFactor = ndBrainFloat(0.99f);
 	m_policyMovingAverageFactor = ndBrainFloat(0.005f);
 	m_criticMovingAverageFactor = ndBrainFloat(0.005f);
+	m_entropyRegularizerCoef = ndBrainFloat(0.005f);
+	m_actionNoiseSigma = ndSqrt(ND_CONTINUE_POLICY_CONST_SIGMA2);
 
 	m_policyRegularizerType = ndBrainOptimizer::m_ridge;
 	m_criticRegularizerType = ndBrainOptimizer::m_ridge;
@@ -60,7 +61,6 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize);
 
 //m_threadsCount = 1;
-//m_replayBufferSize /= 10;
 }
 
 ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::ndTrajectoryTransition(ndInt32 actionsSize, ndInt32 obsevationsSize)
@@ -195,7 +195,7 @@ ndInt32 ndBrainAgentDeterministicPolicyGradient_Agent::GetEpisodeFrames() const
 
 ndReal ndBrainAgentDeterministicPolicyGradient_Agent::SampleAction(ndReal action)
 {
-	ndFloat32 sigma = ndSqrt(ND_CONTINUE_POLICY_CONST_SIGMA2);
+	ndFloat32 sigma = m_owner->m_parameters.m_actionNoiseSigma;
 	ndBrainFloat unitVar = m_randomeGenerator.m_d(m_randomeGenerator.m_gen) * sigma;
 	ndBrainFloat sample = ndBrainFloat(action) + unitVar;
 	ndBrainFloat squashedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
@@ -536,11 +536,12 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 	ndAtomic<ndInt32> iterator(0);
 	auto ExpectedRewards = ndMakeObject::ndFunction([this, count, &iterator](ndInt32, ndInt32)
 	{
+		const ndInt32 batchSize = 128;
 		ndBrainFixSizeVector<256> criticObservationAction;
 		criticObservationAction.SetCount(m_parameters.m_numberOfActions + m_parameters.m_numberOfObservations);
-		for (ndInt32 i = iterator.fetch_add(32); i < count; i = iterator.fetch_add(32))
+		for (ndInt32 i = iterator.fetch_add(batchSize); i < count; i = iterator.fetch_add(batchSize))
 		{
-			const ndInt32 size = (i + 32) < count ? i + 32 : count;
+			const ndInt32 size = (i + batchSize) < count ? i + batchSize : count;
 			for (ndInt32 j = i; j < size; ++j)
 			{
 				ndBrainFixSizeVector<ND_NUMBER_OF_CRITICS> rewards;

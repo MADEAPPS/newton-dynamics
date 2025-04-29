@@ -35,7 +35,7 @@ namespace ndUnicycle
 	#define ND_TERMINATION_ANGLE	(ndFloat32 (45.0f) * ndDegreeToRad)
 	#define ND_TRAJECTORY_STEPS		(1024 * 4)
 
-	//#define USE_DDPG
+	#define USE_DDPG
 
 	enum ndActionSpace
 	{
@@ -52,69 +52,8 @@ namespace ndUnicycle
 		m_observationsSize
 	};
 
-	ndModelArticulation* BuildModelOldModel(ndDemoEntityManager* const scene, const ndMatrix& location)
-	{
-		ndModelArticulation* const model = new ndModelArticulation();
-
-		ndFloat32 mass = 10.0f;
-		ndFloat32 limbMass = 1.0f;
-		ndFloat32 wheelMass = 1.0f;
-
-		ndFloat32 xSize = 0.25f;
-		ndFloat32 ySize = 0.40f;
-		ndFloat32 zSize = 0.30f;
-		ndPhysicsWorld* const world = scene->GetWorld();
-
-		// add hip body
-		ndSharedPtr<ndBody> hipBody(world->GetBody(AddBox(scene, location, mass, xSize, ySize, zSize, "wood_0.png")));
-		ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(hipBody);
-
-		ndMatrix matrix(location);
-		matrix.m_posit.m_y += -1.21f;
-		hipBody->SetMatrix(matrix);
-
-		ndMatrix limbLocation(matrix);
-		limbLocation.m_posit.m_z += zSize * 0.0f;
-		limbLocation.m_posit.m_y -= ySize * 0.5f;
-
-		// make single leg
-		ndFloat32 limbLength = 0.3f;
-		ndFloat32 limbRadio = 0.025f;
-
-		ndSharedPtr<ndBody> pole(world->GetBody(AddCapsule(scene, ndGetIdentityMatrix(), limbMass, limbRadio, limbRadio, limbLength, "wood_1.png")));
-		ndMatrix legLocation(ndRollMatrix(-90.0f * ndDegreeToRad) * limbLocation);
-		legLocation.m_posit.m_y -= limbLength * 0.5f;
-		pole->SetMatrix(legLocation);
-		ndMatrix legPivot(ndYawMatrix(90.0f * ndDegreeToRad) * ndRollMatrix(-90.0f * ndDegreeToRad) * legLocation);
-		legPivot.m_posit.m_y += limbLength * 0.5f;
-		ndSharedPtr<ndJointBilateralConstraint> poleHinge(new ndJointHinge(legPivot, pole->GetAsBodyKinematic(), modelRootNode->m_body->GetAsBodyKinematic()));
-		ndModelArticulation::ndNode* const poleLink = model->AddLimb(modelRootNode, pole, poleHinge);
-		poleLink->m_name = "leg";
-		ndJointHinge* const hinge = (ndJointHinge*)*poleHinge;
-		hinge->SetAsSpringDamper(0.02f, 1500, 40.0f);
-		//model->m_poleJoint = hinge;
-
-		// make wheel
-		ndFloat32 wheelRadio = 4.0f * limbRadio;
-		ndSharedPtr<ndBody> ball(world->GetBody(AddSphere(scene, ndGetIdentityMatrix(), wheelMass, wheelRadio, "wood_0.png")));
-		ndMatrix wheelMatrix(legPivot);
-		wheelMatrix.m_posit.m_y -= limbLength;
-		ball->SetMatrix(wheelMatrix);
-		ndSharedPtr<ndJointBilateralConstraint> ballHinge(new ndJointHinge(wheelMatrix, ball->GetAsBodyKinematic(), pole->GetAsBodyKinematic()));
-		ndModelArticulation::ndNode* const ballHingeNode = model->AddLimb(poleLink, ball, ballHinge);
-		//ndJointHinge* const wheelMotor = (ndJointHinge*)*ballHinge;
-		//wheelMotor->SetAsSpringDamper(0.02f, 0.0f, 0.2f);
-		ballHingeNode->m_name = "wheel";
-		ball->GetAsBodyDynamic()->SetSleepAccel(ball->GetAsBodyDynamic()->GetSleepAccel() * ndFloat32(0.1f));
-
-		return model;
-	}
-
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndSharedPtr<ndDemoEntity>& modelMesh)
 	{
-#if 0
-		ndModelArticulation* const model = BuildModelOldModel(scene, location);
-#else
 		ndModelArticulation* const model = new ndModelArticulation();
 		ndSharedPtr<ndDemoEntity> entity(modelMesh->GetChildren().GetFirst()->GetInfo()->CreateClone());
 		scene->AddEntity(entity);
@@ -162,7 +101,6 @@ namespace ndUnicycle
 		//char fileName[256];
 		//ndGetWorkingFileName("unicycle.urdf", fileName);
 		//urdf.Export(fileName, model->GetAsModelArticulation());
-#endif
 
 		return model;
 	}
@@ -639,7 +577,8 @@ namespace ndUnicycle
 				ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
 				hyperParameters.m_numberOfActions = m_actionsSize;
 				hyperParameters.m_numberOfObservations = m_observationsSize;
-				m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
+				m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentSoftActorCritic_Trainer(hyperParameters));
+				//m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
 			#else
 				ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 				hyperParameters.m_numberOfActions = m_actionsSize;

@@ -140,6 +140,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
 		ndBrainFloat m_policyMovingAverageFactor;
 		ndBrainFloat m_criticMovingAverageFactor;
 		ndBrainFloat m_actionNoiseSigma;
+		ndBrainFloat m_entropyRegularizerCoef;
 
 		ndUnsigned32 m_randomSeed;
 		ndInt32 m_miniBatchSize;
@@ -183,8 +184,8 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
 	void SaveTrajectory();
 	void BuildPolicyClass();
 	void BuildCriticClass();
-	void LearnPolicyFunction();
-	void CalculateExpectedRewards();
+	virtual void LearnPolicyFunction();
+	virtual void CalculateExpectedRewards();
 	void LearnQvalueFunction(ndInt32 criticIndex);
 
 	public:
