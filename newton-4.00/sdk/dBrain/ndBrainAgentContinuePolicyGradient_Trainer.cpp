@@ -497,9 +497,11 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildPolicyClass()
 		layers.PushBack(new ndBrainLayerLinear(m_parameters.m_neuronPerLayers, m_parameters.m_neuronPerLayers));
 		layers.PushBack(new ndBrainLayerActivationTanh(m_parameters.m_neuronPerLayers));
 	}
+	ndAssert(0);
 	layers.PushBack(new ndBrainLayerLinear(m_parameters.m_neuronPerLayers, m_parameters.m_numberOfActions + 1));
 	layers.PushBack(new ndBrainLayerActivationTanh(m_parameters.m_numberOfActions + 1));
-	layers.PushBack(new ndBrainLayerActivationPolicyGradientMeanSigma(m_parameters.m_numberOfActions + 1, m_parameters.m_useConsActionsSigma));
+
+//	layers.PushBack(new ndBrainLayerActivationPolicyGradientMeanSigma(m_parameters.m_numberOfActions + 1, m_parameters.m_useConsActionsSigma));
 
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{

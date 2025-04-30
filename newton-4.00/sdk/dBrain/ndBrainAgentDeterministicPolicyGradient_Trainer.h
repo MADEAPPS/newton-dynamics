@@ -114,7 +114,7 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 	virtual bool IsTrainer() const { ndAssert(0); return true; }
 	virtual ndInt32 GetEpisodeFrames() const;
 
-	ndReal SampleAction(ndReal action);
+	void SampleAction(ndBrainVector& action);
 
 	ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer> m_owner;
 	ndTrajectoryTransition m_trajectory;
@@ -139,7 +139,9 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
 		ndBrainFloat m_discountRewardFactor;
 		ndBrainFloat m_policyMovingAverageFactor;
 		ndBrainFloat m_criticMovingAverageFactor;
-		ndBrainFloat m_actionNoiseSigma;
+
+		ndBrainFloat m_actionFixSigma;
+		ndBrainFloat m_actionVariableSigma;
 		ndBrainFloat m_entropyRegularizerCoef;
 
 		ndUnsigned32 m_randomSeed;
@@ -158,6 +160,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
 		ndInt32 m_criticUpdatesCount;
 		ndInt32 m_policyUpdatesCount;
 
+		bool m_useFixSigma;
 		ndBrainOptimizer::ndRegularizerType m_policyRegularizerType;
 		ndBrainOptimizer::ndRegularizerType m_criticRegularizerType;
 	};
