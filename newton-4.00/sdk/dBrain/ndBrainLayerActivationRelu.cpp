@@ -20,8 +20,8 @@
 */
 
 #include "ndBrainStdafx.h"
-//#include "ndBrainFloat4.h"
 #include "ndBrainSaveLoad.h"
+#include "ndBrainSimdFloat8.h"
 #include "gpu/ndBrainGpuContext.h"
 #include "ndBrainLayerActivationRelu.h"
 
@@ -60,10 +60,25 @@ ndBrainLayer* ndBrainLayerActivationRelu::Load(const ndBrainLoad* const loadSave
 void ndBrainLayerActivationRelu::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == output.GetCount());
-	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
+	//for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
+	//{
+	//	output[i] = ndMax (input[i], ndBrainFloat (0.0f));
+	//	ndAssert(ndCheckFloat(output[i]));
+	//}
+
+	const ndBrainSimdFloat8 zero(0.0f);
+	ndBrainFloat* const dst = &output[0];
+	const ndBrainFloat* const src = &input[0];
+	const ndInt32 roundCount = ndInt32(input.GetCount()) & -8;
+	for (ndInt32 i = 0; i < roundCount; i += 8)
+	{
+		const ndBrainSimdFloat8 x(&src[i]);
+		const ndBrainSimdFloat8 value(x.Max(zero));
+		value.Store(&dst[i]);
+	}
+	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= (roundCount * 8); --i)
 	{
 		output[i] = ndMax (input[i], ndBrainFloat (0.0f));
-		ndAssert(ndCheckFloat(output[i]));
 	}
 }
 
@@ -72,10 +87,26 @@ void ndBrainLayerActivationRelu::InputDerivative(const ndBrainVector& input, con
 	ndAssert(input.GetCount() == outputDerivative.GetCount());
 	ndAssert(input.GetCount() == inputDerivative.GetCount());
 
-	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
+	//for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
+	//{
+	//	inputDerivative[i] = (input[i] > ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+	//	ndAssert(ndCheckFloat(inputDerivative[i]));
+	//}
+	const ndBrainSimdFloat8 one(1.0f);
+	const ndBrainSimdFloat8 zero(0.0f);
+	ndBrainFloat* const dst = &inputDerivative[0];
+	const ndBrainFloat* const src = &input[0];
+	const ndInt32 roundCount = ndInt32(input.GetCount()) & -8;
+	for (ndInt32 i = 0; i < roundCount; i += 8)
+	{
+		const ndBrainSimdFloat8 x(&src[i]);
+		const ndBrainSimdFloat8 test(x > zero);
+		const ndBrainSimdFloat8 value(test & one);
+		value.Store(&dst[i]);
+	}
+	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= (roundCount * 8); --i)
 	{
 		inputDerivative[i] = (input[i] > ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
-		ndAssert(ndCheckFloat(inputDerivative[i]));
 	}
 
 	inputDerivative.Mul(outputDerivative);

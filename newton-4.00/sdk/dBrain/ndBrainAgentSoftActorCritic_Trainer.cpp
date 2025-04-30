@@ -77,7 +77,7 @@ ndBrainFloat ndBrainAgentSoftActorCritic_Trainer::CalculateReparametarizedPolicy
 	policyEntropyAction.SetCount(m_policy.GetOutputSize());
 	const ndBrainMemVector observation(m_replayBuffer.GetObservations(index), m_policy.GetInputSize());
 	m_policy.MakePrediction(observation, policyEntropyAction);
-	m_agent->SampleAction(policyEntropyAction);
+	m_agent->SampleActions(policyEntropyAction);
 	return CalculatePolicyProbability(index, policyEntropyAction);
 }
 

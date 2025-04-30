@@ -138,19 +138,24 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndBrainFloat m_discountRewardFactor;
 		ndBrainFloat m_generalizedAdvangeDiscount;
 
+		ndBrainFloat m_actionFixSigma;
+		//ndBrainFloat m_actionVariableSigma;
+
 		ndInt32 m_threadsCount;
 		ndInt32 m_numberOfActions;
 		ndInt32 m_numberOfObservations;
 
 		ndInt32 m_numberOfLayers;
 		ndInt32 m_miniBatchSize;
-		ndInt32 m_neuronPerLayers;
+		ndInt32 m_hiddenLayersNumberOfNeurons;
 		ndInt32 m_criticNeuronScale;
 		ndInt32 m_maxTrajectorySteps;
 		ndInt32 m_batchTrajectoryCount;
 		ndUnsigned32 m_randomSeed;
 		ndBrainOptimizer::ndRegularizerType m_regularizerType;
-		bool m_useConsActionsSigma;
+
+		bool m_useFixSigma;
+
 		bool m_useConstantBaseLineStateValue;
 	};
 
@@ -188,7 +193,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	void OptimizePolicy();
 	void OptimizeCritic();
 	void BuildPolicyClass();
-	void BuildCricticClass();
+	void BuildCriticClass();
 	virtual void CalculateAdvange();
 
 	ndBrainAgentContinuePolicyGradient_Agent::ndRandomGenerator* GetRandomGenerator();

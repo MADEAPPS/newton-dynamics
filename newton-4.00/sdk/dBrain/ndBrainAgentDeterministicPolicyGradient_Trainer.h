@@ -114,7 +114,7 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 	virtual bool IsTrainer() const { ndAssert(0); return true; }
 	virtual ndInt32 GetEpisodeFrames() const;
 
-	void SampleAction(ndBrainVector& action);
+	void SampleActions(ndBrainVector& action);
 
 	ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer> m_owner;
 	ndTrajectoryTransition m_trajectory;
@@ -141,7 +141,6 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
 		ndBrainFloat m_criticMovingAverageFactor;
 
 		ndBrainFloat m_actionFixSigma;
-		ndBrainFloat m_actionVariableSigma;
 		ndBrainFloat m_entropyRegularizerCoef;
 
 		ndUnsigned32 m_randomSeed;

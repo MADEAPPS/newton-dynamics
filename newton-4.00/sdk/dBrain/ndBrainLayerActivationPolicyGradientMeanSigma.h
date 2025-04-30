@@ -26,7 +26,7 @@
 #include "ndBrainLayerActivation.h"
 
 //#define ND_CONTINUE_POLICY_MIN_SIGMA2						ndBrainFloat(0.0625)
-//#define ND_CONTINUE_POLICY_CONST_SIGMA2						ndBrainFloat(0.25f)
+//#define ND_CONTINUE_POLICY_FIX_SIGMA2						ndBrainFloat(0.25f)
 #define ND_BRAIN_LAYER_ACTIVATION_POLICY_MEAN_SIGMAN_NAME	"ndBrainLayerActivationPolicyGradientMeanSigma"
 
 class ndBrainLayerActivationPolicyGradientMeanSigma : public ndBrainLayerActivation
@@ -38,7 +38,6 @@ class ndBrainLayerActivationPolicyGradientMeanSigma : public ndBrainLayerActivat
 
 	virtual const char* GetLabelId() const override;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
-
 
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const override;
 	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const override;

@@ -49,23 +49,9 @@ class ndBrainSimdFloat8
 	ndBrainSimdFloat8 Min(const ndBrainSimdFloat8& src) const;
 	ndBrainSimdFloat8 Max(const ndBrainSimdFloat8& src) const;
 	ndBrainSimdFloat8 Clamp(const ndBrainSimdFloat8& min, const ndBrainSimdFloat8& max) const;
-
-	//ndBrainSimdFloat8(const ndBrainFloat* const ptr);
-	//ndBrainSimdFloat8(ndInt32 x, ndInt32 y, ndInt32 z, ndInt32 w);
-	//ndBrainSimdFloat8(ndBrainFloat x, ndBrainFloat y, ndBrainFloat z, ndBrainFloat w);
-	//~ndBrainSimdFloat8();
-	//
-	//ndBrainSimdFloat8& operator= (const ndBrainSimdFloat8& A);
 	
 	ndBrainSimdFloat8 operator+ (const ndBrainSimdFloat8& A) const;
 	ndBrainSimdFloat8 operator- (const ndBrainSimdFloat8& A) const;
-	//ndBrainSimdFloat8 operator* (const ndBrainSimdFloat8& A) const;
-	//
-	//ndBrainFloat HorizontalAdd() const;
-	//ndBrainSimdFloat8 Min(const ndBrainSimdFloat8& A) const;
-	//ndBrainSimdFloat8 Max(const ndBrainSimdFloat8& A) const;
-	//ndBrainSimdFloat8 MulAdd(const ndBrainSimdFloat8& A, const ndBrainSimdFloat8& B) const;
-	//ndBrainSimdFloat8 MulSub(const ndBrainSimdFloat8& A, const ndBrainSimdFloat8& B) const;
 	
 	// logical operations;
 	ndBrainSimdFloat8 operator& (const ndBrainSimdFloat8& data) const;
@@ -117,6 +103,27 @@ inline ndBrainSimdFloat8 ndBrainSimdFloat8::Clamp(const ndBrainSimdFloat8& min, 
 		tmp.m_f[i] = ndClamp(m_f[i], min.m_f[i], max.m_f[i]);
 	}
 	return tmp;
+}
+
+inline ndBrainSimdFloat8 ndBrainSimdFloat8::Min(const ndBrainSimdFloat8& min) const
+{
+	ndBrainSimdFloat8 tmp;
+	for (ndInt32 i = 0; i < 8; ++i)
+	{
+		tmp.m_f[i] = ndMin(m_f[i], min.m_f[i]);
+	}
+	return tmp;
+}
+
+inline ndBrainSimdFloat8 ndBrainSimdFloat8::Max(const ndBrainSimdFloat8& max) const
+{
+	ndBrainSimdFloat8 tmp;
+	for (ndInt32 i = 0; i < 8; ++i)
+	{
+		tmp.m_f[i] = ndMax(m_f[i], max.m_f[i]);
+	}
+	return tmp;
+
 }
 
 inline ndBrainSimdFloat8 ndBrainSimdFloat8::Tanh() const

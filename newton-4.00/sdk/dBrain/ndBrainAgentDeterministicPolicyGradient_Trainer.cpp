@@ -25,14 +25,14 @@
 #include "ndBrainTrainer.h"
 #include "ndBrainLayerLinear.h"
 #include "ndBrainOptimizerAdam.h"
+#include "ndBrainLayerActivationRelu.h"
 #include "ndBrainLayerActivationTanh.h"
 #include "ndBrainLossLeastSquaredError.h"
 #include "ndBrainLayerActivationLinear.h"
 #include "ndBrainLayerActivationPolicyGradientMeanSigma.h"
 #include "ndBrainAgentDeterministicPolicyGradient_Trainer.h"
 
-#define ND_CONTINUE_POLICY_MIN_SIGMA2						ndBrainFloat(0.0625)
-#define ND_CONTINUE_POLICY_CONST_SIGMA2						ndBrainFloat(0.25f)
+#define ND_CONTINUE_POLICY_FIX_SIGMA2		ndBrainFloat(0.25f)
 
 ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameters()
 {
@@ -47,8 +47,7 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 
 	//m_useFixSigma = true;
 	m_useFixSigma = false;
-	m_actionFixSigma = ndSqrt(ND_CONTINUE_POLICY_CONST_SIGMA2);
-	m_actionVariableSigma = ndSqrt(ND_CONTINUE_POLICY_CONST_SIGMA2);
+	m_actionFixSigma = ndSqrt(ND_CONTINUE_POLICY_FIX_SIGMA2);
 
 	m_policyRegularizerType = ndBrainOptimizer::m_ridge;
 	m_criticRegularizerType = ndBrainOptimizer::m_ridge;
@@ -201,15 +200,15 @@ ndInt32 ndBrainAgentDeterministicPolicyGradient_Agent::GetEpisodeFrames() const
 	return 0;
 }
 
-void ndBrainAgentDeterministicPolicyGradient_Agent::SampleAction(ndBrainVector& action)
+void ndBrainAgentDeterministicPolicyGradient_Agent::SampleActions(ndBrainVector& actions)
 {
-	ndFloat32 sigma = action[action.GetCount() - 1];
-	for (ndInt32 i = ndInt32(action.GetCount()) - 2; i >= 0; --i)
+	ndFloat32 sigma = actions[actions.GetCount() - 1];
+	for (ndInt32 i = ndInt32(actions.GetCount()) - 2; i >= 0; --i)
 	{
-		ndBrainFloat unitVar = m_randomeGenerator.m_d(m_randomeGenerator.m_gen) * sigma;
-		ndBrainFloat sample = ndBrainFloat(action[i]) + unitVar;
+		ndBrainFloat unitVar = m_randomeGenerator.m_d(m_randomeGenerator.m_gen);
+		ndBrainFloat sample = ndBrainFloat(actions[i]) + unitVar * sigma;
 		ndBrainFloat squashedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
-		action[i] = squashedAction;
+		actions[i] = squashedAction;
 	}
 }
 
@@ -229,7 +228,7 @@ void ndBrainAgentDeterministicPolicyGradient_Agent::Step()
 	
 	owner->m_policy.MakePrediction(observation, actions, m_workingBuffer);
 	// explore environment
-	SampleAction(actions);
+	SampleActions(actions);
 	ApplyActions(&actions[0]);
 }
 
@@ -309,14 +308,15 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildPolicyClass()
 	{
 		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == m_parameters.m_hiddenLayersNumberOfNeurons);
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
-		layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
+		//layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
 	}
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_numberOfActions + 1));
 	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 	layers.PushBack(new ndBrainLayerActivationPolicyGradientMeanSigma(layers[layers.GetCount() - 1]->GetOutputSize()));
 
-	ndBrainFixSizeVector<256> slope;
 	ndBrainFixSizeVector<256> bias;
+	ndBrainFixSizeVector<256> slope;
 	bias.SetCount(layers[layers.GetCount() - 1]->GetOutputSize());
 	slope.SetCount(layers[layers.GetCount() - 1]->GetOutputSize());
 	bias.Set(ndBrainFloat(0.0f));
@@ -324,7 +324,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildPolicyClass()
 	if (m_parameters.m_useFixSigma)
 	{
 		slope[layers[layers.GetCount() - 1]->GetOutputSize() - 1] = ndBrainFloat(0.0f);
-		bias[layers[layers.GetCount() - 1]->GetOutputSize() - 1] = m_parameters.m_actionVariableSigma;
+		bias[layers[layers.GetCount() - 1]->GetOutputSize() - 1] = m_parameters.m_actionFixSigma;
 	}
 	layers.PushBack(new ndBrainLayerActivationLinear(slope, bias));
 
@@ -360,7 +360,8 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildCriticClass()
 		{
 			ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == m_parameters.m_hiddenLayersNumberOfNeurons);
 			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
-			layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
+			//layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
+			layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
 		}
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
 

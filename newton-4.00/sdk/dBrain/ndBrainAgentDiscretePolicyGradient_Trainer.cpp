@@ -40,7 +40,7 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 	m_randomSeed = 47;
 	m_numberOfLayers = 3;
 	m_miniBatchSize = 256;
-	m_neuronPerLayers = 64;
+	m_hiddenLayersNumberOfNeurons = 64;
 	m_maxTrajectorySteps = 4096;
 	m_extraTrajectorySteps = 1024;
 	//m_batchTrajectoryCount = 100;
@@ -393,15 +393,15 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::ndBrainAgentDiscretePolicyGrad
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 	
 	layers.SetCount(0);
-	layers.PushBack(new ndBrainLayerLinear(m_numberOfObservations, hyperParameters.m_neuronPerLayers));
+	layers.PushBack(new ndBrainLayerLinear(m_numberOfObservations, hyperParameters.m_hiddenLayersNumberOfNeurons));
 	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 	for (ndInt32 i = 0; i < hyperParameters.m_numberOfLayers; ++i)
 	{
-		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == hyperParameters.m_neuronPerLayers);
-		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_neuronPerLayers, hyperParameters.m_neuronPerLayers));
-		layers.PushBack(new ndBrainLayerActivationTanh(hyperParameters.m_neuronPerLayers));
+		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == hyperParameters.m_hiddenLayersNumberOfNeurons);
+		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, hyperParameters.m_hiddenLayersNumberOfNeurons));
+		layers.PushBack(new ndBrainLayerActivationTanh(hyperParameters.m_hiddenLayersNumberOfNeurons));
 	}
-	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_neuronPerLayers, m_numberOfActions));
+	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, m_numberOfActions));
 	layers.PushBack(new ndBrainLayerActivationSoftmax(m_numberOfActions));
 
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
@@ -430,7 +430,7 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::ndBrainAgentDiscretePolicyGrad
 	
 	// build state value critic neural net
 	layers.SetCount(0);
-	ndInt32 criticNeurons = hyperParameters.m_neuronPerLayers * 1;
+	ndInt32 criticNeurons = hyperParameters.m_hiddenLayersNumberOfNeurons * 1;
 	layers.PushBack(new ndBrainLayerLinear(m_numberOfObservations, criticNeurons));
 	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 	for (ndInt32 i = 0; i < hyperParameters.m_numberOfLayers; ++i)

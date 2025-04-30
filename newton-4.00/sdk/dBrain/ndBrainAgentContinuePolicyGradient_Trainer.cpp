@@ -24,13 +24,15 @@
 #include "ndBrainSaveLoad.h"
 #include "ndBrainLayerLinear.h"
 #include "ndBrainOptimizerAdam.h"
+#include "ndBrainLayerActivationRelu.h"
 #include "ndBrainLayerActivationTanh.h"
 #include "ndBrainLayerActivationLinear.h"
 #include "ndBrainAgentContinuePolicyGradient_Trainer.h"
 #include "ndBrainLayerActivationPolicyGradientMeanSigma.h"
 
-#define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 256)
 #define ND_CONTINUE_POLICY_STATE_VALUE_ITERATIONS	5
+#define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE		(1024 * 256)
+#define ND_CONTINUE_POLICY_FIX_SIGMA2				ndBrainFloat(0.25f)
 
 //*********************************************************************************************
 //
@@ -39,7 +41,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 {
 	m_randomSeed = 47;
 	m_numberOfLayers = 3;
-	m_neuronPerLayers = 64;
+	m_hiddenLayersNumberOfNeurons = 64;
 	m_criticNeuronScale = 2;
 	m_maxTrajectorySteps = 4096;
 	m_batchTrajectoryCount = 1000;
@@ -53,13 +55,17 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 	m_policyRegularizer = ndBrainFloat(1.0e-4f);
 	m_criticRegularizer = ndBrainFloat(5.0e-3f);
 	m_regularizerType = ndBrainOptimizer::m_ridge;
-	m_useConsActionsSigma = true;
 	m_useConstantBaseLineStateValue = false;
+
+	m_useFixSigma = false;
+	m_actionFixSigma = ndSqrt(ND_CONTINUE_POLICY_FIX_SIGMA2);
+	//m_actionVariableSigma = ndSqrt(ND_CONTINUE_POLICY_FIX_SIGMA2);
 
 	m_discountRewardFactor = ndBrainFloat(0.99f);
 	m_generalizedAdvangeDiscount = ndBrainFloat(0.99f);
 	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize);
 
+//m_useFixSigma = true;
 //m_threadsCount = 1;
 //m_batchTrajectoryCount = 10;
 //m_useConstantBaseLineStateValue = false;
@@ -270,13 +276,12 @@ bool ndBrainAgentContinuePolicyGradient_Agent::IsTerminal() const
 //#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_Agent::SampleActions(ndBrainVector& actions) const
 {
-	const ndInt32 numberOfActions = m_master->m_parameters.m_numberOfActions;
-
+	ndFloat32 sigma = actions[actions.GetCount() - 1];
 	ndRandomGenerator& generator = *m_randomGenerator;
-	for (ndInt32 i = numberOfActions - 1; i >= 0; --i)
+	for (ndInt32 i = ndInt32(actions.GetCount()) - 2; i >= 0; --i)
 	{
-		ndFloat32 sigma = ndSqrt(actions[i + numberOfActions]);
-		ndBrainFloat sample = ndBrainFloat(actions[i] + generator.m_d(generator.m_gen) * sigma);
+		ndBrainFloat unitVar = generator.m_d(generator.m_gen);
+		ndBrainFloat sample = ndBrainFloat(actions[i]) + unitVar * sigma;
 		ndBrainFloat squashedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
 		actions[i] = squashedAction;
 	}
@@ -304,7 +309,7 @@ void ndBrainAgentContinuePolicyGradient_Agent::Step()
 	m_trajectory.SetReward(entryIndex, reward);
 	m_trajectory.SetTerminalState(entryIndex, isDead);
 
-	// remember if teh agen dies inside a substep
+	// remember if this agent died inside a substep
 	m_isDead = m_isDead || isDead;
 }
 
@@ -326,7 +331,6 @@ void ndBrainAgentContinuePolicyGradient_Agent::SaveTrajectory()
 
 		for (ndInt32 i = 1; i < m_trajectory.GetCount(); ++i)
 		{
-			//m_trajectory.SetReward(i - 1, m_trajectory.GetReward(i));
 			ndMemCpy(m_trajectory.GetNextObservations(i - 1), m_trajectory.GetObservations(i), m_master->m_parameters.m_numberOfObservations);
 		}
 
@@ -413,7 +417,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 	SetThreadCount(m_parameters.m_threadsCount);
 
 	BuildPolicyClass();
-	BuildCricticClass();
+	BuildCriticClass();
 }
 
 ndBrainAgentContinuePolicyGradient_TrainerMaster::~ndBrainAgentContinuePolicyGradient_TrainerMaster()
@@ -489,19 +493,31 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildPolicyClass()
 {
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 
-	layers.PushBack(new ndBrainLayerLinear(m_parameters.m_numberOfObservations, m_parameters.m_neuronPerLayers));
+	layers.PushBack(new ndBrainLayerLinear(m_parameters.m_numberOfObservations, m_parameters.m_hiddenLayersNumberOfNeurons));
 	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 	for (ndInt32 i = 0; i < m_parameters.m_numberOfLayers; ++i)
 	{
-		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == m_parameters.m_neuronPerLayers);
-		layers.PushBack(new ndBrainLayerLinear(m_parameters.m_neuronPerLayers, m_parameters.m_neuronPerLayers));
-		layers.PushBack(new ndBrainLayerActivationTanh(m_parameters.m_neuronPerLayers));
+		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == m_parameters.m_hiddenLayersNumberOfNeurons);
+		layers.PushBack(new ndBrainLayerLinear(m_parameters.m_hiddenLayersNumberOfNeurons, m_parameters.m_hiddenLayersNumberOfNeurons));
+		//layers.PushBack(new ndBrainLayerActivationTanh(m_parameters.m_hiddenLayersNumberOfNeurons));
+		layers.PushBack(new ndBrainLayerActivationRelu(m_parameters.m_hiddenLayersNumberOfNeurons));
 	}
-	ndAssert(0);
-	layers.PushBack(new ndBrainLayerLinear(m_parameters.m_neuronPerLayers, m_parameters.m_numberOfActions + 1));
-	layers.PushBack(new ndBrainLayerActivationTanh(m_parameters.m_numberOfActions + 1));
+	layers.PushBack(new ndBrainLayerLinear(m_parameters.m_hiddenLayersNumberOfNeurons, m_parameters.m_numberOfActions + 1));
+	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
+	layers.PushBack(new ndBrainLayerActivationPolicyGradientMeanSigma(layers[layers.GetCount() - 1]->GetOutputSize()));
 
-//	layers.PushBack(new ndBrainLayerActivationPolicyGradientMeanSigma(m_parameters.m_numberOfActions + 1, m_parameters.m_useConsActionsSigma));
+	ndBrainFixSizeVector<256> bias;
+	ndBrainFixSizeVector<256> slope;
+	bias.SetCount(layers[layers.GetCount() - 1]->GetOutputSize());
+	slope.SetCount(layers[layers.GetCount() - 1]->GetOutputSize());
+	bias.Set(ndBrainFloat(0.0f));
+	slope.Set(ndBrainFloat(1.0f));
+	if (m_parameters.m_useFixSigma)
+	{
+		slope[layers[layers.GetCount() - 1]->GetOutputSize() - 1] = ndBrainFloat(0.0f);
+		bias[layers[layers.GetCount() - 1]->GetOutputSize() - 1] = m_parameters.m_actionFixSigma;
+	}
+	layers.PushBack(new ndBrainLayerActivationLinear(slope, bias));
 
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
@@ -529,20 +545,20 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildPolicyClass()
 	m_policyOptimizer->SetRegularizerType(m_parameters.m_regularizerType);
 }
 
-void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildCricticClass()
+void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildCriticClass()
 {
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 	// build state value critic neural net
 	layers.SetCount(0);
 
-	ndInt32 criticNeurons = m_parameters.m_neuronPerLayers * m_parameters.m_criticNeuronScale;
-	layers.PushBack(new ndBrainLayerLinear(m_parameters.m_numberOfObservations, criticNeurons));
+	layers.PushBack(new ndBrainLayerLinear(m_policy.GetInputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
 	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 	for (ndInt32 i = 0; i < m_parameters.m_numberOfLayers; ++i)
 	{
-		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == criticNeurons);
-		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), criticNeurons));
-		layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
+		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == m_parameters.m_hiddenLayersNumberOfNeurons);
+		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
+		//layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerActivationRelu(m_parameters.m_hiddenLayersNumberOfNeurons));
 	}
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
@@ -844,26 +860,29 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 					const ndBrainFloat advantage = m_agent->m_advantage[m_index];
 					const ndBrainMemVector sampledProbability(m_agent->m_trajectoryAccumulator.GetActions(m_index), numberOfActions);
 
-					//negate the gradient for gradient ascend?
-					ndBrainFloat ascend = ndBrainFloat(-1.0f);
 					ndBrainFloat sigmaGrad2Z = ndBrainFloat(0.0f);
-					ndBrainFloat sigma2 = probabilityDistribution[numberOfActions - 1];
+					ndBrainFloat sigma = probabilityDistribution[numberOfActions - 1];
+					ndBrainFloat sigma2 = sigma * sigma;
 					ndBrainFloat invSigma2 = ndBrainFloat(1.0f) / sigma2;
 					for (ndInt32 i = numberOfActions - 2; i >= 0; --i)
 					{
 						// as I understand, this is just a special case of maximum likelihood optimization.
 						// given a multivariate Gaussian process with zero cross covariance to the actions.
 						// calculate the log of prob of a multivariate Gaussian
-
 						const ndBrainFloat mean = probabilityDistribution[i];
 						ndBrainFloat confidence = sampledProbability[i] - mean;
-						sigmaGrad2Z += confidence * confidence;
 
 						ndBrainFloat meanGradient = confidence * invSigma2;
-						loss[i] = meanGradient * advantage * ascend;
+						loss[i] = meanGradient * advantage;
+
+						sigmaGrad2Z += confidence * confidence;
 					}
 					ndBrainFloat sigmaGrad = ndBrainFloat(0.5f) * invSigma2 * (sigmaGrad2Z * invSigma2 - ndBrainFloat(numberOfActions - 1));
-					loss[numberOfActions - 1] = sigmaGrad * advantage * ascend;
+					loss[numberOfActions - 1] = sigmaGrad * advantage;
+
+					//negate the gradient for gradient ascend?
+					ndBrainFloat ascend = ndBrainFloat(-1.0f);
+					loss.Scale(ascend);
 				}
 
 				ndBrainTrainer& m_trainer;

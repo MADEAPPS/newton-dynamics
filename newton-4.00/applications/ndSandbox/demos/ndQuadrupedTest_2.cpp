@@ -70,6 +70,8 @@ namespace ndQuadruped_2
 
 	#define D_ACTION_SPEED			ndReal(0.005f)
 
+	//#define USE_DDPG
+
 	class RobotModelNotify : public ndModelNotify
 	{
 		class ndController : public ndBrainAgentContinuePolicyGradient
@@ -100,8 +102,12 @@ namespace ndQuadruped_2
 			RobotModelNotify* m_robot;
 		};
 
-		//class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Agent
+		
+#ifdef USE_DDPG
 		class ndControllerTrainer : public ndBrainAgentDeterministicPolicyGradient_Agent
+#else
+		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Agent
+#endif
 		{
 			public:
 			class ndBasePose
@@ -242,8 +248,13 @@ namespace ndQuadruped_2
 				ndFloat32 m_stride_z;
 			};
 
+#ifdef USE_DDPG
 			ndControllerTrainer(const ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>& master, RobotModelNotify* const robot)
 				:ndBrainAgentDeterministicPolicyGradient_Agent(master)
+#else
+			ndControllerTrainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, RobotModelNotify* const robot)
+				: ndBrainAgentContinuePolicyGradient_Agent(master)
+#endif
 				,m_robot(robot)
 				,m_animPose()
 				,m_poseGenerator()
@@ -389,8 +400,11 @@ namespace ndQuadruped_2
 		{
 		}
 
-		//void SetControllerTrainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
+		#ifdef USE_DDPG
 		void SetControllerTrainer(const ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>& master)
+		#else
+		void SetControllerTrainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
+		#endif
 		{
 			m_controllerTrainer = ndSharedPtr<ndControllerTrainer>(new ndControllerTrainer(master, this));
 			m_controllerTrainer->InitAnimation();
@@ -648,9 +662,7 @@ namespace ndQuadruped_2
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndSharedPtr<ndDemoEntity>& modelMesh)
 	{
 		ndModelArticulation* const model = new ndModelArticulation();
-		//RobotModelNotify* const notify = new RobotModelNotify(master, model);
 		RobotModelNotify* const notify = new RobotModelNotify(model);
-		//m_controllerTrainer = ndSharedPtr<ndControllerTrainer>(new ndControllerTrainer(master, this));
 		model->SetNotifyCallback(notify);
 
 		ndSharedPtr<ndDemoEntity> entity(modelMesh->GetChildren().GetFirst()->GetInfo()->CreateClone());
@@ -733,7 +745,6 @@ namespace ndQuadruped_2
 			leg.m_effector = (ndIkSwivelPositionEffector*)*effector;
 			notify->m_legs.PushBack(leg);
 		}
-		//notify->Init();
 		return model;
 	}
 
@@ -758,22 +769,23 @@ namespace ndQuadruped_2
 			m_outFile = fopen("ndQuadruped_2-vpg.csv", "wb");
 			fprintf(m_outFile, "vpg\n");
 
-			//ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
-			//hyperParameters.m_maxTrajectorySteps = 1024 * 4;
-			//hyperParameters.m_numberOfActions = m_actionsSize;
-			//hyperParameters.m_numberOfObservations = m_observationsSize;
-			//hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
-			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
-			//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
-
-			m_stopTraining = 250000;
-			ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
-
-			//hyperParameters.m_actionFixSigma *= 0.25f;
-			hyperParameters.m_numberOfActions = ndActionsPerLeg * 1;
-			hyperParameters.m_numberOfObservations = ndObservationsPerLeg * 1;
-			//m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
-			m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentSoftActorCritic_Trainer(hyperParameters));
+			#ifdef USE_DDPG
+				m_stopTraining = 250000;
+				ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
+				hyperParameters.m_numberOfActions = ndActionsPerLeg * 1;
+				hyperParameters.m_numberOfObservations = ndObservationsPerLeg * 1;
+				//m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
+				m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentSoftActorCritic_Trainer(hyperParameters));
+			#else
+			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
+				hyperParameters.m_numberOfActions = ndActionsPerLeg * 1;
+				hyperParameters.m_numberOfObservations = ndObservationsPerLeg * 1;
+				//hyperParameters.m_maxTrajectorySteps = ND_TRAJECTORY_STEPS;
+				//hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
+				//hyperParameters.m_regularizerType = ndBrainOptimizer::m_lasso;
+				m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
+				//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
+			#endif
 
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
 
@@ -794,10 +806,11 @@ namespace ndQuadruped_2
 
 			// add a hidden battery of model to generate trajectories in parallel
 
+#ifndef USE_DDPG
 			ndInt32 countX = 10;
 			ndInt32 countZ = 10;
 			//countX = 0;
-			countZ = 0;
+			//countZ = 0;
 			
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
@@ -811,7 +824,6 @@ namespace ndQuadruped_2
 					ndFloat32 step = 20.0f * (ndRand() - 0.5f);
 					location.m_posit.m_x += step;
 
-					//ndSharedPtr<ndModel>model(CreateModel(scene, location, modelMesh, m_master));
 					ndSharedPtr<ndModel>model(CreateModel(scene, location, modelMesh));
 					RobotModelNotify* const notify1 = (RobotModelNotify*)*model->GetAsModel()->GetNotifyCallback();
 					notify1->SetControllerTrainer(m_master);
@@ -828,7 +840,7 @@ namespace ndQuadruped_2
 
 				}
 			}
-
+#endif
 			scene->SetAcceleratedUpdate();
 		}
 
@@ -965,8 +977,11 @@ namespace ndQuadruped_2
 			}
 		}
 
-		//ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
+#ifdef USE_DDPG
 		ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer> m_master;
+#else
+		ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
+#endif
 		ndSharedPtr<ndBrain> m_bestActor;
 		ndList<ndModelArticulation*> m_models;
 		FILE* m_outFile;
