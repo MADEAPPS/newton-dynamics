@@ -57,7 +57,7 @@ const char* ndBrainLayerActivationPolicyGradientMeanSigma::GetLabelId() const
 	return ND_BRAIN_LAYER_ACTIVATION_POLICY_MEAN_SIGMAN_NAME;
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainLayerActivationPolicyGradientMeanSigma::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	output.Set(input);
@@ -65,12 +65,12 @@ void ndBrainLayerActivationPolicyGradientMeanSigma::MakePrediction(const ndBrain
 	output[count] = ndExp(ND_SIGMA_SCALE * input[count]);
 }
 
-#pragma optimize( "", off )
-void ndBrainLayerActivationPolicyGradientMeanSigma::InputDerivative(const ndBrainVector& input, const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+//#pragma optimize( "", off )
+void ndBrainLayerActivationPolicyGradientMeanSigma::InputDerivative(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	inputDerivative.Set(ndBrainFloat(1.0f));
-	ndInt32 count = ndInt32(input.GetCount()) - 1;
-	inputDerivative[count] = ND_SIGMA_SCALE * input[count];
+	ndInt32 count = ndInt32(output.GetCount()) - 1;
+	inputDerivative[count] = ND_SIGMA_SCALE * output[count];
 
 	inputDerivative.Mul(outputDerivative);
 }
