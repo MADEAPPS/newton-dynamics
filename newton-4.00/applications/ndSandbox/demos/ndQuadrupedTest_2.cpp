@@ -437,22 +437,21 @@ namespace ndQuadruped_2
 			ndSharedPtr<ndAnimationBlendTreeNode> node = m_controllerTrainer->m_poseGenerator;
 			ndAnimationSequencePlayer* const sequencePlayer = (ndAnimationSequencePlayer*)*node;
 			ndControllerTrainer::ndPoseGenerator* const poseGenerator = (ndControllerTrainer::ndPoseGenerator*)*sequencePlayer->GetSequence();
-			ndVector normalize(poseGenerator->m_poseBoundMax.Reciproc());
+			const ndVector bound(poseGenerator->m_poseBoundMax);
 			for (ndInt32 i = 0; i < m_controllerTrainer->m_animPose.GetCount(); ++i)
 			{
 				const ndVector error(CalculatePositError(i));
-				const ndVector normalError(error * normalize);
-				if (ndAbs(normalError.m_x) > 2.5f)
+				if (ndAbs(error.m_x) > bound.m_x)
 				{
 					return true;
 				}
 
-				if (ndAbs(normalError.m_y) > 2.5f)
+				if (ndAbs(error.m_y) > bound.m_y)
 				{
 					return true;
 				}
 
-				if (ndAbs(normalError.m_z) > 2.5f)
+				if (ndAbs(error.m_z) > bound.m_z)
 				{
 					return true;
 				}
@@ -558,7 +557,7 @@ namespace ndQuadruped_2
 			ndSharedPtr<ndAnimationBlendTreeNode> node = m_controllerTrainer->m_poseGenerator;
 			ndAnimationSequencePlayer* const sequencePlayer = (ndAnimationSequencePlayer*)*node;
 			ndControllerTrainer::ndPoseGenerator* const poseGenerator = (ndControllerTrainer::ndPoseGenerator*)*sequencePlayer->GetSequence();
-			const ndVector bound(poseGenerator->m_poseBoundMax);
+			const ndVector bound(poseGenerator->m_poseBoundMax.Scale(1.1f));
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
 				ndEffectorInfo& leg = m_legs[i];
