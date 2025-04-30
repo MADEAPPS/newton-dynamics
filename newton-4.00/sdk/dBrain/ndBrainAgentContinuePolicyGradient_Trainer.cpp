@@ -59,7 +59,6 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 
 	m_useFixSigma = false;
 	m_actionFixSigma = ndSqrt(ND_CONTINUE_POLICY_FIX_SIGMA2);
-	//m_actionVariableSigma = ndSqrt(ND_CONTINUE_POLICY_FIX_SIGMA2);
 
 	m_discountRewardFactor = ndBrainFloat(0.99f);
 	m_generalizedAdvangeDiscount = ndBrainFloat(0.99f);
