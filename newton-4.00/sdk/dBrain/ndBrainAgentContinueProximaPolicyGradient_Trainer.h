@@ -42,6 +42,8 @@ class ndBrainAgentContinueProximaPolicyGradient_TrainerMaster : public ndBrainAg
 	void OptimizedSurrogate();
 	ndBrainFloat CalculateKLdivergence();
 	virtual void CalculateAdvange() override;
+	ndBrainFloat CalculatePolicyProbability(ndInt32 index);
+	ndBrainFloat CalculatePolicyProbability(ndInt32 index, ndBrainVector& distribution);
 	
 	ndBrainVector m_policyActions;
 	ndBrainVector m_referenceProbability;
