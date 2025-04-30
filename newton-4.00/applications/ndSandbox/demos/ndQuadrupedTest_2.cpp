@@ -497,7 +497,7 @@ namespace ndQuadruped_2
 					for (ndInt32 j = 0; j < 3; ++j)
 					{
 						ndFloat32 dist = ndFloat32(1.0f) - ndClamp(ndAbs(normalError[j]), 0.0f, 1.0f);
-						ndFloat32 legReward = dist * dist;
+						ndFloat32 legReward = dist * dist * dist * dist;
 						//ndFloat32 error2 = error[j] * error[j];
 						//ndFloat32 legReward = ndExp(-200000.0f * error2);
 						reward += legReward;
@@ -780,11 +780,8 @@ namespace ndQuadruped_2
 			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 				hyperParameters.m_numberOfActions = ndActionsPerLeg * 1;
 				hyperParameters.m_numberOfObservations = ndObservationsPerLeg * 1;
-				//hyperParameters.m_maxTrajectorySteps = ND_TRAJECTORY_STEPS;
-				//hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
-				//hyperParameters.m_regularizerType = ndBrainOptimizer::m_lasso;
-				m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
-				//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
+				//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
+				m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
 			#endif
 
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
