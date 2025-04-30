@@ -39,7 +39,7 @@ ndBrainAgentSoftActorCritic_Trainer::~ndBrainAgentSoftActorCritic_Trainer()
 {
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 ndBrainFloat ndBrainAgentSoftActorCritic_Trainer::CalculatePolicyProbability(ndInt32 index, const ndBrainVector& sampledActions)
 {
 	ndBrainFixSizeVector<256> distribution;
@@ -62,14 +62,14 @@ ndBrainFloat ndBrainAgentSoftActorCritic_Trainer::CalculatePolicyProbability(ndI
 	return ndMax(prob, ndBrainFloat(1.0e-4f));
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 ndBrainFloat ndBrainAgentSoftActorCritic_Trainer::CalculatePolicyProbability(ndInt32 index)
 {
 	const ndBrainMemVector sampledProbabilities(m_replayBuffer.GetActions(index), m_policy.GetOutputSize());
 	return CalculatePolicyProbability(index, sampledProbabilities);
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 ndBrainFloat ndBrainAgentSoftActorCritic_Trainer::CalculateReparametarizedPolicyProbability(ndInt32 index)
 {
 	ndBrainFixSizeVector<256> policyEntropyAction;
@@ -84,7 +84,7 @@ ndBrainFloat ndBrainAgentSoftActorCritic_Trainer::CalculateReparametarizedPolicy
 	return CalculatePolicyProbability(index, policyEntropyAction);
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainAgentSoftActorCritic_Trainer::CalculateExpectedRewards()
 {
 	ndInt32 count = m_parameters.m_criticUpdatesCount * m_parameters.m_miniBatchSize;
@@ -158,7 +158,7 @@ void ndBrainAgentSoftActorCritic_Trainer::CalculateExpectedRewards()
 	m_averageExpectedRewards.Update(averageReward);
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainAgentSoftActorCritic_Trainer::LearnPolicyFunction()
 {
 	ndAtomic<ndInt32> iterator(0);
