@@ -57,64 +57,10 @@ namespace ndQuadruped_2
 	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
 
-	enum ndActionSpace
-	{
-		m_leg0_x,
-		m_leg0_y,
-		m_leg0_z,
+	#define ndActionsPerLeg			3
+	#define ndObservationsPerLeg	12
 
-		m_leg1_x,
-		m_leg1_y,
-		m_leg1_z,
-
-		m_leg2_x,
-		m_leg2_y,
-		m_leg2_z,
-
-		m_leg3_x,
-		m_leg3_y,
-		m_leg3_z,
-
-		m_actionsSize
-	};
-
-	enum ndStateSpace
-	{
-		m_leg0_posit_x,
-		m_leg0_posit_y,
-		m_leg0_posit_z,
-
-		m_leg1_posit_x,
-		m_leg1_posit_y,
-		m_leg1_posit_z,
-
-		m_leg2_posit_x,
-		m_leg2_posit_y,
-		m_leg2_posit_z,
-
-		m_leg3_posit_x,
-		m_leg3_posit_y,
-		m_leg3_posit_z,
-
-		//m_leg0_veloc_x,
-		//m_leg0_veloc_y,
-		//m_leg0_veloc_z,
-		//
-		//m_leg1veloc_x,
-		//m_leg1veloc_y,
-		//m_leg1veloc_z,
-		//
-		//m_leg2_veloc_x,
-		//m_leg2_veloc_y,
-		//m_leg2_veloc_z,
-		//
-		//m_leg3_veloc_x,
-		//m_leg3_veloc_y,
-		//m_leg3_veloc_z,
-
-		m_frameTick,
-		m_observationsSize
-	};
+	#define ndNumberOfLeg			2
 
 	#define D_CYCLE_PERIOD			ndFloat32(4.0f)
 	#define D_CYCLE_STRIDE_X		ndFloat32(0.3f)
@@ -122,8 +68,7 @@ namespace ndQuadruped_2
 	#define D_CYCLE_AMPLITUDE		ndFloat32(0.27f)
 	#define D_POSE_REST_POSITION_Y	ndReal(-0.3f)
 
-	#define D_ACTION_SPEED			ndReal(0.05f)
-
+	#define D_ACTION_SPEED			ndReal(0.025f)
 
 	class RobotModelNotify : public ndModelNotify
 	{
@@ -523,18 +468,31 @@ namespace ndQuadruped_2
 			{
 				return -1.0f;
 			}
+
 			ndFloat32 reward = 0.0f;
+
+			ndSharedPtr<ndAnimationBlendTreeNode> node = m_controllerTrainer->m_poseGenerator;
+			ndAnimationSequencePlayer* const sequencePlayer = (ndAnimationSequencePlayer*)*node;
+			ndControllerTrainer::ndPoseGenerator* const poseGenerator = (ndControllerTrainer::ndPoseGenerator*)*sequencePlayer->GetSequence();
+			ndVector normalize(poseGenerator->m_poseBoundMax.Reciproc());
 			for (ndInt32 i = 0; i < m_controllerTrainer->m_animPose.GetCount(); ++i)
 			{
-				const ndVector error(CalculatePositError(i));
-				for (ndInt32 j = 0; j < 3; ++j)
+				if (i == ndNumberOfLeg)
 				{
-					ndFloat32 error2 = error[j] * error[j];
-					ndFloat32 legReward = ndExp(-200000.0f * error2);
-					reward += legReward;
+					const ndVector error(CalculatePositError(i));
+					const ndVector normalError(error * normalize);
+					for (ndInt32 j = 0; j < 3; ++j)
+					{
+						ndFloat32 dist = ndFloat32(1.0f) - ndClamp(ndAbs(normalError[j]), 0.0f, 1.0f);
+						ndFloat32 legReward = dist * dist;
+						//ndFloat32 error2 = error[j] * error[j];
+						//ndFloat32 legReward = ndExp(-200000.0f * error2);
+						reward += legReward;
+					}
 				}
 			}
-			return reward / 12.0f;
+			//return reward / 12.0f;
+			return reward / 3.0f;
 		}
 
 		#pragma optimize( "", off )
@@ -552,23 +510,42 @@ namespace ndQuadruped_2
 		#pragma optimize( "", off )
 		void GetObservation(ndBrainFloat* const observations)
 		{
-			ndInt32 size = m_leg1_posit_x - m_leg0_posit_x;
-			observations[m_frameTick] = ndBrainFloat(m_animFrame);
+			//ndInt32 size = m_leg1_posit_x - m_leg0_posit_x;
+			//observations[m_frameTick] = ndBrainFloat(m_animFrame);
+			//ndSharedPtr<ndAnimationBlendTreeNode> node = m_controllerTrainer->m_poseGenerator;
+			//ndAnimationSequencePlayer* const sequencePlayer = (ndAnimationSequencePlayer*)*node;
+			//ndControllerTrainer::ndPoseGenerator* const poseGenerator = (ndControllerTrainer::ndPoseGenerator*)*sequencePlayer->GetSequence();
+
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
-				ndEffectorInfo& leg = m_legs[i];
-				ndJointBilateralConstraint::ndKinematicState kinematicState[4];
-				leg.m_effector->GetKinematicState(kinematicState);
-				const ndVector restPosit(leg.m_effector->GetRestPosit());
-				const ndVector effectorPosit(kinematicState[0].m_posit, kinematicState[1].m_posit, kinematicState[2].m_posit, 0.0f);
-				const ndVector effectorRelPosit(effectorPosit - restPosit);
+				if (i == ndNumberOfLeg)
+				{
+					//ndEffectorInfo& leg = m_legs[i];
+					ndEffectorInfo& leg = m_legs[ndNumberOfLeg];
+					ndJointBilateralConstraint::ndKinematicState kinematicState[4];
+					leg.m_effector->GetKinematicState(kinematicState);
+					const ndVector effectorPosit(kinematicState[0].m_posit, kinematicState[1].m_posit, kinematicState[2].m_posit, 0.0f);
+					const ndVector effectorVeloc(kinematicState[0].m_velocity, kinematicState[1].m_velocity, kinematicState[2].m_velocity, 0.0f);
 
-				observations[i * size + m_leg0_posit_x] = effectorRelPosit.m_x;
-				observations[i * size + m_leg0_posit_y] = effectorRelPosit.m_y;
-				observations[i * size + m_leg0_posit_z] = effectorRelPosit.m_z;
-				//observations[i * size + m_leg0_veloc_x] = kinematicState[0].m_velocity;
-				//observations[i * size + m_leg0_veloc_y] = kinematicState[1].m_velocity;
-				//observations[i * size + m_leg0_veloc_z] = kinematicState[2].m_velocity;
+					const ndAnimKeyframe keyFrame = m_controllerTrainer->m_animPose[i];
+					const ndVector keyFramePosit0(keyFrame.m_posit);
+					const ndVector keyFramePosit1(keyFrame.m_posit);
+
+					ndInt32 base = ndObservationsPerLeg * i;
+					base = 0;
+					observations[base + 0] = effectorPosit.m_x;
+					observations[base + 1] = effectorPosit.m_y;
+					observations[base + 2] = effectorPosit.m_z;
+					observations[base + 3] = effectorVeloc.m_x;
+					observations[base + 4] = effectorVeloc.m_y;
+					observations[base + 5] = effectorVeloc.m_z;
+					observations[base + 6] = keyFramePosit0.m_x;
+					observations[base + 7] = keyFramePosit0.m_y;
+					observations[base + 8] = keyFramePosit0.m_z;
+					observations[base + 9] = keyFramePosit1.m_x;
+					observations[base + 10] = keyFramePosit1.m_y;
+					observations[base + 11] = keyFramePosit1.m_z;
+				}
 			}
 		}
 
@@ -576,31 +553,33 @@ namespace ndQuadruped_2
 		{
 			ndBodyKinematic* const rootBody = GetModel()->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic();
 
-			ndInt32 size = m_leg1_x - m_leg0_x;
 			const ndVector upVector(rootBody->GetMatrix().m_up);
 
-			//ndSharedPtr<ndAnimationBlendTreeNode> node = m_controllerTrainer->m_poseGenerator;
-			//ndAnimationSequencePlayer* const sequencePlayer = (ndAnimationSequencePlayer*)*node;
-			//ndControllerTrainer::ndPoseGenerator* const poseGenerator = (ndControllerTrainer::ndPoseGenerator*)*sequencePlayer->GetSequence();
-
+			ndSharedPtr<ndAnimationBlendTreeNode> node = m_controllerTrainer->m_poseGenerator;
+			ndAnimationSequencePlayer* const sequencePlayer = (ndAnimationSequencePlayer*)*node;
+			ndControllerTrainer::ndPoseGenerator* const poseGenerator = (ndControllerTrainer::ndPoseGenerator*)*sequencePlayer->GetSequence();
+			const ndVector bound(poseGenerator->m_poseBoundMax);
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
 				ndEffectorInfo& leg = m_legs[i];
 				ndIkSwivelPositionEffector* const effector = leg.m_effector;
-				
-				const ndVector resPosit(leg.m_effector->GetRestPosit());
-				const ndVector effectorPosit(leg.m_effector->GetEffectorPosit());
-				ndVector relativePosit(effectorPosit - resPosit);
+				if (i == ndNumberOfLeg)
+				{
+					ndInt32 base = ndActionsPerLeg * i;
+					base = 0;
+					const ndVector resPosit(leg.m_effector->GetRestPosit());
+					const ndVector effectorPosit(leg.m_effector->GetEffectorPosit());
+					ndVector relativePosit(effectorPosit - resPosit);
+					relativePosit.m_x += actions[base + 0] * D_ACTION_SPEED;
+					relativePosit.m_y += actions[base + 1] * D_ACTION_SPEED;
+					relativePosit.m_z += actions[base + 2] * D_ACTION_SPEED;
+					relativePosit.m_x = ndClamp(relativePosit.m_x, -bound.m_x, bound.m_x);
+					relativePosit.m_y = ndClamp(relativePosit.m_y, -bound.m_y, bound.m_y);
+					relativePosit.m_z = ndClamp(relativePosit.m_z, -bound.m_z, bound.m_z);
 
-				relativePosit.m_x += actions[size * i + m_leg0_x] * D_ACTION_SPEED;
-				relativePosit.m_y += actions[size * i + m_leg0_y] * D_ACTION_SPEED;
-				relativePosit.m_z += actions[size * i + m_leg0_z] * D_ACTION_SPEED;
-				//relativePosit.m_x = ndClamp(relativePosit.m_x, poseGenerator->m_poseBoundMin.m_x, poseGenerator->m_poseBoundMax.m_x);
-				//relativePosit.m_y = ndClamp(relativePosit.m_y, poseGenerator->m_poseBoundMin.m_y, poseGenerator->m_poseBoundMax.m_y);
-				//relativePosit.m_z = ndClamp(relativePosit.m_z, poseGenerator->m_poseBoundMin.m_z, poseGenerator->m_poseBoundMax.m_z);
-
-				const ndVector newPosit(relativePosit + resPosit);
-				effector->SetLocalTargetPosition(newPosit);
+					const ndVector newPosit(relativePosit + resPosit);
+					effector->SetLocalTargetPosition(newPosit);
+				}
 
 				ndFloat32 swivelAngle = effector->CalculateLookAtSwivelAngle(upVector);
 				effector->SetSwivelAngle(swivelAngle);
@@ -787,11 +766,12 @@ namespace ndQuadruped_2
 
 			m_stopTraining = 250000;
 			ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
-			hyperParameters.m_numberOfActions = m_actionsSize;
-			hyperParameters.m_numberOfObservations = m_observationsSize;
+
+			//hyperParameters.m_actionNoiseSigma *= 0.25f;
+			hyperParameters.m_numberOfActions = ndActionsPerLeg * ndNumberOfLeg;
+			hyperParameters.m_numberOfObservations = ndObservationsPerLeg * ndNumberOfLeg;
 			m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentSoftActorCritic_Trainer(hyperParameters));
 			//m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
-
 
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
 

@@ -246,6 +246,7 @@ void ndBrainTrainer::CalculateInputGradient(const ndBrainVector& input, ndBrainV
 	inputGradientsOut.Set(gradientOut);
 }
 
+//#pragma optimize( "", off )
 void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss)
 {
 	const ndInt32 layersCount = ndInt32(m_brain->GetCount());
