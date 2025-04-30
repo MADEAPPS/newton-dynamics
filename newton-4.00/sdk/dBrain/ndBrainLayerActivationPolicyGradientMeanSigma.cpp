@@ -23,7 +23,9 @@
 #include "ndBrainSaveLoad.h"
 #include "ndBrainLayerActivationPolicyGradientMeanSigma.h"
 
-#define ND_SIGMA_SCALE ndBrainFloat(2.0794)
+//#define ND_SIGMA_SCALE ndBrainFloat(2.0794)
+#define ND_MIN_SIGMA ndBrainFloat(0.1f)
+#define ND_MAX_SIGMA ndBrainFloat(1.0f)
 
 ndBrainLayerActivationPolicyGradientMeanSigma::ndBrainLayerActivationPolicyGradientMeanSigma(ndInt32 neurons)
 	:ndBrainLayerActivation(neurons)
@@ -62,7 +64,11 @@ void ndBrainLayerActivationPolicyGradientMeanSigma::MakePrediction(const ndBrain
 {
 	output.Set(input);
 	ndInt32 count = ndInt32(input.GetCount()) - 1;
-	output[count] = ndExp(ND_SIGMA_SCALE * input[count]);
+	//output[count] = ndExp(ND_SIGMA_SCALE * input[count]);
+
+	ndFloat32 b = (ND_MIN_SIGMA + ND_MAX_SIGMA) * ndFloat32(0.5f);
+	ndFloat32 a = ndFloat32(1.0f) - b;
+	output[count] = a * input[count] + b;
 }
 
 //#pragma optimize( "", off )
@@ -70,7 +76,10 @@ void ndBrainLayerActivationPolicyGradientMeanSigma::InputDerivative(const ndBrai
 {
 	inputDerivative.Set(ndBrainFloat(1.0f));
 	ndInt32 count = ndInt32(output.GetCount()) - 1;
-	inputDerivative[count] = ND_SIGMA_SCALE * output[count];
+	ndFloat32 b = (ND_MIN_SIGMA + ND_MAX_SIGMA) * ndFloat32(0.5f);
+	ndFloat32 a = ndFloat32(1.0f) - b;
+	inputDerivative[count] = a;
 
+	//inputDerivative[count] = ND_SIGMA_SCALE * output[count];
 	inputDerivative.Mul(outputDerivative);
 }
