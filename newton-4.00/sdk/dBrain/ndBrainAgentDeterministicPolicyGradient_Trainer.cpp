@@ -45,8 +45,8 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 	m_criticMovingAverageFactor = ndBrainFloat(0.005f);
 	m_entropyRegularizerCoef = ndBrainFloat(0.005f);
 
-	m_useFixSigma = true;
-	//m_useFixSigma = false;
+	//m_useFixSigma = true;
+	m_useFixSigma = false;
 	m_actionFixSigma = ndSqrt(ND_CONTINUE_POLICY_CONST_SIGMA2);
 	m_actionVariableSigma = ndSqrt(ND_CONTINUE_POLICY_CONST_SIGMA2);
 

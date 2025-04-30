@@ -557,7 +557,7 @@ namespace ndQuadruped_2
 			ndSharedPtr<ndAnimationBlendTreeNode> node = m_controllerTrainer->m_poseGenerator;
 			ndAnimationSequencePlayer* const sequencePlayer = (ndAnimationSequencePlayer*)*node;
 			ndControllerTrainer::ndPoseGenerator* const poseGenerator = (ndControllerTrainer::ndPoseGenerator*)*sequencePlayer->GetSequence();
-			const ndVector bound(poseGenerator->m_poseBoundMax);
+			const ndVector bound(poseGenerator->m_poseBoundMax.Scale(ndFloat32(1.5f)));
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
 				ndEffectorInfo& leg = m_legs[i];
