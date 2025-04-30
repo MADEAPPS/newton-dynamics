@@ -68,7 +68,7 @@ namespace ndQuadruped_2
 	#define D_CYCLE_AMPLITUDE		ndFloat32(0.27f)
 	#define D_POSE_REST_POSITION_Y	ndReal(-0.3f)
 
-	#define D_ACTION_SPEED			ndReal(0.025f)
+	#define D_ACTION_SPEED			ndReal(0.005f)
 
 	class RobotModelNotify : public ndModelNotify
 	{
@@ -437,7 +437,7 @@ namespace ndQuadruped_2
 			ndSharedPtr<ndAnimationBlendTreeNode> node = m_controllerTrainer->m_poseGenerator;
 			ndAnimationSequencePlayer* const sequencePlayer = (ndAnimationSequencePlayer*)*node;
 			ndControllerTrainer::ndPoseGenerator* const poseGenerator = (ndControllerTrainer::ndPoseGenerator*)*sequencePlayer->GetSequence();
-			const ndVector bound(poseGenerator->m_poseBoundMax);
+			const ndVector bound(poseGenerator->m_poseBoundMax * ndFloat32 (1.25f));
 			for (ndInt32 i = 0; i < m_controllerTrainer->m_animPose.GetCount(); ++i)
 			{
 				const ndVector error(CalculatePositError(i));
@@ -557,7 +557,7 @@ namespace ndQuadruped_2
 			ndSharedPtr<ndAnimationBlendTreeNode> node = m_controllerTrainer->m_poseGenerator;
 			ndAnimationSequencePlayer* const sequencePlayer = (ndAnimationSequencePlayer*)*node;
 			ndControllerTrainer::ndPoseGenerator* const poseGenerator = (ndControllerTrainer::ndPoseGenerator*)*sequencePlayer->GetSequence();
-			const ndVector bound(poseGenerator->m_poseBoundMax.Scale(1.1f));
+			const ndVector bound(poseGenerator->m_poseBoundMax);
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
 				ndEffectorInfo& leg = m_legs[i];
@@ -568,6 +568,9 @@ namespace ndQuadruped_2
 					base = 0;
 					const ndVector resPosit(leg.m_effector->GetRestPosit());
 					const ndVector effectorPosit(leg.m_effector->GetEffectorPosit());
+
+					//ndVector xxxx(CalculatePositError(i));
+
 					ndVector relativePosit(effectorPosit - resPosit);
 					relativePosit.m_x += actions[base + 0] * D_ACTION_SPEED;
 					relativePosit.m_y += actions[base + 1] * D_ACTION_SPEED;
