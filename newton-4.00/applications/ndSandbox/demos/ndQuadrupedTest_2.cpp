@@ -766,11 +766,11 @@ namespace ndQuadruped_2
 			m_stopTraining = 250000;
 			ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
 
-			//hyperParameters.m_actionNoiseSigma *= 0.25f;
-			hyperParameters.m_numberOfActions = ndActionsPerLeg * ndNumberOfLeg;
-			hyperParameters.m_numberOfObservations = ndObservationsPerLeg * ndNumberOfLeg;
-			m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentSoftActorCritic_Trainer(hyperParameters));
+			//hyperParameters.m_actionFixSigma *= 0.25f;
+			hyperParameters.m_numberOfActions = ndActionsPerLeg * 1;
+			hyperParameters.m_numberOfObservations = ndObservationsPerLeg * 1;
 			//m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
+			m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentSoftActorCritic_Trainer(hyperParameters));
 
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
 
