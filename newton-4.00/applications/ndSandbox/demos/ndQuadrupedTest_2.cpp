@@ -259,7 +259,7 @@ namespace ndQuadruped_2
 				: ndBrainAgentContinuePolicyGradient_Agent(master)
 #endif
 				,m_robot(robot)
-				,m_animPose()
+				,m_animPose____()
 				,m_poseGenerator()
 				,m_animBlendTree()
 				,m_basePose()
@@ -315,7 +315,7 @@ namespace ndQuadruped_2
 					ndEffectorInfo& leg = m_robot->m_legs[i];
 					ndAnimKeyframe keyFrame;
 					keyFrame.m_userData = &leg;
-					m_animPose.PushBack(keyFrame);
+					m_animPose____.PushBack(keyFrame);
 					poseGenerator->AddTrack();
 				}
 
@@ -329,7 +329,7 @@ namespace ndQuadruped_2
 			}
 
 			RobotModelNotify* m_robot;
-			ndAnimationPose m_animPose;
+			ndAnimationPose m_animPose____;
 			ndSharedPtr<ndAnimationBlendTreeNode> m_poseGenerator;
 			ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
 			ndFixSizeArray<ndBasePose, 32> m_basePose;
@@ -399,7 +399,8 @@ namespace ndQuadruped_2
 		ndVector CalculatePositError(ndInt32 keyFrameIndex) const
 		{
 			ndJointBilateralConstraint::ndKinematicState kinematicState[4];
-			const ndAnimKeyframe keyFrame = m_controllerTrainer->m_animPose[keyFrameIndex];
+			//const ndAnimKeyframe keyFrame = m_controllerTrainer->m_animPose[keyFrameIndex];
+			const ndAnimKeyframe keyFrame = m_animPose0[keyFrameIndex];
 			const ndEffectorInfo* const leg = (ndEffectorInfo*)keyFrame.m_userData;
 			
 			leg->m_effector->GetKinematicState(kinematicState);
@@ -432,7 +433,7 @@ namespace ndQuadruped_2
 			ndAnimationSequencePlayer* const sequencePlayer = (ndAnimationSequencePlayer*)*node;
 			ndControllerTrainer::ndPoseGenerator* const poseGenerator = (ndControllerTrainer::ndPoseGenerator*)*sequencePlayer->GetSequence();
 			const ndVector bound(poseGenerator->m_poseBoundMax * ndFloat32 (1.25f));
-			for (ndInt32 i = 0; i < m_controllerTrainer->m_animPose.GetCount(); ++i)
+			for (ndInt32 i = 0; i < m_animPose0.GetCount(); ++i)
 			{
 				const ndVector error(CalculatePositError(i));
 				if (ndAbs(error.m_x) > bound.m_x)
@@ -468,7 +469,7 @@ namespace ndQuadruped_2
 			ndAnimationSequencePlayer* const sequencePlayer = (ndAnimationSequencePlayer*)*node;
 			ndControllerTrainer::ndPoseGenerator* const poseGenerator = (ndControllerTrainer::ndPoseGenerator*)*sequencePlayer->GetSequence();
 			ndVector normalize(poseGenerator->m_poseBoundMax.Reciproc());
-			for (ndInt32 i = 0; i < m_controllerTrainer->m_animPose.GetCount(); ++i)
+			for (ndInt32 i = 0; i < m_animPose0.GetCount(); ++i)
 			{
 				if (i == ndNumberOfLeg)
 				{
@@ -520,7 +521,7 @@ namespace ndQuadruped_2
 			ndFloat32 animFrame = m_controllerTrainer->m_time * duration;
 			m_controllerTrainer->m_animBlendTree->SetTime(animFrame);
 			m_controllerTrainer->m_robot->m_animFrame = animFrame;
-			m_animPose1.CopySource(m_controllerTrainer->m_animPose);
+			m_animPose1.CopySource(m_controllerTrainer->m_animPose____);
 			ndVector veloc;
 			m_controllerTrainer->m_animBlendTree->Evaluate(m_animPose1, veloc);
 		}
