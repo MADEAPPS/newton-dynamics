@@ -23,12 +23,9 @@
 
 #include "ndBrainLayer.h"
 #include "ndBrainTrainer.h"
-#include "ndBrainLayerLinear.h"
 #include "ndBrainOptimizerAdam.h"
-#include "ndBrainLayerActivationTanh.h"
 #include "ndBrainLossLeastSquaredError.h"
 #include "ndBrainAgentSoftActorCritic_Trainer.h"
-#include "ndBrainLayerActivationPolicyGradientMeanSigma.h"
 
 ndBrainAgentSoftActorCritic_Trainer::ndBrainAgentSoftActorCritic_Trainer(const HyperParameters& parameters)
 	:ndBrainAgentDeterministicPolicyGradient_Trainer(parameters)
