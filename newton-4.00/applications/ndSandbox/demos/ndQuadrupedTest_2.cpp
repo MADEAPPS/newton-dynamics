@@ -259,7 +259,7 @@ namespace ndQuadruped_2
 				: ndBrainAgentContinuePolicyGradient_Agent(master)
 #endif
 				,m_robot(robot)
-				,m_animPose____()
+				,m_animPose()
 				,m_poseGenerator()
 				,m_animBlendTree()
 				,m_basePose()
@@ -315,7 +315,7 @@ namespace ndQuadruped_2
 					ndEffectorInfo& leg = m_robot->m_legs[i];
 					ndAnimKeyframe keyFrame;
 					keyFrame.m_userData = &leg;
-					m_animPose____.PushBack(keyFrame);
+					m_animPose.PushBack(keyFrame);
 					poseGenerator->AddTrack();
 				}
 
@@ -329,7 +329,7 @@ namespace ndQuadruped_2
 			}
 
 			RobotModelNotify* m_robot;
-			ndAnimationPose m_animPose____;
+			ndAnimationPose m_animPose;
 			ndSharedPtr<ndAnimationBlendTreeNode> m_poseGenerator;
 			ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
 			ndFixSizeArray<ndBasePose, 32> m_basePose;
@@ -513,15 +513,14 @@ namespace ndQuadruped_2
 			//m_animBlendTree->SetTime(duration * ndFloat32(start));
 			//m_animBlendTree->SetTime(duration * ndFloat32(start));
 
-			
-
 			m_controllerTrainer->m_animBlendTree->SetTime(0.0f);
-			m_controllerTrainer->m_time = ndFmod(ndRand(), 1.0f);
+			//m_controllerTrainer->m_time = ndFmod(ndRand(), 1.0f);
 			m_controllerTrainer->m_time = 0.0f;
 			ndFloat32 animFrame = m_controllerTrainer->m_time * duration;
+
 			m_controllerTrainer->m_animBlendTree->SetTime(animFrame);
 			m_controllerTrainer->m_robot->m_animFrame = animFrame;
-			m_animPose1.CopySource(m_controllerTrainer->m_animPose____);
+			m_animPose1.CopySource(m_controllerTrainer->m_animPose);
 			ndVector veloc;
 			m_controllerTrainer->m_animBlendTree->Evaluate(m_animPose1, veloc);
 		}
@@ -529,12 +528,7 @@ namespace ndQuadruped_2
 		#pragma optimize( "", off )
 		void GetObservation(ndBrainFloat* const observations)
 		{
-			//ndInt32 size = m_leg1_posit_x - m_leg0_posit_x;
-			//observations[m_frameTick] = ndBrainFloat(m_animFrame);
-			//ndSharedPtr<ndAnimationBlendTreeNode> node = m_controllerTrainer->m_poseGenerator;
-			//ndAnimationSequencePlayer* const sequencePlayer = (ndAnimationSequencePlayer*)*node;
-			//ndControllerTrainer::ndPoseGenerator* const poseGenerator = (ndControllerTrainer::ndPoseGenerator*)*sequencePlayer->GetSequence();
-
+			ndFloat32 invTimestep = 1.0f / m_timestep;
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
 				if (i == ndNumberOfLeg)
@@ -562,9 +556,9 @@ namespace ndQuadruped_2
 					observations[base + 6] = keyFramePosit0.m_x;
 					observations[base + 7] = keyFramePosit0.m_y;
 					observations[base + 8] = keyFramePosit0.m_z;
-					observations[base + 9] = keyFramePosit1.m_x;
-					observations[base + 10] = keyFramePosit1.m_y;
-					observations[base + 11] = keyFramePosit1.m_z;
+					observations[base + 9] =  (keyFramePosit1.m_x - keyFramePosit0.m_x) * invTimestep;
+					observations[base + 10] = (keyFramePosit1.m_y - keyFramePosit0.m_y) * invTimestep;
+					observations[base + 11] = (keyFramePosit1.m_z - keyFramePosit0.m_z) * invTimestep;
 				}
 			}
 		}
