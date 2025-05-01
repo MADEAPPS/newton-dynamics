@@ -34,7 +34,7 @@ namespace ndUnicycle
 	#define ND_TERMINATION_ANGLE	(ndFloat32 (45.0f) * ndDegreeToRad)
 	#define ND_TRAJECTORY_STEPS		(1024 * 4)
 
-	#define USE_DDPG
+	#define USE_SAC
 
 	enum ndActionSpace
 	{
@@ -137,21 +137,12 @@ namespace ndUnicycle
 
 	class RobotModelNotify : public ndModelNotify
 	{
-#ifdef USE_DDPG
-		class ndController : public ndBrainAgentDeterministicPolicyGradient
-#else
 		class ndController : public ndBrainAgentContinuePolicyGradient
-#endif
 		{
 			public:
-#ifdef USE_DDPG
 			ndController(const ndSharedPtr<ndBrain>& brain)
-				:ndBrainAgentDeterministicPolicyGradient(brain)
-#else
-			ndController(const ndSharedPtr<ndBrain>& brain)
-				: ndBrainAgentContinuePolicyGradient(brain)
-#endif
-				, m_robot(nullptr)
+				:ndBrainAgentContinuePolicyGradient(brain)
+				,m_robot(nullptr)
 			{
 			}
 
@@ -168,14 +159,14 @@ namespace ndUnicycle
 			RobotModelNotify* m_robot;
 		};
 
-#ifdef USE_DDPG
+#ifdef USE_SAC
 		class ndControllerTrainer : public ndBrainAgentDeterministicPolicyGradient_Agent
 #else
 		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Agent
 #endif
 		{
 			public:
-#ifdef USE_DDPG
+#ifdef USE_SAC
 			ndControllerTrainer(const ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>& master)
 				:ndBrainAgentDeterministicPolicyGradient_Agent(master)
 #else
@@ -217,7 +208,7 @@ namespace ndUnicycle
 		};
 
 		public:
-#ifdef USE_DDPG
+#ifdef USE_SAC
 		RobotModelNotify(ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>& master, ndModelArticulation* const robot)
 #else
 		RobotModelNotify(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot)
@@ -571,7 +562,7 @@ namespace ndUnicycle
 			m_outFile = fopen("unicycle.csv", "wb");
 			fprintf(m_outFile, "vpg\n");
 
-			#ifdef USE_DDPG
+			#ifdef USE_SAC
 				m_stopTraining = 250000;
 				ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
 				hyperParameters.m_numberOfActions = m_actionsSize;
@@ -603,7 +594,7 @@ namespace ndUnicycle
 			visualModel->SetNotifyCallback(new RobotModelNotify(m_master, visualModel->GetAsModelArticulation()));
 			SetMaterial(visualModel->GetAsModelArticulation());
 			
-			#ifndef USE_DDPG
+			#ifndef USE_SAC
 			// add a hidden battery of model to generate trajectories in parallel
 			//const ndInt32 countX = 0;
 			const ndInt32 countX = 100;
@@ -765,7 +756,7 @@ namespace ndUnicycle
 			}
 		}
 
-#ifdef USE_DDPG
+#ifdef USE_SAC
 		ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer> m_master;
 #else
 		ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;

@@ -58,7 +58,6 @@
 #include <ndBrainLossCategoricalCrossEntropy.h>
 #include <ndBrainAgentSoftActorCritic_Trainer.h>
 #include <ndBrainLayerActivationSigmoidLinear.h>
-#include <ndBrainAgentDeterministicPolicyGradient.h>
 #include <ndBrainLayerConvolutionalWithDropOut_2d.h>
 #include <ndBrainLayerActivationCategoricalSoftmax.h>
 #include <ndBrainAgentDiscretePolicyGradient_Trainer.h>

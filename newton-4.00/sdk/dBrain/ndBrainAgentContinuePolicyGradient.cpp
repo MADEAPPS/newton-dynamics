@@ -24,10 +24,12 @@
 
 #include "ndBrainAgentContinuePolicyGradient.h"
 
-ndBrainAgentContinuePolicyGradient::ndBrainAgentContinuePolicyGradient(const ndSharedPtr<ndBrain>& actor)
+ndBrainAgentContinuePolicyGradient::ndBrainAgentContinuePolicyGradient(const ndSharedPtr<ndBrain>& policy)
 	:ndBrainAgent()
-	,m_policy(actor)
+	,m_policy(policy)
 {
+	m_actions.SetCount(m_policy->GetOutputSize());
+	m_observations.SetCount(m_policy->GetInputSize());
 }
 
 ndBrainAgentContinuePolicyGradient::ndBrainAgentContinuePolicyGradient(const ndBrainAgentContinuePolicyGradient& src)
@@ -85,16 +87,17 @@ void ndBrainAgentContinuePolicyGradient::OptimizeStep()
 
 void ndBrainAgentContinuePolicyGradient::Step()
 {
-	ndInt32 bufferSize = m_policy->CalculateWorkingBufferSize();
-	ndBrainFloat* const bufferMem = ndAlloca(ndBrainFloat, bufferSize);
-	ndBrainFloat* const actionBuffer = ndAlloca(ndBrainFloat, m_policy->GetOutputSize());
-	ndBrainFloat* const observationBuffer = ndAlloca(ndBrainFloat, m_policy->GetInputSize());
+	//ndInt32 bufferSize = m_policy->CalculateWorkingBufferSize();
+	//ndBrainFloat* const bufferMem = ndAlloca(ndBrainFloat, bufferSize);
+	//ndBrainFloat* const actionBuffer = ndAlloca(ndBrainFloat, m_policy->GetOutputSize());
+	//ndBrainFloat* const observationBuffer = ndAlloca(ndBrainFloat, m_policy->GetInputSize());
+	//
+	//ndBrainMemVector workingBuffer(bufferMem, bufferSize);
+	//ndBrainMemVector actions(actionBuffer, m_policy->GetOutputSize());
+	//ndBrainMemVector observations(observationBuffer, m_policy->GetInputSize());
 	
-	ndBrainMemVector workingBuffer(bufferMem, bufferSize);
-	ndBrainMemVector actions(actionBuffer, m_policy->GetOutputSize());
-	ndBrainMemVector observations(observationBuffer, m_policy->GetInputSize());
-	
-	GetObservation(observationBuffer);
-	m_policy->MakePrediction(observations, actions, workingBuffer);
-	ApplyActions(&actions[0]);
+	GetObservation(&m_observations[0]);
+	//m_policy->MakePrediction(m_observations, m_actions, workingBuffer);
+	m_policy->MakePrediction(m_observations, m_actions);
+	ApplyActions(&m_actions[0]);
 }

@@ -33,19 +33,21 @@ class ndBrainAgentContinuePolicyGradient: public ndBrainAgent
 	ndBrainAgentContinuePolicyGradient(const ndBrainAgentContinuePolicyGradient& src);
 	~ndBrainAgentContinuePolicyGradient();
 
-	void Step();
+	void Step() override;
 
 	protected:
-	void ResetModel();
-	void OptimizeStep();
-	bool IsTrainer() const;
-	bool IsTerminal() const;
-	ndBrainFloat CalculateReward();
-	ndInt32 GetEpisodeFrames() const;
-	void Save(ndBrainSave* const loadSave);
-
-	void InitWeights();
+	void InitWeights() override;
+	void ResetModel() override;
+	void OptimizeStep() override;
+	bool IsTrainer() const override;
+	bool IsTerminal() const override;
+	ndBrainFloat CalculateReward() override;
+	ndInt32 GetEpisodeFrames() const override;
+	void Save(ndBrainSave* const loadSave) override;
+	
 	ndSharedPtr<ndBrain> m_policy;
+	ndBrainVector m_actions;
+	ndBrainVector m_observations;
 };
 
 #endif 
