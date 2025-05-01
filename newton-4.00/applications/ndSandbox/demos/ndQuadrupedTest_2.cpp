@@ -55,7 +55,7 @@ are more suitable for medium small systems.
 // to the environment with increasing complexity
 namespace ndQuadruped_2
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 
 	#define USE_SAC
 
@@ -68,7 +68,7 @@ namespace ndQuadruped_2
 	#define ndActionsPerLeg			3
 	#define ndObservationsPerLeg	12
 
-	#define ndNumberOfLeg			2
+	//#define ndNumberOfLeg			2
 
 	#define D_CYCLE_PERIOD			ndFloat32(4.0f)
 	#define D_CYCLE_STRIDE_X		ndFloat32(0.3f)
@@ -468,9 +468,11 @@ namespace ndQuadruped_2
 			ndAnimationSequencePlayer* const sequencePlayer = (ndAnimationSequencePlayer*)*node;
 			ndPoseGenerator* const poseGenerator = (ndPoseGenerator*)*sequencePlayer->GetSequence();
 			ndVector normalize(poseGenerator->m_poseBoundMax.Reciproc());
+
+			ndFloat32 weight = 0.0f;
 			for (ndInt32 i = 0; i < m_animPose0.GetCount(); ++i)
 			{
-				if (i == ndNumberOfLeg)
+				//if (i == ndNumberOfLeg)
 				{
 					const ndVector error(CalculatePositError(i));
 					const ndVector normalError(error * normalize);
@@ -482,10 +484,11 @@ namespace ndQuadruped_2
 						//ndFloat32 legReward = ndExp(-200000.0f * error2);
 						reward += legReward;
 					}
+					weight += ndActionsPerLeg;
 				}
 			}
-			//return reward / 12.0f;
-			return reward / 3.0f;
+			return reward / 12.0f;
+			//return reward / 3.0f;
 		}
 
 		#pragma optimize( "", off )
@@ -530,10 +533,10 @@ namespace ndQuadruped_2
 			ndFloat32 invTimestep = 1.0f / m_timestep;
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
-				if (i == ndNumberOfLeg)
+				//if (i == ndNumberOfLeg)
 				{
-					//ndEffectorInfo& leg = m_legs[i];
-					ndEffectorInfo& leg = m_legs[ndNumberOfLeg];
+					ndEffectorInfo& leg = m_legs[i];
+					//ndEffectorInfo& leg = m_legs[ndNumberOfLeg];
 					ndJointBilateralConstraint::ndKinematicState kinematicState[4];
 					leg.m_effector->GetKinematicState(kinematicState);
 					const ndVector effectorPosit(kinematicState[0].m_posit, kinematicState[1].m_posit, kinematicState[2].m_posit, 0.0f);
@@ -545,7 +548,6 @@ namespace ndQuadruped_2
 					const ndVector keyFramePosit1(keyFrame1.m_posit);
 
 					ndInt32 base = ndObservationsPerLeg * i;
-					base = 0;
 					observations[base + 0] = effectorPosit.m_x;
 					observations[base + 1] = effectorPosit.m_y;
 					observations[base + 2] = effectorPosit.m_z;
@@ -576,10 +578,9 @@ namespace ndQuadruped_2
 			{
 				ndEffectorInfo& leg = m_legs[i];
 				ndIkSwivelPositionEffector* const effector = leg.m_effector;
-				if (i == ndNumberOfLeg)
+				//if (i == ndNumberOfLeg)
 				{
 					ndInt32 base = ndActionsPerLeg * i;
-					base = 0;
 					const ndVector resPosit(leg.m_effector->GetRestPosit());
 					const ndVector effectorPosit(leg.m_effector->GetEffectorPosit());
 			
@@ -786,8 +787,8 @@ namespace ndQuadruped_2
 
 				m_stopTraining = 500000;
 				ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
-				hyperParameters.m_numberOfActions = ndActionsPerLeg * 1;
-				hyperParameters.m_numberOfObservations = ndObservationsPerLeg * 1;
+				hyperParameters.m_numberOfActions = ndActionsPerLeg * 4;
+				hyperParameters.m_numberOfObservations = ndObservationsPerLeg * 4;
 				//m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
 				m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentSoftActorCritic_Trainer(hyperParameters));
 			#else
@@ -819,7 +820,6 @@ namespace ndQuadruped_2
 			world->AddJoint(fixJoint);
 
 			// add a hidden battery of model to generate trajectories in parallel
-
 #ifndef USE_SAC
 			ndInt32 countX = 10;
 			ndInt32 countZ = 10;

@@ -70,7 +70,7 @@ void ndBrainLayerActivationRelu::MakePrediction(const ndBrainVector& input, ndBr
 		const ndBrainSimdFloat8 value(x.Max(zero));
 		value.Store(&dst[i]);
 	}
-	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= (roundCount * 8); --i)
+	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= roundCount; --i)
 	{
 		output[i] = ndMax (input[i], ndBrainFloat (0.0f));
 	}
@@ -93,7 +93,7 @@ void ndBrainLayerActivationRelu::InputDerivative(const ndBrainVector& input, con
 		const ndBrainSimdFloat8 value(test & one);
 		value.Store(&dst[i]);
 	}
-	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= (roundCount * 8); --i)
+	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= roundCount; --i)
 	{
 		inputDerivative[i] = (input[i] >= ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
 	}

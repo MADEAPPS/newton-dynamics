@@ -72,7 +72,7 @@ void ndBrainLayerActivationTanh::MakePrediction(const ndBrainVector& input, ndBr
 		const ndBrainSimdFloat8 value(x.Clamp(min, max));
 		value.Tanh().Store(&dst[i]);
 	}
-	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= (roundCount * 8); --i)
+	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= roundCount; --i)
 	{
 		ndBrainFloat value = ndClamp(src[i], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
 		dst[i] = ndBrainFloat(ndTanh(value));
