@@ -23,12 +23,12 @@
 #include "ndDemoInstanceEntity.h"
 
 /*
-This demo trains a simple robot using a policy gradient method—
+This demo trains a simple robot using a policy gradient method
 either vanilla policy gradients, Proximal Policy Optimization(PPO), or a custom variant.
 
 While policy gradient methods tend to be more stable than Q value based methods, 
 they require collecting a large amount of data, which can be impractical on hardware with limited resources.
-As model complexity grows—from medium to large scale—the variance in the collected data increases exponentially.
+As model complexity grows from medium to large scale, The variance in the collected data increases exponentially.
 This happens because uncertainty in the data stems from all control outputs, 
 and any moderately complex robot typically deals with an input vector composed of dozens of signals.
 
@@ -36,16 +36,17 @@ To manage this high variance,one common solution is to train thousands of agents
 This approach is motivated by the theoretical foundation of policy gradient methods, 
 which update model parameters based on the expected reward over all possible trajectories.
 However, in practice, we must estimate this expectation from a finite set of sampled trajectories.
-The challenge arises because, while our ability to generate data grows linearly(or sublinearly) with system resources,
+The challenge arises because, while our ability to generate data grows linearly(or sub linearly) with system resources,
 the variance of that data increases exponentially with the size of the action vector.
 This becomes a major bottleneck for small to medium sized systems.
 
 In fact, even a high end single GPU system may struggle with this demand, 
 which often limits the practical use of policy gradient methods to organizations with access 
-to large scale computing resources such as supercomputers plus al large number of humans in the 
-loop to uspervise data generation.
+to large scale computing resources such as supercomputers plus a large number of humans in the 
+loop to supervise data generation.
 
-therefore, it is my opinion and conclusion that Q base mthos are more sutable for medium small systems.
+therefore, it is my opinion and conclusion that Q base methods like DDPG, TD3 and SAC
+are more suitable for medium small systems.
 */
 
 // This model attempts to take animation poses and use a reward system to generate a policy  
@@ -56,12 +57,14 @@ namespace ndQuadruped_2
 {
 	#define ND_TRAIN_MODEL
 
-	#define USE_SAC
+	//#define USE_SAC
+
 	#ifdef USE_SAC
 		#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
 	#else	
 		#define CONTROLLER_NAME "ndQuadruped_2-ppo.dnn"
 	#endif
+
 	#define ndActionsPerLeg			3
 	#define ndObservationsPerLeg	12
 
