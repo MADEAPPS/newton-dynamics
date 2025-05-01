@@ -147,10 +147,9 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 
 		ndInt32 m_numberOfLayers;
 		ndInt32 m_miniBatchSize;
-		ndInt32 m_hiddenLayersNumberOfNeurons;
-		ndInt32 m_criticNeuronScale;
 		ndInt32 m_maxTrajectorySteps;
 		ndInt32 m_batchTrajectoryCount;
+		ndInt32 m_hiddenLayersNumberOfNeurons;
 		ndUnsigned32 m_randomSeed;
 		ndBrainOptimizer::ndRegularizerType m_regularizerType;
 
@@ -195,9 +194,9 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	void BuildPolicyClass();
 	void BuildCriticClass();
 	virtual void CalculateAdvange();
-
 	ndBrainAgentContinuePolicyGradient_Agent::ndRandomGenerator* GetRandomGenerator();
 
+	public:
 	ndBrain m_policy;
 	ndBrain m_critic;
 	const HyperParameters m_parameters;

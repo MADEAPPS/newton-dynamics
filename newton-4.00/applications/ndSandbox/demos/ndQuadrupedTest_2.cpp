@@ -57,7 +57,7 @@ namespace ndQuadruped_2
 {
 	#define ND_TRAIN_MODEL
 
-	#define USE_SAC
+	//#define USE_SAC
 
 	#ifdef USE_SAC
 		#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
@@ -459,8 +459,14 @@ namespace ndQuadruped_2
 		{
 			if (IsTerminal())
 			{
-				return -1.0f;
+				//return -1.0f;
+				return 0.0f;
 			}
+
+			//static int xxxx;
+			//xxxx++;
+			//if (xxxx >= 45)
+			//	xxxx *= 1;
 			
 			ndFloat32 reward = 0.0f;
 			
@@ -487,8 +493,7 @@ namespace ndQuadruped_2
 					weight += ndActionsPerLeg;
 				}
 			}
-			return reward / 12.0f;
-			//return reward / 3.0f;
+			return reward / weight;
 		}
 
 		#pragma optimize( "", off )
@@ -796,8 +801,8 @@ namespace ndQuadruped_2
 				fprintf(m_outFile, "ppo\n");
 
 				ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
-				hyperParameters.m_numberOfActions = ndActionsPerLeg * 1;
-				hyperParameters.m_numberOfObservations = ndObservationsPerLeg * 1;
+				hyperParameters.m_numberOfActions = ndActionsPerLeg * 4;
+				hyperParameters.m_numberOfObservations = ndObservationsPerLeg * 4;
 				//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
 				m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
 			#endif
@@ -975,8 +980,9 @@ namespace ndQuadruped_2
 					}
 				}
 			}
-
-			if ((stopTraining >= m_stopTraining) || (100.0f * m_master->GetAverageScore() / m_horizon > 95.0f))
+			
+			ndFloat32 stopScore = 100.0f * ndFloat32(m_master->GetAverageFrames() * m_master->GetAverageScore()) / m_horizon;
+			if ((stopTraining >= m_stopTraining) || (stopScore > 95.0f * ndFloat32(m_master->m_parameters.m_maxTrajectorySteps)))
 			{
 				char fileName[1024];
 				m_modelIsTrained = true;
