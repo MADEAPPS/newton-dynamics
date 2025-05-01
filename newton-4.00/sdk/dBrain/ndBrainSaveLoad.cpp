@@ -131,7 +131,6 @@ ndBrain* ndBrainLoad::Load() const
 		{
 			layer = ndBrainLayerActivationLeakyRelu::Load(this);
 		}
-
 		else if (!strcmp(layerType, "ndBrainLayerActivationSigmoid"))
 		{
 			ndAssert(0);

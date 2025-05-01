@@ -50,8 +50,9 @@ ndBrainLayer* ndBrainLayerActivationPolicyGradientMeanSigma::Load(const ndBrainL
 
 	loadSave->ReadString(buffer);
 	ndInt32 inputs = loadSave->ReadInt();
-
 	ndBrainLayer* const layer = new ndBrainLayerActivationPolicyGradientMeanSigma(inputs);
+
+	loadSave->ReadString(buffer);
 	return layer;
 }
 
