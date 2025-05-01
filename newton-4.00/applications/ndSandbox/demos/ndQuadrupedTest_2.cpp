@@ -55,8 +55,13 @@ therefore, it is my opinion and conclusion that Q base mthos are more sutable fo
 namespace ndQuadruped_2
 {
 	#define ND_TRAIN_MODEL
-	#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
 
+	//#define USE_DDPG
+	#ifdef USE_DDPG
+		#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
+	#else	
+		#define CONTROLLER_NAME "ndQuadruped_2-ppo.dnn"
+	#endif
 	#define ndActionsPerLeg			3
 	#define ndObservationsPerLeg	12
 
@@ -69,8 +74,6 @@ namespace ndQuadruped_2
 	#define D_POSE_REST_POSITION_Y	ndReal(-0.3f)
 
 	#define D_ACTION_SPEED			ndReal(0.005f)
-
-	//#define USE_DDPG
 
 	class RobotModelNotify : public ndModelNotify
 	{
@@ -497,7 +500,7 @@ namespace ndQuadruped_2
 					for (ndInt32 j = 0; j < 3; ++j)
 					{
 						ndFloat32 dist = ndFloat32(1.0f) - ndClamp(ndAbs(normalError[j]), 0.0f, 1.0f);
-						ndFloat32 legReward = dist * dist * dist * dist;
+						ndFloat32 legReward = ndPow(dist, 6.0f);;
 						//ndFloat32 error2 = error[j] * error[j];
 						//ndFloat32 legReward = ndExp(-200000.0f * error2);
 						reward += legReward;
@@ -761,13 +764,18 @@ namespace ndQuadruped_2
 			,m_discountRewardFactor(0.99f)
 			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountRewardFactor))
 			,m_lastEpisode(0xffffffff)
-			,m_stopTraining(500 * 1000000)
+			,m_stopTraining(200 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
 
-			m_outFile = fopen("ndQuadruped_2-vpg.csv", "wb");
-			fprintf(m_outFile, "vpg\n");
+			#ifdef USE_DDPG
+				m_outFile = fopen("ndQuadruped_2-ppo.csv", "wb");
+				fprintf(m_outFile, "ppo\n");
+			#else
+				m_outFile = fopen("ndQuadruped_2-sac.csv", "wb");
+				fprintf(m_outFile, "sac\n");
+			#endif
 
 			#ifdef USE_DDPG
 				m_stopTraining = 250000;
