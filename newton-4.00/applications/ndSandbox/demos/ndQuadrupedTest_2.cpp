@@ -73,7 +73,7 @@ namespace ndQuadruped_2
 	#define D_CYCLE_AMPLITUDE		ndFloat32(0.27f)
 	#define D_POSE_REST_POSITION_Y	ndReal(-0.3f)
 
-	#define D_ACTION_SPEED			ndReal(0.005f)
+	#define D_ACTION_SPEED			ndReal(0.05f)
 
 	class RobotModelNotify : public ndModelNotify
 	{
