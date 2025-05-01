@@ -163,8 +163,6 @@ namespace ndQuadruped_1
 			ndSharedPtr<ndAnimationSequence> sequence(new ndPoseGenerator());
 			
 			m_poseGenerator = ndSharedPtr<ndAnimationBlendTreeNode>(new ndAnimationSequencePlayer(sequence));
-			//m_control = new ndUIControlNode(m_poseGenerator);
-			//m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(m_control);
 			m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(m_poseGenerator);
 			
 			//ndFloat32 duration = ((ndAnimationSequencePlayer*)*m_poseGenerator)->GetSequence()->GetDuration();
@@ -175,9 +173,6 @@ namespace ndQuadruped_1
 			ndFloat32 offset_z[] = { -0.3f, 0.3f, -0.3f, 0.3f };
 			ndFloat32 offset_y[] = { D_POSE_REST_POSITION_Y, D_POSE_REST_POSITION_Y, D_POSE_REST_POSITION_Y, D_POSE_REST_POSITION_Y };
 			
-			//ndFloat32 angles[] = { -90.0f, -90.0f, 90.0f, 90.0f };
-			//const char* effectorNames[] = { "foot_0",  "foot_1",  "foot_2",  "foot_3" };
-			
 			ndPoseGenerator* const poseGenerator = (ndPoseGenerator*)*sequence;
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
@@ -187,11 +182,6 @@ namespace ndQuadruped_1
 				m_animPose.PushBack(keyFrame);
 				poseGenerator->AddTrack();
 			}
-			
-			//for (ndModelArticulation::ndNode* node = robot->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-			//{
-			//	m_controllerTrainer->m_basePose.PushBack(node->m_body->GetAsBodyDynamic());
-			//}
 		}
 
 		//RobotModelNotify(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot, bool showDebug)
@@ -297,7 +287,7 @@ namespace ndQuadruped_1
 		// build all for legs
 		for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = entity->GetChildren().GetFirst(); node; node = node->GetNext())
 		{
-			// build thig
+			// build whig
 			ndSharedPtr<ndDemoEntity> thighEntity(node->GetInfo());
 			const ndMatrix thighMatrix(thighEntity->GetCurrentMatrix() * matrix);
 			ndSharedPtr<ndBody> thigh(CreateRigidBody(thighEntity, thighMatrix, limbMass, rootBody->GetAsBodyDynamic()));
@@ -379,7 +369,6 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 
 	ndMeshLoader loader;
 	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("quadrupeSpider.fbx", scene));
-
 
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.6f;
