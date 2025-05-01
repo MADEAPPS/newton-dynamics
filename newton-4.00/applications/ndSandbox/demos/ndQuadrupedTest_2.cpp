@@ -290,21 +290,6 @@ namespace ndQuadruped_2
 			void ResetModel()
 			{
 				m_robot->ResetModel();
-				//ndUnsigned32 start = ndRandInt() & 3;
-				ndFloat32 duration = ((ndAnimationSequencePlayer*)*m_poseGenerator)->GetSequence();
-				//m_animBlendTree->SetTime(duration * ndFloat32(start));
-				//m_animBlendTree->SetTime(duration * ndFloat32(start));
-
-				m_animBlendTree->SetTime(0.0f);
-				m_time = ndFmod (ndRand(), 1.0f);
-			m_time = 0.0f;
-				ndFloat32 animFrame = m_time * duration;
-				//m_animBlendTree->Update(time);
-				m_animBlendTree->SetTime(animFrame);
-				m_robot->m_animFrame = animFrame;
-
-				ndVector veloc;
-				m_animBlendTree->Evaluate(m_animPose, veloc);
 			}
 
 			void InitAnimation()
@@ -342,14 +327,6 @@ namespace ndQuadruped_2
 
 				ResetModel();
 			}
-
-			//ndFloat32 GetPoseSequence() const
-			//{
-			//	ndAnimationSequencePlayer* const poseGenerator = (ndAnimationSequencePlayer*)*m_poseGenerator;
-			//	ndFloat32 seq = poseGenerator->GetTime() / D_CYCLE_PERIOD;
-			//	//ndTrace(("%f seq\n", seq));
-			//	return seq;
-			//}
 
 			RobotModelNotify* m_robot;
 			ndAnimationPose m_animPose;
@@ -521,6 +498,31 @@ namespace ndQuadruped_2
 			}
 
 			model->ClearMemory();
+
+
+			//ndFloat32 animSpeed = 1.0f;
+			//m_controllerTrainer->m_animBlendTree->Update(timestep * animSpeed);
+
+			//ndVector veloc;
+			//m_animPose0.CopySource(m_animPose1);
+			//m_controllerTrainer->m_animBlendTree->Evaluate(m_animPose1, veloc);
+
+			//ndUnsigned32 start = ndRandInt() & 3;
+			ndFloat32 duration = ((ndAnimationSequencePlayer*)*m_controllerTrainer->m_poseGenerator)->GetSequence();
+			//m_animBlendTree->SetTime(duration * ndFloat32(start));
+			//m_animBlendTree->SetTime(duration * ndFloat32(start));
+
+			
+
+			m_controllerTrainer->m_animBlendTree->SetTime(0.0f);
+			m_controllerTrainer->m_time = ndFmod(ndRand(), 1.0f);
+			m_controllerTrainer->m_time = 0.0f;
+			ndFloat32 animFrame = m_controllerTrainer->m_time * duration;
+			m_controllerTrainer->m_animBlendTree->SetTime(animFrame);
+			m_controllerTrainer->m_robot->m_animFrame = animFrame;
+			m_animPose1.CopySource(m_controllerTrainer->m_animPose);
+			ndVector veloc;
+			m_controllerTrainer->m_animBlendTree->Evaluate(m_animPose1, veloc);
 		}
 
 		#pragma optimize( "", off )
@@ -543,9 +545,10 @@ namespace ndQuadruped_2
 					const ndVector effectorPosit(kinematicState[0].m_posit, kinematicState[1].m_posit, kinematicState[2].m_posit, 0.0f);
 					const ndVector effectorVeloc(kinematicState[0].m_velocity, kinematicState[1].m_velocity, kinematicState[2].m_velocity, 0.0f);
 
-					const ndAnimKeyframe keyFrame = m_controllerTrainer->m_animPose[i];
-					const ndVector keyFramePosit0(keyFrame.m_posit);
-					const ndVector keyFramePosit1(keyFrame.m_posit);
+					const ndAnimKeyframe keyFrame0 = m_animPose0[i];
+					const ndAnimKeyframe keyFrame1 = m_animPose1[i];
+					const ndVector keyFramePosit0(keyFrame0.m_posit);
+					const ndVector keyFramePosit1(keyFrame1.m_posit);
 
 					ndInt32 base = ndObservationsPerLeg * i;
 					base = 0;
@@ -642,10 +645,18 @@ namespace ndQuadruped_2
 			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 			ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
 			rootBody->SetSleepState(false);
-
 			m_timestep = timestep;
+
 			if (m_controllerTrainer)
 			{
+				//ndFloat32 animSpeed = 2.0f * m_control->m_animSpeed;
+				ndFloat32 animSpeed = 1.0f;
+				m_controllerTrainer->m_animBlendTree->Update(timestep * animSpeed);
+
+				ndVector veloc;
+				m_animPose0.CopySource(m_animPose1);
+				m_controllerTrainer->m_animBlendTree->Evaluate(m_animPose1, veloc);
+
 				m_controllerTrainer->Step();
 			}
 			else
@@ -654,6 +665,8 @@ namespace ndQuadruped_2
 			}
 		}
 		
+		ndAnimationPose m_animPose0;
+		ndAnimationPose m_animPose1;
 		ndFixSizeArray<ndEffectorInfo, 4> m_legs;
 		ndSharedPtr<ndController> m_controller;
 		ndSharedPtr<ndControllerTrainer> m_controllerTrainer;
@@ -661,7 +674,6 @@ namespace ndQuadruped_2
 		ndFloat32 m_animFrame;
 	};
 
-	//ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndSharedPtr<ndDemoEntity>& modelMesh, ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndSharedPtr<ndDemoEntity>& modelMesh)
 	{
 		ndModelArticulation* const model = new ndModelArticulation();

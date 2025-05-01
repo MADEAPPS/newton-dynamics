@@ -29,18 +29,12 @@ void ndAnimationPose::Clear()
 //	RemoveAll(); 
 }
 
-//void ndAnimationPose::CopySource(const ndAnimationPose& source)
-void ndAnimationPose::CopySource(const ndAnimationPose&)
+void ndAnimationPose::CopySource(const ndAnimationPose& src)
 {
-	ndAssert(0);
-//	dListNode* destNode = GetFirst();
-//	for (dListNode* sourceNode = source.GetFirst(); sourceNode; sourceNode = sourceNode->GetNext()) {
-//		const ndAnimKeyframe& srcFrame = sourceNode->GetInfo();
-//		ndAnimKeyframe& dstFrame = destNode->GetInfo();
-//		ndAssert(srcFrame.m_userData == dstFrame.m_userData);
-//		dstFrame.m_rotation = srcFrame.m_rotation;
-//		dstFrame.m_posit = srcFrame.m_posit;
-//		destNode = destNode->GetNext();
-//	}
+	SetCount(0);
+	for (ndInt32 i = 0; i < src.GetCount(); ++i)
+	{
+		PushBack(src[i]);
+	}
 }
 
