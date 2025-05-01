@@ -493,6 +493,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildPolicyClass()
 {
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 
+	layers.SetCount(0);
 	layers.PushBack(new ndBrainLayerLinear(m_parameters.m_numberOfObservations, m_parameters.m_hiddenLayersNumberOfNeurons));
 	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 	for (ndInt32 i = 0; i < m_parameters.m_numberOfLayers; ++i)
@@ -500,8 +501,8 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildPolicyClass()
 		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == m_parameters.m_hiddenLayersNumberOfNeurons);
 		layers.PushBack(new ndBrainLayerLinear(m_parameters.m_hiddenLayersNumberOfNeurons, m_parameters.m_hiddenLayersNumberOfNeurons));
 		//layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
-		//layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
-		layers.PushBack(new ndBrainLayerActivationLeakyRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
+		//layers.PushBack(new ndBrainLayerActivationLeakyRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
 	}
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_numberOfActions + 1));
 	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
@@ -550,8 +551,8 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildCriticClass()
 {
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 	// build state value critic neural net
-	layers.SetCount(0);
 
+	layers.SetCount(0);
 	layers.PushBack(new ndBrainLayerLinear(m_policy.GetInputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
 	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 	for (ndInt32 i = 0; i < m_parameters.m_numberOfLayers; ++i)
@@ -559,8 +560,8 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildCriticClass()
 		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == m_parameters.m_hiddenLayersNumberOfNeurons);
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
 		//layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
-		//layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
-		layers.PushBack(new ndBrainLayerActivationLeakyRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
+		//layers.PushBack(new ndBrainLayerActivationLeakyRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
 	}
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
