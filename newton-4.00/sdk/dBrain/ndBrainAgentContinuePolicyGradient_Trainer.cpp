@@ -27,6 +27,7 @@
 #include "ndBrainLayerActivationRelu.h"
 #include "ndBrainLayerActivationTanh.h"
 #include "ndBrainLayerActivationLinear.h"
+#include "ndBrainLayerActivationLeakyRelu.h"
 #include "ndBrainAgentContinuePolicyGradient_Trainer.h"
 #include "ndBrainLayerActivationPolicyGradientMeanSigma.h"
 
@@ -64,8 +65,8 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 	m_generalizedAdvangeDiscount = ndBrainFloat(0.99f);
 	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize);
 
-//m_useFixSigma = true;
 //m_threadsCount = 1;
+//m_useFixSigma = true;
 //m_batchTrajectoryCount = 10;
 //m_useConstantBaseLineStateValue = false;
 }
@@ -499,7 +500,8 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildPolicyClass()
 		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == m_parameters.m_hiddenLayersNumberOfNeurons);
 		layers.PushBack(new ndBrainLayerLinear(m_parameters.m_hiddenLayersNumberOfNeurons, m_parameters.m_hiddenLayersNumberOfNeurons));
 		//layers.PushBack(new ndBrainLayerActivationTanh(m_parameters.m_hiddenLayersNumberOfNeurons));
-		layers.PushBack(new ndBrainLayerActivationRelu(m_parameters.m_hiddenLayersNumberOfNeurons));
+		//layers.PushBack(new ndBrainLayerActivationRelu(m_parameters.m_hiddenLayersNumberOfNeurons));
+		layers.PushBack(new ndBrainLayerActivationLeakyRelu(m_parameters.m_hiddenLayersNumberOfNeurons));
 	}
 	layers.PushBack(new ndBrainLayerLinear(m_parameters.m_hiddenLayersNumberOfNeurons, m_parameters.m_numberOfActions + 1));
 	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
@@ -557,7 +559,8 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildCriticClass()
 		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == m_parameters.m_hiddenLayersNumberOfNeurons);
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
 		//layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
-		layers.PushBack(new ndBrainLayerActivationRelu(m_parameters.m_hiddenLayersNumberOfNeurons));
+		//layers.PushBack(new ndBrainLayerActivationRelu(m_parameters.m_hiddenLayersNumberOfNeurons));
+		layers.PushBack(new ndBrainLayerActivationLeakyRelu(m_parameters.m_hiddenLayersNumberOfNeurons));
 	}
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)

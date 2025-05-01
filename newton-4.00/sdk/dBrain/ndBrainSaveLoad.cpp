@@ -33,6 +33,7 @@
 #include "ndBrainLayerActivationSigmoid.h"
 //#include "ndBrainLayerLinearWithDropOut.h"
 #include "ndBrainLayerCrossCorrelation_2d.h"
+#include "ndBrainLayerActivationLeakyRelu.h"
 #include "ndBrainLayerActivationSigmoidLinear.h"
 #include "ndBrainLayerActivationCategoricalSoftmax.h"
 #include "ndBrainAgentContinuePolicyGradient_Trainer.h"
@@ -122,11 +123,15 @@ ndBrain* ndBrainLoad::Load() const
 		{
 			layer = ndBrainLayerActivationPolicyGradientMeanSigma::Load(this);
 		}
-		else if (!strcmp(layerType, "ndBrainLayerActivationRelu"))
+		else if (!strcmp(layerType, ND_BRAIN_LAYER_ACTIVATION_RELU_NAME))
 		{
-			ndAssert(0);
 			layer = ndBrainLayerActivationRelu::Load(this);
 		}
+		else if (!strcmp(layerType, ND_BRAIN_LAYER_ACTIVATION_LEAKY_RELU_NAME))
+		{
+			layer = ndBrainLayerActivationLeakyRelu::Load(this);
+		}
+
 		else if (!strcmp(layerType, "ndBrainLayerActivationSigmoid"))
 		{
 			ndAssert(0);

@@ -52,12 +52,16 @@ class ndBrainSimdFloat8
 	
 	ndBrainSimdFloat8 operator+ (const ndBrainSimdFloat8& A) const;
 	ndBrainSimdFloat8 operator- (const ndBrainSimdFloat8& A) const;
+	ndBrainSimdFloat8 operator* (const ndBrainSimdFloat8& A) const;
 	
 	// logical operations;
+	ndBrainSimdFloat8 operator~ () const;
 	ndBrainSimdFloat8 operator& (const ndBrainSimdFloat8& data) const;
 	ndBrainSimdFloat8 operator| (const ndBrainSimdFloat8& data) const;
 	ndBrainSimdFloat8 operator> (const ndBrainSimdFloat8& data) const;
 	ndBrainSimdFloat8 operator< (const ndBrainSimdFloat8& data) const;
+	ndBrainSimdFloat8 operator>= (const ndBrainSimdFloat8& data) const;
+	ndBrainSimdFloat8 operator<= (const ndBrainSimdFloat8& data) const;
 
 	union
 	{
@@ -156,13 +160,32 @@ inline ndBrainSimdFloat8 ndBrainSimdFloat8::operator- (const ndBrainSimdFloat8& 
 	return tmp;
 }
 
+inline ndBrainSimdFloat8 ndBrainSimdFloat8::operator* (const ndBrainSimdFloat8& A) const
+{
+	ndBrainSimdFloat8 tmp;
+	for (ndInt32 i = 0; i < 8; ++i)
+	{
+		tmp.m_f[i] = m_f[i] * A.m_f[i];
+	}
+	return tmp;
+}
+
 inline ndBrainSimdFloat8 ndBrainSimdFloat8::operator> (const ndBrainSimdFloat8& data) const
 {
 	ndBrainSimdFloat8 tmp;
-	const ndBrainSimdFloat8 diff(data - *this);
 	for (ndInt32 i = 0; i < 8; ++i)
 	{
-		tmp.m_i[i] = diff.m_i[i] >> 31;
+		tmp.m_i[i] = m_f[i] > data.m_f[i] ? -1 : 0;
+	}
+	return tmp;
+}
+
+inline ndBrainSimdFloat8 ndBrainSimdFloat8::operator>= (const ndBrainSimdFloat8& data) const
+{
+	ndBrainSimdFloat8 tmp;
+	for (ndInt32 i = 0; i < 8; ++i)
+	{
+		tmp.m_i[i] = m_f[i] >= data.m_f[i] ? -1 : 0;
 	}
 	return tmp;
 }
@@ -170,10 +193,29 @@ inline ndBrainSimdFloat8 ndBrainSimdFloat8::operator> (const ndBrainSimdFloat8& 
 inline ndBrainSimdFloat8 ndBrainSimdFloat8::operator< (const ndBrainSimdFloat8& data) const
 {
 	ndBrainSimdFloat8 tmp;
-	ndBrainSimdFloat8 diff (*this - data);
 	for (ndInt32 i = 0; i < 8; ++i)
 	{
-		tmp.m_i[i] = diff.m_i[i] >> 31;
+		tmp.m_i[i] = m_f[i] < data.m_f[i] ? -1 : 0;
+	}
+	return tmp;
+}
+
+inline ndBrainSimdFloat8 ndBrainSimdFloat8::operator<= (const ndBrainSimdFloat8& data) const
+{
+	ndBrainSimdFloat8 tmp;
+	for (ndInt32 i = 0; i < 8; ++i)
+	{
+		tmp.m_i[i] = m_f[i] <= data.m_f[i] ? -1 : 0;
+	}
+	return tmp;
+}
+
+inline ndBrainSimdFloat8 ndBrainSimdFloat8::operator~ () const
+{
+	ndBrainSimdFloat8 tmp;
+	for (ndInt32 i = 0; i < 8; ++i)
+	{
+		tmp.m_i[i] = ~m_i[i];
 	}
 	return tmp;
 }

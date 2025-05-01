@@ -19,19 +19,20 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_LAYER_RELU_ACTIVATION_H__
-#define _ND_BRAIN_LAYER_RELU_ACTIVATION_H__
+#ifndef _ND_BRAIN_LAYER_LEAKY_RELU_ACTIVATION_H__
+#define _ND_BRAIN_LAYER_LEAKY_RELU_ACTIVATION_H__
 
 #include "ndBrainStdafx.h"
 #include "ndBrainLayerActivation.h"
 
-#define ND_BRAIN_LAYER_ACTIVATION_RELU_NAME	"ndBrainLayerActivationRelu"
+#define ND_LEAKY_LRU_NEG_GRADIENT					ndBrainFloat(0.01f)
+#define ND_BRAIN_LAYER_ACTIVATION_LEAKY_RELU_NAME	"ndBrainLayerActivationLeakyRelu"
 
-class ndBrainLayerActivationRelu : public ndBrainLayerActivation
+class ndBrainLayerActivationLeakyRelu : public ndBrainLayerActivation
 {
 	public:
-	ndBrainLayerActivationRelu(ndInt32 neurons);
-	ndBrainLayerActivationRelu(const ndBrainLayerActivationRelu& src);
+	ndBrainLayerActivationLeakyRelu(ndInt32 neurons);
+	ndBrainLayerActivationLeakyRelu(const ndBrainLayerActivationLeakyRelu& src);
 	ndBrainLayer* Clone() const;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 

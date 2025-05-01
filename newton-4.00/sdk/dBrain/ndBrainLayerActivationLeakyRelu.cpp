@@ -23,85 +23,90 @@
 #include "ndBrainSaveLoad.h"
 #include "ndBrainSimdFloat8.h"
 #include "gpu/ndBrainGpuContext.h"
-#include "ndBrainLayerActivationRelu.h"
+#include "ndBrainLayerActivationLeakyRelu.h"
 
-ndBrainLayerActivationRelu::ndBrainLayerActivationRelu(ndInt32 neurons)
+ndBrainLayerActivationLeakyRelu::ndBrainLayerActivationLeakyRelu(ndInt32 neurons)
 	:ndBrainLayerActivation(neurons)
 {
 }
 
-ndBrainLayerActivationRelu::ndBrainLayerActivationRelu(const ndBrainLayerActivationRelu& src)
+ndBrainLayerActivationLeakyRelu::ndBrainLayerActivationLeakyRelu(const ndBrainLayerActivationLeakyRelu& src)
 	:ndBrainLayerActivation(src)
 {
 }
 
-ndBrainLayer* ndBrainLayerActivationRelu::Clone() const
+ndBrainLayer* ndBrainLayerActivationLeakyRelu::Clone() const
 {
-	return new ndBrainLayerActivationRelu(*this);
+	return new ndBrainLayerActivationLeakyRelu(*this);
 }
 
-const char* ndBrainLayerActivationRelu::GetLabelId() const
+const char* ndBrainLayerActivationLeakyRelu::GetLabelId() const
 {
-	return "ND_BRAIN_LAYER_ACTIVATION_RELU_NAME";
+	return ND_BRAIN_LAYER_ACTIVATION_LEAKY_RELU_NAME;
 }
 
-ndBrainLayer* ndBrainLayerActivationRelu::Load(const ndBrainLoad* const loadSave)
+ndBrainLayer* ndBrainLayerActivationLeakyRelu::Load(const ndBrainLoad* const loadSave)
 {
 	char buffer[1024];
 	loadSave->ReadString(buffer);
 
 	loadSave->ReadString(buffer);
 	ndInt32 inputs = loadSave->ReadInt();
-	ndBrainLayerActivationRelu* const layer = new ndBrainLayerActivationRelu(inputs);
+	ndBrainLayerActivationLeakyRelu* const layer = new ndBrainLayerActivationLeakyRelu(inputs);
 	loadSave->ReadString(buffer);
 	return layer;
 }
 
-void ndBrainLayerActivationRelu::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
+void ndBrainLayerActivationLeakyRelu::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == output.GetCount());
+
 	const ndBrainSimdFloat8 zero(0.0f);
+	const ndBrainSimdFloat8 leakyGrad(ND_LEAKY_LRU_NEG_GRADIENT);
 	ndBrainFloat* const dst = &output[0];
 	const ndBrainFloat* const src = &input[0];
 	const ndInt32 roundCount = ndInt32(input.GetCount()) & -8;
 	for (ndInt32 i = 0; i < roundCount; i += 8)
 	{
 		const ndBrainSimdFloat8 x(&src[i]);
-		const ndBrainSimdFloat8 value(x.Max(zero));
+		const ndBrainSimdFloat8 mask(x >= zero);
+		const ndBrainSimdFloat8 negOut(leakyGrad * x);
+		const ndBrainSimdFloat8 value((x & mask) | (negOut & (~mask)));
 		value.Store(&dst[i]);
 	}
 	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= (roundCount * 8); --i)
 	{
-		output[i] = ndMax (input[i], ndBrainFloat (0.0f));
+		output[i] = (input[i] >= 0) ? input[i] : ND_LEAKY_LRU_NEG_GRADIENT * input[i];
 	}
 }
 
-void ndBrainLayerActivationRelu::InputDerivative(const ndBrainVector& input, const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+void ndBrainLayerActivationLeakyRelu::InputDerivative(const ndBrainVector& input, const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	ndAssert(input.GetCount() == outputDerivative.GetCount());
 	ndAssert(input.GetCount() == inputDerivative.GetCount());
 
 	const ndBrainSimdFloat8 one(1.0f);
 	const ndBrainSimdFloat8 zero(0.0f);
+	const ndBrainSimdFloat8 leakyGrad(ND_LEAKY_LRU_NEG_GRADIENT);
 	ndBrainFloat* const dst = &inputDerivative[0];
 	const ndBrainFloat* const src = &input[0];
 	const ndInt32 roundCount = ndInt32(input.GetCount()) & -8;
 	for (ndInt32 i = 0; i < roundCount; i += 8)
 	{
 		const ndBrainSimdFloat8 x(&src[i]);
-		const ndBrainSimdFloat8 test(x >= zero);
-		const ndBrainSimdFloat8 value(test & one);
+		const ndBrainSimdFloat8 mask(x >= zero);
+		const ndBrainSimdFloat8 value((one & mask) | (leakyGrad & (~mask)));
 		value.Store(&dst[i]);
 	}
 	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= (roundCount * 8); --i)
 	{
-		inputDerivative[i] = (input[i] >= ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+		inputDerivative[i] = (input[i] >= ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ND_LEAKY_LRU_NEG_GRADIENT;
 	}
 
 	inputDerivative.Mul(outputDerivative);
 }
 
-ndBrainGpuCommand* ndBrainLayerActivationRelu::AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params)
+ndBrainGpuCommand* ndBrainLayerActivationLeakyRelu::AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params)
 {
 	return AssemblyGPUCommandCommon(context, layerIndex, batchCount, params, context->m_ndBrainLayerReluActivation);
 }

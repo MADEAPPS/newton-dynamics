@@ -52,6 +52,7 @@
 #include <ndBrainLayerLinearWithDropOut.h>
 #include <ndBrainLayerActivationSigmoid.h>
 #include <ndBrainLayerActivationSoftmax.h>
+#include <ndBrainLayerActivationLeakyRelu.h>
 #include <ndBrainLayerCrossCorrelation_2d.h>
 #include <ndBrainAgentDiscretePolicyGradient.h>
 #include <ndBrainAgentContinuePolicyGradient.h>
