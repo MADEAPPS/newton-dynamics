@@ -216,10 +216,8 @@ ndInt32 ndBrainAgentDeterministicPolicyGradient_Agent::GetEpisodeFrames() const
 
 void ndBrainAgentDeterministicPolicyGradient_Agent::SampleActions(ndBrainVector& actions)
 {
-	//ndFloat32 sigma = actions[actions.GetCount() - 1];
 	const ndInt32 count = ndInt32(actions.GetCount()) / 2;
 	const ndInt32 start = ndInt32(actions.GetCount()) / 2;
-
 	for (ndInt32 i = count - 1; i >= 0; --i)
 	{
 		ndFloat32 sigma = actions[start + i];
@@ -375,6 +373,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildCriticClass()
 		layers.SetCount(0);
 		layers.PushBack(new ndBrainLayerLinear(m_policy.GetOutputSize() + m_policy.GetInputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
 		layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
+
 		for (ndInt32 i = 0; i < m_parameters.m_actorHiddenLayers; ++i)
 		{
 			ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == m_parameters.m_hiddenLayersNumberOfNeurons);
