@@ -33,7 +33,11 @@
 #include "ndBrainLayerActivationPolicyGradientMeanSigma.h"
 #include "ndBrainAgentDeterministicPolicyGradient_Trainer.h"
 
-#define ND_CONTINUE_POLICY_FIX_SIGMA2		ndBrainFloat(0.25f)
+#define ND_DETERMINISTIC_POLICY_FIX_SIGMA2							ndBrainFloat(0.25f)
+
+//#define ND_DETERMINISTIC_POLICY_GRADIENT_HIDEN_LAYERS_ACTIVATION	ndBrainLayerActivationRelu
+#define ND_DETERMINISTIC_POLICY_GRADIENT_HIDEN_LAYERS_ACTIVATION	ndBrainLayerActivationTanh
+//#define ND_DETERMINISTIC_POLICY_GRADIENT_HIDEN_LAYERS_ACTIVATION	ndBrainLayerActivationLeakyRelu
 
 ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameters()
 {
@@ -42,13 +46,14 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 	m_policyRegularizer = ndBrainFloat(1.0e-4f);
 	m_criticRegularizer = ndBrainFloat(1.0e-4f);
 	m_discountRewardFactor = ndBrainFloat(0.99f);
-	m_entropyRegularizerCoef = ndBrainFloat(0.005f);
+
+	m_entropyRegularizerCoef = ndBrainFloat(0.002f);
 	m_policyMovingAverageFactor = ndBrainFloat(0.005f);
 	m_criticMovingAverageFactor = ndBrainFloat(0.005f);
 
 	//m_useFixSigma = true;
 	m_useFixSigma = false;
-	m_actionFixSigma = ndSqrt(ND_CONTINUE_POLICY_FIX_SIGMA2);
+	m_actionFixSigma = ndSqrt(ND_DETERMINISTIC_POLICY_FIX_SIGMA2);
 
 	m_policyRegularizerType = ndBrainOptimizer::m_ridge;
 	m_criticRegularizerType = ndBrainOptimizer::m_ridge;
