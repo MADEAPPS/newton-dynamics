@@ -57,7 +57,7 @@ namespace ndQuadruped_2
 {
 	#define ND_TRAIN_MODEL
 
-	#define USE_SAC
+	//#define USE_SAC
 
 	#ifdef USE_SAC
 		#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
@@ -809,7 +809,7 @@ namespace ndQuadruped_2
 				m_outFile = fopen("ndQuadruped_2-sac.csv", "wb");
 				fprintf(m_outFile, "sac\n");
 
-				m_stopTraining = 500000;
+				m_stopTraining = 200000;
 				ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
 				hyperParameters.m_numberOfActions = m_actionsSize * 4;
 				hyperParameters.m_numberOfObservations = m_observationSize * 4;
