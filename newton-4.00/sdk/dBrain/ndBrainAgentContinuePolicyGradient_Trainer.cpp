@@ -35,8 +35,8 @@
 #define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE					(1024 * 256)
 #define ND_CONTINUE_POLICY_FIX_SIGMA2							ndBrainFloat(0.25f)
 
-//#define ND_CONTINUE_POLICY_GRADIENT_HIDEN_LAYERS_ACTIVATION	ndBrainLayerActivationRelu
-#define ND_CONTINUE_POLICY_GRADIENT_HIDEN_LAYERS_ACTIVATION	ndBrainLayerActivationTanh
+#define ND_CONTINUE_POLICY_GRADIENT_HIDEN_LAYERS_ACTIVATION		ndBrainLayerActivationRelu
+//#define ND_CONTINUE_POLICY_GRADIENT_HIDEN_LAYERS_ACTIVATION	ndBrainLayerActivationTanh
 //#define ND_CONTINUE_POLICY_GRADIENT_HIDEN_LAYERS_ACTIVATION	ndBrainLayerActivationLeakyRelu
 
 //*********************************************************************************************
