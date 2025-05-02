@@ -74,7 +74,9 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 			m_transitionSize
 		};
 	
-		ndTrajectoryTransition(ndInt32 actionsSize, ndInt32 obsevationsSize);
+		ndTrajectoryTransition();
+
+		void Init(ndInt32 actionsSize, ndInt32 obsevationsSize);
 	
 		ndInt32 GetCount() const;
 		void SetCount(ndInt32 count);

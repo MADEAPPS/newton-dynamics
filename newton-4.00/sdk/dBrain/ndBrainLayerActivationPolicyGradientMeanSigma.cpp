@@ -65,27 +65,35 @@ const char* ndBrainLayerActivationPolicyGradientMeanSigma::GetLabelId() const
 void ndBrainLayerActivationPolicyGradientMeanSigma::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	output.Set(input);
-	ndInt32 count = ndInt32(input.GetCount()) - 1;
-#ifdef ND_USE_NATURAL_SIGMA
-	output[count] = ND_NATURAL_SIGMA * ndExp(ndFloat32 (2.0f) * input[count]);
-#else
-	ndFloat32 b = (ND_MIN_LINEAR_SIGMA + ND_MAX_LINEAR_SIGMA) * ndFloat32(0.5f);
-	ndFloat32 a = ndFloat32(1.0f) - b;
-	output[count] = a * input[count] + b;
-#endif
+	const ndInt32 count = ndInt32(input.GetCount()) / 2;
+	const ndInt32 start = ndInt32(input.GetCount()) / 2;
+	for (ndInt32 i = count - 1; i >= 0; --i)
+	{
+		#ifdef ND_USE_NATURAL_SIGMA
+			output[start + i] = ND_NATURAL_SIGMA * ndExp(ndFloat32(2.0f) * input[start + i]);
+		#else
+			ndFloat32 b = (ND_MIN_LINEAR_SIGMA + ND_MAX_LINEAR_SIGMA) * ndFloat32(0.5f);
+			ndFloat32 a = ndFloat32(1.0f) - b;
+			output[start + i] = a * input[start + i] + b;
+		#endif
+	}
 }
 
 //#pragma optimize( "", off )
 void ndBrainLayerActivationPolicyGradientMeanSigma::InputDerivative(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	inputDerivative.Set(ndBrainFloat(1.0f));
-	ndInt32 count = ndInt32(output.GetCount()) - 1;
-#ifdef ND_USE_NATURAL_SIGMA
-	inputDerivative[count] = ndFloat32(2.0f) * output[count];
-#else
-	ndFloat32 b = (ND_MIN_LINEAR_SIGMA + ND_MAX_LINEAR_SIGMA) * ndFloat32(0.5f);
-	ndFloat32 a = ndFloat32(1.0f) - b;
-	inputDerivative[count] = a;
-#endif
+	const ndInt32 count = ndInt32(output.GetCount()) / 2;
+	const ndInt32 start = ndInt32(output.GetCount()) / 2;
+	for (ndInt32 i = count - 1; i >= 0; --i)
+	{
+		#ifdef ND_USE_NATURAL_SIGMA
+			inputDerivative[start + i] = ndFloat32(2.0f) * output[start + i];
+		#else
+			ndFloat32 b = (ND_MIN_LINEAR_SIGMA + ND_MAX_LINEAR_SIGMA) * ndFloat32(0.5f);
+			ndFloat32 a = ndFloat32(1.0f) - b;
+			inputDerivative[start + i] = a;
+		#endif
+	}
 	inputDerivative.Mul(outputDerivative);
 }
