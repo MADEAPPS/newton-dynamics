@@ -234,16 +234,19 @@ void ndBrain::CalculateInputGradient(const ndBrainVector& input, ndBrainVector& 
 	ndBrainFloat* const gradientBuffer = ndAlloca(ndBrainFloat, maxSize * 2 + 256);
 
 	ndMemCpy(memBuffer, &input[0], input.GetCount());
-	for (ndInt32 i = 0; i < GetCount(); ++i)
+	const ndInt32 layersCount = ndInt32(GetCount());
+	for (ndInt32 i = 0; i < layersCount; ++i)
 	{
 		ndBrainMemVector in(memBuffer + prefixScan[i + 0], layers[i]->GetInputSize());
 		ndBrainMemVector out(memBuffer + prefixScan[i + 1], layers[i]->GetOutputSize());
 		layers[i]->MakePrediction(in, out);
 	}
+	const ndBrainMemVector output(memBuffer + prefixScan[layersCount], GetOutputSize());
 
 	ndBrainMemVector gradientIn(gradientBuffer, GetOutputSize());
 	ndBrainMemVector gradientOut(gradientBuffer + maxSize + 128, GetOutputSize());
-	loss.GetLoss(gradientIn, gradientOut);
+	//loss.GetLoss(gradientIn, gradientOut);
+	loss.GetLoss(output, gradientOut);
 
 	for (ndInt32 i = ndInt32(layers.GetCount()) - 1; i >= 0; --i)
 	{
