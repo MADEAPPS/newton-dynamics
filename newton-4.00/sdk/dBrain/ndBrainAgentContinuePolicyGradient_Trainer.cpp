@@ -33,7 +33,7 @@
 
 #define ND_CONTINUE_POLICY_STATE_VALUE_ITERATIONS				5
 #define ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE					(1024 * 256)
-#define ND_CONTINUE_POLICY_FIX_SIGMA2							ndBrainFloat(0.25f)
+#define ND_CONTINUE_POLICY_FIX_SIGMA							ndBrainFloat(0.5f)
 
 #define ND_CONTINUE_POLICY_GRADIENT_HIDEN_LAYERS_ACTIVATION		ndBrainLayerActivationRelu
 //#define ND_CONTINUE_POLICY_GRADIENT_HIDEN_LAYERS_ACTIVATION	ndBrainLayerActivationTanh
@@ -62,7 +62,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 	m_useConstantBaseLineStateValue = false;
 
 	m_useFixSigma = false;
-	m_actionFixSigma = ndSqrt(ND_CONTINUE_POLICY_FIX_SIGMA2);
+	m_actionFixSigma = ND_CONTINUE_POLICY_FIX_SIGMA;
 
 	m_discountRewardFactor = ndBrainFloat(0.99f);
 	m_generalizedAdvangeDiscount = ndBrainFloat(0.99f);
