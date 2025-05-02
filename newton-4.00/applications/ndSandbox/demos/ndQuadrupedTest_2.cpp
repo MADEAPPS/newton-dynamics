@@ -813,8 +813,8 @@ namespace ndQuadruped_2
 				ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
 				hyperParameters.m_numberOfActions = m_actionsSize * 4;
 				hyperParameters.m_numberOfObservations = m_observationSize * 4;
-				m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
-				//m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentSoftActorCritic_Trainer(hyperParameters));
+				//m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
+				m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentSoftActorCritic_Trainer(hyperParameters));
 			#else
 				m_outFile = fopen("ndQuadruped_2-ppo.csv", "wb");
 				fprintf(m_outFile, "ppo\n");
@@ -830,7 +830,6 @@ namespace ndQuadruped_2
 
 			m_master->SetName(CONTROLLER_NAME);
 
-			//ndSharedPtr<ndModel>visualModel(CreateModel(scene, matrix, modelMesh, m_master));
 			ndSharedPtr<ndModel>visualModel(CreateModel(scene, matrix, modelMesh));
 			RobotModelNotify* const notify = (RobotModelNotify*)*visualModel->GetAsModel()->GetNotifyCallback();
 			notify->SetControllerTrainer(m_master);
