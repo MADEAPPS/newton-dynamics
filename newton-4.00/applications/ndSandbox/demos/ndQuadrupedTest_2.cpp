@@ -431,7 +431,6 @@ namespace ndQuadruped_2
 		#pragma optimize( "", off )
 		bool IsTerminal() const
 		{
-			return false;
 			// termination for execive velocity
 			for (ndInt32 i = 0; i < m_basePose.GetCount(); i++)
 			{
@@ -479,8 +478,8 @@ namespace ndQuadruped_2
 		{
 			if (IsTerminal())
 			{
-				//return -1.0f;
-				return 0.0f;
+				return -1.0f;
+				//return 0.0f;
 			}
 
 			//static int xxxx;
@@ -996,6 +995,7 @@ namespace ndQuadruped_2
 					if (m_outFile)
 					{
 						fprintf(m_outFile, "%g\n", m_master->GetAverageScore());
+						//fprintf(m_outFile, "%g\n", ndMax (m_master->GetAverageScore(), ndFloat32 (0.0f)));
 						fflush(m_outFile);
 					}
 				}
