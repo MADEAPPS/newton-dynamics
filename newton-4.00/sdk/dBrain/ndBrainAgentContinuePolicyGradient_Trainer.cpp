@@ -59,9 +59,9 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 	m_policyRegularizer = ndBrainFloat(1.0e-4f);
 	m_criticRegularizer = ndBrainFloat(5.0e-3f);
 	m_regularizerType = ndBrainOptimizer::m_ridge;
-	m_useConstantBaseLineStateValue = false;
-
+	
 	m_useFixSigma = false;
+	m_useConstantBaseLineStateValue = false;
 	m_actionFixSigma = ND_CONTINUE_POLICY_FIX_SIGMA;
 
 	m_discountRewardFactor = ndBrainFloat(0.99f);
@@ -894,7 +894,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 					const ndBrainFloat advantage = m_owner->m_advantage[m_index];
 
 					//negate the gradient for gradient ascend?
-					ndBrainFloat ascend = ndBrainFloat(-1.0f * advantage);
+					ndBrainFloat ascend = ndBrainFloat(-1.0f) * advantage;
 					loss.Scale(ascend);
 				}
 
