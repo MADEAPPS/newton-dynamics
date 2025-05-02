@@ -199,9 +199,9 @@ void ndBrainAgentSoftActorCritic_Trainer::LearnPolicyFunction()
 					ndBrainFloat m_saveQValue;
 				};
 	
-				void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
+				void GetLoss(const ndBrainVector& probabilityDistribution, ndBrainVector& loss)
 				{
-					ndMemCpy(&m_tempCombinedInputGradients[0], &m_owner->m_reparametizedActions[m_batchIndex * m_owner->m_policy.GetOutputSize()], m_owner->m_policy.GetOutputSize());
+					ndMemCpy(&m_combinedActionObservation[0], &m_owner->m_reparametizedActions[m_batchIndex * m_owner->m_policy.GetOutputSize()], m_owner->m_policy.GetOutputSize());
 					ndMemCpy(&m_combinedActionObservation[m_owner->m_policy.GetOutputSize()], m_owner->m_replayBuffer.GetNextObservations(m_index), m_owner->m_policy.GetInputSize());
 	
 					ndBrainFloat minReward = ndBrainFloat(1.0e10f);
@@ -222,9 +222,10 @@ void ndBrainAgentSoftActorCritic_Trainer::LearnPolicyFunction()
 					const ndBrainMemVector reparametizedActions(&m_owner->m_reparametizedActions[m_batchIndex], count);
 					for (ndInt32 i = count - 1; i >= 0; --i)
 					{
-						ndBrainFloat sigma = output[i + start];
+						ndBrainFloat sigma = probabilityDistribution[i + start];
 						ndBrainFloat invSigma = ndBrainFloat(1.0f) / sigma;;
-						ndBrainFloat z = output[i] - reparametizedActions[i];
+						//ndBrainFloat z = probabilityDistribution[i] - reparametizedActions[i];
+						ndBrainFloat z = reparametizedActions[i] - probabilityDistribution[i];
 						ndBrainFloat meanGrad = z * invSigma * invSigma;
 						ndBrainFloat sigmaGrad = z * z * invSigma * invSigma * invSigma - sigma;
 
