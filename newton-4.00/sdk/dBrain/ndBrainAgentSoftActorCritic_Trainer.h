@@ -42,8 +42,10 @@ class ndBrainAgentSoftActorCritic_Trainer : public ndBrainAgentDeterministicPoli
 	virtual void CalculateExpectedRewards() override;
 
 	ndBrainFloat CalculatePolicyProbability(ndInt32 index);
-	ndBrainFloat CalculateReparametarizedPolicyProbability(ndInt32 index);
+	//ndBrainFloat CalculateReparametarizedPolicyProbability(ndInt32 index);
 	ndBrainFloat CalculatePolicyProbability(ndInt32 index, const ndBrainVector& sampledActions);
+
+	ndBrainVector m_reparametizedActions;
 };
 
 #endif 

@@ -45,17 +45,21 @@ ndBrainFloat ndBrainAgentSoftActorCritic_Trainer::CalculatePolicyProbability(ndI
 	m_policy.MakePrediction(observation, distribution);
 
 	ndBrainFloat z2 = 0.0f;
-	ndFloat32 sigma = distribution[m_policy.GetOutputSize() - 1];
-	ndFloat32 sigma2 = sigma * sigma;
-	ndBrainFloat invSigma2 = ndBrainFloat(1.0f) / ndSqrt(2.0f * ndPi * sigma2);
 	ndBrainFloat invSigma2Det = ndBrainFloat(1.0f);
-	for (ndInt32 i = m_policy.GetOutputSize() - 2; i >= 0; --i)
+
+	const ndInt32 count = ndInt32(distribution.GetCount()) / 2;
+	const ndInt32 start = ndInt32(distribution.GetCount()) / 2;
+	ndFloat32 invSqrtPi = ndSqrt(1.0f / (2.0f * ndPi));
+	for (ndInt32 i = count - 1; i >= 0; --i)
 	{
-		ndBrainFloat z = sampledActions[i] - distribution[i];
+		ndFloat32 sigma = distribution[start + i];
+		ndBrainFloat invSigma = ndBrainFloat(1.0f) / sigma;
+		ndBrainFloat z = (sampledActions[i] - distribution[i]) * invSigma;
+
 		z2 += z * z;
-		invSigma2Det *= invSigma2;
+		invSigma2Det *= (invSqrtPi * invSigma);
 	}
-	ndBrainFloat exponent = ndBrainFloat(0.5f) * z2 / sigma2;
+	ndBrainFloat exponent = ndBrainFloat(0.5f) * z2;
 	ndBrainFloat prob = invSigma2Det * ndExp(-exponent);
 	return ndMax(prob, ndBrainFloat(1.0e-4f));
 }
@@ -65,17 +69,6 @@ ndBrainFloat ndBrainAgentSoftActorCritic_Trainer::CalculatePolicyProbability(ndI
 {
 	const ndBrainMemVector sampledProbabilities(m_replayBuffer.GetActions(index), m_policy.GetOutputSize());
 	return CalculatePolicyProbability(index, sampledProbabilities);
-}
-
-//#pragma optimize( "", off )
-ndBrainFloat ndBrainAgentSoftActorCritic_Trainer::CalculateReparametarizedPolicyProbability(ndInt32 index)
-{
-	ndBrainFixSizeVector<256> policyEntropyAction;
-	policyEntropyAction.SetCount(m_policy.GetOutputSize());
-	const ndBrainMemVector observation(m_replayBuffer.GetObservations(index), m_policy.GetInputSize());
-	m_policy.MakePrediction(observation, policyEntropyAction);
-	m_agent->SampleActions(policyEntropyAction);
-	return CalculatePolicyProbability(index, policyEntropyAction);
 }
 
 //#pragma optimize( "", off )
@@ -156,6 +149,7 @@ void ndBrainAgentSoftActorCritic_Trainer::CalculateExpectedRewards()
 void ndBrainAgentSoftActorCritic_Trainer::LearnPolicyFunction()
 {
 	ndAtomic<ndInt32> iterator(0);
+	m_reparametizedActions.SetCount(m_policy.GetOutputSize() * m_parameters.m_miniBatchSize);
 	for (ndInt32 n = m_parameters.m_policyUpdatesCount - 1; n >= 0; --n)
 	{
 		ndFixSizeArray<ndInt32, 1024> indirectBuffer;
@@ -164,24 +158,25 @@ void ndBrainAgentSoftActorCritic_Trainer::LearnPolicyFunction()
 			indirectBuffer.PushBack(m_shuffleBuffer[m_shuffleIndexBuffer]);
 			m_shuffleIndexBuffer = (m_shuffleIndexBuffer + 1) % ndInt32(m_shuffleBuffer.GetCount());
 		}
-
-		auto BackPropagateBatch = ndMakeObject::ndFunction([this, &iterator, &indirectBuffer](ndInt32 threadIndex, ndInt32)
+	
+		auto BackPropagateBatch = ndMakeObject::ndFunction([this, &iterator, &indirectBuffer](ndInt32, ndInt32)
 		{
 			class ndLoss : public ndBrainLossLeastSquaredError
 			{
 				public:
-				ndLoss(ndBrainAgentSoftActorCritic_Trainer* const owner, const ndInt32 index, ndInt32 m_threadIndex)
+				ndLoss(ndBrainAgentSoftActorCritic_Trainer* const owner, const ndInt32 index, ndInt32 batchIndex)
 					:ndBrainLossLeastSquaredError(1)
 					,m_criticLoss(owner, index)
 					,m_owner(owner)
 					,m_combinedActionObservation()
 					,m_index(index)
-					,m_threadIndex(m_threadIndex)
+					,m_batchIndex(batchIndex)
 				{
 					m_combinedInputGradients.SetCount(m_owner->m_policy.GetInputSize() + m_owner->m_policy.GetOutputSize());
+					m_tempCombinedInputGradients.SetCount(m_owner->m_policy.GetInputSize() + m_owner->m_policy.GetOutputSize());
 					m_combinedActionObservation.SetCount(m_owner->m_policy.GetInputSize() + m_owner->m_policy.GetOutputSize());
 				}
-
+	
 				class ndCriticLoss : public ndBrainLossLeastSquaredError
 				{
 					public:
@@ -189,51 +184,95 @@ void ndBrainAgentSoftActorCritic_Trainer::LearnPolicyFunction()
 						:ndBrainLossLeastSquaredError(1)
 						,m_owner(owner)
 						,m_index(index)
+						,m_saveQValue(ndBrainFloat(0.0f))
 					{
 					}
-
-					void GetLoss(const ndBrainVector&, ndBrainVector& loss)
+	
+					void GetLoss(const ndBrainVector& qValue, ndBrainVector& loss)
 					{
-						ndBrainFloat criticQvalueGradient = ndBrainFloat(1.0f);
-						ndBrainFloat policyProbability = m_owner->CalculateReparametarizedPolicyProbability(m_index);
-						ndBrainFloat policyGrad = m_owner->m_parameters.m_entropyRegularizerCoef / policyProbability;
-
-						// gradient ascend
-						ndBrainFloat grad = criticQvalueGradient - policyGrad;
-						loss[0] = -grad;
+						loss[0] = 1.0f;
+						m_saveQValue = qValue[0];
 					}
-
+	
 					ndBrainAgentSoftActorCritic_Trainer* m_owner;
 					ndInt32 m_index;
+					ndBrainFloat m_saveQValue;
 				};
-
+	
 				void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
 				{
-					ndMemCpy(&m_combinedActionObservation[0], &output[0], m_owner->m_policy.GetOutputSize());
+					ndMemCpy(&m_tempCombinedInputGradients[0], &m_owner->m_reparametizedActions[m_batchIndex * m_owner->m_policy.GetOutputSize()], m_owner->m_policy.GetOutputSize());
 					ndMemCpy(&m_combinedActionObservation[m_owner->m_policy.GetOutputSize()], m_owner->m_replayBuffer.GetNextObservations(m_index), m_owner->m_policy.GetInputSize());
-					m_owner->m_referenceCritic[0].CalculateInputGradient(m_combinedActionObservation, m_combinedInputGradients, m_criticLoss);
+	
+					ndBrainFloat minReward = ndBrainFloat(1.0e10f);
+					for (ndInt32 i = 0; i < sizeof(m_critic) / sizeof(m_critic[0]); ++i)
+					{
+						m_owner->m_critic[i].CalculateInputGradient(m_combinedActionObservation, m_tempCombinedInputGradients, m_criticLoss);
+						if (m_criticLoss.m_saveQValue < minReward)
+						{
+							minReward = m_criticLoss.m_saveQValue;
+							m_combinedInputGradients.Set(m_tempCombinedInputGradients);
+						}
+					}
 					ndMemCpy(&loss[0], &m_combinedInputGradients[0], loss.GetCount());
-				}
+					
+					// calculate and add the Gradient of entropy (grad of log probability)
+					const ndInt32 count = ndInt32(m_owner->m_policy.GetOutputSize()) / 2;
+					const ndInt32 start = ndInt32(m_owner->m_policy.GetOutputSize()) / 2;
+					const ndBrainMemVector reparametizedActions(&m_owner->m_reparametizedActions[m_batchIndex], count);
+					for (ndInt32 i = count - 1; i >= 0; --i)
+					{
+						ndBrainFloat sigma = output[i + start];
+						ndBrainFloat invSigma = ndBrainFloat(1.0f) / sigma;;
+						ndBrainFloat z = output[i] - reparametizedActions[i];
+						ndBrainFloat meanGrad = z * invSigma * invSigma;
+						ndBrainFloat sigmaGrad = z * z * invSigma * invSigma * invSigma - sigma;
 
+						loss[i] -= m_owner->m_parameters.m_entropyRegularizerCoef * meanGrad;
+						loss[i + start] -= m_owner->m_parameters.m_entropyRegularizerCoef * sigmaGrad;
+					}
+
+					// gradient ascend
+					loss.Scale(ndBrainFloat (-1.0f));
+				}
+	
 				ndCriticLoss m_criticLoss;
 				ndBrainAgentSoftActorCritic_Trainer* m_owner;
 				ndBrainFixSizeVector<256> m_combinedInputGradients;
 				ndBrainFixSizeVector<256> m_combinedActionObservation;
+				ndBrainFixSizeVector<256> m_tempCombinedInputGradients;
 				ndInt32 m_index;
-				ndInt32 m_threadIndex;
+				ndInt32 m_batchIndex;
 			};
-
+	
 			for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
 			{
 				const ndInt32 index = indirectBuffer[i];
 				ndBrainTrainer& trainer = *m_policyTrainers[i];
 				const ndBrainMemVector observation(m_replayBuffer.GetObservations(index), m_policy.GetInputSize());
-
-				ndLoss loss(this, index, threadIndex);
+	
+				ndLoss loss(this, index, i);
 				trainer.BackPropagate(observation, loss);
 			}
 		});
 
+		auto CalculateReparametizedSamples = ndMakeObject::ndFunction([this, &iterator, &indirectBuffer](ndInt32, ndInt32)
+		{
+			ndInt32 actiontSize = m_policy.GetOutputSize();
+			ndInt32 observationSize = m_policy.GetInputSize();
+			for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
+			{
+				const ndInt32 index = indirectBuffer[i];
+				const ndBrainMemVector observation(m_replayBuffer.GetObservations(index), observationSize);
+				ndBrainMemVector reparametizedAction(&m_reparametizedActions[i * actiontSize], actiontSize);
+				m_policy.MakePrediction(observation, reparametizedAction);
+				m_agent->SampleActions(reparametizedAction);
+			}
+		});
+
+		iterator = 0;
+		ndBrainThreadPool::ParallelExecute(CalculateReparametizedSamples);
+	
 		iterator = 0;
 		ndBrainThreadPool::ParallelExecute(BackPropagateBatch);
 		m_policyOptimizer->Update(this, m_policyTrainers, m_parameters.m_policyLearnRate);
