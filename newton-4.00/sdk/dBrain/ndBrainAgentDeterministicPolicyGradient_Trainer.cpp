@@ -64,8 +64,8 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 
 	m_randomSeed = 47;
 	m_actorHiddenLayers = 3;
-	m_policyUpdatesCount = 16;
-	m_criticUpdatesCount = 16;
+	m_policyUpdatesCount = 4;
+	m_criticUpdatesCount = 4;
 	m_maxTrajectorySteps = 1024 * 4;
 	m_hiddenLayersNumberOfNeurons = 64;
 	m_replayBufferStartOptimizeSize = m_maxTrajectorySteps * 4;
@@ -74,6 +74,8 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize);
 
 //m_threadsCount = 1;
+//m_policyUpdatesCount = 2;
+//m_criticUpdatesCount = 2;
 //m_maxTrajectorySteps = 100;
 }
 
@@ -518,6 +520,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::SaveTrajectory()
 			m_framesAlive = 0;
 			m_averageFramesPerEpisodes.Update(ndFloat32 (m_agent->m_trajectoryBaseCount));
 		}
+
 		m_agent->ResetModel();
 		m_agent->m_trajectory.SetCount(0);
 		m_agent->m_trajectoryBaseCount = 0;
