@@ -47,7 +47,7 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 	m_criticRegularizer = ndBrainFloat(1.0e-4f);
 	m_discountRewardFactor = ndBrainFloat(0.99f);
 
-	m_entropyRegularizerCoef = ndBrainFloat(0.1f);
+	m_entropyRegularizerCoef = ndBrainFloat(0.01f);
 	m_policyMovingAverageFactor = ndBrainFloat(0.005f);
 	m_criticMovingAverageFactor = ndBrainFloat(0.005f);
 
