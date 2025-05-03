@@ -77,11 +77,11 @@ void ndBrainAgentSoftActorCritic_Trainer::CalculateExpectedRewards()
 	ndInt32 count = m_parameters.m_criticUpdatesCount * m_parameters.m_miniBatchSize;
 	m_expectedRewards.SetCount(count);
 
-	m_expectedRewardsIndexBuffer.SetCount(0);
+	m_miniBatchIndexBuffer.SetCount(0);
 	for (ndInt32 i = 0; i < count; ++i)
 	{
-		m_expectedRewardsIndexBuffer.PushBack(m_shuffleBuffer[m_shuffleIndexBuffer]);
-		m_shuffleIndexBuffer = (m_shuffleIndexBuffer + 1) % ndInt32(m_shuffleBuffer.GetCount());
+		m_miniBatchIndexBuffer.PushBack(m_shuffleBuffer[m_shuffleBatchIndex]);
+		m_shuffleBatchIndex = (m_shuffleBatchIndex + 1) % ndInt32(m_shuffleBuffer.GetCount());
 	}
 
 	ndAtomic<ndInt32> iterator(0);
@@ -100,7 +100,7 @@ void ndBrainAgentSoftActorCritic_Trainer::CalculateExpectedRewards()
 			{
 				ndBrainFixSizeVector<ND_NUMBER_OF_CRITICS> rewards;
 				rewards.SetCount(0);
-				const ndInt32 index = m_expectedRewardsIndexBuffer[j];
+				const ndInt32 index = m_miniBatchIndexBuffer[j];
 				for (ndInt32 i = 0; i < sizeof(m_critic) / sizeof(m_critic[0]); ++i)
 				{
 					rewards.PushBack(m_replayBuffer.GetReward(index));
@@ -155,8 +155,8 @@ void ndBrainAgentSoftActorCritic_Trainer::LearnPolicyFunction()
 		ndFixSizeArray<ndInt32, 1024> indirectBuffer;
 		for (ndInt32 i = 0; i < m_parameters.m_miniBatchSize; ++i)
 		{
-			indirectBuffer.PushBack(m_shuffleBuffer[m_shuffleIndexBuffer]);
-			m_shuffleIndexBuffer = (m_shuffleIndexBuffer + 1) % ndInt32(m_shuffleBuffer.GetCount());
+			indirectBuffer.PushBack(m_shuffleBuffer[m_shuffleBatchIndex]);
+			m_shuffleBatchIndex = (m_shuffleBatchIndex + 1) % ndInt32(m_shuffleBuffer.GetCount());
 		}
 	
 		auto BackPropagateBatch = ndMakeObject::ndFunction([this, &iterator, &indirectBuffer](ndInt32, ndInt32)

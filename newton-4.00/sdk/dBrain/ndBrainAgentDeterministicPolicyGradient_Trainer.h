@@ -206,7 +206,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
 	ndSharedPtr<ndBrainOptimizerAdam> m_criticOptimizer[ND_NUMBER_OF_CRITICS];
 
 	ndBrainVector m_expectedRewards;
-	ndArray<ndInt32> m_expectedRewardsIndexBuffer;
+	ndArray<ndInt32> m_miniBatchIndexBuffer;
 	ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition m_replayBuffer;
 	ndBrainAgentDeterministicPolicyGradient_Agent* m_agent;
 	ndArray<ndInt32> m_shuffleBuffer;
@@ -217,7 +217,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
 	ndUnsigned32 m_eposideCount;
 	ndInt32 m_replayBufferIndex;
 	ndUnsigned32 ndPolycyDelayMod;
-	ndUnsigned32 m_shuffleIndexBuffer;
+	ndUnsigned32 m_shuffleBatchIndex;
 	bool m_startOptimization;
 
 	friend class ndBrainAgentDeterministicPolicyGradient_Agent;
