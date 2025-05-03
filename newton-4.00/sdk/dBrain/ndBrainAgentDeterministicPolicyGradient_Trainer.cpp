@@ -47,7 +47,7 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 	m_criticRegularizer = ndBrainFloat(1.0e-4f);
 	m_discountRewardFactor = ndBrainFloat(0.99f);
 
-	m_entropyRegularizerCoef = ndBrainFloat(0.005f);
+	m_entropyRegularizerCoef = ndBrainFloat(0.1f);
 	m_policyMovingAverageFactor = ndBrainFloat(0.005f);
 	m_criticMovingAverageFactor = ndBrainFloat(0.005f);
 
@@ -64,8 +64,8 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 
 	m_randomSeed = 47;
 	m_actorHiddenLayers = 3;
-	m_policyUpdatesCount = 8;
-	m_criticUpdatesCount = 8;
+	m_policyUpdatesCount = 16;
+	m_criticUpdatesCount = 16;
 	m_maxTrajectorySteps = 1024 * 4;
 	m_hiddenLayersNumberOfNeurons = 64;
 	m_replayBufferStartOptimizeSize = m_maxTrajectorySteps * 4;
