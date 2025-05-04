@@ -34,7 +34,7 @@ namespace ndUnicycle
 	#define ND_TERMINATION_ANGLE	(ndFloat32 (45.0f) * ndDegreeToRad)
 	#define ND_TRAJECTORY_STEPS		(1024 * 4)
 
-	//#define USE_SAC
+	#define USE_SAC
 
 	enum ndActionSpace
 	{
@@ -331,7 +331,6 @@ namespace ndUnicycle
 		//#pragma optimize( "", off )
 		bool IsTerminal() const
 		{
-			//bool fail = ndAbs(GetBoxAngle()) > ND_TERMINATION_ANGLE;
 			bool fail = ndAbs(GetPoleAngle()) > ND_TERMINATION_ANGLE;
 			return fail;
 		}
@@ -403,8 +402,9 @@ namespace ndUnicycle
 
 			auto PolynomialAccelerationReward = [](ndFloat32 alpha)
 			{
-				alpha = ndClamp(alpha, ndFloat32(-5.0f), ndFloat32(5.0f));
-				ndFloat32 r = ndFloat32(1.0f) - ndAbs(alpha) / ndFloat32(5.0f);
+				ndFloat32 maxAlpha = 10.0f;
+				alpha = ndClamp(alpha, maxAlpha, maxAlpha);
+				ndFloat32 r = ndFloat32(1.0f) - ndAbs(alpha) / maxAlpha;
 				ndFloat32 reward = r * r * r * r;
 				return reward;
 			};
