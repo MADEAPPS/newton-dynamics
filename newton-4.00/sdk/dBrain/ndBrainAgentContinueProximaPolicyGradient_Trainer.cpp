@@ -163,21 +163,8 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizedSurrogate
 	});
 	ndBrainThreadPool::ParallelExecute(ClearGradients);
 
-	if (m_trajectoryAccumulator.GetCount() < m_parameters.m_miniBatchSize)
-	{
-		ndInt32 padTransitions = m_parameters.m_miniBatchSize - m_trajectoryAccumulator.GetCount();
-		for (ndInt32 i = 0; i < padTransitions; ++i)
-		{
-			ndInt32 index = m_trajectoryAccumulator.GetCount();
-			m_trajectoryAccumulator.SetCount(index + 1);
-			m_trajectoryAccumulator.CopyFrom(index, m_trajectoryAccumulator, i);
-
-			ndBrainFloat advantage = m_advantage[i];
-			m_advantage.PushBack(advantage);
-		}
-	}
-
 	const ndInt32 steps = m_trajectoryAccumulator.GetCount() & -m_parameters.m_miniBatchSize;
+	ndBrainFloat gradientScale = ndBrainFloat(m_parameters.m_miniBatchSize) / ndBrainFloat(steps);
 	for (ndInt32 base = 0; base < steps; base += m_parameters.m_miniBatchSize)
 	{
 		auto CalculateGradients = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
@@ -251,12 +238,13 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizedSurrogate
 			}
 		});
 
-		auto AddGradients = ndMakeObject::ndFunction([this, &iterator](ndInt32, ndInt32)
+		auto AddGradients = ndMakeObject::ndFunction([this, &iterator, gradientScale](ndInt32, ndInt32)
 		{
 			for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
 			{
 				ndBrainTrainer* const trainer = m_policyTrainers[i];
-				const ndBrainTrainer* const auxiliaryTrainer = m_policyAuxiliaryTrainers[i];
+				ndBrainTrainer* const auxiliaryTrainer = m_policyAuxiliaryTrainers[i];
+				auxiliaryTrainer->ScaleWeights(gradientScale);
 				trainer->AddGradients(auxiliaryTrainer);
 			}
 		});
@@ -267,9 +255,10 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizedSurrogate
 		ndBrainThreadPool::ParallelExecute(AddGradients);
 	}
 
-	m_policyOptimizer->AccumulateGradients(this, m_policyTrainers);
-	m_policyWeightedTrainer[0]->ScaleWeights(ndBrainFloat(1.0f) / ndBrainFloat(steps));
-	m_policyOptimizer->Update(this, m_policyWeightedTrainer, m_parameters.m_policyLearnRate);
+	//m_policyOptimizer->AccumulateGradients(this, m_policyTrainers);
+	//m_policyWeightedTrainer[0]->ScaleWeights(ndBrainFloat(1.0f) / ndBrainFloat(steps));
+	//m_policyOptimizer->Update(this, m_policyWeightedTrainer, m_parameters.m_policyLearnRate);
+	m_policyOptimizer->Update(this, m_policyTrainers, m_parameters.m_policyLearnRate);
 }
 
 void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateAdvange()
@@ -297,7 +286,7 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateAdvange()
 	}
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::Optimize()
 {
 	ndAtomic<ndInt32> iterator(0);
@@ -318,7 +307,6 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::Optimize()
 	});
 	ndBrainThreadPool::ParallelExecute(CalculateActionsDistribution);
 	
-	OptimizeCritic();
 	CalculateAdvange();
 	OptimizePolicy();
 	ndBrainFloat divergence = CalculateKLdivergence();
@@ -327,4 +315,5 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::Optimize()
 		OptimizedSurrogate();
 		divergence = CalculateKLdivergence();
 	}
+	OptimizeCritic();
 }
