@@ -401,49 +401,29 @@ namespace ndUnicycle
 			m_wheel->SetTorque(savedTorque);
 			m_wheelJoint->SetAsSpringDamper(ndFloat32(0.0), ndFloat32(0.0f), ndFloat32(0.0f));
 
-			auto AccelerationRewardLinearPenalty = [](ndFloat32 alpha)
+			auto PolynomialAccelerationReward = [](ndFloat32 alpha)
 			{
-				ndFloat32 reward = ndFloat32(1.0f) - ndAbs(alpha) / ndFloat32(5.0f);
-				if (reward < ndFloat32(0.0f))
-				{
-					reward = ndFloat32(0.0f);
-				}
-				if (reward > ndFloat32(1.0f))
-				{
-					reward = ndFloat32(1.0f);
-				}
+				alpha = ndClamp(alpha, ndFloat32(-5.0f), ndFloat32(5.0f));
+				ndFloat32 r = ndFloat32(1.0f) - ndAbs(alpha) / ndFloat32(5.0f);
+				ndFloat32 reward = r * r * r * r;
 				return reward;
 			};
 
-			auto AccelerationRewardGaussianPenalty = [](ndFloat32 alpha)
+			auto PolynomialAngleReward = [](ndFloat32 angle)
 			{
-				//ndFloat32 reward = ndReal(ndExp(-ndFloat32(1.0e-1f) * alpha * alpha));
-				ndFloat32 reward = ndReal(ndExp(-ndFloat32(0.5f) * alpha * alpha));
+				angle = ndClamp(angle, -ND_TERMINATION_ANGLE, ND_TERMINATION_ANGLE);
+				ndFloat32 r = ndFloat32(1.0f) - ndAbs(angle) / ND_TERMINATION_ANGLE;
+				ndFloat32 reward = r * r * r * r;
 				return reward;
 			};
 
 			const ndVector wheelMass(m_wheel->GetMassMatrix());
 			ndFloat32 alphaError = savedTorque.m_z / wheelMass.m_z - wheelAlpha.m_z;
-			//ndFloat32 alphaReward = AccelerationRewardGaussianPenalty(alphaError);
-			ndFloat32 alphaReward = AccelerationRewardLinearPenalty(alphaError);
+			ndFloat32 alphaReward = PolynomialAccelerationReward(alphaError);
 
 			ndFloat32 poleAngle = GetPoleAngle();
-			ndFloat32 poleReward = ndFloat32(ndExp(-ndFloat32(500.0f) * poleAngle * poleAngle));
+			ndFloat32 poleReward = PolynomialAngleReward(poleAngle);
 
-			//ndFloat32 speedReward = ndFloat32(1.0f);
-			//if ((alphaReward > ndFloat32(0.98f)) && (poleReward > ndFloat32(0.98f)))
-			//{
-			//	const ndVector velocDir(poleMatrix.m_front.CrossProduct(ndVector(0.0f, 1.0f, 0.0f, 0.0f)));
-			//	ndFloat32 wheelSpeed = m_wheel->GetVelocity().DotProduct(velocDir).GetScalar();
-			//	//speedReward = ndFloat32(ndExp(-ndFloat32(10.0f) * wheelSpeed * wheelSpeed));
-			//}
-			//ndFloat32 reward = 0.25f * poleReward + 0.25f * speedReward + 0.5f * alphaReward;
-
-			//ndFloat32 robotSpeed = CalculateComSpeed();
-			//ndFloat32 speedReward = ndFloat32(ndExp(-ndFloat32(100.0f) * robotSpeed * robotSpeed));
-			//poleReward = 0.0f;
-
-			//ndFloat32 reward = 0.25f * poleReward + 0.25f * speedReward + 0.5f * alphaReward;
 			ndFloat32 reward = 0.5f * poleReward + 0.5f * alphaReward;
 			if (IsOnAir())
 			{
