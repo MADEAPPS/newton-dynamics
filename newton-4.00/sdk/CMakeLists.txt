@@ -117,10 +117,8 @@ else()
 	endif()
     
 	if (MSVC)
-		if (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
-			set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YundCoreStdafx.h")
-			set_source_files_properties(dCore/ndCoreStdAfx.cpp PROPERTIES COMPILE_FLAGS "/YcndCoreStdafx.h")
-		endif()
+		set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YundCoreStdafx.h")
+		set_source_files_properties(dCore/ndCoreStdAfx.cpp PROPERTIES COMPILE_FLAGS "/YcndCoreStdafx.h")
 
 		if (NEWTON_BUILD_SHARED_LIBS)
 			add_custom_command(
