@@ -526,6 +526,19 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::SaveTrajectory()
 			m_eposideCount++;
 			m_framesAlive = 0;
 			m_averageFramesPerEpisodes.Update(ndFloat32 (m_agent->m_trajectoryBaseCount));
+
+			// using the Bellman equation to calculate trajectory rewards. (Monte Carlo method)
+			ndBrainFloat gamma = m_parameters.m_discountRewardFactor;
+			ndBrainFloat stateReward = m_agent->m_trajectory.GetReward(m_agent->m_trajectory.GetCount() - 1);
+			ndBrainFloat averageReward = stateReward;
+			for (ndInt32 i = m_agent->m_trajectory.GetCount() - 2; i >= 0; --i)
+			{
+				ndBrainFloat r = m_agent->m_trajectory.GetReward(i);
+				stateReward = r + gamma * stateReward;
+				averageReward += stateReward;
+			}
+			averageReward /= ndBrainFloat(m_agent->m_trajectory.GetCount());
+			m_averageExpectedRewards.Update(averageReward);
 		}
 
 		m_agent->ResetModel();
@@ -629,14 +642,6 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 		}
 	});
 	ndBrainThreadPool::ParallelExecute(ExpectedRewards);
-
-	ndFloat32 rewardSum = 0.0f;
-	for (ndInt32 i = ndInt32 (m_expectedRewards.GetCount()) - 1; i >= 0; --i)
-	{
-		rewardSum += m_expectedRewards[i];
-	}
-	ndFloat32 averageReward = rewardSum / ndFloat32(m_expectedRewards.GetCount());
-	m_averageExpectedRewards.Update(averageReward);
 }
 
 //#pragma optimize( "", off )

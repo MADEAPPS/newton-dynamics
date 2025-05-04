@@ -143,14 +143,6 @@ void ndBrainAgentSoftActorCritic_Trainer::CalculateExpectedRewards()
 		}
 	});
 	ndBrainThreadPool::ParallelExecute(ExpectedRewards);
-
-	ndFloat32 rewardSum = 0.0f;
-	for (ndInt32 i = ndInt32(m_expectedRewards.GetCount()) - 1; i >= 0; --i)
-	{
-		rewardSum += m_expectedRewards[i];
-	}
-	ndFloat32 averageReward = rewardSum / ndFloat32(m_expectedRewards.GetCount());
-	m_averageExpectedRewards.Update(averageReward);
 }
 
 #pragma optimize( "", off )
