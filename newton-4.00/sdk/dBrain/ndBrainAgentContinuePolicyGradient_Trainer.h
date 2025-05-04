@@ -155,8 +155,6 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndBrainOptimizer::ndRegularizerType m_regularizerType;
 
 		bool m_useFixSigma;
-
-		bool m_useConstantBaseLineStateValue;
 	};
 
 	class MemoryStateValues: protected ndBrainVector

@@ -61,7 +61,6 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 	m_regularizerType = ndBrainOptimizer::m_ridge;
 	
 	m_useFixSigma = false;
-	m_useConstantBaseLineStateValue = false;
 	m_actionFixSigma = ND_CONTINUE_POLICY_FIX_SIGMA;
 
 	m_discountRewardFactor = ndBrainFloat(0.99f);
@@ -71,7 +70,6 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 //m_threadsCount = 1;
 //m_useFixSigma = true;
 //m_batchTrajectoryCount = 2;
-//m_useConstantBaseLineStateValue = false;
 }
 
 //*********************************************************************************************
@@ -292,10 +290,10 @@ void ndBrainAgentContinuePolicyGradient_Agent::SampleActions(ndBrainVector& acti
 	for (ndInt32 i = count - 1; i >= 0; --i)
 	{
 		ndFloat32 sigma = actions[start + i];
-		ndBrainFloat unitVar = generator.m_d(generator.m_gen);
-		ndBrainFloat sample = ndBrainFloat(actions[i]) + unitVar * sigma;
-		ndBrainFloat squashedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
-		actions[i] = squashedAction;
+		ndBrainFloat unitVarianceSample = generator.m_d(generator.m_gen);
+		ndBrainFloat sample = ndBrainFloat(actions[i]) + unitVarianceSample * sigma;
+		ndBrainFloat clippedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
+		actions[i] = clippedAction;
 	}
 }
 
@@ -606,72 +604,69 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildCriticClass()
 //#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 {
-	if (!m_parameters.m_useConstantBaseLineStateValue)
+	m_randomPermutation.SetCount(m_trajectoryAccumulator.GetCount() - 1);
+	for (ndInt32 i = ndInt32(m_randomPermutation.GetCount()) - 1; i >= 0; --i)
 	{
-		m_randomPermutation.SetCount(m_trajectoryAccumulator.GetCount() - 1);
-		for (ndInt32 i = ndInt32(m_randomPermutation.GetCount()) - 1; i >= 0; --i)
+		m_randomPermutation[i] = i;
+	}
+	if (m_randomPermutation.GetCount() < m_parameters.m_miniBatchSize)
+	{
+		ndInt32 mod = ndInt32(m_randomPermutation.GetCount());
+		ndInt32 padding = m_parameters.m_miniBatchSize - ndInt32(m_randomPermutation.GetCount());
+		for (ndInt32 i = 0; i < padding; ++i)
 		{
-			m_randomPermutation[i] = i;
+			m_randomPermutation.PushBack(i % mod);
 		}
-		if (m_randomPermutation.GetCount() < m_parameters.m_miniBatchSize)
-		{
-			ndInt32 mod = ndInt32(m_randomPermutation.GetCount());
-			ndInt32 padding = m_parameters.m_miniBatchSize - ndInt32(m_randomPermutation.GetCount());
-			for (ndInt32 i = 0; i < padding; ++i)
-			{
-				m_randomPermutation.PushBack(i % mod);
-			}
-		}
+	}
 
-		// generalize state value function, in theory more noisy but yields better results than Monte Carlos.
-		if (m_randomPermutation.GetCount() > ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE)
-		{
-			m_randomPermutation.SetCount(ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE);
-		}
-		else
-		{
-			m_randomPermutation.SetCount(m_randomPermutation.GetCount() & -m_parameters.m_miniBatchSize);
-		}
+	// generalize state value function, in theory more noisy but yields better results than Monte Carlos.
+	if (m_randomPermutation.GetCount() > ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE)
+	{
+		m_randomPermutation.SetCount(ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE);
+	}
+	else
+	{
+		m_randomPermutation.SetCount(m_randomPermutation.GetCount() & -m_parameters.m_miniBatchSize);
+	}
 
-		ndAtomic<ndInt32> iterator(0);
-		for (ndInt32 i = 0; i < ND_CONTINUE_POLICY_STATE_VALUE_ITERATIONS; ++i)
+	ndAtomic<ndInt32> iterator(0);
+	for (ndInt32 i = 0; i < ND_CONTINUE_POLICY_STATE_VALUE_ITERATIONS; ++i)
+	{
+		m_randomPermutation.RandomShuffle(m_randomPermutation.GetCount());
+		for (ndInt32 base = 0; base < m_randomPermutation.GetCount(); base += m_parameters.m_miniBatchSize)
 		{
-			m_randomPermutation.RandomShuffle(m_randomPermutation.GetCount());
-			for (ndInt32 base = 0; base < m_randomPermutation.GetCount(); base += m_parameters.m_miniBatchSize)
+			auto BackPropagateBatch = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
 			{
-				auto BackPropagateBatch = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
+				ndBrainLossLeastSquaredError loss(1);
+				ndBrainFixSizeVector<1> stateValue;
+				ndBrainFixSizeVector<1> stateQValue;
+
+				// calculate GAE(l, 1) // very, very noisy
+				// calculate GAE(l, 0) // too smooth, and does not work either
+				ndFloat32 gamma = m_parameters.m_discountRewardFactor * m_parameters.m_generalizedAdvangeDiscount;
+
+				for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
 				{
-					ndBrainLossLeastSquaredError loss(1);
-					ndBrainFixSizeVector<1> stateValue;
-					ndBrainFixSizeVector<1> stateQValue;
+					const ndInt32 index = m_randomPermutation[base + i];
+					ndBrainTrainer& trainer = *m_criticTrainers[i];
 
-					// calculate GAE(l, 1) // very, very noisy
-					// calculate GAE(l, 0) // too smooth, and does not work either
-					ndFloat32 gamma = m_parameters.m_discountRewardFactor * m_parameters.m_generalizedAdvangeDiscount;
-
-					for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
+					stateValue[0] = m_trajectoryAccumulator.GetReward(index);
+					if (!m_trajectoryAccumulator.GetTerminalState(index))
 					{
-						const ndInt32 index = m_randomPermutation[base + i];
-						ndBrainTrainer& trainer = *m_criticTrainers[i];
-
-						stateValue[0] = m_trajectoryAccumulator.GetReward(index);
-						if (!m_trajectoryAccumulator.GetTerminalState(index))
-						{
-							const ndBrainMemVector nextObservation(m_trajectoryAccumulator.GetNextObservations(index), m_parameters.m_numberOfObservations);
-							m_critic.MakePrediction(nextObservation, stateQValue);
-							stateValue[0] += gamma * stateQValue[0];
-						}
-
-						loss.SetTruth(stateValue);
-						const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(index), m_parameters.m_numberOfObservations);
-						trainer.BackPropagate(observation, loss);
+						const ndBrainMemVector nextObservation(m_trajectoryAccumulator.GetNextObservations(index), m_parameters.m_numberOfObservations);
+						m_critic.MakePrediction(nextObservation, stateQValue);
+						stateValue[0] += gamma * stateQValue[0];
 					}
-				});
 
-				iterator = 0;
-				ndBrainThreadPool::ParallelExecute(BackPropagateBatch);
-				m_criticOptimizer->Update(this, m_criticTrainers, m_parameters.m_criticLearnRate);
-			}
+					loss.SetTruth(stateValue);
+					const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(index), m_parameters.m_numberOfObservations);
+					trainer.BackPropagate(observation, loss);
+				}
+			});
+
+			iterator = 0;
+			ndBrainThreadPool::ParallelExecute(BackPropagateBatch);
+			m_criticOptimizer->Update(this, m_criticTrainers, m_parameters.m_criticLearnRate);
 		}
 	}
 }
@@ -679,137 +674,46 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 //#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::CalculateAdvange()
 {
-	if (m_parameters.m_useConstantBaseLineStateValue)
+	ndBrainFloat averageSum = ndBrainFloat(0.0f);
+	const ndInt32 stepNumber = m_trajectoryAccumulator.GetCount();
+	for (ndInt32 i = stepNumber - 1; i >= 0; --i)
 	{
-		ndFloat64 averageSum = ndBrainFloat(0.0f);
-		const ndInt32 stepNumber = m_trajectoryAccumulator.GetCount();
-		for (ndInt32 i = 0; i < stepNumber; ++i)
-		{
-			ndFloat32 expectedReward = m_trajectoryAccumulator.GetExpectedReward(i);
-			averageSum += expectedReward;
-		}
-		ndFloat32 baseLineReward = ndFloat32(averageSum / ndFloat32(stepNumber));
-		m_averageExpectedRewards.Update(baseLineReward);
-		m_averageFramesPerEpisodes.Update(ndFloat32(stepNumber) / ndFloat32(m_parameters.m_batchTrajectoryCount));
-
-#if 0
-		// using minimum variance normalization. 
-		// I actually see far more oscillation of variance with this method that just fitting a unit Gaussian 	
-		ndAtomic<ndInt32> iterator(0);
-		m_advantage.SetCount(m_trajectoryAccumulator.GetCount());
-		auto CalculateMinimumVariaceBaseLine = ndMakeObject::ndFunction([this, &iterator](ndInt32, ndInt32)
-		{
-			ndBrainFixSizeVector<256> probabilities;
-			ndInt32 numberOfActions = m_policy.GetOutputSize();
-			ndInt32 numberOfObservations = m_policy.GetInputSize();
-			probabilities.SetCount(numberOfActions);
-
-			ndInt32 const count = m_trajectoryAccumulator.GetCount();
-			for (ndInt32 i = iterator.fetch_add(m_parameters.m_miniBatchSize); i < count; i = iterator.fetch_add(m_parameters.m_miniBatchSize))
-			{
-				const ndInt32 batchCount = ((i + m_parameters.m_miniBatchSize) < m_trajectoryAccumulator.GetCount()) ? m_parameters.m_miniBatchSize : m_trajectoryAccumulator.GetCount() - i;
-				for (ndInt32 k = 0; k < batchCount; ++k)
-				{
-					ndInt32 index = i + k;
-					const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(index), numberOfObservations);
-					m_policy.MakePrediction(observation, probabilities);
-
-					ndBrainFloat z2 = 0.0f;
-					const ndBrainMemVector sampledProbabilities(m_trajectoryAccumulator.GetActions(index), numberOfActions);
-					ndBrainFloat sigma2 = probabilities[numberOfActions - 1];
-					ndBrainFloat invSigma2 = ndBrainFloat(1.0f) / ndSqrt(2.0f * ndPi * sigma2);
-					ndBrainFloat invSigma2Det = ndBrainFloat(1.0f);
-					for (ndInt32 j = numberOfActions - 2; j >= 0; --j)
-					{
-						ndBrainFloat z = sampledProbabilities[j] - probabilities[j];
-						z2 += z * z;
-						invSigma2Det *= invSigma2;
-					}
-					ndBrainFloat exponent = ndBrainFloat(0.5f) * z2 / sigma2;
-					ndBrainFloat prob = invSigma2Det * ndExp(-exponent);
-					ndBrainFloat logProb = ndLog(prob);
-					m_advantage[index] = logProb * logProb;
-				}
-			}
-		});
-		ndBrainThreadPool::ParallelExecute(CalculateMinimumVariaceBaseLine);
-
-		ndBrainFloat logProbSum2 = 1.0e-4f;
-		ndBrainFloat logProbSum2Reward = 0.0f;
-		for (ndInt32 i = ndInt32(m_advantage.GetCount()) - 1; i >= 0; --i)
-		{
-			ndBrainFloat variace2 = m_advantage[i];
-			logProbSum2 += variace2;
-			logProbSum2Reward += variace2 * m_trajectoryAccumulator.GetExpectedReward(i);
-		}
-
-		ndBrainFloat baseLine = logProbSum2Reward / logProbSum2;
-		for (ndInt32 i = ndInt32(m_advantage.GetCount()) - 1; i >= 0; --i)
-		{
-			m_advantage[i] = m_trajectoryAccumulator.GetExpectedReward(i) - baseLine;
-		}
-#else
-		// just fit a unit Gaussian, reduces variance, 
-		// so far, it seems more stable that all other methods.
-		ndFloat64 varianceSum2 = ndBrainFloat(0.0f);
-		for (ndInt32 i = 0; i < stepNumber; ++i)
-		{
-			ndFloat32 expectedReward = m_trajectoryAccumulator.GetExpectedReward(i);
-			varianceSum2 += expectedReward * expectedReward;
-		}
-		m_advantage.SetCount(0);
-		ndFloat32 variance = ndSqrt(ndMax(ndFloat32(varianceSum2 / ndFloat32(stepNumber)), ndFloat32(1.0e-4f)));
-		ndFloat32 invVariance = ndBrainFloat(1.0f) / variance;
-		for (ndInt32 i = 0; i < stepNumber; ++i)
-		{
-			ndFloat32 expectedReward = m_trajectoryAccumulator.GetExpectedReward(i);
-			m_advantage.PushBack((expectedReward - baseLineReward) * invVariance);
-		}
-#endif
+		averageSum += m_trajectoryAccumulator.GetExpectedReward(i);
 	}
-	else
+	m_averageExpectedRewards.Update(averageSum / ndBrainFloat(stepNumber));
+	m_averageFramesPerEpisodes.Update(ndBrainFloat(stepNumber) / ndBrainFloat(m_parameters.m_batchTrajectoryCount));
+
+	ndAtomic<ndInt32> iterator(0);
+	m_advantage.SetCount(m_trajectoryAccumulator.GetCount());
+
+	m_workingBuffer.SetCount(m_baseValueWorkingBufferSize * GetThreadCount());
+	auto CalculateAdvantage = ndMakeObject::ndFunction([this, &iterator](ndInt32 threadIndex, ndInt32)
 	{
-		ndBrainFloat averageSum = ndBrainFloat(0.0f);
-		const ndInt32 stepNumber = m_trajectoryAccumulator.GetCount();
-		for (ndInt32 i = stepNumber - 1; i >= 0; --i)
+		// using Monte Carlos 
+		ndBrainFixSizeVector<1> actions;
+		ndBrainMemVector workingBuffer(&m_workingBuffer[threadIndex * m_baseValueWorkingBufferSize], m_baseValueWorkingBufferSize);
+
+		ndInt32 const count = m_trajectoryAccumulator.GetCount();
+		for (ndInt32 i = iterator++; i < count; i = iterator++)
 		{
-			averageSum += m_trajectoryAccumulator.GetExpectedReward(i);
+			const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(i), m_parameters.m_numberOfObservations);
+			m_critic.MakePrediction(observation, actions, workingBuffer);
+			ndBrainFloat stateQValue = actions[0];
+
+			// calculate GAE(l, 1) // very, very noisy
+			//ndBrainFloat trajectoryExpectedReward = m_trajectoryAccumulator.GetExpectedReward(i);
+			//ndBrainFloat advantage = trajectoryExpectedReward - stateValue;
+
+			// calculate GAE(l, 0) // too smooth, and does not work either
+			const ndBrainMemVector nextObservation(m_trajectoryAccumulator.GetNextObservations(i), m_parameters.m_numberOfObservations);
+			m_critic.MakePrediction(nextObservation, actions, workingBuffer);
+			ndBrainFloat nextStateQValue = actions[0];
+			ndBrainFloat advantage = m_trajectoryAccumulator.GetReward(i) + nextStateQValue - stateQValue;
+
+			m_advantage[i] = advantage;
 		}
-		m_averageExpectedRewards.Update(averageSum / ndBrainFloat(stepNumber));
-		m_averageFramesPerEpisodes.Update(ndBrainFloat(stepNumber) / ndBrainFloat(m_parameters.m_batchTrajectoryCount));
-
-		ndAtomic<ndInt32> iterator(0);
-		m_advantage.SetCount(m_trajectoryAccumulator.GetCount());
-
-		m_workingBuffer.SetCount(m_baseValueWorkingBufferSize * GetThreadCount());
-		auto CalculateAdvantage = ndMakeObject::ndFunction([this, &iterator](ndInt32 threadIndex, ndInt32)
-		{
-			// using Monte Carlos 
-			ndBrainFixSizeVector<1> actions;
-			ndBrainMemVector workingBuffer(&m_workingBuffer[threadIndex * m_baseValueWorkingBufferSize], m_baseValueWorkingBufferSize);
-
-			ndInt32 const count = m_trajectoryAccumulator.GetCount();
-			for (ndInt32 i = iterator++; i < count; i = iterator++)
-			{
-				const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(i), m_parameters.m_numberOfObservations);
-				m_critic.MakePrediction(observation, actions, workingBuffer);
-				ndBrainFloat stateQValue = actions[0];
-
-				// calculate GAE(l, 1) // very, very noisy
-				//ndBrainFloat trajectoryExpectedReward = m_trajectoryAccumulator.GetExpectedReward(i);
-				//ndBrainFloat advantage = trajectoryExpectedReward - stateValue;
-
-				// calculate GAE(l, 0) // too smooth, and does not work either
-				const ndBrainMemVector nextObservation(m_trajectoryAccumulator.GetNextObservations(i), m_parameters.m_numberOfObservations);
-				m_critic.MakePrediction(nextObservation, actions, workingBuffer);
-				ndBrainFloat nextStateQValue = actions[0];
-				ndBrainFloat advantage1 = m_trajectoryAccumulator.GetReward(i) + nextStateQValue - stateQValue;
-
-				m_advantage[i] = advantage1;
-			}
-		});
-		ndBrainThreadPool::ParallelExecute(CalculateAdvantage);
-	}
+	});
+	ndBrainThreadPool::ParallelExecute(CalculateAdvantage);
 
 	if (m_advantage.GetCount() < m_parameters.m_miniBatchSize)
 	{
@@ -855,7 +759,6 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 	const ndInt32 steps = m_trajectoryAccumulator.GetCount() & -m_parameters.m_miniBatchSize;
 	for (ndInt32 base = 0; base < steps; base += m_parameters.m_miniBatchSize)
 	{
-
 		auto CalculateGradients = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
 		{
 			class MaxLikelihoodLoss : public ndBrainLoss
