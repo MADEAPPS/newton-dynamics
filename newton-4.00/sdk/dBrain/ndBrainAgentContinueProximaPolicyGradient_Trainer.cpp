@@ -30,11 +30,15 @@
 #define ND_CONTINUE_PROXIMA_POLICY_KL_DIVERGENCE		ndBrainFloat(0.001f)
 #define ND_CONTINUE_PROXIMA_POLICY_CLIP_EPSILON			ndBrainFloat(0.2f)
 
+#define ND_CONTINUE_PROXIMA_POLICY_ENTROPY_CONFICIENT	ndBrainFloat (2.0e-5f)
+
 ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(const HyperParameters& hyperParameters)
 	:ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters)
 	,m_policyActions()
 	,m_referenceProbability()
 {
+	ndBrainFloat unitEntropy = ndClamp(m_parameters.m_entropyRegularizerCoef, ndBrainFloat(0.0f), ndBrainFloat(1.0f));
+	m_parameters.m_entropyRegularizerCoef = ND_CONTINUE_PROXIMA_POLICY_ENTROPY_CONFICIENT * unitEntropy;
 }
 
 ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::~ndBrainAgentContinueProximaPolicyGradient_TrainerMaster()

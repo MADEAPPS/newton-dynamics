@@ -53,12 +53,16 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 	m_miniBatchSize = 256;
 	m_numberOfActions = 0;
 	m_numberOfObservations = 0;
+
 	m_policyLearnRate = ndBrainFloat(1.0e-4f);
 	m_criticLearnRate = m_policyLearnRate * ndBrainFloat(0.5f);
+	m_entropyRegularizerCoef = ndBrainFloat(0.25f);
 
 	m_policyRegularizer = ndBrainFloat(1.0e-4f);
 	m_criticRegularizer = ndBrainFloat(5.0e-3f);
-	m_regularizerType = ndBrainOptimizer::m_ridge;
+
+	m_policyRegularizerType = ndBrainOptimizer::m_ridge;
+	m_criticRegularizerType = ndBrainOptimizer::m_ridge;
 	
 	m_useFixSigma = false;
 	m_actionFixSigma = ND_CONTINUE_POLICY_FIX_SIGMA;
@@ -552,7 +556,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildPolicyClass()
 
 	m_policyOptimizer = ndSharedPtr<ndBrainOptimizerAdam> (new ndBrainOptimizerAdam());
 	m_policyOptimizer->SetRegularizer(m_parameters.m_policyRegularizer);
-	m_policyOptimizer->SetRegularizerType(m_parameters.m_regularizerType);
+	m_policyOptimizer->SetRegularizerType(m_parameters.m_policyRegularizerType);
 
 	m_trajectoryAccumulator.Init(m_policy.GetOutputSize(), m_policy.GetInputSize());
 }
@@ -593,7 +597,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildCriticClass()
 
 	m_criticOptimizer = ndSharedPtr<ndBrainOptimizerAdam> (new ndBrainOptimizerAdam());
 	m_criticOptimizer->SetRegularizer(m_parameters.m_criticRegularizer);
-	m_criticOptimizer->SetRegularizerType(m_parameters.m_regularizerType);
+	m_criticOptimizer->SetRegularizerType(m_parameters.m_criticRegularizerType);
 
 	m_baseValueWorkingBufferSize = m_critic.CalculateWorkingBufferSize();
 	m_workingBuffer.SetCount(m_baseValueWorkingBufferSize * m_parameters.m_threadsCount);

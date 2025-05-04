@@ -27,13 +27,13 @@
 #include "ndBrainLossLeastSquaredError.h"
 #include "ndBrainAgentSoftActorCritic_Trainer.h"
 
-#define ND_MAX_ENTROPY_CONFICIENT	ndBrainFloat (2.0e-5f)
+#define ND_MAX_SAC_ENTROPY_CONFICIENT	ndBrainFloat (2.0e-5f)
 
 ndBrainAgentSoftActorCritic_Trainer::ndBrainAgentSoftActorCritic_Trainer(const HyperParameters& parameters)
 	:ndBrainAgentDeterministicPolicyGradient_Trainer(parameters)
 {
 	ndBrainFloat unitEntropy = ndClamp(m_parameters.m_entropyRegularizerCoef, ndBrainFloat(0.0f), ndBrainFloat(1.0f));
-	m_parameters.m_entropyRegularizerCoef = ND_MAX_ENTROPY_CONFICIENT * unitEntropy;
+	m_parameters.m_entropyRegularizerCoef = ND_MAX_SAC_ENTROPY_CONFICIENT * unitEntropy;
 }
 
 ndBrainAgentSoftActorCritic_Trainer::~ndBrainAgentSoftActorCritic_Trainer()

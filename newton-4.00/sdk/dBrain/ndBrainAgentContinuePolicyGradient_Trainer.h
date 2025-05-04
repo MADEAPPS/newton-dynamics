@@ -140,7 +140,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndBrainFloat m_generalizedAdvangeDiscount;
 
 		ndBrainFloat m_actionFixSigma;
-		//ndBrainFloat m_actionVariableSigma;
+		ndBrainFloat m_entropyRegularizerCoef;
 
 		ndInt32 m_threadsCount;
 		ndInt32 m_numberOfActions;
@@ -152,9 +152,10 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndInt32 m_batchTrajectoryCount;
 		ndInt32 m_hiddenLayersNumberOfNeurons;
 		ndUnsigned32 m_randomSeed;
-		ndBrainOptimizer::ndRegularizerType m_regularizerType;
 
 		bool m_useFixSigma;
+		ndBrainOptimizer::ndRegularizerType m_policyRegularizerType;
+		ndBrainOptimizer::ndRegularizerType m_criticRegularizerType;
 	};
 
 	class MemoryStateValues: protected ndBrainVector
@@ -198,7 +199,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	public:
 	ndBrain m_policy;
 	ndBrain m_critic;
-	const HyperParameters m_parameters;
+	HyperParameters m_parameters;
 	ndArray<ndBrainTrainer*> m_criticTrainers;
 	ndArray<ndBrainTrainer*> m_policyTrainers;
 	ndArray<ndBrainTrainer*> m_policyAuxiliaryTrainers;
