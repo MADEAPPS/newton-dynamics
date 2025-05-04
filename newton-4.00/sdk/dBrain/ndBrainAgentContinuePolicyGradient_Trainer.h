@@ -201,7 +201,6 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	const HyperParameters m_parameters;
 	ndArray<ndBrainTrainer*> m_criticTrainers;
 	ndArray<ndBrainTrainer*> m_policyTrainers;
-	ndArray<ndBrainTrainer*> m_policyWeightedTrainer;
 	ndArray<ndBrainTrainer*> m_policyAuxiliaryTrainers;
 
 	ndSharedPtr<ndBrainOptimizerAdam> m_criticOptimizer;
