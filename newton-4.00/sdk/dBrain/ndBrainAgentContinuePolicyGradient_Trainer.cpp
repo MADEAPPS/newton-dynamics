@@ -841,9 +841,9 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 //#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::Optimize()
 {
-	OptimizeCritic();
 	CalculateAdvange();
 	OptimizePolicy();
+	OptimizeCritic();
 }
 
 //#pragma optimize( "", off )
