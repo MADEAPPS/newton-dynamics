@@ -79,7 +79,7 @@ ndBrainFloat ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateP
 //	return CalculatePolicyProbability(index, distribution);
 //}
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 ndBrainFloat ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateKLdivergence()
 {
 	// https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence

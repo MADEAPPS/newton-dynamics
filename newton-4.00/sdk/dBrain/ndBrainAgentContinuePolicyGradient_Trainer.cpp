@@ -71,7 +71,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize);
 
 //m_threadsCount = 1;
-m_entropyRegularizerCoef = 0.0f;
+//m_entropyRegularizerCoef = 0.0f;
 //m_batchTrajectoryCount = 2;
 }
 
@@ -604,72 +604,6 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildCriticClass()
 //#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 {
-	//m_randomPermutation.SetCount(m_trajectoryAccumulator.GetCount() - 1);
-	//for (ndInt32 i = ndInt32(m_randomPermutation.GetCount()) - 1; i >= 0; --i)
-	//{
-	//	m_randomPermutation[i] = i;
-	//}
-	//if (m_randomPermutation.GetCount() < m_parameters.m_miniBatchSize)
-	//{
-	//	ndInt32 mod = ndInt32(m_randomPermutation.GetCount());
-	//	ndInt32 padding = m_parameters.m_miniBatchSize - ndInt32(m_randomPermutation.GetCount());
-	//	for (ndInt32 i = 0; i < padding; ++i)
-	//	{
-	//		m_randomPermutation.PushBack(i % mod);
-	//	}
-	//}
-	//
-	//// generalize state value function, in theory more noisy but yields better results than Monte Carlos.
-	//if (m_randomPermutation.GetCount() > ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE)
-	//{
-	//	m_randomPermutation.SetCount(ND_CONTINUE_POLICY_GRADIENT_BUFFER_SIZE);
-	//}
-	//else
-	//{
-	//	m_randomPermutation.SetCount(m_randomPermutation.GetCount() & -m_parameters.m_miniBatchSize);
-	//}
-	//
-	//ndAtomic<ndInt32> iterator(0);
-	//for (ndInt32 iter = m_parameters.m_criticValueIterations; iter >= 0; ++iter)
-	//{
-	//	m_randomPermutation.RandomShuffle(m_randomPermutation.GetCount());
-	//	for (ndInt32 base = 0; base < m_randomPermutation.GetCount(); base += m_parameters.m_miniBatchSize)
-	//	{
-	//		auto BackPropagateBatch = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
-	//		{
-	//			ndBrainLossLeastSquaredError loss(1);
-	//			ndBrainFixSizeVector<1> stateValue;
-	//			ndBrainFixSizeVector<1> stateQValue;
-	//
-	//			// calculate GAE(l, 1) // very, very noisy
-	//			// calculate GAE(l, 0) // too smooth, and does not work either
-	//			ndFloat32 gamma = m_parameters.m_discountRewardFactor * m_parameters.m_generalizedAdvangeDiscount;
-	//
-	//			for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
-	//			{
-	//				const ndInt32 index = m_randomPermutation[base + i];
-	//				ndBrainTrainer& trainer = *m_criticTrainers[i];
-	//
-	//				stateValue[0] = m_trajectoryAccumulator.GetReward(index);
-	//				if (!m_trajectoryAccumulator.GetTerminalState(index))
-	//				{
-	//					const ndBrainMemVector nextObservation(m_trajectoryAccumulator.GetNextObservations(index), m_parameters.m_numberOfObservations);
-	//					m_critic.MakePrediction(nextObservation, stateQValue);
-	//					stateValue[0] += gamma * stateQValue[0];
-	//				}
-	//
-	//				loss.SetTruth(stateValue);
-	//				const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(index), m_parameters.m_numberOfObservations);
-	//				trainer.BackPropagate(observation, loss);
-	//			}
-	//		});
-	//
-	//		iterator = 0;
-	//		ndBrainThreadPool::ParallelExecute(BackPropagateBatch);
-	//		m_criticOptimizer->Update(this, m_criticTrainers, m_parameters.m_criticLearnRate);
-	//	}
-	//}
-
 	m_randomPermutation.SetCount(m_trajectoryAccumulator.GetCount() - 1);
 	for (ndInt32 i = ndInt32(m_randomPermutation.GetCount()) - 1; i >= 0; --i)
 	{
