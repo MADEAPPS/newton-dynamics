@@ -145,6 +145,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndInt32 m_threadsCount;
 		ndInt32 m_numberOfActions;
 		ndInt32 m_numberOfObservations;
+		ndInt32 m_criticValueIterations;
 
 		ndInt32 m_numberOfLayers;
 		ndInt32 m_miniBatchSize;
@@ -188,11 +189,11 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	void OptimizeStep();
 
 	protected:
-	virtual void Optimize();
-	void OptimizePolicy();
-	void OptimizeCritic();
 	void BuildPolicyClass();
 	void BuildCriticClass();
+	virtual void Optimize();
+	virtual void OptimizePolicy();
+	virtual void OptimizeCritic();
 	virtual void CalculateAdvange();
 	ndBrainAgentContinuePolicyGradient_Agent::ndRandomGenerator* GetRandomGenerator();
 

@@ -36,14 +36,16 @@ class ndBrainAgentContinueProximaPolicyGradient_TrainerMaster : public ndBrainAg
 
 	virtual void Optimize() override;
 
+
 	private:
 	void OptimizedSurrogate();
 	ndBrainFloat CalculateKLdivergence();
-	virtual void CalculateAdvange() override;
-	ndBrainFloat CalculatePolicyProbability(ndInt32 index);
-	ndBrainFloat CalculatePolicyProbability(ndInt32 index, ndBrainVector& distribution);
+	virtual void OptimizePolicy() override;
+	virtual void OptimizeCritic() override;
+	ndBrainFloat CalculatePolicyProbability(ndInt32 index, const ndBrainVector& distribution);
 	
 	ndBrainVector m_policyActions;
+	ndBrainVector m_policyDivergeActions;
 	ndBrainVector m_referenceProbability;
 };
 

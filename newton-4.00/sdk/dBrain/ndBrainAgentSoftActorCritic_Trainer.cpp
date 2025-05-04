@@ -226,7 +226,7 @@ void ndBrainAgentSoftActorCritic_Trainer::LearnPolicyFunction()
 						for (ndInt32 i = count - 1; i >= 0; --i)
 						{
 							ndBrainFloat sigma = probabilityDistribution[i + start];
-							ndBrainFloat invSigma = ndBrainFloat(1.0f) / sigma;;
+							ndBrainFloat invSigma = ndBrainFloat(1.0f) / sigma;
 							ndBrainFloat z = sampledActions[i] - probabilityDistribution[i];
 							ndBrainFloat meanGrad = z * invSigma * invSigma;
 							ndBrainFloat sigmaGrad = z * z * invSigma * invSigma * invSigma - sigma;
