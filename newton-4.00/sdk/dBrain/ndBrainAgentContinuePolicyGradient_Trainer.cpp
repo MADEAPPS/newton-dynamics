@@ -80,6 +80,12 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 //*********************************************************************************************
 ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::ndTrajectoryTransition()
 	:ndBrainVector()
+	,m_reward()
+	,m_terminal()
+	,m_actions()
+	,m_observations()
+	,m_expectedReward()
+	,m_nextObservations()
 	,m_actionsSize(0)
 	,m_obsevationsSize(0)
 {
@@ -91,119 +97,99 @@ void ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::Init(ndIn
 	m_obsevationsSize = obsevationsSize;
 }
 
-ndInt64 ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::CalculateStride() const
+void ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::Clear(ndInt32 entry)
 {
-	return m_transitionSize + m_actionsSize + m_obsevationsSize * 2;
+	m_reward[entry] = ndBrainFloat(0.0f);
+	m_terminal[entry] = ndBrainFloat(0.0f);
+	m_expectedReward[entry] = ndBrainFloat(0.0f);
+	ndMemSet(&m_actions[entry * m_actionsSize], ndBrainFloat(0.0f), m_actionsSize);
+	ndMemSet(&m_observations[entry * m_obsevationsSize], ndBrainFloat(0.0f), m_obsevationsSize);
+	ndMemSet(&m_nextObservations[entry * m_obsevationsSize], ndBrainFloat(0.0f), m_obsevationsSize);
 }
 
 ndInt32 ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::GetCount() const
 {
-	const ndInt64 stride = CalculateStride();
-	return ndInt32(ndBrainVector::GetCount() / stride);
+	return ndInt32(m_reward.GetCount());
 }
 
 void ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::SetCount(ndInt32 count)
 {
-	const ndInt64 stride = CalculateStride();
-	ndBrainVector::SetCount(stride * count);
-}
-
-ndBrainFloat ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::GetReward(ndInt32 entry) const
-{
-	const ndTrajectoryTransition& me = *this;
-	const ndInt64 stride = CalculateStride();
-	return me[stride * entry + m_reward];
-}
-
-void ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::SetReward(ndInt32 entry, ndBrainFloat reward)
-{
-	ndTrajectoryTransition& me = *this;
-	const ndInt64 stride = CalculateStride();
-	me[stride * entry + m_reward] = reward;
-}
-
-ndBrainFloat ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::GetExpectedReward(ndInt32 entry) const
-{
-	const ndTrajectoryTransition& me = *this;
-	const ndInt64 stride = CalculateStride();
-	return me[stride * entry + m_expectedReward];
-}
-
-void ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::SetExpectedReward(ndInt32 entry, ndBrainFloat reward)
-{
-	ndTrajectoryTransition& me = *this;
-	const ndInt64 stride = CalculateStride();
-	me[stride * entry + m_expectedReward] = reward;
-}
-
-ndBrainFloat* ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::GetActions(ndInt32 entry)
-{
-	ndTrajectoryTransition& me = *this;
-	const ndInt64 stride = CalculateStride();
-	return &me[stride * entry + m_transitionSize];
-}
-
-const ndBrainFloat* ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::GetActions(ndInt32 entry) const
-{
-	const ndTrajectoryTransition& me = *this;
-	const ndInt64 stride = CalculateStride();
-	return &me[stride * entry + m_transitionSize];
-}
-
-ndBrainFloat* ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::GetObservations(ndInt32 entry)
-{
-	ndTrajectoryTransition& me = *this;
-	const ndInt64 stride = CalculateStride();
-	return &me[stride * entry + m_transitionSize + m_actionsSize];
-}
-
-const ndBrainFloat* ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::GetObservations(ndInt32 entry) const
-{
-	const ndTrajectoryTransition& me = *this;
-	const ndInt64 stride = CalculateStride();
-	return &me[stride * entry + m_transitionSize + m_actionsSize];
-}
-
-ndBrainFloat* ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::GetNextObservations(ndInt32 entry)
-{
-	ndTrajectoryTransition& me = *this;
-	const ndInt64 stride = CalculateStride();
-	return &me[stride * entry + m_transitionSize + m_actionsSize + m_obsevationsSize];
-}
-
-const ndBrainFloat* ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::GetNextObservations(ndInt32 entry) const
-{
-	const ndTrajectoryTransition& me = *this;
-	const ndInt64 stride = CalculateStride();
-	return &me[stride * entry + m_transitionSize + m_actionsSize + m_obsevationsSize];
-}
-
-bool ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::GetTerminalState(ndInt32 entry) const
-{
-	const ndTrajectoryTransition& me = *this;
-	const ndInt64 stride = CalculateStride();
-	return (me[stride * entry + m_isterminalState] == ndBrainFloat(999.0f)) ? true : false;
-}
-
-void ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::SetTerminalState(ndInt32 entry, bool isTernimal)
-{
-	ndTrajectoryTransition& me = *this;
-	const ndInt64 stride = CalculateStride();
-	me[stride * entry + m_isterminalState] = isTernimal ? ndBrainFloat(999.0f) : ndBrainFloat(-999.0f);
-}
-
-void ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::Clear(ndInt32 entry)
-{
-	ndTrajectoryTransition& me = *this;
-	const ndInt64 stride = CalculateStride();
-	ndMemSet(&me[stride * entry], ndBrainFloat(0.0f), stride);
+	m_reward.SetCount(count);
+	m_terminal.SetCount(count);
+	m_expectedReward.SetCount(count);
+	m_actions.SetCount(count * m_actionsSize);
+	m_observations.SetCount(count * m_obsevationsSize);
+	m_nextObservations.SetCount(count * m_obsevationsSize);
 }
 
 void ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::CopyFrom(ndInt32 entry, ndTrajectoryTransition& src, ndInt32 srcEntry)
 {
-	const ndInt64 stride = CalculateStride();
-	ndTrajectoryTransition& me = *this;
-	ndMemCpy(&me[stride * entry], &src[stride * srcEntry], stride);
+	m_reward[entry] = src.m_reward[srcEntry];
+	m_terminal[entry] = src.m_terminal[srcEntry];
+	m_expectedReward[entry] = src.m_expectedReward[srcEntry];;
+	ndMemCpy(&m_actions[entry * m_actionsSize], &src.m_actions[srcEntry * m_actionsSize], m_actionsSize);
+	ndMemCpy(&m_observations[entry * m_obsevationsSize], &src.m_observations[srcEntry * m_obsevationsSize], m_obsevationsSize);
+	ndMemCpy(&m_nextObservations[entry * m_obsevationsSize], &src.m_nextObservations[srcEntry * m_obsevationsSize], m_obsevationsSize);
+}
+
+ndBrainFloat ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::GetReward(ndInt32 entry) const
+{
+	return m_reward[entry];
+}
+
+void ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::SetReward(ndInt32 entry, ndBrainFloat reward)
+{
+	m_reward[entry] = reward;
+}
+
+ndBrainFloat ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::GetExpectedReward(ndInt32 entry) const
+{
+	return m_expectedReward[entry];
+}
+
+void ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::SetExpectedReward(ndInt32 entry, ndBrainFloat reward)
+{
+	m_expectedReward[entry] = reward;
+}
+
+bool ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::GetTerminalState(ndInt32 entry) const
+{
+	return (m_terminal[entry] == 999.0f) ? true : false;
+}
+
+void ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::SetTerminalState(ndInt32 entry, bool isTernimal)
+{
+	m_terminal[entry] = isTernimal ? ndBrainFloat(999.0f) : ndBrainFloat(-999.0f);
+}
+
+ndBrainFloat* ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::GetActions(ndInt32 entry)
+{
+	return &m_actions[entry * m_actionsSize];
+}
+
+const ndBrainFloat* ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::GetActions(ndInt32 entry) const
+{
+	return &m_actions[entry * m_actionsSize];
+}
+
+ndBrainFloat* ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::GetObservations(ndInt32 entry)
+{
+	return &m_observations[entry * m_obsevationsSize];
+}
+
+const ndBrainFloat* ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::GetObservations(ndInt32 entry) const
+{
+	return &m_observations[entry * m_obsevationsSize];
+}
+
+ndBrainFloat* ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::GetNextObservations(ndInt32 entry)
+{
+	return &m_nextObservations[entry * m_obsevationsSize];
+}
+
+const ndBrainFloat* ndBrainAgentContinuePolicyGradient_Agent::ndTrajectoryTransition::GetNextObservations(ndInt32 entry) const
+{
+	return &m_nextObservations[entry * m_obsevationsSize];
 }
 
 //*********************************************************************************************

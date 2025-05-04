@@ -57,13 +57,13 @@ class ndBrainAgentContinuePolicyGradient_Agent : public ndBrainAgent
 	class ndTrajectoryTransition : protected ndBrainVector
 	{
 		public:
-		enum ndMemberIndex
-		{
-			m_reward,
-			m_expectedReward,
-			m_isterminalState,
-			m_transitionSize
-		};
+		//enum ndMemberIndex
+		//{
+		//	m_reward,
+		//	m_expectedReward,
+		//	m_isterminalState,
+		//	m_transitionSize
+		//};
 
 		ndTrajectoryTransition();
 		void Init(ndInt32 actionsSize, ndInt32 obsevationsSize);
@@ -92,7 +92,12 @@ class ndBrainAgentContinuePolicyGradient_Agent : public ndBrainAgent
 		ndBrainFloat* GetNextObservations(ndInt32 entry);
 		const ndBrainFloat* GetNextObservations(ndInt32 entry) const;
 
-		ndInt64 CalculateStride() const;
+		ndBrainVector m_reward;
+		ndBrainVector m_terminal;
+		ndBrainVector m_actions;
+		ndBrainVector m_observations;
+		ndBrainVector m_expectedReward;
+		ndBrainVector m_nextObservations;
 
 		ndInt64 m_actionsSize;
 		ndInt64 m_obsevationsSize;
