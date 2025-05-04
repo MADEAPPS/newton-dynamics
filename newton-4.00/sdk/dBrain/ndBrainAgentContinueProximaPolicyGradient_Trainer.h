@@ -27,8 +27,6 @@
 
 // This is an implementation of the proxima policy Gradient as described in:
 // https://spinningup.openai.com/en/latest/algorithms/ppo.html
-// it is an impropment that allows multiple passes on the same data collection as 
-// a long as the two disrtribution are close.
 
 class ndBrainAgentContinueProximaPolicyGradient_TrainerMaster : public ndBrainAgentContinuePolicyGradient_TrainerMaster
 {
