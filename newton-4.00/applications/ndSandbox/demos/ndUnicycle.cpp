@@ -344,7 +344,7 @@ namespace ndUnicycle
 			}
 			GetModel()->GetAsModelArticulation()->ClearMemory();
 
-			ndFloat32 angle = (ndRand() - ndFloat32(0.5f)) * ndFloat32(20.0f);
+			ndFloat32 angle = (ndRand() - ndFloat32(0.5f)) * ndFloat32(10.0f);
 			const ndMatrix randomRollMatrix(ndRollMatrix(angle * ndDegreeToRad));
 			const ndMatrix matrix(randomRollMatrix * GetModel()->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix());
 			GetModel()->GetAsModelArticulation()->SetTransform(matrix);
@@ -404,9 +404,10 @@ namespace ndUnicycle
 			referenceFrame.m_posit = com;
 			const ndMatrix invReferenceFrame(referenceFrame.OrthoInverse());
 
-			ndMatrix inetia(ndGetZeroMatrix());
+			ndMatrix inertia(ndGetZeroMatrix());
 			// calculate model angular Inertia respec to center of mass
 			ndVector totalToque(ndVector::m_zero);
+			ndVector totalAngularMomentum(ndVector::m_zero);
 			for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
 			{
 				const ndBodyKinematic* const body = m_bodies[i];
@@ -417,7 +418,7 @@ namespace ndUnicycle
 
 				ndMatrix covariance(ndCovarianceMatrix(bodyCom, bodyCom));
 				ndFloat32 mag2 = bodyCom.DotProduct(bodyCom).GetScalar();
-				ndFloat32 mass(body->GetMassMatrix().m_w);
+				ndFloat32 mass = body->GetMassMatrix().m_w;
 			
 				const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
 				ndMatrix refInertia(invReferenceFrame * bodyInertia * referenceFrame);
@@ -425,37 +426,52 @@ namespace ndUnicycle
 				{
 					refInertia[j][j] += mass * mag2;
 					refInertia[j] -= covariance[j].Scale(mass);
-					inetia[j] += refInertia[j];
+					inertia[j] += refInertia[j];
 				}
-
-				const ndVector xxx0(body->GetAccel());
-				const ndVector xxx1(body->GetAlpha());
-
+	
+				const ndVector omega(body->GetOmega());
+				const ndVector veloc(body->GetVelocity());
+				const ndVector linearMomentum(veloc.Scale(mass));
+				const ndVector angularMomentum(bodyInertia.RotateVector(omega));
 				const ndVector force(invReferenceFrame.RotateVector(body->GetAccel().Scale(body->GetMassMatrix().m_w)));
-				//const ndVector torque(bodyInertia.RotateVector(body->GetAlpha()));
 				const ndVector torque(invReferenceFrame.RotateVector(bodyInertia.RotateVector(body->GetAlpha())));
-				const ndVector gyroTorque(invReferenceFrame.RotateVector(body->GetOmega().CrossProduct(bodyInertia.RotateVector(body->GetOmega()))));
+				const ndVector gyroTorque(invReferenceFrame.RotateVector(omega.CrossProduct(angularMomentum)));
 
 				totalToque += torque;
 				totalToque += gyroTorque;
 				totalToque += bodyCom.CrossProduct(force);
+
+				totalAngularMomentum += bodyCom.CrossProduct(invReferenceFrame.RotateVector(linearMomentum));
+				totalAngularMomentum += invReferenceFrame.RotateVector(bodyInertia.RotateVector(omega));
 			}
-			inetia.m_posit.m_w = ndFloat32 (1.0f);
-			const ndMatrix invInertia(inetia.Inverse4x4());
+			inertia.m_posit.m_w = ndFloat32 (1.0f);
+			const ndMatrix invInertia(inertia.Inverse4x4());
+
 			const ndVector comAlpha(invInertia.RotateVector(totalToque));
+			const ndVector comOmega(invInertia.RotateVector(totalAngularMomentum));
 			solver.SolverEnd();
 			//ndTrace(("%f %f %f\n", comAlpha.m_x, comAlpha.m_y, comAlpha.m_z));
+			//ndTrace(("%f %f %f\n", comOmega.m_x, comOmega.m_y, comOmega.m_z));
 
 			auto PolynomialAccelerationReward = [](ndFloat32 alpha)
 			{
 				ndFloat32 maxAlpha = 5.0f;
 				alpha = ndClamp(alpha, -maxAlpha, maxAlpha);
 				ndFloat32 r = ndFloat32(1.0f) - ndAbs(alpha) / maxAlpha;
-				//ndFloat32 reward = r * r * r * r;
 				ndFloat32 reward = r * r;
 				return reward;
 			};
 			ndFloat32 alphaReward = PolynomialAccelerationReward(comAlpha.m_x);
+
+			auto PolynomialOmegaReward = [](ndFloat32 omega)
+			{
+				ndFloat32 maxOmega = 2.0f;
+				omega = ndClamp(omega, -maxOmega, maxOmega);
+				ndFloat32 r = ndFloat32(1.0f) - ndAbs(omega) / maxOmega;
+				ndFloat32 reward = r * r * r * r;
+				return reward;
+			};
+			ndFloat32 omegaReward = PolynomialOmegaReward(comOmega.m_x);
 
 			auto PolynomialAngleReward = [](ndFloat32 angle)
 			{
@@ -467,12 +483,12 @@ namespace ndUnicycle
 			ndFloat32 poleAngle = GetPoleAngle();
 			ndFloat32 poleReward = PolynomialAngleReward(poleAngle);
 
-			ndFloat32 reward = 0.5f * poleReward + 0.5f * alphaReward;
-			if (IsOnAir())
-			{
-				ndVector wheelOmega(m_wheel->GetOmega());
-				reward = ndExp(-ndFloat32(100.0f) * wheelOmega.m_z * wheelOmega.m_z);
-			}
+			//ndFloat32 reward = 0.5f * poleReward + 0.5f * alphaReward;
+			ndFloat32 reward = 0.5f * omegaReward + 0.5f * alphaReward;
+			//if (IsOnAir())
+			//{
+			//	reward = omegaReward;
+			//}
 
 			return ndReal(reward);
 		}
@@ -812,7 +828,7 @@ void ndUnicycleController(ndDemoEntityManager* const scene)
 	ndSetRandSeed(42);
 
 	ndMatrix matrix(ndGetIdentityMatrix());
-	matrix.m_posit.m_y = 1.9f;
+	matrix.m_posit.m_y = 2.5f;
 
 	ndMeshLoader loader;
 	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("unicycle.fbx", scene));
