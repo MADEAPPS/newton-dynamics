@@ -24,7 +24,7 @@
 
 namespace ndUnicycle
 {
-	#define ND_TRAIN_AGENT
+	//#define ND_TRAIN_AGENT
 
 	#define USE_SAC
 	#define CONTROLLER_NAME			"unicycle.dnn"
