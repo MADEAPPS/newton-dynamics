@@ -277,7 +277,7 @@ void ndBrainAgentContinuePolicyGradient_Agent::SampleActions(ndBrainVector& acti
 	const ndInt32 start = ndInt32(actions.GetCount()) / 2;
 	for (ndInt32 i = count - 1; i >= 0; --i)
 	{
-		ndFloat32 sigma = actions[start + i];
+		ndBrainFloat sigma = actions[start + i];
 		ndBrainFloat unitVarianceSample = generator.m_d(generator.m_gen);
 		ndBrainFloat sample = ndBrainFloat(actions[i]) + unitVarianceSample * sigma;
 		ndBrainFloat clippedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
@@ -629,7 +629,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 
 				// calculate GAE(l, 1) // very, very noisy
 				// calculate GAE(l, 0) // too smooth, and does not work either
-				ndFloat32 gamma = m_parameters.m_discountRewardFactor * m_parameters.m_generalizedAdvangeDiscount;
+				ndBrainFloat gamma = m_parameters.m_discountRewardFactor * m_parameters.m_generalizedAdvangeDiscount;
 
 				for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
 				{

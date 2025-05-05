@@ -72,8 +72,8 @@ void ndBrainLayerActivationPolicyGradientMeanSigma::MakePrediction(const ndBrain
 		#ifdef ND_USE_NATURAL_SIGMA
 			output[start + i] = ND_NATURAL_SIGMA * ndExp(ndFloat32(2.0f) * input[start + i]);
 		#else
-			ndFloat32 b = (ND_MIN_LINEAR_SIGMA + ND_MAX_LINEAR_SIGMA) * ndFloat32(0.5f);
-			ndFloat32 a = ndFloat32(1.0f) - b;
+			ndBrainFloat b = (ND_MIN_LINEAR_SIGMA + ND_MAX_LINEAR_SIGMA) * ndFloat32(0.5f);
+			ndBrainFloat a = ndBrainFloat(1.0f) - b;
 			output[start + i] = a * input[start + i] + b;
 		#endif
 	}
@@ -90,8 +90,8 @@ void ndBrainLayerActivationPolicyGradientMeanSigma::InputDerivative(const ndBrai
 		#ifdef ND_USE_NATURAL_SIGMA
 			inputDerivative[start + i] = ndFloat32(2.0f) * output[start + i];
 		#else
-			ndFloat32 b = (ND_MIN_LINEAR_SIGMA + ND_MAX_LINEAR_SIGMA) * ndFloat32(0.5f);
-			ndFloat32 a = ndFloat32(1.0f) - b;
+			ndBrainFloat b = (ND_MIN_LINEAR_SIGMA + ND_MAX_LINEAR_SIGMA) * ndFloat32(0.5f);
+			ndBrainFloat a = ndBrainFloat(1.0f) - b;
 			inputDerivative[start + i] = a;
 		#endif
 	}

@@ -540,9 +540,9 @@ namespace ndQuadruped_3
 				//observations[i * size + m_leg0_posit_x] = effectorRelPosit.m_x;
 				//observations[i * size + m_leg0_posit_y] = effectorRelPosit.m_y;
 				//observations[i * size + m_leg0_posit_z] = effectorRelPosit.m_z;
-				observations[m_leg0_posit_x] = effectorRelPosit.m_x;
-				observations[m_leg0_posit_y] = effectorRelPosit.m_y;
-				observations[m_leg0_posit_z] = effectorRelPosit.m_z;
+				observations[m_leg0_posit_x] = ndBrainFloat(effectorRelPosit.m_x);
+				observations[m_leg0_posit_y] = ndBrainFloat(effectorRelPosit.m_y);
+				observations[m_leg0_posit_z] = ndBrainFloat(effectorRelPosit.m_z);
 			}
 		}
 

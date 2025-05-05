@@ -52,12 +52,12 @@ ndBrainFloat ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateP
 	
 	const ndInt32 count = ndInt32(distribution.GetCount()) / 2;
 	const ndInt32 start = ndInt32(distribution.GetCount()) / 2;
-	ndFloat32 invSqrtPi = ndSqrt(1.0f / (2.0f * ndPi));
+	ndBrainFloat invSqrtPi = ndBrainFloat(ndSqrt(1.0f / (2.0f * ndPi)));
 
 	const ndBrainMemVector sampledProbabilities(m_trajectoryAccumulator.GetActions(index), m_policy.GetOutputSize());
 	for (ndInt32 i = count - 1; i >= 0; --i)
 	{
-		ndFloat32 sigma = distribution[start + i];
+		ndBrainFloat sigma = distribution[start + i];
 		ndBrainFloat invSigma = ndBrainFloat(1.0f) / sigma;
 		ndBrainFloat z = (sampledProbabilities[i] - distribution[i]) * invSigma;
 	
@@ -65,7 +65,7 @@ ndBrainFloat ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateP
 		invSigma2Det *= (invSqrtPi * invSigma);
 	}
 	ndBrainFloat exponent = ndBrainFloat(0.5f) * z2;
-	ndBrainFloat prob = invSigma2Det * ndExp(-exponent);
+	ndBrainFloat prob = invSigma2Det * ndBrainFloat(ndExp(-exponent));
 	return ndMax(prob, ndBrainFloat(1.0e-4f));
 }
 
@@ -447,7 +447,7 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizeCritic()
 
 				// calculate GAE(l, 1) // very, very noisy
 				// calculate GAE(l, 0) // too smooth, and does not work either
-				ndFloat32 gamma = m_parameters.m_discountRewardFactor * m_parameters.m_generalizedAdvangeDiscount;
+				ndBrainFloat gamma = m_parameters.m_discountRewardFactor * m_parameters.m_generalizedAdvangeDiscount;
 	
 				for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
 				{
@@ -467,7 +467,7 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizeCritic()
 						const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(index), m_parameters.m_numberOfObservations);
 						m_policy.MakePrediction(observation, entropyActions);
 						ndBrainFloat prob = CalculatePolicyProbability(index, entropyActions);
-						ndBrainFloat logProb = ndLog(prob);
+						ndBrainFloat logProb = ndBrainFloat(ndLog(prob));
 						stateValue[0] -= m_parameters.m_entropyRegularizerCoef * logProb;
 					}
 	

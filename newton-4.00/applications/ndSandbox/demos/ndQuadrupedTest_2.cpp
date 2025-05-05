@@ -501,7 +501,7 @@ namespace ndQuadruped_2
 				const ndVector normalError(error * normalize);
 				for (ndInt32 j = 0; j < 3; ++j)
 				{
-					ndFloat32 dist = ndFloat32(1.0f) - ndClamp(ndAbs(normalError[j]), 0.0f, 1.0f);
+					ndFloat32 dist = ndFloat32(1.0f) - ndClamp(ndAbs(normalError[j]), ndFloat32(0.0f), ndFloat32(1.0f));
 					ndFloat32 legReward = ndPow(dist, 6.0f);;
 					//ndFloat32 error2 = error[j] * error[j];
 					//ndFloat32 legReward = ndExp(-200000.0f * error2);
@@ -509,7 +509,7 @@ namespace ndQuadruped_2
 				}
 				weight += 3;
 			}
-			return reward / weight;
+			return ndBrainFloat(reward / weight);
 		}
 
 		#pragma optimize( "", off )
@@ -563,18 +563,18 @@ namespace ndQuadruped_2
 				const ndVector keyFramePosit1(keyFrame1.m_posit);
 
 				ndInt32 base = m_observationSize * i;
-				observations[base + m_effectPosit_x] = effectorPosit.m_x;
-				observations[base + m_effectPosit_y] = effectorPosit.m_y;
-				observations[base + m_effectPosit_z] = effectorPosit.m_z;
-				observations[base + m_effectVeloc_x] = effectorVeloc.m_x;
-				observations[base + m_effectVeloc_y] = effectorVeloc.m_y;
-				observations[base + m_effectVeloc_z] = effectorVeloc.m_z;
-				observations[base + m_posePosit_x] = keyFramePosit0.m_x;
-				observations[base + m_posePosit_y] = keyFramePosit0.m_y;
-				observations[base + m_posePosit_z] = keyFramePosit0.m_z;
-				observations[base + m_poseVeloc_x] = (keyFramePosit1.m_x - keyFramePosit0.m_x) * invTimestep;
-				observations[base + m_poseVeloc_y] = (keyFramePosit1.m_y - keyFramePosit0.m_y) * invTimestep;
-				observations[base + m_poseVeloc_z] = (keyFramePosit1.m_z - keyFramePosit0.m_z) * invTimestep;
+				observations[base + m_effectPosit_x] = ndBrainFloat(effectorPosit.m_x);
+				observations[base + m_effectPosit_y] = ndBrainFloat(effectorPosit.m_y);
+				observations[base + m_effectPosit_z] = ndBrainFloat(effectorPosit.m_z);
+				observations[base + m_effectVeloc_x] = ndBrainFloat(effectorVeloc.m_x);
+				observations[base + m_effectVeloc_y] = ndBrainFloat(effectorVeloc.m_y);
+				observations[base + m_effectVeloc_z] = ndBrainFloat(effectorVeloc.m_z);
+				observations[base + m_posePosit_x] = ndBrainFloat(keyFramePosit0.m_x);
+				observations[base + m_posePosit_y] = ndBrainFloat(keyFramePosit0.m_y);
+				observations[base + m_posePosit_z] = ndBrainFloat(keyFramePosit0.m_z);
+				observations[base + m_poseVeloc_x] = ndBrainFloat((keyFramePosit1.m_x - keyFramePosit0.m_x) * invTimestep);
+				observations[base + m_poseVeloc_y] = ndBrainFloat((keyFramePosit1.m_y - keyFramePosit0.m_y) * invTimestep);
+				observations[base + m_poseVeloc_z] = ndBrainFloat((keyFramePosit1.m_z - keyFramePosit0.m_z) * invTimestep);
 			}
 		}
 

@@ -338,7 +338,7 @@ namespace ndUnicycle
 			GetModel()->GetAsModelArticulation()->SetTransform(matrix);
 		}
 		
-		ndFloat32 IsOnAir() const
+		ndBrainFloat IsOnAir() const
 		{
 			ndBodyKinematic::ndContactMap& contacts = m_wheel->GetContactMap();
 			ndBodyKinematic::ndContactMap::Iterator it(contacts);
@@ -347,10 +347,10 @@ namespace ndUnicycle
 				ndContact* const contact = *it;
 				if (contact->IsActive())
 				{
-					return 0.0f;
+					return ndBrainFloat(0.0f);
 				}
 			}
-			return 1.0f;
+			return ndBrainFloat(1.0f);
 		};
 
 		//#pragma optimize( "", off )
@@ -620,9 +620,9 @@ namespace ndUnicycle
 			ndFloat32 poleOmega(m_pole->GetOmega().DotProduct(poleMatrix.m_front).GetScalar());
 			ndFloat32 wheelOmega(m_wheel->GetOmega().DotProduct(poleMatrix.m_front).GetScalar());
 
-			observation[m_poleAngle] = poleAngle;
-			observation[m_poleOmega] = poleOmega;
-			observation[m_wheelOmega] = wheelOmega;
+			observation[m_poleAngle] = ndBrainFloat(poleAngle);
+			observation[m_poleOmega] = ndBrainFloat(poleOmega);
+			observation[m_wheelOmega] = ndBrainFloat(wheelOmega);
 			observation[m_hasSupportContact] = IsOnAir();
 		}
 

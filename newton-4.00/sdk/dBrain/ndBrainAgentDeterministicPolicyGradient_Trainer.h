@@ -60,7 +60,7 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 	
 		std::mt19937 m_gen;
 		std::random_device m_rd;
-		std::normal_distribution<ndFloat32> m_d;
+		std::normal_distribution<ndReal> m_d;
 	};
 
 	public:

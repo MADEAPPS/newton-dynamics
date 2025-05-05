@@ -135,7 +135,7 @@ inline ndBrainSimdFloat8 ndBrainSimdFloat8::Tanh() const
 	ndBrainSimdFloat8 tmp;
 	for (ndInt32 i = 0; i < 8; ++i)
 	{
-		tmp.m_f[i] = ndTanh(m_f[i]);
+		tmp.m_f[i] = ndBrainFloat(ndTanh(m_f[i]));
 	}
 	return tmp;
 }

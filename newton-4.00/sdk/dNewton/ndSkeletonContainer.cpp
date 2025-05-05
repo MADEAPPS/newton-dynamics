@@ -1026,10 +1026,14 @@ void ndSkeletonContainer::SolveLcp(ndInt32 stride, ndInt32 size, ndFloat32* cons
 {
 	D_TRACKTIME();
 	// better chance for auto vectorization. 
-	const ndInt32 maxIterCount = 64;
 	const ndFloat32 sor = ndFloat32(1.125f);
 	const ndFloat32 tol2 = accelTol * accelTol;
 	ndFloat32* const invDiag = ndAlloca(ndFloat32, stride);
+
+static int xxxx;
+xxxx++;
+if (xxxx >= 12449)
+xxxx *= 1;
 
 	const ndInt32 blockSize = m_blockSize;
 	const ndFloat32* const matrix = &m_massMatrix11[blockSize * stride + blockSize];
@@ -1050,17 +1054,16 @@ void ndSkeletonContainer::SolveLcp(ndInt32 stride, ndInt32 size, ndFloat32* cons
 		base1 += stride;
 	}
 
-	//ndInt32 iterCount = 0;
+	const ndInt32 maxIterCount = 1000;
 	ndFloat32 tolerance(tol2 * ndFloat32(2.0f));
 	for (ndInt32 m = 0; (m < maxIterCount) && (tolerance > tol2); ++m)
 	{
-		//iterCount++;
+		//ndAssert(m < (100));
 		ndInt32 base = 0;
 		tolerance = ndFloat32(0.0f);
 		for (ndInt32 i = 0; i < size; ++i)
 		{
 			const ndFloat32* const row = &matrix[base];
-			//ndFloat32 r = b[i] - ndDotProduct(size, row, x);
 			ndFloat32 r = b[i];
 			for (ndInt32 k = 0; k < size; ++k)
 			{

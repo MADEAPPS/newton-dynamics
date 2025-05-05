@@ -210,7 +210,7 @@ void ndBrainAgentDeterministicPolicyGradient_Agent::SampleActions(ndBrainVector&
 	const ndInt32 start = ndInt32(actions.GetCount()) / 2;
 	for (ndInt32 i = count - 1; i >= 0; --i)
 	{
-		ndFloat32 sigma = actions[start + i];
+		ndBrainFloat sigma = actions[start + i];
 		ndBrainFloat unitVarianceSample = m_randomeGenerator.m_d(m_randomeGenerator.m_gen);
 		ndBrainFloat sample = ndBrainFloat(actions[i]) + unitVarianceSample * sigma;
 		ndBrainFloat clippedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
@@ -510,7 +510,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::SaveTrajectory()
 		{
 			m_eposideCount++;
 			m_framesAlive = 0;
-			m_averageFramesPerEpisodes.Update(ndFloat32 (m_agent->m_trajectoryBaseCount));
+			m_averageFramesPerEpisodes.Update(ndReal (m_agent->m_trajectoryBaseCount));
 
 			// using the Bellman equation to calculate trajectory rewards. (Monte Carlo method)
 			ndBrainFloat gamma = m_parameters.m_discountRewardFactor;
@@ -617,7 +617,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 					}
 				}
 
-				ndFloat32 minQ = ndFloat32(1.0e10f);
+				ndBrainFloat minQ = ndBrainFloat(1.0e10f);
 				for (ndInt32 i = 0; i < sizeof(m_critic) / sizeof(m_critic[0]); ++i)
 				{
 					minQ = ndMin(minQ, rewards[i]);

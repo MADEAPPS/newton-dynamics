@@ -53,10 +53,10 @@ ndBrainFloat ndBrainAgentSoftActorCritic_Trainer::CalculatePolicyProbability(ndI
 
 	const ndInt32 count = ndInt32(distribution.GetCount()) / 2;
 	const ndInt32 start = ndInt32(distribution.GetCount()) / 2;
-	ndFloat32 invSqrtPi = ndSqrt(1.0f / (2.0f * ndPi));
+	ndBrainFloat invSqrtPi = ndBrainFloat(ndSqrt(1.0f / (2.0f * ndPi)));
 	for (ndInt32 i = count - 1; i >= 0; --i)
 	{
-		ndFloat32 sigma = distribution[start + i];
+		ndBrainFloat sigma = distribution[start + i];
 		ndBrainFloat invSigma = ndBrainFloat(1.0f) / sigma;
 		ndBrainFloat z = (sampledActions[i] - distribution[i]) * invSigma;
 
@@ -64,7 +64,7 @@ ndBrainFloat ndBrainAgentSoftActorCritic_Trainer::CalculatePolicyProbability(ndI
 		invSigma2Det *= (invSqrtPi * invSigma);
 	}
 	ndBrainFloat exponent = ndBrainFloat(0.5f) * z2;
-	ndBrainFloat prob = invSigma2Det * ndExp(-exponent);
+	ndBrainFloat prob = invSigma2Det * ndBrainFloat(ndExp(-exponent));
 	return ndMax(prob, ndBrainFloat(1.0e-4f));
 }
 
@@ -125,7 +125,7 @@ void ndBrainAgentSoftActorCritic_Trainer::CalculateExpectedRewards()
 					}
 				}
 
-				ndFloat32 minQ = ndFloat32(1.0e10f);
+				ndBrainFloat minQ = ndBrainFloat(1.0e10f);
 				for (ndInt32 i = 0; i < sizeof(m_critic) / sizeof(m_critic[0]); ++i)
 				{
 					minQ = ndMin(minQ, rewards[i]);
@@ -135,7 +135,7 @@ void ndBrainAgentSoftActorCritic_Trainer::CalculateExpectedRewards()
 				if (m_parameters.m_entropyRegularizerCoef > ndBrainFloat(1.0e-6f))
 				{
 					ndBrainFloat prob = CalculatePolicyProbability(index);
-					ndBrainFloat logProb = ndLog(prob);
+					ndBrainFloat logProb = ndBrainFloat (ndLog(prob));
 					minQ -= m_parameters.m_entropyRegularizerCoef * logProb;
 				}
 				m_expectedRewards[j + base] = minQ;
