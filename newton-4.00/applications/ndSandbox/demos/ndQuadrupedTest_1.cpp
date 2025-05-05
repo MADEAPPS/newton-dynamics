@@ -199,14 +199,152 @@ namespace ndQuadruped_1
 		{
 		}
 
+		void CalculateZeroMomnetPoint(ndFloat32 timestep)
+		{
+			ndModelArticulation* const articulation = GetModel()->GetAsModelArticulation();
+			ndBodyKinematic* const rootBody = articulation->GetRoot()->m_body->GetAsBodyKinematic();
+			ndSkeletonContainer* const skeleton = rootBody->GetSkeleton();
+			ndAssert(skeleton);
+
+			m_solver.SolverBegin(skeleton, nullptr, 0, articulation->GetWorld(), timestep);
+			m_solver.Solve();
+
+			ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
+			auto CalculateReferenceFrame = [this, &bodies]()
+			{
+				ndVector com(ndVector::m_zero);
+				ndFloat32 totalMass = ndFloat32(0.0f);
+				ndModelArticulation::ndNode* const rootNode = GetModel()->GetAsModelArticulation()->GetRoot();
+				for (ndModelArticulation::ndNode* iter = rootNode->GetFirstIterator(); iter; iter = iter->GetNextIterator())
+				{
+					const ndBodyKinematic* const body = iter->m_body->GetAsBodyKinematic();
+					bodies.PushBack(body);
+					const ndMatrix matrix(body->GetMatrix());
+					const ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
+					ndFloat32 mass = body->GetMassMatrix().m_w;
+					totalMass += mass;
+					com += bodyCom.Scale(mass);
+				}
+			
+				com = com.Scale(1.0f / totalMass);
+				ndMatrix referenceFrame(rootNode->m_body->GetMatrix());
+				referenceFrame.m_up = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
+				referenceFrame.m_right = referenceFrame.m_front.CrossProduct(referenceFrame.m_up).Normalize();
+				referenceFrame.m_front = referenceFrame.m_up.CrossProduct(referenceFrame.m_right).Normalize();
+				referenceFrame.m_posit = com;
+				referenceFrame.m_posit.m_w = 1.0f;
+				return referenceFrame;
+			};
+			const ndMatrix comFrame(CalculateReferenceFrame());
+			
+			//auto CalculateInertiaAndAngularMomentum = [this, &comFrame](ndVector& angularMomentum)
+			//	{
+			//		ndMatrix inertia(ndGetZeroMatrix());
+			//		angularMomentum = ndVector::m_zero;
+			//		const ndMatrix invComFrame(comFrame.OrthoInverse());
+			//		for (ndInt32 i = m_bodies.GetCount() - 1; i >= 0; --i)
+			//		{
+			//			const ndBodyKinematic* const body = m_bodies[i];
+			//			const ndMatrix bodyMatrix(body->GetMatrix());
+			//
+			//			const ndVector origin(bodyMatrix.TransformVector(body->GetCentreOfMass()));
+			//			const ndVector bodyCom(comFrame.UntransformVector(origin) & ndVector::m_triplexMask);
+			//			ndMatrix covariance(ndCovarianceMatrix(bodyCom, bodyCom));
+			//
+			//			ndFloat32 mass = body->GetMassMatrix().m_w;
+			//			ndFloat32 mag2 = bodyCom.DotProduct(bodyCom).GetScalar();
+			//
+			//			const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
+			//			ndMatrix refInertia(invComFrame * bodyInertia * comFrame);
+			//			for (ndInt32 j = 0; j < 3; j++)
+			//			{
+			//				refInertia[j][j] += mass * mag2;
+			//				refInertia[j] -= covariance[j].Scale(mass);
+			//				inertia[j] += refInertia[j];
+			//			}
+			//
+			//			angularMomentum += bodyCom.CrossProduct(invComFrame.RotateVector(body->GetVelocity().Scale(mass)));
+			//			angularMomentum += invComFrame.RotateVector(bodyInertia.RotateVector(body->GetOmega()));
+			//		}
+			//		inertia.m_posit.m_w = 1.0f;
+			//		return inertia;
+			//	};
+			//
+			//ndVector angularMomentum;
+			//const ndMatrix comInertia(CalculateInertiaAndAngularMomentum(angularMomentum));
+			//const ndMatrix invComInertia(comInertia.Inverse4x4());
+			//const ndVector comOmega(invComInertia.RotateVector(angularMomentum));
+			//
+			//auto CalculateAngularAcceleration = [this, &comOmega, &comInertia, &comFrame, &invComInertia]()
+			//	{
+			//		ndVector totalToque(ndVector::m_zero);
+			//		const ndMatrix invComFrame(comFrame.OrthoInverse());
+			//		for (ndInt32 i = m_bodies.GetCount() - 1; i >= 0; --i)
+			//		{
+			//			const ndBodyKinematic* const body = m_bodies[i];
+			//			const ndMatrix bodyMatrix(body->GetMatrix());
+			//
+			//			const ndVector origin(bodyMatrix.TransformVector(body->GetCentreOfMass()));
+			//			const ndVector bodyCom(comFrame.UntransformVector(origin) & ndVector::m_triplexMask);
+			//
+			//			ndFloat32 mass = body->GetMassMatrix().m_w;
+			//			const ndVector veloc(body->GetVelocity());
+			//			const ndVector linearMomentum(invComFrame.RotateVector(veloc.Scale(mass)));
+			//
+			//			const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
+			//			const ndVector extForceTorque(bodyCom.CrossProduct(invComFrame.RotateVector(body->GetAccel().Scale(mass))));
+			//			const ndVector extTorque(invComFrame.RotateVector(bodyInertia.RotateVector(body->GetAlpha())));
+			//			const ndVector gyroTorque(invComFrame.RotateVector(body->GetOmega().CrossProduct(bodyInertia.RotateVector(body->GetOmega()))));
+			//
+			//			// centripetal should always be zero, or else the bodies will be flying apart from each other
+			//			//const ndVector centripetal((comOmega.CrossProduct(bodyCom)).CrossProduct(linearMomentum));
+			//			//totalToque += centripetal;
+			//
+			//			totalToque += extTorque;
+			//			totalToque += gyroTorque;
+			//			totalToque += extForceTorque;
+			//		}
+			//		const ndVector comAlpha(invComInertia.RotateVector(totalToque));
+			//		return comAlpha;
+			//	};
+			//
+			//const ndVector comAlpha(CalculateAngularAcceleration());
+			m_solver.SolverEnd();
+			
+			//auto PolynomialOmegaReward = [](ndFloat32 omega)
+			//	{
+			//		ndFloat32 maxOmega = 2.0f;
+			//		omega = ndClamp(omega, -maxOmega, maxOmega);
+			//		ndFloat32 r = ndFloat32(1.0f) - ndAbs(omega) / maxOmega;
+			//		ndFloat32 reward = r * r * r * r;
+			//		return reward;
+			//	};
+			//
+			//auto PolynomialAccelerationReward = [](ndFloat32 alpha)
+			//	{
+			//		ndFloat32 maxAlpha = 5.0f;
+			//		alpha = ndClamp(alpha, -maxAlpha, maxAlpha);
+			//		ndFloat32 r = ndFloat32(1.0f) - ndAbs(alpha) / maxAlpha;
+			//		ndFloat32 reward = r * r;
+			//		return reward;
+			//	};
+			//ndFloat32 omegaReward = PolynomialOmegaReward(comOmega.m_x);
+			//ndFloat32 alphaReward = PolynomialAccelerationReward(comAlpha.m_x);
+			//ndFloat32 reward = ndFloat32(0.5f) * omegaReward + ndFloat32(0.5f) * alphaReward;
+			//
+			//return ndBrainFloat(reward);
+		}
+
 		void Update(ndFloat32 timestep)
 		{
 			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 			ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
 			rootBody->SetSleepState(false);
 
+			CalculateZeroMomnetPoint(timestep);
+
 			//ndFloat32 animSpeed = 2.0f * m_control->m_animSpeed;
-			ndFloat32 animSpeed = 1.0f;
+			ndFloat32 animSpeed = 0.1f;
 			m_animBlendTree->Update(timestep * animSpeed);
 
 			ndVector veloc;
@@ -250,6 +388,7 @@ namespace ndQuadruped_1
 			}
 		}
 
+		ndIkSolver m_solver;
 		ndAnimationPose m_animPose;
 		ndFixSizeArray<ndEffectorInfo, 4> m_legs;
 		ndSharedPtr<ndAnimationBlendTreeNode> m_poseGenerator;
