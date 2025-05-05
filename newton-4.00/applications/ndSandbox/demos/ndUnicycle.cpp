@@ -25,9 +25,13 @@
 namespace ndUnicycle
 {
 	//#define ND_TRAIN_AGENT
-
 	#define USE_SAC
-	#define CONTROLLER_NAME			"unicycle.dnn"
+
+#ifdef USE_SAC
+	#define CONTROLLER_NAME			"unicycle_sac.dnn"
+#else
+	#define CONTROLLER_NAME			"unicycle_ppo.dnn"
+#endif
 
 	#define ND_MAX_LEG_JOINT_ANGLE	(ndFloat32 (45.0f) * ndDegreeToRad)
 
@@ -313,20 +317,6 @@ namespace ndUnicycle
 		}
 
 		//#pragma optimize( "", off )
-		ndFloat32 CalculateComSpeed() const
-		{
-			ndFloat32 totalMass = 0.0f;
-			ndVector totalMomentum(ndVector::m_zero);
-			for (ndModelArticulation::ndNode* node = GetModel()->GetAsModelArticulation()->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-			{
-				ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();
-				ndFloat32 mass = body->GetMassMatrix().m_w;
-				totalMass += mass;
-				totalMomentum += body->GetVelocity().Scale(mass);
-			}
-			totalMomentum = totalMomentum.Scale(1.0f / totalMass);
-			return totalMomentum.m_x;
-		}
 
 		//#pragma optimize( "", off )
 		bool IsTerminal() const
@@ -598,19 +588,26 @@ namespace ndUnicycle
 		{
 			ndWorld* const world = scene->GetWorld();
 			
-			m_outFile = fopen("unicycle.csv", "wb");
-			fprintf(m_outFile, "vpg\n");
-
 			#ifdef USE_SAC
+				m_outFile = fopen("unicycle_sac.csv", "wb");
+				fprintf(m_outFile, "sac\n");
 				//m_stopTraining = 250000;
-				m_stopTraining = 100000;
+				m_stopTraining = 150000;
+
 				ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
 				hyperParameters.m_numberOfActions = m_actionsSize;
 				hyperParameters.m_numberOfObservations = m_observationsSize;
+				hyperParameters.m_maxTrajectorySteps = ND_TRAJECTORY_STEPS;
+				hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
+				//hyperParameters.m_policyRegularizerType = ndBrainOptimizer::m_lasso;
+				//hyperParameters.m_criticRegularizerType = ndBrainOptimizer::m_lasso;
 				//m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
 				m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentSoftActorCritic_Trainer(hyperParameters));
 			#else
-				m_stopTraining = 500 * 1000000;
+				m_outFile = fopen("unicycle_pp0.csv", "wb");
+				fprintf(m_outFile, "ppo\n");
+				m_stopTraining = 150 * 1000000;
+
 				ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 				hyperParameters.m_numberOfActions = m_actionsSize;
 				hyperParameters.m_numberOfObservations = m_observationsSize;
