@@ -518,15 +518,26 @@ void ndSkeletonContainer::Finalize(ndInt32 loopJointsCount, ndJointBilateralCons
 	{
 		ndJointBilateralConstraint* const joint = loopJointArray[i];
 		joint->m_isInSkeleton = true;
-		//m_loopingJoints.PushBack(joint);
-		//m_loopCount++;
 		m_permanentLoopingJoints.PushBack(joint);
+	}
+}
+
+void ndSkeletonContainer::AddCloseLoopJoint(ndConstraint* const joint)
+{
+	ndScopeSpinLock lock(m_lock);
+	ndContact* const contact = joint->GetAsContact();
+	if (contact)
+	{
+		m_transientLoopingContacts.PushBack(contact);
+	}
+	else
+	{
+		m_transientLoopingJoints.PushBack(joint->GetAsBilateral());
 	}
 }
 
 void ndSkeletonContainer::ClearCloseLoopJoints()
 {
-	//m_dynamicsLoopCount = 0;
 	ndScopeSpinLock lock(m_lock);
 	for (ndInt32 i = ndInt32(m_transientLoopingContacts.GetCount() - 1); i >= 0; --i)
 	{
@@ -539,26 +550,6 @@ void ndSkeletonContainer::ClearCloseLoopJoints()
 
 	m_transientLoopingJoints.SetCount(0);
 	m_transientLoopingContacts.SetCount(0);
-}
-
-void ndSkeletonContainer::AddCloseLoopJoint(ndConstraint* const joint)
-{
-	ndScopeSpinLock lock(m_lock);
-	//if (m_loopingJoints.GetCount() < (m_loopCount + m_dynamicsLoopCount + 1)) 
-	//{
-	//	m_loopingJoints.SetCount(2 * (m_loopCount + m_dynamicsLoopCount + 1));
-	//}
-	//m_loopingJoints[m_loopCount + m_dynamicsLoopCount] = joint;
-	//m_dynamicsLoopCount++;
-	ndContact* const contact = joint->GetAsContact();
-	if (contact)
-	{
-		m_transientLoopingContacts.PushBack(contact);
-	}
-	else
-	{
-		m_transientLoopingJoints.PushBack(joint->GetAsBilateral());
-	}
 }
 
 void ndSkeletonContainer::CheckSleepState()
