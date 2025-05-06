@@ -1022,6 +1022,7 @@ void ndSkeletonContainer::UpdateForces(ndJacobian* const internalForces, const n
 }
 
 // new lcp solver  simplify the friction index array.
+#if 0
 void ndSkeletonContainer::SolveLcp(ndInt32 stride, ndInt32 size, ndFloat32* const x, const ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex, ndFloat32 accelTol) const
 {
 	D_TRACKTIME();
@@ -1029,11 +1030,6 @@ void ndSkeletonContainer::SolveLcp(ndInt32 stride, ndInt32 size, ndFloat32* cons
 	const ndFloat32 sor = ndFloat32(1.125f);
 	const ndFloat32 tol2 = accelTol * accelTol;
 	ndFloat32* const invDiag = ndAlloca(ndFloat32, stride);
-
-static int xxxx;
-xxxx++;
-if (xxxx >= 12449)
-xxxx *= 1;
 
 	const ndInt32 blockSize = m_blockSize;
 	const ndFloat32* const matrix = &m_massMatrix11[blockSize * stride + blockSize];
@@ -1054,11 +1050,10 @@ xxxx *= 1;
 		base1 += stride;
 	}
 
-	const ndInt32 maxIterCount = 1000;
-	ndFloat32 tolerance(tol2 * ndFloat32(2.0f));
-	for (ndInt32 m = 0; (m < maxIterCount) && (tolerance > tol2); ++m)
+	const ndInt32 maxIterCount = 64;
+	ndFloat32 tolerance = tol2 * ndFloat32(2.0f);
+	for (ndInt32 m = maxIterCount; (m >=0) && (tolerance > tol2); --m)
 	{
-		//ndAssert(m < (100));
 		ndInt32 base = 0;
 		tolerance = ndFloat32(0.0f);
 		for (ndInt32 i = 0; i < size; ++i)
@@ -1074,7 +1069,6 @@ xxxx *= 1;
 			const ndFloat32 coefficient = x[index];
 			const ndFloat32 l = low[i] * coefficient;
 			const ndFloat32 h = high[i] * coefficient;
-			//const ndFloat32 f = ndClamp(x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor, l, h);
 			const ndFloat32 x0 = x[i];
 			const ndFloat32 x1 = x0 + r * invDiag[i];
 			const ndFloat32 x2 = x0 + (x1 - x0) * sor;
@@ -1089,8 +1083,77 @@ xxxx *= 1;
 			base += stride;
 		}
 	}
-}
 
+static int xxxxxxxxx;
+ndTrace(("%d %d %f\n", xxxxxxxxx++, xxxx, error2));
+}
+#else
+
+void ndSkeletonContainer::SolveLcp(ndInt32 stride, ndInt32 size, ndFloat32* const x, const ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex, ndFloat32 accelTol) const
+{
+	D_TRACKTIME();
+	// better chance for auto vectorization. 
+	const ndFloat32 sor = ndFloat32(1.125f);
+	const ndFloat32 tol2 = accelTol * accelTol;
+	ndFloat32* const invDiag = ndAlloca(ndFloat32, stride);
+
+	const ndInt32 blockSize = m_blockSize;
+	const ndFloat32* const matrix = &m_massMatrix11[blockSize * stride + blockSize];
+	ndAssert(ndTestPSDmatrix(size, stride, matrix));
+
+	ndInt32 base1 = 0;
+	for (ndInt32 i = 0; i < size; ++i)
+	{
+		const ndInt32 index = normalIndex[i] + i;
+		const ndFloat32 coefficient = x[index];
+
+		const ndFloat32 l = low[i] * coefficient;
+		const ndFloat32 h = high[i] * coefficient;
+
+		x[i] = ndClamp(x[i], l, h);
+		invDiag[i] = ndFloat32(1.0f) / matrix[base1 + i];
+		ndAssert(ndCheckFloat(invDiag[i]));
+		base1 += stride;
+	}
+
+	const ndInt32 maxIterCount = 64;
+	ndFloat32 tolerance = tol2 * ndFloat32(2.0f);
+	for (ndInt32 m = maxIterCount; (m >= 0) && (tolerance > tol2); --m)
+	{
+		ndInt32 base = 0;
+		tolerance = ndFloat32(0.0f);
+		for (ndInt32 i = 0; i < size; ++i)
+		{
+			const ndFloat32* const row = &matrix[base];
+			ndFloat32 r = b[i];
+			for (ndInt32 k = 0; k < size; ++k)
+			{
+				r -= row[k] * x[k];
+			}
+
+			const ndInt32 index = normalIndex[i] + i;
+			const ndFloat32 coefficient = x[index];
+			const ndFloat32 l = low[i] * coefficient;
+			const ndFloat32 h = high[i] * coefficient;
+			const ndFloat32 x0 = x[i];
+			const ndFloat32 x1 = x0 + r * invDiag[i];
+			const ndFloat32 x2 = x0 + (x1 - x0) * sor;
+			const ndFloat32 f = ndClamp(x2, l, h);
+			ndAssert(ndCheckFloat(f));
+
+			const ndFloat32 dx = f - x0;
+			const ndFloat32 dr = dx * row[i];
+			tolerance += dr * dr;
+			x[i] = f;
+
+			base += stride;
+		}
+	}
+
+	static int xxxxxxxxx;
+	ndTrace(("%d %d %f\n", xxxxxxxxx++, xxxx, error2));
+}
+#endif
 void ndSkeletonContainer::RegularizeLcp() const
 {
 	ndInt32 size = m_auxiliaryRowCount - m_blockSize;
