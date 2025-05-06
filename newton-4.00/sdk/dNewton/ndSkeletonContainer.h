@@ -120,15 +120,6 @@ class ndSkeletonContainer
 		ndInt8 m_swapJacobianBodiesIndex;
 	};
 
-	//class ndNodeList : public ndList<ndNode, ndContainersFreeListAlloc<ndSkeletonContainer::ndNode> >
-	//{
-	//	public:
-	//	ndNodeList()
-	//		:ndList<ndSkeletonContainer::ndNode, ndContainersFreeListAlloc<ndSkeletonContainer::ndNode> >()
-	//	{
-	//	}
-	//};
-
 	class ndNodeList : public ndList<ndSkeletonContainer::ndNode, ndContainersFreeListAlloc<ndSkeletonContainer::ndNode> >
 	{
 		public:
