@@ -387,7 +387,7 @@ namespace ndQuadruped_1
 		};
 
 		ndFloat32 mass = 20.0f;
-		ndFloat32 limbMass = 5.0f;
+		ndFloat32 limbMass = 1.0f;
 		ndMatrix matrix(entity->GetCurrentMatrix() * location);
 
 		ndSharedPtr<ndBody> rootBody(CreateRigidBody(entity, matrix, mass, nullptr));
