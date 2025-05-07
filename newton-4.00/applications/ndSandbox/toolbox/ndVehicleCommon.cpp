@@ -175,17 +175,11 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_rearTire.m_brakeTorque = 1500.0f;
 	m_rearTire.m_handBrakeTorque = 1000.0f;
 	
-	//ndFloat32 longStiffness = 10.0f * DEMO_GRAVITY * m_chassisMass;
-	//ndFloat32 lateralStiffness = 2.0f * longStiffness;
-
-	ndFloat32 longStiffness = 10.0f * DEMO_GRAVITY;
-	ndFloat32 lateralStiffness = 2.0f * longStiffness;
-
-	m_rearTire.m_longitudinalStiffness = longStiffness;
-	m_frontTire.m_longitudinalStiffness = longStiffness;
+	m_rearTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
+	m_frontTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
 	
-	m_rearTire.m_laterialStiffness = lateralStiffness;
-	m_frontTire.m_laterialStiffness = lateralStiffness;
+	m_rearTire.m_laterialStiffness = 0.75f * DEMO_GRAVITY;
+	m_frontTire.m_laterialStiffness = 0.75f * DEMO_GRAVITY;
 
 	m_motorMass = 20.0f;
 	m_motorRadius = 0.25f;
@@ -586,6 +580,7 @@ void ndVehicleCommonNotify::ApplyInputs(ndFloat32)
 		{
 			brake = 1.0f;
 		}
+brake = 0.0f;
 
 		ndFloat32 steerAngle = axis[m_steeringWheel];
 		ndFloat32 handBrake = buttons[m_handBreakButton] ? 1.0f : 0.0f;

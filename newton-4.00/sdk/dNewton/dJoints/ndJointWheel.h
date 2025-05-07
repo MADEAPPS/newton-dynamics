@@ -79,10 +79,10 @@ class ndJointWheel : public ndJointBilateralConstraint
 	ndFloat32 m_speed;
 	ndFloat32 m_regularizer;
 	ndFloat32 m_normalizedBrake;
-	ndFloat32 m_normalidedSteering;
-	ndFloat32 m_normalidedSteering0;
+	ndFloat32 m_normalizedSteering;
+	ndFloat32 m_normalizedSteering0;
 	ndFloat32 m_normalizedHandBrake;
-	bool m_IsAapplyingBreaks;
+	bool m_IsApplyingBreaks;
 
 	friend class ndMultiBodyVehicle;
 } D_GCC_NEWTON_CLASS_ALIGN_32;

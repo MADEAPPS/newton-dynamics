@@ -21,10 +21,10 @@ ndJointWheel::ndJointWheel()
 	,m_speed(ndFloat32(0.0f))
 	,m_regularizer(m_info.m_regularizer)
 	,m_normalizedBrake(ndFloat32(0.0f))
-	,m_normalidedSteering(ndFloat32(0.0f))
-	,m_normalidedSteering0(ndFloat32(0.0f))
+	,m_normalizedSteering(ndFloat32(0.0f))
+	,m_normalizedSteering0(ndFloat32(0.0f))
 	,m_normalizedHandBrake(ndFloat32(0.0f))
-	,m_IsAapplyingBreaks(false)
+	,m_IsApplyingBreaks(false)
 	//,m_vcdMode(false)
 {
 	m_maxDof = 7;
@@ -38,10 +38,10 @@ ndJointWheel::ndJointWheel(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* co
 	,m_speed(ndFloat32(0.0f))
 	,m_regularizer(info.m_regularizer)
 	,m_normalizedBrake(ndFloat32(0.0f))
-	,m_normalidedSteering(ndFloat32(0.0f))
-	,m_normalidedSteering0(ndFloat32(0.0f))
+	,m_normalizedSteering(ndFloat32(0.0f))
+	,m_normalizedSteering0(ndFloat32(0.0f))
 	,m_normalizedHandBrake(ndFloat32(0.0f))
-	,m_IsAapplyingBreaks(false)
+	,m_IsApplyingBreaks(false)
 	//,m_vcdMode(false)
 {
 }
@@ -77,7 +77,7 @@ ndFloat32 ndJointWheel::GetBreak() const
 
 ndFloat32 ndJointWheel::GetSteering() const
 {
-	return m_normalidedSteering;
+	return m_normalizedSteering;
 }
 
 ndFloat32 ndJointWheel::GetHandBreak() const
@@ -97,14 +97,14 @@ void ndJointWheel::SetHandBreak(ndFloat32 normalizedBrake)
 
 void ndJointWheel::SetSteering(ndFloat32 normalidedSteering)
 {
-	m_normalidedSteering = ndClamp(normalidedSteering, ndFloat32(-1.0f), ndFloat32(1.0f));
+	m_normalizedSteering = ndClamp(normalidedSteering, ndFloat32(-1.0f), ndFloat32(1.0f));
 }
 
 void ndJointWheel::UpdateTireSteeringAngleMatrix()
 {
 	ndMatrix tireMatrix;
 	ndMatrix chassisMatrix;
-	m_localMatrix1 = ndYawMatrix(m_normalidedSteering * m_info.m_steeringAngle) * m_baseFrame;
+	m_localMatrix1 = ndYawMatrix(m_normalizedSteering * m_info.m_steeringAngle) * m_baseFrame;
 
 	CalculateGlobalMatrix(tireMatrix, chassisMatrix);
 	const ndVector localRelPosit(chassisMatrix.UntransformVector(tireMatrix.m_posit));
@@ -184,11 +184,11 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
 	SetMassSpringDamperAcceleration(desc, m_regularizer, m_info.m_springK, m_info.m_damperC);
 
-	m_IsAapplyingBreaks = false;
+	m_IsApplyingBreaks = false;
 	const ndFloat32 brakeFrictionTorque = ndMax(m_normalizedBrake * m_info.m_brakeTorque, m_normalizedHandBrake * m_info.m_handBrakeTorque);
 	if (brakeFrictionTorque > ndFloat32(0.0f))
 	{
-		m_IsAapplyingBreaks = true;
+		m_IsApplyingBreaks = true;
 		const ndFloat32 brakesToChassisInfluence = ndFloat32 (0.125f);
 
 		AddAngularRowJacobian(desc, matrix1.m_front, ndFloat32(0.0f));

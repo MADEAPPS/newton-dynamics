@@ -47,7 +47,6 @@ ndContact::ndContact()
 	,m_inTrigger(0)
 	,m_isAttached(0)
 	,m_isIntersetionTestOnly(0)
-	//,m_skeletonIntraCollision(1)
 	,m_skeletonSelftCollision(1)
 	,m_skeletonExtraContact(0)
 {
@@ -218,7 +217,6 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 	desc.m_penetration[normalIndex] = penetration;
 	desc.m_restitution[normalIndex] = restitutionCoefficient;
 	desc.m_forceBounds[normalIndex].m_low = ndFloat32(0.0f);
-	//desc.m_forceBounds[normalIndex].m_normalIndex = D_INDEPENDENT_ROW;
 	desc.m_forceBounds[normalIndex].m_normalIndex = D_INDEPENDENT_ROW;
 	desc.m_forceBounds[normalIndex].m_jointForce = (ndForceImpactPair*)&contact.m_normal_Force;
 

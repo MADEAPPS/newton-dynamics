@@ -51,14 +51,14 @@ class ndVehicleDectriptorViper : public ndVehicleDectriptor
 		m_frontTire.m_mass = 25.0f;
 		m_frontTire.m_handBrakeTorque = 0.0f;
 		m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		m_frontTire.m_longitudinalStiffness = 1.0f * DEMO_GRAVITY;
-		m_frontTire.m_laterialStiffness = 2.0f * m_frontTire.m_longitudinalStiffness;
+		m_frontTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
+		m_frontTire.m_laterialStiffness = m_frontTire.m_longitudinalStiffness;
 
 		m_rearTire.m_mass = 25.0f;
 		m_rearTire.m_handBrakeTorque = 100000.0f;
 		m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		m_rearTire.m_longitudinalStiffness = 1.0f * DEMO_GRAVITY;
-		m_rearTire.m_laterialStiffness = 2.0f * m_rearTire.m_longitudinalStiffness;
+		m_rearTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
+		m_rearTire.m_laterialStiffness = 1.25f * m_rearTire.m_longitudinalStiffness;
 	}
 };
 
@@ -108,10 +108,10 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 
 		m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
 		m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		m_rearTire.m_longitudinalStiffness = 10.0f * DEMO_GRAVITY;
-		m_frontTire.m_longitudinalStiffness = 10.0f * DEMO_GRAVITY;
-		m_rearTire.m_laterialStiffness = 2.0f * m_rearTire.m_longitudinalStiffness;
-		m_frontTire.m_laterialStiffness = 2.0f * m_frontTire.m_longitudinalStiffness;
+		m_rearTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
+		m_frontTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
+		m_rearTire.m_laterialStiffness = m_rearTire.m_longitudinalStiffness;
+		m_frontTire.m_laterialStiffness = m_frontTire.m_longitudinalStiffness;
 	}
 };
 
@@ -159,10 +159,10 @@ class ndVehicleDectriptorMonsterTruck0: public ndVehicleDectriptor
 
 		m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
 		m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		m_rearTire.m_longitudinalStiffness = 10.0f * DEMO_GRAVITY;
-		m_frontTire.m_longitudinalStiffness = 10.0f * DEMO_GRAVITY;
-		m_rearTire.m_laterialStiffness = 2.0f * m_rearTire.m_longitudinalStiffness;
-		m_frontTire.m_laterialStiffness = 2.0f * m_frontTire.m_longitudinalStiffness;
+		m_rearTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
+		m_frontTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
+		m_rearTire.m_laterialStiffness = m_rearTire.m_longitudinalStiffness;
+		m_frontTire.m_laterialStiffness = m_frontTire.m_longitudinalStiffness;
 	}
 };
 
@@ -218,10 +218,10 @@ class ndVehicleDectriptorMonsterTruck1 : public ndVehicleDectriptor
 
 		m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
 		m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		m_rearTire.m_longitudinalStiffness = 10.0f * DEMO_GRAVITY;
-		m_frontTire.m_longitudinalStiffness = 10.0f * DEMO_GRAVITY;
-		m_rearTire.m_laterialStiffness = 2.0f * m_rearTire.m_longitudinalStiffness;
-		m_frontTire.m_laterialStiffness = 2.0f * m_frontTire.m_longitudinalStiffness;
+		m_rearTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
+		m_frontTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
+		m_rearTire.m_laterialStiffness = m_rearTire.m_longitudinalStiffness;
+		m_frontTire.m_laterialStiffness = m_frontTire.m_longitudinalStiffness;
 	}
 };
 
@@ -451,8 +451,8 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	ndSharedPtr<ndUIEntity> vehicleUI(new ndVehicleUI(scene));
 	scene->Set2DDisplayRenderFunction(vehicleUI);
 	
-	ndSharedPtr<ndModel> vehicle0 (CreateBasicVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
-	ndSharedPtr<ndModel> vehicle1 (CreateBasicVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -6.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
+	ndSharedPtr<ndModel> vehicle0 (CreateBasicVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
+	ndSharedPtr<ndModel> vehicle1 (CreateBasicVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f,  -6.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
 	ndSharedPtr<ndModel> vehicle2 (CreateBasicVehicle(scene, monterTruckDesc0, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 0.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
 	ndSharedPtr<ndModel> vehicle3 (CreateBasicVehicle(scene, monterTruckDesc1, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 6.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
 
@@ -485,7 +485,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	
 	matrix.m_posit.m_x += 20.0f;
 	matrix.m_posit.m_z += 5.0f;
-	//AddPlanks(scene, matrix, 60.0f, 5);
+	AddPlanks(scene, matrix, 60.0f, 5);
 
 	ndQuaternion rot;
 	ndVector origin(-10.0f, 2.0f, -10.0f, 1.0f);
