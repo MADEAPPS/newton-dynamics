@@ -1482,13 +1482,13 @@ void ndDynamicsUpdate::CalculateJointsForce()
 				}
 				force[rowsCount] = ndFloat32(1.0f);
 
-				const ndFloat32 preconditioner0 = body0->m_weigh;
-				const ndFloat32 preconditioner1 = body1->m_weigh;
-
 				ndVector forceM0(m_internalForces[m0].m_linear);
 				ndVector torqueM0(m_internalForces[m0].m_angular);
 				ndVector forceM1(m_internalForces[m1].m_linear);
 				ndVector torqueM1(m_internalForces[m1].m_angular);
+
+				const ndFloat32 preconditioner0 = body0->m_weigh;
+				const ndFloat32 preconditioner1 = body1->m_weigh;
 
 				const ndFloat32 tol = ndFloat32(0.125f);
 				const ndFloat32 tol2 = tol * tol;
@@ -1497,10 +1497,10 @@ void ndDynamicsUpdate::CalculateJointsForce()
 				for (ndInt32 k = 0; (k < 4) && (accNorm > tol2); ++k)
 				{
 					accNorm = ndFloat32(0.0f);
-					for (ndInt32 j = 0; j < rowsCount; ++j)
+					for (ndInt32 i = 0; i < rowsCount; ++i)
 					{
-						ndRightHandSide* const rhs = &m_rightHandSide[rowStart + j];
-						const ndLeftHandSide* const lhs = &m_leftHandSide[rowStart + j];
+						ndRightHandSide* const rhs = &m_rightHandSide[rowStart + i];
+						const ndLeftHandSide* const lhs = &m_leftHandSide[rowStart + i];
 						const ndFloat32 f0 = rhs->m_force;
 
 						ndVector accel(lhs->m_JMinv.m_jacobianM0.m_linear* forceM0);
@@ -1570,8 +1570,8 @@ void ndDynamicsUpdate::CalculateJointsForce()
 			for (ndInt32 j = 0; j < maxSpan; ++j)
 			{
 				ndConstraint* const joint = jointArray[i + j];
-				JointForce(joint, i + j);
-				//JointForceNew(joint, i + j);
+				//JointForce(joint, i + j);
+				JointForceNew(joint, i + j);
 			}
 		}
 	});
