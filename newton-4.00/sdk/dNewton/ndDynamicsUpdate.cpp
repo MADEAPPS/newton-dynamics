@@ -1452,6 +1452,48 @@ void ndDynamicsUpdate::CalculateJointsForce()
 			const ndInt32 resting = body0->m_equilibrium0 & body1->m_equilibrium0;
 			if (!resting)
 			{
+static int xxxxx;
+xxxxx++;
+int xxxxxxxxxx = 1000;
+if (xxxxx >= xxxxxxxxxx)
+xxxxx *= 1;
+
+				const ndFloat32 weight0 = body0->m_weigh;
+				const ndFloat32 weight1 = body1->m_weigh;
+
+				ndInt32 stride = (rowsCount + 3) & -4;
+				ndFixSizeArray<ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS>, D_CONSTRAINT_MAX_ROWS> massMatrix(rowsCount);
+				for (ndInt32 i = 0; i < rowsCount; ++i)
+				{
+					const ndRightHandSide* const rhs = &m_rightHandSide[rowStart + i];
+					const ndLeftHandSide* const row_i = &m_leftHandSide[rowStart + i];
+					const ndJacobian JinvMassM0_i(row_i->m_JMinv.m_jacobianM0);
+					const ndJacobian JinvMassM1_i(row_i->m_JMinv.m_jacobianM1);
+
+					massMatrix[i].SetCount(rowsCount);
+					ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS>& row = massMatrix[i];
+
+					row[i] = rhs->m_JinvMJt;
+					for (ndInt32 j = i + 1; j < rowsCount; ++j)
+					{
+						const ndLeftHandSide* const row_j = &m_leftHandSide[rowStart + j];
+						const ndJacobian Jtm0_j(row_j->m_Jt.m_jacobianM0);
+						const ndJacobian Jtm1_j(row_j->m_Jt.m_jacobianM1);
+
+						const ndVector offDiagonal(
+							ndVector(weight0) * (JinvMassM0_i.m_linear * Jtm0_j.m_linear + JinvMassM0_i.m_angular * Jtm0_j.m_angular) +
+							ndVector(weight1) * (JinvMassM1_i.m_linear * Jtm1_j.m_linear + JinvMassM1_i.m_angular * Jtm1_j.m_angular));
+
+						ndFloat32 offDiagonalElement = offDiagonal.AddHorizontal().GetScalar();
+						row[j] = offDiagonalElement;
+						massMatrix[j][i] = offDiagonalElement;
+					}
+					for (ndInt32 j = rowsCount; j < stride; j++)
+					{
+						row[j] = ndFloat32(0.0f);
+					}
+				}
+
 				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS + 1> force(rowsCount + 1);
 				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS> diagDamp(rowsCount);
 				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS> JinvMJt(rowsCount);
@@ -1460,12 +1502,22 @@ void ndDynamicsUpdate::CalculateJointsForce()
 				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS> lowerBoundFrictionCoefficent(rowsCount);
 				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS> upperBoundFrictionCoefficent(rowsCount);
 				ndFixSizeArray<ndInt32, D_CONSTRAINT_MAX_ROWS> normalForceIndexFlat(rowsCount);
+
+				ndVector forceM0(m_internalForces[m0].m_linear);
+				ndVector torqueM0(m_internalForces[m0].m_angular);
+				ndVector forceM1(m_internalForces[m1].m_linear);
+				ndVector torqueM1(m_internalForces[m1].m_angular);
+
 				for (ndInt32 i = 0; i < rowsCount; ++i)
 				{
 					const ndRightHandSide* const rhs = &m_rightHandSide[rowStart + i];
 					ndAssert(rhs->SanityCheck());
-
 					force[i] = rhs->m_force;
+				}
+
+				for (ndInt32 i = 0; i < rowsCount; ++i)
+				{
+					const ndRightHandSide* const rhs = &m_rightHandSide[rowStart + i];
 					diagDamp[i] = rhs->m_diagDamp;
 					JinvMJt[i] = rhs->m_JinvMJt;
 					invJinvMJt[i] = rhs->m_invJinvMJt;
@@ -1473,21 +1525,81 @@ void ndDynamicsUpdate::CalculateJointsForce()
 					lowerBoundFrictionCoefficent[i] = rhs->m_lowerBoundFrictionCoefficent;
 					upperBoundFrictionCoefficent[i] = rhs->m_upperBoundFrictionCoefficent;
 					normalForceIndexFlat[i] = rhs->m_normalForceIndexFlat ? rhs->m_normalForceIndexFlat - rowStart : rowsCount;
+					
+					const ndLeftHandSide* const lhs = &m_leftHandSide[rowStart + i];
+					const ndJacobian& JinvMassM0 = lhs->m_JMinv.m_jacobianM0;
+					const ndJacobian& JinvMassM1 = lhs->m_JMinv.m_jacobianM1;
+					const ndVector accel(
+						JinvMassM0.m_linear * forceM0 + JinvMassM0.m_angular * torqueM0 +
+						JinvMassM1.m_linear * forceM1 + JinvMassM1.m_angular * torqueM1);
+					coordenateAccel[i] = rhs->m_coordenateAccel - force[i] * diagDamp[i] - accel.AddHorizontal().GetScalar();
+
+					const ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS>& row = massMatrix[i];
+					const ndVector* const rowSimd = (ndVector*)&row[0];
+					const ndVector* const forceSimd = (ndVector*)&force[0];
+					ndVector sum(ndVector::m_zero);
+					for (ndInt32 j = (stride / 4) - 1; j >= 0; --j)
+					{
+						sum += rowSimd[j] * forceSimd[j];
+					}
+					coordenateAccel[i] += sum.AddHorizontal().GetScalar();
 				}
 				force[rowsCount] = ndFloat32(1.0f);
 
-				ndVector forceM0(m_internalForces[m0].m_linear);
-				ndVector torqueM0(m_internalForces[m0].m_angular);
-				ndVector forceM1(m_internalForces[m1].m_linear);
-				ndVector torqueM1(m_internalForces[m1].m_angular);
-
-				const ndFloat32 weight0 = body0->m_weigh;
-				const ndFloat32 weight1 = body1->m_weigh;
-
+				const ndInt32 maxIterCount = 4;
 				const ndFloat32 tol = ndFloat32(0.125f);
 				const ndFloat32 tol2 = tol * tol;
 
+if (xxxxx >= xxxxxxxxxx)
+xxxxx *= 1;
+
 				ndFloat32 accNorm = ndFloat32(10.0f);
+				const ndVector* const forceStepSimd = (ndVector*)&force[0];
+				for (ndInt32 k = maxIterCount - 1; (k >= 0) && (accNorm > tol2); --k)
+				{
+					accNorm = ndFloat32(0.0f);
+					for (ndInt32 i = 0; i < rowsCount; ++i)
+					{
+						const ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS>& row = massMatrix[i];
+						const ndVector* const rowSimd = (ndVector*)&row[0];
+						ndVector sum(ndVector::m_zero);
+						for (ndInt32 j = (stride / 4) - 1; j >= 0; --j)
+						{
+							sum += rowSimd[j] * forceStepSimd[j];
+						}
+						const ndFloat32 r = coordenateAccel[i] - sum.AddHorizontal().GetScalar();
+						
+						ndAssert(normalForceIndexFlat[i] >= 0);
+						const ndInt32 frictionIndex = normalForceIndexFlat[i];
+						const ndFloat32 frictionNormal = force[frictionIndex];
+						const ndFloat32 lowerFrictionForce = frictionNormal * lowerBoundFrictionCoefficent[i];
+						const ndFloat32 upperFrictionForce = frictionNormal * upperBoundFrictionCoefficent[i];
+						
+						accNorm += r * r;
+						const ndFloat32 x0 = force[i];
+						const ndFloat32 x1 = x0 + r * invJinvMJt[i];
+						const ndFloat32 f = ndClamp(x1, lowerFrictionForce, upperFrictionForce);
+						ndAssert(ndCheckFloat(f));
+						force[i] = f;
+					}
+				}
+				
+				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS> xxxx(rowsCount);
+				for (ndInt32 i = 0; i < rowsCount; ++i)
+				{
+					ndRightHandSide* const rhs = &m_rightHandSide[rowStart + i];
+					xxxx[i] = force[i];
+					force[i] = rhs->m_force;
+					coordenateAccel[i] = rhs->m_coordenateAccel;
+				}
+
+if (xxxxx >= xxxxxxxxxx)
+xxxxx *= 1;
+
+				//const ndFloat32 tol = ndFloat32(0.125f);
+				//const ndFloat32 tol2 = tol * tol;
+				//ndFloat32 accNorm = ndFloat32(10.0f);
+				accNorm = ndFloat32(10.0f);
 				for (ndInt32 k = 0; (k < 4) && (accNorm > tol2); ++k)
 				{
 					accNorm = ndFloat32(0.0f);
@@ -1495,27 +1607,27 @@ void ndDynamicsUpdate::CalculateJointsForce()
 					{
 						const ndLeftHandSide* const lhs = &m_leftHandSide[rowStart + i];
 						const ndFloat32 f0 = force[i];
-
+						
 						ndVector accel(lhs->m_JMinv.m_jacobianM0.m_linear * forceM0);
 						accel = accel.MulAdd(lhs->m_JMinv.m_jacobianM0.m_angular, torqueM0);
 						accel = accel.MulAdd(lhs->m_JMinv.m_jacobianM1.m_linear, forceM1);
 						accel = accel.MulAdd(lhs->m_JMinv.m_jacobianM1.m_angular, torqueM1);
 						const ndFloat32 a = coordenateAccel[i] - f0 * diagDamp[i] - accel.AddHorizontal().GetScalar();
-
+						
 						ndAssert(normalForceIndexFlat[i] >= 0);
 						ndFloat32 f1 = f0 + a * invJinvMJt[i];
 						const ndInt32 frictionIndex = normalForceIndexFlat[i];
 						const ndFloat32 frictionNormal = force[frictionIndex];
 						const ndFloat32 lowerFrictionForce = frictionNormal * lowerBoundFrictionCoefficent[i];
 						const ndFloat32 upperFrictionForce = frictionNormal * upperBoundFrictionCoefficent[i];
-
+						
 						f1 = ndClamp(f1, lowerFrictionForce, upperFrictionForce);
 						force[i] = f1;
-
+						
 						const ndFloat32 deltaForce = f1 - f0;
 						ndFloat32 residual = deltaForce * JinvMJt[i];
 						accNorm += residual * residual;
-
+						
 						const ndVector deltaForce0(deltaForce * weight0);
 						const ndVector deltaForce1(deltaForce * weight1);
 						forceM0 = forceM0.MulAdd(lhs->m_Jt.m_jacobianM0.m_linear, deltaForce0);
@@ -1524,6 +1636,9 @@ void ndDynamicsUpdate::CalculateJointsForce()
 						torqueM1 = torqueM1.MulAdd(lhs->m_Jt.m_jacobianM1.m_angular, deltaForce1);
 					}
 				}
+
+if (xxxxx >= xxxxxxxxxx)
+xxxxx *= 1;
 
 				for (ndInt32 i = 0; i < rowsCount; ++i)
 				{
