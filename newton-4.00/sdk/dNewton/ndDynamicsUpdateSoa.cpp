@@ -685,6 +685,7 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 				rhs->m_diagDamp = diag * rhs->m_diagonalRegularizer;
 
 				diag *= (ndFloat32(1.0f) + rhs->m_diagonalRegularizer);
+				rhs->m_JinvMJt = diag;
 				rhs->m_invJinvMJt = ndFloat32(1.0f) / diag;
 
 				const ndVector f(rhs->m_force);
@@ -924,6 +925,7 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 							const ndRightHandSide* const rhs = &rightHandSide[soaJoint->m_rowStart + k];
 							row.m_force[n] = rhs->m_force;
 							row.m_diagDamp[n] = rhs->m_diagDamp;
+							row.m_JinvMJt[n] = rhs->m_JinvMJt;
 							row.m_invJinvMJt[n] = rhs->m_invJinvMJt;
 							row.m_coordenateAccel[n] = rhs->m_coordenateAccel;
 							normalIndex[n] = (rhs->m_normalForceIndex + 1) * D_SSE_WORK_GROUP + n;
@@ -966,6 +968,7 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 
 						row.m_force = zero;
 						row.m_diagDamp = zero;
+						row.m_JinvMJt = zero;
 						row.m_invJinvMJt = zero;
 						row.m_coordenateAccel = zero;
 						row.m_normalForceIndex = ordinals;
@@ -1012,6 +1015,7 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 								const ndRightHandSide* const rhs = &rightHandSide[joint->m_rowStart + n];
 								row.m_force[k] = rhs->m_force;
 								row.m_diagDamp[k] = rhs->m_diagDamp;
+								row.m_JinvMJt[k] = rhs->m_JinvMJt;
 								row.m_invJinvMJt[k] = rhs->m_invJinvMJt;
 								row.m_coordenateAccel[k] = rhs->m_coordenateAccel;
 
@@ -1341,7 +1345,7 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 			ndSoaVector6 forceM1;
 			ndVector preconditioner0;
 			ndVector preconditioner1;
-			ndVector normalForce[D_CONSTRAINT_MAX_ROWS + 1];
+			ndFixSizeArray<ndVector, D_CONSTRAINT_MAX_ROWS + 1> normalForce(D_CONSTRAINT_MAX_ROWS + 1);
 
 			const ndInt32 block = group * D_SSE_WORK_GROUP;
 			ndConstraint** const jointGroup = &jointArray[block];
@@ -1425,70 +1429,22 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 					}
 				}
 			}
-
-			ndVector accNorm(zero);
-			normalForce[0] = ndVector::m_one;
 			const ndInt32 rowsCount = jointGroup[0]->m_rowCount;
 
+			normalForce[0] = ndVector::m_one;
 			for (ndInt32 j = 0; j < rowsCount; ++j)
 			{
 				const ndSoaMatrixElement* const row = &massMatrix[j];
-
-				ndVector a(row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x);
-				a = a.MulAdd(row->m_JMinv.m_jacobianM0.m_linear.m_y, forceM0.m_linear.m_y);
-				a = a.MulAdd(row->m_JMinv.m_jacobianM0.m_linear.m_z, forceM0.m_linear.m_z);
-
-				a = a.MulAdd(row->m_JMinv.m_jacobianM0.m_angular.m_x, forceM0.m_angular.m_x);
-				a = a.MulAdd(row->m_JMinv.m_jacobianM0.m_angular.m_y, forceM0.m_angular.m_y);
-				a = a.MulAdd(row->m_JMinv.m_jacobianM0.m_angular.m_z, forceM0.m_angular.m_z);
-
-				a = a.MulAdd(row->m_JMinv.m_jacobianM1.m_linear.m_x, forceM1.m_linear.m_x);
-				a = a.MulAdd(row->m_JMinv.m_jacobianM1.m_linear.m_y, forceM1.m_linear.m_y);
-				a = a.MulAdd(row->m_JMinv.m_jacobianM1.m_linear.m_z, forceM1.m_linear.m_z);
-
-				a = a.MulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_x, forceM1.m_angular.m_x);
-				a = a.MulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_y, forceM1.m_angular.m_y);
-				a = a.MulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_z, forceM1.m_angular.m_z);
-
-				a = row->m_coordenateAccel.MulSub(row->m_force, row->m_diagDamp) - a;
-				ndVector f(row->m_force.MulAdd(row->m_invJinvMJt, a));
-
-				const ndVector frictionNormal(&normalForce[0].m_x, row->m_normalForceIndex.m_i);
-				const ndVector lowerFrictionForce(frictionNormal * row->m_lowerBoundFrictionCoefficent);
-				const ndVector upperFrictionForce(frictionNormal * row->m_upperBoundFrictionCoefficent);
-
-				a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
-				accNorm = accNorm.MulAdd(a, a);
-
-				f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
-				normalForce[j + 1] = f;
-
-				const ndVector deltaForce(f - row->m_force);
-				const ndVector deltaForce0(deltaForce * preconditioner0);
-				const ndVector deltaForce1(deltaForce * preconditioner1);
-
-				forceM0.m_linear.m_x = forceM0.m_linear.m_x.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_x, deltaForce0);
-				forceM0.m_linear.m_y = forceM0.m_linear.m_y.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_y, deltaForce0);
-				forceM0.m_linear.m_z = forceM0.m_linear.m_z.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_z, deltaForce0);
-				forceM0.m_angular.m_x = forceM0.m_angular.m_x.MulAdd(row->m_Jt.m_jacobianM0.m_angular.m_x, deltaForce0);
-				forceM0.m_angular.m_y = forceM0.m_angular.m_y.MulAdd(row->m_Jt.m_jacobianM0.m_angular.m_y, deltaForce0);
-				forceM0.m_angular.m_z = forceM0.m_angular.m_z.MulAdd(row->m_Jt.m_jacobianM0.m_angular.m_z, deltaForce0);
-
-				forceM1.m_linear.m_x = forceM1.m_linear.m_x.MulAdd(row->m_Jt.m_jacobianM1.m_linear.m_x, deltaForce1);
-				forceM1.m_linear.m_y = forceM1.m_linear.m_y.MulAdd(row->m_Jt.m_jacobianM1.m_linear.m_y, deltaForce1);
-				forceM1.m_linear.m_z = forceM1.m_linear.m_z.MulAdd(row->m_Jt.m_jacobianM1.m_linear.m_z, deltaForce1);
-				forceM1.m_angular.m_x = forceM1.m_angular.m_x.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_x, deltaForce1);
-				forceM1.m_angular.m_y = forceM1.m_angular.m_y.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_y, deltaForce1);
-				forceM1.m_angular.m_z = forceM1.m_angular.m_z.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_z, deltaForce1);
+				normalForce[j + 1] = row->m_force;
 			}
 
 			const ndFloat32 tol = ndFloat32(0.125f);
 			const ndFloat32 tol2 = tol * tol;
 
-			ndVector maxAccel(accNorm);
-			for (ndInt32 k = 0; (k < 4) && (maxAccel.GetMax().GetScalar() > tol2); ++k)
+			ndVector accNorm(ndFloat32 (10.0f));
+			for (ndInt32 k = 0; (k < 4) && (accNorm.GetMax().GetScalar() > tol2); ++k)
 			{
-				maxAccel = zero;
+				accNorm = zero;
 				for (ndInt32 j = 0; j < rowsCount; ++j)
 				{
 					const ndSoaMatrixElement* const row = &massMatrix[j];
@@ -1517,13 +1473,13 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 					const ndVector lowerFrictionForce(frictionNormal * row->m_lowerBoundFrictionCoefficent);
 					const ndVector upperFrictionForce(frictionNormal * row->m_upperBoundFrictionCoefficent);
 
-					a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
-					maxAccel = maxAccel.MulAdd(a, a);
-
 					f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
 					normalForce[j + 1] = f;
 
 					const ndVector deltaForce(f - force);
+					const ndVector residual (deltaForce * row->m_JinvMJt);
+					accNorm = accNorm.MulAdd(residual, residual);
+
 					const ndVector deltaForce0(deltaForce * preconditioner0);
 					const ndVector deltaForce1(deltaForce * preconditioner1);
 

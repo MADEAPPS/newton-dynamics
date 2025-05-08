@@ -57,6 +57,7 @@ namespace ndSoa
 
 		ndVector m_force;
 		ndVector m_diagDamp;
+		ndVector m_JinvMJt;
 		ndVector m_invJinvMJt;
 		ndVector m_coordenateAccel;
 		ndVector m_normalForceIndex;

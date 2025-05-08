@@ -58,7 +58,7 @@ ndFixSizeArray<T, maxSize>::ndFixSizeArray(ndInt32 initialSize)
 	:ndClassAlloc()
 	,m_count(initialSize)
 {
-	ndAssert(initialSize < maxSize);
+	ndAssert(initialSize <= maxSize);
 }
 
 template<class T, ndInt32 maxSize>
