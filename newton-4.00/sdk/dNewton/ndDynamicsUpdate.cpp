@@ -1300,8 +1300,8 @@ void ndDynamicsUpdate::CalculateJointsForce()
 	ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
 	ndArray<ndConstraint*>& jointArray = scene->GetActiveContactArray();
 
-	ndAtomic<ndInt32> iterator0(0);
-	auto CalculateJointsForce = ndMakeObject::ndFunction([this, &iterator0, &jointArray](ndInt32, ndInt32)
+	ndAtomic<ndInt32> iterator(0);
+	auto CalculateJointsForce = ndMakeObject::ndFunction([this, &iterator, &jointArray](ndInt32, ndInt32)
 	{
 		D_TRACKTIME_NAMED(CalculateJointsForce);
 		ndJacobian* const jointPartialForces = &GetTempInternalForces()[0];
@@ -1442,7 +1442,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 		};
 
 		const ndInt32 jointCount = ndInt32 (jointArray.GetCount());
-		for (ndInt32 i = iterator0.fetch_add(D_WORKER_BATCH_SIZE); i < jointCount; i = iterator0.fetch_add(D_WORKER_BATCH_SIZE))
+		for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < jointCount; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
 		{
 			const ndInt32 maxSpan = ((jointCount - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : jointCount - i;
 			for (ndInt32 j = 0; j < maxSpan; ++j)
@@ -1453,8 +1453,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 		}
 	});
 
-	ndAtomic<ndInt32> iterator1(0);
-	auto ApplyJacobianAccumulatePartialForces = ndMakeObject::ndFunction([this, &iterator1, &bodyArray](ndInt32, ndInt32)
+	auto ApplyJacobianAccumulatePartialForces = ndMakeObject::ndFunction([this, &iterator, &bodyArray](ndInt32, ndInt32)
 	{
 		D_TRACKTIME_NAMED(ApplyJacobianAccumulatePartialForces);
 		const ndVector zero(ndVector::m_zero);
@@ -1466,7 +1465,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 		const ndJointBodyPairIndex* const jointBodyPairIndexBuffer = &GetJointBodyPairIndexBuffer()[0];
 
 		const ndInt32 bodyCount = ndInt32 (bodyArray.GetCount());
-		for (ndInt32 i = iterator1.fetch_add(D_WORKER_BATCH_SIZE); i < bodyCount; i = iterator1.fetch_add(D_WORKER_BATCH_SIZE))
+		for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < bodyCount; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
 		{
 			const ndInt32 maxSpan = ((bodyCount - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : bodyCount - i;
 			for (ndInt32 j = 0; j < maxSpan; ++j)
@@ -1493,9 +1492,10 @@ void ndDynamicsUpdate::CalculateJointsForce()
 
 	for (ndInt32 i = 0; i < ndInt32(passes); ++i)
 	{
-		iterator0 = 0;
-		iterator1 = 0;
+		iterator = 0;
 		scene->ParallelExecute(CalculateJointsForce);
+
+		iterator = 0;
 		scene->ParallelExecute(ApplyJacobianAccumulatePartialForces);
 	}
 }
