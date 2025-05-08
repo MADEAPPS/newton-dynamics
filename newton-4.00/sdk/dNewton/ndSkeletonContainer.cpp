@@ -361,8 +361,8 @@ ndSkeletonContainer::ndSkeletonContainer()
 	,m_massMatrix11(nullptr)
 	,m_massMatrix10(nullptr)
 	,m_deltaForce(nullptr)
-	,m_precondinonedMassMatrix11(nullptr)
 	,m_diagonalPreconditioner(nullptr)
+	,m_precondinonedMassMatrix11(nullptr)
 	,m_nodeList()
 	,m_transientLoopingContacts()
 	,m_transientLoopingJoints()
@@ -1026,14 +1026,11 @@ void ndSkeletonContainer::SolveLcp(ndInt32 stride, ndInt32 size, ndFloat32* cons
 	D_TRACKTIME();
 	// better chance for auto vectorization. 
 	const ndFloat32 tol2 = accelTol * accelTol;
-	//const ndInt32 blockSize = m_blockSize;
-	//const ndFloat32* const matrix = &m_massMatrix11[blockSize * stride + blockSize];
 	const ndFloat32* const matrix = &m_precondinonedMassMatrix11[0];
 	ndAssert(ndTestPSDmatrix(size, stride, matrix));
 
 	ndFloat32* const bScaled = ndAlloca(ndFloat32, stride);
 
-	ndInt32 base = 0;
 	for (ndInt32 i = 0; i < size; ++i)
 	{
 		const ndInt32 index = normalIndex[i] + i;
@@ -1046,9 +1043,8 @@ void ndSkeletonContainer::SolveLcp(ndInt32 stride, ndInt32 size, ndFloat32* cons
 		const ndFloat32 h = high[i] * coefficient;
 	
 		x[i] = ndClamp(x[i], l, h);
-		base += stride;
 	}
-	
+
 	const ndInt32 maxIterCount = 64;
 	ndFloat32 error2 = tol2 * ndFloat32(2.0f);
 	//const ndFloat32 sor = ndFloat32(1.0f);
