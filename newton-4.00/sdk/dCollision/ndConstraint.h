@@ -246,6 +246,7 @@ class ndRightHandSide
 	ndFloat32 m_diagonalRegularizer;
 	ndFloat32 m_penetrationStiffness;
 
+	ndFloat32 m_JinvMJt;
 	ndForceImpactPair* m_jointFeebackForce;
 	ndInt32 m_normalForceIndex;
 	ndInt32 m_normalForceIndexFlat;
