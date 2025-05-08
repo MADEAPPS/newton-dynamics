@@ -51,19 +51,19 @@ ndMultiBodyVehicle::ndDownForce::ndDownForce()
 	m_downForceTable[0].m_aerodynamicDownforceConstant = ndFloat32(0.0f);
 
 	m_downForceTable[1].m_speed = ndFloat32(30.0f) * ndFloat32(0.27f);
-	m_downForceTable[1].m_forceFactor = 1.0f;
+	m_downForceTable[1].m_forceFactor = 0.5f;
 	m_downForceTable[1].m_aerodynamicDownforceConstant = CalculateFactor(&m_downForceTable[0]);
 
 	m_downForceTable[2].m_speed = ndFloat32(60.0f) * ndFloat32(0.27f);
-	m_downForceTable[2].m_forceFactor = 1.6f;
+	m_downForceTable[2].m_forceFactor = 1.0f;
 	m_downForceTable[2].m_aerodynamicDownforceConstant = CalculateFactor(&m_downForceTable[1]);
 
 	m_downForceTable[3].m_speed = ndFloat32(140.0f) * ndFloat32(0.27f);
-	m_downForceTable[3].m_forceFactor = 3.0f;
+	m_downForceTable[3].m_forceFactor = 2.0f;
 	m_downForceTable[3].m_aerodynamicDownforceConstant = CalculateFactor(&m_downForceTable[2]);
 
 	m_downForceTable[4].m_speed = ndFloat32(1000.0f) * ndFloat32(0.27f);
-	m_downForceTable[4].m_forceFactor = 3.0f;
+	m_downForceTable[4].m_forceFactor = 2.0f;
 	m_downForceTable[4].m_aerodynamicDownforceConstant = CalculateFactor(&m_downForceTable[3]);
 }
 
@@ -88,6 +88,7 @@ ndFloat32 ndMultiBodyVehicle::ndDownForce::GetDownforceFactor(ndFloat32 speed) c
 		}
 	}
 
+	index = ndMin(index, ndInt32 (sizeof(m_downForceTable) / sizeof(m_downForceTable[0])) - 2);
 	ndFloat32 deltaSpeed = speed - m_downForceTable[index].m_speed;
 	ndFloat32 downForceFactor = m_downForceTable[index].m_forceFactor + m_downForceTable[index + 1].m_aerodynamicDownforceConstant * deltaSpeed * deltaSpeed;
 	return downForceFactor * m_gravity;
