@@ -1310,7 +1310,6 @@ void ndDynamicsUpdate::CalculateJointsForce()
 		{
 			D_TRACKTIME_NAMED(JointForce);
 			const ndVector zero(ndVector::m_zero);
-			ndVector accNorm(zero);
 			ndBodyKinematic* const body0 = joint->GetBody0();
 			ndBodyKinematic* const body1 = joint->GetBody1();
 			ndAssert(body0);
@@ -1332,6 +1331,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 				ndVector forceM1(m_internalForces[m1].m_linear);
 				ndVector torqueM1(m_internalForces[m1].m_angular);
 
+				ndVector accNorm(zero);
 				for (ndInt32 j = 0; j < rowsCount; ++j)
 				{
 					ndRightHandSide* const rhs = &m_rightHandSide[rowStart + j];
