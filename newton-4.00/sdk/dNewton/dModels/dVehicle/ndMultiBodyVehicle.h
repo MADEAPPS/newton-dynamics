@@ -59,7 +59,7 @@ class ndMultiBodyVehicle : public ndModelArticulation
 			ndFloat32 m_speed;
 			ndFloat32 m_forceFactor;
 			ndFloat32 m_aerodynamicDownforceConstant;
-			friend class ndDownForce;
+			//friend class ndDownForce;
 		};
 	
 		ndDownForce();
