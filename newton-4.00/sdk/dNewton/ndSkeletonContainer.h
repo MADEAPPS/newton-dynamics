@@ -241,8 +241,8 @@ class ndSkeletonContainer
 	ndFloat32* m_massMatrix11;
 	ndFloat32* m_massMatrix10;
 	ndFloat32* m_deltaForce;
-	ndFloat32* m_precondinonedMassMatrix11;
 	ndFloat32* m_diagonalPreconditioner;
+	ndFloat32* m_precondinonedMassMatrix11;
 
 	ndNodeList m_nodeList;
 	ndArray<ndContact*> m_transientLoopingContacts;
