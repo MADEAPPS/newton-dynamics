@@ -29,6 +29,7 @@ class ndFixSizeArray: public ndClassAlloc
 {
 	public:
 	ndFixSizeArray();
+	ndFixSizeArray(ndInt32 initialSize);
 
 	ndInt32 GetCount() const;
 	void SetCount(ndInt32 count);
@@ -50,6 +51,14 @@ ndFixSizeArray<T, maxSize>::ndFixSizeArray()
 	:ndClassAlloc()
 	,m_count(0)
 {
+}
+
+template<class T, ndInt32 maxSize>
+ndFixSizeArray<T, maxSize>::ndFixSizeArray(ndInt32 initialSize)
+	:ndClassAlloc()
+	,m_count(initialSize)
+{
+	ndAssert(initialSize < maxSize);
 }
 
 template<class T, ndInt32 maxSize>
