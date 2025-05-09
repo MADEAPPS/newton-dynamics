@@ -87,6 +87,7 @@ static void BuildBoxColumn(ndDemoEntityManager* const scene, ndFloat32 mass, con
 	ndSharedPtr<ndDemoEntity> rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
 
+baseMatrix.m_posit.m_y -= 0.01;
 	ndMatrix rotation(ndYawMatrix(20.0f * ndDegreeToRad));
 	for (ndInt32 i = 0; i < count; ++i) 
 	{
@@ -239,7 +240,7 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	//ndInt32 pyramidHigh = 10;
 	//ndInt32 pyramidHigh = 20;
 	ndInt32 pyramidHigh = 30;
-	//ndInt32 pyramidHigh = 60;
+	//ndInt32 pyramidHigh = 50;
 	for (ndInt32 i = 0; i < 4; ++i)
 	{
 		BuildPyramidStacks(scene, 1.0f, origin, ndVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
@@ -253,7 +254,7 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 
 	origin.m_z += 6.0f;
 	BuildBoxColumn(scene, 10.0f, origin, ndVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
-	//BuildBoxColumn(scene, 10.0f, origin, ndVector(0.5f, 0.5f, 0.5f, 0.0f), 2);
+	//BuildBoxColumn(scene, 10.0f, origin, ndVector(0.5f, 0.5f, 0.5f, 0.0f), 1);
 	
 	origin.m_z += 6.0f;
 	BuildCylinderColumn(scene, 10.0f, origin, ndVector(0.75f, 0.6f, 1.0f, 0.0f), 20);
