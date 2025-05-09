@@ -64,7 +64,8 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(
 	const ndVector offset(pinAndPivotParentInGlobalSpace.UntransformVector(childPivotInGlobalSpace) & ndVector::m_triplexMask);
 	ndFloat32 length = ndSqrt(offset.DotProduct(offset).GetScalar());
 	m_maxWorkSpaceRadio = ndFloat32(1.01f) * length;
-	m_restPosition = offset.Normalize().Scale(length) | ndVector::m_wOne;
+//	m_restPosition = offset.Normalize().Scale(length) | ndVector::m_wOne;
+	SetRestPosit(offset.Normalize().Scale(length));
 	SetLocalTargetPosition(m_restPosition);
 	
 	SetSolverModel(m_jointkinematicCloseLoop);
@@ -101,7 +102,9 @@ ndVector ndIkSwivelPositionEffector::GetRestPosit() const
 
 void ndIkSwivelPositionEffector::SetRestPosit(const ndVector& posit)
 {
-	m_restPosition = posit & ndVector::m_wOne;
+	m_restPosition = posit;
+	m_restPosition.m_w = ndFloat32(1.0f);
+	m_underDeterminedClipDistance = ndSqrt(m_restPosition.DotProduct(m_restPosition & ndVector::m_triplexMask).GetScalar());
 }
 
 ndVector ndIkSwivelPositionEffector::GetLocalTargetPosition() const
@@ -212,6 +215,33 @@ ndVector ndIkSwivelPositionEffector::GetEffectorPosit() const
 	//const ndMatrix swivelMatrix(ndPitchMatrix(-m_swivelAngle) * CalculateSwivelFrame(matrix1));
 	//posit.m_w = CalculateAngle(matrix0[1], swivelMatrix[1], swivelMatrix[0]);
 	return posit;
+}
+
+ndFloat32 ndIkSwivelPositionEffector::GetSafeEffectorDist() const
+{
+	return m_underDeterminedClipDistance;
+}
+
+void ndIkSwivelPositionEffector::SetSafeEffectorDist(ndFloat32 dist)
+{
+	m_underDeterminedClipDistance = dist;
+}
+
+ndVector ndIkSwivelPositionEffector::CalculateSafePosit(const ndVector& desiredTarget) const
+{
+	//const ndVector posit(desiredTarget & ndVector::m_triplexMask);
+	//const ndVector effectorPosit(GetEffectorPosit() & ndVector::m_triplexMask);
+	//ndFloat32 refDistance2 = effectorPosit.DotProduct(effectorPosit).GetScalar();
+	//ndFloat32 targetDistance2 = posit.DotProduct(posit).GetScalar();
+	//ndFloat32 dist = ndSqrt(ndMin(targetDistance2, refDistance2));
+	//const ndVector safePosit(posit.Normalize().Scale(dist) | ndVector::m_wOne);
+	//return safePosit;
+
+	const ndVector posit(desiredTarget & ndVector::m_triplexMask);
+	ndFloat32 targetDistance = ndSqrt(posit.DotProduct(posit).GetScalar());
+	ndFloat32 dist = ndMin(m_underDeterminedClipDistance, targetDistance);
+	const ndVector safePosit(posit.Normalize().Scale(dist) | ndVector::m_wOne);
+	return safePosit;
 }
 
 void ndIkSwivelPositionEffector::ClearMemory()

@@ -148,12 +148,10 @@ namespace ndQuadruped_1
 						output[i].m_posit.m_x += -(stride_x * t0 - stride_x * 0.5f);
 						//output[i].m_posit.m_z += (stride_z * t0 - stride_z * 0.5f);
 					}
-					break;
-					//m_currentPose[i] = output[i].m_posit;
+					//break;
 				}
 			}
 
-			//mutable ndVector m_currentPose[4];
 			ndFloat32 m_amp;
 			ndFloat32 m_stride_x;
 			ndFloat32 m_stride_z;
@@ -326,8 +324,24 @@ namespace ndQuadruped_1
 				ndEffectorInfo& leg = m_legs[i];
 				ndIkSwivelPositionEffector* const effector = leg.m_effector;
 				
-				const ndVector posit(m_animPose[i].m_posit - zmp);
+				ndVector posit(m_animPose[i].m_posit - zmp);
 				ndFloat32 swivelAngle = effector->CalculateLookAtSwivelAngle(upVector);
+
+				ndFloat32 minAngle;
+				ndFloat32 maxAngle;
+				ndFloat32 kneeAngle = leg.m_calf->GetAngle();
+				leg.m_calf->GetLimits(minAngle, maxAngle);
+				ndFloat32 safeGuardAngle = ndFloat32(3.0f * ndDegreeToRad);
+				maxAngle = ndMax(ndFloat32(0.0f), maxAngle - safeGuardAngle);
+				minAngle = ndMin(ndFloat32(0.0f), minAngle + safeGuardAngle);
+
+				posit = effector->CalculateSafePosit(posit);
+
+				if ((kneeAngle > maxAngle) || (kneeAngle < minAngle))
+				{
+					// project that target to the sphere of the corrent position
+					ndTrace (("warning: model is hitting a limit, expect unpreditable results\n"))
+				}
 				
 				effector->SetSwivelAngle(swivelAngle);
 				effector->SetLocalTargetPosition(posit);
@@ -350,12 +364,16 @@ namespace ndQuadruped_1
 
 		virtual void Debug(ndConstraintDebugCallback& context) const
 		{
+			ndFloat32 scale = context.GetScale();
+			context.SetScale(scale * 0.75f);
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
 				const ndEffectorInfo& leg = m_legs[i];
-				leg.m_heel->DebugJoint(context);
+				//leg.m_heel->DebugJoint(context);
 				//leg.m_effector->DebugJoint(context);
+				leg.m_calf->DebugJoint(context);
 			}
+			context.SetScale(scale);
 		}
 
 		ndIkSolver m_solver;
@@ -441,6 +459,12 @@ namespace ndQuadruped_1
 			((ndIkSwivelPositionEffector*)*effector)->SetWorkSpaceConstraints(0.0f, 0.75f * 0.9f);
 			((ndIkSwivelPositionEffector*)*effector)->SetMaxForce(effectorStrength);
 			((ndIkSwivelPositionEffector*)*effector)->SetMaxTorque(effectorStrength);
+
+			// make sure the effect is nevr outside the work space.
+			ndVector posit(((ndIkSwivelPositionEffector*)*effector)->GetRestPosit());
+			ndFloat32 dist = ndSqrt (posit.DotProduct(posit & ndVector::m_triplexMask).GetScalar());
+			dist -= 0.05f;
+			((ndIkSwivelPositionEffector*)*effector)->SetSafeEffectorDist(dist);
 			
 			model->AddCloseLoop(effector);
 
