@@ -345,7 +345,7 @@ namespace ndContinueCarpole
 
 			const ndVector cartVeloc(m_cart->GetVelocity());
 			ndFloat32 cartSpeed = cartVeloc.m_x;
-			observation[m_cartSpeed] = cartSpeed;
+			observation[m_cartSpeed] = ndBrainFloat(cartSpeed);
 		}
 
 		void ApplyActions(ndBrainFloat* const actions)
