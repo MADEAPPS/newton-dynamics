@@ -183,7 +183,6 @@ namespace ndQuadruped_1
 			}
 		}
 
-		//RobotModelNotify(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot, bool showDebug)
 		RobotModelNotify(ndModelArticulation* const robot)
 			:ndModelNotify()
 		{
@@ -198,7 +197,7 @@ namespace ndQuadruped_1
 		{
 		}
 
-		ndVector CalculateZeroMomnetPoint(ndFloat32 timestep)
+		ndVector CalculateZeroMomentPoint(ndFloat32 timestep)
 		{
 			ndModelArticulation* const articulation = GetModel()->GetAsModelArticulation();
 			ndBodyKinematic* const rootBody = articulation->GetRoot()->m_body->GetAsBodyKinematic();
@@ -261,45 +260,52 @@ namespace ndQuadruped_1
 					totalToque += gyroTorque;
 					totalToque += extForceTorque;
 				}
-				//totalMass *= DEMO_GRAVITY;
-				//ndFloat32 limit = 0.001f;
-				//ndFloat32 x = totalToque.m_z / totalMass;
-				//ndFloat32 z = -totalToque.m_x / totalMass;
-				//x = ndClamp (x, -limit, limit); 
-				//z = ndClamp(z, -limit, limit);
-				//const ndVector zmp(x, ndFloat32 (0.0f), z, ndFloat32(0.0f));
-				//return zmp;
-				return ndVector::m_zero;
+				ndFloat32 gravityForce = totalMass * DEMO_GRAVITY + 0.1f;
+				ndFloat32 x = totalToque.m_z / gravityForce;
+				ndFloat32 z = -totalToque.m_x / gravityForce;
+				const ndVector zmp(x, ndFloat32 (0.0f), z, ndFloat32(0.0f));
+				return zmp.Scale (ndFloat32 (-0.1f));
 			};
-			
-			const ndVector zmp(0.0f, 0.0f, 0.0f, 0.0f);
-			const ndVector zmp1(CalculateZmp().Scale(10.0f));
-			ndTrace(("%f %f %f\n", zmp1.m_x, zmp1.m_y, zmp1.m_z));
+			const ndVector zmp(CalculateZmp());
+			//ndTrace(("%f %f %f\n", zmp.m_x, zmp.m_y, zmp.m_z));
 			m_solver.SolverEnd();
 			
-			//auto PolynomialOmegaReward = [](ndFloat32 omega)
-			//	{
-			//		ndFloat32 maxOmega = 2.0f;
-			//		omega = ndClamp(omega, -maxOmega, maxOmega);
-			//		ndFloat32 r = ndFloat32(1.0f) - ndAbs(omega) / maxOmega;
-			//		ndFloat32 reward = r * r * r * r;
-			//		return reward;
-			//	};
-			//
-			//auto PolynomialAccelerationReward = [](ndFloat32 alpha)
-			//	{
-			//		ndFloat32 maxAlpha = 5.0f;
-			//		alpha = ndClamp(alpha, -maxAlpha, maxAlpha);
-			//		ndFloat32 r = ndFloat32(1.0f) - ndAbs(alpha) / maxAlpha;
-			//		ndFloat32 reward = r * r;
-			//		return reward;
-			//	};
-			//ndFloat32 omegaReward = PolynomialOmegaReward(comOmega.m_x);
-			//ndFloat32 alphaReward = PolynomialAccelerationReward(comAlpha.m_x);
-			//ndFloat32 reward = ndFloat32(0.5f) * omegaReward + ndFloat32(0.5f) * alphaReward;
-			//
-			//return ndBrainFloat(reward);
 			return zmp;
+		}
+
+		ndJacobian CalculateDynamics(ndFloat32 timestep)
+		{
+			ndModelArticulation* const articulation = GetModel()->GetAsModelArticulation();
+			ndBodyKinematic* const rootBody = articulation->GetRoot()->m_body->GetAsBodyKinematic();
+			ndSkeletonContainer* const skeleton = rootBody->GetSkeleton();
+			ndAssert(skeleton);
+
+			auto CalculateReferenceFrame = [this]()
+			{
+				ndVector com(ndVector::m_zero);
+				ndFloat32 totalMass = ndFloat32(0.0f);
+				ndModelArticulation::ndNode* const rootNode = GetModel()->GetAsModelArticulation()->GetRoot();
+				for (ndModelArticulation::ndNode* iter = rootNode->GetFirstIterator(); iter; iter = iter->GetNextIterator())
+				{
+					const ndBodyKinematic* const body = iter->m_body->GetAsBodyKinematic();
+					const ndMatrix matrix(body->GetMatrix());
+					const ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
+					ndFloat32 mass = body->GetMassMatrix().m_w;
+					totalMass += mass;
+					com += bodyCom.Scale(mass);
+				}
+
+				com = com.Scale(1.0f / totalMass);
+				ndMatrix referenceFrame(rootNode->m_body->GetMatrix());
+				referenceFrame.m_up = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
+				referenceFrame.m_right = referenceFrame.m_front.CrossProduct(referenceFrame.m_up).Normalize();
+				referenceFrame.m_front = referenceFrame.m_up.CrossProduct(referenceFrame.m_right).Normalize();
+				referenceFrame.m_posit = com;
+				referenceFrame.m_posit.m_w = 1.0f;
+				return referenceFrame;
+			};
+			const ndMatrix comFrame(CalculateReferenceFrame());
+			return GetModel()->GetAsModelArticulation()->CalculateLocalAcceleration(m_solver, comFrame, timestep);
 		}
 
 		void Update(ndFloat32 timestep)
@@ -308,11 +314,15 @@ namespace ndQuadruped_1
 			ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
 			rootBody->SetSleepState(false);
 
-			//const ndVector zmp(CalculateZeroMomnetPoint(timestep));
-			const ndVector zmp(ndVector::m_zero);
+			//ndJacobian xxxx(model->CalculateTotalMomentum());
+			//const ndVector zmp(CalculateZeroMomentPoint(timestep));
+			//const ndVector zmp(ndVector::m_zero);
+			const ndJacobian comOmegaAlpha(CalculateDynamics(timestep));
+			const ndVector comOmega(comOmegaAlpha.m_linear);
+			const ndVector comAlpha(comOmegaAlpha.m_angular);
 
 			//ndFloat32 animSpeed = 2.0f * m_control->m_animSpeed;
-			ndFloat32 animSpeed = 0.1f;
+			ndFloat32 animSpeed = 0.25f;
 			m_animBlendTree->Update(timestep * animSpeed);
 
 			ndVector veloc;
@@ -324,7 +334,8 @@ namespace ndQuadruped_1
 				ndEffectorInfo& leg = m_legs[i];
 				ndIkSwivelPositionEffector* const effector = leg.m_effector;
 				
-				ndVector posit(m_animPose[i].m_posit - zmp);
+				//ndVector posit(m_animPose[i].m_posit - zmp);
+				ndVector posit(m_animPose[i].m_posit);
 				ndFloat32 swivelAngle = effector->CalculateLookAtSwivelAngle(upVector);
 
 				ndFloat32 minAngle;
@@ -368,10 +379,10 @@ namespace ndQuadruped_1
 			context.SetScale(scale * 0.75f);
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
-				const ndEffectorInfo& leg = m_legs[i];
+				//const ndEffectorInfo& leg = m_legs[i];
 				//leg.m_heel->DebugJoint(context);
 				//leg.m_effector->DebugJoint(context);
-				leg.m_calf->DebugJoint(context);
+				//leg.m_calf->DebugJoint(context);
 			}
 			context.SetScale(scale);
 		}
@@ -405,7 +416,7 @@ namespace ndQuadruped_1
 		};
 
 		ndFloat32 mass = 20.0f;
-		ndFloat32 limbMass = 1.0f;
+		ndFloat32 limbMass = 0.5f;
 		ndMatrix matrix(entity->GetCurrentMatrix() * location);
 
 		ndSharedPtr<ndBody> rootBody(CreateRigidBody(entity, matrix, mass, nullptr));
@@ -463,7 +474,7 @@ namespace ndQuadruped_1
 			// make sure the effect is nevr outside the work space.
 			ndVector posit(((ndIkSwivelPositionEffector*)*effector)->GetRestPosit());
 			ndFloat32 dist = ndSqrt (posit.DotProduct(posit & ndVector::m_triplexMask).GetScalar());
-			dist -= 0.05f;
+			dist -= 0.07f;
 			((ndIkSwivelPositionEffector*)*effector)->SetSafeEffectorDist(dist);
 			
 			model->AddCloseLoop(effector);
@@ -504,10 +515,10 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("quadrupeSpider.fbx", scene));
 
 	ndMatrix matrix(ndGetIdentityMatrix());
-	matrix.m_posit.m_y = 0.6f;
+	matrix.m_posit.m_y = 0.4f;
 
 	//matrix.m_posit.m_y += 5.0f;
-	matrix.m_posit.m_y = 1.0f;
+	//matrix.m_posit.m_y = 1.0f;
 	ndWorld* const world = scene->GetWorld();
 
 	ndSharedPtr<ndModel> referenceModel (CreateModel(scene, matrix, modelMesh));
@@ -517,8 +528,8 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
 	//world->AddJoint(fixJoint);
 	
-	matrix.m_posit.m_x -= 8.0f;
-	matrix.m_posit.m_y += 1.5f;
+	matrix.m_posit.m_x -= 4.0f;
+	matrix.m_posit.m_y += 1.0f;
 	matrix.m_posit.m_z += 0.25f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);

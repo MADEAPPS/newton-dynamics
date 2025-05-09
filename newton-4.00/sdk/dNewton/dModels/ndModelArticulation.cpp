@@ -552,7 +552,6 @@ ndJacobian ndModelArticulation::CalculateTotalMomentum() const
 		return totalMomentum;
 	}
 
-	ndInt32 numberOfBodies = 0;
 	ndFloat32 totalMass = ndFloat32(0.0f);
 	ndVector com(ndVector::m_zero);
 	for (ndModelArticulation::ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
@@ -560,15 +559,13 @@ ndJacobian ndModelArticulation::CalculateTotalMomentum() const
 		const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
 		const ndMatrix matrix(body->GetMatrix());
 
-		numberOfBodies++;
 		ndFloat32 mass = body->GetMassMatrix().m_w;
 		totalMass += mass;
 		totalMomentum.m_linear += body->GetVelocity().Scale(mass);
 		const ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
 		com += bodyCom.Scale(mass);
 	}
-	ndFloat32 den = ndFloat32(1.0f) / ndFloat32(numberOfBodies);
-	com = com.Scale(den);
+	com = com.Scale(ndFloat32(1.0f) / totalMass);
 
 	for (ndModelArticulation::ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
 	{
@@ -586,11 +583,15 @@ ndJacobian ndModelArticulation::CalculateTotalMomentum() const
 	return totalMomentum;
 }
 
-ndVector ndModelArticulation::CalculateLocalAcceleration(ndIkSolver& solver, const ndMatrix& frame, ndFloat32 timestep) const
+ndJacobian ndModelArticulation::CalculateLocalAcceleration(ndIkSolver& solver, const ndMatrix& frame, ndFloat32 timestep) const
 {
+	ndJacobian omegaAlpha;
+	omegaAlpha.m_linear = ndVector::m_zero;
+	omegaAlpha.m_angular = ndVector::m_zero;
+
 	if (!m_rootNode)
 	{
-		return ndVector::m_zero;
+		return omegaAlpha;
 	}
 
 	ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
@@ -598,7 +599,7 @@ ndVector ndModelArticulation::CalculateLocalAcceleration(ndIkSolver& solver, con
 	ndAssert(skeleton);
 	if (!skeleton)
 	{
-		return ndVector::m_zero;
+		return omegaAlpha;
 	}
 
 	ndFloat32 totalMass = ndFloat32(0.0f);
@@ -617,8 +618,7 @@ ndVector ndModelArticulation::CalculateLocalAcceleration(ndIkSolver& solver, con
 			totalMass += mass;
 			com += bodyCom.Scale(mass);
 		}
-		ndFloat32 den = ndFloat32(1.0f) / ndFloat32(bodyArray.GetCount());
-		com = com.Scale(den);
+		com = com.Scale(ndFloat32(1.0f) / totalMass);
 		comFrame.m_posit = com;
 		comFrame.m_posit.m_w = ndFloat32(1.0f);
 	};
@@ -665,42 +665,43 @@ ndVector ndModelArticulation::CalculateLocalAcceleration(ndIkSolver& solver, con
 	solver.SolverBegin(skeleton, nullptr, 0, GetWorld(), timestep);
 	solver.Solve();
 
-	auto CalculateAngularAcceleration = [this, &comOmega, &comInertia, &comFrame, &invComInertia]()
+	auto CalculateAngularAcceleration = [this, &comFrame, &bodyArray, &comOmega, &comInertia, &invComInertia]()
 	{
-	//	ndVector totalToque(ndVector::m_zero);
-	//	const ndMatrix invComFrame(comFrame.OrthoInverse());
-	//	for (ndInt32 i = m_bodies.GetCount() - 1; i >= 0; --i)
-	//	{
-	//		const ndBodyKinematic* const body = m_bodies[i];
-	//		const ndMatrix bodyMatrix(body->GetMatrix());
-	//
-	//		const ndVector origin(bodyMatrix.TransformVector(body->GetCentreOfMass()));
-	//		const ndVector bodyCom(comFrame.UntransformVector(origin) & ndVector::m_triplexMask);
-	//
-	//		ndFloat32 mass = body->GetMassMatrix().m_w;
-	//		const ndVector veloc(body->GetVelocity());
-	//		const ndVector linearMomentum(invComFrame.RotateVector(veloc.Scale(mass)));
-	//
-	//		const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
-	//		const ndVector extForceTorque(bodyCom.CrossProduct(invComFrame.RotateVector(body->GetAccel().Scale(mass))));
-	//		const ndVector extTorque(invComFrame.RotateVector(bodyInertia.RotateVector(body->GetAlpha())));
-	//		const ndVector gyroTorque(invComFrame.RotateVector(body->GetOmega().CrossProduct(bodyInertia.RotateVector(body->GetOmega()))));
-	//
-	//		// centripetal should always be zero, or else the bodies will be flying apart from each other
-	//		//const ndVector centripetal((comOmega.CrossProduct(bodyCom)).CrossProduct(linearMomentum));
-	//		//totalToque += centripetal;
-	//
-	//		totalToque += extTorque;
-	//		totalToque += gyroTorque;
-	//		totalToque += extForceTorque;
-	//	}
-	//	const ndVector comAlpha(invComInertia.RotateVector(totalToque));
-	//	return comAlpha;
-		return ndVector::m_zero;
+		ndVector totalToque(ndVector::m_zero);
+		const ndMatrix invComFrame(comFrame.OrthoInverse());
+		for (ndInt32 i = bodyArray.GetCount() - 1; i >= 0; --i)
+		{
+			const ndBodyKinematic* const body = bodyArray[i];
+			const ndMatrix bodyMatrix(body->GetMatrix());
+	
+			const ndVector origin(bodyMatrix.TransformVector(body->GetCentreOfMass()));
+			const ndVector bodyCom(comFrame.UntransformVector(origin) & ndVector::m_triplexMask);
+	
+			ndFloat32 mass = body->GetMassMatrix().m_w;
+			const ndVector veloc(body->GetVelocity());
+			const ndVector linearMomentum(invComFrame.RotateVector(veloc.Scale(mass)));
+	
+			const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
+			const ndVector extForceTorque(bodyCom.CrossProduct(invComFrame.RotateVector(body->GetAccel().Scale(mass))));
+			const ndVector extTorque(invComFrame.RotateVector(bodyInertia.RotateVector(body->GetAlpha())));
+			const ndVector gyroTorque(invComFrame.RotateVector(body->GetOmega().CrossProduct(bodyInertia.RotateVector(body->GetOmega()))));
+	
+			// centripetal should always be zero, or else the bodies will be flying apart from each other
+			//const ndVector centripetal((comOmega.CrossProduct(bodyCom)).CrossProduct(linearMomentum));
+			//totalToque += centripetal;
+	
+			totalToque += extTorque;
+			totalToque += gyroTorque;
+			totalToque += extForceTorque;
+		}
+		const ndVector comAlpha(invComInertia.RotateVector(totalToque));
+		return comAlpha;
 	};
 	
 	const ndVector comAlpha(CalculateAngularAcceleration());
 	solver.SolverEnd();
 
-	return comAlpha;
+	omegaAlpha.m_linear = comOmega;
+	omegaAlpha.m_angular = comAlpha;
+	return omegaAlpha;
 }
