@@ -253,6 +253,7 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 
 	origin.m_z += 6.0f;
 	BuildBoxColumn(scene, 10.0f, origin, ndVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
+	//BuildBoxColumn(scene, 10.0f, origin, ndVector(0.5f, 0.5f, 0.5f, 0.0f), 2);
 	
 	origin.m_z += 6.0f;
 	BuildCylinderColumn(scene, 10.0f, origin, ndVector(0.75f, 0.6f, 1.0f, 0.0f), 20);

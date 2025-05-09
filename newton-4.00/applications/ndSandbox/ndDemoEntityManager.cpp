@@ -37,14 +37,14 @@
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
 //#define DEFAULT_SCENE	4		// conservation of momentum 
-//#define DEFAULT_SCENE	5		// basic Stacks
+#define DEFAULT_SCENE	5		// basic Stacks
 //#define DEFAULT_SCENE	6		// basic Trigger
 //#define DEFAULT_SCENE	7		// object Placement
 //#define DEFAULT_SCENE	8		// particle fluid
 //#define DEFAULT_SCENE	9		// static mesh collision 
 //#define DEFAULT_SCENE	10		// static user mesh collision 
 //#define DEFAULT_SCENE	11		// basic joints
-#define DEFAULT_SCENE	12		// basic vehicle
+//#define DEFAULT_SCENE	12		// basic vehicle
 //#define DEFAULT_SCENE	13		// heavy vehicle
 //#define DEFAULT_SCENE	14		// background vehicle prop
 //#define DEFAULT_SCENE	15		// basic player
@@ -561,7 +561,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//m_showScene = true;
 	//m_showConcaveEdge = true;
 	//m_showMeshSkeleton = true;
-	m_autoSleepMode = false;
+	//m_autoSleepMode = false;
 	m_hidePostUpdate = true;
 	//m_hideVisualMeshes = true;
 	//m_solverMode = ndWorld::ndCudaSolver;
@@ -579,7 +579,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 1;
 	//m_collisionDisplayMode = 2;	
-	//m_collisionDisplayMode = 3;		// solid wire frame
+	m_collisionDisplayMode = 3;		// solid wire frame
 	m_synchronousPhysicsUpdate = true;
 	m_synchronousParticlesUpdate = true;
 

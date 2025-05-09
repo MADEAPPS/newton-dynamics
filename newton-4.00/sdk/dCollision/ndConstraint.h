@@ -247,6 +247,7 @@ class ndRightHandSide
 	ndFloat32 m_penetrationStiffness;
 
 	ndFloat32 m_JinvMJt;
+	ndFloat32 m_diagonalPreconditioner;
 	ndForceImpactPair* m_jointFeebackForce;
 	ndInt32 m_normalForceIndex;
 	ndInt32 m_normalForceIndexFlat;
@@ -298,13 +299,13 @@ class ndConstraint: public ndContainersFreeListAlloc<ndConstraint>
 
 	ndInt32 m_rowCount;
 	ndInt32 m_rowStart;
+	ndInt32 m_blockDiagonalOffset;
 	ndUnsigned8 m_maxDof;
 	ndUnsigned8 m_active;
 	ndUnsigned8 m_fence0;
 	ndUnsigned8 m_fence1;
 	ndUnsigned8 m_resting;   // this should be identical to m_fence0, should be removed. 
 	ndUnsigned8 m_isInSkeletonLoop;
-
 
 	friend class ndIkSolver;
 	friend class ndBodyKinematic;
