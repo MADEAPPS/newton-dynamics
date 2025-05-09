@@ -27,6 +27,7 @@
 #include "ndModel.h"
 #include "dIkSolver/ndIkSolver.h"
 
+class ndIkSolver;
 class ndMultiBodyVehicle;
 
 D_MSV_NEWTON_CLASS_ALIGN_32
@@ -76,6 +77,8 @@ class ndModelArticulation: public ndModel
 
 	D_NEWTON_API void ClearMemory();
 	D_NEWTON_API void SetTransform(const ndMatrix& matrix);
+	D_NEWTON_API ndJacobian CalculateTotalMomentum() const;
+	D_NEWTON_API ndVector CalculateLocalAcceleration(ndIkSolver& solver, const ndMatrix& localFrame, ndFloat32 timestep) const;
 
 	protected:
 	D_NEWTON_API void ConvertToUrdf();
