@@ -275,11 +275,6 @@ namespace ndQuadruped_1
 
 		ndJacobian CalculateDynamics(ndFloat32 timestep)
 		{
-			ndModelArticulation* const articulation = GetModel()->GetAsModelArticulation();
-			ndBodyKinematic* const rootBody = articulation->GetRoot()->m_body->GetAsBodyKinematic();
-			ndSkeletonContainer* const skeleton = rootBody->GetSkeleton();
-			ndAssert(skeleton);
-
 			auto CalculateReferenceFrame = [this]()
 			{
 				ndVector com(ndVector::m_zero);

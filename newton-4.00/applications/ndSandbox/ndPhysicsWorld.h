@@ -75,7 +75,6 @@ class ndPhysicsWorld: public ndWorld
 
 	void AdvanceTime(ndFloat32 timestep);
 	ndDemoEntityManager* GetManager() const;
-	ndSoundManager* GetSoundManager() const;
 	void RemoveEntity(ndDemoEntity* const entity);
 
 	void NormalUpdates();
@@ -89,7 +88,6 @@ class ndPhysicsWorld: public ndWorld
 	void RemoveDeadBodies();
 
 	ndDemoEntityManager* m_manager;
-	ndSoundManager* m_soundManager;
 	ndFloat32 m_timeAccumulator;
 	ndDefferentDeleteEntities m_deadEntities;
 	bool m_acceleratedUpdate;
