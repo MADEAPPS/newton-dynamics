@@ -917,7 +917,6 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 				rhs->m_JinvMJt = diag;
 				rhs->m_invJinvMJt = ndFloat32(1.0f) / diag;
 				//rhs->m_diagonalPreconditioner = ndFloat32(ndSqrt(rhs->m_invJinvMJt));
-rhs->m_diagonalPreconditioner = 1.0f;
 
 				const ndVector f(rhs->m_force);
 				forceAcc0 = forceAcc0 + JtM0.m_linear * f;
@@ -1627,7 +1626,6 @@ void ndDynamicsUpdate::CalculateJointsForce()
 					}
 				}
 				
-				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS> xxxx(rowsCount);
 				for (ndInt32 i = 0; i < rowsCount; ++i)
 				{
 					ndRightHandSide* const rhs = &m_rightHandSide[rowStart + i];
