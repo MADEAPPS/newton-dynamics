@@ -313,7 +313,7 @@ namespace ndQuadruped_1
 			const ndVector comAlpha(comOmegaAlpha.m_angular);
 
 			//ndFloat32 animSpeed = 2.0f * m_control->m_animSpeed;
-			ndFloat32 animSpeed = 0.25f;
+			ndFloat32 animSpeed = 0.5f;
 			m_animBlendTree->Update(timestep * animSpeed);
 
 			ndVector veloc;
@@ -327,6 +327,7 @@ namespace ndQuadruped_1
 				
 				//ndVector posit(m_animPose[i].m_posit - zmp);
 				ndVector posit(m_animPose[i].m_posit);
+
 				ndFloat32 swivelAngle = effector->CalculateLookAtSwivelAngle(upVector);
 
 				ndFloat32 minAngle;
@@ -370,8 +371,8 @@ namespace ndQuadruped_1
 			{
 				const ndEffectorInfo& leg = m_legs[i];
 				//leg.m_heel->DebugJoint(context);
-				//leg.m_effector->DebugJoint(context);
-				leg.m_calf->DebugJoint(context);
+				leg.m_effector->DebugJoint(context);
+				//leg.m_calf->DebugJoint(context);
 			}
 			context.SetScale(scale);
 		}
@@ -467,7 +468,7 @@ namespace ndQuadruped_1
 			leg.m_effector = (ndIkSwivelPositionEffector*)*effector;
 			notify->m_legs.PushBack(leg);
 
-			//break;
+//			break;
 		}
 		notify->Init();
 		return model;
@@ -509,7 +510,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	referenceModel->AddBodiesAndJointsToWorld();
 		
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-	world->AddJoint(fixJoint);
+	//world->AddJoint(fixJoint);
 	
 	matrix.m_posit.m_x -= 4.0f;
 	matrix.m_posit.m_y += 1.0f;
