@@ -624,7 +624,7 @@ ndModelArticulation::ndCenterOfMassDynamics ndModelArticulation::CalculateCentre
 			dynamics.m_angularMomentum += bodyCom.CrossProduct(invComFrame.RotateVector(body->GetVelocity().Scale(mass)));
 			dynamics.m_angularMomentum += invComFrame.RotateVector(bodyInertia.RotateVector(body->GetOmega()));
 		}
-		dynamics.m_inertiaMatrix.m_posit.m_w = 1.0f;
+		dynamics.m_inertiaMatrix.m_posit.m_w = ndFloat32 (1.0f);
 	};
 	
 	CalculateInertiaAndAngularMomentum();
