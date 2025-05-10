@@ -30,11 +30,12 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	D_NEWTON_API ndVector GetLocalTargetPosition() const;
 	D_NEWTON_API void SetLocalTargetPosition(const ndVector& posit);
 	
+	D_NEWTON_API void SetAsReducedDof();
 	D_NEWTON_API ndVector GetEffectorPosit() const;
-
-	D_NEWTON_API ndFloat32 GetSafeEffectorDist() const;
-	D_NEWTON_API void SetSafeEffectorDist(ndFloat32 dist);
-	D_NEWTON_API ndVector CalculateSafePosit(const ndVector& desiredTarget) const;
+	
+	//D_NEWTON_API ndFloat32 GetSafeEffectorDist() const;
+	//D_NEWTON_API void SetSafeEffectorDist(ndFloat32 dist);
+	//D_NEWTON_API ndVector CalculateSafePosit(const ndVector& desiredTarget) const;
 	
 	D_NEWTON_API ndVector GetRestPosit() const;
 	D_NEWTON_API void SetRestPosit(const ndVector& posit);
@@ -72,6 +73,7 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 
 	void SubmitLinearAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	void SubmitAngularAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
+	void SubmitReducedLinearAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	
 	ndVector m_restPosition;
 	ndVector m_localTargetPosit;
@@ -89,7 +91,8 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 
 	ndFloat32 m_minWorkSpaceRadio;
 	ndFloat32 m_maxWorkSpaceRadio;
-	ndFloat32 m_underDeterminedClipDistance;
+	//ndFloat32 m_underDeterminedClipDistance;
+	bool m_reducedDof;
 	bool m_enableSwivelControl;
 } D_GCC_NEWTON_CLASS_ALIGN_32;
 

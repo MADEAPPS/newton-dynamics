@@ -29,6 +29,7 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector()
 	,m_linearRegularizer(ndFloat32(5.0e-3f))
 	,m_minWorkSpaceRadio(ndFloat32(0.0f))
 	,m_maxWorkSpaceRadio(ndFloat32(0.0f))
+	,m_reducedDof(false)
 	,m_enableSwivelControl(true)
 {
 	m_maxDof = 6;
@@ -51,6 +52,7 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(
 	,m_linearRegularizer(ndFloat32(5.0e-3f))
 	,m_minWorkSpaceRadio(ndFloat32(0.0f))
 	,m_maxWorkSpaceRadio(ndFloat32(0.0f))
+	,m_reducedDof(false)
 	,m_enableSwivelControl(true)
 {
 	ndMatrix temp;
@@ -104,7 +106,12 @@ void ndIkSwivelPositionEffector::SetRestPosit(const ndVector& posit)
 {
 	m_restPosition = posit;
 	m_restPosition.m_w = ndFloat32(1.0f);
-	m_underDeterminedClipDistance = ndSqrt(m_restPosition.DotProduct(m_restPosition & ndVector::m_triplexMask).GetScalar());
+	//m_underDeterminedClipDistance = ndSqrt(m_restPosition.DotProduct(m_restPosition & ndVector::m_triplexMask).GetScalar());
+}
+
+void ndIkSwivelPositionEffector::SetAsReducedDof()
+{
+	m_reducedDof = true;
 }
 
 ndVector ndIkSwivelPositionEffector::GetLocalTargetPosition() const
@@ -217,32 +224,32 @@ ndVector ndIkSwivelPositionEffector::GetEffectorPosit() const
 	return posit;
 }
 
-ndFloat32 ndIkSwivelPositionEffector::GetSafeEffectorDist() const
-{
-	return m_underDeterminedClipDistance;
-}
-
-void ndIkSwivelPositionEffector::SetSafeEffectorDist(ndFloat32 dist)
-{
-	m_underDeterminedClipDistance = dist;
-}
-
-ndVector ndIkSwivelPositionEffector::CalculateSafePosit(const ndVector& desiredTarget) const
-{
-	//const ndVector posit(desiredTarget & ndVector::m_triplexMask);
-	//const ndVector effectorPosit(GetEffectorPosit() & ndVector::m_triplexMask);
-	//ndFloat32 refDistance2 = effectorPosit.DotProduct(effectorPosit).GetScalar();
-	//ndFloat32 targetDistance2 = posit.DotProduct(posit).GetScalar();
-	//ndFloat32 dist = ndSqrt(ndMin(targetDistance2, refDistance2));
-	//const ndVector safePosit(posit.Normalize().Scale(dist) | ndVector::m_wOne);
-	//return safePosit;
-
-	const ndVector posit(desiredTarget & ndVector::m_triplexMask);
-	ndFloat32 targetDistance = ndSqrt(posit.DotProduct(posit).GetScalar());
-	ndFloat32 dist = ndMin(m_underDeterminedClipDistance, targetDistance);
-	const ndVector safePosit(posit.Normalize().Scale(dist) | ndVector::m_wOne);
-	return safePosit;
-}
+//ndFloat32 ndIkSwivelPositionEffector::GetSafeEffectorDist() const
+//{
+//	return m_underDeterminedClipDistance;
+//}
+//
+//void ndIkSwivelPositionEffector::SetSafeEffectorDist(ndFloat32 dist)
+//{
+//	m_underDeterminedClipDistance = dist;
+//}
+//
+//ndVector ndIkSwivelPositionEffector::CalculateSafePosit(const ndVector& desiredTarget) const
+//{
+//	//const ndVector posit(desiredTarget & ndVector::m_triplexMask);
+//	//const ndVector effectorPosit(GetEffectorPosit() & ndVector::m_triplexMask);
+//	//ndFloat32 refDistance2 = effectorPosit.DotProduct(effectorPosit).GetScalar();
+//	//ndFloat32 targetDistance2 = posit.DotProduct(posit).GetScalar();
+//	//ndFloat32 dist = ndSqrt(ndMin(targetDistance2, refDistance2));
+//	//const ndVector safePosit(posit.Normalize().Scale(dist) | ndVector::m_wOne);
+//	//return safePosit;
+//
+//	const ndVector posit(desiredTarget & ndVector::m_triplexMask);
+//	ndFloat32 targetDistance = ndSqrt(posit.DotProduct(posit).GetScalar());
+//	ndFloat32 dist = ndMin(m_underDeterminedClipDistance, targetDistance);
+//	const ndVector safePosit(posit.Normalize().Scale(dist) | ndVector::m_wOne);
+//	return safePosit;
+//}
 
 void ndIkSwivelPositionEffector::ClearMemory()
 {
@@ -328,6 +335,18 @@ void ndIkSwivelPositionEffector::DebugJoint(ndConstraintDebugCallback& debugCall
 	debugCallback.DrawFrame(swivelMatrix0);
 }
 
+void ndIkSwivelPositionEffector::SubmitAngularAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
+{
+	const ndMatrix swivelMatrix1(ndPitchMatrix(-m_swivelAngle) * CalculateSwivelFrame(matrix1));
+	const ndVector& pin = swivelMatrix1.m_front;
+	const ndFloat32 angle = CalculateAngle(matrix0[1], swivelMatrix1[1], swivelMatrix1[0]);
+
+	AddAngularRowJacobian(desc, pin, angle);
+	SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+	SetHighFriction(desc, m_angularMaxTorque);
+	SetLowerFriction(desc, -m_angularMaxTorque);
+}
+
 void ndIkSwivelPositionEffector::SubmitLinearAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
 	const ndVector posit0(matrix0.m_posit);
@@ -343,16 +362,27 @@ void ndIkSwivelPositionEffector::SubmitLinearAxis(ndConstraintDescritor& desc, c
 	}
 }
 
-void ndIkSwivelPositionEffector::SubmitAngularAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
+void ndIkSwivelPositionEffector::SubmitReducedLinearAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
-	const ndMatrix swivelMatrix1(ndPitchMatrix(-m_swivelAngle) * CalculateSwivelFrame(matrix1));
-	const ndVector& pin = swivelMatrix1.m_front;
-	const ndFloat32 angle = CalculateAngle(matrix0[1], swivelMatrix1[1], swivelMatrix1[0]);
+	m_reducedDof = false;
 
-	AddAngularRowJacobian(desc, pin, angle);
-	SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
-	SetHighFriction(desc, m_angularMaxTorque);
-	SetLowerFriction(desc, -m_angularMaxTorque);
+	const ndVector posit0(matrix0.m_posit);
+	const ndVector posit1(matrix1.TransformVector(m_localTargetPosit));
+	const ndVector refPosit(posit0 - matrix1.m_posit);
+	ndFloat32 r = ndSqrt(refPosit.DotProduct(refPosit).GetScalar());
+
+	const ndVector projectTarget(posit1 - matrix1.m_posit);
+	const ndVector newTarget(matrix1.m_posit + projectTarget.Normalize().Scale (r));
+
+	const ndMatrix& axisDir = matrix1;
+	for (ndInt32 i = 0; i < 3; ++i)
+	{
+		const ndVector pin = axisDir[i];
+		AddLinearRowJacobian(desc, posit0, newTarget, pin);
+		SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
+		SetHighFriction(desc, m_linearMaxForce);
+		SetLowerFriction(desc, -m_linearMaxForce);
+	}
 }
 
 void ndIkSwivelPositionEffector::JacobianDerivative(ndConstraintDescritor& desc)
@@ -361,7 +391,14 @@ void ndIkSwivelPositionEffector::JacobianDerivative(ndConstraintDescritor& desc)
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
-	SubmitLinearAxis(desc, matrix0, matrix1);
+	if (m_reducedDof)
+	{
+		SubmitReducedLinearAxis(desc, matrix0, matrix1);
+	}
+	else
+	{
+		SubmitLinearAxis(desc, matrix0, matrix1);
+	}
 	if (m_enableSwivelControl)
 	{
 		SubmitAngularAxis(desc, matrix0, matrix1);
