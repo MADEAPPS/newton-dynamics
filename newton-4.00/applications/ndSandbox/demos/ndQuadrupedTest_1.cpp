@@ -26,7 +26,7 @@
 namespace ndQuadruped_1
 {
 	#define D_CYCLE_PERIOD		ndFloat32(4.0f)
-	#define D_CYCLE_STRIDE_X	ndFloat32(0.3f)
+	#define D_CYCLE_STRIDE_X	ndFloat32(0.4f)
 	#define D_CYCLE_STRIDE_Z	ndFloat32(0.3f)
 	#define D_CYCLE_AMPLITUDE	ndFloat32(0.27f)
 	#define D_POSE_REST_POSITION_Y	ndReal(-0.3f)
@@ -73,10 +73,6 @@ namespace ndQuadruped_1
 				,m_stride_z(D_CYCLE_STRIDE_Z)
 			{
 				m_duration = ndFloat32(4.0f);
-				for (ndInt32 i = 0; i < 4; i++)
-				{
-					//m_currentPose[i] = ndVector::m_zero;
-				}
 			}
 
 			ndVector GetTranslation(ndFloat32) const
@@ -418,7 +414,7 @@ namespace ndQuadruped_1
 		// build all for legs
 		for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = entity->GetChildren().GetFirst(); node; node = node->GetNext())
 		{
-			// build whig
+			// build thig
 			ndSharedPtr<ndDemoEntity> thighEntity(node->GetInfo());
 			const ndMatrix thighMatrix(thighEntity->GetCurrentMatrix() * matrix);
 			ndSharedPtr<ndBody> thigh(CreateRigidBody(thighEntity, thighMatrix, limbMass, rootBody->GetAsBodyDynamic()));
@@ -470,6 +466,8 @@ namespace ndQuadruped_1
 			leg.m_thigh = (ndJointSpherical*)*ballJoint;
 			leg.m_effector = (ndIkSwivelPositionEffector*)*effector;
 			notify->m_legs.PushBack(leg);
+
+			//break;
 		}
 		notify->Init();
 		return model;
@@ -511,7 +509,7 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	referenceModel->AddBodiesAndJointsToWorld();
 		
 	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-	//world->AddJoint(fixJoint);
+	world->AddJoint(fixJoint);
 	
 	matrix.m_posit.m_x -= 4.0f;
 	matrix.m_posit.m_y += 1.0f;
