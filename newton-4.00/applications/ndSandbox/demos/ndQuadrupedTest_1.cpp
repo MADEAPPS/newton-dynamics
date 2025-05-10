@@ -153,7 +153,7 @@ namespace ndQuadruped_1
 			ndFloat32 m_stride_z;
 		};
 
-		void Init()
+		void InitAnimation()
 		{
 			ndSharedPtr<ndAnimationSequence> sequence(new ndPoseGenerator());
 			
@@ -181,6 +181,12 @@ namespace ndQuadruped_1
 
 		RobotModelNotify(ndModelArticulation* const robot)
 			:ndModelNotify()
+			,m_solver()
+			,m_animPose()
+			,m_legs()
+			,m_poseGenerator()
+			,m_animBlendTree()
+			,m_timestep(ndFloat32 (0.0f))
 		{
 			SetModel(robot);
 		}
@@ -269,7 +275,7 @@ namespace ndQuadruped_1
 			return zmp;
 		}
 
-		ndModelArticulation::ndCenterOfMassDynamics CalculateDynamics(ndFloat32 timestep)
+		ndModelArticulation::ndCenterOfMassDynamics CalculateDynamics(ndFloat32 timestep) const
 		{
 			auto CalculateReferenceFrame = [this]()
 			{
@@ -301,6 +307,8 @@ namespace ndQuadruped_1
 
 		void Update(ndFloat32 timestep)
 		{
+			m_timestep = timestep;
+
 			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 			ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
 			rootBody->SetSleepState(false);
@@ -377,11 +385,12 @@ namespace ndQuadruped_1
 			context.SetScale(scale);
 		}
 
-		ndIkSolver m_solver;
+		mutable ndIkSolver m_solver;
 		ndAnimationPose m_animPose;
 		ndFixSizeArray<ndEffectorInfo, 4> m_legs;
 		ndSharedPtr<ndAnimationBlendTreeNode> m_poseGenerator;
 		ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
+		ndFloat32 m_timestep;
 	};
 
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndSharedPtr<ndDemoEntity>& modelMesh)
@@ -406,7 +415,7 @@ namespace ndQuadruped_1
 		};
 
 		ndFloat32 mass = 20.0f;
-		ndFloat32 limbMass = 0.5f;
+		ndFloat32 limbMass = 0.25f;
 		ndMatrix matrix(entity->GetCurrentMatrix() * location);
 
 		ndSharedPtr<ndBody> rootBody(CreateRigidBody(entity, matrix, mass, nullptr));
@@ -467,9 +476,8 @@ namespace ndQuadruped_1
 			leg.m_thigh = (ndJointSpherical*)*ballJoint;
 			leg.m_effector = (ndIkSwivelPositionEffector*)*effector;
 			notify->m_legs.PushBack(leg);
-			//break;
 		}
-		notify->Init();
+		notify->InitAnimation();
 		return model;
 	}
 }
