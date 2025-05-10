@@ -405,9 +405,9 @@ namespace ndUnicycle
 			};
 
 			ndIkSolver& solver = m_controllerTrainer->m_solver;
-			const ndJacobian comOmegaAlpha(GetModel()->GetAsModelArticulation()->CalculateLocalAcceleration(solver, comFrame, m_timestep));
-			const ndVector comOmega(comOmegaAlpha.m_linear);
-			const ndVector comAlpha(comOmegaAlpha.m_angular);
+			const ndModelArticulation::ndCenterOfMassDynamics comDynamics(GetModel()->GetAsModelArticulation()->CalculateCentreOfMassDynamics(solver, comFrame, m_timestep));
+			const ndVector comOmega(comDynamics.m_omega);
+			const ndVector comAlpha(comDynamics.m_alpha);
 		
 			ndFloat32 omegaReward = PolynomialOmegaReward(comOmega.m_x);
 			ndFloat32 alphaReward = PolynomialAccelerationReward(comAlpha.m_x);

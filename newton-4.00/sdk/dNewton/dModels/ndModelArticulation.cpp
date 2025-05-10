@@ -27,6 +27,22 @@
 #include "ndBodyDynamic.h"
 #include "ndModelArticulation.h"
 
+
+ndModelArticulation::ndCenterOfMassDynamics::ndCenterOfMassDynamics()
+	:m_omega(ndVector::m_zero)
+	,m_alpha(ndVector::m_zero)
+	,m_velocity(ndVector::m_zero)
+	,m_acceleration(ndVector::m_zero)
+	,m_centerOfMass(ndVector::m_zero)
+	,m_force(ndVector::m_zero)
+	,m_torque(ndVector::m_zero)
+	,m_momentum(ndVector::m_zero)
+	,m_angularMomentum(ndVector::m_zero)
+	,m_inertiaMatrix(ndGetZeroMatrix())
+	,m_mass(ndFloat32 (0.0f))
+{
+}
+
 ndModelArticulation::ndNode::ndNode(const ndSharedPtr<ndBody>& body, const ndSharedPtr<ndJointBilateralConstraint>& joint, ndNode* const parent)
 	:ndNodeHierarchy<ndNode>()
 	,m_body(body)
@@ -542,56 +558,12 @@ void ndModelArticulation::RemoveBodiesAndJointsFromWorld()
 	}
 }
 
-ndJacobian ndModelArticulation::CalculateTotalMomentum() const
+ndModelArticulation::ndCenterOfMassDynamics ndModelArticulation::CalculateCentreOfMassDynamics(ndIkSolver& solver, const ndMatrix& frame, ndFloat32 timestep) const
 {
-	ndJacobian totalMomentum;
-	totalMomentum.m_linear = ndVector::m_zero;
-	totalMomentum.m_angular = ndVector::m_zero;
+	ndCenterOfMassDynamics dynamics;
 	if (!m_rootNode)
 	{
-		return totalMomentum;
-	}
-
-	ndFloat32 totalMass = ndFloat32(0.0f);
-	ndVector com(ndVector::m_zero);
-	for (ndModelArticulation::ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
-	{
-		const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
-		const ndMatrix matrix(body->GetMatrix());
-
-		ndFloat32 mass = body->GetMassMatrix().m_w;
-		totalMass += mass;
-		totalMomentum.m_linear += body->GetVelocity().Scale(mass);
-		const ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
-		com += bodyCom.Scale(mass);
-	}
-	com = com.Scale(ndFloat32(1.0f) / totalMass);
-
-	for (ndModelArticulation::ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
-	{
-		const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
-		const ndMatrix matrix(body->GetMatrix());
-		ndFloat32 mass = body->GetMassMatrix().m_w;
-		const ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
-		const ndVector r(bodyCom - com);
-		totalMomentum.m_angular += r.CrossProduct(body->GetVelocity().Scale(mass));
-
-		const ndMatrix inertia(body->CalculateInertiaMatrix());
-		totalMomentum.m_angular += inertia.RotateVector(body->GetOmega());
-	}
-
-	return totalMomentum;
-}
-
-ndJacobian ndModelArticulation::CalculateLocalAcceleration(ndIkSolver& solver, const ndMatrix& frame, ndFloat32 timestep) const
-{
-	ndJacobian omegaAlpha;
-	omegaAlpha.m_linear = ndVector::m_zero;
-	omegaAlpha.m_angular = ndVector::m_zero;
-
-	if (!m_rootNode)
-	{
-		return omegaAlpha;
+		return dynamics;
 	}
 
 	ndBodyKinematic* const rootBody = GetRoot()->m_body->GetAsBodyKinematic();
@@ -599,15 +571,13 @@ ndJacobian ndModelArticulation::CalculateLocalAcceleration(ndIkSolver& solver, c
 	ndAssert(skeleton);
 	if (!skeleton)
 	{
-		return omegaAlpha;
+		return dynamics;
 	}
 
-	ndFloat32 totalMass = ndFloat32(0.0f);
 	ndMatrix comFrame(frame);
 	ndFixSizeArray<const ndBodyKinematic*, 256> bodyArray;
-	auto CalculateCenterOfMass = [this, &comFrame, &bodyArray, &totalMass]()
+	auto CalculateCenterOfMass = [this, &dynamics, &comFrame, &bodyArray]()
 	{
-		ndVector com(ndVector::m_zero);
 		for (ndModelArticulation::ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
 		{
 			const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
@@ -615,20 +585,20 @@ ndJacobian ndModelArticulation::CalculateLocalAcceleration(ndIkSolver& solver, c
 			const ndMatrix matrix(body->GetMatrix());
 			const ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
 			ndFloat32 mass = body->GetMassMatrix().m_w;
-			totalMass += mass;
-			com += bodyCom.Scale(mass);
+			dynamics.m_mass += mass;
+			dynamics.m_centerOfMass += bodyCom.Scale(mass);
+			dynamics.m_momentum += body->GetVelocity().Scale(mass);
 		}
-		com = com.Scale(ndFloat32(1.0f) / totalMass);
-		comFrame.m_posit = com;
-		comFrame.m_posit.m_w = ndFloat32(1.0f);
+		ndFloat32 massScale = ndFloat32(1.0f) / dynamics.m_mass;
+		dynamics.m_velocity = dynamics.m_momentum.Scale(massScale);
+		dynamics.m_centerOfMass = dynamics.m_centerOfMass.Scale(massScale);
+		dynamics.m_centerOfMass.m_w = ndFloat32(1.0f);
+		comFrame.m_posit = dynamics.m_centerOfMass;
 	};
 	CalculateCenterOfMass();
 
-	ndVector angularMomentum;
-	auto CalculateInertiaAndAngularMomentum = [this, &comFrame, &bodyArray](ndVector& angularMomentum)
+	auto CalculateInertiaAndAngularMomentum = [this, &dynamics, &comFrame, &bodyArray]()
 	{
-		ndMatrix inertia(ndGetZeroMatrix());
-		angularMomentum = ndVector::m_zero;
 		const ndMatrix invComFrame(comFrame.OrthoInverse());
 		for (ndInt32 i = bodyArray.GetCount() - 1; i >= 0; --i)
 		{
@@ -648,26 +618,23 @@ ndJacobian ndModelArticulation::CalculateLocalAcceleration(ndIkSolver& solver, c
 			{
 				refInertia[j][j] += mass * mag2;
 				refInertia[j] -= covariance[j].Scale(mass);
-				inertia[j] += refInertia[j];
+				dynamics.m_inertiaMatrix[j] += refInertia[j];
 			}
 	
-			angularMomentum += bodyCom.CrossProduct(invComFrame.RotateVector(body->GetVelocity().Scale(mass)));
-			angularMomentum += invComFrame.RotateVector(bodyInertia.RotateVector(body->GetOmega()));
+			dynamics.m_angularMomentum += bodyCom.CrossProduct(invComFrame.RotateVector(body->GetVelocity().Scale(mass)));
+			dynamics.m_angularMomentum += invComFrame.RotateVector(bodyInertia.RotateVector(body->GetOmega()));
 		}
-		inertia.m_posit.m_w = 1.0f;
-		return inertia;
+		dynamics.m_inertiaMatrix.m_posit.m_w = 1.0f;
 	};
 	
-	const ndMatrix comInertia(CalculateInertiaAndAngularMomentum(angularMomentum));
-	const ndMatrix invComInertia(comInertia.Inverse4x4());
-	const ndVector comOmega(invComInertia.RotateVector(angularMomentum));
+	CalculateInertiaAndAngularMomentum();
+	const ndMatrix invComInertia(dynamics.m_inertiaMatrix.Inverse4x4());
+	dynamics.m_omega = invComInertia.RotateVector(dynamics.m_angularMomentum);
 
 	solver.SolverBegin(skeleton, nullptr, 0, GetWorld(), timestep);
 	solver.Solve();
-
-	auto CalculateAngularAcceleration = [this, &comFrame, &bodyArray, &comOmega, &comInertia, &invComInertia]()
+	auto CalculateForceAndAcceleration = [this, &dynamics, &comFrame, &bodyArray, &invComInertia]()
 	{
-		ndVector totalToque(ndVector::m_zero);
 		const ndMatrix invComFrame(comFrame.OrthoInverse());
 		for (ndInt32 i = bodyArray.GetCount() - 1; i >= 0; --i)
 		{
@@ -682,26 +649,24 @@ ndJacobian ndModelArticulation::CalculateLocalAcceleration(ndIkSolver& solver, c
 			const ndVector linearMomentum(invComFrame.RotateVector(veloc.Scale(mass)));
 	
 			const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
-			const ndVector extForceTorque(bodyCom.CrossProduct(invComFrame.RotateVector(body->GetAccel().Scale(mass))));
+			const ndVector extForce(invComFrame.RotateVector(body->GetAccel().Scale(mass)));
+			const ndVector extForceTorque(bodyCom.CrossProduct(extForce));
 			const ndVector extTorque(invComFrame.RotateVector(bodyInertia.RotateVector(body->GetAlpha())));
 			const ndVector gyroTorque(invComFrame.RotateVector(body->GetOmega().CrossProduct(bodyInertia.RotateVector(body->GetOmega()))));
 	
 			// centripetal should always be zero, or else the bodies will be flying apart from each other
 			//const ndVector centripetal((comOmega.CrossProduct(bodyCom)).CrossProduct(linearMomentum));
 			//totalToque += centripetal;
-	
-			totalToque += extTorque;
-			totalToque += gyroTorque;
-			totalToque += extForceTorque;
+			dynamics.m_force += extForce;
+			dynamics.m_torque += extTorque;
+			dynamics.m_torque += gyroTorque;
+			dynamics.m_torque += extForceTorque;
 		}
-		const ndVector comAlpha(invComInertia.RotateVector(totalToque));
-		return comAlpha;
+		dynamics.m_alpha = invComInertia.RotateVector(dynamics.m_torque);
+		dynamics.m_acceleration = dynamics.m_force.Scale(ndFloat32(1.0f) / dynamics.m_mass);
 	};
-	
-	const ndVector comAlpha(CalculateAngularAcceleration());
+	CalculateForceAndAcceleration();
 	solver.SolverEnd();
 
-	omegaAlpha.m_linear = comOmega;
-	omegaAlpha.m_angular = comAlpha;
-	return omegaAlpha;
+	return dynamics;
 }

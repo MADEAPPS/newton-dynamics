@@ -269,7 +269,7 @@ namespace ndQuadruped_1
 			return zmp;
 		}
 
-		ndJacobian CalculateDynamics(ndFloat32 timestep)
+		ndModelArticulation::ndCenterOfMassDynamics CalculateDynamics(ndFloat32 timestep)
 		{
 			auto CalculateReferenceFrame = [this]()
 			{
@@ -296,7 +296,7 @@ namespace ndQuadruped_1
 				return referenceFrame;
 			};
 			const ndMatrix comFrame(CalculateReferenceFrame());
-			return GetModel()->GetAsModelArticulation()->CalculateLocalAcceleration(m_solver, comFrame, timestep);
+			return GetModel()->GetAsModelArticulation()->CalculateCentreOfMassDynamics(m_solver, comFrame, timestep);
 		}
 
 		void Update(ndFloat32 timestep)
@@ -308,9 +308,9 @@ namespace ndQuadruped_1
 			//ndJacobian xxxx(model->CalculateTotalMomentum());
 			//const ndVector zmp(CalculateZeroMomentPoint(timestep));
 			//const ndVector zmp(ndVector::m_zero);
-			const ndJacobian comOmegaAlpha(CalculateDynamics(timestep));
-			const ndVector comOmega(comOmegaAlpha.m_linear);
-			const ndVector comAlpha(comOmegaAlpha.m_angular);
+			const ndModelArticulation::ndCenterOfMassDynamics comDynamics(CalculateDynamics(timestep));
+			const ndVector comOmega(comDynamics.m_omega);
+			const ndVector comAlpha(comDynamics.m_alpha);
 
 			//ndFloat32 animSpeed = 2.0f * m_control->m_animSpeed;
 			ndFloat32 animSpeed = 0.5f;
@@ -369,9 +369,9 @@ namespace ndQuadruped_1
 			context.SetScale(scale * 0.75f);
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
-				const ndEffectorInfo& leg = m_legs[i];
+				//const ndEffectorInfo& leg = m_legs[i];
 				//leg.m_heel->DebugJoint(context);
-				leg.m_effector->DebugJoint(context);
+				//leg.m_effector->DebugJoint(context);
 				//leg.m_calf->DebugJoint(context);
 			}
 			context.SetScale(scale);
@@ -467,8 +467,7 @@ namespace ndQuadruped_1
 			leg.m_thigh = (ndJointSpherical*)*ballJoint;
 			leg.m_effector = (ndIkSwivelPositionEffector*)*effector;
 			notify->m_legs.PushBack(leg);
-
-//			break;
+			//break;
 		}
 		notify->Init();
 		return model;

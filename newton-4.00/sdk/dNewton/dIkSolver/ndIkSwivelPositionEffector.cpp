@@ -292,21 +292,6 @@ ndInt32 ndIkSwivelPositionEffector::GetKinematicState(ndKinematicState* const st
 
 ndFloat32 ndIkSwivelPositionEffector::CalculateLookAtSwivelAngle(const ndVector& upDir) const
 {
-
-ndMatrix matrix0;
-ndMatrix matrix1;
-CalculateGlobalMatrix(matrix0, matrix1);
-ndMatrix swivelMatrix1(CalculateSwivelFrame(matrix1));
-ndMatrix swivelMatrix0(ndPitchMatrix(-m_swivelAngle) * swivelMatrix1);
-
-static ndInt32 xxxxxx;
-if (xxxxxx > 550)
-xxxxxx *= 1;
-ndTrace(("%d\n", xxxxxx));
-xxxxxx++;
-
-
-
 	ndMatrix swivelMatrix(CalculateSwivelFrame(CalculateGlobalMatrix1()));
 	ndVector localPin(swivelMatrix.UnrotateVector(upDir));
 	ndFloat32 swivelAngle = -ndAtan2(localPin.m_z, localPin.m_y);
