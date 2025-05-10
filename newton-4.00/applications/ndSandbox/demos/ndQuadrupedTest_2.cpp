@@ -57,7 +57,7 @@ namespace ndQuadruped_2
 {
 	#define ND_TRAIN_MODEL
 
-	//#define USE_SAC
+	#define USE_SAC
 
 	#ifdef USE_SAC
 		#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
@@ -346,6 +346,7 @@ namespace ndQuadruped_2
 		public:
 		RobotModelNotify(ndModelArticulation* const robot)
 			:ndModelNotify()
+			,m_solver()
 			,m_animPose0()
 			,m_animPose1()
 			,m_poseGenerator()
@@ -473,6 +474,36 @@ namespace ndQuadruped_2
 			return false;
 		}
 
+		ndModelArticulation::ndCenterOfMassDynamics CalculateDynamics(ndFloat32 timestep) const
+		{
+			auto CalculateReferenceFrame = [this]()
+			{
+				ndVector com(ndVector::m_zero);
+				ndFloat32 totalMass = ndFloat32(0.0f);
+				ndModelArticulation::ndNode* const rootNode = GetModel()->GetAsModelArticulation()->GetRoot();
+				for (ndModelArticulation::ndNode* iter = rootNode->GetFirstIterator(); iter; iter = iter->GetNextIterator())
+				{
+					const ndBodyKinematic* const body = iter->m_body->GetAsBodyKinematic();
+					const ndMatrix matrix(body->GetMatrix());
+					const ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
+					ndFloat32 mass = body->GetMassMatrix().m_w;
+					totalMass += mass;
+					com += bodyCom.Scale(mass);
+				}
+
+				com = com.Scale(1.0f / totalMass);
+				ndMatrix referenceFrame(rootNode->m_body->GetMatrix());
+				referenceFrame.m_up = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
+				referenceFrame.m_right = referenceFrame.m_front.CrossProduct(referenceFrame.m_up).Normalize();
+				referenceFrame.m_front = referenceFrame.m_up.CrossProduct(referenceFrame.m_right).Normalize();
+				referenceFrame.m_posit = com;
+				referenceFrame.m_posit.m_w = 1.0f;
+				return referenceFrame;
+			};
+			const ndMatrix comFrame(CalculateReferenceFrame());
+			return GetModel()->GetAsModelArticulation()->CalculateCentreOfMassDynamics(m_solver, comFrame, timestep);
+		}
+
 		#pragma optimize( "", off )
 		ndBrainFloat CalculateReward() const
 		{
@@ -488,6 +519,10 @@ namespace ndQuadruped_2
 			//	xxxx *= 1;
 			
 			ndFloat32 reward = 0.0f;
+
+			const ndModelArticulation::ndCenterOfMassDynamics comDynamics(CalculateDynamics(m_timestep));
+			const ndVector comOmega(comDynamics.m_omega);
+			const ndVector comAlpha(comDynamics.m_alpha);
 			
 			ndSharedPtr<ndAnimationBlendTreeNode> node = m_poseGenerator;
 			ndAnimationSequencePlayer* const sequencePlayer = (ndAnimationSequencePlayer*)*node;
@@ -522,7 +557,6 @@ namespace ndQuadruped_2
 			}
 			
 			model->ClearMemory();
-			
 			
 			//ndFloat32 animSpeed = 1.0f;
 			//m_controllerTrainer->m_animBlendTree->Update(timestep * animSpeed);
@@ -582,45 +616,48 @@ namespace ndQuadruped_2
 		{
 			ndBodyKinematic* const rootBody = GetModel()->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic();
 			
-			const ndVector upVector(rootBody->GetMatrix().m_up);
-			
 			ndSharedPtr<ndAnimationBlendTreeNode> node = m_poseGenerator;
 			ndAnimationSequencePlayer* const sequencePlayer = (ndAnimationSequencePlayer*)*node;
 			ndPoseGenerator* const poseGenerator = (ndPoseGenerator*)*sequencePlayer->GetSequence();
 			const ndVector bound(poseGenerator->m_poseBoundMax.Scale(ndFloat32(1.5f)));
+
+			const ndVector upVector(rootBody->GetMatrix().m_up);
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
 				ndEffectorInfo& leg = m_legs[i];
 				ndIkSwivelPositionEffector* const effector = leg.m_effector;
 				ndInt32 base = m_actionsSize * i;
-				const ndVector resPosit(leg.m_effector->GetRestPosit());
-				//const ndVector effectorPosit(leg.m_effector->GetEffectorPosit());
-				
-				//ndVector relativePosit(effectorPosit - resPosit);
-				//relativePosit.m_x += actions[base + m_actionPosit_x] * D_ACTION_SPEED;
-				//relativePosit.m_y += actions[base + m_actionPosit_y] * D_ACTION_SPEED;
-				//relativePosit.m_z += actions[base + m_actionPosit_z] * D_ACTION_SPEED;
-				//relativePosit.m_x = ndClamp(relativePosit.m_x, -bound.m_x, bound.m_x);
-				//relativePosit.m_y = ndClamp(relativePosit.m_y, -bound.m_y, bound.m_y);
-				//relativePosit.m_z = ndClamp(relativePosit.m_z, -bound.m_z, bound.m_z);
+				//const ndVector resPosit(leg.m_effector->GetRestPosit());
 				
 				const ndAnimKeyframe keyFrame = m_animPose0[i];
-				ndVector keyFramePosit(keyFrame.m_posit);
-				keyFramePosit.m_x += actions[base + m_actionPosit_x] * D_ACTION_SPEED;
-				keyFramePosit.m_y += actions[base + m_actionPosit_y] * D_ACTION_SPEED;
-				keyFramePosit.m_z += actions[base + m_actionPosit_z] * D_ACTION_SPEED;
+				ndVector posit(keyFrame.m_posit);
+				posit.m_x += actions[base + m_actionPosit_x] * D_ACTION_SPEED;
+				posit.m_y += actions[base + m_actionPosit_y] * D_ACTION_SPEED;
+				posit.m_z += actions[base + m_actionPosit_z] * D_ACTION_SPEED;
 
-				ndVector localPost(keyFramePosit - resPosit);
-				localPost.m_x = ndClamp(localPost.m_x, -bound.m_x, bound.m_x);
-				localPost.m_y = ndClamp(localPost.m_y, -bound.m_y, bound.m_y);
-				localPost.m_z = ndClamp(localPost.m_z, -bound.m_z, bound.m_z);
-
-				const ndVector newPosit(localPost + resPosit);
-				effector->SetLocalTargetPosition(newPosit);
-				//effector->SetLocalTargetPosition(keyFramePosit);
+				//ndVector localPost(keyFramePosit - resPosit);
+				//localPost.m_x = ndClamp(localPost.m_x, -bound.m_x, bound.m_x);
+				//localPost.m_y = ndClamp(localPost.m_y, -bound.m_y, bound.m_y);
+				//localPost.m_z = ndClamp(localPost.m_z, -bound.m_z, bound.m_z);
+				//const ndVector newPosit(localPost + resPosit);
 			
 				ndFloat32 swivelAngle = effector->CalculateLookAtSwivelAngle(upVector);
+
+				ndFloat32 minAngle;
+				ndFloat32 maxAngle;
+				ndFloat32 kneeAngle = leg.m_calf->GetAngle();
+				leg.m_calf->GetLimits(minAngle, maxAngle);
+				ndFloat32 safeGuardAngle = ndFloat32(3.0f * ndDegreeToRad);
+				maxAngle = ndMax(ndFloat32(0.0f), maxAngle - safeGuardAngle);
+				minAngle = ndMin(ndFloat32(0.0f), minAngle + safeGuardAngle);
+				if ((kneeAngle > maxAngle) || (kneeAngle < minAngle))
+				{
+					// project that target to the sphere of the corrent position
+					leg.m_effector->SetAsReducedDof();
+				}
+
 				effector->SetSwivelAngle(swivelAngle);
+				effector->SetLocalTargetPosition(posit);
 			
 				// calculate lookAt angle
 				ndMatrix lookAtMatrix0;
@@ -658,10 +695,11 @@ namespace ndQuadruped_2
 
 		void Update(ndFloat32 timestep)
 		{
+			m_timestep = timestep;
+
 			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 			ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
 			rootBody->SetSleepState(false);
-			m_timestep = timestep;
 
 			//ndFloat32 animSpeed = 2.0f * m_control->m_animSpeed;
 			ndFloat32 animSpeed = 1.0f;
@@ -682,6 +720,7 @@ namespace ndQuadruped_2
 			}
 		}
 
+		mutable ndIkSolver m_solver;
 		ndAnimationPose m_animPose0;
 		ndAnimationPose m_animPose1;
 		ndSharedPtr<ndAnimationBlendTreeNode> m_poseGenerator;
@@ -691,9 +730,8 @@ namespace ndQuadruped_2
 		ndSharedPtr<ndController> m_controller;
 		ndSharedPtr<ndControllerTrainer> m_controllerTrainer;
 
-		//ndFloat32 m_time;
 		ndFloat32 m_timestep;
-		//ndFloat32 m_animFrame;
+
 	};
 
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndSharedPtr<ndDemoEntity>& modelMesh)
@@ -744,7 +782,7 @@ namespace ndQuadruped_2
 			ndModelArticulation::ndNode* const calfNode = model->AddLimb(thighNode, calf, calfHinge);
 
 			((ndIkJointHinge*)*calfHinge)->SetLimitState(true);
-			((ndIkJointHinge*)*calfHinge)->SetLimits(-70.0f * ndDegreeToRad, 10.0f * ndDegreeToRad);
+			((ndIkJointHinge*)*calfHinge)->SetLimits(-50.0f * ndDegreeToRad, 40.0f * ndDegreeToRad);
 
 			// build heel
 			ndSharedPtr<ndDemoEntity> heelEntity(calfEntity->GetChildren().GetFirst()->GetInfo());
@@ -752,7 +790,6 @@ namespace ndQuadruped_2
 			ndSharedPtr<ndBody> heel(CreateRigidBody(heelEntity, heelMatrix, limbMass, calf->GetAsBodyDynamic()));
 
 			ndSharedPtr<ndJointBilateralConstraint> heelHinge(new ndJointHinge(heelMatrix, heel->GetAsBodyKinematic(), calf->GetAsBodyKinematic()));
-			//ndModelArticulation::ndNode* const heelNode = model->AddLimb(calfNode, heel, heelHinge);
 			model->AddLimb(calfNode, heel, heelHinge);
 			((ndJointHinge*)*heelHinge)->SetAsSpringDamper(0.001f, 2000.0f, 50.0f);
 
@@ -772,7 +809,6 @@ namespace ndQuadruped_2
 			((ndIkSwivelPositionEffector*)*effector)->SetWorkSpaceConstraints(0.0f, 0.75f * 0.9f);
 			((ndIkSwivelPositionEffector*)*effector)->SetMaxForce(effectorStrength);
 			((ndIkSwivelPositionEffector*)*effector)->SetMaxTorque(effectorStrength);
-			
 			model->AddCloseLoop(effector);
 
 			RobotModelNotify::ndEffectorInfo leg;
