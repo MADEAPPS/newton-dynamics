@@ -368,11 +368,19 @@ void ndIkSwivelPositionEffector::SubmitReducedLinearAxis(ndConstraintDescritor& 
 
 	const ndVector posit0(matrix0.m_posit);
 	const ndVector posit1(matrix1.TransformVector(m_localTargetPosit));
-	const ndVector refPosit(posit0 - matrix1.m_posit);
-	ndFloat32 r = ndSqrt(refPosit.DotProduct(refPosit).GetScalar());
 
-	const ndVector projectTarget(posit1 - matrix1.m_posit);
-	const ndVector newTarget(matrix1.m_posit + projectTarget.Normalize().Scale (r));
+	const ndVector refPosit0(posit0 - matrix1.m_posit);
+	const ndVector refPosit1(posit1 - matrix1.m_posit);
+
+	ndFloat32 refPosit0Dist2 = refPosit0.DotProduct(refPosit0).GetScalar();
+	ndFloat32 refPosit1Dist2 = refPosit1.DotProduct(refPosit1).GetScalar();
+
+	ndVector newTarget(posit1);
+	if (refPosit1Dist2 > refPosit0Dist2)
+	{
+		ndFloat32 dist = ndSqrt(refPosit0Dist2);
+		newTarget = matrix1.m_posit + refPosit1.Normalize().Scale(dist);
+	}
 
 	const ndMatrix& axisDir = matrix1;
 	for (ndInt32 i = 0; i < 3; ++i)

@@ -435,7 +435,7 @@ namespace ndQuadruped_1
 			ndModelArticulation::ndNode* const calfNode = model->AddLimb(thighNode, calf, calfHinge);
 
 			((ndIkJointHinge*)*calfHinge)->SetLimitState(true);
-			((ndIkJointHinge*)*calfHinge)->SetLimits(-70.0f * ndDegreeToRad, 10.0f * ndDegreeToRad);
+			((ndIkJointHinge*)*calfHinge)->SetLimits(-50.0f * ndDegreeToRad, 40.0f * ndDegreeToRad);
 
 			// build heel
 			ndSharedPtr<ndDemoEntity> heelEntity(calfEntity->GetChildren().GetFirst()->GetInfo());
@@ -443,7 +443,6 @@ namespace ndQuadruped_1
 			ndSharedPtr<ndBody> heel(CreateRigidBody(heelEntity, heelMatrix, limbMass, calf->GetAsBodyDynamic()));
 
 			ndSharedPtr<ndJointBilateralConstraint> heelHinge(new ndJointHinge(heelMatrix, heel->GetAsBodyKinematic(), calf->GetAsBodyKinematic()));
-			//ndModelArticulation::ndNode* const heelNode = model->AddLimb(calfNode, heel, heelHinge);
 			model->AddLimb(calfNode, heel, heelHinge);
 			((ndJointHinge*)*heelHinge)->SetAsSpringDamper(0.001f, 2000.0f, 50.0f);
 

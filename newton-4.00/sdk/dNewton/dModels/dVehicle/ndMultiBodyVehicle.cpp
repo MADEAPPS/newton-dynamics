@@ -33,7 +33,7 @@
 #include "ndMultiBodyVehicleDifferential.h"
 #include "ndMultiBodyVehicleDifferentialAxle.h"
 
-#define D_MAX_CONTACT_SPEED_TRESHOLD	ndFloat32 (0.5f)
+#define D_MAX_CONTACT_SPEED_TRESHOLD	ndFloat32 (0.1f)
 #define D_MAX_CONTACT_PENETRATION		ndFloat32 (1.0e-2f)
 #define D_MIN_CONTACT_CLOSE_DISTANCE2	ndFloat32 (5.0e-2f * 5.0e-2f)
 
@@ -670,10 +670,12 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 		//ndTrace(("(%d: u=%f f1=%f f2=%f)  ", tireBody->GetId(), longitudialSlip, longitudinalForce, lateralForce));
 
 		ndFloat32 dynamicFrictionCoef = tire->m_IsApplyingBreaks ? ndFloat32(0.5f) : ndFloat32(1.0f);
+
 		contactPoint.m_material.m_staticFriction1 = lateralForce * dynamicFrictionCoef;
-		contactPoint.m_material.m_staticFriction0 = longitudinalForce * dynamicFrictionCoef;
 		contactPoint.m_material.m_dynamicFriction1 = lateralForce * dynamicFrictionCoef;
+		contactPoint.m_material.m_staticFriction0 = longitudinalForce * dynamicFrictionCoef;
 		contactPoint.m_material.m_dynamicFriction0 = longitudinalForce * dynamicFrictionCoef;
+
 		ndUnsigned32 newFlags = contactPoint.m_material.m_flags | m_override0Friction | m_override1Friction;
 		contactPoint.m_material.m_flags = newFlags;
 	}
