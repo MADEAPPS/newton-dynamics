@@ -29,6 +29,7 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector()
 	,m_linearRegularizer(ndFloat32(5.0e-3f))
 	,m_minWorkSpaceRadio(ndFloat32(0.0f))
 	,m_maxWorkSpaceRadio(ndFloat32(0.0f))
+	,m_rotationOrder(m_pitchRollYaw)
 	,m_reducedDof(false)
 	,m_enableSwivelControl(true)
 {
@@ -52,6 +53,7 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(
 	,m_linearRegularizer(ndFloat32(5.0e-3f))
 	,m_minWorkSpaceRadio(ndFloat32(0.0f))
 	,m_maxWorkSpaceRadio(ndFloat32(0.0f))
+	,m_rotationOrder(m_pitchRollYaw)
 	,m_reducedDof(false)
 	,m_enableSwivelControl(true)
 {
@@ -74,6 +76,16 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(
 
 ndIkSwivelPositionEffector::~ndIkSwivelPositionEffector()
 {
+}
+
+ndIkSwivelPositionEffector::ndRotationOrder ndIkSwivelPositionEffector::GetRotationOrder() const
+{
+	return m_rotationOrder;
+}
+
+void ndIkSwivelPositionEffector::SetRotationOrder(ndRotationOrder rotationOrder)
+{
+	m_rotationOrder = rotationOrder;
 }
 
 bool ndIkSwivelPositionEffector::GetSwivelMode() const
@@ -202,12 +214,26 @@ void ndIkSwivelPositionEffector::GetAngularSpringDamper(ndFloat32& regularizer, 
 ndMatrix ndIkSwivelPositionEffector::CalculateSwivelFrame(const ndMatrix& matrix1) const
 {
 	const ndVector pin((m_localTargetPosit & ndVector::m_triplexMask).Normalize());
-	ndFloat32 yaw = -ndAsin(ndClamp (pin.m_z, ndFloat32 (-1.0f), ndFloat32(1.0f)));
-	ndFloat32 roll = ndAtan2(pin.m_y, pin.m_x);
+	if (m_rotationOrder == m_pitchRollYaw)
+	{
+		//ndVector pin = (ndRollMatrix(30.0f * ndDegreeToRad) * ndYawMatrix(60.0f * ndDegreeToRad)).RotateVector(ndVector(1.0f, 0.0f, 0.0f, 0.0f));
+		ndFloat32 yaw = ndAtan2(-pin.m_z, pin.m_x);
+		ndFloat32 roll = ndAsin(ndClamp(pin.m_y, ndFloat32(-1.0f), ndFloat32(1.0f)));
 
-	ndMatrix swivelMatrix (ndYawMatrix(yaw) * ndRollMatrix(roll) * matrix1);
-	swivelMatrix.m_posit = matrix1.TransformVector(m_localTargetPosit);
-	return swivelMatrix;
+		ndMatrix swivelMatrix(ndRollMatrix(roll) * ndYawMatrix(yaw) * matrix1);
+		swivelMatrix.m_posit = matrix1.TransformVector(m_localTargetPosit);
+		return swivelMatrix;
+	}
+	else
+	{
+		ndAssert(m_rotationOrder == m_pitchYawRoll);
+		ndFloat32 roll = ndAtan2(pin.m_y, pin.m_x);
+		ndFloat32 yaw = -ndAsin(ndClamp(pin.m_z, ndFloat32(-1.0f), ndFloat32(1.0f)));
+
+		ndMatrix swivelMatrix(ndYawMatrix(yaw) * ndRollMatrix(roll) * matrix1);
+		swivelMatrix.m_posit = matrix1.TransformVector(m_localTargetPosit);
+		return swivelMatrix;
+	}
 }
 
 ndVector ndIkSwivelPositionEffector::GetEffectorPosit() const
@@ -266,6 +292,21 @@ ndInt32 ndIkSwivelPositionEffector::GetKinematicState(ndKinematicState* const st
 
 ndFloat32 ndIkSwivelPositionEffector::CalculateLookAtSwivelAngle(const ndVector& upDir) const
 {
+
+ndMatrix matrix0;
+ndMatrix matrix1;
+CalculateGlobalMatrix(matrix0, matrix1);
+ndMatrix swivelMatrix1(CalculateSwivelFrame(matrix1));
+ndMatrix swivelMatrix0(ndPitchMatrix(-m_swivelAngle) * swivelMatrix1);
+
+static ndInt32 xxxxxx;
+if (xxxxxx > 550)
+xxxxxx *= 1;
+ndTrace(("%d\n", xxxxxx));
+xxxxxx++;
+
+
+
 	ndMatrix swivelMatrix(CalculateSwivelFrame(CalculateGlobalMatrix1()));
 	ndVector localPin(swivelMatrix.UnrotateVector(upDir));
 	ndFloat32 swivelAngle = -ndAtan2(localPin.m_z, localPin.m_y);

@@ -19,6 +19,12 @@ D_MSV_NEWTON_CLASS_ALIGN_32
 class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 {
 	public:
+	enum ndRotationOrder
+	{
+		m_pitchRollYaw,
+		m_pitchYawRoll
+	};
+
 	D_CLASS_REFLECTION(ndIkSwivelPositionEffector, ndJointBilateralConstraint)
 
 	D_NEWTON_API ndIkSwivelPositionEffector();
@@ -29,13 +35,12 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 
 	D_NEWTON_API ndVector GetLocalTargetPosition() const;
 	D_NEWTON_API void SetLocalTargetPosition(const ndVector& posit);
+
+	D_NEWTON_API ndRotationOrder GetRotationOrder() const;
+	D_NEWTON_API void SetRotationOrder(ndRotationOrder rotationOrder);
 	
 	D_NEWTON_API void SetAsReducedDof();
 	D_NEWTON_API ndVector GetEffectorPosit() const;
-	
-	//D_NEWTON_API ndFloat32 GetSafeEffectorDist() const;
-	//D_NEWTON_API void SetSafeEffectorDist(ndFloat32 dist);
-	//D_NEWTON_API ndVector CalculateSafePosit(const ndVector& desiredTarget) const;
 	
 	D_NEWTON_API ndVector GetRestPosit() const;
 	D_NEWTON_API void SetRestPosit(const ndVector& posit);
@@ -91,7 +96,8 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 
 	ndFloat32 m_minWorkSpaceRadio;
 	ndFloat32 m_maxWorkSpaceRadio;
-	//ndFloat32 m_underDeterminedClipDistance;
+
+	ndRotationOrder m_rotationOrder;
 	bool m_reducedDof;
 	bool m_enableSwivelControl;
 } D_GCC_NEWTON_CLASS_ALIGN_32;
