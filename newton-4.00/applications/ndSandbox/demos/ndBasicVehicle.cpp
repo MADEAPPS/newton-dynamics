@@ -15,7 +15,6 @@
 #include "ndVehicleUI.h"
 #include "ndMeshLoader.h"
 #include "ndDemoCamera.h"
-#include "ndSoundManager.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndCompoundScene.h"
@@ -230,13 +229,6 @@ static ndVehicleDectriptorViper viperDesc;
 static ndVehicleDectriptorMonsterTruck0 monterTruckDesc0;
 static ndVehicleDectriptorMonsterTruck1 monterTruckDesc1;
 
-static const char* engineSounds[] =
-{
-	"engine_start.wav",
-	"engine_rpm.wav",
-	"tire_skid.wav",
-};
-
 static ndDemoEntity* LoadVehicleMeshModel(ndDemoEntityManager* const scene, const char* const filename)
 {
 	ndMeshLoader loader;
@@ -421,12 +413,6 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	ndVector floor(FindFloor(*world, location + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit = floor;
 	matrix.m_posit.m_y += 0.5f;
-
-	ndSoundManager* const soundManager = world->GetSoundManager();
-	for (ndInt32 i = 0; i < ndInt32 (sizeof(engineSounds) / sizeof(engineSounds[0])); ++i)
-	{
-		soundManager->CreateSoundAsset(engineSounds[i]);
-	}
 
 	ndVehicleMaterial material;
 	material.m_restitution = 0.1f;

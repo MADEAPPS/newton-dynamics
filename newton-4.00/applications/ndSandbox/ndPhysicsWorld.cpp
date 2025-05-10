@@ -13,7 +13,6 @@
 #include "ndDemoMesh.h"
 #include "ndDemoCamera.h"
 #include "ndPhysicsWorld.h"
-#include "ndSoundManager.h"
 #include "ndContactCallback.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
@@ -71,7 +70,6 @@ void ndPhysicsWorld::ndDefferentDeleteEntities::RemoveEntity(ndDemoEntity* const
 ndPhysicsWorld::ndPhysicsWorld(ndDemoEntityManager* const manager)
 	:ndWorld()
 	,m_manager(manager)
-	,m_soundManager(new ndSoundManager(manager))
 	,m_timeAccumulator(0.0f)
 	,m_deadEntities(manager)
 	,m_acceleratedUpdate(false)
@@ -88,11 +86,6 @@ ndPhysicsWorld::~ndPhysicsWorld()
 void ndPhysicsWorld::CleanUp()
 {
 	ndWorld::CleanUp();
-	if (m_soundManager)
-	{
-		delete m_soundManager;
-		m_soundManager = nullptr;
-	}
 }
 
 void ndPhysicsWorld::RemoveEntity(ndDemoEntity* const entity)
@@ -104,11 +97,6 @@ void ndPhysicsWorld::RemoveEntity(ndDemoEntity* const entity)
 ndDemoEntityManager* ndPhysicsWorld::GetManager() const
 {
 	return m_manager;
-}
-
-ndSoundManager* ndPhysicsWorld::GetSoundManager() const
-{
-	return m_soundManager;
 }
 
 void ndPhysicsWorld::PreUpdate(ndFloat32 timestep)
@@ -190,11 +178,6 @@ void ndPhysicsWorld::PostUpdate(ndFloat32 timestep)
 	if (m_manager->m_updateCamera)
 	{
 		m_manager->m_updateCamera(m_manager, m_manager->m_updateCameraContext, timestep);
-	}
-
-	if (m_soundManager)
-	{
-		m_soundManager->Update(this, timestep);
 	}
 
 	if (m_manager->m_onPostUpdate)
