@@ -52,8 +52,8 @@
 //#define DEFAULT_SCENE	17		// cart pole discrete controller
 //#define DEFAULT_SCENE	18		// cart pole continue controller
 //#define DEFAULT_SCENE	19		// unit cycle controller
-//#define DEFAULT_SCENE	20		// quadruped test 1
-#define DEFAULT_SCENE	21		// quadruped test 2
+#define DEFAULT_SCENE	20		// quadruped test 1
+//#define DEFAULT_SCENE	21		// quadruped test 2
 //#define DEFAULT_SCENE	22		// quadruped test 3
 //#define DEFAULT_SCENE	23		// quadruped test 3
 //#define DEFAULT_SCENE	24		// quadruped test 4
@@ -576,7 +576,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//m_showNormalForces = true;
 	//m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
-	//m_showModelsDebugInfo = true;
+	m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 1;
 	//m_collisionDisplayMode = 2;	
 	//m_collisionDisplayMode = 3;		// solid wire frame

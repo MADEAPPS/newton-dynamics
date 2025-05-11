@@ -45,11 +45,12 @@ class ndModelArticulation: public ndModel
 		ndVector m_alpha;
 		ndVector m_velocity;
 		ndVector m_acceleration;
-		ndVector m_centerOfMass;
+		//ndVector m_centerOfMass;
 		ndVector m_force;
 		ndVector m_torque;
 		ndVector m_momentum;
 		ndVector m_angularMomentum;
+		ndMatrix m_centerOfMass;
 		ndMatrix m_inertiaMatrix;
 		ndFloat32 m_mass;
 	};

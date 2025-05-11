@@ -33,11 +33,11 @@ ndModelArticulation::ndCenterOfMassDynamics::ndCenterOfMassDynamics()
 	,m_alpha(ndVector::m_zero)
 	,m_velocity(ndVector::m_zero)
 	,m_acceleration(ndVector::m_zero)
-	,m_centerOfMass(ndVector::m_zero)
 	,m_force(ndVector::m_zero)
 	,m_torque(ndVector::m_zero)
 	,m_momentum(ndVector::m_zero)
 	,m_angularMomentum(ndVector::m_zero)
+	,m_centerOfMass(ndGetIdentityMatrix())
 	,m_inertiaMatrix(ndGetZeroMatrix())
 	,m_mass(ndFloat32 (0.0f))
 {
@@ -574,9 +574,11 @@ ndModelArticulation::ndCenterOfMassDynamics ndModelArticulation::CalculateCentre
 		return dynamics;
 	}
 
-	ndMatrix comFrame(frame);
+	//ndMatrix comFrame(frame);
+	dynamics.m_centerOfMass = frame;
+	dynamics.m_centerOfMass.m_posit = ndVector::m_zero;
 	ndFixSizeArray<const ndBodyKinematic*, 256> bodyArray;
-	auto CalculateCenterOfMass = [this, &dynamics, &comFrame, &bodyArray]()
+	auto CalculateCenterOfMass = [this, &dynamics, &bodyArray]()
 	{
 		for (ndModelArticulation::ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
 		{
@@ -586,34 +588,33 @@ ndModelArticulation::ndCenterOfMassDynamics ndModelArticulation::CalculateCentre
 			const ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
 			ndFloat32 mass = body->GetMassMatrix().m_w;
 			dynamics.m_mass += mass;
-			dynamics.m_centerOfMass += bodyCom.Scale(mass);
+			dynamics.m_centerOfMass.m_posit += bodyCom.Scale(mass);
 			dynamics.m_momentum += body->GetVelocity().Scale(mass);
 		}
 		ndFloat32 massScale = ndFloat32(1.0f) / dynamics.m_mass;
 		dynamics.m_velocity = dynamics.m_momentum.Scale(massScale);
-		dynamics.m_centerOfMass = dynamics.m_centerOfMass.Scale(massScale);
-		dynamics.m_centerOfMass.m_w = ndFloat32(1.0f);
-		comFrame.m_posit = dynamics.m_centerOfMass;
+		dynamics.m_centerOfMass.m_posit = dynamics.m_centerOfMass.m_posit.Scale(massScale);
+		dynamics.m_centerOfMass.m_posit.m_w = ndFloat32(1.0f);
 	};
 	CalculateCenterOfMass();
 
-	auto CalculateInertiaAndAngularMomentum = [this, &dynamics, &comFrame, &bodyArray]()
+	auto CalculateInertiaAndAngularMomentum = [this, &dynamics, &bodyArray]()
 	{
-		const ndMatrix invComFrame(comFrame.OrthoInverse());
+		const ndMatrix invComFrame(dynamics.m_centerOfMass.OrthoInverse());
 		for (ndInt32 i = bodyArray.GetCount() - 1; i >= 0; --i)
 		{
 			const ndBodyKinematic* const body = bodyArray[i];
 			const ndMatrix bodyMatrix(body->GetMatrix());
 	
 			const ndVector origin(bodyMatrix.TransformVector(body->GetCentreOfMass()));
-			const ndVector bodyCom(comFrame.UntransformVector(origin) & ndVector::m_triplexMask);
+			const ndVector bodyCom(dynamics.m_centerOfMass.UntransformVector(origin) & ndVector::m_triplexMask);
 			ndMatrix covariance(ndCovarianceMatrix(bodyCom, bodyCom));
 	
 			ndFloat32 mass = body->GetMassMatrix().m_w;
 			ndFloat32 mag2 = bodyCom.DotProduct(bodyCom).GetScalar();
 	
 			const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
-			ndMatrix refInertia(invComFrame * bodyInertia * comFrame);
+			ndMatrix refInertia(invComFrame * bodyInertia * dynamics.m_centerOfMass);
 			for (ndInt32 j = 0; j < 3; j++)
 			{
 				refInertia[j][j] += mass * mag2;
@@ -633,16 +634,16 @@ ndModelArticulation::ndCenterOfMassDynamics ndModelArticulation::CalculateCentre
 
 	solver.SolverBegin(skeleton, nullptr, 0, GetWorld(), timestep);
 	solver.Solve();
-	auto CalculateForceAndAcceleration = [this, &dynamics, &comFrame, &bodyArray, &invComInertia]()
+	auto CalculateForceAndAcceleration = [this, &dynamics, &bodyArray, &invComInertia]()
 	{
-		const ndMatrix invComFrame(comFrame.OrthoInverse());
+		const ndMatrix invComFrame(dynamics.m_centerOfMass.OrthoInverse());
 		for (ndInt32 i = bodyArray.GetCount() - 1; i >= 0; --i)
 		{
 			const ndBodyKinematic* const body = bodyArray[i];
 			const ndMatrix bodyMatrix(body->GetMatrix());
 	
 			const ndVector origin(bodyMatrix.TransformVector(body->GetCentreOfMass()));
-			const ndVector bodyCom(comFrame.UntransformVector(origin) & ndVector::m_triplexMask);
+			const ndVector bodyCom(dynamics.m_centerOfMass.UntransformVector(origin) & ndVector::m_triplexMask);
 	
 			ndFloat32 mass = body->GetMassMatrix().m_w;
 			const ndVector veloc(body->GetVelocity());

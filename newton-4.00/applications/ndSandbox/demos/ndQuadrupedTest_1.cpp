@@ -210,17 +210,6 @@ namespace ndQuadruped_1
 			return GetModel()->GetAsModelArticulation()->CalculateCentreOfMassDynamics(m_solver, referenceFrame, timestep);
 		}
 
-		ndVector CalculateZeroMomentPoint(ndFloat32 timestep)
-		{
-			ndModelArticulation::ndCenterOfMassDynamics dynamics(CalculateDynamics(timestep));
-
-			ndFloat32 gravityForce = dynamics.m_mass * DEMO_GRAVITY + 0.001f;
-			ndFloat32 x = dynamics.m_torque.m_z / gravityForce;
-			ndFloat32 z = -dynamics.m_torque.m_x / gravityForce;
-			const ndVector zmp(x, ndFloat32(0.0f), z, ndFloat32(0.0f));
-			return zmp;
-		}
-
 		void Update(ndFloat32 timestep)
 		{
 			m_timestep = timestep;
@@ -228,8 +217,6 @@ namespace ndQuadruped_1
 			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 			ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
 			rootBody->SetSleepState(false);
-
-			const ndVector zmp(CalculateZeroMomentPoint(timestep));
 
 			const ndModelArticulation::ndCenterOfMassDynamics comDynamics(CalculateDynamics(timestep));
 			const ndVector comOmega(comDynamics.m_omega);
@@ -248,9 +235,7 @@ namespace ndQuadruped_1
 				ndEffectorInfo& leg = m_legs[i];
 				ndIkSwivelPositionEffector* const effector = leg.m_effector;
 				
-				//ndVector posit(m_animPose[i].m_posit - zmp);
 				ndVector posit(m_animPose[i].m_posit);
-
 				ndFloat32 swivelAngle = effector->CalculateLookAtSwivelAngle(upVector);
 
 				ndFloat32 minAngle;
@@ -288,16 +273,129 @@ namespace ndQuadruped_1
 
 		virtual void Debug(ndConstraintDebugCallback& context) const
 		{
-			ndFloat32 scale = context.GetScale();
-			context.SetScale(scale * 0.75f);
+			
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
+				ndFloat32 scale = context.GetScale();
+				context.SetScale(scale * 0.75f);
 				//const ndEffectorInfo& leg = m_legs[i];
 				//leg.m_heel->DebugJoint(context);
 				//leg.m_effector->DebugJoint(context);
 				//leg.m_calf->DebugJoint(context);
+				context.SetScale(scale);
 			}
-			context.SetScale(scale);
+
+			ndVector supportColor(0.0f, 1.0f, 1.0f, 1.0f);
+			ndFixSizeArray<ndBigVector, 16> supportPoint;
+			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
+			{
+				const ndEffectorInfo& leg = m_legs[i];
+				ndIkSwivelPositionEffector* const effector = leg.m_effector;
+
+				auto HasContact = [effector]()
+				{
+					ndBodyKinematic* const body = effector->GetBody0();
+					ndBodyKinematic::ndContactMap& contacts = body->GetContactMap();
+					ndBodyKinematic::ndContactMap::Iterator it(contacts);
+					for (it.Begin(); it; it++)
+					{
+						ndContact* const contact = *it;
+						if (contact->IsActive())
+						{
+							return true;
+						}
+					}
+					return false;
+				};
+
+				if (HasContact())
+				{
+					supportPoint.PushBack(effector->CalculateGlobalMatrix0().m_posit);
+				}
+			}
+
+			auto PrepareSupportFeature = [&supportPoint]()
+			{
+				ndBigVector origin(ndBigVector::m_zero);
+				for (ndInt32 i = 0; i < supportPoint.GetCount(); ++i)
+				{
+					origin += supportPoint[i];
+				}
+				origin = origin.Scale(1.0f / ndFloat32(supportPoint.GetCount()));
+
+				ndFloat32 scale = 1.0f;
+				for (ndInt32 i = 0; i < supportPoint.GetCount(); ++i)
+				{
+					supportPoint[i] = origin + (supportPoint[i] - origin).Scale(scale);
+				}
+			};
+
+			switch (supportPoint.GetCount())
+			{
+				case 1:
+					context.DrawPoint(supportPoint[0], ndVector(1.0f, 0.0f, 0.0f, 1.0f), 5);
+					break;
+
+				case 2:
+					context.DrawLine(supportPoint[0], supportPoint[1], supportColor);
+					break;
+
+				case 3:
+				case 4:
+				{
+					ndBigVector origin(ndBigVector::m_zero);
+					for (ndInt32 i = 0; i < supportPoint.GetCount(); ++i)
+					{
+						origin += supportPoint[i];
+					}
+					origin = origin.Scale(1.0f / ndFloat32(supportPoint.GetCount()));
+					
+					ndFloat32 scale = 1.0f;
+					for (ndInt32 i = 0; i < supportPoint.GetCount(); ++i)
+					{
+						supportPoint[i] = origin + (supportPoint[i] - origin).Scale(scale);
+					}
+
+					ndFixSizeArray<ndVector, 16> desiredSupportPoint;
+					for (ndInt32 i = 0; i < supportPoint.GetCount(); ++i)
+					{
+						desiredSupportPoint.PushBack(supportPoint[i]);
+					}
+
+					ndMatrix rotation(ndPitchMatrix(90.0f * ndDegreeToRad));
+					rotation.TransformTriplex(&desiredSupportPoint[0].m_x, sizeof(ndVector), &desiredSupportPoint[0].m_x, sizeof(ndVector), desiredSupportPoint.GetCount());
+					ndInt32 supportCount = ndConvexHull2d(&desiredSupportPoint[0], desiredSupportPoint.GetCount());
+					rotation.OrthoInverse().TransformTriplex(&desiredSupportPoint[0].m_x, sizeof(ndVector), &desiredSupportPoint[0].m_x, sizeof(ndVector), desiredSupportPoint.GetCount());
+					ndVector p0(desiredSupportPoint[supportCount - 1]);
+					ndBigVector bigPolygon[16];
+					for (ndInt32 i = 0; i < supportCount; ++i)
+					{
+						bigPolygon[i] = desiredSupportPoint[i];
+						context.DrawLine(desiredSupportPoint[i], p0, supportColor);
+						p0 = desiredSupportPoint[i];
+					}
+				}
+
+				default:;
+			}
+
+			// calculate zmp
+			ndModelArticulation::ndCenterOfMassDynamics dynamics(CalculateDynamics(m_timestep));
+
+			// draw center of pressure define as
+			// a point where a vertical line draw from the center of mass, intersect the support polygon plane.
+			ndMatrix centerOfPresure(dynamics.m_centerOfMass);
+			centerOfPresure.m_posit.m_y -= 0.3f;
+			context.DrawPoint(centerOfPresure.m_posit, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 4);
+
+			// draw zero moment point define as: 
+			// a point on the support polygon plane where a vertical force make the horizontal components of the com acceleration zero.
+			ndFloat32 gravityForce = dynamics.m_mass * DEMO_GRAVITY + 0.001f;
+			ndFloat32 x = dynamics.m_torque.m_z / gravityForce;
+			ndFloat32 z = -dynamics.m_torque.m_x / gravityForce;
+			//const ndVector localZmp(x, ndFloat32(0.0f), z, ndFloat32(1.0f));
+			const ndVector zmp(centerOfPresure.TransformVector(ndVector(x, ndFloat32(0.0f), z, ndFloat32(1.0f))));
+			context.DrawPoint(zmp, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 4);
 		}
 
 		mutable ndIkSolver m_solver;
@@ -337,14 +435,15 @@ namespace ndQuadruped_1
 
 		// offset com so that the model is unstable
 		ndVector com(rootBody->GetAsBodyKinematic()->GetCentreOfMass());
-		com.m_x -= 0.05f;
+		//com.m_x -= 0.05f;
+		com.m_x -= 0.00f;
 		rootBody->GetAsBodyKinematic()->SetCentreOfMass(com);
 	
 		// build all for legs
 		ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(rootBody);
 		for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = entity->GetChildren().GetFirst(); node; node = node->GetNext())
 		{
-			// build thig
+			// build thigh
 			ndSharedPtr<ndDemoEntity> thighEntity(node->GetInfo());
 			const ndMatrix thighMatrix(thighEntity->GetCurrentMatrix() * matrix);
 			ndSharedPtr<ndBody> thigh(CreateRigidBody(thighEntity, thighMatrix, limbMass, rootBody->GetAsBodyDynamic()));
