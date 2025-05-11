@@ -42,9 +42,6 @@ class ndIkSolver: public ndClassAlloc
 	D_NEWTON_API void UpdateJointAcceleration(ndConstraint* const joint);
 	D_NEWTON_API void SolverEnd();
 
-	//D_NEWTON_API ndVector GetBodyForce(const ndBodyKinematic* const body) const;
-	//D_NEWTON_API ndVector GetBodyTorque(const ndBodyKinematic* const body) const;
-
 	private:
 	void BuildMassMatrix();
 	void GetJacobianDerivatives(ndConstraint* const joint);

@@ -199,110 +199,26 @@ namespace ndQuadruped_1
 		{
 		}
 
-		ndVector CalculateZeroMomentPoint(ndFloat32 timestep)
-		{
-			ndModelArticulation* const articulation = GetModel()->GetAsModelArticulation();
-			ndBodyKinematic* const rootBody = articulation->GetRoot()->m_body->GetAsBodyKinematic();
-			ndSkeletonContainer* const skeleton = rootBody->GetSkeleton();
-			ndAssert(skeleton);
-
-			m_solver.SolverBegin(skeleton, nullptr, 0, articulation->GetWorld(), timestep);
-			m_solver.Solve();
-
-			ndFixSizeArray<const ndBodyKinematic*, 32> bodies;
-			auto CalculateReferenceFrame = [this, &bodies]()
-			{
-				ndVector com(ndVector::m_zero);
-				ndFloat32 totalMass = ndFloat32(0.0f);
-				ndModelArticulation::ndNode* const rootNode = GetModel()->GetAsModelArticulation()->GetRoot();
-				for (ndModelArticulation::ndNode* iter = rootNode->GetFirstIterator(); iter; iter = iter->GetNextIterator())
-				{
-					const ndBodyKinematic* const body = iter->m_body->GetAsBodyKinematic();
-					bodies.PushBack(body);
-					const ndMatrix matrix(body->GetMatrix());
-					const ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
-					ndFloat32 mass = body->GetMassMatrix().m_w;
-					totalMass += mass;
-					com += bodyCom.Scale(mass);
-				}
-			
-				com = com.Scale(1.0f / totalMass);
-				ndMatrix referenceFrame(rootNode->m_body->GetMatrix());
-				referenceFrame.m_up = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
-				referenceFrame.m_right = referenceFrame.m_front.CrossProduct(referenceFrame.m_up).Normalize();
-				referenceFrame.m_front = referenceFrame.m_up.CrossProduct(referenceFrame.m_right).Normalize();
-				referenceFrame.m_posit = com;
-				referenceFrame.m_posit.m_w = 1.0f;
-				return referenceFrame;
-			};
-			const ndMatrix comFrame(CalculateReferenceFrame());
-			
-			auto CalculateZmp = [this, &bodies, &comFrame]()
-			{
-				ndFloat32 totalMass = ndFloat32(0.0f);
-				ndVector totalToque(ndVector::m_zero);
-				const ndMatrix invComFrame(comFrame.OrthoInverse());
-				for (ndInt32 i = bodies.GetCount() - 1; i >= 0; --i)
-				{
-					const ndBodyKinematic* const body = bodies[i];
-					const ndMatrix bodyMatrix(body->GetMatrix());
-				
-					const ndVector origin(bodyMatrix.TransformVector(body->GetCentreOfMass()));
-					const ndVector bodyCom(comFrame.UntransformVector(origin) & ndVector::m_triplexMask);
-				
-					ndFloat32 mass = body->GetMassMatrix().m_w;
-				
-					totalMass += mass;
-					const ndMatrix bodyInertia(body->CalculateInertiaMatrix());
-					const ndVector extForceTorque(bodyCom.CrossProduct(invComFrame.RotateVector(body->GetAccel().Scale(mass))));
-					const ndVector extTorque(invComFrame.RotateVector(bodyInertia.RotateVector(body->GetAlpha())));
-					const ndVector gyroTorque(invComFrame.RotateVector(body->GetOmega().CrossProduct(bodyInertia.RotateVector(body->GetOmega()))));
-				
-					totalToque += extTorque;
-					totalToque += gyroTorque;
-					totalToque += extForceTorque;
-				}
-				ndFloat32 gravityForce = totalMass * DEMO_GRAVITY + 0.1f;
-				ndFloat32 x = totalToque.m_z / gravityForce;
-				ndFloat32 z = -totalToque.m_x / gravityForce;
-				const ndVector zmp(x, ndFloat32 (0.0f), z, ndFloat32(0.0f));
-				return zmp.Scale (ndFloat32 (-0.1f));
-			};
-			const ndVector zmp(CalculateZmp());
-			//ndTrace(("%f %f %f\n", zmp.m_x, zmp.m_y, zmp.m_z));
-			m_solver.SolverEnd();
-			
-			return zmp;
-		}
-
 		ndModelArticulation::ndCenterOfMassDynamics CalculateDynamics(ndFloat32 timestep) const
 		{
-			auto CalculateReferenceFrame = [this]()
-			{
-				ndVector com(ndVector::m_zero);
-				ndFloat32 totalMass = ndFloat32(0.0f);
-				ndModelArticulation::ndNode* const rootNode = GetModel()->GetAsModelArticulation()->GetRoot();
-				for (ndModelArticulation::ndNode* iter = rootNode->GetFirstIterator(); iter; iter = iter->GetNextIterator())
-				{
-					const ndBodyKinematic* const body = iter->m_body->GetAsBodyKinematic();
-					const ndMatrix matrix(body->GetMatrix());
-					const ndVector bodyCom(matrix.TransformVector(body->GetCentreOfMass()));
-					ndFloat32 mass = body->GetMassMatrix().m_w;
-					totalMass += mass;
-					com += bodyCom.Scale(mass);
-				}
+			ndModelArticulation::ndNode* const rootNode = GetModel()->GetAsModelArticulation()->GetRoot();
 
-				com = com.Scale(1.0f / totalMass);
-				ndMatrix referenceFrame(rootNode->m_body->GetMatrix());
-				referenceFrame.m_up = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
-				referenceFrame.m_right = referenceFrame.m_front.CrossProduct(referenceFrame.m_up).Normalize();
-				referenceFrame.m_front = referenceFrame.m_up.CrossProduct(referenceFrame.m_right).Normalize();
-				referenceFrame.m_posit = com;
-				referenceFrame.m_posit.m_w = 1.0f;
-				return referenceFrame;
-			};
-			const ndMatrix comFrame(CalculateReferenceFrame());
-			return GetModel()->GetAsModelArticulation()->CalculateCentreOfMassDynamics(m_solver, comFrame, timestep);
+			ndMatrix referenceFrame(rootNode->m_body->GetMatrix());
+			referenceFrame.m_up = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
+			referenceFrame.m_right = referenceFrame.m_front.CrossProduct(referenceFrame.m_up).Normalize();
+			referenceFrame.m_front = referenceFrame.m_up.CrossProduct(referenceFrame.m_right).Normalize();
+			return GetModel()->GetAsModelArticulation()->CalculateCentreOfMassDynamics(m_solver, referenceFrame, timestep);
+		}
+
+		ndVector CalculateZeroMomentPoint(ndFloat32 timestep)
+		{
+			ndModelArticulation::ndCenterOfMassDynamics dynamics(CalculateDynamics(timestep));
+
+			ndFloat32 gravityForce = dynamics.m_mass * DEMO_GRAVITY + 0.001f;
+			ndFloat32 x = dynamics.m_torque.m_z / gravityForce;
+			ndFloat32 z = -dynamics.m_torque.m_x / gravityForce;
+			const ndVector zmp(x, ndFloat32(0.0f), z, ndFloat32(0.0f));
+			return zmp;
 		}
 
 		void Update(ndFloat32 timestep)
@@ -313,9 +229,8 @@ namespace ndQuadruped_1
 			ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
 			rootBody->SetSleepState(false);
 
-			//ndJacobian xxxx(model->CalculateTotalMomentum());
-			//const ndVector zmp(CalculateZeroMomentPoint(timestep));
-			//const ndVector zmp(ndVector::m_zero);
+			const ndVector zmp(CalculateZeroMomentPoint(timestep));
+
 			const ndModelArticulation::ndCenterOfMassDynamics comDynamics(CalculateDynamics(timestep));
 			const ndVector comOmega(comDynamics.m_omega);
 			const ndVector comAlpha(comDynamics.m_alpha);
@@ -419,9 +334,14 @@ namespace ndQuadruped_1
 		ndMatrix matrix(entity->GetCurrentMatrix() * location);
 
 		ndSharedPtr<ndBody> rootBody(CreateRigidBody(entity, matrix, mass, nullptr));
-		ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(rootBody);
+
+		// offset com so that the model is unstable
+		ndVector com(rootBody->GetAsBodyKinematic()->GetCentreOfMass());
+		com.m_x -= 0.05f;
+		rootBody->GetAsBodyKinematic()->SetCentreOfMass(com);
 	
 		// build all for legs
+		ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(rootBody);
 		for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = entity->GetChildren().GetFirst(); node; node = node->GetNext())
 		{
 			// build thig
