@@ -475,48 +475,14 @@ namespace ndQuadruped_2
 				return reward;
 			};
 
-			ndInt32 numberOfContacts = 0;
-			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
-			{
-				const ndEffectorInfo& leg = m_legs[i];
-				ndIkSwivelPositionEffector* const effector = leg.m_effector;
-
-				auto HasContact = [effector]()
-				{
-					ndBodyKinematic* const body = effector->GetBody0();
-					ndBodyKinematic::ndContactMap& contacts = body->GetContactMap();
-					ndBodyKinematic::ndContactMap::Iterator it(contacts);
-					for (it.Begin(); it; it++)
-					{
-						ndContact* const contact = *it;
-						if (contact->IsActive())
-						{
-							return 1;
-						}
-					}
-					return 0;
-				};
-				numberOfContacts += HasContact();
-			}
-
-			// add a penalty for not not having a support polygon
-			if ((numberOfContacts == 1) || (numberOfContacts == 2))
-			{
-				return ndBrainFloat (-0.5f);
-			}
-
 			// calculate a surrogate zero moment point
 			const ndModelArticulation::ndCenterOfMassDynamics comDynamics(CalculateDynamics(m_timestep));
-			//const ndVector comOmega(comDynamics.m_omega);
-			//const ndVector comAlpha(comDynamics.m_alpha);
-			//ndFloat32 alphaReward_x = PolynomialAccelerationReward(comAlpha.m_x, 20.0f);
-			//ndFloat32 alphaReward_z = PolynomialAccelerationReward(comAlpha.m_z, 20.0f);
-			//return ndFloat32(0.5f) * (alphaReward_x + alphaReward_z);
 
 			ndFloat32 xAlpha = comDynamics.m_alpha.m_z / DEMO_GRAVITY;
 			ndFloat32 zAlpha = -comDynamics.m_alpha.m_x / DEMO_GRAVITY;
 			const ndVector surrogateLocalZmpPoint(xAlpha, ndFloat32(0.0f), zAlpha, ndFloat32(1.0f));
 			ndVector scaledSurrogateLocalZmpPoint(surrogateLocalZmpPoint.Scale(ndFloat32 (0.25f)));
+			scaledSurrogateLocalZmpPoint.m_w = ndFloat32 (1.0f);
 
 			static float xxxxx = 0.0f;
 			static float zzzzz = 0.0f;
@@ -525,6 +491,62 @@ namespace ndQuadruped_2
 				xxxxx = ndMax(xxxxx, ndAbs(scaledSurrogateLocalZmpPoint.m_x));
 				zzzzz = ndMax(zzzzz, ndAbs(scaledSurrogateLocalZmpPoint.m_z));
 				ndTrace(("zmp(%f %f)\n", xxxxx, zzzzz));
+			}
+
+			ndFixSizeArray<ndVector, 16> supportPolygon;
+			CaculateSupportPolygon(supportPolygon);
+			// add a penalty for not not having a support polygon
+			if (supportPolygon.GetCount() == 0)
+			{
+				return 1.0f;
+			}
+			if (supportPolygon.GetCount() == 1)
+			{
+				return ndBrainFloat(-0.5f);
+			}
+
+			if (supportPolygon.GetCount() == 2)
+			{
+				const ndVector surrogateZmpPoint(comDynamics.m_centerOfMass.TransformVector(scaledSurrogateLocalZmpPoint));
+				ndBigVector ray_p0(surrogateZmpPoint);
+				ndBigVector ray_p1(surrogateZmpPoint + ndVector(0.0f, -0.5f, 0.0f, 0.0f));
+
+				ndBigVector ray_q0(supportPolygon[0]);
+				ndBigVector ray_q1(supportPolygon[1]);
+
+				ndBigVector p0;
+				ndBigVector p1;
+				ndRayToRayDistance(ray_p0, ray_p1, ray_q0, ray_q1, p0, p1);
+
+				ndVector dist(p1 - p0);
+				ndFloat32 dist2 = dist.DotProduct(dist).GetScalar();
+				if (dist2 < 0.001f)
+				{
+					return ndFloat32(1.0f);
+				}
+			}
+			else
+			{
+				const ndVector surrogateZmpPoint(comDynamics.m_centerOfMass.TransformVector(scaledSurrogateLocalZmpPoint));
+				ndBigVector ray_p0(surrogateZmpPoint);
+				ndBigVector ray_p1(surrogateZmpPoint + ndVector(0.0f, -0.5f, 0.0f, 0.0f));
+
+				ndFixSizeArray<ndBigVector, 16> polygon;
+				for (ndInt32 i = 0; i < supportPolygon.GetCount(); ++i)
+				{
+					polygon.PushBack(supportPolygon[i]);
+				}
+
+				ndBigVector p0;
+				ndBigVector p1;
+				ndRayToPolygonDistance(ray_p0, ray_p1, &polygon[0], supportPolygon.GetCount(), p0, p1);
+
+				ndVector dist(p1 - p0);
+				ndFloat32 dist2 = dist.DotProduct(dist).GetScalar();
+				if (dist2 < 0.0001f)
+				{
+					return ndFloat32(1.0f);
+				}
 			}
 
 			ndFloat32 alphaReward_x = PolynomialAccelerationReward(scaledSurrogateLocalZmpPoint.m_x, 4.0f);
