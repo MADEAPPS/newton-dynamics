@@ -49,13 +49,15 @@ class ndVehicleDectriptorViper : public ndVehicleDectriptor
 
 		m_frontTire.m_mass = 25.0f;
 		m_frontTire.m_handBrakeTorque = 0.0f;
-		m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
+		//m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
+		m_frontTire.m_frictionModel = ndTireFrictionModel::m_pacejka;
 		m_frontTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
 		m_frontTire.m_laterialStiffness = m_frontTire.m_longitudinalStiffness;
 
 		m_rearTire.m_mass = 25.0f;
 		m_rearTire.m_handBrakeTorque = 100000.0f;
-		m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
+		//m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
+		m_rearTire.m_frictionModel = ndTireFrictionModel::m_pacejka;
 		m_rearTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
 		m_rearTire.m_laterialStiffness = 1.25f * m_rearTire.m_longitudinalStiffness;
 	}
@@ -446,13 +448,13 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	vehicle0->AddBodiesAndJointsToWorld();
 
 	world->AddModel(vehicle1);
-	vehicle1->AddBodiesAndJointsToWorld();
+	//vehicle1->AddBodiesAndJointsToWorld();
 	
 	world->AddModel(vehicle2);
-	vehicle2->AddBodiesAndJointsToWorld();
+	//vehicle2->AddBodiesAndJointsToWorld();
 	
 	world->AddModel(vehicle3);
-	vehicle3->AddBodiesAndJointsToWorld();
+	//vehicle3->AddBodiesAndJointsToWorld();
 
 	//test removing model from world
 	//vehicle1->RemoveBodiesAndJointsFromWorld();
