@@ -273,7 +273,6 @@ namespace ndQuadruped_1
 
 		virtual void Debug(ndConstraintDebugCallback& context) const
 		{
-			
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
 				ndFloat32 scale = context.GetScale();
@@ -379,6 +378,12 @@ namespace ndQuadruped_1
 				default:;
 			}
 
+static int xxxxx;
+if (xxxxx > 300)
+xxxxx *= 1;
+ndTrace(("%d\n", xxxxx));
+xxxxx++;
+
 			// calculate zmp
 			ndModelArticulation::ndCenterOfMassDynamics dynamics(CalculateDynamics(m_timestep));
 
@@ -436,7 +441,7 @@ namespace ndQuadruped_1
 		// offset com so that the model is unstable
 		ndVector com(rootBody->GetAsBodyKinematic()->GetCentreOfMass());
 		//com.m_x -= 0.05f;
-		com.m_x -= 0.00f;
+		com.m_x -= 0.03f;
 		rootBody->GetAsBodyKinematic()->SetCentreOfMass(com);
 	
 		// build all for legs
