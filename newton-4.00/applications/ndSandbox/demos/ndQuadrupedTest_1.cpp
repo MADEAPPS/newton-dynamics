@@ -402,10 +402,10 @@ namespace ndQuadruped_1
 			//ndVector surrogateZmpPoint(centerOfPresure.TransformVector(surrogateLocalZmpPoint));
 			//context.DrawPoint(surrogateZmpPoint, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 4);
 
-			ndFloat32 xAlpha = dynamics.m_alpha.m_z / gravityForce;
-			ndFloat32 zAlpha = -dynamics.m_alpha.m_x / gravityForce;
+			ndFloat32 xAlpha = dynamics.m_alpha.m_z / DEMO_GRAVITY;
+			ndFloat32 zAlpha = -dynamics.m_alpha.m_x / DEMO_GRAVITY;
 			const ndVector surrogateLocalZmpPoint(xAlpha, ndFloat32(0.0f), zAlpha, ndFloat32(1.0f));
-			ndVector scaledSurrogateLocalZmpPoint(surrogateLocalZmpPoint.Scale(5.0f));
+			ndVector scaledSurrogateLocalZmpPoint(surrogateLocalZmpPoint.Scale(ndFloat32(0.25f)));
 			scaledSurrogateLocalZmpPoint.m_w = ndFloat32(1.0f);
 			const ndVector surrogateZmpPoint(centerOfPresure.TransformVector(scaledSurrogateLocalZmpPoint));
 			context.DrawPoint(surrogateZmpPoint, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 4);

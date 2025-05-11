@@ -75,12 +75,6 @@ namespace ndQuadruped_2
 
 	enum Observations
 	{
-		//m_effectPosit_x,
-		//m_effectPosit_y,
-		//m_effectPosit_z,
-		//m_effectVeloc_x,
-		//m_effectVeloc_y,
-		//m_effectVeloc_z,
 		m_posePosit_x,
 		m_posePosit_y,
 		m_posePosit_z,
@@ -418,19 +412,6 @@ namespace ndQuadruped_2
 			m_controller = ndSharedPtr<ndController> (new ndController(policy, robot));
 		}
 
-		//ndVector CalculatePositError(ndInt32 keyFrameIndex) const
-		//{
-		//	ndJointBilateralConstraint::ndKinematicState kinematicState[4];
-		//	const ndAnimKeyframe keyFrame = m_animPose0[keyFrameIndex];
-		//	const ndEffectorInfo* const leg = (ndEffectorInfo*)keyFrame.m_userData;
-		//	
-		//	leg->m_effector->GetKinematicState(kinematicState);
-		//	const ndVector effectPosit(kinematicState[0].m_posit, kinematicState[1].m_posit, kinematicState[2].m_posit, ndFloat32(0.0f));
-		//	const ndVector animPosit(keyFrame.m_posit);
-		//	const ndVector error(animPosit - effectPosit);
-		//	return error;
-		//}
-
 		#pragma optimize( "", off )
 		bool IsTerminal() const
 		{
@@ -478,28 +459,6 @@ namespace ndQuadruped_2
 				return -1.0f;
 			}
 
-			//ndSharedPtr<ndAnimationBlendTreeNode> node = m_poseGenerator;
-			//ndAnimationSequencePlayer* const sequencePlayer = (ndAnimationSequencePlayer*)*node;
-			//ndPoseGenerator* const poseGenerator = (ndPoseGenerator*)*sequencePlayer->GetSequence();
-			//ndVector normalize(poseGenerator->m_poseBoundMax.Reciproc());
-			//
-			//ndFloat32 weight = 0.0f;
-			//for (ndInt32 i = 0; i < m_animPose0.GetCount(); ++i)
-			//{
-			//	const ndVector error(CalculatePositError(i));
-			//	const ndVector normalError(error * normalize);
-			//	for (ndInt32 j = 0; j < 3; ++j)
-			//	{
-			//		ndFloat32 dist = ndFloat32(1.0f) - ndClamp(ndAbs(normalError[j]), ndFloat32(0.0f), ndFloat32(1.0f));
-			//		ndFloat32 legReward = ndPow(dist, 6.0f);;
-			//		//ndFloat32 error2 = error[j] * error[j];
-			//		//ndFloat32 legReward = ndExp(-200000.0f * error2);
-			//		reward += legReward;
-			//	}
-			//	weight += 3;
-			//}
-			//return ndBrainFloat(reward / weight);
-
 			auto PolynomialOmegaReward = [](ndFloat32 omega, ndFloat32 maxValue)
 			{
 				omega = ndClamp(omega, -maxValue, maxValue);
@@ -516,16 +475,60 @@ namespace ndQuadruped_2
 				return reward;
 			};
 
-			const ndModelArticulation::ndCenterOfMassDynamics comDynamics(CalculateDynamics(m_timestep));
-			const ndVector comOmega(comDynamics.m_omega);
-			const ndVector comAlpha(comDynamics.m_alpha);
-			//ndExpandTraceMessage("w(%f %f %f) q(%f %f %f)\n", comOmega.m_x, comOmega.m_y, comOmega.m_z, comAlpha.m_x, comAlpha.m_y, comAlpha.m_z);
+			ndInt32 numberOfContacts = 0;
+			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
+			{
+				const ndEffectorInfo& leg = m_legs[i];
+				ndIkSwivelPositionEffector* const effector = leg.m_effector;
 
-			//ndFloat32 omegaReward_x = PolynomialOmegaReward(comOmega.m_x, 0.5f);
-			//ndFloat32 omegaReward_z = PolynomialOmegaReward(comOmega.m_z, 0.5f);
-			ndFloat32 alphaReward_x = PolynomialAccelerationReward(comAlpha.m_x, 20.0f);
-			ndFloat32 alphaReward_z = PolynomialAccelerationReward(comAlpha.m_z, 20.0f);
-			//return ndFloat32(0.25f) * (omegaReward_x + omegaReward_z + alphaReward_x + alphaReward_z);
+				auto HasContact = [effector]()
+				{
+					ndBodyKinematic* const body = effector->GetBody0();
+					ndBodyKinematic::ndContactMap& contacts = body->GetContactMap();
+					ndBodyKinematic::ndContactMap::Iterator it(contacts);
+					for (it.Begin(); it; it++)
+					{
+						ndContact* const contact = *it;
+						if (contact->IsActive())
+						{
+							return 1;
+						}
+					}
+					return 0;
+				};
+				numberOfContacts += HasContact();
+			}
+
+			// add a penalty for not not having a support polygon
+			if ((numberOfContacts == 1) || (numberOfContacts == 2))
+			{
+				return ndBrainFloat (-0.5f);
+			}
+
+			// calculate a surrogate zero moment point
+			const ndModelArticulation::ndCenterOfMassDynamics comDynamics(CalculateDynamics(m_timestep));
+			//const ndVector comOmega(comDynamics.m_omega);
+			//const ndVector comAlpha(comDynamics.m_alpha);
+			//ndFloat32 alphaReward_x = PolynomialAccelerationReward(comAlpha.m_x, 20.0f);
+			//ndFloat32 alphaReward_z = PolynomialAccelerationReward(comAlpha.m_z, 20.0f);
+			//return ndFloat32(0.5f) * (alphaReward_x + alphaReward_z);
+
+			ndFloat32 xAlpha = comDynamics.m_alpha.m_z / DEMO_GRAVITY;
+			ndFloat32 zAlpha = -comDynamics.m_alpha.m_x / DEMO_GRAVITY;
+			const ndVector surrogateLocalZmpPoint(xAlpha, ndFloat32(0.0f), zAlpha, ndFloat32(1.0f));
+			ndVector scaledSurrogateLocalZmpPoint(surrogateLocalZmpPoint.Scale(ndFloat32 (0.25f)));
+
+			static float xxxxx = 0.0f;
+			static float zzzzz = 0.0f;
+			if ((ndAbs(scaledSurrogateLocalZmpPoint.m_x) > xxxxx) || (ndAbs(scaledSurrogateLocalZmpPoint.m_z) > zzzzz))
+			{
+				xxxxx = ndMax(xxxxx, ndAbs(scaledSurrogateLocalZmpPoint.m_x));
+				zzzzz = ndMax(zzzzz, ndAbs(scaledSurrogateLocalZmpPoint.m_z));
+				ndTrace(("zmp(%f %f)\n", xxxxx, zzzzz));
+			}
+
+			ndFloat32 alphaReward_x = PolynomialAccelerationReward(scaledSurrogateLocalZmpPoint.m_x, 4.0f);
+			ndFloat32 alphaReward_z = PolynomialAccelerationReward(scaledSurrogateLocalZmpPoint.m_z, 2.0f);
 			return ndFloat32(0.5f) * (alphaReward_x + alphaReward_z);
 		}
 
@@ -703,20 +706,20 @@ namespace ndQuadruped_2
 				ndIkSwivelPositionEffector* const effector = leg.m_effector;
 
 				auto HasContact = [effector]()
+				{
+					ndBodyKinematic* const body = effector->GetBody0();
+					ndBodyKinematic::ndContactMap& contacts = body->GetContactMap();
+					ndBodyKinematic::ndContactMap::Iterator it(contacts);
+					for (it.Begin(); it; it++)
 					{
-						ndBodyKinematic* const body = effector->GetBody0();
-						ndBodyKinematic::ndContactMap& contacts = body->GetContactMap();
-						ndBodyKinematic::ndContactMap::Iterator it(contacts);
-						for (it.Begin(); it; it++)
+						ndContact* const contact = *it;
+						if (contact->IsActive())
 						{
-							ndContact* const contact = *it;
-							if (contact->IsActive())
-							{
-								return true;
-							}
+							return true;
 						}
-						return false;
-					};
+					}
+					return false;
+				};
 
 				if (HasContact())
 				{
@@ -751,7 +754,6 @@ namespace ndQuadruped_2
 						supportPoints[i] = origin + (supportPoints[i] - origin).Scale(scale);
 					}
 
-					//ndFixSizeArray<ndVector, 16> desiredSupportPoint;
 					for (ndInt32 i = 0; i < supportPoints.GetCount(); ++i)
 					{
 						supportPolygon.PushBack(supportPoints[i]);
@@ -832,7 +834,7 @@ namespace ndQuadruped_2
 			rootBody->SetSleepState(false);
 
 			//ndFloat32 animSpeed = 2.0f * m_control->m_animSpeed;
-			ndFloat32 animSpeed = 1.0f;
+			ndFloat32 animSpeed = 0.5f;
 			m_animBlendTree->Update(timestep * animSpeed);
 
 			ndVector veloc;
