@@ -387,23 +387,35 @@ namespace ndQuadruped_1
 			ndFloat32 x = dynamics.m_torque.m_z / gravityForce;
 			ndFloat32 z = -dynamics.m_torque.m_x / gravityForce;
 			const ndVector localZmp(x, ndFloat32(0.0f), z, ndFloat32(1.0f));
-			ndVector scaledZmp(localZmp.Scale(10.0f));
-			scaledZmp.m_w = ndFloat32 (1.0f);
-			const ndVector zmp(centerOfPresure.TransformVector(scaledZmp));
+			ndVector scaledLocalZmp(localZmp.Scale(10.0f));
+			scaledLocalZmp.m_w = ndFloat32 (1.0f);
+			const ndVector zmp(centerOfPresure.TransformVector(scaledLocalZmp));
 			context.DrawPoint(zmp, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 4);
 
 			// draw a point proportinal the horizonal acceleration
-			ndVector localAccel(dynamics.m_alpha);
-			localAccel.m_y = 0.0f;
-			ndVector scaledAccel(localZmp.Scale(5.0f));
-			scaledAccel.m_w = ndFloat32(1.0f);
-			const ndVector accel(centerOfPresure.TransformVector(scaledAccel));
-			context.DrawPoint(accel, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 4);
+			//ndVector localAccel(dynamics.m_alpha);
+			//localAccel.m_y = 0.0f;
+			//ndVector surrogateLocalZmpPoint(localAccel.Scale(0.02f));
+			//surrogateLocalZmpPoint.m_x *= ndFloat32(-1.0f);
+			//surrogateLocalZmpPoint.Scale(-1.0f);
+			//surrogateLocalZmpPoint.m_w = ndFloat32(1.0f);
+			//ndVector surrogateZmpPoint(centerOfPresure.TransformVector(surrogateLocalZmpPoint));
+			//context.DrawPoint(surrogateZmpPoint, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 4);
+
+			ndFloat32 xAlpha = dynamics.m_alpha.m_z / gravityForce;
+			ndFloat32 zAlpha = -dynamics.m_alpha.m_x / gravityForce;
+			const ndVector surrogateLocalZmpPoint(xAlpha, ndFloat32(0.0f), zAlpha, ndFloat32(1.0f));
+			ndVector scaledSurrogateLocalZmpPoint(surrogateLocalZmpPoint.Scale(5.0f));
+			scaledSurrogateLocalZmpPoint.m_w = ndFloat32(1.0f);
+			const ndVector surrogateZmpPoint(centerOfPresure.TransformVector(scaledSurrogateLocalZmpPoint));
+			context.DrawPoint(surrogateZmpPoint, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 4);
+
+//ndAssert((surrogateLocalZmpPoint.m_x * scaledLocalZmp.m_x >= 0.0f) && (surrogateLocalZmpPoint.m_z * scaledLocalZmp.m_z >= 0.0f));
 
 static int xxxxx;
 ndTrace(("%d suppostpoints(%d) alpha(%f %f) zmp(%f %f)\n", xxxxx, supportPolygon.GetCount(), dynamics.m_alpha.m_x, dynamics.m_alpha.m_z, localZmp.m_x * 10.0f, localZmp.m_z * 10.0f));
 //if (xxxxx >= 1127)
-if (xxxxx >= 1120)
+if (xxxxx >= 100)
 	xxxxx *= 1;
 xxxxx++;
 
