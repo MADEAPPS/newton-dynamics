@@ -199,7 +199,7 @@ namespace ndQuadruped_2
 						phase = (localPosit.m_z > 0.0f) ? 0.75f : 0.25f;
 					}
 					
-					//stride_x = 0.0f;
+					stride_x = 0.0f;
 					//stride_z = 0.0f;
 					
 					ndFloat32 t = ndMod(param - phase + ndFloat32(1.0f), ndFloat32(1.0f));
@@ -357,6 +357,7 @@ namespace ndQuadruped_2
 			,m_controller(nullptr)
 			,m_controllerTrainer(nullptr)
 			,m_timestep(ndFloat32(0.0f))
+			,m_modelEnum(0)
 		{
 			SetModel(robot);
 		}
@@ -567,7 +568,7 @@ namespace ndQuadruped_2
 
 			class ndRayCastFloor : public ndRayCastClosestHitCallback
 			{
-			public:
+				public:
 				ndRayCastFloor(ndWorld* const world, const ndEffectorInfo& leg)
 					:ndRayCastClosestHitCallback()
 				{
@@ -692,14 +693,134 @@ namespace ndQuadruped_2
 		{
 		}
 
-		virtual void Debug(ndConstraintDebugCallback& context) const
+		void CaculateSupportPolygon(ndFixSizeArray<ndVector, 16>& supportPolygon) const
 		{
+			supportPolygon.SetCount(0);
+			ndFixSizeArray<ndBigVector, 16> supportPoints;
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
 				const ndEffectorInfo& leg = m_legs[i];
-				leg.m_heel->DebugJoint(context);
-				leg.m_effector->DebugJoint(context);
+				ndIkSwivelPositionEffector* const effector = leg.m_effector;
+
+				auto HasContact = [effector]()
+					{
+						ndBodyKinematic* const body = effector->GetBody0();
+						ndBodyKinematic::ndContactMap& contacts = body->GetContactMap();
+						ndBodyKinematic::ndContactMap::Iterator it(contacts);
+						for (it.Begin(); it; it++)
+						{
+							ndContact* const contact = *it;
+							if (contact->IsActive())
+							{
+								return true;
+							}
+						}
+						return false;
+					};
+
+				if (HasContact())
+				{
+					supportPoints.PushBack(effector->CalculateGlobalMatrix0().m_posit);
+				}
 			}
+
+			switch (supportPoints.GetCount())
+			{
+				case 1:
+					supportPolygon.PushBack(supportPoints[0]);
+					break;
+
+				case 2:
+					supportPolygon.PushBack(supportPoints[0]);
+					supportPolygon.PushBack(supportPoints[1]);
+					break;
+
+				case 3:
+				case 4:
+				{
+					ndBigVector origin(ndBigVector::m_zero);
+					for (ndInt32 i = 0; i < supportPoints.GetCount(); ++i)
+					{
+						origin += supportPoints[i];
+					}
+					origin = origin.Scale(1.0f / ndFloat32(supportPoints.GetCount()));
+
+					ndFloat32 scale = 1.0f;
+					for (ndInt32 i = 0; i < supportPoints.GetCount(); ++i)
+					{
+						supportPoints[i] = origin + (supportPoints[i] - origin).Scale(scale);
+					}
+
+					//ndFixSizeArray<ndVector, 16> desiredSupportPoint;
+					for (ndInt32 i = 0; i < supportPoints.GetCount(); ++i)
+					{
+						supportPolygon.PushBack(supportPoints[i]);
+					}
+
+					ndMatrix rotation(ndPitchMatrix(90.0f * ndDegreeToRad));
+					rotation.TransformTriplex(&supportPolygon[0].m_x, sizeof(ndVector), &supportPolygon[0].m_x, sizeof(ndVector), supportPolygon.GetCount());
+					ndInt32 supportCount = ndConvexHull2d(&supportPolygon[0], supportPolygon.GetCount());
+					rotation.OrthoInverse().TransformTriplex(&supportPolygon[0].m_x, sizeof(ndVector), &supportPolygon[0].m_x, sizeof(ndVector), supportCount);
+					supportPolygon.SetCount(supportCount);
+				}
+				default:;
+			}
+		}
+
+		virtual void Debug(ndConstraintDebugCallback& context) const
+		{
+			if (m_modelEnum != 0)
+			{
+				return;
+			}
+			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
+			{
+				//const ndEffectorInfo& leg = m_legs[i];
+				//leg.m_heel->DebugJoint(context);
+				//leg.m_effector->DebugJoint(context);
+			}
+
+			ndFixSizeArray<ndVector, 16> supportPolygon;
+			CaculateSupportPolygon(supportPolygon);
+
+			ndVector supportColor(0.0f, 1.0f, 1.0f, 1.0f);
+			if (supportPolygon.GetCount() > 1)
+			{
+				ndInt32 i0 = supportPolygon.GetCount() - 1;
+				for (ndInt32 i1 = 0; i1 < supportPolygon.GetCount(); ++i1)
+				{
+					context.DrawLine(supportPolygon[i0], supportPolygon[i1], supportColor);
+					i0 = i1;
+				}
+			}
+
+			// calculate zmp
+			ndModelArticulation::ndCenterOfMassDynamics dynamics(CalculateDynamics(m_timestep));
+
+			// draw center of pressure define as
+			// a point where a vertical line draw from the center of mass, intersect the support polygon plane.
+			ndMatrix centerOfPresure(dynamics.m_centerOfMass);
+			centerOfPresure.m_posit.m_y -= 0.28f;
+			context.DrawPoint(centerOfPresure.m_posit, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 4);
+
+			// draw zero moment point define as: 
+			// a point on the support polygon plane where a vertical force make the horizontal components of the com acceleration zero.
+			ndFloat32 gravityForce = dynamics.m_mass * DEMO_GRAVITY + 0.001f;
+			ndFloat32 x = dynamics.m_torque.m_z / gravityForce;
+			ndFloat32 z = -dynamics.m_torque.m_x / gravityForce;
+			const ndVector localZmp(x, ndFloat32(0.0f), z, ndFloat32(1.0f));
+			ndVector scaledZmp(localZmp.Scale(10.0f));
+			scaledZmp.m_w = ndFloat32(1.0f);
+			const ndVector zmp(centerOfPresure.TransformVector(scaledZmp));
+			context.DrawPoint(zmp, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 4);
+
+			// draw a point proportinal the horizonal acceleration
+			ndVector localAccel(dynamics.m_alpha);
+			localAccel.m_y = 0.0f;
+			ndVector scaledAccel(localZmp.Scale(5.0f));
+			scaledAccel.m_w = ndFloat32(1.0f);
+			const ndVector accel(centerOfPresure.TransformVector(scaledAccel));
+			context.DrawPoint(accel, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 4);
 		}
 
 		void Update(ndFloat32 timestep)
@@ -739,6 +860,7 @@ namespace ndQuadruped_2
 		ndSharedPtr<ndControllerTrainer> m_controllerTrainer;
 
 		ndFloat32 m_timestep;
+		ndInt32 m_modelEnum;
 	};
 
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndSharedPtr<ndDemoEntity>& modelMesh)
@@ -770,7 +892,8 @@ namespace ndQuadruped_2
 
 		// offset com so that the model is unstable
 		ndVector com(rootBody->GetAsBodyKinematic()->GetCentreOfMass());
-		com.m_x -= 0.05f;
+		//com.m_x -= 0.05f;
+		com.m_x += 0.00f;
 		rootBody->GetAsBodyKinematic()->SetCentreOfMass(com);
 
 		// build all for legs
@@ -881,6 +1004,7 @@ namespace ndQuadruped_2
 			ndSharedPtr<ndModel>visualModel(CreateModel(scene, matrix, modelMesh));
 			RobotModelNotify* const notify = (RobotModelNotify*)*visualModel->GetAsModel()->GetNotifyCallback();
 			notify->SetControllerTrainer(m_master);
+			notify->m_modelEnum = 0;
 			
 			SetMaterial(visualModel->GetAsModelArticulation());
 			world->AddModel(visualModel);
@@ -897,6 +1021,7 @@ namespace ndQuadruped_2
 			//countX = 0;
 			//countZ = 0;
 			
+			ndInt32 enumeration = 1;
 			// add a hidden battery of model to generate trajectories in parallel
 			for (ndInt32 i = 0; i < countZ; ++i)
 			{
@@ -912,6 +1037,8 @@ namespace ndQuadruped_2
 					ndSharedPtr<ndModel>model(CreateModel(scene, location, modelMesh));
 					RobotModelNotify* const notify1 = (RobotModelNotify*)*model->GetAsModel()->GetNotifyCallback();
 					notify1->SetControllerTrainer(m_master);
+					notify1->m_modelEnum = enumeration;
+					enumeration++;
 
 					SetMaterial(model->GetAsModelArticulation());
 					world->AddModel(model);

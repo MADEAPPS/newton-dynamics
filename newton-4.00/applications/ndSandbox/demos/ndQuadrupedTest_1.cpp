@@ -387,8 +387,18 @@ namespace ndQuadruped_1
 			ndFloat32 x = dynamics.m_torque.m_z / gravityForce;
 			ndFloat32 z = -dynamics.m_torque.m_x / gravityForce;
 			const ndVector localZmp(x, ndFloat32(0.0f), z, ndFloat32(1.0f));
-			const ndVector zmp(centerOfPresure.TransformVector(localZmp.Scale (10.0f)));
+			ndVector scaledZmp(localZmp.Scale(10.0f));
+			scaledZmp.m_w = ndFloat32 (1.0f);
+			const ndVector zmp(centerOfPresure.TransformVector(scaledZmp));
 			context.DrawPoint(zmp, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 4);
+
+			// draw a point proportinal the horizonal acceleration
+			ndVector localAccel(dynamics.m_alpha);
+			localAccel.m_y = 0.0f;
+			ndVector scaledAccel(localZmp.Scale(5.0f));
+			scaledAccel.m_w = ndFloat32(1.0f);
+			const ndVector accel(centerOfPresure.TransformVector(scaledAccel));
+			context.DrawPoint(accel, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 4);
 
 static int xxxxx;
 ndTrace(("%d suppostpoints(%d) alpha(%f %f) zmp(%f %f)\n", xxxxx, supportPolygon.GetCount(), dynamics.m_alpha.m_x, dynamics.m_alpha.m_z, localZmp.m_x * 10.0f, localZmp.m_z * 10.0f));
