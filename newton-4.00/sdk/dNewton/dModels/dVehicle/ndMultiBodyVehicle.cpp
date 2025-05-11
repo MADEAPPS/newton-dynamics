@@ -594,11 +594,6 @@ void ndMultiBodyVehicle::CoulombTireModel(ndMultiBodyVehicleTireJoint* const joi
 	contactPoint.m_material.m_dynamicFriction1 = frictionCoefficient * dynamicFrictionCoef;
 }
 
-void ndMultiBodyVehicle::PacejkaTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const
-{
-	BrushTireModel(tire, contactPoint, timestep);
-}
-
 void ndMultiBodyVehicle::CoulombFrictionCircleTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const
 {
 	BrushTireModel(tire, contactPoint, timestep);
@@ -683,6 +678,28 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 	{
 		CoulombTireModel(tire, contactPoint, timestep);
 	}
+}
+
+void ndMultiBodyVehicle::PacejkaTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const
+{
+	// from Wikipedia PacejKa equation.
+	//F = D * sin(C * atan(Bx * (1 - E) + E * atan(Bx)))
+
+	// from Giancarlo Genta page 60, it added some extra term that allow to use the 
+	// formula even when the vehicle is at rest 
+	// my huge problem with the formula is that is is quiet difficult to
+	// determine the parameters C, D, E, Bx, phi and Sh, and Sv for each force and moment
+	// the Genta book provide 5 table of coefficients for five different vehicles 
+	// but no where is the book it gives the relation to the parameters B, C, D, E of the magic formula.
+	// teh cl;oser I got is this paper.
+	// http://www-cdr.stanford.edu/dynamic/bywire/tires.pdf
+	// which is what I am implementing here
+	//F = D * sin(C * atan(Bx * (1 - E) * (phi + Sh) + E * atan(Bx * (phi + Sh)))) + Sv
+
+	BrushTireModel(tire, contactPoint, timestep);
+
+
+
 }
 
 void ndMultiBodyVehicle::PostUpdate(ndFloat32)
