@@ -96,7 +96,6 @@ namespace ndQuadruped_1
 					output[i].m_userParamFloat = 0.0f;
 					output[i].m_posit = leg.m_effector->GetRestPosit();
 				}
-				
 
 				for (ndInt32 i = 0; i < output.GetCount(); i++)
 				{
@@ -114,7 +113,7 @@ namespace ndQuadruped_1
 						phase = (localPosit.m_z > 0.0f) ? 0.75f : 0.25f;
 					}
 					
-					//stride_x = 0.0f;
+					stride_x = 0.0f;
 					//stride_z = 0.0f;
 					
 					ndFloat32 t = ndMod(param - phase + ndFloat32(1.0f), ndFloat32(1.0f));
@@ -144,7 +143,6 @@ namespace ndQuadruped_1
 						output[i].m_posit.m_x += -(stride_x * t0 - stride_x * 0.5f);
 						//output[i].m_posit.m_z += (stride_z * t0 - stride_z * 0.5f);
 					}
-					//break;
 				}
 			}
 
@@ -271,21 +269,10 @@ namespace ndQuadruped_1
 			}
 		}
 
-		virtual void Debug(ndConstraintDebugCallback& context) const
+		void CaculateSupportPolygon(ndFixSizeArray<ndVector, 16>& supportPolygon) const
 		{
-			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
-			{
-				ndFloat32 scale = context.GetScale();
-				context.SetScale(scale * 0.75f);
-				//const ndEffectorInfo& leg = m_legs[i];
-				//leg.m_heel->DebugJoint(context);
-				//leg.m_effector->DebugJoint(context);
-				//leg.m_calf->DebugJoint(context);
-				context.SetScale(scale);
-			}
-
-			ndVector supportColor(0.0f, 1.0f, 1.0f, 1.0f);
-			ndFixSizeArray<ndBigVector, 16> supportPoint;
+			supportPolygon.SetCount(0);
+			ndFixSizeArray<ndBigVector, 16> supportPoints;
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
 				const ndEffectorInfo& leg = m_legs[i];
@@ -309,73 +296,80 @@ namespace ndQuadruped_1
 
 				if (HasContact())
 				{
-					supportPoint.PushBack(effector->CalculateGlobalMatrix0().m_posit);
+					supportPoints.PushBack(effector->CalculateGlobalMatrix0().m_posit);
 				}
 			}
 
-			auto PrepareSupportFeature = [&supportPoint]()
-			{
-				ndBigVector origin(ndBigVector::m_zero);
-				for (ndInt32 i = 0; i < supportPoint.GetCount(); ++i)
-				{
-					origin += supportPoint[i];
-				}
-				origin = origin.Scale(1.0f / ndFloat32(supportPoint.GetCount()));
-
-				ndFloat32 scale = 1.0f;
-				for (ndInt32 i = 0; i < supportPoint.GetCount(); ++i)
-				{
-					supportPoint[i] = origin + (supportPoint[i] - origin).Scale(scale);
-				}
-			};
-
-			switch (supportPoint.GetCount())
+			switch (supportPoints.GetCount())
 			{
 				case 1:
-					context.DrawPoint(supportPoint[0], ndVector(1.0f, 0.0f, 0.0f, 1.0f), 5);
+					supportPolygon.PushBack(supportPoints[0]);
 					break;
 
 				case 2:
-					context.DrawLine(supportPoint[0], supportPoint[1], supportColor);
+					supportPolygon.PushBack(supportPoints[0]);
+					supportPolygon.PushBack(supportPoints[1]);
 					break;
 
 				case 3:
 				case 4:
 				{
 					ndBigVector origin(ndBigVector::m_zero);
-					for (ndInt32 i = 0; i < supportPoint.GetCount(); ++i)
+					for (ndInt32 i = 0; i < supportPoints.GetCount(); ++i)
 					{
-						origin += supportPoint[i];
+						origin += supportPoints[i];
 					}
-					origin = origin.Scale(1.0f / ndFloat32(supportPoint.GetCount()));
-					
+					origin = origin.Scale(1.0f / ndFloat32(supportPoints.GetCount()));
+
 					ndFloat32 scale = 1.0f;
-					for (ndInt32 i = 0; i < supportPoint.GetCount(); ++i)
+					for (ndInt32 i = 0; i < supportPoints.GetCount(); ++i)
 					{
-						supportPoint[i] = origin + (supportPoint[i] - origin).Scale(scale);
+						supportPoints[i] = origin + (supportPoints[i] - origin).Scale(scale);
 					}
 
-					ndFixSizeArray<ndVector, 16> desiredSupportPoint;
-					for (ndInt32 i = 0; i < supportPoint.GetCount(); ++i)
+					//ndFixSizeArray<ndVector, 16> desiredSupportPoint;
+					for (ndInt32 i = 0; i < supportPoints.GetCount(); ++i)
 					{
-						desiredSupportPoint.PushBack(supportPoint[i]);
+						supportPolygon.PushBack(supportPoints[i]);
 					}
 
 					ndMatrix rotation(ndPitchMatrix(90.0f * ndDegreeToRad));
-					rotation.TransformTriplex(&desiredSupportPoint[0].m_x, sizeof(ndVector), &desiredSupportPoint[0].m_x, sizeof(ndVector), desiredSupportPoint.GetCount());
-					ndInt32 supportCount = ndConvexHull2d(&desiredSupportPoint[0], desiredSupportPoint.GetCount());
-					rotation.OrthoInverse().TransformTriplex(&desiredSupportPoint[0].m_x, sizeof(ndVector), &desiredSupportPoint[0].m_x, sizeof(ndVector), desiredSupportPoint.GetCount());
-					ndVector p0(desiredSupportPoint[supportCount - 1]);
-					ndBigVector bigPolygon[16];
-					for (ndInt32 i = 0; i < supportCount; ++i)
-					{
-						bigPolygon[i] = desiredSupportPoint[i];
-						context.DrawLine(desiredSupportPoint[i], p0, supportColor);
-						p0 = desiredSupportPoint[i];
-					}
+					rotation.TransformTriplex(&supportPolygon[0].m_x, sizeof(ndVector), &supportPolygon[0].m_x, sizeof(ndVector), supportPolygon.GetCount());
+					ndInt32 supportCount = ndConvexHull2d(&supportPolygon[0], supportPolygon.GetCount());
+					rotation.OrthoInverse().TransformTriplex(&supportPolygon[0].m_x, sizeof(ndVector), &supportPolygon[0].m_x, sizeof(ndVector), supportCount);
+					supportPolygon.SetCount(supportCount);
 				}
-
 				default:;
+			}
+		}
+
+		virtual void Debug(ndConstraintDebugCallback& context) const
+		{
+			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
+			{
+				ndFloat32 scale = context.GetScale();
+				context.SetScale(scale * 0.75f);
+				//const ndEffectorInfo& leg = m_legs[i];
+				//leg.m_heel->DebugJoint(context);
+				//leg.m_effector->DebugJoint(context);
+				//leg.m_calf->DebugJoint(context);
+				context.SetScale(scale);
+			}
+
+			ndVector supportColor(0.0f, 1.0f, 1.0f, 1.0f);
+
+			// draw support feature ( a point, line or a polygon.
+			ndFixSizeArray<ndVector, 16> supportPolygon;
+			CaculateSupportPolygon(supportPolygon);
+
+			if (supportPolygon.GetCount() > 1)
+			{
+				ndInt32 i0 = supportPolygon.GetCount() - 1;
+				for (ndInt32 i1 = 0; i1 < supportPolygon.GetCount(); ++i1)
+				{
+					context.DrawLine(supportPolygon[i0], supportPolygon[i1], supportColor);
+					i0 = i1;
+				}
 			}
 
 			// calculate zmp
@@ -384,7 +378,7 @@ namespace ndQuadruped_1
 			// draw center of pressure define as
 			// a point where a vertical line draw from the center of mass, intersect the support polygon plane.
 			ndMatrix centerOfPresure(dynamics.m_centerOfMass);
-			centerOfPresure.m_posit.m_y -= 0.3f;
+			centerOfPresure.m_posit.m_y -= 0.28f;
 			context.DrawPoint(centerOfPresure.m_posit, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 4);
 
 			// draw zero moment point define as: 
@@ -393,13 +387,14 @@ namespace ndQuadruped_1
 			ndFloat32 x = dynamics.m_torque.m_z / gravityForce;
 			ndFloat32 z = -dynamics.m_torque.m_x / gravityForce;
 			const ndVector localZmp(x, ndFloat32(0.0f), z, ndFloat32(1.0f));
-			const ndVector zmp(centerOfPresure.TransformVector(localZmp));
+			const ndVector zmp(centerOfPresure.TransformVector(localZmp.Scale (10.0f)));
 			context.DrawPoint(zmp, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 4);
 
 static int xxxxx;
-if (xxxxx > 300)
+ndTrace(("%d suppostpoints(%d) alpha(%f %f) zmp(%f %f)\n", xxxxx, supportPolygon.GetCount(), dynamics.m_alpha.m_x, dynamics.m_alpha.m_z, localZmp.m_x * 10.0f, localZmp.m_z * 10.0f));
+//if (xxxxx >= 1127)
+if (xxxxx >= 1120)
 	xxxxx *= 1;
-ndTrace(("%d alpha(%f %f) zmp(%f %f)\n", xxxxx, dynamics.m_alpha.m_x, dynamics.m_alpha.m_z, localZmp.m_x, localZmp.m_z));
 xxxxx++;
 
 		}
@@ -442,7 +437,7 @@ xxxxx++;
 		// offset com so that the model is unstable
 		ndVector com(rootBody->GetAsBodyKinematic()->GetCentreOfMass());
 		//com.m_x -= 0.05f;
-		com.m_x += 0.09f;
+		com.m_x += 0.00f;
 		rootBody->GetAsBodyKinematic()->SetCentreOfMass(com);
 	
 		// build all for legs
