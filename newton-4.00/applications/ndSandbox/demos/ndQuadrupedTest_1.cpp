@@ -378,12 +378,6 @@ namespace ndQuadruped_1
 				default:;
 			}
 
-static int xxxxx;
-if (xxxxx > 300)
-xxxxx *= 1;
-ndTrace(("%d\n", xxxxx));
-xxxxx++;
-
 			// calculate zmp
 			ndModelArticulation::ndCenterOfMassDynamics dynamics(CalculateDynamics(m_timestep));
 
@@ -398,9 +392,16 @@ xxxxx++;
 			ndFloat32 gravityForce = dynamics.m_mass * DEMO_GRAVITY + 0.001f;
 			ndFloat32 x = dynamics.m_torque.m_z / gravityForce;
 			ndFloat32 z = -dynamics.m_torque.m_x / gravityForce;
-			//const ndVector localZmp(x, ndFloat32(0.0f), z, ndFloat32(1.0f));
-			const ndVector zmp(centerOfPresure.TransformVector(ndVector(x, ndFloat32(0.0f), z, ndFloat32(1.0f))));
+			const ndVector localZmp(x, ndFloat32(0.0f), z, ndFloat32(1.0f));
+			const ndVector zmp(centerOfPresure.TransformVector(localZmp));
 			context.DrawPoint(zmp, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 4);
+
+static int xxxxx;
+if (xxxxx > 300)
+	xxxxx *= 1;
+ndTrace(("%d alpha(%f %f) zmp(%f %f)\n", xxxxx, dynamics.m_alpha.m_x, dynamics.m_alpha.m_z, localZmp.m_x, localZmp.m_z));
+xxxxx++;
+
 		}
 
 		mutable ndIkSolver m_solver;
@@ -441,7 +442,7 @@ xxxxx++;
 		// offset com so that the model is unstable
 		ndVector com(rootBody->GetAsBodyKinematic()->GetCentreOfMass());
 		//com.m_x -= 0.05f;
-		com.m_x -= 0.03f;
+		com.m_x += 0.09f;
 		rootBody->GetAsBodyKinematic()->SetCentreOfMass(com);
 	
 		// build all for legs
