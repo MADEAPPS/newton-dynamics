@@ -392,16 +392,7 @@ namespace ndQuadruped_1
 			const ndVector zmp(centerOfPresure.TransformVector(scaledLocalZmp));
 			context.DrawPoint(zmp, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 4);
 
-			// draw a point proportinal the horizonal acceleration
-			//ndVector localAccel(dynamics.m_alpha);
-			//localAccel.m_y = 0.0f;
-			//ndVector surrogateLocalZmpPoint(localAccel.Scale(0.02f));
-			//surrogateLocalZmpPoint.m_x *= ndFloat32(-1.0f);
-			//surrogateLocalZmpPoint.Scale(-1.0f);
-			//surrogateLocalZmpPoint.m_w = ndFloat32(1.0f);
-			//ndVector surrogateZmpPoint(centerOfPresure.TransformVector(surrogateLocalZmpPoint));
-			//context.DrawPoint(surrogateZmpPoint, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 4);
-
+			// draw a the surrogate zmp (a point proportional the horizontal acceleration)
 			ndFloat32 xAlpha = dynamics.m_alpha.m_z / DEMO_GRAVITY;
 			ndFloat32 zAlpha = -dynamics.m_alpha.m_x / DEMO_GRAVITY;
 			const ndVector surrogateLocalZmpPoint(xAlpha, ndFloat32(0.0f), zAlpha, ndFloat32(1.0f));
