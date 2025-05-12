@@ -92,7 +92,7 @@ namespace ndQuadruped_2
 	#define D_CYCLE_AMPLITUDE		ndFloat32(0.27f)
 	#define D_POSE_REST_POSITION_Y	ndReal(-0.3f)
 
-	#define D_ACTION_SPEED			ndReal(0.005f)
+	#define D_ACTION_SPEED			ndReal(0.05f)
 
 	class RobotModelNotify : public ndModelNotify
 	{
@@ -647,12 +647,6 @@ namespace ndQuadruped_2
 				hitDist = (hitDist - ndFloat32(0.1284f)) / D_CYCLE_AMPLITUDE;
 
 				ndInt32 base = m_observationSize * i;
-				//observations[base + m_effectPosit_x] = ndBrainFloat(effectorPosit.m_x);
-				//observations[base + m_effectPosit_y] = ndBrainFloat(effectorPosit.m_y);
-				//observations[base + m_effectPosit_z] = ndBrainFloat(effectorPosit.m_z);
-				//observations[base + m_effectVeloc_x] = ndBrainFloat(effectorVeloc.m_x);
-				//observations[base + m_effectVeloc_y] = ndBrainFloat(effectorVeloc.m_y);
-				//observations[base + m_effectVeloc_z] = ndBrainFloat(effectorVeloc.m_z);
 				observations[base + m_contactDistance] = ndBrainFloat(hitDist);
 				observations[base + m_posePosit_x] = ndBrainFloat(keyFramePosit0.m_x);
 				observations[base + m_posePosit_y] = ndBrainFloat(keyFramePosit0.m_y);
@@ -677,19 +671,15 @@ namespace ndQuadruped_2
 				ndEffectorInfo& leg = m_legs[i];
 				ndIkSwivelPositionEffector* const effector = leg.m_effector;
 				ndInt32 base = m_actionsSize * i;
-				//const ndVector resPosit(leg.m_effector->GetRestPosit());
 				
 				const ndAnimKeyframe keyFrame = m_animPose0[i];
 				ndVector posit(keyFrame.m_posit);
-				posit.m_x += actions[base + m_actionPosit_x] * D_ACTION_SPEED;
-				posit.m_y += actions[base + m_actionPosit_y] * D_ACTION_SPEED;
-				posit.m_z += actions[base + m_actionPosit_z] * D_ACTION_SPEED;
-
-				//ndVector localPost(keyFramePosit - resPosit);
-				//localPost.m_x = ndClamp(localPost.m_x, -bound.m_x, bound.m_x);
-				//localPost.m_y = ndClamp(localPost.m_y, -bound.m_y, bound.m_y);
-				//localPost.m_z = ndClamp(localPost.m_z, -bound.m_z, bound.m_z);
-				//const ndVector newPosit(localPost + resPosit);
+				ndFloat32 x = actions[base + m_actionPosit_x] * D_ACTION_SPEED;
+				ndFloat32 y = actions[base + m_actionPosit_x] * D_ACTION_SPEED;
+				ndFloat32 z = actions[base + m_actionPosit_x] * D_ACTION_SPEED;
+				posit.m_x += x;
+				posit.m_y += y;
+				posit.m_z += z;
 			
 				ndFloat32 swivelAngle = effector->CalculateLookAtSwivelAngle(upVector);
 
