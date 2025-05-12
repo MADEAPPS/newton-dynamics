@@ -95,12 +95,13 @@ class ndModelArticulation: public ndModel
 
 	D_NEWTON_API void ClearMemory();
 	D_NEWTON_API void SetTransform(const ndMatrix& matrix);
-	D_NEWTON_API ndCenterOfMassDynamics CalculateCentreOfMassDynamicsOld(ndIkSolver& solver, const ndMatrix& localFrame, ndFloat32 timestep) const;
+	D_NEWTON_API ndCenterOfMassDynamics CalculateCentreOfMassKinematics(const ndMatrix& localFrame) const;
 	D_NEWTON_API ndCenterOfMassDynamics CalculateCentreOfMassDynamics(ndIkSolver& solver, const ndMatrix& localFrame, ndFloat32 timestep) const;
-
+	
 	protected:
 	D_NEWTON_API void ConvertToUrdf();
-
+	void CalculateCentreOfMass(ndCenterOfMassDynamics& comDynamics, ndFixSizeArray<const ndBodyKinematic*, 256> bodyArrayOut, ndFixSizeArray<ndVector, 256>& bodyCenterOut) const;
+	
 	ndString m_name;
 	ndNode* m_rootNode;
 	ndList<ndNode> m_closeLoops;
