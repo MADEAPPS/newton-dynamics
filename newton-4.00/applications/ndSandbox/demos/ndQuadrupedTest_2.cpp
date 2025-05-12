@@ -57,7 +57,7 @@ namespace ndQuadruped_2
 {
 	#define ND_TRAIN_MODEL
 
-	//#define USE_SAC
+	#define USE_SAC
 
 	#ifdef USE_SAC
 		#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
@@ -92,7 +92,9 @@ namespace ndQuadruped_2
 	#define D_CYCLE_AMPLITUDE		ndFloat32(0.27f)
 	#define D_POSE_REST_POSITION_Y	ndReal(-0.3f)
 
-	#define D_ACTION_SPEED			ndReal(0.05f)
+	#define D_ACTION_SPEED			ndReal(0.01f)
+
+	#define D_TILT_KILL_COS_ANGLE		ndReal(0.9f) // 25 dregree respect to the vertical
 
 	class RobotModelNotify : public ndModelNotify
 	{
@@ -338,6 +340,29 @@ namespace ndQuadruped_2
 			RobotModelNotify* m_robot;
 		};
 
+		class ndRayCastFloor : public ndRayCastClosestHitCallback
+		{
+			public:
+			ndRayCastFloor(ndWorld* const world, const ndEffectorInfo& leg)
+				:ndRayCastClosestHitCallback()
+			{
+				ndMatrix origin(leg.m_effector->CalculateGlobalMatrix0());
+				ndVector dest(origin.m_posit);
+				dest.m_y -= D_CYCLE_AMPLITUDE;
+				world->RayCast(*this, origin.m_posit, dest);
+			}
+
+			ndFloat32 OnRayCastAction(const ndContactPoint& contact, ndFloat32 intersetParam)
+			{
+				if (contact.m_body1->GetInvMass() != ndFloat32(0.0f))
+				{
+					return 1.2f;
+				}
+				return ndRayCastClosestHitCallback::OnRayCastAction(contact, intersetParam);
+			}
+		};
+
+
 		public:
 		RobotModelNotify(ndModelArticulation* const robot)
 			:ndModelNotify()
@@ -417,7 +442,7 @@ namespace ndQuadruped_2
 		{
 			const ndModelArticulation::ndNode* const rootNode = GetModel()->GetAsModelArticulation()->GetRoot();
 			const ndVector upDir (rootNode->m_body->GetMatrix().m_up);
-			if (upDir.m_y < ndFloat32 (0.9f))
+			if (upDir.m_y < D_TILT_KILL_COS_ANGLE)
 			{
 				return true;
 			}
@@ -516,6 +541,15 @@ namespace ndQuadruped_2
 			}
 		}
 
+		ndFloat32 CalculateFloorDistance(const ndEffectorInfo& leg) const
+		{
+			ndWorld* const world = GetModel()->GetWorld();
+			const ndRayCastFloor caster(world, leg);
+			ndFloat32 hitDist = ndClamp(caster.m_param, ndFloat32(0.1284f), (D_CYCLE_AMPLITUDE));
+			hitDist = (hitDist - ndFloat32(0.1284f)) / D_CYCLE_AMPLITUDE;
+			return hitDist;
+		}
+
 		#pragma optimize( "", off )
 		ndBrainFloat CalculateReward() const
 		{
@@ -524,6 +558,7 @@ namespace ndQuadruped_2
 				return -1.0f;
 			}
 
+#if 0
 			auto PolynomialOmegaReward = [](ndFloat32 omega, ndFloat32 maxValue)
 			{
 				omega = ndClamp(omega, -maxValue, maxValue);
@@ -567,6 +602,32 @@ namespace ndQuadruped_2
 			ndFloat32 alphaReward_x = PolynomialAccelerationReward(scaledSurrogateLocalZmpPoint.m_x, 4.0f);
 			ndFloat32 alphaReward_z = PolynomialAccelerationReward(scaledSurrogateLocalZmpPoint.m_z, 2.0f);
 			return ndFloat32(0.5f) * (alphaReward_x + alphaReward_z);
+#endif
+
+
+			ndModelArticulation::ndNode* const rootNode = GetModel()->GetAsModelArticulation()->GetRoot();
+			ndMatrix referenceFrame(rootNode->m_body->GetMatrix());
+			referenceFrame.m_up = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
+			referenceFrame.m_right = referenceFrame.m_front.CrossProduct(referenceFrame.m_up).Normalize();
+			referenceFrame.m_front = referenceFrame.m_up.CrossProduct(referenceFrame.m_right).Normalize();
+			//ndVector omega(referenceFrame.UnrotateVector(rootNode->m_body->GetOmega()));
+
+			auto CalculateTiltReward = [](const ndFloat32 cosAngle)
+			{
+				ndFloat32 dist = ndClamp(cosAngle, D_TILT_KILL_COS_ANGLE, ndFloat32(1.0f));
+				ndFloat32 parametricDist = (dist - D_TILT_KILL_COS_ANGLE) / (ndFloat32(1.0f) - D_TILT_KILL_COS_ANGLE);
+				ndFloat32 tiltReward = ndPow(parametricDist, ndFloat32(4.0f));
+				return tiltReward;
+			};
+
+			//ndFloat32 tiltReward0 = CalculateTiltReward(1.0f);
+			//ndFloat32 tiltReward1 = CalculateTiltReward(0.5f);
+			//ndFloat32 tiltReward2 = CalculateTiltReward(0.95f);
+			//ndFloat32 tiltReward3 = CalculateTiltReward(D_TILT_KILL_COS_ANGLE + 0.001);
+
+			ndFloat32 tiltReward = CalculateTiltReward(referenceFrame.m_up.m_y);
+
+			return tiltReward;
 		}
 
 		#pragma optimize( "", off )
@@ -580,23 +641,14 @@ namespace ndQuadruped_2
 			
 			model->ClearMemory();
 			
-			//ndFloat32 animSpeed = 1.0f;
-			//m_controllerTrainer->m_animBlendTree->Update(timestep * animSpeed);
-			
-			//ndVector veloc;
-			//m_animPose0.CopySource(m_animPose1);
-			//m_controllerTrainer->m_animBlendTree->Evaluate(m_animPose1, veloc);
-			
-			//ndUnsigned32 start = ndRandInt() & 3;
-			ndFloat32 duration = ((ndAnimationSequencePlayer*)*m_poseGenerator)->GetSequence();
-			//m_animBlendTree->SetTime(duration * ndFloat32(start));
-			//m_animBlendTree->SetTime(duration * ndFloat32(start));
-			
-			m_animBlendTree->SetTime(ndRand() * duration);
-			//m_controllerTrainer->m_time = ndFmod(ndRand(), 1.0f);
-			//m_time = 0.0f;
-			//m_animFrame = animFrame;
-			//m_animPose1.CopySource(m_animPose);
+			ndAnimationSequencePlayer* const animPlayer = (ndAnimationSequencePlayer*)*m_poseGenerator;
+			ndAnimationSequence* const sequence = *animPlayer->GetSequence();
+			ndFloat32 duration = sequence->GetDuration();
+
+			ndFloat32 startQuadrant = ndFloat32(ndRandInt() % 4);
+			ndFloat32 startTime = duration * startQuadrant / ndFloat32 (4.0f);
+			m_animBlendTree->SetTime(startTime);
+
 			ndVector veloc;
 			m_animBlendTree->Evaluate(m_animPose1, veloc);
 		}
@@ -606,29 +658,6 @@ namespace ndQuadruped_2
 		{
 			ndFloat32 invTimestep = 1.0f / m_timestep;
 
-			class ndRayCastFloor : public ndRayCastClosestHitCallback
-			{
-				public:
-				ndRayCastFloor(ndWorld* const world, const ndEffectorInfo& leg)
-					:ndRayCastClosestHitCallback()
-				{
-					ndMatrix origin(leg.m_effector->CalculateGlobalMatrix0());
-					ndVector dest(origin.m_posit);
-					dest.m_y -= D_CYCLE_AMPLITUDE;
-					world->RayCast(*this, origin.m_posit, dest);
-				}
-
-				ndFloat32 OnRayCastAction(const ndContactPoint& contact, ndFloat32 intersetParam)
-				{
-					if (contact.m_body1->GetInvMass() != ndFloat32(0.0f))
-					{
-						return 1.2f;
-					}
-					return ndRayCastClosestHitCallback::OnRayCastAction(contact, intersetParam);
-				}
-			};
-
-			ndWorld* const world = GetModel()->GetWorld();
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
 				ndEffectorInfo& leg = m_legs[i];
@@ -642,12 +671,10 @@ namespace ndQuadruped_2
 				const ndVector keyFramePosit0(keyFrame0.m_posit);
 				const ndVector keyFramePosit1(keyFrame1.m_posit);
 
-				const ndRayCastFloor caster(world, leg);
-				ndFloat32 hitDist = ndClamp(caster.m_param, ndFloat32(0.1284f), (D_CYCLE_AMPLITUDE));
-				hitDist = (hitDist - ndFloat32(0.1284f)) / D_CYCLE_AMPLITUDE;
+				ndFloat32 floorDistance = CalculateFloorDistance(leg);
 
 				ndInt32 base = m_observationSize * i;
-				observations[base + m_contactDistance] = ndBrainFloat(hitDist);
+				observations[base + m_contactDistance] = ndBrainFloat(floorDistance);
 				observations[base + m_posePosit_x] = ndBrainFloat(keyFramePosit0.m_x);
 				observations[base + m_posePosit_y] = ndBrainFloat(keyFramePosit0.m_y);
 				observations[base + m_posePosit_z] = ndBrainFloat(keyFramePosit0.m_z);
@@ -802,11 +829,18 @@ namespace ndQuadruped_2
 			{
 				return;
 			}
+
+			ndVector blackColor(ndVector::m_wOne);
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
-				//const ndEffectorInfo& leg = m_legs[i];
+				const ndEffectorInfo& leg = m_legs[i];
 				//leg.m_heel->DebugJoint(context);
 				//leg.m_effector->DebugJoint(context);
+				ndFloat32 floorDistance = CalculateFloorDistance(leg);
+				ndVector origin (leg.m_effector->CalculateGlobalMatrix0().m_posit);
+				ndVector dest(origin);
+				dest.m_y -= floorDistance * D_CYCLE_AMPLITUDE;
+				context.DrawLine(origin, dest, blackColor);
 			}
 
 			ndFixSizeArray<ndVector, 16> supportPolygon;
@@ -832,14 +866,15 @@ namespace ndQuadruped_2
 				dist *= 1;
 			}
 
-			// draw center of pressure define as
+			// draw center of mass support defined as:
 			// a point where a vertical line draw from the center of mass, intersect the support polygon plane.
 			ndMatrix centerOfPresure(dynamics.m_centerOfMass);
 			centerOfPresure.m_posit.m_y -= 0.28f;
 			context.DrawPoint(centerOfPresure.m_posit, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 4);
 
 			// draw zero moment point define as: 
-			// a point on the support polygon plane where a vertical force make the horizontal components of the com acceleration zero.
+			// a point on the support polygon plane where a vertical 
+			// force make the horizontal components of the com acceleration zero.
 			ndFloat32 gravityForce = dynamics.m_mass * DEMO_GRAVITY + 0.001f;
 			ndFloat32 x = dynamics.m_torque.m_z / gravityForce;
 			ndFloat32 z = -dynamics.m_torque.m_x / gravityForce;
@@ -849,15 +884,16 @@ namespace ndQuadruped_2
 			const ndVector zmp(centerOfPresure.TransformVector(scaledLocalZmp));
 			context.DrawPoint(zmp, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 4);
 
-			ndFloat32 xAlpha = dynamics.m_alpha.m_z / gravityForce;
-			ndFloat32 zAlpha = -dynamics.m_alpha.m_x / gravityForce;
-			const ndVector surrogateLocalZmpPoint(xAlpha, ndFloat32(0.0f), zAlpha, ndFloat32(1.0f));
-			ndVector scaledSurrogateLocalZmpPoint(surrogateLocalZmpPoint.Scale(5.0f));
-			scaledSurrogateLocalZmpPoint.m_w = ndFloat32(1.0f);
-			const ndVector surrogateZmpPoint(centerOfPresure.TransformVector(scaledSurrogateLocalZmpPoint));
-			context.DrawPoint(surrogateZmpPoint, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 4);
-
-			
+			//// draw zero moment point surrogate point, define as: 
+			//// a point propertinal to the center of mass angular acceleration
+			//// projected onto the support polygon plane.
+			//ndFloat32 xAlpha = dynamics.m_alpha.m_z / gravityForce;
+			//ndFloat32 zAlpha = -dynamics.m_alpha.m_x / gravityForce;
+			//const ndVector surrogateLocalZmpPoint(xAlpha, ndFloat32(0.0f), zAlpha, ndFloat32(1.0f));
+			//ndVector scaledSurrogateLocalZmpPoint(surrogateLocalZmpPoint.Scale(5.0f));
+			//scaledSurrogateLocalZmpPoint.m_w = ndFloat32(1.0f);
+			//const ndVector surrogateZmpPoint(centerOfPresure.TransformVector(scaledSurrogateLocalZmpPoint));
+			//context.DrawPoint(surrogateZmpPoint, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 4);
 		}
 
 		void Update(ndFloat32 timestep)
@@ -1021,8 +1057,8 @@ namespace ndQuadruped_2
 				ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
 				hyperParameters.m_numberOfActions = m_actionsSize * 4;
 				hyperParameters.m_numberOfObservations = m_observationSize * 4;
-				//m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
-				m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentSoftActorCritic_Trainer(hyperParameters));
+				m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
+				//m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentSoftActorCritic_Trainer(hyperParameters));
 			#else
 				m_outFile = fopen("ndQuadruped_2-ppo.csv", "wb");
 				fprintf(m_outFile, "ppo\n");
