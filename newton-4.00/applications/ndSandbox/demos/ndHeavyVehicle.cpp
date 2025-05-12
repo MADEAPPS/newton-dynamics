@@ -284,8 +284,8 @@ static ndMultiBodyVehicle* CreateFlatBedTruck(ndDemoEntityManager* const scene, 
 	ndMultiBodyVehicleTireJoint* const rl_tire1 = vehicle->AddTire(r3_tireConfiguration, rl_tire1_body);
 
 	// 3- add the slip differential, this vehicle is rear wheel drive but has four wheels instead of two.
-	// we link each wheel pair with one slip differetial, 
-	// the each differential is linke to one master slip differential
+	// we link each wheel pair with one slip differential, 
+	// the each differential is linked to one master slip differential
 	ndMultiBodyVehicleDifferential* const rearDifferential0 = vehicle->AddDifferential(configuration.m_differentialMass, configuration.m_differentialRadius, rl_tire0, rr_tire0, configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
 	ndMultiBodyVehicleDifferential* const rearDifferential1 = vehicle->AddDifferential(configuration.m_differentialMass, configuration.m_differentialRadius, rl_tire1, rr_tire1, configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
 	ndMultiBodyVehicleDifferential* const differential = vehicle->AddDifferential(configuration.m_differentialMass, configuration.m_differentialRadius, rearDifferential0, rearDifferential1, configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
@@ -425,7 +425,7 @@ static ndMultiBodyVehicle* CreateLav25Vehicle(ndDemoEntityManager* const scene, 
 	ndMultiBodyVehicleTireJoint* const fl_tire1 = vehicle->AddTire(f3_tireConfiguration, fl_tire1_body);
 
 	// 3- add the slip differential, this vehicle is all wheel drive but has eight wheels instead of two.
-	// we link each wheel pair with one slip differetial. 
+	// we link each wheel pair with one slip differential. 
 	// them each differential is link to one master slip differential, until there is onel one master
 	ndMultiBodyVehicleDifferential* const rearDifferential0 = vehicle->AddDifferential(configuration.m_differentialMass, configuration.m_differentialRadius, rl_tire0, rr_tire0, configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
 	ndMultiBodyVehicleDifferential* const rearDifferential1 = vehicle->AddDifferential(configuration.m_differentialMass, configuration.m_differentialRadius, rl_tire1, rr_tire1, configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
@@ -446,7 +446,7 @@ static ndMultiBodyVehicle* CreateLav25Vehicle(ndDemoEntityManager* const scene, 
 	ndMultiBodyVehicleGearBox* const gearBox = vehicle->AddGearBox(differential);
 	gearBox->SetIdleOmega(configuration.m_engine.GetIdleRadPerSec() * dRadPerSecToRpm);
 
-	// 6 add any extra funtionality
+	// 6 add any extra functionality
 	auto BuildTurret = [vehicle, notifyCallback, scene]()
 	{
 		const ndMatrix localFrame(vehicle->GetLocalFrame());
@@ -620,7 +620,7 @@ static ndMultiBodyVehicle* CreateTractor(ndDemoEntityManager* const scene, const
 
 	// 3- add 4 x 4 the slip differential
 	// this vehicle is rear wheel drive but has four wheels instead of two.
-	// we link each wheel pair with one slip differetial, 
+	// we link each wheel pair with one slip differential, 
 	// the each differential is linked to one master slip differential
 	ndMultiBodyVehicleDifferential* const rearDifferential = vehicle->AddDifferential(configuration.m_differentialMass, configuration.m_differentialRadius, rl_tire0, rr_tire0, configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
 	ndMultiBodyVehicleDifferential* const frontDifferential = vehicle->AddDifferential(configuration.m_differentialMass, configuration.m_differentialRadius, fl_tire0, fr_tire0, configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
