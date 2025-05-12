@@ -42,10 +42,9 @@ class ndModelArticulation: public ndModel
 		D_NEWTON_API ndCenterOfMassDynamics();
 
 		ndVector m_omega;
+		ndVector m_veloc;
 		ndVector m_alpha;
-		ndVector m_velocity;
-		ndVector m_acceleration;
-		//ndVector m_centerOfMass;
+		ndVector m_accel;
 		ndVector m_force;
 		ndVector m_torque;
 		ndVector m_momentum;
@@ -96,6 +95,7 @@ class ndModelArticulation: public ndModel
 
 	D_NEWTON_API void ClearMemory();
 	D_NEWTON_API void SetTransform(const ndMatrix& matrix);
+	D_NEWTON_API ndCenterOfMassDynamics CalculateCentreOfMassDynamicsOld(ndIkSolver& solver, const ndMatrix& localFrame, ndFloat32 timestep) const;
 	D_NEWTON_API ndCenterOfMassDynamics CalculateCentreOfMassDynamics(ndIkSolver& solver, const ndMatrix& localFrame, ndFloat32 timestep) const;
 
 	protected:
