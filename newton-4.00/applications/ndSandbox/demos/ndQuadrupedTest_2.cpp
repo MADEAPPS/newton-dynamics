@@ -702,8 +702,8 @@ namespace ndQuadruped_2
 				const ndAnimKeyframe keyFrame = m_animPose0[i];
 				ndVector posit(keyFrame.m_posit);
 				ndFloat32 x = actions[base + m_actionPosit_x] * D_ACTION_SPEED;
-				ndFloat32 y = actions[base + m_actionPosit_x] * D_ACTION_SPEED;
-				ndFloat32 z = actions[base + m_actionPosit_x] * D_ACTION_SPEED;
+				ndFloat32 y = actions[base + m_actionPosit_y] * D_ACTION_SPEED;
+				ndFloat32 z = actions[base + m_actionPosit_z] * D_ACTION_SPEED;
 				posit.m_x += x;
 				posit.m_y += y;
 				posit.m_z += z;
