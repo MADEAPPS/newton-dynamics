@@ -12,7 +12,6 @@
 * claim that you wrote the original software. If you use this software
 * in a product, an acknowledgment in the product documentation would be
 * appreciated but is not required.
-* 
 * 2. Altered source versions must be plainly marked as such, and must not be
 * misrepresented as being the original software.
 * 
@@ -682,24 +681,112 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 
 void ndMultiBodyVehicle::PacejkaTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const
 {
-	// from Wikipedia PacejKa equation.
+	// from Wikipedia the Pacejka equation is write as, but it does not include phi.
 	//F = D * sin(C * atan(Bx * (1 - E) + E * atan(Bx)))
 
-	// from Giancarlo Genta page 60, it added some extra term that allow to use the 
+	// from Giancarlo Genta page 60, it added some extra term that allows to use the 
 	// formula even when the vehicle is at rest 
 	// my huge problem with the formula is that is is quiet difficult to
 	// determine the parameters C, D, E, Bx, phi and Sh, and Sv for each force and moment
-	// the Genta book provide 5 table of coefficients for five different vehicles 
+	// The Genta book provide 5 table of coefficients for five different vehicles 
 	// but no where is the book it gives the relation to the parameters B, C, D, E of the magic formula.
-	// teh cl;oser I got is this paper.
-	// http://www-cdr.stanford.edu/dynamic/bywire/tires.pdf
-	// which is what I am implementing here
+	// the closer I got is this paper. http://www-cdr.stanford.edu/dynamic/bywire/tires.pdf
 	//F = D * sin(C * atan(Bx * (1 - E) * (phi + Sh) + E * atan(Bx * (phi + Sh)))) + Sv
 
 	BrushTireModel(tire, contactPoint, timestep);
 
+	const ndBodyKinematic* const tireBody = tire->GetBody0()->GetAsBodyDynamic();
+	const ndBodyKinematic* const otherBody = (contactPoint.m_body0 == tireBody) ? ((ndBodyKinematic*)contactPoint.m_body1)->GetAsBodyDynamic() : ((ndBodyKinematic*)contactPoint.m_body0)->GetAsBodyDynamic();
 
+	const ndVector longitudDir(contactPoint.m_dir0);
+	const ndVector contactVeloc0(tireBody->GetVelocity());
+	const ndVector contactVeloc1(otherBody->GetVelocityAtPoint(contactPoint.m_point));
+	const ndVector relVeloc(contactVeloc0 - contactVeloc1);
+	const ndFloat32 relSpeed = relVeloc.DotProduct(longitudDir).GetScalar();
 
+	const ndFloat32 normalForce = contactPoint.m_normal_Force.GetInitialGuess() + ndFloat32(1.0f);
+	const ndFloat32 frictionCoefficient = contactPoint.m_material.m_staticFriction0;
+	const ndFloat32 f = frictionCoefficient * normalForce;
+
+	const ndVector contactVeloc(tireBody->GetVelocityAtPoint(contactPoint.m_point) - contactVeloc1);
+	const ndFloat32 vr = -contactVeloc.DotProduct(longitudDir).GetScalar();
+	const ndFloat32 longitudialSlip = ndClamp(vr / relSpeed, ndFloat32(-0.99f), ndFloat32(100.0f));
+	tire->m_longitudinalSlip = ndMax(tire->m_longitudinalSlip, longitudialSlip);
+	const ndFloat32 den = ndFloat32(1.0f) / (longitudialSlip + ndFloat32(1.0f));
+	const ndFloat32 u = longitudialSlip * den;
+
+	const ndVector lateralDir(contactPoint.m_dir1);
+	const ndFloat32 sideSpeed = relVeloc.DotProduct(lateralDir).GetScalar();
+	const ndFloat32 signedLateralSlip = sideSpeed / (relSpeed + ndFloat32(1.0f));
+	const ndFloat32 lateralSlip = ndAbs(signedLateralSlip);
+	tire->m_lateralSlip = ndMax(tire->m_lateralSlip, lateralSlip);
+	const ndFloat32 v = lateralSlip * den;
+
+	auto MagicFormula = [](ndFloat32 phi, ndFloat32 B, ndFloat32 C, ndFloat32 D, ndFloat32 E, ndFloat32 Sv, ndFloat32 Sh)
+	{
+		ndFloat32 displacedPhi = phi - Sh;
+		ndFloat32 EaTang = E * ndAtan(B * displacedPhi);
+		ndFloat32 BEarg = B * (ndFloat32(1.0f) - E) * displacedPhi;
+		ndFloat32 Carg = C * ndAtan(BEarg + EaTang);
+		return D * ndSin(Carg) + Sv;
+	};
+
+	auto LongitudinalForce = [MagicFormula](const ndFloat32 f, ndFloat32  phi, const ndFloat32* const a)
+	{
+		ndFloat32 a0 = a[0];
+		ndFloat32 a1 = a[1];
+		ndFloat32 a2 = a[2];
+		ndFloat32 a3 = a[3];
+		ndFloat32 a4 = a[4];
+		ndFloat32 a5 = a[5];
+		ndFloat32 a6 = a[6];
+		ndFloat32 a7 = a[7];
+		ndFloat32 a8 = a[8];
+		ndFloat32 f2 = f * f;
+
+		ndFloat32 C = a0;
+		ndFloat32 D = a1 * f2 + a2 * f;
+		ndFloat32 BCD = (a3 * f2 + a4 * f) / ndExp(a5 * f);
+		ndFloat32 B = BCD / (C * D);
+		ndFloat32 E = a6 * f2 + a7 * f + a8;
+
+		ndFloat32 Sh = ndFloat32(0.0f);
+		ndFloat32 Sv = ndFloat32(0.0f);
+		return MagicFormula(phi, B, C, D, E, Sv, Sh);
+	};
+
+	auto LateralForce = [MagicFormula](const ndFloat32 f, ndFloat32  phi, const ndFloat32* const a)
+	{
+		ndFloat32 a0 = a[0];
+		ndFloat32 a1 = a[1];
+		ndFloat32 a2 = a[2];
+		ndFloat32 a3 = a[3];
+		ndFloat32 a4 = a[4];
+		ndFloat32 a5 = a[5];
+		ndFloat32 a6 = a[6];
+		ndFloat32 a7 = a[7];
+		ndFloat32 a8 = a[8];
+		ndFloat32 f2 = f * f;
+
+		ndFloat32 C = a0;
+		ndFloat32 D = a1 * f2 + a2 * f;
+		ndFloat32 BCD = (a3 * f2 + a4 * f) / ndExp(a5 * f);
+		ndFloat32 B = BCD / (C * D);
+		ndFloat32 E = a6 * f2 + a7 * f + a8;
+
+		ndFloat32 Sh = ndFloat32(0.0f);
+		ndFloat32 Sv = ndFloat32(0.0f);
+		return MagicFormula(phi, B, C, D, E, Sv, Sh);
+	};
+
+	// test data
+	ndFloat32 aLateral[] = { 1.3f, -22.1f, 1011.0f, 1078.0f, 1.82f, 0.208f, 0.0f, -0.354f, 0.707f };
+	ndFloat32 aLongigtudinal[] = { 1.65f, -21.3f, 1144.0f, 49.6f, 226.0f, 0.069f, -0.006f, 0.056f, 0.486f };
+
+	//ndFloat32 fz = LateralForce(f, v, aLateral);
+	//ndFloat32 fx = LongitudinalForce(f, u, aLongigtudinal);
+
+	BrushTireModel(tire, contactPoint, timestep);
 }
 
 void ndMultiBodyVehicle::PostUpdate(ndFloat32)
