@@ -100,7 +100,7 @@ class ndModelArticulation: public ndModel
 	
 	protected:
 	D_NEWTON_API void ConvertToUrdf();
-	void CalculateCentreOfMass(ndCenterOfMassDynamics& comDynamics, ndFixSizeArray<const ndBodyKinematic*, 256> bodyArrayOut, ndFixSizeArray<ndVector, 256>& bodyCenterOut) const;
+	void CalculateCentreOfMass(ndCenterOfMassDynamics& comDynamics, ndFixSizeArray<const ndBodyKinematic*, 256>& bodyArrayOut, ndFixSizeArray<ndVector, 256>& bodyCenterOut) const;
 	
 	ndString m_name;
 	ndNode* m_rootNode;

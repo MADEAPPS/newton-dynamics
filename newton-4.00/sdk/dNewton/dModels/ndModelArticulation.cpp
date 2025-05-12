@@ -558,7 +558,7 @@ void ndModelArticulation::RemoveBodiesAndJointsFromWorld()
 	}
 }
 
-void ndModelArticulation::CalculateCentreOfMass(ndCenterOfMassDynamics& dynamics, ndFixSizeArray<const ndBodyKinematic*, 256> bodyArrayOut, ndFixSizeArray<ndVector, 256>& bodyCenterOut) const
+void ndModelArticulation::CalculateCentreOfMass(ndCenterOfMassDynamics& dynamics, ndFixSizeArray<const ndBodyKinematic*, 256>& bodyArrayOut, ndFixSizeArray<ndVector, 256>& bodyCenterOut) const
 {
 	for (ndModelArticulation::ndNode* node = m_rootNode->GetFirstIterator(); node; node = node->GetNextIterator())
 	{
