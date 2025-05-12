@@ -24,7 +24,6 @@ class ndAnimationBlendTreeNode: public ndContainersFreeListAlloc<ndAnimationBlen
 	virtual void Update(ndFloat32 dt);
 	virtual void Evaluate(ndAnimationPose& output, ndVector& veloc);
 
-	//ndAnimationBlendTreeNode* m_input;
 	ndSharedPtr<ndAnimationBlendTreeNode> m_input;
 };
 
