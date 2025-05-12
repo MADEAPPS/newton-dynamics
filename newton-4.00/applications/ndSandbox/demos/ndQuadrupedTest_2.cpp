@@ -57,18 +57,20 @@ namespace ndQuadruped_2
 {
 	#define ND_TRAIN_MODEL
 
-	#define USE_SAC
+	//#define USE_SAC
 
 	#ifdef USE_SAC
+		#define USE_DDPG
 		#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
 	#else	
+		//#define USE_PPO
 		#define CONTROLLER_NAME "ndQuadruped_2-ppo.dnn"
 	#endif
 
 	enum Actions
 	{
 		m_actionPosit_x,
-		m_actionPosit_y,
+		//m_actionPosit_y,
 		m_actionPosit_z,
 		m_actionsSize
 	};
@@ -375,6 +377,8 @@ namespace ndQuadruped_2
 			,m_legs()
 			,m_controller(nullptr)
 			,m_controllerTrainer(nullptr)
+			,m_comX(ndFloat32(0.0f))
+			,m_comZ(ndFloat32(0.0f))
 			,m_timestep(ndFloat32(0.0f))
 			,m_modelEnum(0)
 		{
@@ -682,31 +686,37 @@ namespace ndQuadruped_2
 				observations[base + m_poseVeloc_y] = ndBrainFloat((keyFramePosit1.m_y - keyFramePosit0.m_y) * invTimestep);
 				observations[base + m_poseVeloc_z] = ndBrainFloat((keyFramePosit1.m_z - keyFramePosit0.m_z) * invTimestep);
 			}
+
+			observations[m_observationSize * m_legs.GetCount() + 0] = m_comX / D_CYCLE_STRIDE_X;
+			observations[m_observationSize * m_legs.GetCount() + 1] = m_comZ / D_CYCLE_STRIDE_Z;
 		}
 
 		void ApplyActions(ndBrainFloat* const actions)
 		{
 			ndBodyKinematic* const rootBody = GetModel()->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic();
-			
-			#ifdef _DEBUG
-			const ndModelArticulation::ndCenterOfMassDynamics comDynamics(CalculateDynamics(m_timestep));
-			#endif
 
 			const ndVector upVector(rootBody->GetMatrix().m_up);
+
+			ndFloat32 y = ndFloat32(0.0f);
+			m_comX = ndClamp(m_comX + actions[m_actionPosit_x] * D_ACTION_SPEED, -ndFloat32(0.25f) * D_CYCLE_STRIDE_X, ndFloat32(0.25f) * D_CYCLE_STRIDE_X);
+			m_comZ = ndClamp(m_comZ + actions[m_actionPosit_z] * D_ACTION_SPEED, -ndFloat32(0.25f) * D_CYCLE_STRIDE_Z, ndFloat32(0.25f) * D_CYCLE_STRIDE_Z);
+
+			//x = ndFloat32(0.25f) * 1.0f * D_CYCLE_STRIDE_X;
+			//z = ndFloat32(0.25f) * 1.0f * D_CYCLE_STRIDE_Z;
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
 				ndEffectorInfo& leg = m_legs[i];
 				ndIkSwivelPositionEffector* const effector = leg.m_effector;
-				ndInt32 base = m_actionsSize * i;
+				//ndInt32 base = m_actionsSize * i;
 				
 				const ndAnimKeyframe keyFrame = m_animPose0[i];
 				ndVector posit(keyFrame.m_posit);
-				ndFloat32 x = actions[base + m_actionPosit_x] * D_ACTION_SPEED;
-				ndFloat32 y = actions[base + m_actionPosit_y] * D_ACTION_SPEED;
-				ndFloat32 z = actions[base + m_actionPosit_z] * D_ACTION_SPEED;
-				posit.m_x += x;
+				//ndFloat32 x = actions[base + m_actionPosit_x] * D_ACTION_SPEED;
+				//ndFloat32 y = actions[base + m_actionPosit_y] * D_ACTION_SPEED;
+				//ndFloat32 z = actions[base + m_actionPosit_z] * D_ACTION_SPEED;
+				posit.m_x += m_comX;
 				posit.m_y += y;
-				posit.m_z += z;
+				posit.m_z += m_comZ;
 			
 				ndFloat32 swivelAngle = effector->CalculateLookAtSwivelAngle(upVector);
 
@@ -932,6 +942,8 @@ namespace ndQuadruped_2
 		ndSharedPtr<ndController> m_controller;
 		ndSharedPtr<ndControllerTrainer> m_controllerTrainer;
 
+		ndFloat32 m_comX;
+		ndFloat32 m_comZ;
 		ndFloat32 m_timestep;
 		ndInt32 m_modelEnum;
 	};
@@ -1049,25 +1061,35 @@ namespace ndQuadruped_2
 		{
 			ndWorld* const world = scene->GetWorld();
 
+			//ndFloat32 numberOfActions = m_actionsSize * 4;
+			ndInt32 numberOfActions = m_actionsSize;
+			ndInt32 numberOfObservations = m_observationSize * 4 + 2;
+
 			#ifdef USE_SAC
 				m_outFile = fopen("ndQuadruped_2-sac.csv", "wb");
 				fprintf(m_outFile, "sac\n");
 
 				m_stopTraining = 200000;
 				ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
-				hyperParameters.m_numberOfActions = m_actionsSize * 4;
-				hyperParameters.m_numberOfObservations = m_observationSize * 4;
-				m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
-				//m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentSoftActorCritic_Trainer(hyperParameters));
+				hyperParameters.m_numberOfActions = numberOfActions;
+				hyperParameters.m_numberOfObservations = numberOfObservations;
+				#ifdef USE_DDPG
+					m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
+				#else
+					m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentSoftActorCritic_Trainer(hyperParameters));
+				#endif
 			#else
 				m_outFile = fopen("ndQuadruped_2-ppo.csv", "wb");
 				fprintf(m_outFile, "ppo\n");
 
 				ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
-				hyperParameters.m_numberOfActions = m_actionsSize * 4;
-				hyperParameters.m_numberOfObservations = m_observationSize * 4;
-				//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
-				m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
+				hyperParameters.m_numberOfActions = numberOfActions;
+				hyperParameters.m_numberOfObservations = numberOfObservations;
+				#ifdef USE_PPO
+					m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
+				#else	
+					m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
+				#endif
 			#endif
 
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
