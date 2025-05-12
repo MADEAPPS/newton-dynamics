@@ -63,14 +63,13 @@ namespace ndQuadruped_2
 		#define USE_DDPG
 		#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
 	#else	
-		//#define USE_PPO
+		#define USE_PPO
 		#define CONTROLLER_NAME "ndQuadruped_2-ppo.dnn"
 	#endif
 
 	enum Actions
 	{
 		m_actionPosit_x,
-		//m_actionPosit_y,
 		m_actionPosit_z,
 		m_actionsSize
 	};
@@ -653,6 +652,9 @@ namespace ndQuadruped_2
 			ndFloat32 startTime = duration * startQuadrant / ndFloat32 (4.0f);
 			m_animBlendTree->SetTime(startTime);
 
+			m_comX = ndFloat32(0.0f);
+			m_comZ = ndFloat32(0.0f);
+
 			ndVector veloc;
 			m_animBlendTree->Evaluate(m_animPose1, veloc);
 		}
@@ -707,13 +709,9 @@ namespace ndQuadruped_2
 			{
 				ndEffectorInfo& leg = m_legs[i];
 				ndIkSwivelPositionEffector* const effector = leg.m_effector;
-				//ndInt32 base = m_actionsSize * i;
 				
 				const ndAnimKeyframe keyFrame = m_animPose0[i];
 				ndVector posit(keyFrame.m_posit);
-				//ndFloat32 x = actions[base + m_actionPosit_x] * D_ACTION_SPEED;
-				//ndFloat32 y = actions[base + m_actionPosit_y] * D_ACTION_SPEED;
-				//ndFloat32 z = actions[base + m_actionPosit_z] * D_ACTION_SPEED;
 				posit.m_x += m_comX;
 				posit.m_y += y;
 				posit.m_z += m_comZ;
