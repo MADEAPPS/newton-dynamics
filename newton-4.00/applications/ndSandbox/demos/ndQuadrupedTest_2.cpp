@@ -55,7 +55,7 @@ are more suitable for medium small systems.
 // to the environment with increasing complexity
 namespace ndQuadruped_2
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 
 	#define USE_SAC
 
@@ -93,7 +93,7 @@ namespace ndQuadruped_2
 	#define D_CYCLE_AMPLITUDE		ndFloat32(0.27f)
 	#define D_POSE_REST_POSITION_Y	ndReal(-0.3f)
 
-	#define D_ACTION_SPEED			ndReal(0.01f)
+	#define D_ACTION_SENSITIVITY	ndReal(0.002f)
 
 	#define D_TILT_KILL_COS_ANGLE		ndReal(0.9f) // 25 dregree respect to the vertical
 
@@ -614,8 +614,7 @@ namespace ndQuadruped_2
 			referenceFrame.m_right = referenceFrame.m_front.CrossProduct(referenceFrame.m_up).Normalize();
 			referenceFrame.m_front = referenceFrame.m_up.CrossProduct(referenceFrame.m_right).Normalize();
 			//ndVector omega(referenceFrame.UnrotateVector(rootNode->m_body->GetOmega()));
-auto CalculateTiltReward = [](const ndFloat32 cosAngle)
-			
+			auto CalculateTiltReward = [](const ndFloat32 cosAngle)
 			{
 				ndFloat32 dist = ndClamp(cosAngle, D_TILT_KILL_COS_ANGLE, ndFloat32(1.0f));
 				ndFloat32 parametricDist = (dist - D_TILT_KILL_COS_ANGLE) / (ndFloat32(1.0f) - D_TILT_KILL_COS_ANGLE);
@@ -628,9 +627,42 @@ auto CalculateTiltReward = [](const ndFloat32 cosAngle)
 			//ndFloat32 tiltReward2 = CalculateTiltReward(0.95f);
 			//ndFloat32 tiltReward3 = CalculateTiltReward(D_TILT_KILL_COS_ANGLE + 0.001);
 
+			ndFloat32 contacSlideSpeed = 0.0f;
+			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
+			{
+				const ndEffectorInfo& leg = m_legs[i];
+				ndIkSwivelPositionEffector* const effector = leg.m_effector;
+				const ndContact* const contact = GetContact(effector);
+				if (contact)
+				{
+					ndBodyKinematic* const body = effector->GetBody0();
+					const ndContactPointList& contactPoints = contact->GetContactPoints();
+					for (ndContactPointList::ndNode* contactPointsNode = contactPoints.GetFirst(); contactPointsNode; contactPointsNode = contactPointsNode->GetNext())
+					{
+						ndContactMaterial& contactPoint = contactPointsNode->GetInfo();
+						ndVector contactVeloc(body->GetVelocityAtPoint(contactPoint.m_point));
+						contactVeloc = contactPoint.m_normal.Scale(contactVeloc.DotProduct(contactPoint.m_normal).GetScalar());
+						ndFloat32 hSpeed = ndSqrt(contactVeloc.DotProduct(contactVeloc).GetScalar());
+						if (hSpeed > contacSlideSpeed)
+						{
+							contacSlideSpeed = hSpeed;
+						}
+					}
+				}
+			}
+
+			auto ContacSlidingReward = [](const ndFloat32 slideSpeed)
+			{
+				ndFloat32 dist = ndClamp(slideSpeed, ndFloat32(0.0f), ndFloat32(2.0f));
+				ndFloat32 parametricDist = (ndFloat32(2.0f) - dist) / ndFloat32(2.0f);
+				ndFloat32 tiltReward = ndPow(parametricDist, ndFloat32(4.0f));
+				return tiltReward;
+			};
+
+			ndFloat32 slideReward = ContacSlidingReward(contacSlideSpeed);
 			ndFloat32 tiltReward = CalculateTiltReward(referenceFrame.m_up.m_y);
 
-			return tiltReward;
+			return tiltReward * 0.6f + slideReward * 0.4f;
 		}
 
 		#pragma optimize( "", off )
@@ -701,8 +733,8 @@ auto CalculateTiltReward = [](const ndFloat32 cosAngle)
 			const ndVector upVector(rootBody->GetMatrix().m_up);
 
 			ndFloat32 y = ndFloat32(0.0f);
-			m_comX = ndClamp(m_comX + actions[m_actionPosit_x] * D_ACTION_SPEED, -ndFloat32(0.25f) * D_CYCLE_STRIDE_X, ndFloat32(0.25f) * D_CYCLE_STRIDE_X);
-			m_comZ = ndClamp(m_comZ + actions[m_actionPosit_z] * D_ACTION_SPEED, -ndFloat32(0.25f) * D_CYCLE_STRIDE_Z, ndFloat32(0.25f) * D_CYCLE_STRIDE_Z);
+			m_comX = ndClamp(m_comX + actions[m_actionPosit_x] * D_ACTION_SENSITIVITY, -ndFloat32(0.25f) * D_CYCLE_STRIDE_X, ndFloat32(0.25f) * D_CYCLE_STRIDE_X);
+			m_comZ = ndClamp(m_comZ + actions[m_actionPosit_z] * D_ACTION_SENSITIVITY, -ndFloat32(0.25f) * D_CYCLE_STRIDE_Z, ndFloat32(0.25f) * D_CYCLE_STRIDE_Z);
 
 			//x = ndFloat32(0.25f) * 1.0f * D_CYCLE_STRIDE_X;
 			//z = ndFloat32(0.25f) * 1.0f * D_CYCLE_STRIDE_Z;
@@ -759,6 +791,22 @@ auto CalculateTiltReward = [](const ndFloat32 cosAngle)
 		{
 		}
 
+		const ndContact* GetContact (ndIkSwivelPositionEffector* const effector) const
+		{
+			ndBodyKinematic* const body = effector->GetBody0();
+			ndBodyKinematic::ndContactMap& contacts = body->GetContactMap();
+			ndBodyKinematic::ndContactMap::Iterator it(contacts);
+			for (it.Begin(); it; it++)
+			{
+				ndContact* const contact = *it;
+				if (contact->IsActive())
+				{
+					return contact;
+				}
+			}
+			return nullptr;
+		};
+
 		void CaculateSupportPolygon(ndFixSizeArray<ndVector, 16>& supportPolygon) const
 		{
 			supportPolygon.SetCount(0);
@@ -768,23 +816,23 @@ auto CalculateTiltReward = [](const ndFloat32 cosAngle)
 				const ndEffectorInfo& leg = m_legs[i];
 				ndIkSwivelPositionEffector* const effector = leg.m_effector;
 
-				auto HasContact = [effector]()
-				{
-					ndBodyKinematic* const body = effector->GetBody0();
-					ndBodyKinematic::ndContactMap& contacts = body->GetContactMap();
-					ndBodyKinematic::ndContactMap::Iterator it(contacts);
-					for (it.Begin(); it; it++)
-					{
-						ndContact* const contact = *it;
-						if (contact->IsActive())
-						{
-							return true;
-						}
-					}
-					return false;
-				};
+				//auto HasContact = [effector]()
+				//{
+				//	ndBodyKinematic* const body = effector->GetBody0();
+				//	ndBodyKinematic::ndContactMap& contacts = body->GetContactMap();
+				//	ndBodyKinematic::ndContactMap::Iterator it(contacts);
+				//	for (it.Begin(); it; it++)
+				//	{
+				//		ndContact* const contact = *it;
+				//		if (contact->IsActive())
+				//		{
+				//			return true;
+				//		}
+				//	}
+				//	return false;
+				//};
 
-				if (HasContact())
+				if (GetContact(effector))
 				{
 					supportPoints.PushBack(effector->CalculateGlobalMatrix0().m_posit);
 				}
