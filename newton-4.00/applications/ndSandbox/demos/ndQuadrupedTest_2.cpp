@@ -55,9 +55,9 @@ are more suitable for medium small systems.
 // to the environment with increasing complexity
 namespace ndQuadruped_2
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 
-	//#define USE_SAC
+	#define USE_SAC
 
 	#ifdef USE_SAC
 		#define USE_DDPG
@@ -1065,29 +1065,34 @@ auto CalculateTiltReward = [](const ndFloat32 cosAngle)
 			ndInt32 numberOfObservations = m_observationSize * 4 + 2;
 
 			#ifdef USE_SAC
-				m_outFile = fopen("ndQuadruped_2-sac.csv", "wb");
-				fprintf(m_outFile, "sac\n");
-
 				m_stopTraining = 200000;
 				ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
 				hyperParameters.m_numberOfActions = numberOfActions;
 				hyperParameters.m_numberOfObservations = numberOfObservations;
 				#ifdef USE_DDPG
+					m_outFile = fopen("ndQuadruped_2-ddpg.csv", "wb");
+					fprintf(m_outFile, "ddpgc\n");
+
 					m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
 				#else
+					m_outFile = fopen("ndQuadruped_2-sac.csv", "wb");
+					fprintf(m_outFile, "sac\n");
+
 					m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentSoftActorCritic_Trainer(hyperParameters));
 				#endif
 			#else
-				m_outFile = fopen("ndQuadruped_2-ppo.csv", "wb");
-				fprintf(m_outFile, "ppo\n");
-
 				m_stopTraining = 500 * 1000000;
 				ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 				hyperParameters.m_numberOfActions = numberOfActions;
 				hyperParameters.m_numberOfObservations = numberOfObservations;
 				#ifdef USE_PPO
+					m_outFile = fopen("ndQuadruped_2-ppo.csv", "wb");
+					fprintf(m_outFile, "ppo\n");
+
 					m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
 				#else	
+					m_outFile = fopen("ndQuadruped_2-vpg.csv", "wb");
+					fprintf(m_outFile, "vpg\n");
 					m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
 				#endif
 			#endif
