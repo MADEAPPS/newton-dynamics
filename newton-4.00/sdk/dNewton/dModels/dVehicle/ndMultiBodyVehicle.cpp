@@ -739,6 +739,12 @@ void ndMultiBodyVehicle::PacejkaTireModel(ndMultiBodyVehicleTireJoint* const tir
 	// the closer I got is this paper. http://www-cdr.stanford.edu/dynamic/bywire/tires.pdf
 	//F = D * sin(C * atan(Bx * (1 - E) * (phi + Sh) + E * atan(Bx * (phi + Sh)))) + Sv
 
+	//implementing Pacejka,
+	//in Genta book from page 60 to 63, the units are all mess up really bad,
+	//to the point that the results makes not sense whatsoever
+	//for decades, I try to implement that I have never been able to get it right.
+	//Now, I am comparing to the Brush model which seem decent.
+
 	const ndBodyKinematic* const tireBody = tire->GetBody0()->GetAsBodyDynamic();
 	const ndBodyKinematic* const otherBody = (contactPoint.m_body0 == tireBody) ? ((ndBodyKinematic*)contactPoint.m_body1)->GetAsBodyDynamic() : ((ndBodyKinematic*)contactPoint.m_body0)->GetAsBodyDynamic();
 
