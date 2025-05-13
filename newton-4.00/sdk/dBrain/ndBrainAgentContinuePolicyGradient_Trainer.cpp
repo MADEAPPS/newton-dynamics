@@ -54,8 +54,10 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 	m_numberOfObservations = 0;
 
 	m_policyLearnRate = ndBrainFloat(1.0e-4f);
-	m_criticLearnRate = m_policyLearnRate * ndBrainFloat(0.5f);
-	m_entropyRegularizerCoef = ndBrainFloat(0.25f);
+	m_criticLearnRate = m_policyLearnRate;
+
+	m_entropyRegularizerCoef = ndBrainFloat(0.0f);
+	//m_entropyRegularizerCoef = ndBrainFloat(0.25f);
 
 	m_policyRegularizer = ndBrainFloat(1.0e-4f);
 	m_criticRegularizer = ndBrainFloat(5.0e-3f);
