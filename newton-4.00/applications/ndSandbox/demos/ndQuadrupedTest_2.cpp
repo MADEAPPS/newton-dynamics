@@ -614,8 +614,8 @@ namespace ndQuadruped_2
 			referenceFrame.m_right = referenceFrame.m_front.CrossProduct(referenceFrame.m_up).Normalize();
 			referenceFrame.m_front = referenceFrame.m_up.CrossProduct(referenceFrame.m_right).Normalize();
 			//ndVector omega(referenceFrame.UnrotateVector(rootNode->m_body->GetOmega()));
-
-			auto CalculateTiltReward = [](const ndFloat32 cosAngle)
+auto CalculateTiltReward = [](const ndFloat32 cosAngle)
+			
 			{
 				ndFloat32 dist = ndClamp(cosAngle, D_TILT_KILL_COS_ANGLE, ndFloat32(1.0f));
 				ndFloat32 parametricDist = (dist - D_TILT_KILL_COS_ANGLE) / (ndFloat32(1.0f) - D_TILT_KILL_COS_ANGLE);
@@ -649,6 +649,7 @@ namespace ndQuadruped_2
 			ndFloat32 duration = sequence->GetDuration();
 
 			ndFloat32 startQuadrant = ndFloat32(ndRandInt() % 4);
+			startQuadrant = 0.0f;
 			ndFloat32 startTime = duration * startQuadrant / ndFloat32 (4.0f);
 			m_animBlendTree->SetTime(startTime);
 
@@ -1080,6 +1081,7 @@ namespace ndQuadruped_2
 				m_outFile = fopen("ndQuadruped_2-ppo.csv", "wb");
 				fprintf(m_outFile, "ppo\n");
 
+				m_stopTraining = 500 * 1000000;
 				ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 				hyperParameters.m_numberOfActions = numberOfActions;
 				hyperParameters.m_numberOfObservations = numberOfObservations;
