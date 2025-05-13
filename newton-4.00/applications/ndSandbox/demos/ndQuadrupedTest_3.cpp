@@ -99,7 +99,7 @@ namespace ndQuadruped_3
 	#define D_CYCLE_AMPLITUDE		ndFloat32(0.27f)
 	#define D_POSE_REST_POSITION_Y	ndReal(-0.3f)
 
-	#define D_ACTION_SPEED			ndReal(0.05f)
+	#define D_ACTION_SENSITIVITY			ndReal(0.05f)
 
 	class RobotModelNotify : public ndModelNotify
 	{
@@ -562,15 +562,15 @@ namespace ndQuadruped_3
 				const ndVector effectorPosit(leg.m_effector->GetEffectorPosit());
 				ndVector relativePosit(effectorPosit - resPosit);
 			
-				//relativePosit.m_x += actions[size * i + m_leg0_x] * D_ACTION_SPEED;
-				//relativePosit.m_y += actions[size * i + m_leg0_y] * D_ACTION_SPEED;
-				//relativePosit.m_z += actions[size * i + m_leg0_z] * D_ACTION_SPEED;
+				//relativePosit.m_x += actions[size * i + m_leg0_x] * D_ACTION_SENSITIVITY;
+				//relativePosit.m_y += actions[size * i + m_leg0_y] * D_ACTION_SENSITIVITY;
+				//relativePosit.m_z += actions[size * i + m_leg0_z] * D_ACTION_SENSITIVITY;
 
 				if (i == 0)
 				{
-					relativePosit.m_x += actions[3 * i + m_leg0_x] * D_ACTION_SPEED;
-					relativePosit.m_y += actions[3 * i + m_leg0_y] * D_ACTION_SPEED;
-					relativePosit.m_z += actions[3 * i + m_leg0_z] * D_ACTION_SPEED;
+					relativePosit.m_x += actions[3 * i + m_leg0_x] * D_ACTION_SENSITIVITY;
+					relativePosit.m_y += actions[3 * i + m_leg0_y] * D_ACTION_SENSITIVITY;
+					relativePosit.m_z += actions[3 * i + m_leg0_z] * D_ACTION_SENSITIVITY;
 					const ndVector newPosit(relativePosit + resPosit);
 					effector->SetLocalTargetPosition(newPosit);
 				}
