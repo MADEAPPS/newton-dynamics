@@ -43,6 +43,47 @@ D_MSV_NEWTON_CLASS_ALIGN_32
 class ndMultiBodyVehicle : public ndModelArticulation
 {
 	public:
+	class ndPacejkaTireModel
+	{
+		public:
+		ndPacejkaTireModel()
+		{
+			// set some defula value, longitudinal force for a classic tire form Giancalr Genta book.
+			m_b = ndFloat32 (0.5f);
+			m_c = ndFloat32(1.65f);
+			m_d = ndFloat32(1.0f);
+			m_e = ndFloat32(0.8f);
+			m_sv = ndFloat32(0.0f);
+			m_sh = ndFloat32(0.0f);
+		}
+
+		ndPacejkaTireModel(ndFloat32 B, ndFloat32 C, ndFloat32 D, ndFloat32 E, ndFloat32 Sv, ndFloat32 Sh)
+			:m_b(B)
+			,m_c(C)
+			,m_d(D)
+			,m_e(E)
+			,m_sv(Sv)
+			,m_sh(Sh)
+		{
+		}
+
+		ndFloat32 Evaluate(ndFloat32 phi, ndFloat32 f) const
+		{
+			ndFloat32 displacedPhi = phi + m_sh;
+			ndFloat32 EaTang = m_e * ndAtan(m_b * displacedPhi);
+			ndFloat32 BEarg = m_b * (ndFloat32(1.0f) - m_e) * displacedPhi;
+			ndFloat32 Carg = m_c * ndAtan(BEarg + EaTang);
+			return f * (m_d * ndSin(Carg) + m_sv);
+		}
+
+		ndFloat32 m_b;
+		ndFloat32 m_c;
+		ndFloat32 m_d;
+		ndFloat32 m_e;
+		ndFloat32 m_sv;
+		ndFloat32 m_sh;
+	};
+
 	class ndTireContactPair
 	{
 		public:
@@ -121,18 +162,18 @@ class ndMultiBodyVehicle : public ndModelArticulation
 	//D_NEWTON_API void SetVehicleSolverModel(bool hardJoint);
 
 	private:
+	void ApplyTireModel();
 	void ApplyStabilityControl();
 	void ApplyAlignmentAndBalancing();
-	void ApplyTireModel(ndFloat32 timestep);
 	void ApplyAerodynamics(ndFloat32 timestep);
+	void ApplyTireModel(ndFixSizeArray<ndTireContactPair, 128>& tireContacts);
 	ndBodyKinematic* CreateInternalBodyPart(ndFloat32 mass, ndFloat32 radius) const;
-	void ApplyTireModel(ndFloat32 timestep, ndFixSizeArray<ndTireContactPair, 128>& tireContacts);
 
+	void BrushTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
+	void CoulombTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
+	void PacejkaTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
 	void CalculateNormalizedAlgniningTorque(ndMultiBodyVehicleTireJoint* const tire, ndFloat32 sideSlipTangent) const;
-	void BrushTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const;
-	void CoulombTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const;
-	void PacejkaTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const;
-	void CoulombFrictionCircleTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint, ndFloat32 timestep) const;
+	void CoulombFrictionCircleTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
 
 	ndMatrix m_localFrame;
 	ndBodyDynamic* m_chassis;
