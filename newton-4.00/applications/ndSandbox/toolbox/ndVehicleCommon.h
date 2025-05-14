@@ -145,8 +145,6 @@ class ndVehicleDectriptor
 	ndFloat32 m_torsionBarDamperC;
 	ndFloat32 m_torsionBarRegularizer;
 	ndTorsionBarType m_torsionBarType;
-
-	bool m_useHardSolverMode;
 };
 
 class ndVehicleMaterial : public ndApplicationMaterial

@@ -756,7 +756,7 @@ void ndMultiBodyVehicle::PacejkaTireModel(ndMultiBodyVehicleTireJoint* const tir
 	ndFloat32 phi_combined_x = phi_max * frictionModel.m_longitudinalPacejka.m_normalizingPhi;
 
 	// now calculate the modified  
-	ndFloat32 normalFrictionForce = normalForce * frictionCoefficient * 0.7f;
+	ndFloat32 normalFrictionForce = normalForce * frictionCoefficient;
 	ndFloat32 pureFx = LongitudinalForce(frictionModel.m_longitudinalPacejka, normalFrictionForce, phi_combined_x);
 	ndFloat32 pureFz = LateralForce(frictionModel.m_lateralPacejka, normalFrictionForce, phi_combined_z * ndDegreeToRad);
 

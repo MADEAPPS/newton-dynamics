@@ -35,8 +35,6 @@ class ndVehicleDectriptorLav25: public ndVehicleDectriptor
 		m_chassisAngularDrag = 0.25f;
 		m_comDisplacement = ndVector(0.0f, -0.55f, 0.0f, 0.0f);
 
-		m_useHardSolverMode = false;
-
 		ndFloat32 idleTorquePoundFoot = 250.0f;
 		ndFloat32 idleRmp = 600.0f;
 		ndFloat32 horsePower = 500.0f;
@@ -93,8 +91,6 @@ class ndVehicleDectriptorTractor : public ndVehicleDectriptor
 		m_comDisplacement = ndVector(0.0f, -0.55f, 0.0f, 0.0f);
 		m_chassisMass = 2000.0f;
 		m_chassisAngularDrag = 0.25f;
-
-		m_useHardSolverMode = false;
 
 		ndFloat32 idleTorquePoundFoot = 250.0f;
 		ndFloat32 idleRmp = 600.0f;
@@ -156,8 +152,6 @@ class ndVehicleDectriptorBigRig : public ndVehicleDectriptor
 		m_chassisMass = 2000.0f;
 		m_chassisAngularDrag = 0.25f;
 		m_comDisplacement = ndVector(0.0f, -0.55f, 0.0f, 0.0f);
-
-		m_useHardSolverMode = false;
 
 		ndFloat32 idleTorquePoundFoot = 250.0f;
 		ndFloat32 idleRmp = 600.0f;

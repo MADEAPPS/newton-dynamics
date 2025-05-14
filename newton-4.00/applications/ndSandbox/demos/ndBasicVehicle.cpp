@@ -33,9 +33,7 @@ class ndVehicleDectriptorViper : public ndVehicleDectriptor
 	ndVehicleDectriptorViper()
 		:ndVehicleDectriptor("viper.fbx")
 	{
-		m_useHardSolverMode = true;
-		//m_useHardSolverMode = false;
-		m_comDisplacement = ndVector(0.25f, -0.5f, 0.0f, 0.0f);
+		m_comDisplacement = ndVector(-0.2f, -0.5f, 0.0f, 0.0f);
 
 		ndFloat32 idleTorquePoundFoot = 300.0f;
 		ndFloat32 idleRmp = 700.0f;
@@ -68,10 +66,6 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 	ndVehicleDectriptorJeep()
 		:ndVehicleDectriptor("jeep.fbx")
 	{
-		//m_useHardSolverMode = true;
-		m_useHardSolverMode = false;
-		m_comDisplacement = ndVector(0.0f, -0.6f, 0.0f, 0.0f);
-
 		ndFloat32 idleTorquePoundFoot = 200.0f;
 		ndFloat32 idleRmp = 800.0f;
 		ndFloat32 horsePower = 400.0f;
@@ -81,6 +75,8 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		ndFloat32 redLineRpm = 8000.0f;
 		m_engine.Init(idleTorquePoundFoot, idleRmp, 
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
+
+		m_comDisplacement = ndVector(0.0f, -1.0f, 0.0f, 0.0f);
 
 		m_frontTire.m_mass = 25.0f;
 		m_frontTire.m_verticalOffset = -0.15f;
@@ -108,10 +104,9 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 
 		m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
 		m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		//m_rearTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
-		//m_frontTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
-		//m_rearTire.m_laterialStiffness = m_rearTire.m_longitudinalStiffness;
-		//m_frontTire.m_laterialStiffness = m_frontTire.m_longitudinalStiffness;
+		m_rearTire.m_frictionModel = ndTireFrictionModel::m_pacejka;
+		m_frontTire.m_frictionModel = ndTireFrictionModel::m_pacejka;
+
 		m_rearTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
 		m_frontTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
 	}
@@ -123,8 +118,6 @@ class ndVehicleDectriptorMonsterTruck0: public ndVehicleDectriptor
 	ndVehicleDectriptorMonsterTruck0()
 		:ndVehicleDectriptor("monsterTruck0.fbx")
 	{
-		m_comDisplacement = ndVector(0.0f, -0.7f, 0.0f, 0.0f);
-
 		ndFloat32 idleTorquePoundFoot = 250.0f;
 		ndFloat32 idleRmp = 800.0f;
 		ndFloat32 horsePower = 400.0f;
@@ -134,6 +127,8 @@ class ndVehicleDectriptorMonsterTruck0: public ndVehicleDectriptor
 		ndFloat32 redLineRpm = 8000.0f;
 		m_engine.Init(idleTorquePoundFoot, idleRmp, 
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
+
+		m_comDisplacement = ndVector(0.0f, -0.8f, 0.0f, 0.0f);
 
 		m_frontTire.m_mass = 100.0f;
 		m_frontTire.m_verticalOffset = 0.0f;
@@ -161,10 +156,8 @@ class ndVehicleDectriptorMonsterTruck0: public ndVehicleDectriptor
 
 		m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
 		m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		//m_rearTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
-		//m_frontTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
-		//m_rearTire.m_laterialStiffness = m_rearTire.m_longitudinalStiffness;
-		//m_frontTire.m_laterialStiffness = m_frontTire.m_longitudinalStiffness;
+		m_rearTire.m_frictionModel = ndTireFrictionModel::m_pacejka;
+		m_frontTire.m_frictionModel = ndTireFrictionModel::m_pacejka;
 
 		m_rearTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
 		m_frontTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
@@ -177,8 +170,6 @@ class ndVehicleDectriptorMonsterTruck1 : public ndVehicleDectriptor
 	ndVehicleDectriptorMonsterTruck1()
 		:ndVehicleDectriptor("monsterTruck1.fbx")
 	{
-		m_comDisplacement = ndVector(0.0f, -1.1f, 0.0f, 0.0f);
-
 		// reset gear box ratios
 		m_transmission.m_gearsCount = 4;
 		m_transmission.m_forwardRatios[0] = 2.5f;
@@ -187,6 +178,8 @@ class ndVehicleDectriptorMonsterTruck1 : public ndVehicleDectriptor
 		m_transmission.m_forwardRatios[3] = 0.8f;
 		m_transmission.m_crownGearRatio = 20.0f;
 
+		m_comDisplacement = ndVector(0.0f, -1.5f, 0.0f, 0.0f);
+		
 		ndFloat32 idleTorquePoundFoot = 300.0f;
 		ndFloat32 idleRmp = 800.0f;
 		ndFloat32 horsePower = 600.0f;
@@ -434,8 +427,6 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	callback->RegisterMaterial(material, ndDemoContactCallback::m_modelPart, ndDemoContactCallback::m_modelPart);
 	callback->RegisterMaterial(material, ndDemoContactCallback::m_vehicleTirePart, ndDemoContactCallback::m_modelPart);
 	callback->RegisterMaterial(material, ndDemoContactCallback::m_vehicleTirePart, ndDemoContactCallback::m_vehicleTirePart);
-
-	//material.m_flags = material.m_flags | m_useBrushTireModel____;
 	callback->RegisterMaterial(material, ndDemoContactCallback::m_vehicleTirePart, ndDemoContactCallback::m_default);
 
 	// add a model for general controls
@@ -454,13 +445,13 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	vehicle0->AddBodiesAndJointsToWorld();
 
 	world->AddModel(vehicle1);
-	//vehicle1->AddBodiesAndJointsToWorld();
+	vehicle1->AddBodiesAndJointsToWorld();
 	
 	world->AddModel(vehicle2);
-	//vehicle2->AddBodiesAndJointsToWorld();
+	vehicle2->AddBodiesAndJointsToWorld();
 	
 	world->AddModel(vehicle3);
-	//vehicle3->AddBodiesAndJointsToWorld();
+	vehicle3->AddBodiesAndJointsToWorld();
 
 	//test removing model from world
 	//vehicle1->RemoveBodiesAndJointsFromWorld();

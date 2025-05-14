@@ -196,8 +196,6 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_torsionBarType = m_noWheelAxle;
 
 	m_differentialType = m_rearWheelDrive;
-
-	m_useHardSolverMode = true;
 }
 
 //***************************************************************************************************

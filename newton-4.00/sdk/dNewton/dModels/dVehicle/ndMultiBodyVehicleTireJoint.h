@@ -59,10 +59,9 @@ class ndTireFrictionModel
 
 	ndTireFrictionModel()
 		:m_brush()
-		,m_lateralPacejka(ndFloat32(0.34f), ndFloat32(1.5f), ndFloat32(0.92f), ndFloat32(-0.74f), ndFloat32(0.0f), ndFloat32(0.01f))
+		//,m_lateralPacejka(ndFloat32(0.34f), ndFloat32(1.5f), ndFloat32(0.5f), ndFloat32(-0.74f), ndFloat32(0.0f), ndFloat32(0.01f))
+		,m_lateralPacejka(ndFloat32(0.01f), ndFloat32(2.85f), ndFloat32(0.2f), ndFloat32(1.42f), ndFloat32(0.0f), ndFloat32(0.01f))
 		,m_longitudinalPacejka(ndFloat32(0.5f), ndFloat32(1.65f), ndFloat32(1.0f), ndFloat32(0.8f), ndFloat32(0.0f), ndFloat32(0.0f))
-		//,m_laterialStiffness(ndFloat32(-100.0f))
-		//,m_longitudinalStiffness(ndFloat32(-100.0f))
 		,m_frictionModel(m_brushModel)
 	{
 	}
