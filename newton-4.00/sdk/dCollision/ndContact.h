@@ -104,6 +104,7 @@ class ndContact: public ndConstraint
 	D_COLLISION_API void DetachFromBodies();
 	D_COLLISION_API bool IsTestOnly() const;
 	D_COLLISION_API bool IsInTrigger() const;
+	D_COLLISION_API void InvalicatdeCache();
 	D_COLLISION_API virtual ndContact* GetAsContact();
 	D_COLLISION_API const ndMaterial* GetMaterial() const;
 	D_COLLISION_API bool IsSkeletonSelftCollision() const;

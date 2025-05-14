@@ -110,6 +110,13 @@ void ndContact::ClearSeparatingDistance()
 	m_separationDistance = 0;
 }
 
+void ndContact::InvalicatdeCache()
+{
+	ClearSeparatingDistance();
+	m_positAcc = ndVector::m_wOne;
+	m_positAcc.m_x = ndFloat32(1.0f);
+}
+
 void ndContact::ClearMemory()
 {
 	ndContactPointList& contacts = GetContactPoints();
