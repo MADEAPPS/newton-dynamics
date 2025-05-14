@@ -686,9 +686,6 @@ static int xxxxx;
 
 void ndMultiBodyVehicle::PacejkaTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const
 {
-	BrushTireModel(tire, contactPoint);
-	return;
-
 	// from Wikipedia the Pacejka equation is write as, but it does not include phi.
 	//F = D * sin(C * atan(Bx * (1 - E) + E * atan(Bx)))
 
@@ -759,7 +756,7 @@ void ndMultiBodyVehicle::PacejkaTireModel(ndMultiBodyVehicleTireJoint* const tir
 	ndFloat32 phi_combined_x = phi_max * frictionModel.m_longitudinalPacejka.m_normalizingPhi;
 
 	// now calculate the modified  
-	ndFloat32 normalFrictionForce = normalForce * frictionCoefficient;
+	ndFloat32 normalFrictionForce = normalForce * frictionCoefficient * 0.7f;
 	ndFloat32 pureFx = LongitudinalForce(frictionModel.m_longitudinalPacejka, normalFrictionForce, phi_combined_x);
 	ndFloat32 pureFz = LateralForce(frictionModel.m_lateralPacejka, normalFrictionForce, phi_combined_z * ndDegreeToRad);
 
@@ -782,14 +779,13 @@ void ndMultiBodyVehicle::PacejkaTireModel(ndMultiBodyVehicleTireJoint* const tir
 	//BrushTireModel(tire, contactPoint);
 	//ndTrace(("(%d %f %f) ", tireBody->GetId(), fx, fz));
 
-if (ndAbs(tire->m_normalizedSteering) > 0.1)
-{
-	ndFloat32 z = LateralForce(frictionModel.m_lateralPacejka, normalFrictionForce, sideSlipAngle);
-	ndFloat32 x = LongitudinalForce(frictionModel.m_longitudinalPacejka, normalFrictionForce, longitudialSlip);
-	BrushTireModel(tire, contactPoint);
-	pureFz *= 1;
-}
-
+//if (ndAbs(tire->m_normalizedSteering) > 0.1)
+//{
+//	ndFloat32 z = LateralForce(frictionModel.m_lateralPacejka, normalFrictionForce, sideSlipAngle);
+//	ndFloat32 x = LongitudinalForce(frictionModel.m_longitudinalPacejka, normalFrictionForce, longitudialSlip);
+//	BrushTireModel(tire, contactPoint);
+//	pureFz *= 1;
+//}
 
 	contactPoint.m_material.m_staticFriction1 = ndAbs(fz);
 	contactPoint.m_material.m_dynamicFriction1 = ndAbs(fz);
@@ -797,8 +793,6 @@ if (ndAbs(tire->m_normalizedSteering) > 0.1)
 	contactPoint.m_material.m_dynamicFriction0 = ndAbs(fx);
 	ndUnsigned32 newFlags = contactPoint.m_material.m_flags | m_override0Friction | m_override1Friction;
 	contactPoint.m_material.m_flags = newFlags;
-
-	//BrushTireModel(tire, contactPoint);
 }
 
 void ndMultiBodyVehicle::PostUpdate(ndFloat32)

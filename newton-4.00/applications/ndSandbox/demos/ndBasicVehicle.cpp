@@ -35,7 +35,7 @@ class ndVehicleDectriptorViper : public ndVehicleDectriptor
 	{
 		m_useHardSolverMode = true;
 		//m_useHardSolverMode = false;
-		m_comDisplacement = ndVector(0.25f, -0.4f, 0.0f, 0.0f);
+		m_comDisplacement = ndVector(0.25f, -0.5f, 0.0f, 0.0f);
 
 		ndFloat32 idleTorquePoundFoot = 300.0f;
 		ndFloat32 idleRmp = 700.0f;
@@ -49,17 +49,13 @@ class ndVehicleDectriptorViper : public ndVehicleDectriptor
 
 		m_frontTire.m_mass = 25.0f;
 		m_frontTire.m_handBrakeTorque = 0.0f;
-		//m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		m_frontTire.m_frictionModel = ndTireFrictionModel::m_pacejka;
-		//m_frontTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
-		//m_frontTire.m_laterialStiffness = m_frontTire.m_longitudinalStiffness;
 
 		m_rearTire.m_mass = 25.0f;
 		m_rearTire.m_handBrakeTorque = 100000.0f;
-		//m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
 		m_rearTire.m_frictionModel = ndTireFrictionModel::m_pacejka;
-		//m_rearTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
-		//m_rearTire.m_laterialStiffness = 1.25f * m_rearTire.m_longitudinalStiffness;
+		m_frontTire.m_frictionModel = ndTireFrictionModel::m_pacejka;
+		//m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
+		//m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
 
 		m_rearTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
 		m_frontTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
