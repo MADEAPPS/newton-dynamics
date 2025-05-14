@@ -175,11 +175,13 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_rearTire.m_brakeTorque = 1500.0f;
 	m_rearTire.m_handBrakeTorque = 1000.0f;
 	
-	m_rearTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
-	m_frontTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
+	//m_rearTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
+	//m_frontTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
 	
-	m_rearTire.m_laterialStiffness = 0.75f * DEMO_GRAVITY;
-	m_frontTire.m_laterialStiffness = 0.75f * DEMO_GRAVITY;
+	//m_rearTire.m_laterialStiffness = 0.75f * DEMO_GRAVITY;
+	//m_frontTire.m_laterialStiffness = 0.75f * DEMO_GRAVITY;
+	m_rearTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
+	m_frontTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
 
 	m_motorMass = 20.0f;
 	m_motorRadius = 0.25f;
