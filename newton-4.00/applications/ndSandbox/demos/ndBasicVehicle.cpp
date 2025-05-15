@@ -128,7 +128,7 @@ class ndVehicleDectriptorMonsterTruck0: public ndVehicleDectriptor
 		m_engine.Init(idleTorquePoundFoot, idleRmp, 
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
-		m_comDisplacement = ndVector(0.0f, -0.8f, 0.0f, 0.0f);
+		m_comDisplacement = ndVector(0.0f, -0.9f, 0.0f, 0.0f);
 
 		m_frontTire.m_mass = 100.0f;
 		m_frontTire.m_verticalOffset = 0.0f;
@@ -463,7 +463,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	matrix.m_posit.m_x += 5.0f;
 	//TestPlayerCapsuleInteraction(scene, matrix);
 	
-	matrix.m_posit.m_x += 30.0f;
+	matrix.m_posit.m_x += 40.0f;
 	matrix.m_posit.m_z += 5.0f;
 	AddPlanks(scene, matrix, 60.0f, 5);
 
