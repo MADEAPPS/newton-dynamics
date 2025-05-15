@@ -1073,7 +1073,9 @@ void ndMultiBodyVehicle::ApplyTireModel(ndFixSizeArray<ndTireContactPair, 128>& 
 						break;
 					}
 
-					case ndTireFrictionModel::m_pacejka:
+					case ndTireFrictionModel::m_pacejkaSport:
+					case ndTireFrictionModel::m_pacejkaTruck:
+					case ndTireFrictionModel::m_pacejkaUtility:
 					{
 						PacejkaTireModel(tire, contactPoint);
 						contact->InvalicatdeCache();

@@ -53,13 +53,15 @@ class ndTireFrictionModel
 	{
 		m_coulomb,
 		m_brushModel,
-		m_pacejka,
+		m_pacejkaSport,
+		m_pacejkaTruck,
+		m_pacejkaUtility,
+		m_pacejkaCustom,
 		m_coulombCicleOfFriction,
 	};
 
 	ndTireFrictionModel()
 		:m_brush()
-		//,m_lateralPacejka(ndFloat32(0.34f), ndFloat32(1.5f), ndFloat32(0.5f), ndFloat32(-0.74f), ndFloat32(0.0f), ndFloat32(0.01f))
 		,m_lateralPacejka(ndFloat32(0.01f), ndFloat32(2.85f), ndFloat32(0.2f), ndFloat32(1.42f), ndFloat32(0.0f), ndFloat32(0.01f))
 		,m_longitudinalPacejka(ndFloat32(0.5f), ndFloat32(1.65f), ndFloat32(1.0f), ndFloat32(0.8f), ndFloat32(0.0f), ndFloat32(0.0f))
 		,m_frictionModel(m_brushModel)
@@ -69,9 +71,6 @@ class ndTireFrictionModel
 	ndBrushTireModel m_brush;
 	ndPacejkaTireModel m_lateralPacejka;
 	ndPacejkaTireModel m_longitudinalPacejka;
-
-	//ndFloat32 m_laterialStiffness;
-	//ndFloat32 m_longitudinalStiffness;
 	ndFrictionModel m_frictionModel;
 };
 
@@ -82,7 +81,6 @@ class ndMultiBodyVehicleTireJointInfo : public ndWheelDescriptor, public ndTireF
 		:ndWheelDescriptor()
 		,ndTireFrictionModel()
 	{
-		ndPacejkaTireModel pacejkaLongitudical(0.5f, 1.65f, 1.0f, 0.8f, 0.0f, 0.0f);
 	}
 
 	ndMultiBodyVehicleTireJointInfo(const ndWheelDescriptor& info, const ndTireFrictionModel& frictionModel)

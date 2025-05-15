@@ -52,8 +52,8 @@ class ndVehicleDectriptorViper : public ndVehicleDectriptor
 		m_rearTire.m_handBrakeTorque = 100000.0f;
 		m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
 		m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		m_rearTire.m_frictionModel = ndTireFrictionModel::m_pacejka;
-		m_frontTire.m_frictionModel = ndTireFrictionModel::m_pacejka;
+		m_rearTire.m_frictionModel = ndTireFrictionModel::m_pacejkaSport;
+		m_frontTire.m_frictionModel = ndTireFrictionModel::m_pacejkaSport;
 
 		m_rearTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
 		m_frontTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
@@ -102,10 +102,10 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_torsionBarType = m_fourWheelAxle;
 		m_differentialType = m_fourWheeldrive;
 
-		m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		m_rearTire.m_frictionModel = ndTireFrictionModel::m_pacejka;
-		m_frontTire.m_frictionModel = ndTireFrictionModel::m_pacejka;
+		//m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
+		//m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
+		m_rearTire.m_frictionModel = ndTireFrictionModel::m_pacejkaSport;
+		m_frontTire.m_frictionModel = ndTireFrictionModel::m_pacejkaSport;
 
 		m_rearTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
 		m_frontTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
@@ -128,36 +128,36 @@ class ndVehicleDectriptorMonsterTruck0: public ndVehicleDectriptor
 		m_engine.Init(idleTorquePoundFoot, idleRmp, 
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
-		m_comDisplacement = ndVector(0.0f, -0.9f, 0.0f, 0.0f);
+		m_comDisplacement = ndVector(0.0f, -0.6f, 0.0f, 0.0f);
 
-		m_frontTire.m_mass = 100.0f;
+		m_frontTire.m_mass = 150.0f;
 		m_frontTire.m_verticalOffset = 0.0f;
 		m_frontTire.m_steeringAngle = 35.0f * ndDegreeToRad;
 		m_frontTire.m_springK = 500.0f;
-		m_frontTire.m_damperC = 50.0f;
-		m_frontTire.m_regularizer = 0.2f;
+		m_frontTire.m_damperC = 20.0f;
+		m_frontTire.m_regularizer = 0.05f;
 		m_frontTire.m_lowerStop = -0.05f;
 		m_frontTire.m_upperStop = 0.4f;
 		m_frontTire.m_brakeTorque = 1000.0f;
 		m_frontTire.m_handBrakeTorque = 0.0f;
 
-		m_rearTire.m_mass = 100.0f;
+		m_rearTire.m_mass = 150.0f;
 		m_rearTire.m_verticalOffset = 0.0f;
 		m_rearTire.m_steeringAngle = 0.0f;
 		m_rearTire.m_springK = 500.0f;
-		m_rearTire.m_damperC = 50.0f;
-		m_rearTire.m_regularizer = 0.2f;
+		m_rearTire.m_damperC = 20.0f;
+		m_rearTire.m_regularizer = 0.05f;
 		m_rearTire.m_lowerStop = -0.05f;
 		m_rearTire.m_upperStop = 0.4f;
 		m_rearTire.m_brakeTorque = 5000.0f;
-		m_rearTire.m_handBrakeTorque = 1000000.0f;
+		m_rearTire.m_handBrakeTorque = 100000.0f;
 		m_torsionBarType = m_fourWheelAxle;
 		m_differentialType = m_fourWheeldrive;
 
 		m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
 		m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		m_rearTire.m_frictionModel = ndTireFrictionModel::m_pacejka;
-		m_frontTire.m_frictionModel = ndTireFrictionModel::m_pacejka;
+		m_rearTire.m_frictionModel = ndTireFrictionModel::m_pacejkaUtility;
+		m_frontTire.m_frictionModel = ndTireFrictionModel::m_pacejkaUtility;
 
 		m_rearTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
 		m_frontTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
@@ -435,19 +435,19 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	scene->Set2DDisplayRenderFunction(vehicleUI);
 	
 	//ndSharedPtr<ndModel> vehicle0 (CreateBasicVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
-	ndSharedPtr<ndModel> vehicle1 (CreateBasicVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f,  -6.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
-	//ndSharedPtr<ndModel> vehicle2 (CreateBasicVehicle(scene, monterTruckDesc0, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 0.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
+	//ndSharedPtr<ndModel> vehicle1 (CreateBasicVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f,  -6.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
+	ndSharedPtr<ndModel> vehicle2 (CreateBasicVehicle(scene, monterTruckDesc0, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 0.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
 	//ndSharedPtr<ndModel> vehicle3 (CreateBasicVehicle(scene, monterTruckDesc1, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 6.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
 
 	//world->AddModel(vehicle0);
 	//vehicle0->AddBodiesAndJointsToWorld();
 
-	world->AddModel(vehicle1);
-	vehicle1->AddBodiesAndJointsToWorld();
+	//world->AddModel(vehicle1);
+	//vehicle1->AddBodiesAndJointsToWorld();
 	
-	//world->AddModel(vehicle2);
-	//vehicle2->AddBodiesAndJointsToWorld();
-	//
+	world->AddModel(vehicle2);
+	vehicle2->AddBodiesAndJointsToWorld();
+	
 	//world->AddModel(vehicle3);
 	//vehicle3->AddBodiesAndJointsToWorld();
 
@@ -455,7 +455,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//vehicle1->RemoveBodiesAndJointsFromWorld();
 	//world->RemoveModel(*vehicle1);
 
-	ndSharedPtr<ndModel> vehicle(vehicle1);
+	ndSharedPtr<ndModel> vehicle(vehicle2);
 	ndVehicleCommonNotify* const notifyCallback = (ndVehicleCommonNotify*)*vehicle->GetNotifyCallback();
 	notifyCallback->SetAsPlayer(scene);
 	matrix.m_posit.m_x += 5.0f;

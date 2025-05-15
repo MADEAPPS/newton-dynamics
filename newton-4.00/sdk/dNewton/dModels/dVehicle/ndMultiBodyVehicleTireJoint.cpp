@@ -14,6 +14,15 @@
 #include "ndMultiBodyVehicle.h"
 #include "ndMultiBodyVehicleTireJoint.h"
 
+static ndTireFrictionModel::ndPacejkaTireModel pacejkaSportLateral(ndFloat32(0.01f), ndFloat32(2.85f), ndFloat32(0.2f), ndFloat32(1.42f), ndFloat32(0.0f), ndFloat32(0.01f));
+static ndTireFrictionModel::ndPacejkaTireModel m_pacejkaSportLongitudinal(ndFloat32(0.5f), ndFloat32(1.65f), ndFloat32(1.0f), ndFloat32(0.8f), ndFloat32(0.0f), ndFloat32(0.0f));
+
+static ndTireFrictionModel::ndPacejkaTireModel pacejkaUtilityLateral(ndFloat32(0.01f), ndFloat32(2.85f), ndFloat32(0.2f), ndFloat32(1.42f), ndFloat32(0.0f), ndFloat32(0.01f));
+static ndTireFrictionModel::ndPacejkaTireModel m_pacejkaUtilityLongitudinal(ndFloat32(0.2f), ndFloat32(1.4), ndFloat32(1.0f), ndFloat32(-9.8f), ndFloat32(0.0f), ndFloat32(0.0f));
+
+static ndTireFrictionModel::ndPacejkaTireModel pacejkaTruckLateral(ndFloat32(0.01f), ndFloat32(2.85f), ndFloat32(0.2f), ndFloat32(1.42f), ndFloat32(0.0f), ndFloat32(0.01f));
+static ndTireFrictionModel::ndPacejkaTireModel m_pacejkaTruckLongitudinal(ndFloat32(0.5f), ndFloat32(1.65f), ndFloat32(1.0f), ndFloat32(0.8f), ndFloat32(0.0f), ndFloat32(0.0f));
+
 ndTireFrictionModel::ndBrushTireModel::ndBrushTireModel()
 	:m_laterialStiffness(ndFloat32(10.0f))
 	,m_longitudinalStiffness(ndFloat32(10.0f))
@@ -96,8 +105,27 @@ ndMultiBodyVehicleTireJoint::ndMultiBodyVehicleTireJoint(const ndMatrix& pinAndP
 	,m_longitudinalSlip(ndFloat32(0.0f))
 	,m_normalizedAligningTorque(ndFloat32(0.0f))
 {
-	//m_frictionModel.m_laterialStiffness = ndMax(ndAbs(m_frictionModel.m_laterialStiffness), ndFloat32(1.0f));
-	//m_frictionModel.m_longitudinalStiffness = ndMax(ndAbs(m_frictionModel.m_longitudinalStiffness), ndFloat32(1.0f));
+	switch (m_frictionModel.m_frictionModel)
+	{
+		case ndTireFrictionModel::m_pacejkaSport:
+			m_frictionModel.m_lateralPacejka = pacejkaSportLateral;
+			m_frictionModel.m_longitudinalPacejka = m_pacejkaSportLongitudinal;
+			break;
+
+		case ndTireFrictionModel::m_pacejkaUtility:
+			m_frictionModel.m_lateralPacejka = pacejkaUtilityLateral;
+			m_frictionModel.m_longitudinalPacejka = m_pacejkaUtilityLongitudinal;
+			break;
+
+		case ndTireFrictionModel::m_pacejkaTruck:
+			m_frictionModel.m_lateralPacejka = pacejkaTruckLateral;
+			m_frictionModel.m_longitudinalPacejka = m_pacejkaTruckLongitudinal;
+			break;
+
+		case ndTireFrictionModel::m_pacejkaCustom:
+		default:
+			break;
+	}
 }
 
 ndMultiBodyVehicleTireJoint::~ndMultiBodyVehicleTireJoint()
