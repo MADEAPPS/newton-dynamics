@@ -178,6 +178,14 @@ class ndVehicleEntityNotify : public ndDemoEntityNotify
 class ndVehicleCommonNotify : public ndModelNotify
 {
 	public:
+	enum ndDriveState
+	{
+		m_parked,
+		m_idle,
+		m_forwardGears,
+
+	};
+
 	enum ndInputButtons
 	{
 		m_handBreakButton = ndGameControllerInputs::m_button_00,
@@ -233,6 +241,8 @@ class ndVehicleCommonNotify : public ndModelNotify
 	bool m_startEngine;
 	bool m_sleepingState;
 	bool m_isManualTransmission;
+
+	ndDriveState m_driverState;
 };
 
 #endif

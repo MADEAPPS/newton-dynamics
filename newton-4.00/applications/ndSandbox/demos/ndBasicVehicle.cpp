@@ -445,13 +445,13 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	vehicle0->AddBodiesAndJointsToWorld();
 
 	world->AddModel(vehicle1);
-	vehicle1->AddBodiesAndJointsToWorld();
+	//vehicle1->AddBodiesAndJointsToWorld();
 	
 	world->AddModel(vehicle2);
-	vehicle2->AddBodiesAndJointsToWorld();
+	//vehicle2->AddBodiesAndJointsToWorld();
 	
 	world->AddModel(vehicle3);
-	vehicle3->AddBodiesAndJointsToWorld();
+	//vehicle3->AddBodiesAndJointsToWorld();
 
 	//test removing model from world
 	//vehicle1->RemoveBodiesAndJointsFromWorld();
@@ -466,11 +466,11 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	ndVehicleCommonNotify* const notifyCallback = (ndVehicleCommonNotify*)*vehicle->GetNotifyCallback();
 	notifyCallback->SetAsPlayer(scene);
 	matrix.m_posit.m_x += 5.0f;
-	TestPlayerCapsuleInteraction(scene, matrix);
+	//TestPlayerCapsuleInteraction(scene, matrix);
 	
 	matrix.m_posit.m_x += 20.0f;
 	matrix.m_posit.m_z += 5.0f;
-	AddPlanks(scene, matrix, 60.0f, 5);
+	//AddPlanks(scene, matrix, 60.0f, 5);
 
 	ndQuaternion rot;
 	ndVector origin(-10.0f, 2.0f, -10.0f, 1.0f);
