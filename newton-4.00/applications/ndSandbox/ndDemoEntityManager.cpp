@@ -704,6 +704,19 @@ bool ndDemoEntityManager::GetKeyState(ndInt32 key) const
 	return state;
 }
 
+bool ndDemoEntityManager::AnyKeyDown() const
+{
+	const ImGuiIO& io = ImGui::GetIO();
+	for (ndInt32 i = 0; i < ImGuiKey_COUNT; ++i)
+	{
+		if (io.KeysDown[i])
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 ndSharedPtr<ndAnimationSequence> ndDemoEntityManager::GetAnimationSequence(ndMeshLoader& loader, const char* const fileName)
 {
 	ndTree<ndSharedPtr<ndAnimationSequence>, ndString>::ndNode* node = m_animationCache.Find(fileName);
@@ -767,23 +780,55 @@ bool ndDemoEntityManager::JoystickDetected() const
 
 void ndDemoEntityManager::GetJoystickAxis (ndFixSizeArray<ndFloat32, 8>& axisValues)
 {
-	//ndAssert(JoystickDetected());
 	if (JoystickDetected())
 	{
-		ndInt32 axisCount = 0;
-		axisValues.SetCount(0);
-		const float* const axis = glfwGetJoystickAxes(0, &axisCount);
-		axisCount = ndMin(axisCount, axisValues.GetCapacity());
-		for (ndInt32 i = 0; i < axisCount; ++i)
+		bool isInitialized = false;
+		static ndFixSizeArray<ndFloat32, 8> initialValues;
+		if (!initialValues.GetCount())
 		{
-			axisValues.PushBack(axis[i]);
+			ndInt32 axisCount = 0;
+			const float* const axis = glfwGetJoystickAxes(0, &axisCount);
+			axisCount = ndMin(axisCount, axisValues.GetCapacity());
+			for (ndInt32 i = 0; i < axisCount; ++i)
+			{
+				initialValues.PushBack(axis[i]);
+			}
+		}
+		
+		if (!isInitialized)
+		{
+			ndInt32 axisCount = 0;
+			const float* const axis = glfwGetJoystickAxes(0, &axisCount);
+			for (ndInt32 i = 0; i < axisCount; ++i)
+			{
+				ndFloat32 diff = ndAbs(axis[i] - initialValues[i]);
+				isInitialized = isInitialized || (diff != ndFloat32(0.0f));
+			}
+		}
+
+		axisValues.SetCount(0);
+		for (ndInt32 i = 0; i < axisValues.GetCapacity(); ++i)
+		{
+			axisValues.PushBack(ndFloat32 (1.0f));
+		}
+
+		if (isInitialized)
+		{
+			ndInt32 axisCount = 0;
+			const float* const axis = glfwGetJoystickAxes(0, &axisCount);
+			axisCount = ndMin(axisCount, axisValues.GetCapacity());
+
+			axisValues.SetCount(0);
+			for (ndInt32 i = 0; i < axisCount; ++i)
+			{
+				axisValues.PushBack(axis[i]);
+			}
 		}
 	}
 }
 
 void ndDemoEntityManager::GetJoystickButtons(ndFixSizeArray<char, 32>& axisbuttons)
 {
-	//ndAssert(JoystickDetected());
 	if (JoystickDetected())
 	{
 		ndInt32 buttonsCount = 0;

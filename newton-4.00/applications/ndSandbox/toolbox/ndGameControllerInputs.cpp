@@ -24,6 +24,10 @@ ndGameControllerInputs::~ndGameControllerInputs()
 
 bool ndGameControllerInputs::GetKeyboardInputs(ndDemoEntityManager* const scene)
 {
+	if (!scene->AnyKeyDown())
+	{
+		return false;
+	}
 	m_buttons.SetCount(m_buttonCount);
 	m_buttons[m_button_00] = scene->GetKeyState(' ');
 	m_buttons[m_button_01] = scene->GetKeyState('>') || scene->GetKeyState('.');
@@ -43,28 +47,6 @@ bool ndGameControllerInputs::GetKeyboardInputs(ndDemoEntityManager* const scene)
 	m_axis[m_azis_01] = ndFloat32(scene->GetKeyState('W')) ? 1.0f : 0.0f;
 	m_axis[m_azis_02] = ndFloat32(scene->GetKeyState('S') ? 1.0f : 0.0f);
 	m_axis[m_azis_03] = ndFloat32(0.0f);
-
-//static int frame;
-//frame++;
-//bool check = false;
-//for (ndInt32 i = 0; i < m_buttons.GetCount(); ++i)
-//{
-//	if (m_buttons[i])
-//	{
-//		check = true;
-//	}
-//}
-//if (check)
-//{
-//	ndTrace(("\n%d: ", frame));
-//	for (ndInt32 i = 0; i < m_buttons.GetCount(); ++i)
-//	{
-//		if (m_buttons[i])
-//		{
-//			ndTrace(("(%d %d) ", i, m_buttons[i]));
-//		}
-//	}
-//}
 	
 	char ret = false;
 	for (ndInt32 i = 0; i < m_buttons.GetCount(); ++i)
@@ -264,8 +246,8 @@ void ndGameControllerInputs::GetWheelJoystickInputs(ndDemoEntityManager* const s
 	}
 	m_axis[m_azis_00] = -m_axis[m_azis_00] * 2.0f; 
 	m_axis[m_azis_01] = (1.0f - m_axis[m_azis_01]) * 0.5f;
-	//m_axis[m_azis_02] = (1.0f - m_axis[m_azis_02]) * 0.5f;
 	m_axis[m_azis_02] = ndFloat32 (1.0f) - ndClamp(m_axis[m_azis_02], ndFloat32(0.0f), ndFloat32(1.0f));
+	m_axis[m_azis_03] = ndFloat32(0.0f);
 	ndTrace(("%f\n", m_axis[m_azis_02]));
 }
 
@@ -273,27 +255,21 @@ void ndGameControllerInputs::Update(ndDemoEntityManager* const scene)
 {
 	if (scene->JoystickDetected())
 	{
-		if (!GetKeyboardInputs(scene))
+		char joystickName[256];
+		strcpy(&joystickName[0], glfwGetJoystickName(0));
+		strtolwr(joystickName);
+		if (strstr(joystickName, "wheel"))
 		{
-			char joystickName[256];
-			strcpy(&joystickName[0], glfwGetJoystickName(0));
-			strtolwr(joystickName);
-			if (strstr(joystickName, "wheel"))
-			{
-				GetWheelJoystickInputs(scene);
-			}
-			else if (strstr(joystickName, "xbox"))
-			{
-				GetXboxJoystickInputs(scene);
-			}
-			else
-			{
-				GetJoystickInputs(scene);
-			}
+			GetWheelJoystickInputs(scene);
+		}
+		else if (strstr(joystickName, "xbox"))
+		{
+			GetXboxJoystickInputs(scene);
+		}
+		else
+		{
+			GetJoystickInputs(scene);
 		}
 	}
-	else
-	{
-		GetKeyboardInputs(scene);
-	}
+	GetKeyboardInputs(scene);
 }

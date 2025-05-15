@@ -168,6 +168,7 @@ class ndDemoEntityManager : public ndList <ndSharedPtr<ndDemoEntity>>
 	void PushTransparentMesh(const ndDemoMeshInterface* const mesh, const ndMatrix& modelMatrix);
 	void Set2DDisplayRenderFunction(ndSharedPtr<ndUIEntity>& demoGui);
 
+	bool AnyKeyDown() const;
 	bool IsShiftKeyDown () const;
 	bool JoystickDetected() const;
 	bool IsControlKeyDown () const;
