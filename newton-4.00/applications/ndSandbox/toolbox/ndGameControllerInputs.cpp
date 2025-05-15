@@ -24,7 +24,7 @@ ndGameControllerInputs::~ndGameControllerInputs()
 
 bool ndGameControllerInputs::GetKeyboardInputs(ndDemoEntityManager* const scene)
 {
-	if (!scene->AnyKeyDown())
+	if (scene->JoystickDetected() && !scene->AnyKeyDown())
 	{
 		return false;
 	}
