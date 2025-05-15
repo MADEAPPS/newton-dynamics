@@ -790,12 +790,15 @@ void ndVehicleCommonNotify::ApplyInputs(ndFloat32)
 				gearBox->SetRatio(0.0f);
 				m_driverState = m_idle;
 			}
+			if (m_reverseGear.Update(buttons[m_reverseGearButton] ? true : false))
+			{
+				m_driverState = m_driveReverseFromForward;
+			}
 			if (m_reverseGear.Update(buttons[m_neutralGearButton] ? true : false))
 			{
 				gearBox->SetRatio(0.0f);
 				m_driverState = m_driveForwardGearDelay;
 			}
-
 			if (m_forwardGearUp.Update(buttons[m_upGearButton] ? true : false))
 			{
 				m_driverState = m_driveShitGearUp;
@@ -804,6 +807,25 @@ void ndVehicleCommonNotify::ApplyInputs(ndFloat32)
 			if (m_forwardGearUp.Update(buttons[m_downGearButton] ? true : false))
 			{
 				m_driverState = m_driveShitGearDown;
+			}
+			break;
+		}
+
+		case m_driveReverseFromForward:
+		{
+			ndFloat32 gearRatio = gearBox->GetRatio();
+			if (gearRatio == ndFloat32 (0.0f))
+			{
+				m_currentGear = sizeof(m_desc.m_transmission.m_forwardRatios) / sizeof(m_desc.m_transmission.m_forwardRatios[0]);
+				ndFloat32 reverseGearRatio = m_desc.m_transmission.m_ratios[m_currentGear];
+				ndFloat32 gearGain = m_desc.m_transmission.m_crownGearRatio * reverseGearRatio;
+				gearBox->SetRatio(gearGain);
+
+				m_driverState = m_driveReverse;
+			}
+			else
+			{
+				m_driverState = m_driveForward;
 			}
 			break;
 		}

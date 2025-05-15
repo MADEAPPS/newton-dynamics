@@ -187,6 +187,7 @@ class ndVehicleCommonNotify : public ndModelNotify
 		m_driveShitGearUp,
 		m_driveShitGearDown,
 		m_driveForwardGearDelay,
+		m_driveReverseFromForward,
 	};
 
 	enum ndInputButtons

@@ -445,22 +445,17 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	vehicle0->AddBodiesAndJointsToWorld();
 
 	world->AddModel(vehicle1);
-	//vehicle1->AddBodiesAndJointsToWorld();
+	vehicle1->AddBodiesAndJointsToWorld();
 	
 	world->AddModel(vehicle2);
-	//vehicle2->AddBodiesAndJointsToWorld();
+	vehicle2->AddBodiesAndJointsToWorld();
 	
 	world->AddModel(vehicle3);
-	//vehicle3->AddBodiesAndJointsToWorld();
+	vehicle3->AddBodiesAndJointsToWorld();
 
 	//test removing model from world
 	//vehicle1->RemoveBodiesAndJointsFromWorld();
 	//world->RemoveModel(*vehicle1);
-
-//ndMatrix matrix1(vehicle0->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix());
-//matrix1.m_posit = vehicle0->GetAsModelArticulation()->GetRoot()->m_body->GetGlobalGetCentreOfMass();
-//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(matrix1, vehicle0->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-//world->AddJoint(fixJoint);
 
 	ndSharedPtr<ndModel> vehicle(vehicle0);
 	ndVehicleCommonNotify* const notifyCallback = (ndVehicleCommonNotify*)*vehicle->GetNotifyCallback();
@@ -468,9 +463,9 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	matrix.m_posit.m_x += 5.0f;
 	//TestPlayerCapsuleInteraction(scene, matrix);
 	
-	matrix.m_posit.m_x += 20.0f;
+	matrix.m_posit.m_x += 30.0f;
 	matrix.m_posit.m_z += 5.0f;
-	//AddPlanks(scene, matrix, 60.0f, 5);
+	AddPlanks(scene, matrix, 60.0f, 5);
 
 	ndQuaternion rot;
 	ndVector origin(-10.0f, 2.0f, -10.0f, 1.0f);
