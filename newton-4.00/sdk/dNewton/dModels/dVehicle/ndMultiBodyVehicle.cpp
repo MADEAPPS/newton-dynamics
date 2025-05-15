@@ -478,6 +478,7 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	}
 
 	// draw vehicle coordinade system;
+#if 0
 	const ndBodyKinematic* const chassis = m_chassis;
 	ndAssert(chassis);
 	ndMatrix chassisMatrix(chassis->GetMatrix());
@@ -488,7 +489,7 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	ndVector effectiveCom(chassisMatrix.m_posit.Scale(totalMass));
 	
 	// draw front direction for side slip angle reference
-		// draw velocity vector
+	// draw velocity vector
 	ndVector veloc(chassis->GetVelocity());
 	ndVector p0(chassisMatrix.m_posit + m_localFrame.m_up.Scale(1.0f));
 	ndVector p1(p0 + chassisMatrix.RotateVector(m_localFrame.m_front).Scale(2.0f));
@@ -578,6 +579,73 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	chassisMatrix.m_posit = effectiveCom;
 	chassisMatrix.m_posit.m_w = ndFloat32(1.0f);
 	context.DrawFrame(chassisMatrix);
+#endif
+
+	const ndBodyKinematic* const chassis = m_chassis;
+	ndAssert(chassis);
+	const ndMatrix chassisMatrix(chassis->GetMatrix());
+
+	// draw center of mass;
+	const ndCenterOfMassDynamics kinematioc (CalculateCentreOfMassKinematics(chassisMatrix));
+	context.DrawFrame(kinematioc.m_centerOfMass);
+
+	// draw vehicle velocity
+	const ndVector veloc(kinematioc.m_veloc);
+	const ndVector p0(kinematioc.m_centerOfMass.m_posit + kinematioc.m_centerOfMass.m_up.Scale(1.5f));
+	const ndVector p1(p0 + kinematioc.m_centerOfMass.m_front.Scale(2.0f));
+	const ndVector p2(p0 + kinematioc.m_centerOfMass.RotateVector(veloc.Scale(0.25f)));
+
+	context.DrawLine(p0, p2, ndVector(1.0f, 1.0f, 0.0f, 0.0f));
+	context.DrawLine(p0, p1, ndVector(1.0f, 0.0f, 0.0f, 0.0f));
+
+	// draw tires info
+	ndFloat32 scale = ndFloat32(3.0f);
+	const ndVector forceColor(ndFloat32(0.8f), ndFloat32(0.8f), ndFloat32(0.8f), ndFloat32(0.0f));
+	const ndVector lateralColor(ndFloat32(0.3f), ndFloat32(0.7f), ndFloat32(0.0f), ndFloat32(0.0f));
+	const ndVector longitudinalColor(ndFloat32(0.7f), ndFloat32(0.3f), ndFloat32(0.0f), ndFloat32(0.0f));
+	ndVector weight(chassis->GetForce().Scale(scale * chassis->GetInvMass() / m_downForce.m_gravity));
+	for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+	{
+		ndMultiBodyVehicleTireJoint* const tireJoint = node->GetInfo();
+		ndBodyKinematic* const tireBody = tireJoint->GetBody0()->GetAsBodyDynamic();
+
+		tireJoint->DebugJoint(context);
+
+		// draw tire forces
+		const ndBodyKinematic::ndContactMap& contactMap = tireBody->GetContactMap();
+		ndFloat32 tireGravities = scale / (kinematioc.m_mass * m_downForce.m_gravity);
+		ndBodyKinematic::ndContactMap::Iterator it(contactMap);
+		for (it.Begin(); it; it++)
+		{
+			ndContact* const contact = *it;
+			if (contact->IsActive())
+			{
+				const ndContactPointList& contactPoints = contact->GetContactPoints();
+				for (ndContactPointList::ndNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
+				{
+					const ndContactMaterial& contactPoint = contactNode->GetInfo();
+					ndMatrix frame(contactPoint.m_normal, contactPoint.m_dir0, contactPoint.m_dir1, contactPoint.m_point);
+
+					ndVector localPosit(m_localFrame.UntransformVector(chassisMatrix.UntransformVector(contactPoint.m_point)));
+					ndFloat32 offset = (localPosit.m_z > ndFloat32(0.0f)) ? ndFloat32(0.2f) : ndFloat32(-0.2f);
+					frame.m_posit += contactPoint.m_dir0.Scale(offset);
+					frame.m_posit += contactPoint.m_normal.Scale(0.1f);
+
+					// normal force
+					ndFloat32 normalForce = -tireGravities * contactPoint.m_normal_Force.m_force;
+					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_normal.Scale(normalForce), forceColor);
+
+					// lateral force
+					ndFloat32 lateralForce = -tireGravities * contactPoint.m_dir0_Force.m_force;
+					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_dir0.Scale(lateralForce), lateralColor);
+
+					// longitudinal force
+					ndFloat32 longitudinalForce = tireGravities * contactPoint.m_dir1_Force.m_force;
+					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_dir1.Scale(longitudinalForce), longitudinalColor);
+				}
+			}
+		}
+	}
 }
 
 void ndMultiBodyVehicle::CoulombTireModel(ndMultiBodyVehicleTireJoint* const joint, ndContactMaterial& contactPoint) const

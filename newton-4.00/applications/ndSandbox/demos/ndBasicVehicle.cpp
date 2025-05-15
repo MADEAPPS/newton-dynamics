@@ -76,10 +76,10 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_engine.Init(idleTorquePoundFoot, idleRmp, 
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
-		m_comDisplacement = ndVector(0.0f, -1.0f, 0.0f, 0.0f);
+		m_comDisplacement = ndVector(0.0f, -0.65f, 0.0f, 0.0f);
 
 		m_frontTire.m_mass = 25.0f;
-		m_frontTire.m_verticalOffset = -0.15f;
+		m_frontTire.m_verticalOffset = 0.0f;
 		m_frontTire.m_steeringAngle = 35.0f * ndDegreeToRad;
 		m_frontTire.m_springK = 800.0f;
 		m_frontTire.m_damperC = 50.0f;
@@ -90,7 +90,7 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_frontTire.m_handBrakeTorque = 0.0f;
 
 		m_rearTire.m_mass = 25.0f;
-		m_rearTire.m_verticalOffset = -0.15f;
+		m_rearTire.m_verticalOffset = 0.0f;
 		m_rearTire.m_steeringAngle = 0.0f;
 		m_rearTire.m_springK = 800.0f;
 		m_rearTire.m_damperC = 50.0f;
@@ -254,7 +254,6 @@ static ndMultiBodyVehicle* CreateBasicVehicle(ndDemoEntityManager* const scene, 
 	const ndVehicleDectriptor& configuration = notifyCallback->m_desc;
 	vehicle->AddChassis(ndSharedPtr<ndBody>(notifyCallback->CreateChassis(scene, chassisEntity, configuration.m_chassisMass)));
 
-#if 1
 	ndBodyDynamic* const chassis = vehicle->GetChassis();
 	chassis->SetAngularDamping(ndVector(configuration.m_chassisAngularDrag));
 	
@@ -362,7 +361,6 @@ static ndMultiBodyVehicle* CreateBasicVehicle(ndDemoEntityManager* const scene, 
 	
 	// set a soft or hard mode
 	//vehicle->SetVehicleSolverModel(configuration.m_useHardSolverMode ? true : false);
-#endif
 	return vehicle;
 }
 
@@ -436,28 +434,28 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	ndSharedPtr<ndUIEntity> vehicleUI(new ndVehicleUI(scene));
 	scene->Set2DDisplayRenderFunction(vehicleUI);
 	
-	ndSharedPtr<ndModel> vehicle0 (CreateBasicVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
+	//ndSharedPtr<ndModel> vehicle0 (CreateBasicVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
 	ndSharedPtr<ndModel> vehicle1 (CreateBasicVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f,  -6.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
-	ndSharedPtr<ndModel> vehicle2 (CreateBasicVehicle(scene, monterTruckDesc0, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 0.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
-	ndSharedPtr<ndModel> vehicle3 (CreateBasicVehicle(scene, monterTruckDesc1, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 6.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
+	//ndSharedPtr<ndModel> vehicle2 (CreateBasicVehicle(scene, monterTruckDesc0, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 0.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
+	//ndSharedPtr<ndModel> vehicle3 (CreateBasicVehicle(scene, monterTruckDesc1, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 6.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
 
-	world->AddModel(vehicle0);
-	vehicle0->AddBodiesAndJointsToWorld();
+	//world->AddModel(vehicle0);
+	//vehicle0->AddBodiesAndJointsToWorld();
 
 	world->AddModel(vehicle1);
 	vehicle1->AddBodiesAndJointsToWorld();
 	
-	world->AddModel(vehicle2);
-	vehicle2->AddBodiesAndJointsToWorld();
-	
-	world->AddModel(vehicle3);
-	vehicle3->AddBodiesAndJointsToWorld();
+	//world->AddModel(vehicle2);
+	//vehicle2->AddBodiesAndJointsToWorld();
+	//
+	//world->AddModel(vehicle3);
+	//vehicle3->AddBodiesAndJointsToWorld();
 
 	//test removing model from world
 	//vehicle1->RemoveBodiesAndJointsFromWorld();
 	//world->RemoveModel(*vehicle1);
 
-	ndSharedPtr<ndModel> vehicle(vehicle0);
+	ndSharedPtr<ndModel> vehicle(vehicle1);
 	ndVehicleCommonNotify* const notifyCallback = (ndVehicleCommonNotify*)*vehicle->GetNotifyCallback();
 	notifyCallback->SetAsPlayer(scene);
 	matrix.m_posit.m_x += 5.0f;
@@ -465,7 +463,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	
 	matrix.m_posit.m_x += 40.0f;
 	matrix.m_posit.m_z += 5.0f;
-	AddPlanks(scene, matrix, 60.0f, 5);
+	//AddPlanks(scene, matrix, 60.0f, 5);
 
 	ndQuaternion rot;
 	ndVector origin(-10.0f, 2.0f, -10.0f, 1.0f);
