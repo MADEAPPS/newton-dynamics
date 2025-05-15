@@ -640,7 +640,7 @@ ndModelArticulation::ndCenterOfMassDynamics ndModelArticulation::CalculateCentre
 	dynamics.m_veloc = dynamics.m_momentum.Scale(ndFloat32(1.0f) / dynamics.m_mass);
 
 	dynamics.m_centerOfMass.m_front = localFrame.m_front;
-	dynamics.m_centerOfMass.m_up = localFrame.m_front;
+	dynamics.m_centerOfMass.m_up = localFrame.m_up;
 	dynamics.m_centerOfMass.m_right = localFrame.m_right;
 
 	return dynamics;
@@ -724,7 +724,7 @@ ndModelArticulation::ndCenterOfMassDynamics ndModelArticulation::CalculateCentre
 	dynamics.m_accel = dynamics.m_force.Scale(ndFloat32(1.0f) / dynamics.m_mass);
 
 	dynamics.m_centerOfMass.m_front = localFrame.m_front;
-	dynamics.m_centerOfMass.m_up = localFrame.m_front;
+	dynamics.m_centerOfMass.m_up = localFrame.m_up;
 	dynamics.m_centerOfMass.m_right = localFrame.m_right;
 
 	return dynamics;
