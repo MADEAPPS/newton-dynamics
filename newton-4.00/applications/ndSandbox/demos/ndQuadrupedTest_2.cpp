@@ -55,16 +55,17 @@ are more suitable for medium small systems.
 // to the environment with increasing complexity
 namespace ndQuadruped_2
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 
-	#define USE_SAC
+	#define USE_DDPG
 
-	#ifdef USE_SAC
-		#define USE_DDPG
-		#ifdef USE_DDPG
-			#define CONTROLLER_NAME "ndQuadruped_2-ddpg.dnn"
-		#else
+	#ifdef USE_DDPG
+		//#define USE_SAC
+
+		#ifdef USE_SAC
 			#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
+		#else
+			#define CONTROLLER_NAME "ndQuadruped_2-ddpg.dnn"
 		#endif
 	#else	
 		#define USE_PPO
@@ -303,14 +304,14 @@ namespace ndQuadruped_2
 			RobotModelNotify* m_robot;
 		};
 		
-#ifdef USE_SAC
+#ifdef USE_DDPG
 		class ndControllerTrainer : public ndBrainAgentDeterministicPolicyGradient_Agent
 #else
 		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Agent
 #endif
 		{
 			public:
-#ifdef USE_SAC
+#ifdef USE_DDPG
 			ndControllerTrainer(const ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>& master, RobotModelNotify* const robot)
 				:ndBrainAgentDeterministicPolicyGradient_Agent(master)
 #else
@@ -396,7 +397,7 @@ namespace ndQuadruped_2
 		{
 		}
 
-		#ifdef USE_SAC
+		#ifdef USE_DDPG
 		void SetControllerTrainer(const ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>& master)
 		#else
 		void SetControllerTrainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
@@ -1120,21 +1121,22 @@ namespace ndQuadruped_2
 			ndInt32 numberOfActions = m_actionsSize;
 			ndInt32 numberOfObservations = m_observationSize * 4 + 2;
 
-			#ifdef USE_SAC
+			#ifdef USE_DDPG
 				m_stopTraining = 500000;
 				ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
 				hyperParameters.m_numberOfActions = numberOfActions;
 				hyperParameters.m_numberOfObservations = numberOfObservations;
-				#ifdef USE_DDPG
-					m_outFile = fopen("ndQuadruped_2-ddpg.csv", "wb");
-					fprintf(m_outFile, "ddpgc\n");
-
-					m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
-				#else
+				#ifdef USE_SAC
 					m_outFile = fopen("ndQuadruped_2-sac.csv", "wb");
 					fprintf(m_outFile, "sac\n");
 
 					m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentSoftActorCritic_Trainer(hyperParameters));
+				#else
+					m_outFile = fopen("ndQuadruped_2-ddpg.csv", "wb");
+					fprintf(m_outFile, "ddpg\n");
+
+					m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
+
 				#endif
 			#else
 				m_stopTraining = 500 * 1000000;
@@ -1170,7 +1172,7 @@ namespace ndQuadruped_2
 			//world->AddJoint(fixJoint);
 
 			// add a hidden battery of model to generate trajectories in parallel
-#ifndef USE_SAC
+#ifndef USE_DDPG
 			ndInt32 countX = 10;
 			ndInt32 countZ = 10;
 			//countX = 0;
@@ -1345,7 +1347,7 @@ namespace ndQuadruped_2
 			}
 		}
 
-#ifdef USE_SAC
+#ifdef USE_DDPG
 		ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer> m_master;
 #else
 		ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
