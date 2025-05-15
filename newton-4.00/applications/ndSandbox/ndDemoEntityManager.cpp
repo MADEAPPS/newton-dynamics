@@ -811,6 +811,7 @@ void ndDemoEntityManager::GetJoystickAxis (ndFixSizeArray<ndFloat32, 8>& axisVal
 		{
 			axisValues.PushBack(ndFloat32 (1.0f));
 		}
+		axisValues[0] = 0.0f;
 
 		if (isInitialized)
 		{
