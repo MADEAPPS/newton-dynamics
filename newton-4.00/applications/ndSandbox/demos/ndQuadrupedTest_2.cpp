@@ -55,16 +55,24 @@ are more suitable for medium small systems.
 // to the environment with increasing complexity
 namespace ndQuadruped_2
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 
 	#define USE_SAC
 
 	#ifdef USE_SAC
 		#define USE_DDPG
-		#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
+		#ifdef USE_DDPG
+			#define CONTROLLER_NAME "ndQuadruped_2-ddpg.dnn"
+		#else
+			#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
+		#endif
 	#else	
 		#define USE_PPO
-		#define CONTROLLER_NAME "ndQuadruped_2-ppo.dnn"
+		#ifdef USE_PPO
+			#define CONTROLLER_NAME "ndQuadruped_2-ppo.dnn"
+		#else
+			#define CONTROLLER_NAME "ndQuadruped_2-vpg.dnn"
+		#endif
 	#endif
 
 	enum Actions
@@ -1103,7 +1111,7 @@ namespace ndQuadruped_2
 			,m_discountRewardFactor(0.99f)
 			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountRewardFactor))
 			,m_lastEpisode(0xffffffff)
-			,m_stopTraining(200 * 1000000)
+			,m_stopTraining(0)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
@@ -1113,7 +1121,7 @@ namespace ndQuadruped_2
 			ndInt32 numberOfObservations = m_observationSize * 4 + 2;
 
 			#ifdef USE_SAC
-				m_stopTraining = 200000;
+				m_stopTraining = 500000;
 				ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
 				hyperParameters.m_numberOfActions = numberOfActions;
 				hyperParameters.m_numberOfObservations = numberOfObservations;
@@ -1136,7 +1144,6 @@ namespace ndQuadruped_2
 				#ifdef USE_PPO
 					m_outFile = fopen("ndQuadruped_2-ppo.csv", "wb");
 					fprintf(m_outFile, "ppo\n");
-
 					m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
 				#else	
 					m_outFile = fopen("ndQuadruped_2-vpg.csv", "wb");
