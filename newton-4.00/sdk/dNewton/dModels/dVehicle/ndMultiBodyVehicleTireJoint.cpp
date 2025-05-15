@@ -17,7 +17,7 @@
 static ndTireFrictionModel::ndPacejkaTireModel pacejkaSportLateral(ndFloat32(0.01f), ndFloat32(2.85f), ndFloat32(0.2f), ndFloat32(1.42f), ndFloat32(0.0f), ndFloat32(0.01f));
 static ndTireFrictionModel::ndPacejkaTireModel m_pacejkaSportLongitudinal(ndFloat32(0.5f), ndFloat32(1.65f), ndFloat32(1.0f), ndFloat32(0.8f), ndFloat32(0.0f), ndFloat32(0.0f));
 
-static ndTireFrictionModel::ndPacejkaTireModel pacejkaUtilityLateral(ndFloat32(0.01f), ndFloat32(2.85f), ndFloat32(0.2f), ndFloat32(1.42f), ndFloat32(0.0f), ndFloat32(0.01f));
+static ndTireFrictionModel::ndPacejkaTireModel pacejkaUtilityLateral(ndFloat32(0.2f), ndFloat32(0.75f), ndFloat32(0.2f), ndFloat32(-2.5f), ndFloat32(0.0f), ndFloat32(0.01f));
 static ndTireFrictionModel::ndPacejkaTireModel m_pacejkaUtilityLongitudinal(ndFloat32(0.2f), ndFloat32(1.4), ndFloat32(1.0f), ndFloat32(-9.8f), ndFloat32(0.0f), ndFloat32(0.0f));
 
 static ndTireFrictionModel::ndPacejkaTireModel pacejkaTruckLateral(ndFloat32(0.01f), ndFloat32(2.85f), ndFloat32(0.2f), ndFloat32(1.42f), ndFloat32(0.0f), ndFloat32(0.01f));
