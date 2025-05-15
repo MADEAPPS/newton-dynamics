@@ -226,6 +226,10 @@ void ndGameControllerInputs::GetWheelJoystickInputs(ndDemoEntityManager* const s
 	for (ndInt32 i = 0; i < unmappedButtons.GetCount(); ++i)
 	{
 		m_buttons[buttonMapping[i]] = unmappedButtons[i];
+		//if (unmappedButtons[i])
+		//{
+		//	ndTrace(("(%d %d)\n", i, m_buttons[buttonMapping[i]]));
+		//}
 	}
 
 	if (!axisMapping.GetCount())
