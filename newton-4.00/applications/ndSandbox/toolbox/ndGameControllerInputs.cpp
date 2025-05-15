@@ -248,7 +248,7 @@ void ndGameControllerInputs::GetWheelJoystickInputs(ndDemoEntityManager* const s
 	m_axis[m_azis_01] = (1.0f - m_axis[m_azis_01]) * 0.5f;
 	m_axis[m_azis_02] = ndFloat32 (1.0f) - ndClamp(m_axis[m_azis_02], ndFloat32(0.0f), ndFloat32(1.0f));
 	m_axis[m_azis_03] = ndFloat32(0.0f);
-	ndTrace(("%f\n", m_axis[m_azis_02]));
+	//ndTrace(("%f\n", m_axis[m_azis_02]));
 }
 
 void ndGameControllerInputs::Update(ndDemoEntityManager* const scene)
