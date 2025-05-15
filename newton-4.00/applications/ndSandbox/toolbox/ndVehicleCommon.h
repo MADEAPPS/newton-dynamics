@@ -182,8 +182,11 @@ class ndVehicleCommonNotify : public ndModelNotify
 	{
 		m_parked,
 		m_idle,
-		m_forwardGears,
-
+		m_driveReverse,
+		m_driveForward,
+		m_driveShitGearUp,
+		m_driveShitGearDown,
+		m_driveForwardGearDelay,
 	};
 
 	enum ndInputButtons
@@ -237,10 +240,7 @@ class ndVehicleCommonNotify : public ndModelNotify
 	ndDemoEntityManager::ndKeyTrigger m_forwardGearDown;
 	ndDemoEntityManager::ndKeyTrigger m_manualTransmission;
 	bool m_isPlayer;
-	bool m_isParked;
-	bool m_startEngine;
 	bool m_sleepingState;
-	bool m_isManualTransmission;
 
 	ndDriveState m_driverState;
 };
