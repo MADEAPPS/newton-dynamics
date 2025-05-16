@@ -623,7 +623,6 @@ namespace ndQuadruped_2
 			referenceFrame.m_up = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
 			referenceFrame.m_right = referenceFrame.m_front.CrossProduct(referenceFrame.m_up).Normalize();
 			referenceFrame.m_front = referenceFrame.m_up.CrossProduct(referenceFrame.m_right).Normalize();
-			//ndVector omega(referenceFrame.UnrotateVector(rootNode->m_body->GetOmega()));
 			auto CalculateTiltReward = [](const ndFloat32 cosAngle)
 			{
 				ndFloat32 dist = ndClamp(cosAngle, D_TILT_KILL_COS_ANGLE, ndFloat32(1.0f));
@@ -631,11 +630,6 @@ namespace ndQuadruped_2
 				ndFloat32 tiltReward = ndPow(parametricDist, ndFloat32(4.0f));
 				return tiltReward;
 			};
-
-			//ndFloat32 tiltReward0 = CalculateTiltReward(1.0f);
-			//ndFloat32 tiltReward1 = CalculateTiltReward(0.5f);
-			//ndFloat32 tiltReward2 = CalculateTiltReward(0.95f);
-			//ndFloat32 tiltReward3 = CalculateTiltReward(D_TILT_KILL_COS_ANGLE + 0.001);
 
 			ndFloat32 contacSlideSpeed = 0.0f;
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
