@@ -17,7 +17,7 @@
 static ndTireFrictionModel::ndPacejkaTireModel pacejkaSportLateral(ndFloat32(0.01f), ndFloat32(2.85f), ndFloat32(0.2f), ndFloat32(1.42f), ndFloat32(0.0f), ndFloat32(0.01f));
 static ndTireFrictionModel::ndPacejkaTireModel m_pacejkaSportLongitudinal(ndFloat32(0.5f), ndFloat32(1.65f), ndFloat32(1.0f), ndFloat32(0.8f), ndFloat32(0.0f), ndFloat32(0.0f));
 
-static ndTireFrictionModel::ndPacejkaTireModel pacejkaUtilityLateral(ndFloat32(0.2f), ndFloat32(0.75f), ndFloat32(0.2f), ndFloat32(-2.5f), ndFloat32(0.0f), ndFloat32(0.01f));
+static ndTireFrictionModel::ndPacejkaTireModel pacejkaUtilityLateral(ndFloat32(0.2f), ndFloat32(0.75f), ndFloat32(1.0f), ndFloat32(-2.5f), ndFloat32(0.0f), ndFloat32(0.01f));
 static ndTireFrictionModel::ndPacejkaTireModel m_pacejkaUtilityLongitudinal(ndFloat32(0.2f), ndFloat32(1.4), ndFloat32(1.0f), ndFloat32(-9.8f), ndFloat32(0.0f), ndFloat32(0.0f));
 
 static ndTireFrictionModel::ndPacejkaTireModel pacejkaTruckLateral(ndFloat32(0.01f), ndFloat32(2.85f), ndFloat32(0.2f), ndFloat32(1.42f), ndFloat32(0.0f), ndFloat32(0.01f));
@@ -79,11 +79,13 @@ void ndTireFrictionModel::ndPacejkaTireModel::CalculateMaxPhi()
 
 ndFloat32 ndTireFrictionModel::ndPacejkaTireModel::Evaluate(ndFloat32 phi, ndFloat32 f) const
 {
-	ndFloat32 displacedPhi = phi + m_sh;
+	//ndFloat32 displacedPhi = phi + m_sh;
+	ndFloat32 displacedPhi = phi;
 	ndFloat32 EaTang = m_e * ndAtan(m_b * displacedPhi);
 	ndFloat32 BEarg = m_b * (ndFloat32(1.0f) - m_e) * displacedPhi;
-	ndFloat32 Carg = m_c * ndAtan(BEarg + EaTang);
+	ndFloat32 Carg = m_c * ndAtan((BEarg + EaTang));
 	return f * (m_d * ndSin(Carg) + m_sv);
+	//return m_d * ndSin(Carg) + m_sv;
 }
 
 ndMultiBodyVehicleTireJoint::ndMultiBodyVehicleTireJoint()

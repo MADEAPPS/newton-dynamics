@@ -298,7 +298,6 @@ static ndMultiBodyVehicle* CreateFlatBedTruck(ndDemoEntityManager* const scene, 
 	gearBox->SetIdleOmega(configuration.m_engine.GetIdleRadPerSec() * dRadPerSecToRpm);
 
 	notifyCallback->m_currentGear = sizeof(configuration.m_transmission.m_forwardRatios) / sizeof(configuration.m_transmission.m_forwardRatios[0]) + 1;
-	//vehicle->SetVehicleSolverModel(configuration.m_useHardSolverMode ? true : false);
 	return vehicle;
 }
 
@@ -485,7 +484,6 @@ static ndMultiBodyVehicle* CreateLav25Vehicle(ndDemoEntityManager* const scene, 
 	BuildTurret();
 	
 	notifyCallback->m_currentGear = sizeof(configuration.m_transmission.m_forwardRatios) / sizeof(configuration.m_transmission.m_forwardRatios[0]) + 1;
-	//vehicle->SetVehicleSolverModel(configuration.m_useHardSolverMode ? true : false);
 	return vehicle;
 }
 
@@ -695,7 +693,6 @@ static ndMultiBodyVehicle* CreateTractor(ndDemoEntityManager* const scene, const
 	BuildBucket();
 
 	notifyCallback->m_currentGear = sizeof(configuration.m_transmission.m_forwardRatios) / sizeof(configuration.m_transmission.m_forwardRatios[0]) + 1;
-	//vehicle->SetVehicleSolverModel(configuration.m_useHardSolverMode ? true : false);
 	return vehicle;
 }
 

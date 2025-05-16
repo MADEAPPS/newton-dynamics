@@ -506,7 +506,6 @@ void ndBodyKinematic::DetachContact(ndContact* const contact)
 {
 	ndScopeSpinLock lock(m_lock);
 	ndAssert((this == contact->GetBody0()) || (this == contact->GetBody1()));
-	//m_equilibrium = ndUnsigned8(contact->m_body0->m_equilibrium & contact->m_body1->m_equilibrium);
 	if (contact->IsActive() && m_invMass.m_w > ndFloat32(0.0f))
 	{
 		m_equilibrium = 0;

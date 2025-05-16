@@ -485,7 +485,8 @@ namespace ndQuadruped_2
 			referenceFrame.m_up = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
 			referenceFrame.m_right = referenceFrame.m_front.CrossProduct(referenceFrame.m_up).Normalize();
 			referenceFrame.m_front = referenceFrame.m_up.CrossProduct(referenceFrame.m_right).Normalize();
-			return GetModel()->GetAsModelArticulation()->CalculateCentreOfMassDynamics(m_solver, referenceFrame, timestep);
+			ndFixSizeArray<ndJointBilateralConstraint*, 64> extraJoint;
+			return GetModel()->GetAsModelArticulation()->CalculateCentreOfMassDynamics(m_solver, referenceFrame, extraJoint,timestep);
 		}
 
 		ndFloat32 CalculateSupportDistance(const ndModelArticulation::ndCenterOfMassDynamics& comDynamics) const

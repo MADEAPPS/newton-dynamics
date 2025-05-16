@@ -1107,7 +1107,7 @@ bool ndSolveDantzigLCP(ndInt32 size, T* const symetricMatrix, T* const x, T* con
 // high(i) = infinity.
 // this is the same as enforcing the constraint: x(i) * r(i) = 0
 template <class T>
-bool ndSolvePartitionDantzigLCP(ndInt32 size, T* const symmetricMatrixPSD , T* const x, T* const b, T* const low, T* const high)
+bool ndSolvePartitionDantzigLCP(ndInt32 size, T* const symmetricMatrixPSD, T* const x, T* const b, T* const low, T* const high)
 {
 	ndInt16* const permute = ndAlloca(ndInt16, size);
 

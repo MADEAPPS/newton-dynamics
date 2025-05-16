@@ -36,9 +36,21 @@ class ndModelArticulation: public ndModel
 	public: 
 	D_CLASS_REFLECTION(ndModelArticulation, ndModelBase)
 
+	class ndNode : public ndNodeHierarchy<ndNode>
+	{
+		public:
+		D_NEWTON_API ndNode(const ndNode& src);
+		D_NEWTON_API ndNode(const ndSharedPtr<ndBody>& body, const ndSharedPtr<ndJointBilateralConstraint>& joint, ndNode* const parent);
+		D_NEWTON_API virtual ~ndNode();
+
+		ndSharedPtr<ndBody> m_body;
+		ndSharedPtr<ndJointBilateralConstraint> m_joint;
+		ndString m_name;
+	};
+
 	class ndCenterOfMassDynamics
 	{
-		public:	
+		public:
 		D_NEWTON_API ndCenterOfMassDynamics();
 
 		ndVector m_omega;
@@ -52,18 +64,6 @@ class ndModelArticulation: public ndModel
 		ndMatrix m_centerOfMass;
 		ndMatrix m_inertiaMatrix;
 		ndFloat32 m_mass;
-	};
-
-	class ndNode : public ndNodeHierarchy<ndNode>
-	{
-		public:
-		D_NEWTON_API ndNode(const ndNode& src);
-		D_NEWTON_API ndNode(const ndSharedPtr<ndBody>& body, const ndSharedPtr<ndJointBilateralConstraint>& joint, ndNode* const parent);
-		D_NEWTON_API virtual ~ndNode();
-
-		ndSharedPtr<ndBody> m_body;
-		ndSharedPtr<ndJointBilateralConstraint> m_joint;
-		ndString m_name;
 	};
 
 	D_NEWTON_API ndModelArticulation();
@@ -96,7 +96,7 @@ class ndModelArticulation: public ndModel
 	D_NEWTON_API void ClearMemory();
 	D_NEWTON_API void SetTransform(const ndMatrix& matrix);
 	D_NEWTON_API ndCenterOfMassDynamics CalculateCentreOfMassKinematics(const ndMatrix& localFrame) const;
-	D_NEWTON_API ndCenterOfMassDynamics CalculateCentreOfMassDynamics(ndIkSolver& solver, const ndMatrix& localFrame, ndFloat32 timestep) const;
+	D_NEWTON_API ndCenterOfMassDynamics CalculateCentreOfMassDynamics(ndIkSolver& solver, const ndMatrix& localFrame, ndFixSizeArray<ndJointBilateralConstraint*, 64>& extraJoints, ndFloat32 timestep) const;
 	
 	protected:
 	D_NEWTON_API void ConvertToUrdf();

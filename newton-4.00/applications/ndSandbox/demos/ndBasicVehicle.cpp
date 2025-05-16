@@ -359,8 +359,6 @@ static ndMultiBodyVehicle* CreateBasicVehicle(ndDemoEntityManager* const scene, 
 	//	}
 	//}
 	
-	// set a soft or hard mode
-	//vehicle->SetVehicleSolverModel(configuration.m_useHardSolverMode ? true : false);
 	return vehicle;
 }
 

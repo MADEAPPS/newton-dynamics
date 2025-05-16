@@ -1759,7 +1759,6 @@ void ndScene::DeleteDeadContacts()
 
 		ndInt32 GetKey(const ndContact* const contact) const
 		{
-			//const ndUnsigned32 inactive = ndUnsigned32(!contact->IsActive() | (contact->m_maxDOF ? 0 : 1));
 			const ndUnsigned32 inactive = ndUnsigned32(!contact->IsActive() | (contact->m_maxDof ? 0 : 1));
 			const ndUnsigned32 idDead = contact->m_isDead;
 			return m_code[idDead * 2 + inactive];

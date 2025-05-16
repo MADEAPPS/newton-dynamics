@@ -405,7 +405,8 @@ namespace ndUnicycle
 			};
 
 			ndIkSolver& solver = m_controllerTrainer->m_solver;
-			const ndModelArticulation::ndCenterOfMassDynamics comDynamics(GetModel()->GetAsModelArticulation()->CalculateCentreOfMassDynamics(solver, comFrame, m_timestep));
+			ndFixSizeArray<ndJointBilateralConstraint*, 64> extraJoint;
+			const ndModelArticulation::ndCenterOfMassDynamics comDynamics(GetModel()->GetAsModelArticulation()->CalculateCentreOfMassDynamics(solver, comFrame, extraJoint, m_timestep));
 			const ndVector comOmega(comDynamics.m_omega);
 			const ndVector comAlpha(comDynamics.m_alpha);
 		

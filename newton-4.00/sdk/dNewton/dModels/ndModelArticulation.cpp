@@ -581,7 +581,7 @@ void ndModelArticulation::CalculateCentreOfMass(ndCenterOfMassDynamics& dynamics
 	}
 }
 
-ndModelArticulation::ndCenterOfMassDynamics ndModelArticulation::CalculateCentreOfMassDynamics(ndIkSolver& solver, const ndMatrix& localFrame, ndFloat32 timestep) const
+ndModelArticulation::ndCenterOfMassDynamics ndModelArticulation::CalculateCentreOfMassDynamics(ndIkSolver& solver, const ndMatrix& localFrame, ndFixSizeArray<ndJointBilateralConstraint*, 64>& extraJoints, ndFloat32 timestep) const
 {
 	ndCenterOfMassDynamics dynamics;
 	if (!m_rootNode)
@@ -601,7 +601,7 @@ ndModelArticulation::ndCenterOfMassDynamics ndModelArticulation::CalculateCentre
 	ndFixSizeArray<const ndBodyKinematic*, 256> bodyArray;
 	CalculateCentreOfMass(dynamics, bodyArray, bodyCenter);
 
-	solver.SolverBegin(skeleton, nullptr, 0, GetWorld(), timestep);
+	solver.SolverBegin(skeleton, &extraJoints[0], extraJoints.GetCount(), GetWorld(), timestep);
 	solver.Solve();
 	auto CalculateComFullDynamics = [this, &dynamics, &bodyArray, &bodyCenter]()
 	{

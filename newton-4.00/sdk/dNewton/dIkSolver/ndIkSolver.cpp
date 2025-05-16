@@ -307,7 +307,7 @@ void ndIkSolver::BuildMassMatrix()
 
 	auto CopyCloseLoopBody = [this](ndBodyKinematic* const body)
 	{
-		ndAssert(body->GetId() > 0);
+		//ndAssert(body->GetId() > 0);
 		if (body->GetInvMass() == ndFloat32(0.0f))
 		{
 			return;
@@ -334,10 +334,22 @@ void ndIkSolver::BuildMassMatrix()
 		}
 	};
 
-	// add closed loop 
+	// add closed loop permanent joints 
 	for (ndInt32 i = ndInt32 (m_skeleton->m_permanentLoopingJoints.GetCount() - 1); i >= 0; --i)
 	{
 		ndConstraint* const joint = m_skeleton->m_permanentLoopingJoints[i];
+		ndBodyKinematic* const body0 = joint->GetBody0();
+		ndBodyKinematic* const body1 = joint->GetBody1();
+
+		ndAssert(body0->GetInvMass() > ndFloat32(0.0f));
+		CopyCloseLoopBody(body0);
+		CopyCloseLoopBody(body1);
+	}
+
+	// add closed loop extra joints 
+	for (ndInt32 i = ndInt32(m_skeleton->m_transientLoopingJoints.GetCount() - 1); i >= 0; --i)
+	{
+		ndConstraint* const joint = m_skeleton->m_transientLoopingJoints[i];
 		ndBodyKinematic* const body0 = joint->GetBody0();
 		ndBodyKinematic* const body1 = joint->GetBody1();
 
@@ -475,7 +487,14 @@ void ndIkSolver::BuildMassMatrix()
 		GetJacobianDerivatives(joint);
 		BuildJacobianMatrix(joint);
 	}
-	
+
+	for (ndInt32 i = ndInt32(m_skeleton->m_transientLoopingJoints.GetCount() - 1); i >= 0; --i)
+	{
+		ndConstraint* const joint = m_skeleton->m_transientLoopingJoints[i];
+		GetJacobianDerivatives(joint);
+		BuildJacobianMatrix(joint);
+	}
+
 	for (ndInt32 i = 0; i < m_contacts.GetCount(); ++i)
 	{
 		ndContact* const contact = m_contacts[i];

@@ -53,7 +53,6 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKin
 	,m_worldNode(nullptr)
 	,m_body0Node(nullptr)
 	,m_body1Node(nullptr)
-	//,m_deletedNode(nullptr)
 {
 	m_body0 = body0;
 	m_body1 = body1;
@@ -88,7 +87,6 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKin
 	,m_worldNode(nullptr)
 	,m_body0Node(nullptr)
 	,m_body1Node(nullptr)
-	//,m_deletedNode(nullptr)
 {
 	m_body0 = body0;
 	m_body1 = body1;
@@ -121,10 +119,6 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKin
 
 ndJointBilateralConstraint::~ndJointBilateralConstraint()
 {
-	//ndAssert(m_worldNode == nullptr);
-	//ndAssert(m_body0Node == nullptr);
-	//ndAssert(m_body1Node == nullptr);
-	//ndAssert(m_deletedNode == nullptr);
 }
 
 ndJointBilateralSolverModel ndJointBilateralConstraint::GetSolverModel() const

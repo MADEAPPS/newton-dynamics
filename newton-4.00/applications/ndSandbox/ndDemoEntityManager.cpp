@@ -191,6 +191,20 @@ void Test0__()
 	cgd.Solve(6, 1.0e-5f, x, B, &A[0][0], precond);
 }
 
+//static int fib(int n)
+//{
+//	int a = 0, b = 1, c;
+//	if (n == 0)
+//		return a;
+//	for (int i = 2; i <= n; i++)
+//	{
+//		c = a + b;
+//		a = b;
+//		b = c;
+//	}
+//	return b;
+//}
+
 void Test1__()
 {
 	//ndFloat32 A[2][2];

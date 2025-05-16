@@ -118,9 +118,8 @@ class ndMultiBodyVehicle : public ndModelArticulation
 	D_NEWTON_API ndMultiBodyVehicle* GetAsMultiBodyVehicle();
 #endif
 
-	//D_NEWTON_API void SetVehicleSolverModel(bool hardJoint);
-
 	private:
+	void FinalizeBuild();
 	void ApplyTireModel();
 	void ApplyStabilityControl();
 	void ApplyAlignmentAndBalancing();
@@ -128,11 +127,11 @@ class ndMultiBodyVehicle : public ndModelArticulation
 	void ApplyTireModel(ndFixSizeArray<ndTireContactPair, 128>& tireContacts);
 	ndBodyKinematic* CreateInternalBodyPart(ndFloat32 mass, ndFloat32 radius) const;
 
-	void BrushTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
-	void CoulombTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
-	void PacejkaTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
-	void CalculateNormalizedAlgniningTorque(ndMultiBodyVehicleTireJoint* const tire, ndFloat32 sideSlipTangent) const;
-	void CoulombFrictionCircleTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
+	bool BrushTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
+	bool CoulombTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
+	bool PacejkaTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
+	bool CalculateNormalizedAlgniningTorque(ndMultiBodyVehicleTireJoint* const tire, ndFloat32 sideSlipTangent) const;
+	bool CoulombFrictionCircleTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
 
 	ndMatrix m_localFrame;
 	ndBodyDynamic* m_chassis;
@@ -143,11 +142,11 @@ class ndMultiBodyVehicle : public ndModelArticulation
 	ndList<ndMultiBodyVehicleTireJoint*> m_tireList;
 	ndList<ndMultiBodyVehicleDifferential*> m_differentialList;
 
-	//ndIkSolver m_dynamicSolver;
 	ndDownForce m_downForce;
 	ndFloat32 m_steeringRate;
 	ndFloat32 m_maxSideslipRate;
 	ndFloat32 m_maxSideslipAngle;
+	bool m_iniliazed;
 
 	friend class ndMultiBodyVehicleMotor;
 	friend class ndMultiBodyVehicleTireJoint;
