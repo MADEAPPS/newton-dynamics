@@ -38,7 +38,7 @@
 ndBrainAgentDiscretePolicyGradient_TrainerMaster::HyperParameters::HyperParameters()
 {
 	m_randomSeed = 47;
-	m_numberOfLayers = 3;
+	m_numberOfHiddenLayers = 3;
 	m_miniBatchSize = 256;
 	m_hiddenLayersNumberOfNeurons = 64;
 	m_maxTrajectorySteps = 4096;
@@ -395,7 +395,7 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::ndBrainAgentDiscretePolicyGrad
 	layers.SetCount(0);
 	layers.PushBack(new ndBrainLayerLinear(m_numberOfObservations, hyperParameters.m_hiddenLayersNumberOfNeurons));
 	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
-	for (ndInt32 i = 0; i < hyperParameters.m_numberOfLayers; ++i)
+	for (ndInt32 i = 0; i < hyperParameters.m_numberOfHiddenLayers; ++i)
 	{
 		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == hyperParameters.m_hiddenLayersNumberOfNeurons);
 		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, hyperParameters.m_hiddenLayersNumberOfNeurons));
@@ -433,7 +433,7 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::ndBrainAgentDiscretePolicyGrad
 	ndInt32 criticNeurons = hyperParameters.m_hiddenLayersNumberOfNeurons * 1;
 	layers.PushBack(new ndBrainLayerLinear(m_numberOfObservations, criticNeurons));
 	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
-	for (ndInt32 i = 0; i < hyperParameters.m_numberOfLayers; ++i)
+	for (ndInt32 i = 0; i < hyperParameters.m_numberOfHiddenLayers; ++i)
 	{
 		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == criticNeurons);
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), criticNeurons));

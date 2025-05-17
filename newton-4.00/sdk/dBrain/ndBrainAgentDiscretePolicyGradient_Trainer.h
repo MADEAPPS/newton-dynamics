@@ -135,7 +135,7 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndInt32 m_numberOfActions;
 		ndInt32 m_numberOfObservations;
 
-		ndInt32 m_numberOfLayers;
+		ndInt32 m_numberOfHiddenLayers;
 		ndInt32 m_miniBatchSize;
 		ndInt32 m_hiddenLayersNumberOfNeurons;
 		ndInt32 m_maxTrajectorySteps;

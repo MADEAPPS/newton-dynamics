@@ -57,11 +57,10 @@ namespace ndQuadruped_2
 {
 	#define ND_TRAIN_MODEL
 
-	#define USE_DDPG
+	//#define USE_DDPG
 
 	#ifdef USE_DDPG
 		//#define USE_SAC
-
 		#ifdef USE_SAC
 			#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
 		#else
@@ -1138,6 +1137,8 @@ namespace ndQuadruped_2
 				ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 				hyperParameters.m_numberOfActions = numberOfActions;
 				hyperParameters.m_numberOfObservations = numberOfObservations;
+				hyperParameters.m_numberOfHiddenLayers = 2;
+				hyperParameters.m_hiddenLayersNumberOfNeurons = 128;
 				#ifdef USE_PPO
 					m_outFile = fopen("ndQuadruped_2-ppo.csv", "wb");
 					fprintf(m_outFile, "ppo\n");
