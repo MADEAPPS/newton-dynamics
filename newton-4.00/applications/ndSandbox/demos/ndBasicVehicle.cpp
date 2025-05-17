@@ -128,9 +128,11 @@ class ndVehicleDectriptorMonsterTruck0: public ndVehicleDectriptor
 		m_engine.Init(idleTorquePoundFoot, idleRmp, 
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
+		m_chassisMass = 1000.0f;
 		m_comDisplacement = ndVector(0.0f, -0.6f, 0.0f, 0.0f);
 
-		m_frontTire.m_mass = 150.0f;
+		//m_frontTire.m_mass = 150.0f;
+		m_frontTire.m_mass = 100.0f;
 		m_frontTire.m_verticalOffset = 0.0f;
 		m_frontTire.m_steeringAngle = 35.0f * ndDegreeToRad;
 		m_frontTire.m_springK = 500.0f;
@@ -142,6 +144,7 @@ class ndVehicleDectriptorMonsterTruck0: public ndVehicleDectriptor
 		m_frontTire.m_handBrakeTorque = 0.0f;
 
 		m_rearTire.m_mass = 150.0f;
+		m_rearTire.m_mass = 100.0f;
 		m_rearTire.m_verticalOffset = 0.0f;
 		m_rearTire.m_steeringAngle = 0.0f;
 		m_rearTire.m_springK = 500.0f;

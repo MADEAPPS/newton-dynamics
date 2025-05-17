@@ -41,8 +41,8 @@
 #define D_MAX_SIZE_SLIP_RATE			ndFloat32(2.0f)
 
 ndMultiBodyVehicle::ndDownForce::ndDownForce()
-	:m_gravity(ndFloat32(-10.0f))
-	,m_suspensionStiffnessModifier(ndFloat32(1.0f))
+//	:m_gravity(ndFloat32(-10.0f))
+	:m_suspensionStiffnessModifier(ndFloat32(1.0f))
 {
 	m_downForceTable[0].m_speed = ndFloat32(0.0f) * ndFloat32(0.27f);
 	m_downForceTable[0].m_forceFactor = 0.0f;
@@ -89,9 +89,9 @@ ndFloat32 ndMultiBodyVehicle::ndDownForce::GetDownforceFactor(ndFloat32 speed) c
 	index = ndMin(index, ndInt32 (sizeof(m_downForceTable) / sizeof(m_downForceTable[0])) - 2);
 	ndFloat32 deltaSpeed = speed - m_downForceTable[index].m_speed;
 	ndFloat32 downForceFactor = m_downForceTable[index].m_forceFactor + m_downForceTable[index + 1].m_aerodynamicDownforceConstant * deltaSpeed * deltaSpeed;
-	return downForceFactor * m_gravity;
+	//return downForceFactor * m_gravity;
+	return downForceFactor;
 }
-
 
 #if 0
 ndMultiBodyVehicleTorsionBar* ndMultiBodyVehicle::AddTorsionBar(ndBodyKinematic* const)
@@ -104,7 +104,7 @@ ndMultiBodyVehicleTorsionBar* ndMultiBodyVehicle::AddTorsionBar(ndBodyKinematic*
 }
 #endif
 
-ndMultiBodyVehicle::ndMultiBodyVehicle()
+ndMultiBodyVehicle::ndMultiBodyVehicle(ndFloat32 gravityMagnitud)
 	:ndModelArticulation()
 	,m_localFrame(ndGetIdentityMatrix())
 	,m_tireShape(new ndShapeChamferCylinder(ndFloat32(0.75f), ndFloat32(0.5f)))
@@ -119,6 +119,9 @@ ndMultiBodyVehicle::ndMultiBodyVehicle()
 	m_steeringRate = D_MAX_STEERING_RATE;
 	m_maxSideslipRate = D_MAX_SIZE_SLIP_RATE;
 	m_maxSideslipAngle = D_MAX_SIDESLIP_ANGLE;
+
+	m_gravityMagnitud = -ndAbs(gravityMagnitud);
+	ndAssert(ndAbs(m_gravityMagnitud) > ndFloat32 (0.0f));
 
 	m_tireShape->AddRef();
 }
@@ -143,12 +146,18 @@ void ndMultiBodyVehicle::FinalizeBuild()
 	ndFixSizeArray<ndIndexPair, 64> jointArray;
 	ndFixSizeArray<ndJacobianPair, 64> jacobianArray;
 	ndFixSizeArray<const ndBodyKinematic*, 64> bodyArray;
+	ndFixSizeArray<const ndConstraint*, 64> constraintArray;
 
-	const ndVector upDir(m_localFrame.m_up);
+	const ndVector upDir(m_localFrame.m_up.Scale(ndFloat32 (1.0f)));
 	const ndMatrix savedMatrix(GetRoot()->m_body->GetMatrix());
 	SetTransform(ndGetIdentityMatrix());
 
-	ndInt32 bodyIndex = 0;
+	bodyId.PushBack(0);
+	bodyArray.PushBack(GetWorld()->GetSentinelBody());
+	invMass.PushBack(ndFloat32 (0.0f));
+	invInertia.PushBack(ndGetZeroMatrix());
+
+	ndInt32 bodyIndex = 1;
 
 	// get all jacobians
 	stack.PushBack(GetRoot());
@@ -159,7 +168,6 @@ void ndMultiBodyVehicle::FinalizeBuild()
 		const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
 		bodyArray.PushBack(body);
 		bodyId.PushBack(bodyIndex);
-
 		invMass.PushBack(body->GetInvMass());
 		invInertia.PushBack(body->CalculateInvInertiaMatrix());
 		
@@ -181,28 +189,47 @@ void ndMultiBodyVehicle::FinalizeBuild()
 				return -1;
 			};
 
-			ndInt32 m0 = bodyIndex;
-			ndInt32 m1 = FindParentId();
-
-			const ndVector com0(bodyArray[m0]->GetMatrix().TransformVector(bodyArray[m0]->GetCentreOfMass()));
-			const ndVector com1(bodyArray[m1]->GetMatrix().TransformVector(bodyArray[m1]->GetCentreOfMass()));
-			const ndVector r(com1 - com0);
-
-			ndInt32 rowIndex = jointArray.GetCount();
-			jacobianArray[rowIndex].m_jacobianM0.m_linear = upDir;
-			jacobianArray[rowIndex].m_jacobianM1.m_linear = upDir.Scale(ndFloat32(-1.0f));
-			jacobianArray[rowIndex].m_jacobianM0.m_angular = jacobianArray[rowIndex].m_jacobianM0.m_linear.CrossProduct(r);
-			jacobianArray[rowIndex].m_jacobianM1.m_angular = jacobianArray[rowIndex].m_jacobianM1.m_linear.CrossProduct(r);
-
-			ndIndexPair pair;
-			pair.m_m0 = m0;
-			pair.m_m1 = m1;
-			jointArray.PushBack(pair);
-			rhsAccel.PushBack(ndFloat32 (0.0f));
-
 			if (!strcmp(joint->ClassName(), "ndMultiBodyVehicleTireJoint"))
 			{
-				//ndAssert(0);
+				ndInt32 m0 = bodyIndex;
+				ndInt32 m1 = FindParentId();
+
+				const ndVector com0(bodyArray[m0]->GetMatrix().TransformVector(bodyArray[m0]->GetCentreOfMass()));
+				const ndVector com1(bodyArray[m1]->GetMatrix().TransformVector(bodyArray[m1]->GetCentreOfMass()));
+				const ndVector r0(joint->CalculateGlobalMatrix0().m_posit - com0);
+				const ndVector r1(joint->CalculateGlobalMatrix1().m_posit - com1);
+
+				ndJacobianPair jacobianPair;
+				jacobianPair.m_jacobianM0.m_linear = upDir.Scale(ndFloat32(-1.0f));
+				jacobianPair.m_jacobianM0.m_angular = jacobianPair.m_jacobianM0.m_linear.CrossProduct(r0);
+
+				jacobianPair.m_jacobianM1.m_linear = upDir;
+				jacobianPair.m_jacobianM1.m_angular = jacobianPair.m_jacobianM1.m_linear.CrossProduct(r1);
+				
+				jacobianArray.PushBack(jacobianPair);
+
+				ndIndexPair pair;
+				pair.m_m0 = m0;
+				pair.m_m1 = m1;
+				jointArray.PushBack(pair);
+				rhsAccel.PushBack(ndFloat32(0.0f));
+				constraintArray.PushBack(nullptr);
+
+				if (!strcmp(joint->ClassName(), "ndMultiBodyVehicleTireJoint"))
+				{
+					pair.m_m0 = m0;
+					pair.m_m1 = 0;
+
+					jacobianPair.m_jacobianM0.m_linear = upDir.Scale(ndFloat32 (-1.0f));
+					jacobianPair.m_jacobianM0.m_angular = ndVector::m_zero;
+					jacobianPair.m_jacobianM1.m_linear = ndVector::m_zero;
+					jacobianPair.m_jacobianM1.m_angular = ndVector::m_zero;
+
+					jointArray.PushBack(pair);
+					constraintArray.PushBack(joint);
+					jacobianArray.PushBack(jacobianPair);
+					rhsAccel.PushBack(m_gravityMagnitud);
+				}
 			}
 		}
 
@@ -215,10 +242,23 @@ void ndMultiBodyVehicle::FinalizeBuild()
 
 	// build Mass Matrix
 	ndFixSizeArray<ndFixSizeArray<ndFloat32, 64>, 64> massMatrix(64);
+
+	ndJacobian zeroJacobian;
+	zeroJacobian.m_linear = ndVector::m_zero;
+	zeroJacobian.m_angular = ndVector::m_zero;
+
 	massMatrix.SetCount(jointArray.GetCount());
 	for (ndInt32 i = 0; i < jointArray.GetCount(); ++i)
 	{
 		massMatrix[i].SetCount(jointArray.GetCount());
+	}
+
+	ndFixSizeArray<ndJacobian, 64> Jt;
+	ndFixSizeArray<ndJacobian, 64> JinvMass;
+	for (ndInt32 i = 0; i < bodyId.GetCount(); ++i)
+	{
+		Jt.PushBack(zeroJacobian);
+		JinvMass.PushBack(zeroJacobian);
 	}
 
 	for (ndInt32 i = 0; i < jointArray.GetCount(); ++i)
@@ -226,58 +266,53 @@ void ndMultiBodyVehicle::FinalizeBuild()
 		ndInt32 m0 = jointArray[i].m_m0;
 		ndInt32 m1 = jointArray[i].m_m1;
 
-		ndJacobian JinvMass0(jacobianArray[i].m_jacobianM0);
-		ndJacobian JinvMass1(jacobianArray[i].m_jacobianM1);
+		const ndJacobian& J01invMass(jacobianArray[i].m_jacobianM0);
+		const ndJacobian& J10invMass(jacobianArray[i].m_jacobianM1);
 
-		JinvMass0.m_linear = JinvMass0.m_linear.Scale(invMass[m0]);
-		JinvMass1.m_linear = JinvMass1.m_linear.Scale(invMass[m1]);
-		JinvMass0.m_angular = invInertia[m0].RotateVector(JinvMass0.m_angular);
-		JinvMass1.m_angular = invInertia[m1].RotateVector(JinvMass1.m_angular);
+		JinvMass[m0].m_linear = J01invMass.m_linear.Scale(invMass[m0]);
+		JinvMass[m0].m_angular = J01invMass.m_angular.Scale(invMass[m0]);
+		JinvMass[m1].m_linear = J10invMass.m_linear.Scale(invMass[m1]);
+		JinvMass[m1].m_angular = J10invMass.m_angular.Scale(invMass[m1]);
 
 		ndVector diagDot(
-			JinvMass0.m_linear * jacobianArray[i].m_jacobianM0.m_linear +
-			JinvMass0.m_angular * jacobianArray[i].m_jacobianM0.m_angular +
-			JinvMass1.m_linear * jacobianArray[i].m_jacobianM1.m_linear +
-			JinvMass1.m_angular * jacobianArray[i].m_jacobianM1.m_angular);
-		ndFloat32 diagonal = diagDot.AddHorizontal().GetScalar() * 1.001f;
+			JinvMass[m0].m_linear * jacobianArray[i].m_jacobianM0.m_linear +
+			JinvMass[m0].m_angular * jacobianArray[i].m_jacobianM0.m_angular +
+			JinvMass[m1].m_linear * jacobianArray[i].m_jacobianM1.m_linear +
+			JinvMass[m1].m_angular * jacobianArray[i].m_jacobianM1.m_angular);
+		ndFloat32 diagonal = diagDot.AddHorizontal().GetScalar() * ndFloat32 (1.0005f);
 		massMatrix[i][i] = diagonal;
 
 		for (ndInt32 j = i + 1; j < jointArray.GetCount(); ++j)
 		{
-			ndFloat32 offDiag = ndFloat32(0.0f);
-			if (m0 == jointArray[j].m_m0)
+			ndInt32 n0 = jointArray[j].m_m0;
+			ndInt32 n1 = jointArray[j].m_m1;
+			Jt[n0] = jacobianArray[j].m_jacobianM0;
+			Jt[n1] = jacobianArray[j].m_jacobianM1;
+
+			ndVector sum(ndVector::m_zero);
+			for (ndInt32 k = 0; k < bodyId.GetCount(); ++k)
 			{
-				ndAssert(0);
-				const ndJacobian& Jt(jacobianArray[j].m_jacobianM0);
-				ndVector dot(JinvMass0.m_linear * Jt.m_linear + JinvMass0.m_angular * Jt.m_angular);
-				offDiag += dot.AddHorizontal().GetScalar();
+				sum += JinvMass[k].m_linear * Jt[k].m_linear + JinvMass[k].m_angular * Jt[k].m_angular;
 			}
-			if (m0 == jointArray[j].m_m1)
-			{
-				ndAssert(0);
-				const ndJacobian& Jt(jacobianArray[j].m_jacobianM1);
-				ndVector dot(JinvMass0.m_linear * Jt.m_linear + JinvMass0.m_angular * Jt.m_angular);
-				offDiag += dot.AddHorizontal().GetScalar();
-			}
-			if (m1 == jointArray[j].m_m0)
-			{
-				ndAssert(0);
-				const ndJacobian& Jt(jacobianArray[j].m_jacobianM0);
-				ndVector dot(JinvMass1.m_linear* Jt.m_linear + JinvMass1.m_angular * Jt.m_angular);
-				offDiag += dot.AddHorizontal().GetScalar();
-			}
-			if (m1 == jointArray[j].m_m1)
-			{
-				const ndJacobian& Jt(jacobianArray[j].m_jacobianM1);
-				ndVector dot(JinvMass1.m_linear * Jt.m_linear + JinvMass1.m_angular * Jt.m_angular);
-				offDiag += dot.AddHorizontal().GetScalar();
-			}
+			ndFloat32 offDiag = sum.AddHorizontal().GetScalar();
 			massMatrix[i][j] = offDiag;
 			massMatrix[j][i] = offDiag;
-		}
-	}
-	ndAssert(ndTestPSDmatrix(jointArray.GetCount(), jointArray.GetCapacity(), &massMatrix[0][0]));
 
+			Jt[n0] = zeroJacobian;
+			Jt[n1] = zeroJacobian;
+		}
+
+		JinvMass[m0] = zeroJacobian;
+		JinvMass[m1] = zeroJacobian;
+	}
+
+	ndInt32 stride = ndInt32 (&massMatrix[1][0] - &massMatrix[0][0]);
+	ndAssert(ndTestPSDmatrix(jointArray.GetCount(), stride, &massMatrix[0][0]));
+
+	ndFixSizeArray<ndFloat32, 64> force;
+	force.SetCount(jointArray.GetCount());
+	ndCholeskyFactorization(jointArray.GetCount(), stride, &massMatrix[0][0]);
+	ndSolveCholesky(jointArray.GetCount(), stride, &massMatrix[0][0], &force[0], &rhsAccel[0]);
 
 	SetTransform(savedMatrix);
 	m_iniliazed = true;
@@ -532,7 +567,7 @@ bool ndMultiBodyVehicle::IsSleeping() const
 void ndMultiBodyVehicle::ApplyAerodynamics(ndFloat32)
 {
 	m_downForce.m_suspensionStiffnessModifier = ndFloat32(1.0f);
-	ndFloat32 gravity = m_downForce.GetDownforceFactor(GetSpeed());
+	ndFloat32 gravity = m_downForce.GetDownforceFactor(GetSpeed()) * m_gravityMagnitud;
 	if (ndAbs (gravity) > ndFloat32(1.0e-2f))
 	{
 		const ndVector up(m_chassis->GetMatrix().RotateVector(m_localFrame.m_up));
@@ -767,7 +802,7 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	const ndVector forceColor(ndFloat32(0.8f), ndFloat32(0.8f), ndFloat32(0.8f), ndFloat32(0.0f));
 	const ndVector lateralColor(ndFloat32(0.3f), ndFloat32(0.7f), ndFloat32(0.0f), ndFloat32(0.0f));
 	const ndVector longitudinalColor(ndFloat32(0.7f), ndFloat32(0.3f), ndFloat32(0.0f), ndFloat32(0.0f));
-	ndVector weight(chassis->GetForce().Scale(scale * chassis->GetInvMass() / m_downForce.m_gravity));
+	ndVector weight(chassis->GetForce().Scale(scale * chassis->GetInvMass() / m_gravityMagnitud));
 	for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
 		ndMultiBodyVehicleTireJoint* const tireJoint = node->GetInfo();
@@ -777,7 +812,7 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 
 		// draw tire forces
 		const ndBodyKinematic::ndContactMap& contactMap = tireBody->GetContactMap();
-		ndFloat32 tireGravities = scale / (kinematioc.m_mass * m_downForce.m_gravity);
+		ndFloat32 tireGravities = scale / (kinematioc.m_mass * m_gravityMagnitud);
 		ndBodyKinematic::ndContactMap::Iterator it(contactMap);
 		for (it.Begin(); it; it++)
 		{

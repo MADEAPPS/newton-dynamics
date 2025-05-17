@@ -67,7 +67,7 @@ class ndMultiBodyVehicle : public ndModelArticulation
 		private:
 		ndFloat32 CalculateFactor(const ndSpeedForcePair* const entry) const;
 	
-		ndFloat32 m_gravity;
+		//ndFloat32 m_gravity;
 		ndFloat32 m_suspensionStiffnessModifier;
 		ndSpeedForcePair m_downForceTable[5];
 		friend class ndMultiBodyVehicle;
@@ -76,7 +76,7 @@ class ndMultiBodyVehicle : public ndModelArticulation
 
 	D_CLASS_REFLECTION(ndMultiBodyVehicle, ndModelArticulation)
 
-	D_NEWTON_API ndMultiBodyVehicle();
+	D_NEWTON_API ndMultiBodyVehicle(ndFloat32 gravityMagnitud = ndFloat32 (10.0f));
 	D_NEWTON_API virtual ~ndMultiBodyVehicle ();
 
 	D_NEWTON_API const ndMatrix& GetLocalFrame() const;
@@ -146,6 +146,7 @@ class ndMultiBodyVehicle : public ndModelArticulation
 	ndFloat32 m_steeringRate;
 	ndFloat32 m_maxSideslipRate;
 	ndFloat32 m_maxSideslipAngle;
+	ndFloat32 m_gravityMagnitud;
 	bool m_iniliazed;
 
 	friend class ndMultiBodyVehicleMotor;

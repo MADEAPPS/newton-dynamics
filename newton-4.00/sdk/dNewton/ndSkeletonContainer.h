@@ -147,7 +147,7 @@ class ndSkeletonContainer
 	{
 		public:
 		ndQueue()
-			:ndFixSizeArray<ndSkeletonContainer::ndNode*, 1024 * 4>()
+			:ndFixSizeArray<ndSkeletonContainer::ndNode*, 1024 * 4>(1024 * 4)
 			,m_mod(sizeof(m_array) / sizeof(m_array[0]))
 		{
 			m_lastIndex = 0;

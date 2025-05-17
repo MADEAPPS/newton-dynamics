@@ -83,7 +83,7 @@ template<class T, ndInt32 maxSize>
 T& ndFixSizeArray<T, maxSize>::operator[] (ndInt32 i)
 {
 	ndAssert(i >= 0);
-	ndAssert(i < maxSize);
+	ndAssert(i < m_count);
 	return m_array[i];
 }
 
@@ -91,7 +91,7 @@ template<class T, ndInt32 maxSize>
 const T& ndFixSizeArray<T, maxSize>::operator[] (ndInt32 i) const
 {
 	ndAssert(i >= 0);
-	ndAssert(i < maxSize);
+	ndAssert(i < m_count);
 	return m_array[i];
 }
 
@@ -100,14 +100,14 @@ T ndFixSizeArray<T, maxSize>::Pop()
 {
 	ndAssert(m_count >= 1);
 	m_count--;
-	return (*this)[m_count];
+	return m_array[m_count];
 }
 
 template<class T, ndInt32 maxSize>
 void ndFixSizeArray<T, maxSize>::PushBack(const T& element)
 {
 	ndAssert(m_count <= maxSize);
-	(*this)[m_count] = element;
+	m_array[m_count] = element;
 	m_count++;
 }
 

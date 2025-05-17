@@ -156,27 +156,6 @@ bool ndTestPSDmatrix(ndInt32 size, ndInt32 stride, const T* const matrix)
 	return ndCholeskyFactorization(size, size, copy);
 }
 
-//template<class T>
-//void ndCholeskyApplyRegularizer (ndInt32 size, ndInt32 stride, T* const psdMatrix, T* const regularizer)
-//{
-//	bool isPsdMatrix = false;
-//	//ndFloat32* const lowerTriangule = ndAlloca(ndFloat32, stride * stride);
-//	T* const lowerTriangule = ndAlloca(T, stride * stride);
-//	do 
-//	{
-//		ndMemCpy(lowerTriangule, psdMatrix, stride * stride);
-//		isPsdMatrix = ndCholeskyFactorization(size, stride, lowerTriangule);
-//		if (!isPsdMatrix) 
-//		{
-//			for (ndInt32 i = 0; i < size; ++i) 
-//			{
-//				regularizer[i] *= ndFloat32(4.0f);
-//				psdMatrix[i * stride + i] += regularizer[i];
-//			}
-//		}
-//	} while (!isPsdMatrix);
-//}
-
 template<class T>
 void ndSolveCholesky(ndInt32 size, ndInt32 stride, const T* const choleskyMatrix, T* const x, const T* const b)
 {
@@ -761,7 +740,7 @@ void ndCholeskyUpdate(ndInt32 size, ndInt32 row, ndInt32 colum, T* const cholesk
 	else 
 	{
 		ndMemCpy(choleskyMatrix, psdMatrix, size * size);
-		ndCholeskyFactorization(size, choleskyMatrix);
+		ndCholeskyFactorization(size, size, choleskyMatrix);
 	}
 
 //#if _DEBUG
@@ -849,7 +828,7 @@ void ndSolveDantzigLcpLow(ndInt32 size, T* const symmetricMatrixPSD, T* const x,
 	ndMemCpy(lowerTriangularMatrix, symmetricMatrixPSD, size * size);
 
 #ifdef _DEBUG
-	bool valid = ndCholeskyFactorization(size, lowerTriangularMatrix);
+	bool valid = ndTestPSDmatrix(size, size, lowerTriangularMatrix);
 	ndAssert(valid);
 #else
 	ndCholeskyFactorization(size, lowerTriangularMatrix);
