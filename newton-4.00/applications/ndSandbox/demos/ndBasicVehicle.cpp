@@ -50,13 +50,26 @@ class ndVehicleDectriptorViper : public ndVehicleDectriptor
 
 		m_rearTire.m_mass = 25.0f;
 		m_rearTire.m_handBrakeTorque = 100000.0f;
-		m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		m_rearTire.m_frictionModel = ndTireFrictionModel::m_pacejkaSport;
-		m_frontTire.m_frictionModel = ndTireFrictionModel::m_pacejkaSport;
 
-		m_rearTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
-		m_frontTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
+		//m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
+		//m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
+		//m_rearTire.m_frictionModel = ndTireFrictionModel::m_pacejkaSport;
+		//m_frontTire.m_frictionModel = ndTireFrictionModel::m_pacejkaSport;
+		//m_rearTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
+		//m_frontTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
+
+		// Get a stock pacejka curve set and modified a litle for dramatic driving
+		ndTireFrictionModel::ndPacejkaTireModel lateral;
+		ndTireFrictionModel::ndPacejkaTireModel longitudinal;
+		m_frontTire.GetPacejkaCurves(ndTireFrictionModel::m_pacejkaSport, longitudinal, lateral);
+		lateral.m_d = 0.3f;
+
+		// override the tire cuves.
+		m_rearTire.SetPacejkaCurves(longitudinal, lateral);
+		m_frontTire.SetPacejkaCurves(longitudinal, lateral);
+
+		// plot the curve to check it is a value form
+		m_frontTire.PlotPacejkaCurves("sportcar");
 	}
 };
 
@@ -78,6 +91,7 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 
 		m_comDisplacement = ndVector(0.0f, -0.65f, 0.0f, 0.0f);
 
+		m_chassisMass = 1000.0f;
 		m_frontTire.m_mass = 25.0f;
 		m_frontTire.m_verticalOffset = 0.0f;
 		m_frontTire.m_steeringAngle = 35.0f * ndDegreeToRad;
@@ -102,13 +116,25 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_torsionBarType = m_fourWheelAxle;
 		m_differentialType = m_fourWheeldrive;
 
-		//m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		//m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		m_rearTire.m_frictionModel = ndTireFrictionModel::m_pacejkaSport;
-		m_frontTire.m_frictionModel = ndTireFrictionModel::m_pacejkaSport;
+		////m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
+		////m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
+		//m_rearTire.m_frictionModel = ndTireFrictionModel::m_pacejkaSport;
+		//m_frontTire.m_frictionModel = ndTireFrictionModel::m_pacejkaSport;
+		//m_rearTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
+		//m_frontTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
 
-		m_rearTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
-		m_frontTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
+		// Get a stock pacejka curve set and modified a litle for dramatic driving
+		ndTireFrictionModel::ndPacejkaTireModel lateral;
+		ndTireFrictionModel::ndPacejkaTireModel longitudinal;
+		m_frontTire.GetPacejkaCurves(ndTireFrictionModel::m_pacejkaSport, longitudinal, lateral);
+		lateral.m_d = 0.5f;
+
+		// override the tire cuves.
+		m_rearTire.SetPacejkaCurves(longitudinal, lateral);
+		m_frontTire.SetPacejkaCurves(longitudinal, lateral);
+
+		// plot the curve to check it is a value form
+		m_frontTire.PlotPacejkaCurves("sportcar");
 	}
 };
 
@@ -164,7 +190,7 @@ class ndVehicleDectriptorMonsterTruck0: public ndVehicleDectriptor
 		//m_rearTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
 		//m_frontTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
 
-		// Get a stck pajeck curve set and modified a litle for dramatic driving
+		// Get a stock pacejka curve set and modified a litle for dramatic driving
 		ndTireFrictionModel::ndPacejkaTireModel lateral;
 		ndTireFrictionModel::ndPacejkaTireModel longitudinal;
 		m_frontTire.GetPacejkaCurves(ndTireFrictionModel::m_pacejkaUtility, longitudinal, lateral);
@@ -193,7 +219,7 @@ class ndVehicleDectriptorMonsterTruck1 : public ndVehicleDectriptor
 		m_transmission.m_forwardRatios[3] = 0.8f;
 		m_transmission.m_crownGearRatio = 20.0f;
 
-		m_comDisplacement = ndVector(0.0f, -1.5f, 0.0f, 0.0f);
+		m_comDisplacement = ndVector(0.0f, -1.3f, 0.0f, 0.0f);
 		
 		ndFloat32 idleTorquePoundFoot = 300.0f;
 		ndFloat32 idleRmp = 800.0f;
@@ -229,14 +255,26 @@ class ndVehicleDectriptorMonsterTruck1 : public ndVehicleDectriptor
 		m_torsionBarType = m_fourWheelAxle;
 		m_differentialType = m_fourWheeldrive;
 
-		m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		//m_rearTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
-		//m_frontTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
-		//m_rearTire.m_laterialStiffness = m_rearTire.m_longitudinalStiffness;
-		//m_frontTire.m_laterialStiffness = m_frontTire.m_longitudinalStiffness;
-		m_rearTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
-		m_frontTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
+		//m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
+		//m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
+		////m_rearTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
+		////m_frontTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
+		////m_rearTire.m_laterialStiffness = m_rearTire.m_longitudinalStiffness;
+		////m_frontTire.m_laterialStiffness = m_frontTire.m_longitudinalStiffness;
+		//m_rearTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
+		//m_frontTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
+
+		ndTireFrictionModel::ndPacejkaTireModel lateral;
+		ndTireFrictionModel::ndPacejkaTireModel longitudinal;
+		m_frontTire.GetPacejkaCurves(ndTireFrictionModel::m_pacejkaUtility, longitudinal, lateral);
+		lateral.m_d = 0.3f;
+
+		// override the tire cuves.
+		m_rearTire.SetPacejkaCurves(longitudinal, lateral);
+		m_frontTire.SetPacejkaCurves(longitudinal, lateral);
+
+		// plot the curve to check it is a value form
+		m_frontTire.PlotPacejkaCurves("sportcar");
 	}
 };
 
@@ -374,8 +412,6 @@ static ndMultiBodyVehicle* CreateBasicVehicle(ndDemoEntityManager* const scene, 
 	//	}
 	//}
 
-
-//	friend class ndTireFrictionModel;
 	return vehicle;
 }
 
@@ -449,28 +485,28 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	ndSharedPtr<ndUIEntity> vehicleUI(new ndVehicleUI(scene));
 	scene->Set2DDisplayRenderFunction(vehicleUI);
 	
-	//ndSharedPtr<ndModel> vehicle0 (CreateBasicVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
-	//ndSharedPtr<ndModel> vehicle1 (CreateBasicVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f,  -6.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
+	ndSharedPtr<ndModel> vehicle0 (CreateBasicVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
+	ndSharedPtr<ndModel> vehicle1 (CreateBasicVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f,  -6.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
 	ndSharedPtr<ndModel> vehicle2 (CreateBasicVehicle(scene, monterTruckDesc0, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 0.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
-	//ndSharedPtr<ndModel> vehicle3 (CreateBasicVehicle(scene, monterTruckDesc1, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 6.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
+	ndSharedPtr<ndModel> vehicle3 (CreateBasicVehicle(scene, monterTruckDesc1, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 6.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
 
-	//world->AddModel(vehicle0);
-	//vehicle0->AddBodiesAndJointsToWorld();
+	world->AddModel(vehicle0);
+	vehicle0->AddBodiesAndJointsToWorld();
 
-	//world->AddModel(vehicle1);
-	//vehicle1->AddBodiesAndJointsToWorld();
+	world->AddModel(vehicle1);
+	vehicle1->AddBodiesAndJointsToWorld();
 	
 	world->AddModel(vehicle2);
 	vehicle2->AddBodiesAndJointsToWorld();
 	
-	//world->AddModel(vehicle3);
-	//vehicle3->AddBodiesAndJointsToWorld();
+	world->AddModel(vehicle3);
+	vehicle3->AddBodiesAndJointsToWorld();
 
 	//test removing model from world
 	//vehicle1->RemoveBodiesAndJointsFromWorld();
 	//world->RemoveModel(*vehicle1);
 
-	ndSharedPtr<ndModel> vehicle(vehicle2);
+	ndSharedPtr<ndModel> vehicle(vehicle0);
 	ndVehicleCommonNotify* const notifyCallback = (ndVehicleCommonNotify*)*vehicle->GetNotifyCallback();
 	notifyCallback->SetAsPlayer(scene);
 	matrix.m_posit.m_x += 5.0f;
@@ -478,7 +514,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	
 	matrix.m_posit.m_x += 40.0f;
 	matrix.m_posit.m_z += 5.0f;
-	//AddPlanks(scene, matrix, 60.0f, 5);
+	AddPlanks(scene, matrix, 60.0f, 5);
 
 	ndQuaternion rot;
 	ndVector origin(-10.0f, 2.0f, -10.0f, 1.0f);

@@ -14,7 +14,7 @@
 #include "ndMultiBodyVehicle.h"
 #include "ndMultiBodyVehicleTireJoint.h"
 
-static ndTireFrictionModel::ndPacejkaTireModel pacejkaSportLateral(ndFloat32(0.01f), ndFloat32(2.85f), ndFloat32(1000.0f), ndFloat32(1.42f), ndFloat32(0.0f), ndFloat32(0.01f));
+static ndTireFrictionModel::ndPacejkaTireModel pacejkaSportLateral(ndFloat32(0.2f), ndFloat32(1.5f), ndFloat32(1000.0f), ndFloat32(-0.1f), ndFloat32(0.0f), ndFloat32(0.01f));
 static ndTireFrictionModel::ndPacejkaTireModel pacejkaSportLongitudinal(ndFloat32(0.5f), ndFloat32(1.65f), ndFloat32(1000.0f), ndFloat32(0.8f), ndFloat32(0.0f), ndFloat32(0.0f));
 
 static ndTireFrictionModel::ndPacejkaTireModel pacejkaUtilityLateral(ndFloat32(0.14f), ndFloat32(1.35f), ndFloat32(1000.0f), ndFloat32(-0.5f), ndFloat32(0.0f), ndFloat32(0.01f));
