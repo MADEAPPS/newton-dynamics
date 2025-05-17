@@ -208,7 +208,7 @@ void ndGameControllerInputs::GetWheelJoystickInputs(ndDemoEntityManager* const s
 		{
 			for (ndInt32 i = 0; i < buttonMapping.GetCapacity(); ++i)
 			{
-				buttonMapping.PushBack(m_buttonCount);
+				buttonMapping.PushBack(0);
 			}
 			buttonMapping[1] = m_button_00;     //m_handBreakButton
 			buttonMapping[4] = m_button_01;		//m_downGearButton
@@ -225,7 +225,8 @@ void ndGameControllerInputs::GetWheelJoystickInputs(ndDemoEntityManager* const s
 	m_buttons.SetCount(m_buttonCount);
 	for (ndInt32 i = 0; i < unmappedButtons.GetCount(); ++i)
 	{
-		m_buttons[buttonMapping[i]] = unmappedButtons[i];
+		ndInt32 index = buttonMapping[i];
+		m_buttons[index] = unmappedButtons[i];
 		//if (unmappedButtons[i])
 		//{
 		//	ndTrace(("(%d %d)\n", i, m_buttons[buttonMapping[i]]));
@@ -241,12 +242,14 @@ void ndGameControllerInputs::GetWheelJoystickInputs(ndDemoEntityManager* const s
 		axisMapping[0] = m_azis_00;
 		axisMapping[1] = m_azis_01;
 		axisMapping[2] = m_azis_02;
+		axisMapping[3] = m_azis_03;
 	}
 
-	m_axis.SetCount(m_axisCount);
-	for (ndInt32 i = 0; i < axisMapping.GetCount(); i++)
+	m_axis.SetCount(axisMapping.GetCount());
+	for (ndInt32 i = 0; i < unmappedAxis.GetCount(); i++)
 	{
-		m_axis[axisMapping[i]] = unmappedAxis[i];
+		ndInt32 axisIndex = axisMapping[i];
+		m_axis[axisIndex] = unmappedAxis[i];
 	}
 	m_axis[m_azis_00] = -m_axis[m_azis_00] * 2.0f; 
 	m_axis[m_azis_01] = (1.0f - m_axis[m_azis_01]) * 0.5f;
