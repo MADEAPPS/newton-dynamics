@@ -69,7 +69,7 @@ class ndVehicleDectriptorViper : public ndVehicleDectriptor
 		m_frontTire.SetPacejkaCurves(longitudinal, lateral);
 
 		// plot the curve to check it is a value form
-		m_frontTire.PlotPacejkaCurves("sportcar");
+		m_frontTire.PlotPacejkaCurves("sportTireModel");
 	}
 };
 
@@ -134,7 +134,7 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_frontTire.SetPacejkaCurves(longitudinal, lateral);
 
 		// plot the curve to check it is a value form
-		m_frontTire.PlotPacejkaCurves("sportcar");
+		m_frontTire.PlotPacejkaCurves("sportTireModel");
 	}
 };
 
@@ -201,7 +201,7 @@ class ndVehicleDectriptorMonsterTruck0: public ndVehicleDectriptor
 		m_frontTire.SetPacejkaCurves(longitudinal, lateral);
 
 		// plot the curve to check it is a value form
-		m_frontTire.PlotPacejkaCurves("monsterTruck");
+		m_frontTire.PlotPacejkaCurves("utilityVehicleTireModel");
 	}
 };
 
@@ -274,7 +274,7 @@ class ndVehicleDectriptorMonsterTruck1 : public ndVehicleDectriptor
 		m_frontTire.SetPacejkaCurves(longitudinal, lateral);
 
 		// plot the curve to check it is a value form
-		m_frontTire.PlotPacejkaCurves("sportcar");
+		m_frontTire.PlotPacejkaCurves("utilityVehicleTireModel");
 	}
 };
 

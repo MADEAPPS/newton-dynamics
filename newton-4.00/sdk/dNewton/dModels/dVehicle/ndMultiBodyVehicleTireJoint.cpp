@@ -23,10 +23,8 @@ static ndTireFrictionModel::ndPacejkaTireModel pacejkaUtilityLongitudinal(ndFloa
 static ndTireFrictionModel::ndPacejkaTireModel pacejkaTruckLateral(ndFloat32(0.01f), ndFloat32(2.85f), ndFloat32(1000.0f), ndFloat32(1.42f), ndFloat32(0.0f), ndFloat32(0.01f));
 static ndTireFrictionModel::ndPacejkaTireModel pacejkaTruckLongitudinal(ndFloat32(0.5f), ndFloat32(1.65f), ndFloat32(1000.0f), ndFloat32(0.8f), ndFloat32(0.0f), ndFloat32(0.0f));
 
-
 ndTireFrictionModel::ndTireFrictionModel()
-	:m_brush()
-	,m_frictionModel(m_brushModel)
+	:m_frictionModel(m_pacejkaUtility)
 {
 	SetPacejkaCurves(m_pacejkaUtility);
 }
@@ -99,18 +97,6 @@ void ndTireFrictionModel::PlotPacejkaCurves(const char* const name) const
 		fprintf(outFile, "%g; %g; %g\n", fx, fz, x);
 	}
 	fclose(outFile);
-}
-
-ndTireFrictionModel::ndBrushTireModel::ndBrushTireModel()
-	:m_laterialStiffness(ndFloat32(10.0f))
-	,m_longitudinalStiffness(ndFloat32(10.0f))
-{
-}
-
-ndTireFrictionModel::ndBrushTireModel::ndBrushTireModel(ndFloat32 laterialStiffness, ndFloat32 longitudinalStiffness)
-	:m_laterialStiffness(laterialStiffness)
-	,m_longitudinalStiffness(longitudinalStiffness)
-{
 }
 
 ndTireFrictionModel::ndPacejkaTireModel::ndPacejkaTireModel()

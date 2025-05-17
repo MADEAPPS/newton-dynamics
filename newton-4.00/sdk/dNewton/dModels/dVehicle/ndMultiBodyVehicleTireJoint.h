@@ -18,16 +18,6 @@
 class ndTireFrictionModel
 {
 	public:
-	class ndBrushTireModel
-	{
-		public:
-		D_NEWTON_API ndBrushTireModel();
-		D_NEWTON_API ndBrushTireModel(ndFloat32 laterialStiffness, ndFloat32 longitudinalStiffness);
-
-		ndFloat32 m_laterialStiffness;
-		ndFloat32 m_longitudinalStiffness;
-	};
-
 	class ndPacejkaTireModel
 	{
 		public:
@@ -55,7 +45,6 @@ class ndTireFrictionModel
 	enum ndFrictionModel
 	{
 		m_coulomb,
-		m_brushModel,
 		m_pacejkaSport,
 		m_pacejkaTruck,
 		m_pacejkaUtility,
@@ -70,7 +59,6 @@ class ndTireFrictionModel
 	D_NEWTON_API void SetPacejkaCurves(const ndPacejkaTireModel& longitudinal, const ndPacejkaTireModel& lateral);
 	D_NEWTON_API void GetPacejkaCurves(ndFrictionModel pacejkaStockModel, ndPacejkaTireModel& longitudinal, ndPacejkaTireModel& lateral) const;
 
-	ndBrushTireModel m_brush;
 	ndPacejkaTireModel m_lateralPacejka;
 	ndPacejkaTireModel m_longitudinalPacejka;
 	ndFrictionModel m_frictionModel;
