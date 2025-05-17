@@ -1182,11 +1182,12 @@ ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, 
 	};
 	
 	ndFixSizeArray<ndContactPoint, 32> buffer;
-	ndFixSizeArray<ndVector, D_MAX_CONTATCS> array;
+	ndFixSizeArray<ndVector, D_MAX_CONTATCS> array(D_MAX_CONTATCS);
 	ndFixSizeArray<ndConvexFaceNode, D_MAX_CONTATCS> convexHull;
 	const ndVector xyMask(ndVector::m_xMask | ndVector::m_yMask);
 	ndUpHeap<ndConvexFaceNode*, ndFloat32> sortHeap(&array[0], D_MAX_CONTATCS * array.GetCapacity());
 	
+	array.SetCount(0);
 	for (ndInt32 i = 0; i < count; ++i)
 	{
 		ndVector p(matrix.UntransformVector(contactArray[i].m_point) & xyMask);
