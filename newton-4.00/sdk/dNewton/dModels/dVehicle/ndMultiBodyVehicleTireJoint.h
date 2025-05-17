@@ -36,8 +36,9 @@ class ndTireFrictionModel
 
 		private:
 		void CalculateMaxPhi();
-		ndFloat32 Evaluate(ndFloat32 phi, ndFloat32 f) const;
+		ndFloat32 Evaluate(ndFloat32 phi, ndFloat32 frictionCoefficient) const;
 
+		public:
 		ndFloat32 m_b;
 		ndFloat32 m_c;
 		ndFloat32 m_d;
@@ -45,8 +46,10 @@ class ndTireFrictionModel
 		ndFloat32 m_sv;
 		ndFloat32 m_sh;
 		ndFloat32 m_normalizingPhi;
+		ndFloat32 m_norminalNormalForce;
 
 		friend class ndMultiBodyVehicle;
+		friend class ndTireFrictionModel;
 	};
 
 	enum ndFrictionModel
@@ -60,13 +63,12 @@ class ndTireFrictionModel
 		m_coulombCicleOfFriction,
 	};
 
-	ndTireFrictionModel()
-		:m_brush()
-		,m_lateralPacejka(ndFloat32(0.01f), ndFloat32(2.85f), ndFloat32(0.2f), ndFloat32(1.42f), ndFloat32(0.0f), ndFloat32(0.01f))
-		,m_longitudinalPacejka(ndFloat32(0.5f), ndFloat32(1.65f), ndFloat32(1.0f), ndFloat32(0.8f), ndFloat32(0.0f), ndFloat32(0.0f))
-		,m_frictionModel(m_brushModel)
-	{
-	}
+	D_NEWTON_API ndTireFrictionModel();
+	D_NEWTON_API void PlotPacejkaCurves(const char* const name) const;
+
+	D_NEWTON_API void SetPacejkaCurves(ndFrictionModel pacejkaStockModel);
+	D_NEWTON_API void SetPacejkaCurves(const ndPacejkaTireModel& longitudinal, const ndPacejkaTireModel& lateral);
+	D_NEWTON_API void GetPacejkaCurves(ndFrictionModel pacejkaStockModel, ndPacejkaTireModel& longitudinal, ndPacejkaTireModel& lateral) const;
 
 	ndBrushTireModel m_brush;
 	ndPacejkaTireModel m_lateralPacejka;
@@ -115,8 +117,6 @@ class ndMultiBodyVehicleTireJoint: public ndJointWheel
 	ndFloat32 m_lateralSlip;
 	ndFloat32 m_longitudinalSlip;
 	ndFloat32 m_normalizedAligningTorque;
-
-	bool m_hasVSC;
 
 	friend class ndMultiBodyVehicle;
 } D_GCC_NEWTON_CLASS_ALIGN_32;

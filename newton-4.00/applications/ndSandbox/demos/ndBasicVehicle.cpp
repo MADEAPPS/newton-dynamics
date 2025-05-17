@@ -157,13 +157,25 @@ class ndVehicleDectriptorMonsterTruck0: public ndVehicleDectriptor
 		m_torsionBarType = m_fourWheelAxle;
 		m_differentialType = m_fourWheeldrive;
 
-		m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		m_rearTire.m_frictionModel = ndTireFrictionModel::m_pacejkaUtility;
-		m_frontTire.m_frictionModel = ndTireFrictionModel::m_pacejkaUtility;
+		//m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
+		//m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
+		//m_rearTire.m_frictionModel = ndTireFrictionModel::m_pacejkaUtility;
+		//m_frontTire.m_frictionModel = ndTireFrictionModel::m_pacejkaUtility;
+		//m_rearTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
+		//m_frontTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
 
-		m_rearTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
-		m_frontTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
+		// Get a stck pajeck curve set and modified a litle for dramatic driving
+		ndTireFrictionModel::ndPacejkaTireModel lateral;
+		ndTireFrictionModel::ndPacejkaTireModel longitudinal;
+		m_frontTire.GetPacejkaCurves(ndTireFrictionModel::m_pacejkaUtility, longitudinal, lateral);
+		lateral.m_d = 0.25f;
+
+		// override the tire cuves.
+		m_rearTire.SetPacejkaCurves(longitudinal, lateral);
+		m_frontTire.SetPacejkaCurves(longitudinal, lateral);
+
+		// plot the curve to check it is a value form
+		m_frontTire.PlotPacejkaCurves("monsterTruck");
 	}
 };
 
@@ -361,7 +373,9 @@ static ndMultiBodyVehicle* CreateBasicVehicle(ndDemoEntityManager* const scene, 
 	//		break;
 	//	}
 	//}
-	
+
+
+//	friend class ndTireFrictionModel;
 	return vehicle;
 }
 
