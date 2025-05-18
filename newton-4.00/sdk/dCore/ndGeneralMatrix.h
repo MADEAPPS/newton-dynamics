@@ -36,14 +36,14 @@
 //
 //*************************************************************
 template<class T>
-void ndMatrixTimeVector(ndInt32 size, const T* const matrix, const T* const v, T* const out)
+void ndMatrixTimeVector(ndInt32 size, ndInt32 stride, const T* const matrix, const T* const v, T* const out)
 {
-	ndInt32 stride = 0;
+	ndInt32 rowStart = 0;
 	for (ndInt32 i = 0; i < size; ++i) 
 	{
-		const T* const row = &matrix[stride];
+		const T* const row = &matrix[rowStart];
 		out[i] = ndDotProduct(size, row, v);
-		stride += size;
+		rowStart += stride;
 	}
 }
 
@@ -67,18 +67,18 @@ void ndMatrixTimeMatrix(ndInt32 size, const T* const matrixA, const T* const mat
 }
 
 template<class T>
-void ndCovarianceMatrix(ndInt32 size, T* const matrix, const T* const vectorA, const T* const vectorB)
+void ndCovarianceMatrix(ndInt32 size, ndInt32 stride, T* const matrix, const T* const vectorA, const T* const vectorB)
 {
-	ndInt32 stride = 0;
+	ndInt32 rowStart = 0;
 	for (ndInt32 i = 0; i < size; ++i) 
 	{
-		T scale(vectorA[i]);
-		T* const row = &matrix[stride];
+		const T scale(vectorA[i]);
+		T* const row = &matrix[rowStart];
 		for (ndInt32 j = 0; j < size; ++j) 
 		{
 			row[j] = scale * vectorB[j];
 		}
-		stride += size;
+		rowStart += stride;
 	}
 }
 
