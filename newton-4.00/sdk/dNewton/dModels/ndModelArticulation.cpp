@@ -601,7 +601,8 @@ ndModelArticulation::ndCenterOfMassDynamics ndModelArticulation::CalculateCentre
 	ndFixSizeArray<const ndBodyKinematic*, 256> bodyArray;
 	CalculateCentreOfMass(dynamics, bodyArray, bodyCenter);
 
-	solver.SolverBegin(skeleton, &extraJoints[0], extraJoints.GetCount(), GetWorld(), timestep);
+	ndJointBilateralConstraint** const extraJointsPtr = extraJoints.GetCount() ? &extraJoints[0] : nullptr;
+	solver.SolverBegin(skeleton, extraJointsPtr, extraJoints.GetCount(), GetWorld(), timestep);
 	solver.Solve();
 	auto CalculateComFullDynamics = [this, &dynamics, &bodyArray, &bodyCenter]()
 	{
