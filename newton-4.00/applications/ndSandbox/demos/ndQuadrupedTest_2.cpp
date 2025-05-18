@@ -1120,6 +1120,8 @@ namespace ndQuadruped_2
 				ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
 				hyperParameters.m_numberOfActions = numberOfActions;
 				hyperParameters.m_numberOfObservations = numberOfObservations;
+				hyperParameters.m_numberOfHiddenLayers = 2;
+				hyperParameters.m_hiddenLayersNumberOfNeurons = 128;
 				#ifdef USE_SAC
 					m_outFile = fopen("ndQuadruped_2-sac.csv", "wb");
 					fprintf(m_outFile, "sac\n");
@@ -1133,7 +1135,7 @@ namespace ndQuadruped_2
 
 				#endif
 			#else
-				m_stopTraining = 500 * 1000000;
+				m_stopTraining = 200 * 1000000;
 				ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 				hyperParameters.m_numberOfActions = numberOfActions;
 				hyperParameters.m_numberOfObservations = numberOfObservations;
