@@ -160,6 +160,16 @@ void ndMul(ndInt32 size, T* const X, const T* const A, const T* const B)
 }
 
 template<class T>
+void ndDiv(ndInt32 size, T* const X, const T* const A, const T* const B)
+{
+	for (ndInt32 i = 0; i < size; ++i)
+	{
+		X[i] = A[i] / B[i];
+		ndAssert(ndCheckFloat(X[i]));
+	}
+}
+
+template<class T>
 void ndMulAdd(ndInt32 size, T* const X, const T* const B, const T* const C)
 {
 	for (ndInt32 i = 0; i < size; ++i)
@@ -200,5 +210,3 @@ void ndMulSub(ndInt32 size, T* const X, const T* const A, const T* const B, cons
 }
 
 #endif
-
-
