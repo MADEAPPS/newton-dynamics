@@ -192,14 +192,13 @@ class ndVehicleCommonNotify : public ndModelNotify
 
 	enum ndInputButtons
 	{
-		m_handBreakButton = ndGameControllerInputs::m_button_00,
+		m_ignitionButton = ndGameControllerInputs::m_button_00,
 		m_upGearButton = ndGameControllerInputs::m_button_01,
 		m_downGearButton = ndGameControllerInputs::m_button_02,
-		m_neutralGearButton = ndGameControllerInputs::m_button_03,
-		m_ignitionButton = ndGameControllerInputs::m_button_04,
+		m_handBreakButton = ndGameControllerInputs::m_button_03,
+		m_neutralGearButton = ndGameControllerInputs::m_button_04,
 		m_reverseGearButton = ndGameControllerInputs::m_button_05,
 		m_automaticGearBoxButton = ndGameControllerInputs::m_button_06,
-		m_parkingButton = ndGameControllerInputs::m_button_07,
 		m_playerButton = ndGameControllerInputs::m_button_08,
 	};
 

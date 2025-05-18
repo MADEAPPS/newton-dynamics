@@ -51,18 +51,11 @@ class ndVehicleDectriptorViper : public ndVehicleDectriptor
 		m_rearTire.m_mass = 25.0f;
 		m_rearTire.m_handBrakeTorque = 100000.0f;
 
-		//m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		//m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		//m_rearTire.m_frictionModel = ndTireFrictionModel::m_pacejkaSport;
-		//m_frontTire.m_frictionModel = ndTireFrictionModel::m_pacejkaSport;
-		//m_rearTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
-		//m_frontTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
-
 		// Get a stock pacejka curve set and modified a litle for dramatic driving
 		ndTireFrictionModel::ndPacejkaTireModel lateral;
 		ndTireFrictionModel::ndPacejkaTireModel longitudinal;
 		m_frontTire.GetPacejkaCurves(ndTireFrictionModel::m_pacejkaSport, longitudinal, lateral);
-		lateral.m_d = 0.3f;
+		lateral.m_d = 0.4f;
 
 		// override the tire cuves.
 		m_rearTire.SetPacejkaCurves(longitudinal, lateral);
@@ -115,13 +108,6 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_rearTire.m_handBrakeTorque = 100000.0f;
 		m_torsionBarType = m_fourWheelAxle;
 		m_differentialType = m_fourWheeldrive;
-
-		////m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		////m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		//m_rearTire.m_frictionModel = ndTireFrictionModel::m_pacejkaSport;
-		//m_frontTire.m_frictionModel = ndTireFrictionModel::m_pacejkaSport;
-		//m_rearTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
-		//m_frontTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
 
 		// Get a stock pacejka curve set and modified a litle for dramatic driving
 		ndTireFrictionModel::ndPacejkaTireModel lateral;
@@ -182,13 +168,6 @@ class ndVehicleDectriptorMonsterTruck0: public ndVehicleDectriptor
 		m_rearTire.m_handBrakeTorque = 100000.0f;
 		m_torsionBarType = m_fourWheelAxle;
 		m_differentialType = m_fourWheeldrive;
-
-		//m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		//m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		//m_rearTire.m_frictionModel = ndTireFrictionModel::m_pacejkaUtility;
-		//m_frontTire.m_frictionModel = ndTireFrictionModel::m_pacejkaUtility;
-		//m_rearTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
-		//m_frontTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
 
 		// Get a stock pacejka curve set and modified a litle for dramatic driving
 		ndTireFrictionModel::ndPacejkaTireModel lateral;
@@ -254,15 +233,6 @@ class ndVehicleDectriptorMonsterTruck1 : public ndVehicleDectriptor
 		m_rearTire.m_handBrakeTorque = 50000.0f;
 		m_torsionBarType = m_fourWheelAxle;
 		m_differentialType = m_fourWheeldrive;
-
-		//m_rearTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		//m_frontTire.m_frictionModel = ndTireFrictionModel::m_brushModel;
-		////m_rearTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
-		////m_frontTire.m_longitudinalStiffness = 0.75f * DEMO_GRAVITY;
-		////m_rearTire.m_laterialStiffness = m_rearTire.m_longitudinalStiffness;
-		////m_frontTire.m_laterialStiffness = m_frontTire.m_longitudinalStiffness;
-		//m_rearTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
-		//m_frontTire.m_brush = ndTireFrictionModel::ndBrushTireModel(0.75f * DEMO_GRAVITY, 0.75f * DEMO_GRAVITY);
 
 		ndTireFrictionModel::ndPacejkaTireModel lateral;
 		ndTireFrictionModel::ndPacejkaTireModel longitudinal;

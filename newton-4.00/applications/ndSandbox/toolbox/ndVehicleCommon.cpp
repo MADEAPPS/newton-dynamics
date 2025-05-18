@@ -150,7 +150,7 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_transmission.m_torqueConverter = 2000.0f;
 	m_transmission.m_idleClutchTorque = 200.0f;
 	m_transmission.m_lockedClutchTorque = 1.0e6f;
-	m_transmission.m_gearShiftDelayTicks = 300;
+	m_transmission.m_gearShiftDelayTicks = 180;
 	m_transmission.m_manual = false;
 
 	m_frontTire.m_mass = 20.0f;
@@ -541,11 +541,6 @@ void ndVehicleCommonNotify::ApplyInputs(ndFloat32)
 			tire->SetSteering(steerAngle);
 			tire->SetHandBreak(handBrake);
 		}
-
-		//if (handBrake)
-		//{
-		//	handBrake *= 1;
-		//}
 	};
 
 	m_inputs.Update(scene);
