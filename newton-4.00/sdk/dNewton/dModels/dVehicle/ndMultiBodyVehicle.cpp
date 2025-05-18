@@ -1235,7 +1235,13 @@ bool ndMultiBodyVehicle::PacejkaTireModel(ndMultiBodyVehicleTireJoint* const tir
 	ndFloat32 den = ndFloat32(1.0f) + ndAbs(longitudialSlip);
 	ndFloat32 phi_x = -longitudialSlip / den;
 	ndFloat32 phi_z = ndTan(sideSlipAngleInRadians) / den;
-	ndFloat32 phi = ndSqrt(phi_x * phi_x + phi_z * phi_z);
+	ndFloat32 phi2 = phi_x * phi_x + phi_z * phi_z;
+	if (phi2 < ndFloat32 (1.0e-6f))
+	{
+		// this is the vanishing phi
+		return true;
+	}
+	ndFloat32 phi = ndSqrt(phi2);
 
 	const ndFloat32 frictionCoefficient_x = contactPoint.m_material.m_staticFriction0;
 	const ndFloat32 frictionCoefficient_z = contactPoint.m_material.m_staticFriction1;
