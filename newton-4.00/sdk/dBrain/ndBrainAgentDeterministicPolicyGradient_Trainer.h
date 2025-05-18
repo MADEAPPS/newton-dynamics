@@ -145,7 +145,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
 		ndInt32 m_numberOfActions;
 		ndInt32 m_numberOfObservations;
 
-		ndInt32 m_actorHiddenLayers;
+		ndInt32 m_numberOfHiddenLayers;
 		ndInt32 m_hiddenLayersNumberOfNeurons;
 
 		ndInt32 m_replayBufferSize;
