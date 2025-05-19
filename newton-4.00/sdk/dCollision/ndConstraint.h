@@ -248,6 +248,7 @@ class ndRightHandSide
 
 	ndFloat32 m_JinvMJt;
 	ndFloat32 m_diagonalPreconditioner;
+	ndFloat32 m_invDiagonalPreconditioner;
 	ndForceImpactPair* m_jointFeebackForce;
 	ndInt32 m_normalForceIndex;
 	ndInt32 m_normalForceIndexFlat;

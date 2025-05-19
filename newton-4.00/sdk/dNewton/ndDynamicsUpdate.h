@@ -63,8 +63,8 @@ class ndDynamicsUpdate : public ndClassAlloc
 		public:
 		ndIsland(ndBodyKinematic* const root)
 			:m_start(0)
-			, m_count(0)
-			, m_root(root)
+			,m_count(0)
+			,m_root(root)
 		{
 		}
 

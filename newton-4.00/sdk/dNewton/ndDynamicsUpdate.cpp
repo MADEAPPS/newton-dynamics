@@ -916,7 +916,10 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 				diag *= (ndFloat32(1.0f) + rhs->m_diagonalRegularizer);
 				rhs->m_JinvMJt = diag;
 				rhs->m_invJinvMJt = ndFloat32(1.0f) / diag;
-				rhs->m_diagonalPreconditioner = ndSqrt(diag);
+
+				ndFloat32 precond = ndSqrt(diag);
+				rhs->m_diagonalPreconditioner = precond;
+				rhs->m_invDiagonalPreconditioner = ndFloat32(1.0f) / precond;
 
 				const ndVector f(rhs->m_force);
 				forceAcc0 = forceAcc0 + JtM0.m_linear * f;
@@ -1394,10 +1397,10 @@ void ndDynamicsUpdate::CalculateJointsForce()
 			const ndInt32 resting = body0->m_equilibrium0 & body1->m_equilibrium0;
 			if (!resting)
 			{
-				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS + 1> force(rowsCount + 1);
 				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS> diagDamp(rowsCount);
 				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS> JinvMJt(rowsCount);
 				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS> invJinvMJt(rowsCount);
+				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS + 1> force(rowsCount + 1);
 				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS> coordenateAccel(rowsCount);
 				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS> lowerBoundFrictionCoefficent(rowsCount);
 				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS> upperBoundFrictionCoefficent(rowsCount);
@@ -1445,13 +1448,13 @@ void ndDynamicsUpdate::CalculateJointsForce()
 						const ndFloat32 a = coordenateAccel[i] - f0 * diagDamp[i] - accel.AddHorizontal().GetScalar();
 
 						ndAssert(normalForceIndexFlat[i] >= 0);
-						ndFloat32 f1 = f0 + a * invJinvMJt[i];
 						const ndInt32 frictionIndex = normalForceIndexFlat[i];
 						const ndFloat32 frictionNormal = force[frictionIndex];
 						const ndFloat32 lowerFrictionForce = frictionNormal * lowerBoundFrictionCoefficent[i];
 						const ndFloat32 upperFrictionForce = frictionNormal * upperBoundFrictionCoefficent[i];
 
-						f1 = ndClamp(f1, lowerFrictionForce, upperFrictionForce);
+						const ndFloat32 f1 = ndClamp(f0 + a * invJinvMJt[i], lowerFrictionForce, upperFrictionForce);
+						//f1 = ndClamp(f1, lowerFrictionForce, upperFrictionForce);
 						force[i] = f1;
 
 						const ndFloat32 deltaForce = f1 - f0;
@@ -1522,9 +1525,11 @@ void ndDynamicsUpdate::CalculateJointsForce()
 			const ndInt32 resting = body0->m_equilibrium0 & body1->m_equilibrium0;
 			if (!resting)
 			{
+				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS> JinvMJt(rowsCount);
 				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS> invJinvMJt(rowsCount);
 				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS + 8> force(rowsCount + 8);
 				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS> coordenateAccel(rowsCount);
+				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS> invPreconditioner(rowsCount);
 				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS + 8> preconditioner(rowsCount + 8);
 				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS> lowerBoundFrictionCoefficent(rowsCount);
 				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS> upperBoundFrictionCoefficent(rowsCount);
@@ -1541,8 +1546,16 @@ void ndDynamicsUpdate::CalculateJointsForce()
 					const ndRightHandSide* const rhs = &m_rightHandSide[rowStart + i];
 					ndAssert(rhs->SanityCheck());
 					force[i] = rhs->m_force;
-					preconditioner[i] = rhs->m_diagonalPreconditioner;
-					preconditioner[i] = 1.0f;
+					// set preconditioner to 1.0 for cecking the algorithm
+					preconditioner[i] = ndFloat32 (1.0f); 
+					invPreconditioner[i] = ndFloat32(1.0f) / preconditioner[i];
+
+					// for some reason using a precoditioner makes is more untable
+					// therefore the only reason to use this is if it was faster.
+					// but it does not seem to be, plus is uses about twice as much memory.
+					// I still believe there is a hidden bug, therfore I am keeping for further debugging.
+					//preconditioner[i] = rhs->m_diagonalPreconditioner;
+					//invPreconditioner[i] = rhs->m_invDiagonalPreconditioner;
 				}
 				for (ndInt32 i = rowsCount; i < stride; ++i)
 				{
@@ -1581,11 +1594,12 @@ void ndDynamicsUpdate::CalculateJointsForce()
 						sum += rowSimd[j * 2 + 0] * forceSimd[j * 2 + 0];
 					}
 					coordenateAccel[i] += sum.AddHorizontal().GetScalar();
-					invJinvMJt[i] = rhs->m_invJinvMJt * rhs->m_diagonalPreconditioner * rhs->m_diagonalPreconditioner;
+					invJinvMJt[i] = rhs->m_invJinvMJt * preconditioner[i] * preconditioner[i];
+					JinvMJt[i] = rhs->m_JinvMJt * invPreconditioner[i] * invPreconditioner[i];
 				}
 				for (ndInt32 i = 0; i < rowsCount; ++i)
 				{
-					force[i] /= preconditioner[i];
+					force[i] *= invPreconditioner[i];
 					coordenateAccel[i] *= preconditioner[i];
 				}
 
@@ -1614,7 +1628,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 							sum += rowSimd[j * 2 + 0] * forceStepSimd[j * 2 + 0] * precondSimd[j * 2 + 0];
 						}
 
-						const ndFloat32 r = coordenateAccel[i] - sum.AddHorizontal().GetScalar();
+						const ndFloat32 r = coordenateAccel[i] - sum.AddHorizontal().GetScalar() * preconditioner[i];
 						
 						ndAssert(normalForceIndexFlat[i] >= 0);
 						const ndInt32 frictionIndex = normalForceIndexFlat[i];
@@ -1622,10 +1636,13 @@ void ndDynamicsUpdate::CalculateJointsForce()
 						const ndFloat32 lowerFrictionForce = frictionNormal * lowerBoundFrictionCoefficent[i];
 						const ndFloat32 upperFrictionForce = frictionNormal * upperBoundFrictionCoefficent[i];
 						
-						accNorm += r * r;
+						//accNorm += r * r;
 						const ndFloat32 x0 = force[i];
 						const ndFloat32 x1 = x0 + r * invJinvMJt[i];
 						const ndFloat32 f = ndClamp(x1, lowerFrictionForce, upperFrictionForce);
+						const ndFloat32 residual = (f - x0) * JinvMJt[i];
+						accNorm += residual * residual;
+
 						ndAssert(ndCheckFloat(f));
 						force[i] = f;
 					}
