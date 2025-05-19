@@ -32,7 +32,7 @@
 // policy gradient for continues control re enforcement learning.  
 // ddpg algorithm as described in: https://arxiv.org/pdf/1509.02971.pdf
 // https://spinningup.openai.com/en/latest/algorithms/ddpg.html
-// https://spinningup.openai.com/en/latest/algorithms/td3.html#pseudocode
+// https://spinningup.openai.com/en/latest/algorithms/td3.html
 
 #define ND_USE_TDD3
 #ifdef ND_USE_TDD3
