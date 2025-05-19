@@ -1071,13 +1071,14 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndBvhNode** stackPo
 						else if (callback.m_param > savedNotification.m_param)
 						{
 							// restore contacts
+							callback.m_contacts.SetCount(0);
 							callback.m_normal = savedNotification.m_normal;
 							callback.m_closestPoint0 = savedNotification.m_closestPoint0;
 							callback.m_closestPoint1 = savedNotification.m_closestPoint1;
 							callback.m_param = savedNotification.m_param;
 							for (ndInt32 i = 0; i < savedNotification.m_contacts.GetCount(); ++i)
 							{
-								callback.m_contacts[i] = savedNotification.m_contacts[i];
+								callback.m_contacts.PushBack(savedNotification.m_contacts[i]);
 							}
 						}
 					}
@@ -1086,13 +1087,15 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndBvhNode** stackPo
 						// no new contacts restore old ones,
 						// in theory it should no copy, by the notification may change
 						// the previous found contacts
+						callback.m_contacts.SetCount(0);
 						callback.m_normal = savedNotification.m_normal;
 						callback.m_closestPoint0 = savedNotification.m_closestPoint0;
 						callback.m_closestPoint1 = savedNotification.m_closestPoint1;
 						callback.m_param = savedNotification.m_param;
 						for (ndInt32 i = 0; i < savedNotification.m_contacts.GetCount(); ++i)
 						{
-							callback.m_contacts[i] = savedNotification.m_contacts[i];
+							//callback.m_contacts[i] = savedNotification.m_contacts[i];
+							callback.m_contacts.PushBack(savedNotification.m_contacts[i]);
 						}
 					}
 
