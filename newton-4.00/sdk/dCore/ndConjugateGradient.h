@@ -34,13 +34,16 @@ template<class T>
 class ndConjugateGradient : public ndClassAlloc
 {
 	public:
-	ndConjugateGradient();
+	ndConjugateGradient(bool usePreconditioner = true);
 	~ndConjugateGradient();
 	T Solve(ndInt32 size, ndInt32 stride, T tolerance, T* const x, const T* const b, const T* const matrix) const;
+
+	bool m_usedPreconditioner;
 };
 
 template<class T>
-ndConjugateGradient<T>::ndConjugateGradient()
+ndConjugateGradient<T>::ndConjugateGradient(bool usePreconditioner)
+	:m_usedPreconditioner(usePreconditioner)
 {
 }
 
@@ -60,15 +63,35 @@ T ndConjugateGradient<T>::Solve(ndInt32 size, ndInt32 stride, T tolerance, T* co
 	T* const bPreconditioned = ndAlloca(T, size);
 	T* const xPreconditioned = ndAlloca(T, size);
 
+
+	ndMemCpy(bPreconditioned, b, size);
+	ndMemCpy(xPreconditioned, x, size);
+	ndMemSet(preconditioner, T(1.0f), size);
+
 	// naive preconditioner but very effective.
-	for (ndInt32 i = 0; i < size; ++i)
+	if (m_usedPreconditioner)
 	{
-		T diag = matrix[i * stride + i];
-		T precond = T(1.0f) / ndSqrt(diag);
-		//precond = 1.0f;
-		preconditioner[i] = precond;
-		bPreconditioned[i] = precond * b[i];
-		xPreconditioned[i] = x[i] / precond;
+		for (ndInt32 i = 0; i < size; ++i)
+		{
+			const T* const row = &matrix[i * stride];
+			T diag = row[i];
+			T offDiagDominant = ndFloat32 (0.0f);
+			for (ndInt32 j = 0; j < i; ++j)
+			{
+				offDiagDominant = ndMax(offDiagDominant, ndAbs(row[j]));
+			}
+			for (ndInt32 j = i + 1; j < size; ++j)
+			{
+				offDiagDominant = ndMax(offDiagDominant, ndAbs(row[j]));
+			}
+			if (diag <= offDiagDominant)
+			{
+				T precond = T(1.0f) / ndSqrt(diag);
+				preconditioner[i] = precond;
+				bPreconditioned[i] = precond * b[i];
+				xPreconditioned[i] = x[i] / precond;
+			}
+		}
 	}
 
 	auto StartResidual = [size, stride, r, p, q, tmp, matrix, xPreconditioned, bPreconditioned, preconditioner]()
