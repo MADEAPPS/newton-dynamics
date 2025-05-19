@@ -37,7 +37,7 @@
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
 //#define DEFAULT_SCENE	4		// conservation of momentum 
-//#define DEFAULT_SCENE	5		// basic Stacks
+#define DEFAULT_SCENE	5		// basic Stacks
 //#define DEFAULT_SCENE	6		// basic Trigger
 //#define DEFAULT_SCENE	7		// object Placement
 //#define DEFAULT_SCENE	8		// particle fluid
@@ -53,7 +53,7 @@
 //#define DEFAULT_SCENE	18		// cart pole continue controller
 //#define DEFAULT_SCENE	19		// unit cycle controller
 //#define DEFAULT_SCENE	20		// quadruped test 1
-#define DEFAULT_SCENE	21		// quadruped test 2
+//#define DEFAULT_SCENE	21		// quadruped test 2
 //#define DEFAULT_SCENE	22		// quadruped test 3
 //#define DEFAULT_SCENE	23		// quadruped test 3
 //#define DEFAULT_SCENE	24		// quadruped test 4
@@ -168,42 +168,76 @@ ndInt32 ndDemoEntityManager::ButtonKey::UpdatePushButton (bool triggerValue)
 
 void Test0__()
 {
-	ndFloat32 x[] = { 1.0f, -2.0f, 1.0f, 2.5f, 3.0f, -1.0f };
-	//ndFloat32 x[] = { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
-	ndFloat32 A[6][6];
-	ndFloat32 B[6];
-
-	ndCovarianceMatrix<ndFloat32>(6, &A[0][0], x, x);
-	for (ndInt32 i = 0; i < 6; ++i)
+	ndFixSizeArray<ndFloat32, 6> B(6);
+	ndFixSizeArray<ndFloat32, 6> x0(6);
+	ndFixSizeArray<ndFloat32, 6> x1(6);
+	ndFixSizeArray<ndFixSizeArray<ndFloat32, 6>, 6> A(6);
+	for (ndInt32 i = 0; i < A.GetCount(); ++i)
 	{
-		A[i][i] *= 1.1f;
-	}
-	ndAssert(ndTestPSDmatrix(6, 6, &A[0][0]));
-
-	ndMatrixTimeVector<ndFloat32>(6, &A[0][0], x, B);
-	for (ndInt32 i = 0; i < 6; ++i)
-	{
-		x[i] = 0;
+		A[i].SetCount(A.GetCount());
+		ndMemSet(&A[i][0], ndFloat32(0.0f), A.GetCount());
 	}
 
-	ndFloat32 precond[6 * 2];
-	ndConjugateGradient<ndFloat32> cgd;
-	cgd.Solve(6, 1.0e-5f, x, B, &A[0][0], precond);
+	ndFloat32 data[] = { 1.0f, -2.0f, 1.0f, 2.5f, 3.0f, -1.0f };
+	ndInt32 stride = ndInt32 (&A[1][0] - &A[0][0]);
+	//ndCovarianceMatrix<ndFloat32>(6, stride, &A[0][0], data, data);
+	//for (ndInt32 i = 0; i < A.GetCount(); ++i)
+	//{
+	//	A[i][i] *= 1.001f;
+	//}
+	ndFloat32 t = ndFloat32(0.99f);
+	A[0][0] = t;
+	for (ndInt32 i = 1; i < A.GetCount(); ++i)
+	{
+		A[i][i] = ndFloat32(1.0f) + t;
+	}
+	ndFloat32 ot = ndSqrt(t);
+	for (ndInt32 i = 0; i < A.GetCount() - 1; ++i)
+	{
+		A[i][i + 1] = ot;
+		A[i + 1][i] = ot;
+	}
+
+	for (ndInt32 i = 0; i < A.GetCount(); ++i)
+	{
+		x0[i] = ndFloat32(i) + 1.0f;
+		x1[i] = ndFloat32(i) - 1.0f;
+	}
+	ndAssert(ndTestPSDmatrix(6, stride, &A[0][0]));
+
+	ndMatrixTimeVector<ndFloat32>(A.GetCount(), stride, &A[0][0], &x0[0], &B[0]);
+
+	ndConjugateGradient<ndFloat32> cgd(true);
+	cgd.Solve(A.GetCount(), stride, ndFloat32(1.0e-5f), &x1[0], &B[0], &A[0][0]);
+
+	B[0] = 1.0f;
+	B[1] = 1.0f;
+	x1[0] = 0.0f;
+	x1[1] = 0.0f;
+	A[0][0] = 4.0f;
+	A[0][1] = 1.0f;
+	A[1][0] = 1.0f;
+	A[1][1] = 9.0f;
+	cgd.Solve(2, stride, ndFloat32(1.0e-5f), &x1[0], &B[0], &A[0][0]);
 }
 
-//static int fib(int n)
-//{
-//	int a = 0, b = 1, c;
-//	if (n == 0)
-//		return a;
-//	for (int i = 2; i <= n; i++)
-//	{
-//		c = a + b;
-//		a = b;
-//		b = c;
-//	}
-//	return b;
-//}
+static ndInt32 Fibonacci(ndInt32 n)
+{
+	ndInt32 a = 0;
+	ndInt32 b = 1;
+	
+	if (n == 0)
+	{
+		return a;
+	}
+	for (ndInt32 i = 2; i <= n; i++)
+	{
+		ndInt32 c = a + b;
+		a = b;
+		b = c;
+	}
+	return b;
+}
 
 void Test1__()
 {
@@ -606,9 +640,10 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	m_diretionalLightDir = ndVector(-1.0f, 1.0f, 1.0f, 0.0f).Normalize();
 
+	Test0__();
 	//Test1__();
 	//TestVulkanStuff();
-	ndHandWrittenDigits();
+	//ndHandWrittenDigits();
 	//ndCifar10ImageClassification();
 	//TargaToPng();
 }
