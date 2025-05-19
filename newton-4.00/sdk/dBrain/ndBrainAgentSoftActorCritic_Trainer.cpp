@@ -43,6 +43,7 @@ ndBrainAgentSoftActorCritic_Trainer::~ndBrainAgentSoftActorCritic_Trainer()
 //#pragma optimize( "", off )
 ndBrainFloat ndBrainAgentSoftActorCritic_Trainer::CalculatePolicyProbability(ndInt32 index, const ndBrainVector& sampledActions)
 {
+#ifdef ND_USE_GAUSSIAN_POLICY_OUTPUT
 	ndBrainFixSizeVector<256> distribution;
 	distribution.SetCount(m_policy.GetOutputSize());
 	const ndBrainMemVector observation(m_replayBuffer.GetObservations(index), m_policy.GetInputSize());
@@ -66,6 +67,10 @@ ndBrainFloat ndBrainAgentSoftActorCritic_Trainer::CalculatePolicyProbability(ndI
 	ndBrainFloat exponent = ndBrainFloat(0.5f) * z2;
 	ndBrainFloat prob = invSigma2Det * ndBrainFloat(ndExp(-exponent));
 	return ndMax(prob, ndBrainFloat(1.0e-4f));
+#else
+	ndAssert(0);
+	return ndBrainFloat(0.0f);
+#endif
 }
 
 //#pragma optimize( "", off )
@@ -73,16 +78,6 @@ ndBrainFloat ndBrainAgentSoftActorCritic_Trainer::CalculatePolicyProbability(ndI
 {
 	const ndBrainMemVector sampledProbabilities(m_replayBuffer.GetActions(index), m_policy.GetOutputSize());
 	return CalculatePolicyProbability(index, sampledProbabilities);
-}
-
-void ndBrainAgentSoftActorCritic_Trainer::BuildPolicyClass()
-{
-	ndAssert(0);
-}
-
-void ndBrainAgentSoftActorCritic_Trainer::BuildCriticClass()
-{
-	ndAssert(0);
 }
 
 //#pragma optimize( "", off )
@@ -220,22 +215,27 @@ void ndBrainAgentSoftActorCritic_Trainer::LearnPolicyFunction()
 					
 					if (m_owner->m_parameters.m_entropyRegularizerCoef > ndBrainFloat(1.0e-6f))
 					{
-						// calculate and add the Gradient of entropy (grad of log probability)
-						const ndInt32 count = ndInt32(m_owner->m_policy.GetOutputSize()) / 2;
-						const ndInt32 start = ndInt32(m_owner->m_policy.GetOutputSize()) / 2;
-						ndBrainMemVector sampledActions(m_owner->m_replayBuffer.GetActions(m_index), m_owner->m_policy.GetOutputSize());
-						ndBrainFloat entropyRegularizerCoef = m_owner->m_parameters.m_entropyRegularizerCoef;
-						for (ndInt32 i = count - 1; i >= 0; --i)
-						{
-							ndBrainFloat sigma = probabilityDistribution[i + start];
-							ndBrainFloat invSigma = ndBrainFloat(1.0f) / sigma;
-							ndBrainFloat z = sampledActions[i] - probabilityDistribution[i];
-							ndBrainFloat meanGrad = z * invSigma * invSigma;
-							ndBrainFloat sigmaGrad = z * z * invSigma * invSigma * invSigma - sigma;
+						ndAssert(0);
+						#ifdef ND_USE_GAUSSIAN_POLICY_OUTPUT
+							// calculate and add the Gradient of entropy (grad of log probability)
+							const ndInt32 count = ndInt32(m_owner->m_policy.GetOutputSize()) / 2;
+							const ndInt32 start = ndInt32(m_owner->m_policy.GetOutputSize()) / 2;
+							ndBrainMemVector sampledActions(m_owner->m_replayBuffer.GetActions(m_index), m_owner->m_policy.GetOutputSize());
+							ndBrainFloat entropyRegularizerCoef = m_owner->m_parameters.m_entropyRegularizerCoef;
+							for (ndInt32 i = count - 1; i >= 0; --i)
+							{
+								ndBrainFloat sigma = probabilityDistribution[i + start];
+								ndBrainFloat invSigma = ndBrainFloat(1.0f) / sigma;
+								ndBrainFloat z = sampledActions[i] - probabilityDistribution[i];
+								ndBrainFloat meanGrad = z * invSigma * invSigma;
+								ndBrainFloat sigmaGrad = z * z * invSigma * invSigma * invSigma - sigma;
 
-							loss[i] -= entropyRegularizerCoef * meanGrad;
-							loss[i + start] -= entropyRegularizerCoef * sigmaGrad;
+								loss[i] -= entropyRegularizerCoef * meanGrad;
+								loss[i + start] -= entropyRegularizerCoef * sigmaGrad;
+							}
 						}
+						#else
+						#endif
 					}
 					
 					// gradient ascend

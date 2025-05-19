@@ -41,9 +41,6 @@ class ndBrainAgentSoftActorCritic_Trainer : public ndBrainAgentDeterministicPoli
 	virtual void LearnPolicyFunction() override;
 	virtual void CalculateExpectedRewards() override;
 
-	virtual void BuildPolicyClass() override;
-	virtual void BuildCriticClass() override;
-
 	ndBrainFloat CalculatePolicyProbability(ndInt32 index);
 	ndBrainFloat CalculatePolicyProbability(ndInt32 index, const ndBrainVector& sampledActions);
 };

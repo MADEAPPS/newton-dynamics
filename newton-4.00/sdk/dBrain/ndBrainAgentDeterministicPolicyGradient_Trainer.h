@@ -42,6 +42,7 @@
 #endif
 
 #define ND_POLICY_DELAY_MOD		1
+//#define ND_USE_GAUSSIAN_POLICY_OUTPUT
 
 class ndBrainOptimizerAdam;
 class ndBrainAgentDeterministicPolicyGradient_Trainer;

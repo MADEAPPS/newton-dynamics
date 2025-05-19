@@ -33,7 +33,6 @@
 #include "ndBrainLayerActivationPolicyGradientMeanSigma.h"
 #include "ndBrainAgentDeterministicPolicyGradient_Trainer.h"
 
-//#define ND_USE_GAUSSIAN_POLICY_OUTPUT
 
 #define ND_EXPLORATION_NOISE_SIGMA									ndFloat32 (0.2f)
 
@@ -689,8 +688,8 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnPolicyFunction()
 				void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
 				{
 					ndMemCpy(&m_combinedActionObservation[0], &output[0], m_owner->m_policy.GetOutputSize());
-					//ndMemCpy(&m_combinedActionObservation[m_owner->m_policy.GetOutputSize()], m_owner->m_replayBuffer.GetNextObservations(m_index), m_owner->m_policy.GetInputSize());
 					ndMemCpy(&m_combinedActionObservation[m_owner->m_policy.GetOutputSize()], m_owner->m_replayBuffer.GetObservations(m_index), m_owner->m_policy.GetInputSize());
+
 					m_owner->m_critic[0].CalculateInputGradient(m_combinedActionObservation, m_combinedInputGradients, m_criticLoss);
 					ndMemCpy(&loss[0], &m_combinedInputGradients[0], loss.GetCount());
 				}
