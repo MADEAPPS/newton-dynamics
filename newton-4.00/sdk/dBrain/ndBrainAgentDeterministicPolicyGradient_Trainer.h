@@ -181,8 +181,8 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
 	protected:
 	void Optimize();
 	void SaveTrajectory();
-	void BuildPolicyClass();
-	void BuildCriticClass();
+	virtual void BuildPolicyClass();
+	virtual void BuildCriticClass();
 	virtual void LearnPolicyFunction();
 	virtual void CalculateExpectedRewards();
 	void LearnQvalueFunction(ndInt32 criticIndex);

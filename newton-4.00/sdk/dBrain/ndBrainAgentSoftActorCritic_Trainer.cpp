@@ -75,6 +75,16 @@ ndBrainFloat ndBrainAgentSoftActorCritic_Trainer::CalculatePolicyProbability(ndI
 	return CalculatePolicyProbability(index, sampledProbabilities);
 }
 
+void ndBrainAgentSoftActorCritic_Trainer::BuildPolicyClass()
+{
+	ndAssert(0);
+}
+
+void ndBrainAgentSoftActorCritic_Trainer::BuildCriticClass()
+{
+	ndAssert(0);
+}
+
 //#pragma optimize( "", off )
 void ndBrainAgentSoftActorCritic_Trainer::CalculateExpectedRewards()
 {

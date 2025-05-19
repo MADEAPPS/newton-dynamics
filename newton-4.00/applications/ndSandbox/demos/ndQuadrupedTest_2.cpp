@@ -57,7 +57,7 @@ namespace ndQuadruped_2
 {
 	#define ND_TRAIN_MODEL
 
-	//#define USE_DDPG
+	#define USE_DDPG
 
 	#ifdef USE_DDPG
 		//#define USE_SAC
@@ -67,7 +67,7 @@ namespace ndQuadruped_2
 			#define CONTROLLER_NAME "ndQuadruped_2-ddpg.dnn"
 		#endif
 	#else	
-		#define USE_PPO
+		//#define USE_PPO
 		#ifdef USE_PPO
 			#define CONTROLLER_NAME "ndQuadruped_2-ppo.dnn"
 		#else
@@ -90,8 +90,14 @@ namespace ndQuadruped_2
 		m_poseVeloc_x,
 		m_poseVeloc_y,
 		m_poseVeloc_z,
-		m_contactDistance,
+		m_effectorPosit_x,
+		m_effectorPosit_y,
+		m_effectorPosit_z,
+		m_effectorVeloc_x,
+		m_effectorVeloc_y,
+		m_effectorVeloc_z,
 
+		m_contactDistance,
 		m_observationSize
 	};
 
@@ -702,7 +708,7 @@ namespace ndQuadruped_2
 			ndFloat32 duration = sequence->GetDuration();
 
 			ndFloat32 startQuadrant = ndFloat32(ndRandInt() % 4);
-			startQuadrant = 0.0f;
+			//startQuadrant = 0.0f;
 			ndFloat32 startTime = duration * startQuadrant / ndFloat32 (4.0f);
 			m_animBlendTree->SetTime(startTime);
 
@@ -734,13 +740,21 @@ namespace ndQuadruped_2
 				ndFloat32 floorDistance = CalculateFloorDistance(leg);
 
 				ndInt32 base = m_observationSize * i;
-				observations[base + m_contactDistance] = ndBrainFloat(floorDistance);
 				observations[base + m_posePosit_x] = ndBrainFloat(keyFramePosit0.m_x);
 				observations[base + m_posePosit_y] = ndBrainFloat(keyFramePosit0.m_y);
 				observations[base + m_posePosit_z] = ndBrainFloat(keyFramePosit0.m_z);
 				observations[base + m_poseVeloc_x] = ndBrainFloat((keyFramePosit1.m_x - keyFramePosit0.m_x) * invTimestep);
 				observations[base + m_poseVeloc_y] = ndBrainFloat((keyFramePosit1.m_y - keyFramePosit0.m_y) * invTimestep);
 				observations[base + m_poseVeloc_z] = ndBrainFloat((keyFramePosit1.m_z - keyFramePosit0.m_z) * invTimestep);
+
+				observations[base + m_effectorPosit_x] = ndBrainFloat(effectorPosit.m_x);
+				observations[base + m_effectorPosit_y] = ndBrainFloat(effectorPosit.m_y);
+				observations[base + m_effectorPosit_z] = ndBrainFloat(effectorPosit.m_z);
+				observations[base + m_effectorVeloc_x] = ndBrainFloat(effectorVeloc.m_x);
+				observations[base + m_effectorVeloc_y] = ndBrainFloat(effectorVeloc.m_y);
+				observations[base + m_effectorVeloc_z] = ndBrainFloat(effectorVeloc.m_z);
+
+				observations[base + m_contactDistance] = ndBrainFloat(floorDistance);
 			}
 
 			observations[m_observationSize * m_legs.GetCount() + 0] = m_comX / D_CYCLE_STRIDE_X;
