@@ -434,180 +434,123 @@ T ndConditionNumber(const ndInt32 size, const ndInt32 stride, const T* const cho
 // high(i) = infinity.
 // this the same as enforcing the constraint: x(i) * r(i) = 0
 template <class T>
-void ndGaussSeidelLcpSor(const ndInt32 size, const T* const matrix, T* const x, const T* const b, const T* const low, const T* const high, T tol2, ndInt32 maxIterCount, ndInt16* const clipped, T sor)
+void ndGaussSeidelLcpBaseLine(const ndInt32 size, const ndInt32 stride, const T* const matrix, T* const x, const T* const b, const ndInt32* const normalIndex, const T* const low, const T* const high, T tol2, ndInt32 maxIterCount)
 {
-	const T* const me = matrix;
-	T* const invDiag1 = ndAlloca(T, size);
-
-	ndInt32 stride = 0;
-	for (ndInt32 i = 0; i < size; ++i) 
-	{
-		x[i] = ndClamp(T(0.0f), low[i], high[i]);
-		invDiag1[i] = T(1.0f) / me[stride + i];
-		stride += size;
-	}
-
-	T tolerance(tol2 * 2.0f);
-	const T* const invDiag = invDiag1;
-#ifdef _DEBUG 
-	ndInt32 passes = 0;
-#endif
-	for (ndInt32 i = 0; (i < maxIterCount) && (tolerance > tol2); ++i) 
-	{
-		ndInt32 base = 0;
-		tolerance = T(0.0f);
-#ifdef _DEBUG 
-		passes++;
-#endif
-		for (ndInt32 j = 0; j < size; ++j) 
-		{
-			const T* const row = &me[base];
-			T r(b[j] - ndDotProduct(size, row, x));
-			T f((r + row[j] * x[j]) * invDiag[j]);
-			if (f > high[j]) 
-			{
-				x[j] = high[j];
-				clipped[j] = 1;
-			} 
-			else if (f < low[j]) 
-			{
-				x[j] = low[j];
-				clipped[j] = 1;
-			} 
-			else 
-			{
-				clipped[j] = 0;
-				tolerance += r * r;
-				x[j] = x[j] + (f - x[j]) * sor;
-			}
-			base += size;
-		}
-	}
-}
-
-template <class T>
-void ndGaussSeidelLcpSor(const ndInt32 size, const ndInt32 stride, const T* const matrix, T* const x, const T* const b, const ndInt32* const normalIndex, const T* const low, const T* const high, T tol2, ndInt32 maxIterCount, T sor)
-{
-	const T* const me = matrix;
-	T* const invDiag1 = ndAlloca(T, size);
 	T* const u = ndAlloca(T, size + 1);
-	ndInt32* const index = ndAlloca(ndInt32, size);
+	T* const invDiag = ndAlloca(T, stride);
+	ndAssert(ndTestPSDmatrix(size, stride, matrix));
 
 	u[size] = T(1.0f);
-	ndInt32 rowStart = 0;
-	for (ndInt32 j = 0; j < size; ++j) 
+	ndInt32 base1 = 0;
+	for (ndInt32 i = 0; i < size; ++i)
 	{
-		u[j] = x[j];
-		index[j] = normalIndex[j] ? j + normalIndex[j] : size;
+		const ndInt32 index = normalIndex[i];
+
+		u[i] = x[i];
+		const T coefficient = u[index];
+		const T l = low[i] * coefficient;
+		const T h = high[i] * coefficient;
+
+		u[i] = ndClamp(u[i], l, h);
+		invDiag[i] = T(1.0f) / matrix[base1 + i];
+		ndAssert(ndCheckFloat(invDiag[i]));
+		base1 += stride;
 	}
 
-	for (ndInt32 j = 0; j < size; ++j) 
-	{
-		const T val = u[index[j]];
-		const T l = low[j] * val;
-		const T h = high[j] * val;
-		u[j] = ndClamp(u[j], l, h);
-		invDiag1[j] = T(1.0f) / me[rowStart + j];
-		rowStart += stride;
-	}
-
-	T tolerance(tol2 * 2.0f);
-	const T* const invDiag = invDiag1;
-	const ndInt32 maxCount = ndMax(8, size);
-	for (ndInt32 i = 0; (i < maxCount) && (tolerance > tol2); ++i) 
+	T error2 = T(10.0f) * tol2;
+	for (ndInt32 m = maxIterCount; (m >= 0) && (error2 > tol2); --m)
 	{
 		ndInt32 base = 0;
-		tolerance = T(0.0f);
-		for (ndInt32 j = 0; j < size; ++j) 
+		error2 = T(0.0f);
+		for (ndInt32 i = 0; i < size; ++i)
 		{
-			const T* const row = &me[base];
-			T r(b[j] - ndDotProduct(size, row, u));
-			T f((r + row[j] * u[j]) * invDiag[j]);
+			const T* const row = &matrix[base];
+			const T r = b[i] - ndDotProduct(size, row, u);
+			const ndInt32 index = normalIndex[i];
+			const T coefficient = u[index];
+			const T l = low[i] * coefficient;
+			const T h = high[i] * coefficient;
+			const T u0 = u[i];
+			const T u1 = u0 + r * invDiag[i];
+			const T f = ndClamp(u1, l, h);
+			ndAssert(ndCheckFloat(f));
 
-			const T val = u[index[j]];
-			const T l = low[j] * val;
-			const T h = high[j] * val;
-			if (f > h) 
-			{
-				u[j] = h;
-			}
-			else if (f < l) 
-			{
-				u[j] = l;
-			}
-			else 
-			{
-				tolerance += r * r;
-				u[j] = f;
-			}
+			const T du = f - u0;
+			const T dr = du * row[i];
+			error2 += dr * dr;
+			u[i] = f;
+
 			base += stride;
 		}
 	}
 
-#ifdef _DEBUG 
-	ndInt32 passes = 0;
-#endif
-	for (ndInt32 i = 0; (i < maxIterCount) && (tolerance > tol2); ++i) 
+	for (ndInt32 i = 0; i < size; ++i)
 	{
-		ndInt32 base = 0;
-		tolerance = T(0.0f);
-#ifdef _DEBUG 
-		passes++;
-#endif
-		for (ndInt32 j = 0; j < size; ++j) 
-		{
-			const T* const row = &me[base];
-			T r(b[j] - ndDotProduct(size, row, u));
-			T f((r + row[j] * u[j]) * invDiag[j]);
-			f = u[j] + (f - u[j]) * sor;
-
-			const T val = u[index[j]];
-			const T l = low[j] * val;
-			const T h = high[j] * val;
-			if (f > h) 
-			{
-				u[j] = h;
-			}
-			else if (f < l) 
-			{
-				u[j] = l;
-			}
-			else 
-			{
-				tolerance += r * r;
-				u[j] = f;
-			}
-			base += stride;
-		}
-	}
-
-	for (ndInt32 j = 0; j < size; ++j) 
-	{
-		x[j] = u[j];
+		x[i] = u[i];
 	}
 }
 
-// solve a general Linear complementary program (LCP)
-// A * x = b + r
-// subjected to constraints
-// x(i) = low(i),  if r(i) >= 0  
-// x(i) = high(i), if r(i) <= 0  
-// low(i) <= x(i) <= high(i),  if r(i) == 0  
-//
-// return true is the system has a solution.
-// in return 
-// x is the solution,
-// r is return in vector b
-// note: although the system is called LCP, the solver is far more general than a strict LCP
-// to solve a strict LCP, set the following
-// low(i) = 0
-// high(i) = infinity.
-// this the same as enforcing the constraint: x(i) * r(i) = 0
 template <class T>
-void ndGaussSeidelLCP(const ndInt32 size, const T* const matrix, T* const x, const T* const b, const T* const low, const T* const high, T sor = T(1.2f))
+void ndGaussSeidelLcp(const ndInt32 size, const ndInt32 stride, const T* const matrix, T* const x, const T* const b, const ndInt32* const normalIndex, const T* const low, const T* const high, T tol2, ndInt32 maxIterCount)
 {
-	ndInt16* const clipped = ndAlloca(ndInt16, size);
-	ndGaussSeidelLcpSor(size, matrix, x, b, low, high, T(1.0e-3f), size * size, clipped, sor);
+	T* const u = ndAlloca(T, size + 1);
+	T* const tmp = ndAlloca(T, stride);
+	T* const precond = ndAlloca(T, stride);
+	T* const bPrecond = ndAlloca(T, stride);
+	ndAssert(ndTestPSDmatrix(size, stride, matrix));
+
+	u[size] = T(1.0f);
+	ndInt32 base1 = 0;
+	for (ndInt32 i = 0; i < size; ++i)
+	{
+		const ndInt32 index = normalIndex[i];
+
+		T diag = matrix[base1 + i];
+		ndAssert(diag > ndFloat32 (1.0e-8f));
+		precond[i] = ndSqrt(T(1.0f) / diag);
+
+		u[i] = x[i] / precond[i];
+		bPrecond[i] = b[i] * precond[i];
+		const T coefficient = u[index];
+		const T l = low[i] * coefficient;
+		const T h = high[i] * coefficient;
+	
+		u[i] = ndClamp(u[i], l, h);
+		base1 += stride;
+	}
+
+	T error2 = T(10.0f) * tol2;
+	for (ndInt32 m = maxIterCount; (m >= 0) && (error2 > tol2); --m)
+	{
+		ndInt32 base = 0;
+		error2 = T(0.0f);
+		for (ndInt32 i = 0; i < size; ++i)
+		{
+			const T* const row = &matrix[base];
+			ndMul(size, tmp, precond, u);
+			const T r = bPrecond[i] - ndDotProduct(size, row, tmp) * precond[i];
+			const ndInt32 index = normalIndex[i];
+			const T coefficient = u[index];
+			const T l = low[i] * coefficient;
+			const T h = high[i] * coefficient;
+			const T u0 = u[i];
+			const T u1 = u0 + r;
+			const T f = ndClamp(u1, l, h);
+			ndAssert(ndCheckFloat(f));
+	
+			const T du = f - u0;
+			const T dr = du * row[i];
+			error2 += dr * dr;
+			u[i] = f;
+
+			base += stride;
+		}
+	}
+
+	for (ndInt32 i = 0; i < size; ++i)
+	{
+		x[i] = u[i] * precond[i];
+	}
 }
 
 template<class T>
@@ -742,22 +685,6 @@ void ndCholeskyUpdate(ndInt32 size, ndInt32 row, ndInt32 colum, T* const cholesk
 		ndMemCpy(choleskyMatrix, psdMatrix, size * size);
 		ndCholeskyFactorization(size, size, choleskyMatrix);
 	}
-
-//#if _DEBUG
-#if 0
-	T* const psdMatrixCopy = dAlloca(T, size * size);
-	ndMemCpy(psdMatrixCopy, psdMatrix, size * size);
-	dCholeskyFactorization(size, psdMatrixCopy);
-
-	for (dInt32 i = 0; i < size; ++i) 
-	{
-		for (dInt32 j = 0; j < size; ++j) 
-		{
-			T err = psdMatrixCopy[i*size + j] - choleskyMatrix[i*size + j];
-			dAssert(dAbs(err) < T(1.0e-4f));
-		}
-	}
-#endif
 }
 
 // solve a general Linear complementary program (LCP)
@@ -827,12 +754,7 @@ void ndSolveDantzigLcpLow(ndInt32 size, T* const symmetricMatrixPSD, T* const x,
 	}
 	ndMemCpy(lowerTriangularMatrix, symmetricMatrixPSD, size * size);
 
-#ifdef _DEBUG
-	bool valid = ndTestPSDmatrix(size, size, lowerTriangularMatrix);
-	ndAssert(valid);
-#else
 	ndCholeskyFactorization(size, lowerTriangularMatrix);
-#endif
 	for (ndInt32 j = 0; (j != -1) && initialGuessCount;) 
 	{
 		ndSolveCholesky(size, initialGuessCount, lowerTriangularMatrix, x0, b);
@@ -1225,7 +1147,7 @@ void ndSolveDantzigLCP(ndInt32 size, T* const symmetricMatrixPSD, T* const x, T*
 	ndInt16* const clipped = ndAlloca(ndInt16, size);
 
 	// find an approximation to the solution
-	ndGaussSeidelLcpSor(size, symmetricMatrixPSD, x, b, low, high, tol2, passes, clipped, T(1.3f));
+	ndGaussSeidelLcp(size, symmetricMatrixPSD, x, b, low, high, tol2, passes, clipped);
 
 	T err2(0.0f);
 	ndInt32 stride = 0;
@@ -1260,7 +1182,7 @@ void ndSolveDantzigLCP(ndInt32 size, T* const symmetricMatrixPSD, T* const x, T*
 		else 
 		{
 			// larger lcp are too hard for direct method, see if we can get better approximation
-			ndGaussSeidelLcpSor(size, symmetricMatrixPSD, x, b, low, high, tol2, 20, clipped, T(1.3f));
+			ndGaussSeidelLcp(size, symmetricMatrixPSD, x, b, low, high, tol2, 20, clipped);
 		}
 	}
 }
