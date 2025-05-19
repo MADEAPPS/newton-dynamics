@@ -916,7 +916,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 				diag *= (ndFloat32(1.0f) + rhs->m_diagonalRegularizer);
 				rhs->m_JinvMJt = diag;
 				rhs->m_invJinvMJt = ndFloat32(1.0f) / diag;
-				rhs->m_diagonalPreconditioner = ndSqrt(rhs->m_invJinvMJt);
+				rhs->m_diagonalPreconditioner = ndSqrt(diag);
 
 				const ndVector f(rhs->m_force);
 				forceAcc0 = forceAcc0 + JtM0.m_linear * f;
@@ -1525,6 +1525,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS> invJinvMJt(rowsCount);
 				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS + 8> force(rowsCount + 8);
 				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS> coordenateAccel(rowsCount);
+				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS + 8> preconditioner(rowsCount + 8);
 				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS> lowerBoundFrictionCoefficent(rowsCount);
 				ndFixSizeArray<ndFloat32, D_CONSTRAINT_MAX_ROWS> upperBoundFrictionCoefficent(rowsCount);
 				ndFixSizeArray<ndInt32, D_CONSTRAINT_MAX_ROWS> normalForceIndexFlat(rowsCount);
@@ -1540,11 +1541,13 @@ void ndDynamicsUpdate::CalculateJointsForce()
 					const ndRightHandSide* const rhs = &m_rightHandSide[rowStart + i];
 					ndAssert(rhs->SanityCheck());
 					force[i] = rhs->m_force;
+					preconditioner[i] = rhs->m_diagonalPreconditioner;
+					preconditioner[i] = 1.0f;
 				}
 				for (ndInt32 i = rowsCount; i < stride; ++i)
 				{
 					force[i] = ndFloat32(0.0f);
-					//preconditioner[i] = ndFloat32(0.0f);
+					preconditioner[i] = ndFloat32(0.0f);
 				}
 				force[stride] = ndFloat32(1.0f);
 
@@ -1552,8 +1555,6 @@ void ndDynamicsUpdate::CalculateJointsForce()
 				for (ndInt32 i = 0; i < rowsCount; ++i)
 				{
 					const ndRightHandSide* const rhs = &m_rightHandSide[rowStart + i];
-					invJinvMJt[i] = rhs->m_invJinvMJt;
-
 					lowerBoundFrictionCoefficent[i] = rhs->m_lowerBoundFrictionCoefficent;
 					upperBoundFrictionCoefficent[i] = rhs->m_upperBoundFrictionCoefficent;
 					normalForceIndexFlat[i] = rhs->m_normalForceIndexFlat ? rhs->m_normalForceIndexFlat - rowStart : stride;
@@ -1580,6 +1581,12 @@ void ndDynamicsUpdate::CalculateJointsForce()
 						sum += rowSimd[j * 2 + 0] * forceSimd[j * 2 + 0];
 					}
 					coordenateAccel[i] += sum.AddHorizontal().GetScalar();
+					invJinvMJt[i] = rhs->m_invJinvMJt * rhs->m_diagonalPreconditioner * rhs->m_diagonalPreconditioner;
+				}
+				for (ndInt32 i = 0; i < rowsCount; ++i)
+				{
+					force[i] /= preconditioner[i];
+					coordenateAccel[i] *= preconditioner[i];
 				}
 
 				const ndInt32 maxIterCount = 4;
@@ -1588,6 +1595,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 
 				ndFloat32 accNorm = ndFloat32(10.0f);
 				const ndVector* const forceStepSimd = (ndVector*)&force[0];
+				const ndVector* const precondSimd = (ndVector*)&preconditioner[0];
 				for (ndInt32 k = maxIterCount - 1; (k >= 0) && (accNorm > tol2); --k)
 				{
 					accNorm = ndFloat32(0.0f);
@@ -1598,12 +1606,12 @@ void ndDynamicsUpdate::CalculateJointsForce()
 						if (stride & 7)
 						{
 							ndInt32 index = (stride / 4) - 1;
-							sum += rowSimd[index] * forceStepSimd[index];
+							sum += rowSimd[index] * forceStepSimd[index] * precondSimd[index];
 						}
 						for (ndInt32 j = (stride / 8) - 1; j >= 0; --j)
 						{
-							sum += rowSimd[j * 2 + 1] * forceStepSimd[j * 2 + 1];
-							sum += rowSimd[j * 2 + 0] * forceStepSimd[j * 2 + 0];
+							sum += rowSimd[j * 2 + 1] * forceStepSimd[j * 2 + 1] * precondSimd[j * 2 + 1];
+							sum += rowSimd[j * 2 + 0] * forceStepSimd[j * 2 + 0] * precondSimd[j * 2 + 0];
 						}
 
 						const ndFloat32 r = coordenateAccel[i] - sum.AddHorizontal().GetScalar();
@@ -1626,7 +1634,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 				for (ndInt32 i = 0; i < rowsCount; ++i)
 				{
 					ndRightHandSide* const rhs = &m_rightHandSide[rowStart + i];
-					rhs->m_force = force[i];
+					rhs->m_force = force[i] * preconditioner[i];
 				}
 			}
 
