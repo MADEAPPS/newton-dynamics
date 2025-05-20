@@ -47,12 +47,13 @@ ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::~ndBrainAgentContinuePr
 
 ndBrainFloat ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculatePolicyProbability(ndInt32 index, const ndBrainVector& distribution)
 {
-	ndBrainFloat z2 = 0.0f;
+	ndBrainFloat z2 = ndBrainFloat(0.0f);
 	ndBrainFloat invSigma2Det = ndBrainFloat(1.0f);
-	
+	ndBrainFloat invSqrtPi = ndBrainFloat(ndSqrt(1.0f / (2.0f * ndPi)));
+
+#ifdef ND_CONTINUE_PER_ACTION_SIGMA
 	const ndInt32 count = ndInt32(distribution.GetCount()) / 2;
 	const ndInt32 start = ndInt32(distribution.GetCount()) / 2;
-	ndBrainFloat invSqrtPi = ndBrainFloat(ndSqrt(1.0f / (2.0f * ndPi)));
 
 	const ndBrainMemVector sampledProbabilities(m_trajectoryAccumulator.GetActions(index), m_policy.GetOutputSize());
 	for (ndInt32 i = count - 1; i >= 0; --i)
@@ -67,17 +68,23 @@ ndBrainFloat ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateP
 	ndBrainFloat exponent = ndBrainFloat(0.5f) * z2;
 	ndBrainFloat prob = invSigma2Det * ndBrainFloat(ndExp(-exponent));
 	return ndMax(prob, ndBrainFloat(1.0e-4f));
-}
+#else
+	const ndInt32 count = ndInt32(distribution.GetCount());
 
-//ndBrainFloat ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculatePolicyProbability(ndInt32 index)
-//{
-//	ndBrainFixSizeVector<256> distribution;
-//	ndInt32 numberOfActions = m_policy.GetOutputSize();
-//	distribution.SetCount(numberOfActions);
-//	const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(index), m_policy.GetInputSize());
-//	m_policy.MakePrediction(observation, distribution);
-//	return CalculatePolicyProbability(index, distribution);
-//}
+	ndBrainFloat sigma = m_parameters.m_actionFixSigma;
+	ndBrainFloat invSigma = ndBrainFloat(1.0f) / sigma;
+	const ndBrainMemVector sampledProbabilities(m_trajectoryAccumulator.GetActions(index), m_policy.GetOutputSize());
+	for (ndInt32 i = count - 1; i >= 0; --i)
+	{
+		ndBrainFloat z = (sampledProbabilities[i] - distribution[i]) * invSigma;
+		z2 += z * z;
+		invSigma2Det *= (invSqrtPi * invSigma);
+	}
+	ndBrainFloat exponent = ndBrainFloat(0.5f) * z2;
+	ndBrainFloat prob = invSigma2Det * ndBrainFloat(ndExp(-exponent));
+	return ndMax(prob, ndBrainFloat(1.0e-4f));
+#endif
+}
 
 //#pragma optimize( "", off )
 ndBrainFloat ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateKLdivergence()
@@ -106,11 +113,12 @@ ndBrainFloat ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateK
 			// calculate t1 = numberOfActions
 			// calculate t2 = trans(Uq - Up) * inv(Sigma_q) * (Uq - Up)
 			// calculate t3 = log(det(Sigma_q) /det(Sigma_p))
-			ndFloat32 t0 = 0.0f;
-			ndFloat32 t2 = 0.0f;
-			ndFloat32 log_det_p = 0.0f;
-			ndFloat32 log_det_q = 0.0f;
+			ndFloat32 t0 = ndFloat32(0.0f);
+			ndFloat32 t2 = ndFloat32(0.0f);
+			ndFloat32 log_det_p = ndFloat32(0.0f);
+			ndFloat32 log_det_q = ndFloat32(0.0f);
 			
+			#ifdef ND_CONTINUE_PER_ACTION_SIGMA
 			const ndInt32 count = ndInt32(m_policy.GetOutputSize()) / 2;
 			const ndInt32 start = ndInt32(m_policy.GetOutputSize()) / 2;
 			for (ndInt32 j = count - 1; j >= 0; --j)
@@ -125,6 +133,23 @@ ndBrainFloat ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateK
 				ndBrainFloat meanError(crossProbabilities[j] - probabilities[j]);
 				t2 += meanError * invSigma_q * meanError;
 			}
+			#else
+			const ndInt32 count = ndInt32(m_policy.GetOutputSize());
+			ndBrainFloat sigma_p = m_parameters.m_actionFixSigma;
+			ndBrainFloat sigma_q = m_parameters.m_actionFixSigma;
+			ndBrainFloat invSigma_q = 1.0f / sigma_q;
+			ndFloat32 logSigmap = ndLog(sigma_p);
+			ndFloat32 logSigmaq = ndLog(sigma_q);
+			for (ndInt32 j = count - 1; j >= 0; --j)
+			{
+				log_det_p += logSigmap;
+				log_det_q += logSigmaq;
+				t0 += sigma_p * invSigma_q;
+				ndBrainFloat meanError(crossProbabilities[j] - probabilities[j]);
+				t2 += meanError * invSigma_q * meanError;
+			}
+			#endif
+
 			// it does not really matter  the ratio is inverted since KLis a distance, 
 			// the only problem is that KL(p/q) is different that KL(q/p)
 			// but the distance still represent how close are the two distributions.
@@ -203,23 +228,37 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizedSurrogate
 					// calculate grad of probability	
 					const ndBrainMemVector sampledProbability(m_owner->m_trajectoryAccumulator.GetActions(m_index), numberOfActions);
 
-					const ndInt32 count = ndInt32(m_owner->m_policy.GetOutputSize()) / 2;
-					const ndInt32 start = ndInt32(m_owner->m_policy.GetOutputSize()) / 2;
-					for (ndInt32 i = count - 1; i >= 0; --i)
-					{
-						ndBrainFloat sigma = probabilityDistribution[i + start];
-						ndBrainFloat invSigma = ndBrainFloat(1.0f) / sigma;
-						ndBrainFloat z = sampledProbability[i] - probabilityDistribution[i];
-						ndBrainFloat meanGrad = z * invSigma * invSigma;
-						ndBrainFloat sigmaGrad = z * z * invSigma * invSigma * invSigma - sigma;
+					#ifdef ND_CONTINUE_PER_ACTION_SIGMA
+						const ndInt32 count = ndInt32(m_owner->m_policy.GetOutputSize()) / 2;
+						const ndInt32 start = ndInt32(m_owner->m_policy.GetOutputSize()) / 2;
+						for (ndInt32 i = count - 1; i >= 0; --i)
+						{
+							ndBrainFloat sigma = probabilityDistribution[i + start];
+							ndBrainFloat invSigma = ndBrainFloat(1.0f) / sigma;
+							ndBrainFloat z = sampledProbability[i] - probabilityDistribution[i];
+							ndBrainFloat meanGrad = z * invSigma * invSigma;
+							ndBrainFloat sigmaGrad = z * z * invSigma * invSigma * invSigma - sigma;
 
-						loss[i] = meanGrad;
-						loss[i + start] = sigmaGrad;
-					}
+							loss[i] = meanGrad;
+							loss[i + start] = sigmaGrad;
+						}
+					#else
+						ndFloat32 fixSigma = m_owner->m_parameters.m_actionFixSigma;
+						ndFloat32 sigma2 = fixSigma * fixSigma;
+						ndBrainFloat invSigma2 = ndBrainFloat(1.0f) / sigma2;
+						const ndInt32 count = ndInt32(m_owner->m_policy.GetOutputSize());
+						for (ndInt32 i = count - 1; i >= 0; --i)
+						{
+							ndBrainFloat z = sampledProbability[i] - probabilityDistribution[i];
+							ndBrainFloat meanGrad = z * invSigma2;
+							loss[i] = meanGrad;
+						}
+					#endif
 
 					if (m_owner->m_parameters.m_entropyRegularizerCoef > ndBrainFloat(1.0e-6f))
 					{
 						// calculate and add the Gradient of entropy (grad of log probability)
+						#ifdef ND_CONTINUE_PER_ACTION_SIGMA
 						ndBrainFloat entropyRegularizerCoef = m_owner->m_parameters.m_entropyRegularizerCoef;
 						for (ndInt32 i = count - 1; i >= 0; --i)
 						{
@@ -232,6 +271,7 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizedSurrogate
 							loss[i] -= entropyRegularizerCoef * meanGrad;
 							loss[i + start] -= entropyRegularizerCoef * sigmaGrad;
 						}
+						#endif
 					}
 
 					//negate the gradient for gradient ascend?
@@ -331,6 +371,7 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizePolicy()
 
 					// as I understand it, this is just a special case of maximum likelihood optimization.
 					// given a multivariate Gaussian process with zero cross covariance to the actions.
+					#ifdef ND_CONTINUE_PER_ACTION_SIGMA
 					const ndInt32 count = ndInt32(m_owner->m_policy.GetOutputSize()) / 2;
 					const ndInt32 start = ndInt32(m_owner->m_policy.GetOutputSize()) / 2;
 					const ndBrainMemVector sampledProbability(m_owner->m_trajectoryAccumulator.GetActions(m_index), numberOfActions);
@@ -345,10 +386,24 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizePolicy()
 						loss[i] = meanGrad;
 						loss[i + start] = sigmaGrad;
 					}
+					#else
+						ndFloat32 fixSigma = m_owner->m_parameters.m_actionFixSigma;
+						ndFloat32 sigma2 = fixSigma * fixSigma;
+						ndBrainFloat invSigma2 = ndBrainFloat(1.0f) / sigma2;
+						const ndInt32 count = ndInt32(m_owner->m_policy.GetOutputSize());
+						const ndBrainMemVector sampledProbability(m_owner->m_trajectoryAccumulator.GetActions(m_index), numberOfActions);
+						for (ndInt32 i = count - 1; i >= 0; --i)
+						{
+							ndBrainFloat z = sampledProbability[i] - probabilityDistribution[i];
+							ndBrainFloat meanGrad = z * invSigma2;
+							loss[i] = meanGrad;
+						}
+					#endif
 					const ndBrainFloat advantage = m_owner->m_advantage[m_index];
 
 					if (m_owner->m_parameters.m_entropyRegularizerCoef > ndBrainFloat(1.0e-6f))
 					{
+						#ifdef ND_CONTINUE_PER_ACTION_SIGMA
 						// calculate and add the Gradient of entropy (grad of log probability)
 						ndBrainFloat entropyRegularizerCoef = m_owner->m_parameters.m_entropyRegularizerCoef;
 						for (ndInt32 i = count - 1; i >= 0; --i)
@@ -362,6 +417,7 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizePolicy()
 							loss[i] -= entropyRegularizerCoef * meanGrad;
 							loss[i + start] -= entropyRegularizerCoef * sigmaGrad;
 						}
+						#endif
 					}
 
 					//negate the gradient for gradient ascend?

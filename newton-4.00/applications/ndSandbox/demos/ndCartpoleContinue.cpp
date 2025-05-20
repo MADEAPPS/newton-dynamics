@@ -185,7 +185,7 @@ namespace ndContinueCarpole
 			}
 
 			ndControllerTrainer(const ndControllerTrainer& src)
-				:ndBrainAgentContinuePolicyGradient_Agent(src.m_master)
+				:ndBrainAgentContinuePolicyGradient_Agent(src.m_owner)
 				,m_robot(nullptr)
 			{
 			}

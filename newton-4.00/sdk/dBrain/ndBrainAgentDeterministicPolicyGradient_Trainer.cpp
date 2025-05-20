@@ -34,7 +34,7 @@
 #include "ndBrainAgentDeterministicPolicyGradient_Trainer.h"
 
 
-#define ND_EXPLORATION_NOISE_SIGMA									ndFloat32 (0.2f)
+#define ND_TD3_EXPLORATION_NOISE_SIGMA								ndFloat32 (0.2f)
 
 #define ND_DETERMINISTIC_POLICY_GRADIENT_HIDEN_LAYERS_ACTIVATION	ndBrainLayerActivationRelu
 //#define ND_DETERMINISTIC_POLICY_GRADIENT_HIDEN_LAYERS_ACTIVATION	ndBrainLayerActivationTanh
@@ -55,7 +55,7 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 
 	//m_useFixSigma = true;
 	m_useFixSigma = false;
-	m_actionFixSigma = ND_EXPLORATION_NOISE_SIGMA;
+	m_actionFixSigma = ND_TD3_EXPLORATION_NOISE_SIGMA;
 
 	m_policyRegularizerType = ndBrainOptimizer::m_ridge;
 	m_criticRegularizerType = ndBrainOptimizer::m_ridge;
@@ -206,7 +206,7 @@ ndInt32 ndBrainAgentDeterministicPolicyGradient_Agent::GetEpisodeFrames() const
 
 void ndBrainAgentDeterministicPolicyGradient_Agent::SampleActions(ndBrainVector& actions)
 {
-#ifdef ND_USE_GAUSSIAN_POLICY_OUTPUT
+#ifdef ND_TD3_PER_ACTION_SIGMA
 	const ndInt32 count = ndInt32(actions.GetCount()) / 2;
 	const ndInt32 start = ndInt32(actions.GetCount()) / 2;
 	for (ndInt32 i = count - 1; i >= 0; --i)
@@ -332,7 +332,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildPolicyClass()
 		layers.PushBack(new ND_DETERMINISTIC_POLICY_GRADIENT_HIDEN_LAYERS_ACTIVATION(layers[layers.GetCount() - 1]->GetOutputSize()));
 	}
 
-#ifdef ND_USE_GAUSSIAN_POLICY_OUTPUT
+#ifdef ND_TD3_PER_ACTION_SIGMA
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_numberOfActions + m_parameters.m_numberOfActions));
 	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 	layers.PushBack(new ndBrainLayerActivationPolicyGradientMeanSigma(layers[layers.GetCount() - 1]->GetOutputSize()));
@@ -738,7 +738,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::Optimize()
 	{
 		m_referenceCritic[k].SoftCopy(m_critic[k], m_parameters.m_criticMovingAverageFactor);
 	}
-	ndPolycyDelayMod = (ndPolycyDelayMod + 1) % ND_POLICY_DELAY_MOD;
+	ndPolycyDelayMod = (ndPolycyDelayMod + 1) % ND_TD3_POLICY_DELAY_MOD;
 }
 
 //#pragma optimize( "", off )

@@ -33,6 +33,8 @@
 // this is an implementation of the vanilla policy Gradient as described in:
 // https://spinningup.openai.com/en/latest/algorithms/vpg.html
 
+//#define ND_CONTINUE_PER_ACTION_SIGMA
+
 class ndBrainOptimizerAdam;
 class ndBrainAgentContinuePolicyGradient_TrainerMaster;
 
@@ -57,14 +59,6 @@ class ndBrainAgentContinuePolicyGradient_Agent : public ndBrainAgent
 	class ndTrajectoryTransition : protected ndBrainVector
 	{
 		public:
-		//enum ndMemberIndex
-		//{
-		//	m_reward,
-		//	m_expectedReward,
-		//	m_isterminalState,
-		//	m_transitionSize
-		//};
-
 		ndTrajectoryTransition();
 		void Init(ndInt32 actionsSize, ndInt32 obsevationsSize);
 
@@ -122,7 +116,7 @@ class ndBrainAgentContinuePolicyGradient_Agent : public ndBrainAgent
 
 	ndBrainVector m_workingBuffer;
 	ndTrajectoryTransition m_trajectory;
-	ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
+	ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_owner;
 	ndRandomGenerator* m_randomGenerator;
 	bool m_isDead;
 

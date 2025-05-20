@@ -43,7 +43,7 @@ ndBrainAgentSoftActorCritic_Trainer::~ndBrainAgentSoftActorCritic_Trainer()
 //#pragma optimize( "", off )
 ndBrainFloat ndBrainAgentSoftActorCritic_Trainer::CalculatePolicyProbability(ndInt32 index, const ndBrainVector& sampledActions)
 {
-#ifdef ND_USE_GAUSSIAN_POLICY_OUTPUT
+#ifdef ND_TD3_PER_ACTION_SIGMA
 	ndBrainFixSizeVector<256> distribution;
 	distribution.SetCount(m_policy.GetOutputSize());
 	const ndBrainMemVector observation(m_replayBuffer.GetObservations(index), m_policy.GetInputSize());
@@ -216,7 +216,7 @@ void ndBrainAgentSoftActorCritic_Trainer::LearnPolicyFunction()
 					if (m_owner->m_parameters.m_entropyRegularizerCoef > ndBrainFloat(1.0e-6f))
 					{
 						ndAssert(0);
-						#ifdef ND_USE_GAUSSIAN_POLICY_OUTPUT
+						#ifdef ND_TD3_PER_ACTION_SIGMA
 							// calculate and add the Gradient of entropy (grad of log probability)
 							const ndInt32 count = ndInt32(m_owner->m_policy.GetOutputSize()) / 2;
 							const ndInt32 start = ndInt32(m_owner->m_policy.GetOutputSize()) / 2;
@@ -229,11 +229,10 @@ void ndBrainAgentSoftActorCritic_Trainer::LearnPolicyFunction()
 								ndBrainFloat z = sampledActions[i] - probabilityDistribution[i];
 								ndBrainFloat meanGrad = z * invSigma * invSigma;
 								ndBrainFloat sigmaGrad = z * z * invSigma * invSigma * invSigma - sigma;
-
+						
 								loss[i] -= entropyRegularizerCoef * meanGrad;
 								loss[i + start] -= entropyRegularizerCoef * sigmaGrad;
 							}
-						}
 						#else
 						#endif
 					}

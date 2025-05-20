@@ -36,13 +36,13 @@
 
 #define ND_USE_TDD3
 #ifdef ND_USE_TDD3
-	#define ND_NUMBER_OF_CRITICS	2
+	#define ND_NUMBER_OF_CRITICS		2
 #else
-	#define ND_NUMBER_OF_CRITICS	1
+	#define ND_NUMBER_OF_CRITICS		1
 #endif
 
-#define ND_POLICY_DELAY_MOD		1
-//#define ND_USE_GAUSSIAN_POLICY_OUTPUT
+//#define ND_TD3_PER_ACTION_SIGMA
+#define ND_TD3_POLICY_DELAY_MOD			1
 
 class ndBrainOptimizerAdam;
 class ndBrainAgentDeterministicPolicyGradient_Trainer;
