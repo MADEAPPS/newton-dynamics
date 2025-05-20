@@ -56,7 +56,7 @@ class ndBrainAgentContinuePolicyGradient_Agent : public ndBrainAgent
 	};
 
 	public:
-	class ndTrajectoryTransition : protected ndBrainVector
+	class ndTrajectoryTransition
 	{
 		public:
 		ndTrajectoryTransition();
@@ -144,7 +144,6 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndInt32 m_threadsCount;
 		ndInt32 m_numberOfActions;
 		ndInt32 m_numberOfObservations;
-		ndInt32 m_criticValueIterations;
 
 		ndInt32 m_miniBatchSize;
 		ndInt32 m_maxTrajectorySteps;

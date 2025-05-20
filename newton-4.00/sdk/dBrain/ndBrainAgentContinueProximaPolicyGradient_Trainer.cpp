@@ -462,35 +462,16 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizePolicy()
 
 void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizeCritic()
 {
-	m_randomPermutation.SetCount(m_trajectoryAccumulator.GetCount() - 1);
-	for (ndInt32 i = ndInt32(m_randomPermutation.GetCount()) - 1; i >= 0; --i)
+	m_randomPermutation.SetCount(0);
+	for (ndInt32 i = ndInt32(m_trajectoryAccumulator.GetCount()) - 1; i >= 0; --i)
 	{
-		m_randomPermutation[i] = i;
+		m_randomPermutation.PushBack(i);
 	}
-	if (m_randomPermutation.GetCount() < m_parameters.m_miniBatchSize)
-	{
-		ndInt32 mod = ndInt32(m_randomPermutation.GetCount());
-		ndInt32 padding = m_parameters.m_miniBatchSize - ndInt32(m_randomPermutation.GetCount());
-		for (ndInt32 i = 0; i < padding; ++i)
-		{
-			m_randomPermutation.PushBack(i % mod);
-		}
-	}
-	m_randomPermutation.RandomShuffle(m_randomPermutation.GetCount());
 
-	ndInt32 numberOfIterations = m_parameters.m_criticValueIterations;
-	if (m_randomPermutation.GetCount() > (numberOfIterations * m_parameters.m_miniBatchSize))
-	{
-		m_randomPermutation.SetCount(m_parameters.m_criticValueIterations * m_parameters.m_miniBatchSize);
-	}
-	else
-	{
-		m_randomPermutation.SetCount(m_randomPermutation.GetCount() & -m_parameters.m_miniBatchSize);
-	}
-	
 	ndAtomic<ndInt32> iterator(0);
-	for (ndInt32 iter = numberOfIterations; iter >=0; --iter)
+	for (ndInt32 iter = 1; iter >=0; --iter)
 	{
+		m_randomPermutation.RandomShuffle(m_randomPermutation.GetCount());
 		for (ndInt32 base = 0; base < m_randomPermutation.GetCount(); base += m_parameters.m_miniBatchSize)
 		{
 			auto BackPropagateBatch = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
@@ -500,7 +481,7 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizeCritic()
 				ndBrainFixSizeVector<1> stateQValue;
 				ndBrainFixSizeVector<256> entropyActions;
 				entropyActions.SetCount(m_policy.GetOutputSize());
-
+	
 				// calculate GAE(l, 1) // very, very noisy
 				// calculate GAE(l, 0) // too smooth, and does not work either
 				ndBrainFloat gamma = m_parameters.m_discountRewardFactor * m_parameters.m_generalizedAdvangeDiscount;
@@ -517,7 +498,7 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizeCritic()
 						m_critic.MakePrediction(nextObservation, stateQValue);
 						stateValue[0] += gamma * stateQValue[0];
 					}
-
+	
 					if (m_parameters.m_entropyRegularizerCoef > ndBrainFloat(1.0e-6f))
 					{
 						const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(index), m_parameters.m_numberOfObservations);
@@ -536,7 +517,6 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizeCritic()
 			iterator = 0;
 			ndBrainThreadPool::ParallelExecute(BackPropagateBatch);
 			m_criticOptimizer->Update(this, m_criticTrainers, m_parameters.m_criticLearnRate);
-			m_randomPermutation.RandomShuffle(m_randomPermutation.GetCount());
 		}
 	}
 }
