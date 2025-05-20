@@ -57,17 +57,17 @@ namespace ndQuadruped_2
 {
 	#define ND_TRAIN_MODEL
 
-	#define USE_DDPG
+	//#define USE_DDPG
 
 	#ifdef USE_DDPG
-		//#define USE_SAC
+		#define USE_SAC
 		#ifdef USE_SAC
 			#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
 		#else
 			#define CONTROLLER_NAME "ndQuadruped_2-ddpg.dnn"
 		#endif
 	#else	
-		//#define USE_PPO
+		#define USE_PPO
 		#ifdef USE_PPO
 			#define CONTROLLER_NAME "ndQuadruped_2-ppo.dnn"
 		#else
@@ -192,10 +192,6 @@ namespace ndQuadruped_2
 		
 				for (ndInt32 i = 0; i < output.GetCount(); i++)
 				{
-					//if (i != 2)
-					//{
-					//	continue;
-					//}
 					const ndEffectorInfo& leg = *(ndEffectorInfo*)output[i].m_userData;;
 					const ndVector localPosit(leg.m_effector->GetRestPosit());
 					ndFloat32 stride_x = m_stride_x;
@@ -459,7 +455,7 @@ namespace ndQuadruped_2
 		{
 			const ndModelArticulation::ndNode* const rootNode = GetModel()->GetAsModelArticulation()->GetRoot();
 			const ndVector upDir (rootNode->m_body->GetMatrix().m_up);
-			if (upDir.m_y < ndCos(D_TILT_MAX_TILL_ANGLE))
+			if (upDir.m_y < ndCos(D_TILT_MAX_TILL_ANGLE * ndFloat32 (1.5f)))
 			{
 				return true;
 			}
@@ -573,7 +569,7 @@ namespace ndQuadruped_2
 		{
 			if (IsTerminal())
 			{
-				return -1.0f;
+				return ndBrainFloat (-1.0f);
 			}
 
 #if 0
@@ -622,15 +618,6 @@ namespace ndQuadruped_2
 			return ndFloat32(0.5f) * (alphaReward_x + alphaReward_z);
 #endif
 
-
-			//auto CalculateTiltReward = [](const ndFloat32 cosAngle)
-			//{
-			//	ndFloat32 dist = ndClamp(cosAngle, D_TILT_KILL_COS_ANGLE, ndFloat32(1.0f));
-			//	ndFloat32 parametricDist = (dist - D_TILT_KILL_COS_ANGLE) / (ndFloat32(1.0f) - D_TILT_KILL_COS_ANGLE);
-			//	ndFloat32 tiltReward = ndPow(parametricDist, ndFloat32(4.0f));
-			//	return tiltReward;
-			//};
-
 			ndFloat32 contacSlideSpeed = 0.0f;
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
@@ -658,7 +645,7 @@ namespace ndQuadruped_2
 			auto SparseReward = [](const ndFloat32 x, ndFloat32 maxParam)
 			{
 				ndFloat32 param = ndClamp(x, -maxParam, maxParam) / maxParam;
-				return ndExp(ndFloat32(-10.0f) * param * param);
+				return ndExp(ndFloat32(-100.0f) * param * param);
 			};
 
 			auto ContacSlidingReward = [SparseReward](const ndFloat32 slideSpeed)
@@ -672,13 +659,19 @@ namespace ndQuadruped_2
 				return SparseReward(angle, D_TILT_MAX_TILL_ANGLE);
 			};
 
-			ndModelArticulation::ndNode* const rootNode = GetModel()->GetAsModelArticulation()->GetRoot();
+			const ndModelArticulation::ndNode* const rootNode = GetModel()->GetAsModelArticulation()->GetRoot();
 			ndMatrix referenceFrame(rootNode->m_body->GetMatrix());
 			referenceFrame.m_up = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
 			referenceFrame.m_right = referenceFrame.m_front.CrossProduct(referenceFrame.m_up).Normalize();
 			referenceFrame.m_front = referenceFrame.m_up.CrossProduct(referenceFrame.m_right).Normalize();
 
 			const ndVector upDir (referenceFrame.UnrotateVector(rootNode->m_body->GetMatrix().m_up));
+
+			if (upDir.m_y < ndCos(D_TILT_MAX_TILL_ANGLE))
+			{
+				// add a penalty for few frames before dying
+				return ndBrainFloat(-0.5f);
+			}
 
 			//ndFloat32 xxx0 = CalculateSparceTiltReward(0.0f);
 			//ndFloat32 xxx1 = CalculateSparceTiltReward(0.01f);
