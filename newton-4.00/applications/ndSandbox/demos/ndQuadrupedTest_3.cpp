@@ -440,7 +440,7 @@ namespace ndQuadruped_3
 			return error;
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		bool IsTerminal() const
 		{
 			// termination for execive velocity
@@ -486,7 +486,7 @@ namespace ndQuadruped_3
 			return false;
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		ndBrainFloat CalculateReward() const
 		{
 			if (IsTerminal())
@@ -510,7 +510,7 @@ namespace ndQuadruped_3
 			return ndBrainFloat(reward / 3.0f);
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		void ResetModel()
 		{
 			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
@@ -522,7 +522,7 @@ namespace ndQuadruped_3
 			model->ClearMemory();
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		void GetObservation(ndBrainFloat* const observations)
 		{
 			//ndInt32 size = m_leg1_posit_x - m_leg0_posit_x;
@@ -903,7 +903,7 @@ namespace ndQuadruped_3
 			}
 		};
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		virtual void Update(ndDemoEntityManager* const manager, ndFloat32)
 		{
 			ndUnsigned32 stopTraining = m_master->GetFramesCount();
