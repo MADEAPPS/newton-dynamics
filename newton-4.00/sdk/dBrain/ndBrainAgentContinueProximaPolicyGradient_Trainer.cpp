@@ -469,7 +469,7 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizeCritic()
 	}
 
 	ndAtomic<ndInt32> iterator(0);
-	for (ndInt32 iter = 1; iter >=0; --iter)
+	for (ndInt32 iter = 2; iter >=0; --iter)
 	{
 		m_randomPermutation.RandomShuffle(m_randomPermutation.GetCount());
 		for (ndInt32 base = 0; base < m_randomPermutation.GetCount(); base += m_parameters.m_miniBatchSize)
@@ -513,9 +513,27 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizeCritic()
 					trainer.BackPropagate(observation, loss);
 				}
 			});
+
+			auto BackPropagateMontecarlo = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
+			{
+				ndBrainLossLeastSquaredError loss(1);
+				ndBrainFixSizeVector<1> stateValue;
+				//ndBrainFixSizeVector<256> entropyActions;
+				///entropyActions.SetCount(m_policy.GetOutputSize());
+				for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
+				{
+					const ndInt32 index = m_randomPermutation[base + i];
+					ndBrainTrainer& trainer = *m_criticTrainers[i];
+					stateValue[0] = m_trajectoryAccumulator.GetExpectedReward(index);
+					loss.SetTruth(stateValue);
+					const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(index), m_parameters.m_numberOfObservations);
+					trainer.BackPropagate(observation, loss);
+				}
+			});
 	
 			iterator = 0;
-			ndBrainThreadPool::ParallelExecute(BackPropagateBatch);
+			//ndBrainThreadPool::ParallelExecute(BackPropagateBatch);
+			ndBrainThreadPool::ParallelExecute(BackPropagateMontecarlo);
 			m_criticOptimizer->Update(this, m_criticTrainers, m_parameters.m_criticLearnRate);
 		}
 	}

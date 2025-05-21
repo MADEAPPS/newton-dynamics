@@ -323,7 +323,7 @@ void ndBrainAgentContinuePolicyGradient_Agent::Step()
 	m_isDead = m_isDead || isDead;
 }
 
-//#pragma optimize( "", off )
+#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_Agent::SaveTrajectory()
 {
 	for (ndInt32 i = 0; i < m_trajectory.GetCount(); ++i)
@@ -783,7 +783,6 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 				// calculate GAE(l, 1) // very, very noisy
 				// calculate GAE(l, 0) // too smooth, and does not work either
 				ndBrainFloat gamma = m_parameters.m_discountRewardFactor * m_parameters.m_generalizedAdvangeDiscount;
-
 				for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
 				{
 					const ndInt32 index = m_randomPermutation[base + i];
@@ -803,8 +802,26 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 				}
 			});
 
+			auto BackPropagateMontecarlo = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
+			{
+				ndBrainLossLeastSquaredError loss(1);
+				ndBrainFixSizeVector<1> stateValue;
+				//ndBrainFixSizeVector<256> entropyActions;
+				///entropyActions.SetCount(m_policy.GetOutputSize());
+				for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
+				{
+					const ndInt32 index = m_randomPermutation[base + i];
+					ndBrainTrainer& trainer = *m_criticTrainers[i];
+					stateValue[0] = m_trajectoryAccumulator.GetExpectedReward(index);
+					loss.SetTruth(stateValue);
+					const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(index), m_parameters.m_numberOfObservations);
+					trainer.BackPropagate(observation, loss);
+				}
+			});
+
 			iterator = 0;
-			ndBrainThreadPool::ParallelExecute(BackPropagateBatch);
+			//ndBrainThreadPool::ParallelExecute(BackPropagateBatch);
+			ndBrainThreadPool::ParallelExecute(BackPropagateMontecarlo);
 			m_criticOptimizer->Update(this, m_criticTrainers, m_parameters.m_criticLearnRate);
 		}
 	}

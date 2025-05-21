@@ -55,7 +55,7 @@ are more suitable for medium small systems.
 // to the environment with increasing complexity
 namespace ndQuadruped_2
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 
 	//#define USE_DDPG
 
@@ -569,7 +569,7 @@ namespace ndQuadruped_2
 		{
 			if (IsTerminal())
 			{
-				return ndBrainFloat (-1.0f);
+				return ndBrainFloat (-50.0f);
 			}
 
 #if 0
@@ -670,7 +670,7 @@ namespace ndQuadruped_2
 			if (upDir.m_y < ndCos(D_TILT_MAX_TILL_ANGLE))
 			{
 				// add a penalty for few frames before dying
-				return ndBrainFloat(-0.5f);
+				return ndBrainFloat(-5.0f);
 			}
 
 			//ndFloat32 xxx0 = CalculateSparceTiltReward(0.0f);
