@@ -152,7 +152,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndInt32 m_hiddenLayersNumberOfNeurons;
 		ndUnsigned32 m_randomSeed;
 
-		bool m_useSigmasPerActions;
+		bool m_usePerActionSigmas;
 		ndBrainOptimizer::ndRegularizerType m_policyRegularizerType;
 		ndBrainOptimizer::ndRegularizerType m_criticRegularizerType;
 	};

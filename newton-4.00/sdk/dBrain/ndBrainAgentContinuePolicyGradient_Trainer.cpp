@@ -65,7 +65,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 	m_policyRegularizerType = ndBrainOptimizer::m_ridge;
 	m_criticRegularizerType = ndBrainOptimizer::m_ridge;
 	
-	m_useSigmasPerActions = false;
+	m_usePerActionSigmas = false;
 	m_actionFixSigma = ND_CONTINUE_POLICY_FIX_SIGMA;
 
 	m_criticVelueIterations = 2;
@@ -75,7 +75,7 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 
 //m_threadsCount = 1;
 //m_batchTrajectoryCount = 1;
-//m_useSigmasPerActions = true;
+//m_usePerActionSigmas = true;
 }
 
 //*********************************************************************************************
@@ -275,7 +275,7 @@ bool ndBrainAgentContinuePolicyGradient_Agent::IsTerminal() const
 void ndBrainAgentContinuePolicyGradient_Agent::SampleActions(ndBrainVector& actions) const
 {
 	ndRandomGenerator& generator = *m_randomGenerator;
-	if (m_owner->m_parameters.m_useSigmasPerActions)
+	if (m_owner->m_parameters.m_usePerActionSigmas)
 	{
 		const ndInt32 size = ndInt32(actions.GetCount()) / 2;
 		for (ndInt32 i = size - 1; i >= 0; --i)
@@ -516,10 +516,10 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildPolicyClass()
 		layers.PushBack(new ND_CONTINUE_POLICY_GRADIENT_HIDEN_LAYERS_ACTIVATION(layers[layers.GetCount() - 1]->GetOutputSize()));
 	}
 
-	ndInt32 nunberOfOutput = m_parameters.m_useSigmasPerActions ? 2 * m_parameters.m_numberOfActions : m_parameters.m_numberOfActions;
+	ndInt32 nunberOfOutput = m_parameters.m_usePerActionSigmas ? 2 * m_parameters.m_numberOfActions : m_parameters.m_numberOfActions;
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), nunberOfOutput));
 	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
-	if (m_parameters.m_useSigmasPerActions)
+	if (m_parameters.m_usePerActionSigmas)
 	{
 		ndBrainFixSizeVector<256> bias;
 		ndBrainFixSizeVector<256> slope;
@@ -693,7 +693,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 	
 					const ndInt32 numberOfActions = m_owner->m_policy.GetOutputSize();
 					const ndBrainMemVector sampledProbability(m_owner->m_trajectoryAccumulator.GetActions(m_index), numberOfActions);
-					if (m_owner->m_parameters.m_useSigmasPerActions)
+					if (m_owner->m_parameters.m_usePerActionSigmas)
 					{
 						const ndInt32 size = ndInt32(m_owner->m_policy.GetOutputSize()) / 2;
 						for (ndInt32 i = size - 1; i >= 0; --i)

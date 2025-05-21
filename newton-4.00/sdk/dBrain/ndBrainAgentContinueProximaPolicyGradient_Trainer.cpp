@@ -52,7 +52,7 @@ ndBrainFloat ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateP
 	ndBrainFloat invSqrtPi = ndBrainFloat(1.0f) / ndSqrt(2.0f * ndPi);
 
 	ndBrainFloat prob = 1.0f;
-	if (m_parameters.m_useSigmasPerActions)
+	if (m_parameters.m_usePerActionSigmas)
 	{
 		const ndInt32 size = ndInt32(distribution.GetCount()) / 2;
 
@@ -196,7 +196,7 @@ ndBrainFloat ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::CalculateK
 		partialDivergence[threadIndex] = ndBrainFloat(0.5f) * totalDivergence;
 	});
 
-	if (m_parameters.m_useSigmasPerActions)
+	if (m_parameters.m_usePerActionSigmas)
 	{
 		ndBrainThreadPool::ParallelExecute(ParcialDivergence);
 	}
@@ -270,7 +270,7 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizedSurrogate
 					// calculate grad of probability	
 					const ndBrainMemVector sampledProbability(m_owner->m_trajectoryAccumulator.GetActions(m_index), numberOfActions);
 
-					if (m_owner->m_parameters.m_useSigmasPerActions)
+					if (m_owner->m_parameters.m_usePerActionSigmas)
 					{
 						const ndInt32 size = numberOfActions / 2;
 						for (ndInt32 i = size - 1; i >= 0; --i)
@@ -302,7 +302,7 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizedSurrogate
 					if (m_owner->m_parameters.m_entropyRegularizerCoef > ndBrainFloat(1.0e-6f))
 					{
 						// calculate and add the Gradient of entropy (grad of log probability)
-						if (m_owner->m_parameters.m_useSigmasPerActions)
+						if (m_owner->m_parameters.m_usePerActionSigmas)
 						{
 							ndBrainFloat entropyRegularizerCoef = m_owner->m_parameters.m_entropyRegularizerCoef;
 							const ndInt32 size = numberOfActions / 2;
@@ -419,7 +419,7 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizePolicy()
 					// given a multivariate Gaussian process with zero cross covariance to the actions.
 
 					const ndBrainMemVector sampledProbability(m_owner->m_trajectoryAccumulator.GetActions(m_index), numberOfActions);
-					if (m_owner->m_parameters.m_useSigmasPerActions)
+					if (m_owner->m_parameters.m_usePerActionSigmas)
 					{
 						const ndInt32 size = numberOfActions / 2;
 						for (ndInt32 i = size - 1; i >= 0; --i)
@@ -453,7 +453,7 @@ void ndBrainAgentContinueProximaPolicyGradient_TrainerMaster::OptimizePolicy()
 
 					if (m_owner->m_parameters.m_entropyRegularizerCoef > ndBrainFloat(1.0e-6f))
 					{
-						if (m_owner->m_parameters.m_useSigmasPerActions)
+						if (m_owner->m_parameters.m_usePerActionSigmas)
 						{
 							// calculate and add the Gradient of entropy (grad of log probability)
 							const ndInt32 size = numberOfActions / 2;

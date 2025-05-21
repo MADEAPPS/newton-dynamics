@@ -156,7 +156,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
 		ndInt32 m_criticUpdatesCount;
 		ndInt32 m_policyUpdatesCount;
 
-		bool m_useSigmasPerActions;
+		bool m_usePerActionSigmas;
 		ndBrainOptimizer::ndRegularizerType m_policyRegularizerType;
 		ndBrainOptimizer::ndRegularizerType m_criticRegularizerType;
 	};
@@ -186,6 +186,8 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
 	virtual void LearnPolicyFunction();
 	virtual void CalculateExpectedRewards();
 	void LearnQvalueFunction(ndInt32 criticIndex);
+	ndBrainFloat CalculatePolicyProbability(ndInt32 index) const;
+	ndBrainFloat CalculatePolicyProbability(ndInt32 index, const ndBrainVector& distribution) const;
 
 	public:
 	ndString m_name;
