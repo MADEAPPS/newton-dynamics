@@ -27,13 +27,13 @@
 #include "ndBrainLossLeastSquaredError.h"
 #include "ndBrainAgentSoftActorCritic_Trainer.h"
 
-#define ND_MAX_SAC_ENTROPY_CONFICIENT	ndBrainFloat (2.0e-5f)
+#define ND_MAX_SAC_ENTROPY_COEFFICIENT	ndBrainFloat (2.0e-5f)
 
 ndBrainAgentSoftActorCritic_Trainer::ndBrainAgentSoftActorCritic_Trainer(const HyperParameters& parameters)
 	:ndBrainAgentDeterministicPolicyGradient_Trainer(parameters)
 {
 	ndBrainFloat unitEntropy = ndClamp(m_parameters.m_entropyRegularizerCoef, ndBrainFloat(0.0f), ndBrainFloat(1.0f));
-	m_parameters.m_entropyRegularizerCoef = ND_MAX_SAC_ENTROPY_CONFICIENT * unitEntropy;
+	m_parameters.m_entropyRegularizerCoef = ND_MAX_SAC_ENTROPY_COEFFICIENT * unitEntropy;
 }
 
 ndBrainAgentSoftActorCritic_Trainer::~ndBrainAgentSoftActorCritic_Trainer()
@@ -41,36 +41,49 @@ ndBrainAgentSoftActorCritic_Trainer::~ndBrainAgentSoftActorCritic_Trainer()
 }
 
 //#pragma optimize( "", off )
-ndBrainFloat ndBrainAgentSoftActorCritic_Trainer::CalculatePolicyProbability(ndInt32 index, const ndBrainVector& sampledActions)
+//ndBrainFloat ndBrainAgentSoftActorCritic_Trainer::CalculatePolicyProbability(ndInt32 index, const ndBrainVector& sampledActions)
+ndBrainFloat ndBrainAgentSoftActorCritic_Trainer::CalculatePolicyProbability(ndInt32 index, const ndBrainVector& distribution)
 {
-#ifdef ND_TD3_PER_ACTION_SIGMA
-	ndBrainFixSizeVector<256> distribution;
-	distribution.SetCount(m_policy.GetOutputSize());
-	const ndBrainMemVector observation(m_replayBuffer.GetObservations(index), m_policy.GetInputSize());
-	m_policy.MakePrediction(observation, distribution);
-
-	ndBrainFloat z2 = 0.0f;
-	ndBrainFloat invSigma2Det = ndBrainFloat(1.0f);
-
-	const ndInt32 count = ndInt32(distribution.GetCount()) / 2;
-	const ndInt32 start = ndInt32(distribution.GetCount()) / 2;
-	ndBrainFloat invSqrtPi = ndBrainFloat(ndSqrt(1.0f / (2.0f * ndPi)));
-	for (ndInt32 i = count - 1; i >= 0; --i)
-	{
-		ndBrainFloat sigma = distribution[start + i];
-		ndBrainFloat invSigma = ndBrainFloat(1.0f) / sigma;
-		ndBrainFloat z = (sampledActions[i] - distribution[i]) * invSigma;
-
-		z2 += z * z;
-		invSigma2Det *= (invSqrtPi * invSigma);
-	}
-	ndBrainFloat exponent = ndBrainFloat(0.5f) * z2;
-	ndBrainFloat prob = invSigma2Det * ndBrainFloat(ndExp(-exponent));
-	return ndMax(prob, ndBrainFloat(1.0e-4f));
-#else
 	ndAssert(0);
-	return ndBrainFloat(0.0f);
-#endif
+	ndBrainFloat z2 = ndBrainFloat(0.0f);
+	ndBrainFloat invSigma2Det = ndBrainFloat(1.0f);
+	ndBrainFloat invSqrtPi = ndBrainFloat(1.0f) / ndSqrt(2.0f * ndPi);
+
+	ndBrainFloat prob = 1.0f;
+	if (m_parameters.m_useSigmasPerActions)
+	{
+		const ndInt32 size = ndInt32(distribution.GetCount()) / 2;
+
+		const ndBrainMemVector sampledProbabilities(m_replayBuffer.GetActions(index), m_policy.GetOutputSize());
+		for (ndInt32 i = size - 1; i >= 0; --i)
+		{
+			ndBrainFloat sigma = distribution[i + size];
+			ndBrainFloat invSigma = ndBrainFloat(1.0f) / sigma;
+			ndBrainFloat z = (sampledProbabilities[i] - distribution[i]) * invSigma;
+
+			z2 += (z * z);
+			invSigma2Det *= (invSqrtPi * invSigma);
+		}
+		ndBrainFloat exponent = ndBrainFloat(0.5f) * z2;
+		prob = invSigma2Det * ndBrainFloat(ndExp(-exponent));
+	}
+	else
+	{
+		const ndInt32 count = ndInt32(distribution.GetCount());
+
+		ndBrainFloat sigma = m_parameters.m_actionFixSigma;
+		ndBrainFloat invSigma = ndBrainFloat(1.0f) / sigma;
+		const ndBrainMemVector sampledProbabilities(m_replayBuffer.GetActions(index), m_policy.GetOutputSize());
+		for (ndInt32 i = count - 1; i >= 0; --i)
+		{
+			ndBrainFloat z = (sampledProbabilities[i] - distribution[i]) * invSigma;
+			z2 += z * z;
+			invSigma2Det *= (invSqrtPi * invSigma);
+		}
+		ndBrainFloat exponent = ndBrainFloat(0.5f) * z2;
+		prob = invSigma2Det * ndBrainFloat(ndExp(-exponent));
+	}
+	return ndMax(prob, ndBrainFloat(1.0e-4f));
 }
 
 //#pragma optimize( "", off )
@@ -98,11 +111,11 @@ void ndBrainAgentSoftActorCritic_Trainer::CalculateExpectedRewards()
 	{
 		const ndInt32 batchSize = 128;
 		ndBrainFixSizeVector<256> policyEntropyAction;
-		ndBrainFixSizeVector<256> criticObservationAction;
+		ndBrainFixSizeVector<256> criticNextObservationAction;
 		
 		ndAssert(count % batchSize == 0);
 		policyEntropyAction.SetCount(m_policy.GetOutputSize());
-		criticObservationAction.SetCount(m_policy.GetOutputSize() + m_policy.GetInputSize());
+		criticNextObservationAction.SetCount(m_policy.GetOutputSize() + m_policy.GetInputSize());
 		for (ndInt32 base = iterator.fetch_add(batchSize); base < count; base = iterator.fetch_add(batchSize))
 		{
 			for (ndInt32 j = 0; j < batchSize; ++j)
@@ -117,15 +130,15 @@ void ndBrainAgentSoftActorCritic_Trainer::CalculateExpectedRewards()
 				}
 				if (!m_replayBuffer.GetTerminalState(index))
 				{
-					ndBrainMemVector nextAction(&criticObservationAction[0], m_policy.GetOutputSize());
+					ndBrainMemVector nextAction(&criticNextObservationAction[0], m_policy.GetOutputSize());
 					const ndBrainMemVector nextObservation(m_replayBuffer.GetNextObservations(index), m_policy.GetInputSize());
 					m_policy.MakePrediction(nextObservation, nextAction);
-					ndMemCpy(&criticObservationAction[m_policy.GetOutputSize()], &nextObservation[0], nextObservation.GetCount());
+					ndMemCpy(&criticNextObservationAction[m_policy.GetOutputSize()], &nextObservation[0], nextObservation.GetCount());
 
 					ndBrainFixSizeVector<1> criticQvalue;
 					for (ndInt32 i = 0; i < sizeof(m_critic) / sizeof(m_critic[0]); ++i)
 					{
-						m_referenceCritic[i].MakePrediction(criticObservationAction, criticQvalue);
+						m_referenceCritic[i].MakePrediction(criticNextObservationAction, criticQvalue);
 						rewards[i] += m_parameters.m_discountRewardFactor * criticQvalue[0];
 					}
 				}
@@ -150,7 +163,7 @@ void ndBrainAgentSoftActorCritic_Trainer::CalculateExpectedRewards()
 	ndBrainThreadPool::ParallelExecute(ExpectedRewards);
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainAgentSoftActorCritic_Trainer::LearnPolicyFunction()
 {
 	ndAtomic<ndInt32> iterator(0);
@@ -215,26 +228,25 @@ void ndBrainAgentSoftActorCritic_Trainer::LearnPolicyFunction()
 					
 					if (m_owner->m_parameters.m_entropyRegularizerCoef > ndBrainFloat(1.0e-6f))
 					{
-						ndAssert(0);
-						#ifdef ND_TD3_PER_ACTION_SIGMA
+						if (m_owner->m_parameters.m_useSigmasPerActions)
+						{
 							// calculate and add the Gradient of entropy (grad of log probability)
-							const ndInt32 count = ndInt32(m_owner->m_policy.GetOutputSize()) / 2;
-							const ndInt32 start = ndInt32(m_owner->m_policy.GetOutputSize()) / 2;
 							ndBrainMemVector sampledActions(m_owner->m_replayBuffer.GetActions(m_index), m_owner->m_policy.GetOutputSize());
 							ndBrainFloat entropyRegularizerCoef = m_owner->m_parameters.m_entropyRegularizerCoef;
-							for (ndInt32 i = count - 1; i >= 0; --i)
+
+							const ndInt32 size = ndInt32(m_owner->m_policy.GetOutputSize()) / 2;
+							for (ndInt32 i = size - 1; i >= 0; --i)
 							{
-								ndBrainFloat sigma = probabilityDistribution[i + start];
+								ndBrainFloat sigma = probabilityDistribution[size + i];
 								ndBrainFloat invSigma = ndBrainFloat(1.0f) / sigma;
 								ndBrainFloat z = sampledActions[i] - probabilityDistribution[i];
 								ndBrainFloat meanGrad = z * invSigma * invSigma;
 								ndBrainFloat sigmaGrad = z * z * invSigma * invSigma * invSigma - sigma;
-						
+
 								loss[i] -= entropyRegularizerCoef * meanGrad;
-								loss[i + start] -= entropyRegularizerCoef * sigmaGrad;
+								loss[size + i] -= entropyRegularizerCoef * sigmaGrad;
 							}
-						#else
-						#endif
+						}
 					}
 					
 					// gradient ascend

@@ -41,7 +41,6 @@
 	#define ND_NUMBER_OF_CRITICS		1
 #endif
 
-//#define ND_TD3_PER_ACTION_SIGMA
 #define ND_TD3_POLICY_DELAY_MOD			1
 
 class ndBrainOptimizerAdam;
