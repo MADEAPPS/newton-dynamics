@@ -157,7 +157,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
 		ndInt32 m_criticUpdatesCount;
 		ndInt32 m_policyUpdatesCount;
 
-		bool m_useFixSigma;
+		bool m_useSigmasPerActions;
 		ndBrainOptimizer::ndRegularizerType m_policyRegularizerType;
 		ndBrainOptimizer::ndRegularizerType m_criticRegularizerType;
 	};

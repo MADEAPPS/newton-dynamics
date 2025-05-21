@@ -476,7 +476,7 @@ xxxxx++;
 			ndModelArticulation::ndNode* const calfNode = model->AddLimb(thighNode, calf, calfHinge);
 
 			((ndIkJointHinge*)*calfHinge)->SetLimitState(true);
-			((ndIkJointHinge*)*calfHinge)->SetLimits(-50.0f * ndDegreeToRad, 40.0f * ndDegreeToRad);
+			((ndIkJointHinge*)*calfHinge)->SetLimits(-60.0f * ndDegreeToRad, 50.0f * ndDegreeToRad);
 
 			// build heel
 			ndSharedPtr<ndDemoEntity> heelEntity(calfEntity->GetChildren().GetFirst()->GetInfo());

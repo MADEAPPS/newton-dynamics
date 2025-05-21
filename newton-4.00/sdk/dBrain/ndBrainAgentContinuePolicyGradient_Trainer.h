@@ -33,8 +33,6 @@
 // this is an implementation of the vanilla policy Gradient as described in:
 // https://spinningup.openai.com/en/latest/algorithms/vpg.html
 
-//#define ND_CONTINUE_PER_ACTION_SIGMA
-
 class ndBrainOptimizerAdam;
 class ndBrainAgentContinuePolicyGradient_TrainerMaster;
 
@@ -148,11 +146,13 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndInt32 m_miniBatchSize;
 		ndInt32 m_maxTrajectorySteps;
 		ndInt32 m_batchTrajectoryCount;
+
 		ndInt32 m_numberOfHiddenLayers;
+		ndInt32 m_criticVelueIterations;
 		ndInt32 m_hiddenLayersNumberOfNeurons;
 		ndUnsigned32 m_randomSeed;
 
-		bool m_useFixSigma;
+		bool m_useSigmasPerActions;
 		ndBrainOptimizer::ndRegularizerType m_policyRegularizerType;
 		ndBrainOptimizer::ndRegularizerType m_criticRegularizerType;
 	};

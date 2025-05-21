@@ -37,7 +37,6 @@
 #include "ndBrainLayerActivationSigmoidLinear.h"
 #include "ndBrainLayerActivationCategoricalSoftmax.h"
 #include "ndBrainAgentContinuePolicyGradient_Trainer.h"
-#include "ndBrainLayerActivationPolicyGradientMeanSigma.h"
 //#include "ndBrainLayerConvolutionalWithDropOut_2d.h"
 
 ndBrain* ndBrainLoad::Load(const char* const pathName)
@@ -118,10 +117,6 @@ ndBrain* ndBrainLoad::Load() const
 		else if (!strcmp(layerType, ND_BRAIN_LAYER_ACTIVATION_TANGH_NAME))
 		{
 			layer = ndBrainLayerActivationTanh::Load(this);
-		}
-		else if (!strcmp(layerType, ND_BRAIN_LAYER_ACTIVATION_POLICY_MEAN_SIGMAN_NAME))
-		{
-			layer = ndBrainLayerActivationPolicyGradientMeanSigma::Load(this);
 		}
 		else if (!strcmp(layerType, ND_BRAIN_LAYER_ACTIVATION_RELU_NAME))
 		{

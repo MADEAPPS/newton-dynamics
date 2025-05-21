@@ -30,9 +30,7 @@
 #include "ndBrainLossLeastSquaredError.h"
 #include "ndBrainLayerActivationLinear.h"
 #include "ndBrainLayerActivationLeakyRelu.h"
-#include "ndBrainLayerActivationPolicyGradientMeanSigma.h"
 #include "ndBrainAgentDeterministicPolicyGradient_Trainer.h"
-
 
 #define ND_TD3_EXPLORATION_NOISE_SIGMA								ndFloat32 (0.2f)
 
@@ -53,8 +51,8 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 	m_policyMovingAverageFactor = ndBrainFloat(0.005f);
 	m_criticMovingAverageFactor = ndBrainFloat(0.005f);
 
-	//m_useFixSigma = true;
-	m_useFixSigma = false;
+	//m_useSigmasPerActions = true;
+	m_useSigmasPerActions = false;
 	m_actionFixSigma = ND_TD3_EXPLORATION_NOISE_SIGMA;
 
 	m_policyRegularizerType = ndBrainOptimizer::m_ridge;
@@ -343,7 +341,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildPolicyClass()
 	slope.SetCount(layers[layers.GetCount() - 1]->GetOutputSize());
 	bias.Set(ndBrainFloat(0.0f));
 	slope.Set(ndBrainFloat(1.0f));
-	if (m_parameters.m_useFixSigma)
+	if (m_parameters.m_useSigmasPerActions)
 	{
 		ndInt32 size = layers[layers.GetCount() - 1]->GetOutputSize() / 2;
 

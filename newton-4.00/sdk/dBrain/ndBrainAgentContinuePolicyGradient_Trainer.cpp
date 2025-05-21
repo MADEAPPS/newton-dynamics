@@ -29,14 +29,14 @@
 #include "ndBrainLayerActivationLinear.h"
 #include "ndBrainLayerActivationLeakyRelu.h"
 #include "ndBrainAgentContinuePolicyGradient_Trainer.h"
-#include "ndBrainLayerActivationPolicyGradientMeanSigma.h"
-
-#define ND_CONTINUE_POLICY_FIX_SIGMA							ndBrainFloat(0.2f)
-
 
 #define ND_CONTINUE_POLICY_GRADIENT_HIDEN_LAYERS_ACTIVATION		ndBrainLayerActivationRelu
 //#define ND_CONTINUE_POLICY_GRADIENT_HIDEN_LAYERS_ACTIVATION	ndBrainLayerActivationTanh
 //#define ND_CONTINUE_POLICY_GRADIENT_HIDEN_LAYERS_ACTIVATION	ndBrainLayerActivationLeakyRelu
+
+#define ND_CONTINUE_POLICY_FIX_SIGMA			ndBrainFloat(0.2f)
+#define ND_CONTINUE_POLICY_MIN_PER_ACTION_SIGMA	ndBrainFloat(0.01f)
+#define ND_CONTINUE_POLICY_MAX_PER_ACTION_SIGMA	ndBrainFloat(1.0f)
 
 //*********************************************************************************************
 //
@@ -65,15 +65,17 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 	m_policyRegularizerType = ndBrainOptimizer::m_ridge;
 	m_criticRegularizerType = ndBrainOptimizer::m_ridge;
 	
-	m_useFixSigma = false;
+	m_useSigmasPerActions = false;
 	m_actionFixSigma = ND_CONTINUE_POLICY_FIX_SIGMA;
 
+	m_criticVelueIterations = 2;
 	m_discountRewardFactor = ndBrainFloat(0.99f);
 	m_generalizedAdvangeDiscount = ndBrainFloat(0.99f);
 	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize);
 
 //m_threadsCount = 1;
 //m_batchTrajectoryCount = 1;
+//m_useSigmasPerActions = true;
 }
 
 //*********************************************************************************************
@@ -273,28 +275,30 @@ bool ndBrainAgentContinuePolicyGradient_Agent::IsTerminal() const
 void ndBrainAgentContinuePolicyGradient_Agent::SampleActions(ndBrainVector& actions) const
 {
 	ndRandomGenerator& generator = *m_randomGenerator;
-#ifdef ND_CONTINUE_PER_ACTION_SIGMA
-	const ndInt32 count = ndInt32(actions.GetCount()) / 2;
-	const ndInt32 start = ndInt32(actions.GetCount()) / 2;
-	for (ndInt32 i = count - 1; i >= 0; --i)
+	if (m_owner->m_parameters.m_useSigmasPerActions)
 	{
-		ndBrainFloat sigma = actions[start + i];
-		ndBrainFloat unitVarianceSample = generator.m_d(generator.m_gen);
-		ndBrainFloat sample = ndBrainFloat(actions[i]) + unitVarianceSample * sigma;
-		ndBrainFloat clippedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
-		actions[i] = clippedAction;
+		const ndInt32 size = ndInt32(actions.GetCount()) / 2;
+		for (ndInt32 i = size - 1; i >= 0; --i)
+		{
+			ndBrainFloat sigma = actions[size + i];
+			ndBrainFloat unitVarianceSample = generator.m_d(generator.m_gen);
+			ndBrainFloat sample = ndBrainFloat(actions[i]) + unitVarianceSample * sigma;
+			ndBrainFloat clippedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
+			actions[i] = clippedAction;
+		}
 	}
-#else
-	ndFloat32 sigma = m_owner->m_parameters.m_actionFixSigma;
-	const ndInt32 count = ndInt32(actions.GetCount());
-	for (ndInt32 i = count - 1; i >= 0; --i)
+	else
 	{
-		ndBrainFloat unitVarianceSample = generator.m_d(generator.m_gen);
-		ndBrainFloat sample = ndBrainFloat(actions[i]) + unitVarianceSample * sigma;
-		ndBrainFloat clippedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
-		actions[i] = clippedAction;
+		ndFloat32 sigma = m_owner->m_parameters.m_actionFixSigma;
+		const ndInt32 size = ndInt32(actions.GetCount());
+		for (ndInt32 i = size - 1; i >= 0; --i)
+		{
+			ndBrainFloat unitVarianceSample = generator.m_d(generator.m_gen);
+			ndBrainFloat sample = ndBrainFloat(actions[i]) + unitVarianceSample * sigma;
+			ndBrainFloat clippedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
+			actions[i] = clippedAction;
+		}
 	}
-#endif
 }
 
 //#pragma optimize( "", off )
@@ -511,29 +515,27 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildPolicyClass()
 		layers.PushBack(new ndBrainLayerLinear(m_parameters.m_hiddenLayersNumberOfNeurons, m_parameters.m_hiddenLayersNumberOfNeurons));
 		layers.PushBack(new ND_CONTINUE_POLICY_GRADIENT_HIDEN_LAYERS_ACTIVATION(layers[layers.GetCount() - 1]->GetOutputSize()));
 	}
-#ifdef ND_CONTINUE_PER_ACTION_SIGMA
-	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_numberOfActions + m_parameters.m_numberOfActions));
-	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
-	layers.PushBack(new ndBrainLayerActivationPolicyGradientMeanSigma(layers[layers.GetCount() - 1]->GetOutputSize()));
 
-	ndBrainFixSizeVector<256> bias;
-	ndBrainFixSizeVector<256> slope;
-	bias.SetCount(layers[layers.GetCount() - 1]->GetOutputSize());
-	slope.SetCount(layers[layers.GetCount() - 1]->GetOutputSize());
-	bias.Set(ndBrainFloat(0.0f));
-	slope.Set(ndBrainFloat(1.0f));
-	if (m_parameters.m_useFixSigma)
+	ndInt32 nunberOfOutput = m_parameters.m_useSigmasPerActions ? 2 * m_parameters.m_numberOfActions : m_parameters.m_numberOfActions;
+	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), nunberOfOutput));
+	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
+	if (m_parameters.m_useSigmasPerActions)
 	{
-		ndInt32 size = layers[layers.GetCount() - 1]->GetOutputSize() / 2;
+		ndBrainFixSizeVector<256> bias;
+		ndBrainFixSizeVector<256> slope;
+		bias.SetCount(layers[layers.GetCount() - 1]->GetOutputSize());
+		slope.SetCount(layers[layers.GetCount() - 1]->GetOutputSize());
 
-		ndMemSet(&slope[size], ndBrainFloat(0.0f), size);
-		ndMemSet(&bias[size], m_parameters.m_actionFixSigma, size);
+		ndInt32 sigmaSize = nunberOfOutput / 2;
+		ndBrainFloat b = ndBrainFloat(0.5f) * (ND_CONTINUE_POLICY_MAX_PER_ACTION_SIGMA + ND_CONTINUE_POLICY_MIN_PER_ACTION_SIGMA);
+		ndBrainFloat a = ndBrainFloat(0.5f) * (ND_CONTINUE_POLICY_MAX_PER_ACTION_SIGMA - ND_CONTINUE_POLICY_MIN_PER_ACTION_SIGMA);
+
+		bias.Set(ndBrainFloat(0.0f));
+		slope.Set(ndBrainFloat(1.0f));
+		ndMemSet(&bias[sigmaSize], b, sigmaSize);
+		ndMemSet(&slope[sigmaSize], a, sigmaSize);
+		layers.PushBack(new ndBrainLayerActivationLinear(slope, bias));
 	}
-	layers.PushBack(new ndBrainLayerActivationLinear(slope, bias));
-#else
-	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_numberOfActions));
-	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
-#endif
 
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
@@ -691,32 +693,34 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 	
 					const ndInt32 numberOfActions = m_owner->m_policy.GetOutputSize();
 					const ndBrainMemVector sampledProbability(m_owner->m_trajectoryAccumulator.GetActions(m_index), numberOfActions);
-					#ifdef ND_CONTINUE_PER_ACTION_SIGMA
-						const ndInt32 count = ndInt32(m_owner->m_policy.GetOutputSize()) / 2;
-						const ndInt32 start = ndInt32(m_owner->m_policy.GetOutputSize()) / 2;
-						for (ndInt32 i = count - 1; i >= 0; --i)
+					if (m_owner->m_parameters.m_useSigmasPerActions)
+					{
+						const ndInt32 size = ndInt32(m_owner->m_policy.GetOutputSize()) / 2;
+						for (ndInt32 i = size - 1; i >= 0; --i)
 						{
-							ndBrainFloat sigma = probabilityDistribution[i + start];
+							ndBrainFloat sigma = probabilityDistribution[size + i];
 							ndBrainFloat invSigma = ndBrainFloat(1.0f) / sigma;
 							ndBrainFloat z = sampledProbability[i] - probabilityDistribution[i];
 							ndBrainFloat meanGrad = z * invSigma * invSigma;
 							ndBrainFloat sigmaGrad = z * z * invSigma * invSigma * invSigma - sigma;
-	
+
 							loss[i] = meanGrad;
-							loss[i + start] = sigmaGrad;
+							loss[size + i] = sigmaGrad;
 						}
-					#else
+					}
+					else
+					{
 						ndFloat32 sigma = m_owner->m_parameters.m_actionFixSigma;
 						ndFloat32 sigma2 = sigma * sigma;
 						ndBrainFloat invSigma2 = ndBrainFloat(1.0f) / sigma2;
-						const ndInt32 count = ndInt32(m_owner->m_policy.GetOutputSize());
-						for (ndInt32 i = count - 1; i >= 0; --i)
+						const ndInt32 size = ndInt32(m_owner->m_policy.GetOutputSize());
+						for (ndInt32 i = size - 1; i >= 0; --i)
 						{
 							ndBrainFloat z = sampledProbability[i] - probabilityDistribution[i];
 							ndBrainFloat meanGrad = z * invSigma2;
 							loss[i] = meanGrad;
 						}
-					#endif
+					}
 					const ndBrainFloat advantage = m_owner->m_advantage[m_index];
 	
 					//negate the gradient for gradient ascend?
@@ -768,20 +772,20 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 	}
 
 	ndAtomic<ndInt32> iterator(0);
-	//for (ndInt32 iter = numberOfIterations; iter >= 0; --iter)
-	for (ndInt32 iter = 1; iter >= 0; --iter)
+	for (ndInt32 iter = m_parameters.m_criticVelueIterations - 1; iter >= 0; --iter)
 	{
 		m_randomPermutation.RandomShuffle(m_randomPermutation.GetCount());
 		for (ndInt32 base = 0; base < m_randomPermutation.GetCount(); base += m_parameters.m_miniBatchSize)
 		{
 			auto BackPropagateBatch = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
 			{
-				ndBrainLossLeastSquaredError loss(1);
 				ndBrainFixSizeVector<1> stateValue;
 				ndBrainFixSizeVector<1> stateQValue;
+				ndBrainLossLeastSquaredError loss(1);
 
 				// calculate GAE(l, 1) // very, very noisy
 				// calculate GAE(l, 0) // too smooth, and does not work either
+				// but this shit does not seems any better than ramdom.
 				ndBrainFloat gamma = m_parameters.m_discountRewardFactor * m_parameters.m_generalizedAdvangeDiscount;
 				for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
 				{
@@ -804,10 +808,8 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 
 			auto BackPropagateMontecarlo = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
 			{
-				ndBrainLossLeastSquaredError loss(1);
 				ndBrainFixSizeVector<1> stateValue;
-				//ndBrainFixSizeVector<256> entropyActions;
-				///entropyActions.SetCount(m_policy.GetOutputSize());
+				ndBrainLossLeastSquaredError loss(1);
 				for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
 				{
 					const ndInt32 index = m_randomPermutation[base + i];

@@ -55,7 +55,7 @@ are more suitable for medium small systems.
 // to the environment with increasing complexity
 namespace ndQuadruped_2
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 
 	//#define USE_DDPG
 
@@ -67,7 +67,7 @@ namespace ndQuadruped_2
 			#define CONTROLLER_NAME "ndQuadruped_2-ddpg.dnn"
 		#endif
 	#else	
-		#define USE_PPO
+		//#define USE_PPO
 		#ifdef USE_PPO
 			#define CONTROLLER_NAME "ndQuadruped_2-ppo.dnn"
 		#else
@@ -1077,7 +1077,7 @@ namespace ndQuadruped_2
 			ndModelArticulation::ndNode* const calfNode = model->AddLimb(thighNode, calf, calfHinge);
 
 			((ndIkJointHinge*)*calfHinge)->SetLimitState(true);
-			((ndIkJointHinge*)*calfHinge)->SetLimits(-50.0f * ndDegreeToRad, 40.0f * ndDegreeToRad);
+			((ndIkJointHinge*)*calfHinge)->SetLimits(-60.0f * ndDegreeToRad, 50.0f * ndDegreeToRad);
 
 			// build heel
 			ndSharedPtr<ndDemoEntity> heelEntity(calfEntity->GetChildren().GetFirst()->GetInfo());
@@ -1142,7 +1142,7 @@ namespace ndQuadruped_2
 			ndInt32 numberOfObservations = m_observationSize * 4 + 2;
 
 			#ifdef USE_DDPG
-				m_stopTraining = 500000;
+				m_stopTraining = 1000000;
 				ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
 				hyperParameters.m_numberOfActions = numberOfActions;
 				hyperParameters.m_numberOfObservations = numberOfObservations;
@@ -1161,7 +1161,7 @@ namespace ndQuadruped_2
 
 				#endif
 			#else
-				m_stopTraining = 100 * 1000000;
+				m_stopTraining = 500 * 1000000;
 				ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 				hyperParameters.m_numberOfActions = numberOfActions;
 				hyperParameters.m_numberOfObservations = numberOfObservations;
