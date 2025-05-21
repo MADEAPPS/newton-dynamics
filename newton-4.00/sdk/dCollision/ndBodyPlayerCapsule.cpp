@@ -95,26 +95,26 @@ ndBodyPlayerCapsule::~ndBodyPlayerCapsule()
 
 void ndBodyPlayerCapsule::Init(const ndMatrix& localAxis, ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight)
 {
-	//m_contactTestOnly = 1;
+	m_height = height;
+	m_radius = radius;
+	m_isAirbone = false;
+	m_isOnFloor = false;
+	m_isCrouched = false;
+
 	m_impulse = ndVector::m_zero;
 	m_headingAngle = ndFloat32(0.0f);
 	m_forwardSpeed = ndFloat32(0.0f);
 	m_lateralSpeed = ndFloat32(0.0f);
 	m_stepHeight = ndFloat32(0.0f);
 	m_contactPatch = ndFloat32(0.0f);
-	m_height = height;
-	m_radius = radius;
 	m_weistScale = ndFloat32(3.0f);
 	m_crouchScale = ndFloat32(0.5f);
-	m_isAirbone = false;
-	m_isOnFloor = false;
-	m_isCrouched = false;
 
 	ndMatrix shapeMatrix(localAxis);
-	shapeMatrix.m_posit = shapeMatrix.m_front.Scale(height * 0.5f);
-	shapeMatrix.m_posit.m_w = 1.0f;
+	shapeMatrix.m_posit = shapeMatrix.m_front.Scale(height * ndFloat32(0.5f));
+	shapeMatrix.m_posit.m_w = ndFloat32(1.0f);
 
-	height = ndMax(height - 2.0f * radius / m_weistScale, ndFloat32(0.1f));
+	height = ndMax(height - ndFloat32(2.0f) * radius / m_weistScale, ndFloat32(0.1f));
 	ndShapeInstance instance(new ndShapeCapsule(radius / m_weistScale, radius / m_weistScale, height));
 	instance.SetLocalMatrix(shapeMatrix);
 	instance.SetScale(ndVector(ndFloat32(1.0f), m_weistScale, m_weistScale, ndFloat32(0.0f)));
@@ -169,7 +169,7 @@ void ndBodyPlayerCapsule::ResolveStep(ndBodyPlayerCapsuleContactSolver& contactS
 				ndVector point(contactSolver.m_contactBuffer[i].m_point);
 				ndVector normal(contactSolver.m_contactBuffer[i].m_normal);
 				ndFloat32 speed = ndMin((contactSolver.m_contactBuffer[i].m_penetration + D_MAX_COLLISION_PENETRATION), ndFloat32(0.25f)) * invTimeStep;
-				impulseSolver.AddLinearRow(normal, point - com, speed, 0.0f, 1.0e12f);
+				impulseSolver.AddLinearRow(normal, point - com, speed, ndFloat32(0.0f), ndFloat32(1.0e12f));
 			}
 
 			impulseSolver.AddAngularRows();
@@ -188,7 +188,7 @@ void ndBodyPlayerCapsule::ResolveStep(ndBodyPlayerCapsuleContactSolver& contactS
 		ndFloat32 forwardSpeed = m_forwardSpeed * scaleSpeedFactor;
 		ndFloat32 lateralSpeed = m_lateralSpeed * scaleSpeedFactor;
 		ndFloat32 maxSpeed = ndMax(ndAbs(forwardSpeed), ndAbs(lateralSpeed));
-		ndFloat32 stepFriction = 1.0f + m_mass * maxSpeed;
+		ndFloat32 stepFriction = ndFloat32(1.0f) + m_mass * maxSpeed;
 		
 		SetVelocity(savedVeloc);
 		impulseSolver.Reset(this);
@@ -231,7 +231,7 @@ void ndBodyPlayerCapsule::ResolveStep(ndBodyPlayerCapsuleContactSolver& contactS
 					{
 						ndVector point(contactSolver.m_contactBuffer[i].m_point);
 						ndVector normal(contactSolver.m_contactBuffer[i].m_normal);
-						impulseSolver.AddLinearRow(normal, point - com, 0.0f, 0.0f, 1.0e12f);
+						impulseSolver.AddLinearRow(normal, point - com, ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0e12f));
 					}
 					
 					impulseSolver.AddAngularRows();
@@ -249,7 +249,7 @@ void ndBodyPlayerCapsule::ResolveStep(ndBodyPlayerCapsuleContactSolver& contactS
 		{
 			ndMatrix stepMatrix(GetMatrix());
 			
-			ndFloat32 maxHigh = 0.0f;
+			ndFloat32 maxHigh = ndFloat32(0.0f);
 			for (ndInt32 i = 0; i < contactSolver.m_contactCount; ++i) 
 			{
 				ndVector point (contactSolver.m_contactBuffer[i].m_point);
@@ -265,7 +265,7 @@ void ndBodyPlayerCapsule::ResolveStep(ndBodyPlayerCapsuleContactSolver& contactS
 				}
 			}
 			
-			if (maxHigh > 0.0f) 
+			if (maxHigh > ndFloat32(0.0f)) 
 			{
 				ndVector step(stepMatrix.RotateVector(m_localFrame.RotateVector(ndVector(maxHigh, ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f)))));
 				matrix.m_posit += step;
@@ -341,7 +341,7 @@ ndFloat32 ndBodyPlayerCapsule::PredictTimestep(ndBodyPlayerCapsuleContactSolver&
 	if (playerCollide == m_deepPenetration) 
 	{
 		ndFloat32 savedTimeStep = timestep;
-		timestep *= 0.5f;
+		timestep *= ndFloat32(0.5f);
 		ndFloat32 dt = timestep;
 		for (ndInt32 i = 0; i < D_MAX_COLLIONSION_STEPS; ++i) 
 		{
@@ -349,7 +349,7 @@ ndFloat32 ndBodyPlayerCapsule::PredictTimestep(ndBodyPlayerCapsuleContactSolver&
 			contactSolver.CalculateContacts();
 			SetMatrix(matrix);
 		
-			dt *= 0.5f;
+			dt *= ndFloat32(0.5f);
 			playerCollide = TestPredictCollision(contactSolver, veloc);
 			if (playerCollide == m_colliding) 
 			{
@@ -408,9 +408,9 @@ void ndBodyPlayerCapsule::ResolveInterpenetrations(ndBodyPlayerCapsuleContactSol
 			ndContactPoint* const contact = &contactSolver.m_contactBuffer[i];
 			ndVector point(contact->m_point);
 			ndVector normal(contact->m_normal);
-			ndInt32 index = impulseSolver.AddContactRow(contact, normal, point - com, 0.0f, 0.0f, 1.0e12f);
+			ndInt32 index = impulseSolver.AddContactRow(contact, normal, point - com, ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0e12f));
 	
-			ndFloat32 impulse = invTimestep * ndClamp(contact->m_penetration - D_MAX_COLLISION_PENETRATION * 0.5f, ndFloat32(0.0f), ndFloat32(0.5f));
+			ndFloat32 impulse = invTimestep * ndClamp(contact->m_penetration - D_MAX_COLLISION_PENETRATION * ndFloat32(0.5f), ndFloat32(0.0f), ndFloat32(0.5f));
 			impulseSolver.m_rhs[index] = impulse;
 		}
 
@@ -420,7 +420,7 @@ void ndBodyPlayerCapsule::ResolveInterpenetrations(ndBodyPlayerCapsuleContactSol
 		SetVelocity(veloc);
 		ndBodyKinematic::IntegrateVelocity(timestep);
 	
-		penetration = 0.0f;
+		penetration = ndFloat32(0.0f);
 		contactSolver.CalculateContacts();
 		for (ndInt32 i = 0; i < contactSolver.m_contactCount; ++i) 
 		{
@@ -439,7 +439,7 @@ void ndBodyPlayerCapsule::ResolveCollision(ndBodyPlayerCapsuleContactSolver& con
 		return;
 	}
 
-	ndFloat32 maxPenetration = 0.0f;
+	ndFloat32 maxPenetration = ndFloat32(0.0f);
 	for (ndInt32 i = 0; i < contactSolver.m_contactCount; ++i) 
 	{
 		maxPenetration = ndMax(contactSolver.m_contactBuffer[i].m_penetration, maxPenetration);
@@ -458,7 +458,7 @@ void ndBodyPlayerCapsule::ResolveCollision(ndBodyPlayerCapsuleContactSolver& con
 	ndVector com(matrix.TransformVector(GetCentreOfMass()));
 
 	impulseSolver.Reset(this);
-	ndVector surfaceVeloc(0.0f);
+	ndVector surfaceVeloc(ndFloat32(0.0f));
 	const ndFloat32 contactPatchHigh = m_contactPatch * ndFloat32(0.995f);
 
 	for (ndInt32 i = 0; i < contactSolver.m_contactCount; ++i) 
@@ -472,7 +472,7 @@ void ndBodyPlayerCapsule::ResolveCollision(ndBodyPlayerCapsuleContactSolver& con
 		if (localPoint.m_x < contactPatchHigh) 
 		{
 			ndFloat32 friction = ContactFrictionCallback(point, normal, 0, contact->m_body1);
-			if (friction > 0.0f) 
+			if (friction > ndFloat32(0.0f)) 
 			{
 				// add lateral traction friction
 				ndVector sideDir(frameMatrix.m_up.CrossProduct(normal).Normalize());
@@ -519,6 +519,8 @@ void ndBodyPlayerCapsuleContactSolver::CalculateContacts()
 	ndScene* const scene = m_player->GetScene();
 	ndContactNotify* const contactNotify = m_player->GetScene()->GetContactNotify();
 	ndBodyKinematic::ndContactMap::Iterator it(m_player->GetContactMap());
+
+	ndContactPoint contactBuffer[D_MAX_CONTATCS];
 	for (it.Begin(); it; it++)
 	{
 		const ndContact* const srcContact = *it;
@@ -533,14 +535,11 @@ void ndBodyPlayerCapsuleContactSolver::CalculateContacts()
 			ndContact contact;
 			contact.SetBodies(body0, body1);
 			contact.m_material = contactNotify->GetMaterial(&contact, body0->GetCollisionShape(), body1->GetCollisionShape());
-	
-			ndContactPoint contactBuffer[D_MAX_CONTATCS];
+
 			ndContactSolver contactSolver(&contact, scene->GetContactNotify(), ndFloat32(1.0f), 0);
 			contactSolver.m_instance0.SetGlobalMatrix(contactSolver.m_instance0.GetLocalMatrix() * body0->GetMatrix());
 			contactSolver.m_instance1.SetGlobalMatrix(contactSolver.m_instance1.GetLocalMatrix() * body1->GetMatrix());
 			contactSolver.m_separatingVector = srcContact->m_separatingVector;
-			//contactSolver.m_timestep = ndFloat32 (1.0f);
-			//contactSolver.m_ccdMode = 0;
 			contactSolver.m_intersectionTestOnly = 0;
 			contactSolver.m_contactBuffer = contactBuffer;
 			const ndInt32 count = contactSolver.CalculateContactsDiscrete ();
@@ -608,7 +607,7 @@ ndVector ndBodyPlayerCapsuleImpulseSolver::CalculateImpulse()
 
 		massMatrix[i][i] = a00;
 
-		m_impulseMag[i] = 0.0f;
+		m_impulseMag[i] = ndFloat32(0.0f);
 		for (ndInt32 j = i + 1; j < m_rowCount; ++j) 
 		{
 			ndVector tmp1(
@@ -627,9 +626,14 @@ ndVector ndBodyPlayerCapsuleImpulseSolver::CalculateImpulse()
 	}
 
 	ndAssert(ndTestPSDmatrix(m_rowCount, D_PLAYER_MAX_ROWS, &massMatrix[0][0]));
-	ndGaussSeidelLcp(m_rowCount, D_PLAYER_MAX_ROWS, &massMatrix[0][0], m_impulseMag, m_rhs, m_normalIndex, m_low, m_high, ndFloat32(1.0e-6f), 32);
+	for (ndInt32 i = 0; i < m_rowCount; ++i)
+	{
+		ndAssert(m_normalIndex[i] <= 0);
+		m_normalIndex[i] = m_normalIndex[i] ? m_normalIndex[i] + i : m_rowCount;
+	}
+	ndGaussSeidelLcp<ndFloat32>(m_rowCount, D_PLAYER_MAX_ROWS, &massMatrix[0][0], m_impulseMag, m_rhs, m_normalIndex, m_low, m_high, ndFloat32(1.0e-6f), 32);
 
-	ndVector netImpulse(0.0f);
+	ndVector netImpulse(ndFloat32(0.0f));
 	for (ndInt32 i = 0; i < m_rowCount; ++i) 
 	{
 		netImpulse += m_jacobianPairs[i].m_jacobianM0.m_linear.Scale(m_impulseMag[i]);
@@ -652,7 +656,7 @@ ndInt32 ndBodyPlayerCapsuleImpulseSolver::AddContactRow(const ndContactPoint* co
 	
 	ndVector p1(contact->m_point);
 	ndVector r1(p1 - com);
-	ndVector dir1(dir.Scale(-1.0f));
+	ndVector dir1(dir.Scale(ndFloat32(-1.0f)));
 	
 	m_contactPoint[m_rowCount] = (ndContactPoint*)contact;
 	m_jacobianPairs[m_rowCount].m_jacobianM0.m_linear = dir;
@@ -717,7 +721,7 @@ void ndBodyPlayerCapsule::SpecialUpdate(ndFloat32 timestep)
 {
 	ndBodyPlayerCapsuleContactSolver contactSolver(this);
 	ndFloat32 timeLeft = timestep;
-	const ndFloat32 timeEpsilon = timestep * (1.0f / 16.0f);
+	const ndFloat32 timeEpsilon = timestep * ndFloat32(1.0f / 16.0f);
 
 	m_equilibriumOverride = 0;
 	m_impulse = ndVector::m_zero;
