@@ -67,7 +67,7 @@ namespace ndQuadruped_2
 			#define CONTROLLER_NAME "ndQuadruped_2-ddpg.dnn"
 		#endif
 	#else	
-		//#define USE_PPO
+		#define USE_PPO
 		#ifdef USE_PPO
 			#define CONTROLLER_NAME "ndQuadruped_2-ppo.dnn"
 		#else
@@ -1144,6 +1144,8 @@ namespace ndQuadruped_2
 			#ifdef USE_DDPG
 				m_stopTraining = 1000000;
 				ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
+
+				hyperParameters.m_useSigmasPerActions = true;
 				hyperParameters.m_numberOfActions = numberOfActions;
 				hyperParameters.m_numberOfObservations = numberOfObservations;
 				hyperParameters.m_numberOfHiddenLayers = hiddenLayers;
@@ -1163,6 +1165,8 @@ namespace ndQuadruped_2
 			#else
 				m_stopTraining = 500 * 1000000;
 				ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
+
+				hyperParameters.m_useSigmasPerActions = true;
 				hyperParameters.m_numberOfActions = numberOfActions;
 				hyperParameters.m_numberOfObservations = numberOfObservations;
 				hyperParameters.m_numberOfHiddenLayers = hiddenLayers;
