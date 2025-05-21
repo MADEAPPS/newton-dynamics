@@ -1506,8 +1506,8 @@ void ndDynamicsUpdate::CalculateJointsForce()
 			outBody1.m_angular = torqueM1;
 		};
 
-		// this version use scalar operation since vs 2022 and all other compiel can 
-		// predicate condional scalar, whis was reall bad on VS prior to 2015
+		// this version use scalar operation since vs 2022 and all other compile can 
+		// predicate conditional scalar, which was really bad on VS prior to 2015
 		auto JointForceNew = [this, &jointPartialForces](ndConstraint* const joint, ndInt32 jointIndex)
 		{
 			D_TRACKTIME_NAMED(JointForce);
@@ -1521,6 +1521,10 @@ void ndDynamicsUpdate::CalculateJointsForce()
 			const ndInt32 m1 = body1->m_index;
 			const ndInt32 rowStart = joint->m_rowStart;
 			const ndInt32 rowsCount = joint->m_rowCount;
+
+			//static int xxxxxx;
+			//xxxxxx ++;
+
 
 			const ndInt32 resting = body0->m_equilibrium0 & body1->m_equilibrium0;
 			if (!resting)
@@ -1546,14 +1550,14 @@ void ndDynamicsUpdate::CalculateJointsForce()
 					const ndRightHandSide* const rhs = &m_rightHandSide[rowStart + i];
 					ndAssert(rhs->SanityCheck());
 					force[i] = rhs->m_force;
-					// set preconditioner to 1.0 for cecking the algorithm
+					// set preconditioner to 1.0 for checking the algorithm
 					preconditioner[i] = ndFloat32 (1.0f); 
 					invPreconditioner[i] = ndFloat32(1.0f) / preconditioner[i];
 
-					// for some reason using a precoditioner makes is more untable
+					// for some reason using a preconditioned makes is more unstable
 					// therefore the only reason to use this is if it was faster.
 					// but it does not seem to be, plus is uses about twice as much memory.
-					// I still believe there is a hidden bug, therfore I am keeping for further debugging.
+					// I still believe there is a hidden bug, therefore I am keeping for further debugging.
 					//preconditioner[i] = rhs->m_diagonalPreconditioner;
 					//invPreconditioner[i] = rhs->m_invDiagonalPreconditioner;
 				}
@@ -1636,7 +1640,6 @@ void ndDynamicsUpdate::CalculateJointsForce()
 						const ndFloat32 lowerFrictionForce = frictionNormal * lowerBoundFrictionCoefficent[i];
 						const ndFloat32 upperFrictionForce = frictionNormal * upperBoundFrictionCoefficent[i];
 						
-						//accNorm += r * r;
 						const ndFloat32 x0 = force[i];
 						const ndFloat32 x1 = x0 + r * invJinvMJt[i];
 						const ndFloat32 f = ndClamp(x1, lowerFrictionForce, upperFrictionForce);
