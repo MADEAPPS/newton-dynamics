@@ -55,17 +55,12 @@ are more suitable for medium small systems.
 // to the environment with increasing complexity
 namespace ndQuadruped_2
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 
 	//#define USE_DDPG
 
 	#ifdef USE_DDPG
-		#define USE_SAC
-		#ifdef USE_SAC
-			#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
-		#else
-			#define CONTROLLER_NAME "ndQuadruped_2-ddpg.dnn"
-		#endif
+		#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
 	#else	
 		#define USE_PPO
 		#ifdef USE_PPO
@@ -450,7 +445,7 @@ namespace ndQuadruped_2
 			m_controller = ndSharedPtr<ndController> (new ndController(policy, robot));
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		bool IsTerminal() const
 		{
 			const ndModelArticulation::ndNode* const rootNode = GetModel()->GetAsModelArticulation()->GetRoot();
@@ -564,7 +559,7 @@ namespace ndQuadruped_2
 			return hitDist;
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		ndBrainFloat CalculateReward() const
 		{
 			if (IsTerminal())
@@ -685,7 +680,7 @@ namespace ndQuadruped_2
 			return tiltReward_x * 0.3f + tiltReward_z * 0.3f + slideReward * 0.4f;
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		void ResetModel()
 		{
 			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
@@ -712,7 +707,7 @@ namespace ndQuadruped_2
 			m_animBlendTree->Evaluate(m_animPose1, veloc);
 		}
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		void GetObservation(ndBrainFloat* const observations)
 		{
 			ndFloat32 invTimestep = 1.0f / m_timestep;
@@ -1142,31 +1137,23 @@ namespace ndQuadruped_2
 			ndInt32 numberOfObservations = m_observationSize * 4 + 2;
 
 			#ifdef USE_DDPG
+				m_outFile = fopen("ndQuadruped_2-sac.csv", "wb");
+				fprintf(m_outFile, "sac\n");
+
 				m_stopTraining = 1000000;
 				ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
 
-				hyperParameters.m_useSigmasPerActions = true;
+				//hyperParameters.m_usePerActionSigmas = true;
 				hyperParameters.m_numberOfActions = numberOfActions;
 				hyperParameters.m_numberOfObservations = numberOfObservations;
 				hyperParameters.m_numberOfHiddenLayers = hiddenLayers;
 				hyperParameters.m_hiddenLayersNumberOfNeurons = hiddenLayersNeurons;
-				#ifdef USE_SAC
-					m_outFile = fopen("ndQuadruped_2-sac.csv", "wb");
-					fprintf(m_outFile, "sac\n");
-
-					m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentSoftActorCritic_Trainer(hyperParameters));
-				#else
-					m_outFile = fopen("ndQuadruped_2-ddpg.csv", "wb");
-					fprintf(m_outFile, "ddpg\n");
-
-					m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
-
-				#endif
+				m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
 			#else
 				m_stopTraining = 500 * 1000000;
 				ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 
-				hyperParameters.m_useSigmasPerActions = true;
+				hyperParameters.m_usePerActionSigmas = true;
 				hyperParameters.m_numberOfActions = numberOfActions;
 				hyperParameters.m_numberOfObservations = numberOfObservations;
 				hyperParameters.m_numberOfHiddenLayers = hiddenLayers;
@@ -1325,7 +1312,7 @@ namespace ndQuadruped_2
 			}
 		};
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		virtual void Update(ndDemoEntityManager* const manager, ndFloat32)
 		{
 			ndUnsigned32 stopTraining = m_master->GetFramesCount();
