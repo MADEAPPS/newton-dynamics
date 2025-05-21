@@ -247,8 +247,6 @@ class ndRightHandSide
 	ndFloat32 m_penetrationStiffness;
 
 	ndFloat32 m_JinvMJt;
-	ndFloat32 m_diagonalPreconditioner;
-	ndFloat32 m_invDiagonalPreconditioner;
 	ndForceImpactPair* m_jointFeebackForce;
 	ndInt32 m_normalForceIndex;
 	ndInt32 m_normalForceIndexFlat;
@@ -300,7 +298,6 @@ class ndConstraint: public ndContainersFreeListAlloc<ndConstraint>
 
 	ndInt32 m_rowCount;
 	ndInt32 m_rowStart;
-	ndInt32 m_blockDiagonalOffset;
 	ndUnsigned8 m_maxDof;
 	ndUnsigned8 m_active;
 	ndUnsigned8 m_fence0;

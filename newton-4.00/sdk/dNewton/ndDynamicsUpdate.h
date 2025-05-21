@@ -122,7 +122,6 @@ class ndDynamicsUpdate : public ndClassAlloc
 	ndArray<ndIsland> m_islands;
 	ndArray<ndInt32> m_jointForcesIndex;
 	ndArray<ndJacobian> m_internalForces;
-	ndArray<ndFloat32> m_blockMassMatrix;
 	ndArray<ndLeftHandSide> m_leftHandSide;
 	ndArray<ndRightHandSide> m_rightHandSide;
 	ndArray<ndJacobian> m_tempInternalForces;
