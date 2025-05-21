@@ -327,7 +327,7 @@ void ndBrainAgentContinuePolicyGradient_Agent::Step()
 	m_isDead = m_isDead || isDead;
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_Agent::SaveTrajectory()
 {
 	for (ndInt32 i = 0; i < m_trajectory.GetCount(); ++i)
