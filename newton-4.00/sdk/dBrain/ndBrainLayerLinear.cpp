@@ -29,14 +29,6 @@
 #include "gpu/ndBrainGpuIntegerBuffer.h"
 #include "gpu/ndBrainGpuUniformBuffer.h"
 
-#define D_USE_GPU_TILED_MATRIX
-
-#if defined (D_USE_GPU_TILED_MATRIX)
-	#define ND_MATRIX_TILE_SIZE 16
-#else
-	#define ND_MATRIX_TILE_SIZE 1
-#endif
-
 ndBrainLayerLinear::ndBrainLayerLinear(ndInt32 inputs, ndInt32 outputs)
 	:ndBrainLayer()
 	,m_bias()
@@ -367,37 +359,34 @@ ndBrainGpuCommand* ndBrainLayerLinear::AssemblyGPUCommand(ndBrainGpuContext* con
 			:ndBrainGpuCommand(context)
 			,m_parammeters(m_context, sizeof(UniformBufferObject))
 		{
-			UniformBufferObject uniformParam;
-			memset(&uniformParam, -1, sizeof(uniformParam));
-
-			ndInt32 rounding = ND_GPU_BUFFER_ALIGNMENT / sizeof(ndBrainFloat);
-			ndInt32 rowsStride = (layer->GetOutputSize() + rounding - 1) & -rounding;
-			ndInt32 columnsStride = (layer->GetInputSize() + rounding - 1) & -rounding;
-
-			uniformParam.m_matrixRows = layer->GetOutputSize();
-			uniformParam.m_matrixColumns = layer->GetInputSize();
-			uniformParam.m_matrixRowsStride = rowsStride;
-			uniformParam.m_matrixColumnsStride = columnsStride;
-			uniformParam.m_workGroupsPerMatrix = ((uniformParam.m_matrixRows + ND_MATRIX_TILE_SIZE - 1) & -ND_MATRIX_TILE_SIZE) / ND_MATRIX_TILE_SIZE;
-
-			uniformParam.m_inputStart = workingBuffer.m_offsets[layerIndex + 0];
-			uniformParam.m_outputStart = workingBuffer.m_offsets[layerIndex + 1];
-			uniformParam.m_workBufferSize = workingBuffer.m_offsets[workingBuffer.m_offsets.GetCount() - 1];
-			uniformParam.m_paramStart = parameterBuffer.m_offsets[layerIndex];
-
-			m_parammeters.LoadData(sizeof(uniformParam), &uniformParam);
-
-			ndFixSizeArray<ndBrainGpuBuffer*, 4> params;
-			params.PushBack(&m_parammeters);
-			params.PushBack(workingBuffer.m_buffer);
-			params.PushBack(parameterBuffer.m_buffer);
-
-			ndInt32 numberOfWorkGroup = batchCount * uniformParam.m_workGroupsPerMatrix;
-			#if defined (D_USE_GPU_TILED_MATRIX)
-				Assembly(context->m_ndBrainLayerLinearTiled, numberOfWorkGroup, params.GetCount(), &params[0]);
-			#else
-				Assembly(context->m_ndBrainLayerLinear, numberOfWorkGroup, params.GetCount(), &params[0]);
-			#endif
+			ndAssert(0);
+			//UniformBufferObject uniformParam;
+			//memset(&uniformParam, -1, sizeof(uniformParam));
+			//
+			//ndInt32 rounding = ND_GPU_BUFFER_ALIGNMENT / sizeof(ndBrainFloat);
+			//ndInt32 rowsStride = (layer->GetOutputSize() + rounding - 1) & -rounding;
+			//ndInt32 columnsStride = (layer->GetInputSize() + rounding - 1) & -rounding;
+			//
+			//uniformParam.m_matrixRows = layer->GetOutputSize();
+			//uniformParam.m_matrixColumns = layer->GetInputSize();
+			//uniformParam.m_matrixRowsStride = rowsStride;
+			//uniformParam.m_matrixColumnsStride = columnsStride;
+			//uniformParam.m_workGroupsPerMatrix = ((uniformParam.m_matrixRows + ND_MATRIX_TILE_SIZE - 1) & -ND_MATRIX_TILE_SIZE) / ND_MATRIX_TILE_SIZE;
+			//
+			//uniformParam.m_inputStart = workingBuffer.m_offsets[layerIndex + 0];
+			//uniformParam.m_outputStart = workingBuffer.m_offsets[layerIndex + 1];
+			//uniformParam.m_workBufferSize = workingBuffer.m_offsets[workingBuffer.m_offsets.GetCount() - 1];
+			//uniformParam.m_paramStart = parameterBuffer.m_offsets[layerIndex];
+			//
+			//m_parammeters.LoadData(sizeof(uniformParam), &uniformParam);
+			//
+			//ndFixSizeArray<ndBrainGpuBuffer*, 4> params;
+			//params.PushBack(&m_parammeters);
+			//params.PushBack(workingBuffer.m_buffer);
+			//params.PushBack(parameterBuffer.m_buffer);
+			//
+			//ndInt32 numberOfWorkGroup = batchCount * uniformParam.m_workGroupsPerMatrix;
+			//Assembly(context->m_ndBrainLayerLinear, numberOfWorkGroup, params.GetCount(), &params[0]);
 		}
 
 		ndBrainGpuUniformBuffer m_parammeters;

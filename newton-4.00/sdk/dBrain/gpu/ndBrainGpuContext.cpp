@@ -115,19 +115,20 @@ void* ndBrainGpuContext::VulkanAlloc(void* userData, size_t size, size_t alignme
 	ndTree<ndMemoryEntry, void*>& dictionary = context->m_memoryDictionary;
 	
 	size_t originalSize = size;
-	alignment = ndMax(alignment, size_t(D_MEMORY_ALIGMNET));
-	if (alignment > D_MEMORY_ALIGMNET)
+	//alignment = ndMax(alignment, ndMemory::GetMemoryAligment());
+	if (alignment > ndMemory::GetMemoryAligment())
 	{
+		ndAssert(0);
 		size += alignment;
 	}
-
+	
 	char* const allocatedPtr = (char*)ndMemory::Malloc(size);
 	size_t const ptrValue = ((size_t)(allocatedPtr + alignment - 1)) & ~(alignment - 1);
 	char* const ptr = (char*)ptrValue;
-
+	
 	ndTree<ndMemoryEntry, void*>::ndNode* const node = dictionary.Insert(ptr);
 	ndMemoryEntry& entry = node->GetInfo();
-
+	
 	entry.m_ptr = allocatedPtr;
 	entry.m_size = originalSize;
 	return ptr;
@@ -522,8 +523,7 @@ void ndBrainGpuContext::LoadShaderPrograms()
 	m_ndBrainCopyInput = LoadShaderProgram("ndBrainCopyInput-comp.spv");
 	m_ndBrainCopyBuffer = LoadShaderProgram("ndBrainCopyBuffer-comp.spv");
 	m_ndBrainGetResults = LoadShaderProgram("ndBrainGetResults-comp.spv");
-	//m_ndBrainLayerLinear = LoadShaderProgram("ndBrainLayerLinear-comp.spv");
-	m_ndBrainLayerLinearTiled = LoadShaderProgram("ndBrainLayerLinearTiled-comp.spv");
+	m_ndBrainLayerLinear = LoadShaderProgram("ndBrainLayerLinear-comp.spv");
 	m_ndBrainLayerEluActivation = LoadShaderProgram("ndBrainLayerEluActivation-comp.spv");
 	m_ndBrainLayerReluActivation = LoadShaderProgram("ndBrainLayerReluActivation-comp.spv");
 	m_ndBrainLayerTanhActivation = LoadShaderProgram("ndBrainLayerTanhActivation-comp.spv");
