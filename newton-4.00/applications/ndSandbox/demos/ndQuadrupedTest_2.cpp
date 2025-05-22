@@ -1151,7 +1151,7 @@ namespace ndQuadruped_2
 				m_stopTraining = 500 * 1000000;
 				ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
 
-				hyperParameters.m_usePerActionSigmas = true;
+				//hyperParameters.m_usePerActionSigmas = false;
 				hyperParameters.m_numberOfActions = numberOfActions;
 				hyperParameters.m_numberOfObservations = numberOfObservations;
 				hyperParameters.m_numberOfHiddenLayers = hiddenLayers;
