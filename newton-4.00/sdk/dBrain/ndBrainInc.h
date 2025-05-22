@@ -63,7 +63,6 @@
 #include <ndBrainAgentDiscretePolicyGradient_Trainer.h>
 #include <ndBrainAgentContinuePolicyGradient_Trainer.h>
 #include <ndBrainAgentDeterministicPolicyGradient_Trainer.h>
-#include <ndBrainAgentContinueProximaPolicyGradient_Trainer.h>
 
 #include <gpu/ndBrainGpuBuffer.h>
 #include <gpu/ndBrainGpuCommand.h>

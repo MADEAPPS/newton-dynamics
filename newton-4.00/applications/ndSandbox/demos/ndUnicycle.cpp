@@ -549,8 +549,7 @@ namespace ndUnicycle
 				hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
 				//hyperParameters.m_policyRegularizerType = ndBrainOptimizer::m_lasso;
 				//hyperParameters.m_criticRegularizerType = ndBrainOptimizer::m_lasso;
-				//m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
-				m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinueProximaPolicyGradient_TrainerMaster(hyperParameters));
+				m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
 			#endif
 
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));

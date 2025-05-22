@@ -32,6 +32,7 @@
 
 // this is an implementation of the vanilla policy Gradient as described in:
 // https://spinningup.openai.com/en/latest/algorithms/vpg.html
+// https://spinningup.openai.com/en/latest/algorithms/ppo.html
 
 class ndBrainOptimizerAdam;
 class ndBrainAgentContinuePolicyGradient_TrainerMaster;
@@ -193,7 +194,10 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	virtual void OptimizePolicy();
 	virtual void OptimizeCritic();
 	virtual void CalculateAdvange();
+	void OptimizedSurrogatePolicy();
+	ndBrainFloat CalculateKLdivergence();
 	ndBrainAgentContinuePolicyGradient_Agent::ndRandomGenerator* GetRandomGenerator();
+	ndBrainFloat CalculatePolicyProbability(ndInt32 index, const ndBrainVector& distribution) const;
 
 	public:
 	ndBrain m_policy;
@@ -222,6 +226,10 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndMovingAverage<8> m_averageExpectedRewards;
 	ndMovingAverage<8> m_averageFramesPerEpisodes;
 	ndString m_name;
+
+	ndBrainVector m_policyActions;
+	ndBrainVector m_policyDivergeActions;
+	ndBrainVector m_referenceProbability;
 	ndList<ndBrainAgentContinuePolicyGradient_Agent*> m_agents;
 	friend class ndBrainAgentContinuePolicyGradient_Agent;
 };
