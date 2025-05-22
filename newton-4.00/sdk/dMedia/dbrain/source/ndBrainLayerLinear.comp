@@ -10,21 +10,14 @@
 */
 #version 450
 
-#define WORKGROUP_SIZE 128
+#define WORKGROUP_SIZE  256
 layout (local_size_x = WORKGROUP_SIZE) in;
 
 layout(std140, binding = 0) uniform param
 {
-    int m_matrixRows;
-    int m_matrixColumns;
-    int m_matrixRowsStride;
-    int m_matrixColumnsStride;
-    int m_workGroupsPerMatrix;
-
-    int m_paramStart;
-    int m_inputStart;
-    int m_outputStart;
-    int m_workBufferSize;
+    uint m_matrixRows;
+    uint m_matrixColumns;
+    uint m_inputOutputBlockSize;
  };
 
 layout(std430, binding = 1) buffer inputOutputBuffer
@@ -39,49 +32,53 @@ layout(std430, binding = 2) readonly buffer newralNetParameters
 
 shared float reductionBuffer [WORKGROUP_SIZE];
 
-// perform one road colum of a matrix multiply. 
+// a matrix time a vector by interating over each row of the matrix 
+// calculating an dot product of that row time the vector and adding the bias value.
 void main() 
 {
-    uint batch = gl_WorkGroupID.x / m_matrixRows;
-    uint batchIndex = gl_WorkGroupID.x - batch * m_matrixRows;
+    uint biasOffset = m_matrixRows * m_matrixColumns;
 
-    uint batchOffset = batch * m_workBufferSize;
-    uint weightRowOffset = batchIndex * m_matrixColumnsStride;
-    
-    float partialSum = 0.0f;
-    for (uint index = gl_LocalInvocationID.x; index < m_matrixColumns; index += gl_WorkGroupSize.x)
+    uint inputOffset = gl_WorkGroupID.x * m_inputOutputBlockSize;
+    uint outputOffset = inputOffset + m_matrixColumns;
+
+    uint numberOfIterations = m_matrixColumns / WORKGROUP_SIZE;
+    uint roundedGroupIterations = numberOfIterations * WORKGROUP_SIZE;
+    uint residualPasses = m_matrixColumns - roundedGroupIterations;
+
+    for (uint i = 0; i < m_matrixRows; ++i)
     {
-        float a = m_inputOutputData[batchOffset + m_inputStart + index];
-        float b = m_weightsAndBias[m_paramStart + weightRowOffset + index];
-        partialSum += a * b;
-    }
-    
-    // do the a binary reduction
-    if (gl_LocalInvocationID.x >= WORKGROUP_SIZE / 2)
-    {
-        reductionBuffer[gl_LocalInvocationID.x] = partialSum;
-    }
-    memoryBarrierShared(); 
-    barrier();
-    
-    for (uint i = WORKGROUP_SIZE / 2; i != 0; i = i >> 1)
-    {
-        if (gl_LocalInvocationID.x < i)
+        float partialSum = 0.0f;
+        uint stride = i * m_matrixColumns;
+        for (uint j = 0; j < roundedGroupIterations; j += WORKGROUP_SIZE)
         {
-            partialSum += reductionBuffer[i + gl_LocalInvocationID.x];
-            if (gl_LocalInvocationID.x >= i>>1)
-            {
-                reductionBuffer[gl_LocalInvocationID.x] = partialSum;
-            }
+            float a = m_weightsAndBias[stride + gl_LocalInvocationID.x + j];
+            float b = m_inputOutputData[inputOffset + gl_LocalInvocationID.x + j];
+            partialSum += a * b;
         }
-        memoryBarrierShared();
+        if (gl_LocalInvocationID.x < residualPasses)
+        {
+            float a = m_weightsAndBias[stride + roundedGroupIterations + gl_LocalInvocationID.x];
+            float b = m_inputOutputData[inputOffset + roundedGroupIterations + gl_LocalInvocationID.x];
+            partialSum += a * b;
+        }
+        reductionBuffer[gl_LocalInvocationID.x] = 0.0f;
+        memoryBarrierShared(); 
         barrier();
-    }
 
-    if (gl_LocalInvocationID.x == 0)
-    {
-        uint biasOffset = m_paramStart + m_matrixRows * m_matrixColumnsStride;
-        partialSum += m_weightsAndBias[biasOffset + batchIndex];
-        m_inputOutputData[batchOffset + m_outputStart + batchIndex] = partialSum;
+        for (uint j = WORKGROUP_SIZE / 2; j > 0; j = j >> 1)
+        {
+            if ((gl_LocalInvocationID.x >= j) && (gl_LocalInvocationID.x < j * 2))
+            {
+                reductionBuffer[gl_LocalInvocationID.x - j] = partialSum;
+            }
+            memoryBarrierShared();
+            barrier();
+            partialSum += reductionBuffer[gl_LocalInvocationID.x];
+        }
+        if (gl_LocalInvocationID.x == 0)
+        {
+            partialSum += m_weightsAndBias[biasOffset + i];
+            m_inputOutputData[outputOffset + i] = partialSum;
+        }
     }
 }
