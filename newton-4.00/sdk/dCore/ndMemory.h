@@ -44,6 +44,9 @@ class ndMemory
 	/// Destroy a memory buffer previously allocated by Malloc.
 	D_CORE_API static void Free(void* const ptr);
 
+	/// Get The memory aligment buffer offset.
+	D_CORE_API static size_t GetMemoryAligment();
+
 	/// Get memory buffer size previously allocated by Malloc. include extra align padding.
 	D_CORE_API static size_t GetSize(void* const ptr);
 

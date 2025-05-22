@@ -42,6 +42,11 @@ class ndMemoryHeader
 #define D_MEMORY_ALIGMNET			32
 #define ndGetBufferPaddingInBytes	size_t(D_MEMORY_ALIGMNET - 1 + sizeof (ndMemoryHeader))
 
+size_t ndMemory::GetMemoryAligment()
+{
+	return D_MEMORY_ALIGMNET;
+}
+
 size_t ndMemory::CalculateBufferSize(size_t size)
 {
 	#if defined (D_MEMORY_SANITY_CHECK) && defined(_DEBUG)
