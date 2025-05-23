@@ -230,10 +230,12 @@ static void MnistTrainingSet()
 	#define CONVOLUTIONAL_FEATURE_MAPS		32
 	#define MIN_TRAIN_SCORE					0.9999f
 
-	#if 1
-		#define CONVOLUTIONAL_LAYER	ndBrainLayerConvolutional_2d
-	#else
-		#define CONVOLUTIONAL_LAYER	ndBrainLayerConvolutionalWithDropOut_2d
+	#ifdef USE_CONVOLUTIONAL_LAYERS
+		#if 1
+			#define CONVOLUTIONAL_LAYER	ndBrainLayerConvolutional_2d
+		#else
+			#define CONVOLUTIONAL_LAYER	ndBrainLayerConvolutionalWithDropOut_2d
+		#endif
 	#endif
 
 	#if 1
@@ -247,8 +249,8 @@ static void MnistTrainingSet()
 	#if 0
 		#define ACTIVATION_TYPE ndBrainLayerActivationTanh
 	#else
-		#define ACTIVATION_TYPE ndBrainLayerActivationElu
-		//#define ACTIVATION_TYPE ndBrainLayerActivationRelu		
+		#define ACTIVATION_TYPE ndBrainLayerActivationRelu
+		//#define ACTIVATION_TYPE ndBrainLayerActivationElu
 		//#define ACTIVATION_TYPE ndBrainLayerActivationSigmoidLinear
 	#endif
 
@@ -268,31 +270,43 @@ static void MnistTrainingSet()
 	class SupervisedTrainer : public ndBrainThreadPool
 	{
 		public:
-		SupervisedTrainer(ndBrain* const brain)
+		SupervisedTrainer(const ndSharedPtr<ndBrain>& brain)
 			:ndBrainThreadPool()
-			,m_brain(*brain)
+			,m_brain(brain)
 			,m_prioritySamples()
 			,m_learnRate(ndReal(5.0e-4f))
 			,m_miniBatchSize(BATCH_BUFFER_SIZE)
+			,m_hasGpuSupport(ndBrainGpuContext::HasGpuSupport())
 		{
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize);
 
 			//threadCount = 1;
 			SetThreadCount(threadCount);
-			for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
+
+			if (m_hasGpuSupport)
 			{
-				ndBrainTrainer* const trainer = new ndBrainTrainer(&m_brain);
-				m_trainers.PushBack(trainer);
+				for (ndInt32 i = m_brain->GetCount() - 1; i >= 0; --i)
+				{
+					const ndBrainLayer* const layer = (**m_brain)[i];
+					m_hasGpuSupport = m_hasGpuSupport && layer->HasGpuSupport();
+				}
+			}
+
+			if (m_hasGpuSupport)
+			{
+				ndSharedPtr<ndBrainGpuContext> context(new ndBrainGpuContext);
+				ndBrainTrainer* const trainer = new ndBrainTrainerGpu(m_brain, context, m_miniBatchSize);
+				m_trainers.Append(ndSharedPtr<ndBrainTrainer>(trainer));
+			}
+			else
+			{
+				for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
+				{
+					ndBrainTrainer* const trainer = new ndBrainTrainerCpu(m_brain);
+					m_trainers.Append(ndSharedPtr<ndBrainTrainer>(trainer));
+				}
 			}
 			m_prioritySamples.SetCount(m_miniBatchSize);
-		}
-
-		~SupervisedTrainer()
-		{
-			for (ndInt32 i = 0; i < m_trainers.GetCount(); ++i)
-			{
-				delete m_trainers[i];
-			}
 		}
 
 		ndFloat32 LogScore(ndInt32 epoch, ndInt32 size) const
@@ -307,6 +321,8 @@ static void MnistTrainingSet()
 
 		ndInt32 ScoreModeZero(ndBrain& bestBrain, ndInt32 epoch, ndUnsigned32* const failCount, ndBrainMatrix* const trainingDigits, ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
 		{
+			ndAssert(0);
+#if 0
 			ndInt32 trainFail = 0;
 			for (ndInt32 i = 0; i < GetThreadCount(); ++i)
 			{
@@ -362,11 +378,14 @@ static void MnistTrainingSet()
 				ndFloat32 score = LogScore(epoch, ndInt32(trainingDigits->GetCount()));
 				return (score <= MIN_TRAIN_SCORE) ? 0 : 1;
 			}
+#endif
 			return 0;
 		}
 
 		ndInt32 ScoreModeOne(ndBrain& bestBrain, ndInt32 epoch, ndUnsigned32* const failCount, ndBrainMatrix* const trainingDigits, ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
 		{
+			ndAssert(0);
+#if 0
 			ndInt32 trainFail = 0;
 			for (ndInt32 i = 0; i < GetThreadCount(); ++i)
 			{
@@ -425,6 +444,7 @@ static void MnistTrainingSet()
 					LogScore(epoch, ndInt32(trainingDigits->GetCount()));
 				}
 			}
+#endif
 			return 0;
 		}
 
@@ -481,16 +501,17 @@ static void MnistTrainingSet()
 
 				for (ndInt32 i = iterator++; i < m_miniBatchSize; i = iterator++)
 				{
-					ndBrainTrainer& trainer = *m_trainers[i];
-					ndUnsigned32 index = miniBatchArray[i];
-					CategoricalLoss loss(m_brain.GetOutputSize(), &failCount[threadIndex], m_prioritySamples[i], index);
-				
-					loss.SetTruth((*trainingLabels)[ndInt32(index)]);
-					trainer.BackPropagate((*trainingDigits)[ndInt32(index)], loss);
+					ndAssert(0);
+					//ndBrainTrainer& trainer = *m_trainers[i];
+					//ndUnsigned32 index = miniBatchArray[i];
+					//CategoricalLoss loss(m_brain.GetOutputSize(), &failCount[threadIndex], m_prioritySamples[i], index);
+					//
+					//loss.SetTruth((*trainingLabels)[ndInt32(index)]);
+					//trainer.BackPropagate((*trainingDigits)[ndInt32(index)], loss);
 				}
 			});
 
-			ndBrain bestBrain(m_brain);
+			ndBrain bestBrain(**m_brain);
 			ndBrainOptimizerAdam optimizer;
 
 			m_minTestFail = ndInt32(testDigits->GetCount());
@@ -517,49 +538,58 @@ static void MnistTrainingSet()
 				const ndInt32 numberOfEpocks = 400;
 			#endif
 			ndInt32 scoreMode = 0;
-			for (ndInt32 epoch = 0; epoch < numberOfEpocks; ++epoch)
+			if (m_hasGpuSupport)
 			{
-				ndInt32 start = 0;
-				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
+				ndAssert(0);
+			}
+			else
+			{
+				for (ndInt32 epoch = 0; epoch < numberOfEpocks; ++epoch)
+				{
+					ndInt32 start = 0;
+					ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
 
-				m_brain.EnableDropOut();
-				m_brain.UpdateDropOut();
-				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
-				for (ndInt32 batch = 0; batch < batches; ++batch)
-				{
-					iterator = 0;
-					ndMemCpy(miniBatchArray, &shuffleBuffer[start], m_miniBatchSize);
-					ndBrainThreadPool::ParallelExecute(BackPropagateBatch);
-					optimizer.Update(this, m_trainers, m_learnRate);
-					start += m_miniBatchSize;
-				}
-				m_brain.DisableDropOut();
+					m_brain->EnableDropOut();
+					m_brain->UpdateDropOut();
+					shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
+					for (ndInt32 batch = 0; batch < batches; ++batch)
+					{
+						iterator = 0;
+						ndAssert(0);
+						//ndMemCpy(miniBatchArray, &shuffleBuffer[start], m_miniBatchSize);
+						//ndBrainThreadPool::ParallelExecute(BackPropagateBatch);
+						//optimizer.Update(this, m_trainers, m_learnRate);
+						//start += m_miniBatchSize;
+					}
+					m_brain->DisableDropOut();
 
-				if (scoreMode == 0)
-				{
-					scoreMode = ScoreModeZero(bestBrain, epoch, failCount, trainingDigits, testLabels, testDigits);
-				}
-				else
-				{
-					ScoreModeOne(bestBrain, epoch, failCount, trainingDigits, testLabels, testDigits);
+					if (scoreMode == 0)
+					{
+						scoreMode = ScoreModeZero(bestBrain, epoch, failCount, trainingDigits, testLabels, testDigits);
+					}
+					else
+					{
+						ScoreModeOne(bestBrain, epoch, failCount, trainingDigits, testLabels, testDigits);
+					}
 				}
 			}
-			m_brain.CopyFrom(bestBrain);
+			m_brain->CopyFrom(bestBrain);
 		}
 
-		ndBrain& m_brain;
-		ndArray<ndBrainTrainer*> m_trainers;
+		ndSharedPtr<ndBrain> m_brain;
+		//ndArray<ndBrainTrainer*> m_trainers;
+		ndList<ndSharedPtr<ndBrainTrainer>> m_trainers;
 		ndFixSizeArray<ndFixSizeArray<ndUnsigned32, 16>, BATCH_BUFFER_SIZE> m_prioritySamples;
 		ndReal m_learnRate;
 		ndInt32 m_miniBatchSize;
 		ndInt32 m_minTestFail;
 		ndInt32 m_minTrainingFail;
-
+		bool m_hasGpuSupport;
 	};
 	
 	if (trainingLabels && trainingDigits)
 	{
-		ndBrain brain;
+		ndSharedPtr<ndBrain> brain(new ndBrain);
 		ndFixSizeArray<ndBrainLayer*, 32> layers;
 
 		#ifdef USE_CONVOLUTIONAL_LAYERS
@@ -591,26 +621,26 @@ static void MnistTrainingSet()
 		#else
 			layers.PushBack(new LINEAR_LAYER(trainingDigits->GetColumns(), LINEAR_LAYERS_NEURONS));
 			layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
-
+			
 			layers.PushBack(new LINEAR_LAYER(layers[layers.GetCount() - 1]->GetOutputSize(), LINEAR_LAYERS_NEURONS));
 			layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
-
+			
 			layers.PushBack(new LINEAR_LAYER(layers[layers.GetCount() - 1]->GetOutputSize(), LINEAR_LAYERS_NEURONS));
 			layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 		#endif
 
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
-		layers.PushBack(new ndBrainLayerActivationCategoricalSoftmax(layers[layers.GetCount() - 1]->GetOutputSize()));
+		//layers.PushBack(new ndBrainLayerActivationCategoricalSoftmax(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 		for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 		{
-			brain.AddLayer(layers[i]);
+			brain->AddLayer(layers[i]);
 		}
 
-		brain.InitWeights();
-		ndExpandTraceMessage("training mnist database, number of parameters %d\n", brain.GetNumberOfParameters());
+		brain->InitWeights();
+		ndExpandTraceMessage("training mnist database, number of parameters %d\n", brain->GetNumberOfParameters());
 	
-		SupervisedTrainer optimizer(&brain);
+		SupervisedTrainer optimizer(brain);
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
 		optimizer.Optimize(*trainingLabels, *trainingDigits, *testLabels, *testDigits);
 		time = ndGetTimeInMicroseconds() - time;
@@ -622,8 +652,8 @@ static void MnistTrainingSet()
 		ndGetWorkingFileName("mnistDatabase/mnist.dnn", path);
 		#endif
 		
-		ndBrainSave::Save(&brain, path);
-		ValidateData("training data", brain, *trainingLabels, *trainingDigits);
+		ndBrainSave::Save(*brain, path);
+		ValidateData("training data", **brain, *trainingLabels, *trainingDigits);
 		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
 	}
 }
@@ -666,7 +696,6 @@ static void MnistTestSet()
 void ndHandWrittenDigits()
 {
 	ndSetRandSeed(53);
-
-	//MnistTrainingSet();
+	MnistTrainingSet();
 	//MnistTestSet();
 }

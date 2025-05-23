@@ -84,6 +84,8 @@ ndBrainOptimizerAdam::~ndBrainOptimizerAdam()
 //#pragma optimize( "", off )
 void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients, ndBrainFloat learnRate)
 {
+	ndAssert(0);
+#if 0
 	ndBrainTrainer* const trainer = partialGradients[0];
 	ndBrain& brain = *trainer->GetBrain();
 
@@ -173,5 +175,6 @@ void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const threadPool, ndArray<n
 	{
 		m_alphaAcc = ndBrainFloat(0.0f);
 	}
+#endif
 }
 

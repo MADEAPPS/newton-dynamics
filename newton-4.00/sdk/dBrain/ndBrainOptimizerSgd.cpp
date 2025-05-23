@@ -37,6 +37,8 @@ ndBrainOptimizerSgd::~ndBrainOptimizerSgd()
 
 void ndBrainOptimizerSgd::Update(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients, ndBrainFloat learnRate)
 {
+	ndAssert(0);
+#if 0
 	ndBrainTrainer* const trainer = partialGradients[0];
 	ndBrain& brain = *trainer->GetBrain();
 
@@ -78,4 +80,5 @@ void ndBrainOptimizerSgd::Update(ndBrainThreadPool* const threadPool, ndArray<nd
 	});
 
 	threadPool->ndBrainThreadPool::ParallelExecute(UpdateGradients);
+#endif
 }

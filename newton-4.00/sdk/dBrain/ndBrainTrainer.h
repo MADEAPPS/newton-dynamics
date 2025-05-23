@@ -24,41 +24,33 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainVector.h"
+
 class ndBrain;
-class ndBrainLoss;
-class ndBrainLayer;
 
 class ndBrainTrainer: public ndClassAlloc
 {
 	public: 
-	class ndLayerData;
-
-	ndBrainTrainer(ndBrain* const brain);
+	ndBrainTrainer(const ndSharedPtr<ndBrain>& brain);
 	ndBrainTrainer(const ndBrainTrainer& src);
 	virtual ~ndBrainTrainer();
 
 	ndBrain* GetBrain() const;
-	void AcculumateGradients(const ndBrainTrainer& src, ndInt32 index);
-	void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss);
-	void CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradientsOut, ndBrainLoss& loss);
+	//void AcculumateGradients(const ndBrainTrainer& src, ndInt32 index);
+	//void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss);
+	//void CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradientsOut, ndBrainLoss& loss);
+	//
+	//ndBrainLayer* GetWeightsLayer(ndInt32 index) const;
+	//ndBrainLayer* GetGradientLayer(ndInt32 index) const;
+	//
+	//void ClearGradients();
+	//void ScaleWeights(const ndBrainFloat s);
+	//void AddGradients(const ndBrainTrainer* const src);
+	//void CopyGradients(const ndBrainTrainer* const src);
+	//
+	//ndBrainVector& GetWorkingBuffer();
 
-	ndBrainLayer* GetWeightsLayer(ndInt32 index) const;
-	ndBrainLayer* GetGradientLayer(ndInt32 index) const;
-
-	void ClearGradients();
-	void ScaleWeights(const ndBrainFloat s);
-	void AddGradients(const ndBrainTrainer* const src);
-	void CopyGradients(const ndBrainTrainer* const src);
-
-	ndBrainVector& GetWorkingBuffer();
-
-	private:
-	ndArray<ndLayerData*> m_data;
-	ndBrainVector m_workingBuffer;
-	ndFixSizeArray<ndInt32, 256> m_prefixScan;
-	ndBrain* m_brain;
-	ndInt32 m_workingBufferSize;
-	ndInt32 m_maxLayerBufferSize;
+	protected:
+	ndSharedPtr<ndBrain> m_brain;
 };
 
 #endif 

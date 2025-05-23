@@ -375,6 +375,8 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::ndBrainAgentDiscretePolicyGrad
 	,m_averageFramesPerEpisodes()
 	,m_agents()
 {
+	ndAssert(0);
+#if 0
 	ndAssert(m_numberOfActions);
 	ndAssert(m_numberOfObservations);
 	ndSetRandSeed(m_randomSeed);
@@ -463,6 +465,7 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::ndBrainAgentDiscretePolicyGrad
 	
 	m_baseValueWorkingBufferSize = m_critic.CalculateWorkingBufferSize();
 	m_workingBuffer.SetCount(m_baseValueWorkingBufferSize * hyperParameters.m_threadsCount);
+#endif
 }
 
 ndBrainAgentDiscretePolicyGradient_TrainerMaster::~ndBrainAgentDiscretePolicyGradient_TrainerMaster()
@@ -485,6 +488,8 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::~ndBrainAgentDiscretePolicyGra
 
 void ndBrainAgentDiscretePolicyGradient_TrainerMaster::Normalize(ndBrain& actor)
 {
+	ndAssert(0);
+#if 0
 	// using supervised learning make sure that the m_policy has zero mean and standard deviation 
 	class SupervisedTrainer : public ndBrainThreadPool
 	{
@@ -562,6 +567,7 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::Normalize(ndBrain& actor)
 
 	SupervisedTrainer optimizer(&actor);
 	optimizer.Optimize();
+#endif
 }
 
 ndBrain* ndBrainAgentDiscretePolicyGradient_TrainerMaster::GetPolicyNetwork()
@@ -768,6 +774,8 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::OptimizePolicyPPOstep()
 //#pragma optimize( "", off )
 void ndBrainAgentDiscretePolicyGradient_TrainerMaster::OptimizePolicy()
 {
+	ndAssert(0);
+#if 0
 	ndAtomic<ndInt32> iterator(0);
 	auto ClearGradients = ndMakeObject::ndFunction([this, &iterator](ndInt32, ndInt32)
 	{
@@ -845,10 +853,13 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::OptimizePolicy()
 	m_policyOptimizer->AccumulateGradients(this, m_policyTrainers);
 	m_policyWeightedTrainer[0]->ScaleWeights(ndBrainFloat(1.0f) / ndBrainFloat(m_trajectoryAccumulator.GetCount()));
 	m_policyOptimizer->Update(this, m_policyWeightedTrainer, -m_policyLearnRate);
+#endif
 }
 
 void ndBrainAgentDiscretePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 {
+	ndAssert(0);
+#if 0
 	m_trajectoryAccumulator.SetTerminalState(m_trajectoryAccumulator.GetCount() - 2, true);
 
 	m_randomPermutation.SetCount(m_trajectoryAccumulator.GetCount() - 1);
@@ -903,6 +914,7 @@ void ndBrainAgentDiscretePolicyGradient_TrainerMaster::UpdateBaseLineValue()
 		}
 		m_randomPermutation.RandomShuffle(m_randomPermutation.GetCount());
 	}
+#endif
 }
 
 void ndBrainAgentDiscretePolicyGradient_TrainerMaster::OptimizeCritic()

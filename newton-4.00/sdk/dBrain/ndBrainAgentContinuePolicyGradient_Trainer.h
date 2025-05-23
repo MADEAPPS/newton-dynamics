@@ -200,8 +200,8 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndBrainFloat CalculatePolicyProbability(ndInt32 index, const ndBrainVector& distribution) const;
 
 	public:
-	ndBrain m_policy;
-	ndBrain m_critic;
+	ndSharedPtr<ndBrain> m_policy;
+	ndSharedPtr<ndBrain> m_critic;
 	HyperParameters m_parameters;
 	ndArray<ndBrainTrainer*> m_criticTrainers;
 	ndArray<ndBrainTrainer*> m_policyTrainers;

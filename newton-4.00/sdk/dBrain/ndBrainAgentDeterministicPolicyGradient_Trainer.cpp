@@ -324,6 +324,9 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::SetName(const ndString& na
 
 void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildPolicyClass()
 {
+	ndAssert(0);
+#if 0
+
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 
 	layers.SetCount(0);
@@ -374,10 +377,13 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildPolicyClass()
 	}
 	m_referencePolicy = m_policy;
 	m_replayBuffer.Init(m_policy.GetOutputSize(), m_policy.GetInputSize());
+#endif
 }
 
 void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildCriticClass()
 {
+	ndAssert(0);
+#if 0
 	for (ndInt32 k = 0; k < sizeof(m_critic) / sizeof(m_critic[0]); ++k)
 	{
 		ndFixSizeArray<ndBrainLayer*, 32> layers;
@@ -414,6 +420,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildCriticClass()
 		m_criticOptimizer[k]->SetRegularizer(m_parameters.m_criticRegularizer);
 		m_criticOptimizer[k]->SetRegularizerType(m_parameters.m_criticRegularizerType);
 	}
+#endif
 }
 
 ndBrainFloat ndBrainAgentDeterministicPolicyGradient_Trainer::CalculatePolicyProbability(ndInt32 index, const ndBrainVector& distribution) const
@@ -606,6 +613,8 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::SaveTrajectory()
 //#pragma optimize( "", off )
 void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnQvalueFunction(ndInt32 criticIndex)
 {
+	ndAssert(0);
+#if 0
 	ndInt32 base = 0;
 	ndAtomic<ndInt32> iterator(0);
 	for (ndInt32 n = m_parameters.m_criticUpdatesCount - 1; n >= 0; --n)
@@ -636,6 +645,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnQvalueFunction(ndInt3
 		m_criticOptimizer[criticIndex]->Update(this, m_criticTrainers[criticIndex], m_parameters.m_criticLearnRate);
 		base += m_parameters.m_miniBatchSize;
 	}
+#endif
 }
 
 //#pragma optimize( "", off )
@@ -844,6 +854,8 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 //#pragma optimize( "", off )
 void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnPolicyFunction()
 {
+	ndAssert(0);
+#if 0
 	ndAtomic<ndInt32> iterator(0);
 	ndInt32 base = 0;
 	for (ndInt32 n = m_parameters.m_policyUpdatesCount - 1; n >= 0; --n)
@@ -957,6 +969,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnPolicyFunction()
 
 		base += m_parameters.m_miniBatchSize;
 	}
+#endif
 }
 
 //#pragma optimize( "", off )

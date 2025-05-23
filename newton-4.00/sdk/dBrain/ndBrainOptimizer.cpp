@@ -63,6 +63,8 @@ void ndBrainOptimizer::Update(ndBrainThreadPool* const, ndArray<ndBrainTrainer*>
 
 void ndBrainOptimizer::AccumulateGradients(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients) const
 {
+	ndAssert(0);
+#if 0
 	ndBrainTrainer* const trainer0 = partialGradients[0];
 	const ndBrain& brain = *trainer0->GetBrain();
 
@@ -89,7 +91,7 @@ void ndBrainOptimizer::AccumulateGradients(ndBrainThreadPool* const threadPool, 
 			}
 		}
 	});
-
 	threadPool->ndBrainThreadPool::ParallelExecute(AddGradients);
+#endif
 }
 

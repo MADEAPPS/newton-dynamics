@@ -105,3 +105,20 @@ ndBrainGpuCommand* ndBrainLayerActivationRelu::AssemblyGPUCommand(ndBrainGpuCont
 {
 	return AssemblyGPUCommandCommon(context, layerIndex, batchCount, params, context->m_ndBrainLayerReluActivation);
 }
+
+
+bool ndBrainLayerActivationRelu::HasGpuSupport() const
+{
+	return true;
+}
+
+ndBrainLayer::ndLayerUniformData ndBrainLayerActivationRelu::GetLayerGpuUniformData(const ndBrainGpuContext* const context) const
+{
+	ndLayerUniformData data;
+	data.m_shader = context->m_ndBrainLayerReluActivation;
+	data.m_inputSize = GetInputSize();
+	data.m_outputSize = GetOutputSize();
+	data.m_blockSize = 0;
+
+	return data;
+}

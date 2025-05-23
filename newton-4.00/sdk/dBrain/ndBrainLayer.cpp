@@ -72,6 +72,21 @@ void ndBrainLayer::GetNumberOfGPUParameters(ndBrainVector&, ndArray<ndInt32>&) c
 	ndAssert(0);
 }
 
+bool ndBrainLayer::HasGpuSupport() const
+{
+	return false;
+}
+
+void ndBrainLayer::CopyGpuWeights(ndBrainVector&) const
+{
+}
+
+ndBrainLayer::ndLayerUniformData ndBrainLayer::GetLayerGpuUniformData(const ndBrainGpuContext* const context) const
+{
+	ndAssert(0);
+	return ndLayerUniformData();
+}
+
 const char* ndBrainLayer::GetLabelId() const
 {
 	ndAssert(0);

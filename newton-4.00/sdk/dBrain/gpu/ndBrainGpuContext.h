@@ -37,8 +37,7 @@ class ndBrainGpuContext : public ndClassAlloc
 		{
 			void* m_testShader;
 			void* m_ndBrainCopyInput;
-			//void* m_ndBrainLayerLinear;
-			void* m_ndBrainLayerLinearTiled;
+			void* m_ndBrainLayerLinear;
 			void* m_ndBrainLayerEluActivation;
 			void* m_ndBrainLayerReluActivation;
 			void* m_ndBrainLayerTanhActivation;
@@ -121,7 +120,6 @@ class ndBrainGpuContext: public ndClassAlloc
 	{
 		struct
 		{
-			VkShaderModule m_testShader;
 			VkShaderModule m_ndBrainCopyInput;
 			VkShaderModule m_ndBrainGetResults;
 			VkShaderModule m_ndBrainCopyBuffer;
@@ -130,7 +128,6 @@ class ndBrainGpuContext: public ndClassAlloc
 			VkShaderModule m_ndBrainLayerReluActivation;
 			VkShaderModule m_ndBrainLayerTanhActivation;
 			VkShaderModule m_ndBrainLayerSoftmaxActivation;
-			VkShaderModule m_ndBrainLayerSoftmaxActivationSubGroup;
 		};
 		VkShaderModule m_modules[128];
 	};

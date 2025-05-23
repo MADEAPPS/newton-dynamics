@@ -21,15 +21,14 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"
-//#include "ndBrainLoss.h"
-//#include "ndBrainLayer.h"
-//#include "ndBrainVector.h"
-//#include "ndBrainMatrix.h"
-#include "ndBrainTrainer.h"
-//#include "ndBrainLayerActivationSoftmax.h"
+#include "ndBrainLoss.h"
+#include "ndBrainLayer.h"
+#include "ndBrainVector.h"
+#include "ndBrainMatrix.h"
+#include "ndBrainTrainerCpu.h"
+#include "ndBrainLayerActivationSoftmax.h"
 
-#if 0
-class ndBrainTrainer::ndLayerData : public ndClassAlloc
+class ndBrainTrainerCpu::ndLayerData : public ndClassAlloc
 {
 	public:
 	ndLayerData(ndBrainLayer* const layer)
@@ -87,19 +86,18 @@ class ndBrainTrainer::ndLayerData : public ndClassAlloc
 	ndBrainLayer* m_gradient;
 };
 
-ndBrainTrainer::ndBrainTrainer(ndBrain* const brain)
-	:ndClassAlloc()
+ndBrainTrainerCpu::ndBrainTrainerCpu(const ndSharedPtr<ndBrain>& brain)
+	:ndBrainTrainer(brain)
 	,m_data()
 	,m_workingBuffer()
 	,m_prefixScan()
-	,m_brain(brain)
 {
 	for (ndInt32 i = 0; i < m_brain->GetCount(); ++i)
 	{
-		m_data.PushBack(new ndLayerData((*m_brain)[i]));
+		m_data.PushBack(new ndLayerData((**m_brain)[i]));
 	}
 
-	const ndArray<ndBrainLayer*>& layers = *brain;
+	const ndArray<ndBrainLayer*>& layers = **brain;
 
 	ndInt32 maxSize = layers[0]->GetInputSize();
 	ndInt32 sizeAcc = (layers[0]->GetInputSize() + 7) & -8;
@@ -119,12 +117,11 @@ ndBrainTrainer::ndBrainTrainer(ndBrain* const brain)
 	m_workingBuffer.SetCount(m_workingBufferSize);
 }
 
-ndBrainTrainer::ndBrainTrainer(const ndBrainTrainer& src)
-	:ndClassAlloc()
+ndBrainTrainerCpu::ndBrainTrainerCpu(const ndBrainTrainerCpu& src)
+	:ndBrainTrainer(src)
 	,m_data()
 	,m_workingBuffer()
 	,m_prefixScan(src.m_prefixScan)
-	,m_brain(src.m_brain)
 	,m_workingBufferSize(src.m_workingBufferSize)
 	,m_maxLayerBufferSize(src.m_maxLayerBufferSize)
 {
@@ -132,11 +129,11 @@ ndBrainTrainer::ndBrainTrainer(const ndBrainTrainer& src)
 	m_workingBuffer.SetCount(src.m_workingBuffer.GetCount());
 	for (ndInt32 i = 0; i < m_brain->GetCount(); ++i)
 	{
-		m_data.PushBack(new ndLayerData((*m_brain)[i]));
+		m_data.PushBack(new ndLayerData((**m_brain)[i]));
 	}
 }
 
-ndBrainTrainer::~ndBrainTrainer()
+ndBrainTrainerCpu::~ndBrainTrainerCpu()
 {
 	for (ndInt32 i = 0; i < m_data.GetCount(); ++i)
 	{
@@ -144,27 +141,22 @@ ndBrainTrainer::~ndBrainTrainer()
 	}
 }
 
-ndBrain* ndBrainTrainer::GetBrain() const
-{
-	return m_brain;
-}
-
-ndBrainVector& ndBrainTrainer::GetWorkingBuffer()
+ndBrainVector& ndBrainTrainerCpu::GetWorkingBuffer()
 {
 	return m_workingBuffer;
 }
 
-ndBrainLayer* ndBrainTrainer::GetWeightsLayer(ndInt32 index) const
+ndBrainLayer* ndBrainTrainerCpu::GetWeightsLayer(ndInt32 index) const
 {
 	return m_data[index]->m_layer;
 }
 
-ndBrainLayer* ndBrainTrainer::GetGradientLayer(ndInt32 index) const
+ndBrainLayer* ndBrainTrainerCpu::GetGradientLayer(ndInt32 index) const
 {
 	return m_data[index]->m_gradient;
 }
 
-void ndBrainTrainer::AcculumateGradients(const ndBrainTrainer& src, ndInt32 index)
+void ndBrainTrainerCpu::AcculumateGradients(const ndBrainTrainerCpu& src, ndInt32 index)
 {
 	ndLayerData* const dstData = m_data[index];
 	ndAssert(dstData->m_layer->HasParameters());
@@ -172,7 +164,7 @@ void ndBrainTrainer::AcculumateGradients(const ndBrainTrainer& src, ndInt32 inde
 	dstData->Add(*srcData);
 }
 
-void ndBrainTrainer::ClearGradients()
+void ndBrainTrainerCpu::ClearGradients()
 {
 	for (ndInt32 i = ndInt32(m_data.GetCount() - 1); i >= 0; --i)
 	{
@@ -180,7 +172,7 @@ void ndBrainTrainer::ClearGradients()
 	}
 }
 
-void ndBrainTrainer::AddGradients(const ndBrainTrainer* const src)
+void ndBrainTrainerCpu::AddGradients(const ndBrainTrainerCpu* const src)
 {
 	for (ndInt32 i = ndInt32(m_data.GetCount() - 1); i >= 0; --i)
 	{
@@ -188,7 +180,7 @@ void ndBrainTrainer::AddGradients(const ndBrainTrainer* const src)
 	}
 }
 
-void ndBrainTrainer::CopyGradients(const ndBrainTrainer* const src)
+void ndBrainTrainerCpu::CopyGradients(const ndBrainTrainerCpu* const src)
 {
 	for (ndInt32 i = ndInt32(m_data.GetCount() - 1); i >= 0; --i)
 	{
@@ -196,7 +188,7 @@ void ndBrainTrainer::CopyGradients(const ndBrainTrainer* const src)
 	}
 }
 
-void ndBrainTrainer::ScaleWeights(const ndBrainFloat s)
+void ndBrainTrainerCpu::ScaleWeights(const ndBrainFloat s)
 {
 	for (ndInt32 i = ndInt32(m_data.GetCount() - 1); i >= 0; --i)
 	{
@@ -204,10 +196,10 @@ void ndBrainTrainer::ScaleWeights(const ndBrainFloat s)
 	}
 }
 
-void ndBrainTrainer::CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradientsOut, ndBrainLoss& loss)
+void ndBrainTrainerCpu::CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradientsOut, ndBrainLoss& loss)
 {
 	const ndInt32 layersCount = ndInt32(m_brain->GetCount());
-	const ndArray<ndBrainLayer*>& layers = *m_brain;
+	const ndArray<ndBrainLayer*>& layers = **m_brain;
 	ndAssert(!(loss.IsCategorical() ^ (!strcmp(layers[layersCount - 1]->GetLabelId(), "ndBrainLayerActivationCategoricalSoftmax"))));
 
 	if (m_workingBuffer.GetCount() < m_workingBufferSize)
@@ -248,10 +240,10 @@ void ndBrainTrainer::CalculateInputGradient(const ndBrainVector& input, ndBrainV
 }
 
 //#pragma optimize( "", off )
-void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss)
+void ndBrainTrainerCpu::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss)
 {
 	const ndInt32 layersCount = ndInt32(m_brain->GetCount());
-	const ndArray<ndBrainLayer*>& layers = *m_brain;
+	const ndArray<ndBrainLayer*>& layers = **m_brain;
 	ndAssert(!(loss.IsCategorical() ^ (!strcmp(layers[layersCount - 1]->GetLabelId(), "ndBrainLayerActivationCategoricalSoftmax"))));
 
 	if (m_workingBuffer.GetCount() < m_workingBufferSize)
@@ -288,22 +280,4 @@ void ndBrainTrainer::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss
 		layer->CalculateParamGradients(in, out, gradientOut, gradientIn, m_data[i]->m_gradient);
 		gradientIn.Swap(gradientOut);
 	}
-}
-#endif
-
-
-ndBrainTrainer::ndBrainTrainer(const ndSharedPtr<ndBrain>& brain)
-	:ndClassAlloc()
-	,m_brain(brain)
-{
-}
-
-ndBrainTrainer::ndBrainTrainer(const ndBrainTrainer& src)
-	:ndClassAlloc()
-	,m_brain(src.m_brain)
-{
-}
-
-ndBrainTrainer::~ndBrainTrainer()
-{
 }

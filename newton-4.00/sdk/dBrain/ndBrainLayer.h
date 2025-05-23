@@ -45,6 +45,24 @@ class ndBrainLayer : public ndClassAlloc
 		ndArray<ndInt32> m_offsets;
 	};
 
+	class ndLayerUniformData
+	{
+		public:
+		ndLayerUniformData()
+			:m_shader(nullptr)
+			,m_blockSize(0)
+			,m_inputSize(0)
+			,m_outputSize(0)
+			,m_parameterSize(0)
+		{
+		}
+		void* m_shader;
+		ndInt32 m_blockSize;
+		ndInt32 m_inputSize;
+		ndInt32 m_outputSize;
+		ndInt32 m_parameterSize;
+	};
+
 	ndBrainLayer();
 	ndBrainLayer(const ndBrainLayer& src);
 
@@ -84,8 +102,13 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void Save(const ndBrainSave* const loadSave) const;
 	virtual void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
 
+	// to be removed !!!
 	virtual void GetNumberOfGPUParameters(ndBrainVector& parameters, ndArray<ndInt32>& offsets) const;
 	virtual ndBrainGpuCommand* AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params);
+
+	virtual bool HasGpuSupport() const;
+	virtual void CopyGpuWeights(ndBrainVector& oput) const;
+	virtual ndLayerUniformData GetLayerGpuUniformData(const ndBrainGpuContext* const context) const;
 };
 
 #endif 

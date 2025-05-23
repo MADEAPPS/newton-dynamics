@@ -233,11 +233,14 @@ static void Cifar10TrainingSet()
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize);
 			//threadCount = 1;
 			SetThreadCount(threadCount);
+ndAssert(0);
+#if 0
 			for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
 			{
 				ndBrainTrainer* const trainer = new ndBrainTrainer(&m_brain);
 				m_trainers.PushBack(trainer);
 			}
+#endif
 		}
 
 		~SupervisedTrainer()
@@ -251,6 +254,8 @@ static void Cifar10TrainingSet()
 		void Optimize(ndBrainMatrix* const trainingLabels, const ndBrainMatrix* const sourceTrainingImages,
 					  ndBrainMatrix* const testLabels, ndBrainMatrix* const testImages)
 		{
+			ndAssert(0);
+#if 0
 			ndUnsigned32 failCount[D_MAX_THREADS_COUNT];
 			ndUnsigned32 miniBatchArray[BATCH_BUFFER_SIZE];
 
@@ -409,6 +414,7 @@ static void Cifar10TrainingSet()
 				}
 			}
 			m_brain.CopyFrom(bestBrain);
+#endif
 		}
 
 		ndBrain& m_brain;

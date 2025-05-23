@@ -519,7 +519,6 @@ void ndBrainGpuContext::LoadShaderPrograms()
 	VkShaderModule clean (VK_NULL_HANDLE);
 	ndMemSet(m_modules, clean, sizeof(m_modules) / sizeof(m_modules[0]));
 
-	m_testShader = LoadShaderProgram("testShader-comp.spv");
 	m_ndBrainCopyInput = LoadShaderProgram("ndBrainCopyInput-comp.spv");
 	m_ndBrainCopyBuffer = LoadShaderProgram("ndBrainCopyBuffer-comp.spv");
 	m_ndBrainGetResults = LoadShaderProgram("ndBrainGetResults-comp.spv");
@@ -528,7 +527,6 @@ void ndBrainGpuContext::LoadShaderPrograms()
 	m_ndBrainLayerReluActivation = LoadShaderProgram("ndBrainLayerReluActivation-comp.spv");
 	m_ndBrainLayerTanhActivation = LoadShaderProgram("ndBrainLayerTanhActivation-comp.spv");
 	m_ndBrainLayerSoftmaxActivation = LoadShaderProgram("ndBrainLayerSoftmaxActivation-comp.spv");
-	m_ndBrainLayerSoftmaxActivationSubGroup = LoadShaderProgram("ndBrainLayerSoftmaxActivationSubGroup-comp.spv");
 }
 
 void ndBrainGpuContext::SubmitQueue(const ndList<ndSharedPtr<ndBrainGpuCommand>>& displayList)

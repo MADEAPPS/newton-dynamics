@@ -397,3 +397,37 @@ ndBrainGpuCommand* ndBrainLayerLinear::AssemblyGPUCommand(ndBrainGpuContext* con
 	const ndBufferOffsetPair& workingBuffer = *params[1];
 	return new ndBrainLayerCommand(this, context, layerIndex, batchCount, parameterBuffer, workingBuffer);
 }
+
+bool ndBrainLayerLinear::HasGpuSupport() const
+{
+	return true;
+}
+
+void ndBrainLayerLinear::CopyGpuWeights(ndBrainVector& output) const
+{
+	ndAssert(output.GetCount() >= (GetOutputSize() * GetInputSize() + GetOutputSize()));
+
+	ndInt32 stride = 0;
+	ndInt32 step = GetInputSize();
+	for (ndInt32 i = 0; i < m_weights.GetRows(); ++i)
+	{
+		const ndBrainVector& src = m_weights[i];
+		ndBrainMemVector dst(&output[stride], step);
+		dst.Set(src);
+		stride += step;
+	}
+	ndBrainMemVector bias(&output[stride], m_bias.GetCount());
+	bias.Set(m_bias);
+}
+
+ndBrainLayer::ndLayerUniformData ndBrainLayerLinear::GetLayerGpuUniformData(const ndBrainGpuContext* const context) const
+{
+	ndLayerUniformData data;
+	data.m_shader = context->m_ndBrainLayerLinear;
+	data.m_inputSize = GetInputSize();
+	data.m_outputSize = GetOutputSize();
+	data.m_blockSize = GetOutputSize() * GetInputSize() + GetOutputSize();
+	data.m_parameterSize = data.m_blockSize;
+
+	return data;
+}
