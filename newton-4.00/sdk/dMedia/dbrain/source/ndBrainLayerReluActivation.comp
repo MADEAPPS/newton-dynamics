@@ -17,8 +17,11 @@ layout(std140, binding = 0) uniform param
 {
     uint m_inputSize;
     uint m_outputSize;
-    uint m_inputOutputBlockSize;
- };
+    uint m_weightsStartOffset;
+
+    uint m_inputOutputSize;
+    uint m_inputOutputStartOffset;
+};
 
 layout(std430, binding = 1) buffer inputOutputBuffer
 {
@@ -37,7 +40,7 @@ void main()
     uint modRowCount = roundRowCount * WORKGROUP_SIZE;
     uint reminderRowCount = m_inputSize - modRowCount;
 
-    uint inputOffset = gl_WorkGroupID.x * m_inputOutputBlockSize;
+    uint inputOffset = gl_WorkGroupID.x * m_inputOutputSize + m_inputOutputStartOffset;
     uint outputOffset = inputOffset + m_inputSize;
 
     for (uint i = 0; i < modRowCount; i += WORKGROUP_SIZE)

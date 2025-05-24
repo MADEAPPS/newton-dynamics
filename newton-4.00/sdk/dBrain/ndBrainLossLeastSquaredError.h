@@ -36,7 +36,6 @@ class ndBrainLossLeastSquaredError: public ndBrainLoss
 	ndBrainVector m_truth;
 };
 
-
 class ndBrainLossHuber : public ndBrainLossLeastSquaredError
 {
 	public:

@@ -145,81 +145,82 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 
 static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
 {
+	ndAssert(0);
 	//ndInt32 batchSize = 100;
-	const ndInt32 batchSize = ndInt32(testDigits->GetCount());
-
-	ndBrainGpuContext gpuContext;
-	ndBrainGpuInference inference(&gpuContext, &brain, *testDigits, batchSize);
-
-	ndUnsigned64 gpuTime = ndGetTimeInMicroseconds();
-	gpuContext.SubmitQueue(inference.GetDisplayList());
-	gpuContext.Sync();
-	gpuTime = ndGetTimeInMicroseconds() - gpuTime;
-	ndExpandTraceMessage("gpuTime %f (sec) batch size(%d)\n", ndFloat64(gpuTime) / 1000000.0f, batchSize);
-
-	ndBrainVector workBuffer;
-	ndBrainVector outputBuffer;
-	inference.GetResults(outputBuffer);
-
-	ndInt32 failCount = 0;
-	const ndInt32 outputSize = ndInt32((*testLabels)[0].GetCount());
-
-	ndBrainVector workingBuffer;
-	brain.DisableDropOut();
-
-	ndBrainVector output;
-	output.SetCount(outputSize * batchSize);
-	ndUnsigned64 cpuTime = ndGetTimeInMicroseconds();
-	for (ndInt32 i = 0; i < batchSize; i++)
-	{
-		const ndBrainVector& input = (*testDigits)[i];
-		ndBrainMemVector outputCpu (&output[i * outputSize], outputSize);
-		brain.MakePrediction(input, outputCpu, workingBuffer);
-		//#ifdef _DEBUG
-		//const ndArray<ndInt32>& offsets = inference.GetWorkBufferOffsets();		
-		//ndBrainMemVector workBufferBatch (&workBuffer[i * offsets[offsets.GetCount() - 1]], offsets[offsets.GetCount() - 1]);
-		//brain.MakePrediction_____(input, outputCpu, workingBuffer, workBufferBatch, offsets);
-		//#endif
-	}
-	cpuTime = ndGetTimeInMicroseconds() - cpuTime;
-	ndExpandTraceMessage("cpuTime %f (sec)\n", ndFloat64(cpuTime) / 1000000.0f);
-	
-	for (ndInt32 i = 0; i < batchSize; i++)
-	{
-		const ndBrainMemVector outputCpu(&output[i * outputSize], outputSize);
-		const ndBrainMemVector outputGpu(&outputBuffer[i * outputSize], outputSize);
-		const ndBrainVector& truth = (*testLabels)[i];
-	
-		ndInt32 indexCpu = -1;
-		ndInt32 indexGpu = -1;
-		ndBrainFloat maxProbability = -1.0f;
-		ndBrainFloat maxProbabilityGpu = -1.0f;
-		for (ndInt32 j = 0; j < outputSize; j++)
-		{
-			if (outputCpu[j] > maxProbability)
-			{
-				indexCpu = j;
-				maxProbability = outputCpu[j];
-			}
-			if (outputGpu[j] > maxProbabilityGpu)
-			{
-				indexGpu = j;
-				maxProbabilityGpu = outputGpu[j];
-			}
-		}
-		ndAssert(indexGpu == indexCpu);
-	
-		ndAssert(indexCpu >= 0);
-		if (truth[indexCpu] == ndReal(0.0f))
-		{
-			failCount++;
-		}
-	}
-
-	ndExpandTraceMessage("%s\n", title);
-	ndExpandTraceMessage("num_right: %d  out of %d\n", testDigits->GetCount() - failCount, testDigits->GetCount());
-	ndExpandTraceMessage("num_wrong: %d  out of %d\n", failCount, testDigits->GetCount());
-	ndExpandTraceMessage("success rate %f%%\n", (ndFloat32)(testDigits->GetCount() - failCount) * 100.0f / (ndFloat32)testDigits->GetCount());
+	//const ndInt32 batchSize = ndInt32(testDigits->GetCount());
+	//
+	//ndBrainGpuContext gpuContext;
+	//ndBrainGpuInference inference(&gpuContext, &brain, *testDigits, batchSize);
+	//
+	//ndUnsigned64 gpuTime = ndGetTimeInMicroseconds();
+	//gpuContext.SubmitQueue(inference.GetDisplayList());
+	//gpuContext.Sync();
+	//gpuTime = ndGetTimeInMicroseconds() - gpuTime;
+	//ndExpandTraceMessage("gpuTime %f (sec) batch size(%d)\n", ndFloat64(gpuTime) / 1000000.0f, batchSize);
+	//
+	//ndBrainVector workBuffer;
+	//ndBrainVector outputBuffer;
+	//inference.GetResults(outputBuffer);
+	//
+	//ndInt32 failCount = 0;
+	//const ndInt32 outputSize = ndInt32((*testLabels)[0].GetCount());
+	//
+	//ndBrainVector workingBuffer;
+	//brain.DisableDropOut();
+	//
+	//ndBrainVector output;
+	//output.SetCount(outputSize * batchSize);
+	//ndUnsigned64 cpuTime = ndGetTimeInMicroseconds();
+	//for (ndInt32 i = 0; i < batchSize; i++)
+	//{
+	//	const ndBrainVector& input = (*testDigits)[i];
+	//	ndBrainMemVector outputCpu (&output[i * outputSize], outputSize);
+	//	brain.MakePrediction(input, outputCpu, workingBuffer);
+	//	//#ifdef _DEBUG
+	//	//const ndArray<ndInt32>& offsets = inference.GetWorkBufferOffsets();		
+	//	//ndBrainMemVector workBufferBatch (&workBuffer[i * offsets[offsets.GetCount() - 1]], offsets[offsets.GetCount() - 1]);
+	//	//brain.MakePrediction_____(input, outputCpu, workingBuffer, workBufferBatch, offsets);
+	//	//#endif
+	//}
+	//cpuTime = ndGetTimeInMicroseconds() - cpuTime;
+	//ndExpandTraceMessage("cpuTime %f (sec)\n", ndFloat64(cpuTime) / 1000000.0f);
+	//
+	//for (ndInt32 i = 0; i < batchSize; i++)
+	//{
+	//	const ndBrainMemVector outputCpu(&output[i * outputSize], outputSize);
+	//	const ndBrainMemVector outputGpu(&outputBuffer[i * outputSize], outputSize);
+	//	const ndBrainVector& truth = (*testLabels)[i];
+	//
+	//	ndInt32 indexCpu = -1;
+	//	ndInt32 indexGpu = -1;
+	//	ndBrainFloat maxProbability = -1.0f;
+	//	ndBrainFloat maxProbabilityGpu = -1.0f;
+	//	for (ndInt32 j = 0; j < outputSize; j++)
+	//	{
+	//		if (outputCpu[j] > maxProbability)
+	//		{
+	//			indexCpu = j;
+	//			maxProbability = outputCpu[j];
+	//		}
+	//		if (outputGpu[j] > maxProbabilityGpu)
+	//		{
+	//			indexGpu = j;
+	//			maxProbabilityGpu = outputGpu[j];
+	//		}
+	//	}
+	//	ndAssert(indexGpu == indexCpu);
+	//
+	//	ndAssert(indexCpu >= 0);
+	//	if (truth[indexCpu] == ndReal(0.0f))
+	//	{
+	//		failCount++;
+	//	}
+	//}
+	//
+	//ndExpandTraceMessage("%s\n", title);
+	//ndExpandTraceMessage("num_right: %d  out of %d\n", testDigits->GetCount() - failCount, testDigits->GetCount());
+	//ndExpandTraceMessage("num_wrong: %d  out of %d\n", failCount, testDigits->GetCount());
+	//ndExpandTraceMessage("success rate %f%%\n", (ndFloat32)(testDigits->GetCount() - failCount) * 100.0f / (ndFloat32)testDigits->GetCount());
 }
 
 static void MnistTrainingSet()
@@ -273,6 +274,7 @@ static void MnistTrainingSet()
 		SupervisedTrainer(const ndSharedPtr<ndBrain>& brain)
 			:ndBrainThreadPool()
 			,m_brain(brain)
+			,m_context()
 			,m_prioritySamples()
 			,m_learnRate(ndReal(5.0e-4f))
 			,m_miniBatchSize(BATCH_BUFFER_SIZE)
@@ -294,8 +296,8 @@ static void MnistTrainingSet()
 
 			if (m_hasGpuSupport)
 			{
-				ndSharedPtr<ndBrainGpuContext> context(new ndBrainGpuContext);
-				ndBrainTrainer* const trainer = new ndBrainTrainerGpu(m_brain, context, m_miniBatchSize);
+				m_context = ndSharedPtr<ndBrainGpuContext>(new ndBrainGpuContext);
+				ndBrainTrainer* const trainer = new ndBrainTrainerGpu(m_brain, m_context, m_miniBatchSize);
 				m_trainers.Append(ndSharedPtr<ndBrainTrainer>(trainer));
 			}
 			else
@@ -511,6 +513,17 @@ static void MnistTrainingSet()
 				}
 			});
 
+			auto BackPropagateBatchGpu = [this, &iterator, trainingDigits, trainingLabels, &miniBatchArray, &failCount]()
+			{
+				ndBrainTrainer* const trainer = *m_trainers.GetFirst()->GetInfo();
+
+				ndBrainVector input;
+				ndBrainLossLeastSquaredError loss(1);
+				m_context->BeginQueue();
+				trainer->BackPropagate(input, loss);
+				m_context->EndQueue();
+			};
+
 			ndBrain bestBrain(**m_brain);
 			ndBrainOptimizerAdam optimizer;
 
@@ -540,7 +553,13 @@ static void MnistTrainingSet()
 			ndInt32 scoreMode = 0;
 			if (m_hasGpuSupport)
 			{
-				ndAssert(0);
+				for (ndInt32 epoch = 0; epoch < numberOfEpocks; ++epoch)
+				{
+					for (ndInt32 batch = 0; batch < batches; ++batch)
+					{
+						BackPropagateBatchGpu();
+					}
+				}
 			}
 			else
 			{
@@ -577,7 +596,7 @@ static void MnistTrainingSet()
 		}
 
 		ndSharedPtr<ndBrain> m_brain;
-		//ndArray<ndBrainTrainer*> m_trainers;
+		ndSharedPtr<ndBrainGpuContext> m_context;
 		ndList<ndSharedPtr<ndBrainTrainer>> m_trainers;
 		ndFixSizeArray<ndFixSizeArray<ndUnsigned32, 16>, BATCH_BUFFER_SIZE> m_prioritySamples;
 		ndReal m_learnRate;

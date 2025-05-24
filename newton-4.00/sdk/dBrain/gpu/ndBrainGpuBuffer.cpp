@@ -20,7 +20,7 @@
 ndInt64 ndBrainGpuBuffer::m_memoryUsed = 0;
 
 ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt64 sizeInByte, ndStorageBufferType bufferTypeFlags, ndDeviceBufferType deviceType)
-	:ndClassAlloc()
+	:ndContainersFreeListAlloc<ndBrainGpuBuffer>()
 	,m_context(context)
 	,m_sizeInBytes(sizeInByte)
 	,m_bufferType(bufferTypeFlags)
@@ -57,7 +57,7 @@ ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt64 siz
 	ndBrainGpuContext::CheckResultVulkan(vkBindBufferMemory(device, m_buffer, m_bufferMemory, 0));
 
 	m_memoryUsed += m_sizeInBytes;
-	ndTrace(("buffers memory %d (megBytes)\n", ndInt32(m_memoryUsed >> 20)));
+	//ndTrace(("buffers memory %d (megBytes)\n", ndInt32(m_memoryUsed >> 20)));
 }
 
 ndBrainGpuBuffer::~ndBrainGpuBuffer()
@@ -67,8 +67,7 @@ ndBrainGpuBuffer::~ndBrainGpuBuffer()
 	VkAllocationCallbacks* const allocators = (VkAllocationCallbacks*)m_context->GetAllocator();
 	vkFreeMemory(device, m_bufferMemory, allocators);
 	vkDestroyBuffer(device, m_buffer, allocators);
-
-	ndTrace(("buffers memory %d (megBytes)\n", ndInt32(m_memoryUsed >> 20)));
+	//ndTrace(("buffers memory %d (megBytes)\n", ndInt32(m_memoryUsed >> 20)));
 }
 
 ndStorageBufferType ndBrainGpuBuffer::GetType() const

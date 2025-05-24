@@ -39,9 +39,9 @@ class ndBrainTrainerGpu: public ndBrainTrainer
 	ndBrainTrainerGpu(const ndBrainTrainerGpu& src);
 	virtual ~ndBrainTrainerGpu();
 
+	virtual void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss) override;
 
 	void AcculumateGradients(const ndBrainTrainerGpu& src, ndInt32 index);
-	void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss);
 	void CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradientsOut, ndBrainLoss& loss);
 
 	ndBrainLayer* GetWeightsLayer(ndInt32 index) const;
@@ -59,9 +59,10 @@ class ndBrainTrainerGpu: public ndBrainTrainer
 	void InitWeightAndBiasBuffer();
 
 	ndSharedPtr<ndBrainGpuContext> m_context;
-	ndSharedPtr<ndBrainGpuFloatBuffer> m_inputOutputBuffer;
-	ndSharedPtr<ndBrainGpuFloatBuffer> m_weightAndBiasBuffer;
-	ndFixSizeArray<ndBrainLayer::ndLayerUniformData, 256> m_uniforms;
+	ndList<ndSharedPtr<ndBrainGpuBuffer>> m_uniforms;
+	ndSharedPtr<ndBrainGpuBuffer> m_inputOutputBuffer;
+	ndSharedPtr<ndBrainGpuBuffer> m_weightAndBiasBuffer;
+	ndList<ndSharedPtr<ndBrainGpuCommand>> m_commandBuffers;
 	ndInt32 m_miniBatchSize;
 };
 

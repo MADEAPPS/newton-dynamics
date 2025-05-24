@@ -118,7 +118,6 @@ ndBrainLayer::ndLayerUniformData ndBrainLayerActivationRelu::GetLayerGpuUniformD
 	data.m_shader = context->m_ndBrainLayerReluActivation;
 	data.m_inputSize = GetInputSize();
 	data.m_outputSize = GetOutputSize();
-	data.m_blockSize = 0;
 
 	return data;
 }

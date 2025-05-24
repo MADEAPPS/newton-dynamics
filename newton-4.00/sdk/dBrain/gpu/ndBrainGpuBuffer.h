@@ -38,9 +38,9 @@ class ndBrainGpuBuffer : public ndClassAlloc
 {
 	protected:
 	ndBrainGpuBuffer(ndBrainGpuContext* const, ndInt64, ndStorageBufferType, ndDeviceBufferType):m_sizeInBytes(0){}
-	virtual ~ndBrainGpuBuffer(){}
 
 	public:
+	virtual ~ndBrainGpuBuffer() {}
 	void* GetBuffer() const { return nullptr;}
 	ndInt32 SizeInBytes() const { return 0; }
 
@@ -51,7 +51,7 @@ class ndBrainGpuBuffer : public ndClassAlloc
 
 #else
 
-class ndBrainGpuBuffer : public ndClassAlloc
+class ndBrainGpuBuffer: public ndContainersFreeListAlloc<ndBrainGpuBuffer>
 {
 	public:
 	virtual ~ndBrainGpuBuffer();

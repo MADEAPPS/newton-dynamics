@@ -50,17 +50,19 @@ class ndBrainLayer : public ndClassAlloc
 		public:
 		ndLayerUniformData()
 			:m_shader(nullptr)
-			,m_blockSize(0)
 			,m_inputSize(0)
 			,m_outputSize(0)
-			,m_parameterSize(0)
+			,m_parametersSize(0)
+			,m_parametersStartOffset(0)
+			,m_inputOutputStartOffset(0)
 		{
 		}
 		void* m_shader;
-		ndInt32 m_blockSize;
 		ndInt32 m_inputSize;
 		ndInt32 m_outputSize;
-		ndInt32 m_parameterSize;
+		ndInt32 m_parametersSize;
+		ndInt32 m_parametersStartOffset;
+		ndInt32 m_inputOutputStartOffset;
 	};
 
 	ndBrainLayer();

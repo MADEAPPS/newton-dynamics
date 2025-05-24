@@ -43,7 +43,6 @@ ndBrainGpuContext::ndBrainGpuContext()
 	,m_debugMessenger(VK_NULL_HANDLE)
 	,m_subGroupSize(0)
 	,m_queueFamilyIndex(0xffffffff)
-	,m_queueInProgress(false)
 	,m_hasValidationLayers(false)
 {
 	m_allocatorStruct.pUserData = this;
@@ -529,31 +528,54 @@ void ndBrainGpuContext::LoadShaderPrograms()
 	m_ndBrainLayerSoftmaxActivation = LoadShaderProgram("ndBrainLayerSoftmaxActivation-comp.spv");
 }
 
-void ndBrainGpuContext::SubmitQueue(const ndList<ndSharedPtr<ndBrainGpuCommand>>& displayList)
-{
-	ndAssert(!m_queueInProgress);
-	m_queueInProgress = true;
-	m_displayList.SetCount(0);
-	for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = displayList.GetFirst(); node; node = node->GetNext())
-	{
-		ndBrainGpuCommand* command = *node->GetInfo();
-		m_displayList.PushBack(command->m_commandBuffer);
-	}
+//void ndBrainGpuContext::Sync()
+//{
+//	if (m_queueInProgress)
+//	{
+//		CheckResultVulkan(vkWaitForFences(m_device, uint32_t(1), &m_fence, VK_TRUE, 100000000000));
+//	}
+//	m_queueInProgress = false;
+//}
+//void ndBrainGpuContext::SubmitQueue(const ndList<ndSharedPtr<ndBrainGpuCommand>>& displayList)
+//{
+//	ndAssert(!m_queueInProgress);
+//	m_queueInProgress = true;
+//	m_displayList.SetCount(0);
+//	for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = displayList.GetFirst(); node; node = node->GetNext())
+//	{
+//		ndBrainGpuCommand* command = *node->GetInfo();
+//		m_displayList.PushBack(command->m_commandBuffer);
+//	}
+//
+//	VkSubmitInfo submitInfo = {};
+//	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+//	submitInfo.commandBufferCount = uint32_t(m_displayList.GetCount());
+//	submitInfo.pCommandBuffers = &m_displayList[0];
+//	CheckResultVulkan(vkQueueSubmit(m_queue, uint32_t(1), &submitInfo, m_fence));
+//}
 
-	VkSubmitInfo submitInfo = {};
-	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	submitInfo.commandBufferCount = uint32_t(m_displayList.GetCount());
-	submitInfo.pCommandBuffers = &m_displayList[0];
-	CheckResultVulkan(vkQueueSubmit(m_queue, uint32_t(1), &submitInfo, m_fence));
+void ndBrainGpuContext::BeginQueue()
+{
+	m_displayList.SetCount(0);
 }
 
-void ndBrainGpuContext::Sync()
+void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& command)
 {
-	if (m_queueInProgress)
+	m_displayList.PushBack(command->m_commandBuffer);
+}
+
+void ndBrainGpuContext::EndQueue()
+{
+	if (m_displayList.GetCount())
 	{
+		VkSubmitInfo submitInfo = {};
+		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		submitInfo.commandBufferCount = uint32_t(m_displayList.GetCount());
+		submitInfo.pCommandBuffers = &m_displayList[0];
+		CheckResultVulkan(vkQueueSubmit(m_queue, uint32_t(1), &submitInfo, m_fence));
 		CheckResultVulkan(vkWaitForFences(m_device, uint32_t(1), &m_fence, VK_TRUE, 100000000000));
+		CheckResultVulkan(vkResetFences(m_device, 1, &m_fence));
 	}
-	m_queueInProgress = false;
 }
 
 #endif

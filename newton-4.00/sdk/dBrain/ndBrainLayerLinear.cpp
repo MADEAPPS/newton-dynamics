@@ -423,11 +423,11 @@ void ndBrainLayerLinear::CopyGpuWeights(ndBrainVector& output) const
 ndBrainLayer::ndLayerUniformData ndBrainLayerLinear::GetLayerGpuUniformData(const ndBrainGpuContext* const context) const
 {
 	ndLayerUniformData data;
+
 	data.m_shader = context->m_ndBrainLayerLinear;
 	data.m_inputSize = GetInputSize();
 	data.m_outputSize = GetOutputSize();
-	data.m_blockSize = GetOutputSize() * GetInputSize() + GetOutputSize();
-	data.m_parameterSize = data.m_blockSize;
+	data.m_parametersSize = GetOutputSize() * GetInputSize() + GetOutputSize();
 
 	return data;
 }

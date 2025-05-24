@@ -733,11 +733,12 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildPolicyClass()
 	m_policyAuxiliaryTrainers.SetCount(0);
 	for (ndInt32 i = 0; i < m_parameters.m_miniBatchSize; ++i)
 	{
-		ndBrainTrainer* const trainer = new ndBrainTrainer(m_policy);
-		m_policyTrainers.PushBack(trainer);
-
-		ndBrainTrainer* const auxiliaryTrainer = new ndBrainTrainer(m_policy);
-		m_policyAuxiliaryTrainers.PushBack(auxiliaryTrainer);
+		ndAssert(0);
+		//ndBrainTrainer* const trainer = new ndBrainTrainer(m_policy);
+		//m_policyTrainers.PushBack(trainer);
+		//
+		//ndBrainTrainer* const auxiliaryTrainer = new ndBrainTrainer(m_policy);
+		//m_policyAuxiliaryTrainers.PushBack(auxiliaryTrainer);
 	}
 
 	m_policyOptimizer = ndSharedPtr<ndBrainOptimizerAdam> (new ndBrainOptimizerAdam());
@@ -778,8 +779,9 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildCriticClass()
 	m_criticTrainers.SetCount(0);
 	for (ndInt32 i = 0; i < m_parameters.m_miniBatchSize; ++i)
 	{
-		ndBrainTrainer* const trainer = new ndBrainTrainer(m_critic);
-		m_criticTrainers.PushBack(trainer);
+		ndAssert(0);
+		//ndBrainTrainer* const trainer = new ndBrainTrainer(m_critic);
+		//m_criticTrainers.PushBack(trainer);
 	}
 
 	m_criticOptimizer = ndSharedPtr<ndBrainOptimizerAdam> (new ndBrainOptimizerAdam());

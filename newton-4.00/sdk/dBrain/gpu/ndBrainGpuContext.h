@@ -26,8 +26,10 @@ class ndBrainGpuContext : public ndClassAlloc
 	}
 	virtual ~ndBrainGpuContext(){}
 
-	void Sync() {}
-	void SubmitQueue(const ndList<ndSharedPtr<ndBrainGpuCommand>>&) {}
+	void BeginQueue() {}
+	void AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>&) {}
+	void EndQueue() {}
+
 	ndInt32 GetSubGroupSize() const { return 0; }
 	static bool HasGpuSupport() { return false; }
 
@@ -71,8 +73,9 @@ class ndBrainGpuContext: public ndClassAlloc
 	VkAllocationCallbacks* GetAllocator() const;
 	VkPhysicalDevice GetPhysicalDevice() const;
 
-	void Sync();
-	void SubmitQueue(const ndList<ndSharedPtr<ndBrainGpuCommand>>& displayList);
+	void BeginQueue();
+	void AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& command);
+	void EndQueue();
 	
 	static void CheckResultVulkan(VkResult err);
 
@@ -134,7 +137,7 @@ class ndBrainGpuContext: public ndClassAlloc
 
 	ndInt32 m_subGroupSize;
 	uint32_t m_queueFamilyIndex;
-	bool m_queueInProgress;
+	//bool m_queueInProgress;
 	bool m_hasValidationLayers;
 
 	static const char* m_apiLayers[];

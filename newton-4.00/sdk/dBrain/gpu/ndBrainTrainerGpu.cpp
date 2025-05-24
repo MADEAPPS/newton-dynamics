@@ -27,104 +27,23 @@
 #include "ndBrainMatrix.h"
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainTrainerGpu.h"
+#include "ndBrainGpuContext.h"
+#include "ndBrainGpuCommand.h"
 #include "ndBrainLayerLinear.h"
 #include "ndBrainGpuFloatBuffer.h"
-#include "ndBrainLayerActivationSoftmax.h"
-
-class ndBrainTrainerGpu::ndLayerData : public ndClassAlloc
-{
-	public:
-	ndLayerData(ndBrainLayer* const layer)
-		:ndClassAlloc()
-		,m_layer(layer)
-		,m_gradient(nullptr)
-	{
-		if (layer->HasParameters())
-		{
-			m_gradient = layer->Clone();
-		}
-	}
-
-	~ndLayerData()
-	{
-		if (m_gradient)
-		{
-			delete m_gradient;
-		}
-	}
-
-	void Clear()
-	{
-		if (m_layer->HasParameters())
-		{
-			m_gradient->Clear();
-		}
-	}
-
-	void Add(const ndLayerData& src)
-	{
-		if (m_layer->HasParameters())
-		{
-			m_gradient->Add(*src.m_gradient);
-		}
-	}
-
-	void Copy(const ndLayerData& src)
-	{
-		if (m_layer->HasParameters())
-		{
-			m_gradient->Set(*src.m_gradient);
-		}
-	}
-
-	void Scale(ndBrainFloat s)
-	{
-		if (m_layer->HasParameters())
-		{
-			m_gradient->Scale(s);
-		}
-	}
-
-	ndBrainLayer* m_layer;
-	ndBrainLayer* m_gradient;
-};
+#include "ndBrainGpuUniformBuffer.h"
 
 ndBrainTrainerGpu::ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainGpuContext>& context, ndInt32 minibatchSize)
 	:ndBrainTrainer(brain)
 	,m_context(context)
+	,m_uniforms()
 	,m_inputOutputBuffer()
 	,m_weightAndBiasBuffer()
-	,m_uniforms()
+	,m_commandBuffers()
 	,m_miniBatchSize(minibatchSize)
 {
-#if 0
-	for (ndInt32 i = 0; i < m_brain->GetCount(); ++i)
-	{
-		m_data.PushBack(new ndLayerData((*m_brain)[i]));
-	}
-
-	const ndArray<ndBrainLayer*>& layers = *brain;
-
-	ndInt32 maxSize = layers[0]->GetInputSize();
-	ndInt32 sizeAcc = (layers[0]->GetInputSize() + 7) & -8;
-
-	m_prefixScan.PushBack(0);
-	for (ndInt32 i = 0; i < m_brain->GetCount(); ++i)
-	{
-		m_prefixScan.PushBack(sizeAcc);
-		ndInt32 outputSize = layers[i]->GetOutputBufferSize();
-		sizeAcc += (outputSize + 7) & -8;
-		maxSize = ndMax(maxSize, outputSize);
-	}
-	m_prefixScan.PushBack(sizeAcc + 32);
-
-	m_maxLayerBufferSize = maxSize;
-	m_workingBufferSize = sizeAcc + maxSize * 2 + 256;
-	m_workingBuffer.SetCount(m_workingBufferSize);
-#endif
-
-	InitWeightAndBiasBuffer();
 	InitInputOutputBuffer();
+	InitWeightAndBiasBuffer();
 }
 
 ndBrainTrainerGpu::ndBrainTrainerGpu(const ndBrainTrainerGpu& src)
@@ -133,60 +52,105 @@ ndBrainTrainerGpu::ndBrainTrainerGpu(const ndBrainTrainerGpu& src)
 	,m_uniforms()
 	,m_inputOutputBuffer()
 	,m_weightAndBiasBuffer()
-	//,m_data()
-	//,m_workingBuffer()
-	//,m_prefixScan(src.m_prefixScan)
-	//,m_workingBufferSize(src.m_workingBufferSize)
-	//,m_maxLayerBufferSize(src.m_maxLayerBufferSize)
+	,m_commandBuffers()
+	,m_miniBatchSize(src.m_miniBatchSize)
 {
 	ndAssert(0);
-#if 0
-	m_workingBuffer.SetCount(src.m_workingBuffer.GetCount());
-	for (ndInt32 i = 0; i < m_brain->GetCount(); ++i)
-	{
-		m_data.PushBack(new ndLayerData((*m_brain)[i]));
-	}
-#endif
 }
 
 ndBrainTrainerGpu::~ndBrainTrainerGpu()
 {
-	ndAssert(0);
-	//for (ndInt32 i = 0; i < m_data.GetCount(); ++i)
-	//{
-	//	delete (m_data[i]);
-	//}
 }
 
 void ndBrainTrainerGpu::InitWeightAndBiasBuffer()
 {
 	const ndBrain& network = **m_brain;
 
+	ndFixSizeArray<ndBrainLayer::ndLayerUniformData, 256> uniformsData;
 	for (ndInt32 i = 0; i < ndInt32(network.GetCount()); ++i)
 	{
 		const ndBrainLayer* const layer = network[i];
 		ndBrainLayer::ndLayerUniformData uniformData(layer->GetLayerGpuUniformData(*m_context));
-		m_uniforms.PushBack(uniformData);
+		uniformsData.PushBack(uniformData);
 	}
-	m_uniforms.PushBack(ndBrainLayer::ndLayerUniformData());
+	uniformsData.PushBack(ndBrainLayer::ndLayerUniformData());
 
 	ndInt32 sizeAcc = 0;
-	for (ndInt32 i = 0; i < m_uniforms.GetCount(); ++i)
+	for (ndInt32 i = 0; i < uniformsData.GetCount(); ++i)
 	{
-		ndInt32 blockSize = m_uniforms[i].m_blockSize;
-		m_uniforms[i].m_blockSize = sizeAcc;
-		sizeAcc += blockSize;
+		uniformsData[i].m_parametersStartOffset = sizeAcc;
+		sizeAcc += uniformsData[i].m_parametersSize;
 	}
-
+	
 	ndBrainVector parameters;
 	parameters.SetCount(sizeAcc);
 	for (ndInt32 i = 0; i < ndInt32(network.GetCount()); ++i)
 	{
 		const ndBrainLayer* const layer = network[i];
-		ndBrainMemVector weights(&parameters[m_uniforms[i].m_blockSize], m_uniforms[i].m_parameterSize);
+		ndBrainMemVector weights(&parameters[uniformsData[i].m_parametersStartOffset], uniformsData[i].m_parametersSize);
 		layer->CopyGpuWeights(weights);
 	}
-	m_weightAndBiasBuffer = ndSharedPtr<ndBrainGpuFloatBuffer>(new ndBrainGpuFloatBuffer(*m_context, parameters, ndCpuMappable));
+	m_weightAndBiasBuffer = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(*m_context, parameters, ndCpuMappable));
+
+	ndInt32 inputOutputBufferSize = network.GetInputSize();
+	for (ndInt32 i = 0; i < ndInt32(network.GetCount()); ++i)
+	{
+		const ndBrainLayer* const layer = network[i];
+		inputOutputBufferSize += layer->GetOutputSize();
+	}
+
+	// create all the uniform buffers
+	struct UniformBufferObject
+	{
+		ndUnsigned32 m_inputSize;
+		ndUnsigned32 m_outputSize;
+		ndUnsigned32 m_weightsStartOffset;
+		ndUnsigned32 m_inputOutputSize;
+		ndUnsigned32 m_inputOutputStartOffset;
+	};
+
+	class ndGpuCommand : public ndBrainGpuCommand
+	{
+		public:
+		ndGpuCommand(ndBrainGpuContext* const context, 
+			VkShaderModule shader,
+			ndInt32 numberOfinputs,
+			ndBrainGpuBuffer* const uniforms,
+			ndBrainGpuBuffer* const weights, 
+			ndBrainGpuBuffer* const inputOutputs)
+			:ndBrainGpuCommand(context)
+		{
+			ndFixSizeArray<ndBrainGpuBuffer*, 4> params;
+			params.PushBack(uniforms);
+			params.PushBack(inputOutputs);
+			params.PushBack(weights);
+			Assembly(shader, numberOfinputs, params.GetCount(), &params[0]);
+		}
+	};
+
+	ndBrainGpuBuffer* const weightsBuffer = *m_weightAndBiasBuffer;
+	ndBrainGpuBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
+
+	ndInt32 inputOutputStartOffset = 0;
+	for (ndInt32 i = 0; i < ndInt32(network.GetCount()); ++i)
+	{
+		UniformBufferObject uniformParam;
+		ndBrainLayer::ndLayerUniformData& data = uniformsData[i];
+		uniformParam.m_inputSize = ndUnsigned32(data.m_inputSize);
+		uniformParam.m_outputSize = ndUnsigned32(data.m_outputSize);
+		uniformParam.m_weightsStartOffset = ndUnsigned32(data.m_parametersStartOffset);
+
+		uniformParam.m_inputOutputSize = ndUnsigned32(inputOutputBufferSize);
+		uniformParam.m_inputOutputStartOffset = ndUnsigned32(inputOutputStartOffset);
+		ndSharedPtr<ndBrainGpuBuffer> buffer(new ndBrainGpuUniformBuffer(*m_context, sizeof(UniformBufferObject)));
+		m_uniforms.Append(buffer);
+
+		VkShaderModule shader = (VkShaderModule)data.m_shader;
+		ndSharedPtr<ndBrainGpuCommand> command(new ndGpuCommand(*m_context, shader, m_miniBatchSize, *buffer, weightsBuffer, inputOutputBuffer));
+		m_commandBuffers.Append(command);
+
+		inputOutputStartOffset += data.m_inputSize;
+	}
 }
 
 void ndBrainTrainerGpu::InitInputOutputBuffer()
@@ -202,7 +166,7 @@ void ndBrainTrainerGpu::InitInputOutputBuffer()
 	ndBrainVector buffer;
 	buffer.SetCount(bufferSize * m_miniBatchSize);
 	buffer.Set(ndBrainFloat(0.0f));
-	m_inputOutputBuffer = ndSharedPtr<ndBrainGpuFloatBuffer>(new ndBrainGpuFloatBuffer(*m_context, buffer, ndCpuMappable));
+	m_inputOutputBuffer = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(*m_context, buffer, ndCpuMappable));
 }
 
 ndBrainVector& ndBrainTrainerGpu::GetWorkingBuffer()
@@ -321,45 +285,9 @@ void ndBrainTrainerGpu::CalculateInputGradient(const ndBrainVector& input, ndBra
 //#pragma optimize( "", off )
 void ndBrainTrainerGpu::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss)
 {
-	ndAssert(0);
-#if 0
-	const ndInt32 layersCount = ndInt32(m_brain->GetCount());
-	const ndArray<ndBrainLayer*>& layers = *m_brain;
-	ndAssert(!(loss.IsCategorical() ^ (!strcmp(layers[layersCount - 1]->GetLabelId(), "ndBrainLayerActivationCategoricalSoftmax"))));
-
-	if (m_workingBuffer.GetCount() < m_workingBufferSize)
+	for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = m_commandBuffers.GetFirst(); node; node = node->GetNext())
 	{
-		m_workingBuffer.SetCount(m_workingBufferSize);
+		ndSharedPtr<ndBrainGpuCommand>& command = node->GetInfo();
+		m_context->AddCommandQueue(command);
 	}
-
-	const ndInt32 gradientOffset = m_prefixScan[m_prefixScan.GetCount() - 1];
-	const ndBrainFloat* const memBuffer = &m_workingBuffer[0];
-	const ndBrainFloat* const gradientBuffer = &m_workingBuffer[gradientOffset];
-	const ndInt32 maxSize = m_maxLayerBufferSize;
-
-	ndBrainMemVector in0(memBuffer, input.GetCount());
-	in0.Set(input);
-
-	for (ndInt32 i = 0; i < layersCount; ++i)
-	{
-		const ndBrainMemVector in(memBuffer + m_prefixScan[i + 0], layers[i]->GetInputSize());
-		ndBrainMemVector out(memBuffer + m_prefixScan[i + 1], layers[i]->GetOutputSize());
-		layers[i]->MakePrediction(in, out);
-	}
-	const ndBrainMemVector output(memBuffer + m_prefixScan[layersCount], m_brain->GetOutputSize());
-	
-	ndBrainMemVector gradientIn(gradientBuffer, m_brain->GetOutputSize());
-	ndBrainMemVector gradientOut(gradientBuffer + maxSize + 128, m_brain->GetOutputSize());
-	loss.GetLoss(output, gradientOut);
-
-	for (ndInt32 i = ndInt32(m_data.GetCount()) - 1; i >= 0; --i)
-	{
-		const ndBrainLayer* const layer = m_data[i]->m_layer;
-		gradientIn.SetSize(layer->GetInputSize());
-		const ndBrainMemVector in(memBuffer + m_prefixScan[i + 0], layer->GetInputSize());
-		const ndBrainMemVector out(memBuffer + m_prefixScan[i + 1], layer->GetOutputSize());
-		layer->CalculateParamGradients(in, out, gradientOut, gradientIn, m_data[i]->m_gradient);
-		gradientIn.Swap(gradientOut);
-	}
-#endif
 }

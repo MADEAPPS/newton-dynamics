@@ -17,7 +17,10 @@ layout(std140, binding = 0) uniform param
 {
     uint m_inputSize;
     uint m_outputSize;
-    uint m_inputOutputBlockSize;
+    uint m_weightsStartOffset;
+
+    uint m_inputOutputSize;
+    uint m_inputOutputStartOffset;
  };
 
 layout(std430, binding = 1) buffer inputOutputBuffer
@@ -38,9 +41,8 @@ shared float reductionBuffer [WORKGROUP_SIZE / 2];
 // calculating an dot product of that row time the vector and adding the bias value.
 void main() 
 {
-    uint biasOffset = m_outputSize * m_inputSize;
-
-    uint inputOffset = gl_WorkGroupID.x * m_inputOutputBlockSize;
+    uint biasOffset = m_outputSize * m_inputSize + m_weightsStartOffset;
+    uint inputOffset = gl_WorkGroupID.x * m_inputOutputSize + m_inputOutputStartOffset;
     uint outputOffset = inputOffset + m_inputSize;
 
     uint workGroupCount = m_inputSize / WORKGROUP_SIZE;
@@ -70,7 +72,7 @@ void main()
     for (uint i = 0; i < m_outputSize; ++i)
     {
         float partialSum = 0.0f;
-        uint rowStartOffset = i * m_inputSize;
+        uint rowStartOffset = m_weightsStartOffset + i * m_inputSize;
         for (uint j = 0; j < modWorkGroupSize; j += WORKGROUP_SIZE)
         {
             float b = cachedInput[gl_LocalInvocationID.x + j];
@@ -109,6 +111,6 @@ void main()
     }
     if (gl_LocalInvocationID.x < reminderRowCount)
     {
-       m_inputOutputData[outputOffset + modRowCount + gl_LocalInvocationID.x] = cachedOutput[modRowCount + gl_LocalInvocationID.x];
+        m_inputOutputData[outputOffset + modRowCount + gl_LocalInvocationID.x] = cachedOutput[modRowCount + gl_LocalInvocationID.x];
     }
 }

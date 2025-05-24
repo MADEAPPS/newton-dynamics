@@ -39,10 +39,10 @@ class ndBrainTrainerCpu: public ndBrainTrainer
 	ndBrainTrainerCpu(const ndBrainTrainerCpu& src);
 	virtual ~ndBrainTrainerCpu();
 
-	void AcculumateGradients(const ndBrainTrainerCpu& src, ndInt32 index);
-	void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss);
-	void CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradientsOut, ndBrainLoss& loss);
+	virtual void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss) override;
 
+	void AcculumateGradients(const ndBrainTrainerCpu& src, ndInt32 index);
+	void CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradientsOut, ndBrainLoss& loss);
 	ndBrainLayer* GetWeightsLayer(ndInt32 index) const;
 	ndBrainLayer* GetGradientLayer(ndInt32 index) const;
 

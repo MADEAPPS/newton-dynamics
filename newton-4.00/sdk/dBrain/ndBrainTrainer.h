@@ -26,6 +26,7 @@
 #include "ndBrainVector.h"
 
 class ndBrain;
+class ndBrainLoss;
 
 class ndBrainTrainer: public ndClassAlloc
 {
@@ -35,8 +36,9 @@ class ndBrainTrainer: public ndClassAlloc
 	virtual ~ndBrainTrainer();
 
 	ndBrain* GetBrain() const;
+	virtual void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss) = 0;
+
 	//void AcculumateGradients(const ndBrainTrainer& src, ndInt32 index);
-	//void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss);
 	//void CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradientsOut, ndBrainLoss& loss);
 	//
 	//ndBrainLayer* GetWeightsLayer(ndInt32 index) const;
