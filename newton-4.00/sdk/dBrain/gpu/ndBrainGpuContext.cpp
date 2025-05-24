@@ -518,40 +518,14 @@ void ndBrainGpuContext::LoadShaderPrograms()
 	ndMemSet(m_modules, clean, sizeof(m_modules) / sizeof(m_modules[0]));
 
 	m_ndBrainCopyInput = LoadShaderProgram("ndBrainCopyInput-comp.spv");
+	m_ndBrainCopyOutput = LoadShaderProgram("ndBrainCopyOutput-comp.spv");
 	m_ndBrainCopyBuffer = LoadShaderProgram("ndBrainCopyBuffer-comp.spv");
-	m_ndBrainGetResults = LoadShaderProgram("ndBrainGetResults-comp.spv");
 	m_ndBrainLayerLinear = LoadShaderProgram("ndBrainLayerLinear-comp.spv");
 	m_ndBrainLayerEluActivation = LoadShaderProgram("ndBrainLayerEluActivation-comp.spv");
 	m_ndBrainLayerReluActivation = LoadShaderProgram("ndBrainLayerReluActivation-comp.spv");
 	m_ndBrainLayerTanhActivation = LoadShaderProgram("ndBrainLayerTanhActivation-comp.spv");
 	m_ndBrainLayerSoftmaxActivation = LoadShaderProgram("ndBrainLayerSoftmaxActivation-comp.spv");
 }
-
-//void ndBrainGpuContext::Sync()
-//{
-//	if (m_queueInProgress)
-//	{
-//		CheckResultVulkan(vkWaitForFences(m_device, uint32_t(1), &m_fence, VK_TRUE, 100000000000));
-//	}
-//	m_queueInProgress = false;
-//}
-//void ndBrainGpuContext::SubmitQueue(const ndList<ndSharedPtr<ndBrainGpuCommand>>& displayList)
-//{
-//	ndAssert(!m_queueInProgress);
-//	m_queueInProgress = true;
-//	m_displayList.SetCount(0);
-//	for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = displayList.GetFirst(); node; node = node->GetNext())
-//	{
-//		ndBrainGpuCommand* command = *node->GetInfo();
-//		m_displayList.PushBack(command->m_commandBuffer);
-//	}
-//
-//	VkSubmitInfo submitInfo = {};
-//	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-//	submitInfo.commandBufferCount = uint32_t(m_displayList.GetCount());
-//	submitInfo.pCommandBuffers = &m_displayList[0];
-//	CheckResultVulkan(vkQueueSubmit(m_queue, uint32_t(1), &submitInfo, m_fence));
-//}
 
 void ndBrainGpuContext::BeginQueue()
 {

@@ -38,8 +38,8 @@ class ndBrainGpuContext : public ndClassAlloc
 	{
 		struct
 		{
-			ndVulkanShader m_testShader;
 			ndVulkanShader m_ndBrainCopyInput;
+			ndVulkanShader m_ndBrainCopyOutput;
 			ndVulkanShader m_ndBrainLayerLinear;
 			ndVulkanShader m_ndBrainLayerEluActivation;
 			ndVulkanShader m_ndBrainLayerReluActivation;
@@ -128,7 +128,7 @@ class ndBrainGpuContext: public ndClassAlloc
 		struct
 		{
 			ndVulkanShader m_ndBrainCopyInput;
-			ndVulkanShader m_ndBrainGetResults;
+			ndVulkanShader m_ndBrainCopyOutput;
 			ndVulkanShader m_ndBrainCopyBuffer;
 			ndVulkanShader m_ndBrainLayerLinear;
 			ndVulkanShader m_ndBrainLayerEluActivation;
@@ -141,7 +141,6 @@ class ndBrainGpuContext: public ndClassAlloc
 
 	ndInt32 m_subGroupSize;
 	uint32_t m_queueFamilyIndex;
-	//bool m_queueInProgress;
 	bool m_hasValidationLayers;
 
 	static const char* m_apiLayers[];
