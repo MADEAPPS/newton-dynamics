@@ -147,38 +147,39 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const Hyp
 	,m_averageFramesPerEpisodes()
 	,m_collectingSamples(true)
 {
+	ndAssert(0);
 	// build neural net
-	ndFixSizeArray<ndBrainLayer*, 32> layers;
-	layers.PushBack(new ndBrainLayerLinear(statesDim, hyperParameters.m_hiddenLayersNumberOfNeurons));
-	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
-	for (ndInt32 i = 1; i < hyperParameters.m_numberOfHiddenLayers; ++i)
-	{
-		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == hyperParameters.m_hiddenLayersNumberOfNeurons);
-		layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, hyperParameters.m_hiddenLayersNumberOfNeurons));
-		layers.PushBack(new ndBrainLayerActivationTanh(hyperParameters.m_hiddenLayersNumberOfNeurons));
-	}
-	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, actionDim));
-
-	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
-	{
-		m_actor.AddLayer(layers[i]);
-		m_target.AddLayer(layers[i]->Clone());
-	}
-
-	m_trainers.SetCount(0);
-	SetThreadCount(hyperParameters.m_threadsCount);
-	for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
-	{
-		ndBrainTrainer* const trainer = new ndBrainTrainer(&m_actor);
-		m_trainers.PushBack(trainer);
-	}
-
-	SetBufferSize(hyperParameters.m_replayBufferSize);
-	m_explorationProbabilityAnnelining = (m_explorationProbability - m_minExplorationProbability) / ndBrainFloat (m_replayBuffer.GetCapacity());
-
-	InitWeights();
-	m_optimizer = new ndBrainOptimizerAdam();
-	m_optimizer->SetRegularizer(hyperParameters.m_regularizer);
+	//ndFixSizeArray<ndBrainLayer*, 32> layers;
+	//layers.PushBack(new ndBrainLayerLinear(statesDim, hyperParameters.m_hiddenLayersNumberOfNeurons));
+	//layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
+	//for (ndInt32 i = 1; i < hyperParameters.m_numberOfHiddenLayers; ++i)
+	//{
+	//	ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == hyperParameters.m_hiddenLayersNumberOfNeurons);
+	//	layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, hyperParameters.m_hiddenLayersNumberOfNeurons));
+	//	layers.PushBack(new ndBrainLayerActivationTanh(hyperParameters.m_hiddenLayersNumberOfNeurons));
+	//}
+	//layers.PushBack(new ndBrainLayerLinear(hyperParameters.m_hiddenLayersNumberOfNeurons, actionDim));
+	//
+	//for (ndInt32 i = 0; i < layers.GetCount(); ++i)
+	//{
+	//	m_actor.AddLayer(layers[i]);
+	//	m_target.AddLayer(layers[i]->Clone());
+	//}
+	//
+	//m_trainers.SetCount(0);
+	//SetThreadCount(hyperParameters.m_threadsCount);
+	//for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
+	//{
+	//	ndBrainTrainer* const trainer = new ndBrainTrainer(&m_actor);
+	//	m_trainers.PushBack(trainer);
+	//}
+	//
+	//SetBufferSize(hyperParameters.m_replayBufferSize);
+	//m_explorationProbabilityAnnelining = (m_explorationProbability - m_minExplorationProbability) / ndBrainFloat (m_replayBuffer.GetCapacity());
+	//
+	//InitWeights();
+	//m_optimizer = new ndBrainOptimizerAdam();
+	//m_optimizer->SetRegularizer(hyperParameters.m_regularizer);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
