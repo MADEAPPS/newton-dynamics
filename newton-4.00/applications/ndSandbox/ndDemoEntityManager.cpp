@@ -295,6 +295,10 @@ void Test1__()
 
 void TestVulkanStuff()
 {
+	if (!ndBrainGpuContext::HasGpuSupport())
+	{
+		return;
+	}
 	ndBrainVector bias;
 	ndBrainMatrix input;
 	ndBrainMatrix output;
@@ -391,6 +395,9 @@ void TestVulkanStuff()
 	ndBrainGpuFloatBuffer weightParamBuffer(&context, parameters, ndCpuMappable);
 	ndBrainGpuUniformBuffer parammeters(&context, sizeof(UniformBufferObject));
 	parammeters.LoadData(sizeof(UniformBufferObject), &uniformParam);
+
+	UniformBufferObject uniformParam1;
+	parammeters.UnloadData(sizeof(UniformBufferObject), &uniformParam1);
 	
 	ndSharedPtr<ndBrainGpuCommand> command(new TestCommand(&context, ndInt32(input.GetCount()), parammeters, weightParamBuffer, inputOutputBuffer));
 	context.BeginQueue();

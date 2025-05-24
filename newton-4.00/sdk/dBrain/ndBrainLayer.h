@@ -32,8 +32,6 @@ class ndBrainMatrix;
 class ndBrainGpuCommand;
 class ndBrainGpuFloatBuffer;
 
-typedef VkShaderModule ndVulkanShader;
-
 class ndBrainLayer : public ndClassAlloc
 {
 	public: 

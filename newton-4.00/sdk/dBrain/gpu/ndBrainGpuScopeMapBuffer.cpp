@@ -14,7 +14,7 @@
 #include "ndBrainGpuContext.h"
 #include "ndBrainGpuScopeMapBuffer.h"
 
-ndScopeMapBuffer::ndScopeMapBuffer(ndBrainGpuBuffer& buffer)
+ndScopeMapBuffer::ndScopeMapBuffer(const ndBrainGpuBuffer& buffer)
 	:m_mappedMemory(nullptr)
 	,m_buffer(&buffer)
 {

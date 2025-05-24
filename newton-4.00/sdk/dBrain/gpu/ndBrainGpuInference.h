@@ -18,9 +18,8 @@
 class ndBrain;
 class ndBrainGpuBuffer;
 class ndBrainGpuContext;
-//class ndBrainGpuFloatBuffer;
-//class ndBrainGpuIntegerBuffer;
 
+#if 0
 #if !defined (D_USE_VULKAN_SDK)
 
 class ndBrainGpuInference : public ndClassAlloc
@@ -74,8 +73,7 @@ class ndBrainGpuInference : public ndClassAlloc
 	ndList<ndSharedPtr<ndBrainGpuCommand>> m_displayList;
 	ndInt32 m_inputBatchSize;
 };
-
-
+#endif
 #endif
 
 #endif

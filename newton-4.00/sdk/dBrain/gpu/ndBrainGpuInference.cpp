@@ -21,7 +21,7 @@
 #include "ndBrainGpuUniformBuffer.h"
 #include "ndBrainGpuScopeMapBuffer.h"
 
-
+#if 0
 #if defined (D_USE_VULKAN_SDK)
 
 class ndBrainGpuInference::ndBrainLoadInputData : public ndBrainGpuCommand
@@ -304,4 +304,5 @@ void ndBrainGpuInference::BuildDisplayList(const ndBrainMatrix& input)
 	}
 #endif
 }
+#endif
 #endif

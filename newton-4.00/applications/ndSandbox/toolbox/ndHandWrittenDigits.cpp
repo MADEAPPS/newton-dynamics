@@ -227,7 +227,8 @@ static void MnistTrainingSet()
 {
 	//#define USE_CONVOLUTIONAL_LAYERS
 
-	#define BATCH_BUFFER_SIZE				64
+	//#define BATCH_BUFFER_SIZE				64
+	#define BATCH_BUFFER_SIZE				256
 	#define CONVOLUTIONAL_FEATURE_MAPS		32
 	#define MIN_TRAIN_SCORE					0.9999f
 
@@ -288,7 +289,8 @@ static void MnistTrainingSet()
 			if (m_hasGpuSupport)
 			{
 				m_context = ndSharedPtr<ndBrainGpuContext>(new ndBrainGpuContext);
-				ndBrainTrainer* const trainer = new ndBrainTrainerGpu(m_brain, m_context, m_miniBatchSize);
+				ndBrainTrainerGpu* const trainer = new ndBrainTrainerGpu(m_brain, m_context, m_miniBatchSize);
+				trainer->AddGetResultCommand();
 				m_trainers.Append(ndSharedPtr<ndBrainTrainer>(trainer));
 			}
 			else

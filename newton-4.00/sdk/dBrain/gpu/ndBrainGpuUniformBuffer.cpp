@@ -25,23 +25,39 @@ ndBrainGpuUniformBuffer::ndBrainGpuUniformBuffer(ndBrainGpuContext* const contex
 	LoadData(sizeInBytes, data);
 }
 
-void ndBrainGpuUniformBuffer::UnloadData(ndInt32, void* const)
-{
-}
 
 #if defined (D_USE_VULKAN_SDK)
-void ndBrainGpuUniformBuffer::LoadData(ndInt32 sizeInBytes, const void* const data)
+void ndBrainGpuUniformBuffer::UnloadData(ndInt32 sizeInBytes, void* const outputData) const
+{
+	ndAssert(m_deviceBufferType == ndCpuMappable);
+	ndScopeMapBuffer mapBuffer(*this);
+	const ndUnsigned8* const src = (ndUnsigned8*)mapBuffer.GetPointer();
+	if (src)
+	{
+		ndAssert(sizeInBytes <= m_sizeInBytes);
+		ndUnsigned8* const dst = (ndUnsigned8*)outputData;
+		ndMemCpy(dst, src, sizeInBytes);
+	}
+}
+
+void ndBrainGpuUniformBuffer::LoadData(ndInt32 sizeInBytes, const void* const inputData)
 {
 	ndAssert(m_deviceBufferType == ndCpuMappable);
 	ndScopeMapBuffer mapBuffer(*this);
 	ndUnsigned8* const dst = (ndUnsigned8*)mapBuffer.GetPointer();
 	if (dst)
 	{
-		ndMemCpy(dst, (ndUnsigned8*)data, sizeInBytes);
+		ndAssert(sizeInBytes <= m_sizeInBytes);
+		ndUnsigned8* const src = (ndUnsigned8*)inputData;
+		ndMemCpy(dst, src, sizeInBytes);
 	}
 }
 
 #else
+
+void ndBrainGpuUniformBuffer::UnloadData(ndInt32, void* const) const
+{
+}
 
 void ndBrainGpuUniformBuffer::LoadData(ndInt32, const void* const)
 {

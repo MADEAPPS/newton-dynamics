@@ -52,9 +52,7 @@ class ndBrainGpuContext : public ndClassAlloc
 
 #else
 
-//#define ndVulkanShader VkShaderModule
 typedef VkShaderModule ndVulkanShader;
-//override
 
 class ndBrainGpuContext: public ndClassAlloc
 {

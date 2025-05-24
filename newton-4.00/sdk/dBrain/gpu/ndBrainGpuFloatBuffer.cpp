@@ -46,7 +46,7 @@ void ndBrainGpuFloatBuffer::LoadData(ndInt32 sizeInBytes, const void* const inpu
 	}
 }
 
-void ndBrainGpuFloatBuffer::UnloadData(ndInt32 sizeInBytes, void* const outputData)
+void ndBrainGpuFloatBuffer::UnloadData(ndInt32 sizeInBytes, void* const outputData) const
 {
 	if (m_deviceBufferType == ndCpuMappable)
 	{
@@ -69,7 +69,7 @@ void ndBrainGpuFloatBuffer::LoadData(ndInt32, const void* const)
 {
 }
 
-void ndBrainGpuFloatBuffer::UnloadData(ndInt32, void* const)
+void ndBrainGpuFloatBuffer::UnloadData(ndInt32, void* const) const
 {
 }
 

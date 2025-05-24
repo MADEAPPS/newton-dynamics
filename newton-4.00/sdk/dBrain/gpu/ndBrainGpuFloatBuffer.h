@@ -19,8 +19,8 @@ class ndBrainGpuFloatBuffer : public ndBrainGpuBuffer
 	ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, ndInt64 size, ndDeviceBufferType deviceType);
 	ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, const ndBrainVector& input, ndDeviceBufferType deviceType);
 
-	virtual void UnloadData(ndInt32 sizeInBytes, void* const outputData) override;
 	virtual void LoadData(ndInt32 sizeInBytes, const void* const inputData) override;
+	virtual void UnloadData(ndInt32 sizeInBytes, void* const outputData) const override;
 };
 
 #endif

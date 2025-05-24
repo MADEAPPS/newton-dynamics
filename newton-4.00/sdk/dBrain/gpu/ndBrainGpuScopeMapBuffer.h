@@ -18,13 +18,13 @@ class ndBrainGpuBuffer;
 class ndScopeMapBuffer
 {
 	public:
-	ndScopeMapBuffer(ndBrainGpuBuffer& buffer);
+	ndScopeMapBuffer(const ndBrainGpuBuffer& buffer);
 	~ndScopeMapBuffer();
 	void* GetPointer() const;
 
 	private:
 	void* m_mappedMemory;
-	ndBrainGpuBuffer* m_buffer;
+	const ndBrainGpuBuffer* m_buffer;
 };
 
 #endif
