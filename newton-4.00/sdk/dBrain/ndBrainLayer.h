@@ -23,14 +23,16 @@
 #define _ND_BRAIN_LAYER_H__
 
 #include "ndBrainStdafx.h"
+#include "gpu/ndBrainGpuContext.h"
 
 class ndBrainLoad;
 class ndBrainSave;
 class ndBrainVector;
 class ndBrainMatrix;
 class ndBrainGpuCommand;
-class ndBrainGpuContext;
 class ndBrainGpuFloatBuffer;
+
+typedef VkShaderModule ndVulkanShader;
 
 class ndBrainLayer : public ndClassAlloc
 {
@@ -57,7 +59,8 @@ class ndBrainLayer : public ndClassAlloc
 			,m_inputOutputStartOffset(0)
 		{
 		}
-		void* m_shader;
+
+		ndVulkanShader m_shader;
 		ndInt32 m_inputSize;
 		ndInt32 m_outputSize;
 		ndInt32 m_parametersSize;

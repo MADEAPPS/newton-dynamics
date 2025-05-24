@@ -278,21 +278,12 @@ static void MnistTrainingSet()
 			,m_prioritySamples()
 			,m_learnRate(ndReal(5.0e-4f))
 			,m_miniBatchSize(BATCH_BUFFER_SIZE)
-			,m_hasGpuSupport(ndBrainGpuContext::HasGpuSupport())
+			,m_hasGpuSupport(m_brain->IsGpuReady())
 		{
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize);
 
 			//threadCount = 1;
 			SetThreadCount(threadCount);
-
-			if (m_hasGpuSupport)
-			{
-				for (ndInt32 i = m_brain->GetCount() - 1; i >= 0; --i)
-				{
-					const ndBrainLayer* const layer = (**m_brain)[i];
-					m_hasGpuSupport = m_hasGpuSupport && layer->HasGpuSupport();
-				}
-			}
 
 			if (m_hasGpuSupport)
 			{
@@ -450,14 +441,20 @@ static void MnistTrainingSet()
 			return 0;
 		}
 
-		void Optimize(ndBrainMatrix* const trainingLabels, ndBrainMatrix* const trainingDigits,
-					  ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
+		void OptimizeCpu(ndBrainMatrix* const trainingLabels, ndBrainMatrix* const trainingDigits,
+			ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
 		{
 			ndUnsigned32 failCount[D_MAX_THREADS_COUNT];
 			ndUnsigned32 miniBatchArray[BATCH_BUFFER_SIZE];
 
+			ndFixSizeArray<ndBrainTrainer*, 256> trainers;
+			for (ndList<ndSharedPtr<ndBrainTrainer>>::ndNode* node = m_trainers.GetFirst(); node; node = node->GetNext())
+			{
+				trainers.PushBack(*node->GetInfo());
+			}
+
 			ndAtomic<ndInt32> iterator(0);
-			auto BackPropagateBatch = ndMakeObject::ndFunction([this, &iterator, trainingDigits, trainingLabels, &miniBatchArray, &failCount](ndInt32 threadIndex, ndInt32)
+			auto BackPropagateBatch = ndMakeObject::ndFunction([this, &iterator, &trainers, trainingDigits, trainingLabels, &miniBatchArray, &failCount](ndInt32 threadIndex, ndInt32)
 			{
 				class CategoricalLoss : public ndBrainLossCategoricalCrossEntropy
 				{
@@ -504,25 +501,14 @@ static void MnistTrainingSet()
 				for (ndInt32 i = iterator++; i < m_miniBatchSize; i = iterator++)
 				{
 					ndAssert(0);
-					//ndBrainTrainer& trainer = *m_trainers[i];
-					//ndUnsigned32 index = miniBatchArray[i];
-					//CategoricalLoss loss(m_brain.GetOutputSize(), &failCount[threadIndex], m_prioritySamples[i], index);
-					//
-					//loss.SetTruth((*trainingLabels)[ndInt32(index)]);
-					//trainer.BackPropagate((*trainingDigits)[ndInt32(index)], loss);
+					ndBrainTrainer& trainer = *trainers[i];
+					ndUnsigned32 index = miniBatchArray[i];
+					CategoricalLoss loss(m_brain->GetOutputSize(), &failCount[threadIndex], m_prioritySamples[i], index);
+					
+					loss.SetTruth((*trainingLabels)[ndInt32(index)]);
+					trainer.BackPropagate((*trainingDigits)[ndInt32(index)], loss);
 				}
 			});
-
-			auto BackPropagateBatchGpu = [this, &iterator, trainingDigits, trainingLabels, &miniBatchArray, &failCount]()
-			{
-				ndBrainTrainer* const trainer = *m_trainers.GetFirst()->GetInfo();
-
-				ndBrainVector input;
-				ndBrainLossLeastSquaredError loss(1);
-				m_context->BeginQueue();
-				trainer->BackPropagate(input, loss);
-				m_context->EndQueue();
-			};
 
 			ndBrain bestBrain(**m_brain);
 			ndBrainOptimizerAdam optimizer;
@@ -550,49 +536,119 @@ static void MnistTrainingSet()
 			#else
 				const ndInt32 numberOfEpocks = 400;
 			#endif
+
 			ndInt32 scoreMode = 0;
+			for (ndInt32 epoch = 0; epoch < numberOfEpocks; ++epoch)
+			{
+				//ndInt32 start = 0;
+				ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
+
+				m_brain->EnableDropOut();
+				m_brain->UpdateDropOut();
+				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
+				for (ndInt32 batch = 0; batch < batches; ++batch)
+				{
+					iterator = 0;
+					ndAssert(0);
+					//ndMemCpy(miniBatchArray, &shuffleBuffer[start], m_miniBatchSize);
+					//ndBrainThreadPool::ParallelExecute(BackPropagateBatch);
+					//optimizer.Update(this, m_trainers, m_learnRate);
+					//start += m_miniBatchSize;
+				}
+				m_brain->DisableDropOut();
+
+				if (scoreMode == 0)
+				{
+					scoreMode = ScoreModeZero(bestBrain, epoch, failCount, trainingDigits, testLabels, testDigits);
+				}
+				else
+				{
+					ScoreModeOne(bestBrain, epoch, failCount, trainingDigits, testLabels, testDigits);
+				}
+			}
+
+			m_brain->CopyFrom(bestBrain);
+		}
+
+		void OptimizeGpu(ndBrainMatrix* const trainingLabels, ndBrainMatrix* const trainingDigits,
+			ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
+		{
+			////ndUnsigned32 failCount[D_MAX_THREADS_COUNT];
+			////ndUnsigned32 miniBatchArray[BATCH_BUFFER_SIZE];
+			//ndBrain bestBrain(**m_brain);
+			////ndBrainOptimizerAdam optimizer;
+			//
+			//m_minTestFail = ndInt32(testDigits->GetCount());
+			//m_minTrainingFail = ndInt32(trainingDigits->GetCount());
+			//ndInt32 batches = m_minTrainingFail / m_miniBatchSize;
+			//
+			//// so far best training result on the mnist data set
+			//optimizer.SetRegularizer(ndBrainFloat(0.0f));		//         training(100.0%) test(99.35%) 
+			////optimizer.SetRegularizer(ndBrainFloat(0.0f));		// dropout training(99.998%) test(99.4%) 
+			////optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// 
+			////optimizer.SetRegularizer(ndBrainFloat(2.0e-5f));	// 
+			////optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// 
+			//optimizer.SetRegularizer(ndBrainFloat(4.0e-5f));	// 
+
+			ndArray<ndUnsigned32> shuffleBuffer;
+			for (ndInt32 i = 0; i < trainingDigits->GetCount(); ++i)
+			{
+				shuffleBuffer.PushBack(ndUnsigned32(i));
+			}
+
+#ifdef USE_CONVOLUTIONAL_LAYERS
+			const ndInt32 numberOfEpocks = 50;
+#else
+			const ndInt32 numberOfEpocks = 400;
+#endif
+
+			ndInt32 inputSize = trainingDigits->GetColumns();
+			ndBrainTrainer* const trainer = *m_trainers.GetFirst()->GetInfo();
+
+			ndBrainVector miniBatchInput;
+			miniBatchInput.SetCount(inputSize * m_miniBatchSize);
+			auto BackPropagateBatchGpu = [this, trainer, &miniBatchInput]()
+			{
+				ndBrainLossLeastSquaredError loss(1);
+
+				m_context->BeginQueue();
+				trainer->BackPropagate(miniBatchInput, loss);
+				m_context->EndQueue();
+			};
+
+			//ndInt32 scoreMode = 0;
+			ndInt32 batchesSize = trainingDigits->GetRows() / m_miniBatchSize;
+
+			for (ndInt32 epoch = 0; epoch < numberOfEpocks; ++epoch)
+			{
+				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
+				for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
+				{
+					for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
+					{
+						ndUnsigned32 index = shuffleBuffer[batchStart + i];
+						ndBrainMemVector tmp(&miniBatchInput[i * inputSize], inputSize);
+						tmp.SetCount(inputSize);
+						tmp.Set((*trainingDigits)[index]);
+					}
+					BackPropagateBatchGpu();	
+				}
+			}
+
+			//m_brain->CopyFrom(bestBrain);
+		}
+
+		void Optimize(ndBrainMatrix* const trainingLabels, ndBrainMatrix* const trainingDigits,
+			ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
+		{
 			if (m_hasGpuSupport)
 			{
-				for (ndInt32 epoch = 0; epoch < numberOfEpocks; ++epoch)
-				{
-					for (ndInt32 batch = 0; batch < batches; ++batch)
-					{
-						BackPropagateBatchGpu();
-					}
-				}
+				OptimizeGpu(trainingLabels, trainingDigits, testLabels, testDigits);
 			}
 			else
 			{
-				for (ndInt32 epoch = 0; epoch < numberOfEpocks; ++epoch)
-				{
-					ndInt32 start = 0;
-					ndMemSet(failCount, ndUnsigned32(0), D_MAX_THREADS_COUNT);
-
-					m_brain->EnableDropOut();
-					m_brain->UpdateDropOut();
-					shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
-					for (ndInt32 batch = 0; batch < batches; ++batch)
-					{
-						iterator = 0;
-						ndAssert(0);
-						//ndMemCpy(miniBatchArray, &shuffleBuffer[start], m_miniBatchSize);
-						//ndBrainThreadPool::ParallelExecute(BackPropagateBatch);
-						//optimizer.Update(this, m_trainers, m_learnRate);
-						//start += m_miniBatchSize;
-					}
-					m_brain->DisableDropOut();
-
-					if (scoreMode == 0)
-					{
-						scoreMode = ScoreModeZero(bestBrain, epoch, failCount, trainingDigits, testLabels, testDigits);
-					}
-					else
-					{
-						ScoreModeOne(bestBrain, epoch, failCount, trainingDigits, testLabels, testDigits);
-					}
-				}
+				OptimizeCpu(trainingLabels, trainingDigits, testLabels, testDigits);
 			}
-			m_brain->CopyFrom(bestBrain);
 		}
 
 		ndSharedPtr<ndBrain> m_brain;

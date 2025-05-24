@@ -25,6 +25,10 @@ ndBrainGpuUniformBuffer::ndBrainGpuUniformBuffer(ndBrainGpuContext* const contex
 	LoadData(sizeInBytes, data);
 }
 
+void ndBrainGpuUniformBuffer::UnloadData(ndInt32, void* const)
+{
+}
+
 #if defined (D_USE_VULKAN_SDK)
 void ndBrainGpuUniformBuffer::LoadData(ndInt32 sizeInBytes, const void* const data)
 {

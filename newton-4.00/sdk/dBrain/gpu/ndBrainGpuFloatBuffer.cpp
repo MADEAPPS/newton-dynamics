@@ -22,49 +22,58 @@ ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, n
 ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, const ndBrainVector& input, ndDeviceBufferType deviceType)
 	:ndBrainGpuBuffer(context, input.GetCount() * ndInt32(sizeof(ndReal)), ndStorageData, deviceType)
 {
-	LoadData(input);
+	LoadData(ndInt32 (input.GetCount() * sizeof (ndReal)),  & input[0]);
 }
 
-void ndBrainGpuFloatBuffer::LoadData(const ndBrainVector& input)
-{
-	input.GetCount();
 #if defined (D_USE_VULKAN_SDK)
+void ndBrainGpuFloatBuffer::LoadData(ndInt32 sizeInBytes, const void* const inputData)
+{
 	if (m_deviceBufferType == ndCpuMappable)
 	{
 		ndScopeMapBuffer mapBuffer(*this);
 		ndReal* const dst = (ndReal*)mapBuffer.GetPointer();
 		if (dst)
 		{
-			const ndInt64 size = m_sizeInBytes / ndInt32(sizeof(ndReal));
-			ndAssert(size == input.GetCount());
+			ndAssert(sizeInBytes <= m_sizeInBytes);
 
-			for (ndInt64 i = 0; i < size; ++i)
-			{
-				dst[i] = ndReal(input[i]);
-			}
+			const ndReal* const src = (ndReal*)inputData;
+			const ndInt64 size = sizeInBytes / ndInt32(sizeof(ndReal));
+
+			ndBrainMemVector dstData(dst, size);
+			const ndBrainMemVector srcData(src, size);
+			dstData.Set(srcData);
 		}
 	}
-#endif
 }
 
-void ndBrainGpuFloatBuffer::UnloadData(ndBrainVector& output)
+void ndBrainGpuFloatBuffer::UnloadData(ndInt32 sizeInBytes, void* const outputData)
 {
-	output.GetCount();
-#if defined (D_USE_VULKAN_SDK)
 	if (m_deviceBufferType == ndCpuMappable)
 	{
 		ndScopeMapBuffer mapBuffer(*this);
 		const ndReal* const src = (ndReal*)mapBuffer.GetPointer();
 		if (src)
 		{
-			const ndInt64 size = m_sizeInBytes / ndInt32(sizeof(ndReal));
-			output.SetCount(size);
+			ndAssert(sizeInBytes <= m_sizeInBytes);
+
+			const ndInt64 size = sizeInBytes / ndInt32(sizeof(ndReal));
 			const ndBrainMemVector srcData(src, size);
-			output.Set(srcData);
+			ndBrainMemVector dstData((ndReal*)outputData, size);
+			dstData.Set(srcData);
 		}
 	}
-#endif
 }
+#else
+
+void ndBrainGpuFloatBuffer::LoadData(ndInt32, const void* const)
+{
+}
+
+void ndBrainGpuFloatBuffer::UnloadData(ndInt32, void* const)
+{
+}
+
+#endif
 
 
 

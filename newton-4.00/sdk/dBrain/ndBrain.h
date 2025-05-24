@@ -38,6 +38,7 @@ class ndBrain: public ndArray<ndBrainLayer*>
 
 	ndBrain& operator=(const ndBrain& src);
 
+	bool IsGpuReady() const;
 	void Save(ndBrainSave* const loadSave);
 	void SaveToFile(const char* const pathFilename);
 

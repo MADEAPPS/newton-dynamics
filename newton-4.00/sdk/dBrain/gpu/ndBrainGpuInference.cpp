@@ -150,7 +150,7 @@ const ndList<ndSharedPtr<ndBrainGpuCommand>>& ndBrainGpuInference::GetDisplayLis
 
 void ndBrainGpuInference::GetResults(ndBrainVector& results) const
 {
-	m_outputBuffer.m_buffer->UnloadData(results);
+	m_outputBuffer.m_buffer->UnloadData(ndInt32 (results.GetCount() * sizeof (ndReal)), &results[0]);
 }
 
 //void ndBrainGpuInference::GetWorkBuffer(ndBrainVector& results) const

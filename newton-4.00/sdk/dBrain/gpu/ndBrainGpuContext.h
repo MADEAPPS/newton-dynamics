@@ -15,6 +15,7 @@ class ndBrainGpuCommand;
 class ndBrainGpuFloatBuffer;
 
 #if !defined (D_USE_VULKAN_SDK)
+typedef void* ndVulkanShader;
 
 class ndBrainGpuContext : public ndClassAlloc
 {
@@ -37,19 +38,24 @@ class ndBrainGpuContext : public ndClassAlloc
 	{
 		struct
 		{
-			void* m_testShader;
-			void* m_ndBrainCopyInput;
-			void* m_ndBrainLayerLinear;
-			void* m_ndBrainLayerEluActivation;
-			void* m_ndBrainLayerReluActivation;
-			void* m_ndBrainLayerTanhActivation;
-			void* m_ndBrainLayerSoftmaxActivation;
+			ndVulkanShader m_testShader;
+			ndVulkanShader m_ndBrainCopyInput;
+			ndVulkanShader m_ndBrainLayerLinear;
+			ndVulkanShader m_ndBrainLayerEluActivation;
+			ndVulkanShader m_ndBrainLayerReluActivation;
+			ndVulkanShader m_ndBrainLayerTanhActivation;
+			ndVulkanShader m_ndBrainLayerSoftmaxActivation;
 		};
-		void* m_modules[128];
+		ndVulkanShader m_modules[128];
 	};
 };
 
 #else
+
+//#define ndVulkanShader VkShaderModule
+typedef VkShaderModule ndVulkanShader;
+//override
+
 class ndBrainGpuContext: public ndClassAlloc
 {
 	class ndMemoryEntry
@@ -90,7 +96,7 @@ class ndBrainGpuContext: public ndClassAlloc
 	void CreateDescriptorPool();
 	void CreateFence();
 	void LoadShaderPrograms();
-	VkShaderModule LoadShaderProgram(const char* const name);
+	ndVulkanShader LoadShaderProgram(const char* const name);
 	void GetShaderFileName(const char* const name, char* const outPathName);
 
 	static void VulkanFree(void* pUserData, void* memory);
@@ -123,16 +129,16 @@ class ndBrainGpuContext: public ndClassAlloc
 	{
 		struct
 		{
-			VkShaderModule m_ndBrainCopyInput;
-			VkShaderModule m_ndBrainGetResults;
-			VkShaderModule m_ndBrainCopyBuffer;
-			VkShaderModule m_ndBrainLayerLinear;
-			VkShaderModule m_ndBrainLayerEluActivation;
-			VkShaderModule m_ndBrainLayerReluActivation;
-			VkShaderModule m_ndBrainLayerTanhActivation;
-			VkShaderModule m_ndBrainLayerSoftmaxActivation;
+			ndVulkanShader m_ndBrainCopyInput;
+			ndVulkanShader m_ndBrainGetResults;
+			ndVulkanShader m_ndBrainCopyBuffer;
+			ndVulkanShader m_ndBrainLayerLinear;
+			ndVulkanShader m_ndBrainLayerEluActivation;
+			ndVulkanShader m_ndBrainLayerReluActivation;
+			ndVulkanShader m_ndBrainLayerTanhActivation;
+			ndVulkanShader m_ndBrainLayerSoftmaxActivation;
 		};
-		VkShaderModule m_modules[128];
+		ndVulkanShader m_modules[128];
 	};
 
 	ndInt32 m_subGroupSize;

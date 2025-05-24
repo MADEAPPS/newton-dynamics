@@ -10,33 +10,46 @@
 */
 #version 450
 
-#define WORKGROUP_SIZE 128
+#define WORKGROUP_SIZE 256
 layout (local_size_x = WORKGROUP_SIZE) in;
 
 layout(std140, binding = 0) uniform UniformBufferObject 
 {
-    int m_batchIndex;
-    int m_inputSize;
-    int m_inputBlockSize;
-    int m_outputBlockSize;
+    uint m_inputSize;
+    uint m_outputSize;
+    uint m_weightsStartOffset;
+
+    uint m_inputOutputSize;
+    uint m_inputOutputStartOffset;
 };
 
-layout(std430, binding = 1) buffer inputOutputBuffer
-{
-    float m_inputOutputData[];
-};
-
-layout(std430, binding = 2) buffer outputBuffer
+layout(std430, binding = 1) buffer outputBuffer
 {
     float m_inputBuffer[];
 };
 
+layout(std430, binding = 2) buffer inputOutputBuffer
+{
+    float m_inputOutputData[];
+};
+
 void main() 
 {
-    uint dstBase = gl_WorkGroupID.x * m_outputBlockSize;
-    uint srcBase = (gl_WorkGroupID.x + m_batchIndex) * m_inputBlockSize;
-    for (uint index = gl_LocalInvocationID.x; index < m_inputSize; index += gl_WorkGroupSize.x)
+    uint srcBase = gl_WorkGroupID.x * m_inputSize;
+    uint dstBase = gl_WorkGroupID.x * m_inputOutputSize + m_inputOutputStartOffset;
+
+    uint iterations = m_inputSize / WORKGROUP_SIZE;
+    uint modWorkGroupSize = iterations * WORKGROUP_SIZE;
+    uint reminderworkGroupSize = m_inputSize - modWorkGroupSize;
+
+    for (uint i = 0; i < modWorkGroupSize; i += WORKGROUP_SIZE)
     {
-        m_inputOutputData[dstBase + index] = m_inputBuffer[srcBase + index];
+        float a = m_inputBuffer[srcBase + gl_LocalInvocationID.x];
+        m_inputBuffer[dstBase + gl_LocalInvocationID.x] = a;
+    }
+    if (gl_LocalInvocationID.x < reminderworkGroupSize)
+    {
+        float a = m_inputBuffer[srcBase + modWorkGroupSize + gl_LocalInvocationID.x];
+        m_inputBuffer[dstBase + modWorkGroupSize + gl_LocalInvocationID.x] = a;
     }
 }

@@ -392,15 +392,14 @@ void TestVulkanStuff()
 	ndBrainGpuUniformBuffer parammeters(&context, sizeof(UniformBufferObject));
 	parammeters.LoadData(sizeof(UniformBufferObject), &uniformParam);
 	
-	//ndList<ndSharedPtr<ndBrainGpuCommand>> displayList;
-	//displayList.Append (new TestCommand(&context, ndInt32(input.GetCount()), parammeters, weightParamBuffer, inputOutputBuffer));
 	ndSharedPtr<ndBrainGpuCommand> command(new TestCommand(&context, ndInt32(input.GetCount()), parammeters, weightParamBuffer, inputOutputBuffer));
 	context.BeginQueue();
 	context.AddCommandQueue(command);
 	context.EndQueue();
 	
 	ndBrainVector outputGpu;
-	inputOutputBuffer.UnloadData(outputGpu);
+	outputGpu.SetCount(workBuffer.GetCount());
+	inputOutputBuffer.UnloadData(ndInt32 (workBuffer.GetCount() * sizeof (ndReal)), &outputGpu[0]);
 	
 	for (ndInt32 i = 0; i < inputsCount; ++i)
 	{
