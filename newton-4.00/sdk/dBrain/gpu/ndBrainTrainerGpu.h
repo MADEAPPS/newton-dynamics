@@ -27,7 +27,6 @@
 #include "ndBrainTrainer.h"
 #include "ndBrainGpuInference.h"
 
-
 class ndBrainTrainerGpu: public ndBrainGpuInference
 {
 	public: 
@@ -42,6 +41,7 @@ class ndBrainTrainerGpu: public ndBrainGpuInference
 	void AddLossCommandBuffer(const ndBrainLoss& loss);
 
 	ndSharedPtr<ndBrainGpuBuffer> m_groundTruth;
+	ndSharedPtr<ndBrainGpuBuffer> m_weightAndBiasGradientsBuffer;
 };
 
 #endif 

@@ -208,15 +208,16 @@ void ndBrainGpuInference::InitWeightAndBiasBuffer()
 		sizeAcc += uniformData[i].m_parametersSize;
 	}
 	
+	ndInt32 padWeights = 32;
 	ndBrainVector scratchBuffer;
-	scratchBuffer.SetCount(sizeAcc + 1024);
+	scratchBuffer.SetCount(sizeAcc + padWeights);
 	for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
 	{
 		const ndBrainLayer* const layer = brain[i];
 		ndBrainMemVector weights(&scratchBuffer[uniformData[i].m_parametersStartOffset], uniformData[i].m_parametersSize);
 		layer->CopyGpuWeights(weights);
 	}
-	scratchBuffer.SetCount(sizeAcc + 1024);
+	scratchBuffer.SetCount(sizeAcc + padWeights);
 	m_weightAndBiasBuffer = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(*m_context, scratchBuffer, ndCpuMappable));
 
 	scratchBuffer.SetCount(m_miniBatchSize * brain.GetInputSize());
