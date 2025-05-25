@@ -23,6 +23,7 @@
 #include "ndBrain.h"
 #include "ndBrainTrainer.h"
 #include "ndBrainOptimizer.h"
+#include "ndBrainTrainerCpu.h"
 #include "ndBrainThreadPool.h"
 
 ndBrainOptimizer::ndBrainOptimizer()
@@ -63,10 +64,9 @@ void ndBrainOptimizer::Update(ndBrainThreadPool* const, ndArray<ndBrainTrainer*>
 
 void ndBrainOptimizer::AccumulateGradients(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients) const
 {
-	ndAssert(0);
-#if 0
-	ndBrainTrainer* const trainer0 = partialGradients[0];
-	const ndBrain& brain = *trainer0->GetBrain();
+	//ndBrainTrainer* const trainer0 = partialGradients[0];
+	ndBrainTrainerCpu* const trainer0 = (ndBrainTrainerCpu*)partialGradients[0];
+	const ndBrain& brain = **trainer0->GetBrain();
 
 	ndFixSizeArray<ndInt32, 256> paramLayer;
 	for (ndInt32 i = 0; i < brain.GetCount(); ++i)
@@ -79,19 +79,18 @@ void ndBrainOptimizer::AccumulateGradients(ndBrainThreadPool* const threadPool, 
 
 	auto AddGradients = ndMakeObject::ndFunction([this, &paramLayer, &partialGradients](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		ndBrainTrainer* const dst = partialGradients[0];
+			ndBrainTrainerCpu* const dst = (ndBrainTrainerCpu*)partialGradients[0];
 		const ndStartEnd startEnd(paramLayer.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndInt32 index = paramLayer[i];
 			for (ndInt32 j = 1; j < partialGradients.GetCount(); ++j)
 			{
-				ndBrainTrainer* const src = partialGradients[j];
+				const ndBrainTrainerCpu* const src = (ndBrainTrainerCpu*)partialGradients[j];
 				dst->AcculumateGradients(*src, index);
 			}
 		}
 	});
 	threadPool->ndBrainThreadPool::ParallelExecute(AddGradients);
-#endif
 }
 

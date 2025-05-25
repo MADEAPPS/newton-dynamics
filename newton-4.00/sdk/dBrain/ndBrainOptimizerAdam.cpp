@@ -23,6 +23,7 @@
 #include "ndBrain.h"
 #include "ndBrainMatrix.h"
 #include "ndBrainTrainer.h"
+#include "ndBrainTrainerCpu.h"
 #include "ndBrainThreadPool.h"
 #include "ndBrainOptimizerAdam.h"
 
@@ -84,10 +85,9 @@ ndBrainOptimizerAdam::~ndBrainOptimizerAdam()
 //#pragma optimize( "", off )
 void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients, ndBrainFloat learnRate)
 {
-	ndAssert(0);
-#if 0
-	ndBrainTrainer* const trainer = partialGradients[0];
-	ndBrain& brain = *trainer->GetBrain();
+	//ndBrainTrainer* const trainer = partialGradients[0];
+	ndBrainTrainerCpu* const trainer = (ndBrainTrainerCpu*)partialGradients[0];
+	ndBrain& brain = **trainer->GetBrain();
 
 	if (!m_initalized)
 	{
@@ -100,7 +100,8 @@ void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const threadPool, ndArray<n
 
 	for (ndInt32 i = 1; i < partialGradients.GetCount(); ++i)
 	{
-		const ndBrainTrainer* const src = partialGradients[i];
+		//const ndBrainTrainer* const src = partialGradients[i];
+		const ndBrainTrainerCpu* const src = (ndBrainTrainerCpu*)partialGradients[i];
 		trainer->AddGradients(src);
 	}
 
@@ -175,6 +176,5 @@ void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const threadPool, ndArray<n
 	{
 		m_alphaAcc = ndBrainFloat(0.0f);
 	}
-#endif
 }
 

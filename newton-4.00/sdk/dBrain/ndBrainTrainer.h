@@ -43,6 +43,8 @@ class ndBrainTrainer: public ndClassAlloc
 	// new method
 	virtual void BackPropagate(const ndBrainVector& input, const ndBrainVector& groundTruth) = 0;
 
+	//legacy methods
+	//void AddGradients(const ndBrainTrainer* const src);
 	//void AcculumateGradients(const ndBrainTrainer& src, ndInt32 index);
 	//void CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradientsOut, ndBrainLoss& loss);
 	//
@@ -51,7 +53,7 @@ class ndBrainTrainer: public ndClassAlloc
 	//
 	//void ClearGradients();
 	//void ScaleWeights(const ndBrainFloat s);
-	//void AddGradients(const ndBrainTrainer* const src);
+	
 	//void CopyGradients(const ndBrainTrainer* const src);
 	//
 	//ndBrainVector& GetWorkingBuffer();
