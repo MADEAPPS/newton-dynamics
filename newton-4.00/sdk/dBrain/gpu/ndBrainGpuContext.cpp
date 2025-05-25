@@ -523,7 +523,7 @@ void ndBrainGpuContext::LoadShaderPrograms()
 	m_ndBrainLayerReluActivation = LoadShaderProgram("ndBrainLayerReluActivation-comp.spv");
 	m_ndBrainLayerTanhActivation = LoadShaderProgram("ndBrainLayerTanhActivation-comp.spv");
 	m_ndBrainLayerSoftmaxActivation = LoadShaderProgram("ndBrainLayerSoftmaxActivation-comp.spv");
-	m_ndBrainLayerLinearDropOutActivation = LoadShaderProgram("m_ndBrainLayerLinearDropOutActivation-comp.spv");
+	m_ndBrainLayerLinearDropOutActivation = LoadShaderProgram("ndBrainLayerLinearDropOutActivation-comp.spv");
 }
 
 void ndBrainGpuContext::BeginQueue()
