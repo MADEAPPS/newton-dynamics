@@ -37,6 +37,11 @@ class ndBrainTrainerGpu: public ndBrainGpuInference
 
 	virtual void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss) override;
 	virtual void BackPropagate(const ndBrainVector& input, const ndBrainVector& groundTruth) override;
+
+	protected:
+	void AddLossCommandBuffer(const ndBrainLoss& loss);
+
+	ndSharedPtr<ndBrainGpuBuffer> m_groundTruth;
 };
 
 #endif 

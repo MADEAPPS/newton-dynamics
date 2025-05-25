@@ -35,12 +35,15 @@
 
 ndBrainTrainerGpu::ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainGpuContext>& context, ndInt32 minibatchSize, const ndBrainLoss& loss)
 	:ndBrainGpuInference(brain, context, minibatchSize)
+	,m_groundTruth()
 {
 	ndAssert(loss.HasGpuSupport());
+	AddLossCommandBuffer(loss);
 }
 
 ndBrainTrainerGpu::ndBrainTrainerGpu(const ndBrainTrainerGpu& src)
 	:ndBrainGpuInference(src)
+	,m_groundTruth()
 {
 	ndAssert(0);
 }
@@ -49,7 +52,16 @@ ndBrainTrainerGpu::~ndBrainTrainerGpu()
 {
 }
 
-void ndBrainTrainerGpu::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss)
+void ndBrainTrainerGpu::AddLossCommandBuffer(const ndBrainLoss& loss)
+{
+	ndBrainVector buffer;
+	ndInt32 bufferSize = m_brain->GetOutputSize();
+	buffer.SetCount(bufferSize * m_miniBatchSize);
+	buffer.Set(ndBrainFloat(0.0f));
+	m_groundTruth = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(*m_context, buffer, ndCpuMappable));
+}
+
+void ndBrainTrainerGpu::BackPropagate(const ndBrainVector&, ndBrainLoss&)
 {
 	ndAssert(0);
 }
@@ -57,6 +69,7 @@ void ndBrainTrainerGpu::BackPropagate(const ndBrainVector& input, ndBrainLoss& l
 void ndBrainTrainerGpu::BackPropagate(const ndBrainVector& input, const ndBrainVector& groundTruth)
 {
 	m_miniBatchInputBuffer->LoadData(input.GetCount() * sizeof(ndReal), &input[0]);
+	m_groundTruth->LoadData(groundTruth.GetCount() * sizeof(ndReal), &groundTruth[0]);
 	for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = m_commandBuffers.GetFirst(); node; node = node->GetNext())
 	{
 		ndSharedPtr<ndBrainGpuCommand>& command = node->GetInfo();

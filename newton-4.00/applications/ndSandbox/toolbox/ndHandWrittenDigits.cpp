@@ -607,17 +607,19 @@ static void MnistTrainingSet()
 #endif
 
 			ndInt32 inputSize = trainingDigits->GetColumns();
+			ndInt32 outputSize = trainingLabels->GetColumns();
 			ndBrainTrainerGpu* const trainer = (ndBrainTrainerGpu*)*m_trainers.GetFirst()->GetInfo();
 
+			ndBrainVector groundTruth;
 			ndBrainVector miniBatchInput;
 			ndBrainVector miniBatchOutput;
-			miniBatchInput.SetCount(inputSize * m_miniBatchSize);
 
+			groundTruth.SetCount(outputSize * m_miniBatchSize);
+			miniBatchInput.SetCount(inputSize * m_miniBatchSize);
 			
-			auto BackPropagateBatchGpu = [this, trainer, &miniBatchInput, &miniBatchOutput, trainingDigits]()
+			auto BackPropagateBatchGpu = [this, trainer, &miniBatchInput, &miniBatchOutput, &groundTruth, trainingDigits]()
 			{
 				//ndBrainLossLeastSquaredError loss(1);
-				ndBrainVector groundTruth;
 				
 				m_context->BeginQueue();
 				trainer->BackPropagate(miniBatchInput, groundTruth);
@@ -656,9 +658,13 @@ static void MnistTrainingSet()
 					for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
 					{
 						ndUnsigned32 index = shuffleBuffer[batchStart + i];
-						ndBrainMemVector tmp(&miniBatchInput[i * inputSize], inputSize);
-						tmp.SetCount(inputSize);
-						tmp.Set((*trainingDigits)[index]);
+						ndBrainMemVector input(&miniBatchInput[i * inputSize], inputSize);
+						input.SetCount(inputSize);
+						input.Set((*trainingDigits)[index]);
+
+						ndBrainMemVector truth(&groundTruth[i * outputSize], outputSize);
+						truth.SetCount(outputSize);
+						truth.Set((*trainingLabels)[index]);
 					}
 					BackPropagateBatchGpu();	
 				}
