@@ -79,14 +79,14 @@ void ndBrainOptimizer::AccumulateGradients(ndBrainThreadPool* const threadPool, 
 
 	auto AddGradients = ndMakeObject::ndFunction([this, &paramLayer, &partialGradients](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-			ndBrainTrainerCpu* const dst = (ndBrainTrainerCpu*)partialGradients[0];
+		ndBrainTrainerCpu* const dst = (ndBrainTrainerCpu*)partialGradients[0];
 		const ndStartEnd startEnd(paramLayer.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndInt32 index = paramLayer[i];
 			for (ndInt32 j = 1; j < partialGradients.GetCount(); ++j)
 			{
-				const ndBrainTrainerCpu* const src = (ndBrainTrainerCpu*)partialGradients[j];
+				ndBrainTrainerCpu* const src = (ndBrainTrainerCpu*)partialGradients[j];
 				dst->AcculumateGradients(*src, index);
 			}
 		}
