@@ -521,11 +521,11 @@ void ndBrainGpuContext::LoadShaderPrograms()
 	m_ndBrainCopyOutput = LoadShaderProgram("ndBrainCopyOutput-comp.spv");
 	m_ndBrainLayerLinear = LoadShaderProgram("ndBrainLayerLinear-comp.spv");
 	m_ndBrainLayerReluActivation = LoadShaderProgram("ndBrainLayerReluActivation-comp.spv");
+	m_ndBrainLayerTanhActivation = LoadShaderProgram("ndBrainLayerTanhActivation-comp.spv");
+	m_ndBrainLayerSoftmaxActivation = LoadShaderProgram("ndBrainLayerSoftmaxActivation-comp.spv");
 
 	//m_ndBrainCopyBuffer = LoadShaderProgram("ndBrainCopyBuffer-comp.spv");
 	//m_ndBrainLayerEluActivation = LoadShaderProgram("ndBrainLayerEluActivation-comp.spv");
-	//m_ndBrainLayerTanhActivation = LoadShaderProgram("ndBrainLayerTanhActivation-comp.spv");
-	//m_ndBrainLayerSoftmaxActivation = LoadShaderProgram("ndBrainLayerSoftmaxActivation-comp.spv");
 }
 
 void ndBrainGpuContext::BeginQueue()

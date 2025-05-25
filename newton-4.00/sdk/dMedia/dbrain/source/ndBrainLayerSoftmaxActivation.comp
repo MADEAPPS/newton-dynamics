@@ -10,87 +10,126 @@
 */
 #version 450
 
-#define WORKGROUP_SIZE      128
-#define TEMP_BUFFER_SIZE    1024
-
+#define WORKGROUP_SIZE 256
 layout (local_size_x = WORKGROUP_SIZE) in;
 
-layout(std140, binding = 0) uniform UniformBufferObject 
+layout(std140, binding = 0) uniform param
 {
-    int m_inputSize;
-    int m_inputStart;
-    int m_outputStart;
-    int m_workBufferSize;
+    uint m_inputSize;
+    uint m_outputSize;
+    uint m_weightsStartOffset;
+
+    uint m_inputOutputSize;
+    uint m_inputOutputStartOffset;
 };
 
-layout(std430, binding = 1) buffer inputOutputBuffer
+layout(std430, binding = 1) buffer dataBuffer1
 {
     float m_inputOutputData[];
 };
 
-shared float tmpBuffer [TEMP_BUFFER_SIZE];
-shared float reductionBuffer [WORKGROUP_SIZE];
+layout(std430, binding = 2) buffer dataBuffer2
+{
+    float m_weightsAndBias[];
+};
+
+shared float tmpInputBuffer [1024];
+shared float reductionBuffer [WORKGROUP_SIZE/2];
 
 void main() 
 {
-    uint batchOffset = gl_WorkGroupID.x * m_workBufferSize;
+    uint iteration = m_inputSize / WORKGROUP_SIZE;
+    uint modRowCount = iteration * WORKGROUP_SIZE;
+    uint reminderRowCount = m_inputSize - modRowCount;
 
-    float maximunValue = 0.0; 
-    for (uint index = gl_LocalInvocationID.x; index < m_inputSize; index += gl_WorkGroupSize.x)
+    uint inputOffset = gl_WorkGroupID.x * m_inputOutputSize + m_inputOutputStartOffset;
+    uint outputOffset = inputOffset + m_inputSize;
+
+    // save inpout to local buffer, also get the max argument
+    float maxArg = -1.0e30f;
+    for (uint i = 0; i < modRowCount; i += WORKGROUP_SIZE)
     {
-        float value = m_inputOutputData[batchOffset + m_inputStart + index];
-        maximunValue = (value > maximunValue) ? value : maximunValue; 
+        float inputValue = m_inputOutputData[inputOffset + i + gl_LocalInvocationID.x];
+        tmpInputBuffer[i + gl_LocalInvocationID.x] = inputValue;
+        maxArg = (inputValue > maxArg) ? inputValue : maxArg;
+    }
+    if (gl_LocalInvocationID.x < reminderRowCount)
+    {
+        float inputValue = m_inputOutputData[inputOffset + modRowCount + gl_LocalInvocationID.x];
+        tmpInputBuffer[modRowCount + gl_LocalInvocationID.x] = inputValue;
+        maxArg = (inputValue > maxArg) ? inputValue : maxArg;
     }
 
-    reductionBuffer[gl_LocalInvocationID.x] = maximunValue;
-    memoryBarrierShared(); 
-    barrier();
-    
-    for (uint i = WORKGROUP_SIZE / 2; i != 0; i = i >> 1)
+    for (uint j = WORKGROUP_SIZE / 2; j > 0; j = j >> 1)
     {
-        if (gl_LocalInvocationID.x < i)
+        if ((gl_LocalInvocationID.x >= j) && (gl_LocalInvocationID.x < j * 2))
         {
-            float a = reductionBuffer[gl_LocalInvocationID.x];
-            float b = reductionBuffer[gl_LocalInvocationID.x + i];
-            reductionBuffer[gl_LocalInvocationID.x] = (a > b) ? a : b;
+            reductionBuffer[gl_LocalInvocationID.x - j] = maxArg;
         }
         memoryBarrierShared();
         barrier();
-    }
-
-    maximunValue = reductionBuffer[0];
-
-    uint base = m_inputSize / WORKGROUP_SIZE;
-    tmpBuffer[base * WORKGROUP_SIZE + gl_LocalInvocationID.x] = 0.0f;
-
-    float sum = 0.0; 
-    for (uint index = gl_LocalInvocationID.x; index < m_inputSize; index += gl_WorkGroupSize.x)
-    {
-        float a = m_inputOutputData[batchOffset + m_inputStart + index] - maximunValue;
-        float b = -30.0;
-        float value = (a > b) ? a : b;
-        float prob = exp(value);
-        tmpBuffer[index] = prob;
-        sum += prob;
-    }
-
-    reductionBuffer[gl_LocalInvocationID.x] = sum;
-    memoryBarrierShared(); 
-    barrier();
-    
-    for (uint i = WORKGROUP_SIZE / 2; i != 0; i = i >> 1)
-    {
-        if (gl_LocalInvocationID.x < i)
+        if (gl_LocalInvocationID.x < j)
         {
-            reductionBuffer[gl_LocalInvocationID.x] += reductionBuffer[i + gl_LocalInvocationID.x];
+            float inputValue = reductionBuffer[gl_LocalInvocationID.x];
+            maxArg = (inputValue > maxArg) ? inputValue : maxArg;
+        }
+    }
+    if (gl_LocalInvocationID.x == 0)
+    {
+        reductionBuffer[0] = maxArg;
+    }
+    memoryBarrierShared();
+    barrier();
+    maxArg = reductionBuffer[0];
+
+    float sumArg = 0.0f;
+    for (uint i = 0; i < modRowCount; i += WORKGROUP_SIZE)
+    {
+        float inputValue = tmpInputBuffer[i + gl_LocalInvocationID.x] - maxArg;
+        float outputValue = exp(inputValue);
+        sumArg += outputValue;
+        tmpInputBuffer[i + gl_LocalInvocationID.x] = outputValue;
+    }
+    if (gl_LocalInvocationID.x < reminderRowCount)
+    {
+        float inputValue = tmpInputBuffer[modRowCount + gl_LocalInvocationID.x] - maxArg;
+        float outputValue = exp(inputValue);
+        sumArg += outputValue;
+        tmpInputBuffer[modRowCount + gl_LocalInvocationID.x] = outputValue;
+    }
+
+    for (uint j = WORKGROUP_SIZE / 2; j > 0; j = j >> 1)
+    {
+        if ((gl_LocalInvocationID.x >= j) && (gl_LocalInvocationID.x < j * 2))
+        {
+            reductionBuffer[gl_LocalInvocationID.x - j] = sumArg;
         }
         memoryBarrierShared();
         barrier();
+        if (gl_LocalInvocationID.x < j)
+        {
+            float inputValue = reductionBuffer[gl_LocalInvocationID.x];
+            sumArg += inputValue;
+        }
     }
-
-    float scale = 1.0 / reductionBuffer[0];
-    for (uint index = gl_LocalInvocationID.x; index < m_inputSize; index += gl_WorkGroupSize.x)
+    if (gl_LocalInvocationID.x == 0)
     {
-        m_inputOutputData[batchOffset + m_outputStart + index] = tmpBuffer[index] * scale;
+        reductionBuffer[0] = 1.0f / sumArg;
+    }
+    memoryBarrierShared();
+    barrier();
+    
+    float invDen = reductionBuffer[0];
+    for (uint i = 0; i < modRowCount; i += WORKGROUP_SIZE)
+    {
+        float inputValue = tmpInputBuffer[i + gl_LocalInvocationID.x];
+        float outputValue = invDen * inputValue;
+        m_inputOutputData[outputOffset + i + gl_LocalInvocationID.x] = outputValue;
+    }
+    if (gl_LocalInvocationID.x < reminderRowCount)
+    {
+        float inputValue = tmpInputBuffer[modRowCount + gl_LocalInvocationID.x];
+        float outputValue = invDen * inputValue;
+        m_inputOutputData[outputOffset + modRowCount + gl_LocalInvocationID.x] = outputValue;
     }
 }

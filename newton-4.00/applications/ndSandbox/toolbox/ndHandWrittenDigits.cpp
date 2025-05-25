@@ -619,7 +619,7 @@ static void MnistTrainingSet()
 				trainer->BackPropagate(miniBatchInput, loss);
 				m_context->EndQueue();
 
-#if 1
+#if 0
 				ndBrainVector internalBuffers;
 				ndBrainVector internalParameters;
 				trainer->GetOutput(miniBatchOutput);
@@ -729,7 +729,8 @@ static void MnistTrainingSet()
 		#endif
 
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
-		//layers.PushBack(new ndBrainLayerActivationCategoricalSoftmax(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerActivationCategoricalSoftmax(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 		for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 		{

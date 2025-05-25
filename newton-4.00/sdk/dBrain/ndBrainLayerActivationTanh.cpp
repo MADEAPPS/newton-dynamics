@@ -90,3 +90,18 @@ void ndBrainLayerActivationTanh::InputDerivative(const ndBrainVector&, const ndB
 	inputDerivative.Mul(outputDerivative);
 	inputDerivative.FlushToZero();
 }
+
+bool ndBrainLayerActivationTanh::HasGpuSupport() const
+{
+	return true;
+}
+
+ndBrainLayer::ndLayerUniformData ndBrainLayerActivationTanh::GetLayerGpuUniformData(const ndBrainGpuContext* const context) const
+{
+	ndLayerUniformData data;
+	data.m_shader = context->m_ndBrainLayerTanhActivation;
+	data.m_inputSize = GetInputSize();
+	data.m_outputSize = GetOutputSize();
+
+	return data;
+}

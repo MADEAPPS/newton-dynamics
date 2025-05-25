@@ -44,13 +44,14 @@ void main()
     
     for (uint i = 0; i < modRowCount; i += WORKGROUP_SIZE)
     {
-        float value = m_inputOutputData[inputOffset + i + gl_LocalInvocationID.x];
-        m_inputOutputData[outputOffset + i + gl_LocalInvocationID.x] = ((value >= 0.0) ? value : 0.0f);
+        float inputValue = m_inputOutputData[inputOffset + i + gl_LocalInvocationID.x];
+        float outputValue = (inputValue >= 0.0) ? inputValue : 0.0f;
+        m_inputOutputData[outputOffset + i + gl_LocalInvocationID.x] = outputValue;
     }
     if (gl_LocalInvocationID.x < reminderRowCount)
     {
-        float value = m_inputOutputData[inputOffset + modRowCount + gl_LocalInvocationID.x];
-        m_inputOutputData[outputOffset + modRowCount + gl_LocalInvocationID.x] = ((value >= 0.0) ? value : 0.0f);
+        float inputValue = m_inputOutputData[inputOffset + modRowCount + gl_LocalInvocationID.x];
+        float outputValue = (inputValue >= 0.0) ? inputValue : 0.0f;
+        m_inputOutputData[outputOffset + modRowCount + gl_LocalInvocationID.x] = outputValue;
     }
-    //m_inputOutputData[gl_LocalInvocationID.x] = gl_LocalInvocationID.x;
 }

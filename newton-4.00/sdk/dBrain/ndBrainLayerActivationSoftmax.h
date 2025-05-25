@@ -36,6 +36,9 @@ class ndBrainLayerActivationSoftmax : public ndBrainLayerActivation
 	const char* GetLabelId() const;
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
+
+	virtual bool HasGpuSupport() const override;
+	virtual ndLayerUniformData GetLayerGpuUniformData(const ndBrainGpuContext* const context) const override;
 };
 
 #endif 

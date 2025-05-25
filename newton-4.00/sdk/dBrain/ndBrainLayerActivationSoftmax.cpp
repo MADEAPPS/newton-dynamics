@@ -115,3 +115,17 @@ void ndBrainLayerActivationSoftmax::InputDerivative(const ndBrainVector&, const 
 	inputDerivative.FlushToZero();
 }
 
+bool ndBrainLayerActivationSoftmax::HasGpuSupport() const
+{
+	return true;
+}
+
+ndBrainLayer::ndLayerUniformData ndBrainLayerActivationSoftmax::GetLayerGpuUniformData(const ndBrainGpuContext* const context) const
+{
+	ndLayerUniformData data;
+	data.m_shader = context->m_ndBrainLayerSoftmaxActivation;
+	data.m_inputSize = GetInputSize();
+	data.m_outputSize = GetOutputSize();
+
+	return data;
+}
