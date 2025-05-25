@@ -33,6 +33,7 @@
 #include "ndBrainGpuFloatBuffer.h"
 #include "ndBrainGpuUniformBuffer.h"
 
+#if 0
 class ndBrainTrainerGpu::ndUniformBufferObject
 {
 	public:
@@ -286,3 +287,4 @@ void ndBrainTrainerGpu::BackPropagate(const ndBrainVector& input, ndBrainLoss& l
 	//ndSharedPtr<ndBrainGpuCommand>& command = m_commandBuffers.GetLast()->GetInfo();
 	//m_context->AddCommandQueue(command);
 }
+#endif

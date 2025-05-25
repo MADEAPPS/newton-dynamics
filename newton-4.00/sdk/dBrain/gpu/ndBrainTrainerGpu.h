@@ -30,6 +30,7 @@ class ndBrain;
 class ndBrainLoss;
 class ndBrainLayer;
 
+#if 0
 class ndBrainTrainerGpu: public ndBrainTrainer
 {
 	public: 
@@ -64,6 +65,7 @@ class ndBrainTrainerGpu: public ndBrainTrainer
 	ndList<ndSharedPtr<ndBrainGpuCommand>> m_commandBuffers;
 	ndInt32 m_miniBatchSize;
 };
+#endif
 
 #endif 
 
