@@ -41,8 +41,6 @@ class ndBrainLayerActivationLinear : public ndBrainLayerActivation
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
 
-	ndBrainGpuCommand* AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params);
-
 	ndBrainVector m_slopes;
 	ndBrainVector m_biases;
 };

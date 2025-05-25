@@ -142,22 +142,6 @@ ndInt32 ndBrainLayerConvolutional_2d::GetNumberOfParameters() const
 	return ndInt32(m_bias.GetCount()) + m_kernelSize * m_kernelSize * m_inputLayers * m_outputLayers;
 }
 
-void ndBrainLayerConvolutional_2d::GetNumberOfGPUParameters(ndBrainVector& parameters, ndArray<ndInt32>& offsets) const
-{
-	ndInt32 size = (GetNumberOfParameters() + ND_GPU_BUFFER_ALIGNMENT - 1) & -ND_GPU_BUFFER_ALIGNMENT;
-	ndInt32 paramStart = ndInt32(parameters.GetCount());
-	parameters.SetCount(paramStart + size);
-	offsets.PushBack(size);
-
-	ndBrainMemVector memData(&parameters[paramStart], size);
-	memData.Set(ndBrainFloat(-999999999.0f));
-
-	ndBrainMemVector kernelsDst(&memData[0], m_kernels.GetCount());
-	ndBrainMemVector biasDst(&memData[m_kernels.GetCount()], m_bias.GetCount());
-	kernelsDst.Set(m_kernels);
-	biasDst.Set(m_bias);
-}
-
 bool ndBrainLayerConvolutional_2d::HasParameters() const
 {
 	return true;
@@ -666,74 +650,4 @@ void ndBrainLayerConvolutional_2d::MakePrediction(const ndBrainVector&, ndBrainV
 	//	}
 	//	outputOffset += outputSize;
 	//}
-}
-
-ndBrainGpuCommand* ndBrainLayerConvolutional_2d::AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params)
-{
-	class ndBrainLayerCommand : public ndBrainGpuCommand
-	{
-		struct UniformBufferObject
-		{
-			ndInt32 m_matrixRows;
-			ndInt32 m_matrixColumns;
-			ndInt32 m_matrixRowsStride;
-			ndInt32 m_matrixColumnsStride;
-			ndInt32 m_workGroupsPerMatrix;
-
-			ndInt32 m_paramStart;
-			ndInt32 m_inputStart;
-			ndInt32 m_outputStart;
-			ndInt32 m_workBufferSize;
-		};
-
-		public:
-		//ndBrainLayerCommand(
-		//	const ndBrainLayerConvolutional_2d* const layer, ndBrainGpuContext* const context,
-		//	ndInt32 layerIndex, ndInt32 batchCount,
-		//	const ndBufferOffsetPair& parameterBuffer, const ndBufferOffsetPair& workingBuffer)
-		//	:ndBrainGpuCommand(context)
-		ndBrainLayerCommand(
-			const ndBrainLayerConvolutional_2d* const, ndBrainGpuContext* const context,
-			ndInt32, ndInt32,
-			const ndBufferOffsetPair&, const ndBufferOffsetPair&)
-			:ndBrainGpuCommand(context)
-			,m_parammeters(m_context, sizeof(UniformBufferObject))
-		{
-			ndAssert(0);
-			//UniformBufferObject uniformParam;
-			//memset(&uniformParam, -1, sizeof(uniformParam));
-			//
-			//ndInt32 rounding = ND_GPU_BUFFER_ALIGNMENT / sizeof(ndBrainFloat);
-			//ndInt32 rowsStride = (layer->GetOutputSize() + rounding - 1) & -rounding;
-			//ndInt32 columnsStride = (layer->GetInputSize() + rounding - 1) & -rounding;
-			//
-			//uniformParam.m_matrixRows = layer->GetOutputSize();
-			//uniformParam.m_matrixColumns = layer->GetInputSize();
-			//uniformParam.m_matrixRowsStride = rowsStride;
-			//uniformParam.m_matrixColumnsStride = columnsStride;
-			//uniformParam.m_workGroupsPerMatrix = ((uniformParam.m_matrixRows + ND_MATRIX_TILE_SIZE - 1) & -ND_MATRIX_TILE_SIZE) / ND_MATRIX_TILE_SIZE;
-			//
-			//uniformParam.m_inputStart = workingBuffer.m_offsets[layerIndex + 0];
-			//uniformParam.m_outputStart = workingBuffer.m_offsets[layerIndex + 1];
-			//uniformParam.m_workBufferSize = workingBuffer.m_offsets[workingBuffer.m_offsets.GetCount() - 1];
-			//uniformParam.m_paramStart = parameterBuffer.m_offsets[layerIndex];
-			//
-			//m_parammeters.LoadData(sizeof(uniformParam), &uniformParam);
-			//
-			//ndFixSizeArray<ndBrainGpuBuffer*, 4> params;
-			//params.PushBack(&m_parammeters);
-			//params.PushBack(workingBuffer.m_buffer);
-			//params.PushBack(parameterBuffer.m_buffer);
-			//
-			//ndInt32 numberOfWorkGroup = batchCount * uniformParam.m_workGroupsPerMatrix;
-			//Assembly(context->m_ndBrainLayerLinearTiled, numberOfWorkGroup, params.GetCount(), &params[0]);
-		}
-
-		ndBrainGpuUniformBuffer m_parammeters;
-	};
-
-	ndAssert(params.GetCount() == 2);
-	const ndBufferOffsetPair& parameterBuffer = *params[0];
-	const ndBufferOffsetPair& workingBuffer = *params[1];
-	return new ndBrainLayerCommand(this, context, layerIndex, batchCount, parameterBuffer, workingBuffer);
 }

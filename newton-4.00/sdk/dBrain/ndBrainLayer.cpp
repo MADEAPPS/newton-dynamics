@@ -67,11 +67,6 @@ ndInt32 ndBrainLayer::GetNumberOfParameters() const
 	return 0;
 }
 
-void ndBrainLayer::GetNumberOfGPUParameters(ndBrainVector&, ndArray<ndInt32>&) const
-{
-	ndAssert(0);
-}
-
 bool ndBrainLayer::HasGpuSupport() const
 {
 	return false;
@@ -204,8 +199,3 @@ void ndBrainLayer::CalculateParamGradients(const ndBrainVector&, const ndBrainVe
 	ndAssert(0);
 }
 
-ndBrainGpuCommand* ndBrainLayer::AssemblyGPUCommand(ndBrainGpuContext* const, ndInt32, ndInt32, ndFixSizeArray<ndBufferOffsetPair*, 8>&)
-{
-	ndAssert(0);
-	return nullptr;
-}

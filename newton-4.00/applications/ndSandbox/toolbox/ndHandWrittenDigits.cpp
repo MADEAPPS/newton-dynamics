@@ -714,7 +714,7 @@ static void MnistTrainingSet()
 
 		#else
 			layers.PushBack(new LINEAR_LAYER(trainingDigits->GetColumns(), LINEAR_LAYERS_NEURONS));
-			//layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+			layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 			
 			//layers.PushBack(new LINEAR_LAYER(layers[layers.GetCount() - 1]->GetOutputSize(), LINEAR_LAYERS_NEURONS));
 			//layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));

@@ -115,7 +115,3 @@ void ndBrainLayerActivationSoftmax::InputDerivative(const ndBrainVector&, const 
 	inputDerivative.FlushToZero();
 }
 
-ndBrainGpuCommand* ndBrainLayerActivationSoftmax::AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params)
-{
-	return AssemblyGPUCommandCommon(context, layerIndex, batchCount, params, context->m_ndBrainLayerSoftmaxActivation);
-}

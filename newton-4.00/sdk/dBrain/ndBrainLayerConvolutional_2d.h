@@ -71,9 +71,6 @@ class ndBrainLayerConvolutional_2d : public ndBrainLayer
 	virtual void ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale);
 
 	protected:
-	virtual void GetNumberOfGPUParameters(ndBrainVector& parameters, ndArray<ndInt32>& offsets) const;
-	ndBrainGpuCommand* AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params);
-
 	ndBrainVector m_bias;
 	ndBrainVector m_kernels;
 	ndFixSizeArray<ndInt32, 128> m_inputOffsets;

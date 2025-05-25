@@ -81,8 +81,3 @@ void ndBrainLayerActivationElu::InputDerivative(const ndBrainVector&, const ndBr
 	inputDerivative.Mul(outputDerivative);
 	inputDerivative.FlushToZero();
 }
-
-ndBrainGpuCommand* ndBrainLayerActivationElu::AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params)
-{
-	return AssemblyGPUCommandCommon(context, layerIndex, batchCount, params, context->m_ndBrainLayerEluActivation);
-}

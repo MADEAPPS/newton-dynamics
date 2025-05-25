@@ -135,7 +135,3 @@ void ndBrainLayerActivationLinear::InputDerivative(const ndBrainVector&, const n
 	inputDerivative.Mul(outputDerivative);
 }
 
-ndBrainGpuCommand* ndBrainLayerActivationLinear::AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params)
-{
-	return AssemblyGPUCommandCommon(context, layerIndex, batchCount, params, context->m_ndBrainLayerReluActivation);
-}

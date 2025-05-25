@@ -105,8 +105,3 @@ void ndBrainLayerActivationLeakyRelu::InputDerivative(const ndBrainVector& input
 
 	inputDerivative.Mul(outputDerivative);
 }
-
-ndBrainGpuCommand* ndBrainLayerActivationLeakyRelu::AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params)
-{
-	return AssemblyGPUCommandCommon(context, layerIndex, batchCount, params, context->m_ndBrainLayerReluActivation);
-}

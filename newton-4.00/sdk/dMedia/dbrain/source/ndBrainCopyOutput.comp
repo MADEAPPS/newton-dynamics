@@ -51,5 +51,6 @@ void main()
     {
         float a = m_inputOutputData[srcBase + modWorkGroupSize + gl_LocalInvocationID.x];
         m_ouputBuffer[dstBase + modWorkGroupSize + gl_LocalInvocationID.x] = a;
+        //m_ouputBuffer[dstBase + modWorkGroupSize + gl_LocalInvocationID.x] = gl_LocalInvocationID.x;
     }
 }

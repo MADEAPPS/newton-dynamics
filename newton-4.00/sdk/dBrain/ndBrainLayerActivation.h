@@ -62,9 +62,6 @@ class ndBrainLayerActivation : public ndBrainLayer
 	void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
 
 	virtual void Save(const ndBrainSave* const loadSave) const;
-	virtual void GetNumberOfGPUParameters(ndBrainVector& parameters, ndArray<ndInt32>& offsets) const;
-
-	ndBrainGpuCommand* AssemblyGPUCommandCommon(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params, void* shader);
 
 	ndInt32 m_neurons;
 };

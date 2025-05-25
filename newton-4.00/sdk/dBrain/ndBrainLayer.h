@@ -105,10 +105,6 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void Save(const ndBrainSave* const loadSave) const;
 	virtual void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
 
-	// to be removed !!!
-	virtual void GetNumberOfGPUParameters(ndBrainVector& parameters, ndArray<ndInt32>& offsets) const;
-	virtual ndBrainGpuCommand* AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params);
-
 	virtual bool HasGpuSupport() const;
 	virtual void CopyGpuWeights(ndBrainVector& oput) const;
 	virtual ndLayerUniformData GetLayerGpuUniformData(const ndBrainGpuContext* const context) const;

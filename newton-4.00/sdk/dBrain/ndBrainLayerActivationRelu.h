@@ -39,9 +39,6 @@ class ndBrainLayerActivationRelu : public ndBrainLayerActivation
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
 
-	// to be removed 
-	ndBrainGpuCommand* AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params);
-
 	virtual bool HasGpuSupport() const override;
 	virtual ndLayerUniformData GetLayerGpuUniformData(const ndBrainGpuContext* const context) const override;
 };

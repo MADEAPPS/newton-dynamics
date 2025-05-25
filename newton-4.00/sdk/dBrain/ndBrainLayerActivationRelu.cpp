@@ -101,12 +101,6 @@ void ndBrainLayerActivationRelu::InputDerivative(const ndBrainVector& input, con
 	inputDerivative.Mul(outputDerivative);
 }
 
-ndBrainGpuCommand* ndBrainLayerActivationRelu::AssemblyGPUCommand(ndBrainGpuContext* const context, ndInt32 layerIndex, ndInt32 batchCount, ndFixSizeArray<ndBufferOffsetPair*, 8>& params)
-{
-	return AssemblyGPUCommandCommon(context, layerIndex, batchCount, params, context->m_ndBrainLayerReluActivation);
-}
-
-
 bool ndBrainLayerActivationRelu::HasGpuSupport() const
 {
 	return true;
