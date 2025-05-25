@@ -23,16 +23,15 @@ layout(std140, binding = 0) uniform param
     uint m_inputOutputStartOffset;
 };
 
-layout(std430, binding = 1) buffer inputOutputBuffer
+layout(std430, binding = 1) buffer dataBuffer1
 {
     float m_inputOutputData[];
 };
 
-layout(std430, binding = 2) readonly buffer newralNetParameters
+layout(std430, binding = 2) buffer dataBuffer2
 {
     float m_weightsAndBias[];
 };
-
 
 void main() 
 {
@@ -46,11 +45,11 @@ void main()
     for (uint i = 0; i < modRowCount; i += WORKGROUP_SIZE)
     {
         float value = m_inputOutputData[inputOffset + i + gl_WorkGroupID.x];
-        m_inputOutputData[outputOffset + i + gl_WorkGroupID.x] = (value >= 0.0) ? value : 0.0;
+        m_inputOutputData[outputOffset + i + gl_WorkGroupID.x] = ((value >= 0.0) ? value : 0.0f);
     }
     if (gl_LocalInvocationID.x < reminderRowCount)
     {
         float value = m_inputOutputData[inputOffset + reminderRowCount + gl_WorkGroupID.x];
-        m_inputOutputData[outputOffset + reminderRowCount + gl_WorkGroupID.x] = (value >= 0.0) ? value : 0.0;
+        m_inputOutputData[outputOffset + reminderRowCount + gl_WorkGroupID.x] = ((value >= 0.0) ? value : 0.0f);
     }
 }

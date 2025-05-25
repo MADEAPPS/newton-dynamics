@@ -48,7 +48,7 @@ class ndBrainTrainerGpu: public ndBrainTrainer
 	void InitInputOutputBuffer();
 	void InitWeightAndBiasBuffer();
 	void AddCopyInputCommand(const ndBrainLayer::ndLayerUniformData& uniformData);
-	void AddLayersCommands(const ndFixSizeArray<ndBrainLayer::ndLayerUniformData, 256>& layersUniformsData);
+	void AddLayersCommands(ndFixSizeArray<ndBrainLayer::ndLayerUniformData, 256>& layersUniformsData);
 
 	ndSharedPtr<ndBrainGpuContext> m_context;
 	ndList<ndSharedPtr<ndBrainGpuBuffer>> m_uniforms;

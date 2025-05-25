@@ -228,8 +228,8 @@ static void MnistTrainingSet()
 	//#define USE_CONVOLUTIONAL_LAYERS
 
 	//#define MINI_BATCH_BUFFER_SIZE			64
-	//#define MINI_BATCH_BUFFER_SIZE				256
-	#define MINI_BATCH_BUFFER_SIZE				2
+	//#define MINI_BATCH_BUFFER_SIZE			256
+	#define MINI_BATCH_BUFFER_SIZE				1
 
 	#define CONVOLUTIONAL_FEATURE_MAPS		32
 	#define MIN_TRAIN_SCORE					0.9999f
@@ -630,6 +630,7 @@ static void MnistTrainingSet()
 					const ndBrainMemVector in(&miniBatchInput[i * inputSize], inputSize);
 					trainer->GetBrain()->MakePrediction(in, xxx1);
 					const ndBrainMemVector xxx0(&miniBatchOutput[i * outputSize], outputSize);
+					inputSize *= 1;
 				}
 #endif
 			};
@@ -714,7 +715,7 @@ static void MnistTrainingSet()
 		#else
 			layers.PushBack(new LINEAR_LAYER(trainingDigits->GetColumns(), LINEAR_LAYERS_NEURONS));
 			//layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
-			//
+			
 			//layers.PushBack(new LINEAR_LAYER(layers[layers.GetCount() - 1]->GetOutputSize(), LINEAR_LAYERS_NEURONS));
 			//layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 			//
