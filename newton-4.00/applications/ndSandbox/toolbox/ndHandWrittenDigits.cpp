@@ -614,32 +614,24 @@ static void MnistTrainingSet()
 			auto BackPropagateBatchGpu = [this, trainer, &miniBatchInput, &miniBatchOutput, trainingDigits]()
 			{
 				ndBrainLossLeastSquaredError loss(1);
-
-				//miniBatchInput.Set(0.0f);
-				for (ndInt32 i = 0; i < 256; ++i)
-				{
-					//miniBatchInput[i] = 1.0f;
-				}
-				//miniBatchInput[256] = 1.0f;
 				
 				m_context->BeginQueue();
 				trainer->BackPropagate(miniBatchInput, loss);
 				m_context->EndQueue();
 
+#if 1
 				trainer->GetOutput(miniBatchOutput);
-
 				ndInt32 inputSize = trainer->GetBrain()->GetInputSize();
 				ndInt32 outputSize = trainer->GetBrain()->GetOutputSize();
-				ndBrainMemVector xxx1;
+				ndBrainFixSizeVector<1024> xxx1;
 				xxx1.SetCount(outputSize);
 				for (ndInt32 i = 0; i < m_miniBatchSize; i++)
 				{
 					const ndBrainMemVector in(&miniBatchInput[i * inputSize], inputSize);
 					trainer->GetBrain()->MakePrediction(in, xxx1);
 					const ndBrainMemVector xxx0(&miniBatchOutput[i * outputSize], outputSize);
-
-					trainer->GetBrain()->MakePrediction(in, xxx1);
 				}
+#endif
 			};
 
 			//ndInt32 scoreMode = 0;
