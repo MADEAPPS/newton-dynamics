@@ -30,3 +30,13 @@ ndBrainLoss::ndBrainLoss()
 ndBrainLoss::~ndBrainLoss() 
 {
 }
+
+bool ndBrainLoss::IsCategorical() const
+{
+	return false;
+}
+
+bool ndBrainLoss::HasGpuSupport() const
+{
+	return false;
+}

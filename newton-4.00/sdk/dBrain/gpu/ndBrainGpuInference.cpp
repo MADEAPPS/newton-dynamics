@@ -26,10 +26,10 @@
 #include "ndBrainVector.h"
 #include "ndBrainMatrix.h"
 #include "ndBrainGpuBuffer.h"
-#include "ndBrainGpuInference.h"
 #include "ndBrainGpuContext.h"
 #include "ndBrainGpuCommand.h"
 #include "ndBrainLayerLinear.h"
+#include "ndBrainGpuInference.h"
 #include "ndBrainGpuFloatBuffer.h"
 #include "ndBrainGpuUniformBuffer.h"
 
@@ -74,6 +74,7 @@ ndBrainGpuInference::ndBrainGpuInference(const ndSharedPtr<ndBrain>& brain, cons
 	,m_commandBuffers()
 	,m_miniBatchSize(minibatchSize)
 {
+	ndAssert(brain->IsGpuReady());
 	InitInputOutputBuffer();
 	InitWeightAndBiasBuffer();
 }

@@ -48,7 +48,7 @@ class ndBrainGpuInference: public ndBrainTrainer
 	virtual void MakePrediction(const ndBrainVector& input) override;
 	virtual void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss) override;
 
-	private:
+	protected:
 	void AddCopyOutputCommand();
 	void InitInputOutputBuffer();
 	void InitWeightAndBiasBuffer();

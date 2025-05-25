@@ -42,6 +42,8 @@ class ndBrainTrainerCpu: public ndBrainTrainer
 	virtual void MakePrediction(const ndBrainVector& input) override;
 	virtual void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss) override;
 
+	virtual void BackPropagate(const ndBrainVector& input, const ndBrainVector& groundTruth) override;
+
 	void AcculumateGradients(const ndBrainTrainerCpu& src, ndInt32 index);
 	void CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradientsOut, ndBrainLoss& loss);
 	ndBrainLayer* GetWeightsLayer(ndInt32 index) const;

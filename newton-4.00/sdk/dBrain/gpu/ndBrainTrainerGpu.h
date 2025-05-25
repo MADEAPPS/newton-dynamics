@@ -25,47 +25,19 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainVector.h"
 #include "ndBrainTrainer.h"
+#include "ndBrainGpuInference.h"
 
-class ndBrain;
-class ndBrainLoss;
-class ndBrainLayer;
 
-#if 0
-class ndBrainTrainerGpu: public ndBrainTrainer
+class ndBrainTrainerGpu: public ndBrainGpuInference
 {
 	public: 
-	class ndGpuCommand;
-	class ndUniformBufferObject;
-
-	ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainGpuContext>& context, ndInt32 minibatchSize);
+	ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainGpuContext>& context, ndInt32 minibatchSize, const ndBrainLoss& loss);
 	ndBrainTrainerGpu(const ndBrainTrainerGpu& src);
 	virtual ~ndBrainTrainerGpu();
 
-	virtual void GetInput(ndBrainVector& ouput) const;
-	virtual void GetOutput(ndBrainVector& ouput) const;
-	virtual void GetWorkingBuffer(ndBrainVector& ouput) const;
-	virtual void GetParameterBuffer(ndBrainVector& ouput) const;
-
 	virtual void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss) override;
-
-	private:
-	void AddCopyOutputCommand();
-	void InitInputOutputBuffer();
-	void InitWeightAndBiasBuffer();
-	void AddCopyInputCommand(const ndBrainLayer::ndLayerUniformData& uniformData);
-	void UnloadBuffer(ndBrainVector& ouput, const ndSharedPtr<ndBrainGpuBuffer>& gpuBuffer) const;
-	void AddLayersCommands(ndFixSizeArray<ndBrainLayer::ndLayerUniformData, 256>& layersUniformsData);
-
-	ndSharedPtr<ndBrainGpuContext> m_context;
-	ndList<ndSharedPtr<ndBrainGpuBuffer>> m_uniforms;
-	ndSharedPtr<ndBrainGpuBuffer> m_inputOutputBuffer;
-	ndSharedPtr<ndBrainGpuBuffer> m_weightAndBiasBuffer;
-	ndSharedPtr<ndBrainGpuBuffer> m_miniBatchInputBuffer;
-	ndSharedPtr<ndBrainGpuBuffer> m_miniBatchOutputBuffer;
-	ndList<ndSharedPtr<ndBrainGpuCommand>> m_commandBuffers;
-	ndInt32 m_miniBatchSize;
+	virtual void BackPropagate(const ndBrainVector& input, const ndBrainVector& groundTruth) override;
 };
-#endif
 
 #endif 
 

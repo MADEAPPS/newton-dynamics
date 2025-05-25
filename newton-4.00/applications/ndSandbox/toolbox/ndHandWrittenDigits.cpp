@@ -150,7 +150,7 @@ static void ValidateDataGpu(const char* const title, ndBrain& brain, ndBrainMatr
 	//const ndInt32 batchSize = ndInt32(testDigits->GetCount());
 	//
 	//ndBrainGpuContext gpuContext;
-	//ndBrainGpuInference inference(&gpuContext, &brain, *testDigits, batchSize);
+	//ndBrainTrainerGpu inference(&gpuContext, &brain, *testDigits, batchSize);
 	//
 	//ndUnsigned64 gpuTime = ndGetTimeInMicroseconds();
 	//gpuContext.SubmitQueue(inference.GetDisplayList());
@@ -288,10 +288,11 @@ static void MnistTrainingSet()
 			//threadCount = 1;
 			SetThreadCount(threadCount);
 
-			if (m_hasGpuSupport)
+			ndBrainLossLeastSquaredError loss(m_brain->GetOutputSize());
+			if (m_hasGpuSupport && loss.HasGpuSupport())
 			{
 				m_context = ndSharedPtr<ndBrainGpuContext>(new ndBrainGpuContext);
-				ndBrainGpuInference* const trainer = new ndBrainGpuInference(m_brain, m_context, m_miniBatchSize);
+				ndBrainTrainerGpu* const trainer = new ndBrainTrainerGpu(m_brain, m_context, m_miniBatchSize, loss);
 				m_trainers.Append(ndSharedPtr<ndBrainTrainer>(trainer));
 			}
 			else
@@ -606,17 +607,21 @@ static void MnistTrainingSet()
 #endif
 
 			ndInt32 inputSize = trainingDigits->GetColumns();
-			ndBrainGpuInference* const trainer = (ndBrainGpuInference*)*m_trainers.GetFirst()->GetInfo();
+			ndBrainTrainerGpu* const trainer = (ndBrainTrainerGpu*)*m_trainers.GetFirst()->GetInfo();
 
 			ndBrainVector miniBatchInput;
 			ndBrainVector miniBatchOutput;
 			miniBatchInput.SetCount(inputSize * m_miniBatchSize);
+
+			
 			auto BackPropagateBatchGpu = [this, trainer, &miniBatchInput, &miniBatchOutput, trainingDigits]()
 			{
-				ndBrainLossLeastSquaredError loss(1);
+				//ndBrainLossLeastSquaredError loss(1);
+				ndBrainVector groundTruth;
 				
 				m_context->BeginQueue();
-				trainer->BackPropagate(miniBatchInput, loss);
+				trainer->BackPropagate(miniBatchInput, groundTruth);
+				//trainer->MakePrediction(miniBatchInput);
 				m_context->EndQueue();
 
 #if 0

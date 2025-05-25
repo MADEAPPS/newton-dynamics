@@ -37,7 +37,11 @@ class ndBrainTrainer: public ndClassAlloc
 
 	ndSharedPtr<ndBrain>& GetBrain();
 	virtual void MakePrediction(const ndBrainVector& input) = 0;
+	// legacy method;
 	virtual void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss) = 0;
+
+	// new method
+	virtual void BackPropagate(const ndBrainVector& input, const ndBrainVector& groundTruth) = 0;
 
 	//void AcculumateGradients(const ndBrainTrainer& src, ndInt32 index);
 	//void CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradientsOut, ndBrainLoss& loss);

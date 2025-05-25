@@ -28,6 +28,11 @@ ndBrainLossLeastSquaredError::ndBrainLossLeastSquaredError(ndInt32 size)
 	m_truth.SetCount(size);
 }
 
+bool ndBrainLossLeastSquaredError::HasGpuSupport() const
+{
+	return true;
+}
+
 void ndBrainLossLeastSquaredError::SetTruth(const ndBrainVector& truth)
 {
 	ndAssert(m_truth.GetCount() == truth.GetCount());
