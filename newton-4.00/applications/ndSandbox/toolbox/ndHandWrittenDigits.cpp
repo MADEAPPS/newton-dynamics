@@ -291,7 +291,7 @@ static void MnistTrainingSet()
 			if (m_hasGpuSupport)
 			{
 				m_context = ndSharedPtr<ndBrainGpuContext>(new ndBrainGpuContext);
-				ndBrainTrainerGpu* const trainer = new ndBrainTrainerGpu(m_brain, m_context, m_miniBatchSize);
+				ndBrainGpuInference* const trainer = new ndBrainGpuInference(m_brain, m_context, m_miniBatchSize);
 				m_trainers.Append(ndSharedPtr<ndBrainTrainer>(trainer));
 			}
 			else
@@ -606,7 +606,7 @@ static void MnistTrainingSet()
 #endif
 
 			ndInt32 inputSize = trainingDigits->GetColumns();
-			ndBrainTrainerGpu* const trainer = (ndBrainTrainerGpu*)*m_trainers.GetFirst()->GetInfo();
+			ndBrainGpuInference* const trainer = (ndBrainGpuInference*)*m_trainers.GetFirst()->GetInfo();
 
 			ndBrainVector miniBatchInput;
 			ndBrainVector miniBatchOutput;

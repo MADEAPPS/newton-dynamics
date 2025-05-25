@@ -36,7 +36,7 @@ void ndBrainGpuUniformBuffer::UnloadData(size_t sizeInBytes, void* const outputD
 	{
 		ndAssert(sizeInBytes <= m_sizeInBytes);
 		ndUnsigned8* const dst = (ndUnsigned8*)outputData;
-		ndMemCpy(dst, src, sizeInBytes);
+		ndMemCpy(dst, src, ndInt64(sizeInBytes));
 	}
 }
 
@@ -49,7 +49,7 @@ void ndBrainGpuUniformBuffer::LoadData(size_t sizeInBytes, const void* const inp
 	{
 		ndAssert(sizeInBytes <= m_sizeInBytes);
 		ndUnsigned8* const src = (ndUnsigned8*)inputData;
-		ndMemCpy(dst, src, sizeInBytes);
+		ndMemCpy(dst, src, ndInt64(sizeInBytes));
 	}
 }
 

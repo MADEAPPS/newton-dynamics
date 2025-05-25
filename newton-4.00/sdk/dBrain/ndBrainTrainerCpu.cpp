@@ -239,6 +239,11 @@ void ndBrainTrainerCpu::CalculateInputGradient(const ndBrainVector& input, ndBra
 	inputGradientsOut.Set(gradientOut);
 }
 
+void ndBrainTrainerCpu::MakePrediction(const ndBrainVector&)
+{
+	ndAssert(0);
+}
+
 //#pragma optimize( "", off )
 void ndBrainTrainerCpu::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss)
 {

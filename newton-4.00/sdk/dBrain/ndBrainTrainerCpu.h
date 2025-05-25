@@ -39,6 +39,7 @@ class ndBrainTrainerCpu: public ndBrainTrainer
 	ndBrainTrainerCpu(const ndBrainTrainerCpu& src);
 	virtual ~ndBrainTrainerCpu();
 
+	virtual void MakePrediction(const ndBrainVector& input) override;
 	virtual void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss) override;
 
 	void AcculumateGradients(const ndBrainTrainerCpu& src, ndInt32 index);

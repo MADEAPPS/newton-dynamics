@@ -36,6 +36,7 @@ class ndBrainTrainer: public ndClassAlloc
 	virtual ~ndBrainTrainer();
 
 	ndSharedPtr<ndBrain>& GetBrain();
+	virtual void MakePrediction(const ndBrainVector& input) = 0;
 	virtual void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss) = 0;
 
 	//void AcculumateGradients(const ndBrainTrainer& src, ndInt32 index);

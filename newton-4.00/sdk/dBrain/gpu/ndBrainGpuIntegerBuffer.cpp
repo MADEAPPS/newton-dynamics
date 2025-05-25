@@ -35,10 +35,10 @@ void ndBrainGpuIntegerBuffer::LoadData(const ndArray<ndInt32>& input)
 		ndInt32* const dst = (ndInt32*)mapBuffer.GetPointer();
 		if (dst)
 		{
-			const ndInt64 size = m_sizeInBytes / ndInt32(sizeof(ndInt32));
-			ndAssert(size == input.GetCount());
+			size_t size = m_sizeInBytes / sizeof(ndInt32);
+			ndAssert(size == size_t(input.GetCount()));
 
-			for (ndInt64 i = 0; i < size; ++i)
+			for (ndInt64 i = 0; i < ndInt64(size); ++i)
 			{
 				dst[i] = input[i];
 			}
@@ -57,9 +57,9 @@ void ndBrainGpuIntegerBuffer::UnloadData(ndArray<ndInt32>& output)
 		const ndInt32* const src = (ndInt32*)mapBuffer.GetPointer();
 		if (src)
 		{
-			const ndInt64 size = m_sizeInBytes / ndInt32(sizeof(ndInt32));
-			output.SetCount(size);
-			for (ndInt64 i = 0; i < size; ++i)
+			size_t size = m_sizeInBytes / sizeof(ndInt32);
+			output.SetCount(ndInt64(size));
+			for (ndInt64 i = 0; i < ndInt64(size); ++i)
 			{
 				output[i] = src[i];
 			}
