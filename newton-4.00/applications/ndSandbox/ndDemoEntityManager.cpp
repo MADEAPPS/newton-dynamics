@@ -406,7 +406,7 @@ void TestVulkanStuff()
 	
 	ndBrainVector outputGpu;
 	outputGpu.SetCount(workBuffer.GetCount());
-	inputOutputBuffer.UnloadData(ndInt32 (workBuffer.GetCount() * sizeof (ndReal)), &outputGpu[0]);
+	inputOutputBuffer.UnloadData(workBuffer.GetCount() * sizeof (ndReal), &outputGpu[0]);
 	
 	for (ndInt32 i = 0; i < inputsCount; ++i)
 	{

@@ -100,7 +100,7 @@ VkBuffer ndBrainGpuBuffer::GetBuffer() const
 	return m_buffer;
 }
 
-ndInt64 ndBrainGpuBuffer::SizeInBytes() const
+size_t ndBrainGpuBuffer::SizeInBytes() const
 {
 	return m_sizeInBytes;
 }

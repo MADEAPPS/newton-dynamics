@@ -189,7 +189,7 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 
 static void Cifar10TrainingSet()
 {
-	#define BATCH_BUFFER_SIZE	64
+	#define MINI_BATCH_BUFFER_SIZE	64
 
 	#if 1
 		#define CONVOLUTIONAL_LAYER	ndBrainLayerConvolutional_2d
@@ -228,7 +228,7 @@ static void Cifar10TrainingSet()
 			:ndBrainThreadPool()
 			,m_brain(*brain)
 			,m_learnRate(ndReal(5.0e-4f))
-			,m_miniBatchSize(BATCH_BUFFER_SIZE)
+			,m_miniBatchSize(MINI_BATCH_BUFFER_SIZE)
 		{
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize);
 			//threadCount = 1;
@@ -257,7 +257,7 @@ ndAssert(0);
 			ndAssert(0);
 #if 0
 			ndUnsigned32 failCount[D_MAX_THREADS_COUNT];
-			ndUnsigned32 miniBatchArray[BATCH_BUFFER_SIZE];
+			ndUnsigned32 miniBatchArray[MINI_BATCH_BUFFER_SIZE];
 
 			ndAtomic<ndInt32> iterator(0);
 			const ndBrainMatrix& trainingImages = *sourceTrainingImages;

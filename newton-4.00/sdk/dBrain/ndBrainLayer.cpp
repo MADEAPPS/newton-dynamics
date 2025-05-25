@@ -81,7 +81,7 @@ void ndBrainLayer::CopyGpuWeights(ndBrainVector&) const
 {
 }
 
-ndBrainLayer::ndLayerUniformData ndBrainLayer::GetLayerGpuUniformData(const ndBrainGpuContext* const context) const
+ndBrainLayer::ndLayerUniformData ndBrainLayer::GetLayerGpuUniformData(const ndBrainGpuContext* const) const
 {
 	ndAssert(0);
 	return ndLayerUniformData();

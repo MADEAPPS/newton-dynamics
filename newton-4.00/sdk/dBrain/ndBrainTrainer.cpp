@@ -144,11 +144,6 @@ ndBrainTrainer::~ndBrainTrainer()
 	}
 }
 
-ndBrain* ndBrainTrainer::GetBrain() const
-{
-	return m_brain;
-}
-
 ndBrainVector& ndBrainTrainer::GetWorkingBuffer()
 {
 	return m_workingBuffer;
@@ -306,4 +301,9 @@ ndBrainTrainer::ndBrainTrainer(const ndBrainTrainer& src)
 
 ndBrainTrainer::~ndBrainTrainer()
 {
+}
+
+ndSharedPtr<ndBrain>& ndBrainTrainer::GetBrain()
+{
+	return m_brain;
 }

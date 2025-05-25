@@ -35,7 +35,7 @@ class ndBrainTrainer: public ndClassAlloc
 	ndBrainTrainer(const ndBrainTrainer& src);
 	virtual ~ndBrainTrainer();
 
-	ndBrain* GetBrain() const;
+	ndSharedPtr<ndBrain>& GetBrain();
 	virtual void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss) = 0;
 
 	//void AcculumateGradients(const ndBrainTrainer& src, ndInt32 index);

@@ -42,13 +42,13 @@ class ndBrainGpuBuffer : public ndClassAlloc
 	public:
 	virtual ~ndBrainGpuBuffer() {}
 	void* GetBuffer() const { return nullptr;}
-	ndInt32 SizeInBytes() const { return 0; }
+	size_t SizeInBytes() const { return 0; }
 
-	virtual void LoadData(ndInt32 sizeInBytes, const void* const inputData) = 0;
-	virtual void UnloadData(ndInt32 sizeInBytes, void* const outputData) const = 0;
+	virtual void LoadData(size_t sizeInBytes, const void* const inputData) = 0;
+	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const = 0;
 
 	protected:
-	ndInt32 m_sizeInBytes;
+	size_t  m_sizeInBytes;
 	friend class ndScopeMapBuffer;
 };
 
@@ -59,11 +59,11 @@ class ndBrainGpuBuffer: public ndContainersFreeListAlloc<ndBrainGpuBuffer>
 	public:
 	virtual ~ndBrainGpuBuffer();
 	VkBuffer GetBuffer() const;
-	ndInt64 SizeInBytes() const;
+	size_t SizeInBytes() const;
 	ndStorageBufferType GetType() const;
 
-	virtual void LoadData(ndInt32 sizeInBytes, const void* const inputData) = 0;
-	virtual void UnloadData(ndInt32 sizeInBytes, void* const outputData) const = 0;
+	virtual void LoadData(size_t sizeInBytes, const void* const inputData) = 0;
+	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const = 0;
 
 	protected:
 	ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt64 sizeInByte, ndStorageBufferType bufferTypeFlags, ndDeviceBufferType deviceType);
@@ -72,7 +72,7 @@ class ndBrainGpuBuffer: public ndContainersFreeListAlloc<ndBrainGpuBuffer>
 	VkBuffer m_buffer;
 	VkDeviceMemory m_bufferMemory;
 	ndBrainGpuContext* m_context;
-	ndInt64 m_sizeInBytes;
+	size_t m_sizeInBytes;
 	ndStorageBufferType m_bufferType;
 	ndDeviceBufferType m_deviceBufferType;
 
