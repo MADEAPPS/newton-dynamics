@@ -215,7 +215,7 @@ void ndBrainTrainerGpu::InitWeightAndBiasBuffer()
 		ndBrainMemVector weights(&scratchBuffer[uniformData[i].m_parametersStartOffset], uniformData[i].m_parametersSize);
 		layer->CopyGpuWeights(weights);
 	}
-	scratchBuffer.SetCount(sizeAcc);
+	scratchBuffer.SetCount(sizeAcc + 1024);
 	m_weightAndBiasBuffer = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(*m_context, scratchBuffer, ndCpuMappable));
 
 	scratchBuffer.SetCount(m_miniBatchSize * brain.GetInputSize());
@@ -247,11 +247,31 @@ void ndBrainTrainerGpu::InitInputOutputBuffer()
 	m_inputOutputBuffer = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(*m_context, buffer, ndCpuMappable));
 }
 
-void ndBrainTrainerGpu::GetOutput(ndBrainVector& ouput)
+void ndBrainTrainerGpu::UnloadBuffer(ndBrainVector& ouput, const ndSharedPtr<ndBrainGpuBuffer>& gpuBuffer) const
 {
-	size_t sizeInBytes = m_miniBatchOutputBuffer->SizeInBytes();
-	ouput.SetCount(ndInt64 (sizeInBytes / sizeof(ndReal)));
-	m_miniBatchOutputBuffer->UnloadData(sizeInBytes, &ouput[0]);
+	size_t sizeInBytes = gpuBuffer->SizeInBytes();
+	ouput.SetCount(ndInt64(sizeInBytes / sizeof(ndReal)));
+	gpuBuffer->UnloadData(sizeInBytes, &ouput[0]);
+}
+
+void ndBrainTrainerGpu::GetInput(ndBrainVector& ouput) const
+{
+	UnloadBuffer(ouput, m_miniBatchInputBuffer);
+}
+
+void ndBrainTrainerGpu::GetOutput(ndBrainVector& ouput) const
+{
+	UnloadBuffer(ouput, m_miniBatchOutputBuffer);
+}
+
+void ndBrainTrainerGpu::GetWorkingBuffer(ndBrainVector& ouput) const
+{
+	UnloadBuffer(ouput, m_inputOutputBuffer);
+}
+
+void ndBrainTrainerGpu::GetParameterBuffer(ndBrainVector& ouput) const
+{
+	UnloadBuffer(ouput, m_weightAndBiasBuffer);
 }
 
 //#pragma optimize( "", off )

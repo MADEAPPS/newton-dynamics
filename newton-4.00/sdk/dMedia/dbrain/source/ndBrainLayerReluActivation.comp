@@ -41,16 +41,16 @@ void main()
 
     uint inputOffset = gl_WorkGroupID.x * m_inputOutputSize + m_inputOutputStartOffset;
     uint outputOffset = inputOffset + m_inputSize;
-
+    
     for (uint i = 0; i < modRowCount; i += WORKGROUP_SIZE)
     {
-        float value = m_inputOutputData[inputOffset + i + gl_WorkGroupID.x];
-        m_inputOutputData[outputOffset + i + gl_WorkGroupID.x] = ((value >= 0.0) ? value : 0.0f);
+        float value = m_inputOutputData[inputOffset + i + gl_LocalInvocationID.x];
+        m_inputOutputData[outputOffset + i + gl_LocalInvocationID.x] = ((value >= 0.0) ? value : 0.0f);
     }
     if (gl_LocalInvocationID.x < reminderRowCount)
     {
-        float value = m_inputOutputData[inputOffset + modRowCount + gl_WorkGroupID.x];
-        m_inputOutputData[outputOffset + modRowCount + gl_WorkGroupID.x] = ((value >= 0.0) ? value : 0.0f);
-        m_inputOutputData[outputOffset + modRowCount + gl_WorkGroupID.x] = gl_WorkGroupID.x;
+        float value = m_inputOutputData[inputOffset + modRowCount + gl_LocalInvocationID.x];
+        m_inputOutputData[outputOffset + modRowCount + gl_LocalInvocationID.x] = ((value >= 0.0) ? value : 0.0f);
     }
+    //m_inputOutputData[gl_LocalInvocationID.x] = gl_LocalInvocationID.x;
 }

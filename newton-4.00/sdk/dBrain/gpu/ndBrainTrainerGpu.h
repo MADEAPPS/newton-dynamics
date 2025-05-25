@@ -40,7 +40,11 @@ class ndBrainTrainerGpu: public ndBrainTrainer
 	ndBrainTrainerGpu(const ndBrainTrainerGpu& src);
 	virtual ~ndBrainTrainerGpu();
 
-	virtual void GetOutput(ndBrainVector& ouput);
+	virtual void GetInput(ndBrainVector& ouput) const;
+	virtual void GetOutput(ndBrainVector& ouput) const;
+	virtual void GetWorkingBuffer(ndBrainVector& ouput) const;
+	virtual void GetParameterBuffer(ndBrainVector& ouput) const;
+
 	virtual void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss) override;
 
 	private:
@@ -48,6 +52,7 @@ class ndBrainTrainerGpu: public ndBrainTrainer
 	void InitInputOutputBuffer();
 	void InitWeightAndBiasBuffer();
 	void AddCopyInputCommand(const ndBrainLayer::ndLayerUniformData& uniformData);
+	void UnloadBuffer(ndBrainVector& ouput, const ndSharedPtr<ndBrainGpuBuffer>& gpuBuffer) const;
 	void AddLayersCommands(ndFixSizeArray<ndBrainLayer::ndLayerUniformData, 256>& layersUniformsData);
 
 	ndSharedPtr<ndBrainGpuContext> m_context;

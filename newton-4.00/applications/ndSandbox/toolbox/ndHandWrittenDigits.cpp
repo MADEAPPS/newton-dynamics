@@ -228,8 +228,8 @@ static void MnistTrainingSet()
 	//#define USE_CONVOLUTIONAL_LAYERS
 
 	//#define MINI_BATCH_BUFFER_SIZE			64
-	//#define MINI_BATCH_BUFFER_SIZE			256
-	#define MINI_BATCH_BUFFER_SIZE				1
+	#define MINI_BATCH_BUFFER_SIZE			256
+	//#define MINI_BATCH_BUFFER_SIZE				2
 
 	#define CONVOLUTIONAL_FEATURE_MAPS		32
 	#define MIN_TRAIN_SCORE					0.9999f
@@ -620,11 +620,16 @@ static void MnistTrainingSet()
 				m_context->EndQueue();
 
 #if 1
+				ndBrainVector internalBuffers;
+				ndBrainVector internalParameters;
 				trainer->GetOutput(miniBatchOutput);
+				trainer->GetWorkingBuffer(internalBuffers);
+				trainer->GetParameterBuffer(internalParameters);
 				ndInt32 inputSize = trainer->GetBrain()->GetInputSize();
 				ndInt32 outputSize = trainer->GetBrain()->GetOutputSize();
 				ndBrainFixSizeVector<1024> xxx1;
 				xxx1.SetCount(outputSize);
+
 				for (ndInt32 i = 0; i < m_miniBatchSize; i++)
 				{
 					const ndBrainMemVector in(&miniBatchInput[i * inputSize], inputSize);
@@ -716,14 +721,14 @@ static void MnistTrainingSet()
 			layers.PushBack(new LINEAR_LAYER(trainingDigits->GetColumns(), LINEAR_LAYERS_NEURONS));
 			layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 			
-			//layers.PushBack(new LINEAR_LAYER(layers[layers.GetCount() - 1]->GetOutputSize(), LINEAR_LAYERS_NEURONS));
-			//layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
-			//
-			//layers.PushBack(new LINEAR_LAYER(layers[layers.GetCount() - 1]->GetOutputSize(), LINEAR_LAYERS_NEURONS));
-			//layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+			layers.PushBack(new LINEAR_LAYER(layers[layers.GetCount() - 1]->GetOutputSize(), LINEAR_LAYERS_NEURONS));
+			layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+			
+			layers.PushBack(new LINEAR_LAYER(layers[layers.GetCount() - 1]->GetOutputSize(), LINEAR_LAYERS_NEURONS));
+			layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 		#endif
 
-		//layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
+		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
 		//layers.PushBack(new ndBrainLayerActivationCategoricalSoftmax(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 		for (ndInt32 i = 0; i < layers.GetCount(); ++i)
