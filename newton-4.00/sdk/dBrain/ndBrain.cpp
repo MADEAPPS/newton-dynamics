@@ -146,31 +146,18 @@ void ndBrain::InitWeights()
 	}
 }
 
-void ndBrain::EnableDropOut()
+void ndBrain::ApplyDropOutRate(ndFloat32 rate)
 {
 	ndArray<ndBrainLayer*>& layers = *this;
 	for (ndInt32 i = ndInt32(layers.GetCount() - 1); i >= 0; --i)
 	{
-		layers[i]->EnableDropOut(true);
+		layers[i]->ApplyDropOut(rate);
 	}
 }
 
-void ndBrain::DisableDropOut()
+void ndBrain::ResetDropOut()
 {
-	ndArray<ndBrainLayer*>& layers = *this;
-	for (ndInt32 i = ndInt32(layers.GetCount() - 1); i >= 0; --i)
-	{
-		layers[i]->EnableDropOut(false);
-	}
-}
-
-void ndBrain::UpdateDropOut()
-{
-	ndArray<ndBrainLayer*>& layers = *this;
-	for (ndInt32 i = ndInt32(layers.GetCount() - 1); i >= 0; --i)
-	{
-		layers[i]->UpdateDropOut();
-	}
+	ApplyDropOutRate(ndFloat32(0.0f));
 }
 
 ndInt32 ndBrain::CalculateWorkingBufferSize() const

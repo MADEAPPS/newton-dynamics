@@ -111,11 +111,7 @@ bool ndBrainLayer::HasParameters() const
 	return false;
 }
 
-void ndBrainLayer::UpdateDropOut()
-{
-}
-
-void ndBrainLayer::EnableDropOut(bool)
+void ndBrainLayer::ApplyDropOut(ndFloat32 rate)
 {
 }
 

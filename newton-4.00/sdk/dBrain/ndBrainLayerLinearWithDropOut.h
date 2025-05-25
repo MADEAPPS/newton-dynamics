@@ -23,35 +23,31 @@
 #define _ND_BRAIN_LAYER_LINEAR_WITH_DROP_OUT_H__
 
 #include "ndBrainStdafx.h"
-#include "ndBrainLayerLinear.h"
+#include "ndBrainLayerActivation.h"
+//#include "ndBrainLayerLinear.h"
 
-#define ND_LINEAL_DROPOUT_FACTOR ndBrainFloat(0.7f)
+//#define ND_LINEAL_DROPOUT_FACTOR ndBrainFloat(0.7f)
+#define ND_BRAIN_LAYER_ACTIVATION_LINEAR_DROPOUT	"ndBrainLayerLinearWithDropOut"
 
-class ndBrainLayerLinearWithDropOut : public ndBrainLayerLinear
+class ndBrainLayerLinearWithDropOut : public ndBrainLayerActivation
 {
 	public: 
-	ndBrainLayerLinearWithDropOut(ndInt32 inputs, ndInt32 outputs, ndBrainFloat dropOutFactor = ND_LINEAL_DROPOUT_FACTOR);
+	ndBrainLayerLinearWithDropOut(ndInt32 neurons);
 	ndBrainLayerLinearWithDropOut(const ndBrainLayerLinearWithDropOut& src);
-	virtual ~ndBrainLayerLinearWithDropOut();
+
 	virtual ndBrainLayer* Clone() const;
-
-	virtual void UpdateDropOut();
-	virtual void EnableDropOut(bool state);
-	virtual const char* GetLabelId() const;
-	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
-	virtual void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
-
-	virtual void CalculateParamGradients(
-		const ndBrainVector& input, const ndBrainVector& output,
-		const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainLayer* const gradientOut) const;
-
-	virtual void Save(const ndBrainSave* const loadSave) const;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
-	ndBrainVector m_dropout;
-	ndBrainFloat m_dropoutFactor;
-	ndBrainFloat m_dropoutScale;
-	bool m_droutOutEnable;
+	virtual const char* GetLabelId() const;
+	virtual void ApplyDropOut(ndFloat32 rate);
+
+	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
+	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
+
+	virtual bool HasGpuSupport() const override;
+	virtual ndLayerUniformData GetLayerGpuUniformData(const ndBrainGpuContext* const context) const override;
+
+	ndBrainVector m_dropOut;
 };
 
 #endif 

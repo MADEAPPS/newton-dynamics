@@ -31,7 +31,7 @@
 #include "ndBrainLayerConvolutional_2d.h"
 #include "ndBrainLayerActivationSoftmax.h"
 #include "ndBrainLayerActivationSigmoid.h"
-//#include "ndBrainLayerLinearWithDropOut.h"
+#include "ndBrainLayerLinearWithDropOut.h"
 #include "ndBrainLayerCrossCorrelation_2d.h"
 #include "ndBrainLayerActivationLeakyRelu.h"
 #include "ndBrainLayerActivationSigmoidLinear.h"
@@ -125,6 +125,10 @@ ndBrain* ndBrainLoad::Load() const
 		else if (!strcmp(layerType, ND_BRAIN_LAYER_ACTIVATION_LEAKY_RELU_NAME))
 		{
 			layer = ndBrainLayerActivationLeakyRelu::Load(this);
+		}
+		else if (!strcmp(layerType, ND_BRAIN_LAYER_ACTIVATION_LINEAR_DROPOUT))
+		{
+			layer = ndBrainLayerLinearWithDropOut::Load(this);
 		}
 		else if (!strcmp(layerType, "ndBrainLayerActivationSigmoid"))
 		{

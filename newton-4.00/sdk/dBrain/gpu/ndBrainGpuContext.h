@@ -45,6 +45,7 @@ class ndBrainGpuContext : public ndClassAlloc
 			ndVulkanShader m_ndBrainLayerReluActivation;
 			ndVulkanShader m_ndBrainLayerTanhActivation;
 			ndVulkanShader m_ndBrainLayerSoftmaxActivation;
+			ndVulkanShader m_ndBrainLayerLinearDropOutActivation;
 		};
 		ndVulkanShader m_modules[128];
 	};
@@ -133,7 +134,7 @@ class ndBrainGpuContext: public ndClassAlloc
 			ndVulkanShader m_ndBrainLayerReluActivation;
 			ndVulkanShader m_ndBrainLayerTanhActivation;
 			ndVulkanShader m_ndBrainLayerSoftmaxActivation;
-			//ndVulkanShader m_ndBrainLayerEluActivation;
+			ndVulkanShader m_ndBrainLayerLinearDropOutActivation;
 		};
 		ndVulkanShader m_modules[128];
 	};

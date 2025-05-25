@@ -138,8 +138,6 @@ static void ValidateData(const char* const title, ndBrain& brain, ndBrainMatrix*
 	ndBrainVector output;
 	output.SetCount((*testLabels)[0].GetCount());
 
-	brain.DisableDropOut();
-
 	const char* categories[] = {
 		"airplane",
 		"automobile",

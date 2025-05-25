@@ -91,8 +91,7 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void AddReqularizerL1(const ndBrainLayer& weights, ndBrainFloat regularizer);
 	virtual void AddReqularizerL2(const ndBrainLayer& weights, ndBrainFloat regularizer);
 
-	virtual void UpdateDropOut();
-	virtual void EnableDropOut(bool state);
+	virtual void ApplyDropOut(ndFloat32 rate);
 	virtual void InitWeights();
 
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;

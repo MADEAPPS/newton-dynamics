@@ -52,9 +52,8 @@ class ndBrain: public ndArray<ndBrainLayer*>
 	ndInt32 GetNumberOfParameters() const;
 	ndInt32 CalculateWorkingBufferSize() const;
 
-	void UpdateDropOut();
-	void EnableDropOut();
-	void DisableDropOut();
+	void ResetDropOut();
+	void ApplyDropOutRate(ndFloat32 rate);
 
 	void InitWeights();
 	void CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradients);

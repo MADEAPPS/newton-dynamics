@@ -19,11 +19,11 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
 #include "ndBrainLayerLinearWithDropOut.h"
 
+#if 0
 ndBrainLayerLinearWithDropOut::ndBrainLayerLinearWithDropOut(ndInt32 inputs, ndInt32 outputs, ndBrainFloat dropOutFactor)
 	:ndBrainLayerLinear(inputs, outputs)
 	,m_dropout()
@@ -50,22 +50,12 @@ ndBrainLayerLinearWithDropOut::~ndBrainLayerLinearWithDropOut()
 {
 }
 
-const char* ndBrainLayerLinearWithDropOut::GetLabelId() const
-{
-	ndAssert(0);
-	return "ndBrainLayerLinearWithDropOut";
-	//return ND_BRAIN_LAYER_LINEAR_NAME;
-}
 
 ndBrainLayer* ndBrainLayerLinearWithDropOut::Clone() const
 {
 	return new ndBrainLayerLinearWithDropOut(*this);
 }
 
-void ndBrainLayerLinearWithDropOut::Save(const ndBrainSave* const loadSave) const
-{
-	ndBrainLayerLinear::Save(loadSave);
-}
 
 ndBrainLayer* ndBrainLayerLinearWithDropOut::Load(const ndBrainLoad* const)
 {
@@ -121,4 +111,86 @@ void ndBrainLayerLinearWithDropOut::CalculateParamGradients(
 		outDerivative.Mul(m_dropout);
 	}
 	ndBrainLayerLinear::CalculateParamGradients(input, output, outputDerivative, inputGradient, gradientOut);
+}
+#endif
+
+ndBrainLayerLinearWithDropOut::ndBrainLayerLinearWithDropOut(ndInt32 neurons)
+	:ndBrainLayerActivation(neurons)
+	,m_dropOut()
+{
+	m_dropOut.SetCount(neurons);
+	m_dropOut.Set(ndFloat32(1.0f));
+}
+
+ndBrainLayerLinearWithDropOut::ndBrainLayerLinearWithDropOut(const ndBrainLayerLinearWithDropOut& src)
+	:ndBrainLayerActivation(src)
+	,m_dropOut()
+{
+	m_dropOut.SetCount(m_neurons);
+	m_dropOut.Set(ndFloat32(1.0f));
+}
+
+ndBrainLayer* ndBrainLayerLinearWithDropOut::Clone() const
+{
+	return new ndBrainLayerLinearWithDropOut(*this);
+}
+
+const char* ndBrainLayerLinearWithDropOut::GetLabelId() const
+{
+	return ND_BRAIN_LAYER_ACTIVATION_LINEAR_DROPOUT;
+}
+
+ndBrainLayer* ndBrainLayerLinearWithDropOut::Load(const ndBrainLoad* const loadSave)
+{
+	char buffer[1024];
+	loadSave->ReadString(buffer);
+
+	loadSave->ReadString(buffer);
+	ndInt32 inputs = loadSave->ReadInt();
+	ndBrainLayerLinearWithDropOut* const layer = new ndBrainLayerLinearWithDropOut(inputs);
+	loadSave->ReadString(buffer);
+	return layer;
+}
+
+void ndBrainLayerLinearWithDropOut::ApplyDropOut(ndFloat32 rate)
+{
+	ndInt32 activeCount = 0;
+	for (ndInt32 i = ndInt32(m_dropOut.GetCount() - 1); i >= 0; --i)
+	{
+		ndInt32 active = (ndRand() > rate);
+		m_dropOut[i] = active ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+		activeCount += active;
+	}
+	
+	ndAssert(activeCount > 0);
+	ndFloat32 dropoutScale = ndBrainFloat(m_dropOut.GetCount()) / ndBrainFloat(activeCount);
+	m_dropOut.Scale(dropoutScale);
+}
+
+void ndBrainLayerLinearWithDropOut::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
+{
+	output.Set(input);
+	output.Mul(m_dropOut);
+}
+
+void ndBrainLayerLinearWithDropOut::InputDerivative(const ndBrainVector&, const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+{
+	//inputDerivative.Set(1.0f);
+	inputDerivative.Set(m_dropOut);
+	inputDerivative.Mul(outputDerivative);
+}
+
+bool ndBrainLayerLinearWithDropOut::HasGpuSupport() const
+{
+	return true;
+}
+
+ndBrainLayer::ndLayerUniformData ndBrainLayerLinearWithDropOut::GetLayerGpuUniformData(const ndBrainGpuContext* const context) const
+{
+	ndLayerUniformData data;
+	data.m_shader = context->m_ndBrainLayerLinearDropOutActivation;
+	data.m_inputSize = GetInputSize();
+	data.m_outputSize = GetOutputSize();
+
+	return data;
 }
