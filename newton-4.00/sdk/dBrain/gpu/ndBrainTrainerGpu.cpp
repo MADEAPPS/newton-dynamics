@@ -36,6 +36,7 @@
 ndBrainTrainerGpu::ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainGpuContext>& context, ndInt32 minibatchSize, const ndBrainLoss& loss)
 	:ndBrainGpuInference(brain, context, minibatchSize)
 	,m_groundTruth()
+	,m_inputOuputGradientsBuffer()
 	,m_weightAndBiasGradientsBuffer()
 {
 	ndAssert(loss.HasGpuSupport());
@@ -45,6 +46,10 @@ ndBrainTrainerGpu::ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const nd
 	buffer.SetCount(bufferSize * m_miniBatchSize);
 	buffer.Set(ndBrainFloat(0.0f));
 	m_groundTruth = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(*m_context, buffer, ndCpuMappable));
+
+	GetWorkingBuffer(buffer);
+	buffer.Set(ndReal(0.0f));
+	m_inputOuputGradientsBuffer = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(*m_context, buffer, ndCpuMappable));
 
 	GetParameterBuffer(buffer);
 	buffer.SetCount(buffer.GetCount() * m_miniBatchSize);
@@ -57,6 +62,7 @@ ndBrainTrainerGpu::ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const nd
 ndBrainTrainerGpu::ndBrainTrainerGpu(const ndBrainTrainerGpu& src)
 	:ndBrainGpuInference(src)
 	,m_groundTruth()
+	,m_inputOuputGradientsBuffer()
 	,m_weightAndBiasGradientsBuffer()
 {
 	ndAssert(0);

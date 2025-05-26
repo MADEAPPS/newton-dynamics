@@ -41,6 +41,7 @@ class ndBrainTrainerGpu: public ndBrainGpuInference
 	void AddLossCommandBuffer(const ndBrainLoss& loss);
 
 	ndSharedPtr<ndBrainGpuBuffer> m_groundTruth;
+	ndSharedPtr<ndBrainGpuBuffer> m_inputOuputGradientsBuffer;
 	ndSharedPtr<ndBrainGpuBuffer> m_weightAndBiasGradientsBuffer;
 };
 
