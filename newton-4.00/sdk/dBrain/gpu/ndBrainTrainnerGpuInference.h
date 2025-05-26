@@ -46,7 +46,7 @@ class ndBrainTrainnerGpuInference: public ndBrainTrainer
 	virtual void GetParameterBuffer(ndBrainVector& ouput) const;
 
 	// legacy
-	virtual void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss) override { ndAssert(0); }
+	virtual void BackPropagate(const ndBrainVector&, ndBrainLoss&) override { ndAssert(0); }
 
 	virtual void MakePrediction(const ndBrainVector& input) override;
 	virtual void BackPropagate(const ndBrainVector& outputGradients) override;

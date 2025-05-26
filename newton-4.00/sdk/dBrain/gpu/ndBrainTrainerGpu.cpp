@@ -51,7 +51,6 @@ ndBrainTrainerGpu::ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const nd
 
 ndBrainTrainerGpu::ndBrainTrainerGpu(const ndBrainTrainerGpu& src)
 	:ndBrainTrainnerGpuInference(src)
-	//,m_groundTruth()
 	,m_inputOuputGradientsBuffer()
 	,m_weightAndBiasGradientsBuffer()
 {

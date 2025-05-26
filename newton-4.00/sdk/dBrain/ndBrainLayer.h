@@ -53,9 +53,9 @@ class ndBrainLayer : public ndClassAlloc
 		{
 		}
 
-		virtual void Execute(ndInt32)
+		virtual void Execute(ndInt32 miniBatchIndex)
 		{
-			ndAssert(0);
+			m_layer->FeedForward(this, miniBatchIndex);
 		}
 
 		const ndBrainLayer* m_layer;
@@ -130,8 +130,10 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void Save(const ndBrainSave* const loadSave) const;
 	virtual void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
 
-	virtual bool HasGpuSupport() const;
 	virtual ndLayerUniformDataCpu* GetLayerUniformDataCpu() const;
+	virtual void FeedForward(const ndLayerUniformDataCpu* const info, ndInt32 miniBatchIndex) const;
+
+	virtual bool HasGpuSupport() const;
 	virtual ndLayerUniformDataGpu GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const;
 };
 

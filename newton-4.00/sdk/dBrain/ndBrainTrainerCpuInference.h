@@ -51,7 +51,8 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 	protected:
 	void InitInputOutputBuffer();
 	void InitWeightAndBiasBuffer();
-	void AddCopyInputCommand(const ndBrainLayer::ndLayerUniformDataCpu* const uniformData);
+	void AddCopyInputCommand(const ndBrainLayer::ndLayerUniformDataCpu* const firstCommand);
+	void AddLayersCommands(ndFixSizeArray<ndBrainLayer::ndLayerUniformDataCpu*, 256>& layersCommands);
 
 	ndBrainVector m_inputOutputBuffer;
 	ndBrainVector m_weightAndBiasBuffer;
@@ -59,8 +60,9 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 	ndBrainVector m_miniBatchOutputBuffer;
 	ndList<ndSharedPtr<ndBrainTrainerCpuCommand>> m_commandBuffers;
 	ndBrainThreadPool* m_threadPool;
-
 	ndInt32 m_miniBatchSize;
+
+	friend class ndBrainLayerLinear;
 };
 
 #endif 

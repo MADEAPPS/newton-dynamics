@@ -62,6 +62,11 @@ void ndBrainLayer::CopyWeights(ndBrainVector&) const
 {
 }
 
+void ndBrainLayer::FeedForward(const ndLayerUniformDataCpu* const info, ndInt32 miniBatchIndex) const
+{
+	ndAssert(0);
+}
+
 ndBrainLayer::ndLayerUniformDataCpu* ndBrainLayer::GetLayerUniformDataCpu() const
 {
 	ndAssert(0);

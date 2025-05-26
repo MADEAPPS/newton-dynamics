@@ -26,6 +26,7 @@
 #include "gpu/ndBrainGpuCommand.h"
 #include "gpu/ndBrainGpuContext.h"
 #include "gpu/ndBrainGpuFloatBuffer.h"
+#include "ndBrainTrainerCpuInference.h"
 #include "gpu/ndBrainGpuIntegerBuffer.h"
 #include "gpu/ndBrainGpuUniformBuffer.h"
 
@@ -344,4 +345,31 @@ ndBrainLayer::ndLayerUniformDataCpu* ndBrainLayerLinear::GetLayerUniformDataCpu(
 	data->m_outputSize = GetOutputSize();
 	data->m_parametersSize = GetOutputSize() * GetInputSize() + GetOutputSize();
 	return data;
+}
+
+void ndBrainLayerLinear::FeedForward(const ndLayerUniformDataCpu* const info, ndInt32 miniBatchIndex) const
+{
+	const ndBrainTrainerCpuInference* const trainer = info->m_owner;
+
+	ndInt32 inputSize = info->m_inputSize;
+	ndInt32 outputSize = info->m_outputSize;
+	ndInt32 matrixSize = inputSize * outputSize;
+	const ndBrainMemVector matrixVector(&trainer->m_weightAndBiasBuffer[info->m_parametersStartOffset], matrixSize);
+
+	ndInt32 offset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
+	const ndBrainMemVector input(&trainer->m_inputOutputBuffer[offset], inputSize);
+	ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
+	for (ndInt32 i = info->m_outputSize - 1; i >= 0; --i)
+	{
+		const ndBrainMemVector row(&matrixVector[i * inputSize], inputSize);
+		output[i] = ndDotProduct<ndBrainFloat>(inputSize , &row[0], &input[0]);
+	}
+
+	const ndBrainMemVector bias(&matrixVector[matrixSize], outputSize);
+	output.Add(bias);
+
+	// verify results?
+	//m_weights.Mul(input, output);
+	//output.Add(m_bias);
+
 }
