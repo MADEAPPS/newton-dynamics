@@ -354,7 +354,7 @@ void ndBrainLayerLinear::FeedForward(const ndLayerUniformDataCpu* const info, nd
 	ndInt32 inputSize = info->m_inputSize;
 	ndInt32 outputSize = info->m_outputSize;
 	ndInt32 matrixSize = inputSize * outputSize;
-	const ndBrainMemVector matrixVector(&trainer->m_weightAndBiasBuffer[info->m_parametersStartOffset], matrixSize);
+	const ndBrainMemVector matrixVector(&trainer->m_weightAndBiasBuffer[info->m_parametersStartOffset], matrixSize + outputSize);
 
 	ndInt32 offset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
 	const ndBrainMemVector input(&trainer->m_inputOutputBuffer[offset], inputSize);
@@ -369,7 +369,7 @@ void ndBrainLayerLinear::FeedForward(const ndLayerUniformDataCpu* const info, nd
 	output.Add(bias);
 
 	// verify results?
-	//m_weights.Mul(input, output);
-	//output.Add(m_bias);
-
+	//ndBrainFixSizeVector<1000> xxxx;
+	//xxxx.SetCount(outputSize);
+	//MakePrediction(input, xxxx);
 }

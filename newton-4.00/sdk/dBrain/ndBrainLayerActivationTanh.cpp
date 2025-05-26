@@ -23,6 +23,7 @@
 #include "ndBrainSaveLoad.h"
 #include "ndBrainSimdFloat8.h"
 #include "gpu/ndBrainGpuContext.h"
+#include "ndBrainTrainerCpuInference.h"
 #include "ndBrainLayerActivationTanh.h"
 
 ndBrainLayerActivationTanh::ndBrainLayerActivationTanh(ndInt32 neurons)
@@ -113,4 +114,39 @@ ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerActivationTanh::GetLayerUniformD
 	data.m_outputSize = GetOutputSize();
 
 	return data;
+}
+
+void ndBrainLayerActivationTanh::FeedForward(const ndLayerUniformDataCpu* const info, ndInt32 miniBatchIndex) const
+{
+	const ndBrainTrainerCpuInference* const trainer = info->m_owner;
+
+	ndInt32 inputSize = info->m_inputSize;
+	ndInt32 outputSize = info->m_outputSize;
+
+	ndInt32 offset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
+	const ndBrainMemVector input(&trainer->m_inputOutputBuffer[offset], inputSize);
+	ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
+
+	const ndBrainSimdFloat8 max(30.0f);
+	const ndBrainSimdFloat8 min(-30.0f);
+	ndBrainFloat* const dst = &output[0];
+	const ndBrainFloat* const src = &input[0];
+	const ndInt32 roundCount = ndInt32(input.GetCount()) & -8;
+	for (ndInt32 i = 0; i < roundCount; i += 8)
+	{
+		const ndBrainSimdFloat8 x(&src[i]);
+		const ndBrainSimdFloat8 value(x.Clamp(min, max));
+		value.Tanh().Store(&dst[i]);
+	}
+	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= roundCount; --i)
+	{
+		ndBrainFloat value = ndClamp(src[i], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
+		dst[i] = ndBrainFloat(ndTanh(value));
+	}
+	output.FlushToZero();
+
+	// verify
+	//ndBrainFixSizeVector<1000> xxxx;
+	//xxxx.SetCount(outputSize);
+	//MakePrediction(input, xxxx);
 }

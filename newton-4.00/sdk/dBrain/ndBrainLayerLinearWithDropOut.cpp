@@ -21,6 +21,7 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
+#include "ndBrainTrainerCpuInference.h"
 #include "ndBrainLayerLinearWithDropOut.h"
 
 #if 0
@@ -201,4 +202,24 @@ ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerLinearWithDropOut::GetLayerUnifo
 	data.m_inputSize = GetInputSize();
 	data.m_outputSize = GetOutputSize();
 	return data;
+}
+
+void ndBrainLayerLinearWithDropOut::FeedForward(const ndLayerUniformDataCpu* const info, ndInt32 miniBatchIndex) const
+{
+	const ndBrainTrainerCpuInference* const trainer = info->m_owner;
+
+	ndInt32 inputSize = info->m_inputSize;
+	ndInt32 outputSize = info->m_outputSize;
+
+	ndInt32 offset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
+	const ndBrainMemVector input(&trainer->m_inputOutputBuffer[offset], inputSize);
+	ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
+
+	output.Set(input);
+	output.Mul(m_dropOut);
+
+	// verify
+	//ndBrainFixSizeVector<1000> xxxx;
+	//xxxx.SetCount(outputSize);
+	//MakePrediction(input, xxxx);
 }

@@ -22,6 +22,7 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
 #include "gpu/ndBrainGpuContext.h"
+#include "ndBrainTrainerCpuInference.h"
 #include "ndBrainLayerActivationSoftmax.h"
 
 ndBrainLayerActivationSoftmax::ndBrainLayerActivationSoftmax(ndInt32 neurons)
@@ -137,4 +138,41 @@ ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerActivationSoftmax::GetLayerUnifo
 	data.m_outputSize = GetOutputSize();
 
 	return data;
+}
+
+void ndBrainLayerActivationSoftmax::FeedForward(const ndLayerUniformDataCpu* const info, ndInt32 miniBatchIndex) const
+{
+	const ndBrainTrainerCpuInference* const trainer = info->m_owner;
+
+	ndInt32 inputSize = info->m_inputSize;
+	ndInt32 outputSize = info->m_outputSize;
+
+	ndInt32 offset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
+	const ndBrainMemVector input(&trainer->m_inputOutputBuffer[offset], inputSize);
+	ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
+
+	ndBrainFloat max = ndBrainFloat(0.0f);
+	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
+	{
+		max = ndMax(input[i], max);
+	}
+
+	ndBrainFloat acc = ndBrainFloat(0.0f);
+	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
+	{
+		ndBrainFloat in = ndMax((input[i] - max), ndBrainFloat(-30.0f));
+		ndAssert(in <= ndBrainFloat(0.0f));
+		ndBrainFloat prob = ndBrainFloat(ndExp(in));
+		output[i] = prob;
+		acc += prob;
+	}
+
+	ndAssert(acc > ndBrainFloat(0.0f));
+	output.Scale(ndBrainFloat(1.0f) / acc);
+	output.FlushToZero();
+
+	// verify
+	//ndBrainFixSizeVector<1000> xxxx;
+	//xxxx.SetCount(outputSize);
+	//MakePrediction(input, xxxx);
 }

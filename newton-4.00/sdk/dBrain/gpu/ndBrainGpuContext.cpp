@@ -545,6 +545,15 @@ void ndBrainGpuContext::EndQueue()
 		submitInfo.commandBufferCount = uint32_t(m_displayList.GetCount());
 		submitInfo.pCommandBuffers = &m_displayList[0];
 		CheckResultVulkan(vkQueueSubmit(m_queue, uint32_t(1), &submitInfo, m_fence));
+
+		//ndInt32 xxx = 0;
+		//ndExpandTraceMessage("\nwait: ", xxx);
+		//while (vkGetFenceStatus(m_device, m_fence) != VK_SUCCESS)
+		//{
+		//	ndExpandTraceMessage("%d ", xxx);
+		//	xxx++;
+		//}
+
 		CheckResultVulkan(vkWaitForFences(m_device, uint32_t(1), &m_fence, VK_TRUE, 100000000000));
 		CheckResultVulkan(vkResetFences(m_device, 1, &m_fence));
 	}

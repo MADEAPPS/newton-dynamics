@@ -63,6 +63,10 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 	ndInt32 m_miniBatchSize;
 
 	friend class ndBrainLayerLinear;
+	friend class ndBrainLayerActivationRelu;
+	friend class ndBrainLayerActivationTanh;
+	friend class ndBrainLayerActivationSoftmax;
+	friend class ndBrainLayerLinearWithDropOut;
 };
 
 #endif 
