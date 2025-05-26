@@ -30,9 +30,9 @@ class ndBrainLoad;
 class ndBrainSave;
 class ndBrainVector;
 class ndBrainMatrix;
-class ndBrainTrainerCpu;
 class ndBrainGpuCommand;
 class ndBrainGpuFloatBuffer;
+class ndBrainTrainerCpuInference;
 
 class ndBrainLayer : public ndClassAlloc
 {
@@ -62,7 +62,7 @@ class ndBrainLayer : public ndClassAlloc
 		}
 
 		const ndBrainLayer* m_layer;
-		ndBrainTrainerCpu* m_owner;
+		ndBrainTrainerCpuInference* m_owner;
 		ndInt32 m_inputSize;
 		ndInt32 m_outputSize;
 		ndInt32 m_parametersSize;

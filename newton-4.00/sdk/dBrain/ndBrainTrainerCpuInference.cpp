@@ -25,7 +25,7 @@
 #include "ndBrainLayer.h"
 #include "ndBrainVector.h"
 #include "ndBrainMatrix.h"
-#include "ndBrainTrainerCpu.h"
+#include "ndBrainTrainerCpuInference.h"
 #include "ndBrainLayerActivationSoftmax.h"
 
 #if 0
@@ -296,7 +296,7 @@ void ndBrainTrainerCpu::BackPropagate(const ndBrainVector& input, ndBrainLoss& l
 #endif
 
 
-ndBrainTrainerCpu::ndBrainTrainerCpu(const ndSharedPtr<ndBrain>& brain, ndBrainThreadPool* const threadPool, ndInt32 minibatchSize)
+ndBrainTrainerCpuInference::ndBrainTrainerCpuInference(const ndSharedPtr<ndBrain>& brain, ndBrainThreadPool* const threadPool, ndInt32 minibatchSize)
 	:ndBrainTrainer(brain)
 	,m_inputOutputBuffer()
 	,m_weightAndBiasBuffer()
@@ -309,7 +309,7 @@ ndBrainTrainerCpu::ndBrainTrainerCpu(const ndSharedPtr<ndBrain>& brain, ndBrainT
 	InitWeightAndBiasBuffer();
 }
 
-ndBrainTrainerCpu::ndBrainTrainerCpu(const ndBrainTrainerCpu& src)
+ndBrainTrainerCpuInference::ndBrainTrainerCpuInference(const ndBrainTrainerCpuInference& src)
 	:ndBrainTrainer(src)
 	,m_inputOutputBuffer()
 	,m_threadPool(src.m_threadPool)
@@ -318,11 +318,11 @@ ndBrainTrainerCpu::ndBrainTrainerCpu(const ndBrainTrainerCpu& src)
 	ndAssert(0);
 }
 
-ndBrainTrainerCpu::~ndBrainTrainerCpu()
+ndBrainTrainerCpuInference::~ndBrainTrainerCpuInference()
 {
 }
 
-void ndBrainTrainerCpu::InitInputOutputBuffer()
+void ndBrainTrainerCpuInference::InitInputOutputBuffer()
 {
 	const ndBrain& brain = **m_brain;
 	ndInt32 bufferSize = brain.GetInputSize();
@@ -336,7 +336,7 @@ void ndBrainTrainerCpu::InitInputOutputBuffer()
 	m_inputOutputBuffer.Set(ndBrainFloat(0.0f));
 }
 
-void ndBrainTrainerCpu::InitWeightAndBiasBuffer()
+void ndBrainTrainerCpuInference::InitWeightAndBiasBuffer()
 {
 	const ndBrain& brain = **m_brain;
 
@@ -393,7 +393,7 @@ void ndBrainTrainerCpu::InitWeightAndBiasBuffer()
 	//AddCopyOutputCommand();
 }
 
-void ndBrainTrainerCpu::AddCopyInputCommand(const ndBrainLayer::ndLayerUniformDataCpu* const uniformData)
+void ndBrainTrainerCpuInference::AddCopyInputCommand(const ndBrainLayer::ndLayerUniformDataCpu* const uniformData)
 {
 	//const ndBrain& brain = **m_brain;
 	//ndInt32 inputOutputBufferSize = brain.GetInputSize();
@@ -420,13 +420,13 @@ void ndBrainTrainerCpu::AddCopyInputCommand(const ndBrainLayer::ndLayerUniformDa
 	//m_commandBuffers.Append(command);
 }
 
-void ndBrainTrainerCpu::MakePrediction(const ndBrainVector& input)
+void ndBrainTrainerCpuInference::MakePrediction(const ndBrainVector& input)
 {
 	ndAssert(0);
 }
 
 // new method
-void ndBrainTrainerCpu::BackPropagate(const ndBrainVector& outputGradients)
+void ndBrainTrainerCpuInference::BackPropagate(const ndBrainVector& outputGradients)
 {
 	ndAssert(0);
 }

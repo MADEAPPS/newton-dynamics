@@ -31,12 +31,12 @@ class ndBrainLoss;
 class ndBrainLayer;
 class ndBrainThreadPool;
 
-class ndBrainTrainerCpu: public ndBrainTrainer
+class ndBrainTrainerCpuInference: public ndBrainTrainer
 {
 	public: 
-	ndBrainTrainerCpu(const ndSharedPtr<ndBrain>& brain, ndBrainThreadPool* const threadPool, ndInt32 minibatchSize);
-	ndBrainTrainerCpu(const ndBrainTrainerCpu& src);
-	virtual ~ndBrainTrainerCpu();
+	ndBrainTrainerCpuInference(const ndSharedPtr<ndBrain>& brain, ndBrainThreadPool* const threadPool, ndInt32 minibatchSize);
+	ndBrainTrainerCpuInference(const ndBrainTrainerCpuInference& src);
+	virtual ~ndBrainTrainerCpuInference();
 
 	virtual void MakePrediction(const ndBrainVector& input) override;
 
@@ -51,15 +51,15 @@ class ndBrainTrainerCpu: public ndBrainTrainer
 	//
 	//virtual void BackPropagate(const ndBrainVector& input, const ndBrainVector& groundTruth) override;
 	//
-	//void AcculumateGradients(const ndBrainTrainerCpu& src, ndInt32 index);
+	//void AcculumateGradients(const ndBrainTrainerCpuInference& src, ndInt32 index);
 	//void CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradientsOut, ndBrainLoss& loss);
 	//ndBrainLayer* GetWeightsLayer(ndInt32 index) const;
 	//ndBrainLayer* GetGradientLayer(ndInt32 index) const;
 	//
 	//void ClearGradients();
 	//void ScaleWeights(const ndBrainFloat s);
-	//void AddGradients(const ndBrainTrainerCpu* const src);
-	//void CopyGradients(const ndBrainTrainerCpu* const src);
+	//void AddGradients(const ndBrainTrainerCpuInference* const src);
+	//void CopyGradients(const ndBrainTrainerCpuInference* const src);
 	//
 	//ndBrainVector& GetWorkingBuffer();
 

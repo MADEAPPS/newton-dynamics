@@ -297,7 +297,7 @@ static void MnistTrainingSet()
 				//	ndBrainTrainer* const trainer = new ndBrainTrainerCpuLegacy(m_brain);
 				//	m_trainers.Append(ndSharedPtr<ndBrainTrainer>(trainer));
 				//}
-				m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainerCpu(m_brain, this, m_miniBatchSize));
+				m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainerCpuInference(m_brain, this, m_miniBatchSize));
 			}
 			m_prioritySamples.SetCount(m_miniBatchSize);
 		}

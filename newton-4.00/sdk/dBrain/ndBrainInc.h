@@ -35,7 +35,6 @@
 #include <ndBrainOptimizer.h>
 #include <ndBrainSimdFloat8.h>
 #include <ndBrainThreadPool.h>
-#include <ndBrainTrainerCpu.h>
 #include <ndBrainLayerLinear.h>
 #include <ndBrainReplayBuffer.h>
 #include <ndBrainOptimizerSgd.h>
@@ -47,6 +46,7 @@
 #include <ndBrainAgentDQN_Trainer.h>
 #include <ndBrainLayerImagePadding.h>
 #include <ndBrainLayerActivationElu.h>
+#include <ndBrainTrainerCpuInference.h>
 #include <ndBrainLayerActivationRelu.h>
 #include <ndBrainLayerActivationTanh.h>
 #include <ndBrainLayerActivationLinear.h>
@@ -72,11 +72,11 @@
 #include <gpu/ndBrainGpuCommand.h>
 #include <gpu/ndBrainGpuContext.h>
 #include <gpu/ndBrainTrainerGpu.h>
-#include <gpu/ndBrainTrainnerGpuInference.h>
 #include <gpu/ndBrainGpuFloatBuffer.h>
 #include <gpu/ndBrainGpuIntegerBuffer.h>
 #include <gpu/ndBrainGpuUniformBuffer.h>
 #include <gpu/ndBrainGpuScopeMapBuffer.h>
+#include <gpu/ndBrainTrainnerGpuInference.h>
 
 #endif 
 
