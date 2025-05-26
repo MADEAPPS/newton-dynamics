@@ -97,9 +97,9 @@ bool ndBrainLayerActivationTanh::HasGpuSupport() const
 	return true;
 }
 
-ndBrainLayer::ndLayerUniformDataCpu* ndBrainLayerActivationTanh::GetLayerUniformDataCpu() const
+ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* ndBrainLayerActivationTanh::GetLayerUniformDataCpu() const
 {
-	ndLayerUniformDataCpu* const data = new ndLayerUniformDataCpu(this);
+	ndBrainLayerFeedFowardCpuCommand* const data = new ndBrainLayerFeedFowardCpuCommand(this);
 
 	data->m_inputSize = GetInputSize();
 	data->m_outputSize = GetOutputSize();
@@ -116,7 +116,7 @@ ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerActivationTanh::GetLayerUniformD
 	return data;
 }
 
-void ndBrainLayerActivationTanh::FeedForward(const ndLayerUniformDataCpu* const info, ndInt32 miniBatchIndex) const
+void ndBrainLayerActivationTanh::FeedForward(const ndBrainLayerFeedFowardCpuCommand* const info, ndInt32 miniBatchIndex) const
 {
 	const ndBrainTrainerCpuInference* const trainer = info->m_owner;
 

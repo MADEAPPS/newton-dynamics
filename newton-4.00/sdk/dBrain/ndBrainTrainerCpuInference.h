@@ -49,10 +49,11 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 	virtual void BackPropagate(const ndBrainVector& outputGradients) override;
 
 	protected:
+	void AddCopyOutputCommand();
 	void InitInputOutputBuffer();
 	void InitWeightAndBiasBuffer();
-	void AddCopyInputCommand(const ndBrainLayer::ndLayerUniformDataCpu* const firstCommand);
-	void AddLayersCommands(ndFixSizeArray<ndBrainLayer::ndLayerUniformDataCpu*, 256>& layersCommands);
+	void AddCopyInputCommand(const ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* const firstCommand);
+	void AddLayersCommands(ndFixSizeArray<ndBrainLayer::ndBrainLayerFeedFowardCpuCommand*, 256>& layersCommands);
 
 	ndBrainVector m_inputOutputBuffer;
 	ndBrainVector m_weightAndBiasBuffer;

@@ -37,10 +37,10 @@ class ndBrainTrainerCpuInference;
 class ndBrainLayer : public ndClassAlloc
 {
 	public: 
-	class ndLayerUniformDataCpu : public ndBrainTrainerCpuCommand
+	class ndBrainLayerFeedFowardCpuCommand: public ndBrainTrainerCpuCommand
 	{
 		public:
-		ndLayerUniformDataCpu(const ndBrainLayer* const layer)
+		ndBrainLayerFeedFowardCpuCommand(const ndBrainLayer* const layer)
 			:ndBrainTrainerCpuCommand()
 			,m_layer(layer)
 			,m_owner(nullptr)
@@ -56,6 +56,37 @@ class ndBrainLayer : public ndClassAlloc
 		virtual void Execute(ndInt32 miniBatchIndex)
 		{
 			m_layer->FeedForward(this, miniBatchIndex);
+		}
+
+		const ndBrainLayer* m_layer;
+		ndBrainTrainerCpuInference* m_owner;
+		ndInt32 m_inputSize;
+		ndInt32 m_outputSize;
+		ndInt32 m_parametersSize;
+		ndInt32 m_parametersStartOffset;
+		ndInt32 m_inputOutputSize;
+		ndInt32 m_inputOutputStartOffset;
+	};
+
+	class ndBrainLayerBackPropagateCpuCommand : public ndBrainTrainerCpuCommand
+	{
+		public:
+		ndBrainLayerBackPropagateCpuCommand(const ndBrainLayer* const layer)
+			:ndBrainTrainerCpuCommand()
+			,m_layer(layer)
+			,m_owner(nullptr)
+			,m_inputSize(0)
+			,m_outputSize(0)
+			,m_parametersSize(0)
+			,m_parametersStartOffset(0)
+			,m_inputOutputSize(0)
+			,m_inputOutputStartOffset(0)
+		{
+		}
+
+		virtual void Execute(ndInt32 miniBatchIndex)
+		{
+			m_layer->BackPropagated(this, miniBatchIndex);
 		}
 
 		const ndBrainLayer* m_layer;
@@ -130,8 +161,9 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void Save(const ndBrainSave* const loadSave) const;
 	virtual void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
 
-	virtual ndLayerUniformDataCpu* GetLayerUniformDataCpu() const;
-	virtual void FeedForward(const ndLayerUniformDataCpu* const info, ndInt32 miniBatchIndex) const;
+	virtual ndBrainLayerFeedFowardCpuCommand* GetLayerUniformDataCpu() const;
+	virtual void FeedForward(const ndBrainLayerFeedFowardCpuCommand* const info, ndInt32 miniBatchIndex) const;
+	virtual void BackPropagated(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const;
 
 	virtual bool HasGpuSupport() const;
 	virtual ndLayerUniformDataGpu GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const;

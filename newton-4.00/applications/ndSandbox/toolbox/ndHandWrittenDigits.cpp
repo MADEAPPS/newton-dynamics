@@ -253,8 +253,8 @@ static void MnistTrainingSet()
 				shuffleBuffer.PushBack(ndUnsigned32(i));
 			}
 
-			ndInt32 inputSize = trainingDigits->GetColumns();
-			ndInt32 outputSize = trainingLabels->GetColumns();
+			ndInt32 inputSize = m_brain->GetInputSize();
+			ndInt32 outputSize = m_brain->GetOutputSize();
 			ndBrainTrainer* const trainer = *m_trainer;
 
 			ndBrainVector groundTruth;
@@ -267,6 +267,7 @@ static void MnistTrainingSet()
 			ndInt32 batchesCount = trainingDigits->GetRows() / m_miniBatchSize;
 			ndInt32 batchesSize = batchesCount * m_miniBatchSize;
 
+			ndBrainLossLeastSquaredError loss(outputSize);
 			for (ndInt32 epoch = 0; epoch < NUMBER_OF_EPOCKS; ++epoch)
 			{
 				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
@@ -278,28 +279,18 @@ static void MnistTrainingSet()
 						ndBrainMemVector input(&miniBatchInput[i * inputSize], inputSize);
 						input.SetCount(inputSize);
 						input.Set((*trainingDigits)[index]);
-
-						ndBrainMemVector truth(&groundTruth[i * outputSize], outputSize);
-						truth.SetCount(outputSize);
-						truth.Set((*trainingLabels)[index]);
 					}
-					//BackPropagateBatchGpu();
-
 					trainer->MakePrediction(miniBatchInput);
 
-					// TODO: calculate loss
-
-					// backpropagate loss.
-					trainer->BackPropagate(miniBatchInput);
-
+					//calculate loss
 					trainer->GetOutput(miniBatchOutput);
 					#if 0
 						ndBrainVector internalBuffers;
 						ndBrainVector internalParameters;
-						trainer->GetWorkingBuffer(internalBuffers);
-						trainer->GetParameterBuffer(internalParameters);
-						ndInt32 inputSize = trainer->GetBrain()->GetInputSize();
-						ndInt32 outputSize = trainer->GetBrain()->GetOutputSize();
+						//trainer->GetWorkingBuffer(internalBuffers);
+						//trainer->GetParameterBuffer(internalParameters);
+						//ndInt32 inputSize = trainer->GetBrain()->GetInputSize();
+						//ndInt32 outputSize = trainer->GetBrain()->GetOutputSize();
 						ndBrainFixSizeVector<1024> xxx1;
 						xxx1.SetCount(outputSize);
 
@@ -311,9 +302,20 @@ static void MnistTrainingSet()
 							inputSize *= 1;
 						}
 					#endif
+
+					for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
+					{
+						ndUnsigned32 index = shuffleBuffer[batchStart + i];
+						ndBrainMemVector output(&miniBatchOutput[i * outputSize], outputSize);
+						const ndBrainMemVector truth(&(*trainingLabels)[index][0], outputSize);
+						loss.SetTruth(truth);
+						loss.GetLoss(output, output);
+					}
+
+					// backpropagate loss.
+					trainer->BackPropagate(miniBatchOutput);
 				}
 
-				//CalculateScore(bestBrain, epoch, failCount, trainingDigits, testLabels, testDigits);
 				ndInt64 testFailCount = ValidateData(testLabels, testDigits) + 1;
 				ndInt64 trainigFailCount = ValidateData(trainingLabels, trainingDigits) + 1;
 				ndInt64 minCombinedScore = testFailCount * trainigFailCount;

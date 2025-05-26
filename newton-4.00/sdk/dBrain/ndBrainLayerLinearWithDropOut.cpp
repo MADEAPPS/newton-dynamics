@@ -186,9 +186,9 @@ bool ndBrainLayerLinearWithDropOut::HasGpuSupport() const
 	return true;
 }
 
-ndBrainLayer::ndLayerUniformDataCpu* ndBrainLayerLinearWithDropOut::GetLayerUniformDataCpu() const
+ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* ndBrainLayerLinearWithDropOut::GetLayerUniformDataCpu() const
 {
-	ndLayerUniformDataCpu* const data = new ndLayerUniformDataCpu(this);
+	ndBrainLayerFeedFowardCpuCommand* const data = new ndBrainLayerFeedFowardCpuCommand(this);
 
 	data->m_inputSize = GetInputSize();
 	data->m_outputSize = GetOutputSize();
@@ -204,7 +204,7 @@ ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerLinearWithDropOut::GetLayerUnifo
 	return data;
 }
 
-void ndBrainLayerLinearWithDropOut::FeedForward(const ndLayerUniformDataCpu* const info, ndInt32 miniBatchIndex) const
+void ndBrainLayerLinearWithDropOut::FeedForward(const ndBrainLayerFeedFowardCpuCommand* const info, ndInt32 miniBatchIndex) const
 {
 	const ndBrainTrainerCpuInference* const trainer = info->m_owner;
 

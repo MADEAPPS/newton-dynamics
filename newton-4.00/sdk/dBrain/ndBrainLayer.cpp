@@ -62,12 +62,17 @@ void ndBrainLayer::CopyWeights(ndBrainVector&) const
 {
 }
 
-void ndBrainLayer::FeedForward(const ndLayerUniformDataCpu* const info, ndInt32 miniBatchIndex) const
+void ndBrainLayer::FeedForward(const ndBrainLayerFeedFowardCpuCommand* const info, ndInt32 miniBatchIndex) const
 {
 	ndAssert(0);
 }
 
-ndBrainLayer::ndLayerUniformDataCpu* ndBrainLayer::GetLayerUniformDataCpu() const
+void ndBrainLayer::BackPropagated(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const
+{
+	ndAssert(0);
+}
+
+ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* ndBrainLayer::GetLayerUniformDataCpu() const
 {
 	ndAssert(0);
 	return nullptr;

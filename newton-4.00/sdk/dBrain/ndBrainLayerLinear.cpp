@@ -337,9 +337,9 @@ ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerLinear::GetLayerUniformDataGpu(c
 	return data;
 }
 
-ndBrainLayer::ndLayerUniformDataCpu* ndBrainLayerLinear::GetLayerUniformDataCpu() const
+ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* ndBrainLayerLinear::GetLayerUniformDataCpu() const
 {
-	ndLayerUniformDataCpu* const data = new ndLayerUniformDataCpu(this);
+	ndBrainLayerFeedFowardCpuCommand* const data = new ndBrainLayerFeedFowardCpuCommand(this);
 
 	data->m_inputSize = GetInputSize();
 	data->m_outputSize = GetOutputSize();
@@ -347,7 +347,7 @@ ndBrainLayer::ndLayerUniformDataCpu* ndBrainLayerLinear::GetLayerUniformDataCpu(
 	return data;
 }
 
-void ndBrainLayerLinear::FeedForward(const ndLayerUniformDataCpu* const info, ndInt32 miniBatchIndex) const
+void ndBrainLayerLinear::FeedForward(const ndBrainLayerFeedFowardCpuCommand* const info, ndInt32 miniBatchIndex) const
 {
 	const ndBrainTrainerCpuInference* const trainer = info->m_owner;
 

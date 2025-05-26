@@ -29,274 +29,6 @@
 #include "ndBrainTrainerCpuInference.h"
 #include "ndBrainLayerActivationSoftmax.h"
 
-#if 0
-class ndBrainTrainerCpu::ndLayerData : public ndClassAlloc
-{
-	public:
-	ndLayerData(ndBrainLayer* const layer)
-		:ndClassAlloc()
-		,m_layer(layer)
-		,m_gradient(nullptr)
-	{
-		if (layer->HasParameters())
-		{
-			m_gradient = layer->Clone();
-		}
-	}
-
-	~ndLayerData()
-	{
-		if (m_gradient)
-		{
-			delete m_gradient;
-		}
-	}
-
-	void Clear()
-	{
-		if (m_layer->HasParameters())
-		{
-			m_gradient->Clear();
-		}
-	}
-
-	void Add(const ndLayerData& src)
-	{
-		if (m_layer->HasParameters())
-		{
-			m_gradient->Add(*src.m_gradient);
-		}
-	}
-
-	void Copy(const ndLayerData& src)
-	{
-		if (m_layer->HasParameters())
-		{
-			m_gradient->Set(*src.m_gradient);
-		}
-	}
-
-	void Scale(ndBrainFloat s)
-	{
-		if (m_layer->HasParameters())
-		{
-			m_gradient->Scale(s);
-		}
-	}
-
-	ndBrainLayer* m_layer;
-	ndBrainLayer* m_gradient;
-};
-
-ndBrainTrainerCpu::ndBrainTrainerCpu(const ndSharedPtr<ndBrain>& brain)
-	:ndBrainTrainer(brain)
-	,m_data()
-	,m_workingBuffer()
-	,m_prefixScan()
-{
-	for (ndInt32 i = 0; i < m_brain->GetCount(); ++i)
-	{
-		m_data.PushBack(new ndLayerData((**m_brain)[i]));
-	}
-
-	const ndArray<ndBrainLayer*>& layers = **brain;
-
-	ndInt32 maxSize = layers[0]->GetInputSize();
-	ndInt32 sizeAcc = (layers[0]->GetInputSize() + 7) & -8;
-
-	m_prefixScan.PushBack(0);
-	for (ndInt32 i = 0; i < m_brain->GetCount(); ++i)
-	{
-		m_prefixScan.PushBack(sizeAcc);
-		ndInt32 outputSize = layers[i]->GetOutputBufferSize();
-		sizeAcc += (outputSize + 7) & -8;
-		maxSize = ndMax(maxSize, outputSize);
-	}
-	m_prefixScan.PushBack(sizeAcc + 32);
-
-	m_maxLayerBufferSize = maxSize;
-	m_workingBufferSize = sizeAcc + maxSize * 2 + 256;
-	m_workingBuffer.SetCount(m_workingBufferSize);
-}
-
-ndBrainTrainerCpu::ndBrainTrainerCpu(const ndBrainTrainerCpu& src)
-	:ndBrainTrainer(src)
-	,m_data()
-	,m_workingBuffer()
-	,m_prefixScan(src.m_prefixScan)
-	,m_workingBufferSize(src.m_workingBufferSize)
-	,m_maxLayerBufferSize(src.m_maxLayerBufferSize)
-{
-	ndAssert(0);
-	m_workingBuffer.SetCount(src.m_workingBuffer.GetCount());
-	for (ndInt32 i = 0; i < m_brain->GetCount(); ++i)
-	{
-		m_data.PushBack(new ndLayerData((**m_brain)[i]));
-	}
-}
-
-ndBrainTrainerCpu::~ndBrainTrainerCpu()
-{
-	for (ndInt32 i = 0; i < m_data.GetCount(); ++i)
-	{
-		delete (m_data[i]);
-	}
-}
-
-ndBrainVector& ndBrainTrainerCpu::GetWorkingBuffer()
-{
-	return m_workingBuffer;
-}
-
-ndBrainLayer* ndBrainTrainerCpu::GetWeightsLayer(ndInt32 index) const
-{
-	return m_data[index]->m_layer;
-}
-
-ndBrainLayer* ndBrainTrainerCpu::GetGradientLayer(ndInt32 index) const
-{
-	return m_data[index]->m_gradient;
-}
-
-void ndBrainTrainerCpu::AcculumateGradients(const ndBrainTrainerCpu& src, ndInt32 index)
-{
-	ndLayerData* const dstData = m_data[index];
-	ndAssert(dstData->m_layer->HasParameters());
-	const ndLayerData* const srcData = src.m_data[index];
-	dstData->Add(*srcData);
-}
-
-void ndBrainTrainerCpu::ClearGradients()
-{
-	for (ndInt32 i = ndInt32(m_data.GetCount() - 1); i >= 0; --i)
-	{
-		m_data[i]->Clear();
-	}
-}
-
-void ndBrainTrainerCpu::AddGradients(const ndBrainTrainerCpu* const src)
-{
-	for (ndInt32 i = ndInt32(m_data.GetCount() - 1); i >= 0; --i)
-	{
-		m_data[i]->Add(*src->m_data[i]);
-	}
-}
-
-void ndBrainTrainerCpu::CopyGradients(const ndBrainTrainerCpu* const src)
-{
-	for (ndInt32 i = ndInt32(m_data.GetCount() - 1); i >= 0; --i)
-	{
-		m_data[i]->Copy(*src->m_data[i]);
-	}
-}
-
-void ndBrainTrainerCpu::ScaleWeights(const ndBrainFloat s)
-{
-	for (ndInt32 i = ndInt32(m_data.GetCount() - 1); i >= 0; --i)
-	{
-		m_data[i]->Scale(s);
-	}
-}
-
-void ndBrainTrainerCpu::CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradientsOut, ndBrainLoss& loss)
-{
-	const ndInt32 layersCount = ndInt32(m_brain->GetCount());
-	const ndArray<ndBrainLayer*>& layers = **m_brain;
-	ndAssert(!(loss.IsCategorical() ^ (!strcmp(layers[layersCount - 1]->GetLabelId(), "ndBrainLayerActivationCategoricalSoftmax"))));
-
-	if (m_workingBuffer.GetCount() < m_workingBufferSize)
-	{
-		m_workingBuffer.SetCount(m_workingBufferSize);
-	}
-
-	const ndInt32 gradientOffset = m_prefixScan[m_prefixScan.GetCount() - 1];
-	const ndBrainFloat* const memBuffer = &m_workingBuffer[0];
-	const ndBrainFloat* const gradientBuffer = &m_workingBuffer[gradientOffset];
-	const ndInt32 maxSize = m_maxLayerBufferSize;
-
-	ndBrainMemVector in0(memBuffer, input.GetCount());
-	in0.Set(input);
-
-	for (ndInt32 i = 0; i < layersCount; ++i)
-	{
-		const ndBrainMemVector in(memBuffer + m_prefixScan[i + 0], layers[i]->GetInputSize());
-		ndBrainMemVector out(memBuffer + m_prefixScan[i + 1], layers[i]->GetOutputSize());
-		layers[i]->MakePrediction(in, out);
-	}
-	const ndBrainMemVector output(memBuffer + m_prefixScan[layersCount], m_brain->GetOutputSize());
-
-	ndBrainMemVector gradientIn(gradientBuffer, m_brain->GetOutputSize());
-	ndBrainMemVector gradientOut(gradientBuffer + maxSize + 128, m_brain->GetOutputSize());
-	loss.GetLoss(output, gradientOut);
-
-	for (ndInt32 i = ndInt32(m_data.GetCount()) - 1; i >= 0; --i)
-	{
-		const ndBrainLayer* const layer = m_data[i]->m_layer;
-		gradientIn.SetSize(layer->GetInputSize());
-		const ndBrainMemVector in(memBuffer + m_prefixScan[i + 0], layer->GetInputSize());
-		const ndBrainMemVector out(memBuffer + m_prefixScan[i + 1], layer->GetOutputSize());
-		layer->InputDerivative(in, out, gradientOut, gradientIn);
-		gradientIn.Swap(gradientOut);
-	}
-	inputGradientsOut.Set(gradientOut);
-}
-
-void ndBrainTrainerCpu::MakePrediction(const ndBrainVector&)
-{
-	ndAssert(0);
-}
-
-void ndBrainTrainerCpu::BackPropagate(const ndBrainVector&, const ndBrainVector&)
-{
-	ndAssert(0);
-}
-
-//#pragma optimize( "", off )
-void ndBrainTrainerCpu::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss)
-{
-	const ndInt32 layersCount = ndInt32(m_brain->GetCount());
-	const ndArray<ndBrainLayer*>& layers = **m_brain;
-	ndAssert(!(loss.IsCategorical() ^ (!strcmp(layers[layersCount - 1]->GetLabelId(), "ndBrainLayerActivationCategoricalSoftmax"))));
-
-	if (m_workingBuffer.GetCount() < m_workingBufferSize)
-	{
-		m_workingBuffer.SetCount(m_workingBufferSize);
-	}
-
-	const ndInt32 gradientOffset = m_prefixScan[m_prefixScan.GetCount() - 1];
-	const ndBrainFloat* const memBuffer = &m_workingBuffer[0];
-	const ndBrainFloat* const gradientBuffer = &m_workingBuffer[gradientOffset];
-	const ndInt32 maxSize = m_maxLayerBufferSize;
-
-	ndBrainMemVector in0(memBuffer, input.GetCount());
-	in0.Set(input);
-
-	for (ndInt32 i = 0; i < layersCount; ++i)
-	{
-		const ndBrainMemVector in(memBuffer + m_prefixScan[i + 0], layers[i]->GetInputSize());
-		ndBrainMemVector out(memBuffer + m_prefixScan[i + 1], layers[i]->GetOutputSize());
-		layers[i]->MakePrediction(in, out);
-	}
-	const ndBrainMemVector output(memBuffer + m_prefixScan[layersCount], m_brain->GetOutputSize());
-	
-	ndBrainMemVector gradientIn(gradientBuffer, m_brain->GetOutputSize());
-	ndBrainMemVector gradientOut(gradientBuffer + maxSize + 128, m_brain->GetOutputSize());
-	loss.GetLoss(output, gradientOut);
-
-	for (ndInt32 i = ndInt32(m_data.GetCount()) - 1; i >= 0; --i)
-	{
-		const ndBrainLayer* const layer = m_data[i]->m_layer;
-		gradientIn.SetSize(layer->GetInputSize());
-		const ndBrainMemVector in(memBuffer + m_prefixScan[i + 0], layer->GetInputSize());
-		const ndBrainMemVector out(memBuffer + m_prefixScan[i + 1], layer->GetOutputSize());
-		layer->CalculateParamGradients(in, out, gradientOut, gradientIn, m_data[i]->m_gradient);
-		gradientIn.Swap(gradientOut);
-	}
-}
-
-#endif
-
-
 ndBrainTrainerCpuInference::ndBrainTrainerCpuInference(const ndSharedPtr<ndBrain>& brain, ndBrainThreadPool* const threadPool, ndInt32 minibatchSize)
 	:ndBrainTrainer(brain)
 	,m_inputOutputBuffer()
@@ -342,20 +74,20 @@ void ndBrainTrainerCpuInference::InitWeightAndBiasBuffer()
 {
 	const ndBrain& brain = **m_brain;
 
-	ndFixSizeArray<ndBrainLayer::ndLayerUniformDataCpu*, 256> uniformData;
+	ndFixSizeArray<ndBrainLayer::ndBrainLayerFeedFowardCpuCommand*, 256> uniformData;
 	for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
 	{
 		const ndBrainLayer* const layer = brain[i];
-		ndBrainLayer::ndLayerUniformDataCpu* const data = layer->GetLayerUniformDataCpu();
+		ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* const data = layer->GetLayerUniformDataCpu();
 		data->m_owner = this;
 		uniformData.PushBack(data);
 	}
 
-	class DummyLayerUniformDataCpu : public ndBrainLayer::ndLayerUniformDataCpu
+	class DummyLayerUniformDataCpu : public ndBrainLayer::ndBrainLayerFeedFowardCpuCommand
 	{
 		public:
 		DummyLayerUniformDataCpu()
-			:ndBrainLayer::ndLayerUniformDataCpu(nullptr)
+			:ndBrainLayer::ndBrainLayerFeedFowardCpuCommand(nullptr)
 		{
 		}
 
@@ -392,10 +124,10 @@ void ndBrainTrainerCpuInference::InitWeightAndBiasBuffer()
 	
 	AddCopyInputCommand(uniformData[0]);
 	AddLayersCommands(uniformData);
-	//AddCopyOutputCommand();
+	AddCopyOutputCommand();
 }
 
-void ndBrainTrainerCpuInference::AddCopyInputCommand(const ndBrainLayer::ndLayerUniformDataCpu* const uniformData)
+void ndBrainTrainerCpuInference::AddCopyInputCommand(const ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* const uniformData)
 {
 	const ndBrain& brain = **m_brain;
 	ndInt32 inputOutputBufferSize = brain.GetInputSize();
@@ -421,9 +153,9 @@ void ndBrainTrainerCpuInference::AddCopyInputCommand(const ndBrainLayer::ndLayer
 
 		virtual void Execute(ndInt32 miniBatchIndex)
 		{
-			const ndBrainMemVector source(&m_owner->m_miniBatchInputBuffer[miniBatchIndex * m_inputSize], m_inputSize);
+			const ndBrainMemVector src(&m_owner->m_miniBatchInputBuffer[miniBatchIndex * m_inputSize], m_inputSize);
 			ndBrainMemVector dst(&m_owner->m_inputOutputBuffer[miniBatchIndex * m_inputOutputSize], m_inputSize);
-			dst.Set(source);
+			dst.Set(src);
 		}
 
 		ndBrainTrainerCpuInference* m_owner;
@@ -444,7 +176,49 @@ void ndBrainTrainerCpuInference::AddCopyInputCommand(const ndBrainLayer::ndLayer
 	m_commandBuffers.Append(ndSharedPtr<ndBrainTrainerCpuCommand>(inputCommand));
 }
 
-void ndBrainTrainerCpuInference::AddLayersCommands(ndFixSizeArray<ndBrainLayer::ndLayerUniformDataCpu*, 256>& layersCommands)
+void ndBrainTrainerCpuInference::AddCopyOutputCommand()
+{
+	class ndCopyOutputCommand : public ndBrainTrainerCpuCommand
+	{
+		public:
+		ndCopyOutputCommand(ndBrainTrainerCpuInference* owner)
+			:ndBrainTrainerCpuCommand()
+			,m_owner(owner)
+			,m_inputSize(0)
+			,m_outputSize(0)
+			,m_parametersSize(0)
+			,m_inputOutputSize(0)
+			,m_inputOutputStartOffset(0)
+		{
+		}
+
+		virtual void Execute(ndInt32 miniBatchIndex)
+		{
+			const ndBrainMemVector src(&m_owner->m_inputOutputBuffer[miniBatchIndex * m_inputOutputSize + m_inputSize], m_outputSize);
+			ndBrainMemVector dst(&m_owner->m_miniBatchOutputBuffer[miniBatchIndex * m_outputSize], m_outputSize);
+			dst.Set(src);
+		}
+
+		ndBrainTrainerCpuInference* m_owner;
+		ndInt32 m_inputSize;
+		ndInt32 m_outputSize;
+		ndInt32 m_parametersSize;
+		ndInt32 m_inputOutputSize;
+		ndInt32 m_inputOutputStartOffset;
+	};
+	ndCopyOutputCommand* const outputCommand = new ndCopyOutputCommand(this);
+
+	const ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* const lastCommand = (ndBrainLayer::ndBrainLayerFeedFowardCpuCommand*)*m_commandBuffers.GetLast()->GetInfo();
+	outputCommand->m_inputSize = lastCommand->m_inputSize;
+	outputCommand->m_outputSize = lastCommand->m_outputSize;
+	outputCommand->m_parametersSize = 0;
+
+	outputCommand->m_inputOutputSize = lastCommand->m_inputOutputSize;
+	outputCommand->m_inputOutputStartOffset = lastCommand->m_inputOutputStartOffset + lastCommand->m_inputSize;
+	m_commandBuffers.Append(ndSharedPtr<ndBrainTrainerCpuCommand>(outputCommand));
+}
+
+void ndBrainTrainerCpuInference::AddLayersCommands(ndFixSizeArray<ndBrainLayer::ndBrainLayerFeedFowardCpuCommand*, 256>& layersCommands)
 {
 	// create all the uniform buffers 
 	const ndBrain& brain = **m_brain;
@@ -455,7 +229,7 @@ void ndBrainTrainerCpuInference::AddLayersCommands(ndFixSizeArray<ndBrainLayer::
 	ndInt32 inputOutputBufferSize = brain.GetInputSize();
 	for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
 	{
-		ndBrainLayer::ndLayerUniformDataCpu* const data = layersCommands[i];
+		ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* const data = layersCommands[i];
 		data->m_inputOutputStartOffset = inputOutputStartOffset;
 		inputOutputBufferSize += data->m_outputSize;
 		inputOutputStartOffset += data->m_inputSize;
@@ -463,7 +237,7 @@ void ndBrainTrainerCpuInference::AddLayersCommands(ndFixSizeArray<ndBrainLayer::
 	
 	for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
 	{
-		ndBrainLayer::ndLayerUniformDataCpu* const layerCommand = layersCommands[i];
+		ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* const layerCommand = layersCommands[i];
 		layerCommand->m_inputOutputSize = inputOutputBufferSize;
 		m_commandBuffers.Append(ndSharedPtr<ndBrainTrainerCpuCommand>(layerCommand));
 	}
