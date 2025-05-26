@@ -30,15 +30,15 @@ class ndBrain;
 class ndBrainLoss;
 class ndBrainLayer;
 
-class ndBrainGpuInference: public ndBrainTrainer
+class ndBrainTrainnerGpuInference: public ndBrainTrainer
 {
 	public: 
 	class ndGpuCommand;
 	class ndUniformBufferObject;
 
-	ndBrainGpuInference(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainGpuContext>& context, ndInt32 minibatchSize);
-	ndBrainGpuInference(const ndBrainGpuInference& src);
-	virtual ~ndBrainGpuInference();
+	ndBrainTrainnerGpuInference(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainGpuContext>& context, ndInt32 minibatchSize);
+	ndBrainTrainnerGpuInference(const ndBrainTrainnerGpuInference& src);
+	virtual ~ndBrainTrainnerGpuInference();
 
 	virtual void GetInput(ndBrainVector& ouput) const;
 	virtual void GetOutput(ndBrainVector& ouput) const;

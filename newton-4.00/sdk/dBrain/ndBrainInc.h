@@ -72,7 +72,7 @@
 #include <gpu/ndBrainGpuCommand.h>
 #include <gpu/ndBrainGpuContext.h>
 #include <gpu/ndBrainTrainerGpu.h>
-#include <gpu/ndBrainGpuInference.h>
+#include <gpu/ndBrainTrainnerGpuInference.h>
 #include <gpu/ndBrainGpuFloatBuffer.h>
 #include <gpu/ndBrainGpuIntegerBuffer.h>
 #include <gpu/ndBrainGpuUniformBuffer.h>

@@ -34,7 +34,7 @@
 #include "ndBrainGpuUniformBuffer.h"
 
 ndBrainTrainerGpu::ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainGpuContext>& context, ndInt32 minibatchSize)
-	:ndBrainGpuInference(brain, context, minibatchSize)
+	:ndBrainTrainnerGpuInference(brain, context, minibatchSize)
 	,m_inputOuputGradientsBuffer()
 	,m_weightAndBiasGradientsBuffer()
 {
@@ -50,7 +50,7 @@ ndBrainTrainerGpu::ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const nd
 }
 
 ndBrainTrainerGpu::ndBrainTrainerGpu(const ndBrainTrainerGpu& src)
-	:ndBrainGpuInference(src)
+	:ndBrainTrainnerGpuInference(src)
 	//,m_groundTruth()
 	,m_inputOuputGradientsBuffer()
 	,m_weightAndBiasGradientsBuffer()
