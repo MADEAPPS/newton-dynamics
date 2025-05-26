@@ -106,9 +106,18 @@ bool ndBrainLayerActivationRelu::HasGpuSupport() const
 	return true;
 }
 
-ndBrainLayer::ndLayerUniformData ndBrainLayerActivationRelu::GetLayerGpuUniformData(const ndBrainGpuContext* const context) const
+ndBrainLayer::ndLayerUniformDataCpu* ndBrainLayerActivationRelu::GetLayerUniformDataCpu() const
 {
-	ndLayerUniformData data;
+	ndLayerUniformDataCpu* const data = new ndLayerUniformDataCpu(this);
+
+	data->m_inputSize = GetInputSize();
+	data->m_outputSize = GetOutputSize();
+	return data;
+}
+
+ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerActivationRelu::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const
+{
+	ndLayerUniformDataGpu data;
 	data.m_shader = context->m_ndBrainLayerReluActivation;
 	data.m_inputSize = GetInputSize();
 	data.m_outputSize = GetOutputSize();

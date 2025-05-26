@@ -72,9 +72,11 @@ class ndBrainLayerLinear : public ndBrainLayer
 	protected:
 	void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
 
+	virtual void CopyWeights(ndBrainVector& oput) const override;
+
 	virtual bool HasGpuSupport() const override;
-	virtual void CopyGpuWeights(ndBrainVector& oput) const override;
-	virtual ndLayerUniformData GetLayerGpuUniformData(const ndBrainGpuContext* const context) const override;
+	virtual ndLayerUniformDataCpu* GetLayerUniformDataCpu() const override;
+	virtual ndLayerUniformDataGpu GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const override;
 
 	ndBrainVector m_bias;
 	ndBrainMatrix m_weights;

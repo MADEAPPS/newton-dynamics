@@ -39,10 +39,10 @@ class ndBrainTrainerCpuLegacy: public ndBrainTrainer
 	ndBrainTrainerCpuLegacy(const ndBrainTrainerCpuLegacy& src);
 	virtual ~ndBrainTrainerCpuLegacy();
 
-	virtual void MakePrediction(const ndBrainVector& input) override;
 	virtual void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss) override;
 
-	virtual void BackPropagate(const ndBrainVector& input, const ndBrainVector& groundTruth) override;
+	virtual void MakePrediction(const ndBrainVector& input) override;
+	virtual void BackPropagate(const ndBrainVector&) override { ndAssert(0);}
 
 	void AcculumateGradients(const ndBrainTrainerCpuLegacy& src, ndInt32 index);
 	void CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradientsOut, ndBrainLoss& loss);

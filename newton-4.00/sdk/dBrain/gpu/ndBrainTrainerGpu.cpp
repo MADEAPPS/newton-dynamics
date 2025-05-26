@@ -33,20 +33,12 @@
 #include "ndBrainGpuFloatBuffer.h"
 #include "ndBrainGpuUniformBuffer.h"
 
-ndBrainTrainerGpu::ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainGpuContext>& context, ndInt32 minibatchSize, const ndBrainLoss& loss)
+ndBrainTrainerGpu::ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainGpuContext>& context, ndInt32 minibatchSize)
 	:ndBrainGpuInference(brain, context, minibatchSize)
-	,m_groundTruth()
 	,m_inputOuputGradientsBuffer()
 	,m_weightAndBiasGradientsBuffer()
 {
-	ndAssert(loss.HasGpuSupport());
-
 	ndBrainVector buffer;
-	ndInt32 bufferSize = m_brain->GetOutputSize();
-	buffer.SetCount(bufferSize * m_miniBatchSize);
-	buffer.Set(ndBrainFloat(0.0f));
-	m_groundTruth = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(*m_context, buffer, ndCpuMappable));
-
 	GetWorkingBuffer(buffer);
 	buffer.Set(ndReal(0.0f));
 	m_inputOuputGradientsBuffer = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(*m_context, buffer, ndCpuMappable));
@@ -55,13 +47,11 @@ ndBrainTrainerGpu::ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const nd
 	buffer.SetCount(buffer.GetCount() * m_miniBatchSize);
 	buffer.Set(ndReal(0.0f));
 	m_weightAndBiasGradientsBuffer = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(*m_context, buffer, ndCpuMappable));
-
-	AddLossCommandBuffer(loss);
 }
 
 ndBrainTrainerGpu::ndBrainTrainerGpu(const ndBrainTrainerGpu& src)
 	:ndBrainGpuInference(src)
-	,m_groundTruth()
+	//,m_groundTruth()
 	,m_inputOuputGradientsBuffer()
 	,m_weightAndBiasGradientsBuffer()
 {
@@ -72,22 +62,15 @@ ndBrainTrainerGpu::~ndBrainTrainerGpu()
 {
 }
 
-void ndBrainTrainerGpu::AddLossCommandBuffer(const ndBrainLoss& loss)
+void ndBrainTrainerGpu::BackPropagate(const ndBrainVector& outputGradients)
 {
-}
-
-void ndBrainTrainerGpu::BackPropagate(const ndBrainVector&, ndBrainLoss&)
-{
-	ndAssert(0);
-}
-
-void ndBrainTrainerGpu::BackPropagate(const ndBrainVector& input, const ndBrainVector& groundTruth)
-{
-	m_miniBatchInputBuffer->LoadData(input.GetCount() * sizeof(ndReal), &input[0]);
-	m_groundTruth->LoadData(groundTruth.GetCount() * sizeof(ndReal), &groundTruth[0]);
-	for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = m_commandBuffers.GetFirst(); node; node = node->GetNext())
-	{
-		ndSharedPtr<ndBrainGpuCommand>& command = node->GetInfo();
-		m_context->AddCommandQueue(command);
-	}
+	//m_context->BeginQueue();
+	//m_miniBatchInputBuffer->LoadData(input.GetCount() * sizeof(ndReal), &input[0]);
+	////m_groundTruth->LoadData(groundTruth.GetCount() * sizeof(ndReal), &groundTruth[0]);
+	//for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = m_commandBuffers.GetFirst(); node; node = node->GetNext())
+	//{
+	//	ndSharedPtr<ndBrainGpuCommand>& command = node->GetInfo();
+	//	m_context->AddCommandQueue(command);
+	//}
+	//m_context->EndQueue();
 }

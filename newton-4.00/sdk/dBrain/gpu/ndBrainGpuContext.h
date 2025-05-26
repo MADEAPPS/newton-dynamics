@@ -41,7 +41,6 @@ class ndBrainGpuContext : public ndClassAlloc
 			ndVulkanShader m_ndBrainCopyInput;
 			ndVulkanShader m_ndBrainCopyOutput;
 			ndVulkanShader m_ndBrainLayerLinear;
-			ndVulkanShader m_ndBrainLayerEluActivation;
 			ndVulkanShader m_ndBrainLayerReluActivation;
 			ndVulkanShader m_ndBrainLayerTanhActivation;
 			ndVulkanShader m_ndBrainLayerSoftmaxActivation;

@@ -45,16 +45,20 @@ class ndBrainGpuInference: public ndBrainTrainer
 	virtual void GetWorkingBuffer(ndBrainVector& ouput) const;
 	virtual void GetParameterBuffer(ndBrainVector& ouput) const;
 
+	// legacy
+	virtual void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss) override { ndAssert(0); }
+
 	virtual void MakePrediction(const ndBrainVector& input) override;
-	virtual void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss) override;
+	virtual void BackPropagate(const ndBrainVector& outputGradients) override;
 
 	protected:
+	void SubmitCommands();
 	void AddCopyOutputCommand();
 	void InitInputOutputBuffer();
 	void InitWeightAndBiasBuffer();
-	void AddCopyInputCommand(const ndBrainLayer::ndLayerUniformData& uniformData);
+	void AddCopyInputCommand(const ndBrainLayer::ndLayerUniformDataGpu& uniformData);
 	void UnloadBuffer(ndBrainVector& ouput, const ndSharedPtr<ndBrainGpuBuffer>& gpuBuffer) const;
-	void AddLayersCommands(ndFixSizeArray<ndBrainLayer::ndLayerUniformData, 256>& layersUniformsData);
+	void AddLayersCommands(ndFixSizeArray<ndBrainLayer::ndLayerUniformDataGpu, 256>& layersUniformsData);
 
 	ndSharedPtr<ndBrainGpuContext> m_context;
 	ndList<ndSharedPtr<ndBrainGpuBuffer>> m_uniforms;

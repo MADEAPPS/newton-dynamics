@@ -23,32 +23,57 @@
 #define _ND_BRAIN_LAYER_H__
 
 #include "ndBrainStdafx.h"
+#include "ndBrainTrainer.h"
 #include "gpu/ndBrainGpuContext.h"
 
 class ndBrainLoad;
 class ndBrainSave;
 class ndBrainVector;
 class ndBrainMatrix;
+class ndBrainTrainerCpu;
 class ndBrainGpuCommand;
 class ndBrainGpuFloatBuffer;
 
 class ndBrainLayer : public ndClassAlloc
 {
 	public: 
-	class ndBufferOffsetPair
+	class ndLayerUniformDataCpu : public ndBrainTrainerCpuCommand
 	{
 		public:
-		ndBufferOffsetPair();
-		~ndBufferOffsetPair();
+		ndLayerUniformDataCpu(const ndBrainLayer* const layer)
+			:ndBrainTrainerCpuCommand()
+			,m_layer(layer)
+			,m_owner(nullptr)
+			,m_inputSize(0)
+			,m_outputSize(0)
+			,m_parametersSize(0)
+			,m_parametersStartOffset(0)
+			,m_inputOutputStartOffset(0)
+		{
+		}
 
-		ndBrainGpuFloatBuffer* m_buffer;
-		ndArray<ndInt32> m_offsets;
+		virtual ~ndLayerUniformDataCpu()
+		{
+		}
+
+		virtual void Execute(ndInt32 threadid, ndInt32 threadCount)
+		{
+			ndAssert(0);
+		}
+
+		const ndBrainLayer* m_layer;
+		ndBrainTrainerCpu* m_owner;
+		ndInt32 m_inputSize;
+		ndInt32 m_outputSize;
+		ndInt32 m_parametersSize;
+		ndInt32 m_parametersStartOffset;
+		ndInt32 m_inputOutputStartOffset;
 	};
 
-	class ndLayerUniformData
+	class ndLayerUniformDataGpu
 	{
 		public:
-		ndLayerUniformData()
+		ndLayerUniformDataGpu()
 			:m_shader(nullptr)
 			,m_inputSize(0)
 			,m_outputSize(0)
@@ -94,6 +119,7 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void ApplyDropOut(ndFloat32 rate);
 	virtual void InitWeights();
 
+	virtual void CopyWeights(ndBrainVector& oput) const;
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	virtual void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
 
@@ -105,8 +131,8 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
 
 	virtual bool HasGpuSupport() const;
-	virtual void CopyGpuWeights(ndBrainVector& oput) const;
-	virtual ndLayerUniformData GetLayerGpuUniformData(const ndBrainGpuContext* const context) const;
+	virtual ndLayerUniformDataCpu* GetLayerUniformDataCpu() const;
+	virtual ndLayerUniformDataGpu GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const;
 };
 
 #endif 

@@ -30,17 +30,13 @@
 class ndBrainTrainerGpu: public ndBrainGpuInference
 {
 	public: 
-	ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainGpuContext>& context, ndInt32 minibatchSize, const ndBrainLoss& loss);
+	ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainGpuContext>& context, ndInt32 minibatchSize);
 	ndBrainTrainerGpu(const ndBrainTrainerGpu& src);
 	virtual ~ndBrainTrainerGpu();
 
-	virtual void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss) override;
-	virtual void BackPropagate(const ndBrainVector& input, const ndBrainVector& groundTruth) override;
+	virtual void BackPropagate(const ndBrainVector& outputGradients) override;
 
 	protected:
-	void AddLossCommandBuffer(const ndBrainLoss& loss);
-
-	ndSharedPtr<ndBrainGpuBuffer> m_groundTruth;
 	ndSharedPtr<ndBrainGpuBuffer> m_inputOuputGradientsBuffer;
 	ndSharedPtr<ndBrainGpuBuffer> m_weightAndBiasGradientsBuffer;
 };

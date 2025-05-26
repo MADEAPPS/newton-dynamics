@@ -28,20 +28,6 @@
 
 class ndBrainGpuContext;
 
-ndBrainLayer::ndBufferOffsetPair::ndBufferOffsetPair() 
-	:m_buffer(nullptr)
-	,m_offsets()
-{
-}
-
-ndBrainLayer::ndBufferOffsetPair::~ndBufferOffsetPair()
-{
-	if (m_buffer)
-	{
-		delete m_buffer;
-	}
-}
-
 ndBrainLayer::ndBrainLayer(const ndBrainLayer& src)
 	:ndClassAlloc(src)
 {
@@ -72,14 +58,20 @@ bool ndBrainLayer::HasGpuSupport() const
 	return false;
 }
 
-void ndBrainLayer::CopyGpuWeights(ndBrainVector&) const
+void ndBrainLayer::CopyWeights(ndBrainVector&) const
 {
 }
 
-ndBrainLayer::ndLayerUniformData ndBrainLayer::GetLayerGpuUniformData(const ndBrainGpuContext* const) const
+ndBrainLayer::ndLayerUniformDataCpu* ndBrainLayer::GetLayerUniformDataCpu() const
 {
 	ndAssert(0);
-	return ndLayerUniformData();
+	return nullptr;
+}
+
+ndBrainLayer::ndLayerUniformDataGpu ndBrainLayer::GetLayerUniformDataGpu(const ndBrainGpuContext* const) const
+{
+	ndAssert(0);
+	return ndLayerUniformDataGpu();
 }
 
 const char* ndBrainLayer::GetLabelId() const

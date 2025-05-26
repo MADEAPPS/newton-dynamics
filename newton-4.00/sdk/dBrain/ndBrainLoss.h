@@ -34,8 +34,6 @@ class ndBrainLoss : public ndClassAlloc
 	virtual void GetLoss(const ndBrainVector& output, ndBrainVector& loss) = 0;
 
 	virtual bool IsCategorical() const;
-
-	virtual bool HasGpuSupport() const;
 };
 
 

@@ -307,7 +307,7 @@ bool ndBrainLayerLinear::HasGpuSupport() const
 	return true;
 }
 
-void ndBrainLayerLinear::CopyGpuWeights(ndBrainVector& output) const
+void ndBrainLayerLinear::CopyWeights(ndBrainVector& output) const
 {
 	ndAssert(output.GetCount() >= (GetOutputSize() * GetInputSize() + GetOutputSize()));
 
@@ -324,14 +324,24 @@ void ndBrainLayerLinear::CopyGpuWeights(ndBrainVector& output) const
 	bias.Set(m_bias);
 }
 
-ndBrainLayer::ndLayerUniformData ndBrainLayerLinear::GetLayerGpuUniformData(const ndBrainGpuContext* const context) const
+ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerLinear::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const
 {
-	ndLayerUniformData data;
+	ndLayerUniformDataGpu data;
 
 	data.m_shader = context->m_ndBrainLayerLinear;
 	data.m_inputSize = GetInputSize();
 	data.m_outputSize = GetOutputSize();
 	data.m_parametersSize = GetOutputSize() * GetInputSize() + GetOutputSize();
 
+	return data;
+}
+
+ndBrainLayer::ndLayerUniformDataCpu* ndBrainLayerLinear::GetLayerUniformDataCpu() const
+{
+	ndLayerUniformDataCpu* const data = new ndLayerUniformDataCpu(this);
+
+	data->m_inputSize = GetInputSize();
+	data->m_outputSize = GetOutputSize();
+	data->m_parametersSize = GetOutputSize() * GetInputSize() + GetOutputSize();
 	return data;
 }

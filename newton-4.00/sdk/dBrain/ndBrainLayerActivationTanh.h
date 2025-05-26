@@ -42,7 +42,8 @@ class ndBrainLayerActivationTanh : public ndBrainLayerActivation
 	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
 
 	virtual bool HasGpuSupport() const override;
-	virtual ndLayerUniformData GetLayerGpuUniformData(const ndBrainGpuContext* const context) const override;
+	ndLayerUniformDataCpu* GetLayerUniformDataCpu() const override;
+	virtual ndLayerUniformDataGpu GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const override;
 };
 
 #endif 

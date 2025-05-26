@@ -244,11 +244,6 @@ void ndBrainTrainerCpuLegacy::MakePrediction(const ndBrainVector&)
 	ndAssert(0);
 }
 
-void ndBrainTrainerCpuLegacy::BackPropagate(const ndBrainVector&, const ndBrainVector&)
-{
-	ndAssert(0);
-}
-
 //#pragma optimize( "", off )
 void ndBrainTrainerCpuLegacy::BackPropagate(const ndBrainVector& input, ndBrainLoss& loss)
 {

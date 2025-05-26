@@ -35,12 +35,15 @@
 #include <ndBrainOptimizer.h>
 #include <ndBrainSimdFloat8.h>
 #include <ndBrainThreadPool.h>
-#include <ndBrainTrainerCpuLegacy.h>
+#include <ndBrainTrainerCpu.h>
 #include <ndBrainLayerLinear.h>
 #include <ndBrainReplayBuffer.h>
 #include <ndBrainOptimizerSgd.h>
 #include <ndBrainOptimizerAdam.h>
 #include <ndBrainLayerActivation.h>
+
+#include <ndBrainTrainerCpuLegacy.h>
+
 #include <ndBrainAgentDQN_Trainer.h>
 #include <ndBrainLayerImagePadding.h>
 #include <ndBrainLayerActivationElu.h>

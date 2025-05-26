@@ -96,9 +96,18 @@ bool ndBrainLayerActivationTanh::HasGpuSupport() const
 	return true;
 }
 
-ndBrainLayer::ndLayerUniformData ndBrainLayerActivationTanh::GetLayerGpuUniformData(const ndBrainGpuContext* const context) const
+ndBrainLayer::ndLayerUniformDataCpu* ndBrainLayerActivationTanh::GetLayerUniformDataCpu() const
 {
-	ndLayerUniformData data;
+	ndLayerUniformDataCpu* const data = new ndLayerUniformDataCpu(this);
+
+	data->m_inputSize = GetInputSize();
+	data->m_outputSize = GetOutputSize();
+	return data;
+}
+
+ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerActivationTanh::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const
+{
+	ndLayerUniformDataGpu data;
 	data.m_shader = context->m_ndBrainLayerTanhActivation;
 	data.m_inputSize = GetInputSize();
 	data.m_outputSize = GetOutputSize();

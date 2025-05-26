@@ -120,9 +120,18 @@ bool ndBrainLayerActivationSoftmax::HasGpuSupport() const
 	return true;
 }
 
-ndBrainLayer::ndLayerUniformData ndBrainLayerActivationSoftmax::GetLayerGpuUniformData(const ndBrainGpuContext* const context) const
+ndBrainLayer::ndLayerUniformDataCpu* ndBrainLayerActivationSoftmax::GetLayerUniformDataCpu() const
 {
-	ndLayerUniformData data;
+	ndLayerUniformDataCpu* const data = new ndLayerUniformDataCpu(this);
+	data->m_inputSize = GetInputSize();
+	data->m_outputSize = GetOutputSize();
+
+	return data;
+}
+
+ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerActivationSoftmax::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const
+{
+	ndLayerUniformDataGpu data;
 	data.m_shader = context->m_ndBrainLayerSoftmaxActivation;
 	data.m_inputSize = GetInputSize();
 	data.m_outputSize = GetOutputSize();
