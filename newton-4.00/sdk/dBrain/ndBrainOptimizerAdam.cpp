@@ -23,9 +23,9 @@
 #include "ndBrain.h"
 #include "ndBrainMatrix.h"
 #include "ndBrainTrainer.h"
-#include "ndBrainTrainerCpuLegacy.h"
 #include "ndBrainThreadPool.h"
 #include "ndBrainOptimizerAdam.h"
+#include "ndBrainTrainerCpuLegacy.h"
 
 class ndBrainOptimizerAdam::ndBrainOptimizerAdam::ndAdamData : public ndClassAlloc
 {

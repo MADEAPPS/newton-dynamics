@@ -38,6 +38,8 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 	ndBrainTrainerCpuInference(const ndBrainTrainerCpuInference& src);
 	virtual ~ndBrainTrainerCpuInference();
 
+	virtual void GetOutput(ndBrainVector& ouput) const override;
+
 	virtual void MakePrediction(const ndBrainVector& input) override;
 
 	// legacy method;
@@ -45,23 +47,6 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 
 	// new method
 	virtual void BackPropagate(const ndBrainVector& outputGradients) override;
-
-	//virtual void MakePrediction(const ndBrainVector& input) override;
-	//virtual void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss) override;
-	//
-	//virtual void BackPropagate(const ndBrainVector& input, const ndBrainVector& groundTruth) override;
-	//
-	//void AcculumateGradients(const ndBrainTrainerCpuInference& src, ndInt32 index);
-	//void CalculateInputGradient(const ndBrainVector& input, ndBrainVector& inputGradientsOut, ndBrainLoss& loss);
-	//ndBrainLayer* GetWeightsLayer(ndInt32 index) const;
-	//ndBrainLayer* GetGradientLayer(ndInt32 index) const;
-	//
-	//void ClearGradients();
-	//void ScaleWeights(const ndBrainFloat s);
-	//void AddGradients(const ndBrainTrainerCpuInference* const src);
-	//void CopyGradients(const ndBrainTrainerCpuInference* const src);
-	//
-	//ndBrainVector& GetWorkingBuffer();
 
 	protected:
 	void InitInputOutputBuffer();
@@ -72,9 +57,7 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 	ndBrainVector m_weightAndBiasBuffer;
 	ndBrainVector m_miniBatchInputBuffer;
 	ndBrainVector m_miniBatchOutputBuffer;
-	//ndList<ndSharedPtr<ndUniformParameters>> m_uniforms;
-	//ndList<ndSharedPtr<ndBrainGpuCommand>> m_commandBuffers;
-
+	ndList<ndSharedPtr<ndBrainTrainerCpuCommand>> m_commandBuffers;
 	ndBrainThreadPool* m_threadPool;
 
 	ndInt32 m_miniBatchSize;

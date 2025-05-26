@@ -48,15 +48,12 @@ class ndBrainLayer : public ndClassAlloc
 			,m_outputSize(0)
 			,m_parametersSize(0)
 			,m_parametersStartOffset(0)
+			,m_inputOutputSize(0)
 			,m_inputOutputStartOffset(0)
 		{
 		}
 
-		virtual ~ndLayerUniformDataCpu()
-		{
-		}
-
-		virtual void Execute(ndInt32 threadid, ndInt32 threadCount)
+		virtual void Execute(ndInt32)
 		{
 			ndAssert(0);
 		}
@@ -67,6 +64,7 @@ class ndBrainLayer : public ndClassAlloc
 		ndInt32 m_outputSize;
 		ndInt32 m_parametersSize;
 		ndInt32 m_parametersStartOffset;
+		ndInt32 m_inputOutputSize;
 		ndInt32 m_inputOutputStartOffset;
 	};
 
@@ -79,6 +77,7 @@ class ndBrainLayer : public ndClassAlloc
 			,m_outputSize(0)
 			,m_parametersSize(0)
 			,m_parametersStartOffset(0)
+			,m_inputOutputSize(0)
 			,m_inputOutputStartOffset(0)
 		{
 		}
@@ -88,6 +87,7 @@ class ndBrainLayer : public ndClassAlloc
 		ndInt32 m_outputSize;
 		ndInt32 m_parametersSize;
 		ndInt32 m_parametersStartOffset;
+		ndInt32 m_inputOutputSize;
 		ndInt32 m_inputOutputStartOffset;
 	};
 

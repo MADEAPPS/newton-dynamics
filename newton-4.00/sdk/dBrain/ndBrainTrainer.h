@@ -40,9 +40,8 @@ class ndBrainTrainerCpuCommand: public ndContainersFreeListAlloc<ndBrainTrainerC
 	{
 	}
 
-	virtual void Execute(ndInt32 threadid, ndInt32 threadCount) = 0;
+	virtual void Execute(ndInt32 miniBatchIndex) = 0;
 };
-
 
 class ndBrainTrainer: public ndClassAlloc
 {
@@ -52,6 +51,8 @@ class ndBrainTrainer: public ndClassAlloc
 	virtual ~ndBrainTrainer();
 
 	ndSharedPtr<ndBrain>& GetBrain();
+	virtual void GetOutput(ndBrainVector&) const {}
+
 	virtual void MakePrediction(const ndBrainVector& input) = 0;
 
 	// legacy method;

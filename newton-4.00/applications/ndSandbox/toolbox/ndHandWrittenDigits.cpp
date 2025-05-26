@@ -282,7 +282,7 @@ static void MnistTrainingSet()
 		{
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize);
 
-			//threadCount = 1;
+			threadCount = 1;
 			SetThreadCount(threadCount);
 
 			if (m_hasGpuSupport)
@@ -531,7 +531,8 @@ static void MnistTrainingSet()
 
 			ndInt32 inputSize = trainingDigits->GetColumns();
 			ndInt32 outputSize = trainingLabels->GetColumns();
-			ndBrainTrainerGpu* const trainer = (ndBrainTrainerGpu*)*m_trainer;
+			//ndBrainTrainerGpu* const trainer = (ndBrainTrainerGpu*)*m_trainer;
+			ndBrainTrainer* const trainer = *m_trainer;
 
 			ndBrainVector groundTruth;
 			ndBrainVector miniBatchInput;
@@ -609,7 +610,8 @@ static void MnistTrainingSet()
 			}
 			else
 			{
-				OptimizeCpu(trainingLabels, trainingDigits, testLabels, testDigits);
+				//OptimizeCpu(trainingLabels, trainingDigits, testLabels, testDigits);
+				OptimizeGpu(trainingLabels, trainingDigits, testLabels, testDigits);
 			}
 		}
 
