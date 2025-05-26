@@ -296,7 +296,7 @@ static void MnistTrainingSet()
 			{
 				for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
 				{
-					ndBrainTrainer* const trainer = new ndBrainTrainerCpu(m_brain);
+					ndBrainTrainer* const trainer = new ndBrainTrainerCpuLegacy(m_brain);
 					m_trainers.Append(ndSharedPtr<ndBrainTrainer>(trainer));
 				}
 			}
@@ -348,7 +348,7 @@ static void MnistTrainingSet()
 						const ndBrainVector& truth = (*testLabels)[i];
 						const ndBrainVector& input = (*testDigits)[i];
 
-						ndBrainTrainerCpu* const trainer = (ndBrainTrainerCpu*)partialGradients[threadIndex];
+						ndBrainTrainerCpuLegacy* const trainer = (ndBrainTrainerCpuLegacy*)partialGradients[threadIndex];
 						m_brain->MakePrediction(input, output, trainer->GetWorkingBuffer());
 
 						ndInt32 index = -1;
