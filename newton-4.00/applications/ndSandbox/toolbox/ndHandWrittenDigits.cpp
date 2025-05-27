@@ -267,7 +267,8 @@ static void MnistTrainingSet()
 			ndInt32 batchesCount = trainingDigits->GetRows() / m_miniBatchSize;
 			ndInt32 batchesSize = batchesCount * m_miniBatchSize;
 
-			//ndBrainLossLeastSquaredError loss(outputSize);
+			//ndBrainOptimizerAdam optimizer;
+			
 			ndBrainLossCategoricalCrossEntropy loss(outputSize);
 			for (ndInt32 epoch = 0; epoch < NUMBER_OF_EPOCKS; ++epoch)
 			{
@@ -315,6 +316,7 @@ static void MnistTrainingSet()
 
 					// backpropagate loss.
 					trainer->BackPropagate(miniBatchOutput);
+					//optimizer.Update(m_trainer, m_learnRate);
 				}
 
 				ndInt64 testFailCount = ValidateData(testLabels, testDigits) + 1;

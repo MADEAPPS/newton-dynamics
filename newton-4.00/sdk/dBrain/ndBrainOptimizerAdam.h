@@ -25,22 +25,21 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainOptimizer.h"
 
-class ndBrainOptimizerAdamLegacy : public ndBrainOptimizer
+class ndBrainTrainerCpu;
+
+class ndBrainOptimizerAdam : public ndBrainOptimizer
 {
 	public: 
 	class ndAdamData;
-	ndBrainOptimizerAdamLegacy();
-	virtual ~ndBrainOptimizerAdamLegacy();
+	ndBrainOptimizerAdam();
 
-	virtual void Update(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients, ndBrainFloat learnRate);
+	virtual void Update(const ndSharedPtr<ndBrainTrainerCpu>& trainer, ndBrainFloat learnRate);
 
-	ndArray<ndAdamData*> m_data;
 	ndBrainFloat m_beta;
 	ndBrainFloat m_alpha;
 	ndBrainFloat m_epsilon;
 	ndBrainFloat m_betaAcc;
 	ndBrainFloat m_alphaAcc;
-	bool m_initalized;
 };
 
 #endif 

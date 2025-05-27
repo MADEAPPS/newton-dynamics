@@ -39,6 +39,7 @@
 #include <ndBrainLayerLinear.h>
 #include <ndBrainReplayBuffer.h>
 #include <ndBrainOptimizerSgd.h>
+#include <ndBrainOptimizerAdam.h>
 #include <ndBrainLayerActivation.h>
 
 #include <ndBrainTrainerCpuLegacy.h>

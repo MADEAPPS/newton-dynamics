@@ -36,6 +36,8 @@
 // on the nature paper below. 
 // https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf
 
+class ndBrainOptimizerAdamLegacy;
+
 template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 {
