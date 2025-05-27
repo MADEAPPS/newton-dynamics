@@ -23,7 +23,7 @@
 #include "ndBrainTrainer.h"
 #include "ndBrainLayerLinear.h"
 #include "ndBrainOptimizerSgd.h"
-#include "ndBrainOptimizerAdam.h"
+#include "ndBrainOptimizerAdamLegacy.h"
 #include "ndBrainLayerActivationSoftmax.h"
 #include "ndBrainAgentDiscretePolicyGradient_Trainer.h"
 

@@ -43,7 +43,7 @@
 
 #define ND_TD3_POLICY_DELAY_MOD			1
 
-class ndBrainOptimizerAdam;
+class ndBrainOptimizerAdamLegacy;
 class ndBrainAgentDeterministicPolicyGradient_Trainer;
 
 class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
@@ -196,12 +196,12 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
 	ndBrain m_policy;
 	ndBrain m_referencePolicy;
 	ndArray<ndBrainTrainer*> m_policyTrainers;
-	ndSharedPtr<ndBrainOptimizerAdam> m_policyOptimizer;
+	ndSharedPtr<ndBrainOptimizerAdamLegacy> m_policyOptimizer;
 
 	ndBrain m_critic[ND_NUMBER_OF_CRITICS];
 	ndBrain m_referenceCritic[ND_NUMBER_OF_CRITICS];
 	ndArray<ndBrainTrainer*> m_criticTrainers[ND_NUMBER_OF_CRITICS];
-	ndSharedPtr<ndBrainOptimizerAdam> m_criticOptimizer[ND_NUMBER_OF_CRITICS];
+	ndSharedPtr<ndBrainOptimizerAdamLegacy> m_criticOptimizer[ND_NUMBER_OF_CRITICS];
 
 	ndBrainVector m_expectedRewards;
 	ndArray<ndInt32> m_miniBatchIndexBuffer;

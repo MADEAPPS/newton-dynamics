@@ -62,12 +62,12 @@ void ndBrainLayer::CopyWeights(ndBrainVector&) const
 {
 }
 
-void ndBrainLayer::FeedForward(const ndBrainLayerFeedFowardCpuCommand* const info, ndInt32 miniBatchIndex) const
+void ndBrainLayer::FeedForward(const ndBrainLayerFeedFowardCpuCommand* const, ndInt32) const
 {
 	ndAssert(0);
 }
 
-void ndBrainLayer::BackPropagated(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const
+void ndBrainLayer::BackPropagated(const ndBrainLayerBackPropagateCpuCommand* const, ndInt32) const
 {
 	ndAssert(0);
 }
@@ -119,7 +119,7 @@ bool ndBrainLayer::HasParameters() const
 	return false;
 }
 
-void ndBrainLayer::ApplyDropOut(ndFloat32 rate)
+void ndBrainLayer::ApplyDropOut(ndFloat32)
 {
 }
 

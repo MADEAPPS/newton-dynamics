@@ -23,7 +23,7 @@
 #include "ndBrainTrainer.h"
 #include "ndBrainSaveLoad.h"
 #include "ndBrainLayerLinear.h"
-#include "ndBrainOptimizerAdam.h"
+#include "ndBrainOptimizerAdamLegacy.h"
 #include "ndBrainLayerActivationRelu.h"
 #include "ndBrainLayerActivationTanh.h"
 #include "ndBrainLayerActivationLinear.h"
@@ -741,7 +741,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildPolicyClass()
 		//m_policyAuxiliaryTrainers.PushBack(auxiliaryTrainer);
 	}
 
-	m_policyOptimizer = ndSharedPtr<ndBrainOptimizerAdam> (new ndBrainOptimizerAdam());
+	m_policyOptimizer = ndSharedPtr<ndBrainOptimizerAdamLegacy> (new ndBrainOptimizerAdamLegacy());
 	m_policyOptimizer->SetRegularizer(m_parameters.m_policyRegularizer);
 	m_policyOptimizer->SetRegularizerType(m_parameters.m_policyRegularizerType);
 
@@ -784,7 +784,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildCriticClass()
 		//m_criticTrainers.PushBack(trainer);
 	}
 
-	m_criticOptimizer = ndSharedPtr<ndBrainOptimizerAdam> (new ndBrainOptimizerAdam());
+	m_criticOptimizer = ndSharedPtr<ndBrainOptimizerAdamLegacy> (new ndBrainOptimizerAdamLegacy());
 	m_criticOptimizer->SetRegularizer(m_parameters.m_criticRegularizer);
 	m_criticOptimizer->SetRegularizerType(m_parameters.m_criticRegularizerType);
 

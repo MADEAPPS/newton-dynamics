@@ -104,7 +104,7 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	protected:
 	ndBrain m_actor;
 	ndBrain m_target;
-	ndBrainOptimizerAdam* m_optimizer;
+	ndBrainOptimizerAdamLegacy* m_optimizer;
 	ndArray<ndBrainTrainer*> m_trainers;
 
 	ndBrainReplayBuffer<statesDim, 1> m_replayBuffer;
@@ -178,7 +178,7 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const Hyp
 	//m_explorationProbabilityAnnelining = (m_explorationProbability - m_minExplorationProbability) / ndBrainFloat (m_replayBuffer.GetCapacity());
 	//
 	//InitWeights();
-	//m_optimizer = new ndBrainOptimizerAdam();
+	//m_optimizer = new ndBrainOptimizerAdamLegacy();
 	//m_optimizer->SetRegularizer(hyperParameters.m_regularizer);
 }
 

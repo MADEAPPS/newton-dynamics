@@ -40,7 +40,7 @@
 
 //#define ND_DISCRETE_PROXIMA_POLICY_GRADIENT
 
-class ndBrainOptimizerAdam;
+class ndBrainOptimizerAdamLegacy;
 class ndBrainAgentDiscretePolicyGradient_TrainerMaster;
 
 class ndBrainAgentDiscretePolicyGradient_Trainer : public ndBrainAgent
@@ -194,8 +194,8 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndArray<ndBrainTrainer*> m_policyWeightedTrainer;
 	ndArray<ndBrainTrainer*> m_policyAuxiliaryTrainers;
 
-	ndBrainOptimizerAdam* m_criticOptimizer;
-	ndBrainOptimizerAdam* m_policyOptimizer;
+	ndBrainOptimizerAdamLegacy* m_criticOptimizer;
+	ndBrainOptimizerAdamLegacy* m_policyOptimizer;
 
 	ndArray<ndInt32> m_randomPermutation;
 	ndBrainAgentDiscretePolicyGradient_Trainer::ndRandomGenerator* m_randomGenerator;

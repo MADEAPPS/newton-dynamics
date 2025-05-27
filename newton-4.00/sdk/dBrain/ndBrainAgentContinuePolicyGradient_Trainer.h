@@ -34,7 +34,7 @@
 // https://spinningup.openai.com/en/latest/algorithms/vpg.html
 // https://spinningup.openai.com/en/latest/algorithms/ppo.html
 
-class ndBrainOptimizerAdam;
+class ndBrainOptimizerAdamLegacy;
 class ndBrainAgentContinuePolicyGradient_TrainerMaster;
 
 class ndBrainAgentContinuePolicyGradient_Agent : public ndBrainAgent
@@ -207,8 +207,8 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndArray<ndBrainTrainer*> m_policyTrainers;
 	ndArray<ndBrainTrainer*> m_policyAuxiliaryTrainers;
 
-	ndSharedPtr<ndBrainOptimizerAdam> m_criticOptimizer;
-	ndSharedPtr<ndBrainOptimizerAdam> m_policyOptimizer;
+	ndSharedPtr<ndBrainOptimizerAdamLegacy> m_criticOptimizer;
+	ndSharedPtr<ndBrainOptimizerAdamLegacy> m_policyOptimizer;
 
 	ndBrainVector m_advantage;
 	ndArray<ndInt32> m_randomPermutation;

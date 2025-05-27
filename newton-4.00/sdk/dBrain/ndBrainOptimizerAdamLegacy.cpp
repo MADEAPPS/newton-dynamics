@@ -24,10 +24,10 @@
 #include "ndBrainMatrix.h"
 #include "ndBrainTrainer.h"
 #include "ndBrainThreadPool.h"
-#include "ndBrainOptimizerAdam.h"
+#include "ndBrainOptimizerAdamLegacy.h"
 #include "ndBrainTrainerCpuLegacy.h"
 
-class ndBrainOptimizerAdam::ndBrainOptimizerAdam::ndAdamData : public ndClassAlloc
+class ndBrainOptimizerAdamLegacy::ndBrainOptimizerAdamLegacy::ndAdamData : public ndClassAlloc
 {
 	public:
 	ndAdamData(ndBrainLayer* const layer)
@@ -63,7 +63,7 @@ class ndBrainOptimizerAdam::ndBrainOptimizerAdam::ndAdamData : public ndClassAll
 	ndSharedPtr<ndBrainLayer> m_vdw2Corrected;
 };
 
-ndBrainOptimizerAdam::ndBrainOptimizerAdam()
+ndBrainOptimizerAdamLegacy::ndBrainOptimizerAdamLegacy()
 	:ndBrainOptimizer()
 	,m_beta(ndBrainFloat(0.999f))
 	,m_alpha(ndBrainFloat(0.9f))
@@ -74,7 +74,7 @@ ndBrainOptimizerAdam::ndBrainOptimizerAdam()
 {
 }
 
-ndBrainOptimizerAdam::~ndBrainOptimizerAdam()
+ndBrainOptimizerAdamLegacy::~ndBrainOptimizerAdamLegacy()
 {
 	for (ndInt32 i = 0; i < m_data.GetCount(); ++i)
 	{
@@ -83,7 +83,7 @@ ndBrainOptimizerAdam::~ndBrainOptimizerAdam()
 }
 
 //#pragma optimize( "", off )
-void ndBrainOptimizerAdam::Update(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients, ndBrainFloat learnRate)
+void ndBrainOptimizerAdamLegacy::Update(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients, ndBrainFloat learnRate)
 {
 	//ndBrainTrainer* const trainer = partialGradients[0];
 	ndBrainTrainerCpuLegacy* const trainer = (ndBrainTrainerCpuLegacy*)partialGradients[0];
