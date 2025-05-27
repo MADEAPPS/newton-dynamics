@@ -66,7 +66,7 @@ void ndBrainTrainerGpu::BackPropagate(const ndBrainVector& outputGradients)
 	//m_context->BeginQueue();
 	//m_miniBatchInputBuffer->LoadData(input.GetCount() * sizeof(ndReal), &input[0]);
 	////m_groundTruth->LoadData(groundTruth.GetCount() * sizeof(ndReal), &groundTruth[0]);
-	//for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = m_commandBuffers.GetFirst(); node; node = node->GetNext())
+	//for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = m_feedFowardCommands.GetFirst(); node; node = node->GetNext())
 	//{
 	//	ndSharedPtr<ndBrainGpuCommand>& command = node->GetInfo();
 	//	m_context->AddCommandQueue(command);

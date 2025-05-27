@@ -48,6 +48,35 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 	virtual void BackPropagate(const ndBrainVector& outputGradients) override;
 
 	protected:
+	class ndCopyOutputCommand : public ndBrainTrainerCpuCommand
+	{
+		public:
+		ndCopyOutputCommand(ndBrainTrainerCpuInference* owner)
+			:ndBrainTrainerCpuCommand()
+			,m_owner(owner)
+			,m_inputSize(0)
+			,m_outputSize(0)
+			,m_parametersSize(0)
+			,m_inputOutputSize(0)
+			,m_inputOutputStartOffset(0)
+		{
+		}
+
+		virtual void Execute(ndInt32 miniBatchIndex)
+		{
+			const ndBrainMemVector src(&m_owner->m_inputOutputBuffer[miniBatchIndex * m_inputOutputSize + m_inputOutputStartOffset], m_outputSize);
+			ndBrainMemVector dst(&m_owner->m_miniBatchOutputBuffer[miniBatchIndex * m_outputSize], m_outputSize);
+			dst.Set(src);
+		}
+
+		ndBrainTrainerCpuInference* m_owner;
+		ndInt32 m_inputSize;
+		ndInt32 m_outputSize;
+		ndInt32 m_parametersSize;
+		ndInt32 m_inputOutputSize;
+		ndInt32 m_inputOutputStartOffset;
+	};
+
 	void AddCopyOutputCommand();
 	void InitInputOutputBuffer();
 	void InitWeightAndBiasBuffer();
@@ -58,7 +87,7 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 	ndBrainVector m_weightAndBiasBuffer;
 	ndBrainVector m_miniBatchInputBuffer;
 	ndBrainVector m_miniBatchOutputBuffer;
-	ndList<ndSharedPtr<ndBrainTrainerCpuCommand>> m_commandBuffers;
+	ndList<ndSharedPtr<ndBrainTrainerCpuCommand>> m_feedFowardCommands;
 	ndBrainThreadPool* m_threadPool;
 	ndInt32 m_miniBatchSize;
 
