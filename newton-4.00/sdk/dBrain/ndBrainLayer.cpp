@@ -202,4 +202,3 @@ void ndBrainLayer::CalculateParamGradients(const ndBrainVector&, const ndBrainVe
 {
 	ndAssert(0);
 }
-

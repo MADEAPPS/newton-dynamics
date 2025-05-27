@@ -219,7 +219,5 @@ void ndBrainLayerLinearWithDropOut::FeedForward(const ndBrainLayerFeedFowardCpuC
 	output.Mul(m_dropOut);
 
 	// verify
-	//ndBrainFixSizeVector<1000> xxxx;
-	//xxxx.SetCount(outputSize);
-	//MakePrediction(input, xxxx);
+	ndAssert(DebugFeedFoward(input, output));
 }

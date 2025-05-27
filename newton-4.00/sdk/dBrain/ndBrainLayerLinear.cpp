@@ -369,7 +369,5 @@ void ndBrainLayerLinear::FeedForward(const ndBrainLayerFeedFowardCpuCommand* con
 	output.Add(bias);
 
 	// verify results?
-	//ndBrainFixSizeVector<1000> xxxx;
-	//xxxx.SetCount(outputSize);
-	//MakePrediction(input, xxxx);
+	ndAssert(DebugFeedFoward(input, output));
 }

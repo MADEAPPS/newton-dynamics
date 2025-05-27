@@ -162,6 +162,9 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void Save(const ndBrainSave* const loadSave) const;
 	virtual void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
 
+	bool DebugFeedFoward(const ndBrainVector& input, const ndBrainVector& output) const;
+	bool DebugBackPropagated(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, const ndBrainVector& inputDerivative) const;
+
 	virtual ndBrainLayerFeedFowardCpuCommand* GetLayerCpuFeedForwardCommand() const;
 	virtual ndBrainLayerBackPropagateCpuCommand* GetLayerCpuBackPropagateCommand() const;
 	virtual void FeedForward(const ndBrainLayerFeedFowardCpuCommand* const info, ndInt32 miniBatchIndex) const;
@@ -170,6 +173,41 @@ class ndBrainLayer : public ndClassAlloc
 	virtual bool HasGpuSupport() const;
 	virtual ndLayerUniformDataGpu GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const;
 };
+
+inline bool ndBrainLayer::DebugFeedFoward(const ndBrainVector& input, const ndBrainVector& output) const
+{
+	ndBrainFixSizeVector<1024 * 4> tmp;
+	tmp.SetCount(output.GetCount());
+	MakePrediction(input, tmp);
+
+	for (ndInt32 i = ndInt32(tmp.GetCount()) - 1; i >= 0; --i)
+	{
+		ndFloat32 error = ndAbs(tmp[i] - output[i]);
+		if (error > ndFloat32(1.0e-5f))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+inline bool ndBrainLayer::DebugBackPropagated(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, const ndBrainVector& inputDerivative) const
+{
+	ndBrainFixSizeVector<1024 * 4> tmp;
+	tmp.SetCount(inputDerivative.GetCount());
+	InputDerivative(input, output, outputDerivative, tmp);
+
+	for (ndInt32 i = ndInt32(tmp.GetCount()) - 1; i >= 0; --i)
+	{
+		ndFloat32 error = ndAbs(tmp[i] - inputDerivative[i]);
+		if (error > ndFloat32(1.0e-5f))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
 
 #endif 
 

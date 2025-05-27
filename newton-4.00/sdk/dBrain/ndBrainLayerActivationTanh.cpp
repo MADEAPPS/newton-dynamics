@@ -154,9 +154,7 @@ void ndBrainLayerActivationTanh::FeedForward(const ndBrainLayerFeedFowardCpuComm
 	output.FlushToZero();
 
 	// verify
-	//ndBrainFixSizeVector<1000> xxxx;
-	//xxxx.SetCount(outputSize);
-	//MakePrediction(input, xxxx);
+	ndAssert(DebugFeedFoward(input, output));
 }
 
 void ndBrainLayerActivationTanh::BackPropagated(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const
@@ -177,8 +175,6 @@ void ndBrainLayerActivationTanh::BackPropagated(const ndBrainLayerBackPropagateC
 	inputDerivative.Mul(outputDerivative);
 	inputDerivative.FlushToZero();
 
-	// basically it acts as a loss function
-	ndBrainFixSizeVector<1000> xxxx;
-	xxxx.SetCount(inputSize);
-	InputDerivative(xxxx, output, outputDerivative, xxxx);
+	// verify gradients are calaculate correctly
+	ndAssert(DebugBackPropagated(inputDerivative, output, outputDerivative, inputDerivative));
 }

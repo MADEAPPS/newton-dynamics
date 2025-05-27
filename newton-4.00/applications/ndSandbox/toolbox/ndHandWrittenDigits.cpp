@@ -165,7 +165,7 @@ static void MnistTrainingSet()
 		{
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize);
 
-			threadCount = 1;
+			//threadCount = 1;
 			SetThreadCount(threadCount);
 
 			if (m_hasGpuSupport)
