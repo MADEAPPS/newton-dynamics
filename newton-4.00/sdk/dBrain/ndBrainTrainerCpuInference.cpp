@@ -99,7 +99,7 @@ void ndBrainTrainerCpuInference::InitWeightAndBiasBuffer()
 	for (ndInt32 i = 0; i < feedFowardCommands.GetCount(); ++i)
 	{
 		feedFowardCommands[i]->m_parametersStartOffset = sizeAcc;
-		sizeAcc += feedFowardCommands[i]->m_parametersSize;
+		sizeAcc += feedFowardCommands[i]->m_parametersBatchSize;
 	}
 	
 	ndInt32 padWeights = 32;
@@ -108,7 +108,9 @@ void ndBrainTrainerCpuInference::InitWeightAndBiasBuffer()
 	for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
 	{
 		const ndBrainLayer* const layer = brain[i];
-		ndBrainMemVector weights(&m_weightAndBiasBuffer[feedFowardCommands[i]->m_parametersStartOffset], feedFowardCommands[i]->m_parametersSize);
+		ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* const command = feedFowardCommands[i];
+		ndBrainMemVector weights(&m_weightAndBiasBuffer[command->m_parametersStartOffset], command->m_parametersBatchSize);
+		command->m_parametersBatchSize = sizeAcc;
 		layer->CopyWeights(weights);
 	}
 	

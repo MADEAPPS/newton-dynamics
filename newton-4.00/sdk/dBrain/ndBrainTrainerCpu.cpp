@@ -129,15 +129,14 @@ int xxxx = 0;
 
 		ndAssert(command->m_inputSize == feedFowardCommand->m_inputSize);
 		ndAssert(command->m_outputSize == feedFowardCommand->m_outputSize);
-		command->m_parametersSize = feedFowardCommand->m_parametersSize;
+		command->m_parametersBatchSize = feedFowardCommand->m_parametersBatchSize;
 		command->m_parametersStartOffset = feedFowardCommand->m_parametersStartOffset;
 		command->m_inputOutputSize = feedFowardCommand->m_inputOutputSize;
 		command->m_inputOutputStartOffset = feedFowardCommand->m_inputOutputStartOffset;
 
 		m_backPropagateCommands.Append(command);
 
-		if (xxxx >= 1)
-			break;
+		//if (xxxx >= 3) break;
 		xxxx++;
 	}
 }

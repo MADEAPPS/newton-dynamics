@@ -21,7 +21,7 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
-#include "ndBrainTrainerCpuInference.h"
+#include "ndBrainTrainerCpu.h"
 #include "ndBrainLayerLinearWithDropOut.h"
 
 #if 0
@@ -189,7 +189,14 @@ bool ndBrainLayerLinearWithDropOut::HasGpuSupport() const
 ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* ndBrainLayerLinearWithDropOut::GetLayerCpuFeedForwardCommand() const
 {
 	ndBrainLayerFeedFowardCpuCommand* const command = new ndBrainLayerFeedFowardCpuCommand(this);
+	command->m_inputSize = GetInputSize();
+	command->m_outputSize = GetOutputSize();
+	return command;
+}
 
+ndBrainLayer::ndBrainLayerBackPropagateCpuCommand* ndBrainLayerLinearWithDropOut::GetLayerCpuBackPropagateCommand() const
+{
+	ndBrainLayerBackPropagateCpuCommand* const command = new ndBrainLayerBackPropagateCpuCommand(this);
 	command->m_inputSize = GetInputSize();
 	command->m_outputSize = GetOutputSize();
 	return command;
@@ -220,4 +227,24 @@ void ndBrainLayerLinearWithDropOut::FeedForward(const ndBrainLayerFeedFowardCpuC
 
 	// verify
 	ndAssert(DebugFeedFoward(input, output));
+}
+
+void ndBrainLayerLinearWithDropOut::BackPropagated(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const
+{
+	ndInt32 inputSize = info->m_inputSize;
+	ndInt32 outputSize = info->m_outputSize;
+
+	const ndBrainTrainerCpu* const trainer = info->m_owner;
+	ndInt32 offset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
+	const ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
+
+	ndInt32 dstOffset = miniBatchIndex * info->m_inputOutputSize * info->m_owner->m_miniBatchSize + info->m_inputOutputStartOffset;
+	const ndBrainMemVector outputDerivative(&trainer->m_inputOuputGradientsBuffer[dstOffset + inputSize], outputSize);
+	ndBrainMemVector inputDerivative(&trainer->m_inputOuputGradientsBuffer[dstOffset], inputSize);
+
+	inputDerivative.Set(m_dropOut);
+	inputDerivative.Mul(outputDerivative);
+
+	// verify gradients are calaculate correctly
+	ndAssert(DebugBackPropagated(inputDerivative, output, outputDerivative, inputDerivative));
 }

@@ -120,7 +120,6 @@ ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerActivationTanh::GetLayerUniformD
 	data.m_shader = context->m_ndBrainLayerTanhActivation;
 	data.m_inputSize = GetInputSize();
 	data.m_outputSize = GetOutputSize();
-
 	return data;
 }
 

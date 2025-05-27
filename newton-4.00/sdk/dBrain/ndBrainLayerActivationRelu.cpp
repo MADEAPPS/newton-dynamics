@@ -22,8 +22,8 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
 #include "ndBrainSimdFloat8.h"
+#include "ndBrainTrainerCpu.h"
 #include "gpu/ndBrainGpuContext.h"
-#include "ndBrainTrainerCpuInference.h"
 #include "ndBrainLayerActivationRelu.h"
 
 ndBrainLayerActivationRelu::ndBrainLayerActivationRelu(ndInt32 neurons)
@@ -110,7 +110,14 @@ bool ndBrainLayerActivationRelu::HasGpuSupport() const
 ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* ndBrainLayerActivationRelu::GetLayerCpuFeedForwardCommand() const
 {
 	ndBrainLayerFeedFowardCpuCommand* const command = new ndBrainLayerFeedFowardCpuCommand(this);
+	command->m_inputSize = GetInputSize();
+	command->m_outputSize = GetOutputSize();
+	return command;
+}
 
+ndBrainLayer::ndBrainLayerBackPropagateCpuCommand* ndBrainLayerActivationRelu::GetLayerCpuBackPropagateCommand() const
+{
+	ndBrainLayerBackPropagateCpuCommand* const command = new ndBrainLayerBackPropagateCpuCommand(this);
 	command->m_inputSize = GetInputSize();
 	command->m_outputSize = GetOutputSize();
 	return command;
@@ -154,4 +161,40 @@ void ndBrainLayerActivationRelu::FeedForward(const ndBrainLayerFeedFowardCpuComm
 
 	// verify
 	ndAssert (DebugFeedFoward(input, output));
+}
+
+void ndBrainLayerActivationRelu::BackPropagated(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const
+{
+	ndInt32 inputSize = info->m_inputSize;
+	ndInt32 outputSize = info->m_outputSize;
+
+	const ndBrainTrainerCpu* const trainer = info->m_owner;
+	ndInt32 offset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
+	const ndBrainMemVector input(&trainer->m_inputOutputBuffer[offset], inputSize);
+	const ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
+
+	ndInt32 dstOffset = miniBatchIndex * info->m_inputOutputSize * info->m_owner->m_miniBatchSize + info->m_inputOutputStartOffset;
+	const ndBrainMemVector outputDerivative(&trainer->m_inputOuputGradientsBuffer[dstOffset + inputSize], outputSize);
+	ndBrainMemVector inputDerivative(&trainer->m_inputOuputGradientsBuffer[dstOffset], inputSize);
+
+	const ndBrainSimdFloat8 one(1.0f);
+	const ndBrainSimdFloat8 zero(0.0f);
+	ndBrainFloat* const dst = &inputDerivative[0];
+	const ndBrainFloat* const src = &input[0];
+	const ndInt32 roundCount = ndInt32(input.GetCount()) & -8;
+	for (ndInt32 i = 0; i < roundCount; i += 8)
+	{
+		const ndBrainSimdFloat8 x(&src[i]);
+		const ndBrainSimdFloat8 test(x >= zero);
+		const ndBrainSimdFloat8 value(test & one);
+		value.Store(&dst[i]);
+	}
+	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= roundCount; --i)
+	{
+		inputDerivative[i] = (input[i] >= ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+	}
+	inputDerivative.Mul(outputDerivative);
+
+	// verify gradients are calaculate correctly
+	ndAssert(DebugBackPropagated(input, output, outputDerivative, inputDerivative));
 }
