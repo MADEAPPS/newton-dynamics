@@ -47,6 +47,9 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 	// new method
 	virtual void BackPropagate(const ndBrainVector& outputGradients) override;
 
+	// new method
+	virtual void ApplyLearnRate(ndBrainFloat learnRate) override;
+
 	protected:
 	class ndCopyOutputCommand : public ndBrainTrainerCpuCommand
 	{

@@ -222,6 +222,10 @@ void ndBrainTrainerCpuInference::BackPropagate(const ndBrainVector&)
 {
 }
 
+void ndBrainTrainerCpuInference::ApplyLearnRate(ndBrainFloat learnRate)
+{
+}
+
 void ndBrainTrainerCpuInference::MakePrediction(const ndBrainVector& input)
 {
 	ndAssert(input.GetCount() == m_miniBatchInputBuffer.GetCount());

@@ -25,6 +25,7 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainVector.h"
 #include "ndBrainTrainer.h"
+#include "ndBrainOptimizerAdamCpu.h"
 #include "ndBrainTrainerCpuInference.h"
 
 class ndBrainTrainerCpu: public ndBrainTrainerCpuInference
@@ -33,12 +34,14 @@ class ndBrainTrainerCpu: public ndBrainTrainerCpuInference
 	ndBrainTrainerCpu(const ndSharedPtr<ndBrain>& brain, ndBrainThreadPool* const threadPool, ndInt32 minibatchSize);
 	ndBrainTrainerCpu(const ndBrainTrainerCpu& src);
 
+	virtual void ApplyLearnRate(ndBrainFloat learnRate) override;
 	virtual void BackPropagate(const ndBrainVector& outputGradients) override;
 
 	protected:
 	void AddLayersGradientCommands();
 	void AddCopyOutputGradientCommand();
 
+	ndBrainOptimizerAdamCpu m_optimizer;
 	ndBrainVector m_inputOuputGradientsBuffer;
 	ndBrainVector m_weightAndBiasGradientsBuffer;
 	ndBrainVector m_miniBatchInputGradientBuffer;
