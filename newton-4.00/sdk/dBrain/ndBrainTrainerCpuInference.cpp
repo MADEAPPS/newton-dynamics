@@ -52,10 +52,6 @@ ndBrainTrainerCpuInference::ndBrainTrainerCpuInference(const ndBrainTrainerCpuIn
 	ndAssert(0);
 }
 
-ndBrainTrainerCpuInference::~ndBrainTrainerCpuInference()
-{
-}
-
 void ndBrainTrainerCpuInference::InitInputOutputBuffer()
 {
 	const ndBrain& brain = **m_brain;
@@ -250,7 +246,7 @@ void ndBrainTrainerCpuInference::GetOutput(ndBrainVector& ouput) const
 }
 
 // new method
-void ndBrainTrainerCpuInference::BackPropagate(const ndBrainVector& outputGradients)
+void ndBrainTrainerCpuInference::BackPropagate(const ndBrainVector&)
 {
 }
 

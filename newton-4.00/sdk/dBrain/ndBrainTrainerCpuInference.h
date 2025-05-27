@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_TRAINER_CPU_H__
-#define _ND_BRAIN_TRAINER_CPU_H__
+#ifndef _ND_BRAIN_TRAINER_CPU_INFERENCE_H__
+#define _ND_BRAIN_TRAINER_CPU_INFERENCE_H__
 
 #include "ndBrainStdafx.h"
 #include "ndBrainVector.h"
@@ -36,7 +36,6 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 	public: 
 	ndBrainTrainerCpuInference(const ndSharedPtr<ndBrain>& brain, ndBrainThreadPool* const threadPool, ndInt32 minibatchSize);
 	ndBrainTrainerCpuInference(const ndBrainTrainerCpuInference& src);
-	virtual ~ndBrainTrainerCpuInference();
 
 	virtual void GetOutput(ndBrainVector& ouput) const override;
 

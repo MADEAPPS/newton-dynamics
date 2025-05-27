@@ -175,7 +175,7 @@ static void MnistTrainingSet()
 			}
 			else
 			{
-				m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainerCpuInference(m_brain, this, m_miniBatchSize));
+				m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainerCpu(m_brain, this, m_miniBatchSize));
 			}
 			m_prioritySamples.SetCount(m_miniBatchSize);
 		}

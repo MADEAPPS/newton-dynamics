@@ -34,6 +34,7 @@
 #include <ndBrainAgentDQN.h>
 #include <ndBrainOptimizer.h>
 #include <ndBrainSimdFloat8.h>
+#include <ndBrainTrainerCpu.h>
 #include <ndBrainThreadPool.h>
 #include <ndBrainLayerLinear.h>
 #include <ndBrainReplayBuffer.h>
