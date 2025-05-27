@@ -25,9 +25,9 @@
 #include "ndBrainTrainer.h"
 #include "ndBrainTrainerCpu.h"
 #include "ndBrainThreadPool.h"
-#include "ndBrainOptimizerAdam.h"
+#include "ndBrainOptimizerAdamCpu.h"
 
-ndBrainOptimizerAdam::ndBrainOptimizerAdam()
+ndBrainOptimizerAdamCpu::ndBrainOptimizerAdamCpu()
 	:ndBrainOptimizer()
 	,m_beta(ndBrainFloat(0.999f))
 	,m_alpha(ndBrainFloat(0.9f))
@@ -38,7 +38,7 @@ ndBrainOptimizerAdam::ndBrainOptimizerAdam()
 }
 
 //#pragma optimize( "", off )
-void ndBrainOptimizerAdam::Update(const ndSharedPtr<ndBrainTrainerCpu>& trainer, ndBrainFloat learnRate)
+void ndBrainOptimizerAdamCpu::Update(const ndSharedPtr<ndBrainTrainerCpu>& trainer, ndBrainFloat learnRate)
 {
 	//ndBrainTrainer* const trainer = partialGradients[0];
 	//ndBrainTrainerCpuLegacy* const trainer = (ndBrainTrainerCpuLegacy*)partialGradients[0];

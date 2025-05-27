@@ -19,19 +19,19 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_OPTIMIZER_ADAM_LEGACY_H__
-#define _ND_BRAIN_OPTIMIZER_ADAM_LEGACY_H__
+#ifndef _ND_BRAIN_OPTIMIZER_ADAM_H__
+#define _ND_BRAIN_OPTIMIZER_ADAM_H__
 
 #include "ndBrainStdafx.h"
 #include "ndBrainOptimizer.h"
 
 class ndBrainTrainerCpu;
 
-class ndBrainOptimizerAdam : public ndBrainOptimizer
+class ndBrainOptimizerAdamCpu : public ndBrainOptimizer
 {
 	public: 
 	class ndAdamData;
-	ndBrainOptimizerAdam();
+	ndBrainOptimizerAdamCpu();
 
 	virtual void Update(const ndSharedPtr<ndBrainTrainerCpu>& trainer, ndBrainFloat learnRate);
 
