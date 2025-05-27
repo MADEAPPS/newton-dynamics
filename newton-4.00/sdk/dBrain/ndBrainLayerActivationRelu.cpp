@@ -107,13 +107,13 @@ bool ndBrainLayerActivationRelu::HasGpuSupport() const
 	return true;
 }
 
-ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* ndBrainLayerActivationRelu::GetLayerUniformDataCpu() const
+ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* ndBrainLayerActivationRelu::GetLayerCpuFeedForwardCommand() const
 {
-	ndBrainLayerFeedFowardCpuCommand* const data = new ndBrainLayerFeedFowardCpuCommand(this);
+	ndBrainLayerFeedFowardCpuCommand* const command = new ndBrainLayerFeedFowardCpuCommand(this);
 
-	data->m_inputSize = GetInputSize();
-	data->m_outputSize = GetOutputSize();
-	return data;
+	command->m_inputSize = GetInputSize();
+	command->m_outputSize = GetOutputSize();
+	return command;
 }
 
 ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerActivationRelu::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const

@@ -31,8 +31,9 @@ class ndBrainLoss;
 class ndBrainTrainerCpuCommand: public ndContainersFreeListAlloc<ndBrainTrainerCpuCommand>
 {
 	public:
-	ndBrainTrainerCpuCommand()
+	ndBrainTrainerCpuCommand(size_t m_id)
 		:ndContainersFreeListAlloc<ndBrainTrainerCpuCommand>()
+		,m_id(m_id)
 	{
 	}
 
@@ -41,6 +42,8 @@ class ndBrainTrainerCpuCommand: public ndContainersFreeListAlloc<ndBrainTrainerC
 	}
 
 	virtual void Execute(ndInt32 miniBatchIndex) = 0;
+
+	size_t m_id;
 };
 
 class ndBrainTrainer: public ndClassAlloc

@@ -44,6 +44,8 @@ class ndBrainLayerActivationCategoricalSoftmax : public ndBrainLayerActivationSo
 
 	const char* GetLabelId() const;
 	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
+
+	virtual void BackPropagated(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const override;
 };
 
 #endif 

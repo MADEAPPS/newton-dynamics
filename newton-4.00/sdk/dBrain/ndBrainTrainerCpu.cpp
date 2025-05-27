@@ -47,6 +47,7 @@ ndBrainTrainerCpu::ndBrainTrainerCpu(const ndSharedPtr<ndBrain>& brain, ndBrainT
 	m_weightAndBiasGradientsBuffer.Set(ndBrainFloat(0.0f));
 
 	AddCopyOutputGradientCommand();
+	AddLayersGradientCommands();
 }
 
 ndBrainTrainerCpu::ndBrainTrainerCpu(const ndBrainTrainerCpu& src)
@@ -62,8 +63,8 @@ void ndBrainTrainerCpu::AddCopyOutputGradientCommand()
 	class ndCopyOutputGradientCommand : public ndBrainTrainerCpuCommand
 	{
 		public:
-		ndCopyOutputGradientCommand(ndBrainTrainerCpu* owner)
-			:ndBrainTrainerCpuCommand()
+		ndCopyOutputGradientCommand(ndBrainTrainerCpu* const owner)
+			:ndBrainTrainerCpuCommand(10)
 			,m_owner(owner)
 			,m_inputSize(0)
 			,m_outputSize(0)
@@ -76,7 +77,8 @@ void ndBrainTrainerCpu::AddCopyOutputGradientCommand()
 		virtual void Execute(ndInt32 miniBatchIndex)
 		{
 			const ndBrainMemVector src(&m_owner->m_miniBatchOutputGradientBuffer[miniBatchIndex * m_outputSize], m_outputSize);
-			ndBrainMemVector dst(&m_owner->m_inputOuputGradientsBuffer[miniBatchIndex * m_inputOutputSize + m_inputOutputStartOffset], m_outputSize);
+			ndInt32 destOffset = miniBatchIndex * m_inputOutputSize * m_owner->m_miniBatchSize;
+			ndBrainMemVector dst(&m_owner->m_inputOuputGradientsBuffer[destOffset + m_inputOutputStartOffset], m_outputSize);
 			dst.Set(src);
 		}
 
@@ -95,8 +97,49 @@ void ndBrainTrainerCpu::AddCopyOutputGradientCommand()
 	outputGradientCommand->m_parametersSize = 0;
 	
 	outputGradientCommand->m_inputOutputSize = lastCommand->m_inputOutputSize;
-	outputGradientCommand->m_inputOutputStartOffset = lastCommand->m_inputOutputStartOffset + lastCommand->m_inputSize;
+	outputGradientCommand->m_inputOutputStartOffset = lastCommand->m_inputOutputStartOffset;
 	m_backPropagateCommands.Append(ndSharedPtr<ndBrainTrainerCpuCommand>(outputGradientCommand));
+}
+
+void ndBrainTrainerCpu::AddLayersGradientCommands()
+{
+	const ndBrain& brain = **m_brain;
+
+int xxxx = 0;
+	for (ndInt32 i = ndInt32(brain.GetCount()) - 1; i >= 0; --i)
+	{
+		auto FindFeedFowardCommand = [this](size_t id)
+		{
+			for (ndList<ndSharedPtr<ndBrainTrainerCpuCommand>>::ndNode* node = m_feedFowardCommands.GetFirst(); node; node = node->GetNext())
+			{
+				const ndBrainTrainerCpuCommand* const command = *node->GetInfo();
+				if (command->m_id == id)
+				{
+					return (ndBrainLayer::ndBrainLayerFeedFowardCpuCommand*)command;
+				}
+			}
+			return (ndBrainLayer::ndBrainLayerFeedFowardCpuCommand*)nullptr;
+		};
+		const ndBrainLayer* const layer = brain[i];
+		const ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* const feedFowardCommand = FindFeedFowardCommand(size_t(layer));
+		ndAssert(feedFowardCommand);
+
+		ndBrainLayer::ndBrainLayerBackPropagateCpuCommand* const command = layer->GetLayerCpuBackPropagateCommand();
+		command->m_owner = this;
+
+		ndAssert(command->m_inputSize == feedFowardCommand->m_inputSize);
+		ndAssert(command->m_outputSize == feedFowardCommand->m_outputSize);
+		command->m_parametersSize = feedFowardCommand->m_parametersSize;
+		command->m_parametersStartOffset = feedFowardCommand->m_parametersStartOffset;
+		command->m_inputOutputSize = feedFowardCommand->m_inputOutputSize;
+		command->m_inputOutputStartOffset = feedFowardCommand->m_inputOutputStartOffset;
+
+		m_backPropagateCommands.Append(command);
+
+		if (xxxx >= 1)
+			break;
+		xxxx++;
+	}
 }
 
 void ndBrainTrainerCpu::BackPropagate(const ndBrainVector& outputGradients)

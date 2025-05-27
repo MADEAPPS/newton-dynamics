@@ -165,7 +165,7 @@ static void MnistTrainingSet()
 		{
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize);
 
-			//threadCount = 1;
+			threadCount = 1;
 			SetThreadCount(threadCount);
 
 			if (m_hasGpuSupport)
@@ -267,7 +267,8 @@ static void MnistTrainingSet()
 			ndInt32 batchesCount = trainingDigits->GetRows() / m_miniBatchSize;
 			ndInt32 batchesSize = batchesCount * m_miniBatchSize;
 
-			ndBrainLossLeastSquaredError loss(outputSize);
+			//ndBrainLossLeastSquaredError loss(outputSize);
+			ndBrainLossCategoricalCrossEntropy loss(outputSize);
 			for (ndInt32 epoch = 0; epoch < NUMBER_OF_EPOCKS; ++epoch)
 			{
 				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());

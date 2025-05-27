@@ -72,7 +72,13 @@ void ndBrainLayer::BackPropagated(const ndBrainLayerBackPropagateCpuCommand* con
 	ndAssert(0);
 }
 
-ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* ndBrainLayer::GetLayerUniformDataCpu() const
+ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* ndBrainLayer::GetLayerCpuFeedForwardCommand() const
+{
+	ndAssert(0);
+	return nullptr;
+}
+
+ndBrainLayer::ndBrainLayerBackPropagateCpuCommand* ndBrainLayer::GetLayerCpuBackPropagateCommand() const
 {
 	ndAssert(0);
 	return nullptr;

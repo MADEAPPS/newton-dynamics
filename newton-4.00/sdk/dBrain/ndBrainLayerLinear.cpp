@@ -337,14 +337,14 @@ ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerLinear::GetLayerUniformDataGpu(c
 	return data;
 }
 
-ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* ndBrainLayerLinear::GetLayerUniformDataCpu() const
+ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* ndBrainLayerLinear::GetLayerCpuFeedForwardCommand() const
 {
-	ndBrainLayerFeedFowardCpuCommand* const data = new ndBrainLayerFeedFowardCpuCommand(this);
+	ndBrainLayerFeedFowardCpuCommand* const command = new ndBrainLayerFeedFowardCpuCommand(this);
 
-	data->m_inputSize = GetInputSize();
-	data->m_outputSize = GetOutputSize();
-	data->m_parametersSize = GetOutputSize() * GetInputSize() + GetOutputSize();
-	return data;
+	command->m_inputSize = GetInputSize();
+	command->m_outputSize = GetOutputSize();
+	command->m_parametersSize = GetOutputSize() * GetInputSize() + GetOutputSize();
+	return command;
 }
 
 void ndBrainLayerLinear::FeedForward(const ndBrainLayerFeedFowardCpuCommand* const info, ndInt32 miniBatchIndex) const

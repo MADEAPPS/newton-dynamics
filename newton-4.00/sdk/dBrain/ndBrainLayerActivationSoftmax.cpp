@@ -121,13 +121,20 @@ bool ndBrainLayerActivationSoftmax::HasGpuSupport() const
 	return true;
 }
 
-ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* ndBrainLayerActivationSoftmax::GetLayerUniformDataCpu() const
+ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* ndBrainLayerActivationSoftmax::GetLayerCpuFeedForwardCommand() const
 {
-	ndBrainLayerFeedFowardCpuCommand* const data = new ndBrainLayerFeedFowardCpuCommand(this);
-	data->m_inputSize = GetInputSize();
-	data->m_outputSize = GetOutputSize();
+	ndBrainLayerFeedFowardCpuCommand* const command = new ndBrainLayerFeedFowardCpuCommand(this);
+	command->m_inputSize = GetInputSize();
+	command->m_outputSize = GetOutputSize();
+	return command;
+}
 
-	return data;
+ndBrainLayer::ndBrainLayerBackPropagateCpuCommand* ndBrainLayerActivationSoftmax::GetLayerCpuBackPropagateCommand() const
+{
+	ndBrainLayerBackPropagateCpuCommand* const command = new ndBrainLayerBackPropagateCpuCommand(this);
+	command->m_inputSize = GetInputSize();
+	command->m_outputSize = GetOutputSize();
+	return command;
 }
 
 ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerActivationSoftmax::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const
@@ -142,11 +149,10 @@ ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerActivationSoftmax::GetLayerUnifo
 
 void ndBrainLayerActivationSoftmax::FeedForward(const ndBrainLayerFeedFowardCpuCommand* const info, ndInt32 miniBatchIndex) const
 {
-	const ndBrainTrainerCpuInference* const trainer = info->m_owner;
-
 	ndInt32 inputSize = info->m_inputSize;
 	ndInt32 outputSize = info->m_outputSize;
 
+	const ndBrainTrainerCpuInference* const trainer = info->m_owner;
 	ndInt32 offset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
 	const ndBrainMemVector input(&trainer->m_inputOutputBuffer[offset], inputSize);
 	ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
@@ -175,4 +181,9 @@ void ndBrainLayerActivationSoftmax::FeedForward(const ndBrainLayerFeedFowardCpuC
 	//ndBrainFixSizeVector<1000> xxxx;
 	//xxxx.SetCount(outputSize);
 	//MakePrediction(input, xxxx);
+}
+
+void ndBrainLayerActivationSoftmax::BackPropagated(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const
+{
+	ndAssert(0);
 }

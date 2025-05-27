@@ -36,6 +36,7 @@ class ndBrainTrainerCpu: public ndBrainTrainerCpuInference
 	virtual void BackPropagate(const ndBrainVector& outputGradients) override;
 
 	protected:
+	void AddLayersGradientCommands();
 	void AddCopyOutputGradientCommand();
 
 	ndBrainVector m_inputOuputGradientsBuffer;
@@ -43,6 +44,13 @@ class ndBrainTrainerCpu: public ndBrainTrainerCpuInference
 	ndBrainVector m_miniBatchInputGradientBuffer;
 	ndBrainVector m_miniBatchOutputGradientBuffer;
 	ndList<ndSharedPtr<ndBrainTrainerCpuCommand>> m_backPropagateCommands;
+
+	friend class ndBrainLayerLinear;
+	friend class ndBrainLayerActivationRelu;
+	friend class ndBrainLayerActivationTanh;
+	friend class ndBrainLayerActivationSoftmax;
+	friend class ndBrainLayerLinearWithDropOut;
+	friend class ndBrainLayerActivationCategoricalSoftmax;
 };
 
 #endif 

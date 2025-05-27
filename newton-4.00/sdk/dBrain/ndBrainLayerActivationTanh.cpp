@@ -22,8 +22,8 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
 #include "ndBrainSimdFloat8.h"
+#include "ndBrainTrainerCpu.h"
 #include "gpu/ndBrainGpuContext.h"
-#include "ndBrainTrainerCpuInference.h"
 #include "ndBrainLayerActivationTanh.h"
 
 ndBrainLayerActivationTanh::ndBrainLayerActivationTanh(ndInt32 neurons)
@@ -97,13 +97,21 @@ bool ndBrainLayerActivationTanh::HasGpuSupport() const
 	return true;
 }
 
-ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* ndBrainLayerActivationTanh::GetLayerUniformDataCpu() const
+ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* ndBrainLayerActivationTanh::GetLayerCpuFeedForwardCommand() const
 {
-	ndBrainLayerFeedFowardCpuCommand* const data = new ndBrainLayerFeedFowardCpuCommand(this);
+	ndBrainLayerFeedFowardCpuCommand* const command = new ndBrainLayerFeedFowardCpuCommand(this);
 
-	data->m_inputSize = GetInputSize();
-	data->m_outputSize = GetOutputSize();
-	return data;
+	command->m_inputSize = GetInputSize();
+	command->m_outputSize = GetOutputSize();
+	return command;
+}
+
+ndBrainLayer::ndBrainLayerBackPropagateCpuCommand* ndBrainLayerActivationTanh::GetLayerCpuBackPropagateCommand() const
+{
+	ndBrainLayerBackPropagateCpuCommand* const command = new ndBrainLayerBackPropagateCpuCommand(this);
+	command->m_inputSize = GetInputSize();
+	command->m_outputSize = GetOutputSize();
+	return command;
 }
 
 ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerActivationTanh::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const
@@ -149,4 +157,28 @@ void ndBrainLayerActivationTanh::FeedForward(const ndBrainLayerFeedFowardCpuComm
 	//ndBrainFixSizeVector<1000> xxxx;
 	//xxxx.SetCount(outputSize);
 	//MakePrediction(input, xxxx);
+}
+
+void ndBrainLayerActivationTanh::BackPropagated(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const
+{
+	ndInt32 inputSize = info->m_inputSize;
+	ndInt32 outputSize = info->m_outputSize;
+
+	const ndBrainTrainerCpu* const trainer = info->m_owner;
+	ndInt32 offset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
+	const ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
+
+	ndInt32 dstOffset = miniBatchIndex * info->m_inputOutputSize * info->m_owner->m_miniBatchSize + info->m_inputOutputStartOffset;
+	const ndBrainMemVector outputDerivative(&trainer->m_inputOuputGradientsBuffer[dstOffset + inputSize], outputSize);
+	ndBrainMemVector inputDerivative(&trainer->m_inputOuputGradientsBuffer[dstOffset], inputSize);
+
+	inputDerivative.Set(ndBrainFloat(1.0f));
+	inputDerivative.MulSub(output, output);
+	inputDerivative.Mul(outputDerivative);
+	inputDerivative.FlushToZero();
+
+	// basically it acts as a loss function
+	ndBrainFixSizeVector<1000> xxxx;
+	xxxx.SetCount(inputSize);
+	InputDerivative(xxxx, output, outputDerivative, xxxx);
 }

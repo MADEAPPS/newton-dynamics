@@ -70,13 +70,13 @@ void ndBrainTrainerCpuInference::InitWeightAndBiasBuffer()
 {
 	const ndBrain& brain = **m_brain;
 
-	ndFixSizeArray<ndBrainLayer::ndBrainLayerFeedFowardCpuCommand*, 256> uniformData;
+	ndFixSizeArray<ndBrainLayer::ndBrainLayerFeedFowardCpuCommand*, 256> feedFowardCommands;
 	for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
 	{
 		const ndBrainLayer* const layer = brain[i];
-		ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* const data = layer->GetLayerUniformDataCpu();
+		ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* const data = layer->GetLayerCpuFeedForwardCommand();
 		data->m_owner = this;
-		uniformData.PushBack(data);
+		feedFowardCommands.PushBack(data);
 	}
 
 	class DummyLayerUniformDataCpu : public ndBrainLayer::ndBrainLayerFeedFowardCpuCommand
@@ -93,13 +93,13 @@ void ndBrainTrainerCpuInference::InitWeightAndBiasBuffer()
 	};
 
 	DummyLayerUniformDataCpu sentinel;
-	uniformData.PushBack(&sentinel);
+	feedFowardCommands.PushBack(&sentinel);
 	
 	ndInt32 sizeAcc = 0;
-	for (ndInt32 i = 0; i < uniformData.GetCount(); ++i)
+	for (ndInt32 i = 0; i < feedFowardCommands.GetCount(); ++i)
 	{
-		uniformData[i]->m_parametersStartOffset = sizeAcc;
-		sizeAcc += uniformData[i]->m_parametersSize;
+		feedFowardCommands[i]->m_parametersStartOffset = sizeAcc;
+		sizeAcc += feedFowardCommands[i]->m_parametersSize;
 	}
 	
 	ndInt32 padWeights = 32;
@@ -108,7 +108,7 @@ void ndBrainTrainerCpuInference::InitWeightAndBiasBuffer()
 	for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
 	{
 		const ndBrainLayer* const layer = brain[i];
-		ndBrainMemVector weights(&m_weightAndBiasBuffer[uniformData[i]->m_parametersStartOffset], uniformData[i]->m_parametersSize);
+		ndBrainMemVector weights(&m_weightAndBiasBuffer[feedFowardCommands[i]->m_parametersStartOffset], feedFowardCommands[i]->m_parametersSize);
 		layer->CopyWeights(weights);
 	}
 	
@@ -118,8 +118,8 @@ void ndBrainTrainerCpuInference::InitWeightAndBiasBuffer()
 	m_miniBatchOutputBuffer.SetCount(m_miniBatchSize * brain.GetOutputSize());
 	m_miniBatchOutputBuffer.Set(ndBrainFloat(0.0f));
 	
-	AddCopyInputCommand(uniformData[0]);
-	AddLayersCommands(uniformData);
+	AddCopyInputCommand(feedFowardCommands[0]);
+	AddLayersCommands(feedFowardCommands);
 	AddCopyOutputCommand();
 }
 
@@ -136,8 +136,8 @@ void ndBrainTrainerCpuInference::AddCopyInputCommand(const ndBrainLayer::ndBrain
 	class ndCopyInputCommand : public ndBrainTrainerCpuCommand
 	{
 		public:
-		ndCopyInputCommand(ndBrainTrainerCpuInference* owner)
-			:ndBrainTrainerCpuCommand()
+		ndCopyInputCommand(ndBrainTrainerCpuInference* const owner)
+			:ndBrainTrainerCpuCommand(0)
 			,m_owner(owner)
 			,m_inputSize(0)
 			,m_outputSize(0)

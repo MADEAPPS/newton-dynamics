@@ -51,8 +51,8 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 	class ndCopyOutputCommand : public ndBrainTrainerCpuCommand
 	{
 		public:
-		ndCopyOutputCommand(ndBrainTrainerCpuInference* owner)
-			:ndBrainTrainerCpuCommand()
+		ndCopyOutputCommand(ndBrainTrainerCpuInference* const owner)
+			:ndBrainTrainerCpuCommand(10)
 			,m_owner(owner)
 			,m_inputSize(0)
 			,m_outputSize(0)
@@ -96,6 +96,7 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 	friend class ndBrainLayerActivationTanh;
 	friend class ndBrainLayerActivationSoftmax;
 	friend class ndBrainLayerLinearWithDropOut;
+	friend class ndBrainLayerActivationCategoricalSoftmax;
 };
 
 #endif 

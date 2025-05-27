@@ -39,7 +39,7 @@ class ndBrainLayerActivationRelu : public ndBrainLayerActivation
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
 
-	virtual ndBrainLayerFeedFowardCpuCommand* GetLayerUniformDataCpu() const override;
+	virtual ndBrainLayerFeedFowardCpuCommand* GetLayerCpuFeedForwardCommand() const override;
 	virtual void FeedForward(const ndBrainLayerFeedFowardCpuCommand* const info, ndInt32 miniBatchIndex) const override;
 
 	virtual bool HasGpuSupport() const override;

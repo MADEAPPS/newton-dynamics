@@ -74,7 +74,7 @@ class ndBrainLayerLinear : public ndBrainLayer
 
 	virtual void CopyWeights(ndBrainVector& oput) const override;
 
-	virtual ndBrainLayerFeedFowardCpuCommand* GetLayerUniformDataCpu() const override;
+	virtual ndBrainLayerFeedFowardCpuCommand* GetLayerCpuFeedForwardCommand() const override;
 	virtual void FeedForward(const ndBrainLayerFeedFowardCpuCommand* const info, ndInt32 miniBatchIndex) const override;
 
 	virtual bool HasGpuSupport() const override;

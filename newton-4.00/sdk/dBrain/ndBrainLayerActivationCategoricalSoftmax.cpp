@@ -21,6 +21,7 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
+#include "ndBrainTrainerCpu.h"
 #include "ndBrainLayerActivationCategoricalSoftmax.h"
 
 ndBrainLayerActivationCategoricalSoftmax::ndBrainLayerActivationCategoricalSoftmax(ndInt32 neurons)
@@ -42,6 +43,18 @@ ndBrainLayer* ndBrainLayerActivationCategoricalSoftmax::Clone() const
 const char* ndBrainLayerActivationCategoricalSoftmax::GetLabelId() const
 {
 	return "ndBrainLayerActivationCategoricalSoftmax";
+}
+
+ndBrainLayer* ndBrainLayerActivationCategoricalSoftmax::Load(const ndBrainLoad* const loadSave)
+{
+	char buffer[1024];
+	loadSave->ReadString(buffer);
+
+	loadSave->ReadString(buffer);
+	ndInt32 inputs = loadSave->ReadInt();
+	ndBrainLayerActivationCategoricalSoftmax* const layer = new ndBrainLayerActivationCategoricalSoftmax(inputs);
+	loadSave->ReadString(buffer);
+	return layer;
 }
 
 void ndBrainLayerActivationCategoricalSoftmax::InputDerivative(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
@@ -67,14 +80,25 @@ void ndBrainLayerActivationCategoricalSoftmax::InputDerivative(const ndBrainVect
 	inputDerivative.FlushToZero();
 }
 
-ndBrainLayer* ndBrainLayerActivationCategoricalSoftmax::Load(const ndBrainLoad* const loadSave)
+void ndBrainLayerActivationCategoricalSoftmax::BackPropagated(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const
 {
-	char buffer[1024];
-	loadSave->ReadString(buffer);
+	ndInt32 inputSize = info->m_inputSize;
+	ndInt32 outputSize = info->m_outputSize;
 
-	loadSave->ReadString(buffer);
-	ndInt32 inputs = loadSave->ReadInt();
-	ndBrainLayerActivationCategoricalSoftmax* const layer = new ndBrainLayerActivationCategoricalSoftmax(inputs);
-	loadSave->ReadString(buffer);
-	return layer;
+	const ndBrainTrainerCpu* const trainer = info->m_owner;
+	ndInt32 offset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
+	const ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
+
+	ndInt32 dstOffset = miniBatchIndex * info->m_inputOutputSize * info->m_owner->m_miniBatchSize + info->m_inputOutputStartOffset;
+	const ndBrainMemVector outputDerivative(&trainer->m_inputOuputGradientsBuffer[dstOffset + inputSize], outputSize);
+	ndBrainMemVector inputDerivative (&trainer->m_inputOuputGradientsBuffer[dstOffset], inputSize);
+
+	inputDerivative.Set(output);
+	inputDerivative.Sub(outputDerivative);
+	inputDerivative.FlushToZero();
+
+	// basically it acts as a loss function
+	//ndBrainFixSizeVector<1000> xxxx;
+	//xxxx.SetCount(inputSize);
+	//InputDerivative(xxxx, output, outputDerivative, xxxx);
 }
