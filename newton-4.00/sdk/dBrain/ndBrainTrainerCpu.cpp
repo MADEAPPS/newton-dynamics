@@ -146,6 +146,7 @@ void ndBrainTrainerCpu::ApplyLearnRate(ndBrainFloat learnRate)
 	{
 		ndInt32 size = ndInt32(m_weightAndBiasBuffer.GetCount());
 		ndInt32 slide = size / m_miniBatchSize;
+		ndFloat32 scale = ndFloat32(1.0f) / ndFloat32(m_miniBatchSize);
 		for (ndInt32 i = iterator++; i < m_miniBatchSize; i = iterator++)
 		{
 			ndInt32 start = i * slide;
@@ -160,6 +161,7 @@ void ndBrainTrainerCpu::ApplyLearnRate(ndBrainFloat learnRate)
 				const ndBrainMemVector src(&m_weightAndBiasGradientsBuffer[rowBase], count);
 				dst.Add(src);
 			}
+			dst.Scale(scale);
 		}
 	});
 	m_threadPool->ndBrainThreadPool::ParallelExecute(AddGradients);
