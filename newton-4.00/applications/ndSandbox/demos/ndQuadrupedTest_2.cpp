@@ -57,7 +57,7 @@ namespace ndQuadruped_2
 {
 	#define ND_TRAIN_MODEL
 
-	//#define USE_DDPG
+	#define USE_DDPG
 
 	#ifdef USE_DDPG
 		#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"

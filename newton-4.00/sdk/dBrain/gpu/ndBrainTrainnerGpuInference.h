@@ -53,6 +53,7 @@ class ndBrainTrainnerGpuInference: public ndBrainTrainer
 	virtual void ApplyLearnRate(ndBrainFloat learnRate) override;
 	virtual void MakePrediction(const ndBrainVector& input) override;
 	virtual void BackPropagate(const ndBrainVector& outputGradients) override;
+	virtual void MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output) override;
 
 	protected:
 	void SubmitCommands();

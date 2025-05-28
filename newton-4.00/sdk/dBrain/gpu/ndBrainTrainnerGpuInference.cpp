@@ -306,3 +306,9 @@ void ndBrainTrainnerGpuInference::MakePrediction(const ndBrainVector& input)
 	SubmitCommands();
 	m_context->EndQueue();
 }
+
+void ndBrainTrainnerGpuInference::MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output)
+{
+	ndAssert(0);
+}
+

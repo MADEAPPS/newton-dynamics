@@ -251,3 +251,14 @@ void ndBrainTrainerCpuInference::MakePrediction(const ndBrainVector& input)
 		m_threadPool->ndBrainThreadPool::ParallelExecute(ExecuteCommand);
 	}
 }
+
+void ndBrainTrainerCpuInference::MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output)
+{
+	ndMemCpy(&m_miniBatchInputBuffer[0], &input[0], input.GetCount());
+	for (ndList<ndSharedPtr<ndBrainTrainerCpuCommand>>::ndNode* node = m_feedFowardCommands.GetFirst(); node; node = node->GetNext())
+	{
+		ndBrainTrainerCpuCommand* const command = *node->GetInfo();
+		command->Execute(0);
+	}
+	ndMemCpy(&output[0], &m_miniBatchOutputBuffer[0], output.GetCount());
+}

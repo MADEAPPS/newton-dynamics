@@ -57,10 +57,14 @@ class ndBrainTrainer: public ndClassAlloc
 	virtual void UpdateParameters() = 0;
 	virtual void GetOutput(ndBrainVector&) const {}
 
-	virtual void MakePrediction(const ndBrainVector& input) = 0;
-
 	// legacy method;
 	virtual void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss) = 0;
+
+	// new method
+	virtual void MakePrediction(const ndBrainVector& input) = 0;
+
+	// new method
+	virtual void MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output) = 0;
 
 	// new method
 	virtual void BackPropagate(const ndBrainVector& outputGradients) = 0;

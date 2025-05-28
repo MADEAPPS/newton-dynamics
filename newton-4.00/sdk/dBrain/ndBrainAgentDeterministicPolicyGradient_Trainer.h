@@ -115,7 +115,7 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 
 	ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer> m_owner;
 	ndTrajectoryTransition m_trajectory;
-	ndBrainVector m_workingBuffer;
+	//ndBrainVector m_workingBuffer;
 	ndInt32 m_trajectoryBaseCount;
 	ndRandomGenerator m_randomeGenerator;
 	friend class ndBrainAgentDeterministicPolicyGradient_Trainer;
@@ -193,15 +193,20 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
 	ndString m_name;
 	HyperParameters m_parameters;
 
-	ndBrain m_policy;
-	ndBrain m_referencePolicy;
-	ndArray<ndBrainTrainer*> m_policyTrainers;
-	ndSharedPtr<ndBrainOptimizerAdamLegacy> m_policyOptimizer;
+	ndSharedPtr<ndBrainTrainerCpu> m_policy___;
+	ndSharedPtr<ndBrainTrainerCpuInference> m_referencePolicy___;
 
-	ndBrain m_critic[ND_NUMBER_OF_CRITICS];
-	ndBrain m_referenceCritic[ND_NUMBER_OF_CRITICS];
-	ndArray<ndBrainTrainer*> m_criticTrainers[ND_NUMBER_OF_CRITICS];
-	ndSharedPtr<ndBrainOptimizerAdamLegacy> m_criticOptimizer[ND_NUMBER_OF_CRITICS];
+	ndSharedPtr<ndBrainTrainerCpu> m_critic___[ND_NUMBER_OF_CRITICS];
+	ndSharedPtr<ndBrainTrainerCpu> m_referenceCritic___[ND_NUMBER_OF_CRITICS];
+
+	//ndBrain m_policy;
+	//ndBrain m_referencePolicy;
+	//ndArray<ndBrainTrainer*> m_policyTrainers;
+	//ndSharedPtr<ndBrainOptimizerAdamLegacy> m_policyOptimizer;
+	//ndBrain m_critic[ND_NUMBER_OF_CRITICS];
+	//ndBrain m_referenceCritic[ND_NUMBER_OF_CRITICS];
+	//ndArray<ndBrainTrainer*> m_criticTrainers[ND_NUMBER_OF_CRITICS];
+	//ndSharedPtr<ndBrainOptimizerAdamLegacy> m_criticOptimizer[ND_NUMBER_OF_CRITICS];
 
 	ndBrainVector m_expectedRewards;
 	ndArray<ndInt32> m_miniBatchIndexBuffer;
