@@ -299,19 +299,6 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::ndBrainAgentDeterministicPolicy
 
 ndBrainAgentDeterministicPolicyGradient_Trainer::~ndBrainAgentDeterministicPolicyGradient_Trainer()
 {
-	ndAssert(0);
-	//for (ndInt32 i = 0; i < m_policyTrainers.GetCount(); ++i)
-	//{
-	//	delete m_policyTrainers[i];
-	//}
-	//
-	//for (ndInt32 k = 0; k < sizeof(m_critic) / sizeof(m_critic[0]); ++k)
-	//{
-	//	for (ndInt32 i = 0; i < m_criticTrainers[k].GetCount(); ++i)
-	//	{
-	//		delete m_criticTrainers[k][i];
-	//	}
-	//}
 }
 
 ndBrain* ndBrainAgentDeterministicPolicyGradient_Trainer::GetPolicyNetwork()
@@ -1007,8 +994,8 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnPolicyFunction()
 //#pragma optimize( "", off )
 void ndBrainAgentDeterministicPolicyGradient_Trainer::Optimize()
 {
+	CalculateExpectedRewards();
 	ndAssert(0);
-	//CalculateExpectedRewards();
 	//for (ndInt32 k = 0; k < sizeof(m_critic) / sizeof(m_critic[0]); ++k)
 	//{
 	//	LearnQvalueFunction(k);
