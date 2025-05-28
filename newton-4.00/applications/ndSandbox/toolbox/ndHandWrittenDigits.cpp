@@ -271,7 +271,7 @@ static void MnistTrainingSet()
 			ndInt32 batchesCount = trainingDigits->GetRows() / m_miniBatchSize;
 			ndInt32 batchesSize = batchesCount * m_miniBatchSize;
 
-			m_bestBrain = **trainer->GetBrain();
+			m_bestBrain = ndSharedPtr<ndBrain>(new ndBrain (**trainer->GetBrain()));
 
 			ndBrainLossCategoricalCrossEntropy loss(outputSize);
 			for (ndInt32 epoch = 0; epoch < NUMBER_OF_EPOCKS; ++epoch)
@@ -330,7 +330,7 @@ static void MnistTrainingSet()
 				ndInt64 testFailCount = ValidateData(testLabels, testDigits) + 1;
 				if (testFailCount < m_minValidationFail)
 				{
-					m_bestBrain.CopyFrom(**trainer->GetBrain());
+					m_bestBrain->CopyFrom(**trainer->GetBrain());
 					m_minValidationFail = testFailCount + 1;
 					ndInt64 trainigFailCount = ValidateData(trainingLabels, trainingDigits) + 1;
 					ndInt64 size = trainingLabels->GetCount();
@@ -357,12 +357,11 @@ static void MnistTrainingSet()
 					}
 				}
 			}
-
-			trainer->GetBrain()->CopyFrom(m_bestBrain);
+			trainer->GetBrain()->CopyFrom(**m_bestBrain);
 		}
 
-		ndBrain m_bestBrain;
 		ndSharedPtr<ndBrain> m_brain;
+		ndSharedPtr<ndBrain> m_bestBrain;
 		ndSharedPtr<ndBrainGpuContext> m_context;
 		ndSharedPtr<ndBrainTrainer> m_trainer;
 		ndFixSizeArray<ndFixSizeArray<ndUnsigned32, 16>, MINIBATCH_BUFFER_SIZE> m_prioritySamples;
@@ -444,13 +443,15 @@ static void MnistTrainingSet()
 		
 		ndBrainSave::Save(*brain, path);
 
-		ndInt32 trainingFailCount = optimizer.ValidateData(*trainingLabels, *trainingDigits);
+		SupervisedTrainer inference(optimizer.m_bestBrain);
+
+		ndInt32 trainingFailCount = inference.ValidateData(*trainingLabels, *trainingDigits);
 		ndExpandTraceMessage("training data results:\n");
 		ndExpandTraceMessage("  num_right: %d  out of %d\n", trainingLabels->GetCount() - trainingFailCount, trainingLabels->GetCount());
 		ndExpandTraceMessage("  num_wrong: %d  out of %d\n", trainingFailCount, trainingLabels->GetCount());
 		ndExpandTraceMessage("  success rate %f%%\n", (ndFloat32)(trainingLabels->GetCount() - trainingFailCount) * 100.0f / (ndFloat32)trainingLabels->GetCount());
 
-		ndInt32 testFailCount = optimizer.ValidateData(*testLabels, *testDigits);
+		ndInt32 testFailCount = inference.ValidateData(*testLabels, *testDigits);
 		ndExpandTraceMessage("test data results:\n");
 		ndExpandTraceMessage("  num_right: %d  out of %d\n", testLabels->GetCount() - testFailCount, testLabels->GetCount());
 		ndExpandTraceMessage("  num_wrong: %d  out of %d\n", testFailCount, testLabels->GetCount());
