@@ -161,6 +161,7 @@ static void MnistTrainingSet()
 			,m_learnRate(ndReal(5.0e-4f))
 			,m_miniBatchSize(MINIBATCH_BUFFER_SIZE)
 			,m_minCombinedScore(ndInt64(1000000) * ndInt64(1000000))
+			,m_minValidationFail(ndInt64(1000000)* ndInt64(1000000))
 			,m_hasGpuSupport(m_brain->IsGpuReady())
 		{
 			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize);
@@ -268,7 +269,6 @@ static void MnistTrainingSet()
 			miniBatchOutputGradients.SetCount(outputSize * m_miniBatchSize);
 			
 			ndInt32 batchesCount = trainingDigits->GetRows() / m_miniBatchSize;
-			//ndInt32 batchesCount = MINIBATCH_BUFFER_SIZE / m_miniBatchSize;
 			ndInt32 batchesSize = batchesCount * m_miniBatchSize;
 
 			ndBrainLossCategoricalCrossEntropy loss(outputSize);
@@ -325,21 +325,35 @@ static void MnistTrainingSet()
 				}
 
 				ndInt64 testFailCount = ValidateData(testLabels, testDigits) + 1;
-				ndInt64 trainigFailCount = ValidateData(trainingLabels, trainingDigits) + 1;
-				ndInt64 minCombinedScore = testFailCount * trainigFailCount;
-				if (minCombinedScore <= m_minCombinedScore)
+				if (testFailCount < m_minValidationFail)
 				{
-					m_minCombinedScore = minCombinedScore;
+					trainer->UpdateParameters();
+					m_minValidationFail = testFailCount + 1;
+					ndInt64 trainigFailCount = ValidateData(trainingLabels, trainingDigits) + 1;
 					ndInt64 size = trainingLabels->GetCount();
 					ndFloat32 score = (ndFloat32)(size - trainigFailCount) / (ndFloat32)size;
+					ndExpandTraceMessage("Best model: ");
 					ndExpandTraceMessage("  epoch: %d", epoch);
 					ndExpandTraceMessage("  success rate:%f%%", score * 100.0f);
 					ndExpandTraceMessage("  training fail count:%d", trainigFailCount);
 					ndExpandTraceMessage("  test fail count:%d\n", testFailCount);
+				} 
+				else
+				{
+					ndInt64 trainigFailCount = ValidateData(trainingLabels, trainingDigits) + 1;
+					ndInt64 minCombinedScore = testFailCount * trainigFailCount;
+					if (minCombinedScore <= m_minCombinedScore)
+					{
+						m_minCombinedScore = minCombinedScore;
+						ndInt64 size = trainingLabels->GetCount();
+						ndFloat32 score = (ndFloat32)(size - trainigFailCount) / (ndFloat32)size;
+						ndExpandTraceMessage("  epoch: %d", epoch);
+						ndExpandTraceMessage("  success rate:%f%%", score * 100.0f);
+						ndExpandTraceMessage("  training fail count:%d", trainigFailCount);
+						ndExpandTraceMessage("  test fail count:%d\n", testFailCount);
+					}
 				}
 			}
-
-			//m_brain->CopyFrom(bestBrain);
 		}
 
 		ndSharedPtr<ndBrain> m_brain;
@@ -348,8 +362,8 @@ static void MnistTrainingSet()
 		ndFixSizeArray<ndFixSizeArray<ndUnsigned32, 16>, MINIBATCH_BUFFER_SIZE> m_prioritySamples;
 		ndReal m_learnRate;
 		ndInt32 m_miniBatchSize;
-		ndInt32 m_minTrainingFail;
 		ndInt64 m_minCombinedScore;
+		ndInt64 m_minValidationFail;
 		bool m_hasGpuSupport;
 	};
 	
