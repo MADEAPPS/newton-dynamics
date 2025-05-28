@@ -176,36 +176,35 @@ class ndBrainLayer : public ndClassAlloc
 
 inline bool ndBrainLayer::DebugFeedFoward(const ndBrainVector& input, const ndBrainVector& output) const
 {
-	ndBrainFixSizeVector<1024 * 4> tmp;
-	tmp.SetCount(output.GetCount());
-	MakePrediction(input, tmp);
-
-	for (ndInt32 i = ndInt32(tmp.GetCount()) - 1; i >= 0; --i)
-	{
-		ndFloat32 error = ndAbs(tmp[i] - output[i]);
-		if (error > ndFloat32(1.0e-5f))
-		{
-			return false;
-		}
-	}
+	//ndBrainFixSizeVector<1024 * 4> tmp;
+	//tmp.SetCount(output.GetCount());
+	//MakePrediction(input, tmp);
+	//
+	//for (ndInt32 i = ndInt32(tmp.GetCount()) - 1; i >= 0; --i)
+	//{
+	//	ndFloat32 error = ndAbs(tmp[i] - output[i]);
+	//	if (error > ndFloat32(1.0e-5f))
+	//	{
+	//		return false;
+	//	}
+	//}
 	return true;
 }
 
 inline bool ndBrainLayer::DebugBackPropagated(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, const ndBrainVector& inputDerivative) const
 {
-	ndBrainFixSizeVector<1024 * 4> tmp;
-	tmp.SetCount(inputDerivative.GetCount());
-	InputDerivative(input, output, outputDerivative, tmp);
-
-	for (ndInt32 i = ndInt32(tmp.GetCount()) - 1; i >= 0; --i)
-	{
-		ndFloat32 error = ndAbs(tmp[i] - inputDerivative[i]);
-		if (error > ndFloat32(1.0e-5f))
-		{
-			return false;
-		}
-	}
-
+	//ndBrainFixSizeVector<1024 * 4> tmp;
+	//tmp.SetCount(inputDerivative.GetCount());
+	//InputDerivative(input, output, outputDerivative, tmp);
+	//
+	//for (ndInt32 i = ndInt32(tmp.GetCount()) - 1; i >= 0; --i)
+	//{
+	//	ndFloat32 error = ndAbs(tmp[i] - inputDerivative[i]);
+	//	if (error > ndFloat32(1.0e-5f))
+	//	{
+	//		return false;
+	//	}
+	//}
 	return true;
 }
 

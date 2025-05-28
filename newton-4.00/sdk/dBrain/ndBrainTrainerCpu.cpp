@@ -31,7 +31,7 @@
 
 ndBrainTrainerCpu::ndBrainTrainerCpu(const ndSharedPtr<ndBrain>& brain, ndBrainThreadPool* const threadPool, ndInt32 minibatchSize)
 	:ndBrainTrainerCpuInference(brain, threadPool, minibatchSize)
-	,m_optimizer()
+	,m_optimizer(threadPool, ndInt32(m_weightAndBiasBuffer.GetCount()))
 	,m_inputOuputGradientsBuffer()
 	,m_weightAndBiasGradientsBuffer()
 	,m_miniBatchInputGradientBuffer()
@@ -53,7 +53,7 @@ ndBrainTrainerCpu::ndBrainTrainerCpu(const ndSharedPtr<ndBrain>& brain, ndBrainT
 
 ndBrainTrainerCpu::ndBrainTrainerCpu(const ndBrainTrainerCpu& src)
 	:ndBrainTrainerCpuInference(src)
-	,m_optimizer()
+	,m_optimizer(src.m_threadPool, ndInt32 (m_weightAndBiasBuffer.GetCount()))
 	,m_inputOuputGradientsBuffer()
 	,m_weightAndBiasGradientsBuffer()
 {
@@ -144,14 +144,15 @@ void ndBrainTrainerCpu::ApplyLearnRate(ndBrainFloat learnRate)
 	ndAtomic<ndInt32> iterator(0);
 	auto AddGradients = ndMakeObject::ndFunction([this, &iterator](ndInt32, ndInt32)
 	{
-		ndInt32 size = ndInt32(m_weightAndBiasBuffer.GetCount());
-		ndInt32 slide = size / m_miniBatchSize;
 		ndFloat32 scale = ndFloat32(1.0f) / ndFloat32(m_miniBatchSize);
-		for (ndInt32 i = iterator++; i < m_miniBatchSize; i = iterator++)
+
+		const ndInt32 stride = 1024 * 4;
+		const ndInt32 size = ndInt32(m_weightAndBiasBuffer.GetCount());
+		const ndInt32 slices = (ndInt32(m_weightAndBiasBuffer.GetCount() + stride - 1)) / stride;
+		for (ndInt32 i = iterator++; i < slices; i = iterator++)
 		{
-			ndInt32 start = i * slide;
-			ndInt32 end = (i + 1) * slide;
-			end = (end >= size) ? size : end;
+			ndInt32 start = i * stride;
+			ndInt32 end = ((start + stride) > size) ? size : start + stride;
 			ndInt32 count = end - start;
 
 			ndBrainMemVector dst(&m_weightAndBiasGradientsBuffer[start], count);
@@ -165,6 +166,9 @@ void ndBrainTrainerCpu::ApplyLearnRate(ndBrainFloat learnRate)
 		}
 	});
 	m_threadPool->ndBrainThreadPool::ParallelExecute(AddGradients);
+
+	const ndBrainMemVector gradients(&m_weightAndBiasGradientsBuffer[0], m_weightAndBiasBuffer.GetCount());
+	m_optimizer.Update(m_weightAndBiasBuffer, gradients, learnRate);
 }
 
 void ndBrainTrainerCpu::BackPropagate(const ndBrainVector& outputGradients)
