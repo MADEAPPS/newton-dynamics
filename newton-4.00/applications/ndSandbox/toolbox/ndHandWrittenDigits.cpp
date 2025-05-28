@@ -324,10 +324,11 @@ static void MnistTrainingSet()
 					#endif
 				}
 
+				trainer->UpdateParameters();
 				ndInt64 testFailCount = ValidateData(testLabels, testDigits) + 1;
 				if (testFailCount < m_minValidationFail)
 				{
-					trainer->UpdateParameters();
+					m_bestBrain.CopyFrom(**trainer->GetBrain());
 					m_minValidationFail = testFailCount + 1;
 					ndInt64 trainigFailCount = ValidateData(trainingLabels, trainingDigits) + 1;
 					ndInt64 size = trainingLabels->GetCount();
@@ -354,8 +355,11 @@ static void MnistTrainingSet()
 					}
 				}
 			}
+
+			trainer->GetBrain()->CopyFrom(m_bestBrain);
 		}
 
+		ndBrain m_bestBrain;
 		ndSharedPtr<ndBrain> m_brain;
 		ndSharedPtr<ndBrainGpuContext> m_context;
 		ndSharedPtr<ndBrainTrainer> m_trainer;
