@@ -271,6 +271,8 @@ static void MnistTrainingSet()
 			ndInt32 batchesCount = trainingDigits->GetRows() / m_miniBatchSize;
 			ndInt32 batchesSize = batchesCount * m_miniBatchSize;
 
+			m_bestBrain = **trainer->GetBrain();
+
 			ndBrainLossCategoricalCrossEntropy loss(outputSize);
 			for (ndInt32 epoch = 0; epoch < NUMBER_OF_EPOCKS; ++epoch)
 			{
