@@ -325,6 +325,23 @@ void ndBrainLayerLinear::CopyWeights(ndBrainVector& output) const
 	bias.Set(m_bias);
 }
 
+void ndBrainLayerLinear::SetWeights(const ndBrainVector& input)
+{
+	ndAssert(input.GetCount() >= (GetOutputSize() * GetInputSize() + GetOutputSize()));
+
+	ndInt32 stride = 0;
+	ndInt32 step = GetInputSize();
+	for (ndInt32 i = 0; i < m_weights.GetRows(); ++i)
+	{
+		ndBrainVector& dst = m_weights[i];
+		const ndBrainMemVector src(&input[stride], step);
+		dst.Set(src);
+		stride += step;
+	}
+	const ndBrainMemVector bias(&input[stride], m_bias.GetCount());
+	m_bias.Set(bias);
+}
+
 ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerLinear::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const
 {
 	ndLayerUniformDataGpu data;
@@ -391,11 +408,9 @@ void ndBrainLayerLinear::BackPropagated(const ndBrainLayerBackPropagateCpuComman
 	const ndBrainMemVector input(&trainer->m_inputOutputBuffer[offset], inputSize);
 	const ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
 	
-	//ndInt32 dstOffset = miniBatchIndex * info->m_inputOutputSize * info->m_owner->m_miniBatchSize + info->m_inputOutputStartOffset;
 	ndInt32 dstOffset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
 	const ndBrainMemVector outputDerivative(&trainer->m_inputOuputGradientsBuffer[dstOffset + inputSize], outputSize);
 	
-	//ndInt32 gradientOffset = miniBatchIndex * info->m_parametersSize * info->m_owner->m_miniBatchSize + info->m_parametersStartOffset;
 	ndInt32 gradientOffset = miniBatchIndex * info->m_parametersBatchSize + info->m_parametersStartOffset;
 	ndBrainMemVector gradients(&trainer->m_weightAndBiasGradientsBuffer[gradientOffset], matrixSize + outputSize);
 	for (ndInt32 i = outputSize - 1; i >= 0; --i)

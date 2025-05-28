@@ -151,7 +151,8 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void ApplyDropOut(ndFloat32 rate);
 	virtual void InitWeights();
 
-	virtual void CopyWeights(ndBrainVector& oput) const;
+	virtual void SetWeights(const ndBrainVector& input);
+	virtual void CopyWeights(ndBrainVector& output) const;
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	virtual void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
 
@@ -174,7 +175,8 @@ class ndBrainLayer : public ndClassAlloc
 	virtual ndLayerUniformDataGpu GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const;
 };
 
-inline bool ndBrainLayer::DebugFeedFoward(const ndBrainVector& input, const ndBrainVector& output) const
+//inline bool ndBrainLayer::DebugFeedFoward(const ndBrainVector& input, const ndBrainVector& output) const
+inline bool ndBrainLayer::DebugFeedFoward(const ndBrainVector&, const ndBrainVector&) const
 {
 	//ndBrainFixSizeVector<1024 * 4> tmp;
 	//tmp.SetCount(output.GetCount());
@@ -191,7 +193,8 @@ inline bool ndBrainLayer::DebugFeedFoward(const ndBrainVector& input, const ndBr
 	return true;
 }
 
-inline bool ndBrainLayer::DebugBackPropagated(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, const ndBrainVector& inputDerivative) const
+//inline bool ndBrainLayer::DebugBackPropagated(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, const ndBrainVector& inputDerivative) const
+inline bool ndBrainLayer::DebugBackPropagated(const ndBrainVector&, const ndBrainVector&, const ndBrainVector&, const ndBrainVector&) const
 {
 	//ndBrainFixSizeVector<1024 * 4> tmp;
 	//tmp.SetCount(inputDerivative.GetCount());

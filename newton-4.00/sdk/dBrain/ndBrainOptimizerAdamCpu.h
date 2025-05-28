@@ -31,9 +31,12 @@ class ndBrainThreadPool;
 class ndBrainOptimizerAdamCpu : public ndBrainOptimizer
 {
 	public: 
-	ndBrainOptimizerAdamCpu(ndBrainThreadPool* const threadPool, ndInt32 size);
+	ndBrainOptimizerAdamCpu();
 
 	virtual void Update(ndBrainVector& parameters, const ndBrainVector& gradrients, ndBrainFloat learnRate);
+
+	private:
+	void Init(ndBrainThreadPool* const threadPool, ndInt32 size);
 
 	ndBrainVector m_vdw;
 	ndBrainVector m_vdw2;
@@ -48,6 +51,8 @@ class ndBrainOptimizerAdamCpu : public ndBrainOptimizer
 	ndBrainFloat m_alphaAcc;
 	ndBrainThreadPool* m_threadPool;
 	ndInt32 m_miniBatchSize;
+
+	friend class ndBrainTrainerCpu;
 };
 
 #endif 

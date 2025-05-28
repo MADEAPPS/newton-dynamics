@@ -101,9 +101,9 @@ void ndBrainTrainerCpuInference::InitWeightAndBiasBuffer()
 		feedFowardCommands[i]->m_parametersStartOffset = sizeAcc;
 		sizeAcc += feedFowardCommands[i]->m_parametersBatchSize;
 	}
-	
-	ndInt32 padWeights = 32;
-	m_weightAndBiasBuffer.SetCount(sizeAcc + padWeights);
+	// add some padding for edge cases
+	sizeAcc += 32;
+	m_weightAndBiasBuffer.SetCount(sizeAcc);
 	m_weightAndBiasBuffer.Set(ndBrainFloat(0.0f));
 	for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
 	{
@@ -223,6 +223,10 @@ void ndBrainTrainerCpuInference::BackPropagate(const ndBrainVector&)
 }
 
 void ndBrainTrainerCpuInference::ApplyLearnRate(ndBrainFloat learnRate)
+{
+}
+
+void ndBrainTrainerCpuInference::UpdateParameters()
 {
 }
 

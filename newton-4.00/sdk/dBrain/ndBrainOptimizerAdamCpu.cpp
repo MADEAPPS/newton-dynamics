@@ -27,7 +27,7 @@
 #include "ndBrainThreadPool.h"
 #include "ndBrainOptimizerAdamCpu.h"
 
-ndBrainOptimizerAdamCpu::ndBrainOptimizerAdamCpu(ndBrainThreadPool* const threadPool, ndInt32 size)
+ndBrainOptimizerAdamCpu::ndBrainOptimizerAdamCpu()
 	:ndBrainOptimizer()
 	,m_vdw()
 	,m_vdw2()
@@ -39,9 +39,14 @@ ndBrainOptimizerAdamCpu::ndBrainOptimizerAdamCpu(ndBrainThreadPool* const thread
 	,m_epsilon(1.0e-6f)
 	,m_betaAcc(m_beta)
 	,m_alphaAcc(m_alpha)
-	,m_threadPool(threadPool)
+	,m_threadPool(nullptr)
 	,m_miniBatchSize(256)
 {
+}
+
+void ndBrainOptimizerAdamCpu::Init(ndBrainThreadPool* const threadPool, ndInt32 size)
+{
+	m_threadPool = threadPool;
 	m_vdw.SetCount(size);
 	m_vdw2.SetCount(size);
 	m_temp.SetCount(size);

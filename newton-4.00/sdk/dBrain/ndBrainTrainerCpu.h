@@ -31,9 +31,13 @@
 class ndBrainTrainerCpu: public ndBrainTrainerCpuInference
 {
 	public: 
-	ndBrainTrainerCpu(const ndSharedPtr<ndBrain>& brain, ndBrainThreadPool* const threadPool, ndInt32 minibatchSize);
+	ndBrainTrainerCpu(
+		const ndSharedPtr<ndBrain>& brain, 
+		const ndSharedPtr<ndBrainOptimizerAdamCpu>& optimizer, 
+		ndBrainThreadPool* const threadPool, ndInt32 minibatchSize);
 	ndBrainTrainerCpu(const ndBrainTrainerCpu& src);
 
+	virtual void UpdateParameters() override;
 	virtual void ApplyLearnRate(ndBrainFloat learnRate) override;
 	virtual void BackPropagate(const ndBrainVector& outputGradients) override;
 
@@ -41,11 +45,11 @@ class ndBrainTrainerCpu: public ndBrainTrainerCpuInference
 	void AddLayersGradientCommands();
 	void AddCopyOutputGradientCommand();
 
-	ndBrainOptimizerAdamCpu m_optimizer;
 	ndBrainVector m_inputOuputGradientsBuffer;
 	ndBrainVector m_weightAndBiasGradientsBuffer;
 	ndBrainVector m_miniBatchInputGradientBuffer;
 	ndBrainVector m_miniBatchOutputGradientBuffer;
+	ndSharedPtr<ndBrainOptimizerAdamCpu> m_optimizer;
 	ndList<ndSharedPtr<ndBrainTrainerCpuCommand>> m_backPropagateCommands;
 
 	friend class ndBrainLayerLinear;

@@ -72,6 +72,7 @@ class ndBrainLayerLinear : public ndBrainLayer
 	protected:
 	void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
 
+	virtual void SetWeights(const ndBrainVector& input) override;
 	virtual void CopyWeights(ndBrainVector& oput) const override;
 
 	virtual ndBrainLayerFeedFowardCpuCommand* GetLayerCpuFeedForwardCommand() const override;

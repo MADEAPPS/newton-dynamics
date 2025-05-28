@@ -62,6 +62,10 @@ void ndBrainLayer::CopyWeights(ndBrainVector&) const
 {
 }
 
+void ndBrainLayer::SetWeights(const ndBrainVector& input)
+{
+}
+
 void ndBrainLayer::FeedForward(const ndBrainLayerFeedFowardCpuCommand* const, ndInt32) const
 {
 	ndAssert(0);

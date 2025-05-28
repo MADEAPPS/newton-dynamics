@@ -54,6 +54,7 @@ class ndBrainTrainer: public ndClassAlloc
 	virtual ~ndBrainTrainer();
 
 	ndSharedPtr<ndBrain>& GetBrain();
+	virtual void UpdateParameters() = 0;
 	virtual void GetOutput(ndBrainVector&) const {}
 
 	virtual void MakePrediction(const ndBrainVector& input) = 0;

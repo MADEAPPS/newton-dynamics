@@ -294,6 +294,11 @@ void ndBrainTrainnerGpuInference::ApplyLearnRate(ndBrainFloat learnRate)
 	ndAssert(0);
 }
 
+void ndBrainTrainnerGpuInference::UpdateParameters()
+{
+	ndAssert(0);
+}
+
 void ndBrainTrainnerGpuInference::MakePrediction(const ndBrainVector& input)
 {
 	m_context->BeginQueue();

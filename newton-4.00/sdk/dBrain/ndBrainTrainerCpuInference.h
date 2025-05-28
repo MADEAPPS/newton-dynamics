@@ -50,6 +50,9 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 	// new method
 	virtual void ApplyLearnRate(ndBrainFloat learnRate) override;
 
+	// new method
+	virtual void UpdateParameters() override;
+
 	protected:
 	class ndCopyOutputCommand : public ndBrainTrainerCpuCommand
 	{

@@ -165,7 +165,7 @@ void ndBrainLayerActivationTanh::BackPropagated(const ndBrainLayerBackPropagateC
 	ndInt32 offset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
 	const ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
 
-	ndInt32 dstOffset = miniBatchIndex * info->m_inputOutputSize * info->m_owner->m_miniBatchSize + info->m_inputOutputStartOffset;
+	ndInt32 dstOffset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
 	const ndBrainMemVector outputDerivative(&trainer->m_inputOuputGradientsBuffer[dstOffset + inputSize], outputSize);
 	ndBrainMemVector inputDerivative(&trainer->m_inputOuputGradientsBuffer[dstOffset], inputSize);
 
