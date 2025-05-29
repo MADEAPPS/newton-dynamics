@@ -77,7 +77,7 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 	m_replayBufferSize = 1024 * 1024;
 	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize);
 
-m_threadsCount = 1;
+//m_threadsCount = 1;
 //m_policyUpdatesCount = 2;
 //m_criticUpdatesCount = 2;
 //m_maxTrajectorySteps = 100;
@@ -729,17 +729,16 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnQvalueFunction(ndInt3
 //#pragma optimize( "", off )
 void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 {
-	ndAssert(0);
-	//ndInt32 count = m_parameters.m_criticUpdatesCount * m_parameters.m_miniBatchSize;
-	//m_expectedRewards.SetCount(count);
-	//
-	//m_miniBatchIndexBuffer.SetCount(0);
-	//for (ndInt32 i = 0; i < count; ++i)
-	//{
-	//	m_miniBatchIndexBuffer.PushBack(m_shuffleBuffer[m_shuffleBatchIndex]);
-	//	m_shuffleBatchIndex = (m_shuffleBatchIndex + 1) % ndInt32(m_shuffleBuffer.GetCount());
-	//}
-	//
+	ndInt32 count = m_parameters.m_criticUpdatesCount * m_parameters.m_miniBatchSize;
+	m_expectedRewards.SetCount(count);
+	
+	m_miniBatchIndexBuffer.SetCount(0);
+	for (ndInt32 i = 0; i < count; ++i)
+	{
+		m_miniBatchIndexBuffer.PushBack(m_shuffleBuffer[m_shuffleBatchIndex]);
+		m_shuffleBatchIndex = (m_shuffleBatchIndex + 1) % ndInt32(m_shuffleBuffer.GetCount());
+	}
+	
 	//ndAtomic<ndInt32> iterator(0);
 	//auto ExpectedRewards = ndMakeObject::ndFunction([this, count, &iterator](ndInt32, ndInt32)
 	//{
@@ -795,6 +794,31 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 	//	}
 	//});
 	//ndBrainThreadPool::ParallelExecute(ExpectedRewards);
+
+	const ndBrain& brain = **m_policy___->GetBrain();
+	m_nextActionBatch.SetCount(m_parameters.m_miniBatchSize * brain.GetOutputSize());
+	m_nextObsevationsBatch.SetCount(m_parameters.m_miniBatchSize * brain.GetInputSize());
+
+	for (ndInt32 i = 0; i < m_parameters.m_criticUpdatesCount; ++i)
+	{
+		for (ndInt32 j = 0; j < m_parameters.m_miniBatchSize; ++j)
+		{
+			const ndInt32 index = m_miniBatchIndexBuffer[i * m_parameters.m_miniBatchSize + j];
+			ndBrainMemVector nextObsevations(&m_nextObsevationsBatch[j * brain.GetInputSize()], brain.GetInputSize());
+			if (!m_replayBuffer.GetTerminalState(index))
+			{
+				nextObsevations.Set(ndBrainFloat(0.0f));
+			} 
+			else
+			{
+				const ndBrainMemVector nextReplyObservation(m_replayBuffer.GetNextObservations(index), brain.GetInputSize());
+				nextObsevations.Set(nextReplyObservation);
+			}
+		}
+		m_policy___->MakePrediction(m_nextObsevationsBatch);
+		m_policy___->GetOutput(m_nextActionBatch);
+
+	}
 }
 
 ////#pragma optimize( "", off )
@@ -995,7 +1019,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnPolicyFunction()
 void ndBrainAgentDeterministicPolicyGradient_Trainer::Optimize()
 {
 	CalculateExpectedRewards();
-	ndAssert(0);
+	//ndAssert(0);
 	//for (ndInt32 k = 0; k < sizeof(m_critic) / sizeof(m_critic[0]); ++k)
 	//{
 	//	LearnQvalueFunction(k);
