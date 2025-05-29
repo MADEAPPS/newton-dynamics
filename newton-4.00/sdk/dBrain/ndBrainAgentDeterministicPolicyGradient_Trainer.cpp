@@ -71,7 +71,7 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 	m_policyUpdatesCount = 16;
 	m_criticUpdatesCount = 16;
 	m_maxTrajectorySteps = 1024 * 4;
-	m_hiddenLayersNumberOfNeurons = 64;
+	m_hiddenLayersNumberOfNeurons = 128;
 	m_replayBufferStartOptimizeSize = m_maxTrajectorySteps * 4;
 
 	m_replayBufferSize = 1024 * 1024;
@@ -328,8 +328,8 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildPolicyClass()
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
 		layers.PushBack(new ND_DETERMINISTIC_POLICY_GRADIENT_HIDEN_LAYERS_ACTIVATION(layers[layers.GetCount() - 1]->GetOutputSize()));
 	}
-	ndInt32 nunberOfOutput = m_parameters.m_usePerActionSigmas ? 2 * m_parameters.m_numberOfActions : m_parameters.m_numberOfActions;
-	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), nunberOfOutput));
+	ndInt32 numberOfOutput = m_parameters.m_usePerActionSigmas ? 2 * m_parameters.m_numberOfActions : m_parameters.m_numberOfActions;
+	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), numberOfOutput));
 	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 	if (m_parameters.m_usePerActionSigmas)
 	{
@@ -338,7 +338,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildPolicyClass()
 		bias.SetCount(layers[layers.GetCount() - 1]->GetOutputSize());
 		slope.SetCount(layers[layers.GetCount() - 1]->GetOutputSize());
 
-		ndInt32 sigmaSize = nunberOfOutput / 2;
+		ndInt32 sigmaSize = numberOfOutput / 2;
 		ndBrainFloat b = ndBrainFloat(0.5f) * (ND_TD3_POLICY_MAX_PER_ACTION_SIGMA + ND_TD3_POLICY_MIN_PER_ACTION_SIGMA);
 		ndBrainFloat a = ndBrainFloat(0.5f) * (ND_TD3_POLICY_MAX_PER_ACTION_SIGMA - ND_TD3_POLICY_MIN_PER_ACTION_SIGMA);
 
