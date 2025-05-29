@@ -387,7 +387,8 @@ void ndBrainLayerLinear::FeedForward(const ndBrainLayerFeedFowardCpuCommand* con
 	for (ndInt32 i = outputSize - 1; i >= 0; --i)
 	{
 		const ndBrainMemVector row(&parameters[i * inputSize], inputSize);
-		output[i] = ndDotProduct<ndBrainFloat>(inputSize , &row[0], &input[0]);
+		//output[i] = ndDotProduct<ndBrainFloat>(inputSize , &row[0], &input[0]);
+		output[i] = row.Dot(input);
 	}
 
 	const ndBrainMemVector bias(&parameters[matrixSize], outputSize);
@@ -422,7 +423,6 @@ void ndBrainLayerLinear::BackPropagated(const ndBrainLayerBackPropagateCpuComman
 	ndBrainMemVector inputDerivative(&trainer->m_inputOuputGradientsBuffer[dstOffset], inputSize);
 	const ndBrainMemVector matrixVector(&trainer->m_weightAndBiasBuffer[info->m_parametersStartOffset], matrixSize + outputSize);
 	
-	//m_weights.TransposeMul(outputDerivative, inputGradient);
 	inputDerivative.Set(ndBrainFloat(0.0f));
 	for (ndInt32 i = outputSize - 1; i >= 0; --i)
 	{
