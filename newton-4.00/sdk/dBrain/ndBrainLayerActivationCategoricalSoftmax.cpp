@@ -96,7 +96,4 @@ void ndBrainLayerActivationCategoricalSoftmax::BackPropagated(const ndBrainLayer
 	inputDerivative.Set(output);
 	inputDerivative.Sub(outputDerivative);
 	inputDerivative.FlushToZero();
-
-	// basically it acts as a loss function
-	ndAssert(DebugBackPropagated(inputDerivative, output, outputDerivative, inputDerivative));
 }

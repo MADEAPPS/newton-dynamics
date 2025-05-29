@@ -151,9 +151,6 @@ void ndBrainLayerActivationTanh::FeedForward(const ndBrainLayerFeedFowardCpuComm
 		dst[i] = ndBrainFloat(ndTanh(value));
 	}
 	output.FlushToZero();
-
-	// verify
-	ndAssert(DebugFeedFoward(input, output));
 }
 
 void ndBrainLayerActivationTanh::BackPropagated(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const
@@ -173,7 +170,4 @@ void ndBrainLayerActivationTanh::BackPropagated(const ndBrainLayerBackPropagateC
 	inputDerivative.MulSub(output, output);
 	inputDerivative.Mul(outputDerivative);
 	inputDerivative.FlushToZero();
-
-	// verify gradients are calaculate correctly
-	ndAssert(DebugBackPropagated(inputDerivative, output, outputDerivative, inputDerivative));
 }

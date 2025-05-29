@@ -222,7 +222,7 @@ void ndBrainTrainerCpuInference::BackPropagate(const ndBrainVector&)
 {
 }
 
-void ndBrainTrainerCpuInference::ApplyLearnRate(ndBrainFloat learnRate)
+void ndBrainTrainerCpuInference::ApplyLearnRate(ndBrainFloat)
 {
 }
 
@@ -240,7 +240,7 @@ void ndBrainTrainerCpuInference::MakePrediction(const ndBrainVector& input)
 	{
 		ndBrainTrainerCpuCommand* const command = *node->GetInfo();
 
-		auto ExecuteCommand = ndMakeObject::ndFunction([this, &iterator, command](ndInt32 xxxx, ndInt32)
+		auto ExecuteCommand = ndMakeObject::ndFunction([this, &iterator, command](ndInt32, ndInt32)
 		{
 			for (ndInt32 i = iterator++; i < m_miniBatchSize; i = iterator++)
 			{

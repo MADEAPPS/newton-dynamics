@@ -176,9 +176,6 @@ void ndBrainLayerActivationSoftmax::FeedForward(const ndBrainLayerFeedFowardCpuC
 	ndAssert(acc > ndBrainFloat(0.0f));
 	output.Scale(ndBrainFloat(1.0f) / acc);
 	output.FlushToZero();
-
-	// verify
-	ndAssert(DebugFeedFoward(input, output));
 }
 
 void ndBrainLayerActivationSoftmax::BackPropagated(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const

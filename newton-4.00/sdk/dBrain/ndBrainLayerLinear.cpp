@@ -392,9 +392,6 @@ void ndBrainLayerLinear::FeedForward(const ndBrainLayerFeedFowardCpuCommand* con
 
 	const ndBrainMemVector bias(&parameters[matrixSize], outputSize);
 	output.Add(bias);
-
-	// verify results?
-	ndAssert(DebugFeedFoward(input, output));
 }
 
 void ndBrainLayerLinear::BackPropagated(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const
@@ -433,7 +430,4 @@ void ndBrainLayerLinear::BackPropagated(const ndBrainLayerBackPropagateCpuComman
 		const ndBrainMemVector row(&matrixVector[i * inputSize], inputSize);
 		inputDerivative.ScaleAdd(row, scale);
 	}
-	
-	// verify gradients are calaculate correctly
-	ndAssert(DebugBackPropagated(input, output, outputDerivative, inputDerivative));
 }

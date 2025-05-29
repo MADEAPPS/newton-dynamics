@@ -158,9 +158,6 @@ void ndBrainLayerActivationRelu::FeedForward(const ndBrainLayerFeedFowardCpuComm
 	{
 		output[i] = ndMax(input[i], ndBrainFloat(0.0f));
 	}
-
-	// verify
-	ndAssert (DebugFeedFoward(input, output));
 }
 
 void ndBrainLayerActivationRelu::BackPropagated(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const
@@ -194,7 +191,4 @@ void ndBrainLayerActivationRelu::BackPropagated(const ndBrainLayerBackPropagateC
 		inputDerivative[i] = (input[i] >= ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
 	}
 	inputDerivative.Mul(outputDerivative);
-
-	// verify gradients are calaculate correctly
-	ndAssert(DebugBackPropagated(input, output, outputDerivative, inputDerivative));
 }

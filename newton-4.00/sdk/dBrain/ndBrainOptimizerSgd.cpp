@@ -22,9 +22,9 @@
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"
 #include "ndBrainMatrix.h"
-#include "ndBrainTrainer.h"
 #include "ndBrainThreadPool.h"
 #include "ndBrainOptimizerSgd.h"
+#include "ndBrainTrainerCpuLegacy.h"
 
 ndBrainOptimizerSgd::ndBrainOptimizerSgd()
 	:ndBrainOptimizer()
@@ -37,10 +37,9 @@ ndBrainOptimizerSgd::~ndBrainOptimizerSgd()
 
 void ndBrainOptimizerSgd::Update(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients, ndBrainFloat learnRate)
 {
-	ndAssert(0);
-#if 0
-	ndBrainTrainer* const trainer = partialGradients[0];
-	ndBrain& brain = *trainer->GetBrain();
+	//const ndBrainTrainer* const trainer = partialGradients[0];
+	ndBrainTrainerCpuLegacy* const trainer = (ndBrainTrainerCpuLegacy*)partialGradients[0];
+	ndBrain& brain = **trainer->GetBrain();
 
 	ndFixSizeArray<ndInt32, 256> paramLayer;
 	for (ndInt32 i = 0; i < brain.GetCount(); ++i)
@@ -53,7 +52,8 @@ void ndBrainOptimizerSgd::Update(ndBrainThreadPool* const threadPool, ndArray<nd
 
 	auto UpdateGradients = ndMakeObject::ndFunction([this, learnRate, &paramLayer, &partialGradients](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		ndBrainTrainer* const trainer = partialGradients[0];
+		//ndBrainTrainer* const trainer = partialGradients[0];
+		ndBrainTrainerCpuLegacy* const trainer = (ndBrainTrainerCpuLegacy*)partialGradients[0];
 		ndBrainFloat regularizer = -GetRegularizer();
 		ndBrainFloat descendRate = -learnRate / ndBrainFloat(partialGradients.GetCount());
 
@@ -68,7 +68,7 @@ void ndBrainOptimizerSgd::Update(ndBrainThreadPool* const threadPool, ndArray<nd
 
 			for (ndInt32 j = 1; j < partialGradients.GetCount(); ++j)
 			{
-				ndBrainTrainer* const src = partialGradients[j];
+				ndBrainTrainerCpuLegacy* const src = (ndBrainTrainerCpuLegacy*)partialGradients[j];
 				trainer->AcculumateGradients(*src, index);
 			}
 			
@@ -80,5 +80,5 @@ void ndBrainOptimizerSgd::Update(ndBrainThreadPool* const threadPool, ndArray<nd
 	});
 
 	threadPool->ndBrainThreadPool::ParallelExecute(UpdateGradients);
-#endif
+
 }

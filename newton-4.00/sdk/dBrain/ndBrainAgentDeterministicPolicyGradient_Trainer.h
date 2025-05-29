@@ -199,8 +199,11 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
 	ndSharedPtr<ndBrainTrainerCpu> m_referenceCriticTrainer[ND_NUMBER_OF_CRITICS];
 
 	ndBrainVector m_nextQValue;
+	ndBrainVector m_criticValue;
+	ndBrainVector m_criticGradients;
 	ndBrainVector m_nextActionBatch;
 	ndBrainVector m_nextObsevationsBatch;
+	ndBrainVector m_criticObservationActionBatch;
 	ndBrainVector m_criticNextObservationActionBatch;
 	ndBrainVector m_rewardBatch[ND_NUMBER_OF_CRITICS];
 

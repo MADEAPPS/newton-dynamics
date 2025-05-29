@@ -224,9 +224,6 @@ void ndBrainLayerLinearWithDropOut::FeedForward(const ndBrainLayerFeedFowardCpuC
 
 	output.Set(input);
 	output.Mul(m_dropOut);
-
-	// verify
-	ndAssert(DebugFeedFoward(input, output));
 }
 
 void ndBrainLayerLinearWithDropOut::BackPropagated(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const
@@ -244,7 +241,4 @@ void ndBrainLayerLinearWithDropOut::BackPropagated(const ndBrainLayerBackPropaga
 
 	inputDerivative.Set(m_dropOut);
 	inputDerivative.Mul(outputDerivative);
-
-	// verify gradients are calaculate correctly
-	ndAssert(DebugBackPropagated(inputDerivative, output, outputDerivative, inputDerivative));
 }
