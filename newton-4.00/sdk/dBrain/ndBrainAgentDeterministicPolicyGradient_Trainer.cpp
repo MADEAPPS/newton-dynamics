@@ -77,7 +77,7 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 	m_replayBufferSize = 1024 * 1024;
 	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize);
 
-m_threadsCount = 1;
+m_threadsCount = 8;
 //m_policyUpdatesCount = 2;
 //m_criticUpdatesCount = 2;
 //m_replayBufferStartOptimizeSize = 1000;
@@ -667,7 +667,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnQvalueFunction(ndInt3
 		}
 		//trainer.BackPropagate(criticObservationAction, loss);
 		m_criticTrainer[criticIndex]->BackPropagate(m_criticGradients);
-
+		m_criticTrainer[criticIndex]->ApplyLearnRate(m_parameters.m_criticLearnRate);
 	}
 }
 
