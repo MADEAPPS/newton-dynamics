@@ -61,7 +61,7 @@ void ndBrainOptimizerSgd::Update(ndBrainThreadPool* const threadPool, ndArray<nd
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndInt32 index = paramLayer[i];
-			ndAssert((*trainer->GetBrain())[index]->HasParameters());
+			ndAssert((**trainer->GetBrain())[index]->HasParameters());
 			
 			ndBrainLayer& weights = *trainer->GetWeightsLayer(index);
 			ndBrainLayer& gradients = *trainer->GetGradientLayer(index);
