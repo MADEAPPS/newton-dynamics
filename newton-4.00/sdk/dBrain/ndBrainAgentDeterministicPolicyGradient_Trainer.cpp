@@ -77,10 +77,10 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 	m_replayBufferSize = 1024 * 1024;
 	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize);
 
-//m_threadsCount = 1;
+m_threadsCount = 1;
 //m_policyUpdatesCount = 2;
 //m_criticUpdatesCount = 2;
-m_replayBufferStartOptimizeSize = 1000;
+//m_replayBufferStartOptimizeSize = 1000;
 }
 
 ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::ndTrajectoryTransition()
@@ -639,13 +639,16 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnQvalueFunction(ndInt3
 	m_criticValue.SetCount(m_parameters.m_miniBatchSize);
 	m_criticGradients.SetCount(m_parameters.m_miniBatchSize);
 	m_criticObservationActionBatch.SetCount(m_parameters.m_miniBatchSize * criticInputSize);
+
+	//ndMemSet((ndInt32*)&m_criticObservationActionBatch[0], ndInt32(0xffffffff), m_criticObservationActionBatch.GetCount());
+
 	for (ndInt32 n = 0; n < m_parameters.m_criticUpdatesCount; ++n)
 	{
 		for (ndInt32 i = 0; i < m_parameters.m_miniBatchSize; ++i)
 		{
 			const ndInt32 index = m_miniBatchIndexBuffer[n * m_parameters.m_miniBatchSize + i];
 
-			ndBrainMemVector criticObservationAction(&m_criticObservationActionBatch[n * criticInputSize + i], criticInputSize);
+			ndBrainMemVector criticObservationAction(&m_criticObservationActionBatch[i * criticInputSize], criticInputSize);
 			ndMemCpy(&criticObservationAction[0], m_replayBuffer.GetActions(index), brain.GetOutputSize());
 			ndMemCpy(&criticObservationAction[brain.GetOutputSize()], m_replayBuffer.GetObservations(index), brain.GetInputSize());
 		}
