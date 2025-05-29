@@ -186,13 +186,12 @@ ndBrainAgentDeterministicPolicyGradient_Agent::ndBrainAgentDeterministicPolicyGr
 	:ndBrainAgent()
 	,m_owner(master)
 	,m_trajectory()
-	//,m_workingBuffer()
 	,m_trajectoryBaseCount(0)
 	,m_randomeGenerator()
 {
 	m_owner->m_agent = this;
 
-	const ndBrain* const brain = *m_owner->m_policy___->GetBrain();
+	const ndBrain* const brain = *m_owner->m_policyTrainer->GetBrain();
 	m_trajectory.Init(brain->GetOutputSize(), m_owner->m_parameters.m_numberOfObservations);
 	m_randomeGenerator.m_gen.seed(m_owner->m_parameters.m_randomSeed);
 }
@@ -241,7 +240,7 @@ void ndBrainAgentDeterministicPolicyGradient_Agent::Step()
 	m_trajectory.SetCount(entryIndex + 1);
 	m_trajectory.Clear(entryIndex);
 	
-	const ndBrain* const brain = *m_owner->m_policy___->GetBrain();
+	const ndBrain* const brain = *m_owner->m_policyTrainer->GetBrain();
 	const ndBrainAgentDeterministicPolicyGradient_Trainer* const owner = *m_owner;
 	ndBrainMemVector actions(m_trajectory.GetActions(entryIndex), brain->GetOutputSize());
 	ndBrainMemVector observation(m_trajectory.GetObservations(entryIndex), owner->m_parameters.m_numberOfObservations);
@@ -251,7 +250,7 @@ void ndBrainAgentDeterministicPolicyGradient_Agent::Step()
 	m_trajectory.SetReward(entryIndex, reward);
 	m_trajectory.SetTerminalState(entryIndex, IsTerminal());
 	
-	owner->m_policy___->MakeSinglePrediction(observation, actions);
+	owner->m_policyTrainer->MakeSinglePrediction(observation, actions);
 	
 	SampleActions(actions);
 	ApplyActions(&actions[0]);
@@ -291,7 +290,7 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::ndBrainAgentDeterministicPolicy
 
 	BuildPolicyClass();
 	BuildCriticClass();
-	m_replayBuffer.Init(m_policy___->GetBrain()->GetOutputSize(), m_policy___->GetBrain()->GetInputSize());
+	m_replayBuffer.Init(m_policyTrainer->GetBrain()->GetOutputSize(), m_policyTrainer->GetBrain()->GetInputSize());
 
 	ndBrainFloat unitEntropy = ndClamp(m_parameters.m_entropyRegularizerCoef, ndBrainFloat(0.0f), ndBrainFloat(1.0f));
 	m_parameters.m_entropyRegularizerCoef = ND_MAX_SAC_ENTROPY_COEFFICIENT * unitEntropy;
@@ -303,7 +302,7 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::~ndBrainAgentDeterministicPolic
 
 ndBrain* ndBrainAgentDeterministicPolicyGradient_Trainer::GetPolicyNetwork()
 {
-	return *m_policy___->GetBrain();
+	return *m_policyTrainer->GetBrain();
 }
 
 const ndString& ndBrainAgentDeterministicPolicyGradient_Trainer::GetName() const
@@ -362,29 +361,19 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildPolicyClass()
 	}
 	policy->InitWeights();
 
-	//m_policyOptimizer = ndSharedPtr<ndBrainOptimizerAdam> (new ndBrainOptimizerAdam());
-	//m_policyOptimizer->SetRegularizer(m_parameters.m_policyRegularizer);
-	//m_policyOptimizer->SetRegularizerType(m_parameters.m_policyRegularizerType);
 	ndSharedPtr<ndBrainOptimizerAdamCpu> policyOptimizer(new ndBrainOptimizerAdamCpu());
 	policyOptimizer->SetRegularizer(m_parameters.m_policyRegularizer);
 	policyOptimizer->SetRegularizerType(m_parameters.m_policyRegularizerType);
-	m_policy___ = ndSharedPtr<ndBrainTrainerCpu>(new ndBrainTrainerCpu(policy, policyOptimizer, this, m_parameters.m_miniBatchSize));
+	m_policyTrainer = ndSharedPtr<ndBrainTrainerCpu>(new ndBrainTrainerCpu(policy, policyOptimizer, this, m_parameters.m_miniBatchSize));
 	
-	//m_policyTrainers.SetCount(0);
-	//for (ndInt32 i = 0; i < m_parameters.m_miniBatchSize; ++i)
-	//{
-	//	ndBrainTrainer* const trainer = new ndBrainTrainer(&m_policy);
-	//	m_policyTrainers.PushBack(trainer);
-	//}
-	//m_referencePolicy = m_policy;
 	ndSharedPtr<ndBrain> referencePolicy(new ndBrain(**policy));
 	m_referencePolicy___ = ndSharedPtr<ndBrainTrainerCpuInference>(new ndBrainTrainerCpuInference(referencePolicy, this, m_parameters.m_miniBatchSize));
 }
 
 void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildCriticClass()
 {
-	const ndBrain& policy = **m_policy___->GetBrain();
-	for (ndInt32 k = 0; k < sizeof(m_critic___) / sizeof(m_critic___[0]); ++k)
+	const ndBrain& policy = **m_policyTrainer->GetBrain();
+	for (ndInt32 k = 0; k < sizeof(m_criticTrainer) / sizeof(m_criticTrainer[0]); ++k)
 	{
 		ndFixSizeArray<ndBrainLayer*, 32> layers;
 
@@ -402,37 +391,20 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildCriticClass()
 		layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
 
-		//for (ndInt32 i = 0; i < layers.GetCount(); ++i)
-		//{
-		//	m_critic[k].AddLayer(layers[i]);
-		//}
-		//m_critic[k].InitWeights();
-		 
 		ndSharedPtr<ndBrain> critic(new ndBrain);
 		for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 		{
 			critic->AddLayer(layers[i]);
 		}
 		critic->InitWeights();
-		//m_criticOptimizer[k] = ndSharedPtr<ndBrainOptimizerAdam>(new ndBrainOptimizerAdam());
-		//m_criticOptimizer[k]->SetRegularizer(m_parameters.m_criticRegularizer);
-		//m_criticOptimizer[k]->SetRegularizerType(m_parameters.m_criticRegularizerType);
 		ndSharedPtr<ndBrainOptimizerAdamCpu> criticOptimizer(new ndBrainOptimizerAdamCpu());
 		criticOptimizer->SetRegularizer(m_parameters.m_policyRegularizer);
 		criticOptimizer->SetRegularizerType(m_parameters.m_policyRegularizerType);
-		m_critic___[k] = ndSharedPtr<ndBrainTrainerCpu>(new ndBrainTrainerCpu(critic, criticOptimizer, this, m_parameters.m_miniBatchSize));
-
-		//m_criticTrainers[k].SetCount(0);
-		//for (ndInt32 i = 0; i < m_parameters.m_miniBatchSize; ++i)
-		//{
-		//	ndBrainTrainer* const trainer = new ndBrainTrainer(&m_critic[k]);
-		//	m_criticTrainers[k].PushBack(trainer);
-		//}
-		//m_referenceCritic[k] = m_critic[k];
+		m_criticTrainer[k] = ndSharedPtr<ndBrainTrainerCpu>(new ndBrainTrainerCpu(critic, criticOptimizer, this, m_parameters.m_miniBatchSize));
 
 		ndSharedPtr<ndBrain> referenceCritic(new ndBrain(**critic));
 		ndSharedPtr<ndBrainOptimizerAdamCpu> criticOptimizer1(new ndBrainOptimizerAdamCpu());
-		m_referenceCritic___[k] = ndSharedPtr<ndBrainTrainerCpu>(new ndBrainTrainerCpu(referenceCritic, criticOptimizer1, this, m_parameters.m_miniBatchSize));
+		m_referenceCriticTrainer[k] = ndSharedPtr<ndBrainTrainerCpu>(new ndBrainTrainerCpu(referenceCritic, criticOptimizer1, this, m_parameters.m_miniBatchSize));
 	}
 }
 
@@ -536,7 +508,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::SaveTrajectory()
 		bool terminalState = m_agent->m_trajectory.GetTerminalState(srcIndex + 1);
 		m_replayBuffer.SetTerminalState(dstIndex, terminalState);
 	
-		const ndBrain& brain = **m_policy___->GetBrain();
+		const ndBrain& brain = **m_policyTrainer->GetBrain();
 		ndBrainMemVector nextObservation(m_replayBuffer.GetNextObservations(dstIndex), brain.GetInputSize());
 		nextObservation.Set(ndBrainMemVector(m_agent->m_trajectory.GetObservations(srcIndex + 1), brain.GetInputSize()));
 	};
@@ -578,7 +550,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::SaveTrajectory()
 	}
 	else
 	{
-		const ndBrain& brain = **m_policy___->GetBrain();
+		const ndBrain& brain = **m_policyTrainer->GetBrain();
 		const ndInt32 numOfTransitions = m_agent->m_trajectory.GetCount() - 1;
 		for (ndInt32 i = m_agent->m_trajectoryBaseCount; i < numOfTransitions; ++i)
 		{
@@ -795,10 +767,9 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 	//});
 	//ndBrainThreadPool::ParallelExecute(ExpectedRewards);
 
-	const ndBrain& brain = **m_policy___->GetBrain();
+	const ndBrain& brain = **m_policyTrainer->GetBrain();
 	m_nextActionBatch.SetCount(m_parameters.m_miniBatchSize * brain.GetOutputSize());
 	m_nextObsevationsBatch.SetCount(m_parameters.m_miniBatchSize * brain.GetInputSize());
-
 	for (ndInt32 i = 0; i < m_parameters.m_criticUpdatesCount; ++i)
 	{
 		for (ndInt32 j = 0; j < m_parameters.m_miniBatchSize; ++j)
@@ -815,9 +786,25 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 				nextObsevations.Set(nextReplyObservation);
 			}
 		}
-		m_policy___->MakePrediction(m_nextObsevationsBatch);
-		m_policy___->GetOutput(m_nextActionBatch);
+		m_policyTrainer->MakePrediction(m_nextObsevationsBatch);
+		m_policyTrainer->GetOutput(m_nextActionBatch);
 
+		ndInt32 criticInputSize = brain.GetInputSize() + brain.GetOutputSize();
+		m_criticNextObservationAction.SetCount(m_parameters.m_miniBatchSize * criticInputSize);
+		for (ndInt32 j = 0; j < m_parameters.m_miniBatchSize; ++j)
+		{
+			const ndInt32 index = m_miniBatchIndexBuffer[i * m_parameters.m_miniBatchSize + j];
+			const ndBrainMemVector nextAction(&m_nextActionBatch[j * brain.GetOutputSize()], brain.GetOutputSize());
+			const ndBrainMemVector nextObsevations(&m_nextObsevationsBatch[j * brain.GetInputSize()], brain.GetInputSize());
+
+			ndBrainMemVector criticNextObservationAction(&m_criticNextObservationAction[j * criticInputSize], criticInputSize);
+			ndMemCpy(&criticNextObservationAction[0], &nextAction[0], brain.GetOutputSize());
+			ndMemCpy(&criticNextObservationAction[brain.GetOutputSize()], &nextObsevations[0], brain.GetInputSize());
+		}
+		for (ndInt32 j = 0; j < sizeof(m_criticTrainer) / sizeof(m_criticTrainer[0]); ++j)
+		{
+			m_referenceCriticTrainer[j]->MakePrediction(m_criticNextObservationAction);
+		}
 	}
 }
 
