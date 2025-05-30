@@ -229,7 +229,7 @@ void ndMesh::ApplyTransform(const ndMatrix& transform)
 		{
 			entBuffer[stack] = child;
 			stack++;
-			ndAssert(stack < sizeof(entBuffer) / sizeof (entBuffer[0]));
+			ndAssert(stack < ndInt32(sizeof(entBuffer) / sizeof (entBuffer[0])));
 		}
 	}
 }

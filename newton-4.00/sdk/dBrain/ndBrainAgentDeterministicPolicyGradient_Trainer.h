@@ -33,6 +33,7 @@
 // ddpg algorithm as described in: https://arxiv.org/pdf/1509.02971.pdf
 // https://spinningup.openai.com/en/latest/algorithms/ddpg.html
 // https://spinningup.openai.com/en/latest/algorithms/td3.html
+// https://spinningup.openai.com/en/latest/algorithms/sac.html
 
 #define ND_USE_TDD3
 #ifdef ND_USE_TDD3
@@ -193,7 +194,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
 	HyperParameters m_parameters;
 
 	ndSharedPtr<ndBrainTrainerCpu> m_policyTrainer;
-	ndSharedPtr<ndBrainTrainerCpuInference> m_referencePolicy;
+	//ndSharedPtr<ndBrainTrainerCpuInference> m_referencePolicy;
 
 	ndSharedPtr<ndBrainTrainerCpu> m_criticTrainer[ND_NUMBER_OF_CRITICS];
 	ndSharedPtr<ndBrainTrainerCpu> m_referenceCriticTrainer[ND_NUMBER_OF_CRITICS];
@@ -202,6 +203,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
 	ndBrainVector m_criticValue;
 	ndBrainVector m_criticGradients;
 	ndBrainVector m_nextActionBatch;
+	ndBrainVector m_obsevationsBatch;
 	ndBrainVector m_nextObsevationsBatch;
 	ndBrainVector m_criticObservationActionBatch;
 	ndBrainVector m_criticNextObservationActionBatch;

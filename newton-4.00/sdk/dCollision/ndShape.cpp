@@ -60,7 +60,7 @@ ndShapeInfo::ndShapeInfo()
 	, m_shapeMaterial()
 	, m_collisionType(::m_box)
 {
-	for (ndInt32 i = 0; i < sizeof(m_paramArray) / sizeof(m_paramArray[0]); ++i)
+	for (ndInt32 i = 0; i < ndInt32(sizeof(m_paramArray) / sizeof(m_paramArray[0])); ++i)
 	{
 		m_paramArray[i] = ndFloat32(0.0f);
 	}

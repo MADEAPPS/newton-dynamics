@@ -85,7 +85,7 @@ class ndShapeMaterial
 		:m_userId(0)
 	{
 		m_data.m_alignPad = 0;
-		for (ndInt32 i = 0; i < sizeof(m_userParam) / sizeof(m_userParam[0]); ++i)
+		for (ndInt32 i = 0; i < ndInt32 (sizeof(m_userParam) / sizeof(m_userParam[0])); ++i)
 		{
 			m_userParam[i].m_intData = 0;
 		}

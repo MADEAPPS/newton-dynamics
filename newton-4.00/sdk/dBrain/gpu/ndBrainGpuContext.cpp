@@ -76,7 +76,7 @@ ndBrainGpuContext::~ndBrainGpuContext()
 		}
 	}
 
-	for (ndInt32 i = 0; i < sizeof(m_modules) / sizeof(m_modules[0]); ++i)
+	for (ndInt32 i = 0; i < ndInt32(sizeof(m_modules) / sizeof(m_modules[0])); ++i)
 	{
 		if (m_modules[i])
 		{
@@ -228,7 +228,7 @@ void ndBrainGpuContext::CreateInstance()
 	ndInt32 extCount = 0;
 	const char* apiExtensionLayers[32];
 
-	for (ndInt32 j = 0; j < sizeof(m_apiExtensionLayers) / sizeof(m_apiExtensionLayers[3]); ++j)
+	for (ndInt32 j = 0; j < ndInt32(sizeof(m_apiExtensionLayers) / sizeof(m_apiExtensionLayers[3])); ++j)
 	{
 		for (ndInt32 i = 0; i < ndInt32(extensionCount); ++i)
 		{

@@ -894,7 +894,7 @@ ndInt32 ndBvhSceneManager::BuildSmallBvhTree(ndThreadPool& threadPool, ndBvhNode
 
 							stack++;
 							rootNodeIndex++;
-							ndAssert(stack < sizeof(stackPool) / sizeof(stackPool[0]));
+							ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0])));
 						}
 
 						ndInt32 count1 = block.m_start + block.m_count - index0;
@@ -953,7 +953,7 @@ ndInt32 ndBvhSceneManager::BuildSmallBvhTree(ndThreadPool& threadPool, ndBvhNode
 
 							stack++;
 							rootNodeIndex++;
-							ndAssert(stack < sizeof(stackPool) / sizeof(stackPool[0]));
+							ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0])));
 						}
 					}
 					rootNode->m_bhvLinked = 0;

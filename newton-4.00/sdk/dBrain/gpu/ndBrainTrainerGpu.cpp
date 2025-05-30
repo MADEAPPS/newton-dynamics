@@ -61,6 +61,10 @@ ndBrainTrainerGpu::~ndBrainTrainerGpu()
 {
 }
 
+void ndBrainTrainerGpu::ApplyLearnRate(ndBrainFloat learnRate)
+{
+}
+
 void ndBrainTrainerGpu::BackPropagate(const ndBrainVector& outputGradients)
 {
 	//m_context->BeginQueue();
