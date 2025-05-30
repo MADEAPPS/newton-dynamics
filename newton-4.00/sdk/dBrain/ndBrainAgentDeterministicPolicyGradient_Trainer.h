@@ -200,6 +200,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
 	ndBrainVector m_actionBatch;
 	ndBrainVector m_nextActionBatch;
 	ndBrainVector m_obsevationsBatch;
+	ndBrainVector m_policyGradientBatch;
 	ndBrainVector m_nextObsevationsBatch;
 	ndBrainVector m_criticObservationActionBatch;
 	ndBrainVector m_criticNextObservationActionBatch;

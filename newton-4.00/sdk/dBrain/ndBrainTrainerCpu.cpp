@@ -68,7 +68,6 @@ ndBrainTrainerCpu::ndBrainTrainerCpu(const ndBrainTrainerCpu& src)
 
 void ndBrainTrainerCpu::GetInput(ndBrainVector& input) const
 {
-	ndAssert(0);
 	input.SetCount(m_miniBatchInputGradientBuffer.GetCount());
 	input.Set(m_miniBatchInputGradientBuffer);
 }
@@ -134,7 +133,7 @@ void ndBrainTrainerCpu::AddCopyOutputGradientCommand()
 
 	ndAssert(FindCommand(ndBrainTrainerCpuInference::m_outpuId));
 	const ndCopyOutputCommand* const lastCommand = (ndCopyOutputCommand*)FindCommand(ndBrainTrainerCpuInference::m_outpuId);
-	outputGradientCommand->m_inputSize = lastCommand->m_inputSize;
+	outputGradientCommand->m_inputSize = 0;
 	outputGradientCommand->m_outputSize = lastCommand->m_outputSize;
 	outputGradientCommand->m_parametersSize = 0;
 	
@@ -161,11 +160,10 @@ void ndBrainTrainerCpu::AddCopyInputGradientCommand()
 
 		virtual void Execute(ndInt32 miniBatchIndex)
 		{
-			//ndAssert(0);
-			//const ndBrainMemVector src(&m_owner->m_miniBatchOutputGradientBuffer[miniBatchIndex * m_outputSize], m_outputSize);
-			//ndInt32 destOffset = miniBatchIndex * m_inputOutputSize;
-			//ndBrainMemVector dst(&m_owner->m_inputOuputGradientsBuffer[destOffset + m_inputOutputStartOffset], m_outputSize);
-			//dst.Set(src);
+			ndInt32 srcOffset = miniBatchIndex * m_inputOutputSize;
+			const ndBrainMemVector src(&m_owner->m_inputOuputGradientsBuffer[srcOffset + m_inputOutputStartOffset], m_inputSize);
+			ndBrainMemVector dst(&m_owner->m_miniBatchInputGradientBuffer[miniBatchIndex * m_inputSize], m_inputSize);
+			dst.Set(src);
 		}
 
 		ndBrainTrainerCpu* m_owner;
@@ -181,7 +179,7 @@ void ndBrainTrainerCpu::AddCopyInputGradientCommand()
 	const ndCopyInputCommand* const firstCommand = (ndCopyInputCommand*)FindCommand(ndBrainTrainerCpuInference::m_inputId);
 
 	inputGradientCommand->m_inputSize = firstCommand->m_inputSize;
-	inputGradientCommand->m_outputSize = firstCommand->m_outputSize;
+	inputGradientCommand->m_outputSize = 0;
 	inputGradientCommand->m_parametersSize = 0;
 
 	inputGradientCommand->m_inputOutputSize = firstCommand->m_inputOutputSize;

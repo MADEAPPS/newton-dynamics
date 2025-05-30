@@ -1127,7 +1127,7 @@ namespace ndQuadruped_2
 			ndWorld* const world = scene->GetWorld();
 
 			ndInt32 hiddenLayers = 4;
-			ndInt32 hiddenLayersNeurons = 64;
+			ndInt32 hiddenLayersNeurons = 128;
 			ndInt32 numberOfActions = m_actionsSize;
 			ndInt32 numberOfObservations = m_observationSize * 4 + 2;
 
