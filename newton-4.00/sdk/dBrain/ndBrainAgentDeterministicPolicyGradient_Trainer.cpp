@@ -347,11 +347,6 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildPolicyClass()
 	}
 
 	ndSharedPtr<ndBrain> policy (new ndBrain);
-	//for (ndInt32 i = 0; i < layers.GetCount(); ++i)
-	//{
-	//	m_policy.AddLayer(layers[i]);
-	//}
-	//m_policy.InitWeights();
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
 		policy->AddLayer(layers[i]);
@@ -741,120 +736,6 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 //#pragma optimize( "", off )
 void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnPolicyFunction()
 {
-	//ndAtomic<ndInt32> iterator(0);
-	//ndInt32 base = 0;
-	//for (ndInt32 n = m_parameters.m_policyUpdatesCount - 1; n >= 0; --n)
-	//{
-	//	auto BackPropagateBatch = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
-	//	{
-	//		class ndLoss : public ndBrainLossLeastSquaredError
-	//		{
-	//			public:
-	//			ndLoss(ndBrainAgentDeterministicPolicyGradient_Trainer* const owner, const ndInt32 index)
-	//				:ndBrainLossLeastSquaredError(1)
-	//				,m_criticLoss(owner, index)
-	//				,m_owner(owner)
-	//				,m_combinedActionObservation()
-	//				,m_index(index)
-	//			{
-	//				m_combinedInputGradients.SetCount(m_owner->m_policy.GetInputSize() + m_owner->m_policy.GetOutputSize());
-	//				m_tempCombinedInputGradients.SetCount(m_owner->m_policy.GetInputSize() + m_owner->m_policy.GetOutputSize());
-	//				m_combinedActionObservation.SetCount(m_owner->m_policy.GetInputSize() + m_owner->m_policy.GetOutputSize());
-	//			}
-	//
-	//			class ndCriticLoss : public ndBrainLossLeastSquaredError
-	//			{
-	//				public:
-	//				ndCriticLoss(ndBrainAgentDeterministicPolicyGradient_Trainer* const owner, ndInt32 index)
-	//					:ndBrainLossLeastSquaredError(1)
-	//					,m_owner(owner)
-	//					,m_index(index)
-	//					,m_saveQValue(ndBrainFloat(0.0f))
-	//				{
-	//				}
-	//
-	//				void GetLoss(const ndBrainVector& qValue, ndBrainVector& loss)
-	//				{
-	//					loss[0] = 1.0f;
-	//					m_saveQValue = qValue[0];
-	//				}
-	//
-	//				ndBrainAgentDeterministicPolicyGradient_Trainer* m_owner;
-	//				ndInt32 m_index;
-	//				ndBrainFloat m_saveQValue;
-	//			};
-	//
-	//			void GetLoss(const ndBrainVector& probabilityDistribution, ndBrainVector& loss)
-	//			{
-	//				ndMemCpy(&m_combinedActionObservation[0], &probabilityDistribution[0], m_owner->m_policy.GetOutputSize());
-	//				ndMemCpy(&m_combinedActionObservation[m_owner->m_policy.GetOutputSize()], m_owner->m_replayBuffer.GetObservations(m_index), m_owner->m_policy.GetInputSize());
-	//
-	//				ndBrainFloat minReward = ndBrainFloat(1.0e10f);
-	//				for (ndInt32 i = 0; i < sizeof(m_critic) / sizeof(m_critic[0]); ++i)
-	//				{
-	//					m_owner->m_critic[i].CalculateInputGradient(m_combinedActionObservation, m_tempCombinedInputGradients, m_criticLoss);
-	//					if (m_criticLoss.m_saveQValue < minReward)
-	//					{
-	//						minReward = m_criticLoss.m_saveQValue;
-	//						m_combinedInputGradients.Set(m_tempCombinedInputGradients);
-	//					}
-	//				}
-	//				ndMemCpy(&loss[0], &m_combinedInputGradients[0], loss.GetCount());
-	//
-	//				if (m_owner->m_parameters.m_entropyRegularizerCoef > ndBrainFloat(1.0e-6f))
-	//				{
-	//					if (m_owner->m_parameters.m_usePerActionSigmas)
-	//					{
-	//						// calculate and add the Gradient of entropy (grad of log probability)
-	//						ndBrainMemVector sampledActions(m_owner->m_replayBuffer.GetActions(m_index), m_owner->m_policy.GetOutputSize());
-	//						ndBrainFloat entropyRegularizerCoef = m_owner->m_parameters.m_entropyRegularizerCoef;
-	//
-	//						const ndInt32 size = ndInt32(m_owner->m_policy.GetOutputSize()) / 2;
-	//						for (ndInt32 i = size - 1; i >= 0; --i)
-	//						{
-	//							ndBrainFloat sigma = probabilityDistribution[size + i];
-	//							ndBrainFloat invSigma = ndBrainFloat(1.0f) / sigma;
-	//							ndBrainFloat z = sampledActions[i] - probabilityDistribution[i];
-	//							ndBrainFloat meanGrad = z * invSigma * invSigma;
-	//							ndBrainFloat sigmaGrad = z * z * invSigma * invSigma * invSigma - sigma;
-	//
-	//							loss[i] -= entropyRegularizerCoef * meanGrad;
-	//							loss[size + i] -= entropyRegularizerCoef * sigmaGrad;
-	//						}
-	//					}
-	//				}
-	//
-	//				// gradient ascend
-	//				loss.Scale(ndBrainFloat(-1.0f));
-	//			}
-	//
-	//			ndCriticLoss m_criticLoss;
-	//			ndBrainAgentDeterministicPolicyGradient_Trainer* m_owner;
-	//			ndBrainFixSizeVector<256> m_combinedInputGradients;
-	//			ndBrainFixSizeVector<256> m_combinedActionObservation;
-	//			ndBrainFixSizeVector<256> m_tempCombinedInputGradients;
-	//			ndInt32 m_index;
-	//			ndInt32 m_batchIndex;
-	//		};
-	//
-	//		for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
-	//		{
-	//			const ndInt32 index = m_miniBatchIndexBuffer[i + base];
-	//			ndBrainTrainer& trainer = *m_policyTrainers[i];
-	//			const ndBrainMemVector observation(m_replayBuffer.GetObservations(index), m_policy.GetInputSize());
-	//
-	//			ndLoss loss(this, index);
-	//			trainer.BackPropagate(observation, loss);
-	//		}
-	//	});
-	//
-	//	iterator = 0;
-	//	ndBrainThreadPool::ParallelExecute(BackPropagateBatch);
-	//	m_policyOptimizer->Update(this, m_policyTrainers, m_parameters.m_policyLearnRate);
-	//
-	//	base += m_parameters.m_miniBatchSize;
-	//}
-
 	const ndBrain& brain = **m_policyTrainer->GetBrain();
 	ndInt32 criticInputSize = brain.GetInputSize() + brain.GetOutputSize();
 
@@ -862,7 +743,6 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnPolicyFunction()
 	m_obsevationsBatch.SetCount(m_parameters.m_miniBatchSize * brain.GetInputSize());
 	m_policyGradientBatch.SetCount(m_parameters.m_miniBatchSize * brain.GetOutputSize());
 	m_criticObservationActionBatch.SetCount(m_parameters.m_miniBatchSize* criticInputSize);
-	//m_obsevationsBatch.Set(-999999.0);
 
 	for (ndInt32 i = 0; i < ndInt32(sizeof(m_criticTrainer) / sizeof(m_criticTrainer[0])); ++i)
 	{
@@ -939,7 +819,6 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::Optimize()
 	}
 	for (ndInt32 k = 0; k < ndInt32(sizeof(m_criticTrainer) / sizeof(m_criticTrainer[0])); ++k)
 	{
-		//m_referenceCritic[k].SoftCopy(m_critic[k], m_parameters.m_criticMovingAverageFactor);
 		m_referenceCriticTrainer[k]->SoftCopyParameters(**m_criticTrainer[k], m_parameters.m_criticMovingAverageFactor);
 	}
 	ndPolycyDelayMod = (ndPolycyDelayMod + 1) % ND_TD3_POLICY_DELAY_MOD;
