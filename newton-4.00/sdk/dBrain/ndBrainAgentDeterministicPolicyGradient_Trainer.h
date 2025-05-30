@@ -194,20 +194,21 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
 	HyperParameters m_parameters;
 
 	ndSharedPtr<ndBrainTrainerCpu> m_policyTrainer;
-	//ndSharedPtr<ndBrainTrainerCpuInference> m_referencePolicy;
-
 	ndSharedPtr<ndBrainTrainerCpu> m_criticTrainer[ND_NUMBER_OF_CRITICS];
 	ndSharedPtr<ndBrainTrainerCpu> m_referenceCriticTrainer[ND_NUMBER_OF_CRITICS];
 
-	ndBrainVector m_nextQValue;
-	ndBrainVector m_criticValue;
-	ndBrainVector m_criticGradients;
+	ndBrainVector m_actionBatch;
 	ndBrainVector m_nextActionBatch;
 	ndBrainVector m_obsevationsBatch;
 	ndBrainVector m_nextObsevationsBatch;
 	ndBrainVector m_criticObservationActionBatch;
 	ndBrainVector m_criticNextObservationActionBatch;
+
+	ndBrainVector m_nextQValue;
+	ndBrainVector m_criticValue[ND_NUMBER_OF_CRITICS];
 	ndBrainVector m_rewardBatch[ND_NUMBER_OF_CRITICS];
+	ndBrainVector m_criticInputGradients[ND_NUMBER_OF_CRITICS];
+	ndBrainVector m_criticOutputGradients[ND_NUMBER_OF_CRITICS];
 
 	ndBrainVector m_expectedRewards;
 	ndArray<ndInt32> m_miniBatchIndexBuffer;

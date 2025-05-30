@@ -39,10 +39,13 @@ class ndBrainTrainerCpu: public ndBrainTrainerCpuInference
 
 	virtual void UpdateParameters() override;
 	virtual void ApplyLearnRate(ndBrainFloat learnRate) override;
+
+	virtual void GetInput(ndBrainVector& input) const override;
 	virtual void BackPropagate(const ndBrainVector& outputGradients) override;
 
 	protected:
 	void AddLayersGradientCommands();
+	void AddCopyInputGradientCommand();
 	void AddCopyOutputGradientCommand();
 
 	ndBrainVector m_inputOuputGradientsBuffer;

@@ -37,6 +37,7 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 	ndBrainTrainerCpuInference(const ndSharedPtr<ndBrain>& brain, ndBrainThreadPool* const threadPool, ndInt32 minibatchSize);
 	ndBrainTrainerCpuInference(const ndBrainTrainerCpuInference& src);
 
+	virtual void GetInput(ndBrainVector& input) const override;
 	virtual void GetOutput(ndBrainVector& ouput) const override;
 
 	// legacy method;
@@ -59,11 +60,46 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 	virtual void UpdateParameters() override;
 
 	protected:
+	enum ndInputOutputCommandId
+	{
+		m_inputId = 7,
+		m_outpuId = 8,
+	};
+
+	class ndCopyInputCommand : public ndBrainTrainerCpuCommand
+	{
+		public:
+		ndCopyInputCommand(ndBrainTrainerCpuInference* const owner)
+			:ndBrainTrainerCpuCommand(m_inputId)
+			,m_owner(owner)
+			,m_inputSize(0)
+			,m_outputSize(0)
+			,m_parametersSize(0)
+			,m_inputOutputSize(0)
+			,m_inputOutputStartOffset(0)
+		{
+		}
+
+		virtual void Execute(ndInt32 miniBatchIndex)
+		{
+			const ndBrainMemVector src(&m_owner->m_miniBatchInputBuffer[miniBatchIndex * m_inputSize], m_inputSize);
+			ndBrainMemVector dst(&m_owner->m_inputOutputBuffer[miniBatchIndex * m_inputOutputSize], m_inputSize);
+			dst.Set(src);
+		}
+
+		ndBrainTrainerCpuInference* m_owner;
+		ndInt32 m_inputSize;
+		ndInt32 m_outputSize;
+		ndInt32 m_parametersSize;
+		ndInt32 m_inputOutputSize;
+		ndInt32 m_inputOutputStartOffset;
+	};
+
 	class ndCopyOutputCommand : public ndBrainTrainerCpuCommand
 	{
 		public:
 		ndCopyOutputCommand(ndBrainTrainerCpuInference* const owner)
-			:ndBrainTrainerCpuCommand(10)
+			:ndBrainTrainerCpuCommand(m_outpuId)
 			,m_owner(owner)
 			,m_inputSize(0)
 			,m_outputSize(0)
@@ -87,6 +123,8 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 		ndInt32 m_inputOutputSize;
 		ndInt32 m_inputOutputStartOffset;
 	};
+
+	ndBrainTrainerCpuCommand* FindCommand(size_t id) const;
 
 	void AddCopyOutputCommand();
 	void InitInputOutputBuffer();

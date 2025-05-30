@@ -55,6 +55,8 @@ class ndBrainTrainer: public ndClassAlloc
 
 	ndSharedPtr<ndBrain>& GetBrain();
 	virtual void UpdateParameters() = 0;
+
+	virtual void GetInput(ndBrainVector&) const {}
 	virtual void GetOutput(ndBrainVector&) const {}
 
 	// legacy method;

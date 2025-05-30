@@ -135,34 +135,6 @@ void ndBrainTrainerCpuInference::AddCopyInputCommand(const ndBrainLayer::ndBrain
 		inputOutputBufferSize += layer->GetOutputSize();
 	}
 
-	class ndCopyInputCommand : public ndBrainTrainerCpuCommand
-	{
-		public:
-		ndCopyInputCommand(ndBrainTrainerCpuInference* const owner)
-			:ndBrainTrainerCpuCommand(0)
-			,m_owner(owner)
-			,m_inputSize(0)
-			,m_outputSize(0)
-			,m_parametersSize(0)
-			,m_inputOutputSize(0)
-			,m_inputOutputStartOffset(0)
-		{
-		}
-
-		virtual void Execute(ndInt32 miniBatchIndex)
-		{
-			const ndBrainMemVector src(&m_owner->m_miniBatchInputBuffer[miniBatchIndex * m_inputSize], m_inputSize);
-			ndBrainMemVector dst(&m_owner->m_inputOutputBuffer[miniBatchIndex * m_inputOutputSize], m_inputSize);
-			dst.Set(src);
-		}
-
-		ndBrainTrainerCpuInference* m_owner;
-		ndInt32 m_inputSize;
-		ndInt32 m_outputSize;
-		ndInt32 m_parametersSize;
-		ndInt32 m_inputOutputSize;
-		ndInt32 m_inputOutputStartOffset;
-	};
 	ndCopyInputCommand* const inputCommand = new ndCopyInputCommand(this);
 	
 	inputCommand->m_inputSize = uniformData->m_inputSize;
@@ -186,6 +158,19 @@ void ndBrainTrainerCpuInference::AddCopyOutputCommand()
 	outputCommand->m_inputOutputSize = lastCommand->m_inputOutputSize;
 	outputCommand->m_inputOutputStartOffset = lastCommand->m_inputOutputStartOffset + lastCommand->m_inputSize;
 	m_feedFowardCommands.Append(ndSharedPtr<ndBrainTrainerCpuCommand>(outputCommand));
+}
+
+ndBrainTrainerCpuCommand* ndBrainTrainerCpuInference::FindCommand(size_t id) const
+{
+	for (ndList<ndSharedPtr<ndBrainTrainerCpuCommand>>::ndNode* node = m_feedFowardCommands.GetFirst(); node; node = node->GetNext())
+	{
+		ndBrainTrainerCpuCommand* const command = *node->GetInfo();
+		if (command->m_id == id)
+		{
+			return command;
+		}
+	}
+	return nullptr;
 }
 
 void ndBrainTrainerCpuInference::AddLayersCommands(ndFixSizeArray<ndBrainLayer::ndBrainLayerFeedFowardCpuCommand*, 256>& layersCommands)
@@ -215,6 +200,12 @@ void ndBrainTrainerCpuInference::GetOutput(ndBrainVector& ouput) const
 {
 	ouput.SetCount(m_miniBatchOutputBuffer.GetCount());
 	ouput.Set(m_miniBatchOutputBuffer);
+}
+
+void ndBrainTrainerCpuInference::GetInput(ndBrainVector& input) const
+{
+	input.SetCount(m_miniBatchInputBuffer.GetCount());
+	input.Set(m_miniBatchInputBuffer);
 }
 
 // new method
