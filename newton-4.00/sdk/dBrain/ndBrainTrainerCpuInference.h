@@ -39,6 +39,7 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 
 	virtual void GetInput(ndBrainVector& input) const override;
 	virtual void GetOutput(ndBrainVector& ouput) const override;
+	virtual void SoftCopyParameters(const ndBrainTrainer& src, ndBrainFloat blendFactor) override;
 
 	// legacy method;
 	virtual void BackPropagate(const ndBrainVector&, ndBrainLoss&) override { ndAssert(0);}

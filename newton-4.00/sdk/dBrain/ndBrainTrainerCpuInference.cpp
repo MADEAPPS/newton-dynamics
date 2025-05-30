@@ -221,6 +221,15 @@ void ndBrainTrainerCpuInference::UpdateParameters()
 {
 }
 
+void ndBrainTrainerCpuInference::SoftCopyParameters(const ndBrainTrainer& src, ndBrainFloat blendFactor)
+{
+	//Scale(ndBrainFloat(1.0f) - blend);
+	//ScaleAdd(target, blend);
+	const ndBrainTrainerCpuInference* const blendSource = (ndBrainTrainerCpuInference*)&src;
+	m_weightAndBiasBuffer.Scale(ndBrainFloat(1.0f) - blendFactor);
+	m_weightAndBiasBuffer.ScaleAdd(blendSource->m_weightAndBiasBuffer, blendFactor);
+}
+
 void ndBrainTrainerCpuInference::MakePrediction(const ndBrainVector& input)
 {
 	ndAssert(input.GetCount() == m_miniBatchInputBuffer.GetCount());

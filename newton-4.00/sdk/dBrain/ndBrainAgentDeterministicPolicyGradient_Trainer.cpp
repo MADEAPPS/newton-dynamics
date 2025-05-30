@@ -77,11 +77,11 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 	m_replayBufferSize = 1024 * 1024;
 	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize);
 
-m_threadsCount = 1;
-//m_threadsCount = 8;
+//m_threadsCount = 1;
+m_threadsCount = 8;
 //m_policyUpdatesCount = 2;
 //m_criticUpdatesCount = 2;
-m_replayBufferStartOptimizeSize = 1000;
+//m_replayBufferStartOptimizeSize = 1000;
 }
 
 ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::ndTrajectoryTransition()
@@ -937,10 +937,11 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::Optimize()
 	{
 		LearnPolicyFunction();
 	}
-	//for (ndInt32 k = 0; k < sizeof(m_critic) / sizeof(m_critic[0]); ++k)
-	//{
-	//	m_referenceCritic[k].SoftCopy(m_critic[k], m_parameters.m_criticMovingAverageFactor);
-	//}
+	for (ndInt32 k = 0; k < ndInt32(sizeof(m_criticTrainer) / sizeof(m_criticTrainer[0])); ++k)
+	{
+		//m_referenceCritic[k].SoftCopy(m_critic[k], m_parameters.m_criticMovingAverageFactor);
+		m_referenceCriticTrainer[k]->SoftCopyParameters(**m_criticTrainer[k], m_parameters.m_criticMovingAverageFactor);
+	}
 	ndPolycyDelayMod = (ndPolycyDelayMod + 1) % ND_TD3_POLICY_DELAY_MOD;
 }
 

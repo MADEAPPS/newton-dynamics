@@ -78,19 +78,21 @@ void ndBrainTrainerCpu::UpdateParameters()
 	for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
 	{
 		ndBrainLayer* const layer = brain[i];
-		auto FindFeedFowardCommand = [this](size_t id)
-		{
-			for (ndList<ndSharedPtr<ndBrainTrainerCpuCommand>>::ndNode* node = m_feedFowardCommands.GetFirst(); node; node = node->GetNext())
-			{
-				const ndBrainTrainerCpuCommand* const command = *node->GetInfo();
-				if (command->m_id == id)
-				{
-					return (ndBrainLayer::ndBrainLayerFeedFowardCpuCommand*)command;
-				}
-			}
-			return (ndBrainLayer::ndBrainLayerFeedFowardCpuCommand*)nullptr;
-		};
-		const ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* const command = FindFeedFowardCommand(size_t(layer));
+		//auto FindFeedFowardCommand = [this](size_t id)
+		//{
+		//	for (ndList<ndSharedPtr<ndBrainTrainerCpuCommand>>::ndNode* node = m_feedFowardCommands.GetFirst(); node; node = node->GetNext())
+		//	{
+		//		const ndBrainTrainerCpuCommand* const command = *node->GetInfo();
+		//		if (command->m_id == id)
+		//		{
+		//			return (ndBrainLayer::ndBrainLayerFeedFowardCpuCommand*)command;
+		//		}
+		//	}
+		//	return (ndBrainLayer::ndBrainLayerFeedFowardCpuCommand*)nullptr;
+		//};
+		//const ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* const command = FindFeedFowardCommand(size_t(layer));
+		ndAssert(FindCommand(size_t(layer)));
+		const ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* const command = (ndBrainLayer::ndBrainLayerFeedFowardCpuCommand*)FindCommand(size_t(layer));
 
 		ndInt32 size = command->m_inputSize * command->m_outputSize + command->m_outputSize;
 		const ndBrainMemVector weights(&m_weightAndBiasBuffer[command->m_parametersStartOffset], size);

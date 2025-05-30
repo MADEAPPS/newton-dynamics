@@ -58,6 +58,7 @@ class ndBrainTrainer: public ndClassAlloc
 
 	virtual void GetInput(ndBrainVector&) const {}
 	virtual void GetOutput(ndBrainVector&) const {}
+	virtual void SoftCopyParameters(const ndBrainTrainer&, ndBrainFloat) {}
 
 	// legacy method;
 	virtual void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss) = 0;

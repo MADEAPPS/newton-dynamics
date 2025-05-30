@@ -289,7 +289,8 @@ void ndBrainTrainnerGpuInference::SubmitCommands()
 	}
 }
 
-void ndBrainTrainnerGpuInference::ApplyLearnRate(ndBrainFloat learnRate)
+//void ndBrainTrainnerGpuInference::ApplyLearnRate(ndBrainFloat learnRate)
+void ndBrainTrainnerGpuInference::ApplyLearnRate(ndBrainFloat)
 {
 	ndAssert(0);
 }
@@ -307,7 +308,8 @@ void ndBrainTrainnerGpuInference::MakePrediction(const ndBrainVector& input)
 	m_context->EndQueue();
 }
 
-void ndBrainTrainnerGpuInference::MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output)
+//void ndBrainTrainnerGpuInference::MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output)
+void ndBrainTrainnerGpuInference::MakeSinglePrediction(const ndBrainVector&, ndBrainVector&)
 {
 	ndAssert(0);
 }
