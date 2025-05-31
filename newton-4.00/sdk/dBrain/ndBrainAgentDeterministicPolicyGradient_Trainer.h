@@ -31,6 +31,7 @@
 // this is an implementation of the vanilla deep deterministic 
 // policy gradient for continues control re enforcement learning.  
 // ddpg algorithm as described in: https://arxiv.org/pdf/1509.02971.pdf
+// pseudo code sample:
 // https://spinningup.openai.com/en/latest/algorithms/ddpg.html
 // https://spinningup.openai.com/en/latest/algorithms/td3.html
 // https://spinningup.openai.com/en/latest/algorithms/sac.html
@@ -208,6 +209,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
 	ndBrainVector m_nextQValue;
 	ndBrainVector m_criticValue[ND_NUMBER_OF_CRITICS];
 	ndBrainVector m_rewardBatch[ND_NUMBER_OF_CRITICS];
+	//ndBrainVector m_criticTruthValue[ND_NUMBER_OF_CRITICS];
 	ndBrainVector m_criticInputGradients[ND_NUMBER_OF_CRITICS];
 	ndBrainVector m_criticOutputGradients[ND_NUMBER_OF_CRITICS];
 
