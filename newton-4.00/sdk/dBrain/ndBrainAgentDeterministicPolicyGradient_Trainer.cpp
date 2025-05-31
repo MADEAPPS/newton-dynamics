@@ -43,7 +43,7 @@
 #define ND_TD3_POLICY_MAX_PER_ACTION_SIGMA	ndBrainFloat(1.0f)
 #define ND_MAX_SAC_ENTROPY_COEFFICIENT		ndBrainFloat (2.0e-5f)
 
-#define ND_TD3_VARIANCE
+//#define ND_TD3_VARIANCE
 
 ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameters()
 {
@@ -381,6 +381,9 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildCriticClass()
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
 		layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
+#ifdef ND_TD3_VARIANCE
+		layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
+#endif
 
 		ndSharedPtr<ndBrain> critic(new ndBrain);
 		for (ndInt32 i = 0; i < layers.GetCount(); ++i)
@@ -740,21 +743,6 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnPolicyFunction()
 	const ndBrain& brain = **m_policyTrainer->GetBrain();
 	ndInt32 criticInputSize = brain.GetInputSize() + brain.GetOutputSize();
 
-#ifdef ND_TD3_VARIANCE
-	ndInt32 count = m_parameters.m_criticUpdatesCount * m_parameters.m_miniBatchSize;
-	m_miniBatchIndexBuffer.SetCount(0);
-	for (ndInt32 i = 0; i < count; ++i)
-	{
-		m_miniBatchIndexBuffer.PushBack(m_shuffleBuffer[m_shuffleBatchIndex]);
-		m_shuffleBatchIndex++;
-		if (m_shuffleBatchIndex >= m_shuffleBuffer.GetCount())
-		{
-			m_shuffleBatchIndex = 0;
-			m_shuffleBuffer.RandomShuffle(m_shuffleBuffer.GetCount());
-		}
-	}
-#endif
-
 	m_actionBatch.SetCount(m_parameters.m_miniBatchSize * brain.GetOutputSize());
 	m_obsevationsBatch.SetCount(m_parameters.m_miniBatchSize * brain.GetInputSize());
 	m_policyGradientBatch.SetCount(m_parameters.m_miniBatchSize * brain.GetOutputSize());
@@ -788,19 +776,10 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnPolicyFunction()
 
 		for (ndInt32 i = 0; i < ndInt32(sizeof(m_criticTrainer) / sizeof(m_criticTrainer[0])); ++i)
 		{
-			#ifdef ND_TD3_VARIANCE
-				m_referenceCriticTrainer[i]->MakePrediction(m_criticObservationActionBatch);
-				m_referenceCriticTrainer[i]->GetOutput(m_criticOutputGradients[i]);
-				m_criticTrainer[i]->MakePrediction(m_criticObservationActionBatch);
-				m_criticTrainer[i]->GetOutput(m_criticValue[i]);
+			m_criticTrainer[i]->MakePrediction(m_criticObservationActionBatch);
+			m_criticTrainer[i]->GetOutput(m_criticValue[i]);
+			m_criticOutputGradients[i].Set(ndBrainFloat(1.0f));
 
-				m_criticOutputGradients[i].Sub(m_criticValue[i]);
-				m_criticOutputGradients[i].Scale(ndBrainFloat(-1.0f));
-			#else
-				m_criticTrainer[i]->MakePrediction(m_criticObservationActionBatch);
-				m_criticTrainer[i]->GetOutput(m_criticValue[i]);
-				m_criticOutputGradients[i].Set(ndBrainFloat(1.0f));
-			#endif
 			if (m_parameters.m_entropyRegularizerCoef > ndBrainFloat(1.0e-6f))
 			{
 				ndAssert(0);
