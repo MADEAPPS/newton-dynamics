@@ -40,7 +40,7 @@ ndBrainGpuCommand::~ndBrainGpuCommand()
 	}
 }
 
-void ndBrainGpuCommand::Assembly(void* const shaderHandle, ndInt32 workGroups, ndInt32 paramCount, ndBrainGpuBuffer** params)
+void ndBrainGpuCommand::Assembly(void* const shaderHandle, ndInt32 workGroups, ndInt32 buffersCount, ndBrainGpuBuffer** buffers)
 {
 	VkDevice const device = m_context->GetDevice();
 	ndVulkanShader shader = (ndVulkanShader)shaderHandle;
@@ -56,12 +56,12 @@ void ndBrainGpuCommand::Assembly(void* const shaderHandle, ndInt32 workGroups, n
 	m_context->CheckResultVulkan(vkAllocateCommandBuffers(device, &commandBufferAllocateInfo, &m_commandBuffer));
 	
 	ndFixSizeArray<VkDescriptorSetLayoutBinding, 32> layoutBinding;
-	for (ndInt32 i = 0; i < paramCount; ++i)
+	for (ndInt32 i = 0; i < buffersCount; ++i)
 	{
 		VkDescriptorSetLayoutBinding binding = {};
 
 		binding.binding = uint32_t(i);
-		binding.descriptorType = (params[i]->GetType() == ndUniformData) ? VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER : VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+		binding.descriptorType = (buffers[i]->GetType() == ndUniformData) ? VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER : VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 		binding.descriptorCount = 1;
 		binding.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
 		layoutBinding.PushBack(binding);
@@ -81,12 +81,12 @@ void ndBrainGpuCommand::Assembly(void* const shaderHandle, ndInt32 workGroups, n
 
 	ndFixSizeArray<VkWriteDescriptorSet, 32> descriptorSet;
 	ndFixSizeArray<VkDescriptorBufferInfo, 32> bufferInfo;
-	for (ndInt32 i = 0; i < paramCount; ++i)
+	for (ndInt32 i = 0; i < buffersCount; ++i)
 	{
 		VkDescriptorBufferInfo descriptorBufferInfo = {};
-		descriptorBufferInfo.buffer = params[i]->GetBuffer();
+		descriptorBufferInfo.buffer = buffers[i]->GetBuffer();
 		descriptorBufferInfo.offset = 0;
-		descriptorBufferInfo.range = (VkDeviceSize)params[i]->SizeInBytes();
+		descriptorBufferInfo.range = (VkDeviceSize)buffers[i]->SizeInBytes();
 		bufferInfo.PushBack(descriptorBufferInfo);
 
 		VkWriteDescriptorSet set = {};
@@ -95,7 +95,7 @@ void ndBrainGpuCommand::Assembly(void* const shaderHandle, ndInt32 workGroups, n
 		set.dstBinding = uint32_t(i);
 		set.descriptorCount = 1;
 		//set.descriptorType = params[i]->GetType();
-		set.descriptorType = (params[i]->GetType() == ndUniformData) ? VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER : VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+		set.descriptorType = (buffers[i]->GetType() == ndUniformData) ? VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER : VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 		set.pBufferInfo = &bufferInfo[i];
 		descriptorSet.PushBack(set);
 	}
@@ -124,23 +124,70 @@ void ndBrainGpuCommand::Assembly(void* const shaderHandle, ndInt32 workGroups, n
 	//beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 	//beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
 	m_context->CheckResultVulkan(vkBeginCommandBuffer(m_commandBuffer, &beginInfo)); // start recording commands.
+
+	//for (ndInt32 i = 0; i < paramCount; ++i)
+	//{
+	//	if (buffers[i]->GetType() == ndStorageData)
+	//	{
+	//		ndBrainGpuBuffer* const gpuBuffer = buffers[i];
+	//
+	//		VkBufferMemoryBarrier buffer_barrier =
+	//		{
+	//			VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,
+	//			nullptr,
+	//			0,
+	//			VK_ACCESS_SHADER_WRITE_BIT,
+	//			m_context->m_queueFamilyIndex,
+	//			m_context->m_queueFamilyIndex,
+	//			gpuBuffer->GetBuffer(),
+	//			0,
+	//			gpuBuffer->SizeInBytes()
+	//		};
+	//
+	//		vkCmdPipelineBarrier(
+	//			m_commandBuffer,
+	//			VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+	//			VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+	//			0,
+	//			0, nullptr,
+	//			1, &buffer_barrier,
+	//			0, nullptr);
+	//	}
+	//}
 	
 	vkCmdBindPipeline(m_commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_pipeline);
 	vkCmdBindDescriptorSets(m_commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_pipelineLayout, 0, 1, &m_descriptorSet, 0, nullptr);
 	vkCmdDispatch(m_commandBuffer, uint32_t(workGroups), 1, 1);
 
-	//VkMemoryBarrier memoryBarrier = {};
-	//memoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
-	//memoryBarrier.pNext = VK_NULL_HANDLE;
-	//memoryBarrier.srcAccessMask = VK_ACCESS_MEMORY_WRITE_BIT;
-	//memoryBarrier.dstAccessMask = VK_ACCESS_MEMORY_WRITE_BIT;
-	//vkCmdPipelineBarrier(m_commandBuffer,
-	//	VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-	//	VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-	//	0,
-	//	0, &memoryBarrier,
-	//	0, VK_NULL_HANDLE,
-	//	0, VK_NULL_HANDLE);
+	ndFixSizeArray<VkBufferMemoryBarrier, 10> memoryBarriers;
+	for (ndInt32 i = 0; i < buffersCount; ++i)
+	{
+		if (buffers[i]->GetType() == ndStorageData)
+		{
+			ndBrainGpuBuffer* const gpuBuffer = buffers[i];
+			VkBufferMemoryBarrier memoryBarrier{};
+			memoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+			//memoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			//memoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			memoryBarrier.srcQueueFamilyIndex = m_context->m_queueFamilyIndex;
+			memoryBarrier.dstQueueFamilyIndex = m_context->m_queueFamilyIndex;
+			memoryBarrier.pNext = VK_NULL_HANDLE;
+			memoryBarrier.srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT;
+			memoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+			memoryBarrier.buffer = gpuBuffer->GetBuffer();
+			memoryBarrier.offset = 0;
+			memoryBarrier.size = gpuBuffer->SizeInBytes();
+			memoryBarriers.PushBack(memoryBarrier);
+		}
+	}
+	vkCmdPipelineBarrier(
+		m_commandBuffer,
+		VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+		VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+		0,
+		0, VK_NULL_HANDLE,
+		uint32_t(memoryBarriers.GetCount()), &memoryBarriers[0],
+		0, VK_NULL_HANDLE);
 
 	m_context->CheckResultVulkan(vkEndCommandBuffer(m_commandBuffer));
 }
