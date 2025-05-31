@@ -81,7 +81,7 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 m_threadsCount = 8;
 //m_policyUpdatesCount = 2;
 //m_criticUpdatesCount = 2;
-//m_replayBufferStartOptimizeSize = 1000;
+m_replayBufferStartOptimizeSize = 1000;
 }
 
 ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::ndTrajectoryTransition()
@@ -299,6 +299,7 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::~ndBrainAgentDeterministicPolic
 
 ndBrain* ndBrainAgentDeterministicPolicyGradient_Trainer::GetPolicyNetwork()
 {
+	m_policyTrainer->UpdateParameters();
 	return *m_policyTrainer->GetBrain();
 }
 

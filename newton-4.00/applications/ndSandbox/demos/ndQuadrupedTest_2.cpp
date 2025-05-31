@@ -1341,9 +1341,10 @@ namespace ndQuadruped_2
 			{
 				char fileName[1024];
 				m_modelIsTrained = true;
-				m_master->GetPolicyNetwork()->CopyFrom(*(*m_bestActor));
 				ndGetWorkingFileName(m_master->GetName().GetStr(), fileName);
-				m_master->GetPolicyNetwork()->SaveToFile(fileName);
+				//m_master->GetPolicyNetwork()->CopyFrom(*(*m_bestActor));
+				//m_master->GetPolicyNetwork()->SaveToFile(fileName);
+				m_bestActor->SaveToFile(fileName);
 				ndExpandTraceMessage("saving to file: %s\n", fileName);
 				ndExpandTraceMessage("training complete\n");
 				ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
