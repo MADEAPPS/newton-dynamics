@@ -23,7 +23,6 @@
 #include "ndBrain.h"
 #include "ndBrainTrainer.h"
 #include "ndBrainOptimizer.h"
-#include "ndBrainTrainerCpuLegacy.h"
 #include "ndBrainThreadPool.h"
 
 ndBrainOptimizer::ndBrainOptimizer(const ndSharedPtr<ndBrainContext>& context)
@@ -58,39 +57,42 @@ void ndBrainOptimizer::SetRegularizer(ndBrainFloat regularizer)
 	m_weighDecayRegularizer = ndClamp(regularizer, ndBrainFloat(0.0f), ndBrainFloat(0.01f));
 }
 
+#if 0
 void ndBrainOptimizer::Update(ndBrainThreadPool* const, ndArray<ndBrainTrainer*>&, ndBrainFloat)
 {
 	ndAssert(0);
 }
 
-void ndBrainOptimizer::AccumulateGradients(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients) const
+//void ndBrainOptimizer::AccumulateGradients(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients) const
+void ndBrainOptimizer::AccumulateGradients(ndBrainThreadPool* const, ndArray<ndBrainTrainer*>&) const
 {
-	ndBrainTrainerCpuLegacy* const trainer0 = (ndBrainTrainerCpuLegacy*)partialGradients[0];
-	const ndBrain& brain = **trainer0->GetBrain();
-
-	ndFixSizeArray<ndInt32, 256> paramLayer;
-	for (ndInt32 i = 0; i < brain.GetCount(); ++i)
-	{
-		if (brain[i]->HasParameters())
-		{
-			paramLayer.PushBack(i);
-		}
-	}
-
-	auto AddGradients = ndMakeObject::ndFunction([this, &paramLayer, &partialGradients](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		ndBrainTrainerCpuLegacy* const dst = (ndBrainTrainerCpuLegacy*)partialGradients[0];
-		const ndStartEnd startEnd(paramLayer.GetCount(), threadIndex, threadCount);
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-		{
-			ndInt32 index = paramLayer[i];
-			for (ndInt32 j = 1; j < partialGradients.GetCount(); ++j)
-			{
-				ndBrainTrainerCpuLegacy* const src = (ndBrainTrainerCpuLegacy*)partialGradients[j];
-				dst->AcculumateGradients(*src, index);
-			}
-		}
-	});
-	threadPool->ndBrainThreadPool::ParallelExecute(AddGradients);
+	ndAssert(0);
+	//ndBrainTrainerCpuLegacy* const trainer0 = (ndBrainTrainerCpuLegacy*)partialGradients[0];
+	//const ndBrain& brain = **trainer0->GetBrain();
+	//
+	//ndFixSizeArray<ndInt32, 256> paramLayer;
+	//for (ndInt32 i = 0; i < brain.GetCount(); ++i)
+	//{
+	//	if (brain[i]->HasParameters())
+	//	{
+	//		paramLayer.PushBack(i);
+	//	}
+	//}
+	//
+	//auto AddGradients = ndMakeObject::ndFunction([this, &paramLayer, &partialGradients](ndInt32 threadIndex, ndInt32 threadCount)
+	//{
+	//	ndBrainTrainerCpuLegacy* const dst = (ndBrainTrainerCpuLegacy*)partialGradients[0];
+	//	const ndStartEnd startEnd(paramLayer.GetCount(), threadIndex, threadCount);
+	//	for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+	//	{
+	//		ndInt32 index = paramLayer[i];
+	//		for (ndInt32 j = 1; j < partialGradients.GetCount(); ++j)
+	//		{
+	//			ndBrainTrainerCpuLegacy* const src = (ndBrainTrainerCpuLegacy*)partialGradients[j];
+	//			dst->AcculumateGradients(*src, index);
+	//		}
+	//	}
+	//});
+	//threadPool->ndBrainThreadPool::ParallelExecute(AddGradients);
 }
-
+#endif

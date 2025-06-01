@@ -27,7 +27,6 @@
 #include "ndBrainTrainerCpu.h"
 #include "ndBrainLayerLinear.h"
 #include "ndBrainOptimizerAdamCpu.h"
-#include "ndBrainOptimizerAdamLegacy.h"
 #include "ndBrainLayerActivationRelu.h"
 #include "ndBrainLayerActivationTanh.h"
 #include "ndBrainLossLeastSquaredError.h"

@@ -47,8 +47,10 @@ class ndBrainOptimizer : public ndClassAlloc
 	void SetRegularizer(ndBrainFloat regularizer);
 	void SetRegularizerType(ndRegularizerType type);
 
-	void AccumulateGradients(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients) const;
-	virtual void Update(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients, ndBrainFloat learnRate);
+	virtual void Update(ndBrainVector& parameters, const ndBrainVector& gradients, ndBrainFloat learnRate) = 0;
+
+	//void AccumulateGradients(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients) const;
+	//virtual void Update(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients, ndBrainFloat learnRate);
 
 	protected:
 	ndSharedPtr<ndBrainContext> m_context;

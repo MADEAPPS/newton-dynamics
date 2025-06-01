@@ -43,10 +43,6 @@
 #include <ndBrainOptimizerSgd.h>
 #include <ndBrainLayerActivation.h>
 #include <ndBrainOptimizerAdamCpu.h>
-
-#include <ndBrainTrainerCpuLegacy.h>
-#include <ndBrainOptimizerAdamLegacy.h>
-
 #include <ndBrainAgentDQN_Trainer.h>
 #include <ndBrainLayerImagePadding.h>
 #include <ndBrainLayerActivationElu.h>
