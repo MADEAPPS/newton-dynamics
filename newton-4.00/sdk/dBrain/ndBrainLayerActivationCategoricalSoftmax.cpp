@@ -80,7 +80,7 @@ void ndBrainLayerActivationCategoricalSoftmax::InputDerivative(const ndBrainVect
 	inputDerivative.FlushToZero();
 }
 
-void ndBrainLayerActivationCategoricalSoftmax::BackPropagated(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const
+void ndBrainLayerActivationCategoricalSoftmax::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const
 {
 	ndInt32 inputSize = info->m_inputSize;
 	ndInt32 outputSize = info->m_outputSize;

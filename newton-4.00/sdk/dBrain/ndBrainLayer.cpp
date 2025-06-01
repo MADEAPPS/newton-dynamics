@@ -71,7 +71,7 @@ void ndBrainLayer::FeedForward(const ndBrainLayerFeedFowardCpuCommand* const, nd
 	ndAssert(0);
 }
 
-void ndBrainLayer::BackPropagated(const ndBrainLayerBackPropagateCpuCommand* const, ndInt32) const
+void ndBrainLayer::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const, ndInt32) const
 {
 	ndAssert(0);
 }

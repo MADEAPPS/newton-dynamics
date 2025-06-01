@@ -160,7 +160,7 @@ void ndBrainLayerActivationRelu::FeedForward(const ndBrainLayerFeedFowardCpuComm
 	}
 }
 
-void ndBrainLayerActivationRelu::BackPropagated(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const
+void ndBrainLayerActivationRelu::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const
 {
 	ndInt32 inputSize = info->m_inputSize;
 	ndInt32 outputSize = info->m_outputSize;

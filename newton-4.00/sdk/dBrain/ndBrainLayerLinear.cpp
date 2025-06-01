@@ -395,7 +395,7 @@ void ndBrainLayerLinear::FeedForward(const ndBrainLayerFeedFowardCpuCommand* con
 	output.Add(bias);
 }
 
-void ndBrainLayerLinear::BackPropagated(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const
+void ndBrainLayerLinear::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const
 {
 	ndInt32 inputSize = info->m_inputSize;
 	ndInt32 outputSize = info->m_outputSize;

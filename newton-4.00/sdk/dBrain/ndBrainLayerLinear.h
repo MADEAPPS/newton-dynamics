@@ -78,7 +78,7 @@ class ndBrainLayerLinear : public ndBrainLayer
 	virtual ndBrainLayerFeedFowardCpuCommand* GetLayerCpuFeedForwardCommand() const override;
 	virtual ndBrainLayerBackPropagateCpuCommand* GetLayerCpuBackPropagateCommand() const override;
 	virtual void FeedForward(const ndBrainLayerFeedFowardCpuCommand* const info, ndInt32 miniBatchIndex) const override;
-	virtual void BackPropagated(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const override;
+	virtual void BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const override;
 
 	virtual bool HasGpuSupport() const override;
 	virtual ndLayerUniformDataGpu GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const override;
@@ -86,8 +86,6 @@ class ndBrainLayerLinear : public ndBrainLayer
 	ndBrainVector m_bias;
 	ndBrainMatrix m_weights;
 };
-
-
 
 #endif 
 

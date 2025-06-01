@@ -87,7 +87,7 @@ class ndBrainLayer : public ndClassAlloc
 
 		virtual void Execute(ndInt32 miniBatchIndex)
 		{
-			m_layer->BackPropagated(this, miniBatchIndex);
+			m_layer->BackPropagate(this, miniBatchIndex);
 		}
 
 		const ndBrainLayer* m_layer;
@@ -166,7 +166,7 @@ class ndBrainLayer : public ndClassAlloc
 	virtual ndBrainLayerFeedFowardCpuCommand* GetLayerCpuFeedForwardCommand() const;
 	virtual ndBrainLayerBackPropagateCpuCommand* GetLayerCpuBackPropagateCommand() const;
 	virtual void FeedForward(const ndBrainLayerFeedFowardCpuCommand* const info, ndInt32 miniBatchIndex) const;
-	virtual void BackPropagated(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const;
+	virtual void BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const;
 
 	virtual bool HasGpuSupport() const;
 	virtual ndLayerUniformDataGpu GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const;

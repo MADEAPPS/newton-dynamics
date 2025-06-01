@@ -469,20 +469,21 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::ndBrainAgentDiscretePolicyGrad
 
 ndBrainAgentDiscretePolicyGradient_TrainerMaster::~ndBrainAgentDiscretePolicyGradient_TrainerMaster()
 {
-	for (ndInt32 i = 0; i < m_policyTrainers.GetCount(); ++i)
-	{
-		delete m_policyTrainers[i];
-		delete m_policyAuxiliaryTrainers[i];
-	}
-	delete m_policyOptimizer;
-
-	for (ndInt32 i = 0; i < m_criticTrainers.GetCount(); ++i)
-	{
-		delete m_criticTrainers[i];
-	}
-
-	delete m_criticOptimizer;
-	delete[] m_randomGenerator;
+	ndAssert(0);
+	//for (ndInt32 i = 0; i < m_policyTrainers.GetCount(); ++i)
+	//{
+	//	delete m_policyTrainers[i];
+	//	delete m_policyAuxiliaryTrainers[i];
+	//}
+	//delete m_policyOptimizer;
+	//
+	//for (ndInt32 i = 0; i < m_criticTrainers.GetCount(); ++i)
+	//{
+	//	delete m_criticTrainers[i];
+	//}
+	//
+	//delete m_criticOptimizer;
+	//delete[] m_randomGenerator;
 }
 
 //void ndBrainAgentDiscretePolicyGradient_TrainerMaster::Normalize(ndBrain& actor)
