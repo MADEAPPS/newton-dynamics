@@ -32,29 +32,9 @@ enum ndDeviceBufferType
 	ndCpuMappable,
 };
 
-#if !defined (D_USE_VULKAN_SDK)
+#if defined (D_USE_VULKAN_SDK)
 
 class ndBrainGpuBuffer : public ndClassAlloc
-{
-	protected:
-	ndBrainGpuBuffer(ndBrainGpuContext* const, ndInt64, ndStorageBufferType, ndDeviceBufferType):m_sizeInBytes(0){}
-
-	public:
-	virtual ~ndBrainGpuBuffer() {}
-	void* GetBuffer() const { return nullptr;}
-	size_t SizeInBytes() const { return 0; }
-
-	virtual void LoadData(size_t sizeInBytes, const void* const inputData) = 0;
-	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const = 0;
-
-	protected:
-	size_t  m_sizeInBytes;
-	friend class ndScopeMapBuffer;
-};
-
-#else
-
-class ndBrainGpuBuffer: public ndContainersFreeListAlloc<ndBrainGpuBuffer>
 {
 	public:
 	virtual ~ndBrainGpuBuffer();
@@ -77,6 +57,26 @@ class ndBrainGpuBuffer: public ndContainersFreeListAlloc<ndBrainGpuBuffer>
 	ndDeviceBufferType m_deviceBufferType;
 
 	static ndInt64 m_memoryUsed;
+	friend class ndScopeMapBuffer;
+};
+
+#else
+
+class ndBrainGpuBuffer : public ndClassAlloc
+{
+	protected:
+	ndBrainGpuBuffer(ndBrainGpuContext* const, ndInt64, ndStorageBufferType, ndDeviceBufferType):m_sizeInBytes(0){}
+
+	public:
+	virtual ~ndBrainGpuBuffer() {}
+	void* GetBuffer() const { return nullptr;}
+	size_t SizeInBytes() const { return 0; }
+
+	virtual void LoadData(size_t sizeInBytes, const void* const inputData) = 0;
+	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const = 0;
+
+	protected:
+	size_t  m_sizeInBytes;
 	friend class ndScopeMapBuffer;
 };
 #endif

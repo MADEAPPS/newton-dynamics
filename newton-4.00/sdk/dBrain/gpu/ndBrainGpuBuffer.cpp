@@ -20,7 +20,7 @@
 ndInt64 ndBrainGpuBuffer::m_memoryUsed = 0;
 
 ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt64 sizeInByte, ndStorageBufferType bufferTypeFlags, ndDeviceBufferType deviceType)
-	:ndContainersFreeListAlloc<ndBrainGpuBuffer>()
+	:ndClassAlloc()
 	,m_context(context)
 	,m_sizeInBytes(size_t(sizeInByte))
 	,m_bufferType(bufferTypeFlags)

@@ -208,13 +208,12 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	ndBrainVector m_criticNextObservationActionBatch;
 
 	ndBrainVector m_nextQValue;
+	ndBrainVector m_expectedRewards;
 	ndBrainVector m_criticValue[ND_NUMBER_OF_CRITICS];
 	ndBrainVector m_rewardBatch[ND_NUMBER_OF_CRITICS];
-	//ndBrainVector m_criticTruthValue[ND_NUMBER_OF_CRITICS];
 	ndBrainVector m_criticInputGradients[ND_NUMBER_OF_CRITICS];
 	ndBrainVector m_criticOutputGradients[ND_NUMBER_OF_CRITICS];
 
-	ndBrainVector m_expectedRewards;
 	ndArray<ndInt32> m_miniBatchIndexBuffer;
 	ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition m_replayBuffer;
 	ndBrainAgentDeterministicPolicyGradient_Agent* m_agent;
