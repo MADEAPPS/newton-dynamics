@@ -12,6 +12,40 @@
 #include "ndSandboxStdafx.h"
 #include "ndTestDeepBrain.h"
 
+//#define MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
+
+//#define MINIST_MINIBATCH_BUFFER_SIZE			64
+#define MINIST_MINIBATCH_BUFFER_SIZE			256
+//#define MINIST_MINIBATCH_BUFFER_SIZE			2
+
+#define MNIST_CONVOLUTIONAL_FEATURE_MAPS		32
+//#define MIN_TRAIN_SCORE						0.9999f
+
+#define MINIST_NUMBER_OF_EPOCKS					70
+
+#ifdef MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
+	#if 1
+		#define MINIST_CONVOLUTIONAL_LAYER	ndBrainLayerConvolutional_2d
+	#else
+		#define MINIST_CONVOLUTIONAL_LAYER	ndBrainLayerConvolutionalWithDropOut_2d
+	#endif
+#endif
+
+#define MINIST_LINEAR_LAYERS_NEURONS	256
+#define MINIST_LINEAR_DROPOUT_RATE		ndFloat32 (0.05f)
+
+#define MINIST_ACTIVATION_TYPE ndBrainLayerActivationRelu
+//#define MINIST_ACTIVATION_TYPE ndBrainLayerActivationElu
+//#define MINIST_ACTIVATION_TYPE ndBrainLayerActivationSigmoidLinear
+
+//#if 1
+//	//#define MINIST_DIGIT_FILTER_LAYER_TYPE ndBrainLayerConvolutional_2d
+//	#define MINIST_DIGIT_FILTER_LAYER_TYPE ndBrainLayerConvolutionalWithDropOut_2d
+//#else
+//	#define MINIST_DIGIT_FILTER_LAYER_TYPE ndBrainLayerCrossCorrelation_2d			
+//#endif
+
+
 static ndBrainMatrix* LoadMnistLabelData(const char* const filename)
 {
 	ndBrainMatrix* labelData = nullptr;
@@ -107,43 +141,6 @@ static ndBrainMatrix* LoadMnistSampleData(const char* const filename)
 
 static void MnistTrainingSet()
 {
-	//#define USE_CONVOLUTIONAL_LAYERS
-
-	//#define MINIBATCH_BUFFER_SIZE		64
-	#define MINIBATCH_BUFFER_SIZE		256
-	//#define MINIBATCH_BUFFER_SIZE		2
-
-	#define CONVOLUTIONAL_FEATURE_MAPS		32
-	#define MIN_TRAIN_SCORE					0.9999f
-
-	#define NUMBER_OF_EPOCKS				150
-
-	#ifdef USE_CONVOLUTIONAL_LAYERS
-		#if 1
-			#define CONVOLUTIONAL_LAYER	ndBrainLayerConvolutional_2d
-		#else
-			#define CONVOLUTIONAL_LAYER	ndBrainLayerConvolutionalWithDropOut_2d
-		#endif
-	#endif
-
-	#define LINEAR_LAYERS_NEURONS	256
-	#define LINEAR_DROPOUT_RATE		ndFloat32 (0.05f)
-
-	#if 0
-		#define ACTIVATION_TYPE ndBrainLayerActivationTanh
-	#else
-		#define ACTIVATION_TYPE ndBrainLayerActivationRelu
-		//#define ACTIVATION_TYPE ndBrainLayerActivationElu
-		//#define ACTIVATION_TYPE ndBrainLayerActivationSigmoidLinear
-	#endif
-
-	//#if 1
-	//	//#define DIGIT_FILTER_LAYER_TYPE ndBrainLayerConvolutional_2d
-	//	#define DIGIT_FILTER_LAYER_TYPE ndBrainLayerConvolutionalWithDropOut_2d
-	//#else
-	//	#define DIGIT_FILTER_LAYER_TYPE ndBrainLayerCrossCorrelation_2d			
-	//#endif
-
 	ndSharedPtr<ndBrainMatrix> trainingLabels (LoadMnistLabelData("mnistDatabase/train-labels.idx1-ubyte"));
 	ndSharedPtr<ndBrainMatrix> trainingDigits (LoadMnistSampleData("mnistDatabase/train-images.idx3-ubyte"));
 
@@ -158,7 +155,7 @@ static void MnistTrainingSet()
 			,m_context()
 			,m_prioritySamples()
 			,m_learnRate(ndReal(5.0e-4f))
-			,m_miniBatchSize(MINIBATCH_BUFFER_SIZE)
+			,m_miniBatchSize(MINIST_MINIBATCH_BUFFER_SIZE)
 			,m_minCombinedScore(ndInt64(1000000) * ndInt64(1000000))
 			,m_minValidationFail(ndInt64(1000000)* ndInt64(1000000))
 			,m_hasGpuSupport(m_brain->IsGpuReady())
@@ -272,7 +269,7 @@ static void MnistTrainingSet()
 			m_bestBrain = ndSharedPtr<ndBrain>(new ndBrain (**trainer->GetBrain()));
 
 			ndBrainLossCategoricalCrossEntropy loss(outputSize);
-			for (ndInt32 epoch = 0; epoch < NUMBER_OF_EPOCKS; ++epoch)
+			for (ndInt32 epoch = 0; epoch < MINIST_NUMBER_OF_EPOCKS; ++epoch)
 			{
 				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
 				for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
@@ -366,7 +363,7 @@ static void MnistTrainingSet()
 		ndSharedPtr<ndBrain> m_bestBrain;
 		ndSharedPtr<ndBrainTrainer> m_trainer;
 		ndSharedPtr<ndBrainContext> m_context;
-		ndFixSizeArray<ndFixSizeArray<ndUnsigned32, 16>, MINIBATCH_BUFFER_SIZE> m_prioritySamples;
+		ndFixSizeArray<ndFixSizeArray<ndUnsigned32, 16>, MINIST_MINIBATCH_BUFFER_SIZE> m_prioritySamples;
 		ndReal m_learnRate;
 		ndInt32 m_miniBatchSize;
 		ndInt64 m_minCombinedScore;
@@ -379,44 +376,44 @@ static void MnistTrainingSet()
 		ndSharedPtr<ndBrain> brain(new ndBrain);
 		ndFixSizeArray<ndBrainLayer*, 32> layers;
 
-		#ifdef USE_CONVOLUTIONAL_LAYERS
+		#ifdef MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
 			ndInt32 height = 28;
 			ndInt32 width = trainingDigits->GetColumns() / height;
 			ndAssert((height * width) == trainingDigits->GetColumns());
 
-			const CONVOLUTIONAL_LAYER* conv;
+			const MINIST_CONVOLUTIONAL_LAYER* conv;
 			const ndBrainLayerImagePolling_2x2* pooling;
 
-			layers.PushBack(new CONVOLUTIONAL_LAYER(width, height, 1, 3, CONVOLUTIONAL_FEATURE_MAPS));
-			conv = (CONVOLUTIONAL_LAYER*)(layers[layers.GetCount() - 1]);
-			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
+			layers.PushBack(new MINIST_CONVOLUTIONAL_LAYER(width, height, 1, 3, MNIST_CONVOLUTIONAL_FEATURE_MAPS));
+			conv = (MINIST_CONVOLUTIONAL_LAYER*)(layers[layers.GetCount() - 1]);
+			layers.PushBack(new MINIST_ACTIVATION_TYPE(conv->GetOutputSize()));
 			layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
 
-			layers.PushBack(new CONVOLUTIONAL_LAYER(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, CONVOLUTIONAL_FEATURE_MAPS));
-			conv = (CONVOLUTIONAL_LAYER*)(layers[layers.GetCount() - 1]);
-			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
+			layers.PushBack(new MINIST_CONVOLUTIONAL_LAYER(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, MNIST_CONVOLUTIONAL_FEATURE_MAPS));
+			conv = (MINIST_CONVOLUTIONAL_LAYER*)(layers[layers.GetCount() - 1]);
+			layers.PushBack(new MINIST_ACTIVATION_TYPE(conv->GetOutputSize()));
 			layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
 
-			layers.PushBack(new CONVOLUTIONAL_LAYER(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, CONVOLUTIONAL_FEATURE_MAPS));
-			conv = (CONVOLUTIONAL_LAYER*)(layers[layers.GetCount() - 1]);
-			layers.PushBack(new ACTIVATION_TYPE(conv->GetOutputSize()));
+			layers.PushBack(new MINIST_CONVOLUTIONAL_LAYER(pooling->GetOutputWidth(), pooling->GetOutputHeight(), pooling->GetOutputChannels(), 3, MNIST_CONVOLUTIONAL_FEATURE_MAPS));
+			conv = (MINIST_CONVOLUTIONAL_LAYER*)(layers[layers.GetCount() - 1]);
+			layers.PushBack(new MINIST_ACTIVATION_TYPE(conv->GetOutputSize()));
 			layers.PushBack(new ndBrainLayerImagePolling_2x2(conv->GetOutputWidth(), conv->GetOutputHeight(), conv->GetOutputChannels()));
 			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
 
 		#else
-			layers.PushBack(new ndBrainLayerLinear(trainingDigits->GetColumns(), LINEAR_LAYERS_NEURONS));
+			layers.PushBack(new ndBrainLayerLinear(trainingDigits->GetColumns(), MINIST_LINEAR_LAYERS_NEURONS));
 			layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize()));
-			layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+			layers.PushBack(new MINIST_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 			
-			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), LINEAR_LAYERS_NEURONS));
+			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), MINIST_LINEAR_LAYERS_NEURONS));
 			layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize()));
-			layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+			layers.PushBack(new MINIST_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 			
-			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), LINEAR_LAYERS_NEURONS));
+			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), MINIST_LINEAR_LAYERS_NEURONS));
 			layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize()));
-			layers.PushBack(new ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+			layers.PushBack(new MINIST_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 		#endif
 
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
@@ -437,7 +434,7 @@ static void MnistTrainingSet()
 		time = ndGetTimeInMicroseconds() - time;
 	
 		char path[256];
-		#ifdef USE_CONVOLUTIONAL_LAYERS
+		#ifdef MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
 		ndGetWorkingFileName("mnistDatabase/mnist-cnn.dnn", path);
 		#else
 		ndGetWorkingFileName("mnistDatabase/mnist.dnn", path);
@@ -473,26 +470,82 @@ static void MnistTestSet()
 	if (testLabels && testDigits)
 	{
 		char path[256];
-		#ifdef USE_CONVOLUTIONAL_LAYERS
+		#ifdef MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
 		ndGetWorkingFileName("mnistDatabase/mnist-cnn.dnn", path);
 		#else
 		ndGetWorkingFileName("mnistDatabase/mnist.dnn", path);
 		#endif
 
-		//ndSharedPtr<ndBrain> brain (ndBrainLoad::Load(path));
-		//ndInt32 numbeOfParam = brain->GetNumberOfParameters();
-		//ndUnsigned64 time = ndGetTimeInMicroseconds();
-		//ndExpandTraceMessage("mnist database, number of Parameters %d\n", numbeOfParam);
-		//if (ndBrainGpuContext::HasGpuSupport())
-		//{
-		//	ValidateDataGpu("test data", *(*brain), *testLabels, *testDigits);
-		//}
-		//else
-		//{
-		//	ValidateData("test data", *(*brain), *testLabels, *testDigits);
-		//}
-		//time = ndGetTimeInMicroseconds() - time;
-		//ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
+		ndSharedPtr<ndBrain> brain (ndBrainLoad::Load(path));
+		ndInt32 numbeOfParam = brain->GetNumberOfParameters();
+
+		ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), 8);
+		ndSharedPtr<ndBrainContext> context(new ndBrainCpuContext);
+		context->GetAsCpuContext()->SetThreadCount(threadCount);
+
+		ndInt32 minibatchSize = 256;
+		ndSharedPtr<ndBrainTrainer> inference(ndSharedPtr<ndBrainTrainer>(new ndBrainTrainerCpuInference(brain, context, minibatchSize)));
+
+		ndBrainVector groundTruth;
+		ndBrainVector miniBatchInput;
+		ndBrainVector miniBatchOutput;
+
+		ndInt32 inputSize = testDigits->GetColumns();
+		ndInt32 outputSize = testLabels->GetColumns();
+
+		miniBatchInput.SetCount(inputSize * minibatchSize);
+		groundTruth.SetCount(outputSize * minibatchSize);
+
+		ndUnsigned64 time = ndGetTimeInMicroseconds();
+
+		ndInt32 failCount = 0;
+		ndInt32 batchesCount = testDigits->GetRows() / minibatchSize;
+		ndInt32 batchesSize = batchesCount * minibatchSize;
+		for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += minibatchSize)
+		{
+			for (ndInt32 i = 0; i < minibatchSize; ++i)
+			{
+				ndBrainMemVector input(&miniBatchInput[i * inputSize], inputSize);
+				input.SetCount(inputSize);
+				input.Set((**testDigits)[batchStart + i]);
+			}
+			inference->MakePrediction(miniBatchInput);
+			inference->GetOutput(miniBatchOutput);
+		
+			for (ndInt32 i = 0; i < minibatchSize; ++i)
+			{
+				ndBrainMemVector truth(&groundTruth[i * outputSize], outputSize);
+				const ndBrainMemVector output(&miniBatchOutput[i * outputSize], outputSize);
+		
+				truth.SetCount(outputSize);
+				truth.Set((**testLabels)[batchStart + i]);
+		
+				ndInt32 maxProbIndex = -1;
+				ndBrainFloat maxProbability = ndBrainFloat(-1.0f);
+				for (ndInt32 j = 0; j < output.GetCount(); j++)
+				{
+					if (output[j] > maxProbability)
+					{
+						maxProbIndex = j;
+						maxProbability = output[j];
+					}
+				}
+		
+				ndAssert(maxProbIndex >= 0);
+				if (truth[maxProbIndex] == ndReal(0.0f))
+				{
+					failCount++;
+				}
+			}
+		}
+
+		time = ndGetTimeInMicroseconds() - time;
+
+		ndFloat32 score = (ndFloat32)(batchesSize - failCount) / (ndFloat32)batchesSize;
+		ndExpandTraceMessage("mnist database, number of Parameters %d\n", numbeOfParam);
+		ndExpandTraceMessage("  success rate:%f%%", score * 100.0f);
+		ndExpandTraceMessage("  test fail count:%d\n", failCount);
+		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
 	}
 }
 
@@ -500,5 +553,5 @@ void ndHandWrittenDigits()
 {
 	ndSetRandSeed(53);
 	MnistTrainingSet();
-	//MnistTestSet();
+	MnistTestSet();
 }
