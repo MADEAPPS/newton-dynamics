@@ -125,40 +125,7 @@ void ndBrainGpuCommand::Assembly(void* const shaderHandle, ndInt32 workGroups, n
 	//beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
 	m_context->CheckResultVulkan(vkBeginCommandBuffer(m_commandBuffer, &beginInfo)); // start recording commands.
 
-	//for (ndInt32 i = 0; i < paramCount; ++i)
-	//{
-	//	if (buffers[i]->GetType() == ndStorageData)
-	//	{
-	//		ndBrainGpuBuffer* const gpuBuffer = buffers[i];
-	//
-	//		VkBufferMemoryBarrier buffer_barrier =
-	//		{
-	//			VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER,
-	//			nullptr,
-	//			0,
-	//			VK_ACCESS_SHADER_WRITE_BIT,
-	//			m_context->m_queueFamilyIndex,
-	//			m_context->m_queueFamilyIndex,
-	//			gpuBuffer->GetBuffer(),
-	//			0,
-	//			gpuBuffer->SizeInBytes()
-	//		};
-	//
-	//		vkCmdPipelineBarrier(
-	//			m_commandBuffer,
-	//			VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-	//			VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-	//			0,
-	//			0, nullptr,
-	//			1, &buffer_barrier,
-	//			0, nullptr);
-	//	}
-	//}
-	
-	vkCmdBindPipeline(m_commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_pipeline);
-	vkCmdBindDescriptorSets(m_commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_pipelineLayout, 0, 1, &m_descriptorSet, 0, nullptr);
-	vkCmdDispatch(m_commandBuffer, uint32_t(workGroups), 1, 1);
-
+	// lock this command by issuing a memory barries
 	ndFixSizeArray<VkBufferMemoryBarrier, 10> memoryBarriers;
 	for (ndInt32 i = 0; i < buffersCount; ++i)
 	{
@@ -167,13 +134,45 @@ void ndBrainGpuCommand::Assembly(void* const shaderHandle, ndInt32 workGroups, n
 			ndBrainGpuBuffer* const gpuBuffer = buffers[i];
 			VkBufferMemoryBarrier memoryBarrier{};
 			memoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
-			//memoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-			//memoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			memoryBarrier.pNext = VK_NULL_HANDLE;
+			memoryBarrier.srcAccessMask = 0;
+			memoryBarrier.dstAccessMask = VK_ACCESS_SHADER_WRITE_BIT;
 			memoryBarrier.srcQueueFamilyIndex = m_context->m_queueFamilyIndex;
 			memoryBarrier.dstQueueFamilyIndex = m_context->m_queueFamilyIndex;
+			memoryBarrier.buffer = gpuBuffer->GetBuffer();
+			memoryBarrier.offset = 0;
+			memoryBarrier.size = gpuBuffer->SizeInBytes();
+			memoryBarriers.PushBack(memoryBarrier);
+		}
+	}
+	vkCmdPipelineBarrier(
+		m_commandBuffer,
+		VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+		VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+		0,
+		0, nullptr,
+		uint32_t(memoryBarriers.GetCount()), &memoryBarriers[0],
+		0, nullptr);
+	
+	vkCmdBindPipeline(m_commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_pipeline);
+	vkCmdBindDescriptorSets(m_commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, m_pipelineLayout, 0, 1, &m_descriptorSet, 0, nullptr);
+	vkCmdDispatch(m_commandBuffer, uint32_t(workGroups), 1, 1);
+
+	// unlock this command by issuing a memory barries
+	memoryBarriers.SetCount(0);
+	for (ndInt32 i = 0; i < buffersCount; ++i)
+	{
+		if (buffers[i]->GetType() == ndStorageData)
+		{
+			ndBrainGpuBuffer* const gpuBuffer = buffers[i];
+
+			VkBufferMemoryBarrier memoryBarrier{};
+			memoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
 			memoryBarrier.pNext = VK_NULL_HANDLE;
 			memoryBarrier.srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT;
 			memoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+			memoryBarrier.srcQueueFamilyIndex = m_context->m_queueFamilyIndex;
+			memoryBarrier.dstQueueFamilyIndex = m_context->m_queueFamilyIndex;
 			memoryBarrier.buffer = gpuBuffer->GetBuffer();
 			memoryBarrier.offset = 0;
 			memoryBarrier.size = gpuBuffer->SizeInBytes();

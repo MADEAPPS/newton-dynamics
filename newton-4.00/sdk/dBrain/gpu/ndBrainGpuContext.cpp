@@ -31,7 +31,7 @@ const char* ndBrainGpuContext::m_apiExtensionLayers[] =
 };
 
 ndBrainGpuContext::ndBrainGpuContext()
-	:ndClassAlloc()
+	:ndBrainContext()
 	,m_allocator(&m_allocatorStruct)
 	,m_fence(VK_NULL_HANDLE)
 	,m_queue(VK_NULL_HANDLE)
@@ -97,6 +97,17 @@ bool ndBrainGpuContext::HasGpuSupport()
 {
 	return true;
 }
+
+ndBrainContext::ndContextType ndBrainGpuContext::GetType() const
+{
+	return ndBrainContext::m_gpu;
+}
+
+ndBrainGpuContext* ndBrainGpuContext::GetAsGpuContext()
+{
+	return this;
+}
+
 
 void ndBrainGpuContext::CheckResultVulkan(VkResult err)
 {
@@ -557,6 +568,23 @@ void ndBrainGpuContext::EndQueue()
 		CheckResultVulkan(vkWaitForFences(m_device, uint32_t(1), &m_fence, VK_TRUE, 100000000000));
 		CheckResultVulkan(vkResetFences(m_device, 1, &m_fence));
 	}
+}
+
+#else
+
+ndBrainGpuContext::ndBrainGpuContext()
+	:ndBrainContext()
+{
+	ndMemSet(m_modules, (void*)nullptr, sizeof(m_modules) / sizeof(m_modules[0]));
+}
+
+ndBrainGpuContext::~ndBrainGpuContext()
+{
+}
+
+ndBrainContext::ndContextType ndBrainGpuContext::GetType() const
+{
+	return ndBrainContext::m_cpu;
 }
 
 #endif

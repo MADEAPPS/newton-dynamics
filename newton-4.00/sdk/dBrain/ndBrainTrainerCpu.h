@@ -33,8 +33,9 @@ class ndBrainTrainerCpu: public ndBrainTrainerCpuInference
 	public: 
 	ndBrainTrainerCpu(
 		const ndSharedPtr<ndBrain>& brain, 
+		const ndSharedPtr<ndBrainContext>& context,
 		const ndSharedPtr<ndBrainOptimizerAdamCpu>& optimizer, 
-		ndBrainThreadPool* const threadPool, ndInt32 minibatchSize);
+		ndInt32 minibatchSize);
 	ndBrainTrainerCpu(const ndBrainTrainerCpu& src);
 
 	virtual void UpdateParameters() override;

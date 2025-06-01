@@ -486,7 +486,8 @@ ndBrainAgentDiscretePolicyGradient_TrainerMaster::~ndBrainAgentDiscretePolicyGra
 	delete[] m_randomGenerator;
 }
 
-void ndBrainAgentDiscretePolicyGradient_TrainerMaster::Normalize(ndBrain& actor)
+//void ndBrainAgentDiscretePolicyGradient_TrainerMaster::Normalize(ndBrain& actor)
+void ndBrainAgentDiscretePolicyGradient_TrainerMaster::Normalize(ndBrain&)
 {
 	ndAssert(0);
 #if 0

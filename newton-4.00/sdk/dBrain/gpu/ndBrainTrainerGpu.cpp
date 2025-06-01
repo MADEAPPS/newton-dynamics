@@ -33,7 +33,7 @@
 #include "ndBrainGpuFloatBuffer.h"
 #include "ndBrainGpuUniformBuffer.h"
 
-ndBrainTrainerGpu::ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainGpuContext>& context, ndInt32 minibatchSize)
+ndBrainTrainerGpu::ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndInt32 minibatchSize)
 	:ndBrainTrainnerGpuInference(brain, context, minibatchSize)
 	,m_inputOuputGradientsBuffer()
 	,m_weightAndBiasGradientsBuffer()
@@ -41,12 +41,12 @@ ndBrainTrainerGpu::ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const nd
 	ndBrainVector buffer;
 	GetWorkingBuffer(buffer);
 	buffer.Set(ndReal(0.0f));
-	m_inputOuputGradientsBuffer = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(*m_context, buffer, ndCpuMappable));
+	m_inputOuputGradientsBuffer = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(m_context, buffer, ndCpuMappable));
 
 	GetParameterBuffer(buffer);
 	buffer.SetCount(buffer.GetCount() * m_miniBatchSize);
 	buffer.Set(ndReal(0.0f));
-	m_weightAndBiasGradientsBuffer = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(*m_context, buffer, ndCpuMappable));
+	m_weightAndBiasGradientsBuffer = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(m_context, buffer, ndCpuMappable));
 }
 
 ndBrainTrainerGpu::ndBrainTrainerGpu(const ndBrainTrainerGpu& src)
@@ -61,12 +61,16 @@ ndBrainTrainerGpu::~ndBrainTrainerGpu()
 {
 }
 
-void ndBrainTrainerGpu::ApplyLearnRate(ndBrainFloat learnRate)
+//void ndBrainTrainerGpu::ApplyLearnRate(ndBrainFloat learnRate)
+void ndBrainTrainerGpu::ApplyLearnRate(ndBrainFloat)
 {
+	ndAssert(0);
 }
 
-void ndBrainTrainerGpu::BackPropagate(const ndBrainVector& outputGradients)
+//void ndBrainTrainerGpu::BackPropagate(const ndBrainVector& outputGradients)
+void ndBrainTrainerGpu::BackPropagate(const ndBrainVector&)
 {
+	ndAssert(0);
 	//m_context->BeginQueue();
 	//m_miniBatchInputBuffer->LoadData(input.GetCount() * sizeof(ndReal), &input[0]);
 	////m_groundTruth->LoadData(groundTruth.GetCount() * sizeof(ndReal), &groundTruth[0]);

@@ -150,12 +150,11 @@ static void MnistTrainingSet()
 	ndSharedPtr<ndBrainMatrix> testLabels(LoadMnistLabelData("mnistDatabase/t10k-labels.idx1-ubyte"));
 	ndSharedPtr<ndBrainMatrix> testDigits(LoadMnistSampleData("mnistDatabase/t10k-images.idx3-ubyte"));
 	
-	class SupervisedTrainer : public ndBrainThreadPool
+	class SupervisedTrainer
 	{
 		public:
 		SupervisedTrainer(const ndSharedPtr<ndBrain>& brain)
-			:ndBrainThreadPool()
-			,m_brain(brain)
+			:m_brain(brain)
 			,m_context()
 			,m_prioritySamples()
 			,m_learnRate(ndReal(5.0e-4f))
@@ -164,20 +163,19 @@ static void MnistTrainingSet()
 			,m_minValidationFail(ndInt64(1000000)* ndInt64(1000000))
 			,m_hasGpuSupport(m_brain->IsGpuReady())
 		{
-			ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize);
-
-			//threadCount = 1;
-			SetThreadCount(threadCount);
-
 			if (m_hasGpuSupport)
 			{
-				m_context = ndSharedPtr<ndBrainGpuContext>(new ndBrainGpuContext);
+				m_context = ndSharedPtr<ndBrainContext>(new ndBrainGpuContext);
 				m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainerGpu(m_brain, m_context, m_miniBatchSize));
 			}
 			else
 			{
+				ndInt32 threadCount = ndMin (ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize), 8);
+				m_context = ndSharedPtr<ndBrainContext>(new ndBrainCpuContext);
+
+				m_context->GetAsCpuContext()->SetThreadCount(threadCount);
 				ndSharedPtr<ndBrainOptimizerAdamCpu> optimizer(new ndBrainOptimizerAdamCpu);
-				m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainerCpu(m_brain, optimizer, this, m_miniBatchSize));
+				m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainerCpu(m_brain, m_context, optimizer, m_miniBatchSize));
 			}
 			m_prioritySamples.SetCount(m_miniBatchSize);
 		}
@@ -321,7 +319,11 @@ static void MnistTrainingSet()
 							const ndBrainMemVector in(&miniBatchInput[i * inputSize], inputSize);
 							brain->MakePrediction(in, xxx1);
 							const ndBrainMemVector xxx0(&miniBatchOutput[i * outputSize], outputSize);
-							inputSize *= 1;
+							for (ndInt32 k = 0; k < xxx0.GetCount(); ++k)
+							{
+								ndBrainFloat error = xxx0[k] - xxx1[k];
+								ndAssert(ndAbs(error) < ndBrainFloat(1.0e-5f));
+							}
 						}
 					#endif
 				}
@@ -362,8 +364,8 @@ static void MnistTrainingSet()
 
 		ndSharedPtr<ndBrain> m_brain;
 		ndSharedPtr<ndBrain> m_bestBrain;
-		ndSharedPtr<ndBrainGpuContext> m_context;
 		ndSharedPtr<ndBrainTrainer> m_trainer;
+		ndSharedPtr<ndBrainContext> m_context;
 		ndFixSizeArray<ndFixSizeArray<ndUnsigned32, 16>, MINIBATCH_BUFFER_SIZE> m_prioritySamples;
 		ndReal m_learnRate;
 		ndInt32 m_miniBatchSize;

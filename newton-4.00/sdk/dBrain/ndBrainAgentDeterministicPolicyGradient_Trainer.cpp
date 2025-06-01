@@ -23,6 +23,7 @@
 
 #include "ndBrainLayer.h"
 #include "ndBrainTrainer.h"
+#include "ndBrainCpuContext.h"
 #include "ndBrainTrainerCpu.h"
 #include "ndBrainLayerLinear.h"
 #include "ndBrainOptimizerAdamCpu.h"
@@ -258,9 +259,10 @@ void ndBrainAgentDeterministicPolicyGradient_Agent::Step()
 }
 
 ndBrainAgentDeterministicPolicyGradient_Trainer::ndBrainAgentDeterministicPolicyGradient_Trainer(const HyperParameters& parameters)
-	:ndBrainThreadPool()
+	:ndClassAlloc()
 	,m_name()
 	,m_parameters(parameters)
+	,m_context()
 	,m_expectedRewards()
 	,m_miniBatchIndexBuffer()
 	,m_replayBuffer()
@@ -282,8 +284,10 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::ndBrainAgentDeterministicPolicy
 	m_parameters.m_criticUpdatesCount = ndMax(m_parameters.m_criticUpdatesCount, 2);
 	m_parameters.m_policyUpdatesCount = ndMax(m_parameters.m_policyUpdatesCount, 2);
 
+	m_context = ndSharedPtr<ndBrainContext>(new ndBrainCpuContext);
+
 	// create actor class
-	SetThreadCount(m_parameters.m_threadsCount);
+	m_context->GetAsCpuContext()->SetThreadCount(m_parameters.m_threadsCount);
 
 	BuildPolicyClass();
 	BuildCriticClass();
@@ -357,7 +361,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildPolicyClass()
 	ndSharedPtr<ndBrainOptimizerAdamCpu> policyOptimizer(new ndBrainOptimizerAdamCpu());
 	policyOptimizer->SetRegularizer(m_parameters.m_policyRegularizer);
 	policyOptimizer->SetRegularizerType(m_parameters.m_policyRegularizerType);
-	m_policyTrainer = ndSharedPtr<ndBrainTrainerCpu>(new ndBrainTrainerCpu(policy, policyOptimizer, this, m_parameters.m_miniBatchSize));
+	m_policyTrainer = ndSharedPtr<ndBrainTrainerCpu>(new ndBrainTrainerCpu(policy, m_context, policyOptimizer, m_parameters.m_miniBatchSize));
 }
 
 void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildCriticClass()
@@ -387,14 +391,15 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildCriticClass()
 			critic->AddLayer(layers[i]);
 		}
 		critic->InitWeights();
+
 		ndSharedPtr<ndBrainOptimizerAdamCpu> criticOptimizer(new ndBrainOptimizerAdamCpu());
 		criticOptimizer->SetRegularizer(m_parameters.m_policyRegularizer);
 		criticOptimizer->SetRegularizerType(m_parameters.m_policyRegularizerType);
-		m_criticTrainer[k] = ndSharedPtr<ndBrainTrainerCpu>(new ndBrainTrainerCpu(critic, criticOptimizer, this, m_parameters.m_miniBatchSize));
-
+		m_criticTrainer[k] = ndSharedPtr<ndBrainTrainerCpu>(new ndBrainTrainerCpu(critic, m_context, criticOptimizer, m_parameters.m_miniBatchSize));
+		
 		ndSharedPtr<ndBrain> referenceCritic(new ndBrain(**critic));
-		ndSharedPtr<ndBrainOptimizerAdamCpu> criticOptimizer1(new ndBrainOptimizerAdamCpu());
-		m_referenceCriticTrainer[k] = ndSharedPtr<ndBrainTrainerCpu>(new ndBrainTrainerCpu(referenceCritic, criticOptimizer1, this, m_parameters.m_miniBatchSize));
+		ndSharedPtr<ndBrainOptimizerAdamCpu> referenceCriticOptimizer(new ndBrainOptimizerAdamCpu());
+		m_referenceCriticTrainer[k] = ndSharedPtr<ndBrainTrainerCpu>(new ndBrainTrainerCpu(referenceCritic, m_context, referenceCriticOptimizer, m_parameters.m_miniBatchSize));
 	}
 }
 

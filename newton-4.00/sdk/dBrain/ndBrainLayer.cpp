@@ -62,7 +62,7 @@ void ndBrainLayer::CopyWeights(ndBrainVector&) const
 {
 }
 
-void ndBrainLayer::SetWeights(const ndBrainVector& input)
+void ndBrainLayer::SetWeights(const ndBrainVector&)
 {
 }
 

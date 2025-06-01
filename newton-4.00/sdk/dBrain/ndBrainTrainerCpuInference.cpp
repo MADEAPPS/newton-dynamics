@@ -26,17 +26,19 @@
 #include "ndBrainVector.h"
 #include "ndBrainMatrix.h"
 #include "ndBrainThreadPool.h"
+#include "ndBrainCpuContext.h"
 #include "ndBrainTrainerCpuInference.h"
 #include "ndBrainLayerActivationSoftmax.h"
 
-ndBrainTrainerCpuInference::ndBrainTrainerCpuInference(const ndSharedPtr<ndBrain>& brain, ndBrainThreadPool* const threadPool, ndInt32 minibatchSize)
+ndBrainTrainerCpuInference::ndBrainTrainerCpuInference(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndInt32 minibatchSize)
 	:ndBrainTrainer(brain)
 	,m_inputOutputBuffer()
 	,m_weightAndBiasBuffer()
 	,m_miniBatchInputBuffer()
 	,m_miniBatchOutputBuffer()
 	,m_feedFowardCommands()
-	,m_threadPool(threadPool)
+	,m_context(context)
+	,m_threadPool(m_context->GetAsCpuContext())
 	,m_miniBatchSize(minibatchSize)
 {
 	InitInputOutputBuffer();

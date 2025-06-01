@@ -34,7 +34,10 @@ class ndBrainThreadPool;
 class ndBrainTrainerCpuInference: public ndBrainTrainer
 {
 	public: 
-	ndBrainTrainerCpuInference(const ndSharedPtr<ndBrain>& brain, ndBrainThreadPool* const threadPool, ndInt32 minibatchSize);
+	ndBrainTrainerCpuInference(
+		const ndSharedPtr<ndBrain>& brain, 
+		const ndSharedPtr<ndBrainContext>& context,
+		ndInt32 minibatchSize);
 	ndBrainTrainerCpuInference(const ndBrainTrainerCpuInference& src);
 
 	virtual void GetInput(ndBrainVector& input) const override;
@@ -138,6 +141,7 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 	ndBrainVector m_miniBatchInputBuffer;
 	ndBrainVector m_miniBatchOutputBuffer;
 	ndList<ndSharedPtr<ndBrainTrainerCpuCommand>> m_feedFowardCommands;
+	ndSharedPtr<ndBrainContext> m_context;
 	ndBrainThreadPool* m_threadPool;
 	ndInt32 m_miniBatchSize;
 

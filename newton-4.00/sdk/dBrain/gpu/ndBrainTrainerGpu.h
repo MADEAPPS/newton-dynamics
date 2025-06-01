@@ -30,7 +30,7 @@
 class ndBrainTrainerGpu: public ndBrainTrainnerGpuInference
 {
 	public: 
-	ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainGpuContext>& context, ndInt32 minibatchSize);
+	ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndInt32 minibatchSize);
 	ndBrainTrainerGpu(const ndBrainTrainerGpu& src);
 	virtual ~ndBrainTrainerGpu();
 
@@ -40,6 +40,11 @@ class ndBrainTrainerGpu: public ndBrainTrainnerGpuInference
 	protected:
 	ndSharedPtr<ndBrainGpuBuffer> m_inputOuputGradientsBuffer;
 	ndSharedPtr<ndBrainGpuBuffer> m_weightAndBiasGradientsBuffer;
+	//ndBrainVector m_inputOuputGradientsBuffer;
+	//ndBrainVector m_weightAndBiasGradientsBuffer;
+	//ndBrainVector m_miniBatchInputGradientBuffer;
+	//ndBrainVector m_miniBatchOutputGradientBuffer;
+
 };
 
 #endif 

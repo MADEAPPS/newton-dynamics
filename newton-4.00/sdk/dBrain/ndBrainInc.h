@@ -29,10 +29,12 @@
 #include <ndBrainLayer.h>
 #include <ndBrainVector.h>
 #include <ndBrainMatrix.h>
+#include <ndBrainContext.h>
 #include <ndBrainTrainer.h>
 #include <ndBrainSaveLoad.h>
 #include <ndBrainAgentDQN.h>
 #include <ndBrainOptimizer.h>
+#include <ndBrainCpuContext.h>
 #include <ndBrainSimdFloat8.h>
 #include <ndBrainTrainerCpu.h>
 #include <ndBrainThreadPool.h>

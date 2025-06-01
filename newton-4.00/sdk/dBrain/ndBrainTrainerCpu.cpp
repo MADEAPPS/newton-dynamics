@@ -31,9 +31,10 @@
 
 ndBrainTrainerCpu::ndBrainTrainerCpu(
 	const ndSharedPtr<ndBrain>& brain, 
+	const ndSharedPtr<ndBrainContext>& context,
 	const ndSharedPtr<ndBrainOptimizerAdamCpu>& optimizer, 
-	ndBrainThreadPool* const threadPool, ndInt32 minibatchSize)
-	:ndBrainTrainerCpuInference(brain, threadPool, minibatchSize)
+	ndInt32 minibatchSize)
+	:ndBrainTrainerCpuInference(brain, context, minibatchSize)
 	,m_inputOuputGradientsBuffer()
 	,m_weightAndBiasGradientsBuffer()
 	,m_miniBatchInputGradientBuffer()

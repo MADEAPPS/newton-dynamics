@@ -11,21 +11,21 @@
 #ifndef __ND_BRAIN_GPU_CONTEXT_H__
 #define __ND_BRAIN_GPU_CONTEXT_H__
 
+#include "ndBrainStdafx.h"
+#include "ndBrainContext.h"
+
 class ndBrainGpuCommand;
 class ndBrainGpuFloatBuffer;
 
 #if !defined (D_USE_VULKAN_SDK)
 typedef void* ndVulkanShader;
 
-class ndBrainGpuContext : public ndClassAlloc
+class ndBrainGpuContext : public ndBrainContext
 {
 	public:
-	ndBrainGpuContext() 
-		:ndClassAlloc() 
-	{ 
-		ndMemSet(m_modules, (void*)nullptr, sizeof(m_modules) / sizeof(m_modules[0]));
-	}
-	virtual ~ndBrainGpuContext(){}
+	ndBrainGpuContext();
+	virtual ~ndBrainGpuContext();
+	virtual ndContextType GetType() const override;
 
 	void BeginQueue() {}
 	void AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>&) {}
@@ -54,7 +54,7 @@ class ndBrainGpuContext : public ndClassAlloc
 
 typedef VkShaderModule ndVulkanShader;
 
-class ndBrainGpuContext: public ndClassAlloc
+class ndBrainGpuContext : public ndBrainContext
 {
 	class ndMemoryEntry
 	{
@@ -71,6 +71,8 @@ class ndBrainGpuContext: public ndClassAlloc
 
 	VkDevice GetDevice() const;
 	ndInt32 GetSubGroupSize() const;
+	virtual ndContextType GetType() const override;
+	virtual ndBrainGpuContext* GetAsGpuContext() override;
 
 	VkCommandPool GetCommandPool() const;
 	VkDescriptorPool GetDescriptorPool() const;

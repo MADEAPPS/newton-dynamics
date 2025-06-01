@@ -36,7 +36,10 @@ class ndBrainTrainnerGpuInference: public ndBrainTrainer
 	class ndGpuCommand;
 	class ndUniformBufferObject;
 
-	ndBrainTrainnerGpuInference(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainGpuContext>& context, ndInt32 minibatchSize);
+	ndBrainTrainnerGpuInference(
+		const ndSharedPtr<ndBrain>& brain, 
+		const ndSharedPtr<ndBrainContext>& context, 
+		ndInt32 minibatchSize);
 	ndBrainTrainnerGpuInference(const ndBrainTrainnerGpuInference& src);
 	virtual ~ndBrainTrainnerGpuInference();
 
@@ -64,7 +67,8 @@ class ndBrainTrainnerGpuInference: public ndBrainTrainer
 	void UnloadBuffer(ndBrainVector& ouput, const ndSharedPtr<ndBrainGpuBuffer>& gpuBuffer) const;
 	void AddLayersCommands(ndFixSizeArray<ndBrainLayer::ndLayerUniformDataGpu, 256>& layersUniformsData);
 
-	ndSharedPtr<ndBrainGpuContext> m_context;
+	ndBrainGpuContext* m_context;
+	ndSharedPtr<ndBrainContext> m_contextRef;
 	ndList<ndSharedPtr<ndBrainGpuBuffer>> m_uniforms;
 	ndSharedPtr<ndBrainGpuBuffer> m_inputOutputBuffer;
 	ndSharedPtr<ndBrainGpuBuffer> m_weightAndBiasBuffer;

@@ -122,7 +122,7 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 	friend class ndBrainAgentDeterministicPolicyGradient_Trainer;
 };
 
-class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
+class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 {
 	public:
 	class HyperParameters
@@ -194,6 +194,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndBrainThreadPool
 	ndString m_name;
 	HyperParameters m_parameters;
 
+	ndSharedPtr<ndBrainContext> m_context;
 	ndSharedPtr<ndBrainTrainerCpu> m_policyTrainer;
 	ndSharedPtr<ndBrainTrainerCpu> m_criticTrainer[ND_NUMBER_OF_CRITICS];
 	ndSharedPtr<ndBrainTrainerCpu> m_referenceCriticTrainer[ND_NUMBER_OF_CRITICS];
