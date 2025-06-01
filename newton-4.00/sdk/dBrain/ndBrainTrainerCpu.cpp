@@ -55,7 +55,7 @@ ndBrainTrainerCpu::ndBrainTrainerCpu(
 	AddLayersGradientCommands();
 	AddCopyInputGradientCommand();
 
-	m_optimizer->Init(m_threadPool, ndInt32(m_weightAndBiasBuffer.GetCount()));
+	m_optimizer->Init(ndInt32(m_weightAndBiasBuffer.GetCount()));
 }
 
 ndBrainTrainerCpu::ndBrainTrainerCpu(const ndBrainTrainerCpu& src)

@@ -31,13 +31,12 @@
 #include "ndBrainLayerActivationSoftmax.h"
 
 ndBrainTrainerCpuInference::ndBrainTrainerCpuInference(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndInt32 minibatchSize)
-	:ndBrainTrainer(brain)
+	:ndBrainTrainer(brain, context)
 	,m_inputOutputBuffer()
 	,m_weightAndBiasBuffer()
 	,m_miniBatchInputBuffer()
 	,m_miniBatchOutputBuffer()
 	,m_feedFowardCommands()
-	,m_context(context)
 	,m_threadPool(m_context->GetAsCpuContext())
 	,m_miniBatchSize(minibatchSize)
 {

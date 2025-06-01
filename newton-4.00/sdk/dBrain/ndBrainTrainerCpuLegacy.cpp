@@ -87,7 +87,7 @@ class ndBrainTrainerCpuLegacy::ndLayerData : public ndClassAlloc
 };
 
 ndBrainTrainerCpuLegacy::ndBrainTrainerCpuLegacy(const ndSharedPtr<ndBrain>& brain)
-	:ndBrainTrainer(brain)
+	:ndBrainTrainer(brain, ndSharedPtr<ndBrainContext>())
 	,m_data()
 	,m_workingBuffer()
 	,m_prefixScan()

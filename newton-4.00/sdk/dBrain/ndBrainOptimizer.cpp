@@ -26,8 +26,9 @@
 #include "ndBrainTrainerCpuLegacy.h"
 #include "ndBrainThreadPool.h"
 
-ndBrainOptimizer::ndBrainOptimizer()
+ndBrainOptimizer::ndBrainOptimizer(const ndSharedPtr<ndBrainContext>& context)
 	:ndClassAlloc()
+	,m_context(context)
 	,m_weighDecayRegularizer(ndBrainFloat(0.0f))
 	,m_regularizerType(m_ridge)
 {
@@ -64,7 +65,6 @@ void ndBrainOptimizer::Update(ndBrainThreadPool* const, ndArray<ndBrainTrainer*>
 
 void ndBrainOptimizer::AccumulateGradients(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients) const
 {
-	//ndBrainTrainer* const trainer0 = partialGradients[0];
 	ndBrainTrainerCpuLegacy* const trainer0 = (ndBrainTrainerCpuLegacy*)partialGradients[0];
 	const ndBrain& brain = **trainer0->GetBrain();
 

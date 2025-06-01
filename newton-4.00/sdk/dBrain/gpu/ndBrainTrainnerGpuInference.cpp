@@ -64,7 +64,7 @@ class ndBrainTrainnerGpuInference::ndGpuCommand : public ndBrainGpuCommand
 };
 
 ndBrainTrainnerGpuInference::ndBrainTrainnerGpuInference(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndInt32 minibatchSize)
-	:ndBrainTrainer(brain)
+	:ndBrainTrainer(brain, context)
 	,m_context(context->GetAsGpuContext())
 	,m_contextRef(context)
 	,m_uniforms()

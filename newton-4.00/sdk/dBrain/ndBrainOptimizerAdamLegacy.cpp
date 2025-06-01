@@ -64,7 +64,7 @@ class ndBrainOptimizerAdamLegacy::ndBrainOptimizerAdamLegacy::ndAdamData : publi
 };
 
 ndBrainOptimizerAdamLegacy::ndBrainOptimizerAdamLegacy()
-	:ndBrainOptimizer()
+	:ndBrainOptimizer(ndSharedPtr<ndBrainContext>())
 	,m_beta(ndBrainFloat(0.999f))
 	,m_alpha(ndBrainFloat(0.9f))
 	,m_epsilon(1.0e-6f)
@@ -85,7 +85,6 @@ ndBrainOptimizerAdamLegacy::~ndBrainOptimizerAdamLegacy()
 //#pragma optimize( "", off )
 void ndBrainOptimizerAdamLegacy::Update(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients, ndBrainFloat learnRate)
 {
-	//ndBrainTrainer* const trainer = partialGradients[0];
 	ndBrainTrainerCpuLegacy* const trainer = (ndBrainTrainerCpuLegacy*)partialGradients[0];
 	ndBrain& brain = **trainer->GetBrain();
 

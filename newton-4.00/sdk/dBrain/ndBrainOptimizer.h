@@ -24,6 +24,7 @@
 
 #include "ndBrainStdafx.h"
 
+class ndBrainContext;
 class ndBrainTrainer;
 class ndBrainThreadPool;
 
@@ -37,7 +38,7 @@ class ndBrainOptimizer : public ndClassAlloc
 		m_lasso,
 	};
 
-	ndBrainOptimizer();
+	ndBrainOptimizer(const ndSharedPtr<ndBrainContext>& context);
 	virtual ~ndBrainOptimizer();
 
 	ndBrainFloat GetRegularizer() const;
@@ -46,10 +47,11 @@ class ndBrainOptimizer : public ndClassAlloc
 	void SetRegularizer(ndBrainFloat regularizer);
 	void SetRegularizerType(ndRegularizerType type);
 
+	void AccumulateGradients(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients) const;
 	virtual void Update(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients, ndBrainFloat learnRate);
 
-	void AccumulateGradients(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients) const;
 	protected:
+	ndSharedPtr<ndBrainContext> m_context;
 	ndBrainFloat m_weighDecayRegularizer;
 	ndRegularizerType m_regularizerType;
 };

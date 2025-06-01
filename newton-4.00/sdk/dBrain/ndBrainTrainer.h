@@ -27,6 +27,7 @@
 
 class ndBrain;
 class ndBrainLoss;
+class ndBrainContext;
 
 class ndBrainTrainerCpuCommand: public ndContainersFreeListAlloc<ndBrainTrainerCpuCommand>
 {
@@ -49,11 +50,12 @@ class ndBrainTrainerCpuCommand: public ndContainersFreeListAlloc<ndBrainTrainerC
 class ndBrainTrainer: public ndClassAlloc
 {
 	public: 
-	ndBrainTrainer(const ndSharedPtr<ndBrain>& brain);
+	ndBrainTrainer(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context);
 	ndBrainTrainer(const ndBrainTrainer& src);
 	virtual ~ndBrainTrainer();
 
 	ndSharedPtr<ndBrain>& GetBrain();
+	ndSharedPtr<ndBrainContext> GetContext();
 	virtual void UpdateParameters() = 0;
 
 	virtual void GetInput(ndBrainVector&) const {}
@@ -77,6 +79,7 @@ class ndBrainTrainer: public ndClassAlloc
 
 	protected:
 	ndSharedPtr<ndBrain> m_brain;
+	ndSharedPtr<ndBrainContext> m_context;
 };
 
 #endif 

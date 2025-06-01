@@ -171,7 +171,7 @@ static void MnistTrainingSet()
 				m_context = ndSharedPtr<ndBrainContext>(new ndBrainCpuContext);
 
 				m_context->GetAsCpuContext()->SetThreadCount(threadCount);
-				ndSharedPtr<ndBrainOptimizerAdamCpu> optimizer(new ndBrainOptimizerAdamCpu);
+				ndSharedPtr<ndBrainOptimizerAdamCpu> optimizer(new ndBrainOptimizerAdamCpu(m_context));
 				m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainerCpu(m_brain, m_context, optimizer, m_miniBatchSize));
 			}
 			m_prioritySamples.SetCount(m_miniBatchSize);

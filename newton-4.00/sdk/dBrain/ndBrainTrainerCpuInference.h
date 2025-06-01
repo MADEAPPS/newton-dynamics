@@ -141,7 +141,6 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 	ndBrainVector m_miniBatchInputBuffer;
 	ndBrainVector m_miniBatchOutputBuffer;
 	ndList<ndSharedPtr<ndBrainTrainerCpuCommand>> m_feedFowardCommands;
-	ndSharedPtr<ndBrainContext> m_context;
 	ndBrainThreadPool* m_threadPool;
 	ndInt32 m_miniBatchSize;
 

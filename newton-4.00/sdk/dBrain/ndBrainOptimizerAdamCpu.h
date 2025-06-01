@@ -25,18 +25,17 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainOptimizer.h"
 
-//class ndBrainTrainerCpu;
 class ndBrainThreadPool;
 
 class ndBrainOptimizerAdamCpu : public ndBrainOptimizer
 {
 	public: 
-	ndBrainOptimizerAdamCpu();
+	ndBrainOptimizerAdamCpu(const ndSharedPtr<ndBrainContext>& context);
 
 	virtual void Update(ndBrainVector& parameters, const ndBrainVector& gradrients, ndBrainFloat learnRate);
 
 	private:
-	void Init(ndBrainThreadPool* const threadPool, ndInt32 size);
+	void Init(ndInt32 size);
 
 	ndBrainVector m_vdw;
 	ndBrainVector m_vdw2;

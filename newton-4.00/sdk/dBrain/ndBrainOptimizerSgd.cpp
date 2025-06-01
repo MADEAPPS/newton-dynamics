@@ -27,7 +27,7 @@
 #include "ndBrainTrainerCpuLegacy.h"
 
 ndBrainOptimizerSgd::ndBrainOptimizerSgd()
-	:ndBrainOptimizer()
+	:ndBrainOptimizer(ndSharedPtr<ndBrainContext>())
 {
 }
 

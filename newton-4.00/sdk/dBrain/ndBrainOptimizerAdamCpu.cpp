@@ -22,13 +22,14 @@
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"
 #include "ndBrainMatrix.h"
-#include "ndBrainTrainer.h"
+//#include "ndBrainTrainer.h"
+#include "ndBrainCpuContext.h"
 #include "ndBrainTrainerCpu.h"
 #include "ndBrainThreadPool.h"
 #include "ndBrainOptimizerAdamCpu.h"
 
-ndBrainOptimizerAdamCpu::ndBrainOptimizerAdamCpu()
-	:ndBrainOptimizer()
+ndBrainOptimizerAdamCpu::ndBrainOptimizerAdamCpu(const ndSharedPtr<ndBrainContext>& context)
+	:ndBrainOptimizer(context)
 	,m_vdw()
 	,m_vdw2()
 	,m_temp()
@@ -39,14 +40,13 @@ ndBrainOptimizerAdamCpu::ndBrainOptimizerAdamCpu()
 	,m_epsilon(1.0e-6f)
 	,m_betaAcc(m_beta)
 	,m_alphaAcc(m_alpha)
-	,m_threadPool(nullptr)
+	,m_threadPool(context->GetAsCpuContext())
 	,m_miniBatchSize(256)
 {
 }
 
-void ndBrainOptimizerAdamCpu::Init(ndBrainThreadPool* const threadPool, ndInt32 size)
+void ndBrainOptimizerAdamCpu::Init(ndInt32 size)
 {
-	m_threadPool = threadPool;
 	m_vdw.SetCount(size);
 	m_vdw2.SetCount(size);
 	m_temp.SetCount(size);
