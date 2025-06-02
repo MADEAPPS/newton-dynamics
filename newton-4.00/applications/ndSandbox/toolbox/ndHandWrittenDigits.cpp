@@ -160,6 +160,7 @@ static void MnistTrainingSet()
 			,m_minValidationFail(ndInt64(1000000)* ndInt64(1000000))
 			,m_hasGpuSupport(m_brain->IsGpuReady())
 		{
+			m_prioritySamples.SetCount(m_miniBatchSize);
 			if (m_hasGpuSupport)
 			{
 				m_context = ndSharedPtr<ndBrainContext>(new ndBrainGpuContext);
@@ -174,7 +175,6 @@ static void MnistTrainingSet()
 				ndSharedPtr<ndBrainOptimizerAdamCpu> optimizer(new ndBrainOptimizerAdamCpu(m_context));
 				m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainerCpu(m_brain, m_context, optimizer, m_miniBatchSize));
 			}
-			m_prioritySamples.SetCount(m_miniBatchSize);
 		}
 
 		ndInt32 ValidateData(ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
@@ -429,6 +429,7 @@ static void MnistTrainingSet()
 		ndExpandTraceMessage("training mnist database, number of parameters %d\n", brain->GetNumberOfParameters());
 	
 		SupervisedTrainer optimizer(brain);
+
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
 		optimizer.Optimize(*trainingLabels, *trainingDigits, *testLabels, *testDigits);
 		time = ndGetTimeInMicroseconds() - time;

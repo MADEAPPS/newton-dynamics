@@ -31,6 +31,44 @@ class ndBrainLoss;
 class ndBrainLayer;
 class ndBrainThreadPool;
 
+class ndBrainTrainerCpuCommand: public ndContainersFreeListAlloc<ndBrainTrainerCpuCommand>
+{
+	public:
+	ndBrainTrainerCpuCommand(const ndBrainLayer::ndCommandShareInfo& info, size_t m_id)
+		:ndContainersFreeListAlloc<ndBrainTrainerCpuCommand>()
+		,m_owner(nullptr)
+		,m_info(info)
+		,m_id(m_id)
+	{
+	}
+
+	virtual ~ndBrainTrainerCpuCommand()
+	{
+	}
+
+	virtual void Execute(ndInt32 miniBatchIndex) = 0;
+
+	ndBrainTrainerCpuInference* m_owner;
+	ndBrainLayer::ndCommandShareInfo m_info;
+	size_t m_id;
+};
+
+class ndBrainLayerFeedFowardCpuCommand : public ndBrainTrainerCpuCommand
+{
+	public:
+	ndBrainLayerFeedFowardCpuCommand(const ndBrainLayer* const layer)
+		:ndBrainTrainerCpuCommand(layer->GetCommandSharedInfo(), size_t(layer))
+		,m_layer(layer)
+	{
+	}
+
+	virtual void Execute(ndInt32 miniBatchIndex)
+	{
+		m_layer->FeedForward(this, miniBatchIndex);
+	}
+	const ndBrainLayer* m_layer;
+};
+
 class ndBrainTrainerCpuInference: public ndBrainTrainer
 {
 	public: 
@@ -74,67 +112,42 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 	{
 		public:
 		ndCopyInputCommand(ndBrainTrainerCpuInference* const owner)
-			:ndBrainTrainerCpuCommand(m_inputId)
-			,m_owner(owner)
-			,m_inputSize(0)
-			,m_outputSize(0)
-			,m_parametersSize(0)
-			,m_inputOutputSize(0)
-			,m_inputOutputStartOffset(0)
+			:ndBrainTrainerCpuCommand(ndBrainLayer::ndCommandShareInfo(nullptr), m_inputId)
 		{
+			m_owner = owner;
 		}
-
+	
 		virtual void Execute(ndInt32 miniBatchIndex)
 		{
-			const ndBrainMemVector src(&m_owner->m_miniBatchInputBuffer[miniBatchIndex * m_inputSize], m_inputSize);
-			ndBrainMemVector dst(&m_owner->m_inputOutputBuffer[miniBatchIndex * m_inputOutputSize], m_inputSize);
+			const ndBrainMemVector src(&m_owner->m_miniBatchInputBuffer[miniBatchIndex * m_info.m_inputSize], m_info.m_inputSize);
+			ndBrainMemVector dst(&m_owner->m_inputOutputBuffer[miniBatchIndex * m_info.m_inputOutputSize], m_info.m_inputSize);
 			dst.Set(src);
 		}
-
-		ndBrainTrainerCpuInference* m_owner;
-		ndInt32 m_inputSize;
-		ndInt32 m_outputSize;
-		ndInt32 m_parametersSize;
-		ndInt32 m_inputOutputSize;
-		ndInt32 m_inputOutputStartOffset;
 	};
-
+	
 	class ndCopyOutputCommand : public ndBrainTrainerCpuCommand
 	{
 		public:
 		ndCopyOutputCommand(ndBrainTrainerCpuInference* const owner)
-			:ndBrainTrainerCpuCommand(m_outpuId)
-			,m_owner(owner)
-			,m_inputSize(0)
-			,m_outputSize(0)
-			,m_parametersSize(0)
-			,m_inputOutputSize(0)
-			,m_inputOutputStartOffset(0)
+			:ndBrainTrainerCpuCommand(ndBrainLayer::ndCommandShareInfo(nullptr), m_outpuId)
 		{
+			m_owner = owner;
 		}
-
+	
 		virtual void Execute(ndInt32 miniBatchIndex)
 		{
-			const ndBrainMemVector src(&m_owner->m_inputOutputBuffer[miniBatchIndex * m_inputOutputSize + m_inputOutputStartOffset], m_outputSize);
-			ndBrainMemVector dst(&m_owner->m_miniBatchOutputBuffer[miniBatchIndex * m_outputSize], m_outputSize);
+			const ndBrainMemVector src(&m_owner->m_inputOutputBuffer[miniBatchIndex * m_info.m_inputOutputSize + m_info.m_inputOutputStartOffset], m_info.m_outputSize);
+			ndBrainMemVector dst(&m_owner->m_miniBatchOutputBuffer[miniBatchIndex * m_info.m_outputSize], m_info.m_outputSize);
 			dst.Set(src);
 		}
-
-		ndBrainTrainerCpuInference* m_owner;
-		ndInt32 m_inputSize;
-		ndInt32 m_outputSize;
-		ndInt32 m_parametersSize;
-		ndInt32 m_inputOutputSize;
-		ndInt32 m_inputOutputStartOffset;
 	};
-
-	ndBrainTrainerCpuCommand* FindCommand(size_t id) const;
 
 	void AddCopyOutputCommand();
 	void InitInputOutputBuffer();
 	void InitWeightAndBiasBuffer();
-	void AddCopyInputCommand(const ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* const firstCommand);
-	void AddLayersCommands(ndFixSizeArray<ndBrainLayer::ndBrainLayerFeedFowardCpuCommand*, 256>& layersCommands);
+	ndBrainTrainerCpuCommand* FindCommand(size_t id) const;
+	void AddCopyInputCommand(const ndBrainTrainerCpuCommand* const firstCommand);
+	void AddLayersCommands(ndFixSizeArray<ndBrainTrainerCpuCommand*, 256>& layersCommands);
 
 	ndBrainVector m_inputOutputBuffer;
 	ndBrainVector m_weightAndBiasBuffer;

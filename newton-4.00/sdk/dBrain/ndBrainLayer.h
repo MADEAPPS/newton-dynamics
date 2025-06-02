@@ -33,95 +33,60 @@ class ndBrainMatrix;
 class ndBrainGpuCommand;
 class ndBrainTrainerCpu;
 class ndBrainGpuFloatBuffer;
+class ndLayerUniformDataGpu;
 class ndBrainTrainerCpuInference;
+class ndBrainLayerFeedFowardCpuCommand;
+class ndBrainLayerBackPropagateCpuCommand;
 
 class ndBrainLayer : public ndClassAlloc
 {
 	public: 
-	class ndBrainLayerFeedFowardCpuCommand: public ndBrainTrainerCpuCommand
+	class ndCommandShareInfo
 	{
 		public:
-		ndBrainLayerFeedFowardCpuCommand(const ndBrainLayer* const layer)
-			:ndBrainTrainerCpuCommand(size_t(layer))
-			,m_layer(layer)
-			,m_owner(nullptr)
-			,m_inputSize(0)
+		ndCommandShareInfo(const ndBrainLayer* const layer)
+			:m_inputSize(0)
 			,m_outputSize(0)
 			,m_parametersBatchSize(0)
 			,m_parametersStartOffset(0)
 			,m_inputOutputSize(0)
 			,m_inputOutputStartOffset(0)
+			,m_layer(layer)
 		{
 		}
 
-		virtual void Execute(ndInt32 miniBatchIndex)
-		{
-			m_layer->FeedForward(this, miniBatchIndex);
-		}
-
-		const ndBrainLayer* m_layer;
-		ndBrainTrainerCpuInference* m_owner;
 		ndInt32 m_inputSize;
 		ndInt32 m_outputSize;
 		ndInt32 m_parametersBatchSize;
 		ndInt32 m_parametersStartOffset;
 		ndInt32 m_inputOutputSize;
 		ndInt32 m_inputOutputStartOffset;
-	};
-
-	class ndBrainLayerBackPropagateCpuCommand: public ndBrainTrainerCpuCommand
-	{
-		public:
-		ndBrainLayerBackPropagateCpuCommand(const ndBrainLayer* const layer)
-			:ndBrainTrainerCpuCommand(size_t(layer))
-			,m_layer(layer)
-			,m_owner(nullptr)
-			,m_inputSize(0)
-			,m_outputSize(0)
-			,m_parametersBatchSize(0)
-			,m_parametersStartOffset(0)
-			,m_inputOutputSize(0)
-			,m_inputOutputStartOffset(0)
-		{
-		}
-
-		virtual void Execute(ndInt32 miniBatchIndex)
-		{
-			m_layer->BackPropagate(this, miniBatchIndex);
-		}
-
 		const ndBrainLayer* m_layer;
-		ndBrainTrainerCpu* m_owner;
-		ndInt32 m_inputSize;
-		ndInt32 m_outputSize;
-		ndInt32 m_parametersBatchSize;
-		ndInt32 m_parametersStartOffset;
-		ndInt32 m_inputOutputSize;
-		ndInt32 m_inputOutputStartOffset;
 	};
 
-	class ndLayerUniformDataGpu
-	{
-		public:
-		ndLayerUniformDataGpu()
-			:m_shader(nullptr)
-			,m_inputSize(0)
-			,m_outputSize(0)
-			,m_parametersSize(0)
-			,m_parametersStartOffset(0)
-			,m_inputOutputSize(0)
-			,m_inputOutputStartOffset(0)
-		{
-		}
-
-		ndVulkanShader m_shader;
-		ndInt32 m_inputSize;
-		ndInt32 m_outputSize;
-		ndInt32 m_parametersSize;
-		ndInt32 m_parametersStartOffset;
-		ndInt32 m_inputOutputSize;
-		ndInt32 m_inputOutputStartOffset;
-	};
+	//
+	//class ndLayerUniformDataGpu
+	//{
+	//	public:
+	//	ndLayerUniformDataGpu()
+	//		:m_shader(nullptr)
+	//		,m_inputSize(0)
+	//		,m_outputSize(0)
+	//		,m_parametersSize(0)
+	//		,m_parametersStartOffset(0)
+	//		,m_inputOutputSize(0)
+	//		,m_inputOutputStartOffset(0)
+	//	{
+	//	}
+	//
+	//	ndVulkanShader m_shader;
+	//	ndInt32 m_inputSize;
+	//	ndInt32 m_outputSize;
+	//	ndInt32 m_parametersSize;
+	//	ndInt32 m_parametersStartOffset;
+	//	ndInt32 m_inputOutputSize;
+	//	ndInt32 m_inputOutputStartOffset;
+	//};
 
 	ndBrainLayer();
 	ndBrainLayer(const ndBrainLayer& src);
@@ -163,13 +128,15 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void Save(const ndBrainSave* const loadSave) const;
 	virtual void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
 
+	virtual ndCommandShareInfo GetCommandSharedInfo() const;
+
 	virtual ndBrainLayerFeedFowardCpuCommand* GetLayerCpuFeedForwardCommand() const;
 	virtual ndBrainLayerBackPropagateCpuCommand* GetLayerCpuBackPropagateCommand() const;
 	virtual void FeedForward(const ndBrainLayerFeedFowardCpuCommand* const info, ndInt32 miniBatchIndex) const;
 	virtual void BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const;
 
 	virtual bool HasGpuSupport() const;
-	virtual ndLayerUniformDataGpu GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const;
+	//virtual ndLayerUniformDataGpu GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const;
 };
 
 #endif 

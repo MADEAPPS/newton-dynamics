@@ -23,23 +23,31 @@ class ndBrainGpuUniformBuffer;
 class ndBrainGpuCommand : public ndClassAlloc
 {
 	public:
-	ndBrainGpuCommand(ndBrainGpuContext* const context):m_context(context){}
+	ndBrainGpuCommand(ndBrainGpuContext* const context, size_t id)
+		:m_context(context)
+		,m_id(id)
+	{
+	}
 	virtual ~ndBrainGpuCommand(){}
+
+	size_t GetId() const { return m_id; }
 	void Assembly(void*, ndInt32, ndInt32, ndBrainGpuBuffer**) {}
 
 	protected:
 	ndBrainGpuContext* m_context;
+	size_t m_id;
 };
 
 #else
 
-class ndBrainGpuCommand : public ndClassAlloc
+class ndBrainGpuCommand : public ndContainersFreeListAlloc<ndBrainGpuCommand>
 {
 	public:
 	virtual ~ndBrainGpuCommand();
 
+	size_t GetId() const { return m_id; }
 	protected:
-	ndBrainGpuCommand(ndBrainGpuContext* const context);
+	ndBrainGpuCommand(ndBrainGpuContext* const context, size_t id);
 	void Assembly(void* const shader, ndInt32 workGroups, ndInt32 paramCount, ndBrainGpuBuffer** params);
 
 	ndBrainGpuContext* m_context;
@@ -48,17 +56,10 @@ class ndBrainGpuCommand : public ndClassAlloc
 	VkCommandBuffer m_commandBuffer;
 	VkPipelineLayout m_pipelineLayout;
 	VkDescriptorSetLayout m_descriptorSetLayout;
+	size_t m_id;
 
 	friend class ndBrainGpuContext;
 };
 
 #endif
-
-class ndBrainGpuCommandTest : public ndBrainGpuCommand
-{
-	public:
-	ndBrainGpuCommandTest(ndBrainGpuContext* const context,
-		ndBrainGpuUniformBuffer& parammeters,
-		ndBrainGpuFloatBuffer& input, ndBrainGpuFloatBuffer& output);
-};
 #endif

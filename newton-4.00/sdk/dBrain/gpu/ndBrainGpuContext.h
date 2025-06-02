@@ -41,6 +41,7 @@ class ndBrainGpuContext : public ndBrainContext
 			ndVulkanShader m_ndBrainCopyInput;
 			ndVulkanShader m_ndBrainCopyOutput;
 			ndVulkanShader m_ndBrainLayerLinear;
+			ndVulkanShader m_ndBrainCopyOutputGradients;
 			ndVulkanShader m_ndBrainLayerReluActivation;
 			ndVulkanShader m_ndBrainLayerTanhActivation;
 			ndVulkanShader m_ndBrainLayerSoftmaxActivation;
@@ -132,6 +133,7 @@ class ndBrainGpuContext : public ndBrainContext
 			ndVulkanShader m_ndBrainCopyInput;
 			ndVulkanShader m_ndBrainCopyOutput;
 			ndVulkanShader m_ndBrainLayerLinear;
+			ndVulkanShader m_ndBrainCopyOutputGradients;
 			ndVulkanShader m_ndBrainLayerReluActivation;
 			ndVulkanShader m_ndBrainLayerTanhActivation;
 			ndVulkanShader m_ndBrainLayerSoftmaxActivation;

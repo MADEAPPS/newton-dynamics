@@ -21,6 +21,7 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
+#include "ndBrainTrainerCpu.h"
 #include "gpu/ndBrainGpuContext.h"
 #include "ndBrainTrainerCpuInference.h"
 #include "ndBrainLayerActivationSoftmax.h"
@@ -121,48 +122,54 @@ bool ndBrainLayerActivationSoftmax::HasGpuSupport() const
 	return true;
 }
 
-ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* ndBrainLayerActivationSoftmax::GetLayerCpuFeedForwardCommand() const
+ndBrainLayer::ndCommandShareInfo ndBrainLayerActivationSoftmax::GetCommandSharedInfo() const
+{
+	ndCommandShareInfo info(this);
+	info.m_inputSize = GetInputSize();
+	info.m_outputSize = GetOutputSize();
+	return info;
+}
+
+ndBrainLayerFeedFowardCpuCommand* ndBrainLayerActivationSoftmax::GetLayerCpuFeedForwardCommand() const
 {
 	ndBrainLayerFeedFowardCpuCommand* const command = new ndBrainLayerFeedFowardCpuCommand(this);
-	command->m_inputSize = GetInputSize();
-	command->m_outputSize = GetOutputSize();
 	return command;
 }
 
-ndBrainLayer::ndBrainLayerBackPropagateCpuCommand* ndBrainLayerActivationSoftmax::GetLayerCpuBackPropagateCommand() const
+ndBrainLayerBackPropagateCpuCommand* ndBrainLayerActivationSoftmax::GetLayerCpuBackPropagateCommand() const
 {
 	ndBrainLayerBackPropagateCpuCommand* const command = new ndBrainLayerBackPropagateCpuCommand(this);
-	command->m_inputSize = GetInputSize();
-	command->m_outputSize = GetOutputSize();
 	return command;
 }
 
-ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerActivationSoftmax::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const
-{
-	ndLayerUniformDataGpu data;
-	data.m_shader = context->m_ndBrainLayerSoftmaxActivation;
-	data.m_inputSize = GetInputSize();
-	data.m_outputSize = GetOutputSize();
+//ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerActivationSoftmax::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const
+//{
+//	ndLayerUniformDataGpu data;
+//	data.m_shader = context->m_ndBrainLayerSoftmaxActivation;
+//	data.m_inputSize = GetInputSize();
+//	data.m_outputSize = GetOutputSize();
+//
+//	return data;
+//}
 
-	return data;
-}
-
-void ndBrainLayerActivationSoftmax::FeedForward(const ndBrainLayerFeedFowardCpuCommand* const info, ndInt32 miniBatchIndex) const
+void ndBrainLayerActivationSoftmax::FeedForward(const ndBrainLayerFeedFowardCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
+	const ndCommandShareInfo* const info = &command->m_info;
+	const ndBrainTrainerCpuInference* const trainer = command->m_owner;
+
 	ndInt32 inputSize = info->m_inputSize;
 	ndInt32 outputSize = info->m_outputSize;
 
-	const ndBrainTrainerCpuInference* const trainer = info->m_owner;
 	ndInt32 offset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
 	const ndBrainMemVector input(&trainer->m_inputOutputBuffer[offset], inputSize);
 	ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
-
+	
 	ndBrainFloat max = ndBrainFloat(0.0f);
 	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
 	{
 		max = ndMax(input[i], max);
 	}
-
+	
 	ndBrainFloat acc = ndBrainFloat(0.0f);
 	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
 	{
@@ -172,11 +179,11 @@ void ndBrainLayerActivationSoftmax::FeedForward(const ndBrainLayerFeedFowardCpuC
 		output[i] = prob;
 		acc += prob;
 	}
-
+	
 	ndAssert(acc > ndBrainFloat(0.0f));
 	output.Scale(ndBrainFloat(1.0f) / acc);
 	output.FlushToZero();
-}
+}	
 
 //void ndBrainLayerActivationSoftmax::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const
 void ndBrainLayerActivationSoftmax::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const, ndInt32) const

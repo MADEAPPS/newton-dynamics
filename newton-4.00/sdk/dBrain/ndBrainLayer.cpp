@@ -76,23 +76,23 @@ void ndBrainLayer::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* cons
 	ndAssert(0);
 }
 
-ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* ndBrainLayer::GetLayerCpuFeedForwardCommand() const
+ndBrainLayerFeedFowardCpuCommand* ndBrainLayer::GetLayerCpuFeedForwardCommand() const
 {
 	ndAssert(0);
 	return nullptr;
 }
 
-ndBrainLayer::ndBrainLayerBackPropagateCpuCommand* ndBrainLayer::GetLayerCpuBackPropagateCommand() const
+ndBrainLayerBackPropagateCpuCommand* ndBrainLayer::GetLayerCpuBackPropagateCommand() const
 {
 	ndAssert(0);
 	return nullptr;
 }
 
-ndBrainLayer::ndLayerUniformDataGpu ndBrainLayer::GetLayerUniformDataGpu(const ndBrainGpuContext* const) const
-{
-	ndAssert(0);
-	return ndLayerUniformDataGpu();
-}
+//ndLayerUniformDataGpu ndBrainLayer::GetLayerUniformDataGpu(const ndBrainGpuContext* const) const
+//{
+//	ndAssert(0);
+//	return ndLayerUniformDataGpu();
+//}
 
 const char* ndBrainLayer::GetLabelId() const
 {
@@ -205,4 +205,10 @@ void ndBrainLayer::InputDerivative(const ndBrainVector&, const ndBrainVector&, c
 void ndBrainLayer::CalculateParamGradients(const ndBrainVector&, const ndBrainVector&, const ndBrainVector&, ndBrainVector&, ndBrainLayer* const) const
 {
 	ndAssert(0);
+}
+
+ndBrainLayer::ndCommandShareInfo ndBrainLayer::GetCommandSharedInfo() const
+{
+	ndAssert(0);
+	return ndCommandShareInfo(this);
 }

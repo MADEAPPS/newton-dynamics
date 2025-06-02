@@ -107,43 +107,48 @@ bool ndBrainLayerActivationRelu::HasGpuSupport() const
 	return true;
 }
 
-ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* ndBrainLayerActivationRelu::GetLayerCpuFeedForwardCommand() const
+ndBrainLayer::ndCommandShareInfo ndBrainLayerActivationRelu::GetCommandSharedInfo() const
+{
+	ndCommandShareInfo info(this);
+	info.m_inputSize = GetInputSize();
+	info.m_outputSize = GetOutputSize();
+	return info;
+}
+
+ndBrainLayerFeedFowardCpuCommand* ndBrainLayerActivationRelu::GetLayerCpuFeedForwardCommand() const
 {
 	ndBrainLayerFeedFowardCpuCommand* const command = new ndBrainLayerFeedFowardCpuCommand(this);
-	command->m_inputSize = GetInputSize();
-	command->m_outputSize = GetOutputSize();
 	return command;
 }
 
-ndBrainLayer::ndBrainLayerBackPropagateCpuCommand* ndBrainLayerActivationRelu::GetLayerCpuBackPropagateCommand() const
+ndBrainLayerBackPropagateCpuCommand* ndBrainLayerActivationRelu::GetLayerCpuBackPropagateCommand() const
 {
 	ndBrainLayerBackPropagateCpuCommand* const command = new ndBrainLayerBackPropagateCpuCommand(this);
-	command->m_inputSize = GetInputSize();
-	command->m_outputSize = GetOutputSize();
 	return command;
 }
 
-ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerActivationRelu::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const
+//ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerActivationRelu::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const
+//{
+//	ndLayerUniformDataGpu data;
+//	data.m_shader = context->m_ndBrainLayerReluActivation;
+//	data.m_inputSize = GetInputSize();
+//	data.m_outputSize = GetOutputSize();
+//
+//	return data;
+//}
+
+void ndBrainLayerActivationRelu::FeedForward(const ndBrainLayerFeedFowardCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
-	ndLayerUniformDataGpu data;
-	data.m_shader = context->m_ndBrainLayerReluActivation;
-	data.m_inputSize = GetInputSize();
-	data.m_outputSize = GetOutputSize();
-
-	return data;
-}
-
-void ndBrainLayerActivationRelu::FeedForward(const ndBrainLayerFeedFowardCpuCommand* const info, ndInt32 miniBatchIndex) const
-{
-	const ndBrainTrainerCpuInference* const trainer = info->m_owner;
-
+	const ndCommandShareInfo* const info = &command->m_info;
+	const ndBrainTrainerCpuInference* const trainer = command->m_owner;
+	
 	ndInt32 inputSize = info->m_inputSize;
 	ndInt32 outputSize = info->m_outputSize;
-
+	
 	ndInt32 offset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
 	const ndBrainMemVector input(&trainer->m_inputOutputBuffer[offset], inputSize);
 	ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
-
+	
 	const ndBrainSimdFloat8 zero(0.0f);
 	ndBrainFloat* const dst = &output[0];
 	const ndBrainFloat* const src = &input[0];
@@ -160,20 +165,22 @@ void ndBrainLayerActivationRelu::FeedForward(const ndBrainLayerFeedFowardCpuComm
 	}
 }
 
-void ndBrainLayerActivationRelu::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const
+void ndBrainLayerActivationRelu::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
+	const ndCommandShareInfo* const info = &command->m_info;
+	const ndBrainTrainerCpu* const trainer = (ndBrainTrainerCpu*)command->m_owner;
+
 	ndInt32 inputSize = info->m_inputSize;
 	ndInt32 outputSize = info->m_outputSize;
 
-	const ndBrainTrainerCpu* const trainer = info->m_owner;
 	ndInt32 offset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
 	const ndBrainMemVector input(&trainer->m_inputOutputBuffer[offset], inputSize);
 	const ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
-
+	
 	ndInt32 dstOffset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
 	const ndBrainMemVector outputDerivative(&trainer->m_inputOuputGradientsBuffer[dstOffset + inputSize], outputSize);
 	ndBrainMemVector inputDerivative(&trainer->m_inputOuputGradientsBuffer[dstOffset], inputSize);
-
+	
 	const ndBrainSimdFloat8 one(1.0f);
 	const ndBrainSimdFloat8 zero(0.0f);
 	ndBrainFloat* const dst = &inputDerivative[0];

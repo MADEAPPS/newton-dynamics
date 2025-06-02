@@ -28,6 +28,22 @@
 #include "ndBrainOptimizerAdamCpu.h"
 #include "ndBrainTrainerCpuInference.h"
 
+class ndBrainLayerBackPropagateCpuCommand: public ndBrainTrainerCpuCommand
+{
+	public:
+	ndBrainLayerBackPropagateCpuCommand(const ndBrainLayer* const layer)
+		:ndBrainTrainerCpuCommand(layer->GetCommandSharedInfo(), size_t(layer))
+		,m_layer(layer)
+	{
+	}
+
+	virtual void Execute(ndInt32 miniBatchIndex)
+	{
+		m_layer->BackPropagate(this, miniBatchIndex);
+	}
+	const ndBrainLayer* m_layer;
+};
+
 class ndBrainTrainerCpu: public ndBrainTrainerCpuInference
 {
 	public: 
@@ -45,6 +61,44 @@ class ndBrainTrainerCpu: public ndBrainTrainerCpuInference
 	virtual void BackPropagate(const ndBrainVector& outputGradients) override;
 
 	protected:
+	class ndCopyOutputGradientCommand : public ndBrainTrainerCpuCommand
+	{
+		public:
+		ndCopyOutputGradientCommand(ndBrainTrainerCpu* const owner)
+			:ndBrainTrainerCpuCommand(ndBrainLayer::ndCommandShareInfo(nullptr), m_outpuId)
+		{
+			m_owner = owner;
+		}
+
+		virtual void Execute(ndInt32 miniBatchIndex)
+		{
+			ndBrainTrainerCpu* const owner = (ndBrainTrainerCpu*)m_owner;
+			const ndBrainMemVector src(&owner->m_miniBatchOutputGradientBuffer[miniBatchIndex * m_info.m_outputSize], m_info.m_outputSize);
+			ndInt32 destOffset = miniBatchIndex * m_info.m_inputOutputSize;
+			ndBrainMemVector dst(&owner->m_inputOuputGradientsBuffer[destOffset + m_info.m_inputOutputStartOffset], m_info.m_outputSize);
+			dst.Set(src);
+		}
+	};
+
+	class ndCopyInputGradientCommand : public ndBrainTrainerCpuCommand
+	{
+		public:
+		ndCopyInputGradientCommand(ndBrainTrainerCpu* const owner)
+			:ndBrainTrainerCpuCommand(ndBrainLayer::ndCommandShareInfo(nullptr), m_inputId)
+		{
+			m_owner = owner;
+		}
+	
+		virtual void Execute(ndInt32 miniBatchIndex)
+		{
+			ndBrainTrainerCpu* const owner = (ndBrainTrainerCpu*)m_owner;
+			ndInt32 srcOffset = miniBatchIndex * m_info.m_inputOutputSize;
+			const ndBrainMemVector src(&owner->m_inputOuputGradientsBuffer[srcOffset + m_info.m_inputOutputStartOffset], m_info.m_inputSize);
+			ndBrainMemVector dst(&owner->m_miniBatchInputGradientBuffer[miniBatchIndex * m_info.m_inputSize], m_info.m_inputSize);
+			dst.Set(src);
+		}
+	};
+
 	void AddLayersGradientCommands();
 	void AddCopyInputGradientCommand();
 	void AddCopyOutputGradientCommand();

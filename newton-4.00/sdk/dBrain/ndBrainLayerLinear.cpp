@@ -342,66 +342,71 @@ void ndBrainLayerLinear::SetWeights(const ndBrainVector& input)
 	m_bias.Set(bias);
 }
 
-ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerLinear::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const
+//ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerLinear::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const
+//{
+//	ndLayerUniformDataGpu data;
+//
+//	data.m_shader = context->m_ndBrainLayerLinear;
+//	data.m_inputSize = GetInputSize();
+//	data.m_outputSize = GetOutputSize();
+//	data.m_parametersSize = GetOutputSize() * GetInputSize() + GetOutputSize();
+//
+//	return data;
+//}
+
+ndBrainLayerLinear::ndCommandShareInfo ndBrainLayerLinear::GetCommandSharedInfo() const
 {
-	ndLayerUniformDataGpu data;
-
-	data.m_shader = context->m_ndBrainLayerLinear;
-	data.m_inputSize = GetInputSize();
-	data.m_outputSize = GetOutputSize();
-	data.m_parametersSize = GetOutputSize() * GetInputSize() + GetOutputSize();
-
-	return data;
+	ndCommandShareInfo info(this);
+	info.m_inputSize = GetInputSize();
+	info.m_outputSize = GetOutputSize();
+	info.m_parametersBatchSize = GetOutputSize() * GetInputSize() + GetOutputSize();
+	return info;
 }
 
-ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* ndBrainLayerLinear::GetLayerCpuFeedForwardCommand() const
+ndBrainLayerFeedFowardCpuCommand* ndBrainLayerLinear::GetLayerCpuFeedForwardCommand() const
 {
 	ndBrainLayerFeedFowardCpuCommand* const command = new ndBrainLayerFeedFowardCpuCommand(this);
-	command->m_inputSize = GetInputSize();
-	command->m_outputSize = GetOutputSize();
-	command->m_parametersBatchSize = GetOutputSize() * GetInputSize() + GetOutputSize();
 	return command;
 }
 
-ndBrainLayer::ndBrainLayerBackPropagateCpuCommand* ndBrainLayerLinear::GetLayerCpuBackPropagateCommand() const
+ndBrainLayerBackPropagateCpuCommand* ndBrainLayerLinear::GetLayerCpuBackPropagateCommand() const
 {
 	ndBrainLayerBackPropagateCpuCommand* const command = new ndBrainLayerBackPropagateCpuCommand(this);
-	command->m_inputSize = GetInputSize();
-	command->m_outputSize = GetOutputSize();
-	command->m_parametersBatchSize = GetOutputSize() * GetInputSize() + GetOutputSize();
 	return command;
 }
 
-void ndBrainLayerLinear::FeedForward(const ndBrainLayerFeedFowardCpuCommand* const info, ndInt32 miniBatchIndex) const
+void ndBrainLayerLinear::FeedForward(const ndBrainLayerFeedFowardCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
-	const ndBrainTrainerCpuInference* const trainer = info->m_owner;
-
+	const ndCommandShareInfo* const info = &command->m_info;
+	const ndBrainTrainerCpuInference* const trainer = command->m_owner;
+	
 	ndInt32 inputSize = info->m_inputSize;
 	ndInt32 outputSize = info->m_outputSize;
 	ndInt32 matrixSize = inputSize * outputSize;
 	const ndBrainMemVector parameters(&trainer->m_weightAndBiasBuffer[info->m_parametersStartOffset], matrixSize + outputSize);
-
+	
 	ndInt32 offset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
 	const ndBrainMemVector input(&trainer->m_inputOutputBuffer[offset], inputSize);
 	ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
 	for (ndInt32 i = outputSize - 1; i >= 0; --i)
 	{
 		const ndBrainMemVector row(&parameters[i * inputSize], inputSize);
-		//output[i] = ndDotProduct<ndBrainFloat>(inputSize , &row[0], &input[0]);
 		output[i] = row.Dot(input);
 	}
-
+	
 	const ndBrainMemVector bias(&parameters[matrixSize], outputSize);
 	output.Add(bias);
 }
 
-void ndBrainLayerLinear::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const
+void ndBrainLayerLinear::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
+	const ndCommandShareInfo* const info = &command->m_info;
+	const ndBrainTrainerCpu* const trainer = (ndBrainTrainerCpu*)command->m_owner;
+
 	ndInt32 inputSize = info->m_inputSize;
 	ndInt32 outputSize = info->m_outputSize;
 	ndInt32 matrixSize = inputSize * outputSize;
 	
-	const ndBrainTrainerCpu* const trainer = info->m_owner;
 	ndInt32 offset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
 	const ndBrainMemVector input(&trainer->m_inputOutputBuffer[offset], inputSize);
 	const ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);

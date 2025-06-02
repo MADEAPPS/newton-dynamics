@@ -25,6 +25,8 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainVector.h"
 #include "ndBrainTrainer.h"
+#include "ndBrainGpuContext.h"
+#include "ndBrainGpuCommand.h"
 
 class ndBrain;
 class ndBrainLoss;
@@ -33,8 +35,37 @@ class ndBrainLayer;
 class ndBrainTrainnerGpuInference: public ndBrainTrainer
 {
 	public: 
-	class ndGpuCommand;
-	class ndUniformBufferObject;
+	class ndUniformBufferObject
+	{
+		public:
+		ndUniformBufferObject()
+			:m_inputSize(0)
+			,m_outputSize(0)
+			,m_parametersStartOffset(0)
+			,m_inputOutputSize(0)
+			,m_inputOutputStartOffset(0)
+		{
+		}
+
+		ndUnsigned32 m_inputSize;
+		ndUnsigned32 m_outputSize;
+		ndUnsigned32 m_parametersStartOffset;
+		ndUnsigned32 m_inputOutputSize;
+		ndUnsigned32 m_inputOutputStartOffset;
+	};
+
+	class ndGpuCommand : public ndBrainGpuCommand
+	{
+		public:
+		ndGpuCommand(ndBrainGpuContext* const context,
+			ndVulkanShader m_shader,
+			ndInt32 numberOfinputs,
+			const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
+			ndBrainGpuBuffer* const buffer1,
+			ndBrainGpuBuffer* const buffer2, size_t id);
+
+		ndSharedPtr<ndBrainGpuBuffer> m_uniformBuffer;
+	};
 
 	ndBrainTrainnerGpuInference(
 		const ndSharedPtr<ndBrain>& brain, 
@@ -59,17 +90,23 @@ class ndBrainTrainnerGpuInference: public ndBrainTrainer
 	virtual void MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output) override;
 
 	protected:
+	enum ndInputOutputCommandId
+	{
+		m_inputId = 7,
+		m_outpuId = 8,
+	};
+
 	void SubmitCommands();
 	void AddCopyOutputCommand();
 	void InitInputOutputBuffer();
 	void InitWeightAndBiasBuffer();
-	void AddCopyInputCommand(const ndBrainLayer::ndLayerUniformDataGpu& uniformData);
+	ndBrainGpuCommand* FindCommand(size_t id) const;
+	void AddCopyInputCommand(const ndLayerUniformDataGpu& uniformData);
 	void UnloadBuffer(ndBrainVector& ouput, const ndSharedPtr<ndBrainGpuBuffer>& gpuBuffer) const;
-	void AddLayersCommands(ndFixSizeArray<ndBrainLayer::ndLayerUniformDataGpu, 256>& layersUniformsData);
+	void AddLayersCommands(ndFixSizeArray<ndLayerUniformDataGpu, 256>& layersUniformsData);
 
 	ndBrainGpuContext* m_context;
 	ndSharedPtr<ndBrainContext> m_contextRef;
-	ndList<ndSharedPtr<ndBrainGpuBuffer>> m_uniforms;
 	ndSharedPtr<ndBrainGpuBuffer> m_inputOutputBuffer;
 	ndSharedPtr<ndBrainGpuBuffer> m_weightAndBiasBuffer;
 	ndSharedPtr<ndBrainGpuBuffer> m_miniBatchInputBuffer;

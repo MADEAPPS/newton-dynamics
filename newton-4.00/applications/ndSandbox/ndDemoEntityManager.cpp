@@ -365,7 +365,7 @@ void TestVulkanStuff()
 			ndBrainGpuBuffer& uniforms,
 			ndBrainGpuBuffer& weights, 
 			ndBrainGpuBuffer& imputOutputs)
-			:ndBrainGpuCommand(context)
+			:ndBrainGpuCommand(context, 0)
 		{
 			ndFixSizeArray<ndBrainGpuBuffer*, 4> params;
 			params.PushBack(&uniforms);
@@ -378,7 +378,7 @@ void TestVulkanStuff()
 	{
 		ndUnsigned32 m_inputSize;
 		ndUnsigned32 m_outputSize;
-		ndUnsigned32 m_weightsStartOffset;
+		ndUnsigned32 m_parametersStartOffset;
 		ndUnsigned32 m_inputOutputSize;
 		ndUnsigned32 m_inputOutputStartOffset;
 	};
@@ -386,7 +386,7 @@ void TestVulkanStuff()
 	UniformBufferObject uniformParam;
 	uniformParam.m_outputSize = ndUnsigned32(matrix.GetRows());
 	uniformParam.m_inputSize = ndUnsigned32(matrix.GetColumns());
-	uniformParam.m_weightsStartOffset = 0;
+	uniformParam.m_parametersStartOffset = 0;
 
 	uniformParam.m_inputOutputSize = ndUnsigned32(matrix.GetColumns() + matrix.GetRows());
 	uniformParam.m_inputOutputStartOffset = 0;

@@ -19,14 +19,15 @@
 
 #if defined (D_USE_VULKAN_SDK)
 
-ndBrainGpuCommand::ndBrainGpuCommand(ndBrainGpuContext* const context)
-	:ndClassAlloc()
+ndBrainGpuCommand::ndBrainGpuCommand(ndBrainGpuContext* const context, size_t id)
+	:ndContainersFreeListAlloc<ndBrainGpuCommand>()
 	,m_context(context)
 	,m_pipeline(VK_NULL_HANDLE)
 	,m_descriptorSet(VK_NULL_HANDLE)
 	,m_commandBuffer(VK_NULL_HANDLE)
 	,m_pipelineLayout(VK_NULL_HANDLE)
 	,m_descriptorSetLayout(VK_NULL_HANDLE)
+	,m_id (id)
 {
 }
 
@@ -94,7 +95,6 @@ void ndBrainGpuCommand::Assembly(void* const shaderHandle, ndInt32 workGroups, n
 		set.dstSet = m_descriptorSet;
 		set.dstBinding = uint32_t(i);
 		set.descriptorCount = 1;
-		//set.descriptorType = params[i]->GetType();
 		set.descriptorType = (buffers[i]->GetType() == ndUniformData) ? VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER : VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 		set.pBufferInfo = &bufferInfo[i];
 		descriptorSet.PushBack(set);
@@ -191,9 +191,3 @@ void ndBrainGpuCommand::Assembly(void* const shaderHandle, ndInt32 workGroups, n
 	m_context->CheckResultVulkan(vkEndCommandBuffer(m_commandBuffer));
 }
 #endif
-
-ndBrainGpuCommandTest::ndBrainGpuCommandTest(ndBrainGpuContext* const context,
-	ndBrainGpuUniformBuffer&, ndBrainGpuFloatBuffer&, ndBrainGpuFloatBuffer&)
-	:ndBrainGpuCommand(context)
-{
-}

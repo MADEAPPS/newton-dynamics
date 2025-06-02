@@ -186,59 +186,66 @@ bool ndBrainLayerLinearWithDropOut::HasGpuSupport() const
 	return true;
 }
 
-ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* ndBrainLayerLinearWithDropOut::GetLayerCpuFeedForwardCommand() const
+ndBrainLayer::ndCommandShareInfo ndBrainLayerLinearWithDropOut::GetCommandSharedInfo() const
+{
+	ndCommandShareInfo info(this);
+	info.m_inputSize = GetInputSize();
+	info.m_outputSize = GetOutputSize();
+	return info;
+}
+
+ndBrainLayerFeedFowardCpuCommand* ndBrainLayerLinearWithDropOut::GetLayerCpuFeedForwardCommand() const
 {
 	ndBrainLayerFeedFowardCpuCommand* const command = new ndBrainLayerFeedFowardCpuCommand(this);
-	command->m_inputSize = GetInputSize();
-	command->m_outputSize = GetOutputSize();
 	return command;
 }
 
-ndBrainLayer::ndBrainLayerBackPropagateCpuCommand* ndBrainLayerLinearWithDropOut::GetLayerCpuBackPropagateCommand() const
+ndBrainLayerBackPropagateCpuCommand* ndBrainLayerLinearWithDropOut::GetLayerCpuBackPropagateCommand() const
 {
 	ndBrainLayerBackPropagateCpuCommand* const command = new ndBrainLayerBackPropagateCpuCommand(this);
-	command->m_inputSize = GetInputSize();
-	command->m_outputSize = GetOutputSize();
 	return command;
 }
 
-ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerLinearWithDropOut::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const
-{
-	ndLayerUniformDataGpu data;
-	data.m_shader = context->m_ndBrainLayerLinearDropOutActivation;
-	data.m_inputSize = GetInputSize();
-	data.m_outputSize = GetOutputSize();
-	return data;
-}
+//ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerLinearWithDropOut::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const
+//{
+//	ndLayerUniformDataGpu data;
+//	data.m_shader = context->m_ndBrainLayerLinearDropOutActivation;
+//	data.m_inputSize = GetInputSize();
+//	data.m_outputSize = GetOutputSize();
+//	return data;
+//}
 
-void ndBrainLayerLinearWithDropOut::FeedForward(const ndBrainLayerFeedFowardCpuCommand* const info, ndInt32 miniBatchIndex) const
+void ndBrainLayerLinearWithDropOut::FeedForward(const ndBrainLayerFeedFowardCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
-	const ndBrainTrainerCpuInference* const trainer = info->m_owner;
-
+	const ndCommandShareInfo* const info = &command->m_info;
+	const ndBrainTrainerCpuInference* const trainer = command->m_owner;
+	
 	ndInt32 inputSize = info->m_inputSize;
 	ndInt32 outputSize = info->m_outputSize;
-
+	
 	ndInt32 offset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
 	const ndBrainMemVector input(&trainer->m_inputOutputBuffer[offset], inputSize);
 	ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
-
+	
 	output.Set(input);
 	output.Mul(m_dropOut);
 }
 
-void ndBrainLayerLinearWithDropOut::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const
+void ndBrainLayerLinearWithDropOut::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
+	const ndCommandShareInfo* const info = &command->m_info;
+	const ndBrainTrainerCpu* const trainer = (ndBrainTrainerCpu*)command->m_owner;
+
 	ndInt32 inputSize = info->m_inputSize;
 	ndInt32 outputSize = info->m_outputSize;
-
-	const ndBrainTrainerCpu* const trainer = info->m_owner;
+	
 	ndInt32 offset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
 	const ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
-
+	
 	ndInt32 dstOffset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
 	const ndBrainMemVector outputDerivative(&trainer->m_inputOuputGradientsBuffer[dstOffset + inputSize], outputSize);
 	ndBrainMemVector inputDerivative(&trainer->m_inputOuputGradientsBuffer[dstOffset], inputSize);
-
+	
 	inputDerivative.Set(m_dropOut);
 	inputDerivative.Mul(outputDerivative);
 }

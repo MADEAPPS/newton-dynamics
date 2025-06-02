@@ -97,43 +97,47 @@ bool ndBrainLayerActivationTanh::HasGpuSupport() const
 	return true;
 }
 
-ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* ndBrainLayerActivationTanh::GetLayerCpuFeedForwardCommand() const
+ndBrainLayer::ndCommandShareInfo ndBrainLayerActivationTanh::GetCommandSharedInfo() const
+{
+	ndCommandShareInfo info(this);
+	info.m_inputSize = GetInputSize();
+	info.m_outputSize = GetOutputSize();
+	return info;
+}
+
+ndBrainLayerFeedFowardCpuCommand* ndBrainLayerActivationTanh::GetLayerCpuFeedForwardCommand() const
 {
 	ndBrainLayerFeedFowardCpuCommand* const command = new ndBrainLayerFeedFowardCpuCommand(this);
-
-	command->m_inputSize = GetInputSize();
-	command->m_outputSize = GetOutputSize();
 	return command;
 }
 
-ndBrainLayer::ndBrainLayerBackPropagateCpuCommand* ndBrainLayerActivationTanh::GetLayerCpuBackPropagateCommand() const
+ndBrainLayerBackPropagateCpuCommand* ndBrainLayerActivationTanh::GetLayerCpuBackPropagateCommand() const
 {
 	ndBrainLayerBackPropagateCpuCommand* const command = new ndBrainLayerBackPropagateCpuCommand(this);
-	command->m_inputSize = GetInputSize();
-	command->m_outputSize = GetOutputSize();
 	return command;
 }
 
-ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerActivationTanh::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const
-{
-	ndLayerUniformDataGpu data;
-	data.m_shader = context->m_ndBrainLayerTanhActivation;
-	data.m_inputSize = GetInputSize();
-	data.m_outputSize = GetOutputSize();
-	return data;
-}
+//ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerActivationTanh::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const
+//{
+//	ndLayerUniformDataGpu data;
+//	data.m_shader = context->m_ndBrainLayerTanhActivation;
+//	data.m_inputSize = GetInputSize();
+//	data.m_outputSize = GetOutputSize();
+//	return data;
+//}
 
-void ndBrainLayerActivationTanh::FeedForward(const ndBrainLayerFeedFowardCpuCommand* const info, ndInt32 miniBatchIndex) const
+void ndBrainLayerActivationTanh::FeedForward(const ndBrainLayerFeedFowardCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
-	const ndBrainTrainerCpuInference* const trainer = info->m_owner;
-
+	const ndCommandShareInfo* const info = &command->m_info;
+	const ndBrainTrainerCpuInference* const trainer = command->m_owner;
+	
 	ndInt32 inputSize = info->m_inputSize;
 	ndInt32 outputSize = info->m_outputSize;
-
+	
 	ndInt32 offset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
 	const ndBrainMemVector input(&trainer->m_inputOutputBuffer[offset], inputSize);
 	ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
-
+	
 	const ndBrainSimdFloat8 max(30.0f);
 	const ndBrainSimdFloat8 min(-30.0f);
 	ndBrainFloat* const dst = &output[0];
@@ -153,19 +157,21 @@ void ndBrainLayerActivationTanh::FeedForward(const ndBrainLayerFeedFowardCpuComm
 	output.FlushToZero();
 }
 
-void ndBrainLayerActivationTanh::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const
+void ndBrainLayerActivationTanh::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
+	const ndCommandShareInfo* const info = &command->m_info;
+	const ndBrainTrainerCpu* const trainer = (ndBrainTrainerCpu*)command->m_owner;
+
 	ndInt32 inputSize = info->m_inputSize;
 	ndInt32 outputSize = info->m_outputSize;
-
-	const ndBrainTrainerCpu* const trainer = info->m_owner;
+	
 	ndInt32 offset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
 	const ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
-
+	
 	ndInt32 dstOffset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
 	const ndBrainMemVector outputDerivative(&trainer->m_inputOuputGradientsBuffer[dstOffset + inputSize], outputSize);
 	ndBrainMemVector inputDerivative(&trainer->m_inputOuputGradientsBuffer[dstOffset], inputSize);
-
+	
 	inputDerivative.Set(ndBrainFloat(1.0f));
 	inputDerivative.MulSub(output, output);
 	inputDerivative.Mul(outputDerivative);

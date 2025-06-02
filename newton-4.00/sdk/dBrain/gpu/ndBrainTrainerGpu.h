@@ -38,13 +38,14 @@ class ndBrainTrainerGpu: public ndBrainTrainnerGpuInference
 	virtual void BackPropagate(const ndBrainVector& outputGradients) override;
 
 	protected:
+	void SubmitBackwardCommands();
+	void AddCopyOutputGradientCommand();
+
 	ndSharedPtr<ndBrainGpuBuffer> m_inputOuputGradientsBuffer;
 	ndSharedPtr<ndBrainGpuBuffer> m_weightAndBiasGradientsBuffer;
-	//ndBrainVector m_inputOuputGradientsBuffer;
-	//ndBrainVector m_weightAndBiasGradientsBuffer;
-	//ndBrainVector m_miniBatchInputGradientBuffer;
-	//ndBrainVector m_miniBatchOutputGradientBuffer;
-
+	ndSharedPtr<ndBrainGpuBuffer> m_miniBatchInputGradientBuffer;
+	ndSharedPtr<ndBrainGpuBuffer> m_miniBatchOutputGradientBuffer;
+	ndList<ndSharedPtr<ndBrainGpuCommand>> m_backPropagateCommands;
 };
 
 #endif 
