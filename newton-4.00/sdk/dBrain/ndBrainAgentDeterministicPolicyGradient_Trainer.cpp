@@ -34,9 +34,9 @@
 #include "ndBrainLayerActivationLeakyRelu.h"
 #include "ndBrainAgentDeterministicPolicyGradient_Trainer.h"
 
-#define ND_SAC_POLICY_GRADIENT_HIDEN_LAYERS_ACTIVATION		ndBrainLayerActivationRelu
-//#define ND_SAC_POLICY_GRADIENT_HIDEN_LAYERS_ACTIVATION	ndBrainLayerActivationTanh
-//#define ND_SAC_POLICY_GRADIENT_HIDEN_LAYERS_ACTIVATION	ndBrainLayerActivationLeakyRelu
+#define ND_SAC_HIDEN_LAYERS_ACTIVATION		ndBrainLayerActivationRelu
+//#define ND_SAC_HIDEN_LAYERS_ACTIVATION	ndBrainLayerActivationTanh
+//#define ND_SAC_HIDEN_LAYERS_ACTIVATION	ndBrainLayerActivationLeakyRelu
 
 #define ND_SAC_POLICY_FIX_SIGMA				ndBrainFloat(0.2f)
 #define ND_SAC_POLICY_MIN_PER_ACTION_SIGMA	ndBrainFloat(0.01f)
@@ -327,7 +327,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildPolicyClass()
 	{
 		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == m_parameters.m_hiddenLayersNumberOfNeurons);
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
-		layers.PushBack(new ND_SAC_POLICY_GRADIENT_HIDEN_LAYERS_ACTIVATION(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ND_SAC_HIDEN_LAYERS_ACTIVATION(layers[layers.GetCount() - 1]->GetOutputSize()));
 	}
 	ndInt32 numberOfOutput = m_parameters.m_usePerActionSigmas ? 2 * m_parameters.m_numberOfActions : m_parameters.m_numberOfActions;
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), numberOfOutput));
@@ -377,7 +377,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildCriticClass()
 		{
 			ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == m_parameters.m_hiddenLayersNumberOfNeurons);
 			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
-			layers.PushBack(new ND_SAC_POLICY_GRADIENT_HIDEN_LAYERS_ACTIVATION(layers[layers.GetCount() - 1]->GetOutputSize()));
+			layers.PushBack(new ND_SAC_HIDEN_LAYERS_ACTIVATION(layers[layers.GetCount() - 1]->GetOutputSize()));
 		}
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
 		layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
