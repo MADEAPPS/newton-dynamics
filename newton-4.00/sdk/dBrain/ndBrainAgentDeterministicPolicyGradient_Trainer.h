@@ -36,14 +36,14 @@
 // https://spinningup.openai.com/en/latest/algorithms/td3.html
 // https://spinningup.openai.com/en/latest/algorithms/sac.html
 
-#define ND_USE_TDD3
-#ifdef ND_USE_TDD3
-	#define ND_NUMBER_OF_CRITICS		2
+#define ND_USE_SAC
+#ifdef ND_USE_SAC
+	#define ND_SAC_NUMBER_OF_CRITICS	2
 #else
-	#define ND_NUMBER_OF_CRITICS		1
+	#define ND_SAC_NUMBER_OF_CRITICS	1
 #endif
 
-#define ND_TD3_POLICY_DELAY_MOD			1
+#define ND_SAC_POLICY_DELAY_MOD			1
 
 class ndBrainOptimizerAdamLegacy;
 class ndBrainAgentDeterministicPolicyGradient_Trainer;
@@ -196,8 +196,8 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 
 	ndSharedPtr<ndBrainContext> m_context;
 	ndSharedPtr<ndBrainTrainerCpu> m_policyTrainer;
-	ndSharedPtr<ndBrainTrainerCpu> m_criticTrainer[ND_NUMBER_OF_CRITICS];
-	ndSharedPtr<ndBrainTrainerCpu> m_referenceCriticTrainer[ND_NUMBER_OF_CRITICS];
+	ndSharedPtr<ndBrainTrainerCpu> m_criticTrainer[ND_SAC_NUMBER_OF_CRITICS];
+	ndSharedPtr<ndBrainTrainerCpu> m_referenceCriticTrainer[ND_SAC_NUMBER_OF_CRITICS];
 
 	ndBrainVector m_actionBatch;
 	ndBrainVector m_nextActionBatch;
@@ -209,10 +209,10 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 
 	ndBrainVector m_nextQValue;
 	ndBrainVector m_expectedRewards;
-	ndBrainVector m_criticValue[ND_NUMBER_OF_CRITICS];
-	ndBrainVector m_rewardBatch[ND_NUMBER_OF_CRITICS];
-	ndBrainVector m_criticInputGradients[ND_NUMBER_OF_CRITICS];
-	ndBrainVector m_criticOutputGradients[ND_NUMBER_OF_CRITICS];
+	ndBrainVector m_criticValue[ND_SAC_NUMBER_OF_CRITICS];
+	ndBrainVector m_rewardBatch[ND_SAC_NUMBER_OF_CRITICS];
+	ndBrainVector m_criticInputGradients[ND_SAC_NUMBER_OF_CRITICS];
+	ndBrainVector m_criticOutputGradients[ND_SAC_NUMBER_OF_CRITICS];
 
 	ndArray<ndInt32> m_miniBatchIndexBuffer;
 	ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition m_replayBuffer;
