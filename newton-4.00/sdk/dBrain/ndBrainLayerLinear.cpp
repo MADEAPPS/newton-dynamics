@@ -29,7 +29,7 @@
 #include "gpu/ndBrainGpuFloatBuffer.h"
 #include "gpu/ndBrainGpuIntegerBuffer.h"
 #include "gpu/ndBrainGpuUniformBuffer.h"
-#include "gpu/ndBrainTrainnerGpuInference.h"
+#include "gpu/ndBrainTrainerGpuInference.h"
 
 ndBrainLayerLinear::ndBrainLayerLinear(ndInt32 inputs, ndInt32 outputs)
 	:ndBrainLayer()
@@ -439,7 +439,7 @@ void ndBrainLayerLinear::BackPropagate(const ndBrainLayerBackPropagateCpuCommand
 //}
 
 ndBrainTrainerGpuCommand* ndBrainLayerLinear::CreateGpuFeedForwardCommand(
-	ndBrainTrainnerGpuInference* const owner,
+	ndBrainTrainerGpuInference* const owner,
 	const ndBrainLayer::ndCommandShareInfo& info,
 	ndBrainGpuContext* const context, ndInt32 miniBatchSize,
 	const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,

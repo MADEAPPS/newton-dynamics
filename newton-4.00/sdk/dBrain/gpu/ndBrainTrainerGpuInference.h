@@ -31,12 +31,12 @@
 class ndBrain;
 class ndBrainLoss;
 class ndBrainLayer;
-class ndBrainTrainnerGpuInference;
+class ndBrainTrainerGpuInference;
 
 class ndBrainTrainerGpuCommand : public ndBrainGpuCommand
 {
 	public:
-	ndBrainTrainerGpuCommand(ndBrainTrainnerGpuInference* const owner,
+	ndBrainTrainerGpuCommand(ndBrainTrainerGpuInference* const owner,
 		const ndBrainLayer::ndCommandShareInfo& info, size_t m_id,
 		ndBrainGpuContext* const context,
 		ndVulkanShader m_shader,
@@ -47,50 +47,19 @@ class ndBrainTrainerGpuCommand : public ndBrainGpuCommand
 
 	ndSharedPtr<ndBrainGpuBuffer> m_uniformBuffer;
 	ndBrainLayer::ndCommandShareInfo m_info;
-	ndBrainTrainnerGpuInference* m_owner;
+	ndBrainTrainerGpuInference* m_owner;
 	size_t m_id;
 };
 
-//class ndBrainLayerFeedFowardGpuCommand : public ndBrainTrainerGpuCommand
-//{
-//	public:
-//	//ndBrainLayerFeedFowardGpuCommand(const ndBrainLayer* const layer)
-//	ndBrainLayerFeedFowardGpuCommand(const ndBrainLayer::ndCommandShareInfo& info, size_t m_id,
-//			ndBrainGpuContext* const context,
-//			ndVulkanShader m_shader,
-//			ndInt32 numberOfinputs,
-//			const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
-//			ndBrainGpuBuffer* const buffer1,
-//			ndBrainGpuBuffer* const buffer2
-//		:ndBrainTrainerGpuCommand(info, m_id,
-//			context,
-//			//ndVulkanShader m_shader,
-//			numberOfinputs,
-//			uniformBuffer,
-//			buffer1,
-//			buffer2
-//		)
-//		,m_layer(layer)
-//	{
-//	}
-//
-//	//virtual void Execute(ndInt32 miniBatchIndex)
-//	//{
-//	//	ndAssert(0);
-//	//	//m_layer->FeedForward(this, miniBatchIndex);
-//	//}
-//	const ndBrainLayer* m_layer;
-//};
-
-class ndBrainTrainnerGpuInference: public ndBrainTrainer
+class ndBrainTrainerGpuInference: public ndBrainTrainer
 {
 	public: 
-	ndBrainTrainnerGpuInference(
+	ndBrainTrainerGpuInference(
 		const ndSharedPtr<ndBrain>& brain, 
 		const ndSharedPtr<ndBrainContext>& context, 
 		ndInt32 minibatchSize);
-	ndBrainTrainnerGpuInference(const ndBrainTrainnerGpuInference& src);
-	virtual ~ndBrainTrainnerGpuInference();
+	ndBrainTrainerGpuInference(const ndBrainTrainerGpuInference& src);
+	virtual ~ndBrainTrainerGpuInference();
 
 	virtual void GetInput(ndBrainVector& ouput) const;
 	virtual void GetOutput(ndBrainVector& ouput) const override;

@@ -25,9 +25,9 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainVector.h"
 #include "ndBrainTrainer.h"
-#include "ndBrainTrainnerGpuInference.h"
+#include "ndBrainTrainerGpuInference.h"
 
-class ndBrainTrainerGpu: public ndBrainTrainnerGpuInference
+class ndBrainTrainerGpu: public ndBrainTrainerGpuInference
 {
 	public: 
 	ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndInt32 minibatchSize);
