@@ -46,6 +46,12 @@ class ndBrainLayerActivationSoftmax : public ndBrainLayerActivation
 
 	virtual bool HasGpuSupport() const override;
 	//virtual ndLayerUniformDataGpu GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const override;
+	virtual ndBrainTrainerGpuCommand* CreateGpuFeedForwardCommand(ndBrainTrainerGpuInference* const owner,
+		const ndBrainLayer::ndCommandShareInfo& info,
+		ndBrainGpuContext* const context, ndInt32 miniBatchSize,
+		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
+		ndBrainGpuBuffer* const buffer1,
+		ndBrainGpuBuffer* const buffer2) const override;
 };
 
 #endif 

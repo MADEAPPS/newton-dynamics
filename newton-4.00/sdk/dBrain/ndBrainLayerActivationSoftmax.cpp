@@ -25,6 +25,7 @@
 #include "gpu/ndBrainGpuContext.h"
 #include "ndBrainTrainerCpuInference.h"
 #include "ndBrainLayerActivationSoftmax.h"
+#include "gpu/ndBrainTrainerGpuInference.h"
 
 ndBrainLayerActivationSoftmax::ndBrainLayerActivationSoftmax(ndInt32 neurons)
 	:ndBrainLayerActivation(neurons)
@@ -142,16 +143,6 @@ ndBrainLayerBackPropagateCpuCommand* ndBrainLayerActivationSoftmax::GetLayerCpuB
 	return command;
 }
 
-//ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerActivationSoftmax::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const
-//{
-//	ndLayerUniformDataGpu data;
-//	data.m_shader = context->m_ndBrainLayerSoftmaxActivation;
-//	data.m_inputSize = GetInputSize();
-//	data.m_outputSize = GetOutputSize();
-//
-//	return data;
-//}
-
 void ndBrainLayerActivationSoftmax::FeedForward(const ndBrainLayerFeedFowardCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
 	const ndCommandShareInfo* const info = &command->m_info;
@@ -189,4 +180,27 @@ void ndBrainLayerActivationSoftmax::FeedForward(const ndBrainLayerFeedFowardCpuC
 void ndBrainLayerActivationSoftmax::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const, ndInt32) const
 {
 	ndAssert(0);
+}
+
+//ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerActivationSoftmax::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const
+//{
+//	ndLayerUniformDataGpu data;
+//	data.m_shader = context->m_ndBrainLayerSoftmaxActivation;
+//	data.m_inputSize = GetInputSize();
+//	data.m_outputSize = GetOutputSize();
+//
+//	return data;
+//}
+
+ndBrainTrainerGpuCommand* ndBrainLayerActivationSoftmax::CreateGpuFeedForwardCommand(
+	ndBrainTrainerGpuInference* const owner,
+	const ndBrainLayer::ndCommandShareInfo& info,
+	ndBrainGpuContext* const context, ndInt32 miniBatchSize,
+	const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
+	ndBrainGpuBuffer* const buffer1,
+	ndBrainGpuBuffer* const buffer2) const
+{
+	ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(owner,
+		info, size_t(this), context, context->m_ndBrainLayerSoftmaxActivation, miniBatchSize, uniformBuffer, buffer1, buffer2);
+	return command;
 }
