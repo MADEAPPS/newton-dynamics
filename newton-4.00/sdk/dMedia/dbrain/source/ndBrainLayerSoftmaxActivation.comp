@@ -13,15 +13,27 @@
 #define WORKGROUP_SIZE 256
 layout (local_size_x = WORKGROUP_SIZE) in;
 
-layout(std140, binding = 0) uniform param
+//layout(std140, binding = 0) uniform param
+//{
+//    uint m_inputSize;
+//    uint m_outputSize;
+//    uint m_weightsStartOffset;
+//
+//    uint m_inputOutputSize;
+//    uint m_inputOutputStartOffset;
+//};
+
+layout(std140, binding = 0) uniform UniformBufferObject 
 {
     uint m_inputSize;
-    uint m_outputSize;
-    uint m_weightsStartOffset;
-
-    uint m_inputOutputSize;
-    uint m_inputOutputStartOffset;
+	uint m_outputSize;
+	uint m_parametersBatchSize;
+	uint m_parametersStartOffset;
+	uint m_inputOutputSize;
+	uint m_inputOutputStartOffset;
+	uint m_unused[4];
 };
+
 
 layout(std430, binding = 1) buffer dataBuffer1
 {

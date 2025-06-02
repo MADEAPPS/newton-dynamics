@@ -23,97 +23,7 @@
 #include "ndBrainSaveLoad.h"
 #include "ndBrainTrainerCpu.h"
 #include "ndBrainLayerLinearWithDropOut.h"
-
-#if 0
-ndBrainLayerLinearWithDropOut::ndBrainLayerLinearWithDropOut(ndInt32 inputs, ndInt32 outputs, ndBrainFloat dropOutFactor)
-	:ndBrainLayerLinear(inputs, outputs)
-	,m_dropout()
-	,m_dropoutFactor(dropOutFactor)
-	,m_dropoutScale(ndBrainFloat(1.0f))
-	,m_droutOutEnable(true)
-{
-	ndAssert(dropOutFactor >= ndBrainFloat(0.5f));
-	ndAssert(dropOutFactor <= ndBrainFloat(1.0f));
-	m_dropout.SetCount(outputs);
-	UpdateDropOut();
-}
-
-ndBrainLayerLinearWithDropOut::ndBrainLayerLinearWithDropOut(const ndBrainLayerLinearWithDropOut& src)
-	:ndBrainLayerLinear(src)
-	,m_dropout(src.m_dropout)
-	,m_dropoutFactor(src.m_dropoutFactor)
-	,m_dropoutScale(src.m_dropoutScale)
-	,m_droutOutEnable(src.m_droutOutEnable)
-{
-}
-
-ndBrainLayerLinearWithDropOut::~ndBrainLayerLinearWithDropOut()
-{
-}
-
-
-ndBrainLayer* ndBrainLayerLinearWithDropOut::Clone() const
-{
-	return new ndBrainLayerLinearWithDropOut(*this);
-}
-
-
-ndBrainLayer* ndBrainLayerLinearWithDropOut::Load(const ndBrainLoad* const)
-{
-	ndAssert(0);
-	return nullptr;
-}
-
-void ndBrainLayerLinearWithDropOut::EnableDropOut(bool state)
-{
-	m_droutOutEnable = state;
-}
-
-void ndBrainLayerLinearWithDropOut::UpdateDropOut()
-{
-	ndInt32 activeCount = 0;
-	for (ndInt32 i = ndInt32(m_dropout.GetCount()-1); i >= 0; --i)
-	{
-		ndInt32 active = (ndRand() <= m_dropoutFactor);
-		m_dropout[i] = active ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
-		activeCount += active;
-	}
-
-	ndAssert(activeCount > 0);
-	m_dropoutScale = ndBrainFloat (m_dropout.GetCount()) / ndBrainFloat (activeCount);
-	m_dropout.Scale(m_dropoutScale);
-}
-
-void ndBrainLayerLinearWithDropOut::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
-{
-	ndAssert(output.GetCount() == m_dropout.GetCount());
-	ndBrainLayerLinear::MakePrediction(input, output);
-	if (m_droutOutEnable)
-	{
-		output.Mul(m_dropout);
-	}
-}
-
-//void ndBrainLayerLinearWithDropOut::InputDerivative(const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
-void ndBrainLayerLinearWithDropOut::InputDerivative(const ndBrainVector&, const ndBrainVector&, const ndBrainVector&, ndBrainVector&) const
-{
-	ndAssert(0);
-	//m_weights.TransposeMul(outputDerivative, inputDerivative);
-}
-
-void ndBrainLayerLinearWithDropOut::CalculateParamGradients(
-	const ndBrainVector& input, const ndBrainVector& output,
-	const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainLayer* const gradientOut) const
-{
-	if (m_droutOutEnable)
-	{
-		const ndBrainFloat* const outMemory = &outputDerivative[0];
-		ndBrainMemVector outDerivative(outMemory, outputDerivative.GetCount());
-		outDerivative.Mul(m_dropout);
-	}
-	ndBrainLayerLinear::CalculateParamGradients(input, output, outputDerivative, inputGradient, gradientOut);
-}
-#endif
+#include "gpu/ndBrainTrainerGpuInference.h"
 
 ndBrainLayerLinearWithDropOut::ndBrainLayerLinearWithDropOut(ndInt32 neurons)
 	:ndBrainLayerActivation(neurons)
@@ -206,15 +116,6 @@ ndBrainLayerBackPropagateCpuCommand* ndBrainLayerLinearWithDropOut::GetLayerCpuB
 	return command;
 }
 
-//ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerLinearWithDropOut::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const
-//{
-//	ndLayerUniformDataGpu data;
-//	data.m_shader = context->m_ndBrainLayerLinearDropOutActivation;
-//	data.m_inputSize = GetInputSize();
-//	data.m_outputSize = GetOutputSize();
-//	return data;
-//}
-
 void ndBrainLayerLinearWithDropOut::FeedForward(const ndBrainLayerFeedFowardCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
 	const ndCommandShareInfo* const info = &command->m_info;
@@ -248,4 +149,26 @@ void ndBrainLayerLinearWithDropOut::BackPropagate(const ndBrainLayerBackPropagat
 	
 	inputDerivative.Set(m_dropOut);
 	inputDerivative.Mul(outputDerivative);
+}
+
+//ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerLinearWithDropOut::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const
+//{
+//	ndLayerUniformDataGpu data;
+//	data.m_shader = context->m_ndBrainLayerLinearDropOutActivation;
+//	data.m_inputSize = GetInputSize();
+//	data.m_outputSize = GetOutputSize();
+//	return data;
+//}
+
+ndBrainTrainerGpuCommand* ndBrainLayerLinearWithDropOut::CreateGpuFeedForwardCommand(
+	ndBrainTrainerGpuInference* const owner,
+	const ndBrainLayer::ndCommandShareInfo& info,
+	ndBrainGpuContext* const context, ndInt32 miniBatchSize,
+	const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
+	ndBrainGpuBuffer* const buffer1,
+	ndBrainGpuBuffer* const buffer2) const
+{
+	ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(owner,
+		info, size_t(this), context, context->m_ndBrainLayerLinearDropOutActivation, miniBatchSize, uniformBuffer, buffer1, buffer2);
+	return command;
 }
