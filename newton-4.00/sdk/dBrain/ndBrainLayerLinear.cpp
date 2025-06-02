@@ -29,6 +29,7 @@
 #include "gpu/ndBrainGpuFloatBuffer.h"
 #include "gpu/ndBrainGpuIntegerBuffer.h"
 #include "gpu/ndBrainGpuUniformBuffer.h"
+#include "gpu/ndBrainTrainnerGpuInference.h"
 
 ndBrainLayerLinear::ndBrainLayerLinear(ndInt32 inputs, ndInt32 outputs)
 	:ndBrainLayer()
@@ -342,18 +343,6 @@ void ndBrainLayerLinear::SetWeights(const ndBrainVector& input)
 	m_bias.Set(bias);
 }
 
-//ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerLinear::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const
-//{
-//	ndLayerUniformDataGpu data;
-//
-//	data.m_shader = context->m_ndBrainLayerLinear;
-//	data.m_inputSize = GetInputSize();
-//	data.m_outputSize = GetOutputSize();
-//	data.m_parametersSize = GetOutputSize() * GetInputSize() + GetOutputSize();
-//
-//	return data;
-//}
-
 ndBrainLayerLinear::ndCommandShareInfo ndBrainLayerLinear::GetCommandSharedInfo() const
 {
 	ndCommandShareInfo info(this);
@@ -435,4 +424,29 @@ void ndBrainLayerLinear::BackPropagate(const ndBrainLayerBackPropagateCpuCommand
 		const ndBrainMemVector row(&matrixVector[i * inputSize], inputSize);
 		inputDerivative.ScaleAdd(row, scale);
 	}
+}
+
+//ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerLinear::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const
+//{
+//	ndLayerUniformDataGpu data;
+//
+//	data.m_shader = context->m_ndBrainLayerLinear;
+//	data.m_inputSize = GetInputSize();
+//	data.m_outputSize = GetOutputSize();
+//	data.m_parametersSize = GetOutputSize() * GetInputSize() + GetOutputSize();
+//
+//	return data;
+//}
+
+ndBrainTrainerGpuCommand* ndBrainLayerLinear::CreateGpuFeedForwardCommand(
+	ndBrainTrainnerGpuInference* const owner,
+	const ndBrainLayer::ndCommandShareInfo& info,
+	ndBrainGpuContext* const context, ndInt32 miniBatchSize,
+	const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
+	ndBrainGpuBuffer* const buffer1,
+	ndBrainGpuBuffer* const buffer2) const
+{
+	ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(owner,
+		info, size_t(this), context, context->m_ndBrainLayerLinear, miniBatchSize, uniformBuffer, buffer1, buffer2);
+	return command;
 }

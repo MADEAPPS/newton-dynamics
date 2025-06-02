@@ -30,11 +30,13 @@ class ndBrainLoad;
 class ndBrainSave;
 class ndBrainVector;
 class ndBrainMatrix;
+class ndBrainGpuBuffer;
 class ndBrainGpuCommand;
 class ndBrainTrainerCpu;
 class ndBrainGpuFloatBuffer;
-class ndLayerUniformDataGpu;
+class ndBrainTrainerGpuCommand;
 class ndBrainTrainerCpuInference;
+class ndBrainTrainnerGpuInference;
 class ndBrainLayerFeedFowardCpuCommand;
 class ndBrainLayerBackPropagateCpuCommand;
 
@@ -44,6 +46,17 @@ class ndBrainLayer : public ndClassAlloc
 	class ndCommandShareInfo
 	{
 		public:
+		ndCommandShareInfo()
+			:m_inputSize(0)
+			,m_outputSize(0)
+			,m_parametersBatchSize(0)
+			,m_parametersStartOffset(0)
+			,m_inputOutputSize(0)
+			,m_inputOutputStartOffset(0)
+			,m_layer(nullptr)
+		{
+		}
+
 		ndCommandShareInfo(const ndBrainLayer* const layer)
 			:m_inputSize(0)
 			,m_outputSize(0)
@@ -136,7 +149,12 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const;
 
 	virtual bool HasGpuSupport() const;
-	//virtual ndLayerUniformDataGpu GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const;
+	virtual ndBrainTrainerGpuCommand* CreateGpuFeedForwardCommand(ndBrainTrainnerGpuInference* const owner,
+		const ndBrainLayer::ndCommandShareInfo& info,
+		ndBrainGpuContext* const context, ndInt32 miniBatchSize,
+		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
+		ndBrainGpuBuffer* const buffer1,
+		ndBrainGpuBuffer* const buffer2) const;
 };
 
 #endif 

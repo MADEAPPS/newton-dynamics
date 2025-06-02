@@ -13,15 +13,26 @@
 #define WORKGROUP_SIZE  256
 layout (local_size_x = WORKGROUP_SIZE) in;
 
-layout(std140, binding = 0) uniform param
+//layout(std140, binding = 0) uniform param
+//{
+//    uint m_inputSize;
+//    uint m_outputSize;
+//    uint m_weightsStartOffset;
+//
+//    uint m_inputOutputSize;
+//    uint m_inputOutputStartOffset;
+// };
+
+layout(std140, binding = 0) uniform UniformBufferObject 
 {
     uint m_inputSize;
-    uint m_outputSize;
-    uint m_weightsStartOffset;
-
-    uint m_inputOutputSize;
-    uint m_inputOutputStartOffset;
- };
+	uint m_outputSize;
+	uint m_parametersBatchSize;
+	uint m_parametersStartOffset;
+	uint m_inputOutputSize;
+	uint m_inputOutputStartOffset;
+	uint m_unused[4];
+};
 
 layout(std430, binding = 1) buffer dataBuffer1
 {
@@ -41,7 +52,7 @@ shared float reductionBuffer [WORKGROUP_SIZE / 2];
 // calculating an dot product of that row time the vector and adding the bias value.
 void main() 
 {
-    uint biasOffset = m_outputSize * m_inputSize + m_weightsStartOffset;
+    uint biasOffset = m_outputSize * m_inputSize + m_parametersStartOffset;
     uint inputOffset = gl_WorkGroupID.x * m_inputOutputSize + m_inputOutputStartOffset;
     uint outputOffset = inputOffset + m_inputSize;
 
@@ -72,7 +83,7 @@ void main()
     for (uint i = 0; i < m_outputSize; ++i)
     {
         float partialSum = 0.0f;
-        uint rowStartOffset = m_weightsStartOffset + i * m_inputSize;
+        uint rowStartOffset = i * m_inputSize + m_parametersStartOffset;
         for (uint j = 0; j < modWorkGroupSize; j += WORKGROUP_SIZE)
         {
             float b = cachedInput[gl_LocalInvocationID.x + j];

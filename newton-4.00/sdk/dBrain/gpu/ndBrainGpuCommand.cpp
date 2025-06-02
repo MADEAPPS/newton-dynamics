@@ -19,7 +19,7 @@
 
 #if defined (D_USE_VULKAN_SDK)
 
-ndBrainGpuCommand::ndBrainGpuCommand(ndBrainGpuContext* const context, size_t id)
+ndBrainGpuCommand::ndBrainGpuCommand(ndBrainGpuContext* const context)
 	:ndContainersFreeListAlloc<ndBrainGpuCommand>()
 	,m_context(context)
 	,m_pipeline(VK_NULL_HANDLE)
@@ -27,7 +27,6 @@ ndBrainGpuCommand::ndBrainGpuCommand(ndBrainGpuContext* const context, size_t id
 	,m_commandBuffer(VK_NULL_HANDLE)
 	,m_pipelineLayout(VK_NULL_HANDLE)
 	,m_descriptorSetLayout(VK_NULL_HANDLE)
-	,m_id (id)
 {
 }
 

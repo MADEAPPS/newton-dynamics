@@ -45,9 +45,8 @@ class ndBrainGpuCommand : public ndContainersFreeListAlloc<ndBrainGpuCommand>
 	public:
 	virtual ~ndBrainGpuCommand();
 
-	size_t GetId() const { return m_id; }
 	protected:
-	ndBrainGpuCommand(ndBrainGpuContext* const context, size_t id);
+	ndBrainGpuCommand(ndBrainGpuContext* const context);
 	void Assembly(void* const shader, ndInt32 workGroups, ndInt32 paramCount, ndBrainGpuBuffer** params);
 
 	ndBrainGpuContext* m_context;
@@ -56,7 +55,6 @@ class ndBrainGpuCommand : public ndContainersFreeListAlloc<ndBrainGpuCommand>
 	VkCommandBuffer m_commandBuffer;
 	VkPipelineLayout m_pipelineLayout;
 	VkDescriptorSetLayout m_descriptorSetLayout;
-	size_t m_id;
 
 	friend class ndBrainGpuContext;
 };

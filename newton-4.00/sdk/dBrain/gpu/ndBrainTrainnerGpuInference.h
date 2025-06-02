@@ -31,42 +31,60 @@
 class ndBrain;
 class ndBrainLoss;
 class ndBrainLayer;
+class ndBrainTrainnerGpuInference;
+
+class ndBrainTrainerGpuCommand : public ndBrainGpuCommand
+{
+	public:
+	ndBrainTrainerGpuCommand(ndBrainTrainnerGpuInference* const owner,
+		const ndBrainLayer::ndCommandShareInfo& info, size_t m_id,
+		ndBrainGpuContext* const context,
+		ndVulkanShader m_shader,
+		ndInt32 numberOfinputs,
+		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
+		ndBrainGpuBuffer* const buffer1,
+		ndBrainGpuBuffer* const buffer2);
+
+	ndSharedPtr<ndBrainGpuBuffer> m_uniformBuffer;
+	ndBrainLayer::ndCommandShareInfo m_info;
+	ndBrainTrainnerGpuInference* m_owner;
+	size_t m_id;
+};
+
+//class ndBrainLayerFeedFowardGpuCommand : public ndBrainTrainerGpuCommand
+//{
+//	public:
+//	//ndBrainLayerFeedFowardGpuCommand(const ndBrainLayer* const layer)
+//	ndBrainLayerFeedFowardGpuCommand(const ndBrainLayer::ndCommandShareInfo& info, size_t m_id,
+//			ndBrainGpuContext* const context,
+//			ndVulkanShader m_shader,
+//			ndInt32 numberOfinputs,
+//			const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
+//			ndBrainGpuBuffer* const buffer1,
+//			ndBrainGpuBuffer* const buffer2
+//		:ndBrainTrainerGpuCommand(info, m_id,
+//			context,
+//			//ndVulkanShader m_shader,
+//			numberOfinputs,
+//			uniformBuffer,
+//			buffer1,
+//			buffer2
+//		)
+//		,m_layer(layer)
+//	{
+//	}
+//
+//	//virtual void Execute(ndInt32 miniBatchIndex)
+//	//{
+//	//	ndAssert(0);
+//	//	//m_layer->FeedForward(this, miniBatchIndex);
+//	//}
+//	const ndBrainLayer* m_layer;
+//};
 
 class ndBrainTrainnerGpuInference: public ndBrainTrainer
 {
 	public: 
-	class ndUniformBufferObject
-	{
-		public:
-		ndUniformBufferObject()
-			:m_inputSize(0)
-			,m_outputSize(0)
-			,m_parametersStartOffset(0)
-			,m_inputOutputSize(0)
-			,m_inputOutputStartOffset(0)
-		{
-		}
-
-		ndUnsigned32 m_inputSize;
-		ndUnsigned32 m_outputSize;
-		ndUnsigned32 m_parametersStartOffset;
-		ndUnsigned32 m_inputOutputSize;
-		ndUnsigned32 m_inputOutputStartOffset;
-	};
-
-	class ndGpuCommand : public ndBrainGpuCommand
-	{
-		public:
-		ndGpuCommand(ndBrainGpuContext* const context,
-			ndVulkanShader m_shader,
-			ndInt32 numberOfinputs,
-			const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
-			ndBrainGpuBuffer* const buffer1,
-			ndBrainGpuBuffer* const buffer2, size_t id);
-
-		ndSharedPtr<ndBrainGpuBuffer> m_uniformBuffer;
-	};
-
 	ndBrainTrainnerGpuInference(
 		const ndSharedPtr<ndBrain>& brain, 
 		const ndSharedPtr<ndBrainContext>& context, 
@@ -100,10 +118,10 @@ class ndBrainTrainnerGpuInference: public ndBrainTrainer
 	void AddCopyOutputCommand();
 	void InitInputOutputBuffer();
 	void InitWeightAndBiasBuffer();
-	ndBrainGpuCommand* FindCommand(size_t id) const;
-	void AddCopyInputCommand(const ndLayerUniformDataGpu& uniformData);
+	ndBrainTrainerGpuCommand* FindCommand(size_t id) const;
+	void AddCopyInputCommand(const ndBrainLayer::ndCommandShareInfo& uniformData);
 	void UnloadBuffer(ndBrainVector& ouput, const ndSharedPtr<ndBrainGpuBuffer>& gpuBuffer) const;
-	void AddLayersCommands(ndFixSizeArray<ndLayerUniformDataGpu, 256>& layersUniformsData);
+	void AddLayersCommands(ndFixSizeArray<ndBrainLayer::ndCommandShareInfo, 256>& layersUniformsData);
 
 	ndBrainGpuContext* m_context;
 	ndSharedPtr<ndBrainContext> m_contextRef;
@@ -111,7 +129,7 @@ class ndBrainTrainnerGpuInference: public ndBrainTrainer
 	ndSharedPtr<ndBrainGpuBuffer> m_weightAndBiasBuffer;
 	ndSharedPtr<ndBrainGpuBuffer> m_miniBatchInputBuffer;
 	ndSharedPtr<ndBrainGpuBuffer> m_miniBatchOutputBuffer;
-	ndList<ndSharedPtr<ndBrainGpuCommand>> m_feedFowardCommands;
+	ndList<ndSharedPtr<ndBrainTrainerGpuCommand>> m_feedFowardCommands;
 	ndInt32 m_miniBatchSize;
 };
 
