@@ -44,13 +44,13 @@ include_directories(../../thirdParty/glfw/include/)
 include_directories(../../thirdParty/imgui/backends)
 include_directories(../../thirdParty/glatter/include/glatter/)
 include_directories(../../thirdParty/hacd/src/VHACD_Lib/public/)
-include_directories(../../thirdParty/openalRuntime/win32sdk/include)
 
 if(NEWTON_ENABLE_VULKAN_SDK)
 	include_directories(../../sdk/dBrain/dVulkan)
 	include_directories ($ENV{VULKAN_SDK}/Include)
 elseif(NEWTON_ENABLE_OPENCL_SDK)
-	message (FATAL_ERROR "opencl not ready yet")
+	include_directories(../../thirdParty/opencl/OpenCL-SDK-v2024.10.24-Win-x64)
+	include_directories(../../sdk/dBrain/dOpencl)
 else()
 	include_directories(../../sdk/dBrain/cpuEmulation)
 endif()
@@ -84,20 +84,6 @@ if(MSVC OR MINGW)
 		endif()
 	endif(NEWTON_ENABLE_CUDA_SOLVER)
 
-	if (PTR_SIZE EQUAL 8)
-		target_link_libraries (${projectName} ${CMAKE_SOURCE_DIR}/thirdParty/openalRuntime/win64sdk/lib/OpenAL_32.lib)
-		add_custom_command(
-			TARGET ${projectName} POST_BUILD
-			COMMAND ${CMAKE_COMMAND}
-			ARGS -E copy ${CMAKE_SOURCE_DIR}/thirdParty/openalRuntime/win64sdk/bin/OpenAL_32.dll ${PROJECT_BINARY_DIR}/applications/ndSandbox/${CMAKE_CFG_INTDIR})
-	else()
-		target_link_libraries (${projectName} ${CMAKE_SOURCE_DIR}/thirdParty/openalRuntime/win32sdk/lib/OpenAL_32.lib)
-		add_custom_command(
-			TARGET ${projectName} POST_BUILD
-			COMMAND ${CMAKE_COMMAND}
-			ARGS -E copy ${CMAKE_SOURCE_DIR}/thirdParty/openalRuntime/win32sdk/bin/OpenAL_32.dll ${PROJECT_BINARY_DIR}/applications/ndSandbox/${CMAKE_CFG_INTDIR})
-	endif()
-
     target_link_libraries (${projectName} glu32 opengl32)
 
 	target_link_options(${projectName} PUBLIC "/DEBUG") 
@@ -110,8 +96,6 @@ if(MSVC OR MINGW)
 endif()
 
 if(UNIX)
-	target_link_libraries (${projectName} GL GLU dl X11 pthread openal)
-
 	if(NEWTON_ENABLE_VULKAN_SDK)
 		target_link_libraries (${projectName} vulkan)
 	endif(NEWTON_ENABLE_VULKAN_SDK)

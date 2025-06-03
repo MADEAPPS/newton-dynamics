@@ -76,6 +76,8 @@ endif()
 
 if (NEWTON_ENABLE_VULKAN_SDK)
 	add_definitions(-DD_USE_VULKAN_SDK)
+elseif(NEWTON_ENABLE_OPENCL_SDK)
+	add_definitions(-DD_USE_OPENCL_SDK)
 endif()
 
 if (X86 AND NEWTON_ENABLE_AVX2)

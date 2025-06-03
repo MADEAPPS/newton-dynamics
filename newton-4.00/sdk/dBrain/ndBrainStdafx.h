@@ -30,6 +30,11 @@
 	#include <vulkan/vulkan.h>
 #endif
 
+#ifdef D_USE_OPENCL_SDK
+	//#include <vulkan/vulkan.h>
+#endif
+
+
 typedef ndReal ndBrainFloat;
 
 
