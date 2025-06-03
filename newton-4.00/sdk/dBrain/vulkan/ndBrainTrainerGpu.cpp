@@ -112,7 +112,8 @@ void ndBrainTrainerGpu::SubmitBackwardCommands()
 	//}
 }
 
-void ndBrainTrainerGpu::BackPropagate(const ndBrainVector& outputGradients)
+//void ndBrainTrainerGpu::BackPropagate(const ndBrainVector& outputGradients)
+void ndBrainTrainerGpu::BackPropagate(const ndBrainVector&)
 {
 	ndAssert(0);
 	//m_context->BeginQueue();

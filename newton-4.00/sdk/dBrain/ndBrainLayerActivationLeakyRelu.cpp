@@ -22,7 +22,7 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
 #include "ndBrainSimdFloat8.h"
-#include "gpu/ndBrainGpuContext.h"
+#include "vulkan/ndBrainGpuContext.h"
 #include "ndBrainLayerActivationLeakyRelu.h"
 
 ndBrainLayerActivationLeakyRelu::ndBrainLayerActivationLeakyRelu(ndInt32 neurons)

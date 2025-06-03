@@ -23,13 +23,13 @@
 #include "ndBrainSaveLoad.h"
 #include "ndBrainTrainerCpu.h"
 #include "ndBrainLayerLinear.h"
-#include "gpu/ndBrainGpuBuffer.h"
-#include "gpu/ndBrainGpuCommand.h"
-#include "gpu/ndBrainGpuContext.h"
-#include "gpu/ndBrainGpuFloatBuffer.h"
-#include "gpu/ndBrainGpuIntegerBuffer.h"
-#include "gpu/ndBrainGpuUniformBuffer.h"
-#include "gpu/ndBrainTrainerGpuInference.h"
+#include "vulkan/ndBrainGpuBuffer.h"
+#include "vulkan/ndBrainGpuCommand.h"
+#include "vulkan/ndBrainGpuContext.h"
+#include "vulkan/ndBrainGpuFloatBuffer.h"
+#include "vulkan/ndBrainGpuIntegerBuffer.h"
+#include "vulkan/ndBrainGpuUniformBuffer.h"
+#include "vulkan/ndBrainTrainerGpuInference.h"
 
 ndBrainLayerLinear::ndBrainLayerLinear(ndInt32 inputs, ndInt32 outputs)
 	:ndBrainLayer()

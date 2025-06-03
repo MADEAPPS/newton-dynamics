@@ -22,10 +22,10 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
 #include "ndBrainTrainerCpu.h"
-#include "gpu/ndBrainGpuContext.h"
+#include "vulkan/ndBrainGpuContext.h"
 #include "ndBrainTrainerCpuInference.h"
 #include "ndBrainLayerActivationSoftmax.h"
-#include "gpu/ndBrainTrainerGpuInference.h"
+#include "vulkan/ndBrainTrainerGpuInference.h"
 
 ndBrainLayerActivationSoftmax::ndBrainLayerActivationSoftmax(ndInt32 neurons)
 	:ndBrainLayerActivation(neurons)

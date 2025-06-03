@@ -23,19 +23,17 @@ class ndBrainGpuUniformBuffer;
 class ndBrainGpuCommand : public ndClassAlloc
 {
 	public:
-	ndBrainGpuCommand(ndBrainGpuContext* const context, size_t id)
+	ndBrainGpuCommand(ndBrainGpuContext* const context)
 		:m_context(context)
 		,m_id(id)
 	{
 	}
 	virtual ~ndBrainGpuCommand(){}
 
-	size_t GetId() const { return m_id; }
 	void Assembly(void*, ndInt32, ndInt32, ndBrainGpuBuffer**) {}
 
 	protected:
 	ndBrainGpuContext* m_context;
-	size_t m_id;
 };
 
 #else

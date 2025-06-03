@@ -24,7 +24,7 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainTrainer.h"
-#include "gpu/ndBrainGpuContext.h"
+#include "vulkan/ndBrainGpuContext.h"
 
 class ndBrainLoad;
 class ndBrainSave;

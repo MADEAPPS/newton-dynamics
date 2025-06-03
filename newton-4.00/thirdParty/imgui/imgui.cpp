@@ -5232,7 +5232,7 @@ ImVec2 ImGui::CalcTextSize(const char* text, const char* text_end, bool hide_tex
     // FIXME: This has been here since Dec 2015 (7b0bf230) but down the line we want this out.
     // FIXME: Investigate using ceilf or e.g.
     // - https://git.musl-libc.org/cgit/musl/tree/src/math/ceilf.c
-    // - https://embarkstudios.github.io/rust-gpu/api/src/libm/math/ceilf.rs.html
+    // - https://embarkstudios.github.io/rust-vulkan/api/src/libm/math/ceilf.rs.html
     text_size.x = IM_FLOOR(text_size.x + 0.99999f);
 
     return text_size;

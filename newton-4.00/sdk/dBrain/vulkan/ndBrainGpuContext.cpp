@@ -318,7 +318,7 @@ void ndBrainGpuContext::CreatePhysicalDevice()
 	CheckResultVulkan(vkEnumeratePhysicalDevices(m_instance, &gpuCount, &gpus[0]));
 
 	// If a number >1 of GPUs got reported, find discrete GPU if present, or use first one available. This covers
-	// most common cases (multi-gpu/integrated+dedicated graphics). Handling more complicated setups (multiple
+	// most common cases (multi-vulkan/integrated+dedicated graphics). Handling more complicated setups (multiple
 	// dedicated GPUs) is out of scope of this sample.
 	ndInt32 use_gpu = 0;
 	for (ndInt32 i = 0; i < ndInt32(gpuCount); i++)

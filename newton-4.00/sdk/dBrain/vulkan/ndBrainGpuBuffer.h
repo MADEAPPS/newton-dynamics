@@ -17,7 +17,7 @@ class ndBrainVector;
 class ndBrainGpuContext;
 class ndBrainGpuBuffer;
 
-#define ND_GPU_BUFFER_ALIGNMENT	32
+//#define ND_GPU_BUFFER_ALIGNMENT	32
 
 
 enum ndStorageBufferType

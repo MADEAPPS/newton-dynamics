@@ -21,7 +21,7 @@ if(NEWTON_ENABLE_VULKAN_SDK)
 	include_directories ($ENV{VULKAN_SDK}/Include)
 endif()
 
-file(GLOB CPP_SOURCE *.cpp gpu/*.cpp *.h gpu/*.h)
+file(GLOB CPP_SOURCE *.cpp vulkan/*.cpp *.h vulkan/*.h)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 add_library(${projectName} STATIC ${CPP_SOURCE})

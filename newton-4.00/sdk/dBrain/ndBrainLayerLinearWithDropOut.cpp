@@ -23,7 +23,7 @@
 #include "ndBrainSaveLoad.h"
 #include "ndBrainTrainerCpu.h"
 #include "ndBrainLayerLinearWithDropOut.h"
-#include "gpu/ndBrainTrainerGpuInference.h"
+#include "vulkan/ndBrainTrainerGpuInference.h"
 
 ndBrainLayerLinearWithDropOut::ndBrainLayerLinearWithDropOut(ndInt32 neurons)
 	:ndBrainLayerActivation(neurons)

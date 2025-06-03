@@ -27,9 +27,8 @@ class ndBrainGpuContext : public ndBrainContext
 	virtual ~ndBrainGpuContext();
 	virtual ndContextType GetType() const override;
 
-	void BeginQueue() {}
+	void SyncQueue() {}
 	void AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>&) {}
-	void EndQueue() {}
 
 	ndInt32 GetSubGroupSize() const { return 0; }
 	static bool HasGpuSupport() { return false; }
@@ -80,8 +79,8 @@ class ndBrainGpuContext : public ndBrainContext
 	VkAllocationCallbacks* GetAllocator() const;
 	VkPhysicalDevice GetPhysicalDevice() const;
 
-	void AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& command);
 	void SyncQueue();
+	void AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& command);
 	
 	static void CheckResultVulkan(VkResult err);
 
