@@ -47,5 +47,8 @@ class ndBrainGpuContext : public ndBrainContext
 		};
 		ndBrainGpuShader m_modules[128];
 	};
+
+	cl::Device m_device;
+	bool m_devicedInitialized;
 };
 #endif
