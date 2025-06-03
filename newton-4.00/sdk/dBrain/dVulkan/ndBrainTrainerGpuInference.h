@@ -39,7 +39,7 @@ class ndBrainTrainerGpuCommand : public ndBrainGpuCommand
 	ndBrainTrainerGpuCommand(ndBrainTrainerGpuInference* const owner,
 		const ndBrainLayer::ndCommandShareInfo& info, size_t m_id,
 		ndBrainGpuContext* const context,
-		ndVulkanShader m_shader,
+		ndBrainGpuShader m_shader,
 		ndInt32 numberOfinputs,
 		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
 		ndBrainGpuBuffer* const buffer1,

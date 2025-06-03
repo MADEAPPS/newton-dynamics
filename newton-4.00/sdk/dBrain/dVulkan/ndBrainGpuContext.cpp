@@ -480,7 +480,7 @@ void ndBrainGpuContext::GetShaderFileName(const char* const name, char* const ou
 #endif
 }
 
-ndVulkanShader ndBrainGpuContext::LoadShaderProgram(const char* const name)
+ndBrainGpuShader ndBrainGpuContext::LoadShaderProgram(const char* const name)
 {
 	ndFixSizeArray<char, 1024 * 64> code;
 	auto LoadShaderCode = [this, &code](const char* const name)
@@ -516,14 +516,14 @@ ndVulkanShader ndBrainGpuContext::LoadShaderProgram(const char* const name)
 	createInfo.pCode = (uint32_t*)&code[0];
 	createInfo.codeSize = size_t(code.GetCount());
 
-	ndVulkanShader computeShaderModule;
+	ndBrainGpuShader computeShaderModule;
 	CheckResultVulkan(vkCreateShaderModule(m_device, &createInfo, m_allocator, &computeShaderModule));
 	return computeShaderModule;
 }
 
 void ndBrainGpuContext::LoadShaderPrograms()
 {
-	ndVulkanShader clean (VK_NULL_HANDLE);
+	ndBrainGpuShader clean (VK_NULL_HANDLE);
 	ndMemSet(m_modules, clean, sizeof(m_modules) / sizeof(m_modules[0]));
 
 	m_ndBrainCopyInput = LoadShaderProgram("ndBrainCopyInput-comp.spv");

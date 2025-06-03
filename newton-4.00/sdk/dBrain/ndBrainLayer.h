@@ -92,7 +92,7 @@ class ndBrainLayer : public ndClassAlloc
 	//	{
 	//	}
 	//
-	//	ndVulkanShader m_shader;
+	//	ndBrainGpuShader m_shader;
 	//	ndInt32 m_inputSize;
 	//	ndInt32 m_outputSize;
 	//	ndInt32 m_parametersSize;

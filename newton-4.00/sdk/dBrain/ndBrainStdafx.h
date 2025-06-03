@@ -31,7 +31,7 @@
 #endif
 
 #ifdef D_USE_OPENCL_SDK
-	//#include <vulkan/vulkan.h>
+	#include <CL/opencl.hpp>
 #endif
 
 

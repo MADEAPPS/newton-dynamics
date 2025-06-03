@@ -17,7 +17,7 @@
 class ndBrainGpuCommand;
 class ndBrainGpuFloatBuffer;
 
-typedef VkShaderModule ndVulkanShader;
+typedef VkShaderModule ndBrainGpuShader;
 
 class ndBrainGpuContext : public ndBrainContext
 {
@@ -60,7 +60,7 @@ class ndBrainGpuContext : public ndBrainContext
 	void CreateDescriptorPool();
 	void CreateFence();
 	void LoadShaderPrograms();
-	ndVulkanShader LoadShaderProgram(const char* const name);
+	ndBrainGpuShader LoadShaderProgram(const char* const name);
 	void GetShaderFileName(const char* const name, char* const outPathName);
 
 	static void VulkanFree(void* pUserData, void* memory);
@@ -93,16 +93,16 @@ class ndBrainGpuContext : public ndBrainContext
 	{
 		struct
 		{
-			ndVulkanShader m_ndBrainCopyInput;
-			ndVulkanShader m_ndBrainCopyOutput;
-			ndVulkanShader m_ndBrainLayerLinear;
-			ndVulkanShader m_ndBrainCopyOutputGradients;
-			ndVulkanShader m_ndBrainLayerReluActivation;
-			ndVulkanShader m_ndBrainLayerTanhActivation;
-			ndVulkanShader m_ndBrainLayerSoftmaxActivation;
-			ndVulkanShader m_ndBrainLayerLinearDropOutActivation;
+			ndBrainGpuShader m_ndBrainCopyInput;
+			ndBrainGpuShader m_ndBrainCopyOutput;
+			ndBrainGpuShader m_ndBrainLayerLinear;
+			ndBrainGpuShader m_ndBrainCopyOutputGradients;
+			ndBrainGpuShader m_ndBrainLayerReluActivation;
+			ndBrainGpuShader m_ndBrainLayerTanhActivation;
+			ndBrainGpuShader m_ndBrainLayerSoftmaxActivation;
+			ndBrainGpuShader m_ndBrainLayerLinearDropOutActivation;
 		};
-		ndVulkanShader m_modules[128];
+		ndBrainGpuShader m_modules[128];
 	};
 
 	ndInt32 m_subGroupSize;

@@ -25,7 +25,12 @@ ndBrainGpuContext::~ndBrainGpuContext()
 {
 }
 
+bool ndBrainGpuContext::HasGpuSupport() 
+{ 
+	return true; 
+}
+
 ndBrainContext::ndContextType ndBrainGpuContext::GetType() const
 {
-	return ndBrainContext::m_cpu;
+	return ndBrainContext::m_gpu;
 }
