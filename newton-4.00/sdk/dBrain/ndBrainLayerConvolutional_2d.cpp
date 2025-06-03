@@ -22,12 +22,12 @@
 #include "ndBrainStdafx.h"
 //#include "ndBrainFloat4.h"
 #include "ndBrainSaveLoad.h"
-#include "vulkan/ndBrainGpuBuffer.h"
-#include "vulkan/ndBrainGpuBuffer.h"
-#include "vulkan/ndBrainGpuCommand.h"
-#include "vulkan/ndBrainGpuFloatBuffer.h"
-#include "vulkan/ndBrainGpuIntegerBuffer.h"
-#include "vulkan/ndBrainGpuUniformBuffer.h"
+#include "ndBrainGpuBuffer.h"
+#include "ndBrainGpuBuffer.h"
+#include "ndBrainGpuCommand.h"
+#include "ndBrainGpuFloatBuffer.h"
+#include "ndBrainGpuIntegerBuffer.h"
+#include "ndBrainGpuUniformBuffer.h"
 #include "ndBrainLayerConvolutional_2d.h"
 
 ndBrainLayerConvolutional_2d::ndBrainLayerConvolutional_2d(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth, ndInt32 kernelSize, ndInt32 numberOfKernels)

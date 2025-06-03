@@ -15,8 +15,6 @@
 #include "ndBrainGpuContext.h"
 #include "ndBrainGpuScopeMapBuffer.h"
 
-#if defined (D_USE_VULKAN_SDK)
-
 ndInt64 ndBrainGpuBuffer::m_memoryUsed = 0;
 
 ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt64 sizeInByte, ndStorageBufferType bufferTypeFlags, ndDeviceBufferType deviceType)
@@ -104,6 +102,3 @@ size_t ndBrainGpuBuffer::SizeInBytes() const
 {
 	return m_sizeInBytes;
 }
-#endif
-
-

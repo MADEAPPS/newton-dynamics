@@ -28,42 +28,9 @@ ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainGpuContext* const contex
 void ndBrainGpuIntegerBuffer::LoadData(const ndArray<ndInt32>& input)
 {
 	input.GetCount();
-#if defined (D_USE_VULKAN_SDK)
-	if (m_deviceBufferType == ndCpuMappable)
-	{
-		ndScopeMapBuffer mapBuffer(*this);
-		ndInt32* const dst = (ndInt32*)mapBuffer.GetPointer();
-		if (dst)
-		{
-			size_t size = m_sizeInBytes / sizeof(ndInt32);
-			ndAssert(size == size_t(input.GetCount()));
-
-			for (ndInt64 i = 0; i < ndInt64(size); ++i)
-			{
-				dst[i] = input[i];
-			}
-		}
-	}
-#endif
 }
 
 void ndBrainGpuIntegerBuffer::UnloadData(ndArray<ndInt32>& output)
 {
 	output.GetCount();
-#if defined (D_USE_VULKAN_SDK)
-	if (m_deviceBufferType == ndCpuMappable)
-	{
-		ndScopeMapBuffer mapBuffer(*this);
-		const ndInt32* const src = (ndInt32*)mapBuffer.GetPointer();
-		if (src)
-		{
-			size_t size = m_sizeInBytes / sizeof(ndInt32);
-			output.SetCount(ndInt64(size));
-			for (ndInt64 i = 0; i < ndInt64(size); ++i)
-			{
-				output[i] = src[i];
-			}
-		}
-	}
-#endif
 }

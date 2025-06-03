@@ -18,10 +18,16 @@ include_directories(../dCore)
 include_directories(../../thirdParty/png)
 
 if(NEWTON_ENABLE_VULKAN_SDK)
+	include_directories(dVulkan)
 	include_directories ($ENV{VULKAN_SDK}/Include)
+	file(GLOB CPP_SOURCE *.cpp dVulkan/*.cpp *.h dVulkan/*.h)
+elseif(NEWTON_ENABLE_OPENCL_SDK)
+	message (FATAL_ERROR "opencl not ready yet")
+else()
+	include_directories(../../sdk/dBrain/cpuEmulation)
+	file(GLOB CPP_SOURCE *.cpp cpuEmulation/*.cpp *.h cpuEmulation/*.h)
 endif()
 
-file(GLOB CPP_SOURCE *.cpp vulkan/*.cpp *.h vulkan/*.h)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 add_library(${projectName} STATIC ${CPP_SOURCE})

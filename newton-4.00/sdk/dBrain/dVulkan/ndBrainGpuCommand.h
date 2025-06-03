@@ -18,26 +18,6 @@ class ndBrainGpuBuffer;
 class ndBrainGpuFloatBuffer;
 class ndBrainGpuUniformBuffer;
 
-#if !defined (D_USE_VULKAN_SDK)
-
-class ndBrainGpuCommand : public ndClassAlloc
-{
-	public:
-	ndBrainGpuCommand(ndBrainGpuContext* const context)
-		:m_context(context)
-		,m_id(id)
-	{
-	}
-	virtual ~ndBrainGpuCommand(){}
-
-	void Assembly(void*, ndInt32, ndInt32, ndBrainGpuBuffer**) {}
-
-	protected:
-	ndBrainGpuContext* m_context;
-};
-
-#else
-
 class ndBrainGpuCommand : public ndContainersFreeListAlloc<ndBrainGpuCommand>
 {
 	public:
@@ -56,6 +36,4 @@ class ndBrainGpuCommand : public ndContainersFreeListAlloc<ndBrainGpuCommand>
 
 	friend class ndBrainGpuContext;
 };
-
-#endif
 #endif

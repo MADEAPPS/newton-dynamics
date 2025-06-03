@@ -47,7 +47,12 @@ include_directories(../../thirdParty/hacd/src/VHACD_Lib/public/)
 include_directories(../../thirdParty/openalRuntime/win32sdk/include)
 
 if(NEWTON_ENABLE_VULKAN_SDK)
+	include_directories(../../sdk/dBrain/dVulkan)
 	include_directories ($ENV{VULKAN_SDK}/Include)
+elseif(NEWTON_ENABLE_OPENCL_SDK)
+	message (FATAL_ERROR "opencl not ready yet")
+else()
+	include_directories(../../sdk/dBrain/cpuEmulation)
 endif()
 
 add_executable(${projectName} ${CPP_SOURCE})

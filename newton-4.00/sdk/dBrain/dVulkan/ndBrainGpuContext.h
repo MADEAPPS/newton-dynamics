@@ -17,41 +17,6 @@
 class ndBrainGpuCommand;
 class ndBrainGpuFloatBuffer;
 
-#if !defined (D_USE_VULKAN_SDK)
-typedef void* ndVulkanShader;
-
-class ndBrainGpuContext : public ndBrainContext
-{
-	public:
-	ndBrainGpuContext();
-	virtual ~ndBrainGpuContext();
-	virtual ndContextType GetType() const override;
-
-	void SyncQueue() {}
-	void AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>&) {}
-
-	ndInt32 GetSubGroupSize() const { return 0; }
-	static bool HasGpuSupport() { return false; }
-
-	union
-	{
-		struct
-		{
-			ndVulkanShader m_ndBrainCopyInput;
-			ndVulkanShader m_ndBrainCopyOutput;
-			ndVulkanShader m_ndBrainLayerLinear;
-			ndVulkanShader m_ndBrainCopyOutputGradients;
-			ndVulkanShader m_ndBrainLayerReluActivation;
-			ndVulkanShader m_ndBrainLayerTanhActivation;
-			ndVulkanShader m_ndBrainLayerSoftmaxActivation;
-			ndVulkanShader m_ndBrainLayerLinearDropOutActivation;
-		};
-		ndVulkanShader m_modules[128];
-	};
-};
-
-#else
-
 typedef VkShaderModule ndVulkanShader;
 
 class ndBrainGpuContext : public ndBrainContext
@@ -149,8 +114,5 @@ class ndBrainGpuContext : public ndBrainContext
 
 	friend class ndBrainGpuCommand;
 };
-
-#endif
-
 
 #endif

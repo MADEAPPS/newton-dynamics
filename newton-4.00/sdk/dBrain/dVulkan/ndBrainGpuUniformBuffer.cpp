@@ -25,8 +25,6 @@ ndBrainGpuUniformBuffer::ndBrainGpuUniformBuffer(ndBrainGpuContext* const contex
 	LoadData(size_t(sizeInBytes), data);
 }
 
-
-#if defined (D_USE_VULKAN_SDK)
 void ndBrainGpuUniformBuffer::UnloadData(size_t sizeInBytes, void* const outputData) const
 {
 	ndAssert(m_deviceBufferType == ndCpuMappable);
@@ -53,14 +51,3 @@ void ndBrainGpuUniformBuffer::LoadData(size_t sizeInBytes, const void* const inp
 	}
 }
 
-#else
-
-void ndBrainGpuUniformBuffer::UnloadData(size_t, void* const) const
-{
-}
-
-void ndBrainGpuUniformBuffer::LoadData(size_t, const void* const)
-{
-}
-
-#endif

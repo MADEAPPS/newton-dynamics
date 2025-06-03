@@ -22,7 +22,7 @@
 #include "ndBrainStdafx.h"
 //#include "ndBrainFloat4.h"
 #include "ndBrainSaveLoad.h"
-#include "vulkan/ndBrainGpuContext.h"
+#include "ndBrainGpuContext.h"
 #include "ndBrainLayerActivationLinear.h"
 
 ndBrainLayerActivationLinear::ndBrainLayerActivationLinear(const ndBrainVector& slopes, const ndBrainVector& biases)

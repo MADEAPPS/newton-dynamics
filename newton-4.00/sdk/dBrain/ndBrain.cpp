@@ -24,7 +24,7 @@
 #include "ndBrainVector.h"
 #include "ndBrainTrainer.h"
 #include "ndBrainSaveLoad.h"
-#include "vulkan/ndBrainGpuContext.h"
+#include "ndBrainGpuContext.h"
 #include "ndBrainLossLeastSquaredError.h"
 
 ndBrain::ndBrain()

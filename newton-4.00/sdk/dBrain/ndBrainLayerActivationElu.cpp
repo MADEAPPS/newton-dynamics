@@ -20,8 +20,8 @@
 */
 
 #include "ndBrainStdafx.h"
-#include "vulkan/ndBrainGpuBuffer.h"
-#include "vulkan/ndBrainGpuContext.h"
+#include "ndBrainGpuBuffer.h"
+#include "ndBrainGpuContext.h"
 #include "ndBrainLayerActivationElu.h"
 
 ndBrainLayerActivationElu::ndBrainLayerActivationElu(ndInt32 neurons)

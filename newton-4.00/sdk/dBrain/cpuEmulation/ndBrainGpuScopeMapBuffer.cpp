@@ -18,20 +18,10 @@ ndScopeMapBuffer::ndScopeMapBuffer(const ndBrainGpuBuffer& buffer)
 	:m_mappedMemory(nullptr)
 	,m_buffer(&buffer)
 {
-#if defined (D_USE_VULKAN_SDK)
-	VkDevice const device = (VkDevice)m_buffer->m_context->GetDevice();
-
-	// Map the buffer memory, so that we can read from it on the CPU.
-	vkMapMemory(device, m_buffer->m_bufferMemory, 0, ndUnsigned32(m_buffer->m_sizeInBytes), 0, &m_mappedMemory);
-#endif
 }
 
 ndScopeMapBuffer::~ndScopeMapBuffer()
 {
-#if defined (D_USE_VULKAN_SDK)
-	VkDevice const device = (VkDevice)m_buffer->m_context->GetDevice();
-	vkUnmapMemory(device, m_buffer->m_bufferMemory);
-#endif
 }
 
 void* ndScopeMapBuffer::GetPointer() const

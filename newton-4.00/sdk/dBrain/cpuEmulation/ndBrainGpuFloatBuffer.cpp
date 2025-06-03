@@ -25,46 +25,6 @@ ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, c
 	LoadData(input.GetCount() * sizeof (ndReal),  & input[0]);
 }
 
-#if defined (D_USE_VULKAN_SDK)
-void ndBrainGpuFloatBuffer::LoadData(size_t sizeInBytes, const void* const inputData)
-{
-	if (m_deviceBufferType == ndCpuMappable)
-	{
-		ndScopeMapBuffer mapBuffer(*this);
-		ndReal* const dst = (ndReal*)mapBuffer.GetPointer();
-		if (dst)
-		{
-			ndAssert(sizeInBytes <= m_sizeInBytes);
-
-			const ndReal* const src = (ndReal*)inputData;
-			const size_t size = sizeInBytes / sizeof(ndReal);
-
-			ndBrainMemVector dstData(dst, ndInt64(size));
-			const ndBrainMemVector srcData(src, ndInt64(size));
-			dstData.Set(srcData);
-		}
-	}
-}
-
-void ndBrainGpuFloatBuffer::UnloadData(size_t sizeInBytes, void* const outputData) const
-{
-	if (m_deviceBufferType == ndCpuMappable)
-	{
-		ndScopeMapBuffer mapBuffer(*this);
-		const ndReal* const src = (ndReal*)mapBuffer.GetPointer();
-		if (src)
-		{
-			ndAssert(sizeInBytes <= m_sizeInBytes);
-
-			const size_t size = sizeInBytes / sizeof(ndReal);
-			const ndBrainMemVector srcData(src, ndInt64(size));
-			ndBrainMemVector dstData((ndReal*)outputData, ndInt64(size));
-			dstData.Set(srcData);
-		}
-	}
-}
-#else
-
 void ndBrainGpuFloatBuffer::LoadData(size_t, const void* const)
 {
 }
@@ -72,8 +32,3 @@ void ndBrainGpuFloatBuffer::LoadData(size_t, const void* const)
 void ndBrainGpuFloatBuffer::UnloadData(size_t, void* const) const
 {
 }
-
-#endif
-
-
-

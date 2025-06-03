@@ -68,15 +68,16 @@
 #include <ndBrainAgentContinuePolicyGradient_Trainer.h>
 #include <ndBrainAgentDeterministicPolicyGradient_Trainer.h>
 
-#include <vulkan/ndBrainGpuBuffer.h>
-#include <vulkan/ndBrainGpuCommand.h>
-#include <vulkan/ndBrainGpuContext.h>
-#include <vulkan/ndBrainTrainerGpu.h>
-#include <vulkan/ndBrainGpuFloatBuffer.h>
-#include <vulkan/ndBrainGpuIntegerBuffer.h>
-#include <vulkan/ndBrainGpuUniformBuffer.h>
-#include <vulkan/ndBrainGpuScopeMapBuffer.h>
-#include <vulkan/ndBrainTrainerGpuInference.h>
+// gpu support 
+#include <ndBrainGpuBuffer.h>
+#include <ndBrainGpuCommand.h>
+#include <ndBrainGpuContext.h>
+#include <ndBrainTrainerGpu.h>
+#include <ndBrainGpuFloatBuffer.h>
+#include <ndBrainGpuIntegerBuffer.h>
+#include <ndBrainGpuUniformBuffer.h>
+#include <ndBrainGpuScopeMapBuffer.h>
+#include <ndBrainTrainerGpuInference.h>
 
 #endif 
 

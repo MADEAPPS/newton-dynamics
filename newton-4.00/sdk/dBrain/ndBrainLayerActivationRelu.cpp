@@ -23,9 +23,9 @@
 #include "ndBrainSaveLoad.h"
 #include "ndBrainSimdFloat8.h"
 #include "ndBrainTrainerCpu.h"
-#include "vulkan/ndBrainGpuContext.h"
+#include "ndBrainGpuContext.h"
 #include "ndBrainLayerActivationRelu.h"
-#include "vulkan/ndBrainTrainerGpuInference.h"
+#include "ndBrainTrainerGpuInference.h"
 
 ndBrainLayerActivationRelu::ndBrainLayerActivationRelu(ndInt32 neurons)
 	:ndBrainLayerActivation(neurons)

@@ -17,8 +17,6 @@
 #include "ndBrainGpuIntegerBuffer.h"
 #include "ndBrainGpuUniformBuffer.h"
 
-#if defined (D_USE_VULKAN_SDK)
-
 ndBrainGpuCommand::ndBrainGpuCommand(ndBrainGpuContext* const context)
 	:ndContainersFreeListAlloc<ndBrainGpuCommand>()
 	,m_context(context)
@@ -190,4 +188,3 @@ void ndBrainGpuCommand::Assembly(void* const shaderHandle, ndInt32 workGroups, n
 
 	m_context->CheckResultVulkan(vkEndCommandBuffer(m_commandBuffer));
 }
-#endif

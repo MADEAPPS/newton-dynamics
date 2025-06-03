@@ -14,8 +14,6 @@
 #include "ndBrainGpuCommand.h"
 #include "ndBrainGpuContext.h"
 
-#if defined (D_USE_VULKAN_SDK)
-
 #define ND_SELECT_DISCRETE_GPU
 
 const char* ndBrainGpuContext::m_apiLayers[] =
@@ -572,21 +570,6 @@ void ndBrainGpuContext::SyncQueue()
 	m_displayList.SetCount(0);
 }
 
-#else
 
-ndBrainGpuContext::ndBrainGpuContext()
-	:ndBrainContext()
-{
-	ndMemSet(m_modules, (void*)nullptr, sizeof(m_modules) / sizeof(m_modules[0]));
-}
 
-ndBrainGpuContext::~ndBrainGpuContext()
-{
-}
 
-ndBrainContext::ndContextType ndBrainGpuContext::GetType() const
-{
-	return ndBrainContext::m_cpu;
-}
-
-#endif
