@@ -13,16 +13,6 @@
 #define WORKGROUP_SIZE 256
 layout (local_size_x = WORKGROUP_SIZE) in;
 
-//layout(std140, binding = 0) uniform UniformBufferObject 
-//{
-//    uint m_inputSize;
-//    uint m_outputSize;
-//    uint m_weightsStartOffset;
-//
-//    uint m_inputOutputSize;
-//    uint m_inputOutputStartOffset;
-//};
-
 layout(std140, binding = 0) uniform UniformBufferObject 
 {
     uint m_inputSize;
@@ -47,7 +37,6 @@ layout(std430, binding = 2) buffer dataBuffer2
 void main() 
 {
     uint dstBase = gl_WorkGroupID.x * m_outputSize;
-    //uint srcBase = gl_WorkGroupID.x * m_inputOutputSize + m_inputOutputStartOffset + m_inputSize;
     uint srcBase = gl_WorkGroupID.x * m_inputOutputSize + m_inputOutputStartOffset;
 
     uint iterations = m_outputSize / WORKGROUP_SIZE;
@@ -62,6 +51,5 @@ void main()
     {
         float a = m_inputOutputData[srcBase + modWorkGroupSize + gl_LocalInvocationID.x];
         m_ouputBuffer[dstBase + modWorkGroupSize + gl_LocalInvocationID.x] = a;
-        //m_ouputBuffer[dstBase + modWorkGroupSize + gl_LocalInvocationID.x] = gl_LocalInvocationID.x;
     }
 }

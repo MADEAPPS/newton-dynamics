@@ -146,7 +146,8 @@ void ndBrainGpuCommand::Assembly(void* const shaderHandle, ndInt32 workGroups, n
 	}
 	vkCmdPipelineBarrier(
 		m_commandBuffer,
-		VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+		//VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+		VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
 		VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
 		0,
 		0, nullptr,

@@ -77,7 +77,7 @@ ndBrainTrainerGpu::~ndBrainTrainerGpu()
 
 void ndBrainTrainerGpu::AddCopyOutputGradientCommand()
 {
-	ndAssert(0);
+	//ndAssert(0);
 	//ndUniformBufferObject data;
 	//ndAssert(FindCommand(ndBrainTrainerGpuInference::m_outpuId));
 	//ndGpuCommand* const lastCommand = (ndGpuCommand*)FindCommand(m_outpuId);
@@ -114,8 +114,9 @@ void ndBrainTrainerGpu::SubmitBackwardCommands()
 
 void ndBrainTrainerGpu::BackPropagate(const ndBrainVector& outputGradients)
 {
-	m_context->BeginQueue();
-	m_miniBatchOutputGradientBuffer->LoadData(outputGradients.GetCount() * sizeof(ndReal), &outputGradients[0]);
-	SubmitBackwardCommands();
-	m_context->EndQueue();
+	ndAssert(0);
+	//m_context->BeginQueue();
+	//m_miniBatchOutputGradientBuffer->LoadData(outputGradients.GetCount() * sizeof(ndReal), &outputGradients[0]);
+	//SubmitBackwardCommands();
+	//m_context->EndQueue();
 }

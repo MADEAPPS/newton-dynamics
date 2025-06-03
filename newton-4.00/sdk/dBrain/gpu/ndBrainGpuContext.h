@@ -80,9 +80,8 @@ class ndBrainGpuContext : public ndBrainContext
 	VkAllocationCallbacks* GetAllocator() const;
 	VkPhysicalDevice GetPhysicalDevice() const;
 
-	void BeginQueue();
 	void AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& command);
-	void EndQueue();
+	void SyncQueue();
 	
 	static void CheckResultVulkan(VkResult err);
 

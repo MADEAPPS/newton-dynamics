@@ -400,9 +400,8 @@ void TestVulkanStuff()
 	parammeters.UnloadData(sizeof(UniformBufferObject), &uniformParam1);
 	
 	ndSharedPtr<ndBrainGpuCommand> command(new TestCommand(&context, ndInt32(input.GetCount()), parammeters, weightParamBuffer, inputOutputBuffer));
-	context.BeginQueue();
 	context.AddCommandQueue(command);
-	context.EndQueue();
+	context.SyncQueue();
 	
 	ndBrainVector outputGpu;
 	outputGpu.SetCount(workBuffer.GetCount());

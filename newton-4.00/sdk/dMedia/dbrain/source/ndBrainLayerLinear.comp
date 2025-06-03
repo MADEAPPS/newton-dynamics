@@ -44,12 +44,12 @@ layout(std430, binding = 2) buffer dataBuffer2
     float m_weightsAndBias[];
 };
 
-shared float cachedInput [1024];
-shared float cachedOutput [1024];
+shared float cachedInput [1024 * 2];
+shared float cachedOutput [1024 * 2];
 shared float reductionBuffer [WORKGROUP_SIZE / 2];
 
-// a matrix time a vector by interating over each row of the matrix 
-// calculating an dot product of that row time the vector and adding the bias value.
+// a matrix time a vector by iterating over each row of the matrix 
+// calculating the dot product of that row time the vector and adding the bias value.
 void main() 
 {
     uint biasOffset = m_outputSize * m_inputSize + m_parametersStartOffset;

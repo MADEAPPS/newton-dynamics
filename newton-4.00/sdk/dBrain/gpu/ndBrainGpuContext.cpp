@@ -537,17 +537,12 @@ void ndBrainGpuContext::LoadShaderPrograms()
 	m_ndBrainLayerLinearDropOutActivation = LoadShaderProgram("ndBrainLayerLinearDropOutActivation-comp.spv");
 }
 
-void ndBrainGpuContext::BeginQueue()
-{
-	m_displayList.SetCount(0);
-}
-
 void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& command)
 {
 	m_displayList.PushBack(command->m_commandBuffer);
 }
 
-void ndBrainGpuContext::EndQueue()
+void ndBrainGpuContext::SyncQueue()
 {
 	if (m_displayList.GetCount())
 	{
@@ -557,17 +552,24 @@ void ndBrainGpuContext::EndQueue()
 		submitInfo.pCommandBuffers = &m_displayList[0];
 		CheckResultVulkan(vkQueueSubmit(m_queue, uint32_t(1), &submitInfo, m_fence));
 
-		//ndInt32 xxx = 0;
-		//ndExpandTraceMessage("\nwait: ", xxx);
-		//while (vkGetFenceStatus(m_device, m_fence) != VK_SUCCESS)
-		//{
-		//	ndExpandTraceMessage("%d ", xxx);
-		//	xxx++;
-		//}
+#if 1
+		if (vkGetFenceStatus(m_device, m_fence) != VK_SUCCESS)
+		{
+			ndInt32 waits = 0;
+			ndExpandTraceMessage("wait: ", waits);
+			while (vkGetFenceStatus(m_device, m_fence) != VK_SUCCESS)
+			{
+				waits++;
+				ndExpandTraceMessage("%d ", waits);
+			}
+			ndExpandTraceMessage("\n");
+		}
+#endif
 
 		CheckResultVulkan(vkWaitForFences(m_device, uint32_t(1), &m_fence, VK_TRUE, 100000000000));
 		CheckResultVulkan(vkResetFences(m_device, 1, &m_fence));
 	}
+	m_displayList.SetCount(0);
 }
 
 #else
