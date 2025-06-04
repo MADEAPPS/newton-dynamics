@@ -13,6 +13,7 @@
 
 #include "ndBrainStdafx.h"
 
+#if 0
 class ndBrainGpuBuffer;
 
 class ndScopeMapBuffer
@@ -26,5 +27,5 @@ class ndScopeMapBuffer
 	void* m_mappedMemory;
 	const ndBrainGpuBuffer* m_buffer;
 };
-
+#endif
 #endif

@@ -14,6 +14,7 @@
 #include "ndBrainGpuContext.h"
 #include "ndBrainGpuScopeMapBuffer.h"
 
+#if 0
 ndScopeMapBuffer::ndScopeMapBuffer(const ndBrainGpuBuffer& buffer)
 	:m_mappedMemory(nullptr)
 	,m_buffer(&buffer)
@@ -28,3 +29,4 @@ void* ndScopeMapBuffer::GetPointer() const
 {
 	return m_mappedMemory;
 }
+#endif

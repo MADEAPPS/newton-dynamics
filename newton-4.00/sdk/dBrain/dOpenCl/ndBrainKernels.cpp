@@ -15,6 +15,8 @@
 const char* ndBrainGpuContext::m_kernelSource =
 R""""(
 
+    #define WORKGROUP_SIZE  256
+
     typedef struct
     {
         uint m_inputSize;
@@ -26,7 +28,7 @@ R""""(
 	    uint m_unused[4];
     }  UniformBufferObject ;
 
-    __kernel void brainCopyInput(__local const UniformBufferObject* parameters, __global float* inputBuffer, __global float* inputOutputData)
+    __kernel void brainCopyInput(__local const UniformBufferObject* parameters, __global float* inputOutputData, __global float* inputBuffer)
     {                                                                      
         size_t itemId = get_local_id(0);
         size_t groupId = get_group_id(0);
@@ -51,7 +53,7 @@ R""""(
         }
     }
 
-    __kernel void brainCopyOutput(__local const UniformBufferObject* parameters, __global float* outputBuffer, __global float* inputOutputData) 
+    __kernel void brainCopyOutput(__local const UniformBufferObject* parameters, __global float* inputOutputData, __global float* outputBuffer) 
     {
         size_t itemId = get_local_id(0);
         size_t groupId = get_group_id(0);
@@ -76,6 +78,95 @@ R""""(
         }
     }
 
+    // a matrix time a vector by iterating over each row of the matrix 
+    // calculating the dot product of that row time the vector and adding the bias value.
+    __kernel void brainLayerLinear(__local const UniformBufferObject* parameters, __global float* inputOutputData, __global float* weightsAndBias) 
+    {
+        __local float cachedInput [1024 * 2];
+        __local float cachedOutput [1024 * 2];
+        __local float reductionBuffer [WORKGROUP_SIZE / 2];
+
+        size_t itemId = get_local_id(0);
+        size_t groupId = get_group_id(0);
+        size_t workGroupSize = get_local_size(0);
+
+        size_t biasOffset = parameters->m_outputSize * parameters->m_inputSize + parameters->m_parametersStartOffset;
+        size_t inputOffset = groupId * parameters->m_inputOutputSize + parameters->m_inputOutputStartOffset;
+        size_t outputOffset = inputOffset + parameters->m_inputSize;
+        
+        size_t workGroupCount = parameters->m_inputSize / workGroupSize;
+        size_t modWorkGroupSize = workGroupCount * workGroupSize;
+        size_t reminderworkGroupSize = parameters->m_inputSize - modWorkGroupSize;
+
+        for (size_t i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            cachedInput[i + itemId] = inputOutputData[inputOffset + itemId + i];
+        }
+        if (itemId < reminderworkGroupSize)
+        {
+            cachedInput[modWorkGroupSize + itemId] = inputOutputData[inputOffset + modWorkGroupSize + itemId];
+        }
+        
+        size_t roundRowCount = parameters->m_outputSize / workGroupSize;
+        size_t modRowCount = roundRowCount * workGroupSize;
+        size_t reminderRowCount = parameters->m_outputSize - modRowCount;
+        for (size_t i = 0; i < modRowCount; i += workGroupSize)
+        {
+            cachedOutput[i + itemId] = weightsAndBias[biasOffset + itemId];
+        }
+        if (itemId < reminderRowCount)
+        {
+            cachedOutput[modRowCount + itemId] = weightsAndBias[biasOffset + modRowCount + itemId];
+        }
+        
+        for (size_t i = 0; i < parameters->m_outputSize; ++i)
+        {
+            float partialSum = 0.0f;
+            size_t rowStartOffset = i * parameters->m_inputSize + parameters->m_parametersStartOffset;
+            for (size_t j = 0; j < modWorkGroupSize; j += workGroupSize)
+            {
+                float b = cachedInput[itemId + j];
+                float a = weightsAndBias[rowStartOffset + itemId + j];
+                partialSum += a * b;
+            }
+            if (itemId < reminderworkGroupSize)
+            {
+                float b = cachedInput[modWorkGroupSize + itemId];
+                float a = weightsAndBias[rowStartOffset + modWorkGroupSize + itemId];
+                partialSum += a * b;
+            }
+            
+            for (size_t j = workGroupSize / 2; j > 0; j = j >> 1)
+            {
+                if ((itemId >= j) && (itemId < j * 2))
+                {
+                    reductionBuffer[itemId - j] = partialSum;
+                }
+                //memoryBarrierShared();
+                //barrier();
+                barrier(CLK_GLOBAL_MEM_FENCE); 
+                if (itemId < j)
+                {
+                    partialSum += reductionBuffer[itemId];
+                }
+            }
+            if (itemId == 0)
+            {
+                cachedOutput[i] += partialSum;
+            }
+        }
+        
+        for (size_t i = 0; i < modRowCount; i += workGroupSize)
+        {
+            inputOutputData[outputOffset + i + itemId] = cachedOutput[i + itemId];
+        }
+        if (itemId < reminderRowCount)
+        {
+            inputOutputData[outputOffset + modRowCount + itemId] = cachedOutput[modRowCount + itemId];
+        }
+    }
+
+
 )"""";
 
 
@@ -95,4 +186,5 @@ void ndBrainGpuContext::CreateKerners()
     ndAssert(errcode_ret == 0);
     m_ndBrainCopyInput = CreateKerner(program, "brainCopyInput");
     m_ndBrainCopyOutput = CreateKerner(program, "brainCopyOutput");
+    m_ndBrainLayerLinear = CreateKerner(program, "brainLayerLinear");
 }

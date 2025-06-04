@@ -17,7 +17,6 @@ class ndBrainVector;
 class ndBrainGpuContext;
 class ndBrainGpuBuffer;
 
-
 enum ndStorageBufferType
 {
 	ndStorageData,
@@ -33,10 +32,11 @@ enum ndDeviceBufferType
 class ndBrainGpuBuffer : public ndClassAlloc
 {
 	protected:
-	ndBrainGpuBuffer(ndBrainGpuContext* const, ndInt64, ndStorageBufferType, ndDeviceBufferType):m_sizeInBytes(0){}
+	ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt64 sizeInByte, ndStorageBufferType bufferTypeFlags, ndDeviceBufferType deviceType);
 
 	public:
-	virtual ~ndBrainGpuBuffer() {}
+	virtual ~ndBrainGpuBuffer();
+
 	void* GetBuffer() const { return nullptr;}
 	size_t SizeInBytes() const { return 0; }
 
@@ -44,8 +44,10 @@ class ndBrainGpuBuffer : public ndClassAlloc
 	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const = 0;
 
 	protected:
-	size_t  m_sizeInBytes;
-	friend class ndScopeMapBuffer;
+	cl::Buffer m_buffer;
+	ndBrainGpuContext* m_context;
+	size_t m_sizeInBytes;
+	//friend class ndScopeMapBuffer;
 };
 
 #endif

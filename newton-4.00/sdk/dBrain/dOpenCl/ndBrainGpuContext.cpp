@@ -18,8 +18,8 @@
 #include <string>
 #include <vector>
 
-#define D_OPENCL_SELECTION_TYPE		CL_DEVICE_TYPE_ALL
-//#define D_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_CPU
+//#define D_OPENCL_SELECTION_TYPE		CL_DEVICE_TYPE_ALL
+#define D_OPENCL_SELECTION_TYPE		CL_DEVICE_TYPE_CPU
 //#define D_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_GPU
 
 ndBrainGpuContext::ndBrainGpuContext()
@@ -36,7 +36,7 @@ ndBrainGpuContext::ndBrainGpuContext()
 			const std::string name(cl_platforms[i].getInfo<CL_PLATFORM_NAME>());
 			ndExpandTraceMessage("opencl platform: %s\n", name.c_str());
 			cl_platforms[i].getDevices(D_OPENCL_SELECTION_TYPE, &cl_devices_available);
-			for (size_t j = 0u; j < cl_devices_available.size(); j++)
+			for (size_t j = 0; j < cl_devices_available.size(); j++)
 			{
 				cl_devices.push_back(cl_devices_available[j]);
 			}
@@ -66,8 +66,13 @@ ndBrainGpuContext::ndBrainGpuContext()
 		ndExpandTraceMessage("opencl device: %s\n", name.c_str());
 
 		m_device = ndSharedPtr<cl::Device>(new cl::Device(cl_devices[best_i]));
-		m_context = ndSharedPtr<cl::Context>(new cl::Context(**m_device));
-		m_queue = ndSharedPtr<cl::CommandQueue>(new cl::CommandQueue(**m_context , **m_device));
+		
+		cl_int error = 0;
+		m_context = ndSharedPtr<cl::Context>(new cl::Context(**m_device, nullptr, clNotification, this, &error));
+		ndAssert(error == CL_SUCCESS);
+		
+		m_queue = ndSharedPtr<cl::CommandQueue>(new cl::CommandQueue(**m_context , **m_device, 0, &error));
+		ndAssert(error == CL_SUCCESS);
 
 		CreateKerners();
 	}
@@ -91,4 +96,9 @@ void CL_CALLBACK ndBrainGpuContext::clNotification(const char*, const void*, siz
 ndBrainContext::ndContextType ndBrainGpuContext::GetType() const
 {
 	return ndBrainContext::m_gpu;
+}
+
+ndBrainGpuContext* ndBrainGpuContext::GetAsGpuContext()
+{
+	return this;
 }

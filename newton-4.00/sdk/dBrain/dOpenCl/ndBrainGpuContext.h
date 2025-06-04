@@ -32,6 +32,8 @@ class ndBrainGpuContext : public ndBrainContext
 	ndInt32 GetSubGroupSize() const { return 0; }
 	static bool HasGpuSupport();
 
+	ndBrainGpuContext* GetAsGpuContext() override;
+
 	private:
 	void CreateKerners();
 	ndSharedPtr<ndBrainGpuShader> CreateKerner(const cl::Program& program, const char* const functionMame) const;
@@ -53,5 +55,8 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<cl::CommandQueue> m_queue;
 
 	static const char* m_kernelSource;
+
+	friend class ndBrainGpuBuffer;
+	friend class ndBrainGpuFloatBuffer;
 };
 #endif
