@@ -17,7 +17,16 @@
 class ndBrainGpuCommand;
 class ndBrainGpuFloatBuffer;
 
-typedef VkShaderModule ndBrainGpuShader;
+//typedef VkShaderModule ndBrainGpuShader;
+class ndBrainGpuShader : public ndClassAlloc
+{
+	public:
+	ndBrainGpuShader(VkShaderModule shader, ndBrainGpuContext* owner);
+	~ndBrainGpuShader();
+
+	VkShaderModule m_shader;
+	ndBrainGpuContext* m_owner;
+};
 
 class ndBrainGpuContext : public ndBrainContext
 {
@@ -60,7 +69,7 @@ class ndBrainGpuContext : public ndBrainContext
 	void CreateDescriptorPool();
 	void CreateFence();
 	void LoadShaderPrograms();
-	ndBrainGpuShader LoadShaderProgram(const char* const name);
+	VkShaderModule LoadShaderProgram(const char* const name);
 	void GetShaderFileName(const char* const name, char* const outPathName);
 
 	static void VulkanFree(void* pUserData, void* memory);
@@ -89,21 +98,14 @@ class ndBrainGpuContext : public ndBrainContext
 	ndTree<ndMemoryEntry, void*> m_memoryDictionary;
 
 	public:
-	union
-	{
-		struct
-		{
-			ndBrainGpuShader m_ndBrainCopyInput;
-			ndBrainGpuShader m_ndBrainCopyOutput;
-			ndBrainGpuShader m_ndBrainLayerLinear;
-			ndBrainGpuShader m_ndBrainCopyOutputGradients;
-			ndBrainGpuShader m_ndBrainLayerReluActivation;
-			ndBrainGpuShader m_ndBrainLayerTanhActivation;
-			ndBrainGpuShader m_ndBrainLayerSoftmaxActivation;
-			ndBrainGpuShader m_ndBrainLayerLinearDropOutActivation;
-		};
-		ndBrainGpuShader m_modules[128];
-	};
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyInput;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyOutput;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinear;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyOutputGradients;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerReluActivation;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerTanhActivation;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerSoftmaxActivation;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinearDropOutActivation;
 
 	ndInt32 m_subGroupSize;
 	uint32_t m_queueFamilyIndex;
@@ -112,6 +114,7 @@ class ndBrainGpuContext : public ndBrainContext
 	static const char* m_apiLayers[];
 	static const char* m_apiExtensionLayers[];
 
+	friend class ndBrainGpuShader;
 	friend class ndBrainGpuCommand;
 };
 

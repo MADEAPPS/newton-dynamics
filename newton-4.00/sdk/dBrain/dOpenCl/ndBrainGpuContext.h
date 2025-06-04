@@ -17,7 +17,7 @@
 class ndBrainGpuCommand;
 class ndBrainGpuFloatBuffer;
 
-typedef void* ndBrainGpuShader;
+typedef cl::Kernel ndBrainGpuShader;
 
 class ndBrainGpuContext : public ndBrainContext
 {
@@ -32,23 +32,27 @@ class ndBrainGpuContext : public ndBrainContext
 	ndInt32 GetSubGroupSize() const { return 0; }
 	static bool HasGpuSupport();
 
-	union
-	{
-		struct
-		{
-			ndBrainGpuShader m_ndBrainCopyInput;
-			ndBrainGpuShader m_ndBrainCopyOutput;
-			ndBrainGpuShader m_ndBrainLayerLinear;
-			ndBrainGpuShader m_ndBrainCopyOutputGradients;
-			ndBrainGpuShader m_ndBrainLayerReluActivation;
-			ndBrainGpuShader m_ndBrainLayerTanhActivation;
-			ndBrainGpuShader m_ndBrainLayerSoftmaxActivation;
-			ndBrainGpuShader m_ndBrainLayerLinearDropOutActivation;
-		};
-		ndBrainGpuShader m_modules[128];
-	};
+	private:
+	void LoadKerners();
+	ndSharedPtr<ndBrainGpuShader> CreateKerner(const cl::Program& program, const char* const functionMame) const;
+	static void CL_CALLBACK clNotification(const char* errinfo, const void* private_info, size_t cb, void* user_data);
 
+	public:
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyInput;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyOutput;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinear;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyOutputGradients;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerReluActivation;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerTanhActivation;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerSoftmaxActivation;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinearDropOutActivation;
+
+	private:
 	cl::Device m_device;
+	cl::Context m_context;
+	cl::CommandQueue m_queue;
 	bool m_devicedInitialized;
+
+	static const char* m_kernelSource;
 };
 #endif

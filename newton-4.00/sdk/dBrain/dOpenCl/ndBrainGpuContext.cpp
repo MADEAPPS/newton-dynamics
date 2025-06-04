@@ -18,11 +18,15 @@
 #include <string>
 #include <vector>
 
+#define D_OPENCL_SELECTION_TYPE		CL_DEVICE_TYPE_ALL
+//#define D_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_CPU
+//#define D_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_GPU
+
 ndBrainGpuContext::ndBrainGpuContext()
 	:ndBrainContext()
 {
 	m_devicedInitialized = false;
-	ndMemSet(m_modules, (void*)nullptr, sizeof(m_modules) / sizeof(m_modules[0]));
+	//ndMemSet(m_modules, (void*)nullptr, sizeof(m_modules) / sizeof(m_modules[0]));
 
 	// get all devices of all platforms
 	std::vector<cl::Device> cl_devices; 
@@ -32,7 +36,9 @@ ndBrainGpuContext::ndBrainGpuContext()
 		for (size_t i = 0; i < cl_platforms.size(); i++)
 		{
 			std::vector<cl::Device> cl_devices_available;
-			cl_platforms[i].getDevices(CL_DEVICE_TYPE_ALL, &cl_devices_available);
+			const std::string name(cl_platforms[i].getInfo<CL_PLATFORM_NAME>());
+			ndExpandTraceMessage("opencl platform: %s\n", name.c_str());
+			cl_platforms[i].getDevices(D_OPENCL_SELECTION_TYPE, &cl_devices_available);
 			for (size_t j = 0u; j < cl_devices_available.size(); j++)
 			{
 				cl_devices.push_back(cl_devices_available[j]);
@@ -41,22 +47,20 @@ ndBrainGpuContext::ndBrainGpuContext()
 	}
 
 	// select fastest available device
+	if (cl_devices.size())
 	{
 		size_t best_i = 0;
 		size_t bestCapacity = 0;
 		for (size_t i = 0u; i < cl_devices.size(); i++)
 		{
 			// find device with highest (estimated) floating point performance
-			//const std::string name (cl_devices[i].getInfo<CL_DEVICE_NAME>()); // device name
-			//const std::string vendor (cl_devices[i].getInfo<CL_DEVICE_VENDOR>()); // device vendor
-			const size_t compute_units = cl_devices[i].getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>(); // compute units (CUs) can contain multiple cores depending on the microarchitecture
-			const size_t clock_frequency = cl_devices[i].getInfo<CL_DEVICE_MAX_CLOCK_FREQUENCY>(); // in MHz
+			const std::string name (cl_devices[i].getInfo<CL_DEVICE_NAME>()); // device name
+			const size_t compute_units = cl_devices[i].getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>(); 
 
-			size_t capacity = compute_units * clock_frequency;
-			// estimated device floating point performance in TeraFLOPs/s
-			if (capacity > bestCapacity)
+			// just go for the device with the most compute units.
+			if (compute_units > bestCapacity)
 			{
-				bestCapacity = capacity;
+				bestCapacity = compute_units;
 				best_i = i;
 			}
 		}
@@ -64,8 +68,13 @@ ndBrainGpuContext::ndBrainGpuContext()
 		const std::string name(cl_devices[best_i].getInfo<CL_DEVICE_NAME>());
 		m_device = cl_devices[best_i];
 		//print_info(name); // print device name
-		ndExpandTraceMessage("opencl accelerator: %s\n", name.c_str());
+		ndExpandTraceMessage("opencl device: %s\n", name.c_str());
 		m_devicedInitialized = true;
+
+		m_context = cl::Context(m_device);
+		m_queue = cl::CommandQueue(m_context, m_device);
+
+		LoadKerners();
 	}
 }
 
@@ -76,6 +85,12 @@ ndBrainGpuContext::~ndBrainGpuContext()
 bool ndBrainGpuContext::HasGpuSupport() 
 { 
 	return true; 
+}
+
+//void CL_CALLBACK ndBrainGpuContext::clNotification(const char* errinfo, const void* private_info, size_t cb, void* user_data)
+void CL_CALLBACK ndBrainGpuContext::clNotification(const char*, const void*, size_t, void*)
+{
+	ndAssert(0);
 }
 
 ndBrainContext::ndContextType ndBrainGpuContext::GetType() const

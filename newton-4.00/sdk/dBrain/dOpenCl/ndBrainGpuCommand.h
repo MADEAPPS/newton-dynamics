@@ -12,8 +12,9 @@
 #define __ND_BRAIN_GPU_COMMAND_H__
 
 #include "ndBrainStdafx.h"
+#include "ndBrainGpuContext.h"
 
-class ndBrainGpuContext;
+//class ndBrainGpuContext;
 class ndBrainGpuBuffer;
 class ndBrainGpuFloatBuffer;
 class ndBrainGpuUniformBuffer;
@@ -27,7 +28,7 @@ class ndBrainGpuCommand : public ndClassAlloc
 	}
 	virtual ~ndBrainGpuCommand(){}
 
-	void Assembly(void*, ndInt32, ndInt32, ndBrainGpuBuffer**) {}
+	void Assembly(const ndSharedPtr<ndBrainGpuShader>&, ndInt32, ndInt32, ndBrainGpuBuffer**) {}
 
 	protected:
 	ndBrainGpuContext* m_context;

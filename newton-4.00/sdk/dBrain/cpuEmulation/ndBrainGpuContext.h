@@ -32,20 +32,13 @@ class ndBrainGpuContext : public ndBrainContext
 	ndInt32 GetSubGroupSize() const { return 0; }
 	static bool HasGpuSupport() { return false; }
 
-	union
-	{
-		struct
-		{
-			ndBrainGpuShader m_ndBrainCopyInput;
-			ndBrainGpuShader m_ndBrainCopyOutput;
-			ndBrainGpuShader m_ndBrainLayerLinear;
-			ndBrainGpuShader m_ndBrainCopyOutputGradients;
-			ndBrainGpuShader m_ndBrainLayerReluActivation;
-			ndBrainGpuShader m_ndBrainLayerTanhActivation;
-			ndBrainGpuShader m_ndBrainLayerSoftmaxActivation;
-			ndBrainGpuShader m_ndBrainLayerLinearDropOutActivation;
-		};
-		ndBrainGpuShader m_modules[128];
-	};
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyInput;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyOutput;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinear;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyOutputGradients;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerReluActivation;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerTanhActivation;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerSoftmaxActivation;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinearDropOutActivation;
 };
 #endif

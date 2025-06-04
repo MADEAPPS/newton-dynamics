@@ -12,8 +12,8 @@
 #define __ND_BRAIN_GPU_COMMAND_H__
 
 #include "ndBrainStdafx.h"
+#include "ndBrainGpuContext.h"
 
-class ndBrainGpuContext;
 class ndBrainGpuBuffer;
 class ndBrainGpuFloatBuffer;
 class ndBrainGpuUniformBuffer;
@@ -25,7 +25,7 @@ class ndBrainGpuCommand : public ndContainersFreeListAlloc<ndBrainGpuCommand>
 
 	protected:
 	ndBrainGpuCommand(ndBrainGpuContext* const context);
-	void Assembly(void* const shader, ndInt32 workGroups, ndInt32 paramCount, ndBrainGpuBuffer** params);
+	void Assembly(const ndSharedPtr<ndBrainGpuShader>& shader, ndInt32 workGroups, ndInt32 paramCount, ndBrainGpuBuffer** params);
 
 	ndBrainGpuContext* m_context;
 	VkPipeline m_pipeline;

@@ -14,11 +14,10 @@
 #include "ndBrainGpuCommand.h"
 #include "ndBrainGpuContext.h"
 
-
 ndBrainGpuContext::ndBrainGpuContext()
 	:ndBrainContext()
 {
-	ndMemSet(m_modules, (void*)nullptr, sizeof(m_modules) / sizeof(m_modules[0]));
+	//ndMemSet(m_modules, (void*)nullptr, sizeof(m_modules) / sizeof(m_modules[0]));
 }
 
 ndBrainGpuContext::~ndBrainGpuContext()

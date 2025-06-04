@@ -28,6 +28,20 @@ const char* ndBrainGpuContext::m_apiExtensionLayers[] =
 	"VK_EXT_device_memory_report"
 };
 
+ndBrainGpuShader::ndBrainGpuShader(VkShaderModule shader, ndBrainGpuContext* owner)
+	:m_shader(shader)
+	,m_owner(owner)
+{
+}
+
+ndBrainGpuShader::~ndBrainGpuShader()
+{
+	if (m_shader)
+	{
+		vkDestroyShaderModule(m_owner->m_device, m_shader, m_owner->m_allocator);
+	}
+}
+
 ndBrainGpuContext::ndBrainGpuContext()
 	:ndBrainContext()
 	,m_allocator(&m_allocatorStruct)
@@ -74,13 +88,13 @@ ndBrainGpuContext::~ndBrainGpuContext()
 		}
 	}
 
-	for (ndInt32 i = 0; i < ndInt32(sizeof(m_modules) / sizeof(m_modules[0])); ++i)
-	{
-		if (m_modules[i])
-		{
-			vkDestroyShaderModule(m_device, m_modules[i], m_allocator);
-		}
-	}
+	//for (ndInt32 i = 0; i < ndInt32(sizeof(m_modules) / sizeof(m_modules[0])); ++i)
+	//{
+	//	if (m_modules[i])
+	//	{
+	//		vkDestroyShaderModule(m_device, m_modules[i], m_allocator);
+	//	}
+	//}
 	
 	vkDestroyFence(m_device, m_fence, m_allocator);
 	vkDestroyDescriptorPool(m_device, m_descriptorPool, m_allocator);
@@ -480,7 +494,7 @@ void ndBrainGpuContext::GetShaderFileName(const char* const name, char* const ou
 #endif
 }
 
-ndBrainGpuShader ndBrainGpuContext::LoadShaderProgram(const char* const name)
+VkShaderModule ndBrainGpuContext::LoadShaderProgram(const char* const name)
 {
 	ndFixSizeArray<char, 1024 * 64> code;
 	auto LoadShaderCode = [this, &code](const char* const name)
@@ -516,23 +530,24 @@ ndBrainGpuShader ndBrainGpuContext::LoadShaderProgram(const char* const name)
 	createInfo.pCode = (uint32_t*)&code[0];
 	createInfo.codeSize = size_t(code.GetCount());
 
-	ndBrainGpuShader computeShaderModule;
+	//ndBrainGpuShader computeShaderModule;
+	VkShaderModule computeShaderModule;
 	CheckResultVulkan(vkCreateShaderModule(m_device, &createInfo, m_allocator, &computeShaderModule));
 	return computeShaderModule;
 }
 
 void ndBrainGpuContext::LoadShaderPrograms()
 {
-	ndBrainGpuShader clean (VK_NULL_HANDLE);
-	ndMemSet(m_modules, clean, sizeof(m_modules) / sizeof(m_modules[0]));
+	//ndBrainGpuShader clean (VK_NULL_HANDLE);
+	//ndMemSet(m_modules, clean, sizeof(m_modules) / sizeof(m_modules[0]));
 
-	m_ndBrainCopyInput = LoadShaderProgram("ndBrainCopyInput-comp.spv");
-	m_ndBrainCopyOutput = LoadShaderProgram("ndBrainCopyOutput-comp.spv");
-	m_ndBrainLayerLinear = LoadShaderProgram("ndBrainLayerLinear-comp.spv");
-	m_ndBrainLayerReluActivation = LoadShaderProgram("ndBrainLayerReluActivation-comp.spv");
-	m_ndBrainLayerTanhActivation = LoadShaderProgram("ndBrainLayerTanhActivation-comp.spv");
-	m_ndBrainLayerSoftmaxActivation = LoadShaderProgram("ndBrainLayerSoftmaxActivation-comp.spv");
-	m_ndBrainLayerLinearDropOutActivation = LoadShaderProgram("ndBrainLayerLinearDropOutActivation-comp.spv");
+	m_ndBrainCopyInput = ndSharedPtr<ndBrainGpuShader> (new ndBrainGpuShader (LoadShaderProgram("ndBrainCopyInput-comp.spv"), this));
+	m_ndBrainCopyOutput = ndSharedPtr<ndBrainGpuShader>(new ndBrainGpuShader(LoadShaderProgram("ndBrainCopyOutput-comp.spv"), this));
+	m_ndBrainLayerLinear = ndSharedPtr<ndBrainGpuShader>(new ndBrainGpuShader(LoadShaderProgram("ndBrainLayerLinear-comp.spv"), this));
+	m_ndBrainLayerReluActivation = ndSharedPtr<ndBrainGpuShader>(new ndBrainGpuShader(LoadShaderProgram("ndBrainLayerReluActivation-comp.spv"), this));
+	m_ndBrainLayerTanhActivation = ndSharedPtr<ndBrainGpuShader>(new ndBrainGpuShader(LoadShaderProgram("ndBrainLayerTanhActivation-comp.spv"), this));
+	m_ndBrainLayerSoftmaxActivation = ndSharedPtr<ndBrainGpuShader>(new ndBrainGpuShader(LoadShaderProgram("ndBrainLayerSoftmaxActivation-comp.spv"), this));
+	m_ndBrainLayerLinearDropOutActivation = ndSharedPtr<ndBrainGpuShader>(new ndBrainGpuShader(LoadShaderProgram("ndBrainLayerLinearDropOutActivation-comp.spv"), this));
 }
 
 void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& command)
