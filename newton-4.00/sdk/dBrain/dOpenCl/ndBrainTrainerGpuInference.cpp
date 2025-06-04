@@ -32,9 +32,9 @@
 #include "ndBrainTrainerGpuInference.h"
 
 ndBrainTrainerGpuCommand::ndBrainTrainerGpuCommand(ndBrainTrainerGpuInference* const owner,
-	const ndBrainLayer::ndCommandShareInfo& info, size_t m_id,
+	const ndBrainLayer::ndCommandShareInfo& info, size_t id,
 	ndBrainGpuContext* const context,
-	const ndSharedPtr<ndBrainGpuShader>& m_shader,
+	const ndSharedPtr<ndBrainGpuShader>& shader,
 	ndInt32 numberOfinputs,
 	const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
 	ndBrainGpuBuffer* const buffer1,
@@ -43,13 +43,13 @@ ndBrainTrainerGpuCommand::ndBrainTrainerGpuCommand(ndBrainTrainerGpuInference* c
 	,m_uniformBuffer(uniformBuffer)
 	,m_info(info)
 	,m_owner(owner)
-	,m_id(m_id)
+	,m_id(id)
 {
 	ndFixSizeArray<ndBrainGpuBuffer*, 4> params;
 	params.PushBack(*m_uniformBuffer);
 	params.PushBack(buffer1);
 	params.PushBack(buffer2);
-	Assembly(m_shader, numberOfinputs, params.GetCount(), &params[0]);
+	Assembly(shader, numberOfinputs, params.GetCount(), &params[0]);
 }
 
 ndBrainTrainerGpuInference::ndBrainTrainerGpuInference(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndInt32 minibatchSize)

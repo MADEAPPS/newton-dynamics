@@ -34,11 +34,11 @@ class ndBrainThreadPool;
 class ndBrainTrainerCpuCommand: public ndContainersFreeListAlloc<ndBrainTrainerCpuCommand>
 {
 	public:
-	ndBrainTrainerCpuCommand(const ndBrainLayer::ndCommandShareInfo& info, size_t m_id)
+	ndBrainTrainerCpuCommand(const ndBrainLayer::ndCommandShareInfo& info, size_t id)
 		:ndContainersFreeListAlloc<ndBrainTrainerCpuCommand>()
 		,m_owner(nullptr)
 		,m_info(info)
-		,m_id(m_id)
+		,m_id(id)
 	{
 	}
 

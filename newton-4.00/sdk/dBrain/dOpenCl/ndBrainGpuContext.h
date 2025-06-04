@@ -58,5 +58,6 @@ class ndBrainGpuContext : public ndBrainContext
 
 	friend class ndBrainGpuBuffer;
 	friend class ndBrainGpuFloatBuffer;
+	friend class ndBrainGpuUniformBuffer;
 };
 #endif

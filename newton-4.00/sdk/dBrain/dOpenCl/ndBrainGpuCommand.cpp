@@ -16,3 +16,19 @@
 #include "ndBrainGpuFloatBuffer.h"
 #include "ndBrainGpuIntegerBuffer.h"
 #include "ndBrainGpuUniformBuffer.h"
+
+ndBrainGpuCommand::ndBrainGpuCommand(ndBrainGpuContext* const context)
+	:ndClassAlloc()
+	,m_context(context)
+{
+}
+
+ndBrainGpuCommand::~ndBrainGpuCommand()
+{
+}
+
+void ndBrainGpuCommand::Assembly(const ndSharedPtr<ndBrainGpuShader>& shader, ndInt32 workGroupSize, ndInt32 buffersCount, ndBrainGpuBuffer** buffer)
+{
+
+}
+
