@@ -33,7 +33,7 @@ class ndBrainGpuContext : public ndBrainContext
 	static bool HasGpuSupport();
 
 	private:
-	void LoadKerners();
+	void CreateKerners();
 	ndSharedPtr<ndBrainGpuShader> CreateKerner(const cl::Program& program, const char* const functionMame) const;
 	static void CL_CALLBACK clNotification(const char* errinfo, const void* private_info, size_t cb, void* user_data);
 
@@ -48,10 +48,9 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinearDropOutActivation;
 
 	private:
-	cl::Device m_device;
-	cl::Context m_context;
-	cl::CommandQueue m_queue;
-	bool m_devicedInitialized;
+	ndSharedPtr<cl::Device> m_device;
+	ndSharedPtr<cl::Context> m_context;
+	ndSharedPtr<cl::CommandQueue> m_queue;
 
 	static const char* m_kernelSource;
 };

@@ -25,9 +25,6 @@
 ndBrainGpuContext::ndBrainGpuContext()
 	:ndBrainContext()
 {
-	m_devicedInitialized = false;
-	//ndMemSet(m_modules, (void*)nullptr, sizeof(m_modules) / sizeof(m_modules[0]));
-
 	// get all devices of all platforms
 	std::vector<cl::Device> cl_devices; 
 	{
@@ -66,15 +63,13 @@ ndBrainGpuContext::ndBrainGpuContext()
 		}
 
 		const std::string name(cl_devices[best_i].getInfo<CL_DEVICE_NAME>());
-		m_device = cl_devices[best_i];
-		//print_info(name); // print device name
 		ndExpandTraceMessage("opencl device: %s\n", name.c_str());
-		m_devicedInitialized = true;
 
-		m_context = cl::Context(m_device);
-		m_queue = cl::CommandQueue(m_context, m_device);
+		m_device = ndSharedPtr<cl::Device>(new cl::Device(cl_devices[best_i]));
+		m_context = ndSharedPtr<cl::Context>(new cl::Context(**m_device));
+		m_queue = ndSharedPtr<cl::CommandQueue>(new cl::CommandQueue(**m_context , **m_device));
 
-		LoadKerners();
+		CreateKerners();
 	}
 }
 

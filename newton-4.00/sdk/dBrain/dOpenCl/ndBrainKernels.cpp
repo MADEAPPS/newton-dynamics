@@ -81,22 +81,18 @@ R""""(
 
 ndSharedPtr<ndBrainGpuShader> ndBrainGpuContext::CreateKerner(const cl::Program& program, const char* const functionMame) const
 {
-    //cl::Kernel kernel(program, "brainCopyInput", &errcode_ret);
-    //ndAssert(errcode_ret == 0);
     cl_int errcode_ret = 0;
     ndSharedPtr<ndBrainGpuShader> kernel(ndSharedPtr<ndBrainGpuShader>(new ndBrainGpuShader(program, functionMame, &errcode_ret)));
     ndAssert(errcode_ret == 0);
     return kernel;
 }
 
-void ndBrainGpuContext::LoadKerners()
+void ndBrainGpuContext::CreateKerners()
 {
     cl_int errcode_ret = 0;
     const std::string source(m_kernelSource);
-    cl::Program program (m_context, source, CL_TRUE, &errcode_ret);
+    cl::Program program (**m_context, source, CL_TRUE, &errcode_ret);
     ndAssert(errcode_ret == 0);
     m_ndBrainCopyInput = CreateKerner(program, "brainCopyInput");
     m_ndBrainCopyOutput = CreateKerner(program, "brainCopyOutput");
-    
-
 }
