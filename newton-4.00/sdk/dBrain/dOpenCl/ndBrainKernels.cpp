@@ -28,19 +28,19 @@ R""""(
 
     __kernel void brainCopyInput(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* inputBuffer)
     {                                                                      
-        size_t itemId = get_local_id(0);
-        size_t groupId = get_group_id(0);
-        size_t workGroupSize = get_local_size(0);
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
 
-        size_t inputSize = parameters->m_inputSize;
-        size_t inputOutputSize = parameters->m_inputOutputSize;
-        size_t inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+        uint inputSize = parameters->m_inputSize;
+        uint inputOutputSize = parameters->m_inputOutputSize;
+        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        size_t srcBase = groupId * inputSize;
-        size_t dstBase = groupId * inputOutputSize + inputOutputStartOffset;
+        uint srcBase = groupId * inputSize;
+        uint dstBase = groupId * inputOutputSize + inputOutputStartOffset;
         
-        size_t workGroupSizeReminder = inputSize % workGroupSize;
-        size_t modWorkGroupSize = inputSize - workGroupSizeReminder;
+        uint workGroupSizeReminder = inputSize % workGroupSize;
+        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
         
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
@@ -56,19 +56,19 @@ R""""(
 
     __kernel void brainCopyOutput(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* outputBuffer) 
     {
-        size_t itemId = get_local_id(0);
-        size_t groupId = get_group_id(0);
-        size_t workGroupSize = get_local_size(0);
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
 
-        size_t outputSize = parameters->m_outputSize;
-        size_t inputOutputSize = parameters->m_inputOutputSize;
-        size_t inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+        uint outputSize = parameters->m_outputSize;
+        uint inputOutputSize = parameters->m_inputOutputSize;
+        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        size_t dstBase = groupId * outputSize;
-        size_t srcBase = groupId * inputOutputSize + inputOutputStartOffset;
+        uint dstBase = groupId * outputSize;
+        uint srcBase = groupId * inputOutputSize + inputOutputStartOffset;
 
-        size_t workGroupSizeReminder = outputSize % workGroupSize;
-        size_t modWorkGroupSize = outputSize - workGroupSizeReminder;
+        uint workGroupSizeReminder = outputSize % workGroupSize;
+        uint modWorkGroupSize = outputSize - workGroupSizeReminder;
         
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
@@ -91,23 +91,23 @@ R""""(
         __local float cachedOutput [1024 * 2];
         __local float reductionBuffer [1024];
 
-        size_t itemId = get_local_id(0);
-        size_t groupId = get_group_id(0);
-        size_t workGroupSize = get_local_size(0);
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
 
-        size_t inputSize = parameters->m_inputSize;
-        size_t outputSize = parameters->m_outputSize;
-        size_t inputOutputSize = parameters->m_inputOutputSize;
-        size_t parametersStartOffset = parameters->m_parametersStartOffset;
-        size_t inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+        uint inputSize = parameters->m_inputSize;
+        uint outputSize = parameters->m_outputSize;
+        uint inputOutputSize = parameters->m_inputOutputSize;
+        uint parametersStartOffset = parameters->m_parametersStartOffset;
+        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
 
-        size_t biasOffset = outputSize * inputSize + parametersStartOffset;
-        size_t inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
-        size_t outputOffset = inputOffset + inputSize;
+        uint biasOffset = outputSize * inputSize + parametersStartOffset;
+        uint inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
+        uint outputOffset = inputOffset + inputSize;
         
-        size_t workGroupSizeReminder = inputSize % workGroupSize;
-        size_t modWorkGroupSize = inputSize - workGroupSizeReminder;
-        for (size_t i = 0; i < modWorkGroupSize; i += workGroupSize)
+        uint workGroupSizeReminder = inputSize % workGroupSize;
+        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             cachedInput[i + itemId] = inputOutputData[inputOffset + itemId + i];
         }
@@ -116,10 +116,10 @@ R""""(
             cachedInput[modWorkGroupSize + itemId] = inputOutputData[inputOffset + modWorkGroupSize + itemId];
         }
         
-        size_t rowCountReminder = outputSize % workGroupSize;
-        size_t modRowCount = outputSize - rowCountReminder;
+        uint rowCountReminder = outputSize % workGroupSize;
+        uint modRowCount = outputSize - rowCountReminder;
 
-        for (size_t i = 0; i < modRowCount; i += workGroupSize)
+        for (uint i = 0; i < modRowCount; i += workGroupSize)
         {
             cachedOutput[i + itemId] = weightsAndBias[biasOffset + itemId];
         }
@@ -129,11 +129,11 @@ R""""(
         }
         //barrier(CLK_LOCAL_MEM_FENCE); 
 
-        for (size_t i = 0; i < outputSize; ++i)
+        for (uint i = 0; i < outputSize; ++i)
         {
             float partialSum = 0.0f;
-            size_t rowStartOffset = i * inputSize + parametersStartOffset;
-            for (size_t j = 0; j < modWorkGroupSize; j += workGroupSize)
+            uint rowStartOffset = i * inputSize + parametersStartOffset;
+            for (uint j = 0; j < modWorkGroupSize; j += workGroupSize)
             {
                 float b = cachedInput[itemId + j];
                 float a = weightsAndBias[rowStartOffset + itemId + j];
@@ -146,7 +146,7 @@ R""""(
                 partialSum += a * b;
             }
 
-            for (size_t j = workGroupSize / 2; j > 0; j = j >> 1)
+            for (uint j = workGroupSize / 2; j > 0; j = j >> 1)
             {
                 barrier(CLK_LOCAL_MEM_FENCE); 
                 if ((itemId >= j) && (itemId < j * 2))
@@ -168,7 +168,7 @@ R""""(
         }
         barrier(CLK_LOCAL_MEM_FENCE); 
         
-        for (size_t i = 0; i < modRowCount; i += workGroupSize)
+        for (uint i = 0; i < modRowCount; i += workGroupSize)
         {
             inputOutputData[outputOffset + i + itemId] = cachedOutput[i + itemId];
         }
@@ -185,15 +185,14 @@ R""""(
         uint workGroupSize = get_local_size(0);
         
         uint inputSize = parameters->m_inputSize;
-        //uint outputSize = parameters->m_outputSize;
         uint inputOutputSize = parameters->m_inputOutputSize;
         uint parametersStartOffset = parameters->m_parametersStartOffset;
         uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        size_t workGroupSizeReminder = inputSize % workGroupSize;
-        size_t modWorkGroupSize = inputSize - workGroupSizeReminder;
+        uint workGroupSizeReminder = inputSize % workGroupSize;
+        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
         
-        uint inputOffset = itemId * inputOutputSize + inputOutputStartOffset;
+        uint inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
         uint outputOffset = inputOffset + inputSize;
         
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
@@ -204,7 +203,7 @@ R""""(
         }
         if (itemId < workGroupSizeReminder)
         {
-            float inputValue = inputOutputData[inputOffset + modWorkGroupSize + groupId];
+            float inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
             float outputValue = inputValue;
             inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
         }
