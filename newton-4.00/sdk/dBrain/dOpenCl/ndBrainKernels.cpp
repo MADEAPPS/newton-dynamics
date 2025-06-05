@@ -57,7 +57,7 @@ R""""(
         }
     }
 
-    __kernel void brainCopyOutput(__local const UniformBufferObject* parameters, __global float* inputOutputData, __global float* outputBuffer) 
+    __kernel void brainCopyOutput(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* outputBuffer) 
     {
         size_t itemId = get_local_id(0);
         size_t groupId = get_group_id(0);
@@ -89,7 +89,7 @@ R""""(
 
     // a matrix time a vector by iterating over each row of the matrix 
     // calculating the dot product of that row time the vector and adding the bias value.
-    __kernel void brainLayerLinear(__local const UniformBufferObject* parameters, __global float* inputOutputData, __global float* weightsAndBias) 
+    __kernel void brainLayerLinear(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* weightsAndBias) 
     {
         __local float cachedInput [1024 * 2];
         __local float cachedOutput [1024 * 2];

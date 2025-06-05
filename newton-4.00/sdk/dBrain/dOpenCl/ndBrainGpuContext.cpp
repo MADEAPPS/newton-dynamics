@@ -102,3 +102,18 @@ ndBrainGpuContext* ndBrainGpuContext::GetAsGpuContext()
 {
 	return this;
 }
+
+void ndBrainGpuContext::SyncQueue()
+{
+	cl_int error = m_queue->finish();
+	ndAssert(error == CL_SUCCESS);
+}
+
+void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& command)
+{
+	cl::NDRange offset(0);
+	cl::NDRange local(command->m_workGroupSize);
+	cl::NDRange global(command->m_numberOfWorkGroups);
+	cl_int error = m_queue->enqueueNDRangeKernel(**command->m_shader, offset, global, global, nullptr, nullptr);
+	ndAssert(error == CL_SUCCESS);
+}

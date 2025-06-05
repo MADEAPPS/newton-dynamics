@@ -312,11 +312,11 @@ void ndBrainTrainerGpuInference::UpdateParameters()
 
 void ndBrainTrainerGpuInference::MakePrediction(const ndBrainVector& input)
 {
-#if 0
-	m_context->SyncQueue();
+#if 1
+	//m_context->SyncQueue();
 	m_miniBatchInputBuffer->LoadData(input.GetCount() * sizeof(ndReal), &input[0]);
 	SubmitCommands();
-	//m_context->EndQueue();
+	m_context->SyncQueue();
 #else
 	m_miniBatchInputBuffer->LoadData(input.GetCount() * sizeof(ndReal), &input[0]);
 	for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = m_feedFowardCommands.GetFirst(); node; node = node->GetNext())

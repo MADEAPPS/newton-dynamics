@@ -26,8 +26,8 @@ class ndBrainGpuContext : public ndBrainContext
 	virtual ~ndBrainGpuContext();
 	virtual ndContextType GetType() const override;
 
-	void SyncQueue() {}
-	void AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>&) {}
+	void SyncQueue();
+	void AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& command); 
 
 	ndInt32 GetSubGroupSize() const { return 0; }
 	static bool HasGpuSupport();

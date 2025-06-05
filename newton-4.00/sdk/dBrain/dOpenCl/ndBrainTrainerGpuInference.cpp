@@ -312,20 +312,9 @@ void ndBrainTrainerGpuInference::UpdateParameters()
 
 void ndBrainTrainerGpuInference::MakePrediction(const ndBrainVector& input)
 {
-#if 0
-	m_context->SyncQueue();
 	m_miniBatchInputBuffer->LoadData(input.GetCount() * sizeof(ndReal), &input[0]);
 	SubmitCommands();
-	//m_context->EndQueue();
-#else
-	m_miniBatchInputBuffer->LoadData(input.GetCount() * sizeof(ndReal), &input[0]);
-	for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = m_feedFowardCommands.GetFirst(); node; node = node->GetNext())
-	{
-		ndSharedPtr<ndBrainGpuCommand>& command = node->GetInfo();
-		m_context->AddCommandQueue(command);
-		m_context->SyncQueue();
-	}
-#endif
+	m_context->SyncQueue();
 }
 
 //void ndBrainTrainerGpuInference::MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output)

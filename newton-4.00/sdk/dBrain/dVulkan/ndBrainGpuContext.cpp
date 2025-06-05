@@ -565,7 +565,7 @@ void ndBrainGpuContext::SyncQueue()
 		submitInfo.pCommandBuffers = &m_displayList[0];
 		CheckResultVulkan(vkQueueSubmit(m_queue, uint32_t(1), &submitInfo, m_fence));
 
-#if 1
+#if 0
 		if (vkGetFenceStatus(m_device, m_fence) != VK_SUCCESS)
 		{
 			ndInt32 waits = 0;

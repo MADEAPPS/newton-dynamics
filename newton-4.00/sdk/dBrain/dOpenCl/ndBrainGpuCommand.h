@@ -31,6 +31,7 @@ class ndBrainGpuCommand : public ndClassAlloc
 	size_t m_workGroupSize;
 	size_t m_numberOfWorkGroups;
 	//cl::KernelFunctor <cl::Buffer, cl::Buffer, cl::Buffer> m_function;
+	friend class ndBrainGpuContext;
 };
 
 #endif

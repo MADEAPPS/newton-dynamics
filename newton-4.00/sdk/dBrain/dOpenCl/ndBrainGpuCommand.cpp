@@ -40,11 +40,5 @@ void ndBrainGpuCommand::Assembly(const ndSharedPtr<ndBrainGpuShader>& shader, nd
 		cl_int error = m_shader->setArg(cl_uint(i), argBuffer->m_buffer);
 		ndAssert(error == CL_SUCCESS);
 	}
-
-	//cl::NDRange offset(0);
-	//cl::NDRange local(m_workGroupSize);
-	//cl::NDRange global(m_numberOfWorkGroups);
-	//cl_int error = m_context->m_queue->enqueueNDRangeKernel(**m_shader, offset, global, global, nullptr, nullptr);
-	//ndAssert(error == CL_SUCCESS);
 }
 

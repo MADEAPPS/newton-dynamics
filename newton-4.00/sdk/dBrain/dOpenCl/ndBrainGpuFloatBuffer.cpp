@@ -43,14 +43,18 @@ void ndBrainGpuFloatBuffer::LoadData(size_t sizeInBytes, const void* const sourc
 	//	size_type offset, size_type size, const void* ptr,
 	//	const vector<Event>* events = nullptr, Event* event = nullptr) const
 
-	ndSharedPtr<cl::CommandQueue>& queue = m_context->m_queue;
-
 	cl_int error = 0;
 	ndAssert(sizeInBytes == m_sizeInBytes);
+	ndSharedPtr<cl::CommandQueue>& queue = m_context->m_queue;
 	error =	queue->enqueueWriteBuffer(m_buffer, CL_TRUE, 0, sizeInBytes, sourceData);
 	ndAssert(error == CL_SUCCESS);
 }
 
-void ndBrainGpuFloatBuffer::UnloadData(size_t, void* const) const
+void ndBrainGpuFloatBuffer::UnloadData(size_t sizeInBytes, void* const destinationData) const
 {
+	cl_int error = 0;
+	ndAssert(sizeInBytes == m_sizeInBytes);
+	ndSharedPtr<cl::CommandQueue>& queue = m_context->m_queue;
+	error = queue->enqueueReadBuffer(m_buffer, CL_TRUE, 0, sizeInBytes, destinationData);
+	ndAssert(error == CL_SUCCESS);
 }
