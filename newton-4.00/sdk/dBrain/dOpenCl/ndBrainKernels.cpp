@@ -188,6 +188,38 @@ R""""(
         }
     }
 
+    __kernel void brainLayerLinearDropOutActivation(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* notUsed)  
+    {
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+        
+        uint inputSize = parameters->m_inputSize;
+        uint outputSize = parameters->m_outputSize;
+        uint inputOutputSize = parameters->m_inputOutputSize;
+        uint parametersStartOffset = parameters->m_parametersStartOffset;
+        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+        
+        uint rowCountReminder = inputSize % workGroupSize;
+        uint modRowCount = inputSize - rowCountReminder;
+        
+        uint inputOffset = itemId * inputOutputSize + inputOutputStartOffset;
+        uint outputOffset = inputOffset + inputSize;
+        
+        for (uint i = 0; i < modRowCount; i += workGroupSize)
+        {
+            float inputValue = inputOutputData[inputOffset + i + itemId];
+            float outputValue = inputValue;
+            inputOutputData[outputOffset + i + itemId] = outputValue;
+        }
+        if (itemId < rowCountReminder)
+        {
+            float inputValue = inputOutputData[inputOffset + modRowCount + groupId];
+            float outputValue = inputValue;
+            inputOutputData[outputOffset + modRowCount + itemId] = outputValue;
+        }
+    }
+
 
 )"""";
 
