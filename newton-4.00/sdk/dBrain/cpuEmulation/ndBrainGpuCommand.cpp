@@ -16,3 +16,26 @@
 #include "ndBrainGpuFloatBuffer.h"
 #include "ndBrainGpuIntegerBuffer.h"
 #include "ndBrainGpuUniformBuffer.h"
+
+ndBrainGpuCommand::ndBrainGpuCommand(ndBrainGpuContext* const context)
+	:m_context(context)
+	,m_workGroupSize(0)
+	,m_miniBatchSize(0)
+{
+}
+
+ndBrainGpuCommand::~ndBrainGpuCommand()
+{
+}
+
+
+void ndBrainGpuCommand::Assembly(const ndSharedPtr<ndBrainGpuContext::ndBrainGpuShader>& shader, ndInt32 workGroupSize, ndInt32 buffersCount, ndBrainGpuBuffer** buffer)
+{
+	m_shader = shader;
+	m_miniBatchSize = size_t(workGroupSize);
+	m_miniBatchSize = size_t(workGroupSize);
+	for (ndInt32 i = 0; i < buffersCount; ++i)
+	{
+		m_shader->m_parameters.PushBack(buffer[i]);
+	}
+}

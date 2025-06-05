@@ -12,23 +12,30 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainVector.h"
 #include "ndBrainGpuFloatBuffer.h"
-#include "ndBrainGpuScopeMapBuffer.h"
 
 ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, ndInt64 size, ndDeviceBufferType deviceType)
 	:ndBrainGpuBuffer(context, size * ndInt32(sizeof(ndReal)), ndStorageData, deviceType)
+	,m_buffer()
 {
 }
 
 ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, const ndBrainVector& input, ndDeviceBufferType deviceType)
 	:ndBrainGpuBuffer(context, input.GetCount() * ndInt32(sizeof(ndReal)), ndStorageData, deviceType)
 {
-	LoadData(input.GetCount() * sizeof (ndReal),  & input[0]);
+	LoadData(input.GetCount() * sizeof (ndBrainFloat),  & input[0]);
 }
 
-void ndBrainGpuFloatBuffer::LoadData(size_t, const void* const)
+void ndBrainGpuFloatBuffer::LoadData(size_t sizeInByte, const void* const sourceData)
 {
+	ndInt64 size = ndInt64(sizeInByte / sizeof(ndBrainFloat));
+	m_buffer.SetCount(size);
+	const ndBrainMemVector src((ndBrainFloat*)sourceData, size);
+	m_buffer.Set(src);
 }
 
-void ndBrainGpuFloatBuffer::UnloadData(size_t, void* const) const
+void ndBrainGpuFloatBuffer::UnloadData(size_t sizeInByte, void* const dstData) const
 {
+	ndInt64 size = ndInt64(sizeInByte / sizeof(ndBrainFloat));
+	ndBrainMemVector dst((ndBrainFloat*)dstData, size);
+	dst.Set(m_buffer);
 }

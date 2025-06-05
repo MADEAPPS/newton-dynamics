@@ -76,7 +76,6 @@
 #include <ndBrainGpuFloatBuffer.h>
 #include <ndBrainGpuIntegerBuffer.h>
 #include <ndBrainGpuUniformBuffer.h>
-#include <ndBrainGpuScopeMapBuffer.h>
 #include <ndBrainTrainerGpuInference.h>
 
 #endif 

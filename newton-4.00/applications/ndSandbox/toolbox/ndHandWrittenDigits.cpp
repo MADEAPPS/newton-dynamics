@@ -14,8 +14,9 @@
 
 //#define MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
 
-//#define MINIST_MINIBATCH_BUFFER_SIZE			128
-#define MINIST_MINIBATCH_BUFFER_SIZE			256
+// no sure why but I get randme erro when using minibatch size of 256 in gpu
+//#define MINIST_MINIBATCH_BUFFER_SIZE			256
+#define MINIST_MINIBATCH_BUFFER_SIZE			128
 
 #define MNIST_CONVOLUTIONAL_FEATURE_MAPS		32
 //#define MIN_TRAIN_SCORE						0.9999f
@@ -30,8 +31,8 @@
 	#endif
 #endif
 
-//#define MINIST_LINEAR_LAYERS_NEURONS	256
-#define MINIST_LINEAR_LAYERS_NEURONS	10
+#define MINIST_LINEAR_LAYERS_NEURONS	256
+//#define MINIST_LINEAR_LAYERS_NEURONS	10
 #define MINIST_LINEAR_DROPOUT_RATE		ndFloat32 (0.05f)
 
 #define MINIST_ACTIVATION_TYPE ndBrainLayerActivationRelu
@@ -272,10 +273,9 @@ static void MnistTrainingSet()
 			ndBrainLossCategoricalCrossEntropy loss(outputSize);
 
 			batchesSize = m_miniBatchSize * 2;
-for (int xxxx = 0; xxxx < 100; xxxx++)
 			for (ndInt32 epoch = 0; epoch < MINIST_NUMBER_OF_EPOCKS; ++epoch)
 			{
-				//shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
+				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
 				for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
 				{
 					for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
@@ -287,8 +287,7 @@ for (int xxxx = 0; xxxx < 100; xxxx++)
 					}
 
 					trainer->MakePrediction(miniBatchInput);
-	
-
+					
 					//calculate loss
 					trainer->GetOutput(miniBatchOutput);
 					//for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
@@ -453,19 +452,22 @@ for (int xxxx = 0; xxxx < 100; xxxx++)
 
 		SupervisedTrainer inference(optimizer.m_bestBrain);
 
-		ndInt32 trainingFailCount = inference.ValidateData(*trainingLabels, *trainingDigits);
+
+		ndExpandTraceMessage("\ntraining time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
+
+		//ndInt32 trainingFailCount = inference.ValidateData(*trainingLabels, *trainingDigits);
+		ndInt32 trainingFailCount = ndInt32(trainingLabels->GetCount());
 		ndExpandTraceMessage("training data results:\n");
 		ndExpandTraceMessage("  num_right: %d  out of %d\n", trainingLabels->GetCount() - trainingFailCount, trainingLabels->GetCount());
 		ndExpandTraceMessage("  num_wrong: %d  out of %d\n", trainingFailCount, trainingLabels->GetCount());
 		ndExpandTraceMessage("  success rate %f%%\n", (ndFloat32)(trainingLabels->GetCount() - trainingFailCount) * 100.0f / (ndFloat32)trainingLabels->GetCount());
 
-		ndInt32 testFailCount = inference.ValidateData(*testLabels, *testDigits);
+		//ndInt32 testFailCount = inference.ValidateData(*testLabels, *testDigits);
+		ndInt32 testFailCount = ndInt32(testLabels->GetCount());
 		ndExpandTraceMessage("test data results:\n");
 		ndExpandTraceMessage("  num_right: %d  out of %d\n", testLabels->GetCount() - testFailCount, testLabels->GetCount());
 		ndExpandTraceMessage("  num_wrong: %d  out of %d\n", testFailCount, testLabels->GetCount());
 		ndExpandTraceMessage("  success rate %f%%\n", (ndFloat32)(testLabels->GetCount() - testFailCount) * 100.0f / (ndFloat32)testLabels->GetCount());
-
-		ndExpandTraceMessage("treaning time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
 	}
 }
 
@@ -562,5 +564,5 @@ void ndHandWrittenDigits()
 {
 	ndSetRandSeed(53);
 	MnistTrainingSet();
-	MnistTestSet();
+	//MnistTestSet();
 }

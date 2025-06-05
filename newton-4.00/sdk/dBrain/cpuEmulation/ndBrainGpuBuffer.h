@@ -33,19 +33,19 @@ enum ndDeviceBufferType
 class ndBrainGpuBuffer : public ndClassAlloc
 {
 	protected:
-	ndBrainGpuBuffer(ndBrainGpuContext* const, ndInt64, ndStorageBufferType, ndDeviceBufferType):m_sizeInBytes(0){}
+	ndBrainGpuBuffer(ndBrainGpuContext* const, ndInt64, ndStorageBufferType, ndDeviceBufferType);
 
 	public:
-	virtual ~ndBrainGpuBuffer() {}
+	virtual ~ndBrainGpuBuffer();
 	void* GetBuffer() const { return nullptr;}
-	size_t SizeInBytes() const { return 0; }
+	size_t SizeInBytes() const { return m_sizeInBytes; }
 
 	virtual void LoadData(size_t sizeInBytes, const void* const inputData) = 0;
 	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const = 0;
 
 	protected:
-	size_t  m_sizeInBytes;
-	friend class ndScopeMapBuffer;
+	ndBrainGpuContext* m_context;
+	size_t m_sizeInBytes;
 };
 
 #endif

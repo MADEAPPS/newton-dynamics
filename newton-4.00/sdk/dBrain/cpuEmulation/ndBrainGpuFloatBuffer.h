@@ -11,7 +11,9 @@
 #ifndef __ND_BRAIN_GPU_FLOAT_BUFFER_H__
 #define __ND_BRAIN_GPU_FLOAT_BUFFER_H__
 
+#include "ndBrainStdafx.h"
 #include "ndBrainGpuBuffer.h"
+#include "ndBrainVector.h"
 
 class ndBrainGpuFloatBuffer : public ndBrainGpuBuffer
 {
@@ -21,6 +23,8 @@ class ndBrainGpuFloatBuffer : public ndBrainGpuBuffer
 
 	virtual void LoadData(size_t sizeInBytes, const void* const inputData) override;
 	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const override;
+
+	ndBrainVector m_buffer;
 };
 
 #endif

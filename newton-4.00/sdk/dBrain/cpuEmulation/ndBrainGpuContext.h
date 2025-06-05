@@ -13,25 +13,65 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainContext.h"
+#include "ndBrainThreadPool.h"
 
+class ndBrainGpuBuffer;
 class ndBrainGpuCommand;
 class ndBrainGpuFloatBuffer;
 
-typedef void* ndBrainGpuShader;
+typedef struct
+{
+	ndUnsigned32 m_inputSize;
+	ndUnsigned32 m_outputSize;
+	ndUnsigned32 m_parametersBatchSize;
+	ndUnsigned32 m_parametersStartOffset;
+	ndUnsigned32 m_inputOutputSize;
+	ndUnsigned32 m_inputOutputStartOffset;
+	ndUnsigned32 m_unused[4];
+} UniformBufferObject;
 
-class ndBrainGpuContext : public ndBrainContext
+class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 {
 	public:
+	class ndBrainGpuShader : public ndClassAlloc
+	{
+		public:
+		ndBrainGpuShader(ndBrainGpuContext* const context)
+			:ndClassAlloc()
+			,m_context(context)
+			,m_groupId(0)
+			,m_workGroupSize(0)
+		{
+		}
+		virtual ~ndBrainGpuShader()
+		{
+
+		}
+		virtual void Execute(const UniformBufferObject* const parameters, float* const inputOutputData, float* const inputBuffer) = 0;
+
+		ndBrainGpuContext* m_context;
+		ndFixSizeArray<ndBrainGpuBuffer*, 4> m_parameters;
+		ndInt32 m_groupId;
+		ndInt32 m_workGroupSize;
+	};
+
 	ndBrainGpuContext();
 	virtual ~ndBrainGpuContext();
 	virtual ndContextType GetType() const override;
 
-	void SyncQueue() {}
-	void AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>&) {}
-
 	ndInt32 GetSubGroupSize() const { return 0; }
-	static bool HasGpuSupport() { return false; }
 
+	void SyncQueue();
+	void AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>&);
+
+	static bool HasGpuSupport();
+
+	ndBrainGpuContext* GetAsGpuContext() override;
+
+	private:
+	void CreateKerners();
+
+	public:
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyInput;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyOutput;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinear;

@@ -15,8 +15,6 @@
 const char* ndBrainGpuContext::m_kernelSource =
 R""""(
 
-    #define WORKGROUP_SIZE  256
-
     typedef struct
     {
         uint m_inputSize;
@@ -68,22 +66,25 @@ R""""(
         size_t inputOutputSize = parameters->m_inputOutputSize;
         size_t inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        uint dstBase = groupId * outputSize;
-        uint srcBase = groupId * inputOutputSize + inputOutputStartOffset;
+        size_t dstBase = groupId * outputSize;
+        size_t srcBase = groupId * inputOutputSize + inputOutputStartOffset;
         
-        uint iterations = outputSize / workGroupSize;
-        uint modWorkGroupSize = iterations * workGroupSize;
-        uint reminderworkGroupSize = outputSize - modWorkGroupSize;
+        size_t iterations = outputSize / workGroupSize;
+        size_t modWorkGroupSize = iterations * workGroupSize;
+        size_t reminderworkGroupSize = outputSize - modWorkGroupSize;
         
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             float a = inputOutputData[srcBase + itemId];
             outputBuffer[dstBase + i + itemId] = a;
         }
+        
         if (itemId < reminderworkGroupSize)
         {
             float a = inputOutputData[srcBase + modWorkGroupSize + itemId];
             outputBuffer[dstBase + modWorkGroupSize + itemId] = a;
+            //if (itemId == 0) printf ("%d %d %d", groupId, workGroupSize, get_num_groups(0));
+            //outputBuffer[dstBase + modWorkGroupSize + itemId] = groupId * 100 + itemId;
         }
     }
 
@@ -93,7 +94,7 @@ R""""(
     {
         __local float cachedInput [1024 * 2];
         __local float cachedOutput [1024 * 2];
-        __local float reductionBuffer [WORKGROUP_SIZE / 2];
+        __local float reductionBuffer [1024];
 
         size_t itemId = get_local_id(0);
         size_t groupId = get_group_id(0);

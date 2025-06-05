@@ -13,5 +13,13 @@
 #include "ndBrainVector.h"
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuContext.h"
-#include "ndBrainGpuScopeMapBuffer.h"
 
+ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt64 sizeInBytes, ndStorageBufferType, ndDeviceBufferType)
+	:m_context (context)
+	,m_sizeInBytes(size_t(sizeInBytes))
+{
+}
+
+ndBrainGpuBuffer::~ndBrainGpuBuffer()
+{
+}

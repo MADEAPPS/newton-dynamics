@@ -21,7 +21,7 @@ ndBrainGpuCommand::ndBrainGpuCommand(ndBrainGpuContext* const context)
 	:ndClassAlloc()
 	,m_context(context)
 	,m_workGroupSize(0)
-	,m_numberOfWorkGroups(0)
+	,m_miniBatchSize(0)
 {
 }
 
@@ -32,8 +32,8 @@ ndBrainGpuCommand::~ndBrainGpuCommand()
 void ndBrainGpuCommand::Assembly(const ndSharedPtr<ndBrainGpuShader>& shader, ndInt32 workGroupSize, ndInt32 buffersCount, ndBrainGpuBuffer** buffer)
 {
 	m_shader = shader;
-	m_workGroupSize = size_t(workGroupSize);
-	m_numberOfWorkGroups = size_t(workGroupSize);
+	m_miniBatchSize = workGroupSize;
+	m_shader->getWorkGroupInfo(**m_context->m_device, CL_KERNEL_WORK_GROUP_SIZE, &m_workGroupSize);
 	for (ndInt32 i = 0; i < buffersCount; ++i)
 	{
 		ndBrainGpuBuffer* const argBuffer = buffer[i];

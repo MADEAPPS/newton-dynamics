@@ -19,8 +19,8 @@
 #include <vector>
 
 //#define D_OPENCL_SELECTION_TYPE		CL_DEVICE_TYPE_ALL
-#define D_OPENCL_SELECTION_TYPE		CL_DEVICE_TYPE_CPU
-//#define D_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_GPU
+//#define D_OPENCL_SELECTION_TYPE		CL_DEVICE_TYPE_CPU
+#define D_OPENCL_SELECTION_TYPE			CL_DEVICE_TYPE_GPU
 
 ndBrainGpuContext::ndBrainGpuContext()
 	:ndBrainContext()
@@ -112,8 +112,7 @@ void ndBrainGpuContext::SyncQueue()
 void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& command)
 {
 	cl::NDRange offset(0);
-	cl::NDRange local(command->m_workGroupSize);
-	cl::NDRange global(command->m_numberOfWorkGroups);
-	cl_int error = m_queue->enqueueNDRangeKernel(**command->m_shader, offset, global, global, nullptr, nullptr);
+	cl::NDRange global(command->m_workGroupSize * command->m_miniBatchSize);
+	cl_int error = m_queue->enqueueNDRangeKernel(**command->m_shader, offset, global);
 	ndAssert(error == CL_SUCCESS);
 }

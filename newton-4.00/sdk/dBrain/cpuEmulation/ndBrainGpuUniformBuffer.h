@@ -11,8 +11,9 @@
 #ifndef __ND_BRAIN_GPU_UNIFORM_BUFFER_H__
 #define __ND_BRAIN_GPU_UNIFORM_BUFFER_H__
 
+#include "ndBrainStdafx.h"
 #include "ndBrainGpuBuffer.h"
-
+#include "ndBrainGpuContext.h"
 
 class ndBrainGpuUniformBuffer : public ndBrainGpuBuffer
 {
@@ -22,6 +23,8 @@ class ndBrainGpuUniformBuffer : public ndBrainGpuBuffer
 
 	virtual void LoadData(size_t sizeInBytes, const void* const inputData) override;
 	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const override;
+
+	UniformBufferObject m_data;
 };
 
 #endif

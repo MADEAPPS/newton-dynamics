@@ -96,7 +96,9 @@ ndInt32 ndBrainThreadPool::GetMaxThreads()
 	#ifdef D_USE_BRAIN_THREAD_EMULATION
 		return D_MAX_THREADS_COUNT;
 	#else
-		return ndClamp(ndInt32(std::thread::hardware_concurrency() + 1) / 2, 1, D_MAX_THREADS_COUNT);
+		//return ndClamp(ndInt32(std::thread::hardware_concurrency() + 1) / 2, 1, D_MAX_THREADS_COUNT);
+		ndInt32 threadCount = ndInt32(std::thread::hardware_concurrency());
+		return ndClamp((threadCount + 1) / 2, 1, D_MAX_THREADS_COUNT);
 	#endif
 }
 

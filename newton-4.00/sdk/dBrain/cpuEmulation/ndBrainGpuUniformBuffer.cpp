@@ -12,7 +12,6 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainVector.h"
 #include "ndBrainGpuUniformBuffer.h"
-#include "ndBrainGpuScopeMapBuffer.h"
 
 ndBrainGpuUniformBuffer::ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes)
 	:ndBrainGpuBuffer(context, sizeInBytes, ndUniformData, ndCpuMappable)
@@ -29,6 +28,8 @@ void ndBrainGpuUniformBuffer::UnloadData(size_t, void* const) const
 {
 }
 
-void ndBrainGpuUniformBuffer::LoadData(size_t, const void* const)
+void ndBrainGpuUniformBuffer::LoadData(size_t, const void* const sourceData)
 {
+	const UniformBufferObject* const src = (UniformBufferObject*)sourceData;
+	m_data = *src;
 }
