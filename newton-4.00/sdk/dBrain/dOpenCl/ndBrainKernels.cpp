@@ -39,9 +39,8 @@ R""""(
         size_t srcBase = groupId * inputSize;
         size_t dstBase = groupId * inputOutputSize + inputOutputStartOffset;
         
-        size_t iterations = inputSize / workGroupSize;
-        size_t modWorkGroupSize = iterations * workGroupSize;
-        size_t workGroupSizeReminder = inputSize - modWorkGroupSize;
+        size_t workGroupSizeReminder = inputSize % workGroupSize;
+        size_t modWorkGroupSize = inputSize - workGroupSizeReminder;
         
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
@@ -61,17 +60,15 @@ R""""(
         size_t groupId = get_group_id(0);
         size_t workGroupSize = get_local_size(0);
 
-        size_t inputSize = parameters->m_inputSize;
         size_t outputSize = parameters->m_outputSize;
         size_t inputOutputSize = parameters->m_inputOutputSize;
         size_t inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
         size_t dstBase = groupId * outputSize;
         size_t srcBase = groupId * inputOutputSize + inputOutputStartOffset;
-        
-        size_t iterations = outputSize / workGroupSize;
-        size_t modWorkGroupSize = iterations * workGroupSize;
-        size_t workGroupSizeReminder = outputSize - modWorkGroupSize;
+
+        size_t workGroupSizeReminder = outputSize % workGroupSize;
+        size_t modWorkGroupSize = outputSize - workGroupSizeReminder;
         
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
@@ -108,10 +105,6 @@ R""""(
         size_t inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
         size_t outputOffset = inputOffset + inputSize;
         
-        //size_t workGroupCount = inputSize / workGroupSize;
-        //size_t modWorkGroupSize = workGroupCount * workGroupSize;
-        //size_t workGroupSizeReminder = inputSize - modWorkGroupSize;
-
         size_t workGroupSizeReminder = inputSize % workGroupSize;
         size_t modWorkGroupSize = inputSize - workGroupSizeReminder;
         for (size_t i = 0; i < modWorkGroupSize; i += workGroupSize)
@@ -123,9 +116,6 @@ R""""(
             cachedInput[modWorkGroupSize + itemId] = inputOutputData[inputOffset + modWorkGroupSize + itemId];
         }
         
-        //size_t roundRowCount = outputSize / workGroupSize;
-        //size_t modRowCount = roundRowCount * workGroupSize;
-        //size_t rowCountReminder = outputSize - modRowCount;
         size_t rowCountReminder = outputSize % workGroupSize;
         size_t modRowCount = outputSize - rowCountReminder;
 
@@ -195,28 +185,28 @@ R""""(
         uint workGroupSize = get_local_size(0);
         
         uint inputSize = parameters->m_inputSize;
-        uint outputSize = parameters->m_outputSize;
+        //uint outputSize = parameters->m_outputSize;
         uint inputOutputSize = parameters->m_inputOutputSize;
         uint parametersStartOffset = parameters->m_parametersStartOffset;
         uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        uint rowCountReminder = inputSize % workGroupSize;
-        uint modRowCount = inputSize - rowCountReminder;
+        size_t workGroupSizeReminder = inputSize % workGroupSize;
+        size_t modWorkGroupSize = inputSize - workGroupSizeReminder;
         
         uint inputOffset = itemId * inputOutputSize + inputOutputStartOffset;
         uint outputOffset = inputOffset + inputSize;
         
-        for (uint i = 0; i < modRowCount; i += workGroupSize)
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             float inputValue = inputOutputData[inputOffset + i + itemId];
             float outputValue = inputValue;
             inputOutputData[outputOffset + i + itemId] = outputValue;
         }
-        if (itemId < rowCountReminder)
+        if (itemId < workGroupSizeReminder)
         {
-            float inputValue = inputOutputData[inputOffset + modRowCount + groupId];
+            float inputValue = inputOutputData[inputOffset + modWorkGroupSize + groupId];
             float outputValue = inputValue;
-            inputOutputData[outputOffset + modRowCount + itemId] = outputValue;
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
         }
     }
 
@@ -241,4 +231,5 @@ void ndBrainGpuContext::CreateKerners()
     m_ndBrainCopyInput = CreateKerner(program, "brainCopyInput");
     m_ndBrainCopyOutput = CreateKerner(program, "brainCopyOutput");
     m_ndBrainLayerLinear = CreateKerner(program, "brainLayerLinear");
+    m_ndBrainLayerLinearDropOutActivation = CreateKerner(program, "brainLayerLinearDropOutActivation");
 }
