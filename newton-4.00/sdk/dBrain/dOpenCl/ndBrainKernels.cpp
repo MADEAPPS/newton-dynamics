@@ -209,6 +209,37 @@ R""""(
         }
     }
 
+    __kernel void brainLayerReluActivation(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* notUsed)  
+    {
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+        
+        uint inputSize = parameters->m_inputSize;
+        uint inputOutputSize = parameters->m_inputOutputSize;
+        uint parametersStartOffset = parameters->m_parametersStartOffset;
+        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+        
+        uint workGroupSizeReminder = inputSize % workGroupSize;
+        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
+        
+        uint inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
+        uint outputOffset = inputOffset + inputSize;
+        
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            float inputValue = inputOutputData[inputOffset + i + itemId];
+            float outputValue = (inputValue >= 0.0) ? inputValue : 0.0f;
+            inputOutputData[outputOffset + i + itemId] = outputValue;
+        }
+        if (itemId < workGroupSizeReminder)
+        {
+            float inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
+            float outputValue = (inputValue >= 0.0) ? inputValue : 0.0f;
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
+        }
+    }
+
 
 )"""";
 
@@ -230,5 +261,6 @@ void ndBrainGpuContext::CreateKerners()
     m_ndBrainCopyInput = CreateKerner(program, "brainCopyInput");
     m_ndBrainCopyOutput = CreateKerner(program, "brainCopyOutput");
     m_ndBrainLayerLinear = CreateKerner(program, "brainLayerLinear");
+    m_ndBrainLayerReluActivation = CreateKerner(program, "brainLayerReluActivation");
     m_ndBrainLayerLinearDropOutActivation = CreateKerner(program, "brainLayerLinearDropOutActivation");
 }
