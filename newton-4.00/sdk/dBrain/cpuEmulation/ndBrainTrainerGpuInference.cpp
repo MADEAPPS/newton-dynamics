@@ -86,7 +86,6 @@ ndBrainTrainerGpuInference::~ndBrainTrainerGpuInference()
 {
 }
 
-//void ndBrainTrainerGpuInference::AddLayersCommands(ndFixSizeArray<ndLayerUniformDataGpu, 256>& layersUniformsData)
 void ndBrainTrainerGpuInference::AddLayersCommands(ndFixSizeArray<ndBrainLayer::ndCommandShareInfo, 256>& layersUniformsData)
 {
 	// create all the uniform buffers 

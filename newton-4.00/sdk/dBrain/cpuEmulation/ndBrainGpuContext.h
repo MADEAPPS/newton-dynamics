@@ -43,11 +43,19 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 			,m_workGroupSize(0)
 		{
 		}
+
+		ndBrainGpuShader(const ndBrainGpuShader& src)
+			:ndClassAlloc()
+			,m_context(src.m_context)
+			,m_groupId(src.m_groupId)
+			,m_workGroupSize(src.m_workGroupSize)
+		{
+		}
+
 		virtual ~ndBrainGpuShader()
 		{
-
 		}
-		//virtual void Execute(const UniformBufferObject* const parameters, float* const inputOutputData, float* const inputBuffer) = 0;
+
 		virtual void Execute(ndInt32 groupId, ndInt32 workGroupSize) = 0;
 
 		ndBrainGpuContext* m_context;

@@ -54,23 +54,21 @@ void ndBrainGpuContext::SyncQueue()
 void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& command)
 {
 	ndAtomic<ndInt32> iterator(0);
-	auto ExecuteCommand = ndMakeObject::ndFunction([this, &iterator, command](ndInt32, ndInt32)
-	{
-		ndInt32 miniBatchSize = ndInt32(command->m_miniBatchSize);
-		ndBrainGpuContext::ndBrainGpuShader& shader = **command->m_shader;
-		//ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)shader.m_parameters[0];
-		//ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)shader.m_parameters[1];
-		//ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)shader.m_parameters[2];
-		//
-		////shader.m_workGroupSize = 256;
-		//UniformBufferObject* const parameters = &buffer0->m_data;
-		//ndBrainFloat* const arg1 = &buffer1->m_buffer[0];
-		//ndBrainFloat* const arg2 = &buffer2->m_buffer[0];
+	ndBrainGpuContext::ndBrainGpuShader& shader = **command->m_shader;
+	shader.m_parameters.SetCount(0);
+	shader.m_parameters.PushBack(command->m_parameters[0]);
+	shader.m_parameters.PushBack(command->m_parameters[1]);
+	shader.m_parameters.PushBack(command->m_parameters[2]);
 
+	auto ExecuteCommand = ndMakeObject::ndFunction([this, &iterator, &command](ndInt32, ndInt32)
+	{
 		ndInt32 workGroupdSize = 256;
+		ndInt32 miniBatchSize = ndInt32(command->m_miniBatchSize);
+		
+		ndBrainGpuContext::ndBrainGpuShader& kernel = **command->m_shader;
 		for (ndInt32 i = iterator++; i < miniBatchSize; i = iterator++)
 		{
-			shader.Execute(i, workGroupdSize);
+			kernel.Execute(i, workGroupdSize);
 		}
 	});
 	iterator = 0;

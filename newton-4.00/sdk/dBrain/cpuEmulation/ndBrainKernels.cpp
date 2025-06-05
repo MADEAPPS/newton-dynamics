@@ -95,7 +95,6 @@ class brainCopyOutput : public ndBrainGpuContext::ndBrainGpuShader
             }
         }
             
-        //if (itemId < workGroupSizeReminder)
         for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
         {
             float a = inputOutputData[srcBase + modWorkGroupSize + itemId];
@@ -222,7 +221,6 @@ class brainLayerLinear : public ndBrainGpuContext::ndBrainGpuShader
                 inputOutputData[outputOffset + i + itemId] = cachedOutput[i + itemId];
             }
         }
-        //if (itemId < rowCountReminder)
         for (ndInt32 itemId = 0; itemId < rowCountReminder; ++itemId)
         {
             inputOutputData[outputOffset + modRowCount + itemId] = cachedOutput[modRowCount + itemId];
@@ -230,9 +228,98 @@ class brainLayerLinear : public ndBrainGpuContext::ndBrainGpuShader
     }
 };
 
+class brainLayerReluActivation : public ndBrainGpuContext::ndBrainGpuShader
+{
+    public:
+    brainLayerReluActivation(ndBrainGpuContext* const context)
+        :ndBrainGpuContext::ndBrainGpuShader(context)
+    {
+    }
+
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    {
+        ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
+        //ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)m_parameters[2];
+        UniformBufferObject* const parameters = &buffer0->m_data;
+        ndBrainFloat* const inputOutputData = &buffer1->m_buffer[0];
+
+        ndInt32 inputSize = ndInt32(parameters->m_inputSize);
+        ndInt32 inputOutputSize = ndInt32(parameters->m_inputOutputSize);
+        //ndInt32 parametersStartOffset = ndInt32(parameters->m_parametersStartOffset);
+        ndInt32 inputOutputStartOffset = ndInt32(parameters->m_inputOutputStartOffset);
+
+        ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
+        ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
+
+        ndInt32 inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
+        ndInt32 outputOffset = inputOffset + inputSize;
+
+        for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+            {
+                float a = inputOutputData[inputOffset + i + itemId];
+                float b = (a >= 0.0) ? a : 0.0f;
+                inputOutputData[outputOffset + i + itemId] = b;
+            }
+        }
+        for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+        {
+            float a = inputOutputData[inputOffset + modWorkGroupSize + itemId];
+            float b = (a >= 0.0) ? a : 0.0f;
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = b;
+        }
+    }
+};
+
+class brainLayerLinearDropOutActivation : public ndBrainGpuContext::ndBrainGpuShader
+{
+    public:
+    brainLayerLinearDropOutActivation(ndBrainGpuContext* const context)
+        :ndBrainGpuContext::ndBrainGpuShader(context)
+    {
+    }
+
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    {
+        ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
+        //ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)m_parameters[2];
+        UniformBufferObject* const parameters = &buffer0->m_data;
+        ndBrainFloat* const inputOutputData = &buffer1->m_buffer[0];
+
+        ndInt32 inputSize = ndInt32(parameters->m_inputSize);
+        ndInt32 inputOutputSize = ndInt32(parameters->m_inputOutputSize);
+        //ndInt32 parametersStartOffset = ndInt32(parameters->m_parametersStartOffset);
+        ndInt32 inputOutputStartOffset = ndInt32(parameters->m_inputOutputStartOffset);
+
+        ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
+        ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
+
+        ndInt32 inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
+        ndInt32 outputOffset = inputOffset + inputSize;
+
+        for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+            {
+                float a = inputOutputData[inputOffset + i + itemId];
+                inputOutputData[outputOffset + i + itemId] = a;
+            }
+        }
+        for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+        {
+            float a = inputOutputData[inputOffset + modWorkGroupSize + itemId];
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = a;
+        }
+    }
+};
 void ndBrainGpuContext::CreateKerners()
 {
     m_ndBrainCopyInput = ndSharedPtr<ndBrainGpuShader> (new brainCopyInput(this));
     m_ndBrainCopyOutput = ndSharedPtr<ndBrainGpuShader> (new brainCopyOutput(this));
     m_ndBrainLayerLinear = ndSharedPtr<ndBrainGpuShader> (new brainLayerLinear(this));
+    m_ndBrainLayerReluActivation = ndSharedPtr<ndBrainGpuShader>(new brainLayerReluActivation(this));
+    m_ndBrainLayerLinearDropOutActivation = ndSharedPtr<ndBrainGpuShader>(new brainLayerLinearDropOutActivation(this));
 }
