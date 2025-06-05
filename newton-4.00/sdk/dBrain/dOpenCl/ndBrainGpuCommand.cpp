@@ -32,7 +32,7 @@ ndBrainGpuCommand::~ndBrainGpuCommand()
 void ndBrainGpuCommand::Assembly(const ndSharedPtr<ndBrainGpuShader>& shader, ndInt32 workGroupSize, ndInt32 buffersCount, ndBrainGpuBuffer** buffer)
 {
 	m_shader = shader;
-	m_miniBatchSize = workGroupSize;
+	m_miniBatchSize = size_t(workGroupSize);
 	m_shader->getWorkGroupInfo(**m_context->m_device, CL_KERNEL_WORK_GROUP_SIZE, &m_workGroupSize);
 	for (ndInt32 i = 0; i < buffersCount; ++i)
 	{

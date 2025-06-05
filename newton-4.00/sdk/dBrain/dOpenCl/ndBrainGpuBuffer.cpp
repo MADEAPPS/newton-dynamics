@@ -13,7 +13,6 @@
 #include "ndBrainVector.h"
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuContext.h"
-#include "ndBrainGpuScopeMapBuffer.h"
 
 ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt64 sizeInByte, ndStorageBufferType bufferTypeFlags, ndDeviceBufferType)
 	:m_buffer(**context->m_context, (bufferTypeFlags == ndStorageData) ? CL_MEM_READ_WRITE : CL_MEM_READ_ONLY, size_t(sizeInByte))

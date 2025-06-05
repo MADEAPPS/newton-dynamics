@@ -41,14 +41,14 @@ R""""(
         
         size_t iterations = inputSize / workGroupSize;
         size_t modWorkGroupSize = iterations * workGroupSize;
-        size_t reminderworkGroupSize = inputSize - modWorkGroupSize;
+        size_t workGroupSizeReminder = inputSize - modWorkGroupSize;
         
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             float a = inputBuffer[srcBase + i + itemId];
             inputOutputData[dstBase + i + itemId] = a;
         }
-        if (itemId < reminderworkGroupSize)
+        if (itemId < workGroupSizeReminder)
         {
             float a = inputBuffer[srcBase + modWorkGroupSize + itemId];
             inputOutputData[dstBase + modWorkGroupSize + itemId] = a;
@@ -71,7 +71,7 @@ R""""(
         
         size_t iterations = outputSize / workGroupSize;
         size_t modWorkGroupSize = iterations * workGroupSize;
-        size_t reminderworkGroupSize = outputSize - modWorkGroupSize;
+        size_t workGroupSizeReminder = outputSize - modWorkGroupSize;
         
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
@@ -79,12 +79,10 @@ R""""(
             outputBuffer[dstBase + i + itemId] = a;
         }
         
-        if (itemId < reminderworkGroupSize)
+        if (itemId < workGroupSizeReminder)
         {
             float a = inputOutputData[srcBase + modWorkGroupSize + itemId];
             outputBuffer[dstBase + modWorkGroupSize + itemId] = a;
-            //if (itemId == 0) printf ("%d %d %d", groupId, workGroupSize, get_num_groups(0));
-            //outputBuffer[dstBase + modWorkGroupSize + itemId] = groupId * 100 + itemId;
         }
     }
 
@@ -110,31 +108,37 @@ R""""(
         size_t inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
         size_t outputOffset = inputOffset + inputSize;
         
-        size_t workGroupCount = inputSize / workGroupSize;
-        size_t modWorkGroupSize = workGroupCount * workGroupSize;
-        size_t reminderworkGroupSize = inputSize - modWorkGroupSize;
+        //size_t workGroupCount = inputSize / workGroupSize;
+        //size_t modWorkGroupSize = workGroupCount * workGroupSize;
+        //size_t workGroupSizeReminder = inputSize - modWorkGroupSize;
 
+        size_t workGroupSizeReminder = inputSize % workGroupSize;
+        size_t modWorkGroupSize = inputSize - workGroupSizeReminder;
         for (size_t i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             cachedInput[i + itemId] = inputOutputData[inputOffset + itemId + i];
         }
-        if (itemId < reminderworkGroupSize)
+        if (itemId < workGroupSizeReminder)
         {
             cachedInput[modWorkGroupSize + itemId] = inputOutputData[inputOffset + modWorkGroupSize + itemId];
         }
         
-        size_t roundRowCount = outputSize / workGroupSize;
-        size_t modRowCount = roundRowCount * workGroupSize;
-        size_t reminderRowCount = outputSize - modRowCount;
+        //size_t roundRowCount = outputSize / workGroupSize;
+        //size_t modRowCount = roundRowCount * workGroupSize;
+        //size_t rowCountReminder = outputSize - modRowCount;
+        size_t rowCountReminder = outputSize % workGroupSize;
+        size_t modRowCount = outputSize - rowCountReminder;
+
         for (size_t i = 0; i < modRowCount; i += workGroupSize)
         {
             cachedOutput[i + itemId] = weightsAndBias[biasOffset + itemId];
         }
-        if (itemId < reminderRowCount)
+        if (itemId < rowCountReminder)
         {
             cachedOutput[modRowCount + itemId] = weightsAndBias[biasOffset + modRowCount + itemId];
         }
-        
+        //barrier(CLK_LOCAL_MEM_FENCE); 
+
         for (size_t i = 0; i < outputSize; ++i)
         {
             float partialSum = 0.0f;
@@ -145,38 +149,40 @@ R""""(
                 float a = weightsAndBias[rowStartOffset + itemId + j];
                 partialSum += a * b;
             }
-            if (itemId < reminderworkGroupSize)
+            if (itemId < workGroupSizeReminder)
             {
                 float b = cachedInput[modWorkGroupSize + itemId];
                 float a = weightsAndBias[rowStartOffset + modWorkGroupSize + itemId];
                 partialSum += a * b;
             }
-            
+
             for (size_t j = workGroupSize / 2; j > 0; j = j >> 1)
             {
+                barrier(CLK_LOCAL_MEM_FENCE); 
                 if ((itemId >= j) && (itemId < j * 2))
                 {
                     reductionBuffer[itemId - j] = partialSum;
                 }
-                //memoryBarrierShared();
-                //barrier();
-                barrier(CLK_GLOBAL_MEM_FENCE); 
+
+                barrier(CLK_LOCAL_MEM_FENCE); 
                 if (itemId < j)
                 {
                     partialSum += reductionBuffer[itemId];
                 }
             }
+
             if (itemId == 0)
             {
                 cachedOutput[i] += partialSum;
             }
         }
+        barrier(CLK_LOCAL_MEM_FENCE); 
         
         for (size_t i = 0; i < modRowCount; i += workGroupSize)
         {
             inputOutputData[outputOffset + i + itemId] = cachedOutput[i + itemId];
         }
-        if (itemId < reminderRowCount)
+        if (itemId < rowCountReminder)
         {
             inputOutputData[outputOffset + modRowCount + itemId] = cachedOutput[modRowCount + itemId];
         }

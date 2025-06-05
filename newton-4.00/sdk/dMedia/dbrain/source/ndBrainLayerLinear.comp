@@ -13,16 +13,6 @@
 #define WORKGROUP_SIZE  256
 layout (local_size_x = WORKGROUP_SIZE) in;
 
-//layout(std140, binding = 0) uniform param
-//{
-//    uint m_inputSize;
-//    uint m_outputSize;
-//    uint m_weightsStartOffset;
-//
-//    uint m_inputOutputSize;
-//    uint m_inputOutputStartOffset;
-// };
-
 layout(std140, binding = 0) uniform UniformBufferObject 
 {
     uint m_inputSize;
@@ -99,10 +89,13 @@ void main()
 
         for (uint j = WORKGROUP_SIZE / 2; j > 0; j = j >> 1)
         {
+            memoryBarrierShared();
+            barrier();
             if ((gl_LocalInvocationID.x >= j) && (gl_LocalInvocationID.x < j * 2))
             {
                 reductionBuffer[gl_LocalInvocationID.x - j] = partialSum;
             }
+
             memoryBarrierShared();
             barrier();
             if (gl_LocalInvocationID.x < j)
@@ -115,6 +108,8 @@ void main()
             cachedOutput[i] += partialSum;
         }
     }
+    memoryBarrierShared();
+    barrier();
 
     for (uint i = 0; i < modRowCount; i += WORKGROUP_SIZE)
     {

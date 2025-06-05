@@ -12,7 +12,6 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainVector.h"
 #include "ndBrainGpuIntegerBuffer.h"
-#include "ndBrainGpuScopeMapBuffer.h"
 
 ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, ndInt64 size, ndDeviceBufferType deviceType)
 	:ndBrainGpuBuffer(context, size* ndInt32(sizeof(ndInt32)), ndStorageData, deviceType)
