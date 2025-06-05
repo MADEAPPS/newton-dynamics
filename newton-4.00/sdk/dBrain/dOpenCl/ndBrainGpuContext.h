@@ -57,6 +57,7 @@ class ndBrainGpuContext : public ndBrainContext
 	static const char* m_kernelSource;
 
 	friend class ndBrainGpuBuffer;
+	friend class ndBrainGpuCommand;
 	friend class ndBrainGpuFloatBuffer;
 	friend class ndBrainGpuUniformBuffer;
 };

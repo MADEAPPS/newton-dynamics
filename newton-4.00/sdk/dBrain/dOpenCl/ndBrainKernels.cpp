@@ -26,20 +26,24 @@ R""""(
 	    uint m_inputOutputSize;
 	    uint m_inputOutputStartOffset;
 	    uint m_unused[4];
-    }  UniformBufferObject ;
+    }  UniformBufferObject;
 
-    __kernel void brainCopyInput(__local const UniformBufferObject* parameters, __global float* inputOutputData, __global float* inputBuffer)
+    __kernel void brainCopyInput(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* inputBuffer)
     {                                                                      
         size_t itemId = get_local_id(0);
         size_t groupId = get_group_id(0);
         size_t workGroupSize = get_local_size(0);
+
+        size_t inputSize = parameters->m_inputSize;
+        size_t inputOutputSize = parameters->m_inputOutputSize;
+        size_t inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        size_t srcBase = groupId * parameters->m_inputSize;
-        size_t dstBase = groupId * parameters->m_inputOutputSize + parameters->m_inputOutputStartOffset;
+        size_t srcBase = groupId * inputSize;
+        size_t dstBase = groupId * inputOutputSize + inputOutputStartOffset;
         
-        size_t iterations = parameters->m_inputSize / workGroupSize;
+        size_t iterations = inputSize / workGroupSize;
         size_t modWorkGroupSize = iterations * workGroupSize;
-        size_t reminderworkGroupSize = parameters->m_inputSize - modWorkGroupSize;
+        size_t reminderworkGroupSize = inputSize - modWorkGroupSize;
         
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
@@ -58,13 +62,18 @@ R""""(
         size_t itemId = get_local_id(0);
         size_t groupId = get_group_id(0);
         size_t workGroupSize = get_local_size(0);
+
+        size_t inputSize = parameters->m_inputSize;
+        size_t outputSize = parameters->m_outputSize;
+        size_t inputOutputSize = parameters->m_inputOutputSize;
+        size_t inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        uint dstBase = groupId * parameters->m_outputSize;
-        uint srcBase = groupId * parameters->m_inputOutputSize + parameters->m_inputOutputStartOffset;
+        uint dstBase = groupId * outputSize;
+        uint srcBase = groupId * inputOutputSize + inputOutputStartOffset;
         
-        uint iterations = parameters->m_outputSize / workGroupSize;
+        uint iterations = outputSize / workGroupSize;
         uint modWorkGroupSize = iterations * workGroupSize;
-        uint reminderworkGroupSize = parameters->m_outputSize - modWorkGroupSize;
+        uint reminderworkGroupSize = outputSize - modWorkGroupSize;
         
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
@@ -90,13 +99,19 @@ R""""(
         size_t groupId = get_group_id(0);
         size_t workGroupSize = get_local_size(0);
 
-        size_t biasOffset = parameters->m_outputSize * parameters->m_inputSize + parameters->m_parametersStartOffset;
-        size_t inputOffset = groupId * parameters->m_inputOutputSize + parameters->m_inputOutputStartOffset;
-        size_t outputOffset = inputOffset + parameters->m_inputSize;
+        size_t inputSize = parameters->m_inputSize;
+        size_t outputSize = parameters->m_outputSize;
+        size_t inputOutputSize = parameters->m_inputOutputSize;
+        size_t parametersStartOffset = parameters->m_parametersStartOffset;
+        size_t inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+
+        size_t biasOffset = outputSize * inputSize + parametersStartOffset;
+        size_t inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
+        size_t outputOffset = inputOffset + inputSize;
         
-        size_t workGroupCount = parameters->m_inputSize / workGroupSize;
+        size_t workGroupCount = inputSize / workGroupSize;
         size_t modWorkGroupSize = workGroupCount * workGroupSize;
-        size_t reminderworkGroupSize = parameters->m_inputSize - modWorkGroupSize;
+        size_t reminderworkGroupSize = inputSize - modWorkGroupSize;
 
         for (size_t i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
@@ -107,9 +122,9 @@ R""""(
             cachedInput[modWorkGroupSize + itemId] = inputOutputData[inputOffset + modWorkGroupSize + itemId];
         }
         
-        size_t roundRowCount = parameters->m_outputSize / workGroupSize;
+        size_t roundRowCount = outputSize / workGroupSize;
         size_t modRowCount = roundRowCount * workGroupSize;
-        size_t reminderRowCount = parameters->m_outputSize - modRowCount;
+        size_t reminderRowCount = outputSize - modRowCount;
         for (size_t i = 0; i < modRowCount; i += workGroupSize)
         {
             cachedOutput[i + itemId] = weightsAndBias[biasOffset + itemId];
@@ -119,10 +134,10 @@ R""""(
             cachedOutput[modRowCount + itemId] = weightsAndBias[biasOffset + modRowCount + itemId];
         }
         
-        for (size_t i = 0; i < parameters->m_outputSize; ++i)
+        for (size_t i = 0; i < outputSize; ++i)
         {
             float partialSum = 0.0f;
-            size_t rowStartOffset = i * parameters->m_inputSize + parameters->m_parametersStartOffset;
+            size_t rowStartOffset = i * inputSize + parametersStartOffset;
             for (size_t j = 0; j < modWorkGroupSize; j += workGroupSize)
             {
                 float b = cachedInput[itemId + j];

@@ -27,6 +27,10 @@ class ndBrainGpuCommand : public ndClassAlloc
 
 	protected:
 	ndBrainGpuContext* m_context;
+	ndSharedPtr<ndBrainGpuShader> m_shader;
+	size_t m_workGroupSize;
+	size_t m_numberOfWorkGroups;
+	//cl::KernelFunctor <cl::Buffer, cl::Buffer, cl::Buffer> m_function;
 };
 
 #endif
