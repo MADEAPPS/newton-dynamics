@@ -11,6 +11,8 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainGpuContext.h"
+#include "ndBrainGpuFloatBuffer.h"
+#include "ndBrainGpuUniformBuffer.h"
 
 class brainCopyInput : public ndBrainGpuContext::ndBrainGpuShader
 {
@@ -20,10 +22,14 @@ class brainCopyInput : public ndBrainGpuContext::ndBrainGpuShader
     {
     }
 
-    void Execute(const UniformBufferObject* const parameters, float* const inputOutputData, float* const inputBuffer)
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
-        ndInt32 groupId = m_groupId;
-        ndInt32 workGroupSize = m_workGroupSize;
+        ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
+        ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)m_parameters[2];
+        UniformBufferObject* const parameters = &buffer0->m_data;
+        ndBrainFloat* const inputOutputData = &buffer1->m_buffer[0];
+        ndBrainFloat* const inputBuffer = &buffer2->m_buffer[0];
         
         ndInt32 inputSize = ndInt32(parameters->m_inputSize);
         ndInt32 inputOutputSize = ndInt32(parameters->m_inputOutputSize);
@@ -60,16 +66,15 @@ class brainCopyOutput : public ndBrainGpuContext::ndBrainGpuShader
     {
     }
 
-    void Execute(const UniformBufferObject* const parameters, float* const inputOutputData, float* const outputBuffer)
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
-        //ndInt32 itemId = get_local_id(0);
-        //ndInt32 groupId = get_group_id(0);
-        //ndInt32 workGroupSize = get_local_size(0);
+        ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
+        ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)m_parameters[2];
+        UniformBufferObject* const parameters = &buffer0->m_data;
+        ndBrainFloat* const inputOutputData = &buffer1->m_buffer[0];
+        ndBrainFloat* const outputBuffer = &buffer2->m_buffer[0];
 
-        ndInt32 groupId = m_groupId;
-        ndInt32 workGroupSize = m_workGroupSize;
-
-        //ndInt32 inputSize = ndInt32(parameters->m_inputSize);
         ndInt32 outputSize = ndInt32(parameters->m_outputSize);
         ndInt32 inputOutputSize = ndInt32(parameters->m_inputOutputSize);
         ndInt32 inputOutputStartOffset = ndInt32(parameters->m_inputOutputStartOffset);
@@ -95,8 +100,6 @@ class brainCopyOutput : public ndBrainGpuContext::ndBrainGpuShader
         {
             float a = inputOutputData[srcBase + modWorkGroupSize + itemId];
             outputBuffer[dstBase + modWorkGroupSize + itemId] = a;
-            //if (itemId == 0) printf ("%d %d %d", groupId, workGroupSize, get_num_groups(0));
-            //outputBuffer[dstBase + modWorkGroupSize + itemId] = groupId * 100 + itemId;
         }
     }
 };
@@ -111,15 +114,19 @@ class brainLayerLinear : public ndBrainGpuContext::ndBrainGpuShader
 
     // a matrix time a vector by iterating over each row of the matrix 
     // calculating the dot product of that row time the vector and adding the bias value.
-    void Execute(const UniformBufferObject* const parameters, float* const inputOutputData, float* const weightsAndBias)
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
         float cachedInput [1024 * 2];
         float cachedOutput [1024 * 2];
         float reductionBuffer [1024];
         
-        ndInt32 groupId = m_groupId;
-        ndInt32 workGroupSize = m_workGroupSize;
-        
+        ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
+        ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)m_parameters[2];
+        UniformBufferObject* const parameters = &buffer0->m_data;
+        ndBrainFloat* const inputOutputData = &buffer1->m_buffer[0];
+        ndBrainFloat* const weightsAndBias = &buffer2->m_buffer[0];
+
         ndInt32 inputSize = ndInt32(parameters->m_inputSize);
         ndInt32 outputSize = ndInt32(parameters->m_outputSize);
         ndInt32 inputOutputSize = ndInt32(parameters->m_inputOutputSize);
@@ -216,7 +223,7 @@ class brainLayerLinear : public ndBrainGpuContext::ndBrainGpuShader
             }
         }
         //if (itemId < rowCountReminder)
-        for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+        for (ndInt32 itemId = 0; itemId < rowCountReminder; ++itemId)
         {
             inputOutputData[outputOffset + modRowCount + itemId] = cachedOutput[modRowCount + itemId];
         }

@@ -15,8 +15,8 @@
 //#define MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
 
 // no sure why but I get randme erro when using minibatch size of 256 in gpu
-//#define MINIST_MINIBATCH_BUFFER_SIZE			256
-#define MINIST_MINIBATCH_BUFFER_SIZE			128
+#define MINIST_MINIBATCH_BUFFER_SIZE			256
+//#define MINIST_MINIBATCH_BUFFER_SIZE			128
 
 #define MNIST_CONVOLUTIONAL_FEATURE_MAPS		32
 //#define MIN_TRAIN_SCORE						0.9999f

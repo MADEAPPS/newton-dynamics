@@ -47,7 +47,8 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 		{
 
 		}
-		virtual void Execute(const UniformBufferObject* const parameters, float* const inputOutputData, float* const inputBuffer) = 0;
+		//virtual void Execute(const UniformBufferObject* const parameters, float* const inputOutputData, float* const inputBuffer) = 0;
+		virtual void Execute(ndInt32 groupId, ndInt32 workGroupSize) = 0;
 
 		ndBrainGpuContext* m_context;
 		ndFixSizeArray<ndBrainGpuBuffer*, 4> m_parameters;
