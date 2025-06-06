@@ -212,7 +212,7 @@ void ndBrainTrainerCpuInference::GetInput(ndBrainVector& input) const
 }
 
 // new method
-void ndBrainTrainerCpuInference::BackPropagate(const ndBrainVector&)
+void ndBrainTrainerCpuInference::BackPropagate(const ndBrainVector&, bool)
 {
 }
 

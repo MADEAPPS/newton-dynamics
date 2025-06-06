@@ -74,7 +74,7 @@ class ndBrainTrainerGpuInference: public ndBrainTrainer
 	virtual void UpdateParameters() override;
 	virtual void ApplyLearnRate(ndBrainFloat learnRate) override;
 	virtual void MakePrediction(const ndBrainVector& input, bool sync = true) override;
-	virtual void BackPropagate(const ndBrainVector& outputGradients) override;
+	virtual void BackPropagate(const ndBrainVector& outputGradients, bool sync = true) override;
 	virtual void MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output) override;
 
 	protected:
@@ -98,7 +98,6 @@ class ndBrainTrainerGpuInference: public ndBrainTrainer
 	ndSharedPtr<ndBrainGpuBuffer> m_weightAndBiasBuffer;
 	ndSharedPtr<ndBrainGpuBuffer> m_miniBatchInputBuffer;
 	ndSharedPtr<ndBrainGpuBuffer> m_miniBatchOutputBuffer;
-	//ndList<ndSharedPtr<ndBrainTrainerGpuCommand>> m_feedFowardCommands;
 	ndList<ndSharedPtr<ndBrainGpuCommand>> m_feedFowardCommands;
 	ndInt32 m_miniBatchSize;
 };

@@ -61,6 +61,8 @@ ndBrainTrainerGpu::ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const nd
 	m_weightAndBiasGradientsBuffer = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(m_context, buffer, ndCpuMappable));
 
 	AddCopyOutputGradientCommand();
+	AddLayersGradientCommands();
+	AddCopyInputGradientCommand();
 }
 
 ndBrainTrainerGpu::ndBrainTrainerGpu(const ndBrainTrainerGpu& src)
@@ -75,26 +77,35 @@ ndBrainTrainerGpu::~ndBrainTrainerGpu()
 {
 }
 
-void ndBrainTrainerGpu::AddCopyOutputGradientCommand()
+void ndBrainTrainerGpu::AddLayersGradientCommands()
 {
 	//ndAssert(0);
-	//ndUniformBufferObject data;
-	//ndAssert(FindCommand(ndBrainTrainerGpuInference::m_outpuId));
-	//ndGpuCommand* const lastCommand = (ndGpuCommand*)FindCommand(m_outpuId);
-	//
-	//const ndBrainGpuBuffer& uniformData = **lastCommand->m_uniformBuffer;
-	//uniformData.UnloadData(ndInt32(sizeof(ndUniformBufferObject)), &data);
-	// 
-	//data.m_inputSize = 0;
-	//data.m_parametersStartOffset = 0;
-	//data.m_inputOutputStartOffset += data.m_inputSize;
-	//ndSharedPtr<ndBrainGpuBuffer> uniformbuffer(new ndBrainGpuUniformBuffer(m_context, sizeof(ndUniformBufferObject)));
-	//uniformbuffer->LoadData(sizeof(ndUniformBufferObject), &data);
-	//
-	////ndBrainGpuBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
-	//ndBrainGpuBuffer* const miniBatchOutputBuffer = *m_miniBatchOutputGradientBuffer;
-	////ndSharedPtr<ndBrainGpuCommand> command(new ndGpuCommand(m_context, m_context->m_ndBrainCopyOutput, m_miniBatchSize, *uniformbuffer, inputOutputBuffer, miniBatchOutputBuffer));
-	////m_feedFowardCommands.Append(command);
+}
+
+void ndBrainTrainerGpu::AddCopyInputGradientCommand()
+{
+	//ndAssert(0);
+}
+
+void ndBrainTrainerGpu::AddCopyOutputGradientCommand()
+{
+	ndBrainTrainerGpuCommand* const lastLayerCommand = FindCommand(m_outpuId);
+	ndAssert(lastLayerCommand);
+
+	ndBrainLayer::ndCommandShareInfo data(lastLayerCommand->m_info);
+
+	data.m_inputSize = 0;
+	data.m_parametersBatchSize = 0;
+	data.m_parametersStartOffset = 0;
+	data.m_inputOutputStartOffset += data.m_inputSize;
+	ndSharedPtr<ndBrainGpuBuffer> uniformbuffer(new ndBrainGpuUniformBuffer(m_context, sizeof(ndBrainLayer::ndCommandShareInfo)));
+	uniformbuffer->LoadData(sizeof(ndBrainLayer::ndCommandShareInfo), &data);
+
+	ndBrainGpuBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
+	//ndBrainGpuBuffer* const miniBatchOutputBuffer = *m_miniBatchOutputBuffer;
+	ndBrainGpuBuffer* const miniBatchOutputBuffer = *m_miniBatchOutputGradientBuffer;
+	ndSharedPtr<ndBrainGpuCommand>command(new ndBrainTrainerGpuCommand(this, data, m_outpuId, m_context, m_context->m_ndBrainCopyOutputGradients, m_miniBatchSize, uniformbuffer, inputOutputBuffer, miniBatchOutputBuffer));
+	m_backPropagateCommands.Append(command);
 }
 
 //void ndBrainTrainerGpu::ApplyLearnRate(ndBrainFloat learnRate)
@@ -103,21 +114,17 @@ void ndBrainTrainerGpu::ApplyLearnRate(ndBrainFloat)
 	//ndAssert(0);
 }
 
-void ndBrainTrainerGpu::SubmitBackwardCommands()
+void ndBrainTrainerGpu::BackPropagate(const ndBrainVector& outputGradients, bool sync)
 {
-	//for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = m_feedFowardCommands.GetFirst(); node; node = node->GetNext())
-	//{
-	//	ndSharedPtr<ndBrainGpuCommand>& command = node->GetInfo();
-	//	m_context->AddCommandQueue(command);
-	//}
-}
+	m_miniBatchOutputGradientBuffer->LoadData(outputGradients.GetCount() * sizeof(ndReal), &outputGradients[0]);
 
-//void ndBrainTrainerGpu::BackPropagate(const ndBrainVector& outputGradients)
-void ndBrainTrainerGpu::BackPropagate(const ndBrainVector&)
-{
-	ndAssert(0);
-	//m_context->BeginQueue();
-	//m_miniBatchOutputGradientBuffer->LoadData(outputGradients.GetCount() * sizeof(ndReal), &outputGradients[0]);
-	//SubmitBackwardCommands();
-	//m_context->EndQueue();
+	for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = m_backPropagateCommands.GetFirst(); node; node = node->GetNext())
+	{
+		ndSharedPtr<ndBrainGpuCommand>& command = node->GetInfo();
+		m_context->AddCommandQueue(command);
+	}
+	if (sync)
+	{
+		SyncQueue();
+	}
 }

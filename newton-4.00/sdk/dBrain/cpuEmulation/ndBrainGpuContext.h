@@ -74,13 +74,16 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 	void CreateKerners();
 
 	public:
+	// feed foward shaders
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyInput;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyOutput;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinear;
-	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyOutputGradients;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerReluActivation;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerTanhActivation;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerSoftmaxActivation;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinearDropOutActivation;
+
+	// back prpagate shaders
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyOutputGradients;
 };
 #endif

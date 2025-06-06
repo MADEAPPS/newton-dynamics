@@ -289,22 +289,22 @@ static void MnistTrainingSet()
 					trainer->SyncQueue();
 					
 					//calculate loss
-					//trainer->GetOutput(miniBatchOutput);
-					//for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
-					//{
-					//	ndUnsigned32 index = shuffleBuffer[batchStart + i];
-					//	ndBrainMemVector grad(&miniBatchOutputGradients[i * outputSize], outputSize);
-					//	const ndBrainMemVector output(&miniBatchOutput[i * outputSize], outputSize);
-					//	const ndBrainMemVector truth(&(*trainingLabels)[index][0], outputSize);
-					//	
-					//	loss.SetTruth(truth);
-					//	loss.GetLoss(output, grad);
-					//}
-					//// backpropagate loss.
-					//trainer->BackPropagate(miniBatchOutputGradients);
+					trainer->GetOutput(miniBatchOutput);
+					for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
+					{
+						ndUnsigned32 index = shuffleBuffer[batchStart + i];
+						ndBrainMemVector grad(&miniBatchOutputGradients[i * outputSize], outputSize);
+						const ndBrainMemVector output(&miniBatchOutput[i * outputSize], outputSize);
+						const ndBrainMemVector truth(&(*trainingLabels)[index][0], outputSize);
+						
+						loss.SetTruth(truth);
+						loss.GetLoss(output, grad);
+					}
+					// backpropagate loss.
+					trainer->BackPropagate(miniBatchOutputGradients);
 					//trainer->ApplyLearnRate(m_learnRate);
 
-					#if 1
+					#if 0
 						//ndBrainVector internalBuffers;
 						//ndBrainVector internalParameters;
 						//trainer->GetWorkingBuffer(internalBuffers);
@@ -314,7 +314,7 @@ static void MnistTrainingSet()
 						ndBrainFixSizeVector<1024> xxx1;
 						xxx1.SetCount(outputSize);
 
-						trainer->GetOutput(miniBatchOutput);
+						//trainer->GetOutput(miniBatchOutput);
 						//trainer->UpdateParameters();
 						const ndBrain* const brain = *trainer->GetBrain();
 						for (ndInt32 i = 0; i < m_miniBatchSize; i++)

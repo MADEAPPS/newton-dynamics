@@ -260,7 +260,7 @@ void ndBrainTrainerGpuInference::GetParameterBuffer(ndBrainVector& ouput) const
 	UnloadBuffer(ouput, m_weightAndBiasBuffer);
 }
 
-void ndBrainTrainerGpuInference::BackPropagate(const ndBrainVector&)
+void ndBrainTrainerGpuInference::BackPropagate(const ndBrainVector&, bool)
 {
 }
 
