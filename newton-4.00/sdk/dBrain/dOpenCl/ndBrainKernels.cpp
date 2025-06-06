@@ -87,14 +87,14 @@ R""""(
 
     __kernel void brainCopyOutputGradients(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* outputBuffer) 
     {
-        //uint itemId = get_local_id(0);
-        //uint groupId = get_group_id(0);
-        //uint workGroupSize = get_local_size(0);
-        //
-        //uint outputSize = parameters->m_outputSize;
-        //uint inputOutputSize = parameters->m_inputOutputSize;
-        //uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
-        //
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+        
+        uint outputSize = parameters->m_outputSize;
+        uint inputOutputSize = parameters->m_inputOutputSize;
+        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+        
         //uint dstBase = groupId * outputSize;
         //uint srcBase = groupId * inputOutputSize + inputOutputStartOffset;
         //

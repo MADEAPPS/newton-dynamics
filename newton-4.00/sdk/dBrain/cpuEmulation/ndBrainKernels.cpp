@@ -259,24 +259,24 @@ class brainLayerReluActivation : public ndBrainGpuContext::ndBrainGpuShader
         {
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
             {
-                float a = inputOutputData[inputOffset + i + itemId];
-                float b = (a >= 0.0) ? a : 0.0f;
-                inputOutputData[outputOffset + i + itemId] = b;
+                float inputValue = inputOutputData[inputOffset + i + itemId];
+                float outputValue = (inputValue >= 0.0) ? inputValue : 0.0f;
+                inputOutputData[outputOffset + i + itemId] = outputValue;
             }
         }
         for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
         {
-            float a = inputOutputData[inputOffset + modWorkGroupSize + itemId];
-            float b = (a >= 0.0) ? a : 0.0f;
-            inputOutputData[outputOffset + modWorkGroupSize + itemId] = b;
+            float inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
+            float outputValue = (inputValue >= 0.0) ? inputValue : 0.0f;
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
         }
     }
 };
 
-class brainLayerLinearDropOutActivation : public ndBrainGpuContext::ndBrainGpuShader
+class brainLayerTanhActivation : public ndBrainGpuContext::ndBrainGpuShader
 {
     public:
-    brainLayerLinearDropOutActivation(ndBrainGpuContext* const context)
+        brainLayerTanhActivation(ndBrainGpuContext* const context)
         :ndBrainGpuContext::ndBrainGpuShader(context)
     {
     }
@@ -285,13 +285,11 @@ class brainLayerLinearDropOutActivation : public ndBrainGpuContext::ndBrainGpuSh
     {
         ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
         ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
-        //ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)m_parameters[2];
         UniformBufferObject* const parameters = &buffer0->m_data;
         ndBrainFloat* const inputOutputData = &buffer1->m_buffer[0];
 
         ndInt32 inputSize = ndInt32(parameters->m_inputSize);
         ndInt32 inputOutputSize = ndInt32(parameters->m_inputOutputSize);
-        //ndInt32 parametersStartOffset = ndInt32(parameters->m_parametersStartOffset);
         ndInt32 inputOutputStartOffset = ndInt32(parameters->m_inputOutputStartOffset);
 
         ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
@@ -304,22 +302,29 @@ class brainLayerLinearDropOutActivation : public ndBrainGpuContext::ndBrainGpuSh
         {
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
             {
-                float a = inputOutputData[inputOffset + i + itemId];
-                inputOutputData[outputOffset + i + itemId] = a;
+                float inputValue = inputOutputData[inputOffset + i + itemId];
+                float outputValue = (inputValue > -30.0f) ? ((inputValue < 30.0f) ? inputValue : 30.0f) : -30.0f;
+                inputOutputData[outputOffset + i + itemId] = outputValue;
             }
         }
         for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
         {
-            float a = inputOutputData[inputOffset + modWorkGroupSize + itemId];
-            inputOutputData[outputOffset + modWorkGroupSize + itemId] = a;
+            float inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
+            float outputValue = (inputValue > -30.0f) ? ((inputValue < 30.0f) ? inputValue : 30.0f) : -30.0f;
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
         }
     }
 };
+
+
 void ndBrainGpuContext::CreateKerners()
 {
     m_ndBrainCopyInput = ndSharedPtr<ndBrainGpuShader> (new brainCopyInput(this));
     m_ndBrainCopyOutput = ndSharedPtr<ndBrainGpuShader> (new brainCopyOutput(this));
     m_ndBrainLayerLinear = ndSharedPtr<ndBrainGpuShader> (new brainLayerLinear(this));
+    //m_ndBrainCopyOutputGradients = ndSharedPtr<ndBrainGpuShader>(new brainCopyOutputGradients(this));
     m_ndBrainLayerReluActivation = ndSharedPtr<ndBrainGpuShader>(new brainLayerReluActivation(this));
-    m_ndBrainLayerLinearDropOutActivation = ndSharedPtr<ndBrainGpuShader>(new brainLayerLinearDropOutActivation(this));
+    m_ndBrainLayerTanhActivation = ndSharedPtr<ndBrainGpuShader>(new brainLayerTanhActivation(this));
+    //m_ndBrainLayerSoftmaxActivation = ndSharedPtr<ndBrainGpuShader>(new brainLayerSoftmaxActivation(this));
+    //m_ndBrainLayerLinearDropOutActivation = ndSharedPtr<ndBrainGpuShader>(new brainLayerLinearDropOutActivation(this));
 }

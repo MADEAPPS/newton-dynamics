@@ -297,12 +297,21 @@ void ndBrainTrainerGpuInference::UpdateParameters()
 	//ndAssert(0);
 }
 
-void ndBrainTrainerGpuInference::MakePrediction(const ndBrainVector& input)
+void ndBrainTrainerGpuInference::SyncQueue()
+{
+	m_context->SyncQueue();
+}
+
+void ndBrainTrainerGpuInference::MakePrediction(const ndBrainVector& input, bool sync)
 {
 	m_miniBatchInputBuffer->LoadData(input.GetCount() * sizeof(ndReal), &input[0]);
 #if 1
 	SubmitCommands();
 	m_context->SyncQueue();
+	if (sync)
+	{
+		SyncQueue();
+	}
 #else
 	for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = m_feedFowardCommands.GetFirst(); node; node = node->GetNext())
 	{
