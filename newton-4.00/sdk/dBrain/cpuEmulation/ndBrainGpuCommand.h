@@ -23,11 +23,11 @@ class ndBrainGpuCommand : public ndClassAlloc
 	public:
 	ndBrainGpuCommand(ndBrainGpuContext* const context);
 	virtual ~ndBrainGpuCommand();
-	void Assembly(const ndSharedPtr<ndBrainGpuContext::ndBrainGpuShader>& shader, ndInt32 workGroupSize, ndInt32 buffersCount, ndBrainGpuBuffer** buffer);
+	void Assembly(const ndSharedPtr<ndBrainGpuShader>& shader, ndInt32 workGroupSize, ndInt32 buffersCount, ndBrainGpuBuffer** buffer);
 
 	protected:
 	ndBrainGpuContext* m_context;
-	ndSharedPtr<ndBrainGpuContext::ndBrainGpuShader> m_shader;
+	ndSharedPtr<ndBrainGpuShader> m_shader;
 	ndFixSizeArray<ndBrainGpuBuffer*, 4> m_parameters;
 	size_t m_workGroupSize;
 	size_t m_miniBatchSize;

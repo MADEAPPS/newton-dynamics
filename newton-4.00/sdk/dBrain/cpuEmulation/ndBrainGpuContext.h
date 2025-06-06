@@ -30,40 +30,33 @@ typedef struct
 	ndUnsigned32 m_unused[4];
 } UniformBufferObject;
 
+#define ND_GPU_LOCAL_BUFFER_SIZE	1024
+class ndBrainGpuShader : public ndClassAlloc
+{
+	public:
+	ndBrainGpuShader(ndBrainGpuContext* const context)
+		:ndClassAlloc()
+		,m_context(context)
+		,m_groupId(0)
+		,m_workGroupSize(0)
+	{
+	}
+
+	virtual ~ndBrainGpuShader()
+	{
+	}
+
+	virtual void Execute(ndInt32 groupId, ndInt32 workGroupSize) = 0;
+
+	ndBrainGpuContext* m_context;
+	ndFixSizeArray<ndBrainGpuBuffer*, 4> m_parameters;
+	ndInt32 m_groupId;
+	ndInt32 m_workGroupSize;
+};
+
 class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 {
 	public:
-	class ndBrainGpuShader : public ndClassAlloc
-	{
-		public:
-		ndBrainGpuShader(ndBrainGpuContext* const context)
-			:ndClassAlloc()
-			,m_context(context)
-			,m_groupId(0)
-			,m_workGroupSize(0)
-		{
-		}
-
-		ndBrainGpuShader(const ndBrainGpuShader& src)
-			:ndClassAlloc()
-			,m_context(src.m_context)
-			,m_groupId(src.m_groupId)
-			,m_workGroupSize(src.m_workGroupSize)
-		{
-		}
-
-		virtual ~ndBrainGpuShader()
-		{
-		}
-
-		virtual void Execute(ndInt32 groupId, ndInt32 workGroupSize) = 0;
-
-		ndBrainGpuContext* m_context;
-		ndFixSizeArray<ndBrainGpuBuffer*, 4> m_parameters;
-		ndInt32 m_groupId;
-		ndInt32 m_workGroupSize;
-	};
-
 	ndBrainGpuContext();
 	virtual ~ndBrainGpuContext();
 	virtual ndContextType GetType() const override;

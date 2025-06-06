@@ -47,14 +47,14 @@ ndBrainGpuContext* ndBrainGpuContext::GetAsGpuContext()
 
 void ndBrainGpuContext::SyncQueue()
 {
-	// do nothing. as cpu alway wait afte each kernel submition
+	// do nothing. cpu kernels always wait for completion.
 	//ndAssert(0);
 }
 
 void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& command)
 {
 	ndAtomic<ndInt32> iterator(0);
-	ndBrainGpuContext::ndBrainGpuShader& shader = **command->m_shader;
+	ndBrainGpuShader& shader = **command->m_shader;
 	shader.m_parameters.SetCount(0);
 	shader.m_parameters.PushBack(command->m_parameters[0]);
 	shader.m_parameters.PushBack(command->m_parameters[1]);
@@ -65,7 +65,7 @@ void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& co
 		ndInt32 workGroupdSize = 256;
 		ndInt32 miniBatchSize = ndInt32(command->m_miniBatchSize);
 		
-		ndBrainGpuContext::ndBrainGpuShader& kernel = **command->m_shader;
+		ndBrainGpuShader& kernel = **command->m_shader;
 		for (ndInt32 i = iterator++; i < miniBatchSize; i = iterator++)
 		{
 			kernel.Execute(i, workGroupdSize);

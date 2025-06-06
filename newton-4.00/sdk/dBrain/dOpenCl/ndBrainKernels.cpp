@@ -14,6 +14,9 @@
 
 const char* ndBrainGpuContext::m_kernelSource0 =
 R""""(
+
+    #define ND_GPU_LOCAL_BUFFER_SIZE	1024
+
     typedef struct
     {
         uint m_inputSize;
@@ -123,9 +126,9 @@ R""""(
     // calculating the dot product of that row time the vector and adding the bias value.
     __kernel void brainLayerLinear(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* weightsAndBias) 
     {
-        __local float cachedInput [1024 * 2];
-        __local float cachedOutput [1024 * 2];
-        __local float reductionBuffer [1024];
+        __local float cachedInput [ND_GPU_LOCAL_BUFFER_SIZE * 2];
+        __local float cachedOutput [ND_GPU_LOCAL_BUFFER_SIZE * 2];
+        __local float reductionBuffer [ND_GPU_LOCAL_BUFFER_SIZE];
 
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
@@ -312,8 +315,8 @@ R""""(
 
     __kernel void brainLayerSoftmaxActivation(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* notUsed)
     {
-        __local float tmpInputBuffer [1024 * 2];
-        __local float reductionBuffer [1024];
+        __local float tmpInputBuffer [ND_GPU_LOCAL_BUFFER_SIZE * 2];
+        __local float reductionBuffer [ND_GPU_LOCAL_BUFFER_SIZE];
 
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);

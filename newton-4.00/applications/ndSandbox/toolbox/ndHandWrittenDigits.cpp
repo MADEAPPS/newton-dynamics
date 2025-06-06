@@ -304,7 +304,7 @@ static void MnistTrainingSet()
 					//trainer->BackPropagate(miniBatchOutputGradients);
 					//trainer->ApplyLearnRate(m_learnRate);
 
-					#if 0
+					#if 1
 						//ndBrainVector internalBuffers;
 						//ndBrainVector internalParameters;
 						//trainer->GetWorkingBuffer(internalBuffers);
@@ -314,7 +314,7 @@ static void MnistTrainingSet()
 						ndBrainFixSizeVector<1024> xxx1;
 						xxx1.SetCount(outputSize);
 
-
+						trainer->GetOutput(miniBatchOutput);
 						//trainer->UpdateParameters();
 						const ndBrain* const brain = *trainer->GetBrain();
 						for (ndInt32 i = 0; i < m_miniBatchSize; i++)
