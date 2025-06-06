@@ -28,6 +28,7 @@ class ndBrainGpuCommand : public ndClassAlloc
 	protected:
 	ndBrainGpuContext* m_context;
 	ndSharedPtr<ndBrainGpuShader> m_shader;
+	ndFixSizeArray<ndBrainGpuBuffer*, 4> m_parameters;
 	size_t m_workGroupSize;
 	size_t m_miniBatchSize;
 	friend class ndBrainGpuContext;

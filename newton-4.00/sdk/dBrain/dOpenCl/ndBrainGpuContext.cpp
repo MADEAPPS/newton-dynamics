@@ -111,6 +111,14 @@ void ndBrainGpuContext::SyncQueue()
 
 void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& command)
 {
+	ndSharedPtr<ndBrainGpuShader>& shader = command->m_shader;
+	for (ndInt32 i = 0; i < command->m_parameters.GetCount(); ++i)
+	{
+		ndBrainGpuBuffer* const argBuffer = command->m_parameters[i];
+		cl_int error = shader->setArg(cl_uint(i), argBuffer->m_buffer);
+		ndAssert(error == CL_SUCCESS);
+	}
+
 	cl::NDRange offset(0);
 	cl::NDRange global(command->m_workGroupSize * command->m_miniBatchSize);
 	cl_int error = m_queue->enqueueNDRangeKernel(**command->m_shader, offset, global);

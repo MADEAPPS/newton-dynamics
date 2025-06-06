@@ -47,6 +47,7 @@ class ndBrainGpuBuffer : public ndClassAlloc
 	cl::Buffer m_buffer;
 	ndBrainGpuContext* m_context;
 	size_t m_sizeInBytes;
+	friend class ndBrainGpuContext;
 	friend class ndBrainGpuCommand;
 };
 

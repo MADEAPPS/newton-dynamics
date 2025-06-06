@@ -34,11 +34,13 @@ void ndBrainGpuCommand::Assembly(const ndSharedPtr<ndBrainGpuShader>& shader, nd
 	m_shader = shader;
 	m_miniBatchSize = size_t(workGroupSize);
 	m_shader->getWorkGroupInfo(**m_context->m_device, CL_KERNEL_WORK_GROUP_SIZE, &m_workGroupSize);
+	m_parameters.SetCount(0);
 	for (ndInt32 i = 0; i < buffersCount; ++i)
 	{
-		ndBrainGpuBuffer* const argBuffer = buffer[i];
-		cl_int error = m_shader->setArg(cl_uint(i), argBuffer->m_buffer);
-		ndAssert(error == CL_SUCCESS);
+		m_parameters.PushBack(buffer[i]);
+		//ndBrainGpuBuffer* const argBuffer = buffer[i];
+		//cl_int error = m_shader->setArg(cl_uint(i), argBuffer->m_buffer);
+		//ndAssert(error == CL_SUCCESS);
 	}
 }
 
