@@ -149,12 +149,21 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const;
 
 	virtual bool HasGpuSupport() const;
+
 	virtual ndBrainTrainerGpuCommand* CreateGpuFeedForwardCommand(ndBrainTrainerGpuInference* const owner,
 		const ndBrainLayer::ndCommandShareInfo& info,
 		ndBrainGpuContext* const context, ndInt32 miniBatchSize,
 		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
 		ndBrainGpuBuffer* const buffer1,
 		ndBrainGpuBuffer* const buffer2) const;
+
+	virtual ndBrainTrainerGpuCommand* CreateGpuBackPropagateCommand(ndBrainTrainerGpuInference* const owner,
+		const ndBrainLayer::ndCommandShareInfo& info,
+		ndBrainGpuContext* const context, ndInt32 miniBatchSize,
+		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
+		ndBrainGpuBuffer* const buffer1,
+		ndBrainGpuBuffer* const buffer2) const;
+
 };
 
 #endif 

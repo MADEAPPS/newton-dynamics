@@ -36,7 +36,7 @@ class ndIkJointHinge: public ndJointHinge, public ndJointBilateralConstraint::nd
 	D_NEWTON_API void SetMaxTorque(ndFloat32 maxTorque);
 
 	protected:
-	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
+	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc) override;
 
 	ndFloat32 m_maxTorque;
 } D_GCC_NEWTON_CLASS_ALIGN_32;

@@ -37,8 +37,8 @@ class ndMultiBodyVehicleDifferentialAxle : public ndJointBilateralConstraint
 		const ndVector& pin1, ndBodyKinematic* const body1);
 
 	protected:
-	void JacobianDerivative(ndConstraintDescritor& desc);
-	void DebugJoint(ndConstraintDebugCallback&) const {}
+	void JacobianDerivative(ndConstraintDescritor& desc) override;
+	void DebugJoint(ndConstraintDebugCallback&) const override {}
 
 } D_GCC_NEWTON_CLASS_ALIGN_32;
 

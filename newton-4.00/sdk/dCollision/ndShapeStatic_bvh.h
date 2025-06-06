@@ -38,13 +38,13 @@ class ndShapeStatic_bvh: public ndShapeStaticMesh, public ndAabbPolygonSoup
 	D_COLLISION_API void operator delete (void* ptr);
 
 	protected:
-	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
-	D_COLLISION_API virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const;
+	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const override;
+	D_COLLISION_API virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const override;
 
-	virtual ndShapeStatic_bvh* GetAsShapeStaticBVH() { return this; }
-	D_COLLISION_API virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
-	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
-	D_COLLISION_API virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
+	virtual ndShapeStatic_bvh* GetAsShapeStaticBVH() override { return this; }
+	D_COLLISION_API virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const override;
+	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const override;
+	D_COLLISION_API virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const override;
 	
 	static ndFloat32 RayHit(void* const context, const ndFloat32* const polygon, ndInt32 strideInBytes, const ndInt32* const indexArray, ndInt32 indexCount);
 	static ndIntersectStatus ShowDebugPolygon(void* const context, const ndFloat32* const polygon, ndInt32 strideInBytes, const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32 hitDistance);

@@ -33,16 +33,16 @@ class ndBodyTriggerVolume : public ndBodyKinematicBase
 	D_COLLISION_API ndBodyTriggerVolume();
 	D_COLLISION_API virtual ~ndBodyTriggerVolume();
 
-	ndBodyTriggerVolume* GetAsBodyTriggerVolume();
+	ndBodyTriggerVolume* GetAsBodyTriggerVolume() override;
 
 	virtual void OnTrigger(ndBodyKinematic* const body, ndFloat32 timestep);
 	virtual void OnTriggerEnter(ndBodyKinematic* const body, ndFloat32 timestep);
 	virtual void OnTriggerExit(ndBodyKinematic* const body, ndFloat32 timestep);
 
-	D_COLLISION_API virtual void SpecialUpdate(ndFloat32 timestep);
+	D_COLLISION_API virtual void SpecialUpdate(ndFloat32 timestep) override;
 
 	private:
-	virtual void IntegrateExternalForce(ndFloat32 timestep);
+	virtual void IntegrateExternalForce(ndFloat32 timestep) override;
 
 } D_GCC_NEWTON_CLASS_ALIGN_32;
 

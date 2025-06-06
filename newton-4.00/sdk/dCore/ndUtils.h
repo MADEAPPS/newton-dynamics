@@ -193,7 +193,7 @@ inline void ndMemSet(T* const dst, const T& val, ndInt64 elements)
 template <class T>
 inline void ndMemCpy(T* const dst, const T* const src, ndInt64 elements)
 {
-	memcpy(dst, src, sizeof(T) * elements);
+	memcpy((void*)dst, (void*)src, sizeof(T) * elements);
 }
 
 #ifndef _MSC_VER 

@@ -10,7 +10,6 @@
 */
 
 #include "ndBrainStdafx.h"
-#include <CL/opencl.hpp>
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuCommand.h"
 #include "ndBrainGpuContext.h"
@@ -19,8 +18,8 @@
 #include <vector>
 
 //#define D_OPENCL_SELECTION_TYPE		CL_DEVICE_TYPE_ALL
-//#define D_OPENCL_SELECTION_TYPE		CL_DEVICE_TYPE_CPU
-#define D_OPENCL_SELECTION_TYPE			CL_DEVICE_TYPE_GPU
+#define D_OPENCL_SELECTION_TYPE		CL_DEVICE_TYPE_CPU
+//#define D_OPENCL_SELECTION_TYPE			CL_DEVICE_TYPE_GPU
 
 ndBrainGpuContext::ndBrainGpuContext()
 	:ndBrainContext()
@@ -105,22 +104,24 @@ ndBrainGpuContext* ndBrainGpuContext::GetAsGpuContext()
 
 void ndBrainGpuContext::SyncQueue()
 {
-	cl_int error = m_queue->finish();
+	cl_int error = 0;
+	error = m_queue->finish();
 	ndAssert(error == CL_SUCCESS);
 }
 
 void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& command)
 {
+	cl_int error = 0;
 	ndSharedPtr<ndBrainGpuShader>& shader = command->m_shader;
 	for (ndInt32 i = 0; i < command->m_parameters.GetCount(); ++i)
 	{
 		ndBrainGpuBuffer* const argBuffer = command->m_parameters[i];
-		cl_int error = shader->setArg(cl_uint(i), argBuffer->m_buffer);
+		error = shader->setArg(cl_uint(i), argBuffer->m_buffer);
 		ndAssert(error == CL_SUCCESS);
 	}
 
 	cl::NDRange offset(0);
 	cl::NDRange global(command->m_workGroupSize * command->m_miniBatchSize);
-	cl_int error = m_queue->enqueueNDRangeKernel(**command->m_shader, offset, global);
+	error = m_queue->enqueueNDRangeKernel(**command->m_shader, offset, global);
 	ndAssert(error == CL_SUCCESS);
 }

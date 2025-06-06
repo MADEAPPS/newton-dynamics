@@ -213,10 +213,21 @@ ndBrainLayer::ndCommandShareInfo ndBrainLayer::GetCommandSharedInfo() const
 	return ndCommandShareInfo(this);
 }
 
-ndBrainTrainerGpuCommand* ndBrainLayer::CreateGpuFeedForwardCommand(ndBrainTrainerGpuInference* const,
-	const ndBrainLayer::ndCommandShareInfo&, ndBrainGpuContext* const, ndInt32,
-	const ndSharedPtr<ndBrainGpuBuffer>&, ndBrainGpuBuffer* const, ndBrainGpuBuffer* const) const
+ndBrainTrainerGpuCommand* ndBrainLayer::CreateGpuFeedForwardCommand(
+	ndBrainTrainerGpuInference* const, const ndBrainLayer::ndCommandShareInfo&, 
+	ndBrainGpuContext* const, ndInt32, const ndSharedPtr<ndBrainGpuBuffer>&, 
+	ndBrainGpuBuffer* const, ndBrainGpuBuffer* const) const
 {
 	ndAssert(0);
 	return nullptr;
 }
+
+ndBrainTrainerGpuCommand* ndBrainLayer::CreateGpuBackPropagateCommand(
+	ndBrainTrainerGpuInference* const, const ndBrainLayer::ndCommandShareInfo&,
+	ndBrainGpuContext* const, ndInt32, const ndSharedPtr<ndBrainGpuBuffer>&,
+	ndBrainGpuBuffer* const, ndBrainGpuBuffer* const) const
+{
+	ndAssert(0);
+	return nullptr;
+}
+

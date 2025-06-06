@@ -68,10 +68,10 @@ class ndJointWheel : public ndJointBilateralConstraint
 	D_NEWTON_API const ndWheelDescriptor& GetInfo() const;
 	D_NEWTON_API void SetInfo(const ndWheelDescriptor& info);
 
-	void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
+	void DebugJoint(ndConstraintDebugCallback& debugCallback) const override;
 
 	protected:
-	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
+	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc) override;
 
 	ndMatrix m_baseFrame;
 	ndWheelDescriptor m_info;

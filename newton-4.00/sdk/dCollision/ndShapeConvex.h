@@ -47,31 +47,31 @@ class ndShapeConvex: public ndShape
 	D_COLLISION_API ndShapeConvex (ndShapeID id);
 	D_COLLISION_API ~ndShapeConvex ();
 
-	virtual ndShapeConvex* GetAsShapeConvex() { return this; }
+	virtual ndShapeConvex* GetAsShapeConvex()  override { return this; }
 
 	D_COLLISION_API void SetVolumeAndCG();
-	D_COLLISION_API virtual void MassProperties();
-	D_COLLISION_API virtual ndFloat32 GetVolume() const;
-	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
-	D_COLLISION_API virtual ndFloat32 GetBoxMinRadius() const;
-	D_COLLISION_API virtual ndFloat32 GetBoxMaxRadius() const;
-	D_COLLISION_API virtual ndVector SupportVertex(const ndVector& dir) const;
+	D_COLLISION_API virtual void MassProperties() override;
+	D_COLLISION_API virtual ndFloat32 GetVolume() const override;
+	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const override;
+	D_COLLISION_API virtual ndFloat32 GetBoxMinRadius() const override;
+	D_COLLISION_API virtual ndFloat32 GetBoxMaxRadius() const override;
+	D_COLLISION_API virtual ndVector SupportVertex(const ndVector& dir) const override;
 	D_COLLISION_API virtual const ndConvexSimplexEdge** GetVertexToEdgeMapping() const;
-	D_COLLISION_API virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const;
-	D_COLLISION_API virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
+	D_COLLISION_API virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const override;
+	D_COLLISION_API virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const override;
 	D_COLLISION_API virtual ndVector SupportFeatureVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
-	D_COLLISION_API virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
-	D_COLLISION_API virtual ndMatrix CalculateInertiaAndCenterOfMass(const ndMatrix& alignMatrix, const ndVector& localScale, const ndMatrix& matrix) const;
-	D_COLLISION_API virtual ndFloat32 CalculateMassProperties(const ndMatrix& offset, ndVector& inertia, ndVector& crossInertia, ndVector& centerOfMass) const;
-	D_COLLISION_API virtual ndVector CalculateVolumeIntegral(const ndMatrix& globalMatrix, const ndVector& globalPlane, const ndShapeInstance& parentScale) const;
-	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+	D_COLLISION_API virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const override;
+	D_COLLISION_API virtual ndMatrix CalculateInertiaAndCenterOfMass(const ndMatrix& alignMatrix, const ndVector& localScale, const ndMatrix& matrix) const override;
+	D_COLLISION_API virtual ndFloat32 CalculateMassProperties(const ndMatrix& offset, ndVector& inertia, ndVector& crossInertia, ndVector& centerOfMass) const override;
+	D_COLLISION_API virtual ndVector CalculateVolumeIntegral(const ndMatrix& globalMatrix, const ndVector& globalPlane, const ndShapeInstance& parentScale) const override;
+	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const override;
 
 	bool SanityCheck(ndPolyhedra& hull) const;
 	bool SanityCheck(ndInt32 count, const ndVector& normal, ndVector* const contactsOut) const;
 	ndInt32 RectifyConvexSlice(ndInt32 count, const ndVector& normal, ndVector* const contactsOut) const;
-	virtual ndInt32 GetConvexVertexCount() const { return m_vertexCount; }
-	virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32) const;
-	virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector&) const;
+	virtual ndInt32 GetConvexVertexCount() const override { return m_vertexCount; }
+	virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32) const override;
+	virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector&) const override;
 
 	ndVector CalculateVolumeIntegral(const ndPlane& plane) const;
 	ndInt32 BuildCylinderCapPoly (ndFloat32 radius, const ndMatrix& transform, ndVector* const vertexOut) const;

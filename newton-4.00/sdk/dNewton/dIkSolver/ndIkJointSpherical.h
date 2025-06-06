@@ -30,10 +30,10 @@ class ndIkJointSpherical: public ndJointSpherical, public ndJointBilateralConstr
 
 	protected:
 	D_NEWTON_API void SubmitAccel(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
-	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
-	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
+	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc) override;
+	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const override;
 
-	D_NEWTON_API ndInt32 GetKinematicState(ndKinematicState* const state) const;
+	D_NEWTON_API ndInt32 GetKinematicState(ndKinematicState* const state) const override;
 } D_GCC_NEWTON_CLASS_ALIGN_32;
 
 

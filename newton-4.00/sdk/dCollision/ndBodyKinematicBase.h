@@ -33,8 +33,8 @@ class ndBodyKinematicBase : public ndBodyKinematic
 	D_COLLISION_API ndBodyKinematicBase();
 	D_COLLISION_API virtual ~ndBodyKinematicBase();
 
-	void SpecialUpdate(ndFloat32 timestep);
-	ndBodyKinematicBase* GetAsBodyKinematicSpecial();
+	virtual void SpecialUpdate(ndFloat32 timestep) override;
+	virtual ndBodyKinematicBase* GetAsBodyKinematicSpecial() override;
 } D_GCC_NEWTON_CLASS_ALIGN_32;
 
 inline ndBodyKinematicBase* ndBodyKinematicBase::GetAsBodyKinematicSpecial()

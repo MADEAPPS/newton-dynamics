@@ -1164,11 +1164,11 @@ void ndSkeletonContainer::RegularizeLcp() const
 		ndFloat32* const regulatiser = ndAlloca(ndFloat32, size);
 		ndMemSet(regulatiser, ndFloat32(1.01f), size);
 		ndInt32 step = m_auxiliaryRowCount + 1;
-		ndInt32 passes = 0;
+		//ndInt32 passes = 0;
 		ndFloat32 reg = ndFloat32 (1.125f);
 		do 
 		{
-			passes++;
+			//passes++;
 			ndFloat32* base = &m_massMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount - 1];
 			for (ndInt32 i = size - 1; i >= 0; --i)
 			{

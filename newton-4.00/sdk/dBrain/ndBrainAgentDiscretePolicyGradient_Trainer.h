@@ -194,22 +194,22 @@ class ndBrainAgentDiscretePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 	ndArray<ndBrainTrainer*> m_policyWeightedTrainer;
 	ndArray<ndBrainTrainer*> m_policyAuxiliaryTrainers;
 
-	ndBrainOptimizerAdamLegacy* m_criticOptimizer;
-	ndBrainOptimizerAdamLegacy* m_policyOptimizer;
+	//ndBrainOptimizerAdamLegacy* m_criticOptimizer;
+	//ndBrainOptimizerAdamLegacy* m_policyOptimizer;
 
 	ndArray<ndInt32> m_randomPermutation;
 	ndBrainAgentDiscretePolicyGradient_Trainer::ndRandomGenerator* m_randomGenerator;
 	ndBrainAgentDiscretePolicyGradient_Trainer::ndTrajectoryTransition m_trajectoryAccumulator;
 
 	ndBrainFloat m_gamma;
-	ndBrainFloat m_policyLearnRate;
-	ndBrainFloat m_criticLearnRate;
+	//ndBrainFloat m_policyLearnRate;
+	//ndBrainFloat m_criticLearnRate;
 	ndInt32 m_numberOfActions;
 	ndInt32 m_numberOfObservations;
 	ndInt32 m_framesAlive;
 	ndUnsigned32 m_frameCount;
 	ndUnsigned32 m_eposideCount;
-	ndInt32 m_miniBatchSize;
+	//ndInt32 m_miniBatchSize;
 	ndInt32 m_maxTrajectorySteps;
 	ndInt32 m_extraTrajectorySteps;
 	ndInt32 m_batchTrajectoryIndex;

@@ -39,11 +39,11 @@ class ndBrainLayerActivationCategoricalSoftmax : public ndBrainLayerActivationSo
 	public:
 	ndBrainLayerActivationCategoricalSoftmax(ndInt32 neurons);
 	ndBrainLayerActivationCategoricalSoftmax(const ndBrainLayerActivationCategoricalSoftmax& src);
-	ndBrainLayer* Clone() const;
+	ndBrainLayer* Clone() const override;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
-	const char* GetLabelId() const;
-	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
+	const char* GetLabelId() const override;
+	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const override;
 
 	virtual void BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const override;
 };

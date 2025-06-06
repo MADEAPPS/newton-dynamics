@@ -67,14 +67,14 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	D_NEWTON_API bool GetSwivelMode() const;
 	D_NEWTON_API void SetSwivelMode(bool active);
 
-	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
-	D_NEWTON_API ndInt32 GetKinematicState(ndKinematicState* const state) const;
+	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const override;
+	D_NEWTON_API ndInt32 GetKinematicState(ndKinematicState* const state) const override;
 	
-	D_NEWTON_API void ClearMemory();
+	D_NEWTON_API void ClearMemory() override;
 
 	protected:
 	ndMatrix CalculateSwivelFrame(const ndMatrix& matrix1) const;
-	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
+	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc) override;
 
 	void SubmitLinearAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	void SubmitAngularAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);

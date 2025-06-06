@@ -46,7 +46,7 @@ class ndJointRoller: public ndJointBilateralConstraint
 	D_NEWTON_API void GetLimitsPosit(ndFloat32& minLimit, ndFloat32& maxLimit) const;
 	D_NEWTON_API void SetAsSpringDamperPosit(ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
 	D_NEWTON_API void GetSpringDamperPosit(ndFloat32& regularizer, ndFloat32& spring, ndFloat32& damper) const;
-	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
+	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const override;
 
 	protected:
 	D_NEWTON_API ndFloat32 PenetrationOmega(ndFloat32 penetartion) const;
@@ -57,7 +57,7 @@ class ndJointRoller: public ndJointBilateralConstraint
 	D_NEWTON_API void SubmitLimitsPosit(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	D_NEWTON_API void SubmitSpringDamperPosit(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 
-	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
+	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc) override;
 	D_NEWTON_API void ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 
 	ndFloat32 m_angle;

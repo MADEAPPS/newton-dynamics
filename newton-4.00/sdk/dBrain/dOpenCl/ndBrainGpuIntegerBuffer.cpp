@@ -21,15 +21,18 @@ ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainGpuContext* const contex
 ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, const ndArray<ndInt32>& input, ndDeviceBufferType deviceType)
 	:ndBrainGpuBuffer(context, input.GetCount()* ndInt32(sizeof(ndInt32)), ndStorageData, deviceType)
 {
-	LoadData(input);
+	ndAssert(0);
+	//LoadData(input);
 }
 
-void ndBrainGpuIntegerBuffer::LoadData(const ndArray<ndInt32>& input)
+void ndBrainGpuIntegerBuffer::LoadData(size_t, const void* const)
 {
-	input.GetCount();
+	ndAssert(0);
+	//input.GetCount();
 }
 
-void ndBrainGpuIntegerBuffer::UnloadData(ndArray<ndInt32>& output)
+void ndBrainGpuIntegerBuffer::UnloadData(size_t, void* const) const
 {
-	output.GetCount();
+	ndAssert(0);
+	//output.GetCount();
 }

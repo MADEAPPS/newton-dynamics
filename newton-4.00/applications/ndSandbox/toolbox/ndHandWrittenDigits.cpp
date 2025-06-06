@@ -271,7 +271,7 @@ static void MnistTrainingSet()
 
 			ndBrainLossCategoricalCrossEntropy loss(outputSize);
 
-			batchesSize = m_miniBatchSize * 2;
+			//batchesSize = m_miniBatchSize * 2;
 			for (ndInt32 epoch = 0; epoch < MINIST_NUMBER_OF_EPOCKS; ++epoch)
 			{
 				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
@@ -286,22 +286,22 @@ static void MnistTrainingSet()
 					}
 
 					trainer->MakePrediction(miniBatchInput, false);
-					trainer->SyncQueue();
+					//trainer->SyncQueue();
 					
 					//calculate loss
-					trainer->GetOutput(miniBatchOutput);
-					for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
-					{
-						ndUnsigned32 index = shuffleBuffer[batchStart + i];
-						ndBrainMemVector grad(&miniBatchOutputGradients[i * outputSize], outputSize);
-						const ndBrainMemVector output(&miniBatchOutput[i * outputSize], outputSize);
-						const ndBrainMemVector truth(&(*trainingLabels)[index][0], outputSize);
-						
-						loss.SetTruth(truth);
-						loss.GetLoss(output, grad);
-					}
+					//trainer->GetOutput(miniBatchOutput);
+					//for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
+					//{
+					//	ndUnsigned32 index = shuffleBuffer[batchStart + i];
+					//	ndBrainMemVector grad(&miniBatchOutputGradients[i * outputSize], outputSize);
+					//	const ndBrainMemVector output(&miniBatchOutput[i * outputSize], outputSize);
+					//	const ndBrainMemVector truth(&(*trainingLabels)[index][0], outputSize);
+					//	
+					//	loss.SetTruth(truth);
+					//	loss.GetLoss(output, grad);
+					//}
 					// backpropagate loss.
-					trainer->BackPropagate(miniBatchOutputGradients);
+					//trainer->BackPropagate(miniBatchOutputGradients);
 					//trainer->ApplyLearnRate(m_learnRate);
 
 					#if 0

@@ -1991,10 +1991,6 @@ inline ndMinkFace* ndContactSolver::NewFace()
 			return nullptr;
 		}
 	}
-
-#ifdef _DEBUG
-	memset(face, 0, sizeof(ndMinkFace));
-#endif
 	return face;
 }
 

@@ -32,14 +32,14 @@ class ndBrainLayerActivationLinear : public ndBrainLayerActivation
 	public:
 	ndBrainLayerActivationLinear(const ndBrainVector& slope, const ndBrainVector& bias);
 	ndBrainLayerActivationLinear(const ndBrainLayerActivationLinear& src);
-	ndBrainLayer* Clone() const;
+	ndBrainLayer* Clone() const override;
 
 	virtual void Save(const ndBrainSave* const loadSave) const override;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
-	const char* GetLabelId() const;
-	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
-	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
+	const char* GetLabelId() const override;
+	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const override;
+	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const override;
 
 	ndBrainVector m_slopes;
 	ndBrainVector m_biases;

@@ -35,26 +35,26 @@ class ndBrainLayerLinear : public ndBrainLayer
 	ndBrainLayerLinear(ndInt32 inputs, ndInt32 outputs);
 	ndBrainLayerLinear(const ndBrainLayerLinear& src);
 	virtual ~ndBrainLayerLinear();
-	virtual ndBrainLayer* Clone() const;
+	virtual ndBrainLayer* Clone() const override;
 
-	virtual bool HasParameters() const;
-	virtual ndInt32 GetOutputSize() const;
-	virtual ndInt32 GetInputSize() const;
-	virtual const char* GetLabelId() const;
-	virtual ndInt32 GetNumberOfParameters() const;
+	virtual bool HasParameters() const override;
+	virtual ndInt32 GetOutputSize() const override;
+	virtual ndInt32 GetInputSize() const override;
+	virtual const char* GetLabelId() const override;
+	virtual ndInt32 GetNumberOfParameters() const override;
 	
 	virtual ndBrainVector* GetBias();
 	virtual ndBrainMatrix* GetWeights();
 	
-	virtual void InitWeights();
-	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
-	virtual void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
+	virtual void InitWeights() override;
+	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const override;
+	virtual void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const override;
 
 	virtual void CalculateParamGradients(
 		const ndBrainVector& input, const ndBrainVector& output,
-		const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainLayer* const gradientOut) const;
+		const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainLayer* const gradientOut) const override;
 
-	virtual void Save(const ndBrainSave* const loadSave) const;
+	virtual void Save(const ndBrainSave* const loadSave) const override;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 	
 	void Clear() override;
@@ -66,11 +66,11 @@ class ndBrainLayerLinear : public ndBrainLayer
 	void Blend(const ndBrainLayer& src, ndBrainFloat blend) override;
 	void ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale) override;
 
-	void AddReqularizerL1(const ndBrainLayer& weights, ndBrainFloat regularizer);
-	void AddReqularizerL2(const ndBrainLayer& weights, ndBrainFloat regularizer);
+	void AddReqularizerL1(const ndBrainLayer& weights, ndBrainFloat regularizer) override;
+	void AddReqularizerL2(const ndBrainLayer& weights, ndBrainFloat regularizer) override;
 
 	protected:
-	void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
+	void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon) override;
 
 	virtual void SetWeights(const ndBrainVector& input) override;
 	virtual void CopyWeights(ndBrainVector& oput) const override;

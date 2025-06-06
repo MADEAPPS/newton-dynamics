@@ -36,17 +36,17 @@ class ndShapeUserDefinedImplicit: public ndShapeConvex
 	virtual ndShapeUserDefinedImplicit* GetAsShape() { return this; }
 
 	protected:
-	D_COLLISION_API virtual void MassProperties();
+	D_COLLISION_API virtual void MassProperties() override;
 
-	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
-	D_COLLISION_API virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const;
-	D_COLLISION_API virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const;
-	D_COLLISION_API virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
-	D_COLLISION_API virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const;
-	D_COLLISION_API virtual ndVector SupportVertex(const ndVector& dir) const;
-	D_COLLISION_API virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin) const;
-	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
-	D_COLLISION_API virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
+	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const override;
+	D_COLLISION_API virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const override;
+	D_COLLISION_API virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const override;
+	D_COLLISION_API virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const override;
+	D_COLLISION_API virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const override;
+	D_COLLISION_API virtual ndVector SupportVertex(const ndVector& dir) const override;
+	D_COLLISION_API virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin) const override;
+	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const override;
+	D_COLLISION_API virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const override;
 
 } D_GCC_NEWTON_CLASS_ALIGN_32;
 

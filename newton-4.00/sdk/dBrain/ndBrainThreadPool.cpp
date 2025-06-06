@@ -25,11 +25,11 @@
 class ndBrainThreadPool::ndWorker : public ndThread
 {
 	public:
-	ndWorker(const char* const name, ndBrainThreadPool* const owner, ndInt32 threadIndex)
+	ndWorker(const char* const name, ndBrainThreadPool* const owner, ndInt32)
 		:ndThread()
 		,m_task(nullptr)
 		,m_owner(owner)
-		,m_threadIndex(threadIndex)
+		//,m_threadIndex(threadIndex)
 	{
 		SetName(name);
 	}
@@ -57,7 +57,7 @@ class ndBrainThreadPool::ndWorker : public ndThread
 
 	ndTask* m_task;
 	ndBrainThreadPool* m_owner;
-	ndInt32 m_threadIndex;
+	//ndInt32 m_threadIndex;
 	friend class ndBrainThreadPool;
 };
 

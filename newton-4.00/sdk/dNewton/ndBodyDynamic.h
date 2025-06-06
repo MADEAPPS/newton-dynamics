@@ -46,38 +46,38 @@ class ndBodyDynamic: public ndBodyKinematic
 	D_NEWTON_API ndBodyDynamic(const ndBodyDynamic& src);
 	D_NEWTON_API virtual ~ndBodyDynamic ();
 
-	D_NEWTON_API virtual ndBodyDynamic* GetAsBodyDynamic() { return this; }
-	D_NEWTON_API virtual void ApplyExternalForces(ndInt32 threadIndex, ndFloat32 timestep);
-	D_NEWTON_API virtual void AddDampingAcceleration(ndFloat32 timestep);
-	D_NEWTON_API virtual void IntegrateVelocity(ndFloat32 timestep);
-	D_NEWTON_API virtual void InitSurrogateBody(ndBodyKinematic* const surrogate) const;
+	D_NEWTON_API virtual ndBodyDynamic* GetAsBodyDynamic() override { return this; }
+	D_NEWTON_API virtual void ApplyExternalForces(ndInt32 threadIndex, ndFloat32 timestep) override;
+	D_NEWTON_API virtual void AddDampingAcceleration(ndFloat32 timestep) override;
+	D_NEWTON_API virtual void IntegrateVelocity(ndFloat32 timestep) override;
+	D_NEWTON_API virtual void InitSurrogateBody(ndBodyKinematic* const surrogate) const override;
 
-	D_NEWTON_API void SetForce(const ndVector& force);
-	D_NEWTON_API void SetTorque(const ndVector& torque);
+	D_NEWTON_API void SetForce(const ndVector& force) override;
+	D_NEWTON_API void SetTorque(const ndVector& torque) override;
 
-	D_NEWTON_API void AddImpulse(const ndVector& pointVeloc, const ndVector& pointPosit, ndFloat32 timestep);
-	D_NEWTON_API void ApplyImpulsePair(const ndVector& linearImpulse, const ndVector& angularImpulse, ndFloat32 timestep);
-	D_NEWTON_API void ApplyImpulsesAtPoint(ndInt32 count, const ndVector* const impulseArray, const ndVector* const pointArray, ndFloat32 timestep);
+	D_NEWTON_API void AddImpulse(const ndVector& pointVeloc, const ndVector& pointPosit, ndFloat32 timestep) override;
+	D_NEWTON_API void ApplyImpulsePair(const ndVector& linearImpulse, const ndVector& angularImpulse, ndFloat32 timestep) override;
+	D_NEWTON_API void ApplyImpulsesAtPoint(ndInt32 count, const ndVector* const impulseArray, const ndVector* const pointArray, ndFloat32 timestep) override;
 
-	D_NEWTON_API ndFloat32 GetLinearDamping() const;
-	D_NEWTON_API void SetLinearDamping(ndFloat32 linearDamp);
+	D_NEWTON_API ndFloat32 GetLinearDamping() const override;
+	D_NEWTON_API void SetLinearDamping(ndFloat32 linearDamp) override;
 
-	D_NEWTON_API ndVector GetCachedDamping() const;
-	D_NEWTON_API ndVector GetAngularDamping() const;
-	D_NEWTON_API void SetAngularDamping(const ndVector& angularDamp);
+	D_NEWTON_API ndVector GetCachedDamping() const override;
+	D_NEWTON_API ndVector GetAngularDamping() const override;
+	D_NEWTON_API void SetAngularDamping(const ndVector& angularDamp) override;
 
 	D_NEWTON_API ndFloat32 GetSleepAccel() const;
 	D_NEWTON_API void SetSleepAccel(ndFloat32 accelMag2);
 
-	virtual ndVector GetForce() const;
-	virtual ndVector GetTorque() const;
+	virtual ndVector GetForce() const override;
+	virtual ndVector GetTorque() const override;
 	
 	private:
 	void SaveExternalForces();
-	void SetAcceleration(const ndVector& accel, const ndVector& alpha);
-	D_NEWTON_API virtual void IntegrateGyroSubstep(const ndVector& timestep);
-	D_NEWTON_API virtual ndJacobian IntegrateForceAndToque(const ndVector& force, const ndVector& torque, const ndVector& timestep) const;
-	D_NEWTON_API virtual void EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeAccel2);
+	virtual void SetAcceleration(const ndVector& accel, const ndVector& alpha) override;
+	D_NEWTON_API virtual void IntegrateGyroSubstep(const ndVector& timestep) override;
+	D_NEWTON_API virtual ndJacobian IntegrateForceAndToque(const ndVector& force, const ndVector& torque, const ndVector& timestep) const override;
+	D_NEWTON_API virtual void EvaluateSleepState(ndFloat32 freezeSpeed2, ndFloat32 freezeAccel2) override;
 
 	ndVector m_externalForce;
 	ndVector m_externalTorque;

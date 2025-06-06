@@ -24,7 +24,7 @@ class ndBrainCpuContext :
 	virtual ~ndBrainCpuContext();
 
 	virtual ndContextType GetType() const override;
-	virtual ndBrainCpuContext* GetAsCpuContext();
+	virtual ndBrainCpuContext* GetAsCpuContext() override;
 };
 
 #endif

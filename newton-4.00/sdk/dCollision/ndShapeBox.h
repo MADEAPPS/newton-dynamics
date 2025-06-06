@@ -32,24 +32,24 @@ class ndShapeBox: public ndShapeConvex
 	D_COLLISION_API ndShapeBox(ndFloat32 size_x, ndFloat32 size_y, ndFloat32 size_z);
 	D_COLLISION_API virtual ~ndShapeBox();
 
-	D_COLLISION_API virtual ndShapeBox* GetAsShapeBox() { return this; }
+	D_COLLISION_API virtual ndShapeBox* GetAsShapeBox() override { return this; }
 
 	protected:
 	D_COLLISION_API void Init (ndFloat32 size_x, ndFloat32 size_y, ndFloat32 size_z);
-	D_COLLISION_API virtual void MassProperties();
+	D_COLLISION_API virtual void MassProperties() override;
 
-	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
-	D_COLLISION_API virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const;
-	D_COLLISION_API virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const;
-	D_COLLISION_API virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const;
-	D_COLLISION_API virtual ndVector SupportVertex(const ndVector& dir) const;
-	D_COLLISION_API virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin) const;
-	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const override;
+	D_COLLISION_API virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const override;
+	D_COLLISION_API virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const override;
+	D_COLLISION_API virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const override;
+	D_COLLISION_API virtual ndVector SupportVertex(const ndVector& dir) const override;
+	D_COLLISION_API virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin) const override;
+	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const override;
 
-	D_COLLISION_API const ndConvexSimplexEdge** GetVertexToEdgeMapping() const;
-	D_COLLISION_API virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
+	D_COLLISION_API const ndConvexSimplexEdge** GetVertexToEdgeMapping() const override;
+	D_COLLISION_API virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const override;
 
-	virtual ndVector SupportFeatureVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
+	virtual ndVector SupportFeatureVertex(const ndVector& dir, ndInt32* const vertexIndex) const override;
 	ndVector m_size[2];
 	ndVector m_vertex[8];
 

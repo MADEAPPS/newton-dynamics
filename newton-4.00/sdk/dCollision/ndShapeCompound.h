@@ -55,7 +55,7 @@ class ndShapeCompound: public ndShape
 	//void SetOwner(const ndShapeInstance* const myInstance);
 
 	D_COLLISION_API const ndTreeArray& GetTree() const;
-	D_COLLISION_API virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const;
+	D_COLLISION_API virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const override;
 
 	D_COLLISION_API virtual void BeginAddRemove();
 	D_COLLISION_API virtual void RemoveNode(ndTreeArray::ndNode* const node);
@@ -67,25 +67,25 @@ class ndShapeCompound: public ndShape
 	class ndSpliteInfo;
 	D_COLLISION_API ndShapeCompound(const ndShapeCompound& source);
 
-	virtual ndShapeInfo GetShapeInfo() const;
-	virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
-	virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+	virtual ndShapeInfo GetShapeInfo() const override;
+	virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const override;
+	virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const override;
 
-	virtual ndFloat32 GetVolume() const;
-	virtual ndFloat32 GetBoxMinRadius() const;
-	virtual ndFloat32 GetBoxMaxRadius() const;
+	virtual ndFloat32 GetVolume() const override;
+	virtual ndFloat32 GetBoxMinRadius() const override;
+	virtual ndFloat32 GetBoxMaxRadius() const override;
 
-	virtual ndShapeCompound* GetAsShapeCompound();
-	virtual ndVector SupportVertex(const ndVector& dir) const;
-	virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin) const;
-	virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const;
-	virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
-	virtual ndVector CalculateVolumeIntegral(const ndMatrix& globalMatrix, const ndVector& plane, const ndShapeInstance& parentScale) const;
+	virtual ndShapeCompound* GetAsShapeCompound() override;
+	virtual ndVector SupportVertex(const ndVector& dir) const override;
+	virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin) const override;
+	virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const override;
+	virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const override;
+	virtual ndVector CalculateVolumeIntegral(const ndMatrix& globalMatrix, const ndVector& plane, const ndShapeInstance& parentScale) const override;
 	
-	D_COLLISION_API virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const;
+	D_COLLISION_API virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const override;
 	//D_COLLISION_API ndInt32 CalculatePlaneIntersection(const ndFloat32* const vertex, const ndInt32* const index, ndInt32 indexCount, ndInt32 strideInFloat, const dPlane& localPlane, dVector* const contactsOut) const;
 
-	virtual void MassProperties();
+	virtual void MassProperties() override;
 	void ApplyScale(const ndVector& scale);
 	void SetSubShapeOwner(ndBodyKinematic* const body);
 	void ImproveNodeFitness(ndNodeBase* const node) const;
@@ -93,8 +93,8 @@ class ndShapeCompound: public ndShape
 	ndNodeBase* BuildTopDown(ndNodeBase** const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndNodeBase** rootNodesMemory, ndInt32& rootIndex);
 	ndNodeBase* BuildTopDownBig(ndNodeBase** const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndNodeBase** rootNodesMemory, ndInt32& rootIndex);
 	ndFloat32 CalculateSurfaceArea(ndNodeBase* const node0, ndNodeBase* const node1, ndVector& minBox, ndVector& maxBox) const;
-	ndMatrix CalculateInertiaAndCenterOfMass(const ndMatrix& alignMatrix, const ndVector& localScale, const ndMatrix& matrix) const;
-	ndFloat32 CalculateMassProperties(const ndMatrix& offset, ndVector& inertia, ndVector& crossInertia, ndVector& centerOfMass) const;
+	ndMatrix CalculateInertiaAndCenterOfMass(const ndMatrix& alignMatrix, const ndVector& localScale, const ndMatrix& matrix) const override;
+	ndFloat32 CalculateMassProperties(const ndMatrix& offset, ndVector& inertia, ndVector& crossInertia, ndVector& centerOfMass) const override;
 
 	ndTreeArray m_array;
 	ndFloat64 m_treeEntropy;

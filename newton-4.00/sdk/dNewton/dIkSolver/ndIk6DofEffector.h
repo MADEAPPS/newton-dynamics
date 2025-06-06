@@ -57,13 +57,13 @@ class ndIk6DofEffector: public ndJointBilateralConstraint
 	
 	D_NEWTON_API ndFloat32 GetMaxTorque() const;
 	D_NEWTON_API void SetMaxTorque(ndFloat32 torque);
-	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
+	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const override;
 
-	D_NEWTON_API ndMatrix CalculateGlobalMatrix1() const;
+	D_NEWTON_API ndMatrix CalculateGlobalMatrix1() const override;
 	D_NEWTON_API ndMatrix CalculateGlobalBaseMatrix1() const;
 
 	protected:
-	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
+	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc) override;
 	D_NEWTON_API void SubmitLinearAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	D_NEWTON_API void SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	D_NEWTON_API void SubmitShortestPathAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);

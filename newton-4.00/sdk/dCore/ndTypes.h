@@ -323,18 +323,18 @@ class ndTriplex
 		return #Class;							\
 	}
 
-#define D_CLASS_REFLECTION(Class,SuperClass)	\
-	virtual const char* ClassName() const		\
-	{											\
-		return #Class;							\
-	}											\
-	static const char* StaticClassName()		\
-	{											\
-		return #Class;							\
-	}											\
-	virtual const char* SuperClassName() const	\
-	{											\
-		return #SuperClass;						\
+#define D_CLASS_REFLECTION(Class,SuperClass)			\
+	virtual const char* ClassName() const override		\
+	{													\
+		return #Class;									\
+	}													\
+	static const char* StaticClassName()				\
+	{													\
+		return #Class;									\
+	}													\
+	virtual const char* SuperClassName() const override	\
+	{													\
+		return #SuperClass;								\
 	}
 
 #define D_OPERATOR_NEW_AND_DELETE			\

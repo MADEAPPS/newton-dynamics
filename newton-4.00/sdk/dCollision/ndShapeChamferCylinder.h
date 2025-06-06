@@ -36,22 +36,22 @@ class ndShapeChamferCylinder: public ndShapeConvex
 	D_COLLISION_API ndShapeChamferCylinder(ndFloat32 radius, ndFloat32 height);
 	D_COLLISION_API virtual ~ndShapeChamferCylinder();
 
-	virtual ndShapeChamferCylinder* GetAsShapeChamferCylinder() { return this; }
+	virtual ndShapeChamferCylinder* GetAsShapeChamferCylinder() override { return this; }
 
 	protected:
 
 	D_COLLISION_API void Init(ndFloat32 radius, ndFloat32 height);
 
-	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
-	D_COLLISION_API virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const;
-	D_COLLISION_API virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const;
-	D_COLLISION_API virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
-	D_COLLISION_API virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const;
-	D_COLLISION_API virtual ndVector SupportVertex(const ndVector& dir) const;
-	D_COLLISION_API virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin) const;
-	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const override;
+	D_COLLISION_API virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const override;
+	D_COLLISION_API virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const override;
+	D_COLLISION_API virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const override;
+	D_COLLISION_API virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const override;
+	D_COLLISION_API virtual ndVector SupportVertex(const ndVector& dir) const override;
+	D_COLLISION_API virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin) const override;
+	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const override;
 
-	virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
+	virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const override;
 
 	private:
 	ndFloat32 m_height;

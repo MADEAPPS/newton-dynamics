@@ -90,7 +90,7 @@ class ndBodyKinematic : public ndBody
 	D_COLLISION_API ndScene* GetScene() const;
 
 	D_COLLISION_API ndUnsigned32 GetIndex() const;
-	D_COLLISION_API ndFloat32 GetInvMass() const;
+	D_COLLISION_API virtual ndFloat32 GetInvMass() const override;
 	D_COLLISION_API const ndVector GetInvInertia() const;
 	D_COLLISION_API const ndVector& GetMassMatrix() const;
 	D_COLLISION_API const ndMatrix& GetInvInertiaMatrix() const;
@@ -118,7 +118,7 @@ class ndBodyKinematic : public ndBody
 	D_COLLISION_API ndShapeInstance& GetCollisionShape();
 	D_COLLISION_API const ndShapeInstance& GetCollisionShape() const;
 	D_COLLISION_API virtual void SetCollisionShape(const ndShapeInstance& shapeInstance);
-	D_COLLISION_API virtual bool RayCast(ndRayCastNotify& callback, const ndFastRay& ray, const ndFloat32 maxT) const;
+	D_COLLISION_API virtual bool RayCast(ndRayCastNotify& callback, const ndFastRay& ray, const ndFloat32 maxT) const override;
 
 	D_COLLISION_API ndVector CalculateLinearMomentum() const;
 	D_COLLISION_API virtual ndVector CalculateAngularMomentum() const;
@@ -127,7 +127,7 @@ class ndBodyKinematic : public ndBody
 	D_COLLISION_API void ClearMemory();
 	D_COLLISION_API virtual void IntegrateVelocity(ndFloat32 timestep);
 	D_COLLISION_API void SetMatrixUpdateScene(const ndMatrix& matrix);
-	D_COLLISION_API virtual ndContact* FindContact(const ndBody* const otherBody) const;
+	D_COLLISION_API virtual ndContact* FindContact(const ndBody* const otherBody) const override;
 
 	D_COLLISION_API ndJacobian CalculateNetForce() const;
 	D_COLLISION_API ndMatrix CalculateInertiaMatrix() const;
@@ -145,7 +145,7 @@ class ndBodyKinematic : public ndBody
 	D_COLLISION_API ndMatrix GetPrincipalAxis() const;
 	D_COLLISION_API void GetMassMatrix(ndFloat32& Ixx, ndFloat32& Iyy, ndFloat32& Izz, ndFloat32& mass);
 
-	D_COLLISION_API virtual ndBodyKinematic* GetAsBodyKinematic();
+	D_COLLISION_API virtual ndBodyKinematic* GetAsBodyKinematic() override;
 
 	D_COLLISION_API ndSkeletonContainer* GetSkeleton() const;
 	D_COLLISION_API void SetSkeleton(ndSkeletonContainer* const skeleton);
@@ -171,8 +171,8 @@ class ndBodyKinematic : public ndBody
 	D_COLLISION_API const ndContactMap& GetContactMap() const;
 
 	protected:
-	D_COLLISION_API virtual void AttachContact(ndContact* const contact);
-	D_COLLISION_API virtual void DetachContact(ndContact* const contact);
+	D_COLLISION_API virtual void AttachContact(ndContact* const contact) override;
+	D_COLLISION_API virtual void DetachContact(ndContact* const contact) override;
 
 	D_COLLISION_API virtual void DetachJoint(ndJointList::ndNode* const node);
 	D_COLLISION_API virtual ndJointList::ndNode* AttachJoint(ndJointBilateralConstraint* const joint);

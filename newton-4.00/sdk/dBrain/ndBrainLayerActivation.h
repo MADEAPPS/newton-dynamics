@@ -33,35 +33,34 @@ class ndBrainLayerActivation : public ndBrainLayer
 	ndBrainLayerActivation(ndInt32 neurons);
 	ndBrainLayerActivation(const ndBrainLayerActivation& src);
 	virtual ~ndBrainLayerActivation();
-	virtual ndBrainLayer* Clone() const;
+	virtual ndBrainLayer* Clone() const override;
 
-	virtual bool HasParameters() const;
-	virtual ndInt32 GetOutputSize() const;
-	virtual ndInt32 GetInputSize() const;
-	virtual const char* GetLabelId() const;
+	virtual bool HasParameters() const override;
+	virtual ndInt32 GetOutputSize() const override;
+	virtual ndInt32 GetInputSize() const override;
+	virtual const char* GetLabelId() const override;
 
 	protected:
-	void Clear();
-	void FlushToZero();
-	void Scale(ndBrainFloat scale);
-	void Set(const ndBrainLayer& src);
-	void Add(const ndBrainLayer& src);
-	void Mul(const ndBrainLayer& src);
-	void ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale);
-	virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend);
+	void Clear() override;
+	void FlushToZero() override;
+	void Scale(ndBrainFloat scale) override;
+	void Set(const ndBrainLayer& src) override;
+	void Add(const ndBrainLayer& src) override;
+	void Mul(const ndBrainLayer& src) override;
+	void ScaleAdd(const ndBrainLayer& src, ndBrainFloat scale) override;
+	virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend) override;
 	
-	virtual void InitWeights();
-	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
-	//virtual void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
-	virtual void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
+	virtual void InitWeights() override;
+	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const override;
+	virtual void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const override;
 
 	virtual void CalculateParamGradients(
 		const ndBrainVector& input, const ndBrainVector& output,
-		const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainLayer* const gradientOut) const;
+		const ndBrainVector& outputDerivative, ndBrainVector& inputGradient, ndBrainLayer* const gradientOut) const override;
 
-	void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
+	void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon) override;
 
-	virtual void Save(const ndBrainSave* const loadSave) const;
+	virtual void Save(const ndBrainSave* const loadSave) const override;
 
 	ndInt32 m_neurons;
 };

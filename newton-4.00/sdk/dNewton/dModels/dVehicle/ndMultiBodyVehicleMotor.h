@@ -44,11 +44,11 @@ class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 	D_NEWTON_API void SetOmegaAccel(ndFloat32 rpmStep);
 	D_NEWTON_API void SetFrictionLoss(ndFloat32 newtonMeters);
 	D_NEWTON_API void SetTorqueAndRpm(ndFloat32 newtonMeters, ndFloat32 rpm);
-	void DebugJoint(ndConstraintDebugCallback&) const {}
+	void DebugJoint(ndConstraintDebugCallback&) const override {}
 
 	private:
 	void AlignMatrix();
-	void JacobianDerivative(ndConstraintDescritor& desc);
+	void JacobianDerivative(ndConstraintDescritor& desc) override;
 	ndFloat32 CalculateAcceleration(ndConstraintDescritor& desc);
 
 	protected:

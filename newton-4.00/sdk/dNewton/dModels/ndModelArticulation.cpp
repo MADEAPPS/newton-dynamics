@@ -604,12 +604,12 @@ ndModelArticulation::ndCenterOfMassDynamics ndModelArticulation::CalculateCentre
 	ndJointBilateralConstraint** const extraJointsPtr = extraJoints.GetCount() ? &extraJoints[0] : nullptr;
 	solver.SolverBegin(skeleton, extraJointsPtr, extraJoints.GetCount(), GetWorld(), timestep);
 	solver.Solve();
-	auto CalculateComFullDynamics = [this, &dynamics, &bodyArray, &bodyCenter]()
+	auto CalculateComFullDynamics = [&dynamics, &bodyArray, &bodyCenter]()
 	{
 		for (ndInt32 i = bodyArray.GetCount() - 1; i >= 0; --i)
 		{
 			const ndBodyKinematic* const body = bodyArray[i];
-			const ndMatrix bodyMatrix(body->GetMatrix());
+			//const ndMatrix bodyMatrix(body->GetMatrix());
 
 			ndFloat32 mass = body->GetMassMatrix().m_w;
 
@@ -686,12 +686,12 @@ ndModelArticulation::ndCenterOfMassDynamics ndModelArticulation::CalculateCentre
 	ndFixSizeArray<const ndBodyKinematic*, 256> bodyArray;
 	CalculateCentreOfMass(dynamics, bodyArray, bodyCenter);
 
-	auto CalculateTotalMomentum = [this, &dynamics, &bodyArray, &bodyCenter]()
+	auto CalculateTotalMomentum = [&dynamics, &bodyArray, &bodyCenter]()
 	{
 		for (ndInt32 i = bodyArray.GetCount() - 1; i >= 0; --i)
 		{
 			const ndBodyKinematic* const body = bodyArray[i];
-			const ndMatrix bodyMatrix(body->GetMatrix());
+			//const ndMatrix bodyMatrix(body->GetMatrix());
 
 			ndFloat32 mass = body->GetMassMatrix().m_w;
 

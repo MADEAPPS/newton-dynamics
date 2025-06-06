@@ -41,8 +41,8 @@ class ndMultiBodyVehicleDifferential : public ndJointBilateralConstraint
 
 	protected:
 	void AlignMatrix();
-	void DebugJoint(ndConstraintDebugCallback&) const {}
-	void JacobianDerivative(ndConstraintDescritor& desc);
+	void DebugJoint(ndConstraintDebugCallback&) const override {}
+	void JacobianDerivative(ndConstraintDescritor& desc) override;
 
 	ndFloat32 m_limitedSlipOmega;
 

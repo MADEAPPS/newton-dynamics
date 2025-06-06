@@ -33,6 +33,7 @@
 #include "ndArray.h"
 #include "ndVector.h"
 #include "ndMatrix.h"
+#include "ndVector.h"
 
 /// Helper intermediate class for encoding a face adjacent face to an edge of a face.
 class ndAdjacentFace

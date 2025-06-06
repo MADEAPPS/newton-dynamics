@@ -20,8 +20,8 @@ class ndBrainGpuIntegerBuffer : public ndBrainGpuBuffer
 	ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, ndInt64 size, ndDeviceBufferType deviceType);
 	ndBrainGpuIntegerBuffer(ndBrainGpuContext* const context, const ndArray<ndInt32>& input, ndDeviceBufferType deviceType);
 
-	void UnloadData(ndArray<ndInt32>& output);
-	void LoadData(const ndArray<ndInt32>& input);
+	virtual void LoadData(size_t sizeInBytes, const void* const inputData) override;
+	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const override;
 };
 
 #endif

@@ -209,7 +209,7 @@ void ndBrainLayerLinear::AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v
 void ndBrainLayerLinear::Save(const ndBrainSave* const loadSave) const
 {
 	char buffer[1024];
-	auto Save = [this, &buffer, &loadSave](const char* const fmt, ...)
+	auto Save = [&buffer, &loadSave](const char* const fmt, ...)
 	{
 		va_list v_args;
 		buffer[0] = 0;

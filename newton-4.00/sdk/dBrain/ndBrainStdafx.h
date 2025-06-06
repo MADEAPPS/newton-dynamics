@@ -31,6 +31,7 @@
 #endif
 
 #ifdef D_USE_OPENCL_SDK
+	#define CL_HPP_TARGET_OPENCL_VERSION 300
 	#include <CL/opencl.hpp>
 #endif
 

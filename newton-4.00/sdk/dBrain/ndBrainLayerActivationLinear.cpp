@@ -55,7 +55,7 @@ void ndBrainLayerActivationLinear::Save(const ndBrainSave* const loadSave) const
 	ndBrainLayerActivation::Save(loadSave);
 
 	char buffer[1024];
-	auto Save = [this, &buffer, &loadSave](const char* const fmt, ...)
+	auto Save = [&buffer, &loadSave](const char* const fmt, ...)
 	{
 		va_list v_args;
 		buffer[0] = 0;

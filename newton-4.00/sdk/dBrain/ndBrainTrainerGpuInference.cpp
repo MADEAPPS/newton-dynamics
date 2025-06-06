@@ -296,7 +296,6 @@ void ndBrainTrainerGpuInference::SyncQueue()
 void ndBrainTrainerGpuInference::MakePrediction(const ndBrainVector& input, bool sync)
 {
 	m_miniBatchInputBuffer->LoadData(input.GetCount() * sizeof(ndReal), &input[0]);
-
 	for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = m_feedFowardCommands.GetFirst(); node; node = node->GetNext())
 	{
 		ndSharedPtr<ndBrainGpuCommand>& command = node->GetInfo();

@@ -41,11 +41,11 @@ enum ndJointBilateralSolverModel
 };
 
 #define D_ADD_IK_INTERFACE()															\
-virtual void SetIkMode(bool mode)														\
+virtual void SetIkMode(bool mode) override												\
 {																						\
 	m_ikMode = mode;																	\
 }																						\
-virtual void SetIkSetAccel(const ndJacobian& body0Accel, const ndJacobian& body1Accel)	\
+virtual void SetIkSetAccel(const ndJacobian& body0Accel, const ndJacobian& body1Accel) override	\
 {																						\
 	m_accel0 = body0Accel;																\
 	m_accel1 = body1Accel;																\
@@ -55,7 +55,7 @@ D_MSV_NEWTON_CLASS_ALIGN_32
 class ndJointBilateralConstraint : public ndConstraint
 {
 	public:
-	D_BASE_CLASS_REFLECTION(ndJointBilateralConstraint);
+	D_CLASS_REFLECTION(ndJointBilateralConstraint, ndConstraint);
 
 	class ndIkInterface
 	{
@@ -83,17 +83,17 @@ class ndJointBilateralConstraint : public ndConstraint
 	D_COLLISION_API ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const ndMatrix& globalMatrixBody0,  const ndMatrix& globalMatrixBody1);
 	D_COLLISION_API virtual ~ndJointBilateralConstraint();
 
-	D_COLLISION_API virtual ndJointBilateralConstraint* GetAsBilateral();
-	D_COLLISION_API virtual void JacobianDerivative(ndConstraintDescritor& desc);
+	D_COLLISION_API virtual ndJointBilateralConstraint* GetAsBilateral() override;
+	D_COLLISION_API virtual void JacobianDerivative(ndConstraintDescritor& desc) override;
 	D_COLLISION_API virtual ndJointBilateralSolverModel GetSolverModel() const;
 	D_COLLISION_API virtual void SetSolverModel(ndJointBilateralSolverModel model);
 
 	D_COLLISION_API ndFloat32 CalculateAngle(const ndVector& planeDir, const ndVector& cosDir, const ndVector& sinDir) const;
-	D_COLLISION_API virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc);
+	D_COLLISION_API virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc) override;
 	D_COLLISION_API void AddAngularRowJacobian(ndConstraintDescritor& desc, const ndVector& dir, ndFloat32 relAngle);
 	D_COLLISION_API void AddLinearRowJacobian(ndConstraintDescritor& desc, const ndVector& pivot0, const ndVector& pivot1, const ndVector& dir);
 
-	D_COLLISION_API virtual void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
+	D_COLLISION_API virtual void DebugJoint(ndConstraintDebugCallback& debugCallback) const override;
 	D_COLLISION_API ndFloat32 CalculateSpringDamperAcceleration(ndFloat32 dt, ndFloat32 ks, ndFloat32 x, ndFloat32 kd, ndFloat32 v) const;
 	D_COLLISION_API void SetMassSpringDamperAcceleration(ndConstraintDescritor& desc, ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
 
@@ -112,7 +112,7 @@ class ndJointBilateralConstraint : public ndConstraint
 
 	D_COLLISION_API bool IsInWorld() const;
 	D_COLLISION_API bool IsSkeleton() const;
-	D_COLLISION_API bool IsBilateral() const;
+	D_COLLISION_API bool IsBilateral() const override;
 	D_COLLISION_API bool IsCollidable() const;
 	D_COLLISION_API bool GetSkeletonFlag() const;
 	D_COLLISION_API void SetCollidable(bool state);
@@ -135,7 +135,7 @@ class ndJointBilateralConstraint : public ndConstraint
 	D_COLLISION_API void ReplaceSentinel(ndBodyKinematic* const sentinel);
 
 	// inverse dynamics interface
-	D_COLLISION_API virtual void ClearMemory();
+	D_COLLISION_API virtual void ClearMemory() override;
 	D_COLLISION_API virtual void SetIkMode(bool mode);
 	D_COLLISION_API virtual void SetIkSetAccel(const ndJacobian& body0Accel, const ndJacobian& body1Accel);
 

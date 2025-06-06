@@ -35,14 +35,14 @@ class ndBrainLayerLinearWithDropOut : public ndBrainLayerActivation
 	ndBrainLayerLinearWithDropOut(ndInt32 neurons);
 	ndBrainLayerLinearWithDropOut(const ndBrainLayerLinearWithDropOut& src);
 
-	virtual ndBrainLayer* Clone() const;
+	virtual ndBrainLayer* Clone() const override;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
-	virtual const char* GetLabelId() const;
-	virtual void ApplyDropOut(ndFloat32 rate);
+	virtual const char* GetLabelId() const override;
+	virtual void ApplyDropOut(ndFloat32 rate) override;
 
-	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
-	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
+	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const override;
+	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const override;
 
 	virtual ndCommandShareInfo GetCommandSharedInfo() const override;
 

@@ -82,7 +82,7 @@ class ndMultiBodyVehicle : public ndModelArticulation
 	D_NEWTON_API const ndMatrix& GetLocalFrame() const;
 	D_NEWTON_API void SetLocalFrame(const ndMatrix& localframe);
 
-	D_NEWTON_API ndMultiBodyVehicle* GetAsMultiBodyVehicle();
+	D_NEWTON_API ndMultiBodyVehicle* GetAsMultiBodyVehicle() override;
 
 	D_NEWTON_API ndBodyDynamic* GetChassis() const;
 	D_NEWTON_API ndMultiBodyVehicleMotor* GetMotor() const;

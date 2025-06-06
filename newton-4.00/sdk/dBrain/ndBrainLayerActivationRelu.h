@@ -32,12 +32,12 @@ class ndBrainLayerActivationRelu : public ndBrainLayerActivation
 	public:
 	ndBrainLayerActivationRelu(ndInt32 neurons);
 	ndBrainLayerActivationRelu(const ndBrainLayerActivationRelu& src);
-	ndBrainLayer* Clone() const;
+	ndBrainLayer* Clone() const override;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
-	const char* GetLabelId() const;
-	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
-	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
+	const char* GetLabelId() const override;
+	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const override;
+	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const override;
 
 	virtual ndCommandShareInfo GetCommandSharedInfo() const override;
 

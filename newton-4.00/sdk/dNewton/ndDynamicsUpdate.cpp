@@ -267,7 +267,7 @@ void ndDynamicsUpdate::SortJointsScan()
 	const ndInt32 threadCount = scene->GetThreadCount();
 	
 	ndAtomic<ndInt32> iterator(0);
-	auto MarkFence0 = ndMakeObject::ndFunction([this, &iterator, &jointArray](ndInt32, ndInt32)
+	auto MarkFence0 = ndMakeObject::ndFunction([&iterator, &jointArray](ndInt32, ndInt32)
 	{
 		D_TRACKTIME_NAMED(MarkFence0);
 		const ndInt32 jointCount = ndInt32 (jointArray.GetCount());
@@ -301,7 +301,7 @@ void ndDynamicsUpdate::SortJointsScan()
 		}
 	});
 	
-	auto MarkFence1 = ndMakeObject::ndFunction([this, &jointArray, &movingJoints](ndInt32 threadIndex, ndInt32 threadCount)
+	auto MarkFence1 = ndMakeObject::ndFunction([&jointArray, &movingJoints](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME_NAMED(MarkFence1);
 		ndInt32 activeJointCount = 0;

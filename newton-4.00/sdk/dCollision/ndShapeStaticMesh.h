@@ -36,22 +36,22 @@ class ndShapeStaticMesh: public ndShape
 	D_COLLISION_API ndShapeStaticMesh(ndShapeID id);
 	D_COLLISION_API virtual ~ndShapeStaticMesh();
 
-	D_COLLISION_API virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
-	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+	D_COLLISION_API virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const override;
+	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const override;
 	D_COLLISION_API virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
 
 	protected:
-	D_COLLISION_API virtual ndFloat32 GetVolume() const;
-	D_COLLISION_API virtual ndFloat32 GetBoxMinRadius() const;
-	D_COLLISION_API virtual ndFloat32 GetBoxMaxRadius() const;
-	D_COLLISION_API virtual ndShapeStaticMesh* GetAsShapeStaticMesh();
-	D_COLLISION_API virtual ndVector SupportVertex(const ndVector& dir) const;
-	D_COLLISION_API virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin) const;
-	D_COLLISION_API virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const;
-	D_COLLISION_API virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
-	D_COLLISION_API virtual ndVector CalculateVolumeIntegral(const ndMatrix& globalMatrix, const ndVector& plane, const ndShapeInstance& parentScale) const;
+	D_COLLISION_API virtual ndFloat32 GetVolume() const override;
+	D_COLLISION_API virtual ndFloat32 GetBoxMinRadius() const override;
+	D_COLLISION_API virtual ndFloat32 GetBoxMaxRadius() const override;
+	D_COLLISION_API virtual ndShapeStaticMesh* GetAsShapeStaticMesh() override;
+	D_COLLISION_API virtual ndVector SupportVertex(const ndVector& dir) const override;
+	D_COLLISION_API virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin) const override;
+	D_COLLISION_API virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const override;
+	D_COLLISION_API virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const override;
+	D_COLLISION_API virtual ndVector CalculateVolumeIntegral(const ndMatrix& globalMatrix, const ndVector& plane, const ndShapeInstance& parentScale) const override;
 
-	D_COLLISION_API virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const;
+	D_COLLISION_API virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const override;
 	D_COLLISION_API ndInt32 CalculatePlaneIntersection(const ndFloat32* const vertex, const ndInt32* const index, ndInt32 indexCount, ndInt32 strideInFloat, const ndPlane& localPlane, ndVector* const contactsOut) const;
 
 	D_MSV_NEWTON_CLASS_ALIGN_32 

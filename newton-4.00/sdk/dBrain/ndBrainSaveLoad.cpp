@@ -62,23 +62,26 @@ ndBrain* ndBrainLoad::Load(const char* const pathName)
 		ndInt32 ReadInt() const
 		{
 			ndInt32 value;
-			ndInt32 error = 0;
-			error = fscanf(m_file, "%d", &value);
+			//ndInt32 error = 0;
+			//error = fscanf(m_file, "%d", &value);
+			fscanf(m_file, "%d", &value);
 			return value;
 		}
 
 		ndFloat32 ReadFloat() const
 		{
 			ndReal value;
-			ndInt32 error = 0;
-			error = fscanf(m_file, "%f", &value);
+			//ndInt32 error = 0;
+			//error = fscanf(m_file, "%f", &value);
+			fscanf(m_file, "%f", &value);
 			return ndFloat32 (value);
 		}
 
 		void ReadString(char* const buffer) const
 		{
-			ndInt32 error = 0;
-			error = fscanf(m_file, "%s", buffer);
+			//ndInt32 error = 0;
+			//error = fscanf(m_file, "%s", buffer);
+			fscanf(m_file, "%s", buffer);
 		}
 
 		FILE* m_file;
@@ -229,8 +232,9 @@ void ndBrainSave::Save(const ndBrain* const brain, const char* const pathName)
 
 		void WriteData(const char* const data) const
 		{
-			ndInt32 error = 0;
-			error = fprintf(m_file, "%s", data);
+			//ndInt32 error = 0;
+			//error = fprintf(m_file, "%s", data);
+			fprintf(m_file, "%s", data);
 		}
 
 		FILE* m_file;

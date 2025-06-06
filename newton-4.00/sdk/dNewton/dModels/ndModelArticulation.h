@@ -69,9 +69,9 @@ class ndModelArticulation: public ndModel
 	D_NEWTON_API ndModelArticulation();
 	D_NEWTON_API ndModelArticulation(const ndModelArticulation& src);
 	D_NEWTON_API virtual ~ndModelArticulation();
-	D_NEWTON_API virtual ndModel* Clone() const;
+	D_NEWTON_API virtual ndModel* Clone() const override;
 
-	D_NEWTON_API virtual ndModelArticulation* GetAsModelArticulation();
+	D_NEWTON_API virtual ndModelArticulation* GetAsModelArticulation() override;
 
 	D_NEWTON_API ndNode* GetRoot() const;
 	D_NEWTON_API ndNode* AddRootBody(const ndSharedPtr<ndBody>& rootBody);

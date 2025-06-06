@@ -70,12 +70,12 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	D_COLLISION_API void GetLocalAabb(const ndVector& p0, const ndVector& p1, ndVector& boxP0, ndVector& boxP1) const;
 
 	protected:
-	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
-	D_COLLISION_API virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const;
-	D_COLLISION_API virtual ndShapeHeightfield* GetAsShapeHeightfield() { return this; }
-	D_COLLISION_API virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
-	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
-	D_COLLISION_API virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
+	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const override;
+	D_COLLISION_API virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const override;
+	D_COLLISION_API virtual ndShapeHeightfield* GetAsShapeHeightfield() override { return this; }
+	D_COLLISION_API virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const override;
+	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const override;
+	D_COLLISION_API virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const override;
 
 	private: 
 	void CalculateLocalObb();

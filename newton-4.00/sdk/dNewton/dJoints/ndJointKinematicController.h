@@ -33,7 +33,7 @@ class ndJointKinematicController: public ndJointBilateralConstraint
 	D_NEWTON_API ndJointKinematicController(ndBodyKinematic* const referenceBody, ndBodyKinematic* const body, const ndMatrix& attachmentMatrixInGlobalSpace);
 	D_NEWTON_API virtual ~ndJointKinematicController();
 
-	D_NEWTON_API virtual bool IsBilateral() const;
+	D_NEWTON_API virtual bool IsBilateral() const override;
 	D_NEWTON_API void SetControlMode(ndControlModes mode);
 	D_NEWTON_API void SetMaxSpeed(ndFloat32 speedInMetersPerSeconds);
 	D_NEWTON_API void SetMaxOmega(ndFloat32 speedInRadiansPerSeconds);
@@ -57,7 +57,7 @@ class ndJointKinematicController: public ndJointBilateralConstraint
 	protected:
 	D_NEWTON_API void CheckSleep() const;
 	D_NEWTON_API void Init(const ndMatrix& matrix);
-	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
+	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc) override;
 
 	private:
 	ndFloat32 m_maxSpeed;

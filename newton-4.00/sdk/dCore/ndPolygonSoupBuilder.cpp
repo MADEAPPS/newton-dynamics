@@ -220,21 +220,19 @@ void ndPolygonSoupBuilder::LoadPLY(const char* const fileName)
 	FILE* const file = fopen(fileName, "rb");
 
 	char line[1024];
-	char* ret0 = nullptr;
-	ndInt32 ret1 = 0;
-	ret0 = fgets(line, sizeof (line) - 1, file);
+	fgets(line, sizeof (line) - 1, file);
 	if (!strncmp(line, "ply", 3))
 	{
 		ndInt32 faceCount;
 		ndInt32 vertexCount;
-		ret0 = fgets(line, sizeof(line) - 1, file);
-		ret1 = fscanf(file, "%s %s %d\n", line, line, &vertexCount);
-		ret0 = fgets(line, sizeof(line) - 1, file);
-		ret0 = fgets(line, sizeof(line) - 1, file);
-		ret0 = fgets(line, sizeof(line) - 1, file);
-		ret1 = fscanf(file, "%s %s %d\n", line, line, &faceCount);
-		ret0 = fgets(line, sizeof(line) - 1, file);
-		ret0 = fgets(line, sizeof(line) - 1, file);
+		fgets(line, sizeof(line) - 1, file);
+		fscanf(file, "%s %s %d\n", line, line, &vertexCount);
+		fgets(line, sizeof(line) - 1, file);
+		fgets(line, sizeof(line) - 1, file);
+		fgets(line, sizeof(line) - 1, file);
+		fscanf(file, "%s %s %d\n", line, line, &faceCount);
+		fgets(line, sizeof(line) - 1, file);
+		fgets(line, sizeof(line) - 1, file);
 
 		ndArray<ndVector> vertexArray;
 		vertexArray.SetCount(vertexCount);
@@ -243,7 +241,7 @@ void ndPolygonSoupBuilder::LoadPLY(const char* const fileName)
 			ndReal x;
 			ndReal y;
 			ndReal z;
-			ret1 = fscanf(file, "%f %f %f", &x, &y, &z);
+			fscanf(file, "%f %f %f", &x, &y, &z);
 			vertexArray[i] = ndBigVector(ndFloat32(x), ndFloat32(y), ndFloat32(z), ndFloat32(0.0f));
 		}
 
@@ -252,11 +250,11 @@ void ndPolygonSoupBuilder::LoadPLY(const char* const fileName)
 		for (ndInt32 i = 0; i < faceCount; ++i)
 		{
 			ndInt32 indexCount;
-			ret1 = fscanf(file, "%d", &indexCount);
+			fscanf(file, "%d", &indexCount);
 			for (ndInt32 j = 0; j < indexCount; ++j)
 			{
 				ndInt32 index;
-				ret1 = fscanf(file, "%d", &index);
+				fscanf(file, "%d", &index);
 				face[j] = vertexArray[index];
 			}
 			AddFace(&face[0].m_x, sizeof (ndVector), indexCount, 0);

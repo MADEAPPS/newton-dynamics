@@ -52,9 +52,8 @@ void ndUrdfFile::ImportMaterials(const nd::TiXmlNode* const rootNode)
 			ndReal g;
 			ndReal b;
 			ndReal a;
-			ndInt32 ret = 0;
 			const char* const rgba = color->Attribute("rgba");
-			ret = sscanf(rgba, "%f %f %f %f", &r, &g, &b, &a);
+			sscanf(rgba, "%f %f %f %f", &r, &g, &b, &a);
 			material.m_color.m_x = r;
 			material.m_color.m_y = g;
 			material.m_color.m_z = b;
@@ -596,14 +595,12 @@ ndMatrix ndUrdfFile::ImportOrigin(const nd::TiXmlNode* const parentNode) const
 		const char* const xyz = origin->Attribute("xyz");
 		if (xyz)
 		{
-			ndInt32 ret = 0;
-			ret = sscanf(xyz, "%f %f %f", &x, &y, &z);
+			sscanf(xyz, "%f %f %f", &x, &y, &z);
 		}
 		const char* const rpy = origin->Attribute("rpy");
 		if (rpy)
 		{
-			ndInt32 ret = 0;
-			ret = sscanf(rpy, "%f %f %f", &pitch, &yaw, &roll);
+			sscanf(rpy, "%f %f %f", &pitch, &yaw, &roll);
 		}
 
 		matrix = ndPitchMatrix(pitch) * ndYawMatrix(yaw) * ndRollMatrix(roll);
@@ -641,8 +638,7 @@ void ndUrdfFile::ImportStlMesh(const char* const pathName, ndMeshEffect* const m
 		}
 
 		ndInt32 numberOfTriangles;
-		size_t ret = 0;
-		ret = fread(&numberOfTriangles, 1, 4, file);
+		fread(&numberOfTriangles, 1, 4, file);
 		ndFloat32 inchToMeters = 0.0254f;
 
 		ndReal normal[3];
@@ -651,9 +647,9 @@ void ndUrdfFile::ImportStlMesh(const char* const pathName, ndMeshEffect* const m
 
 		for (ndInt32 i = 0; i < numberOfTriangles; ++i)
 		{
-			ret = fread(normal, 1, sizeof(normal), file);
-			ret = fread(triangle, 1, sizeof(triangle), file);
-			ret = fread(&flags, 1, sizeof(flags), file);
+			fread(normal, 1, sizeof(normal), file);
+			fread(triangle, 1, sizeof(triangle), file);
+			fread(&flags, 1, sizeof(flags), file);
 
 			meshEffect->BeginBuildFace();
 			for (ndInt32 j = 0; j < 3; ++j)
@@ -741,9 +737,8 @@ void ndUrdfFile::ImportVisual(const nd::TiXmlNode* const linkNode, ndBodyDynamic
 			ndReal x;
 			ndReal y;
 			ndReal z;
-			ndInt32 ret = 0;
 			const char* const size = shapeNode->Attribute("size");
-			ret = sscanf(size, "%f %f %f", &x, &y, &z);
+			sscanf(size, "%f %f %f", &x, &y, &z);
 			shape = new ndShapeBox(x, y, z);
 		}
 		else
@@ -927,9 +922,8 @@ void ndUrdfFile::ImportCollision(const nd::TiXmlNode* const linkNode, ndBodyDyna
 			ndReal x;
 			ndReal y;
 			ndReal z;
-			ndInt32 ret = 0;
 			const char* const size = shapeNode->Attribute("size");
-			ret = sscanf(size, "%f %f %f", &x, &y, &z);
+			sscanf(size, "%f %f %f", &x, &y, &z);
 			shape = new ndShapeBox(x, y, z);
 		}
 		else
@@ -1043,8 +1037,7 @@ ndJointBilateralConstraint* ndUrdfFile::ImportJoint(const nd::TiXmlNode* const j
 			ndReal y = ndFloat32(0.0f);
 			ndReal z = ndFloat32(0.0f);
 			const char* const axisPin = axisNode->Attribute("xyz");
-			ndInt32 ret = 0;
-			ret = sscanf(axisPin, "%f %f %f", &x, &y, &z);
+			sscanf(axisPin, "%f %f %f", &x, &y, &z);
 
 			ndMatrix matrix(ndGramSchmidtMatrix(ndVector(x, y, z, ndFloat32(0.0f))));
 			pivotMatrix = matrix * pivotMatrix;
@@ -1053,7 +1046,6 @@ ndJointBilateralConstraint* ndUrdfFile::ImportJoint(const nd::TiXmlNode* const j
 		const nd::TiXmlElement* const newtonEx = (nd::TiXmlElement*)jointNode->FirstChild("newton");
 		if (newtonEx)
 		{
-			ndInt32 ret = 0;
 			ndReal springPD;
 			ndReal damperPD;
 			ndReal regularizerPD;
@@ -1061,9 +1053,9 @@ ndJointBilateralConstraint* ndUrdfFile::ImportJoint(const nd::TiXmlNode* const j
 			const char* const spring = newtonEx->Attribute("springPD");
 			const char* const damper = newtonEx->Attribute("damperPD");
 			const char* const regularizer = newtonEx->Attribute("regularizer");
-			ret = sscanf(spring, "%f", &springPD);
-			ret = sscanf(damper, "%f", &damperPD);
-			ret = sscanf(regularizer, "%f", &regularizerPD);
+			sscanf(spring, "%f", &springPD);
+			sscanf(damper, "%f", &damperPD);
+			sscanf(regularizer, "%f", &regularizerPD);
 
 			ndJointHinge* const hinge = (ndJointHinge*)joint;
 			hinge->SetAsSpringDamper(regularizerPD, springPD, damperPD);
@@ -1078,8 +1070,7 @@ ndJointBilateralConstraint* ndUrdfFile::ImportJoint(const nd::TiXmlNode* const j
 			ndReal y = ndFloat32(0.0f);
 			ndReal z = ndFloat32(0.0f);
 			const char* const axisPin = axisNode->Attribute("xyz");
-			ndInt32 ret = 0;
-			ret = sscanf(axisPin, "%f %f %f", &x, &y, &z);
+			sscanf(axisPin, "%f %f %f", &x, &y, &z);
 
 			ndMatrix matrix(ndGramSchmidtMatrix(ndVector(x, y, z, ndFloat32(0.0f))));
 			pivotMatrix = matrix * pivotMatrix;
@@ -1110,8 +1101,7 @@ ndJointBilateralConstraint* ndUrdfFile::ImportJoint(const nd::TiXmlNode* const j
 			ndReal y = ndFloat32(0.0f);
 			ndReal z = ndFloat32(0.0f);
 			const char* const axisPin = axisNode->Attribute("xyz");
-			ndInt32 ret = 0;
-			ret = sscanf(axisPin, "%f %f %f", &x, &y, &z);
+			sscanf(axisPin, "%f %f %f", &x, &y, &z);
 
 			ndMatrix matrix(ndGramSchmidtMatrix(ndVector(x, y, z, ndFloat32(0.0f))));
 			pivotMatrix = matrix * pivotMatrix;
@@ -1150,7 +1140,6 @@ ndJointBilateralConstraint* ndUrdfFile::ImportJoint(const nd::TiXmlNode* const j
 		//const nd::TiXmlElement* const newtonEx = (nd::TiXmlElement*)jointNode->FirstChild("newton");
 		if (newtonEx)
 		{
-			ndInt32 ret = 0;
 			const char* const spring = newtonEx->Attribute("springPD");
 			const char* const damper = newtonEx->Attribute("damperPD");
 			const char* const regularizer = newtonEx->Attribute("regularizer");
@@ -1161,15 +1150,15 @@ ndJointBilateralConstraint* ndUrdfFile::ImportJoint(const nd::TiXmlNode* const j
 				ndReal regularizerPD = 0.0f;
 				if (spring)
 				{
-					ret = sscanf(spring, "%f", &springPD);
+					sscanf(spring, "%f", &springPD);
 				}
 				if (damperPD)
 				{
-					ret = sscanf(damper, "%f", &damperPD);
+					sscanf(damper, "%f", &damperPD);
 				}
 				if (regularizerPD)
 				{
-					ret = sscanf(regularizer, "%f", &regularizerPD);
+					sscanf(regularizer, "%f", &regularizerPD);
 				}
 				ndJointHinge* const hinge = (ndJointHinge*)joint;
 				hinge->SetAsSpringDamper(regularizerPD, springPD, damperPD);

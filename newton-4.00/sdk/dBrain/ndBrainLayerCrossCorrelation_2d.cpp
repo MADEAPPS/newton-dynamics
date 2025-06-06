@@ -225,15 +225,15 @@ void ndBrainLayerCrossCorrelation_2d::UpdateDropOut()
 void ndBrainLayerCrossCorrelation_2d::Save(const ndBrainSave* const loadSave) const
 {
 	char buffer[1024];
-	auto Save = [this, &buffer, &loadSave](const char* const fmt, ...)
-		{
-			va_list v_args;
-			buffer[0] = 0;
-			va_start(v_args, fmt);
-			vsnprintf(buffer, sizeof(buffer), fmt, v_args);
-			va_end(v_args);
-			loadSave->WriteData(buffer);
-		};
+	auto Save = [&buffer, &loadSave](const char* const fmt, ...)
+	{
+		va_list v_args;
+		buffer[0] = 0;
+		va_start(v_args, fmt);
+		vsnprintf(buffer, sizeof(buffer), fmt, v_args);
+		va_end(v_args);
+		loadSave->WriteData(buffer);
+	};
 
 	Save("\tinput_width %d\n", m_inputWidth);
 	Save("\tinput_heigh %d\n", m_inputHeight);

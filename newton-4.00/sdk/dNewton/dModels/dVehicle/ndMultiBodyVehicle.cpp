@@ -711,7 +711,7 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	const ndVector forceColor(ndFloat32(0.8f), ndFloat32(0.8f), ndFloat32(0.8f), ndFloat32(0.0f));
 	const ndVector lateralColor(ndFloat32(0.3f), ndFloat32(0.7f), ndFloat32(0.0f), ndFloat32(0.0f));
 	const ndVector longitudinalColor(ndFloat32(0.7f), ndFloat32(0.3f), ndFloat32(0.0f), ndFloat32(0.0f));
-	ndVector weight(chassis->GetForce().Scale(scale * chassis->GetInvMass() / m_gravityMagnitud));
+	//ndVector weight(chassis->GetForce().Scale(scale * chassis->GetInvMass() / m_gravityMagnitud));
 	for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
 		ndMultiBodyVehicleTireJoint* const tireJoint = node->GetInfo();
