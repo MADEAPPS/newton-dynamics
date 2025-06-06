@@ -86,7 +86,10 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 	virtual void BackPropagate(const ndBrainVector&, ndBrainLoss&) override { ndAssert(0);}
 
 	// new method
-	virtual void MakePrediction(const ndBrainVector& input) override;
+	virtual void SyncQueue() override;
+
+	// new method
+	virtual void MakePrediction(const ndBrainVector& input, bool sync = true) override;
 	// new method
 
 	// new method

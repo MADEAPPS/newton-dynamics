@@ -233,7 +233,12 @@ void ndBrainTrainerCpuInference::SoftCopyParameters(const ndBrainTrainer& src, n
 	m_weightAndBiasBuffer.ScaleAdd(blendSource->m_weightAndBiasBuffer, blendFactor);
 }
 
-void ndBrainTrainerCpuInference::MakePrediction(const ndBrainVector& input)
+void ndBrainTrainerCpuInference::SyncQueue()
+{
+	// do nothing
+}
+
+void ndBrainTrainerCpuInference::MakePrediction(const ndBrainVector& input, bool sync)
 {
 	ndAssert(input.GetCount() == m_miniBatchInputBuffer.GetCount());
 	m_miniBatchInputBuffer.Set(input);
@@ -252,6 +257,11 @@ void ndBrainTrainerCpuInference::MakePrediction(const ndBrainVector& input)
 		});
 		iterator = 0;
 		m_threadPool->ndBrainThreadPool::ParallelExecute(ExecuteCommand);
+	}
+
+	if (sync)
+	{
+		SyncQueue();
 	}
 }
 

@@ -285,7 +285,8 @@ static void MnistTrainingSet()
 						input.Set((*trainingDigits)[index]);
 					}
 
-					trainer->MakePrediction(miniBatchInput);
+					trainer->MakePrediction(miniBatchInput, false);
+					trainer->SyncQueue();
 					
 					//calculate loss
 					//trainer->GetOutput(miniBatchOutput);

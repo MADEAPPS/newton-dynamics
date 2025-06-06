@@ -48,7 +48,10 @@ class ndBrainTrainer: public ndClassAlloc
 	virtual void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss) = 0;
 
 	// new method
-	virtual void MakePrediction(const ndBrainVector& input) = 0;
+	virtual void SyncQueue() = 0;
+
+	// new method
+	virtual void MakePrediction(const ndBrainVector& input, bool sync = true) = 0;
 
 	// new method
 	virtual void MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output) = 0;
