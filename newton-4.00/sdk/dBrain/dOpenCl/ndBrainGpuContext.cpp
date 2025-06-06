@@ -105,8 +105,8 @@ ndBrainGpuContext* ndBrainGpuContext::GetAsGpuContext()
 
 void ndBrainGpuContext::SyncQueue()
 {
-	cl_int error = m_queue->finish();
-	ndAssert(error == CL_SUCCESS);
+	//cl_int error = m_queue->finish();
+	//ndAssert(error == CL_SUCCESS);
 }
 
 void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& command)

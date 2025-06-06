@@ -14,9 +14,7 @@
 
 //#define MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
 
-// no sure why but I get randme erro when using minibatch size of 256 in gpu
 #define MINIST_MINIBATCH_BUFFER_SIZE			256
-//#define MINIST_MINIBATCH_BUFFER_SIZE			128
 
 #define MNIST_CONVOLUTIONAL_FEATURE_MAPS		32
 //#define MIN_TRAIN_SCORE						0.9999f
@@ -161,6 +159,7 @@ static void MnistTrainingSet()
 			,m_minValidationFail(ndInt64(1000000)* ndInt64(1000000))
 			,m_hasGpuSupport(m_brain->IsGpuReady())
 		{
+			//m_hasGpuSupport = false;
 			m_prioritySamples.SetCount(m_miniBatchSize);
 			if (m_hasGpuSupport)
 			{
@@ -289,7 +288,7 @@ static void MnistTrainingSet()
 					trainer->MakePrediction(miniBatchInput);
 					
 					//calculate loss
-					trainer->GetOutput(miniBatchOutput);
+					//trainer->GetOutput(miniBatchOutput);
 					//for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
 					//{
 					//	ndUnsigned32 index = shuffleBuffer[batchStart + i];
@@ -304,7 +303,7 @@ static void MnistTrainingSet()
 					//trainer->BackPropagate(miniBatchOutputGradients);
 					//trainer->ApplyLearnRate(m_learnRate);
 
-					#if 1
+					#if 0
 						//ndBrainVector internalBuffers;
 						//ndBrainVector internalParameters;
 						//trainer->GetWorkingBuffer(internalBuffers);
@@ -424,8 +423,8 @@ static void MnistTrainingSet()
 		#endif
 
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
-		//layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
-		//layers.PushBack(new ndBrainLayerActivationCategoricalSoftmax(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerActivationCategoricalSoftmax(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 		for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 		{

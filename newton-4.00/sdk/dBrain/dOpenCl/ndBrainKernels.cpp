@@ -85,6 +85,40 @@ R""""(
         }
     }
 
+    __kernel void brainCopyOutputGradients(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* outputBuffer) 
+    {
+        //uint itemId = get_local_id(0);
+        //uint groupId = get_group_id(0);
+        //uint workGroupSize = get_local_size(0);
+        //
+        //uint outputSize = parameters->m_outputSize;
+        //uint inputOutputSize = parameters->m_inputOutputSize;
+        //uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+        //
+        //uint dstBase = groupId * outputSize;
+        //uint srcBase = groupId * inputOutputSize + inputOutputStartOffset;
+        //
+        //uint workGroupSizeReminder = outputSize % workGroupSize;
+        //uint modWorkGroupSize = outputSize - workGroupSizeReminder;
+        //
+        //for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        //{
+        //    float a = inputOutputData[srcBase + itemId];
+        //    outputBuffer[dstBase + i + itemId] = a;
+        //}
+        //
+        //if (itemId < workGroupSizeReminder)
+        //{
+        //    float a = inputOutputData[srcBase + modWorkGroupSize + itemId];
+        //    outputBuffer[dstBase + modWorkGroupSize + itemId] = a;
+        //}
+    }
+
+)"""";
+
+const char* ndBrainGpuContext::m_kernelSource2 =
+R""""(
+
     // a matrix time a vector by iterating over each row of the matrix 
     // calculating the dot product of that row time the vector and adding the bias value.
     __kernel void brainLayerLinear(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* weightsAndBias) 
@@ -129,7 +163,6 @@ R""""(
         {
             cachedOutput[modRowCount + itemId] = weightsAndBias[biasOffset + modRowCount + itemId];
         }
-        //barrier(CLK_LOCAL_MEM_FENCE); 
 
         for (uint i = 0; i < outputSize; ++i)
         {
@@ -212,7 +245,7 @@ R""""(
     }
 )"""";
 
-const char* ndBrainGpuContext::m_kernelSource2 =
+const char* ndBrainGpuContext::m_kernelSource3 =
 R""""(
 
     __kernel void brainLayerReluActivation(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* notUsed)  
@@ -280,6 +313,7 @@ R""""(
     __kernel void brainLayerSoftmaxActivation(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* notUsed)
     {
         __local float tmpInputBuffer [1024 * 2];
+        __local float reductionBuffer [1024];
 
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
@@ -311,98 +345,81 @@ R""""(
             maxArg = (inputValue > maxArg) ? inputValue : maxArg;
         }
         
-        //for (uint j = workGroupSize / 2; j > 0; j = j >> 1)
-        //{
-        //    if ((itemId >= j) && (itemId < j * 2))
-        //    {
-        //        reductionBuffer[itemId - j] = maxArg;
-        //    }
-        //    memoryBarrierShared();
-        //    barrier();
-        //    if (itemId < j)
-        //    {
-        //        float inputValue = reductionBuffer[itemId];
-        //        maxArg = (inputValue > maxArg) ? inputValue : maxArg;
-        //    }
-        //}
-        //if (itemId == 0)
-        //{
-        //    reductionBuffer[0] = maxArg;
-        //}
-        //memoryBarrierShared();
-        //barrier();
-        //maxArg = reductionBuffer[0];
-        //
-        //float sumArg = 0.0f;
-        //for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
-        //{
-        //    float inputValue = tmpInputBuffer[i + itemId] - maxArg;
-        //    float outputValue = exp(inputValue);
-        //    sumArg += outputValue;
-        //    tmpInputBuffer[i + itemId] = outputValue;
-        //}
-        //if (itemId < workGroupSizeReminder)
-        //{
-        //    float inputValue = tmpInputBuffer[modWorkGroupSize + itemId] - maxArg;
-        //    float outputValue = exp(inputValue);
-        //    sumArg += outputValue;
-        //    tmpInputBuffer[modWorkGroupSize + itemId] = outputValue;
-        //}
-        //
-        //for (uint j = workGroupSize / 2; j > 0; j = j >> 1)
-        //{
-        //    if ((itemId >= j) && (itemId < j * 2))
-        //    {
-        //        reductionBuffer[itemId - j] = sumArg;
-        //    }
-        //    memoryBarrierShared();
-        //    barrier();
-        //    if (itemId < j)
-        //    {
-        //        float inputValue = reductionBuffer[itemId];
-        //        sumArg += inputValue;
-        //    }
-        //}
-        //if (itemId == 0)
-        //{
-        //    reductionBuffer[0] = 1.0f / sumArg;
-        //}
-        //memoryBarrierShared();
-        //barrier();
-        //
-        //float invDen = reductionBuffer[0];
-        //for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
-        //{
-        //    float inputValue = tmpInputBuffer[i + itemId];
-        //    float outputValue = invDen * inputValue;
-        //    m_inputOutputData[outputOffset + i + itemId] = outputValue;
-        //}
-        //if (itemId < workGroupSizeReminder)
-        //{
-        //    float inputValue = tmpInputBuffer[modWorkGroupSize + itemId];
-        //    float outputValue = invDen * inputValue;
-        //    m_inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
-        //}
+        for (uint j = workGroupSize / 2; j > 0; j = j >> 1)
+        {
+            barrier(CLK_LOCAL_MEM_FENCE); 
+            if ((itemId >= j) && (itemId < j * 2))
+            {
+                reductionBuffer[itemId - j] = maxArg;
+            }
 
+            barrier(CLK_LOCAL_MEM_FENCE); 
+            if (itemId < j)
+            {
+                float inputValue = reductionBuffer[itemId];
+                maxArg = (inputValue > maxArg) ? inputValue : maxArg;
+            }
+        }
+        if (itemId == 0)
+        {
+            reductionBuffer[0] = maxArg;
+        }
+        barrier(CLK_LOCAL_MEM_FENCE); 
+        
+        maxArg = reductionBuffer[0];
+        
+        float sumArg = 0.0f;
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            float inputValue = tmpInputBuffer[i + itemId] - maxArg;
+            float outputValue = exp(inputValue);
+            sumArg += outputValue;
+            tmpInputBuffer[i + itemId] = outputValue;
+        }
+        if (itemId < workGroupSizeReminder)
+        {
+            float inputValue = tmpInputBuffer[modWorkGroupSize + itemId] - maxArg;
+            float outputValue = exp(inputValue);
+            sumArg += outputValue;
+            tmpInputBuffer[modWorkGroupSize + itemId] = outputValue;
+        }
+        
+        for (uint j = workGroupSize / 2; j > 0; j = j >> 1)
+        {
+            barrier(CLK_LOCAL_MEM_FENCE); 
+            if ((itemId >= j) && (itemId < j * 2))
+            {
+                reductionBuffer[itemId - j] = sumArg;
+            }
 
-
-        //for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
-        //{
-        //    float inputValue = inputOutputData[inputOffset + i + itemId];
-        //    float outputValue = (inputValue > -30.0f) ? ((inputValue < 30.0f) ? inputValue : 30.0f) : -30.0f;
-        //    inputOutputData[outputOffset + i + itemId] = tanh(outputValue);
-        //}
-        //if (itemId < workGroupSizeReminder)
-        //{
-        //    float inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
-        //    float outputValue = (inputValue > -30.0f) ? ((inputValue < 30.0f) ? inputValue : 30.0f) : -30.0f;
-        //    inputOutputData[outputOffset + modWorkGroupSize + itemId] = tanh(outputValue);
-        //}
-
+            barrier(CLK_LOCAL_MEM_FENCE); 
+            if (itemId < j)
+            {
+                float inputValue = reductionBuffer[itemId];
+                sumArg += inputValue;
+            }
+        }
+        if (itemId == 0)
+        {
+            reductionBuffer[0] = 1.0f / sumArg;
+        }
+        barrier(CLK_LOCAL_MEM_FENCE); 
+        
+        float invDen = reductionBuffer[0];
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            float inputValue = tmpInputBuffer[i + itemId];
+            float outputValue = invDen * inputValue;
+            inputOutputData[outputOffset + i + itemId] = outputValue;
+        }
+        if (itemId < workGroupSizeReminder)
+        {
+            float inputValue = tmpInputBuffer[modWorkGroupSize + itemId];
+            float outputValue = invDen * inputValue;
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
+        }
     }
-
 )"""";
-
 
 ndSharedPtr<ndBrainGpuShader> ndBrainGpuContext::CreateKerner(const cl::Program& program, const char* const functionMame) const
 {
@@ -418,6 +435,7 @@ void ndBrainGpuContext::CreateKerners()
     std::string source(m_kernelSource0);
     source += m_kernelSource1;
     source += m_kernelSource2;
+    source += m_kernelSource3;
 
     cl::Program program (**m_context, source, CL_TRUE, &errcode_ret);
     ndAssert(errcode_ret == 0);
@@ -425,7 +443,9 @@ void ndBrainGpuContext::CreateKerners()
     m_ndBrainCopyInput = CreateKerner(program, "brainCopyInput");
     m_ndBrainCopyOutput = CreateKerner(program, "brainCopyOutput");
     m_ndBrainLayerLinear = CreateKerner(program, "brainLayerLinear");
+    m_ndBrainCopyOutputGradients = CreateKerner(program, "brainCopyOutputGradients");
     m_ndBrainLayerReluActivation = CreateKerner(program, "brainLayerReluActivation");
     m_ndBrainLayerTanhActivation = CreateKerner(program, "brainLayerTanhActivation");
+    m_ndBrainLayerSoftmaxActivation = CreateKerner(program, "brainLayerSoftmaxActivation");
     m_ndBrainLayerLinearDropOutActivation = CreateKerner(program, "brainLayerLinearDropOutActivation");
 }
