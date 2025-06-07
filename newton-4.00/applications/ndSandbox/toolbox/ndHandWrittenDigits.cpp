@@ -169,6 +169,7 @@ static void MnistTrainingSet()
 			else
 			{
 				ndInt32 threadCount = ndMin (ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize), 8);
+				//threadCount = 1;
 				m_context = ndSharedPtr<ndBrainContext>(new ndBrainCpuContext);
 
 				m_context->GetAsCpuContext()->SetThreadCount(threadCount);
@@ -288,7 +289,7 @@ static void MnistTrainingSet()
 					trainer->MakePrediction(miniBatchInput, false);
 					trainer->SyncQueue();
 					
-					////calculate loss
+					//calculate loss
 					trainer->GetOutput(miniBatchOutput);
 					for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
 					{
@@ -300,11 +301,11 @@ static void MnistTrainingSet()
 						loss.SetTruth(truth);
 						loss.GetLoss(output, grad);
 					}
-					//// backpropagate loss.
+					// backpropagate loss.
 					trainer->BackPropagate(miniBatchOutputGradients);
-					//trainer->ApplyLearnRate(m_learnRate);
+					trainer->ApplyLearnRate(m_learnRate);
 
-					#if 1
+					#if 0
 						//ndBrainVector internalBuffers;
 						//ndBrainVector internalParameters;
 						//trainer->GetWorkingBuffer(internalBuffers);
@@ -332,37 +333,40 @@ static void MnistTrainingSet()
 					#endif
 				}
 
+#if 0
 				ndExpandTraceMessage("epoc: %d\n", epoch);
-				//trainer->UpdateParameters();
-				//ndInt64 testFailCount = ValidateData(testLabels, testDigits) + 1;
-				//if (testFailCount < m_minValidationFail)
-				//{
-				//	m_bestBrain->CopyFrom(**trainer->GetBrain());
-				//	m_minValidationFail = testFailCount + 1;
-				//	ndInt64 trainigFailCount = ValidateData(trainingLabels, trainingDigits) + 1;
-				//	ndInt64 size = trainingLabels->GetCount();
-				//	ndFloat32 score = (ndFloat32)(size - trainigFailCount) / (ndFloat32)size;
-				//	ndExpandTraceMessage("Best model: ");
-				//	ndExpandTraceMessage("  epoch: %d", epoch);
-				//	ndExpandTraceMessage("  success rate:%f%%", score * 100.0f);
-				//	ndExpandTraceMessage("  training fail count:%d", trainigFailCount);
-				//	ndExpandTraceMessage("  test fail count:%d\n", testFailCount);
-				//} 
-				//else
-				//{
-				//	ndInt64 trainigFailCount = ValidateData(trainingLabels, trainingDigits) + 1;
-				//	ndInt64 minCombinedScore = testFailCount * trainigFailCount;
-				//	if (minCombinedScore <= m_minCombinedScore)
-				//	{
-				//		m_minCombinedScore = minCombinedScore;
-				//		ndInt64 size = trainingLabels->GetCount();
-				//		ndFloat32 score = (ndFloat32)(size - trainigFailCount) / (ndFloat32)size;
-				//		ndExpandTraceMessage("  epoch: %d", epoch);
-				//		ndExpandTraceMessage("  success rate:%f%%", score * 100.0f);
-				//		ndExpandTraceMessage("  training fail count:%d", trainigFailCount);
-				//		ndExpandTraceMessage("  test fail count:%d\n", testFailCount);
-				//	}
-				//}
+#else
+				trainer->UpdateParameters();
+				ndInt64 testFailCount = ValidateData(testLabels, testDigits) + 1;
+				if (testFailCount < m_minValidationFail)
+				{
+					m_bestBrain->CopyFrom(**trainer->GetBrain());
+					m_minValidationFail = testFailCount + 1;
+					ndInt64 trainigFailCount = ValidateData(trainingLabels, trainingDigits) + 1;
+					ndInt64 size = trainingLabels->GetCount();
+					ndFloat32 score = (ndFloat32)(size - trainigFailCount) / (ndFloat32)size;
+					ndExpandTraceMessage("Best model: ");
+					ndExpandTraceMessage("  epoch: %d", epoch);
+					ndExpandTraceMessage("  success rate:%f%%", score * 100.0f);
+					ndExpandTraceMessage("  training fail count:%d", trainigFailCount);
+					ndExpandTraceMessage("  test fail count:%d\n", testFailCount);
+				} 
+				else
+				{
+					ndInt64 trainigFailCount = ValidateData(trainingLabels, trainingDigits) + 1;
+					ndInt64 minCombinedScore = testFailCount * trainigFailCount;
+					if (minCombinedScore <= m_minCombinedScore)
+					{
+						m_minCombinedScore = minCombinedScore;
+						ndInt64 size = trainingLabels->GetCount();
+						ndFloat32 score = (ndFloat32)(size - trainigFailCount) / (ndFloat32)size;
+						ndExpandTraceMessage("  epoch: %d", epoch);
+						ndExpandTraceMessage("  success rate:%f%%", score * 100.0f);
+						ndExpandTraceMessage("  training fail count:%d", trainigFailCount);
+						ndExpandTraceMessage("  test fail count:%d\n", testFailCount);
+					}
+				}
+#endif
 			}
 			trainer->GetBrain()->CopyFrom(**m_bestBrain);
 		}

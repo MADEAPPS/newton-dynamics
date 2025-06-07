@@ -182,26 +182,16 @@ void ndBrainLayerActivationSoftmax::BackPropagate(const ndBrainLayerBackPropagat
 	ndAssert(0);
 }
 
-//ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerActivationSoftmax::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const
-//{
-//	ndLayerUniformDataGpu data;
-//	data.m_shader = context->m_ndBrainLayerSoftmaxActivation;
-//	data.m_inputSize = GetInputSize();
-//	data.m_outputSize = GetOutputSize();
-//
-//	return data;
-//}
-
 ndBrainTrainerGpuCommand* ndBrainLayerActivationSoftmax::CreateGpuFeedForwardCommand(
 	ndBrainTrainerGpuInference* const owner,
 	const ndBrainLayer::ndCommandShareInfo& info,
 	ndBrainGpuContext* const context, ndInt32 miniBatchSize,
 	const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
-	ndBrainGpuBuffer* const buffer1,
-	ndBrainGpuBuffer* const buffer2) const
+	ndBrainGpuBuffer* const inputOutputData,
+	ndBrainGpuBuffer* const parameters) const
 {
 	ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(
 		owner, info, size_t(this), context, context->m_ndBrainLayerSoftmaxActivation, 
-		miniBatchSize, uniformBuffer, buffer1, buffer2);
+		miniBatchSize, uniformBuffer, inputOutputData, parameters);
 	return command;
 }

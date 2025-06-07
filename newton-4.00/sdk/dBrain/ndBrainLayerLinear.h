@@ -84,12 +84,22 @@ class ndBrainLayerLinear : public ndBrainLayer
 	virtual void BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const override;
 
 	virtual bool HasGpuSupport() const override;
+
 	virtual ndBrainTrainerGpuCommand* CreateGpuFeedForwardCommand(ndBrainTrainerGpuInference* const owner,
 		const ndBrainLayer::ndCommandShareInfo& info,
 		ndBrainGpuContext* const context, ndInt32 miniBatchSize,
 		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
-		ndBrainGpuBuffer* const buffer1,
-		ndBrainGpuBuffer* const buffer2) const override;
+		ndBrainGpuBuffer* const inputOutputData,
+		ndBrainGpuBuffer* const parameters) const override;
+
+	virtual ndBrainTrainerGpuCommand* CreateGpuBackPropagateCommand(ndBrainTrainerGpuInference* const owner,
+		const ndBrainLayer::ndCommandShareInfo& info,
+		ndBrainGpuContext* const context, ndInt32 miniBatchSize,
+		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
+		ndBrainGpuBuffer* const inputOutputData,
+		ndBrainGpuBuffer* const weightsAndBias,
+		ndBrainGpuBuffer* const inputOutputGradients,
+		ndBrainGpuBuffer* const weightsAndBiasGradients) const override;
 
 	ndBrainVector m_bias;
 	ndBrainMatrix m_weights;

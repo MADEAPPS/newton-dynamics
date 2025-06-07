@@ -77,30 +77,6 @@ class ndBrainLayer : public ndClassAlloc
 		const ndBrainLayer* m_layer;
 	};
 
-	//
-	//class ndLayerUniformDataGpu
-	//{
-	//	public:
-	//	ndLayerUniformDataGpu()
-	//		:m_shader(nullptr)
-	//		,m_inputSize(0)
-	//		,m_outputSize(0)
-	//		,m_parametersSize(0)
-	//		,m_parametersStartOffset(0)
-	//		,m_inputOutputSize(0)
-	//		,m_inputOutputStartOffset(0)
-	//	{
-	//	}
-	//
-	//	ndBrainGpuShader m_shader;
-	//	ndInt32 m_inputSize;
-	//	ndInt32 m_outputSize;
-	//	ndInt32 m_parametersSize;
-	//	ndInt32 m_parametersStartOffset;
-	//	ndInt32 m_inputOutputSize;
-	//	ndInt32 m_inputOutputStartOffset;
-	//};
-
 	ndBrainLayer();
 	ndBrainLayer(const ndBrainLayer& src);
 
@@ -155,15 +131,16 @@ class ndBrainLayer : public ndClassAlloc
 		ndBrainGpuContext* const context, ndInt32 miniBatchSize,
 		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
 		ndBrainGpuBuffer* const inputOutputData,
-		ndBrainGpuBuffer* const parameters) const;
+		ndBrainGpuBuffer* const weightsAndBias) const;
 
 	virtual ndBrainTrainerGpuCommand* CreateGpuBackPropagateCommand(ndBrainTrainerGpuInference* const owner,
 		const ndBrainLayer::ndCommandShareInfo& info,
 		ndBrainGpuContext* const context, ndInt32 miniBatchSize,
 		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
 		ndBrainGpuBuffer* const inputOutputData,
-		ndBrainGpuBuffer* const parameters,
-		ndBrainGpuBuffer* const inputOutputGradients) const;
+		ndBrainGpuBuffer* const weightsAndBias,
+		ndBrainGpuBuffer* const inputOutputGradients,
+		ndBrainGpuBuffer* const weightsAndBiasGradients) const;
 };
 
 #endif 

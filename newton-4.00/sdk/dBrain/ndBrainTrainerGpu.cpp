@@ -122,15 +122,16 @@ int xxxx = 0;
 		ndBrainGpuBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
 		ndBrainGpuBuffer* const weightsAndBiasBuffer = *m_weightAndBiasBuffer;
 		ndBrainGpuBuffer* const inputOutputGradientBuffer = *m_inputOuputGradientsBuffer;
+		ndBrainGpuBuffer* const weightAndBiasGradientsBuffer = *m_weightAndBiasGradientsBuffer;
 
 		ndBrainTrainerGpuCommand* const commandBuffer = layer->CreateGpuBackPropagateCommand(
 			this, data, m_context, m_miniBatchSize,
-			uniformBuffer, inputOutputBuffer, weightsAndBiasBuffer, inputOutputGradientBuffer);
+			uniformBuffer, inputOutputBuffer, weightsAndBiasBuffer, inputOutputGradientBuffer, weightAndBiasGradientsBuffer);
 
 		ndSharedPtr<ndBrainGpuCommand>command(commandBuffer);
 		m_backPropagateCommands.Append(command);
 
-		if (xxxx == 0)
+		if (xxxx == 2)
 		break;
 		xxxx++;
 	}

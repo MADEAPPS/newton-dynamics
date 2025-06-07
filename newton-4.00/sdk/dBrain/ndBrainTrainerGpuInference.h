@@ -46,7 +46,8 @@ class ndBrainTrainerGpuCommand : public ndBrainGpuCommand
 		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
 		ndBrainGpuBuffer* const inputOutputData,
 		ndBrainGpuBuffer* const parameters,
-		ndBrainGpuBuffer* const inputOutputGradients = nullptr);
+		ndBrainGpuBuffer* const inputOutputGradients = nullptr,
+		ndBrainGpuBuffer* const weightsAndBiasGradients = nullptr);
 
 	ndSharedPtr<ndBrainGpuBuffer> m_uniformBuffer;
 	ndBrainLayer::ndCommandShareInfo m_info;

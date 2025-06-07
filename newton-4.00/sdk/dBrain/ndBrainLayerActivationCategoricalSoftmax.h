@@ -52,8 +52,9 @@ class ndBrainLayerActivationCategoricalSoftmax : public ndBrainLayerActivationSo
 		ndBrainGpuContext* const context, ndInt32 miniBatchSize,
 		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
 		ndBrainGpuBuffer* const inputOutputData,
-		ndBrainGpuBuffer* const parameters, 
-		ndBrainGpuBuffer* const inputOutputGradients) const override;
+		ndBrainGpuBuffer* const weightsAndBias,
+		ndBrainGpuBuffer* const inputOutputGradients,
+		ndBrainGpuBuffer* const weightsAndBiasGradients) const override;
 };
 
 #endif 

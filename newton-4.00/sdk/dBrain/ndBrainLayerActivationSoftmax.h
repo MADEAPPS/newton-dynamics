@@ -49,8 +49,8 @@ class ndBrainLayerActivationSoftmax : public ndBrainLayerActivation
 		const ndBrainLayer::ndCommandShareInfo& info,
 		ndBrainGpuContext* const context, ndInt32 miniBatchSize,
 		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
-		ndBrainGpuBuffer* const buffer1,
-		ndBrainGpuBuffer* const buffer2) const override;
+		ndBrainGpuBuffer* const inputOutputData,
+		ndBrainGpuBuffer* const parameters) const override;
 };
 
 #endif 
