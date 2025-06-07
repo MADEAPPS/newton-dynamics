@@ -243,21 +243,25 @@ void ndBrainTrainerGpuInference::UnloadBuffer(ndBrainVector& ouput, const ndShar
 void ndBrainTrainerGpuInference::GetInput(ndBrainVector& ouput) const
 {
 	UnloadBuffer(ouput, m_miniBatchInputBuffer);
+	m_context->SyncQueue();
 }
 
 void ndBrainTrainerGpuInference::GetOutput(ndBrainVector& ouput) const
 {
 	UnloadBuffer(ouput, m_miniBatchOutputBuffer);
+	m_context->SyncQueue();
 }
 
 void ndBrainTrainerGpuInference::GetWorkingBuffer(ndBrainVector& ouput) const
 {
 	UnloadBuffer(ouput, m_inputOutputBuffer);
+	m_context->SyncQueue();
 }
 
 void ndBrainTrainerGpuInference::GetParameterBuffer(ndBrainVector& ouput) const
 {
 	UnloadBuffer(ouput, m_weightAndBiasBuffer);
+	m_context->SyncQueue();
 }
 
 void ndBrainTrainerGpuInference::BackPropagate(const ndBrainVector&, bool)
@@ -288,6 +292,12 @@ void ndBrainTrainerGpuInference::UpdateParameters()
 	//ndAssert(0);
 }
 
+//void ndBrainTrainerGpuInference::MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output)
+void ndBrainTrainerGpuInference::MakeSinglePrediction(const ndBrainVector&, ndBrainVector&)
+{
+	ndAssert(0);
+}
+
 void ndBrainTrainerGpuInference::SyncQueue()
 {
 	m_context->SyncQueue();
@@ -305,11 +315,5 @@ void ndBrainTrainerGpuInference::MakePrediction(const ndBrainVector& input, bool
 	{
 		SyncQueue();
 	}
-}
-
-//void ndBrainTrainerGpuInference::MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output)
-void ndBrainTrainerGpuInference::MakeSinglePrediction(const ndBrainVector&, ndBrainVector&)
-{
-	ndAssert(0);
 }
 

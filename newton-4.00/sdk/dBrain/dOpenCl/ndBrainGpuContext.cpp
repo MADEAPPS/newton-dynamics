@@ -17,9 +17,9 @@
 #include <string>
 #include <vector>
 
-//#define D_OPENCL_SELECTION_TYPE		CL_DEVICE_TYPE_ALL
-#define D_OPENCL_SELECTION_TYPE		CL_DEVICE_TYPE_CPU
-//#define D_OPENCL_SELECTION_TYPE			CL_DEVICE_TYPE_GPU
+#define D_OPENCL_SELECTION_TYPE		CL_DEVICE_TYPE_ALL
+//#define D_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_CPU
+//#define D_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_GPU
 
 ndBrainGpuContext::ndBrainGpuContext()
 	:ndBrainContext()
@@ -32,11 +32,11 @@ ndBrainGpuContext::ndBrainGpuContext()
 		for (size_t i = 0; i < cl_platforms.size(); i++)
 		{
 			std::vector<cl::Device> cl_devices_available;
-			const std::string name(cl_platforms[i].getInfo<CL_PLATFORM_NAME>());
-			ndExpandTraceMessage("opencl platform: %s\n", name.c_str());
 			cl_platforms[i].getDevices(D_OPENCL_SELECTION_TYPE, &cl_devices_available);
 			for (size_t j = 0; j < cl_devices_available.size(); j++)
 			{
+				const std::string name(cl_platforms[i].getInfo<CL_PLATFORM_NAME>());
+				ndExpandTraceMessage("opencl platform: %s\n", name.c_str());
 				cl_devices.push_back(cl_devices_available[j]);
 			}
 		}
@@ -50,7 +50,7 @@ ndBrainGpuContext::ndBrainGpuContext()
 		for (size_t i = 0u; i < cl_devices.size(); i++)
 		{
 			// find device with highest (estimated) floating point performance
-			const std::string name (cl_devices[i].getInfo<CL_DEVICE_NAME>()); // device name
+			//const std::string name (cl_devices[i].getInfo<CL_DEVICE_NAME>()); // device name
 			const size_t compute_units = cl_devices[i].getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>(); 
 
 			// just go for the device with the most compute units.
@@ -62,6 +62,7 @@ ndBrainGpuContext::ndBrainGpuContext()
 		}
 
 		const std::string name(cl_devices[best_i].getInfo<CL_DEVICE_NAME>());
+		//const std::string name(cl_devices[2].getInfo<CL_DEVICE_NAME>());
 		ndExpandTraceMessage("opencl device: %s\n", name.c_str());
 
 		m_device = ndSharedPtr<cl::Device>(new cl::Device(cl_devices[best_i]));
@@ -122,6 +123,7 @@ void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& co
 
 	cl::NDRange offset(0);
 	cl::NDRange global(command->m_workGroupSize * command->m_miniBatchSize);
-	error = m_queue->enqueueNDRangeKernel(**command->m_shader, offset, global);
+	cl::NDRange local(command->m_miniBatchSize);
+	error = m_queue->enqueueNDRangeKernel(**command->m_shader, offset, global, local);
 	ndAssert(error == CL_SUCCESS);
 }

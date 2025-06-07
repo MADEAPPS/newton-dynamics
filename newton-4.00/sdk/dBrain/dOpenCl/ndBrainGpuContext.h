@@ -19,6 +19,8 @@ class ndBrainGpuFloatBuffer;
 
 typedef cl::Kernel ndBrainGpuShader;
 
+#define ND_WORK_GROUP_SIZE	256
+
 class ndBrainGpuContext : public ndBrainContext
 {
 	public:

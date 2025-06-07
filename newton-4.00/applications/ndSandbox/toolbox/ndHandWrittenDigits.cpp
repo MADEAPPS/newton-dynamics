@@ -286,7 +286,7 @@ static void MnistTrainingSet()
 					}
 
 					trainer->MakePrediction(miniBatchInput, false);
-					//trainer->SyncQueue();
+					trainer->SyncQueue();
 					
 					//calculate loss
 					//trainer->GetOutput(miniBatchOutput);
@@ -314,7 +314,7 @@ static void MnistTrainingSet()
 						ndBrainFixSizeVector<1024> xxx1;
 						xxx1.SetCount(outputSize);
 
-						//trainer->GetOutput(miniBatchOutput);
+						trainer->GetOutput(miniBatchOutput);
 						//trainer->UpdateParameters();
 						const ndBrain* const brain = *trainer->GetBrain();
 						for (ndInt32 i = 0; i < m_miniBatchSize; i++)
@@ -332,6 +332,7 @@ static void MnistTrainingSet()
 					#endif
 				}
 
+				ndExpandTraceMessage("epoc: %d\n", epoch);
 				//trainer->UpdateParameters();
 				//ndInt64 testFailCount = ValidateData(testLabels, testDigits) + 1;
 				//if (testFailCount < m_minValidationFail)
@@ -426,6 +427,7 @@ static void MnistTrainingSet()
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
 		layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 		layers.PushBack(new ndBrainLayerActivationCategoricalSoftmax(layers[layers.GetCount() - 1]->GetOutputSize()));
+
 
 		for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 		{

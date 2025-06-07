@@ -29,18 +29,20 @@ ndBrainGpuCommand::~ndBrainGpuCommand()
 {
 }
 
-void ndBrainGpuCommand::Assembly(const ndSharedPtr<ndBrainGpuShader>& shader, ndInt32 workGroupSize, ndInt32 buffersCount, ndBrainGpuBuffer** buffer)
+void ndBrainGpuCommand::Assembly(const ndSharedPtr<ndBrainGpuShader>& shader, ndInt32 minibatchSize, ndInt32 buffersCount, ndBrainGpuBuffer** buffer)
 {
 	m_shader = shader;
-	m_miniBatchSize = size_t(workGroupSize);
-	m_shader->getWorkGroupInfo(**m_context->m_device, CL_KERNEL_WORK_GROUP_SIZE, &m_workGroupSize);
+	m_workGroupSize = ND_WORK_GROUP_SIZE;
+	m_miniBatchSize = size_t(minibatchSize);
+	//m_shader->getWorkGroupInfo(**m_context->m_device, CL_KERNEL_WORK_GROUP_SIZE, &m_workGroupSize);
+	//m_shader->getWorkGroupInfo(**m_context->m_device, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, &m_workGroupSize);
+	//const size_t compute_units = m_context->m_device->getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>();
+	//const size_t compute_items = m_context->m_device->getInfo<CL_DEVICE_MAX_WORK_GROUP_SIZE>();
+	
 	m_parameters.SetCount(0);
 	for (ndInt32 i = 0; i < buffersCount; ++i)
 	{
 		m_parameters.PushBack(buffer[i]);
-		//ndBrainGpuBuffer* const argBuffer = buffer[i];
-		//cl_int error = m_shader->setArg(cl_uint(i), argBuffer->m_buffer);
-		//ndAssert(error == CL_SUCCESS);
 	}
 }
 
