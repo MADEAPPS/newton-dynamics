@@ -22,6 +22,8 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
 #include "ndBrainTrainerCpu.h"
+#include "ndBrainTrainerCpuInference.h"
+#include "ndBrainTrainerGpuInference.h"
 #include "ndBrainLayerActivationCategoricalSoftmax.h"
 
 ndBrainLayerActivationCategoricalSoftmax::ndBrainLayerActivationCategoricalSoftmax(ndInt32 neurons)
@@ -99,3 +101,19 @@ void ndBrainLayerActivationCategoricalSoftmax::BackPropagate(const ndBrainLayerB
 	inputDerivative.Sub(outputDerivative);
 	inputDerivative.FlushToZero();
 }
+
+ndBrainTrainerGpuCommand* ndBrainLayerActivationCategoricalSoftmax::CreateGpuBackPropagateCommand(
+	ndBrainTrainerGpuInference* const owner,
+	const ndBrainLayer::ndCommandShareInfo& info,
+	ndBrainGpuContext* const context, ndInt32 miniBatchSize,
+	const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
+	ndBrainGpuBuffer* const inputOutputData,
+	ndBrainGpuBuffer* const parameters,
+	ndBrainGpuBuffer* const inputOutputGradients) const
+{
+	ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(
+		owner, info, size_t(this), context, context->m_ndBrainCathegoricalSoftMaxBackPropagate, 
+		miniBatchSize, uniformBuffer, inputOutputData, parameters, inputOutputGradients);
+	return command;
+}
+

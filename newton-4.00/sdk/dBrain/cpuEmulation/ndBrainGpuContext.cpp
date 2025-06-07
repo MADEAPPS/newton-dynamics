@@ -56,13 +56,14 @@ void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& co
 	ndAtomic<ndInt32> iterator(0);
 	ndBrainGpuShader& shader = **command->m_shader;
 	shader.m_parameters.SetCount(0);
-	shader.m_parameters.PushBack(command->m_parameters[0]);
-	shader.m_parameters.PushBack(command->m_parameters[1]);
-	shader.m_parameters.PushBack(command->m_parameters[2]);
+	for (ndInt32 i = 0; i < ndInt32 (command->m_parameters.GetCount()); ++i)
+	{
+		shader.m_parameters.PushBack(command->m_parameters[i]);
+	}
 
 	auto ExecuteCommand = ndMakeObject::ndFunction([this, &iterator, &command](ndInt32, ndInt32)
 	{
-		ndInt32 workGroupdSize = 256;
+		ndInt32 workGroupdSize = ND_KERNELS_WORKGROUP_SIZE;
 		ndInt32 miniBatchSize = ndInt32(command->m_miniBatchSize);
 		
 		ndBrainGpuShader& kernel = **command->m_shader;

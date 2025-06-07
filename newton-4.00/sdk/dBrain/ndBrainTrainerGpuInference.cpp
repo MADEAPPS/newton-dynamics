@@ -37,8 +37,9 @@ ndBrainTrainerGpuCommand::ndBrainTrainerGpuCommand(ndBrainTrainerGpuInference* c
 	const ndSharedPtr<ndBrainGpuShader>& shader,
 	ndInt32 numberOfinputs,
 	const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
-	ndBrainGpuBuffer* const buffer1,
-	ndBrainGpuBuffer* const buffer2)
+	ndBrainGpuBuffer* const inputOutputData,
+	ndBrainGpuBuffer* const parameters,
+	ndBrainGpuBuffer* const inputOutputGradients)
 	:ndBrainGpuCommand(context)
 	,m_uniformBuffer(uniformBuffer)
 	,m_info(info)
@@ -47,8 +48,9 @@ ndBrainTrainerGpuCommand::ndBrainTrainerGpuCommand(ndBrainTrainerGpuInference* c
 {
 	ndFixSizeArray<ndBrainGpuBuffer*, 4> params;
 	params.PushBack(*m_uniformBuffer);
-	params.PushBack(buffer1);
-	params.PushBack(buffer2);
+	params.PushBack(inputOutputData);
+	params.PushBack(parameters);
+	params.PushBack(inputOutputGradients);
 	Assembly(shader, numberOfinputs, params.GetCount(), &params[0]);
 }
 

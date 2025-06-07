@@ -96,47 +96,44 @@ void ndBrainTrainerGpu::AddCopyOutputGradientCommand()
 	ndSharedPtr<ndBrainGpuBuffer> uniformbuffer(new ndBrainGpuUniformBuffer(m_context, sizeof(ndBrainLayer::ndCommandShareInfo)));
 	uniformbuffer->LoadData(sizeof(ndBrainLayer::ndCommandShareInfo), &data);
 
-	ndBrainGpuBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
-	//ndBrainGpuBuffer* const miniBatchOutputBuffer = *m_miniBatchOutputBuffer;
-	ndBrainGpuBuffer* const miniBatchOutputBuffer = *m_miniBatchOutputGradientBuffer;
-	ndSharedPtr<ndBrainGpuCommand>command(new ndBrainTrainerGpuCommand(this, data, m_outpuId, m_context, m_context->m_ndBrainCopyOutputGradients, m_miniBatchSize, uniformbuffer, inputOutputBuffer, miniBatchOutputBuffer));
+	//ndBrainGpuBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
+	ndBrainGpuBuffer* const miniBatchOutputGradientBuffer = *m_miniBatchOutputGradientBuffer;
+	ndBrainGpuBuffer* const inputOutputGradientBuffer = *m_inputOuputGradientsBuffer;
+	ndSharedPtr<ndBrainGpuCommand>command(new ndBrainTrainerGpuCommand(this, data, m_outpuId, m_context, m_context->m_ndBrainCopyOutputGradients, m_miniBatchSize, uniformbuffer, nullptr, miniBatchOutputGradientBuffer, inputOutputGradientBuffer));
 	m_backPropagateCommands.Append(command);
 }
 
 void ndBrainTrainerGpu::AddLayersGradientCommands()
 {
-	//const ndBrain& brain = **m_brain;
-	//ndBrainGpuBuffer* const weightsBuffer = *m_weightAndBiasBuffer;
-	//ndBrainGpuBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
+	const ndBrain& brain = **m_brain;
 
-	//ndInt32 inputOutputStartOffset = 0;
-	//ndInt32 inputOutputBufferSize = brain.GetInputSize();
-	//for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
-	//{
-	//	ndBrainLayer::ndCommandShareInfo& data = layersUniformsData[i];
-	//	data.m_inputOutputStartOffset = inputOutputStartOffset;
-	//	inputOutputBufferSize += data.m_outputSize;
-	//	inputOutputStartOffset += data.m_inputSize;
-	//}
+int xxxx = 0;
+	for (ndInt32 i = ndInt32(brain.GetCount()) - 1; i >= 0; --i)
+	{
+		const ndBrainLayer* const layer = brain[i];
+		ndBrainTrainerGpuCommand* const feedFowardLayerCommand = FindCommand(size_t(layer));
+		ndAssert(feedFowardLayerCommand);
 
-	//for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
-	//{
-	//	ndBrainLayer::ndCommandShareInfo uniformParam;
-	//	const ndBrainLayer::ndCommandShareInfo& data = layersUniformsData[i];
-	//	uniformParam.m_inputSize = data.m_inputSize;
-	//	uniformParam.m_outputSize = data.m_outputSize;
-	//	uniformParam.m_parametersBatchSize = data.m_parametersBatchSize;
-	//	uniformParam.m_parametersStartOffset = data.m_parametersStartOffset;
-	//	uniformParam.m_inputOutputSize = inputOutputBufferSize;
-	//	uniformParam.m_inputOutputStartOffset = data.m_inputOutputStartOffset;
-	//
-	//	ndSharedPtr<ndBrainGpuBuffer> uniformbuffer(new ndBrainGpuUniformBuffer(m_context, sizeof(ndBrainLayer::ndCommandShareInfo)));
-	//	uniformbuffer->LoadData(sizeof(ndBrainLayer::ndCommandShareInfo), &uniformParam);
-	//
-	//	const ndBrainLayer* const layer = brain[i];
-	//	ndSharedPtr<ndBrainGpuCommand> command(layer->CreateGpuFeedForwardCommand(this, uniformParam, m_context, m_miniBatchSize, uniformbuffer, inputOutputBuffer, weightsBuffer));
-	//	m_feedFowardCommands.Append(command);
-	//}
+		ndBrainLayer::ndCommandShareInfo data(feedFowardLayerCommand->m_info);
+
+		ndSharedPtr<ndBrainGpuBuffer> uniformBuffer(new ndBrainGpuUniformBuffer(m_context, sizeof(ndBrainLayer::ndCommandShareInfo)));
+		uniformBuffer->LoadData(sizeof(ndBrainLayer::ndCommandShareInfo), &data);
+
+		ndBrainGpuBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
+		ndBrainGpuBuffer* const weightsAndBiasBuffer = *m_weightAndBiasBuffer;
+		ndBrainGpuBuffer* const inputOutputGradientBuffer = *m_inputOuputGradientsBuffer;
+
+		ndBrainTrainerGpuCommand* const commandBuffer = layer->CreateGpuBackPropagateCommand(
+			this, data, m_context, m_miniBatchSize,
+			uniformBuffer, inputOutputBuffer, weightsAndBiasBuffer, inputOutputGradientBuffer);
+
+		ndSharedPtr<ndBrainGpuCommand>command(commandBuffer);
+		m_backPropagateCommands.Append(command);
+
+		if (xxxx == 0)
+		break;
+		xxxx++;
+	}
 }
 
 //void ndBrainTrainerGpu::ApplyLearnRate(ndBrainFloat learnRate)

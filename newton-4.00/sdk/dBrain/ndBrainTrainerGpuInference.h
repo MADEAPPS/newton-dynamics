@@ -36,14 +36,17 @@ class ndBrainTrainerGpuInference;
 class ndBrainTrainerGpuCommand : public ndBrainGpuCommand
 {
 	public:
-	ndBrainTrainerGpuCommand(ndBrainTrainerGpuInference* const owner,
-		const ndBrainLayer::ndCommandShareInfo& info, size_t id,
+	ndBrainTrainerGpuCommand(
+		ndBrainTrainerGpuInference* const owner,
+		const ndBrainLayer::ndCommandShareInfo& info, 
+		size_t id,
 		ndBrainGpuContext* const context,
 		const ndSharedPtr<ndBrainGpuShader>& shader,
 		ndInt32 numberOfinputs,
 		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
-		ndBrainGpuBuffer* const buffer1,
-		ndBrainGpuBuffer* const buffer2);
+		ndBrainGpuBuffer* const inputOutputData,
+		ndBrainGpuBuffer* const parameters,
+		ndBrainGpuBuffer* const inputOutputGradients = nullptr);
 
 	ndSharedPtr<ndBrainGpuBuffer> m_uniformBuffer;
 	ndBrainLayer::ndCommandShareInfo m_info;

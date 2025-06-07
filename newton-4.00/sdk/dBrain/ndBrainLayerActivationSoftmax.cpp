@@ -24,8 +24,8 @@
 #include "ndBrainTrainerCpu.h"
 #include "ndBrainGpuContext.h"
 #include "ndBrainTrainerCpuInference.h"
-#include "ndBrainLayerActivationSoftmax.h"
 #include "ndBrainTrainerGpuInference.h"
+#include "ndBrainLayerActivationSoftmax.h"
 
 ndBrainLayerActivationSoftmax::ndBrainLayerActivationSoftmax(ndInt32 neurons)
 	:ndBrainLayerActivation(neurons)
@@ -200,7 +200,8 @@ ndBrainTrainerGpuCommand* ndBrainLayerActivationSoftmax::CreateGpuFeedForwardCom
 	ndBrainGpuBuffer* const buffer1,
 	ndBrainGpuBuffer* const buffer2) const
 {
-	ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(owner,
-		info, size_t(this), context, context->m_ndBrainLayerSoftmaxActivation, miniBatchSize, uniformBuffer, buffer1, buffer2);
+	ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(
+		owner, info, size_t(this), context, context->m_ndBrainLayerSoftmaxActivation, 
+		miniBatchSize, uniformBuffer, buffer1, buffer2);
 	return command;
 }

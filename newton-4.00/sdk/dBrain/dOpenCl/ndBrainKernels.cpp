@@ -432,6 +432,7 @@ ndSharedPtr<ndBrainGpuShader> ndBrainGpuContext::CreateKerner(const cl::Program&
     return kernel;
 }
 
+#include <vector>
 void ndBrainGpuContext::CreateKerners()
 {
     cl_int errcode_ret = 0;
@@ -442,6 +443,13 @@ void ndBrainGpuContext::CreateKerners()
 
     cl::Program program (**m_context, source, CL_TRUE, &errcode_ret);
     ndAssert(errcode_ret == 0);
+
+    //size_t bin_sz;
+    //errcode_ret = clGetProgramInfo(program.get(), CL_PROGRAM_BINARY_SIZES, sizeof(size_t), &bin_sz, NULL);
+    //
+    //unsigned char* bin = (unsigned char*)malloc(bin_sz);
+    //errcode_ret = clGetProgramInfo(program.get(), CL_PROGRAM_BINARIES, sizeof(unsigned char*), &bin, NULL);
+    //free(bin);
 
     m_ndBrainCopyInput = CreateKerner(program, "brainCopyInput");
     m_ndBrainCopyOutput = CreateKerner(program, "brainCopyOutput");

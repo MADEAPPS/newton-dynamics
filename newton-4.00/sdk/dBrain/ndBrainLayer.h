@@ -154,16 +154,16 @@ class ndBrainLayer : public ndClassAlloc
 		const ndBrainLayer::ndCommandShareInfo& info,
 		ndBrainGpuContext* const context, ndInt32 miniBatchSize,
 		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
-		ndBrainGpuBuffer* const buffer1,
-		ndBrainGpuBuffer* const buffer2) const;
+		ndBrainGpuBuffer* const inputOutputData,
+		ndBrainGpuBuffer* const parameters) const;
 
 	virtual ndBrainTrainerGpuCommand* CreateGpuBackPropagateCommand(ndBrainTrainerGpuInference* const owner,
 		const ndBrainLayer::ndCommandShareInfo& info,
 		ndBrainGpuContext* const context, ndInt32 miniBatchSize,
 		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
-		ndBrainGpuBuffer* const buffer1,
-		ndBrainGpuBuffer* const buffer2) const;
-
+		ndBrainGpuBuffer* const inputOutputData,
+		ndBrainGpuBuffer* const parameters,
+		ndBrainGpuBuffer* const inputOutputGradients) const;
 };
 
 #endif 

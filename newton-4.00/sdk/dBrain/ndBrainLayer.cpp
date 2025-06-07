@@ -225,7 +225,7 @@ ndBrainTrainerGpuCommand* ndBrainLayer::CreateGpuFeedForwardCommand(
 ndBrainTrainerGpuCommand* ndBrainLayer::CreateGpuBackPropagateCommand(
 	ndBrainTrainerGpuInference* const, const ndBrainLayer::ndCommandShareInfo&,
 	ndBrainGpuContext* const, ndInt32, const ndSharedPtr<ndBrainGpuBuffer>&,
-	ndBrainGpuBuffer* const, ndBrainGpuBuffer* const) const
+	ndBrainGpuBuffer* const, ndBrainGpuBuffer* const, ndBrainGpuBuffer* const) const
 {
 	ndAssert(0);
 	return nullptr;

@@ -30,15 +30,14 @@ typedef struct
 	ndUnsigned32 m_unused[4];
 } UniformBufferObject;
 
-#define ND_GPU_LOCAL_BUFFER_SIZE	1024
+#define ND_KERNELS_WORKGROUP_SIZE	256
+
 class ndBrainGpuShader : public ndClassAlloc
 {
 	public:
 	ndBrainGpuShader(ndBrainGpuContext* const context)
 		:ndClassAlloc()
 		,m_context(context)
-		,m_groupId(0)
-		,m_workGroupSize(0)
 	{
 	}
 
@@ -50,8 +49,6 @@ class ndBrainGpuShader : public ndClassAlloc
 
 	ndBrainGpuContext* m_context;
 	ndFixSizeArray<ndBrainGpuBuffer*, 4> m_parameters;
-	ndInt32 m_groupId;
-	ndInt32 m_workGroupSize;
 };
 
 class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool

@@ -288,23 +288,23 @@ static void MnistTrainingSet()
 					trainer->MakePrediction(miniBatchInput, false);
 					trainer->SyncQueue();
 					
-					//calculate loss
-					//trainer->GetOutput(miniBatchOutput);
-					//for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
-					//{
-					//	ndUnsigned32 index = shuffleBuffer[batchStart + i];
-					//	ndBrainMemVector grad(&miniBatchOutputGradients[i * outputSize], outputSize);
-					//	const ndBrainMemVector output(&miniBatchOutput[i * outputSize], outputSize);
-					//	const ndBrainMemVector truth(&(*trainingLabels)[index][0], outputSize);
-					//	
-					//	loss.SetTruth(truth);
-					//	loss.GetLoss(output, grad);
-					//}
-					// backpropagate loss.
-					//trainer->BackPropagate(miniBatchOutputGradients);
+					////calculate loss
+					trainer->GetOutput(miniBatchOutput);
+					for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
+					{
+						ndUnsigned32 index = shuffleBuffer[batchStart + i];
+						ndBrainMemVector grad(&miniBatchOutputGradients[i * outputSize], outputSize);
+						const ndBrainMemVector output(&miniBatchOutput[i * outputSize], outputSize);
+						const ndBrainMemVector truth(&(*trainingLabels)[index][0], outputSize);
+						
+						loss.SetTruth(truth);
+						loss.GetLoss(output, grad);
+					}
+					//// backpropagate loss.
+					trainer->BackPropagate(miniBatchOutputGradients);
 					//trainer->ApplyLearnRate(m_learnRate);
 
-					#if 0
+					#if 1
 						//ndBrainVector internalBuffers;
 						//ndBrainVector internalParameters;
 						//trainer->GetWorkingBuffer(internalBuffers);

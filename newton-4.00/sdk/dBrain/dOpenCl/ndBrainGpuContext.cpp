@@ -70,8 +70,9 @@ ndBrainGpuContext::ndBrainGpuContext()
 		cl_int error = 0;
 		m_context = ndSharedPtr<cl::Context>(new cl::Context(**m_device, nullptr, clNotification, this, &error));
 		ndAssert(error == CL_SUCCESS);
-		
-		m_queue = ndSharedPtr<cl::CommandQueue>(new cl::CommandQueue(**m_context , **m_device, 0, &error));
+
+		cl_command_queue_properties properties = CL_QUEUE_PROFILING_ENABLE;
+		m_queue = ndSharedPtr<cl::CommandQueue>(new cl::CommandQueue(**m_context , **m_device, properties, &error));
 		ndAssert(error == CL_SUCCESS);
 
 		CreateKerners();
