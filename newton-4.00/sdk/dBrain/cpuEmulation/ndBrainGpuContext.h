@@ -81,6 +81,7 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinearDropOutActivation;
 
 	// back prpagate shaders
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyInputGradients;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyOutputGradients;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerReluBackPropagate;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerTanhBackPropagate;

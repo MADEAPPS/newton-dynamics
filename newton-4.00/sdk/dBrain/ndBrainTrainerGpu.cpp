@@ -79,7 +79,22 @@ ndBrainTrainerGpu::~ndBrainTrainerGpu()
 
 void ndBrainTrainerGpu::AddCopyInputGradientCommand()
 {
-	//ndAssert(0);
+	ndBrainTrainerGpuCommand* const firstCommand = FindCommand(m_inputId);
+	ndAssert(firstCommand);
+
+	ndBrainLayer::ndCommandShareInfo data(firstCommand->m_info);
+
+	data.m_outputSize = 0;
+	data.m_parametersBatchSize = 0;
+	data.m_parametersStartOffset = 0;
+	data.m_inputOutputStartOffset = 0;
+	ndSharedPtr<ndBrainGpuBuffer> uniformbuffer(new ndBrainGpuUniformBuffer(m_context, sizeof(ndBrainLayer::ndCommandShareInfo)));
+	uniformbuffer->LoadData(sizeof(ndBrainLayer::ndCommandShareInfo), &data);
+
+	ndBrainGpuBuffer* const inputOutputGradientBuffer = *m_inputOuputGradientsBuffer;
+	ndBrainGpuBuffer* const miniBatchInputGradientBuffer = *m_miniBatchInputGradientBuffer;
+	ndSharedPtr<ndBrainGpuCommand>command(new ndBrainTrainerGpuCommand(this, data, m_inputId, m_context, m_context->m_ndBrainCopyInputGradients, m_miniBatchSize, uniformbuffer, nullptr, miniBatchInputGradientBuffer, inputOutputGradientBuffer));
+	m_backPropagateCommands.Append(command);
 }
 
 void ndBrainTrainerGpu::AddCopyOutputGradientCommand()
@@ -96,9 +111,8 @@ void ndBrainTrainerGpu::AddCopyOutputGradientCommand()
 	ndSharedPtr<ndBrainGpuBuffer> uniformbuffer(new ndBrainGpuUniformBuffer(m_context, sizeof(ndBrainLayer::ndCommandShareInfo)));
 	uniformbuffer->LoadData(sizeof(ndBrainLayer::ndCommandShareInfo), &data);
 
-	//ndBrainGpuBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
-	ndBrainGpuBuffer* const miniBatchOutputGradientBuffer = *m_miniBatchOutputGradientBuffer;
 	ndBrainGpuBuffer* const inputOutputGradientBuffer = *m_inputOuputGradientsBuffer;
+	ndBrainGpuBuffer* const miniBatchOutputGradientBuffer = *m_miniBatchOutputGradientBuffer;
 	ndSharedPtr<ndBrainGpuCommand>command(new ndBrainTrainerGpuCommand(this, data, m_outpuId, m_context, m_context->m_ndBrainCopyOutputGradients, m_miniBatchSize, uniformbuffer, nullptr, miniBatchOutputGradientBuffer, inputOutputGradientBuffer));
 	m_backPropagateCommands.Append(command);
 }
