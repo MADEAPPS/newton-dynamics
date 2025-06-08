@@ -56,8 +56,17 @@ class ndBrainLayerLinearWithDropOut : public ndBrainLayerActivation
 		const ndBrainLayer::ndCommandShareInfo& info,
 		ndBrainGpuContext* const context, ndInt32 miniBatchSize,
 		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
-		ndBrainGpuBuffer* const buffer1,
-		ndBrainGpuBuffer* const buffer2) const override;
+		ndBrainGpuBuffer* const inputOutputData,
+		ndBrainGpuBuffer* const weightsAndBias) const override;
+
+	virtual ndBrainTrainerGpuCommand* CreateGpuBackPropagateCommand(ndBrainTrainerGpuInference* const owner,
+		const ndBrainLayer::ndCommandShareInfo& info,
+		ndBrainGpuContext* const context, ndInt32 miniBatchSize,
+		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
+		ndBrainGpuBuffer* const inputOutputData,
+		ndBrainGpuBuffer* const weightsAndBias,
+		ndBrainGpuBuffer* const inputOutputGradients,
+		ndBrainGpuBuffer* const weightsAndBiasGradients) const override;
 
 	ndBrainVector m_dropOut;
 };

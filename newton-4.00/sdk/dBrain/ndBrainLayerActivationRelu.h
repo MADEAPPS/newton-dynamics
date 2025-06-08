@@ -62,7 +62,6 @@ class ndBrainLayerActivationRelu : public ndBrainLayerActivation
 		ndBrainGpuBuffer* const weightsAndBias,
 		ndBrainGpuBuffer* const inputOutputGradients,
 		ndBrainGpuBuffer* const weightsAndBiasGradients) const override;
-
 };
 
 #endif 

@@ -107,7 +107,7 @@ void ndBrainTrainerGpu::AddLayersGradientCommands()
 {
 	const ndBrain& brain = **m_brain;
 
-int xxxx = 0;
+//int xxxx = 0;
 	for (ndInt32 i = ndInt32(brain.GetCount()) - 1; i >= 0; --i)
 	{
 		const ndBrainLayer* const layer = brain[i];
@@ -131,9 +131,9 @@ int xxxx = 0;
 		ndSharedPtr<ndBrainGpuCommand>command(commandBuffer);
 		m_backPropagateCommands.Append(command);
 
-		if (xxxx == 3)
-		break;
-		xxxx++;
+		//if (xxxx == 4)
+		//break;
+		//xxxx++;
 	}
 }
 
