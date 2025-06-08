@@ -19,29 +19,33 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_OPTIMIZER_ADAM_CPU_H__
-#define _ND_BRAIN_OPTIMIZER_ADAM_CPU_H__
+#ifndef _ND_BRAIN_OPTIMIZER_ADAM_GPU_H__
+#define _ND_BRAIN_OPTIMIZER_ADAM_GPU_H__
 
 #include "ndBrainStdafx.h"
 #include "ndBrainOptimizer.h"
 
 class ndBrainThreadPool;
 
-class ndBrainOptimizerAdamCpu : public ndBrainOptimizer
+class ndBrainOptimizerAdamGpu : public ndBrainOptimizer
 {
 	public: 
-	ndBrainOptimizerAdamCpu(const ndSharedPtr<ndBrainContext>& context);
+	ndBrainOptimizerAdamGpu(const ndSharedPtr<ndBrainContext>& context);
 
+	virtual void Init(ndInt32 parametersBufferSizeInFloats) override;
 	virtual void Update(ndBrainVector& parameters, const ndBrainVector& gradients, ndBrainFloat learnRate) override;
 
 	private:
-	void Init(ndInt32 size);
-
-	ndBrainVector m_vdw;
-	ndBrainVector m_vdw2;
-	ndBrainVector m_temp;
-	ndBrainVector m_vdwCorrected;
-	ndBrainVector m_vdw2Corrected;
+	//ndBrainVector m_vdw;
+	//ndBrainVector m_vdw2;
+	//ndBrainVector m_temp;
+	//ndBrainVector m_vdwCorrected;
+	//ndBrainVector m_vdw2Corrected;
+	ndSharedPtr<ndBrainGpuBuffer> m_vdw;
+	ndSharedPtr<ndBrainGpuBuffer> m_vdw2;
+	ndSharedPtr<ndBrainGpuBuffer> m_temp;
+	ndSharedPtr<ndBrainGpuBuffer> m_vdwCorrected;
+	ndSharedPtr<ndBrainGpuBuffer> m_vdw2Corrected;
 
 	ndBrainFloat m_beta;
 	ndBrainFloat m_alpha;

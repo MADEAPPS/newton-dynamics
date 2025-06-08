@@ -32,16 +32,17 @@
 ndBrainTrainerCpu::ndBrainTrainerCpu(
 	const ndSharedPtr<ndBrain>& brain, 
 	const ndSharedPtr<ndBrainContext>& context,
-	const ndSharedPtr<ndBrainOptimizerAdamCpu>& optimizer, 
 	ndInt32 minibatchSize)
 	:ndBrainTrainerCpuInference(brain, context, minibatchSize)
+	,m_optimizer(new ndBrainOptimizerAdamCpu(context))
 	,m_inputOuputGradientsBuffer()
 	,m_weightAndBiasGradientsBuffer()
 	,m_miniBatchInputGradientBuffer()
 	,m_miniBatchOutputGradientBuffer()
-	,m_optimizer(optimizer)
 	,m_backPropagateCommands()
 {
+	m_optimizer->Init(ndInt32(m_weightAndBiasBuffer.GetCount()));
+
 	m_miniBatchInputGradientBuffer.SetCount(m_miniBatchInputBuffer.GetCount());
 	m_miniBatchOutputGradientBuffer.SetCount(m_miniBatchOutputBuffer.GetCount());
 
@@ -54,8 +55,6 @@ ndBrainTrainerCpu::ndBrainTrainerCpu(
 	AddCopyOutputGradientCommand();
 	AddLayersGradientCommands();
 	AddCopyInputGradientCommand();
-
-	m_optimizer->Init(ndInt32(m_weightAndBiasBuffer.GetCount()));
 }
 
 ndBrainTrainerCpu::ndBrainTrainerCpu(const ndBrainTrainerCpu& src)
@@ -81,7 +80,7 @@ void ndBrainTrainerCpu::UpdateParameters()
 		ndAssert(0);
 		//ndBrainLayer* const layer = brain[i];
 		//ndAssert(FindCommand(size_t(layer)));
-		//const ndBrainLayer::ndBrainLayerFeedFowardCpuCommand* const command = (ndBrainLayer::ndBrainLayerFeedFowardCpuCommand*)FindCommand(size_t(layer));
+		//const ndBrainLayer::ndBrainLayerFeedForwardCpuCommand* const command = (ndBrainLayer::ndBrainLayerFeedForwardCpuCommand*)FindCommand(size_t(layer));
 		//
 		//ndInt32 size = command->m_inputSize * command->m_outputSize + command->m_outputSize;
 		//const ndBrainMemVector weights(&m_weightAndBiasBuffer[command->m_parametersStartOffset], size);
@@ -125,18 +124,18 @@ void ndBrainTrainerCpu::AddLayersGradientCommands()
 	{
 		const ndBrainLayer* const layer = brain[i];
 		ndAssert(FindCommand(size_t(layer)));
-		const ndBrainTrainerCpuCommand* const feedFowardCommand = FindCommand(size_t(layer));
-		ndAssert(feedFowardCommand);
+		const ndBrainTrainerCpuCommand* const feedForwardCommand = FindCommand(size_t(layer));
+		ndAssert(feedForwardCommand);
 	
 		ndBrainLayerBackPropagateCpuCommand* const command = layer->GetLayerCpuBackPropagateCommand();
 		command->m_owner = this;
 	
-		ndAssert(command->m_info.m_inputSize == feedFowardCommand->m_info.m_inputSize);
-		ndAssert(command->m_info.m_outputSize == feedFowardCommand->m_info.m_outputSize);
-		command->m_info.m_parametersBatchSize = feedFowardCommand->m_info.m_parametersBatchSize;
-		command->m_info.m_parametersStartOffset = feedFowardCommand->m_info.m_parametersStartOffset;
-		command->m_info.m_inputOutputSize = feedFowardCommand->m_info.m_inputOutputSize;
-		command->m_info.m_inputOutputStartOffset = feedFowardCommand->m_info.m_inputOutputStartOffset;
+		ndAssert(command->m_info.m_inputSize == feedForwardCommand->m_info.m_inputSize);
+		ndAssert(command->m_info.m_outputSize == feedForwardCommand->m_info.m_outputSize);
+		command->m_info.m_parametersBatchSize = feedForwardCommand->m_info.m_parametersBatchSize;
+		command->m_info.m_parametersStartOffset = feedForwardCommand->m_info.m_parametersStartOffset;
+		command->m_info.m_inputOutputSize = feedForwardCommand->m_info.m_inputOutputSize;
+		command->m_info.m_inputOutputStartOffset = feedForwardCommand->m_info.m_inputOutputStartOffset;
 	
 		m_backPropagateCommands.Append(command);
 	}

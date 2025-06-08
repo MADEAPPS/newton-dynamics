@@ -78,9 +78,9 @@ class ndBrainLayerLinear : public ndBrainLayer
 
 	virtual ndCommandShareInfo GetCommandSharedInfo() const override;
 
-	virtual ndBrainLayerFeedFowardCpuCommand* GetLayerCpuFeedForwardCommand() const override;
+	virtual ndBrainLayerFeedForwardCpuCommand* GetLayerCpuFeedForwardCommand() const override;
 	virtual ndBrainLayerBackPropagateCpuCommand* GetLayerCpuBackPropagateCommand() const override;
-	virtual void FeedForward(const ndBrainLayerFeedFowardCpuCommand* const info, ndInt32 miniBatchIndex) const override;
+	virtual void FeedForward(const ndBrainLayerFeedForwardCpuCommand* const info, ndInt32 miniBatchIndex) const override;
 	virtual void BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const override;
 
 	virtual bool HasGpuSupport() const override;

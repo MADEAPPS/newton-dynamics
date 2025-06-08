@@ -66,7 +66,7 @@ void ndBrainLayer::SetWeights(const ndBrainVector&)
 {
 }
 
-void ndBrainLayer::FeedForward(const ndBrainLayerFeedFowardCpuCommand* const, ndInt32) const
+void ndBrainLayer::FeedForward(const ndBrainLayerFeedForwardCpuCommand* const, ndInt32) const
 {
 	ndAssert(0);
 }
@@ -76,7 +76,7 @@ void ndBrainLayer::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* cons
 	ndAssert(0);
 }
 
-ndBrainLayerFeedFowardCpuCommand* ndBrainLayer::GetLayerCpuFeedForwardCommand() const
+ndBrainLayerFeedForwardCpuCommand* ndBrainLayer::GetLayerCpuFeedForwardCommand() const
 {
 	ndAssert(0);
 	return nullptr;

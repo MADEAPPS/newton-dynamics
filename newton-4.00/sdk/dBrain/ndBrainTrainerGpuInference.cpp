@@ -64,7 +64,7 @@ ndBrainTrainerGpuInference::ndBrainTrainerGpuInference(const ndSharedPtr<ndBrain
 	,m_weightAndBiasBuffer()
 	,m_miniBatchInputBuffer()
 	,m_miniBatchOutputBuffer()
-	,m_feedFowardCommands()
+	,m_feedForwardCommands()
 	,m_miniBatchSize(minibatchSize)
 {
 	ndAssert(brain->IsGpuReady());
@@ -80,7 +80,7 @@ ndBrainTrainerGpuInference::ndBrainTrainerGpuInference(const ndBrainTrainerGpuIn
 	,m_weightAndBiasBuffer()
 	,m_miniBatchInputBuffer()
 	,m_miniBatchOutputBuffer()
-	,m_feedFowardCommands()
+	,m_feedForwardCommands()
 	,m_miniBatchSize(src.m_miniBatchSize)
 {
 	ndAssert(0);
@@ -123,7 +123,7 @@ void ndBrainTrainerGpuInference::AddLayersCommands(ndFixSizeArray<ndBrainLayer::
 		
 		const ndBrainLayer* const layer = brain[i];
 		ndSharedPtr<ndBrainGpuCommand> command(layer->CreateGpuFeedForwardCommand(this, uniformParam, m_context, m_miniBatchSize, uniformbuffer, inputOutputBuffer, weightsBuffer));
-		m_feedFowardCommands.Append(command);
+		m_feedForwardCommands.Append(command);
 	}
 }
 
@@ -150,7 +150,7 @@ void ndBrainTrainerGpuInference::AddCopyInputCommand(const ndBrainLayer::ndComma
 	ndBrainGpuBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
 	ndBrainGpuBuffer* const miniBatchInputBuffer = *m_miniBatchInputBuffer;
 	ndSharedPtr<ndBrainGpuCommand>command(new ndBrainTrainerGpuCommand(this, uniformParam, m_inputId, m_context, m_context->m_ndBrainCopyInput, m_miniBatchSize, uniformbuffer, inputOutputBuffer, miniBatchInputBuffer));
-	m_feedFowardCommands.Append(command);
+	m_feedForwardCommands.Append(command);
 }
 
 void ndBrainTrainerGpuInference::AddCopyOutputCommand()
@@ -170,7 +170,7 @@ void ndBrainTrainerGpuInference::AddCopyOutputCommand()
 	ndBrainGpuBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
 	ndBrainGpuBuffer* const miniBatchOutputBuffer = *m_miniBatchOutputBuffer;
 	ndSharedPtr<ndBrainGpuCommand>command(new ndBrainTrainerGpuCommand(this, data, m_outpuId, m_context, m_context->m_ndBrainCopyOutput, m_miniBatchSize, uniformbuffer, inputOutputBuffer, miniBatchOutputBuffer));
-	m_feedFowardCommands.Append(command);
+	m_feedForwardCommands.Append(command);
 }
 
 void ndBrainTrainerGpuInference::InitWeightAndBiasBuffer()
@@ -274,7 +274,7 @@ void ndBrainTrainerGpuInference::BackPropagate(const ndBrainVector&, bool)
 
 ndBrainTrainerGpuCommand* ndBrainTrainerGpuInference::FindCommand(size_t id) const
 {
-	for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = m_feedFowardCommands.GetFirst(); node; node = node->GetNext())
+	for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = m_feedForwardCommands.GetFirst(); node; node = node->GetNext())
 	{
 		ndBrainTrainerGpuCommand* const command = (ndBrainTrainerGpuCommand*)*node->GetInfo();
 		if (command->m_id == id)
@@ -310,7 +310,7 @@ void ndBrainTrainerGpuInference::SyncQueue()
 void ndBrainTrainerGpuInference::MakePrediction(const ndBrainVector& input, bool sync)
 {
 	m_miniBatchInputBuffer->LoadData(input.GetCount() * sizeof(ndReal), &input[0]);
-	for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = m_feedFowardCommands.GetFirst(); node; node = node->GetNext())
+	for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = m_feedForwardCommands.GetFirst(); node; node = node->GetNext())
 	{
 		ndSharedPtr<ndBrainGpuCommand>& command = node->GetInfo();
 		m_context->AddCommandQueue(command);

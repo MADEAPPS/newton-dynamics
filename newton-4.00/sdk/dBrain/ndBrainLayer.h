@@ -37,7 +37,7 @@ class ndBrainGpuFloatBuffer;
 class ndBrainTrainerGpuCommand;
 class ndBrainTrainerCpuInference;
 class ndBrainTrainerGpuInference;
-class ndBrainLayerFeedFowardCpuCommand;
+class ndBrainLayerFeedForwardCpuCommand;
 class ndBrainLayerBackPropagateCpuCommand;
 
 class ndBrainLayer : public ndClassAlloc
@@ -119,9 +119,9 @@ class ndBrainLayer : public ndClassAlloc
 
 	virtual ndCommandShareInfo GetCommandSharedInfo() const;
 
-	virtual ndBrainLayerFeedFowardCpuCommand* GetLayerCpuFeedForwardCommand() const;
+	virtual ndBrainLayerFeedForwardCpuCommand* GetLayerCpuFeedForwardCommand() const;
 	virtual ndBrainLayerBackPropagateCpuCommand* GetLayerCpuBackPropagateCommand() const;
-	virtual void FeedForward(const ndBrainLayerFeedFowardCpuCommand* const info, ndInt32 miniBatchIndex) const;
+	virtual void FeedForward(const ndBrainLayerFeedForwardCpuCommand* const info, ndInt32 miniBatchIndex) const;
 	virtual void BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const;
 
 	virtual bool HasGpuSupport() const;

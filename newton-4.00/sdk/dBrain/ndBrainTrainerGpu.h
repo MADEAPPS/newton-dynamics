@@ -27,6 +27,8 @@
 #include "ndBrainTrainer.h"
 #include "ndBrainTrainerGpuInference.h"
 
+class ndBrainOptimizerAdamGpu;
+
 class ndBrainTrainerGpu: public ndBrainTrainerGpuInference
 {
 	public: 
@@ -41,7 +43,10 @@ class ndBrainTrainerGpu: public ndBrainTrainerGpuInference
 	void AddLayersGradientCommands();
 	void AddCopyInputGradientCommand();
 	void AddCopyOutputGradientCommand();
+	void AddOptimizerGradientCommand();
 
+	ndSharedPtr<ndBrainOptimizerAdamGpu> m_optimizer;
+	ndSharedPtr<ndBrainGpuCommand> m_accumulateGradients;
 	ndSharedPtr<ndBrainGpuBuffer> m_inputOuputGradientsBuffer;
 	ndSharedPtr<ndBrainGpuBuffer> m_weightAndBiasGradientsBuffer;
 	ndSharedPtr<ndBrainGpuBuffer> m_miniBatchInputGradientBuffer;

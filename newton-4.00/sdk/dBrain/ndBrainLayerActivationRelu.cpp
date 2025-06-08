@@ -116,9 +116,9 @@ ndBrainLayer::ndCommandShareInfo ndBrainLayerActivationRelu::GetCommandSharedInf
 	return info;
 }
 
-ndBrainLayerFeedFowardCpuCommand* ndBrainLayerActivationRelu::GetLayerCpuFeedForwardCommand() const
+ndBrainLayerFeedForwardCpuCommand* ndBrainLayerActivationRelu::GetLayerCpuFeedForwardCommand() const
 {
-	ndBrainLayerFeedFowardCpuCommand* const command = new ndBrainLayerFeedFowardCpuCommand(this);
+	ndBrainLayerFeedForwardCpuCommand* const command = new ndBrainLayerFeedForwardCpuCommand(this);
 	return command;
 }
 
@@ -128,7 +128,7 @@ ndBrainLayerBackPropagateCpuCommand* ndBrainLayerActivationRelu::GetLayerCpuBack
 	return command;
 }
 
-void ndBrainLayerActivationRelu::FeedForward(const ndBrainLayerFeedFowardCpuCommand* const command, ndInt32 miniBatchIndex) const
+void ndBrainLayerActivationRelu::FeedForward(const ndBrainLayerFeedForwardCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
 	const ndCommandShareInfo* const info = &command->m_info;
 	const ndBrainTrainerCpuInference* const trainer = command->m_owner;

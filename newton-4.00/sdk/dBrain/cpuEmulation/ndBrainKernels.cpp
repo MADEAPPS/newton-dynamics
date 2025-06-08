@@ -25,7 +25,7 @@ class brainCopyInput : public ndBrainGpuShader
     {
     }
 
-    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize, ndInt32)
     {
         ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
         ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
@@ -68,7 +68,7 @@ class brainCopyOutput : public ndBrainGpuShader
     {
     }
 
-    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize, ndInt32)
     {
         ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
         ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
@@ -114,7 +114,7 @@ class brainLayerLinear : public ndBrainGpuShader
 
     // a matrix time a vector by iterating over each row of the matrix 
     // calculating the dot product of that row time the vector and adding the bias value.
-    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize, ndInt32)
     {
         ndBrainFloat cachedInput [ND_GPU_LOCAL_BUFFER_SIZE * 2];
         ndBrainFloat cachedOutput [ND_GPU_LOCAL_BUFFER_SIZE * 2];
@@ -235,7 +235,7 @@ class brainLayerReluActivation : public ndBrainGpuShader
     {
     }
 
-    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize, ndInt32)
     {
         ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
         ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
@@ -278,7 +278,7 @@ class brainLayerLinearDropOutActivation : public ndBrainGpuShader
     {
     }
 
-    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize, ndInt32)
     {
         ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
         ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
@@ -321,7 +321,7 @@ class brainLayerTanhActivation : public ndBrainGpuShader
     {
     }
 
-    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize, ndInt32)
     {
         ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
         ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
@@ -364,7 +364,7 @@ class brainLayerSoftmaxActivation : public ndBrainGpuShader
     {
     }
 
-    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize, ndInt32)
     {
         ndBrainFloat tmpInputBuffer[ND_GPU_LOCAL_BUFFER_SIZE * 2];
         ndBrainFloat reductionBuffer[ND_GPU_LOCAL_BUFFER_SIZE];
@@ -497,7 +497,6 @@ class brainLayerSoftmaxActivation : public ndBrainGpuShader
     }
 };
 
-
 // back propagation kernels
 class brainCopyInputGradients : public ndBrainGpuShader
 {
@@ -507,7 +506,7 @@ class brainCopyInputGradients : public ndBrainGpuShader
     {
     }
 
-    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize, ndInt32)
     {
         ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
         ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)m_parameters[2];
@@ -527,8 +526,8 @@ class brainCopyInputGradients : public ndBrainGpuShader
         ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
         ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
 
-        ndBrainMemVector xxxx0(&miniBatchGradients[dstBase], inputSize);
-        ndBrainMemVector xxxx1(&inputOutputGradients[srcBase], inputSize);
+        //ndBrainMemVector xxxx0(&miniBatchGradients[dstBase], inputSize);
+        //ndBrainMemVector xxxx1(&inputOutputGradients[srcBase], inputSize);
         for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
@@ -554,7 +553,7 @@ class brainCopyOutputGradients : public ndBrainGpuShader
     {
     }
 
-    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize, ndInt32)
     {
         ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
         ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)m_parameters[2];
@@ -600,7 +599,7 @@ class brainLayerBrainCathegoricalSoftmaxBackPropagate : public ndBrainGpuShader
     {
     }
 
-    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize, ndInt32)
     {
         ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
         ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
@@ -654,7 +653,7 @@ class brainLayerBrainReluBackPropagate : public ndBrainGpuShader
     {
     }
 
-    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize, ndInt32)
     {
         ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
         ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
@@ -706,7 +705,7 @@ class brainLayerBrainLinearDropOutBackPropagate : public ndBrainGpuShader
     {
     }
 
-    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize, ndInt32)
     {
         ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
         //ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
@@ -754,7 +753,7 @@ class brainLayerBrainTanhBackPropagate : public ndBrainGpuShader
     {
     }
 
-    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize, ndInt32)
     {
         ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
         ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
@@ -810,7 +809,7 @@ class brainLayerBrainLinearBackPropagate : public ndBrainGpuShader
     {
     }
 
-    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize, ndInt32)
     {
         ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
         ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
@@ -936,6 +935,88 @@ class brainLayerBrainLinearBackPropagate : public ndBrainGpuShader
     }
 };
 
+// extra keenels
+class brainAccumulateGradients : public ndBrainGpuShader
+{
+    public:
+    brainAccumulateGradients(ndBrainGpuContext* const context)
+        :ndBrainGpuShader(context)
+    {
+    }
+
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize, ndInt32 numberOfWorGroups)
+    {
+        ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
+        //ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)m_parameters[2];
+         
+        UniformBufferObject* const parameters = &buffer0->m_data;
+        ndBrainFloat* const gradientBuffer = &buffer1->m_buffer[0];
+
+        ndInt32 inputSize = ndInt32(parameters->m_inputSize);
+
+        ndInt32 sliceSize = inputSize / numberOfWorGroups;
+        //ndInt32 start = (groupId * sliceSize + 3) & -4;
+        //ndInt32 end = ((groupId + 1) * sliceSize + 3) & -4;
+        ndInt32 start = groupId * sliceSize;
+        ndInt32 end = (groupId + 1) * sliceSize;
+        if ((groupId + 1) == numberOfWorGroups)
+        {
+            end = inputSize;
+        }
+
+        ndInt32 count = end - start;
+        ndInt32 workGroupSizeReminder = count % workGroupSize;
+        ndInt32 modWorkGroupSize = count - workGroupSizeReminder;
+
+        ndBrainFloat cachedAccumulator[ND_GPU_LOCAL_BUFFER_SIZE];
+
+        for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+            {
+                cachedAccumulator[itemId] = ndBrainFloat(0.0f);
+            }
+            for (ndInt32 j = 0; j < numberOfWorGroups; ++j)
+            {
+                ndInt32 base = j * inputSize + start;
+                ndBrainMemVector xxxx0(&gradientBuffer[base], workGroupSize);
+
+                for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+                {
+                    ndBrainFloat a = gradientBuffer[base + i + itemId];
+                    cachedAccumulator[itemId] += a;
+                }
+            }
+            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+            {
+                gradientBuffer[start + i + itemId] = cachedAccumulator[itemId];
+            }
+        }
+
+        //for (ndInt32 i = 0; i < workGroupSizeReminder; i += workGroupSize)
+        {
+            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+            {
+                cachedAccumulator[itemId] = ndBrainFloat(0.0f);
+            }
+            for (ndInt32 j = 0; j < numberOfWorGroups; ++j)
+            {
+                ndInt32 base = j * inputSize + modWorkGroupSize;
+                for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+                {
+                    ndBrainFloat a = gradientBuffer[base + itemId];
+                    cachedAccumulator[itemId] += a;
+                }
+            }
+            for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+            {
+                gradientBuffer[modWorkGroupSize + itemId] = cachedAccumulator[itemId];
+            }
+        }
+    }
+};
+
 void ndBrainGpuContext::CreateKerners()
 {   
     // create all feed foward shaders
@@ -955,4 +1036,7 @@ void ndBrainGpuContext::CreateKerners()
     m_ndBrainLayerLinearBackPropagate = ndSharedPtr<ndBrainGpuShader>(new brainLayerBrainLinearBackPropagate(this));
     m_ndBrainLayerLinearDropOutBackPropagate = ndSharedPtr<ndBrainGpuShader>(new brainLayerBrainLinearDropOutBackPropagate(this));
     m_ndBrainLayerCathegoricalSoftmaxBackPropagate = ndSharedPtr<ndBrainGpuShader>(new brainLayerBrainCathegoricalSoftmaxBackPropagate(this));
+
+    // optimizer shaders
+    m_ndBrainAccumulateGradients = ndSharedPtr<ndBrainGpuShader>(new brainAccumulateGradients(this));
 }

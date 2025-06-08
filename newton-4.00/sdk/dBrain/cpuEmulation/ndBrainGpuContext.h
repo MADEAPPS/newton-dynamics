@@ -45,7 +45,7 @@ class ndBrainGpuShader : public ndClassAlloc
 	{
 	}
 
-	virtual void Execute(ndInt32 groupId, ndInt32 workGroupSize) = 0;
+	virtual void Execute(ndInt32 groupId, ndInt32 workGroupSize, ndInt32 numberOfWorkGroups) = 0;
 
 	ndBrainGpuContext* m_context;
 	ndFixSizeArray<ndBrainGpuBuffer*, 8> m_parameters;
@@ -80,7 +80,7 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerSoftmaxActivation;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinearDropOutActivation;
 
-	// back prpagate shaders
+	// back propagate shaders
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyInputGradients;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyOutputGradients;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerReluBackPropagate;
@@ -88,5 +88,8 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinearBackPropagate;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinearDropOutBackPropagate;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerCathegoricalSoftmaxBackPropagate;
+
+	// optimizer shaders
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainAccumulateGradients;
 };
 #endif

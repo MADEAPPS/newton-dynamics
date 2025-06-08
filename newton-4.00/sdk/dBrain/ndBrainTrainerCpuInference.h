@@ -53,10 +53,10 @@ class ndBrainTrainerCpuCommand: public ndContainersFreeListAlloc<ndBrainTrainerC
 	size_t m_id;
 };
 
-class ndBrainLayerFeedFowardCpuCommand : public ndBrainTrainerCpuCommand
+class ndBrainLayerFeedForwardCpuCommand : public ndBrainTrainerCpuCommand
 {
 	public:
-	ndBrainLayerFeedFowardCpuCommand(const ndBrainLayer* const layer)
+	ndBrainLayerFeedForwardCpuCommand(const ndBrainLayer* const layer)
 		:ndBrainTrainerCpuCommand(layer->GetCommandSharedInfo(), size_t(layer))
 		,m_layer(layer)
 	{
@@ -157,7 +157,7 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 	ndBrainVector m_weightAndBiasBuffer;
 	ndBrainVector m_miniBatchInputBuffer;
 	ndBrainVector m_miniBatchOutputBuffer;
-	ndList<ndSharedPtr<ndBrainTrainerCpuCommand>> m_feedFowardCommands;
+	ndList<ndSharedPtr<ndBrainTrainerCpuCommand>> m_feedForwardCommands;
 	ndBrainThreadPool* m_threadPool;
 	ndInt32 m_miniBatchSize;
 

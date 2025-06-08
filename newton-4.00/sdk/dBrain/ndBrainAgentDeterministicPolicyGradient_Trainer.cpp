@@ -357,10 +357,11 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildPolicyClass()
 	}
 	policy->InitWeights();
 
-	ndSharedPtr<ndBrainOptimizerAdamCpu> policyOptimizer(new ndBrainOptimizerAdamCpu(m_context));
-	policyOptimizer->SetRegularizer(m_parameters.m_policyRegularizer);
-	policyOptimizer->SetRegularizerType(m_parameters.m_policyRegularizerType);
-	m_policyTrainer = ndSharedPtr<ndBrainTrainerCpu>(new ndBrainTrainerCpu(policy, m_context, policyOptimizer, m_parameters.m_miniBatchSize));
+	ndAssert(0);
+	//ndSharedPtr<ndBrainOptimizerAdamCpu> policyOptimizer(new ndBrainOptimizerAdamCpu(m_context));
+	//policyOptimizer->SetRegularizer(m_parameters.m_policyRegularizer);
+	//policyOptimizer->SetRegularizerType(m_parameters.m_policyRegularizerType);
+	//m_policyTrainer = ndSharedPtr<ndBrainTrainerCpu>(new ndBrainTrainerCpu(policy, m_context, policyOptimizer, m_parameters.m_miniBatchSize));
 }
 
 void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildCriticClass()
@@ -392,14 +393,15 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildCriticClass()
 		}
 		critic->InitWeights();
 
-		ndSharedPtr<ndBrainOptimizerAdamCpu> criticOptimizer(new ndBrainOptimizerAdamCpu(m_context));
-		criticOptimizer->SetRegularizer(m_parameters.m_policyRegularizer);
-		criticOptimizer->SetRegularizerType(m_parameters.m_policyRegularizerType);
-		m_criticTrainer[k] = ndSharedPtr<ndBrainTrainerCpu>(new ndBrainTrainerCpu(critic, m_context, criticOptimizer, m_parameters.m_miniBatchSize));
-		
-		ndSharedPtr<ndBrain> referenceCritic(new ndBrain(**critic));
-		ndSharedPtr<ndBrainOptimizerAdamCpu> referenceCriticOptimizer(new ndBrainOptimizerAdamCpu(m_context));
-		m_referenceCriticTrainer[k] = ndSharedPtr<ndBrainTrainerCpu>(new ndBrainTrainerCpu(referenceCritic, m_context, referenceCriticOptimizer, m_parameters.m_miniBatchSize));
+		ndAssert(0);
+		//ndSharedPtr<ndBrainOptimizerAdamCpu> criticOptimizer(new ndBrainOptimizerAdamCpu(m_context));
+		//criticOptimizer->SetRegularizer(m_parameters.m_policyRegularizer);
+		//criticOptimizer->SetRegularizerType(m_parameters.m_policyRegularizerType);
+		//m_criticTrainer[k] = ndSharedPtr<ndBrainTrainerCpu>(new ndBrainTrainerCpu(critic, m_context, criticOptimizer, m_parameters.m_miniBatchSize));
+		//
+		//ndSharedPtr<ndBrain> referenceCritic(new ndBrain(**critic));
+		//ndSharedPtr<ndBrainOptimizerAdamCpu> referenceCriticOptimizer(new ndBrainOptimizerAdamCpu(m_context));
+		//m_referenceCriticTrainer[k] = ndSharedPtr<ndBrainTrainerCpu>(new ndBrainTrainerCpu(referenceCritic, m_context, referenceCriticOptimizer, m_parameters.m_miniBatchSize));
 	}
 }
 
