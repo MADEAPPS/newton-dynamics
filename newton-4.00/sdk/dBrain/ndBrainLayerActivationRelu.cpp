@@ -191,25 +191,31 @@ void ndBrainLayerActivationRelu::BackPropagate(const ndBrainLayerBackPropagateCp
 	inputDerivative.Mul(outputDerivative);
 }
 
-//ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerActivationRelu::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const
-//{
-//	ndLayerUniformDataGpu data;
-//	data.m_shader = context->m_ndBrainLayerReluActivation;
-//	data.m_inputSize = GetInputSize();
-//	data.m_outputSize = GetOutputSize();
-//
-//	return data;
-//}
-
 ndBrainTrainerGpuCommand* ndBrainLayerActivationRelu::CreateGpuFeedForwardCommand(
 	ndBrainTrainerGpuInference* const owner,
 	const ndBrainLayer::ndCommandShareInfo& info,
 	ndBrainGpuContext* const context, ndInt32 miniBatchSize,
 	const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
-	ndBrainGpuBuffer* const buffer1,
-	ndBrainGpuBuffer* const buffer2) const
+	ndBrainGpuBuffer* const inputOutputData,
+	ndBrainGpuBuffer* const weightsAndBias) const
 {
 	ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(owner,
-		info, size_t(this), context, context->m_ndBrainLayerReluActivation, miniBatchSize, uniformBuffer, buffer1, buffer2);
+		info, size_t(this), context, context->m_ndBrainLayerReluActivation, miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias);
+	return command;
+}
+
+ndBrainTrainerGpuCommand* ndBrainLayerActivationRelu::CreateGpuBackPropagateCommand(
+	ndBrainTrainerGpuInference* const owner,
+	const ndBrainLayer::ndCommandShareInfo& info,
+	ndBrainGpuContext* const context, ndInt32 miniBatchSize,
+	const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
+	ndBrainGpuBuffer* const inputOutputData,
+	ndBrainGpuBuffer* const weightsAndBias,
+	ndBrainGpuBuffer* const inputOutputGradients,
+	ndBrainGpuBuffer* const weightsAndBiasGradients) const
+{
+	ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(
+		owner, info, size_t(this), context, context->m_ndBrainLayerReluBackPropagate,
+		miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias, inputOutputGradients, weightsAndBiasGradients);
 	return command;
 }

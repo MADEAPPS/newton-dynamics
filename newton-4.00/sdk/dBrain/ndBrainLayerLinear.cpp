@@ -435,10 +435,10 @@ ndBrainTrainerGpuCommand* ndBrainLayerLinear::CreateGpuFeedForwardCommand(
 	ndBrainGpuContext* const context, ndInt32 miniBatchSize,
 	const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
 	ndBrainGpuBuffer* const inputOutputData,
-	ndBrainGpuBuffer* const parameters) const
+	ndBrainGpuBuffer* const weightsAndBias) const
 {
 	ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(owner,
-		info, size_t(this), context, context->m_ndBrainLayerLinear, miniBatchSize, uniformBuffer, inputOutputData, parameters);
+		info, size_t(this), context, context->m_ndBrainLayerLinear, miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias);
 	return command;
 }
 
@@ -448,12 +448,12 @@ ndBrainTrainerGpuCommand* ndBrainLayerLinear::CreateGpuBackPropagateCommand(
 	ndBrainGpuContext* const context, ndInt32 miniBatchSize,
 	const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
 	ndBrainGpuBuffer* const inputOutputData,
-	ndBrainGpuBuffer* const parameters,
+	ndBrainGpuBuffer* const weightsAndBias,
 	ndBrainGpuBuffer* const inputOutputGradients,
 	ndBrainGpuBuffer* const weightsAndBiasGradients) const
 {
 	ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(
 		owner, info, size_t(this), context, context->m_ndBrainLayerLinearBackPropagate,
-		miniBatchSize, uniformBuffer, inputOutputData, parameters, inputOutputGradients, weightsAndBiasGradients);
+		miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias, inputOutputGradients, weightsAndBiasGradients);
 	return command;
 }

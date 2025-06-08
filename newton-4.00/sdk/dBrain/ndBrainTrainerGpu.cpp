@@ -131,7 +131,7 @@ int xxxx = 0;
 		ndSharedPtr<ndBrainGpuCommand>command(commandBuffer);
 		m_backPropagateCommands.Append(command);
 
-		if (xxxx == 2)
+		if (xxxx == 3)
 		break;
 		xxxx++;
 	}

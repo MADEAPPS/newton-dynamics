@@ -185,10 +185,10 @@ ndBrainTrainerGpuCommand* ndBrainLayerActivationTanh::CreateGpuFeedForwardComman
 	ndBrainGpuContext* const context, ndInt32 miniBatchSize,
 	const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
 	ndBrainGpuBuffer* const inputOutputData,
-	ndBrainGpuBuffer* const parameters) const
+	ndBrainGpuBuffer* const weightsAndBias) const
 {
 	ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(owner,
-		info, size_t(this), context, context->m_ndBrainLayerTanhActivation, miniBatchSize, uniformBuffer, inputOutputData, parameters);
+		info, size_t(this), context, context->m_ndBrainLayerTanhActivation, miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias);
 	return command;
 }
 
@@ -198,13 +198,13 @@ ndBrainTrainerGpuCommand* ndBrainLayerActivationTanh::CreateGpuBackPropagateComm
 	ndBrainGpuContext* const context, ndInt32 miniBatchSize,
 	const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
 	ndBrainGpuBuffer* const inputOutputData,
-	ndBrainGpuBuffer* const parameters,
+	ndBrainGpuBuffer* const weightsAndBias,
 	ndBrainGpuBuffer* const inputOutputGradients,
 	ndBrainGpuBuffer* const weightsAndBiasGradients) const
 {
 	ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(
 		owner, info, size_t(this), context, context->m_ndBrainLayerTanhBackPropagate,
-		miniBatchSize, uniformBuffer, inputOutputData, parameters, inputOutputGradients, weightsAndBiasGradients);
+		miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias, inputOutputGradients, weightsAndBiasGradients);
 	return command;
 }
 

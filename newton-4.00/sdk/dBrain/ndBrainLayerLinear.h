@@ -90,7 +90,7 @@ class ndBrainLayerLinear : public ndBrainLayer
 		ndBrainGpuContext* const context, ndInt32 miniBatchSize,
 		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
 		ndBrainGpuBuffer* const inputOutputData,
-		ndBrainGpuBuffer* const parameters) const override;
+		ndBrainGpuBuffer* const weightsAndBias) const override;
 
 	virtual ndBrainTrainerGpuCommand* CreateGpuBackPropagateCommand(ndBrainTrainerGpuInference* const owner,
 		const ndBrainLayer::ndCommandShareInfo& info,

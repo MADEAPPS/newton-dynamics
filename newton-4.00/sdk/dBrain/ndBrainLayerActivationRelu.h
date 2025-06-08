@@ -47,13 +47,22 @@ class ndBrainLayerActivationRelu : public ndBrainLayerActivation
 	virtual void BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const override;
 
 	virtual bool HasGpuSupport() const override;
-	//virtual ndLayerUniformDataGpu GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const override;
 	virtual ndBrainTrainerGpuCommand* CreateGpuFeedForwardCommand(ndBrainTrainerGpuInference* const owner,
 		const ndBrainLayer::ndCommandShareInfo& info,
 		ndBrainGpuContext* const context, ndInt32 miniBatchSize,
 		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
-		ndBrainGpuBuffer* const buffer1,
-		ndBrainGpuBuffer* const buffer2) const override;
+		ndBrainGpuBuffer* const inputOutputData,
+		ndBrainGpuBuffer* const weightsAndBias) const override;
+
+	virtual ndBrainTrainerGpuCommand* CreateGpuBackPropagateCommand(ndBrainTrainerGpuInference* const owner,
+		const ndBrainLayer::ndCommandShareInfo& info,
+		ndBrainGpuContext* const context, ndInt32 miniBatchSize,
+		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
+		ndBrainGpuBuffer* const inputOutputData,
+		ndBrainGpuBuffer* const weightsAndBias,
+		ndBrainGpuBuffer* const inputOutputGradients,
+		ndBrainGpuBuffer* const weightsAndBiasGradients) const override;
+
 };
 
 #endif 
