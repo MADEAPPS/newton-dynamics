@@ -32,11 +32,12 @@ class ndBrainOptimizerAdamCpu : public ndBrainOptimizer
 	public: 
 	ndBrainOptimizerAdamCpu(const ndSharedPtr<ndBrainContext>& context);
 
-	virtual void Update(ndBrainVector& parameters, const ndBrainVector& gradients, ndBrainFloat learnRate) override;
+	void Init(ndInt32 parametersBufferSizeInFloats, ndBrainFloat learnRate);
+
+	// legacy style
+	virtual void Update(ndBrainVector& parameters, const ndBrainVector& gradients) override;
 
 	private:
-	void Init(ndInt32 size);
-
 	ndBrainVector m_vdw;
 	ndBrainVector m_vdw2;
 	ndBrainVector m_temp;

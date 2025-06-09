@@ -36,7 +36,7 @@ ndBrainOptimizerSgd::~ndBrainOptimizerSgd()
 
 //void ndBrainOptimizerSgd::Update(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients, ndBrainFloat learnRate)
 //void ndBrainOptimizerSgd::Update(ndBrainVector& parameters, const ndBrainVector& gradients, ndBrainFloat learnRate)
-void ndBrainOptimizerSgd::Update(ndBrainVector&, const ndBrainVector&, ndBrainFloat)
+void ndBrainOptimizerSgd::Update(ndBrainVector&, const ndBrainVector&)
 {
 	ndAssert(0);
 	//ndBrainTrainerCpuLegacy* const trainer = (ndBrainTrainerCpuLegacy*)partialGradients[0];

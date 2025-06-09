@@ -100,7 +100,7 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 	virtual void BackPropagate(const ndBrainVector& outputGradients, bool sync = true) override;
 
 	// new method
-	virtual void ApplyLearnRate(ndBrainFloat learnRate) override;
+	virtual void ApplyLearnRate() override;
 
 	// new method
 	virtual void UpdateParameters() override;

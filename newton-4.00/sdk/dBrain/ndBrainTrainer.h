@@ -61,7 +61,7 @@ class ndBrainTrainer: public ndClassAlloc
 	virtual void BackPropagate(const ndBrainVector& outputGradients, bool sync = true) = 0;
 
 	// new method
-	virtual void ApplyLearnRate(ndBrainFloat learnRate) = 0;
+	virtual void ApplyLearnRate() = 0;
 
 	protected:
 	ndSharedPtr<ndBrain> m_brain;

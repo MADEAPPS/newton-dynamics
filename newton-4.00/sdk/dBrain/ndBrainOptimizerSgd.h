@@ -31,7 +31,7 @@ class ndBrainOptimizerSgd : public ndBrainOptimizer
 	ndBrainOptimizerSgd();
 	virtual ~ndBrainOptimizerSgd();
 
-	virtual void Update(ndBrainVector& parameters, const ndBrainVector& gradients, ndBrainFloat learnRate) override;
+	virtual void Update(ndBrainVector& parameters, const ndBrainVector& gradients) override;
 };
 
 

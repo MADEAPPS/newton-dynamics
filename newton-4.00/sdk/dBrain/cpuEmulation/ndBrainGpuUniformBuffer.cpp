@@ -28,8 +28,15 @@ void ndBrainGpuUniformBuffer::UnloadData(size_t, void* const) const
 {
 }
 
-void ndBrainGpuUniformBuffer::LoadData(size_t, const void* const sourceData)
+void ndBrainGpuUniformBuffer::LoadData(size_t sizeIntBytes, const void* const sourceData)
 {
-	const UniformBufferObject* const src = (UniformBufferObject*)sourceData;
-	m_data = *src;
+	//const UniformBufferObject* const xxx = (UniformBufferObject*)sourceData;
+	m_data.SetCount(0);
+	const char* const src = (const char*) sourceData;
+	for (ndInt32 i = 0; i < ndInt32 (sizeIntBytes); ++i)
+	{
+		m_data.PushBack(src[i]);
+	}
+	//const UniformBufferObject* const xxx1 = (UniformBufferObject*)&m_data[0];
+	//const UniformBufferObject* const xxx0 = (UniformBufferObject*)sourceData;
 }

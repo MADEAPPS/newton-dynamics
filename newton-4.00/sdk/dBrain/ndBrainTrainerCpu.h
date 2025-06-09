@@ -47,11 +47,11 @@ class ndBrainLayerBackPropagateCpuCommand: public ndBrainTrainerCpuCommand
 class ndBrainTrainerCpu: public ndBrainTrainerCpuInference
 {
 	public: 
-	ndBrainTrainerCpu(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndInt32 minibatchSize);
+	ndBrainTrainerCpu(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndBrainFloat learnRate, ndInt32 minibatchSize);
 	ndBrainTrainerCpu(const ndBrainTrainerCpu& src);
 
 	virtual void UpdateParameters() override;
-	virtual void ApplyLearnRate(ndBrainFloat learnRate) override;
+	virtual void ApplyLearnRate() override;
 
 	virtual void GetInput(ndBrainVector& input) const override;
 	virtual void BackPropagate(const ndBrainVector& outputGradients, bool sync = true) override;
@@ -104,7 +104,6 @@ class ndBrainTrainerCpu: public ndBrainTrainerCpuInference
 	ndBrainVector m_weightAndBiasGradientsBuffer;
 	ndBrainVector m_miniBatchInputGradientBuffer;
 	ndBrainVector m_miniBatchOutputGradientBuffer;
-
 	ndList<ndSharedPtr<ndBrainTrainerCpuCommand>> m_backPropagateCommands;
 
 	friend class ndBrainLayerLinear;

@@ -633,7 +633,8 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnQvalueFunction(ndInt3
 			loss.GetLoss(output, gradient);
 		}
 		m_criticTrainer[criticIndex]->BackPropagate(m_criticOutputGradients[0]);
-		m_criticTrainer[criticIndex]->ApplyLearnRate(m_parameters.m_criticLearnRate);
+		ndAssert(0);
+		//m_criticTrainer[criticIndex]->ApplyLearnRate(m_parameters.m_criticLearnRate);
 	}
 }
 
@@ -808,7 +809,8 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnPolicyFunction()
 		}
 		m_policyGradientBatch.Scale(ndBrainFloat(-1.0f));
 		m_policyTrainer->BackPropagate(m_policyGradientBatch);
-		m_policyTrainer->ApplyLearnRate(m_parameters.m_policyLearnRate);
+		ndAssert(0);
+		//m_policyTrainer->ApplyLearnRate(m_parameters.m_policyLearnRate);
 	}
 }
 

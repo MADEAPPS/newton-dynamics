@@ -28,6 +28,7 @@
 ndBrainOptimizer::ndBrainOptimizer(const ndSharedPtr<ndBrainContext>& context)
 	:ndClassAlloc()
 	,m_context(context)
+	,m_learnRate(ndBrainFloat(1.0e-4f))
 	,m_weighDecayRegularizer(ndBrainFloat(0.0f))
 	,m_regularizerType(m_ridge)
 {
@@ -35,11 +36,6 @@ ndBrainOptimizer::ndBrainOptimizer(const ndSharedPtr<ndBrainContext>& context)
 
 ndBrainOptimizer::~ndBrainOptimizer()
 {
-}
-
-ndBrainFloat ndBrainOptimizer::GetRegularizer() const
-{
-	return m_weighDecayRegularizer;
 }
 
 ndBrainOptimizer::ndRegularizerType ndBrainOptimizer::GetRegularizerType() const
@@ -50,6 +46,11 @@ ndBrainOptimizer::ndRegularizerType ndBrainOptimizer::GetRegularizerType() const
 void ndBrainOptimizer::SetRegularizerType(ndRegularizerType type)
 {
 	m_regularizerType = type;
+}
+
+ndBrainFloat ndBrainOptimizer::GetRegularizer() const
+{
+	return m_weighDecayRegularizer;
 }
 
 void ndBrainOptimizer::SetRegularizer(ndBrainFloat regularizer)

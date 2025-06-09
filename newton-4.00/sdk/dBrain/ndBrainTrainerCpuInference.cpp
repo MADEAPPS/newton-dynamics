@@ -222,7 +222,7 @@ void ndBrainTrainerCpuInference::BackPropagate(const ndBrainVector&, bool)
 {
 }
 
-void ndBrainTrainerCpuInference::ApplyLearnRate(ndBrainFloat)
+void ndBrainTrainerCpuInference::ApplyLearnRate()
 {
 }
 

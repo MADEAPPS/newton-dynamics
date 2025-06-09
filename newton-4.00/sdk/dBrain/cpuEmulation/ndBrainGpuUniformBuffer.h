@@ -24,7 +24,7 @@ class ndBrainGpuUniformBuffer : public ndBrainGpuBuffer
 	virtual void LoadData(size_t sizeInBytes, const void* const inputData) override;
 	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const override;
 
-	UniformBufferObject m_data;
+	ndFixSizeArray<char, 256> m_data;
 };
 
 #endif

@@ -32,34 +32,25 @@ ndBrainOptimizerAdamGpu::ndBrainOptimizerAdamGpu(const ndSharedPtr<ndBrainContex
 	:ndBrainOptimizer(context)
 	,m_vdw()
 	,m_vdw2()
-	,m_temp()
-	,m_vdwCorrected()
-	,m_vdw2Corrected()
-	,m_beta(ndBrainFloat(0.999f))
-	,m_alpha(ndBrainFloat(0.9f))
-	,m_epsilon(1.0e-6f)
-	,m_betaAcc(m_beta)
-	,m_alphaAcc(m_alpha)
-	,m_miniBatchSize(256)
+	,m_parameters()
 {
 }
 
-void ndBrainOptimizerAdamGpu::Init(ndInt32 size)
+void ndBrainOptimizerAdamGpu::Init(ndInt32 parametersBufferSizeInFloats, ndBrainFloat learnRate)
 {
 	ndBrainVector buffer;
-	buffer.SetCount(size);
+	buffer.SetCount(parametersBufferSizeInFloats);
 	buffer.Set(ndReal(0.0f));
 
+	m_parameters.m_learnRate = learnRate;
+	m_parameters.m_decayRegularizer = GetRegularizer();
 	ndBrainGpuContext* const context = m_context->GetAsGpuContext();
 	m_vdw = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(context, buffer, ndCpuMappable));
 	m_vdw2 = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(context, buffer, ndCpuMappable));
-	m_temp = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(context, buffer, ndCpuMappable));
-	m_vdwCorrected = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(context, buffer, ndCpuMappable));
-	m_vdw2Corrected = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(context, buffer, ndCpuMappable));
 }
 
 //#pragma optimize( "", off )
-void ndBrainOptimizerAdamGpu::Update(ndBrainVector& parameters, const ndBrainVector& gradients, ndBrainFloat learnRate)
+void ndBrainOptimizerAdamGpu::Update(ndBrainVector&, const ndBrainVector&)
 {
 	ndAssert(0);
 	//ndAtomic<ndInt32> iterator(0);

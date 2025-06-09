@@ -32,20 +32,21 @@ class ndBrainOptimizerAdamGpu;
 class ndBrainTrainerGpu: public ndBrainTrainerGpuInference
 {
 	public: 
-	ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndInt32 minibatchSize);
+	ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndBrainFloat learnRate, ndInt32 minibatchSize);
 	ndBrainTrainerGpu(const ndBrainTrainerGpu& src);
 	virtual ~ndBrainTrainerGpu();
 
-	virtual void ApplyLearnRate(ndBrainFloat learnRate) override;
+	virtual void ApplyLearnRate() override;
 	virtual void BackPropagate(const ndBrainVector& outputGradients, bool sync = true) override;
 
 	protected:
 	void AddLayersGradientCommands();
 	void AddCopyInputGradientCommand();
 	void AddCopyOutputGradientCommand();
-	void AddOptimizerGradientCommand();
+	void AddOptimizerGradientCommand(ndBrainFloat learnRate);
 
 	ndSharedPtr<ndBrainOptimizerAdamGpu> m_optimizer;
+	ndSharedPtr<ndBrainGpuCommand> m_adamOtimizerUpdate;
 	ndSharedPtr<ndBrainGpuCommand> m_accumulateGradients;
 	ndSharedPtr<ndBrainGpuBuffer> m_inputOuputGradientsBuffer;
 	ndSharedPtr<ndBrainGpuBuffer> m_weightAndBiasGradientsBuffer;

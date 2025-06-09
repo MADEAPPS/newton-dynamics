@@ -30,31 +30,50 @@ class ndBrainThreadPool;
 class ndBrainOptimizerAdamGpu : public ndBrainOptimizer
 {
 	public: 
+	class ndCommandShareInfo
+	{
+		public:
+		ndCommandShareInfo()
+			:m_beta(ndBrainFloat(0.999f))
+			,m_alpha(ndBrainFloat(0.9f))
+			,m_epsilon(ndBrainFloat(1.0e-6f))
+			,m_betaAcc(m_beta)
+			,m_alphaAcc(m_alpha)
+			,m_learnRate(ndBrainFloat(1.0e-4f))
+			,m_invBeta(ndBrainFloat(1.0f)/ (ndBrainFloat(1.0f) - m_beta))
+			,m_invAlpha(ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) - m_alpha))
+			,m_decayRegularizer(ndBrainFloat(1.0e-4f))
+			,m_minibatchSize(0)
+		{
+		}
+
+		ndBrainFloat m_beta;
+		ndBrainFloat m_alpha;
+		ndBrainFloat m_epsilon;
+		ndBrainFloat m_betaAcc;
+		ndBrainFloat m_alphaAcc;
+		ndBrainFloat m_learnRate;
+		ndBrainFloat m_invBeta;
+		ndBrainFloat m_invAlpha;
+		ndBrainFloat m_decayRegularizer;
+		ndInt32 m_minibatchSize;
+	};
+
 	ndBrainOptimizerAdamGpu(const ndSharedPtr<ndBrainContext>& context);
 
-	virtual void Init(ndInt32 parametersBufferSizeInFloats) override;
-	virtual void Update(ndBrainVector& parameters, const ndBrainVector& gradients, ndBrainFloat learnRate) override;
+	// lageavy
+	virtual void Update(ndBrainVector& parameters, const ndBrainVector& gradients) override;
+
+	// new system
+	virtual void Init(ndInt32 parametersBufferSizeInFloats, ndBrainFloat m_learRate) override;
 
 	private:
-	//ndBrainVector m_vdw;
-	//ndBrainVector m_vdw2;
-	//ndBrainVector m_temp;
-	//ndBrainVector m_vdwCorrected;
-	//ndBrainVector m_vdw2Corrected;
 	ndSharedPtr<ndBrainGpuBuffer> m_vdw;
 	ndSharedPtr<ndBrainGpuBuffer> m_vdw2;
-	ndSharedPtr<ndBrainGpuBuffer> m_temp;
-	ndSharedPtr<ndBrainGpuBuffer> m_vdwCorrected;
-	ndSharedPtr<ndBrainGpuBuffer> m_vdw2Corrected;
-
-	ndBrainFloat m_beta;
-	ndBrainFloat m_alpha;
-	ndBrainFloat m_epsilon;
-	ndBrainFloat m_betaAcc;
-	ndBrainFloat m_alphaAcc;
-	ndInt32 m_miniBatchSize;
+	ndCommandShareInfo m_parameters;
 
 	friend class ndBrainTrainerCpu;
+	friend class ndBrainTrainerGpu;
 };
 
 #endif 

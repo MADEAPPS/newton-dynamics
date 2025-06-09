@@ -45,13 +45,15 @@ ndBrainOptimizerAdamCpu::ndBrainOptimizerAdamCpu(const ndSharedPtr<ndBrainContex
 {
 }
 
-void ndBrainOptimizerAdamCpu::Init(ndInt32 size)
+void ndBrainOptimizerAdamCpu::Init(ndInt32 parametersBufferSizeInFloats, ndBrainFloat learnRate)
 {
-	m_vdw.SetCount(size);
-	m_vdw2.SetCount(size);
-	m_temp.SetCount(size);
-	m_vdwCorrected.SetCount(size);
-	m_vdw2Corrected.SetCount(size);
+	m_learnRate = learnRate;
+
+	m_vdw.SetCount(parametersBufferSizeInFloats);
+	m_vdw2.SetCount(parametersBufferSizeInFloats);
+	m_temp.SetCount(parametersBufferSizeInFloats);
+	m_vdwCorrected.SetCount(parametersBufferSizeInFloats);
+	m_vdw2Corrected.SetCount(parametersBufferSizeInFloats);
 
 	m_vdw.Set(ndBrainFloat(0.0f));
 	m_vdw2.Set(ndBrainFloat(0.0f));
@@ -61,15 +63,13 @@ void ndBrainOptimizerAdamCpu::Init(ndInt32 size)
 }
 
 //#pragma optimize( "", off )
-void ndBrainOptimizerAdamCpu::Update(ndBrainVector& parameters, const ndBrainVector& gradients, ndBrainFloat learnRate)
+void ndBrainOptimizerAdamCpu::Update(ndBrainVector& parameters, const ndBrainVector& gradients)
 {
 	ndAtomic<ndInt32> iterator(0);
-	auto CalculateLayerGradients = ndMakeObject::ndFunction([this, learnRate, &gradients, &parameters, &iterator](ndInt32, ndInt32)
+	auto CalculateLayerGradients = ndMakeObject::ndFunction([this, &gradients, &parameters, &iterator](ndInt32, ndInt32)
 	{
-		ndBrainFloat descendRate = -learnRate;
+		ndBrainFloat descendRate = -m_learnRate;
 		ndBrainFloat regularizer = -GetRegularizer();
-		//ndBrainFloat den = ndBrainFloat(1.0f) / ndBrainFloat(partialGradients.GetCount());
-		//ndBrainFloat den = ndBrainFloat(1.0f);
 
 		const ndInt32 stride = 1024 * 4;
 		const ndInt32 size = ndInt32(gradients.GetCount());

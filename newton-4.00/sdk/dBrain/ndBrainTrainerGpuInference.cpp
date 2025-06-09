@@ -290,8 +290,7 @@ ndBrainTrainerGpuCommand* ndBrainTrainerGpuInference::FindCommand(size_t id) con
 	return nullptr;
 }
 
-//void ndBrainTrainerGpuInference::ApplyLearnRate(ndBrainFloat learnRate)
-void ndBrainTrainerGpuInference::ApplyLearnRate(ndBrainFloat)
+void ndBrainTrainerGpuInference::ApplyLearnRate()
 {
 	ndAssert(0);
 }

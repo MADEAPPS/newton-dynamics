@@ -32,6 +32,7 @@
 ndBrainTrainerCpu::ndBrainTrainerCpu(
 	const ndSharedPtr<ndBrain>& brain, 
 	const ndSharedPtr<ndBrainContext>& context,
+	ndBrainFloat learnRate,
 	ndInt32 minibatchSize)
 	:ndBrainTrainerCpuInference(brain, context, minibatchSize)
 	,m_optimizer(new ndBrainOptimizerAdamCpu(context))
@@ -41,7 +42,7 @@ ndBrainTrainerCpu::ndBrainTrainerCpu(
 	,m_miniBatchOutputGradientBuffer()
 	,m_backPropagateCommands()
 {
-	m_optimizer->Init(ndInt32(m_weightAndBiasBuffer.GetCount()));
+	m_optimizer->Init(ndInt32(m_weightAndBiasBuffer.GetCount()), learnRate);
 
 	m_miniBatchInputGradientBuffer.SetCount(m_miniBatchInputBuffer.GetCount());
 	m_miniBatchOutputGradientBuffer.SetCount(m_miniBatchOutputBuffer.GetCount());
@@ -59,9 +60,12 @@ ndBrainTrainerCpu::ndBrainTrainerCpu(
 
 ndBrainTrainerCpu::ndBrainTrainerCpu(const ndBrainTrainerCpu& src)
 	:ndBrainTrainerCpuInference(src)
+	,m_optimizer(src.m_optimizer)
 	,m_inputOuputGradientsBuffer()
 	,m_weightAndBiasGradientsBuffer()
-	,m_optimizer(src.m_optimizer)
+	,m_miniBatchInputGradientBuffer()
+	,m_miniBatchOutputGradientBuffer()
+	,m_backPropagateCommands()
 {
 	ndAssert(0);
 }
@@ -141,7 +145,7 @@ void ndBrainTrainerCpu::AddLayersGradientCommands()
 	}
 }
 
-void ndBrainTrainerCpu::ApplyLearnRate(ndBrainFloat learnRate)
+void ndBrainTrainerCpu::ApplyLearnRate()
 {
 	ndAtomic<ndInt32> iterator(0);
 	auto AddGradients = ndMakeObject::ndFunction([this, &iterator](ndInt32, ndInt32)
@@ -170,7 +174,7 @@ void ndBrainTrainerCpu::ApplyLearnRate(ndBrainFloat learnRate)
 	m_threadPool->ndBrainThreadPool::ParallelExecute(AddGradients);
 
 	const ndBrainMemVector gradients(&m_weightAndBiasGradientsBuffer[0], m_weightAndBiasBuffer.GetCount());
-	m_optimizer->Update(m_weightAndBiasBuffer, gradients, learnRate);
+	m_optimizer->Update(m_weightAndBiasBuffer, gradients);
 }
 
 void ndBrainTrainerCpu::BackPropagate(const ndBrainVector& outputGradients, bool)

@@ -164,7 +164,7 @@ static void MnistTrainingSet()
 			if (m_hasGpuSupport)
 			{
 				m_context = ndSharedPtr<ndBrainContext>(new ndBrainGpuContext);
-				m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainerGpu(m_brain, m_context, m_miniBatchSize));
+				m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainerGpu(m_brain, m_context, m_learnRate, m_miniBatchSize));
 			}
 			else
 			{
@@ -173,7 +173,7 @@ static void MnistTrainingSet()
 
 				m_context = ndSharedPtr<ndBrainContext>(new ndBrainCpuContext);
 				m_context->GetAsCpuContext()->SetThreadCount(threadCount);
-				m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainerCpu(m_brain, m_context, m_miniBatchSize));
+				m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainerCpu(m_brain, m_context, m_learnRate, m_miniBatchSize));
 			}
 		}
 
@@ -302,7 +302,7 @@ static void MnistTrainingSet()
 					}
 					// backpropagate loss.
 					trainer->BackPropagate(miniBatchOutputGradients);
-					trainer->ApplyLearnRate(m_learnRate);
+					trainer->ApplyLearnRate();
 
 					#if 0
 						//ndBrainVector internalBuffers;
