@@ -37,9 +37,10 @@ class ndBrainGpuBuffer : public ndClassAlloc
 
 	public:
 	virtual ~ndBrainGpuBuffer();
-	void* GetBuffer() const { return nullptr;}
+	
 	size_t SizeInBytes() const { return m_sizeInBytes; }
 
+	virtual void* GetBuffer() = 0;
 	virtual void LoadData(size_t sizeInBytes, const void* const inputData) = 0;
 	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const = 0;
 

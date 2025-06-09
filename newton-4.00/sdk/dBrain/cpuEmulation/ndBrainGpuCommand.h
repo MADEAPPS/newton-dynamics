@@ -12,8 +12,10 @@
 #define __ND_BRAIN_GPU_COMMAND_H__
 
 #include "ndBrainStdafx.h"
+#include "ndBrainLayer.h"
 #include "ndBrainGpuContext.h"
 
+//class ndBrainLayer;
 class ndBrainGpuBuffer;
 class ndBrainGpuFloatBuffer;
 class ndBrainGpuUniformBuffer;
@@ -21,19 +23,22 @@ class ndBrainGpuUniformBuffer;
 class ndBrainGpuCommand : public ndClassAlloc
 {
 	public:
-	ndBrainGpuCommand(ndBrainGpuContext* const context);
+	ndBrainGpuCommand(ndBrainGpuContext* const context, const ndBrainLayer::ndCommandShareInfo& info);
 	virtual ~ndBrainGpuCommand();
 	void Assembly(const ndSharedPtr<ndBrainGpuShader>& shader, ndInt32 workGroupSize, ndInt32 buffersCount, ndBrainGpuBuffer** buffer);
 
 	protected:
 	ndBrainGpuContext* m_context;
 	ndSharedPtr<ndBrainGpuShader> m_shader;
+	ndBrainLayer::ndCommandShareInfo m_info;
+	ndBrainLayer* m_layer;
 	ndFixSizeArray<ndBrainGpuBuffer*, 8> m_parameters;
 	size_t m_workGroupSize;
 	size_t m_miniBatchSize;
 
 	friend class ndBrainGpuContext;
 	friend class ndBrainTrainerGpu;
+	friend class ndBrainTrainerGpuInference;
 };
 
 #endif

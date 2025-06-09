@@ -31,7 +31,7 @@
 class ndBrainLayerBackPropagateCpuCommand: public ndBrainTrainerCpuCommand
 {
 	public:
-	ndBrainLayerBackPropagateCpuCommand(const ndBrainLayer* const layer)
+	ndBrainLayerBackPropagateCpuCommand(ndBrainLayer* const layer)
 		:ndBrainTrainerCpuCommand(layer->GetCommandSharedInfo(), size_t(layer))
 		,m_layer(layer)
 	{

@@ -24,12 +24,21 @@ ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainGpuContext* const contex
 	LoadData(input);
 }
 
+void* ndBrainGpuIntegerBuffer::GetBuffer()
+{
+	ndAssert(0);
+	return nullptr;
+	//return &input[0];
+}
+
 void ndBrainGpuIntegerBuffer::LoadData(const ndArray<ndInt32>& input)
 {
+	ndAssert(0);
 	input.GetCount();
 }
 
 void ndBrainGpuIntegerBuffer::UnloadData(ndArray<ndInt32>& output)
 {
+	ndAssert(0);
 	output.GetCount();
 }

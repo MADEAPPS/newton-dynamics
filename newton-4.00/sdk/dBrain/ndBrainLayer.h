@@ -57,7 +57,7 @@ class ndBrainLayer : public ndClassAlloc
 		{
 		}
 
-		ndCommandShareInfo(const ndBrainLayer* const layer)
+		ndCommandShareInfo(ndBrainLayer* const layer)
 			:m_inputSize(0)
 			,m_outputSize(0)
 			,m_parametersBatchSize(0)
@@ -74,7 +74,7 @@ class ndBrainLayer : public ndClassAlloc
 		ndInt32 m_parametersStartOffset;
 		ndInt32 m_inputOutputSize;
 		ndInt32 m_inputOutputStartOffset;
-		const ndBrainLayer* m_layer;
+		ndBrainLayer* m_layer;
 	};
 
 	ndBrainLayer();
@@ -117,10 +117,10 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void Save(const ndBrainSave* const loadSave) const;
 	virtual void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
 
-	virtual ndCommandShareInfo GetCommandSharedInfo() const;
+	virtual ndCommandShareInfo GetCommandSharedInfo();
+	virtual ndBrainLayerFeedForwardCpuCommand* GetLayerCpuFeedForwardCommand();
+	virtual ndBrainLayerBackPropagateCpuCommand* GetLayerCpuBackPropagateCommand();
 
-	virtual ndBrainLayerFeedForwardCpuCommand* GetLayerCpuFeedForwardCommand() const;
-	virtual ndBrainLayerBackPropagateCpuCommand* GetLayerCpuBackPropagateCommand() const;
 	virtual void FeedForward(const ndBrainLayerFeedForwardCpuCommand* const info, ndInt32 miniBatchIndex) const;
 	virtual void BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const;
 

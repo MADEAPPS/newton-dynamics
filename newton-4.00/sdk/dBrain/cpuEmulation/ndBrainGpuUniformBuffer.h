@@ -21,6 +21,7 @@ class ndBrainGpuUniformBuffer : public ndBrainGpuBuffer
 	ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes);
 	ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes, const void* const data);
 
+	void* GetBuffer();
 	virtual void LoadData(size_t sizeInBytes, const void* const inputData) override;
 	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const override;
 

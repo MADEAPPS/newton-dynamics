@@ -44,10 +44,10 @@ class ndBrainLayerLinearWithDropOut : public ndBrainLayerActivation
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const override;
 	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const override;
 
-	virtual ndCommandShareInfo GetCommandSharedInfo() const override;
+	virtual ndCommandShareInfo GetCommandSharedInfo() override;
+	virtual ndBrainLayerFeedForwardCpuCommand* GetLayerCpuFeedForwardCommand() override;
+	virtual ndBrainLayerBackPropagateCpuCommand* GetLayerCpuBackPropagateCommand() override;
 
-	virtual ndBrainLayerFeedForwardCpuCommand* GetLayerCpuFeedForwardCommand() const override;
-	virtual ndBrainLayerBackPropagateCpuCommand* GetLayerCpuBackPropagateCommand() const override;
 	virtual void FeedForward(const ndBrainLayerFeedForwardCpuCommand* const info, ndInt32 miniBatchIndex) const override;
 	virtual void BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const override;
 

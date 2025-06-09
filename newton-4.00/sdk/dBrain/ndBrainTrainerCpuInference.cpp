@@ -74,9 +74,10 @@ void ndBrainTrainerCpuInference::InitWeightAndBiasBuffer()
 	ndFixSizeArray<ndBrainTrainerCpuCommand*, 256> feedForwardCommands;
 	for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
 	{
-		const ndBrainLayer* const layer = brain[i];
+		ndBrainLayer* const layer = brain[i];
 		ndBrainLayerFeedForwardCpuCommand* const command = layer->GetLayerCpuFeedForwardCommand();
 		command->m_owner = this;
+		command->m_info.m_layer = layer;
 		feedForwardCommands.PushBack(command);
 	}
 	

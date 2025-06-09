@@ -19,7 +19,8 @@
 #define MNIST_CONVOLUTIONAL_FEATURE_MAPS		32
 //#define MIN_TRAIN_SCORE						0.9999f
 
-#define MINIST_NUMBER_OF_EPOCKS					70
+//#define MINIST_NUMBER_OF_EPOCKS					70
+#define MINIST_NUMBER_OF_EPOCKS					10
 
 #ifdef MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
 	#if 1
@@ -169,8 +170,6 @@ static void MnistTrainingSet()
 			else
 			{
 				ndInt32 threadCount = ndMin (ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize), 8);
-				//threadCount = 1;
-
 				m_context = ndSharedPtr<ndBrainContext>(new ndBrainCpuContext);
 				m_context->GetAsCpuContext()->SetThreadCount(threadCount);
 				m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainerCpu(m_brain, m_context, m_learnRate, m_miniBatchSize));
@@ -271,7 +270,6 @@ static void MnistTrainingSet()
 
 			ndBrainLossCategoricalCrossEntropy loss(outputSize);
 
-			//batchesSize = m_miniBatchSize * 2;
 			for (ndInt32 epoch = 0; epoch < MINIST_NUMBER_OF_EPOCKS; ++epoch)
 			{
 				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
@@ -314,8 +312,9 @@ static void MnistTrainingSet()
 						ndBrainFixSizeVector<1024> xxx1;
 						xxx1.SetCount(outputSize);
 
+						trainer->MakePrediction(miniBatchInput);
 						trainer->GetOutput(miniBatchOutput);
-						//trainer->UpdateParameters();
+						trainer->UpdateParameters();
 						const ndBrain* const brain = *trainer->GetBrain();
 						for (ndInt32 i = 0; i < m_miniBatchSize; i++)
 						{
@@ -335,10 +334,11 @@ static void MnistTrainingSet()
 #if 0
 				ndExpandTraceMessage("epoc: %d\n", epoch);
 #else
-				trainer->UpdateParameters();
+				
 				ndInt64 testFailCount = ValidateData(testLabels, testDigits) + 1;
 				if (testFailCount < m_minValidationFail)
 				{
+					trainer->UpdateParameters();
 					m_bestBrain->CopyFrom(**trainer->GetBrain());
 					m_minValidationFail = testFailCount + 1;
 					ndInt64 trainigFailCount = ValidateData(trainingLabels, trainingDigits) + 1;

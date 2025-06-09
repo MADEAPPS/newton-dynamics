@@ -76,23 +76,17 @@ void ndBrainLayer::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* cons
 	ndAssert(0);
 }
 
-ndBrainLayerFeedForwardCpuCommand* ndBrainLayer::GetLayerCpuFeedForwardCommand() const
+ndBrainLayerFeedForwardCpuCommand* ndBrainLayer::GetLayerCpuFeedForwardCommand()
 {
 	ndAssert(0);
 	return nullptr;
 }
 
-ndBrainLayerBackPropagateCpuCommand* ndBrainLayer::GetLayerCpuBackPropagateCommand() const
+ndBrainLayerBackPropagateCpuCommand* ndBrainLayer::GetLayerCpuBackPropagateCommand()
 {
 	ndAssert(0);
 	return nullptr;
 }
-
-//ndLayerUniformDataGpu ndBrainLayer::GetLayerUniformDataGpu(const ndBrainGpuContext* const) const
-//{
-//	ndAssert(0);
-//	return ndLayerUniformDataGpu();
-//}
 
 const char* ndBrainLayer::GetLabelId() const
 {
@@ -207,7 +201,7 @@ void ndBrainLayer::CalculateParamGradients(const ndBrainVector&, const ndBrainVe
 	ndAssert(0);
 }
 
-ndBrainLayer::ndCommandShareInfo ndBrainLayer::GetCommandSharedInfo() const
+ndBrainLayer::ndCommandShareInfo ndBrainLayer::GetCommandSharedInfo()
 {
 	ndAssert(0);
 	return ndCommandShareInfo(this);

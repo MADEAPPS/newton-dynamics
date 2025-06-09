@@ -343,7 +343,7 @@ void ndBrainLayerLinear::SetWeights(const ndBrainVector& input)
 	m_bias.Set(bias);
 }
 
-ndBrainLayerLinear::ndCommandShareInfo ndBrainLayerLinear::GetCommandSharedInfo() const
+ndBrainLayerLinear::ndCommandShareInfo ndBrainLayerLinear::GetCommandSharedInfo()
 {
 	ndCommandShareInfo info(this);
 	info.m_inputSize = GetInputSize();
@@ -352,13 +352,13 @@ ndBrainLayerLinear::ndCommandShareInfo ndBrainLayerLinear::GetCommandSharedInfo(
 	return info;
 }
 
-ndBrainLayerFeedForwardCpuCommand* ndBrainLayerLinear::GetLayerCpuFeedForwardCommand() const
+ndBrainLayerFeedForwardCpuCommand* ndBrainLayerLinear::GetLayerCpuFeedForwardCommand()
 {
 	ndBrainLayerFeedForwardCpuCommand* const command = new ndBrainLayerFeedForwardCpuCommand(this);
 	return command;
 }
 
-ndBrainLayerBackPropagateCpuCommand* ndBrainLayerLinear::GetLayerCpuBackPropagateCommand() const
+ndBrainLayerBackPropagateCpuCommand* ndBrainLayerLinear::GetLayerCpuBackPropagateCommand()
 {
 	ndBrainLayerBackPropagateCpuCommand* const command = new ndBrainLayerBackPropagateCpuCommand(this);
 	return command;

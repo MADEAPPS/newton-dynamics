@@ -78,17 +78,16 @@ void ndBrainTrainerCpu::GetInput(ndBrainVector& input) const
 
 void ndBrainTrainerCpu::UpdateParameters()
 {
-	ndBrain& brain = **m_brain;
-	for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
+	for (ndList<ndSharedPtr<ndBrainTrainerCpuCommand>>::ndNode* node = m_feedForwardCommands.GetFirst(); node; node = node->GetNext())
 	{
-		ndAssert(0);
-		//ndBrainLayer* const layer = brain[i];
-		//ndAssert(FindCommand(size_t(layer)));
-		//const ndBrainLayer::ndBrainLayerFeedForwardCpuCommand* const command = (ndBrainLayer::ndBrainLayerFeedForwardCpuCommand*)FindCommand(size_t(layer));
-		//
-		//ndInt32 size = command->m_inputSize * command->m_outputSize + command->m_outputSize;
-		//const ndBrainMemVector weights(&m_weightAndBiasBuffer[command->m_parametersStartOffset], size);
-		//layer->SetWeights(weights);
+		ndBrainTrainerCpuCommand* const command = *node->GetInfo();
+		ndBrainLayer* const layer = command->m_info.m_layer;
+		if (layer)
+		{
+			ndInt32 size = command->m_info.m_inputSize * command->m_info.m_outputSize + command->m_info.m_outputSize;
+			const ndBrainMemVector weights(&m_weightAndBiasBuffer[command->m_info.m_parametersStartOffset], size);
+			layer->SetWeights(weights);
+		}
 	}
 }
 
@@ -126,16 +125,17 @@ void ndBrainTrainerCpu::AddLayersGradientCommands()
 	
 	for (ndInt32 i = ndInt32(brain.GetCount()) - 1; i >= 0; --i)
 	{
-		const ndBrainLayer* const layer = brain[i];
+		ndBrainLayer* const layer = brain[i];
 		ndAssert(FindCommand(size_t(layer)));
 		const ndBrainTrainerCpuCommand* const feedForwardCommand = FindCommand(size_t(layer));
 		ndAssert(feedForwardCommand);
 	
 		ndBrainLayerBackPropagateCpuCommand* const command = layer->GetLayerCpuBackPropagateCommand();
-		command->m_owner = this;
-	
 		ndAssert(command->m_info.m_inputSize == feedForwardCommand->m_info.m_inputSize);
 		ndAssert(command->m_info.m_outputSize == feedForwardCommand->m_info.m_outputSize);
+
+		command->m_owner = this;
+		command->m_info.m_layer = layer;
 		command->m_info.m_parametersBatchSize = feedForwardCommand->m_info.m_parametersBatchSize;
 		command->m_info.m_parametersStartOffset = feedForwardCommand->m_info.m_parametersStartOffset;
 		command->m_info.m_inputOutputSize = feedForwardCommand->m_info.m_inputOutputSize;

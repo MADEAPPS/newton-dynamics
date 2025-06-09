@@ -17,8 +17,11 @@
 #include "ndBrainGpuIntegerBuffer.h"
 #include "ndBrainGpuUniformBuffer.h"
 
-ndBrainGpuCommand::ndBrainGpuCommand(ndBrainGpuContext* const context)
+ndBrainGpuCommand::ndBrainGpuCommand(ndBrainGpuContext* const context, const ndBrainLayer::ndCommandShareInfo& info)
 	:m_context(context)
+	,m_shader()
+	,m_info(info)
+	,m_layer(nullptr)
 	,m_workGroupSize(0)
 	,m_miniBatchSize(0)
 {

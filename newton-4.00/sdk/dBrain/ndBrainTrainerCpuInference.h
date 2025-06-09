@@ -56,7 +56,7 @@ class ndBrainTrainerCpuCommand: public ndContainersFreeListAlloc<ndBrainTrainerC
 class ndBrainLayerFeedForwardCpuCommand : public ndBrainTrainerCpuCommand
 {
 	public:
-	ndBrainLayerFeedForwardCpuCommand(const ndBrainLayer* const layer)
+	ndBrainLayerFeedForwardCpuCommand(ndBrainLayer* const layer)
 		:ndBrainTrainerCpuCommand(layer->GetCommandSharedInfo(), size_t(layer))
 		,m_layer(layer)
 	{

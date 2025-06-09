@@ -43,7 +43,7 @@ class ndBrainAdamUpdateCommand : public ndBrainGpuCommand
 		ndInt32 miniBatchSize,
 		ndBrainOptimizerAdamGpu::ndCommandShareInfo& info,
 		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer)
-		:ndBrainGpuCommand(context)
+		:ndBrainGpuCommand(context, ndBrainLayer::ndCommandShareInfo())
 		,m_shader(shader)
 		,m_uniformBuffer(uniformBuffer)
 		,m_info(info)
@@ -65,7 +65,7 @@ class ndBrainAdamUpdateCommand : public ndBrainGpuCommand
 		ndSharedPtr<ndBrainGpuBuffer>& weightAndBiasGradientBuffer,
 		ndSharedPtr<ndBrainGpuBuffer>& vdw,
 		ndSharedPtr<ndBrainGpuBuffer>& vdw2)
-		:ndBrainGpuCommand(context)
+		:ndBrainGpuCommand(context, ndBrainLayer::ndCommandShareInfo())
 		,m_shader(shader)
 		,m_uniformBuffer(uniformBuffer)
 		,m_info(info)
@@ -226,7 +226,7 @@ void ndBrainTrainerGpu::AddLayersGradientCommands()
 
 	for (ndInt32 i = ndInt32(brain.GetCount()) - 1; i >= 0; --i)
 	{
-		const ndBrainLayer* const layer = brain[i];
+		ndBrainLayer* const layer = brain[i];
 		ndBrainTrainerGpuCommand* const feedForwardLayerCommand = FindCommand(size_t(layer));
 		ndAssert(feedForwardLayerCommand);
 
@@ -245,6 +245,7 @@ void ndBrainTrainerGpu::AddLayersGradientCommands()
 			uniformBuffer, inputOutputBuffer, weightsAndBiasBuffer, inputOutputGradientBuffer, weightAndBiasGradientsBuffer);
 
 		ndSharedPtr<ndBrainGpuCommand>command(commandBuffer);
+		command->m_layer = layer;
 		m_backPropagateCommands.Append(command);
 	}
 }

@@ -108,7 +108,7 @@ bool ndBrainLayerActivationRelu::HasGpuSupport() const
 	return true;
 }
 
-ndBrainLayer::ndCommandShareInfo ndBrainLayerActivationRelu::GetCommandSharedInfo() const
+ndBrainLayer::ndCommandShareInfo ndBrainLayerActivationRelu::GetCommandSharedInfo()
 {
 	ndCommandShareInfo info(this);
 	info.m_inputSize = GetInputSize();
@@ -116,13 +116,13 @@ ndBrainLayer::ndCommandShareInfo ndBrainLayerActivationRelu::GetCommandSharedInf
 	return info;
 }
 
-ndBrainLayerFeedForwardCpuCommand* ndBrainLayerActivationRelu::GetLayerCpuFeedForwardCommand() const
+ndBrainLayerFeedForwardCpuCommand* ndBrainLayerActivationRelu::GetLayerCpuFeedForwardCommand()
 {
 	ndBrainLayerFeedForwardCpuCommand* const command = new ndBrainLayerFeedForwardCpuCommand(this);
 	return command;
 }
 
-ndBrainLayerBackPropagateCpuCommand* ndBrainLayerActivationRelu::GetLayerCpuBackPropagateCommand() const
+ndBrainLayerBackPropagateCpuCommand* ndBrainLayerActivationRelu::GetLayerCpuBackPropagateCommand()
 {
 	ndBrainLayerBackPropagateCpuCommand* const command = new ndBrainLayerBackPropagateCpuCommand(this);
 	return command;
