@@ -977,6 +977,51 @@ class brainAccumulateGradients : public ndBrainGpuShader
     }
 };
 
+
+class brainAdamUpdate : public ndBrainGpuShader
+{
+    public:
+    brainAdamUpdate(ndBrainGpuContext* const context)
+        :ndBrainGpuShader(context)
+    {
+    }
+
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    {
+        ndAssert(0);
+        //ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
+        //ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        //
+        //UniformBufferObject* const parameters = &buffer0->m_data;
+        //ndBrainFloat* const gradientBuffer = &buffer1->m_buffer[0];
+        //
+        //ndInt32 inputSize = ndInt32(parameters->m_inputSize);
+        //ndInt32 miniBatchSize = ndInt32(parameters->m_inputOutputSize);
+        //
+        //ndInt32 start = groupId * workGroupSize;
+        //ndBrainFloat weightFactor = ndBrainFloat(1.0f) / ndBrainFloat(miniBatchSize);
+        //
+        //ndBrainFloat accRegister[ND_GPU_LOCAL_BUFFER_SIZE];
+        //for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+        //{
+        //    accRegister[itemId] = ndBrainFloat(0.0f);
+        //}
+        //for (ndInt32 j = 0; j < miniBatchSize; ++j)
+        //{
+        //    ndInt32 base = start + j * inputSize;
+        //    for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+        //    {
+        //        ndBrainFloat a = gradientBuffer[base + itemId];
+        //        accRegister[itemId] += a;
+        //    }
+        //}
+        //for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+        //{
+        //    ndBrainFloat sum = accRegister[itemId];
+        //    gradientBuffer[start + itemId] = sum * weightFactor;
+        //}
+    }
+};
 void ndBrainGpuContext::CreateKerners()
 {   
     // create all feed foward shaders
@@ -998,5 +1043,6 @@ void ndBrainGpuContext::CreateKerners()
     m_ndBrainLayerCathegoricalSoftmaxBackPropagate = ndSharedPtr<ndBrainGpuShader>(new brainLayerBrainCathegoricalSoftmaxBackPropagate(this));
 
     // optimizer shaders
+    m_ndBrainAdamOptimizerUpdate = ndSharedPtr<ndBrainGpuShader>(new brainAdamUpdate(this));
     m_ndBrainAccumulateGradients = ndSharedPtr<ndBrainGpuShader>(new brainAccumulateGradients(this));
 }

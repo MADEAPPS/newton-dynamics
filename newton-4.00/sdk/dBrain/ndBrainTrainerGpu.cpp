@@ -135,6 +135,10 @@ void ndBrainTrainerGpu::AddOptimizerGradientCommand()
 	ndBrainGpuBuffer* const weightAndBiasGradientsBuffer = *m_weightAndBiasGradientsBuffer;
 	m_accumulateGradients = ndSharedPtr<ndBrainGpuCommand>(new ndBrainTrainerGpuCommand(this, data, 0, m_context, m_context->m_ndBrainAccumulateGradients, m_miniBatchSize, uniformbuffer, weightAndBiasGradientsBuffer, nullptr, nullptr));
 	m_accumulateGradients->m_miniBatchSize = size_t(sizeInFloats / ND_KERNELS_WORKGROUP_SIZE);
+
+	// add the adam iptimizer kernel here
+	ndAssert(0);
+
 }
 
 void ndBrainTrainerGpu::AddLayersGradientCommands()

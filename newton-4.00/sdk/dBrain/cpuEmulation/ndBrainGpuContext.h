@@ -90,6 +90,7 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerCathegoricalSoftmaxBackPropagate;
 
 	// optimizer shaders
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainAdamOptimizerUpdate;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainAccumulateGradients;
 };
 #endif

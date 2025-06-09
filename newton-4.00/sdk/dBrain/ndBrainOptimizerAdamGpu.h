@@ -52,7 +52,6 @@ class ndBrainOptimizerAdamGpu : public ndBrainOptimizer
 	ndBrainFloat m_epsilon;
 	ndBrainFloat m_betaAcc;
 	ndBrainFloat m_alphaAcc;
-	ndBrainThreadPool* m_threadPool;
 	ndInt32 m_miniBatchSize;
 
 	friend class ndBrainTrainerCpu;

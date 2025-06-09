@@ -40,7 +40,6 @@ ndBrainOptimizerAdamGpu::ndBrainOptimizerAdamGpu(const ndSharedPtr<ndBrainContex
 	,m_epsilon(1.0e-6f)
 	,m_betaAcc(m_beta)
 	,m_alphaAcc(m_alpha)
-	,m_threadPool(context->GetAsCpuContext())
 	,m_miniBatchSize(256)
 {
 }
