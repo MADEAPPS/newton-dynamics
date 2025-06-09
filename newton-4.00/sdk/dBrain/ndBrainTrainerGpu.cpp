@@ -42,6 +42,24 @@ class ndBrainAdamUpdateCommand : public ndBrainGpuCommand
 		const ndSharedPtr<ndBrainGpuShader>& shader,
 		ndInt32 miniBatchSize,
 		ndBrainOptimizerAdamGpu::ndCommandShareInfo& info,
+		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer)
+		:ndBrainGpuCommand(context)
+		,m_shader(shader)
+		,m_uniformBuffer(uniformBuffer)
+		,m_info(info)
+		,m_owner(owner)
+		,m_miniBatchSize(miniBatchSize)
+	{
+		ndFixSizeArray<ndBrainGpuBuffer*, 8> params;
+		params.PushBack(*m_uniformBuffer);
+		Assembly(shader, m_miniBatchSize, params.GetCount(), &params[0]);
+	}
+
+	ndBrainAdamUpdateCommand(ndBrainTrainerGpuInference* const owner,
+		ndBrainGpuContext* const context,
+		const ndSharedPtr<ndBrainGpuShader>& shader,
+		ndInt32 miniBatchSize,
+		ndBrainOptimizerAdamGpu::ndCommandShareInfo& info,
 		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
 		ndSharedPtr<ndBrainGpuBuffer>& weightAndBiasBuffer,
 		ndSharedPtr<ndBrainGpuBuffer>& weightAndBiasGradientBuffer,
@@ -179,11 +197,27 @@ void ndBrainTrainerGpu::AddOptimizerGradientCommand(ndBrainFloat learnRate)
 	ndSharedPtr<ndBrainGpuBuffer> adamUniformbuffer(new ndBrainGpuUniformBuffer(m_context, sizeof(ndBrainOptimizerAdamGpu::ndCommandShareInfo)));
 	adamUniformbuffer->LoadData(sizeof(ndBrainOptimizerAdamGpu::ndCommandShareInfo), &optimizerData);
 
-	m_adamOtimizerUpdate = ndSharedPtr<ndBrainGpuCommand>(new ndBrainAdamUpdateCommand(
-		this, m_context, m_context->m_ndBrainAdamOptimizerUpdate, m_miniBatchSize, optimizerData, 
-		adamUniformbuffer, m_weightAndBiasBuffer, m_weightAndBiasGradientsBuffer,
-		m_optimizer->m_vdw, m_optimizer->m_vdw2));
-	m_adamOtimizerUpdate->m_miniBatchSize = size_t(sizeInFloats / ND_KERNELS_WORKGROUP_SIZE);
+	if (m_optimizer->GetRegularizerType() == ndBrainOptimizer::m_lasso)
+	{
+		m_adamOtimizerUpdate = ndSharedPtr<ndBrainGpuCommand>(new ndBrainAdamUpdateCommand(
+			this, m_context, m_context->m_ndBrainAdamLassoOptimizerUpdate, m_miniBatchSize, optimizerData,
+			adamUniformbuffer, m_weightAndBiasBuffer, m_weightAndBiasGradientsBuffer,
+			m_optimizer->m_vdw, m_optimizer->m_vdw2));
+		m_adamOtimizerUpdate->m_miniBatchSize = size_t(sizeInFloats / ND_KERNELS_WORKGROUP_SIZE);
+	}
+	else
+	{
+		m_adamOtimizerUpdate = ndSharedPtr<ndBrainGpuCommand>(new ndBrainAdamUpdateCommand(
+			this, m_context, m_context->m_ndBrainAdamRidgeOptimizerUpdate, m_miniBatchSize, optimizerData,
+			adamUniformbuffer, m_weightAndBiasBuffer, m_weightAndBiasGradientsBuffer,
+			m_optimizer->m_vdw, m_optimizer->m_vdw2));
+		m_adamOtimizerUpdate->m_miniBatchSize = size_t(sizeInFloats / ND_KERNELS_WORKGROUP_SIZE);
+	}
+
+	// add the momentum update command
+	m_adamMomentumUpdate = ndSharedPtr<ndBrainGpuCommand>(new ndBrainAdamUpdateCommand(
+		this, m_context, m_context->m_ndBrainAdamMomentumUpdate, 1, optimizerData, adamUniformbuffer));
+	m_adamMomentumUpdate->m_miniBatchSize = 1;
 }
 
 void ndBrainTrainerGpu::AddLayersGradientCommands()
@@ -219,6 +253,7 @@ void ndBrainTrainerGpu::ApplyLearnRate()
 {
 	m_context->AddCommandQueue(m_accumulateGradients);
 	m_context->AddCommandQueue(m_adamOtimizerUpdate);
+	m_context->AddCommandQueue(m_adamMomentumUpdate);
 }
 
 void ndBrainTrainerGpu::BackPropagate(const ndBrainVector& outputGradients, bool sync)

@@ -140,8 +140,8 @@ void ndBrainOptimizerAdamCpu::Update(ndBrainVector& parameters, const ndBrainVec
 					ndBrainFloat negativeRegularizer = -regularizer;
 					for (ndInt32 j = ndInt32(grad.GetCount()) - 1; j >= 0; --j)
 					{
-						ndBrainFloat b = grad[j];
-						grad[j] += (b > ndFloat32(0.0f)) ? regularizer : negativeRegularizer;
+						ndBrainFloat lasso = weights[j];
+						grad[j] += (lasso > ndFloat32(0.0f)) ? regularizer : negativeRegularizer;
 					}
 					break;
 				}

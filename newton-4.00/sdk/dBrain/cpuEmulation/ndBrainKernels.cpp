@@ -980,6 +980,62 @@ class brainAccumulateGradients : public ndBrainGpuShader
     }
 };
 
+
+class brainAdamUpdateLassoRegularizer : public ndBrainGpuShader
+{
+    public:
+    brainAdamUpdateLassoRegularizer(ndBrainGpuContext* const context)
+        :ndBrainGpuShader(context)
+    {
+    }
+
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    {
+        ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
+        ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)m_parameters[2];
+        ndBrainGpuFloatBuffer* const buffer3 = (ndBrainGpuFloatBuffer*)m_parameters[3];
+        ndBrainGpuFloatBuffer* const buffer4 = (ndBrainGpuFloatBuffer*)m_parameters[4];
+
+        ndBrainOptimizerAdamGpu::ndCommandShareInfo* const parameters = (ndBrainOptimizerAdamGpu::ndCommandShareInfo*)&buffer0->m_data[0];
+        ndBrainFloat* const weightAndBiasBuffer = &buffer1->m_buffer[0];
+        ndBrainFloat* const weightAndBiasGradientBuffer = &buffer2->m_buffer[0];
+        ndBrainFloat* const vdw = &buffer3->m_buffer[0];
+        ndBrainFloat* const vdw2 = &buffer4->m_buffer[0];
+
+        ndBrainFloat descendRate = -parameters->m_learnRate;
+        ndBrainFloat regularizer = -parameters->m_decayRegularizer;
+
+        ndInt32 start = groupId * workGroupSize;
+
+        const ndBrainMemVector vdw__(&vdw[start], workGroupSize);
+        const ndBrainMemVector vdw2__(&vdw[start], workGroupSize);
+        const ndBrainMemVector weight___(&weightAndBiasBuffer[start], workGroupSize);
+        for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+        {
+            ndBrainFloat temp = weightAndBiasGradientBuffer[start + itemId];
+            ndBrainFloat a = vdw[start + itemId] * parameters->m_alpha + temp * (ndBrainFloat(1.0f) - parameters->m_alpha);
+            vdw[start + itemId] = a;
+
+            ndBrainFloat b = vdw2[start + itemId] * parameters->m_beta + temp * temp * (ndBrainFloat(1.0f) - parameters->m_beta);
+            vdw2[start + itemId] = b;
+
+            ndBrainFloat vdwCorrected = a * parameters->m_invAlpha;
+            ndBrainFloat vdw2Corrected = b * parameters->m_invBeta;
+
+            ndBrainFloat bias_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(vdw2Corrected)) + parameters->m_epsilon);
+            ndBrainFloat gradient = vdwCorrected * bias_den;
+
+            ndBrainFloat weight = weightAndBiasBuffer[start + itemId];
+            ndBrainFloat lassoRegularizer = (weight >= ndBrainFloat(0.0f)) ? regularizer : -regularizer;
+            gradient += weight * lassoRegularizer;
+
+            //weights.ScaleAdd(grad, descendRate);
+            weightAndBiasBuffer[start + itemId] = weight + gradient * descendRate;
+        }
+    }
+};
+
 class brainAdamUpdateRidgeRegularizer : public ndBrainGpuShader
 {
     public:
@@ -1007,9 +1063,9 @@ class brainAdamUpdateRidgeRegularizer : public ndBrainGpuShader
 
         ndInt32 start = groupId * workGroupSize;
 
-        const ndBrainMemVector vdw__(&vdw[start], workGroupSize);
-        const ndBrainMemVector vdw2__(&vdw[start], workGroupSize);
-        const ndBrainMemVector weight___(&weightAndBiasBuffer[start], workGroupSize);
+        //const ndBrainMemVector vdw__(&vdw[start], workGroupSize);
+        //const ndBrainMemVector vdw2__(&vdw[start], workGroupSize);
+        //const ndBrainMemVector weight___(&weightAndBiasBuffer[start], workGroupSize);
         for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
         {
             //temp.Set(grad);
@@ -1082,6 +1138,35 @@ class brainAdamUpdateRidgeRegularizer : public ndBrainGpuShader
         }
     }
 };
+
+class brainAdamMomentumUpdate : public ndBrainGpuShader
+{
+    public:
+    brainAdamMomentumUpdate(ndBrainGpuContext* const context)
+        :ndBrainGpuShader(context)
+    {
+    }
+
+    //void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    void Execute(ndInt32, ndInt32)
+    {
+        ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        ndBrainOptimizerAdamGpu::ndCommandShareInfo* const parameters = (ndBrainOptimizerAdamGpu::ndCommandShareInfo*)&buffer0->m_data[0];
+
+        parameters->m_betaAcc *= parameters->m_beta;
+        parameters->m_alphaAcc *= parameters->m_alpha;
+        if (parameters->m_betaAcc < ndBrainFloat(1.0e-6f))
+        {
+            parameters->m_betaAcc = ndBrainFloat(0.0f);
+        }
+        if (parameters->m_alphaAcc < ndBrainFloat(1.0e-6f))
+        {
+            parameters->m_alphaAcc = ndBrainFloat(0.0f);
+        }
+    }
+};
+
+
 void ndBrainGpuContext::CreateKerners()
 {   
     // create all feed foward shaders
@@ -1102,7 +1187,11 @@ void ndBrainGpuContext::CreateKerners()
     m_ndBrainLayerLinearDropOutBackPropagate = ndSharedPtr<ndBrainGpuShader>(new brainLayerBrainLinearDropOutBackPropagate(this));
     m_ndBrainLayerCathegoricalSoftmaxBackPropagate = ndSharedPtr<ndBrainGpuShader>(new brainLayerBrainCathegoricalSoftmaxBackPropagate(this));
 
-    // optimizer shaders
-    m_ndBrainAdamOptimizerUpdate = ndSharedPtr<ndBrainGpuShader>(new brainAdamUpdateRidgeRegularizer(this));
+    // accumulate gradient kernels
     m_ndBrainAccumulateGradients = ndSharedPtr<ndBrainGpuShader>(new brainAccumulateGradients(this));
+
+    // optimizer kernels
+    m_ndBrainAdamMomentumUpdate = ndSharedPtr<ndBrainGpuShader>(new brainAdamMomentumUpdate(this));
+    m_ndBrainAdamRidgeOptimizerUpdate = ndSharedPtr<ndBrainGpuShader>(new brainAdamUpdateRidgeRegularizer(this));
+    m_ndBrainAdamLassoOptimizerUpdate = ndSharedPtr<ndBrainGpuShader>(new brainAdamUpdateLassoRegularizer(this));
 }

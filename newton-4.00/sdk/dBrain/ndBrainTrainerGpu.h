@@ -47,6 +47,7 @@ class ndBrainTrainerGpu: public ndBrainTrainerGpuInference
 
 	ndSharedPtr<ndBrainOptimizerAdamGpu> m_optimizer;
 	ndSharedPtr<ndBrainGpuCommand> m_adamOtimizerUpdate;
+	ndSharedPtr<ndBrainGpuCommand> m_adamMomentumUpdate;
 	ndSharedPtr<ndBrainGpuCommand> m_accumulateGradients;
 	ndSharedPtr<ndBrainGpuBuffer> m_inputOuputGradientsBuffer;
 	ndSharedPtr<ndBrainGpuBuffer> m_weightAndBiasGradientsBuffer;
