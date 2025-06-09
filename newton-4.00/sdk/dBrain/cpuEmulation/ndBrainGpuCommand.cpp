@@ -32,7 +32,6 @@ void ndBrainGpuCommand::Assembly(const ndSharedPtr<ndBrainGpuShader>& shader, nd
 {
 	m_shader = shader;
 	m_miniBatchSize = size_t(workGroupSize);
-	m_miniBatchSize = size_t(workGroupSize);
 	for (ndInt32 i = 0; i < buffersCount; ++i)
 	{
 		m_parameters.PushBack(buffer[i]);

@@ -33,6 +33,7 @@ class ndBrainGpuCommand : public ndClassAlloc
 	size_t m_miniBatchSize;
 
 	friend class ndBrainGpuContext;
+	friend class ndBrainTrainerGpu;
 };
 
 #endif

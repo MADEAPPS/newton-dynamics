@@ -69,7 +69,7 @@ void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& co
 		ndBrainGpuShader& kernel = **command->m_shader;
 		for (ndInt32 i = iterator++; i < miniBatchSize; i = iterator++)
 		{
-			kernel.Execute(i, workGroupdSize, miniBatchSize);
+			kernel.Execute(i, workGroupdSize);
 		}
 	});
 	iterator = 0;

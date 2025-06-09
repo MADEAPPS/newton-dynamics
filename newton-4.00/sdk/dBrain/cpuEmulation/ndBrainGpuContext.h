@@ -45,7 +45,7 @@ class ndBrainGpuShader : public ndClassAlloc
 	{
 	}
 
-	virtual void Execute(ndInt32 groupId, ndInt32 workGroupSize, ndInt32 numberOfWorkGroups) = 0;
+	virtual void Execute(ndInt32 groupId, ndInt32 workGroupSize) = 0;
 
 	ndBrainGpuContext* m_context;
 	ndFixSizeArray<ndBrainGpuBuffer*, 8> m_parameters;

@@ -193,7 +193,11 @@ void ndBrainTrainerGpuInference::InitWeightAndBiasBuffer()
 		uniformData[i].m_parametersStartOffset = sizeAcc;
 		sizeAcc += uniformData[i].m_parametersBatchSize;
 	}
-	sizeAcc += 32;
+	ndInt32 residual = sizeAcc % m_miniBatchSize;
+	if (residual)
+	{
+		sizeAcc += m_miniBatchSize - residual;
+	}
 
 	ndBrainVector scratchBuffer;
 	scratchBuffer.SetCount(sizeAcc);

@@ -128,11 +128,13 @@ void ndBrainTrainerGpu::AddOptimizerGradientCommand()
 	ndBrainLayer::ndCommandShareInfo data;
 
 	data.m_inputSize = sizeInFloats;
+	data.m_inputOutputSize = m_miniBatchSize;
 	ndSharedPtr<ndBrainGpuBuffer> uniformbuffer(new ndBrainGpuUniformBuffer(m_context, sizeof(ndBrainLayer::ndCommandShareInfo)));
 	uniformbuffer->LoadData(sizeof(ndBrainLayer::ndCommandShareInfo), &data);
 
 	ndBrainGpuBuffer* const weightAndBiasGradientsBuffer = *m_weightAndBiasGradientsBuffer;
 	m_accumulateGradients = ndSharedPtr<ndBrainGpuCommand>(new ndBrainTrainerGpuCommand(this, data, 0, m_context, m_context->m_ndBrainAccumulateGradients, m_miniBatchSize, uniformbuffer, weightAndBiasGradientsBuffer, nullptr, nullptr));
+	m_accumulateGradients->m_miniBatchSize = size_t(sizeInFloats / ND_KERNELS_WORKGROUP_SIZE);
 }
 
 void ndBrainTrainerGpu::AddLayersGradientCommands()
