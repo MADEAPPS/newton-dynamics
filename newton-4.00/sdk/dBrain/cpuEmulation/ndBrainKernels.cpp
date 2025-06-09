@@ -43,7 +43,9 @@ class brainCopyInput : public ndBrainGpuShader
         
         ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
         ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
-            
+
+        //const ndBrainMemVector xxxxx2(&inputBuffer[srcBase], inputSize);
+        //const ndBrainMemVector xxxxx3(&inputOutputData[dstBase], inputSize);
         for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
@@ -57,6 +59,11 @@ class brainCopyInput : public ndBrainGpuShader
             ndBrainFloat a = inputBuffer[srcBase + modWorkGroupSize + itemId];
             inputOutputData[dstBase + modWorkGroupSize + itemId] = a;
         }
+
+        //if ((inputSize > 256) && (groupId == 1))
+        //{
+        //    inputSize *= 1;
+        //}
     }
 };
 
@@ -119,13 +126,19 @@ class brainLayerLinear : public ndBrainGpuShader
         ndBrainFloat cachedInput [ND_GPU_LOCAL_BUFFER_SIZE * 2];
         ndBrainFloat cachedOutput [ND_GPU_LOCAL_BUFFER_SIZE * 2];
         ndBrainFloat reductionBuffer [ND_GPU_LOCAL_BUFFER_SIZE];
-        
+
         ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
         ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
         ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)m_parameters[2];
         UniformBufferObject* const parameters = &buffer0->m_data;
         ndBrainFloat* const inputOutputData = &buffer1->m_buffer[0];
         ndBrainFloat* const weightsAndBias = &buffer2->m_buffer[0];
+
+//static int xxxxxxx = 0;
+//xxxxxxx++;
+//if (xxxxxxx >= 768)
+//xxxxxxx *= 1;
+
 
         ndInt32 inputSize = ndInt32(parameters->m_inputSize);
         ndInt32 outputSize = ndInt32(parameters->m_outputSize);
@@ -153,8 +166,7 @@ class brainLayerLinear : public ndBrainGpuShader
         }
             
         ndInt32 rowCountReminder = outputSize % workGroupSize;
-        ndInt32 modRowCount = inputSize - rowCountReminder;
-
+        ndInt32 modRowCount = outputSize - rowCountReminder;
         for (ndInt32 i = 0; i < modRowCount; i += workGroupSize)
         {
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
@@ -162,7 +174,6 @@ class brainLayerLinear : public ndBrainGpuShader
                 cachedOutput[i + itemId] = weightsAndBias[biasOffset + itemId];
             }
         }
-        //if (itemId < rowCountReminder)
         for (ndInt32 itemId = 0; itemId < rowCountReminder; ++itemId)
         {
             cachedOutput[modRowCount + itemId] = weightsAndBias[biasOffset + modRowCount + itemId];
@@ -185,7 +196,6 @@ class brainLayerLinear : public ndBrainGpuShader
                     partialSum[itemId] += a * b;
                 }
             }
-            //if (itemId < workGroupSizeReminder)
             for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
             {
                 ndBrainFloat b = cachedInput[modWorkGroupSize + itemId];
@@ -195,22 +205,16 @@ class brainLayerLinear : public ndBrainGpuShader
                 
             for (ndInt32 j = workGroupSize / 2; j > 0; j = j >> 1)
             {
-                //if ((itemId >= j) && (itemId < j * 2))
                 for (ndInt32 itemId = j; itemId < j * 2; ++itemId)
                 {
                     reductionBuffer[itemId - j] = partialSum[itemId];
                 }
-                // barrier here
-                //if (itemId < j)
                 for (ndInt32 itemId = 0; itemId < j; ++itemId)
                 {
                     partialSum[itemId] += reductionBuffer[itemId];
                 }
             }
-            //if (itemId == 0)
-            {
-                cachedOutput[i] += partialSum[0];
-            }
+            cachedOutput[i] += partialSum[0];
         }
             
         for (ndInt32 i = 0; i < modRowCount; i += workGroupSize)
@@ -848,13 +852,6 @@ class brainLayerBrainLinearBackPropagate : public ndBrainGpuShader
         ndInt32 parametersStartOffset = ndInt32(parameters->m_parametersStartOffset);
 
         // calculate input gradients
-        //ndBrainMemVector xxxx0(&inputOutputGradients[dstBase], outputSize);
-        //const ndBrainMemVector xxxxx1(&cachedInput[256], 256);
-        //const ndBrainMemVector xxxxx2(&cachedInput[0], inputSize);
-        //if (inputSize > 256)
-        //{
-        //    inputSize *= 1;
-        //}
         for (ndInt32 j = 0; j < outputSize; ++j)
         {
             ndBrainFloat scale = inputOutputGradients[dstBase + j];
@@ -875,7 +872,12 @@ class brainLayerBrainLinearBackPropagate : public ndBrainGpuShader
         }
 
         // store input gradients
-        //const ndBrainMemVector xxxxx3(&inputOutputGradients[srcBase], inputSize);
+        //const ndBrainMemVector xxxxx3(&inputOutputData[srcBase], inputSize);
+        //if ((inputSize > 256) && (groupId == 1))
+        //{
+        //    inputSize *= 1;
+        //}
+
         for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
@@ -895,7 +897,8 @@ class brainLayerBrainLinearBackPropagate : public ndBrainGpuShader
         ndInt32 workGroupbOuputSizeReminder = outputSize % workGroupSize;
         ndInt32 modWorkGroupOuputSize = outputSize - workGroupbOuputSizeReminder;
         ndInt32 weightAndBiasGradientOffset = groupId * ndInt32(parameters->m_parametersBatchSize) + parametersStartOffset;
-        
+
+        // calculate bias Gradient
         for (ndInt32 i = 0; i < modWorkGroupOuputSize; i += workGroupSize)
         {
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
@@ -909,13 +912,19 @@ class brainLayerBrainLinearBackPropagate : public ndBrainGpuShader
             float a = inputOutputGradients[dstBase + modWorkGroupOuputSize + itemId];
             weightAndBiasGradients[weightAndBiasGradientOffset + matrixSize + modWorkGroupOuputSize + itemId] = a;
         }
-        
+
+        if ((inputSize > 256) && (groupId > 0))
+        {
+            inputSize *= 1;
+        }
+
+        // calculate matrix weight Gradient
         for (ndInt32 j = 0; j < outputSize; ++j)
         {
             ndBrainFloat scale = inputOutputGradients[dstBase + j];
             ndInt32 weightRowOffset = j * inputSize + weightAndBiasGradientOffset;
 
-            //ndBrainMemVector xxxx(&weightAndBiasGradients[weightRowOffset], inputSize);
+            ndBrainMemVector xxxx(&weightAndBiasGradients[weightRowOffset], inputSize);
             for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
             {
                 for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
@@ -935,7 +944,7 @@ class brainLayerBrainLinearBackPropagate : public ndBrainGpuShader
     }
 };
 
-// extra keenels
+// extra kernels
 class brainAccumulateGradients : public ndBrainGpuShader
 {
     public:
@@ -970,7 +979,9 @@ class brainAccumulateGradients : public ndBrainGpuShader
         ndInt32 modWorkGroupSize = count - workGroupSizeReminder;
 
         ndBrainFloat cachedAccumulator[ND_GPU_LOCAL_BUFFER_SIZE];
-
+        //ndBrainMemVector xxxx0(&gradientBuffer[0], sliceSize);
+        //ndBrainMemVector xxxx1(&gradientBuffer[sliceSize], sliceSize);
+        
         for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
@@ -979,12 +990,10 @@ class brainAccumulateGradients : public ndBrainGpuShader
             }
             for (ndInt32 j = 0; j < numberOfWorGroups; ++j)
             {
-                ndInt32 base = j * inputSize + start;
-                ndBrainMemVector xxxx0(&gradientBuffer[base], workGroupSize);
-
+                ndInt32 base = start + i + j * inputSize;
                 for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
                 {
-                    ndBrainFloat a = gradientBuffer[base + i + itemId];
+                    ndBrainFloat a = gradientBuffer[base + itemId];
                     cachedAccumulator[itemId] += a;
                 }
             }
@@ -994,25 +1003,22 @@ class brainAccumulateGradients : public ndBrainGpuShader
             }
         }
 
-        //for (ndInt32 i = 0; i < workGroupSizeReminder; i += workGroupSize)
+        for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
         {
-            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-            {
-                cachedAccumulator[itemId] = ndBrainFloat(0.0f);
-            }
-            for (ndInt32 j = 0; j < numberOfWorGroups; ++j)
-            {
-                ndInt32 base = j * inputSize + modWorkGroupSize;
-                for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-                {
-                    ndBrainFloat a = gradientBuffer[base + itemId];
-                    cachedAccumulator[itemId] += a;
-                }
-            }
+            cachedAccumulator[itemId] = ndBrainFloat(0.0f);
+        }
+        for (ndInt32 j = 0; j < numberOfWorGroups; ++j)
+        {
+            ndInt32 base = start + j * inputSize + modWorkGroupSize;
             for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
             {
-                gradientBuffer[modWorkGroupSize + itemId] = cachedAccumulator[itemId];
+                ndBrainFloat a = gradientBuffer[base + itemId];
+                cachedAccumulator[itemId] += a;
             }
+        }
+        for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+        {
+            gradientBuffer[start + modWorkGroupSize + itemId] = cachedAccumulator[itemId];
         }
     }
 };

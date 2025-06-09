@@ -145,10 +145,10 @@ void ndBrainTrainerGpu::AddLayersGradientCommands()
 		ndBrainTrainerGpuCommand* const feedForwardLayerCommand = FindCommand(size_t(layer));
 		ndAssert(feedForwardLayerCommand);
 
-		ndBrainLayer::ndCommandShareInfo data(feedForwardLayerCommand->m_info);
+		ndBrainLayer::ndCommandShareInfo info(feedForwardLayerCommand->m_info);
 
 		ndSharedPtr<ndBrainGpuBuffer> uniformBuffer(new ndBrainGpuUniformBuffer(m_context, sizeof(ndBrainLayer::ndCommandShareInfo)));
-		uniformBuffer->LoadData(sizeof(ndBrainLayer::ndCommandShareInfo), &data);
+		uniformBuffer->LoadData(sizeof(ndBrainLayer::ndCommandShareInfo), &info);
 
 		ndBrainGpuBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
 		ndBrainGpuBuffer* const weightsAndBiasBuffer = *m_weightAndBiasBuffer;
@@ -156,7 +156,7 @@ void ndBrainTrainerGpu::AddLayersGradientCommands()
 		ndBrainGpuBuffer* const weightAndBiasGradientsBuffer = *m_weightAndBiasGradientsBuffer;
 
 		ndBrainTrainerGpuCommand* const commandBuffer = layer->CreateGpuBackPropagateCommand(
-			this, data, m_context, m_miniBatchSize,
+			this, info, m_context, m_miniBatchSize,
 			uniformBuffer, inputOutputBuffer, weightsAndBiasBuffer, inputOutputGradientBuffer, weightAndBiasGradientsBuffer);
 
 		ndSharedPtr<ndBrainGpuCommand>command(commandBuffer);
