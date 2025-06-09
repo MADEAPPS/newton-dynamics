@@ -112,9 +112,11 @@ ndBrainTrainerGpuCommand* ndBrainLayerActivationCategoricalSoftmax::CreateGpuBac
 	ndBrainGpuBuffer* const inputOutputGradients,
 	ndBrainGpuBuffer* const weightsAndBiasGradients) const
 {
-	ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(
-		owner, info, size_t(this), context, context->m_ndBrainLayerCathegoricalSoftmaxBackPropagate, 
-		miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias, inputOutputGradients, weightsAndBiasGradients);
-	return command;
+	ndAssert(0);
+	return nullptr;
+	//ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(
+	//	owner, info, size_t(this), context, context->m_ndBrainLayerCathegoricalSoftmaxBackPropagate, 
+	//	miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias, inputOutputGradients, weightsAndBiasGradients);
+	//return command;
 }
 

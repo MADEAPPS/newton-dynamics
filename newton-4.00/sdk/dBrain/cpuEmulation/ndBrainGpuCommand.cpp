@@ -18,7 +18,8 @@
 #include "ndBrainGpuUniformBuffer.h"
 
 ndBrainGpuCommand::ndBrainGpuCommand(ndBrainGpuContext* const context, const ndBrainLayer::ndCommandShareInfo& info)
-	:m_context(context)
+	:ndClassAlloc()
+	,m_context(context)
 	,m_shader()
 	,m_info(info)
 	,m_layer(nullptr)
@@ -35,6 +36,8 @@ void ndBrainGpuCommand::Assembly(const ndSharedPtr<ndBrainGpuShader>& shader, nd
 {
 	m_shader = shader;
 	m_miniBatchSize = size_t(workGroupSize);
+
+	m_parameters.SetCount(0);
 	for (ndInt32 i = 0; i < buffersCount; ++i)
 	{
 		m_parameters.PushBack(buffer[i]);

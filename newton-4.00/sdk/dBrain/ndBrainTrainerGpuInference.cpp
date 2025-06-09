@@ -303,13 +303,14 @@ void ndBrainTrainerGpuInference::UpdateParameters()
 	for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = m_feedForwardCommands.GetFirst(); node; node = node->GetNext())
 	{
 		ndBrainGpuCommand* const command = *node->GetInfo();
-		ndBrainLayer* const layer = command->m_layer;
-		if (layer)
-		{
-			ndInt32 size = command->m_info.m_inputSize * command->m_info.m_outputSize + command->m_info.m_outputSize;
-			const ndBrainMemVector weights(&buffer[command->m_info.m_parametersStartOffset], size);
-			layer->SetWeights(weights);
-		}
+		ndAssert(0);
+		//ndBrainLayer* const layer = command->m_layer;
+		//if (layer)
+		//{
+		//	ndInt32 size = command->m_info.m_inputSize * command->m_info.m_outputSize + command->m_info.m_outputSize;
+		//	const ndBrainMemVector weights(&buffer[command->m_info.m_parametersStartOffset], size);
+		//	layer->SetWeights(weights);
+		//}
 	}
 }
 
