@@ -982,6 +982,7 @@ class brainAccumulateGradients : public ndBrainGpuShader
         //ndBrainMemVector xxxx0(&gradientBuffer[0], sliceSize);
         //ndBrainMemVector xxxx1(&gradientBuffer[sliceSize], sliceSize);
         
+        ndBrainFloat weightFactor = ndBrainFloat(1.0f) / ndBrainFloat(numberOfWorGroups);
         for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
@@ -999,7 +1000,8 @@ class brainAccumulateGradients : public ndBrainGpuShader
             }
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
             {
-                gradientBuffer[start + i + itemId] = cachedAccumulator[itemId];
+                ndBrainFloat sum = cachedAccumulator[itemId];
+                gradientBuffer[start + i + itemId] = sum * weightFactor;
             }
         }
 
@@ -1018,7 +1020,8 @@ class brainAccumulateGradients : public ndBrainGpuShader
         }
         for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
         {
-            gradientBuffer[start + modWorkGroupSize + itemId] = cachedAccumulator[itemId];
+            ndBrainFloat sum = cachedAccumulator[itemId];
+            gradientBuffer[start + modWorkGroupSize + itemId] = sum * weightFactor;
         }
     }
 };
