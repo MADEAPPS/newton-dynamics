@@ -32,6 +32,68 @@ R""""(
 const char* ndBrainGpuContext::m_kernelSource1 =
 R""""(
 
+    __kernel void brainCopyInput(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* inputBuffer)
+    {                                                                      
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+        
+        uint inputSize = parameters->m_inputSize;
+        uint inputOutputSize = parameters->m_inputOutputSize;
+        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+        
+        uint srcBase = groupId * inputSize;
+        uint dstBase = groupId * inputOutputSize + inputOutputStartOffset;
+        
+        uint workGroupSizeReminder = inputSize % workGroupSize;
+        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
+        
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            float a = inputBuffer[srcBase + i + itemId];
+            inputOutputData[dstBase + i + itemId] = a;
+        }
+        if (itemId < workGroupSizeReminder)
+        {
+            float a = inputBuffer[srcBase + modWorkGroupSize + itemId];
+            inputOutputData[dstBase + modWorkGroupSize + itemId] = a;
+        }
+    }
+
+    __kernel void brainCopyOutput(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* outputBuffer) 
+    {
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+        
+        uint outputSize = parameters->m_outputSize;
+        uint inputOutputSize = parameters->m_inputOutputSize;
+        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+        
+        uint dstBase = groupId * outputSize;
+        uint srcBase = groupId * inputOutputSize + inputOutputStartOffset;
+        
+        uint workGroupSizeReminder = outputSize % workGroupSize;
+        uint modWorkGroupSize = outputSize - workGroupSizeReminder;
+        
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            float a = inputOutputData[srcBase + itemId];
+            outputBuffer[dstBase + i + itemId] = a;
+        }
+        
+        if (itemId < workGroupSizeReminder)
+        {
+            float a = inputOutputData[srcBase + modWorkGroupSize + itemId];
+            outputBuffer[dstBase + modWorkGroupSize + itemId] = a;
+        }
+    }
+
+)"""";
+
+const char* ndBrainGpuContext::m_kernelSource2 =
+R""""(
+
     __kernel void brainLayerLinear_old(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* weightsAndBias) 
     {
         __local float cachedInput [ND_GPU_LOCAL_BUFFER_SIZE * 2];
@@ -123,67 +185,6 @@ R""""(
             inputOutputData[outputOffset + modRowCount + itemId] = cachedOutput[modRowCount + itemId];
         }
     }
-
-    __kernel void brainCopyInput(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* inputBuffer)
-    {                                                                      
-        uint itemId = get_local_id(0);
-        uint groupId = get_group_id(0);
-        uint workGroupSize = get_local_size(0);
-        
-        uint inputSize = parameters->m_inputSize;
-        uint inputOutputSize = parameters->m_inputOutputSize;
-        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
-        
-        uint srcBase = groupId * inputSize;
-        uint dstBase = groupId * inputOutputSize + inputOutputStartOffset;
-        
-        uint workGroupSizeReminder = inputSize % workGroupSize;
-        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
-        
-        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
-        {
-            float a = inputBuffer[srcBase + i + itemId];
-            inputOutputData[dstBase + i + itemId] = a;
-        }
-        if (itemId < workGroupSizeReminder)
-        {
-            float a = inputBuffer[srcBase + modWorkGroupSize + itemId];
-            inputOutputData[dstBase + modWorkGroupSize + itemId] = a;
-        }
-    }
-
-    __kernel void brainCopyOutput(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* outputBuffer) 
-    {
-        uint itemId = get_local_id(0);
-        uint groupId = get_group_id(0);
-        uint workGroupSize = get_local_size(0);
-        
-        uint outputSize = parameters->m_outputSize;
-        uint inputOutputSize = parameters->m_inputOutputSize;
-        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
-        
-        uint dstBase = groupId * outputSize;
-        uint srcBase = groupId * inputOutputSize + inputOutputStartOffset;
-        
-        uint workGroupSizeReminder = outputSize % workGroupSize;
-        uint modWorkGroupSize = outputSize - workGroupSizeReminder;
-        
-        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
-        {
-            float a = inputOutputData[srcBase + itemId];
-            outputBuffer[dstBase + i + itemId] = a;
-        }
-        
-        if (itemId < workGroupSizeReminder)
-        {
-            float a = inputOutputData[srcBase + modWorkGroupSize + itemId];
-            outputBuffer[dstBase + modWorkGroupSize + itemId] = a;
-        }
-    }
-)"""";
-
-const char* ndBrainGpuContext::m_kernelSource2 =
-R""""(
 
     // a matrix time a vector by iterating over each row of the matrix 
     // calculating the dot product of that row time the vector and adding the bias value.
@@ -301,77 +302,6 @@ R""""(
             inputOutputData[outputOffset + modRowCount + itemId] = cachedOutput[modRowCount + itemId];
         }
     }
-)"""";
-
-
-#if 0
-
-    __kernel void brainCopyOutputGradients(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* outputBuffer) 
-    {
-        uint itemId = get_local_id(0);
-        uint groupId = get_group_id(0);
-        uint workGroupSize = get_local_size(0);
-        
-        uint outputSize = parameters->m_outputSize;
-        uint inputOutputSize = parameters->m_inputOutputSize;
-        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
-        
-        //uint dstBase = groupId * outputSize;
-        //uint srcBase = groupId * inputOutputSize + inputOutputStartOffset;
-        //
-        //uint workGroupSizeReminder = outputSize % workGroupSize;
-        //uint modWorkGroupSize = outputSize - workGroupSizeReminder;
-        //
-        //for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
-        //{
-        //    float a = inputOutputData[srcBase + itemId];
-        //    outputBuffer[dstBase + i + itemId] = a;
-        //}
-        //
-        //if (itemId < workGroupSizeReminder)
-        //{
-        //    float a = inputOutputData[srcBase + modWorkGroupSize + itemId];
-        //    outputBuffer[dstBase + modWorkGroupSize + itemId] = a;
-        //}
-    }
-
-)"""";
-
-
-    __kernel void brainLayerLinearDropOutActivation(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* notUsed)  
-    {
-        uint itemId = get_local_id(0);
-        uint groupId = get_group_id(0);
-        uint workGroupSize = get_local_size(0);
-        
-        uint inputSize = parameters->m_inputSize;
-        uint inputOutputSize = parameters->m_inputOutputSize;
-        uint parametersStartOffset = parameters->m_parametersStartOffset;
-        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
-        
-        uint workGroupSizeReminder = inputSize % workGroupSize;
-        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
-        
-        uint inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
-        uint outputOffset = inputOffset + inputSize;
-        
-        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
-        {
-            float inputValue = inputOutputData[inputOffset + i + itemId];
-            float outputValue = inputValue;
-            inputOutputData[outputOffset + i + itemId] = outputValue;
-        }
-        if (itemId < workGroupSizeReminder)
-        {
-            float inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
-            float outputValue = inputValue;
-            inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
-        }
-    }
-)"""";
-
-const char* ndBrainGpuContext::m_kernelSource3 =
-R""""(
 
     __kernel void brainLayerReluActivation(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* notUsed)  
     {
@@ -381,7 +311,6 @@ R""""(
         
         uint inputSize = parameters->m_inputSize;
         uint inputOutputSize = parameters->m_inputOutputSize;
-        uint parametersStartOffset = parameters->m_parametersStartOffset;
         uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
         uint workGroupSizeReminder = inputSize % workGroupSize;
@@ -393,13 +322,13 @@ R""""(
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             float inputValue = inputOutputData[inputOffset + i + itemId];
-            float outputValue = (inputValue >= 0.0) ? inputValue : 0.0f;
+            float outputValue = (inputValue >= 0.0f) ? inputValue : 0.0f;
             inputOutputData[outputOffset + i + itemId] = outputValue;
         }
         if (itemId < workGroupSizeReminder)
         {
             float inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
-            float outputValue = (inputValue >= 0.0) ? inputValue : 0.0f;
+            float outputValue = (inputValue >= 0.0f) ? inputValue : 0.0f;
             inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
         }
     }
@@ -412,7 +341,6 @@ R""""(
         
         uint inputSize = parameters->m_inputSize;
         uint inputOutputSize = parameters->m_inputOutputSize;
-        uint parametersStartOffset = parameters->m_parametersStartOffset;
         uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
         uint workGroupSizeReminder = inputSize % workGroupSize;
@@ -435,6 +363,41 @@ R""""(
         }
     }
 
+    __kernel void brainLayerLinearDropOutActivation(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* notUsed)  
+    {
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+        
+        uint inputSize = parameters->m_inputSize;
+        uint inputOutputSize = parameters->m_inputOutputSize;
+        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+        
+        uint workGroupSizeReminder = inputSize % workGroupSize;
+        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
+        
+        uint inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
+        uint outputOffset = inputOffset + inputSize;
+        
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            float inputValue = inputOutputData[inputOffset + i + itemId];
+            float outputValue = inputValue;
+            inputOutputData[outputOffset + i + itemId] = outputValue;
+        }
+        if (itemId < workGroupSizeReminder)
+        {
+            float inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
+            float outputValue = inputValue;
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
+        }
+    }
+)"""";
+
+
+const char* ndBrainGpuContext::m_kernelSource3 =
+    R""""(
+
     __kernel void brainLayerSoftmaxActivation(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* notUsed)
     {
         __local float tmpInputBuffer [ND_GPU_LOCAL_BUFFER_SIZE * 2];
@@ -446,7 +409,6 @@ R""""(
         
         uint inputSize = parameters->m_inputSize;
         uint inputOutputSize = parameters->m_inputOutputSize;
-        uint parametersStartOffset = parameters->m_parametersStartOffset;
         uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
         uint workGroupSizeReminder = inputSize % workGroupSize;
@@ -546,6 +508,43 @@ R""""(
     }
 )"""";
 
+#if 0
+
+    __kernel void brainCopyOutputGradients(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* outputBuffer) 
+    {
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+        
+        uint outputSize = parameters->m_outputSize;
+        uint inputOutputSize = parameters->m_inputOutputSize;
+        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+        
+        //uint dstBase = groupId * outputSize;
+        //uint srcBase = groupId * inputOutputSize + inputOutputStartOffset;
+        //
+        //uint workGroupSizeReminder = outputSize % workGroupSize;
+        //uint modWorkGroupSize = outputSize - workGroupSizeReminder;
+        //
+        //for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        //{
+        //    float a = inputOutputData[srcBase + itemId];
+        //    outputBuffer[dstBase + i + itemId] = a;
+        //}
+        //
+        //if (itemId < workGroupSizeReminder)
+        //{
+        //    float a = inputOutputData[srcBase + modWorkGroupSize + itemId];
+        //    outputBuffer[dstBase + modWorkGroupSize + itemId] = a;
+        //}
+    }
+
+)"""";
+
+
+)"""";
+
+
 
 #endif
 
@@ -564,7 +563,7 @@ void ndBrainGpuContext::CreateKerners()
     std::string source(m_kernelSource0);
     source += m_kernelSource1;
     source += m_kernelSource2;
-    //source += m_kernelSource3;
+    source += m_kernelSource3;
 
     cl::Program program (**m_context, source, CL_TRUE, &errcode_ret);
     ndAssert(errcode_ret == 0);
@@ -576,12 +575,15 @@ void ndBrainGpuContext::CreateKerners()
     //errcode_ret = clGetProgramInfo(program.get(), CL_PROGRAM_BINARIES, sizeof(unsigned char*), &bin, NULL);
     //free(bin);
 
+    // create all feed foward shaders
     m_ndBrainCopyInput = CreateKerner(program, "brainCopyInput");
     m_ndBrainCopyOutput = CreateKerner(program, "brainCopyOutput");
     m_ndBrainLayerLinear = CreateKerner(program, "brainLayerLinear");
+    m_ndBrainLayerReluActivation = CreateKerner(program, "brainLayerReluActivation");
+    m_ndBrainLayerTanhActivation = CreateKerner(program, "brainLayerTanhActivation");
+    m_ndBrainLayerSoftmaxActivation = CreateKerner(program, "brainLayerSoftmaxActivation");
+    m_ndBrainLayerLinearDropOutActivation = CreateKerner(program, "brainLayerLinearDropOutActivation");
+
+    // create all backpropagate shaders
     //m_ndBrainCopyOutputGradients = CreateKerner(program, "brainCopyOutputGradients");
-    //m_ndBrainLayerReluActivation = CreateKerner(program, "brainLayerReluActivation");
-    //m_ndBrainLayerTanhActivation = CreateKerner(program, "brainLayerTanhActivation");
-    //m_ndBrainLayerSoftmaxActivation = CreateKerner(program, "brainLayerSoftmaxActivation");
-    //m_ndBrainLayerLinearDropOutActivation = CreateKerner(program, "brainLayerLinearDropOutActivation");
 }

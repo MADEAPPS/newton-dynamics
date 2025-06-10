@@ -56,6 +56,8 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<cl::Context> m_context;
 	ndSharedPtr<cl::CommandQueue> m_queue;
 
+	cl::Buffer m_emptyBuffer;
+
 	static const char* m_kernelSource0;
 	static const char* m_kernelSource1;
 	static const char* m_kernelSource2;

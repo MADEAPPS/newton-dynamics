@@ -74,8 +74,9 @@ ndBrainGpuContext::ndBrainGpuContext()
 		cl_command_queue_properties properties = CL_QUEUE_PROFILING_ENABLE;
 		m_queue = ndSharedPtr<cl::CommandQueue>(new cl::CommandQueue(**m_context , **m_device, properties, &error));
 		ndAssert(error == CL_SUCCESS);
-
 		CreateKerners();
+
+		m_emptyBuffer = cl::Buffer(**m_context, CL_MEM_READ_WRITE, 256);
 	}
 }
 
@@ -118,8 +119,12 @@ void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& co
 	for (ndInt32 i = 0; i < command->m_parameters.GetCount(); ++i)
 	{
 		ndBrainGpuBuffer* const argBuffer = command->m_parameters[i];
-		error = shader->setArg(cl_uint(i), argBuffer->m_buffer);
-		ndAssert(error == CL_SUCCESS);
+		if (argBuffer)
+		{
+			//error = shader->setArg(cl_uint(i),  argBuffer->m_buffer : m_emptyBuffer);
+			error = shader->setArg(cl_uint(i), argBuffer->m_buffer);
+			ndAssert(error == CL_SUCCESS);
+		}
 	}
 
 	cl::NDRange offset(0);

@@ -299,10 +299,10 @@ static void MnistTrainingSet()
 						loss.GetLoss(output, grad);
 					}
 					// backpropagate loss.
-					trainer->BackPropagate(miniBatchOutputGradients);
-					trainer->ApplyLearnRate();
+					//trainer->BackPropagate(miniBatchOutputGradients);
+					//trainer->ApplyLearnRate();
 
-					#if 0
+					#if 1
 						//ndBrainVector internalBuffers;
 						//ndBrainVector internalParameters;
 						//trainer->GetWorkingBuffer(internalBuffers);
