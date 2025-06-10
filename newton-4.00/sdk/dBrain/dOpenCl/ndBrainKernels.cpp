@@ -549,7 +549,7 @@ R""""(
 const char* ndBrainGpuContext::m_backPropagateKernels_2 =
 R""""(
 
-    __kernel void brainLayerBrainCathegoricalSoftmaxBackPropagate(
+    __kernel void brainLayerBrainReluBackPropagate(
             __global const UniformBufferObject* parameters, 
             __global float* inputOutputData, 
             __global float* notUsed, 
@@ -570,16 +570,18 @@ R""""(
         uint modWorkGroupSize = inputSize - workGroupSizeReminder;
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
-            float a = inputOutputData[dstBase + i + itemId];
-            a -= inputOutputGradients[dstBase + i + itemId];
-            inputOutputGradients[srcBase + i + itemId] = a;
+            float inpuData = inputOutputData[dstBase + i + itemId];
+            float gradient = (inpuData >= 0.0f) ? 1.0f : 0.0f;
+            float outputGrad = inputOutputGradients[dstBase + i + itemId];
+            inputOutputGradients[srcBase + i + itemId] = gradient * outputGrad;
         }
         
         if (itemId < workGroupSizeReminder)
         {
-            float a = inputOutputData[dstBase + modWorkGroupSize + itemId];
-            a -= inputOutputGradients[dstBase + modWorkGroupSize + itemId];
-            inputOutputGradients[srcBase + modWorkGroupSize + itemId] = a;
+            float inpuData = inputOutputData[srcBase + modWorkGroupSize + itemId];
+            float gradient = (inpuData >= 0.0f) ? 1.0f : 0.0f;
+            float outputGrad = inputOutputGradients[dstBase + modWorkGroupSize + itemId];
+            inputOutputGradients[srcBase + modWorkGroupSize + itemId] = gradient * outputGrad;
         }
     }
 
@@ -617,6 +619,72 @@ R""""(
             float a = 1.0f - outputData * outputData;
             float b = inputOutputGradients[dstBase + modWorkGroupSize + itemId];
             inputOutputGradients[srcBase + modWorkGroupSize + itemId] = a * b;
+        }
+    }
+
+    __kernel void brainLayerBrainCathegoricalSoftmaxBackPropagate(
+            __global const UniformBufferObject* parameters, 
+            __global float* inputOutputData, 
+            __global float* notUsed, 
+            __global float* inputOutputGradients) 
+    {
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+        
+        uint inputSize = parameters->m_inputSize;
+        uint inputOutputSize = parameters->m_inputOutputSize;
+        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+        
+        uint srcBase = groupId * inputOutputSize + inputOutputStartOffset;        
+        uint dstBase = groupId * inputSize;
+        
+        uint workGroupSizeReminder = inputSize % workGroupSize;
+        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            float a = inputOutputData[dstBase + i + itemId];
+            a -= inputOutputGradients[dstBase + i + itemId];
+            inputOutputGradients[srcBase + i + itemId] = a;
+        }
+        
+        if (itemId < workGroupSizeReminder)
+        {
+            float a = inputOutputData[dstBase + modWorkGroupSize + itemId];
+            a -= inputOutputGradients[dstBase + modWorkGroupSize + itemId];
+            inputOutputGradients[srcBase + modWorkGroupSize + itemId] = a;
+        }
+    }
+
+    __kernel void brainLayerBrainLinearDropOutBackPropagate(
+            __global const UniformBufferObject* parameters, 
+            __global float* inputOutputData, 
+            __global float* notUsed, 
+            __global float* inputOutputGradients) 
+    {
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+        
+        uint inputSize = parameters->m_inputSize;
+        uint inputOutputSize = parameters->m_inputOutputSize;
+        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+        
+        uint srcBase = groupId * inputOutputSize + inputOutputStartOffset;        
+        uint dstBase = groupId * inputSize;
+        
+        uint workGroupSizeReminder = inputSize % workGroupSize;
+        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            float outputGrad = inputOutputGradients[dstBase + i + itemId];
+            inputOutputGradients[srcBase + i + itemId] = outputGrad;
+        }
+        
+        if (itemId < workGroupSizeReminder)
+        {
+            float outputGrad = inputOutputGradients[dstBase + modWorkGroupSize + itemId];
+            inputOutputGradients[srcBase + modWorkGroupSize + itemId] = outputGrad;
         }
     }
 
@@ -870,7 +938,9 @@ void ndBrainGpuContext::CreateKerners()
 
     // create all backpropagate shaders
     m_ndBrainCopyOutputGradients = CreateKerner(program, "brainCopyOutputGradients");
+    m_ndBrainLayerReluBackPropagate = CreateKerner(program, "brainLayerBrainReluBackPropagate");
     m_ndBrainLayerTanhBackPropagate = CreateKerner(program, "brainLayerBrainTanhBackPropagate");
     m_ndBrainLayerLinearBackPropagate = CreateKerner(program, "brainLayerBrainLinearBackPropagate");
+    m_ndBrainLayerLinearDropOutBackPropagate = CreateKerner(program, "brainLayerBrainLinearDropOutBackPropagate");
     m_ndBrainLayerCathegoricalSoftmaxBackPropagate = CreateKerner(program, "brainLayerBrainCathegoricalSoftmaxBackPropagate");
 }

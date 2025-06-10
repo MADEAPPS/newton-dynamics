@@ -671,10 +671,6 @@ class brainLayerBrainReluBackPropagate : public ndBrainGpuShader
 
         ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
         ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
-
-        ///ndBrainMemVector xxxx0(&inputOutputData[srcBase], inputSize);
-        //ndBrainMemVector xxxx1(&inputOutputGradients[dstBase], inputSize);
-        //ndBrainMemVector xxxx(&inputOutputGradients[srcBase], inputSize);
         for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
@@ -707,11 +703,9 @@ class brainLayerBrainLinearDropOutBackPropagate : public ndBrainGpuShader
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
         ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
-        //ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
         ndBrainGpuFloatBuffer* const buffer3 = (ndBrainGpuFloatBuffer*)m_parameters[3];
 
         UniformBufferObject* const parameters = (UniformBufferObject*)&buffer0->m_data[0];
-        //ndBrainFloat* const inputOutputData = &buffer1->m_buffer[0];
         ndBrainFloat* const inputOutputGradients = &buffer3->m_buffer[0];
 
         ndInt32 inputSize = ndInt32(parameters->m_inputSize);
@@ -724,9 +718,6 @@ class brainLayerBrainLinearDropOutBackPropagate : public ndBrainGpuShader
         ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
         ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
 
-        //ndBrainMemVector xxxx0(&inputOutputData[srcBase], inputSize);
-        //ndBrainMemVector xxxx1(&inputOutputGradients[dstBase], inputSize);
-        //ndBrainMemVector xxxx(&inputOutputGradients[srcBase], inputSize);
         for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
