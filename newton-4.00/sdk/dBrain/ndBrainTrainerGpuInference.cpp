@@ -44,7 +44,6 @@ ndBrainTrainerGpuCommand::ndBrainTrainerGpuCommand(
 	ndBrainGpuBuffer* const weightsAndBiasGradients)
 	:ndBrainGpuCommand(context, info)
 	,m_uniformBuffer(uniformBuffer)
-	//,m_info(info)
 	,m_owner(owner)
 	,m_id(id)
 {

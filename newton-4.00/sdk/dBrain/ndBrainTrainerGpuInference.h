@@ -50,7 +50,6 @@ class ndBrainTrainerGpuCommand : public ndBrainGpuCommand
 		ndBrainGpuBuffer* const weightsAndBiasGradients = nullptr);
 
 	ndSharedPtr<ndBrainGpuBuffer> m_uniformBuffer;
-	//ndBrainLayer::ndCommandShareInfo m_info;
 	ndBrainTrainerGpuInference* m_owner;
 	size_t m_id;
 };
