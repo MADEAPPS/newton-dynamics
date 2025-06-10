@@ -13,7 +13,6 @@
 #include "ndBrainVector.h"
 #include "ndBrainGpuContext.h"
 #include "ndBrainGpuFloatBuffer.h"
-//#include "ndBrainGpuScopeMapBuffer.h"
 
 ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, ndInt64 size, ndDeviceBufferType deviceType)
 	:ndBrainGpuBuffer(context, size * ndInt32(sizeof(ndReal)), ndStorageData, deviceType)

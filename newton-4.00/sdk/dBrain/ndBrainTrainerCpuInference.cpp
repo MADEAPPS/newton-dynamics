@@ -227,8 +227,9 @@ void ndBrainTrainerCpuInference::ApplyLearnRate()
 {
 }
 
-void ndBrainTrainerCpuInference::UpdateParameters()
+void ndBrainTrainerCpuInference::UpdateParameters(const ndBrainVector&)
 {
+	ndAssert(0);
 }
 
 void ndBrainTrainerCpuInference::SoftCopyParameters(const ndBrainTrainer& src, ndBrainFloat blendFactor)

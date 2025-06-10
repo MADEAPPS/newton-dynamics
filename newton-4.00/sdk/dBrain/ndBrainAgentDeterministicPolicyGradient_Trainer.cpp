@@ -302,7 +302,8 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::~ndBrainAgentDeterministicPolic
 
 ndBrain* ndBrainAgentDeterministicPolicyGradient_Trainer::GetPolicyNetwork()
 {
-	m_policyTrainer->UpdateParameters();
+	ndAssert(0);
+	//m_policyTrainer->UpdateParameters();
 	return *m_policyTrainer->GetBrain();
 }
 

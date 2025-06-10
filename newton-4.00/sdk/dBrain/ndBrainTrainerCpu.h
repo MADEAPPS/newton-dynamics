@@ -50,8 +50,8 @@ class ndBrainTrainerCpu: public ndBrainTrainerCpuInference
 	ndBrainTrainerCpu(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndBrainFloat learnRate, ndInt32 minibatchSize);
 	ndBrainTrainerCpu(const ndBrainTrainerCpu& src);
 
-	virtual void UpdateParameters() override;
 	virtual void ApplyLearnRate() override;
+	virtual void UpdateParameters(const ndBrainVector& weightAndBias) override;
 
 	virtual void GetInput(ndBrainVector& input) const override;
 	virtual void BackPropagate(const ndBrainVector& outputGradients, bool sync = true) override;

@@ -103,7 +103,7 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 	virtual void ApplyLearnRate() override;
 
 	// new method
-	virtual void UpdateParameters() override;
+	virtual void UpdateParameters(const ndBrainVector& weightAndBias) override;
 
 	protected:
 	enum ndInputOutputCommandId

@@ -76,8 +76,9 @@ void ndBrainTrainerCpu::GetInput(ndBrainVector& input) const
 	input.Set(m_miniBatchInputGradientBuffer);
 }
 
-void ndBrainTrainerCpu::UpdateParameters()
+void ndBrainTrainerCpu::UpdateParameters(const ndBrainVector& weightAndBias)
 {
+	ndAssert(0);
 	for (ndList<ndSharedPtr<ndBrainTrainerCpuCommand>>::ndNode* node = m_feedForwardCommands.GetFirst(); node; node = node->GetNext())
 	{
 		ndBrainTrainerCpuCommand* const command = *node->GetInfo();

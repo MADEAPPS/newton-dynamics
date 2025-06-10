@@ -23,3 +23,18 @@ ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt64 siz
 ndBrainGpuBuffer::~ndBrainGpuBuffer()
 {
 }
+
+size_t ndBrainGpuBuffer::SizeInBytes() const
+{ 
+	return m_sizeInBytes; 
+}
+
+ndBrainGpuFloatBuffer* ndBrainGpuBuffer::GetAsFloatBuffer()
+{
+	return nullptr;
+}
+
+ndBrainGpuUniformBuffer* ndBrainGpuBuffer::GetAsUniformBuffer()
+{
+	return nullptr;
+}

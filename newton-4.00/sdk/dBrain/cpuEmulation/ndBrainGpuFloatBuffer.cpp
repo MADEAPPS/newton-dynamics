@@ -25,9 +25,9 @@ ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, c
 	LoadData(input.GetCount() * sizeof (ndBrainFloat),  & input[0]);
 }
 
-void* ndBrainGpuFloatBuffer::GetBuffer()
+ndBrainGpuFloatBuffer* ndBrainGpuFloatBuffer::GetAsFloatBuffer()
 {
-	return &m_buffer[0];
+	return this;
 }
 
 void ndBrainGpuFloatBuffer::LoadData(size_t sizeInByte, const void* const sourceData)

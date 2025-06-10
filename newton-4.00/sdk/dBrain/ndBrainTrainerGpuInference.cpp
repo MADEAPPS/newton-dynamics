@@ -252,26 +252,26 @@ void ndBrainTrainerGpuInference::UnloadBuffer(ndBrainVector& ouput, const ndShar
 
 void ndBrainTrainerGpuInference::GetInput(ndBrainVector& ouput) const
 {
-	UnloadBuffer(ouput, m_miniBatchInputBuffer);
 	m_context->SyncQueue();
+	UnloadBuffer(ouput, m_miniBatchInputBuffer);
 }
 
 void ndBrainTrainerGpuInference::GetOutput(ndBrainVector& ouput) const
 {
-	UnloadBuffer(ouput, m_miniBatchOutputBuffer);
 	m_context->SyncQueue();
+	UnloadBuffer(ouput, m_miniBatchOutputBuffer);
 }
 
 void ndBrainTrainerGpuInference::GetWorkingBuffer(ndBrainVector& ouput) const
 {
-	UnloadBuffer(ouput, m_inputOutputBuffer);
 	m_context->SyncQueue();
+	UnloadBuffer(ouput, m_inputOutputBuffer);
 }
 
 void ndBrainTrainerGpuInference::GetParameterBuffer(ndBrainVector& ouput) const
 {
-	UnloadBuffer(ouput, m_weightAndBiasBuffer);
 	m_context->SyncQueue();
+	UnloadBuffer(ouput, m_weightAndBiasBuffer);
 }
 
 void ndBrainTrainerGpuInference::BackPropagate(const ndBrainVector&, bool)
@@ -296,20 +296,18 @@ void ndBrainTrainerGpuInference::ApplyLearnRate()
 	ndAssert(0);
 }
 
-void ndBrainTrainerGpuInference::UpdateParameters()
+void ndBrainTrainerGpuInference::UpdateParameters(const ndBrainVector& weightAndBias)
 {
-	const ndBrainFloat* const buffer = (const ndBrainFloat*)m_weightAndBiasBuffer->GetBuffer();
 	for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = m_feedForwardCommands.GetFirst(); node; node = node->GetNext())
 	{
 		ndBrainGpuCommand* const command = *node->GetInfo();
-		ndAssert(0);
-		//ndBrainLayer* const layer = command->m_layer;
-		//if (layer)
-		//{
-		//	ndInt32 size = command->m_info.m_inputSize * command->m_info.m_outputSize + command->m_info.m_outputSize;
-		//	const ndBrainMemVector weights(&buffer[command->m_info.m_parametersStartOffset], size);
-		//	layer->SetWeights(weights);
-		//}
+		ndBrainLayer* const layer = command->m_layer;
+		if (layer)
+		{
+			ndInt32 size = command->m_info.m_inputSize * command->m_info.m_outputSize + command->m_info.m_outputSize;
+			const ndBrainMemVector weights(&weightAndBias[command->m_info.m_parametersStartOffset], size);
+			layer->SetWeights(weights);
+		}
 	}
 }
 

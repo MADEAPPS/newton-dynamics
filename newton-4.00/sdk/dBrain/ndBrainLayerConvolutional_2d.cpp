@@ -20,13 +20,11 @@
 */
 
 #include "ndBrainStdafx.h"
-//#include "ndBrainFloat4.h"
 #include "ndBrainSaveLoad.h"
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuCommand.h"
 #include "ndBrainGpuFloatBuffer.h"
-#include "ndBrainGpuIntegerBuffer.h"
 #include "ndBrainGpuUniformBuffer.h"
 #include "ndBrainLayerConvolutional_2d.h"
 

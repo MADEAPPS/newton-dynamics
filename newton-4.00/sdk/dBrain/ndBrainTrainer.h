@@ -38,11 +38,11 @@ class ndBrainTrainer: public ndClassAlloc
 
 	ndSharedPtr<ndBrain>& GetBrain();
 	ndSharedPtr<ndBrainContext> GetContext();
-	virtual void UpdateParameters() = 0;
 
 	virtual void GetInput(ndBrainVector&) const {}
 	virtual void GetOutput(ndBrainVector&) const {}
 	virtual void GetWorkingBuffer(ndBrainVector&) const {}
+	virtual void GetParameterBuffer(ndBrainVector&) const {}
 	virtual void SoftCopyParameters(const ndBrainTrainer&, ndBrainFloat) {}
 
 	// legacy method;
@@ -62,6 +62,9 @@ class ndBrainTrainer: public ndClassAlloc
 
 	// new method
 	virtual void ApplyLearnRate() = 0;
+
+	// new method
+	virtual void UpdateParameters(const ndBrainVector& weightAndBias) = 0;
 
 	protected:
 	ndSharedPtr<ndBrain> m_brain;

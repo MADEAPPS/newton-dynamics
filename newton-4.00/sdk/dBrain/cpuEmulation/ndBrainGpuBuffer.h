@@ -30,6 +30,9 @@ enum ndDeviceBufferType
 	ndCpuMappable,
 };
 
+class ndBrainGpuFloatBuffer;
+class ndBrainGpuUniformBuffer;
+
 class ndBrainGpuBuffer : public ndClassAlloc
 {
 	protected:
@@ -38,9 +41,11 @@ class ndBrainGpuBuffer : public ndClassAlloc
 	public:
 	virtual ~ndBrainGpuBuffer();
 	
-	size_t SizeInBytes() const { return m_sizeInBytes; }
+	size_t SizeInBytes() const;
 
-	virtual void* GetBuffer() = 0;
+	virtual ndBrainGpuFloatBuffer* GetAsFloatBuffer();
+	virtual ndBrainGpuUniformBuffer* GetAsUniformBuffer();
+
 	virtual void LoadData(size_t sizeInBytes, const void* const inputData) = 0;
 	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const = 0;
 

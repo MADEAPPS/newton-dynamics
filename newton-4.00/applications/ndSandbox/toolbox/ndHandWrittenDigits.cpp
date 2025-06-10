@@ -256,6 +256,7 @@ static void MnistTrainingSet()
 			ndBrainVector groundTruth;
 			ndBrainVector miniBatchInput;
 			ndBrainVector miniBatchOutput;
+			ndBrainVector parametersBuffer;
 			ndBrainVector miniBatchOutputGradients;
 
 			groundTruth.SetCount(outputSize * m_miniBatchSize);
@@ -302,11 +303,8 @@ static void MnistTrainingSet()
 					//trainer->BackPropagate(miniBatchOutputGradients);
 					//trainer->ApplyLearnRate();
 
-					#if 1
-						//ndBrainVector internalBuffers;
-						//ndBrainVector internalParameters;
+					#if 0
 						//trainer->GetWorkingBuffer(internalBuffers);
-						//trainer->GetParameterBuffer(internalParameters);
 						//ndInt32 inputSize = trainer->GetBrain()->GetInputSize();
 						//ndInt32 outputSize = trainer->GetBrain()->GetOutputSize();
 						ndBrainFixSizeVector<1024> xxx1;
@@ -314,7 +312,8 @@ static void MnistTrainingSet()
 
 						trainer->MakePrediction(miniBatchInput);
 						trainer->GetOutput(miniBatchOutput);
-						trainer->UpdateParameters();
+						trainer->GetParameterBuffer(parametersBuffer);
+						trainer->UpdateParameters(parametersBuffer);
 						const ndBrain* const brain = *trainer->GetBrain();
 						for (ndInt32 i = 0; i < m_miniBatchSize; i++)
 						{
@@ -331,14 +330,15 @@ static void MnistTrainingSet()
 					#endif
 				}
 
-#if 0
+#if 1
 				ndExpandTraceMessage("epoc: %d\n", epoch);
 #else
 				
 				ndInt64 testFailCount = ValidateData(testLabels, testDigits) + 1;
 				if (testFailCount < m_minValidationFail)
 				{
-					trainer->UpdateParameters();
+					trainer->GetParameterBuffer(parametersBuffer);
+					trainer->UpdateParameters(parametersBuffer);
 					m_bestBrain->CopyFrom(**trainer->GetBrain());
 					m_minValidationFail = testFailCount + 1;
 					ndInt64 trainigFailCount = ValidateData(trainingLabels, trainingDigits) + 1;

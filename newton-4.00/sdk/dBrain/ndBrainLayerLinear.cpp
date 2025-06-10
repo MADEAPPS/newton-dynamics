@@ -27,7 +27,6 @@
 #include "ndBrainGpuCommand.h"
 #include "ndBrainGpuContext.h"
 #include "ndBrainGpuFloatBuffer.h"
-#include "ndBrainGpuIntegerBuffer.h"
 #include "ndBrainGpuUniformBuffer.h"
 #include "ndBrainTrainerGpuInference.h"
 

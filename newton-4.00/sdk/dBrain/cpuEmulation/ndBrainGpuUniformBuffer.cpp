@@ -24,9 +24,9 @@ ndBrainGpuUniformBuffer::ndBrainGpuUniformBuffer(ndBrainGpuContext* const contex
 	LoadData(size_t(sizeInBytes), data);
 }
 
-void* ndBrainGpuUniformBuffer::GetBuffer()
+ndBrainGpuUniformBuffer* ndBrainGpuUniformBuffer::GetAsUniformBuffer()
 {
-	return &m_data[0];
+	return this;
 }
 
 void ndBrainGpuUniformBuffer::UnloadData(size_t, void* const) const
