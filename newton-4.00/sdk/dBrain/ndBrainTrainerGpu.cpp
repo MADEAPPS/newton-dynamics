@@ -251,7 +251,7 @@ int xxxx = 0;
 		command->m_layer = layer;
 		m_backPropagateCommands.Append(command);
 
-		if (xxxx == 1)
+		if (xxxx == 2)
 			break;
 		xxxx++;
 	}

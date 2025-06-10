@@ -54,6 +54,7 @@ class ndBrainGpuContext : public ndBrainContext
 	// back propagate shaders
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyOutputGradients;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerTanhBackPropagate;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinearBackPropagate;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerCathegoricalSoftmaxBackPropagate;
 
 	private:
@@ -69,6 +70,7 @@ class ndBrainGpuContext : public ndBrainContext
 
 	static const char* m_backPropagateKernels_1;
 	static const char* m_backPropagateKernels_2;
+	static const char* m_backPropagateKernels_3;
 
 	static const char* m_commonKernelsSource;
 
