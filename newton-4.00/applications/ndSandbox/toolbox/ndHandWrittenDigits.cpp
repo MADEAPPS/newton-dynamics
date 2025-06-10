@@ -301,7 +301,7 @@ static void MnistTrainingSet()
 					}
 					// backpropagate loss.
 					trainer->BackPropagate(miniBatchOutputGradients);
-					//trainer->ApplyLearnRate();
+					trainer->ApplyLearnRate();
 
 					#if 0
 						//trainer->GetWorkingBuffer(internalBuffers);

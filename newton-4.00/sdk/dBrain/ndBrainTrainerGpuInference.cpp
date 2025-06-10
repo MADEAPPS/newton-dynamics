@@ -98,13 +98,14 @@ void ndBrainTrainerGpuInference::AddLayersCommands(ndFixSizeArray<ndBrainLayer::
 	ndBrainGpuBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
 	
 	ndInt32 inputOutputStartOffset = 0;
-	ndInt32 inputOutputBufferSize = brain.GetInputSize();
+	//ndInt32 inputOutputBufferSize = brain.GetInputSize();
+	ndInt32 inputOutputBufferSize = RoundoffOffset(brain.GetInputSize());
 	for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
 	{
 		ndBrainLayer::ndCommandShareInfo& data = layersUniformsData[i];
 		data.m_inputOutputStartOffset = inputOutputStartOffset;
-		inputOutputBufferSize += data.m_outputSize;
-		inputOutputStartOffset += data.m_inputSize;
+		inputOutputBufferSize += RoundoffOffset(data.m_outputSize);
+		inputOutputStartOffset += RoundoffOffset(data.m_inputSize);
 	}
 	
 	for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
@@ -132,11 +133,11 @@ void ndBrainTrainerGpuInference::AddLayersCommands(ndFixSizeArray<ndBrainLayer::
 void ndBrainTrainerGpuInference::AddCopyInputCommand(const ndBrainLayer::ndCommandShareInfo& uniformData)
 {
 	const ndBrain& brain = **m_brain;
-	ndInt32 inputOutputBufferSize = brain.GetInputSize();
+	ndInt32 inputOutputBufferSize = RoundoffOffset(brain.GetInputSize());
 	for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
 	{
 		const ndBrainLayer* const layer = brain[i];
-		inputOutputBufferSize += layer->GetOutputSize();
+		inputOutputBufferSize += RoundoffOffset(layer->GetOutputSize());
 	}
 	
 	ndBrainLayer::ndCommandShareInfo uniformParam;
@@ -165,7 +166,7 @@ void ndBrainTrainerGpuInference::AddCopyOutputCommand()
 	ndBrainLayer::ndCommandShareInfo data(lastLayerCommand->m_info);
 	
 	data.m_parametersStartOffset = 0;
-	data.m_inputOutputStartOffset += data.m_inputSize;
+	data.m_inputOutputStartOffset += RoundoffOffset(data.m_inputSize);
 	ndSharedPtr<ndBrainGpuBuffer> uniformbuffer(new ndBrainGpuUniformBuffer(m_context, sizeof(ndBrainLayer::ndCommandShareInfo)));
 	uniformbuffer->LoadData(sizeof(ndBrainLayer::ndCommandShareInfo), &data);
 	
@@ -227,14 +228,20 @@ void ndBrainTrainerGpuInference::InitWeightAndBiasBuffer()
 	AddCopyOutputCommand();
 }
 
+ndInt32 ndBrainTrainerGpuInference::RoundoffOffset(ndInt32 value) const
+{
+	ndInt32 roundoffBatch = 1 << ndExp2(m_miniBatchSize);
+	return (value + +roundoffBatch - 1) & -roundoffBatch;
+}
+
 void ndBrainTrainerGpuInference::InitInputOutputBuffer()
 {
 	const ndBrain& brain = **m_brain;
-	ndInt32 bufferSize = brain.GetInputSize();
+	ndInt32 bufferSize = RoundoffOffset(brain.GetInputSize());
 	for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
 	{
 		const ndBrainLayer* const layer = brain[i];
-		bufferSize += layer->GetOutputSize();
+		bufferSize += RoundoffOffset(layer->GetOutputSize());
 	}
 
 	ndBrainVector buffer;

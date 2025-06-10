@@ -90,6 +90,7 @@ class ndBrainTrainerGpuInference: public ndBrainTrainer
 	void AddCopyOutputCommand();
 	void InitInputOutputBuffer();
 	void InitWeightAndBiasBuffer();
+	ndInt32 RoundoffOffset(ndInt32 value) const;
 	ndBrainTrainerGpuCommand* FindCommand(size_t id) const;
 	void AddCopyInputCommand(const ndBrainLayer::ndCommandShareInfo& uniformData);
 	void UnloadBuffer(ndBrainVector& ouput, const ndSharedPtr<ndBrainGpuBuffer>& gpuBuffer) const;
