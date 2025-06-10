@@ -546,6 +546,82 @@ R""""(
 
 )"""";
 
+const char* ndBrainGpuContext::m_backPropagateKernels_2 =
+R""""(
+
+    __kernel void brainLayerBrainCathegoricalSoftmaxBackPropagate(
+            __global const UniformBufferObject* parameters, 
+            __global float* inputOutputData, 
+            __global float* notUsed, 
+            __global float* inputOutputGradients) 
+    {
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+        
+        uint inputSize = parameters->m_inputSize;
+        uint inputOutputSize = parameters->m_inputOutputSize;
+        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+        
+        uint srcBase = groupId * inputOutputSize + inputOutputStartOffset;        
+        uint dstBase = groupId * inputSize;
+        
+        uint workGroupSizeReminder = inputSize % workGroupSize;
+        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            float a = inputOutputData[dstBase + i + itemId];
+            a -= inputOutputGradients[dstBase + i + itemId];
+            inputOutputGradients[srcBase + i + itemId] = a;
+        }
+        
+        if (itemId < workGroupSizeReminder)
+        {
+            float a = inputOutputData[dstBase + modWorkGroupSize + itemId];
+            a -= inputOutputGradients[dstBase + modWorkGroupSize + itemId];
+            inputOutputGradients[srcBase + modWorkGroupSize + itemId] = a;
+        }
+    }
+
+    __kernel void brainLayerBrainTanhBackPropagate(
+            __global const UniformBufferObject* parameters, 
+            __global float* inputOutputData, 
+            __global float* notUsed, 
+            __global float* inputOutputGradients) 
+    {
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+
+        uint inputSize = parameters->m_inputSize;
+        uint inputOutputSize = parameters->m_inputOutputSize;
+        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+
+        uint srcBase = groupId * inputOutputSize + inputOutputStartOffset;
+        uint dstBase = srcBase + inputSize;
+
+        uint workGroupSizeReminder = inputSize % workGroupSize;
+        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
+
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            float outputData = inputOutputData[dstBase + i + itemId];
+            float a = 1.0f - outputData * outputData;
+            float b = inputOutputGradients[dstBase + i + itemId];
+            inputOutputGradients[srcBase + i + itemId] = a * b;
+        }
+        
+        for (uint itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+        {
+            float outputData = inputOutputData[dstBase + modWorkGroupSize + itemId];
+            float a = 1.0f - outputData * outputData;
+            float b = inputOutputGradients[dstBase + modWorkGroupSize + itemId];
+            inputOutputGradients[srcBase + modWorkGroupSize + itemId] = a * b;
+        }
+    }
+
+)"""";
+
 
 ndSharedPtr<ndBrainGpuShader> ndBrainGpuContext::CreateKerner(const cl::Program& program, const char* const functionMame) const
 {
@@ -564,6 +640,7 @@ void ndBrainGpuContext::CreateKerners()
     source += m_feedForwardKernels_2;
     source += m_feedForwardKernels_3;
     source += m_backPropagateKernels_1;
+    source += m_backPropagateKernels_2;
 
     cl::Program program (**m_context, source, CL_TRUE, &errcode_ret);
     ndAssert(errcode_ret == 0);
@@ -586,4 +663,6 @@ void ndBrainGpuContext::CreateKerners()
 
     // create all backpropagate shaders
     m_ndBrainCopyOutputGradients = CreateKerner(program, "brainCopyOutputGradients");
+    m_ndBrainLayerTanhBackPropagate = CreateKerner(program, "brainLayerBrainTanhBackPropagate");
+    m_ndBrainLayerCathegoricalSoftmaxBackPropagate = CreateKerner(program, "brainLayerBrainCathegoricalSoftmaxBackPropagate");
 }

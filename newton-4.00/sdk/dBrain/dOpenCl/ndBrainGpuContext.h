@@ -42,14 +42,19 @@ class ndBrainGpuContext : public ndBrainContext
 	static void CL_CALLBACK clNotification(const char* errinfo, const void* private_info, size_t cb, void* user_data);
 
 	public:
+	// feed foward shaders
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyInput;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyOutput;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinear;
-	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyOutputGradients;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerReluActivation;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerTanhActivation;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerSoftmaxActivation;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinearDropOutActivation;
+
+	// back propagate shaders
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyOutputGradients;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerTanhBackPropagate;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerCathegoricalSoftmaxBackPropagate;
 
 	private:
 	ndSharedPtr<cl::Device> m_device;
@@ -63,6 +68,7 @@ class ndBrainGpuContext : public ndBrainContext
 	static const char* m_feedForwardKernels_3;
 
 	static const char* m_backPropagateKernels_1;
+	static const char* m_backPropagateKernels_2;
 
 	static const char* m_commonKernelsSource;
 

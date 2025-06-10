@@ -118,7 +118,7 @@ ndBrainTrainerGpu::ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const nd
 	m_weightAndBiasGradientsBuffer = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(m_context, buffer, ndCpuMappable));
 
 	AddCopyOutputGradientCommand();
-	//AddLayersGradientCommands();
+	AddLayersGradientCommands();
 	//AddCopyInputGradientCommand();
 	//AddOptimizerGradientCommand(learnRate);
 }
@@ -226,6 +226,7 @@ void ndBrainTrainerGpu::AddLayersGradientCommands()
 {
 	const ndBrain& brain = **m_brain;
 
+int xxxx = 0;
 	for (ndInt32 i = ndInt32(brain.GetCount()) - 1; i >= 0; --i)
 	{
 		ndBrainLayer* const layer = brain[i];
@@ -249,6 +250,10 @@ void ndBrainTrainerGpu::AddLayersGradientCommands()
 		ndSharedPtr<ndBrainGpuCommand>command(commandBuffer);
 		command->m_layer = layer;
 		m_backPropagateCommands.Append(command);
+
+		if (xxxx == 1)
+			break;
+		xxxx++;
 	}
 }
 
