@@ -117,7 +117,7 @@ ndBrainTrainerGpu::ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const nd
 	buffer.Set(ndReal(0.0f));
 	m_weightAndBiasGradientsBuffer = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(m_context, buffer, ndCpuMappable));
 
-	//AddCopyOutputGradientCommand();
+	AddCopyOutputGradientCommand();
 	//AddLayersGradientCommands();
 	//AddCopyInputGradientCommand();
 	//AddOptimizerGradientCommand(learnRate);

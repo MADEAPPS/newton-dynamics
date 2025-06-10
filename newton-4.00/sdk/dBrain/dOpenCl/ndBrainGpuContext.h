@@ -58,10 +58,13 @@ class ndBrainGpuContext : public ndBrainContext
 
 	cl::Buffer m_emptyBuffer;
 
-	static const char* m_kernelSource0;
-	static const char* m_kernelSource1;
-	static const char* m_kernelSource2;
-	static const char* m_kernelSource3;
+	static const char* m_feedForwardKernels_1;
+	static const char* m_feedForwardKernels_2;
+	static const char* m_feedForwardKernels_3;
+
+	static const char* m_backPropagateKernels_1;
+
+	static const char* m_commonKernelsSource;
 
 	friend class ndBrainGpuBuffer;
 	friend class ndBrainGpuCommand;

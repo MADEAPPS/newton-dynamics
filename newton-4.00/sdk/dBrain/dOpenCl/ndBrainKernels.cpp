@@ -12,7 +12,8 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainGpuContext.h"
 
-const char* ndBrainGpuContext::m_kernelSource0 =
+// feed forward kernels
+const char* ndBrainGpuContext::m_commonKernelsSource =
 R""""(
 
     #define ND_GPU_LOCAL_BUFFER_SIZE	512
@@ -29,7 +30,7 @@ R""""(
     }  UniformBufferObject;
 )"""";
 
-const char* ndBrainGpuContext::m_kernelSource1 =
+const char* ndBrainGpuContext::m_feedForwardKernels_1 =
 R""""(
 
     __kernel void brainCopyInput(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* inputBuffer)
@@ -91,7 +92,7 @@ R""""(
 
 )"""";
 
-const char* ndBrainGpuContext::m_kernelSource2 =
+const char* ndBrainGpuContext::m_feedForwardKernels_2 =
 R""""(
 
     __kernel void brainLayerLinear_old(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* weightsAndBias) 
@@ -394,8 +395,7 @@ R""""(
     }
 )"""";
 
-
-const char* ndBrainGpuContext::m_kernelSource3 =
+const char* ndBrainGpuContext::m_feedForwardKernels_3 =
     R""""(
 
     __kernel void brainLayerSoftmaxActivation(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* notUsed)
@@ -508,9 +508,14 @@ const char* ndBrainGpuContext::m_kernelSource3 =
     }
 )"""";
 
-#if 0
+const char* ndBrainGpuContext::m_backPropagateKernels_1 =
+R""""(
 
-    __kernel void brainCopyOutputGradients(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* outputBuffer) 
+    __kernel void brainCopyOutputGradients(
+            __global const UniformBufferObject* parameters, 
+            __global float* notUsed, 
+            __global float* miniBatchGradients, 
+            __global float* inputOutputGradients) 
     {
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
@@ -520,33 +525,27 @@ const char* ndBrainGpuContext::m_kernelSource3 =
         uint inputOutputSize = parameters->m_inputOutputSize;
         uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        //uint dstBase = groupId * outputSize;
-        //uint srcBase = groupId * inputOutputSize + inputOutputStartOffset;
-        //
-        //uint workGroupSizeReminder = outputSize % workGroupSize;
-        //uint modWorkGroupSize = outputSize - workGroupSizeReminder;
-        //
-        //for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
-        //{
-        //    float a = inputOutputData[srcBase + itemId];
-        //    outputBuffer[dstBase + i + itemId] = a;
-        //}
-        //
-        //if (itemId < workGroupSizeReminder)
-        //{
-        //    float a = inputOutputData[srcBase + modWorkGroupSize + itemId];
-        //    outputBuffer[dstBase + modWorkGroupSize + itemId] = a;
-        //}
+        uint dstBase = groupId * outputSize;
+        uint srcBase = groupId * inputOutputSize + inputOutputStartOffset;
+        
+        uint workGroupSizeReminder = outputSize % workGroupSize;
+        uint modWorkGroupSize = outputSize - workGroupSizeReminder;
+        
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            float a = miniBatchGradients[srcBase + i + itemId];
+            inputOutputGradients[dstBase + i + itemId] = a;
+        }
+        
+        if (itemId < workGroupSizeReminder)
+        {
+            float a = miniBatchGradients[srcBase + modWorkGroupSize + itemId];
+            inputOutputGradients[dstBase + modWorkGroupSize + itemId] = a;
+        }
     }
 
 )"""";
 
-
-)"""";
-
-
-
-#endif
 
 ndSharedPtr<ndBrainGpuShader> ndBrainGpuContext::CreateKerner(const cl::Program& program, const char* const functionMame) const
 {
@@ -560,10 +559,11 @@ ndSharedPtr<ndBrainGpuShader> ndBrainGpuContext::CreateKerner(const cl::Program&
 void ndBrainGpuContext::CreateKerners()
 {
     cl_int errcode_ret = 0;
-    std::string source(m_kernelSource0);
-    source += m_kernelSource1;
-    source += m_kernelSource2;
-    source += m_kernelSource3;
+    std::string source(m_commonKernelsSource);
+    source += m_feedForwardKernels_1;
+    source += m_feedForwardKernels_2;
+    source += m_feedForwardKernels_3;
+    source += m_backPropagateKernels_1;
 
     cl::Program program (**m_context, source, CL_TRUE, &errcode_ret);
     ndAssert(errcode_ret == 0);
@@ -585,5 +585,5 @@ void ndBrainGpuContext::CreateKerners()
     m_ndBrainLayerLinearDropOutActivation = CreateKerner(program, "brainLayerLinearDropOutActivation");
 
     // create all backpropagate shaders
-    //m_ndBrainCopyOutputGradients = CreateKerner(program, "brainCopyOutputGradients");
+    m_ndBrainCopyOutputGradients = CreateKerner(program, "brainCopyOutputGradients");
 }

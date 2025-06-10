@@ -115,16 +115,19 @@ void ndBrainGpuContext::SyncQueue()
 void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& command)
 {
 	cl_int error = 0;
+	cl_int numberOfParameters = 0;
 	ndSharedPtr<ndBrainGpuShader>& shader = command->m_shader;
-	for (ndInt32 i = 0; i < command->m_parameters.GetCount(); ++i)
+	
+	//std::string name;
+	//error = shader->getInfo(CL_KERNEL_FUNCTION_NAME, &name);
+	error = shader->getInfo(CL_KERNEL_NUM_ARGS, &numberOfParameters);
+	ndAssert(error == CL_SUCCESS);
+
+	for (ndInt32 i = 0; i < numberOfParameters; ++i)
 	{
 		ndBrainGpuBuffer* const argBuffer = command->m_parameters[i];
-		if (argBuffer)
-		{
-			//error = shader->setArg(cl_uint(i),  argBuffer->m_buffer : m_emptyBuffer);
-			error = shader->setArg(cl_uint(i), argBuffer->m_buffer);
-			ndAssert(error == CL_SUCCESS);
-		}
+		error = shader->setArg(cl_uint(i), argBuffer ? argBuffer->m_buffer : m_emptyBuffer);
+		ndAssert(error == CL_SUCCESS);
 	}
 
 	cl::NDRange offset(0);

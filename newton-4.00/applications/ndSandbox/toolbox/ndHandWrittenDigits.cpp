@@ -300,7 +300,7 @@ static void MnistTrainingSet()
 						loss.GetLoss(output, grad);
 					}
 					// backpropagate loss.
-					//trainer->BackPropagate(miniBatchOutputGradients);
+					trainer->BackPropagate(miniBatchOutputGradients);
 					//trainer->ApplyLearnRate();
 
 					#if 0
