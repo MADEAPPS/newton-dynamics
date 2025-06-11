@@ -27,9 +27,24 @@ R""""(
 	    uint m_inputOutputSize;
 	    uint m_inputOutputStartOffset;
 	    uint m_unused[4];
-    }  UniformBufferObject;
+    } UniformBufferLayerArguments;
 
-     uint CalculateWorkGroupRoundoff(uint value, uint workgroupSize) 
+    typedef struct
+    {
+		float m_beta;
+		float m_alpha;
+		float m_epsilon;
+		float m_betaAcc;
+		float m_alphaAcc;
+		float m_learnRate;
+		float m_invBeta;
+		float m_invAlpha;
+		float m_decayRegularizer;
+		uint m_minibatchSize;
+    } UniformBufferOptimizerArguments;
+
+
+    uint CalculateWorkGroupRoundoff(uint value, uint workgroupSize) 
     {
         return (value + workgroupSize - 1) & (int)workgroupSize;
     }
@@ -39,7 +54,7 @@ R""""(
 const char* ndBrainGpuContext::m_feedForwardKernels_1 =
 R""""(
 
-    __kernel void brainCopyInput(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* inputBuffer)
+    __kernel void brainCopyInput(__global const UniformBufferLayerArguments* parameters, __global float* inputOutputData, __global float* inputBuffer)
     {                                                                      
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
@@ -67,7 +82,7 @@ R""""(
         }
     }
 
-    __kernel void brainCopyOutput(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* outputBuffer) 
+    __kernel void brainCopyOutput(__global const UniformBufferLayerArguments* parameters, __global float* inputOutputData, __global float* outputBuffer) 
     {
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
@@ -101,7 +116,7 @@ R""""(
 const char* ndBrainGpuContext::m_feedForwardKernels_2 =
 R""""(
 
-    __kernel void brainLayerLinear_old(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* weightsAndBias) 
+    __kernel void brainLayerLinear_old(__global const UniformBufferLayerArguments* parameters, __global float* inputOutputData, __global float* weightsAndBias) 
     {
         __local float cachedInput [ND_GPU_LOCAL_BUFFER_SIZE * 2];
         __local float cachedOutput [ND_GPU_LOCAL_BUFFER_SIZE * 2];
@@ -195,7 +210,7 @@ R""""(
 
     // a matrix time a vector by iterating over each row of the matrix 
     // calculating the dot product of that row time the vector and adding the bias value.
-    __kernel void brainLayerLinear(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* weightsAndBias) 
+    __kernel void brainLayerLinear(__global const UniformBufferLayerArguments* parameters, __global float* inputOutputData, __global float* weightsAndBias) 
     {
         __local float cachedInput [ND_GPU_LOCAL_BUFFER_SIZE * 2];
         __local float cachedOutput [ND_GPU_LOCAL_BUFFER_SIZE * 2];
@@ -321,7 +336,7 @@ R""""(
         //}
     }
 
-    __kernel void brainLayerReluActivation(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* notUsed)  
+    __kernel void brainLayerReluActivation(__global const UniformBufferLayerArguments* parameters, __global float* inputOutputData, __global float* notUsed)  
     {
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
@@ -351,7 +366,7 @@ R""""(
         //}
     }
 
-    __kernel void brainLayerTanhActivation(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* notUsed)  
+    __kernel void brainLayerTanhActivation(__global const UniformBufferLayerArguments* parameters, __global float* inputOutputData, __global float* notUsed)  
     {
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
@@ -381,7 +396,7 @@ R""""(
         //}
     }
 
-    __kernel void brainLayerLinearDropOutActivation(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* notUsed)  
+    __kernel void brainLayerLinearDropOutActivation(__global const UniformBufferLayerArguments* parameters, __global float* inputOutputData, __global float* notUsed)  
     {
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
@@ -415,7 +430,7 @@ R""""(
 const char* ndBrainGpuContext::m_feedForwardKernels_3 =
 R""""(
 
-    __kernel void brainLayerSoftmaxActivation(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* notUsed)
+    __kernel void brainLayerSoftmaxActivation(__global const UniformBufferLayerArguments* parameters, __global float* inputOutputData, __global float* notUsed)
     {
         __local float tmpInputBuffer [ND_GPU_LOCAL_BUFFER_SIZE * 2];
         __local float reductionBuffer [ND_GPU_LOCAL_BUFFER_SIZE];
@@ -530,7 +545,7 @@ const char* ndBrainGpuContext::m_backPropagateKernels_1 =
 R""""(
 
     __kernel void brainCopyInputGradients(
-            __global const UniformBufferObject* parameters, 
+            __global const UniformBufferLayerArguments* parameters, 
             __global float* notUsed, 
             __global float* miniBatchGradients, 
             __global float* inputOutputGradients) 
@@ -561,7 +576,7 @@ R""""(
     }
 
     __kernel void brainCopyOutputGradients(
-            __global const UniformBufferObject* parameters, 
+            __global const UniformBufferLayerArguments* parameters, 
             __global float* notUsed, 
             __global float* miniBatchGradients, 
             __global float* inputOutputGradients) 
@@ -597,7 +612,7 @@ const char* ndBrainGpuContext::m_backPropagateKernels_2 =
 R""""(
 
     __kernel void brainLayerBrainReluBackPropagate(
-            __global const UniformBufferObject* parameters, 
+            __global const UniformBufferLayerArguments* parameters, 
             __global float* inputOutputData, 
             __global float* notUsed, 
             __global float* inputOutputGradients) 
@@ -633,7 +648,7 @@ R""""(
     }
 
     __kernel void brainLayerBrainTanhBackPropagate(
-            __global const UniformBufferObject* parameters, 
+            __global const UniformBufferLayerArguments* parameters, 
             __global float* inputOutputData, 
             __global float* notUsed, 
             __global float* inputOutputGradients) 
@@ -669,7 +684,7 @@ R""""(
     }
 
     __kernel void brainLayerBrainCathegoricalSoftmaxBackPropagate(
-            __global const UniformBufferObject* parameters, 
+            __global const UniformBufferLayerArguments* parameters, 
             __global float* inputOutputData, 
             __global float* notUsed, 
             __global float* inputOutputGradients) 
@@ -703,7 +718,7 @@ R""""(
     }
 
     __kernel void brainLayerBrainLinearDropOutBackPropagate(
-            __global const UniformBufferObject* parameters, 
+            __global const UniformBufferLayerArguments* parameters, 
             __global float* inputOutputData, 
             __global float* notUsed, 
             __global float* inputOutputGradients) 
@@ -740,7 +755,7 @@ const char* ndBrainGpuContext::m_backPropagateKernels_3 =
 R""""(
 
     //__kernel void brainLayerBrainLinearBackPropagate_old(
-    //        __global const UniformBufferObject* parameters, 
+    //        __global const UniformBufferLayerArguments* parameters, 
     //        __global float* inputOutputData, 
     //        __global float* weightAndBias, 
     //        __global float* inputOutputGradients,
@@ -844,7 +859,7 @@ R""""(
 
     // optimizations pending.
     __kernel void brainLayerBrainLinearBackPropagate(
-            __global const UniformBufferObject* parameters, 
+            __global const UniformBufferLayerArguments* parameters, 
             __global float* inputOutputData, 
             __global float* weightAndBias, 
             __global float* inputOutputGradients,
@@ -953,9 +968,32 @@ R""""(
 const char* ndBrainGpuContext::m_optimizerKernels =
 R""""(
 
-    //__kernel void brainAccumulateGradients(__global UniformBufferObject* parameters, __global float* gradientBuffer)
+    //void Execute(uint groupId, uint workGroupSize)
+    __kernel void brainAdamMomentumUpdate(__global UniformBufferOptimizerArguments* parameters) 
+    {
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        
+        //ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        //ndBrainOptimizerAdamGpu::ndCommandShareInfo* const parameters = (ndBrainOptimizerAdamGpu::ndCommandShareInfo*)&buffer0->m_data[0];
+
+        if (itemId == 0)
+        {
+            parameters->m_betaAcc *= parameters->m_beta;
+            parameters->m_alphaAcc *= parameters->m_alpha;
+            if (parameters->m_betaAcc < 1.0e-6f)
+            {
+                parameters->m_betaAcc = 0.0f;
+            }
+            if (parameters->m_alphaAcc < 1.0e-6f)
+            {
+                parameters->m_alphaAcc = 0.0f;
+            }
+        }
+    }
+
     __kernel void brainAccumulateGradients(
-            __global const UniformBufferObject* parameters,
+            __global const UniformBufferLayerArguments* parameters,
             __global float* gradientBuffer)
     {
         uint itemId = get_local_id(0);
@@ -964,7 +1002,7 @@ R""""(
 
         //ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
         //ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
-        //UniformBufferObject* const parameters = (UniformBufferObject*)&buffer0->m_data[0];
+        //UniformBufferLayerArguments* const parameters = (UniformBufferLayerArguments*)&buffer0->m_data[0];
         //float* const gradientBuffer = &buffer1->m_buffer[0];
 
         uint inputSize = parameters->m_inputSize;
@@ -980,6 +1018,78 @@ R""""(
             sum += gradientBuffer[base + itemId];
         }
         gradientBuffer[start + itemId] = sum * weightFactor;
+    }
+
+    __kernel void brainAdamUpdateLassoRegularizer(
+        __global const UniformBufferOptimizerArguments* parameters,
+        __global float* weightAndBiasBuffer, __global float* weightAndBiasGradientBuffer,
+        __global float* vdw, __global float* vdw2)
+    {
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+
+        float descendRate = -parameters->m_learnRate;
+        float regularizer = -parameters->m_decayRegularizer;
+
+        uint start = groupId * workGroupSize;
+
+        for (uint itemId = 0; itemId < workGroupSize; ++itemId)
+        {
+            float temp = weightAndBiasGradientBuffer[start + itemId];
+            float a = vdw[start + itemId] * parameters->m_alpha + temp * (1.0f - parameters->m_alpha);
+            vdw[start + itemId] = a;
+            
+            // calcuate RMS
+            float b = vdw2[start + itemId] * parameters->m_beta + temp * temp * (1.0f - parameters->m_beta);
+            vdw2[start + itemId] = b;
+        
+            float vdwCorrected = a * parameters->m_invAlpha;
+            float vdw2Corrected = b * parameters->m_invBeta;
+            
+            float bias_den = 1.0f / (sqrt(vdw2Corrected) + parameters->m_epsilon);
+            float gradient = vdwCorrected * bias_den;
+             
+            float weight = weightAndBiasBuffer[start + itemId];
+            float lassoRegularizer = (weight >= 0.0f) ? regularizer : -regularizer;
+            gradient += weight * lassoRegularizer;
+            weightAndBiasBuffer[start + itemId] = weight + gradient * descendRate;
+        }
+    }
+
+    __kernel void brainAdamUpdateRidgeRegularizer(
+        __global const UniformBufferOptimizerArguments* parameters,
+        __global float* weightAndBiasBuffer, __global float* weightAndBiasGradientBuffer,
+        __global float* vdw, __global float* vdw2)
+    {
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+
+        float descendRate = -parameters->m_learnRate;
+        float regularizer = -parameters->m_decayRegularizer;
+
+        uint start = groupId * workGroupSize;
+        for (uint itemId = 0; itemId < workGroupSize; ++itemId)
+        {
+            float temp = weightAndBiasGradientBuffer[start + itemId];
+            float a = vdw[start + itemId] * parameters->m_alpha + temp * (1.0f - parameters->m_alpha);
+            vdw[start + itemId] = a;
+            
+            // calcuate RMS
+            float b = vdw2[start + itemId] * parameters->m_beta + temp * temp * (1.0f - parameters->m_beta);
+            vdw2[start + itemId] = b;
+        
+            float vdwCorrected = a * parameters->m_invAlpha;
+            float vdw2Corrected = b * parameters->m_invBeta;
+            
+            float bias_den = 1.0f / (sqrt(vdw2Corrected) + parameters->m_epsilon);
+            float gradient = vdwCorrected * bias_den;
+             
+            float weight = weightAndBiasBuffer[start + itemId];
+            gradient += weight * regularizer;
+            weightAndBiasBuffer[start + itemId] = weight + gradient * descendRate;
+        }
     }
 
 )"""";
@@ -1037,4 +1147,8 @@ void ndBrainGpuContext::CreateKerners()
     // accumulate gradient kernels
     m_ndBrainAccumulateGradients = CreateKerner(program, "brainAccumulateGradients");
 
+    // optimizer kernels
+    m_ndBrainAdamMomentumUpdate = CreateKerner(program, "brainAdamMomentumUpdate");
+    m_ndBrainAdamRidgeOptimizerUpdate = CreateKerner(program, "brainAdamUpdateRidgeRegularizer");
+    m_ndBrainAdamLassoOptimizerUpdate = CreateKerner(program, "brainAdamUpdateLassoRegularizer");
 }
