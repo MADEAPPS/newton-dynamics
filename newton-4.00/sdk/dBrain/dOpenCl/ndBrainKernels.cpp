@@ -413,7 +413,7 @@ R""""(
 )"""";
 
 const char* ndBrainGpuContext::m_feedForwardKernels_3 =
-    R""""(
+R""""(
 
     __kernel void brainLayerSoftmaxActivation(__global const UniformBufferObject* parameters, __global float* inputOutputData, __global float* notUsed)
     {
@@ -529,6 +529,37 @@ const char* ndBrainGpuContext::m_feedForwardKernels_3 =
 const char* ndBrainGpuContext::m_backPropagateKernels_1 =
 R""""(
 
+    __kernel void brainCopyInputGradients(
+            __global const UniformBufferObject* parameters, 
+            __global float* notUsed, 
+            __global float* miniBatchGradients, 
+            __global float* inputOutputGradients) 
+    {
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+        
+        uint inputSize = parameters->m_inputSize;
+        uint inputOutputSize = parameters->m_inputOutputSize;
+        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+        
+        uint dstBase = groupId * inputSize;
+        uint srcBase = groupId * inputOutputSize + inputOutputStartOffset;
+        
+        uint workGroupSizeReminder = inputSize % workGroupSize;
+        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            float a = miniBatchGradients[srcBase + i + itemId];
+            inputOutputGradients[dstBase + i + itemId] = a;
+        }
+        if (itemId < workGroupSizeReminder)
+        {
+            float a = miniBatchGradients[srcBase + modWorkGroupSize + itemId];
+            inputOutputGradients[dstBase + modWorkGroupSize + itemId] = a;
+        }
+    }
+
     __kernel void brainCopyOutputGradients(
             __global const UniformBufferObject* parameters, 
             __global float* notUsed, 
@@ -548,7 +579,6 @@ R""""(
         
         uint workGroupSizeReminder = outputSize % workGroupSize;
         uint modWorkGroupSize = outputSize - workGroupSizeReminder;
-        
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             float a = miniBatchGradients[srcBase + i + itemId];
@@ -920,6 +950,40 @@ R""""(
 
 )"""";
 
+const char* ndBrainGpuContext::m_optimizerKernels =
+R""""(
+
+    //__kernel void brainAccumulateGradients(__global UniformBufferObject* parameters, __global float* gradientBuffer)
+    __kernel void brainAccumulateGradients(
+            __global const UniformBufferObject* parameters,
+            __global float* gradientBuffer)
+    {
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+
+        //ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
+        //ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        //UniformBufferObject* const parameters = (UniformBufferObject*)&buffer0->m_data[0];
+        //float* const gradientBuffer = &buffer1->m_buffer[0];
+
+        uint inputSize = parameters->m_inputSize;
+        uint miniBatchSize = parameters->m_inputOutputSize;
+        
+        uint start = groupId * workGroupSize;
+        float weightFactor = 1.0f / (float)workGroupSize;
+        
+        float sum = 0.0f;
+        for (uint j = 0; j < workGroupSize; ++j)
+        {
+            uint base = start + j * inputSize;
+            sum += gradientBuffer[base + itemId];
+        }
+        gradientBuffer[start + itemId] = sum * weightFactor;
+    }
+
+)"""";
+
 
 ndSharedPtr<ndBrainGpuShader> ndBrainGpuContext::CreateKerner(const cl::Program& program, const char* const functionMame) const
 {
@@ -934,6 +998,7 @@ void ndBrainGpuContext::CreateKerners()
 {
     cl_int errcode_ret = 0;
     std::string source(m_commonKernelsSource);
+    source += m_optimizerKernels;
     source += m_feedForwardKernels_1;
     source += m_feedForwardKernels_2;
     source += m_feedForwardKernels_3;
@@ -961,10 +1026,15 @@ void ndBrainGpuContext::CreateKerners()
     m_ndBrainLayerLinearDropOutActivation = CreateKerner(program, "brainLayerLinearDropOutActivation");
 
     // create all backpropagate shaders
+    m_ndBrainCopyInputGradients = CreateKerner(program, "brainCopyInputGradients");
     m_ndBrainCopyOutputGradients = CreateKerner(program, "brainCopyOutputGradients");
     m_ndBrainLayerReluBackPropagate = CreateKerner(program, "brainLayerBrainReluBackPropagate");
     m_ndBrainLayerTanhBackPropagate = CreateKerner(program, "brainLayerBrainTanhBackPropagate");
     m_ndBrainLayerLinearBackPropagate = CreateKerner(program, "brainLayerBrainLinearBackPropagate");
     m_ndBrainLayerLinearDropOutBackPropagate = CreateKerner(program, "brainLayerBrainLinearDropOutBackPropagate");
     m_ndBrainLayerCathegoricalSoftmaxBackPropagate = CreateKerner(program, "brainLayerBrainCathegoricalSoftmaxBackPropagate");
+
+    // accumulate gradient kernels
+    m_ndBrainAccumulateGradients = CreateKerner(program, "brainAccumulateGradients");
+
 }

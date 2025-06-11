@@ -52,12 +52,21 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinearDropOutActivation;
 
 	// back propagate shaders
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyInputGradients;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyOutputGradients;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerReluBackPropagate;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerTanhBackPropagate;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinearBackPropagate;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinearDropOutBackPropagate;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerCathegoricalSoftmaxBackPropagate;
+
+	// add all the partial gradinets
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainAccumulateGradients;
+
+	// optimizer shaders
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainAdamMomentumUpdate;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainAdamRidgeOptimizerUpdate;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainAdamLassoOptimizerUpdate;
 
 	private:
 	ndSharedPtr<cl::Device> m_device;
@@ -74,6 +83,7 @@ class ndBrainGpuContext : public ndBrainContext
 	static const char* m_backPropagateKernels_2;
 	static const char* m_backPropagateKernels_3;
 
+	static const char* m_optimizerKernels;
 	static const char* m_commonKernelsSource;
 
 	friend class ndBrainGpuBuffer;
