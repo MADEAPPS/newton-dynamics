@@ -33,7 +33,7 @@ class ndBrainGpuCommand : public ndClassAlloc
 	ndBrainLayer* m_layer;
 	ndFixSizeArray<ndBrainGpuBuffer*, 8> m_parameters;
 	size_t m_workGroupSize;
-	size_t m_miniBatchSize;
+	size_t m_numberOfWorkGroups;
 
 	friend class ndBrainGpuContext;
 	friend class ndBrainTrainerGpu;

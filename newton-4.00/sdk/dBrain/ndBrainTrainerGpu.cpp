@@ -187,7 +187,7 @@ void ndBrainTrainerGpu::AddOptimizerGradientCommand(ndBrainFloat learnRate)
 	uniformbuffer->LoadData(sizeof(ndBrainLayer::ndCommandShareInfo), &data);
 	ndBrainGpuBuffer* const weightAndBiasGradientsBuffer = *m_weightAndBiasGradientsBuffer;
 	m_accumulateGradients = ndSharedPtr<ndBrainGpuCommand>(new ndBrainTrainerGpuCommand(this, data, 0, m_context, m_context->m_ndBrainAccumulateGradients, m_miniBatchSize, uniformbuffer, weightAndBiasGradientsBuffer, nullptr, nullptr));
-	m_accumulateGradients->m_numberOfWorkGrouds = size_t(sizeInFloats / m_miniBatchSize);
+	m_accumulateGradients->m_numberOfWorkGroups = size_t(sizeInFloats / m_miniBatchSize);
 	
 	// add the adam optimizer kernel here
 	ndBrainOptimizerAdamGpu::ndCommandShareInfo optimizerData(m_optimizer->m_parameters);
@@ -200,7 +200,7 @@ void ndBrainTrainerGpu::AddOptimizerGradientCommand(ndBrainFloat learnRate)
 			this, m_context, m_context->m_ndBrainAdamLassoOptimizerUpdate, m_miniBatchSize, optimizerData,
 			adamUniformbuffer, m_weightAndBiasBuffer, m_weightAndBiasGradientsBuffer,
 			m_optimizer->m_vdw, m_optimizer->m_vdw2));
-			m_adamOtimizerUpdate->m_numberOfWorkGrouds = size_t(sizeInFloats / m_miniBatchSize);
+			m_adamOtimizerUpdate->m_numberOfWorkGroups = size_t(sizeInFloats / m_miniBatchSize);
 	}
 	else
 	{
@@ -208,13 +208,13 @@ void ndBrainTrainerGpu::AddOptimizerGradientCommand(ndBrainFloat learnRate)
 			this, m_context, m_context->m_ndBrainAdamRidgeOptimizerUpdate, m_miniBatchSize, optimizerData,
 			adamUniformbuffer, m_weightAndBiasBuffer, m_weightAndBiasGradientsBuffer,
 			m_optimizer->m_vdw, m_optimizer->m_vdw2));
-		m_adamOtimizerUpdate->m_numberOfWorkGrouds = size_t(sizeInFloats / m_miniBatchSize);
+		m_adamOtimizerUpdate->m_numberOfWorkGroups = size_t(sizeInFloats / m_miniBatchSize);
 	}
 	
 	// add the momentum update command
 	m_adamMomentumUpdate = ndSharedPtr<ndBrainGpuCommand>(new ndBrainAdamUpdateCommand(
 		this, m_context, m_context->m_ndBrainAdamMomentumUpdate, 1, optimizerData, adamUniformbuffer));
-	m_adamMomentumUpdate->m_numberOfWorkGrouds = 1;
+	m_adamMomentumUpdate->m_numberOfWorkGroups = 1;
 }
 
 void ndBrainTrainerGpu::AddLayersGradientCommands()

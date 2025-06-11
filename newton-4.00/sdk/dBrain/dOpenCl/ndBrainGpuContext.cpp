@@ -131,8 +131,9 @@ void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& co
 	}
 
 	cl::NDRange offset(0);
-	cl::NDRange global(command->m_workGroupSize * command->m_miniBatchSize);
-	cl::NDRange local(command->m_miniBatchSize);
+	cl::NDRange local(command->m_workGroupSize);
+	cl::NDRange global(command->m_workGroupSize * command->m_numberOfWorkGroups);
+	//cl::NDRange local(command->m_miniBatchSize);
 	error = m_queue->enqueueNDRangeKernel(**command->m_shader, offset, global, local);
 	ndAssert(error == CL_SUCCESS);
 }

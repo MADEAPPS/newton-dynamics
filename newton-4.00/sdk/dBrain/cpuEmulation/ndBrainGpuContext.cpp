@@ -64,7 +64,7 @@ void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& co
 	auto ExecuteCommand = ndMakeObject::ndFunction([this, &iterator, &command](ndInt32, ndInt32)
 	{
 		ndInt32 workGroupdSize = ND_KERNELS_WORKGROUP_SIZE;
-		ndInt32 numberOfWorkGrouds = ndInt32(command->m_numberOfWorkGrouds);
+		ndInt32 numberOfWorkGrouds = ndInt32(command->m_numberOfWorkGroups);
 		
 		ndBrainGpuShader& kernel = **command->m_shader;
 		for (ndInt32 i = iterator++; i < numberOfWorkGrouds; i = iterator++)

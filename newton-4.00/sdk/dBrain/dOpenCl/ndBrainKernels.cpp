@@ -46,7 +46,7 @@ R""""(
 
     uint CalculateWorkGroupRoundoff(uint value, uint workgroupSize) 
     {
-        return (value + workgroupSize - 1) & (int)workgroupSize;
+        return (value + workgroupSize - 1) & -(int)workgroupSize;
     }
 
 )"""";
@@ -69,7 +69,6 @@ R""""(
         
         uint workGroupSizeReminder = inputSize % workGroupSize;
         uint modWorkGroupSize = inputSize - workGroupSizeReminder;
-        
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             float a = inputBuffer[srcBase + i + itemId];
@@ -125,7 +124,7 @@ R""""(
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
         uint workGroupSize = get_local_size(0);
-        
+
         uint inputSize = parameters->m_inputSize;
         uint outputSize = parameters->m_outputSize;
         uint inputOutputSize = parameters->m_inputOutputSize;
@@ -134,31 +133,27 @@ R""""(
         
         uint biasOffset = outputSize * inputSize + parametersStartOffset;
         uint inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
-        uint outputOffset = inputOffset + inputSize;
-        
-        uint workGroupSizeReminder = inputSize % workGroupSize;
-        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
-        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        uint outputOffset = inputOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
+        for (uint i = 0; i < inputSize; i += workGroupSize)
         {
             cachedInput[i + itemId] = inputOutputData[inputOffset + itemId + i];
         }
-        if (itemId < workGroupSizeReminder)
-        {
-            cachedInput[modWorkGroupSize + itemId] = inputOutputData[inputOffset + modWorkGroupSize + itemId];
-        }
         
-        uint rowCountReminder = outputSize % workGroupSize;
-        uint modRowCount = outputSize - rowCountReminder;
-        
-        for (uint i = 0; i < modRowCount; i += workGroupSize)
+        // copy the matrix bias
+        //uint rowCountReminder = outputSize % workGroupSize;
+        //uint modRowCount = outputSize - rowCountReminder;
+        //for (uint i = 0; i < modRowCount; i += workGroupSize)
+        for (uint i = 0; i < outputSize; i += workGroupSize)
         {
             cachedOutput[i + itemId] = weightsAndBias[biasOffset + itemId];
         }
-        if (itemId < rowCountReminder)
-        {
-            cachedOutput[modRowCount + itemId] = weightsAndBias[biasOffset + modRowCount + itemId];
-        }
+        //if (itemId < rowCountReminder)
+        //{
+        //    cachedOutput[modRowCount + itemId] = weightsAndBias[biasOffset + modRowCount + itemId];
+        //}
         
+        uint workGroupSizeReminder = inputSize % workGroupSize;
+        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
         for (uint i = 0; i < outputSize; ++i)
         {
             float partialSum = 0.0f;
@@ -190,22 +185,23 @@ R""""(
                     partialSum += reductionBuffer[itemId];
                 }
             }
-        
+
             if (itemId == 0)
             {
                 cachedOutput[i] += partialSum;
             }
         }
         barrier(CLK_LOCAL_MEM_FENCE); 
-        
-        for (uint i = 0; i < modRowCount; i += workGroupSize)
+
+        //for (uint i = 0; i < modRowCount; i += workGroupSize)
+        for (uint i = 0; i < outputSize; i += workGroupSize)
         {
             inputOutputData[outputOffset + i + itemId] = cachedOutput[i + itemId];
         }
-        if (itemId < rowCountReminder)
-        {
-            inputOutputData[outputOffset + modRowCount + itemId] = cachedOutput[modRowCount + itemId];
-        }
+        //if (itemId < rowCountReminder)
+        //{
+        //    inputOutputData[outputOffset + modRowCount + itemId] = cachedOutput[modRowCount + itemId];
+        //}
     }
 
     // a matrix time a vector by iterating over each row of the matrix 
@@ -229,9 +225,8 @@ R""""(
         
         uint biasOffset = outputSize * inputSize + parametersStartOffset;
         uint inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
-        //uint outputOffset = inputOffset + inputSize;
         uint outputOffset = inputOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
-        
+
         //uint workGroupSizeReminder = inputSize % workGroupSize;
         //uint modWorkGroupSize = inputSize - workGroupSizeReminder;
         //for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
@@ -244,22 +239,23 @@ R""""(
         //    cachedInput[modWorkGroupSize + itemId] = inputOutputData[inputOffset + modWorkGroupSize + itemId];
         //    cacheWeight[0][modWorkGroupSize + itemId] = weightsAndBias[rowStartOffset + modWorkGroupSize + itemId];
         //}
-        
+
         // copy the matrix bias
-        uint rowCountReminder = outputSize % workGroupSize;
-        uint modRowCount = outputSize - rowCountReminder;
-        for (uint i = 0; i < modRowCount; i += workGroupSize)
+        //uint rowCountReminder = outputSize % workGroupSize;
+        //uint modRowCount = outputSize - rowCountReminder;
+        //for (uint i = 0; i < modRowCount; i += workGroupSize)
+        for (uint i = 0; i < outputSize; i += workGroupSize)
         {
             cachedOutput[i + itemId] = weightsAndBias[biasOffset + itemId];
         }
-        if (itemId < rowCountReminder)
-        {
-            cachedOutput[modRowCount + itemId] = weightsAndBias[biasOffset + modRowCount + itemId];
-        }
+        //if (itemId < rowCountReminder)
+        //{
+        //    cachedOutput[modRowCount + itemId] = weightsAndBias[biasOffset + modRowCount + itemId];
+        //}
 
+        uint rowStartOffset = parametersStartOffset;     
         uint workGroupSizeReminder = inputSize % workGroupSize;
         uint modWorkGroupSize = inputSize - workGroupSizeReminder;
-        uint rowStartOffset = parametersStartOffset;
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             cacheWeight[0][i + itemId] = weightsAndBias[rowStartOffset + itemId + i];
@@ -270,9 +266,10 @@ R""""(
         }
         barrier(CLK_LOCAL_MEM_FENCE); 
 
-        int cacheWeighIndex = 0;
+        uint cacheWeighIndex = 0;
         for (uint i = 0; i < outputSize; ++i)
         {
+#if 1
             if (i < (outputSize - 1))
             {
                 //load next cache line
@@ -322,6 +319,7 @@ R""""(
             {
                 cachedOutput[i] += partialSum;
             }
+#endif
         }
         barrier(CLK_LOCAL_MEM_FENCE); 
         
@@ -1129,7 +1127,8 @@ void ndBrainGpuContext::CreateKerners()
     // create all feed foward shaders
     m_ndBrainCopyInput = CreateKerner(program, "brainCopyInput");
     m_ndBrainCopyOutput = CreateKerner(program, "brainCopyOutput");
-    m_ndBrainLayerLinear = CreateKerner(program, "brainLayerLinear");
+    //m_ndBrainLayerLinear = CreateKerner(program, "brainLayerLinear");
+    m_ndBrainLayerLinear = CreateKerner(program, "brainLayerLinear_old");
     m_ndBrainLayerReluActivation = CreateKerner(program, "brainLayerReluActivation");
     m_ndBrainLayerTanhActivation = CreateKerner(program, "brainLayerTanhActivation");
     m_ndBrainLayerSoftmaxActivation = CreateKerner(program, "brainLayerSoftmaxActivation");
