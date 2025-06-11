@@ -43,7 +43,7 @@ class ndBrainOptimizerAdamGpu : public ndBrainOptimizer
 			,m_invBeta(ndBrainFloat(1.0f)/ (ndBrainFloat(1.0f) - m_beta))
 			,m_invAlpha(ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) - m_alpha))
 			,m_decayRegularizer(ndBrainFloat(1.0e-4f))
-			,m_minibatchSize(0)
+			//,m_parametersSize(0)
 		{
 		}
 
@@ -56,7 +56,7 @@ class ndBrainOptimizerAdamGpu : public ndBrainOptimizer
 		ndBrainFloat m_invBeta;
 		ndBrainFloat m_invAlpha;
 		ndBrainFloat m_decayRegularizer;
-		ndInt32 m_minibatchSize;
+		//ndInt32 m_parametersSize;
 	};
 
 	ndBrainOptimizerAdamGpu(const ndSharedPtr<ndBrainContext>& context);

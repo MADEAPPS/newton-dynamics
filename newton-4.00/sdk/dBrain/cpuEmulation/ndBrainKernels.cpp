@@ -917,6 +917,7 @@ class brainAccumulateGradients : public ndBrainGpuShader
         UniformBufferObject* const parameters = (UniformBufferObject*)&buffer0->m_data[0];
         ndBrainFloat* const gradientBuffer = &buffer1->m_buffer[0];
 
+        //ndInt32 inputSize = ndInt32(__cpuKernelRoundoff(parameters->m_inputSize, workGroupSize);
         ndInt32 inputSize = ndInt32(parameters->m_inputSize);
         ndInt32 miniBatchSize = ndInt32(parameters->m_inputOutputSize);
      

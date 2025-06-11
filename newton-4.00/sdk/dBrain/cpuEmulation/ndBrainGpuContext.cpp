@@ -64,10 +64,10 @@ void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& co
 	auto ExecuteCommand = ndMakeObject::ndFunction([this, &iterator, &command](ndInt32, ndInt32)
 	{
 		ndInt32 workGroupdSize = ND_KERNELS_WORKGROUP_SIZE;
-		ndInt32 miniBatchSize = ndInt32(command->m_miniBatchSize);
+		ndInt32 numberOfWorkGrouds = ndInt32(command->m_numberOfWorkGrouds);
 		
 		ndBrainGpuShader& kernel = **command->m_shader;
-		for (ndInt32 i = iterator++; i < miniBatchSize; i = iterator++)
+		for (ndInt32 i = iterator++; i < numberOfWorkGrouds; i = iterator++)
 		{
 			kernel.Execute(i, workGroupdSize);
 		}

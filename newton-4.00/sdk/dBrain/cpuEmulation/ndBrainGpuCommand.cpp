@@ -23,7 +23,7 @@ ndBrainGpuCommand::ndBrainGpuCommand(ndBrainGpuContext* const context, const ndB
 	,m_info(info)
 	,m_layer(nullptr)
 	,m_workGroupSize(0)
-	,m_miniBatchSize(0)
+	,m_numberOfWorkGrouds(0)
 {
 }
 
@@ -34,7 +34,7 @@ ndBrainGpuCommand::~ndBrainGpuCommand()
 void ndBrainGpuCommand::Assembly(const ndSharedPtr<ndBrainGpuShader>& shader, ndInt32 workGroupSize, ndInt32 buffersCount, ndBrainGpuBuffer** buffer)
 {
 	m_shader = shader;
-	m_miniBatchSize = size_t(workGroupSize);
+	m_numberOfWorkGrouds = size_t(workGroupSize);
 
 	m_parameters.SetCount(0);
 	for (ndInt32 i = 0; i < buffersCount; ++i)
