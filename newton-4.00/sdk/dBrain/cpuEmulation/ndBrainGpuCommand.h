@@ -15,7 +15,6 @@
 #include "ndBrainLayer.h"
 #include "ndBrainGpuContext.h"
 
-//class ndBrainLayer;
 class ndBrainGpuBuffer;
 class ndBrainGpuFloatBuffer;
 class ndBrainGpuUniformBuffer;
@@ -38,6 +37,7 @@ class ndBrainGpuCommand : public ndClassAlloc
 
 	friend class ndBrainGpuContext;
 	friend class ndBrainTrainerGpu;
+	friend class ndBrainLayerLinear;
 	friend class ndBrainTrainerGpuInference;
 };
 
