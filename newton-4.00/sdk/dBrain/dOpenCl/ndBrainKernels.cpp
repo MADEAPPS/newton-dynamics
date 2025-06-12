@@ -115,7 +115,7 @@ R""""(
 const char* ndBrainGpuContext::m_feedForwardKernels_2 =
 R""""(
 
-    __kernel void brainLayerLinear_old(__global const UniformBufferLayerArguments* parameters, __global float* inputOutputData, __global float* weightsAndBias) 
+    __kernel void brainLayerLinear(__global const UniformBufferLayerArguments* parameters, __global float* inputOutputData, __global float* weightsAndBias) 
     {
         __local float cachedInput [ND_GPU_LOCAL_BUFFER_SIZE * 2];
         __local float cachedOutput [ND_GPU_LOCAL_BUFFER_SIZE * 2];
@@ -204,135 +204,6 @@ R""""(
         //}
     }
 
-    // a matrix time a vector by iterating over each row of the matrix 
-    // calculating the dot product of that row time the vector and adding the bias value.
-    __kernel void brainLayerLinear(__global const UniformBufferLayerArguments* parameters, __global float* inputOutputData, __global float* weightsAndBias) 
-    {
-        __local float cachedInput [ND_GPU_LOCAL_BUFFER_SIZE * 2];
-        __local float cachedOutput [ND_GPU_LOCAL_BUFFER_SIZE * 2];
-        __local float cacheWeight [2][ND_GPU_LOCAL_BUFFER_SIZE * 2];
-        __local float reductionBuffer [ND_GPU_LOCAL_BUFFER_SIZE];
-        
-        uint itemId = get_local_id(0);
-        uint groupId = get_group_id(0);
-        uint workGroupSize = get_local_size(0);
-        
-        uint inputSize = parameters->m_inputSize;
-        uint outputSize = parameters->m_outputSize;
-        uint inputOutputSize = parameters->m_inputOutputSize;
-        uint parametersStartOffset = parameters->m_parametersStartOffset;
-        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
-        
-        uint biasOffset = outputSize * inputSize + parametersStartOffset;
-        uint inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
-        uint outputOffset = inputOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
-
-        //uint workGroupSizeReminder = inputSize % workGroupSize;
-        //uint modWorkGroupSize = inputSize - workGroupSizeReminder;
-        //for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
-        for (uint i = 0; i < inputSize; i += workGroupSize)
-        {
-            cachedInput[i + itemId] = inputOutputData[inputOffset + itemId + i];
-        }
-        //if (itemId < workGroupSizeReminder)
-        //{
-        //    cachedInput[modWorkGroupSize + itemId] = inputOutputData[inputOffset + modWorkGroupSize + itemId];
-        //    cacheWeight[0][modWorkGroupSize + itemId] = weightsAndBias[rowStartOffset + modWorkGroupSize + itemId];
-        //}
-
-        // copy the matrix bias
-        //uint rowCountReminder = outputSize % workGroupSize;
-        //uint modRowCount = outputSize - rowCountReminder;
-        //for (uint i = 0; i < modRowCount; i += workGroupSize)
-        for (uint i = 0; i < outputSize; i += workGroupSize)
-        {
-            cachedOutput[i + itemId] = weightsAndBias[biasOffset + itemId];
-        }
-        //if (itemId < rowCountReminder)
-        //{
-        //    cachedOutput[modRowCount + itemId] = weightsAndBias[biasOffset + modRowCount + itemId];
-        //}
-
-        uint rowStartOffset = parametersStartOffset;     
-        uint workGroupSizeReminder = inputSize % workGroupSize;
-        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
-        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
-        {
-            cacheWeight[0][i + itemId] = weightsAndBias[rowStartOffset + itemId + i];
-        }
-        if (itemId < workGroupSizeReminder)
-        {
-            cacheWeight[0][modWorkGroupSize + itemId] = weightsAndBias[rowStartOffset + modWorkGroupSize + itemId];
-        }
-        barrier(CLK_LOCAL_MEM_FENCE); 
-
-        uint cacheWeighIndex = 0;
-        for (uint i = 0; i < outputSize; ++i)
-        {
-#if 1
-            if (i < (outputSize - 1))
-            {
-                //load next cache line
-                rowStartOffset += inputSize;
-                int nextIndex = (cacheWeighIndex + 1) & 1;
-                for (uint j = 0; j < modWorkGroupSize; j += workGroupSize)
-                {
-                    cacheWeight[nextIndex][j + itemId] = weightsAndBias[rowStartOffset + itemId + j];
-                }
-                if (itemId < workGroupSizeReminder)
-                {
-                    cacheWeight[nextIndex][modWorkGroupSize + itemId] = weightsAndBias[rowStartOffset + itemId + modWorkGroupSize];
-                }
-            }
-        
-            float partialSum = 0.0f;
-            for (uint j = 0; j < modWorkGroupSize; j += workGroupSize)
-            {
-                float b = cachedInput[itemId + j];
-                float a = cacheWeight[cacheWeighIndex][j + itemId];
-                partialSum += a * b;
-            }
-            if (itemId < workGroupSizeReminder)
-            {
-                float b = cachedInput[modWorkGroupSize + itemId];
-                float a = cacheWeight[cacheWeighIndex][modWorkGroupSize + itemId];
-                partialSum += a * b;
-            }
-            cacheWeighIndex = (cacheWeighIndex + 1) & 1;
-        
-            for (uint j = workGroupSize / 2; j > 0; j = j >> 1)
-            {
-                barrier(CLK_LOCAL_MEM_FENCE); 
-                if ((itemId >= j) && (itemId < j * 2))
-                {
-                    reductionBuffer[itemId - j] = partialSum;
-                }
-        
-                barrier(CLK_LOCAL_MEM_FENCE); 
-                if (itemId < j)
-                {
-                    partialSum += reductionBuffer[itemId];
-                }
-            }
-        
-            if (itemId == 0)
-            {
-                cachedOutput[i] += partialSum;
-            }
-#endif
-        }
-        barrier(CLK_LOCAL_MEM_FENCE); 
-        
-        //for (uint i = 0; i < modRowCount; i += workGroupSize)
-        for (uint i = 0; i < outputSize; i += workGroupSize)
-        {
-            inputOutputData[outputOffset + i + itemId] = cachedOutput[i + itemId];
-        }
-        //if (itemId < rowCountReminder)
-        //{
-        //    inputOutputData[outputOffset + modRowCount + itemId] = cachedOutput[modRowCount + itemId];
-        //}
-    }
 
     __kernel void brainLayerReluActivation(__global const UniformBufferLayerArguments* parameters, __global float* inputOutputData, __global float* notUsed)  
     {
@@ -1130,8 +1001,7 @@ void ndBrainGpuContext::CreateKerners()
     // create all feed foward shaders
     m_ndBrainCopyInput = CreateKerner(program, "brainCopyInput");
     m_ndBrainCopyOutput = CreateKerner(program, "brainCopyOutput");
-    //m_ndBrainLayerLinear = CreateKerner(program, "brainLayerLinear");
-    m_ndBrainLayerLinear = CreateKerner(program, "brainLayerLinear_old");
+    m_ndBrainLayerLinear = CreateKerner(program, "brainLayerLinear");
     m_ndBrainLayerReluActivation = CreateKerner(program, "brainLayerReluActivation");
     m_ndBrainLayerTanhActivation = CreateKerner(program, "brainLayerTanhActivation");
     m_ndBrainLayerSoftmaxActivation = CreateKerner(program, "brainLayerSoftmaxActivation");
