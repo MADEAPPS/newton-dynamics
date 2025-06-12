@@ -1117,12 +1117,15 @@ void ndBrainGpuContext::CreateKerners()
     cl::Program program (**m_context, source, CL_TRUE, &errcode_ret);
     ndAssert(errcode_ret == 0);
 
-    //size_t bin_sz;
-    //errcode_ret = clGetProgramInfo(program.get(), CL_PROGRAM_BINARY_SIZES, sizeof(size_t), &bin_sz, NULL);
-    //
-    //unsigned char* bin = (unsigned char*)malloc(bin_sz);
-    //errcode_ret = clGetProgramInfo(program.get(), CL_PROGRAM_BINARIES, sizeof(unsigned char*), &bin, NULL);
-    //free(bin);
+#if 0
+    // this only seems to work with nvidia PTX        
+    size_t bin_sz;
+    errcode_ret = clGetProgramInfo(program.get(), CL_PROGRAM_BINARY_SIZES, sizeof(size_t), &bin_sz, NULL);
+    
+    unsigned char* code = (unsigned char*)malloc(bin_sz);
+    errcode_ret = clGetProgramInfo(program.get(), CL_PROGRAM_BINARIES, sizeof(unsigned char*), &code, NULL);
+    free(code);
+#endif
 
     // create all feed foward shaders
     m_ndBrainCopyInput = CreateKerner(program, "brainCopyInput");

@@ -19,7 +19,7 @@
 #define MNIST_CONVOLUTIONAL_FEATURE_MAPS		32
 //#define MIN_TRAIN_SCORE						0.9999f
 
-//#define MINIST_NUMBER_OF_EPOCKS					70
+//#define MINIST_NUMBER_OF_EPOCKS				70
 #define MINIST_NUMBER_OF_EPOCKS					10
 
 #ifdef MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
@@ -304,19 +304,19 @@ static void MnistTrainingSet()
 					trainer->ApplyLearnRate();
 					trainer->SyncQueue();
 
-					#if 0
+					#if 1
 						ndBrainFixSizeVector<1024> xxx1;
 						xxx1.SetCount(outputSize);
 
-						ndBrainVector gradienBuffer;
-						trainer->GetGradientBuffer(gradienBuffer);
-						const ndBrainMemVector xxxxx0(&gradienBuffer[0], 4096);
-						for (int i = xxxxx0.GetCount() - 256; i >= 0; i -= 256)
-						{
-							const ndBrainMemVector xxxxx1(&gradienBuffer[i], 256);
-							const ndBrainMemVector xxxxx2(&gradienBuffer[i - 256], 256);
-							const ndBrainMemVector xxxxx3(&gradienBuffer[i - 512], 256);
-						}
+						//ndBrainVector gradienBuffer;
+						//trainer->GetGradientBuffer(gradienBuffer);
+						//const ndBrainMemVector xxxxx0(&gradienBuffer[0], 4096);
+						//for (int i = ndInt32(xxxxx0.GetCount()) - 256; i >= 0; i -= 256)
+						//{
+						//	const ndBrainMemVector xxxxx1(&gradienBuffer[i], 256);
+						//	const ndBrainMemVector xxxxx2(&gradienBuffer[i - 256], 256);
+						//	const ndBrainMemVector xxxxx3(&gradienBuffer[i - 512], 256);
+						//}
 
 						trainer->MakePrediction(miniBatchInput);
 						trainer->GetOutput(miniBatchOutput);

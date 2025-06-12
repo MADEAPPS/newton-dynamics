@@ -45,27 +45,31 @@ ndBrainGpuContext::ndBrainGpuContext()
 	// select fastest available device
 	if (cl_devices.size())
 	{
-		size_t best_i = 0;
-		size_t bestCapacity = 0;
-		for (size_t i = 0u; i < cl_devices.size(); i++)
-		{
-			// find device with highest (estimated) floating point performance
-			//const std::string name (cl_devices[i].getInfo<CL_DEVICE_NAME>()); // device name
-			const size_t compute_units = cl_devices[i].getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>(); 
+		size_t bestDeviceIndex = 0;
+		//size_t bestCapacity = 0;
+		//for (size_t i = 0u; i < cl_devices.size(); i++)
+		//{
+		//	// find device with highest (estimated) floating point performance
+		//	//const std::string name (cl_devices[i].getInfo<CL_DEVICE_NAME>()); // device name
+		//	const size_t compute_units = cl_devices[i].getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>(); 
+		//	const std::string version(cl_devices[i].getInfo<CL_DEVICE_VERSION>());
+		//
+		//	// just go for the device with the most compute units.
+		//	if (compute_units > bestCapacity)
+		//	{
+		//		bestCapacity = compute_units;
+		//		bestDeviceIndex = i;
+		//	}
+		//}
 
-			// just go for the device with the most compute units.
-			if (compute_units > bestCapacity)
-			{
-				bestCapacity = compute_units;
-				best_i = i;
-			}
-		}
+		const std::string name(cl_devices[bestDeviceIndex].getInfo<CL_DEVICE_NAME>());
+		//const std::string name(cl_devices[bestDeviceIndex].getInfo<CL_DEVICE_PROFILE>());
+		const std::string version(cl_devices[bestDeviceIndex].getInfo<CL_DEVICE_VERSION>());
+		//const std::string version(cl_devices[bestDeviceIndex].getInfo<CL_DEVICE_OPENCL_C_VERSION>());
+		ndExpandTraceMessage("opencl device name: %s\n", name.c_str());
+		ndExpandTraceMessage("opencl device version: %s\n", version.c_str());
 
-		const std::string name(cl_devices[best_i].getInfo<CL_DEVICE_NAME>());
-		//const std::string name(cl_devices[2].getInfo<CL_DEVICE_NAME>());
-		ndExpandTraceMessage("opencl device: %s\n", name.c_str());
-
-		m_device = ndSharedPtr<cl::Device>(new cl::Device(cl_devices[best_i]));
+		m_device = ndSharedPtr<cl::Device>(new cl::Device(cl_devices[bestDeviceIndex]));
 		
 		cl_int error = 0;
 		m_context = ndSharedPtr<cl::Context>(new cl::Context(**m_device, nullptr, clNotification, this, &error));
