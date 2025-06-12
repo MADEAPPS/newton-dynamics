@@ -145,9 +145,6 @@ class brainLayerLinear : public ndBrainGpuShader
         ndInt32 inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
         ndInt32 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
             
-        //ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
-        //ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
-        //for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
         for (ndInt32 i = 0; i < inputSize; i += workGroupSize)
         {
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
@@ -155,14 +152,7 @@ class brainLayerLinear : public ndBrainGpuShader
                 cachedInput[i + itemId] = inputOutputData[inputOffset + itemId + i];
             }
         }
-        //for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
-        //{
-        //    cachedInput[modWorkGroupSize + itemId] = inputOutputData[inputOffset + modWorkGroupSize + itemId];
-        //}
             
-        //ndInt32 rowCountReminder = outputSize % workGroupSize;
-        //ndInt32 modRowCount = outputSize - rowCountReminder;
-        //for (ndInt32 i = 0; i < modRowCount; i += workGroupSize)
         for (ndInt32 i = 0; i < outputSize; i += workGroupSize)
         {
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
@@ -170,10 +160,6 @@ class brainLayerLinear : public ndBrainGpuShader
                 cachedOutput[i + itemId] = weightsAndBias[biasOffset + itemId];
             }
         }
-        //for (ndInt32 itemId = 0; itemId < rowCountReminder; ++itemId)
-        //{
-        //    cachedOutput[modRowCount + itemId] = weightsAndBias[biasOffset + modRowCount + itemId];
-        //}
             
         ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
         ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
@@ -186,7 +172,6 @@ class brainLayerLinear : public ndBrainGpuShader
             }
             ndInt32 rowStartOffset = i * inputSize + parametersStartOffset;
             for (ndInt32 j = 0; j < modWorkGroupSize; j += workGroupSize)
-            //for (ndInt32 j = 0; j < inputSize; j += workGroupSize)
             {
                 for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
                 {
@@ -224,10 +209,6 @@ class brainLayerLinear : public ndBrainGpuShader
                 inputOutputData[outputOffset + i + itemId] = cachedOutput[i + itemId];
             }
         }
-        //for (ndInt32 itemId = 0; itemId < rowCountReminder; ++itemId)
-        //{
-        //    inputOutputData[outputOffset + modRowCount + itemId] = cachedOutput[modRowCount + itemId];
-        //}
     }
 };
 
