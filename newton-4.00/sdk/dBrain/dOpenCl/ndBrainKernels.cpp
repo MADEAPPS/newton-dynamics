@@ -140,17 +140,10 @@ R""""(
         }
         
         // copy the matrix bias
-        //uint rowCountReminder = outputSize % workGroupSize;
-        //uint modRowCount = outputSize - rowCountReminder;
-        //for (uint i = 0; i < modRowCount; i += workGroupSize)
         for (uint i = 0; i < outputSize; i += workGroupSize)
         {
             cachedOutput[i + itemId] = weightsAndBias[biasOffset + itemId];
         }
-        //if (itemId < rowCountReminder)
-        //{
-        //    cachedOutput[modRowCount + itemId] = weightsAndBias[biasOffset + modRowCount + itemId];
-        //}
         
         uint workGroupSizeReminder = inputSize % workGroupSize;
         uint modWorkGroupSize = inputSize - workGroupSizeReminder;
@@ -198,12 +191,7 @@ R""""(
         {
             inputOutputData[outputOffset + i + itemId] = cachedOutput[i + itemId];
         }
-        //if (itemId < rowCountReminder)
-        //{
-        //    inputOutputData[outputOffset + modRowCount + itemId] = cachedOutput[modRowCount + itemId];
-        //}
     }
-
 
     __kernel void brainLayerReluActivation(__global const UniformBufferLayerArguments* parameters, __global float* inputOutputData, __global float* notUsed)  
     {

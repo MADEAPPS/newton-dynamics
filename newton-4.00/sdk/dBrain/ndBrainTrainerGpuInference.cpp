@@ -98,7 +98,6 @@ void ndBrainTrainerGpuInference::AddLayersCommands(ndFixSizeArray<ndBrainLayer::
 	ndBrainGpuBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
 	
 	ndInt32 inputOutputStartOffset = 0;
-	//ndInt32 inputOutputBufferSize = brain.GetInputSize();
 	ndInt32 inputOutputBufferSize = RoundoffOffset(brain.GetInputSize());
 	for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
 	{
@@ -195,11 +194,6 @@ void ndBrainTrainerGpuInference::InitWeightAndBiasBuffer()
 		uniformData[i].m_parametersStartOffset = parametersSizeSum;
 		parametersSizeSum += uniformData[i].m_parametersBatchSize;
 	}
-	//ndInt32 residual = parametersSizeSum % m_miniBatchSize;
-	//if (residual)
-	//{
-	//	parametersSizeSum += m_miniBatchSize - residual;
-	//}
 	parametersSizeSum = RoundoffOffset(parametersSizeSum);
 
 	ndBrainVector scratchBuffer;
