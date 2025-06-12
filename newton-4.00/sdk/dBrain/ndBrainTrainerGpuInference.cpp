@@ -258,28 +258,28 @@ void ndBrainTrainerGpuInference::UnloadBuffer(ndBrainVector& ouput, const ndShar
 	gpuBuffer->UnloadData(sizeInBytes, &ouput[0]);
 }
 
-void ndBrainTrainerGpuInference::GetInput(ndBrainVector& ouput) const
+void ndBrainTrainerGpuInference::GetInput(ndBrainVector& output) const
 {
 	m_context->SyncQueue();
-	UnloadBuffer(ouput, m_miniBatchInputBuffer);
+	UnloadBuffer(output, m_miniBatchInputBuffer);
 }
 
-void ndBrainTrainerGpuInference::GetOutput(ndBrainVector& ouput) const
+void ndBrainTrainerGpuInference::GetOutput(ndBrainVector& output) const
 {
 	m_context->SyncQueue();
-	UnloadBuffer(ouput, m_miniBatchOutputBuffer);
+	UnloadBuffer(output, m_miniBatchOutputBuffer);
 }
 
-void ndBrainTrainerGpuInference::GetWorkingBuffer(ndBrainVector& ouput) const
+void ndBrainTrainerGpuInference::GetWorkingBuffer(ndBrainVector& output) const
 {
 	m_context->SyncQueue();
-	UnloadBuffer(ouput, m_inputOutputBuffer);
+	UnloadBuffer(output, m_inputOutputBuffer);
 }
 
-void ndBrainTrainerGpuInference::GetParameterBuffer(ndBrainVector& ouput) const
+void ndBrainTrainerGpuInference::GetParameterBuffer(ndBrainVector& output) const
 {
 	m_context->SyncQueue();
-	UnloadBuffer(ouput, m_weightAndBiasBuffer);
+	UnloadBuffer(output, m_weightAndBiasBuffer);
 }
 
 void ndBrainTrainerGpuInference::BackPropagate(const ndBrainVector&, bool)

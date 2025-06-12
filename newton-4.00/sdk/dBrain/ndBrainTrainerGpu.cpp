@@ -253,6 +253,12 @@ void ndBrainTrainerGpu::ApplyLearnRate()
 	m_context->AddCommandQueue(m_adamMomentumUpdate);
 }
 
+void ndBrainTrainerGpu::GetGradientBuffer(ndBrainVector& output) const
+{
+	m_context->SyncQueue();
+	UnloadBuffer(output, m_inputOuputGradientsBuffer);
+}
+
 void ndBrainTrainerGpu::BackPropagate(const ndBrainVector& outputGradients, bool sync)
 {
 	m_miniBatchOutputGradientBuffer->LoadData(outputGradients.GetCount() * sizeof(ndReal), &outputGradients[0]);

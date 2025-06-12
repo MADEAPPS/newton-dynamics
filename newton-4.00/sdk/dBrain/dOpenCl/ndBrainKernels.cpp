@@ -523,19 +523,19 @@ R""""(
         barrier(CLK_LOCAL_MEM_FENCE); 
         
         float invDen = reductionBuffer[0];
-        //for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
-        for (uint i = 0; i < inputSize; i += workGroupSize)
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        //for (uint i = 0; i < inputSize; i += workGroupSize)
         {
             float inputValue = tmpInputBuffer[i + itemId];
             float outputValue = invDen * inputValue;
             inputOutputData[outputOffset + i + itemId] = outputValue;
         }
-        //if (itemId < workGroupSizeReminder)
-        //{
-        //    float inputValue = tmpInputBuffer[modWorkGroupSize + itemId];
-        //    float outputValue = invDen * inputValue;
-        //    inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
-        //}
+        if (itemId < workGroupSizeReminder)
+        {
+            float inputValue = tmpInputBuffer[modWorkGroupSize + itemId];
+            float outputValue = invDen * inputValue;
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
+        }
     }
 )"""";
 
@@ -563,13 +563,13 @@ R""""(
         uint modWorkGroupSize = inputSize - workGroupSizeReminder;
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
-            float a = miniBatchGradients[srcBase + i + itemId];
-            inputOutputGradients[dstBase + i + itemId] = a;
+            float a = inputOutputGradients[srcBase + i + itemId];
+            miniBatchGradients[dstBase + i + itemId] = a;
         }
         if (itemId < workGroupSizeReminder)
         {
-            float a = miniBatchGradients[srcBase + modWorkGroupSize + itemId];
-            inputOutputGradients[dstBase + modWorkGroupSize + itemId] = a;
+            float a = inputOutputGradients[srcBase + modWorkGroupSize + itemId];
+            miniBatchGradients[dstBase + modWorkGroupSize + itemId] = a;
         }
     }
 
@@ -586,9 +586,9 @@ R""""(
         uint outputSize = parameters->m_outputSize;
         uint inputOutputSize = parameters->m_inputOutputSize;
         uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
-        
-        uint dstBase = groupId * outputSize;
-        uint srcBase = groupId * inputOutputSize + inputOutputStartOffset;
+
+        uint srcBase = groupId * outputSize;        
+        uint dstBase = groupId * inputOutputSize + inputOutputStartOffset;
         
         uint workGroupSizeReminder = outputSize % workGroupSize;
         uint modWorkGroupSize = outputSize - workGroupSizeReminder;
@@ -624,14 +624,14 @@ R""""(
         uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
         uint srcBase = groupId * inputOutputSize + inputOutputStartOffset;
-        uint dstBase = groupId + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
+        uint dstBase = srcBase + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
         
         //uint workGroupSizeReminder = inputSize % workGroupSize;
         //uint modWorkGroupSize = inputSize - workGroupSizeReminder;
         //for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         for (uint i = 0; i < inputSize; i += workGroupSize)
         {
-            float inpuData = inputOutputData[dstBase + i + itemId];
+            float inpuData = inputOutputData[srcBase + i + itemId];
             float gradient = (inpuData >= 0.0f) ? 1.0f : 0.0f;
             float outputGrad = inputOutputGradients[dstBase + i + itemId];
             inputOutputGradients[srcBase + i + itemId] = gradient * outputGrad;
@@ -695,17 +695,17 @@ R""""(
         uint inputOutputSize = parameters->m_inputOutputSize;
         uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        uint srcBase = groupId * inputOutputSize + inputOutputStartOffset;        
-        uint dstBase = groupId + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
+        uint srcBase = groupId * inputOutputSize + inputOutputStartOffset;
+        uint dstBase = srcBase + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
         
         //uint workGroupSizeReminder = inputSize % workGroupSize;
         //uint modWorkGroupSize = inputSize - workGroupSizeReminder;
         //for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         for (uint i = 0; i < inputSize; i += workGroupSize)
         {
-            float a = inputOutputData[dstBase + i + itemId];
-            a -= inputOutputGradients[dstBase + i + itemId];
-            inputOutputGradients[srcBase + i + itemId] = a;
+            float inputValue = inputOutputData[dstBase + i + itemId];
+            float gradient = inputValue - inputOutputGradients[dstBase + i + itemId];
+            inputOutputGradients[srcBase + i + itemId] = gradient;
         }
         //if (itemId < workGroupSizeReminder)
         //{
@@ -730,7 +730,7 @@ R""""(
         uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
         uint srcBase = groupId * inputOutputSize + inputOutputStartOffset;        
-        uint dstBase = groupId + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
+        uint dstBase = srcBase + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
         
         //uint workGroupSizeReminder = inputSize % workGroupSize;
         //uint modWorkGroupSize = inputSize - workGroupSizeReminder;

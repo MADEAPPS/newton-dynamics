@@ -474,8 +474,8 @@ class brainLayerSoftmaxActivation : public ndBrainGpuShader
         reductionBuffer[0] = ndBrainFloat(1.0f) / sumArg[0];
 
         ndBrainFloat invDen = reductionBuffer[0];
-        //for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
-        for (ndInt32 i = 0; i < inputSize; i += workGroupSize)
+        for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
+        //for (ndInt32 i = 0; i < inputSize; i += workGroupSize)
         {
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
             {
@@ -484,12 +484,12 @@ class brainLayerSoftmaxActivation : public ndBrainGpuShader
                 inputOutputData[outputOffset + i + itemId] = outputValue;
             }
         }
-        //for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
-        //{
-        //    ndBrainFloat inputValue = tmpInputBuffer[modWorkGroupSize + itemId];
-        //    ndBrainFloat outputValue = invDen * inputValue;
-        //    inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
-        //}
+        for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+        {
+            ndBrainFloat inputValue = tmpInputBuffer[modWorkGroupSize + itemId];
+            ndBrainFloat outputValue = invDen * inputValue;
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
+        }
     }
 };
 
@@ -573,7 +573,6 @@ class brainCopyOutputGradients : public ndBrainGpuShader
                 inputOutputGradients[dstBase + i + itemId] = a;
             }
         }
-
         for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
         {
             ndBrainFloat a = miniBatchGradients[srcBase + modWorkGroupSize + itemId];

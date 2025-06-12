@@ -43,6 +43,7 @@ class ndBrainTrainer: public ndClassAlloc
 	virtual void GetOutput(ndBrainVector&) const {}
 	virtual void GetWorkingBuffer(ndBrainVector&) const {}
 	virtual void GetParameterBuffer(ndBrainVector&) const {}
+	virtual void GetGradientBuffer(ndBrainVector&) const {}
 	virtual void SoftCopyParameters(const ndBrainTrainer&, ndBrainFloat) {}
 
 	// legacy method;
