@@ -160,7 +160,7 @@ ndBrainTrainerGpuCommand* ndBrainLayerLinearWithDropOut::CreateGpuFeedForwardCom
 	ndBrainGpuBuffer* const weightsAndBias) const
 {
 	ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(owner,
-		info, size_t(this), context, context->m_ndBrainLayerLinearDropOutActivation, miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias);
+		info, size_t(this), context, context->m_ndBrainLayerDropOutActivation, miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias);
 	return command;
 }
 
@@ -175,7 +175,7 @@ ndBrainTrainerGpuCommand* ndBrainLayerLinearWithDropOut::CreateGpuBackPropagateC
 	ndBrainGpuBuffer* const weightsAndBiasGradients) const
 {
 	ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(
-		owner, info, size_t(this), context, context->m_ndBrainLayerLinearDropOutBackPropagate,
+		owner, info, size_t(this), context, context->m_ndBrainLayerDropOutBackPropagate,
 		miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias, inputOutputGradients, weightsAndBiasGradients);
 	return command;
 }

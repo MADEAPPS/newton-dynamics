@@ -19,16 +19,16 @@ class ndBrainGpuBuffer;
 class ndBrainGpuCommand;
 class ndBrainGpuFloatBuffer;
 
-typedef struct
-{
-	ndUnsigned32 m_inputSize;
-	ndUnsigned32 m_outputSize;
-	ndUnsigned32 m_parametersBatchSize;
-	ndUnsigned32 m_parametersStartOffset;
-	ndUnsigned32 m_inputOutputSize;
-	ndUnsigned32 m_inputOutputStartOffset;
-	ndUnsigned32 m_unused[4];
-} UniformBufferObject;
+//typedef struct
+//{
+//	ndUnsigned32 m_inputSize;
+//	ndUnsigned32 m_outputSize;
+//	ndUnsigned32 m_parametersBatchSize;
+//	ndUnsigned32 m_parametersStartOffset;
+//	ndUnsigned32 m_inputOutputSize;
+//	ndUnsigned32 m_inputOutputStartOffset;
+//	ndUnsigned32 m_unused[4];
+//} UniformBufferObject;
 
 #define ND_KERNELS_WORKGROUP_SIZE	256
 
@@ -78,7 +78,7 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerReluActivation;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerTanhActivation;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerSoftmaxActivation;
-	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinearDropOutActivation;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerDropOutActivation;
 
 	// back propagate shaders
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyInputGradients;
@@ -86,7 +86,7 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerReluBackPropagate;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerTanhBackPropagate;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinearBackPropagate;
-	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinearDropOutBackPropagate;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerDropOutBackPropagate;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerCathegoricalSoftmaxBackPropagate;
 
 	// add all the partial gradinets

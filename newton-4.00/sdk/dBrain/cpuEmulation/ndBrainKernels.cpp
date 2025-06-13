@@ -10,6 +10,7 @@
 */
 
 #include "ndBrainStdafx.h"
+#include "ndBrainLayer.h"
 #include "ndBrainGpuContext.h"
 #include "ndBrainGpuFloatBuffer.h"
 #include "ndBrainGpuUniformBuffer.h"
@@ -37,7 +38,7 @@ class brainCopyInput : public ndBrainGpuShader
         ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
         ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)m_parameters[2];
 
-        UniformBufferObject* const parameters = (UniformBufferObject*)&buffer0->m_data[0];
+        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
         ndBrainFloat* const inputOutputData = &buffer1->m_buffer[0];
         ndBrainFloat* const inputBuffer = &buffer2->m_buffer[0];
         
@@ -80,7 +81,7 @@ class brainCopyOutput : public ndBrainGpuShader
         ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
         ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)m_parameters[2];
 
-        UniformBufferObject* const parameters = (UniformBufferObject*)&buffer0->m_data[0];
+        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
         ndBrainFloat* const inputOutputData = &buffer1->m_buffer[0];
         ndBrainFloat* const outputBuffer = &buffer2->m_buffer[0];
 
@@ -111,10 +112,10 @@ class brainCopyOutput : public ndBrainGpuShader
     }
 };
 
-class brainLayerLinear : public ndBrainGpuShader
+class brainLayerMatrixTimeVector_old : public ndBrainGpuShader
 {
     public:
-    brainLayerLinear(ndBrainGpuContext* const context)
+    brainLayerMatrixTimeVector_old(ndBrainGpuContext* const context)
         :ndBrainGpuShader(context)
     {
     }
@@ -131,7 +132,7 @@ class brainLayerLinear : public ndBrainGpuShader
         ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
         ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)m_parameters[2];
 
-        UniformBufferObject* const parameters = (UniformBufferObject*)&buffer0->m_data[0];
+        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
         ndBrainFloat* const inputOutputData = &buffer1->m_buffer[0];
         ndBrainFloat* const weightsAndBias = &buffer2->m_buffer[0];
 
@@ -201,13 +202,90 @@ class brainLayerLinear : public ndBrainGpuShader
             cachedOutput[i] += partialSum[0];
         }
             
-        //for (ndInt32 i = 0; i < modRowCount; i += workGroupSize)
         for (ndInt32 i = 0; i < outputSize; i += workGroupSize)
         {
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
             {
                 inputOutputData[outputOffset + i + itemId] = cachedOutput[i + itemId];
             }
+        }
+    }
+};
+
+class brainLayerMatrixTimeVector : public ndBrainGpuShader
+{
+    public:
+    brainLayerMatrixTimeVector(ndBrainGpuContext* const context)
+        :ndBrainGpuShader(context)
+    {
+    }
+
+    // a matrix time a vector by iterating over each row of the matrix 
+    // calculating the dot product of that row time the vector and adding the bias value.
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    {
+        ndBrainFloat cachedInput[ND_GPU_LOCAL_BUFFER_SIZE * 2];
+        ndBrainFloat accumulator[ND_GPU_LOCAL_BUFFER_SIZE * 2];
+
+        ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
+        ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)m_parameters[2];
+
+        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
+        ndBrainFloat* const inputOutputData = &buffer1->m_buffer[0];
+        ndBrainFloat* const weightsAndBias = &buffer2->m_buffer[0];
+
+        ndInt32 inputSize = ndInt32(parameters->m_inputSize);
+        ndInt32 outputSize = ndInt32(parameters->m_outputSize);
+        ndInt32 inputOutputSize = ndInt32(parameters->m_inputOutputSize);
+        ndInt32 parametersStartOffset = ndInt32(parameters->m_parametersStartOffset);
+        ndInt32 inputOutputStartOffset = ndInt32(parameters->m_inputOutputStartOffset);
+
+        ndInt32 biasOffset = outputSize * inputSize + parametersStartOffset;
+        ndInt32 inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
+        ndInt32 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
+
+        // cache the input
+        ndInt32 workGroupInputSizeReminder = inputSize % workGroupSize;
+        ndInt32 modWorkGroupInputSize = inputSize - workGroupInputSizeReminder;
+        for (ndInt32 i = 0; i < modWorkGroupInputSize; i += workGroupSize)
+        {
+            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+            {
+                cachedInput[i + itemId] = inputOutputData[inputOffset + itemId + i];
+            }
+        }
+        for (ndInt32 itemId = 0; itemId < workGroupInputSizeReminder; ++itemId)
+        {
+            cachedInput[modWorkGroupInputSize + itemId] = inputOutputData[inputOffset + itemId + modWorkGroupInputSize];
+        }
+
+        // copy the matrix bias
+        ndInt32 workGroupSizeReminder = outputSize % workGroupSize;
+        for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+        {
+            accumulator[itemId] = 0.0f;
+        }
+        for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+        {
+            accumulator[itemId] = weightsAndBias[biasOffset + itemId];
+        }
+
+        for (ndInt32 i = 0; i < inputSize; ++i)
+        {
+            float scaleScale = cachedInput[i];
+            ndInt32 rowStartOffset = i * outputSize + parametersStartOffset;
+            for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+            {
+                float matrixElement = weightsAndBias[rowStartOffset + itemId];
+                accumulator[itemId] += matrixElement * scaleScale;
+            }
+        }
+
+        for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+        {
+            float value = accumulator[itemId];
+            inputOutputData[outputOffset + itemId] = value;
         }
     }
 };
@@ -225,7 +303,7 @@ class brainLayerReluActivation : public ndBrainGpuShader
         ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
         ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
 
-        UniformBufferObject* const parameters = (UniformBufferObject*)&buffer0->m_data[0];
+        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
         ndBrainFloat* const inputOutputData = &buffer1->m_buffer[0];
 
         ndInt32 inputSize = ndInt32(parameters->m_inputSize);
@@ -270,7 +348,7 @@ class brainLayerLinearDropOutActivation : public ndBrainGpuShader
         ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
         ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
 
-        UniformBufferObject* const parameters = (UniformBufferObject*)&buffer0->m_data[0];
+        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
         ndBrainFloat* const inputOutputData = &buffer1->m_buffer[0];
 
         ndInt32 inputSize = ndInt32(parameters->m_inputSize);
@@ -315,7 +393,7 @@ class brainLayerTanhActivation : public ndBrainGpuShader
         ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
         ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
 
-        UniformBufferObject* const parameters = (UniformBufferObject*)&buffer0->m_data[0];
+        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
         ndBrainFloat* const inputOutputData = &buffer1->m_buffer[0];
 
         ndInt32 inputSize = ndInt32(parameters->m_inputSize);
@@ -363,7 +441,7 @@ class brainLayerSoftmaxActivation : public ndBrainGpuShader
         ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
         ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
 
-        UniformBufferObject* const parameters = (UniformBufferObject*)&buffer0->m_data[0];
+        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
         ndBrainFloat* const inputOutputData = &buffer1->m_buffer[0];
 
         ndInt32 inputSize = ndInt32(parameters->m_inputSize);
@@ -489,7 +567,7 @@ class brainCopyInputGradients : public ndBrainGpuShader
         ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)m_parameters[2];
         ndBrainGpuFloatBuffer* const buffer3 = (ndBrainGpuFloatBuffer*)m_parameters[3];
 
-        UniformBufferObject* const parameters = (UniformBufferObject*)&buffer0->m_data[0];
+        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
         ndBrainFloat* const miniBatchGradients = &buffer2->m_buffer[0];
         ndBrainFloat* const inputOutputGradients = &buffer3->m_buffer[0];
 
@@ -532,7 +610,7 @@ class brainCopyOutputGradients : public ndBrainGpuShader
         ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)m_parameters[2];
         ndBrainGpuFloatBuffer* const buffer3 = (ndBrainGpuFloatBuffer*)m_parameters[3];
 
-        UniformBufferObject* const parameters = (UniformBufferObject*)&buffer0->m_data[0];
+        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
         ndBrainFloat* const miniBatchGradients = &buffer2->m_buffer[0];
         ndBrainFloat* const inputOutputGradients = &buffer3->m_buffer[0];
 
@@ -576,7 +654,7 @@ class brainLayerBrainCathegoricalSoftmaxBackPropagate : public ndBrainGpuShader
         ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
         ndBrainGpuFloatBuffer* const buffer3 = (ndBrainGpuFloatBuffer*)m_parameters[3];
 
-        UniformBufferObject* const parameters = (UniformBufferObject*)&buffer0->m_data[0];
+        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
         ndBrainFloat* const inputOutputData = &buffer1->m_buffer[0];
         ndBrainFloat* const inputOutputGradients = &buffer3->m_buffer[0];
 
@@ -623,7 +701,7 @@ class brainLayerBrainReluBackPropagate : public ndBrainGpuShader
         ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
         ndBrainGpuFloatBuffer* const buffer3 = (ndBrainGpuFloatBuffer*)m_parameters[3];
 
-        UniformBufferObject* const parameters = (UniformBufferObject*)&buffer0->m_data[0];
+        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
         ndBrainFloat* const inputOutputData = &buffer1->m_buffer[0];
         ndBrainFloat* const inputOutputGradients = &buffer3->m_buffer[0];
 
@@ -671,7 +749,7 @@ class brainLayerBrainLinearDropOutBackPropagate : public ndBrainGpuShader
         ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
         ndBrainGpuFloatBuffer* const buffer3 = (ndBrainGpuFloatBuffer*)m_parameters[3];
 
-        UniformBufferObject* const parameters = (UniformBufferObject*)&buffer0->m_data[0];
+        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
         ndBrainFloat* const inputOutputGradients = &buffer3->m_buffer[0];
 
         ndInt32 inputSize = ndInt32(parameters->m_inputSize);
@@ -715,7 +793,7 @@ class brainLayerBrainTanhBackPropagate : public ndBrainGpuShader
         ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
         ndBrainGpuFloatBuffer* const buffer3 = (ndBrainGpuFloatBuffer*)m_parameters[3];
 
-        UniformBufferObject* const parameters = (UniformBufferObject*)&buffer0->m_data[0];
+        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
         ndBrainFloat* const inputOutputData = &buffer1->m_buffer[0];
         ndBrainFloat* const inputOutputGradients = &buffer3->m_buffer[0];
 
@@ -766,7 +844,7 @@ class brainLayerBrainLinearBackPropagate : public ndBrainGpuShader
         ndBrainGpuFloatBuffer* const buffer3 = (ndBrainGpuFloatBuffer*)m_parameters[3];
         ndBrainGpuFloatBuffer* const buffer4 = (ndBrainGpuFloatBuffer*)m_parameters[4];
 
-        UniformBufferObject* const parameters = (UniformBufferObject*)&buffer0->m_data[0];
+        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
         ndBrainFloat* const inputOutputData = &buffer1->m_buffer[0];
         ndBrainFloat* const weightAndBias = &buffer2->m_buffer[0];
         ndBrainFloat* const inputOutputGradients = &buffer3->m_buffer[0];
@@ -894,7 +972,7 @@ class brainAccumulateGradients : public ndBrainGpuShader
         ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
         ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
 
-        UniformBufferObject* const parameters = (UniformBufferObject*)&buffer0->m_data[0];
+        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
         ndBrainFloat* const gradientBuffer = &buffer1->m_buffer[0];
 
         //ndInt32 inputSize = ndInt32(__cpuKernelRoundoff(parameters->m_inputSize, workGroupSize);
@@ -1109,17 +1187,16 @@ class brainAdamMomentumUpdate : public ndBrainGpuShader
     }
 };
 
-
 void ndBrainGpuContext::CreateKerners()
 {   
     // create all feed foward shaders
     m_ndBrainCopyInput = ndSharedPtr<ndBrainGpuShader> (new brainCopyInput(this));
     m_ndBrainCopyOutput = ndSharedPtr<ndBrainGpuShader> (new brainCopyOutput(this));
-    m_ndBrainLayerLinear = ndSharedPtr<ndBrainGpuShader> (new brainLayerLinear(this));
+    m_ndBrainLayerLinear = ndSharedPtr<ndBrainGpuShader> (new brainLayerMatrixTimeVector(this));
     m_ndBrainLayerReluActivation = ndSharedPtr<ndBrainGpuShader>(new brainLayerReluActivation(this));
     m_ndBrainLayerTanhActivation = ndSharedPtr<ndBrainGpuShader>(new brainLayerTanhActivation(this));
     m_ndBrainLayerSoftmaxActivation = ndSharedPtr<ndBrainGpuShader>(new brainLayerSoftmaxActivation(this));
-    m_ndBrainLayerLinearDropOutActivation = ndSharedPtr<ndBrainGpuShader>(new brainLayerLinearDropOutActivation(this));
+    m_ndBrainLayerDropOutActivation = ndSharedPtr<ndBrainGpuShader>(new brainLayerLinearDropOutActivation(this));
 
     // create all backpropagate shaders
     m_ndBrainCopyInputGradients = ndSharedPtr<ndBrainGpuShader>(new brainCopyInputGradients(this));
@@ -1127,7 +1204,7 @@ void ndBrainGpuContext::CreateKerners()
     m_ndBrainLayerReluBackPropagate = ndSharedPtr<ndBrainGpuShader>(new brainLayerBrainReluBackPropagate(this));
     m_ndBrainLayerTanhBackPropagate = ndSharedPtr<ndBrainGpuShader>(new brainLayerBrainTanhBackPropagate(this));
     m_ndBrainLayerLinearBackPropagate = ndSharedPtr<ndBrainGpuShader>(new brainLayerBrainLinearBackPropagate(this));
-    m_ndBrainLayerLinearDropOutBackPropagate = ndSharedPtr<ndBrainGpuShader>(new brainLayerBrainLinearDropOutBackPropagate(this));
+    m_ndBrainLayerDropOutBackPropagate = ndSharedPtr<ndBrainGpuShader>(new brainLayerBrainLinearDropOutBackPropagate(this));
     m_ndBrainLayerCathegoricalSoftmaxBackPropagate = ndSharedPtr<ndBrainGpuShader>(new brainLayerBrainCathegoricalSoftmaxBackPropagate(this));
 
     // accumulate gradient kernels

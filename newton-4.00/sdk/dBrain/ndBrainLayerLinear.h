@@ -74,7 +74,7 @@ class ndBrainLayerLinear : public ndBrainLayer
 
 	virtual void SetWeights(const ndBrainVector& input) override;
 	virtual void CopyWeights(ndBrainVector& oput) const override;
-
+	virtual void CopyTransposedWeights(ndBrainVector& output) const override;
 
 	virtual ndCommandShareInfo GetCommandSharedInfo() override;
 	virtual ndBrainLayerFeedForwardCpuCommand* GetLayerCpuFeedForwardCommand() override;

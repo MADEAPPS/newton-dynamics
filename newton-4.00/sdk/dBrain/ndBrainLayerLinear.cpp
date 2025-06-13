@@ -21,11 +21,11 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
-#include "ndBrainTrainerCpu.h"
-#include "ndBrainLayerLinear.h"
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuCommand.h"
 #include "ndBrainGpuContext.h"
+#include "ndBrainTrainerCpu.h"
+#include "ndBrainLayerLinear.h"
 #include "ndBrainGpuFloatBuffer.h"
 #include "ndBrainGpuUniformBuffer.h"
 #include "ndBrainTrainerGpuInference.h"
@@ -98,6 +98,19 @@ void ndBrainLayerLinear::InitWeights()
 	{
 		m_weights[i].InitGaussianWeights(variance);
 	}
+
+	//for (ndInt32 i = 0; i < ndInt32(m_weights.GetCount()); ++i)
+	//{
+	//	for (ndInt32 j = 0; j < ndInt32(m_weights.GetColumns()); ++j)
+	//	{
+	//		m_weights[i][j] = ndFloat32(0);
+	//	}
+	//
+	//	for (ndInt32 j = 0; j < 10; ++j)
+	//	{
+	//		m_weights[i][j] = ndFloat32(i * 10 + j);
+	//	}
+	//}
 }
 
 void ndBrainLayerLinear::Clear()
@@ -322,6 +335,26 @@ void ndBrainLayerLinear::CopyWeights(ndBrainVector& output) const
 		stride += step;
 	}
 	ndBrainMemVector bias(&output[stride], m_bias.GetCount());
+	bias.Set(m_bias);
+}
+
+void ndBrainLayerLinear::CopyTransposedWeights(ndBrainVector& output) const
+{
+	ndAssert(output.GetCount() >= (GetOutputSize() * GetInputSize() + GetOutputSize()));
+
+	const ndInt32 stride = m_weights.GetRows();
+	for (ndInt32 i = 0; i < m_weights.GetRows(); ++i)
+	{
+		ndInt32 row = i;
+		const ndBrainVector& src = m_weights[i];
+		for (ndInt32 j = 0; j < m_weights.GetColumns(); ++j)
+		{
+			output[row] = src[j];
+			row += stride;
+		}
+	}
+	ndInt32 size = m_weights.GetColumns() * m_weights.GetRows();
+	ndBrainMemVector bias(&output[size], m_bias.GetCount());
 	bias.Set(m_bias);
 }
 

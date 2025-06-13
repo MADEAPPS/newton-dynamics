@@ -49,7 +49,7 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerReluActivation;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerTanhActivation;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerSoftmaxActivation;
-	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinearDropOutActivation;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerDropOutActivation;
 
 	// back propagate shaders
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyInputGradients;
@@ -57,7 +57,7 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerReluBackPropagate;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerTanhBackPropagate;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinearBackPropagate;
-	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinearDropOutBackPropagate;
+	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerDropOutBackPropagate;
 	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerCathegoricalSoftmaxBackPropagate;
 
 	// add all the partial gradinets

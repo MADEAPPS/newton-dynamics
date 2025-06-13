@@ -64,6 +64,7 @@ ndBrainTrainerGpuInference::ndBrainTrainerGpuInference(const ndSharedPtr<ndBrain
 	,m_weightAndBiasBuffer()
 	,m_miniBatchInputBuffer()
 	,m_miniBatchOutputBuffer()
+	,m_weightAndBiasTransposeBuffer()
 	,m_feedForwardCommands()
 	,m_miniBatchSize(minibatchSize)
 {
@@ -94,8 +95,9 @@ void ndBrainTrainerGpuInference::AddLayersCommands(ndFixSizeArray<ndBrainLayer::
 {
 	// create all the uniform buffers 
 	const ndBrain& brain = **m_brain;
-	ndBrainGpuBuffer* const weightsBuffer = *m_weightAndBiasBuffer;
+	//ndBrainGpuBuffer* const weightsBuffer = *m_weightAndBiasBuffer;
 	ndBrainGpuBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
+	ndBrainGpuBuffer* const weightsBuffer = *m_weightAndBiasTransposeBuffer;
 	
 	ndInt32 inputOutputStartOffset = 0;
 	ndInt32 inputOutputBufferSize = RoundoffOffset(brain.GetInputSize());
@@ -197,8 +199,12 @@ void ndBrainTrainerGpuInference::InitWeightAndBiasBuffer()
 	parametersSizeSum = RoundoffOffset(parametersSizeSum);
 
 	ndBrainVector scratchBuffer;
+	ndBrainVector weightAndBiasTranspose;
 	scratchBuffer.SetCount(parametersSizeSum);
 	scratchBuffer.Set(ndBrainFloat(0.0f));
+	weightAndBiasTranspose.SetCount(parametersSizeSum);
+	weightAndBiasTranspose.Set(ndBrainFloat(0.0f));
+
 	for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
 	{
 		const ndBrainLayer* const layer = brain[i];
@@ -206,9 +212,13 @@ void ndBrainTrainerGpuInference::InitWeightAndBiasBuffer()
 		ndBrainMemVector weights(&scratchBuffer[uniformData[i].m_parametersStartOffset], uniformData[i].m_parametersBatchSize);
 		info.m_parametersBatchSize = parametersSizeSum;
 		layer->CopyWeights(weights);
+
+		ndBrainMemVector weightTranspose(&weightAndBiasTranspose[uniformData[i].m_parametersStartOffset], uniformData[i].m_parametersBatchSize);
+		layer->CopyTransposedWeights(weightTranspose);
 	}
 	uniformData[uniformData.GetCount() - 1].m_parametersBatchSize = parametersSizeSum;
 	m_weightAndBiasBuffer = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(m_context, scratchBuffer, ndCpuMappable));
+	m_weightAndBiasTransposeBuffer = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(m_context, weightAndBiasTranspose, ndCpuMappable));
 
 	scratchBuffer.SetCount(m_miniBatchSize * brain.GetInputSize());
 	scratchBuffer.Set(ndBrainFloat(0.0f));

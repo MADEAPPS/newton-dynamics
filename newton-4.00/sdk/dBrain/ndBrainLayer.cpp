@@ -61,6 +61,10 @@ void ndBrainLayer::CopyWeights(ndBrainVector&) const
 {
 }
 
+void ndBrainLayer::CopyTransposedWeights(ndBrainVector&) const
+{
+}
+
 void ndBrainLayer::SetWeights(const ndBrainVector&)
 {
 }
