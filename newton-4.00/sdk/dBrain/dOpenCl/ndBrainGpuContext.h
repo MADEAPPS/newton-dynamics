@@ -43,30 +43,30 @@ class ndBrainGpuContext : public ndBrainContext
 
 	public:
 	// feed foward shaders
-	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyInput;
-	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyOutput;
-	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinear;
-	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerReluActivation;
-	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerTanhActivation;
-	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerSoftmaxActivation;
-	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerDropOutActivation;
+	ndSharedPtr<ndBrainGpuShader> m_brainCopyInput;
+	ndSharedPtr<ndBrainGpuShader> m_brainCopyOutput;
+	ndSharedPtr<ndBrainGpuShader> m_brainLayerLinear;
+	ndSharedPtr<ndBrainGpuShader> m_brainLayerReluActivation;
+	ndSharedPtr<ndBrainGpuShader> m_brainLayerTanhActivation;
+	ndSharedPtr<ndBrainGpuShader> m_brainLayerSoftmaxActivation;
+	ndSharedPtr<ndBrainGpuShader> m_brainLayerDropOutActivation;
 
 	// back propagate shaders
-	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyInputGradients;
-	ndSharedPtr<ndBrainGpuShader> m_ndBrainCopyOutputGradients;
-	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerReluBackPropagate;
-	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerTanhBackPropagate;
-	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerLinearBackPropagate;
-	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerDropOutBackPropagate;
-	ndSharedPtr<ndBrainGpuShader> m_ndBrainLayerCathegoricalSoftmaxBackPropagate;
+	ndSharedPtr<ndBrainGpuShader> m_brainCopyInputGradients;
+	ndSharedPtr<ndBrainGpuShader> m_brainCopyOutputGradients;
+	ndSharedPtr<ndBrainGpuShader> m_brainLayerReluBackPropagate;
+	ndSharedPtr<ndBrainGpuShader> m_brainLayerTanhBackPropagate;
+	ndSharedPtr<ndBrainGpuShader> m_brainLayerLinearBackPropagate;
+	ndSharedPtr<ndBrainGpuShader> m_brainLayerDropOutBackPropagate;
+	ndSharedPtr<ndBrainGpuShader> m_brainLayerCathegoricalSoftmaxBackPropagate;
 
 	// add all the partial gradinets
-	ndSharedPtr<ndBrainGpuShader> m_ndBrainAccumulateGradients;
+	ndSharedPtr<ndBrainGpuShader> m_brainAccumulateGradients;
 
 	// optimizer shaders
-	ndSharedPtr<ndBrainGpuShader> m_ndBrainAdamMomentumUpdate;
-	ndSharedPtr<ndBrainGpuShader> m_ndBrainAdamRidgeOptimizerUpdate;
-	ndSharedPtr<ndBrainGpuShader> m_ndBrainAdamLassoOptimizerUpdate;
+	ndSharedPtr<ndBrainGpuShader> m_brainAdamMomentumUpdate;
+	ndSharedPtr<ndBrainGpuShader> m_brainAdamRidgeOptimizerUpdate;
+	ndSharedPtr<ndBrainGpuShader> m_brainAdamLassoOptimizerUpdate;
 
 	private:
 	ndSharedPtr<cl::Device> m_device;

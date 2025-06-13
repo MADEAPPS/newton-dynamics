@@ -920,28 +920,28 @@ void ndBrainGpuContext::CreateKerners()
 #endif
 
     // create all feed foward shaders
-    m_ndBrainCopyInput = CreateKerner(program, "brainCopyInput");
-    m_ndBrainCopyOutput = CreateKerner(program, "brainCopyOutput");
-    m_ndBrainLayerLinear = CreateKerner(program, "brainLayerMatrixTimeVector");
-    m_ndBrainLayerReluActivation = CreateKerner(program, "brainLayerReluActivation");
-    m_ndBrainLayerTanhActivation = CreateKerner(program, "brainLayerTanhActivation");
-    m_ndBrainLayerSoftmaxActivation = CreateKerner(program, "brainLayerSoftmaxActivation");
-    m_ndBrainLayerDropOutActivation = CreateKerner(program, "brainLayerDropOutActivation");
+    m_brainCopyInput = CreateKerner(program, "brainCopyInput");
+    m_brainCopyOutput = CreateKerner(program, "brainCopyOutput");
+    m_brainLayerLinear = CreateKerner(program, "brainLayerMatrixTimeVector");
+    m_brainLayerReluActivation = CreateKerner(program, "brainLayerReluActivation");
+    m_brainLayerTanhActivation = CreateKerner(program, "brainLayerTanhActivation");
+    m_brainLayerSoftmaxActivation = CreateKerner(program, "brainLayerSoftmaxActivation");
+    m_brainLayerDropOutActivation = CreateKerner(program, "brainLayerDropOutActivation");
 
     // create all backpropagate shaders
-    m_ndBrainCopyInputGradients = CreateKerner(program, "brainCopyInputGradients");
-    m_ndBrainCopyOutputGradients = CreateKerner(program, "brainCopyOutputGradients");
-    m_ndBrainLayerReluBackPropagate = CreateKerner(program, "brainLayerBrainReluBackPropagate");
-    m_ndBrainLayerTanhBackPropagate = CreateKerner(program, "brainLayerBrainTanhBackPropagate");
-    m_ndBrainLayerLinearBackPropagate = CreateKerner(program, "brainLayerBrainLinearBackPropagate");
-    m_ndBrainLayerDropOutBackPropagate = CreateKerner(program, "brainLayerBrainDropOutBackPropagate");
-    m_ndBrainLayerCathegoricalSoftmaxBackPropagate = CreateKerner(program, "brainLayerBrainCathegoricalSoftmaxBackPropagate");
+    m_brainCopyInputGradients = CreateKerner(program, "brainCopyInputGradients");
+    m_brainCopyOutputGradients = CreateKerner(program, "brainCopyOutputGradients");
+    m_brainLayerReluBackPropagate = CreateKerner(program, "brainLayerBrainReluBackPropagate");
+    m_brainLayerTanhBackPropagate = CreateKerner(program, "brainLayerBrainTanhBackPropagate");
+    m_brainLayerLinearBackPropagate = CreateKerner(program, "brainLayerBrainLinearBackPropagate");
+    m_brainLayerDropOutBackPropagate = CreateKerner(program, "brainLayerBrainDropOutBackPropagate");
+    m_brainLayerCathegoricalSoftmaxBackPropagate = CreateKerner(program, "brainLayerBrainCathegoricalSoftmaxBackPropagate");
 
     // accumulate gradient kernels
-    m_ndBrainAccumulateGradients = CreateKerner(program, "brainAccumulateGradients");
+    m_brainAccumulateGradients = CreateKerner(program, "brainAccumulateGradients");
 
     // optimizer kernels
-    m_ndBrainAdamMomentumUpdate = CreateKerner(program, "brainAdamMomentumUpdate");
-    m_ndBrainAdamRidgeOptimizerUpdate = CreateKerner(program, "brainAdamUpdateRidgeRegularizer");
-    m_ndBrainAdamLassoOptimizerUpdate = CreateKerner(program, "brainAdamUpdateLassoRegularizer");
+    m_brainAdamMomentumUpdate = CreateKerner(program, "brainAdamMomentumUpdate");
+    m_brainAdamRidgeOptimizerUpdate = CreateKerner(program, "brainAdamUpdateRidgeRegularizer");
+    m_brainAdamLassoOptimizerUpdate = CreateKerner(program, "brainAdamUpdateLassoRegularizer");
 }

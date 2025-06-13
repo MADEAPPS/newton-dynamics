@@ -191,7 +191,7 @@ ndBrainTrainerGpuCommand* ndBrainLayerActivationSoftmax::CreateGpuFeedForwardCom
 	ndBrainGpuBuffer* const parameters) const
 {
 	ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(
-		owner, info, size_t(this), context, context->m_ndBrainLayerSoftmaxActivation, 
+		owner, info, size_t(this), context, context->m_brainLayerSoftmaxActivation, 
 		miniBatchSize, uniformBuffer, inputOutputData, parameters);
 	return command;
 }

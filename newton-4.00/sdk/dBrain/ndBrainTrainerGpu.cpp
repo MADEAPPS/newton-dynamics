@@ -151,7 +151,7 @@ void ndBrainTrainerGpu::AddCopyInputGradientCommand()
 	
 	ndBrainGpuBuffer* const inputOutputGradientBuffer = *m_inputOuputGradientsBuffer;
 	ndBrainGpuBuffer* const miniBatchInputGradientBuffer = *m_miniBatchInputGradientBuffer;
-	ndSharedPtr<ndBrainGpuCommand>command(new ndBrainTrainerGpuCommand(this, data, m_inputId, m_context, m_context->m_ndBrainCopyInputGradients, m_miniBatchSize, uniformbuffer, nullptr, miniBatchInputGradientBuffer, inputOutputGradientBuffer));
+	ndSharedPtr<ndBrainGpuCommand>command(new ndBrainTrainerGpuCommand(this, data, m_inputId, m_context, m_context->m_brainCopyInputGradients, m_miniBatchSize, uniformbuffer, nullptr, miniBatchInputGradientBuffer, inputOutputGradientBuffer));
 	m_backPropagateCommands.Append(command);
 }
 
@@ -171,7 +171,7 @@ void ndBrainTrainerGpu::AddCopyOutputGradientCommand()
 
 	ndBrainGpuBuffer* const inputOutputGradientBuffer = *m_inputOuputGradientsBuffer;
 	ndBrainGpuBuffer* const miniBatchOutputGradientBuffer = *m_miniBatchOutputGradientBuffer;
-	ndSharedPtr<ndBrainGpuCommand>command(new ndBrainTrainerGpuCommand(this, data, m_outpuId, m_context, m_context->m_ndBrainCopyOutputGradients, m_miniBatchSize, uniformbuffer, nullptr, miniBatchOutputGradientBuffer, inputOutputGradientBuffer));
+	ndSharedPtr<ndBrainGpuCommand>command(new ndBrainTrainerGpuCommand(this, data, m_outpuId, m_context, m_context->m_brainCopyOutputGradients, m_miniBatchSize, uniformbuffer, nullptr, miniBatchOutputGradientBuffer, inputOutputGradientBuffer));
 	m_backPropagateCommands.Append(command);
 }
 
@@ -186,7 +186,7 @@ void ndBrainTrainerGpu::AddOptimizerGradientCommand(ndBrainFloat learnRate)
 	ndSharedPtr<ndBrainGpuBuffer> uniformbuffer(new ndBrainGpuUniformBuffer(m_context, sizeof(ndBrainLayer::ndCommandShareInfo)));
 	uniformbuffer->LoadData(sizeof(ndBrainLayer::ndCommandShareInfo), &data);
 	ndBrainGpuBuffer* const weightAndBiasGradientsBuffer = *m_weightAndBiasGradientsBuffer;
-	m_accumulateGradients = ndSharedPtr<ndBrainGpuCommand>(new ndBrainTrainerGpuCommand(this, data, 0, m_context, m_context->m_ndBrainAccumulateGradients, m_miniBatchSize, uniformbuffer, weightAndBiasGradientsBuffer, nullptr, nullptr));
+	m_accumulateGradients = ndSharedPtr<ndBrainGpuCommand>(new ndBrainTrainerGpuCommand(this, data, 0, m_context, m_context->m_brainAccumulateGradients, m_miniBatchSize, uniformbuffer, weightAndBiasGradientsBuffer, nullptr, nullptr));
 	m_accumulateGradients->m_numberOfWorkGroups = size_t(sizeInFloats / m_miniBatchSize);
 	
 	// add the adam optimizer kernel here
@@ -197,7 +197,7 @@ void ndBrainTrainerGpu::AddOptimizerGradientCommand(ndBrainFloat learnRate)
 	if (m_optimizer->GetRegularizerType() == ndBrainOptimizer::m_lasso)
 	{
 		m_adamOtimizerUpdate = ndSharedPtr<ndBrainGpuCommand>(new ndBrainAdamUpdateCommand(
-			this, m_context, m_context->m_ndBrainAdamLassoOptimizerUpdate, m_miniBatchSize, optimizerData,
+			this, m_context, m_context->m_brainAdamLassoOptimizerUpdate, m_miniBatchSize, optimizerData,
 			adamUniformbuffer, m_weightAndBiasBuffer, m_weightAndBiasGradientsBuffer,
 			m_optimizer->m_vdw, m_optimizer->m_vdw2));
 			m_adamOtimizerUpdate->m_numberOfWorkGroups = size_t(sizeInFloats / m_miniBatchSize);
@@ -205,7 +205,7 @@ void ndBrainTrainerGpu::AddOptimizerGradientCommand(ndBrainFloat learnRate)
 	else
 	{
 		m_adamOtimizerUpdate = ndSharedPtr<ndBrainGpuCommand>(new ndBrainAdamUpdateCommand(
-			this, m_context, m_context->m_ndBrainAdamRidgeOptimizerUpdate, m_miniBatchSize, optimizerData,
+			this, m_context, m_context->m_brainAdamRidgeOptimizerUpdate, m_miniBatchSize, optimizerData,
 			adamUniformbuffer, m_weightAndBiasBuffer, m_weightAndBiasGradientsBuffer,
 			m_optimizer->m_vdw, m_optimizer->m_vdw2));
 		m_adamOtimizerUpdate->m_numberOfWorkGroups = size_t(sizeInFloats / m_miniBatchSize);
@@ -213,7 +213,7 @@ void ndBrainTrainerGpu::AddOptimizerGradientCommand(ndBrainFloat learnRate)
 	
 	// add the momentum update command
 	m_adamMomentumUpdate = ndSharedPtr<ndBrainGpuCommand>(new ndBrainAdamUpdateCommand(
-		this, m_context, m_context->m_ndBrainAdamMomentumUpdate, 1, optimizerData, adamUniformbuffer));
+		this, m_context, m_context->m_brainAdamMomentumUpdate, 1, optimizerData, adamUniformbuffer));
 	m_adamMomentumUpdate->m_numberOfWorkGroups = 1;
 }
 

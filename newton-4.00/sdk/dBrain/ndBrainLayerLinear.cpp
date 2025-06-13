@@ -99,18 +99,25 @@ void ndBrainLayerLinear::InitWeights()
 		m_weights[i].InitGaussianWeights(variance);
 	}
 
-	//for (ndInt32 i = 0; i < ndInt32(m_weights.GetCount()); ++i)
-	//{
-	//	for (ndInt32 j = 0; j < ndInt32(m_weights.GetColumns()); ++j)
-	//	{
-	//		m_weights[i][j] = ndFloat32(0);
-	//	}
-	//
-	//	for (ndInt32 j = 0; j < 10; ++j)
-	//	{
-	//		m_weights[i][j] = ndFloat32(i * 10 + j);
-	//	}
-	//}
+#if 0
+	for (ndInt32 i = 0; i < ndInt32(m_bias.GetCount()); ++i)
+	{
+		//m_bias[i] = ndFloat32(i);
+		m_bias[i] = ndFloat32(0.0f);
+	}
+	for (ndInt32 i = 0; i < ndInt32(m_weights.GetCount()); ++i)
+	{
+		for (ndInt32 j = 0; j < ndInt32(m_weights.GetColumns()); ++j)
+		{
+			m_weights[i][j] = ndFloat32(0);
+		}
+	
+		for (ndInt32 j = 0; j < 10; ++j)
+		{
+			m_weights[i][j] = ndFloat32(i * 10 + j);
+		}
+	}
+#endif
 }
 
 void ndBrainLayerLinear::Clear()
@@ -470,7 +477,7 @@ ndBrainTrainerGpuCommand* ndBrainLayerLinear::CreateGpuFeedForwardCommand(
 	ndBrainGpuBuffer* const weightsAndBias) const
 {
 	ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(owner,
-		info, size_t(this), context, context->m_ndBrainLayerLinear, miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias);
+		info, size_t(this), context, context->m_brainLayerLinear, miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias);
 	return command;
 }
 
@@ -485,7 +492,7 @@ ndBrainTrainerGpuCommand* ndBrainLayerLinear::CreateGpuBackPropagateCommand(
 	ndBrainGpuBuffer* const weightsAndBiasGradients) const
 {
 	ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(
-		owner, info, size_t(this), context, context->m_ndBrainLayerLinearBackPropagate,
+		owner, info, size_t(this), context, context->m_brainLayerLinearBackPropagate,
 		miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias, inputOutputGradients, weightsAndBiasGradients);
 	return command;
 }

@@ -282,27 +282,30 @@ static void MnistTrainingSet()
 						ndBrainMemVector input(&miniBatchInput[i * inputSize], inputSize);
 						input.SetCount(inputSize);
 						input.Set((*trainingDigits)[index]);
+
+						//input.Set(0.0f);
+						//input[i] = 1.0f;
 					}
 
 					trainer->MakePrediction(miniBatchInput, false);
 					trainer->SyncQueue();
 					
 					//calculate loss
-					trainer->GetOutput(miniBatchOutput);
-					for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
-					{
-						ndUnsigned32 index = shuffleBuffer[batchStart + i];
-						ndBrainMemVector grad(&miniBatchOutputGradients[i * outputSize], outputSize);
-						const ndBrainMemVector output(&miniBatchOutput[i * outputSize], outputSize);
-						const ndBrainMemVector truth(&(*trainingLabels)[index][0], outputSize);
-						
-						loss.SetTruth(truth);
-						loss.GetLoss(output, grad);
-					}
+					//trainer->GetOutput(miniBatchOutput);
+					//for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
+					//{
+					//	ndUnsigned32 index = shuffleBuffer[batchStart + i];
+					//	ndBrainMemVector grad(&miniBatchOutputGradients[i * outputSize], outputSize);
+					//	const ndBrainMemVector output(&miniBatchOutput[i * outputSize], outputSize);
+					//	const ndBrainMemVector truth(&(*trainingLabels)[index][0], outputSize);
+					//	
+					//	loss.SetTruth(truth);
+					//	loss.GetLoss(output, grad);
+					//}
 					// backpropagate loss.
-					trainer->BackPropagate(miniBatchOutputGradients);
-					trainer->ApplyLearnRate(); 
-					trainer->SyncQueue();
+					//trainer->BackPropagate(miniBatchOutputGradients);
+					//trainer->ApplyLearnRate(); 
+					//trainer->SyncQueue();
 
 #if 0
 						ndBrainFixSizeVector<1024> xxx1;
@@ -338,7 +341,7 @@ static void MnistTrainingSet()
 #endif
 				}
 
-#if 0
+#if 1
 				ndExpandTraceMessage("epoc: %d\n", epoch);
 #else
 				
@@ -423,6 +426,7 @@ static void MnistTrainingSet()
 
 		#else
 			layers.PushBack(new ndBrainLayerLinear(trainingDigits->GetColumns(), MINIST_LINEAR_LAYERS_NEURONS));
+			//layers.PushBack(new ndBrainLayerLinear(trainingDigits->GetColumns(), 255));
 			layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize()));
 			layers.PushBack(new MINIST_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 			
@@ -438,8 +442,13 @@ static void MnistTrainingSet()
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
 		layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 		layers.PushBack(new ndBrainLayerActivationCategoricalSoftmax(layers[layers.GetCount() - 1]->GetOutputSize()));
-		
+
+
 		//layers.PushBack(new ndBrainLayerLinear(trainingDigits->GetColumns(), trainingLabels->GetColumns()));
+		//layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize()));
+		//layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
+		//layers.PushBack(new MINIST_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+		//layers.PushBack(new ndBrainLayerActivationCategoricalSoftmax(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 		for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 		{
