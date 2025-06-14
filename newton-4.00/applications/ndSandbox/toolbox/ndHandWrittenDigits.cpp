@@ -307,7 +307,7 @@ static void MnistTrainingSet()
 					//trainer->ApplyLearnRate(); 
 					//trainer->SyncQueue();
 
-#if 1
+#if 0
 						ndBrainFixSizeVector<1024> xxx1;
 						xxx1.SetCount(outputSize);
 

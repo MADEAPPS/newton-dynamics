@@ -248,7 +248,6 @@ class brainLayerMatrixTimeVector_small : public ndBrainGpuShader
         ndInt32 inputSize = ndInt32(parameters->m_inputSize);
         ndInt32 inputOutputSize = ndInt32(parameters->m_inputOutputSize);
         ndInt32 inputOutputStartOffset = ndInt32(parameters->m_inputOutputStartOffset);
-        
         ndInt32 inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
         
         // cache the input vector
@@ -290,17 +289,14 @@ class brainLayerMatrixTimeVector_small : public ndBrainGpuShader
                 }
             }
         }
-        if (workGroupInputSizeReminder)
+        for (ndInt32 i = 0; i < workGroupInputSizeReminder; ++i)
         {
-            for (ndInt32 i = 0; i < workGroupInputSizeReminder; ++i)
+            float scaleScale = cachedInput[modWorkGroupInputSize + i];
+            ndInt32 rowStartOffset = (modWorkGroupInputSize + i) * outputSize + parametersStartOffset;
+            for (ndInt32 itemId = 0; itemId < outputSize; ++itemId)
             {
-                float scaleScale = cachedInput[modWorkGroupInputSize + i];
-                ndInt32 rowStartOffset = (modWorkGroupInputSize + i) * outputSize + parametersStartOffset;
-                for (ndInt32 itemId = 0; itemId < outputSize; ++itemId)
-                {
-                    float matrixElement = weightsAndBias[rowStartOffset + itemId];
-                    accumulator[itemId] += matrixElement * scaleScale;
-                }
+                float matrixElement = weightsAndBias[rowStartOffset + itemId];
+                accumulator[itemId] += matrixElement * scaleScale;
             }
         }
 
