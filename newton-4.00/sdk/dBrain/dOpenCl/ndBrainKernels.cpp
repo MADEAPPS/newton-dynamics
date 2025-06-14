@@ -165,6 +165,73 @@ R""""(
         {
             accumulator[modWorkGroupSize + itemId] = weightsAndBias[biasOffset + modWorkGroupSize + itemId];
         }
+        barrier(CLK_LOCAL_MEM_FENCE); 
+        
+        for (uint i = 0; i < inputSize; ++i)
+        {
+            float scaleScale = cachedInput[i];
+            uint rowStartOffset = i * outputSize + parametersStartOffset;
+            for (uint j = 0; j < modWorkGroupSize; j += workGroupSize)
+            {
+                float matrixElement = weightsAndBias[rowStartOffset + j + itemId];
+                accumulator[j + itemId] += matrixElement * scaleScale;
+            }
+        
+            if (itemId < workGroupSizeReminder)
+            {
+                float matrixElement = weightsAndBias[rowStartOffset + modWorkGroupSize + itemId];
+                accumulator[modWorkGroupSize + itemId] += matrixElement * scaleScale;
+            }
+        }
+        
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            float value = accumulator[i + itemId];
+            inputOutputData[outputOffset + i + itemId] = value;
+        }
+        for (uint itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+        {
+            float value = accumulator[modWorkGroupSize + itemId];
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = value;
+        }
+    }
+
+    __kernel void brainLayerMatrixTimeVector_fast(__global const UniformBufferLayerArguments* parameters, __global float* inputOutputData, __global float* weightsAndBias) 
+    {
+        __local float cachedInput[ND_GPU_LOCAL_BUFFER_SIZE * 2];
+
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+        
+        uint inputSize = parameters->m_inputSize;
+        uint outputSize = parameters->m_outputSize;
+        uint inputOutputSize = parameters->m_inputOutputSize;
+        uint parametersStartOffset = parameters->m_parametersStartOffset;
+        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+        
+        uint biasOffset = outputSize * inputSize + parametersStartOffset;
+        uint inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
+        uint outputOffset = inputOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
+
+        // cache the in coalesing mode
+        //uint workGroupInputSizeReminder = inputSize % workGroupSize;
+        //uint modWorkGroupInputSize = inputSize - workGroupInputSizeReminder;
+        //for (uint i = 0; i < modWorkGroupInputSize; i += workGroupSize)
+        //{
+        //    cachedInput[i + itemId] = inputOutputData[inputOffset + itemId + i];
+        //}
+        //for (uint itemId = 0; itemId < workGroupInputSizeReminder; ++itemId)
+        //{
+        //    cachedInput[modWorkGroupInputSize + itemId] = inputOutputData[inputOffset + itemId + modWorkGroupInputSize];
+        //}
+        for (uint i = 0; i < inputSize; i += workGroupSize)
+        {
+            cachedInput[i + itemId] = inputOutputData[inputOffset + itemId + i];
+        }
+
+        // iniatlize result to the matrix bias
+        float accumulator = weightsAndBias[biasOffset + modWorkGroupSize + itemId];
         //barrier(CLK_LOCAL_MEM_FENCE); 
         
         for (uint i = 0; i < inputSize; ++i)
@@ -892,7 +959,7 @@ void ndBrainGpuContext::CreateKerners()
     // create all feed foward shaders
     m_brainCopyInput = CreateKerner(program, "brainCopyInput");
     m_brainCopyOutput = CreateKerner(program, "brainCopyOutput");
-    m_brainLayerLinear = CreateKerner(program, "brainLayerMatrixTimeVector");
+    m_brainLayerLinear = CreateKerner(program, "brainLayerMatrixTimeVector_fast");
     m_brainLayerReluActivation = CreateKerner(program, "brainLayerReluActivation");
     m_brainLayerTanhActivation = CreateKerner(program, "brainLayerTanhActivation");
     m_brainLayerSoftmaxActivation = CreateKerner(program, "brainLayerSoftmaxActivation");

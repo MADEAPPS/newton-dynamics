@@ -388,7 +388,7 @@ void ndBrainTrainerGpuInference::MakePrediction(const ndBrainVector& input, bool
 	m_miniBatchInputBuffer->LoadData(input.GetCount() * sizeof(ndReal), &input[0]);
 
 	// for testing;
-CalculateWeightAndBiasTranspose();
+//CalculateWeightAndBiasTranspose();
 
 	for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = m_feedForwardCommands.GetFirst(); node; node = node->GetNext())
 	{
