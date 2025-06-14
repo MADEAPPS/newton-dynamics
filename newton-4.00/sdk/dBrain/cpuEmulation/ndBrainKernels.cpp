@@ -162,13 +162,20 @@ class brainLayerMatrixTimeVector : public ndBrainGpuShader
         }
 
         // copy the matrix bias
+        //for (ndInt32 i = 0; i < outputSize; i += workGroupSize)
+        //{
+        //    for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+        //    {
+        //        accumulator[i + itemId] = 0.0f;
+        //    }
+        //}
         ndInt32 workGroupSizeReminder = outputSize % workGroupSize;
         ndInt32 modWorkGroupSize = outputSize - workGroupSizeReminder;
         for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
             {
-                accumulator[i + itemId] = 0.0f;
+                accumulator[i + itemId] = weightsAndBias[biasOffset + i + itemId];
             }
         }
         for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
@@ -180,6 +187,7 @@ class brainLayerMatrixTimeVector : public ndBrainGpuShader
         {
             float scaleScale = cachedInput[i];
             ndInt32 rowStartOffset = i * outputSize + parametersStartOffset;
+
             for (ndInt32 j = 0; j < modWorkGroupSize; j += workGroupSize)
             {
                 for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
@@ -195,10 +203,19 @@ class brainLayerMatrixTimeVector : public ndBrainGpuShader
             }
         }
 
-        for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+        for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
-            float value = accumulator[itemId];
-            inputOutputData[outputOffset + itemId] = value;
+            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+            {
+                float value = accumulator[i + itemId];
+                inputOutputData[outputOffset + i + itemId] = value;
+            }
+        }
+
+        for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+        {
+            float value = accumulator[modWorkGroupSize + itemId];
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = value;
         }
     }
 };

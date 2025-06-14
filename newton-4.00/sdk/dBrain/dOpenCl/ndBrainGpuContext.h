@@ -60,6 +60,10 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainGpuShader> m_brainLayerDropOutBackPropagate;
 	ndSharedPtr<ndBrainGpuShader> m_brainLayerCathegoricalSoftmaxBackPropagate;
 
+	// miscellaneous
+	ndSharedPtr<ndBrainGpuShader> m_brainLayerTransposeMatrix;
+	ndSharedPtr<ndBrainGpuShader> m_brainLayerTransposeMatrixBias;
+
 	// add all the partial gradinets
 	ndSharedPtr<ndBrainGpuShader> m_brainAccumulateGradients;
 
@@ -83,6 +87,7 @@ class ndBrainGpuContext : public ndBrainContext
 	static const char* m_backPropagateKernels_2;
 	static const char* m_backPropagateKernels_3;
 
+	static const char* m_transposeKernels;
 	static const char* m_optimizerKernels;
 	static const char* m_commonKernelsSource;
 
