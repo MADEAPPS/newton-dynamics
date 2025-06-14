@@ -76,22 +76,6 @@ void ndBrainTrainerCpu::GetInput(ndBrainVector& input) const
 	input.Set(m_miniBatchInputGradientBuffer);
 }
 
-void ndBrainTrainerCpu::UpdateParameters(const ndBrainVector& weightAndBias)
-{
-	ndAssert(0);
-	for (ndList<ndSharedPtr<ndBrainTrainerCpuCommand>>::ndNode* node = m_feedForwardCommands.GetFirst(); node; node = node->GetNext())
-	{
-		ndBrainTrainerCpuCommand* const command = *node->GetInfo();
-		ndBrainLayer* const layer = command->m_info.m_layer;
-		if (layer)
-		{
-			ndInt32 size = command->m_info.m_inputSize * command->m_info.m_outputSize + command->m_info.m_outputSize;
-			const ndBrainMemVector weights(&m_weightAndBiasBuffer[command->m_info.m_parametersStartOffset], size);
-			layer->SetWeights(weights);
-		}
-	}
-}
-
 void ndBrainTrainerCpu::AddCopyOutputGradientCommand()
 {
 	ndCopyOutputGradientCommand* const outputGradientCommand = new ndCopyOutputGradientCommand(this);

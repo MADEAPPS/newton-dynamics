@@ -218,6 +218,12 @@ void ndBrainTrainerCpuInference::GetWorkingBuffer(ndBrainVector& inputOutputBuff
 	inputOutputBuffer.Set(m_miniBatchOutputBuffer);
 }
 
+void ndBrainTrainerCpuInference::GetParameterBuffer(ndBrainVector& parameters) const
+{
+	parameters.SetCount(m_weightAndBiasBuffer.GetCount());
+	parameters.Set(m_weightAndBiasBuffer);
+}
+
 // new method
 void ndBrainTrainerCpuInference::BackPropagate(const ndBrainVector&, bool)
 {
@@ -227,9 +233,19 @@ void ndBrainTrainerCpuInference::ApplyLearnRate()
 {
 }
 
-void ndBrainTrainerCpuInference::UpdateParameters(const ndBrainVector&)
+void ndBrainTrainerCpuInference::UpdateParameters(const ndBrainVector& weightAndBias)
 {
-	ndAssert(0);
+	for (ndList<ndSharedPtr<ndBrainTrainerCpuCommand>>::ndNode* node = m_feedForwardCommands.GetFirst(); node; node = node->GetNext())
+	{
+		ndBrainTrainerCpuCommand* const command = *node->GetInfo();
+		ndBrainLayer* const layer = command->m_info.m_layer;
+		if (layer)
+		{
+			ndInt32 size = command->m_info.m_inputSize * command->m_info.m_outputSize + command->m_info.m_outputSize;
+			const ndBrainMemVector weights(&weightAndBias[command->m_info.m_parametersStartOffset], size);
+			layer->SetWeights(weights);
+		}
+	}
 }
 
 void ndBrainTrainerCpuInference::SoftCopyParameters(const ndBrainTrainer& src, ndBrainFloat blendFactor)
