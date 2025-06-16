@@ -371,7 +371,7 @@ void TestVulkanStuff()
 			params.PushBack(&uniforms);
 			params.PushBack(&imputOutputs);
 			params.PushBack(&weights);
-			Assembly(context->m_brainLayerLinear, numberOfImputs, params.GetCount(), &params[0]);
+			Assembly(context->m_brainLayerMatrixVectorMultiply, numberOfImputs, params.GetCount(), &params[0]);
 		}
 	};
 	struct UniformBufferObject

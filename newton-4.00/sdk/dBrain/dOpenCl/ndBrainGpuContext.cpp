@@ -62,14 +62,15 @@ ndBrainGpuContext::ndBrainGpuContext()
 		//	}
 		//}
 
-		const std::string name(cl_devices[bestDeviceIndex].getInfo<CL_DEVICE_NAME>());
-		//const std::string name(cl_devices[bestDeviceIndex].getInfo<CL_DEVICE_PROFILE>());
-		const std::string version(cl_devices[bestDeviceIndex].getInfo<CL_DEVICE_VERSION>());
-		//const std::string version(cl_devices[bestDeviceIndex].getInfo<CL_DEVICE_OPENCL_C_VERSION>());
+		m_device = ndSharedPtr<cl::Device>(new cl::Device(cl_devices[bestDeviceIndex]));
+		const std::string name(m_device->getInfo<CL_DEVICE_NAME>());
+		const std::string version(m_device->getInfo<CL_DEVICE_VERSION>());
+		size_t localMemorySize = m_device->getInfo<CL_DEVICE_LOCAL_MEM_SIZE>();
 		ndExpandTraceMessage("opencl device name: %s\n", name.c_str());
 		ndExpandTraceMessage("opencl device version: %s\n", version.c_str());
+		ndExpandTraceMessage("opencl device local memory: %d\n", localMemorySize);
 
-		m_device = ndSharedPtr<cl::Device>(new cl::Device(cl_devices[bestDeviceIndex]));
+		ndAssert(localMemorySize >= 1024 * 24);
 		
 		cl_int error = 0;
 		m_context = ndSharedPtr<cl::Context>(new cl::Context(**m_device, nullptr, clNotification, this, &error));

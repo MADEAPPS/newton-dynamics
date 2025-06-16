@@ -15,6 +15,8 @@
 class ndBrainGpuContext;
 class ndBrainCpuContext;
 
+#define ND_DEFAULT_WORKGROUP_SIZE	256
+
 class ndBrainContext : public ndClassAlloc
 {
 	public:

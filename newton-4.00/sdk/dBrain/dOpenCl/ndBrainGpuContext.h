@@ -45,7 +45,7 @@ class ndBrainGpuContext : public ndBrainContext
 	// feed foward shaders
 	ndSharedPtr<ndBrainGpuShader> m_brainCopyInput;
 	ndSharedPtr<ndBrainGpuShader> m_brainCopyOutput;
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerLinear;
+	ndSharedPtr<ndBrainGpuShader> m_brainLayerMatrixVectorMultiply;
 	ndSharedPtr<ndBrainGpuShader> m_brainLayerReluActivation;
 	ndSharedPtr<ndBrainGpuShader> m_brainLayerTanhActivation;
 	ndSharedPtr<ndBrainGpuShader> m_brainLayerSoftmaxActivation;
@@ -56,7 +56,7 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainGpuShader> m_brainCopyOutputGradients;
 	ndSharedPtr<ndBrainGpuShader> m_brainLayerReluBackPropagate;
 	ndSharedPtr<ndBrainGpuShader> m_brainLayerTanhBackPropagate;
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerLinearBackPropagate;
+	ndSharedPtr<ndBrainGpuShader> m_brainLayerMatrixVectorBackPropagate;
 	ndSharedPtr<ndBrainGpuShader> m_brainLayerDropOutBackPropagate;
 	ndSharedPtr<ndBrainGpuShader> m_brainLayerCathegoricalSoftmaxBackPropagate;
 

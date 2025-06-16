@@ -29,6 +29,14 @@
 
 #define ND_BRAIN_LAYER_LINEAR_NAME	"ndBrainLayerLinear"
 
+#define USE_TILED_MATRIX
+#define ND_GPU_TILED_MATRIX_ROWS_BITS		4
+#define ND_GPU_TILED_MATRIX_COLUMNS_BITS	5
+#define ND_GPU_TILED_MATRIX_ROWS			(1<<ND_GPU_TILED_MATRIX_ROWS_BITS)
+#define ND_GPU_TILED_MATRIX_COLUMNS			(1<<ND_GPU_TILED_MATRIX_COLUMNS_BITS)
+
+#define ND_CPU_MINI_BATCH_SIZE_GRANULARITY	ND_GPU_TILED_MATRIX_ROWS
+
 class ndBrainLayerLinear : public ndBrainLayer
 {
 	public: 
@@ -84,6 +92,8 @@ class ndBrainLayerLinear : public ndBrainLayer
 	virtual void BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const override;
 
 	virtual bool HasGpuSupport() const override;
+
+	void CalculateRoundedSize(ndInt32& width, ndInt32& height) const;
 
 	virtual ndBrainTrainerGpuCommand* CreateGpuFeedForwardCommand(ndBrainTrainerGpuInference* const owner,
 		const ndBrainLayer::ndCommandShareInfo& info,

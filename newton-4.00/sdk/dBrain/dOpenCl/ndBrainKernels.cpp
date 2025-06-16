@@ -954,7 +954,7 @@ void ndBrainGpuContext::CreateKerners()
     // create all feed foward shaders
     m_brainCopyInput = CreateKerner(program, "brainCopyInput");
     m_brainCopyOutput = CreateKerner(program, "brainCopyOutput");
-    m_brainLayerLinear = CreateKerner(program, "brainLayerMatrixTimeVector_small");
+    m_brainLayerMatrixVectorMultiply = CreateKerner(program, "brainLayerMatrixTimeVector_small");
     m_brainLayerReluActivation = CreateKerner(program, "brainLayerReluActivation");
     m_brainLayerTanhActivation = CreateKerner(program, "brainLayerTanhActivation");
     m_brainLayerSoftmaxActivation = CreateKerner(program, "brainLayerSoftmaxActivation");
@@ -965,7 +965,7 @@ void ndBrainGpuContext::CreateKerners()
     m_brainCopyOutputGradients = CreateKerner(program, "brainCopyOutputGradients");
     m_brainLayerReluBackPropagate = CreateKerner(program, "brainLayerBrainReluBackPropagate");
     m_brainLayerTanhBackPropagate = CreateKerner(program, "brainLayerBrainTanhBackPropagate");
-    m_brainLayerLinearBackPropagate = CreateKerner(program, "brainLayerBrainLinearBackPropagate");
+    m_brainLayerMatrixVectorBackPropagate = CreateKerner(program, "brainLayerBrainLinearBackPropagate");
     m_brainLayerDropOutBackPropagate = CreateKerner(program, "brainLayerBrainDropOutBackPropagate");
     m_brainLayerCathegoricalSoftmaxBackPropagate = CreateKerner(program, "brainLayerBrainCathegoricalSoftmaxBackPropagate");
 

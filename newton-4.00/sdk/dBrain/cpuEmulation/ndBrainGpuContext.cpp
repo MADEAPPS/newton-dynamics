@@ -21,7 +21,7 @@ ndBrainGpuContext::ndBrainGpuContext()
 	,ndBrainThreadPool()
 {
 	ndInt32 numOfThreads = (ndBrainThreadPool::GetMaxThreads() + 1) / 2;
-//numOfThreads = 1;
+numOfThreads = 1;
 	SetThreadCount(numOfThreads);
 	CreateKerners();
 }
@@ -63,7 +63,6 @@ void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& co
 
 	auto ExecuteCommand = ndMakeObject::ndFunction([this, &iterator, &command](ndInt32, ndInt32)
 	{
-		ndAssert(command->m_workGroupSize == 256);
 		ndInt32 workGroupdSize = ndInt32(command->m_workGroupSize);
 		ndInt32 numberOfWorkGrouds = ndInt32(command->m_numberOfWorkGroups);
 		

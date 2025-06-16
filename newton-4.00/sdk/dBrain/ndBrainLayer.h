@@ -46,13 +46,14 @@ class ndBrainLayer : public ndClassAlloc
 	class ndCommandShareInfo
 	{
 		public:
-		ndCommandShareInfo()
+			ndCommandShareInfo()
 			:m_inputSize(0)
 			,m_outputSize(0)
 			,m_inputOutputSize(0)
 			,m_inputOutputStartOffset(0)
 			,m_parametersBatchSize(0)
 			,m_parametersStartOffset(0)
+			,m_tiledStride(0)
 			,m_layer(nullptr)
 		{
 		}
@@ -74,6 +75,7 @@ class ndBrainLayer : public ndClassAlloc
 		ndInt32 m_inputOutputStartOffset;
 		ndInt32 m_parametersBatchSize;
 		ndInt32 m_parametersStartOffset;
+		ndInt32	m_tiledStride;
 		ndBrainLayer* m_layer;
 	};
 

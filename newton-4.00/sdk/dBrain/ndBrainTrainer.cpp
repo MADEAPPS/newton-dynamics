@@ -49,3 +49,10 @@ ndSharedPtr<ndBrainContext> ndBrainTrainer::GetContext()
 {
 	return m_context;
 }
+
+void ndBrainTrainer::UpdateParameters()
+{
+	ndBrainVector tmpBuffer;
+	GetParameterBuffer(tmpBuffer);
+	UpdateParameters(tmpBuffer);
+}

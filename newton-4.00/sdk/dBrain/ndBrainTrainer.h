@@ -65,6 +65,7 @@ class ndBrainTrainer: public ndClassAlloc
 	virtual void ApplyLearnRate() = 0;
 
 	// new method
+	void UpdateParameters();
 	virtual void UpdateParameters(const ndBrainVector& weightAndBias) = 0;
 
 	protected:

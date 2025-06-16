@@ -12,6 +12,7 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainLayer.h"
 #include "ndBrainGpuContext.h"
+#include "ndBrainLayerLinear.h"
 #include "ndBrainGpuFloatBuffer.h"
 #include "ndBrainGpuUniformBuffer.h"
 #include "ndBrainOptimizerAdamGpu.h"
@@ -108,328 +109,6 @@ class brainCopyOutput : public ndBrainGpuShader
             ndBrainFloat a = inputOutputData[srcBase + modWorkGroupSize + itemId];
             outputBuffer[dstBase + modWorkGroupSize + itemId] = a;
         }
-    }
-};
-
-class brainLayerMatrixTimeVector_big : public ndBrainGpuShader
-{
-    public:
-    brainLayerMatrixTimeVector_big(ndBrainGpuContext* const context)
-        :ndBrainGpuShader(context)
-    {
-    }
-
-    // a matrix time a vector by iterating over each row of the matrix 
-    // calculating the dot product of that row time the vector and adding the bias value.
-    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
-    {
-        // these local buffers have to be largest that the max hidden buffer size
-        ndBrainFloat cachedInput[ND_GPU_LOCAL_BUFFER_SIZE * 2];
-        ndBrainFloat accumulator[ND_GPU_LOCAL_BUFFER_SIZE * 2];
-        ndAssert(ND_GPU_LOCAL_BUFFER_SIZE * 2 >= 1024);
-
-        ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
-        ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
-        ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)m_parameters[2];
-
-        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
-        ndBrainFloat* const inputOutputData = &buffer1->m_buffer[0];
-        ndBrainFloat* const weightsAndBias = &buffer2->m_buffer[0];
-
-        ndInt32 inputSize = ndInt32(parameters->m_inputSize);
-        ndInt32 outputSize = ndInt32(parameters->m_outputSize);
-        ndInt32 inputOutputSize = ndInt32(parameters->m_inputOutputSize);
-        ndInt32 parametersStartOffset = ndInt32(parameters->m_parametersStartOffset);
-        ndInt32 inputOutputStartOffset = ndInt32(parameters->m_inputOutputStartOffset);
-        ndAssert(ND_GPU_LOCAL_BUFFER_SIZE * 2 >= __cpuKernelRoundoff(inputSize, workGroupSize));
-
-        ndInt32 biasOffset = outputSize * inputSize + parametersStartOffset;
-        ndInt32 inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
-        ndInt32 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
-
-        // cache the input
-        ndInt32 workGroupInputSizeReminder = inputSize % workGroupSize;
-        ndInt32 modWorkGroupInputSize = inputSize - workGroupInputSizeReminder;
-        for (ndInt32 i = 0; i < modWorkGroupInputSize; i += workGroupSize)
-        {
-            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-            {
-                cachedInput[i + itemId] = inputOutputData[inputOffset + itemId + i];
-            }
-        }
-        for (ndInt32 itemId = 0; itemId < workGroupInputSizeReminder; ++itemId)
-        {
-            cachedInput[modWorkGroupInputSize + itemId] = inputOutputData[inputOffset + itemId + modWorkGroupInputSize];
-        }
-
-        // copy the matrix bias
-        //for (ndInt32 i = 0; i < outputSize; i += workGroupSize)
-        //{
-        //    for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-        //    {
-        //        accumulator[i + itemId] = 0.0f;
-        //    }
-        //}
-        ndInt32 workGroupSizeReminder = outputSize % workGroupSize;
-        ndInt32 modWorkGroupSize = outputSize - workGroupSizeReminder;
-        for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
-        {
-            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-            {
-                accumulator[i + itemId] = weightsAndBias[biasOffset + i + itemId];
-            }
-        }
-        for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
-        {
-            accumulator[modWorkGroupSize + itemId] = weightsAndBias[biasOffset + modWorkGroupSize + itemId];
-        }
-
-        for (ndInt32 i = 0; i < inputSize; ++i)
-        {
-            float scaleScale = cachedInput[i];
-            ndInt32 rowStartOffset = i * outputSize + parametersStartOffset;
-
-            for (ndInt32 j = 0; j < modWorkGroupSize; j += workGroupSize)
-            {
-                for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-                {
-                    float matrixElement = weightsAndBias[rowStartOffset + j + itemId];
-                    accumulator[j + itemId] += matrixElement * scaleScale;
-                }
-            }
-            for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
-            {
-                float matrixElement = weightsAndBias[rowStartOffset + modWorkGroupSize + itemId];
-                accumulator[modWorkGroupSize + itemId] += matrixElement * scaleScale;
-            }
-        }
-
-        for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
-        {
-            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-            {
-                float value = accumulator[i + itemId];
-                inputOutputData[outputOffset + i + itemId] = value;
-            }
-        }
-        for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
-        {
-            float value = accumulator[modWorkGroupSize + itemId];
-            inputOutputData[outputOffset + modWorkGroupSize + itemId] = value;
-        }
-    }
-};
-
-class brainLayerMatrixTimeVector_small : public ndBrainGpuShader
-{
-    public:
-    brainLayerMatrixTimeVector_small(ndBrainGpuContext* const context)
-        :ndBrainGpuShader(context)
-    {
-    }
-
-    // a matrix time a vector by iterating over each row of the matrix 
-    // calculating the dot product of that row time the vector and adding the bias value.
-    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
-    {
-        // these local buffers have to be largest that the max hidden buffer size
-        ndBrainFloat cachedInput[ND_GPU_LOCAL_BUFFER_SIZE * 2];
-        ndBrainFloat accumulator[ND_GPU_LOCAL_BUFFER_SIZE];
-        ndAssert((ND_GPU_LOCAL_BUFFER_SIZE * 2) >= 1024);
-
-        ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
-        ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
-        ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)m_parameters[2];
-        
-        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
-        ndBrainFloat* const inputOutputData = &buffer1->m_buffer[0];
-        ndBrainFloat* const weightsAndBias = &buffer2->m_buffer[0];
-        
-        ndInt32 inputSize = ndInt32(parameters->m_inputSize);
-        ndInt32 inputOutputSize = ndInt32(parameters->m_inputOutputSize);
-        ndInt32 inputOutputStartOffset = ndInt32(parameters->m_inputOutputStartOffset);
-        ndInt32 inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
-        
-        // cache the input vector
-        for (ndInt32 i = 0; i < inputSize; i += workGroupSize)
-        {
-            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-            {
-                cachedInput[i + itemId] = inputOutputData[inputOffset + i + itemId];
-            }
-        }
-
-        for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-        {
-            accumulator[itemId] = 0.0f;
-        }
-
-        ndInt32 outputSize = ndInt32(parameters->m_outputSize);
-        ndAssert(outputSize <= workGroupSize);
-        ndInt32 parametersStartOffset = ndInt32(parameters->m_parametersStartOffset);
-        ndInt32 biasOffset = outputSize * inputSize + parametersStartOffset;
-        for (ndInt32 itemId = 0; itemId < outputSize; ++itemId)
-        {
-            accumulator[itemId] = weightsAndBias[biasOffset + itemId];
-        }
-
-        ndInt32 workGroupInputSizeReminder = inputSize % workGroupSize;
-        ndInt32 modWorkGroupInputSize = inputSize - workGroupInputSizeReminder;
-        for (ndInt32 base = 0; base < modWorkGroupInputSize; base += workGroupSize)
-        {
-            // cache the input
-            for (ndInt32 i = 0; i < workGroupSize; ++i)
-            {
-                float scaleScale = cachedInput[base + i];
-                ndInt32 rowStartOffset = (base + i) * outputSize + parametersStartOffset;
-                for (ndInt32 itemId = 0; itemId < outputSize; ++itemId)
-                {
-                    float matrixElement = weightsAndBias[rowStartOffset + itemId];
-                    accumulator[itemId] += matrixElement * scaleScale;
-                }
-            }
-        }
-        for (ndInt32 i = 0; i < workGroupInputSizeReminder; ++i)
-        {
-            float scaleScale = cachedInput[modWorkGroupInputSize + i];
-            ndInt32 rowStartOffset = (modWorkGroupInputSize + i) * outputSize + parametersStartOffset;
-            for (ndInt32 itemId = 0; itemId < outputSize; ++itemId)
-            {
-                float matrixElement = weightsAndBias[rowStartOffset + itemId];
-                accumulator[itemId] += matrixElement * scaleScale;
-            }
-        }
-
-        ndInt32 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
-        for (ndInt32 itemId = 0; itemId < outputSize; ++itemId)
-        {
-            float value = accumulator[itemId];
-            inputOutputData[outputOffset + itemId] = value;
-        }
-    }
-};
-
-class brainLayerTransposeMatrixBias : public ndBrainGpuShader
-{
-    public:
-    brainLayerTransposeMatrixBias(ndBrainGpuContext* const context)
-        :ndBrainGpuShader(context)
-    {
-    }
-
-    // copy the bias from to the transpose matrix, whis is not transposed
-    void Execute(ndInt32, ndInt32)
-    {
-        ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
-        ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
-        ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)m_parameters[2];
-
-        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
-        ndBrainFloat* const weightMatrixBuffer = &buffer1->m_buffer[0];
-        ndBrainFloat* const transposeWeightMatrixBuffer = &buffer2->m_buffer[0];
-
-        ndInt32 inputSize = ndInt32(parameters->m_inputSize);
-        ndInt32 outputSize = ndInt32(parameters->m_outputSize);
-        ndInt32 parametersStartOffset = ndInt32(parameters->m_parametersStartOffset);
-        ndInt32 biasOffset = outputSize * inputSize + parametersStartOffset;
-
-        ndBrainMemVector xxx0(&weightMatrixBuffer[biasOffset], outputSize);
-        ndBrainMemVector xxx1(&transposeWeightMatrixBuffer[biasOffset], outputSize);
-
-        // copy the matrix bias
-        //for (ndInt32 i = 0; i < outputSize; i += workGroupSize)
-        //{
-        //    for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-        //    {
-        //        float a = weightMatrixBuffer[biasOffset + itemId];
-        //        transposeWeightMatrixBuffer[biasOffset + itemId] = a;
-        //    }
-        //}
-        for (ndInt32 itemId = 0; itemId < outputSize; ++itemId)
-        {
-            float a = weightMatrixBuffer[biasOffset + itemId];
-            transposeWeightMatrixBuffer[biasOffset + itemId] = a;
-        }
-    }
-};
-
-class brainLayerTransposeMatrix : public ndBrainGpuShader
-{
-    public:
-    brainLayerTransposeMatrix(ndBrainGpuContext* const context)
-        :ndBrainGpuShader(context)
-    {
-    }
-
-
-    // transpose one tile of a (16 x 16) block matrix.
-    void Execute(ndInt32 groupId, ndInt32)
-    {
-        ndBrainFloat tileBlock[16][16];
-        
-        ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
-        ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
-        ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)m_parameters[2];
-        
-        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
-        ndBrainFloat* const weightMatrixBuffer = &buffer1->m_buffer[0];
-        ndBrainFloat* const transposeWeightMatrixBuffer = &buffer2->m_buffer[0];
-        
-        ndInt32 inputSize = ndInt32(parameters->m_inputSize);
-        ndInt32 outputSize = ndInt32(parameters->m_outputSize);
-        ndInt32 numberOfTile_x = ((inputSize + 15) & -16) / 16;
-        //ndInt32 numberOfTile_y = ((outputSize + 15) & -16) / 16;
-
-        ndInt32 blockId_x = groupId % numberOfTile_x;
-        ndInt32 blockId_y = (groupId - blockId_x) / numberOfTile_x;
-
-        ndInt32 tile_offset_x = blockId_x * 16;
-        ndInt32 tile_count_x = ((tile_offset_x + 16) < inputSize) ? 16 : inputSize - tile_offset_x;
-        ndAssert(tile_count_x > 0);
-
-        ndInt32 tile_offset_y = blockId_y * 16;
-        ndInt32 tile_count_y = ((tile_offset_y + 16) < outputSize) ? 16 : outputSize - tile_offset_y;
-        ndAssert(tile_count_y > 0);
-
-        if ((tile_count_x < 16) || (tile_count_y < 16))
-        {
-            for (ndInt32 threadId_y = 0; threadId_y < 16; ++threadId_y)
-            {
-                for (ndInt32 threadId_x = 0; threadId_x < 16; ++threadId_x)
-                {
-                    tileBlock[threadId_y][threadId_x] = 0.0f;
-                }
-            }
-        }
-
-        ndInt32 parametersStartOffset = ndInt32(parameters->m_parametersStartOffset);
-        ndInt32 srcStartOffset = 16 * blockId_y * inputSize + tile_offset_x + parametersStartOffset;
-        for (ndInt32 threadId_y = 0; threadId_y < tile_count_y; ++threadId_y)
-        {
-            for (ndInt32 threadId_x = 0; threadId_x < tile_count_x; ++threadId_x)
-            {
-                // read and transpose source tile.
-                float element = weightMatrixBuffer[srcStartOffset + threadId_x];
-                tileBlock[threadId_x][threadId_y] = element;
-            }
-            srcStartOffset += inputSize;
-        }
-        // block all thread here
-
-        ndInt32 dstStartOffset = 16 * blockId_x * outputSize + tile_offset_y + parametersStartOffset;
-        for (ndInt32 threadId_y = 0; threadId_y < tile_count_x; ++threadId_y)
-        {
-            ndBrainMemVector xxx1(&tileBlock[threadId_y][0], tile_count_y);
-            ndBrainMemVector xxx0(&transposeWeightMatrixBuffer[dstStartOffset], tile_count_y);
-            for (ndInt32 threadId_x = 0; threadId_x < tile_count_y; ++threadId_x)
-            {
-                float element = tileBlock[threadId_y][threadId_x];
-                ndAssert(element == transposeWeightMatrixBuffer[dstStartOffset + threadId_x]);
-                transposeWeightMatrixBuffer[dstStartOffset + threadId_x] = element;
-            }
-            dstStartOffset += outputSize;
-        }
-
     }
 };
 
@@ -1337,12 +1016,441 @@ class brainAdamMomentumUpdate : public ndBrainGpuShader
     }
 };
 
+// matrix vector operation kernels.
+class brainLayerMatrixTimeVector_big : public ndBrainGpuShader
+{
+    public:
+    brainLayerMatrixTimeVector_big(ndBrainGpuContext* const context)
+        :ndBrainGpuShader(context)
+    {
+    }
+
+    // a matrix time a vector by iterating over each row of the matrix 
+    // calculating the dot product of that row time the vector and adding the bias value.
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    {
+        // these local buffers have to be largest that the max hidden buffer size
+        ndBrainFloat cachedInput[ND_GPU_LOCAL_BUFFER_SIZE * 2];
+        ndBrainFloat accumulator[ND_GPU_LOCAL_BUFFER_SIZE * 2];
+        ndAssert(ND_GPU_LOCAL_BUFFER_SIZE * 2 >= 1024);
+
+        ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
+        ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)m_parameters[2];
+
+        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
+        ndBrainFloat* const inputOutputData = &buffer1->m_buffer[0];
+        ndBrainFloat* const weightsAndBias = &buffer2->m_buffer[0];
+
+        ndInt32 inputSize = ndInt32(parameters->m_inputSize);
+        ndInt32 outputSize = ndInt32(parameters->m_outputSize);
+        ndInt32 inputOutputSize = ndInt32(parameters->m_inputOutputSize);
+        ndInt32 parametersStartOffset = ndInt32(parameters->m_parametersStartOffset);
+        ndInt32 inputOutputStartOffset = ndInt32(parameters->m_inputOutputStartOffset);
+        ndAssert(ND_GPU_LOCAL_BUFFER_SIZE * 2 >= __cpuKernelRoundoff(inputSize, workGroupSize));
+
+        ndInt32 biasOffset = outputSize * inputSize + parametersStartOffset;
+        ndInt32 inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
+        ndInt32 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
+
+        // cache the input
+        ndInt32 workGroupInputSizeReminder = inputSize % workGroupSize;
+        ndInt32 modWorkGroupInputSize = inputSize - workGroupInputSizeReminder;
+        for (ndInt32 i = 0; i < modWorkGroupInputSize; i += workGroupSize)
+        {
+            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+            {
+                cachedInput[i + itemId] = inputOutputData[inputOffset + itemId + i];
+            }
+        }
+        for (ndInt32 itemId = 0; itemId < workGroupInputSizeReminder; ++itemId)
+        {
+            cachedInput[modWorkGroupInputSize + itemId] = inputOutputData[inputOffset + itemId + modWorkGroupInputSize];
+        }
+
+        // copy the matrix bias
+        //for (ndInt32 i = 0; i < outputSize; i += workGroupSize)
+        //{
+        //    for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+        //    {
+        //        accumulator[i + itemId] = 0.0f;
+        //    }
+        //}
+        ndInt32 workGroupSizeReminder = outputSize % workGroupSize;
+        ndInt32 modWorkGroupSize = outputSize - workGroupSizeReminder;
+        for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+            {
+                accumulator[i + itemId] = weightsAndBias[biasOffset + i + itemId];
+            }
+        }
+        for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+        {
+            accumulator[modWorkGroupSize + itemId] = weightsAndBias[biasOffset + modWorkGroupSize + itemId];
+        }
+
+        for (ndInt32 i = 0; i < inputSize; ++i)
+        {
+            float scaleScale = cachedInput[i];
+            ndInt32 rowStartOffset = i * outputSize + parametersStartOffset;
+
+            for (ndInt32 j = 0; j < modWorkGroupSize; j += workGroupSize)
+            {
+                for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+                {
+                    float matrixElement = weightsAndBias[rowStartOffset + j + itemId];
+                    accumulator[j + itemId] += matrixElement * scaleScale;
+                }
+            }
+            for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+            {
+                float matrixElement = weightsAndBias[rowStartOffset + modWorkGroupSize + itemId];
+                accumulator[modWorkGroupSize + itemId] += matrixElement * scaleScale;
+            }
+        }
+
+        for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+            {
+                float value = accumulator[i + itemId];
+                inputOutputData[outputOffset + i + itemId] = value;
+            }
+        }
+        for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+        {
+            float value = accumulator[modWorkGroupSize + itemId];
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = value;
+        }
+    }
+};
+
+class brainLayerMatrixTimeVector_small : public ndBrainGpuShader
+{
+    public:
+    brainLayerMatrixTimeVector_small(ndBrainGpuContext* const context)
+        :ndBrainGpuShader(context)
+    {
+    }
+
+    // a matrix time a vector by iterating over each row of the matrix 
+    // calculating the dot product of that row time the vector and adding the bias value.
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    {
+        // these local buffers have to be largest that the max hidden buffer size
+        ndBrainFloat cachedInput[ND_GPU_LOCAL_BUFFER_SIZE * 2];
+        ndBrainFloat accumulator[ND_GPU_LOCAL_BUFFER_SIZE];
+        ndAssert((ND_GPU_LOCAL_BUFFER_SIZE * 2) >= 1024);
+
+        ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
+        ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)m_parameters[2];
+
+        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
+        ndBrainFloat* const inputOutputData = &buffer1->m_buffer[0];
+        ndBrainFloat* const weightsAndBias = &buffer2->m_buffer[0];
+
+        ndInt32 inputSize = ndInt32(parameters->m_inputSize);
+        ndInt32 inputOutputSize = ndInt32(parameters->m_inputOutputSize);
+        ndInt32 inputOutputStartOffset = ndInt32(parameters->m_inputOutputStartOffset);
+        ndInt32 inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
+
+        // cache the input vector
+        for (ndInt32 i = 0; i < inputSize; i += workGroupSize)
+        {
+            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+            {
+                cachedInput[i + itemId] = inputOutputData[inputOffset + i + itemId];
+            }
+        }
+
+        for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+        {
+            accumulator[itemId] = 0.0f;
+        }
+
+        ndInt32 outputSize = ndInt32(parameters->m_outputSize);
+        ndAssert(outputSize <= workGroupSize);
+        ndInt32 parametersStartOffset = ndInt32(parameters->m_parametersStartOffset);
+        ndInt32 biasOffset = outputSize * inputSize + parametersStartOffset;
+        for (ndInt32 itemId = 0; itemId < outputSize; ++itemId)
+        {
+            accumulator[itemId] = weightsAndBias[biasOffset + itemId];
+        }
+
+        ndInt32 workGroupInputSizeReminder = inputSize % workGroupSize;
+        ndInt32 modWorkGroupInputSize = inputSize - workGroupInputSizeReminder;
+        for (ndInt32 base = 0; base < modWorkGroupInputSize; base += workGroupSize)
+        {
+            // cache the input
+            for (ndInt32 i = 0; i < workGroupSize; ++i)
+            {
+                float scaleScale = cachedInput[base + i];
+                ndInt32 rowStartOffset = (base + i) * outputSize + parametersStartOffset;
+                for (ndInt32 itemId = 0; itemId < outputSize; ++itemId)
+                {
+                    float matrixElement = weightsAndBias[rowStartOffset + itemId];
+                    accumulator[itemId] += matrixElement * scaleScale;
+                }
+            }
+        }
+        for (ndInt32 i = 0; i < workGroupInputSizeReminder; ++i)
+        {
+            float scaleScale = cachedInput[modWorkGroupInputSize + i];
+            ndInt32 rowStartOffset = (modWorkGroupInputSize + i) * outputSize + parametersStartOffset;
+            for (ndInt32 itemId = 0; itemId < outputSize; ++itemId)
+            {
+                float matrixElement = weightsAndBias[rowStartOffset + itemId];
+                accumulator[itemId] += matrixElement * scaleScale;
+            }
+        }
+
+        ndInt32 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
+        for (ndInt32 itemId = 0; itemId < outputSize; ++itemId)
+        {
+            float value = accumulator[itemId];
+            inputOutputData[outputOffset + itemId] = value;
+        }
+    }
+};
+
+class brainLayerTransposeMatrixBias : public ndBrainGpuShader
+{
+    public:
+    brainLayerTransposeMatrixBias(ndBrainGpuContext* const context)
+        :ndBrainGpuShader(context)
+    {
+    }
+
+    // copy the bias from to the transpose matrix, whis is not transposed
+    void Execute(ndInt32, ndInt32)
+    {
+        ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
+        ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)m_parameters[2];
+
+        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
+        ndBrainFloat* const weightMatrixBuffer = &buffer1->m_buffer[0];
+        ndBrainFloat* const transposeWeightMatrixBuffer = &buffer2->m_buffer[0];
+
+        ndInt32 inputSize = ndInt32(parameters->m_inputSize);
+        ndInt32 outputSize = ndInt32(parameters->m_outputSize);
+        ndInt32 parametersStartOffset = ndInt32(parameters->m_parametersStartOffset);
+        ndInt32 biasOffset = outputSize * inputSize + parametersStartOffset;
+
+        ndBrainMemVector xxx0(&weightMatrixBuffer[biasOffset], outputSize);
+        ndBrainMemVector xxx1(&transposeWeightMatrixBuffer[biasOffset], outputSize);
+
+        // copy the matrix bias
+        //for (ndInt32 i = 0; i < outputSize; i += workGroupSize)
+        //{
+        //    for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+        //    {
+        //        float a = weightMatrixBuffer[parametersBiasOffset + itemId];
+        //        transposeWeightMatrixBuffer[parametersBiasOffset + itemId] = a;
+        //    }
+        //}
+        for (ndInt32 itemId = 0; itemId < outputSize; ++itemId)
+        {
+            float a = weightMatrixBuffer[biasOffset + itemId];
+            transposeWeightMatrixBuffer[biasOffset + itemId] = a;
+        }
+    }
+};
+
+class brainLayerTransposeMatrix : public ndBrainGpuShader
+{
+    public:
+    brainLayerTransposeMatrix(ndBrainGpuContext* const context)
+        :ndBrainGpuShader(context)
+    {
+    }
+
+    // transpose one tile of a (16 x 16) block matrix.
+    void Execute(ndInt32 groupId, ndInt32)
+    {
+        ndBrainFloat tileBlock[16][16];
+
+        ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
+        ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)m_parameters[2];
+
+        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
+        ndBrainFloat* const weightMatrixBuffer = &buffer1->m_buffer[0];
+        ndBrainFloat* const transposeWeightMatrixBuffer = &buffer2->m_buffer[0];
+
+        ndInt32 inputSize = ndInt32(parameters->m_inputSize);
+        ndInt32 outputSize = ndInt32(parameters->m_outputSize);
+        ndInt32 numberOfTile_x = ((inputSize + 15) & -16) / 16;
+        //ndInt32 numberOfTile_y = ((outputSize + 15) & -16) / 16;
+
+        ndInt32 blockId_x = groupId % numberOfTile_x;
+        ndInt32 blockId_y = (groupId - blockId_x) / numberOfTile_x;
+
+        ndInt32 tile_offset_x = blockId_x * 16;
+        ndInt32 tile_count_x = ((tile_offset_x + 16) < inputSize) ? 16 : inputSize - tile_offset_x;
+        ndAssert(tile_count_x > 0);
+
+        ndInt32 tile_offset_y = blockId_y * 16;
+        ndInt32 tile_count_y = ((tile_offset_y + 16) < outputSize) ? 16 : outputSize - tile_offset_y;
+        ndAssert(tile_count_y > 0);
+
+        if ((tile_count_x < 16) || (tile_count_y < 16))
+        {
+            for (ndInt32 threadId_y = 0; threadId_y < 16; ++threadId_y)
+            {
+                for (ndInt32 threadId_x = 0; threadId_x < 16; ++threadId_x)
+                {
+                    tileBlock[threadId_y][threadId_x] = 0.0f;
+                }
+            }
+        }
+
+        ndInt32 parametersStartOffset = ndInt32(parameters->m_parametersStartOffset);
+        ndInt32 srcStartOffset = 16 * blockId_y * inputSize + tile_offset_x + parametersStartOffset;
+        for (ndInt32 threadId_y = 0; threadId_y < tile_count_y; ++threadId_y)
+        {
+            for (ndInt32 threadId_x = 0; threadId_x < tile_count_x; ++threadId_x)
+            {
+                // read and transpose source tile.
+                float element = weightMatrixBuffer[srcStartOffset + threadId_x];
+                tileBlock[threadId_x][threadId_y] = element;
+            }
+            srcStartOffset += inputSize;
+        }
+        // block all thread here
+
+        ndInt32 dstStartOffset = 16 * blockId_x * outputSize + tile_offset_y + parametersStartOffset;
+        for (ndInt32 threadId_y = 0; threadId_y < tile_count_x; ++threadId_y)
+        {
+            ndBrainMemVector xxx1(&tileBlock[threadId_y][0], tile_count_y);
+            ndBrainMemVector xxx0(&transposeWeightMatrixBuffer[dstStartOffset], tile_count_y);
+            for (ndInt32 threadId_x = 0; threadId_x < tile_count_y; ++threadId_x)
+            {
+                float element = tileBlock[threadId_y][threadId_x];
+                ndAssert(element == transposeWeightMatrixBuffer[dstStartOffset + threadId_x]);
+                transposeWeightMatrixBuffer[dstStartOffset + threadId_x] = element;
+            }
+            dstStartOffset += outputSize;
+        }
+
+    }
+};
+
+class brainLayerMatrixTimeVector_tiled : public ndBrainGpuShader
+{
+    public:
+    brainLayerMatrixTimeVector_tiled(ndBrainGpuContext* const context)
+        :ndBrainGpuShader(context)
+    {
+    }
+
+    // a matrix time a vector by iterating over each row of the matrix 
+    // calculating the dot product of that row time the vector and adding the bias value.
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    {
+        ndBrainFloat tile_inputs[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_COLUMNS];
+        ndBrainFloat tile_weights[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_COLUMNS];
+        ndBrainFloat tile_acc[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_ROWS];
+
+        ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
+        ndBrainGpuFloatBuffer* const buffer2 = (ndBrainGpuFloatBuffer*)m_parameters[2];
+        ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+
+        ndBrainFloat* const weightsAndBias = &buffer2->m_buffer[0];
+        ndBrainFloat* const inputOutputData = &buffer1->m_buffer[0];
+        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
+
+        const ndInt32 inputSize = ndInt32(parameters->m_inputSize);
+        const ndInt32 outputSize = ndInt32(parameters->m_outputSize);
+        const ndInt32 height = (outputSize + ND_GPU_TILED_MATRIX_ROWS - 1) & -ND_GPU_TILED_MATRIX_ROWS;
+        const ndInt32 width = (inputSize + ND_GPU_TILED_MATRIX_COLUMNS - 1) & -ND_GPU_TILED_MATRIX_COLUMNS;
+
+        const ndInt32 groupId_x = groupId % parameters->m_tiledStride;
+        const ndInt32 groupId_y = (groupId - groupId_x) / parameters->m_tiledStride;
+        
+        ////Initialise the accumulation register
+        const ndInt32 parametersStartOffset = groupId_x * width * ND_GPU_TILED_MATRIX_ROWS + ndInt32(parameters->m_parametersStartOffset);
+        const ndInt32 parametersBiasOffset = width * height + ndInt32(parameters->m_parametersStartOffset);
+        
+        ndBrainFloat biasValue[ND_GPU_TILED_MATRIX_ROWS];
+        for (ndInt32 itemId_y = 0; itemId_y < ND_GPU_TILED_MATRIX_ROWS; ++itemId_y)
+        {
+            biasValue[itemId_y] = weightsAndBias[parametersBiasOffset + itemId_y];
+        }
+        for (ndInt32 itemId_x = 0; itemId_x < ND_GPU_TILED_MATRIX_ROWS; ++itemId_x)
+        {
+            for (ndInt32 itemId_y = 0; itemId_y < ND_GPU_TILED_MATRIX_ROWS; ++itemId_y)
+            {
+                tile_acc[itemId_x][itemId_y] = biasValue[itemId_y];
+            }
+        }
+
+        const ndInt32 inputOutputStride = ndInt32(parameters->m_inputOutputSize);
+        const ndInt32 inputOffset = groupId_y * inputOutputStride * ND_GPU_TILED_MATRIX_ROWS + ndInt32(parameters->m_inputOutputStartOffset);
+
+        ndBrainMemVector xxxxx0(&weightsAndBias[parametersStartOffset], 100);
+        ndBrainMemVector xxxxx1(&inputOutputData[inputOffset], 100);
+        
+        //// Loop over all tiles
+        //const ndInt32 numTilesReminder = inputSize % ND_GPU_TILED_MATRIX_COLUMNS;
+        //const ndInt32 numTilesModule = inputSize - numTilesReminder;
+        for (ndInt32 tile = 0; tile < width; tile += ND_GPU_TILED_MATRIX_COLUMNS)
+        {
+            // Load one tile of A and B into local memory
+            ndInt32 inputStartOffset = tile + inputOffset;
+            ndInt32 weightOffsetStart = tile + parametersStartOffset;
+            for (ndInt32 itemId_y = 0; itemId_y < ND_GPU_TILED_MATRIX_ROWS; ++itemId_y)
+            {
+                for (ndInt32 itemId_x = 0; itemId_x < ND_GPU_TILED_MATRIX_COLUMNS; ++itemId_x)
+                {
+                    tile_weights[itemId_y][itemId_x] = weightsAndBias[weightOffsetStart + itemId_x];
+                    tile_inputs[itemId_y][itemId_x] = inputOutputData[inputStartOffset + itemId_x];
+                }
+                weightOffsetStart += width;
+                inputStartOffset += inputOutputStride;
+            }
+            //barrier
+            
+            //// Perform the computation for a single tile
+            for (ndInt32 i = 0; i < ND_GPU_TILED_MATRIX_COLUMNS; ++i)
+            {
+                for (ndInt32 itemId_y = 0; itemId_y < ND_GPU_TILED_MATRIX_ROWS; itemId_y++)
+                {
+                    ndBrainFloat a = tile_weights[itemId_y][i];
+                    for (ndInt32 itemId_x = 0; itemId_x < ND_GPU_TILED_MATRIX_ROWS; itemId_x++)
+                    {
+                        tile_acc[itemId_x][itemId_y] += a * tile_inputs[itemId_x][i];
+                    }
+                }
+            }
+            // barrier maybe?
+        }
+
+        const ndInt32 numberOutput = ((groupId_x + 1) * ND_GPU_TILED_MATRIX_ROWS < outputSize) ? ND_GPU_TILED_MATRIX_ROWS : outputSize - groupId_x * ND_GPU_TILED_MATRIX_ROWS;
+        ndInt32 outputOffset = groupId_x * ND_GPU_TILED_MATRIX_ROWS + inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
+        for (ndInt32 itemId_y = 0; itemId_y < ND_GPU_TILED_MATRIX_ROWS; ++itemId_y)
+        {
+            ndBrainMemVector xxx(&inputOutputData[itemId_y * inputOutputStride + inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize)], 100);
+            for (ndInt32 itemId_x = 0; itemId_x < numberOutput; ++itemId_x)
+            {
+                float value = tile_acc[itemId_y][itemId_x];
+                inputOutputData[outputOffset + itemId_x] = value;
+            }
+            outputOffset += inputOutputStride;
+        }
+    }
+};
+
 void ndBrainGpuContext::CreateKerners()
 {   
     // create all feed foward shaders
     m_brainCopyInput = ndSharedPtr<ndBrainGpuShader> (new brainCopyInput(this));
     m_brainCopyOutput = ndSharedPtr<ndBrainGpuShader> (new brainCopyOutput(this));
-    m_brainLayerLinear = ndSharedPtr<ndBrainGpuShader> (new brainLayerMatrixTimeVector_small(this));
+    //m_brainLayerMatrixVectorMultiply = ndSharedPtr<ndBrainGpuShader> (new brainLayerMatrixTimeVector_big(this));
+    //m_brainLayerMatrixVectorMultiply = ndSharedPtr<ndBrainGpuShader> (new brainLayerMatrixTimeVector_small(this));
+    m_brainLayerMatrixVectorMultiply = ndSharedPtr<ndBrainGpuShader>(new brainLayerMatrixTimeVector_tiled(this));
     m_brainLayerReluActivation = ndSharedPtr<ndBrainGpuShader>(new brainLayerReluActivation(this));
     m_brainLayerTanhActivation = ndSharedPtr<ndBrainGpuShader>(new brainLayerTanhActivation(this));
     m_brainLayerSoftmaxActivation = ndSharedPtr<ndBrainGpuShader>(new brainLayerSoftmaxActivation(this));
@@ -1353,7 +1461,7 @@ void ndBrainGpuContext::CreateKerners()
     m_brainCopyOutputGradients = ndSharedPtr<ndBrainGpuShader>(new brainCopyOutputGradients(this));
     m_brainLayerReluBackPropagate = ndSharedPtr<ndBrainGpuShader>(new brainLayerBrainReluBackPropagate(this));
     m_brainLayerTanhBackPropagate = ndSharedPtr<ndBrainGpuShader>(new brainLayerBrainTanhBackPropagate(this));
-    m_brainLayerLinearBackPropagate = ndSharedPtr<ndBrainGpuShader>(new brainLayerBrainLinearBackPropagate(this));
+    m_brainLayerMatrixVectorBackPropagate = ndSharedPtr<ndBrainGpuShader>(new brainLayerBrainLinearBackPropagate(this));
     m_brainLayerDropOutBackPropagate = ndSharedPtr<ndBrainGpuShader>(new brainLayerBrainLinearDropOutBackPropagate(this));
     m_brainLayerCathegoricalSoftmaxBackPropagate = ndSharedPtr<ndBrainGpuShader>(new brainLayerBrainCathegoricalSoftmaxBackPropagate(this));
 
