@@ -307,7 +307,7 @@ static void MnistTrainingSet()
 					//trainer->ApplyLearnRate(); 
 					//trainer->SyncQueue();
 
-#if 0
+#if 1
 						ndBrainFixSizeVector<1024> xxx1;
 						xxx1.SetCount(outputSize);
 
@@ -335,7 +335,7 @@ static void MnistTrainingSet()
 							{
 								ndBrainFloat a = xxx0[k];
 								ndBrainFloat b = xxx1[k];
-								ndAssert(ndAreEqual(a, b, ndBrainFloat(1.0e-4f)));
+								//ndAssert(ndAreEqual(a, b, ndBrainFloat(1.0e-4f)));
 							}
 						}
 #endif

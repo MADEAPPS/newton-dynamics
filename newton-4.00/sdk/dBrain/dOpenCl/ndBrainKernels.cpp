@@ -960,7 +960,8 @@ R""""(
                 float a = tile_weights[acc_y][i];
                 tile_acc[acc_x][acc_y] += a * tile_inputs[acc_x][i];
             }
-           // barrier here? maybe?
+            // barrier here? maybe?
+            barrier(CLK_LOCAL_MEM_FENCE); 
         }
         
         const uint numberOutput = ((groupId_x + 1) * ND_GPU_TILED_MATRIX_ROWS < outputSize) ? ND_GPU_TILED_MATRIX_ROWS : outputSize - groupId_x * ND_GPU_TILED_MATRIX_ROWS;
