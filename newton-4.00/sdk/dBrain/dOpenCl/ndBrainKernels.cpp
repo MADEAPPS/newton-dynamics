@@ -936,9 +936,6 @@ R""""(
         const uint groupId_x = groupId % parameters->m_tiledStride;
         const uint groupId_y = (groupId - groupId_x) / parameters->m_tiledStride;
 
-//if (itemId == 0)
-//printf ("w = %d h = %d groupId_y = %d  groupId_x = %d\n", width, height, groupId_y, groupId_x);
-
         //Initialise the accumulation register
         const uint parametersBiasOffset = width * height + parameters->m_parametersStartOffset;
         const uint parametersStartOffset = groupId_x * width * ND_GPU_TILED_MATRIX_ROWS + parameters->m_parametersStartOffset;
@@ -961,7 +958,6 @@ R""""(
         const uint tile_y0 = itemId >> ND_GPU_TILED_MATRIX_COLUMNS_BITS;
         const uint tile_y1 = tile_y0 + ND_GPU_TILED_MATRIX_ROWS/2;
         for (uint tile = 0; tile < width; tile += ND_GPU_TILED_MATRIX_COLUMNS)
-        //for (uint tile = 0; tile < 1; tile += ND_GPU_TILED_MATRIX_COLUMNS)
         {
             // Load one tile of A and B into local memory
             uint inputStartOffset = tile + inputOffset;
@@ -971,29 +967,10 @@ R""""(
             tile_inputs[tile_y0][tile_x] = inputOutputData[inputStartOffset + inputOutputStride * tile_y0 + tile_x];
             tile_inputs[tile_y1][tile_x] = inputOutputData[inputStartOffset + inputOutputStride * tile_y1 + tile_x];
             barrier(CLK_LOCAL_MEM_FENCE); 
-
-//printf ("tile_y0y1x (%d %d %d) %f %f\n", tile_y0, tile_y1, tile_x, tile_weights[tile_y0][tile_x], weightsAndBias[weightOffsetStart + width * tile_y0 + tile_x]);
-//if (itemId == 0)
-//{
-//    for (uint i = 0; i < ND_GPU_TILED_MATRIX_COLUMNS; ++i)
-//    {
-//        //printf ("weight = %f    input = %f\n", tile_weights[tile][i], tile_inputs[tile][i]);
-//        uint xxx = weightOffsetStart + width * 0 + i;
-//        printf ("weight = %f\n", weightsAndBias[xxx]);
-//    }
-//}
-            
+           
             // Perform the computation for a single tile
             for (uint i = 0; i < ND_GPU_TILED_MATRIX_COLUMNS; ++i)
             {
-                //for (uint itemId_y = 0; itemId_y < ND_GPU_TILED_MATRIX_ROWS; itemId_y++)
-                //{
-                //    float a = tile_weights[itemId_y][i];
-                //    for (uint itemId_x = 0; itemId_x < ND_GPU_TILED_MATRIX_ROWS; itemId_x++)
-                //    {
-                //        tile_acc[itemId_x][itemId_y] += a * tile_inputs[itemId_x][i];
-                //    }
-                //}
                 float a = tile_weights[acc_y][i];
                 tile_acc[acc_x][acc_y] += a * tile_inputs[acc_x][i];
             }
@@ -1002,16 +979,6 @@ R""""(
         
         const uint numberOutput = ((groupId_x + 1) * ND_GPU_TILED_MATRIX_ROWS < outputSize) ? ND_GPU_TILED_MATRIX_ROWS : outputSize - groupId_x * ND_GPU_TILED_MATRIX_ROWS;
         uint outputOffset = groupId_x * ND_GPU_TILED_MATRIX_ROWS + inputOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
-        //for (uint itemId_y = 0; itemId_y < ND_GPU_TILED_MATRIX_ROWS; ++itemId_y)
-        //{
-        //    ndBrainMemVector xxx(&inputOutputData[itemId_y * inputOutputStride + inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize)], 100);
-        //    for (uint itemId_x = 0; itemId_x < numberOutput; ++itemId_x)
-        //    {
-        //        float value = tile_acc[itemId_y][itemId_x];
-        //        inputOutputData[outputOffset + itemId_x] = value;
-        //    }
-        //    outputOffset += inputOutputStride;
-        //}
         float value = tile_acc[acc_y][acc_x];
         inputOutputData[outputOffset + acc_y * inputOutputStride + acc_x] = value;
     }

@@ -257,7 +257,6 @@ static void MnistTrainingSet()
 			ndBrainVector groundTruth;
 			ndBrainVector miniBatchInput;
 			ndBrainVector miniBatchOutput;
-			//ndBrainVector parametersBuffer;
 			ndBrainVector miniBatchOutputGradients;
 
 			groundTruth.SetCount(outputSize * m_miniBatchSize);
@@ -308,7 +307,7 @@ static void MnistTrainingSet()
 					//trainer->ApplyLearnRate(); 
 					//trainer->SyncQueue();
 
-#if 1
+#if 0
 						ndBrainFixSizeVector<1024> xxx1;
 						xxx1.SetCount(outputSize);
 
@@ -324,7 +323,6 @@ static void MnistTrainingSet()
 
 						trainer->MakePrediction(miniBatchInput);
 						trainer->GetOutput(miniBatchOutput);
-						//trainer->GetParameterBuffer(parametersBuffer);
 						trainer->UpdateParameters();
 						const ndBrain* const brain = *trainer->GetBrain();
 						for (ndInt32 i = 0; i < m_miniBatchSize; i++)
