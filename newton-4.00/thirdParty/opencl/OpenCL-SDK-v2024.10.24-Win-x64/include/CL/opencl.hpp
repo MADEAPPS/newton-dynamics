@@ -4172,6 +4172,7 @@ public:
      * Return the maximum possible allocation size.
      * This is the minimum of the maximum sizes of all devices in the context.
      */
+    #undef max
     size_type max_size() const noexcept
     {
         size_type maxSize = std::numeric_limits<size_type>::max() / sizeof(T);
@@ -6667,11 +6668,11 @@ public:
 
         for (size_type i = 0; i < n; ++i) {
 #if !defined(CL_HPP_ENABLE_PROGRAM_CONSTRUCTION_FROM_ARRAY_COMPATIBILITY)
-            strings[i] = sources[(int)i].data();
-            lengths[i] = sources[(int)i].length();
+            strings[i] = sources[i].data();
+            lengths[i] = sources[i].length();
 #else // #if !defined(CL_HPP_ENABLE_PROGRAM_CONSTRUCTION_FROM_ARRAY_COMPATIBILITY)
-            strings[i] = sources[(int)i].first;
-            lengths[i] = sources[(int)i].second;
+            strings[i] = sources[i].first;
+            lengths[i] = sources[i].second;
 #endif // #if !defined(CL_HPP_ENABLE_PROGRAM_CONSTRUCTION_FROM_ARRAY_COMPATIBILITY)
         }
 
@@ -6702,11 +6703,11 @@ public:
 
         for (size_type i = 0; i < n; ++i) {
 #if !defined(CL_HPP_ENABLE_PROGRAM_CONSTRUCTION_FROM_ARRAY_COMPATIBILITY)
-            strings[i] = sources[(int)i].data();
-            lengths[i] = sources[(int)i].length();
+            strings[i] = sources[i].data();
+            lengths[i] = sources[i].length();
 #else // #if !defined(CL_HPP_ENABLE_PROGRAM_CONSTRUCTION_FROM_ARRAY_COMPATIBILITY)
-            strings[i] = sources[(int)i].first;
-            lengths[i] = sources[(int)i].second;
+            strings[i] = sources[i].first;
+            lengths[i] = sources[i].second;
 #endif // #if !defined(CL_HPP_ENABLE_PROGRAM_CONSTRUCTION_FROM_ARRAY_COMPATIBILITY)
         }
 
@@ -6873,7 +6874,7 @@ public:
 #if !defined(CL_HPP_ENABLE_PROGRAM_CONSTRUCTION_FROM_ARRAY_COMPATIBILITY)
         for (size_type i = 0; i < numDevices; ++i) {
             images[i] = binaries[i].data();
-            lengths[i] = binaries[(int)i].size();
+            lengths[i] = binaries[i].size();
         }
 #else // #if !defined(CL_HPP_ENABLE_PROGRAM_CONSTRUCTION_FROM_ARRAY_COMPATIBILITY)
         for (size_type i = 0; i < numDevices; ++i) {
@@ -8180,9 +8181,9 @@ public:
         return enqueueReadBufferRect(
             buffer,
             blocking,
-            { buffer_offset[0], buffer_offset[1], 0 },
-            { host_offset[0], host_offset[1], 0 },
-            { region[0], region[1], 1 },
+            { {buffer_offset[0], buffer_offset[1], 0 } },
+            { {host_offset[0], host_offset[1], 0} },
+            { {region[0], region[1], 1} },
             buffer_row_pitch,
             buffer_slice_pitch,
             host_row_pitch,
@@ -8248,9 +8249,9 @@ public:
         return enqueueWriteBufferRect(
             buffer, 
             blocking,
-            { buffer_offset[0], buffer_offset[1], 0 },
-            { host_offset[0], host_offset[1], 0 },
-            { region[0], region[1], 1 },
+            { {buffer_offset[0], buffer_offset[1], 0 } },
+            { {host_offset[0], host_offset[1], 0 } },
+            { {region[0], region[1], 1} },
             buffer_row_pitch,
             buffer_slice_pitch,
             host_row_pitch,
@@ -8313,9 +8314,9 @@ public:
         return enqueueCopyBufferRect(
             src,
             dst,
-            { src_origin[0], src_origin[1], 0 },
-            { dst_origin[0], dst_origin[1], 0 },
-            { region[0], region[1], 1 },
+            { {src_origin[0], src_origin[1], 0} },
+            { {dst_origin[0], dst_origin[1], 0} },
+            { {region[0], region[1], 1} },
             src_row_pitch,
             src_slice_pitch,
             dst_row_pitch,
@@ -8414,8 +8415,8 @@ public:
         return enqueueReadImage(
             image,
             blocking,
-            { origin[0], origin[1], 0 },
-            { region[0], region[1], 1 },
+            { {origin[0], origin[1], 0} },
+            { {region[0], region[1], 1} },
             row_pitch,
             slice_pitch,
             ptr,
@@ -8470,8 +8471,8 @@ public:
         return enqueueWriteImage(
             image,
             blocking,
-            { origin[0], origin[1], 0 },
-            { region[0], region[1], 1 },
+            { {origin[0], origin[1], 0} },
+            { {region[0], region[1], 1} },
             row_pitch,
             slice_pitch,
             ptr,
@@ -8520,9 +8521,9 @@ public:
         return enqueueCopyImage(
             src,
             dst,
-            { src_origin[0], src_origin[1], 0 },
-            { dst_origin[0], dst_origin[1], 0 },
-            { region[0], region[1], 1 },
+            { {src_origin[0], src_origin[1], 0} },
+            { {dst_origin[0], dst_origin[1], 0} },
+            { {region[0], region[1], 1} },
             events,
             event);
     }
@@ -8637,8 +8638,8 @@ public:
         return enqueueCopyImageToBuffer(
             src,
             dst,
-            { src_origin[0], src_origin[1], 0 },
-            { region[0], region[1], 1 },
+            { {src_origin[0], src_origin[1], 0} },
+            { {region[0], region[1], 1} },
             dst_offset,
             events,
             event);
@@ -8686,8 +8687,8 @@ public:
             src,
             dst, 
             src_offset,
-            { dst_origin[0], dst_origin[1], 0 },
-            { region[0], region[1], 1 },
+            { {dst_origin[0], dst_origin[1], 0} },
+            { {region[0], region[1], 1} },
             events,
             event);
     }
@@ -8767,8 +8768,8 @@ public:
          cl_int* err = nullptr) const
     {
         return enqueueMapImage(image, blocking, flags,
-                               { origin[0], origin[1], 0 },
-                               { region[0], region[1], 1 }, row_pitch,
+                               { {origin[0], origin[1], 0} },
+                               { {region[0], region[1], 1} }, row_pitch,
                                slice_pitch, events, event, err);
     }
 
@@ -9186,7 +9187,7 @@ public:
         
         vector<cl_mem> localMemObjects(memObjects.size());
 
-        for( int i = 0; i < (int)memObjects.size(); ++i ) {
+        for( size_t i = 0; i < memObjects.size(); ++i ) {
             localMemObjects[i] = memObjects[i]();
         }
         
@@ -10467,9 +10468,9 @@ inline cl_int enqueueReadBufferRect(
     return enqueueReadBufferRect(
         buffer,
         blocking,
-        { buffer_offset[0], buffer_offset[1], 0 },
-        { host_offset[0], host_offset[1], 0 },
-        { region[0], region[1], 1 },
+        { {buffer_offset[0], buffer_offset[1], 0} },
+        { {host_offset[0], host_offset[1], 0} },
+        { {region[0], region[1], 1} },
         buffer_row_pitch,
         buffer_slice_pitch,
         host_row_pitch,
@@ -10532,9 +10533,9 @@ inline cl_int enqueueWriteBufferRect(
     return enqueueWriteBufferRect(
         buffer, 
         blocking,
-        { buffer_offset[0], buffer_offset[1], 0 },
-        { host_offset[0], host_offset[1], 0 },
-        { region[0], region[1], 1 }, 
+        { {buffer_offset[0], buffer_offset[1], 0} },
+        { {host_offset[0], host_offset[1], 0} },
+        { {region[0], region[1], 1} },
         buffer_row_pitch,
         buffer_slice_pitch,
         host_row_pitch,
@@ -10594,9 +10595,9 @@ inline cl_int enqueueCopyBufferRect(
     return enqueueCopyBufferRect(
         src,
         dst, 
-        { src_origin[0], src_origin[1], 0 },
-        { dst_origin[0], dst_origin[1], 0 },
-        { region[0], region[1], 1 }, 
+        { {src_origin[0], src_origin[1], 0} },
+        { {dst_origin[0], dst_origin[1], 0} },
+        { {region[0], region[1], 1} },
         src_row_pitch,
         src_slice_pitch,
         dst_row_pitch,
@@ -10650,8 +10651,8 @@ inline cl_int enqueueReadImage(
     return enqueueReadImage(
         image,
         blocking, 
-        { origin[0], origin[1], 0 },
-        { region[0], region[1], 1 },
+        { {origin[0], origin[1], 0} },
+        { {region[0], region[1], 1} },
         row_pitch,
         slice_pitch,
         ptr,
@@ -10703,8 +10704,8 @@ inline cl_int enqueueWriteImage(
     return enqueueWriteImage(
         image, 
         blocking, 
-        { origin[0], origin[1], 0 },
-        { region[0], region[1], 1 }, 
+        { {origin[0], origin[1], 0} },
+        { {region[0], region[1], 1} }, 
         row_pitch,
         slice_pitch,
         ptr,
@@ -10750,9 +10751,9 @@ inline cl_int enqueueCopyImage(
     return enqueueCopyImage(
         src, 
         dst,
-        { src_origin[0], src_origin[1], 0 },
-        { dst_origin[0], dst_origin[1], 0 },
-        { region[0], region[1], 1 },
+        { {src_origin[0], src_origin[1], 0} },
+        { {dst_origin[0], dst_origin[1], 0} },
+        { {region[0], region[1], 1} },
         events,
         event);
 }
@@ -10795,8 +10796,8 @@ inline cl_int enqueueCopyImageToBuffer(
     return enqueueCopyImageToBuffer(
         src,
         dst,
-        { src_origin[0], src_origin[1], 0 },
-        { region[0], region[1], 1 },
+        { {src_origin[0], src_origin[1], 0} },
+        { {region[0], region[1], 1} },
         dst_offset,
         events,
         event);
@@ -10848,8 +10849,8 @@ inline cl_int enqueueCopyBufferToImage(
         src,
         dst,
         src_offset,
-        { dst_origin[0], dst_origin[1], 0 },
-        { region[0], region[1], 1 },
+        { {dst_origin[0], dst_origin[1], 0} },
+        { {region[0], region[1], 1} },
         events,
         event);
 }
