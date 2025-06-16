@@ -374,26 +374,6 @@ void ndBrainLayerLinear::SetWeights(const ndBrainVector& input)
 	m_bias.Set(bias);
 }
 
-void ndBrainLayerLinear::CopyTransposedWeights(ndBrainVector& output) const
-{
-	ndAssert(output.GetCount() >= (GetOutputSize() * GetInputSize() + GetOutputSize()));
-
-	const ndInt32 stride = m_weights.GetRows();
-	for (ndInt32 i = 0; i < m_weights.GetRows(); ++i)
-	{
-		ndInt32 row = i;
-		const ndBrainVector& src = m_weights[i];
-		for (ndInt32 j = 0; j < m_weights.GetColumns(); ++j)
-		{
-			output[row] = src[j];
-			row += stride;
-		}
-	}
-	ndInt32 size = m_weights.GetColumns() * m_weights.GetRows();
-	ndBrainMemVector bias(&output[size], m_bias.GetCount());
-	bias.Set(m_bias);
-}
-
 ndBrainLayerLinear::ndCommandShareInfo ndBrainLayerLinear::GetCommandSharedInfo()
 {
 	ndCommandShareInfo info(this);

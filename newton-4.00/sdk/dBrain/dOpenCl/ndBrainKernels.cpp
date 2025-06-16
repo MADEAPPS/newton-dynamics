@@ -754,22 +754,8 @@ R""""(
 
 )"""";
 
-
 const char* ndBrainGpuContext::m_matrixMultiply =
 R""""(
-
-    __kernel void brainLayerTransposeMatrixBias(
-        __global const UniformBufferOptimizerArguments* parameters,
-        __global float* weightAndBiasBuffer, __global float* wtransposeWightAndBiasBuffer)
-    {
-    }
-
-    __kernel void brainLayerTransposeMatrix(
-        __global const UniformBufferOptimizerArguments* parameters,
-        __global float* weightAndBiasBuffer, __global float* wtransposeWightAndBiasBuffer)
-    {
-    }
-
     __kernel void brainLayerMatrixTimeVector_big(__global const UniformBufferLayerArguments* parameters, __global float* inputOutputData, __global float* weightsAndBias) 
     {
         __local float cachedInput[ND_GPU_LOCAL_BUFFER_SIZE * 2];
@@ -959,7 +945,7 @@ R""""(
         const uint tile_y1 = tile_y0 + ND_GPU_TILED_MATRIX_ROWS/2;
         for (uint tile = 0; tile < width; tile += ND_GPU_TILED_MATRIX_COLUMNS)
         {
-            // Load one tile of A and B into local memory
+            // Load one tile of weights and one tile of inputs into local memory
             uint inputStartOffset = tile + inputOffset;
             uint weightOffsetStart = tile + parametersStartOffset;
             tile_weights[tile_y0][tile_x] = weightsAndBias[weightOffsetStart + width * tile_y0 + tile_x];
@@ -974,7 +960,7 @@ R""""(
                 float a = tile_weights[acc_y][i];
                 tile_acc[acc_x][acc_y] += a * tile_inputs[acc_x][i];
             }
-           // barrier maybe?
+           // barrier here? maybe?
         }
         
         const uint numberOutput = ((groupId_x + 1) * ND_GPU_TILED_MATRIX_ROWS < outputSize) ? ND_GPU_TILED_MATRIX_ROWS : outputSize - groupId_x * ND_GPU_TILED_MATRIX_ROWS;
@@ -1039,10 +1025,6 @@ void ndBrainGpuContext::CreateKerners()
     m_brainLayerDropOutBackPropagate = CreateKerner(program, "brainLayerBrainDropOutBackPropagate");
     m_brainLayerMatrixVectorBackPropagate = CreateKerner(program, "brainLayerBrainLinearBackPropagate");
     m_brainLayerCathegoricalSoftmaxBackPropagate = CreateKerner(program, "brainLayerBrainCathegoricalSoftmaxBackPropagate");
-
-    // miscellaneous
-    m_brainLayerTransposeMatrix = CreateKerner(program, "brainLayerTransposeMatrix");
-    m_brainLayerTransposeMatrixBias = CreateKerner(program, "brainLayerTransposeMatrixBias");
 
     // accumulate gradient kernels
     m_brainAccumulateGradients = CreateKerner(program, "brainAccumulateGradients");

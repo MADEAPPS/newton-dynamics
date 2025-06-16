@@ -85,14 +85,11 @@ class ndBrainTrainerGpuInference: public ndBrainTrainer
 	{
 		m_inputId = 7,
 		m_outpuId,
-		m_transposeMatrix,
 	};
 
-	void InitTransposeMatrix();
 	void AddCopyOutputCommand();
 	void InitInputOutputBuffer();
 	void InitWeightAndBiasBuffer();
-	void CalculateWeightAndBiasTranspose();
 	ndInt32 RoundoffOffset(ndInt32 value) const;
 	ndBrainTrainerGpuCommand* FindCommand(size_t id) const;
 	void AddCopyInputCommand(const ndBrainLayer::ndCommandShareInfo& uniformData);
@@ -105,7 +102,6 @@ class ndBrainTrainerGpuInference: public ndBrainTrainer
 	ndSharedPtr<ndBrainGpuBuffer> m_weightAndBiasBuffer;
 	ndSharedPtr<ndBrainGpuBuffer> m_miniBatchInputBuffer;
 	ndSharedPtr<ndBrainGpuBuffer> m_miniBatchOutputBuffer;
-	ndSharedPtr<ndBrainGpuBuffer> m_weightAndBiasTransposeBuffer;
 	ndList<ndSharedPtr<ndBrainGpuCommand>> m_feedForwardCommands;
 	ndList<ndSharedPtr<ndBrainGpuCommand>> m_weightAndBiasTranspose;
 	ndInt32 m_miniBatchSize;

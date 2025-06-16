@@ -29,7 +29,6 @@
 
 #define ND_BRAIN_LAYER_LINEAR_NAME	"ndBrainLayerLinear"
 
-#define USE_TILED_MATRIX
 #define ND_GPU_TILED_MATRIX_ROWS_BITS		4
 #define ND_GPU_TILED_MATRIX_COLUMNS_BITS	5
 #define ND_GPU_TILED_MATRIX_ROWS			(1<<ND_GPU_TILED_MATRIX_ROWS_BITS)
@@ -82,7 +81,6 @@ class ndBrainLayerLinear : public ndBrainLayer
 
 	virtual void SetWeights(const ndBrainVector& input) override;
 	virtual void CopyWeights(ndBrainVector& oput) const override;
-	virtual void CopyTransposedWeights(ndBrainVector& output) const override;
 
 	virtual ndCommandShareInfo GetCommandSharedInfo() override;
 	virtual ndBrainLayerFeedForwardCpuCommand* GetLayerCpuFeedForwardCommand() override;

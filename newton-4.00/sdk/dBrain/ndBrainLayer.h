@@ -109,7 +109,6 @@ class ndBrainLayer : public ndClassAlloc
 
 	virtual void SetWeights(const ndBrainVector& input);
 	virtual void CopyWeights(ndBrainVector& output) const;
-	virtual void CopyTransposedWeights(ndBrainVector& output) const;
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	virtual void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
 

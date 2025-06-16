@@ -60,10 +60,6 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainGpuShader> m_brainLayerDropOutBackPropagate;
 	ndSharedPtr<ndBrainGpuShader> m_brainLayerCathegoricalSoftmaxBackPropagate;
 
-	// miscellaneous
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerTransposeMatrix;
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerTransposeMatrixBias;
-
 	// add all the partial gradinets
 	ndSharedPtr<ndBrainGpuShader> m_brainAccumulateGradients;
 
