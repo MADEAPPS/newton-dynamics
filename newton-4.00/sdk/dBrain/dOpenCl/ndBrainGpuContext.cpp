@@ -29,6 +29,8 @@ ndBrainGpuContext::ndBrainGpuContext()
 	{
 		std::vector<cl::Platform> cl_platforms; 
 		cl::Platform::get(&cl_platforms);
+		ndExpandTraceMessage("\n");
+		ndExpandTraceMessage("platforms found:\n");
 		for (size_t i = 0; i < cl_platforms.size(); i++)
 		{
 			std::vector<cl::Device> cl_devices_available;
@@ -66,6 +68,8 @@ ndBrainGpuContext::ndBrainGpuContext()
 		const std::string name(m_device->getInfo<CL_DEVICE_NAME>());
 		const std::string version(m_device->getInfo<CL_DEVICE_VERSION>());
 		size_t localMemorySize = m_device->getInfo<CL_DEVICE_LOCAL_MEM_SIZE>();
+		ndExpandTraceMessage("\n");
+		ndExpandTraceMessage("selecting:\n");
 		ndExpandTraceMessage("opencl device name: %s\n", name.c_str());
 		ndExpandTraceMessage("opencl device version: %s\n", version.c_str());
 		ndExpandTraceMessage("opencl device local memory: %d\n", localMemorySize);
