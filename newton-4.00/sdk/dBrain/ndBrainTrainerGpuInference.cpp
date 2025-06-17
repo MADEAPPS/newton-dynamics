@@ -194,7 +194,8 @@ void ndBrainTrainerGpuInference::InitWeightAndBiasBuffer()
 		uniformData[i].m_parametersStartOffset = parametersSizeSum;
 		parametersSizeSum += uniformData[i].m_parametersBatchSize;
 	}
-	parametersSizeSum = RoundoffOffset(parametersSizeSum);
+	ndAssert((parametersSizeSum & (ND_DEFAULT_WORKGROUP_SIZE - 1)) == 0);
+	//parametersSizeSum = RoundoffOffset(parametersSizeSum);
 
 	ndBrainVector scratchBuffer;
 	scratchBuffer.SetCount(parametersSizeSum);
@@ -232,8 +233,6 @@ void ndBrainTrainerGpuInference::InitWeightAndBiasBuffer()
 
 ndInt32 ndBrainTrainerGpuInference::RoundoffOffset(ndInt32 value) const
 {
-	//ndInt32 roundoffBatch = 1 << ndExp2(m_miniBatchSize);
-	//return (value + roundoffBatch - 1) & -roundoffBatch;
 	return (value + ND_DEFAULT_WORKGROUP_SIZE - 1) & -ND_DEFAULT_WORKGROUP_SIZE;
 }
 
