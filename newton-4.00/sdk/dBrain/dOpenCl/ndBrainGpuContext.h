@@ -49,7 +49,7 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainGpuShader> m_brainLayerTanhActivation;
 	ndSharedPtr<ndBrainGpuShader> m_brainLayerSoftmaxActivation;
 	ndSharedPtr<ndBrainGpuShader> m_brainLayerDropOutActivation;
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerMatrixVectorMultiply;
+	ndSharedPtr<ndBrainGpuShader> m_brainLayerMatrixMatrixMultiply;
 
 	// back propagate shaders
 	ndSharedPtr<ndBrainGpuShader> m_brainCopyInputGradients;
@@ -81,8 +81,7 @@ class ndBrainGpuContext : public ndBrainContext
 
 	static const char* m_backPropagateKernels_1;
 	static const char* m_backPropagateKernels_2;
-	static const char* m_backPropagateKernels_3;
-
+	
 	static const char* m_matrixMultiply;
 	static const char* m_optimizerKernels;
 	static const char* m_commonKernelsSource;

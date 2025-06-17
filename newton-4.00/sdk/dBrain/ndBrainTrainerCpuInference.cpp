@@ -112,7 +112,7 @@ void ndBrainTrainerCpuInference::InitWeightAndBiasBuffer()
 		ndBrainTrainerCpuCommand* const command = feedForwardCommands[i];
 		ndBrainMemVector weights(&m_weightAndBiasBuffer[command->m_info.m_parametersStartOffset], command->m_info.m_parametersBatchSize);
 		command->m_info.m_parametersBatchSize = sizeAcc;
-		layer->CopyWeights(weights);
+		layer->CopyCpuWeights(weights);
 	}
 	
 	m_miniBatchInputBuffer.SetCount(m_miniBatchSize * brain.GetInputSize());
@@ -150,14 +150,12 @@ void ndBrainTrainerCpuInference::AddCopyOutputCommand()
 	const ndBrain& brain = **m_brain;
 	ndCopyOutputCommand* const outputCommand = new ndCopyOutputCommand(this);
 	
-	//const ndBrainLayer::ndBrainLayerFeedForwardCpuCommand* const lastCommand = (ndBrainLayer::ndBrainLayerFeedForwardCpuCommand*)*m_feedForwardCommands.GetLast()->GetInfo();
 	size_t lastId = (size_t)brain[brain.GetCount() - 1];
 	ndAssert(FindCommand(lastId));
 	ndBrainTrainerCpuCommand* const lastCommand = FindCommand(lastId);
 	 
 	outputCommand->m_info.m_inputSize = lastCommand->m_info.m_inputSize;
 	outputCommand->m_info.m_outputSize = lastCommand->m_info.m_outputSize;
-	//outputCommand->m_info.m_parametersSize = 0;
 	
 	outputCommand->m_info.m_inputOutputSize = lastCommand->m_info.m_inputOutputSize;
 	outputCommand->m_info.m_inputOutputStartOffset = lastCommand->m_info.m_inputOutputStartOffset + lastCommand->m_info.m_inputSize;
@@ -238,12 +236,12 @@ void ndBrainTrainerCpuInference::UpdateParameters(const ndBrainVector& weightAnd
 	for (ndList<ndSharedPtr<ndBrainTrainerCpuCommand>>::ndNode* node = m_feedForwardCommands.GetFirst(); node; node = node->GetNext())
 	{
 		ndBrainTrainerCpuCommand* const command = *node->GetInfo();
-		ndBrainLayer* const layer = command->m_info.m_layer;
+		const ndBrainLayer* const layer = command->m_info.m_layer;
 		if (layer)
 		{
 			ndInt32 size = command->m_info.m_inputSize * command->m_info.m_outputSize + command->m_info.m_outputSize;
 			const ndBrainMemVector weights(&weightAndBias[command->m_info.m_parametersStartOffset], size);
-			layer->SetWeights(weights);
+			((ndBrainLayer*)layer)->SetCpuWeights(weights);
 		}
 	}
 }

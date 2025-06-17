@@ -57,7 +57,7 @@ class ndBrainLayerFeedForwardCpuCommand : public ndBrainTrainerCpuCommand
 {
 	public:
 	ndBrainLayerFeedForwardCpuCommand(ndBrainLayer* const layer)
-		:ndBrainTrainerCpuCommand(layer->GetCommandSharedInfo(), size_t(layer))
+		:ndBrainTrainerCpuCommand(layer->GetCpuCommandSharedInfo(), size_t(layer))
 		,m_layer(layer)
 	{
 	}

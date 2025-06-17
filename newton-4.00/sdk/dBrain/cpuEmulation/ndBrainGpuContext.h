@@ -65,7 +65,7 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 	ndSharedPtr<ndBrainGpuShader> m_brainLayerTanhActivation;
 	ndSharedPtr<ndBrainGpuShader> m_brainLayerSoftmaxActivation;
 	ndSharedPtr<ndBrainGpuShader> m_brainLayerDropOutActivation;
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerMatrixVectorMultiply;
+	ndSharedPtr<ndBrainGpuShader> m_brainLayerMatrixMatrixMultiply;
 
 	// back propagate shaders
 	ndSharedPtr<ndBrainGpuShader> m_brainCopyInputGradients;
@@ -75,10 +75,6 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 	ndSharedPtr<ndBrainGpuShader> m_brainLayerDropOutBackPropagate;
 	ndSharedPtr<ndBrainGpuShader> m_brainLayerMatrixVectorBackPropagate;
 	ndSharedPtr<ndBrainGpuShader> m_brainLayerCathegoricalSoftmaxBackPropagate;
-
-	// miscellaneous
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerTransposeMatrix;
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerTransposeMatrixBias;
 
 	// add all the partial gradinets
 	ndSharedPtr<ndBrainGpuShader> m_brainAccumulateGradients;

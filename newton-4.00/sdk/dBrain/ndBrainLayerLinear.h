@@ -79,10 +79,14 @@ class ndBrainLayerLinear : public ndBrainLayer
 	protected:
 	void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon) override;
 
-	virtual void SetWeights(const ndBrainVector& input) override;
-	virtual void CopyWeights(ndBrainVector& oput) const override;
+	virtual void SetCpuWeights(const ndBrainVector& input) override;
+	virtual void SetGpuWeights(const ndBrainVector& input) override;
 
-	virtual ndCommandShareInfo GetCommandSharedInfo() override;
+	virtual void CopyCpuWeights(ndBrainVector& oput) const override;
+	virtual void CopyGpuWeights(ndBrainVector& oput) const override;
+
+	virtual ndCommandShareInfo GetCpuCommandSharedInfo() const override;
+	virtual ndCommandShareInfo GetGpuCommandSharedInfo() const override;
 	virtual ndBrainLayerFeedForwardCpuCommand* GetLayerCpuFeedForwardCommand() override;
 	virtual ndBrainLayerBackPropagateCpuCommand* GetLayerCpuBackPropagateCommand() override;
 

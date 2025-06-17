@@ -98,14 +98,6 @@ bool ndBrainLayerActivationTanh::HasGpuSupport() const
 	return true;
 }
 
-ndBrainLayer::ndCommandShareInfo ndBrainLayerActivationTanh::GetCommandSharedInfo()
-{
-	ndCommandShareInfo info(this);
-	info.m_inputSize = GetInputSize();
-	info.m_outputSize = GetOutputSize();
-	return info;
-}
-
 ndBrainLayerFeedForwardCpuCommand* ndBrainLayerActivationTanh::GetLayerCpuFeedForwardCommand()
 {
 	ndBrainLayerFeedForwardCpuCommand* const command = new ndBrainLayerFeedForwardCpuCommand(this);
@@ -169,15 +161,6 @@ void ndBrainLayerActivationTanh::BackPropagate(const ndBrainLayerBackPropagateCp
 	inputDerivative.Mul(outputDerivative);
 	inputDerivative.FlushToZero();
 }
-
-//ndBrainLayer::ndLayerUniformDataGpu ndBrainLayerActivationTanh::GetLayerUniformDataGpu(const ndBrainGpuContext* const context) const
-//{
-//	ndLayerUniformDataGpu data;
-//	data.m_shader = context->m_brainLayerTanhActivation;
-//	data.m_inputSize = GetInputSize();
-//	data.m_outputSize = GetOutputSize();
-//	return data;
-//}
 
 ndBrainTrainerGpuCommand* ndBrainLayerActivationTanh::CreateGpuFeedForwardCommand(
 	ndBrainTrainerGpuInference* const owner,

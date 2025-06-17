@@ -14,14 +14,14 @@
 
 //#define MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
 
-#define MINIST_MINIBATCH_BUFFER_SIZE			256
-//#define MINIST_MINIBATCH_BUFFER_SIZE			(3 * ND_CPU_MINI_BATCH_SIZE_GRANULARITY)
+//#define MINIST_MINIBATCH_BUFFER_SIZE			256
+#define MINIST_MINIBATCH_BUFFER_SIZE			(1 * ND_CPU_MINI_BATCH_SIZE_GRANULARITY)
 
 #define MNIST_CONVOLUTIONAL_FEATURE_MAPS		32
 //#define MIN_TRAIN_SCORE						0.9999f
 
 //#define MINIST_NUMBER_OF_EPOCKS				70
-#define MINIST_NUMBER_OF_EPOCKS					20
+#define MINIST_NUMBER_OF_EPOCKS					10
 
 #ifdef MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
 	#if 1
@@ -158,7 +158,7 @@ static void MnistTrainingSet()
 			,m_learnRate(ndReal(5.0e-4f))
 			,m_miniBatchSize(MINIST_MINIBATCH_BUFFER_SIZE)
 			,m_minCombinedScore(ndInt64(1000000) * ndInt64(1000000))
-			,m_minValidationFail(ndInt64(1000000)* ndInt64(1000000))
+			,m_minValidationFail(ndInt64(1000000) * ndInt64(1000000))
 			,m_hasGpuSupport(m_brain->IsGpuReady())
 		{
 			//m_hasGpuSupport = false;
@@ -171,6 +171,7 @@ static void MnistTrainingSet()
 			else
 			{
 				ndInt32 threadCount = ndMin (ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize), 8);
+				//threadCount = 1;
 				m_context = ndSharedPtr<ndBrainContext>(new ndBrainCpuContext);
 				m_context->GetAsCpuContext()->SetThreadCount(threadCount);
 				m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainerCpu(m_brain, m_context, m_learnRate, m_miniBatchSize));
@@ -233,6 +234,46 @@ static void MnistTrainingSet()
 			return failCount;
 		}
 
+		void DebugTest(ndBrainTrainer* const trainer, 
+			ndBrainVector& miniBatchOutput,
+			ndBrainVector& miniBatchInput)
+		{
+			ndInt32 inputSize = m_brain->GetInputSize();
+			ndInt32 outputSize = m_brain->GetOutputSize();
+
+			ndBrainFixSizeVector<1024> xxx1;
+			xxx1.SetCount(outputSize);
+
+			//ndBrainVector gradienBuffer;
+			//trainer->GetGradientBuffer(gradienBuffer);
+			//const ndBrainMemVector xxxxx0(&gradienBuffer[0], 4096);
+			//for (int i = ndInt32(xxxxx0.GetCount()) - 256; i >= 0; i -= 256)
+			//{
+			//	const ndBrainMemVector xxxxx1(&gradienBuffer[i], 256);
+			//	const ndBrainMemVector xxxxx2(&gradienBuffer[i - 256], 256);
+			//	const ndBrainMemVector xxxxx3(&gradienBuffer[i - 512], 256);
+			//}
+
+			trainer->MakePrediction(miniBatchInput);
+			trainer->GetOutput(miniBatchOutput);
+			trainer->UpdateParameters();
+			const ndBrain* const brain = *trainer->GetBrain();
+			//for (ndInt32 i = 0; i < m_miniBatchSize; i++)
+			for (ndInt32 i = 0; i < 10; i++)
+			{
+				const ndBrainMemVector xxx0(&miniBatchOutput[i * outputSize], outputSize);
+				const ndBrainMemVector in(&miniBatchInput[i * inputSize], inputSize);
+				brain->MakePrediction(in, xxx1);
+				i *= 1;
+				for (ndInt32 k = 0; k < xxx0.GetCount(); ++k)
+				{
+					ndBrainFloat a = xxx0[k];
+					ndBrainFloat b = xxx1[k];
+					ndAssert(ndAreEqual(a, b, ndBrainFloat(1.0e-4f)));
+				}
+			}
+		}
+
 		void Optimize(ndBrainMatrix* const trainingLabels, ndBrainMatrix* const trainingDigits,
 			ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
 		{
@@ -282,74 +323,48 @@ static void MnistTrainingSet()
 						ndBrainMemVector input(&miniBatchInput[i * inputSize], inputSize);
 						input.SetCount(inputSize);
 						input.Set((*trainingDigits)[index]);
-
-						input.Set(0.0f);
-						input[i] = 1.0f;
+						//input.Set(0.0f);
+						//input[i] = 1.0f;
 					}
 
 					trainer->MakePrediction(miniBatchInput, false);
 					trainer->SyncQueue();
 					
 					//calculate loss
-					//trainer->GetOutput(miniBatchOutput);
-					//for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
-					//{
-					//	ndUnsigned32 index = shuffleBuffer[batchStart + i];
-					//	ndBrainMemVector grad(&miniBatchOutputGradients[i * outputSize], outputSize);
-					//	const ndBrainMemVector output(&miniBatchOutput[i * outputSize], outputSize);
-					//	const ndBrainMemVector truth(&(*trainingLabels)[index][0], outputSize);
-					//	
-					//	loss.SetTruth(truth);
-					//	loss.GetLoss(output, grad);
-					//}
-					// backpropagate loss.
-					//trainer->BackPropagate(miniBatchOutputGradients);
-					//trainer->ApplyLearnRate(); 
-					//trainer->SyncQueue();
+					trainer->GetOutput(miniBatchOutput);
+					for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
+					{
+						ndUnsigned32 index = shuffleBuffer[batchStart + i];
+						ndBrainMemVector grad(&miniBatchOutputGradients[i * outputSize], outputSize);
+						const ndBrainMemVector output(&miniBatchOutput[i * outputSize], outputSize);
+						const ndBrainMemVector truth(&(*trainingLabels)[index][0], outputSize);
+						
+						loss.SetTruth(truth);
+						loss.GetLoss(output, grad);
+					}
 
 #if 1
-						ndBrainFixSizeVector<1024> xxx1;
-						xxx1.SetCount(outputSize);
+					//DebugTest(trainer, miniBatchOutput, miniBatchInput);
+#endif
+					// backpropagate loss.
+					trainer->BackPropagate(miniBatchOutputGradients);
+					trainer->ApplyLearnRate(); 
+					trainer->SyncQueue();
 
-						//ndBrainVector gradienBuffer;
-						//trainer->GetGradientBuffer(gradienBuffer);
-						//const ndBrainMemVector xxxxx0(&gradienBuffer[0], 4096);
-						//for (int i = ndInt32(xxxxx0.GetCount()) - 256; i >= 0; i -= 256)
-						//{
-						//	const ndBrainMemVector xxxxx1(&gradienBuffer[i], 256);
-						//	const ndBrainMemVector xxxxx2(&gradienBuffer[i - 256], 256);
-						//	const ndBrainMemVector xxxxx3(&gradienBuffer[i - 512], 256);
-						//}
-
-						trainer->MakePrediction(miniBatchInput);
-						trainer->GetOutput(miniBatchOutput);
-						trainer->UpdateParameters();
-						const ndBrain* const brain = *trainer->GetBrain();
-						for (ndInt32 i = 0; i < m_miniBatchSize; i++)
-						{
-							const ndBrainMemVector xxx0(&miniBatchOutput[i * outputSize], outputSize);
-							const ndBrainMemVector in(&miniBatchInput[i * inputSize], inputSize);
-							brain->MakePrediction(in, xxx1);
-							i *= 1;
-							for (ndInt32 k = 0; k < xxx0.GetCount(); ++k)
-							{
-								ndBrainFloat a = xxx0[k];
-								ndBrainFloat b = xxx1[k];
-								//ndAssert(ndAreEqual(a, b, ndBrainFloat(1.0e-4f)));
-							}
-						}
+#if 1
+					//DebugTest(trainer, miniBatchOutput, miniBatchInput);
 #endif
 				}
-
-#if 1
+#if 0
 				ndExpandTraceMessage("epoc: %d\n", epoch);
 #else
 				
 				ndInt64 testFailCount = ValidateData(testLabels, testDigits) + 1;
 				if (testFailCount < m_minValidationFail)
 				{
-					trainer->GetParameterBuffer(parametersBuffer);
-					trainer->UpdateParameters(parametersBuffer);
+					//trainer->GetParameterBuffer(parametersBuffer);
+					//trainer->UpdateParameters(parametersBuffer);
+					trainer->UpdateParameters();
 					m_bestBrain->CopyFrom(**trainer->GetBrain());
 					m_minValidationFail = testFailCount + 1;
 					ndInt64 trainigFailCount = ValidateData(trainingLabels, trainingDigits) + 1;
@@ -425,24 +440,26 @@ static void MnistTrainingSet()
 			pooling = (ndBrainLayerImagePolling_2x2*)(layers[layers.GetCount() - 1]);
 
 		#else
-			layers.PushBack(new ndBrainLayerLinear(trainingDigits->GetColumns(), MINIST_LINEAR_LAYERS_NEURONS));
-			layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize()));
-			layers.PushBack(new MINIST_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
-			
-			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), MINIST_LINEAR_LAYERS_NEURONS));
-			layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize()));
-			layers.PushBack(new MINIST_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
-			 
-			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), MINIST_LINEAR_LAYERS_NEURONS));
-			layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize()));
-			layers.PushBack(new MINIST_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+			//layers.PushBack(new ndBrainLayerLinear(trainingDigits->GetColumns(), MINIST_LINEAR_LAYERS_NEURONS));
+			//layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize()));
+			//layers.PushBack(new MINIST_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+			//
+			//layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), MINIST_LINEAR_LAYERS_NEURONS));
+			//layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize()));
+			//layers.PushBack(new MINIST_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
+			// 
+			//layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), MINIST_LINEAR_LAYERS_NEURONS));
+			//layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize()));
+			//layers.PushBack(new MINIST_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));
 		#endif
 
-		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
+		//layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), trainingLabels->GetColumns()));
+		//layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
+		//layers.PushBack(new ndBrainLayerActivationCategoricalSoftmax(layers[layers.GetCount() - 1]->GetOutputSize()));
+
+		layers.PushBack(new ndBrainLayerLinear(trainingDigits->GetColumns(), trainingLabels->GetColumns()));
 		layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 		layers.PushBack(new ndBrainLayerActivationCategoricalSoftmax(layers[layers.GetCount() - 1]->GetOutputSize()));
-
-		//layers.PushBack(new ndBrainLayerLinear(trainingDigits->GetColumns(), 19));
 
 		for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 		{

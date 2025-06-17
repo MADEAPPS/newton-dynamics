@@ -121,6 +121,22 @@ void ndBrainLayerActivation::Blend(const ndBrainLayer&, ndBrainFloat)
 {
 }
 
+ndBrainLayer::ndCommandShareInfo ndBrainLayerActivation::GetCpuCommandSharedInfo() const
+{
+	ndCommandShareInfo info(this);
+	info.m_inputSize = GetInputSize();
+	info.m_outputSize = GetOutputSize();
+	return info;
+}
+
+ndBrainLayer::ndCommandShareInfo ndBrainLayerActivation::GetGpuCommandSharedInfo() const
+{
+	ndCommandShareInfo info(this);
+	info.m_inputSize = GetInputSize();
+	info.m_outputSize = GetOutputSize();
+	return info;
+}
+
 void ndBrainLayerActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
 	ndAssert(input.GetCount() == m_neurons);

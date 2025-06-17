@@ -108,14 +108,6 @@ bool ndBrainLayerActivationRelu::HasGpuSupport() const
 	return true;
 }
 
-ndBrainLayer::ndCommandShareInfo ndBrainLayerActivationRelu::GetCommandSharedInfo()
-{
-	ndCommandShareInfo info(this);
-	info.m_inputSize = GetInputSize();
-	info.m_outputSize = GetOutputSize();
-	return info;
-}
-
 ndBrainLayerFeedForwardCpuCommand* ndBrainLayerActivationRelu::GetLayerCpuFeedForwardCommand()
 {
 	ndBrainLayerFeedForwardCpuCommand* const command = new ndBrainLayerFeedForwardCpuCommand(this);

@@ -187,7 +187,8 @@ void ndBrainTrainerGpu::AddOptimizerGradientCommand(ndBrainFloat learnRate)
 	uniformbuffer->LoadData(sizeof(ndBrainLayer::ndCommandShareInfo), &data);
 	ndBrainGpuBuffer* const weightAndBiasGradientsBuffer = *m_weightAndBiasGradientsBuffer;
 	m_accumulateGradients = ndSharedPtr<ndBrainGpuCommand>(new ndBrainTrainerGpuCommand(this, data, 0, m_context, m_context->m_brainAccumulateGradients, m_miniBatchSize, uniformbuffer, weightAndBiasGradientsBuffer, nullptr, nullptr));
-	m_accumulateGradients->m_numberOfWorkGroups = size_t(sizeInFloats / m_miniBatchSize);
+	//m_accumulateGradients->m_numberOfWorkGroups = size_t(sizeInFloats / m_miniBatchSize);
+	m_accumulateGradients->m_numberOfWorkGroups = size_t(sizeInFloats / m_accumulateGradients->m_workGroupSize);
 	
 	// add the adam optimizer kernel here
 	ndBrainOptimizerAdamGpu::ndCommandShareInfo optimizerData(m_optimizer->m_parameters);
@@ -200,7 +201,6 @@ void ndBrainTrainerGpu::AddOptimizerGradientCommand(ndBrainFloat learnRate)
 			this, m_context, m_context->m_brainAdamLassoOptimizerUpdate, m_miniBatchSize, optimizerData,
 			adamUniformbuffer, m_weightAndBiasBuffer, m_weightAndBiasGradientsBuffer,
 			m_optimizer->m_vdw, m_optimizer->m_vdw2));
-			m_adamOtimizerUpdate->m_numberOfWorkGroups = size_t(sizeInFloats / m_miniBatchSize);
 	}
 	else
 	{
@@ -208,8 +208,9 @@ void ndBrainTrainerGpu::AddOptimizerGradientCommand(ndBrainFloat learnRate)
 			this, m_context, m_context->m_brainAdamRidgeOptimizerUpdate, m_miniBatchSize, optimizerData,
 			adamUniformbuffer, m_weightAndBiasBuffer, m_weightAndBiasGradientsBuffer,
 			m_optimizer->m_vdw, m_optimizer->m_vdw2));
-		m_adamOtimizerUpdate->m_numberOfWorkGroups = size_t(sizeInFloats / m_miniBatchSize);
 	}
+	//m_adamOtimizerUpdate->m_numberOfWorkGroups = size_t(sizeInFloats / m_miniBatchSize);
+	m_adamOtimizerUpdate->m_numberOfWorkGroups = size_t(sizeInFloats / m_accumulateGradients->m_workGroupSize);
 	
 	// add the momentum update command
 	m_adamMomentumUpdate = ndSharedPtr<ndBrainGpuCommand>(new ndBrainAdamUpdateCommand(

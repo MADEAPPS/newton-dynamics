@@ -96,14 +96,6 @@ bool ndBrainLayerLinearWithDropOut::HasGpuSupport() const
 	return true;
 }
 
-ndBrainLayer::ndCommandShareInfo ndBrainLayerLinearWithDropOut::GetCommandSharedInfo()
-{
-	ndCommandShareInfo info(this);
-	info.m_inputSize = GetInputSize();
-	info.m_outputSize = GetOutputSize();
-	return info;
-}
-
 ndBrainLayerFeedForwardCpuCommand* ndBrainLayerLinearWithDropOut::GetLayerCpuFeedForwardCommand()
 {
 	ndBrainLayerFeedForwardCpuCommand* const command = new ndBrainLayerFeedForwardCpuCommand(this);

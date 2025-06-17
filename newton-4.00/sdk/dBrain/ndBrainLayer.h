@@ -58,7 +58,7 @@ class ndBrainLayer : public ndClassAlloc
 		{
 		}
 
-		ndCommandShareInfo(ndBrainLayer* const layer)
+		ndCommandShareInfo(const ndBrainLayer* const layer)
 			:m_inputSize(0)
 			,m_outputSize(0)
 			,m_inputOutputSize(0)
@@ -76,7 +76,7 @@ class ndBrainLayer : public ndClassAlloc
 		ndInt32 m_parametersBatchSize;
 		ndInt32 m_parametersStartOffset;
 		ndInt32	m_tiledStride;
-		ndBrainLayer* m_layer;
+		const ndBrainLayer* m_layer;
 	};
 
 	ndBrainLayer();
@@ -107,8 +107,6 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void ApplyDropOut(ndFloat32 rate);
 	virtual void InitWeights();
 
-	virtual void SetWeights(const ndBrainVector& input);
-	virtual void CopyWeights(ndBrainVector& output) const;
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	virtual void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
 
@@ -119,7 +117,15 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void Save(const ndBrainSave* const loadSave) const;
 	virtual void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
 
-	virtual ndCommandShareInfo GetCommandSharedInfo();
+	virtual void SetCpuWeights(const ndBrainVector& input);
+	virtual void SetGpuWeights(const ndBrainVector& input);
+
+	virtual void CopyCpuWeights(ndBrainVector& output) const;
+	virtual void CopyGpuWeights(ndBrainVector& output) const;
+
+	virtual ndCommandShareInfo GetCpuCommandSharedInfo() const;
+	virtual ndCommandShareInfo GetGpuCommandSharedInfo() const;
+
 	virtual ndBrainLayerFeedForwardCpuCommand* GetLayerCpuFeedForwardCommand();
 	virtual ndBrainLayerBackPropagateCpuCommand* GetLayerCpuBackPropagateCommand();
 
