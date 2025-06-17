@@ -68,10 +68,14 @@ ndBrainGpuContext::ndBrainGpuContext()
 		const std::string name(m_device->getInfo<CL_DEVICE_NAME>());
 		const std::string version(m_device->getInfo<CL_DEVICE_VERSION>());
 		size_t localMemorySize = m_device->getInfo<CL_DEVICE_LOCAL_MEM_SIZE>();
+		//size_t compute_units = m_device->getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>();
+		size_t compute_units = m_device->getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>();
 		ndExpandTraceMessage("\n");
 		ndExpandTraceMessage("selecting:\n");
 		ndExpandTraceMessage("opencl device name: %s\n", name.c_str());
 		ndExpandTraceMessage("opencl device version: %s\n", version.c_str());
+		
+		ndExpandTraceMessage("opencl device compute units: %d\n", compute_units);
 		ndExpandTraceMessage("opencl device local memory: %d\n", localMemorySize);
 
 		ndAssert(localMemorySize >= 1024 * 24);
