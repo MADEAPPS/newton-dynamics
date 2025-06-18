@@ -116,7 +116,7 @@ void ndBrainLayerLinear::InitWeights()
 		m_weights[i].Set(ndFloat32(0.0f));
 		for (ndInt32 j = 0; j < ndInt32(m_weights.GetColumns()); ++j)
 		{
-			m_weights[i][j] = ndFloat32(i + j);
+			m_weights[i][j] = ndFloat32(i + j) * 0.0001f;
 		}
 	}
 #endif
