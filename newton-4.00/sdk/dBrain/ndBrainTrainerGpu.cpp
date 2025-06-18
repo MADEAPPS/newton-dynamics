@@ -108,7 +108,6 @@ ndBrainTrainerGpu::ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const nd
 	m_miniBatchOutputGradientBuffer = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(m_context, buffer, ndCpuMappable));
 
 	GetWorkingBuffer(buffer);
-	//buffer.SetCount(buffer.GetCount() * m_miniBatchSize);
 	buffer.Set(ndReal(0.0f));
 	m_inputOuputGradientsBuffer = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(m_context, buffer, ndCpuMappable));
 
@@ -187,7 +186,6 @@ void ndBrainTrainerGpu::AddOptimizerGradientCommand(ndBrainFloat learnRate)
 	uniformbuffer->LoadData(sizeof(ndBrainLayer::ndCommandShareInfo), &data);
 	ndBrainGpuBuffer* const weightAndBiasGradientsBuffer = *m_weightAndBiasGradientsBuffer;
 	m_accumulateGradients = ndSharedPtr<ndBrainGpuCommand>(new ndBrainTrainerGpuCommand(this, data, 0, m_context, m_context->m_brainAccumulateGradients, m_miniBatchSize, uniformbuffer, weightAndBiasGradientsBuffer, nullptr, nullptr));
-	//m_accumulateGradients->m_numberOfWorkGroups = size_t(sizeInFloats / m_miniBatchSize);
 	m_accumulateGradients->m_numberOfWorkGroups = size_t(sizeInFloats / m_accumulateGradients->m_workGroupSize);
 	
 	// add the adam optimizer kernel here
@@ -209,7 +207,6 @@ void ndBrainTrainerGpu::AddOptimizerGradientCommand(ndBrainFloat learnRate)
 			adamUniformbuffer, m_weightAndBiasBuffer, m_weightAndBiasGradientsBuffer,
 			m_optimizer->m_vdw, m_optimizer->m_vdw2));
 	}
-	//m_adamOtimizerUpdate->m_numberOfWorkGroups = size_t(sizeInFloats / m_miniBatchSize);
 	m_adamOtimizerUpdate->m_numberOfWorkGroups = size_t(sizeInFloats / m_accumulateGradients->m_workGroupSize);
 	
 	// add the momentum update command
