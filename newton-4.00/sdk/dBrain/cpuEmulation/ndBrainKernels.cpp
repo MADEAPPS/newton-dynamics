@@ -715,8 +715,6 @@ class brainAccumulateGradients : public ndBrainGpuShader
         ndInt32 miniBatchSize = ndInt32(parameters->m_inputOutputSize);
      
         ndInt32 start = groupId * workGroupSize;
-        ndBrainFloat weightFactor = ndBrainFloat(1.0f) / ndBrainFloat(miniBatchSize);
-        
         for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
         {
             accRegister[itemId] = ndBrainFloat(0.0f);
@@ -730,6 +728,8 @@ class brainAccumulateGradients : public ndBrainGpuShader
                 accRegister[itemId] += a;
             }
         }
+        // sync here.
+        ndBrainFloat weightFactor = ndBrainFloat(1.0f) / ndBrainFloat(miniBatchSize);
         for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
         {
             ndBrainFloat sum = accRegister[itemId];
