@@ -844,7 +844,6 @@ ndSharedPtr<ndBrainGpuShader> ndBrainGpuContext::CreateKerner(const cl::Program&
 //#include <vector>
 void ndBrainGpuContext::CreateKerners()
 {
-    cl_int errcode_ret = 0;
     std::string source(m_commonKernelsSource);
     source += m_matrixMultiply;
     source += m_optimizerKernels;
@@ -854,8 +853,38 @@ void ndBrainGpuContext::CreateKerners()
     source += m_backPropagateKernels_1;
     source += m_backPropagateKernels_2;
 
-    cl::Program program (**m_context, source, CL_TRUE, &errcode_ret);
-    ndAssert(errcode_ret == 0);
+    class ClProgram : public cl::Program
+    {
+        public:
+#if 1
+        ClProgram(const cl::Context& context, const std::string& source)
+            :cl::Program(context, source, CL_TRUE, &m_errcode)
+        {
+        }
+#else
+        ClProgram(const cl::Context& context, const std::string& source)
+            :cl::Program()
+            //:cl::Program(context, source, CL_TRUE, &m_errcode)
+        {
+            const char* strings = source.c_str();
+            const size_t length = source.size();
+            
+            object_ = ::clCreateProgramWithSource(context(), (cl_uint)1, &strings, &length, &m_errcode);
+            if (m_errcode == CL_SUCCESS)
+            {
+                //const char* const compilerOptions = "-cl-std=CL3.0 -cl-opt-disable";
+                //const char* const compilerOptions = "-cl-std=CL2.0 -cl-opt-disable";
+                //const char* const compilerOptions = "-cl-std=CL2.0";
+                const char* const compilerOptions = "-cl-std=CL1.2";
+                m_errcode = ::clBuildProgram(object_, 0, nullptr, compilerOptions, nullptr, nullptr);
+            }
+        }
+#endif
+        cl_int m_errcode;
+    };
+
+    ClProgram program(**m_context, source);
+    ndAssert(program.m_errcode == 0);
 
 #if 0
     // this only seems to work with nvidia PTX        
