@@ -535,9 +535,6 @@ R""""(
     {
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
-        
-        //ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
-        //ndBrainOptimizerAdamGpu::ndCommandShareInfo* const parameters = (ndBrainOptimizerAdamGpu::ndCommandShareInfo*)&buffer0->m_data[0];
 
         if (itemId == 0)
         {
@@ -562,23 +559,19 @@ R""""(
         uint groupId = get_group_id(0);
         uint workGroupSize = get_local_size(0);
 
-        //ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
-        //ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
-        //UniformBufferLayerArguments* const parameters = (UniformBufferLayerArguments*)&buffer0->m_data[0];
-        //float* const gradientBuffer = &buffer1->m_buffer[0];
-
         uint inputSize = parameters->m_inputSize;
         uint miniBatchSize = parameters->m_inputOutputSize;
         
-        uint start = groupId * workGroupSize;
-        float weightFactor = 1.0f / (float)workGroupSize;
-        
         float sum = 0.0f;
-        for (uint j = 0; j < workGroupSize; ++j)
+        uint start = groupId * workGroupSize;
+        for (uint j = 0; j < miniBatchSize; ++j)
         {
             uint base = start + j * inputSize;
             sum += gradientBuffer[base + itemId];
         }
+        float weightFactor = 1.0f / (float)miniBatchSize;
+        barrier(CLK_LOCAL_MEM_FENCE); 
+
         gradientBuffer[start + itemId] = sum * weightFactor;
     }
 
@@ -806,8 +799,7 @@ R""""(
         uint workGroupOuputSizeReminder = outputSize % workGroupSize;
         uint modWorkGroupOuputSize = outputSize - workGroupOuputSizeReminder;
         for (uint i = 0; i < modWorkGroupOuputSize; i += workGroupSize)
-        //for (uint i = 0; i < outputSize; i += workGroupSize)
-        {
+         {
             float a = inputOutputGradients[dstBase + i + itemId];
             weightAndBiasGradients[weightAndBiasGradientOffset + matrixSize + i + itemId] = a;
         }
