@@ -864,7 +864,6 @@ void ndBrainGpuContext::CreateKerners()
 #else
         ClProgram(const cl::Context& context, const std::string& source)
             :cl::Program()
-            //:cl::Program(context, source, CL_TRUE, &m_errcode)
         {
             const char* strings = source.c_str();
             const size_t length = source.size();
