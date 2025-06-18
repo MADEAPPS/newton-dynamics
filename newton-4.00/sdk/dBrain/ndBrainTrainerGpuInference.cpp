@@ -195,6 +195,10 @@ void ndBrainTrainerGpuInference::InitWeightAndBiasBuffer()
 		parametersSizeSum += uniformData[i].m_parametersBatchSize;
 	}
 	ndAssert((parametersSizeSum & (ND_DEFAULT_WORKGROUP_SIZE - 1)) == 0);
+	if (!parametersSizeSum)
+	{
+		parametersSizeSum = ND_DEFAULT_WORKGROUP_SIZE;
+	}
 	//parametersSizeSum = RoundoffOffset(parametersSizeSum);
 
 	ndBrainVector scratchBuffer;
