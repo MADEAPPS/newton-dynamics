@@ -17,6 +17,8 @@
 #include <string>
 #include <vector>
 
+//#define ND_DEBUG_KERNELS
+
 #define D_OPENCL_SELECTION_TYPE		CL_DEVICE_TYPE_ALL
 //#define D_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_CPU
 //#define D_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_GPU
@@ -48,21 +50,17 @@ ndBrainGpuContext::ndBrainGpuContext()
 	if (cl_devices.size())
 	{
 		size_t bestDeviceIndex = 0;
-		//size_t bestCapacity = 0;
-		//for (size_t i = 0u; i < cl_devices.size(); i++)
-		//{
-		//	// find device with highest (estimated) floating point performance
-		//	//const std::string name (cl_devices[i].getInfo<CL_DEVICE_NAME>()); // device name
-		//	const size_t compute_units = cl_devices[i].getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>(); 
-		//	const std::string version(cl_devices[i].getInfo<CL_DEVICE_VERSION>());
-		//
-		//	// just go for the device with the most compute units.
-		//	if (compute_units > bestCapacity)
-		//	{
-		//		bestCapacity = compute_units;
-		//		bestDeviceIndex = i;
-		//	}
-		//}
+		#ifdef ND_DEBUG_KERNELS
+		for (size_t i = 0u; i < cl_devices.size(); i++)
+		{
+			const std::string name (cl_devices[i].getInfo<CL_DEVICE_NAME>()); 
+			size_t index = name.find("Oclgrind");
+			if (index != size_t (-1))
+			{
+				bestDeviceIndex = i;
+			}
+		}
+		#endif
 
 		m_device = ndSharedPtr<cl::Device>(new cl::Device(cl_devices[bestDeviceIndex]));
 		const std::string name(m_device->getInfo<CL_DEVICE_NAME>());
@@ -131,8 +129,6 @@ void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& co
 	cl_int numberOfParameters = 0;
 	ndSharedPtr<ndBrainGpuShader>& shader = command->m_shader;
 	
-	//std::string name;
-	//error = shader->getInfo(CL_KERNEL_FUNCTION_NAME, &name);
 	error = shader->getInfo(CL_KERNEL_NUM_ARGS, &numberOfParameters);
 	ndAssert(error == CL_SUCCESS);
 
