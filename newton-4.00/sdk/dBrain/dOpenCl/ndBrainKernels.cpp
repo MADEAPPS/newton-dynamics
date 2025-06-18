@@ -860,10 +860,13 @@ void ndBrainGpuContext::CreateKerners()
 #if 0
     // this only seems to work with nvidia PTX        
     size_t bin_sz;
-    errcode_ret = clGetProgramInfo(program.get(), CL_PROGRAM_BINARY_SIZES, sizeof(size_t), &bin_sz, NULL);
+    cl_int errcode = 0;
+    errcode = clGetProgramInfo(program.get(), CL_PROGRAM_BINARY_SIZES, sizeof(size_t), &bin_sz, NULL);
+    ndAssert(errcode == 0);
     
     unsigned char* code = (unsigned char*)malloc(bin_sz);
-    errcode_ret = clGetProgramInfo(program.get(), CL_PROGRAM_BINARIES, sizeof(unsigned char*), &code, NULL);
+    errcode = clGetProgramInfo(program.get(), CL_PROGRAM_BINARIES, sizeof(unsigned char*), &code, NULL);
+    ndAssert(errcode == 0);
     free(code);
 #endif
 
