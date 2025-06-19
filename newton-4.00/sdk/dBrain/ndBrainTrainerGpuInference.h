@@ -102,8 +102,8 @@ class ndBrainTrainerGpuInference: public ndBrainTrainer
 	ndSharedPtr<ndBrainGpuBuffer> m_weightAndBiasBuffer;
 	ndSharedPtr<ndBrainGpuBuffer> m_miniBatchInputBuffer;
 	ndSharedPtr<ndBrainGpuBuffer> m_miniBatchOutputBuffer;
+
 	ndList<ndSharedPtr<ndBrainGpuCommand>> m_feedForwardCommands;
-	ndList<ndSharedPtr<ndBrainGpuCommand>> m_weightAndBiasTranspose;
 	ndInt32 m_miniBatchSize;
 };
 
