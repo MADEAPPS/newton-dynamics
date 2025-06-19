@@ -589,27 +589,24 @@ R""""(
 
         uint start = groupId * workGroupSize;
 
-        for (uint itemId = 0; itemId < workGroupSize; ++itemId)
-        {
-            float temp = weightAndBiasGradientBuffer[start + itemId];
-            float a = vdw[start + itemId] * parameters->m_alpha + temp * (1.0f - parameters->m_alpha);
-            vdw[start + itemId] = a;
+        float temp = weightAndBiasGradientBuffer[start + itemId];
+        float a = vdw[start + itemId] * parameters->m_alpha + temp * (1.0f - parameters->m_alpha);
+        vdw[start + itemId] = a;
             
-            // calcuate RMS
-            float b = vdw2[start + itemId] * parameters->m_beta + temp * temp * (1.0f - parameters->m_beta);
-            vdw2[start + itemId] = b;
+        // calcuate RMS
+        float b = vdw2[start + itemId] * parameters->m_beta + temp * temp * (1.0f - parameters->m_beta);
+        vdw2[start + itemId] = b;
         
-            float vdwCorrected = a * parameters->m_invAlpha;
-            float vdw2Corrected = b * parameters->m_invBeta;
+        float vdwCorrected = a * parameters->m_invAlpha;
+        float vdw2Corrected = b * parameters->m_invBeta;
             
-            float bias_den = 1.0f / (sqrt(vdw2Corrected) + parameters->m_epsilon);
-            float gradient = vdwCorrected * bias_den;
+        float bias_den = 1.0f / (sqrt(vdw2Corrected) + parameters->m_epsilon);
+        float gradient = vdwCorrected * bias_den;
              
-            float weight = weightAndBiasBuffer[start + itemId];
-            float lassoRegularizer = (weight >= 0.0f) ? regularizer : -regularizer;
-            gradient += weight * lassoRegularizer;
-            weightAndBiasBuffer[start + itemId] = weight + gradient * descendRate;
-        }
+        float weight = weightAndBiasBuffer[start + itemId];
+        float lassoRegularizer = (weight >= 0.0f) ? regularizer : -regularizer;
+        gradient += weight * lassoRegularizer;
+        weightAndBiasBuffer[start + itemId] = weight + gradient * descendRate;
     }
 
     __kernel void brainAdamUpdateRidgeRegularizer(
@@ -625,26 +622,24 @@ R""""(
         float regularizer = -parameters->m_decayRegularizer;
 
         uint start = groupId * workGroupSize;
-        for (uint itemId = 0; itemId < workGroupSize; ++itemId)
-        {
-            float temp = weightAndBiasGradientBuffer[start + itemId];
-            float a = vdw[start + itemId] * parameters->m_alpha + temp * (1.0f - parameters->m_alpha);
-            vdw[start + itemId] = a;
+
+        float temp = weightAndBiasGradientBuffer[start + itemId];
+        float a = vdw[start + itemId] * parameters->m_alpha + temp * (1.0f - parameters->m_alpha);
+        vdw[start + itemId] = a;
             
-            // calcuate RMS
-            float b = vdw2[start + itemId] * parameters->m_beta + temp * temp * (1.0f - parameters->m_beta);
-            vdw2[start + itemId] = b;
+        // calcuate RMS
+        float b = vdw2[start + itemId] * parameters->m_beta + temp * temp * (1.0f - parameters->m_beta);
+        vdw2[start + itemId] = b;
         
-            float vdwCorrected = a * parameters->m_invAlpha;
-            float vdw2Corrected = b * parameters->m_invBeta;
+        float vdwCorrected = a * parameters->m_invAlpha;
+        float vdw2Corrected = b * parameters->m_invBeta;
             
-            float bias_den = 1.0f / (sqrt(vdw2Corrected) + parameters->m_epsilon);
-            float gradient = vdwCorrected * bias_den;
+        float bias_den = 1.0f / (sqrt(vdw2Corrected) + parameters->m_epsilon);
+        float gradient = vdwCorrected * bias_den;
              
-            float weight = weightAndBiasBuffer[start + itemId];
-            gradient += weight * regularizer;
-            weightAndBiasBuffer[start + itemId] = weight + gradient * descendRate;
-        }
+        float weight = weightAndBiasBuffer[start + itemId];
+        gradient += weight * regularizer;
+        weightAndBiasBuffer[start + itemId] = weight + gradient * descendRate;
     }
 
 )"""";
