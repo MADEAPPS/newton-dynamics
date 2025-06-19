@@ -15,7 +15,7 @@
 #include "ndBrainGpuContext.h"
 
 ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt64 sizeInByte, ndStorageBufferType bufferTypeFlags, ndDeviceBufferType)
-	:m_buffer(**context->m_context, (bufferTypeFlags == ndStorageData) ? CL_MEM_READ_WRITE : CL_MEM_READ_ONLY, size_t(sizeInByte))
+	:m_buffer(**context->m_context, cl_mem_flags((bufferTypeFlags == ndStorageData) ? CL_MEM_READ_WRITE : CL_MEM_READ_ONLY), size_t(sizeInByte))
 	,m_context(context)
 	,m_sizeInBytes(size_t(sizeInByte))
 {
