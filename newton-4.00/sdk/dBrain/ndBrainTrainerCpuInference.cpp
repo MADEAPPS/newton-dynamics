@@ -273,31 +273,25 @@ void ndBrainTrainerCpuInference::MakeSinglePrediction(const ndBrainVector& input
 
 void ndBrainTrainerCpuInference::LoadInput(const ndBrainVector& input)
 {
-	ndAssert(0);
 	ndAssert(input.GetCount() == m_miniBatchInputBuffer.GetCount());
 	m_miniBatchInputBuffer.Set(input);
 }
 
-//void ndBrainTrainerCpuInference::MakePrediction(const ndBrainVector& input)
 void ndBrainTrainerCpuInference::MakePrediction()
 {
-	ndAssert(0);
-	//ndAssert(input.GetCount() == m_miniBatchInputBuffer.GetCount());
-	//m_miniBatchInputBuffer.Set(input);
-	//
-	//ndAtomic<ndInt32> iterator(0);
-	//for (ndList<ndSharedPtr<ndBrainTrainerCpuCommand>>::ndNode* node = m_feedForwardCommands.GetFirst(); node; node = node->GetNext())
-	//{
-	//	ndBrainTrainerCpuCommand* const command = *node->GetInfo();
-	//
-	//	auto ExecuteCommand = ndMakeObject::ndFunction([this, &iterator, command](ndInt32, ndInt32)
-	//	{
-	//		for (ndInt32 i = iterator++; i < m_miniBatchSize; i = iterator++)
-	//		{
-	//			command->Execute(i);
-	//		}
-	//	});
-	//	iterator = 0;
-	//	m_threadPool->ndBrainThreadPool::ParallelExecute(ExecuteCommand);
-	//}
+	ndAtomic<ndInt32> iterator(0);
+	for (ndList<ndSharedPtr<ndBrainTrainerCpuCommand>>::ndNode* node = m_feedForwardCommands.GetFirst(); node; node = node->GetNext())
+	{
+		ndBrainTrainerCpuCommand* const command = *node->GetInfo();
+	
+		auto ExecuteCommand = ndMakeObject::ndFunction([this, &iterator, command](ndInt32, ndInt32)
+		{
+			for (ndInt32 i = iterator++; i < m_miniBatchSize; i = iterator++)
+			{
+				command->Execute(i);
+			}
+		});
+		iterator = 0;
+		m_threadPool->ndBrainThreadPool::ParallelExecute(ExecuteCommand);
+	}
 }

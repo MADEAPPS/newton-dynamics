@@ -161,7 +161,7 @@ static void MnistTrainingSet()
 			,m_minValidationFail(ndInt64(1000000) * ndInt64(1000000))
 			,m_hasGpuSupport(m_brain->IsGpuReady())
 		{
-			//m_hasGpuSupport = false;
+			m_hasGpuSupport = false;
 			m_prioritySamples.SetCount(m_miniBatchSize);
 			if (m_hasGpuSupport)
 			{
@@ -171,7 +171,6 @@ static void MnistTrainingSet()
 			else
 			{
 				ndInt32 threadCount = ndMin (ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize), 8);
-				//threadCount = 1;
 				m_context = ndSharedPtr<ndBrainContext>(new ndBrainCpuContext);
 				m_context->GetAsCpuContext()->SetThreadCount(threadCount);
 				m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainerCpu(m_brain, m_context, m_learnRate, m_miniBatchSize));
