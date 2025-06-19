@@ -346,7 +346,7 @@ static void MnistTrainingSet()
 					//DebugTest(trainer, miniBatchOutput, miniBatchInput);
 #endif
 					// backpropagate loss.
-					trainer->BackPropagate(miniBatchOutputGradients);
+					trainer->BackPropagate(miniBatchOutputGradients, false);
 					trainer->ApplyLearnRate(); 
 					trainer->SyncQueue();
 
