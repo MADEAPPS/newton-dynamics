@@ -234,45 +234,6 @@ static void MnistTrainingSet()
 			return failCount;
 		}
 
-		void DebugTest(ndBrainTrainer* const trainer, 
-			ndBrainVector& miniBatchOutput,
-			ndBrainVector& miniBatchInput)
-		{
-			ndInt32 inputSize = m_brain->GetInputSize();
-			ndInt32 outputSize = m_brain->GetOutputSize();
-
-			ndBrainFixSizeVector<1024> xxx1;
-			xxx1.SetCount(outputSize);
-
-			//ndBrainVector gradienBuffer;
-			//trainer->GetGradientBuffer(gradienBuffer);
-			//const ndBrainMemVector xxxxx0(&gradienBuffer[0], 4096);
-			//for (int i = ndInt32(xxxxx0.GetCount()) - 256; i >= 0; i -= 256)
-			//{
-			//	const ndBrainMemVector xxxxx1(&gradienBuffer[i], 256);
-			//	const ndBrainMemVector xxxxx2(&gradienBuffer[i - 256], 256);
-			//	const ndBrainMemVector xxxxx3(&gradienBuffer[i - 512], 256);
-			//}
-
-			trainer->MakePrediction(miniBatchInput);
-			trainer->GetOutput(miniBatchOutput);
-			trainer->UpdateParameters();
-			const ndBrain* const brain = *trainer->GetBrain();
-			for (ndInt32 i = 0; i < m_miniBatchSize; i++)
-			{
-				const ndBrainMemVector xxx0(&miniBatchOutput[i * outputSize], outputSize);
-				const ndBrainMemVector in(&miniBatchInput[i * inputSize], inputSize);
-				brain->MakePrediction(in, xxx1);
-				i *= 1;
-				for (ndInt32 k = 0; k < xxx0.GetCount(); ++k)
-				{
-					ndBrainFloat a = xxx0[k];
-					ndBrainFloat b = xxx1[k];
-					ndAssert(ndAreEqual(a, b, ndBrainFloat(1.0e-4f)));
-				}
-			}
-		}
-
 		void Optimize(ndBrainMatrix* const trainingLabels, ndBrainMatrix* const trainingDigits,
 			ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
 		{
@@ -342,19 +303,12 @@ static void MnistTrainingSet()
 						loss.GetLoss(output, grad);
 					}
 
-#if 1
-					//DebugTest(trainer, miniBatchOutput, miniBatchInput);
-#endif
 					// backpropagate loss.
 					trainer->BackPropagate(miniBatchOutputGradients);
 					trainer->ApplyLearnRate(); 
-					trainer->SyncQueue();
-
-#if 1
-					//DebugTest(trainer, miniBatchOutput, miniBatchInput);
-#endif
+					//trainer->SyncQueue();
 				}
-#if 0
+#if 1
 				ndExpandTraceMessage("epoc: %d\n", epoch);
 #else
 				
