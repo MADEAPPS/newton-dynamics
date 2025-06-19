@@ -78,7 +78,9 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 		ndInt32 minibatchSize);
 	ndBrainTrainerCpuInference(const ndBrainTrainerCpuInference& src);
 
+	virtual void LoadInput(const ndBrainVector&) override;
 	virtual void GetInput(ndBrainVector& input) const override;
+
 	virtual void GetOutput(ndBrainVector& ouput) const override;
 	virtual void GetWorkingBuffer(ndBrainVector& buffer) const override;
 	virtual void GetParameterBuffer(ndBrainVector& ouput) const override;
@@ -95,7 +97,7 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 	virtual void MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output) override;
 
 	// new method
-	virtual void MakePrediction(const ndBrainVector& input) override;
+	virtual void MakePrediction() override;
 	// new method
 
 	// new method

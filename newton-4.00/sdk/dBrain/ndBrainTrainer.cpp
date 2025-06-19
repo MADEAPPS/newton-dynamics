@@ -56,3 +56,9 @@ void ndBrainTrainer::UpdateParameters()
 	GetParameterBuffer(tmpBuffer);
 	UpdateParameters(tmpBuffer);
 }
+
+void ndBrainTrainer::MakePrediction(const ndBrainVector& input)
+{
+	LoadInput(input);
+	MakePrediction();
+}

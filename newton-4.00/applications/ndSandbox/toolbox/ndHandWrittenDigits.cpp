@@ -202,7 +202,9 @@ static void MnistTrainingSet()
 					input.SetCount(inputSize);
 					input.Set((*testDigits)[batchStart + i]);
 				}
-				m_trainer->MakePrediction(miniBatchInput);
+				//m_trainer->MakePrediction(miniBatchInput);
+				m_trainer->LoadInput(miniBatchInput);
+				m_trainer->MakePrediction();
 				m_trainer->GetOutput(miniBatchOutput);
 
 				for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
@@ -287,7 +289,9 @@ static void MnistTrainingSet()
 						//input[i] = 1.0f;
 					}
 
-					trainer->MakePrediction(miniBatchInput);
+					//trainer->MakePrediction(miniBatchInput);
+					trainer->LoadInput(miniBatchInput);
+					trainer->MakePrediction();
 					trainer->SyncQueue();
 					
 					//calculate loss
@@ -308,7 +312,7 @@ static void MnistTrainingSet()
 					trainer->ApplyLearnRate(); 
 					//trainer->SyncQueue();
 				}
-#if 1
+#if 0
 				ndExpandTraceMessage("epoc: %d\n", epoch);
 #else
 				

@@ -40,6 +40,8 @@ class ndBrainTrainer: public ndClassAlloc
 	ndSharedPtr<ndBrainContext> GetContext();
 
 	virtual void GetInput(ndBrainVector&) const {}
+	virtual void LoadInput(const ndBrainVector&) = 0;
+
 	virtual void GetOutput(ndBrainVector&) const {}
 	virtual void GetWorkingBuffer(ndBrainVector&) const {}
 	virtual void GetParameterBuffer(ndBrainVector&) const {}
@@ -56,7 +58,8 @@ class ndBrainTrainer: public ndClassAlloc
 	virtual void MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output) = 0;
 
 	// new method
-	virtual void MakePrediction(const ndBrainVector& input) = 0;
+	virtual void MakePrediction() = 0;
+	void MakePrediction(const ndBrainVector& input);
 
 	// new method
 	virtual void BackPropagate(const ndBrainVector& outputGradients) = 0;

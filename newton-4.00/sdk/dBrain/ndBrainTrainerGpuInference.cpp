@@ -337,10 +337,14 @@ void ndBrainTrainerGpuInference::SyncQueue()
 	m_context->SyncQueue();
 }
 
-void ndBrainTrainerGpuInference::MakePrediction(const ndBrainVector& input)
+void ndBrainTrainerGpuInference::LoadInput(const ndBrainVector& input)
 {
+	m_context->SyncQueue();
 	m_miniBatchInputBuffer->LoadData(input.GetCount() * sizeof(ndReal), &input[0]);
+}
 
+void ndBrainTrainerGpuInference::MakePrediction()
+{
 	for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = m_feedForwardCommands.GetFirst(); node; node = node->GetNext())
 	{
 		ndSharedPtr<ndBrainGpuCommand>& command = node->GetInfo();

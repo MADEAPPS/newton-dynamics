@@ -64,7 +64,9 @@ class ndBrainTrainerGpuInference: public ndBrainTrainer
 	ndBrainTrainerGpuInference(const ndBrainTrainerGpuInference& src);
 	virtual ~ndBrainTrainerGpuInference();
 
+	virtual void LoadInput(const ndBrainVector&) override;
 	virtual void GetInput(ndBrainVector& ouput) const override;
+
 	virtual void GetOutput(ndBrainVector& ouput) const override;
 	virtual void GetWorkingBuffer(ndBrainVector& ouput) const override;
 	virtual void GetParameterBuffer(ndBrainVector& ouput) const override;
@@ -75,7 +77,7 @@ class ndBrainTrainerGpuInference: public ndBrainTrainer
 	// new methods
 	virtual void SyncQueue() override;
 	virtual void ApplyLearnRate() override;
-	virtual void MakePrediction(const ndBrainVector& input) override;
+	virtual void MakePrediction() override;
 	virtual void BackPropagate(const ndBrainVector& outputGradients) override;
 	virtual void UpdateParameters(const ndBrainVector& weightAndBias) override;
 	virtual void MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output) override;
