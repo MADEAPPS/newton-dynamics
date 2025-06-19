@@ -326,7 +326,7 @@ static void MnistTrainingSet()
 						//input[i] = 1.0f;
 					}
 
-					trainer->MakePrediction(miniBatchInput, false);
+					trainer->MakePrediction(miniBatchInput);
 					trainer->SyncQueue();
 					
 					//calculate loss
@@ -346,7 +346,7 @@ static void MnistTrainingSet()
 					//DebugTest(trainer, miniBatchOutput, miniBatchInput);
 #endif
 					// backpropagate loss.
-					trainer->BackPropagate(miniBatchOutputGradients, false);
+					trainer->BackPropagate(miniBatchOutputGradients);
 					trainer->ApplyLearnRate(); 
 					trainer->SyncQueue();
 

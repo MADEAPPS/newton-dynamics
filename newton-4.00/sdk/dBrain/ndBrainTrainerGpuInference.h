@@ -75,9 +75,9 @@ class ndBrainTrainerGpuInference: public ndBrainTrainer
 	// new methods
 	virtual void SyncQueue() override;
 	virtual void ApplyLearnRate() override;
+	virtual void MakePrediction(const ndBrainVector& input) override;
+	virtual void BackPropagate(const ndBrainVector& outputGradients) override;
 	virtual void UpdateParameters(const ndBrainVector& weightAndBias) override;
-	virtual void MakePrediction(const ndBrainVector& input, bool sync = true) override;
-	virtual void BackPropagate(const ndBrainVector& outputGradients, bool sync = true) override;
 	virtual void MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output) override;
 
 	protected:

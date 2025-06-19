@@ -286,7 +286,7 @@ void ndBrainTrainerGpuInference::GetParameterBuffer(ndBrainVector& output) const
 	UnloadBuffer(output, m_weightAndBiasBuffer);
 }
 
-void ndBrainTrainerGpuInference::BackPropagate(const ndBrainVector&, bool)
+void ndBrainTrainerGpuInference::BackPropagate(const ndBrainVector&)
 {
 }
 
@@ -337,7 +337,7 @@ void ndBrainTrainerGpuInference::SyncQueue()
 	m_context->SyncQueue();
 }
 
-void ndBrainTrainerGpuInference::MakePrediction(const ndBrainVector& input, bool sync)
+void ndBrainTrainerGpuInference::MakePrediction(const ndBrainVector& input)
 {
 	m_miniBatchInputBuffer->LoadData(input.GetCount() * sizeof(ndReal), &input[0]);
 
@@ -345,10 +345,6 @@ void ndBrainTrainerGpuInference::MakePrediction(const ndBrainVector& input, bool
 	{
 		ndSharedPtr<ndBrainGpuCommand>& command = node->GetInfo();
 		m_context->AddCommandQueue(command);
-	}
-	if (sync)
-	{
-		SyncQueue();
 	}
 }
 

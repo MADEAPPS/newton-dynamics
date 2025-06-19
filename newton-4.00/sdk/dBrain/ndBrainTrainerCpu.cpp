@@ -162,7 +162,7 @@ void ndBrainTrainerCpu::ApplyLearnRate()
 	m_optimizer->Update(m_weightAndBiasBuffer, gradients);
 }
 
-void ndBrainTrainerCpu::BackPropagate(const ndBrainVector& outputGradients, bool)
+void ndBrainTrainerCpu::BackPropagate(const ndBrainVector& outputGradients)
 {
 	ndAssert(outputGradients.GetCount() == m_miniBatchOutputGradientBuffer.GetCount());
 	m_miniBatchOutputGradientBuffer.Set(outputGradients);

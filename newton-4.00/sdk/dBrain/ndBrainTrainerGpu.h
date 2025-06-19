@@ -38,7 +38,7 @@ class ndBrainTrainerGpu: public ndBrainTrainerGpuInference
 
 	virtual void ApplyLearnRate() override;
 	virtual void GetGradientBuffer(ndBrainVector&) const override;
-	virtual void BackPropagate(const ndBrainVector& outputGradients, bool sync = true) override;
+	virtual void BackPropagate(const ndBrainVector& outputGradients) override;
 
 	protected:
 	void AddLayersGradientCommands();

@@ -223,7 +223,7 @@ void ndBrainTrainerCpuInference::GetParameterBuffer(ndBrainVector& parameters) c
 }
 
 // new method
-void ndBrainTrainerCpuInference::BackPropagate(const ndBrainVector&, bool)
+void ndBrainTrainerCpuInference::BackPropagate(const ndBrainVector&)
 {
 }
 
@@ -271,7 +271,7 @@ void ndBrainTrainerCpuInference::MakeSinglePrediction(const ndBrainVector& input
 	ndMemCpy(&output[0], &m_miniBatchOutputBuffer[0], output.GetCount());
 }
 
-void ndBrainTrainerCpuInference::MakePrediction(const ndBrainVector& input, bool sync)
+void ndBrainTrainerCpuInference::MakePrediction(const ndBrainVector& input)
 {
 	ndAssert(input.GetCount() == m_miniBatchInputBuffer.GetCount());
 	m_miniBatchInputBuffer.Set(input);
@@ -290,10 +290,5 @@ void ndBrainTrainerCpuInference::MakePrediction(const ndBrainVector& input, bool
 		});
 		iterator = 0;
 		m_threadPool->ndBrainThreadPool::ParallelExecute(ExecuteCommand);
-	}
-
-	if (sync)
-	{
-		SyncQueue();
 	}
 }

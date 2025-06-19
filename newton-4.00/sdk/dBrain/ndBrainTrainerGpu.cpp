@@ -279,7 +279,7 @@ void ndBrainTrainerGpu::GetGradientBuffer(ndBrainVector& output) const
 	UnloadBuffer(output, m_inputOuputGradientsBuffer);
 }
 
-void ndBrainTrainerGpu::BackPropagate(const ndBrainVector& outputGradients, bool sync)
+void ndBrainTrainerGpu::BackPropagate(const ndBrainVector& outputGradients)
 {
 	m_miniBatchOutputGradientBuffer->LoadData(outputGradients.GetCount() * sizeof(ndReal), &outputGradients[0]);
 
@@ -287,10 +287,6 @@ void ndBrainTrainerGpu::BackPropagate(const ndBrainVector& outputGradients, bool
 	{
 		ndSharedPtr<ndBrainGpuCommand>& command = node->GetInfo();
 		m_context->AddCommandQueue(command);
-	}
-	if (sync)
-	{
-		SyncQueue();
 	}
 }
 
