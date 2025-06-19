@@ -37,10 +37,6 @@ void ndBrainGpuCommand::Assembly(const ndSharedPtr<ndBrainGpuShader>& shader, nd
 	ndAssert(*m_shader);
 	m_workGroupSize = ND_KERNELS_WORKGROUP_SIZE;
 	m_numberOfWorkGroups = size_t(minibatchSize);
-	//m_shader->getWorkGroupInfo(**m_context->m_device, CL_KERNEL_WORK_GROUP_SIZE, &m_workGroupSize);
-	//m_shader->getWorkGroupInfo(**m_context->m_device, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, &m_workGroupSize);
-	//const size_t compute_units = m_context->m_device->getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>();
-	//const size_t compute_items = m_context->m_device->getInfo<CL_DEVICE_MAX_WORK_GROUP_SIZE>();
 	
 	m_parameters.SetCount(0);
 	for (ndInt32 i = 0; i < buffersCount; ++i)
