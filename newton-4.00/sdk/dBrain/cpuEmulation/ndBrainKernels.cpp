@@ -817,78 +817,31 @@ class brainAdamUpdateRidgeRegularizer : public ndBrainGpuShader
         ndBrainFloat regularizer = -parameters->m_decayRegularizer;
 
         ndInt32 start = groupId * workGroupSize;
-
-        //const ndBrainMemVector vdw__(&vdw[start], workGroupSize);
-        //const ndBrainMemVector vdw2__(&vdw[start], workGroupSize);
-        //const ndBrainMemVector weight___(&weightAndBiasBuffer[start], workGroupSize);
         for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
         {
-            //temp.Set(grad);
             ndBrainFloat temp = weightAndBiasGradientBuffer[start + itemId];
             
             // calculate moving average
-            //vdw.Scale(m_alpha);
-            //vdw.ScaleAdd(temp, ndBrainFloat(1.0f) - m_alpha);
-
             ndBrainFloat a = vdw[start + itemId] * parameters->m_alpha + temp * (ndBrainFloat(1.0f) - parameters->m_alpha);
             vdw[start + itemId] = a;
             
-            //// caluate RMS
-            //vdw2.Scale(m_beta);
-            //temp.Mul(temp);
-            //vdw2.ScaleAdd(temp, ndBrainFloat(1.0) - m_beta);
+            // caluate RMS
             ndBrainFloat b = vdw2[start + itemId] * parameters->m_beta + temp * temp * (ndBrainFloat(1.0f) - parameters->m_beta);
             vdw2[start + itemId] = b;
             
-            //vdwCorrected.Set(vdw);
-            //vdw2Corrected.Set(vdw2);
-            //if (m_alphaAcc > ndBrainFloat(0.0f))
-            //{
-            //	vdwCorrected.Scale(ndBrainFloat(1.0f / (1.0f - m_alphaAcc)));
-            //}
-            //
-            //if (m_betaAcc > ndBrainFloat(0.0f))
-            //{
-            //	vdw2Corrected.Scale(ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) - m_betaAcc));
-            //}
-
             ndBrainFloat vdwCorrected = a * parameters->m_invAlpha;
             ndBrainFloat vdw2Corrected = b * parameters->m_invBeta;
             
-            //for (ndInt32 j = ndInt32(grad.GetCount() - 1); j >= 0; --j)
-            //{
-            //	ndBrainFloat bias_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(vdw2Corrected[j])) + m_epsilon);
-            //	grad[j] = vdwCorrected[j] * bias_den;
-            //}
+            if (vdw2Corrected == 0.0f)
+            {
+                vdw2Corrected *= 1;
+            }
+
             ndBrainFloat bias_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(vdw2Corrected)) + parameters->m_epsilon);
             ndBrainFloat gradient = vdwCorrected * bias_den;
              
-            //ndBrainMemVector weights (&parameters[start], count);
-            //switch (m_regularizerType)
-            //{
-            //	case m_lasso:
-            //	{
-            //		ndBrainFloat negativeRegularizer = -regularizer;
-            //		for (ndInt32 j = ndInt32(grad.GetCount()) - 1; j >= 0; --j)
-            //		{
-            //			ndBrainFloat b = grad[j];
-            //			grad[j] += (b > ndFloat32(0.0f)) ? regularizer : negativeRegularizer;
-            //		}
-            //		break;
-            //	}
-            //
-            //	case m_ridge:
-            //	{
-            //		grad.ScaleAdd(weights, regularizer);
-            //		break;
-            //	}
-            //
-            //	case m_none:;
-            //}
             ndBrainFloat weight = weightAndBiasBuffer[start + itemId];
             gradient += weight * regularizer;
-             
-            //weights.ScaleAdd(grad, descendRate);
             weightAndBiasBuffer[start + itemId] = weight + gradient * descendRate;
         }
     }
