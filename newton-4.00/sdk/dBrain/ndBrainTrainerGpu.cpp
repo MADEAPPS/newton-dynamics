@@ -296,7 +296,6 @@ void ndBrainTrainerGpu::BackPropagate(const ndBrainVector& outputGradients, bool
 
 void ndBrainTrainerGpu::ApplyLearnRate()
 {
-	//m_context->AddCommandQueue(m_accumulateGradients);
 	for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = m_accumulateGradientsCommands.GetFirst(); node; node = node->GetNext())
 	{
 		ndSharedPtr<ndBrainGpuCommand>& command = node->GetInfo();
@@ -305,59 +304,4 @@ void ndBrainTrainerGpu::ApplyLearnRate()
 
 	m_context->AddCommandQueue(m_adamOtimizerUpdate);
 	m_context->AddCommandQueue(m_adamMomentumUpdate);
-
-//	ndBrainVector buffer;
-//	auto SaveBuffer = [this, &buffer](const char* fileName, const ndSharedPtr<ndBrainGpuBuffer>& gpuBuffer)
-//	{
-//		SyncQueue();
-//		FILE* log = fopen(fileName, "wb");
-//		UnloadBuffer(buffer, gpuBuffer);
-//
-//		union FloatInt
-//		{
-//			float floatValue;
-//			int intValue;
-//		};
-//		for (ndInt32 i = 0; i < buffer.GetCount(); ++i)
-//		{
-//			FloatInt a;
-//			a.floatValue = buffer[i];
-//			fprintf(log, "%x ", a.intValue);
-//		}
-//		fclose(log);
-//	};
-//
-//	auto CheckBuffer = [this, &buffer](const char* fileName, const ndSharedPtr<ndBrainGpuBuffer>& gpuBuffer)
-//	{
-//		SyncQueue();
-//		FILE* log = fopen(fileName, "rb");
-//		UnloadBuffer(buffer, gpuBuffer);
-//
-//		union FloatInt
-//		{
-//			float floatValue;
-//			int intValue;
-//		};
-//		for (ndInt32 i = 0; i < buffer.GetCount(); ++i)
-//		{
-//			FloatInt a;
-//			FloatInt b;
-//			b.floatValue = buffer[i];
-//			fscanf(log, "%x ", &a.intValue);
-//			ndAssert(a.intValue == b.intValue);
-//		}
-//		fclose(log);
-//	};
-//
-//#if 0
-//	//SaveBuffer("gpuLog1.txt", m_inputOutputBuffer);
-//	SaveBuffer("gpuLog0.txt", m_weightAndBiasBuffer);
-//	//SaveBuffer("gpuLog2.txt", m_inputOuputGradientsBuffer);
-//	//SaveBuffer("gpuLog3.txt", m_weightAndBiasGradientsBuffer);
-//#else
-//	//CheckBuffer("gpuLog1.txt", m_inputOutputBuffer);
-//	//CheckBuffer("gpuLog2.txt", m_inputOuputGradientsBuffer);
-//	//CheckBuffer("gpuLog3.txt", m_weightAndBiasGradientsBuffer);
-//	CheckBuffer("gpuLog0.txt", m_weightAndBiasBuffer);
-//#endif
 }
