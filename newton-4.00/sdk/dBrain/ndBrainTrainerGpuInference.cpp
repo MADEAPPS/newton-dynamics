@@ -65,7 +65,6 @@ ndBrainTrainerGpuInference::ndBrainTrainerGpuInference(const ndSharedPtr<ndBrain
 	,m_miniBatchInputBuffer()
 	,m_miniBatchOutputBuffer()
 	,m_feedForwardCommands()
-	,m_weightAndBiasTranspose()
 	,m_miniBatchSize(minibatchSize)
 {
 	ndAssert(brain->IsGpuReady());
