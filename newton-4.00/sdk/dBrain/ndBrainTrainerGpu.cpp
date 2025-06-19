@@ -88,7 +88,6 @@ class ndBrainAdamUpdateCommand : public ndBrainGpuCommand
 	ndInt32 m_miniBatchSize;
 };
 
-
 ndBrainTrainerGpu::ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndBrainFloat learnRate, ndInt32 minibatchSize)
 	:ndBrainTrainerGpuInference(brain, context, minibatchSize)
 	,m_optimizer(new ndBrainOptimizerAdamGpu(context))
@@ -182,11 +181,39 @@ void ndBrainTrainerGpu::AddOptimizerGradientCommand(ndBrainFloat learnRate)
 	ndBrainLayer::ndCommandShareInfo data;
 	data.m_inputSize = sizeInFloats;
 	data.m_inputOutputSize = m_miniBatchSize;
+	ndBrainGpuBuffer* const weightAndBiasGradientsBuffer = *m_weightAndBiasGradientsBuffer;
+
+#if 1
 	ndSharedPtr<ndBrainGpuBuffer> uniformbuffer(new ndBrainGpuUniformBuffer(m_context, sizeof(ndBrainLayer::ndCommandShareInfo)));
 	uniformbuffer->LoadData(sizeof(ndBrainLayer::ndCommandShareInfo), &data);
-	ndBrainGpuBuffer* const weightAndBiasGradientsBuffer = *m_weightAndBiasGradientsBuffer;
-	m_accumulateGradients = ndSharedPtr<ndBrainGpuCommand>(new ndBrainTrainerGpuCommand(this, data, 0, m_context, m_context->m_brainAccumulateGradients, m_miniBatchSize, uniformbuffer, weightAndBiasGradientsBuffer, nullptr, nullptr));
-	m_accumulateGradients->m_numberOfWorkGroups = size_t(sizeInFloats / m_accumulateGradients->m_workGroupSize);
+	ndSharedPtr<ndBrainGpuCommand> accumulateGradients(new ndBrainTrainerGpuCommand(this, data, 0, m_context, m_context->m_brainAccumulateGradientsAndAverage, m_miniBatchSize, uniformbuffer, weightAndBiasGradientsBuffer, nullptr, nullptr));
+	accumulateGradients->m_numberOfWorkGroups = size_t(sizeInFloats / accumulateGradients->m_workGroupSize);
+	m_accumulateGradientsCommands.Append(accumulateGradients);
+#else
+	// as usual my theory are all wrong, this make the update three rtime slower.
+	for (ndInt32 i = m_miniBatchSize / 2; i > 0; i >>= 1)
+	{
+		for (ndInt32 j = 0; j < i; ++j)
+		{
+			data.m_parametersBatchSize = i * sizeInFloats;
+			data.m_parametersStartOffset = j * sizeInFloats;
+			ndSharedPtr<ndBrainGpuBuffer> uniformbuffer(new ndBrainGpuUniformBuffer(m_context, sizeof(ndBrainLayer::ndCommandShareInfo)));
+			uniformbuffer->LoadData(sizeof(ndBrainLayer::ndCommandShareInfo), &data);
+
+			ndSharedPtr<ndBrainGpuCommand> accumulateGradients(new ndBrainTrainerGpuCommand(this, data, 0, m_context, m_context->m_brainAccumulateGradients, m_miniBatchSize, uniformbuffer, weightAndBiasGradientsBuffer, nullptr, nullptr));
+			accumulateGradients->m_numberOfWorkGroups = size_t(sizeInFloats / accumulateGradients->m_workGroupSize);
+			m_accumulateGradientsCommands.Append(accumulateGradients);
+		}
+	}
+
+	ndSharedPtr<ndBrainGpuBuffer> uniformbuffer(new ndBrainGpuUniformBuffer(m_context, sizeof(ndBrainLayer::ndCommandShareInfo)));
+	uniformbuffer->LoadData(sizeof(ndBrainLayer::ndCommandShareInfo), &data);
+
+	ndSharedPtr<ndBrainGpuCommand> averageGradients(new ndBrainTrainerGpuCommand(this, data, 0, m_context, m_context->m_brainAverageGradients, m_miniBatchSize, uniformbuffer, weightAndBiasGradientsBuffer, nullptr, nullptr));
+	averageGradients->m_numberOfWorkGroups = size_t(sizeInFloats / averageGradients->m_workGroupSize);
+	m_accumulateGradientsCommands.Append(averageGradients);
+
+#endif
 	
 	// add the adam optimizer kernel here
 	ndBrainOptimizerAdamGpu::ndCommandShareInfo optimizerData(m_optimizer->m_parameters);
@@ -207,7 +234,9 @@ void ndBrainTrainerGpu::AddOptimizerGradientCommand(ndBrainFloat learnRate)
 			adamUniformbuffer, m_weightAndBiasBuffer, m_weightAndBiasGradientsBuffer,
 			m_optimizer->m_vdw, m_optimizer->m_vdw2));
 	}
-	m_adamOtimizerUpdate->m_numberOfWorkGroups = size_t(sizeInFloats / m_accumulateGradients->m_workGroupSize);
+	
+	const ndSharedPtr<ndBrainGpuCommand>& gradientsData = m_accumulateGradientsCommands.GetFirst()->GetInfo();
+	m_adamOtimizerUpdate->m_numberOfWorkGroups = size_t(sizeInFloats / gradientsData->m_workGroupSize);
 	
 	// add the momentum update command
 	m_adamMomentumUpdate = ndSharedPtr<ndBrainGpuCommand>(new ndBrainAdamUpdateCommand(
@@ -267,53 +296,59 @@ void ndBrainTrainerGpu::BackPropagate(const ndBrainVector& outputGradients, bool
 
 void ndBrainTrainerGpu::ApplyLearnRate()
 {
-	m_context->AddCommandQueue(m_accumulateGradients);
+	//m_context->AddCommandQueue(m_accumulateGradients);
+	for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = m_accumulateGradientsCommands.GetFirst(); node; node = node->GetNext())
+	{
+		ndSharedPtr<ndBrainGpuCommand>& command = node->GetInfo();
+		m_context->AddCommandQueue(command);
+	}
+
 	m_context->AddCommandQueue(m_adamOtimizerUpdate);
 	m_context->AddCommandQueue(m_adamMomentumUpdate);
 
-	ndBrainVector buffer;
-	auto SaveBuffer = [this, &buffer](const char* fileName, const ndSharedPtr<ndBrainGpuBuffer>& gpuBuffer)
-	{
-		SyncQueue();
-		FILE* log = fopen(fileName, "wb");
-		UnloadBuffer(buffer, gpuBuffer);
-
-		union FloatInt
-		{
-			float floatValue;
-			int intValue;
-		};
-		for (ndInt32 i = 0; i < buffer.GetCount(); ++i)
-		{
-			FloatInt a;
-			a.floatValue = buffer[i];
-			fprintf(log, "%x ", a.intValue);
-		}
-		fclose(log);
-	};
-
-	auto CheckBuffer = [this, &buffer](const char* fileName, const ndSharedPtr<ndBrainGpuBuffer>& gpuBuffer)
-	{
-		SyncQueue();
-		FILE* log = fopen(fileName, "rb");
-		UnloadBuffer(buffer, gpuBuffer);
-
-		union FloatInt
-		{
-			float floatValue;
-			int intValue;
-		};
-		for (ndInt32 i = 0; i < buffer.GetCount(); ++i)
-		{
-			FloatInt a;
-			FloatInt b;
-			b.floatValue = buffer[i];
-			fscanf(log, "%x ", &a.intValue);
-			ndAssert(a.intValue == b.intValue);
-		}
-		fclose(log);
-	};
-
+//	ndBrainVector buffer;
+//	auto SaveBuffer = [this, &buffer](const char* fileName, const ndSharedPtr<ndBrainGpuBuffer>& gpuBuffer)
+//	{
+//		SyncQueue();
+//		FILE* log = fopen(fileName, "wb");
+//		UnloadBuffer(buffer, gpuBuffer);
+//
+//		union FloatInt
+//		{
+//			float floatValue;
+//			int intValue;
+//		};
+//		for (ndInt32 i = 0; i < buffer.GetCount(); ++i)
+//		{
+//			FloatInt a;
+//			a.floatValue = buffer[i];
+//			fprintf(log, "%x ", a.intValue);
+//		}
+//		fclose(log);
+//	};
+//
+//	auto CheckBuffer = [this, &buffer](const char* fileName, const ndSharedPtr<ndBrainGpuBuffer>& gpuBuffer)
+//	{
+//		SyncQueue();
+//		FILE* log = fopen(fileName, "rb");
+//		UnloadBuffer(buffer, gpuBuffer);
+//
+//		union FloatInt
+//		{
+//			float floatValue;
+//			int intValue;
+//		};
+//		for (ndInt32 i = 0; i < buffer.GetCount(); ++i)
+//		{
+//			FloatInt a;
+//			FloatInt b;
+//			b.floatValue = buffer[i];
+//			fscanf(log, "%x ", &a.intValue);
+//			ndAssert(a.intValue == b.intValue);
+//		}
+//		fclose(log);
+//	};
+//
 //#if 0
 //	//SaveBuffer("gpuLog1.txt", m_inputOutputBuffer);
 //	SaveBuffer("gpuLog0.txt", m_weightAndBiasBuffer);

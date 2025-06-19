@@ -551,7 +551,7 @@ R""""(
         }
     }
 
-    __kernel void brainAccumulateGradients(
+    __kernel void brainAccumulateGradientsAndAverage(
             __global const UniformBufferLayerArguments* parameters,
             __global float* gradientBuffer)
     {
@@ -572,6 +572,39 @@ R""""(
         float weightFactor = 1.0f / (float)miniBatchSize;
         barrier(CLK_LOCAL_MEM_FENCE); 
 
+        gradientBuffer[start + itemId] = sum * weightFactor;
+    }
+
+    __kernel void brainAccumulateGradients(
+            __global const UniformBufferLayerArguments* parameters,
+            __global float* gradientBuffer)
+    {
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+
+        uint inputSize = parameters->m_inputSize;
+        uint miniBatchSize = parameters->m_inputOutputSize;
+        
+        uint dst = parameters->m_parametersStartOffset + groupId * workGroupSize;
+        uint src = dst + parameters->m_parametersBatchSize;
+        float a = gradientBuffer[src + itemId];
+        gradientBuffer[dst + itemId] += a;
+    }
+
+    __kernel void brainAverageGradients(
+            __global const UniformBufferLayerArguments* parameters,
+            __global float* gradientBuffer)
+    {
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+
+        uint start = groupId * workGroupSize;
+        uint miniBatchSize = parameters->m_inputOutputSize;
+        
+        float weightFactor = 1.0f / (float)miniBatchSize;
+        float sum = gradientBuffer[start + itemId];
         gradientBuffer[start + itemId] = sum * weightFactor;
     }
 
@@ -912,7 +945,9 @@ void ndBrainGpuContext::CreateKerners()
     m_brainLayerCathegoricalSoftmaxBackPropagate = CreateKerner(program, "brainLayerBrainCathegoricalSoftmaxBackPropagate");
 
     // accumulate gradient kernels
+    m_brainAverageGradients = CreateKerner(program, "brainAverageGradients");
     m_brainAccumulateGradients = CreateKerner(program, "brainAccumulateGradients");
+    m_brainAccumulateGradientsAndAverage = CreateKerner(program, "brainAccumulateGradientsAndAverage");
 
     // optimizer kernels
     m_brainAdamMomentumUpdate = CreateKerner(program, "brainAdamMomentumUpdate");

@@ -692,11 +692,11 @@ class brainLayerBrainLinearDropOutBackPropagate : public ndBrainGpuShader
     }
 };
 
-// extra kernels
-class brainAccumulateGradients : public ndBrainGpuShader
+// accumulate kernel gradienst
+class brainAccumulateGradientsAndAverage : public ndBrainGpuShader
 {
     public:
-    brainAccumulateGradients(ndBrainGpuContext* const context)
+    brainAccumulateGradientsAndAverage(ndBrainGpuContext* const context)
         :ndBrainGpuShader(context)
     {
     }
@@ -733,6 +733,60 @@ class brainAccumulateGradients : public ndBrainGpuShader
         for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
         {
             ndBrainFloat sum = accRegister[itemId];
+            gradientBuffer[start + itemId] = sum * weightFactor;
+        }
+    }
+};
+
+class brainAccumulateGradients : public ndBrainGpuShader
+{
+    public:
+    brainAccumulateGradients(ndBrainGpuContext* const context)
+        :ndBrainGpuShader(context)
+    {
+    }
+
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    {
+        ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
+        ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+
+        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
+        ndBrainFloat* const gradientBuffer = &buffer1->m_buffer[0];
+
+        ndInt32 dst = parameters->m_parametersStartOffset + groupId * workGroupSize;
+        ndInt32 src = dst + parameters->m_parametersBatchSize;
+        for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+        {
+            ndBrainFloat a = gradientBuffer[src + itemId];
+            gradientBuffer[dst + itemId] += a;
+        }
+    }
+};
+
+class brainAverageGradients : public ndBrainGpuShader
+{
+    public:
+    brainAverageGradients(ndBrainGpuContext* const context)
+        :ndBrainGpuShader(context)
+    {
+    }
+
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    {
+        ndBrainGpuFloatBuffer* const buffer1 = (ndBrainGpuFloatBuffer*)m_parameters[1];
+        ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+
+        ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)&buffer0->m_data[0];
+        ndBrainFloat* const gradientBuffer = &buffer1->m_buffer[0];
+
+        ndInt32 start = groupId * workGroupSize;
+
+        ndInt32 miniBatchSize = ndInt32(parameters->m_inputOutputSize);
+        ndBrainFloat weightFactor = ndBrainFloat(1.0f) / ndBrainFloat(miniBatchSize);
+        for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+        {
+            ndBrainFloat sum = gradientBuffer[start + itemId];
             gradientBuffer[start + itemId] = sum * weightFactor;
         }
     }
@@ -1144,7 +1198,9 @@ void ndBrainGpuContext::CreateKerners()
     m_brainLayerCathegoricalSoftmaxBackPropagate = ndSharedPtr<ndBrainGpuShader>(new brainLayerBrainCathegoricalSoftmaxBackPropagate(this));
 
     // accumulate gradient kernels
+    m_brainAverageGradients = ndSharedPtr<ndBrainGpuShader>(new brainAverageGradients(this));
     m_brainAccumulateGradients = ndSharedPtr<ndBrainGpuShader>(new brainAccumulateGradients(this));
+    m_brainAccumulateGradientsAndAverage = ndSharedPtr<ndBrainGpuShader>(new brainAccumulateGradientsAndAverage(this));
 
     // optimizer kernels
     m_brainAdamMomentumUpdate = ndSharedPtr<ndBrainGpuShader>(new brainAdamMomentumUpdate(this));

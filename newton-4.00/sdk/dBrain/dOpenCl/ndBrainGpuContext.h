@@ -61,7 +61,9 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainGpuShader> m_brainLayerCathegoricalSoftmaxBackPropagate;
 
 	// add all the partial gradinets
+	ndSharedPtr<ndBrainGpuShader> m_brainAverageGradients;
 	ndSharedPtr<ndBrainGpuShader> m_brainAccumulateGradients;
+	ndSharedPtr<ndBrainGpuShader> m_brainAccumulateGradientsAndAverage;
 
 	// optimizer shaders
 	ndSharedPtr<ndBrainGpuShader> m_brainAdamMomentumUpdate;
