@@ -10,16 +10,14 @@
 */
 
 #include "ndBrainStdafx.h"
-#include "ndBrainGpuBuffer.h"
-#include "ndBrainGpuContext.h"
+#include "ndBrainBuffer.h"
 
-ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainContext* const context, ndInt64 sizeInByte, ndStorageBufferType bufferTypeFlags)
-	:ndBrainBuffer(context, sizeInByte, bufferTypeFlags)
-	,m_buffer(**context->GetAsGpuContext()->m_context, cl_mem_flags((bufferTypeFlags == ndStorageData) ? CL_MEM_READ_WRITE : CL_MEM_READ_ONLY), size_t(sizeInByte))
+ndBrainBuffer::ndBrainBuffer(ndBrainContext* const context, ndInt64 sizeInByte, ndStorageBufferType)
+	:m_context(context)
 	,m_sizeInBytes(size_t(sizeInByte))
 {
 }
 
-ndBrainGpuBuffer::~ndBrainGpuBuffer()
+ndBrainBuffer::~ndBrainBuffer()
 {
 }

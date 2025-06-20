@@ -8,22 +8,24 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
-#ifndef __ND_BRAIN_GPU_FLOAT_BUFFER_H__
-#define __ND_BRAIN_GPU_FLOAT_BUFFER_H__
+#ifndef __ND_BRAIN_CPU_FLOAT_BUFFER_H__
+#define __ND_BRAIN_CPU_FLOAT_BUFFER_H__
 
 #include "ndBrainGpuBuffer.h"
 
-class ndBrainGpuFloatBuffer : public ndBrainGpuBuffer
+class ndBrainCpuFloatBuffer : public ndBrainBuffer
 {
 	public:
-	ndBrainGpuFloatBuffer(ndBrainContext* const context, ndInt64 size);
-	ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainVector& input);
-	ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainMatrix& matrix);
+	ndBrainCpuFloatBuffer(ndBrainContext* const context, ndInt64 size);
+	ndBrainCpuFloatBuffer(ndBrainContext* const context, const ndBrainVector& input);
+	ndBrainCpuFloatBuffer(ndBrainContext* const context, const ndBrainMatrix& matrix);
 
 	void LoadBuffer(const ndBrainMatrix* const matrix);
 
 	virtual void LoadData(size_t sizeInBytes, const void* const sourceData) override;
 	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const override;
+
+	ndBrainVector m_buffer;
 };
 
 #endif

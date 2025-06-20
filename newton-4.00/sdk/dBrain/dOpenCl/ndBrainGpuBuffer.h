@@ -12,38 +12,23 @@
 #define __ND_BRAIN_GPU_BUFFER_H__
 
 #include "ndBrainStdafx.h"
+#include "ndBrainBuffer.h"
 
 class ndBrainVector;
-class ndBrainGpuContext;
+class ndBrainMatrix;
 class ndBrainGpuBuffer;
+class ndBrainGpuContext;
 
-enum ndStorageBufferType
-{
-	ndStorageData,
-	ndUniformData
-};
-
-enum ndDeviceBufferType
-{
-	ndGpuOnly,
-	ndCpuMappable,
-};
-
-class ndBrainGpuBuffer : public ndClassAlloc
+class ndBrainGpuBuffer : public ndBrainBuffer
 {
 	protected:
-	ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt64 sizeInByte, ndStorageBufferType bufferTypeFlags, ndDeviceBufferType deviceType);
+	ndBrainGpuBuffer(ndBrainContext* const context, ndInt64 sizeInByte, ndStorageBufferType bufferTypeFlags);
 
 	public:
 	virtual ~ndBrainGpuBuffer();
 
-	size_t SizeInBytes() const { return m_sizeInBytes; }
-	virtual void LoadData(size_t sizeInBytes, const void* const inputData) = 0;
-	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const = 0;
-
 	protected:
 	cl::Buffer m_buffer;
-	ndBrainGpuContext* m_context;
 	size_t m_sizeInBytes;
 	friend class ndBrainGpuContext;
 	friend class ndBrainGpuCommand;

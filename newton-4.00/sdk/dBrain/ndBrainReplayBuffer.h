@@ -26,6 +26,7 @@
 #include "ndBrainVector.h"
 #include "ndBrainMatrix.h"
 
+#if 0
 template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainReplayTransitionMemory
 {
@@ -147,5 +148,6 @@ void ndBrainReplayBuffer<statesDim, actionDim>::AddTransition(const ndBrainRepla
 		m_replayBufferIndex = (m_replayBufferIndex + 1) % ndArray<ndBrainReplayTransitionMemory<statesDim, actionDim>>::GetCapacity();
 	}
 }
+#endif 
 #endif 
 

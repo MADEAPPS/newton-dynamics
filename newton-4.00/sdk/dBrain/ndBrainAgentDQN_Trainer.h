@@ -27,8 +27,8 @@
 #include "ndBrainLayer.h"
 #include "ndBrainAgent.h"
 #include "ndBrainTrainer.h"
-#include "ndBrainReplayBuffer.h"
 #include "ndBrainLayerLinear.h"
+//#include "ndBrainReplayBuffer.h"
 #include "ndBrainLayerActivationTanh.h"
 #include "ndBrainLossLeastSquaredError.h"
 
@@ -109,8 +109,8 @@ class ndBrainAgentDQN_Trainer: public ndBrainAgent, public ndBrainThreadPool
 	ndBrainOptimizerAdamLegacy* m_optimizer;
 	ndArray<ndBrainTrainer*> m_trainers;
 
-	ndBrainReplayBuffer<statesDim, 1> m_replayBuffer;
-	ndBrainReplayTransitionMemory<statesDim, 1> m_currentTransition;
+	//ndBrainReplayBuffer<statesDim, 1> m_replayBuffer;
+	//ndBrainReplayTransitionMemory<statesDim, 1> m_currentTransition;
 	
 	ndBrainFloat m_gamma;
 	ndBrainFloat m_learnRate;

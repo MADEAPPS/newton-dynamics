@@ -15,13 +15,13 @@
 #include "ndBrainGpuUniformBuffer.h"
 //#include "ndBrainGpuScopeMapBuffer.h"
 
-ndBrainGpuUniformBuffer::ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes)
-	:ndBrainGpuBuffer(context, sizeInBytes, ndUniformData, ndCpuMappable)
+ndBrainGpuUniformBuffer::ndBrainGpuUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes)
+	:ndBrainGpuBuffer(context, sizeInBytes, ndUniformData)
 {
 }
 
-ndBrainGpuUniformBuffer::ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes, const void* const data)
-	:ndBrainGpuBuffer(context, sizeInBytes, ndUniformData, ndCpuMappable)
+ndBrainGpuUniformBuffer::ndBrainGpuUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, const void* const data)
+	:ndBrainGpuBuffer(context, sizeInBytes, ndUniformData)
 {
 	LoadData(size_t(sizeInBytes), data);
 }
@@ -32,7 +32,7 @@ void ndBrainGpuUniformBuffer::UnloadData(size_t, void* const) const
 
 void ndBrainGpuUniformBuffer::LoadData(size_t sizeInBytes, const void* const sourceData)
 {
-	ndSharedPtr<cl::CommandQueue>& queue = m_context->m_queue;
+	ndSharedPtr<cl::CommandQueue>& queue = m_context->GetAsGpuContext()->m_queue;
 
 	cl_int error = 0;
 	ndAssert(sizeInBytes == m_sizeInBytes);

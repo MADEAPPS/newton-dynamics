@@ -11,18 +11,27 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainVector.h"
+#include "ndBrainMatrix.h"
 #include "ndBrainGpuContext.h"
 #include "ndBrainGpuFloatBuffer.h"
 
-ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, ndInt64 size, ndDeviceBufferType deviceType)
-	:ndBrainGpuBuffer(context, size * ndInt32(sizeof(ndReal)), ndStorageData, deviceType)
+ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, ndInt64 size)
+	:ndBrainGpuBuffer(context, size * ndInt32(sizeof(ndReal)), ndStorageData)
 {
 }
 
-ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, const ndBrainVector& input, ndDeviceBufferType deviceType)
-	:ndBrainGpuBuffer(context, input.GetCount() * ndInt32(sizeof(ndReal)), ndStorageData, deviceType)
+ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainVector& input)
+	:ndBrainGpuBuffer(context, input.GetCount() * ndInt32(sizeof(ndReal)), ndStorageData)
 {
+	ndAssert(m_context->GetAsGpuContext());
 	LoadData(input.GetCount() * sizeof (ndReal), &input[0]);
+}
+
+ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainMatrix& matrix)
+	:ndBrainGpuBuffer(context, matrix.GetColumns() * matrix.GetRows() * ndInt32(sizeof(ndReal)), ndStorageData)
+{
+	ndAssert(m_context->GetAsGpuContext());
+	LoadBuffer(&matrix);
 }
 
 void ndBrainGpuFloatBuffer::LoadData(size_t sizeInBytes, const void* const sourceData)
@@ -42,9 +51,11 @@ void ndBrainGpuFloatBuffer::LoadData(size_t sizeInBytes, const void* const sourc
 	//	size_type offset, size_type size, const void* ptr,
 	//	const vector<Event>* events = nullptr, Event* event = nullptr) const
 
+	ndAssert(m_context->GetAsGpuContext());
+
 	cl_int error = 0;
 	ndAssert(sizeInBytes == m_sizeInBytes);
-	ndSharedPtr<cl::CommandQueue>& queue = m_context->m_queue;
+	ndSharedPtr<cl::CommandQueue>& queue = m_context->GetAsGpuContext()->m_queue;
 	error =	queue->enqueueWriteBuffer(m_buffer, CL_TRUE, 0, sizeInBytes, sourceData);
 	ndAssert(error == CL_SUCCESS);
 }
@@ -53,7 +64,48 @@ void ndBrainGpuFloatBuffer::UnloadData(size_t sizeInBytes, void* const destinati
 {
 	cl_int error = 0;
 	ndAssert(sizeInBytes == m_sizeInBytes);
-	ndSharedPtr<cl::CommandQueue>& queue = m_context->m_queue;
+	ndAssert(m_context->GetAsGpuContext());
+	ndSharedPtr<cl::CommandQueue>& queue = m_context->GetAsGpuContext()->m_queue;
 	error = queue->enqueueReadBuffer(m_buffer, CL_TRUE, 0, sizeInBytes, destinationData);
+	ndAssert(error == CL_SUCCESS);
+}
+
+void ndBrainGpuFloatBuffer::LoadBuffer(const ndBrainMatrix* const matrix)
+{
+	//cl_int enqueueWriteBufferRect(
+	//	const Buffer & buffer,
+	//	cl_bool blocking,
+	//	const array<size_type, 2>&buffer_offset,
+	//	const array<size_type, 2>&host_offset,
+	//	const array<size_type, 2>&region,
+	//	size_type buffer_row_pitch,
+	//	size_type buffer_slice_pitch,
+	//	size_type host_row_pitch,
+	//	size_type host_slice_pitch,
+	//	const void* ptr,
+	//	const vector<Event>*events = nullptr,
+	//	Event * event = nullptr) const
+
+	ndAssert(m_context->GetAsGpuContext());
+
+	std::array<size_t, 2> region;
+	std::array<size_t, 2> host_offset;
+	std::array<size_t, 2> buffer_offset;
+	
+	host_offset[0] = 0;
+	host_offset[1] = 0;
+	buffer_offset[0] = 0;
+	buffer_offset[1] = 0;
+	region[1] = size_t(matrix->GetRows());
+	region[0] = size_t(matrix->GetColumns() * sizeof(ndReal));
+
+	cl_int error = 0;
+	ndSharedPtr<cl::CommandQueue>& queue = m_context->GetAsGpuContext()->m_queue;
+	error = queue->enqueueWriteBufferRect(
+		m_buffer, CL_TRUE,
+		buffer_offset, host_offset, region,
+		matrix->GetColumns() * sizeof(ndReal), 0,
+		matrix->GetColumns() * sizeof(ndReal), 0,
+		&matrix[0][0]);
 	ndAssert(error == CL_SUCCESS);
 }

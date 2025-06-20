@@ -208,6 +208,7 @@ namespace ndQuadruped_3
 
 					output[0].m_posit.m_y += 0.25f;
 
+					//param = 0.0f;
 					//ndFloat32 gaitFraction = 0.25f;
 					//ndFloat32 gaitGuard = gaitFraction * 0.25f;
 					//ndFloat32 omega = ndPi / (gaitFraction - gaitGuard);

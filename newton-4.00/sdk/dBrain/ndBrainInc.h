@@ -28,6 +28,7 @@
 #include <ndBrainAgent.h>
 #include <ndBrainLayer.h>
 #include <ndBrainVector.h>
+#include <ndBrainBuffer.h>
 #include <ndBrainMatrix.h>
 #include <ndBrainContext.h>
 #include <ndBrainTrainer.h>
@@ -40,8 +41,9 @@
 #include <ndBrainTrainerGpu.h>
 #include <ndBrainThreadPool.h>
 #include <ndBrainLayerLinear.h>
-#include <ndBrainReplayBuffer.h>
+//#include <ndBrainReplayBuffer.h>
 #include <ndBrainOptimizerSgd.h>
+#include <ndBrainCpuFloatBuffer.h>
 #include <ndBrainLayerActivation.h>
 #include <ndBrainOptimizerAdamCpu.h>
 #include <ndBrainOptimizerAdamGpu.h>

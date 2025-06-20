@@ -26,7 +26,7 @@
 #include "ndBrain.h"
 #include "ndBrainAgent.h"
 #include "ndBrainTrainer.h"
-#include "ndBrainReplayBuffer.h"
+//#include "ndBrainReplayBuffer.h"
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 class ndBrainAgentDQN: public ndBrainAgent

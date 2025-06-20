@@ -142,11 +142,11 @@ static ndBrainMatrix* LoadMnistSampleData(const char* const filename)
 
 static void MnistTrainingSet()
 {
-	ndSharedPtr<ndBrainMatrix> trainingLabels (LoadMnistLabelData("mnistDatabase/train-labels.idx1-ubyte"));
-	ndSharedPtr<ndBrainMatrix> trainingDigits (LoadMnistSampleData("mnistDatabase/train-images.idx3-ubyte"));
-
 	ndSharedPtr<ndBrainMatrix> testLabels(LoadMnistLabelData("mnistDatabase/t10k-labels.idx1-ubyte"));
+	ndSharedPtr<ndBrainMatrix> trainingLabels (LoadMnistLabelData("mnistDatabase/train-labels.idx1-ubyte"));
+
 	ndSharedPtr<ndBrainMatrix> testDigits(LoadMnistSampleData("mnistDatabase/t10k-images.idx3-ubyte"));
+	ndSharedPtr<ndBrainMatrix> trainingDigits (LoadMnistSampleData("mnistDatabase/train-images.idx3-ubyte"));
 	
 	class SupervisedTrainer
 	{
@@ -154,7 +154,6 @@ static void MnistTrainingSet()
 		SupervisedTrainer(const ndSharedPtr<ndBrain>& brain)
 			:m_brain(brain)
 			,m_context()
-			,m_prioritySamples()
 			,m_learnRate(ndReal(5.0e-4f))
 			,m_miniBatchSize(MINIST_MINIBATCH_BUFFER_SIZE)
 			,m_minCombinedScore(ndInt64(1000000) * ndInt64(1000000))
@@ -162,7 +161,6 @@ static void MnistTrainingSet()
 			,m_hasGpuSupport(m_brain->IsGpuReady())
 		{
 			m_hasGpuSupport = false;
-			m_prioritySamples.SetCount(m_miniBatchSize);
 			if (m_hasGpuSupport)
 			{
 				m_context = ndSharedPtr<ndBrainContext>(new ndBrainGpuContext);
@@ -235,7 +233,8 @@ static void MnistTrainingSet()
 			return failCount;
 		}
 
-		void Optimize(ndBrainMatrix* const trainingLabels, ndBrainMatrix* const trainingDigits,
+		void Optimize(
+			ndBrainMatrix* const trainingLabels, ndBrainMatrix* const trainingDigits,
 			ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
 		{
 			//// so far best training result on the mnist data set
@@ -284,8 +283,6 @@ static void MnistTrainingSet()
 						ndBrainMemVector input(&miniBatchInput[i * inputSize], inputSize);
 						input.SetCount(inputSize);
 						input.Set((*trainingDigits)[index]);
-						//input.Set(0.0f);
-						//input[i] = 1.0f;
 					}
 
 					//trainer->MakePrediction(miniBatchInput);
@@ -356,7 +353,8 @@ static void MnistTrainingSet()
 		ndSharedPtr<ndBrain> m_bestBrain;
 		ndSharedPtr<ndBrainTrainer> m_trainer;
 		ndSharedPtr<ndBrainContext> m_context;
-		ndFixSizeArray<ndFixSizeArray<ndUnsigned32, 16>, MINIST_MINIBATCH_BUFFER_SIZE> m_prioritySamples;
+
+		ndSharedPtr<ndBrainBuffer> m_trainingData;
 		ndReal m_learnRate;
 		ndInt32 m_miniBatchSize;
 		ndInt64 m_minCombinedScore;
@@ -426,6 +424,16 @@ static void MnistTrainingSet()
 		ndExpandTraceMessage("training mnist database, number of parameters %d\n", brain->GetNumberOfParameters());
 	
 		SupervisedTrainer optimizer(brain);
+
+		ndBrainContext* const context = *optimizer.m_trainer->GetContext();
+		if (optimizer.m_hasGpuSupport)
+		{
+			optimizer.m_trainingData = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuFloatBuffer(context, **trainingDigits));
+		}
+		else
+		{
+			optimizer.m_trainingData = ndSharedPtr<ndBrainBuffer>(new ndBrainCpuFloatBuffer(context, **trainingDigits));
+		}
 
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
 		optimizer.Optimize(*trainingLabels, *trainingDigits, *testLabels, *testDigits);

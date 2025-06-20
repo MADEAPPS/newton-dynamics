@@ -391,8 +391,8 @@ void TestVulkanStuff()
 	uniformParam.m_inputOutputSize = ndUnsigned32(matrix.GetColumns() + matrix.GetRows());
 	uniformParam.m_inputOutputStartOffset = 0;
 	
-	ndBrainGpuFloatBuffer inputOutputBuffer(&context, workBuffer, ndCpuMappable);
-	ndBrainGpuFloatBuffer weightParamBuffer(&context, parameters, ndCpuMappable);
+	ndBrainGpuFloatBuffer inputOutputBuffer(&context, workBuffer);
+	ndBrainGpuFloatBuffer weightParamBuffer(&context, parameters);
 	ndBrainGpuUniformBuffer parammeters(&context, sizeof(UniformBufferObject));
 	parammeters.LoadData(sizeof(UniformBufferObject), &uniformParam);
 
