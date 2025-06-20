@@ -14,7 +14,7 @@
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuContext.h"
 
-ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt64 sizeInBytes, ndStorageBufferType, ndDeviceBufferType)
+ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt64 sizeInBytes, ndStorageBufferType)
 	:m_context (context)
 	,m_sizeInBytes(size_t(sizeInBytes))
 {

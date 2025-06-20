@@ -27,6 +27,7 @@
 #include "ndBrainMatrix.h"
 #include "ndBrainThreadPool.h"
 #include "ndBrainCpuContext.h"
+#include "ndBrainCpuFloatBuffer.h"
 #include "ndBrainTrainerCpuInference.h"
 #include "ndBrainLayerActivationSoftmax.h"
 
@@ -116,8 +117,11 @@ void ndBrainTrainerCpuInference::InitWeightAndBiasBuffer()
 		layer->CopyCpuWeights(weights);
 	}
 	
-	ndAssert(0);
+	ndBrainVector scratchBuffer;
+	scratchBuffer.SetCount(m_miniBatchSize* brain.GetInputSize());
+	scratchBuffer.Set(ndBrainFloat(0.0f));
 	//m_miniBatchInputBuffer = ndSharedPtr<ndBrainCpuFloatBuffer>(new ndBrainCpuFloatBuffer(*m_context, m_miniBatchSize * brain.GetInputSize()));
+	m_miniBatchInputBuffer = ndSharedPtr<ndBrainCpuFloatBuffer>(new ndBrainCpuFloatBuffer(*m_context, scratchBuffer));
 	//m_miniBatchInputBuffer.SetCount(m_miniBatchSize * brain.GetInputSize());
 	//m_miniBatchInputBuffer.Set(ndBrainFloat(0.0f));
 	

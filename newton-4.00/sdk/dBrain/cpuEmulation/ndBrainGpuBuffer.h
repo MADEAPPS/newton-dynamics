@@ -12,23 +12,11 @@
 #define __ND_BRAIN_GPU_BUFFER_H__
 
 #include "ndBrainStdafx.h"
+#include "ndBrainBuffer.h"
 
 class ndBrainVector;
-class ndBrainGpuContext;
 class ndBrainGpuBuffer;
-
-
-enum ndStorageBufferType
-{
-	ndStorageData,
-	ndUniformData
-};
-
-enum ndDeviceBufferType
-{
-	ndGpuOnly,
-	ndCpuMappable,
-};
+class ndBrainGpuContext;
 
 class ndBrainGpuFloatBuffer;
 class ndBrainGpuUniformBuffer;
@@ -36,20 +24,25 @@ class ndBrainGpuUniformBuffer;
 class ndBrainGpuBuffer : public ndClassAlloc
 {
 	protected:
-	ndBrainGpuBuffer(ndBrainGpuContext* const, ndInt64, ndStorageBufferType, ndDeviceBufferType);
+	ndBrainGpuBuffer(ndBrainGpuContext* const, ndInt64, ndStorageBufferType);
 
 	public:
 	virtual ~ndBrainGpuBuffer();
 	
-	size_t SizeInBytes() const;
+	virtual void BrainVectorToDevice(const ndBrainVector& vector) override;
+	virtual void BrainVectorFromDevice(ndBrainVector& vector) const override;
 
-	virtual ndBrainGpuFloatBuffer* GetAsFloatBuffer();
-	virtual ndBrainGpuUniformBuffer* GetAsUniformBuffer();
+	virtual void BrainMatrixToDevice(const ndBrainMatrix* const matrix) override;
 
-	virtual void LoadData(size_t sizeInBytes, const void* const inputData) = 0;
-	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const = 0;
+	virtual void MemoryToDevive(size_t sizeInBytes, const void* const inputData) override;
+	virtual void MemoryFromDevive(size_t sizeInBytes, void* const outputMemory) const override;
+
+	virtual void CopyBuffer(const ndBrainBuffer& source, size_t sourceOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes) override;
 
 	protected:
+	virtual void LoadData(size_t sizeInBytes, const void* const sourceData) override;
+	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const override;
+
 	ndBrainGpuContext* m_context;
 	size_t m_sizeInBytes;
 };

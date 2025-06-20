@@ -11,7 +11,7 @@
 #ifndef __ND_BRAIN_CPU_FLOAT_BUFFER_H__
 #define __ND_BRAIN_CPU_FLOAT_BUFFER_H__
 
-#include "ndBrainGpuBuffer.h"
+#include "ndBrainBuffer.h"
 
 class ndBrainCpuFloatBuffer : public ndBrainBuffer
 {
@@ -20,13 +20,24 @@ class ndBrainCpuFloatBuffer : public ndBrainBuffer
 	ndBrainCpuFloatBuffer(ndBrainContext* const context, const ndBrainVector& input);
 	ndBrainCpuFloatBuffer(ndBrainContext* const context, const ndBrainMatrix& matrix);
 
-	void LoadBuffer(const ndBrainMatrix* const matrix);
+	virtual void BrainVectorToDevice(const ndBrainVector& vector) override;
+	virtual void BrainVectorFromDevice(ndBrainVector& vector) const override;
 
-	virtual void LoadData(size_t sizeInBytes, const void* const sourceData) override;
-	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const override;
+	virtual void BrainMatrixToDevice(const ndBrainMatrix* const matrix) override;
+
+	virtual void MemoryToDevive(size_t sizeInBytes, const void* const inputData) override;
+	virtual void MemoryFromDevive(size_t sizeInBytes, void* const outputMemory) const override;
+
 	virtual void CopyBuffer(const ndBrainBuffer& source, size_t sourceOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes) override;
 
+	protected:
+	virtual void LoadData(size_t sizeInBytes, const void* const sourceData) override;
+	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const override;
+
 	ndBrainVector m_buffer;
+
+	friend class ndBrainTrainerCpu;
+	friend class ndBrainTrainerCpuInference;
 };
 
 #endif

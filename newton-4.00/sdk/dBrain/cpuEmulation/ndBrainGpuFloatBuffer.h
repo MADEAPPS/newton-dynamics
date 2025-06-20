@@ -18,8 +18,8 @@
 class ndBrainGpuFloatBuffer : public ndBrainGpuBuffer
 {
 	public:
-	ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, ndInt64 size, ndDeviceBufferType deviceType = ndGpuOnly);
-	ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, const ndBrainVector& input, ndDeviceBufferType deviceType = ndGpuOnly);
+	ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, ndInt64 size);
+	ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, const ndBrainVector& input);
 
 	virtual ndBrainGpuFloatBuffer* GetAsFloatBuffer() override;
 	virtual void LoadData(size_t sizeInBytes, const void* const inputData) override;

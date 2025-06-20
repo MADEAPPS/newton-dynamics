@@ -19,9 +19,6 @@ class ndBrainGpuFloatBuffer : public ndBrainGpuBuffer
 	ndBrainGpuFloatBuffer(ndBrainContext* const context, ndInt64 size);
 	ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainVector& input);
 	ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainMatrix& matrix);
-
-	//void UnloadData(ndBrainVector& ouput) const;
-	//void LoadBuffer(const ndBrainMatrix* const matrix);
 };
 
 #endif

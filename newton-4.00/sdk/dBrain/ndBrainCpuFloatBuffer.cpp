@@ -18,58 +18,116 @@
 ndBrainCpuFloatBuffer::ndBrainCpuFloatBuffer(ndBrainContext* const context, ndInt64 sizeInFloat)
 	:ndBrainBuffer(context, sizeInFloat * ndInt32(sizeof(ndReal)), ndStorageData)
 {
-	m_buffer.SetCount(sizeInFloat);
-	m_buffer.Set(ndBrainFloat(0.0f));
+	ndAssert(0);
+	//m_buffer.SetCount(sizeInFloat);
+	//m_buffer.Set(ndBrainFloat(0.0f));
 }
 
 ndBrainCpuFloatBuffer::ndBrainCpuFloatBuffer(ndBrainContext* const context, const ndBrainVector& input)
 	:ndBrainBuffer(context, input.GetCount() * ndInt32(sizeof(ndReal)), ndStorageData)
 {
 	ndAssert(m_context->GetAsCpuContext());
-	m_buffer.SetCount(ndInt64(m_sizeInBytes / sizeof(ndReal)));
-	LoadData(input.GetCount() * sizeof (ndReal), &input[0]);
+	m_buffer.SetCount(input.GetCount());
+	BrainVectorToDevice(input);
 }
 
 ndBrainCpuFloatBuffer::ndBrainCpuFloatBuffer(ndBrainContext* const context, const ndBrainMatrix& matrix)
 	:ndBrainBuffer(context, matrix.GetColumns() * matrix.GetRows() * ndInt32(sizeof(ndReal)), ndStorageData)
 {
 	ndAssert(m_context->GetAsCpuContext());
-	m_buffer.SetCount(ndInt64(m_sizeInBytes / sizeof(ndReal)));
-	LoadBuffer(&matrix);
+	m_buffer.SetCount(matrix.GetColumns() * matrix.GetRows());
+	BrainMatrixToDevice(&matrix);
 }
 
-//void ndBrainCpuFloatBuffer::LoadData(size_t sizeInBytes, const void* const sourceData)
-void ndBrainCpuFloatBuffer::LoadData(size_t, const void* const)
+////void ndBrainCpuFloatBuffer::LoadData(size_t sizeInBytes, const void* const sourceData)
+//void ndBrainCpuFloatBuffer::LoadData(size_t, const void* const)
+//{
+//	ndAssert(0);
+//}
+//
+////void ndBrainCpuFloatBuffer::UnloadData(size_t sizeInBytes, void* const destinationData) const
+//void ndBrainCpuFloatBuffer::UnloadData(size_t, void* const) const
+//{
+//	ndAssert(0);
+//}
+//
+//void ndBrainCpuFloatBuffer::LoadBuffer(const ndBrainMatrix* const matrix)
+//{
+//	for (ndInt32 i = 0; i < matrix->GetRows(); ++i)
+//	{
+//		ndBrainMemVector dst (&m_buffer[i * matrix->GetColumns()], matrix->GetColumns());
+//		dst.Set((*matrix)[i]);
+//	}
+//}
+//
+//void ndBrainCpuFloatBuffer::CopyBuffer(const ndBrainBuffer& source, size_t srcOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes)
+//{
+//	size_t size = sizeInBytes / sizeof(ndReal);
+//	size_t srcOffset = srcOffsetInBytes / sizeof(ndReal);
+//	size_t dstOffset = dstOffsetInBytes / sizeof(ndReal);
+//	ndAssert(size <= size_t(m_buffer.GetCount()));
+//	ndAssert((dstOffset + size) * sizeof(ndReal) <= SizeInBytes());
+//	ndAssert((srcOffset + size) * sizeof (ndReal) <= source.SizeInBytes());
+//
+//	ndBrainMemVector dst(&m_buffer[ndInt64(dstOffset)], ndInt64(size));
+//	const ndBrainCpuFloatBuffer& srcBuffer = *((ndBrainCpuFloatBuffer*)&source);
+//	const ndBrainMemVector src(&srcBuffer.m_buffer[ndInt64(srcOffset)], ndInt64(size));
+//	dst.Set(src);
+//}
+
+
+void ndBrainCpuFloatBuffer::BrainVectorToDevice(const ndBrainVector& vector)
+{
+	ndAssert(vector.GetCount() * sizeof(ndReal) <= m_sizeInBytes);
+	LoadData(vector.GetCount() * sizeof(ndReal), &vector[0]);
+}
+
+void ndBrainCpuFloatBuffer::BrainVectorFromDevice(ndBrainVector& vector) const
 {
 	ndAssert(0);
 }
 
-//void ndBrainCpuFloatBuffer::UnloadData(size_t sizeInBytes, void* const destinationData) const
-void ndBrainCpuFloatBuffer::UnloadData(size_t, void* const) const
+void ndBrainCpuFloatBuffer::BrainMatrixToDevice(const ndBrainMatrix* const matrix)
 {
-	ndAssert(0);
-}
-
-void ndBrainCpuFloatBuffer::LoadBuffer(const ndBrainMatrix* const matrix)
-{
-	for (ndInt32 i = 0; i < matrix->GetRows(); ++i)
+	ndBrainVector flatArray;
+	for (ndInt32 i = 0; i < matrix->GetRows(); i++)
 	{
-		ndBrainMemVector dst (&m_buffer[i * matrix->GetColumns()], matrix->GetColumns());
-		dst.Set((*matrix)[i]);
+		for (ndInt32 j = 0; j < matrix->GetColumns(); j++)
+		{
+			flatArray.PushBack((*matrix)[i][j]);
+		}
 	}
+	BrainVectorToDevice(flatArray);
 }
 
-void ndBrainCpuFloatBuffer::CopyBuffer(const ndBrainBuffer& source, size_t srcOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes)
+void ndBrainCpuFloatBuffer::MemoryToDevive(size_t sizeInBytes, const void* const inputData)
 {
-	size_t size = sizeInBytes / sizeof(ndReal);
-	size_t srcOffset = srcOffsetInBytes / sizeof(ndReal);
-	size_t dstOffset = dstOffsetInBytes / sizeof(ndReal);
-	ndAssert(size <= size_t(m_buffer.GetCount()));
-	ndAssert((dstOffset + size) * sizeof(ndReal) <= SizeInBytes());
-	ndAssert((srcOffset + size) * sizeof (ndReal) <= source.SizeInBytes());
+	ndAssert(0);
+}
 
-	ndBrainMemVector dst(&m_buffer[ndInt64(dstOffset)], ndInt64(size));
-	const ndBrainCpuFloatBuffer& srcBuffer = *((ndBrainCpuFloatBuffer*)&source);
-	const ndBrainMemVector src(&srcBuffer.m_buffer[ndInt64(srcOffset)], ndInt64(size));
+void ndBrainCpuFloatBuffer::MemoryFromDevive(size_t sizeInBytes, void* const outputMemory) const
+{
+	ndAssert(0);
+}
+
+void ndBrainCpuFloatBuffer::CopyBuffer(const ndBrainBuffer& sourceData, size_t srcOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes)
+{
+	ndInt64 dstOffset = ndInt64(dstOffsetInBytes / sizeof(ndReal));
+	ndInt64 srcOffset = ndInt64(srcOffsetInBytes / sizeof(ndReal));
+	
+	ndBrainCpuFloatBuffer& source = *((ndBrainCpuFloatBuffer*)&sourceData);
+	ndBrainMemVector dst(&m_buffer[dstOffset], ndInt32(sizeInBytes / sizeof(ndReal)));
+	const ndBrainMemVector src(&source.m_buffer[srcOffset], ndInt32(sizeInBytes / sizeof(ndReal)));
 	dst.Set(src);
+}
+
+void ndBrainCpuFloatBuffer::LoadData(size_t sizeInBytes, const void* const sourceData)
+{
+	ndBrainMemVector src((ndBrainFloat*)sourceData, ndInt32 (sizeInBytes / sizeof(ndReal)));
+	m_buffer.Set(src);
+}
+
+void ndBrainCpuFloatBuffer::UnloadData(size_t sizeInBytes, void* const outputData) const
+{
+	ndAssert(0);
 }

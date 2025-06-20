@@ -18,7 +18,6 @@
 ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainContext* const context, ndInt64 sizeInByte, ndStorageBufferType bufferTypeFlags)
 	:ndBrainBuffer(context, sizeInByte, bufferTypeFlags)
 	,m_buffer(**context->GetAsGpuContext()->m_context, cl_mem_flags((bufferTypeFlags == ndStorageData) ? CL_MEM_READ_WRITE : CL_MEM_READ_ONLY), size_t(sizeInByte))
-	,m_sizeInBytes(size_t(sizeInByte))
 {
 }
 
@@ -77,7 +76,6 @@ void ndBrainGpuBuffer::BrainMatrixToDevice(const ndBrainMatrix* const matrix)
 #else
 
 	ndBrainVector flatArray;
-	//BrainVectorFromDevice(flatArray);
 	for (ndInt32 i = 0; i < matrix->GetRows(); i ++)
 	{
 		for (ndInt32 j = 0; j < matrix->GetColumns(); j++)
@@ -105,20 +103,10 @@ void ndBrainGpuBuffer::CopyBuffer(const ndBrainBuffer& source, size_t srcOffsetI
 	ndAssert((dstOffset + sizeInBytes) <= m_sizeInBytes);
 	ndAssert((srcOffset + sizeInBytes) <= source.SizeInBytes());
 
-	//ndBrainVector xxx0;
-	//ndBrainVector xxx1;
-	//xxx0.SetCount(ndInt64(m_sizeInBytes / sizeof(ndReal)));
-	//xxx1.SetCount(ndInt64(m_sizeInBytes / sizeof(ndReal)));
-	//BrainVectorFromDevice(xxx0);
-	//source.BrainVectorFromDevice(xxx1);
-
 	cl_int error = 0;
 	ndSharedPtr<cl::CommandQueue>& queue = m_context->GetAsGpuContext()->m_queue;
 	error = queue->enqueueCopyBuffer(srcBuffer.m_buffer, m_buffer, srcOffset, dstOffset, sizeInBytes, nullptr, nullptr);
 	ndAssert(error == CL_SUCCESS);
-
-	//BrainVectorFromDevice(xxx0);
-	//source.BrainVectorFromDevice(xxx1);
 }
 
 void ndBrainGpuBuffer::LoadData(size_t sizeInBytes, const void* const sourceData)

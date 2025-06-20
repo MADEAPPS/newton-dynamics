@@ -41,7 +41,6 @@
 #include <ndBrainTrainerGpu.h>
 #include <ndBrainThreadPool.h>
 #include <ndBrainLayerLinear.h>
-//#include <ndBrainReplayBuffer.h>
 #include <ndBrainOptimizerSgd.h>
 #include <ndBrainCpuFloatBuffer.h>
 #include <ndBrainLayerActivation.h>

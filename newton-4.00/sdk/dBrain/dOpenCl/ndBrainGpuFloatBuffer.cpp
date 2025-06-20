@@ -24,7 +24,6 @@ ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, cons
 	:ndBrainGpuBuffer(context, input.GetCount() * ndInt32(sizeof(ndReal)), ndStorageData)
 {
 	ndAssert(m_context->GetAsGpuContext());
-	//LoadData(input.GetCount() * sizeof (ndReal), &input[0]);
 	BrainVectorToDevice(input);
 }
 
@@ -32,6 +31,5 @@ ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, cons
 	:ndBrainGpuBuffer(context, matrix.GetColumns() * matrix.GetRows() * ndInt32(sizeof(ndReal)), ndStorageData)
 {
 	ndAssert(m_context->GetAsGpuContext());
-	//LoadBuffer(&matrix);
 	BrainMatrixToDevice(&matrix);
 }

@@ -14,8 +14,6 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainBuffer.h"
 
-//class ndBrainVector;
-//class ndBrainMatrix;
 class ndBrainGpuBuffer;
 class ndBrainGpuContext;
 
@@ -42,7 +40,6 @@ class ndBrainGpuBuffer : public ndBrainBuffer
 	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const override;
 
 	cl::Buffer m_buffer;
-	size_t m_sizeInBytes;
 	friend class ndBrainGpuContext;
 	friend class ndBrainGpuCommand;
 };
