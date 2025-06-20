@@ -175,8 +175,7 @@ static void MnistTrainingSet()
 			}
 		}
 
-		//ndInt32 ValidateData(ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
-		ndInt32 ValidateData(ndBrainMatrix* const testLabels, const ndSharedPtr<ndBrainBuffer>& data, ndBrainMatrix* const testDigits)
+		ndInt32 ValidateData(ndBrainMatrix* const testLabels, const ndSharedPtr<ndBrainBuffer>& data)
 		{
 			//ndInt32 inputSize = testDigits->GetColumns();
 			ndInt32 outputSize = testLabels->GetColumns();
@@ -187,6 +186,7 @@ static void MnistTrainingSet()
 			groundTruth.SetCount(outputSize * m_miniBatchSize);
 
 			ndBrainVector miniBatchInput;
+			ndBrainVector miniBatchInput1;
 			miniBatchInput.SetCount(m_inputSize * m_miniBatchSize);
 
 			ndInt32 failCount = 0;
@@ -197,15 +197,7 @@ static void MnistTrainingSet()
 			ndBrainBuffer* const inputBuffer = m_trainer->GetInputBuffer();
 			for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
 			{
-				for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
-				{
-					ndBrainMemVector input(&miniBatchInput[i * m_inputSize], m_inputSize);
-					input.SetCount(m_inputSize);
-					input.Set((*testDigits)[batchStart + i]);
-				}
-				//inputBuffer->CopyData(**data, batchStart * size, 0, size * m_miniBatchSize);
-				m_trainer->LoadInput(miniBatchInput);
-
+				inputBuffer->CopyBuffer(**data, batchStart * size, 0, size * m_miniBatchSize);
 				m_trainer->MakePrediction();
 				m_trainer->GetOutput(miniBatchOutput);
 
@@ -238,10 +230,10 @@ static void MnistTrainingSet()
 			return failCount;
 		}
 
-		void Optimize(
-			ndBrainMatrix* const trainingLabels, ndBrainMatrix* const trainingDigits,
-			ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
-		//void Optimize(ndBrainMatrix* const trainingLabels, ndBrainMatrix* const trainingDigits, ndBrainMatrix* const testLabels)
+		//void Optimize(
+		//	ndBrainMatrix* const trainingLabels, ndBrainMatrix* const trainingDigits,
+		//	ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
+		void Optimize(ndBrainMatrix* const trainingLabels, ndBrainMatrix* const trainingDigits, ndBrainMatrix* const testLabels)
 		{
 			//// so far best training result on the mnist data set
 			//optimizer.SetRegularizer(ndBrainFloat(0.0f));		//         training(100.0%) test(99.35%) 
@@ -318,7 +310,7 @@ static void MnistTrainingSet()
 				ndExpandTraceMessage("epoc: %d\n", epoch);
 #else
 				
-				ndInt64 testFailCount = ValidateData(testLabels, m_testData, testDigits) + 1;
+				ndInt64 testFailCount = ValidateData(testLabels, m_testData) + 1;
 				if (testFailCount < m_minValidationFail)
 				{
 					//trainer->GetParameterBuffer(parametersBuffer);
@@ -326,7 +318,7 @@ static void MnistTrainingSet()
 					trainer->UpdateParameters();
 					m_bestBrain->CopyFrom(**trainer->GetBrain());
 					m_minValidationFail = testFailCount + 1;
-					ndInt64 trainigFailCount = ValidateData(trainingLabels, m_trainingData, trainingDigits) + 1;
+					ndInt64 trainigFailCount = ValidateData(trainingLabels, m_trainingData) + 1;
 					ndInt64 size = trainingLabels->GetCount();
 					ndFloat32 score = (ndFloat32)(size - trainigFailCount) / (ndFloat32)size;
 					ndExpandTraceMessage("Best model: ");
@@ -337,7 +329,7 @@ static void MnistTrainingSet()
 				} 
 				else
 				{
-					ndInt64 trainigFailCount = ValidateData(trainingLabels, m_trainingData, trainingDigits) + 1;
+					ndInt64 trainigFailCount = ValidateData(trainingLabels, m_trainingData) + 1;
 					ndInt64 minCombinedScore = testFailCount * trainigFailCount;
 					if (minCombinedScore <= m_minCombinedScore)
 					{
@@ -432,7 +424,7 @@ static void MnistTrainingSet()
 		ndExpandTraceMessage("training mnist database, number of parameters %d\n", brain->GetNumberOfParameters());
 	
 		SupervisedTrainer optimizer(brain);
-
+		
 		optimizer.m_inputSize = trainingDigits->GetColumns();
 		ndBrainContext* const context = *optimizer.m_trainer->GetContext();
 		if (optimizer.m_hasGpuSupport)
@@ -442,12 +434,13 @@ static void MnistTrainingSet()
 		}
 		else
 		{
-			optimizer.m_testData = ndSharedPtr<ndBrainBuffer>(new ndBrainCpuFloatBuffer(context, **testDigits));
-			optimizer.m_trainingData = ndSharedPtr<ndBrainBuffer>(new ndBrainCpuFloatBuffer(context, **trainingDigits));
+			ndAssert(0);
+			//optimizer.m_testData = ndSharedPtr<ndBrainBuffer>(new ndBrainCpuFloatBuffer(context, **testDigits));
+			//optimizer.m_trainingData = ndSharedPtr<ndBrainBuffer>(new ndBrainCpuFloatBuffer(context, **trainingDigits));
 		}
 
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
-		optimizer.Optimize(*trainingLabels, *trainingDigits, *testLabels, *testDigits);
+		optimizer.Optimize(*trainingLabels, *trainingDigits, *testLabels);
 		time = ndGetTimeInMicroseconds() - time;
 	
 		char path[256];

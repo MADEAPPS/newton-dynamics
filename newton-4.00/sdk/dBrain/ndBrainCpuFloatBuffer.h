@@ -24,7 +24,7 @@ class ndBrainCpuFloatBuffer : public ndBrainBuffer
 
 	virtual void LoadData(size_t sizeInBytes, const void* const sourceData) override;
 	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const override;
-	virtual void CopyData(const ndBrainBuffer& source, size_t sourceOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes) override;
+	virtual void CopyBuffer(const ndBrainBuffer& source, size_t sourceOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes) override;
 
 	ndBrainVector m_buffer;
 };

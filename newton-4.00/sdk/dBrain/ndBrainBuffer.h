@@ -19,6 +19,8 @@ enum ndStorageBufferType
 	ndUniformData
 };
 
+class ndBrainVector;
+class ndBrainMatrix;
 class ndBrainContext;
 
 class ndBrainBuffer : public ndClassAlloc
@@ -31,11 +33,20 @@ class ndBrainBuffer : public ndClassAlloc
 
 	size_t SizeInBytes() const { return m_sizeInBytes; }
 
-	virtual void LoadData(size_t sizeInBytes, const void* const inputData) = 0;
-	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const = 0;
-	virtual void CopyData(const ndBrainBuffer& source, size_t sourceOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes) = 0;
+	virtual void BrainVectorToDevice(const ndBrainVector& vector) = 0;
+	virtual void BrainVectorFromDevice(ndBrainVector& vector) const = 0;
+
+	virtual void BrainMatrixToDevice(const ndBrainMatrix* const matrix) = 0;
+
+	virtual void MemoryToDevive(size_t sizeInBytes, const void* const inputMemory) = 0;
+	virtual void MemoryFromDevive(size_t sizeInBytes, void* const outputMemory) const = 0;
+
+	virtual void CopyBuffer(const ndBrainBuffer& srcBuffer, size_t sourceOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes) = 0;
 
 	protected:
+	virtual void LoadData(size_t sizeInBytes, const void* const inputData) = 0;
+	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const = 0;
+
 	ndBrainContext* m_context;
 	size_t m_sizeInBytes;
 };

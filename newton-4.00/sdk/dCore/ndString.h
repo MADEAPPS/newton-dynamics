@@ -74,7 +74,7 @@ class ndString: public ndClassAlloc
 	private:
 	D_CORE_API ndInt32 CalculateSize (const char* const data) const;
 	ndInt32 Compare (const char* const str0, const char* const str1) const;
-	void CopyData (char* const dst, const char* const src, ndInt32 size) const;
+	void CopyBuffer (char* const dst, const char* const src, ndInt32 size) const;
 
 	D_CORE_API ndInt32 Find (const char* const subString, ndInt32 stringSize, ndInt32 from, ndInt32 lenght) const;
 
@@ -153,7 +153,7 @@ inline ndInt32 ndString::Capacity() const
 	return m_capacity;
 }
 
-inline void ndString::CopyData (char* const dst, const char* const src, ndInt32 size) const
+inline void ndString::CopyBuffer (char* const dst, const char* const src, ndInt32 size) const
 {
 	ndAssert (dst);
 	ndAssert (src);

@@ -20,10 +20,8 @@ class ndBrainGpuFloatBuffer : public ndBrainGpuBuffer
 	ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainVector& input);
 	ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainMatrix& matrix);
 
-	void LoadBuffer(const ndBrainMatrix* const matrix);
-
-	virtual void LoadData(size_t sizeInBytes, const void* const sourceData) override;
-	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const override;
+	//void UnloadData(ndBrainVector& ouput) const;
+	//void LoadBuffer(const ndBrainMatrix* const matrix);
 };
 
 #endif

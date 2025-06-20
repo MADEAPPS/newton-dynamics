@@ -59,7 +59,7 @@ void ndBrainCpuFloatBuffer::LoadBuffer(const ndBrainMatrix* const matrix)
 	}
 }
 
-void ndBrainCpuFloatBuffer::CopyData(const ndBrainBuffer& source, size_t srcOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes)
+void ndBrainCpuFloatBuffer::CopyBuffer(const ndBrainBuffer& source, size_t srcOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes)
 {
 	size_t size = sizeInBytes / sizeof(ndReal);
 	size_t srcOffset = srcOffsetInBytes / sizeof(ndReal);

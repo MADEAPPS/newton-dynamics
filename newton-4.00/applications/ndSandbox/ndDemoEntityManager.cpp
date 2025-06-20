@@ -391,27 +391,23 @@ void TestVulkanStuff()
 	uniformParam.m_inputOutputSize = ndUnsigned32(matrix.GetColumns() + matrix.GetRows());
 	uniformParam.m_inputOutputStartOffset = 0;
 	
-	ndBrainGpuFloatBuffer inputOutputBuffer(&context, workBuffer);
-	ndBrainGpuFloatBuffer weightParamBuffer(&context, parameters);
-	ndBrainGpuUniformBuffer parammeters(&context, sizeof(UniformBufferObject));
-	parammeters.LoadData(sizeof(UniformBufferObject), &uniformParam);
-
-	UniformBufferObject uniformParam1;
-	parammeters.UnloadData(sizeof(UniformBufferObject), &uniformParam1);
+	ndAssert(0);
+	//ndBrainGpuFloatBuffer inputOutputBuffer(&context, workBuffer);
+	//ndBrainGpuFloatBuffer weightParamBuffer(&context, parameters);
+	//ndBrainGpuUniformBuffer parammeters(&context, sizeof(UniformBufferObject));
+	//parammeters.LoadData(sizeof(UniformBufferObject), &uniformParam);
+	//
+	//UniformBufferObject uniformParam1;
+	//parammeters.UnloadData(sizeof(UniformBufferObject), &uniformParam1);
+	//
+	//ndSharedPtr<ndBrainGpuCommand> command(new TestCommand(&context, ndInt32(input.GetCount()), parammeters, weightParamBuffer, inputOutputBuffer));
+	//context.AddCommandQueue(command);
+	//context.SyncQueue();
+	//
+	//ndBrainVector outputGpu;
+	//outputGpu.SetCount(workBuffer.GetCount());
 	
-	ndSharedPtr<ndBrainGpuCommand> command(new TestCommand(&context, ndInt32(input.GetCount()), parammeters, weightParamBuffer, inputOutputBuffer));
-	context.AddCommandQueue(command);
-	context.SyncQueue();
-	
-	ndBrainVector outputGpu;
-	outputGpu.SetCount(workBuffer.GetCount());
-	inputOutputBuffer.UnloadData(workBuffer.GetCount() * sizeof (ndReal), &outputGpu[0]);
-	
-	for (ndInt32 i = 0; i < inputsCount; ++i)
-	{
-		ndBrainMemVector xxx(&outputGpu[i * uniformParam.m_inputOutputSize + uniformParam.m_inputSize], uniformParam.m_outputSize);
-		i *= 1;
-	}
+	//inputOutputBuffer.UnloadData(workBuffer.GetCount() * sizeof (ndReal), &outputGpu[0]);
 }
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline

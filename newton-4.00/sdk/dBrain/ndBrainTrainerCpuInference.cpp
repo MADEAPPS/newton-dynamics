@@ -116,8 +116,8 @@ void ndBrainTrainerCpuInference::InitWeightAndBiasBuffer()
 		layer->CopyCpuWeights(weights);
 	}
 	
-//	m_miniBatchInputBuffer = 
-	m_miniBatchInputBuffer = ndSharedPtr<ndBrainCpuFloatBuffer>(new ndBrainCpuFloatBuffer(*m_context, m_miniBatchSize * brain.GetInputSize()));
+	ndAssert(0);
+	//m_miniBatchInputBuffer = ndSharedPtr<ndBrainCpuFloatBuffer>(new ndBrainCpuFloatBuffer(*m_context, m_miniBatchSize * brain.GetInputSize()));
 	//m_miniBatchInputBuffer.SetCount(m_miniBatchSize * brain.GetInputSize());
 	//m_miniBatchInputBuffer.Set(ndBrainFloat(0.0f));
 	

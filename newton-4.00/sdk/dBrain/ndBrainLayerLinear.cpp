@@ -542,10 +542,10 @@ ndBrainTrainerGpuCommand* ndBrainLayerLinear::CreateGpuFeedForwardCommand(
 
 	miniBatchSize = blockRows * blockColums;
 	ndBrainLayer::ndCommandShareInfo newInfo(info);
-	uniformBuffer->UnloadData(sizeof(ndBrainLayer::ndCommandShareInfo), &newInfo);
+	uniformBuffer->MemoryFromDevive(sizeof(ndBrainLayer::ndCommandShareInfo), &newInfo);
 
 	newInfo.m_tiledStride = blockRows;
-	uniformBuffer->LoadData(sizeof(ndBrainLayer::ndCommandShareInfo), &newInfo);
+	uniformBuffer->MemoryToDevive(sizeof(ndBrainLayer::ndCommandShareInfo), &newInfo);
 
 	ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(
 		owner, newInfo, size_t(this), context, context->m_brainLayerMatrixMatrixMultiply, miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias);

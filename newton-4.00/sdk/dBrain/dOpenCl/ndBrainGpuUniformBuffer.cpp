@@ -26,16 +26,16 @@ ndBrainGpuUniformBuffer::ndBrainGpuUniformBuffer(ndBrainContext* const context, 
 	LoadData(size_t(sizeInBytes), data);
 }
 
-void ndBrainGpuUniformBuffer::UnloadData(size_t, void* const) const
-{
-}
-
-void ndBrainGpuUniformBuffer::LoadData(size_t sizeInBytes, const void* const sourceData)
-{
-	ndSharedPtr<cl::CommandQueue>& queue = m_context->GetAsGpuContext()->m_queue;
-
-	cl_int error = 0;
-	ndAssert(sizeInBytes == m_sizeInBytes);
-	error = queue->enqueueWriteBuffer(m_buffer, CL_TRUE, 0, sizeInBytes, sourceData);
-	ndAssert(error == CL_SUCCESS);
-}
+//void ndBrainGpuUniformBuffer::UnloadData(size_t, void* const) const
+//{
+//}
+//
+//void ndBrainGpuUniformBuffer::LoadData(size_t sizeInBytes, const void* const sourceData)
+//{
+//	ndSharedPtr<cl::CommandQueue>& queue = m_context->GetAsGpuContext()->m_queue;
+//
+//	cl_int error = 0;
+//	ndAssert(sizeInBytes == m_sizeInBytes);
+//	error = queue->enqueueWriteBuffer(m_buffer, CL_TRUE, 0, sizeInBytes, sourceData);
+//	ndAssert(error == CL_SUCCESS);
+//}

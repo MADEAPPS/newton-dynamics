@@ -96,7 +96,7 @@ class ndArray: public ndClassAlloc
 	void SetMembers(ndInt64 size, void* const memory);
 
 	private: 
-	void CopyData(T* const dst, const T* const src, ndInt64 elements);
+	void CopyBuffer(T* const dst, const T* const src, ndInt64 elements);
 
 	protected:
 	T* m_array;
@@ -201,7 +201,7 @@ ndInt64 ndArray<T>::GetCapacity() const
 }
 
 template<class T>
-void ndArray<T>::CopyData(T* const dstPtr, const T* const srcPtr, ndInt64 elements)
+void ndArray<T>::CopyBuffer(T* const dstPtr, const T* const srcPtr, ndInt64 elements)
 {
 	ndMemCpy(dstPtr, srcPtr, elements);
 }
@@ -225,7 +225,7 @@ void ndArray<T>::Resize(ndInt64 newSize)
 		{
 			if (m_size)
 			{
-				CopyData(newArray, m_array, m_size);
+				CopyBuffer(newArray, m_array, m_size);
 			}
 			ndMemory::Free(m_array);
 		}
@@ -238,7 +238,7 @@ void ndArray<T>::Resize(ndInt64 newSize)
 		T* const newArray = (T*)ndMemory::Malloc(size_t(sizeof(T) * newSize));
 		if (m_array) 
 		{
-			CopyData(newArray, m_array, newSize);
+			CopyBuffer(newArray, m_array, newSize);
 			ndMemory::Free(m_array);
 		}
 		m_size = newSize;

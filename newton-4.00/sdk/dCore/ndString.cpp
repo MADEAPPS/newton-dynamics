@@ -178,7 +178,7 @@ ndString::ndString (const ndString& src)
 		m_capacity = m_size + 1;
 
 		m_string = AllocMem (src.m_size + 1);
-		CopyData (m_string, src.m_string, src.m_size + 1);
+		CopyBuffer (m_string, src.m_string, src.m_size + 1);
 		m_string[m_size] = 0;
 	}
 }
@@ -194,7 +194,7 @@ ndString::ndString (const char* const data)
 		m_capacity = m_size + 1; 
 
 		m_string = AllocMem (m_size + 1);
-		CopyData (m_string, data, m_size + 1);
+		CopyBuffer (m_string, data, m_size + 1);
 		m_string[m_size] = 0;
 	}
 }
@@ -209,7 +209,7 @@ ndString::ndString (const char* const data, ndInt32 maxSize)
 		m_size = ndMin (CalculateSize (data), maxSize);
 		m_capacity = m_size + 1; 
 		m_string = AllocMem (m_size + 1);
-		CopyData (m_string, data, m_size + 1);
+		CopyBuffer (m_string, data, m_size + 1);
 		m_string[m_size] = 0;
 	}
 }
@@ -465,7 +465,7 @@ ndString& ndString::operator= (const ndString& src)
 	{
 		m_capacity = src.m_size + 1;
 		m_string = AllocMem (src.m_size + 1);
-		CopyData (m_string, src.m_string, src.m_size + 1);
+		CopyBuffer (m_string, src.m_string, src.m_size + 1);
 	}
 	return *this;
 }
