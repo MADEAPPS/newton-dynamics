@@ -264,8 +264,7 @@ void ndBrainTrainerGpuInference::UnloadBuffer(ndBrainVector& ouput, const ndShar
 
 ndBrainBuffer* ndBrainTrainerGpuInference::GetInputBuffer()
 {
-	ndAssert(0);
-	return nullptr;
+	return *m_miniBatchInputBuffer;
 }
 
 void ndBrainTrainerGpuInference::SaveInput(ndBrainVector& output) const

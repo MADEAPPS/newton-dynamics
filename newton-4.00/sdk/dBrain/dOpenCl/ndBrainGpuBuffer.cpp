@@ -24,8 +24,21 @@ ndBrainGpuBuffer::~ndBrainGpuBuffer()
 {
 }
 
-void ndBrainGpuBuffer::CopyData(const ndBrainBuffer& source, size_t sourceOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes)
+void ndBrainGpuBuffer::CopyData(const ndBrainBuffer& source, size_t srcOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes)
 {
-	ndAssert(0);
+	ndAssert(m_context->GetAsGpuContext());
+
+	const ndBrainGpuBuffer& srcBuffer = *((ndBrainGpuBuffer*)&source);
+
+	size_t srcOffset = srcOffsetInBytes;
+	size_t dstOffset = dstOffsetInBytes;
+	ndAssert(sizeInBytes <= m_sizeInBytes);
+	ndAssert((dstOffset + sizeInBytes) <= m_sizeInBytes);
+	ndAssert((srcOffset + sizeInBytes) <= source.SizeInBytes());
+
+	cl_int error = 0;
+	ndSharedPtr<cl::CommandQueue>& queue = m_context->GetAsGpuContext()->m_queue;
+	error = queue->enqueueCopyBuffer(srcBuffer.m_buffer, m_buffer, srcOffset, dstOffset, sizeInBytes, nullptr, nullptr);
+	ndAssert(error == CL_SUCCESS);
 }
 
