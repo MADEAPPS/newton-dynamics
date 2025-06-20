@@ -30,8 +30,10 @@ class ndBrainBuffer : public ndClassAlloc
 	virtual ~ndBrainBuffer();
 
 	size_t SizeInBytes() const { return m_sizeInBytes; }
+
 	virtual void LoadData(size_t sizeInBytes, const void* const inputData) = 0;
 	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const = 0;
+	virtual void CopyData(const ndBrainBuffer& source, size_t sourceOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes) = 0;
 
 	protected:
 	ndBrainContext* m_context;

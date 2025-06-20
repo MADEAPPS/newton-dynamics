@@ -64,8 +64,9 @@ class ndBrainTrainerGpuInference: public ndBrainTrainer
 	ndBrainTrainerGpuInference(const ndBrainTrainerGpuInference& src);
 	virtual ~ndBrainTrainerGpuInference();
 
-	virtual void LoadInput(const ndBrainVector&) override;
-	virtual void GetInput(ndBrainVector& ouput) const override;
+	virtual ndBrainBuffer* GetInputBuffer() override;
+	virtual void LoadInput(const ndBrainVector& input) override;
+	virtual void SaveInput(ndBrainVector& ouput) const override;
 
 	virtual void GetOutput(ndBrainVector& ouput) const override;
 	virtual void GetWorkingBuffer(ndBrainVector& ouput) const override;

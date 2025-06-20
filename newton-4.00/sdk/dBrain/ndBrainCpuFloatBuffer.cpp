@@ -18,8 +18,8 @@
 ndBrainCpuFloatBuffer::ndBrainCpuFloatBuffer(ndBrainContext* const context, ndInt64 sizeInFloat)
 	:ndBrainBuffer(context, sizeInFloat * ndInt32(sizeof(ndReal)), ndStorageData)
 {
-	ndAssert(0);
 	m_buffer.SetCount(sizeInFloat);
+	m_buffer.Set(ndBrainFloat(0.0f));
 }
 
 ndBrainCpuFloatBuffer::ndBrainCpuFloatBuffer(ndBrainContext* const context, const ndBrainVector& input)
@@ -42,25 +42,12 @@ ndBrainCpuFloatBuffer::ndBrainCpuFloatBuffer(ndBrainContext* const context, cons
 void ndBrainCpuFloatBuffer::LoadData(size_t, const void* const)
 {
 	ndAssert(0);
-	//ndAssert(m_context->GetAsGpuContext());
-	//
-	//cl_int error = 0;
-	//ndAssert(sizeInBytes == m_sizeInBytes);
-	//ndSharedPtr<cl::CommandQueue>& queue = m_context->GetAsGpuContext()->m_queue;
-	//error =	queue->enqueueWriteBuffer(m_buffer, CL_TRUE, 0, sizeInBytes, sourceData);
-	//ndAssert(error == CL_SUCCESS);
 }
 
 //void ndBrainCpuFloatBuffer::UnloadData(size_t sizeInBytes, void* const destinationData) const
 void ndBrainCpuFloatBuffer::UnloadData(size_t, void* const) const
 {
 	ndAssert(0);
-	//cl_int error = 0;
-	//ndAssert(sizeInBytes == m_sizeInBytes);
-	//ndAssert(m_context->GetAsGpuContext());
-	//ndSharedPtr<cl::CommandQueue>& queue = m_context->GetAsGpuContext()->m_queue;
-	//error = queue->enqueueReadBuffer(m_buffer, CL_TRUE, 0, sizeInBytes, destinationData);
-	//ndAssert(error == CL_SUCCESS);
 }
 
 void ndBrainCpuFloatBuffer::LoadBuffer(const ndBrainMatrix* const matrix)
@@ -70,4 +57,19 @@ void ndBrainCpuFloatBuffer::LoadBuffer(const ndBrainMatrix* const matrix)
 		ndBrainMemVector dst (&m_buffer[i * matrix->GetColumns()], matrix->GetColumns());
 		dst.Set((*matrix)[i]);
 	}
+}
+
+void ndBrainCpuFloatBuffer::CopyData(const ndBrainBuffer& source, size_t srcOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes)
+{
+	size_t size = sizeInBytes / sizeof(ndReal);
+	size_t srcOffset = srcOffsetInBytes / sizeof(ndReal);
+	size_t dstOffset = dstOffsetInBytes / sizeof(ndReal);
+	ndAssert(size <= size_t(m_buffer.GetCount()));
+	ndAssert((dstOffset + size) * sizeof(ndReal) <= SizeInBytes());
+	ndAssert((srcOffset + size) * sizeof (ndReal) <= source.SizeInBytes());
+
+	ndBrainMemVector dst(&m_buffer[ndInt64(dstOffset)], ndInt64(size));
+	const ndBrainCpuFloatBuffer& srcBuffer = *((ndBrainCpuFloatBuffer*)&source);
+	const ndBrainMemVector src(&srcBuffer.m_buffer[ndInt64(srcOffset)], ndInt64(size));
+	dst.Set(src);
 }

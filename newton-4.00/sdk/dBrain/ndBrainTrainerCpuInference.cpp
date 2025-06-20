@@ -47,6 +47,7 @@ ndBrainTrainerCpuInference::ndBrainTrainerCpuInference(const ndSharedPtr<ndBrain
 ndBrainTrainerCpuInference::ndBrainTrainerCpuInference(const ndBrainTrainerCpuInference& src)
 	:ndBrainTrainer(src)
 	,m_inputOutputBuffer()
+	,m_miniBatchInputBuffer()
 	,m_threadPool(src.m_threadPool)
 	,m_miniBatchSize(src.m_miniBatchSize)
 {
@@ -115,8 +116,10 @@ void ndBrainTrainerCpuInference::InitWeightAndBiasBuffer()
 		layer->CopyCpuWeights(weights);
 	}
 	
-	m_miniBatchInputBuffer.SetCount(m_miniBatchSize * brain.GetInputSize());
-	m_miniBatchInputBuffer.Set(ndBrainFloat(0.0f));
+//	m_miniBatchInputBuffer = 
+	m_miniBatchInputBuffer = ndSharedPtr<ndBrainCpuFloatBuffer>(new ndBrainCpuFloatBuffer(*m_context, m_miniBatchSize * brain.GetInputSize()));
+	//m_miniBatchInputBuffer.SetCount(m_miniBatchSize * brain.GetInputSize());
+	//m_miniBatchInputBuffer.Set(ndBrainFloat(0.0f));
 	
 	m_miniBatchOutputBuffer.SetCount(m_miniBatchSize * brain.GetOutputSize());
 	m_miniBatchOutputBuffer.Set(ndBrainFloat(0.0f));
@@ -198,15 +201,20 @@ void ndBrainTrainerCpuInference::AddLayersCommands(ndFixSizeArray<ndBrainTrainer
 	}
 }
 
+ndBrainBuffer* ndBrainTrainerCpuInference::GetInputBuffer()
+{
+	return *m_miniBatchInputBuffer;
+}
+
 void ndBrainTrainerCpuInference::GetOutput(ndBrainVector& ouput) const
 {
 	ouput.SetCount(m_miniBatchOutputBuffer.GetCount());
 	ouput.Set(m_miniBatchOutputBuffer);
 }
 
-void ndBrainTrainerCpuInference::GetInput(ndBrainVector& input) const
+void ndBrainTrainerCpuInference::SaveInput(ndBrainVector& input) const
 {
-	input.SetCount(m_miniBatchInputBuffer.GetCount());
+	input.SetCount(m_miniBatchInputBuffer->m_buffer.GetCount());
 	input.Set(m_miniBatchInputBuffer);
 }
 
@@ -262,7 +270,7 @@ void ndBrainTrainerCpuInference::SyncQueue()
 
 void ndBrainTrainerCpuInference::MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output)
 {
-	ndMemCpy(&m_miniBatchInputBuffer[0], &input[0], input.GetCount());
+	ndMemCpy(&m_miniBatchInputBuffer->m_buffer[0], &input[0], input.GetCount());
 	for (ndList<ndSharedPtr<ndBrainTrainerCpuCommand>>::ndNode* node = m_feedForwardCommands.GetFirst(); node; node = node->GetNext())
 	{
 		ndBrainTrainerCpuCommand* const command = *node->GetInfo();
@@ -273,8 +281,8 @@ void ndBrainTrainerCpuInference::MakeSinglePrediction(const ndBrainVector& input
 
 void ndBrainTrainerCpuInference::LoadInput(const ndBrainVector& input)
 {
-	ndAssert(input.GetCount() == m_miniBatchInputBuffer.GetCount());
-	m_miniBatchInputBuffer.Set(input);
+	ndAssert(input.GetCount() == m_miniBatchInputBuffer->m_buffer.GetCount());
+	m_miniBatchInputBuffer->m_buffer.Set(input);
 }
 
 void ndBrainTrainerCpuInference::MakePrediction()

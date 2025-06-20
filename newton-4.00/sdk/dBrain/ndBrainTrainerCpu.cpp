@@ -44,7 +44,7 @@ ndBrainTrainerCpu::ndBrainTrainerCpu(
 {
 	m_optimizer->Init(ndInt32(m_weightAndBiasBuffer.GetCount()), learnRate);
 
-	m_miniBatchInputGradientBuffer.SetCount(m_miniBatchInputBuffer.GetCount());
+	m_miniBatchInputGradientBuffer.SetCount(m_miniBatchInputBuffer->m_buffer.GetCount());
 	m_miniBatchOutputGradientBuffer.SetCount(m_miniBatchOutputBuffer.GetCount());
 
 	m_inputOuputGradientsBuffer.SetCount(m_inputOutputBuffer.GetCount() * m_miniBatchSize);
@@ -70,7 +70,7 @@ ndBrainTrainerCpu::ndBrainTrainerCpu(const ndBrainTrainerCpu& src)
 	ndAssert(0);
 }
 
-void ndBrainTrainerCpu::GetInput(ndBrainVector& input) const
+void ndBrainTrainerCpu::SaveInput(ndBrainVector& input) const
 {
 	input.SetCount(m_miniBatchInputGradientBuffer.GetCount());
 	input.Set(m_miniBatchInputGradientBuffer);

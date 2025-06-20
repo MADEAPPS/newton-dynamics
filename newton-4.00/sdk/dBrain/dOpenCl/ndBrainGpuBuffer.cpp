@@ -23,3 +23,9 @@ ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainContext* const context, ndInt64 sizeIn
 ndBrainGpuBuffer::~ndBrainGpuBuffer()
 {
 }
+
+void ndBrainGpuBuffer::CopyData(const ndBrainBuffer& source, size_t sourceOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes)
+{
+	ndAssert(0);
+}
+

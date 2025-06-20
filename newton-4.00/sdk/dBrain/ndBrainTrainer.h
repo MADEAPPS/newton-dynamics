@@ -27,6 +27,7 @@
 
 class ndBrain;
 class ndBrainLoss;
+class ndBrainBuffer;
 class ndBrainContext;
 
 class ndBrainTrainer: public ndClassAlloc
@@ -39,8 +40,9 @@ class ndBrainTrainer: public ndClassAlloc
 	ndSharedPtr<ndBrain>& GetBrain();
 	ndSharedPtr<ndBrainContext> GetContext();
 
-	virtual void GetInput(ndBrainVector&) const {}
-	virtual void LoadInput(const ndBrainVector&) = 0;
+	virtual ndBrainBuffer* GetInputBuffer() = 0;
+	virtual void SaveInput(ndBrainVector& ouput) const = 0;
+	virtual void LoadInput(const ndBrainVector& input) = 0;
 
 	virtual void GetOutput(ndBrainVector&) const {}
 	virtual void GetWorkingBuffer(ndBrainVector&) const {}

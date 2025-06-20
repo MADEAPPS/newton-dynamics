@@ -98,7 +98,7 @@ ndBrainTrainerGpu::ndBrainTrainerGpu(const ndSharedPtr<ndBrain>& brain, const nd
 {
 	ndBrainVector buffer;
 
-	GetInput(buffer);
+	SaveInput(buffer);
 	buffer.Set(ndReal(0.0f));
 	m_miniBatchInputGradientBuffer = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(m_context, buffer));
 

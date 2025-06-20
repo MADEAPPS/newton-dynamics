@@ -25,6 +25,7 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainVector.h"
 #include "ndBrainTrainer.h"
+#include "ndBrainCpuFloatBuffer.h"
 
 class ndBrain;
 class ndBrainLoss;
@@ -78,8 +79,9 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 		ndInt32 minibatchSize);
 	ndBrainTrainerCpuInference(const ndBrainTrainerCpuInference& src);
 
+	ndBrainBuffer* GetInputBuffer() override;
 	virtual void LoadInput(const ndBrainVector&) override;
-	virtual void GetInput(ndBrainVector& input) const override;
+	virtual void SaveInput(ndBrainVector& input) const override;
 
 	virtual void GetOutput(ndBrainVector& ouput) const override;
 	virtual void GetWorkingBuffer(ndBrainVector& buffer) const override;
@@ -127,7 +129,7 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 	
 		virtual void Execute(ndInt32 miniBatchIndex)
 		{
-			const ndBrainMemVector src(&m_owner->m_miniBatchInputBuffer[miniBatchIndex * m_info.m_inputSize], m_info.m_inputSize);
+			const ndBrainMemVector src(&m_owner->m_miniBatchInputBuffer->m_buffer[miniBatchIndex * m_info.m_inputSize], m_info.m_inputSize);
 			ndBrainMemVector dst(&m_owner->m_inputOutputBuffer[miniBatchIndex * m_info.m_inputOutputSize], m_info.m_inputSize);
 			dst.Set(src);
 		}
@@ -159,7 +161,8 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 
 	ndBrainVector m_inputOutputBuffer;
 	ndBrainVector m_weightAndBiasBuffer;
-	ndBrainVector m_miniBatchInputBuffer;
+	//ndBrainVector m_miniBatchInputBuffer;
+	ndSharedPtr<ndBrainCpuFloatBuffer> m_miniBatchInputBuffer;
 	ndBrainVector m_miniBatchOutputBuffer;
 	ndList<ndSharedPtr<ndBrainTrainerCpuCommand>> m_feedForwardCommands;
 	ndBrainThreadPool* m_threadPool;

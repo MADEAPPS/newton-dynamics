@@ -601,7 +601,8 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::SaveTrajectory()
 }
 
 //#pragma optimize( "", off )
-void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnQvalueFunction(ndInt32 criticIndex)
+//void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnQvalueFunction(ndInt32 criticIndex)
+void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnQvalueFunction(ndInt32)
 {
 	const ndBrain& brain = **m_policyTrainer->GetBrain();
 	ndInt32 criticInputSize = brain.GetInputSize() + brain.GetOutputSize();

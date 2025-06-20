@@ -51,7 +51,8 @@ class ndBrainTrainerCpu: public ndBrainTrainerCpuInference
 	ndBrainTrainerCpu(const ndBrainTrainerCpu& src);
 
 	virtual void ApplyLearnRate() override;
-	virtual void GetInput(ndBrainVector& input) const override;
+	virtual void SaveInput(ndBrainVector& input) const override;
+
 	virtual void BackPropagate(const ndBrainVector& outputGradients) override;
 
 	protected:

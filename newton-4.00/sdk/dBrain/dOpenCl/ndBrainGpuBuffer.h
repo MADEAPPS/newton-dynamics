@@ -26,6 +26,7 @@ class ndBrainGpuBuffer : public ndBrainBuffer
 
 	public:
 	virtual ~ndBrainGpuBuffer();
+	virtual void CopyData(const ndBrainBuffer& source, size_t sourceOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes) override;
 
 	protected:
 	cl::Buffer m_buffer;
