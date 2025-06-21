@@ -130,7 +130,8 @@ GLATTER_INLINE_OR_NOT
 int x_error_handler(Display *dsp, XErrorEvent *error)
 {
     char error_string[128];
-    XGetErrorText(dsp, error->error_code, error_string, 128);
+    //XGetErrorText(dsp, error->error_code, error_string, 128);
+    sprintf(error_string, "this fail: %d", error->error_code);
     GLATTER_PRINTF("X Error: %s\n", error_string);
     return 0;
 }
