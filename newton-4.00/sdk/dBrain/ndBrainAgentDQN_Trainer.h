@@ -336,9 +336,9 @@ ndBrainFloat ndBrainAgentDQN_Trainer<statesDim, actionDim>::CalculateReward()
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::PopulateReplayBuffer()
 {
-	GetObservation(&m_currentTransition.m_nextObservation[0]);
-	m_currentTransition.m_terminalState = IsTerminal();
-	m_replayBuffer.AddTransition(m_currentTransition);
+	//GetObservation(&m_currentTransition.m_nextObservation[0]);
+	//m_currentTransition.m_terminalState = IsTerminal();
+	//m_replayBuffer.AddTransition(m_currentTransition);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
@@ -432,36 +432,37 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Step()
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::OptimizeStep()
 {
-	if (!m_frameCount)
-	{
-		ResetModel();
-	}
-
-	PopulateReplayBuffer();
-	if (m_replayBuffer.GetCount() == m_replayBuffer.GetCapacity())
-	{
-		Optimize();
-	}
-
-	if (m_currentTransition.m_terminalState)
-	{
-		ResetModel();
-		if (IsSampling() && (m_eposideCount % 500 == 0))
-		{
-			ndExpandTraceMessage("collecting samples: frame %d out of %d, episode %d \n", m_frameCount, m_replayBuffer.GetCapacity(), m_eposideCount);
-		}
-
-		if (!IsSampling())
-		{
-			m_averageFramesPerEpisodes.Update(ndBrainFloat(m_framesAlive));
-		}
-		m_eposideCount++;
-		m_framesAlive = 0;
-	}
-
-	m_frameCount++;
-	m_framesAlive++;
-	m_explorationProbability = ndMax(m_explorationProbability - m_explorationProbabilityAnnelining, m_minExplorationProbability);
+	ndAssert(0);
+	//if (!m_frameCount)
+	//{
+	//	ResetModel();
+	//}
+	//
+	//PopulateReplayBuffer();
+	//if (m_replayBuffer.GetCount() == m_replayBuffer.GetCapacity())
+	//{
+	//	Optimize();
+	//}
+	//
+	//if (m_currentTransition.m_terminalState)
+	//{
+	//	ResetModel();
+	//	if (IsSampling() && (m_eposideCount % 500 == 0))
+	//	{
+	//		ndExpandTraceMessage("collecting samples: frame %d out of %d, episode %d \n", m_frameCount, m_replayBuffer.GetCapacity(), m_eposideCount);
+	//	}
+	//
+	//	if (!IsSampling())
+	//	{
+	//		m_averageFramesPerEpisodes.Update(ndBrainFloat(m_framesAlive));
+	//	}
+	//	m_eposideCount++;
+	//	m_framesAlive = 0;
+	//}
+	//
+	//m_frameCount++;
+	//m_framesAlive++;
+	//m_explorationProbability = ndMax(m_explorationProbability - m_explorationProbabilityAnnelining, m_minExplorationProbability);
 }
 
 #endif 
