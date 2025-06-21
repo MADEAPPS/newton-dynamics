@@ -1043,8 +1043,9 @@ void _glfwReleaseErrorHandlerX11(void)
 void _glfwInputErrorX11(int error, const char* message)
 {
     char buffer[_GLFW_MESSAGE_SIZE];
-    //XGetErrorText(_glfw.x11.display, _glfw.x11.errorCode, buffer, sizeof(buffer));
-    sprintf (buffer, "this fail: %d", _glfw.x11.errorCode);
+    XGetErrorText(_glfw.x11.display, _glfw.x11.errorCode,
+                  buffer, sizeof(buffer));
+
     _glfwInputError(error, "%s: %s", message, buffer);
 }
 
