@@ -769,16 +769,17 @@ void ndAabbPolygonSoup::Create (const ndPolygonSoupBuilder& builder)
 void ndAabbPolygonSoup::Serialize (const char* const path) const
 {
 	FILE* const file = fopen(path, "wb");
+	size_t sizeWrite = 0;
 	if (file)
 	{
-		(void)fwrite(&m_vertexCount, sizeof(ndInt32), 1, file);
-		(void)fwrite(&m_indexCount, sizeof(ndInt32), 1, file);
-		(void)fwrite(&m_nodesCount, sizeof(ndInt32), 1, file);
+		sizeWrite += fwrite(&m_vertexCount, sizeof(ndInt32), 1, file);
+		sizeWrite += fwrite(&m_indexCount, sizeof(ndInt32), 1, file);
+		sizeWrite += fwrite(&m_nodesCount, sizeof(ndInt32), 1, file);
 		if (m_aabb)
 		{
-			(void)fwrite(m_localVertex, sizeof(ndTriplex) * m_vertexCount, 1, file);
-			(void)fwrite(m_indices, sizeof(ndInt32) * m_indexCount, 1, file);
-			(void)fwrite(m_aabb, sizeof(ndNode) * m_nodesCount, 1, file);
+			sizeWrite += fwrite(m_localVertex, sizeof(ndTriplex) * m_vertexCount, 1, file);
+			sizeWrite += fwrite(m_indices, sizeof(ndInt32) * m_indexCount, 1, file);
+			sizeWrite += fwrite(m_aabb, sizeof(ndNode) * m_nodesCount, 1, file);
 		}
 		fclose(file);
 	}
@@ -787,12 +788,13 @@ void ndAabbPolygonSoup::Serialize (const char* const path) const
 void ndAabbPolygonSoup::Deserialize (const char* const path)
 {
 	FILE* const file = fopen(path, "rb");
+	size_t sizeRead = 0;
 	if (file)
 	{
 		m_strideInBytes = sizeof(ndTriplex);
-		(void)fread(&m_vertexCount, sizeof(ndInt32), 1, file);
-		(void)fread(&m_indexCount, sizeof(ndInt32), 1, file);
-		(void)fread(&m_nodesCount, sizeof(ndInt32), 1, file);
+		sizeRead += fread(&m_vertexCount, sizeof(ndInt32), 1, file);
+		sizeRead += fread(&m_indexCount, sizeof(ndInt32), 1, file);
+		sizeRead += fread(&m_nodesCount, sizeof(ndInt32), 1, file);
 
 		if (m_vertexCount) 
 		{
@@ -800,9 +802,9 @@ void ndAabbPolygonSoup::Deserialize (const char* const path)
 			m_indices = (ndInt32*)ndMemory::Malloc(sizeof(ndInt32) * m_indexCount);
 			m_aabb = (ndNode*)ndMemory::Malloc(sizeof(ndNode) * m_nodesCount);
 
-			(void)fread(m_localVertex, sizeof(ndTriplex) * m_vertexCount, 1, file);
-			(void)fread(m_indices, sizeof(ndInt32) * m_indexCount, 1, file);
-			(void)fread(m_aabb, sizeof(ndNode) * m_nodesCount, 1, file);
+			sizeRead += fread(m_localVertex, sizeof(ndTriplex) * m_vertexCount, 1, file);
+			sizeRead += fread(m_indices, sizeof(ndInt32) * m_indexCount, 1, file);
+			sizeRead += fread(m_aabb, sizeof(ndNode) * m_nodesCount, 1, file);
 		}
 		else 
 		{
