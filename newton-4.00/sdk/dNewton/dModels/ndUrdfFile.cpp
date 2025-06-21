@@ -37,6 +37,8 @@ void ndUrdfFile::ImportMaterials(const nd::TiXmlNode* const rootNode)
 	m_materialMap.RemoveAll();
 	m_materials.PushBack(Material());
 	snprintf(m_materials[0].m_texture, sizeof (m_materials[0].m_texture), "wood_0.png");
+
+	size_t readValues = 0;
 	for (const nd::TiXmlNode* node = rootNode->FirstChild("material"); node; node = node->NextSibling("material"))
 	{
 		const nd::TiXmlElement* const materialNode = (nd::TiXmlElement*)node;
@@ -53,7 +55,7 @@ void ndUrdfFile::ImportMaterials(const nd::TiXmlNode* const rootNode)
 			ndReal b;
 			ndReal a;
 			const char* const rgba = color->Attribute("rgba");
-			sscanf(rgba, "%f %f %f %f", &r, &g, &b, &a);
+			readValues += sscanf(rgba, "%f %f %f %f", &r, &g, &b, &a);
 			material.m_color.m_x = r;
 			material.m_color.m_y = g;
 			material.m_color.m_z = b;
@@ -631,6 +633,7 @@ void ndUrdfFile::ImportStlMesh(const char* const pathName, ndMeshEffect* const m
 	ndAssert(file);
 	if (file)
 	{
+		size_t readValues = 0;
 		char buffer[256];
 		for (ndInt32 i = 0; i < 80; ++i)
 		{
@@ -638,7 +641,7 @@ void ndUrdfFile::ImportStlMesh(const char* const pathName, ndMeshEffect* const m
 		}
 
 		ndInt32 numberOfTriangles;
-		fread(&numberOfTriangles, 1, 4, file);
+		readValues += fread(&numberOfTriangles, 1, 4, file);
 		ndFloat32 inchToMeters = 0.0254f;
 
 		ndReal normal[3];
@@ -647,9 +650,9 @@ void ndUrdfFile::ImportStlMesh(const char* const pathName, ndMeshEffect* const m
 
 		for (ndInt32 i = 0; i < numberOfTriangles; ++i)
 		{
-			fread(normal, 1, sizeof(normal), file);
-			fread(triangle, 1, sizeof(triangle), file);
-			fread(&flags, 1, sizeof(flags), file);
+			readValues += fread(normal, 1, sizeof(normal), file);
+			readValues += fread(triangle, 1, sizeof(triangle), file);
+			readValues += fread(&flags, 1, sizeof(flags), file);
 
 			meshEffect->BeginBuildFace();
 			for (ndInt32 j = 0; j < 3; ++j)
