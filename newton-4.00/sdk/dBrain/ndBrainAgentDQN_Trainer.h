@@ -134,7 +134,7 @@ ndBrainAgentDQN_Trainer<statesDim, actionDim>::ndBrainAgentDQN_Trainer(const Hyp
 	,m_actor()
 	,m_target()
 	,m_optimizer(nullptr)
-	,m_replayBuffer()
+	//,m_replayBuffer()
 	,m_gamma(hyperParameters.m_discountRewardFactor)
 	,m_learnRate(hyperParameters.m_learnRate)
 	,m_explorationProbability(ndBrainFloat(1.0f))
@@ -234,82 +234,83 @@ ndInt32 ndBrainAgentDQN_Trainer<statesDim, actionDim>::GetEpisodeFrames() const
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::SetBufferSize(ndInt32 size)
 {
-	m_replayBuffer.SetSize(size);
+	//m_replayBuffer.SetSize(size);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::BackPropagate()
 {
-	ndUnsigned32 shuffleBuffer[1024];
-	for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
-	{
-		shuffleBuffer[i] = ndRandInt() % m_replayBuffer.GetCount();
-	}
-
-	auto PropagateBatch = ndMakeObject::ndFunction([this, &shuffleBuffer](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		class Loss: public ndBrainLossLeastSquaredError
-		{
-			public:
-			Loss(ndBrainTrainer& trainer, ndBrainAgentDQN_Trainer<statesDim, actionDim>* const agent)
-				:ndBrainLossLeastSquaredError(trainer.GetBrain()->GetOutputSize())
-				,m_trainer(trainer)
-				,m_agent(agent)
-				,m_index(0)
-			{
-			}
-
-			void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
-			{
-				ndAssert(output.GetCount() == actionDim);
-				ndAssert(m_truth.GetCount() == m_trainer.GetBrain()->GetOutputSize());
-
-				ndBrainFixSizeVector<actionDim> action;
-				
-				const ndBrainReplayTransitionMemory<statesDim, 1>& transition = m_agent->m_replayBuffer[m_index];
-				action.Set(output);
-				ndInt32 actionIndex = ndInt32(transition.m_action[0]);
-				if (transition.m_terminalState)
-				{
-					action[actionIndex] = transition.m_reward;
-				}
-				else
-				{
-					ndBrainFixSizeVector<actionDim> nextAction;
-					m_agent->m_target.MakePrediction(transition.m_nextObservation, nextAction);
-					action[actionIndex] = transition.m_reward + m_agent->m_gamma * nextAction[actionIndex];
-				}
-				
-				SetTruth(action);
-				ndBrainLossLeastSquaredError::GetLoss(output, loss);
-			}
-
-			ndBrainTrainer& m_trainer;
-			ndBrainAgentDQN_Trainer<statesDim, actionDim>* m_agent;
-			ndInt32 m_index;
-		};
-
-		ndAssert(m_miniBatchSize == m_trainers.GetCount());
-		const ndStartEnd startEnd(m_miniBatchSize, threadIndex, threadCount);
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-		{
-			ndBrainTrainer& trainer = *m_trainers[i];
-			Loss loss(trainer, this);
-			ndInt32 index = ndInt32 (shuffleBuffer[i]);
-			const ndBrainReplayTransitionMemory<statesDim, 1>& transition = m_replayBuffer[index];
-			loss.m_index = index;
-			trainer.BackPropagate(transition.m_observation, loss);
-		}
-	});
-
-	ndBrainThreadPool::ParallelExecute(PropagateBatch);
-	m_optimizer->Update(this, m_trainers, m_learnRate);
-	
-	if ((m_frameCount % m_targetUpdatePeriod) == (m_targetUpdatePeriod - 1))
-	{
-		// update on line network
-		m_target.CopyFrom(m_actor);
-	}
+	ndAssert(0);
+	//ndUnsigned32 shuffleBuffer[1024];
+	//for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
+	//{
+	//	shuffleBuffer[i] = ndRandInt() % m_replayBuffer.GetCount();
+	//}
+	//
+	//auto PropagateBatch = ndMakeObject::ndFunction([this, &shuffleBuffer](ndInt32 threadIndex, ndInt32 threadCount)
+	//{
+	//	class Loss: public ndBrainLossLeastSquaredError
+	//	{
+	//		public:
+	//		Loss(ndBrainTrainer& trainer, ndBrainAgentDQN_Trainer<statesDim, actionDim>* const agent)
+	//			:ndBrainLossLeastSquaredError(trainer.GetBrain()->GetOutputSize())
+	//			,m_trainer(trainer)
+	//			,m_agent(agent)
+	//			,m_index(0)
+	//		{
+	//		}
+	//
+	//		void GetLoss(const ndBrainVector& output, ndBrainVector& loss)
+	//		{
+	//			ndAssert(output.GetCount() == actionDim);
+	//			ndAssert(m_truth.GetCount() == m_trainer.GetBrain()->GetOutputSize());
+	//
+	//			ndBrainFixSizeVector<actionDim> action;
+	//			
+	//			const ndBrainReplayTransitionMemory<statesDim, 1>& transition = m_agent->m_replayBuffer[m_index];
+	//			action.Set(output);
+	//			ndInt32 actionIndex = ndInt32(transition.m_action[0]);
+	//			if (transition.m_terminalState)
+	//			{
+	//				action[actionIndex] = transition.m_reward;
+	//			}
+	//			else
+	//			{
+	//				ndBrainFixSizeVector<actionDim> nextAction;
+	//				m_agent->m_target.MakePrediction(transition.m_nextObservation, nextAction);
+	//				action[actionIndex] = transition.m_reward + m_agent->m_gamma * nextAction[actionIndex];
+	//			}
+	//			
+	//			SetTruth(action);
+	//			ndBrainLossLeastSquaredError::GetLoss(output, loss);
+	//		}
+	//
+	//		ndBrainTrainer& m_trainer;
+	//		ndBrainAgentDQN_Trainer<statesDim, actionDim>* m_agent;
+	//		ndInt32 m_index;
+	//	};
+	//
+	//	ndAssert(m_miniBatchSize == m_trainers.GetCount());
+	//	const ndStartEnd startEnd(m_miniBatchSize, threadIndex, threadCount);
+	//	for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+	//	{
+	//		ndBrainTrainer& trainer = *m_trainers[i];
+	//		Loss loss(trainer, this);
+	//		ndInt32 index = ndInt32 (shuffleBuffer[i]);
+	//		const ndBrainReplayTransitionMemory<statesDim, 1>& transition = m_replayBuffer[index];
+	//		loss.m_index = index;
+	//		trainer.BackPropagate(transition.m_observation, loss);
+	//	}
+	//});
+	//
+	//ndBrainThreadPool::ParallelExecute(PropagateBatch);
+	//m_optimizer->Update(this, m_trainers, m_learnRate);
+	//
+	//if ((m_frameCount % m_targetUpdatePeriod) == (m_targetUpdatePeriod - 1))
+	//{
+	//	// update on line network
+	//	m_target.CopyFrom(m_actor);
+	//}
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
