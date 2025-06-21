@@ -37,6 +37,8 @@ if (NEWTON_BUILD_SANDBOX_DEMOS)
         else(NOT_glfw3_FOUND)
             message("Found GLFW library")
         endif(NOT_glfw3_FOUND)
+        message (${GLFW_LIB})
+        message (${CMAKE_DL_LIBS})
         
         find_package(OpenGL REQUIRED)
         if(NOT_OpenGL_FOUND)
