@@ -45,9 +45,10 @@ The first extension support query in the program, will trigger an initialization
 Tracing calls, checking errors
 ------------------------------
 
-Although there are the extensions ``ARB_debug_output`` and ``KHR_debug``, which serve a similar purpose, at least with regards to error checking, the asynchronous nature of OpenGL, makes their usage less convenient. The main issue with these extensions is that, depending on the implementation, the errors may only show when the OpenGL server reaches the erroneous calls in the command buffer, without providing a clear indication of where the problem in the source code really is.
+For error checking, the extensions ``ARB_debug_output`` and ``KHR_debug`` offer similar functionality, when ``GL_DEBUG_OUTPUT_SYNCHRONOUS`` is enabled.
+However, besides implementation support, they require a debug context, i.e. ``{GLX|WGL}_CONTEXT_DEBUG_BIT`` would have to be specified in the attribute list when calling ``{GLX|WGL}_ARB_create_context``.
 
-Glatter performs this task by wrapping all library calls inside debug versions of each call.
+Glatter on the other hand, performs this task by wrapping all library calls inside debug versions of each call.
 There are two modes of debug operation, which can be switched on and off independently:
 
 1. Logging (tracing) every OpenGL call, which can be enabled by defining ``GLATTER_LOG_CALLS`` in the configuration header

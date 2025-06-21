@@ -33,10 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma warning(disable : 4201)
 #endif
 
-typedef union glatter_extension_support_status_union_EGL
+typedef struct glatter_extension_support_status_EGL
 {
-    int inexed_extensions[125];
-    struct {
         int has_EGL_ANDROID_blob_cache;
         int has_EGL_ANDROID_create_native_client_buffer;
         int has_EGL_ANDROID_framebuffer_target;
@@ -162,7 +160,6 @@ typedef union glatter_extension_support_status_union_EGL
         int has_EGL_NV_system_time;
         int has_EGL_TIZEN_image_native_buffer;
         int has_EGL_TIZEN_image_native_surface;
-    };
 } glatter_extension_support_status_EGL_t;
 
 

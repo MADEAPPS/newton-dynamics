@@ -33,10 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma warning(disable : 4201)
 #endif
 
-typedef union glatter_extension_support_status_union_WGL
+typedef struct glatter_extension_support_status_WGL
 {
-    int inexed_extensions[55];
-    struct {
         int has_WGL_3DFX_multisample;
         int has_WGL_3DL_stereo_control;
         int has_WGL_AMD_gpu_association;
@@ -92,7 +90,6 @@ typedef union glatter_extension_support_status_union_WGL
         int has_WGL_NV_video_capture;
         int has_WGL_NV_video_output;
         int has_WGL_OML_sync_control;
-    };
 } glatter_extension_support_status_WGL_t;
 
 

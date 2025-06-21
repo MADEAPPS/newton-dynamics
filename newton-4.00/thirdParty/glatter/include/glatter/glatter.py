@@ -940,12 +940,9 @@ def get_ext_support_decl(v):
 #pragma warning(disable : 4201)
 #endif
 
-typedef union glatter_extension_support_status_union_''' + v + '''
+typedef struct glatter_extension_support_status_''' + v + '''
 {
-    int inexed_extensions[''' + str(len(ext_names_sorted[v])) + '''];
-    struct {
 ''' + '\n'.join(['        int has_'+ x + ';' for x in ext_names_sorted[v]]) + '''
-    };
 } glatter_extension_support_status_''' + v + '''_t;
 
 
@@ -973,9 +970,12 @@ def get_ext_support_def(v):
         hts += str(val) + ',' + ('\n        ' if (((idx+1) % 30) == 0) else '')
 
     rv = '''
+#include <string.h> /* memcpy */
+
 GLATTER_INLINE_OR_NOT
 glatter_extension_support_status_''' + v + '''_t glatter_get_extension_support_''' + v + '''()
 {
+    static int indexed_extensions[''' + str(len(ext_names_sorted[v])) + '''];
     static glatter_extension_support_status_''' + v + '''_t ess;
 
     typedef glatter_es_record_t rt;
@@ -1021,7 +1021,7 @@ glatter_extension_support_status_''' + v + '''_t glatter_get_extension_support_'
                 for ( ; r && (r->hash | r->index); r++ ) {
                     if (r->hash == hash) {
                         index = r->index;
-                        ess.inexed_extensions[index] = 1;
+                        indexed_extensions[index] = 1;
                         break;
                     }
                 }
@@ -1045,7 +1045,7 @@ glatter_extension_support_status_''' + v + '''_t glatter_get_extension_support_'
                     for ( ; r && (r->hash | r->index); r++ ) {
                         if (r->hash == hash) {
                             index = r->index;
-                            ess.inexed_extensions[index] = 1;
+                            indexed_extensions[index] = 1;
                             break;
                         }
                     }
@@ -1068,7 +1068,7 @@ glatter_extension_support_status_''' + v + '''_t glatter_get_extension_support_'
                 for ( ; r && (r->hash | r->index); r++ ) {
                     if (r->hash == hash) {
                         index = r->index;
-                        ess.inexed_extensions[index] = 1;
+                        indexed_extensions[index] = 1;
                         break;
                     }
                 }
@@ -1101,7 +1101,7 @@ glatter_extension_support_status_''' + v + '''_t glatter_get_extension_support_'
                 for ( ; r && (r->hash | r->index); r++ ) {
                     if (r->hash == hash) {
                         index = r->index;
-                        ess.inexed_extensions[index] = 1;
+                        indexed_extensions[index] = 1;
                         break;
                     }
                 }
@@ -1124,7 +1124,7 @@ glatter_extension_support_status_''' + v + '''_t glatter_get_extension_support_'
             for ( ; r && (r->hash | r->index); r++ ) {
                 if (r->hash == hash) {
                     index = r->index;
-                    ess.inexed_extensions[index] = 1;
+                    indexed_extensions[index] = 1;
                     break;
                 }
             }
@@ -1136,6 +1136,10 @@ glatter_extension_support_status_''' + v + '''_t glatter_get_extension_support_'
     rv += '''
         initialized = 1;
     }
+    
+    // Map array to a struct without undefined behaviour.
+    // No actual copy is performed with even basic optimization e.g.: -Og
+    memcpy((void*)&ess, indexed_extensions, sizeof(ess)); 
 
     return ess;
 }

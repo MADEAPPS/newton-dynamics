@@ -27,9 +27,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 
+#include <string.h> /* memcpy */
+
 GLATTER_INLINE_OR_NOT
 glatter_extension_support_status_WGL_t glatter_get_extension_support_WGL()
 {
+    static int indexed_extensions[55];
     static glatter_extension_support_status_WGL_t ess;
 
     typedef glatter_es_record_t rt;
@@ -661,7 +664,7 @@ glatter_extension_support_status_WGL_t glatter_get_extension_support_WGL()
                 for ( ; r && (r->hash | r->index); r++ ) {
                     if (r->hash == hash) {
                         index = r->index;
-                        ess.inexed_extensions[index] = 1;
+                        indexed_extensions[index] = 1;
                         break;
                     }
                 }
@@ -684,7 +687,7 @@ glatter_extension_support_status_WGL_t glatter_get_extension_support_WGL()
             for ( ; r && (r->hash | r->index); r++ ) {
                 if (r->hash == hash) {
                     index = r->index;
-                    ess.inexed_extensions[index] = 1;
+                    indexed_extensions[index] = 1;
                     break;
                 }
             }
@@ -694,6 +697,10 @@ glatter_extension_support_status_WGL_t glatter_get_extension_support_WGL()
         }
         initialized = 1;
     }
+    
+    // Map array to a struct without undefined behaviour.
+    // No actual copy is performed with even basic optimization e.g.: -Og
+    memcpy((void*)&ess, indexed_extensions, sizeof(ess)); 
 
     return ess;
 }

@@ -33,10 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma warning(disable : 4201)
 #endif
 
-typedef union glatter_extension_support_status_union_GLX
+typedef struct glatter_extension_support_status_GLX
 {
-    int inexed_extensions[67];
-    struct {
         int has_GLX_3DFX_multisample;
         int has_GLX_AMD_gpu_association;
         int has_GLX_ARB_context_flush_control;
@@ -104,7 +102,6 @@ typedef union glatter_extension_support_status_union_GLX
         int has_GLX_SGI_swap_control;
         int has_GLX_SGI_video_sync;
         int has_GLX_SUN_get_transparent_index;
-    };
 } glatter_extension_support_status_GLX_t;
 
 

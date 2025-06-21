@@ -33,10 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma warning(disable : 4201)
 #endif
 
-typedef union glatter_extension_support_status_union_GL
+typedef struct glatter_extension_support_status_GL
 {
-    int inexed_extensions[591];
-    struct {
         int has_GL_3DFX_multisample;
         int has_GL_3DFX_tbuffer;
         int has_GL_3DFX_texture_compression_FXT1;
@@ -628,7 +626,6 @@ typedef union glatter_extension_support_status_union_GL
         int has_GL_SUN_vertex;
         int has_GL_WIN_phong_shading;
         int has_GL_WIN_specular_fog;
-    };
 } glatter_extension_support_status_GL_t;
 
 

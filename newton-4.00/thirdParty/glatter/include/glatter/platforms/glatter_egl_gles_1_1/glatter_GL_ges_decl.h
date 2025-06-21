@@ -33,10 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma warning(disable : 4201)
 #endif
 
-typedef union glatter_extension_support_status_union_GL
+typedef struct glatter_extension_support_status_GL
 {
-    int inexed_extensions[74];
-    struct {
         int has_GL_AMD_compressed_3DC_texture;
         int has_GL_AMD_compressed_ATC_texture;
         int has_GL_APPLE_copy_texture_levels;
@@ -111,7 +109,6 @@ typedef union glatter_extension_support_status_union_GL
         int has_GL_QCOM_perfmon_global_mode;
         int has_GL_QCOM_tiled_rendering;
         int has_GL_QCOM_writeonly_rendering;
-    };
 } glatter_extension_support_status_GL_t;
 
 
