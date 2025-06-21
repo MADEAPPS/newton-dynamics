@@ -8,22 +8,16 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
-#ifndef __ND_BRAIN_GPU_BUFFER_H__
-#define __ND_BRAIN_GPU_BUFFER_H__
+#ifndef __ND_BRAIN_CPU_INTEGER_BUFFER_H__
+#define __ND_BRAIN_CPU_INTEGER_BUFFER_H__
 
-#include "ndBrainStdafx.h"
 #include "ndBrainBuffer.h"
 
-class ndBrainGpuBuffer;
-class ndBrainGpuContext;
-
-class ndBrainGpuBuffer : public ndBrainBuffer
+class ndBrainCpuIntegerBuffer : public ndBrainBuffer
 {
-	protected:
-	ndBrainGpuBuffer(ndBrainContext* const context, ndInt64 sizeInByte, ndStorageBufferType bufferTypeFlags);
-
 	public:
-	virtual ~ndBrainGpuBuffer();
+	ndBrainCpuIntegerBuffer(ndBrainContext* const context, ndInt64 sizeInElements);
+	ndBrainCpuIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32* const indexArray);
 
 	virtual void BrainVectorToDevice(const ndBrainVector& vector) override;
 	virtual void BrainVectorFromDevice(ndBrainVector& vector) const override;
@@ -40,9 +34,10 @@ class ndBrainGpuBuffer : public ndBrainBuffer
 	virtual void LoadData(size_t sizeInBytes, const void* const sourceData) override;
 	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const override;
 
-	cl::Buffer m_buffer;
-	friend class ndBrainGpuContext;
-	friend class ndBrainGpuCommand;
+	ndArray<ndUnsigned32> m_indexArray;
+
+	friend class ndBrainTrainerCpu;
+	friend class ndBrainTrainerCpuInference;
 };
 
 #endif

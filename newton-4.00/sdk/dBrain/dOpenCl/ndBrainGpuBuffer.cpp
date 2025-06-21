@@ -91,24 +91,6 @@ void ndBrainGpuBuffer::BrainMatrixToDevice(const ndBrainMatrix* const matrix)
 	//error *= 1;
 }
 
-void ndBrainGpuBuffer::CopyBuffer(const ndBrainBuffer& source, size_t srcOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes)
-{
-	ndAssert(m_context->GetAsGpuContext());
-
-	const ndBrainGpuBuffer& srcBuffer = *((ndBrainGpuBuffer*)&source);
-
-	size_t srcOffset = srcOffsetInBytes;
-	size_t dstOffset = dstOffsetInBytes;
-	ndAssert(sizeInBytes <= m_sizeInBytes);
-	ndAssert((dstOffset + sizeInBytes) <= m_sizeInBytes);
-	ndAssert((srcOffset + sizeInBytes) <= source.SizeInBytes());
-
-	cl_int error = 0;
-	ndSharedPtr<cl::CommandQueue>& queue = m_context->GetAsGpuContext()->m_queue;
-	error = queue->enqueueCopyBuffer(srcBuffer.m_buffer, m_buffer, srcOffset, dstOffset, sizeInBytes, nullptr, nullptr);
-	ndAssert(error == CL_SUCCESS);
-}
-
 void ndBrainGpuBuffer::LoadData(size_t sizeInBytes, const void* const sourceData)
 {
 	ndAssert(m_context->GetAsGpuContext());
@@ -128,4 +110,27 @@ void ndBrainGpuBuffer::UnloadData(size_t sizeInBytes, void* const destinationDat
 	ndSharedPtr<cl::CommandQueue>& queue = m_context->GetAsGpuContext()->m_queue;
 	error = queue->enqueueReadBuffer(m_buffer, CL_TRUE, 0, sizeInBytes, destinationData);
 	ndAssert(error == CL_SUCCESS);
+}
+
+void ndBrainGpuBuffer::CopyBuffer(const ndBrainBuffer& source, size_t srcOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes)
+{
+	ndAssert(m_context->GetAsGpuContext());
+
+	const ndBrainGpuBuffer& srcBuffer = *((ndBrainGpuBuffer*)&source);
+
+	size_t srcOffset = srcOffsetInBytes;
+	size_t dstOffset = dstOffsetInBytes;
+	ndAssert(sizeInBytes <= m_sizeInBytes);
+	ndAssert((dstOffset + sizeInBytes) <= m_sizeInBytes);
+	ndAssert((srcOffset + sizeInBytes) <= source.SizeInBytes());
+
+	cl_int error = 0;
+	ndSharedPtr<cl::CommandQueue>& queue = m_context->GetAsGpuContext()->m_queue;
+	error = queue->enqueueCopyBuffer(srcBuffer.m_buffer, m_buffer, srcOffset, dstOffset, sizeInBytes, nullptr, nullptr);
+	ndAssert(error == CL_SUCCESS);
+}
+
+void ndBrainGpuBuffer::CopyBufferIndirectSource(const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcDataBuffer, ndInt32 srcStrideIntBytes)
+{
+	ndAssert(0);
 }

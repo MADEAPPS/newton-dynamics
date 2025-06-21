@@ -113,17 +113,6 @@ void ndBrainCpuFloatBuffer::MemoryFromDevive(size_t, void* const) const
 	ndAssert(0);
 }
 
-void ndBrainCpuFloatBuffer::CopyBuffer(const ndBrainBuffer& sourceData, size_t srcOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes)
-{
-	ndInt64 dstOffset = ndInt64(dstOffsetInBytes / sizeof(ndReal));
-	ndInt64 srcOffset = ndInt64(srcOffsetInBytes / sizeof(ndReal));
-	
-	ndBrainCpuFloatBuffer& source = *((ndBrainCpuFloatBuffer*)&sourceData);
-	ndBrainMemVector dst(&m_buffer[dstOffset], ndInt32(sizeInBytes / sizeof(ndReal)));
-	const ndBrainMemVector src(&source.m_buffer[srcOffset], ndInt32(sizeInBytes / sizeof(ndReal)));
-	dst.Set(src);
-}
-
 void ndBrainCpuFloatBuffer::LoadData(size_t sizeInBytes, const void* const sourceData)
 {
 	ndBrainMemVector src((ndBrainFloat*)sourceData, ndInt32 (sizeInBytes / sizeof(ndReal)));
@@ -132,6 +121,23 @@ void ndBrainCpuFloatBuffer::LoadData(size_t sizeInBytes, const void* const sourc
 
 //void ndBrainCpuFloatBuffer::UnloadData(size_t sizeInBytes, void* const outputData) const
 void ndBrainCpuFloatBuffer::UnloadData(size_t, void* const) const
+{
+	ndAssert(0);
+}
+
+
+void ndBrainCpuFloatBuffer::CopyBuffer(const ndBrainBuffer& sourceData, size_t srcOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes)
+{
+	ndInt64 dstOffset = ndInt64(dstOffsetInBytes / sizeof(ndReal));
+	ndInt64 srcOffset = ndInt64(srcOffsetInBytes / sizeof(ndReal));
+
+	ndBrainCpuFloatBuffer& source = *((ndBrainCpuFloatBuffer*)&sourceData);
+	ndBrainMemVector dst(&m_buffer[dstOffset], ndInt32(sizeInBytes / sizeof(ndReal)));
+	const ndBrainMemVector src(&source.m_buffer[srcOffset], ndInt32(sizeInBytes / sizeof(ndReal)));
+	dst.Set(src);
+}
+
+void ndBrainCpuFloatBuffer::CopyBufferIndirectSource(const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcDataBuffer, ndInt32 srcStrideIntBytes)
 {
 	ndAssert(0);
 }

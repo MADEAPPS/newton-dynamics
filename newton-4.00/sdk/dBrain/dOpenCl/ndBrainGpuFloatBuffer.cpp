@@ -15,20 +15,20 @@
 #include "ndBrainGpuContext.h"
 #include "ndBrainGpuFloatBuffer.h"
 
-ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, ndInt64 size)
-	:ndBrainGpuBuffer(context, size * ndInt32(sizeof(ndReal)), ndStorageData)
+ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, ndInt64 sizeInElements)
+	:ndBrainGpuBuffer(context, sizeInElements * ndInt64(sizeof(ndReal)), ndStorageData)
 {
 }
 
 ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainVector& input)
-	:ndBrainGpuBuffer(context, input.GetCount() * ndInt32(sizeof(ndReal)), ndStorageData)
+	:ndBrainGpuBuffer(context, input.GetCount() * ndInt64(sizeof(ndReal)), ndStorageData)
 {
 	ndAssert(m_context->GetAsGpuContext());
 	BrainVectorToDevice(input);
 }
 
 ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainMatrix& matrix)
-	:ndBrainGpuBuffer(context, matrix.GetColumns() * matrix.GetRows() * ndInt32(sizeof(ndReal)), ndStorageData)
+	:ndBrainGpuBuffer(context, matrix.GetColumns() * matrix.GetRows() * ndInt64(sizeof(ndReal)), ndStorageData)
 {
 	ndAssert(m_context->GetAsGpuContext());
 	BrainMatrixToDevice(&matrix);

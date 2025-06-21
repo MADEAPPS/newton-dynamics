@@ -160,7 +160,7 @@ static void MnistTrainingSet()
 			,m_minValidationFail(ndInt64(1000000) * ndInt64(1000000))
 			,m_hasGpuSupport(m_brain->IsGpuReady())
 		{
-			//m_hasGpuSupport = false;
+			m_hasGpuSupport = false;
 			if (m_hasGpuSupport)
 			{
 				m_context = ndSharedPtr<ndBrainContext>(new ndBrainGpuContext);
@@ -282,8 +282,9 @@ static void MnistTrainingSet()
 						input.SetCount(inputSize);
 						input.Set((*trainingDigits)[index]);
 					}
-
 					//trainer->MakePrediction(miniBatchInput);
+
+					m_indirectMiniBatch->MemoryToDevive(m_miniBatchSize * sizeof(ndUnsigned32), &shuffleBuffer[batchStart]);
 					trainer->LoadInput(miniBatchInput);
 					trainer->MakePrediction();
 					trainer->SyncQueue();
@@ -354,6 +355,7 @@ static void MnistTrainingSet()
 
 		ndSharedPtr<ndBrainBuffer> m_testData;
 		ndSharedPtr<ndBrainBuffer> m_trainingData;
+		ndSharedPtr<ndBrainBuffer> m_indirectMiniBatch;
 		ndInt32 m_inputSize;
 		ndReal m_learnRate;
 		ndInt32 m_miniBatchSize;
@@ -431,11 +433,13 @@ static void MnistTrainingSet()
 		{
 			optimizer.m_testData = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuFloatBuffer(context, **testDigits));
 			optimizer.m_trainingData = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuFloatBuffer(context, **trainingDigits));
+			optimizer.m_indirectMiniBatch = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuIntegerBuffer(context, optimizer.m_miniBatchSize));
 		}
 		else
 		{
 			optimizer.m_testData = ndSharedPtr<ndBrainBuffer>(new ndBrainCpuFloatBuffer(context, **testDigits));
 			optimizer.m_trainingData = ndSharedPtr<ndBrainBuffer>(new ndBrainCpuFloatBuffer(context, **trainingDigits));
+			optimizer.m_indirectMiniBatch = ndSharedPtr<ndBrainBuffer>(new ndBrainCpuIntegerBuffer(context, optimizer.m_miniBatchSize));
 		}
 
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
