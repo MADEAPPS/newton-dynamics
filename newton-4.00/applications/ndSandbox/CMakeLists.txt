@@ -59,10 +59,9 @@ endif()
 
 add_executable(${projectName} ${CPP_SOURCE})
 
-if(MSVC OR MINGW)
-	target_link_libraries (${projectName} ndNewton ndBrain ndModel vhacd openfbx lodepng glfw imgui glatter)
-else()
-	target_link_libraries (${projectName} ndNewton ndBrain ndModel vhacd openfbx lodepng imgui glatter glfw dl ${X11_LIBRARIES})
+target_link_libraries (${projectName} ndNewton ndBrain ndModel vhacd openfbx lodepng imgui glatter glfw)
+if(UNIX)
+	target_link_libraries (${projectName} dl ${X11_LIBRARIES})
 endif()
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
