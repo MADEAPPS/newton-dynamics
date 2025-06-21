@@ -160,7 +160,7 @@ static void MnistTrainingSet()
 			,m_minValidationFail(ndInt64(1000000) * ndInt64(1000000))
 			,m_hasGpuSupport(m_brain->IsGpuReady())
 		{
-			m_hasGpuSupport = false;
+			//m_hasGpuSupport = false;
 			if (m_hasGpuSupport)
 			{
 				m_context = ndSharedPtr<ndBrainContext>(new ndBrainGpuContext);
@@ -233,7 +233,7 @@ static void MnistTrainingSet()
 		//void Optimize(
 		//	ndBrainMatrix* const trainingLabels, ndBrainMatrix* const trainingDigits,
 		//	ndBrainMatrix* const testLabels, ndBrainMatrix* const testDigits)
-		void Optimize(ndBrainMatrix* const trainingLabels, ndBrainMatrix* const trainingDigits, ndBrainMatrix* const testLabels)
+		void Optimize(ndBrainMatrix* const trainingLabels, ndBrainMatrix* const testLabels)
 		{
 			//// so far best training result on the mnist data set
 			//optimizer.SetRegularizer(ndBrainFloat(0.0f));		//         training(100.0%) test(99.35%) 
@@ -244,7 +244,7 @@ static void MnistTrainingSet()
 			//optimizer.SetRegularizer(ndBrainFloat(4.0e-5f));	// 
 
 			ndArray<ndUnsigned32> shuffleBuffer;
-			for (ndInt32 i = 0; i < trainingDigits->GetCount(); ++i)
+			for (ndInt32 i = 0; i < trainingLabels->GetCount(); ++i)
 			{
 				shuffleBuffer.PushBack(ndUnsigned32(i));
 			}
@@ -263,7 +263,7 @@ static void MnistTrainingSet()
 			miniBatchOutput.SetCount(outputSize * m_miniBatchSize);
 			miniBatchOutputGradients.SetCount(outputSize * m_miniBatchSize);
 			
-			ndInt32 batchesCount = trainingDigits->GetRows() / m_miniBatchSize;
+			ndInt32 batchesCount = trainingLabels->GetRows() / m_miniBatchSize;
 			ndInt32 batchesSize = batchesCount * m_miniBatchSize;
 
 			m_bestBrain = ndSharedPtr<ndBrain>(new ndBrain (**trainer->GetBrain()));
@@ -446,7 +446,7 @@ static void MnistTrainingSet()
 		}
 
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
-		optimizer.Optimize(*trainingLabels, *trainingDigits, *testLabels);
+		optimizer.Optimize(*trainingLabels, *testLabels);
 		time = ndGetTimeInMicroseconds() - time;
 	
 		char path[256];

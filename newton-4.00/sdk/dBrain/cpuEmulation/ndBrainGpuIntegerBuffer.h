@@ -8,41 +8,34 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
-#ifndef __ND_BRAIN_GPU_UNIFORM_BUFFER_H__
-#define __ND_BRAIN_GPU_UNIFORM_BUFFER_H__
+#ifndef __ND_BRAIN_GPU_INTEGER_BUFFER_H__
+#define __ND_BRAIN_GPU_INTEGER_BUFFER_H__
 
-#include "ndBrainStdafx.h"
 #include "ndBrainBuffer.h"
-#include "ndBrainGpuContext.h"
 
-class ndBrainGpuUniformBuffer : public ndBrainBuffer
+class ndBrainGpuIntegerBuffer : public ndBrainBuffer
 {
 	public:
-	ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes);
-	ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes, const void* const data);
-
-	//virtual ndBrainGpuUniformBuffer* GetAsUniformBuffer();
-	//virtual void LoadData(size_t sizeInBytes, const void* const inputData) override;
-	//virtual void UnloadData(size_t sizeInBytes, void* const outputData) const override;
+	ndBrainGpuIntegerBuffer(ndBrainContext* const context, ndInt64 sizeInElements);
+	ndBrainGpuIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32* const indexArray);
 
 	virtual void BrainVectorToDevice(const ndBrainVector& vector) override;
 	virtual void BrainVectorFromDevice(ndBrainVector& vector) const override;
 
 	virtual void BrainMatrixToDevice(const ndBrainMatrix* const matrix) override;
 
-	virtual void MemoryToDevive(size_t sizeInBytes, const void* const inputMemory) override;
+	virtual void MemoryToDevive(size_t sizeInBytes, const void* const inputData) override;
 	virtual void MemoryFromDevive(size_t sizeInBytes, void* const outputMemory) const override;
 
-	virtual void CopyBuffer(const ndBrainBuffer& srcBuffer, size_t sourceOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes) override;
+	virtual void CopyBuffer(const ndBrainBuffer& source, size_t sourceOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes) override;
 	virtual void CopyBufferIndirectSource(const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcDataBuffer, ndInt32 srcStrideIntBytes) override;
 
-	void* GetData();
-
 	protected:
-	virtual void LoadData(size_t sizeInBytes, const void* const inputData) override;
+	virtual void LoadData(size_t sizeInBytes, const void* const sourceData) override;
 	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const override;
 
-	ndFixSizeArray<char, 256> m_data;
+	ndArray<ndUnsigned32> m_indexArray;
+	friend class ndBrainGpuFloatBuffer;
 };
 
 #endif

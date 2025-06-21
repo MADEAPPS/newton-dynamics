@@ -144,7 +144,7 @@ void ndBrainCpuFloatBuffer::CopyBufferIndirectSource(const ndBrainBuffer& indexB
 	const ndBrainCpuIntegerBuffer& indirectArray = *((ndBrainCpuIntegerBuffer*)&indexBuffer);
 	ndInt32 count = ndInt32 (indirectArray.m_sizeInBytes / sizeof(ndUnsigned32));
 
-	ndInt32 stride = srcStrideIntBytes / sizeof(ndReal);
+	ndInt32 stride = ndInt32 (srcStrideIntBytes / sizeof(ndReal));
 	for (ndInt32 i = 0; i < count; ++i)
 	{
 		ndUnsigned32 index = indirectArray.m_indexArray[i];

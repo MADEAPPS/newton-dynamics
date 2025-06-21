@@ -14,6 +14,7 @@
 #include "ndBrainMatrix.h"
 #include "ndBrainGpuContext.h"
 #include "ndBrainGpuFloatBuffer.h"
+#include "ndBrainGpuIntegerBuffer.h"
 
 ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, ndInt64 size)
 	:ndBrainBuffer(context, size * ndInt32(sizeof(ndReal)), ndStorageData)
@@ -91,14 +92,22 @@ void ndBrainGpuFloatBuffer::BrainMatrixToDevice(const ndBrainMatrix* const matri
 	BrainVectorToDevice(flatArray);
 }
 
-void ndBrainGpuFloatBuffer::MemoryToDevive(size_t sizeInBytes, const void* const inputMemory)
+//void ndBrainGpuFloatBuffer::MemoryToDevive(size_t sizeInBytes, const void* const inputMemory)
+void ndBrainGpuFloatBuffer::MemoryToDevive(size_t, const void* const)
 {
 	ndAssert(0);
 }
 
-void ndBrainGpuFloatBuffer::MemoryFromDevive(size_t sizeInBytes, void* const outputMemory) const
+//void ndBrainGpuFloatBuffer::MemoryFromDevive(size_t sizeInBytes, void* const outputMemory) const
+void ndBrainGpuFloatBuffer::MemoryFromDevive(size_t, void* const) const
 {
 	ndAssert(0);
+}
+
+void ndBrainGpuFloatBuffer::LoadData(size_t sizeInBytes, const void* const sourceData)
+{
+	ndBrainMemVector src((ndBrainFloat*)sourceData, ndInt32(sizeInBytes / sizeof(ndReal)));
+	m_buffer.Set(src);
 }
 
 void ndBrainGpuFloatBuffer::CopyBuffer(const ndBrainBuffer& srcBuffer, size_t srcOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes)
@@ -112,14 +121,24 @@ void ndBrainGpuFloatBuffer::CopyBuffer(const ndBrainBuffer& srcBuffer, size_t sr
 	dst.Set(src);
 }
 
-void ndBrainGpuFloatBuffer::LoadData(size_t sizeInBytes, const void* const sourceData)
-{
-	ndBrainMemVector src((ndBrainFloat*)sourceData, ndInt32(sizeInBytes / sizeof(ndReal)));
-	m_buffer.Set(src);
-}
-
 void ndBrainGpuFloatBuffer::UnloadData(size_t sizeInBytes, void* const outputData) const
 {
 	ndBrainMemVector dst((ndBrainFloat*)outputData, ndInt32(sizeInBytes / sizeof(ndReal)));
 	dst.Set(m_buffer);
+}
+
+void ndBrainGpuFloatBuffer::CopyBufferIndirectSource(const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcDataBuffer, ndInt32 srcStrideIntBytes)
+{
+	const ndBrainGpuFloatBuffer& srcBuffer = *((ndBrainGpuFloatBuffer*)&srcDataBuffer);
+	const ndBrainGpuIntegerBuffer& indirectArray = *((ndBrainGpuIntegerBuffer*)&indexBuffer);
+	ndInt32 count = ndInt32(indirectArray.SizeInBytes() / sizeof(ndUnsigned32));
+
+	ndInt32 stride = ndInt32 (srcStrideIntBytes / sizeof(ndReal));
+	for (ndInt32 i = 0; i < count; ++i)
+	{
+		ndUnsigned32 index = indirectArray.m_indexArray[i];
+		ndBrainMemVector src(&srcBuffer.m_buffer[index * stride], stride);
+		ndBrainMemVector dst(&m_buffer[i * stride], stride);
+		dst.Set(src);
+	}
 }
