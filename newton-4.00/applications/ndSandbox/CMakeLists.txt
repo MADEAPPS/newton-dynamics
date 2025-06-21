@@ -114,11 +114,11 @@ if(UNIX)
 
     set (source "${CMAKE_SOURCE_DIR}/applications/media")
     set (destination "${PROJECT_BINARY_DIR}/applications/media")
-    //add_custom_command(
-    //    TARGET ${projectName} POST_BUILD
-    //    COMMAND ${CMAKE_COMMAND} -E create_symlink ${source} ${destination}
-    //    DEPENDS ${destination}
-    //    COMMENT "symbolic link resources folder from ${source} => ${destination}")
+    #add_custom_command(
+    #    TARGET ${projectName} POST_BUILD
+    #    COMMAND ${CMAKE_COMMAND} -E create_symlink ${source} ${destination}
+    #    DEPENDS ${destination}
+    #    COMMENT "symbolic link resources folder from ${source} => ${destination}")
     add_custom_command(
         TARGET ${projectName} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E create_symlink ${source} ${destination}
