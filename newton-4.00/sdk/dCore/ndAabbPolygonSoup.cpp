@@ -771,14 +771,14 @@ void ndAabbPolygonSoup::Serialize (const char* const path) const
 	FILE* const file = fopen(path, "wb");
 	if (file)
 	{
-		fwrite(&m_vertexCount, sizeof(ndInt32), 1, file);
-		fwrite(&m_indexCount, sizeof(ndInt32), 1, file);
-		fwrite(&m_nodesCount, sizeof(ndInt32), 1, file);
+		(void)fwrite(&m_vertexCount, sizeof(ndInt32), 1, file);
+		(void)fwrite(&m_indexCount, sizeof(ndInt32), 1, file);
+		(void)fwrite(&m_nodesCount, sizeof(ndInt32), 1, file);
 		if (m_aabb)
 		{
-			fwrite(m_localVertex, sizeof(ndTriplex) * m_vertexCount, 1, file);
-			fwrite(m_indices, sizeof(ndInt32) * m_indexCount, 1, file);
-			fwrite(m_aabb, sizeof(ndNode) * m_nodesCount, 1, file);
+			(void)fwrite(m_localVertex, sizeof(ndTriplex) * m_vertexCount, 1, file);
+			(void)fwrite(m_indices, sizeof(ndInt32) * m_indexCount, 1, file);
+			(void)fwrite(m_aabb, sizeof(ndNode) * m_nodesCount, 1, file);
 		}
 		fclose(file);
 	}
@@ -790,9 +790,9 @@ void ndAabbPolygonSoup::Deserialize (const char* const path)
 	if (file)
 	{
 		m_strideInBytes = sizeof(ndTriplex);
-		fread(&m_vertexCount, sizeof(ndInt32), 1, file);
-		fread(&m_indexCount, sizeof(ndInt32), 1, file);
-		fread(&m_nodesCount, sizeof(ndInt32), 1, file);
+		(void)fread(&m_vertexCount, sizeof(ndInt32), 1, file);
+		(void)fread(&m_indexCount, sizeof(ndInt32), 1, file);
+		(void)fread(&m_nodesCount, sizeof(ndInt32), 1, file);
 
 		if (m_vertexCount) 
 		{
@@ -800,9 +800,9 @@ void ndAabbPolygonSoup::Deserialize (const char* const path)
 			m_indices = (ndInt32*)ndMemory::Malloc(sizeof(ndInt32) * m_indexCount);
 			m_aabb = (ndNode*)ndMemory::Malloc(sizeof(ndNode) * m_nodesCount);
 
-			fread(m_localVertex, sizeof(ndTriplex) * m_vertexCount, 1, file);
-			fread(m_indices, sizeof(ndInt32) * m_indexCount, 1, file);
-			fread(m_aabb, sizeof(ndNode) * m_nodesCount, 1, file);
+			(void)fread(m_localVertex, sizeof(ndTriplex) * m_vertexCount, 1, file);
+			(void)fread(m_indices, sizeof(ndInt32) * m_indexCount, 1, file);
+			(void)fread(m_aabb, sizeof(ndNode) * m_nodesCount, 1, file);
 		}
 		else 
 		{
