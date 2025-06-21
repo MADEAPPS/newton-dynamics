@@ -130,8 +130,7 @@ GLATTER_INLINE_OR_NOT
 int x_error_handler(Display *dsp, XErrorEvent *error)
 {
     char error_string[128];
-    //XGetErrorText(dsp, error->error_code, error_string, 128);
-    sprintf(error_string, "error: %d", error->error_code);
+    XGetErrorText(dsp, error->error_code, error_string, 128);
     GLATTER_PRINTF("X Error: %s\n", error_string);
     return 0;
 }
@@ -148,8 +147,7 @@ void* glatter_get_proc_address_GLX(const char* function_name)
 #if !defined(GLATTER_DO_NOT_INSTALL_X_ERROR_HANDLER)
     static int initialized = 0;
     if (!initialized) {
-        // for some reason GLW misses these functions in linux.    
-        //XSetErrorHandler(x_error_handler);
+        XSetErrorHandler(x_error_handler);
         initialized = 1;
     }
 #endif //!defined(GLATTER_DO_NOT_INSTALL_X_ERROR_HANDLER)
