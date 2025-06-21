@@ -194,10 +194,10 @@ static void MnistTrainingSet()
 			ndInt32 batchesSize = batchesCount * m_miniBatchSize;
 
 			size_t size = m_inputSize * sizeof(ndReal);
-			ndBrainBuffer* const inputBuffer = m_trainer->GetInputBuffer();
+			ndBrainBuffer* const deviceMinibatchBuffer = m_trainer->GetInputBuffer();
 			for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
 			{
-				inputBuffer->CopyBuffer(**data, batchStart * size, 0, size * m_miniBatchSize);
+				deviceMinibatchBuffer->CopyBuffer(**data, batchStart * size, 0, size * m_miniBatchSize);
 				m_trainer->MakePrediction();
 				m_trainer->GetOutput(miniBatchOutput);
 
@@ -270,22 +270,25 @@ static void MnistTrainingSet()
 
 			ndBrainLossCategoricalCrossEntropy loss(outputSize);
 
+			ndBrainBuffer* const deviceMinibatchBuffer = m_trainer->GetInputBuffer();
 			for (ndInt32 epoch = 0; epoch < MINIST_NUMBER_OF_EPOCKS; ++epoch)
 			{
 				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
 				for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
 				{
-					for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
-					{
-						ndUnsigned32 index = shuffleBuffer[batchStart + i];
-						ndBrainMemVector input(&miniBatchInput[i * inputSize], inputSize);
-						input.SetCount(inputSize);
-						input.Set((*trainingDigits)[index]);
-					}
+					//for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
+					//{
+					//	ndUnsigned32 index = shuffleBuffer[batchStart + i];
+					//	ndBrainMemVector input(&miniBatchInput[i * inputSize], inputSize);
+					//	input.SetCount(inputSize);
+					//	input.Set((*trainingDigits)[index]);
+					//}
 					//trainer->MakePrediction(miniBatchInput);
+					//trainer->LoadInput(miniBatchInput);
 
 					m_indirectMiniBatch->MemoryToDevive(m_miniBatchSize * sizeof(ndUnsigned32), &shuffleBuffer[batchStart]);
-					trainer->LoadInput(miniBatchInput);
+					deviceMinibatchBuffer->CopyBufferIndirectSource(**m_indirectMiniBatch, **m_trainingData, ndInt32 (inputSize * sizeof (ndReal)));
+					
 					trainer->MakePrediction();
 					trainer->SyncQueue();
 					

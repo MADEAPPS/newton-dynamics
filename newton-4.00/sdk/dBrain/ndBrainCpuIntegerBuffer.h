@@ -37,6 +37,7 @@ class ndBrainCpuIntegerBuffer : public ndBrainBuffer
 	ndArray<ndUnsigned32> m_indexArray;
 
 	friend class ndBrainTrainerCpu;
+	friend class ndBrainCpuFloatBuffer;
 	friend class ndBrainTrainerCpuInference;
 };
 

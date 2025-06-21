@@ -14,6 +14,7 @@
 #include "ndBrainMatrix.h"
 #include "ndBrainCpuContext.h"
 #include "ndBrainCpuFloatBuffer.h"
+#include "ndBrainCpuIntegerBuffer.h"
 
 ndBrainCpuFloatBuffer::ndBrainCpuFloatBuffer(ndBrainContext* const context, ndInt64 sizeInFloat)
 	:ndBrainBuffer(context, sizeInFloat * ndInt32(sizeof(ndReal)), ndStorageData)
@@ -139,5 +140,16 @@ void ndBrainCpuFloatBuffer::CopyBuffer(const ndBrainBuffer& sourceData, size_t s
 
 void ndBrainCpuFloatBuffer::CopyBufferIndirectSource(const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcDataBuffer, ndInt32 srcStrideIntBytes)
 {
-	ndAssert(0);
+	const ndBrainCpuFloatBuffer& src = *((ndBrainCpuFloatBuffer*)&srcDataBuffer);
+	const ndBrainCpuIntegerBuffer& indirectArray = *((ndBrainCpuIntegerBuffer*)&indexBuffer);
+	ndInt32 count = ndInt32 (indirectArray.m_sizeInBytes / sizeof(ndUnsigned32));
+
+	ndInt32 stride = srcStrideIntBytes / sizeof(ndReal);
+	for (ndInt32 i = 0; i < count; ++i)
+	{
+		ndUnsigned32 index = indirectArray.m_indexArray[i];
+		ndBrainMemVector src(&src.m_buffer[index * stride], stride);
+		ndBrainMemVector dst(&m_buffer[i * stride], stride);
+		dst.Set(src);
+	}
 }
