@@ -120,7 +120,6 @@ void ndBrainTrainerGpuInference::AddLayersCommands(ndFixSizeArray<ndBrainLayer::
 		uniformParam.m_parametersStartOffset = data.m_parametersStartOffset;
 		uniformParam.m_layer = layer;
 		ndSharedPtr<ndBrainGpuUniformBuffer> uniformbuffer(new ndBrainGpuUniformBuffer(m_context, sizeof(ndBrainLayer::ndCommandShareInfo)));
-		//uniformbuffer->LoadData(sizeof(ndBrainLayer::ndCommandShareInfo), &uniformParam);
 		uniformbuffer->MemoryToDevive(sizeof(ndBrainLayer::ndCommandShareInfo), &uniformParam);
 
 		ndSharedPtr<ndBrainGpuCommand> command(layer->CreateGpuFeedForwardCommand(this, uniformParam, m_context, m_miniBatchSize, uniformbuffer, inputOutputBuffer, weightsBuffer));
@@ -147,7 +146,6 @@ void ndBrainTrainerGpuInference::AddCopyInputCommand(const ndBrainLayer::ndComma
 	uniformParam.m_inputOutputStartOffset = 0;
 	
 	ndSharedPtr<ndBrainGpuUniformBuffer> uniformbuffer(new ndBrainGpuUniformBuffer(m_context, sizeof(ndBrainLayer::ndCommandShareInfo)));
-	//uniformbuffer->LoadData(sizeof(ndBrainLayer::ndCommandShareInfo), &uniformParam);
 	uniformbuffer->MemoryToDevive(sizeof(ndBrainLayer::ndCommandShareInfo), &uniformParam);
 	
 	ndBrainGpuFloatBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
@@ -257,14 +255,6 @@ void ndBrainTrainerGpuInference::InitInputOutputBuffer()
 	m_inputOutputBuffer = ndSharedPtr<ndBrainGpuFloatBuffer>(new ndBrainGpuFloatBuffer(m_context, buffer));
 }
 
-//void ndBrainTrainerGpuInference::UnloadBuffer(ndBrainVector& ouput, const ndSharedPtr<ndBrainGpuBuffer>& gpuBuffer) const
-//{
-//	size_t sizeInBytes = gpuBuffer->SizeInBytes();
-//	ouput.SetCount(ndInt64(sizeInBytes / sizeof(ndReal)));
-//	ndAssert(0);
-////	gpuBuffer->UnloadData(sizeInBytes, &ouput[0]);
-//}
-
 ndBrainBuffer* ndBrainTrainerGpuInference::GetInputBuffer()
 {
 	return *m_miniBatchInputBuffer;
@@ -273,28 +263,24 @@ ndBrainBuffer* ndBrainTrainerGpuInference::GetInputBuffer()
 void ndBrainTrainerGpuInference::SaveInput(ndBrainVector& output) const
 {
 	m_context->SyncQueue();
-	//UnloadBuffer(output, m_miniBatchInputBuffer);
 	m_miniBatchInputBuffer->BrainVectorFromDevice(output);
 }
 
 void ndBrainTrainerGpuInference::GetOutput(ndBrainVector& output) const
 {
 	m_context->SyncQueue();
-	//UnloadBuffer(output, m_miniBatchOutputBuffer);
 	m_miniBatchOutputBuffer->BrainVectorFromDevice(output);
 }
 
 void ndBrainTrainerGpuInference::GetWorkingBuffer(ndBrainVector& output) const
 {
 	m_context->SyncQueue();
-	//UnloadBuffer(output, m_inputOutputBuffer);
 	m_inputOutputBuffer->BrainVectorFromDevice(output);
 }
 
 void ndBrainTrainerGpuInference::GetParameterBuffer(ndBrainVector& output) const
 {
 	m_context->SyncQueue();
-	//UnloadBuffer(output, m_weightAndBiasBuffer);
 	m_weightAndBiasBuffer->BrainVectorFromDevice(output);
 }
 

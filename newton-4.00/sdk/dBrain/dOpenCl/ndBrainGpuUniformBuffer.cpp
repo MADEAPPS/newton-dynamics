@@ -13,7 +13,6 @@
 #include "ndBrainVector.h"
 #include "ndBrainGpuContext.h"
 #include "ndBrainGpuUniformBuffer.h"
-//#include "ndBrainGpuScopeMapBuffer.h"
 
 ndBrainGpuUniformBuffer::ndBrainGpuUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes)
 	:ndBrainGpuBuffer(context, sizeInBytes, ndUniformData)

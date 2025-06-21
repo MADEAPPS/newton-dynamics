@@ -82,7 +82,8 @@ void ndBrainCpuFloatBuffer::BrainVectorToDevice(const ndBrainVector& vector)
 	LoadData(vector.GetCount() * sizeof(ndReal), &vector[0]);
 }
 
-void ndBrainCpuFloatBuffer::BrainVectorFromDevice(ndBrainVector& vector) const
+//void ndBrainCpuFloatBuffer::BrainVectorFromDevice(ndBrainVector& vector) const
+void ndBrainCpuFloatBuffer::BrainVectorFromDevice(ndBrainVector&) const
 {
 	ndAssert(0);
 }
@@ -100,12 +101,14 @@ void ndBrainCpuFloatBuffer::BrainMatrixToDevice(const ndBrainMatrix* const matri
 	BrainVectorToDevice(flatArray);
 }
 
-void ndBrainCpuFloatBuffer::MemoryToDevive(size_t sizeInBytes, const void* const inputData)
+//void ndBrainCpuFloatBuffer::MemoryToDevive(size_t sizeInBytes, const void* const inputData)
+void ndBrainCpuFloatBuffer::MemoryToDevive(size_t, const void* const)
 {
 	ndAssert(0);
 }
 
-void ndBrainCpuFloatBuffer::MemoryFromDevive(size_t sizeInBytes, void* const outputMemory) const
+//void ndBrainCpuFloatBuffer::MemoryFromDevive(size_t sizeInBytes, void* const outputMemory) const
+void ndBrainCpuFloatBuffer::MemoryFromDevive(size_t, void* const) const
 {
 	ndAssert(0);
 }
@@ -127,7 +130,8 @@ void ndBrainCpuFloatBuffer::LoadData(size_t sizeInBytes, const void* const sourc
 	m_buffer.Set(src);
 }
 
-void ndBrainCpuFloatBuffer::UnloadData(size_t sizeInBytes, void* const outputData) const
+//void ndBrainCpuFloatBuffer::UnloadData(size_t sizeInBytes, void* const outputData) const
+void ndBrainCpuFloatBuffer::UnloadData(size_t, void* const) const
 {
 	ndAssert(0);
 }
