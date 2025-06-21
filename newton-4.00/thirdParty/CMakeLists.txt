@@ -27,7 +27,6 @@ if (NOT APPLE)
 		endif(MSVC OR MINGW)
 
 		add_subdirectory(imgui)
-		#add_subdirectory(openAL)
 		add_subdirectory(glatter)
 	endif()
 endif()

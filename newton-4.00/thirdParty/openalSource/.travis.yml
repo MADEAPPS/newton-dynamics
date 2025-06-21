@@ -1,5 +1,0 @@
-os:
-  - linux
-  - osx
-language: c
-script: cmake . && make -j2
