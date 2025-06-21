@@ -58,11 +58,13 @@ else()
 endif()
 
 add_executable(${projectName} ${CPP_SOURCE})
-if(MSVC OR MINGW)
-	target_link_libraries (${projectName} ndNewton ndBrain ndModel vhacd openfbx lodepng glfw imgui glatter)
-else()
-	target_link_libraries (${projectName} ndNewton ndBrain ndModel vhacd openfbx lodepng imgui glatter glfw Xlib pthread ${CMAKE_DL_LIBS})
-endif()
+target_link_libraries (${projectName} ndNewton ndBrain ndModel vhacd openfbx lodepng glfw imgui glatter)
+
+#if(MSVC OR MINGW)
+#	target_link_libraries (${projectName} ndNewton ndBrain ndModel vhacd openfbx lodepng glfw imgui glatter)
+#else()
+#	target_link_libraries (${projectName} ndNewton ndBrain ndModel vhacd openfbx lodepng imgui glatter glfw Xlib pthread ${CMAKE_DL_LIBS})
+#endif()
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	target_link_libraries (${projectName} ndCollision ndCore)
