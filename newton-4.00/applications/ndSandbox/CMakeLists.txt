@@ -58,7 +58,7 @@ else()
 endif()
 
 add_executable(${projectName} ${CPP_SOURCE})
-target_link_libraries (${projectName} ndNewton ndBrain ndModel vhacd openfbx lodepng glfw imgui glatter)
+target_link_libraries (${projectName} ndNewton ndBrain ndModel vhacd openfbx lodepng glfw imgui glatter ${CMAKE_DL_LIBS})
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	target_link_libraries (${projectName} ndCollision ndCore)
