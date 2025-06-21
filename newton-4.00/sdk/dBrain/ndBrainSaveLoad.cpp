@@ -62,20 +62,23 @@ ndBrain* ndBrainLoad::Load(const char* const pathName)
 		ndInt32 ReadInt() const
 		{
 			ndInt32 value;
-			(void)fscanf(m_file, "%d", &value);
+			size_t readValues = 0;
+			readValues += fscanf(m_file, "%d", &value);
 			return value;
 		}
 
 		ndFloat32 ReadFloat() const
 		{
 			ndReal value;
-			(void)fscanf(m_file, "%f", &value);
+			size_t readValues = 0;
+			readValues += fscanf(m_file, "%f", &value);
 			return ndFloat32 (value);
 		}
 
 		void ReadString(char* const buffer) const
 		{
-			(void)fscanf(m_file, "%s", buffer);
+			size_t readValues = 0;
+			readValues += fscanf(m_file, "%s", buffer);
 		}
 
 		FILE* m_file;
