@@ -355,78 +355,80 @@ void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Optimize()
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::AddExploration(ndBrainFloat* const actions)
 {
-	ndInt32 action = 0;
-	ndFloat32 explore = ndRand();
-	
-	const ndBrainMemVector qActionValues(actions, actionDim);
-	if (explore <= m_explorationProbability)
-	{
-		// explore environment
-		ndUnsigned32 randomIndex = ndRandInt();
-		action = ndInt32(randomIndex % actionDim);
-
-		// using soft max and cumulative distribution instead
-		// seem like a good idead but in fact si really bad. 
-		//ndBrainFloat max = ndBrainFloat(1.0e-16f);
-		//for (ndInt32 i = actionDim - 1; i >= 0; --i)
-		//{
-		//	max = ndMax(actions[i], max);
-		//}
-		//ndBrainFixSizeVector<actionDim + 1> pdf;
-		//pdf.SetCount(0);
-		//ndBrainFloat acc = ndBrainFloat(0.0f);
-		//for (ndInt32 i = 0; i < actionDim; ++i)
-		//{
-		//	ndBrainFloat in = ndMax((actions[i] - max), ndBrainFloat(-30.0f));
-		//	ndAssert(in <= ndBrainFloat(0.0f));
-		//	ndBrainFloat prob = ndBrainFloat(ndExp(in));
-		//	pdf.PushBack(acc);
-		//	acc += prob;
-		//}
-		//pdf.PushBack(acc);
-		//pdf.Scale(ndBrainFloat(1.0f) / acc);
-		//
-		//ndFloat32 r = ndRand();
-		//action = actionDim - 1;
-		//for (ndInt32 i = actionDim - 1; i >= 0; --i)
-		//{
-		//	action = i;
-		//	if (pdf[i] < r)
-		//	{
-		//		break;
-		//	}
-		//}
-	}
-	else
-	{
-		action = qActionValues.ArgMax();
-	}
-	
-	if (!IsSampling())
-	{
-		m_averageQvalue.Update(qActionValues[action]);
-	}
-	m_currentTransition.m_action[0] = ndBrainFloat(action);
+	ndAssert(0);
+	//ndInt32 action = 0;
+	//ndFloat32 explore = ndRand();
+	//
+	//const ndBrainMemVector qActionValues(actions, actionDim);
+	//if (explore <= m_explorationProbability)
+	//{
+	//	// explore environment
+	//	ndUnsigned32 randomIndex = ndRandInt();
+	//	action = ndInt32(randomIndex % actionDim);
+	//
+	//	// using soft max and cumulative distribution instead
+	//	// seem like a good idead but in fact si really bad. 
+	//	//ndBrainFloat max = ndBrainFloat(1.0e-16f);
+	//	//for (ndInt32 i = actionDim - 1; i >= 0; --i)
+	//	//{
+	//	//	max = ndMax(actions[i], max);
+	//	//}
+	//	//ndBrainFixSizeVector<actionDim + 1> pdf;
+	//	//pdf.SetCount(0);
+	//	//ndBrainFloat acc = ndBrainFloat(0.0f);
+	//	//for (ndInt32 i = 0; i < actionDim; ++i)
+	//	//{
+	//	//	ndBrainFloat in = ndMax((actions[i] - max), ndBrainFloat(-30.0f));
+	//	//	ndAssert(in <= ndBrainFloat(0.0f));
+	//	//	ndBrainFloat prob = ndBrainFloat(ndExp(in));
+	//	//	pdf.PushBack(acc);
+	//	//	acc += prob;
+	//	//}
+	//	//pdf.PushBack(acc);
+	//	//pdf.Scale(ndBrainFloat(1.0f) / acc);
+	//	//
+	//	//ndFloat32 r = ndRand();
+	//	//action = actionDim - 1;
+	//	//for (ndInt32 i = actionDim - 1; i >= 0; --i)
+	//	//{
+	//	//	action = i;
+	//	//	if (pdf[i] < r)
+	//	//	{
+	//	//		break;
+	//	//	}
+	//	//}
+	//}
+	//else
+	//{
+	//	action = qActionValues.ArgMax();
+	//}
+	//
+	//if (!IsSampling())
+	//{
+	//	m_averageQvalue.Update(qActionValues[action]);
+	//}
+	//m_currentTransition.m_action[0] = ndBrainFloat(action);
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
 void ndBrainAgentDQN_Trainer<statesDim, actionDim>::Step()
 {
-	ndBrainFixSizeVector<actionDim> actions;
-
-	GetObservation(&m_currentTransition.m_observation[0]);
-	m_actor.MakePrediction(m_currentTransition.m_observation, actions);
-
-	AddExploration(&actions[0]);
-	ndBrainFloat bestAction = ndBrainFloat(m_currentTransition.m_action[0]);
-	
-	ApplyActions(&bestAction);
-	if (bestAction != ndBrainFloat(m_currentTransition.m_action[0]))
-	{
-		m_currentTransition.m_action[0] = bestAction;
-	}
-	
-	m_currentTransition.m_reward = CalculateReward();
+	ndAssert(0);
+	//ndBrainFixSizeVector<actionDim> actions;
+	//
+	//GetObservation(&m_currentTransition.m_observation[0]);
+	//m_actor.MakePrediction(m_currentTransition.m_observation, actions);
+	//
+	//AddExploration(&actions[0]);
+	//ndBrainFloat bestAction = ndBrainFloat(m_currentTransition.m_action[0]);
+	//
+	//ApplyActions(&bestAction);
+	//if (bestAction != ndBrainFloat(m_currentTransition.m_action[0]))
+	//{
+	//	m_currentTransition.m_action[0] = bestAction;
+	//}
+	//
+	//m_currentTransition.m_reward = CalculateReward();
 }
 
 template<ndInt32 statesDim, ndInt32 actionDim>
