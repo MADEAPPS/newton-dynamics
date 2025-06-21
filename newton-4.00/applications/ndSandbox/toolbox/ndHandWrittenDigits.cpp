@@ -160,7 +160,7 @@ static void MnistTrainingSet()
 			,m_minValidationFail(ndInt64(1000000) * ndInt64(1000000))
 			,m_hasGpuSupport(m_brain->IsGpuReady())
 		{
-			m_hasGpuSupport = false;
+			//m_hasGpuSupport = false;
 			if (m_hasGpuSupport)
 			{
 				m_context = ndSharedPtr<ndBrainContext>(new ndBrainGpuContext);

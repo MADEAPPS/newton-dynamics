@@ -362,12 +362,12 @@ void TestVulkanStuff()
 		TestCommand(
 			ndBrainGpuContext* const context, 
 			ndInt32 numberOfImputs, 
-			ndBrainGpuBuffer& uniforms,
-			ndBrainGpuBuffer& weights, 
-			ndBrainGpuBuffer& imputOutputs)
+			ndBrainGpuUniformBuffer& uniforms,
+			ndBrainGpuFloatBuffer& weights, 
+			ndBrainGpuFloatBuffer& imputOutputs)
 			:ndBrainGpuCommand(context, ndBrainLayer::ndCommandShareInfo())
 		{
-			ndFixSizeArray<ndBrainGpuBuffer*, 4> params;
+			ndFixSizeArray<ndBrainBuffer*, 4> params;
 			params.PushBack(&uniforms);
 			params.PushBack(&imputOutputs);
 			params.PushBack(&weights);

@@ -47,9 +47,9 @@ class ndBrainLayerActivationSoftmax : public ndBrainLayerActivation
 	virtual ndBrainTrainerGpuCommand* CreateGpuFeedForwardCommand(ndBrainTrainerGpuInference* const owner,
 		const ndBrainLayer::ndCommandShareInfo& info,
 		ndBrainGpuContext* const context, ndInt32 miniBatchSize,
-		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
-		ndBrainGpuBuffer* const inputOutputData,
-		ndBrainGpuBuffer* const parameters) const override;
+		const ndSharedPtr<ndBrainGpuUniformBuffer>& uniformBuffer,
+		ndBrainGpuFloatBuffer* const inputOutputData,
+		ndBrainGpuFloatBuffer* const parameters) const override;
 };
 
 #endif 

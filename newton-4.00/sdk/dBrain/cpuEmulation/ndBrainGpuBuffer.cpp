@@ -10,6 +10,7 @@
 */
 
 #include "ndBrainStdafx.h"
+#if 0
 #include "ndBrainVector.h"
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuContext.h"
@@ -23,6 +24,7 @@ ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt64 siz
 ndBrainGpuBuffer::~ndBrainGpuBuffer()
 {
 }
+
 
 size_t ndBrainGpuBuffer::SizeInBytes() const
 { 
@@ -38,3 +40,5 @@ ndBrainGpuUniformBuffer* ndBrainGpuBuffer::GetAsUniformBuffer()
 {
 	return nullptr;
 }
+
+#endif

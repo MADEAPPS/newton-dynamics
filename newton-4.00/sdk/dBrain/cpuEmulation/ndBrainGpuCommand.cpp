@@ -31,7 +31,7 @@ ndBrainGpuCommand::~ndBrainGpuCommand()
 {
 }
 
-void ndBrainGpuCommand::Assembly(const ndSharedPtr<ndBrainGpuShader>& shader, ndInt32 workGroupSize, ndInt32 buffersCount, ndBrainGpuBuffer** buffer)
+void ndBrainGpuCommand::Assembly(const ndSharedPtr<ndBrainGpuShader>& shader, ndInt32 workGroupSize, ndInt32 buffersCount, ndBrainBuffer** buffer)
 {
 	m_shader = shader;
 	m_workGroupSize = ND_DEFAULT_WORKGROUP_SIZE;

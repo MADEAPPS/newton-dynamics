@@ -68,8 +68,8 @@ class ndBrainOptimizerAdamGpu : public ndBrainOptimizer
 	virtual void Init(ndInt32 parametersBufferSizeInFloats, ndBrainFloat m_learRate) override;
 
 	private:
-	ndSharedPtr<ndBrainGpuBuffer> m_vdw;
-	ndSharedPtr<ndBrainGpuBuffer> m_vdw2;
+	ndSharedPtr<ndBrainGpuFloatBuffer> m_vdw;
+	ndSharedPtr<ndBrainGpuFloatBuffer> m_vdw2;
 	ndCommandShareInfo m_parameters;
 
 	friend class ndBrainTrainerCpu;

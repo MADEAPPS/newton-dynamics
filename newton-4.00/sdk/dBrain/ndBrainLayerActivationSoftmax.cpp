@@ -178,9 +178,9 @@ ndBrainTrainerGpuCommand* ndBrainLayerActivationSoftmax::CreateGpuFeedForwardCom
 	ndBrainTrainerGpuInference* const owner,
 	const ndBrainLayer::ndCommandShareInfo& info,
 	ndBrainGpuContext* const context, ndInt32 miniBatchSize,
-	const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
-	ndBrainGpuBuffer* const inputOutputData,
-	ndBrainGpuBuffer* const parameters) const
+	const ndSharedPtr<ndBrainGpuUniformBuffer>& uniformBuffer,
+	ndBrainGpuFloatBuffer* const inputOutputData,
+	ndBrainGpuFloatBuffer* const parameters) const
 {
 	ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(
 		owner, info, size_t(this), context, context->m_brainLayerSoftmaxActivation, 

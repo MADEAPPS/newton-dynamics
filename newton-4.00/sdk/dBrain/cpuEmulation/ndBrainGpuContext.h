@@ -15,7 +15,7 @@
 #include "ndBrainContext.h"
 #include "ndBrainThreadPool.h"
 
-class ndBrainGpuBuffer;
+class ndBrainBuffer;
 class ndBrainGpuCommand;
 class ndBrainGpuFloatBuffer;
 
@@ -35,7 +35,7 @@ class ndBrainGpuShader : public ndClassAlloc
 	virtual void Execute(ndInt32 groupId, ndInt32 workGroupSize) = 0;
 
 	ndBrainGpuContext* m_context;
-	ndFixSizeArray<ndBrainGpuBuffer*, 8> m_parameters;
+	ndFixSizeArray<ndBrainBuffer*, 8> m_parameters;
 };
 
 class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool

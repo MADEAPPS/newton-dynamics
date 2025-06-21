@@ -31,7 +31,7 @@ ndBrainGpuCommand::~ndBrainGpuCommand()
 {
 }
 
-void ndBrainGpuCommand::Assembly(const ndSharedPtr<ndBrainGpuShader>& shader, ndInt32 minibatchSize, ndInt32 buffersCount, ndBrainGpuBuffer** buffer)
+void ndBrainGpuCommand::Assembly(const ndSharedPtr<ndBrainGpuShader>& shader, ndInt32 minibatchSize, ndInt32 buffersCount, ndBrainBuffer** buffer)
 {
 	m_shader = shader;
 	ndAssert(*m_shader);

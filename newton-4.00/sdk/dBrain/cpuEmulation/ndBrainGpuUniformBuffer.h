@@ -12,16 +12,32 @@
 #define __ND_BRAIN_GPU_UNIFORM_BUFFER_H__
 
 #include "ndBrainStdafx.h"
-#include "ndBrainGpuBuffer.h"
+#include "ndBrainBuffer.h"
 #include "ndBrainGpuContext.h"
 
-class ndBrainGpuUniformBuffer : public ndBrainGpuBuffer
+class ndBrainGpuUniformBuffer : public ndBrainBuffer
 {
 	public:
 	ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes);
 	ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes, const void* const data);
 
-	virtual ndBrainGpuUniformBuffer* GetAsUniformBuffer();
+	//virtual ndBrainGpuUniformBuffer* GetAsUniformBuffer();
+	//virtual void LoadData(size_t sizeInBytes, const void* const inputData) override;
+	//virtual void UnloadData(size_t sizeInBytes, void* const outputData) const override;
+
+	virtual void BrainVectorToDevice(const ndBrainVector& vector) override;
+	virtual void BrainVectorFromDevice(ndBrainVector& vector) const override;
+
+	virtual void BrainMatrixToDevice(const ndBrainMatrix* const matrix) override;
+
+	virtual void MemoryToDevive(size_t sizeInBytes, const void* const inputMemory) override;
+	virtual void MemoryFromDevive(size_t sizeInBytes, void* const outputMemory) const override;
+
+	virtual void CopyBuffer(const ndBrainBuffer& srcBuffer, size_t sourceOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes) override;
+
+	void* GetData();
+
+	protected:
 	virtual void LoadData(size_t sizeInBytes, const void* const inputData) override;
 	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const override;
 

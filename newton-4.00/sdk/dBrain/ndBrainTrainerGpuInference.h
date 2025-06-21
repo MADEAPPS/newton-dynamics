@@ -43,13 +43,13 @@ class ndBrainTrainerGpuCommand : public ndBrainGpuCommand
 		ndBrainGpuContext* const context,
 		const ndSharedPtr<ndBrainGpuShader>& shader,
 		ndInt32 numberOfinputs,
-		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
-		ndBrainGpuBuffer* const inputOutputData,
-		ndBrainGpuBuffer* const parameters,
-		ndBrainGpuBuffer* const inputOutputGradients = nullptr,
-		ndBrainGpuBuffer* const weightsAndBiasGradients = nullptr);
+		const ndSharedPtr<ndBrainGpuUniformBuffer>& uniformBuffer,
+		ndBrainGpuFloatBuffer* const inputOutputData,
+		ndBrainGpuFloatBuffer* const parameters,
+		ndBrainGpuFloatBuffer* const inputOutputGradients = nullptr,
+		ndBrainGpuFloatBuffer* const weightsAndBiasGradients = nullptr);
 
-	ndSharedPtr<ndBrainGpuBuffer> m_uniformBuffer;
+	ndSharedPtr<ndBrainGpuUniformBuffer> m_uniformBuffer;
 	ndBrainTrainerGpuInference* m_owner;
 	size_t m_id;
 };
@@ -101,10 +101,10 @@ class ndBrainTrainerGpuInference: public ndBrainTrainer
 
 	ndBrainGpuContext* m_context;
 	ndSharedPtr<ndBrainContext> m_contextRef;
-	ndSharedPtr<ndBrainGpuBuffer> m_inputOutputBuffer;
-	ndSharedPtr<ndBrainGpuBuffer> m_weightAndBiasBuffer;
-	ndSharedPtr<ndBrainGpuBuffer> m_miniBatchInputBuffer;
-	ndSharedPtr<ndBrainGpuBuffer> m_miniBatchOutputBuffer;
+	ndSharedPtr<ndBrainGpuFloatBuffer> m_inputOutputBuffer;
+	ndSharedPtr<ndBrainGpuFloatBuffer> m_weightAndBiasBuffer;
+	ndSharedPtr<ndBrainGpuFloatBuffer> m_miniBatchInputBuffer;
+	ndSharedPtr<ndBrainGpuFloatBuffer> m_miniBatchOutputBuffer;
 
 	ndList<ndSharedPtr<ndBrainGpuCommand>> m_feedForwardCommands;
 	ndInt32 m_miniBatchSize;

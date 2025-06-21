@@ -12,16 +12,29 @@
 #define __ND_BRAIN_GPU_FLOAT_BUFFER_H__
 
 #include "ndBrainStdafx.h"
-#include "ndBrainGpuBuffer.h"
 #include "ndBrainVector.h"
+#include "ndBrainBuffer.h"
 
-class ndBrainGpuFloatBuffer : public ndBrainGpuBuffer
+class ndBrainGpuFloatBuffer : public ndBrainBuffer
 {
 	public:
-	ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, ndInt64 size);
-	ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, const ndBrainVector& input);
+	ndBrainGpuFloatBuffer(ndBrainContext* const context, ndInt64 size);
+	ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainVector& input);
+	ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainMatrix& matrix);
 
-	virtual ndBrainGpuFloatBuffer* GetAsFloatBuffer() override;
+	virtual void BrainVectorToDevice(const ndBrainVector& vector) override;
+	virtual void BrainVectorFromDevice(ndBrainVector& vector) const override;
+
+	virtual void BrainMatrixToDevice(const ndBrainMatrix* const matrix) override;
+
+	virtual void MemoryToDevive(size_t sizeInBytes, const void* const inputMemory) override;
+	virtual void MemoryFromDevive(size_t sizeInBytes, void* const outputMemory) const override;
+
+	virtual void CopyBuffer(const ndBrainBuffer& srcBuffer, size_t sourceOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes) override;
+
+	ndBrainFloat* GetData();
+
+	protected:
 	virtual void LoadData(size_t sizeInBytes, const void* const inputData) override;
 	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const override;
 

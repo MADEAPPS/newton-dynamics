@@ -50,10 +50,10 @@ class ndBrainTrainerGpu: public ndBrainTrainerGpuInference
 	ndSharedPtr<ndBrainGpuCommand> m_adamOtimizerUpdate;
 	ndSharedPtr<ndBrainGpuCommand> m_adamMomentumUpdate;
 
-	ndSharedPtr<ndBrainGpuBuffer> m_inputOuputGradientsBuffer;
-	ndSharedPtr<ndBrainGpuBuffer> m_weightAndBiasGradientsBuffer;
-	ndSharedPtr<ndBrainGpuBuffer> m_miniBatchInputGradientBuffer;
-	ndSharedPtr<ndBrainGpuBuffer> m_miniBatchOutputGradientBuffer;
+	ndSharedPtr<ndBrainGpuFloatBuffer> m_inputOuputGradientsBuffer;
+	ndSharedPtr<ndBrainGpuFloatBuffer> m_weightAndBiasGradientsBuffer;
+	ndSharedPtr<ndBrainGpuFloatBuffer> m_miniBatchInputGradientBuffer;
+	ndSharedPtr<ndBrainGpuFloatBuffer> m_miniBatchOutputGradientBuffer;
 
 	ndList<ndSharedPtr<ndBrainGpuCommand>> m_backPropagateCommands;
 	ndList<ndSharedPtr<ndBrainGpuCommand>> m_accumulateGradientsCommands;

@@ -49,18 +49,18 @@ class ndBrainLayerActivationRelu : public ndBrainLayerActivation
 	virtual ndBrainTrainerGpuCommand* CreateGpuFeedForwardCommand(ndBrainTrainerGpuInference* const owner,
 		const ndBrainLayer::ndCommandShareInfo& info,
 		ndBrainGpuContext* const context, ndInt32 miniBatchSize,
-		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
-		ndBrainGpuBuffer* const inputOutputData,
-		ndBrainGpuBuffer* const weightsAndBias) const override;
+		const ndSharedPtr<ndBrainGpuUniformBuffer>& uniformBuffer,
+		ndBrainGpuFloatBuffer* const inputOutputData,
+		ndBrainGpuFloatBuffer* const weightsAndBias) const override;
 
 	virtual ndBrainTrainerGpuCommand* CreateGpuBackPropagateCommand(ndBrainTrainerGpuInference* const owner,
 		const ndBrainLayer::ndCommandShareInfo& info,
 		ndBrainGpuContext* const context, ndInt32 miniBatchSize,
-		const ndSharedPtr<ndBrainGpuBuffer>& uniformBuffer,
-		ndBrainGpuBuffer* const inputOutputData,
-		ndBrainGpuBuffer* const weightsAndBias,
-		ndBrainGpuBuffer* const inputOutputGradients,
-		ndBrainGpuBuffer* const weightsAndBiasGradients) const override;
+		const ndSharedPtr<ndBrainGpuUniformBuffer>& uniformBuffer,
+		ndBrainGpuFloatBuffer* const inputOutputData,
+		ndBrainGpuFloatBuffer* const weightsAndBias,
+		ndBrainGpuFloatBuffer* const inputOutputGradients,
+		ndBrainGpuFloatBuffer* const weightsAndBiasGradients) const override;
 };
 
 #endif 

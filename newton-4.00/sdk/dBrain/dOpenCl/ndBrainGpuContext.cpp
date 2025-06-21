@@ -134,7 +134,7 @@ void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& co
 
 	for (ndInt32 i = 0; i < numberOfParameters; ++i)
 	{
-		ndBrainGpuBuffer* const argBuffer = command->m_parameters[i];
+		ndBrainGpuBuffer* const argBuffer = (ndBrainGpuBuffer*)command->m_parameters[i];
 		error = shader->setArg(cl_uint(i), argBuffer ? argBuffer->m_buffer : m_emptyBuffer);
 		ndAssert(error == CL_SUCCESS);
 	}

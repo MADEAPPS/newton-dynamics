@@ -24,14 +24,14 @@ class ndBrainGpuCommand : public ndClassAlloc
 	public:
 	ndBrainGpuCommand(ndBrainGpuContext* const context, const ndBrainLayer::ndCommandShareInfo& info);
 	virtual ~ndBrainGpuCommand();
-	void Assembly(const ndSharedPtr<ndBrainGpuShader>& shader, ndInt32 workGroupSize, ndInt32 buffersCount, ndBrainGpuBuffer** buffer);
+	void Assembly(const ndSharedPtr<ndBrainGpuShader>& shader, ndInt32 workGroupSize, ndInt32 buffersCount, ndBrainBuffer** buffer);
 
 	protected:
 	ndBrainGpuContext* m_context;
 	ndSharedPtr<ndBrainGpuShader> m_shader;
 	ndBrainLayer::ndCommandShareInfo m_info;
 	ndBrainLayer* m_layer;
-	ndFixSizeArray<ndBrainGpuBuffer*, 8> m_parameters;
+	ndFixSizeArray<ndBrainBuffer*, 8> m_parameters;
 	size_t m_workGroupSize;
 	size_t m_numberOfWorkGroups;
 

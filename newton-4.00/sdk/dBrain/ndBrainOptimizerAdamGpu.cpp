@@ -45,8 +45,8 @@ void ndBrainOptimizerAdamGpu::Init(ndInt32 parametersBufferSizeInFloats, ndBrain
 	m_parameters.m_learnRate = learnRate;
 	m_parameters.m_decayRegularizer = GetRegularizer();
 	ndBrainGpuContext* const context = m_context->GetAsGpuContext();
-	m_vdw = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(context, buffer));
-	m_vdw2 = ndSharedPtr<ndBrainGpuBuffer>(new ndBrainGpuFloatBuffer(context, buffer));
+	m_vdw = ndSharedPtr<ndBrainGpuFloatBuffer>(new ndBrainGpuFloatBuffer(context, buffer));
+	m_vdw2 = ndSharedPtr<ndBrainGpuFloatBuffer>(new ndBrainGpuFloatBuffer(context, buffer));
 }
 
 //#pragma optimize( "", off )

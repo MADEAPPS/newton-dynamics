@@ -11,20 +11,34 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainVector.h"
+#include "ndBrainMatrix.h"
+#include "ndBrainGpuContext.h"
 #include "ndBrainGpuFloatBuffer.h"
 
-ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, ndInt64 size)
-	:ndBrainGpuBuffer(context, size * ndInt32(sizeof(ndReal)), ndStorageData)
+ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, ndInt64 size)
+	:ndBrainBuffer(context, size * ndInt32(sizeof(ndReal)), ndStorageData)
 	,m_buffer()
 {
+	ndAssert(0);
 }
 
-ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainGpuContext* const context, const ndBrainVector& input)
-	:ndBrainGpuBuffer(context, input.GetCount() * ndInt32(sizeof(ndReal)), ndStorageData)
+ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainVector& input)
+	:ndBrainBuffer(context, input.GetCount() * ndInt32(sizeof(ndReal)), ndStorageData)
 {
-	LoadData(input.GetCount() * sizeof (ndBrainFloat),  & input[0]);
+	ndAssert(0);
+	//LoadData(input.GetCount() * sizeof (ndBrainFloat),  & input[0]);
 }
 
+ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainMatrix& matrix)
+	:ndBrainBuffer(context, matrix.GetColumns()* matrix.GetRows()* ndInt32(sizeof(ndReal)), ndStorageData)
+{
+	ndAssert(0);
+	//ndAssert(m_context->GetAsGpuContext());
+	//BrainMatrixToDevice(&matrix);
+}
+
+
+#if 0
 ndBrainGpuFloatBuffer* ndBrainGpuFloatBuffer::GetAsFloatBuffer()
 {
 	return this;
@@ -43,4 +57,51 @@ void ndBrainGpuFloatBuffer::UnloadData(size_t sizeInByte, void* const dstData) c
 	ndInt64 size = ndInt64(sizeInByte / sizeof(ndBrainFloat));
 	ndBrainMemVector dst((ndBrainFloat*)dstData, size);
 	dst.Set(m_buffer);
+}
+
+#endif
+
+ndBrainFloat* ndBrainGpuFloatBuffer::GetData()
+{
+	return &m_buffer[0];
+}
+
+void ndBrainGpuFloatBuffer::BrainVectorToDevice(const ndBrainVector& vector)
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuFloatBuffer::BrainVectorFromDevice(ndBrainVector& vector) const
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuFloatBuffer::BrainMatrixToDevice(const ndBrainMatrix* const matrix)
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuFloatBuffer::MemoryToDevive(size_t sizeInBytes, const void* const inputMemory)
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuFloatBuffer::MemoryFromDevive(size_t sizeInBytes, void* const outputMemory) const
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuFloatBuffer::CopyBuffer(const ndBrainBuffer& srcBuffer, size_t sourceOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes)
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuFloatBuffer::LoadData(size_t sizeInBytes, const void* const inputData)
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuFloatBuffer::UnloadData(size_t sizeInBytes, void* const outputData) const
+{
+	ndAssert(0);
 }
