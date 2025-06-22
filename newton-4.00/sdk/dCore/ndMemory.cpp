@@ -35,8 +35,8 @@ class ndMemoryHeader
 {
 	public:
 	void* m_ptr;
-	ndUnsigned32 m_bufferSize;
-	ndUnsigned32 m_requestedSize;
+	size_t m_bufferSize;
+	size_t m_requestedSize;
 };
 
 #define D_MEMORY_ALIGMNET			32
@@ -57,9 +57,14 @@ size_t ndMemory::CalculateBufferSize(size_t size)
 
 void* ndMemory::Malloc(size_t size)
 {
+	//if (size > 1024 * 1024 * 1024)
+	//{
+	//	size *= 1;
+	//}
+
 	ndIntPtr metToVal;
 	#if defined (D_MEMORY_SANITY_CHECK) && defined(_DEBUG)
-	size += D_MEMORY_SAFE_GUARD * 2;
+		size += D_MEMORY_SAFE_GUARD * 2;
 	#endif
 
 	size_t bufferSize = size + ndGetBufferPaddingInBytes;
@@ -71,16 +76,16 @@ void* ndMemory::Malloc(size_t size)
 	ndMemoryHeader* const info = ret - 1;
 	ndAssert((char*)info >= (char*)metToVal.m_ptr);
 	info->m_ptr = metToVal.m_ptr;
-	info->m_bufferSize = ndUnsigned32 (bufferSize);
-	info->m_requestedSize = ndUnsigned32(size);
+	info->m_bufferSize = bufferSize;
+	info->m_requestedSize = size;
 	m_memoryUsed.fetch_add(bufferSize);
 
 	#if defined (D_MEMORY_SANITY_CHECK) && defined(_DEBUG)
-	char code = ND_CHECK_CORRUPT_MEM;
-	char* const ptr = (char*)ret;
-	ndMemSet(ptr, code, D_MEMORY_SAFE_GUARD);
-	ndMemSet(ptr + size - D_MEMORY_SAFE_GUARD, code, D_MEMORY_SAFE_GUARD);
-	ret = (ndMemoryHeader*) (ptr + D_MEMORY_SAFE_GUARD);
+		char code = ND_CHECK_CORRUPT_MEM;
+		char* const ptr = (char*)ret;
+		ndMemSet(ptr, code, D_MEMORY_SAFE_GUARD);
+		ndMemSet(ptr + size - D_MEMORY_SAFE_GUARD, code, D_MEMORY_SAFE_GUARD);
+		ret = (ndMemoryHeader*) (ptr + D_MEMORY_SAFE_GUARD);
 	#endif
 	return ret;
 }
