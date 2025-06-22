@@ -20,7 +20,6 @@
 #include <string>
 #include <vector>
 
-//#define ND_DEBUG_KERNELS
 
 #define D_OPENCL_SELECTION_TYPE		CL_DEVICE_TYPE_ALL
 //#define D_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_CPU
@@ -52,25 +51,24 @@ ndBrainGpuContext::ndBrainGpuContext()
 	// select fastest available device
 	if (cl_devices.size())
 	{
+		size_t bestScore = 0;
 		size_t bestDeviceIndex = 0;
-		#ifdef ND_DEBUG_KERNELS
-		for (size_t i = 0u; i < cl_devices.size(); i++)
+		for (size_t i = 0; i < cl_devices.size(); ++i)
 		{
-			const std::string name (cl_devices[i].getInfo<CL_DEVICE_NAME>()); 
-			size_t index = name.find("Oclgrind");
-			if (index != size_t (-1))
+			size_t score = GetDeviceScore(cl_devices[i]);
+			if (score > bestScore)
 			{
+				bestScore = score;
 				bestDeviceIndex = i;
 			}
 		}
-		#endif
 
 		m_device = ndSharedPtr<cl::Device>(new cl::Device(cl_devices[bestDeviceIndex]));
 		const std::string name(m_device->getInfo<CL_DEVICE_NAME>());
 		const std::string version(m_device->getInfo<CL_DEVICE_VERSION>());
 		size_t localMemorySize = m_device->getInfo<CL_DEVICE_LOCAL_MEM_SIZE>();
-		//size_t compute_units = m_device->getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>();
 		size_t compute_units = m_device->getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>();
+
 		ndExpandTraceMessage("\n");
 		ndExpandTraceMessage("selecting:\n");
 		ndExpandTraceMessage("opencl device name: %s\n", name.c_str());
@@ -99,6 +97,32 @@ ndBrainGpuContext::ndBrainGpuContext()
 
 ndBrainGpuContext::~ndBrainGpuContext()
 {
+}
+
+size_t ndBrainGpuContext::GetDeviceScore(cl::Device& device)
+{
+	std::string name = device.getInfo<CL_DEVICE_NAME>();
+	
+	std::string lowerName;
+	for (size_t i = 0; i < name.size(); ++i)
+	{
+		int ch = tolower(name[i]);
+		lowerName.push_back(char (ch));
+	}
+
+	// some heuristic to select a device. I am no using specific vendor gpu/cpu/fpga types.
+	size_t computeUnits = device.getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>();
+	size_t clockMegaHertz = device.getInfo<CL_DEVICE_MAX_CLOCK_FREQUENCY>();
+	const bool is_gpu = device.getInfo<CL_DEVICE_TYPE>() == CL_DEVICE_TYPE_GPU;
+	size_t wavefront = size_t(is_gpu ? 64 : 8);
+	size_t amd = size_t((lowerName.find("amd") != std::string::npos) ? 1 : 0);
+	size_t arm = size_t((lowerName.find("arm") != std::string::npos) ? 1 : 0);
+	size_t intel = size_t((lowerName.find("intel") != std::string::npos) ? 1 : 0);
+	size_t nvidia = size_t((lowerName.find ("nvidia") != std::string::npos) ? 1 : 0);
+
+	size_t cores = computeUnits * (nvidia + amd + intel + arm);
+	size_t megaFlops = cores * wavefront * clockMegaHertz;
+	return megaFlops;
 }
 
 bool ndBrainGpuContext::HasGpuSupport() 

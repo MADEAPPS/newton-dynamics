@@ -41,13 +41,14 @@ class ndBrainGpuContext : public ndBrainContext
 	private:
 	void CreateKerners();
 	void CreateCopyIndirectCommand();
+	size_t GetDeviceScore(cl::Device& device);
 	void CopyBufferIndirectSource(ndBrainGpuFloatBuffer& dstBuffer, ndBrainGpuIntegerBuffer& indexBuffer, ndBrainGpuFloatBuffer& srcDataBuffer, ndInt32 srcStrideInBytes);
 
 	ndSharedPtr<ndBrainGpuShader> CreateKerner(const cl::Program& program, const char* const functionMame) const;
 	static void CL_CALLBACK clNotification(const char* errinfo, const void* private_info, size_t cb, void* user_data);
 
 	public:
-	// feed foward shaders
+	// feed forward shaders
 	ndSharedPtr<ndBrainGpuShader> m_brainCopyInput;
 	ndSharedPtr<ndBrainGpuShader> m_brainCopyOutput;
 	ndSharedPtr<ndBrainGpuShader> m_brainLayerReluActivation;
@@ -65,7 +66,7 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainGpuShader> m_brainLayerDropOutBackPropagate;
 	ndSharedPtr<ndBrainGpuShader> m_brainLayerCathegoricalSoftmaxBackPropagate;
 
-	// add all the partial gradinets
+	// add all the partial gradients
 	ndSharedPtr<ndBrainGpuShader> m_brainAverageGradients;
 	ndSharedPtr<ndBrainGpuShader> m_brainAccumulateGradients;
 	ndSharedPtr<ndBrainGpuShader> m_brainAccumulateGradientsAndAverage;
