@@ -13,6 +13,9 @@
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuCommand.h"
 #include "ndBrainGpuContext.h"
+#include "ndBrainGpuFloatBuffer.h"
+#include "ndBrainGpuUniformBuffer.h"
+#include "ndBrainGpuIntegerBuffer.h"
 
 #include <string>
 #include <vector>
@@ -85,9 +88,11 @@ ndBrainGpuContext::ndBrainGpuContext()
 		cl_command_queue_properties properties = CL_QUEUE_PROFILING_ENABLE;
 		m_queue = ndSharedPtr<cl::CommandQueue>(new cl::CommandQueue(**m_context , **m_device, properties, &error));
 		ndAssert(error == CL_SUCCESS);
-		CreateKerners();
 
 		m_emptyBuffer = cl::Buffer(**m_context, CL_MEM_READ_WRITE, 256);
+
+		CreateKerners();
+		CreateCopyIndirectCommand();
 	}
 }
 
@@ -114,6 +119,32 @@ ndBrainContext::ndContextType ndBrainGpuContext::GetType() const
 ndBrainGpuContext* ndBrainGpuContext::GetAsGpuContext()
 {
 	return this;
+}
+
+void ndBrainGpuContext::CreateCopyIndirectCommand()
+{
+	ndBrainLayer::ndCommandShareInfo uniformParam;
+	//uniformParam.m_inputSize = uniformData.m_inputSize;
+	//uniformParam.m_outputSize = uniformData.m_outputSize;
+	//uniformParam.m_parametersStartOffset = 0;
+	//uniformParam.m_inputOutputSize = inputOutputBufferSize;
+	//uniformParam.m_inputOutputStartOffset = 0;
+	m_copyBufferIndirectCommand = ndSharedPtr<ndBrainGpuCommand>(new ndBrainGpuCommand(this, uniformParam));
+	m_copyBufferIndirectCommandParamBuffer = ndSharedPtr<ndBrainGpuUniformBuffer>(new ndBrainGpuUniformBuffer(this, sizeof(ndBrainLayer::ndCommandShareInfo)));
+}
+
+void ndBrainGpuContext::CopyBufferIndirectSource(ndBrainGpuFloatBuffer& dstBuffer, ndBrainGpuIntegerBuffer& indexBuffer, ndBrainGpuFloatBuffer& srcDataBuffer, ndInt32 srcStrideInBytes)
+{
+	ndFixSizeArray<ndBrainBuffer*, 8> params;
+	params.PushBack(*m_copyBufferIndirectCommandParamBuffer);
+	params.PushBack(&indexBuffer);
+	params.PushBack(&srcDataBuffer);
+	params.PushBack(&dstBuffer);
+	ndInt32 stride = srcStrideInBytes / sizeof(ndReal);
+	ndInt32 minibatchSize = indexBuffer.SizeInBytes() / sizeof (ndUnsigned32);
+
+	m_copyBufferIndirectCommand->Assembly(m_brainCopyBufferIndirect, minibatchSize, params.GetCount(), &params[0]);
+	AddCommandQueue(m_copyBufferIndirectCommand);
 }
 
 void ndBrainGpuContext::SyncQueue()

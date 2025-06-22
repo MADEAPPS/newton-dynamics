@@ -13,7 +13,7 @@
 #include "ndBrainGpuContext.h"
 
 // feed forward kernels
-const char* ndBrainGpuContext::m_commonKernelsSource =
+const char* ndBrainGpuContext::m_commonKernelsInclude =
 R""""(
 
     #define ND_GPU_LOCAL_BUFFER_SIZE	        512
@@ -860,6 +860,39 @@ R""""(
 
 )"""";
 
+const char* ndBrainGpuContext::m_otherShaderFunctions =
+R""""(
+
+    __kernel void m_brainCopyBufferIndirect(
+        __global const UniformBufferLayerArguments* parameters,
+        __global uint* indexBuffer, __global float* inputData, __global float* ouputData)
+    {                                                                      
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+        
+        uint stride = parameters->m_inputOutputSize;
+        //uint numberOfIndex = parameters->m_inputSize;
+     
+        uint dstOffset = groupId * stride;
+        uint srcOffset = indexBuffer[groupId] * stride;
+
+        uint workGroupSizeReminder = stride % workGroupSize;
+        uint modWorkGroupSize = stride - workGroupSizeReminder;
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            float a = inputData[srcOffset + i + itemId];
+            ouputData[dstOffset + i + itemId] = a;
+        }
+        if (itemId < workGroupSizeReminder)
+        {
+            float a = inputData[srcOffset + modWorkGroupSize + itemId];
+            ouputData[dstOffset + modWorkGroupSize + itemId] = a;
+        }
+    }
+
+)"""";
+
 
 ndSharedPtr<ndBrainGpuShader> ndBrainGpuContext::CreateKerner(const cl::Program& program, const char* const functionMame) const
 {
@@ -872,7 +905,7 @@ ndSharedPtr<ndBrainGpuShader> ndBrainGpuContext::CreateKerner(const cl::Program&
 //#include <vector>
 void ndBrainGpuContext::CreateKerners()
 {
-    std::string source(m_commonKernelsSource);
+    std::string source(m_commonKernelsInclude);
     source += m_matrixMultiply;
     source += m_optimizerKernels;
     source += m_feedForwardKernels_1;
@@ -880,6 +913,7 @@ void ndBrainGpuContext::CreateKerners()
     source += m_feedForwardKernels_3;
     source += m_backPropagateKernels_1;
     source += m_backPropagateKernels_2;
+    source += m_otherShaderFunctions;
 
     class ClProgram : public cl::Program
     {
@@ -953,4 +987,7 @@ void ndBrainGpuContext::CreateKerners()
     m_brainAdamMomentumUpdate = CreateKerner(program, "brainAdamMomentumUpdate");
     m_brainAdamRidgeOptimizerUpdate = CreateKerner(program, "brainAdamUpdateRidgeRegularizer");
     m_brainAdamLassoOptimizerUpdate = CreateKerner(program, "brainAdamUpdateLassoRegularizer");
+
+    // other shaders
+    m_brainCopyBufferIndirect = CreateKerner(program, "m_brainCopyBufferIndirect");
 }

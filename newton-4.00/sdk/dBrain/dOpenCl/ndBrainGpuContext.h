@@ -16,6 +16,8 @@
 
 class ndBrainGpuCommand;
 class ndBrainGpuFloatBuffer;
+class ndBrainGpuUniformBuffer;
+class ndBrainGpuIntegerBuffer;
 
 typedef cl::Kernel ndBrainGpuShader;
 
@@ -38,6 +40,9 @@ class ndBrainGpuContext : public ndBrainContext
 
 	private:
 	void CreateKerners();
+	void CreateCopyIndirectCommand();
+	void CopyBufferIndirectSource(ndBrainGpuFloatBuffer& dstBuffer, ndBrainGpuIntegerBuffer& indexBuffer, ndBrainGpuFloatBuffer& srcDataBuffer, ndInt32 srcStrideInBytes);
+
 	ndSharedPtr<ndBrainGpuShader> CreateKerner(const cl::Program& program, const char* const functionMame) const;
 	static void CL_CALLBACK clNotification(const char* errinfo, const void* private_info, size_t cb, void* user_data);
 
@@ -70,12 +75,17 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainGpuShader> m_brainAdamRidgeOptimizerUpdate;
 	ndSharedPtr<ndBrainGpuShader> m_brainAdamLassoOptimizerUpdate;
 
+	// other shaders
+	ndSharedPtr<ndBrainGpuShader> m_brainCopyBufferIndirect;
+	
 	private:
 	ndSharedPtr<cl::Device> m_device;
 	ndSharedPtr<cl::Context> m_context;
 	ndSharedPtr<cl::CommandQueue> m_queue;
-
 	cl::Buffer m_emptyBuffer;
+
+	ndSharedPtr<ndBrainGpuCommand> m_copyBufferIndirectCommand;
+	ndSharedPtr<ndBrainGpuUniformBuffer> m_copyBufferIndirectCommandParamBuffer;
 
 	static const char* m_feedForwardKernels_1;
 	static const char* m_feedForwardKernels_2;
@@ -86,7 +96,9 @@ class ndBrainGpuContext : public ndBrainContext
 	
 	static const char* m_matrixMultiply;
 	static const char* m_optimizerKernels;
-	static const char* m_commonKernelsSource;
+	static const char* m_commonKernelsInclude;
+
+	static const char* m_otherShaderFunctions;
 
 	friend class ndBrainGpuBuffer;
 	friend class ndBrainGpuCommand;

@@ -13,14 +13,11 @@
 
 #include "ndBrainGpuBuffer.h"
 
-
 class ndBrainGpuUniformBuffer : public ndBrainGpuBuffer
 {
 	public:
 	ndBrainGpuUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes);
 	ndBrainGpuUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, const void* const data);
-	//virtual void LoadData(size_t sizeInBytes, const void* const inputData) override;
-	//virtual void UnloadData(size_t sizeInBytes, void* const outputData) const override;
 };
 
 #endif

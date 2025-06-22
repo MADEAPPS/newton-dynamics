@@ -138,13 +138,13 @@ void ndBrainCpuFloatBuffer::CopyBuffer(const ndBrainBuffer& sourceData, size_t s
 	dst.Set(src);
 }
 
-void ndBrainCpuFloatBuffer::CopyBufferIndirectSource(const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcDataBuffer, ndInt32 srcStrideIntBytes)
+void ndBrainCpuFloatBuffer::CopyBufferIndirectSource(const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcDataBuffer, ndInt32 srcStrideInBytes)
 {
 	const ndBrainCpuFloatBuffer& srcBuffer = *((ndBrainCpuFloatBuffer*)&srcDataBuffer);
 	const ndBrainCpuIntegerBuffer& indirectArray = *((ndBrainCpuIntegerBuffer*)&indexBuffer);
 	ndInt32 count = ndInt32 (indirectArray.m_sizeInBytes / sizeof(ndUnsigned32));
 
-	ndInt32 stride = ndInt32 (srcStrideIntBytes / sizeof(ndReal));
+	ndInt32 stride = ndInt32 (srcStrideInBytes / sizeof(ndReal));
 	for (ndInt32 i = 0; i < count; ++i)
 	{
 		ndUnsigned32 index = indirectArray.m_indexArray[i];

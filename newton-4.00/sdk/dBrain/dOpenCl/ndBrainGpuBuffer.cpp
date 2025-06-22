@@ -130,7 +130,13 @@ void ndBrainGpuBuffer::CopyBuffer(const ndBrainBuffer& source, size_t srcOffsetI
 	ndAssert(error == CL_SUCCESS);
 }
 
-void ndBrainGpuBuffer::CopyBufferIndirectSource(const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcDataBuffer, ndInt32 srcStrideIntBytes)
+void ndBrainGpuBuffer::CopyBufferIndirectSource(const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcDataBuffer, ndInt32 srcStrideInBytes)
 {
-	ndAssert(0);
+	ndBrainGpuContext* const context = m_context->GetAsGpuContext();
+	ndAssert(context);
+
+	ndBrainGpuFloatBuffer& dst = *(ndBrainGpuFloatBuffer*)this;
+	ndBrainGpuFloatBuffer& src = *(ndBrainGpuFloatBuffer*)&srcDataBuffer;
+	ndBrainGpuIntegerBuffer& index = *(ndBrainGpuIntegerBuffer*)&indexBuffer;
+	context->CopyBufferIndirectSource(dst, index, src, srcStrideInBytes);
 }
