@@ -25,10 +25,8 @@
 
 namespace ndContinueCarpole
 {
-	//#define ND_TRAIN_AGENT
+	#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME			"cartpoleContinue"
-
-	//#define CONTROLLER_RESUME_TRAINING
 
 	#define ND_TRAJECTORY_STEPS		(1024 * 4)
 	#define D_PUSH_ACCEL			ndBrainFloat (-3.0f * DEMO_GRAVITY)
@@ -442,19 +440,6 @@ namespace ndContinueCarpole
 
 			snprintf(name, sizeof(name), "%s.dnn", CONTROLLER_NAME);
 			m_master->SetName(name);
-
-			#ifdef CONTROLLER_RESUME_TRAINING
-				char fileName[256];
-				snprintf(name, sizeof(name), "%s_critic.dnn", CONTROLLER_NAME);
-				ndGetWorkingFileName(name, fileName);
-				ndSharedPtr<ndBrain> valueNetwork(ndBrainLoad::Load(fileName));
-				m_master->GetValueNetwork()->CopyFrom(**valueNetwork);
-
-				snprintf(name, sizeof(name), "%s_actor.dnn", CONTROLLER_NAME);
-				ndGetWorkingFileName(name, fileName);
-				ndSharedPtr<ndBrain> policyNetwork(ndBrainLoad::Load(fileName));
-				m_master->GetPolicyNetwork()->CopyFrom(**policyNetwork);
-			#endif
 
 			ndWorld* const world = scene->GetWorld();
 			ndSharedPtr<ndModel>visualModel (CreateModel(scene, matrix, modelMesh));

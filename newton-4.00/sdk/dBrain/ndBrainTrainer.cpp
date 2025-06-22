@@ -23,6 +23,34 @@
 #include "ndBrain.h"
 #include "ndBrainTrainer.h"
 
+
+ndTrainerDescriptor::ndTrainerDescriptor()
+	:m_brain()
+	,m_context()
+	,m_learRate(ndBrainFloat (1.0e-4f))
+	,m_regularizer(ndBrainFloat(1.0e-4f))
+	,m_minibatchSize(256)
+	,m_regularizerType(m_ridge)
+{
+}
+
+ndTrainerDescriptor::ndTrainerDescriptor(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndInt32 minibatchSize, ndBrainFloat learnRate)
+	:m_brain(brain)
+	,m_context(context)
+	,m_learRate(learnRate)
+	,m_regularizer(ndBrainFloat(1.0e-4f))
+	,m_minibatchSize(minibatchSize)
+	,m_regularizerType(m_ridge)
+{
+}
+
+ndBrainTrainer::ndBrainTrainer(const ndTrainerDescriptor& descriptor)
+	:ndClassAlloc()
+	,m_brain(descriptor.m_brain)
+	,m_context(descriptor.m_context)
+{
+}
+
 ndBrainTrainer::ndBrainTrainer(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context)
 	:ndClassAlloc()
 	,m_brain(brain)

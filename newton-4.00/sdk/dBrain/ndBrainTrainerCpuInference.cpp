@@ -31,8 +31,21 @@
 #include "ndBrainTrainerCpuInference.h"
 #include "ndBrainLayerActivationSoftmax.h"
 
+ndBrainTrainerCpuInference::ndBrainTrainerCpuInference(const ndTrainerDescriptor& descriptor)
+	:ndBrainTrainer(descriptor)
+	,m_inputOutputBuffer()
+	,m_weightAndBiasBuffer()
+	,m_miniBatchInputBuffer()
+	,m_miniBatchOutputBuffer()
+	,m_feedForwardCommands()
+	,m_threadPool(m_context->GetAsCpuContext())
+	,m_miniBatchSize(descriptor.m_minibatchSize)
+{
+	ndBrainTrainerCpuInference::Initialize(descriptor);
+}
+
 ndBrainTrainerCpuInference::ndBrainTrainerCpuInference(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndInt32 minibatchSize)
-	:ndBrainTrainer(brain, context)
+	:ndBrainTrainer(ndTrainerDescriptor(brain, context, m_miniBatchSize, ndBrainFloat(0.0f)))
 	,m_inputOutputBuffer()
 	,m_weightAndBiasBuffer()
 	,m_miniBatchInputBuffer()
@@ -41,8 +54,7 @@ ndBrainTrainerCpuInference::ndBrainTrainerCpuInference(const ndSharedPtr<ndBrain
 	,m_threadPool(m_context->GetAsCpuContext())
 	,m_miniBatchSize(minibatchSize)
 {
-	InitInputOutputBuffer();
-	InitWeightAndBiasBuffer();
+	ndTrainerDescriptor initializer(brain, context, m_miniBatchSize, ndBrainFloat(0.0f));
 }
 
 ndBrainTrainerCpuInference::ndBrainTrainerCpuInference(const ndBrainTrainerCpuInference& src)
@@ -53,6 +65,13 @@ ndBrainTrainerCpuInference::ndBrainTrainerCpuInference(const ndBrainTrainerCpuIn
 	,m_miniBatchSize(src.m_miniBatchSize)
 {
 	ndAssert(0);
+}
+
+void ndBrainTrainerCpuInference::Initialize(const ndTrainerDescriptor& descriptor)
+{
+	m_miniBatchSize = descriptor.m_minibatchSize;
+	InitInputOutputBuffer();
+	InitWeightAndBiasBuffer();
 }
 
 void ndBrainTrainerCpuInference::InitInputOutputBuffer()

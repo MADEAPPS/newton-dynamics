@@ -28,16 +28,16 @@ class ndBrainContext;
 class ndBrainTrainer;
 class ndBrainThreadPool;
 
+enum ndRegularizerType
+{
+	m_none,
+	m_ridge,
+	m_lasso,
+};
+
 class ndBrainOptimizer : public ndClassAlloc
 {
 	public: 
-	enum ndRegularizerType
-	{
-		m_none,
-		m_ridge,
-		m_lasso,
-	};
-
 	ndBrainOptimizer(const ndSharedPtr<ndBrainContext>& context);
 	virtual ~ndBrainOptimizer();
 

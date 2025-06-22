@@ -121,7 +121,7 @@ class ndBrainAgentContinuePolicyGradient_Agent : public ndBrainAgent
 	friend class ndBrainAgentContinuePolicyGradient_TrainerMaster;
 };
 
-class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPool
+class ndBrainAgentContinuePolicyGradient_TrainerMaster: public ndClassAlloc 
 {
 	public:
 	class HyperParameters
@@ -153,8 +153,8 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster : public ndBrainThreadPoo
 		ndUnsigned32 m_randomSeed;
 
 		bool m_usePerActionSigmas;
-		ndBrainOptimizer::ndRegularizerType m_policyRegularizerType;
-		ndBrainOptimizer::ndRegularizerType m_criticRegularizerType;
+		ndRegularizerType m_policyRegularizerType;
+		ndRegularizerType m_criticRegularizerType;
 	};
 
 	class MemoryStateValues: protected ndBrainVector

@@ -47,6 +47,7 @@ class ndBrainLayerBackPropagateCpuCommand: public ndBrainTrainerCpuCommand
 class ndBrainTrainerCpu: public ndBrainTrainerCpuInference
 {
 	public: 
+	ndBrainTrainerCpu(const ndTrainerDescriptor& descriptor);
 	ndBrainTrainerCpu(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndBrainFloat learnRate, ndInt32 minibatchSize);
 	ndBrainTrainerCpu(const ndBrainTrainerCpu& src);
 
@@ -97,6 +98,7 @@ class ndBrainTrainerCpu: public ndBrainTrainerCpuInference
 	void AddLayersGradientCommands();
 	void AddCopyInputGradientCommand();
 	void AddCopyOutputGradientCommand();
+	void Initialize(const ndTrainerDescriptor& descriptor);
 
 	ndSharedPtr<ndBrainOptimizerAdamCpu> m_optimizer;
 	ndBrainVector m_inputOuputGradientsBuffer;

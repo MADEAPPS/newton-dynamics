@@ -73,10 +73,8 @@ class ndBrainLayerFeedForwardCpuCommand : public ndBrainTrainerCpuCommand
 class ndBrainTrainerCpuInference: public ndBrainTrainer
 {
 	public: 
-	ndBrainTrainerCpuInference(
-		const ndSharedPtr<ndBrain>& brain, 
-		const ndSharedPtr<ndBrainContext>& context,
-		ndInt32 minibatchSize);
+	ndBrainTrainerCpuInference(const ndTrainerDescriptor& descriptor);
+	ndBrainTrainerCpuInference(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndInt32 minibatchSize);
 	ndBrainTrainerCpuInference(const ndBrainTrainerCpuInference& src);
 
 	ndBrainBuffer* GetInputBuffer() override;
@@ -156,12 +154,12 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 	void InitInputOutputBuffer();
 	void InitWeightAndBiasBuffer();
 	ndBrainTrainerCpuCommand* FindCommand(size_t id) const;
+	void Initialize(const ndTrainerDescriptor& descriptor);
 	void AddCopyInputCommand(const ndBrainTrainerCpuCommand* const firstCommand);
 	void AddLayersCommands(ndFixSizeArray<ndBrainTrainerCpuCommand*, 256>& layersCommands);
 
 	ndBrainVector m_inputOutputBuffer;
 	ndBrainVector m_weightAndBiasBuffer;
-	//ndBrainVector m_miniBatchInputBuffer;
 	ndSharedPtr<ndBrainCpuFloatBuffer> m_miniBatchInputBuffer;
 	ndBrainVector m_miniBatchOutputBuffer;
 	ndList<ndSharedPtr<ndBrainTrainerCpuCommand>> m_feedForwardCommands;

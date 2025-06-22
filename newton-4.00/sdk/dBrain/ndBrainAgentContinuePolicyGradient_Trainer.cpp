@@ -66,8 +66,8 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 	m_policyRegularizer = ndBrainFloat(1.0e-4f);
 	m_criticRegularizer = ndBrainFloat(5.0e-3f);
 
-	m_policyRegularizerType = ndBrainOptimizer::m_ridge;
-	m_criticRegularizerType = ndBrainOptimizer::m_ridge;
+	m_policyRegularizerType = m_ridge;
+	m_criticRegularizerType = m_ridge;
 	
 	m_usePerActionSigmas = false;
 	m_actionFixSigma = ND_CONTINUE_POLICY_FIX_SIGMA;
@@ -389,7 +389,7 @@ ndInt32 ndBrainAgentContinuePolicyGradient_Agent::GetEpisodeFrames() const
 //
 // ***************************************************************************************
 ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGradient_TrainerMaster(const HyperParameters& hyperParameters)
-	:ndBrainThreadPool()
+	:ndClassAlloc()
 	,m_policy()
 	,m_critic()
 	,m_parameters(hyperParameters)
@@ -436,8 +436,6 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 	m_extraTrajectorySteps = extraSteps;
 
 	// build policy neural net
-	SetThreadCount(m_parameters.m_threadsCount);
-
 	BuildPolicyClass();
 	BuildCriticClass();
 
@@ -535,128 +533,130 @@ ndBrainFloat ndBrainAgentContinuePolicyGradient_TrainerMaster::CalculatePolicyPr
 //#pragma optimize( "", off )
 ndBrainFloat ndBrainAgentContinuePolicyGradient_TrainerMaster::CalculateKLdivergence()
 {
-	// https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
-	// since I am using a diagonal sigma, I do not have to use Cholesky 
-
-	ndAtomic<ndInt32> iterator(0);
-	ndFloat64 partialDivergence[256];
-
-	m_policyDivergeActions.SetCount(m_trajectoryAccumulator.GetCount() * m_policy->GetOutputSize());
-	auto ParcialDivergence = ndMakeObject::ndFunction([this, &iterator, &partialDivergence](ndInt32 threadIndex, ndInt32)
-	{
-		ndFloat64 totalDivergence = ndFloat32(0.0f);
-		ndInt32 count = m_trajectoryAccumulator.GetCount();
-
-		ndInt32 numberOfActions = m_policy->GetOutputSize();
-		for (ndInt32 i = iterator++; i < count; i = iterator++)
-		{
-			const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(i), m_parameters.m_numberOfObservations);
-			ndBrainMemVector crossProbabilities(&m_policyDivergeActions[i * numberOfActions], numberOfActions);
-			m_policy->MakePrediction(observation, crossProbabilities);
-			const ndBrainMemVector probabilities(&m_policyActions[i * numberOfActions], numberOfActions);
-
-			// calculate t0 = trace(inv(Sigma_q) * Sigma_p
-			// calculate t1 = numberOfActions
-			// calculate t2 = trans(Uq - Up) * inv(Sigma_q) * (Uq - Up)
-			// calculate t3 = log(det(Sigma_q) /det(Sigma_p))
-			ndFloat32 t0 = ndFloat32(0.0f);
-			ndFloat32 t2 = ndFloat32(0.0f);
-			ndFloat32 log_det_p = ndFloat32(0.0f);
-			ndFloat32 log_det_q = ndFloat32(0.0f);
-
-			const ndInt32 size = numberOfActions / 2;
-			for (ndInt32 j = size - 1; j >= 0; --j)
-			{
-				ndBrainFloat sigma_p = probabilities[size + j];
-				ndBrainFloat sigma_q = crossProbabilities[size + j];
-				ndBrainFloat invSigma_q = 1.0f / sigma_q;
-
-				log_det_p += ndLog(sigma_p);
-				log_det_q += ndLog(sigma_q);
-				t0 += sigma_p * invSigma_q;
-				ndBrainFloat meanError(crossProbabilities[j] - probabilities[j]);
-				t2 += meanError * invSigma_q * meanError;
-			}
-
-			// it does not really matter  the ratio is inverted since KLis a distance, 
-			// the only problem is that KL(p/q) is different that KL(q/p)
-			// but the distance still represent how close are the two distributions.
-			//ndFloat64 t3 = ndLog(det_q / det_p);
-			ndFloat64 t3 = log_det_q - log_det_p;
-			ndFloat64 t1 = ndBrainFloat(size);
-			ndFloat64 divergence = t0 - t1 + t2 + t3;
-			totalDivergence += divergence;
-		}
-		partialDivergence[threadIndex] = ndBrainFloat(0.5f) * totalDivergence;
-	});
-
-	auto ParcialDivergenceFixSigma = ndMakeObject::ndFunction([this, &iterator, &partialDivergence](ndInt32 threadIndex, ndInt32)
-	{
-		ndFloat64 totalDivergence = ndFloat32(0.0f);
-		ndInt32 count = m_trajectoryAccumulator.GetCount();
-
-		ndInt32 numberOfActions = m_policy->GetOutputSize();
-		for (ndInt32 i = iterator++; i < count; i = iterator++)
-		{
-			const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(i), m_parameters.m_numberOfObservations);
-			ndBrainMemVector crossProbabilities(&m_policyDivergeActions[i * numberOfActions], numberOfActions);
-			m_policy->MakePrediction(observation, crossProbabilities);
-			const ndBrainMemVector probabilities(&m_policyActions[i * numberOfActions], numberOfActions);
-
-			// calculate t0 = trace(inv(Sigma_q) * Sigma_p
-			// calculate t1 = numberOfActions
-			// calculate t2 = trans(Uq - Up) * inv(Sigma_q) * (Uq - Up)
-			// calculate t3 = log(det(Sigma_q) /det(Sigma_p))
-			ndFloat32 t0 = ndFloat32(0.0f);
-			ndFloat32 t2 = ndFloat32(0.0f);
-			ndFloat32 log_det_p = ndFloat32(0.0f);
-			ndFloat32 log_det_q = ndFloat32(0.0f);
-
-			ndBrainFloat sigma_p = m_parameters.m_actionFixSigma;
-			ndBrainFloat sigma_q = m_parameters.m_actionFixSigma;
-			ndBrainFloat invSigma_q = 1.0f / sigma_q;
-			ndFloat32 logSigmap = ndLog(sigma_p);
-			ndFloat32 logSigmaq = ndLog(sigma_q);
-
-			const ndInt32 size = numberOfActions;
-			for (ndInt32 j = size - 1; j >= 0; --j)
-			{
-				log_det_p += logSigmap;
-				log_det_q += logSigmaq;
-				t0 += sigma_p * invSigma_q;
-				ndBrainFloat meanError(crossProbabilities[j] - probabilities[j]);
-				t2 += meanError * invSigma_q * meanError;
-			}
-
-			// it does not really matter  the ratio is inverted since KLis a distance, 
-			// the only problem is that KL(p/q) is different that KL(q/p)
-			// but the distance still represent how close are the two distributions.
-			//ndFloat64 t3 = ndLog(det_q / det_p);
-			ndFloat64 t3 = log_det_q - log_det_p;
-			ndFloat64 t1 = ndBrainFloat(size);
-			ndFloat64 divergence = t0 - t1 + t2 + t3;
-			totalDivergence += divergence;
-		}
-		partialDivergence[threadIndex] = ndBrainFloat(0.5f) * totalDivergence;
-	});
-
-	if (m_parameters.m_usePerActionSigmas)
-	{
-		ndBrainThreadPool::ParallelExecute(ParcialDivergence);
-	}
-	else
-	{
-		ndBrainThreadPool::ParallelExecute(ParcialDivergenceFixSigma);
-	}
-
-	ndFloat64 divergence = ndFloat32(0.0f);
-	for (ndInt32 i = GetThreadCount() - 1; i >= 0; --i)
-	{
-		divergence += partialDivergence[i];
-	}
-	ndAssert(divergence >= 0.0f);
-	divergence /= ndFloat64(m_trajectoryAccumulator.GetCount());
-	return ndBrainFloat(divergence);
+	ndAssert(0);
+	return 0;
+	//// https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
+	//// since I am using a diagonal sigma, I do not have to use Cholesky 
+	//
+	//ndAtomic<ndInt32> iterator(0);
+	//ndFloat64 partialDivergence[256];
+	//
+	//m_policyDivergeActions.SetCount(m_trajectoryAccumulator.GetCount() * m_policy->GetOutputSize());
+	//auto ParcialDivergence = ndMakeObject::ndFunction([this, &iterator, &partialDivergence](ndInt32 threadIndex, ndInt32)
+	//{
+	//	ndFloat64 totalDivergence = ndFloat32(0.0f);
+	//	ndInt32 count = m_trajectoryAccumulator.GetCount();
+	//
+	//	ndInt32 numberOfActions = m_policy->GetOutputSize();
+	//	for (ndInt32 i = iterator++; i < count; i = iterator++)
+	//	{
+	//		const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(i), m_parameters.m_numberOfObservations);
+	//		ndBrainMemVector crossProbabilities(&m_policyDivergeActions[i * numberOfActions], numberOfActions);
+	//		m_policy->MakePrediction(observation, crossProbabilities);
+	//		const ndBrainMemVector probabilities(&m_policyActions[i * numberOfActions], numberOfActions);
+	//
+	//		// calculate t0 = trace(inv(Sigma_q) * Sigma_p
+	//		// calculate t1 = numberOfActions
+	//		// calculate t2 = trans(Uq - Up) * inv(Sigma_q) * (Uq - Up)
+	//		// calculate t3 = log(det(Sigma_q) /det(Sigma_p))
+	//		ndFloat32 t0 = ndFloat32(0.0f);
+	//		ndFloat32 t2 = ndFloat32(0.0f);
+	//		ndFloat32 log_det_p = ndFloat32(0.0f);
+	//		ndFloat32 log_det_q = ndFloat32(0.0f);
+	//
+	//		const ndInt32 size = numberOfActions / 2;
+	//		for (ndInt32 j = size - 1; j >= 0; --j)
+	//		{
+	//			ndBrainFloat sigma_p = probabilities[size + j];
+	//			ndBrainFloat sigma_q = crossProbabilities[size + j];
+	//			ndBrainFloat invSigma_q = 1.0f / sigma_q;
+	//
+	//			log_det_p += ndLog(sigma_p);
+	//			log_det_q += ndLog(sigma_q);
+	//			t0 += sigma_p * invSigma_q;
+	//			ndBrainFloat meanError(crossProbabilities[j] - probabilities[j]);
+	//			t2 += meanError * invSigma_q * meanError;
+	//		}
+	//
+	//		// it does not really matter  the ratio is inverted since KLis a distance, 
+	//		// the only problem is that KL(p/q) is different that KL(q/p)
+	//		// but the distance still represent how close are the two distributions.
+	//		//ndFloat64 t3 = ndLog(det_q / det_p);
+	//		ndFloat64 t3 = log_det_q - log_det_p;
+	//		ndFloat64 t1 = ndBrainFloat(size);
+	//		ndFloat64 divergence = t0 - t1 + t2 + t3;
+	//		totalDivergence += divergence;
+	//	}
+	//	partialDivergence[threadIndex] = ndBrainFloat(0.5f) * totalDivergence;
+	//});
+	//
+	//auto ParcialDivergenceFixSigma = ndMakeObject::ndFunction([this, &iterator, &partialDivergence](ndInt32 threadIndex, ndInt32)
+	//{
+	//	ndFloat64 totalDivergence = ndFloat32(0.0f);
+	//	ndInt32 count = m_trajectoryAccumulator.GetCount();
+	//
+	//	ndInt32 numberOfActions = m_policy->GetOutputSize();
+	//	for (ndInt32 i = iterator++; i < count; i = iterator++)
+	//	{
+	//		const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(i), m_parameters.m_numberOfObservations);
+	//		ndBrainMemVector crossProbabilities(&m_policyDivergeActions[i * numberOfActions], numberOfActions);
+	//		m_policy->MakePrediction(observation, crossProbabilities);
+	//		const ndBrainMemVector probabilities(&m_policyActions[i * numberOfActions], numberOfActions);
+	//
+	//		// calculate t0 = trace(inv(Sigma_q) * Sigma_p
+	//		// calculate t1 = numberOfActions
+	//		// calculate t2 = trans(Uq - Up) * inv(Sigma_q) * (Uq - Up)
+	//		// calculate t3 = log(det(Sigma_q) /det(Sigma_p))
+	//		ndFloat32 t0 = ndFloat32(0.0f);
+	//		ndFloat32 t2 = ndFloat32(0.0f);
+	//		ndFloat32 log_det_p = ndFloat32(0.0f);
+	//		ndFloat32 log_det_q = ndFloat32(0.0f);
+	//
+	//		ndBrainFloat sigma_p = m_parameters.m_actionFixSigma;
+	//		ndBrainFloat sigma_q = m_parameters.m_actionFixSigma;
+	//		ndBrainFloat invSigma_q = 1.0f / sigma_q;
+	//		ndFloat32 logSigmap = ndLog(sigma_p);
+	//		ndFloat32 logSigmaq = ndLog(sigma_q);
+	//
+	//		const ndInt32 size = numberOfActions;
+	//		for (ndInt32 j = size - 1; j >= 0; --j)
+	//		{
+	//			log_det_p += logSigmap;
+	//			log_det_q += logSigmaq;
+	//			t0 += sigma_p * invSigma_q;
+	//			ndBrainFloat meanError(crossProbabilities[j] - probabilities[j]);
+	//			t2 += meanError * invSigma_q * meanError;
+	//		}
+	//
+	//		// it does not really matter  the ratio is inverted since KLis a distance, 
+	//		// the only problem is that KL(p/q) is different that KL(q/p)
+	//		// but the distance still represent how close are the two distributions.
+	//		//ndFloat64 t3 = ndLog(det_q / det_p);
+	//		ndFloat64 t3 = log_det_q - log_det_p;
+	//		ndFloat64 t1 = ndBrainFloat(size);
+	//		ndFloat64 divergence = t0 - t1 + t2 + t3;
+	//		totalDivergence += divergence;
+	//	}
+	//	partialDivergence[threadIndex] = ndBrainFloat(0.5f) * totalDivergence;
+	//});
+	//
+	//if (m_parameters.m_usePerActionSigmas)
+	//{
+	//	ndBrainThreadPool::ParallelExecute(ParcialDivergence);
+	//}
+	//else
+	//{
+	//	ndBrainThreadPool::ParallelExecute(ParcialDivergenceFixSigma);
+	//}
+	//
+	//ndFloat64 divergence = ndFloat32(0.0f);
+	//for (ndInt32 i = GetThreadCount() - 1; i >= 0; --i)
+	//{
+	//	divergence += partialDivergence[i];
+	//}
+	//ndAssert(divergence >= 0.0f);
+	//divergence /= ndFloat64(m_trajectoryAccumulator.GetCount());
+	//return ndBrainFloat(divergence);
 }
 
 ndUnsigned32 ndBrainAgentContinuePolicyGradient_TrainerMaster::GetFramesCount() const
@@ -797,48 +797,49 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::BuildCriticClass()
 //#pragma optimize( "", off )
 void ndBrainAgentContinuePolicyGradient_TrainerMaster::CalculateAdvange()
 {
-	ndBrainFloat averageSum = ndBrainFloat(0.0f);
-	const ndInt32 stepNumber = m_trajectoryAccumulator.GetCount();
-	for (ndInt32 i = stepNumber - 1; i >= 0; --i)
-	{
-		averageSum += m_trajectoryAccumulator.GetExpectedReward(i);
-	}
-	m_averageExpectedRewards.Update(averageSum / ndBrainFloat(stepNumber));
-	m_averageFramesPerEpisodes.Update(ndBrainFloat(stepNumber) / ndBrainFloat(m_parameters.m_batchTrajectoryCount));
-
-	ndAtomic<ndInt32> iterator(0);
-	m_advantage.SetCount(m_trajectoryAccumulator.GetCount());
-
-	m_workingBuffer.SetCount(m_baseValueWorkingBufferSize * GetThreadCount());
-	auto CalculateAdvantage = ndMakeObject::ndFunction([this, &iterator](ndInt32 threadIndex, ndInt32)
-	{
-		// using Monte Carlos 
-		ndBrainFixSizeVector<1> stateValue;
-		ndBrainMemVector workingBuffer(&m_workingBuffer[threadIndex * m_baseValueWorkingBufferSize], m_baseValueWorkingBufferSize);
-
-		ndInt32 const count = m_trajectoryAccumulator.GetCount();
-		for (ndInt32 i = iterator++; i < count; i = iterator++)
-		{
-			const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(i), m_parameters.m_numberOfObservations);
-			m_critic->MakePrediction(observation, stateValue, workingBuffer);
-			ndBrainFloat expectedReward = m_trajectoryAccumulator.GetExpectedReward(i);
-			m_advantage[i] = expectedReward - stateValue[0];
-		}
-	});
-	ndBrainThreadPool::ParallelExecute(CalculateAdvantage);
-
-	if (m_advantage.GetCount() < m_parameters.m_miniBatchSize)
-	{
-		ndInt32 start = 0;
-		for (ndInt32 i = ndInt32(m_advantage.GetCount()); i < m_parameters.m_miniBatchSize; ++i)
-		{
-			m_trajectoryAccumulator.SetCount(i + 1);
-			m_trajectoryAccumulator.CopyFrom(i, m_trajectoryAccumulator, start);
-			m_advantage.PushBack(m_advantage[start]);
-			start++;
-		}
-	}
-}
+	ndAssert(0);
+	//ndBrainFloat averageSum = ndBrainFloat(0.0f);
+	//const ndInt32 stepNumber = m_trajectoryAccumulator.GetCount();
+	//for (ndInt32 i = stepNumber - 1; i >= 0; --i)
+	//{
+	//	averageSum += m_trajectoryAccumulator.GetExpectedReward(i);
+	//}
+	//m_averageExpectedRewards.Update(averageSum / ndBrainFloat(stepNumber));
+	//m_averageFramesPerEpisodes.Update(ndBrainFloat(stepNumber) / ndBrainFloat(m_parameters.m_batchTrajectoryCount));
+	//
+	//ndAtomic<ndInt32> iterator(0);
+	//m_advantage.SetCount(m_trajectoryAccumulator.GetCount());
+	//
+	//m_workingBuffer.SetCount(m_baseValueWorkingBufferSize * GetThreadCount());
+	//auto CalculateAdvantage = ndMakeObject::ndFunction([this, &iterator](ndInt32 threadIndex, ndInt32)
+	//{
+	//	// using Monte Carlos 
+	//	ndBrainFixSizeVector<1> stateValue;
+	//	ndBrainMemVector workingBuffer(&m_workingBuffer[threadIndex * m_baseValueWorkingBufferSize], m_baseValueWorkingBufferSize);
+	//
+	//	ndInt32 const count = m_trajectoryAccumulator.GetCount();
+	//	for (ndInt32 i = iterator++; i < count; i = iterator++)
+	//	{
+	//		const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(i), m_parameters.m_numberOfObservations);
+	//		m_critic->MakePrediction(observation, stateValue, workingBuffer);
+	//		ndBrainFloat expectedReward = m_trajectoryAccumulator.GetExpectedReward(i);
+	//		m_advantage[i] = expectedReward - stateValue[0];
+	//	}
+	//});
+	//ndBrainThreadPool::ParallelExecute(CalculateAdvantage);
+	//
+	//if (m_advantage.GetCount() < m_parameters.m_miniBatchSize)
+	//{
+	//	ndInt32 start = 0;
+	//	for (ndInt32 i = ndInt32(m_advantage.GetCount()); i < m_parameters.m_miniBatchSize; ++i)
+	//	{
+	//		m_trajectoryAccumulator.SetCount(i + 1);
+	//		m_trajectoryAccumulator.CopyFrom(i, m_trajectoryAccumulator, start);
+	//		m_advantage.PushBack(m_advantage[start]);
+	//		start++;
+	//	}
+	//}
+}	
 
 //#pragma optimize( "", off )
 //void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()

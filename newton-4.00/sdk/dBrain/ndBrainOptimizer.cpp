@@ -38,7 +38,7 @@ ndBrainOptimizer::~ndBrainOptimizer()
 {
 }
 
-ndBrainOptimizer::ndRegularizerType ndBrainOptimizer::GetRegularizerType() const
+ndRegularizerType ndBrainOptimizer::GetRegularizerType() const
 {
 	return m_regularizerType;
 }

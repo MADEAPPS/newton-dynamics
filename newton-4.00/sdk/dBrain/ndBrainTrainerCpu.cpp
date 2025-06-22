@@ -29,12 +29,24 @@
 #include "ndBrainTrainerCpu.h"
 #include "ndBrainLayerLinear.h"
 
+ndBrainTrainerCpu::ndBrainTrainerCpu(const ndTrainerDescriptor& descriptor)
+	:ndBrainTrainerCpuInference(descriptor)
+	,m_optimizer(new ndBrainOptimizerAdamCpu(descriptor.m_context))
+	,m_inputOuputGradientsBuffer()
+	,m_weightAndBiasGradientsBuffer()
+	,m_miniBatchInputGradientBuffer()
+	,m_miniBatchOutputGradientBuffer()
+	,m_backPropagateCommands()
+{
+	ndBrainTrainerCpu::Initialize(descriptor);
+}
+
 ndBrainTrainerCpu::ndBrainTrainerCpu(
 	const ndSharedPtr<ndBrain>& brain, 
 	const ndSharedPtr<ndBrainContext>& context,
 	ndBrainFloat learnRate,
 	ndInt32 minibatchSize)
-	:ndBrainTrainerCpuInference(brain, context, minibatchSize)
+	:ndBrainTrainerCpuInference(ndTrainerDescriptor(brain, context, minibatchSize, learnRate))
 	,m_optimizer(new ndBrainOptimizerAdamCpu(context))
 	,m_inputOuputGradientsBuffer()
 	,m_weightAndBiasGradientsBuffer()
@@ -42,22 +54,8 @@ ndBrainTrainerCpu::ndBrainTrainerCpu(
 	,m_miniBatchOutputGradientBuffer()
 	,m_backPropagateCommands()
 {
-	m_optimizer->Init(ndInt32(m_weightAndBiasBuffer.GetCount()), learnRate);
-	
-	m_miniBatchInputGradientBuffer.SetCount(m_miniBatchInputBuffer->m_buffer.GetCount());
-	m_miniBatchOutputGradientBuffer.SetCount(m_miniBatchOutputBuffer.GetCount());
-	
-	// big mistake here
-	//m_inputOuputGradientsBuffer.SetCount(m_inputOutputBuffer.GetCount() * m_miniBatchSize);
-	m_inputOuputGradientsBuffer.SetCount(m_inputOutputBuffer.GetCount());
-	m_inputOuputGradientsBuffer.Set(ndBrainFloat(0.0f));
-	
-	m_weightAndBiasGradientsBuffer.SetCount(m_weightAndBiasBuffer.GetCount() * m_miniBatchSize);
-	m_weightAndBiasGradientsBuffer.Set(ndBrainFloat(0.0f));
-
-	AddCopyOutputGradientCommand();
-	AddLayersGradientCommands();
-	AddCopyInputGradientCommand();
+	ndTrainerDescriptor initializer (brain, context, minibatchSize, learnRate);
+	ndBrainTrainerCpu::Initialize(initializer);
 }
 
 ndBrainTrainerCpu::ndBrainTrainerCpu(const ndBrainTrainerCpu& src)
@@ -70,6 +68,25 @@ ndBrainTrainerCpu::ndBrainTrainerCpu(const ndBrainTrainerCpu& src)
 	,m_backPropagateCommands()
 {
 	ndAssert(0);
+}
+
+void ndBrainTrainerCpu::Initialize(const ndTrainerDescriptor& descriptor)
+{
+	m_optimizer->Init(ndInt32(m_weightAndBiasBuffer.GetCount()), descriptor.m_learRate);
+
+	m_miniBatchInputGradientBuffer.SetCount(m_miniBatchInputBuffer->m_buffer.GetCount());
+	m_miniBatchOutputGradientBuffer.SetCount(m_miniBatchOutputBuffer.GetCount());
+
+	// big mistake here
+	m_inputOuputGradientsBuffer.SetCount(m_inputOutputBuffer.GetCount());
+	m_inputOuputGradientsBuffer.Set(ndBrainFloat(0.0f));
+
+	m_weightAndBiasGradientsBuffer.SetCount(m_weightAndBiasBuffer.GetCount() * m_miniBatchSize);
+	m_weightAndBiasGradientsBuffer.Set(ndBrainFloat(0.0f));
+
+	AddCopyOutputGradientCommand();
+	AddLayersGradientCommands();
+	AddCopyInputGradientCommand();
 }
 
 void ndBrainTrainerCpu::SaveInput(ndBrainVector& input) const

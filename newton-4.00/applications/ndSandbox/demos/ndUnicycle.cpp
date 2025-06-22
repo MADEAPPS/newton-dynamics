@@ -24,8 +24,8 @@
 
 namespace ndUnicycle
 {
-	//#define ND_TRAIN_AGENT
-	//#define USE_SAC
+	#define ND_TRAIN_AGENT
+	#define USE_SAC
 
 #ifdef USE_SAC
 	#define CONTROLLER_NAME			"unicycle_sac.dnn"
@@ -535,8 +535,7 @@ namespace ndUnicycle
 				hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
 				//hyperParameters.m_policyRegularizerType = ndBrainOptimizer::m_lasso;
 				//hyperParameters.m_criticRegularizerType = ndBrainOptimizer::m_lasso;
-				//m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
-				m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentSoftActorCritic_Trainer(hyperParameters));
+				m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
 			#else
 				m_outFile = fopen("unicycle_pp0.csv", "wb");
 				fprintf(m_outFile, "ppo\n");

@@ -225,7 +225,7 @@ void ndBrainTrainerGpu::AddOptimizerGradientCommand(ndBrainFloat learnRate)
 	//adamUniformbuffer->LoadData(sizeof(ndBrainOptimizerAdamGpu::ndCommandShareInfo), &optimizerData);
 	adamUniformbuffer->MemoryToDevive(sizeof(ndBrainOptimizerAdamGpu::ndCommandShareInfo), &optimizerData);
 	
-	if (m_optimizer->GetRegularizerType() == ndBrainOptimizer::m_lasso)
+	if (m_optimizer->GetRegularizerType() == m_lasso)
 	{
 		m_adamOtimizerUpdate = ndSharedPtr<ndBrainGpuCommand>(new ndBrainAdamUpdateCommand(
 			this, m_context, m_context->m_brainAdamLassoOptimizerUpdate, m_miniBatchSize, optimizerData,

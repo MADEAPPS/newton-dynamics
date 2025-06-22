@@ -152,14 +152,14 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 		ndInt32 m_replayBufferSize;
 		ndInt32 m_maxTrajectorySteps;
 		ndInt32 m_replayBufferStartOptimizeSize;
-		
-		ndInt32 m_threadsCount;
+
 		ndInt32 m_criticUpdatesCount;
 		ndInt32 m_policyUpdatesCount;
 
+		bool m_useGpuBackend;
 		bool m_usePerActionSigmas;
-		ndBrainOptimizer::ndRegularizerType m_policyRegularizerType;
-		ndBrainOptimizer::ndRegularizerType m_criticRegularizerType;
+		ndRegularizerType m_policyRegularizerType;
+		ndRegularizerType m_criticRegularizerType;
 	};
 
 	ndBrainAgentDeterministicPolicyGradient_Trainer(const HyperParameters& parameters);

@@ -24,15 +24,31 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainVector.h"
+#include "ndBrainOptimizer.h"
 
 class ndBrain;
 class ndBrainLoss;
 class ndBrainBuffer;
 class ndBrainContext;
 
+class ndTrainerDescriptor
+{
+	public:
+	ndTrainerDescriptor();
+	ndTrainerDescriptor(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndInt32 minibatchSize, ndBrainFloat learnRate);
+
+	ndSharedPtr<ndBrain> m_brain;
+	ndSharedPtr<ndBrainContext> m_context;
+	ndBrainFloat m_learRate;
+	ndBrainFloat m_regularizer;
+	ndInt32 m_minibatchSize;
+	ndRegularizerType m_regularizerType;
+};
+
 class ndBrainTrainer: public ndClassAlloc
 {
 	public: 
+	ndBrainTrainer(const ndTrainerDescriptor& descriptor);
 	ndBrainTrainer(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context);
 	ndBrainTrainer(const ndBrainTrainer& src);
 	virtual ~ndBrainTrainer();

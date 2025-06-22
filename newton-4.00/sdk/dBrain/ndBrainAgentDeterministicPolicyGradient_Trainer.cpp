@@ -56,11 +56,12 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 	m_policyMovingAverageFactor = ndBrainFloat(0.005f);
 	m_criticMovingAverageFactor = ndBrainFloat(0.005f);
 
+	m_useGpuBackend = true;
 	m_usePerActionSigmas = false;
 	m_actionFixSigma = ND_SAC_POLICY_FIX_SIGMA;
 
-	m_policyRegularizerType = ndBrainOptimizer::m_ridge;
-	m_criticRegularizerType = ndBrainOptimizer::m_ridge;
+	m_policyRegularizerType = m_ridge;
+	m_criticRegularizerType = m_ridge;
 
 	m_miniBatchSize = 256;
 	m_numberOfActions = 0;
@@ -75,10 +76,8 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 	m_replayBufferStartOptimizeSize = m_maxTrajectorySteps * 4;
 
 	m_replayBufferSize = 1024 * 1024;
-	m_threadsCount = ndMin(ndBrainThreadPool::GetMaxThreads(), m_miniBatchSize);
 
-//m_threadsCount = 1;
-m_threadsCount = 8;
+m_useGpuBackend = false;
 //m_policyUpdatesCount = 2;
 //m_criticUpdatesCount = 2;
 //m_replayBufferStartOptimizeSize = 1000;
@@ -283,11 +282,16 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::ndBrainAgentDeterministicPolicy
 	m_parameters.m_criticUpdatesCount = ndMax(m_parameters.m_criticUpdatesCount, 2);
 	m_parameters.m_policyUpdatesCount = ndMax(m_parameters.m_policyUpdatesCount, 2);
 
-	m_context = ndSharedPtr<ndBrainContext>(new ndBrainCpuContext);
+	if (m_parameters.m_useGpuBackend)
+	{
+		m_context = ndSharedPtr<ndBrainContext>(new ndBrainGpuContext);
+	}
+	else
+	{
+		m_context = ndSharedPtr<ndBrainContext>(new ndBrainCpuContext);
+	}
 
 	// create actor class
-	m_context->GetAsCpuContext()->SetThreadCount(m_parameters.m_threadsCount);
-
 	BuildPolicyClass();
 	BuildCriticClass();
 	m_replayBuffer.Init(m_policyTrainer->GetBrain()->GetOutputSize(), m_policyTrainer->GetBrain()->GetInputSize());
@@ -302,7 +306,6 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::~ndBrainAgentDeterministicPolic
 
 ndBrain* ndBrainAgentDeterministicPolicyGradient_Trainer::GetPolicyNetwork()
 {
-	ndAssert(0);
 	//m_policyTrainer->UpdateParameters();
 	return *m_policyTrainer->GetBrain();
 }
@@ -358,11 +361,10 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildPolicyClass()
 	}
 	policy->InitWeights();
 
-	ndAssert(0);
-	//ndSharedPtr<ndBrainOptimizerAdamCpu> policyOptimizer(new ndBrainOptimizerAdamCpu(m_context));
-	//policyOptimizer->SetRegularizer(m_parameters.m_policyRegularizer);
-	//policyOptimizer->SetRegularizerType(m_parameters.m_policyRegularizerType);
-	//m_policyTrainer = ndSharedPtr<ndBrainTrainerCpu>(new ndBrainTrainerCpu(policy, m_context, policyOptimizer, m_parameters.m_miniBatchSize));
+	ndTrainerDescriptor descriptor(policy, m_context, m_parameters.m_miniBatchSize, m_parameters.m_policyLearnRate);
+	descriptor.m_regularizer = m_parameters.m_policyRegularizer;
+	descriptor.m_regularizerType = m_parameters.m_policyRegularizerType;
+	m_policyTrainer = ndSharedPtr<ndBrainTrainerCpu>(new ndBrainTrainerCpu(descriptor));
 }
 
 void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildCriticClass()
@@ -394,15 +396,13 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildCriticClass()
 		}
 		critic->InitWeights();
 
-		ndAssert(0);
-		//ndSharedPtr<ndBrainOptimizerAdamCpu> criticOptimizer(new ndBrainOptimizerAdamCpu(m_context));
-		//criticOptimizer->SetRegularizer(m_parameters.m_policyRegularizer);
-		//criticOptimizer->SetRegularizerType(m_parameters.m_policyRegularizerType);
-		//m_criticTrainer[k] = ndSharedPtr<ndBrainTrainerCpu>(new ndBrainTrainerCpu(critic, m_context, criticOptimizer, m_parameters.m_miniBatchSize));
-		//
-		//ndSharedPtr<ndBrain> referenceCritic(new ndBrain(**critic));
-		//ndSharedPtr<ndBrainOptimizerAdamCpu> referenceCriticOptimizer(new ndBrainOptimizerAdamCpu(m_context));
-		//m_referenceCriticTrainer[k] = ndSharedPtr<ndBrainTrainerCpu>(new ndBrainTrainerCpu(referenceCritic, m_context, referenceCriticOptimizer, m_parameters.m_miniBatchSize));
+		// big mistake here ???
+		ndSharedPtr<ndBrain> referenceCritic(new ndBrain(**critic));
+
+		ndTrainerDescriptor descriptor(critic, m_context, m_parameters.m_miniBatchSize, m_parameters.m_policyLearnRate);
+		descriptor.m_regularizer = m_parameters.m_criticRegularizer;
+		descriptor.m_regularizerType = m_parameters.m_criticRegularizerType;
+		m_referenceCriticTrainer[k] = ndSharedPtr<ndBrainTrainerCpu>(new ndBrainTrainerCpu(descriptor));
 	}
 }
 
