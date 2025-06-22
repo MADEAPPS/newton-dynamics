@@ -16,6 +16,8 @@ ndBrainCpuContext::ndBrainCpuContext()
 	:ndBrainContext()
 	,ndBrainThreadPool()
 {
+	ndInt32 numOfThreads = (ndBrainThreadPool::GetMaxThreads() + 1) / 2;
+	SetThreadCount(numOfThreads);
 }
 
 ndBrainCpuContext::~ndBrainCpuContext()

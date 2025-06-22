@@ -871,8 +871,8 @@ R""""(
         uint groupId = get_group_id(0);
         uint workGroupSize = get_local_size(0);
         
-        uint stride = parameters->m_inputOutputSize;
-        //uint numberOfIndex = parameters->m_inputSize;
+        uint stride = parameters->m_inputSize;
+        //if ((groupId == 0 && ) printf ("%d: %d \n", groupId, stride);
      
         uint dstOffset = groupId * stride;
         uint srcOffset = indexBuffer[groupId] * stride;

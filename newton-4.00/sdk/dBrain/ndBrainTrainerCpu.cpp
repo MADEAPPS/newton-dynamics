@@ -43,11 +43,13 @@ ndBrainTrainerCpu::ndBrainTrainerCpu(
 	,m_backPropagateCommands()
 {
 	m_optimizer->Init(ndInt32(m_weightAndBiasBuffer.GetCount()), learnRate);
-
+	
 	m_miniBatchInputGradientBuffer.SetCount(m_miniBatchInputBuffer->m_buffer.GetCount());
 	m_miniBatchOutputGradientBuffer.SetCount(m_miniBatchOutputBuffer.GetCount());
-
-	m_inputOuputGradientsBuffer.SetCount(m_inputOutputBuffer.GetCount() * m_miniBatchSize);
+	
+	// big mistake here
+	//m_inputOuputGradientsBuffer.SetCount(m_inputOutputBuffer.GetCount() * m_miniBatchSize);
+	m_inputOuputGradientsBuffer.SetCount(m_inputOutputBuffer.GetCount());
 	m_inputOuputGradientsBuffer.Set(ndBrainFloat(0.0f));
 	
 	m_weightAndBiasGradientsBuffer.SetCount(m_weightAndBiasBuffer.GetCount() * m_miniBatchSize);
