@@ -130,6 +130,10 @@ ndBrain* ndBrainLoad::Load() const
 		{
 			layer = ndBrainLayerLinearWithDropOut::Load(this);
 		}
+		else if (!strcmp(layerType, ND_BRAIN_LAYER_ACTIVATION_CATEGORICAL_SOFTMAX))
+		{
+			layer = ndBrainLayerActivationCategoricalSoftmax::Load(this);
+		}
 		else if (!strcmp(layerType, "ndBrainLayerActivationSigmoid"))
 		{
 			ndAssert(0);
@@ -149,11 +153,6 @@ ndBrain* ndBrainLoad::Load() const
 		{
 			ndAssert(0);
 			layer = ndBrainLayerActivationSoftmax::Load(this);
-		}
-		else if (!strcmp(layerType, "ndBrainLayerActivationCategoricalSoftmax"))
-		{
-			ndAssert(0);
-			layer = ndBrainLayerActivationCategoricalSoftmax::Load(this);
 		}
 		else if (!strcmp(layerType, "ndBrainLayerConvolutional_2d"))
 		{

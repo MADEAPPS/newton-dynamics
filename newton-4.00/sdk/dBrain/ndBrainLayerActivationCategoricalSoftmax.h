@@ -25,6 +25,7 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainLayerActivationSoftmax.h"
 
+#define ND_BRAIN_LAYER_ACTIVATION_CATEGORICAL_SOFTMAX	"ndBrainLayerActivationCategoricalSoftmax"
 
 // note: Categorical SoftMax activation layer is designed you work with a 
 // Categorical entropy loss. These rules for using it are:

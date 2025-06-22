@@ -478,11 +478,8 @@ static void MnistTestSet()
 		ndSharedPtr<ndBrain> brain (ndBrainLoad::Load(path));
 		ndInt32 numbeOfParam = brain->GetNumberOfParameters();
 
-		ndInt32 threadCount = ndMin(ndBrainThreadPool::GetMaxThreads(), 8);
-		ndSharedPtr<ndBrainContext> context(new ndBrainCpuContext);
-		context->GetAsCpuContext()->SetThreadCount(threadCount);
-
 		ndInt32 minibatchSize = 256;
+		ndSharedPtr<ndBrainContext> context(new ndBrainCpuContext);
 		ndSharedPtr<ndBrainTrainer> inference(ndSharedPtr<ndBrainTrainer>(new ndBrainTrainerCpuInference(brain, context, minibatchSize)));
 
 		ndBrainVector groundTruth;
@@ -542,7 +539,7 @@ static void MnistTestSet()
 
 		ndFloat32 score = (ndFloat32)(batchesSize - failCount) / (ndFloat32)batchesSize;
 		ndExpandTraceMessage("mnist database, number of Parameters %d\n", numbeOfParam);
-		ndExpandTraceMessage("  success rate:%f%%", score * 100.0f);
+		ndExpandTraceMessage("  success rate:%f%%\n", score * 100.0f);
 		ndExpandTraceMessage("  test fail count:%d\n", failCount);
 		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
 	}
@@ -551,6 +548,6 @@ static void MnistTestSet()
 void ndHandWrittenDigits()
 {
 	ndSetRandSeed(53);
-	MnistTrainingSet();
-	//MnistTestSet();
+	//MnistTrainingSet();
+	MnistTestSet();
 }

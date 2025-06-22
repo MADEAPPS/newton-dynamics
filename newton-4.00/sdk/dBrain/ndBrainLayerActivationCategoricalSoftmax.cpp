@@ -44,7 +44,7 @@ ndBrainLayer* ndBrainLayerActivationCategoricalSoftmax::Clone() const
 
 const char* ndBrainLayerActivationCategoricalSoftmax::GetLabelId() const
 {
-	return "ndBrainLayerActivationCategoricalSoftmax";
+	return ND_BRAIN_LAYER_ACTIVATION_CATEGORICAL_SOFTMAX;
 }
 
 ndBrainLayer* ndBrainLayerActivationCategoricalSoftmax::Load(const ndBrainLoad* const loadSave)
