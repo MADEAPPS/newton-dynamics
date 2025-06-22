@@ -20,7 +20,8 @@ ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainContext* const context, 
 {
 }
 
-ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32 indexArray)
+//ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32 indexArray)
+ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32)
 	:ndBrainGpuBuffer(context, numberOfElements * ndInt64(sizeof(ndUnsigned32)), ndStorageData)
 {
 	ndAssert(m_context->GetAsGpuContext());
