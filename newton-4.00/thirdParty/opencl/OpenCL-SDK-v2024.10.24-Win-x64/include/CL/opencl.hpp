@@ -6471,7 +6471,7 @@ public:
      */
     cl_int enableFineGrainedSystemSVM(bool svmEnabled)
     {
-        cl_bool svmEnabled_ = svmEnabled ? CL_TRUE : CL_FALSE;
+        cl_bool svmEnabled_ = cl_bool(svmEnabled ? CL_TRUE : CL_FALSE);
         return detail::errHandler(
             ::clSetKernelExecInfo(
                 object_,
@@ -7471,7 +7471,7 @@ inline vector<vector<unsigned char>> cl::Program::getInfo<CL_PROGRAM_BINARIES>(c
 template <>
 inline cl_int cl::Program::setSpecializationConstant(cl_uint index, const bool &value)
 {
-    cl_uchar ucValue = value ? CL_UCHAR_MAX : 0;
+    cl_uchar ucValue = cl_uchar(value ? CL_UCHAR_MAX : 0);
     return detail::errHandler(
         ::clSetProgramSpecializationConstant(
             object_,
