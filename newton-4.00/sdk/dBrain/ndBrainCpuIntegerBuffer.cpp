@@ -95,7 +95,7 @@ void ndBrainCpuIntegerBuffer::CopyBuffer(const ndBrainBuffer&, size_t, size_t, s
 	//dst.Set(src);
 }
 
-//void ndBrainCpuIntegerBuffer::CopyBufferIndirectSource(const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcDataBuffer, ndInt32 srcStrideIntBytes)
+//void ndBrainCpuIntegerBuffer::CopyBufferIndirectSource(const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcDataBuffer, ndInt32 srcStrideInBytes)
 void ndBrainCpuIntegerBuffer::CopyBufferIndirectSource(const ndBrainBuffer&, const ndBrainBuffer&, ndInt32)
 {
 	ndAssert(0);
