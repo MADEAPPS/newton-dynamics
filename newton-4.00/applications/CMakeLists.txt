@@ -23,14 +23,8 @@ endif()
 if (NEWTON_BUILD_SANDBOX_DEMOS)
 	add_subdirectory(ndSandbox)
 	
-     if(UNIX)
-        #find_package(OpenAL REQUIRED)
-        #if(NOT_OpenAL_FOUND)
-        #    message(WARNING "OpenAL headers were not found. Disable NEWTON_BUILD_SANDBOX_DEMOS or install OpenAL")
-        #else(NOT_OpenAL_FOUND)
-        #    message("Found OpenAL library")
-        #endif(NOT_OpenAL_FOUND)
-
+     # common libraries for unix systems
+     if (UNIX)
         find_package(glfw3 REQUIRED)
         if(NOT_glfw3_FOUND)
             message(WARNING "GLFW headers were not found. Disable NEWTON_BUILD_SANDBOX_DEMOS or install GLFW")
@@ -44,7 +38,6 @@ if (NEWTON_BUILD_SANDBOX_DEMOS)
         else(NOT_OpenGL_FOUND)
             message("Found OpenGL library")
         endif(NOT_OpenGL_FOUND)
-        
       endif(UNIX)
 endif()
 
