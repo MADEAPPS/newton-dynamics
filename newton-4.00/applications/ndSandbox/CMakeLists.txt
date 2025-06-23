@@ -67,14 +67,12 @@ if (MSVC OR MINGW)
 elseif(APPLE)
 	message ("linking required Apple frameworks")
     add_definitions(-DGL_SILENCE_DEPRECATION)
-    #add_library(glfw3 SHARED my_framework_sources.cpp)
-	#set_target_properties(MyFramework PROPERTIES FRAMEWORK TRUE)
 
 	target_link_libraries(${projectName} PUBLIC glfw)
-	target_link_libraries(${projectName} PUBLIC "-framework OpenGL")
-	target_link_libraries(${projectName} PUBLIC "-framework CoreFoundation")
-	#set_target_properties(glfw3 PROPERTIES FRAMEWORK TRUE)
-	#set_target_properties(OpenGL PROPERTIES FRAMEWORK TRUE)
+	#target_link_libraries(${projectName} PUBLIC "-framework OpenGL")
+	#target_link_libraries(${projectName} PUBLIC "-framework CoreFoundation")
+
+	target_link_libraries(${projectName} PUBLIC ${OpenGL})
 	set_target_properties(${projectName} PROPERTIES LINK_FLAGS "-Wl,-F/Library/Frameworks")
 
 else(UNIX)
