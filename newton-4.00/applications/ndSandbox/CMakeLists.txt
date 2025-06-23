@@ -66,6 +66,7 @@ if (MSVC OR MINGW)
 	target_link_libraries (${projectName} PUBLIC glatter glfw glu32 opengl32)
 elseif(APPLE)
 	message ("linking required Apple frameworks")
+    add_definitions(-DGL_SILENCE_DEPRECATION)
     #add_library(glfw3 SHARED my_framework_sources.cpp)
 	#set_target_properties(MyFramework PROPERTIES FRAMEWORK TRUE)
 
