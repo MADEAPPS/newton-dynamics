@@ -65,6 +65,7 @@ void ndGameControllerInputs::Update(ndDemoEntityManager* const scene)
 {
 	if (scene->JoystickDetected())
 	{
+#if !defined (__APPLE__)
 		char joystickName[256];
 		strcpy(&joystickName[0], glfwGetJoystickName(0));
 		strtolwr(joystickName);
@@ -80,6 +81,7 @@ void ndGameControllerInputs::Update(ndDemoEntityManager* const scene)
 		{
 			GetJoystickInputs(scene);
 		}
+#endif
 	}
 	GetKeyboardInputs(scene);
 }
