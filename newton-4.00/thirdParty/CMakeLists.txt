@@ -17,12 +17,12 @@ endif(NEWTON_TEST_NEW_V_HACD)
 
 add_subdirectory(png)
 add_subdirectory(imgui)
+add_subdirectory(glatter)
 add_subdirectory(openFBX/src)
 add_subdirectory(hacd/src/VHACD_Lib)
 
 if (MSVC OR MINGW)
 	add_subdirectory(glfw)
-	add_subdirectory(glatter)
 elseif(APPLE)
 	add_subdirectory(glfw)
 else(UNIX)
