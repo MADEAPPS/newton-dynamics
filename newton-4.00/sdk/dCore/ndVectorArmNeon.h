@@ -290,7 +290,7 @@ class ndBigVector
 
 	inline ndBigVector Divide(const ndBigVector& denominator) const
 	{
-		return ndVector(m_x / denominator.m_x, m_y / denominator.m_y, m_z / denominator.m_z, m_w / denominator.m_w);
+		return ndBigVector(m_x / denominator.m_x, m_y / denominator.m_y, m_z / denominator.m_z, m_w / denominator.m_w);
 	}
 
 	inline ndBigVector Reciproc() const

@@ -195,9 +195,9 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	HyperParameters m_parameters;
 
 	ndSharedPtr<ndBrainContext> m_context;
-	ndSharedPtr<ndBrainTrainerCpu> m_policyTrainer;
-	ndSharedPtr<ndBrainTrainerCpu> m_criticTrainer[ND_SAC_NUMBER_OF_CRITICS];
-	ndSharedPtr<ndBrainTrainerCpu> m_referenceCriticTrainer[ND_SAC_NUMBER_OF_CRITICS];
+	ndSharedPtr<ndBrainTrainer> m_policyTrainer;
+	ndSharedPtr<ndBrainTrainer> m_criticTrainer____[ND_SAC_NUMBER_OF_CRITICS];
+	ndSharedPtr<ndBrainTrainer> m_referenceCriticTrainer[ND_SAC_NUMBER_OF_CRITICS];
 
 	ndBrainVector m_actionBatch;
 	ndBrainVector m_nextActionBatch;

@@ -22,8 +22,9 @@
 #define MNIST_CONVOLUTIONAL_FEATURE_MAPS		32
 //#define MIN_TRAIN_SCORE						0.9999f
 
-//#define MINIST_NUMBER_OF_EPOCKS				70
-#define MINIST_NUMBER_OF_EPOCKS					20
+//#define MINIST_NUMBER_OF_EPOCHS				70
+#define MINIST_NUMBER_OF_EPOCHS				20
+//#define MINIST_NUMBER_OF_EPOCHS					1
 
 #ifdef MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
 	#if 1
@@ -264,7 +265,7 @@ static void MnistTrainingSet()
 			ndBrainLossCategoricalCrossEntropy loss(outputSize);
 
 			ndBrainBuffer* const deviceMinibatchBuffer = m_trainer->GetInputBuffer();
-			for (ndInt32 epoch = 0; epoch < MINIST_NUMBER_OF_EPOCKS; ++epoch)
+			for (ndInt32 epoch = 0; epoch < MINIST_NUMBER_OF_EPOCHS; ++epoch)
 			{
 				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
 				for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
