@@ -73,7 +73,7 @@ elseif(APPLE)
 	target_link_libraries(${projectName} PUBLIC "-framework OpenGL")
 	#set_target_properties(glfw3 PROPERTIES FRAMEWORK TRUE)
 	#set_target_properties(OpenGL PROPERTIES FRAMEWORK TRUE)
-	set_target_properties(program PROPERTIES LINK_FLAGS "-Wl,-F/Library/Frameworks")
+	set_target_properties(${projectName} PROPERTIES LINK_FLAGS "-Wl,-F/Library/Frameworks")
 
 else(UNIX)
 	message ("linking required POSIT system libraries")
