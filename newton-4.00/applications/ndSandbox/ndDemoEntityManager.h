@@ -216,9 +216,11 @@ class ndDemoEntityManager : public ndList <ndSharedPtr<ndDemoEntity>>
 	static void MouseScrollCallback (GLFWwindow* const window, double x, double y);
 	static void MouseButtonCallback(GLFWwindow* const window, ndInt32 button, ndInt32 action, ndInt32 mods);
 	static void ErrorCallback(ndInt32 error, const char* const description);
+#if (defined(_DEBUG) && defined(WIN32))
 	static void APIENTRY OpenMessageCallback(
 		GLenum source, GLenum type, GLuint id, GLenum severity,
 		GLsizei length, const GLchar* message, const void* userParam);
+#endif
 
 	void ApplyMenuOptions();
 	void LoadDemo(ndInt32 menu);

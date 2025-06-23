@@ -544,11 +544,11 @@ ndDemoEntityManager::ndDemoEntityManager()
 	// attach myself to the main frame
 	glfwSetWindowUserPointer(m_mainFrame, this);
 
-	#if defined (_DEBUG)
+#if (defined(_DEBUG) && defined(WIN32))	
 	glDebugMessageCallback(OpenMessageCallback, m_mainFrame);
 	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-	#endif
+#endif
 
 	// Load Fonts
 	LoadFont();
@@ -631,7 +631,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//Test0__();
 	//Test1__();
 	//TestVulkanStuff();
-	ndHandWrittenDigits();
+	//ndHandWrittenDigits();
 	//ndCifar10ImageClassification();
 	//TargaToPng();
 }
@@ -676,7 +676,7 @@ void ndDemoEntityManager::Terminate()
 	glfwSetWindowShouldClose(m_mainFrame, 1);
 }
 
-#ifdef _DEBUG
+#if (defined(_DEBUG) && defined(WIN32))
 void APIENTRY ndDemoEntityManager::OpenMessageCallback(GLenum source,
 	GLenum type,
 	GLuint id,

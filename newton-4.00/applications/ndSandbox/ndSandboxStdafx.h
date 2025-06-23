@@ -56,22 +56,14 @@
 	#include <GL/glu.h>
 	#include <GL/gl.h>
 	#include <GLFW/glfw3.h>
-
-	// audio library support
-	#include <AL/al.h>
-	#include <AL/alc.h>
 #endif
 
 #if defined (__APPLE__)
 	#include <CoreFoundation/CoreFoundation.h> 
 	#include <unistd.h>
-	#include <GL/glew.h>
+	//#include <GL/glew.h>
 	#include <OpenGL/glu.h>
 	#include <OpenGL/gl.h>
-
-	// audio library support
-	#include <OpenAl/al.h>
-	#include <OpenAl/alc.h>
 #endif
 
 // some third party libraries includes here
