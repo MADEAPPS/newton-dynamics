@@ -70,7 +70,7 @@ elseif(APPLE)
 		src/cocoa_platform.h
 		src/cocoa_init.m
 		src/cocoa_monitor.m
-		src/cocoa_window.c
+		src/cocoa_window.m
 		src/cocoa_joystick.m
 		src/nsgl_context.m)
 endif()
