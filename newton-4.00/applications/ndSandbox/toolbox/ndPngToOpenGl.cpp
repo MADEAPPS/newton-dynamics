@@ -123,22 +123,19 @@ static GLuint LoadGpuImage(const unsigned char* const buffer, ndInt32 width, ndI
 	switch (format)
 	{
 		case m_rgb:
-			// Most likely case
-			//eFormat = GL_BGR;
 			eFormat = GL_RGB;
 			iComponents = GL_RGBA;
 			break;
 
 		case m_rgba:
-			//eFormat = GL_BGRA;
 			eFormat = GL_RGBA;
 			iComponents = GL_RGBA;
 			break;
 
 		case m_luminace:
-			//eFormat = GL_LUMINANCE;
-			eFormat = GL_LUMINANCE_ALPHA;
-			//eFormat = GL_ALPHA;
+			// apple remove this from thier opengl
+			//eFormat = GL_LUMINANCE_ALPHA; 
+			eFormat = GL_RED;
 			iComponents = GL_RGBA;
 			break;
 	};
