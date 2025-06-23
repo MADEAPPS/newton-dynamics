@@ -58,7 +58,8 @@
 
 #if defined (__APPLE__)
 	#include <CoreFoundation/CoreFoundation.h> 
-	#include <ndr.h>
+	//#include <mach/ndr.h>
+	#include <mach/mach.h>
 	#include <unistd.h>
 	#include <OpenGL/gl3.h>
 	#include <OpenGL/glext.h>
