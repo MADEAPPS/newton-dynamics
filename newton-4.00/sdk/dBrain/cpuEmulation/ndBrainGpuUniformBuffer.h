@@ -18,12 +18,8 @@
 class ndBrainGpuUniformBuffer : public ndBrainBuffer
 {
 	public:
-	ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes);
-	ndBrainGpuUniformBuffer(ndBrainGpuContext* const context, ndInt32 sizeInBytes, const void* const data);
-
-	//virtual ndBrainGpuUniformBuffer* GetAsUniformBuffer();
-	//virtual void LoadData(size_t sizeInBytes, const void* const inputData) override;
-	//virtual void UnloadData(size_t sizeInBytes, void* const outputData) const override;
+	ndBrainGpuUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes);
+	ndBrainGpuUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, const void* const data);
 
 	virtual void BrainVectorToDevice(const ndBrainVector& vector) override;
 	virtual void BrainVectorFromDevice(ndBrainVector& vector) const override;
