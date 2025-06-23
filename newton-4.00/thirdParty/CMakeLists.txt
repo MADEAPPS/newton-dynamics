@@ -16,21 +16,16 @@ if(NEWTON_TEST_NEW_V_HACD)
 endif(NEWTON_TEST_NEW_V_HACD)
 
 add_subdirectory(png)
-#add_subdirectory(tinyxml)
 add_subdirectory(openFBX/src)
 add_subdirectory(hacd/src/VHACD_Lib)
 
-if (NOT APPLE)
-	if (NEWTON_BUILD_SANDBOX_DEMOS)
-		if (MSVC OR MINGW)
-			add_subdirectory(glfw)
-		endif(MSVC OR MINGW)
-
-		add_subdirectory(imgui)
-		add_subdirectory(glatter)
-	endif()
+if (MSVC OR MINGW)
+	add_subdirectory(glfw)
+	add_subdirectory(imgui)
+	add_subdirectory(glatter)
+elseif(APPLE)
+	add_subdirectory(glfw)
+else(UNIX)
+	add_subdirectory(imgui)
+	add_subdirectory(glatter)
 endif()
-
-
-
-
