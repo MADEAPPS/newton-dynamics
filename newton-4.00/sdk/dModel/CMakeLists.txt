@@ -24,10 +24,7 @@ include_directories(../../thirdParty/openFBX/src)
 
 include_directories(animation)
 
-file(GLOB CPP_SOURCE 
-	*.h
-	*.cpp
-)
+file(GLOB CPP_SOURCE *.h *.cpp)
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
