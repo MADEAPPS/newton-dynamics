@@ -26,7 +26,6 @@
 #include <float.h>
 #include <ctype.h>
 #include <stdlib.h>
-#include <memory.h>
 #include <math.h>
 #include <time.h>
 
@@ -61,8 +60,9 @@
 	#include <CoreFoundation/CoreFoundation.h> 
 	#include <unistd.h>
 	//#include <GL/glew.h>
-	#include <OpenGL/glu.h>
-	#include <OpenGL/gl.h>
+	//#include <OpenGL/glu.h>
+	//#include <OpenGL/gl.h>
+	#include <OpenGL/gl3.h>
 #endif
 
 // some third party libraries includes here
