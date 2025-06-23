@@ -30,7 +30,8 @@
 #include "internal.h"
 
 #include <stdlib.h>
-#include <malloc.h>
+//julio: apple does not like this header, fortunally this is included by stdlib.h
+//#include <malloc.h> 
 #include <assert.h>
 
 // Return the value corresponding to the specified attribute
