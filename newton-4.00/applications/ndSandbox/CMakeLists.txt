@@ -61,7 +61,7 @@ add_executable(${projectName} ${CPP_SOURCE})
 
 message ("linking project libraries")
 target_link_libraries (${projectName} PUBLIC ndNewton ndBrain ndModel vhacd openfbx lodepng imgui)
-if (MSVC)
+if (MSVC OR MINGW)
 	message ("linking third party opengl libraries")
 	target_link_libraries (${projectName} PUBLIC glatter glfw glu32 opengl32)
 elseif(APPLE)
