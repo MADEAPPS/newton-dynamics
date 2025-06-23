@@ -57,7 +57,7 @@ bool ndShaderCache::CreateAllEffects()
 
 void ndShaderCache::LoadShaderCode (const char* const filename, char* const buffer)
 {
-	ndInt32 size;
+	size_t size;
 	FILE* file;
 	char fullPathName[2048];
 

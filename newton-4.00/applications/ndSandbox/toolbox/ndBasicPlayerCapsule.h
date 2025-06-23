@@ -48,8 +48,8 @@ class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 		ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight, bool isPlayer = false);
 	~ndBasicPlayerCapsule();
 
-	void ApplyInputs(ndFloat32 timestep);
-	ndFloat32 ContactFrictionCallback(const ndVector& position, const ndVector& normal, ndInt32 contactId, const ndBodyKinematic* const otherbody) const;
+	void ApplyInputs(ndFloat32 timestep) override;
+	ndFloat32 ContactFrictionCallback(const ndVector& position, const ndVector& normal, ndInt32 contactId, const ndBodyKinematic* const otherbody) const override;
 
 	void SetCamera(ndDemoEntityManager* const scene);
 	static void UpdateCameraCallback(ndDemoEntityManager* const manager, void* const context, ndFloat32 timestep);

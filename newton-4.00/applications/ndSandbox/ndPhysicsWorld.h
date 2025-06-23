@@ -71,7 +71,7 @@ class ndPhysicsWorld: public ndWorld
 
 	ndPhysicsWorld(ndDemoEntityManager* const manager);
 	virtual ~ndPhysicsWorld();
-	virtual void CleanUp();
+	virtual void CleanUp() override;
 
 	void AdvanceTime(ndFloat32 timestep);
 	ndDemoEntityManager* GetManager() const;
@@ -81,9 +81,9 @@ class ndPhysicsWorld: public ndWorld
 	void AccelerateUpdates();
 
 	private:
-	void PreUpdate(ndFloat32 timestep);
-	void PostUpdate(ndFloat32 timestep);
-	void OnSubStepPostUpdate(ndFloat32 timestep);
+	void PreUpdate(ndFloat32 timestep) override;
+	void PostUpdate(ndFloat32 timestep) override;
+	void OnSubStepPostUpdate(ndFloat32 timestep) override;
 
 	void RemoveDeadBodies();
 

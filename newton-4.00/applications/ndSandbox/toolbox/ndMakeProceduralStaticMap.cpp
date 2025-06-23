@@ -32,7 +32,7 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 	{
 	}
 
-	virtual void DebugShape(const ndMatrix&, ndShapeDebugNotify& notify) const
+	virtual void DebugShape(const ndMatrix&, ndShapeDebugNotify& notify) const override
 	{
 		ndDebugNotify& debugDraw = (ndDebugNotify&)notify;
 		ndBodyKinematic* const body = debugDraw.m_body;
@@ -87,7 +87,7 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 		}
 	}
 
-	virtual ndFloat32 RayCast(ndRayCastNotify&, const ndVector& localP0, const ndVector& localP1, ndFloat32, const ndBody* const, ndContactPoint& contactOut) const
+	virtual ndFloat32 RayCast(ndRayCastNotify&, const ndVector& localP0, const ndVector& localP1, ndFloat32, const ndBody* const, ndContactPoint& contactOut) const override
 	{
 		ndVector segment(ndVector::m_triplexMask & (localP1 - localP0));
 		ndFloat32 den = m_planeEquation.DotProduct(segment).GetScalar();
@@ -98,7 +98,7 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 		return ndClamp (t, ndFloat32 (0.0f), ndFloat32 (1.2f));
 	}
 
-	virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const
+	virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const override
 	{
 		ndShapeStaticProceduralMesh::GetCollidingFaces(data);
 	}
@@ -141,7 +141,7 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 		}
 	}
 
-	virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const
+	virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const override
 	{
 		hash = ndCRC64(&m_planeEquation[0], sizeof(ndVector), hash);
 		hash = ndCRC64(&m_gridSize, sizeof(ndFloat32), hash);

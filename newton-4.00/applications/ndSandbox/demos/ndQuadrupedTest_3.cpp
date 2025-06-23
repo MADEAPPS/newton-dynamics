@@ -188,7 +188,7 @@ namespace ndQuadruped_3
 					m_poseBoundMax.m_w = 1.0f;
 				}
 
-				ndVector GetTranslation(ndFloat32) const
+				ndVector GetTranslation(ndFloat32) const override
 				{
 					return ndVector::m_zero;
 				}

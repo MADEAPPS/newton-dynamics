@@ -104,7 +104,7 @@ class ndJointFollowSplinePath : public ndJointFollowPath
 		//static ndJointFollowSplinePathSaveLoad loadSave;
 	}
 
-	void GetPointAndTangentAtLocation(const ndVector& location, ndVector& positOut, ndVector& tangentOut) const
+	void GetPointAndTangentAtLocation(const ndVector& location, ndVector& positOut, ndVector& tangentOut) const override
 	{
 		const ndSplinePathBody* const splineBody = (ndSplinePathBody*)GetBody1();
 		const ndBezierSpline& spline = splineBody->m_spline;
@@ -240,7 +240,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 			SetAsSpringDamper(regularizer, spring, friction);
 		}
 
-		void JacobianDerivative(ndConstraintDescritor& desc)
+		void JacobianDerivative(ndConstraintDescritor& desc) override
 		{
 			m_rollAngle = ndFmod(m_rollAngle + m_rollOmega * desc.m_timestep, 2.0f * ndPi);
 			m_pitchAngle = ndFmod(m_pitchAngle + m_pitchOmega * desc.m_timestep, 2.0f * ndPi);
