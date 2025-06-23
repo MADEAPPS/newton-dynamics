@@ -59,10 +59,8 @@
 #if defined (__APPLE__)
 	#include <CoreFoundation/CoreFoundation.h> 
 	#include <unistd.h>
-	//#include <GL/glew.h>
-	//#include <OpenGL/glu.h>
-	//#include <OpenGL/gl.h>
 	#include <OpenGL/gl3.h>
+	#include <OpenGL/glext.h>
 #endif
 
 // some third party libraries includes here
