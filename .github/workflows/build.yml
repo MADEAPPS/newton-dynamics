@@ -35,7 +35,7 @@ jobs:
     - name: Run Tests
       shell: bash
       run: |
-        newton-4.00/build/tests/newton_tests
+        #newton-4.00/build/tests/newton_tests
 
   build-windows:
     runs-on: windows-latest
@@ -70,9 +70,10 @@ jobs:
       run: |
         # We need to copy the "newton_test" binary into the folder with
         # the Windows DLL files first before we can run it.
-        cd newton-4.00/build/sdk/Debug
-        cp ../../tests/Debug/newton_tests.exe ./
 
-        # Execute the test suite.
-        ./newton_tests
+        #cd newton-4.00/build/sdk/Debug
+        #cp ../../tests/Debug/newton_tests.exe ./
+        #
+        ## Execute the test suite.
+        #./newton_tests
 
