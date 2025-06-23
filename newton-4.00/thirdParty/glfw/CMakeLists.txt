@@ -13,7 +13,15 @@ cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR)
 set (projectName "glfw")
 message (${projectName})
 
-add_definitions(-D_GLFW_WIN32)
+if (MSVC)
+	add_definitions(-D_GLFW_WIN32)
+elseif(MINGW)
+	add_definitions(-D__CYGWIN__)
+elseif(APPLE)
+	add_definitions(-D_GLFW_COCOA)
+else(UNIX)
+	add_definitions(-D__OpenBSD__)
+endif()
 
 if (MSVC)
 	include_directories(include/GLFW)
@@ -29,10 +37,11 @@ if (MSVC)
 endif()
 
  # low level core
-file(GLOB source src/init.c src/input.c src/monitor.c src/vulkan.c 
-				 src/context.c src/egl_context.c src/egl_context.c
-				 src/wgl_context.c src/win32_*.c src/window.c)
+#file(GLOB source src/init.c src/input.c src/monitor.c src/vulkan.c 
+#				 src/context.c src/egl_context.c src/egl_context.c
+#				 src/wgl_context.c src/win32_*.c src/window.c)
 
+file(GLOB source src/*.c) 
 add_library(${projectName} STATIC ${source})
 
 if (MSVC)
