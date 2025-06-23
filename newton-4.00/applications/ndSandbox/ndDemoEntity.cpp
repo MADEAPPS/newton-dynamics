@@ -333,6 +333,7 @@ const ndMatrix& ndDemoEntity::GetRenderMatrix () const
 //void ndDemoEntity::RenderBone(ndDemoEntityManager* const scene, const ndMatrix& nodeMatrix) const
 void ndDemoEntity::RenderBone(ndDemoEntityManager* const, const ndMatrix&) const
 {
+#if !defined (__APPLE__)
 	class ndSkelDebug : public ndConstraintDebugCallback
 	{
 		public:
@@ -393,23 +394,6 @@ void ndDemoEntity::RenderBone(ndDemoEntityManager* const, const ndMatrix&) const
 
 		glVector3 m_line[2];
 	};
-
-	ndAssert(0);
-
-#if 0
-	ndSkelDebug debug(scene);
-	ndDemoEntity* const parent = GetParent();
-	if (parent)
-	{
-		//glDisable(GL_TEXTURE_2D);
-		ndMatrix parentMatrix(m_matrix.OrthoInverse() * nodeMatrix);
-		ndVector p0(nodeMatrix.m_posit);
-		ndVector p1(parentMatrix.m_posit);
-		ndVector color(0.0f, 0.0f, 0.0f, 1.0f);
-		debug.DrawLine(p0, p1, color, 1.0);
-		debug.SetScale(0.125f);
-		debug.DrawFrame(nodeMatrix);
-	}
 #endif
 }
 

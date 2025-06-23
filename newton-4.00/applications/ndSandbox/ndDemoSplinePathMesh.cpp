@@ -104,25 +104,6 @@ void ndDemoSplinePathMesh::Render(ndDemoEntityManager* const scene, const ndMatr
 		glUniform4fv(GLint(m_shadeColorLocation), 1, &color[0]);
 		glUniformMatrix4fv(GLint(m_projectionViewModelMatrixLocation), 1, false, &viewProjectionMatrix[0][0]);
 
-		//ndMeshVector m_line[2];
-		//glEnableClientState(GL_VERTEX_ARRAY);
-		//glVertexPointer(3, GL_FLOAT, sizeof(ndMeshVector), m_line);
-		//ndFloat64 scale = 1.0f / m_renderResolution;
-		//ndBigVector p0(m_curve.CurvePoint(0.0f));
-		//for (ndInt32 i = 1; i <= m_renderResolution; ++i)
-		//{
-		//	ndBigVector p1(m_curve.CurvePoint(i * scale));
-		//	m_line[0].m_x = GLfloat(p0.m_x);
-		//	m_line[0].m_y = GLfloat(p0.m_y);
-		//	m_line[0].m_z = GLfloat(p0.m_z);
-		//	m_line[1].m_x = GLfloat(p1.m_x);
-		//	m_line[1].m_y = GLfloat(p1.m_y);
-		//	m_line[1].m_z = GLfloat(p1.m_z);
-		//	glDrawArrays(GL_LINES, 0, 2);
-		//	p0 = p1;
-		//}
-		//glDisableClientState(GL_VERTEX_ARRAY);
-
 		glBindVertexArray(m_vertextArrayBuffer);
 		glDrawArrays(GL_LINE_STRIP, 0, m_renderResolution + 1);
 		glBindVertexArray(0);
