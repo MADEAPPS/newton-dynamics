@@ -73,7 +73,12 @@ elseif(APPLE)
 	#target_link_libraries(${projectName} PUBLIC "-framework CoreFoundation")
 
 	target_link_libraries(${projectName} PUBLIC ${OpenGL})
-	set_target_properties(${projectName} PROPERTIES LINK_FLAGS "-Wl,-F/Library/Frameworks")
+    target_link_libraries(${projectName} PRIVATE "-framework CoreGraphics" "-framework Foundation" "-framework AppKit")
+    
+    #target_link_libraries(${projectName} PRIVATE "-framework IOKit")
+    #target_link_libraries(${projectName} PRIVATE "-framework CoreGraphics")
+    #target_link_libraries(${projectName} PRIVATE "-framework CoreFoundation")
+	#set_target_properties(${projectName} PROPERTIES LINK_FLAGS "-Wl,-F/Library/Frameworks")
 
 else(UNIX)
 	message ("linking required POSIT system libraries")
