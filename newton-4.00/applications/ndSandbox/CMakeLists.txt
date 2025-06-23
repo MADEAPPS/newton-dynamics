@@ -69,6 +69,7 @@ elseif(APPLE)
     #add_library(glfw3 SHARED my_framework_sources.cpp)
 	#set_target_properties(MyFramework PROPERTIES FRAMEWORK TRUE)
 
+	target_link_libraries(${projectName} PUBLIC "-framework CoreFoundation")
 	target_link_libraries(${projectName} PUBLIC "-framework glfw3")
 	target_link_libraries(${projectName} PUBLIC "-framework OpenGL")
 	#set_target_properties(glfw3 PROPERTIES FRAMEWORK TRUE)
