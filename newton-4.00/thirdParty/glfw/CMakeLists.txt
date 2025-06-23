@@ -46,8 +46,6 @@ file(GLOB source
 	src/vulkan.c 
 	src/context.c 
 	src/egl_context.c 
-	src/egl_context.c
-	src/wgl_context.c 
 	src/window.c)
 
 add_library(${projectName} STATIC ${source})
@@ -60,6 +58,7 @@ if (MSVC)
 		src/win32_platform.h
 		src/win32_init.c
 		src/win32_time.c
+		src/wgl_context.c 
 		src/win32_monitor.c
 		src/win32_joystick.c
 		src/win32_thread.c
