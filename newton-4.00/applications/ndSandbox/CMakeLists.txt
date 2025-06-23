@@ -68,7 +68,8 @@ elseif(APPLE)
 	message ("linking required Apple frameworks")
     add_definitions(-DGL_SILENCE_DEPRECATION)
 
-	target_link_libraries(${projectName} PUBLIC glfw glut)
+	target_link_libraries(${projectName} PUBLIC glfw)
+	#target_link_libraries(${projectName} PUBLIC glfw glut)
 
     #target_link_libraries(${projectName} PRIVATE "-framework IOKit")
     #target_link_libraries(${projectName} PRIVATE "-framework CoreGraphics")
