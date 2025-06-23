@@ -23,13 +23,13 @@ class ndModelBodyNotify: public ndBodyNotify
 	ndModelBodyNotify(ndBodyKinematic* const parentBody = nullptr, ndVector gravity = ndVector (ndFloat32 (0.0f), ndFloat32(-10.0f), ndFloat32(0.0f), ndFloat32(0.0f)));
 	virtual ~ndModelBodyNotify();
 
-	ndBodyNotify* Clone() const
+	ndBodyNotify* Clone() const override
 	{
 		return new ndModelBodyNotify(*this);
 	}
 
-	virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix);
-	virtual void OnApplyExternalForce(ndInt32 threadIndex, ndFloat32 timestep);
+	virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix) override;
+	virtual void OnApplyExternalForce(ndInt32 threadIndex, ndFloat32 timestep) override;
 
 	bool CheckInWorld(const ndMatrix& matrix) const;
 	void CalculateMatrix(const ndMatrix& matrix, ndQuaternion& rot, ndVector& posit) const;
