@@ -67,11 +67,12 @@ void ndShaderCache::LoadShaderCode (const char* const filename, char* const buff
 	ndAssert (file);
 	fseek (file, 0, SEEK_END); 
 	
-	size = ftell (file);
+	size_t error = 0;
+	size = size_t(ftell (file));
 	fseek (file, 0, SEEK_SET); 
-	size_t error = fread (buffer, size_t(size), 1, file);
-	// for GCC shit
-	ndAssert (error); error = 0;
+	error = fread (buffer, size_t(size), 1, file);
+
+	ndAssert (error);
 	fclose (file);
 	buffer[size] = 0;
 	buffer[size + 1] = 0;
