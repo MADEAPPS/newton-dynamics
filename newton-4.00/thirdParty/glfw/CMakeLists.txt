@@ -37,11 +37,16 @@ if (MSVC)
 endif()
 
  # low level core
-#file(GLOB source src/init.c src/input.c src/monitor.c src/vulkan.c 
-#				 src/context.c src/egl_context.c src/egl_context.c
-#				 src/wgl_context.c src/win32_*.c src/window.c)
+ if (MSVC)
+	file(GLOB source src/init.c src/input.c src/monitor.c src/vulkan.c 
+					 src/context.c src/egl_context.c src/egl_context.c
+					 src/wgl_context.c src/window.c src/win32_*.c)
+else()
+	file(GLOB source src/init.c src/input.c src/monitor.c src/vulkan.c 
+					 src/context.c src/egl_context.c src/egl_context.c
+					 src/wgl_context.c src/window.c)
+endif()
 
-file(GLOB source src/*.c) 
 add_library(${projectName} STATIC ${source})
 
 if (MSVC)
