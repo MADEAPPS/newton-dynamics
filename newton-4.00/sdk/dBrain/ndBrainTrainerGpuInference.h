@@ -57,6 +57,7 @@ class ndBrainTrainerGpuCommand : public ndBrainGpuCommand
 class ndBrainTrainerGpuInference: public ndBrainTrainer
 {
 	public: 
+	ndBrainTrainerGpuInference(const ndTrainerDescriptor& descriptor);
 	ndBrainTrainerGpuInference(
 		const ndSharedPtr<ndBrain>& brain, 
 		const ndSharedPtr<ndBrainContext>& context, 
@@ -94,12 +95,11 @@ class ndBrainTrainerGpuInference: public ndBrainTrainer
 	void InitInputOutputBuffer();
 	void InitWeightAndBiasBuffer();
 	ndInt32 RoundoffOffset(ndInt32 value) const;
+	void Initialize(const ndTrainerDescriptor& descriptor);
 	ndBrainTrainerGpuCommand* FindCommand(size_t id) const;
 	void AddCopyInputCommand(const ndBrainLayer::ndCommandShareInfo& uniformData);
 	void AddLayersCommands(ndFixSizeArray<ndBrainLayer::ndCommandShareInfo, 256>& layersUniformsData);
 
-	ndBrainGpuContext* m_context;
-	ndSharedPtr<ndBrainContext> m_contextRef;
 	ndSharedPtr<ndBrainGpuFloatBuffer> m_inputOutputBuffer;
 	ndSharedPtr<ndBrainGpuFloatBuffer> m_weightAndBiasBuffer;
 	ndSharedPtr<ndBrainGpuFloatBuffer> m_miniBatchInputBuffer;

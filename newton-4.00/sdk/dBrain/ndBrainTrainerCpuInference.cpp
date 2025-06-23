@@ -54,7 +54,8 @@ ndBrainTrainerCpuInference::ndBrainTrainerCpuInference(const ndSharedPtr<ndBrain
 	,m_threadPool(m_context->GetAsCpuContext())
 	,m_miniBatchSize(minibatchSize)
 {
-	ndTrainerDescriptor initializer(brain, context, m_miniBatchSize, ndBrainFloat(0.0f));
+	ndTrainerDescriptor descriptor(brain, context, m_miniBatchSize, ndBrainFloat(0.0f));
+	ndBrainTrainerCpuInference::Initialize(descriptor);
 }
 
 ndBrainTrainerCpuInference::ndBrainTrainerCpuInference(const ndBrainTrainerCpuInference& src)

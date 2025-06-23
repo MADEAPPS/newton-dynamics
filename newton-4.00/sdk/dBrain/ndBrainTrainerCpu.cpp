@@ -31,7 +31,7 @@
 
 ndBrainTrainerCpu::ndBrainTrainerCpu(const ndTrainerDescriptor& descriptor)
 	:ndBrainTrainerCpuInference(descriptor)
-	,m_optimizer(new ndBrainOptimizerAdamCpu(descriptor.m_context))
+	,m_optimizer(new ndBrainOptimizerAdamCpu(m_context))
 	,m_inputOuputGradientsBuffer()
 	,m_weightAndBiasGradientsBuffer()
 	,m_miniBatchInputGradientBuffer()
@@ -47,15 +47,15 @@ ndBrainTrainerCpu::ndBrainTrainerCpu(
 	ndBrainFloat learnRate,
 	ndInt32 minibatchSize)
 	:ndBrainTrainerCpuInference(ndTrainerDescriptor(brain, context, minibatchSize, learnRate))
-	,m_optimizer(new ndBrainOptimizerAdamCpu(context))
+	,m_optimizer(new ndBrainOptimizerAdamCpu(m_context))
 	,m_inputOuputGradientsBuffer()
 	,m_weightAndBiasGradientsBuffer()
 	,m_miniBatchInputGradientBuffer()
 	,m_miniBatchOutputGradientBuffer()
 	,m_backPropagateCommands()
 {
-	ndTrainerDescriptor initializer (brain, context, minibatchSize, learnRate);
-	ndBrainTrainerCpu::Initialize(initializer);
+	ndTrainerDescriptor descriptor(brain, context, minibatchSize, learnRate);
+	ndBrainTrainerCpu::Initialize(descriptor);
 }
 
 ndBrainTrainerCpu::ndBrainTrainerCpu(const ndBrainTrainerCpu& src)
