@@ -15,8 +15,10 @@ message (${projectName})
 
 include_directories(.)
 include_directories(backends)
-include_directories(../glfw/include)
 
+if (MSVC OR MINGW OR APPLE)
+    include_directories(../glfw/include)
+endif()
 
 # low level core
 file(GLOB HEADERS *.h)
