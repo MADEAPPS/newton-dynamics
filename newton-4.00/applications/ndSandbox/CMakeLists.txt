@@ -61,6 +61,7 @@ add_executable(${projectName} ${CPP_SOURCE})
 
 message ("linking project libraries")
 target_link_libraries (${projectName} PUBLIC ndNewton ndBrain ndModel vhacd openfbx lodepng imgui)
+
 if (MSVC OR MINGW)
 	message ("linking third party opengl libraries")
 	target_link_libraries (${projectName} PUBLIC glfw glatter glu32 opengl32)
@@ -84,6 +85,8 @@ else(UNIX)
 	target_link_libraries (${projectName} PUBLIC glatter glfw dl GL X11 pthread)
 endif()
 
+
+
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	target_link_libraries (${projectName} PUBLIC ndCollision ndCore)
 endif()
@@ -91,7 +94,6 @@ endif()
 if (NEWTON_BUILD_PROFILER)
 	target_link_libraries (${projectName} PUBLIC dProfiler)
 endif ()
-
 
 if(MSVC OR MINGW)
 	if(NEWTON_ENABLE_VULKAN_SDK)
@@ -137,20 +139,12 @@ if(UNIX)
 
     set (source "${CMAKE_SOURCE_DIR}/applications/media")
     set (destination "${PROJECT_BINARY_DIR}/applications/media")
-    #add_custom_command(
-    #    TARGET ${projectName} POST_BUILD
-    #    COMMAND ${CMAKE_COMMAND} -E create_symlink ${source} ${destination}
-    #    DEPENDS ${destination}
-    #    COMMENT "symbolic link resources folder from ${source} => ${destination}")
+
     add_custom_command(
         TARGET ${projectName} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E create_symlink ${source} ${destination}
         COMMENT "symbolic link resources folder from ${source} => ${destination}")
 endif()
-
-#if(WIN32)
-#    file(COPY ../media DESTINATION "${PROJECT_BINARY_DIR}/applications")
-#endif()
 
 install(DIRECTORY ../media DESTINATION "${PROJECT_BINARY_DIR}/applications")
 
