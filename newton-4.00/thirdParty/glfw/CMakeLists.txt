@@ -20,7 +20,8 @@ elseif(MINGW)
 elseif(APPLE)
 	add_definitions(-D_GLFW_COCOA)
 else(UNIX)
-	add_definitions(-D__OpenBSD__)
+	#add_definitions(-D_OpenBSD__)
+	add_definitions(-D_GLFW_X11)
 endif()
 
 if (MSVC)
@@ -40,13 +41,25 @@ endif()
 file(GLOB source 
     include/GLFW/glfw3.h
     include/GLFW/glfw3native.h
+	src/internal.h
+	src/mappings.h
+	src/platform.h
 	src/init.c 
 	src/input.c 
-	src/monitor.c 
-	src/vulkan.c 
+	src/vulkan.c
+	src/window.c
 	src/context.c 
+	src/monitor.c 
+	src/platform.c
 	src/egl_context.c 
-	src/window.c)
+	#src/osmesa_context.c
+	#src/null_platform.h 
+	#src/null_joystick.h
+	#src/null_init.c
+	#src/null_window.c 
+	#src/null_monitor.c 
+	#src/null_joystick.c
+	)
 
 add_library(${projectName} STATIC ${source})
 
@@ -72,6 +85,14 @@ elseif(APPLE)
 		src/cocoa_window.m
 		src/cocoa_joystick.m
 		src/nsgl_context.m)
+
+else(UNIX)
+	target_sources(${projectName} PRIVATE 
+		src/posix_time.h 
+		src/posix_thread.h 
+		src/posix_module.c
+		src/posix_time.c 
+		src/posix_thread.c)
 endif()
 
 set_target_properties(${projectName} PROPERTIES FOLDER "thirdParty")
