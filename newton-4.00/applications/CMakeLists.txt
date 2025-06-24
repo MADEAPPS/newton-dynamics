@@ -22,23 +22,26 @@ endif()
 
 if (NEWTON_BUILD_SANDBOX_DEMOS)
 	add_subdirectory(ndSandbox)
+
+    find_package(OpenGL REQUIRED)
+    if(NOT_OpenGL_FOUND)
+        message(WARNING "OpenGL headers were not found. Disable NEWTON_BUILD_SANDBOX_DEMOS or install OpenGL")
+    else(NOT_OpenGL_FOUND)
+        message("Found OpenGL library")
+    endif(NOT_OpenGL_FOUND)
 	
      # common libraries for unix systems
-     if (UNIX)
-        find_package(glfw3 REQUIRED)
-        if(NOT_glfw3_FOUND)
-            message(WARNING "GLFW headers were not found. Disable NEWTON_BUILD_SANDBOX_DEMOS or install GLFW")
-        else(NOT_glfw3_FOUND)
-            message("Found GLFW library")
-        endif(NOT_glfw3_FOUND)
+     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+
+        find_package(libcursorx REQUIRED)
+        if(NOT_libcursorx_FOUND)
+            message(WARNING "libcursorx headers were not found. Disable NEWTON_BUILD_SANDBOX_DEMOS or install libcursorx")
+        else(NOT_libcursorx_FOUND)
+            message("Found libcursorx library")
+        endif(NOT_libcursorx_FOUND)
+
+     endif()
         
-        find_package(OpenGL REQUIRED)
-        if(NOT_OpenGL_FOUND)
-            message(WARNING "OpenGL headers were not found. Disable NEWTON_BUILD_SANDBOX_DEMOS or install OpenGL")
-        else(NOT_OpenGL_FOUND)
-            message("Found OpenGL library")
-        endif(NOT_OpenGL_FOUND)
-      endif(UNIX)
 endif()
 
 

@@ -52,6 +52,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Don't use e.g. GNU extension (like -std=gnu++11) for portability
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+message ("operation System: " ${CMAKE_SYSTEM_NAME})
 if (CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)")
 	message ("x86 processor detected")
     set (X86 TRUE)
