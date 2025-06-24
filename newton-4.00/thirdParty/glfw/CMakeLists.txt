@@ -87,6 +87,10 @@ else(UNIX)
 		src/x11_monitor.c
 		src/x11_platform.h
 		src/x11_window.c
+		src/glx_context.h
+		src/glx_context.c
+		src/xkb_unicode.h
+		src/xkb_unicode.c
 		src/linux_joystick.h
 		src/linux_joystick.c)
 endif()
