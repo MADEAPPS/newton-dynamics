@@ -33,12 +33,12 @@ if (NEWTON_BUILD_SANDBOX_DEMOS)
      # common libraries for unix systems
      if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
-        find_package(cursorx REQUIRED)
-        if(NOT_cursorx_FOUND)
-            message(WARNING "cursorx headers were not found. Disable NEWTON_BUILD_SANDBOX_DEMOS or install cursorx")
-        else(NOT_cursorx_FOUND)
-            message("Found cursorx library")
-        endif(NOT_cursorx_FOUND)
+        find_package(cursorx-dev REQUIRED)
+        if(NOT_cursorx-dev_FOUND)
+            message(WARNING "cursorx-dev headers were not found. Disable NEWTON_BUILD_SANDBOX_DEMOS or install cursorx-dev")
+        else(NOT_cursorx-dev_FOUND)
+            message("Found cursorx-dev library")
+        endif(NOT_cursorx-dev_FOUND)
 
      endif()
         
