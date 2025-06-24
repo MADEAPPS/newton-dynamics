@@ -29,7 +29,8 @@
 #if defined(_WIN32)
     #define GLATTER_WINDOWS_WGL_GL
 #elif defined(__linux__)
-    #define GLATTER_MESA_GLX_GL
+    //#define GLATTER_MESA_GLX_GL
+    #define GLATTER_EGL_GLES_3_2
 #endif
 
 #endif
