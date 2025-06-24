@@ -75,7 +75,7 @@ void ndBrainTrainerCpu::Initialize(const ndTrainerDescriptor& descriptor)
 	m_optimizer->Init(ndInt32(m_weightAndBiasBuffer.GetCount()), descriptor.m_learRate);
 
 	m_miniBatchInputGradientBuffer.SetCount(m_miniBatchInputBuffer->m_buffer.GetCount());
-	m_miniBatchOutputGradientBuffer.SetCount(m_miniBatchOutputBuffer.GetCount());
+	m_miniBatchOutputGradientBuffer.SetCount(m_miniBatchOutputBuffer->m_buffer.GetCount());
 
 	// big mistake here
 	m_inputOuputGradientsBuffer.SetCount(m_inputOutputBuffer.GetCount());

@@ -278,6 +278,11 @@ ndBrainBuffer* ndBrainTrainerGpuInference::GetInputBuffer()
 	return *m_miniBatchInputBuffer;
 }
 
+const ndBrainBuffer* ndBrainTrainerGpuInference::GetOuputBuffer()
+{
+	return *m_miniBatchOutputBuffer;
+}
+
 void ndBrainTrainerGpuInference::SaveInput(ndBrainVector& output) const
 {
 	m_context->GetAsGpuContext()->SyncQueue();
@@ -343,9 +348,13 @@ void ndBrainTrainerGpuInference::UpdateParameters(const ndBrainVector& weightAnd
 }
 
 //void ndBrainTrainerGpuInference::MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output)
-void ndBrainTrainerGpuInference::MakeSinglePrediction(const ndBrainVector&, ndBrainVector&)
+void ndBrainTrainerGpuInference::MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output)
 {
-	ndAssert(0);
+	ndBrainBuffer* const inputBuffer = GetInputBuffer();
+	const ndBrainBuffer* const outputBuffer = GetOuputBuffer();
+	inputBuffer->MemoryToDevive(input.GetCount() * sizeof (ndReal), &input[0]);
+	MakePrediction();
+	outputBuffer->MemoryFromDevive(output.GetCount() * sizeof(ndReal), &output[0]);
 }
 
 void ndBrainTrainerGpuInference::SyncQueue()

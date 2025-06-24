@@ -92,16 +92,18 @@ void ndBrainGpuFloatBuffer::BrainMatrixToDevice(const ndBrainMatrix* const matri
 	BrainVectorToDevice(flatArray);
 }
 
-//void ndBrainGpuFloatBuffer::MemoryToDevive(size_t sizeInBytes, const void* const inputMemory)
-void ndBrainGpuFloatBuffer::MemoryToDevive(size_t, const void* const)
+void ndBrainGpuFloatBuffer::MemoryToDevive(size_t sizeInBytes, const void* const inputMemory)
 {
-	ndAssert(0);
+	ndAssert(sizeInBytes <= m_sizeInBytes);
+	size_t size = ndMin(sizeInBytes, m_sizeInBytes) / sizeof(ndReal);
+	ndMemCpy(&m_buffer[0], (ndBrainFloat*)inputMemory, ndInt64(size));
 }
 
-//void ndBrainGpuFloatBuffer::MemoryFromDevive(size_t sizeInBytes, void* const outputMemory) const
-void ndBrainGpuFloatBuffer::MemoryFromDevive(size_t, void* const) const
+void ndBrainGpuFloatBuffer::MemoryFromDevive(size_t sizeInBytes, void* const outputMemory) const
 {
-	ndAssert(0);
+	ndAssert(sizeInBytes <= m_sizeInBytes);
+	size_t size = ndMin(sizeInBytes, m_sizeInBytes) / sizeof(ndReal);
+	ndMemCpy((ndBrainFloat*)outputMemory, &m_buffer[0], ndInt64(size));
 }
 
 void ndBrainGpuFloatBuffer::LoadData(size_t sizeInBytes, const void* const sourceData)
