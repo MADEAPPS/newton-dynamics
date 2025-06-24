@@ -81,6 +81,7 @@ elseif(APPLE)
 
 else(UNIX)
 	message ("linking required POSIT system libraries")
+
 	#target_link_libraries (${projectName} PUBLIC glatter glfw dl ${X11_LIBRARIES})
 	target_link_libraries (${projectName} PUBLIC glatter glfw dl)
 endif()
