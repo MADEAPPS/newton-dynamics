@@ -33,6 +33,15 @@ if (NEWTON_BUILD_SANDBOX_DEMOS)
      # common libraries for unix systems
      if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
+        find_package(X11 REQUIRED)
+        if (X11_FOUND)
+            message(STATUS "X11 found.")
+            # Add include directories for Xcursor
+            include_directories(${X11_INCLUDE_DIR})
+        else()
+            message(FATAL_ERROR "X11 not found. Please install libx11 or similar package or Disable NEWTON_BUILD_SANDBOX_DEMOS")
+        endif()
+ 
         find_package(X11 REQUIRED COMPONENTS Xcursor)
         if (X11_Xcursor_FOUND)
             message(STATUS "Xcursor found.")
@@ -42,13 +51,23 @@ if (NEWTON_BUILD_SANDBOX_DEMOS)
             message(FATAL_ERROR "Xcursor not found. Please install libxcursor-dev or similar package or Disable NEWTON_BUILD_SANDBOX_DEMOS")
         endif()
 
-        find_package(X11 REQUIRED COMPONENTS Xinerama)
-        if (X11_Xinerama_FOUND)
-            message(STATUS "Xinerama found.")
-            # Add include directories for Xinerama
-            include_directories(${X11_Xinerama_INCLUDE_DIR})
+        #find_package(X11 REQUIRED COMPONENTS Xinerama)
+        #find_library(XINERAMA_LIBRARY NAMES Xinerama xinerama)
+        #if (X11_Xinerama_FOUND)
+        #    message(STATUS "Xinerama found.")
+        #    # Add include directories for Xinerama
+        #    include_directories(${X11_Xinerama_INCLUDE_DIR})
+        #else()
+        #    message(FATAL_ERROR "Xinerama not found. Please install libXinerama-dev or similar package or Disable NEWTON_BUILD_SANDBOX_DEMOS")
+        #endif()
+     
+        find_library(XINERAMA_LIBRARY NAMES Xinerama xinerama)
+        find_path(XINERAMA_INCLUDE_DIR NAMES X11/extensions/Xinerama.h)
+        if(XINERAMA_LIBRARY AND XINERAMA_INCLUDE_DIR)
+            include_directories(${XINERAMA_INCLUDE_DIR})
+            #target_link_libraries(YourTarget ${XINERAMA_LIBRARY})
         else()
-            message(FATAL_ERROR "Xinerama not found. Please install libXinerama-dev or similar package or Disable NEWTON_BUILD_SANDBOX_DEMOS")
+            message(FATAL_ERROR "Xinerama library or headers not found!")
         endif()
 
      endif()
