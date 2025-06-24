@@ -80,7 +80,7 @@ elseif(APPLE)
 	#set_target_properties(${projectName} PROPERTIES LINK_FLAGS "-Wl,-F/Library/Frameworks")
 
 else(UNIX)
-	message ("linking required POSIT system libraries")
+	message ("linking required posit system libraries")
 	target_link_libraries (${projectName} PUBLIC glatter glfw dl GL X11 pthread)
 endif()
 
