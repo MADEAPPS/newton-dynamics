@@ -81,7 +81,7 @@ elseif(APPLE)
 
 else(UNIX)
 	message ("linking required POSIT system libraries")
-	target_link_libraries (${projectName} PUBLIC glatter glfw dl GL X11 pthreads)
+	target_link_libraries (${projectName} PUBLIC glatter glfw dl GL X11 pthread)
 endif()
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
