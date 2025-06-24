@@ -13,9 +13,10 @@ jobs:
     - name: Setup Linux
       shell: bash
       run: |
+        sudo apt update
+        sudo apt-get install libxrandr2-dev
         sudo apt-get install libxcursor-dev
         sudo apt-get install libxinerama-dev
-        sudo apt update
         sudo apt install -y cmake ninja-build
         cmake --version
         ninja --version
