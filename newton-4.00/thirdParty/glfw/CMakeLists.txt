@@ -51,20 +51,12 @@ file(GLOB source
 	src/context.c 
 	src/monitor.c 
 	src/platform.c
-	src/egl_context.c 
-	#src/osmesa_context.c
-	#src/null_platform.h 
-	#src/null_joystick.h
-	#src/null_init.c
-	#src/null_window.c 
-	#src/null_monitor.c 
-	#src/null_joystick.c
-	)
+	src/egl_context.c)
 
 add_library(${projectName} STATIC ${source})
 
 if (MSVC)
-     target_sources(${projectName} PRIVATE 
+    target_sources(${projectName} PRIVATE 
 		#src/win32_time.h 
 		#src/win32_thread.h 
 		src/win32_joystick.h
@@ -85,14 +77,18 @@ elseif(APPLE)
 		src/cocoa_window.m
 		src/cocoa_joystick.m
 		src/nsgl_context.m)
-
 else(UNIX)
 	target_sources(${projectName} PRIVATE 
 		src/posix_time.h 
-		src/posix_thread.h 
-		src/posix_module.c
 		src/posix_time.c 
-		src/posix_thread.c)
+		src/posix_thread.h 
+		src/posix_thread.c
+		src/x11_init.c
+		src/x11_monitor.c
+		src/x11_platform.h
+		src/x11_window.c
+		src/linux_joystick.h
+		src/linux_joystick.c)
 endif()
 
 set_target_properties(${projectName} PROPERTIES FOLDER "thirdParty")
