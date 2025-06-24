@@ -83,7 +83,7 @@ elseif(APPLE)
 
 else(UNIX)
 	message ("linking required posit system libraries")
-	target_link_libraries (${projectName} PUBLIC glatter glfw dl GL X11 pthread ${X11_Xcursor_LIBRARIES} ${XINERAMA_LIBRARY})
+	target_link_libraries (${projectName} PUBLIC glatter glfw dl GL X11 pthread ${X11_Xcursor_LIBRARIES} ${X11_Xinerama_LIBRARIES})
 endif()
 
 
