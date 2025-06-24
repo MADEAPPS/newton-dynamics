@@ -38,15 +38,15 @@ class ndBrainBuffer : public ndClassAlloc
 
 	virtual void BrainMatrixToDevice(const ndBrainMatrix* const matrix) = 0;
 
-	virtual void MemoryToDevive(size_t sizeInBytes, const void* const inputMemory) = 0;
-	virtual void MemoryFromDevive(size_t sizeInBytes, void* const outputMemory) const = 0;
+	virtual void MemoryToDevive(size_t offsetInBytes, size_t sizeInBytes, const void* const inputMemory) = 0;
+	virtual void MemoryFromDevive(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const = 0;
 
 	virtual void CopyBuffer(const ndBrainBuffer& srcBuffer, size_t sourceOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes) = 0;
 	virtual void CopyBufferIndirectSource(const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcDataBuffer, ndInt32 srcStrideInBytes) = 0;
 
 	protected:
-	virtual void LoadData(size_t sizeInBytes, const void* const inputData) = 0;
-	virtual void UnloadData(size_t sizeInBytes, void* const outputData) const = 0;
+	virtual void LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData) = 0;
+	virtual void UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const outputData) const = 0;
 
 	ndBrainContext* m_context;
 	size_t m_sizeInBytes;

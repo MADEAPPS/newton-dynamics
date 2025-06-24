@@ -27,6 +27,7 @@
 #include "ndBrainTrainerCpu.h"
 #include "ndBrainTrainerGpu.h"
 #include "ndBrainLayerLinear.h"
+#include "ndBrainGpuFloatBuffer.h"
 #include "ndBrainOptimizerAdamCpu.h"
 #include "ndBrainLayerActivationRelu.h"
 #include "ndBrainLayerActivationTanh.h"
@@ -84,7 +85,7 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 //m_replayBufferStartOptimizeSize = 1000;
 }
 
-ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::ndTrajectoryTransition()
+ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::ndTrajectory()
 	:m_reward()
 	,m_terminal()
 	,m_actions()
@@ -95,13 +96,23 @@ ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::ndTraject
 {
 }
 
-void ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::Init(ndInt32 actionsSize, ndInt32 obsevationsSize)
+void ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::Init(ndInt32 actionsSize, ndInt32 obsevationsSize)
 {
 	m_actionsSize = actionsSize;
 	m_obsevationsSize = obsevationsSize;
 }
 
-void ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::Clear(ndInt32 entry)
+ndInt32 ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::GetStride() const
+{
+	//ndBrainVector m_reward;
+	//ndBrainVector m_terminal;
+	//ndBrainVector m_actions;
+	//ndBrainVector m_observations;
+	//ndBrainVector m_nextObservations;
+	return 2 + m_actionsSize + m_obsevationsSize * 2;
+}
+
+void ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::Clear(ndInt32 entry)
 {
 	m_reward[entry] = ndBrainFloat(0.0f);
 	m_terminal[entry] = ndBrainFloat(0.0f);
@@ -110,7 +121,7 @@ void ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::Clea
 	ndMemSet(&m_nextObservations[entry * m_obsevationsSize], ndBrainFloat(0.0f), m_obsevationsSize);
 }
 
-void ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::CopyFrom(ndInt32 entry, ndTrajectoryTransition& src, ndInt32 srcEntry)
+void ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::CopyFrom(ndInt32 entry, ndTrajectory& src, ndInt32 srcEntry)
 {
 	m_reward[entry] = src.m_reward[srcEntry];
 	m_terminal[entry] = src.m_terminal[srcEntry];
@@ -119,12 +130,12 @@ void ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::Copy
 	ndMemCpy(&m_nextObservations[entry * m_obsevationsSize], &src.m_nextObservations[srcEntry * m_obsevationsSize], m_obsevationsSize);
 }
 
-ndInt32 ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::GetCount() const
+ndInt32 ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::GetCount() const
 {
 	return ndInt32(m_reward.GetCount());
 }
 
-void ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::SetCount(ndInt32 count)
+void ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::SetCount(ndInt32 count)
 {
 	m_reward.SetCount(count);
 	m_terminal.SetCount(count);
@@ -133,54 +144,64 @@ void ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::SetC
 	m_nextObservations.SetCount(count * m_obsevationsSize);
 }
 
-ndBrainFloat ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::GetReward(ndInt32 entry) const
+ndBrainFloat ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::GetReward(ndInt32 entry) const
 {
 	return m_reward[entry];
 }
 
-void ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::SetReward(ndInt32 entry, ndBrainFloat reward)
+void ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::SetReward(ndInt32 entry, ndBrainFloat reward)
 {
 	m_reward[entry] = reward;
 }
 
-bool ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::GetTerminalState(ndInt32 entry) const
+bool ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::GetTerminalState(ndInt32 entry) const
 {
 	return (m_terminal[entry] == 999.0f) ? true : false;
 }
 
-void ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::SetTerminalState(ndInt32 entry, bool isTernimal)
+void ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::SetTerminalState(ndInt32 entry, bool isTernimal)
 {
 	m_terminal[entry] = isTernimal ? ndBrainFloat(999.0f) : ndBrainFloat(-999.0f);
 }
 
-ndBrainFloat* ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::GetActions(ndInt32 entry)
+ndBrainFloat* ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::GetActions(ndInt32 entry)
 {
 	return &m_actions[entry * m_actionsSize];
 }
 
-const ndBrainFloat* ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::GetActions(ndInt32 entry) const
+const ndBrainFloat* ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::GetActions(ndInt32 entry) const
 {
 	return &m_actions[entry * m_actionsSize];
 }
 
-ndBrainFloat* ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::GetObservations(ndInt32 entry)
+ndBrainFloat* ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::GetObservations(ndInt32 entry)
 {
 	return &m_observations[entry * m_obsevationsSize];
 }
 
-const ndBrainFloat* ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::GetObservations(ndInt32 entry) const
+const ndBrainFloat* ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::GetObservations(ndInt32 entry) const
 {
 	return &m_observations[entry * m_obsevationsSize];
 }
 
-ndBrainFloat* ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::GetNextObservations(ndInt32 entry)
+ndBrainFloat* ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::GetNextObservations(ndInt32 entry)
 {
 	return &m_nextObservations[entry * m_obsevationsSize];
 }
 
-const ndBrainFloat* ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition::GetNextObservations(ndInt32 entry) const
+const ndBrainFloat* ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::GetNextObservations(ndInt32 entry) const
 {
 	return &m_nextObservations[entry * m_obsevationsSize];
+}
+
+void ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::GetFlatArray(ndInt32 index, ndBrainVector& output) const
+{
+	output.SetCount(GetStride());
+	output[0] = m_reward[index];
+	output[1] = m_terminal[index];
+	ndMemCpy(&output[2], &m_actions[index * m_actionsSize], m_actionsSize);
+	ndMemCpy(&output[2 + m_actionsSize], &m_observations[index * m_obsevationsSize], m_obsevationsSize);
+	ndMemCpy(&output[2 + m_actionsSize + m_obsevationsSize], &m_nextObservations[index * m_obsevationsSize], m_obsevationsSize);
 }
 
 ndBrainAgentDeterministicPolicyGradient_Agent::ndBrainAgentDeterministicPolicyGradient_Agent(const ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>& master)
@@ -264,7 +285,8 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::ndBrainAgentDeterministicPolicy
 	,m_context()
 	,m_expectedRewards()
 	,m_miniBatchIndexBuffer()
-	,m_replayBuffer()
+	,m_replayBufferFlat()
+	,m_replayBuffer____()
 	,m_agent(nullptr)
 	,m_shuffleBuffer()
 	,m_averageExpectedRewards()
@@ -295,7 +317,18 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::ndBrainAgentDeterministicPolicy
 	// create actor class
 	BuildPolicyClass();
 	BuildCriticClass();
-	m_replayBuffer.Init(m_policyTrainer->GetBrain()->GetOutputSize(), m_policyTrainer->GetBrain()->GetInputSize());
+	m_replayBuffer____.Init(m_policyTrainer->GetBrain()->GetOutputSize(), m_policyTrainer->GetBrain()->GetInputSize());
+
+	if (m_parameters.m_useGpuBackend)
+	{
+		ndInt32 bufferStride = m_replayBuffer____.GetStride() * m_parameters.m_replayBufferSize;
+		m_replayBufferFlat = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuFloatBuffer(*m_context, bufferStride));
+	}
+	else
+	{
+		ndInt32 bufferStride = m_replayBuffer____.GetStride() * m_parameters.m_replayBufferSize;
+		m_replayBufferFlat = ndSharedPtr<ndBrainBuffer>(new ndBrainCpuFloatBuffer(*m_context, bufferStride));
+	}
 
 	ndBrainFloat unitEntropy = ndClamp(m_parameters.m_entropyRegularizerCoef, ndBrainFloat(0.0f), ndBrainFloat(1.0f));
 	m_parameters.m_entropyRegularizerCoef = ND_SAC_MAX_ENTROPY_COEFFICIENT * unitEntropy;
@@ -520,21 +553,28 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::SaveTrajectory()
 	auto AddTransition = [this](ndInt32 dstIndex, ndInt32 srcIndex)
 	{
 		m_shuffleBuffer.PushBack(dstIndex);
-		m_replayBuffer.SetCount(dstIndex + 1);
-		m_replayBuffer.CopyFrom(dstIndex, m_agent->m_trajectory, srcIndex);
+		m_replayBuffer____.SetCount(dstIndex + 1);
+		m_replayBuffer____.CopyFrom(dstIndex, m_agent->m_trajectory, srcIndex);
 	
 		ndBrainFloat reward = m_agent->m_trajectory.GetReward(srcIndex + 1);
-		m_replayBuffer.SetReward(dstIndex, reward);
+		m_replayBuffer____.SetReward(dstIndex, reward);
 	
 		bool terminalState = m_agent->m_trajectory.GetTerminalState(srcIndex + 1);
-		m_replayBuffer.SetTerminalState(dstIndex, terminalState);
+		m_replayBuffer____.SetTerminalState(dstIndex, terminalState);
 	
 		const ndBrain& brain = **m_policyTrainer->GetBrain();
-		ndBrainMemVector nextObservation(m_replayBuffer.GetNextObservations(dstIndex), brain.GetInputSize());
+		ndBrainMemVector nextObservation(m_replayBuffer____.GetNextObservations(dstIndex), brain.GetInputSize());
 		nextObservation.Set(ndBrainMemVector(m_agent->m_trajectory.GetObservations(srcIndex + 1), brain.GetInputSize()));
+
+		ndBrainFixSizeVector<256> flatVector;
+		m_replayBuffer____.GetFlatArray(dstIndex, flatVector);
+
+		size_t stride = flatVector.GetCount() * sizeof(ndReal);
+		size_t offset = stride * dstIndex;
+		m_replayBufferFlat->MemoryToDevive(offset, stride, &flatVector[0]);
 	};
 	
-	ndInt32 replayBufferCount = m_replayBuffer.GetCount();
+	ndInt32 replayBufferCount = m_replayBuffer____.GetCount();
 	ndInt32 numberOfNewTranstitions = m_agent->m_trajectory.GetCount() - m_agent->m_trajectoryBaseCount;
 	if ((replayBufferCount + numberOfNewTranstitions) < m_parameters.m_replayBufferStartOptimizeSize)
 	{
@@ -572,19 +612,20 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::SaveTrajectory()
 	}
 	else
 	{
+		ndAssert(0);
 		const ndBrain& brain = **m_policyTrainer->GetBrain();
 		const ndInt32 numOfTransitions = m_agent->m_trajectory.GetCount() - 1;
 		for (ndInt32 i = m_agent->m_trajectoryBaseCount; i < numOfTransitions; ++i)
 		{
-			m_replayBuffer.CopyFrom(m_replayBufferIndex, m_agent->m_trajectory, i);
+			m_replayBuffer____.CopyFrom(m_replayBufferIndex, m_agent->m_trajectory, i);
 			
 			ndBrainFloat reward = m_agent->m_trajectory.GetReward(i + 1);
-			m_replayBuffer.SetReward(m_replayBufferIndex, reward);
+			m_replayBuffer____.SetReward(m_replayBufferIndex, reward);
 			
 			bool terminalState = m_agent->m_trajectory.GetTerminalState(i + 1);
-			m_replayBuffer.SetTerminalState(m_replayBufferIndex, terminalState);
+			m_replayBuffer____.SetTerminalState(m_replayBufferIndex, terminalState);
 			
-			ndBrainMemVector nextObservation(m_replayBuffer.GetNextObservations(m_replayBufferIndex), brain.GetInputSize());
+			ndBrainMemVector nextObservation(m_replayBuffer____.GetNextObservations(m_replayBufferIndex), brain.GetInputSize());
 			nextObservation.Set(ndBrainMemVector(m_agent->m_trajectory.GetObservations(i + 1), brain.GetInputSize()));
 	
 			m_replayBufferIndex = (m_replayBufferIndex + 1) % m_parameters.m_replayBufferSize;
@@ -698,7 +739,8 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 			const ndInt32 index = m_miniBatchIndexBuffer[n * m_parameters.m_miniBatchSize + i];
 	
 			//get the state rewards
-			ndBrainFloat r = m_replayBuffer.GetReward(index);
+			ndAssert(0);
+			ndBrainFloat r = m_replayBuffer____.GetReward(index);
 			for (ndInt32 j = 0; j < ndInt32(sizeof(m_referenceCriticTrainer) / sizeof(m_referenceCriticTrainer[0])); ++j)
 			{
 				m_rewardBatch[j][i] = r;
@@ -706,13 +748,13 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 	
 			// get the next state actions
 			ndBrainMemVector nextObsevations(&m_nextObsevationsBatch[i * brain.GetInputSize()], brain.GetInputSize());
-			if (m_replayBuffer.GetTerminalState(index))
+			if (m_replayBuffer____.GetTerminalState(index))
 			{
 				nextObsevations.Set(ndBrainFloat(0.0f));
 			} 
 			else
 			{
-				const ndBrainMemVector nextReplyObservation(m_replayBuffer.GetNextObservations(index), brain.GetInputSize());
+				const ndBrainMemVector nextReplyObservation(m_replayBuffer____.GetNextObservations(index), brain.GetInputSize());
 				nextObsevations.Set(nextReplyObservation);
 			}
 		}
@@ -867,7 +909,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::OptimizeStep()
 	SaveTrajectory();
 	if (m_startOptimization)
 	{
-		Optimize();
+		//Optimize();
 	}
 	m_frameCount++;
 	m_framesAlive++;

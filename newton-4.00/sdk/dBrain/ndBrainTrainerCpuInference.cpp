@@ -296,7 +296,8 @@ void ndBrainTrainerCpuInference::SyncQueue()
 	// do nothing
 }
 
-void ndBrainTrainerCpuInference::MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output)
+//void ndBrainTrainerCpuInference::MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output)
+void ndBrainTrainerCpuInference::MakeSinglePrediction(const ndBrainVector&, ndBrainVector&)
 {
 	ndAssert(0);
 	//ndMemCpy(&m_miniBatchInputBuffer->m_buffer[0], &input[0], input.GetCount());

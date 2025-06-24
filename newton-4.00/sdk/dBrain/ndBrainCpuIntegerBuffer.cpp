@@ -26,7 +26,7 @@ ndBrainCpuIntegerBuffer::ndBrainCpuIntegerBuffer(ndBrainContext* const context, 
 {
 	ndAssert(m_context->GetAsCpuContext());
 	m_indexArray.SetCount(numberOfElements);
-	MemoryToDevive(m_sizeInBytes, indexArray);
+	MemoryToDevive(0, m_sizeInBytes, indexArray);
 }
 
 void ndBrainCpuIntegerBuffer::BrainVectorToDevice(const ndBrainVector&)
@@ -55,29 +55,30 @@ void ndBrainCpuIntegerBuffer::BrainMatrixToDevice(const ndBrainMatrix* const mat
 	BrainVectorToDevice(flatArray);
 }
 
-void ndBrainCpuIntegerBuffer::MemoryToDevive(size_t sizeInBytes, const void* const inputData)
+void ndBrainCpuIntegerBuffer::MemoryToDevive(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData)
 {
 	ndAssert(sizeInBytes <= m_sizeInBytes);
 	size_t size = ndMin(sizeInBytes, m_sizeInBytes) / sizeof (ndUnsigned32);
-	ndMemCpy(&m_indexArray[0], (ndUnsigned32*)inputData, ndInt64(size));
+	ndInt64 offset = ndInt64(offsetInBytes / sizeof(ndUnsigned32));
+	ndMemCpy(&m_indexArray[offset], (ndUnsigned32*)inputData, ndInt64(size));
 }
 
-//void ndBrainCpuIntegerBuffer::MemoryFromDevive(size_t sizeInBytes, void* const outputMemory) const
-void ndBrainCpuIntegerBuffer::MemoryFromDevive(size_t, void* const) const
+//void ndBrainCpuIntegerBuffer::MemoryFromDevive(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
+void ndBrainCpuIntegerBuffer::MemoryFromDevive(size_t, size_t, void* const) const
 {
 	ndAssert(0);
 }
 
-//void ndBrainCpuIntegerBuffer::LoadData(size_t sizeInBytes, const void* const sourceData)
-void ndBrainCpuIntegerBuffer::LoadData(size_t, const void* const)
+//void ndBrainCpuIntegerBuffer::LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const sourceData)
+void ndBrainCpuIntegerBuffer::LoadData(size_t, size_t, const void* const)
 {
 	ndAssert(0);
 	//ndBrainMemVector src((ndBrainFloat*)sourceData, ndInt32 (sizeInBytes / sizeof(ndReal)));
 	//m_buffer.Set(src);
 }
 
-//void ndBrainCpuIntegerBuffer::UnloadData(size_t sizeInBytes, void* const outputData) const
-void ndBrainCpuIntegerBuffer::UnloadData(size_t, void* const) const
+//void ndBrainCpuIntegerBuffer::UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const outputData) const
+void ndBrainCpuIntegerBuffer::UnloadData(size_t, size_t, void* const) const
 {
 	ndAssert(0);
 }

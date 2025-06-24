@@ -66,17 +66,19 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 	};
 
 	public:
-	class ndTrajectoryTransition
+	class ndTrajectory
 	{
 		public:
-		ndTrajectoryTransition();
+		ndTrajectory();
 		void Init(ndInt32 actionsSize, ndInt32 obsevationsSize);
 	
 		ndInt32 GetCount() const;
 		void SetCount(ndInt32 count);
-	
+		
+		ndInt32 GetStride() const;
+
 		void Clear(ndInt32 entry);
-		void CopyFrom(ndInt32 entry, ndTrajectoryTransition& src, ndInt32 srcEntry);
+		void CopyFrom(ndInt32 entry, ndTrajectory& src, ndInt32 srcEntry);
 	
 		ndBrainFloat GetReward(ndInt32 entry) const;
 		void SetReward(ndInt32 entry, ndBrainFloat reward);
@@ -92,6 +94,8 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 
 		ndBrainFloat* GetNextObservations(ndInt32 entry);
 		const ndBrainFloat* GetNextObservations(ndInt32 entry) const;
+
+		void GetFlatArray(ndInt32 index, ndBrainVector& output) const;
 
 		ndBrainVector m_reward;
 		ndBrainVector m_terminal;
@@ -116,7 +120,7 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 	void SampleActions(ndBrainVector& action);
 
 	ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer> m_owner;
-	ndTrajectoryTransition m_trajectory;
+	ndTrajectory m_trajectory;
 	ndInt32 m_trajectoryBaseCount;
 	ndRandomGenerator m_randomeGenerator;
 	friend class ndBrainAgentDeterministicPolicyGradient_Trainer;
@@ -215,7 +219,8 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	ndBrainVector m_criticOutputGradients[ND_SAC_NUMBER_OF_CRITICS];
 
 	ndArray<ndInt32> m_miniBatchIndexBuffer;
-	ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectoryTransition m_replayBuffer;
+	ndSharedPtr<ndBrainBuffer> m_replayBufferFlat;
+	ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory m_replayBuffer____;
 	ndBrainAgentDeterministicPolicyGradient_Agent* m_agent;
 	ndArray<ndInt32> m_shuffleBuffer;
 	ndMovingAverage<8> m_averageExpectedRewards;

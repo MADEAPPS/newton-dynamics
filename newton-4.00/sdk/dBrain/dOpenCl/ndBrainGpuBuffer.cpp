@@ -25,27 +25,27 @@ ndBrainGpuBuffer::~ndBrainGpuBuffer()
 {
 }
 
-void ndBrainGpuBuffer::MemoryToDevive(size_t sizeInBytes, const void* const inputMemory)
+void ndBrainGpuBuffer::MemoryToDevive(size_t offsetInBytes, size_t sizeInBytes, const void* const inputMemory)
 {
-	LoadData(sizeInBytes, inputMemory);
+	LoadData(offsetInBytes, sizeInBytes, inputMemory);
 }
 
-void ndBrainGpuBuffer::MemoryFromDevive(size_t sizeInBytes, void* const outputMemory) const
+void ndBrainGpuBuffer::MemoryFromDevive(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
 {
-	UnloadData(sizeInBytes, outputMemory);
+	UnloadData(offsetInBytes, sizeInBytes, outputMemory);
 }
 
 void ndBrainGpuBuffer::BrainVectorFromDevice(ndBrainVector& vector) const
 {
 	ndInt64 size = ndInt64(m_sizeInBytes / sizeof(ndReal));
 	vector.SetCount(size);
-	UnloadData(m_sizeInBytes, &vector[0]);
+	UnloadData(0, m_sizeInBytes, &vector[0]);
 }
 
 void ndBrainGpuBuffer::BrainVectorToDevice(const ndBrainVector& vector)
 {
 	ndAssert(vector.GetCount() * sizeof (ndReal) <= m_sizeInBytes);
-	LoadData(vector.GetCount() * sizeof(ndReal), &vector[0]);
+	LoadData(0, vector.GetCount() * sizeof(ndReal), &vector[0]);
 }
 
 void ndBrainGpuBuffer::BrainMatrixToDevice(const ndBrainMatrix* const matrix)
@@ -91,24 +91,24 @@ void ndBrainGpuBuffer::BrainMatrixToDevice(const ndBrainMatrix* const matrix)
 	//error *= 1;
 }
 
-void ndBrainGpuBuffer::LoadData(size_t sizeInBytes, const void* const sourceData)
+void ndBrainGpuBuffer::LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const sourceData)
 {
 	ndAssert(m_context->GetAsGpuContext());
 
 	cl_int error = 0;
 	ndAssert(sizeInBytes <= m_sizeInBytes);
 	ndSharedPtr<cl::CommandQueue>& queue = m_context->GetAsGpuContext()->m_queue;
-	error = queue->enqueueWriteBuffer(m_buffer, CL_TRUE, 0, sizeInBytes, sourceData);
+	error = queue->enqueueWriteBuffer(m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, sourceData);
 	ndAssert(error == CL_SUCCESS);
 }
 
-void ndBrainGpuBuffer::UnloadData(size_t sizeInBytes, void* const destinationData) const
+void ndBrainGpuBuffer::UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const destinationData) const
 {
 	cl_int error = 0;
 	//ndAssert(sizeInBytes == m_sizeInBytes);
 	ndAssert(m_context->GetAsGpuContext());
 	ndSharedPtr<cl::CommandQueue>& queue = m_context->GetAsGpuContext()->m_queue;
-	error = queue->enqueueReadBuffer(m_buffer, CL_TRUE, 0, sizeInBytes, destinationData);
+	error = queue->enqueueReadBuffer(m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, destinationData);
 	ndAssert(error == CL_SUCCESS);
 }
 

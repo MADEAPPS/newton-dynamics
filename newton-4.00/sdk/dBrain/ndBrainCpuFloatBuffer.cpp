@@ -42,8 +42,9 @@ ndBrainCpuFloatBuffer::ndBrainCpuFloatBuffer(ndBrainContext* const context, cons
 
 void ndBrainCpuFloatBuffer::BrainVectorToDevice(const ndBrainVector& vector)
 {
+	ndAssert(0);
 	ndAssert(vector.GetCount() * sizeof(ndReal) <= m_sizeInBytes);
-	LoadData(vector.GetCount() * sizeof(ndReal), &vector[0]);
+	LoadData(0, vector.GetCount() * sizeof(ndReal), &vector[0]);
 }
 
 //void ndBrainCpuFloatBuffer::BrainVectorFromDevice(ndBrainVector& vector) const
@@ -66,29 +67,29 @@ void ndBrainCpuFloatBuffer::BrainMatrixToDevice(const ndBrainMatrix* const matri
 }
 
 //void ndBrainCpuFloatBuffer::MemoryToDevive(size_t sizeInBytes, const void* const inputData)
-void ndBrainCpuFloatBuffer::MemoryToDevive(size_t, const void* const)
+void ndBrainCpuFloatBuffer::MemoryToDevive(size_t, size_t, const void* const)
 {
 	ndAssert(0);
 }
 
 //void ndBrainCpuFloatBuffer::MemoryFromDevive(size_t sizeInBytes, void* const outputMemory) const
-void ndBrainCpuFloatBuffer::MemoryFromDevive(size_t, void* const) const
+void ndBrainCpuFloatBuffer::MemoryFromDevive(size_t, size_t, void* const) const
 {
 	ndAssert(0);
 }
 
-void ndBrainCpuFloatBuffer::LoadData(size_t sizeInBytes, const void* const sourceData)
+void ndBrainCpuFloatBuffer::LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const sourceData)
 {
-	ndBrainMemVector src((ndBrainFloat*)sourceData, ndInt32 (sizeInBytes / sizeof(ndReal)));
-	m_buffer.Set(src);
+	const ndBrainMemVector src((ndBrainFloat*)sourceData, ndInt32 (sizeInBytes / sizeof(ndReal)));
+	ndBrainMemVector dst(&m_buffer[ndInt64(offsetInBytes / sizeof(ndReal))], ndInt32(sizeInBytes / sizeof(ndReal)));
+	dst.Set(src);
 }
 
 //void ndBrainCpuFloatBuffer::UnloadData(size_t sizeInBytes, void* const outputData) const
-void ndBrainCpuFloatBuffer::UnloadData(size_t, void* const) const
+void ndBrainCpuFloatBuffer::UnloadData(size_t, size_t, void* const) const
 {
 	ndAssert(0);
 }
-
 
 void ndBrainCpuFloatBuffer::CopyBuffer(const ndBrainBuffer& sourceData, size_t srcOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes)
 {

@@ -157,7 +157,7 @@ void ndBrainGpuContext::CopyBufferIndirectSource(ndBrainGpuFloatBuffer& dstBuffe
 {
 	ndBrainLayer::ndCommandShareInfo uniformParam;
 	uniformParam.m_inputSize = srcStrideInBytes / ndInt32 (sizeof (ndReal));
-	m_copyBufferIndirectCommandParamBuffer->MemoryToDevive(sizeof(ndBrainLayer::ndCommandShareInfo), &uniformParam);
+	m_copyBufferIndirectCommandParamBuffer->MemoryToDevive(0, sizeof(ndBrainLayer::ndCommandShareInfo), &uniformParam);
 
 	ndFixSizeArray<ndBrainBuffer*, 8> params;
 	params.PushBack(*m_copyBufferIndirectCommandParamBuffer);
