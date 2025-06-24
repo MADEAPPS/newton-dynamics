@@ -33,12 +33,24 @@ if (NEWTON_BUILD_SANDBOX_DEMOS)
      # common libraries for unix systems
      if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
-        find_package(xcursor-dev REQUIRED)
-        if(NOT_xcursor-dev_FOUND)
-            message(WARNING "xcursor-dev headers were not found. Disable NEWTON_BUILD_SANDBOX_DEMOS or install xcursor-dev")
-        else(NOT_xcursor-dev_FOUND)
-            message("Found xcursor-dev library")
-        endif(NOT_xcursor-dev_FOUND)
+        #find_package(xcursor-dev REQUIRED)
+        #if(NOT_xcursor-dev_FOUND)
+        #    message(WARNING "xcursor-dev headers were not found. Disable NEWTON_BUILD_SANDBOX_DEMOS or install xcursor-dev")
+        #else(NOT_xcursor-dev_FOUND)
+        #    message("Found xcursor-dev library")
+        #endif(NOT_xcursor-dev_FOUND)
+
+        find_package(X11 REQUIRED COMPONENTS Xcursor)
+        # Check if Xcursor was found
+        if (X11_Xcursor_FOUND)
+            message(STATUS "Xcursor found.")
+            # Add include directories for Xcursor
+            include_directories(${X11_Xcursor_INCLUDE_DIR})
+            # Link libraries for Xcursor
+            #target_link_libraries(YourTargetName PRIVATE ${X11_Xcursor_LIBRARIES})
+        else()
+            message(FATAL_ERROR "Xcursor not found. Please install libxcursor-dev or similar package or Disable NEWTON_BUILD_SANDBOX_DEMOS")
+        endif()
 
      endif()
         

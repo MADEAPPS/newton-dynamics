@@ -65,6 +65,7 @@ target_link_libraries (${projectName} PUBLIC ndNewton ndBrain ndModel vhacd open
 if (MSVC OR MINGW)
 	message ("linking third party opengl libraries")
 	target_link_libraries (${projectName} PUBLIC glfw glatter glu32 opengl32)
+
 elseif(APPLE)
 	message ("linking required Apple frameworks")
     add_definitions(-DGL_SILENCE_DEPRECATION)
@@ -82,9 +83,8 @@ elseif(APPLE)
 
 else(UNIX)
 	message ("linking required posit system libraries")
-	target_link_libraries (${projectName} PUBLIC glatter glfw dl GL X11 pthread)
+	target_link_libraries (${projectName} PUBLIC glatter glfw dl GL X11 pthread ${X11_Xcursor_LIBRARIES})
 endif()
-
 
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
