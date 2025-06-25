@@ -96,8 +96,8 @@ void ndBrainGpuIntegerBuffer::CopyBuffer(const ndBrainBuffer& sourceData, size_t
 	ndMemCpy(&source.m_indexArray[dstOffset], &m_indexArray[srcOffset], ndInt64(size));
 }
 
-//void ndBrainGpuIntegerBuffer::CopyBufferIndirectSource(const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcDataBuffer, ndInt32 srcStrideInBytes)
-void ndBrainGpuIntegerBuffer::CopyBufferIndirectSource(const ndBrainBuffer&, const ndBrainBuffer&, ndInt32)
+//void ndBrainGpuIntegerBuffer::CopyBufferIndirectSource(const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcDataBuffer, size_t srcStrideInBytes)
+void ndBrainGpuIntegerBuffer::CopyBufferIndirectSource(const ndBrainBuffer&, const ndBrainBuffer&, size_t)
 {
 	ndAssert(0);
 }

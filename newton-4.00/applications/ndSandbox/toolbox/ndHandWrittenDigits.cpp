@@ -271,7 +271,7 @@ static void MnistTrainingSet()
 				for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
 				{
 					m_indirectMiniBatch->MemoryToDevive(0, m_miniBatchSize * sizeof(ndUnsigned32), &shuffleBuffer[batchStart]);
-					deviceMinibatchBuffer->CopyBufferIndirectSource(**m_indirectMiniBatch, **m_trainingData, ndInt32 (inputSize * sizeof (ndReal)));
+					deviceMinibatchBuffer->CopyBufferIndirectSource(**m_indirectMiniBatch, **m_trainingData, size_t (inputSize * sizeof (ndReal)));
 					
 					trainer->MakePrediction();
 					trainer->SyncQueue();

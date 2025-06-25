@@ -842,7 +842,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 			}
 			m_minibatchIndexBuffer->MemoryToDevive(0, m_parameters.m_miniBatchSize * sizeof(ndUnsigned32), &nextOvervationIndices[0]);
 			ndBrainBuffer* const deviceMinibatchBuffer = m_policyTrainer->GetInputBuffer();
-			deviceMinibatchBuffer->CopyBufferIndirectSource(**m_minibatchIndexBuffer, **m_replayBufferFlat, ndInt32(inputSize * sizeof(ndReal)));
+			deviceMinibatchBuffer->CopyBufferIndirectSource(**m_minibatchIndexBuffer, **m_replayBufferFlat, size_t(inputSize * sizeof(ndReal)));
 			i *= 1;
 		}
 	}
