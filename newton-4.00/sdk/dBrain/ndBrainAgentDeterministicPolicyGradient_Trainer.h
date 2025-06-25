@@ -220,6 +220,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 
 	ndArray<ndInt32> m_miniBatchIndexBuffer;
 	ndSharedPtr<ndBrainBuffer> m_replayBufferFlat;
+	ndSharedPtr<ndBrainBuffer> m_minibatchIndexBuffer;
 	ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory m_replayBuffer____;
 	ndBrainAgentDeterministicPolicyGradient_Agent* m_agent;
 	ndArray<ndInt32> m_shuffleBuffer;
