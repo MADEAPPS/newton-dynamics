@@ -42,7 +42,10 @@ class ndBrainGpuContext : public ndBrainContext
 	void CreateKerners();
 	void CreateCopyIndirectCommand();
 	size_t GetDeviceScore(cl::Device& device);
-	void CopyBufferIndirectSource(ndBrainGpuFloatBuffer& dstBuffer, ndBrainGpuIntegerBuffer& indexBuffer, ndBrainGpuFloatBuffer& srcDataBuffer, ndInt32 srcStrideInBytes);
+	//void CopyBufferIndirectSource(ndBrainGpuFloatBuffer& dstBuffer, ndBrainGpuIntegerBuffer& indexBuffer, ndBrainGpuFloatBuffer& srcDataBuffer, ndInt32 srcStrideInBytes);
+	void CopyBufferIndirectSource(ndBrainGpuIntegerBuffer& indexBuffer,
+		ndBrainGpuFloatBuffer& dstBuffer, size_t dstOffsetInBytes, size_t dstStrideInBytes, 
+		ndBrainGpuFloatBuffer& srcData, size_t srcOffsetInBytes, size_t srcStrideInBytes);
 
 	ndSharedPtr<ndBrainGpuShader> CreateKerner(const cl::Program& program, const char* const functionMame) const;
 	static void CL_CALLBACK clNotification(const char* errinfo, const void* private_info, size_t cb, void* user_data);

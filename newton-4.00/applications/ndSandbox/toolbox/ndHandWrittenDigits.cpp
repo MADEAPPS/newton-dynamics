@@ -264,6 +264,7 @@ static void MnistTrainingSet()
 
 			ndBrainLossCategoricalCrossEntropy loss(outputSize);
 
+			size_t strideInBytes = size_t(inputSize * sizeof(ndReal));
 			ndBrainBuffer* const deviceMinibatchBuffer = m_trainer->GetInputBuffer();
 			for (ndInt32 epoch = 0; epoch < MINIST_NUMBER_OF_EPOCHS; ++epoch)
 			{
@@ -271,7 +272,7 @@ static void MnistTrainingSet()
 				for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
 				{
 					m_indirectMiniBatch->MemoryToDevive(0, m_miniBatchSize * sizeof(ndUnsigned32), &shuffleBuffer[batchStart]);
-					deviceMinibatchBuffer->CopyBufferIndirectSource(**m_indirectMiniBatch, **m_trainingData, size_t (inputSize * sizeof (ndReal)));
+					deviceMinibatchBuffer->CopyBufferIndirectSource(**m_indirectMiniBatch, 0, strideInBytes, **m_trainingData, 0, strideInBytes);
 					
 					trainer->MakePrediction();
 					trainer->SyncQueue();

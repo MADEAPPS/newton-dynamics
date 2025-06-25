@@ -74,8 +74,8 @@ void ndBrainGpuUniformBuffer::CopyBuffer(const ndBrainBuffer&, size_t, size_t, s
 	ndAssert(0);
 }
 
-//void ndBrainGpuUniformBuffer::CopyBufferIndirectSource(const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcDataBuffer, size_t strideInBytes)
-void ndBrainGpuUniformBuffer::CopyBufferIndirectSource(const ndBrainBuffer&, const ndBrainBuffer&, size_t)
+//void ndBrainGpuUniformBuffer::CopyBufferIndirectSource(const ndBrainBuffer& indexBuffer, size_t dstOffsetInBytes, size_t dstStrideInBytes, const ndBrainBuffer& srcData, size_t srcOffsetInBytes, size_t srcStrideInBytes)
+void ndBrainGpuUniformBuffer::CopyBufferIndirectSource(const ndBrainBuffer&, size_t, size_t, const ndBrainBuffer&, size_t, size_t)
 {
 	ndAssert(0);
 }

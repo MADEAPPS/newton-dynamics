@@ -105,16 +105,6 @@ void ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::Init(ndInt32 a
 	m_obsevationsSize = obsevationsSize;
 }
 
-ndInt32 ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::GetStride() const
-{
-	//ndBrainVector m_reward;
-	//ndBrainVector m_terminal;
-	//ndBrainVector m_actions;
-	//ndBrainVector m_observations;
-	//ndBrainVector m_nextObservations;
-	return 2 + m_actionsSize + m_obsevationsSize * 2;
-}
-
 void ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::Clear(ndInt32 entry)
 {
 	m_reward[entry] = ndBrainFloat(0.0f);
@@ -195,6 +185,21 @@ ndBrainFloat* ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::GetNe
 const ndBrainFloat* ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::GetNextObservations(ndInt32 entry) const
 {
 	return &m_nextObservations[entry * m_obsevationsSize];
+}
+
+ndInt32 ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::GetNextObsevationOffset() const
+{
+	return 2 + m_actionsSize + m_obsevationsSize;
+}
+
+ndInt32 ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::GetStride() const
+{
+	//ndBrainVector m_reward;
+	//ndBrainVector m_terminal;
+	//ndBrainVector m_actions;
+	//ndBrainVector m_observations;
+	//ndBrainVector m_nextObservations;
+	return 2 + m_actionsSize + m_obsevationsSize * 2;
 }
 
 void ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::GetFlatArray(ndInt32 index, ndBrainVector& output) const
@@ -814,8 +819,12 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 	}
 #endif
 
-	ndInt32 inputSize = brain.GetInputSize();
 	ndFixSizeArray<ndUnsigned32, 1024> nextOvervationIndices;
+
+	size_t inputSizeInBytes = size_t(brain.GetInputSize() * sizeof(ndReal));
+	size_t flatInputSizeInBytes = size_t(m_replayBuffer____.GetStride() * sizeof(ndReal));
+	size_t nextObservationOffsetInBytes = size_t(m_replayBuffer____.GetNextObsevationOffset() * sizeof(ndReal));
+
 	for (ndInt32 n = 0; n < m_parameters.m_criticUpdatesCount; ++n)
 	{
 		// Get the rewards for this minibatch
@@ -842,8 +851,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 			}
 			m_minibatchIndexBuffer->MemoryToDevive(0, m_parameters.m_miniBatchSize * sizeof(ndUnsigned32), &nextOvervationIndices[0]);
 			ndBrainBuffer* const deviceMinibatchBuffer = m_policyTrainer->GetInputBuffer();
-			deviceMinibatchBuffer->CopyBufferIndirectSource(**m_minibatchIndexBuffer, **m_replayBufferFlat, size_t(inputSize * sizeof(ndReal)));
-			i *= 1;
+			deviceMinibatchBuffer->CopyBufferIndirectSource(**m_minibatchIndexBuffer, 0, inputSizeInBytes, **m_replayBufferFlat, nextObservationOffsetInBytes, flatInputSizeInBytes);
 		}
 	}
 }

@@ -74,8 +74,6 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 	
 		ndInt32 GetCount() const;
 		void SetCount(ndInt32 count);
-		
-		ndInt32 GetStride() const;
 
 		void Clear(ndInt32 entry);
 		void CopyFrom(ndInt32 entry, ndTrajectory& src, ndInt32 srcEntry);
@@ -95,6 +93,9 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 		ndBrainFloat* GetNextObservations(ndInt32 entry);
 		const ndBrainFloat* GetNextObservations(ndInt32 entry) const;
 
+		// for GPU 
+		ndInt32 GetStride() const;
+		ndInt32 GetNextObsevationOffset() const;
 		void GetFlatArray(ndInt32 index, ndBrainVector& output) const;
 
 		ndBrainVector m_reward;
