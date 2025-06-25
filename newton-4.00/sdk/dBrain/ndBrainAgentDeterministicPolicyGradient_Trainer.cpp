@@ -842,16 +842,17 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 		{
 			for (ndInt32 j = 0; j < m_parameters.m_miniBatchSize; ++j)
 			{
-				const ndInt32 index = m_miniBatchIndexBuffer[n * m_parameters.m_miniBatchSize + j];
+				ndInt32 index = m_miniBatchIndexBuffer[n * m_parameters.m_miniBatchSize + j];
 				nextOvervationIndices.PushBack(ndUnsigned32(index));
 
-				ndBrainMemVector nextObsevations(&m_nextObsevationsBatch[i * brain.GetInputSize()], brain.GetInputSize());
+				ndBrainMemVector nextObsevations(&m_nextObsevationsBatch[j * brain.GetInputSize()], brain.GetInputSize());
 				const ndBrainMemVector nextReplayObservation(m_replayBuffer____.GetNextObservations(index), brain.GetInputSize());
 				nextObsevations.Set(nextReplayObservation);
 			}
 			m_minibatchIndexBuffer->MemoryToDevive(0, m_parameters.m_miniBatchSize * sizeof(ndUnsigned32), &nextOvervationIndices[0]);
 			ndBrainBuffer* const deviceMinibatchBuffer = m_policyTrainer->GetInputBuffer();
 			deviceMinibatchBuffer->CopyBufferIndirectSource(**m_minibatchIndexBuffer, 0, inputSizeInBytes, **m_replayBufferFlat, nextObservationOffsetInBytes, flatInputSizeInBytes);
+			i *= 1;
 		}
 	}
 }

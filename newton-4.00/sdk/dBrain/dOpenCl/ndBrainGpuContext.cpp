@@ -153,13 +153,17 @@ void ndBrainGpuContext::CreateCopyIndirectCommand()
 	m_copyBufferIndirectCommandParamBuffer = ndSharedPtr<ndBrainGpuUniformBuffer>(new ndBrainGpuUniformBuffer(this, sizeof(ndBrainLayer::ndCommandShareInfo)));
 }
 
-//void ndBrainGpuContext::CopyBufferIndirectSource(ndBrainGpuFloatBuffer& dstBuffer, ndBrainGpuIntegerBuffer& indexBuffer, ndBrainGpuFloatBuffer& srcDataBuffer, ndInt32 srcStrideInBytes)
 void ndBrainGpuContext::CopyBufferIndirectSource(ndBrainGpuIntegerBuffer& indexBuffer,
 	ndBrainGpuFloatBuffer& dstBuffer, size_t dstOffsetInBytes, size_t dstStrideInBytes,
 	ndBrainGpuFloatBuffer& srcData, size_t srcOffsetInBytes, size_t srcStrideInBytes)
 {
 	ndBrainLayer::ndCommandShareInfo uniformParam;
 	uniformParam.m_inputSize = ndInt32 (srcStrideInBytes / sizeof (ndReal));
+	uniformParam.m_inputOutputStartOffset = ndInt32(srcOffsetInBytes / sizeof(ndReal));
+
+	uniformParam.m_parametersBatchSize = ndInt32(dstStrideInBytes / sizeof(ndReal));
+	uniformParam.m_parametersStartOffset = ndInt32(dstOffsetInBytes / sizeof(ndReal));
+
 	m_copyBufferIndirectCommandParamBuffer->MemoryToDevive(0, sizeof(ndBrainLayer::ndCommandShareInfo), &uniformParam);
 
 	ndFixSizeArray<ndBrainBuffer*, 8> params;

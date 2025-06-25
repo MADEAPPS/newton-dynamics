@@ -863,7 +863,7 @@ R""""(
 const char* ndBrainGpuContext::m_otherShaderFunctions =
 R""""(
 
-    __kernel void m_brainCopyBufferIndirect(
+    __kernel void brainCopyBufferIndirect(
         __global const UniformBufferLayerArguments* parameters,
         __global uint* indexBuffer, __global float* inputData, __global float* ouputData)
     {                                                                      
@@ -871,14 +871,15 @@ R""""(
         uint groupId = get_group_id(0);
         uint workGroupSize = get_local_size(0);
         
-        uint stride = parameters->m_inputSize;
+        //uint srcStride = parameters->m_inputSize;
         //if ((groupId == 0 && ) printf ("%d: %d \n", groupId, stride);
      
-        uint dstOffset = groupId * stride;
-        uint srcOffset = indexBuffer[groupId] * stride;
-
-        uint workGroupSizeReminder = stride % workGroupSize;
-        uint modWorkGroupSize = stride - workGroupSizeReminder;
+        uint dstOffset = groupId * parameters->m_parametersBatchSize + parameters->m_parametersStartOffset;
+        uint srcOffset = indexBuffer[groupId] * parameters->m_inputSize + parameters->m_inputOutputStartOffset;
+        
+        uint dstStride = parameters->m_parametersBatchSize;
+        uint workGroupSizeReminder = dstStride % workGroupSize;
+        uint modWorkGroupSize = dstStride - workGroupSizeReminder;
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             float a = inputData[srcOffset + i + itemId];
@@ -989,5 +990,5 @@ void ndBrainGpuContext::CreateKerners()
     m_brainAdamLassoOptimizerUpdate = CreateKerner(program, "brainAdamUpdateLassoRegularizer");
 
     // other shaders
-    m_brainCopyBufferIndirect = CreateKerner(program, "m_brainCopyBufferIndirect");
+    m_brainCopyBufferIndirect = CreateKerner(program, "brainCopyBufferIndirect");
 }
