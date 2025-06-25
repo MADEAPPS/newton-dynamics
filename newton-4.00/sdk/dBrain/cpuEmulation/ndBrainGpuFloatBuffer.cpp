@@ -20,7 +20,7 @@ ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, ndIn
 	:ndBrainBuffer(context, size * ndInt32(sizeof(ndReal)), ndStorageData)
 	,m_buffer()
 {
-	ndAssert(0);
+	m_buffer.SetCount(size);
 }
 
 ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainVector& input)
