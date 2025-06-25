@@ -139,7 +139,6 @@ void ndBrainGpuFloatBuffer::CopyBuffer(const ndBrainBuffer& srcBuffer, size_t sr
 
 void ndBrainGpuFloatBuffer::CopyBufferIndirectSource(const ndBrainBuffer& indexBuffer, size_t dstOffsetInBytes, size_t dstStrideInBytes, const ndBrainBuffer& srcData, size_t srcOffsetInBytes, size_t srcStrideInBytes)
 {
-
 	const ndBrainGpuFloatBuffer& srcBuffer = *((ndBrainGpuFloatBuffer*)&srcData);
 	const ndBrainGpuIntegerBuffer& indirectArray = *((ndBrainGpuIntegerBuffer*)&indexBuffer);
 

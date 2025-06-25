@@ -57,10 +57,6 @@ void ndBrainGpuIntegerBuffer::BrainMatrixToDevice(const ndBrainMatrix* const mat
 
 void ndBrainGpuIntegerBuffer::MemoryToDevive(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData)
 {
-	//ndAssert(sizeInBytes <= m_sizeInBytes);
-	//size_t offset = offsetInBytes / sizeof(ndUnsigned32);
-	//size_t size = ndMin(sizeInBytes, m_sizeInBytes) / sizeof(ndUnsigned32);
-	//ndMemCpy(&m_indexArray[ndInt64(offset)], (ndUnsigned32*)inputData, ndInt64(size));
 	LoadData(offsetInBytes, sizeInBytes, inputData);
 }
 

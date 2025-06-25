@@ -208,7 +208,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	ndBrainVector m_nextActionBatch;
 	ndBrainVector m_obsevationsBatch;
 	ndBrainVector m_policyGradientBatch;
-	ndBrainVector m_nextObsevationsBatch;
+	//ndBrainVector m_nextObsevationsBatch;
 	ndBrainVector m_criticObservationActionBatch;
 	ndBrainVector m_criticNextObservationActionBatch;
 
@@ -222,7 +222,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	ndArray<ndInt32> m_miniBatchIndexBuffer;
 	ndSharedPtr<ndBrainBuffer> m_replayBufferFlat;
 	ndSharedPtr<ndBrainBuffer> m_minibatchIndexBuffer;
-	ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory m_replayBuffer____;
+	ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory m_replayBuffer;
 	ndBrainAgentDeterministicPolicyGradient_Agent* m_agent;
 	ndArray<ndInt32> m_shuffleBuffer;
 	ndMovingAverage<8> m_averageExpectedRewards;
