@@ -1124,9 +1124,9 @@ class brainLayerBrainLinearBackPropagate : public ndBrainGpuShader
         ndInt32 weightAndBiasGradientOffset = groupId * ndInt32(parameters->m_parametersBatchSize) + parametersStartOffset;
 
         // calculate bias Gradient
-        ndInt32 workGroupOuputSizeReminder = outputSize % workGroupSize;
-        ndInt32 modWorkGroupOuputSize = outputSize - workGroupOuputSizeReminder;
-        for (ndInt32 i = 0; i < modWorkGroupOuputSize; i += workGroupSize)
+        ndInt32 workGroupOutputSizeReminder = outputSize % workGroupSize;
+        ndInt32 modWorkGroupOutputSize = outputSize - workGroupOutputSizeReminder;
+        for (ndInt32 i = 0; i < modWorkGroupOutputSize; i += workGroupSize)
         //for (ndInt32 i = 0; i < outputSize; i += workGroupSize)
         {
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
@@ -1135,10 +1135,10 @@ class brainLayerBrainLinearBackPropagate : public ndBrainGpuShader
                 weightAndBiasGradients[weightAndBiasGradientOffset + matrixSize + i + itemId] = a;
             }
         }
-        for (ndInt32 itemId = 0; itemId < workGroupOuputSizeReminder; ++itemId)
+        for (ndInt32 itemId = 0; itemId < workGroupOutputSizeReminder; ++itemId)
         {
-            float a = inputOutputGradients[dstBase + modWorkGroupOuputSize + itemId];
-            weightAndBiasGradients[weightAndBiasGradientOffset + matrixSize + modWorkGroupOuputSize + itemId] = a;
+            float a = inputOutputGradients[dstBase + modWorkGroupOutputSize + itemId];
+            weightAndBiasGradients[weightAndBiasGradientOffset + matrixSize + modWorkGroupOutputSize + itemId] = a;
         }
 
         // calculate matrix weight Gradient
