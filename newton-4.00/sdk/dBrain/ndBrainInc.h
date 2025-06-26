@@ -75,13 +75,11 @@
 #include <ndBrainAgentDeterministicPolicyGradient_Trainer.h>
 
 // gpu support 
-#include <ndBrainGpuBuffer.h>
 #include <ndBrainGpuCommand.h>
 #include <ndBrainGpuContext.h>
 #include <ndBrainGpuFloatBuffer.h>
 #include <ndBrainGpuUniformBuffer.h>
 #include <ndBrainGpuIntegerBuffer.h>
-
 
 #endif 
 

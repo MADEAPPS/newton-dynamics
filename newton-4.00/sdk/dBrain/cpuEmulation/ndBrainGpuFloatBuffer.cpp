@@ -99,16 +99,26 @@ void ndBrainGpuFloatBuffer::UnloadData(size_t offsetInBytes, size_t sizeInBytes,
 	dst.Set(src);
 }
 
-void ndBrainGpuFloatBuffer::CopyBuffer(const ndBrainBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer)
+void ndBrainGpuFloatBuffer::CopyBuffer(const ndBrainBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcData)
 {
-	ndAssert(0);
-	//ndInt64 dstOffset = ndInt64(dstOffsetInBytes / sizeof(ndReal));
-	//ndInt64 srcOffset = ndInt64(srcOffsetInBytes / sizeof(ndReal));
-	//
-	//ndBrainGpuFloatBuffer& source = *((ndBrainGpuFloatBuffer*)&srcBuffer);
-	//ndBrainMemVector dst(&m_buffer[dstOffset], ndInt32(sizeInBytes / sizeof(ndReal)));
-	//const ndBrainMemVector src(&source.m_buffer[srcOffset], ndInt32(sizeInBytes / sizeof(ndReal)));
-	//dst.Set(src);
+	const ndBrainGpuFloatBuffer& srcBuffer = *((ndBrainGpuFloatBuffer*)&srcData);
+	const ndBrainGpuUniformBuffer& uniforms = *(ndBrainGpuUniformBuffer*)&parameterBuffer;
+	const ndCopyBufferCommandInfo& data = *((ndCopyBufferCommandInfo*)&uniforms.m_data[0]);
+
+	ndInt32 stride = ndInt32(data.m_strideInByte / sizeof(ndReal));
+	ndInt32 srcStride = ndInt32(data.m_srcStrideInByte / sizeof(ndReal));
+	ndInt32 srcOffset = ndInt32(data.m_srcOffsetInByte / sizeof(ndReal));
+	ndInt32 dstStride = ndInt32(data.m_dstStrideInByte / sizeof(ndReal));
+	ndInt32 dstOffset = ndInt32(data.m_dstOffsetInByte / sizeof(ndReal));
+
+	ndAssert(stride <= srcStride);
+	ndAssert(stride <= dstStride);
+	for (ndInt32 i = 0; i < workGroupCount; ++i)
+	{
+		const ndBrainMemVector src(&srcBuffer.m_buffer[i * srcStride + srcOffset], stride);
+		ndBrainMemVector dst(&m_buffer[i * dstStride + dstOffset], stride);
+		dst.Set(src);
+	}
 }
 
 void ndBrainGpuFloatBuffer::CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcData)

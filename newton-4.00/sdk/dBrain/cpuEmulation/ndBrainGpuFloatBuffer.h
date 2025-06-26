@@ -29,7 +29,7 @@ class ndBrainGpuFloatBuffer : public ndBrainBuffer
 	virtual void MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const override;
 
 	virtual void CopyBuffer(const ndBrainBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer) override;
-	virtual void CopyBufferIndirect(const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer) override;
+	virtual void CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer) override;
 
 	ndBrainFloat* GetData();
 

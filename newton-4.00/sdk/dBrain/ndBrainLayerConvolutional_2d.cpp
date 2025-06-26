@@ -21,8 +21,6 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
-#include "ndBrainGpuBuffer.h"
-#include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuCommand.h"
 #include "ndBrainGpuFloatBuffer.h"
 #include "ndBrainGpuUniformBuffer.h"
