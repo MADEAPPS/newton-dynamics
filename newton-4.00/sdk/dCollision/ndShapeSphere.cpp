@@ -48,7 +48,7 @@ ndShapeSphere::~ndShapeSphere()
 	ndAssert(ndMemory::CheckMemory(this));
 }
 
-void ndShapeSphere::TesselateTriangle(ndInt32 level, const ndVector& p0, const ndVector& p1, const ndVector& p2, ndInt32& count, ndVector* const ouput) const
+void ndShapeSphere::TesselateTriangle(ndInt32 level, const ndVector& p0, const ndVector& p1, const ndVector& p2, ndInt32& count, ndVector* const output) const
 {
 	if (level) 
 	{
@@ -67,16 +67,16 @@ void ndShapeSphere::TesselateTriangle(ndInt32 level, const ndVector& p0, const n
 		ndAssert(ndAbs(p12.DotProduct(p12).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
 		ndAssert(ndAbs(p20.DotProduct(p20).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
 
-		TesselateTriangle(level - 1, p0, p01, p20, count, ouput);
-		TesselateTriangle(level - 1, p1, p12, p01, count, ouput);
-		TesselateTriangle(level - 1, p2, p20, p12, count, ouput);
-		TesselateTriangle(level - 1, p01, p12, p20, count, ouput);
+		TesselateTriangle(level - 1, p0, p01, p20, count, output);
+		TesselateTriangle(level - 1, p1, p12, p01, count, output);
+		TesselateTriangle(level - 1, p2, p20, p12, count, output);
+		TesselateTriangle(level - 1, p01, p12, p20, count, output);
 	}
 	else 
 	{
-		ouput[count++] = p0;
-		ouput[count++] = p1;
-		ouput[count++] = p2;
+		output[count++] = p0;
+		output[count++] = p1;
+		output[count++] = p2;
 	}
 }
 

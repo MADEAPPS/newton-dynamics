@@ -158,7 +158,7 @@ class ndMeshEffect: public ndPolyhedra
 	
 	dgCollisionInstance* CreateCollisionTree(dgWorld* const world, dInt32 shapeID) const;
 	ndMeshEffect* CreateSimplification (dInt32 maxVertexCount, dgReportProgress reportProgressCallback, void* const userData) const;
-	ndMeshEffect* CreateConvexApproximation (dFloat32 maxConcavity, dFloat32 backFaceDistanceFactor, dInt32 maxHullOuputCount, dInt32 maxVertexPerHull, dgReportProgress reportProgressCallback, void* const userData) const;
+	ndMeshEffect* CreateConvexApproximation (dFloat32 maxConcavity, dFloat32 backFaceDistanceFactor, dInt32 maxHullOutputCount, dInt32 maxVertexPerHull, dgReportProgress reportProgressCallback, void* const userData) const;
 
 	ndMeshEffect* CreateTetrahedraIsoSurface() const;
 	void CreateTetrahedraLinearBlendSkinWeightsChannel (const ndMeshEffect* const tetrahedraMesh);

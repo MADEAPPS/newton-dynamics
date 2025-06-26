@@ -212,7 +212,7 @@ ndShapeInfo ndShapeCapsule::GetShapeInfo() const
 	return info;
 }
 
-void ndShapeCapsule::TesselateTriangle(ndInt32 level, const ndVector& p0, const ndVector& p1, const ndVector& p2, ndInt32& count, ndVector* ouput) const
+void ndShapeCapsule::TesselateTriangle(ndInt32 level, const ndVector& p0, const ndVector& p1, const ndVector& p2, ndInt32& count, ndVector* output) const
 {
 	if (level) 
 	{
@@ -231,16 +231,16 @@ void ndShapeCapsule::TesselateTriangle(ndInt32 level, const ndVector& p0, const 
 		ndAssert(ndAbs(p12.DotProduct(p12).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
 		ndAssert(ndAbs(p20.DotProduct(p20).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-4f));
 
-		TesselateTriangle(level - 1, p0, p01, p20, count, ouput);
-		TesselateTriangle(level - 1, p1, p12, p01, count, ouput);
-		TesselateTriangle(level - 1, p2, p20, p12, count, ouput);
-		TesselateTriangle(level - 1, p01, p12, p20, count, ouput);
+		TesselateTriangle(level - 1, p0, p01, p20, count, output);
+		TesselateTriangle(level - 1, p1, p12, p01, count, output);
+		TesselateTriangle(level - 1, p2, p20, p12, count, output);
+		TesselateTriangle(level - 1, p01, p12, p20, count, output);
 	}
 	else 
 	{
-		ouput[count + 0] = p0.Scale(m_radius0);
-		ouput[count + 1] = p1.Scale(m_radius0);
-		ouput[count + 2] = p2.Scale(m_radius0);
+		output[count + 0] = p0.Scale(m_radius0);
+		output[count + 1] = p1.Scale(m_radius0);
+		output[count + 2] = p2.Scale(m_radius0);
 		count += 3;
 	}
 }

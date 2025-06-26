@@ -51,7 +51,7 @@ class ndShapeSphere: public ndShapeConvex
 
 	virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const override;
 
-	void TesselateTriangle(ndInt32 level, const ndVector& p0, const ndVector& p1, const ndVector& p2, ndInt32& count, ndVector* const ouput) const;
+	void TesselateTriangle(ndInt32 level, const ndVector& p0, const ndVector& p1, const ndVector& p2, ndInt32& count, ndVector* const output) const;
 
 	ndVector m_vertex[D_SPHERE_VERTEX_COUNT];
 	ndFloat32 m_radius;
