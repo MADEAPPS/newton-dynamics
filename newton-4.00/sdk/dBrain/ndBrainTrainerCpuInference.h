@@ -78,14 +78,14 @@ class ndBrainTrainerCpuInference: public ndBrainTrainer
 	ndBrainTrainerCpuInference(const ndBrainTrainerCpuInference& src);
 
 	ndBrainBuffer* GetInputBuffer() override;
-	const ndBrainBuffer* GetOuputBuffer() override;
+	const ndBrainBuffer* GetOutputBuffer() override;
 
 	virtual void LoadInput(const ndBrainVector&) override;
 	virtual void SaveInput(ndBrainVector& input) const override;
 
-	virtual void GetOutput(ndBrainVector& ouput) const override;
+	virtual void GetOutput(ndBrainVector& output) const override;
 	virtual void GetWorkingBuffer(ndBrainVector& buffer) const override;
-	virtual void GetParameterBuffer(ndBrainVector& ouput) const override;
+	virtual void GetParameterBuffer(ndBrainVector& output) const override;
 
 	virtual void SoftCopyParameters(const ndBrainTrainer& src, ndBrainFloat blendFactor) override;
 

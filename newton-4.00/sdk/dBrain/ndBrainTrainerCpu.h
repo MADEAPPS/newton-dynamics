@@ -71,7 +71,7 @@ class ndBrainTrainerCpu: public ndBrainTrainerCpuInference
 			ndBrainTrainerCpu* const owner = (ndBrainTrainerCpu*)m_owner;
 			const ndBrainMemVector src(&owner->m_miniBatchOutputGradientBuffer[miniBatchIndex * m_info.m_outputSize], m_info.m_outputSize);
 			ndInt32 destOffset = miniBatchIndex * m_info.m_inputOutputSize;
-			ndBrainMemVector dst(&owner->m_inputOuputGradientsBuffer[destOffset + m_info.m_inputOutputStartOffset], m_info.m_outputSize);
+			ndBrainMemVector dst(&owner->m_inputOutputGradientsBuffer[destOffset + m_info.m_inputOutputStartOffset], m_info.m_outputSize);
 			dst.Set(src);
 		}
 	};
@@ -89,7 +89,7 @@ class ndBrainTrainerCpu: public ndBrainTrainerCpuInference
 		{
 			ndBrainTrainerCpu* const owner = (ndBrainTrainerCpu*)m_owner;
 			ndInt32 srcOffset = miniBatchIndex * m_info.m_inputOutputSize;
-			const ndBrainMemVector src(&owner->m_inputOuputGradientsBuffer[srcOffset + m_info.m_inputOutputStartOffset], m_info.m_inputSize);
+			const ndBrainMemVector src(&owner->m_inputOutputGradientsBuffer[srcOffset + m_info.m_inputOutputStartOffset], m_info.m_inputSize);
 			ndBrainMemVector dst(&owner->m_miniBatchInputGradientBuffer[miniBatchIndex * m_info.m_inputSize], m_info.m_inputSize);
 			dst.Set(src);
 		}
@@ -101,7 +101,7 @@ class ndBrainTrainerCpu: public ndBrainTrainerCpuInference
 	void Initialize(const ndTrainerDescriptor& descriptor);
 
 	ndSharedPtr<ndBrainOptimizerAdamCpu> m_optimizer;
-	ndBrainVector m_inputOuputGradientsBuffer;
+	ndBrainVector m_inputOutputGradientsBuffer;
 	ndBrainVector m_weightAndBiasGradientsBuffer;
 	ndBrainVector m_miniBatchInputGradientBuffer;
 	ndBrainVector m_miniBatchOutputGradientBuffer;

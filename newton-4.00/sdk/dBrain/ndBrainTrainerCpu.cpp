@@ -32,7 +32,7 @@
 ndBrainTrainerCpu::ndBrainTrainerCpu(const ndTrainerDescriptor& descriptor)
 	:ndBrainTrainerCpuInference(descriptor)
 	,m_optimizer(new ndBrainOptimizerAdamCpu(m_context))
-	,m_inputOuputGradientsBuffer()
+	,m_inputOutputGradientsBuffer()
 	,m_weightAndBiasGradientsBuffer()
 	,m_miniBatchInputGradientBuffer()
 	,m_miniBatchOutputGradientBuffer()
@@ -48,7 +48,7 @@ ndBrainTrainerCpu::ndBrainTrainerCpu(
 	ndInt32 minibatchSize)
 	:ndBrainTrainerCpuInference(ndTrainerDescriptor(brain, context, minibatchSize, learnRate))
 	,m_optimizer(new ndBrainOptimizerAdamCpu(m_context))
-	,m_inputOuputGradientsBuffer()
+	,m_inputOutputGradientsBuffer()
 	,m_weightAndBiasGradientsBuffer()
 	,m_miniBatchInputGradientBuffer()
 	,m_miniBatchOutputGradientBuffer()
@@ -61,7 +61,7 @@ ndBrainTrainerCpu::ndBrainTrainerCpu(
 ndBrainTrainerCpu::ndBrainTrainerCpu(const ndBrainTrainerCpu& src)
 	:ndBrainTrainerCpuInference(src)
 	,m_optimizer(src.m_optimizer)
-	,m_inputOuputGradientsBuffer()
+	,m_inputOutputGradientsBuffer()
 	,m_weightAndBiasGradientsBuffer()
 	,m_miniBatchInputGradientBuffer()
 	,m_miniBatchOutputGradientBuffer()
@@ -78,8 +78,8 @@ void ndBrainTrainerCpu::Initialize(const ndTrainerDescriptor& descriptor)
 	m_miniBatchOutputGradientBuffer.SetCount(m_miniBatchOutputBuffer->m_buffer.GetCount());
 
 	// big mistake here
-	m_inputOuputGradientsBuffer.SetCount(m_inputOutputBuffer.GetCount());
-	m_inputOuputGradientsBuffer.Set(ndBrainFloat(0.0f));
+	m_inputOutputGradientsBuffer.SetCount(m_inputOutputBuffer.GetCount());
+	m_inputOutputGradientsBuffer.Set(ndBrainFloat(0.0f));
 
 	m_weightAndBiasGradientsBuffer.SetCount(m_weightAndBiasBuffer.GetCount() * m_miniBatchSize);
 	m_weightAndBiasGradientsBuffer.Set(ndBrainFloat(0.0f));

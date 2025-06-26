@@ -66,14 +66,14 @@ class ndBrainTrainerGpuInference: public ndBrainTrainer
 	virtual ~ndBrainTrainerGpuInference();
 
 	virtual ndBrainBuffer* GetInputBuffer() override;
-	virtual const ndBrainBuffer* GetOuputBuffer() override;
+	virtual const ndBrainBuffer* GetOutputBuffer() override;
 
 	virtual void LoadInput(const ndBrainVector& input) override;
-	virtual void SaveInput(ndBrainVector& ouput) const override;
+	virtual void SaveInput(ndBrainVector& output) const override;
 
-	virtual void GetOutput(ndBrainVector& ouput) const override;
-	virtual void GetWorkingBuffer(ndBrainVector& ouput) const override;
-	virtual void GetParameterBuffer(ndBrainVector& ouput) const override;
+	virtual void GetOutput(ndBrainVector& output) const override;
+	virtual void GetWorkingBuffer(ndBrainVector& output) const override;
+	virtual void GetParameterBuffer(ndBrainVector& output) const override;
 
 	// legacy
 	virtual void BackPropagate(const ndBrainVector&, ndBrainLoss&) override { ndAssert(0); }

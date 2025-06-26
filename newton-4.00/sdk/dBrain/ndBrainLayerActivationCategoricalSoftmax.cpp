@@ -62,7 +62,7 @@ ndBrainLayer* ndBrainLayerActivationCategoricalSoftmax::Load(const ndBrainLoad* 
 void ndBrainLayerActivationCategoricalSoftmax::InputDerivative(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	#ifdef _DEBUG
-	// check that the ouputDerivative is a one hat encoding 
+	// check that the outputDerivative is a one hat encoding 
 	ndAssert(output.GetCount() == inputDerivative.GetCount());
 	ndAssert(output.GetCount() == outputDerivative.GetCount());
 
@@ -94,8 +94,8 @@ void ndBrainLayerActivationCategoricalSoftmax::BackPropagate(const ndBrainLayerB
 	const ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
 	
 	ndInt32 dstOffset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
-	const ndBrainMemVector outputDerivative(&trainer->m_inputOuputGradientsBuffer[dstOffset + inputSize], outputSize);
-	ndBrainMemVector inputDerivative (&trainer->m_inputOuputGradientsBuffer[dstOffset], inputSize);
+	const ndBrainMemVector outputDerivative(&trainer->m_inputOutputGradientsBuffer[dstOffset + inputSize], outputSize);
+	ndBrainMemVector inputDerivative (&trainer->m_inputOutputGradientsBuffer[dstOffset], inputSize);
 	
 	inputDerivative.Set(output);
 	inputDerivative.Sub(outputDerivative);

@@ -229,15 +229,15 @@ ndBrainBuffer* ndBrainTrainerCpuInference::GetInputBuffer()
 	return *m_miniBatchInputBuffer;
 }
 
-const ndBrainBuffer* ndBrainTrainerCpuInference::GetOuputBuffer()
+const ndBrainBuffer* ndBrainTrainerCpuInference::GetOutputBuffer()
 {
 	return *m_miniBatchOutputBuffer;
 }
 
-void ndBrainTrainerCpuInference::GetOutput(ndBrainVector& ouput) const
+void ndBrainTrainerCpuInference::GetOutput(ndBrainVector& output) const
 {
-	ouput.SetCount(m_miniBatchOutputBuffer->m_buffer.GetCount());
-	ouput.Set(m_miniBatchOutputBuffer->m_buffer);
+	output.SetCount(m_miniBatchOutputBuffer->m_buffer.GetCount());
+	output.Set(m_miniBatchOutputBuffer->m_buffer);
 }
 
 void ndBrainTrainerCpuInference::SaveInput(ndBrainVector& input) const

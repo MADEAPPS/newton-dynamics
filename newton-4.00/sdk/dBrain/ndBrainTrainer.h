@@ -57,9 +57,9 @@ class ndBrainTrainer: public ndClassAlloc
 	ndSharedPtr<ndBrainContext> GetContext();
 
 	virtual ndBrainBuffer* GetInputBuffer() = 0;
-	const virtual ndBrainBuffer* GetOuputBuffer() = 0;
+	const virtual ndBrainBuffer* GetOutputBuffer() = 0;
 
-	virtual void SaveInput(ndBrainVector& ouput) const = 0;
+	virtual void SaveInput(ndBrainVector& output) const = 0;
 	virtual void LoadInput(const ndBrainVector& input) = 0;
 
 	virtual void GetOutput(ndBrainVector&) const {}

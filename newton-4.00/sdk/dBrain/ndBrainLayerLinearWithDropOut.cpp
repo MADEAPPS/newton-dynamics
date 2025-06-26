@@ -136,8 +136,8 @@ void ndBrainLayerLinearWithDropOut::BackPropagate(const ndBrainLayerBackPropagat
 	const ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
 	
 	ndInt32 dstOffset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
-	const ndBrainMemVector outputDerivative(&trainer->m_inputOuputGradientsBuffer[dstOffset + inputSize], outputSize);
-	ndBrainMemVector inputDerivative(&trainer->m_inputOuputGradientsBuffer[dstOffset], inputSize);
+	const ndBrainMemVector outputDerivative(&trainer->m_inputOutputGradientsBuffer[dstOffset + inputSize], outputSize);
+	ndBrainMemVector inputDerivative(&trainer->m_inputOutputGradientsBuffer[dstOffset], inputSize);
 	
 	inputDerivative.Set(m_dropOut);
 	inputDerivative.Mul(outputDerivative);

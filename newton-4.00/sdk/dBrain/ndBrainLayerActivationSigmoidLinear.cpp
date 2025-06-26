@@ -88,14 +88,14 @@ void ndBrainLayerActivationSigmoidLinear::MakePrediction(const ndBrainVector& in
 	output.FlushToZero();
 }
 
-void ndBrainLayerActivationSigmoidLinear::InputDerivative(const ndBrainVector& input, const ndBrainVector& ouput, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+void ndBrainLayerActivationSigmoidLinear::InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
 	ndAssert(input.GetCount() == outputDerivative.GetCount());
 	ndAssert(input.GetCount() == inputDerivative.GetCount());
 
 	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
 	{
-		ndBrainFloat sigmoid = (input[i] != ndBrainFloat(0.0f)) ? ouput[i] / input[i] : ndBrainFloat(0.0f);
+		ndBrainFloat sigmoid = (input[i] != ndBrainFloat(0.0f)) ? output[i] / input[i] : ndBrainFloat(0.0f);
 		ndBrainFloat sigmoidDer = sigmoid * (ndBrainFloat(1.0f) - sigmoid);
 
 		ndBrainFloat derivative = input[i] * sigmoidDer + sigmoid;

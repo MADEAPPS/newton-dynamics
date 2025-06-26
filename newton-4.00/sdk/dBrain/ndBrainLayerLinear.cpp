@@ -240,7 +240,7 @@ void ndBrainLayerLinear::Save(const ndBrainSave* const loadSave) const
 	};
 
 	Save("\tinputs %d\n", m_weights.GetColumns());
-	Save("\touputs %d\n", m_weights.GetCount());
+	Save("\toutputs %d\n", m_weights.GetCount());
 
 	Save("\tbias ");
 	for (ndInt32 i = 0; i < m_bias.GetCount(); ++i)
@@ -493,10 +493,10 @@ void ndBrainLayerLinear::BackPropagate(const ndBrainLayerBackPropagateCpuCommand
 	const ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
 	
 	ndInt32 dstOffset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
-	const ndBrainMemVector outputDerivative(&trainer->m_inputOuputGradientsBuffer[dstOffset + inputSize], outputSize);
+	const ndBrainMemVector outputDerivative(&trainer->m_inputOutputGradientsBuffer[dstOffset + inputSize], outputSize);
 
 	// calculate input output gradients
-	ndBrainMemVector inputDerivative(&trainer->m_inputOuputGradientsBuffer[dstOffset], inputSize);
+	ndBrainMemVector inputDerivative(&trainer->m_inputOutputGradientsBuffer[dstOffset], inputSize);
 	const ndBrainMemVector matrixVector(&trainer->m_weightAndBiasBuffer[info->m_parametersStartOffset], matrixSize + outputSize);
 	inputDerivative.Set(ndBrainFloat(0.0f));
 	for (ndInt32 i = outputSize - 1; i >= 0; --i)

@@ -249,7 +249,7 @@ void ndBrainLayerConvolutional_2d::Save(const ndBrainSave* const loadSave) const
 	Save("\tinput_heigh %d\n", m_inputHeight);
 	Save("\tinput_layers %d\n", m_inputLayers);
 	Save("\tkernel_Size %d\n", m_kernelSize);
-	Save("\touput_layers %d\n", m_outputLayers);
+	Save("\toutput_layers %d\n", m_outputLayers);
 
 	Save("\tbias ");
 	for (ndInt32 i = 0; i < m_bias.GetCount(); ++i)
@@ -296,12 +296,12 @@ ndBrainLayer* ndBrainLayerConvolutional_2d::Load(const ndBrainLoad* const loadSa
 	ndInt32 kernelSize = loadSave->ReadInt();
 
 	loadSave->ReadString(buffer);
-	ndInt32 ouputLayers = loadSave->ReadInt();
+	ndInt32 outputLayers = loadSave->ReadInt();
 
-	ndBrainLayerConvolutional_2d* const layer = new ndBrainLayerConvolutional_2d(inputWidth, inputHeight, inputLayers, kernelSize, ouputLayers);
+	ndBrainLayerConvolutional_2d* const layer = new ndBrainLayerConvolutional_2d(inputWidth, inputHeight, inputLayers, kernelSize, outputLayers);
 
 	loadSave->ReadString(buffer);
-	for (ndInt32 i = 0; i < ouputLayers; ++i)
+	for (ndInt32 i = 0; i < outputLayers; ++i)
 	{
 		ndBrainFloat val = ndBrainFloat(loadSave->ReadFloat());
 		layer->m_bias[i] = val;
@@ -311,7 +311,7 @@ ndBrainLayer* ndBrainLayerConvolutional_2d::Load(const ndBrainLoad* const loadSa
 	ndInt32 kernelWeights = kernelSize * kernelSize;
 
 	ndInt32 index = 0;
-	for (ndInt32 i = 0; i < ouputLayers * inputLayers; ++i)
+	for (ndInt32 i = 0; i < outputLayers * inputLayers; ++i)
 	{
 		loadSave->ReadString(buffer);
 		for (ndInt32 j = 0; j < kernelWeights; ++j)
@@ -607,7 +607,7 @@ void ndBrainLayerConvolutional_2d::MakePrediction(const ndBrainVector&, ndBrainV
 	//
 	//ndInt32 outputOffset = 0;
 	//ndInt32 kernelOffset = 0;
-	//const ndInt32 roundedOuputWith = m_outputWidth & -4;
+	//const ndInt32 roundedOutputWith = m_outputWidth & -4;
 	//
 	//for (ndInt32 i = 0; i < m_outputLayers; ++i)
 	//{
@@ -627,14 +627,14 @@ void ndBrainLayerConvolutional_2d::MakePrediction(const ndBrainVector&, ndBrainV
 	//		//{
 	//		//	ndInt32 outIndex = 0;
 	//		//	ndBrainFloat4* const out4 = (ndBrainFloat4*)&out[outOffset];
-	//		//	for (ndInt32 x = 0; x < roundedOuputWith; x += 4)
+	//		//	for (ndInt32 x = 0; x < roundedOutputWith; x += 4)
 	//		//	{
 	//		//		const ndBrainMemVector in(&input[inputBase + x], inputSize);
 	//		//		out4[outIndex] = out4[outIndex] + CrossCorrelationSimd(in);
 	//		//		outIndex++;
 	//		//	}
 	//		//	outIndex *= 4;
-	//		//	for (ndInt32 x = roundedOuputWith; x < m_outputWidth; ++x)
+	//		//	for (ndInt32 x = roundedOutputWith; x < m_outputWidth; ++x)
 	//		//	{
 	//		//		const ndBrainMemVector in(&input[inputBase + x], inputSize);
 	//		//		out[outOffset + outIndex] += CrossCorrelationScalar(in, filter);

@@ -824,17 +824,17 @@ R""""(
         uint weightAndBiasGradientOffset = groupId * parameters->m_parametersBatchSize + parametersStartOffset;
 
         // calculate bias Gradient
-        uint workGroupOuputSizeReminder = outputSize % workGroupSize;
-        uint modWorkGroupOuputSize = outputSize - workGroupOuputSizeReminder;
-        for (uint i = 0; i < modWorkGroupOuputSize; i += workGroupSize)
+        uint workGroupOutputSizeReminder = outputSize % workGroupSize;
+        uint modWorkGroupOutputSize = outputSize - workGroupOutputSizeReminder;
+        for (uint i = 0; i < modWorkGroupOutputSize; i += workGroupSize)
          {
             float a = inputOutputGradients[dstBase + i + itemId];
             weightAndBiasGradients[weightAndBiasGradientOffset + matrixSize + i + itemId] = a;
         }
-        if(itemId < workGroupOuputSizeReminder)
+        if(itemId < workGroupOutputSizeReminder)
         {
-            float a = inputOutputGradients[dstBase + modWorkGroupOuputSize + itemId];
-            weightAndBiasGradients[weightAndBiasGradientOffset + matrixSize + modWorkGroupOuputSize + itemId] = a;
+            float a = inputOutputGradients[dstBase + modWorkGroupOutputSize + itemId];
+            weightAndBiasGradients[weightAndBiasGradientOffset + matrixSize + modWorkGroupOutputSize + itemId] = a;
         }
         
         // calculate matrix weight Gradient
@@ -865,7 +865,7 @@ R""""(
 
     __kernel void brainCopyBufferIndirect(
         __global const UniformBufferLayerArguments* parameters,
-        __global uint* indexBuffer, __global float* inputData, __global float* ouputData)
+        __global uint* indexBuffer, __global float* inputData, __global float* outputData)
     {                                                                      
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
@@ -883,12 +883,12 @@ R""""(
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             float a = inputData[srcOffset + i + itemId];
-            ouputData[dstOffset + i + itemId] = a;
+            outputData[dstOffset + i + itemId] = a;
         }
         if (itemId < workGroupSizeReminder)
         {
             float a = inputData[srcOffset + modWorkGroupSize + itemId];
-            ouputData[dstOffset + modWorkGroupSize + itemId] = a;
+            outputData[dstOffset + modWorkGroupSize + itemId] = a;
         }
     }
 

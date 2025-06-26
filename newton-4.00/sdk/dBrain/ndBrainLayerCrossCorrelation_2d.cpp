@@ -239,7 +239,7 @@ void ndBrainLayerCrossCorrelation_2d::Save(const ndBrainSave* const loadSave) co
 	Save("\tinput_heigh %d\n", m_inputHeight);
 	Save("\tinput_layers %d\n", m_inputLayers);
 	Save("\tkernel_Size %d\n", m_kernelSize);
-	Save("\touput_layers %d\n", m_outputLayers);
+	Save("\toutput_layers %d\n", m_outputLayers);
 
 	Save("\tbias ");
 	for (ndInt32 i = 0; i < m_bias.GetCount(); ++i)
@@ -286,12 +286,12 @@ ndBrainLayer* ndBrainLayerCrossCorrelation_2d::Load(const ndBrainLoad* const loa
 	ndInt32 kernelSize = loadSave->ReadInt();
 
 	loadSave->ReadString(buffer);
-	ndInt32 ouputLayers = loadSave->ReadInt();
+	ndInt32 outputLayers = loadSave->ReadInt();
 
-	ndBrainLayerCrossCorrelation_2d* const layer = new ndBrainLayerCrossCorrelation_2d(inputWidth, inputHeight, inputLayers, kernelSize, ouputLayers);
+	ndBrainLayerCrossCorrelation_2d* const layer = new ndBrainLayerCrossCorrelation_2d(inputWidth, inputHeight, inputLayers, kernelSize, outputLayers);
 
 	loadSave->ReadString(buffer);
-	for (ndInt32 i = 0; i < ouputLayers; ++i)
+	for (ndInt32 i = 0; i < outputLayers; ++i)
 	{
 		ndBrainFloat val = ndBrainFloat(loadSave->ReadFloat());
 		layer->m_bias[i] = val;
@@ -301,7 +301,7 @@ ndBrainLayer* ndBrainLayerCrossCorrelation_2d::Load(const ndBrainLoad* const loa
 	ndInt32 kernelWeights = kernelSize * kernelSize;
 
 	ndInt32 index = 0;
-	for (ndInt32 i = 0; i < ouputLayers * inputLayers; ++i)
+	for (ndInt32 i = 0; i < outputLayers * inputLayers; ++i)
 	{
 		loadSave->ReadString(buffer);
 		for (ndInt32 j = 0; j < kernelWeights; ++j)
