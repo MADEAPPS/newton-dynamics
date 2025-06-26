@@ -96,3 +96,8 @@ void ndBrainGpuBuffer::CopyBufferIndirectSource(const ndBrainBuffer& indexBuffer
 	ndBrainGpuIntegerBuffer& index = *(ndBrainGpuIntegerBuffer*)&indexBuffer;
 	context->CopyBufferIndirectSource(index, dst, dstOffsetInBytes, dstStrideInBytes, src, srcOffsetInBytes, srcStrideInBytes);
 }
+
+void ndBrainGpuBuffer::CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer)
+{
+	ndAssert(0);
+}

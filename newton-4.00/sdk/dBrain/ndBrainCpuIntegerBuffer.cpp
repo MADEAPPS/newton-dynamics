@@ -88,3 +88,8 @@ void ndBrainCpuIntegerBuffer::CopyBufferIndirectSource(const ndBrainBuffer&, siz
 {
 	ndAssert(0);
 }
+
+void ndBrainCpuIntegerBuffer::CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer)
+{
+	ndAssert(0);
+}

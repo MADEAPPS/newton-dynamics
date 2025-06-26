@@ -273,8 +273,7 @@ static void MnistTrainingSet()
 				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
 				for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
 				{
-					//ndAssert(0);
-					//m_indirectMiniBatch->MemoryToDevive(0, m_miniBatchSize * sizeof(ndUnsigned32), &shuffleBuffer[batchStart]);
+					m_indirectMiniBatch->MemoryToDevive(0, m_miniBatchSize * sizeof(ndUnsigned32), &shuffleBuffer[batchStart]);
 					//deviceMinibatchBuffer->CopyBufferIndirect(**m_indirectMiniBatch, strideInBytes, 0, strideInBytes, **m_trainingData, 0, strideInBytes);
 					
 					trainer->MakePrediction();

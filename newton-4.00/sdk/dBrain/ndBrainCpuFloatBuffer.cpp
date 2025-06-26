@@ -117,3 +117,8 @@ void ndBrainCpuFloatBuffer::CopyBufferIndirectSource(const ndBrainBuffer& indexB
 		dst.Set(src);
 	}
 }
+
+void ndBrainCpuFloatBuffer::CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer)
+{
+	ndAssert(0);
+}
