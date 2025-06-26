@@ -190,7 +190,7 @@ void ndBrainGpuContext::CopyBuffer(ndBrainGpuUniformBuffer& parameterBuffer, ndI
 	params.PushBack(&dstBuffer);
 
 	m_copyBufferCommand->Assembly(m_brainCopyBuffer, workGroups, params.GetCount(), &params[0]);
-	AddCommandQueue(m_copyBufferIndirectCommand);
+	AddCommandQueue(m_copyBufferCommand);
 }
 
 void ndBrainGpuContext::CopyBufferIndirect(ndBrainGpuUniformBuffer& parameterBuffer, ndBrainGpuIntegerBuffer& indexBuffer, ndBrainGpuFloatBuffer& dstBuffer, ndBrainGpuFloatBuffer& srcBuffer)
