@@ -871,8 +871,32 @@ R""""(
 const char* ndBrainGpuContext::m_otherShaderFunctions =
 R""""(
 
-    __kernel void brainCopyBufferIndirect(
-        __global const CopyBufferCommandInfo* parameters,
+    __kernel void brainCopyBuffer(__global const CopyBufferCommandInfo* parameters,
+        __global float* inputData, __global float* outputData)
+    {                                                                      
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+        
+        uint dstOffset = (groupId * parameters->m_dstStrideInByte + parameters->m_dstOffsetInByte) / sizeof (uint);
+        uint srcOffset = (groupId * parameters->m_srcStrideInByte + parameters->m_srcOffsetInByte) / sizeof (uint);
+        
+        uint dstStride = parameters->m_strideInByte / sizeof (uint);
+        uint workGroupSizeReminder = dstStride % workGroupSize;
+        uint modWorkGroupSize = dstStride - workGroupSizeReminder;
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            float a = inputData[srcOffset + i + itemId];
+            outputData[dstOffset + i + itemId] = a;
+        }
+        if (itemId < workGroupSizeReminder)
+        {
+            float a = inputData[srcOffset + modWorkGroupSize + itemId];
+            outputData[dstOffset + modWorkGroupSize + itemId] = a;
+        }
+    }
+
+    __kernel void brainCopyBufferIndirect(__global const CopyBufferCommandInfo* parameters,
         __global uint* indexBuffer, __global float* inputData, __global float* outputData)
     {                                                                      
         uint itemId = get_local_id(0);
@@ -1004,5 +1028,6 @@ void ndBrainGpuContext::CreateKerners()
     m_brainAdamLassoOptimizerUpdate = CreateKerner(program, "brainAdamUpdateLassoRegularizer");
 
     // other shaders
+    m_brainCopyBuffer = CreateKerner(program, "brainCopyBuffer");
     m_brainCopyBufferIndirect = CreateKerner(program, "brainCopyBufferIndirect");
 }

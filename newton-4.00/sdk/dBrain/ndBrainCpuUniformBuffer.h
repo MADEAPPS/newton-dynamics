@@ -8,36 +8,35 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
-#ifndef __ND_BRAIN_GPU_FLOAT_BUFFER_H__
-#define __ND_BRAIN_GPU_FLOAT_BUFFER_H__
+#ifndef __ND_BRAIN_CPU_UNIFORM_BUFFER_H__
+#define __ND_BRAIN_CPU_UNIFORM_BUFFER_H__
 
-#include "ndBrainStdafx.h"
-#include "ndBrainVector.h"
 #include "ndBrainBuffer.h"
 
-class ndBrainGpuFloatBuffer : public ndBrainBuffer
+class ndBrainCpuUniformBuffer : public ndBrainBuffer
 {
 	public:
-	ndBrainGpuFloatBuffer(ndBrainContext* const context, ndInt64 size);
-	ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainVector& input);
-	ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainMatrix& matrix);
+	ndBrainCpuUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes);
+	ndBrainCpuUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, const void* const data);
 
 	virtual void BrainVectorToDevice(const ndBrainVector& vector) override;
 	virtual void BrainVectorFromDevice(ndBrainVector& vector) const override;
 
-	virtual void MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputMemory) override;
+	virtual void MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData) override;
 	virtual void MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const override;
 
 	virtual void CopyBuffer(const ndBrainBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer) override;
-	virtual void CopyBufferIndirect(const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer) override;
-
-	ndBrainFloat* GetData();
+	virtual void CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer) override;
 
 	protected:
-	virtual void LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData) override;
+	virtual void LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const sourceData) override;
 	virtual void UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const outputData) const override;
 
-	ndBrainVector m_buffer;
+	ndFixSizeArray<ndUnsigned32, 256> m_data;
+
+	friend class ndBrainTrainerCpu;
+	friend class ndBrainCpuFloatBuffer;
+	friend class ndBrainTrainerCpuInference;
 };
 
 #endif

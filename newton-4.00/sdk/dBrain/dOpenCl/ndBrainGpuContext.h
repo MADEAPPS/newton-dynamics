@@ -42,12 +42,9 @@ class ndBrainGpuContext : public ndBrainContext
 	void CreateKerners();
 	void CreateCopyIndirectCommand();
 	size_t GetDeviceScore(cl::Device& device);
-	//void CopyBufferIndirect(ndBrainGpuFloatBuffer& dstBuffer, ndBrainGpuIntegerBuffer& indexBuffer, ndBrainGpuFloatBuffer& srcDataBuffer, ndInt32 srcStrideInBytes);
 
-	void CopyBufferIndirect(ndBrainGpuIntegerBuffer& indexBuffer,
-		ndBrainGpuFloatBuffer& dstBuffer, size_t dstOffsetInBytes, size_t dstStrideInBytes, 
-		ndBrainGpuFloatBuffer& srcData, size_t srcOffsetInBytes, size_t srcStrideInBytes);
-	void CopyBufferIndirect(ndBrainGpuIntegerBuffer& indexBuffer, ndBrainGpuFloatBuffer& dstBuffer, ndBrainGpuFloatBuffer& srcBuffer);
+	void CopyBuffer(ndBrainGpuUniformBuffer& parameterBuffer, ndInt32 workGroups, ndBrainGpuFloatBuffer& dstBuffer, ndBrainGpuFloatBuffer& srcBuffer);
+	void CopyBufferIndirect(ndBrainGpuUniformBuffer& parameterBuffer, ndBrainGpuIntegerBuffer& indexBuffer, ndBrainGpuFloatBuffer& dstBuffer, ndBrainGpuFloatBuffer& srcBuffer);
 
 	ndSharedPtr<ndBrainGpuShader> CreateKerner(const cl::Program& program, const char* const functionMame) const;
 	static void CL_CALLBACK clNotification(const char* errinfo, const void* private_info, size_t cb, void* user_data);
@@ -82,6 +79,7 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainGpuShader> m_brainAdamLassoOptimizerUpdate;
 
 	// other shaders
+	ndSharedPtr<ndBrainGpuShader> m_brainCopyBuffer;
 	ndSharedPtr<ndBrainGpuShader> m_brainCopyBufferIndirect;
 	
 	private:
@@ -90,8 +88,8 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<cl::CommandQueue> m_queue;
 	cl::Buffer m_emptyBuffer;
 
+	ndSharedPtr<ndBrainGpuCommand> m_copyBufferCommand;
 	ndSharedPtr<ndBrainGpuCommand> m_copyBufferIndirectCommand;
-	ndSharedPtr<ndBrainGpuUniformBuffer> m_copyBufferIndirectCommandParamBuffer;
 
 	static const char* m_feedForwardKernels_1;
 	static const char* m_feedForwardKernels_2;

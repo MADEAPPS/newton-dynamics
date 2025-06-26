@@ -44,10 +44,7 @@ void ndBrainCpuIntegerBuffer::BrainVectorFromDevice(ndBrainVector&) const
 
 void ndBrainCpuIntegerBuffer::MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData)
 {
-	ndAssert(sizeInBytes <= m_sizeInBytes);
-	size_t size = ndMin(sizeInBytes, m_sizeInBytes) / sizeof (ndUnsigned32);
-	ndInt64 offset = ndInt64(offsetInBytes / sizeof(ndUnsigned32));
-	ndMemCpy(&m_indexArray[offset], (ndUnsigned32*)inputData, ndInt64(size));
+	LoadData(offsetInBytes, sizeInBytes, inputData);
 }
 
 //void ndBrainCpuIntegerBuffer::MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
@@ -56,12 +53,12 @@ void ndBrainCpuIntegerBuffer::MemoryFromDevice(size_t, size_t, void* const) cons
 	ndAssert(0);
 }
 
-//void ndBrainCpuIntegerBuffer::LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const sourceData)
-void ndBrainCpuIntegerBuffer::LoadData(size_t, size_t, const void* const)
+void ndBrainCpuIntegerBuffer::LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const sourceData)
 {
-	ndAssert(0);
-	//ndBrainMemVector src((ndBrainFloat*)sourceData, ndInt32 (sizeInBytes / sizeof(ndReal)));
-	//m_buffer.Set(src);
+	ndAssert(sizeInBytes <= m_sizeInBytes);
+	size_t size = ndMin(sizeInBytes, m_sizeInBytes) / sizeof(ndUnsigned32);
+	ndInt64 offset = ndInt64(offsetInBytes / sizeof(ndUnsigned32));
+	ndMemCpy(&m_indexArray[offset], (ndUnsigned32*)sourceData, ndInt64(size));
 }
 
 //void ndBrainCpuIntegerBuffer::UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const outputData) const

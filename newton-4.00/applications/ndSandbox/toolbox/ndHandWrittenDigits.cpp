@@ -12,7 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndTestDeepBrain.h"
 
-//#define MINIST_USE_CPU_TRANNING
+#define MINIST_USE_CPU_TRANNING
  
 //#define MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
 
@@ -174,7 +174,7 @@ static void MnistTrainingSet()
 			}
 		}
 
-		ndInt32 ValidateData(ndBrainGpuUniformBuffer& parameters, ndBrainMatrix* const testLabels, const ndSharedPtr<ndBrainBuffer>& data)
+		ndInt32 ValidateData(ndSharedPtr<ndBrainBuffer>& parameters, ndBrainMatrix* const testLabels, const ndSharedPtr<ndBrainBuffer>& data)
 		{
 			ndBrainVector groundTruth;
 			ndBrainVector miniBatchInput;
@@ -193,16 +193,16 @@ static void MnistTrainingSet()
 			size_t size = inputSize * sizeof(ndReal);
 			ndBrainBuffer* const deviceMinibatchBuffer = m_trainer->GetInputBuffer();
 
-			ndCopyBufferCommandInfo copyBufferIndirect;
-			parameters.MemoryFromDevice(0, sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect);
+			ndCopyBufferCommandInfo copyBufferInfo;
+			parameters->MemoryFromDevice(0, sizeof(ndCopyBufferCommandInfo), &copyBufferInfo);
 
+			copyBufferInfo.m_srcOffsetInByte = 0;
 			for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
 			{
-				//deviceMinibatchBuffer->CopyBuffer(size_t(m_miniBatchSize), size, 0, size, **data, batchStart * size, size);
-				copyBufferIndirect.m_dstOffsetInByte = ndInt32 (batchStart * size);
-				parameters.MemoryToDevice(0, sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect);
+				copyBufferInfo.m_srcOffsetInByte = ndInt32 (batchStart * size);
+				parameters->MemoryToDevice(0, sizeof(ndCopyBufferCommandInfo), &copyBufferInfo);
+				deviceMinibatchBuffer->CopyBuffer(**parameters, m_miniBatchSize, **data);
 
-				//deviceMinibatchBuffer->CopyBuffer(parameters, size_t(m_miniBatchSize), **data, batchStart * size, size);
 				m_trainer->MakePrediction();
 				m_trainer->GetOutput(miniBatchOutput);
 
@@ -225,7 +225,6 @@ static void MnistTrainingSet()
 						}
 					}
 
-					maxProbIndex = 0;
 					ndAssert(maxProbIndex >= 0);
 					if (truth[maxProbIndex] == ndReal(0.0f))
 					{
@@ -276,13 +275,29 @@ static void MnistTrainingSet()
 			size_t strideInBytes = size_t(inputSize * sizeof(ndReal));
 			ndBrainBuffer* const deviceMinibatchBuffer = m_trainer->GetInputBuffer();
 
-			ndCopyBufferCommandInfo copyBufferIndirect;
-			copyBufferIndirect.m_dstOffsetInByte = 0;
-			copyBufferIndirect.m_srcOffsetInByte = 0;
-			copyBufferIndirect.m_strideInByte = ndInt32(strideInBytes);
-			copyBufferIndirect.m_srcStrideInByte = ndInt32(strideInBytes);
-			copyBufferIndirect.m_dstStrideInByte = ndInt32 (strideInBytes);
-			ndBrainGpuUniformBuffer parameterBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect);
+
+			ndCopyBufferCommandInfo copyBufferIndirect0;
+			copyBufferIndirect0.m_dstOffsetInByte = 0;
+			copyBufferIndirect0.m_srcOffsetInByte = 0;
+			copyBufferIndirect0.m_strideInByte = ndInt32(strideInBytes);
+			copyBufferIndirect0.m_srcStrideInByte = ndInt32(strideInBytes);
+			copyBufferIndirect0.m_dstStrideInByte = ndInt32(strideInBytes);
+
+			ndSharedPtr<ndBrainBuffer> parameterBuffer;
+			ndSharedPtr<ndBrainBuffer> parameterBufferIndirect;
+			if (m_trainer->GetContext()->GetAsGpuContext())
+			{
+				parameterBuffer = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect0));
+				parameterBufferIndirect = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect0));
+			}
+			else
+			{
+				parameterBuffer = ndSharedPtr<ndBrainBuffer>(new ndBrainCpuUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect0));
+				parameterBufferIndirect = ndSharedPtr<ndBrainBuffer>(new ndBrainCpuUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect0));
+			}
+
+			ndCopyBufferCommandInfo copyBufferInfo;
+			parameterBufferIndirect->MemoryFromDevice(0, sizeof(ndCopyBufferCommandInfo), &copyBufferInfo);
 
 			for (ndInt32 epoch = 0; epoch < MINIST_NUMBER_OF_EPOCHS; ++epoch)
 			{
@@ -290,7 +305,7 @@ static void MnistTrainingSet()
 				for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
 				{
 					m_indirectMiniBatch->MemoryToDevice(0, m_miniBatchSize * sizeof(ndUnsigned32), &shuffleBuffer[batchStart]);
-					deviceMinibatchBuffer->CopyBufferIndirect(parameterBuffer, **m_indirectMiniBatch, **m_trainingData);
+					deviceMinibatchBuffer->CopyBufferIndirect(**parameterBufferIndirect, **m_indirectMiniBatch, **m_trainingData);
 					
 					trainer->MakePrediction();
 					trainer->SyncQueue();
@@ -458,13 +473,23 @@ static void MnistTrainingSet()
 		ndBrainSave::Save(*optimizer.m_bestBrain, path);
 		
 		size_t strideInBytes = size_t(brain->GetInputSize() * sizeof(ndReal));
-		ndCopyBufferCommandInfo copyBufferIndirect;
-		copyBufferIndirect.m_dstOffsetInByte = 0;
-		copyBufferIndirect.m_srcOffsetInByte = 0;
-		copyBufferIndirect.m_strideInByte = ndInt32(strideInBytes);
-		copyBufferIndirect.m_srcStrideInByte = ndInt32(strideInBytes);
-		copyBufferIndirect.m_dstStrideInByte = ndInt32(strideInBytes);
-		ndBrainGpuUniformBuffer parameterBuffer(*context, sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect);
+
+		ndCopyBufferCommandInfo copyBufferInfo;
+		copyBufferInfo.m_dstOffsetInByte = 0;
+		copyBufferInfo.m_srcOffsetInByte = 0;
+		copyBufferInfo.m_strideInByte = ndInt32(strideInBytes);
+		copyBufferInfo.m_srcStrideInByte = ndInt32(strideInBytes);
+		copyBufferInfo.m_dstStrideInByte = ndInt32(strideInBytes);
+
+		ndSharedPtr<ndBrainBuffer> parameterBuffer;
+		if (context->GetAsGpuContext())
+		{
+			parameterBuffer = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuUniformBuffer(*context, sizeof(ndCopyBufferCommandInfo), &copyBufferInfo));
+		}
+		else
+		{
+			parameterBuffer = ndSharedPtr<ndBrainBuffer>(new ndBrainCpuUniformBuffer(*context, sizeof(ndCopyBufferCommandInfo), &copyBufferInfo));
+		}
 
 		SupervisedTrainer inference(context, optimizer.m_bestBrain);
 		ndInt32 testFailCount = inference.ValidateData(parameterBuffer, *testLabels, optimizer.m_testData);

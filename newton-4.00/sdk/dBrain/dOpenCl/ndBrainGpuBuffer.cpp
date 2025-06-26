@@ -62,30 +62,23 @@ void ndBrainGpuBuffer::LoadData(size_t offsetInBytes, size_t sizeInBytes, const 
 void ndBrainGpuBuffer::UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const destinationData) const
 {
 	cl_int error = 0;
-	//ndAssert(sizeInBytes == m_sizeInBytes);
 	ndAssert(m_context->GetAsGpuContext());
 	ndSharedPtr<cl::CommandQueue>& queue = m_context->GetAsGpuContext()->m_queue;
 	error = queue->enqueueReadBuffer(m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, destinationData);
 	ndAssert(error == CL_SUCCESS);
 }
 
-//void ndBrainGpuBuffer::CopyBuffer(const ndBrainBuffer& source, size_t srcOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes)
 void ndBrainGpuBuffer::CopyBuffer(const ndBrainBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer)
 {
 	ndAssert(m_context->GetAsGpuContext());
-	ndAssert(0);
-	//const ndBrainGpuBuffer& srcBuffer = *((ndBrainGpuBuffer*)&source);
-	//
-	//size_t srcOffset = srcOffsetInBytes;
-	//size_t dstOffset = dstOffsetInBytes;
-	//ndAssert(sizeInBytes <= m_sizeInBytes);
-	//ndAssert((dstOffset + sizeInBytes) <= m_sizeInBytes);
-	//ndAssert((srcOffset + sizeInBytes) <= source.SizeInBytes());
-	//
-	//cl_int error = 0;
-	//ndSharedPtr<cl::CommandQueue>& queue = m_context->GetAsGpuContext()->m_queue;
-	//error = queue->enqueueCopyBuffer(srcBuffer.m_buffer, m_buffer, srcOffset, dstOffset, sizeInBytes, nullptr, nullptr);
-	//ndAssert(error == CL_SUCCESS);
+	ndBrainGpuContext* const context = m_context->GetAsGpuContext();
+	ndAssert(context);
+
+	ndBrainGpuFloatBuffer& dst = *(ndBrainGpuFloatBuffer*)this;
+	ndBrainGpuFloatBuffer& src = *(ndBrainGpuFloatBuffer*)&srcBuffer;
+	ndBrainGpuUniformBuffer& uniforms = *(ndBrainGpuUniformBuffer*)&parameterBuffer;
+
+	context->CopyBuffer(uniforms, workGroupCount, dst, src);
 }
 
 void ndBrainGpuBuffer::CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer)
@@ -96,5 +89,7 @@ void ndBrainGpuBuffer::CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, 
 	ndBrainGpuFloatBuffer& dst = *(ndBrainGpuFloatBuffer*)this;
 	ndBrainGpuFloatBuffer& src = *(ndBrainGpuFloatBuffer*)&srcBuffer;
 	ndBrainGpuIntegerBuffer& index = *(ndBrainGpuIntegerBuffer*)&indexBuffer;
-	context->CopyBufferIndirect(index, dst, src);
+	ndBrainGpuUniformBuffer& uniforms = *(ndBrainGpuUniformBuffer*)&parameterBuffer;
+
+	context->CopyBufferIndirect(uniforms, index, dst, src);
 }
