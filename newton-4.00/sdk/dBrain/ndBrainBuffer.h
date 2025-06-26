@@ -31,7 +31,7 @@ class ndBrainBuffer : public ndClassAlloc
 	public:
 	virtual ~ndBrainBuffer();
 
-	size_t SizeInBytes() const { return m_sizeInBytes; }
+	size_t SizeInBytes() const;
 
 	virtual void BrainVectorToDevice(const ndBrainVector& vector) = 0;
 	virtual void BrainVectorFromDevice(ndBrainVector& vector) const = 0;

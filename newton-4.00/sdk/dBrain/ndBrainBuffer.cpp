@@ -21,3 +21,8 @@ ndBrainBuffer::ndBrainBuffer(ndBrainContext* const context, ndInt64 sizeInByte, 
 ndBrainBuffer::~ndBrainBuffer()
 {
 }
+
+size_t ndBrainBuffer::SizeInBytes() const
+{ 
+	return m_sizeInBytes; 
+}
