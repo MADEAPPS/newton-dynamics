@@ -42,12 +42,6 @@ void ndBrainGpuUniformBuffer::BrainVectorFromDevice(ndBrainVector&) const
 	ndAssert(0);
 }
 
-//void ndBrainGpuUniformBuffer::BrainMatrixToDevice(const ndBrainMatrix* const matrix)
-void ndBrainGpuUniformBuffer::BrainMatrixToDevice(const ndBrainMatrix* const)
-{
-	ndAssert(0);
-}
-
 void ndBrainGpuUniformBuffer::MemoryToDevive(size_t offsetInBytes, size_t sizeInBytes, const void* const inputMemory)
 {
 	const char* const ptr = &((char*)inputMemory)[offsetInBytes];

@@ -30,6 +30,14 @@ ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, cons
 ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainMatrix& matrix)
 	:ndBrainGpuBuffer(context, matrix.GetColumns() * matrix.GetRows() * ndInt64(sizeof(ndReal)), ndStorageData)
 {
+	ndBrainVector flatArray;
 	ndAssert(m_context->GetAsGpuContext());
-	BrainMatrixToDevice(&matrix);
+	for (ndInt32 i = 0; i < matrix.GetRows(); i++)
+	{
+		for (ndInt32 j = 0; j < matrix.GetColumns(); j++)
+		{
+			flatArray.PushBack(matrix[i][j]);
+		}
+	}
+	BrainVectorToDevice(flatArray);
 }

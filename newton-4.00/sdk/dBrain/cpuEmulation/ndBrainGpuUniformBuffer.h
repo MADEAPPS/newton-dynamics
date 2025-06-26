@@ -24,8 +24,6 @@ class ndBrainGpuUniformBuffer : public ndBrainBuffer
 	virtual void BrainVectorToDevice(const ndBrainVector& vector) override;
 	virtual void BrainVectorFromDevice(ndBrainVector& vector) const override;
 
-	virtual void BrainMatrixToDevice(const ndBrainMatrix* const matrix) override;
-
 	virtual void MemoryToDevive(size_t offsetInBytes, size_t sizeInBytes, const void* const inputMemory) override;
 	virtual void MemoryFromDevive(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const override;
 

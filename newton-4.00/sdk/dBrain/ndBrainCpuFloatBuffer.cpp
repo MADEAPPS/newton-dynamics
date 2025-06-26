@@ -35,9 +35,17 @@ ndBrainCpuFloatBuffer::ndBrainCpuFloatBuffer(ndBrainContext* const context, cons
 ndBrainCpuFloatBuffer::ndBrainCpuFloatBuffer(ndBrainContext* const context, const ndBrainMatrix& matrix)
 	:ndBrainBuffer(context, matrix.GetColumns() * matrix.GetRows() * ndInt32(sizeof(ndReal)), ndStorageData)
 {
+	ndBrainVector flatArray;
 	ndAssert(m_context->GetAsCpuContext());
 	m_buffer.SetCount(matrix.GetColumns() * matrix.GetRows());
-	BrainMatrixToDevice(&matrix);
+	for (ndInt32 i = 0; i < matrix.GetRows(); i++)
+	{
+		for (ndInt32 j = 0; j < matrix.GetColumns(); j++)
+		{
+			flatArray.PushBack(matrix[i][j]);
+		}
+	}
+	BrainVectorToDevice(flatArray);
 }
 
 void ndBrainCpuFloatBuffer::BrainVectorToDevice(const ndBrainVector& vector)
@@ -51,19 +59,6 @@ void ndBrainCpuFloatBuffer::BrainVectorToDevice(const ndBrainVector& vector)
 void ndBrainCpuFloatBuffer::BrainVectorFromDevice(ndBrainVector&) const
 {
 	ndAssert(0);
-}
-
-void ndBrainCpuFloatBuffer::BrainMatrixToDevice(const ndBrainMatrix* const matrix)
-{
-	ndBrainVector flatArray;
-	for (ndInt32 i = 0; i < matrix->GetRows(); i++)
-	{
-		for (ndInt32 j = 0; j < matrix->GetColumns(); j++)
-		{
-			flatArray.PushBack((*matrix)[i][j]);
-		}
-	}
-	BrainVectorToDevice(flatArray);
 }
 
 //void ndBrainCpuFloatBuffer::MemoryToDevive(size_t sizeInBytes, const void* const inputData)

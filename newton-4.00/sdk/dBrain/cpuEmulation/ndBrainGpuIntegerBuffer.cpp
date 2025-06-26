@@ -42,19 +42,6 @@ void ndBrainGpuIntegerBuffer::BrainVectorFromDevice(ndBrainVector&) const
 	ndAssert(0);
 }
 
-void ndBrainGpuIntegerBuffer::BrainMatrixToDevice(const ndBrainMatrix* const matrix)
-{
-	ndBrainVector flatArray;
-	for (ndInt32 i = 0; i < matrix->GetRows(); i++)
-	{
-		for (ndInt32 j = 0; j < matrix->GetColumns(); j++)
-		{
-			flatArray.PushBack((*matrix)[i][j]);
-		}
-	}
-	BrainVectorToDevice(flatArray);
-}
-
 void ndBrainGpuIntegerBuffer::MemoryToDevive(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData)
 {
 	LoadData(offsetInBytes, sizeInBytes, inputData);

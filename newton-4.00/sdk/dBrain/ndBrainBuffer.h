@@ -36,8 +36,6 @@ class ndBrainBuffer : public ndClassAlloc
 	virtual void BrainVectorToDevice(const ndBrainVector& vector) = 0;
 	virtual void BrainVectorFromDevice(ndBrainVector& vector) const = 0;
 
-	virtual void BrainMatrixToDevice(const ndBrainMatrix* const matrix) = 0;
-
 	virtual void MemoryToDevive(size_t offsetInBytes, size_t sizeInBytes, const void* const inputMemory) = 0;
 	virtual void MemoryFromDevive(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const = 0;
 

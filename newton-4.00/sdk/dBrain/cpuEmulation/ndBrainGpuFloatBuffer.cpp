@@ -34,33 +34,18 @@ ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, cons
 ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainMatrix& matrix)
 	:ndBrainBuffer(context, matrix.GetColumns()* matrix.GetRows()* ndInt32(sizeof(ndReal)), ndStorageData)
 {
+	ndBrainVector flatArray;
 	ndAssert(m_context->GetAsGpuContext());
 	m_buffer.SetCount(matrix.GetColumns() * matrix.GetRows());
-	BrainMatrixToDevice(&matrix);
+	for (ndInt32 i = 0; i < matrix.GetRows(); i++)
+	{
+		for (ndInt32 j = 0; j < matrix.GetColumns(); j++)
+		{
+			flatArray.PushBack(matrix[i][j]);
+		}
+	}
+	BrainVectorToDevice(flatArray);
 }
-
-#if 0
-ndBrainGpuFloatBuffer* ndBrainGpuFloatBuffer::GetAsFloatBuffer()
-{
-	return this;
-}
-
-void ndBrainGpuFloatBuffer::LoadData(size_t sizeInByte, const void* const sourceData)
-{
-	ndInt64 size = ndInt64(sizeInByte / sizeof(ndBrainFloat));
-	m_buffer.SetCount(size);
-	const ndBrainMemVector src((ndBrainFloat*)sourceData, size);
-	m_buffer.Set(src);
-}
-
-void ndBrainGpuFloatBuffer::UnloadData(size_t sizeInByte, void* const dstData) const
-{
-	ndInt64 size = ndInt64(sizeInByte / sizeof(ndBrainFloat));
-	ndBrainMemVector dst((ndBrainFloat*)dstData, size);
-	dst.Set(m_buffer);
-}
-
-#endif
 
 ndBrainFloat* ndBrainGpuFloatBuffer::GetData()
 {
@@ -73,23 +58,10 @@ void ndBrainGpuFloatBuffer::BrainVectorToDevice(const ndBrainVector& vector)
 	LoadData(0, vector.GetCount() * sizeof(ndReal), &vector[0]);
 }
 
-void ndBrainGpuFloatBuffer::BrainVectorFromDevice(ndBrainVector& ouput) const
+void ndBrainGpuFloatBuffer::BrainVectorFromDevice(ndBrainVector& output) const
 {
-	ouput.SetCount(m_buffer.GetCount());
-	UnloadData(0, ouput.GetCount() * sizeof(ndReal), &ouput[0]);
-}
-
-void ndBrainGpuFloatBuffer::BrainMatrixToDevice(const ndBrainMatrix* const matrix)
-{
-	ndBrainVector flatArray;
-	for (ndInt32 i = 0; i < matrix->GetRows(); i++)
-	{
-		for (ndInt32 j = 0; j < matrix->GetColumns(); j++)
-		{
-			flatArray.PushBack((*matrix)[i][j]);
-		}
-	}
-	BrainVectorToDevice(flatArray);
+	output.SetCount(m_buffer.GetCount());
+	UnloadData(0, output.GetCount() * sizeof(ndReal), &output[0]);
 }
 
 void ndBrainGpuFloatBuffer::MemoryToDevive(size_t offsetInBytes, size_t sizeInBytes, const void* const inputMemory)

@@ -48,49 +48,6 @@ void ndBrainGpuBuffer::BrainVectorToDevice(const ndBrainVector& vector)
 	LoadData(0, vector.GetCount() * sizeof(ndReal), &vector[0]);
 }
 
-void ndBrainGpuBuffer::BrainMatrixToDevice(const ndBrainMatrix* const matrix)
-{
-	ndAssert(m_context->GetAsGpuContext());
-
-#if 0
-	std::array<size_t, 2> region;
-	std::array<size_t, 2> host_offset;
-	std::array<size_t, 2> buffer_offset;
-		
-	host_offset[0] = 0;
-	host_offset[1] = 0;
-	buffer_offset[0] = 0;
-	buffer_offset[1] = 0;
-	region[1] = size_t(matrix->GetRows());
-	region[0] = size_t(matrix->GetColumns() * sizeof(ndReal));
-	
-	cl_int error = 0;
-	ndSharedPtr<cl::CommandQueue>& queue = m_context->GetAsGpuContext()->m_queue;
-	error = queue->enqueueWriteBufferRect(
-		m_buffer, CL_TRUE,
-		buffer_offset, host_offset, region,
-		matrix->GetColumns() * sizeof(ndReal), 0,
-		matrix->GetColumns() * sizeof(ndReal), 0,
-		&matrix[0][0]);
-	ndAssert(error == CL_SUCCESS);
-#else
-
-	ndBrainVector flatArray;
-	for (ndInt32 i = 0; i < matrix->GetRows(); i ++)
-	{
-		for (ndInt32 j = 0; j < matrix->GetColumns(); j++)
-		{
-			flatArray.PushBack((*matrix)[i][j]);
-		}
-	}
-	BrainVectorToDevice(flatArray);
-#endif
-
-	//ndBrainVector xxx0;
-	//BrainVectorFromDevice(xxx0);
-	//error *= 1;
-}
-
 void ndBrainGpuBuffer::LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const sourceData)
 {
 	ndAssert(m_context->GetAsGpuContext());
