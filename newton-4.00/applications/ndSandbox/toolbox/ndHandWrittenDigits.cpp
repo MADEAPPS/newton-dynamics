@@ -194,30 +194,31 @@ static void MnistTrainingSet()
 			ndBrainBuffer* const deviceMinibatchBuffer = m_trainer->GetInputBuffer();
 			for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
 			{
-				ndAssert(0);
+				//ndAssert(0);
 				//deviceMinibatchBuffer->CopyBuffer(size_t(m_miniBatchSize), size, 0, size, **data, batchStart * size, size);
 				m_trainer->MakePrediction();
-				m_trainer->GetOutput(miniBatchOutput);
+				//m_trainer->GetOutput(miniBatchOutput);
 
 				for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
 				{
 					ndBrainMemVector truth(&groundTruth[i * outputSize], outputSize);
-					const ndBrainMemVector output(&miniBatchOutput[i * outputSize], outputSize);
+					//const ndBrainMemVector output(&miniBatchOutput[i * outputSize], outputSize);
 
 					truth.SetCount(outputSize);
 					truth.Set((*testLabels)[batchStart + i]);
 
 					ndInt32 maxProbIndex = -1;
 					ndBrainFloat maxProbability = ndBrainFloat(-1.0f);
-					for (ndInt32 j = 0; j < output.GetCount(); j++)
-					{
-						if (output[j] > maxProbability)
-						{
-							maxProbIndex = j;
-							maxProbability = output[j];
-						}
-					}
+					//for (ndInt32 j = 0; j < output.GetCount(); j++)
+					//{
+					//	if (output[j] > maxProbability)
+					//	{
+					//		maxProbIndex = j;
+					//		maxProbability = output[j];
+					//	}
+					//}
 
+					maxProbIndex = 0;
 					ndAssert(maxProbIndex >= 0);
 					if (truth[maxProbIndex] == ndReal(0.0f))
 					{
@@ -272,7 +273,7 @@ static void MnistTrainingSet()
 				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
 				for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
 				{
-					ndAssert(0);
+					//ndAssert(0);
 					//m_indirectMiniBatch->MemoryToDevive(0, m_miniBatchSize * sizeof(ndUnsigned32), &shuffleBuffer[batchStart]);
 					//deviceMinibatchBuffer->CopyBufferIndirect(**m_indirectMiniBatch, strideInBytes, 0, strideInBytes, **m_trainingData, 0, strideInBytes);
 					
@@ -280,7 +281,7 @@ static void MnistTrainingSet()
 					trainer->SyncQueue();
 					
 					//calculate loss
-					trainer->GetOutput(miniBatchOutput);
+					//trainer->GetOutput(miniBatchOutput);
 					for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
 					{
 						ndUnsigned32 index = shuffleBuffer[batchStart + i];
@@ -551,6 +552,6 @@ static void MnistTestSet()
 void ndHandWrittenDigits()
 {
 	ndSetRandSeed(53);
-	//MnistTrainingSet();
+	MnistTrainingSet();
 	//MnistTestSet();
 }
