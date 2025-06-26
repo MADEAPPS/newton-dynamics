@@ -14,6 +14,7 @@
 #include "ndBrainMatrix.h"
 #include "ndBrainGpuContext.h"
 #include "ndBrainGpuFloatBuffer.h"
+#include "ndBrainGpuUniformBuffer.h"
 #include "ndBrainGpuIntegerBuffer.h"
 
 ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, ndInt64 size)
@@ -109,23 +110,27 @@ void ndBrainGpuFloatBuffer::CopyBuffer(const ndBrainBuffer& srcBuffer, size_t sr
 	dst.Set(src);
 }
 
-void ndBrainGpuFloatBuffer::CopyBufferIndirectSource(const ndBrainBuffer& indexBuffer, size_t dstOffsetInBytes, size_t dstStrideInBytes, const ndBrainBuffer& srcData, size_t srcOffsetInBytes, size_t srcStrideInBytes)
+void ndBrainGpuFloatBuffer::CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcData)
 {
 	const ndBrainGpuFloatBuffer& srcBuffer = *((ndBrainGpuFloatBuffer*)&srcData);
 	const ndBrainGpuIntegerBuffer& indirectArray = *((ndBrainGpuIntegerBuffer*)&indexBuffer);
+	const ndBrainGpuUniformBuffer& uniforms = *(ndBrainGpuUniformBuffer*)&parameterBuffer;
+	const ndCopyBufferCommandInfo& data = *((ndCopyBufferCommandInfo*)&uniforms.m_data[0]);
 
-	ndInt32 srcStride = ndInt32(srcStrideInBytes / sizeof(ndReal));
-	ndInt32 srcOffset = ndInt32(srcOffsetInBytes / sizeof(ndReal));
-	ndInt32 dstStride = ndInt32(dstStrideInBytes / sizeof(ndReal));
-	ndInt32 dstOffset = ndInt32(dstOffsetInBytes / sizeof(ndReal));
+	ndInt32 stride = ndInt32(data.m_strideInByte / sizeof(ndReal));
+	ndInt32 srcStride = ndInt32(data.m_srcStrideInByte / sizeof(ndReal));
+	ndInt32 srcOffset = ndInt32(data.m_srcOffsetInByte / sizeof(ndReal));
+	ndInt32 dstStride = ndInt32(data.m_dstStrideInByte / sizeof(ndReal));
+	ndInt32 dstOffset = ndInt32(data.m_dstOffsetInByte / sizeof(ndReal));
 	ndInt32 count = ndInt32(indirectArray.SizeInBytes() / sizeof(ndUnsigned32));
-
-	ndAssert(dstStride <= srcStride);
+	
+	ndAssert(stride <= srcStride);
+	ndAssert(stride <= dstStride);
 	for (ndInt32 i = 0; i < count; ++i)
 	{
 		ndUnsigned32 index = indirectArray.m_indexArray[i];
-		const ndBrainMemVector src(&srcBuffer.m_buffer[index * srcStride + srcOffset], dstStride);
-		ndBrainMemVector dst(&m_buffer[i * dstStride + dstOffset], dstStride);
+		const ndBrainMemVector src(&srcBuffer.m_buffer[index * srcStride + srcOffset], stride);
+		ndBrainMemVector dst(&m_buffer[i * dstStride + dstOffset], stride);
 		dst.Set(src);
 	}
 }

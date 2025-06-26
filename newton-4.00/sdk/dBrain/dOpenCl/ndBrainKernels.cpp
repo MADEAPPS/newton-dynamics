@@ -48,6 +48,14 @@ R""""(
 		uint m_minibatchSize;
     } UniformBufferOptimizerArguments;
 
+    typedef struct 
+    {
+	    uint m_strideInByte;
+	    uint m_srcStrideInByte;
+	    uint m_srcOffsetInByte;
+	    uint m_dstStrideInByte;
+	    uint m_dstOffsetInByte;
+    } CopyBufferCommandInfo;
 
     uint CalculateWorkGroupRoundoff(uint value, uint workgroupSize) 
     {
@@ -864,7 +872,7 @@ const char* ndBrainGpuContext::m_otherShaderFunctions =
 R""""(
 
     __kernel void brainCopyBufferIndirect(
-        __global const UniformBufferLayerArguments* parameters,
+        __global const CopyBufferCommandInfo* parameters,
         __global uint* indexBuffer, __global float* inputData, __global float* outputData)
     {                                                                      
         uint itemId = get_local_id(0);
@@ -873,11 +881,17 @@ R""""(
         
         //uint srcStride = parameters->m_inputSize;
         //if ((groupId == 0 && ) printf ("%d: %d \n", groupId, stride);
-     
-        uint dstOffset = groupId * parameters->m_parametersBatchSize + parameters->m_parametersStartOffset;
-        uint srcOffset = indexBuffer[groupId] * parameters->m_inputSize + parameters->m_inputOutputStartOffset;
+	    //ndInt32 m_strideInByte;
+	    //ndInt32 m_srcStrideInByte;
+	    //ndInt32 m_srcOffsetInByte;
+	    //ndInt32 m_dstStrideInByte;
+	    //ndInt32 m_dstOffsetInByte;
+        //} CopyBufferCommandInfo;
+
+        uint dstOffset = (groupId * parameters->m_dstStrideInByte + parameters->m_dstOffsetInByte) / sizeof (uint);
+        uint srcOffset = (indexBuffer[groupId] * parameters->m_srcStrideInByte + parameters->m_srcOffsetInByte) / sizeof (uint);
         
-        uint dstStride = parameters->m_parametersBatchSize;
+        uint dstStride = parameters->m_strideInByte / sizeof (uint);
         uint workGroupSizeReminder = dstStride % workGroupSize;
         uint modWorkGroupSize = dstStride - workGroupSizeReminder;
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)

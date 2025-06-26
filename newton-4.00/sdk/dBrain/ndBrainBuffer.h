@@ -23,6 +23,25 @@ class ndBrainVector;
 class ndBrainMatrix;
 class ndBrainContext;
 
+class ndCopyBufferCommandInfo
+{
+	public:
+	ndCopyBufferCommandInfo()
+		:m_strideInByte(0)
+		,m_srcStrideInByte(0)
+		,m_srcOffsetInByte(0)
+		,m_dstStrideInByte(0)
+		,m_dstOffsetInByte(0)
+	{
+	}
+
+	ndInt32 m_strideInByte;
+	ndInt32 m_srcStrideInByte;
+	ndInt32 m_srcOffsetInByte;
+	ndInt32 m_dstStrideInByte;
+	ndInt32 m_dstOffsetInByte;
+};
+
 class ndBrainBuffer : public ndClassAlloc
 {
 	protected:
@@ -40,9 +59,7 @@ class ndBrainBuffer : public ndClassAlloc
 	virtual void MemoryFromDevive(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const = 0;
 
 	virtual void CopyBuffer(const ndBrainBuffer& srcBuffer, size_t sourceOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes) = 0;
-
 	virtual void CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer) = 0;
-	virtual void CopyBufferIndirectSource(const ndBrainBuffer& indexBuffer, size_t dstOffsetInBytes, size_t dstStrideInBytes, const ndBrainBuffer& srcData, size_t srcOffsetInBytes, size_t srcStrideInBytes) = 0;
 
 	protected:
 	virtual void LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData) = 0;

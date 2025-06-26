@@ -202,13 +202,13 @@ static void MnistTrainingSet()
 				for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
 				{
 					ndBrainMemVector truth(&groundTruth[i * outputSize], outputSize);
-					//const ndBrainMemVector output(&miniBatchOutput[i * outputSize], outputSize);
-
 					truth.SetCount(outputSize);
 					truth.Set((*testLabels)[batchStart + i]);
 
 					ndInt32 maxProbIndex = -1;
 					ndBrainFloat maxProbability = ndBrainFloat(-1.0f);
+
+					//const ndBrainMemVector output(&miniBatchOutput[i * outputSize], outputSize);
 					//for (ndInt32 j = 0; j < output.GetCount(); j++)
 					//{
 					//	if (output[j] > maxProbability)
@@ -268,19 +268,28 @@ static void MnistTrainingSet()
 
 			size_t strideInBytes = size_t(inputSize * sizeof(ndReal));
 			ndBrainBuffer* const deviceMinibatchBuffer = m_trainer->GetInputBuffer();
+
+			ndCopyBufferCommandInfo copyBufferIndirect;
+			copyBufferIndirect.m_dstOffsetInByte = 0;
+			copyBufferIndirect.m_srcOffsetInByte = 0;
+			copyBufferIndirect.m_strideInByte = ndInt32(strideInBytes);
+			copyBufferIndirect.m_srcStrideInByte = ndInt32(strideInBytes);
+			copyBufferIndirect.m_dstStrideInByte = ndInt32 (strideInBytes);
+			ndBrainGpuUniformBuffer parameterBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect);
+
 			for (ndInt32 epoch = 0; epoch < MINIST_NUMBER_OF_EPOCHS; ++epoch)
 			{
 				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
 				for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
 				{
 					m_indirectMiniBatch->MemoryToDevive(0, m_miniBatchSize * sizeof(ndUnsigned32), &shuffleBuffer[batchStart]);
-					//deviceMinibatchBuffer->CopyBufferIndirect(**m_indirectMiniBatch, strideInBytes, 0, strideInBytes, **m_trainingData, 0, strideInBytes);
+					deviceMinibatchBuffer->CopyBufferIndirect(parameterBuffer, **m_indirectMiniBatch, **m_trainingData);
 					
 					trainer->MakePrediction();
 					trainer->SyncQueue();
 					
 					//calculate loss
-					//trainer->GetOutput(miniBatchOutput);
+					trainer->GetOutput(miniBatchOutput);
 					for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
 					{
 						ndUnsigned32 index = shuffleBuffer[batchStart + i];

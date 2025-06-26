@@ -153,7 +153,33 @@ void ndBrainGpuContext::CreateCopyIndirectCommand()
 	m_copyBufferIndirectCommandParamBuffer = ndSharedPtr<ndBrainGpuUniformBuffer>(new ndBrainGpuUniformBuffer(this, sizeof(ndBrainLayer::ndCommandShareInfo)));
 }
 
-void ndBrainGpuContext::CopyBufferIndirectSource(ndBrainGpuIntegerBuffer& indexBuffer,
+#if 0
+void ndBrainGpuContext::CopyBuffer(
+	size_t minibatchSize, size_t strideInBytes,
+	ndBrainGpuFloatBuffer& dstBuffer, size_t dstOffsetInBytes, size_t dstStrideInBytes,
+	ndBrainGpuFloatBuffer& srcData, size_t srcOffsetInBytes, size_t srcStrideInBytes)
+{
+	ndBrainLayer::ndCommandShareInfo uniformParam;
+	uniformParam.m_outputSize = ndInt32(strideInBytes / sizeof(ndReal));
+	uniformParam.m_inputSize = ndInt32(srcStrideInBytes / sizeof(ndReal));
+	uniformParam.m_inputOutputStartOffset = ndInt32(srcOffsetInBytes / sizeof(ndReal));
+
+	uniformParam.m_parametersBatchSize = ndInt32(dstStrideInBytes / sizeof(ndReal));
+	uniformParam.m_parametersStartOffset = ndInt32(dstOffsetInBytes / sizeof(ndReal));
+
+	m_copyBufferCommandParamBuffer->MemoryToDevive(0, sizeof(ndBrainLayer::ndCommandShareInfo), &uniformParam);
+
+	ndFixSizeArray<ndBrainBuffer*, 8> params;
+	params.PushBack(*m_copyBufferCommandParamBuffer);
+	params.PushBack(&srcData);
+	params.PushBack(&dstBuffer);
+
+	m_copyBufferCommand->Assembly(m_brainCopyBuffer, ndInt32(minibatchSize), params.GetCount(), &params[0]);
+	AddCommandQueue(m_copyBufferCommand);
+}
+#endif
+
+void ndBrainGpuContext::CopyBufferIndirect(ndBrainGpuIntegerBuffer& indexBuffer,
 	ndBrainGpuFloatBuffer& dstBuffer, size_t dstOffsetInBytes, size_t dstStrideInBytes,
 	ndBrainGpuFloatBuffer& srcData, size_t srcOffsetInBytes, size_t srcStrideInBytes)
 {
@@ -172,6 +198,27 @@ void ndBrainGpuContext::CopyBufferIndirectSource(ndBrainGpuIntegerBuffer& indexB
 	params.PushBack(&srcData);
 	params.PushBack(&dstBuffer);
 	ndInt32 minibatchSize = ndInt32 (indexBuffer.SizeInBytes() / sizeof (ndUnsigned32));
+
+	m_copyBufferIndirectCommand->Assembly(m_brainCopyBufferIndirect, minibatchSize, params.GetCount(), &params[0]);
+	AddCommandQueue(m_copyBufferIndirectCommand);
+}
+
+void ndBrainGpuContext::CopyBufferIndirect(ndBrainGpuIntegerBuffer& indexBuffer, ndBrainGpuFloatBuffer& dstBuffer, ndBrainGpuFloatBuffer& srcBuffer)
+{
+	ndCopyBufferCommandInfo uniformParam;
+	//uniformParam.m_inputSize = ndInt32(srcStrideInBytes / sizeof(ndReal));
+	//uniformParam.m_inputOutputStartOffset = ndInt32(srcOffsetInBytes / sizeof(ndReal));
+	//uniformParam.m_parametersBatchSize = ndInt32(dstStrideInBytes / sizeof(ndReal));
+	//uniformParam.m_parametersStartOffset = ndInt32(dstOffsetInBytes / sizeof(ndReal));
+
+	m_copyBufferIndirectCommandParamBuffer->MemoryToDevive(0, sizeof(ndBrainLayer::ndCommandShareInfo), &uniformParam);
+
+	ndFixSizeArray<ndBrainBuffer*, 8> params;
+	params.PushBack(*m_copyBufferIndirectCommandParamBuffer);
+	params.PushBack(&indexBuffer);
+	params.PushBack(&srcBuffer);
+	params.PushBack(&dstBuffer);
+	ndInt32 minibatchSize = ndInt32(indexBuffer.SizeInBytes() / sizeof(ndUnsigned32));
 
 	m_copyBufferIndirectCommand->Assembly(m_brainCopyBufferIndirect, minibatchSize, params.GetCount(), &params[0]);
 	AddCommandQueue(m_copyBufferIndirectCommand);

@@ -842,9 +842,9 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 
 		m_minibatchIndexBuffer->MemoryToDevive(0, m_parameters.m_miniBatchSize * sizeof(ndUnsigned32), &nextOvervationIndices[0]);
 		ndBrainBuffer* const deviceMinibatchBuffer = m_policyTrainer->GetInputBuffer();
-		deviceMinibatchBuffer->CopyBufferIndirectSource(**m_minibatchIndexBuffer, 0, inputSizeInBytes, **m_replayBufferFlat, nextObservationOffsetInBytes, flatInputSizeInBytes);
+		ndAssert(0);
+		//deviceMinibatchBuffer->CopyBufferIndirect(**m_minibatchIndexBuffer, 0, inputSizeInBytes, **m_replayBufferFlat, nextObservationOffsetInBytes, flatInputSizeInBytes);
 		m_policyTrainer->MakePrediction();
-
 
 		ndBrainVector nextObsevationsBatch___;
 		m_policyTrainer->GetInputBuffer()->BrainVectorFromDevice(nextObsevationsBatch___);

@@ -97,28 +97,30 @@ void ndBrainCpuFloatBuffer::CopyBuffer(const ndBrainBuffer& sourceData, size_t s
 	dst.Set(src);
 }
 
-void ndBrainCpuFloatBuffer::CopyBufferIndirectSource(const ndBrainBuffer& indexBuffer, size_t dstOffsetInBytes, size_t dstStrideInBytes, const ndBrainBuffer& srcData, size_t srcOffsetInBytes, size_t srcStrideInBytes)
-{
-	const ndBrainCpuFloatBuffer& srcBuffer = *((ndBrainCpuFloatBuffer*)&srcData);
-	const ndBrainCpuIntegerBuffer& indirectArray = *((ndBrainCpuIntegerBuffer*)&indexBuffer);
-
-	ndInt32 srcStride = ndInt32(srcStrideInBytes / sizeof(ndReal));
-	ndInt32 srcOffset = ndInt32(srcOffsetInBytes / sizeof(ndReal));
-	ndInt32 dstStride = ndInt32(dstStrideInBytes / sizeof(ndReal));
-	ndInt32 dstOffset = ndInt32(dstOffsetInBytes / sizeof(ndReal));
-	ndInt32 count = ndInt32(indirectArray.SizeInBytes() / sizeof(ndUnsigned32));
-
-	ndAssert(dstStride <= srcStride);
-	for (ndInt32 i = 0; i < count; ++i)
-	{
-		ndUnsigned32 index = indirectArray.m_indexArray[i];
-		const ndBrainMemVector src(&srcBuffer.m_buffer[index * srcStride + srcOffset], dstStride);
-		ndBrainMemVector dst(&m_buffer[i * dstStride + dstOffset], dstStride);
-		dst.Set(src);
-	}
-}
-
-void ndBrainCpuFloatBuffer::CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer)
+void ndBrainCpuFloatBuffer::CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcData)
 {
 	ndAssert(0);
+	// I have to impmnet the cpu a fake uniform buffer  
+	// 
+	//const ndBrainCpuFloatBuffer& srcBuffer = *((ndBrainCpuFloatBuffer*)&srcData);
+	//const ndBrainCpuIntegerBuffer& indirectArray = *((ndBrainCpuIntegerBuffer*)&indexBuffer);
+	//const ndBrainCpuUniformBuffer& uniforms = *(ndBrainCpuUniformBuffer*)&parameterBuffer;
+	//const ndCopyBufferCommandInfo& data = *((ndCopyBufferCommandInfo*)&uniforms.m_data[0]);
+	//
+	//ndInt32 stride = ndInt32(data.m_strideInByte / sizeof(ndReal));
+	//ndInt32 srcStride = ndInt32(data.m_srcStrideInByte / sizeof(ndReal));
+	//ndInt32 srcOffset = ndInt32(data.m_srcOffsetInByte / sizeof(ndReal));
+	//ndInt32 dstStride = ndInt32(data.m_dstStrideInByte / sizeof(ndReal));
+	//ndInt32 dstOffset = ndInt32(data.m_dstOffsetInByte / sizeof(ndReal));
+	//ndInt32 count = ndInt32(indirectArray.SizeInBytes() / sizeof(ndUnsigned32));
+	//
+	//ndAssert(stride <= srcStride);
+	//ndAssert(stride <= dstStride);
+	//for (ndInt32 i = 0; i < count; ++i)
+	//{
+	//	ndUnsigned32 index = indirectArray.m_indexArray[i];
+	//	const ndBrainMemVector src(&srcBuffer.m_buffer[index * srcStride + srcOffset], stride);
+	//	ndBrainMemVector dst(&m_buffer[i * dstStride + dstOffset], stride);
+	//	dst.Set(src);
+	//}
 }

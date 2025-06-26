@@ -44,22 +44,12 @@ void ndBrainGpuUniformBuffer::BrainVectorFromDevice(ndBrainVector&) const
 
 void ndBrainGpuUniformBuffer::MemoryToDevive(size_t offsetInBytes, size_t sizeInBytes, const void* const inputMemory)
 {
-	const char* const ptr = &((char*)inputMemory)[offsetInBytes];
-	m_data.SetCount(0);
-	for (ndInt32 i = 0; i < ndInt32 (sizeInBytes); ++i)
-	{
-		m_data.PushBack(ptr[i]);
-	}
+	LoadData(offsetInBytes, sizeInBytes, inputMemory);
 }
 
 void ndBrainGpuUniformBuffer::MemoryFromDevive(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
 {
-	char* const ptr = &((char*)outputMemory)[offsetInBytes];
-	ndInt32 bytes = ndMin(ndInt32 (sizeInBytes), ndInt32(m_data.GetCount()));
-	for (ndInt32 i = 0; i < bytes; ++i)
-	{
-		ptr[i] = m_data[i];
-	}
+	UnloadData(offsetInBytes, sizeInBytes, outputMemory);
 }
 
 //void ndBrainGpuUniformBuffer::CopyBuffer(const ndBrainBuffer& srcBuffer, size_t sourceOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes)
@@ -68,20 +58,28 @@ void ndBrainGpuUniformBuffer::CopyBuffer(const ndBrainBuffer&, size_t, size_t, s
 	ndAssert(0);
 }
 
-//void ndBrainGpuUniformBuffer::CopyBufferIndirectSource(const ndBrainBuffer& indexBuffer, size_t dstOffsetInBytes, size_t dstStrideInBytes, const ndBrainBuffer& srcData, size_t srcOffsetInBytes, size_t srcStrideInBytes)
-void ndBrainGpuUniformBuffer::CopyBufferIndirectSource(const ndBrainBuffer&, size_t, size_t, const ndBrainBuffer&, size_t, size_t)
+//void ndBrainGpuUniformBuffer::CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer)
+void ndBrainGpuUniformBuffer::CopyBufferIndirect(const ndBrainBuffer&, const ndBrainBuffer&, const ndBrainBuffer&)
 {
 	ndAssert(0);
 }
 
-//void ndBrainGpuUniformBuffer::LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData)
-void ndBrainGpuUniformBuffer::LoadData(size_t, size_t, const void* const)
+void ndBrainGpuUniformBuffer::LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData)
 {
-	ndAssert(0);
+	const char* const ptr = &((char*)inputData)[offsetInBytes];
+	m_data.SetCount(0);
+	for (ndInt32 i = 0; i < ndInt32(sizeInBytes); ++i)
+	{
+		m_data.PushBack(ptr[i]);
+	}
 }
 
-//void ndBrainGpuUniformBuffer::UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const outputData) const
-void ndBrainGpuUniformBuffer::UnloadData(size_t, size_t, void* const) const
+void ndBrainGpuUniformBuffer::UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const outputData) const
 {
-	ndAssert(0);
+	char* const ptr = &((char*)outputData)[offsetInBytes];
+	ndInt32 bytes = ndMin(ndInt32(sizeInBytes), ndInt32(m_data.GetCount()));
+	for (ndInt32 i = 0; i < bytes; ++i)
+	{
+		ptr[i] = m_data[i];
+	}
 }
