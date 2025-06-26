@@ -174,7 +174,7 @@ static void MnistTrainingSet()
 			}
 		}
 
-		ndInt32 ValidateData(ndBrainMatrix* const testLabels, const ndSharedPtr<ndBrainBuffer>& data)
+		ndInt32 ValidateData(ndBrainGpuUniformBuffer& parameters, ndBrainMatrix* const testLabels, const ndSharedPtr<ndBrainBuffer>& data)
 		{
 			ndBrainVector groundTruth;
 			ndBrainVector miniBatchInput;
@@ -192,12 +192,19 @@ static void MnistTrainingSet()
 
 			size_t size = inputSize * sizeof(ndReal);
 			ndBrainBuffer* const deviceMinibatchBuffer = m_trainer->GetInputBuffer();
+
+			ndCopyBufferCommandInfo copyBufferIndirect;
+			parameters.MemoryFromDevice(0, sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect);
+
 			for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
 			{
-				//ndAssert(0);
 				//deviceMinibatchBuffer->CopyBuffer(size_t(m_miniBatchSize), size, 0, size, **data, batchStart * size, size);
+				copyBufferIndirect.m_dstOffsetInByte = ndInt32 (batchStart * size);
+				parameters.MemoryToDevice(0, sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect);
+
+				//deviceMinibatchBuffer->CopyBuffer(parameters, size_t(m_miniBatchSize), **data, batchStart * size, size);
 				m_trainer->MakePrediction();
-				//m_trainer->GetOutput(miniBatchOutput);
+				m_trainer->GetOutput(miniBatchOutput);
 
 				for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
 				{
@@ -208,15 +215,15 @@ static void MnistTrainingSet()
 					ndInt32 maxProbIndex = -1;
 					ndBrainFloat maxProbability = ndBrainFloat(-1.0f);
 
-					//const ndBrainMemVector output(&miniBatchOutput[i * outputSize], outputSize);
-					//for (ndInt32 j = 0; j < output.GetCount(); j++)
-					//{
-					//	if (output[j] > maxProbability)
-					//	{
-					//		maxProbIndex = j;
-					//		maxProbability = output[j];
-					//	}
-					//}
+					const ndBrainMemVector output(&miniBatchOutput[i * outputSize], outputSize);
+					for (ndInt32 j = 0; j < output.GetCount(); j++)
+					{
+						if (output[j] > maxProbability)
+						{
+							maxProbIndex = j;
+							maxProbability = output[j];
+						}
+					}
 
 					maxProbIndex = 0;
 					ndAssert(maxProbIndex >= 0);
@@ -282,7 +289,7 @@ static void MnistTrainingSet()
 				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
 				for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
 				{
-					m_indirectMiniBatch->MemoryToDevive(0, m_miniBatchSize * sizeof(ndUnsigned32), &shuffleBuffer[batchStart]);
+					m_indirectMiniBatch->MemoryToDevice(0, m_miniBatchSize * sizeof(ndUnsigned32), &shuffleBuffer[batchStart]);
 					deviceMinibatchBuffer->CopyBufferIndirect(parameterBuffer, **m_indirectMiniBatch, **m_trainingData);
 					
 					trainer->MakePrediction();
@@ -310,7 +317,7 @@ static void MnistTrainingSet()
 				ndExpandTraceMessage("epoc: %d\n", epoch);
 #else
 				
-				ndInt64 testFailCount = ValidateData(testLabels, m_testData) + 1;
+				ndInt64 testFailCount = ValidateData(parameterBuffer, testLabels, m_testData) + 1;
 				if (testFailCount < m_minValidationFail)
 				{
 					//trainer->GetParameterBuffer(parametersBuffer);
@@ -318,7 +325,7 @@ static void MnistTrainingSet()
 					trainer->UpdateParameters();
 					m_bestBrain->CopyFrom(**trainer->GetBrain());
 					m_minValidationFail = testFailCount + 1;
-					ndInt64 trainigFailCount = ValidateData(trainingLabels, m_trainingData) + 1;
+					ndInt64 trainigFailCount = ValidateData(parameterBuffer, trainingLabels, m_trainingData) + 1;
 					ndInt64 size = trainingLabels->GetCount();
 					ndFloat32 score = (ndFloat32)(size - trainigFailCount) / (ndFloat32)size;
 					ndExpandTraceMessage("Best model: ");
@@ -329,7 +336,7 @@ static void MnistTrainingSet()
 				} 
 				else
 				{
-					ndInt64 trainigFailCount = ValidateData(trainingLabels, m_trainingData) + 1;
+					ndInt64 trainigFailCount = ValidateData(parameterBuffer, trainingLabels, m_trainingData) + 1;
 					ndInt64 minCombinedScore = testFailCount * trainigFailCount;
 					if (minCombinedScore <= m_minCombinedScore)
 					{
@@ -450,9 +457,18 @@ static void MnistTrainingSet()
 		
 		ndBrainSave::Save(*optimizer.m_bestBrain, path);
 		
+		size_t strideInBytes = size_t(brain->GetInputSize() * sizeof(ndReal));
+		ndCopyBufferCommandInfo copyBufferIndirect;
+		copyBufferIndirect.m_dstOffsetInByte = 0;
+		copyBufferIndirect.m_srcOffsetInByte = 0;
+		copyBufferIndirect.m_strideInByte = ndInt32(strideInBytes);
+		copyBufferIndirect.m_srcStrideInByte = ndInt32(strideInBytes);
+		copyBufferIndirect.m_dstStrideInByte = ndInt32(strideInBytes);
+		ndBrainGpuUniformBuffer parameterBuffer(*context, sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect);
+
 		SupervisedTrainer inference(context, optimizer.m_bestBrain);
-		ndInt32 testFailCount = inference.ValidateData(*testLabels, optimizer.m_testData);
-		ndInt32 trainingFailCount = inference.ValidateData(*trainingLabels, optimizer.m_trainingData);
+		ndInt32 testFailCount = inference.ValidateData(parameterBuffer, *testLabels, optimizer.m_testData);
+		ndInt32 trainingFailCount = inference.ValidateData(parameterBuffer, *trainingLabels, optimizer.m_trainingData);
 		
 		ndExpandTraceMessage("\n");
 		ndExpandTraceMessage("results:\n");

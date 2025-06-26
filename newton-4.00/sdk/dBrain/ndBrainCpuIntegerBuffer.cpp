@@ -26,7 +26,7 @@ ndBrainCpuIntegerBuffer::ndBrainCpuIntegerBuffer(ndBrainContext* const context, 
 {
 	ndAssert(m_context->GetAsCpuContext());
 	m_indexArray.SetCount(numberOfElements);
-	MemoryToDevive(0, m_sizeInBytes, indexArray);
+	MemoryToDevice(0, m_sizeInBytes, indexArray);
 }
 
 void ndBrainCpuIntegerBuffer::BrainVectorToDevice(const ndBrainVector&)
@@ -42,7 +42,7 @@ void ndBrainCpuIntegerBuffer::BrainVectorFromDevice(ndBrainVector&) const
 	ndAssert(0);
 }
 
-void ndBrainCpuIntegerBuffer::MemoryToDevive(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData)
+void ndBrainCpuIntegerBuffer::MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData)
 {
 	ndAssert(sizeInBytes <= m_sizeInBytes);
 	size_t size = ndMin(sizeInBytes, m_sizeInBytes) / sizeof (ndUnsigned32);
@@ -50,8 +50,8 @@ void ndBrainCpuIntegerBuffer::MemoryToDevive(size_t offsetInBytes, size_t sizeIn
 	ndMemCpy(&m_indexArray[offset], (ndUnsigned32*)inputData, ndInt64(size));
 }
 
-//void ndBrainCpuIntegerBuffer::MemoryFromDevive(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
-void ndBrainCpuIntegerBuffer::MemoryFromDevive(size_t, size_t, void* const) const
+//void ndBrainCpuIntegerBuffer::MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
+void ndBrainCpuIntegerBuffer::MemoryFromDevice(size_t, size_t, void* const) const
 {
 	ndAssert(0);
 }
@@ -70,8 +70,9 @@ void ndBrainCpuIntegerBuffer::UnloadData(size_t, size_t, void* const) const
 	ndAssert(0);
 }
 
-//void ndBrainCpuIntegerBuffer::CopyBuffer(const ndBrainBuffer& sourceData, size_t srcOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes)
-void ndBrainCpuIntegerBuffer::CopyBuffer(const ndBrainBuffer&, size_t, size_t, size_t)
+
+//void ndBrainCpuIntegerBuffer::CopyBuffer(const ndBrainBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer)
+void ndBrainCpuIntegerBuffer::CopyBuffer(const ndBrainBuffer&, ndInt32, const ndBrainBuffer&)
 {
 	ndAssert(0);
 	//ndInt64 dstOffset = ndInt64(dstOffsetInBytes / sizeof(ndReal));

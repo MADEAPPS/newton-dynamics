@@ -581,7 +581,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::SaveTrajectory()
 
 		size_t stride = flatVector.GetCount() * sizeof(ndReal);
 		size_t offset = stride * dstIndex;
-		m_replayBufferFlat->MemoryToDevive(offset, stride, &flatVector[0]);
+		m_replayBufferFlat->MemoryToDevice(offset, stride, &flatVector[0]);
 	};
 	
 	ndInt32 replayBufferCount = m_replayBuffer.GetCount();
@@ -840,7 +840,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 			nextOvervationIndices.PushBack(ndUnsigned32(index));
 		}
 
-		m_minibatchIndexBuffer->MemoryToDevive(0, m_parameters.m_miniBatchSize * sizeof(ndUnsigned32), &nextOvervationIndices[0]);
+		m_minibatchIndexBuffer->MemoryToDevice(0, m_parameters.m_miniBatchSize * sizeof(ndUnsigned32), &nextOvervationIndices[0]);
 		ndBrainBuffer* const deviceMinibatchBuffer = m_policyTrainer->GetInputBuffer();
 		ndAssert(0);
 		//deviceMinibatchBuffer->CopyBufferIndirect(**m_minibatchIndexBuffer, 0, inputSizeInBytes, **m_replayBufferFlat, nextObservationOffsetInBytes, flatInputSizeInBytes);

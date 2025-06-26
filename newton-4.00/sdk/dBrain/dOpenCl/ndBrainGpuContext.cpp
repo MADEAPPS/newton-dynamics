@@ -167,7 +167,7 @@ void ndBrainGpuContext::CopyBuffer(
 	uniformParam.m_parametersBatchSize = ndInt32(dstStrideInBytes / sizeof(ndReal));
 	uniformParam.m_parametersStartOffset = ndInt32(dstOffsetInBytes / sizeof(ndReal));
 
-	m_copyBufferCommandParamBuffer->MemoryToDevive(0, sizeof(ndBrainLayer::ndCommandShareInfo), &uniformParam);
+	m_copyBufferCommandParamBuffer->MemoryToDevice(0, sizeof(ndBrainLayer::ndCommandShareInfo), &uniformParam);
 
 	ndFixSizeArray<ndBrainBuffer*, 8> params;
 	params.PushBack(*m_copyBufferCommandParamBuffer);
@@ -190,7 +190,7 @@ void ndBrainGpuContext::CopyBufferIndirect(ndBrainGpuIntegerBuffer& indexBuffer,
 	uniformParam.m_parametersBatchSize = ndInt32(dstStrideInBytes / sizeof(ndReal));
 	uniformParam.m_parametersStartOffset = ndInt32(dstOffsetInBytes / sizeof(ndReal));
 
-	m_copyBufferIndirectCommandParamBuffer->MemoryToDevive(0, sizeof(ndBrainLayer::ndCommandShareInfo), &uniformParam);
+	m_copyBufferIndirectCommandParamBuffer->MemoryToDevice(0, sizeof(ndBrainLayer::ndCommandShareInfo), &uniformParam);
 
 	ndFixSizeArray<ndBrainBuffer*, 8> params;
 	params.PushBack(*m_copyBufferIndirectCommandParamBuffer);
@@ -211,7 +211,7 @@ void ndBrainGpuContext::CopyBufferIndirect(ndBrainGpuIntegerBuffer& indexBuffer,
 	//uniformParam.m_parametersBatchSize = ndInt32(dstStrideInBytes / sizeof(ndReal));
 	//uniformParam.m_parametersStartOffset = ndInt32(dstOffsetInBytes / sizeof(ndReal));
 
-	m_copyBufferIndirectCommandParamBuffer->MemoryToDevive(0, sizeof(ndBrainLayer::ndCommandShareInfo), &uniformParam);
+	m_copyBufferIndirectCommandParamBuffer->MemoryToDevice(0, sizeof(ndBrainLayer::ndCommandShareInfo), &uniformParam);
 
 	ndFixSizeArray<ndBrainBuffer*, 8> params;
 	params.PushBack(*m_copyBufferIndirectCommandParamBuffer);

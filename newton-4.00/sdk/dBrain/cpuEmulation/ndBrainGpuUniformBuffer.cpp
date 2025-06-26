@@ -42,18 +42,17 @@ void ndBrainGpuUniformBuffer::BrainVectorFromDevice(ndBrainVector&) const
 	ndAssert(0);
 }
 
-void ndBrainGpuUniformBuffer::MemoryToDevive(size_t offsetInBytes, size_t sizeInBytes, const void* const inputMemory)
+void ndBrainGpuUniformBuffer::MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputMemory)
 {
 	LoadData(offsetInBytes, sizeInBytes, inputMemory);
 }
 
-void ndBrainGpuUniformBuffer::MemoryFromDevive(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
+void ndBrainGpuUniformBuffer::MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
 {
 	UnloadData(offsetInBytes, sizeInBytes, outputMemory);
 }
 
-//void ndBrainGpuUniformBuffer::CopyBuffer(const ndBrainBuffer& srcBuffer, size_t sourceOffsetInBytes, size_t dstOffsetInBytes, size_t sizeInBytes)
-void ndBrainGpuUniformBuffer::CopyBuffer(const ndBrainBuffer&, size_t, size_t, size_t)
+void ndBrainGpuUniformBuffer::CopyBuffer(const ndBrainBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer)
 {
 	ndAssert(0);
 }
