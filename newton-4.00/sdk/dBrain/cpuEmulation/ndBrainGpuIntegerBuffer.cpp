@@ -15,13 +15,13 @@
 #include "ndBrainGpuContext.h"
 #include "ndBrainGpuIntegerBuffer.h"
 
-ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainContext* const context, ndInt64 sizeInElements)
+ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainContext* const context, ndInt64 sizeInElements, bool)
 	:ndBrainBuffer(context, sizeInElements * ndInt64(sizeof(ndUnsigned32)))
 {
 	m_indexArray.SetCount(sizeInElements);
 }
 
-ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32* const indexArray)
+ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32* const indexArray, bool)
 	:ndBrainBuffer(context, numberOfElements * ndInt64(sizeof(ndUnsigned32)))
 {
 	ndAssert(m_context->GetAsGpuContext());

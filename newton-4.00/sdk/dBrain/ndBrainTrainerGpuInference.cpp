@@ -366,15 +366,12 @@ void ndBrainTrainerGpuInference::UpdateParameters(const ndBrainVector& weightAnd
 void ndBrainTrainerGpuInference::MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output)
 {
 	ndBrainBuffer* const inputBuffer = GetInputBuffer();
-	ndBrainBuffer* const outputBuffer = (ndBrainBuffer*)GetOutputBuffer();
-	
-	//inputBuffer->MemoryToDevice(0, input.GetCount() * sizeof (ndReal), &input[0]);
 	m_singlePredictionInputBuffer->MemoryToDevice(0, input.GetCount() * sizeof(ndReal), &input[0]);
 	inputBuffer->CopyBuffer(**m_singlePredictionInputBufferParameters, 1, **m_singlePredictionInputBuffer);
 
 	MakePrediction();
 
-	//outputBuffer->MemoryFromDevice(0, output.GetCount() * sizeof(ndReal), &output[0]);
+	ndBrainBuffer* const outputBuffer = (ndBrainBuffer*)GetOutputBuffer();
 	outputBuffer->CopyBuffer(**m_singlePredictionOutputBufferParameters, 1, **m_singlePredictionOutputBuffer);
 	m_singlePredictionOutputBuffer->MemoryFromDevice(0, output.GetCount() * sizeof(ndReal), &output[0]);
 }

@@ -18,9 +18,9 @@
 class ndBrainGpuFloatBuffer : public ndBrainBuffer
 {
 	public:
-	ndBrainGpuFloatBuffer(ndBrainContext* const context, ndInt64 size);
-	ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainVector& input);
-	ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainMatrix& matrix);
+	ndBrainGpuFloatBuffer(ndBrainContext* const context, ndInt64 size, bool memoryMapped = false);
+	ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainVector& input, bool memoryMapped = false);
+	ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainMatrix& matrix, bool memoryMapped = false);
 
 	virtual void BrainVectorToDevice(const ndBrainVector& vector) override;
 	virtual void BrainVectorFromDevice(ndBrainVector& vector) const override;

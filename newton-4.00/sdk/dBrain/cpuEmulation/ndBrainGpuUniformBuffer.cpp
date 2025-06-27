@@ -14,12 +14,12 @@
 #include "ndBrainGpuContext.h"
 #include "ndBrainGpuUniformBuffer.h"
 
-ndBrainGpuUniformBuffer::ndBrainGpuUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes)
+ndBrainGpuUniformBuffer::ndBrainGpuUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, bool)
 	:ndBrainBuffer(context, sizeInBytes)
 {
 }
 
-ndBrainGpuUniformBuffer::ndBrainGpuUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, const void* const data)
+ndBrainGpuUniformBuffer::ndBrainGpuUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, const void* const data, bool)
 	:ndBrainBuffer(context, sizeInBytes)
 {
 	LoadData(0, size_t(sizeInBytes), data);

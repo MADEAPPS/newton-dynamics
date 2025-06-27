@@ -16,8 +16,8 @@
 class ndBrainGpuIntegerBuffer : public ndBrainBuffer
 {
 	public:
-	ndBrainGpuIntegerBuffer(ndBrainContext* const context, ndInt64 sizeInElements);
-	ndBrainGpuIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32* const indexArray);
+	ndBrainGpuIntegerBuffer(ndBrainContext* const context, ndInt64 sizeInElements, bool memoryMapped = false);
+	ndBrainGpuIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32* const indexArray, bool memoryMapped = false);
 
 	virtual void BrainVectorToDevice(const ndBrainVector& vector) override;
 	virtual void BrainVectorFromDevice(ndBrainVector& vector) const override;

@@ -978,10 +978,10 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::Optimize()
 //#pragma optimize( "", off )
 void ndBrainAgentDeterministicPolicyGradient_Trainer::OptimizeStep()
 {
-	SaveTrajectory();
+	//SaveTrajectory();
 	if (m_startOptimization)
 	{
-		Optimize();
+		//Optimize();
 	}
 	m_frameCount++;
 	m_framesAlive++;

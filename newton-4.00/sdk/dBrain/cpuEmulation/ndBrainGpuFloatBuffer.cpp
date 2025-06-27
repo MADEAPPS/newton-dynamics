@@ -17,14 +17,14 @@
 #include "ndBrainGpuUniformBuffer.h"
 #include "ndBrainGpuIntegerBuffer.h"
 
-ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, ndInt64 size)
+ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, ndInt64 size, bool)
 	:ndBrainBuffer(context, size * ndInt32(sizeof(ndReal)))
 	,m_buffer()
 {
 	m_buffer.SetCount(size);
 }
 
-ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainVector& input)
+ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainVector& input, bool)
 	:ndBrainBuffer(context, input.GetCount() * ndInt32(sizeof(ndReal)))
 {
 	ndAssert(m_context->GetAsGpuContext());
@@ -32,7 +32,7 @@ ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, cons
 	BrainVectorToDevice(input);
 }
 
-ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainMatrix& matrix)
+ndBrainGpuFloatBuffer::ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainMatrix& matrix, bool)
 	:ndBrainBuffer(context, matrix.GetColumns()* matrix.GetRows()* ndInt32(sizeof(ndReal)))
 {
 	ndBrainVector flatArray;
