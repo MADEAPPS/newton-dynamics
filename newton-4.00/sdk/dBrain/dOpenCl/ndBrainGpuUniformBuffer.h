@@ -16,8 +16,8 @@
 class ndBrainGpuUniformBuffer : public ndBrainGpuBuffer
 {
 	public:
-	ndBrainGpuUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes);
-	ndBrainGpuUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, const void* const data);
+	ndBrainGpuUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, bool memoryMapped = false);
+	ndBrainGpuUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, const void* const data, bool memoryMapped = false);
 };
 
 #endif

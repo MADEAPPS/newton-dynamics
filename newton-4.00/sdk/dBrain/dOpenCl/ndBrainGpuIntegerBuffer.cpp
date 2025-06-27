@@ -15,18 +15,16 @@
 #include "ndBrainGpuContext.h"
 #include "ndBrainGpuIntegerBuffer.h"
 
-ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainContext* const context, ndInt64 sizeInElements)
-	:ndBrainGpuBuffer(context, sizeInElements * ndInt64(sizeof(ndUnsigned32)))
+ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainContext* const context, ndInt64 sizeInElements, bool memoryMapped)
+	:ndBrainGpuBuffer(context, sizeInElements * ndInt64(sizeof(ndUnsigned32)), memoryMapped)
 {
 }
 
-//ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32 indexArray)
-ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32)
-	:ndBrainGpuBuffer(context, numberOfElements * ndInt64(sizeof(ndUnsigned32)))
+ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32* const indexArray, bool memoryMapped)
+	:ndBrainGpuBuffer(context, numberOfElements * ndInt64(sizeof(ndUnsigned32)), memoryMapped)
 {
 	ndAssert(m_context->GetAsGpuContext());
-	ndAssert(0);
-	//BrainVectorToDevice(input);
+	MemoryToDevice(0, m_sizeInBytes, indexArray);
 }
 
 

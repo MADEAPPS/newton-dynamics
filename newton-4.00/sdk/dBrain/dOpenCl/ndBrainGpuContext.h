@@ -33,15 +33,13 @@ class ndBrainGpuContext : public ndBrainContext
 	void SyncQueue();
 	void AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& command); 
 
-	ndInt32 GetSubGroupSize() const { return 0; }
 	static bool HasGpuSupport();
-
 	ndBrainGpuContext* GetAsGpuContext() override;
-	virtual bool SupportsMappedMemory() const override;
 
 	private:
 	void CreateKerners();
 	void CreateCopyCommands();
+	bool SupportsMappedMemory() const;
 	size_t GetDeviceScore(cl::Device& device);
 
 	void CopyBuffer(ndBrainGpuUniformBuffer& parameterBuffer, ndInt32 workGroups, ndBrainGpuFloatBuffer& dstBuffer, ndBrainGpuFloatBuffer& srcBuffer);
@@ -88,7 +86,7 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<cl::Context> m_context;
 	ndSharedPtr<cl::CommandQueue> m_queue;
 	cl::Buffer m_emptyBuffer;
-	bool m_supportsForMappedMemory;
+	bool m_supportsMappedMemory;
 
 	ndSharedPtr<ndBrainGpuCommand> m_copyBufferCommand;
 	ndSharedPtr<ndBrainGpuCommand> m_copyBufferIndirectCommand;

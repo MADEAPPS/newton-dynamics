@@ -39,7 +39,7 @@ class ndBrainGpuBuffer : public ndBrainBuffer
 	virtual void UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const outputData) const override;
 
 	ndSharedPtr<cl::Buffer> m_buffer;
-	void* m_memory;
+	ndUnsigned32* m_memory;
 	friend class ndBrainGpuContext;
 	friend class ndBrainGpuCommand;
 };

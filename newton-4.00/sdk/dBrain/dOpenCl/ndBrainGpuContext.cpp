@@ -28,7 +28,8 @@
 ndBrainGpuContext::ndBrainGpuContext()
 	:ndBrainContext()
 {
-	m_supportsForMappedMemory = false;
+	m_supportsMappedMemory = false;
+
 	// get all devices of all platforms
 	std::vector<cl::Device> cl_devices; 
 	{
@@ -95,10 +96,9 @@ ndBrainGpuContext::ndBrainGpuContext()
 
 		if (error == CL_SUCCESS) 
 		{
-			//if (svm_caps & (CL_DEVICE_SVM_COARSE_GRAIN_BUFFER | CL_DEVICE_SVM_FINE_GRAIN_BUFFER))
-			if (svm_caps & CL_DEVICE_SVM_COARSE_GRAIN_BUFFER)
+			if (svm_caps & (CL_DEVICE_SVM_COARSE_GRAIN_BUFFER | CL_DEVICE_SVM_FINE_GRAIN_BUFFER))
 			{
-				m_supportsForMappedMemory = true;
+				m_supportsMappedMemory = true;
 			}
 		}
 
@@ -113,7 +113,7 @@ ndBrainGpuContext::~ndBrainGpuContext()
 
 bool ndBrainGpuContext::SupportsMappedMemory() const
 {
-	return m_supportsForMappedMemory;
+	return m_supportsMappedMemory;
 }
 
 size_t ndBrainGpuContext::GetDeviceScore(cl::Device& device)

@@ -21,16 +21,18 @@ ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainContext* const context, ndInt64 sizeIn
 	,m_memory(nullptr)
 {
 	cl_int error = CL_SUCCESS;
-	if (m_isMemoryMapped && m_context->SupportsMappedMemory())
+	ndBrainGpuContext* const gpuContext = m_context->GetAsGpuContext();
+	ndAssert(context);
+	if (m_isMemoryMapped && gpuContext->SupportsMappedMemory())
 	{
-		m_memory = clSVMAlloc(m_context->GetAsGpuContext()->m_context->get(), CL_MEM_READ_WRITE, size_t(sizeInByte), 32);
+		m_memory = (ndUnsigned32*)clSVMAlloc(gpuContext->m_context->get(), CL_MEM_READ_WRITE | CL_MEM_SVM_FINE_GRAIN_BUFFER, size_t(sizeInByte), 32);
 		ndAssert(m_memory);
-		m_buffer = ndSharedPtr<cl::Buffer>(new cl::Buffer(**m_context->GetAsGpuContext()->m_context, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR, size_t(sizeInByte), m_memory, &error));
+		m_buffer = ndSharedPtr<cl::Buffer>(new cl::Buffer(**gpuContext->m_context, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR, size_t(sizeInByte), m_memory, &error));
 	}
 	else
 	{
 		m_isMemoryMapped = false;
-		m_buffer = ndSharedPtr<cl::Buffer> (new cl::Buffer(**m_context->GetAsGpuContext()->m_context, CL_MEM_READ_WRITE, size_t(sizeInByte), nullptr, &error));
+		m_buffer = ndSharedPtr<cl::Buffer> (new cl::Buffer(**gpuContext->m_context, CL_MEM_READ_WRITE, size_t(sizeInByte), nullptr, &error));
 	}
 	ndAssert(error == CL_SUCCESS);
 }
@@ -69,26 +71,6 @@ void ndBrainGpuBuffer::BrainVectorToDevice(const ndBrainVector& vector)
 	LoadData(0, vector.GetCount() * sizeof(ndReal), &vector[0]);
 }
 
-void ndBrainGpuBuffer::LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const sourceData)
-{
-	ndAssert(m_context->GetAsGpuContext());
-
-	cl_int error = CL_SUCCESS;
-	ndAssert(sizeInBytes <= m_sizeInBytes);
-	ndSharedPtr<cl::CommandQueue>& queue = m_context->GetAsGpuContext()->m_queue;
-	error = queue->enqueueWriteBuffer(**m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, sourceData);
-	ndAssert(error == CL_SUCCESS);
-}
-
-void ndBrainGpuBuffer::UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const destinationData) const
-{
-	cl_int error = CL_SUCCESS;
-	ndAssert(m_context->GetAsGpuContext());
-	ndSharedPtr<cl::CommandQueue>& queue = m_context->GetAsGpuContext()->m_queue;
-	error = queue->enqueueReadBuffer(**m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, destinationData);
-	ndAssert(error == CL_SUCCESS);
-}
-
 void ndBrainGpuBuffer::CopyBuffer(const ndBrainBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer)
 {
 	ndAssert(m_context->GetAsGpuContext());
@@ -113,4 +95,40 @@ void ndBrainGpuBuffer::CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, 
 	ndBrainGpuUniformBuffer& uniforms = *(ndBrainGpuUniformBuffer*)&parameterBuffer;
 
 	context->CopyBufferIndirect(uniforms, index, dst, src);
+}
+
+void ndBrainGpuBuffer::LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const sourceData)
+{
+	ndAssert(m_context->GetAsGpuContext());
+
+	cl_int error = CL_SUCCESS;
+	ndAssert(sizeInBytes <= m_sizeInBytes);
+	ndSharedPtr<cl::CommandQueue>& queue = m_context->GetAsGpuContext()->m_queue;
+
+	ndAssert((sizeInBytes & 3) == 0);
+	if (m_memory)
+	{
+		ndMemCpy(&m_memory[ndInt64(offsetInBytes / sizeof(ndUnsigned32))], (ndUnsigned32*)sourceData, ndInt64(sizeInBytes / sizeof(ndUnsigned32)));
+	}
+	else
+	{
+		error = queue->enqueueWriteBuffer(**m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, sourceData);
+	}
+	ndAssert(error == CL_SUCCESS);
+}
+
+void ndBrainGpuBuffer::UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const destinationData) const
+{
+	cl_int error = CL_SUCCESS;
+	ndAssert(m_context->GetAsGpuContext());
+	ndSharedPtr<cl::CommandQueue>& queue = m_context->GetAsGpuContext()->m_queue;
+	if (m_memory)
+	{
+		ndMemCpy((ndUnsigned32*)destinationData, &m_memory[ndInt64(offsetInBytes / sizeof(ndUnsigned32))], ndInt64(sizeInBytes / sizeof(ndUnsigned32)));
+	}
+	else
+	{
+		error = queue->enqueueReadBuffer(**m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, destinationData);
+	}
+	ndAssert(error == CL_SUCCESS);
 }

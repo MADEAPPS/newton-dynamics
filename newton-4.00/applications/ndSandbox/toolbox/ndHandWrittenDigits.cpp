@@ -287,8 +287,8 @@ static void MnistTrainingSet()
 			ndSharedPtr<ndBrainBuffer> parameterBufferIndirect;
 			if (m_trainer->GetContext()->GetAsGpuContext())
 			{
-				parameterBuffer = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect0));
-				parameterBufferIndirect = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect0));
+				parameterBuffer = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect0, true));
+				parameterBufferIndirect = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect0, true));
 			}
 			else
 			{
@@ -450,7 +450,7 @@ static void MnistTrainingSet()
 		{
 			optimizer.m_testData = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuFloatBuffer(*context, **testDigits));
 			optimizer.m_trainingData = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuFloatBuffer(*context, **trainingDigits));
-			optimizer.m_indirectMiniBatch = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuIntegerBuffer(*context, optimizer.m_miniBatchSize));
+			optimizer.m_indirectMiniBatch = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuIntegerBuffer(*context, optimizer.m_miniBatchSize, true));
 		}
 		else
 		{

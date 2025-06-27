@@ -271,6 +271,7 @@ void ndBrainTrainerGpuInference::InitInputOutputBuffer()
 	buffer.SetCount(bufferSize * m_miniBatchSize);
 	buffer.Set(ndBrainFloat(0.0f));
 	m_inputOutputBuffer = ndSharedPtr<ndBrainGpuFloatBuffer>(new ndBrainGpuFloatBuffer(*m_context, buffer));
+	m_singlePredictionInputBuffer = ndSharedPtr<ndBrainGpuFloatBuffer> (new ndBrainGpuFloatBuffer(*m_context, brain.GetInputSize(), true));
 }
 
 ndBrainBuffer* ndBrainTrainerGpuInference::GetInputBuffer()
@@ -349,11 +350,12 @@ void ndBrainTrainerGpuInference::UpdateParameters(const ndBrainVector& weightAnd
 
 void ndBrainTrainerGpuInference::MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output)
 {
-	//ndBrainGpuFloatBuffer xxxx(*GetContext(), GetBrain()->GetInputSize(), true);
-
 	ndBrainBuffer* const inputBuffer = GetInputBuffer();
 	const ndBrainBuffer* const outputBuffer = GetOutputBuffer();
 	inputBuffer->MemoryToDevice(0, input.GetCount() * sizeof (ndReal), &input[0]);
+
+	m_singlePredictionInputBuffer->MemoryToDevice(0, input.GetCount() * sizeof(ndReal), &input[0]);
+
 	MakePrediction();
 	outputBuffer->MemoryFromDevice(0, output.GetCount() * sizeof(ndReal), &output[0]);
 }

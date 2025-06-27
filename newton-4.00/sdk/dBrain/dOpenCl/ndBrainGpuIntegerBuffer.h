@@ -16,8 +16,8 @@
 class ndBrainGpuIntegerBuffer : public ndBrainGpuBuffer
 {
 	public:
-	ndBrainGpuIntegerBuffer(ndBrainContext* const context, ndInt64 sizeInElements);
-	ndBrainGpuIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32 indexArray);
+	ndBrainGpuIntegerBuffer(ndBrainContext* const context, ndInt64 sizeInElements, bool memoryMapped = false);
+	ndBrainGpuIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32* const indexArray, bool memoryMapped = false);
 };
 
 #endif

@@ -57,11 +57,6 @@ size_t ndMemory::CalculateBufferSize(size_t size)
 
 void* ndMemory::Malloc(size_t size)
 {
-	//if (size > 1024 * 1024 * 1024)
-	//{
-	//	size *= 1;
-	//}
-
 	ndIntPtr metToVal;
 	#if defined (D_MEMORY_SANITY_CHECK) && defined(_DEBUG)
 		size += D_MEMORY_SAFE_GUARD * 2;
