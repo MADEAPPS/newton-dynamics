@@ -21,6 +21,11 @@ ndBrainContext::~ndBrainContext()
 {
 }
 
+bool ndBrainContext::SupportsMappedMemory() const
+{
+	return false;
+}
+
 ndBrainCpuContext* ndBrainContext::GetAsCpuContext()
 {
 	return nullptr;

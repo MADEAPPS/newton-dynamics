@@ -13,12 +13,6 @@
 
 #include "ndBrainStdafx.h"
 
-enum ndStorageBufferType
-{
-	ndStorageData,
-	ndUniformData
-};
-
 class ndBrainVector;
 class ndBrainMatrix;
 class ndBrainContext;
@@ -45,7 +39,7 @@ class ndCopyBufferCommandInfo
 class ndBrainBuffer : public ndClassAlloc
 {
 	protected:
-	ndBrainBuffer(ndBrainContext* const context, ndInt64 sizeInByte, ndStorageBufferType bufferTypeFlags);
+	ndBrainBuffer(ndBrainContext* const context, ndInt64 sizeInByte);
 
 	public:
 	virtual ~ndBrainBuffer();

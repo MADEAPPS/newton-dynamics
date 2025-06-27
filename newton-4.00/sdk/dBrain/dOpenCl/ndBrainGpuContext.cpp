@@ -28,6 +28,7 @@
 ndBrainGpuContext::ndBrainGpuContext()
 	:ndBrainContext()
 {
+	m_supportsForMappedMemory = false;
 	// get all devices of all platforms
 	std::vector<cl::Device> cl_devices; 
 	{
@@ -90,13 +91,29 @@ ndBrainGpuContext::ndBrainGpuContext()
 
 		m_emptyBuffer = cl::Buffer(**m_context, CL_MEM_READ_WRITE, 256);
 
+		cl_device_svm_capabilities svm_caps(m_device->getInfo<CL_DEVICE_SVM_CAPABILITIES>(&error));
+
+		if (error == CL_SUCCESS) 
+		{
+			//if (svm_caps & (CL_DEVICE_SVM_COARSE_GRAIN_BUFFER | CL_DEVICE_SVM_FINE_GRAIN_BUFFER))
+			if (svm_caps & CL_DEVICE_SVM_COARSE_GRAIN_BUFFER)
+			{
+				m_supportsForMappedMemory = true;
+			}
+		}
+
 		CreateKerners();
-		CreateCopyIndirectCommand();
+		CreateCopyCommands();
 	}
 }
 
 ndBrainGpuContext::~ndBrainGpuContext()
 {
+}
+
+bool ndBrainGpuContext::SupportsMappedMemory() const
+{
+	return m_supportsForMappedMemory;
 }
 
 size_t ndBrainGpuContext::GetDeviceScore(cl::Device& device)
@@ -146,7 +163,7 @@ ndBrainGpuContext* ndBrainGpuContext::GetAsGpuContext()
 	return this;
 }
 
-void ndBrainGpuContext::CreateCopyIndirectCommand()
+void ndBrainGpuContext::CreateCopyCommands()
 {
 	ndBrainLayer::ndCommandShareInfo uniformParam;
 	m_copyBufferCommand = ndSharedPtr<ndBrainGpuCommand>(new ndBrainGpuCommand(this, uniformParam));

@@ -85,6 +85,7 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 //m_useGpuBackend = false;
 //m_policyUpdatesCount = 2;
 //m_criticUpdatesCount = 2;
+m_hiddenLayersNumberOfNeurons = 256;
 m_replayBufferStartOptimizeSize = 1000;
 }
 
@@ -331,13 +332,13 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::ndBrainAgentDeterministicPolicy
 	{
 		ndInt32 bufferStride = m_replayBuffer.GetStride() * m_parameters.m_replayBufferSize;
 		m_replayBufferFlat = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuFloatBuffer(*m_context, bufferStride));
-		m_minibatchIndexBuffer = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuIntegerBuffer(*m_context, m_parameters.m_miniBatchSize));
+		m_minibatchIndexBuffer = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuIntegerBuffer(*m_context, m_parameters.m_miniBatchSize * m_parameters.m_criticUpdatesCount));
 	}
 	else
 	{
 		ndInt32 bufferStride = m_replayBuffer.GetStride() * m_parameters.m_replayBufferSize;
 		m_replayBufferFlat = ndSharedPtr<ndBrainBuffer>(new ndBrainCpuFloatBuffer(*m_context, bufferStride));
-		m_minibatchIndexBuffer = ndSharedPtr<ndBrainBuffer>(new ndBrainCpuIntegerBuffer(*m_context, m_parameters.m_miniBatchSize));
+		m_minibatchIndexBuffer = ndSharedPtr<ndBrainBuffer>(new ndBrainCpuIntegerBuffer(*m_context, m_parameters.m_miniBatchSize * m_parameters.m_criticUpdatesCount));
 	}
 
 	ndBrainFloat unitEntropy = ndClamp(m_parameters.m_entropyRegularizerCoef, ndBrainFloat(0.0f), ndBrainFloat(1.0f));
@@ -581,6 +582,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::SaveTrajectory()
 
 		size_t stride = flatVector.GetCount() * sizeof(ndReal);
 		size_t offset = stride * dstIndex;
+
 		m_replayBufferFlat->MemoryToDevice(offset, stride, &flatVector[0]);
 	};
 	
@@ -730,13 +732,12 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 	}
 
 	const ndBrain& brain = **m_policyTrainer->GetBrain();
-	ndInt32 criticInputSize = brain.GetInputSize() + brain.GetOutputSize();
 
 	m_expectedRewards.SetCount(count);
 	m_nextQValue.SetCount(m_parameters.m_miniBatchSize);
-	m_nextActionBatch.SetCount(m_parameters.m_miniBatchSize * brain.GetOutputSize());
+	//m_nextActionBatch.SetCount(m_parameters.m_miniBatchSize * brain.GetOutputSize());
 	//m_nextObsevationsBatch.SetCount(m_parameters.m_miniBatchSize * brain.GetInputSize());
-	m_criticNextObservationActionBatch.SetCount(m_parameters.m_miniBatchSize * criticInputSize);
+	//m_criticNextObservationActionBatch.SetCount(m_parameters.m_miniBatchSize * criticInputSize);
 	for (ndInt32 i = 0; i < ndInt32(sizeof(m_referenceCriticTrainer) / sizeof(m_referenceCriticTrainer[0])); ++i)
 	{
 		m_rewardBatch[i].SetCount(m_parameters.m_miniBatchSize);
@@ -819,15 +820,16 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 	}
 #endif
 
-	size_t inputSizeInBytes = size_t(brain.GetInputSize() * sizeof(ndReal));
-	size_t flatInputSizeInBytes = size_t(m_replayBuffer.GetStride() * sizeof(ndReal));
-	size_t nextObservationOffsetInBytes = size_t(m_replayBuffer.GetNextObsevationOffset() * sizeof(ndReal));
+	//size_t inputSizeInBytes = size_t(brain.GetInputSize() * sizeof(ndReal));
+	//size_t flatInputSizeInBytes = size_t(m_replayBuffer.GetStride() * sizeof(ndReal));
+	//size_t nextObservationOffsetInBytes = size_t(m_replayBuffer.GetNextObsevationOffset() * sizeof(ndReal));
+	m_minibatchIndexBuffer->MemoryToDevice(0, m_miniBatchIndexBuffer.GetCount() * sizeof(ndUnsigned32), &m_miniBatchIndexBuffer[0]);
 
-	ndFixSizeArray<ndUnsigned32, 1024> nextOvervationIndices;
+	//ndFixSizeArray<ndUnsigned32, 1024> nextOvervationIndices;
 	for (ndInt32 n = 0; n < m_parameters.m_criticUpdatesCount; ++n)
 	{
 		// Get the rewards for this minibatch
-		nextOvervationIndices.SetCount(0);
+		//nextOvervationIndices.SetCount(0);
 		for (ndInt32 i = 0; i < m_parameters.m_miniBatchSize; ++i)
 		{
 			const ndInt32 index = m_miniBatchIndexBuffer[n * m_parameters.m_miniBatchSize + i];
@@ -837,33 +839,44 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 			{
 				m_rewardBatch[j][i] = r;
 			}
-			nextOvervationIndices.PushBack(ndUnsigned32(index));
+			//nextOvervationIndices.PushBack(ndUnsigned32(index));
 		}
 
-		m_minibatchIndexBuffer->MemoryToDevice(0, m_parameters.m_miniBatchSize * sizeof(ndUnsigned32), &nextOvervationIndices[0]);
-		ndBrainBuffer* const deviceMinibatchBuffer = m_policyTrainer->GetInputBuffer();
-		ndAssert(0);
-		//deviceMinibatchBuffer->CopyBufferIndirect(**m_minibatchIndexBuffer, 0, inputSizeInBytes, **m_replayBufferFlat, nextObservationOffsetInBytes, flatInputSizeInBytes);
+		ndBrainBuffer* const policyMinibatchInputBuffer = m_policyTrainer->GetInputBuffer();
+		const ndBrainBuffer* const policyMinibatchOuptuBuffer = m_policyTrainer->GetOutputBuffer();
+
+		//m_minibatchIndexBuffer->MemoryToDevive(0, m_parameters.m_miniBatchSize * sizeof(ndUnsigned32), &nextOvervationIndices[0]);
+		//policyMinibatchInputBuffer->CopyBufferIndirect(**m_minibatchIndexBuffer, inputSizeInBytes, 0, inputSizeInBytes, **m_replayBufferFlat, nextObservationOffsetInBytes, flatInputSizeInBytes);
 		m_policyTrainer->MakePrediction();
 
-		ndBrainVector nextObsevationsBatch___;
-		m_policyTrainer->GetInputBuffer()->BrainVectorFromDevice(nextObsevationsBatch___);
-		for (ndInt32 i = 0; i < m_parameters.m_miniBatchSize; ++i)
-		{
-			const ndBrainMemVector nextAction(&m_nextActionBatch[i * brain.GetOutputSize()], brain.GetOutputSize());
-			const ndBrainMemVector nextObsevations(&nextObsevationsBatch___[i * brain.GetInputSize()], brain.GetInputSize());
-			ndBrainMemVector criticNextObservationAction(&m_criticNextObservationActionBatch[i * criticInputSize], criticInputSize);
+		//ndBrainVector nextAction___;
+		//ndBrainVector nextActionBatch___;
+		//ndBrainVector nextObsevationsBatch___;
+		//ndBrainVector criticNextObservationActionBatch___;
+		//criticNextObservationActionBatch___.SetCount(256 * m_replayBuffer.GetStride());
+		//m_policyTrainer->GetInputBuffer()->BrainVectorFromDevice(nextObsevationsBatch___);
+		//m_policyTrainer->GetOutput(nextActionBatch___);
+		//m_policyTrainer->GetInputBuffer()->BrainVectorFromDevice(nextObsevationsBatch___);
+		//for (ndInt32 i = 0; i < m_parameters.m_miniBatchSize; ++i)
+		//{
+		//	const ndBrainMemVector nextAction(&nextActionBatch___[i * brain.GetOutputSize()], brain.GetOutputSize());
+		//	const ndBrainMemVector nextObsevations(&nextObsevationsBatch___[i * brain.GetInputSize()], brain.GetInputSize());
+		//	ndBrainMemVector criticNextObservationAction(&criticNextObservationActionBatch___[i * criticInputSize], criticInputSize);
+		//
+		//	ndMemCpy(&criticNextObservationAction[0], &nextAction[0], brain.GetOutputSize());
+		//	ndMemCpy(&criticNextObservationAction[brain.GetOutputSize()], &nextObsevations[0], brain.GetInputSize());
+		//}
 
-			ndMemCpy(&criticNextObservationAction[0], &nextAction[0], brain.GetOutputSize());
-			ndMemCpy(&criticNextObservationAction[brain.GetOutputSize()], &nextObsevations[0], brain.GetInputSize());
-		}
-
-		m_policyTrainer->GetOutput(m_nextActionBatch);
+		size_t outputActionStrideInBytes = m_replayBuffer.m_actionsSize * sizeof(ndReal);
+		size_t criticMiniBatchStrideInBytes = (m_replayBuffer.m_actionsSize + m_replayBuffer.m_obsevationsSize) * sizeof(ndReal);
 		for (ndInt32 i = 0; i < ndInt32(sizeof(m_referenceCriticTrainer) / sizeof(m_referenceCriticTrainer[0])); ++i)
 		{
-
+			ndBrainBuffer* const criticMinibatchInputBuffer = m_referenceCriticTrainer[i]->GetInputBuffer();
+			//ndAssert(0);
+			//criticMinibatchInputBuffer->CopyBuffer(size_t(m_parameters.m_miniBatchSize), outputActionStrideInBytes, 0, criticMiniBatchStrideInBytes, *policyMinibatchOuptuBuffer, 0, outputActionStrideInBytes);
+			//criticMinibatchInputBuffer->CopyBuffer(size_t(m_parameters.m_miniBatchSize), inputSizeInBytes, outputActionStrideInBytes, criticMiniBatchStrideInBytes, *policyMinibatchInputBuffer, 0, inputSizeInBytes);
+			m_referenceCriticTrainer[i]->MakePrediction();
 		}
-
 	}
 }
 

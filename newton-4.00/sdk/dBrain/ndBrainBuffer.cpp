@@ -12,7 +12,7 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainBuffer.h"
 
-ndBrainBuffer::ndBrainBuffer(ndBrainContext* const context, ndInt64 sizeInByte, ndStorageBufferType)
+ndBrainBuffer::ndBrainBuffer(ndBrainContext* const context, ndInt64 sizeInByte)
 	:m_context(context)
 	,m_sizeInBytes(size_t(sizeInByte))
 {

@@ -16,13 +16,13 @@
 #include "ndBrainCpuIntegerBuffer.h"
 
 ndBrainCpuIntegerBuffer::ndBrainCpuIntegerBuffer(ndBrainContext* const context, ndInt64 sizeInElements)
-	:ndBrainBuffer(context, sizeInElements* ndInt64(sizeof(ndUnsigned32)), ndStorageData)
+	:ndBrainBuffer(context, sizeInElements* ndInt64(sizeof(ndUnsigned32)))
 {
 	m_indexArray.SetCount(sizeInElements);
 }
 
 ndBrainCpuIntegerBuffer::ndBrainCpuIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32* const indexArray)
-	:ndBrainBuffer(context, numberOfElements * ndInt64(sizeof(ndUnsigned32)), ndStorageData)
+	:ndBrainBuffer(context, numberOfElements * ndInt64(sizeof(ndUnsigned32)))
 {
 	ndAssert(m_context->GetAsCpuContext());
 	m_indexArray.SetCount(numberOfElements);
@@ -81,7 +81,8 @@ void ndBrainCpuIntegerBuffer::CopyBuffer(const ndBrainBuffer&, ndInt32, const nd
 	//dst.Set(src);
 }
 
-void ndBrainCpuIntegerBuffer::CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer)
+//void ndBrainCpuIntegerBuffer::CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer)
+void ndBrainCpuIntegerBuffer::CopyBufferIndirect(const ndBrainBuffer&, const ndBrainBuffer&, const ndBrainBuffer&)
 {
 	ndAssert(0);
 }

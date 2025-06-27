@@ -16,13 +16,13 @@
 #include "ndBrainGpuIntegerBuffer.h"
 
 ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainContext* const context, ndInt64 sizeInElements)
-	:ndBrainBuffer(context, sizeInElements * ndInt64(sizeof(ndUnsigned32)), ndStorageData)
+	:ndBrainBuffer(context, sizeInElements * ndInt64(sizeof(ndUnsigned32)))
 {
 	m_indexArray.SetCount(sizeInElements);
 }
 
 ndBrainGpuIntegerBuffer::ndBrainGpuIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32* const indexArray)
-	:ndBrainBuffer(context, numberOfElements * ndInt64(sizeof(ndUnsigned32)), ndStorageData)
+	:ndBrainBuffer(context, numberOfElements * ndInt64(sizeof(ndUnsigned32)))
 {
 	ndAssert(m_context->GetAsGpuContext());
 	m_indexArray.SetCount(numberOfElements);
@@ -66,7 +66,8 @@ void ndBrainGpuIntegerBuffer::UnloadData(size_t offsetInBytes, size_t sizeInByte
 	ndMemCpy((ndUnsigned32*)outputData, &m_indexArray[ndInt64(offset)], ndInt64(size));
 }
 
-void ndBrainGpuIntegerBuffer::CopyBuffer(const ndBrainBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer)
+//void ndBrainGpuIntegerBuffer::CopyBuffer(const ndBrainBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer)
+void ndBrainGpuIntegerBuffer::CopyBuffer(const ndBrainBuffer&, ndInt32, const ndBrainBuffer&)
 {
 	ndAssert(0);
 	//ndInt64 dstOffset = ndInt64(dstOffsetInBytes / sizeof(ndReal));

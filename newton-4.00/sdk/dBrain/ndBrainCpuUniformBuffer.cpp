@@ -15,12 +15,12 @@
 #include "ndBrainCpuUniformBuffer.h"
 
 ndBrainCpuUniformBuffer::ndBrainCpuUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes)
-	:ndBrainBuffer(context, sizeInBytes, ndUniformData)
+	:ndBrainBuffer(context, sizeInBytes)
 {
 }
 
 ndBrainCpuUniformBuffer::ndBrainCpuUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, const void* const data)
-	:ndBrainBuffer(context, sizeInBytes, ndUniformData)
+	:ndBrainBuffer(context, sizeInBytes)
 {
 	LoadData(0, size_t(sizeInBytes), data);
 }
@@ -78,7 +78,8 @@ void ndBrainCpuUniformBuffer::CopyBuffer(const ndBrainBuffer&, ndInt32, const nd
 	//dst.Set(src);
 }
 
-void ndBrainCpuUniformBuffer::CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer)
+//void ndBrainCpuUniformBuffer::CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer)
+void ndBrainCpuUniformBuffer::CopyBufferIndirect(const ndBrainBuffer&, const ndBrainBuffer&, const ndBrainBuffer&)
 {
 	ndAssert(0);
 }

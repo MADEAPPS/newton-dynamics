@@ -18,7 +18,7 @@
 #include "ndBrainCpuUniformBuffer.h"
 
 ndBrainCpuFloatBuffer::ndBrainCpuFloatBuffer(ndBrainContext* const context, ndInt64 sizeInFloat)
-	:ndBrainBuffer(context, sizeInFloat * ndInt32(sizeof(ndReal)), ndStorageData)
+	:ndBrainBuffer(context, sizeInFloat * ndInt32(sizeof(ndReal)))
 {
 	ndAssert(0);
 	//m_buffer.SetCount(sizeInFloat);
@@ -26,7 +26,7 @@ ndBrainCpuFloatBuffer::ndBrainCpuFloatBuffer(ndBrainContext* const context, ndIn
 }
 
 ndBrainCpuFloatBuffer::ndBrainCpuFloatBuffer(ndBrainContext* const context, const ndBrainVector& input)
-	:ndBrainBuffer(context, input.GetCount() * ndInt32(sizeof(ndReal)), ndStorageData)
+	:ndBrainBuffer(context, input.GetCount() * ndInt32(sizeof(ndReal)))
 {
 	ndAssert(m_context->GetAsCpuContext());
 	m_buffer.SetCount(input.GetCount());
@@ -34,7 +34,7 @@ ndBrainCpuFloatBuffer::ndBrainCpuFloatBuffer(ndBrainContext* const context, cons
 }
 
 ndBrainCpuFloatBuffer::ndBrainCpuFloatBuffer(ndBrainContext* const context, const ndBrainMatrix& matrix)
-	:ndBrainBuffer(context, matrix.GetColumns() * matrix.GetRows() * ndInt32(sizeof(ndReal)), ndStorageData)
+	:ndBrainBuffer(context, matrix.GetColumns() * matrix.GetRows() * ndInt32(sizeof(ndReal)))
 {
 	ndBrainVector flatArray;
 	ndAssert(m_context->GetAsCpuContext());

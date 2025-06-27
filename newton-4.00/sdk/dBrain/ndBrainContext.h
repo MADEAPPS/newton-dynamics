@@ -29,6 +29,8 @@ class ndBrainContext : public ndClassAlloc
 	virtual ~ndBrainContext();
 
 	virtual ndContextType GetType() const = 0;
+
+	virtual bool SupportsMappedMemory() const;
 	virtual ndBrainCpuContext* GetAsCpuContext();
 	virtual ndBrainGpuContext* GetAsGpuContext();
 };

@@ -601,6 +601,6 @@ static void MnistTestSet()
 void ndHandWrittenDigits()
 {
 	ndSetRandSeed(53);
-	MnistTrainingSet();
+	//MnistTrainingSet();
 	//MnistTestSet();
 }

@@ -20,7 +20,7 @@ class ndBrainGpuContext;
 class ndBrainGpuBuffer : public ndBrainBuffer
 {
 	protected:
-	ndBrainGpuBuffer(ndBrainContext* const context, ndInt64 sizeInByte, ndStorageBufferType bufferTypeFlags);
+	ndBrainGpuBuffer(ndBrainContext* const context, ndInt64 sizeInByte);
 
 	public:
 	virtual ~ndBrainGpuBuffer();

@@ -37,10 +37,11 @@ class ndBrainGpuContext : public ndBrainContext
 	static bool HasGpuSupport();
 
 	ndBrainGpuContext* GetAsGpuContext() override;
+	virtual bool SupportsMappedMemory() const override;
 
 	private:
 	void CreateKerners();
-	void CreateCopyIndirectCommand();
+	void CreateCopyCommands();
 	size_t GetDeviceScore(cl::Device& device);
 
 	void CopyBuffer(ndBrainGpuUniformBuffer& parameterBuffer, ndInt32 workGroups, ndBrainGpuFloatBuffer& dstBuffer, ndBrainGpuFloatBuffer& srcBuffer);
@@ -87,6 +88,7 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<cl::Context> m_context;
 	ndSharedPtr<cl::CommandQueue> m_queue;
 	cl::Buffer m_emptyBuffer;
+	bool m_supportsForMappedMemory;
 
 	ndSharedPtr<ndBrainGpuCommand> m_copyBufferCommand;
 	ndSharedPtr<ndBrainGpuCommand> m_copyBufferIndirectCommand;
