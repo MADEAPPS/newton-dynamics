@@ -276,24 +276,24 @@ static void MnistTrainingSet()
 			ndBrainBuffer* const deviceMinibatchBuffer = m_trainer->GetInputBuffer();
 
 
-			ndCopyBufferCommandInfo copyBufferIndirect0;
-			copyBufferIndirect0.m_dstOffsetInByte = 0;
-			copyBufferIndirect0.m_srcOffsetInByte = 0;
-			copyBufferIndirect0.m_strideInByte = ndInt32(strideInBytes);
-			copyBufferIndirect0.m_srcStrideInByte = ndInt32(strideInBytes);
-			copyBufferIndirect0.m_dstStrideInByte = ndInt32(strideInBytes);
+			ndCopyBufferCommandInfo copyBufferIndirect;
+			copyBufferIndirect.m_dstOffsetInByte = 0;
+			copyBufferIndirect.m_srcOffsetInByte = 0;
+			copyBufferIndirect.m_strideInByte = ndInt32(strideInBytes);
+			copyBufferIndirect.m_srcStrideInByte = ndInt32(strideInBytes);
+			copyBufferIndirect.m_dstStrideInByte = ndInt32(strideInBytes);
 
 			ndSharedPtr<ndBrainBuffer> parameterBuffer;
 			ndSharedPtr<ndBrainBuffer> parameterBufferIndirect;
 			if (m_trainer->GetContext()->GetAsGpuContext())
 			{
-				parameterBuffer = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect0, true));
-				parameterBufferIndirect = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect0, true));
+				parameterBuffer = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect, true));
+				parameterBufferIndirect = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect, true));
 			}
 			else
 			{
-				parameterBuffer = ndSharedPtr<ndBrainBuffer>(new ndBrainCpuUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect0));
-				parameterBufferIndirect = ndSharedPtr<ndBrainBuffer>(new ndBrainCpuUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect0));
+				parameterBuffer = ndSharedPtr<ndBrainBuffer>(new ndBrainCpuUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect));
+				parameterBufferIndirect = ndSharedPtr<ndBrainBuffer>(new ndBrainCpuUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect));
 			}
 
 			ndCopyBufferCommandInfo copyBufferInfo;
