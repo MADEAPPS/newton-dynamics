@@ -95,6 +95,7 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 
 		// for GPU 
 		ndInt32 GetStride() const;
+		ndInt32 GetObsevationOffset() const;
 		ndInt32 GetNextObsevationOffset() const;
 		void GetFlatArray(ndInt32 index, ndBrainVector& output) const;
 
@@ -219,9 +220,10 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	ndBrainVector m_criticInputGradients[ND_SAC_NUMBER_OF_CRITICS];
 	ndBrainVector m_criticOutputGradients[ND_SAC_NUMBER_OF_CRITICS];
 
-	ndArray<ndInt32> m_miniBatchIndexBuffer;
+	ndArray<ndInt32> m_miniBatchIndices;
 	ndSharedPtr<ndBrainBuffer> m_replayBufferFlat;
 	ndSharedPtr<ndBrainBuffer> m_minibatchIndexBuffer;
+	ndSharedPtr<ndBrainBuffer> m_minibatchIndexBufferParameters;
 	ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory m_replayBuffer____;
 	ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory m_replayBufferCache;
 	ndBrainAgentDeterministicPolicyGradient_Agent* m_agent;
