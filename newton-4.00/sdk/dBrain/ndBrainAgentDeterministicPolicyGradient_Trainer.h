@@ -95,6 +95,7 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 
 		// for GPU 
 		ndInt32 GetStride() const;
+		ndInt32 GetActionOffset() const;
 		ndInt32 GetObsevationOffset() const;
 		ndInt32 GetNextObsevationOffset() const;
 		void GetFlatArray(ndInt32 index, ndBrainVector& output) const;
@@ -205,26 +206,32 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	ndSharedPtr<ndBrainTrainer> m_criticTrainer____[ND_SAC_NUMBER_OF_CRITICS];
 	ndSharedPtr<ndBrainTrainer> m_referenceCriticTrainer[ND_SAC_NUMBER_OF_CRITICS];
 
-	ndBrainVector m_actionBatch;
+	//ndBrainVector m_actionBatch;
 	//ndBrainVector m_nextActionBatch;
-	ndBrainVector m_obsevationsBatch;
-	ndBrainVector m_policyGradientBatch;
+	//ndBrainVector m_obsevationsBatch;
+	//ndBrainVector m_policyGradientBatch;
 	//ndBrainVector m_nextObsevationsBatch;
-	ndBrainVector m_criticObservationActionBatch;
+	//ndBrainVector m_criticObservationActionBatch;
 	//ndBrainVector m_criticNextObservationActionBatch;
 
-	ndBrainVector m_nextQValue;
-	ndBrainVector m_expectedRewards;
-	ndBrainVector m_criticValue[ND_SAC_NUMBER_OF_CRITICS];
+	//ndBrainVector m_nextQValue;
+	//ndBrainVector m_expectedRewards;
+	//ndBrainVector m_criticValue[ND_SAC_NUMBER_OF_CRITICS];
 	ndBrainVector m_rewardBatch[ND_SAC_NUMBER_OF_CRITICS];
-	ndBrainVector m_criticInputGradients[ND_SAC_NUMBER_OF_CRITICS];
-	ndBrainVector m_criticOutputGradients[ND_SAC_NUMBER_OF_CRITICS];
+	//ndBrainVector m_criticInputGradients[ND_SAC_NUMBER_OF_CRITICS];
+	//ndBrainVector m_criticOutputGradients[ND_SAC_NUMBER_OF_CRITICS];
 
 	ndArray<ndInt32> m_miniBatchIndices;
 	ndSharedPtr<ndBrainBuffer> m_replayBufferFlat;
 	ndSharedPtr<ndBrainBuffer> m_minibatchIndexBuffer;
-	ndSharedPtr<ndBrainBuffer> m_minibatchIndexBufferParameters;
-	ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory m_replayBuffer____;
+	ndSharedPtr<ndBrainBuffer> m_replayFlatBufferCache;
+	ndSharedPtr<ndBrainBuffer> m_replayFlatBufferCacheParameters;
+
+	ndSharedPtr<ndBrainBuffer> m_criticNextActionParameters;
+	ndSharedPtr<ndBrainBuffer> m_criticNextObservationParameters;
+	ndSharedPtr<ndBrainBuffer> m_policyNextObservationParameters;
+
+	ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory m_replayBuffer;
 	ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory m_replayBufferCache;
 	ndBrainAgentDeterministicPolicyGradient_Agent* m_agent;
 	ndArray<ndInt32> m_shuffleBuffer;
