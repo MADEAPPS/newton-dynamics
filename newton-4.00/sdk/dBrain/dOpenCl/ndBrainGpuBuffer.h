@@ -20,7 +20,7 @@ class ndBrainGpuContext;
 class ndBrainGpuBuffer : public ndBrainBuffer
 {
 	protected:
-	ndBrainGpuBuffer(ndBrainContext* const context, ndInt64 sizeInByte);
+	ndBrainGpuBuffer(ndBrainContext* const context, ndInt64 sizeInByte, bool memoryMapped = false);
 
 	public:
 	virtual ~ndBrainGpuBuffer();
@@ -38,7 +38,8 @@ class ndBrainGpuBuffer : public ndBrainBuffer
 	virtual void LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const sourceData) override;
 	virtual void UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const outputData) const override;
 
-	cl::Buffer m_buffer;
+	ndSharedPtr<cl::Buffer> m_buffer;
+	void* m_memory;
 	friend class ndBrainGpuContext;
 	friend class ndBrainGpuCommand;
 };

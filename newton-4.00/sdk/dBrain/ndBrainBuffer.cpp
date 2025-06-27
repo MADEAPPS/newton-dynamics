@@ -12,9 +12,10 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainBuffer.h"
 
-ndBrainBuffer::ndBrainBuffer(ndBrainContext* const context, ndInt64 sizeInByte)
+ndBrainBuffer::ndBrainBuffer(ndBrainContext* const context, ndInt64 sizeInByte, bool memoryMapped)
 	:m_context(context)
 	,m_sizeInBytes(size_t(sizeInByte))
+	,m_isMemoryMapped(memoryMapped)
 {
 }
 

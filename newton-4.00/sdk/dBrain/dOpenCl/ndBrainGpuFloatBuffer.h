@@ -16,9 +16,9 @@
 class ndBrainGpuFloatBuffer : public ndBrainGpuBuffer
 {
 	public:
-	ndBrainGpuFloatBuffer(ndBrainContext* const context, ndInt64 sizeInElements);
-	ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainVector& input);
-	ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainMatrix& matrix);
+	ndBrainGpuFloatBuffer(ndBrainContext* const context, ndInt64 sizeInElements, bool memoryMapped = false);
+	ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainVector& input, bool memoryMapped = false);
+	ndBrainGpuFloatBuffer(ndBrainContext* const context, const ndBrainMatrix& matrix, bool memoryMapped = false);
 };
 
 #endif

@@ -39,7 +39,7 @@ class ndCopyBufferCommandInfo
 class ndBrainBuffer : public ndClassAlloc
 {
 	protected:
-	ndBrainBuffer(ndBrainContext* const context, ndInt64 sizeInByte);
+	ndBrainBuffer(ndBrainContext* const context, ndInt64 sizeInByte, bool memoryMapped = false);
 
 	public:
 	virtual ~ndBrainBuffer();
@@ -61,6 +61,7 @@ class ndBrainBuffer : public ndClassAlloc
 
 	ndBrainContext* m_context;
 	size_t m_sizeInBytes;
+	bool m_isMemoryMapped;
 };
 
 #endif

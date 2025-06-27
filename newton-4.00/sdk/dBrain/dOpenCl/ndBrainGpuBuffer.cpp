@@ -15,14 +15,35 @@
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuContext.h"
 
-ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainContext* const context, ndInt64 sizeInByte)
-	:ndBrainBuffer(context, sizeInByte)
-	,m_buffer(**context->GetAsGpuContext()->m_context, CL_MEM_READ_WRITE, size_t(sizeInByte))
+ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainContext* const context, ndInt64 sizeInByte, bool memoryMapped)
+	:ndBrainBuffer(context, sizeInByte, memoryMapped)
+	,m_buffer()
+	,m_memory(nullptr)
 {
+	cl_int error = CL_SUCCESS;
+	if (m_isMemoryMapped && m_context->SupportsMappedMemory())
+	{
+		m_memory = clSVMAlloc(m_context->GetAsGpuContext()->m_context->get(), CL_MEM_READ_WRITE, size_t(sizeInByte), 32);
+		ndAssert(m_memory);
+		m_buffer = ndSharedPtr<cl::Buffer>(new cl::Buffer(**m_context->GetAsGpuContext()->m_context, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR, size_t(sizeInByte), m_memory, &error));
+	}
+	else
+	{
+		m_isMemoryMapped = false;
+		m_buffer = ndSharedPtr<cl::Buffer> (new cl::Buffer(**m_context->GetAsGpuContext()->m_context, CL_MEM_READ_WRITE, size_t(sizeInByte), nullptr, &error));
+	}
+	ndAssert(error == CL_SUCCESS);
 }
 
 ndBrainGpuBuffer::~ndBrainGpuBuffer()
 {
+	m_buffer = ndSharedPtr<cl::Buffer>();
+	if (m_memory)
+	{
+		ndAssert(m_isMemoryMapped);
+		//m_context->GetAsGpuContext()->m_context->lcE
+		clSVMFree(m_context->GetAsGpuContext()->m_context->get(), m_memory);
+	}
 }
 
 void ndBrainGpuBuffer::MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputMemory)
@@ -52,19 +73,19 @@ void ndBrainGpuBuffer::LoadData(size_t offsetInBytes, size_t sizeInBytes, const 
 {
 	ndAssert(m_context->GetAsGpuContext());
 
-	cl_int error = 0;
+	cl_int error = CL_SUCCESS;
 	ndAssert(sizeInBytes <= m_sizeInBytes);
 	ndSharedPtr<cl::CommandQueue>& queue = m_context->GetAsGpuContext()->m_queue;
-	error = queue->enqueueWriteBuffer(m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, sourceData);
+	error = queue->enqueueWriteBuffer(**m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, sourceData);
 	ndAssert(error == CL_SUCCESS);
 }
 
 void ndBrainGpuBuffer::UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const destinationData) const
 {
-	cl_int error = 0;
+	cl_int error = CL_SUCCESS;
 	ndAssert(m_context->GetAsGpuContext());
 	ndSharedPtr<cl::CommandQueue>& queue = m_context->GetAsGpuContext()->m_queue;
-	error = queue->enqueueReadBuffer(m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, destinationData);
+	error = queue->enqueueReadBuffer(**m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, destinationData);
 	ndAssert(error == CL_SUCCESS);
 }
 

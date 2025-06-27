@@ -349,6 +349,8 @@ void ndBrainTrainerGpuInference::UpdateParameters(const ndBrainVector& weightAnd
 
 void ndBrainTrainerGpuInference::MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output)
 {
+	//ndBrainGpuFloatBuffer xxxx(*GetContext(), GetBrain()->GetInputSize(), true);
+
 	ndBrainBuffer* const inputBuffer = GetInputBuffer();
 	const ndBrainBuffer* const outputBuffer = GetOutputBuffer();
 	inputBuffer->MemoryToDevice(0, input.GetCount() * sizeof (ndReal), &input[0]);
