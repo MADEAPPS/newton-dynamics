@@ -164,15 +164,11 @@ static void MnistTrainingSet()
 			,m_minCombinedScore(ndInt64(1000000) * ndInt64(1000000))
 			,m_minValidationFail(ndInt64(1000000) * ndInt64(1000000))
 		{
-			ndAssert(0);
-			//if (context->GetAsGpuContext())
-			//{
-			//	m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainerGpu(m_brain, context, m_learnRate, m_miniBatchSize));
-			//}
-			//else
-			//{
-			//	m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainerCpu(m_brain, context, m_learnRate, m_miniBatchSize));
-			//}
+			ndTrainerDescriptor descritor;
+			descritor.m_context = context;
+			descritor.m_learRate = m_learnRate;
+			descritor.m_minibatchSize = m_miniBatchSize;
+			m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descritor));
 		}
 
 		ndInt32 ValidateData(ndSharedPtr<ndBrainBuffer>& parameters, ndBrainMatrix* const testLabels, const ndSharedPtr<ndBrainFloatBuffer>& data)
@@ -613,6 +609,6 @@ static void MnistTestSet()
 void ndHandWrittenDigits()
 {
 	ndSetRandSeed(53);
-	//MnistTrainingSet();
+	MnistTrainingSet();
 	//MnistTestSet();
 }

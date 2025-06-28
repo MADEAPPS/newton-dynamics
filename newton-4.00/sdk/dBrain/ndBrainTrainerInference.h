@@ -73,10 +73,6 @@ class ndBrainTrainerInference : public ndClassAlloc
 {
 	public: 
 	ndBrainTrainerInference(const ndTrainerDescriptor& descriptor);
-	ndBrainTrainerInference(
-		const ndSharedPtr<ndBrain>& brain, 
-		const ndSharedPtr<ndBrainContext>& context, 
-		ndInt32 minibatchSize);
 	ndBrainTrainerInference(const ndBrainTrainerInference& src);
 	virtual ~ndBrainTrainerInference();
 
@@ -117,6 +113,7 @@ class ndBrainTrainerInference : public ndClassAlloc
 	//void AddCopyInputCommand(const ndBrainLayer::ndCommandShareInfo& uniformData);
 	//void AddLayersCommands(ndFixSizeArray<ndBrainLayer::ndCommandShareInfo, 256>& layersUniformsData);
 
+	ndTrainerDescriptor m_descriptor;
 	ndSharedPtr<ndBrainGpuFloatBuffer> m_inputOutputBuffer;
 	ndSharedPtr<ndBrainGpuFloatBuffer> m_weightAndBiasBuffer;
 	ndSharedPtr<ndBrainGpuFloatBuffer> m_miniBatchInputBuffer;
@@ -128,7 +125,6 @@ class ndBrainTrainerInference : public ndClassAlloc
 	ndSharedPtr<ndBrainGpuUniformBuffer> m_singlePredictionOutputBufferParameters;
 
 	ndList<ndSharedPtr<ndBrainGpuCommand>> m_feedForwardCommands;
-	ndInt32 m_miniBatchSize;
 };
 
 #endif 

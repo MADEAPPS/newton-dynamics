@@ -33,7 +33,6 @@ class ndBrainTrainer: public ndBrainTrainerInference
 {
 	public: 
 	ndBrainTrainer(const ndTrainerDescriptor& descriptor);
-	ndBrainTrainer(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndBrainFloat learnRate, ndInt32 minibatchSize);
 	ndBrainTrainer(const ndBrainTrainer& src);
 	virtual ~ndBrainTrainer();
 

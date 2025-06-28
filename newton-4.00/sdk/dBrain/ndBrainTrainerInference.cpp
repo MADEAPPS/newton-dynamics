@@ -78,47 +78,26 @@ ndBrainTrainerGpuCommand::ndBrainTrainerGpuCommand(
 }
 
 ndBrainTrainerInference::ndBrainTrainerInference(const ndTrainerDescriptor& descriptor)
-	//:ndBrainTrainer(descriptor)
 	:ndClassAlloc()
+	,m_descriptor(descriptor)
 	,m_inputOutputBuffer()
 	,m_weightAndBiasBuffer()
 	,m_miniBatchInputBuffer()
 	,m_miniBatchOutputBuffer()
 	,m_feedForwardCommands()
-	,m_miniBatchSize(descriptor.m_minibatchSize)
 {
-	ndAssert(0);
-	//ndAssert(descriptor.m_brain->IsGpuReady());
-	//ndAssert(descriptor.m_context->GetType() == ndBrainContext::m_gpu);
-	//ndBrainTrainerInference::Initialize(descriptor);
-}
-
-ndBrainTrainerInference::ndBrainTrainerInference(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndInt32 minibatchSize)
-	//:ndBrainTrainer(brain, context)
-	:ndClassAlloc()
-	,m_inputOutputBuffer()
-	,m_weightAndBiasBuffer()
-	,m_miniBatchInputBuffer()
-	,m_miniBatchOutputBuffer()
-	,m_feedForwardCommands()
-	,m_miniBatchSize(minibatchSize)
-{
-	ndAssert(0);
-	//ndTrainerDescriptor descriptor(brain, context, m_miniBatchSize, ndBrainFloat(0.0f));
-	//ndAssert(descriptor.m_brain->IsGpuReady());
-	//ndAssert(descriptor.m_context->GetType() == ndBrainContext::m_gpu);
 	//ndBrainTrainerInference::Initialize(descriptor);
 }
 
 ndBrainTrainerInference::ndBrainTrainerInference(const ndBrainTrainerInference& src)
 	//:ndBrainTrainer(src)
 	:ndClassAlloc()
+	,m_descriptor(src.m_descriptor)
 	,m_inputOutputBuffer()
 	,m_weightAndBiasBuffer()
 	,m_miniBatchInputBuffer()
 	,m_miniBatchOutputBuffer()
 	,m_feedForwardCommands()
-	,m_miniBatchSize(src.m_miniBatchSize)
 {
 	ndAssert(0);
 }

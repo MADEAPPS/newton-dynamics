@@ -100,19 +100,6 @@ ndBrainTrainer::ndBrainTrainer(const ndTrainerDescriptor& descriptor)
 	//ndBrainTrainer::Initialize(descriptor);
 }
 
-ndBrainTrainer::ndBrainTrainer(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndBrainFloat learnRate, ndInt32 minibatchSize)
-	:ndBrainTrainerInference(ndTrainerDescriptor(brain, context, minibatchSize, learnRate))
-	//,m_optimizer(new ndBrainOptimizerAdamGpu(m_context))
-	//,m_inputOutputGradientsBuffer()
-	//,m_weightAndBiasGradientsBuffer()
-	//,m_miniBatchInputGradientBuffer()
-	//,m_miniBatchOutputGradientBuffer()
-{
-	ndAssert(0);
-	//ndTrainerDescriptor descriptor(brain, context, minibatchSize, learnRate);
-	//ndBrainTrainer::Initialize(descriptor);
-}
-
 ndBrainTrainer::ndBrainTrainer(const ndBrainTrainer& src)
 	:ndBrainTrainerInference(src)
 	,m_inputOutputGradientsBuffer()
