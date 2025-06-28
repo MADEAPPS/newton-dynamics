@@ -32,6 +32,8 @@
 class ndBrain;
 class ndBrainLoss;
 class ndBrainLayer;
+class ndBrainFloatBuffer;
+class ndBrainUniformBuffer;
 class ndBrainTrainerInference;
 
 class ndTrainerDescriptor
@@ -48,26 +50,26 @@ class ndTrainerDescriptor
 	ndRegularizerType m_regularizerType;
 };
 
-class ndBrainTrainerGpuCommand : public ndBrainGpuCommand
-{
-	public:
-	ndBrainTrainerGpuCommand(
-		ndBrainTrainerInference* const owner,
-		const ndBrainLayer::ndCommandShareInfo& info, 
-		size_t id,
-		ndBrainGpuContext* const context,
-		const ndSharedPtr<ndBrainGpuShader>& shader,
-		ndInt32 numberOfinputs,
-		const ndSharedPtr<ndBrainGpuUniformBuffer>& uniformBuffer,
-		ndBrainGpuFloatBuffer* const inputOutputData,
-		ndBrainGpuFloatBuffer* const parameters,
-		ndBrainGpuFloatBuffer* const inputOutputGradients = nullptr,
-		ndBrainGpuFloatBuffer* const weightsAndBiasGradients = nullptr);
-
-	ndSharedPtr<ndBrainGpuUniformBuffer> m_uniformBuffer;
-	ndBrainTrainerInference* m_owner;
-	size_t m_id;
-};
+//class ndBrainTrainerGpuCommand : public ndBrainGpuCommand
+//{
+//	public:
+//	ndBrainTrainerGpuCommand(
+//		ndBrainTrainerInference* const owner,
+//		const ndBrainLayer::ndCommandShareInfo& info, 
+//		size_t id,
+//		ndBrainGpuContext* const context,
+//		const ndSharedPtr<ndBrainGpuShader>& shader,
+//		ndInt32 numberOfinputs,
+//		const ndSharedPtr<ndBrainGpuUniformBuffer>& uniformBuffer,
+//		ndBrainFloatBuffer* const inputOutputData,
+//		ndBrainFloatBuffer* const parameters,
+//		ndBrainFloatBuffer* const inputOutputGradients = nullptr,
+//		ndBrainFloatBuffer* const weightsAndBiasGradients = nullptr);
+//
+//	ndSharedPtr<ndBrainGpuUniformBuffer> m_uniformBuffer;
+//	ndBrainTrainerInference* m_owner;
+//	size_t m_id;
+//};
 
 class ndBrainTrainerInference : public ndClassAlloc
 {
@@ -105,24 +107,23 @@ class ndBrainTrainerInference : public ndClassAlloc
 	};
 
 	//void AddCopyOutputCommand();
-	//void InitInputOutputBuffer();
+	void InitInputOutputBuffer();
 	//void InitWeightAndBiasBuffer();
-	//ndInt32 RoundoffOffset(ndInt32 value) const;
-	//void Initialize(const ndTrainerDescriptor& descriptor);
+	ndInt32 RoundoffOffset(ndInt32 value) const;
 	//ndBrainTrainerGpuCommand* FindCommand(size_t id) const;
 	//void AddCopyInputCommand(const ndBrainLayer::ndCommandShareInfo& uniformData);
 	//void AddLayersCommands(ndFixSizeArray<ndBrainLayer::ndCommandShareInfo, 256>& layersUniformsData);
 
 	ndTrainerDescriptor m_descriptor;
-	ndSharedPtr<ndBrainGpuFloatBuffer> m_inputOutputBuffer;
-	ndSharedPtr<ndBrainGpuFloatBuffer> m_weightAndBiasBuffer;
-	ndSharedPtr<ndBrainGpuFloatBuffer> m_miniBatchInputBuffer;
-	ndSharedPtr<ndBrainGpuFloatBuffer> m_miniBatchOutputBuffer;
+	ndSharedPtr<ndBrainFloatBuffer> m_inputOutputBuffer;
+	ndSharedPtr<ndBrainFloatBuffer> m_weightAndBiasBuffer;
+	ndSharedPtr<ndBrainFloatBuffer> m_miniBatchInputBuffer;
+	ndSharedPtr<ndBrainFloatBuffer> m_miniBatchOutputBuffer;
 
-	ndSharedPtr<ndBrainGpuFloatBuffer> m_singlePredictionInputBuffer;
-	ndSharedPtr<ndBrainGpuFloatBuffer> m_singlePredictionOutputBuffer;
-	ndSharedPtr<ndBrainGpuUniformBuffer> m_singlePredictionInputBufferParameters;
-	ndSharedPtr<ndBrainGpuUniformBuffer> m_singlePredictionOutputBufferParameters;
+	ndSharedPtr<ndBrainFloatBuffer> m_singlePredictionInputBuffer;
+	ndSharedPtr<ndBrainFloatBuffer> m_singlePredictionOutputBuffer;
+	ndSharedPtr<ndBrainUniformBuffer> m_singlePredictionInputBufferParameters;
+	ndSharedPtr<ndBrainUniformBuffer> m_singlePredictionOutputBufferParameters;
 
 	ndList<ndSharedPtr<ndBrainGpuCommand>> m_feedForwardCommands;
 };

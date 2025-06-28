@@ -197,8 +197,8 @@ ndBrainTrainerGpuCommand* ndBrainLayerActivationRelu::CreateGpuFeedForwardComman
 	const ndBrainLayer::ndCommandShareInfo& info,
 	ndBrainGpuContext* const context, ndInt32 miniBatchSize,
 	const ndSharedPtr<ndBrainGpuUniformBuffer>& uniformBuffer,
-	ndBrainGpuFloatBuffer* const inputOutputData,
-	ndBrainGpuFloatBuffer* const weightsAndBias) const
+	ndBrainFloatBuffer* const inputOutputData,
+	ndBrainFloatBuffer* const weightsAndBias) const
 {
 	ndAssert(0);
 	return nullptr;
@@ -213,10 +213,10 @@ ndBrainTrainerGpuCommand* ndBrainLayerActivationRelu::CreateGpuBackPropagateComm
 	const ndBrainLayer::ndCommandShareInfo& info,
 	ndBrainGpuContext* const context, ndInt32 miniBatchSize,
 	const ndSharedPtr<ndBrainGpuUniformBuffer>& uniformBuffer,
-	ndBrainGpuFloatBuffer* const inputOutputData,
-	ndBrainGpuFloatBuffer* const weightsAndBias,
-	ndBrainGpuFloatBuffer* const inputOutputGradients,
-	ndBrainGpuFloatBuffer* const weightsAndBiasGradients) const
+	ndBrainFloatBuffer* const inputOutputData,
+	ndBrainFloatBuffer* const weightsAndBias,
+	ndBrainFloatBuffer* const inputOutputGradients,
+	ndBrainFloatBuffer* const weightsAndBiasGradients) const
 {
 	ndAssert(0);
 	return nullptr;

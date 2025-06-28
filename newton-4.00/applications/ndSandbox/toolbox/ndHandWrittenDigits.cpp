@@ -165,6 +165,7 @@ static void MnistTrainingSet()
 			,m_minValidationFail(ndInt64(1000000) * ndInt64(1000000))
 		{
 			ndTrainerDescriptor descritor;
+			descritor.m_brain = brain;
 			descritor.m_context = context;
 			descritor.m_learRate = m_learnRate;
 			descritor.m_minibatchSize = m_miniBatchSize;
@@ -452,8 +453,8 @@ static void MnistTrainingSet()
 
 		//if (deviceType)
 		//{
-		//	//optimizer.m_testData = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuFloatBuffer(*context, **testDigits));
-		//	//optimizer.m_trainingData = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuFloatBuffer(*context, **trainingDigits));
+		//	//optimizer.m_testData = ndSharedPtr<ndBrainBuffer>(new ndBrainFloatBuffer(*context, **testDigits));
+		//	//optimizer.m_trainingData = ndSharedPtr<ndBrainBuffer>(new ndBrainFloatBuffer(*context, **trainingDigits));
 		//	optimizer.m_indirectMiniBatch = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuIntegerBuffer(*context, optimizer.m_miniBatchSize, true));
 		//}
 		//else
@@ -487,15 +488,16 @@ static void MnistTrainingSet()
 		copyBufferInfo.m_dstStrideInByte = ndInt32(strideInBytes);
 
 		ndSharedPtr<ndBrainBuffer> parameterBuffer;
-		if (context->GetAsGpuContext())
-		{
-			parameterBuffer = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuUniformBuffer(*context, sizeof(ndCopyBufferCommandInfo), &copyBufferInfo));
-		}
-		else
-		{
-			ndAssert(0);
-			//parameterBuffer = ndSharedPtr<ndBrainBuffer>(new ndBrainCpuUniformBuffer(*context, sizeof(ndCopyBufferCommandInfo), &copyBufferInfo));
-		}
+		ndAssert(0);
+		//if (context->GetAsGpuContext())
+		//{
+		//	parameterBuffer = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuUniformBuffer(*context, sizeof(ndCopyBufferCommandInfo), &copyBufferInfo));
+		//}
+		//else
+		//{
+		//	ndAssert(0);
+		//	//parameterBuffer = ndSharedPtr<ndBrainBuffer>(new ndBrainCpuUniformBuffer(*context, sizeof(ndCopyBufferCommandInfo), &copyBufferInfo));
+		//}
 
 		SupervisedTrainer inference(context, optimizer.m_bestBrain);
 		ndInt32 testFailCount = inference.ValidateData(parameterBuffer, *testLabels, optimizer.m_testData);
@@ -609,6 +611,6 @@ static void MnistTestSet()
 void ndHandWrittenDigits()
 {
 	ndSetRandSeed(53);
-	MnistTrainingSet();
+	//MnistTrainingSet();
 	//MnistTestSet();
 }

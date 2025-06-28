@@ -185,8 +185,8 @@ ndBrainTrainerGpuCommand* ndBrainLayerActivationSoftmax::CreateGpuFeedForwardCom
 	const ndBrainLayer::ndCommandShareInfo& info,
 	ndBrainGpuContext* const context, ndInt32 miniBatchSize,
 	const ndSharedPtr<ndBrainGpuUniformBuffer>& uniformBuffer,
-	ndBrainGpuFloatBuffer* const inputOutputData,
-	ndBrainGpuFloatBuffer* const parameters) const
+	ndBrainFloatBuffer* const inputOutputData,
+	ndBrainFloatBuffer* const parameters) const
 {
 	ndAssert(0);
 	return nullptr;

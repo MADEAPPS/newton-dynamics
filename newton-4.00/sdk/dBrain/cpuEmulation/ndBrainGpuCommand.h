@@ -16,7 +16,7 @@
 #include "ndBrainGpuContext.h"
 
 class ndBrainGpuBuffer;
-class ndBrainGpuFloatBuffer;
+class ndBrainFloatBuffer;
 class ndBrainGpuUniformBuffer;
 
 class ndBrainGpuCommand : public ndClassAlloc

@@ -24,7 +24,7 @@
 #include "ndBrainMatrix.h"
 #include "ndBrainCpuContext.h"
 #include "ndBrainThreadPool.h"
-#include "ndBrainGpuFloatBuffer.h"
+#include "ndBrainFloatBuffer.h"
 #include "ndBrainOptimizerAdamGpu.h"
 
 ndBrainOptimizerAdamGpu::ndBrainOptimizerAdamGpu(const ndSharedPtr<ndBrainContext>& context)
@@ -44,8 +44,8 @@ void ndBrainOptimizerAdamGpu::Init(ndInt32 parametersBufferSizeInFloats, ndBrain
 	m_parameters.m_learnRate = learnRate;
 	m_parameters.m_decayRegularizer = GetRegularizer();
 	ndBrainGpuContext* const context = m_context->GetAsGpuContext();
-	m_vdw = ndSharedPtr<ndBrainGpuFloatBuffer>(new ndBrainGpuFloatBuffer(context, buffer));
-	m_vdw2 = ndSharedPtr<ndBrainGpuFloatBuffer>(new ndBrainGpuFloatBuffer(context, buffer));
+	m_vdw = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(context, buffer));
+	m_vdw2 = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(context, buffer));
 }
 
 //#pragma optimize( "", off )

@@ -53,17 +53,17 @@ class ndBrainLayerActivationTanh : public ndBrainLayerActivation
 		const ndBrainLayer::ndCommandShareInfo& info,
 		ndBrainGpuContext* const context, ndInt32 miniBatchSize,
 		const ndSharedPtr<ndBrainGpuUniformBuffer>& uniformBuffer,
-		ndBrainGpuFloatBuffer* const inputOutputData,
-		ndBrainGpuFloatBuffer* const weightsAndBias) const override;
+		ndBrainFloatBuffer* const inputOutputData,
+		ndBrainFloatBuffer* const weightsAndBias) const override;
 
 	virtual ndBrainTrainerGpuCommand* CreateGpuBackPropagateCommand(ndBrainTrainerGpuInference* const owner,
 		const ndBrainLayer::ndCommandShareInfo& info,
 		ndBrainGpuContext* const context, ndInt32 miniBatchSize,
 		const ndSharedPtr<ndBrainGpuUniformBuffer>& uniformBuffer,
-		ndBrainGpuFloatBuffer* const inputOutputData,
-		ndBrainGpuFloatBuffer* const weightsAndBias,
-		ndBrainGpuFloatBuffer* const inputOutputGradients,
-		ndBrainGpuFloatBuffer* const weightsAndBiasGradients) const override;
+		ndBrainFloatBuffer* const inputOutputData,
+		ndBrainFloatBuffer* const weightsAndBias,
+		ndBrainFloatBuffer* const inputOutputGradients,
+		ndBrainFloatBuffer* const weightsAndBiasGradients) const override;
 };
 
 #endif 

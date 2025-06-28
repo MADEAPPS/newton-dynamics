@@ -362,9 +362,9 @@ void TestVulkanStuff()
 		TestCommand(
 			ndBrainGpuContext* const context, 
 			ndInt32 numberOfImputs, 
-			ndBrainGpuUniformBuffer& uniforms,
-			ndBrainGpuFloatBuffer& weights, 
-			ndBrainGpuFloatBuffer& imputOutputs)
+			ndBrainUniformBuffer& uniforms,
+			ndBrainFloatBuffer& weights, 
+			ndBrainFloatBuffer& imputOutputs)
 			:ndBrainGpuCommand(context, ndBrainLayer::ndCommandShareInfo())
 		{
 			ndFixSizeArray<ndBrainBuffer*, 4> params;
@@ -392,9 +392,9 @@ void TestVulkanStuff()
 	uniformParam.m_inputOutputStartOffset = 0;
 	
 	ndAssert(0);
-	//ndBrainGpuFloatBuffer inputOutputBuffer(&context, workBuffer);
-	//ndBrainGpuFloatBuffer weightParamBuffer(&context, parameters);
-	//ndBrainGpuUniformBuffer parammeters(&context, sizeof(UniformBufferObject));
+	//ndBrainFloatBuffer inputOutputBuffer(&context, workBuffer);
+	//ndBrainFloatBuffer weightParamBuffer(&context, parameters);
+	//ndBrainUniformBuffer parammeters(&context, sizeof(UniformBufferObject));
 	//parammeters.LoadData(sizeof(UniformBufferObject), &uniformParam);
 	//
 	//UniformBufferObject uniformParam1;

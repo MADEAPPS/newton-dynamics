@@ -25,9 +25,6 @@
 #include "ndBrainTrainer.h"
 #include "ndBrainCpuContext.h"
 #include "ndBrainLayerLinear.h"
-#include "ndBrainGpuFloatBuffer.h"
-#include "ndBrainGpuIntegerBuffer.h"
-#include "ndBrainGpuUniformBuffer.h"
 #include "ndBrainOptimizerAdamCpu.h"
 #include "ndBrainLayerActivationRelu.h"
 #include "ndBrainLayerActivationTanh.h"
@@ -344,8 +341,8 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::ndBrainAgentDeterministicPolicy
 	//
 	//if (m_parameters.m_useGpuBackend)
 	//{
-	//	m_replayFlatBufferCache = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuFloatBuffer(*m_context, m_replayBuffer.GetStride() * ND_MINI_FLAT_BUFFER_CACHE, true));
-	//	m_replayBufferFlat = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuFloatBuffer(*m_context, m_replayBuffer.GetStride() * m_parameters.m_replayBufferSize));
+	//	m_replayFlatBufferCache = ndSharedPtr<ndBrainBuffer>(new ndBrainFloatBuffer(*m_context, m_replayBuffer.GetStride() * ND_MINI_FLAT_BUFFER_CACHE, true));
+	//	m_replayBufferFlat = ndSharedPtr<ndBrainBuffer>(new ndBrainFloatBuffer(*m_context, m_replayBuffer.GetStride() * m_parameters.m_replayBufferSize));
 	//	m_minibatchIndexBuffer = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuIntegerBuffer(*m_context, m_parameters.m_miniBatchSize, true));
 	//
 	//	ndCopyBufferCommandInfo replayCacheBufferInfo;

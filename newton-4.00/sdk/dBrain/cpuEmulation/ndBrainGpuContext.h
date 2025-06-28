@@ -17,7 +17,7 @@
 
 class ndBrainBuffer;
 class ndBrainGpuCommand;
-class ndBrainGpuFloatBuffer;
+class ndBrainFloatBuffer;
 
 class ndBrainGpuShader : public ndClassAlloc
 {

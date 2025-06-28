@@ -17,11 +17,13 @@
 ndBrainUniformBuffer::ndBrainUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes)
 	:ndBrainBuffer(context, sizeInBytes)
 {
+	ndAssert(0);
 }
 
 ndBrainUniformBuffer::ndBrainUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, const void* const data)
 	:ndBrainBuffer(context, sizeInBytes)
 {
+	ndAssert(0);
 	LoadData(0, size_t(sizeInBytes), data);
 }
 
@@ -40,16 +42,19 @@ void ndBrainUniformBuffer::BrainVectorFromDevice(ndBrainVector&) const
 
 void ndBrainUniformBuffer::MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData)
 {
+	ndAssert(0);
 	LoadData(offsetInBytes, sizeInBytes, inputData);
 }
 
 void ndBrainUniformBuffer::MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
 {
+	ndAssert(0);
 	UnloadData(offsetInBytes, sizeInBytes, outputMemory);
 }
 
 void ndBrainUniformBuffer::LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const sourceData)
 {
+	ndAssert(0);
 	ndAssert(sizeInBytes <= m_sizeInBytes);
 	size_t size = ndMin(sizeInBytes, m_sizeInBytes) / sizeof(ndUnsigned32);
 	m_data.SetCount(ndInt32 (size));
@@ -59,6 +64,7 @@ void ndBrainUniformBuffer::LoadData(size_t offsetInBytes, size_t sizeInBytes, co
 
 void ndBrainUniformBuffer::UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const outputData) const
 {
+	ndAssert(0);
 	ndAssert(sizeInBytes <= m_sizeInBytes);
 	size_t size = ndMin(sizeInBytes, m_sizeInBytes) / sizeof(ndUnsigned32);
 	ndInt32 offset = ndInt32(offsetInBytes / sizeof(ndUnsigned32));

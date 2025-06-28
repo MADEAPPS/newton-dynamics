@@ -16,9 +16,9 @@
 class ndBrainFloatBuffer : public ndBrainBuffer
 {
 	public:
-	ndBrainFloatBuffer(ndBrainContext* const context, ndInt64 size);
-	ndBrainFloatBuffer(ndBrainContext* const context, const ndBrainVector& input);
-	ndBrainFloatBuffer(ndBrainContext* const context, const ndBrainMatrix& matrix);
+	ndBrainFloatBuffer(ndBrainContext* const context, ndInt64 size, bool memoryMapped = false);
+	ndBrainFloatBuffer(ndBrainContext* const context, const ndBrainVector& input, bool memoryMapped = false);
+	ndBrainFloatBuffer(ndBrainContext* const context, const ndBrainMatrix& matrix, bool memoryMapped = false);
 
 	size_t GetCount() const;
 

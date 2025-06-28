@@ -12,8 +12,6 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainGpuCommand.h"
 #include "ndBrainGpuContext.h"
-#include "ndBrainGpuFloatBuffer.h"
-#include "ndBrainGpuUniformBuffer.h"
 
 ndBrainGpuContext::ndBrainGpuContext()
 	:ndBrainContext()
