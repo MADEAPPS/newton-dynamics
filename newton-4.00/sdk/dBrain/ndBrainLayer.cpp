@@ -22,8 +22,20 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainLayer.h"
+#include "ndBrainBufferCommand.h"
 
 class ndBrainContext;
+
+ndBrainLayerFeedForwardCpuCommand::ndBrainLayerFeedForwardCpuCommand(const ndBrainBufferCommandDesc& desc, ndBrainLayer* const layer)
+	:ndBrainBufferCommandCpu(ndBrainBufferCommandDesc(desc))
+	,m_layer(layer)
+{
+}
+
+void ndBrainLayerFeedForwardCpuCommand::Execute(ndInt32 miniBatchIndex)
+{
+	ndAssert(0);
+}
 
 ndBrainLayer::ndBrainLayer(const ndBrainLayer& src)
 	:ndClassAlloc(src)
@@ -207,20 +219,20 @@ void ndBrainLayer::CalculateParamGradients(const ndBrainVector&, const ndBrainVe
 	ndAssert(0);
 }
 
-ndBrainLayer::ndCommandShareInfo ndBrainLayer::GetCpuCommandSharedInfo() const
+ndCommandShareInfo ndBrainLayer::GetCpuCommandSharedInfo() const
 {
 	ndAssert(0);
 	return ndCommandShareInfo(this);
 }
 
-ndBrainLayer::ndCommandShareInfo ndBrainLayer::GetGpuCommandSharedInfo() const
+ndCommandShareInfo ndBrainLayer::GetGpuCommandSharedInfo() const
 {
 	ndAssert(0);
 	return ndCommandShareInfo(this);
 }
 
-ndBrainCommandBuffer* ndBrainLayer::CreateGpuFeedForwardCommand(
-	ndBrainTrainerInference* const, const ndBrainLayer::ndCommandShareInfo&, 
+ndBrainBufferCommand* ndBrainLayer::CreateGpuFeedForwardCommand(
+	ndBrainTrainerInference* const, const ndCommandShareInfo&, 
 	ndBrainContext* const, ndInt32, const ndSharedPtr<ndBrainUniformBuffer>&,
 	ndBrainFloatBuffer* const, ndBrainFloatBuffer* const) const
 {
@@ -228,8 +240,8 @@ ndBrainCommandBuffer* ndBrainLayer::CreateGpuFeedForwardCommand(
 	return nullptr;
 }
 
-ndBrainCommandBuffer* ndBrainLayer::CreateGpuBackPropagateCommand(
-	ndBrainTrainerInference* const, const ndBrainLayer::ndCommandShareInfo&,
+ndBrainBufferCommand* ndBrainLayer::CreateGpuBackPropagateCommand(
+	ndBrainTrainerInference* const, const ndCommandShareInfo&,
 	ndBrainContext* const, ndInt32, const ndSharedPtr<ndBrainUniformBuffer>&,
 	ndBrainFloatBuffer* const, ndBrainFloatBuffer* const, 
 	ndBrainFloatBuffer* const, ndBrainFloatBuffer* const) const

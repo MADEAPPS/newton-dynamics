@@ -21,6 +21,7 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
+#include "ndBrainUniformBuffer.h"
 #include "ndBrainLayerImagePadding.h"
 
 ndBrainLayerImagePadding::ndBrainLayerImagePadding(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputLayers, ndInt32 filterSize)

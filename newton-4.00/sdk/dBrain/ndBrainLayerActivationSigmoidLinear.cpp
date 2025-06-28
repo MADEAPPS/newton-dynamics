@@ -20,6 +20,7 @@
 */
 
 #include "ndBrainStdafx.h"
+#include "ndBrainUniformBuffer.h"
 #include "ndBrainLayerActivationSigmoidLinear.h"
 
 ndBrainLayerActivationSigmoidLinear::ndBrainLayerActivationSigmoidLinear(ndInt32 neurons)

@@ -24,6 +24,7 @@
 #include "ndBrainTrainer.h"
 #include "ndBrainOptimizer.h"
 #include "ndBrainThreadPool.h"
+#include "ndBrainUniformBuffer.h"
 
 ndBrainOptimizer::ndBrainOptimizer(const ndSharedPtr<ndBrainContext>& context)
 	:ndClassAlloc()

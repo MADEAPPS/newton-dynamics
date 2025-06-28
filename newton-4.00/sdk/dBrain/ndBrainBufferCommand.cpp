@@ -10,10 +10,10 @@
 */
 
 #include "ndBrainStdafx.h"
-#include "ndBrainCommandBuffer.h"
+#include "ndBrainBufferCommand.h"
 
 #if 0
-ndBrainGpuCommand::ndBrainGpuCommand(ndBrainContext* const context, const ndBrainLayer::ndCommandShareInfo& info)
+ndBrainGpuCommand::ndBrainGpuCommand(ndBrainContext* const context, const ndCommandShareInfo& info)
 	:ndClassAlloc()
 	,m_context(context)
 	,m_shader()
@@ -44,8 +44,27 @@ void ndBrainGpuCommand::Assembly(const ndSharedPtr<ndBrainGpuShader>& shader, nd
 #endif
 
 
-ndBrainCommandBuffer::ndBrainCommandBuffer(const ndBrainCommandBufferDesc& desc)
-	:ndContainersFreeListAlloc<ndBrainCommandBuffer>()
+ndBrainBufferCommand::ndBrainBufferCommand(const ndBrainBufferCommandDesc& desc)
+	:ndContainersFreeListAlloc<ndBrainBufferCommand>()
 	,m_desc(desc)
+{
+}
+
+ndBrainBufferCommandDesc& ndBrainBufferCommand::GetDescriptor()
+{
+	return m_desc;
+}
+
+const ndBrainBufferCommandDesc& ndBrainBufferCommand::GetDescriptor() const
+{
+	return m_desc;
+}
+
+ndBrainBufferCommandCpu::ndBrainBufferCommandCpu(const ndBrainBufferCommandDesc& desc)
+	:ndBrainBufferCommand(desc)
+{
+}
+
+ndBrainBufferCommandCpu::~ndBrainBufferCommandCpu()
 {
 }

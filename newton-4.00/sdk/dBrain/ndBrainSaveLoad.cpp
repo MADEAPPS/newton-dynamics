@@ -23,6 +23,7 @@
 #include "ndBrain.h"
 #include "ndBrainSaveLoad.h"
 #include "ndBrainLayerLinear.h"
+#include "ndBrainUniformBuffer.h"
 #include "ndBrainLayerActivationElu.h"
 #include "ndBrainLayerActivationRelu.h"
 #include "ndBrainLayerActivationTanh.h"

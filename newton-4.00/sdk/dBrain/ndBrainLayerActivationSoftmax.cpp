@@ -21,8 +21,10 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainTrainer.h"
-#include "ndBrainSaveLoad.h"
 #include "ndBrainContext.h"
+#include "ndBrainSaveLoad.h"
+#include "ndBrainFloatBuffer.h"
+#include "ndBrainUniformBuffer.h"
 #include "ndBrainLayerActivationSoftmax.h"
 
 ndBrainLayerActivationSoftmax::ndBrainLayerActivationSoftmax(ndInt32 neurons)
@@ -180,19 +182,37 @@ void ndBrainLayerActivationSoftmax::BackPropagate(const ndBrainLayerBackPropagat
 	ndAssert(0);
 }
 
-ndBrainCommandBuffer* ndBrainLayerActivationSoftmax::CreateGpuFeedForwardCommand(
+ndBrainBufferCommand* ndBrainLayerActivationSoftmax::CreateGpuFeedForwardCommand(
 	ndBrainTrainerInference* const owner,
-	const ndBrainLayer::ndCommandShareInfo& info,
+	const ndCommandShareInfo& info,
 	ndBrainContext* const context, ndInt32 miniBatchSize,
 	const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 	ndBrainFloatBuffer* const inputOutputData,
 	ndBrainFloatBuffer* const parameters) const
 {
-	ndAssert(0);
-	return nullptr;
+	if (context->GetAsCpuContext())
+	{
+		ndBrainBufferCommandDesc descriptor;
+		descriptor.m_id = size_t(this);
+		descriptor.m_context = context;
+		descriptor.m_owner = owner;
+		descriptor.m_info = info;
+		descriptor.m_uniformBuffer = uniformBuffer;
 
-	//ndBrainCommandBuffer* const command = new ndBrainTrainerGpuCommand(
-	//	owner, info, size_t(this), context, context->m_brainLayerSoftmaxActivation, 
-	//	miniBatchSize, uniformBuffer, inputOutputData, parameters);
-	//return command;
+		descriptor.PushBack(inputOutputData);
+		descriptor.PushBack(parameters);
+
+		ndBrainBufferCommand* const command = new ndBrainLayerFeedForwardCpuCommand(descriptor, (ndBrainLayer*)this);
+		return command;
+	}
+	else
+	{
+		ndAssert(0);
+		//ndBrainBufferCommand* const command = new ndBrainTrainerGpuCommand(
+		//	owner, info, size_t(this), context, context->m_brainLayerSoftmaxActivation, 
+		//	miniBatchSize, uniformBuffer, inputOutputData, parameters);
+		//return command;
+
+		return nullptr;
+	}
 }

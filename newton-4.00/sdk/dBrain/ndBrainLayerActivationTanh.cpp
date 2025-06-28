@@ -21,9 +21,11 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainTrainer.h"
+#include "ndBrainContext.h"
 #include "ndBrainSaveLoad.h"
 #include "ndBrainSimdFloat8.h"
-#include "ndBrainContext.h"
+#include "ndBrainFloatBuffer.h"
+#include "ndBrainUniformBuffer.h"
 #include "ndBrainLayerActivationTanh.h"
 
 ndBrainLayerActivationTanh::ndBrainLayerActivationTanh(ndInt32 neurons)
@@ -171,25 +173,10 @@ void ndBrainLayerActivationTanh::BackPropagate(const ndBrainLayerBackPropagateCp
 	//inputDerivative.FlushToZero();
 }
 
-ndBrainCommandBuffer* ndBrainLayerActivationTanh::CreateGpuFeedForwardCommand(
-	ndBrainTrainerInference* const owner,
-	const ndBrainLayer::ndCommandShareInfo& info,
-	ndBrainContext* const context, ndInt32 miniBatchSize,
-	const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
-	ndBrainFloatBuffer* const inputOutputData,
-	ndBrainFloatBuffer* const weightsAndBias) const
-{
-	ndAssert(0);
-	return nullptr;
 
-	//ndBrainCommandBuffer* const command = new ndBrainTrainerGpuCommand(owner,
-	//	info, size_t(this), context, context->m_brainLayerTanhActivation, miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias);
-	//return command;
-}
-
-ndBrainCommandBuffer* ndBrainLayerActivationTanh::CreateGpuBackPropagateCommand(
+ndBrainBufferCommand* ndBrainLayerActivationTanh::CreateGpuBackPropagateCommand(
 	ndBrainTrainerInference* const owner,
-	const ndBrainLayer::ndCommandShareInfo& info,
+	const ndCommandShareInfo& info,
 	ndBrainContext* const context, ndInt32 miniBatchSize,
 	const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 	ndBrainFloatBuffer* const inputOutputData,
@@ -200,9 +187,41 @@ ndBrainCommandBuffer* ndBrainLayerActivationTanh::CreateGpuBackPropagateCommand(
 	ndAssert(0);
 	return nullptr;
 
-	//ndBrainCommandBuffer* const command = new ndBrainTrainerGpuCommand(
+	//ndBrainBufferCommand* const command = new ndBrainTrainerGpuCommand(
 	//	owner, info, size_t(this), context, context->m_brainLayerTanhBackPropagate,
 	//	miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias, inputOutputGradients, weightsAndBiasGradients);
 	//return command;
 }
 
+ndBrainBufferCommand* ndBrainLayerActivationTanh::CreateGpuFeedForwardCommand(
+	ndBrainTrainerInference* const owner,
+	const ndCommandShareInfo& info,
+	ndBrainContext* const context, ndInt32 miniBatchSize,
+	const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
+	ndBrainFloatBuffer* const inputOutputData,
+	ndBrainFloatBuffer* const weightsAndBias) const
+{
+	if (context->GetAsCpuContext())
+	{
+		ndBrainBufferCommandDesc descriptor;
+		descriptor.m_id = size_t(this);
+		descriptor.m_context = context;
+		descriptor.m_owner = owner;
+		descriptor.m_info = info;
+		descriptor.m_uniformBuffer = uniformBuffer;
+
+		descriptor.PushBack(inputOutputData);
+		descriptor.PushBack(weightsAndBias);
+
+		ndBrainBufferCommand* const command = new ndBrainLayerFeedForwardCpuCommand(descriptor, (ndBrainLayer*)this);
+		return command;
+	}
+	else
+	{
+		ndAssert(0);
+		//ndBrainBufferCommand* const command = new ndBrainTrainerGpuCommand(owner,
+		//	info, size_t(this), context, context->m_brainLayerTanhActivation, miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias);
+		//return command;
+		return nullptr;
+	}
+}

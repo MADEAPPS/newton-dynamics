@@ -110,3 +110,29 @@ void ndBrainUniformBuffer::CopyBufferIndirect(const ndBrainBuffer&, const ndBrai
 }
 
 #endif
+
+void ndBrainUniformBuffer::MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
+{
+	if (m_context->GetAsCpuContext())
+	{
+		const ndFixSizeArray<ndUnsigned32, 256>& src = **m_data;
+		m_context->MemoryFromDevice(&src[0], offsetInBytes, sizeInBytes, outputMemory);
+	}
+	else
+	{
+		ndAssert(0);
+	}
+}
+
+void ndBrainUniformBuffer::MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData)
+{
+	if (m_context->GetAsCpuContext())
+	{
+		ndFixSizeArray<ndUnsigned32, 256>& dst = **m_data;
+		m_context->MemoryToDevice(&dst[0], offsetInBytes, sizeInBytes, inputData);
+	}
+	else
+	{
+		ndAssert(0);
+	}
+}

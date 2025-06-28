@@ -85,7 +85,12 @@ void ndBrainGpuContext::CopyBufferIndirect(const ndBrainBuffer& parameterBuffer,
 	ndAssert(0);
 }
 
-void ndBrainGpuContext::MemoryFromDevice(const ndBrainFloatBuffer& buffer, size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
+void ndBrainGpuContext::MemoryFromDevice(const void* const srcBuffer, size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuContext::MemoryToDevice(void* const dstBuffer, size_t offsetInBytes, size_t sizeInBytes, const void* const srcMemory) const
 {
 	ndAssert(0);
 }

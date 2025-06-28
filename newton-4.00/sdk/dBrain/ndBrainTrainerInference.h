@@ -28,7 +28,7 @@
 #include "ndBrainOptimizer.h"
 #include "ndBrainContext.h"
 #include "ndBrainGpuCommand.h"
-#include "ndBrainCommandBuffer.h"
+#include "ndBrainBufferCommand.h"
 
 class ndBrain;
 class ndBrainLoss;
@@ -56,7 +56,7 @@ class ndTrainerDescriptor
 //	public:
 //	ndBrainTrainerGpuCommand(
 //		ndBrainTrainerInference* const owner,
-//		const ndBrainLayer::ndCommandShareInfo& info, 
+//		const ndCommandShareInfo& info, 
 //		size_t id,
 //		ndBrainContext* const context,
 //		const ndSharedPtr<ndBrainGpuShader>& shader,
@@ -80,7 +80,7 @@ class ndBrainTrainerInference : public ndClassAlloc
 	//	public:
 	//	ndBrainTrainerGpuCommand(
 	//		ndBrainTrainerInference* const owner,
-	//		const ndBrainLayer::ndCommandShareInfo& info, 
+	//		const ndCommandShareInfo& info, 
 	//		size_t id,
 	//		ndBrainContext* const context,
 	//		const ndSharedPtr<ndBrainGpuShader>& shader,
@@ -99,7 +99,7 @@ class ndBrainTrainerInference : public ndClassAlloc
 	//class ndBrainTrainerCpuCommand : public ndContainersFreeListAlloc<ndBrainTrainerCpuCommand>
 	//{
 	//	public:
-	//	ndBrainTrainerCpuCommand(const ndBrainLayer::ndCommandShareInfo& info, size_t id)
+	//	ndBrainTrainerCpuCommand(const ndCommandShareInfo& info, size_t id)
 	//		:ndContainersFreeListAlloc<ndBrainTrainerCpuCommand>()
 	//		, m_owner(nullptr)
 	//		, m_info(info)
@@ -114,7 +114,7 @@ class ndBrainTrainerInference : public ndClassAlloc
 	//	virtual void Execute(ndInt32 miniBatchIndex) = 0;
 	//
 	//	ndBrainTrainerCpuInference* m_owner;
-	//	ndBrainLayer::ndCommandShareInfo m_info;
+	//	ndCommandShareInfo m_info;
 	//	size_t m_id;
 	//};
 
@@ -151,13 +151,13 @@ class ndBrainTrainerInference : public ndClassAlloc
 		m_outpuId,
 	};
 
-	//void AddCopyOutputCommand();
+	void AddCopyOutputCommand();
 	void InitInputOutputBuffer();
 	void InitWeightAndBiasBuffer();
 	ndInt32 RoundoffOffset(ndInt32 value) const;
-	//ndBrainTrainerGpuCommand* FindCommand(size_t id) const;
-	void AddCopyInputCommand(const ndBrainLayer::ndCommandShareInfo& uniformData);
-	void AddLayersCommands(ndFixSizeArray<ndBrainLayer::ndCommandShareInfo, 256>& layersUniformsData);
+	ndBrainBufferCommand* FindCommand(size_t id) const;
+	void AddCopyInputCommand(const ndCommandShareInfo& uniformData);
+	void AddLayersCommands(ndFixSizeArray<ndCommandShareInfo, 256>& layersUniformsData);
 
 	ndTrainerDescriptor m_descriptor;
 	ndSharedPtr<ndBrainFloatBuffer> m_inputOutputBuffer;
@@ -170,7 +170,7 @@ class ndBrainTrainerInference : public ndClassAlloc
 	//ndSharedPtr<ndBrainUniformBuffer> m_singlePredictionInputBufferParameters;
 	//ndSharedPtr<ndBrainUniformBuffer> m_singlePredictionOutputBufferParameters;
 
-	ndList<ndSharedPtr<ndBrainCommandBuffer>> m_feedForwardCommands;
+	ndList<ndSharedPtr<ndBrainBufferCommand>> m_feedForwardCommands;
 };
 
 #endif 

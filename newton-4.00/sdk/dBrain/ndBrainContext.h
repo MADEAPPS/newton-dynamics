@@ -40,7 +40,8 @@ class ndBrainContext : public ndClassAlloc
 
 	virtual void BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector) = 0;
 
-	virtual void MemoryFromDevice(const ndBrainFloatBuffer& buffer, size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const = 0;
+	virtual void MemoryToDevice(void* const dstBuffer, size_t offsetInBytes, size_t sizeInBytes, const void* const srcMemory) const = 0;
+	virtual void MemoryFromDevice(const void* const srcBuffer, size_t offsetInBytes, size_t sizeInBytes, void* const dstMemory) const = 0;
 	virtual void CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, ndBrainFloatBuffer& dstData, const ndBrainFloatBuffer& srcData) = 0;
 };
 

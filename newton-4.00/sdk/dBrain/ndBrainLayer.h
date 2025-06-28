@@ -23,62 +23,37 @@
 #define _ND_BRAIN_LAYER_H__
 
 #include "ndBrainStdafx.h"
-//#include "ndBrainTrainer.h"
 #include "ndBrainContext.h"
+#include "ndBrainBufferCommand.h"
 
 class ndBrainLoad;
 class ndBrainSave;
+class ndBrainLayer;
 class ndBrainVector;
 class ndBrainMatrix;
 class ndBrainGpuBuffer;
 class ndBrainGpuCommand;
 class ndBrainFloatBuffer;
-class ndBrainCommandBuffer;
+class ndBrainBufferCommand;
 class ndBrainUniformBuffer;
 class ndBrainTrainerInference;
 
-class ndBrainLayerFeedForwardCpuCommand;
+
 class ndBrainLayerBackPropagateCpuCommand;
+
+class ndBrainLayerFeedForwardCpuCommand : public ndBrainBufferCommandCpu
+{
+	public:
+	ndBrainLayerFeedForwardCpuCommand(const ndBrainBufferCommandDesc& desc, ndBrainLayer* const layer);
+
+	virtual void Execute(ndInt32 miniBatchIndex) override;
+
+	ndBrainLayer* m_layer;
+};
 
 class ndBrainLayer : public ndClassAlloc
 {
 	public: 
-	class ndCommandShareInfo
-	{
-		public:
-			ndCommandShareInfo()
-			:m_inputSize(0)
-			,m_outputSize(0)
-			,m_inputOutputSize(0)
-			,m_inputOutputStartOffset(0)
-			,m_parametersBatchSize(0)
-			,m_parametersStartOffset(0)
-			,m_tiledStride(0)
-			,m_layer(nullptr)
-		{
-		}
-
-		ndCommandShareInfo(const ndBrainLayer* const layer)
-			:m_inputSize(0)
-			,m_outputSize(0)
-			,m_inputOutputSize(0)
-			,m_inputOutputStartOffset(0)
-			,m_parametersBatchSize(0)
-			,m_parametersStartOffset(0)
-			,m_layer(layer)
-		{
-		}
-
-		ndInt32 m_inputSize;
-		ndInt32 m_outputSize;
-		ndInt32 m_inputOutputSize;
-		ndInt32 m_inputOutputStartOffset;
-		ndInt32 m_parametersBatchSize;
-		ndInt32 m_parametersStartOffset;
-		ndInt32	m_tiledStride;
-		const ndBrainLayer* m_layer;
-	};
-
 	ndBrainLayer();
 	ndBrainLayer(const ndBrainLayer& src);
 
@@ -134,15 +109,15 @@ class ndBrainLayer : public ndClassAlloc
 
 	virtual bool HasGpuSupport() const;
 
-	virtual ndBrainCommandBuffer* CreateGpuFeedForwardCommand(ndBrainTrainerInference* const owner,
-		const ndBrainLayer::ndCommandShareInfo& info,
+	virtual ndBrainBufferCommand* CreateGpuFeedForwardCommand(ndBrainTrainerInference* const owner,
+		const ndCommandShareInfo& info,
 		ndBrainContext* const context, ndInt32 miniBatchSize,
 		const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 		ndBrainFloatBuffer* const inputOutputData,
 		ndBrainFloatBuffer* const weightsAndBias) const;
 
-	virtual ndBrainCommandBuffer* CreateGpuBackPropagateCommand(ndBrainTrainerInference* const owner,
-		const ndBrainLayer::ndCommandShareInfo& info,
+	virtual ndBrainBufferCommand* CreateGpuBackPropagateCommand(ndBrainTrainerInference* const owner,
+		const ndCommandShareInfo& info,
 		ndBrainContext* const context, ndInt32 miniBatchSize,
 		const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 		ndBrainFloatBuffer* const inputOutputData,

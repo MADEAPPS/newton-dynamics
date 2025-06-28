@@ -97,15 +97,15 @@ class ndBrainLayerLinear : public ndBrainLayer
 
 	void CalculateRoundedSize(ndInt32& width, ndInt32& height) const;
 
-	virtual ndBrainCommandBuffer* CreateGpuFeedForwardCommand(ndBrainTrainerInference* const owner,
-		const ndBrainLayer::ndCommandShareInfo& info,
+	virtual ndBrainBufferCommand* CreateGpuFeedForwardCommand(ndBrainTrainerInference* const owner,
+		const ndCommandShareInfo& info,
 		ndBrainContext* const context, ndInt32 miniBatchSize,
 		const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 		ndBrainFloatBuffer* const inputOutputData,
 		ndBrainFloatBuffer* const weightsAndBias) const override;
 
-	virtual ndBrainCommandBuffer* CreateGpuBackPropagateCommand(ndBrainTrainerInference* const owner,
-		const ndBrainLayer::ndCommandShareInfo& info,
+	virtual ndBrainBufferCommand* CreateGpuBackPropagateCommand(ndBrainTrainerInference* const owner,
+		const ndCommandShareInfo& info,
 		ndBrainContext* const context, ndInt32 miniBatchSize,
 		const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 		ndBrainFloatBuffer* const inputOutputData,

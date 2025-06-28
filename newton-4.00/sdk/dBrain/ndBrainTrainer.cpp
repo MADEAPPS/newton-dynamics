@@ -23,6 +23,7 @@
 #include "ndBrain.h"
 #include "ndBrainLoss.h"
 #include "ndBrainLayer.h"
+#include "ndBrainKernel.h"
 #include "ndBrainVector.h"
 #include "ndBrainMatrix.h"
 #include "ndBrainBuffer.h"
@@ -43,7 +44,7 @@ class ndBrainAdamUpdateCommand : public ndBrainGpuCommand
 		ndInt32 miniBatchSize,
 		ndBrainOptimizerAdamGpu::ndCommandShareInfo& info,
 		const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer)
-		:ndBrainGpuCommand(context, ndBrainLayer::ndCommandShareInfo())
+		:ndBrainGpuCommand(context, ndCommandShareInfo())
 		,m_shader(shader)
 		,m_uniformBuffer(uniformBuffer)
 		,m_info(info)
@@ -66,7 +67,7 @@ class ndBrainAdamUpdateCommand : public ndBrainGpuCommand
 		ndSharedPtr<ndBrainFloatBuffer>& weightAndBiasGradientBuffer,
 		ndSharedPtr<ndBrainFloatBuffer>& vdw,
 		ndSharedPtr<ndBrainFloatBuffer>& vdw2)
-		:ndBrainGpuCommand(context, ndBrainLayer::ndCommandShareInfo())
+		:ndBrainGpuCommand(context, ndCommandShareInfo())
 		,m_shader(shader)
 		,m_uniformBuffer(uniformBuffer)
 		,m_info(info)
@@ -147,14 +148,14 @@ void ndBrainTrainer::AddCopyInputGradientCommand()
 	ndBrainTrainerCommand* const firstCommand = FindCommand(m_inputId);
 	ndAssert(firstCommand);
 	
-	ndBrainLayer::ndCommandShareInfo data(firstCommand->m_info);
+	ndCommandShareInfo data(firstCommand->m_info);
 	
 	data.m_outputSize = 0;
 	data.m_parametersBatchSize = 0;
 	data.m_parametersStartOffset = 0;
 	data.m_inputOutputStartOffset = 0;
-	ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(*m_context, sizeof(ndBrainLayer::ndCommandShareInfo)));
-	uniformbuffer->MemoryToDevice(0, sizeof(ndBrainLayer::ndCommandShareInfo), &data);
+	ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(*m_context, sizeof(ndCommandShareInfo)));
+	uniformbuffer->MemoryToDevice(0, sizeof(ndCommandShareInfo), &data);
 	
 	ndBrainFloatBuffer* const inputOutputGradientBuffer = *m_inputOutputGradientsBuffer;
 	ndBrainFloatBuffer* const miniBatchInputGradientBuffer = *m_miniBatchInputGradientBuffer;
@@ -167,14 +168,14 @@ void ndBrainTrainer::AddCopyOutputGradientCommand()
 	ndBrainTrainerCommand* const lastLayerCommand = FindCommand(m_outpuId);
 	ndAssert(lastLayerCommand);
 	
-	ndBrainLayer::ndCommandShareInfo data(lastLayerCommand->m_info);
+	ndCommandShareInfo data(lastLayerCommand->m_info);
 	
 	data.m_inputSize = 0;
 	data.m_parametersBatchSize = 0;
 	data.m_parametersStartOffset = 0;
 	data.m_inputOutputStartOffset += RoundoffOffset(data.m_inputSize);
-	ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(*m_context, sizeof(ndBrainLayer::ndCommandShareInfo)));
-	uniformbuffer->MemoryToDevice(0, sizeof(ndBrainLayer::ndCommandShareInfo), &data);
+	ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(*m_context, sizeof(ndCommandShareInfo)));
+	uniformbuffer->MemoryToDevice(0, sizeof(ndCommandShareInfo), &data);
 	
 	ndBrainFloatBuffer* const inputOutputGradientBuffer = *m_inputOutputGradientsBuffer;
 	ndBrainFloatBuffer* const miniBatchOutputGradientBuffer = *m_miniBatchOutputGradientBuffer;
@@ -187,14 +188,14 @@ void ndBrainTrainer::AddOptimizerGradientCommand(ndBrainFloat learnRate)
 	ndInt32 sizeInFloats = ndInt32(m_weightAndBiasBuffer->SizeInBytes() / sizeof(ndReal));
 	m_optimizer->Init(sizeInFloats, learnRate);
 	
-	ndBrainLayer::ndCommandShareInfo data;
+	ndCommandShareInfo data;
 	data.m_inputSize = sizeInFloats;
 	data.m_inputOutputSize = m_miniBatchSize;
 	ndBrainFloatBuffer* const weightAndBiasGradientsBuffer = *m_weightAndBiasGradientsBuffer;
 
 #if 1
-	ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(*m_context, sizeof(ndBrainLayer::ndCommandShareInfo)));
-	uniformbuffer->MemoryToDevice(0, sizeof(ndBrainLayer::ndCommandShareInfo), &data);
+	ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(*m_context, sizeof(ndCommandShareInfo)));
+	uniformbuffer->MemoryToDevice(0, sizeof(ndCommandShareInfo), &data);
 
 	ndSharedPtr<ndBrainGpuCommand> accumulateGradients(new ndBrainTrainerCommand(this, data, 0, m_context->GetAsGpuContext(), m_context->GetAsGpuContext()->m_brainAccumulateGradientsAndAverage, m_miniBatchSize, uniformbuffer, weightAndBiasGradientsBuffer, nullptr, nullptr));
 	accumulateGradients->m_numberOfWorkGroups = size_t(sizeInFloats / accumulateGradients->m_workGroupSize);
@@ -207,8 +208,8 @@ void ndBrainTrainer::AddOptimizerGradientCommand(ndBrainFloat learnRate)
 		{
 			data.m_parametersBatchSize = i * sizeInFloats;
 			data.m_parametersStartOffset = j * sizeInFloats;
-			ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(m_context, sizeof(ndBrainLayer::ndCommandShareInfo)));
-			uniformbuffer->LoadData(sizeof(ndBrainLayer::ndCommandShareInfo), &data);
+			ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(m_context, sizeof(ndCommandShareInfo)));
+			uniformbuffer->LoadData(sizeof(ndCommandShareInfo), &data);
 
 			ndSharedPtr<ndBrainGpuCommand> accumulateGradients(new ndBrainTrainerCommand(this, data, 0, m_context, m_context->m_brainAccumulateGradients, m_miniBatchSize, uniformbuffer, weightAndBiasGradientsBuffer, nullptr, nullptr));
 			accumulateGradients->m_numberOfWorkGroups = size_t(sizeInFloats / accumulateGradients->m_workGroupSize);
@@ -216,8 +217,8 @@ void ndBrainTrainer::AddOptimizerGradientCommand(ndBrainFloat learnRate)
 		}
 	}
 
-	ndSharedPtr<ndBrainGpuBuffer> uniformbuffer(new ndBrainUniformBuffer(m_context, sizeof(ndBrainLayer::ndCommandShareInfo)));
-	uniformbuffer->LoadData(sizeof(ndBrainLayer::ndCommandShareInfo), &data);
+	ndSharedPtr<ndBrainGpuBuffer> uniformbuffer(new ndBrainUniformBuffer(m_context, sizeof(ndCommandShareInfo)));
+	uniformbuffer->LoadData(sizeof(ndCommandShareInfo), &data);
 
 	ndSharedPtr<ndBrainGpuCommand> averageGradients(new ndBrainTrainerCommand(this, data, 0, m_context, m_context->m_brainAverageGradients, m_miniBatchSize, uniformbuffer, weightAndBiasGradientsBuffer, nullptr, nullptr));
 	averageGradients->m_numberOfWorkGroups = size_t(sizeInFloats / averageGradients->m_workGroupSize);
@@ -263,10 +264,10 @@ void ndBrainTrainer::AddLayersGradientCommands()
 		ndBrainTrainerCommand* const feedForwardLayerCommand = FindCommand(size_t(layer));
 		ndAssert(feedForwardLayerCommand);
 	
-		ndBrainLayer::ndCommandShareInfo info(feedForwardLayerCommand->m_info);
+		ndCommandShareInfo info(feedForwardLayerCommand->m_info);
 	
-		ndSharedPtr<ndBrainUniformBuffer> uniformBuffer(new ndBrainUniformBuffer(*m_context, sizeof(ndBrainLayer::ndCommandShareInfo)));
-		uniformBuffer->MemoryToDevice(0, sizeof(ndBrainLayer::ndCommandShareInfo), &info);
+		ndSharedPtr<ndBrainUniformBuffer> uniformBuffer(new ndBrainUniformBuffer(*m_context, sizeof(ndCommandShareInfo)));
+		uniformBuffer->MemoryToDevice(0, sizeof(ndCommandShareInfo), &info);
 	
 		ndBrainFloatBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
 		ndBrainFloatBuffer* const weightsAndBiasBuffer = *m_weightAndBiasBuffer;

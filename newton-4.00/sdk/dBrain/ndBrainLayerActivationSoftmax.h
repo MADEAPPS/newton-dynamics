@@ -44,8 +44,8 @@ class ndBrainLayerActivationSoftmax : public ndBrainLayerActivation
 	virtual void BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const override;
 
 	virtual bool HasGpuSupport() const override;
-	virtual ndBrainCommandBuffer* CreateGpuFeedForwardCommand(ndBrainTrainerInference* const owner,
-		const ndBrainLayer::ndCommandShareInfo& info,
+	virtual ndBrainBufferCommand* CreateGpuFeedForwardCommand(ndBrainTrainerInference* const owner,
+		const ndCommandShareInfo& info,
 		ndBrainContext* const context, ndInt32 miniBatchSize,
 		const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 		ndBrainFloatBuffer* const inputOutputData,

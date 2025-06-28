@@ -25,6 +25,7 @@
 #include "ndBrainTrainer.h"
 #include "ndBrainSaveLoad.h"
 #include "ndBrainContext.h"
+#include "ndBrainUniformBuffer.h"
 #include "ndBrainLossLeastSquaredError.h"
 
 ndBrain::ndBrain()

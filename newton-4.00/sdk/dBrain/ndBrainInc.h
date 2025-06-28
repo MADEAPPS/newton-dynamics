@@ -46,7 +46,7 @@
 #include <ndBrainOptimizerSgd.h>
 #include <ndBrainUniformBuffer.h>
 #include <ndBrainIntegerBuffer.h>
-#include <ndBrainCommandBuffer.h>
+#include <ndBrainBufferCommand.h>
 #include <ndBrainLayerActivation.h>
 #include <ndBrainOptimizerAdamCpu.h>
 #include <ndBrainOptimizerAdamGpu.h>

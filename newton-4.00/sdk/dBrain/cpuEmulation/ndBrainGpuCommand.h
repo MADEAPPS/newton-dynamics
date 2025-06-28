@@ -23,14 +23,14 @@ class ndBrainUniformBuffer;
 class ndBrainGpuCommand : public ndContainersFreeListAlloc<ndBrainGpuCommand>
 {
 	public:
-	ndBrainGpuCommand(ndBrainContext* const context, const ndBrainLayer::ndCommandShareInfo& info);
+	ndBrainGpuCommand(ndBrainContext* const context, const ndCommandShareInfo& info);
 	virtual ~ndBrainGpuCommand();
 	void Assembly(const ndSharedPtr<ndBrainKernel>& shader, ndInt32 workGroupSize, ndInt32 buffersCount, ndBrainBuffer** buffer);
 
 	protected:
 	ndBrainContext* m_context;
 	ndSharedPtr<ndBrainKernel> m_shader;
-	ndBrainLayer::ndCommandShareInfo m_info;
+	ndCommandShareInfo m_info;
 	ndBrainLayer* m_layer;
 	ndFixSizeArray<ndBrainBuffer*, 8> m_parameters;
 	size_t m_workGroupSize;

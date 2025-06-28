@@ -24,6 +24,7 @@
 #include "ndBrainMatrix.h"
 #include "ndBrainThreadPool.h"
 #include "ndBrainOptimizerSgd.h"
+#include "ndBrainUniformBuffer.h"
 
 ndBrainOptimizerSgd::ndBrainOptimizerSgd()
 	:ndBrainOptimizer(ndSharedPtr<ndBrainContext>())

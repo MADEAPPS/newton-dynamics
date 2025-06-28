@@ -73,11 +73,14 @@ void ndBrainCpuContext::CopyBufferIndirect(const ndBrainBuffer& parameterBuffer,
 	//}
 }
 
-void ndBrainCpuContext::MemoryFromDevice(const ndBrainFloatBuffer& buffer, size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
+void ndBrainCpuContext::MemoryFromDevice(const void* const srcBuffer, size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
 {
-	size_t offset = offsetInBytes / sizeof(ndReal);
-	//ndBrainMemVector dst((ndBrainFloat*)outputData, ndInt32(sizeInBytes / sizeof(ndReal)));
-	//const ndBrainMemVector src(&m_buffer[ndInt64(offset)], ndInt32(sizeInBytes / sizeof(ndReal)));
-	//dst.Set(src);
+	const ndInt8* const src = (ndInt8*)srcBuffer;
+	ndMemCpy((ndInt8*)outputMemory, &src[offsetInBytes], ndInt64(sizeInBytes));
+}
 
+void ndBrainCpuContext::MemoryToDevice(void* const dstBuffer, size_t offsetInBytes, size_t sizeInBytes, const void* const inputMemory) const
+{
+	ndInt8* const dst = (ndInt8*)dstBuffer;
+	ndMemCpy(&dst[offsetInBytes], (ndInt8*)inputMemory, ndInt64(sizeInBytes));
 }
