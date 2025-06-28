@@ -24,76 +24,41 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainVector.h"
-#include "ndBrainOptimizer.h"
+#include "ndBrainTrainerInference.h"
 
-class ndBrain;
-class ndBrainLoss;
-class ndBrainBuffer;
-class ndBrainContext;
 
-class ndTrainerDescriptor
-{
-	public:
-	ndTrainerDescriptor();
-	ndTrainerDescriptor(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndInt32 minibatchSize, ndBrainFloat learnRate);
+class ndBrainOptimizerAdamGpu;
 
-	ndSharedPtr<ndBrain> m_brain;
-	ndSharedPtr<ndBrainContext> m_context;
-	ndBrainFloat m_learRate;
-	ndBrainFloat m_regularizer;
-	ndInt32 m_minibatchSize;
-	ndRegularizerType m_regularizerType;
-};
-
-class ndBrainTrainer: public ndClassAlloc
+class ndBrainTrainer: public ndBrainTrainerInference
 {
 	public: 
 	ndBrainTrainer(const ndTrainerDescriptor& descriptor);
-	ndBrainTrainer(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context);
+	ndBrainTrainer(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndBrainFloat learnRate, ndInt32 minibatchSize);
 	ndBrainTrainer(const ndBrainTrainer& src);
 	virtual ~ndBrainTrainer();
 
-	ndSharedPtr<ndBrain>& GetBrain();
-	ndSharedPtr<ndBrainContext> GetContext();
+	//virtual void ApplyLearnRate() override;
+	//virtual void GetGradientBuffer(ndBrainVector&) const override;
+	//virtual void BackPropagate(const ndBrainVector& outputGradients) override;
+	//
+	//protected:
+	//void AddLayersGradientCommands();
+	//void AddCopyInputGradientCommand();
+	//void AddCopyOutputGradientCommand();
+	//void Initialize(const ndTrainerDescriptor& descriptor);
+	//void AddOptimizerGradientCommand(ndBrainFloat learnRate);
 
-	virtual ndBrainBuffer* GetInputBuffer() = 0;
-	const virtual ndBrainBuffer* GetOutputBuffer() = 0;
+	ndSharedPtr<ndBrainOptimizerAdamGpu> m_optimizer;
+	ndSharedPtr<ndBrainGpuCommand> m_adamOtimizerUpdate;
+	ndSharedPtr<ndBrainGpuCommand> m_adamMomentumUpdate;
 
-	virtual void SaveInput(ndBrainVector& output) const = 0;
-	virtual void LoadInput(const ndBrainVector& input) = 0;
+	ndSharedPtr<ndBrainGpuFloatBuffer> m_inputOutputGradientsBuffer;
+	ndSharedPtr<ndBrainGpuFloatBuffer> m_weightAndBiasGradientsBuffer;
+	ndSharedPtr<ndBrainGpuFloatBuffer> m_miniBatchInputGradientBuffer;
+	ndSharedPtr<ndBrainGpuFloatBuffer> m_miniBatchOutputGradientBuffer;
 
-	virtual void GetOutput(ndBrainVector&) const {}
-	virtual void GetWorkingBuffer(ndBrainVector&) const {}
-	virtual void GetParameterBuffer(ndBrainVector&) const {}
-	virtual void GetGradientBuffer(ndBrainVector&) const {}
-	virtual void SoftCopyParameters(const ndBrainTrainer&, ndBrainFloat) {}
-
-	// legacy method;
-	virtual void BackPropagate(const ndBrainVector& input, ndBrainLoss& loss) = 0;
-
-	// new method
-	virtual void SyncQueue() = 0;
-
-	// new method
-	virtual void MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output) = 0;
-
-	// new method
-	virtual void MakePrediction() = 0;
-	void MakePrediction(const ndBrainVector& input);
-
-	// new method
-	virtual void BackPropagate(const ndBrainVector& outputGradients) = 0;
-
-	// new method
-	virtual void ApplyLearnRate() = 0;
-
-	// new method
-	void UpdateParameters();
-	virtual void UpdateParameters(const ndBrainVector& weightAndBias) = 0;
-
-	protected:
-	ndSharedPtr<ndBrain> m_brain;
-	ndSharedPtr<ndBrainContext> m_context;
+	ndList<ndSharedPtr<ndBrainGpuCommand>> m_backPropagateCommands;
+	ndList<ndSharedPtr<ndBrainGpuCommand>> m_accumulateGradientsCommands;
 };
 
 #endif 

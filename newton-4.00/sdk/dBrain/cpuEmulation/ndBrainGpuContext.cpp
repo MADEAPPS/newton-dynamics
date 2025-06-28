@@ -74,3 +74,19 @@ void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& co
 	iterator = 0;
 	ParallelExecute(ExecuteCommand);
 }
+
+
+void ndBrainGpuContext::BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector)
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuContext::CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, ndBrainFloatBuffer& dstData, const ndBrainFloatBuffer& srcData)
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuContext::MemoryFromDevice(const ndBrainFloatBuffer& buffer, size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
+{
+	ndAssert(0);
+}

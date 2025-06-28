@@ -8,17 +8,16 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
-#ifndef __ND_BRAIN_CPU_FLOAT_BUFFER_H__
-#define __ND_BRAIN_CPU_FLOAT_BUFFER_H__
+#ifndef __ND_BRAIN_UNIFORM_BUFFER_H__
+#define __ND_BRAIN_UNIFORM_BUFFER_H__
 
 #include "ndBrainBuffer.h"
 
-class ndBrainCpuFloatBuffer : public ndBrainBuffer
+class ndBrainUniformBuffer : public ndBrainBuffer
 {
 	public:
-	ndBrainCpuFloatBuffer(ndBrainContext* const context, ndInt64 size);
-	ndBrainCpuFloatBuffer(ndBrainContext* const context, const ndBrainVector& input);
-	ndBrainCpuFloatBuffer(ndBrainContext* const context, const ndBrainMatrix& matrix);
+	ndBrainUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes);
+	ndBrainUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, const void* const data);
 
 	virtual void BrainVectorToDevice(const ndBrainVector& vector) override;
 	virtual void BrainVectorFromDevice(ndBrainVector& vector) const override;
@@ -33,9 +32,12 @@ class ndBrainCpuFloatBuffer : public ndBrainBuffer
 	virtual void LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const sourceData) override;
 	virtual void UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const outputData) const override;
 
-	ndBrainVector m_buffer;
+	ndFixSizeArray<ndUnsigned32, 256> m_data;
 
 	friend class ndBrainTrainerCpu;
+	friend class ndBrainFloatBuffer;
+	friend class ndBrainCpuFloatBuffer;
+	friend class ndBrainCpuContext;
 	friend class ndBrainTrainerCpuInference;
 };
 

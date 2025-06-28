@@ -22,9 +22,7 @@
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"
 #include "ndBrainMatrix.h"
-//#include "ndBrainTrainer.h"
 #include "ndBrainCpuContext.h"
-#include "ndBrainTrainerCpu.h"
 #include "ndBrainThreadPool.h"
 #include "ndBrainOptimizerAdamCpu.h"
 

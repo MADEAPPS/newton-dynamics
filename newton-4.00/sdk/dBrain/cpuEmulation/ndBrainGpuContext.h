@@ -50,6 +50,11 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 	void SyncQueue();
 	void AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>&);
 
+	virtual void BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector) override;
+	virtual void MemoryFromDevice(const ndBrainFloatBuffer& buffer, size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const override;
+	virtual void CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, ndBrainFloatBuffer& dstData, const ndBrainFloatBuffer& srcData) override;
+	
+
 	static bool HasGpuSupport();
 
 	ndBrainGpuContext* GetAsGpuContext() override;

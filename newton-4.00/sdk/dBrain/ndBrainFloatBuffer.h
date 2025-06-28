@@ -8,16 +8,19 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
-#ifndef __ND_BRAIN_CPU_UNIFORM_BUFFER_H__
-#define __ND_BRAIN_CPU_UNIFORM_BUFFER_H__
+#ifndef __ND_BRAIN_FLOAT_BUFFER_H__
+#define __ND_BRAIN_FLOAT_BUFFER_H__
 
 #include "ndBrainBuffer.h"
 
-class ndBrainCpuUniformBuffer : public ndBrainBuffer
+class ndBrainFloatBuffer : public ndBrainBuffer
 {
 	public:
-	ndBrainCpuUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes);
-	ndBrainCpuUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, const void* const data);
+	ndBrainFloatBuffer(ndBrainContext* const context, ndInt64 size);
+	ndBrainFloatBuffer(ndBrainContext* const context, const ndBrainVector& input);
+	ndBrainFloatBuffer(ndBrainContext* const context, const ndBrainMatrix& matrix);
+
+	size_t GetCount() const;
 
 	virtual void BrainVectorToDevice(const ndBrainVector& vector) override;
 	virtual void BrainVectorFromDevice(ndBrainVector& vector) const override;
@@ -28,14 +31,17 @@ class ndBrainCpuUniformBuffer : public ndBrainBuffer
 	virtual void CopyBuffer(const ndBrainBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer) override;
 	virtual void CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer) override;
 
+	void CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainFloatBuffer& srcBuffer);
+
 	protected:
 	virtual void LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const sourceData) override;
 	virtual void UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const outputData) const override;
 
-	ndFixSizeArray<ndUnsigned32, 256> m_data;
+	ndSharedPtr<ndBrainVector> m_buffer;
 
+
+	friend class ndBrainCpuContext;
 	friend class ndBrainTrainerCpu;
-	friend class ndBrainCpuFloatBuffer;
 	friend class ndBrainTrainerCpuInference;
 };
 

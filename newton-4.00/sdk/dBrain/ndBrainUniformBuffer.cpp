@@ -12,43 +12,43 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainVector.h"
 #include "ndBrainCpuContext.h"
-#include "ndBrainCpuUniformBuffer.h"
+#include "ndBrainUniformBuffer.h"
 
-ndBrainCpuUniformBuffer::ndBrainCpuUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes)
+ndBrainUniformBuffer::ndBrainUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes)
 	:ndBrainBuffer(context, sizeInBytes)
 {
 }
 
-ndBrainCpuUniformBuffer::ndBrainCpuUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, const void* const data)
+ndBrainUniformBuffer::ndBrainUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, const void* const data)
 	:ndBrainBuffer(context, sizeInBytes)
 {
 	LoadData(0, size_t(sizeInBytes), data);
 }
 
-void ndBrainCpuUniformBuffer::BrainVectorToDevice(const ndBrainVector&)
+void ndBrainUniformBuffer::BrainVectorToDevice(const ndBrainVector&)
 {
 	ndAssert(0);
 	//ndAssert(vector.GetCount() * sizeof(ndReal) <= m_sizeInBytes);
 	//LoadData(vector.GetCount() * sizeof(ndReal), &vector[0]);
 }
 
-//void ndBrainCpuUniformBuffer::BrainVectorFromDevice(ndBrainVector& vector) const
-void ndBrainCpuUniformBuffer::BrainVectorFromDevice(ndBrainVector&) const
+//void ndBrainUniformBuffer::BrainVectorFromDevice(ndBrainVector& vector) const
+void ndBrainUniformBuffer::BrainVectorFromDevice(ndBrainVector&) const
 {
 	ndAssert(0);
 }
 
-void ndBrainCpuUniformBuffer::MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData)
+void ndBrainUniformBuffer::MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData)
 {
 	LoadData(offsetInBytes, sizeInBytes, inputData);
 }
 
-void ndBrainCpuUniformBuffer::MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
+void ndBrainUniformBuffer::MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
 {
 	UnloadData(offsetInBytes, sizeInBytes, outputMemory);
 }
 
-void ndBrainCpuUniformBuffer::LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const sourceData)
+void ndBrainUniformBuffer::LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const sourceData)
 {
 	ndAssert(sizeInBytes <= m_sizeInBytes);
 	size_t size = ndMin(sizeInBytes, m_sizeInBytes) / sizeof(ndUnsigned32);
@@ -57,7 +57,7 @@ void ndBrainCpuUniformBuffer::LoadData(size_t offsetInBytes, size_t sizeInBytes,
 	ndMemCpy(&m_data[offset], (ndUnsigned32*)sourceData, ndInt64(size));
 }
 
-void ndBrainCpuUniformBuffer::UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const outputData) const
+void ndBrainUniformBuffer::UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const outputData) const
 {
 	ndAssert(sizeInBytes <= m_sizeInBytes);
 	size_t size = ndMin(sizeInBytes, m_sizeInBytes) / sizeof(ndUnsigned32);
@@ -65,21 +65,21 @@ void ndBrainCpuUniformBuffer::UnloadData(size_t offsetInBytes, size_t sizeInByte
 	ndMemCpy((ndUnsigned32*)outputData, &m_data[offset], ndInt64(size));
 }
 
-//void ndBrainCpuUniformBuffer::CopyBuffer(const ndBrainBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer)
-void ndBrainCpuUniformBuffer::CopyBuffer(const ndBrainBuffer&, ndInt32, const ndBrainBuffer&)
+//void ndBrainUniformBuffer::CopyBuffer(const ndBrainBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer)
+void ndBrainUniformBuffer::CopyBuffer(const ndBrainBuffer&, ndInt32, const ndBrainBuffer&)
 {
 	ndAssert(0);
 	//ndInt64 dstOffset = ndInt64(dstOffsetInBytes / sizeof(ndReal));
 	//ndInt64 srcOffset = ndInt64(srcOffsetInBytes / sizeof(ndReal));
 	//
-	//ndBrainCpuUniformBuffer& source = *((ndBrainCpuUniformBuffer*)&sourceData);
+	//ndBrainUniformBuffer& source = *((ndBrainUniformBuffer*)&sourceData);
 	//ndBrainMemVector dst(&m_buffer[dstOffset], ndInt32(sizeInBytes / sizeof(ndReal)));
 	//const ndBrainMemVector src(&source.m_buffer[srcOffset], ndInt32(sizeInBytes / sizeof(ndReal)));
 	//dst.Set(src);
 }
 
-//void ndBrainCpuUniformBuffer::CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer)
-void ndBrainCpuUniformBuffer::CopyBufferIndirect(const ndBrainBuffer&, const ndBrainBuffer&, const ndBrainBuffer&)
+//void ndBrainUniformBuffer::CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer)
+void ndBrainUniformBuffer::CopyBufferIndirect(const ndBrainBuffer&, const ndBrainBuffer&, const ndBrainBuffer&)
 {
 	ndAssert(0);
 }

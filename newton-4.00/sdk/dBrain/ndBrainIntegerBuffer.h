@@ -8,16 +8,16 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
-#ifndef __ND_BRAIN_CPU_INTEGER_BUFFER_H__
-#define __ND_BRAIN_CPU_INTEGER_BUFFER_H__
+#ifndef __ND_BRAIN_INTEGER_BUFFER_H__
+#define __ND_BRAIN_INTEGER_BUFFER_H__
 
 #include "ndBrainBuffer.h"
 
-class ndBrainCpuIntegerBuffer : public ndBrainBuffer
+class ndBrainIntegerBuffer : public ndBrainBuffer
 {
 	public:
-	ndBrainCpuIntegerBuffer(ndBrainContext* const context, ndInt64 sizeInElements);
-	ndBrainCpuIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32* const indexArray);
+	ndBrainIntegerBuffer(ndBrainContext* const context, ndInt64 sizeInElements);
+	ndBrainIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32* const indexArray);
 
 	virtual void BrainVectorToDevice(const ndBrainVector& vector) override;
 	virtual void BrainVectorFromDevice(ndBrainVector& vector) const override;
@@ -34,9 +34,11 @@ class ndBrainCpuIntegerBuffer : public ndBrainBuffer
 
 	ndArray<ndUnsigned32> m_indexArray;
 
+	friend class ndBrainFloatBuffer;
 	friend class ndBrainTrainerCpu;
 	friend class ndBrainCpuFloatBuffer;
 	friend class ndBrainTrainerCpuInference;
+	friend class ndBrainCpuContext;
 };
 
 #endif

@@ -19,25 +19,40 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_TRAINER_GPU_INFERENCE_H__
-#define _ND_BRAIN_TRAINER_GPU_INFERENCE_H__
+#ifndef _ND_BRAIN_TRAINER_INFERENCE_H__
+#define _ND_BRAIN_TRAINER_INFERENCE_H__
 
 #include "ndBrainStdafx.h"
+#include "ndBrainLayer.h"
 #include "ndBrainVector.h"
-#include "ndBrainTrainer.h"
+#include "ndBrainOptimizer.h"
 #include "ndBrainGpuContext.h"
 #include "ndBrainGpuCommand.h"
 
 class ndBrain;
 class ndBrainLoss;
 class ndBrainLayer;
-class ndBrainTrainerGpuInference;
+class ndBrainTrainerInference;
+
+class ndTrainerDescriptor
+{
+	public:
+	ndTrainerDescriptor();
+	ndTrainerDescriptor(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndInt32 minibatchSize, ndBrainFloat learnRate);
+
+	ndSharedPtr<ndBrain> m_brain;
+	ndSharedPtr<ndBrainContext> m_context;
+	ndBrainFloat m_learRate;
+	ndBrainFloat m_regularizer;
+	ndInt32 m_minibatchSize;
+	ndRegularizerType m_regularizerType;
+};
 
 class ndBrainTrainerGpuCommand : public ndBrainGpuCommand
 {
 	public:
 	ndBrainTrainerGpuCommand(
-		ndBrainTrainerGpuInference* const owner,
+		ndBrainTrainerInference* const owner,
 		const ndBrainLayer::ndCommandShareInfo& info, 
 		size_t id,
 		ndBrainGpuContext* const context,
@@ -50,41 +65,41 @@ class ndBrainTrainerGpuCommand : public ndBrainGpuCommand
 		ndBrainGpuFloatBuffer* const weightsAndBiasGradients = nullptr);
 
 	ndSharedPtr<ndBrainGpuUniformBuffer> m_uniformBuffer;
-	ndBrainTrainerGpuInference* m_owner;
+	ndBrainTrainerInference* m_owner;
 	size_t m_id;
 };
 
-class ndBrainTrainerGpuInference: public ndBrainTrainer
+class ndBrainTrainerInference : public ndClassAlloc
 {
 	public: 
-	ndBrainTrainerGpuInference(const ndTrainerDescriptor& descriptor);
-	ndBrainTrainerGpuInference(
+	ndBrainTrainerInference(const ndTrainerDescriptor& descriptor);
+	ndBrainTrainerInference(
 		const ndSharedPtr<ndBrain>& brain, 
 		const ndSharedPtr<ndBrainContext>& context, 
 		ndInt32 minibatchSize);
-	ndBrainTrainerGpuInference(const ndBrainTrainerGpuInference& src);
-	virtual ~ndBrainTrainerGpuInference();
+	ndBrainTrainerInference(const ndBrainTrainerInference& src);
+	virtual ~ndBrainTrainerInference();
 
-	virtual ndBrainBuffer* GetInputBuffer() override;
-	virtual const ndBrainBuffer* GetOutputBuffer() override;
-
-	virtual void LoadInput(const ndBrainVector& input) override;
-	virtual void SaveInput(ndBrainVector& output) const override;
-
-	virtual void GetOutput(ndBrainVector& output) const override;
-	virtual void GetWorkingBuffer(ndBrainVector& output) const override;
-	virtual void GetParameterBuffer(ndBrainVector& output) const override;
-
-	// legacy
-	virtual void BackPropagate(const ndBrainVector&, ndBrainLoss&) override { ndAssert(0); }
-
-	// new methods
-	virtual void SyncQueue() override;
-	virtual void ApplyLearnRate() override;
-	virtual void MakePrediction() override;
-	virtual void BackPropagate(const ndBrainVector& outputGradients) override;
-	virtual void UpdateParameters(const ndBrainVector& weightAndBias) override;
-	virtual void MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output) override;
+	//virtual ndBrainBuffer* GetInputBuffer() override;
+	//virtual const ndBrainBuffer* GetOutputBuffer() override;
+	//
+	//virtual void LoadInput(const ndBrainVector& input) override;
+	//virtual void SaveInput(ndBrainVector& output) const override;
+	//
+	//virtual void GetOutput(ndBrainVector& output) const override;
+	//virtual void GetWorkingBuffer(ndBrainVector& output) const override;
+	//virtual void GetParameterBuffer(ndBrainVector& output) const override;
+	//
+	//// legacy
+	//virtual void BackPropagate(const ndBrainVector&, ndBrainLoss&) override { ndAssert(0); }
+	//
+	//// new methods
+	//virtual void SyncQueue() override;
+	//virtual void ApplyLearnRate() override;
+	//virtual void MakePrediction() override;
+	//virtual void BackPropagate(const ndBrainVector& outputGradients) override;
+	//virtual void UpdateParameters(const ndBrainVector& weightAndBias) override;
+	//virtual void MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output) override;
 
 	protected:
 	enum ndInputOutputCommandId
@@ -93,14 +108,14 @@ class ndBrainTrainerGpuInference: public ndBrainTrainer
 		m_outpuId,
 	};
 
-	void AddCopyOutputCommand();
-	void InitInputOutputBuffer();
-	void InitWeightAndBiasBuffer();
-	ndInt32 RoundoffOffset(ndInt32 value) const;
-	void Initialize(const ndTrainerDescriptor& descriptor);
-	ndBrainTrainerGpuCommand* FindCommand(size_t id) const;
-	void AddCopyInputCommand(const ndBrainLayer::ndCommandShareInfo& uniformData);
-	void AddLayersCommands(ndFixSizeArray<ndBrainLayer::ndCommandShareInfo, 256>& layersUniformsData);
+	//void AddCopyOutputCommand();
+	//void InitInputOutputBuffer();
+	//void InitWeightAndBiasBuffer();
+	//ndInt32 RoundoffOffset(ndInt32 value) const;
+	//void Initialize(const ndTrainerDescriptor& descriptor);
+	//ndBrainTrainerGpuCommand* FindCommand(size_t id) const;
+	//void AddCopyInputCommand(const ndBrainLayer::ndCommandShareInfo& uniformData);
+	//void AddLayersCommands(ndFixSizeArray<ndBrainLayer::ndCommandShareInfo, 256>& layersUniformsData);
 
 	ndSharedPtr<ndBrainGpuFloatBuffer> m_inputOutputBuffer;
 	ndSharedPtr<ndBrainGpuFloatBuffer> m_weightAndBiasBuffer;

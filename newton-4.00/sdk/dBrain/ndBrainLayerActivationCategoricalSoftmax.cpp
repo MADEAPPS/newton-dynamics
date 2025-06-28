@@ -20,10 +20,8 @@
 */
 
 #include "ndBrainStdafx.h"
+#include "ndBrainTrainer.h"
 #include "ndBrainSaveLoad.h"
-#include "ndBrainTrainerCpu.h"
-#include "ndBrainTrainerCpuInference.h"
-#include "ndBrainTrainerGpuInference.h"
 #include "ndBrainLayerActivationCategoricalSoftmax.h"
 
 ndBrainLayerActivationCategoricalSoftmax::ndBrainLayerActivationCategoricalSoftmax(ndInt32 neurons)
@@ -84,22 +82,23 @@ void ndBrainLayerActivationCategoricalSoftmax::InputDerivative(const ndBrainVect
 
 void ndBrainLayerActivationCategoricalSoftmax::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
-	const ndCommandShareInfo* const info = &command->m_info;
-	const ndBrainTrainerCpu* const trainer = (ndBrainTrainerCpu*)command->m_owner;
-
-	ndInt32 inputSize = info->m_inputSize;
-	ndInt32 outputSize = info->m_outputSize;
-	
-	ndInt32 offset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
-	const ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
-	
-	ndInt32 dstOffset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
-	const ndBrainMemVector outputDerivative(&trainer->m_inputOutputGradientsBuffer[dstOffset + inputSize], outputSize);
-	ndBrainMemVector inputDerivative (&trainer->m_inputOutputGradientsBuffer[dstOffset], inputSize);
-	
-	inputDerivative.Set(output);
-	inputDerivative.Sub(outputDerivative);
-	inputDerivative.FlushToZero();
+	ndAssert(0);
+	//const ndCommandShareInfo* const info = &command->m_info;
+	//const ndBrainTrainerCpu* const trainer = (ndBrainTrainerCpu*)command->m_owner;
+	//
+	//ndInt32 inputSize = info->m_inputSize;
+	//ndInt32 outputSize = info->m_outputSize;
+	//
+	//ndInt32 offset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
+	//const ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
+	//
+	//ndInt32 dstOffset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
+	//const ndBrainMemVector outputDerivative(&trainer->m_inputOutputGradientsBuffer[dstOffset + inputSize], outputSize);
+	//ndBrainMemVector inputDerivative (&trainer->m_inputOutputGradientsBuffer[dstOffset], inputSize);
+	//
+	//inputDerivative.Set(output);
+	//inputDerivative.Sub(outputDerivative);
+	//inputDerivative.FlushToZero();
 }
 
 ndBrainTrainerGpuCommand* ndBrainLayerActivationCategoricalSoftmax::CreateGpuBackPropagateCommand(
@@ -112,9 +111,12 @@ ndBrainTrainerGpuCommand* ndBrainLayerActivationCategoricalSoftmax::CreateGpuBac
 	ndBrainGpuFloatBuffer* const inputOutputGradients,
 	ndBrainGpuFloatBuffer* const weightsAndBiasGradients) const
 {
-	ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(
-		owner, info, size_t(this), context, context->m_brainLayerCathegoricalSoftmaxBackPropagate, 
-		miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias, inputOutputGradients, weightsAndBiasGradients);
-	return command;
+	ndAssert(0);
+	return nullptr;
+
+	//ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(
+	//	owner, info, size_t(this), context, context->m_brainLayerCathegoricalSoftmaxBackPropagate, 
+	//	miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias, inputOutputGradients, weightsAndBiasGradients);
+	//return command;
 }
 

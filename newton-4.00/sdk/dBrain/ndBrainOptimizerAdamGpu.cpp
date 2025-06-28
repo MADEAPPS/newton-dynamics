@@ -23,7 +23,6 @@
 #include "ndBrain.h"
 #include "ndBrainMatrix.h"
 #include "ndBrainCpuContext.h"
-#include "ndBrainTrainerCpu.h"
 #include "ndBrainThreadPool.h"
 #include "ndBrainGpuFloatBuffer.h"
 #include "ndBrainOptimizerAdamGpu.h"
