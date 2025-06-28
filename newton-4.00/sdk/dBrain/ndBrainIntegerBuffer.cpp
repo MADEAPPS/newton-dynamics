@@ -15,20 +15,43 @@
 #include "ndBrainCpuContext.h"
 #include "ndBrainIntegerBuffer.h"
 
-ndBrainIntegerBuffer::ndBrainIntegerBuffer(ndBrainContext* const context, ndInt64 sizeInElements)
-	:ndBrainBuffer(context, sizeInElements* ndInt64(sizeof(ndUnsigned32)))
+ndBrainIntegerBuffer::ndBrainIntegerBuffer(ndBrainContext* const context, ndInt64 sizeInElements, bool memoryMapped)
+	:ndBrainBuffer(context, sizeInElements * ndInt64(sizeof(ndUnsigned32)), memoryMapped)
 {
-	ndAssert(0);
-	//m_indexArray.SetCount(sizeInElements);
+	if (m_context->GetAsCpuContext())
+	{
+		m_indexArray = ndSharedPtr<ndArray<ndUnsigned32>>(new ndArray<ndUnsigned32>);
+		m_indexArray->SetCount(sizeInElements);
+	}
+	else
+	{
+		ndAssert(0);
+		//BrainVectorToDevice(flatArray);
+	}
+	//m_context->BrainVectorToDevice(*this, flatArray);
 }
 
-ndBrainIntegerBuffer::ndBrainIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32* const indexArray)
-	:ndBrainBuffer(context, numberOfElements * ndInt64(sizeof(ndUnsigned32)))
+ndBrainIntegerBuffer::ndBrainIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32* const indexArray, bool memoryMapped)
+	:ndBrainBuffer(context, numberOfElements * ndInt64(sizeof(ndUnsigned32)), memoryMapped)
 {
-	ndAssert(0);
 	//ndAssert(m_context->GetAsCpuContext());
 	//m_indexArray.SetCount(numberOfElements);
 	//MemoryToDevice(0, m_sizeInBytes, indexArray);
+	if (m_context->GetAsCpuContext())
+	{
+		m_indexArray = ndSharedPtr<ndArray<ndUnsigned32>>(new ndArray<ndUnsigned32>);
+		m_indexArray->SetCount(numberOfElements);
+
+		ndArray<ndUnsigned32>& src = **m_indexArray;
+		m_context->MemoryToDevice(&src[0], 0, m_sizeInBytes, indexArray);
+	}
+	else
+	{
+		ndAssert(0);
+		//BrainVectorToDevice(flatArray);
+	}
+	ndAssert(0);
+
 }
 
 #if 0

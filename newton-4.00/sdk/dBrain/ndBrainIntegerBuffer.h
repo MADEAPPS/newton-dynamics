@@ -16,8 +16,8 @@
 class ndBrainIntegerBuffer : public ndBrainBuffer
 {
 	public:
-	ndBrainIntegerBuffer(ndBrainContext* const context, ndInt64 sizeInElements);
-	ndBrainIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32* const indexArray);
+	ndBrainIntegerBuffer(ndBrainContext* const context, ndInt64 sizeInElements, bool memoryMapped = false);
+	ndBrainIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32* const indexArray, bool memoryMapped = false);
 
 	//virtual void BrainVectorToDevice(const ndBrainVector& vector) override;
 	//virtual void BrainVectorFromDevice(ndBrainVector& vector) const override;
@@ -32,7 +32,8 @@ class ndBrainIntegerBuffer : public ndBrainBuffer
 	//virtual void LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const sourceData) override;
 	//virtual void UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const outputData) const override;
 
-	ndArray<ndUnsigned32> m_indexArray;
+	//ndArray<ndUnsigned32> m_indexArray;
+	ndSharedPtr<ndArray<ndUnsigned32>> m_indexArray;
 
 	friend class ndBrainTrainer;
 	friend class ndBrainCpuContext;

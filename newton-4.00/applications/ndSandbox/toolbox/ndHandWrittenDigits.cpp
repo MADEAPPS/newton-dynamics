@@ -245,38 +245,38 @@ static void MnistTrainingSet()
 			////optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// 
 			//optimizer.SetRegularizer(ndBrainFloat(4.0e-5f));	// 
 
-			ndAssert(0);
-			//ndArray<ndUnsigned32> shuffleBuffer;
-			//for (ndInt32 i = 0; i < trainingLabels->GetCount(); ++i)
-			//{
-			//	shuffleBuffer.PushBack(ndUnsigned32(i));
-			//}
-			//
-			//ndInt32 inputSize = m_brain->GetInputSize();
-			//ndInt32 outputSize = m_brain->GetOutputSize();
-			//ndBrainTrainer* const trainer = *m_trainer;
-			//
-			//ndBrainVector groundTruth;
-			//ndBrainVector miniBatchInput;
-			//ndBrainVector miniBatchOutput;
-			//ndBrainVector miniBatchOutputGradients;
-			//
-			//groundTruth.SetCount(outputSize * m_miniBatchSize);
-			//miniBatchInput.SetCount(inputSize * m_miniBatchSize);
-			//miniBatchOutput.SetCount(outputSize * m_miniBatchSize);
-			//miniBatchOutputGradients.SetCount(outputSize * m_miniBatchSize);
-			//
-			//ndInt32 batchesCount = trainingLabels->GetRows() / m_miniBatchSize;
-			//ndInt32 batchesSize = batchesCount * m_miniBatchSize;
-			//
-			//m_bestBrain = ndSharedPtr<ndBrain>(new ndBrain (**trainer->GetBrain()));
-			//
-			//ndBrainLossCategoricalCrossEntropy loss(outputSize);
-			//
-			//size_t strideInBytes = size_t(inputSize * sizeof(ndReal));
+			
+			ndArray<ndUnsigned32> shuffleBuffer;
+			for (ndInt32 i = 0; i < trainingLabels->GetCount(); ++i)
+			{
+				shuffleBuffer.PushBack(ndUnsigned32(i));
+			}
+			
+			ndInt32 inputSize = m_brain->GetInputSize();
+			ndInt32 outputSize = m_brain->GetOutputSize();
+			ndBrainTrainer* const trainer = *m_trainer;
+			
+			ndBrainVector groundTruth;
+			ndBrainVector miniBatchInput;
+			ndBrainVector miniBatchOutput;
+			ndBrainVector miniBatchOutputGradients;
+			
+			groundTruth.SetCount(outputSize * m_miniBatchSize);
+			miniBatchInput.SetCount(inputSize * m_miniBatchSize);
+			miniBatchOutput.SetCount(outputSize * m_miniBatchSize);
+			miniBatchOutputGradients.SetCount(outputSize * m_miniBatchSize);
+			
+			ndInt32 batchesCount = trainingLabels->GetRows() / m_miniBatchSize;
+			ndInt32 batchesSize = batchesCount * m_miniBatchSize;
+			
+			m_bestBrain = ndSharedPtr<ndBrain>(new ndBrain (**trainer->GetBrain()));
+			
+			ndBrainLossCategoricalCrossEntropy loss(outputSize);
+			
+			size_t strideInBytes = size_t(inputSize * sizeof(ndReal));
 			////ndBrainFloatBuffer* const deviceMinibatchBuffer = m_trainer->GetInputBuffer();
 			//ndBrainFloatBuffer* const deviceMinibatchBuffer = (ndBrainFloatBuffer*)m_trainer->GetInputBuffer();
-			//
+			
 			//ndCopyBufferCommandInfo copyBufferIndirect;
 			//copyBufferIndirect.m_dstOffsetInByte = 0;
 			//copyBufferIndirect.m_srcOffsetInByte = 0;
@@ -446,24 +446,9 @@ static void MnistTrainingSet()
 		ndSharedPtr<ndBrainContext> context(deviceType ? ndSharedPtr<ndBrainContext>(new ndBrainGpuContext) : ndSharedPtr<ndBrainContext>(new ndBrainCpuContext));
 		SupervisedTrainer optimizer(context, brain);
 
-		ndAssert(0);
-		//optimizer.m_testData = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*context, **testDigits));
-		//optimizer.m_trainingData = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*context, **trainingDigits));
-		//optimizer.m_indirectMiniBatch = ndSharedPtr<ndBrainBuffer>(new ndBrainIntegerBuffer(*context, optimizer.m_miniBatchSize, true));
-
-		//if (deviceType)
-		//{
-		//	//optimizer.m_testData = ndSharedPtr<ndBrainBuffer>(new ndBrainFloatBuffer(*context, **testDigits));
-		//	//optimizer.m_trainingData = ndSharedPtr<ndBrainBuffer>(new ndBrainFloatBuffer(*context, **trainingDigits));
-		//	optimizer.m_indirectMiniBatch = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuIntegerBuffer(*context, optimizer.m_miniBatchSize, true));
-		//}
-		//else
-		//{
-		//	ndAssert(0);
-		//	////optimizer.m_testData = ndSharedPtr<ndBrainBuffer>(new ndBrainCpuFloatBuffer(*context, **testDigits));
-		//	////optimizer.m_trainingData = ndSharedPtr<ndBrainBuffer>(new ndBrainCpuFloatBuffer(*context, **trainingDigits));
-		//	//optimizer.m_indirectMiniBatch = ndSharedPtr<ndBrainBuffer>(new ndBrainCpuIntegerBuffer(*context, optimizer.m_miniBatchSize));
-		//}
+		optimizer.m_testData = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*context, **testDigits));
+		optimizer.m_trainingData = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*context, **trainingDigits));
+		optimizer.m_indirectMiniBatch = ndSharedPtr<ndBrainBuffer>(new ndBrainIntegerBuffer(*context, optimizer.m_miniBatchSize, true));
 
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
 		optimizer.Optimize(*trainingLabels, *testLabels);

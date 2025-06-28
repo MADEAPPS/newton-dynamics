@@ -51,77 +51,15 @@ class ndTrainerDescriptor
 	ndRegularizerType m_regularizerType;
 };
 
-//class ndBrainTrainerGpuCommand : public ndBrainGpuCommand
-//{
-//	public:
-//	ndBrainTrainerGpuCommand(
-//		ndBrainTrainerInference* const owner,
-//		const ndCommandShareInfo& info, 
-//		size_t id,
-//		ndBrainContext* const context,
-//		const ndSharedPtr<ndBrainGpuShader>& shader,
-//		ndInt32 numberOfinputs,
-//		const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
-//		ndBrainFloatBuffer* const inputOutputData,
-//		ndBrainFloatBuffer* const parameters,
-//		ndBrainFloatBuffer* const inputOutputGradients = nullptr,
-//		ndBrainFloatBuffer* const weightsAndBiasGradients = nullptr);
-//
-//	ndSharedPtr<ndBrainUniformBuffer> m_uniformBuffer;
-//	ndBrainTrainerInference* m_owner;
-//	size_t m_id;
-//};
-
 class ndBrainTrainerInference : public ndClassAlloc
 {
 	public: 
-	//class ndBrainTrainerGpuCommand : public ndBrainGpuCommand
-	//{
-	//	public:
-	//	ndBrainTrainerGpuCommand(
-	//		ndBrainTrainerInference* const owner,
-	//		const ndCommandShareInfo& info, 
-	//		size_t id,
-	//		ndBrainContext* const context,
-	//		const ndSharedPtr<ndBrainGpuShader>& shader,
-	//		ndInt32 numberOfinputs,
-	//		const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
-	//		ndBrainFloatBuffer* const inputOutputData,
-	//		ndBrainFloatBuffer* const parameters,
-	//		ndBrainFloatBuffer* const inputOutputGradients = nullptr,
-	//		ndBrainFloatBuffer* const weightsAndBiasGradients = nullptr);
-	//
-	//	ndSharedPtr<ndBrainUniformBuffer> m_uniformBuffer;
-	//	ndBrainTrainerInference* m_owner;
-	//	size_t m_id;
-	//};
-	//
-	//class ndBrainTrainerCpuCommand : public ndContainersFreeListAlloc<ndBrainTrainerCpuCommand>
-	//{
-	//	public:
-	//	ndBrainTrainerCpuCommand(const ndCommandShareInfo& info, size_t id)
-	//		:ndContainersFreeListAlloc<ndBrainTrainerCpuCommand>()
-	//		, m_owner(nullptr)
-	//		, m_info(info)
-	//		, m_id(id)
-	//	{
-	//	}
-	//
-	//	virtual ~ndBrainTrainerCpuCommand()
-	//	{
-	//	}
-	//
-	//	virtual void Execute(ndInt32 miniBatchIndex) = 0;
-	//
-	//	ndBrainTrainerCpuInference* m_owner;
-	//	ndCommandShareInfo m_info;
-	//	size_t m_id;
-	//};
-
-
 	ndBrainTrainerInference(const ndTrainerDescriptor& descriptor);
 	ndBrainTrainerInference(const ndBrainTrainerInference& src);
 	virtual ~ndBrainTrainerInference();
+
+	ndSharedPtr<ndBrain>& GetBrain();
+	ndSharedPtr<ndBrainContext> GetContext();
 
 	//virtual ndBrainBuffer* GetInputBuffer() override;
 	//virtual const ndBrainBuffer* GetOutputBuffer() override;
@@ -132,9 +70,6 @@ class ndBrainTrainerInference : public ndClassAlloc
 	//virtual void GetOutput(ndBrainVector& output) const override;
 	//virtual void GetWorkingBuffer(ndBrainVector& output) const override;
 	//virtual void GetParameterBuffer(ndBrainVector& output) const override;
-	//
-	//// legacy
-	//virtual void BackPropagate(const ndBrainVector&, ndBrainLoss&) override { ndAssert(0); }
 	//
 	//// new methods
 	//virtual void SyncQueue() override;

@@ -39,7 +39,7 @@ class ndBrainTrainer: public ndBrainTrainerInference
 	//virtual void ApplyLearnRate() override;
 	//virtual void GetGradientBuffer(ndBrainVector&) const override;
 	//virtual void BackPropagate(const ndBrainVector& outputGradients) override;
-	//
+	
 	protected:
 	void Initialize();
 	void AddLayersGradientCommands();
