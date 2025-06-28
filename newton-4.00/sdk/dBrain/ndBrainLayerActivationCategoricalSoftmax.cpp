@@ -101,7 +101,7 @@ void ndBrainLayerActivationCategoricalSoftmax::BackPropagate(const ndBrainLayerB
 	//inputDerivative.FlushToZero();
 }
 
-ndBrainTrainerGpuCommand* ndBrainLayerActivationCategoricalSoftmax::CreateGpuBackPropagateCommand(
+ndBrainCommandBuffer* ndBrainLayerActivationCategoricalSoftmax::CreateGpuBackPropagateCommand(
 	ndBrainTrainerInference* const owner,
 	const ndBrainLayer::ndCommandShareInfo& info,
 	ndBrainContext* const context, ndInt32 miniBatchSize,
@@ -114,7 +114,7 @@ ndBrainTrainerGpuCommand* ndBrainLayerActivationCategoricalSoftmax::CreateGpuBac
 	ndAssert(0);
 	return nullptr;
 
-	//ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(
+	//ndBrainCommandBuffer* const command = new ndBrainTrainerGpuCommand(
 	//	owner, info, size_t(this), context, context->m_brainLayerCathegoricalSoftmaxBackPropagate, 
 	//	miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias, inputOutputGradients, weightsAndBiasGradients);
 	//return command;

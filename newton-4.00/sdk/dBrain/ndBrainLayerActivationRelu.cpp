@@ -192,7 +192,7 @@ void ndBrainLayerActivationRelu::BackPropagate(const ndBrainLayerBackPropagateCp
 	//inputDerivative.Mul(outputDerivative);
 }
 
-ndBrainTrainerGpuCommand* ndBrainLayerActivationRelu::CreateGpuFeedForwardCommand(
+ndBrainCommandBuffer* ndBrainLayerActivationRelu::CreateGpuFeedForwardCommand(
 	ndBrainTrainerInference* const owner,
 	const ndBrainLayer::ndCommandShareInfo& info,
 	ndBrainContext* const context, ndInt32 miniBatchSize,
@@ -203,12 +203,12 @@ ndBrainTrainerGpuCommand* ndBrainLayerActivationRelu::CreateGpuFeedForwardComman
 	ndAssert(0);
 	return nullptr;
 
-	//ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(owner,
+	//ndBrainCommandBuffer* const command = new ndBrainTrainerGpuCommand(owner,
 	//	info, size_t(this), context, context->m_brainLayerReluActivation, miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias);
 	//return command;
 }
 
-ndBrainTrainerGpuCommand* ndBrainLayerActivationRelu::CreateGpuBackPropagateCommand(
+ndBrainCommandBuffer* ndBrainLayerActivationRelu::CreateGpuBackPropagateCommand(
 	ndBrainTrainerInference* const owner,
 	const ndBrainLayer::ndCommandShareInfo& info,
 	ndBrainContext* const context, ndInt32 miniBatchSize,
@@ -221,7 +221,7 @@ ndBrainTrainerGpuCommand* ndBrainLayerActivationRelu::CreateGpuBackPropagateComm
 	ndAssert(0);
 	return nullptr;
 
-	//ndBrainTrainerGpuCommand* const command = new ndBrainTrainerGpuCommand(
+	//ndBrainCommandBuffer* const command = new ndBrainTrainerGpuCommand(
 	//	owner, info, size_t(this), context, context->m_brainLayerReluBackPropagate,
 	//	miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias, inputOutputGradients, weightsAndBiasGradients);
 	//return command;
