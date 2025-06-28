@@ -22,6 +22,8 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainTrainer.h"
 #include "ndBrainSaveLoad.h"
+#include "ndBrainFloatBuffer.h"
+#include "ndBrainUniformBuffer.h"
 #include "ndBrainLayerActivationCategoricalSoftmax.h"
 
 ndBrainLayerActivationCategoricalSoftmax::ndBrainLayerActivationCategoricalSoftmax(ndInt32 neurons)
@@ -111,12 +113,31 @@ ndBrainBufferCommand* ndBrainLayerActivationCategoricalSoftmax::CreateGpuBackPro
 	ndBrainFloatBuffer* const inputOutputGradients,
 	ndBrainFloatBuffer* const weightsAndBiasGradients) const
 {
-	ndAssert(0);
-	return nullptr;
+	if (context->GetAsCpuContext())
+	{
+		ndBrainBufferCommandDesc descriptor;
+		descriptor.m_id = size_t(this);
+		descriptor.m_context = context;
+		descriptor.m_owner = owner;
+		descriptor.m_info = info;
+		descriptor.m_uniformBuffer = uniformBuffer;
 
-	//ndBrainBufferCommand* const command = new ndBrainTrainerGpuCommand(
-	//	owner, info, size_t(this), context, context->m_brainLayerCathegoricalSoftmaxBackPropagate, 
-	//	miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias, inputOutputGradients, weightsAndBiasGradients);
-	//return command;
+		descriptor.PushBack(inputOutputData);
+		descriptor.PushBack(weightsAndBias);
+		descriptor.PushBack(inputOutputGradients);
+		descriptor.PushBack(weightsAndBiasGradients);
+
+		ndBrainBufferCommand* const command = new ndBrainLayerBackPropagateCpuCommand(descriptor, (ndBrainLayer*)this);
+		return command;
+	}
+	else
+	{
+		ndAssert(0);
+		//ndBrainBufferCommand* const command = new ndBrainTrainerGpuCommand(
+		//	owner, info, size_t(this), context, context->m_brainLayerCathegoricalSoftmaxBackPropagate, 
+		//	miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias, inputOutputGradients, weightsAndBiasGradients);
+		//return command;
+		return nullptr;
+	}
 }
 

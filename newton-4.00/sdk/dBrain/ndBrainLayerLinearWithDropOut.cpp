@@ -153,25 +153,6 @@ void ndBrainLayerLinearWithDropOut::BackPropagate(const ndBrainLayerBackPropagat
 	//inputDerivative.Mul(outputDerivative);
 }
 
-ndBrainBufferCommand* ndBrainLayerLinearWithDropOut::CreateGpuBackPropagateCommand(
-	ndBrainTrainerInference* const owner,
-	const ndCommandShareInfo& info,
-	ndBrainContext* const context, ndInt32 miniBatchSize,
-	const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
-	ndBrainFloatBuffer* const inputOutputData,
-	ndBrainFloatBuffer* const weightsAndBias,
-	ndBrainFloatBuffer* const inputOutputGradients,
-	ndBrainFloatBuffer* const weightsAndBiasGradients) const
-{
-	ndAssert(0);
-	return nullptr;
-	//ndBrainBufferCommand* const command = new ndBrainBufferCommand*(
-	//	owner, info, size_t(this), context, context->m_brainLayerDropOutBackPropagate,
-	//	miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias, inputOutputGradients, weightsAndBiasGradients);
-	//return command;
-}
-
-
 ndBrainBufferCommand* ndBrainLayerLinearWithDropOut::CreateGpuFeedForwardCommand(
 	ndBrainTrainerInference* const owner,
 	const ndCommandShareInfo& info,
@@ -200,6 +181,44 @@ ndBrainBufferCommand* ndBrainLayerLinearWithDropOut::CreateGpuFeedForwardCommand
 		ndAssert(0);
 		//ndBrainBufferCommand* const command = new ndBrainBufferCommand*(owner,
 		//	info, size_t(this), context, context->m_brainLayerDropOutActivation, miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias);
+		//return command;
+		return nullptr;
+	}
+}
+
+ndBrainBufferCommand* ndBrainLayerLinearWithDropOut::CreateGpuBackPropagateCommand(
+	ndBrainTrainerInference* const owner,
+	const ndCommandShareInfo& info,
+	ndBrainContext* const context, ndInt32 miniBatchSize,
+	const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
+	ndBrainFloatBuffer* const inputOutputData,
+	ndBrainFloatBuffer* const weightsAndBias,
+	ndBrainFloatBuffer* const inputOutputGradients,
+	ndBrainFloatBuffer* const weightsAndBiasGradients) const
+{
+	if (context->GetAsCpuContext())
+	{
+		ndBrainBufferCommandDesc descriptor;
+		descriptor.m_id = size_t(this);
+		descriptor.m_context = context;
+		descriptor.m_owner = owner;
+		descriptor.m_info = info;
+		descriptor.m_uniformBuffer = uniformBuffer;
+
+		descriptor.PushBack(inputOutputData);
+		descriptor.PushBack(weightsAndBias);
+		descriptor.PushBack(inputOutputGradients);
+		descriptor.PushBack(weightsAndBiasGradients);
+
+		ndBrainBufferCommand* const command = new ndBrainLayerBackPropagateCpuCommand(descriptor, (ndBrainLayer*)this);
+		return command;
+	}
+	else
+	{
+		ndAssert(0);
+		//ndBrainBufferCommand* const command = new ndBrainBufferCommand*(
+		//	owner, info, size_t(this), context, context->m_brainLayerDropOutBackPropagate,
+		//	miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias, inputOutputGradients, weightsAndBiasGradients);
 		//return command;
 		return nullptr;
 	}

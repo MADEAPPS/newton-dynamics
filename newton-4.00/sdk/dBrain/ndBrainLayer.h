@@ -38,13 +38,20 @@ class ndBrainBufferCommand;
 class ndBrainUniformBuffer;
 class ndBrainTrainerInference;
 
-
-class ndBrainLayerBackPropagateCpuCommand;
-
 class ndBrainLayerFeedForwardCpuCommand : public ndBrainBufferCommandCpu
 {
 	public:
 	ndBrainLayerFeedForwardCpuCommand(const ndBrainBufferCommandDesc& desc, ndBrainLayer* const layer);
+
+	virtual void Execute(ndInt32 miniBatchIndex) override;
+
+	ndBrainLayer* m_layer;
+};
+
+class ndBrainLayerBackPropagateCpuCommand : public ndBrainBufferCommandCpu
+{ 
+	public:
+	ndBrainLayerBackPropagateCpuCommand(const ndBrainBufferCommandDesc& desc, ndBrainLayer* const layer);
 
 	virtual void Execute(ndInt32 miniBatchIndex) override;
 

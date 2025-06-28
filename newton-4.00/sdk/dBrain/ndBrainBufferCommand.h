@@ -41,6 +41,7 @@ class ndCommandShareInfo
 		,m_inputOutputStartOffset(0)
 		,m_parametersBatchSize(0)
 		,m_parametersStartOffset(0)
+		,m_tiledStride(0)
 		,m_layer(layer)
 	{
 	}

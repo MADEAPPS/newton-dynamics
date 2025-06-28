@@ -108,7 +108,7 @@ ndBrainTrainerInference::~ndBrainTrainerInference()
 
 ndInt32 ndBrainTrainerInference::RoundoffOffset(ndInt32 value) const
 {
-	return (value + ND_DEFAULT_WORKGROUP_SIZE - 1) & -ND_DEFAULT_WORKGROUP_SIZE;
+	return m_descriptor.m_context->GetAsGpuContext() ? (value + ND_DEFAULT_WORKGROUP_SIZE - 1) & -ND_DEFAULT_WORKGROUP_SIZE : value;
 }
 
 #if 0
@@ -260,25 +260,12 @@ void ndBrainTrainerInference::InitWeightAndBiasBuffer()
 
 	ndFixSizeArray<ndCommandShareInfo, 256> uniformData;
 	bool isCpu = m_descriptor.m_context->GetAsCpuContext() ? true : false;
-	if (isCpu)
+	for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
 	{
-		for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
-		{
-			ndBrainLayer* const layer = brain[i];
-			ndCommandShareInfo info(layer->GetCpuCommandSharedInfo());
-			//info.m_parametersBatchSize = RoundoffOffset(info.m_parametersBatchSize);
-			uniformData.PushBack(info);
-		}
-	}
-	else
-	{
-		for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
-		{
-			ndBrainLayer* const layer = brain[i];
-			ndCommandShareInfo info(layer->GetGpuCommandSharedInfo());
-			info.m_parametersBatchSize = RoundoffOffset(info.m_parametersBatchSize);
-			uniformData.PushBack(info);
-		}
+		ndBrainLayer* const layer = brain[i];
+		ndCommandShareInfo info(isCpu ? layer->GetCpuCommandSharedInfo(): layer->GetGpuCommandSharedInfo());
+		info.m_parametersBatchSize = RoundoffOffset(info.m_parametersBatchSize);
+		uniformData.PushBack(info);
 	}
 	uniformData.PushBack(ndCommandShareInfo(nullptr));
 
@@ -397,7 +384,7 @@ void ndBrainTrainerInference::AddCopyOutputCommand()
 	ndBrainBufferCommandDesc descritor;
 	descritor.m_context = *m_descriptor.m_context;
 	descritor.m_owner = this;
-	descritor.m_id = m_inputId;
+	descritor.m_id = m_outpuId;
 	descritor.m_info = uniformParam;
 	descritor.m_uniformBuffer = uniformbuffer;
 	descritor.PushBack(inputOutputBuffer);

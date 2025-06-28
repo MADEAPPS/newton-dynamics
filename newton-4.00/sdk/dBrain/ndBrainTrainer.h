@@ -42,22 +42,22 @@ class ndBrainTrainer: public ndBrainTrainerInference
 	//
 	protected:
 	void Initialize();
-	//void AddLayersGradientCommands();
-	//void AddCopyInputGradientCommand();
-	//void AddCopyOutputGradientCommand();
+	void AddLayersGradientCommands();
+	void AddCopyInputGradientCommand();
+	void AddCopyOutputGradientCommand();
 	//void AddOptimizerGradientCommand(ndBrainFloat learnRate);
 
 	ndSharedPtr<ndBrainOptimizerAdamGpu> m_optimizer;
-	ndSharedPtr<ndBrainGpuCommand> m_adamOtimizerUpdate;
-	ndSharedPtr<ndBrainGpuCommand> m_adamMomentumUpdate;
+	ndSharedPtr<ndBrainBufferCommand> m_adamOtimizerUpdate;
+	ndSharedPtr<ndBrainBufferCommand> m_adamMomentumUpdate;
 
 	ndSharedPtr<ndBrainFloatBuffer> m_inputOutputGradientsBuffer;
 	ndSharedPtr<ndBrainFloatBuffer> m_weightAndBiasGradientsBuffer;
 	ndSharedPtr<ndBrainFloatBuffer> m_miniBatchInputGradientBuffer;
 	ndSharedPtr<ndBrainFloatBuffer> m_miniBatchOutputGradientBuffer;
 
-	ndList<ndSharedPtr<ndBrainGpuCommand>> m_backPropagateCommands;
-	ndList<ndSharedPtr<ndBrainGpuCommand>> m_accumulateGradientsCommands;
+	ndList<ndSharedPtr<ndBrainBufferCommand>> m_backPropagateCommands;
+	ndList<ndSharedPtr<ndBrainBufferCommand>> m_accumulateGradientsCommands;
 };
 
 #endif 
