@@ -16,27 +16,30 @@
 #include "ndBrainThreadPool.h"
 
 class ndBrainBuffer;
+class ndBrainKernel;
 class ndBrainGpuCommand;
 class ndBrainFloatBuffer;
+class ndBrainIntegerBuffer;
+class ndBrainUniformBuffer;
 
-class ndBrainGpuShader : public ndClassAlloc
-{
-	public:
-	ndBrainGpuShader(ndBrainGpuContext* const context)
-		:ndClassAlloc()
-		,m_context(context)
-	{
-	}
-
-	virtual ~ndBrainGpuShader()
-	{
-	}
-
-	virtual void Execute(ndInt32 groupId, ndInt32 workGroupSize) = 0;
-
-	ndBrainGpuContext* m_context;
-	ndFixSizeArray<ndBrainBuffer*, 8> m_parameters;
-};
+//class ndBrainKernel : public ndClassAlloc
+//{
+//	public:
+//	ndBrainKernel(ndBrainContext* const context)
+//		:ndClassAlloc()
+//		,m_context(context)
+//	{
+//	}
+//
+//	virtual ~ndBrainKernel()
+//	{
+//	}
+//
+//	virtual void Execute(ndInt32 groupId, ndInt32 workGroupSize) = 0;
+//
+//	ndBrainContext* m_context;
+//	ndFixSizeArray<ndBrainBuffer*, 8> m_parameters;
+//};
 
 class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 {
@@ -54,9 +57,6 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 	virtual void MemoryFromDevice(const ndBrainFloatBuffer& buffer, size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const override;
 	virtual void CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, ndBrainFloatBuffer& dstData, const ndBrainFloatBuffer& srcData) override;
 	
-
-	static bool HasGpuSupport();
-
 	ndBrainGpuContext* GetAsGpuContext() override;
 
 	private:
@@ -64,31 +64,31 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 
 	public:
 	// feed foward shaders
-	ndSharedPtr<ndBrainGpuShader> m_brainCopyInput;
-	ndSharedPtr<ndBrainGpuShader> m_brainCopyOutput;
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerReluActivation;
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerTanhActivation;
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerSoftmaxActivation;
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerDropOutActivation;
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerMatrixMatrixMultiply;
+	ndSharedPtr<ndBrainKernel> m_brainCopyInput;
+	ndSharedPtr<ndBrainKernel> m_brainCopyOutput;
+	ndSharedPtr<ndBrainKernel> m_brainLayerReluActivation;
+	ndSharedPtr<ndBrainKernel> m_brainLayerTanhActivation;
+	ndSharedPtr<ndBrainKernel> m_brainLayerSoftmaxActivation;
+	ndSharedPtr<ndBrainKernel> m_brainLayerDropOutActivation;
+	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixMatrixMultiply;
 
 	// back propagate shaders
-	ndSharedPtr<ndBrainGpuShader> m_brainCopyInputGradients;
-	ndSharedPtr<ndBrainGpuShader> m_brainCopyOutputGradients;
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerReluBackPropagate;
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerTanhBackPropagate;
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerDropOutBackPropagate;
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerMatrixVectorBackPropagate;
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerCathegoricalSoftmaxBackPropagate;
+	ndSharedPtr<ndBrainKernel> m_brainCopyInputGradients;
+	ndSharedPtr<ndBrainKernel> m_brainCopyOutputGradients;
+	ndSharedPtr<ndBrainKernel> m_brainLayerReluBackPropagate;
+	ndSharedPtr<ndBrainKernel> m_brainLayerTanhBackPropagate;
+	ndSharedPtr<ndBrainKernel> m_brainLayerDropOutBackPropagate;
+	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixVectorBackPropagate;
+	ndSharedPtr<ndBrainKernel> m_brainLayerCathegoricalSoftmaxBackPropagate;
 
 	// add all the partial gradinets
-	ndSharedPtr<ndBrainGpuShader> m_brainAverageGradients;
-	ndSharedPtr<ndBrainGpuShader> m_brainAccumulateGradients;
-	ndSharedPtr<ndBrainGpuShader> m_brainAccumulateGradientsAndAverage;
+	ndSharedPtr<ndBrainKernel> m_brainAverageGradients;
+	ndSharedPtr<ndBrainKernel> m_brainAccumulateGradients;
+	ndSharedPtr<ndBrainKernel> m_brainAccumulateGradientsAndAverage;
 
 	// optimizer shaders
-	ndSharedPtr<ndBrainGpuShader> m_brainAdamMomentumUpdate;
-	ndSharedPtr<ndBrainGpuShader> m_brainAdamRidgeOptimizerUpdate;
-	ndSharedPtr<ndBrainGpuShader> m_brainAdamLassoOptimizerUpdate;
+	ndSharedPtr<ndBrainKernel> m_brainAdamMomentumUpdate;
+	ndSharedPtr<ndBrainKernel> m_brainAdamRidgeOptimizerUpdate;
+	ndSharedPtr<ndBrainKernel> m_brainAdamLassoOptimizerUpdate;
 };
 #endif

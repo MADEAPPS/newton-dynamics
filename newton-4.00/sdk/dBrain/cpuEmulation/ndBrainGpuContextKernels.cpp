@@ -11,6 +11,7 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainLayer.h"
+#include "ndBrainKernel.h"
 #include "ndBrainGpuContext.h"
 #include "ndBrainLayerLinear.h"
 #include "ndBrainOptimizerAdamGpu.h"
@@ -22,18 +23,18 @@ inline ndInt32 __cpuKernelRoundoff(ndInt32 value, ndInt32 workgroupSize)
     return (value + workgroupSize - 1) & -workgroupSize;
 }
 
-class brainCopyInput : public ndBrainGpuShader
+class brainCopyInput : public ndBrainKernel
 {
     public:
-    brainCopyInput(ndBrainGpuContext* const context)
-        :ndBrainGpuShader(context)
+    brainCopyInput(ndBrainContext* const context)
+        :ndBrainKernel(context)
     {
     }
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
         ndAssert(0);
-       // ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+       // ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
        // ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
        // ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
        //
@@ -66,18 +67,18 @@ class brainCopyInput : public ndBrainGpuShader
     }
 };
 
-class brainCopyOutput : public ndBrainGpuShader
+class brainCopyOutput : public ndBrainKernel
 {
     public:
-    brainCopyOutput(ndBrainGpuContext* const context)
-        :ndBrainGpuShader(context)
+    brainCopyOutput(ndBrainContext* const context)
+        :ndBrainKernel(context)
     {
     }
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
         ndAssert(0);
-        //ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         //ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
         //
@@ -112,18 +113,18 @@ class brainCopyOutput : public ndBrainGpuShader
     }
 };
 
-class brainLayerReluActivation : public ndBrainGpuShader
+class brainLayerReluActivation : public ndBrainKernel
 {
     public:
-    brainLayerReluActivation(ndBrainGpuContext* const context)
-        :ndBrainGpuShader(context)
+    brainLayerReluActivation(ndBrainContext* const context)
+        :ndBrainKernel(context)
     {
     }
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
         ndAssert(0);
-        //ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         //
         //ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)buffer0->GetData();
@@ -158,18 +159,18 @@ class brainLayerReluActivation : public ndBrainGpuShader
     }
 };
 
-class brainLayerLinearDropOutActivation : public ndBrainGpuShader
+class brainLayerLinearDropOutActivation : public ndBrainKernel
 {
     public:
-    brainLayerLinearDropOutActivation(ndBrainGpuContext* const context)
-        :ndBrainGpuShader(context)
+    brainLayerLinearDropOutActivation(ndBrainContext* const context)
+        :ndBrainKernel(context)
     {
     }
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
         ndAssert(0);
-        //ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         //
         //ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)buffer0->GetData();
@@ -204,18 +205,18 @@ class brainLayerLinearDropOutActivation : public ndBrainGpuShader
     }
 };
 
-class brainLayerTanhActivation : public ndBrainGpuShader
+class brainLayerTanhActivation : public ndBrainKernel
 {
     public:
-        brainLayerTanhActivation(ndBrainGpuContext* const context)
-        :ndBrainGpuShader(context)
+        brainLayerTanhActivation(ndBrainContext* const context)
+        :ndBrainKernel(context)
     {
     }
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
         ndAssert(0);
-        //ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         //
         //ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)buffer0->GetData();
@@ -250,11 +251,11 @@ class brainLayerTanhActivation : public ndBrainGpuShader
     }
 };
 
-class brainLayerSoftmaxActivation : public ndBrainGpuShader
+class brainLayerSoftmaxActivation : public ndBrainKernel
 {
     public:
-    brainLayerSoftmaxActivation(ndBrainGpuContext* const context)
-        :ndBrainGpuShader(context)
+    brainLayerSoftmaxActivation(ndBrainContext* const context)
+        :ndBrainKernel(context)
     {
     }
 
@@ -266,7 +267,7 @@ class brainLayerSoftmaxActivation : public ndBrainGpuShader
         //ndBrainFloat tmpInputBuffer[ND_GPU_LOCAL_BUFFER_SIZE];
         //ndBrainFloat reductionBuffer[ND_GPU_LOCAL_BUFFER_SIZE];
         //
-        //ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         //
         //ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)buffer0->GetData();
@@ -381,18 +382,18 @@ class brainLayerSoftmaxActivation : public ndBrainGpuShader
 };
 
 // back propagation kernels
-class brainCopyInputGradients : public ndBrainGpuShader
+class brainCopyInputGradients : public ndBrainKernel
 {
     public:
-    brainCopyInputGradients(ndBrainGpuContext* const context)
-        :ndBrainGpuShader(context)
+    brainCopyInputGradients(ndBrainContext* const context)
+        :ndBrainKernel(context)
     {
     }
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
         ndAssert(0);
-        //ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
         //ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
         //
@@ -425,18 +426,18 @@ class brainCopyInputGradients : public ndBrainGpuShader
     }
 };
 
-class brainCopyOutputGradients : public ndBrainGpuShader
+class brainCopyOutputGradients : public ndBrainKernel
 {
     public:
-    brainCopyOutputGradients(ndBrainGpuContext* const context)
-        :ndBrainGpuShader(context)
+    brainCopyOutputGradients(ndBrainContext* const context)
+        :ndBrainKernel(context)
     {
     }
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
         ndAssert(0);
-        //ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
         //ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
         //
@@ -470,18 +471,18 @@ class brainCopyOutputGradients : public ndBrainGpuShader
     }
 };
 
-class brainLayerBrainReluBackPropagate : public ndBrainGpuShader
+class brainLayerBrainReluBackPropagate : public ndBrainKernel
 {
     public:
-    brainLayerBrainReluBackPropagate(ndBrainGpuContext* const context)
-        :ndBrainGpuShader(context)
+    brainLayerBrainReluBackPropagate(ndBrainContext* const context)
+        :ndBrainKernel(context)
     {
     }
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
         ndAssert(0);
-        //ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         //ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
         //
@@ -530,18 +531,18 @@ class brainLayerBrainReluBackPropagate : public ndBrainGpuShader
     }
 };
 
-class brainLayerBrainTanhBackPropagate : public ndBrainGpuShader
+class brainLayerBrainTanhBackPropagate : public ndBrainKernel
 {
     public:
-    brainLayerBrainTanhBackPropagate(ndBrainGpuContext* const context)
-        :ndBrainGpuShader(context)
+    brainLayerBrainTanhBackPropagate(ndBrainContext* const context)
+        :ndBrainKernel(context)
     {
     }
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
         ndAssert(0);
-        //ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         //ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
         //
@@ -591,18 +592,18 @@ class brainLayerBrainTanhBackPropagate : public ndBrainGpuShader
     }
 };
 
-class brainLayerBrainCathegoricalSoftmaxBackPropagate : public ndBrainGpuShader
+class brainLayerBrainCathegoricalSoftmaxBackPropagate : public ndBrainKernel
 {
     public:
-    brainLayerBrainCathegoricalSoftmaxBackPropagate(ndBrainGpuContext* const context)
-        :ndBrainGpuShader(context)
+    brainLayerBrainCathegoricalSoftmaxBackPropagate(ndBrainContext* const context)
+        :ndBrainKernel(context)
     {
     }
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
         ndAssert(0);
-        //ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         //ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
         //
@@ -648,18 +649,18 @@ class brainLayerBrainCathegoricalSoftmaxBackPropagate : public ndBrainGpuShader
     }
 };
 
-class brainLayerBrainLinearDropOutBackPropagate : public ndBrainGpuShader
+class brainLayerBrainLinearDropOutBackPropagate : public ndBrainKernel
 {
     public:
-    brainLayerBrainLinearDropOutBackPropagate(ndBrainGpuContext* const context)
-        :ndBrainGpuShader(context)
+    brainLayerBrainLinearDropOutBackPropagate(ndBrainContext* const context)
+        :ndBrainKernel(context)
     {
     }
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
         ndAssert(0);
-        //ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
         //
         //ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)buffer0->GetData();
@@ -702,11 +703,11 @@ class brainLayerBrainLinearDropOutBackPropagate : public ndBrainGpuShader
 };
 
 // accumulate kernel gradienst
-class brainAccumulateGradientsAndAverage : public ndBrainGpuShader
+class brainAccumulateGradientsAndAverage : public ndBrainKernel
 {
     public:
-    brainAccumulateGradientsAndAverage(ndBrainGpuContext* const context)
-        :ndBrainGpuShader(context)
+    brainAccumulateGradientsAndAverage(ndBrainContext* const context)
+        :ndBrainKernel(context)
     {
     }
 
@@ -716,7 +717,7 @@ class brainAccumulateGradientsAndAverage : public ndBrainGpuShader
         //ndBrainFloat accRegister[ND_GPU_LOCAL_BUFFER_SIZE];
         //
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
-        //ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //
         //ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)buffer0->GetData();
         //ndBrainFloat* const gradientBuffer = buffer1->GetData();
@@ -748,11 +749,11 @@ class brainAccumulateGradientsAndAverage : public ndBrainGpuShader
     }
 };
 
-class brainAccumulateGradients : public ndBrainGpuShader
+class brainAccumulateGradients : public ndBrainKernel
 {
     public:
-    brainAccumulateGradients(ndBrainGpuContext* const context)
-        :ndBrainGpuShader(context)
+    brainAccumulateGradients(ndBrainContext* const context)
+        :ndBrainKernel(context)
     {
     }
 
@@ -760,7 +761,7 @@ class brainAccumulateGradients : public ndBrainGpuShader
     {
         ndAssert(0);
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
-        //ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //
         //ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)buffer0->GetData();
         //ndBrainFloat* const gradientBuffer = buffer1->GetData();
@@ -775,11 +776,11 @@ class brainAccumulateGradients : public ndBrainGpuShader
     }
 };
 
-class brainAverageGradients : public ndBrainGpuShader
+class brainAverageGradients : public ndBrainKernel
 {
     public:
-    brainAverageGradients(ndBrainGpuContext* const context)
-        :ndBrainGpuShader(context)
+    brainAverageGradients(ndBrainContext* const context)
+        :ndBrainKernel(context)
     {
     }
 
@@ -787,7 +788,7 @@ class brainAverageGradients : public ndBrainGpuShader
     {
         ndAssert(0);
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
-        //ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //
         //ndBrainLayer::ndCommandShareInfo* const parameters = (ndBrainLayer::ndCommandShareInfo*)buffer0->GetData();
         //ndBrainFloat* const gradientBuffer = buffer1->GetData();
@@ -804,18 +805,18 @@ class brainAverageGradients : public ndBrainGpuShader
     }
 };
 
-class brainAdamUpdateLassoRegularizer : public ndBrainGpuShader
+class brainAdamUpdateLassoRegularizer : public ndBrainKernel
 {
     public:
-    brainAdamUpdateLassoRegularizer(ndBrainGpuContext* const context)
-        :ndBrainGpuShader(context)
+    brainAdamUpdateLassoRegularizer(ndBrainContext* const context)
+        :ndBrainKernel(context)
     {
     }
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
         ndAssert(0);
-        //ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         //ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
         //ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
@@ -858,18 +859,18 @@ class brainAdamUpdateLassoRegularizer : public ndBrainGpuShader
     }
 };
 
-class brainAdamUpdateRidgeRegularizer : public ndBrainGpuShader
+class brainAdamUpdateRidgeRegularizer : public ndBrainKernel
 {
     public:
-    brainAdamUpdateRidgeRegularizer(ndBrainGpuContext* const context)
-        :ndBrainGpuShader(context)
+    brainAdamUpdateRidgeRegularizer(ndBrainContext* const context)
+        :ndBrainKernel(context)
     {
     }
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
         ndAssert(0);
-        //ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         //ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
         //ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
@@ -915,11 +916,11 @@ class brainAdamUpdateRidgeRegularizer : public ndBrainGpuShader
     }
 };
 
-class brainAdamMomentumUpdate : public ndBrainGpuShader
+class brainAdamMomentumUpdate : public ndBrainKernel
 {
     public:
-    brainAdamMomentumUpdate(ndBrainGpuContext* const context)
-        :ndBrainGpuShader(context)
+    brainAdamMomentumUpdate(ndBrainContext* const context)
+        :ndBrainKernel(context)
     {
     }
 
@@ -927,7 +928,7 @@ class brainAdamMomentumUpdate : public ndBrainGpuShader
     void Execute(ndInt32, ndInt32)
     {
         ndAssert(0);
-        //ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //ndBrainOptimizerAdamGpu::ndCommandShareInfo* const parameters = (ndBrainOptimizerAdamGpu::ndCommandShareInfo*)buffer0->GetData();
         //
         //parameters->m_betaAcc *= parameters->m_beta;
@@ -944,11 +945,11 @@ class brainAdamMomentumUpdate : public ndBrainGpuShader
 };
 
 // matrix vector operation kernels.
-class brainLayerMatrixMatrixMultiply : public ndBrainGpuShader
+class brainLayerMatrixMatrixMultiply : public ndBrainKernel
 {
     public:
-    brainLayerMatrixMatrixMultiply(ndBrainGpuContext* const context)
-        :ndBrainGpuShader(context)
+    brainLayerMatrixMatrixMultiply(ndBrainContext* const context)
+        :ndBrainKernel(context)
     {
     }
 
@@ -963,7 +964,7 @@ class brainLayerMatrixMatrixMultiply : public ndBrainGpuShader
         //
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         //ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
-        //ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //
         //ndBrainFloat* const weightsAndBias = buffer2->GetData();
         //ndBrainFloat* const inputOutputData = buffer1->GetData();
@@ -1044,11 +1045,11 @@ class brainLayerMatrixMatrixMultiply : public ndBrainGpuShader
     }
 };
 
-class brainLayerBrainLinearBackPropagate : public ndBrainGpuShader
+class brainLayerBrainLinearBackPropagate : public ndBrainKernel
 {
     public:
-    brainLayerBrainLinearBackPropagate(ndBrainGpuContext* const context)
-        :ndBrainGpuShader(context)
+    brainLayerBrainLinearBackPropagate(ndBrainContext* const context)
+        :ndBrainKernel(context)
     {
     }
 
@@ -1058,7 +1059,7 @@ class brainLayerBrainLinearBackPropagate : public ndBrainGpuShader
         //ndBrainFloat cachedInput[ND_GPU_LOCAL_BUFFER_SIZE * 2];
         //ndAssert(ND_GPU_LOCAL_BUFFER_SIZE * 2 >= 1024);
         //
-        //ndBrainGpuUniformBuffer* const buffer0 = (ndBrainGpuUniformBuffer*)m_parameters[0];
+        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         //ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
         //ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
@@ -1197,30 +1198,30 @@ class brainLayerBrainLinearBackPropagate : public ndBrainGpuShader
 void ndBrainGpuContext::CreateKerners()
 {   
     // create all feed foward shaders
-    m_brainCopyInput = ndSharedPtr<ndBrainGpuShader> (new brainCopyInput(this));
-    m_brainCopyOutput = ndSharedPtr<ndBrainGpuShader> (new brainCopyOutput(this));
-    m_brainLayerReluActivation = ndSharedPtr<ndBrainGpuShader>(new brainLayerReluActivation(this));
-    m_brainLayerTanhActivation = ndSharedPtr<ndBrainGpuShader>(new brainLayerTanhActivation(this));
-    m_brainLayerSoftmaxActivation = ndSharedPtr<ndBrainGpuShader>(new brainLayerSoftmaxActivation(this));
-    m_brainLayerDropOutActivation = ndSharedPtr<ndBrainGpuShader>(new brainLayerLinearDropOutActivation(this));
-    m_brainLayerMatrixMatrixMultiply = ndSharedPtr<ndBrainGpuShader>(new brainLayerMatrixMatrixMultiply(this));
+    m_brainCopyInput = ndSharedPtr<ndBrainKernel> (new brainCopyInput(this));
+    m_brainCopyOutput = ndSharedPtr<ndBrainKernel> (new brainCopyOutput(this));
+    m_brainLayerReluActivation = ndSharedPtr<ndBrainKernel>(new brainLayerReluActivation(this));
+    m_brainLayerTanhActivation = ndSharedPtr<ndBrainKernel>(new brainLayerTanhActivation(this));
+    m_brainLayerSoftmaxActivation = ndSharedPtr<ndBrainKernel>(new brainLayerSoftmaxActivation(this));
+    m_brainLayerDropOutActivation = ndSharedPtr<ndBrainKernel>(new brainLayerLinearDropOutActivation(this));
+    m_brainLayerMatrixMatrixMultiply = ndSharedPtr<ndBrainKernel>(new brainLayerMatrixMatrixMultiply(this));
 
     // create all backpropagate shaders
-    m_brainCopyInputGradients = ndSharedPtr<ndBrainGpuShader>(new brainCopyInputGradients(this));
-    m_brainCopyOutputGradients = ndSharedPtr<ndBrainGpuShader>(new brainCopyOutputGradients(this));
-    m_brainLayerReluBackPropagate = ndSharedPtr<ndBrainGpuShader>(new brainLayerBrainReluBackPropagate(this));
-    m_brainLayerTanhBackPropagate = ndSharedPtr<ndBrainGpuShader>(new brainLayerBrainTanhBackPropagate(this));
-    m_brainLayerMatrixVectorBackPropagate = ndSharedPtr<ndBrainGpuShader>(new brainLayerBrainLinearBackPropagate(this));
-    m_brainLayerDropOutBackPropagate = ndSharedPtr<ndBrainGpuShader>(new brainLayerBrainLinearDropOutBackPropagate(this));
-    m_brainLayerCathegoricalSoftmaxBackPropagate = ndSharedPtr<ndBrainGpuShader>(new brainLayerBrainCathegoricalSoftmaxBackPropagate(this));
+    m_brainCopyInputGradients = ndSharedPtr<ndBrainKernel>(new brainCopyInputGradients(this));
+    m_brainCopyOutputGradients = ndSharedPtr<ndBrainKernel>(new brainCopyOutputGradients(this));
+    m_brainLayerReluBackPropagate = ndSharedPtr<ndBrainKernel>(new brainLayerBrainReluBackPropagate(this));
+    m_brainLayerTanhBackPropagate = ndSharedPtr<ndBrainKernel>(new brainLayerBrainTanhBackPropagate(this));
+    m_brainLayerMatrixVectorBackPropagate = ndSharedPtr<ndBrainKernel>(new brainLayerBrainLinearBackPropagate(this));
+    m_brainLayerDropOutBackPropagate = ndSharedPtr<ndBrainKernel>(new brainLayerBrainLinearDropOutBackPropagate(this));
+    m_brainLayerCathegoricalSoftmaxBackPropagate = ndSharedPtr<ndBrainKernel>(new brainLayerBrainCathegoricalSoftmaxBackPropagate(this));
 
     // accumulate gradient kernels
-    m_brainAverageGradients = ndSharedPtr<ndBrainGpuShader>(new brainAverageGradients(this));
-    m_brainAccumulateGradients = ndSharedPtr<ndBrainGpuShader>(new brainAccumulateGradients(this));
-    m_brainAccumulateGradientsAndAverage = ndSharedPtr<ndBrainGpuShader>(new brainAccumulateGradientsAndAverage(this));
+    m_brainAverageGradients = ndSharedPtr<ndBrainKernel>(new brainAverageGradients(this));
+    m_brainAccumulateGradients = ndSharedPtr<ndBrainKernel>(new brainAccumulateGradients(this));
+    m_brainAccumulateGradientsAndAverage = ndSharedPtr<ndBrainKernel>(new brainAccumulateGradientsAndAverage(this));
 
     // optimizer kernels
-    m_brainAdamMomentumUpdate = ndSharedPtr<ndBrainGpuShader>(new brainAdamMomentumUpdate(this));
-    m_brainAdamRidgeOptimizerUpdate = ndSharedPtr<ndBrainGpuShader>(new brainAdamUpdateRidgeRegularizer(this));
-    m_brainAdamLassoOptimizerUpdate = ndSharedPtr<ndBrainGpuShader>(new brainAdamUpdateLassoRegularizer(this));
+    m_brainAdamMomentumUpdate = ndSharedPtr<ndBrainKernel>(new brainAdamMomentumUpdate(this));
+    m_brainAdamRidgeOptimizerUpdate = ndSharedPtr<ndBrainKernel>(new brainAdamUpdateRidgeRegularizer(this));
+    m_brainAdamLassoOptimizerUpdate = ndSharedPtr<ndBrainKernel>(new brainAdamUpdateLassoRegularizer(this));
 }

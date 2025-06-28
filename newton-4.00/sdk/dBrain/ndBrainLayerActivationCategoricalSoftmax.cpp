@@ -102,10 +102,10 @@ void ndBrainLayerActivationCategoricalSoftmax::BackPropagate(const ndBrainLayerB
 }
 
 ndBrainTrainerGpuCommand* ndBrainLayerActivationCategoricalSoftmax::CreateGpuBackPropagateCommand(
-	ndBrainTrainerGpuInference* const owner,
+	ndBrainTrainerInference* const owner,
 	const ndBrainLayer::ndCommandShareInfo& info,
-	ndBrainGpuContext* const context, ndInt32 miniBatchSize,
-	const ndSharedPtr<ndBrainGpuUniformBuffer>& uniformBuffer,
+	ndBrainContext* const context, ndInt32 miniBatchSize,
+	const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 	ndBrainFloatBuffer* const inputOutputData,
 	ndBrainFloatBuffer* const weightsAndBias,
 	ndBrainFloatBuffer* const inputOutputGradients,

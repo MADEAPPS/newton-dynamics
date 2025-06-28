@@ -26,7 +26,7 @@ ndBrainCpuContext* ndBrainContext::GetAsCpuContext()
 	return nullptr;
 }
 
-ndBrainGpuContext* ndBrainContext::GetAsGpuContext()
+ndBrainContext* ndBrainContext::GetAsGpuContext()
 {
 	return nullptr;
 }

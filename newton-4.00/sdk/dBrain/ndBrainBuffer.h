@@ -36,7 +36,7 @@ class ndCopyBufferCommandInfo
 	ndInt32 m_dstOffsetInByte;
 };
 
-class ndBrainBuffer : public ndClassAlloc
+class ndBrainBuffer : public ndContainersFreeListAlloc<ndBrainBuffer>
 {
 	protected:
 	ndBrainBuffer(ndBrainContext* const context, ndInt64 sizeInByte, bool memoryMapped = false);
@@ -46,18 +46,16 @@ class ndBrainBuffer : public ndClassAlloc
 
 	size_t SizeInBytes() const;
 
-	virtual void BrainVectorToDevice(const ndBrainVector& vector) = 0;
-	virtual void BrainVectorFromDevice(ndBrainVector& vector) const = 0;
-
-	virtual void MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputMemory) = 0;
-	virtual void MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const = 0;
-
-	virtual void CopyBuffer(const ndBrainBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer) = 0;
-	virtual void CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer) = 0;
+	//virtual void BrainVectorToDevice(const ndBrainVector& vector) = 0;
+	//virtual void BrainVectorFromDevice(ndBrainVector& vector) const = 0;
+	//virtual void MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputMemory) = 0;
+	//virtual void MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const = 0;
+	//virtual void CopyBuffer(const ndBrainBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer) = 0;
+	//virtual void CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer) = 0;
 
 	protected:
-	virtual void LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData) = 0;
-	virtual void UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const outputData) const = 0;
+	//virtual void LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData) = 0;
+	//virtual void UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const outputData) const = 0;
 
 	ndBrainContext* m_context;
 	size_t m_sizeInBytes;

@@ -289,8 +289,8 @@ static void MnistTrainingSet()
 			//ndAssert(0);
 			////if (m_trainer->GetContext()->GetAsGpuContext())
 			////{
-			////	parameterBuffer = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect, true));
-			////	parameterBufferIndirect = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect, true));
+			////	parameterBuffer = ndSharedPtr<ndBrainBuffer>(new ndBrainUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect, true));
+			////	parameterBufferIndirect = ndSharedPtr<ndBrainBuffer>(new ndBrainUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect, true));
 			////}
 			////else
 			////{
@@ -491,7 +491,7 @@ static void MnistTrainingSet()
 		ndAssert(0);
 		//if (context->GetAsGpuContext())
 		//{
-		//	parameterBuffer = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuUniformBuffer(*context, sizeof(ndCopyBufferCommandInfo), &copyBufferInfo));
+		//	parameterBuffer = ndSharedPtr<ndBrainBuffer>(new ndBrainUniformBuffer(*context, sizeof(ndCopyBufferCommandInfo), &copyBufferInfo));
 		//}
 		//else
 		//{

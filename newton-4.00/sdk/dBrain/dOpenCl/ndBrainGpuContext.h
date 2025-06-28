@@ -19,7 +19,7 @@ class ndBrainGpuFloatBuffer;
 class ndBrainGpuUniformBuffer;
 class ndBrainGpuIntegerBuffer;
 
-typedef cl::Kernel ndBrainGpuShader;
+typedef cl::Kernel <ndBrainKernel>;
 
 #define ND_KERNELS_WORKGROUP_SIZE	256
 
@@ -45,41 +45,41 @@ class ndBrainGpuContext : public ndBrainContext
 	void CopyBuffer(ndBrainGpuUniformBuffer& parameterBuffer, ndInt32 workGroups, ndBrainGpuFloatBuffer& dstBuffer, ndBrainGpuFloatBuffer& srcBuffer);
 	void CopyBufferIndirect(ndBrainGpuUniformBuffer& parameterBuffer, ndBrainGpuIntegerBuffer& indexBuffer, ndBrainGpuFloatBuffer& dstBuffer, ndBrainGpuFloatBuffer& srcBuffer);
 
-	ndSharedPtr<ndBrainGpuShader> CreateKerner(const cl::Program& program, const char* const functionMame) const;
+	ndSharedPtr<ndBrainKernel> CreateKerner(const cl::Program& program, const char* const functionMame) const;
 	static void CL_CALLBACK clNotification(const char* errinfo, const void* private_info, size_t cb, void* user_data);
 
 	public:
 	// feed forward shaders
-	ndSharedPtr<ndBrainGpuShader> m_brainCopyInput;
-	ndSharedPtr<ndBrainGpuShader> m_brainCopyOutput;
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerReluActivation;
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerTanhActivation;
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerSoftmaxActivation;
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerDropOutActivation;
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerMatrixMatrixMultiply;
+	ndSharedPtr<ndBrainKernel> m_brainCopyInput;
+	ndSharedPtr<ndBrainKernel> m_brainCopyOutput;
+	ndSharedPtr<ndBrainKernel> m_brainLayerReluActivation;
+	ndSharedPtr<ndBrainKernel> m_brainLayerTanhActivation;
+	ndSharedPtr<ndBrainKernel> m_brainLayerSoftmaxActivation;
+	ndSharedPtr<ndBrainKernel> m_brainLayerDropOutActivation;
+	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixMatrixMultiply;
 
 	// back propagate shaders
-	ndSharedPtr<ndBrainGpuShader> m_brainCopyInputGradients;
-	ndSharedPtr<ndBrainGpuShader> m_brainCopyOutputGradients;
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerReluBackPropagate;
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerTanhBackPropagate;
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerMatrixVectorBackPropagate;
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerDropOutBackPropagate;
-	ndSharedPtr<ndBrainGpuShader> m_brainLayerCathegoricalSoftmaxBackPropagate;
+	ndSharedPtr<ndBrainKernel> m_brainCopyInputGradients;
+	ndSharedPtr<ndBrainKernel> m_brainCopyOutputGradients;
+	ndSharedPtr<ndBrainKernel> m_brainLayerReluBackPropagate;
+	ndSharedPtr<ndBrainKernel> m_brainLayerTanhBackPropagate;
+	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixVectorBackPropagate;
+	ndSharedPtr<ndBrainKernel> m_brainLayerDropOutBackPropagate;
+	ndSharedPtr<ndBrainKernel> m_brainLayerCathegoricalSoftmaxBackPropagate;
 
 	// add all the partial gradients
-	ndSharedPtr<ndBrainGpuShader> m_brainAverageGradients;
-	ndSharedPtr<ndBrainGpuShader> m_brainAccumulateGradients;
-	ndSharedPtr<ndBrainGpuShader> m_brainAccumulateGradientsAndAverage;
+	ndSharedPtr<ndBrainKernel> m_brainAverageGradients;
+	ndSharedPtr<ndBrainKernel> m_brainAccumulateGradients;
+	ndSharedPtr<ndBrainKernel> m_brainAccumulateGradientsAndAverage;
 
 	// optimizer shaders
-	ndSharedPtr<ndBrainGpuShader> m_brainAdamMomentumUpdate;
-	ndSharedPtr<ndBrainGpuShader> m_brainAdamRidgeOptimizerUpdate;
-	ndSharedPtr<ndBrainGpuShader> m_brainAdamLassoOptimizerUpdate;
+	ndSharedPtr<ndBrainKernel> m_brainAdamMomentumUpdate;
+	ndSharedPtr<ndBrainKernel> m_brainAdamRidgeOptimizerUpdate;
+	ndSharedPtr<ndBrainKernel> m_brainAdamLassoOptimizerUpdate;
 
 	// other shaders
-	ndSharedPtr<ndBrainGpuShader> m_brainCopyBuffer;
-	ndSharedPtr<ndBrainGpuShader> m_brainCopyBufferIndirect;
+	ndSharedPtr<ndBrainKernel> m_brainCopyBuffer;
+	ndSharedPtr<ndBrainKernel> m_brainCopyBufferIndirect;
 	
 	private:
 	ndSharedPtr<cl::Device> m_device;

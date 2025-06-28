@@ -24,7 +24,7 @@
 #include "ndBrainVector.h"
 #include "ndBrainTrainer.h"
 #include "ndBrainSaveLoad.h"
-#include "ndBrainGpuContext.h"
+#include "ndBrainContext.h"
 #include "ndBrainLossLeastSquaredError.h"
 
 ndBrain::ndBrain()
@@ -65,7 +65,8 @@ ndBrain& ndBrain::operator=(const ndBrain& src)
 bool ndBrain::IsGpuReady() const
 { 
 	const ndArray<ndBrainLayer*>& layers = *this;
-	bool gpuReady = ndBrainGpuContext::HasGpuSupport();
+	//bool gpuReady = ndBrainGpuContext::HasGpuSupport();
+	bool gpuReady = true;
 	for (ndInt32 i = ndInt32 (GetCount()) - 1; i >= 0; --i)
 	{
 		gpuReady = gpuReady && layers[i]->HasGpuSupport();

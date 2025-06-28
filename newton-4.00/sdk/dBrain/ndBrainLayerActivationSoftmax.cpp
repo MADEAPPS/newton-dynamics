@@ -22,7 +22,7 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainTrainer.h"
 #include "ndBrainSaveLoad.h"
-#include "ndBrainGpuContext.h"
+#include "ndBrainContext.h"
 #include "ndBrainLayerActivationSoftmax.h"
 
 ndBrainLayerActivationSoftmax::ndBrainLayerActivationSoftmax(ndInt32 neurons)
@@ -181,10 +181,10 @@ void ndBrainLayerActivationSoftmax::BackPropagate(const ndBrainLayerBackPropagat
 }
 
 ndBrainTrainerGpuCommand* ndBrainLayerActivationSoftmax::CreateGpuFeedForwardCommand(
-	ndBrainTrainerGpuInference* const owner,
+	ndBrainTrainerInference* const owner,
 	const ndBrainLayer::ndCommandShareInfo& info,
-	ndBrainGpuContext* const context, ndInt32 miniBatchSize,
-	const ndSharedPtr<ndBrainGpuUniformBuffer>& uniformBuffer,
+	ndBrainContext* const context, ndInt32 miniBatchSize,
+	const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 	ndBrainFloatBuffer* const inputOutputData,
 	ndBrainFloatBuffer* const parameters) const
 {

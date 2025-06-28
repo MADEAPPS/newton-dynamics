@@ -151,10 +151,10 @@ void ndBrainLayerLinearWithDropOut::BackPropagate(const ndBrainLayerBackPropagat
 }
 
 ndBrainTrainerGpuCommand* ndBrainLayerLinearWithDropOut::CreateGpuFeedForwardCommand(
-	ndBrainTrainerGpuInference* const owner,
+	ndBrainTrainerInference* const owner,
 	const ndBrainLayer::ndCommandShareInfo& info,
-	ndBrainGpuContext* const context, ndInt32 miniBatchSize,
-	const ndSharedPtr<ndBrainGpuUniformBuffer>& uniformBuffer,
+	ndBrainContext* const context, ndInt32 miniBatchSize,
+	const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 	ndBrainFloatBuffer* const inputOutputData,
 	ndBrainFloatBuffer* const weightsAndBias) const
 {
@@ -166,10 +166,10 @@ ndBrainTrainerGpuCommand* ndBrainLayerLinearWithDropOut::CreateGpuFeedForwardCom
 }
 
 ndBrainTrainerGpuCommand* ndBrainLayerLinearWithDropOut::CreateGpuBackPropagateCommand(
-	ndBrainTrainerGpuInference* const owner,
+	ndBrainTrainerInference* const owner,
 	const ndBrainLayer::ndCommandShareInfo& info,
-	ndBrainGpuContext* const context, ndInt32 miniBatchSize,
-	const ndSharedPtr<ndBrainGpuUniformBuffer>& uniformBuffer,
+	ndBrainContext* const context, ndInt32 miniBatchSize,
+	const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 	ndBrainFloatBuffer* const inputOutputData,
 	ndBrainFloatBuffer* const weightsAndBias,
 	ndBrainFloatBuffer* const inputOutputGradients,

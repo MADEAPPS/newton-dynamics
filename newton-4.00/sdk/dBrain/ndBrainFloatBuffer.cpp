@@ -69,6 +69,7 @@ size_t ndBrainFloatBuffer::GetCount() const
 	return m_sizeInBytes / sizeof(ndReal);
 }
 
+#if 0
 void ndBrainFloatBuffer::BrainVectorToDevice(const ndBrainVector& vector)
 {
 	ndAssert(0);
@@ -166,3 +167,5 @@ void ndBrainFloatBuffer::MemoryFromDevice(size_t offsetInBytes, size_t sizeInByt
 {
 	m_context->MemoryFromDevice(*this, offsetInBytes, sizeInBytes, outputMemory);
 }
+
+#endif

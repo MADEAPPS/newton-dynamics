@@ -18,17 +18,20 @@
 ndBrainIntegerBuffer::ndBrainIntegerBuffer(ndBrainContext* const context, ndInt64 sizeInElements)
 	:ndBrainBuffer(context, sizeInElements* ndInt64(sizeof(ndUnsigned32)))
 {
-	m_indexArray.SetCount(sizeInElements);
+	ndAssert(0);
+	//m_indexArray.SetCount(sizeInElements);
 }
 
 ndBrainIntegerBuffer::ndBrainIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32* const indexArray)
 	:ndBrainBuffer(context, numberOfElements * ndInt64(sizeof(ndUnsigned32)))
 {
-	ndAssert(m_context->GetAsCpuContext());
-	m_indexArray.SetCount(numberOfElements);
-	MemoryToDevice(0, m_sizeInBytes, indexArray);
+	ndAssert(0);
+	//ndAssert(m_context->GetAsCpuContext());
+	//m_indexArray.SetCount(numberOfElements);
+	//MemoryToDevice(0, m_sizeInBytes, indexArray);
 }
 
+#if 0
 void ndBrainIntegerBuffer::BrainVectorToDevice(const ndBrainVector&)
 {
 	ndAssert(0);
@@ -86,3 +89,4 @@ void ndBrainIntegerBuffer::CopyBufferIndirect(const ndBrainBuffer&, const ndBrai
 {
 	ndAssert(0);
 }
+#endif

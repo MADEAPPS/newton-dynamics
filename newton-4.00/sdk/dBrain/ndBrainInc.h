@@ -30,6 +30,7 @@
 #include <ndBrainVector.h>
 #include <ndBrainBuffer.h>
 #include <ndBrainMatrix.h>
+#include <ndBrainKernel.h>
 #include <ndBrainContext.h>
 #include <ndBrainTrainer.h>
 #include <ndBrainSaveLoad.h>
@@ -45,6 +46,7 @@
 #include <ndBrainOptimizerSgd.h>
 #include <ndBrainUniformBuffer.h>
 #include <ndBrainIntegerBuffer.h>
+#include <ndBrainCommandBuffer.h>
 #include <ndBrainLayerActivation.h>
 #include <ndBrainOptimizerAdamCpu.h>
 #include <ndBrainOptimizerAdamGpu.h>

@@ -17,16 +17,35 @@
 ndBrainUniformBuffer::ndBrainUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes)
 	:ndBrainBuffer(context, sizeInBytes)
 {
-	ndAssert(0);
+	if (m_context->GetAsCpuContext())
+	{
+		ndAssert(0);
+	}
+	else
+	{
+		ndAssert(0);
+	}
 }
 
 ndBrainUniformBuffer::ndBrainUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, const void* const data)
 	:ndBrainBuffer(context, sizeInBytes)
 {
-	ndAssert(0);
-	LoadData(0, size_t(sizeInBytes), data);
+	sizeInBytes += (sizeof(ndUnsigned32) - 1) & -ndInt32 (sizeof(ndUnsigned32));
+	if (m_context->GetAsCpuContext())
+	{
+		m_data = ndSharedPtr<ndFixSizeArray<ndUnsigned32, 256>>(new ndFixSizeArray<ndUnsigned32, 256>);
+		m_data->SetCount(ndInt32 (sizeInBytes / sizeof (ndUnsigned32)));
+
+		ndFixSizeArray<ndUnsigned32, 256>& dst = **m_data;
+		ndMemCpy(&dst[0], (ndUnsigned32*)data, m_data->GetCount());
+	}
+	else
+	{
+		ndAssert(0);
+	}
 }
 
+#if 0
 void ndBrainUniformBuffer::BrainVectorToDevice(const ndBrainVector&)
 {
 	ndAssert(0);
@@ -89,3 +108,5 @@ void ndBrainUniformBuffer::CopyBufferIndirect(const ndBrainBuffer&, const ndBrai
 {
 	ndAssert(0);
 }
+
+#endif

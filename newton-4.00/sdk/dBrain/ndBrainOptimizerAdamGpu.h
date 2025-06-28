@@ -72,9 +72,6 @@ class ndBrainOptimizerAdamGpu : public ndBrainOptimizer
 	ndSharedPtr<ndBrainFloatBuffer> m_vdw;
 	ndSharedPtr<ndBrainFloatBuffer> m_vdw2;
 	ndCommandShareInfo m_parameters;
-
-	friend class ndBrainTrainerCpu;
-	friend class ndBrainTrainerGpu;
 };
 
 #endif 

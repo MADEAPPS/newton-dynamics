@@ -24,7 +24,7 @@
 
 #include "ndBrainStdafx.h"
 //#include "ndBrainTrainer.h"
-#include "ndBrainGpuContext.h"
+#include "ndBrainContext.h"
 
 class ndBrainLoad;
 class ndBrainSave;
@@ -32,12 +32,10 @@ class ndBrainVector;
 class ndBrainMatrix;
 class ndBrainGpuBuffer;
 class ndBrainGpuCommand;
-class ndBrainTrainerCpu;
 class ndBrainFloatBuffer;
-class ndBrainGpuUniformBuffer;
+class ndBrainUniformBuffer;
+class ndBrainTrainerInference;
 class ndBrainTrainerGpuCommand;
-class ndBrainTrainerCpuInference;
-class ndBrainTrainerGpuInference;
 class ndBrainLayerFeedForwardCpuCommand;
 class ndBrainLayerBackPropagateCpuCommand;
 
@@ -135,17 +133,17 @@ class ndBrainLayer : public ndClassAlloc
 
 	virtual bool HasGpuSupport() const;
 
-	virtual ndBrainTrainerGpuCommand* CreateGpuFeedForwardCommand(ndBrainTrainerGpuInference* const owner,
+	virtual ndBrainTrainerGpuCommand* CreateGpuFeedForwardCommand(ndBrainTrainerInference* const owner,
 		const ndBrainLayer::ndCommandShareInfo& info,
-		ndBrainGpuContext* const context, ndInt32 miniBatchSize,
-		const ndSharedPtr<ndBrainGpuUniformBuffer>& uniformBuffer,
+		ndBrainContext* const context, ndInt32 miniBatchSize,
+		const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 		ndBrainFloatBuffer* const inputOutputData,
 		ndBrainFloatBuffer* const weightsAndBias) const;
 
-	virtual ndBrainTrainerGpuCommand* CreateGpuBackPropagateCommand(ndBrainTrainerGpuInference* const owner,
+	virtual ndBrainTrainerGpuCommand* CreateGpuBackPropagateCommand(ndBrainTrainerInference* const owner,
 		const ndBrainLayer::ndCommandShareInfo& info,
-		ndBrainGpuContext* const context, ndInt32 miniBatchSize,
-		const ndSharedPtr<ndBrainGpuUniformBuffer>& uniformBuffer,
+		ndBrainContext* const context, ndInt32 miniBatchSize,
+		const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 		ndBrainFloatBuffer* const inputOutputData,
 		ndBrainFloatBuffer* const weightsAndBias,
 		ndBrainFloatBuffer* const inputOutputGradients,

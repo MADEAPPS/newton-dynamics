@@ -21,7 +21,7 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
-#include "ndBrainGpuContext.h"
+#include "ndBrainContext.h"
 #include "ndBrainGpuCommand.h"
 #include "ndBrainFloatBuffer.h"
 #include "ndBrainLayerActivation.h"

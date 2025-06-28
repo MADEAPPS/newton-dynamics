@@ -13,29 +13,30 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainLayer.h"
-#include "ndBrainGpuContext.h"
+#include "ndBrainContext.h"
 
+class ndBrainKernel;
 class ndBrainGpuBuffer;
 class ndBrainFloatBuffer;
-class ndBrainGpuUniformBuffer;
+class ndBrainUniformBuffer;
 
-class ndBrainGpuCommand : public ndClassAlloc
+class ndBrainGpuCommand : public ndContainersFreeListAlloc<ndBrainGpuCommand>
 {
 	public:
-	ndBrainGpuCommand(ndBrainGpuContext* const context, const ndBrainLayer::ndCommandShareInfo& info);
+	ndBrainGpuCommand(ndBrainContext* const context, const ndBrainLayer::ndCommandShareInfo& info);
 	virtual ~ndBrainGpuCommand();
-	void Assembly(const ndSharedPtr<ndBrainGpuShader>& shader, ndInt32 workGroupSize, ndInt32 buffersCount, ndBrainBuffer** buffer);
+	void Assembly(const ndSharedPtr<ndBrainKernel>& shader, ndInt32 workGroupSize, ndInt32 buffersCount, ndBrainBuffer** buffer);
 
 	protected:
-	ndBrainGpuContext* m_context;
-	ndSharedPtr<ndBrainGpuShader> m_shader;
+	ndBrainContext* m_context;
+	ndSharedPtr<ndBrainKernel> m_shader;
 	ndBrainLayer::ndCommandShareInfo m_info;
 	ndBrainLayer* m_layer;
 	ndFixSizeArray<ndBrainBuffer*, 8> m_parameters;
 	size_t m_workGroupSize;
 	size_t m_numberOfWorkGroups;
 
-	friend class ndBrainGpuContext;
+	friend class ndBrainContext;
 	friend class ndBrainTrainerGpu;
 	friend class ndBrainLayerLinear;
 	friend class ndBrainTrainerGpuInference;

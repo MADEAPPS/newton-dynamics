@@ -46,17 +46,17 @@ class ndBrainLayerActivationRelu : public ndBrainLayerActivation
 	virtual void BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const override;
 
 	virtual bool HasGpuSupport() const override;
-	virtual ndBrainTrainerGpuCommand* CreateGpuFeedForwardCommand(ndBrainTrainerGpuInference* const owner,
+	virtual ndBrainTrainerGpuCommand* CreateGpuFeedForwardCommand(ndBrainTrainerInference* const owner,
 		const ndBrainLayer::ndCommandShareInfo& info,
-		ndBrainGpuContext* const context, ndInt32 miniBatchSize,
-		const ndSharedPtr<ndBrainGpuUniformBuffer>& uniformBuffer,
+		ndBrainContext* const context, ndInt32 miniBatchSize,
+		const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 		ndBrainFloatBuffer* const inputOutputData,
 		ndBrainFloatBuffer* const weightsAndBias) const override;
 
-	virtual ndBrainTrainerGpuCommand* CreateGpuBackPropagateCommand(ndBrainTrainerGpuInference* const owner,
+	virtual ndBrainTrainerGpuCommand* CreateGpuBackPropagateCommand(ndBrainTrainerInference* const owner,
 		const ndBrainLayer::ndCommandShareInfo& info,
-		ndBrainGpuContext* const context, ndInt32 miniBatchSize,
-		const ndSharedPtr<ndBrainGpuUniformBuffer>& uniformBuffer,
+		ndBrainContext* const context, ndInt32 miniBatchSize,
+		const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 		ndBrainFloatBuffer* const inputOutputData,
 		ndBrainFloatBuffer* const weightsAndBias,
 		ndBrainFloatBuffer* const inputOutputGradients,

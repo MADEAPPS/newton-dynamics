@@ -10,13 +10,11 @@
 */
 
 #include "ndBrainStdafx.h"
-#include "ndBrainKernel.h"
-#include "ndBrainContext.h"
-#include "ndBrainGpuCommand.h"
+#include "ndBrainCommandBuffer.h"
 
-
+#if 0
 ndBrainGpuCommand::ndBrainGpuCommand(ndBrainContext* const context, const ndBrainLayer::ndCommandShareInfo& info)
-	:ndContainersFreeListAlloc<ndBrainGpuCommand>()
+	:ndClassAlloc()
 	,m_context(context)
 	,m_shader()
 	,m_info(info)
@@ -30,7 +28,7 @@ ndBrainGpuCommand::~ndBrainGpuCommand()
 {
 }
 
-void ndBrainGpuCommand::Assembly(const ndSharedPtr<ndBrainKernel>& shader, ndInt32 workGroupSize, ndInt32 buffersCount, ndBrainBuffer** buffer)
+void ndBrainGpuCommand::Assembly(const ndSharedPtr<ndBrainGpuShader>& shader, ndInt32 workGroupSize, ndInt32 buffersCount, ndBrainBuffer** buffer)
 {
 	m_shader = shader;
 	m_workGroupSize = ND_DEFAULT_WORKGROUP_SIZE;
@@ -41,4 +39,13 @@ void ndBrainGpuCommand::Assembly(const ndSharedPtr<ndBrainKernel>& shader, ndInt
 	{
 		m_parameters.PushBack(buffer[i]);
 	}
+}
+
+#endif
+
+
+ndBrainCommandBuffer::ndBrainCommandBuffer(const ndBrainCommandBufferDesc& desc)
+	:ndContainersFreeListAlloc<ndBrainCommandBuffer>()
+	,m_desc(desc)
+{
 }

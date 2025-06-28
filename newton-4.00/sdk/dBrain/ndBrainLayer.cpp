@@ -23,7 +23,7 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainLayer.h"
 
-class ndBrainGpuContext;
+class ndBrainContext;
 
 ndBrainLayer::ndBrainLayer(const ndBrainLayer& src)
 	:ndClassAlloc(src)
@@ -220,8 +220,8 @@ ndBrainLayer::ndCommandShareInfo ndBrainLayer::GetGpuCommandSharedInfo() const
 }
 
 ndBrainTrainerGpuCommand* ndBrainLayer::CreateGpuFeedForwardCommand(
-	ndBrainTrainerGpuInference* const, const ndBrainLayer::ndCommandShareInfo&, 
-	ndBrainGpuContext* const, ndInt32, const ndSharedPtr<ndBrainGpuUniformBuffer>&,
+	ndBrainTrainerInference* const, const ndBrainLayer::ndCommandShareInfo&, 
+	ndBrainContext* const, ndInt32, const ndSharedPtr<ndBrainUniformBuffer>&,
 	ndBrainFloatBuffer* const, ndBrainFloatBuffer* const) const
 {
 	ndAssert(0);
@@ -229,8 +229,8 @@ ndBrainTrainerGpuCommand* ndBrainLayer::CreateGpuFeedForwardCommand(
 }
 
 ndBrainTrainerGpuCommand* ndBrainLayer::CreateGpuBackPropagateCommand(
-	ndBrainTrainerGpuInference* const, const ndBrainLayer::ndCommandShareInfo&,
-	ndBrainGpuContext* const, ndInt32, const ndSharedPtr<ndBrainGpuUniformBuffer>&,
+	ndBrainTrainerInference* const, const ndBrainLayer::ndCommandShareInfo&,
+	ndBrainContext* const, ndInt32, const ndSharedPtr<ndBrainUniformBuffer>&,
 	ndBrainFloatBuffer* const, ndBrainFloatBuffer* const, 
 	ndBrainFloatBuffer* const, ndBrainFloatBuffer* const) const
 {

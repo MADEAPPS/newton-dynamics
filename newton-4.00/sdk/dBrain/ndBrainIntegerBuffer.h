@@ -19,25 +19,22 @@ class ndBrainIntegerBuffer : public ndBrainBuffer
 	ndBrainIntegerBuffer(ndBrainContext* const context, ndInt64 sizeInElements);
 	ndBrainIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32* const indexArray);
 
-	virtual void BrainVectorToDevice(const ndBrainVector& vector) override;
-	virtual void BrainVectorFromDevice(ndBrainVector& vector) const override;
-
-	virtual void MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData) override;
-	virtual void MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const override;
-
-	virtual void CopyBuffer(const ndBrainBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer) override;
-	virtual void CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer) override;
-
-	protected:
-	virtual void LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const sourceData) override;
-	virtual void UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const outputData) const override;
+	//virtual void BrainVectorToDevice(const ndBrainVector& vector) override;
+	//virtual void BrainVectorFromDevice(ndBrainVector& vector) const override;
+	//
+	//virtual void MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData) override;
+	//virtual void MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const override;
+	//
+	//virtual void CopyBuffer(const ndBrainBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer) override;
+	//virtual void CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer) override;
+	//
+	//protected:
+	//virtual void LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const sourceData) override;
+	//virtual void UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const outputData) const override;
 
 	ndArray<ndUnsigned32> m_indexArray;
 
-	friend class ndBrainFloatBuffer;
-	friend class ndBrainTrainerCpu;
-	friend class ndBrainCpuFloatBuffer;
-	friend class ndBrainTrainerCpuInference;
+	friend class ndBrainTrainer;
 	friend class ndBrainCpuContext;
 };
 

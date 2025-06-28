@@ -23,7 +23,7 @@
 #include "ndBrainTrainer.h"
 #include "ndBrainSaveLoad.h"
 #include "ndBrainSimdFloat8.h"
-#include "ndBrainGpuContext.h"
+#include "ndBrainContext.h"
 #include "ndBrainLayerActivationTanh.h"
 
 ndBrainLayerActivationTanh::ndBrainLayerActivationTanh(ndInt32 neurons)
@@ -172,10 +172,10 @@ void ndBrainLayerActivationTanh::BackPropagate(const ndBrainLayerBackPropagateCp
 }
 
 ndBrainTrainerGpuCommand* ndBrainLayerActivationTanh::CreateGpuFeedForwardCommand(
-	ndBrainTrainerGpuInference* const owner,
+	ndBrainTrainerInference* const owner,
 	const ndBrainLayer::ndCommandShareInfo& info,
-	ndBrainGpuContext* const context, ndInt32 miniBatchSize,
-	const ndSharedPtr<ndBrainGpuUniformBuffer>& uniformBuffer,
+	ndBrainContext* const context, ndInt32 miniBatchSize,
+	const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 	ndBrainFloatBuffer* const inputOutputData,
 	ndBrainFloatBuffer* const weightsAndBias) const
 {
@@ -188,10 +188,10 @@ ndBrainTrainerGpuCommand* ndBrainLayerActivationTanh::CreateGpuFeedForwardComman
 }
 
 ndBrainTrainerGpuCommand* ndBrainLayerActivationTanh::CreateGpuBackPropagateCommand(
-	ndBrainTrainerGpuInference* const owner,
+	ndBrainTrainerInference* const owner,
 	const ndBrainLayer::ndCommandShareInfo& info,
-	ndBrainGpuContext* const context, ndInt32 miniBatchSize,
-	const ndSharedPtr<ndBrainGpuUniformBuffer>& uniformBuffer,
+	ndBrainContext* const context, ndInt32 miniBatchSize,
+	const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 	ndBrainFloatBuffer* const inputOutputData,
 	ndBrainFloatBuffer* const weightsAndBias,
 	ndBrainFloatBuffer* const inputOutputGradients,

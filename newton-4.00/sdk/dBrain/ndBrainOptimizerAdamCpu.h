@@ -51,8 +51,6 @@ class ndBrainOptimizerAdamCpu : public ndBrainOptimizer
 	ndBrainFloat m_alphaAcc;
 	ndBrainThreadPool* m_threadPool;
 	ndInt32 m_miniBatchSize;
-
-	friend class ndBrainTrainerCpu;
 };
 
 #endif 

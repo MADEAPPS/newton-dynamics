@@ -15,7 +15,7 @@
 
 class ndBrainBuffer;
 class ndBrainVector;
-class ndBrainGpuContext;
+class ndBrainContext;
 class ndBrainCpuContext;
 class ndBrainFloatBuffer;
 
@@ -34,7 +34,9 @@ class ndBrainContext : public ndClassAlloc
 
 	virtual ndContextType GetType() const = 0;
 	virtual ndBrainCpuContext* GetAsCpuContext();
-	virtual ndBrainGpuContext* GetAsGpuContext();
+	virtual ndBrainContext* GetAsGpuContext();
+
+	static bool HasGpuSupport() { ndAssert(0); return true;}
 
 	virtual void BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector) = 0;
 

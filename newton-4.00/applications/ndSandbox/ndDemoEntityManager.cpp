@@ -295,7 +295,7 @@ void Test1__()
 
 void TestVulkanStuff()
 {
-	if (!ndBrainGpuContext::HasGpuSupport())
+	if (!ndBrainContext::HasGpuSupport())
 	{
 		return;
 	}
@@ -360,18 +360,19 @@ void TestVulkanStuff()
 	{
 		public:
 		TestCommand(
-			ndBrainGpuContext* const context, 
+			ndBrainContext* const context, 
 			ndInt32 numberOfImputs, 
 			ndBrainUniformBuffer& uniforms,
 			ndBrainFloatBuffer& weights, 
 			ndBrainFloatBuffer& imputOutputs)
 			:ndBrainGpuCommand(context, ndBrainLayer::ndCommandShareInfo())
 		{
-			ndFixSizeArray<ndBrainBuffer*, 4> params;
-			params.PushBack(&uniforms);
-			params.PushBack(&imputOutputs);
-			params.PushBack(&weights);
-			Assembly(context->m_brainLayerMatrixMatrixMultiply, numberOfImputs, params.GetCount(), &params[0]);
+			ndAssert(0);
+			//ndFixSizeArray<ndBrainBuffer*, 4> params;
+			//params.PushBack(&uniforms);
+			//params.PushBack(&imputOutputs);
+			//params.PushBack(&weights);
+			//Assembly(context->m_brainLayerMatrixMatrixMultiply, numberOfImputs, params.GetCount(), &params[0]);
 		}
 	};
 	struct UniformBufferObject

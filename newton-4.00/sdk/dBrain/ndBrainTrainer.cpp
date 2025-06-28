@@ -27,7 +27,7 @@
 #include "ndBrainMatrix.h"
 #include "ndBrainBuffer.h"
 #include "ndBrainTrainer.h"
-#include "ndBrainGpuContext.h"
+#include "ndBrainContext.h"
 #include "ndBrainGpuCommand.h"
 #include "ndBrainLayerLinear.h"
 #include "ndBrainFloatBuffer.h"
@@ -38,8 +38,8 @@ class ndBrainAdamUpdateCommand : public ndBrainGpuCommand
 {
 	public:
 	ndBrainAdamUpdateCommand(ndBrainTrainerInference* const owner,
-		ndBrainGpuContext* const context,
-		const ndSharedPtr<ndBrainGpuShader>& shader,
+		ndBrainContext* const context,
+		const ndSharedPtr<ndBrainKernel>& shader,
 		ndInt32 miniBatchSize,
 		ndBrainOptimizerAdamGpu::ndCommandShareInfo& info,
 		const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer)
@@ -57,8 +57,8 @@ class ndBrainAdamUpdateCommand : public ndBrainGpuCommand
 	}
 
 	ndBrainAdamUpdateCommand(ndBrainTrainerInference* const owner,
-		ndBrainGpuContext* const context,
-		const ndSharedPtr<ndBrainGpuShader>& shader,
+		ndBrainContext* const context,
+		const ndSharedPtr<ndBrainKernel>& shader,
 		ndInt32 miniBatchSize,
 		ndBrainOptimizerAdamGpu::ndCommandShareInfo& info,
 		const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
@@ -83,7 +83,7 @@ class ndBrainAdamUpdateCommand : public ndBrainGpuCommand
 		//Assembly(shader, m_miniBatchSize, params.GetCount(), &params[0]);
 	}
 
-	ndSharedPtr<ndBrainGpuShader> m_shader;
+	ndSharedPtr<ndBrainKernel> m_shader;
 	ndSharedPtr<ndBrainUniformBuffer> m_uniformBuffer;
 	ndBrainOptimizerAdamGpu::ndCommandShareInfo m_info;
 	ndBrainTrainerInference* m_owner;

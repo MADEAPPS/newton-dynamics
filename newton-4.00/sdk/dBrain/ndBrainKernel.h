@@ -8,23 +8,24 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
+#ifndef __ND_BRAIN_KERNEL_H__
+#define __ND_BRAIN_KERNEL_H__
 
 #include "ndBrainStdafx.h"
-#include "ndBrainBuffer.h"
 
-ndBrainBuffer::ndBrainBuffer(ndBrainContext* const context, ndInt64 sizeInByte, bool memoryMapped)
-	:ndContainersFreeListAlloc<ndBrainBuffer>()
-	,m_context(context)
-	,m_sizeInBytes(size_t(sizeInByte))
-	,m_isMemoryMapped(memoryMapped)
+class ndBrainBuffer;
+class ndBrainContext;
+
+class ndBrainKernel : public ndContainersFreeListAlloc<ndBrainKernel>
 {
-}
+	public:
+	ndBrainKernel(ndBrainContext* const context);
+	virtual ~ndBrainKernel();
 
-ndBrainBuffer::~ndBrainBuffer()
-{
-}
+	virtual void Execute(ndInt32 groupId, ndInt32 workGroupSize) = 0;
 
-size_t ndBrainBuffer::SizeInBytes() const
-{ 
-	return m_sizeInBytes; 
-}
+	ndBrainContext* m_context;
+	ndFixSizeArray<ndBrainBuffer*, 8> m_parameters;
+};
+
+#endif

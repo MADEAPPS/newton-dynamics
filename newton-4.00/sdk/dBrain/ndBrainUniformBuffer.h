@@ -19,26 +19,23 @@ class ndBrainUniformBuffer : public ndBrainBuffer
 	ndBrainUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes);
 	ndBrainUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, const void* const data);
 
-	virtual void BrainVectorToDevice(const ndBrainVector& vector) override;
-	virtual void BrainVectorFromDevice(ndBrainVector& vector) const override;
-
-	virtual void MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData) override;
-	virtual void MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const override;
-
-	virtual void CopyBuffer(const ndBrainBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer) override;
-	virtual void CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer) override;
+	//virtual void BrainVectorToDevice(const ndBrainVector& vector) override;
+	//virtual void BrainVectorFromDevice(ndBrainVector& vector) const override;
+	//
+	//virtual void MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData) override;
+	//virtual void MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const override;
+	//
+	//virtual void CopyBuffer(const ndBrainBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer) override;
+	//virtual void CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer) override;
+	//
+	//protected:
+	//virtual void LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const sourceData) override;
+	//virtual void UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const outputData) const override;
 
 	protected:
-	virtual void LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const sourceData) override;
-	virtual void UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const outputData) const override;
+	ndSharedPtr<ndFixSizeArray<ndUnsigned32, 256>> m_data;
 
-	ndFixSizeArray<ndUnsigned32, 256> m_data;
-
-	friend class ndBrainTrainerCpu;
-	friend class ndBrainFloatBuffer;
-	friend class ndBrainCpuFloatBuffer;
 	friend class ndBrainCpuContext;
-	friend class ndBrainTrainerCpuInference;
 };
 
 #endif

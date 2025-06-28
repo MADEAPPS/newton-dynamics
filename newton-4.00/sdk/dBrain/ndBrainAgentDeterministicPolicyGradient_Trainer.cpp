@@ -322,14 +322,15 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::ndBrainAgentDeterministicPolicy
 	m_parameters.m_criticUpdatesCount = ndMax(m_parameters.m_criticUpdatesCount, 2);
 	m_parameters.m_policyUpdatesCount = ndMax(m_parameters.m_policyUpdatesCount, 2);
 
-	if (m_parameters.m_useGpuBackend)
-	{
-		m_context = ndSharedPtr<ndBrainContext>(new ndBrainGpuContext);
-	}
-	else
-	{
-		m_context = ndSharedPtr<ndBrainContext>(new ndBrainCpuContext);
-	}
+	ndAssert(0);
+	//if (m_parameters.m_useGpuBackend)
+	//{
+	//	m_context = ndSharedPtr<ndBrainContext>(new ndBrainContext);
+	//}
+	//else
+	//{
+	//	m_context = ndSharedPtr<ndBrainContext>(new ndBrainCpuContext);
+	//}
 
 	// create actor class
 	BuildPolicyClass();
@@ -351,7 +352,7 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::ndBrainAgentDeterministicPolicy
 	//	replayCacheBufferInfo.m_strideInByte = ndInt32(ND_MINI_FLAT_BUFFER_CACHE * m_replayBuffer.GetStride() * sizeof (ndReal));
 	//	replayCacheBufferInfo.m_srcStrideInByte = replayCacheBufferInfo.m_strideInByte;
 	//	replayCacheBufferInfo.m_dstStrideInByte = replayCacheBufferInfo.m_strideInByte;
-	//	m_replayFlatBufferCacheParameters = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuUniformBuffer(*m_context, sizeof(ndCopyBufferCommandInfo), &replayCacheBufferInfo, true));
+	//	m_replayFlatBufferCacheParameters = ndSharedPtr<ndBrainBuffer>(new ndBrainUniformBuffer(*m_context, sizeof(ndCopyBufferCommandInfo), &replayCacheBufferInfo, true));
 	//
 	//	ndCopyBufferCommandInfo policyInputBufferInfo;
 	//	policyInputBufferInfo.m_srcOffsetInByte = 0;
@@ -359,7 +360,7 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::ndBrainAgentDeterministicPolicy
 	//	policyInputBufferInfo.m_strideInByte = ndInt32(m_policyTrainer->GetBrain()->GetInputSize() * sizeof(ndReal));
 	//	policyInputBufferInfo.m_srcStrideInByte = ndInt32(m_replayBuffer.GetStride() * sizeof(ndReal));
 	//	policyInputBufferInfo.m_dstStrideInByte = policyInputBufferInfo.m_strideInByte;
-	//	m_policyNextObservationParameters = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuUniformBuffer(*m_context, sizeof(ndCopyBufferCommandInfo), &policyInputBufferInfo));
+	//	m_policyNextObservationParameters = ndSharedPtr<ndBrainBuffer>(new ndBrainUniformBuffer(*m_context, sizeof(ndCopyBufferCommandInfo), &policyInputBufferInfo));
 	//
 	//	ndCopyBufferCommandInfo crictiActionInputBufferInfo;
 	//	crictiActionInputBufferInfo.m_srcOffsetInByte = 0;
@@ -367,7 +368,7 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::ndBrainAgentDeterministicPolicy
 	//	crictiActionInputBufferInfo.m_strideInByte = ndInt32(m_referenceCriticTrainer[0]->GetBrain()->GetInputSize() * sizeof(ndReal));
 	//	crictiActionInputBufferInfo.m_srcStrideInByte = ndInt32(m_policyTrainer->GetBrain()->GetOutputSize() * sizeof(ndReal));
 	//	crictiActionInputBufferInfo.m_dstStrideInByte = crictiActionInputBufferInfo.m_strideInByte;
-	//	m_criticNextActionParameters = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuUniformBuffer(*m_context, sizeof(ndCopyBufferCommandInfo), &crictiActionInputBufferInfo));
+	//	m_criticNextActionParameters = ndSharedPtr<ndBrainBuffer>(new ndBrainUniformBuffer(*m_context, sizeof(ndCopyBufferCommandInfo), &crictiActionInputBufferInfo));
 	//
 	//	ndCopyBufferCommandInfo crictiObservationInputBufferInfo;
 	//	crictiObservationInputBufferInfo.m_srcOffsetInByte = 0;
@@ -375,7 +376,7 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::ndBrainAgentDeterministicPolicy
 	//	crictiObservationInputBufferInfo.m_strideInByte = ndInt32(m_referenceCriticTrainer[0]->GetBrain()->GetInputSize() * sizeof(ndReal));
 	//	crictiObservationInputBufferInfo.m_srcStrideInByte = ndInt32(m_policyTrainer->GetBrain()->GetInputSize() * sizeof(ndReal));
 	//	crictiObservationInputBufferInfo.m_dstStrideInByte = crictiObservationInputBufferInfo.m_strideInByte;
-	//	m_criticNextObservationParameters = ndSharedPtr<ndBrainBuffer>(new ndBrainGpuUniformBuffer(*m_context, sizeof(ndCopyBufferCommandInfo), &crictiObservationInputBufferInfo));
+	//	m_criticNextObservationParameters = ndSharedPtr<ndBrainBuffer>(new ndBrainUniformBuffer(*m_context, sizeof(ndCopyBufferCommandInfo), &crictiObservationInputBufferInfo));
 	//}
 	//else
 	//{

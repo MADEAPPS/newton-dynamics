@@ -10,21 +10,15 @@
 */
 
 #include "ndBrainStdafx.h"
-#include "ndBrainBuffer.h"
+#include "ndBrainKernel.h"
+#include "ndBrainContext.h"
 
-ndBrainBuffer::ndBrainBuffer(ndBrainContext* const context, ndInt64 sizeInByte, bool memoryMapped)
-	:ndContainersFreeListAlloc<ndBrainBuffer>()
+ndBrainKernel::ndBrainKernel(ndBrainContext* const context)
+	:ndContainersFreeListAlloc<ndBrainKernel>()
 	,m_context(context)
-	,m_sizeInBytes(size_t(sizeInByte))
-	,m_isMemoryMapped(memoryMapped)
 {
 }
 
-ndBrainBuffer::~ndBrainBuffer()
+ndBrainKernel::~ndBrainKernel()
 {
-}
-
-size_t ndBrainBuffer::SizeInBytes() const
-{ 
-	return m_sizeInBytes; 
 }
