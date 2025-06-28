@@ -94,13 +94,12 @@ class ndBrainAdamUpdateCommand : public ndBrainGpuCommand
 ndBrainTrainer::ndBrainTrainer(const ndTrainerDescriptor& descriptor)
 	:ndBrainTrainerInference(descriptor)
 	//,m_optimizer(new ndBrainOptimizerAdamGpu(m_context))
-	//,m_inputOutputGradientsBuffer()
-	//,m_weightAndBiasGradientsBuffer()
-	//,m_miniBatchInputGradientBuffer()
-	//,m_miniBatchOutputGradientBuffer()
+	,m_inputOutputGradientsBuffer()
+	,m_weightAndBiasGradientsBuffer()
+	,m_miniBatchInputGradientBuffer()
+	,m_miniBatchOutputGradientBuffer()
 {
-	ndAssert(0);
-	//ndBrainTrainer::Initialize(descriptor);
+	Initialize();
 }
 
 ndBrainTrainer::ndBrainTrainer(const ndBrainTrainer& src)
@@ -116,33 +115,6 @@ ndBrainTrainer::~ndBrainTrainer()
 }
 
 #if 0
-void ndBrainTrainer::Initialize(const ndTrainerDescriptor& descriptor)
-{
-	ndBrainVector buffer;
-
-	SaveInput(buffer);
-	buffer.Set(ndReal(0.0f));
-	m_miniBatchInputGradientBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, buffer));
-
-	GetOutput(buffer);
-	buffer.Set(ndReal(0.0f));
-	m_miniBatchOutputGradientBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, buffer));
-
-	GetWorkingBuffer(buffer);
-	buffer.Set(ndReal(0.0f));
-	m_inputOutputGradientsBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, buffer));
-
-	GetParameterBuffer(buffer);
-	buffer.SetCount(buffer.GetCount() * m_miniBatchSize);
-	buffer.Set(ndReal(0.0f));
-	m_weightAndBiasGradientsBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, buffer));
-
-	AddCopyOutputGradientCommand();
-	AddLayersGradientCommands();
-	AddCopyInputGradientCommand();
-	AddOptimizerGradientCommand(descriptor.m_learRate);
-}
-
 void ndBrainTrainer::AddCopyInputGradientCommand()
 {
 	ndBrainTrainerCommand* const firstCommand = FindCommand(m_inputId);
@@ -154,7 +126,7 @@ void ndBrainTrainer::AddCopyInputGradientCommand()
 	data.m_parametersBatchSize = 0;
 	data.m_parametersStartOffset = 0;
 	data.m_inputOutputStartOffset = 0;
-	ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(*m_context, sizeof(ndCommandShareInfo)));
+	ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(*m_descriptor.m_context, sizeof(ndCommandShareInfo)));
 	uniformbuffer->MemoryToDevice(0, sizeof(ndCommandShareInfo), &data);
 	
 	ndBrainFloatBuffer* const inputOutputGradientBuffer = *m_inputOutputGradientsBuffer;
@@ -174,7 +146,7 @@ void ndBrainTrainer::AddCopyOutputGradientCommand()
 	data.m_parametersBatchSize = 0;
 	data.m_parametersStartOffset = 0;
 	data.m_inputOutputStartOffset += RoundoffOffset(data.m_inputSize);
-	ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(*m_context, sizeof(ndCommandShareInfo)));
+	ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(*m_descriptor.m_context, sizeof(ndCommandShareInfo)));
 	uniformbuffer->MemoryToDevice(0, sizeof(ndCommandShareInfo), &data);
 	
 	ndBrainFloatBuffer* const inputOutputGradientBuffer = *m_inputOutputGradientsBuffer;
@@ -194,7 +166,7 @@ void ndBrainTrainer::AddOptimizerGradientCommand(ndBrainFloat learnRate)
 	ndBrainFloatBuffer* const weightAndBiasGradientsBuffer = *m_weightAndBiasGradientsBuffer;
 
 #if 1
-	ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(*m_context, sizeof(ndCommandShareInfo)));
+	ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(*m_descriptor.m_context, sizeof(ndCommandShareInfo)));
 	uniformbuffer->MemoryToDevice(0, sizeof(ndCommandShareInfo), &data);
 
 	ndSharedPtr<ndBrainGpuCommand> accumulateGradients(new ndBrainTrainerCommand(this, data, 0, m_context->GetAsGpuContext(), m_context->GetAsGpuContext()->m_brainAccumulateGradientsAndAverage, m_miniBatchSize, uniformbuffer, weightAndBiasGradientsBuffer, nullptr, nullptr));
@@ -228,7 +200,7 @@ void ndBrainTrainer::AddOptimizerGradientCommand(ndBrainFloat learnRate)
 	
 	// add the adam optimizer kernel here
 	ndBrainOptimizerAdamGpu::ndCommandShareInfo optimizerData(m_optimizer->m_parameters);
-	ndSharedPtr<ndBrainUniformBuffer> adamUniformbuffer(new ndBrainUniformBuffer(*m_context, sizeof(ndBrainOptimizerAdamGpu::ndCommandShareInfo)));
+	ndSharedPtr<ndBrainUniformBuffer> adamUniformbuffer(new ndBrainUniformBuffer(*m_descriptor.m_context, sizeof(ndBrainOptimizerAdamGpu::ndCommandShareInfo)));
 	adamUniformbuffer->MemoryToDevice(0, sizeof(ndBrainOptimizerAdamGpu::ndCommandShareInfo), &optimizerData);
 	
 	if (m_optimizer->GetRegularizerType() == m_lasso)
@@ -266,7 +238,7 @@ void ndBrainTrainer::AddLayersGradientCommands()
 	
 		ndCommandShareInfo info(feedForwardLayerCommand->m_info);
 	
-		ndSharedPtr<ndBrainUniformBuffer> uniformBuffer(new ndBrainUniformBuffer(*m_context, sizeof(ndCommandShareInfo)));
+		ndSharedPtr<ndBrainUniformBuffer> uniformBuffer(new ndBrainUniformBuffer(*m_descriptor.m_context, sizeof(ndCommandShareInfo)));
 		uniformBuffer->MemoryToDevice(0, sizeof(ndCommandShareInfo), &info);
 	
 		ndBrainFloatBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
@@ -312,3 +284,33 @@ void ndBrainTrainer::ApplyLearnRate()
 	m_context->GetAsGpuContext()->AddCommandQueue(m_adamOtimizerUpdate);
 }
 #endif
+
+void ndBrainTrainer::Initialize()
+{
+	ndBrainVector buffer;
+
+	//SaveInput(buffer);
+	buffer.SetCount(ndInt64(m_miniBatchInputBuffer->GetCount()));
+	buffer.Set(ndReal(0.0f));
+	m_miniBatchInputGradientBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_descriptor.m_context, buffer));
+	
+	//GetOutput(buffer);
+	buffer.SetCount(ndInt64(m_miniBatchOutputBuffer->GetCount()));
+	buffer.Set(ndReal(0.0f));
+	m_miniBatchOutputGradientBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_descriptor.m_context, buffer));
+	
+	//GetWorkingBuffer(buffer);
+	buffer.SetCount(ndInt64(m_inputOutputBuffer->GetCount()));
+	buffer.Set(ndReal(0.0f));
+	m_inputOutputGradientsBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_descriptor.m_context, buffer));
+	
+	//GetParameterBuffer(buffer);
+	buffer.SetCount(ndInt64(m_weightAndBiasBuffer->GetCount() * m_descriptor.m_minibatchSize));
+	buffer.Set(ndReal(0.0f));
+	m_weightAndBiasGradientsBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_descriptor.m_context, buffer));
+	
+	//AddCopyOutputGradientCommand();
+	//AddLayersGradientCommands();
+	//AddCopyInputGradientCommand();
+	//AddOptimizerGradientCommand(descriptor.m_learRate);
+}

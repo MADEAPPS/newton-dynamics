@@ -40,11 +40,11 @@ class ndBrainTrainer: public ndBrainTrainerInference
 	//virtual void GetGradientBuffer(ndBrainVector&) const override;
 	//virtual void BackPropagate(const ndBrainVector& outputGradients) override;
 	//
-	//protected:
+	protected:
+	void Initialize();
 	//void AddLayersGradientCommands();
 	//void AddCopyInputGradientCommand();
 	//void AddCopyOutputGradientCommand();
-	//void Initialize(const ndTrainerDescriptor& descriptor);
 	//void AddOptimizerGradientCommand(ndBrainFloat learnRate);
 
 	ndSharedPtr<ndBrainOptimizerAdamGpu> m_optimizer;
