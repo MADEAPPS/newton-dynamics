@@ -163,3 +163,25 @@ void ndBrainFloatBuffer::CopyBufferIndirect(const ndBrainUniformBuffer& paramete
 {
 	m_context->CopyBufferIndirect(parameterBuffer, indexBuffer, *this, srcBuffer);
 }
+
+void ndBrainFloatBuffer::MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
+{
+	m_context->MemoryFromDevice(*this, offsetInBytes, sizeInBytes, outputMemory);
+}
+
+void ndBrainFloatBuffer::MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData)
+{
+	m_context->MemoryToDevice(*this, offsetInBytes, sizeInBytes, inputData);
+}
+
+void ndBrainFloatBuffer::VectorFromDevice(ndBrainVector& vector) const
+{
+	vector.SetCount(ndInt64(m_sizeInBytes / sizeof (ndReal)));
+	MemoryFromDevice(0, m_sizeInBytes, &vector[0]);
+}
+
+void ndBrainFloatBuffer::VectorToDevice(const ndBrainVector& vector)
+{
+	ndAssert(vector.GetCount() <= ndInt64(m_sizeInBytes / sizeof(ndReal)));
+	MemoryToDevice(0, vector.GetCount() * sizeof (ndReal), &vector[0]);
+}

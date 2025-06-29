@@ -135,22 +135,28 @@ void ndBrainLayerLinearWithDropOut::FeedForward(const ndBrainLayerFeedForwardCpu
 
 void ndBrainLayerLinearWithDropOut::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
-	ndAssert(0);
 	//const ndCommandShareInfo* const info = &command->m_info;
 	//const ndBrainTrainerCpu* const trainer = (ndBrainTrainerCpu*)command->m_owner;
-	//
-	//ndInt32 inputSize = info->m_inputSize;
-	//ndInt32 outputSize = info->m_outputSize;
-	//
-	//ndInt32 offset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
-	//const ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
-	//
-	//ndInt32 dstOffset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
-	//const ndBrainMemVector outputDerivative(&trainer->m_inputOutputGradientsBuffer[dstOffset + inputSize], outputSize);
-	//ndBrainMemVector inputDerivative(&trainer->m_inputOutputGradientsBuffer[dstOffset], inputSize);
-	//
-	//inputDerivative.Set(m_dropOut);
-	//inputDerivative.Mul(outputDerivative);
+	
+	const ndBrainBufferCommandDesc& desc = command->GetDescriptor();
+	const ndCommandShareInfo& info = desc.m_info;
+	ndBrainTrainer* const trainer = (ndBrainTrainer*)desc.m_owner;
+
+	const ndBrainFloat* const inputOutputBuffer = (ndBrainFloat*)trainer->GetHiddenLayerBuffer()->GetCpuPtr();
+	const ndBrainFloat* const inputOutputGradientsBuffer = (ndBrainFloat*)trainer->GetHiddenLayerGradientBuffer()->GetCpuPtr();
+
+	ndInt32 inputSize = info.m_inputSize;
+	ndInt32 outputSize = info.m_outputSize;
+	
+	ndInt32 offset = miniBatchIndex * info.m_inputOutputSize + info.m_inputOutputStartOffset;
+	const ndBrainMemVector output(&inputOutputBuffer[offset + inputSize], outputSize);
+	
+	ndInt32 dstOffset = miniBatchIndex * info.m_inputOutputSize + info.m_inputOutputStartOffset;
+	const ndBrainMemVector outputDerivative(&inputOutputGradientsBuffer[dstOffset + inputSize], outputSize);
+	ndBrainMemVector inputDerivative(&inputOutputGradientsBuffer[dstOffset], inputSize);
+	
+	inputDerivative.Set(m_dropOut);
+	inputDerivative.Mul(outputDerivative);
 }
 
 ndBrainBufferCommand* ndBrainLayerLinearWithDropOut::CreateGpuFeedForwardCommand(

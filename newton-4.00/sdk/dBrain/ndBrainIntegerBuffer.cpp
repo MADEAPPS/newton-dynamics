@@ -125,16 +125,12 @@ void* ndBrainIntegerBuffer::GetCpuPtr() const
 	return nullptr;
 }
 
+void ndBrainIntegerBuffer::MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
+{
+	m_context->MemoryFromDevice(*this, offsetInBytes, sizeInBytes, outputMemory);
+}
+
 void ndBrainIntegerBuffer::MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData)
 {
-	//if (m_context->GetAsCpuContext())
-	//{
-	//	ndArray<ndUnsigned32>& dst = **m_indexArray;
-	//	m_context->MemoryToDevice(&dst[0], offsetInBytes, sizeInBytes, inputData);
-	//}
-	//else
-	//{
-	//	ndAssert(0);
-	//}
 	m_context->MemoryToDevice(*this, offsetInBytes, sizeInBytes, inputData);
 }

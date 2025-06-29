@@ -51,31 +51,6 @@ ndTrainerDescriptor::ndTrainerDescriptor(const ndSharedPtr<ndBrain>& brain, cons
 {
 }
 
-//ndBrainTrainerGpuCommand::ndBrainTrainerGpuCommand(
-//	ndBrainTrainerInference* const owner,
-//	const ndCommandShareInfo& info, size_t id,
-//	ndBrainContext* const context,
-//	const ndSharedPtr<ndBrainGpuShader>& shader,
-//	ndInt32 numberOfinputs,
-//	const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
-//	ndBrainFloatBuffer* const inputOutputData,
-//	ndBrainFloatBuffer* const parameters,
-//	ndBrainFloatBuffer* const inputOutputGradients,
-//	ndBrainFloatBuffer* const weightsAndBiasGradients)
-//	:ndBrainBufferCommand(context, info)
-//	,m_uniformBuffer(uniformBuffer)
-//	,m_owner(owner)
-//	,m_id(id)
-//{
-//	ndFixSizeArray<ndBrainBuffer*, 8> params;
-//	params.PushBack(*m_uniformBuffer);
-//	params.PushBack(inputOutputData);
-//	params.PushBack(parameters);
-//	params.PushBack(inputOutputGradients);
-//	params.PushBack(weightsAndBiasGradients);
-//	Assembly(shader, numberOfinputs, params.GetCount(), &params[0]);
-//}
-
 ndBrainTrainerInference::ndBrainTrainerInference(const ndTrainerDescriptor& descriptor)
 	:ndClassAlloc()
 	,m_descriptor(descriptor)
@@ -90,7 +65,6 @@ ndBrainTrainerInference::ndBrainTrainerInference(const ndTrainerDescriptor& desc
 }
 
 ndBrainTrainerInference::ndBrainTrainerInference(const ndBrainTrainerInference& src)
-	//:ndBrainTrainer(src)
 	:ndClassAlloc()
 	,m_descriptor(src.m_descriptor)
 	,m_inputOutputBuffer()
@@ -121,17 +95,22 @@ ndSharedPtr<ndBrainContext> ndBrainTrainerInference::GetContext()
 	return m_descriptor.m_context;
 }
 
-ndBrainBuffer* ndBrainTrainerInference::GetInputBuffer()
+ndBrainFloatBuffer* ndBrainTrainerInference::GetInputBuffer()
 {
 	return *m_miniBatchInputBuffer;
 }
 
-ndBrainBuffer* ndBrainTrainerInference::GetHiddenLayerBuffer()
+ndBrainFloatBuffer* ndBrainTrainerInference::GetOuputBuffer()
+{
+	return *m_miniBatchOutputBuffer;
+}
+
+ndBrainFloatBuffer* ndBrainTrainerInference::GetHiddenLayerBuffer()
 {
 	return *m_inputOutputBuffer;
 }
 
-ndBrainBuffer* ndBrainTrainerInference::GetWeightAndBiasBuffer()
+ndBrainFloatBuffer* ndBrainTrainerInference::GetWeightAndBiasBuffer()
 {
 	return *m_weightAndBiasBuffer;
 }
@@ -368,7 +347,6 @@ void ndBrainTrainerInference::AddCopyInputCommand(const ndCommandShareInfo& unif
 	descritor.PushBack(inputOutputBuffer);
 	descritor.PushBack(miniBatchInputBuffer);
 
-	//ndSharedPtr<ndBrainBufferCommand>command(new ndBrainTrainerGpuCommand(this, uniformParam, m_inputId, m_context->GetAsGpuContext(), m_context->GetAsGpuContext()->m_brainCopyInput, m_miniBatchSize, uniformbuffer, inputOutputBuffer, miniBatchInputBuffer));
 	if (descritor.m_context->GetAsCpuContext())
 	{
 		class ndCopyInputCommandCpu : public ndBrainBufferCommandCpu
@@ -415,7 +393,6 @@ void ndBrainTrainerInference::AddCopyOutputCommand()
 	uniformParam.m_parametersStartOffset = 0;
 	uniformParam.m_inputOutputStartOffset += RoundoffOffset(uniformParam.m_inputSize);
 	ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(*m_descriptor.m_context, sizeof(ndCommandShareInfo), &uniformParam));
-	//uniformbuffer->MemoryToDevice(0, sizeof(ndCommandShareInfo), &uniformParam);
 	
 	ndBrainFloatBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
 	ndBrainFloatBuffer* const miniBatchOutputBuffer = *m_miniBatchOutputBuffer;
@@ -429,7 +406,6 @@ void ndBrainTrainerInference::AddCopyOutputCommand()
 	descritor.PushBack(inputOutputBuffer);
 	descritor.PushBack(miniBatchOutputBuffer);
 	
-	//ndSharedPtr<ndBrainBufferCommand>command(new ndBrainTrainerGpuCommand(this, data, m_outpuId, m_descriptor.m_context->GetAsGpuContext(), m_descriptor.m_context->GetAsGpuContext()->m_brainCopyOutput, m_descriptor.m_minibatchSize, uniformbuffer, inputOutputBuffer, miniBatchOutputBuffer));
 	if (descritor.m_context->GetAsCpuContext())
 	{
 		class ndCopyOutputCommandCpu : public ndBrainBufferCommandCpu
@@ -496,11 +472,9 @@ void ndBrainTrainerInference::AddLayersCommands(ndFixSizeArray<ndCommandShareInf
 		ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(*m_descriptor.m_context, sizeof(ndCommandShareInfo), &uniformParam));
 
 		ndSharedPtr<ndBrainBufferCommand> command(layer->CreateGpuFeedForwardCommand(this, uniformParam, *m_descriptor.m_context, m_descriptor.m_minibatchSize, uniformbuffer, inputOutputBuffer, weightsBuffer));
-		//command->m_layer = layer;
 		m_feedForwardCommands.Append(command);
 	}
 }
-
 
 void ndBrainTrainerInference::MakePrediction()
 {

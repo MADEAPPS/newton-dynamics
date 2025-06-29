@@ -191,7 +191,7 @@ static void MnistTrainingSet()
 			//ndInt32 batchesSize = batchesCount * m_miniBatchSize;
 			//
 			//size_t size = inputSize * sizeof(ndReal);
-			//ndBrainBuffer* const deviceMinibatchBuffer = m_trainer->GetInputBuffer();
+			//ndBrainBuffer* const minibatchInputBuffer = m_trainer->GetInputBuffer();
 			//
 			//ndCopyBufferCommandInfo copyBufferInfo;
 			//parameters->MemoryFromDevice(0, sizeof(ndCopyBufferCommandInfo), &copyBufferInfo);
@@ -201,7 +201,7 @@ static void MnistTrainingSet()
 			//{
 			//	copyBufferInfo.m_srcOffsetInByte = ndInt32 (batchStart * size);
 			//	parameters->MemoryToDevice(0, sizeof(ndCopyBufferCommandInfo), &copyBufferInfo);
-			//	deviceMinibatchBuffer->CopyBuffer(**parameters, m_miniBatchSize, **data);
+			//	minibatchInputBuffer->CopyBuffer(**parameters, m_miniBatchSize, **data);
 			//
 			//	m_trainer->MakePrediction();
 			//	m_trainer->GetOutput(miniBatchOutput);
@@ -274,7 +274,9 @@ static void MnistTrainingSet()
 			ndBrainLossCategoricalCrossEntropy loss(outputSize);
 			
 			size_t strideInBytes = size_t(inputSize * sizeof(ndReal));
-			ndBrainFloatBuffer* const deviceMinibatchBuffer = (ndBrainFloatBuffer*)m_trainer->GetInputBuffer();
+			ndBrainFloatBuffer* const minibatchInputBuffer = m_trainer->GetInputBuffer();
+			ndBrainFloatBuffer* const minibatchOutpuBuffer = m_trainer->GetOuputBuffer();
+			ndBrainFloatBuffer* const minibatchOutpuGradientBuffer = m_trainer->GetOuputGradientBuffer();
 			
 			ndCopyBufferCommandInfo copyBufferIndirect;
 			copyBufferIndirect.m_dstOffsetInByte = 0;
@@ -295,26 +297,27 @@ static void MnistTrainingSet()
 				for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
 				{
 					m_indirectMiniBatch->MemoryToDevice(0, m_miniBatchSize * sizeof(ndUnsigned32), &shuffleBuffer[batchStart]);
-					deviceMinibatchBuffer->CopyBufferIndirect(**parameterBufferIndirect, **m_indirectMiniBatch, **m_trainingData);
+					minibatchInputBuffer->CopyBufferIndirect(**parameterBufferIndirect, **m_indirectMiniBatch, **m_trainingData);
 					
 					trainer->MakePrediction();
 					trainer->GetContext()->SyncBufferCommandQueue();
 					
-			//		//calculate loss
-			//		trainer->GetOutput(miniBatchOutput);
-			//		for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
-			//		{
-			//			ndUnsigned32 index = shuffleBuffer[batchStart + i];
-			//			ndBrainMemVector grad(&miniBatchOutputGradients[i * outputSize], outputSize);
-			//			const ndBrainMemVector output(&miniBatchOutput[i * outputSize], outputSize);
-			//			const ndBrainMemVector truth(&(*trainingLabels)[index][0], outputSize);
-			//			
-			//			loss.SetTruth(truth);
-			//			loss.GetLoss(output, grad);
-			//		}
-			//
-			//		// backpropagate loss.
-			//		trainer->BackPropagate(miniBatchOutputGradients);
+					//calculate loss
+					minibatchOutpuBuffer->VectorFromDevice(miniBatchOutput);
+					for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
+					{
+						ndUnsigned32 index = shuffleBuffer[batchStart + i];
+						ndBrainMemVector grad(&miniBatchOutputGradients[i * outputSize], outputSize);
+						const ndBrainMemVector output(&miniBatchOutput[i * outputSize], outputSize);
+						const ndBrainMemVector truth(&(*trainingLabels)[index][0], outputSize);
+						
+						loss.SetTruth(truth);
+						loss.GetLoss(output, grad);
+					}
+			
+					// backpropagate loss.
+					minibatchOutpuGradientBuffer->VectorToDevice(miniBatchOutputGradients);
+					trainer->BackPropagate();
 			//		trainer->ApplyLearnRate(); 
 			//		//trainer->SyncQueue(); // no need to sync here.
 				}

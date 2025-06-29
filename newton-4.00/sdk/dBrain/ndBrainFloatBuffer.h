@@ -31,11 +31,14 @@ class ndBrainFloatBuffer : public ndBrainBuffer
 	//virtual void BrainVectorFromDevice(ndBrainVector& vector) const override;
 	//
 	//virtual void MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData) override;
-	//virtual void MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const override;
-	//
 	//virtual void CopyBuffer(const ndBrainBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer) override;
 	//void CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainFloatBuffer& srcBuffer);
 
+	void VectorToDevice(const ndBrainVector& vector);
+	void VectorFromDevice(ndBrainVector& vector) const;
+
+	void MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData);
+	void MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const;
 	void CopyBufferIndirect(const ndBrainUniformBuffer& parameterBuffer, const ndBrainIntegerBuffer& indexBuffer, const ndBrainFloatBuffer& srcBuffer);
 
 	protected:

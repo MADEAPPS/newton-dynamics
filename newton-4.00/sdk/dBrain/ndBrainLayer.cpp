@@ -45,10 +45,8 @@ ndBrainLayerBackPropagateCpuCommand::ndBrainLayerBackPropagateCpuCommand(const n
 
 void ndBrainLayerBackPropagateCpuCommand::Execute(ndInt32 miniBatchIndex)
 {
-	ndAssert(0);
 	m_layer->BackPropagate(this, miniBatchIndex);
 }
-
 
 ndBrainLayer::ndBrainLayer(const ndBrainLayer& src)
 	:ndClassAlloc(src)

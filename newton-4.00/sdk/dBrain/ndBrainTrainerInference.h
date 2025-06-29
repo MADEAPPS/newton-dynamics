@@ -61,10 +61,11 @@ class ndBrainTrainerInference : public ndClassAlloc
 	ndSharedPtr<ndBrain>& GetBrain();
 	ndSharedPtr<ndBrainContext> GetContext();
 
-	ndBrainBuffer* GetInputBuffer();
+	ndBrainFloatBuffer* GetInputBuffer();
+	ndBrainFloatBuffer* GetOuputBuffer();
 
-	ndBrainBuffer* GetHiddenLayerBuffer();
-	ndBrainBuffer* GetWeightAndBiasBuffer();
+	ndBrainFloatBuffer* GetHiddenLayerBuffer();
+	ndBrainFloatBuffer* GetWeightAndBiasBuffer();
 
 	//virtual const ndBrainBuffer* GetOutputBuffer() override;
 	//

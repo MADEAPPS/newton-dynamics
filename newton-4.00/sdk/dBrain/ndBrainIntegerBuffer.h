@@ -32,6 +32,8 @@ class ndBrainIntegerBuffer : public ndBrainBuffer
 	//virtual void CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer) override;
 	
 	void MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData);
+	void MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const;
+
 	//protected:
 	//virtual void LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const sourceData) override;
 	//virtual void UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const outputData) const override;
