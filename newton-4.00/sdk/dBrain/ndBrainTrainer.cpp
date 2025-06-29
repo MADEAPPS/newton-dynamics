@@ -220,16 +220,6 @@ void ndBrainTrainer::BackPropagate(const ndBrainVector& outputGradients)
 		m_context->GetAsGpuContext()->AddCommandQueue(command);
 	}
 }
-
-void ndBrainTrainer::ApplyLearnRate()
-{
-	for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = m_accumulateGradientsCommands.GetFirst(); node; node = node->GetNext())
-	{
-		ndSharedPtr<ndBrainGpuCommand>& command = node->GetInfo();
-		m_context->GetAsGpuContext()->AddCommandQueue(command);
-	}
-	m_context->GetAsGpuContext()->AddCommandQueue(m_adamOtimizerUpdate);
-}
 #endif
 
 void ndBrainTrainer::Initialize()
@@ -412,4 +402,14 @@ void ndBrainTrainer::BackPropagate()
 		ndSharedPtr<ndBrainBufferCommand>& command = node->GetInfo();
 		context->SubmitBufferCommand(*command);
 	}
+}
+
+void ndBrainTrainer::ApplyLearnRate()
+{
+	//for (ndList<ndSharedPtr<ndBrainGpuCommand>>::ndNode* node = m_accumulateGradientsCommands.GetFirst(); node; node = node->GetNext())
+	//{
+	//	ndSharedPtr<ndBrainGpuCommand>& command = node->GetInfo();
+	//	m_context->GetAsGpuContext()->AddCommandQueue(command);
+	//}
+	//m_context->GetAsGpuContext()->AddCommandQueue(m_adamOtimizerUpdate);
 }

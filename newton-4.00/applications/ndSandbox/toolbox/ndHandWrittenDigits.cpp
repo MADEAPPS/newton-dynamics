@@ -318,8 +318,8 @@ static void MnistTrainingSet()
 					// backpropagate loss.
 					minibatchOutpuGradientBuffer->VectorToDevice(miniBatchOutputGradients);
 					trainer->BackPropagate();
-			//		trainer->ApplyLearnRate(); 
-			//		//trainer->SyncQueue(); // no need to sync here.
+					trainer->ApplyLearnRate(); 
+					//trainer->GetContext()->SyncBufferCommandQueue(); // no need to sync here.
 				}
 				
 			//	ndInt64 testFailCount = ValidateData(parameterBuffer, testLabels, m_testData) + 1;
