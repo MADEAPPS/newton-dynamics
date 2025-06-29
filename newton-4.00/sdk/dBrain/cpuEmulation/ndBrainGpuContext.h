@@ -27,12 +27,12 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 	public:
 	ndBrainGpuContext();
 	virtual ~ndBrainGpuContext();
-	virtual ndContextType GetType() const override;
 
 	ndInt32 GetSubGroupSize() const { return 0; }
 
 	void SyncQueue();
-	void AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>&);
+	//void AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>&);
+	virtual void SubmitBufferCommand(ndBrainBufferCommand* const command) override;
 
 	virtual void BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector) override;
 	virtual void MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, const void* const srcMemory) const override;

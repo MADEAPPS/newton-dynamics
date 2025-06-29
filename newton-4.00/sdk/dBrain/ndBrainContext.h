@@ -20,25 +20,22 @@ class ndBrainCpuContext;
 class ndBrainFloatBuffer;
 class ndBrainUniformBuffer;
 class ndBrainIntegerBuffer;
+class ndBrainBufferCommand;
 
 #define ND_DEFAULT_WORKGROUP_SIZE	256
 
 class ndBrainContext : public ndClassAlloc
 {
 	public:
-	enum ndContextType
-	{
-		m_cpu,
-		m_gpu,
-	};
 	ndBrainContext();
 	virtual ~ndBrainContext();
 
-	virtual ndContextType GetType() const = 0;
 	virtual ndBrainContext* GetAsGpuContext();
 	virtual ndBrainCpuContext* GetAsCpuContext();
 
 	static bool HasGpuSupport() { ndAssert(0); return true;}
+
+	virtual void SubmitBufferCommand(ndBrainBufferCommand* const command) = 0;
 
 	virtual void BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector) = 0;
 

@@ -464,27 +464,29 @@ ndBrainLayerBackPropagateCpuCommand* ndBrainLayerLinear::GetLayerCpuBackPropagat
 
 void ndBrainLayerLinear::FeedForward(const ndBrainLayerFeedForwardCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
-	ndAssert(0);
+	const ndBrainBufferCommandDesc& desc = command->GetDescriptor();
+	const ndCommandShareInfo& info = desc.m_info;
+	ndBrainTrainerInference* const trainer = desc.m_owner;
+	
+	const ndBrainFloat* const weightAndBias = (ndBrainFloat*)trainer->GetWeightAndBiasBuffer()->GetCpuPtr();
+	const ndBrainFloat* const inputOutputBuffer = (ndBrainFloat*)trainer->GetHiddenLayerBuffer()->GetCpuPtr();
 
-	//const ndCommandShareInfo* const info = &command->m_info;
-	//const ndBrainTrainerCpuInference* const trainer = command->m_owner;
-	//
-	//ndInt32 inputSize = info->m_inputSize;
-	//ndInt32 outputSize = info->m_outputSize;
-	//ndInt32 matrixSize = inputSize * outputSize;
-	//const ndBrainMemVector parameters(&trainer->m_weightAndBiasBuffer[info->m_parametersStartOffset], matrixSize + outputSize);
-	//
-	//ndInt32 offset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
-	//const ndBrainMemVector input(&trainer->m_inputOutputBuffer[offset], inputSize);
-	//ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
-	//for (ndInt32 i = outputSize - 1; i >= 0; --i)
-	//{
-	//	const ndBrainMemVector row(&parameters[i * inputSize], inputSize);
-	//	output[i] = row.Dot(input);
-	//}
-	//
-	//const ndBrainMemVector bias(&parameters[matrixSize], outputSize);
-	//output.Add(bias);
+	ndInt32 inputSize = info.m_inputSize;
+	ndInt32 outputSize = info.m_outputSize;
+	ndInt32 matrixSize = inputSize * outputSize;
+	const ndBrainMemVector parameters(&weightAndBias[info.m_parametersStartOffset], matrixSize + outputSize);
+	
+	ndInt32 offset = miniBatchIndex * info.m_inputOutputSize + info.m_inputOutputStartOffset;
+	const ndBrainMemVector input(&inputOutputBuffer[offset], inputSize);
+	ndBrainMemVector output(&inputOutputBuffer[offset + inputSize], outputSize);
+	for (ndInt32 i = outputSize - 1; i >= 0; --i)
+	{
+		const ndBrainMemVector row(&parameters[i * inputSize], inputSize);
+		output[i] = row.Dot(input);
+	}
+	
+	const ndBrainMemVector bias(&parameters[matrixSize], outputSize);
+	output.Add(bias);
 }
 
 void ndBrainLayerLinear::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const command, ndInt32 miniBatchIndex) const
@@ -541,7 +543,7 @@ ndBrainBufferCommand* ndBrainLayerLinear::CreateGpuFeedForwardCommand(
 {
 	if (context->GetAsCpuContext())
 	{
-		ndBrainBufferCommandDesc descriptor;
+		ndBrainBufferCommandDesc descriptor(miniBatchSize);
 		descriptor.m_id = size_t(this);
 		descriptor.m_context = context;
 		descriptor.m_owner = owner;
@@ -595,7 +597,7 @@ ndBrainBufferCommand* ndBrainLayerLinear::CreateGpuBackPropagateCommand(
 {
 	if (context->GetAsCpuContext())
 	{
-		ndBrainBufferCommandDesc descriptor;
+		ndBrainBufferCommandDesc descriptor(miniBatchSize);
 		descriptor.m_id = size_t(this);
 		descriptor.m_context = context;
 		descriptor.m_owner = owner;

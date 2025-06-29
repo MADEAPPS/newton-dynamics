@@ -62,19 +62,24 @@ class ndBrainTrainerInference : public ndClassAlloc
 	ndSharedPtr<ndBrainContext> GetContext();
 
 	ndBrainBuffer* GetInputBuffer();
+
+	ndBrainBuffer* GetHiddenLayerBuffer();
+	ndBrainBuffer* GetWeightAndBiasBuffer();
+
 	//virtual const ndBrainBuffer* GetOutputBuffer() override;
 	//
 	//virtual void LoadInput(const ndBrainVector& input) override;
 	//virtual void SaveInput(ndBrainVector& output) const override;
 	//
 	//virtual void GetOutput(ndBrainVector& output) const override;
-	//virtual void GetWorkingBuffer(ndBrainVector& output) const override;
 	//virtual void GetParameterBuffer(ndBrainVector& output) const override;
-	//
-	//// new methods
+	
+	
+	// new methods
+	void MakePrediction();
 	//virtual void SyncQueue() override;
 	//virtual void ApplyLearnRate() override;
-	//virtual void MakePrediction() override;
+	//
 	//virtual void BackPropagate(const ndBrainVector& outputGradients) override;
 	//virtual void UpdateParameters(const ndBrainVector& weightAndBias) override;
 	//virtual void MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output) override;

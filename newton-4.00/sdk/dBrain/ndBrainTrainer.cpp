@@ -266,7 +266,7 @@ void ndBrainTrainer::AddCopyOutputGradientCommand()
 	ndBrainFloatBuffer* const inputOutputGradientBuffer = *m_inputOutputGradientsBuffer;
 	ndBrainFloatBuffer* const miniBatchOutputGradientBuffer = *m_miniBatchOutputGradientBuffer;
 
-	ndBrainBufferCommandDesc descritor;
+	ndBrainBufferCommandDesc descritor(m_descriptor.m_minibatchSize);
 	descritor.m_context = *m_descriptor.m_context;
 	descritor.m_owner = this;
 	descritor.m_id = m_outpuId;
@@ -276,8 +276,29 @@ void ndBrainTrainer::AddCopyOutputGradientCommand()
 	descritor.PushBack(inputOutputGradientBuffer);
 
 	//ndSharedPtr<ndBrainGpuCommand>command(new ndBrainBufferCommand(this, data, m_outpuId, m_context->GetAsGpuContext(), m_context->GetAsGpuContext()->m_brainCopyOutputGradients, m_miniBatchSize, uniformbuffer, nullptr, miniBatchOutputGradientBuffer, inputOutputGradientBuffer));
-	ndSharedPtr<ndBrainBufferCommand>command(new ndBrainBufferCommand(descritor));
-	m_backPropagateCommands.Append(command);
+	if (descritor.m_context->GetAsCpuContext())
+	{
+		class ndCopyOutputGradientCommandCpu : public ndBrainBufferCommandCpu
+		{
+			public:
+			ndCopyOutputGradientCommandCpu(const ndBrainBufferCommandDesc& desc)
+				:ndBrainBufferCommandCpu(desc)
+			{
+			}
+
+			virtual void Execute(ndInt32 miniBatchIndex) override
+			{
+				ndAssert(0);
+			}
+		};
+
+		ndSharedPtr<ndBrainBufferCommand>command(new ndCopyOutputGradientCommandCpu(descritor));
+		m_backPropagateCommands.Append(command);
+	}
+	else
+	{
+		ndAssert(0);
+	}
 }
 
 void ndBrainTrainer::AddCopyInputGradientCommand()
@@ -297,7 +318,7 @@ void ndBrainTrainer::AddCopyInputGradientCommand()
 	ndBrainFloatBuffer* const inputOutputGradientBuffer = *m_inputOutputGradientsBuffer;
 	ndBrainFloatBuffer* const miniBatchInputGradientBuffer = *m_miniBatchInputGradientBuffer;
 
-	ndBrainBufferCommandDesc descritor;
+	ndBrainBufferCommandDesc descritor(m_descriptor.m_minibatchSize);
 	descritor.m_context = *m_descriptor.m_context;
 	descritor.m_owner = this;
 	descritor.m_id = m_inputId;
@@ -307,8 +328,29 @@ void ndBrainTrainer::AddCopyInputGradientCommand()
 	descritor.PushBack(inputOutputGradientBuffer);
 
 	//ndSharedPtr<ndBrainGpuCommand>command(new ndBrainBufferCommand(this, data, m_inputId, m_context->GetAsGpuContext(), m_context->GetAsGpuContext()->m_brainCopyInputGradients, m_miniBatchSize, uniformbuffer, nullptr, miniBatchInputGradientBuffer, inputOutputGradientBuffer));
-	ndSharedPtr<ndBrainBufferCommand>command(new ndBrainBufferCommand(descritor));
-	m_backPropagateCommands.Append(command);
+	if (descritor.m_context->GetAsCpuContext())
+	{
+		class ndCopyInputGradientCommandCpu : public ndBrainBufferCommandCpu
+		{
+			public:
+			ndCopyInputGradientCommandCpu(const ndBrainBufferCommandDesc& desc)
+				:ndBrainBufferCommandCpu(desc)
+			{
+			}
+
+			virtual void Execute(ndInt32 miniBatchIndex) override
+			{
+				ndAssert(0);
+			}
+		};
+
+		ndSharedPtr<ndBrainBufferCommand>command(new ndCopyInputGradientCommandCpu(descritor));
+		m_backPropagateCommands.Append(command);
+	}
+	else
+	{
+		ndAssert(0);
+	}
 }
 
 void ndBrainTrainer::AddLayersGradientCommands()

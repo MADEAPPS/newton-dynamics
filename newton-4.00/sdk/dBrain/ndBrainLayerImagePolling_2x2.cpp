@@ -21,6 +21,7 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainSaveLoad.h"
+#include "ndBrainUniformBuffer.h"
 #include "ndBrainLayerImagePolling_2x2.h"
 
 ndBrainLayerImagePolling_2x2::ndBrainLayerImagePolling_2x2(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputLayers)

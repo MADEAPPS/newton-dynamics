@@ -296,8 +296,8 @@ static void MnistTrainingSet()
 				{
 					m_indirectMiniBatch->MemoryToDevice(0, m_miniBatchSize * sizeof(ndUnsigned32), &shuffleBuffer[batchStart]);
 					deviceMinibatchBuffer->CopyBufferIndirect(**parameterBufferIndirect, **m_indirectMiniBatch, **m_trainingData);
-			//		
-			//		trainer->MakePrediction();
+					
+					trainer->MakePrediction();
 			//		trainer->SyncQueue();
 			//		
 			//		//calculate loss

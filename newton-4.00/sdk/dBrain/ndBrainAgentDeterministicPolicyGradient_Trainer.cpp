@@ -23,15 +23,14 @@
 
 #include "ndBrainLayer.h"
 #include "ndBrainTrainer.h"
-#include "ndBrainCpuContext.h"
 #include "ndBrainLayerLinear.h"
+#include "ndBrainUniformBuffer.h"
 #include "ndBrainOptimizerAdamCpu.h"
 #include "ndBrainLayerActivationRelu.h"
 #include "ndBrainLayerActivationTanh.h"
 #include "ndBrainLossLeastSquaredError.h"
 #include "ndBrainLayerActivationLinear.h"
 #include "ndBrainLayerActivationLeakyRelu.h"
-
 #include "ndBrainAgentDeterministicPolicyGradient_Trainer.h"
 
 #define ND_SAC_HIDEN_LAYERS_ACTIVATION		ndBrainLayerActivationRelu

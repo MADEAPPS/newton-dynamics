@@ -13,6 +13,7 @@
 #include "ndBrainKernel.h"
 #include "ndBrainGpuCommand.h"
 #include "ndBrainGpuContext.h"
+#include "ndBrainUniformBuffer.h"
 
 ndBrainGpuContext::ndBrainGpuContext()
 	:ndBrainContext()
@@ -24,18 +25,8 @@ ndBrainGpuContext::ndBrainGpuContext()
 	CreateKerners();
 }
 
-//bool ndBrainGpuContext::HasGpuSupport()
-//{ 
-//	return true; 
-//}
-
 ndBrainGpuContext::~ndBrainGpuContext()
 {
-}
-
-ndBrainGpuContext::ndContextType ndBrainGpuContext::GetType() const
-{
-	return ndBrainGpuContext::m_gpu;
 }
 
 ndBrainGpuContext* ndBrainGpuContext::GetAsGpuContext()
@@ -49,31 +40,31 @@ void ndBrainGpuContext::SyncQueue()
 	//ndAssert(0);
 }
 
-void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& command)
-{
-	ndAssert(0);
-	//ndAtomic<ndInt32> iterator(0);
-	//ndBrainGpuShader& shader = **command->m_shader;
-	//shader.m_parameters.SetCount(0);
-	//for (ndInt32 i = 0; i < ndInt32 (command->m_parameters.GetCount()); ++i)
-	//{
-	//	shader.m_parameters.PushBack(command->m_parameters[i]);
-	//}
-	//
-	//auto ExecuteCommand = ndMakeObject::ndFunction([this, &iterator, &command](ndInt32, ndInt32)
-	//{
-	//	ndInt32 workGroupdSize = ndInt32(command->m_workGroupSize);
-	//	ndInt32 numberOfWorkGrouds = ndInt32(command->m_numberOfWorkGroups);
-	//	
-	//	ndBrainGpuShader& kernel = **command->m_shader;
-	//	for (ndInt32 i = iterator++; i < numberOfWorkGrouds; i = iterator++)
-	//	{
-	//		kernel.Execute(i, workGroupdSize);
-	//	}
-	//});
-	//iterator = 0;
-	//ParallelExecute(ExecuteCommand);
-}
+//void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& command)
+//{
+//	ndAssert(0);
+//	//ndAtomic<ndInt32> iterator(0);
+//	//ndBrainGpuShader& shader = **command->m_shader;
+//	//shader.m_parameters.SetCount(0);
+//	//for (ndInt32 i = 0; i < ndInt32 (command->m_parameters.GetCount()); ++i)
+//	//{
+//	//	shader.m_parameters.PushBack(command->m_parameters[i]);
+//	//}
+//	//
+//	//auto ExecuteCommand = ndMakeObject::ndFunction([this, &iterator, &command](ndInt32, ndInt32)
+//	//{
+//	//	ndInt32 workGroupdSize = ndInt32(command->m_workGroupSize);
+//	//	ndInt32 numberOfWorkGrouds = ndInt32(command->m_numberOfWorkGroups);
+//	//	
+//	//	ndBrainGpuShader& kernel = **command->m_shader;
+//	//	for (ndInt32 i = iterator++; i < numberOfWorkGrouds; i = iterator++)
+//	//	{
+//	//		kernel.Execute(i, workGroupdSize);
+//	//	}
+//	//});
+//	//iterator = 0;
+//	//ParallelExecute(ExecuteCommand);
+//}
 
 void ndBrainGpuContext::BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector)
 {
@@ -93,4 +84,32 @@ void ndBrainGpuContext::MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size
 void ndBrainGpuContext::MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, const void* const srcMemory) const
 {
 	ndAssert(0);
+}
+
+void ndBrainGpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
+{
+	ndAssert(0);
+
+	//ndAtomic<ndInt32> iterator(0);
+//ndBrainGpuShader& shader = **command->m_shader;
+//shader.m_parameters.SetCount(0);
+//for (ndInt32 i = 0; i < ndInt32 (command->m_parameters.GetCount()); ++i)
+//{
+//	shader.m_parameters.PushBack(command->m_parameters[i]);
+//}
+//
+//auto ExecuteCommand = ndMakeObject::ndFunction([this, &iterator, &command](ndInt32, ndInt32)
+//{
+//	ndInt32 workGroupdSize = ndInt32(command->m_workGroupSize);
+//	ndInt32 numberOfWorkGrouds = ndInt32(command->m_numberOfWorkGroups);
+//	
+//	ndBrainGpuShader& kernel = **command->m_shader;
+//	for (ndInt32 i = iterator++; i < numberOfWorkGrouds; i = iterator++)
+//	{
+//		kernel.Execute(i, workGroupdSize);
+//	}
+//});
+//iterator = 0;
+//ParallelExecute(ExecuteCommand);
+
 }

@@ -15,22 +15,19 @@
 #include "ndBrainFloatBuffer.h"
 #include "ndBrainUniformBuffer.h"
 #include "ndBrainIntegerBuffer.h"
+#include "ndBrainBufferCommand.h"
 
 ndBrainCpuContext::ndBrainCpuContext()
 	:ndBrainContext()
 	,ndBrainThreadPool()
 {
 	ndInt32 numOfThreads = (ndBrainThreadPool::GetMaxThreads() + 1) / 2;
+numOfThreads = 1;
 	SetThreadCount(numOfThreads);
 }
 
 ndBrainCpuContext::~ndBrainCpuContext()
 {
-}
-
-ndBrainContext::ndContextType ndBrainCpuContext::GetType() const
-{
-	return ndBrainContext::m_cpu;
 }
 
 ndBrainCpuContext* ndBrainCpuContext::GetAsCpuContext()
@@ -87,4 +84,19 @@ void ndBrainCpuContext::MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offse
 	ndInt8* const dst = (ndInt8*)deviceBuffer.GetCpuPtr();
 	ndAssert(dst);
 	ndMemCpy(&dst[offsetInBytes], (ndInt8*)inputMemory, ndInt64(sizeInBytes));
+}
+
+void ndBrainCpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
+{
+	ndAtomic<ndInt32> iterator(0);
+	auto ExecuteCommand = ndMakeObject::ndFunction([this, &iterator, command](ndInt32, ndInt32)
+	{
+		const ndBrainBufferCommandDesc& descriptor = command->GetDescriptor();
+		ndBrainBufferCommandCpu* const cpuCommand = (ndBrainBufferCommandCpu*)command;
+		for (ndInt32 i = iterator++; i < descriptor.m_miniBatchSize; i = iterator++)
+		{
+			cpuCommand->Execute(i);
+		}
+	});
+	ParallelExecute(ExecuteCommand);
 }

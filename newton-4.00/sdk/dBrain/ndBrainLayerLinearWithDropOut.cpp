@@ -117,20 +117,20 @@ ndBrainLayerBackPropagateCpuCommand* ndBrainLayerLinearWithDropOut::GetLayerCpuB
 
 void ndBrainLayerLinearWithDropOut::FeedForward(const ndBrainLayerFeedForwardCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
-	ndAssert(0);
+	const ndBrainBufferCommandDesc& desc = command->GetDescriptor();
+	const ndCommandShareInfo& info = desc.m_info;
+	ndBrainTrainerInference* const trainer = desc.m_owner;
+	const ndBrainFloat* const inputOutputBuffer = (ndBrainFloat*)trainer->GetHiddenLayerBuffer()->GetCpuPtr();
 
-	//const ndCommandShareInfo* const info = &command->m_info;
-	//const ndBrainTrainerCpuInference* const trainer = command->m_owner;
-	//
-	//ndInt32 inputSize = info->m_inputSize;
-	//ndInt32 outputSize = info->m_outputSize;
-	//
-	//ndInt32 offset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
-	//const ndBrainMemVector input(&trainer->m_inputOutputBuffer[offset], inputSize);
-	//ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
-	//
-	//output.Set(input);
-	//output.Mul(m_dropOut);
+	ndInt32 inputSize = info.m_inputSize;
+	ndInt32 outputSize = info.m_outputSize;
+	
+	ndInt32 offset = miniBatchIndex * info.m_inputOutputSize + info.m_inputOutputStartOffset;
+	const ndBrainMemVector input(&inputOutputBuffer[offset], inputSize);
+	ndBrainMemVector output(&inputOutputBuffer[offset + inputSize], outputSize);
+	
+	output.Set(input);
+	output.Mul(m_dropOut);
 }
 
 void ndBrainLayerLinearWithDropOut::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const command, ndInt32 miniBatchIndex) const
@@ -163,7 +163,7 @@ ndBrainBufferCommand* ndBrainLayerLinearWithDropOut::CreateGpuFeedForwardCommand
 {
 	if (context->GetAsCpuContext())
 	{
-		ndBrainBufferCommandDesc descriptor;
+		ndBrainBufferCommandDesc descriptor(miniBatchSize);
 		descriptor.m_id = size_t(this);
 		descriptor.m_context = context;
 		descriptor.m_owner = owner;
@@ -198,7 +198,7 @@ ndBrainBufferCommand* ndBrainLayerLinearWithDropOut::CreateGpuBackPropagateComma
 {
 	if (context->GetAsCpuContext())
 	{
-		ndBrainBufferCommandDesc descriptor;
+		ndBrainBufferCommandDesc descriptor(miniBatchSize);
 		descriptor.m_id = size_t(this);
 		descriptor.m_context = context;
 		descriptor.m_owner = owner;

@@ -15,16 +15,14 @@
 #include "ndBrainContext.h"
 #include "ndBrainThreadPool.h"
 
-class ndBrainCpuContext : 
-	public ndBrainContext, 
-	public ndBrainThreadPool
+class ndBrainCpuContext : public ndBrainContext, public ndBrainThreadPool
 {
 	public:
 	ndBrainCpuContext();
 	virtual ~ndBrainCpuContext();
 
-	virtual ndContextType GetType() const override;
 	virtual ndBrainCpuContext* GetAsCpuContext() override;
+	virtual void SubmitBufferCommand(ndBrainBufferCommand* const command) override;
 
 	virtual void BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector) override;
 

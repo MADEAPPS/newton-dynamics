@@ -115,7 +115,7 @@ ndBrainBufferCommand* ndBrainLayerActivationCategoricalSoftmax::CreateGpuBackPro
 {
 	if (context->GetAsCpuContext())
 	{
-		ndBrainBufferCommandDesc descriptor;
+		ndBrainBufferCommandDesc descriptor(miniBatchSize);
 		descriptor.m_id = size_t(this);
 		descriptor.m_context = context;
 		descriptor.m_owner = owner;

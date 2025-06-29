@@ -34,7 +34,7 @@ ndBrainLayerFeedForwardCpuCommand::ndBrainLayerFeedForwardCpuCommand(const ndBra
 
 void ndBrainLayerFeedForwardCpuCommand::Execute(ndInt32 miniBatchIndex)
 {
-	ndAssert(0);
+	m_layer->FeedForward(this, miniBatchIndex);
 }
 
 ndBrainLayerBackPropagateCpuCommand::ndBrainLayerBackPropagateCpuCommand(const ndBrainBufferCommandDesc& desc, ndBrainLayer* const layer)
@@ -46,6 +46,7 @@ ndBrainLayerBackPropagateCpuCommand::ndBrainLayerBackPropagateCpuCommand(const n
 void ndBrainLayerBackPropagateCpuCommand::Execute(ndInt32 miniBatchIndex)
 {
 	ndAssert(0);
+	m_layer->BackPropagate(this, miniBatchIndex);
 }
 
 

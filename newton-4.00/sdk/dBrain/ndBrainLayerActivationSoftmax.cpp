@@ -143,37 +143,37 @@ ndBrainLayerBackPropagateCpuCommand* ndBrainLayerActivationSoftmax::GetLayerCpuB
 
 void ndBrainLayerActivationSoftmax::FeedForward(const ndBrainLayerFeedForwardCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
-	ndAssert(0);
+	const ndBrainBufferCommandDesc& desc = command->GetDescriptor();
+	const ndCommandShareInfo& info = desc.m_info;
+	ndBrainTrainerInference* const trainer = desc.m_owner;
+	const ndBrainFloat* const inputOutputBuffer = (ndBrainFloat*)trainer->GetHiddenLayerBuffer()->GetCpuPtr();
 
-	//const ndCommandShareInfo* const info = &command->m_info;
-	//const ndBrainTrainerCpuInference* const trainer = command->m_owner;
-	//
-	//ndInt32 inputSize = info->m_inputSize;
-	//ndInt32 outputSize = info->m_outputSize;
-	//
-	//ndInt32 offset = miniBatchIndex * info->m_inputOutputSize + info->m_inputOutputStartOffset;
-	//const ndBrainMemVector input(&trainer->m_inputOutputBuffer[offset], inputSize);
-	//ndBrainMemVector output(&trainer->m_inputOutputBuffer[offset + inputSize], outputSize);
-	//
-	//ndBrainFloat max = ndBrainFloat(0.0f);
-	//for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
-	//{
-	//	max = ndMax(input[i], max);
-	//}
-	//
-	//ndBrainFloat acc = ndBrainFloat(0.0f);
-	//for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
-	//{
-	//	ndBrainFloat in = ndMax((input[i] - max), ndBrainFloat(-30.0f));
-	//	ndAssert(in <= ndBrainFloat(0.0f));
-	//	ndBrainFloat prob = ndBrainFloat(ndExp(in));
-	//	output[i] = prob;
-	//	acc += prob;
-	//}
-	//
-	//ndAssert(acc > ndBrainFloat(0.0f));
-	//output.Scale(ndBrainFloat(1.0f) / acc);
-	//output.FlushToZero();
+	ndInt32 inputSize = info.m_inputSize;
+	ndInt32 outputSize = info.m_outputSize;
+	
+	ndInt32 offset = miniBatchIndex * info.m_inputOutputSize + info.m_inputOutputStartOffset;
+	const ndBrainMemVector input(&inputOutputBuffer[offset], inputSize);
+	ndBrainMemVector output(&inputOutputBuffer[offset + inputSize], outputSize);
+	
+	ndBrainFloat max = ndBrainFloat(0.0f);
+	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
+	{
+		max = ndMax(input[i], max);
+	}
+	
+	ndBrainFloat acc = ndBrainFloat(0.0f);
+	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
+	{
+		ndBrainFloat in = ndMax((input[i] - max), ndBrainFloat(-30.0f));
+		ndAssert(in <= ndBrainFloat(0.0f));
+		ndBrainFloat prob = ndBrainFloat(ndExp(in));
+		output[i] = prob;
+		acc += prob;
+	}
+	
+	ndAssert(acc > ndBrainFloat(0.0f));
+	output.Scale(ndBrainFloat(1.0f) / acc);
+	output.FlushToZero();
 }	
 
 //void ndBrainLayerActivationSoftmax::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const
@@ -192,7 +192,7 @@ ndBrainBufferCommand* ndBrainLayerActivationSoftmax::CreateGpuFeedForwardCommand
 {
 	if (context->GetAsCpuContext())
 	{
-		ndBrainBufferCommandDesc descriptor;
+		ndBrainBufferCommandDesc descriptor(miniBatchSize);
 		descriptor.m_id = size_t(this);
 		descriptor.m_context = context;
 		descriptor.m_owner = owner;
