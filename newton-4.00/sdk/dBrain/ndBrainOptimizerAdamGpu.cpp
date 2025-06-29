@@ -25,7 +25,6 @@
 #include "ndBrainCpuContext.h"
 #include "ndBrainThreadPool.h"
 #include "ndBrainFloatBuffer.h"
-#include "ndBrainUniformBuffer.h"
 #include "ndBrainOptimizerAdamGpu.h"
 
 ndBrainOptimizerAdamGpu::ndBrainOptimizerAdamGpu(const ndSharedPtr<ndBrainContext>& context)

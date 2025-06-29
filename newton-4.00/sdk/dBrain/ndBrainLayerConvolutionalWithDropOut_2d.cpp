@@ -20,8 +20,8 @@
 */
 
 #include "ndBrainStdafx.h"
+#include "ndBrain.h"
 #include "ndBrainSaveLoad.h"
-#include "ndBrainUniformBuffer.h"
 #include "ndBrainLayerConvolutionalWithDropOut_2d.h"
 
 ndBrainLayerConvolutionalWithDropOut_2d::ndBrainLayerConvolutionalWithDropOut_2d(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth, ndInt32 kernelSize, ndInt32 numberOfKernels, ndBrainFloat dropOutFactor)

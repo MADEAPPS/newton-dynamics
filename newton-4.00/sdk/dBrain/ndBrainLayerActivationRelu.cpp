@@ -20,12 +20,12 @@
 */
 
 #include "ndBrainStdafx.h"
+#include "ndBrain.h"
 #include "ndBrainTrainer.h"
 #include "ndBrainContext.h"
 #include "ndBrainSaveLoad.h"
 #include "ndBrainSimdFloat8.h"
 #include "ndBrainFloatBuffer.h"
-#include "ndBrainUniformBuffer.h"
 #include "ndBrainLayerActivationRelu.h"
 
 ndBrainLayerActivationRelu::ndBrainLayerActivationRelu(ndInt32 neurons)

@@ -21,6 +21,7 @@ class ndBrainCpuContext : public ndBrainContext, public ndBrainThreadPool
 	ndBrainCpuContext();
 	virtual ~ndBrainCpuContext();
 
+	virtual void SyncBufferCommandQueue() override;
 	virtual ndBrainCpuContext* GetAsCpuContext() override;
 	virtual void SubmitBufferCommand(ndBrainBufferCommand* const command) override;
 

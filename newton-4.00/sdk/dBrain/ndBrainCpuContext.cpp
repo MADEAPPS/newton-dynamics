@@ -35,6 +35,11 @@ ndBrainCpuContext* ndBrainCpuContext::GetAsCpuContext()
 	return this;
 }
 
+void ndBrainCpuContext::SyncBufferCommandQueue()
+{
+	// do nothing
+}
+
 void ndBrainCpuContext::BrainVectorToDevice(ndBrainFloatBuffer& buffer, const ndBrainVector& srcVector)
 {
 	ndInt64 size = ndMin(srcVector.GetCount(), buffer.m_buffer->GetCount());

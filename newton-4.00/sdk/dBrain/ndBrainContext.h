@@ -35,6 +35,7 @@ class ndBrainContext : public ndClassAlloc
 
 	static bool HasGpuSupport() { ndAssert(0); return true;}
 
+	virtual void SyncBufferCommandQueue() = 0;
 	virtual void SubmitBufferCommand(ndBrainBufferCommand* const command) = 0;
 
 	virtual void BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector) = 0;

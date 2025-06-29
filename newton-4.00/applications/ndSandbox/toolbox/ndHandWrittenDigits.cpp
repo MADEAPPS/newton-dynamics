@@ -298,8 +298,8 @@ static void MnistTrainingSet()
 					deviceMinibatchBuffer->CopyBufferIndirect(**parameterBufferIndirect, **m_indirectMiniBatch, **m_trainingData);
 					
 					trainer->MakePrediction();
-			//		trainer->SyncQueue();
-			//		
+					trainer->GetContext()->SyncBufferCommandQueue();
+					
 			//		//calculate loss
 			//		trainer->GetOutput(miniBatchOutput);
 			//		for (ndInt32 i = 0; i < m_miniBatchSize; ++i)

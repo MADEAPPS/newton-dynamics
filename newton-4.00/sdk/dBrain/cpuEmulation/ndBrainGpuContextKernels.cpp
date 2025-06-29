@@ -14,6 +14,7 @@
 #include "ndBrainKernel.h"
 #include "ndBrainGpuContext.h"
 #include "ndBrainLayerLinear.h"
+#include "ndBrainUniformBuffer.h"
 #include "ndBrainOptimizerAdamGpu.h"
 
 #define ND_GPU_LOCAL_BUFFER_SIZE	512

@@ -20,10 +20,10 @@
 */
 
 #include "ndBrainStdafx.h"
+#include "ndBrain.h"
 #include "ndBrainTrainer.h"
 #include "ndBrainSaveLoad.h"
 #include "ndBrainFloatBuffer.h"
-#include "ndBrainUniformBuffer.h"
 #include "ndBrainLayerActivationCategoricalSoftmax.h"
 
 ndBrainLayerActivationCategoricalSoftmax::ndBrainLayerActivationCategoricalSoftmax(ndInt32 neurons)

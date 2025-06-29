@@ -20,8 +20,8 @@
 */
 
 #include "ndBrainStdafx.h"
+#include "ndBrain.h"
 #include "ndBrainSaveLoad.h"
-#include "ndBrainUniformBuffer.h"
 #include "ndBrainLayerCrossCorrelation_2d.h"
 
 ndBrainLayerCrossCorrelation_2d::ndBrainLayerCrossCorrelation_2d(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth, ndInt32 kernelSize, ndInt32 numberOfKernels)

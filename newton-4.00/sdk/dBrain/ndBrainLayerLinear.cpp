@@ -20,13 +20,13 @@
 */
 
 #include "ndBrainStdafx.h"
+#include "ndBrain.h"
 #include "ndBrainContext.h"
 #include "ndBrainTrainer.h"
 #include "ndBrainSaveLoad.h"
 #include "ndBrainGpuCommand.h"
 #include "ndBrainLayerLinear.h"
 #include "ndBrainFloatBuffer.h"
-#include "ndBrainUniformBuffer.h"
 
 ndBrainLayerLinear::ndBrainLayerLinear(ndInt32 inputs, ndInt32 outputs)
 	:ndBrainLayer()

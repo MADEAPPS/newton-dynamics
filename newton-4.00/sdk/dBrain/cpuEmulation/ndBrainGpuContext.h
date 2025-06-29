@@ -28,10 +28,9 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 	ndBrainGpuContext();
 	virtual ~ndBrainGpuContext();
 
-	ndInt32 GetSubGroupSize() const { return 0; }
+	virtual void SyncBufferCommandQueue() override;
+	virtual ndBrainGpuContext* GetAsGpuContext() override;
 
-	void SyncQueue();
-	//void AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>&);
 	virtual void SubmitBufferCommand(ndBrainBufferCommand* const command) override;
 
 	virtual void BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector) override;
@@ -39,7 +38,7 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 	virtual void MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const override;
 	virtual void CopyBufferIndirect(const ndBrainUniformBuffer& parameterBuffer, const ndBrainIntegerBuffer& indexBuffer, ndBrainBuffer& dstData, const ndBrainBuffer& srcData) override;
 	
-	ndBrainGpuContext* GetAsGpuContext() override;
+	
 
 	private:
 	void CreateKerners();

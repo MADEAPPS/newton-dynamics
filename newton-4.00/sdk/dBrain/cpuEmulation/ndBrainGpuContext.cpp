@@ -34,12 +34,6 @@ ndBrainGpuContext* ndBrainGpuContext::GetAsGpuContext()
 	return this;
 }
 
-void ndBrainGpuContext::SyncQueue()
-{
-	// do nothing. cpu kernels always wait for completion.
-	//ndAssert(0);
-}
-
 //void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& command)
 //{
 //	ndAssert(0);
@@ -111,5 +105,10 @@ void ndBrainGpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
 //});
 //iterator = 0;
 //ParallelExecute(ExecuteCommand);
+}
 
+void ndBrainGpuContext::SyncBufferCommandQueue()
+{
+	// do nothing. cpu kernels always wait for completion.
+	ndAssert(0);
 }

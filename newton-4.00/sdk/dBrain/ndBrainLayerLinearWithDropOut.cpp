@@ -20,11 +20,11 @@
 */
 
 #include "ndBrainStdafx.h"
+#include "ndBrain.h"
 #include "ndBrainTrainer.h"
 #include "ndBrainContext.h"
 #include "ndBrainSaveLoad.h"
 #include "ndBrainFloatBuffer.h"
-#include "ndBrainUniformBuffer.h"
 #include "ndBrainLayerLinearWithDropOut.h"
 
 ndBrainLayerLinearWithDropOut::ndBrainLayerLinearWithDropOut(ndInt32 neurons)
