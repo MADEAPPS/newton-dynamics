@@ -15,6 +15,8 @@
 #include "ndBrainContext.h"
 #include "ndBrainCpuContext.h"
 #include "ndBrainFloatBuffer.h"
+#include "ndBrainIntegerBuffer.h"
+#include "ndBrainUniformBuffer.h"
 
 ndBrainFloatBuffer::ndBrainFloatBuffer(ndBrainContext* const context, ndInt64 sizeInFloat, bool memoryMapped)
 	:ndBrainBuffer(context, sizeInFloat * ndInt32(sizeof(ndReal)), memoryMapped)
@@ -67,6 +69,26 @@ ndBrainFloatBuffer::ndBrainFloatBuffer(ndBrainContext* const context, const ndBr
 size_t ndBrainFloatBuffer::GetCount() const
 {
 	return m_sizeInBytes / sizeof(ndReal);
+}
+
+void* ndBrainFloatBuffer::GetCpuPtr()
+{
+	if (m_context->GetAsCpuContext())
+	{
+		ndBrainVector& dst = **m_buffer;
+		return &dst[0];
+	}
+	return nullptr;
+}
+
+void* ndBrainFloatBuffer::GetCpuPtr() const
+{
+	if (m_context->GetAsCpuContext())
+	{
+		const ndBrainVector& dst = **m_buffer;
+		return (void*)&dst[0];
+	}
+	return nullptr;
 }
 
 #if 0
@@ -125,39 +147,6 @@ void ndBrainFloatBuffer::CopyBuffer(const ndBrainBuffer& parameterBuffer, ndInt3
 	//}
 }
 
-void ndBrainFloatBuffer::CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcData)
-{
-	ndAssert(0);
-	//if (m_context->GetAsCpuContext())
-	//{
-	//	//const ndBrainFloatBuffer& srcBuffer = *((ndBrainFloatBuffer*)&srcData);
-	//	//const ndBrainCpuIntegerBuffer& indirectArray = *((ndBrainCpuIntegerBuffer*)&indexBuffer);
-	//	//const ndBrainCpuUniformBuffer& uniforms = *(ndBrainCpuUniformBuffer*)&parameterBuffer;
-	//	//const ndCopyBufferCommandInfo& data = *((ndCopyBufferCommandInfo*)&uniforms.m_data[0]);
-	//	//
-	//	//ndInt32 stride = ndInt32(data.m_strideInByte / sizeof(ndReal));
-	//	//ndInt32 srcStride = ndInt32(data.m_srcStrideInByte / sizeof(ndReal));
-	//	//ndInt32 srcOffset = ndInt32(data.m_srcOffsetInByte / sizeof(ndReal));
-	//	//ndInt32 dstStride = ndInt32(data.m_dstStrideInByte / sizeof(ndReal));
-	//	//ndInt32 dstOffset = ndInt32(data.m_dstOffsetInByte / sizeof(ndReal));
-	//	//ndInt32 count = ndInt32(indirectArray.SizeInBytes() / sizeof(ndUnsigned32));
-	//	//
-	//	//ndAssert(stride <= srcStride);
-	//	//ndAssert(stride <= dstStride);
-	//	//for (ndInt32 i = 0; i < count; ++i)
-	//	//{
-	//	//	ndUnsigned32 index = indirectArray.m_indexArray[i];
-	//	//	const ndBrainMemVector src(&srcBuffer.m_buffer[index * srcStride + srcOffset], stride);
-	//	//	ndBrainMemVector dst(&m_buffer[i * dstStride + dstOffset], stride);
-	//	//	dst.Set(src);
-	//	//}
-	//}
-	//else
-	//{
-	//	ndAssert(0);
-	//}
-}
-
 void ndBrainFloatBuffer::CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainFloatBuffer& srcBuffer)
 {
 	m_context->CopyBufferIndirect(parameterBuffer, indexBuffer, *this, srcBuffer);
@@ -169,3 +158,8 @@ void ndBrainFloatBuffer::MemoryFromDevice(size_t offsetInBytes, size_t sizeInByt
 }
 
 #endif
+
+void ndBrainFloatBuffer::CopyBufferIndirect(const ndBrainUniformBuffer& parameterBuffer, const ndBrainIntegerBuffer& indexBuffer, const ndBrainFloatBuffer& srcBuffer)
+{
+	m_context->CopyBufferIndirect(parameterBuffer, indexBuffer, *this, srcBuffer);
+}

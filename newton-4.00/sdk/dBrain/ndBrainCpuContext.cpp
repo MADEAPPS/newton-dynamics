@@ -13,6 +13,8 @@
 #include "ndBrainVector.h"
 #include "ndBrainCpuContext.h"
 #include "ndBrainFloatBuffer.h"
+#include "ndBrainUniformBuffer.h"
+#include "ndBrainIntegerBuffer.h"
 
 ndBrainCpuContext::ndBrainCpuContext()
 	:ndBrainContext()
@@ -44,43 +46,45 @@ void ndBrainCpuContext::BrainVectorToDevice(ndBrainFloatBuffer& buffer, const nd
 	dst.Set(src);
 }
 
-void ndBrainCpuContext::CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, ndBrainFloatBuffer& dstData, const ndBrainFloatBuffer& srcData)
+void ndBrainCpuContext::CopyBufferIndirect(const ndBrainUniformBuffer& parameterBuffer, const ndBrainIntegerBuffer& indexBuffer, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
 {
-	ndAssert(0);
-	//const ndBrainCpuIntegerBuffer& indirectArray = *((ndBrainCpuIntegerBuffer*)&indexBuffer);
-	//const ndBrainCpuUniformBuffer& uniforms = *(ndBrainCpuUniformBuffer*)&parameterBuffer;
-	//const ndCopyBufferCommandInfo& data = *((ndCopyBufferCommandInfo*)&uniforms.m_data[0]);
-	//
-	//ndInt32 stride = ndInt32(data.m_strideInByte / sizeof(ndReal));
-	//ndInt32 srcStride = ndInt32(data.m_srcStrideInByte / sizeof(ndReal));
-	//ndInt32 srcOffset = ndInt32(data.m_srcOffsetInByte / sizeof(ndReal));
-	//ndInt32 dstStride = ndInt32(data.m_dstStrideInByte / sizeof(ndReal));
-	//ndInt32 dstOffset = ndInt32(data.m_dstOffsetInByte / sizeof(ndReal));
-	//ndInt32 count = ndInt32(indirectArray.SizeInBytes() / sizeof(ndUnsigned32));
-	//
-	//ndAssert(stride <= srcStride);
-	//ndAssert(stride <= dstStride);
-	//
-	//ndBrainVector& dstVector = **dstData.m_buffer;
-	//const ndBrainVector& srcVector = **srcData.m_buffer;
-	//
-	//for (ndInt32 i = 0; i < count; ++i)
-	//{
-	//	ndUnsigned32 index = indirectArray.m_indexArray[i];
-	//	const ndBrainMemVector src(&srcVector[index * srcStride + srcOffset], stride);
-	//	ndBrainMemVector dst(&dstVector[i * dstStride + dstOffset], stride);
-	//	dst.Set(src);
-	//}
+	// this could be a shader, but for now, just do it in the manin thread
+	const ndFixSizeArray<ndUnsigned32, 256>& bufferData = **parameterBuffer.m_data;
+	const ndCopyBufferCommandInfo& data = *((ndCopyBufferCommandInfo*)&bufferData[0]);
+	ndInt32 stride = ndInt32(data.m_strideInByte);
+	ndInt32 srcStride = ndInt32(data.m_srcStrideInByte);
+	ndInt32 srcOffset = ndInt32(data.m_srcOffsetInByte);
+	ndInt32 dstStride = ndInt32(data.m_dstStrideInByte);
+	ndInt32 dstOffset = ndInt32(data.m_dstOffsetInByte);
+	
+	ndAssert(stride <= srcStride);
+	ndAssert(stride <= dstStride);
+	
+	ndUnsigned8* const dst = (ndUnsigned8*)dstData.GetCpuPtr();
+	const ndUnsigned8* const src = (ndUnsigned8*)srcData.GetCpuPtr();
+	const ndUnsigned32* const indexPtr = (ndUnsigned32*)indexBuffer.GetCpuPtr();
+	ndAssert(dst);
+	ndAssert(src);
+	ndAssert(indexPtr);
+
+	ndInt32 count = ndInt32(indexBuffer.SizeInBytes() / sizeof (ndUnsigned32));
+	for (ndInt32 i = 0; i < count; ++i)
+	{
+		ndUnsigned32 index = indexPtr[i];
+		ndMemCpy(&dst[i * dstStride + dstOffset], &src[index * srcStride + srcOffset], stride);
+	}
 }
 
-void ndBrainCpuContext::MemoryFromDevice(const void* const srcBuffer, size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
+void ndBrainCpuContext::MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
 {
-	const ndInt8* const src = (ndInt8*)srcBuffer;
+	const ndInt8* const src = (ndInt8*)deviceBuffer.GetCpuPtr();
+	ndAssert(src);
 	ndMemCpy((ndInt8*)outputMemory, &src[offsetInBytes], ndInt64(sizeInBytes));
 }
 
-void ndBrainCpuContext::MemoryToDevice(void* const dstBuffer, size_t offsetInBytes, size_t sizeInBytes, const void* const inputMemory) const
+void ndBrainCpuContext::MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, const void* const inputMemory) const
 {
-	ndInt8* const dst = (ndInt8*)dstBuffer;
+	ndInt8* const dst = (ndInt8*)deviceBuffer.GetCpuPtr();
+	ndAssert(dst);
 	ndMemCpy(&dst[offsetInBytes], (ndInt8*)inputMemory, ndInt64(sizeInBytes));
 }

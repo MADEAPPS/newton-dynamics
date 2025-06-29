@@ -121,13 +121,12 @@ ndSharedPtr<ndBrainContext> ndBrainTrainerInference::GetContext()
 	return m_descriptor.m_context;
 }
 
-#if 0
-
 ndBrainBuffer* ndBrainTrainerInference::GetInputBuffer()
 {
 	return *m_miniBatchInputBuffer;
 }
 
+#if 0
 const ndBrainBuffer* ndBrainTrainerInference::GetOutputBuffer()
 {
 	return *m_miniBatchOutputBuffer;

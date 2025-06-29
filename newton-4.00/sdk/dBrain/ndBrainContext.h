@@ -18,6 +18,8 @@ class ndBrainVector;
 class ndBrainContext;
 class ndBrainCpuContext;
 class ndBrainFloatBuffer;
+class ndBrainUniformBuffer;
+class ndBrainIntegerBuffer;
 
 #define ND_DEFAULT_WORKGROUP_SIZE	256
 
@@ -33,16 +35,17 @@ class ndBrainContext : public ndClassAlloc
 	virtual ~ndBrainContext();
 
 	virtual ndContextType GetType() const = 0;
-	virtual ndBrainCpuContext* GetAsCpuContext();
 	virtual ndBrainContext* GetAsGpuContext();
+	virtual ndBrainCpuContext* GetAsCpuContext();
 
 	static bool HasGpuSupport() { ndAssert(0); return true;}
 
 	virtual void BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector) = 0;
 
-	virtual void MemoryToDevice(void* const dstBuffer, size_t offsetInBytes, size_t sizeInBytes, const void* const srcMemory) const = 0;
-	virtual void MemoryFromDevice(const void* const srcBuffer, size_t offsetInBytes, size_t sizeInBytes, void* const dstMemory) const = 0;
-	virtual void CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, ndBrainFloatBuffer& dstData, const ndBrainFloatBuffer& srcData) = 0;
+	virtual void MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, const void* const srcMemory) const = 0;
+	virtual void MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, void* const dstMemory) const = 0;
+
+	virtual void CopyBufferIndirect(const ndBrainUniformBuffer& parameterBuffer, const ndBrainIntegerBuffer& indexBuffer, ndBrainBuffer& dstData, const ndBrainBuffer& srcData) = 0;
 };
 
 #endif

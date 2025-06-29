@@ -16,12 +16,14 @@
 class ndBrainUniformBuffer : public ndBrainBuffer
 {
 	public:
-	ndBrainUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes);
-	ndBrainUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, const void* const data);
+	ndBrainUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, bool memoryMapped = false);
+	ndBrainUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, const void* const data, bool memoryMapped = false);
+
+	virtual void* GetCpuPtr() override;
+	virtual void* GetCpuPtr() const override;
 
 	//virtual void BrainVectorToDevice(const ndBrainVector& vector) override;
 	//virtual void BrainVectorFromDevice(ndBrainVector& vector) const override;
-	//
 	//
 	//virtual void CopyBuffer(const ndBrainBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer) override;
 	//virtual void CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer) override;

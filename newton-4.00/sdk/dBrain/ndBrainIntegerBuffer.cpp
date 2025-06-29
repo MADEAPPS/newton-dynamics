@@ -41,17 +41,13 @@ ndBrainIntegerBuffer::ndBrainIntegerBuffer(ndBrainContext* const context, ndInt6
 	{
 		m_indexArray = ndSharedPtr<ndArray<ndUnsigned32>>(new ndArray<ndUnsigned32>);
 		m_indexArray->SetCount(numberOfElements);
-
-		ndArray<ndUnsigned32>& src = **m_indexArray;
-		m_context->MemoryToDevice(&src[0], 0, m_sizeInBytes, indexArray);
 	}
 	else
 	{
 		ndAssert(0);
 		//BrainVectorToDevice(flatArray);
 	}
-	ndAssert(0);
-
+	MemoryToDevice(0, m_sizeInBytes, indexArray);
 }
 
 #if 0
@@ -66,11 +62,6 @@ void ndBrainIntegerBuffer::BrainVectorToDevice(const ndBrainVector&)
 void ndBrainIntegerBuffer::BrainVectorFromDevice(ndBrainVector&) const
 {
 	ndAssert(0);
-}
-
-void ndBrainIntegerBuffer::MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData)
-{
-	LoadData(offsetInBytes, sizeInBytes, inputData);
 }
 
 //void ndBrainIntegerBuffer::MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
@@ -113,3 +104,37 @@ void ndBrainIntegerBuffer::CopyBufferIndirect(const ndBrainBuffer&, const ndBrai
 	ndAssert(0);
 }
 #endif
+
+void* ndBrainIntegerBuffer::GetCpuPtr()
+{
+	if (m_context->GetAsCpuContext())
+	{
+		ndArray<ndUnsigned32>& dst = **m_indexArray;
+		return &dst[0];
+	}
+	return nullptr;
+}
+
+void* ndBrainIntegerBuffer::GetCpuPtr() const
+{
+	if (m_context->GetAsCpuContext())
+	{
+		const ndArray<ndUnsigned32>& dst = **m_indexArray;
+		return (void*)&dst[0];
+	}
+	return nullptr;
+}
+
+void ndBrainIntegerBuffer::MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData)
+{
+	//if (m_context->GetAsCpuContext())
+	//{
+	//	ndArray<ndUnsigned32>& dst = **m_indexArray;
+	//	m_context->MemoryToDevice(&dst[0], offsetInBytes, sizeInBytes, inputData);
+	//}
+	//else
+	//{
+	//	ndAssert(0);
+	//}
+	m_context->MemoryToDevice(*this, offsetInBytes, sizeInBytes, inputData);
+}

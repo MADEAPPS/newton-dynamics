@@ -22,25 +22,6 @@ class ndBrainFloatBuffer;
 class ndBrainIntegerBuffer;
 class ndBrainUniformBuffer;
 
-//class ndBrainKernel : public ndClassAlloc
-//{
-//	public:
-//	ndBrainKernel(ndBrainContext* const context)
-//		:ndClassAlloc()
-//		,m_context(context)
-//	{
-//	}
-//
-//	virtual ~ndBrainKernel()
-//	{
-//	}
-//
-//	virtual void Execute(ndInt32 groupId, ndInt32 workGroupSize) = 0;
-//
-//	ndBrainContext* m_context;
-//	ndFixSizeArray<ndBrainBuffer*, 8> m_parameters;
-//};
-
 class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 {
 	public:
@@ -54,9 +35,9 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 	void AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>&);
 
 	virtual void BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector) override;
-	virtual void MemoryToDevice(void* const dstBuffer, size_t offsetInBytes, size_t sizeInBytes, const void* const srcMemory) const override;
-	virtual void MemoryFromDevice(const void* const srcBuffer, size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const override;
-	virtual void CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, ndBrainFloatBuffer& dstData, const ndBrainFloatBuffer& srcData) override;
+	virtual void MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, const void* const srcMemory) const override;
+	virtual void MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const override;
+	virtual void CopyBufferIndirect(const ndBrainUniformBuffer& parameterBuffer, const ndBrainIntegerBuffer& indexBuffer, ndBrainBuffer& dstData, const ndBrainBuffer& srcData) override;
 	
 	ndBrainGpuContext* GetAsGpuContext() override;
 

@@ -14,8 +14,8 @@
 #include "ndBrainCpuContext.h"
 #include "ndBrainUniformBuffer.h"
 
-ndBrainUniformBuffer::ndBrainUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes)
-	:ndBrainBuffer(context, sizeInBytes)
+ndBrainUniformBuffer::ndBrainUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, bool memoryMapped)
+	:ndBrainBuffer(context, sizeInBytes, memoryMapped)
 {
 	if (m_context->GetAsCpuContext())
 	{
@@ -27,8 +27,8 @@ ndBrainUniformBuffer::ndBrainUniformBuffer(ndBrainContext* const context, ndInt3
 	}
 }
 
-ndBrainUniformBuffer::ndBrainUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, const void* const data)
-	:ndBrainBuffer(context, sizeInBytes)
+ndBrainUniformBuffer::ndBrainUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, const void* const data, bool memoryMapped)
+	:ndBrainBuffer(context, sizeInBytes, memoryMapped)
 {
 	sizeInBytes += (sizeof(ndUnsigned32) - 1) & -ndInt32 (sizeof(ndUnsigned32));
 	if (m_context->GetAsCpuContext())
@@ -44,6 +44,27 @@ ndBrainUniformBuffer::ndBrainUniformBuffer(ndBrainContext* const context, ndInt3
 		ndAssert(0);
 	}
 }
+
+void* ndBrainUniformBuffer::GetCpuPtr()
+{
+	if (m_context->GetAsCpuContext())
+	{
+		ndFixSizeArray<ndUnsigned32, 256>& dst = **m_data;
+		return &dst[0];
+	}
+	return nullptr;
+}
+
+void* ndBrainUniformBuffer::GetCpuPtr() const
+{
+	if (m_context->GetAsCpuContext())
+	{
+		const ndFixSizeArray<ndUnsigned32, 256>& dst = **m_data;
+		return (void*)&dst[0];
+	}
+	return nullptr;
+}
+
 
 #if 0
 void ndBrainUniformBuffer::BrainVectorToDevice(const ndBrainVector&)
@@ -113,26 +134,28 @@ void ndBrainUniformBuffer::CopyBufferIndirect(const ndBrainBuffer&, const ndBrai
 
 void ndBrainUniformBuffer::MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
 {
-	if (m_context->GetAsCpuContext())
-	{
-		const ndFixSizeArray<ndUnsigned32, 256>& src = **m_data;
-		m_context->MemoryFromDevice(&src[0], offsetInBytes, sizeInBytes, outputMemory);
-	}
-	else
-	{
-		ndAssert(0);
-	}
+	//if (m_context->GetAsCpuContext())
+	//{
+	//	const ndFixSizeArray<ndUnsigned32, 256>& src = **m_data;
+	//	m_context->MemoryFromDevice(&src[0], offsetInBytes, sizeInBytes, outputMemory);
+	//}
+	//else
+	//{
+	//	ndAssert(0);
+	//}
+	m_context->MemoryFromDevice(*this, offsetInBytes, sizeInBytes, outputMemory);
 }
 
 void ndBrainUniformBuffer::MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData)
 {
-	if (m_context->GetAsCpuContext())
-	{
-		ndFixSizeArray<ndUnsigned32, 256>& dst = **m_data;
-		m_context->MemoryToDevice(&dst[0], offsetInBytes, sizeInBytes, inputData);
-	}
-	else
-	{
-		ndAssert(0);
-	}
+	//if (m_context->GetAsCpuContext())
+	//{
+	//	ndFixSizeArray<ndUnsigned32, 256>& dst = **m_data;
+	//	m_context->MemoryToDevice(&dst[0], offsetInBytes, sizeInBytes, inputData);
+	//}
+	//else
+	//{
+	//	ndAssert(0);
+	//}
+	m_context->MemoryToDevice(*this, offsetInBytes, sizeInBytes, inputData);
 }
