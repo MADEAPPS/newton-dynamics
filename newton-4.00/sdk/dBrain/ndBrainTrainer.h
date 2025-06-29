@@ -26,8 +26,7 @@
 #include "ndBrainVector.h"
 #include "ndBrainTrainerInference.h"
 
-
-class ndBrainOptimizerAdamGpu;
+class ndBrainOptimizerAdam;
 
 class ndBrainTrainer: public ndBrainTrainerInference
 {
@@ -52,10 +51,10 @@ class ndBrainTrainer: public ndBrainTrainerInference
 	void Initialize();
 	void AddLayersGradientCommands();
 	void AddCopyInputGradientCommand();
+	void AddOptimizerGradientCommand();
 	void AddCopyOutputGradientCommand();
-	//void AddOptimizerGradientCommand(ndBrainFloat learnRate);
 
-	ndSharedPtr<ndBrainOptimizerAdamGpu> m_optimizer;
+	ndSharedPtr<ndBrainOptimizerAdam> m_optimizer;
 	ndSharedPtr<ndBrainBufferCommand> m_adamOtimizerUpdate;
 	ndSharedPtr<ndBrainBufferCommand> m_adamMomentumUpdate;
 

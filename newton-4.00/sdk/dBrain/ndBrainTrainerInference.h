@@ -45,7 +45,7 @@ class ndTrainerDescriptor
 
 	ndSharedPtr<ndBrain> m_brain;
 	ndSharedPtr<ndBrainContext> m_context;
-	ndBrainFloat m_learRate;
+	ndBrainFloat m_learnRate;
 	ndBrainFloat m_regularizer;
 	ndInt32 m_minibatchSize;
 	ndRegularizerType m_regularizerType;
@@ -90,6 +90,7 @@ class ndBrainTrainerInference : public ndClassAlloc
 	{
 		m_inputId = 7,
 		m_outpuId,
+		m_adamOptimizer,
 	};
 
 	void AddCopyOutputCommand();

@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_OPTIMIZER_ADAM_GPU_H__
-#define _ND_BRAIN_OPTIMIZER_ADAM_GPU_H__
+#ifndef _ND_BRAIN_OPTIMIZER_ADAM_H__
+#define _ND_BRAIN_OPTIMIZER_ADAM_H__
 
 #include "ndBrainStdafx.h"
 #include "ndBrainOptimizer.h"
@@ -28,7 +28,7 @@
 
 class ndBrainFloatBuffer;
 
-class ndBrainOptimizerAdamGpu : public ndBrainOptimizer
+class ndBrainOptimizerAdam : public ndBrainOptimizer
 {
 	public: 
 	class ndCommandShareInfo
@@ -57,10 +57,9 @@ class ndBrainOptimizerAdamGpu : public ndBrainOptimizer
 		ndBrainFloat m_invBeta;
 		ndBrainFloat m_invAlpha;
 		ndBrainFloat m_decayRegularizer;
-		//ndInt32 m_parametersSize;
 	};
 
-	ndBrainOptimizerAdamGpu(const ndSharedPtr<ndBrainContext>& context);
+	ndBrainOptimizerAdam(const ndSharedPtr<ndBrainContext>& context);
 
 	// lageavy
 	virtual void Update(ndBrainVector& parameters, const ndBrainVector& gradients) override;
@@ -72,6 +71,8 @@ class ndBrainOptimizerAdamGpu : public ndBrainOptimizer
 	ndSharedPtr<ndBrainFloatBuffer> m_vdw;
 	ndSharedPtr<ndBrainFloatBuffer> m_vdw2;
 	ndCommandShareInfo m_parameters;
+
+	friend class ndBrainTrainer;
 };
 
 #endif 

@@ -167,7 +167,7 @@ static void MnistTrainingSet()
 			ndTrainerDescriptor descritor;
 			descritor.m_brain = brain;
 			descritor.m_context = context;
-			descritor.m_learRate = m_learnRate;
+			descritor.m_learnRate = m_learnRate;
 			descritor.m_minibatchSize = m_miniBatchSize;
 			m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descritor));
 		}
@@ -585,6 +585,6 @@ static void MnistTestSet()
 void ndHandWrittenDigits()
 {
 	ndSetRandSeed(53);
-	MnistTrainingSet();
+	//MnistTrainingSet();
 	//MnistTestSet();
 }

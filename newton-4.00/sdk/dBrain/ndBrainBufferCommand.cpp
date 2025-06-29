@@ -10,7 +10,20 @@
 */
 
 #include "ndBrainStdafx.h"
+#include "ndBrainContext.h"
 #include "ndBrainBufferCommand.h"
+
+ndBrainBufferCommandDesc::ndBrainBufferCommandDesc(ndInt32 minibatchSize)
+	:m_context(nullptr)
+	,m_owner(nullptr)
+	,m_info()
+	,m_uniformBuffer()
+	,m_id(0)
+	,m_miniBatchSize(minibatchSize)
+	,m_workGroupSize(ND_DEFAULT_WORKGROUP_SIZE)
+{
+}
+
 
 #if 0
 ndBrainGpuCommand::ndBrainGpuCommand(ndBrainContext* const context, const ndCommandShareInfo& info)

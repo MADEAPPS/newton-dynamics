@@ -59,15 +59,7 @@ class ndCommandShareInfo
 class ndBrainBufferCommandDesc : public ndFixSizeArray<ndBrainBuffer*, 16>
 {
 	public:
-	ndBrainBufferCommandDesc(ndInt32 minibatchSize)
-		:m_context(nullptr)
-		,m_owner(nullptr)
-		,m_info()
-		,m_uniformBuffer()
-		,m_id(0)
-		,m_miniBatchSize(minibatchSize)
-	{
-	}
+	ndBrainBufferCommandDesc(ndInt32 minibatchSize);
 
 	ndBrainContext* m_context;
 	ndBrainTrainerInference* m_owner;
@@ -75,6 +67,7 @@ class ndBrainBufferCommandDesc : public ndFixSizeArray<ndBrainBuffer*, 16>
 	ndSharedPtr<ndBrainUniformBuffer> m_uniformBuffer;
 	size_t m_id;
 	ndInt32 m_miniBatchSize;
+	ndInt32 m_workGroupSize;
 };
 
 class ndBrainBufferCommand : public ndContainersFreeListAlloc<ndBrainBufferCommand>
