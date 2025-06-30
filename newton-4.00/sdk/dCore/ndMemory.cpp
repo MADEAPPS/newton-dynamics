@@ -20,6 +20,7 @@
 */
 
 #include "ndCoreStdafx.h"
+#include "ndTree.h"
 #include "ndTypes.h"
 #include "ndUtils.h"
 #include "ndMemory.h"
@@ -29,6 +30,7 @@ ndAtomic<ndUnsigned64> ndMemory::m_memoryUsed(0);
 static ndMemFreeCallback m_freeMemory = free;
 static ndMemAllocCallback m_allocMemory = malloc;
 
+//#define ND_VALIDATE_HEAP 
 #define ND_CHECK_CORRUPT_MEM 0x0a
 
 class ndMemoryHeader
@@ -41,6 +43,103 @@ class ndMemoryHeader
 
 #define D_MEMORY_ALIGMNET			32
 #define ndGetBufferPaddingInBytes	size_t(D_MEMORY_ALIGMNET - 1 + sizeof (ndMemoryHeader))
+
+#ifdef ND_VALIDATE_HEAP 
+class ndMemoryCorruptionAllocatorCheck
+{
+	public:
+	ndMemoryCorruptionAllocatorCheck()
+	{
+	}
+
+	void* operator new (size_t size)
+	{
+		void* const mem = malloc(size);
+		return mem;
+	}
+
+	void operator delete (void* ptr)
+	{
+		free(ptr);
+	}
+};
+
+// keep track of all allocation, this should be disabled for production build 
+class ndMemoryCorruptionCheck : public ndTree<ndInt64, void*, ndMemoryCorruptionAllocatorCheck>
+{
+	public:
+	ndMemoryCorruptionCheck()
+		:ndTree<ndInt64, void*, ndMemoryCorruptionAllocatorCheck>()
+		,m_lock()
+		,m_allocIndex(1)
+	{
+	}
+
+	~ndMemoryCorruptionCheck()
+	{
+		// need to make sure the free list are cleaned up after the last world was deleted
+		ndFreeListAlloc::Flush();
+
+		ndScopeSpinLock lock(m_lock);
+		Iterator it(*this);
+		for (it.Begin(); it; )
+		{
+			ndNode* const node = it.GetNode();
+			it++;
+			if (node->GetInfo() < 0)
+			{
+				Remove(node->GetKey());
+			}
+		}
+		ndAssert(!GetCount());
+	}
+
+	void InsertPointer(void* const ptr)
+	{
+		ndScopeSpinLock lock(m_lock);
+		Insert(m_allocIndex, ptr);
+		if (m_allocIndex == 451)
+		{
+			m_allocIndex *= 1;
+		}
+		m_allocIndex++;
+	}
+
+	void RemovePointer(void* const ptr)
+	{
+		ndScopeSpinLock lock(m_lock);
+		ndAssert(Find(ptr));
+		Remove(ptr);
+	}
+
+	static ndMemoryCorruptionCheck& GetTracker()
+	{
+		static ndMemoryCorruptionCheck leakTracker;
+		return leakTracker;
+	}
+
+	bool ValidateHeap() const
+	{
+		Iterator it(*this);
+		ndInt64 allocIndex = 0;
+		bool valid = true;
+		for (it.Begin(); it; it++)
+		{
+			void* const key = it.GetKey();
+			allocIndex = it.GetNode()->GetInfo();
+			if (allocIndex == 451)
+			{
+				allocIndex *= 1;
+			}
+			valid = valid && ndMemory::CheckMemory(key);
+		}
+		return true;
+	}
+
+	ndSpinLock m_lock;
+	ndInt64 m_allocIndex;
+};
+#endif
 
 size_t ndMemory::GetMemoryAligment()
 {
@@ -82,6 +181,12 @@ void* ndMemory::Malloc(size_t size)
 		ndMemSet(ptr + size - D_MEMORY_SAFE_GUARD, code, D_MEMORY_SAFE_GUARD);
 		ret = (ndMemoryHeader*) (ptr + D_MEMORY_SAFE_GUARD);
 	#endif
+
+#ifdef ND_VALIDATE_HEAP 
+	ndAssert(ValidateHeap());
+	ndMemoryCorruptionCheck::GetTracker().InsertPointer(ret);
+#endif
+
 	return ret;
 }
 
@@ -89,6 +194,12 @@ void ndMemory::Free(void* const ptr)
 {
 	if (ptr)
 	{
+
+#ifdef ND_VALIDATE_HEAP 
+		ndAssert(ValidateHeap());
+		ndMemoryCorruptionCheck::GetTracker().RemovePointer(ptr);
+#endif
+
 		#if defined (D_MEMORY_SANITY_CHECK) && defined(_DEBUG)
 		ndAssert(CheckMemory(ptr));
 		const char* const mem = ((char*)ptr) - D_MEMORY_SAFE_GUARD;
@@ -169,4 +280,13 @@ void ndMemory::GetMemoryAllocators(ndMemAllocCallback& alloc, ndMemFreeCallback&
 {
 	free = m_freeMemory;
 	alloc = m_allocMemory;
+}
+
+bool ndMemory::ValidateHeap()
+{
+#ifdef ND_VALIDATE_HEAP 
+	return ndMemoryCorruptionCheck::GetTracker().ValidateHeap();
+#else	
+	return true;
+#endif
 }

@@ -62,6 +62,8 @@ class ndMemory
 	/// Return true is the pointer isn't curroted. thsi funtion onle work in debug and when D_MEMORY_SANITY_CHECK is defined
 	D_CORE_API static bool CheckMemory(const void* const ptr);
 
+	D_CORE_API static bool ValidateHeap();
+
 	/// Install low level system memory allocation functions.
 	/// \param ndMemAllocCallback alloc: is a function pointer callback to allocate a memory chunk.
 	/// \param ndMemFreeCallback free: is a function pointer callback to free a memory chunk.
