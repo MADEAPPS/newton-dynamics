@@ -85,8 +85,8 @@ class ndBrainLayerLinear : public ndBrainLayer
 	virtual void CopyCpuWeights(ndBrainVector& oput) const override;
 	virtual void CopyGpuWeights(ndBrainVector& oput) const override;
 
-	virtual ndCommandShareInfo GetCpuCommandSharedInfo() const override;
-	virtual ndCommandShareInfo GetGpuCommandSharedInfo() const override;
+	virtual ndCommandSharedInfo GetCpuCommandSharedInfo() const override;
+	virtual ndCommandSharedInfo GetGpuCommandSharedInfo() const override;
 	virtual ndBrainLayerFeedForwardCpuCommand* GetLayerCpuFeedForwardCommand() override;
 	virtual ndBrainLayerBackPropagateCpuCommand* GetLayerCpuBackPropagateCommand() override;
 
@@ -98,14 +98,14 @@ class ndBrainLayerLinear : public ndBrainLayer
 	void CalculateRoundedSize(ndInt32& width, ndInt32& height) const;
 
 	virtual ndBrainBufferCommand* CreateGpuFeedForwardCommand(ndBrainTrainerInference* const owner,
-		const ndCommandShareInfo& info,
+		const ndCommandSharedInfo& info,
 		ndBrainContext* const context, ndInt32 miniBatchSize,
 		const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 		ndBrainFloatBuffer* const inputOutputData,
 		ndBrainFloatBuffer* const weightsAndBias) const override;
 
 	virtual ndBrainBufferCommand* CreateGpuBackPropagateCommand(ndBrainTrainerInference* const owner,
-		const ndCommandShareInfo& info,
+		const ndCommandSharedInfo& info,
 		ndBrainContext* const context, ndInt32 miniBatchSize,
 		const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 		ndBrainFloatBuffer* const inputOutputData,

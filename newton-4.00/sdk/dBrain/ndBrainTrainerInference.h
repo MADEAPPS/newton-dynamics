@@ -98,8 +98,8 @@ class ndBrainTrainerInference : public ndClassAlloc
 	void InitWeightAndBiasBuffer();
 	ndInt32 RoundoffOffset(ndInt32 value) const;
 	ndBrainBufferCommand* FindCommand(size_t id) const;
-	void AddCopyInputCommand(const ndCommandShareInfo& uniformData);
-	void AddLayersCommands(ndFixSizeArray<ndCommandShareInfo, 256>& layersUniformsData);
+	void AddCopyInputCommand(const ndCommandSharedInfo& uniformData);
+	void AddLayersCommands(ndFixSizeArray<ndCommandSharedInfo, 256>& layersUniformsData);
 
 	ndTrainerDescriptor m_descriptor;
 	ndSharedPtr<ndBrainFloatBuffer> m_inputOutputBuffer;

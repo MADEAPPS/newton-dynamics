@@ -31,10 +31,10 @@ class ndBrainFloatBuffer;
 class ndBrainOptimizerAdam : public ndBrainOptimizer
 {
 	public: 
-	class ndCommandShareInfo
+	class ndCommandSharedInfo
 	{
 		public:
-		ndCommandShareInfo()
+		ndCommandSharedInfo()
 			:m_beta(ndBrainFloat(0.999f))
 			,m_alpha(ndBrainFloat(0.9f))
 			,m_epsilon(ndBrainFloat(1.0e-6f))
@@ -68,7 +68,7 @@ class ndBrainOptimizerAdam : public ndBrainOptimizer
 	private:
 	ndSharedPtr<ndBrainFloatBuffer> m_vdw;
 	ndSharedPtr<ndBrainFloatBuffer> m_vdw2;
-	ndCommandShareInfo m_parameters;
+	ndCommandSharedInfo m_parameters;
 
 	friend class ndBrainTrainer;
 };

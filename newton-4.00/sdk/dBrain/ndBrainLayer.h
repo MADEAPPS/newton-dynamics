@@ -105,8 +105,8 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void CopyCpuWeights(ndBrainVector& output) const;
 	virtual void CopyGpuWeights(ndBrainVector& output) const;
 
-	virtual ndCommandShareInfo GetCpuCommandSharedInfo() const;
-	virtual ndCommandShareInfo GetGpuCommandSharedInfo() const;
+	virtual ndCommandSharedInfo GetCpuCommandSharedInfo() const;
+	virtual ndCommandSharedInfo GetGpuCommandSharedInfo() const;
 
 	virtual ndBrainLayerFeedForwardCpuCommand* GetLayerCpuFeedForwardCommand();
 	virtual ndBrainLayerBackPropagateCpuCommand* GetLayerCpuBackPropagateCommand();
@@ -117,14 +117,14 @@ class ndBrainLayer : public ndClassAlloc
 	virtual bool HasGpuSupport() const;
 
 	virtual ndBrainBufferCommand* CreateGpuFeedForwardCommand(ndBrainTrainerInference* const owner,
-		const ndCommandShareInfo& info,
+		const ndCommandSharedInfo& info,
 		ndBrainContext* const context, ndInt32 miniBatchSize,
 		const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 		ndBrainFloatBuffer* const inputOutputData,
 		ndBrainFloatBuffer* const weightsAndBias) const;
 
 	virtual ndBrainBufferCommand* CreateGpuBackPropagateCommand(ndBrainTrainerInference* const owner,
-		const ndCommandShareInfo& info,
+		const ndCommandSharedInfo& info,
 		ndBrainContext* const context, ndInt32 miniBatchSize,
 		const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 		ndBrainFloatBuffer* const inputOutputData,

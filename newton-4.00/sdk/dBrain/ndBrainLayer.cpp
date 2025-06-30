@@ -230,20 +230,20 @@ void ndBrainLayer::CalculateParamGradients(const ndBrainVector&, const ndBrainVe
 	ndAssert(0);
 }
 
-ndCommandShareInfo ndBrainLayer::GetCpuCommandSharedInfo() const
+ndCommandSharedInfo ndBrainLayer::GetCpuCommandSharedInfo() const
 {
 	ndAssert(0);
-	return ndCommandShareInfo(this);
+	return ndCommandSharedInfo(this);
 }
 
-ndCommandShareInfo ndBrainLayer::GetGpuCommandSharedInfo() const
+ndCommandSharedInfo ndBrainLayer::GetGpuCommandSharedInfo() const
 {
 	ndAssert(0);
-	return ndCommandShareInfo(this);
+	return ndCommandSharedInfo(this);
 }
 
 ndBrainBufferCommand* ndBrainLayer::CreateGpuFeedForwardCommand(
-	ndBrainTrainerInference* const, const ndCommandShareInfo&, 
+	ndBrainTrainerInference* const, const ndCommandSharedInfo&, 
 	ndBrainContext* const, ndInt32, const ndSharedPtr<ndBrainUniformBuffer>&,
 	ndBrainFloatBuffer* const, ndBrainFloatBuffer* const) const
 {
@@ -252,7 +252,7 @@ ndBrainBufferCommand* ndBrainLayer::CreateGpuFeedForwardCommand(
 }
 
 ndBrainBufferCommand* ndBrainLayer::CreateGpuBackPropagateCommand(
-	ndBrainTrainerInference* const, const ndCommandShareInfo&,
+	ndBrainTrainerInference* const, const ndCommandSharedInfo&,
 	ndBrainContext* const, ndInt32, const ndSharedPtr<ndBrainUniformBuffer>&,
 	ndBrainFloatBuffer* const, ndBrainFloatBuffer* const, 
 	ndBrainFloatBuffer* const, ndBrainFloatBuffer* const) const

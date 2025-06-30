@@ -51,8 +51,8 @@ class ndBrainLayerActivation : public ndBrainLayer
 	virtual void Blend(const ndBrainLayer& src, ndBrainFloat blend) override;
 	
 	virtual void InitWeights() override;
-	virtual ndCommandShareInfo GetCpuCommandSharedInfo() const override;
-	virtual ndCommandShareInfo GetGpuCommandSharedInfo() const override;
+	virtual ndCommandSharedInfo GetCpuCommandSharedInfo() const override;
+	virtual ndCommandSharedInfo GetGpuCommandSharedInfo() const override;
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const override;
 	virtual void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const override;
 

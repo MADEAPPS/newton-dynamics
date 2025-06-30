@@ -38,7 +38,7 @@ class brainCopyInput : public ndBrainKernel
        // ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
        // ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
        //
-       // ndCommandShareInfo* const parameters = (ndCommandShareInfo*)buffer0->GetData();
+       // ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
        // ndBrainFloat* const inputOutputData = buffer1->GetData();
        // ndBrainFloat* const inputBuffer = buffer2->GetData();
        // 
@@ -82,7 +82,7 @@ class brainCopyOutput : public ndBrainKernel
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         //ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
         //
-        //ndCommandShareInfo* const parameters = (ndCommandShareInfo*)buffer0->GetData();
+        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
         //ndBrainFloat* const inputOutputData = buffer1->GetData();
         //ndBrainFloat* const outputBuffer = buffer2->GetData();
         //
@@ -127,7 +127,7 @@ class brainLayerReluActivation : public ndBrainKernel
         //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         //
-        //ndCommandShareInfo* const parameters = (ndCommandShareInfo*)buffer0->GetData();
+        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
         //ndBrainFloat* const inputOutputData = buffer1->GetData();
         //
         //ndInt32 inputSize = ndInt32(parameters->m_inputSize);
@@ -173,7 +173,7 @@ class brainLayerLinearDropOutActivation : public ndBrainKernel
         //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         //
-        //ndCommandShareInfo* const parameters = (ndCommandShareInfo*)buffer0->GetData();
+        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
         //ndBrainFloat* const inputOutputData = buffer1->GetData();
         //
         //ndInt32 inputSize = ndInt32(parameters->m_inputSize);
@@ -219,7 +219,7 @@ class brainLayerTanhActivation : public ndBrainKernel
         //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         //
-        //ndCommandShareInfo* const parameters = (ndCommandShareInfo*)buffer0->GetData();
+        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
         //ndBrainFloat* const inputOutputData = buffer1->GetData();
         //
         //ndInt32 inputSize = ndInt32(parameters->m_inputSize);
@@ -270,7 +270,7 @@ class brainLayerSoftmaxActivation : public ndBrainKernel
         //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         //
-        //ndCommandShareInfo* const parameters = (ndCommandShareInfo*)buffer0->GetData();
+        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
         //ndBrainFloat* const inputOutputData = buffer1->GetData();
         //
         //ndInt32 inputSize = ndInt32(parameters->m_inputSize);
@@ -397,7 +397,7 @@ class brainCopyInputGradients : public ndBrainKernel
         //ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
         //ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
         //
-        //ndCommandShareInfo* const parameters = (ndCommandShareInfo*)buffer0->GetData();
+        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
         //ndBrainFloat* const miniBatchGradients = buffer2->GetData();
         //ndBrainFloat* const inputOutputGradients = buffer3->GetData();
         //
@@ -441,7 +441,7 @@ class brainCopyOutputGradients : public ndBrainKernel
         //ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
         //ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
         //
-        //ndCommandShareInfo* const parameters = (ndCommandShareInfo*)buffer0->GetData();
+        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
         //ndBrainFloat* const miniBatchGradients = buffer2->GetData();
         //ndBrainFloat* const inputOutputGradients = buffer3->GetData();
         //
@@ -486,7 +486,7 @@ class brainLayerBrainReluBackPropagate : public ndBrainKernel
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         //ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
         //
-        //ndCommandShareInfo* const parameters = (ndCommandShareInfo*)buffer0->GetData();
+        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
         //ndBrainFloat* const inputOutputData = buffer1->GetData();
         //ndBrainFloat* const inputOutputGradients = buffer3->GetData();
         //
@@ -546,7 +546,7 @@ class brainLayerBrainTanhBackPropagate : public ndBrainKernel
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         //ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
         //
-        //ndCommandShareInfo* const parameters = (ndCommandShareInfo*)buffer0->GetData();
+        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
         //ndBrainFloat* const inputOutputData = buffer1->GetData();
         //ndBrainFloat* const inputOutputGradients = buffer3->GetData();
         //
@@ -607,7 +607,7 @@ class brainLayerBrainCathegoricalSoftmaxBackPropagate : public ndBrainKernel
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         //ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
         //
-        //ndCommandShareInfo* const parameters = (ndCommandShareInfo*)buffer0->GetData();
+        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
         //ndBrainFloat* const inputOutputData = buffer1->GetData();
         //ndBrainFloat* const inputOutputGradients = buffer3->GetData();
         //
@@ -663,7 +663,7 @@ class brainLayerBrainLinearDropOutBackPropagate : public ndBrainKernel
         //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
         //
-        //ndCommandShareInfo* const parameters = (ndCommandShareInfo*)buffer0->GetData();
+        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
         //ndBrainFloat* const inputOutputGradients = buffer3->GetData();
         //
         //ndInt32 inputSize = ndInt32(parameters->m_inputSize);
@@ -719,7 +719,7 @@ class brainAccumulateGradientsAndAverage : public ndBrainKernel
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //
-        //ndCommandShareInfo* const parameters = (ndCommandShareInfo*)buffer0->GetData();
+        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
         //ndBrainFloat* const gradientBuffer = buffer1->GetData();
         //
         //ndInt32 inputSize = ndInt32(parameters->m_inputSize);
@@ -763,7 +763,7 @@ class brainAccumulateGradients : public ndBrainKernel
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //
-        //ndCommandShareInfo* const parameters = (ndCommandShareInfo*)buffer0->GetData();
+        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
         //ndBrainFloat* const gradientBuffer = buffer1->GetData();
         //
         //ndInt32 dst = parameters->m_parametersStartOffset + groupId * workGroupSize;
@@ -790,7 +790,7 @@ class brainAverageGradients : public ndBrainKernel
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //
-        //ndCommandShareInfo* const parameters = (ndCommandShareInfo*)buffer0->GetData();
+        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
         //ndBrainFloat* const gradientBuffer = buffer1->GetData();
         //
         //ndInt32 start = groupId * workGroupSize;
@@ -822,7 +822,7 @@ class brainAdamUpdateLassoRegularizer : public ndBrainKernel
         //ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
         //ndBrainFloatBuffer* const buffer4 = (ndBrainFloatBuffer*)m_parameters[4];
         //
-        //ndBrainOptimizerAdamGpu::ndCommandShareInfo* const parameters = (ndBrainOptimizerAdamGpu::ndCommandShareInfo*)buffer0->GetData();
+        //ndBrainOptimizerAdamGpu::ndCommandSharedInfo* const parameters = (ndBrainOptimizerAdamGpu::ndCommandSharedInfo*)buffer0->GetData();
         //ndBrainFloat* const weightAndBiasBuffer = buffer1->GetData();
         //ndBrainFloat* const weightAndBiasGradientBuffer = buffer2->GetData();
         //ndBrainFloat* const vdw = buffer3->GetData();
@@ -876,7 +876,7 @@ class brainAdamUpdateRidgeRegularizer : public ndBrainKernel
         //ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
         //ndBrainFloatBuffer* const buffer4 = (ndBrainFloatBuffer*)m_parameters[4];
         //
-        //ndBrainOptimizerAdamGpu::ndCommandShareInfo* const parameters = (ndBrainOptimizerAdamGpu::ndCommandShareInfo*)buffer0->GetData();
+        //ndBrainOptimizerAdamGpu::ndCommandSharedInfo* const parameters = (ndBrainOptimizerAdamGpu::ndCommandSharedInfo*)buffer0->GetData();
         //ndBrainFloat* const weightAndBiasBuffer = buffer1->GetData();
         //ndBrainFloat* const weightAndBiasGradientBuffer = buffer2->GetData();
         //ndBrainFloat* const vdw = buffer3->GetData();
@@ -929,7 +929,7 @@ class brainAdamMomentumUpdate : public ndBrainKernel
     {
         ndAssert(0);
         //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
-        //ndBrainOptimizerAdamGpu::ndCommandShareInfo* const parameters = (ndBrainOptimizerAdamGpu::ndCommandShareInfo*)buffer0->GetData();
+        //ndBrainOptimizerAdamGpu::ndCommandSharedInfo* const parameters = (ndBrainOptimizerAdamGpu::ndCommandSharedInfo*)buffer0->GetData();
         //
         //parameters->m_betaAcc *= parameters->m_beta;
         //parameters->m_alphaAcc *= parameters->m_alpha;
@@ -968,7 +968,7 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
         //
         //ndBrainFloat* const weightsAndBias = buffer2->GetData();
         //ndBrainFloat* const inputOutputData = buffer1->GetData();
-        //ndCommandShareInfo* const parameters = (ndCommandShareInfo*)buffer0->GetData();
+        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
         //
         //const ndInt32 inputSize = ndInt32(parameters->m_inputSize);
         //const ndInt32 outputSize = ndInt32(parameters->m_outputSize);
@@ -1065,7 +1065,7 @@ class brainLayerBrainLinearBackPropagate : public ndBrainKernel
         //ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
         //ndBrainFloatBuffer* const buffer4 = (ndBrainFloatBuffer*)m_parameters[4];
         //
-        //ndCommandShareInfo* const parameters = (ndCommandShareInfo*)buffer0->GetData();
+        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
         //ndBrainFloat* const inputOutputData = buffer1->GetData();
         //ndBrainFloat* const weightAndBias = buffer2->GetData();
         //ndBrainFloat* const inputOutputGradients = buffer3->GetData();

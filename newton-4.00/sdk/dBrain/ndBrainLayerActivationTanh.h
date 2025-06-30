@@ -50,14 +50,14 @@ class ndBrainLayerActivationTanh : public ndBrainLayerActivation
 	virtual bool HasGpuSupport() const override;
 
 	virtual ndBrainBufferCommand* CreateGpuFeedForwardCommand(ndBrainTrainerInference* const owner,
-		const ndCommandShareInfo& info,
+		const ndCommandSharedInfo& info,
 		ndBrainContext* const context, ndInt32 miniBatchSize,
 		const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 		ndBrainFloatBuffer* const inputOutputData,
 		ndBrainFloatBuffer* const weightsAndBias) const override;
 
 	virtual ndBrainBufferCommand* CreateGpuBackPropagateCommand(ndBrainTrainerInference* const owner,
-		const ndCommandShareInfo& info,
+		const ndCommandSharedInfo& info,
 		ndBrainContext* const context, ndInt32 miniBatchSize,
 		const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 		ndBrainFloatBuffer* const inputOutputData,

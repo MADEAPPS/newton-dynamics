@@ -413,9 +413,9 @@ void ndBrainLayerLinear::SetGpuWeights(const ndBrainVector& input)
 	m_bias.Set(bias);
 }
 
-ndCommandShareInfo ndBrainLayerLinear::GetCpuCommandSharedInfo() const
+ndCommandSharedInfo ndBrainLayerLinear::GetCpuCommandSharedInfo() const
 {
-	ndCommandShareInfo info(this);
+	ndCommandSharedInfo info(this);
 
 	ndInt32 rows = m_weights.GetRows();
 	ndInt32 columns = m_weights.GetColumns();
@@ -426,9 +426,9 @@ ndCommandShareInfo ndBrainLayerLinear::GetCpuCommandSharedInfo() const
 	return info;
 }
 
-ndCommandShareInfo ndBrainLayerLinear::GetGpuCommandSharedInfo() const
+ndCommandSharedInfo ndBrainLayerLinear::GetGpuCommandSharedInfo() const
 {
-	ndCommandShareInfo info(this);
+	ndCommandSharedInfo info(this);
 
 	ndInt32 rows = m_weights.GetRows();
 	ndInt32 columns = m_weights.GetColumns();
@@ -464,7 +464,7 @@ ndBrainLayerBackPropagateCpuCommand* ndBrainLayerLinear::GetLayerCpuBackPropagat
 void ndBrainLayerLinear::FeedForward(const ndBrainLayerFeedForwardCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
 	const ndBrainBufferCommandDesc& desc = command->GetDescriptor();
-	const ndCommandShareInfo& info = desc.m_info;
+	const ndCommandSharedInfo& info = desc.m_info;
 	ndBrainTrainerInference* const trainer = desc.m_owner;
 	
 	const ndBrainFloat* const weightAndBias = (ndBrainFloat*)trainer->GetWeightAndBiasBuffer()->GetCpuPtr();
@@ -490,11 +490,11 @@ void ndBrainLayerLinear::FeedForward(const ndBrainLayerFeedForwardCpuCommand* co
 
 void ndBrainLayerLinear::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
-	//const ndCommandShareInfo* const info = &command->m_info;
+	//const ndCommandSharedInfo* const info = &command->m_info;
 	//const ndBrainTrainerCpu* const trainer = (ndBrainTrainerCpu*)command->m_owner;
 	
 	const ndBrainBufferCommandDesc& desc = command->GetDescriptor();
-	const ndCommandShareInfo& info = desc.m_info;
+	const ndCommandSharedInfo& info = desc.m_info;
 	ndBrainTrainer* const trainer = (ndBrainTrainer*)desc.m_owner;
 
 	const ndBrainFloat* const weightAndBias = (ndBrainFloat*)trainer->GetWeightAndBiasBuffer()->GetCpuPtr();
@@ -541,7 +541,7 @@ void ndBrainLayerLinear::BackPropagate(const ndBrainLayerBackPropagateCpuCommand
 
 ndBrainBufferCommand* ndBrainLayerLinear::CreateGpuFeedForwardCommand(
 	ndBrainTrainerInference* const owner,
-	const ndCommandShareInfo& info,
+	const ndCommandSharedInfo& info,
 	ndBrainContext* const context, ndInt32 miniBatchSize,
 	const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 	ndBrainFloatBuffer* const inputOutputData,
@@ -577,11 +577,11 @@ ndBrainBufferCommand* ndBrainLayerLinear::CreateGpuFeedForwardCommand(
 		//ndInt32 blockColums = miniBatchSize / ND_GPU_TILED_MATRIX_ROWS;
 		//
 		//miniBatchSize = blockRows * blockColums;
-		//ndCommandShareInfo newInfo(info);
-		//uniformBuffer->MemoryFromDevice(0, sizeof(ndCommandShareInfo), &newInfo);
+		//ndCommandSharedInfo newInfo(info);
+		//uniformBuffer->MemoryFromDevice(0, sizeof(ndCommandSharedInfo), &newInfo);
 		//
 		//newInfo.m_tiledStride = blockRows;
-		//uniformBuffer->MemoryToDevice(0, sizeof(ndCommandShareInfo), &newInfo);
+		//uniformBuffer->MemoryToDevice(0, sizeof(ndCommandSharedInfo), &newInfo);
 
 		//ndBrainBufferCommand* const command = new ndBrainTrainerGpuCommand(
 		//	owner, newInfo, size_t(this), context, context->m_brainLayerMatrixMatrixMultiply, miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias);
@@ -594,7 +594,7 @@ ndBrainBufferCommand* ndBrainLayerLinear::CreateGpuFeedForwardCommand(
 
 ndBrainBufferCommand* ndBrainLayerLinear::CreateGpuBackPropagateCommand(
 	ndBrainTrainerInference* const owner,
-	const ndCommandShareInfo& info,
+	const ndCommandSharedInfo& info,
 	ndBrainContext* const context, ndInt32 miniBatchSize,
 	const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 	ndBrainFloatBuffer* const inputOutputData,

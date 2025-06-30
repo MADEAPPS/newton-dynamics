@@ -162,7 +162,7 @@ void ndBrainTrainerInference::UpdateParameters(const ndBrainVector& weightAndBia
 		ndBrainLayer* const layer = command->m_layer;
 		if (layer && command->m_info.m_parametersBatchSize)
 		{
-			const ndCommandShareInfo info (layer->GetCpuCommandSharedInfo());
+			const ndCommandSharedInfo info (layer->GetCpuCommandSharedInfo());
 			ndInt32 height = (info.m_outputSize + ND_GPU_TILED_MATRIX_ROWS - 1) & -ND_GPU_TILED_MATRIX_ROWS;
 			ndInt32 width = (info.m_inputSize + ND_GPU_TILED_MATRIX_COLUMNS - 1) & -ND_GPU_TILED_MATRIX_COLUMNS;
 			ndInt32 size = width * height + height;
@@ -248,16 +248,16 @@ void ndBrainTrainerInference::InitWeightAndBiasBuffer()
 {
 	const ndBrain& brain = **m_descriptor.m_brain;
 
-	ndFixSizeArray<ndCommandShareInfo, 256> uniformData;
+	ndFixSizeArray<ndCommandSharedInfo, 256> uniformData;
 	bool isCpu = m_descriptor.m_context->GetAsCpuContext() ? true : false;
 	for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
 	{
 		ndBrainLayer* const layer = brain[i];
-		ndCommandShareInfo info(isCpu ? layer->GetCpuCommandSharedInfo(): layer->GetGpuCommandSharedInfo());
+		ndCommandSharedInfo info(isCpu ? layer->GetCpuCommandSharedInfo(): layer->GetGpuCommandSharedInfo());
 		info.m_parametersBatchSize = RoundoffOffset(info.m_parametersBatchSize);
 		uniformData.PushBack(info);
 	}
-	uniformData.PushBack(ndCommandShareInfo(nullptr));
+	uniformData.PushBack(ndCommandSharedInfo(nullptr));
 
 	ndInt32 parametersSizeSum = 0;
 	for (ndInt32 i = 0; i < uniformData.GetCount(); ++i)
@@ -276,7 +276,7 @@ void ndBrainTrainerInference::InitWeightAndBiasBuffer()
 	for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
 	{
 		const ndBrainLayer* const layer = brain[i];
-		ndCommandShareInfo& info = uniformData[i];
+		ndCommandSharedInfo& info = uniformData[i];
 
 		ndInt32 size = uniformData[i].m_parametersBatchSize;
 		if (size)
@@ -317,7 +317,7 @@ ndBrainBufferCommand* ndBrainTrainerInference::FindCommand(size_t id) const
 	return nullptr;
 }
 
-void ndBrainTrainerInference::AddCopyInputCommand(const ndCommandShareInfo& uniformData)
+void ndBrainTrainerInference::AddCopyInputCommand(const ndCommandSharedInfo& uniformData)
 {
 	const ndBrain& brain = **m_descriptor.m_brain;
 	ndInt32 inputOutputBufferSize = RoundoffOffset(brain.GetInputSize());
@@ -327,14 +327,14 @@ void ndBrainTrainerInference::AddCopyInputCommand(const ndCommandShareInfo& unif
 		inputOutputBufferSize += RoundoffOffset(layer->GetOutputSize());
 	}
 	
-	ndCommandShareInfo uniformParam;
+	ndCommandSharedInfo uniformParam;
 	uniformParam.m_inputSize = uniformData.m_inputSize;
 	uniformParam.m_outputSize = uniformData.m_outputSize;
 	uniformParam.m_parametersStartOffset = 0;
 	uniformParam.m_inputOutputSize = inputOutputBufferSize;
 	uniformParam.m_inputOutputStartOffset = 0;
 
-	ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(*m_descriptor.m_context, sizeof(ndCommandShareInfo), &uniformParam));
+	ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(*m_descriptor.m_context, sizeof(ndCommandSharedInfo), &uniformParam));
 	
 	ndBrainFloatBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
 	ndBrainFloatBuffer* const miniBatchInputBuffer = *m_miniBatchInputBuffer;
@@ -361,7 +361,7 @@ void ndBrainTrainerInference::AddCopyInputCommand(const ndCommandShareInfo& unif
 
 			virtual void Execute(ndInt32 miniBatchIndex) override
 			{
-				const ndCommandShareInfo& info = m_desc.m_info;
+				const ndCommandSharedInfo& info = m_desc.m_info;
 				ndBrainTrainerInference* const owner = m_desc.m_owner;
 
 				ndBrainFloat* const dstPtr = (ndBrainFloat*)owner->m_inputOutputBuffer->GetCpuPtr();
@@ -390,11 +390,11 @@ void ndBrainTrainerInference::AddCopyOutputCommand()
 	ndAssert(lastLayerCommand);
 	
 	const ndBrainBufferCommandDesc& desc = lastLayerCommand->GetDescriptor();
-	ndCommandShareInfo uniformParam(desc.m_info);
+	ndCommandSharedInfo uniformParam(desc.m_info);
 	
 	uniformParam.m_parametersStartOffset = 0;
 	uniformParam.m_inputOutputStartOffset += RoundoffOffset(uniformParam.m_inputSize);
-	ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(*m_descriptor.m_context, sizeof(ndCommandShareInfo), &uniformParam));
+	ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(*m_descriptor.m_context, sizeof(ndCommandSharedInfo), &uniformParam));
 	
 	ndBrainFloatBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
 	ndBrainFloatBuffer* const miniBatchOutputBuffer = *m_miniBatchOutputBuffer;
@@ -421,7 +421,7 @@ void ndBrainTrainerInference::AddCopyOutputCommand()
 
 			virtual void Execute(ndInt32 miniBatchIndex) override
 			{
-				const ndCommandShareInfo& info = m_desc.m_info;
+				const ndCommandSharedInfo& info = m_desc.m_info;
 				ndBrainTrainerInference* const owner = m_desc.m_owner;
 
 				ndBrainFloat* const dstPtr = (ndBrainFloat*)owner->m_miniBatchOutputBuffer->GetCpuPtr();
@@ -442,7 +442,7 @@ void ndBrainTrainerInference::AddCopyOutputCommand()
 	}
 }
 
-void ndBrainTrainerInference::AddLayersCommands(ndFixSizeArray<ndCommandShareInfo, 256>& layersUniformsData)
+void ndBrainTrainerInference::AddLayersCommands(ndFixSizeArray<ndCommandSharedInfo, 256>& layersUniformsData)
 {
 	// create all the uniform buffers 
 	const ndBrain& brain = **m_descriptor.m_brain;
@@ -451,7 +451,7 @@ void ndBrainTrainerInference::AddLayersCommands(ndFixSizeArray<ndCommandShareInf
 	ndInt32 inputOutputBufferSize = RoundoffOffset(brain.GetInputSize());
 	for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
 	{
-		ndCommandShareInfo& data = layersUniformsData[i];
+		ndCommandSharedInfo& data = layersUniformsData[i];
 		data.m_inputOutputStartOffset = inputOutputStartOffset;
 		inputOutputBufferSize += RoundoffOffset(data.m_outputSize);
 		inputOutputStartOffset += RoundoffOffset(data.m_inputSize);
@@ -461,10 +461,10 @@ void ndBrainTrainerInference::AddLayersCommands(ndFixSizeArray<ndCommandShareInf
 	ndBrainFloatBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
 	for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
 	{
-		ndCommandShareInfo uniformParam;
+		ndCommandSharedInfo uniformParam;
 
 		ndBrainLayer* const layer = brain[i];
-		const ndCommandShareInfo& data = layersUniformsData[i];
+		const ndCommandSharedInfo& data = layersUniformsData[i];
 		uniformParam.m_inputSize = data.m_inputSize;
 		uniformParam.m_outputSize = data.m_outputSize;
 		uniformParam.m_inputOutputSize = inputOutputBufferSize;
@@ -472,7 +472,7 @@ void ndBrainTrainerInference::AddLayersCommands(ndFixSizeArray<ndCommandShareInf
 		uniformParam.m_parametersBatchSize = data.m_parametersBatchSize;
 		uniformParam.m_parametersStartOffset = data.m_parametersStartOffset;
 		uniformParam.m_layer = layer;
-		ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(*m_descriptor.m_context, sizeof(ndCommandShareInfo), &uniformParam));
+		ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(*m_descriptor.m_context, sizeof(ndCommandSharedInfo), &uniformParam));
 
 		ndSharedPtr<ndBrainBufferCommand> command(layer->CreateGpuFeedForwardCommand(this, uniformParam, *m_descriptor.m_context, m_descriptor.m_minibatchSize, uniformbuffer, inputOutputBuffer, weightsBuffer));
 		m_feedForwardCommands.Append(command);

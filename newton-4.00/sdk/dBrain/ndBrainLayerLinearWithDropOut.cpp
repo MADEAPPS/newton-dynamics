@@ -118,7 +118,7 @@ ndBrainLayerBackPropagateCpuCommand* ndBrainLayerLinearWithDropOut::GetLayerCpuB
 void ndBrainLayerLinearWithDropOut::FeedForward(const ndBrainLayerFeedForwardCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
 	const ndBrainBufferCommandDesc& desc = command->GetDescriptor();
-	const ndCommandShareInfo& info = desc.m_info;
+	const ndCommandSharedInfo& info = desc.m_info;
 	ndBrainTrainerInference* const trainer = desc.m_owner;
 	const ndBrainFloat* const inputOutputBuffer = (ndBrainFloat*)trainer->GetHiddenLayerBuffer()->GetCpuPtr();
 
@@ -135,11 +135,11 @@ void ndBrainLayerLinearWithDropOut::FeedForward(const ndBrainLayerFeedForwardCpu
 
 void ndBrainLayerLinearWithDropOut::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
-	//const ndCommandShareInfo* const info = &command->m_info;
+	//const ndCommandSharedInfo* const info = &command->m_info;
 	//const ndBrainTrainerCpu* const trainer = (ndBrainTrainerCpu*)command->m_owner;
 	
 	const ndBrainBufferCommandDesc& desc = command->GetDescriptor();
-	const ndCommandShareInfo& info = desc.m_info;
+	const ndCommandSharedInfo& info = desc.m_info;
 	ndBrainTrainer* const trainer = (ndBrainTrainer*)desc.m_owner;
 
 	const ndBrainFloat* const inputOutputBuffer = (ndBrainFloat*)trainer->GetHiddenLayerBuffer()->GetCpuPtr();
@@ -161,7 +161,7 @@ void ndBrainLayerLinearWithDropOut::BackPropagate(const ndBrainLayerBackPropagat
 
 ndBrainBufferCommand* ndBrainLayerLinearWithDropOut::CreateGpuFeedForwardCommand(
 	ndBrainTrainerInference* const owner,
-	const ndCommandShareInfo& info,
+	const ndCommandSharedInfo& info,
 	ndBrainContext* const context, ndInt32 miniBatchSize,
 	const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 	ndBrainFloatBuffer* const inputOutputData,
@@ -195,7 +195,7 @@ ndBrainBufferCommand* ndBrainLayerLinearWithDropOut::CreateGpuFeedForwardCommand
 
 ndBrainBufferCommand* ndBrainLayerLinearWithDropOut::CreateGpuBackPropagateCommand(
 	ndBrainTrainerInference* const owner,
-	const ndCommandShareInfo& info,
+	const ndCommandSharedInfo& info,
 	ndBrainContext* const context, ndInt32 miniBatchSize,
 	const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 	ndBrainFloatBuffer* const inputOutputData,

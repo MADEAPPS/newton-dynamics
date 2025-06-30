@@ -19,10 +19,10 @@ class ndBrainContext;
 class ndBrainUniformBuffer;
 class ndBrainTrainerInference;
 
-class ndCommandShareInfo
+class ndCommandSharedInfo
 {
 	public:
-	ndCommandShareInfo()
+	ndCommandSharedInfo()
 		:m_inputSize(0)
 		,m_outputSize(0)
 		,m_inputOutputSize(0)
@@ -34,7 +34,7 @@ class ndCommandShareInfo
 	{
 	}
 
-	ndCommandShareInfo(const ndBrainLayer* const layer)
+	ndCommandSharedInfo(const ndBrainLayer* const layer)
 		:m_inputSize(0)
 		,m_outputSize(0)
 		,m_inputOutputSize(0)
@@ -63,7 +63,7 @@ class ndBrainBufferCommandDesc : public ndFixSizeArray<ndBrainBuffer*, 16>
 
 	ndBrainContext* m_context;
 	ndBrainTrainerInference* m_owner;
-	ndCommandShareInfo m_info;
+	ndCommandSharedInfo m_info;
 	ndSharedPtr<ndBrainUniformBuffer> m_uniformBuffer;
 	size_t m_id;
 	ndInt32 m_miniBatchSize;

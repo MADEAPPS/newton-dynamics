@@ -16,7 +16,7 @@
 #include "ndBrainUniformBuffer.h"
 
 #if 0
-ndBrainGpuCommand::ndBrainGpuCommand(ndBrainContext* const context, const ndCommandShareInfo& info)
+ndBrainGpuCommand::ndBrainGpuCommand(ndBrainContext* const context, const ndCommandSharedInfo& info)
 	:ndContainersFreeListAlloc<ndBrainGpuCommand>()
 	,m_context(context)
 	,m_shader()

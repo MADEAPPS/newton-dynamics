@@ -120,17 +120,17 @@ void ndBrainLayerActivation::Blend(const ndBrainLayer&, ndBrainFloat)
 {
 }
 
-ndCommandShareInfo ndBrainLayerActivation::GetCpuCommandSharedInfo() const
+ndCommandSharedInfo ndBrainLayerActivation::GetCpuCommandSharedInfo() const
 {
-	ndCommandShareInfo info(this);
+	ndCommandSharedInfo info(this);
 	info.m_inputSize = GetInputSize();
 	info.m_outputSize = GetOutputSize();
 	return info;
 }
 
-ndCommandShareInfo ndBrainLayerActivation::GetGpuCommandSharedInfo() const
+ndCommandSharedInfo ndBrainLayerActivation::GetGpuCommandSharedInfo() const
 {
-	ndCommandShareInfo info(this);
+	ndCommandSharedInfo info(this);
 	info.m_inputSize = GetInputSize();
 	info.m_outputSize = GetOutputSize();
 	return info;

@@ -365,7 +365,7 @@ void TestVulkanStuff()
 	//		ndBrainUniformBuffer& uniforms,
 	//		ndBrainFloatBuffer& weights, 
 	//		ndBrainFloatBuffer& imputOutputs)
-	//		:ndBrainGpuCommand(context, ndCommandShareInfo())
+	//		:ndBrainGpuCommand(context, ndCommandSharedInfo())
 	//	{
 	//		ndAssert(0);
 	//		//ndFixSizeArray<ndBrainBuffer*, 4> params;
