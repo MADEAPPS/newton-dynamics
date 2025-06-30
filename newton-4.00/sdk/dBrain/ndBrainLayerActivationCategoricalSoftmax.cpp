@@ -84,9 +84,6 @@ void ndBrainLayerActivationCategoricalSoftmax::InputDerivative(const ndBrainVect
 
 void ndBrainLayerActivationCategoricalSoftmax::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
-	//const ndCommandSharedInfo* const info = &command->m_info;
-	//const ndBrainTrainerCpu* const trainer = (ndBrainTrainerCpu*)command->m_owner;
-
 	const ndBrainBufferCommandDesc& desc = command->GetDescriptor();
 	const ndCommandSharedInfo& info = desc.m_info;
 	ndBrainTrainer* const trainer = (ndBrainTrainer*)desc.m_owner;
@@ -119,32 +116,32 @@ ndBrainBufferCommand* ndBrainLayerActivationCategoricalSoftmax::CreateGpuBackPro
 	ndBrainFloatBuffer* const inputOutputGradients,
 	ndBrainFloatBuffer* const weightsAndBiasGradients) const
 {
+	ndBrainBufferCommandDesc descriptor(miniBatchSize);
+	descriptor.m_id = size_t(this);
+	descriptor.m_context = context;
+	descriptor.m_owner = owner;
+	descriptor.m_info = info;
+	descriptor.m_uniformBuffer = uniformBuffer;
+
+	descriptor.PushBack((ndBrainUniformBuffer*)*uniformBuffer);
+	descriptor.PushBack(inputOutputData);
+	descriptor.PushBack(weightsAndBias);
+	descriptor.PushBack(inputOutputGradients);
+	descriptor.PushBack(weightsAndBiasGradients);
+
 	if (context->GetAsCpuContext())
 	{
-		ndBrainBufferCommandDesc descriptor(miniBatchSize);
-		descriptor.m_id = size_t(this);
-		descriptor.m_context = context;
-		descriptor.m_owner = owner;
-		descriptor.m_info = info;
-		descriptor.m_uniformBuffer = uniformBuffer;
-
-		descriptor.PushBack((ndBrainUniformBuffer*)*uniformBuffer);
-		descriptor.PushBack(inputOutputData);
-		descriptor.PushBack(weightsAndBias);
-		descriptor.PushBack(inputOutputGradients);
-		descriptor.PushBack(weightsAndBiasGradients);
-
 		ndBrainBufferCommand* const command = new ndBrainLayerBackPropagateCpuCommand(descriptor, (ndBrainLayer*)this);
 		return command;
 	}
 	else
 	{
-		ndAssert(0);
+		descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerCathegoricalSoftmaxBackPropagate;
 		//ndBrainBufferCommand* const command = new ndBrainTrainerGpuCommand(
 		//	owner, info, size_t(this), context, context->m_brainLayerCathegoricalSoftmaxBackPropagate, 
 		//	miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias, inputOutputGradients, weightsAndBiasGradients);
-		//return command;
-		return nullptr;
+		ndBrainBufferCommand* const command = new ndBrainGpuCommand(descriptor);
+		return command;
 	}
 }
 
