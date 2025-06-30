@@ -38,6 +38,7 @@ class ndBrainContext : public ndClassAlloc
 	virtual void SyncBufferCommandQueue() = 0;
 	virtual void SubmitBufferCommand(ndBrainBufferCommand* const command) = 0;
 
+	virtual void BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVector& dstVector) = 0;
 	virtual void BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector) = 0;
 
 	virtual void MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, const void* const srcMemory) const = 0;

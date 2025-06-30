@@ -21,9 +21,10 @@ class ndBrainGpuBuffer : public ndClassAlloc
 	ndBrainGpuBuffer(const ndBrainBuffer* const owner, bool memoryMapped);
 
 	const ndBrainBuffer* m_owner;
-	ndArray<ndUnsigned8> m_memory;
+	ndArray<ndInt8> m_memory;
 
 	friend class ndBrainBuffer;
+	friend class ndBrainGpuContext;
 };
 
 #endif

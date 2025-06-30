@@ -54,6 +54,7 @@ class ndBrainBuffer : public ndContainersFreeListAlloc<ndBrainBuffer>
 	ndSharedPtr<ndBrainGpuBuffer> m_gpuBuffer;
 	size_t m_sizeInBytes;
 	bool m_isMemoryMapped;
+	friend class ndBrainGpuContext;
 };
 
 #endif

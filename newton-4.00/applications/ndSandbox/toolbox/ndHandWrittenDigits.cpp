@@ -427,12 +427,14 @@ static void MnistTrainingSet()
 
 		brain->InitWeights();
 
-		bool deviceType = brain->IsGpuReady();
+		bool isGpuReady = brain->IsGpuReady();
 #ifdef MINIST_USE_CPU_TRANNING
-		deviceType = false;
+		isGpuReady = false;
+#else
+		ndAssert(isGpuReady);
 #endif
 
-		ndSharedPtr<ndBrainContext> context(deviceType ? ndSharedPtr<ndBrainContext>(new ndBrainGpuContext) : ndSharedPtr<ndBrainContext>(new ndBrainCpuContext));
+		ndSharedPtr<ndBrainContext> context(isGpuReady ? ndSharedPtr<ndBrainContext>(new ndBrainGpuContext) : ndSharedPtr<ndBrainContext>(new ndBrainCpuContext));
 		SupervisedTrainer optimizer(context, brain);
 
 		optimizer.m_testData = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*context, **testDigits));

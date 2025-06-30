@@ -25,6 +25,7 @@ class ndBrainCpuContext : public ndBrainContext, public ndBrainThreadPool
 	virtual ndBrainCpuContext* GetAsCpuContext() override;
 	virtual void SubmitBufferCommand(ndBrainBufferCommand* const command) override;
 
+	virtual void BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVector& dstVector) override;
 	virtual void BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector) override;
 
 	virtual void MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, const void* const srcMemory) const override;

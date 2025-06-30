@@ -42,10 +42,19 @@ void ndBrainCpuContext::SyncBufferCommandQueue()
 
 void ndBrainCpuContext::BrainVectorToDevice(ndBrainFloatBuffer& buffer, const ndBrainVector& srcVector)
 {
-	ndInt64 size = ndMin(srcVector.GetCount(), buffer.m_buffer->GetCount());
-	ndBrainMemVector src(&srcVector[0], size);
-	ndBrainMemVector dst(&(**buffer.m_buffer)[0], size);
-	dst.Set(src);
+	//ndInt64 size = ndMin(srcVector.GetCount(), buffer.m_buffer->GetCount());
+	//ndBrainMemVector src(&srcVector[0], size);
+	//ndBrainMemVector dst(&(**buffer.m_buffer)[0], size);
+	//dst.Set(src);
+	size_t sizeInBytes = ndMin(size_t(buffer.SizeInBytes()), size_t(srcVector.GetCount() * sizeof(ndReal)));
+	MemoryToDevice(buffer, 0, sizeInBytes, &srcVector[0]);
+}
+
+void ndBrainCpuContext::BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVector& dstVector)
+{
+	ndAssert(0);
+	size_t sizeInBytes = ndMin(size_t(src.SizeInBytes()), size_t(dstVector.GetCount() * sizeof(ndReal)));
+	MemoryFromDevice(src, 0, sizeInBytes, &dstVector[0]);
 }
 
 void ndBrainCpuContext::CopyBufferIndirect(const ndBrainUniformBuffer& parameterBuffer, const ndBrainIntegerBuffer& indexBuffer, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)

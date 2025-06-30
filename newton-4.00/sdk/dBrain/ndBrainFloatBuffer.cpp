@@ -69,6 +69,7 @@ void* ndBrainFloatBuffer::GetCpuPtr()
 		ndBrainVector& dst = **m_buffer;
 		return &dst[0];
 	}
+	ndAssert(0);
 	return nullptr;
 }
 

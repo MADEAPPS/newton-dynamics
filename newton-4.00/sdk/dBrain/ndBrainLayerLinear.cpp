@@ -428,17 +428,16 @@ ndCommandShareInfo ndBrainLayerLinear::GetCpuCommandSharedInfo() const
 
 ndCommandShareInfo ndBrainLayerLinear::GetGpuCommandSharedInfo() const
 {
-	ndAssert(0);
 	ndCommandShareInfo info(this);
-
-	ndInt32 width;
-	ndInt32 height;
 
 	ndInt32 rows = m_weights.GetRows();
 	ndInt32 columns = m_weights.GetColumns();
 
 	info.m_outputSize = rows;
 	info.m_inputSize = columns;
+
+	ndInt32 width;
+	ndInt32 height;
 	CalculateRoundedSize(width, height);
 	info.m_parametersBatchSize = width * height + GetOutputSize();
 	return info;

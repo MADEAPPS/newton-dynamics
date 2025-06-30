@@ -10,10 +10,15 @@
 */
 
 #include "ndBrainStdafx.h"
+#include "ndBrainVector.h"
 #include "ndBrainKernel.h"
+#include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuCommand.h"
 #include "ndBrainGpuContext.h"
+#include "ndBrainFloatBuffer.h"
 #include "ndBrainUniformBuffer.h"
+#include "ndBrainIntegerBuffer.h"
+#include "ndBrainBufferCommand.h"
 
 ndBrainGpuContext::ndBrainGpuContext()
 	:ndBrainContext()
@@ -63,6 +68,18 @@ ndBrainGpuContext* ndBrainGpuContext::GetAsGpuContext()
 void ndBrainGpuContext::BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector)
 {
 	ndAssert(0);
+	//ndInt64 sizeInBytes = ndMin(ndInt64(dst.SizeInBytes()), ndInt64(srcVector.GetCount() * sizeof(ndReal)));
+	//MemoryToDevice(dst, 0, sizeInBytes, &srcVector[0]);
+}
+
+void ndBrainGpuContext::BrainVectorFromDevice(ndBrainFloatBuffer& deviceBuffer, ndBrainVector& dstVector)
+{
+	ndAssert(0);
+	//ndSharedPtr<ndBrainGpuBuffer>& gpuBuffer = deviceBuffer.m_gpuBuffer;
+	//ndInt8* const dst = &gpuBuffer->m_memory[0];
+	//
+	//size_t sizeInBytes = ndMin(size_t(deviceBuffer.SizeInBytes()), size_t(dstVector.GetCount() * sizeof(ndReal)));
+	//MemoryFromDevice(deviceBuffer, 0, sizeInBytes, &dstVector[0]);
 }
 
 void ndBrainGpuContext::CopyBufferIndirect(const ndBrainUniformBuffer& parameterBuffer, const ndBrainIntegerBuffer& indexBuffer, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
@@ -80,9 +97,12 @@ void ndBrainGpuContext::MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size
 	ndAssert(0);
 }
 
-void ndBrainGpuContext::MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, const void* const srcMemory) const
+void ndBrainGpuContext::MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, const void* const inputMemory) const
 {
-	ndAssert(0);
+	ndSharedPtr<ndBrainGpuBuffer>& gpuBuffer = deviceBuffer.m_gpuBuffer;
+	ndInt8* const dst = &gpuBuffer->m_memory[0];
+	ndAssert(dst);
+	ndMemCpy(&dst[offsetInBytes], (ndInt8*)inputMemory, ndInt64(sizeInBytes));
 }
 
 void ndBrainGpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)

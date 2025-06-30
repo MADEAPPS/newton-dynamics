@@ -11,6 +11,9 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainContext.h"
+#include "ndBrainFloatBuffer.h"
+#include "ndBrainUniformBuffer.h"
+#include "ndBrainIntegerBuffer.h"
 #include "ndBrainBufferCommand.h"
 
 ndBrainBufferCommandDesc::ndBrainBufferCommandDesc(ndInt32 minibatchSize)
