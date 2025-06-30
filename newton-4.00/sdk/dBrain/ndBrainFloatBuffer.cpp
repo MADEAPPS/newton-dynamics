@@ -164,6 +164,11 @@ void ndBrainFloatBuffer::CopyBufferIndirect(const ndBrainUniformBuffer& paramete
 	m_context->CopyBufferIndirect(parameterBuffer, indexBuffer, *this, srcBuffer);
 }
 
+void ndBrainFloatBuffer::CopyBuffer(const ndBrainUniformBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer)
+{
+	m_context->CopyBuffer(parameterBuffer, workGroupCount, *this, srcBuffer);
+}
+
 void ndBrainFloatBuffer::MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
 {
 	m_context->MemoryFromDevice(*this, offsetInBytes, sizeInBytes, outputMemory);

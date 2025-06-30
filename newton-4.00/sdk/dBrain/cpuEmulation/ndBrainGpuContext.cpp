@@ -70,6 +70,11 @@ void ndBrainGpuContext::CopyBufferIndirect(const ndBrainUniformBuffer& parameter
 	ndAssert(0);
 }
 
+void ndBrainGpuContext::CopyBuffer(const ndBrainUniformBuffer& parameterBuffer, ndInt32 numberOfWorkGrups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
+{
+	ndAssert(0);
+}
+
 void ndBrainGpuContext::MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
 {
 	ndAssert(0);

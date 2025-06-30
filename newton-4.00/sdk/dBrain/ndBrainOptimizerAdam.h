@@ -44,7 +44,6 @@ class ndBrainOptimizerAdam : public ndBrainOptimizer
 			,m_invBeta(ndBrainFloat(1.0f)/ (ndBrainFloat(1.0f) - m_beta))
 			,m_invAlpha(ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) - m_alpha))
 			,m_decayRegularizer(ndBrainFloat(1.0e-4f))
-			//,m_parametersSize(0)
 		{
 		}
 
@@ -61,7 +60,6 @@ class ndBrainOptimizerAdam : public ndBrainOptimizer
 
 	ndBrainOptimizerAdam(const ndSharedPtr<ndBrainContext>& context);
 
-	// lageavy
 	virtual void Update(ndBrainVector& parameters, const ndBrainVector& gradients) override;
 
 	// new system

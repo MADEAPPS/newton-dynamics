@@ -77,6 +77,30 @@ void ndBrainCpuContext::CopyBufferIndirect(const ndBrainUniformBuffer& parameter
 	}
 }
 
+void ndBrainCpuContext::CopyBuffer(const ndBrainUniformBuffer& parameterBuffer, ndInt32 numberOfWorkGroups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
+{
+	const ndFixSizeArray<ndUnsigned32, 256>& bufferData = **parameterBuffer.m_data;
+	const ndCopyBufferCommandInfo& data = *((ndCopyBufferCommandInfo*)&bufferData[0]);
+	ndInt32 stride = ndInt32(data.m_strideInByte);
+	ndInt32 srcStride = ndInt32(data.m_srcStrideInByte);
+	ndInt32 srcOffset = ndInt32(data.m_srcOffsetInByte);
+	ndInt32 dstStride = ndInt32(data.m_dstStrideInByte);
+	ndInt32 dstOffset = ndInt32(data.m_dstOffsetInByte);
+
+	ndAssert(stride <= srcStride);
+	ndAssert(stride <= dstStride);
+
+	ndUnsigned8* const dst = (ndUnsigned8*)dstData.GetCpuPtr();
+	const ndUnsigned8* const src = (ndUnsigned8*)srcData.GetCpuPtr();
+	ndAssert(dst);
+	ndAssert(src);
+
+	for (ndInt32 i = 0; i < numberOfWorkGroups; ++i)
+	{
+		ndMemCpy(&dst[i * dstStride + dstOffset], &src[i * srcStride + srcOffset], stride);
+	}
+}
+
 void ndBrainCpuContext::MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
 {
 	const ndInt8* const src = (ndInt8*)deviceBuffer.GetCpuPtr();
