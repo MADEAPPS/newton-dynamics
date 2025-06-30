@@ -51,3 +51,8 @@ ndBrainGpuBuffer::ndBrainGpuBuffer(const ndBrainBuffer* const owner, bool)
 {
 	m_memory.SetCount(ndInt64(m_owner->SizeInBytes()));
 }
+
+void* ndBrainGpuBuffer::GetPtr()
+{
+	return &m_memory[0];
+}

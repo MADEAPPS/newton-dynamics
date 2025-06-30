@@ -48,6 +48,7 @@ class ndBrainBuffer : public ndContainersFreeListAlloc<ndBrainBuffer>
 
 	virtual void* GetCpuPtr() = 0;
 	virtual void* GetCpuPtr() const = 0;
+	ndBrainGpuBuffer* GetGpuBuffer();
 
 	protected:
 	ndBrainContext* m_context;

@@ -25,7 +25,7 @@ ndBrainGpuContext::ndBrainGpuContext()
 	,ndBrainThreadPool()
 {
 	ndInt32 numOfThreads = (ndBrainThreadPool::GetMaxThreads() + 1) / 2;
-//numOfThreads = 1;
+numOfThreads = 1;
 	SetThreadCount(numOfThreads);
 	CreateKerners();
 }
@@ -136,29 +136,30 @@ void ndBrainGpuContext::MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offse
 
 void ndBrainGpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
 {
-	ndAssert(0);
+	//ndBrainGpuShader& shader = **command->m_shader;
+	ndBrainBufferCommandDesc& desc = command->GetDescriptor();
+	ndBrainKernel& shader = **desc.m_kernel;
 
-	//ndAtomic<ndInt32> iterator(0);
-//ndBrainGpuShader& shader = **command->m_shader;
-//shader.m_parameters.SetCount(0);
-//for (ndInt32 i = 0; i < ndInt32 (command->m_parameters.GetCount()); ++i)
-//{
-//	shader.m_parameters.PushBack(command->m_parameters[i]);
-//}
-//
-//auto ExecuteCommand = ndMakeObject::ndFunction([this, &iterator, &command](ndInt32, ndInt32)
-//{
-//	ndInt32 workGroupdSize = ndInt32(command->m_workGroupSize);
-//	ndInt32 numberOfWorkGrouds = ndInt32(command->m_numberOfWorkGroups);
-//	
-//	ndBrainGpuShader& kernel = **command->m_shader;
-//	for (ndInt32 i = iterator++; i < numberOfWorkGrouds; i = iterator++)
-//	{
-//		kernel.Execute(i, workGroupdSize);
-//	}
-//});
-//iterator = 0;
-//ParallelExecute(ExecuteCommand);
+	shader.m_parameters.SetCount(0);
+	for (ndInt32 i = 0; i < ndInt32 (desc.GetCount()); ++i)
+	{
+		shader.m_parameters.PushBack(desc[i]);
+	}
+
+	ndAtomic<ndInt32> iterator(0);
+	auto ExecuteCommand = ndMakeObject::ndFunction([this, &iterator, &command](ndInt32, ndInt32)
+	{
+		ndBrainBufferCommandDesc& desc = command->GetDescriptor();
+		ndInt32 workGroupdSize = ndInt32(desc.m_workGroupSize);
+		ndInt32 numberOfWorkGrouds = ndInt32(desc.m_miniBatchSize);
+
+		ndBrainKernel& shader = **desc.m_kernel;
+		for (ndInt32 i = iterator++; i < numberOfWorkGrouds; i = iterator++)
+		{
+			shader.Execute(i, workGroupdSize);
+		}
+	});
+	ParallelExecute(ExecuteCommand);
 }
 
 void ndBrainGpuContext::SyncBufferCommandQueue()

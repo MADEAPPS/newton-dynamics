@@ -18,6 +18,10 @@ class ndBrainContext;
 
 class ndBrainGpuBuffer : public ndClassAlloc
 {
+	public:
+	void* GetPtr();
+
+	private:
 	ndBrainGpuBuffer(const ndBrainBuffer* const owner, bool memoryMapped);
 
 	const ndBrainBuffer* m_owner;

@@ -34,3 +34,8 @@ size_t ndBrainBuffer::SizeInBytes() const
 { 
 	return m_sizeInBytes; 
 }
+
+ndBrainGpuBuffer* ndBrainBuffer::GetGpuBuffer()
+{
+	return *m_gpuBuffer;
+}
