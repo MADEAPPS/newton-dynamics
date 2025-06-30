@@ -176,6 +176,7 @@ ndBrainBufferCommand* ndBrainLayerLinearWithDropOut::CreateGpuFeedForwardCommand
 		descriptor.m_info = info;
 		descriptor.m_uniformBuffer = uniformBuffer;
 
+		descriptor.PushBack((ndBrainUniformBuffer*)*uniformBuffer);
 		descriptor.PushBack(inputOutputData);
 		descriptor.PushBack(weightsAndBias);
 
@@ -211,6 +212,7 @@ ndBrainBufferCommand* ndBrainLayerLinearWithDropOut::CreateGpuBackPropagateComma
 		descriptor.m_info = info;
 		descriptor.m_uniformBuffer = uniformBuffer;
 
+		descriptor.PushBack((ndBrainUniformBuffer*)*uniformBuffer);
 		descriptor.PushBack(inputOutputData);
 		descriptor.PushBack(weightsAndBias);
 		descriptor.PushBack(inputOutputGradients);

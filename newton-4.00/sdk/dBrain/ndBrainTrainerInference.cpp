@@ -344,6 +344,7 @@ void ndBrainTrainerInference::AddCopyInputCommand(const ndCommandShareInfo& unif
 	descritor.m_id = m_inputId;
 	descritor.m_info = uniformParam;
 	descritor.m_uniformBuffer = uniformbuffer;
+	descritor.PushBack(*uniformbuffer);
 	descritor.PushBack(inputOutputBuffer);
 	descritor.PushBack(miniBatchInputBuffer);
 
@@ -403,6 +404,7 @@ void ndBrainTrainerInference::AddCopyOutputCommand()
 	descritor.m_id = m_outpuId;
 	descritor.m_info = uniformParam;
 	descritor.m_uniformBuffer = uniformbuffer;
+	descritor.PushBack(*uniformbuffer);
 	descritor.PushBack(inputOutputBuffer);
 	descritor.PushBack(miniBatchOutputBuffer);
 	

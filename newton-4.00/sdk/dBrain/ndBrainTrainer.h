@@ -64,7 +64,7 @@ class ndBrainTrainer: public ndBrainTrainerInference
 	ndSharedPtr<ndBrainFloatBuffer> m_miniBatchOutputGradientBuffer;
 
 	ndList<ndSharedPtr<ndBrainBufferCommand>> m_backPropagateCommands;
-	ndList<ndSharedPtr<ndBrainBufferCommand>> m_accumulateGradientsCommands;
+	ndList<ndSharedPtr<ndBrainBufferCommand>> m_optimizerBufferCommands;
 };
 
 #endif 
