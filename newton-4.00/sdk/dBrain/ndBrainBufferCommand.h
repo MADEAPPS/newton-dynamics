@@ -14,6 +14,7 @@
 #include "ndBrainStdafx.h"
 
 class ndBrainLayer;
+class ndBrainKernel;
 class ndBrainBuffer;
 class ndBrainContext;
 class ndBrainUniformBuffer;
@@ -64,6 +65,7 @@ class ndBrainBufferCommandDesc : public ndFixSizeArray<ndBrainBuffer*, 16>
 	ndBrainContext* m_context;
 	ndBrainTrainerInference* m_owner;
 	ndCommandSharedInfo m_info;
+	ndSharedPtr<ndBrainKernel> m_kernel;
 	ndSharedPtr<ndBrainUniformBuffer> m_uniformBuffer;
 	size_t m_id;
 	ndInt32 m_miniBatchSize;
