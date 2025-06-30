@@ -12,7 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndTestDeepBrain.h"
 
-//#define MINIST_USE_CPU_TRANNING
+#define MINIST_USE_CPU_TRANNING
  
 //#define MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
 
