@@ -30,6 +30,10 @@ ndBrainBufferCommand::ndBrainBufferCommand(const ndBrainBufferCommandDesc& desc)
 {
 }
 
+ndBrainBufferCommand::~ndBrainBufferCommand()
+{
+}
+
 ndBrainBufferCommandDesc& ndBrainBufferCommand::GetDescriptor()
 {
 	return m_desc;

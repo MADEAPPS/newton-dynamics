@@ -74,6 +74,7 @@ class ndBrainBufferCommand : public ndContainersFreeListAlloc<ndBrainBufferComma
 {
 	public:
 	ndBrainBufferCommand(const ndBrainBufferCommandDesc& desc);
+	virtual ~ndBrainBufferCommand();
 	
 	ndBrainBufferCommandDesc& GetDescriptor();
 	const ndBrainBufferCommandDesc& GetDescriptor() const;
