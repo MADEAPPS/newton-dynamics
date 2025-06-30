@@ -26,6 +26,9 @@
 #include "ndBrainVector.h"
 #include "ndBrainMatrix.h"
 #include "ndBrainBuffer.h"
+#include "ndBrainGpuCommand.h"
+#include "ndBrainCpuContext.h"
+#include "ndBrainGpuContext.h"
 #include "ndBrainLayerLinear.h"
 #include "ndBrainFloatBuffer.h"
 #include "ndBrainUniformBuffer.h"
@@ -378,7 +381,9 @@ void ndBrainTrainerInference::AddCopyInputCommand(const ndCommandSharedInfo& uni
 	}
 	else
 	{
-		ndAssert(0);
+		descritor.m_kernel = descritor.m_context->GetAsGpuContext()->m_brainCopyInput;
+		ndSharedPtr<ndBrainBufferCommand>command(new ndBrainGpuCommand(descritor));
+		m_feedForwardCommands.Append(command);
 	}
 }
 

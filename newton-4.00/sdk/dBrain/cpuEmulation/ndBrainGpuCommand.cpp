@@ -55,3 +55,8 @@ ndBrainGpuCommand::ndBrainGpuCommand(const ndBrainBufferCommandDesc& desc)
 ndBrainGpuCommand::~ndBrainGpuCommand()
 {
 }
+
+void ndBrainGpuCommand::Execute(ndInt32 groupId)
+{
+	ndAssert(0);
+}

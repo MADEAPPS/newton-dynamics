@@ -23,6 +23,7 @@ class ndBrainCpuContext : public ndBrainContext, public ndBrainThreadPool
 
 	virtual void SyncBufferCommandQueue() override;
 	virtual ndBrainCpuContext* GetAsCpuContext() override;
+
 	virtual void SubmitBufferCommand(ndBrainBufferCommand* const command) override;
 
 	virtual void BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVector& dstVector) override;

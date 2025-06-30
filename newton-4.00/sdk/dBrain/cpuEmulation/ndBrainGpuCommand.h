@@ -53,7 +53,7 @@ class ndBrainGpuCommand : public ndBrainBufferCommand
 	ndBrainGpuCommand(const ndBrainBufferCommandDesc& desc);
 	virtual ~ndBrainGpuCommand();
 
-	virtual void Execute(ndInt32 miniBatchIndex) = 0;
+	virtual void Execute(ndInt32 groupId);
 };
 
 

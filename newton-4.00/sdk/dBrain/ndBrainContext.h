@@ -17,6 +17,7 @@ class ndBrainBuffer;
 class ndBrainVector;
 class ndBrainContext;
 class ndBrainCpuContext;
+class ndBrainGpuContext;
 class ndBrainFloatBuffer;
 class ndBrainUniformBuffer;
 class ndBrainIntegerBuffer;
@@ -30,7 +31,7 @@ class ndBrainContext : public ndClassAlloc
 	ndBrainContext();
 	virtual ~ndBrainContext();
 
-	virtual ndBrainContext* GetAsGpuContext();
+	virtual ndBrainGpuContext* GetAsGpuContext();
 	virtual ndBrainCpuContext* GetAsCpuContext();
 
 	static bool HasGpuSupport() { ndAssert(0); return true;}

@@ -565,23 +565,21 @@ ndBrainBufferCommand* ndBrainLayerLinear::CreateGpuFeedForwardCommand(
 	}
 	else
 	{
-		ndAssert(0);
-		//ndAssert(info.m_parametersBatchSize);
-		//ndAssert((miniBatchSize % ND_GPU_TILED_MATRIX_ROWS) == 0);
-		//
-		//ndInt32 width;
-		//ndInt32 height;
-		//CalculateRoundedSize(width, height);
-		//
-		//ndInt32 blockRows = height / ND_GPU_TILED_MATRIX_ROWS;
-		//ndInt32 blockColums = miniBatchSize / ND_GPU_TILED_MATRIX_ROWS;
-		//
-		//miniBatchSize = blockRows * blockColums;
-		//ndCommandSharedInfo newInfo(info);
-		//uniformBuffer->MemoryFromDevice(0, sizeof(ndCommandSharedInfo), &newInfo);
-		//
-		//newInfo.m_tiledStride = blockRows;
-		//uniformBuffer->MemoryToDevice(0, sizeof(ndCommandSharedInfo), &newInfo);
+		ndAssert(info.m_parametersBatchSize);
+		ndAssert((miniBatchSize % ND_GPU_TILED_MATRIX_ROWS) == 0);
+		
+		ndInt32 width;
+		ndInt32 height;
+		CalculateRoundedSize(width, height);
+		
+		ndInt32 blockRows = height / ND_GPU_TILED_MATRIX_ROWS;
+		ndInt32 blockColums = miniBatchSize / ND_GPU_TILED_MATRIX_ROWS;
+		
+		miniBatchSize = blockRows * blockColums;
+		ndCommandSharedInfo newInfo(info);
+		uniformBuffer->MemoryFromDevice(0, sizeof(ndCommandSharedInfo), &newInfo);
+		newInfo.m_tiledStride = blockRows;
+		uniformBuffer->MemoryToDevice(0, sizeof(ndCommandSharedInfo), &newInfo);
 
 		//ndBrainBufferCommand* const command = new ndBrainTrainerGpuCommand(
 		//	owner, newInfo, size_t(this), context, context->m_brainLayerMatrixMatrixMultiply, miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias);
