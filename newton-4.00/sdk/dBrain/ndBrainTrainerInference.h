@@ -90,7 +90,9 @@ class ndBrainTrainerInference : public ndClassAlloc
 	{
 		m_inputId = 7,
 		m_outpuId,
-		m_adamOptimizer,
+		m_adamOptimizerSum,
+		m_adamOptimizerUpdate,
+		m_adamOptimizerMomentum,
 	};
 
 	void AddCopyOutputCommand();
