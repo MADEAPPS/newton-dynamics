@@ -408,7 +408,7 @@ void ndBrainTrainer::AddOptimizerGradientCommand()
 			updateGradientDescritor.m_context = *m_descriptor.m_context;
 			updateGradientDescritor.m_owner = this;
 			updateGradientDescritor.m_id = m_adamOptimizer;
-			updateGradientDescritor.m_info = data;
+			//updateGradientDescritor.m_info = data;
 			updateGradientDescritor.m_uniformBuffer = adamUniformbuffer;
 			updateGradientDescritor.m_miniBatchSize = ndInt32(sizeInFloats / updateGradientDescritor.m_workGroupSize);
 
@@ -500,17 +500,18 @@ void ndBrainTrainer::AddOptimizerGradientCommand()
 
 			virtual void Execute(ndInt32) override
 			{
-				ndAssert(0);
-				//const ndCommandShareInfo& info = m_desc.m_info;
-				//ndBrainTrainer* const owner = (ndBrainTrainer*)m_desc.m_owner;
-				//
-				//ndBrainFloat* const dstPtr = (ndBrainFloat*)owner->m_inputOutputGradientsBuffer->GetCpuPtr();
-				//const ndBrainFloat* const srcPtr = (ndBrainFloat*)owner->m_miniBatchOutputGradientBuffer->GetCpuPtr();
-				//
-				//ndInt32 destOffset = miniBatchIndex * info.m_inputOutputSize;
-				//const ndBrainMemVector src(&srcPtr[miniBatchIndex * info.m_outputSize], info.m_outputSize);
-				//ndBrainMemVector dst(&dstPtr[destOffset + info.m_inputOutputStartOffset], info.m_outputSize);
-				//dst.Set(src);
+				ndBrainOptimizerAdam::ndCommandShareInfo* const parameters = (ndBrainOptimizerAdam::ndCommandShareInfo*)m_desc[0]->GetCpuPtr();
+
+				parameters->m_betaAcc *= parameters->m_beta;
+				parameters->m_alphaAcc *= parameters->m_alpha;
+				if (parameters->m_betaAcc < ndBrainFloat(1.0e-7f))
+				{
+					parameters->m_betaAcc = ndBrainFloat(0.0f);
+				}
+				if (parameters->m_alphaAcc < ndBrainFloat(1.0e-7f))
+				{
+					parameters->m_alphaAcc = ndBrainFloat(0.0f);
+				}
 			}
 		};
 
@@ -518,12 +519,10 @@ void ndBrainTrainer::AddOptimizerGradientCommand()
 		momentumUpdateDescritor.m_context = *m_descriptor.m_context;
 		momentumUpdateDescritor.m_owner = this;
 		momentumUpdateDescritor.m_id = m_adamOptimizer;
-		momentumUpdateDescritor.m_info = data;
-		momentumUpdateDescritor.m_uniformBuffer = uniformbuffer;
-		momentumUpdateDescritor.m_miniBatchSize = ndInt32(sizeInFloats / descritor.m_workGroupSize);
-		momentumUpdateDescritor.PushBack(*uniformbuffer);
-		//descritor.PushBack(miniBatchOutputGradientBuffer);
-		//descritor.PushBack(inputOutputGradientBuffer);
+		//momentumUpdateDescritor.m_info = data;
+		momentumUpdateDescritor.m_uniformBuffer = adamUniformbuffer;
+		momentumUpdateDescritor.m_miniBatchSize = 1;
+		momentumUpdateDescritor.PushBack(*adamUniformbuffer);
 
 		// add the momentum update command
 		//m_adamMomentumUpdate = ndSharedPtr<ndBrainBufferCommand>(new ndBrainAdamUpdateCommand(
@@ -537,61 +536,6 @@ void ndBrainTrainer::AddOptimizerGradientCommand()
 	{
 		ndAssert(0);
 	}
-
-	//ndBrainFloatBuffer* const weightAndBiasGradientsBuffer = *m_weightAndBiasGradientsBuffer;
-	//// add the adam optimizer kernel here
-	//ndBrainOptimizerAdam::ndCommandShareInfo optimizerData(m_optimizer->m_parameters);
-	//ndSharedPtr<ndBrainUniformBuffer> adamUniformbuffer(new ndBrainUniformBuffer(*m_descriptor.m_context, sizeof(ndBrainOptimizerAdam::ndCommandShareInfo), &optimizerData));
-	//
-	//if (m_optimizer->GetRegularizerType() != m_lasso)
-	//{
-	//	class ndBrainAdamUpdateParametersRidge : public ndBrainBufferCommandCpu
-	//	{
-	//		public:
-	//		ndBrainAdamUpdateParametersRidge(const ndBrainBufferCommandDesc& desc)
-	//			:ndBrainBufferCommandCpu(desc)
-	//		{
-	//		}
-	//
-	//		virtual void Execute(ndInt32 miniBatchIndex) override
-	//		{
-	//			ndAssert(0);
-	//			//const ndCommandShareInfo& info = m_desc.m_info;
-	//			//ndBrainTrainer* const owner = (ndBrainTrainer*)m_desc.m_owner;
-	//			//
-	//			//ndBrainFloat* const dstPtr = (ndBrainFloat*)owner->m_inputOutputGradientsBuffer->GetCpuPtr();
-	//			//const ndBrainFloat* const srcPtr = (ndBrainFloat*)owner->m_miniBatchOutputGradientBuffer->GetCpuPtr();
-	//			//
-	//			//ndInt32 destOffset = miniBatchIndex * info.m_inputOutputSize;
-	//			//const ndBrainMemVector src(&srcPtr[miniBatchIndex * info.m_outputSize], info.m_outputSize);
-	//			//ndBrainMemVector dst(&dstPtr[destOffset + info.m_inputOutputStartOffset], info.m_outputSize);
-	//			//dst.Set(src);
-	//		}
-	//	};
-	//
-	//	//m_adamOtimizerUpdate = ndSharedPtr<ndBrainBufferCommand>(new ndBrainAdamUpdateCommand(
-	//	//	this, m_context->GetAsGpuContext(), m_context->GetAsGpuContext()->m_brainAdamRidgeOptimizerUpdate, m_miniBatchSize, optimizerData,
-	//	//	adamUniformbuffer, m_weightAndBiasBuffer, m_weightAndBiasGradientsBuffer,
-	//	//	m_optimizer->m_vdw, m_optimizer->m_vdw2));
-	//}
-	//else
-	//{
-	//	ndAssert(0);
-	//	//m_adamOtimizerUpdate = ndSharedPtr<ndBrainBufferCommand>(new ndBrainAdamUpdateCommand(
-	//	//	this, m_context->GetAsGpuContext(), m_context->GetAsGpuContext()->m_brainAdamLassoOptimizerUpdate, m_miniBatchSize, optimizerData,
-	//	//	adamUniformbuffer, m_weightAndBiasBuffer, m_weightAndBiasGradientsBuffer,
-	//	//	m_optimizer->m_vdw, m_optimizer->m_vdw2));
-	//}
-	//
-	//#if 0		
-	//	const ndSharedPtr<ndBrainBufferCommand>& gradientsData = m_optimizerBufferCommands.GetFirst()->GetInfo();
-	//	m_adamOtimizerUpdate->m_numberOfWorkGroups = size_t(sizeInFloats / gradientsData->m_workGroupSize);
-	//
-	//	// add the momentum update command
-	//	m_adamMomentumUpdate = ndSharedPtr<ndBrainBufferCommand>(new ndBrainAdamUpdateCommand(
-	//		this, m_context->GetAsGpuContext(), m_context->GetAsGpuContext()->m_brainAdamMomentumUpdate, 1, optimizerData, adamUniformbuffer));
-	//	m_adamMomentumUpdate->m_numberOfWorkGroups = 1;
-	//#endif
 }
 
 void ndBrainTrainer::ApplyLearnRate()

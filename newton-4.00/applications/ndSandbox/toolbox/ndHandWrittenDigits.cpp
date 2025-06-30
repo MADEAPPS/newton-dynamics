@@ -172,9 +172,8 @@ static void MnistTrainingSet()
 			m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descritor));
 		}
 
-		ndInt32 ValidateData(ndSharedPtr<ndBrainBuffer>& parameters, ndBrainMatrix* const testLabels, const ndSharedPtr<ndBrainFloatBuffer>& data)
+		ndInt32 ValidateData(ndSharedPtr<ndBrainUniformBuffer>& parameters, ndBrainMatrix* const testLabels, const ndSharedPtr<ndBrainFloatBuffer>& data)
 		{
-			ndAssert(0);
 			return 0;
 			//ndBrainVector groundTruth;
 			//ndBrainVector miniBatchInput;
@@ -278,15 +277,15 @@ static void MnistTrainingSet()
 			ndBrainFloatBuffer* const minibatchOutpuBuffer = m_trainer->GetOuputBuffer();
 			ndBrainFloatBuffer* const minibatchOutpuGradientBuffer = m_trainer->GetOuputGradientBuffer();
 			
-			ndCopyBufferCommandInfo copyBufferIndirect;
-			copyBufferIndirect.m_dstOffsetInByte = 0;
-			copyBufferIndirect.m_srcOffsetInByte = 0;
-			copyBufferIndirect.m_strideInByte = ndInt32(strideInBytes);
-			copyBufferIndirect.m_srcStrideInByte = ndInt32(strideInBytes);
-			copyBufferIndirect.m_dstStrideInByte = ndInt32(strideInBytes);
+			ndCopyBufferCommandInfo copyBuffer;
+			copyBuffer.m_dstOffsetInByte = 0;
+			copyBuffer.m_srcOffsetInByte = 0;
+			copyBuffer.m_strideInByte = ndInt32(strideInBytes);
+			copyBuffer.m_srcStrideInByte = ndInt32(strideInBytes);
+			copyBuffer.m_dstStrideInByte = ndInt32(strideInBytes);
 			
-			ndSharedPtr<ndBrainUniformBuffer> parameterBuffer(ndSharedPtr<ndBrainUniformBuffer>(new ndBrainUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect, true)));
-			ndSharedPtr<ndBrainUniformBuffer> parameterBufferIndirect(ndSharedPtr<ndBrainUniformBuffer>(new ndBrainUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBufferIndirect, true)));
+			ndSharedPtr<ndBrainUniformBuffer> parameterBuffer(ndSharedPtr<ndBrainUniformBuffer>(new ndBrainUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBuffer, true)));
+			ndSharedPtr<ndBrainUniformBuffer> parameterBufferIndirect(ndSharedPtr<ndBrainUniformBuffer>(new ndBrainUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBuffer, true)));
 			
 			//ndCopyBufferCommandInfo copyBufferInfo;
 			//parameterBufferIndirect->MemoryFromDevice(0, sizeof(ndCopyBufferCommandInfo), &copyBufferInfo);
@@ -321,8 +320,8 @@ static void MnistTrainingSet()
 					trainer->ApplyLearnRate(); 
 					//trainer->GetContext()->SyncBufferCommandQueue(); // no need to sync here.
 				}
-				
-			//	ndInt64 testFailCount = ValidateData(parameterBuffer, testLabels, m_testData) + 1;
+
+				ndInt64 testFailCount = ValidateData(parameterBuffer, testLabels, m_testData) + 1;
 			//	if (testFailCount < m_minValidationFail)
 			//	{
 			//		//trainer->GetParameterBuffer(parametersBuffer);
@@ -460,18 +459,7 @@ static void MnistTrainingSet()
 		copyBufferInfo.m_strideInByte = ndInt32(strideInBytes);
 		copyBufferInfo.m_srcStrideInByte = ndInt32(strideInBytes);
 		copyBufferInfo.m_dstStrideInByte = ndInt32(strideInBytes);
-
-		ndSharedPtr<ndBrainBuffer> parameterBuffer;
-		ndAssert(0);
-		//if (context->GetAsGpuContext())
-		//{
-		//	parameterBuffer = ndSharedPtr<ndBrainBuffer>(new ndBrainUniformBuffer(*context, sizeof(ndCopyBufferCommandInfo), &copyBufferInfo));
-		//}
-		//else
-		//{
-		//	ndAssert(0);
-		//	//parameterBuffer = ndSharedPtr<ndBrainBuffer>(new ndBrainCpuUniformBuffer(*context, sizeof(ndCopyBufferCommandInfo), &copyBufferInfo));
-		//}
+		ndSharedPtr<ndBrainUniformBuffer> parameterBuffer(new ndBrainUniformBuffer(*context, sizeof(ndCopyBufferCommandInfo), &copyBufferInfo));
 
 		SupervisedTrainer inference(context, optimizer.m_bestBrain);
 		ndInt32 testFailCount = inference.ValidateData(parameterBuffer, *testLabels, optimizer.m_testData);
@@ -585,6 +573,6 @@ static void MnistTestSet()
 void ndHandWrittenDigits()
 {
 	ndSetRandSeed(53);
-	//MnistTrainingSet();
+	MnistTrainingSet();
 	//MnistTestSet();
 }
