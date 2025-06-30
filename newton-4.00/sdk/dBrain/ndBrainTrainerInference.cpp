@@ -404,17 +404,17 @@ void ndBrainTrainerInference::AddCopyOutputCommand()
 	ndBrainFloatBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
 	ndBrainFloatBuffer* const miniBatchOutputBuffer = *m_miniBatchOutputBuffer;
 	
-	ndBrainBufferCommandDesc descritor(m_descriptor.m_minibatchSize);
-	descritor.m_context = *m_descriptor.m_context;
-	descritor.m_owner = this;
-	descritor.m_id = m_outpuId;
-	descritor.m_info = uniformParam;
-	descritor.m_uniformBuffer = uniformbuffer;
-	descritor.PushBack(*uniformbuffer);
-	descritor.PushBack(inputOutputBuffer);
-	descritor.PushBack(miniBatchOutputBuffer);
+	ndBrainBufferCommandDesc descriptor(m_descriptor.m_minibatchSize);
+	descriptor.m_context = *m_descriptor.m_context;
+	descriptor.m_owner = this;
+	descriptor.m_id = m_outpuId;
+	descriptor.m_info = uniformParam;
+	descriptor.m_uniformBuffer = uniformbuffer;
+	descriptor.PushBack(*uniformbuffer);
+	descriptor.PushBack(inputOutputBuffer);
+	descriptor.PushBack(miniBatchOutputBuffer);
 	
-	if (descritor.m_context->GetAsCpuContext())
+	if (descriptor.m_context->GetAsCpuContext())
 	{
 		class ndCopyOutputCommandCpu : public ndBrainBufferCommandCpu
 		{
@@ -438,12 +438,14 @@ void ndBrainTrainerInference::AddCopyOutputCommand()
 			}
 		};
 
-		ndSharedPtr<ndBrainBufferCommand>command(new ndCopyOutputCommandCpu(descritor));
+		ndSharedPtr<ndBrainBufferCommand>command(new ndCopyOutputCommandCpu(descriptor));
 		m_feedForwardCommands.Append(command);
 	}
 	else
 	{
-		ndAssert(0);
+		descriptor.m_kernel = descriptor.m_context->GetAsGpuContext()->m_brainCopyOutput;
+		ndSharedPtr<ndBrainBufferCommand>command(new ndBrainGpuCommand(descriptor));
+		m_feedForwardCommands.Append(command);
 	}
 }
 

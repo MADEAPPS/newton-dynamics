@@ -152,9 +152,6 @@ void ndBrainLayerActivationTanh::FeedForward(const ndBrainLayerFeedForwardCpuCom
 
 void ndBrainLayerActivationTanh::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
-	//const ndCommandSharedInfo* const info = &command->m_info;
-	//const ndBrainTrainerCpu* const trainer = (ndBrainTrainerCpu*)command->m_owner;
-
 	const ndBrainBufferCommandDesc& desc = command->GetDescriptor();
 	const ndCommandSharedInfo& info = desc.m_info;
 	ndBrainTrainer* const trainer = (ndBrainTrainer*)desc.m_owner;
@@ -186,32 +183,30 @@ ndBrainBufferCommand* ndBrainLayerActivationTanh::CreateGpuFeedForwardCommand(
 	ndBrainFloatBuffer* const inputOutputData,
 	ndBrainFloatBuffer* const weightsAndBias) const
 {
+	ndBrainBufferCommandDesc descriptor(miniBatchSize);
+	descriptor.m_id = size_t(this);
+	descriptor.m_context = context;
+	descriptor.m_owner = owner;
+	descriptor.m_info = info;
+	descriptor.m_uniformBuffer = uniformBuffer;
+	descriptor.PushBack((ndBrainUniformBuffer*)*uniformBuffer);
+	descriptor.PushBack(inputOutputData);
+	descriptor.PushBack(weightsAndBias);
+
 	if (context->GetAsCpuContext())
 	{
-		ndBrainBufferCommandDesc descriptor(miniBatchSize);
-		descriptor.m_id = size_t(this);
-		descriptor.m_context = context;
-		descriptor.m_owner = owner;
-		descriptor.m_info = info;
-		descriptor.m_uniformBuffer = uniformBuffer;
-
-		descriptor.PushBack((ndBrainUniformBuffer*)*uniformBuffer);
-		descriptor.PushBack(inputOutputData);
-		descriptor.PushBack(weightsAndBias);
-
 		ndBrainBufferCommand* const command = new ndBrainLayerFeedForwardCpuCommand(descriptor, (ndBrainLayer*)this);
 		return command;
 	}
 	else
 	{
-		ndAssert(0);
+		descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerTanhActivation;
 		//ndBrainBufferCommand* const command = new ndBrainTrainerGpuCommand(owner,
 		//	info, size_t(this), context, context->m_brainLayerTanhActivation, miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias);
-		//return command;
-		return nullptr;
+		ndBrainBufferCommand* const command = new ndBrainGpuCommand(descriptor);
+		return command;
 	}
 }
-
 
 ndBrainBufferCommand* ndBrainLayerActivationTanh::CreateGpuBackPropagateCommand(
 	ndBrainTrainerInference* const owner,
