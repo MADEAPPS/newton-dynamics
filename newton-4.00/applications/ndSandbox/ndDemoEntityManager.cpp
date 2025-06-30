@@ -356,25 +356,25 @@ void TestVulkanStuff()
 	
 	ndBrainGpuContext context;
 	
-	class TestCommand : public ndBrainGpuCommand
-	{
-		public:
-		TestCommand(
-			ndBrainContext* const context, 
-			ndInt32 numberOfImputs, 
-			ndBrainUniformBuffer& uniforms,
-			ndBrainFloatBuffer& weights, 
-			ndBrainFloatBuffer& imputOutputs)
-			:ndBrainGpuCommand(context, ndCommandShareInfo())
-		{
-			ndAssert(0);
-			//ndFixSizeArray<ndBrainBuffer*, 4> params;
-			//params.PushBack(&uniforms);
-			//params.PushBack(&imputOutputs);
-			//params.PushBack(&weights);
-			//Assembly(context->m_brainLayerMatrixMatrixMultiply, numberOfImputs, params.GetCount(), &params[0]);
-		}
-	};
+	//class TestCommand : public ndBrainGpuCommand
+	//{
+	//	public:
+	//	TestCommand(
+	//		ndBrainContext* const context, 
+	//		ndInt32 numberOfImputs, 
+	//		ndBrainUniformBuffer& uniforms,
+	//		ndBrainFloatBuffer& weights, 
+	//		ndBrainFloatBuffer& imputOutputs)
+	//		:ndBrainGpuCommand(context, ndCommandShareInfo())
+	//	{
+	//		ndAssert(0);
+	//		//ndFixSizeArray<ndBrainBuffer*, 4> params;
+	//		//params.PushBack(&uniforms);
+	//		//params.PushBack(&imputOutputs);
+	//		//params.PushBack(&weights);
+	//		//Assembly(context->m_brainLayerMatrixMatrixMultiply, numberOfImputs, params.GetCount(), &params[0]);
+	//	}
+	//};
 	struct UniformBufferObject
 	{
 		ndUnsigned32 m_inputSize;

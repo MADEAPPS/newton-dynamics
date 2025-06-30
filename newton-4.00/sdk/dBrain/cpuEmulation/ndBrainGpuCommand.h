@@ -14,12 +14,15 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainLayer.h"
 #include "ndBrainContext.h"
+#include "ndBrainBufferCommand.h"
 
-class ndBrainKernel;
-class ndBrainGpuBuffer;
-class ndBrainFloatBuffer;
-class ndBrainUniformBuffer;
+//class ndBrainKernel;
+//class ndBrainGpuBuffer;
+//class ndBrainFloatBuffer;
+//class ndBrainUniformBuffer;
 
+
+#if 0
 class ndBrainGpuCommand : public ndContainersFreeListAlloc<ndBrainGpuCommand>
 {
 	public:
@@ -41,5 +44,17 @@ class ndBrainGpuCommand : public ndContainersFreeListAlloc<ndBrainGpuCommand>
 	friend class ndBrainLayerLinear;
 	friend class ndBrainTrainerGpuInference;
 };
+
+#endif
+
+class ndBrainGpuCommand : public ndBrainBufferCommand
+{
+	public:
+	ndBrainGpuCommand(const ndBrainBufferCommandDesc& desc);
+	virtual ~ndBrainGpuCommand();
+
+	virtual void Execute(ndInt32 miniBatchIndex) = 0;
+};
+
 
 #endif

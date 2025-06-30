@@ -35,12 +35,6 @@ ndBrainUniformBuffer::ndBrainUniformBuffer(ndBrainContext* const context, ndInt3
 	{
 		m_data = ndSharedPtr<ndFixSizeArray<ndUnsigned32, 256>>(new ndFixSizeArray<ndUnsigned32, 256>);
 		m_data->SetCount(ndInt32(sizeInBytes / sizeof(ndUnsigned32)));
-		//ndFixSizeArray<ndUnsigned32, 256>& dst = **m_data;
-		//ndMemCpy(&dst[0], (ndUnsigned32*)data, m_data->GetCount());
-	}
-	else
-	{
-		ndAssert(0);
 	}
 	MemoryToDevice(0, size_t(sizeInBytes), data);
 }

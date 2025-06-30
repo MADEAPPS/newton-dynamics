@@ -42,10 +42,6 @@ void ndBrainCpuContext::SyncBufferCommandQueue()
 
 void ndBrainCpuContext::BrainVectorToDevice(ndBrainFloatBuffer& buffer, const ndBrainVector& srcVector)
 {
-	//ndInt64 size = ndMin(srcVector.GetCount(), buffer.m_buffer->GetCount());
-	//ndBrainMemVector src(&srcVector[0], size);
-	//ndBrainMemVector dst(&(**buffer.m_buffer)[0], size);
-	//dst.Set(src);
 	size_t sizeInBytes = ndMin(size_t(buffer.SizeInBytes()), size_t(srcVector.GetCount() * sizeof(ndReal)));
 	MemoryToDevice(buffer, 0, sizeInBytes, &srcVector[0]);
 }

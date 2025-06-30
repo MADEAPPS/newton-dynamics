@@ -15,6 +15,7 @@
 #include "ndBrainGpuCommand.h"
 #include "ndBrainUniformBuffer.h"
 
+#if 0
 ndBrainGpuCommand::ndBrainGpuCommand(ndBrainContext* const context, const ndCommandShareInfo& info)
 	:ndContainersFreeListAlloc<ndBrainGpuCommand>()
 	,m_context(context)
@@ -41,4 +42,16 @@ void ndBrainGpuCommand::Assembly(const ndSharedPtr<ndBrainKernel>& shader, ndInt
 	{
 		m_parameters.PushBack(buffer[i]);
 	}
+}
+
+#endif
+
+ndBrainGpuCommand::ndBrainGpuCommand(const ndBrainBufferCommandDesc& desc)
+	:ndBrainBufferCommand(desc)
+{
+
+}
+
+ndBrainGpuCommand::~ndBrainGpuCommand()
+{
 }

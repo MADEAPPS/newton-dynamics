@@ -67,9 +67,8 @@ ndBrainGpuContext* ndBrainGpuContext::GetAsGpuContext()
 
 void ndBrainGpuContext::BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector)
 {
-	ndAssert(0);
-	//ndInt64 sizeInBytes = ndMin(ndInt64(dst.SizeInBytes()), ndInt64(srcVector.GetCount() * sizeof(ndReal)));
-	//MemoryToDevice(dst, 0, sizeInBytes, &srcVector[0]);
+	size_t sizeInBytes = ndMin(size_t(dst.SizeInBytes()), size_t(srcVector.GetCount() * sizeof(ndReal)));
+	MemoryToDevice(dst, 0, sizeInBytes, &srcVector[0]);
 }
 
 void ndBrainGpuContext::BrainVectorFromDevice(ndBrainFloatBuffer& deviceBuffer, ndBrainVector& dstVector)

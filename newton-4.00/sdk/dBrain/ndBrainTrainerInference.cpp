@@ -333,6 +333,7 @@ void ndBrainTrainerInference::AddCopyInputCommand(const ndCommandShareInfo& unif
 	uniformParam.m_parametersStartOffset = 0;
 	uniformParam.m_inputOutputSize = inputOutputBufferSize;
 	uniformParam.m_inputOutputStartOffset = 0;
+
 	ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(*m_descriptor.m_context, sizeof(ndCommandShareInfo), &uniformParam));
 	
 	ndBrainFloatBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
