@@ -36,6 +36,7 @@
 #include <ndBrainSaveLoad.h>
 #include <ndBrainAgentDQN.h>
 #include <ndBrainOptimizer.h>
+#include <ndBrainGpuBuffer.h>
 #include <ndBrainCpuContext.h>
 #include <ndBrainSimdFloat8.h>
 #include <ndBrainThreadPool.h>
@@ -72,8 +73,6 @@
 #include <ndBrainAgentDiscretePolicyGradient_Trainer.h>
 #include <ndBrainAgentContinuePolicyGradient_Trainer.h>
 #include <ndBrainAgentDeterministicPolicyGradient_Trainer.h>
-
-// gpu support 
 
 #endif 
 

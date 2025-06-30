@@ -16,6 +16,7 @@
 class ndBrainVector;
 class ndBrainMatrix;
 class ndBrainContext;
+class ndBrainGpuBuffer;
 
 class ndCopyBufferCommandInfo
 {
@@ -50,6 +51,7 @@ class ndBrainBuffer : public ndContainersFreeListAlloc<ndBrainBuffer>
 
 	protected:
 	ndBrainContext* m_context;
+	ndSharedPtr<ndBrainGpuBuffer> m_gpuBuffer;
 	size_t m_sizeInBytes;
 	bool m_isMemoryMapped;
 };

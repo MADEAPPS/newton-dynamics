@@ -11,6 +11,8 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainBuffer.h"
+#include "ndBrainContext.h"
+#include "ndBrainGpuBuffer.h"
 
 ndBrainBuffer::ndBrainBuffer(ndBrainContext* const context, ndInt64 sizeInByte, bool memoryMapped)
 	:ndContainersFreeListAlloc<ndBrainBuffer>()
@@ -18,6 +20,10 @@ ndBrainBuffer::ndBrainBuffer(ndBrainContext* const context, ndInt64 sizeInByte, 
 	,m_sizeInBytes(size_t(sizeInByte))
 	,m_isMemoryMapped(memoryMapped)
 {
+	if (m_context->GetAsGpuContext())
+	{
+		m_gpuBuffer = ndSharedPtr<ndBrainGpuBuffer> (new ndBrainGpuBuffer(this, memoryMapped));
+	}
 }
 
 ndBrainBuffer::~ndBrainBuffer()

@@ -34,10 +34,6 @@ ndBrainFloatBuffer::ndBrainFloatBuffer(ndBrainContext* const context, const ndBr
 		m_buffer = ndSharedPtr<ndBrainVector>(new ndBrainVector());
 		m_buffer->SetCount(input.GetCount());
 	}
-	else
-	{
-		ndAssert(0);
-	}
 	m_context->BrainVectorToDevice(*this, input);
 }
 
@@ -57,11 +53,6 @@ ndBrainFloatBuffer::ndBrainFloatBuffer(ndBrainContext* const context, const ndBr
 	{
 		m_buffer = ndSharedPtr<ndBrainVector>(new ndBrainVector());
 		m_buffer->SetCount(matrix.GetColumns() * matrix.GetRows());
-	}
-	else
-	{
-		ndAssert(0);
-		//BrainVectorToDevice(flatArray);
 	}
 	m_context->BrainVectorToDevice(*this, flatArray);
 }
