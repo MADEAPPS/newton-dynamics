@@ -27,13 +27,6 @@ class ndBrainFloatBuffer : public ndBrainBuffer
 	virtual void* GetCpuPtr() override;
 	virtual void* GetCpuPtr() const override;
 
-	//virtual void BrainVectorToDevice(const ndBrainVector& vector) override;
-	//virtual void BrainVectorFromDevice(ndBrainVector& vector) const override;
-	//
-	//virtual void MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData) override;
-	//virtual void CopyBuffer(const ndBrainBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer) override;
-	//void CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainFloatBuffer& srcBuffer);
-
 	void VectorToDevice(const ndBrainVector& vector);
 	void VectorFromDevice(ndBrainVector& vector) const;
 
