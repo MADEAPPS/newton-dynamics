@@ -25,6 +25,8 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainLayer.h"
 #include "ndBrainKernel.h"
+#include "ndBrainGpuContext.h"
+#include "ndBrainGpuCommand.h"
 #include "ndBrainUniformBuffer.h"
 
 class ndBrainLoad;

@@ -93,7 +93,10 @@ void ndBrainGpuContext::CopyBuffer(const ndBrainUniformBuffer& parameterBuffer, 
 
 void ndBrainGpuContext::MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
 {
-	ndAssert(0);
+	const ndSharedPtr<ndBrainGpuBuffer>& gpuBuffer = deviceBuffer.m_gpuBuffer;
+	ndInt8* const src = &gpuBuffer->m_memory[0];
+	ndAssert(src);
+	ndMemCpy((ndInt8*)outputMemory, &src[offsetInBytes], ndInt64(sizeInBytes));
 }
 
 void ndBrainGpuContext::MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, const void* const inputMemory) const

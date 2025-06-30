@@ -575,18 +575,29 @@ ndBrainBufferCommand* ndBrainLayerLinear::CreateGpuFeedForwardCommand(
 		ndInt32 blockRows = height / ND_GPU_TILED_MATRIX_ROWS;
 		ndInt32 blockColums = miniBatchSize / ND_GPU_TILED_MATRIX_ROWS;
 		
-		miniBatchSize = blockRows * blockColums;
-		ndCommandSharedInfo newInfo(info);
+		ndCommandSharedInfo newInfo;
 		uniformBuffer->MemoryFromDevice(0, sizeof(ndCommandSharedInfo), &newInfo);
 		newInfo.m_tiledStride = blockRows;
 		uniformBuffer->MemoryToDevice(0, sizeof(ndCommandSharedInfo), &newInfo);
 
+		ndBrainBufferCommandDesc descriptor(miniBatchSize);
+		descriptor.m_id = size_t(this);
+		descriptor.m_context = context;
+		descriptor.m_owner = owner;
+		descriptor.m_info = newInfo;
+		descriptor.m_miniBatchSize = blockRows * blockColums;
+		descriptor.m_uniformBuffer = uniformBuffer;
+		descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerMatrixMatrixMultiply;
+
+		descriptor.PushBack((ndBrainUniformBuffer*)*uniformBuffer);
+		descriptor.PushBack(inputOutputData);
+		descriptor.PushBack(weightsAndBias);
+
+		//miniBatchSize = blockRows * blockColums;
 		//ndBrainBufferCommand* const command = new ndBrainTrainerGpuCommand(
 		//	owner, newInfo, size_t(this), context, context->m_brainLayerMatrixMatrixMultiply, miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias);
-
-		//return command;
-
-		return nullptr;
+		ndBrainBufferCommand* const command = new ndBrainGpuCommand(descriptor);
+		return command;
 	}
 }
 
