@@ -81,9 +81,36 @@ void ndBrainGpuContext::BrainVectorFromDevice(ndBrainFloatBuffer& deviceBuffer, 
 	//MemoryFromDevice(deviceBuffer, 0, sizeInBytes, &dstVector[0]);
 }
 
-void ndBrainGpuContext::CopyBufferIndirect(const ndBrainUniformBuffer& parameterBuffer, const ndBrainIntegerBuffer& indexBuffer, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
+void ndBrainGpuContext::CopyBufferIndirect(const ndBrainUniformBuffer& parameterBuffer, const ndBrainIntegerBuffer& indexData, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
 {
-	ndAssert(0);
+	const ndSharedPtr<ndBrainGpuBuffer>& gpuBuffer = parameterBuffer.m_gpuBuffer;
+	const ndCopyBufferCommandInfo& data = *((ndCopyBufferCommandInfo*)&gpuBuffer->m_memory[0]);
+	ndInt32 stride = ndInt32(data.m_strideInByte);
+	ndInt32 srcStride = ndInt32(data.m_srcStrideInByte);
+	ndInt32 srcOffset = ndInt32(data.m_srcOffsetInByte);
+	ndInt32 dstStride = ndInt32(data.m_dstStrideInByte);
+	ndInt32 dstOffset = ndInt32(data.m_dstOffsetInByte);
+
+	ndAssert(stride <= srcStride);
+	ndAssert(stride <= dstStride);
+
+	ndSharedPtr<ndBrainGpuBuffer>& dstBuffer = dstData.m_gpuBuffer;
+	const ndSharedPtr<ndBrainGpuBuffer>& srcBuffer = srcData.m_gpuBuffer;
+	const ndSharedPtr<ndBrainGpuBuffer>& indexBuffer = indexData.m_gpuBuffer;
+
+	ndInt8* const dst = &dstBuffer->m_memory[0];
+	const ndInt8* const src = &srcBuffer->m_memory[0];
+	const ndUnsigned32* const indexPtr = (ndUnsigned32*)&indexBuffer->m_memory[0];
+	ndAssert(dst);
+	ndAssert(src);
+	ndAssert(indexPtr);
+
+	ndInt32 count = ndInt32(indexData.SizeInBytes() / sizeof(ndUnsigned32));
+	for (ndInt32 i = 0; i < count; ++i)
+	{
+		ndUnsigned32 index = indexPtr[i];
+		ndMemCpy(&dst[i * dstStride + dstOffset], &src[index * srcStride + srcOffset], stride);
+	}
 }
 
 void ndBrainGpuContext::CopyBuffer(const ndBrainUniformBuffer& parameterBuffer, ndInt32 numberOfWorkGrups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
