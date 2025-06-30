@@ -10,6 +10,7 @@
 */
 
 #include "ndBrainStdafx.h"
+#include "ndBrainKernel.h"
 #include "ndBrainContext.h"
 #include "ndBrainFloatBuffer.h"
 #include "ndBrainUniformBuffer.h"
