@@ -71,7 +71,8 @@ void ndBrainGpuContext::BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBra
 	MemoryToDevice(dst, 0, sizeInBytes, &srcVector[0]);
 }
 
-void ndBrainGpuContext::BrainVectorFromDevice(ndBrainFloatBuffer& deviceBuffer, ndBrainVector& dstVector)
+//void ndBrainGpuContext::BrainVectorFromDevice(ndBrainFloatBuffer& deviceBuffer, ndBrainVector& dstVector)
+void ndBrainGpuContext::BrainVectorFromDevice(ndBrainFloatBuffer&, ndBrainVector&)
 {
 	ndAssert(0);
 	//ndSharedPtr<ndBrainGpuBuffer>& gpuBuffer = deviceBuffer.m_gpuBuffer;
@@ -113,7 +114,8 @@ void ndBrainGpuContext::CopyBufferIndirect(const ndBrainUniformBuffer& parameter
 	}
 }
 
-void ndBrainGpuContext::CopyBuffer(const ndBrainUniformBuffer& parameterBuffer, ndInt32 numberOfWorkGrups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
+//void ndBrainGpuContext::CopyBuffer(const ndBrainUniformBuffer& parameterBuffer, ndInt32 numberOfWorkGrups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
+void ndBrainGpuContext::CopyBuffer(const ndBrainUniformBuffer&, ndInt32, ndBrainBuffer&, const ndBrainBuffer&)
 {
 	ndAssert(0);
 }
