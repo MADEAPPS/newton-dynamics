@@ -100,8 +100,11 @@ void ndBrainGpuContext::CopyBuffer(const ndBrainUniformBuffer& parameterBuffer, 
 	ndAssert(stride <= srcStride);
 	ndAssert(stride <= dstStride);
 
-	ndUnsigned8* const dst = (ndUnsigned8*)dstData.GetCpuPtr();
-	const ndUnsigned8* const src = (ndUnsigned8*)srcData.GetCpuPtr();
+	ndSharedPtr<ndBrainGpuBuffer>& dstBuffer = dstData.m_gpuBuffer;
+	const ndSharedPtr<ndBrainGpuBuffer>& srcBuffer = srcData.m_gpuBuffer;
+
+	ndInt8* const dst = &dstBuffer->m_memory[0];
+	const ndInt8* const src = &srcBuffer->m_memory[0];
 	ndAssert(dst);
 	ndAssert(src);
 
