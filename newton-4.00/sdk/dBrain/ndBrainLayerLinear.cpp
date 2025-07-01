@@ -368,6 +368,7 @@ void ndBrainLayerLinear::CopyGpuWeights(ndBrainVector& output) const
 		ndBrainMemVector dst(&output[offset], columns);
 		dst.Set(src);
 		offset += width;
+		ndAssert(offset >= 0);
 	}
 	ndBrainMemVector bias(&output[height * width], m_bias.GetCount());
 	bias.Set(m_bias);
@@ -386,6 +387,7 @@ void ndBrainLayerLinear::SetCpuWeights(const ndBrainVector& input)
 		const ndBrainMemVector src(&input[offset], columns);
 		dst.Set(src);
 		offset += width;
+		ndAssert(offset >= 0);
 	}
 	const ndBrainMemVector bias(&input[offset], m_bias.GetCount());
 	m_bias.Set(bias);
