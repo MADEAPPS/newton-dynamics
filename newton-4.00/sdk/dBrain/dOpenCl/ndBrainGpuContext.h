@@ -14,6 +14,7 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainContext.h"
 
+#if 0
 class ndBrainGpuCommand;
 class ndBrainGpuFloatBuffer;
 class ndBrainGpuUniformBuffer;
@@ -94,14 +95,11 @@ class ndBrainGpuContext : public ndBrainContext
 	static const char* m_feedForwardKernels_1;
 	static const char* m_feedForwardKernels_2;
 	static const char* m_feedForwardKernels_3;
-
 	static const char* m_backPropagateKernels_1;
 	static const char* m_backPropagateKernels_2;
-	
 	static const char* m_matrixMultiply;
 	static const char* m_optimizerKernels;
 	static const char* m_commonKernelsInclude;
-
 	static const char* m_otherShaderFunctions;
 
 	friend class ndBrainGpuBuffer;
@@ -109,4 +107,71 @@ class ndBrainGpuContext : public ndBrainContext
 	friend class ndBrainGpuFloatBuffer;
 	friend class ndBrainGpuUniformBuffer;
 };
+#endif
+
+class ndBrainBuffer;
+class ndBrainKernel;
+class ndBrainFloatBuffer;
+class ndBrainIntegerBuffer;
+class ndBrainUniformBuffer;
+
+class ndBrainGpuContext : public ndBrainContext
+{
+	public:
+	ndBrainGpuContext();
+	virtual ~ndBrainGpuContext();
+
+	virtual void SyncBufferCommandQueue() override;
+	virtual ndBrainGpuContext* GetAsGpuContext() override;
+
+	virtual void SubmitBufferCommand(ndBrainBufferCommand* const command) override;
+
+	virtual void BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVector& dstVector) override;
+	virtual void BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector) override;
+
+	virtual void MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, const void* const srcMemory) const override;
+	virtual void MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const override;
+
+	virtual void CopyBuffer(const ndBrainUniformBuffer& parameterBuffer, ndInt32 numberOfWorkGrups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData) override;
+	virtual void CopyBufferIndirect(const ndBrainUniformBuffer& parameterBuffer, const ndBrainIntegerBuffer& indexBuffer, ndBrainBuffer& dstData, const ndBrainBuffer& srcData) override;
+
+	private:
+	void CreateKerners();
+
+public:
+	// feed foward shaders
+	ndSharedPtr<ndBrainKernel> m_brainCopyInput;
+	ndSharedPtr<ndBrainKernel> m_brainCopyOutput;
+	ndSharedPtr<ndBrainKernel> m_brainLayerReluActivation;
+	ndSharedPtr<ndBrainKernel> m_brainLayerTanhActivation;
+	ndSharedPtr<ndBrainKernel> m_brainLayerSoftmaxActivation;
+	ndSharedPtr<ndBrainKernel> m_brainLayerDropOutActivation;
+	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixMatrixMultiply;
+
+	// back propagate shaders
+	ndSharedPtr<ndBrainKernel> m_brainCopyInputGradients;
+	ndSharedPtr<ndBrainKernel> m_brainCopyOutputGradients;
+	ndSharedPtr<ndBrainKernel> m_brainLayerReluBackPropagate;
+	ndSharedPtr<ndBrainKernel> m_brainLayerTanhBackPropagate;
+	ndSharedPtr<ndBrainKernel> m_brainLayerDropOutBackPropagate;
+	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixVectorBackPropagate;
+	ndSharedPtr<ndBrainKernel> m_brainLayerCathegoricalSoftmaxBackPropagate;
+
+	// optimizer shaders
+	ndSharedPtr<ndBrainKernel> m_brainAdamMomentumUpdate;
+	ndSharedPtr<ndBrainKernel> m_brainAdamRidgeOptimizerUpdate;
+	ndSharedPtr<ndBrainKernel> m_brainAdamLassoOptimizerUpdate;
+	ndSharedPtr<ndBrainKernel> m_brainAccumulateGradientsAndAverage;
+
+	static const char* m_matrixMultiply;
+	static const char* m_optimizerKernels;
+	static const char* m_commonKernelsInclude;
+	static const char* m_otherShaderFunctions;
+	static const char* m_feedForwardKernels_1;
+	static const char* m_feedForwardKernels_2;
+	static const char* m_feedForwardKernels_3;
+	static const char* m_backPropagateKernels_1;
+	static const char* m_backPropagateKernels_2;
+};
+
 #endif

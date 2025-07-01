@@ -10,9 +10,12 @@
 */
 
 #include "ndBrainStdafx.h"
+#include "ndBrainGpuContext.h"
+
+#if 0
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuCommand.h"
-#include "ndBrainGpuContext.h"
+
 #include "ndBrainGpuFloatBuffer.h"
 #include "ndBrainGpuUniformBuffer.h"
 #include "ndBrainGpuIntegerBuffer.h"
@@ -255,3 +258,62 @@ void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& co
 	error = m_queue->enqueueNDRangeKernel(**command->m_shader, offset, global, local);
 	ndAssert(error == CL_SUCCESS);
 }
+
+#endif
+
+#include "ndBrainKernel.h"
+
+ndBrainGpuContext::ndBrainGpuContext()
+{
+	ndAssert(0);
+}
+
+ndBrainGpuContext::~ndBrainGpuContext()
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuContext::SyncBufferCommandQueue()
+{
+	ndAssert(0);
+}
+
+ndBrainGpuContext* ndBrainGpuContext::GetAsGpuContext()
+{
+	return this;
+}
+
+void ndBrainGpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuContext::BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVector& dstVector)
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuContext::BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector)
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuContext::MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, const void* const srcMemory) const
+{
+	ndAssert(0);
+}
+void ndBrainGpuContext::MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuContext::CopyBuffer(const ndBrainUniformBuffer& parameterBuffer, ndInt32 numberOfWorkGrups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuContext::CopyBufferIndirect(const ndBrainUniformBuffer& parameterBuffer, const ndBrainIntegerBuffer& indexBuffer, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
+{
+	ndAssert(0);
+}
+

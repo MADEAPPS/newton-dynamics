@@ -12,6 +12,9 @@
 #define __ND_BRAIN_GPU_COMMAND_H__
 
 #include "ndBrainStdafx.h"
+#include "ndBrainBufferCommand.h"
+
+#if 0
 #include "ndBrainLayer.h"
 #include "ndBrainGpuContext.h"
 
@@ -38,6 +41,15 @@ class ndBrainGpuCommand : public ndClassAlloc
 	friend class ndBrainGpuContext;
 	friend class ndBrainTrainerGpu;
 	friend class ndBrainTrainerGpuInference;
+};
+#endif
+
+
+class ndBrainGpuCommand : public ndBrainBufferCommand
+{
+	public:
+	ndBrainGpuCommand(const ndBrainBufferCommandDesc& desc);
+	virtual ~ndBrainGpuCommand();
 };
 
 #endif

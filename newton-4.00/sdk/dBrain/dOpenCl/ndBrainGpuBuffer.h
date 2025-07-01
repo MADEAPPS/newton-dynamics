@@ -20,9 +20,9 @@ class ndBrainGpuBuffer : public ndClassAlloc
 	public:
 	void* GetPtr();
 
+	~ndBrainGpuBuffer();
 	protected:
 	ndBrainGpuBuffer(const ndBrainBuffer* const owner, bool memoryMapped = false);
-	~ndBrainGpuBuffer();
 
 	ndSharedPtr<cl::Buffer> m_buffer;
 	const ndBrainBuffer* m_owner;

@@ -15,37 +15,6 @@
 #include "ndBrainGpuCommand.h"
 #include "ndBrainUniformBuffer.h"
 
-#if 0
-ndBrainGpuCommand::ndBrainGpuCommand(ndBrainContext* const context, const ndCommandSharedInfo& info)
-	:ndContainersFreeListAlloc<ndBrainGpuCommand>()
-	,m_context(context)
-	,m_shader()
-	,m_info(info)
-	,m_layer(nullptr)
-	,m_workGroupSize(0)
-	,m_numberOfWorkGroups(0)
-{
-}
-
-ndBrainGpuCommand::~ndBrainGpuCommand()
-{
-}
-
-void ndBrainGpuCommand::Assembly(const ndSharedPtr<ndBrainKernel>& shader, ndInt32 workGroupSize, ndInt32 buffersCount, ndBrainBuffer** buffer)
-{
-	m_shader = shader;
-	m_workGroupSize = ND_DEFAULT_WORKGROUP_SIZE;
-	m_numberOfWorkGroups = size_t(workGroupSize);
-
-	m_parameters.SetCount(0);
-	for (ndInt32 i = 0; i < buffersCount; ++i)
-	{
-		m_parameters.PushBack(buffer[i]);
-	}
-}
-
-#endif
-
 ndBrainGpuCommand::ndBrainGpuCommand(const ndBrainBufferCommandDesc& desc)
 	:ndBrainBufferCommand(desc)
 {

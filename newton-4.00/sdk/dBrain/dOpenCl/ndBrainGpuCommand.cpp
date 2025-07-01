@@ -10,8 +10,10 @@
 */
 
 #include "ndBrainStdafx.h"
-#include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuCommand.h"
+#if 0
+#include "ndBrainGpuBuffer.h"
+
 #include "ndBrainGpuContext.h"
 #include "ndBrainGpuFloatBuffer.h"
 #include "ndBrainGpuUniformBuffer.h"
@@ -44,4 +46,13 @@ void ndBrainGpuCommand::Assembly(const ndSharedPtr<ndBrainGpuShader>& shader, nd
 		m_parameters.PushBack(buffer[i]);
 	}
 }
+#endif
 
+ndBrainGpuCommand::ndBrainGpuCommand(const ndBrainBufferCommandDesc& desc)
+	:ndBrainBufferCommand(desc)
+{
+}
+
+ndBrainGpuCommand::~ndBrainGpuCommand()
+{
+}

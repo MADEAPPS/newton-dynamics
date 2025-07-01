@@ -933,17 +933,18 @@ R""""(
 )"""";
 
 
-ndSharedPtr<ndBrainGpuShader> ndBrainGpuContext::CreateKerner(const cl::Program& program, const char* const functionMame) const
-{
-    cl_int errcode_ret = 0;
-    ndSharedPtr<ndBrainGpuShader> kernel(ndSharedPtr<ndBrainGpuShader>(new ndBrainGpuShader(program, functionMame, &errcode_ret)));
-    ndAssert(errcode_ret == 0);
-    return kernel;
-}
+//ndSharedPtr<ndBrainGpuShader> ndBrainGpuContext::CreateKerner(const cl::Program& program, const char* const functionMame) const
+//{
+//    cl_int errcode_ret = 0;
+//    ndSharedPtr<ndBrainGpuShader> kernel(ndSharedPtr<ndBrainGpuShader>(new ndBrainGpuShader(program, functionMame, &errcode_ret)));
+//    ndAssert(errcode_ret == 0);
+//    return kernel;
+//}
 
-//#include <vector>
 void ndBrainGpuContext::CreateKerners()
 {
+    ndAssert(0);
+#if 0
     std::string source(m_commonKernelsInclude);
     source += m_matrixMultiply;
     source += m_optimizerKernels;
@@ -957,12 +958,12 @@ void ndBrainGpuContext::CreateKerners()
     class ClProgram : public cl::Program
     {
         public:
-#if 1
+        #if 1
         ClProgram(const cl::Context& context, const std::string& source)
             :cl::Program(context, source, CL_TRUE, &m_errcode)
         {
         }
-#else
+        #else
         ClProgram(const cl::Context& context, const std::string& source)
             :cl::Program()
         {
@@ -979,14 +980,14 @@ void ndBrainGpuContext::CreateKerners()
                 m_errcode = ::clBuildProgram(object_, 0, nullptr, compilerOptions, nullptr, nullptr);
             }
         }
-#endif
+        #endif
         cl_int m_errcode;
     };
 
     ClProgram program(**m_context, source);
     ndAssert(program.m_errcode == 0);
 
-#if 0
+    #if 0
     // this only seems to work with nvidia PTX        
     size_t bin_sz;
     cl_int errcode = 0;
@@ -997,7 +998,7 @@ void ndBrainGpuContext::CreateKerners()
     errcode = clGetProgramInfo(program.get(), CL_PROGRAM_BINARIES, sizeof(unsigned char*), &code, NULL);
     ndAssert(errcode == 0);
     free(code);
-#endif
+    #endif
 
     // create all feed foward shaders
     m_brainCopyInput = CreateKerner(program, "brainCopyInput");
@@ -1030,4 +1031,5 @@ void ndBrainGpuContext::CreateKerners()
     // other shaders
     m_brainCopyBuffer = CreateKerner(program, "brainCopyBuffer");
     m_brainCopyBufferIndirect = CreateKerner(program, "brainCopyBufferIndirect");
+#endif
 }

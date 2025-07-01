@@ -12,8 +12,6 @@
 #define __ND_BRAIN_GPU_COMMAND_H__
 
 #include "ndBrainStdafx.h"
-#include "ndBrainLayer.h"
-#include "ndBrainContext.h"
 #include "ndBrainBufferCommand.h"
 
 class ndBrainGpuCommand : public ndBrainBufferCommand
