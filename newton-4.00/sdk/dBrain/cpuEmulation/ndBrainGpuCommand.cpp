@@ -56,7 +56,7 @@ ndBrainGpuCommand::~ndBrainGpuCommand()
 {
 }
 
-void ndBrainGpuCommand::Execute(ndInt32 groupId)
+void ndBrainGpuCommand::Execute(ndInt32)
 {
 	ndAssert(0);
 }
