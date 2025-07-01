@@ -644,10 +644,11 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::SaveTrajectory()
 		m_agent->m_trajectory.SetCount(m_agent->m_trajectory.GetCount() - 1);
 	}
 	
-	auto AddTransition = [this](ndInt32 dstIndex, ndInt32 srcIndex)
+	//auto AddTransition = [this](ndInt32 dstIndex, ndInt32 srcIndex)
+	auto AddTransition = [this](ndInt32, ndInt32)
 	{
-			ndAssert(0);
-			return 0;
+		ndAssert(0);
+		return 0;
 		//ndInt32 dstCacheIndex = m_replayBufferCache.GetCount();
 		//m_replayBufferCache.SetCount(dstCacheIndex + 1);
 		//m_replayBufferCache.CopyFrom(dstCacheIndex, m_agent->m_trajectory, srcIndex);
