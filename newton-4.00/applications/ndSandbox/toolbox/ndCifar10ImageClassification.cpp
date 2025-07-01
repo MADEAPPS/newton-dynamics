@@ -249,8 +249,11 @@ ndAssert(0);
 			}
 		}
 
-		void Optimize(ndBrainMatrix* const trainingLabels, const ndBrainMatrix* const sourceTrainingImages,
-					  ndBrainMatrix* const testLabels, ndBrainMatrix* const testImages)
+		//void Optimize(ndBrainMatrix* const trainingLabels, const ndBrainMatrix* const sourceTrainingImages,
+		//			  ndBrainMatrix* const testLabels, ndBrainMatrix* const testImages)
+		void Optimize(ndBrainMatrix* const, const ndBrainMatrix* const,
+					  ndBrainMatrix* const, ndBrainMatrix* const)
+
 		{
 			ndAssert(0);
 #if 0
