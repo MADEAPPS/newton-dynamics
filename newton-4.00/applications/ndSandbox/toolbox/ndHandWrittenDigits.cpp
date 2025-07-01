@@ -12,7 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndTestDeepBrain.h"
 
-#define MINIST_USE_CPU_TRANNING
+#define MINIST_USE_CPU_TRAINING
  
 //#define MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
 
@@ -431,7 +431,7 @@ static void MnistTrainingSet()
 		brain->InitWeights();
 
 		bool isGpuReady = brain->IsGpuReady();
-#ifdef MINIST_USE_CPU_TRANNING
+#ifdef MINIST_USE_CPU_TRAINING
 		isGpuReady = false;
 #else
 		ndAssert(isGpuReady);
