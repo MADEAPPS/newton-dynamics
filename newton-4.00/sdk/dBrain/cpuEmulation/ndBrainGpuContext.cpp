@@ -25,7 +25,7 @@ ndBrainGpuContext::ndBrainGpuContext()
 	,ndBrainThreadPool()
 {
 	ndInt32 numOfThreads = (ndBrainThreadPool::GetMaxThreads() + 1) / 2;
-numOfThreads = 1;
+//numOfThreads = 1;
 	SetThreadCount(numOfThreads);
 	CreateKerners();
 }
@@ -39,47 +39,17 @@ ndBrainGpuContext* ndBrainGpuContext::GetAsGpuContext()
 	return this;
 }
 
-//void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& command)
-//{
-//	ndAssert(0);
-//	//ndAtomic<ndInt32> iterator(0);
-//	//ndBrainGpuShader& shader = **command->m_shader;
-//	//shader.m_parameters.SetCount(0);
-//	//for (ndInt32 i = 0; i < ndInt32 (command->m_parameters.GetCount()); ++i)
-//	//{
-//	//	shader.m_parameters.PushBack(command->m_parameters[i]);
-//	//}
-//	//
-//	//auto ExecuteCommand = ndMakeObject::ndFunction([this, &iterator, &command](ndInt32, ndInt32)
-//	//{
-//	//	ndInt32 workGroupdSize = ndInt32(command->m_workGroupSize);
-//	//	ndInt32 numberOfWorkGrouds = ndInt32(command->m_numberOfWorkGroups);
-//	//	
-//	//	ndBrainGpuShader& kernel = **command->m_shader;
-//	//	for (ndInt32 i = iterator++; i < numberOfWorkGrouds; i = iterator++)
-//	//	{
-//	//		kernel.Execute(i, workGroupdSize);
-//	//	}
-//	//});
-//	//iterator = 0;
-//	//ParallelExecute(ExecuteCommand);
-//}
-
 void ndBrainGpuContext::BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector)
 {
 	size_t sizeInBytes = ndMin(size_t(dst.SizeInBytes()), size_t(srcVector.GetCount() * sizeof(ndReal)));
 	MemoryToDevice(dst, 0, sizeInBytes, &srcVector[0]);
 }
 
-//void ndBrainGpuContext::BrainVectorFromDevice(ndBrainFloatBuffer& deviceBuffer, ndBrainVector& dstVector)
-void ndBrainGpuContext::BrainVectorFromDevice(ndBrainFloatBuffer&, ndBrainVector&)
+void ndBrainGpuContext::BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVector& dstVector)
 {
 	ndAssert(0);
-	//ndSharedPtr<ndBrainGpuBuffer>& gpuBuffer = deviceBuffer.m_gpuBuffer;
-	//ndInt8* const dst = &gpuBuffer->m_memory[0];
-	//
-	//size_t sizeInBytes = ndMin(size_t(deviceBuffer.SizeInBytes()), size_t(dstVector.GetCount() * sizeof(ndReal)));
-	//MemoryFromDevice(deviceBuffer, 0, sizeInBytes, &dstVector[0]);
+	size_t sizeInBytes = ndMin(size_t(src.SizeInBytes()), size_t(dstVector.GetCount() * sizeof(ndReal)));
+	MemoryFromDevice(src, 0, sizeInBytes, &dstVector[0]);
 }
 
 void ndBrainGpuContext::CopyBufferIndirect(const ndBrainUniformBuffer& parameterBuffer, const ndBrainIntegerBuffer& indexData, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
@@ -114,10 +84,31 @@ void ndBrainGpuContext::CopyBufferIndirect(const ndBrainUniformBuffer& parameter
 	}
 }
 
-//void ndBrainGpuContext::CopyBuffer(const ndBrainUniformBuffer& parameterBuffer, ndInt32 numberOfWorkGrups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
-void ndBrainGpuContext::CopyBuffer(const ndBrainUniformBuffer&, ndInt32, ndBrainBuffer&, const ndBrainBuffer&)
+void ndBrainGpuContext::CopyBuffer(const ndBrainUniformBuffer& parameterBuffer, ndInt32 numberOfWorkGrups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
 {
-	ndAssert(0);
+	//const ndFixSizeArray<ndUnsigned32, 256>& bufferData = **parameterBuffer.m_data;
+	//const ndCopyBufferCommandInfo& data = *((ndCopyBufferCommandInfo*)&bufferData[0]);
+	const ndSharedPtr<ndBrainGpuBuffer>& gpuBuffer = parameterBuffer.m_gpuBuffer;
+	const ndCopyBufferCommandInfo& data = *((ndCopyBufferCommandInfo*)&gpuBuffer->m_memory[0]);
+
+	ndInt32 stride = ndInt32(data.m_strideInByte);
+	ndInt32 srcStride = ndInt32(data.m_srcStrideInByte);
+	ndInt32 srcOffset = ndInt32(data.m_srcOffsetInByte);
+	ndInt32 dstStride = ndInt32(data.m_dstStrideInByte);
+	ndInt32 dstOffset = ndInt32(data.m_dstOffsetInByte);
+
+	ndAssert(stride <= srcStride);
+	ndAssert(stride <= dstStride);
+
+	ndUnsigned8* const dst = (ndUnsigned8*)dstData.GetCpuPtr();
+	const ndUnsigned8* const src = (ndUnsigned8*)srcData.GetCpuPtr();
+	ndAssert(dst);
+	ndAssert(src);
+
+	for (ndInt32 i = 0; i < numberOfWorkGrups; ++i)
+	{
+		ndMemCpy(&dst[i * dstStride + dstOffset], &src[i * srcStride + srcOffset], stride);
+	}
 }
 
 void ndBrainGpuContext::MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
@@ -143,7 +134,6 @@ void ndBrainGpuContext::SyncBufferCommandQueue()
 
 void ndBrainGpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
 {
-	//ndBrainGpuShader& shader = **command->m_shader;
 	ndBrainBufferCommandDesc& desc = command->GetDescriptor();
 	ndBrainKernel& shader = **desc.m_kernel;
 
