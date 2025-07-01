@@ -203,7 +203,6 @@ static void MnistTrainingSet()
 				minibatchInputBuffer->CopyBuffer(**parameters, m_miniBatchSize, **data);
 			
 				m_trainer->MakePrediction();
-				//m_trainer->GetOutput(miniBatchOutput);
 				minibatchOutpuBuffer->VectorFromDevice(miniBatchOutput);
 				
 				for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
