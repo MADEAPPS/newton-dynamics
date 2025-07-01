@@ -12,36 +12,24 @@
 #define __ND_BRAIN_GPU_BUFFER_H__
 
 #include "ndBrainStdafx.h"
-#include "ndBrainBuffer.h"
 
-class ndBrainGpuBuffer;
-class ndBrainGpuContext;
+class ndBrainBuffer;
 
-class ndBrainGpuBuffer : public ndBrainBuffer
+class ndBrainGpuBuffer : public ndClassAlloc
 {
-	protected:
-	ndBrainGpuBuffer(ndBrainContext* const context, ndInt64 sizeInByte, bool memoryMapped = false);
-
 	public:
-	virtual ~ndBrainGpuBuffer();
-
-	virtual void BrainVectorToDevice(const ndBrainVector& vector) override;
-	virtual void BrainVectorFromDevice(ndBrainVector& vector) const override;
-
-	virtual void MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData) override;
-	virtual void MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const override;
-
-	virtual void CopyBuffer(const ndBrainBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer) override;
-	virtual void CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer) override;
+	void* GetPtr();
 
 	protected:
-	virtual void LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const sourceData) override;
-	virtual void UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const outputData) const override;
+	ndBrainGpuBuffer(const ndBrainBuffer* const owner, bool memoryMapped = false);
+	~ndBrainGpuBuffer();
 
 	ndSharedPtr<cl::Buffer> m_buffer;
+	const ndBrainBuffer* m_owner;
 	ndUnsigned32* m_memory;
+
+	friend class ndBrainBuffer;
 	friend class ndBrainGpuContext;
-	friend class ndBrainGpuCommand;
 };
 
 #endif

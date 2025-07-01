@@ -14,7 +14,8 @@
 #include "ndBrainGpuBuffer.h"
 
 ndBrainGpuBuffer::ndBrainGpuBuffer(const ndBrainBuffer* const owner, bool)
-	:m_owner(owner)
+	:ndClassAlloc()
+	,m_owner(owner)
 {
 	ndInt64 size = ndInt64(m_owner->SizeInBytes());
 	m_memory.Resize(size);

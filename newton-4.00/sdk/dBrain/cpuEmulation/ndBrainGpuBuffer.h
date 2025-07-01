@@ -14,7 +14,6 @@
 #include "ndBrainStdafx.h"
 
 class ndBrainBuffer;
-class ndBrainContext;
 
 class ndBrainGpuBuffer : public ndClassAlloc
 {

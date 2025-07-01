@@ -10,44 +10,54 @@
 */
 
 #include "ndBrainStdafx.h"
-#include "ndBrainVector.h"
-#include "ndBrainMatrix.h"
+#include "ndBrainBuffer.h"
 #include "ndBrainGpuBuffer.h"
-#include "ndBrainGpuContext.h"
 
-ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainContext* const context, ndInt64 sizeInByte, bool memoryMapped)
-	:ndBrainBuffer(context, sizeInByte, memoryMapped)
+//ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainContext* const context, ndInt64 sizeInByte, bool memoryMapped)
+ndBrainGpuBuffer::ndBrainGpuBuffer(const ndBrainBuffer* const owner, bool memoryMapped)
+	:ndClassAlloc()
 	,m_buffer()
+	,m_owner(owner)
 	,m_memory(nullptr)
 {
-	cl_int error = CL_SUCCESS;
-	ndBrainGpuContext* const gpuContext = m_context->GetAsGpuContext();
-	ndAssert(context);
-	if (m_isMemoryMapped && gpuContext->SupportsMappedMemory())
-	{
-		m_memory = (ndUnsigned32*)clSVMAlloc(gpuContext->m_context->get(), CL_MEM_READ_WRITE | CL_MEM_SVM_FINE_GRAIN_BUFFER, size_t(sizeInByte), 32);
-		ndAssert(m_memory);
-		m_buffer = ndSharedPtr<cl::Buffer>(new cl::Buffer(**gpuContext->m_context, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR, size_t(sizeInByte), m_memory, &error));
-	}
-	else
-	{
-		m_isMemoryMapped = false;
-		m_buffer = ndSharedPtr<cl::Buffer> (new cl::Buffer(**gpuContext->m_context, CL_MEM_READ_WRITE, size_t(sizeInByte), nullptr, &error));
-	}
-	ndAssert(error == CL_SUCCESS);
+	ndAssert(0);
+	//cl_int error = CL_SUCCESS;
+	//ndBrainGpuContext* const gpuContext = m_context->GetAsGpuContext();
+	//ndAssert(context);
+	//if (m_isMemoryMapped && gpuContext->SupportsMappedMemory())
+	//{
+	//	m_memory = (ndUnsigned32*)clSVMAlloc(gpuContext->m_context->get(), CL_MEM_READ_WRITE | CL_MEM_SVM_FINE_GRAIN_BUFFER, size_t(sizeInByte), 32);
+	//	ndAssert(m_memory);
+	//	m_buffer = ndSharedPtr<cl::Buffer>(new cl::Buffer(**gpuContext->m_context, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR, size_t(sizeInByte), m_memory, &error));
+	//}
+	//else
+	//{
+	//	m_isMemoryMapped = false;
+	//	m_buffer = ndSharedPtr<cl::Buffer> (new cl::Buffer(**gpuContext->m_context, CL_MEM_READ_WRITE, size_t(sizeInByte), nullptr, &error));
+	//}
+	//ndAssert(error == CL_SUCCESS);
 }
 
 ndBrainGpuBuffer::~ndBrainGpuBuffer()
 {
-	m_buffer = ndSharedPtr<cl::Buffer>();
-	if (m_memory)
-	{
-		ndAssert(m_isMemoryMapped);
-		//m_context->GetAsGpuContext()->m_context->lcE
-		clSVMFree(m_context->GetAsGpuContext()->m_context->get(), m_memory);
-	}
+	ndAssert(0);
+	//m_buffer = ndSharedPtr<cl::Buffer>();
+	//if (m_memory)
+	//{
+	//	ndAssert(m_isMemoryMapped);
+	//	//m_context->GetAsGpuContext()->m_context->lcE
+	//	clSVMFree(m_context->GetAsGpuContext()->m_context->get(), m_memory);
+	//}
 }
 
+void* ndBrainGpuBuffer::GetPtr()
+{
+	ndAssert(0);
+	return nullptr;
+	//return &m_memory[0];
+}
+
+#if 0
 void ndBrainGpuBuffer::MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputMemory)
 {
 	LoadData(offsetInBytes, sizeInBytes, inputMemory);
@@ -132,3 +142,4 @@ void ndBrainGpuBuffer::UnloadData(size_t offsetInBytes, size_t sizeInBytes, void
 	}
 	ndAssert(error == CL_SUCCESS);
 }
+#endif
