@@ -25,35 +25,35 @@ class ndCommandSharedInfo
 	public:
 	ndCommandSharedInfo()
 		:m_layer(nullptr)
-		,m_parametersStartOffset(0)
-		,m_inputOutputStartOffset(0)
 		,m_inputSize(0)
 		,m_outputSize(0)
 		,m_inputOutputSize(0)
+		,m_inputOutputStartOffset(0)
 		,m_parametersBatchSize(0)
+		,m_parametersStartOffset(0)
 		,m_tiledStride(0)
 	{
 	}
 
 	ndCommandSharedInfo(const ndBrainLayer* const layer)
 		:m_layer(layer)
-		,m_parametersStartOffset(0)
-		,m_inputOutputStartOffset(0)
 		,m_inputSize(0)
 		,m_outputSize(0)
 		,m_inputOutputSize(0)
+		,m_inputOutputStartOffset(0)
 		,m_parametersBatchSize(0)
+		,m_parametersStartOffset(0)
 		,m_tiledStride(0)
 	{
 	}
 
 	const ndBrainLayer* m_layer;
-	ndInt32 m_parametersStartOffset;
-	ndInt32 m_inputOutputStartOffset;
 	ndInt32 m_inputSize;
 	ndInt32 m_outputSize;
 	ndInt32 m_inputOutputSize;
+	ndInt32 m_inputOutputStartOffset;
 	ndInt32 m_parametersBatchSize;
+	ndInt32 m_parametersStartOffset;
 	ndInt32	m_tiledStride;
 };
 

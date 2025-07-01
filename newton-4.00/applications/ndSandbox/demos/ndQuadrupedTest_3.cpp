@@ -505,7 +505,7 @@ namespace ndQuadruped_3
 					ndFloat32 legReward = ndExp(-200000.0f * error2);
 					reward += legReward;
 				}
-				break;
+				//break;
 			}
 			//return ndBrainFloat(reward / 12.0f);
 			return ndBrainFloat(reward / 3.0f);

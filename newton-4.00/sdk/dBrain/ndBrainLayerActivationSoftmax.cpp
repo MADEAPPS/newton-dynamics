@@ -123,24 +123,6 @@ bool ndBrainLayerActivationSoftmax::HasGpuSupport() const
 	return true;
 }
 
-ndBrainLayerFeedForwardCpuCommand* ndBrainLayerActivationSoftmax::GetLayerCpuFeedForwardCommand()
-{
-	ndAssert(0);
-	return nullptr;
-
-	//ndBrainLayerFeedForwardCpuCommand* const command = new ndBrainLayerFeedForwardCpuCommand(this);
-	//return command;
-}
-
-ndBrainLayerBackPropagateCpuCommand* ndBrainLayerActivationSoftmax::GetLayerCpuBackPropagateCommand()
-{
-	ndAssert(0);
-	return nullptr;
-
-	//ndBrainLayerBackPropagateCpuCommand* const command = new ndBrainLayerBackPropagateCpuCommand(this);
-	//return command;
-}
-
 void ndBrainLayerActivationSoftmax::FeedForward(const ndBrainLayerFeedForwardCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
 	const ndBrainBufferCommandDesc& desc = command->GetDescriptor();
@@ -152,6 +134,8 @@ void ndBrainLayerActivationSoftmax::FeedForward(const ndBrainLayerFeedForwardCpu
 	ndInt32 outputSize = info.m_outputSize;
 	
 	ndInt32 offset = miniBatchIndex * info.m_inputOutputSize + info.m_inputOutputStartOffset;
+	ndAssert(offset >= 0);
+
 	const ndBrainMemVector input(&inputOutputBuffer[offset], inputSize);
 	ndBrainMemVector output(&inputOutputBuffer[offset + inputSize], outputSize);
 	

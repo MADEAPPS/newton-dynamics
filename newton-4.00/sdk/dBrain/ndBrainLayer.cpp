@@ -105,18 +105,6 @@ void ndBrainLayer::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* cons
 	ndAssert(0);
 }
 
-ndBrainLayerFeedForwardCpuCommand* ndBrainLayer::GetLayerCpuFeedForwardCommand()
-{
-	ndAssert(0);
-	return nullptr;
-}
-
-ndBrainLayerBackPropagateCpuCommand* ndBrainLayer::GetLayerCpuBackPropagateCommand()
-{
-	ndAssert(0);
-	return nullptr;
-}
-
 const char* ndBrainLayer::GetLabelId() const
 {
 	ndAssert(0);

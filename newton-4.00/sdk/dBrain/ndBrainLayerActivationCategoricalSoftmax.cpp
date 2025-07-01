@@ -95,11 +95,10 @@ void ndBrainLayerActivationCategoricalSoftmax::BackPropagate(const ndBrainLayerB
 	ndInt32 outputSize = info.m_outputSize;
 	
 	ndInt32 offset = miniBatchIndex * info.m_inputOutputSize + info.m_inputOutputStartOffset;
+	ndAssert(offset >= 0);
 	const ndBrainMemVector output(&inputOutputBuffer[offset + inputSize], outputSize);
-	
-	ndInt32 dstOffset = miniBatchIndex * info.m_inputOutputSize + info.m_inputOutputStartOffset;
-	const ndBrainMemVector outputDerivative(&inputOutputGradientsBuffer[dstOffset + inputSize], outputSize);
-	ndBrainMemVector inputDerivative (&inputOutputGradientsBuffer[dstOffset], inputSize);
+	const ndBrainMemVector outputDerivative(&inputOutputGradientsBuffer[offset + inputSize], outputSize);
+	ndBrainMemVector inputDerivative (&inputOutputGradientsBuffer[offset], inputSize);
 
 	inputDerivative.Set(output);
 	inputDerivative.Sub(outputDerivative);

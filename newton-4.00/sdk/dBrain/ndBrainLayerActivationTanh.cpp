@@ -99,24 +99,6 @@ bool ndBrainLayerActivationTanh::HasGpuSupport() const
 	return true;
 }
 
-ndBrainLayerFeedForwardCpuCommand* ndBrainLayerActivationTanh::GetLayerCpuFeedForwardCommand()
-{
-	ndAssert(0);
-	return nullptr;
-
-	//ndBrainLayerFeedForwardCpuCommand* const command = new ndBrainLayerFeedForwardCpuCommand(this);
-	//return command;
-}
-
-ndBrainLayerBackPropagateCpuCommand* ndBrainLayerActivationTanh::GetLayerCpuBackPropagateCommand()
-{
-	ndAssert(0);
-	return nullptr;
-
-	//ndBrainLayerBackPropagateCpuCommand* const command = new ndBrainLayerBackPropagateCpuCommand(this);
-	//return command;
-}
-
 void ndBrainLayerActivationTanh::FeedForward(const ndBrainLayerFeedForwardCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
 	const ndBrainBufferCommandDesc& desc = command->GetDescriptor();
@@ -128,6 +110,8 @@ void ndBrainLayerActivationTanh::FeedForward(const ndBrainLayerFeedForwardCpuCom
 	ndInt32 outputSize = info.m_outputSize;
 	
 	ndInt32 offset = miniBatchIndex * info.m_inputOutputSize + info.m_inputOutputStartOffset;
+	ndAssert(offset >= 0);
+
 	const ndBrainMemVector input(&inputOutputBuffer[offset], inputSize);
 	ndBrainMemVector output(&inputOutputBuffer[offset + inputSize], outputSize);
 	
@@ -163,11 +147,10 @@ void ndBrainLayerActivationTanh::BackPropagate(const ndBrainLayerBackPropagateCp
 	ndInt32 outputSize = info.m_outputSize;
 	
 	ndInt32 offset = miniBatchIndex * info.m_inputOutputSize + info.m_inputOutputStartOffset;
+	ndAssert(offset >= 0);
 	const ndBrainMemVector output(&inputOutputBuffer[offset + inputSize], outputSize);
-	
-	ndInt32 dstOffset = miniBatchIndex * info.m_inputOutputSize + info.m_inputOutputStartOffset;
-	const ndBrainMemVector outputDerivative(&inputOutputGradientsBuffer[dstOffset + inputSize], outputSize);
-	ndBrainMemVector inputDerivative(&inputOutputGradientsBuffer[dstOffset], inputSize);
+	const ndBrainMemVector outputDerivative(&inputOutputGradientsBuffer[offset + inputSize], outputSize);
+	ndBrainMemVector inputDerivative(&inputOutputGradientsBuffer[offset], inputSize);
 	
 	inputDerivative.Set(ndBrainFloat(1.0f));
 	inputDerivative.MulSub(output, output);

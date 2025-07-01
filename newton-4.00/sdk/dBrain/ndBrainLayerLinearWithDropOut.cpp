@@ -98,23 +98,6 @@ bool ndBrainLayerLinearWithDropOut::HasGpuSupport() const
 	return true;
 }
 
-ndBrainLayerFeedForwardCpuCommand* ndBrainLayerLinearWithDropOut::GetLayerCpuFeedForwardCommand()
-{
-	ndAssert(0);
-	return nullptr;
-	//ndBrainLayerFeedForwardCpuCommand* const command = new ndBrainLayerFeedForwardCpuCommand(this);
-	//return command;
-}
-
-ndBrainLayerBackPropagateCpuCommand* ndBrainLayerLinearWithDropOut::GetLayerCpuBackPropagateCommand()
-{
-	ndAssert(0);
-	return nullptr;
-
-	//ndBrainLayerBackPropagateCpuCommand* const command = new ndBrainLayerBackPropagateCpuCommand(this);
-	//return command;
-}
-
 void ndBrainLayerLinearWithDropOut::FeedForward(const ndBrainLayerFeedForwardCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
 	const ndBrainBufferCommandDesc& desc = command->GetDescriptor();
@@ -126,6 +109,7 @@ void ndBrainLayerLinearWithDropOut::FeedForward(const ndBrainLayerFeedForwardCpu
 	ndInt32 outputSize = info.m_outputSize;
 	
 	ndInt32 offset = miniBatchIndex * info.m_inputOutputSize + info.m_inputOutputStartOffset;
+	ndAssert(offset >= 0);
 	const ndBrainMemVector input(&inputOutputBuffer[offset], inputSize);
 	ndBrainMemVector output(&inputOutputBuffer[offset + inputSize], outputSize);
 	
@@ -135,9 +119,6 @@ void ndBrainLayerLinearWithDropOut::FeedForward(const ndBrainLayerFeedForwardCpu
 
 void ndBrainLayerLinearWithDropOut::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
-	//const ndCommandSharedInfo* const info = &command->m_info;
-	//const ndBrainTrainerCpu* const trainer = (ndBrainTrainerCpu*)command->m_owner;
-	
 	const ndBrainBufferCommandDesc& desc = command->GetDescriptor();
 	const ndCommandSharedInfo& info = desc.m_info;
 	ndBrainTrainer* const trainer = (ndBrainTrainer*)desc.m_owner;
@@ -149,11 +130,10 @@ void ndBrainLayerLinearWithDropOut::BackPropagate(const ndBrainLayerBackPropagat
 	ndInt32 outputSize = info.m_outputSize;
 	
 	ndInt32 offset = miniBatchIndex * info.m_inputOutputSize + info.m_inputOutputStartOffset;
+	ndAssert(offset >= 0);
 	const ndBrainMemVector output(&inputOutputBuffer[offset + inputSize], outputSize);
-	
-	ndInt32 dstOffset = miniBatchIndex * info.m_inputOutputSize + info.m_inputOutputStartOffset;
-	const ndBrainMemVector outputDerivative(&inputOutputGradientsBuffer[dstOffset + inputSize], outputSize);
-	ndBrainMemVector inputDerivative(&inputOutputGradientsBuffer[dstOffset], inputSize);
+	const ndBrainMemVector outputDerivative(&inputOutputGradientsBuffer[offset + inputSize], outputSize);
+	ndBrainMemVector inputDerivative(&inputOutputGradientsBuffer[offset], inputSize);
 	
 	inputDerivative.Set(m_dropOut);
 	inputDerivative.Mul(outputDerivative);

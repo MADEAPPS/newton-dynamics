@@ -257,6 +257,7 @@ static void MnistTrainingSet()
 			ndBrainTrainer* const trainer = *m_trainer;
 			
 			ndBrainVector groundTruth;
+			ndBrainVector weightAndBias;
 			ndBrainVector miniBatchInput;
 			ndBrainVector miniBatchOutput;
 			ndBrainVector miniBatchOutputGradients;
@@ -277,6 +278,7 @@ static void MnistTrainingSet()
 			ndBrainFloatBuffer* const minibatchInputBuffer = m_trainer->GetInputBuffer();
 			ndBrainFloatBuffer* const minibatchOutpuBuffer = m_trainer->GetOuputBuffer();
 			ndBrainFloatBuffer* const minibatchOutpuGradientBuffer = m_trainer->GetOuputGradientBuffer();
+			ndBrainFloatBuffer* const weightdAndBiasBuffer = m_trainer->GetWeightAndBiasGradientBuffer();
 			
 			ndCopyBufferCommandInfo copyBuffer;
 			copyBuffer.m_dstOffsetInByte = 0;
@@ -312,7 +314,7 @@ static void MnistTrainingSet()
 						loss.SetTruth(truth);
 						loss.GetLoss(output, grad);
 					}
-			
+		
 					// backpropagate loss.
 					minibatchOutpuGradientBuffer->VectorToDevice(miniBatchOutputGradients);
 					trainer->BackPropagate();
@@ -326,9 +328,10 @@ static void MnistTrainingSet()
 					//trainer->GetParameterBuffer(parametersBuffer);
 					//trainer->UpdateParameters(parametersBuffer);
 
-					ndAssert(0);
-					//trainer->UpdateParameters();
+					weightdAndBiasBuffer->VectorFromDevice(weightAndBias);
+					trainer->UpdateParameters(weightAndBias);
 					m_bestBrain->CopyFrom(**trainer->GetBrain());
+
 					m_minValidationFail = testFailCount + 1;
 					ndInt64 trainigFailCount = ValidateData(parameterBuffer, trainingLabels, m_trainingData) + 1;
 					ndInt64 size = trainingLabels->GetCount();

@@ -85,18 +85,14 @@ class ndBrainLayerLinear : public ndBrainLayer
 	virtual void CopyCpuWeights(ndBrainVector& oput) const override;
 	virtual void CopyGpuWeights(ndBrainVector& oput) const override;
 
+	void CalculateRoundedSize(ndInt32& width, ndInt32& height) const;
 	virtual ndCommandSharedInfo GetCpuCommandSharedInfo() const override;
 	virtual ndCommandSharedInfo GetGpuCommandSharedInfo() const override;
-	virtual ndBrainLayerFeedForwardCpuCommand* GetLayerCpuFeedForwardCommand() override;
-	virtual ndBrainLayerBackPropagateCpuCommand* GetLayerCpuBackPropagateCommand() override;
-
-	virtual void FeedForward(const ndBrainLayerFeedForwardCpuCommand* const info, ndInt32 miniBatchIndex) const override;
-	virtual void BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const override;
 
 	virtual bool HasGpuSupport() const override;
-
-	void CalculateRoundedSize(ndInt32& width, ndInt32& height) const;
-
+	virtual void FeedForward(const ndBrainLayerFeedForwardCpuCommand* const info, ndInt32 miniBatchIndex) const override;
+	virtual void BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const override;
+	
 	virtual ndBrainBufferCommand* CreateGpuFeedForwardCommand(ndBrainTrainerInference* const owner,
 		const ndCommandSharedInfo& info,
 		ndBrainContext* const context, ndInt32 miniBatchSize,

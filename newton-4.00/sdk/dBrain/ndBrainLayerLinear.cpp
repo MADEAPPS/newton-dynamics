@@ -376,7 +376,6 @@ void ndBrainLayerLinear::CopyGpuWeights(ndBrainVector& output) const
 void ndBrainLayerLinear::SetCpuWeights(const ndBrainVector& input)
 {
 	ndInt32 width = GetInputSize();
-	//ndInt32 height = GetOutputSize();
 	ndAssert(input.GetCount() >= (GetOutputSize() * GetInputSize() + GetOutputSize()));
 
 	ndInt32 offset = 0;
@@ -443,24 +442,6 @@ ndCommandSharedInfo ndBrainLayerLinear::GetGpuCommandSharedInfo() const
 	return info;
 }
 
-ndBrainLayerFeedForwardCpuCommand* ndBrainLayerLinear::GetLayerCpuFeedForwardCommand()
-{
-	ndAssert(0);
-	return nullptr;
-
-	//ndBrainLayerFeedForwardCpuCommand* const command = new ndBrainLayerFeedForwardCpuCommand(this);
-	//return command;
-}
-
-ndBrainLayerBackPropagateCpuCommand* ndBrainLayerLinear::GetLayerCpuBackPropagateCommand()
-{
-	ndAssert(0);
-	return nullptr;
-
-	//ndBrainLayerBackPropagateCpuCommand* const command = new ndBrainLayerBackPropagateCpuCommand(this);
-	//return command;
-}
-
 void ndBrainLayerLinear::FeedForward(const ndBrainLayerFeedForwardCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
 	const ndBrainBufferCommandDesc& desc = command->GetDescriptor();
@@ -476,6 +457,8 @@ void ndBrainLayerLinear::FeedForward(const ndBrainLayerFeedForwardCpuCommand* co
 	const ndBrainMemVector parameters(&weightAndBias[info.m_parametersStartOffset], matrixSize + outputSize);
 	
 	ndInt32 offset = miniBatchIndex * info.m_inputOutputSize + info.m_inputOutputStartOffset;
+	ndAssert(offset >= 0);
+
 	const ndBrainMemVector input(&inputOutputBuffer[offset], inputSize);
 	ndBrainMemVector output(&inputOutputBuffer[offset + inputSize], outputSize);
 	for (ndInt32 i = outputSize - 1; i >= 0; --i)
@@ -490,9 +473,6 @@ void ndBrainLayerLinear::FeedForward(const ndBrainLayerFeedForwardCpuCommand* co
 
 void ndBrainLayerLinear::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const command, ndInt32 miniBatchIndex) const
 {
-	//const ndCommandSharedInfo* const info = &command->m_info;
-	//const ndBrainTrainerCpu* const trainer = (ndBrainTrainerCpu*)command->m_owner;
-	
 	const ndBrainBufferCommandDesc& desc = command->GetDescriptor();
 	const ndCommandSharedInfo& info = desc.m_info;
 	ndBrainTrainer* const trainer = (ndBrainTrainer*)desc.m_owner;
@@ -506,15 +486,14 @@ void ndBrainLayerLinear::BackPropagate(const ndBrainLayerBackPropagateCpuCommand
 	ndInt32 outputSize = info.m_outputSize;
 	ndInt32 matrixSize = inputSize * outputSize;
 	
-	ndInt64 offset = miniBatchIndex * ndInt64(info.m_inputOutputSize) + info.m_inputOutputStartOffset;
+	ndInt32 offset = miniBatchIndex * info.m_inputOutputSize + info.m_inputOutputStartOffset;
+	ndAssert(offset >= 0);
 	const ndBrainMemVector input(&inputOutputBuffer[offset], inputSize);
 	const ndBrainMemVector output(&inputOutputBuffer[offset + inputSize], outputSize);
-	
-	ndInt64 dstOffset = miniBatchIndex * ndInt64(info.m_inputOutputSize) + info.m_inputOutputStartOffset;
-	const ndBrainMemVector outputDerivative(&inputOutputGradientsBuffer[dstOffset + inputSize], outputSize);
+	const ndBrainMemVector outputDerivative(&inputOutputGradientsBuffer[offset + inputSize], outputSize);
 	
 	// calculate input output gradients
-	ndBrainMemVector inputDerivative(&inputOutputGradientsBuffer[dstOffset], inputSize);
+	ndBrainMemVector inputDerivative(&inputOutputGradientsBuffer[offset], inputSize);
 	const ndBrainMemVector matrixVector(&weightAndBias[info.m_parametersStartOffset], matrixSize + outputSize);
 	inputDerivative.Set(ndBrainFloat(0.0f));
 	for (ndInt32 i = outputSize - 1; i >= 0; --i)
@@ -525,9 +504,10 @@ void ndBrainLayerLinear::BackPropagate(const ndBrainLayerBackPropagateCpuCommand
 	}
 	
 	// calculate weight and bias gradients
-	ndInt64 gradientOffset = miniBatchIndex * ndInt64(info.m_parametersBatchSize) + info.m_parametersStartOffset;
+	ndInt32 gradientOffset = miniBatchIndex * info.m_parametersBatchSize + info.m_parametersStartOffset;
+	ndAssert(gradientOffset >= 0);
+
 	ndBrainMemVector gradients(&weightAndBiasGradients[gradientOffset], matrixSize + outputSize);
-	
 	ndBrainMemVector biasRow(&gradients[matrixSize], outputSize);
 	biasRow.Set(outputDerivative);
 	
