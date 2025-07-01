@@ -45,12 +45,14 @@ class brainCopyInput : public ndBrainKernel
        ndBrainFloat* const inputBuffer = (ndBrainFloat*)buffer2->GetGpuBuffer()->GetPtr();
        ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetGpuBuffer()->GetPtr();
         
-        ndInt32 inputSize = ndInt32(parameters->m_inputSize);
-        ndInt32 inputOutputSize = ndInt32(parameters->m_inputOutputSize);
-        ndInt32 inputOutputStartOffset = ndInt32(parameters->m_inputOutputStartOffset);
+        ndInt32 inputSize = parameters->m_inputSize;
+        ndInt32 inputOutputSize = parameters->m_inputOutputSize;
+        ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
         ndInt32 srcBase = groupId * inputSize;
         ndInt32 dstBase = groupId * inputOutputSize + inputOutputStartOffset;
+        ndAssert(srcBase >= 0);
+        ndAssert(dstBase >= 0);
         
         ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
         ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
@@ -80,39 +82,45 @@ class brainCopyOutput : public ndBrainKernel
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
-        ndAssert(0);
         //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         //ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
-        //
         //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
         //ndBrainFloat* const inputOutputData = buffer1->GetData();
         //ndBrainFloat* const outputBuffer = buffer2->GetData();
-        //
-        //ndInt32 outputSize = ndInt32(parameters->m_outputSize);
-        //ndInt32 inputOutputSize = ndInt32(parameters->m_inputOutputSize);
-        //ndInt32 inputOutputStartOffset = ndInt32(parameters->m_inputOutputStartOffset);
-        //    
-        //ndInt32 dstBase = groupId * outputSize;
-        //ndInt32 srcBase = groupId * inputOutputSize + inputOutputStartOffset;
-        //    
-        //ndInt32 workGroupSizeReminder = outputSize % workGroupSize;
-        //ndInt32 modWorkGroupSize = outputSize - workGroupSizeReminder;
-        //    
-        //for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
-        //{
-        //    for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-        //    {
-        //        ndBrainFloat a = inputOutputData[srcBase + i + itemId];
-        //        outputBuffer[dstBase + i + itemId] = a;
-        //    }
-        //}
-        //    
-        //for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
-        //{
-        //    ndBrainFloat a = inputOutputData[srcBase + modWorkGroupSize + itemId];
-        //    outputBuffer[dstBase + modWorkGroupSize + itemId] = a;
-        //}
+
+        ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
+        ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
+        ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
+
+        ndBrainFloat* const inputOutputData = (ndBrainFloat*)buffer1->GetGpuBuffer()->GetPtr();
+        ndBrainFloat* const outputBuffer = (ndBrainFloat*)buffer2->GetGpuBuffer()->GetPtr();
+        ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetGpuBuffer()->GetPtr();
+        
+        ndInt32 outputSize = ndInt32(parameters->m_outputSize);
+        ndInt32 inputOutputSize = parameters->m_inputOutputSize;
+        ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+            
+        ndInt32 dstBase = groupId * outputSize;
+        ndInt32 srcBase = groupId * inputOutputSize + inputOutputStartOffset;
+        ndAssert(srcBase >= 0);
+        ndAssert(dstBase >= 0);
+            
+        ndInt32 workGroupSizeReminder = outputSize % workGroupSize;
+        ndInt32 modWorkGroupSize = outputSize - workGroupSizeReminder;
+        for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+            {
+                ndBrainFloat a = inputOutputData[srcBase + i + itemId];
+                outputBuffer[dstBase + i + itemId] = a;
+            }
+        }
+        for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+        {
+            ndBrainFloat a = inputOutputData[srcBase + modWorkGroupSize + itemId];
+            outputBuffer[dstBase + modWorkGroupSize + itemId] = a;
+        }
     }
 };
 
@@ -126,39 +134,92 @@ class brainLayerReluActivation : public ndBrainKernel
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
-        ndAssert(0);
         //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
-        //
         //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
         //ndBrainFloat* const inputOutputData = buffer1->GetData();
-        //
-        //ndInt32 inputSize = ndInt32(parameters->m_inputSize);
-        //ndInt32 inputOutputSize = ndInt32(parameters->m_inputOutputSize);
-        //ndInt32 inputOutputStartOffset = ndInt32(parameters->m_inputOutputStartOffset);
-        //
-        ////ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
-        ////ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
-        //
-        //ndInt32 inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
-        //ndInt32 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
-        //
-        ////for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
-        //for (ndInt32 i = 0; i < inputSize; i += workGroupSize)
-        //{
-        //    for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-        //    {
-        //        ndBrainFloat inputValue = inputOutputData[inputOffset + i + itemId];
-        //        ndBrainFloat outputValue = (inputValue >= ndBrainFloat(0.0f)) ? inputValue : ndBrainFloat(0.0f);
-        //        inputOutputData[outputOffset + i + itemId] = outputValue;
-        //    }
-        //}
-        ////for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
-        ////{
-        ////    ndBrainFloat inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
-        ////    ndBrainFloat outputValue = (inputValue >= ndBrainFloat(0.0f)) ? inputValue : ndBrainFloat(0.0f);
-        ////    inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
-        ////}
+
+        ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
+        ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
+
+        ndBrainFloat* const inputOutputData = (ndBrainFloat*)buffer1->GetGpuBuffer()->GetPtr();
+        ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetGpuBuffer()->GetPtr();
+        
+        ndInt32 inputSize = parameters->m_inputSize;
+        ndInt32 inputOutputSize = parameters->m_inputOutputSize;
+        ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+        
+        ndInt32 inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
+        ndInt32 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
+        ndAssert(outputOffset >= 0);
+
+        ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
+        ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
+        for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+            {
+                ndBrainFloat inputValue = inputOutputData[inputOffset + i + itemId];
+                ndBrainFloat outputValue = (inputValue >= ndBrainFloat(0.0f)) ? inputValue : ndBrainFloat(0.0f);
+                inputOutputData[outputOffset + i + itemId] = outputValue;
+            }
+        }
+        for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+        {
+            ndBrainFloat inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
+            ndBrainFloat outputValue = (inputValue >= ndBrainFloat(0.0f)) ? inputValue : ndBrainFloat(0.0f);
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
+        }
+    }
+};
+
+class brainLayerTanhActivation : public ndBrainKernel
+{
+    public:
+    brainLayerTanhActivation(ndBrainContext* const context)
+        :ndBrainKernel(context)
+    {
+    }
+
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    {
+        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
+        //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
+        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
+        //ndBrainFloat* const inputOutputData = buffer1->GetData();
+        
+        ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
+        ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
+
+        ndBrainFloat* const inputOutputData = (ndBrainFloat*)buffer1->GetGpuBuffer()->GetPtr();
+        ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetGpuBuffer()->GetPtr();
+
+        ndInt32 inputSize = parameters->m_inputSize;
+        ndInt32 inputOutputSize = parameters->m_inputOutputSize;
+        ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+        
+        ndInt32 inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
+        ndInt32 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
+        ndAssert(outputOffset >= 0);
+
+        ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
+        ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
+
+        for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+            {
+                ndBrainFloat inputValue = inputOutputData[inputOffset + i + itemId];
+                ndBrainFloat outputValue = (inputValue > ndBrainFloat(-30.0f)) ? ((inputValue < ndBrainFloat(30.0f)) ? inputValue : ndBrainFloat(30.0f)) : ndBrainFloat(-30.0f);
+                inputOutputData[outputOffset + i + itemId] = ndTanh(outputValue);
+            }
+        }
+        for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+        {
+            ndBrainFloat inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
+            ndBrainFloat outputValue = (inputValue > ndBrainFloat (-30.0f)) ? ((inputValue < ndBrainFloat(30.0f)) ? inputValue : ndBrainFloat(30.0f)) : ndBrainFloat (-30.0f);
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = ndTanh(outputValue);
+        }
     }
 };
 
@@ -172,85 +233,42 @@ class brainLayerLinearDropOutActivation : public ndBrainKernel
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
-        ndAssert(0);
         //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
-        //
         //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
         //ndBrainFloat* const inputOutputData = buffer1->GetData();
-        //
-        //ndInt32 inputSize = ndInt32(parameters->m_inputSize);
-        //ndInt32 inputOutputSize = ndInt32(parameters->m_inputOutputSize);
-        //ndInt32 inputOutputStartOffset = ndInt32(parameters->m_inputOutputStartOffset);
-        //
-        ////ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
-        ////ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
-        //
-        //ndInt32 inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
-        //ndInt32 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
-        //
-        ////for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
-        //for (ndInt32 i = 0; i < inputSize; i += workGroupSize)
-        //{
-        //    for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-        //    {
-        //        ndBrainFloat inputValue = inputOutputData[inputOffset + i + itemId];
-        //        ndBrainFloat outputValue = inputValue;
-        //        inputOutputData[outputOffset + i + itemId] = outputValue;
-        //    }
-        //}
-        ////for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
-        ////{
-        ////    ndBrainFloat inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
-        ////    ndBrainFloat outputValue = inputValue;
-        ////    inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
-        ////}
-    }
-};
 
-class brainLayerTanhActivation : public ndBrainKernel
-{
-    public:
-        brainLayerTanhActivation(ndBrainContext* const context)
-        :ndBrainKernel(context)
-    {
-    }
+        ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
+        ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
 
-    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
-    {
-        ndAssert(0);
-        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
-        //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
-        //
-        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
-        //ndBrainFloat* const inputOutputData = buffer1->GetData();
-        //
-        //ndInt32 inputSize = ndInt32(parameters->m_inputSize);
-        //ndInt32 inputOutputSize = ndInt32(parameters->m_inputOutputSize);
-        //ndInt32 inputOutputStartOffset = ndInt32(parameters->m_inputOutputStartOffset);
-        //
-        ////ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
-        ////ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
-        //
-        //ndInt32 inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
-        //ndInt32 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
-        //
-        ////for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
-        //for (ndInt32 i = 0; i < inputSize; i += workGroupSize)
-        //{
-        //    for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-        //    {
-        //        ndBrainFloat inputValue = inputOutputData[inputOffset + i + itemId];
-        //        ndBrainFloat outputValue = (inputValue > ndBrainFloat(-30.0f)) ? ((inputValue < ndBrainFloat(30.0f)) ? inputValue : ndBrainFloat(30.0f)) : ndBrainFloat(-30.0f);
-        //        inputOutputData[outputOffset + i + itemId] = ndTanh(outputValue);
-        //    }
-        //}
-        ////for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
-        ////{
-        ////    ndBrainFloat inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
-        ////    ndBrainFloat outputValue = (inputValue > ndBrainFloat (-30.0f)) ? ((inputValue < ndBrainFloat(30.0f)) ? inputValue : ndBrainFloat(30.0f)) : ndBrainFloat (-30.0f);
-        ////    inputOutputData[outputOffset + modWorkGroupSize + itemId] = ndTanh(outputValue);
-        ////}
+        ndBrainFloat* const inputOutputData = (ndBrainFloat*)buffer1->GetGpuBuffer()->GetPtr();
+        ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetGpuBuffer()->GetPtr();
+
+        ndInt32 inputSize = parameters->m_inputSize;
+        ndInt32 inputOutputSize = parameters->m_inputOutputSize;
+        ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+
+        ndInt32 inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
+        ndInt32 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
+        ndAssert(outputOffset >= 0);
+
+        ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
+        ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
+        for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+            {
+                ndBrainFloat inputValue = inputOutputData[inputOffset + i + itemId];
+                ndBrainFloat outputValue = inputValue;
+                inputOutputData[outputOffset + i + itemId] = outputValue;
+            }
+        }
+        for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+        {
+            ndBrainFloat inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
+            ndBrainFloat outputValue = inputValue;
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
+        }
     }
 };
 
@@ -264,123 +282,126 @@ class brainLayerSoftmaxActivation : public ndBrainKernel
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
-        ndAssert(0);
-        //ndBrainFloat maxArg[ND_GPU_LOCAL_BUFFER_SIZE];
-        //ndBrainFloat sumArg[ND_GPU_LOCAL_BUFFER_SIZE];
-        //ndBrainFloat tmpInputBuffer[ND_GPU_LOCAL_BUFFER_SIZE];
-        //ndBrainFloat reductionBuffer[ND_GPU_LOCAL_BUFFER_SIZE];
-        //
+        ndBrainFloat maxArg[ND_GPU_LOCAL_BUFFER_SIZE];
+        ndBrainFloat sumArg[ND_GPU_LOCAL_BUFFER_SIZE];
+        ndBrainFloat tmpInputBuffer[ND_GPU_LOCAL_BUFFER_SIZE];
+        ndBrainFloat reductionBuffer[ND_GPU_LOCAL_BUFFER_SIZE];
+        
         //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
-        //
         //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
         //ndBrainFloat* const inputOutputData = buffer1->GetData();
-        //
-        //ndInt32 inputSize = ndInt32(parameters->m_inputSize);
-        //ndInt32 inputOutputSize = ndInt32(parameters->m_inputOutputSize);
-        //ndInt32 inputOutputStartOffset = ndInt32(parameters->m_inputOutputStartOffset);
-        //
-        //ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
-        //ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
-        //
-        //ndInt32 inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
-        //ndInt32 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
-        //
-        //
-        //for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-        //{
-        //    maxArg[itemId] = ndBrainFloat(-1.0e30f);
-        //}
-        //
-        //for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
-        //{
-        //    for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-        //    {
-        //        ndBrainFloat inputValue = inputOutputData[inputOffset + i + itemId];
-        //        tmpInputBuffer[i + itemId] = inputValue;
-        //        maxArg[itemId] = (inputValue > maxArg[itemId]) ? inputValue : maxArg[itemId];
-        //    }
-        //}
-        //for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
-        //{
-        //    ndBrainFloat inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
-        //    tmpInputBuffer[modWorkGroupSize + itemId] = inputValue;
-        //    maxArg[itemId] = (inputValue > maxArg[itemId]) ? inputValue : maxArg[itemId];
-        //}
-        //for (ndInt32 j = workGroupSize / 2; j > 0; j = j >> 1)
-        //{
-        //    for (ndInt32 itemId = j; itemId < j * 2; ++itemId)
-        //    {
-        //        reductionBuffer[itemId - j] = maxArg[itemId];
-        //    }
-        //
-        //    for (ndInt32 itemId = 0; itemId < j; ++itemId)
-        //    {
-        //        ndBrainFloat inputValue = reductionBuffer[itemId];
-        //        maxArg[itemId] = (inputValue > maxArg[itemId]) ? inputValue : maxArg[itemId];
-        //    }
-        //}
-        //reductionBuffer[0] = maxArg[0];
-        //
-        //for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-        //{
-        //    maxArg[itemId] = reductionBuffer[0];
-        //}
-        //
-        //for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-        //{
-        //    sumArg[itemId] = ndBrainFloat(0.0f);
-        //}
-        //
-        //for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
-        //{
-        //    for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-        //    {
-        //        ndBrainFloat inputValue = tmpInputBuffer[i + itemId] - maxArg[itemId];
-        //        ndBrainFloat outputValue = exp(inputValue);
-        //        sumArg[itemId] += outputValue;
-        //        tmpInputBuffer[i + itemId] = outputValue;
-        //    }
-        //}
-        //for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
-        //{
-        //    ndBrainFloat inputValue = tmpInputBuffer[modWorkGroupSize + itemId] - maxArg[itemId];
-        //    ndBrainFloat outputValue = exp(inputValue);
-        //    sumArg[itemId] += outputValue;
-        //    tmpInputBuffer[modWorkGroupSize + itemId] = outputValue;
-        //}
-        //for (ndInt32 j = workGroupSize / 2; j > 0; j = j >> 1)
-        //{
-        //    for (ndInt32 itemId = j; itemId < j * 2; ++itemId)
-        //    {
-        //        reductionBuffer[itemId - j] = sumArg[itemId];
-        //    }
-        //
-        //    for (ndInt32 itemId = 0; itemId < j; ++itemId)
-        //    {
-        //        ndBrainFloat inputValue = reductionBuffer[itemId];
-        //        sumArg[itemId] += inputValue;
-        //    }
-        //}
-        //reductionBuffer[0] = ndBrainFloat(1.0f) / sumArg[0];
-        //
-        //ndBrainFloat invDen = reductionBuffer[0];
-        //for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
-        ////for (ndInt32 i = 0; i < inputSize; i += workGroupSize)
-        //{
-        //    for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-        //    {
-        //        ndBrainFloat inputValue = tmpInputBuffer[i + itemId];
-        //        ndBrainFloat outputValue = invDen * inputValue;
-        //        inputOutputData[outputOffset + i + itemId] = outputValue;
-        //    }
-        //}
-        //for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
-        //{
-        //    ndBrainFloat inputValue = tmpInputBuffer[modWorkGroupSize + itemId];
-        //    ndBrainFloat outputValue = invDen * inputValue;
-        //    inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
-        //}
+
+        ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
+        ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
+
+        ndBrainFloat* const inputOutputData = (ndBrainFloat*)buffer1->GetGpuBuffer()->GetPtr();
+        ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetGpuBuffer()->GetPtr();
+        
+        ndInt32 inputSize = parameters->m_inputSize;
+        ndInt32 inputOutputSize = parameters->m_inputOutputSize;
+        ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+        
+        ndInt32 inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
+        ndInt32 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
+        ndAssert(outputOffset >= 0);
+
+        
+        for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+        {
+            maxArg[itemId] = ndBrainFloat(-1.0e30f);
+        }
+
+        ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
+        ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
+        for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+            {
+                ndBrainFloat inputValue = inputOutputData[inputOffset + i + itemId];
+                tmpInputBuffer[i + itemId] = inputValue;
+                maxArg[itemId] = (inputValue > maxArg[itemId]) ? inputValue : maxArg[itemId];
+            }
+        }
+        for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+        {
+            ndBrainFloat inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
+            tmpInputBuffer[modWorkGroupSize + itemId] = inputValue;
+            maxArg[itemId] = (inputValue > maxArg[itemId]) ? inputValue : maxArg[itemId];
+        }
+        for (ndInt32 j = workGroupSize / 2; j > 0; j = j >> 1)
+        {
+            for (ndInt32 itemId = j; itemId < j * 2; ++itemId)
+            {
+                reductionBuffer[itemId - j] = maxArg[itemId];
+            }
+        
+            for (ndInt32 itemId = 0; itemId < j; ++itemId)
+            {
+                ndBrainFloat inputValue = reductionBuffer[itemId];
+                maxArg[itemId] = (inputValue > maxArg[itemId]) ? inputValue : maxArg[itemId];
+            }
+        }
+        reductionBuffer[0] = maxArg[0];
+        
+        for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+        {
+            maxArg[itemId] = reductionBuffer[0];
+        }
+        
+        for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+        {
+            sumArg[itemId] = ndBrainFloat(0.0f);
+        }
+        
+        for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+            {
+                ndBrainFloat inputValue = tmpInputBuffer[i + itemId] - maxArg[itemId];
+                ndBrainFloat outputValue = exp(inputValue);
+                sumArg[itemId] += outputValue;
+                tmpInputBuffer[i + itemId] = outputValue;
+            }
+        }
+        for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+        {
+            ndBrainFloat inputValue = tmpInputBuffer[modWorkGroupSize + itemId] - maxArg[itemId];
+            ndBrainFloat outputValue = exp(inputValue);
+            sumArg[itemId] += outputValue;
+            tmpInputBuffer[modWorkGroupSize + itemId] = outputValue;
+        }
+        for (ndInt32 j = workGroupSize / 2; j > 0; j = j >> 1)
+        {
+            for (ndInt32 itemId = j; itemId < j * 2; ++itemId)
+            {
+                reductionBuffer[itemId - j] = sumArg[itemId];
+            }
+        
+            for (ndInt32 itemId = 0; itemId < j; ++itemId)
+            {
+                ndBrainFloat inputValue = reductionBuffer[itemId];
+                sumArg[itemId] += inputValue;
+            }
+        }
+        reductionBuffer[0] = ndBrainFloat(1.0f) / sumArg[0];
+        
+        ndBrainFloat invDen = reductionBuffer[0];
+        for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+            {
+                ndBrainFloat inputValue = tmpInputBuffer[i + itemId];
+                ndBrainFloat outputValue = invDen * inputValue;
+                inputOutputData[outputOffset + i + itemId] = outputValue;
+            }
+        }
+        for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+        {
+            ndBrainFloat inputValue = tmpInputBuffer[modWorkGroupSize + itemId];
+            ndBrainFloat outputValue = invDen * inputValue;
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
+        }
     }
 };
 
@@ -404,9 +425,9 @@ class brainCopyInputGradients : public ndBrainKernel
         //ndBrainFloat* const miniBatchGradients = buffer2->GetData();
         //ndBrainFloat* const inputOutputGradients = buffer3->GetData();
         //
-        //ndInt32 inputSize = ndInt32(parameters->m_inputSize);
-        //ndInt32 inputOutputSize = ndInt32(parameters->m_inputOutputSize);
-        //ndInt32 inputOutputStartOffset = ndInt32(parameters->m_inputOutputStartOffset);
+        //ndInt32 inputSize = parameters->m_inputSize;
+        //ndInt32 inputOutputSize = parameters->m_inputOutputSize;
+        //ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         //
         //ndInt32 dstBase = groupId * inputSize;
         //ndInt32 srcBase = groupId * inputOutputSize + inputOutputStartOffset;
@@ -449,8 +470,8 @@ class brainCopyOutputGradients : public ndBrainKernel
         //ndBrainFloat* const inputOutputGradients = buffer3->GetData();
         //
         //ndInt32 outputSize = ndInt32(parameters->m_outputSize);
-        //ndInt32 inputOutputSize = ndInt32(parameters->m_inputOutputSize);
-        //ndInt32 inputOutputStartOffset = ndInt32(parameters->m_inputOutputStartOffset);
+        //ndInt32 inputOutputSize = parameters->m_inputOutputSize;
+        //ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         //
         //ndInt32 srcBase = groupId * outputSize;
         //ndInt32 dstBase = groupId * inputOutputSize + inputOutputStartOffset;
@@ -493,9 +514,9 @@ class brainLayerBrainReluBackPropagate : public ndBrainKernel
         //ndBrainFloat* const inputOutputData = buffer1->GetData();
         //ndBrainFloat* const inputOutputGradients = buffer3->GetData();
         //
-        //ndInt32 inputSize = ndInt32(parameters->m_inputSize);
-        //ndInt32 inputOutputSize = ndInt32(parameters->m_inputOutputSize);
-        //ndInt32 inputOutputStartOffset = ndInt32(parameters->m_inputOutputStartOffset);
+        //ndInt32 inputSize = parameters->m_inputSize;
+        //ndInt32 inputOutputSize = parameters->m_inputOutputSize;
+        //ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         //
         //ndInt32 srcBase = groupId * inputOutputSize + inputOutputStartOffset;
         //ndInt32 dstBase = srcBase + __cpuKernelRoundoff(inputSize, workGroupSize);
@@ -553,9 +574,9 @@ class brainLayerBrainTanhBackPropagate : public ndBrainKernel
         //ndBrainFloat* const inputOutputData = buffer1->GetData();
         //ndBrainFloat* const inputOutputGradients = buffer3->GetData();
         //
-        //ndInt32 inputSize = ndInt32(parameters->m_inputSize);
-        //ndInt32 inputOutputSize = ndInt32(parameters->m_inputOutputSize);
-        //ndInt32 inputOutputStartOffset = ndInt32(parameters->m_inputOutputStartOffset);
+        //ndInt32 inputSize = parameters->m_inputSize;
+        //ndInt32 inputOutputSize = parameters->m_inputOutputSize;
+        //ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         //
         //ndInt32 srcBase = groupId * inputOutputSize + inputOutputStartOffset;
         //ndInt32 dstBase = srcBase + __cpuKernelRoundoff(inputSize, workGroupSize);
@@ -614,9 +635,9 @@ class brainLayerBrainCathegoricalSoftmaxBackPropagate : public ndBrainKernel
         //ndBrainFloat* const inputOutputData = buffer1->GetData();
         //ndBrainFloat* const inputOutputGradients = buffer3->GetData();
         //
-        //ndInt32 inputSize = ndInt32(parameters->m_inputSize);
-        //ndInt32 inputOutputSize = ndInt32(parameters->m_inputOutputSize);
-        //ndInt32 inputOutputStartOffset = ndInt32(parameters->m_inputOutputStartOffset);
+        //ndInt32 inputSize = parameters->m_inputSize;
+        //ndInt32 inputOutputSize = parameters->m_inputOutputSize;
+        //ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         //
         //ndInt32 srcBase = groupId * inputOutputSize + inputOutputStartOffset;
         //ndInt32 dstBase = srcBase + __cpuKernelRoundoff(inputSize, workGroupSize);
@@ -669,9 +690,9 @@ class brainLayerBrainLinearDropOutBackPropagate : public ndBrainKernel
         //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
         //ndBrainFloat* const inputOutputGradients = buffer3->GetData();
         //
-        //ndInt32 inputSize = ndInt32(parameters->m_inputSize);
-        //ndInt32 inputOutputSize = ndInt32(parameters->m_inputOutputSize);
-        //ndInt32 inputOutputStartOffset = ndInt32(parameters->m_inputOutputStartOffset);
+        //ndInt32 inputSize = parameters->m_inputSize;
+        //ndInt32 inputOutputSize = parameters->m_inputOutputSize;
+        //ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         //
         //ndInt32 srcBase = groupId * inputOutputSize + inputOutputStartOffset;
         //ndInt32 dstBase = srcBase + __cpuKernelRoundoff(inputSize, workGroupSize);
@@ -725,8 +746,8 @@ class brainAccumulateGradientsAndAverage : public ndBrainKernel
         //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
         //ndBrainFloat* const gradientBuffer = buffer1->GetData();
         //
-        //ndInt32 inputSize = ndInt32(parameters->m_inputSize);
-        //ndInt32 miniBatchSize = ndInt32(parameters->m_inputOutputSize);
+        //ndInt32 inputSize = parameters->m_inputSize;
+        //ndInt32 miniBatchSize = parameters->m_inputOutputSize;
         //
         //ndInt32 start = groupId * workGroupSize;
         //for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
@@ -916,7 +937,7 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
         ndBrainFloat* const inputOutputData = (ndBrainFloat*)buffer1->GetGpuBuffer()->GetPtr();
         ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetGpuBuffer()->GetPtr();
         
-        const ndInt32 inputSize = ndInt32(parameters->m_inputSize);
+        const ndInt32 inputSize = parameters->m_inputSize;
         const ndInt32 outputSize = ndInt32(parameters->m_outputSize);
         const ndInt32 height = (outputSize + ND_GPU_TILED_MATRIX_ROWS - 1) & -ND_GPU_TILED_MATRIX_ROWS;
         const ndInt32 width = (inputSize + ND_GPU_TILED_MATRIX_COLUMNS - 1) & -ND_GPU_TILED_MATRIX_COLUMNS;
@@ -927,6 +948,7 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
         //Initialise the accumulation register
         const ndInt32 parametersStartOffset = groupId_x * width * ND_GPU_TILED_MATRIX_ROWS + ndInt32(parameters->m_parametersStartOffset);
         const ndInt32 parametersBiasOffset = width * height + ndInt32(parameters->m_parametersStartOffset);
+        ndAssert(parametersStartOffset >= 0);
         
         ndBrainFloat biasValue[ND_GPU_TILED_MATRIX_ROWS];
         for (ndInt32 itemId_y = 0; itemId_y < ND_GPU_TILED_MATRIX_ROWS; ++itemId_y)
@@ -941,8 +963,9 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
             }
         }
         
-        const ndInt32 inputOutputStride = ndInt32(parameters->m_inputOutputSize);
-        const ndInt32 inputOffset = groupId_y * inputOutputStride * ND_GPU_TILED_MATRIX_ROWS + ndInt32(parameters->m_inputOutputStartOffset);
+        const ndInt32 inputOutputStride = parameters->m_inputOutputSize;
+        const ndInt32 inputOffset = groupId_y * inputOutputStride * ND_GPU_TILED_MATRIX_ROWS + parameters->m_inputOutputStartOffset;
+        ndAssert(inputOffset >= 0);
         
         // Loop over all tiles
         for (ndInt32 tile = 0; tile < width; tile += ND_GPU_TILED_MATRIX_COLUMNS)
@@ -979,6 +1002,8 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
         
         const ndInt32 numberOutput = ((groupId_x + 1) * ND_GPU_TILED_MATRIX_ROWS < outputSize) ? ND_GPU_TILED_MATRIX_ROWS : outputSize - groupId_x * ND_GPU_TILED_MATRIX_ROWS;
         ndInt32 outputOffset = groupId_x * ND_GPU_TILED_MATRIX_ROWS + inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
+        ndAssert(outputOffset >= 0);
+
         for (ndInt32 itemId_y = 0; itemId_y < ND_GPU_TILED_MATRIX_ROWS; ++itemId_y)
         {
             for (ndInt32 itemId_x = 0; itemId_x < numberOutput; ++itemId_x)
@@ -1017,10 +1042,10 @@ class brainLayerBrainLinearBackPropagate : public ndBrainKernel
         //ndBrainFloat* const inputOutputGradients = buffer3->GetData();
         //ndBrainFloat* const weightAndBiasGradients = buffer4->GetData();
         //
-        //ndInt32 inputSize = ndInt32(parameters->m_inputSize);
+        //ndInt32 inputSize = parameters->m_inputSize;
         //ndInt32 outputSize = ndInt32(parameters->m_outputSize);
-        //ndInt32 inputOutputSize = ndInt32(parameters->m_inputOutputSize);
-        //ndInt32 inputOutputStartOffset = ndInt32(parameters->m_inputOutputStartOffset);
+        //ndInt32 inputOutputSize = parameters->m_inputOutputSize;
+        //ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         //
         //for (ndInt32 i = 0; i < inputSize; i += workGroupSize)
         //{

@@ -136,6 +136,11 @@ void ndBrainGpuContext::MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offse
 	ndMemCpy(&dst[offsetInBytes], (ndInt8*)inputMemory, ndInt64(sizeInBytes));
 }
 
+void ndBrainGpuContext::SyncBufferCommandQueue()
+{
+	// do nothing. cpu kernels always wait for completion.
+}
+
 void ndBrainGpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
 {
 	//ndBrainGpuShader& shader = **command->m_shader;
@@ -164,8 +169,3 @@ void ndBrainGpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
 	ParallelExecute(ExecuteCommand);
 }
 
-void ndBrainGpuContext::SyncBufferCommandQueue()
-{
-	// do nothing. cpu kernels always wait for completion.
-	ndAssert(0);
-}
