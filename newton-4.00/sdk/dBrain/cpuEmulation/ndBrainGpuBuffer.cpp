@@ -13,43 +13,12 @@
 #include "ndBrainBuffer.h"
 #include "ndBrainGpuBuffer.h"
 
-#if 0
-#include "ndBrainVector.h"
-
-#include "ndBrainGpuContext.h"
-
-ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainGpuContext* const context, ndInt64 sizeInBytes, ndStorageBufferType)
-	:m_context (context)
-	,m_sizeInBytes(size_t(sizeInBytes))
-{
-}
-
-ndBrainGpuBuffer::~ndBrainGpuBuffer()
-{
-}
-
-
-size_t ndBrainGpuBuffer::SizeInBytes() const
-{ 
-	return m_sizeInBytes; 
-}
-
-ndBrainGpuFloatBuffer* ndBrainGpuBuffer::GetAsFloatBuffer()
-{
-	return nullptr;
-}
-
-ndBrainGpuUniformBuffer* ndBrainGpuBuffer::GetAsUniformBuffer()
-{
-	return nullptr;
-}
-
-#endif
-
 ndBrainGpuBuffer::ndBrainGpuBuffer(const ndBrainBuffer* const owner, bool)
 	:m_owner(owner)
 {
-	m_memory.SetCount(ndInt64(m_owner->SizeInBytes()));
+	ndInt64 size = ndInt64(m_owner->SizeInBytes());
+	m_memory.Resize(size);
+	m_memory.SetCount(size);
 }
 
 void* ndBrainGpuBuffer::GetPtr()

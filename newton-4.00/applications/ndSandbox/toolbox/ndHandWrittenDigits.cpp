@@ -436,7 +436,7 @@ static void MnistTrainingSet()
 		ndAssert(isGpuReady);
 #endif
 
-		ndSharedPtr<ndBrainContext> context(isGpuReady ? ndSharedPtr<ndBrainContext>(new ndBrainGpuContext) : ndSharedPtr<ndBrainContext>(new ndBrainCpuContext));
+		ndSharedPtr<ndBrainContext> context(isGpuReady ? (ndBrainContext*)new ndBrainGpuContext : (ndBrainContext*)new ndBrainCpuContext);
 		SupervisedTrainer optimizer(context, brain);
 
 		optimizer.m_testData = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*context, **testDigits));
@@ -578,6 +578,6 @@ static void MnistTestSet()
 void ndHandWrittenDigits()
 {
 	ndSetRandSeed(53);
-	MnistTrainingSet();
+	//MnistTrainingSet();
 	//MnistTestSet();
 }

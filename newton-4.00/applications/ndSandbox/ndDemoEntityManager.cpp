@@ -166,7 +166,7 @@ ndInt32 ndDemoEntityManager::ButtonKey::UpdatePushButton (bool triggerValue)
 	return m_state ? 1 : 0;
 }
 
-void Test0__()
+static void Test0__()
 {
 	ndFixSizeArray<ndFloat32, 6> B(6);
 	ndFixSizeArray<ndFloat32, 6> x0(6);
@@ -239,7 +239,7 @@ static ndInt32 Fibonacci(ndInt32 n)
 	return b;
 }
 
-void Test1__()
+static void Test1__()
 {
 	//ndFloat32 A[2][2];
 	//ndFloat32 x[2];
@@ -293,122 +293,35 @@ void Test1__()
 	//}
 }
 
-void TestVulkanStuff()
+static void TestMachineLearningStressTest()
 {
-	if (!ndBrainContext::HasGpuSupport())
-	{
-		return;
-	}
-	ndBrainVector bias;
-	ndBrainMatrix input;
-	ndBrainMatrix output;
-	ndBrainMatrix matrix;
-	
-	//ndInt32 rowds = 64;
-	//ndInt32 columns = 784;
-	ndInt32 rowds = 2;
-	ndInt32 columns = 1;
-	ndInt32 inputsCount = 2;
-	
-	bias.SetCount(rowds);
-	matrix.Init(rowds, columns);
-	input.Init(inputsCount, columns);
-	output.Init(inputsCount, rowds);
-	
-	//bias.InitGaussianWeights(0.5f);
-	//input.InitGaussianWeights(0.5f);
-	//matrix.InitGaussianWeights(0.5f);
+	ndSharedPtr<ndBrain> brain(new ndBrain);
+	ndFixSizeArray<ndBrainLayer*, 32> layers;
+	layers.PushBack(new ndBrainLayerLinear(1000, 4096));
+	layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
+	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 4096));
+	layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
+	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
 
-	bias[0] = 1;
-	bias[1] = 2;
-	matrix[0][0] = 1;
-	matrix[1][0] = 2;
-	input[0][0] = 2;
-	input[1][0] = 3;
-	for (ndInt32 i = 0; i < inputsCount; ++i)
+	ndSharedPtr<ndBrainContext> context(new ndBrainGpuContext);
+	ndTrainerDescriptor descritor;
+	descritor.m_brain = brain;
+	descritor.m_context = context;
+	descritor.m_learnRate = 1.0e-4f;
+	descritor.m_minibatchSize = 128;
+	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
-		matrix.Mul(input[i], output[i]);
-		output[i].Add(bias);
+		brain->AddLayer(layers[i]);
 	}
-	
-	ndBrainVector parameters;
-	ndInt32 count = matrix.GetRows() * matrix.GetColumns() + matrix.GetRows();
-	parameters.SetCount(count);
-	parameters.Set(ndBrainFloat(-99999999999999.0f));
-	for (ndInt32 i = 0; i < matrix.GetRows(); ++i)
-	{
-		const ndBrainVector& src = matrix[i];
-		ndBrainMemVector dst (&parameters[i * matrix.GetColumns()], matrix.GetColumns());
-		dst.Set(src);
-	}
-	ndBrainMemVector dst(&parameters[matrix.GetColumns() * matrix.GetRows()], matrix.GetRows());
-	dst.Set(bias);
-	
-	ndBrainVector workBuffer;
-	ndInt32 workBufferStride = matrix.GetColumns() + matrix.GetRows();
-	workBuffer.SetCount(inputsCount * workBufferStride);
-	workBuffer.Set(-99999999999.0);
-	for (ndInt32 i = 0; i < inputsCount; ++i)
-	{
-		ndBrainMemVector buff(&workBuffer[workBufferStride * i], input[i].GetCount());
-		buff.Set(input[i]);
-	}
-	
-	ndBrainGpuContext context;
-	
-	//class TestCommand : public ndBrainGpuCommand
-	//{
-	//	public:
-	//	TestCommand(
-	//		ndBrainContext* const context, 
-	//		ndInt32 numberOfImputs, 
-	//		ndBrainUniformBuffer& uniforms,
-	//		ndBrainFloatBuffer& weights, 
-	//		ndBrainFloatBuffer& imputOutputs)
-	//		:ndBrainGpuCommand(context, ndCommandSharedInfo())
-	//	{
-	//		ndAssert(0);
-	//		//ndFixSizeArray<ndBrainBuffer*, 4> params;
-	//		//params.PushBack(&uniforms);
-	//		//params.PushBack(&imputOutputs);
-	//		//params.PushBack(&weights);
-	//		//Assembly(context->m_brainLayerMatrixMatrixMultiply, numberOfImputs, params.GetCount(), &params[0]);
-	//	}
-	//};
-	struct UniformBufferObject
-	{
-		ndUnsigned32 m_inputSize;
-		ndUnsigned32 m_outputSize;
-		ndUnsigned32 m_parametersStartOffset;
-		ndUnsigned32 m_inputOutputSize;
-		ndUnsigned32 m_inputOutputStartOffset;
-	};
-	
-	UniformBufferObject uniformParam;
-	uniformParam.m_outputSize = ndUnsigned32(matrix.GetRows());
-	uniformParam.m_inputSize = ndUnsigned32(matrix.GetColumns());
-	uniformParam.m_parametersStartOffset = 0;
+	brain->InitWeights();
 
-	uniformParam.m_inputOutputSize = ndUnsigned32(matrix.GetColumns() + matrix.GetRows());
-	uniformParam.m_inputOutputStartOffset = 0;
-	
-	ndAssert(0);
-	//ndBrainFloatBuffer inputOutputBuffer(&context, workBuffer);
-	//ndBrainFloatBuffer weightParamBuffer(&context, parameters);
-	//ndBrainUniformBuffer parammeters(&context, sizeof(UniformBufferObject));
-	//parammeters.LoadData(sizeof(UniformBufferObject), &uniformParam);
-	//
-	//UniformBufferObject uniformParam1;
-	//parammeters.UnloadData(sizeof(UniformBufferObject), &uniformParam1);
-	//
-	//ndSharedPtr<ndBrainGpuCommand> command(new TestCommand(&context, ndInt32(input.GetCount()), parammeters, weightParamBuffer, inputOutputBuffer));
-	//context.AddCommandQueue(command);
-	//context.SyncQueue();
-	//
-	//ndBrainVector outputGpu;
-	//outputGpu.SetCount(workBuffer.GetCount());
-	
-	//inputOutputBuffer.UnloadData(workBuffer.GetCount() * sizeof (ndReal), &outputGpu[0]);
+	ndSharedPtr<ndBrainTrainer> trainer(new ndBrainTrainer(descritor));
+	ndUnsigned64 time = ndGetTimeInMicroseconds();
+	for (ndInt32 epoch = 0; epoch < 5; ++epoch)
+	{
+
+	}
+	time = ndGetTimeInMicroseconds() - time;
 }
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
@@ -631,8 +544,8 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	//Test0__();
 	//Test1__();
-	//TestVulkanStuff();
-	ndHandWrittenDigits();
+	TestMachineLearningStressTest();
+	//ndHandWrittenDigits();
 	//ndCifar10ImageClassification();
 	//TargaToPng();
 }

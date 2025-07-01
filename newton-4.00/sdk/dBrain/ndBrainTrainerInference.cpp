@@ -142,6 +142,7 @@ void ndBrainTrainerInference::InitInputOutputBuffer()
 	}
 	
 	ndBrainVector buffer;
+	buffer.Resize(bufferSize * m_descriptor.m_minibatchSize);
 	buffer.SetCount(bufferSize * m_descriptor.m_minibatchSize);
 	buffer.Set(ndBrainFloat(0.0f));
 	m_inputOutputBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_descriptor.m_context, buffer));
@@ -189,6 +190,7 @@ void ndBrainTrainerInference::InitWeightAndBiasBuffer()
 	ndAssert((parametersSizeSum & (ND_DEFAULT_WORKGROUP_SIZE - 1)) == 0);
 
 	ndBrainVector scratchBuffer;
+	scratchBuffer.Resize(parametersSizeSum);
 	scratchBuffer.SetCount(parametersSizeSum);
 	scratchBuffer.Set(ndBrainFloat(0.0f));
 

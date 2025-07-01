@@ -133,6 +133,7 @@ ndBrainFloatBuffer* ndBrainTrainer::GetWeightAndBiasGradientBuffer()
 void ndBrainTrainer::Initialize()
 {
 	ndBrainVector buffer;
+	buffer.Resize(ndInt64(m_weightAndBiasBuffer->GetCount() * m_descriptor.m_minibatchSize));
 
 	buffer.SetCount(ndInt64(m_miniBatchInputBuffer->GetCount()));
 	buffer.Set(ndReal(0.0f));
