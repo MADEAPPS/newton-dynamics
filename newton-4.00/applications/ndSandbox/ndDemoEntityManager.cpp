@@ -305,8 +305,8 @@ static void SimpleRegressionBrainStressTest()
 	layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
 
-	//ndSharedPtr<ndBrainContext> context(new ndBrainGpuContext);
-	ndSharedPtr<ndBrainContext> context(new ndBrainCpuContext);
+	ndSharedPtr<ndBrainContext> context(new ndBrainGpuContext);
+	//ndSharedPtr<ndBrainContext> context(new ndBrainCpuContext);
 	ndTrainerDescriptor descritor;
 	descritor.m_brain = brain;
 	descritor.m_context = context;
@@ -552,8 +552,8 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	//Test0__();
 	//Test1__();
-	SimpleRegressionBrainStressTest();
-	//ndHandWrittenDigits();
+	ndHandWrittenDigits();
+	//SimpleRegressionBrainStressTest();
 	//ndCifar10ImageClassification();
 	//TargaToPng();
 }
