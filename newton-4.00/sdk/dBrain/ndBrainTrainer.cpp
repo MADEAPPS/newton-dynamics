@@ -364,7 +364,7 @@ void ndBrainTrainer::AddOptimizerGradientCommand()
 
 					for (ndInt32 j = 1; j < miniBatchSize; ++j)
 					{
-						ndInt32 base = start + j * inputSize;
+						ndInt64 base = start + j * ndInt64(inputSize);
 						ndAssert(base > 0);
 						for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
 						{

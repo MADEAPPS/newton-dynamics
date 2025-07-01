@@ -293,19 +293,20 @@ static void Test1__()
 	//}
 }
 
-static void TestMachineLearningStressTest()
+static void SimpleRegressionBrainStressTest()
 {
 	ndSharedPtr<ndBrain> brain(new ndBrain);
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 
 	ndInt32 hidenLayerWidth = 4096;
-	layers.PushBack(new ndBrainLayerLinear(1000, hidenLayerWidth));
+	layers.PushBack(new ndBrainLayerLinear(1, hidenLayerWidth));
 	layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hidenLayerWidth));
 	layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
 
-	ndSharedPtr<ndBrainContext> context(new ndBrainGpuContext);
+	//ndSharedPtr<ndBrainContext> context(new ndBrainGpuContext);
+	ndSharedPtr<ndBrainContext> context(new ndBrainCpuContext);
 	ndTrainerDescriptor descritor;
 	descritor.m_brain = brain;
 	descritor.m_context = context;
@@ -321,9 +322,14 @@ static void TestMachineLearningStressTest()
 	ndUnsigned64 time = ndGetTimeInMicroseconds();
 	for (ndInt32 epoch = 0; epoch < 5; ++epoch)
 	{
-
+		trainer->MakePrediction();
+		trainer->BackPropagate();
+		trainer->ApplyLearnRate();
 	}
 	time = ndGetTimeInMicroseconds() - time;
+
+	ndExpandTraceMessage("Stress test Regresion\n");
+	ndExpandTraceMessage(" training time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
 }
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
@@ -546,7 +552,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	//Test0__();
 	//Test1__();
-	TestMachineLearningStressTest();
+	SimpleRegressionBrainStressTest();
 	//ndHandWrittenDigits();
 	//ndCifar10ImageClassification();
 	//TargaToPng();
