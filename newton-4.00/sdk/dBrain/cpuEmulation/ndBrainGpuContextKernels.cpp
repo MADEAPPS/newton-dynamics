@@ -1070,7 +1070,7 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
     // calculating the dot product of that row time the vector and adding the bias value.
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
-        ndBrainFloat tile_acc[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_ROWS];
+        //ndBrainFloat tile_acc[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_ROWS];
         ndBrainFloat tile_inputs[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_COLUMNS + 1];
         ndBrainFloat tile_weights[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_COLUMNS + 1];
 
@@ -1100,11 +1100,13 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
         {
             biasValue[itemId_y] = weightsAndBias[parametersBiasOffset + itemId_y];
         }
+
+        ndBrainFloat tile_accReg[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_ROWS];
         for (ndInt32 itemId_x = 0; itemId_x < ND_GPU_TILED_MATRIX_ROWS; ++itemId_x)
         {
             for (ndInt32 itemId_y = 0; itemId_y < ND_GPU_TILED_MATRIX_ROWS; ++itemId_y)
             {
-                tile_acc[itemId_x][itemId_y] = biasValue[itemId_y];
+                tile_accReg[itemId_x][itemId_y] = biasValue[itemId_y];
             }
         }
         
@@ -1140,7 +1142,7 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
 //ndTrace(("%d ", (itemId_y * (ND_GPU_TILED_MATRIX_COLUMNS + 1)) % 32));
                     for (ndInt32 itemId_x = 0; itemId_x < ND_GPU_TILED_MATRIX_ROWS; itemId_x++)
                     {
-                        tile_acc[itemId_x][itemId_y] += a * tile_inputs[itemId_x][i];
+                        tile_accReg[itemId_x][itemId_y] += a * tile_inputs[itemId_x][i];
 //ndTrace(("%d ", (itemId_y * ND_GPU_TILED_MATRIX_ROWS + itemId_x) % 32));
                     }
 //ndTrace(("\n"));
@@ -1149,20 +1151,47 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
             }
             // barrier
         }
-        
+
+#if 0
+        // transpose the tile
+        ndBrainFloat tile_acc[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_ROWS];
+        for (ndInt32 itemId_y = 0; itemId_y < ND_GPU_TILED_MATRIX_ROWS; ++itemId_y)
+        {
+            for (ndInt32 itemId_x = 0; itemId_x < ND_GPU_TILED_MATRIX_ROWS; ++itemId_x)
+            {
+                tile_acc[itemId_y][itemId_x] = tile_accReg[itemId_x][itemId_y];
+            }
+        }
         const ndInt32 numberOutput = ((groupId_x + 1) * ND_GPU_TILED_MATRIX_ROWS < outputSize) ? ND_GPU_TILED_MATRIX_ROWS : outputSize - groupId_x * ND_GPU_TILED_MATRIX_ROWS;
         ndInt32 outputOffset = groupId_x * ND_GPU_TILED_MATRIX_ROWS + inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
         ndAssert(outputOffset >= 0);
+        // barrier
 
         for (ndInt32 itemId_y = 0; itemId_y < ND_GPU_TILED_MATRIX_ROWS; ++itemId_y)
         {
             for (ndInt32 itemId_x = 0; itemId_x < numberOutput; ++itemId_x)
             {
                 float value = tile_acc[itemId_y][itemId_x];
+                ndAssert(value == tile_accReg[itemId_x][itemId_y]);
                 inputOutputData[outputOffset + itemId_x] = value;
             }
             outputOffset += inputOutputStride;
         }
+#else
+
+        const ndInt32 numberOutput = ((groupId_x + 1) * ND_GPU_TILED_MATRIX_ROWS < outputSize) ? ND_GPU_TILED_MATRIX_ROWS : outputSize - groupId_x * ND_GPU_TILED_MATRIX_ROWS;
+        ndInt32 outputOffset = groupId_x * ND_GPU_TILED_MATRIX_ROWS + inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
+        ndAssert(outputOffset >= 0);
+        for (ndInt32 itemId_y = 0; itemId_y < ND_GPU_TILED_MATRIX_ROWS; ++itemId_y)
+        {
+            for (ndInt32 itemId_x = 0; itemId_x < numberOutput; ++itemId_x)
+            {
+                float value = tile_accReg[itemId_y][itemId_x];
+                inputOutputData[outputOffset + itemId_x] = value;
+            }
+            outputOffset += inputOutputStride;
+        }
+#endif
     }
 };
 

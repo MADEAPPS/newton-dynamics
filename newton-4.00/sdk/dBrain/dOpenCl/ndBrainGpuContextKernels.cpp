@@ -724,12 +724,17 @@ R""""(
 
         // transpose the flat array results
         tile_acc[acc_x][acc_y] = acc;
-        barrier(CLK_LOCAL_MEM_FENCE); 
-        
+
         const uint numberOutput = ((groupId_x + 1) * ND_GPU_TILED_MATRIX_ROWS < outputSize) ? ND_GPU_TILED_MATRIX_ROWS : outputSize - groupId_x * ND_GPU_TILED_MATRIX_ROWS;
         uint outputOffset = groupId_x * ND_GPU_TILED_MATRIX_ROWS + inputOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
+        outputOffset += acc_y * inputOutputStride + acc_x;
+        barrier(CLK_LOCAL_MEM_FENCE); 
+        
+        //const uint numberOutput = ((groupId_x + 1) * ND_GPU_TILED_MATRIX_ROWS < outputSize) ? ND_GPU_TILED_MATRIX_ROWS : outputSize - groupId_x * ND_GPU_TILED_MATRIX_ROWS;
+        //uint outputOffset = groupId_x * ND_GPU_TILED_MATRIX_ROWS + inputOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
         float value = tile_acc[acc_y][acc_x];
-        inputOutputData[outputOffset + acc_y * inputOutputStride + acc_x] = value;
+        //inputOutputData[outputOffset + acc_y * inputOutputStride + acc_x] = value;
+        inputOutputData[outputOffset] = value;
     }
 
     __kernel void brainLayerBrainLinearBackPropagate(

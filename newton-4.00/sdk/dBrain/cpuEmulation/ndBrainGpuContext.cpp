@@ -25,7 +25,7 @@ ndBrainGpuContext::ndBrainGpuContext()
 	,ndBrainThreadPool()
 {
 	ndInt32 numOfThreads = (ndBrainThreadPool::GetMaxThreads() + 1) / 2;
-numOfThreads = 1;
+//numOfThreads = 1;
 	SetThreadCount(numOfThreads);
 	CreateKerners();
 	CreateCopyCommands();
@@ -55,7 +55,7 @@ void ndBrainGpuContext::BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVe
 
 void ndBrainGpuContext::CopyBuffer(const ndBrainUniformBuffer& parameterBuffer, ndInt32 numberOfWorkGrups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
 {
-#if 0
+#if 1
 	ndBrainBufferCommandDesc& descriptor = m_copyBufferCommand->GetDescriptor();
 	descriptor.SetCount(0);
 	descriptor.PushBack((ndBrainBuffer*)&parameterBuffer);
@@ -89,8 +89,8 @@ void ndBrainGpuContext::CopyBuffer(const ndBrainUniformBuffer& parameterBuffer, 
 	
 	for (ndInt32 i = 0; i < numberOfWorkGrups; ++i)
 	{
-		ndAssert((i * dstStride + dstOffset) > 0);
-		ndAssert((i * srcStride + srcOffset) > 0);
+		ndAssert((i * dstStride + dstOffset) >= 0);
+		ndAssert((i * srcStride + srcOffset) >= 0);
 		ndMemCpy(&dst[i * dstStride + dstOffset], &src[i * srcStride + srcOffset], stride);
 	}
 #endif
@@ -98,7 +98,7 @@ void ndBrainGpuContext::CopyBuffer(const ndBrainUniformBuffer& parameterBuffer, 
 
 void ndBrainGpuContext::CopyBufferIndirect(const ndBrainUniformBuffer& parameterBuffer, const ndBrainIntegerBuffer& indexData, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
 {
-#if 0
+#if 1
 	ndBrainBufferCommandDesc& descriptor = m_copyBufferIndirectCommand->GetDescriptor();
 	descriptor.SetCount(0);
 	descriptor.PushBack((ndBrainBuffer*)&parameterBuffer);
