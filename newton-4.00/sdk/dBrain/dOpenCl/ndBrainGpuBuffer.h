@@ -22,10 +22,10 @@ class ndBrainGpuBuffer : public ndClassAlloc
 
 	~ndBrainGpuBuffer();
 	protected:
-	ndBrainGpuBuffer(const ndBrainBuffer* const owner, bool memoryMapped = false);
+	ndBrainGpuBuffer(const ndBrainBuffer* const owner);
 
 	ndSharedPtr<cl::Buffer> m_buffer;
-	const ndBrainBuffer* m_owner;
+	ndBrainBuffer* m_owner;
 	ndUnsigned32* m_memory;
 
 	friend class ndBrainBuffer;

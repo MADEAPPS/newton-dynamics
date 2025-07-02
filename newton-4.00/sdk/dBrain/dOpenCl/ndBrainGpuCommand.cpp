@@ -11,6 +11,7 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainGpuCommand.h"
+
 #if 0
 #include "ndBrainGpuBuffer.h"
 
@@ -56,3 +57,4 @@ ndBrainGpuCommand::ndBrainGpuCommand(const ndBrainBufferCommandDesc& desc)
 ndBrainGpuCommand::~ndBrainGpuCommand()
 {
 }
+

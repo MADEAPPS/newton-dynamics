@@ -12,6 +12,7 @@
 #define __ND_BRAIN_GPU_CONTEXT_H__
 
 #include "ndBrainStdafx.h"
+#include "ndBrainKernel.h"
 #include "ndBrainContext.h"
 
 #if 0
@@ -111,6 +112,7 @@ class ndBrainGpuContext : public ndBrainContext
 
 class ndBrainBuffer;
 class ndBrainKernel;
+class ndBrainGpuCommand;
 class ndBrainFloatBuffer;
 class ndBrainIntegerBuffer;
 class ndBrainUniformBuffer;
@@ -138,6 +140,7 @@ class ndBrainGpuContext : public ndBrainContext
 	private:
 	void CreateKerners();
 	void CreateCopyCommands();
+	bool SupportsMappedMemory() const;
 	size_t GetDeviceScore(cl::Device& device);
 	ndSharedPtr<ndBrainKernel> CreateKerner(const cl::Program& program, const char* const functionMame) const;
 	static void CL_CALLBACK clNotification(const char* errinfo, const void* private_info, size_t cb, void* user_data);
@@ -178,6 +181,9 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainKernel> m_brainCopyBuffer;
 	ndSharedPtr<ndBrainKernel> m_brainCopyBufferIndirect;
 
+	ndSharedPtr<ndBrainGpuCommand> m_copyBufferCommand;
+	ndSharedPtr<ndBrainGpuCommand> m_copyBufferIndirectCommand;
+
 	static const char* m_matrixMultiply;
 	static const char* m_optimizerKernels;
 	static const char* m_commonKernelsInclude;
@@ -187,6 +193,8 @@ class ndBrainGpuContext : public ndBrainContext
 	static const char* m_feedForwardKernels_3;
 	static const char* m_backPropagateKernels_1;
 	static const char* m_backPropagateKernels_2;
+
+	friend class ndBrainGpuBuffer;
 };
 
 #endif

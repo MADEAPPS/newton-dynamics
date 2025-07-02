@@ -13,7 +13,7 @@
 #include "ndBrainBuffer.h"
 #include "ndBrainGpuBuffer.h"
 
-ndBrainGpuBuffer::ndBrainGpuBuffer(const ndBrainBuffer* const owner, bool)
+ndBrainGpuBuffer::ndBrainGpuBuffer(const ndBrainBuffer* const owner)
 	:ndClassAlloc()
 	,m_owner(owner)
 {

@@ -21,7 +21,7 @@ class ndBrainGpuBuffer : public ndClassAlloc
 	void* GetPtr();
 
 	private:
-	ndBrainGpuBuffer(const ndBrainBuffer* const owner, bool memoryMapped);
+	ndBrainGpuBuffer(const ndBrainBuffer* const owner);
 
 	const ndBrainBuffer* m_owner;
 	ndArray<ndInt8> m_memory;

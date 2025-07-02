@@ -22,7 +22,7 @@ ndBrainBuffer::ndBrainBuffer(ndBrainContext* const context, ndInt64 sizeInByte, 
 {
 	if (m_context->GetAsGpuContext())
 	{
-		m_gpuBuffer = ndSharedPtr<ndBrainGpuBuffer> (new ndBrainGpuBuffer(this, memoryMapped));
+		m_gpuBuffer = ndSharedPtr<ndBrainGpuBuffer> (new ndBrainGpuBuffer(this));
 	}
 }
 

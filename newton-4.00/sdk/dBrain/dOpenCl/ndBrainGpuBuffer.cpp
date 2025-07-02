@@ -12,30 +12,33 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainBuffer.h"
 #include "ndBrainGpuBuffer.h"
+#include "ndBrainGpuContext.h"
 
 //ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainContext* const context, ndInt64 sizeInByte, bool memoryMapped)
-ndBrainGpuBuffer::ndBrainGpuBuffer(const ndBrainBuffer* const owner, bool memoryMapped)
+ndBrainGpuBuffer::ndBrainGpuBuffer(const ndBrainBuffer* const owner)
 	:ndClassAlloc()
 	,m_buffer()
-	,m_owner(owner)
+	,m_owner((ndBrainBuffer*)owner)
 	,m_memory(nullptr)
 {
-	ndAssert(0);
-	//cl_int error = CL_SUCCESS;
-	//ndBrainGpuContext* const gpuContext = m_context->GetAsGpuContext();
-	//ndAssert(context);
-	//if (m_isMemoryMapped && gpuContext->SupportsMappedMemory())
-	//{
-	//	m_memory = (ndUnsigned32*)clSVMAlloc(gpuContext->m_context->get(), CL_MEM_READ_WRITE | CL_MEM_SVM_FINE_GRAIN_BUFFER, size_t(sizeInByte), 32);
-	//	ndAssert(m_memory);
-	//	m_buffer = ndSharedPtr<cl::Buffer>(new cl::Buffer(**gpuContext->m_context, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR, size_t(sizeInByte), m_memory, &error));
-	//}
-	//else
-	//{
-	//	m_isMemoryMapped = false;
-	//	m_buffer = ndSharedPtr<cl::Buffer> (new cl::Buffer(**gpuContext->m_context, CL_MEM_READ_WRITE, size_t(sizeInByte), nullptr, &error));
-	//}
-	//ndAssert(error == CL_SUCCESS);
+	cl_int error = CL_SUCCESS;
+	ndBrainGpuContext* const context = m_owner->m_context->GetAsGpuContext();
+	ndAssert(context);
+
+	size_t size = m_owner->SizeInBytes();
+	if (m_owner->m_isMemoryMapped && context->SupportsMappedMemory())
+	{
+		ndAssert(0);
+		m_memory = (ndUnsigned32*)clSVMAlloc(context->m_context->get(), CL_MEM_READ_WRITE | CL_MEM_SVM_FINE_GRAIN_BUFFER, size, 32);
+		ndAssert(m_memory);
+		m_buffer = ndSharedPtr<cl::Buffer>(new cl::Buffer(**context->m_context, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR, size, m_memory, &error));
+	}
+	else
+	{
+		m_owner->m_isMemoryMapped = false;
+		m_buffer = ndSharedPtr<cl::Buffer> (new cl::Buffer(**context->m_context, CL_MEM_READ_WRITE, size, nullptr, &error));
+	}
+	ndAssert(error == CL_SUCCESS);
 }
 
 ndBrainGpuBuffer::~ndBrainGpuBuffer()

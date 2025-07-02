@@ -10,7 +10,16 @@
 */
 
 #include "ndBrainStdafx.h"
+#include "ndBrainKernel.h"
+#include "ndBrainGpuBuffer.h"
+#include "ndBrainGpuCommand.h"
 #include "ndBrainGpuContext.h"
+#include "ndBrainFloatBuffer.h"
+#include "ndBrainUniformBuffer.h"
+#include "ndBrainIntegerBuffer.h"
+#include "ndBrainBufferCommand.h"
+
+
 
 #if 0
 #include "ndBrainGpuBuffer.h"
@@ -107,11 +116,6 @@ ndBrainGpuContext::ndBrainGpuContext()
 
 ndBrainGpuContext::~ndBrainGpuContext()
 {
-}
-
-bool ndBrainGpuContext::SupportsMappedMemory() const
-{
-	return m_supportMappedMemory;
 }
 
 
@@ -368,6 +372,11 @@ void CL_CALLBACK ndBrainGpuContext::clNotification(const char*, const void*, siz
 	ndAssert(0);
 }
 
+bool ndBrainGpuContext::SupportsMappedMemory() const
+{
+	return m_supportMappedMemory;
+}
+
 size_t ndBrainGpuContext::GetDeviceScore(cl::Device& device)
 {
 	//std::string name (device.getInfo<CL_DEVICE_VENDOR>());
@@ -406,8 +415,13 @@ size_t ndBrainGpuContext::GetDeviceScore(cl::Device& device)
 
 void ndBrainGpuContext::CreateCopyCommands()
 {
-	ndAssert(0);
-	//ndBrainLayer::ndCommandShareInfo uniformParam;
-	//m_copyBufferCommand = ndSharedPtr<ndBrainGpuCommand>(new ndBrainGpuCommand(this, uniformParam));
-	//m_copyBufferIndirectCommand = ndSharedPtr<ndBrainGpuCommand>(new ndBrainGpuCommand(this, uniformParam));
+	ndBrainBufferCommandDesc copyDescriptor(0);
+	copyDescriptor.m_context = this;
+	copyDescriptor.m_kernel = m_brainCopyBuffer;
+	m_copyBufferCommand = ndSharedPtr<ndBrainGpuCommand>(new ndBrainGpuCommand(copyDescriptor));
+
+	ndBrainBufferCommandDesc copyIndirectDescriptor(0);
+	copyIndirectDescriptor.m_context = this;
+	copyIndirectDescriptor.m_kernel = m_brainCopyBufferIndirect;
+	m_copyBufferIndirectCommand = ndSharedPtr<ndBrainGpuCommand>(new ndBrainGpuCommand(copyIndirectDescriptor));
 }
