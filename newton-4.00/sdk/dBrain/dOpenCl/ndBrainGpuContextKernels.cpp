@@ -847,8 +847,8 @@ R""""(
         uint groupId = get_group_id(0);
         uint workGroupSize = get_local_size(0);
         
-        uint dstOffset = (groupId * parameters->m_dstStrideInByte + parameters->m_dstOffsetInByte) / sizeof (uint);
-        uint srcOffset = (groupId * parameters->m_srcStrideInByte + parameters->m_srcOffsetInByte) / sizeof (uint);
+        long dstOffset = (groupId * (long)parameters->m_dstStrideInByte + parameters->m_dstOffsetInByte) / sizeof (uint);
+        long srcOffset = (groupId * (long)parameters->m_srcStrideInByte + parameters->m_srcOffsetInByte) / sizeof (uint);
         
         uint dstStride = parameters->m_strideInByte / sizeof (uint);
         uint workGroupSizeReminder = dstStride % workGroupSize;
@@ -871,18 +871,12 @@ R""""(
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
         uint workGroupSize = get_local_size(0);
-        
-        //uint srcStride = parameters->m_inputSize;
-        //if ((groupId == 0 && ) printf ("%d: %d \n", groupId, stride);
-	    //ndInt32 m_strideInByte;
-	    //ndInt32 m_srcStrideInByte;
-	    //ndInt32 m_srcOffsetInByte;
-	    //ndInt32 m_dstStrideInByte;
-	    //ndInt32 m_dstOffsetInByte;
-        //} CopyBufferCommandInfo;
 
-        uint dstOffset = (groupId * parameters->m_dstStrideInByte + parameters->m_dstOffsetInByte) / sizeof (uint);
-        uint srcOffset = (indexBuffer[groupId] * parameters->m_srcStrideInByte + parameters->m_srcOffsetInByte) / sizeof (uint);
+        //uint dstOffset = (groupId * parameters->m_dstStrideInByte + parameters->m_dstOffsetInByte) / sizeof (uint);
+        //uint srcOffset = (indexBuffer[groupId] * parameters->m_srcStrideInByte + parameters->m_srcOffsetInByte) / sizeof (uint);
+
+        long dstOffset = (groupId * (long) parameters->m_dstStrideInByte + parameters->m_dstOffsetInByte) / sizeof (uint);
+        long srcOffset = (indexBuffer[groupId] * (long) parameters->m_srcStrideInByte + parameters->m_srcOffsetInByte) / sizeof (uint);
         
         uint dstStride = parameters->m_strideInByte / sizeof (uint);
         uint workGroupSizeReminder = dstStride % workGroupSize;
@@ -901,31 +895,13 @@ R""""(
 
 )"""";
 
-
 ndSharedPtr<ndBrainKernel> ndBrainGpuContext::CreateKerner(const cl::Program& program, const char* const functionMame) const
 {
-    class brainOpenclKernel : public ndBrainKernel
-    {
-        public:
-        brainOpenclKernel(ndBrainContext* const context, const ndSharedPtr<cl::Kernel>& kenel)
-            :ndBrainKernel(context)
-            ,m_shader(kenel)
-        {
-        }
-
-        void Execute(ndInt32, ndInt32) override
-        {
-            ndAssert(0);
-        }
-
-        ndSharedPtr<cl::Kernel> m_shader;
-    };
-
     cl_int errcode_ret = 0;
     ndSharedPtr<cl::Kernel> shader(new cl::Kernel(program, functionMame, &errcode_ret));
     ndAssert(errcode_ret == 0);
 
-    ndSharedPtr<ndBrainKernel> kernel(new brainOpenclKernel((ndBrainGpuContext*)this, shader));
+    ndSharedPtr<ndBrainKernel> kernel(new OpenclKernel((ndBrainGpuContext*)this, shader));
     return kernel;
 }
 

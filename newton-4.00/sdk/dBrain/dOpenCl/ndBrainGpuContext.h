@@ -120,6 +120,23 @@ class ndBrainUniformBuffer;
 class ndBrainGpuContext : public ndBrainContext
 {
 	public:
+	class OpenclKernel : public ndBrainKernel
+	{
+		public:
+		OpenclKernel(ndBrainContext* const context, const ndSharedPtr<cl::Kernel>& kenel)
+			:ndBrainKernel(context)
+			,m_shader(kenel)
+		{
+		}
+
+		void Execute(ndInt32, ndInt32) override
+		{
+			ndAssert(0);
+		}
+
+		ndSharedPtr<cl::Kernel> m_shader;
+	};
+
 	ndBrainGpuContext();
 	virtual ~ndBrainGpuContext();
 
