@@ -23,15 +23,10 @@
 #include <string>
 #include <vector>
 
-
-#define D_OPENCL_SELECTION_TYPE		CL_DEVICE_TYPE_ALL
-//#define D_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_CPU
-//#define D_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_GPU
-
 ndBrainGpuContext::ndBrainGpuContext()
 	:ndBrainContext()
 {
-	m_supportsMappedMemory = false;
+	m_supportMappedMemory = false;
 
 	// get all devices of all platforms
 	std::vector<cl::Device> cl_devices; 
@@ -43,7 +38,7 @@ ndBrainGpuContext::ndBrainGpuContext()
 		for (size_t i = 0; i < cl_platforms.size(); i++)
 		{
 			std::vector<cl::Device> cl_devices_available;
-			cl_platforms[i].getDevices(D_OPENCL_SELECTION_TYPE, &cl_devices_available);
+			cl_platforms[i].getDevices(ND_OPENCL_SELECTION_TYPE, &cl_devices_available);
 			for (size_t j = 0; j < cl_devices_available.size(); j++)
 			{
 				const std::string name(cl_platforms[i].getInfo<CL_PLATFORM_NAME>());
@@ -101,7 +96,7 @@ ndBrainGpuContext::ndBrainGpuContext()
 		{
 			if (svm_caps & (CL_DEVICE_SVM_COARSE_GRAIN_BUFFER | CL_DEVICE_SVM_FINE_GRAIN_BUFFER))
 			{
-				m_supportsMappedMemory = true;
+				m_supportMappedMemory = true;
 			}
 		}
 
@@ -116,34 +111,9 @@ ndBrainGpuContext::~ndBrainGpuContext()
 
 bool ndBrainGpuContext::SupportsMappedMemory() const
 {
-	return m_supportsMappedMemory;
+	return m_supportMappedMemory;
 }
 
-size_t ndBrainGpuContext::GetDeviceScore(cl::Device& device)
-{
-	std::string name = device.getInfo<CL_DEVICE_NAME>();
-	
-	std::string lowerName;
-	for (size_t i = 0; i < name.size(); ++i)
-	{
-		int ch = tolower(name[i]);
-		lowerName.push_back(char (ch));
-	}
-
-	// some heuristic to select a device. I am no using specific vendor gpu/cpu/fpga types.
-	size_t computeUnits = device.getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>();
-	size_t clockMegaHertz = device.getInfo<CL_DEVICE_MAX_CLOCK_FREQUENCY>();
-	const bool is_gpu = device.getInfo<CL_DEVICE_TYPE>() == CL_DEVICE_TYPE_GPU;
-	size_t wavefront = size_t(is_gpu ? 64 : 8);
-	size_t amd = size_t((lowerName.find("amd") != std::string::npos) ? 1 : 0);
-	size_t arm = size_t((lowerName.find("arm") != std::string::npos) ? 1 : 0);
-	size_t intel = size_t((lowerName.find("intel") != std::string::npos) ? 1 : 0);
-	size_t nvidia = size_t((lowerName.find ("nvidia") != std::string::npos) ? 1 : 0);
-
-	size_t cores = computeUnits * (nvidia + amd + intel + arm);
-	size_t megaFlops = cores * wavefront * clockMegaHertz;
-	return megaFlops;
-}
 
 bool ndBrainGpuContext::HasGpuSupport() 
 { 
@@ -166,12 +136,6 @@ ndBrainGpuContext* ndBrainGpuContext::GetAsGpuContext()
 	return this;
 }
 
-void ndBrainGpuContext::CreateCopyCommands()
-{
-	ndBrainLayer::ndCommandShareInfo uniformParam;
-	m_copyBufferCommand = ndSharedPtr<ndBrainGpuCommand>(new ndBrainGpuCommand(this, uniformParam));
-	m_copyBufferIndirectCommand = ndSharedPtr<ndBrainGpuCommand>(new ndBrainGpuCommand(this, uniformParam));
-}
 
 #if 0
 void ndBrainGpuContext::CopyBuffer(
@@ -263,15 +227,11 @@ void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& co
 
 #include "ndBrainKernel.h"
 
-ndBrainGpuContext::ndBrainGpuContext()
-{
-	ndAssert(0);
-}
 
-ndBrainGpuContext::~ndBrainGpuContext()
-{
-	ndAssert(0);
-}
+#define ND_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_ALL
+//#define ND_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_CPU
+//#define ND_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_GPU
+
 
 void ndBrainGpuContext::SyncBufferCommandQueue()
 {
@@ -317,3 +277,137 @@ void ndBrainGpuContext::CopyBufferIndirect(const ndBrainUniformBuffer& parameter
 	ndAssert(0);
 }
 
+ndBrainGpuContext::ndBrainGpuContext()
+	:ndBrainContext()
+{
+	m_supportMappedMemory = false;
+
+	// get all devices of all platforms
+	std::vector<cl::Device> cl_devices;
+	{
+		std::vector<cl::Platform> cl_platforms;
+		cl::Platform::get(&cl_platforms);
+		ndExpandTraceMessage("\n");
+		ndExpandTraceMessage("platforms found:\n");
+		for (size_t i = 0; i < cl_platforms.size(); i++)
+		{
+			std::vector<cl::Device> cl_devices_available;
+			cl_platforms[i].getDevices(ND_OPENCL_SELECTION_TYPE, &cl_devices_available);
+			for (size_t j = 0; j < cl_devices_available.size(); j++)
+			{
+				const std::string name(cl_platforms[i].getInfo<CL_PLATFORM_NAME>());
+				ndExpandTraceMessage("opencl platform: %s\n", name.c_str());
+				cl_devices.push_back(cl_devices_available[j]);
+			}
+		}
+	}
+
+	// select fastest available device
+	if (cl_devices.size())
+	{
+		size_t bestScore = 0;
+		size_t bestDeviceIndex = 0;
+		for (size_t i = 0; i < cl_devices.size(); ++i)
+		{
+			size_t score = GetDeviceScore(cl_devices[i]);
+			if (score > bestScore)
+			{
+				bestScore = score;
+				bestDeviceIndex = i;
+			}
+		}
+
+		m_device = ndSharedPtr<cl::Device>(new cl::Device(cl_devices[bestDeviceIndex]));
+		const std::string name(m_device->getInfo<CL_DEVICE_NAME>());
+		const std::string version(m_device->getInfo<CL_DEVICE_VERSION>());
+		size_t localMemorySize = m_device->getInfo<CL_DEVICE_LOCAL_MEM_SIZE>();
+		size_t compute_units = m_device->getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>();
+
+		ndExpandTraceMessage("\n");
+		ndExpandTraceMessage("selecting:\n");
+		ndExpandTraceMessage("opencl device name: %s\n", name.c_str());
+		ndExpandTraceMessage("opencl device version: %s\n", version.c_str());
+
+		ndExpandTraceMessage("opencl device compute units: %d\n", compute_units);
+		ndExpandTraceMessage("opencl device local memory: %d\n", localMemorySize);
+		ndExpandTraceMessage("\n");
+
+		cl_int error = 0;
+		m_context = ndSharedPtr<cl::Context>(new cl::Context(**m_device, nullptr, clNotification, this, &error));
+		ndAssert(error == CL_SUCCESS);
+
+		cl_command_queue_properties properties = CL_QUEUE_PROFILING_ENABLE;
+		m_queue = ndSharedPtr<cl::CommandQueue>(new cl::CommandQueue(**m_context, **m_device, properties, &error));
+		ndAssert(error == CL_SUCCESS);
+
+		m_emptyBuffer = cl::Buffer(**m_context, CL_MEM_READ_WRITE, 256);
+
+		cl_device_svm_capabilities svm_caps(m_device->getInfo<CL_DEVICE_SVM_CAPABILITIES>(&error));
+
+		if (error == CL_SUCCESS)
+		{
+			//if (svm_caps & (CL_DEVICE_SVM_COARSE_GRAIN_BUFFER | CL_DEVICE_SVM_FINE_GRAIN_BUFFER))
+			if (svm_caps & CL_DEVICE_SVM_FINE_GRAIN_BUFFER)
+			{
+				m_supportMappedMemory = true;
+			}
+		}
+
+		CreateKerners();
+		CreateCopyCommands();
+	}
+}
+
+ndBrainGpuContext::~ndBrainGpuContext()
+{
+}
+
+//void CL_CALLBACK ndBrainGpuContext::clNotification(const char* errinfo, const void* private_info, size_t cb, void* user_data)
+void CL_CALLBACK ndBrainGpuContext::clNotification(const char*, const void*, size_t, void*)
+{
+	ndAssert(0);
+}
+
+size_t ndBrainGpuContext::GetDeviceScore(cl::Device& device)
+{
+	//std::string name (device.getInfo<CL_DEVICE_VENDOR>());
+	//std::string lowerName;
+	//for (size_t i = 0; i < name.size(); ++i)
+	//{
+	//	int ch = tolower(name[i]);
+	//	lowerName.push_back(char(ch));
+	//}
+	//
+	//// some heuristic to select a device. I am no using specific vendor gpu/cpu/fpga types.
+	//size_t computeUnits = device.getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>();
+	//size_t clockMegaHertz = device.getInfo<CL_DEVICE_MAX_CLOCK_FREQUENCY>();
+	//const bool is_gpu = device.getInfo<CL_DEVICE_TYPE>() == CL_DEVICE_TYPE_GPU;
+	//size_t wavefront = size_t(is_gpu ? 64 : 8);
+	//size_t amd = size_t((lowerName.find("amd") != std::string::npos) ? 1 : 0);
+	//size_t arm = size_t((lowerName.find("arm") != std::string::npos) ? 1 : 0);
+	//size_t intel = size_t((lowerName.find("intel") != std::string::npos) ? 1 : 0);
+	//size_t nvidia = size_t((lowerName.find("nvidia") != std::string::npos) ? 1 : 0);
+	//amd = amd | (size_t((lowerName.find("advanced micro devices, inc.") != std::string::npos) ? 1 : 0));
+	//size_t cores = computeUnits * (nvidia + amd + intel + arm);
+	//size_t megaFlops = cores * wavefront * clockMegaHertz;
+
+	const bool is_gpu = device.getInfo<CL_DEVICE_TYPE>() == CL_DEVICE_TYPE_GPU;
+	size_t computeUnits = device.getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>();
+	size_t wavefront = size_t(is_gpu ? 128 : 8);
+	size_t flopsPerClock = computeUnits * wavefront;
+
+	size_t localMemorySize = device.getInfo<CL_DEVICE_LOCAL_MEM_SIZE>();
+	if (localMemorySize < 1024 * 32)
+	{
+		flopsPerClock = 0;
+	}
+	return flopsPerClock;
+}
+
+void ndBrainGpuContext::CreateCopyCommands()
+{
+	ndAssert(0);
+	//ndBrainLayer::ndCommandShareInfo uniformParam;
+	//m_copyBufferCommand = ndSharedPtr<ndBrainGpuCommand>(new ndBrainGpuCommand(this, uniformParam));
+	//m_copyBufferIndirectCommand = ndSharedPtr<ndBrainGpuCommand>(new ndBrainGpuCommand(this, uniformParam));
+}

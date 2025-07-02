@@ -10,6 +10,8 @@
 */
 
 #include "ndBrainStdafx.h"
+#include "ndBrainKernel.h"
+#include "ndBrainGpuCommand.h"
 #include "ndBrainGpuContext.h"
 
 // feed forward kernels
@@ -583,38 +585,6 @@ R""""(
         gradientBuffer[start + itemId] = sum * weightFactor;
     }
 
-    __kernel void brainAccumulateGradients(
-            __global const UniformBufferLayerArguments* parameters,
-            __global float* gradientBuffer)
-    {
-        uint itemId = get_local_id(0);
-        uint groupId = get_group_id(0);
-        uint workGroupSize = get_local_size(0);
-
-        uint inputSize = parameters->m_inputSize;
-        uint miniBatchSize = parameters->m_inputOutputSize;
-        
-        uint dst = parameters->m_parametersStartOffset + groupId * workGroupSize;
-        uint src = dst + parameters->m_parametersBatchSize;
-        float a = gradientBuffer[src + itemId];
-        gradientBuffer[dst + itemId] += a;
-    }
-
-    __kernel void brainAverageGradients(
-            __global const UniformBufferLayerArguments* parameters,
-            __global float* gradientBuffer)
-    {
-        uint itemId = get_local_id(0);
-        uint groupId = get_group_id(0);
-        uint workGroupSize = get_local_size(0);
-
-        uint start = groupId * workGroupSize;
-        uint miniBatchSize = parameters->m_inputOutputSize;
-        
-        float weightFactor = 1.0f / (float)miniBatchSize;
-        float sum = gradientBuffer[start + itemId];
-        gradientBuffer[start + itemId] = sum * weightFactor;
-    }
 
     __kernel void brainAdamUpdateLassoRegularizer(
         __global const UniformBufferOptimizerArguments* parameters,
@@ -933,18 +903,35 @@ R""""(
 )"""";
 
 
-//ndSharedPtr<ndBrainGpuShader> ndBrainGpuContext::CreateKerner(const cl::Program& program, const char* const functionMame) const
-//{
-//    cl_int errcode_ret = 0;
-//    ndSharedPtr<ndBrainGpuShader> kernel(ndSharedPtr<ndBrainGpuShader>(new ndBrainGpuShader(program, functionMame, &errcode_ret)));
-//    ndAssert(errcode_ret == 0);
-//    return kernel;
-//}
+ndSharedPtr<ndBrainKernel> ndBrainGpuContext::CreateKerner(const cl::Program& program, const char* const functionMame) const
+{
+    class brainOpenclKernel : public ndBrainKernel
+    {
+        public:
+        brainOpenclKernel(ndBrainContext* const context, const ndSharedPtr<cl::Kernel>& kenel)
+            :ndBrainKernel(context)
+            ,m_shader(kenel)
+        {
+        }
+
+        void Execute(ndInt32, ndInt32) override
+        {
+            ndAssert(0);
+        }
+
+        ndSharedPtr<cl::Kernel> m_shader;
+    };
+
+    cl_int errcode_ret = 0;
+    ndSharedPtr<cl::Kernel> shader(new cl::Kernel(program, functionMame, &errcode_ret));
+    ndAssert(errcode_ret == 0);
+
+    ndSharedPtr<ndBrainKernel> kernel(new brainOpenclKernel((ndBrainGpuContext*)this, shader));
+    return kernel;
+}
 
 void ndBrainGpuContext::CreateKerners()
 {
-    ndAssert(0);
-#if 0
     std::string source(m_commonKernelsInclude);
     source += m_matrixMultiply;
     source += m_optimizerKernels;
@@ -1018,18 +1005,13 @@ void ndBrainGpuContext::CreateKerners()
     m_brainLayerMatrixVectorBackPropagate = CreateKerner(program, "brainLayerBrainLinearBackPropagate");
     m_brainLayerCathegoricalSoftmaxBackPropagate = CreateKerner(program, "brainLayerBrainCathegoricalSoftmaxBackPropagate");
 
-    // accumulate gradient kernels
-    m_brainAverageGradients = CreateKerner(program, "brainAverageGradients");
-    m_brainAccumulateGradients = CreateKerner(program, "brainAccumulateGradients");
-    m_brainAccumulateGradientsAndAverage = CreateKerner(program, "brainAccumulateGradientsAndAverage");
-
-    // optimizer kernels
+    // accumulate gradient kernels and optimizer kernels
     m_brainAdamMomentumUpdate = CreateKerner(program, "brainAdamMomentumUpdate");
     m_brainAdamRidgeOptimizerUpdate = CreateKerner(program, "brainAdamUpdateRidgeRegularizer");
     m_brainAdamLassoOptimizerUpdate = CreateKerner(program, "brainAdamUpdateLassoRegularizer");
+    m_brainAccumulateGradientsAndAverage = CreateKerner(program, "brainAccumulateGradientsAndAverage");
 
     // other shaders
     m_brainCopyBuffer = CreateKerner(program, "brainCopyBuffer");
     m_brainCopyBufferIndirect = CreateKerner(program, "brainCopyBufferIndirect");
-#endif
 }

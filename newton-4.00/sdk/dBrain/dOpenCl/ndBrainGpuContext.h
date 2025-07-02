@@ -87,7 +87,7 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<cl::Context> m_context;
 	ndSharedPtr<cl::CommandQueue> m_queue;
 	cl::Buffer m_emptyBuffer;
-	bool m_supportsMappedMemory;
+	
 
 	ndSharedPtr<ndBrainGpuCommand> m_copyBufferCommand;
 	ndSharedPtr<ndBrainGpuCommand> m_copyBufferIndirectCommand;
@@ -137,8 +137,19 @@ class ndBrainGpuContext : public ndBrainContext
 
 	private:
 	void CreateKerners();
+	void CreateCopyCommands();
+	size_t GetDeviceScore(cl::Device& device);
+	ndSharedPtr<ndBrainKernel> CreateKerner(const cl::Program& program, const char* const functionMame) const;
+	static void CL_CALLBACK clNotification(const char* errinfo, const void* private_info, size_t cb, void* user_data);
 
-public:
+	ndSharedPtr<cl::Device> m_device;
+	ndSharedPtr<cl::Context> m_context;
+	ndSharedPtr<cl::CommandQueue> m_queue;
+	cl::Buffer m_emptyBuffer;
+
+	bool m_supportMappedMemory;
+
+	public:
 	// feed foward shaders
 	ndSharedPtr<ndBrainKernel> m_brainCopyInput;
 	ndSharedPtr<ndBrainKernel> m_brainCopyOutput;
@@ -162,6 +173,9 @@ public:
 	ndSharedPtr<ndBrainKernel> m_brainAdamRidgeOptimizerUpdate;
 	ndSharedPtr<ndBrainKernel> m_brainAdamLassoOptimizerUpdate;
 	ndSharedPtr<ndBrainKernel> m_brainAccumulateGradientsAndAverage;
+
+	ndSharedPtr<ndBrainKernel> m_brainCopyBuffer;
+	ndSharedPtr<ndBrainKernel> m_brainCopyBufferIndirect;
 
 	static const char* m_matrixMultiply;
 	static const char* m_optimizerKernels;
