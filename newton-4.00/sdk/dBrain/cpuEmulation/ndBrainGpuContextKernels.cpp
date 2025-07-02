@@ -27,6 +27,100 @@ inline ndInt32 __cpuKernelRoundoff(ndInt32 value, ndInt32 workgroupSize)
     return (value + workgroupSize - 1) & -workgroupSize;
 }
 
+class brainCopyBuffer : public ndBrainKernel
+{
+    public:
+    brainCopyBuffer(ndBrainContext* const context)
+        :ndBrainKernel(context)
+    {
+    }
+
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    {
+        ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
+        ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
+        ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
+
+        ndUnsigned32* const srcBuffer = (ndUnsigned32*)buffer2->GetGpuBuffer()->GetPtr();
+        ndUnsigned32* const dstBuffer = (ndUnsigned32*)buffer1->GetGpuBuffer()->GetPtr();
+        ndCopyBufferCommandInfo* const parameters = (ndCopyBufferCommandInfo*)buffer0->GetGpuBuffer()->GetPtr();
+        ndAssert((parameters->m_strideInByte & (sizeof(ndInt32) - 1)) == 0);
+
+        ndInt32 stride = parameters->m_strideInByte / ndInt32(sizeof(ndInt32));
+        ndInt32 srcStride = parameters->m_srcStrideInByte / ndInt32(sizeof(ndInt32));
+        ndInt32 srcOffset = parameters->m_srcOffsetInByte / ndInt32(sizeof(ndInt32));
+        ndInt32 dstStride = parameters->m_dstStrideInByte / ndInt32(sizeof(ndInt32));
+        ndInt32 dstOffset = parameters->m_dstOffsetInByte / ndInt32(sizeof(ndInt32));
+
+        ndInt32 workGroupSizeReminder = stride % workGroupSize;
+        ndInt32 modWorkGroupSize = stride - workGroupSizeReminder;
+
+        ndInt64 dstBase = ndInt64(dstOffset) + groupId * ndInt64(dstStride);
+        ndInt64 srcBase = ndInt64(srcOffset) + groupId * ndInt64(srcStride);
+        for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+            {
+                ndUnsigned32 val = srcBuffer[srcBase + i + itemId];
+                dstBuffer[dstBase + i + itemId] = val;
+            }
+        }
+        for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+        {
+            ndUnsigned32 val = srcBuffer[srcBase + modWorkGroupSize + itemId];
+            dstBuffer[dstBase + modWorkGroupSize + itemId] = val;
+        }
+    }
+};
+
+class brainCopyBufferIndirect : public ndBrainKernel
+{
+    public:
+    brainCopyBufferIndirect(ndBrainContext* const context)
+        :ndBrainKernel(context)
+    {
+    }
+
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    {
+        ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
+        ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
+        ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
+        ndBrainIntegerBuffer* const buffer3 = (ndBrainIntegerBuffer*)m_parameters[3];
+        
+        ndUnsigned32* indexArray = (ndUnsigned32*)buffer3->GetGpuBuffer()->GetPtr();
+        ndUnsigned32* const srcBuffer = (ndUnsigned32*)buffer2->GetGpuBuffer()->GetPtr();
+        ndUnsigned32* const dstBuffer = (ndUnsigned32*)buffer1->GetGpuBuffer()->GetPtr();
+        ndCopyBufferCommandInfo* const parameters = (ndCopyBufferCommandInfo*)buffer0->GetGpuBuffer()->GetPtr();
+        ndAssert((parameters->m_strideInByte & (sizeof(ndInt32) - 1)) == 0);
+        
+        ndInt32 stride = parameters->m_strideInByte / ndInt32 (sizeof (ndInt32));
+        ndInt32 srcStride = parameters->m_srcStrideInByte / ndInt32 (sizeof (ndInt32));
+        ndInt32 srcOffset = parameters->m_srcOffsetInByte / ndInt32 (sizeof (ndInt32));
+        ndInt32 dstStride = parameters->m_dstStrideInByte / ndInt32 (sizeof (ndInt32));
+        ndInt32 dstOffset = parameters->m_dstOffsetInByte / ndInt32 (sizeof (ndInt32));
+
+        ndInt32 workGroupSizeReminder = stride % workGroupSize;
+        ndInt32 modWorkGroupSize = stride - workGroupSizeReminder;
+
+        ndInt64 dstBase = ndInt64(dstOffset) + groupId * ndInt64(dstStride);
+        ndInt64 srcBase = ndInt64(srcOffset) + indexArray[groupId] * ndInt64(srcStride);
+        for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+            {
+                ndUnsigned32 val = srcBuffer[srcBase + i + itemId];
+                dstBuffer[dstBase + i + itemId] = val;
+            }
+        }
+        for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+        {
+            ndUnsigned32 val = srcBuffer[srcBase + modWorkGroupSize + itemId];
+            dstBuffer[dstBase + modWorkGroupSize + itemId] = val;
+        }
+    }
+};
+
 class brainCopyInput : public ndBrainKernel
 {
     public:
@@ -1245,4 +1339,8 @@ void ndBrainGpuContext::CreateKerners()
     m_brainAdamRidgeOptimizerUpdate = ndSharedPtr<ndBrainKernel>(new brainAdamUpdateRidgeRegularizer(this));
     m_brainAdamLassoOptimizerUpdate = ndSharedPtr<ndBrainKernel>(new brainAdamUpdateLassoRegularizer(this));
     m_brainAccumulateGradientsAndAverage = ndSharedPtr<ndBrainKernel>(new brainAccumulateGradientsAndAverage(this));
+
+    // optimizer kernels
+    m_brainCopyBuffer = ndSharedPtr<ndBrainKernel>(new brainCopyBuffer(this));
+    m_brainCopyBufferIndirect = ndSharedPtr<ndBrainKernel>(new brainCopyBufferIndirect(this));
 }

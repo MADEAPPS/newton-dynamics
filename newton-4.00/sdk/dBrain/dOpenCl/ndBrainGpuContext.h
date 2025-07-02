@@ -174,6 +174,7 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainKernel> m_brainAdamLassoOptimizerUpdate;
 	ndSharedPtr<ndBrainKernel> m_brainAccumulateGradientsAndAverage;
 
+	// other shader
 	ndSharedPtr<ndBrainKernel> m_brainCopyBuffer;
 	ndSharedPtr<ndBrainKernel> m_brainCopyBufferIndirect;
 

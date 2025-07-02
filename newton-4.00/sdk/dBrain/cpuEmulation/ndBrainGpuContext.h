@@ -44,6 +44,10 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 
 	private:
 	void CreateKerners();
+	void CreateCopyCommands();
+
+	ndSharedPtr<ndBrainGpuCommand> m_copyBufferCommand;
+	ndSharedPtr<ndBrainGpuCommand> m_copyBufferIndirectCommand;
 
 	public:
 	// feed foward shaders
@@ -69,5 +73,9 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 	ndSharedPtr<ndBrainKernel> m_brainAdamRidgeOptimizerUpdate;
 	ndSharedPtr<ndBrainKernel> m_brainAdamLassoOptimizerUpdate;
 	ndSharedPtr<ndBrainKernel> m_brainAccumulateGradientsAndAverage;
+
+	// other shader
+	ndSharedPtr<ndBrainKernel> m_brainCopyBuffer;
+	ndSharedPtr<ndBrainKernel> m_brainCopyBufferIndirect;
 };
 #endif

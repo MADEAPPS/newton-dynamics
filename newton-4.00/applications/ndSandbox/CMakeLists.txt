@@ -59,15 +59,15 @@ endif()
 
 add_executable(${projectName} ${CPP_SOURCE})
 
-message ("linking project libraries")
+message ("adding project libraries")
 target_link_libraries (${projectName} PUBLIC ndNewton ndBrain ndModel vhacd openfbx lodepng imgui)
 
 if (MSVC OR MINGW)
-	message ("linking third party opengl libraries")
+	message ("adding required third party opengl libraries")
 	target_link_libraries (${projectName} PUBLIC glfw glatter glu32 opengl32)
 
 elseif(APPLE)
-	message ("linking required Apple frameworks")
+	message ("adding required Apple frameworks")
     add_definitions(-DGL_SILENCE_DEPRECATION)
 
 	target_link_libraries(${projectName} PUBLIC glfw)
@@ -82,7 +82,7 @@ elseif(APPLE)
 	#set_target_properties(${projectName} PROPERTIES LINK_FLAGS "-Wl,-F/Library/Frameworks")
 
 else(UNIX)
-	message ("linking required posit system libraries")
+	message ("adding required posit system libraries")
 	target_link_libraries (${projectName} PUBLIC glatter glfw dl GL X11 pthread ${X11_Xcursor_LIBRARIES} ${X11_Xinerama_LIBRARIES})
 endif()
 
