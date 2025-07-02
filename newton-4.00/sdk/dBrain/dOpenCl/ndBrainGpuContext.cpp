@@ -10,6 +10,7 @@
 */
 
 #include "ndBrainStdafx.h"
+#include "ndBrainVector.h"
 #include "ndBrainKernel.h"
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuCommand.h"
@@ -259,16 +260,8 @@ void ndBrainGpuContext::BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVe
 
 void ndBrainGpuContext::BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector)
 {
-	ndAssert(0);
-}
-
-void ndBrainGpuContext::MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, const void* const srcMemory) const
-{
-	ndAssert(0);
-}
-void ndBrainGpuContext::MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
-{
-	ndAssert(0);
+	size_t sizeInBytes = ndMin(size_t(dst.SizeInBytes()), size_t(srcVector.GetCount() * sizeof(ndReal)));
+	MemoryToDevice(dst, 0, sizeInBytes, &srcVector[0]);
 }
 
 void ndBrainGpuContext::CopyBuffer(const ndBrainUniformBuffer& parameterBuffer, ndInt32 numberOfWorkGrups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
@@ -424,4 +417,27 @@ void ndBrainGpuContext::CreateCopyCommands()
 	copyIndirectDescriptor.m_context = this;
 	copyIndirectDescriptor.m_kernel = m_brainCopyBufferIndirect;
 	m_copyBufferIndirectCommand = ndSharedPtr<ndBrainGpuCommand>(new ndBrainGpuCommand(copyIndirectDescriptor));
+}
+
+void ndBrainGpuContext::MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, const void* const srcMemory) const
+{
+	cl_int error = 0;
+	ndAssert(sizeInBytes <= deviceBuffer.SizeInBytes());
+
+	const cl::CommandQueue* queue = *m_queue;
+	ndBrainGpuBuffer* const buffer = deviceBuffer.GetGpuBuffer();
+	error = queue->enqueueWriteBuffer(**buffer->m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, srcMemory);
+	ndAssert(error == CL_SUCCESS);
+}
+
+void ndBrainGpuContext::MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
+{
+	cl_int error = 0;
+	ndAssert(sizeInBytes <= deviceBuffer.SizeInBytes());
+
+	const cl::CommandQueue* queue = *m_queue;
+	const ndBrainGpuBuffer* const buffer = deviceBuffer.GetGpuBuffer();
+	//error = queue->enqueueWriteBuffer(**buffer->m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, srcMemory);
+	error = queue->enqueueReadBuffer(**buffer->m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, outputMemory);
+	ndAssert(error == CL_SUCCESS);
 }

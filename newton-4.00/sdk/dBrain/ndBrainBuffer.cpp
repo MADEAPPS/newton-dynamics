@@ -39,3 +39,8 @@ ndBrainGpuBuffer* ndBrainBuffer::GetGpuBuffer()
 {
 	return *m_gpuBuffer;
 }
+
+const ndBrainGpuBuffer* ndBrainBuffer::GetGpuBuffer() const
+{
+	return *m_gpuBuffer;
+}

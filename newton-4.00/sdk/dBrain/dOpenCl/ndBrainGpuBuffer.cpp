@@ -28,7 +28,6 @@ ndBrainGpuBuffer::ndBrainGpuBuffer(const ndBrainBuffer* const owner)
 	size_t size = m_owner->SizeInBytes();
 	if (m_owner->m_isMemoryMapped && context->SupportsMappedMemory())
 	{
-		ndAssert(0);
 		m_memory = (ndUnsigned32*)clSVMAlloc(context->m_context->get(), CL_MEM_READ_WRITE | CL_MEM_SVM_FINE_GRAIN_BUFFER, size, 32);
 		ndAssert(m_memory);
 		m_buffer = ndSharedPtr<cl::Buffer>(new cl::Buffer(**context->m_context, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR, size, m_memory, &error));
