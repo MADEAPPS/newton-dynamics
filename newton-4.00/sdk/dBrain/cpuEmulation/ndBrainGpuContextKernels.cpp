@@ -1071,8 +1071,8 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
         ndBrainFloat tile_acc[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_ROWS];
-        ndBrainFloat tile_inputs[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_COLUMNS];
-        ndBrainFloat tile_weights[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_COLUMNS];
+        ndBrainFloat tile_inputs[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_COLUMNS + 1];
+        ndBrainFloat tile_weights[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_COLUMNS + 1];
 
         ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
@@ -1122,8 +1122,8 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
             {
                 for (ndInt32 itemId_x = 0; itemId_x < ND_GPU_TILED_MATRIX_COLUMNS; ++itemId_x)
                 {
-                    tile_weights[itemId_y][itemId_x] = weightsAndBias[weightOffsetStart + itemId_x];
                     tile_inputs[itemId_y][itemId_x] = inputOutputData[inputStartOffset + itemId_x];
+                    tile_weights[itemId_y][itemId_x] = weightsAndBias[weightOffsetStart + itemId_x];
                 }
                 weightOffsetStart += width;
                 inputStartOffset += inputOutputStride;
@@ -1136,11 +1136,16 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
                 for (ndInt32 itemId_y = 0; itemId_y < ND_GPU_TILED_MATRIX_ROWS; itemId_y++)
                 {
                     ndBrainFloat a = tile_weights[itemId_y][i];
+// banks conflict is really bad
+//ndTrace(("%d ", (itemId_y * (ND_GPU_TILED_MATRIX_COLUMNS + 1)) % 32));
                     for (ndInt32 itemId_x = 0; itemId_x < ND_GPU_TILED_MATRIX_ROWS; itemId_x++)
                     {
                         tile_acc[itemId_x][itemId_y] += a * tile_inputs[itemId_x][i];
+//ndTrace(("%d ", (itemId_y * ND_GPU_TILED_MATRIX_ROWS + itemId_x) % 32));
                     }
+//ndTrace(("\n"));
                 }
+//ndTrace(("\n"));
             }
             // barrier
         }

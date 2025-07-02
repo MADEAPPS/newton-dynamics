@@ -682,16 +682,6 @@ R""""(
         uint acc_x = itemId & (ND_GPU_TILED_MATRIX_ROWS-1);
         uint acc_y = itemId >> ND_GPU_TILED_MATRIX_ROWS_BITS;
 
-        //__local float biasValue[ND_GPU_TILED_MATRIX_ROWS];
-        //if (acc_x < ND_GPU_TILED_MATRIX_ROWS)
-        //{
-        //    biasValue[acc_x] = weightsAndBias[parametersBiasOffset + acc_x];
-        //}
-        //barrier(CLK_LOCAL_MEM_FENCE); 
-        //tile_acc[acc_y][acc_x] = biasValue[acc_x];
-        //barrier(CLK_LOCAL_MEM_FENCE); 
-        //float acc = tile_acc[acc_y][acc_x];
-
         if (acc_x < ND_GPU_TILED_MATRIX_ROWS)
         {
             tile_acc[acc_x][0] = weightsAndBias[parametersBiasOffset + acc_x];
@@ -716,19 +706,23 @@ R""""(
             tile_inputs[tile_y0][tile_x] = inputOutputData[inputStartOffset + inputOutputStride * tile_y0 + tile_x];
             tile_inputs[tile_y1][tile_x] = inputOutputData[inputStartOffset + inputOutputStride * tile_y1 + tile_x];
             barrier(CLK_LOCAL_MEM_FENCE); 
-           
-            // Perform the computation for a single tile
+
+            // Perform the computation for a single tile           
+            // TO DO: experiment by tiling the tile in registers
+            // this funtion does to reads from  shared memory, but
+            // maybe is possible ti remove on read, by using vector operation
+            // and caching a 4 x 4 register tile, further reducing one read shared
+            // so sure how much this will gain, 
             for (uint i = 0; i < ND_GPU_TILED_MATRIX_COLUMNS; ++i)
             {
                 float a = tile_weights[acc_y][i];
-                //tile_acc[acc_x][acc_y] += a * tile_inputs[acc_x][i];
                 acc += a * tile_inputs[acc_x][i];
             }
             // it seems a barrier should not be nesserary here, but the kernel fail without one.
             barrier(CLK_LOCAL_MEM_FENCE); 
         }
 
-        // trnaspose the flat array of results
+        // transpose the flat array results
         tile_acc[acc_x][acc_y] = acc;
         barrier(CLK_LOCAL_MEM_FENCE); 
         
