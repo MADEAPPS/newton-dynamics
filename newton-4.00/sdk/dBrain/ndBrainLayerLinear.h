@@ -111,6 +111,7 @@ class ndBrainLayerLinear : public ndBrainLayer
 
 	ndBrainVector m_bias;
 	ndBrainMatrix m_weights;
+	friend class ndBrainTrainerInference;
 };
 
 #endif 

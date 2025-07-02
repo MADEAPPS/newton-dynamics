@@ -393,25 +393,25 @@ void ndBrainLayerLinear::SetCpuWeights(const ndBrainVector& input)
 	m_bias.Set(bias);
 }
 
-void ndBrainLayerLinear::SetGpuWeights(const ndBrainVector& input)
+void ndBrainLayerLinear::SetGpuWeights(const ndBrainVector& weightsAnBias)
 {
 	ndInt32 width;
 	ndInt32 height;
 
 	CalculateRoundedSize(width, height);
-	ndAssert(input.GetCount() >= (GetOutputSize() * GetInputSize() + GetOutputSize()));
+	ndAssert(weightsAnBias.GetCount() >= (GetOutputSize() * GetInputSize() + GetOutputSize()));
 
 	ndInt32 offset = 0;
 	ndInt32 columns = m_weights.GetColumns();
 	for (ndInt32 i = 0; i < m_weights.GetRows(); ++i)
 	{
 		ndBrainVector& dst = m_weights[i];
-		const ndBrainMemVector src(&input[offset], columns);
+		const ndBrainMemVector src(&weightsAnBias[offset], columns);
 		dst.Set(src);
 		offset += width;
 		ndAssert(offset >= 0);
 	}
-	const ndBrainMemVector bias(&input[offset], m_bias.GetCount());
+	const ndBrainMemVector bias(&weightsAnBias[offset], m_bias.GetCount());
 	m_bias.Set(bias);
 }
 
@@ -495,7 +495,7 @@ void ndBrainLayerLinear::BackPropagate(const ndBrainLayerBackPropagateCpuCommand
 	const ndBrainMemVector output(&inputOutputBuffer[offset + inputSize], outputSize);
 	const ndBrainMemVector outputDerivative(&inputOutputGradientsBuffer[offset + inputSize], outputSize);
 	
-	// calculate input output gradients
+	// calculate weightsAnBias output gradients
 	ndBrainMemVector inputDerivative(&inputOutputGradientsBuffer[offset], inputSize);
 	const ndBrainMemVector matrixVector(&weightAndBias[info.m_parametersStartOffset], matrixSize + outputSize);
 	inputDerivative.Set(ndBrainFloat(0.0f));

@@ -383,7 +383,11 @@ void ndBrainTrainerInference::UpdateParameters(const ndBrainVector& weightAndBia
 		ndBrainLayer* const layer = (ndBrainLayer*)info.m_layer;
 		if (layer)
 		{
-			ndInt32 size = info.m_inputSize * info.m_outputSize + info.m_outputSize;
+			ndInt32 width;
+			ndInt32 height;
+			ndBrainLayerLinear* const linearLayer = (ndBrainLayerLinear*)layer;
+			linearLayer->CalculateRoundedSize(width, height);
+			ndInt32 size = width * height + info.m_outputSize;
 			ndAssert(size >= 0);
 			const ndBrainMemVector weights(&weightAndBias[info.m_parametersStartOffset], size);
 			isCpu ? layer->SetCpuWeights(weights) : layer->SetGpuWeights(weights);

@@ -1074,9 +1074,9 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
         ndBrainFloat tile_inputs[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_COLUMNS + 1];
         ndBrainFloat tile_weights[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_COLUMNS + 1];
 
-        ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
+        ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         
         ndBrainFloat* const weightsAndBias = (ndBrainFloat*)buffer2->GetGpuBuffer()->GetPtr();
         ndBrainFloat* const inputOutputData = (ndBrainFloat*)buffer1->GetGpuBuffer()->GetPtr();
@@ -1138,46 +1138,14 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
                 for (ndInt32 itemId_y = 0; itemId_y < ND_GPU_TILED_MATRIX_ROWS; itemId_y++)
                 {
                     ndBrainFloat a = tile_weights[itemId_y][i];
-// banks conflict is really bad
-//ndTrace(("%d ", (itemId_y * (ND_GPU_TILED_MATRIX_COLUMNS + 1)) % 32));
                     for (ndInt32 itemId_x = 0; itemId_x < ND_GPU_TILED_MATRIX_ROWS; itemId_x++)
                     {
                         tile_accReg[itemId_x][itemId_y] += a * tile_inputs[itemId_x][i];
-//ndTrace(("%d ", (itemId_y * ND_GPU_TILED_MATRIX_ROWS + itemId_x) % 32));
                     }
-//ndTrace(("\n"));
                 }
-//ndTrace(("\n"));
             }
             // barrier
         }
-
-#if 0
-        // transpose the tile
-        ndBrainFloat tile_acc[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_ROWS];
-        for (ndInt32 itemId_y = 0; itemId_y < ND_GPU_TILED_MATRIX_ROWS; ++itemId_y)
-        {
-            for (ndInt32 itemId_x = 0; itemId_x < ND_GPU_TILED_MATRIX_ROWS; ++itemId_x)
-            {
-                tile_acc[itemId_y][itemId_x] = tile_accReg[itemId_x][itemId_y];
-            }
-        }
-        const ndInt32 numberOutput = ((groupId_x + 1) * ND_GPU_TILED_MATRIX_ROWS < outputSize) ? ND_GPU_TILED_MATRIX_ROWS : outputSize - groupId_x * ND_GPU_TILED_MATRIX_ROWS;
-        ndInt32 outputOffset = groupId_x * ND_GPU_TILED_MATRIX_ROWS + inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
-        ndAssert(outputOffset >= 0);
-        // barrier
-
-        for (ndInt32 itemId_y = 0; itemId_y < ND_GPU_TILED_MATRIX_ROWS; ++itemId_y)
-        {
-            for (ndInt32 itemId_x = 0; itemId_x < numberOutput; ++itemId_x)
-            {
-                float value = tile_acc[itemId_y][itemId_x];
-                ndAssert(value == tile_accReg[itemId_x][itemId_y]);
-                inputOutputData[outputOffset + itemId_x] = value;
-            }
-            outputOffset += inputOutputStride;
-        }
-#else
 
         const ndInt32 numberOutput = ((groupId_x + 1) * ND_GPU_TILED_MATRIX_ROWS < outputSize) ? ND_GPU_TILED_MATRIX_ROWS : outputSize - groupId_x * ND_GPU_TILED_MATRIX_ROWS;
         ndInt32 outputOffset = groupId_x * ND_GPU_TILED_MATRIX_ROWS + inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
@@ -1191,7 +1159,6 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
             }
             outputOffset += inputOutputStride;
         }
-#endif
     }
 };
 
