@@ -436,6 +436,7 @@ void ndBrainTrainerInference::AddLayersCommands(ndFixSizeArray<ndCommandSharedIn
 void ndBrainTrainerInference::MakePrediction()
 {
 	ndBrainContext* const context = *m_descriptor.m_context;
+
 	for (ndList<ndSharedPtr<ndBrainBufferCommand>>::ndNode* node = m_feedForwardCommands.GetFirst(); node; node = node->GetNext())
 	{
 		ndSharedPtr<ndBrainBufferCommand>& command = node->GetInfo();
