@@ -42,14 +42,11 @@ ndBrainGpuBuffer::ndBrainGpuBuffer(const ndBrainBuffer* const owner)
 
 ndBrainGpuBuffer::~ndBrainGpuBuffer()
 {
-	ndAssert(0);
 	//m_buffer = ndSharedPtr<cl::Buffer>();
-	//if (m_memory)
-	//{
-	//	ndAssert(m_isMemoryMapped);
-	//	//m_context->GetAsGpuContext()->m_context->lcE
-	//	clSVMFree(m_context->GetAsGpuContext()->m_context->get(), m_memory);
-	//}
+	if (m_owner->m_isMemoryMapped)
+	{
+		clSVMFree(m_owner->m_context->GetAsGpuContext()->m_context->get(), m_memory);
+	}
 }
 
 void* ndBrainGpuBuffer::GetPtr()

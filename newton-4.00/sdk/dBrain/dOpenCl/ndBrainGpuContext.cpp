@@ -237,12 +237,6 @@ void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& co
 //#define ND_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_CPU
 //#define ND_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_GPU
 
-
-void ndBrainGpuContext::SyncBufferCommandQueue()
-{
-	ndAssert(0);
-}
-
 ndBrainGpuContext* ndBrainGpuContext::GetAsGpuContext()
 {
 	return this;
@@ -442,6 +436,13 @@ void ndBrainGpuContext::MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size
 	const cl::CommandQueue* queue = *m_queue;
 	const ndBrainGpuBuffer* const buffer = deviceBuffer.GetGpuBuffer();
 	error = queue->enqueueReadBuffer(**buffer->m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, outputMemory);
+	ndAssert(error == CL_SUCCESS);
+}
+
+void ndBrainGpuContext::SyncBufferCommandQueue()
+{
+	cl_int error = 0;
+	error = m_queue->finish();
 	ndAssert(error == CL_SUCCESS);
 }
 
