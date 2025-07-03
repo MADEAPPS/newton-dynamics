@@ -292,7 +292,6 @@ static void MnistTrainingSet()
 			for (ndInt32 epoch = 0; epoch < MINIST_NUMBER_OF_EPOCHS; ++epoch)
 			{
 				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
-				//for (ndInt32 batchStart = 0; batchStart < 1; batchStart += m_miniBatchSize)
 				for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
 				{
 					m_indirectMiniBatch->MemoryToDevice(0, m_miniBatchSize * sizeof(ndUnsigned32), &shuffleBuffer[batchStart]);
