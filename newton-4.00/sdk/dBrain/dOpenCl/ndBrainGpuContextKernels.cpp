@@ -423,8 +423,8 @@ R""""(
         uint inputOutputSize = parameters->m_inputOutputSize;
         uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        uint dstBase = groupId * inputSize;
-        uint srcBase = groupId * inputOutputSize + inputOutputStartOffset;
+        long dstBase = groupId * (long)inputSize;
+        long srcBase = groupId * (long)inputOutputSize + inputOutputStartOffset;
         
         uint workGroupSizeReminder = inputSize % workGroupSize;
         uint modWorkGroupSize = inputSize - workGroupSizeReminder;
@@ -454,8 +454,8 @@ R""""(
         uint inputOutputSize = parameters->m_inputOutputSize;
         uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
 
-        uint srcBase = groupId * outputSize;        
-        uint dstBase = groupId * inputOutputSize + inputOutputStartOffset;
+        long srcBase = groupId * (long)outputSize;        
+        long dstBase = groupId * (long)inputOutputSize + inputOutputStartOffset;
         
         uint workGroupSizeReminder = outputSize % workGroupSize;
         uint modWorkGroupSize = outputSize - workGroupSizeReminder;

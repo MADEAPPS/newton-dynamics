@@ -528,13 +528,6 @@ class brainCopyInputGradients : public ndBrainKernel
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
-        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
-        //ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
-        //ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
-        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
-        //ndBrainFloat* const miniBatchGradients = buffer2->GetData();
-        //ndBrainFloat* const inputOutputGradients = buffer3->GetData();
-
         ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
         ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
@@ -547,8 +540,8 @@ class brainCopyInputGradients : public ndBrainKernel
         ndInt32 inputOutputSize = parameters->m_inputOutputSize;
         ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        ndInt32 dstBase = groupId * inputSize;
-        ndInt32 srcBase = groupId * inputOutputSize + inputOutputStartOffset;
+        ndInt64 dstBase = groupId * ndInt64(inputSize);
+        ndInt64 srcBase = groupId * ndInt64(inputOutputSize) + inputOutputStartOffset;
         ndAssert(srcBase >= 0);
         ndAssert(dstBase >= 0);
         
@@ -580,13 +573,6 @@ class brainCopyOutputGradients : public ndBrainKernel
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
-        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
-        //ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
-        //ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
-        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
-        //ndBrainFloat* const miniBatchGradients = buffer2->GetData();
-        //ndBrainFloat* const inputOutputGradients = buffer3->GetData();
-
         ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
         ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
@@ -599,8 +585,8 @@ class brainCopyOutputGradients : public ndBrainKernel
         ndInt32 inputOutputSize = parameters->m_inputOutputSize;
         ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        ndInt32 srcBase = groupId * outputSize;
-        ndInt32 dstBase = groupId * inputOutputSize + inputOutputStartOffset;
+        ndInt64 srcBase = groupId * ndInt64(outputSize);
+        ndInt64 dstBase = groupId * ndInt64(inputOutputSize) + inputOutputStartOffset;
         ndAssert(srcBase >= 0);
         ndAssert(dstBase >= 0);
         
