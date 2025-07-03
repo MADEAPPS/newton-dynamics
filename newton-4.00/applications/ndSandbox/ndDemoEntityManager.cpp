@@ -298,8 +298,9 @@ static void SimpleRegressionBrainStressTest()
 
 	//ndInt32 hidenLayerWidth = 4096;
 
-	ndInt32 inputSize = 5;
-	ndInt32 hidenLayerWidth = 17;
+	ndInt32 inputSize = 16;
+	ndInt32 minibatchSize = 16;
+	ndInt32 hidenLayerWidth = 16;
 	layers.PushBack(new ndBrainLayerLinear(inputSize, hidenLayerWidth));
 	layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hidenLayerWidth));
@@ -312,8 +313,7 @@ static void SimpleRegressionBrainStressTest()
 	descritor.m_brain = brain;
 	descritor.m_context = context;
 	descritor.m_learnRate = 1.0e-4f;
-	//descritor.m_minibatchSize = 128;
-	descritor.m_minibatchSize = ND_GPU_TILED_MATRIX_ROWS;
+	descritor.m_minibatchSize = minibatchSize;
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
 		brain->AddLayer(layers[i]);
@@ -321,6 +321,7 @@ static void SimpleRegressionBrainStressTest()
 	brain->InitWeights();
 
 	ndBrainVector inputData;
+	ndBrainVector ouputData;
 	inputData.SetCount(descritor.m_minibatchSize * inputSize);
 	inputData.Set(0.0f);
 	for (ndInt32 i = 0; i < descritor.m_minibatchSize; ++i)
@@ -328,13 +329,29 @@ static void SimpleRegressionBrainStressTest()
 		inputData[i * inputSize + i% inputSize] = 1.0f;
 	}
 
+	//ndCopyBufferCommandInfo copyBuffer;
+	//copyBuffer.m_dstOffsetInByte = 0;
+	//copyBuffer.m_srcOffsetInByte = 0;
+	//copyBuffer.m_strideInByte = inputSize;
+	//copyBuffer.m_srcStrideInByte = inputSize;
+	//copyBuffer.m_dstStrideInByte = inputSize;
+	//ndSharedPtr<ndBrainUniformBuffer> parameterBuffer(ndSharedPtr<ndBrainUniformBuffer>(new ndBrainUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBuffer, true)));
+	//parameters->MemoryToDevice(0, sizeof(ndCopyBufferCommandInfo), &copyBufferInfo);
+
 	ndSharedPtr<ndBrainTrainer> trainer(new ndBrainTrainer(descritor));
+	ndBrainFloatBuffer* const minibatchInputBuffer = trainer->GetInputBuffer();
+	ndBrainFloatBuffer* const minibatchOutpuBuffer = trainer->GetOuputBuffer();
+
+	minibatchInputBuffer->VectorToDevice(inputData);
+
 	ndUnsigned64 time = ndGetTimeInMicroseconds();
 	for (ndInt32 epoch = 0; epoch < 5; ++epoch)
 	{
 		trainer->MakePrediction();
-		trainer->BackPropagate();
-		trainer->ApplyLearnRate();
+		minibatchOutpuBuffer->VectorFromDevice(ouputData);
+
+		//trainer->BackPropagate();
+		//trainer->ApplyLearnRate();
 	}
 	time = ndGetTimeInMicroseconds() - time;
 
@@ -563,7 +580,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//Test0__();
 	//Test1__();
 	SimpleRegressionBrainStressTest();
-	ndHandWrittenDigits();
+	//ndHandWrittenDigits();
 	//ndCifar10ImageClassification();
 	//TargaToPng();
 }
