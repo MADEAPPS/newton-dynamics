@@ -293,6 +293,7 @@ static void Test1__()
 
 static void SimpleRegressionBrainStressTest()
 {
+	ndSetRandSeed(42);
 	ndSharedPtr<ndBrain> brain(new ndBrain);
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 
@@ -301,11 +302,12 @@ static void SimpleRegressionBrainStressTest()
 	ndInt32 inputSize = 16;
 	ndInt32 minibatchSize = 16;
 	ndInt32 hidenLayerWidth = 16;
-	layers.PushBack(new ndBrainLayerLinear(inputSize, hidenLayerWidth));
-	layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
-	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hidenLayerWidth));
-	layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
-	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
+	layers.PushBack(new ndBrainLayerLinear(inputSize, 1));
+	//layers.PushBack(new ndBrainLayerLinear(inputSize, hidenLayerWidth));
+	//layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
+	//layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hidenLayerWidth));
+	//layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
+	//layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
 
 	ndSharedPtr<ndBrainContext> context(new ndBrainGpuContext);
 	//ndSharedPtr<ndBrainContext> context(new ndBrainCpuContext);
@@ -321,7 +323,7 @@ static void SimpleRegressionBrainStressTest()
 	brain->InitWeights();
 
 	ndBrainVector inputData;
-	ndBrainVector ouputData;
+	ndBrainVector outputData;
 	inputData.SetCount(descritor.m_minibatchSize * inputSize);
 	inputData.Set(0.0f);
 	for (ndInt32 i = 0; i < descritor.m_minibatchSize; ++i)
@@ -348,7 +350,7 @@ static void SimpleRegressionBrainStressTest()
 	for (ndInt32 epoch = 0; epoch < 5; ++epoch)
 	{
 		trainer->MakePrediction();
-		minibatchOutpuBuffer->VectorFromDevice(ouputData);
+		minibatchOutpuBuffer->VectorFromDevice(outputData);
 
 		//trainer->BackPropagate();
 		//trainer->ApplyLearnRate();

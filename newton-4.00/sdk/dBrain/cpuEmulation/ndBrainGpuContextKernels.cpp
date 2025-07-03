@@ -84,13 +84,6 @@ class brainCopyOutput : public ndBrainKernel
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
-        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
-        //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
-        //ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
-        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
-        //ndBrainFloat* const inputOutputData = buffer1->GetData();
-        //ndBrainFloat* const outputBuffer = buffer2->GetData();
-
         ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];

@@ -28,6 +28,7 @@ R""""(
 
     typedef struct
     {
+        void* m_unUsed;
         uint m_inputSize;
         uint m_outputSize;
         uint m_inputOutputSize;
@@ -35,7 +36,6 @@ R""""(
         uint m_parametersBatchSize;
         uint m_parametersStartOffset;
         uint m_tiledStride;
-        uint m_unused[4];
     } UniformBufferLayerArguments;
 
     typedef struct
@@ -98,7 +98,10 @@ R""""(
         }
     }
 
-    __kernel void brainCopyOutput(__global const UniformBufferLayerArguments* parameters, __global float* inputOutputData, __global float* outputBuffer) 
+    __kernel void brainCopyOutput(
+        __global const UniformBufferLayerArguments* parameters, 
+        __global float* inputOutputData, 
+        __global float* outputBuffer) 
     {
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
@@ -116,10 +119,9 @@ R""""(
         
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
-            float a = inputOutputData[srcBase + itemId];
+            float a = inputOutputData[srcBase + i + itemId];
             outputBuffer[dstBase + i + itemId] = a;
         }
-        
         if (itemId < workGroupSizeReminder)
         {
             float a = inputOutputData[srcBase + modWorkGroupSize + itemId];
@@ -131,7 +133,10 @@ R""""(
 
 const char* ndBrainGpuContext::m_feedForwardKernels_2 =
 R""""(
-    __kernel void brainLayerReluActivation(__global const UniformBufferLayerArguments* parameters, __global float* inputOutputData, __global float* notUsed)  
+    __kernel void brainLayerReluActivation(
+        __global const UniformBufferLayerArguments* parameters, 
+        __global float* inputOutputData, 
+        __global float* notUsed)  
     {
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
@@ -478,8 +483,9 @@ R""""(
     __kernel void brainLayerBrainReluBackPropagate(
             __global const UniformBufferLayerArguments* parameters, 
             __global float* inputOutputData, 
-            __global float* notUsed, 
-            __global float* inputOutputGradients) 
+            __global float* weightsAndBias, 
+            __global float* inputOutputGradients,
+            __global float* weightsAndBiasGradients) 
     {
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
@@ -513,8 +519,9 @@ R""""(
     __kernel void brainLayerBrainTanhBackPropagate(
             __global const UniformBufferLayerArguments* parameters, 
             __global float* inputOutputData, 
-            __global float* notUsed, 
-            __global float* inputOutputGradients) 
+            __global float* weightsAndBias, 
+            __global float* inputOutputGradients,
+            __global float* weightsAndBiasGradients) 
     {
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
@@ -548,8 +555,9 @@ R""""(
     __kernel void brainLayerBrainCathegoricalSoftmaxBackPropagate(
             __global const UniformBufferLayerArguments* parameters, 
             __global float* inputOutputData, 
-            __global float* notUsed, 
-            __global float* inputOutputGradients) 
+            __global float* weightsAndBias, 
+            __global float* inputOutputGradients,
+            __global float* weightsAndBiasGradients) 
     {
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
@@ -581,8 +589,9 @@ R""""(
     __kernel void brainLayerBrainDropOutBackPropagate(
             __global const UniformBufferLayerArguments* parameters, 
             __global float* inputOutputData, 
-            __global float* notUsed, 
-            __global float* inputOutputGradients) 
+            __global float* weightsAndBias, 
+            __global float* inputOutputGradients,
+            __global float* weightsAndBiasGradients) 
     {
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
@@ -731,7 +740,10 @@ R""""(
 
 const char* ndBrainGpuContext::m_matrixMultiply =
 R""""(
-    __kernel void brainLayerMatrixMatrixMultiply(__global const UniformBufferLayerArguments* parameters, __global float* inputOutputData, __global float* weightsAndBias) 
+    __kernel void brainLayerMatrixMatrixMultiply(
+            __global const UniformBufferLayerArguments* parameters, 
+            __global float* inputOutputData, 
+            __global float* weightsAndBias) 
     {
         __local float tile_acc[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_ROWS];
         __local float tile_inputs[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_COLUMNS+1];
@@ -747,6 +759,8 @@ R""""(
         const uint height = (outputSize + ND_GPU_TILED_MATRIX_ROWS - 1) & -ND_GPU_TILED_MATRIX_ROWS;
         const uint width = (inputSize + ND_GPU_TILED_MATRIX_COLUMNS - 1) & -ND_GPU_TILED_MATRIX_COLUMNS;
 
+        uint acc_x = itemId & (ND_GPU_TILED_MATRIX_ROWS-1);
+        uint acc_y = itemId >> ND_GPU_TILED_MATRIX_ROWS_BITS;
         const uint groupId_x = groupId % parameters->m_tiledStride;
         const uint groupId_y = (groupId - groupId_x) / parameters->m_tiledStride;
 
@@ -754,9 +768,7 @@ R""""(
         const long blockBase = (long)(groupId_x * ND_GPU_TILED_MATRIX_ROWS);
         const long parametersStartOffset = blockBase * width + parameters->m_parametersStartOffset;
         const long parametersBiasOffset = blockBase + width * height + parameters->m_parametersStartOffset;
-        
-        uint acc_x = itemId & (ND_GPU_TILED_MATRIX_ROWS-1);
-        uint acc_y = itemId >> ND_GPU_TILED_MATRIX_ROWS_BITS;
+
         if (acc_x < ND_GPU_TILED_MATRIX_ROWS)
         {
             float a = weightsAndBias[parametersBiasOffset + acc_x];
@@ -769,6 +781,7 @@ R""""(
         barrier(CLK_LOCAL_MEM_FENCE); 
 
         float acc = tile_acc[acc_y][0];
+
         const uint inputOutputStride = parameters->m_inputOutputSize;
         const long inputOffset = groupId_y * (long)inputOutputStride * ND_GPU_TILED_MATRIX_ROWS + parameters->m_inputOutputStartOffset;
 
@@ -917,8 +930,10 @@ R""""(
 const char* ndBrainGpuContext::m_otherShaderFunctions =
 R""""(
 
-    __kernel void brainCopyBuffer(__global const CopyBufferCommandInfo* parameters,
-        __global float* inputData, __global float* outputData)
+    __kernel void brainCopyBuffer(
+        __global const CopyBufferCommandInfo* parameters,
+        __global float* inputData, 
+        __global float* outputData)
     {                                                                      
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
@@ -942,8 +957,11 @@ R""""(
         }
     }
 
-    __kernel void brainCopyBufferIndirect(__global const CopyBufferCommandInfo* parameters,
-        __global uint* indexBuffer, __global float* inputData, __global float* outputData)
+    __kernel void brainCopyBufferIndirect(
+        __global const CopyBufferCommandInfo* parameters,
+        __global uint* indexBuffer, 
+        __global float* inputData, 
+        __global float* outputData)
     {                                                                      
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
