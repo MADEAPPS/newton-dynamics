@@ -70,8 +70,10 @@ ndInt32 ndBrainLayerLinear::GetInputSize() const
 
 void ndBrainLayerLinear::CalculateRoundedSize(ndInt32& width, ndInt32& height) const
 {
-	height = (GetOutputSize() + ND_GPU_TILED_MATRIX_ROWS - 1) & -ND_GPU_TILED_MATRIX_ROWS;
-	width = (GetInputSize() + ND_GPU_TILED_MATRIX_COLUMNS - 1) & -ND_GPU_TILED_MATRIX_COLUMNS;
+	width = GetInputSize();
+	height = GetOutputSize();
+	height = (height + ND_GPU_TILED_MATRIX_ROWS - 1) & -ND_GPU_TILED_MATRIX_ROWS;
+	width = (width + ND_GPU_TILED_MATRIX_COLUMNS - 1) & -ND_GPU_TILED_MATRIX_COLUMNS;
 }
 
 ndBrainVector* ndBrainLayerLinear::GetBias()
@@ -107,14 +109,17 @@ void ndBrainLayerLinear::InitWeights()
 	for (ndInt32 i = 0; i < ndInt32(m_bias.GetCount()); ++i)
 	{
 		//m_bias[i] = ndFloat32(i);
-		m_bias[i] = ndFloat32(0.0f);
+		m_bias[i] = ndFloat32(i + 1) * 10000.0f;
 	}
+
+	ndFloat32 xxxx = 1.0f;
 	for (ndInt32 i = 0; i < ndInt32(m_weights.GetCount()); ++i)
 	{
 		m_weights[i].Set(ndFloat32(0.0f));
 		for (ndInt32 j = 0; j < ndInt32(m_weights.GetColumns()); ++j)
 		{
-			m_weights[i][j] = ndFloat32(i + j) * 0.0001f;
+			m_weights[i][j] = xxxx;
+			xxxx += 1.0f;
 		}
 	}
 #endif
@@ -441,7 +446,8 @@ ndCommandSharedInfo ndBrainLayerLinear::GetGpuCommandSharedInfo() const
 	ndInt32 width;
 	ndInt32 height;
 	CalculateRoundedSize(width, height);
-	info.m_parametersBatchSize = width * height + GetOutputSize();
+	//info.m_parametersBatchSize = width * height + GetOutputSize();
+	info.m_parametersBatchSize = width * height + height;
 	return info;
 }
 
@@ -530,51 +536,43 @@ ndBrainBufferCommand* ndBrainLayerLinear::CreateGpuFeedForwardCommand(
 	ndBrainFloatBuffer* const inputOutputData,
 	ndBrainFloatBuffer* const weightsAndBias) const
 {
+	ndAssert(info.m_parametersBatchSize);
+	ndAssert((miniBatchSize & (ND_GPU_TILED_MATRIX_ROWS - 1)) == 0);
+
+	ndBrainBufferCommandDesc descriptor(miniBatchSize);
+	descriptor.m_id = size_t(this);
+	descriptor.m_context = context;
+	descriptor.m_owner = owner;
+	descriptor.m_info = info;
+	descriptor.m_uniformBuffer = uniformBuffer;
+
+	descriptor.PushBack((ndBrainUniformBuffer*)*uniformBuffer);
+	descriptor.PushBack(inputOutputData);
+	descriptor.PushBack(weightsAndBias);
 	if (context->GetAsCpuContext())
 	{
-		ndBrainBufferCommandDesc descriptor(miniBatchSize);
-		descriptor.m_id = size_t(this);
-		descriptor.m_context = context;
-		descriptor.m_owner = owner;
-		descriptor.m_info = info;
-		descriptor.m_uniformBuffer = uniformBuffer;
-
-		descriptor.PushBack((ndBrainUniformBuffer*)*uniformBuffer);
-		descriptor.PushBack(inputOutputData);
-		descriptor.PushBack(weightsAndBias);
-
 		ndBrainBufferCommand* const command = new ndBrainLayerFeedForwardCpuCommand(descriptor, (ndBrainLayer*)this);
 		return command;
 	}
 	else
 	{
-		ndAssert(info.m_parametersBatchSize);
-		ndAssert((miniBatchSize % ND_GPU_TILED_MATRIX_ROWS) == 0);
-		
 		ndInt32 width;
 		ndInt32 height;
 		CalculateRoundedSize(width, height);
-		
+	
 		ndInt32 blockRows = height / ND_GPU_TILED_MATRIX_ROWS;
 		ndInt32 blockColums = miniBatchSize / ND_GPU_TILED_MATRIX_ROWS;
 		
-		ndCommandSharedInfo newInfo;
-		uniformBuffer->MemoryFromDevice(0, sizeof(ndCommandSharedInfo), &newInfo);
-		newInfo.m_tiledStride = blockRows;
-		uniformBuffer->MemoryToDevice(0, sizeof(ndCommandSharedInfo), &newInfo);
+		//ndCommandSharedInfo newInfo;
+		//uniformBuffer->MemoryFromDevice(0, sizeof(ndCommandSharedInfo), &newInfo);
+		//newInfo.m_tiledStride = blockRows;
+		//uniformBuffer->MemoryToDevice(0, sizeof(ndCommandSharedInfo), &newInfo);
 
-		ndBrainBufferCommandDesc descriptor(miniBatchSize);
-		descriptor.m_id = size_t(this);
-		descriptor.m_context = context;
-		descriptor.m_owner = owner;
-		descriptor.m_info = newInfo;
+		//descriptor.m_info = newInfo;
+		descriptor.m_info.m_tiledStride = blockRows;
 		descriptor.m_miniBatchSize = blockRows * blockColums;
-		descriptor.m_uniformBuffer = uniformBuffer;
 		descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerMatrixMatrixMultiply;
-
-		descriptor.PushBack((ndBrainUniformBuffer*)*uniformBuffer);
-		descriptor.PushBack(inputOutputData);
-		descriptor.PushBack(weightsAndBias);
+		uniformBuffer->MemoryToDevice(0, sizeof(ndCommandSharedInfo), &descriptor.m_info);
 				
 		//ndBrainBufferCommand* const command = new ndBrainTrainerGpuCommand(
 		//	owner, newInfo, size_t(this), context, context->m_brainLayerMatrixMatrixMultiply, miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias);
