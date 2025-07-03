@@ -252,7 +252,7 @@ R""""(
             tmpInputBuffer[modWorkGroupSize + itemId] = inputValue;
             maxArg = (inputValue > maxArg) ? inputValue : maxArg;
         }
-        
+#if 0        
         for (uint j = workGroupSize / 2; j > 0; j = j >> 1)
         {
             barrier(CLK_LOCAL_MEM_FENCE); 
@@ -268,6 +268,38 @@ R""""(
                 maxArg = (inputValue > maxArg) ? inputValue : maxArg;
             }
         }
+#else
+        // barrier reduction loop
+        for (uint j = workGroupSize / 2; j > 32; j = j >> 1)
+        {
+            barrier(CLK_LOCAL_MEM_FENCE); 
+            if ((itemId >= j) && (itemId < j * 2))
+            {
+                reductionBuffer[itemId - j] = maxArg;
+            }
+        
+            barrier(CLK_LOCAL_MEM_FENCE); 
+            if (itemId < j)
+            {
+                float inputValue = reductionBuffer[itemId];
+                maxArg = (inputValue > maxArg) ? inputValue : maxArg;
+            }
+        }
+        // barrier reduction loop
+        for (uint j = 32; j > 0; j = j >> 1)
+        {
+            if ((itemId >= j) && (itemId < j * 2))
+            {
+                reductionBuffer[itemId - j] = maxArg;
+            }
+            if (itemId < j)
+            {
+                float inputValue = reductionBuffer[itemId];
+                maxArg = (inputValue > maxArg) ? inputValue : maxArg;
+            }
+        }
+#endif
+
         if (itemId == 0)
         {
             reductionBuffer[0] = maxArg;

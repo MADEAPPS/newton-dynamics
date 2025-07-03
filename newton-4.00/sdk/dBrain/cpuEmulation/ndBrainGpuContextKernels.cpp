@@ -401,6 +401,8 @@ class brainLayerSoftmaxActivation : public ndBrainKernel
             tmpInputBuffer[modWorkGroupSize + itemId] = inputValue;
             maxArgReg[itemId] = (inputValue > maxArgReg[itemId]) ? inputValue : maxArgReg[itemId];
         }
+
+#if 0
         for (ndInt32 j = workGroupSize / 2; j > 0; j = j >> 1)
         {
             for (ndInt32 itemId = j; itemId < j * 2; ++itemId)
@@ -414,6 +416,40 @@ class brainLayerSoftmaxActivation : public ndBrainKernel
                 maxArgReg[itemId] = (inputValue > maxArgReg[itemId]) ? inputValue : maxArgReg[itemId];
             }
         }
+#else
+        // using the trick that the width of a compute using is larger of equal than 32 
+        // therefere we can about barries.
+
+        // barrier reduction loop
+        for (ndInt32 j = workGroupSize / 2; j > 32; j = j >> 1)
+        {
+            for (ndInt32 itemId = j; itemId < j * 2; ++itemId)
+            {
+                reductionBuffer[itemId - j] = maxArgReg[itemId];
+            }
+            // barrier
+            for (ndInt32 itemId = 0; itemId < j; ++itemId)
+            {
+                ndBrainFloat inputValue = reductionBuffer[itemId];
+                maxArgReg[itemId] = (inputValue > maxArgReg[itemId]) ? inputValue : maxArgReg[itemId];
+            }
+            //barrier
+        }
+
+        // no barrier reduction loop
+        for (ndInt32 j = 32; j > 0; j = j >> 1)
+        {
+            for (ndInt32 itemId = j; itemId < j * 2; ++itemId)
+            {
+                reductionBuffer[itemId - j] = maxArgReg[itemId];
+            }
+            for (ndInt32 itemId = 0; itemId < j; ++itemId)
+            {
+                ndBrainFloat inputValue = reductionBuffer[itemId];
+                maxArgReg[itemId] = (inputValue > maxArgReg[itemId]) ? inputValue : maxArgReg[itemId];
+            }
+        }
+#endif
         reductionBuffer[0] = maxArgReg[0];
         
         for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
