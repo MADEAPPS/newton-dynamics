@@ -108,7 +108,6 @@ void ndBrainLayerLinear::InitWeights()
 #if 0
 	for (ndInt32 i = 0; i < ndInt32(m_bias.GetCount()); ++i)
 	{
-		//m_bias[i] = ndFloat32(i);
 		m_bias[i] = ndFloat32(i + 1) * 10000.0f;
 	}
 
