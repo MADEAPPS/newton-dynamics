@@ -139,24 +139,23 @@ R""""(
         uint inputOutputSize = parameters->m_inputOutputSize;
         uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        //uint workGroupSizeReminder = inputSize % workGroupSize;
-        //uint modWorkGroupSize = inputSize - workGroupSizeReminder;
-        
-        uint inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
-        uint outputOffset = inputOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
-        //for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
-        for (uint i = 0; i < inputSize; i += workGroupSize)
+        long inputOffset = groupId * (long)inputOutputSize + inputOutputStartOffset;
+        long outputOffset = inputOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
+
+        uint workGroupSizeReminder = inputSize % workGroupSize;
+        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             float inputValue = inputOutputData[inputOffset + i + itemId];
             float outputValue = (inputValue >= 0.0f) ? inputValue : 0.0f;
             inputOutputData[outputOffset + i + itemId] = outputValue;
         }
-        //if (itemId < workGroupSizeReminder)
-        //{
-        //    float inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
-        //    float outputValue = (inputValue >= 0.0f) ? inputValue : 0.0f;
-        //    inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
-        //}
+        if (itemId < workGroupSizeReminder)
+        {
+            float inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
+            float outputValue = (inputValue >= 0.0f) ? inputValue : 0.0f;
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
+        }
     }
 
     __kernel void brainLayerTanhActivation(__global const UniformBufferLayerArguments* parameters, __global float* inputOutputData, __global float* notUsed)  
@@ -169,24 +168,23 @@ R""""(
         uint inputOutputSize = parameters->m_inputOutputSize;
         uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        //uint workGroupSizeReminder = inputSize % workGroupSize;
-        //uint modWorkGroupSize = inputSize - workGroupSizeReminder;
-        
-        uint inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
-        uint outputOffset = inputOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
-        //for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
-        for (uint i = 0; i < inputSize; i += workGroupSize)
+        long inputOffset = groupId * (long)inputOutputSize + inputOutputStartOffset;
+        long outputOffset = inputOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
+
+        uint workGroupSizeReminder = inputSize % workGroupSize;
+        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             float inputValue = inputOutputData[inputOffset + i + itemId];
             float outputValue = (inputValue > -30.0f) ? ((inputValue < 30.0f) ? inputValue : 30.0f) : -30.0f;
             inputOutputData[outputOffset + i + itemId] = tanh(outputValue);
         }
-        //if (itemId < workGroupSizeReminder)
-        //{
-        //    float inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
-        //    float outputValue = (inputValue > -30.0f) ? ((inputValue < 30.0f) ? inputValue : 30.0f) : -30.0f;
-        //    inputOutputData[outputOffset + modWorkGroupSize + itemId] = tanh(outputValue);
-        //}
+        if (itemId < workGroupSizeReminder)
+        {
+            float inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
+            float outputValue = (inputValue > -30.0f) ? ((inputValue < 30.0f) ? inputValue : 30.0f) : -30.0f;
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = tanh(outputValue);
+        }
     }
 
     __kernel void brainLayerDropOutActivation(__global const UniformBufferLayerArguments* parameters, __global float* inputOutputData, __global float* notUsed)  
@@ -199,24 +197,23 @@ R""""(
         uint inputOutputSize = parameters->m_inputOutputSize;
         uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        //uint workGroupSizeReminder = inputSize % workGroupSize;
-        //uint modWorkGroupSize = inputSize - workGroupSizeReminder;
-        
-        uint inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
-        uint outputOffset = inputOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
-        //for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
-        for (uint i = 0; i < inputSize; i += workGroupSize)
+        long inputOffset = groupId * (long)inputOutputSize + inputOutputStartOffset;
+        long outputOffset = inputOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
+
+        uint workGroupSizeReminder = inputSize % workGroupSize;
+        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             float inputValue = inputOutputData[inputOffset + i + itemId];
             float outputValue = inputValue;
             inputOutputData[outputOffset + i + itemId] = outputValue;
         }
-        //if (itemId < workGroupSizeReminder)
-        //{
-        //    float inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
-        //    float outputValue = inputValue;
-        //    inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
-        //}
+        if (itemId < workGroupSizeReminder)
+        {
+            float inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
+            float outputValue = inputValue;
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
+        }
     }
 )"""";
 
@@ -238,8 +235,8 @@ R""""(
         uint workGroupSizeReminder = inputSize % workGroupSize;
         uint modWorkGroupSize = inputSize - workGroupSizeReminder;
         
-        uint inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
-        uint outputOffset = inputOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
+        long inputOffset = groupId * (long)inputOutputSize + inputOutputStartOffset;
+        long outputOffset = inputOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
 
         // save input to local buffer, also get the max argument
         float maxArg = -1.0e30f;

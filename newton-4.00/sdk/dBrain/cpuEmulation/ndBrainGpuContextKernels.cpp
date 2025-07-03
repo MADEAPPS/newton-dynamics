@@ -228,11 +228,6 @@ class brainLayerReluActivation : public ndBrainKernel
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
-        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
-        //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
-        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
-        //ndBrainFloat* const inputOutputData = buffer1->GetData();
-
         ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
 
@@ -243,8 +238,8 @@ class brainLayerReluActivation : public ndBrainKernel
         ndInt32 inputOutputSize = parameters->m_inputOutputSize;
         ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        ndInt32 inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
-        ndInt32 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
+        ndInt64 inputOffset = groupId * ndInt64(inputOutputSize) + inputOutputStartOffset;
+        ndInt64 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
         ndAssert(outputOffset >= 0);
 
         ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
@@ -277,11 +272,6 @@ class brainLayerTanhActivation : public ndBrainKernel
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
-        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
-        //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
-        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
-        //ndBrainFloat* const inputOutputData = buffer1->GetData();
-        
         ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
 
@@ -292,8 +282,8 @@ class brainLayerTanhActivation : public ndBrainKernel
         ndInt32 inputOutputSize = parameters->m_inputOutputSize;
         ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        ndInt32 inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
-        ndInt32 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
+        ndInt64 inputOffset = groupId * ndInt64(inputOutputSize) + inputOutputStartOffset;
+        ndInt64 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
         ndAssert(outputOffset >= 0);
 
         ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
@@ -327,11 +317,6 @@ class brainLayerLinearDropOutActivation : public ndBrainKernel
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
-        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
-        //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
-        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
-        //ndBrainFloat* const inputOutputData = buffer1->GetData();
-
         ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
 
@@ -342,8 +327,8 @@ class brainLayerLinearDropOutActivation : public ndBrainKernel
         ndInt32 inputOutputSize = parameters->m_inputOutputSize;
         ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
 
-        ndInt32 inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
-        ndInt32 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
+        ndInt64 inputOffset = groupId * ndInt64(inputOutputSize) + inputOutputStartOffset;
+        ndInt64 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
         ndAssert(outputOffset >= 0);
 
         ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
@@ -389,8 +374,8 @@ class brainLayerSoftmaxActivation : public ndBrainKernel
         ndInt32 inputOutputSize = parameters->m_inputOutputSize;
         ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        ndInt32 inputOffset = groupId * inputOutputSize + inputOutputStartOffset;
-        ndInt32 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
+        ndInt64 inputOffset = groupId * ndInt64(inputOutputSize) + inputOutputStartOffset;
+        ndInt64 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
         ndAssert(outputOffset >= 0);
 
         ndFixSizeArray<ndBrainFloat, 1024> maxArgReg(1024);
