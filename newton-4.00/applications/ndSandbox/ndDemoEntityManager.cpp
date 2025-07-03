@@ -21,13 +21,11 @@
 #include "ndDebugDisplay.h"
 #include "ndPhysicsWorld.h"
 #include "ndPhysicsUtils.h"
-#include "ndDebugDisplay.h"
 #include "ndTestDeepBrain.h"
 #include "ndPngToOpenGl.h"
 #include "ndColorRenderPass.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
-#include "ndDemoCameraManager.h"
 #include "ndDemoCameraManager.h"
 #include "ndHighResolutionTimer.h"
 #include "ndShadowsMapRenderPass.h"
@@ -298,8 +296,11 @@ static void SimpleRegressionBrainStressTest()
 	ndSharedPtr<ndBrain> brain(new ndBrain);
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 
-	ndInt32 hidenLayerWidth = 4096;
-	layers.PushBack(new ndBrainLayerLinear(1, hidenLayerWidth));
+	//ndInt32 hidenLayerWidth = 4096;
+
+	ndInt32 inputSize = 5;
+	ndInt32 hidenLayerWidth = 17;
+	layers.PushBack(new ndBrainLayerLinear(inputSize, hidenLayerWidth));
 	layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hidenLayerWidth));
 	layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
@@ -311,12 +312,21 @@ static void SimpleRegressionBrainStressTest()
 	descritor.m_brain = brain;
 	descritor.m_context = context;
 	descritor.m_learnRate = 1.0e-4f;
-	descritor.m_minibatchSize = 128;
+	//descritor.m_minibatchSize = 128;
+	descritor.m_minibatchSize = ND_GPU_TILED_MATRIX_ROWS;
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
 		brain->AddLayer(layers[i]);
 	}
 	brain->InitWeights();
+
+	ndBrainVector inputData;
+	inputData.SetCount(descritor.m_minibatchSize * inputSize);
+	inputData.Set(0.0f);
+	for (ndInt32 i = 0; i < descritor.m_minibatchSize; ++i)
+	{
+		inputData[i * inputSize + i% inputSize] = 1.0f;
+	}
 
 	ndSharedPtr<ndBrainTrainer> trainer(new ndBrainTrainer(descritor));
 	ndUnsigned64 time = ndGetTimeInMicroseconds();
@@ -552,8 +562,8 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	//Test0__();
 	//Test1__();
-	ndHandWrittenDigits();
-	//SimpleRegressionBrainStressTest();
+	SimpleRegressionBrainStressTest();
+	//ndHandWrittenDigits();
 	//ndCifar10ImageClassification();
 	//TargaToPng();
 }
