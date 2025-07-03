@@ -63,6 +63,7 @@ ndBrainTrainerInference::ndBrainTrainerInference(const ndTrainerDescriptor& desc
 	,m_miniBatchOutputBuffer()
 	,m_feedForwardCommands()
 {
+	ndAssert((m_descriptor.m_minibatchSize & (ND_GPU_TILED_MATRIX_ROWS - 1)) == 0);
 	InitInputOutputBuffer();
 	InitWeightAndBiasBuffer();
 }
