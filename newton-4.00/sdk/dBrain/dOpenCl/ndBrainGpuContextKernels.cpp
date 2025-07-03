@@ -489,8 +489,8 @@ R""""(
         uint inputOutputSize = parameters->m_inputOutputSize;
         uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        uint srcBase = groupId * inputOutputSize + inputOutputStartOffset;
-        uint dstBase = srcBase + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
+        long srcBase = groupId * (long)inputOutputSize + inputOutputStartOffset;
+        long dstBase = srcBase + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
         
         uint workGroupSizeReminder = inputSize % workGroupSize;
         uint modWorkGroupSize = inputSize - workGroupSizeReminder;
@@ -524,8 +524,8 @@ R""""(
         uint inputOutputSize = parameters->m_inputOutputSize;
         uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
 
-        uint srcBase = groupId * inputOutputSize + inputOutputStartOffset;
-        uint dstBase = srcBase + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
+        long srcBase = groupId * (long)inputOutputSize + inputOutputStartOffset;
+        long dstBase = srcBase + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
 
         uint workGroupSizeReminder = inputSize % workGroupSize;
         uint modWorkGroupSize = inputSize - workGroupSizeReminder;
@@ -559,8 +559,8 @@ R""""(
         uint inputOutputSize = parameters->m_inputOutputSize;
         uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        uint srcBase = groupId * inputOutputSize + inputOutputStartOffset;
-        uint dstBase = srcBase + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
+        long srcBase = groupId * (long)inputOutputSize + inputOutputStartOffset;
+        long dstBase = srcBase + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
         
         uint workGroupSizeReminder = inputSize % workGroupSize;
         uint modWorkGroupSize = inputSize - workGroupSizeReminder;
@@ -592,8 +592,8 @@ R""""(
         uint inputOutputSize = parameters->m_inputOutputSize;
         uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        uint srcBase = groupId * inputOutputSize + inputOutputStartOffset;        
-        uint dstBase = srcBase + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
+        long srcBase = groupId * (long)inputOutputSize + inputOutputStartOffset;        
+        long dstBase = srcBase + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
         
         uint workGroupSizeReminder = inputSize % workGroupSize;
         uint modWorkGroupSize = inputSize - workGroupSizeReminder;

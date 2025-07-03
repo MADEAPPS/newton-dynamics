@@ -618,16 +618,7 @@ class brainLayerBrainReluBackPropagate : public ndBrainKernel
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
-        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
-        //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
-        //ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
-        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
-        //ndBrainFloat* const inputOutputData = buffer1->GetData();
-        //ndBrainFloat* const inputOutputGradients = buffer3->GetData();
-
-        //ndBrainFloatBuffer* const buffer4 = (ndBrainFloatBuffer*)m_parameters[4];
         ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
-        //ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
         ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
 
@@ -639,8 +630,8 @@ class brainLayerBrainReluBackPropagate : public ndBrainKernel
         ndInt32 inputOutputSize = parameters->m_inputOutputSize;
         ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        ndInt32 srcBase = groupId * inputOutputSize + inputOutputStartOffset;
-        ndInt32 dstBase = srcBase + __cpuKernelRoundoff(inputSize, workGroupSize);
+        ndInt64 srcBase = groupId * ndInt64(inputOutputSize) + inputOutputStartOffset;
+        ndInt64 dstBase = srcBase + __cpuKernelRoundoff(inputSize, workGroupSize);
         ndAssert(srcBase >= 0);
         ndAssert(dstBase >= 0);
         
@@ -688,16 +679,7 @@ class brainLayerBrainTanhBackPropagate : public ndBrainKernel
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
-        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
-        //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
-        //ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
-        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
-        //ndBrainFloat* const inputOutputData = buffer1->GetData();
-        //ndBrainFloat* const inputOutputGradients = buffer3->GetData();
-
-        //ndBrainFloatBuffer* const buffer4 = (ndBrainFloatBuffer*)m_parameters[4];
         ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
-        //ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
         ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
 
@@ -709,8 +691,8 @@ class brainLayerBrainTanhBackPropagate : public ndBrainKernel
         ndInt32 inputOutputSize = parameters->m_inputOutputSize;
         ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        ndInt32 srcBase = groupId * inputOutputSize + inputOutputStartOffset;
-        ndInt32 dstBase = srcBase + __cpuKernelRoundoff(inputSize, workGroupSize);
+        ndInt64 srcBase = groupId  * ndInt64(inputOutputSize) + inputOutputStartOffset;
+        ndInt64 dstBase = srcBase + __cpuKernelRoundoff(inputSize, workGroupSize);
         ndAssert(srcBase >= 0);
         ndAssert(dstBase >= 0);
 
@@ -757,16 +739,7 @@ class brainLayerBrainCathegoricalSoftmaxBackPropagate : public ndBrainKernel
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
-        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
-        //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
-        //ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
-        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
-        //ndBrainFloat* const inputOutputData = buffer1->GetData();
-        //ndBrainFloat* const inputOutputGradients = buffer3->GetData();
-
-        //ndBrainFloatBuffer* const buffer4 = (ndBrainFloatBuffer*)m_parameters[4];
         ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
-        //ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
         ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
 
@@ -778,8 +751,8 @@ class brainLayerBrainCathegoricalSoftmaxBackPropagate : public ndBrainKernel
         ndInt32 inputOutputSize = parameters->m_inputOutputSize;
         ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        ndInt32 srcBase = groupId * inputOutputSize + inputOutputStartOffset;
-        ndInt32 dstBase = srcBase + __cpuKernelRoundoff(inputSize, workGroupSize);
+        ndInt64 srcBase = groupId * ndInt64(inputOutputSize) + inputOutputStartOffset;
+        ndInt64 dstBase = srcBase + __cpuKernelRoundoff(inputSize, workGroupSize);
         ndAssert(srcBase >= 0);
         ndAssert(dstBase >= 0);
         
@@ -824,18 +797,9 @@ class brainLayerBrainLinearDropOutBackPropagate : public ndBrainKernel
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
-        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
-        //ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
-        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetData();
-        //ndBrainFloat* const inputOutputGradients = buffer3->GetData();
-
-        //ndBrainFloatBuffer* const buffer4 = (ndBrainFloatBuffer*)m_parameters[4];
         ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
-        //ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
-        //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
 
-        //ndBrainFloat* const inputOutputData = (ndBrainFloat*)buffer1->GetGpuBuffer()->GetPtr();
         ndBrainFloat* const inputOutputGradients = (ndBrainFloat*)buffer3->GetGpuBuffer()->GetPtr();
         ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetGpuBuffer()->GetPtr();
         
@@ -843,8 +807,8 @@ class brainLayerBrainLinearDropOutBackPropagate : public ndBrainKernel
         ndInt32 inputOutputSize = parameters->m_inputOutputSize;
         ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        ndInt32 srcBase = groupId * inputOutputSize + inputOutputStartOffset;
-        ndInt32 dstBase = srcBase + __cpuKernelRoundoff(inputSize, workGroupSize);
+        ndInt64 srcBase = groupId * ndInt64(inputOutputSize) + inputOutputStartOffset;
+        ndInt64 dstBase = srcBase + __cpuKernelRoundoff(inputSize, workGroupSize);
         ndAssert(srcBase >= 0);
         ndAssert(dstBase >= 0);
 
