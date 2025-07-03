@@ -1091,9 +1091,10 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
         const ndInt32 groupId_y = (groupId - groupId_x) / parameters->m_tiledStride;
         
         //Initialise the accumulation register
-        const ndInt32 parametersStartOffset = groupId_x * width * ND_GPU_TILED_MATRIX_ROWS + ndInt32(parameters->m_parametersStartOffset);
-        const ndInt32 parametersBiasOffset = width * height + ndInt32(parameters->m_parametersStartOffset);
-        ndAssert(parametersStartOffset >= 0);
+        const ndInt32 blockBase = groupId_x * ND_GPU_TILED_MATRIX_ROWS;
+        const ndInt32 parametersStartOffset = blockBase * width + parameters->m_parametersStartOffset;
+        const ndInt32 parametersBiasOffset = blockBase + width * height + parameters->m_parametersStartOffset;
+        ndAssert(parametersBiasOffset >= 0);
         
         ndBrainFloat biasValue[ND_GPU_TILED_MATRIX_ROWS];
         for (ndInt32 itemId_y = 0; itemId_y < ND_GPU_TILED_MATRIX_ROWS; ++itemId_y)
