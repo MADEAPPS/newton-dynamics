@@ -18,6 +18,8 @@
 const char* ndBrainGpuContext::m_commonKernelsInclude =
 R""""(
 
+    #define ND_GPU_USE_SOFT_SUBGROUPS
+    #define ND_GPU_SOFT_SUBGROUPS_WORD_SIZE     32
     #define ND_GPU_LOCAL_BUFFER_SIZE	        512
     #define ND_GPU_TILED_MATRIX_ROWS_BITS       4
     #define ND_GPU_TILED_MATRIX_COLUMNS_BITS    5
@@ -219,6 +221,7 @@ R""""(
 
 const char* ndBrainGpuContext::m_feedForwardKernels_3 =
 R""""(
+    
     __kernel void brainLayerSoftmaxActivation(__global const UniformBufferLayerArguments* parameters, __global float* inputOutputData, __global float* notUsed)
     {
         __local float tmpInputBuffer [ND_GPU_LOCAL_BUFFER_SIZE * 2];
@@ -252,7 +255,45 @@ R""""(
             tmpInputBuffer[modWorkGroupSize + itemId] = inputValue;
             maxArg = (inputValue > maxArg) ? inputValue : maxArg;
         }
-#if 0        
+
+#ifdef ND_GPU_USE_SOFT_SUBGROUPS
+        // barrier reduction loop
+        for (uint j = workGroupSize / 2; j > ND_GPU_SOFT_SUBGROUPS_WORD_SIZE / 2; j = j >> 1)
+        {
+            barrier(CLK_LOCAL_MEM_FENCE); 
+            if ((itemId >= j) && (itemId < j * 2))
+            {
+                reductionBuffer[itemId - j] = maxArg;
+            }
+        
+            barrier(CLK_LOCAL_MEM_FENCE); 
+            if (itemId < j)
+            {
+                float inputValue = reductionBuffer[itemId];
+                maxArg = (inputValue > maxArg) ? inputValue : maxArg;
+            }
+        }
+        // barrier reduction loop
+        for (uint j = ND_GPU_SOFT_SUBGROUPS_WORD_SIZE / 2; j > 0; j = j >> 1)
+        {
+            //if ((itemId >= j) && (itemId < j * 2))
+            //{
+            //    reductionBuffer[itemId - j] = maxArg;
+            //}
+            //if (itemId < j)
+            //{
+            //    float inputValue = reductionBuffer[itemId];
+            //    maxArg = (inputValue > maxArg) ? inputValue : maxArg;
+            //}
+
+            if (itemId < j * 2)
+            {
+                reductionBuffer[itemId + ND_GPU_SOFT_SUBGROUPS_WORD_SIZE / 2] = maxArg;
+                float inputValue = reductionBuffer[itemId + ND_GPU_SOFT_SUBGROUPS_WORD_SIZE / 2];
+                maxArg = (inputValue > maxArg) ? inputValue : maxArg;
+            }
+        }
+#else
         for (uint j = workGroupSize / 2; j > 0; j = j >> 1)
         {
             barrier(CLK_LOCAL_MEM_FENCE); 
@@ -268,44 +309,13 @@ R""""(
                 maxArg = (inputValue > maxArg) ? inputValue : maxArg;
             }
         }
-#else
-        // barrier reduction loop
-        for (uint j = workGroupSize / 2; j > 32; j = j >> 1)
-        {
-            barrier(CLK_LOCAL_MEM_FENCE); 
-            if ((itemId >= j) && (itemId < j * 2))
-            {
-                reductionBuffer[itemId - j] = maxArg;
-            }
-        
-            barrier(CLK_LOCAL_MEM_FENCE); 
-            if (itemId < j)
-            {
-                float inputValue = reductionBuffer[itemId];
-                maxArg = (inputValue > maxArg) ? inputValue : maxArg;
-            }
-        }
-        // barrier reduction loop
-        for (uint j = 32; j > 0; j = j >> 1)
-        {
-            if ((itemId >= j) && (itemId < j * 2))
-            {
-                reductionBuffer[itemId - j] = maxArg;
-            }
-            if (itemId < j)
-            {
-                float inputValue = reductionBuffer[itemId];
-                maxArg = (inputValue > maxArg) ? inputValue : maxArg;
-            }
-        }
 #endif
-
         if (itemId == 0)
         {
             reductionBuffer[0] = maxArg;
         }
+        // need a barrier here so that I can reload maxArg into all workItems.
         barrier(CLK_LOCAL_MEM_FENCE); 
-        
         maxArg = reductionBuffer[0];
         
         float sumArg = 0.0f;
@@ -323,7 +333,42 @@ R""""(
             sumArg += outputValue;
             tmpInputBuffer[modWorkGroupSize + itemId] = outputValue;
         }
-        
+
+#ifdef ND_GPU_USE_SOFT_SUBGROUPS        
+        for (uint j = workGroupSize / 2; j > ND_GPU_SOFT_SUBGROUPS_WORD_SIZE / 2; j = j >> 1)
+        {
+            barrier(CLK_LOCAL_MEM_FENCE); 
+            if ((itemId >= j) && (itemId < j * 2))
+            {
+                reductionBuffer[itemId - j] = sumArg;
+            }
+            barrier(CLK_LOCAL_MEM_FENCE); 
+            if (itemId < j)
+            {
+                float inputValue = reductionBuffer[itemId];
+                sumArg += inputValue;
+            }
+        }
+        for (uint j = ND_GPU_SOFT_SUBGROUPS_WORD_SIZE / 2; j > 0; j = j >> 1)
+        {
+            //if ((itemId >= j) && (itemId < j * 2))
+            //{
+            //    reductionBuffer[itemId - j] = sumArg;
+            //}
+            //if (itemId < j)
+            //{
+            //    float inputValue = reductionBuffer[itemId];
+            //    sumArg += inputValue;
+            //}
+
+            if (itemId < j * 2)
+            {
+                reductionBuffer[itemId + ND_GPU_SOFT_SUBGROUPS_WORD_SIZE / 2] = sumArg;
+                float inputValue = reductionBuffer[itemId + ND_GPU_SOFT_SUBGROUPS_WORD_SIZE / 2];
+                sumArg += inputValue;
+            }
+        }
+#else
         for (uint j = workGroupSize / 2; j > 0; j = j >> 1)
         {
             barrier(CLK_LOCAL_MEM_FENCE); 
@@ -339,15 +384,15 @@ R""""(
                 sumArg += inputValue;
             }
         }
+#endif
         if (itemId == 0)
         {
             reductionBuffer[0] = 1.0f / sumArg;
         }
         barrier(CLK_LOCAL_MEM_FENCE); 
-        
         float invDen = reductionBuffer[0];
+
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
-        //for (uint i = 0; i < inputSize; i += workGroupSize)
         {
             float inputValue = tmpInputBuffer[i + itemId];
             float outputValue = invDen * inputValue;

@@ -20,7 +20,9 @@
 #include "ndBrainIntegerBuffer.h"
 #include "ndBrainOptimizerAdam.h"
 
-#define ND_GPU_LOCAL_BUFFER_SIZE	1024 * 4
+#define ND_GPU_USE_SOFT_SUBGROUPS
+#define ND_GPU_SOFT_SUBGROUPS_WORD_SIZE 32
+#define ND_GPU_LOCAL_BUFFER_SIZE	    1024 * 4
 
 inline ndInt32 __cpuKernelRoundoff(ndInt32 value, ndInt32 workgroupSize)
 {
@@ -402,30 +404,16 @@ class brainLayerSoftmaxActivation : public ndBrainKernel
             maxArgReg[itemId] = (inputValue > maxArgReg[itemId]) ? inputValue : maxArgReg[itemId];
         }
 
-#if 0
-        for (ndInt32 j = workGroupSize / 2; j > 0; j = j >> 1)
-        {
-            for (ndInt32 itemId = j; itemId < j * 2; ++itemId)
-            {
-                reductionBuffer[itemId - j] = maxArgReg[itemId];
-            }
-        
-            for (ndInt32 itemId = 0; itemId < j; ++itemId)
-            {
-                ndBrainFloat inputValue = reductionBuffer[itemId];
-                maxArgReg[itemId] = (inputValue > maxArgReg[itemId]) ? inputValue : maxArgReg[itemId];
-            }
-        }
-#else
+#ifdef ND_GPU_USE_SOFT_SUBGROUPS
         // using the trick that the width of a compute using is larger of equal than 32 
         // therefere we can about barries.
 
         // barrier reduction loop
-        for (ndInt32 j = workGroupSize / 2; j > 32; j = j >> 1)
+        for (ndInt32 j = workGroupSize / 2; j > ND_GPU_SOFT_SUBGROUPS_WORD_SIZE; j = j >> 1)
         {
-            for (ndInt32 itemId = j; itemId < j * 2; ++itemId)
+            for (ndInt32 itemId = 0; itemId < j; ++itemId)
             {
-                reductionBuffer[itemId - j] = maxArgReg[itemId];
+                reductionBuffer[itemId] = maxArgReg[itemId + j];
             }
             // barrier
             for (ndInt32 itemId = 0; itemId < j; ++itemId)
@@ -434,15 +422,31 @@ class brainLayerSoftmaxActivation : public ndBrainKernel
                 maxArgReg[itemId] = (inputValue > maxArgReg[itemId]) ? inputValue : maxArgReg[itemId];
             }
             //barrier
+            //j *= 1;
         }
 
         // no barrier reduction loop
-        for (ndInt32 j = 32; j > 0; j = j >> 1)
+        for (ndInt32 j = ND_GPU_SOFT_SUBGROUPS_WORD_SIZE; j > 0; j = j >> 1)
         {
-            for (ndInt32 itemId = j; itemId < j * 2; ++itemId)
+            for (ndInt32 itemId = 0; itemId < j; ++itemId)
             {
-                reductionBuffer[itemId - j] = maxArgReg[itemId];
+                reductionBuffer[itemId] = maxArgReg[itemId + j];
             }
+            for (ndInt32 itemId = 0; itemId < j; ++itemId)
+            {
+                ndBrainFloat inputValue = reductionBuffer[itemId];
+                maxArgReg[itemId] = (inputValue > maxArgReg[itemId]) ? inputValue : maxArgReg[itemId];
+            }
+        }
+#else
+        for (ndInt32 j = workGroupSize / 2; j > 0; j = j >> 1)
+        {
+            //for (ndInt32 itemId = j; itemId < j * 2; ++itemId)
+            for (ndInt32 itemId = 0; itemId < j; ++itemId)
+            {
+                reductionBuffer[itemId] = maxArgReg[itemId + j];
+            }
+
             for (ndInt32 itemId = 0; itemId < j; ++itemId)
             {
                 ndBrainFloat inputValue = reductionBuffer[itemId];
