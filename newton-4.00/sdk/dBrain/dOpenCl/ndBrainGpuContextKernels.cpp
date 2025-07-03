@@ -416,7 +416,6 @@ const char* ndBrainGpuContext::m_backPropagateKernels_1 =
 R""""(
     __kernel void brainCopyInputGradients(
             __global const UniformBufferLayerArguments* parameters, 
-            __global float* notUsed, 
             __global float* miniBatchGradients, 
             __global float* inputOutputGradients) 
     {
@@ -447,7 +446,6 @@ R""""(
 
     __kernel void brainCopyOutputGradients(
             __global const UniformBufferLayerArguments* parameters, 
-            __global float* notUsed, 
             __global float* miniBatchGradients, 
             __global float* inputOutputGradients) 
     {

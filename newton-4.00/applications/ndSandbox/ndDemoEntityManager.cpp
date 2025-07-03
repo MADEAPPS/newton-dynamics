@@ -343,6 +343,7 @@ static void SimpleRegressionBrainStressTest()
 	ndSharedPtr<ndBrainTrainer> trainer(new ndBrainTrainer(descritor));
 	ndBrainFloatBuffer* const minibatchInputBuffer = trainer->GetInputBuffer();
 	ndBrainFloatBuffer* const minibatchOutpuBuffer = trainer->GetOuputBuffer();
+	ndBrainFloatBuffer* const minibatchOutpuGradientBuffer = trainer->GetOuputGradientBuffer();
 
 	minibatchInputBuffer->VectorToDevice(inputData);
 
@@ -350,9 +351,12 @@ static void SimpleRegressionBrainStressTest()
 	for (ndInt32 epoch = 0; epoch < 5; ++epoch)
 	{
 		trainer->MakePrediction();
+		context->SyncBufferCommandQueue();
 		minibatchOutpuBuffer->VectorFromDevice(outputData);
 
-		//trainer->BackPropagate();
+		// calculate loss here
+		minibatchOutpuGradientBuffer->VectorFromDevice(outputData);
+		trainer->BackPropagate();
 		//trainer->ApplyLearnRate();
 	}
 	time = ndGetTimeInMicroseconds() - time;
