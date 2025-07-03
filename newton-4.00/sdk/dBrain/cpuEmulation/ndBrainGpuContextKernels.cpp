@@ -143,8 +143,8 @@ class brainCopyInput : public ndBrainKernel
         ndInt32 inputOutputSize = parameters->m_inputOutputSize;
         ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        ndInt32 srcBase = groupId * inputSize;
-        ndInt32 dstBase = groupId * inputOutputSize + inputOutputStartOffset;
+        ndInt64 srcBase = groupId * ndInt64(inputSize);
+        ndInt64 dstBase = groupId * ndInt64(inputOutputSize) + inputOutputStartOffset;
         ndAssert(srcBase >= 0);
         ndAssert(dstBase >= 0);
         
@@ -195,8 +195,8 @@ class brainCopyOutput : public ndBrainKernel
         ndInt32 inputOutputSize = parameters->m_inputOutputSize;
         ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
             
-        ndInt32 dstBase = groupId * outputSize;
-        ndInt32 srcBase = groupId * inputOutputSize + inputOutputStartOffset;
+        ndInt64 dstBase = groupId * (ndInt64)outputSize;
+        ndInt64 srcBase = groupId * (ndInt64)inputOutputSize + inputOutputStartOffset;
         ndAssert(srcBase >= 0);
         ndAssert(dstBase >= 0);
             
