@@ -29,76 +29,13 @@ ndBrainIntegerBuffer::ndBrainIntegerBuffer(ndBrainContext* const context, ndInt6
 ndBrainIntegerBuffer::ndBrainIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32* const indexArray, bool memoryMapped)
 	:ndBrainBuffer(context, numberOfElements * ndInt64(sizeof(ndUnsigned32)), memoryMapped)
 {
-	//ndAssert(m_context->GetAsCpuContext());
-	//m_indexArray.SetCount(numberOfElements);
-	//MemoryToDevice(0, m_sizeInBytes, indexArray);
 	if (m_context->GetAsCpuContext())
 	{
 		m_indexArray = ndSharedPtr<ndArray<ndUnsigned32>>(new ndArray<ndUnsigned32>);
 		m_indexArray->SetCount(numberOfElements);
 	}
-	else
-	{
-		ndAssert(0);
-		//BrainVectorToDevice(flatArray);
-	}
 	MemoryToDevice(0, m_sizeInBytes, indexArray);
 }
-
-#if 0
-void ndBrainIntegerBuffer::BrainVectorToDevice(const ndBrainVector&)
-{
-	ndAssert(0);
-	//ndAssert(vector.GetCount() * sizeof(ndReal) <= m_sizeInBytes);
-	//LoadData(vector.GetCount() * sizeof(ndReal), &vector[0]);
-}
-
-//void ndBrainIntegerBuffer::BrainVectorFromDevice(ndBrainVector& vector) const
-void ndBrainIntegerBuffer::BrainVectorFromDevice(ndBrainVector&) const
-{
-	ndAssert(0);
-}
-
-//void ndBrainIntegerBuffer::MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
-void ndBrainIntegerBuffer::MemoryFromDevice(size_t, size_t, void* const) const
-{
-	ndAssert(0);
-}
-
-void ndBrainIntegerBuffer::LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const sourceData)
-{
-	ndAssert(sizeInBytes <= m_sizeInBytes);
-	size_t size = ndMin(sizeInBytes, m_sizeInBytes) / sizeof(ndUnsigned32);
-	ndInt64 offset = ndInt64(offsetInBytes / sizeof(ndUnsigned32));
-	ndMemCpy(&m_indexArray[offset], (ndUnsigned32*)sourceData, ndInt64(size));
-}
-
-//void ndBrainIntegerBuffer::UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const outputData) const
-void ndBrainIntegerBuffer::UnloadData(size_t, size_t, void* const) const
-{
-	ndAssert(0);
-}
-
-
-//void ndBrainIntegerBuffer::CopyBuffer(const ndBrainBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer)
-void ndBrainIntegerBuffer::CopyBuffer(const ndBrainBuffer&, ndInt32, const ndBrainBuffer&)
-{
-	ndAssert(0);
-	//ndInt64 dstOffset = ndInt64(dstOffsetInBytes / sizeof(ndReal));
-	//ndInt64 srcOffset = ndInt64(srcOffsetInBytes / sizeof(ndReal));
-	//
-	//ndBrainIntegerBuffer& source = *((ndBrainIntegerBuffer*)&sourceData);
-	//ndBrainMemVector dst(&m_buffer[dstOffset], ndInt32(sizeInBytes / sizeof(ndReal)));
-	//const ndBrainMemVector src(&source.m_buffer[srcOffset], ndInt32(sizeInBytes / sizeof(ndReal)));
-	//dst.Set(src);
-}
-
-//void ndBrainIntegerBuffer::CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer)
-void ndBrainIntegerBuffer::CopyBufferIndirect(const ndBrainBuffer&, const ndBrainBuffer&, const ndBrainBuffer&)
-{
-	ndAssert(0);
-}
-#endif
 
 void* ndBrainIntegerBuffer::GetCpuPtr()
 {

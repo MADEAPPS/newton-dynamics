@@ -239,7 +239,8 @@ ndBrainGpuContext* ndBrainGpuContext::GetAsGpuContext()
 
 void ndBrainGpuContext::BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVector& dstVector)
 {
-	ndAssert(0);
+	size_t sizeInBytes = ndMin(size_t(src.SizeInBytes()), size_t(dstVector.GetCount() * sizeof(ndReal)));
+	MemoryFromDevice(src, 0, sizeInBytes, &dstVector[0]);
 }
 
 void ndBrainGpuContext::BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector)

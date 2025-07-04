@@ -214,11 +214,11 @@ void ndBrainTrainerInference::InitWeightAndBiasBuffer()
 
 	scratchBuffer.SetCount(m_descriptor.m_minibatchSize * brain.GetInputSize());
 	scratchBuffer.Set(ndBrainFloat(0.0f));
-	m_miniBatchInputBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_descriptor.m_context, scratchBuffer));
+	m_miniBatchInputBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_descriptor.m_context, scratchBuffer, true));
 
 	scratchBuffer.SetCount(m_descriptor.m_minibatchSize * brain.GetOutputSize());
 	scratchBuffer.Set(ndBrainFloat(0.0f));
-	m_miniBatchOutputBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_descriptor.m_context, scratchBuffer));
+	m_miniBatchOutputBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_descriptor.m_context, scratchBuffer, true));
 
 	AddCopyInputCommand(uniformData[0]);
 	AddLayersCommands(uniformData);

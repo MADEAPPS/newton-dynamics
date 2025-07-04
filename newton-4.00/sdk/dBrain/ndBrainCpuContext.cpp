@@ -53,7 +53,6 @@ void ndBrainCpuContext::BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVe
 	MemoryFromDevice(src, 0, sizeInBytes, &dstVector[0]);
 }
 
-//void ndBrainCpuContext::CopyBuffer(const ndBrainUniformBuffer& parameterBuffer, ndInt32 numberOfWorkGroups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
 void ndBrainCpuContext::CopyBuffer(const ndCopyBufferCommandInfo& descriptor, ndInt32 numberOfWorkGroups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
 {
 	ndInt32 stride = ndInt32(descriptor.m_strideInByte);
