@@ -242,11 +242,15 @@ void ndBrainTrainer::AddLayersGradientCommands()
 		ndBrainFloatBuffer* const inputOutputGradientBuffer = *m_inputOutputGradientsBuffer;
 		ndBrainFloatBuffer* const weightAndBiasGradientsBuffer = *m_weightAndBiasGradientsBuffer;
 
-		ndSharedPtr<ndBrainBufferCommand>command(layer->CreateGpuBackPropagateCommand(
+		ndFixSizeArray<ndBrainBufferCommand*, 16> backCommands(layer->CreateGpuBackPropagateCommand(
 			this, info, *m_descriptor.m_context, m_descriptor.m_minibatchSize,
 			uniformBuffer, inputOutputBuffer, weightsAndBiasBuffer,
 			inputOutputGradientBuffer, weightAndBiasGradientsBuffer));
-		m_backPropagateCommands.Append(command);
+		for (ndInt32 j = 0; j < backCommands.GetCount(); ++j)
+		{
+			ndSharedPtr<ndBrainBufferCommand>command(backCommands[j]);
+			m_backPropagateCommands.Append(command);
+		}
 	}
 }
 

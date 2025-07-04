@@ -430,24 +430,70 @@ void ndBrainGpuContext::CreateCopyCommands()
 
 void ndBrainGpuContext::MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, const void* const srcMemory) const
 {
-	cl_int error = 0;
+	ndAssert((sizeInBytes & 3) == 0);
 	ndAssert(sizeInBytes <= deviceBuffer.SizeInBytes());
 
+	cl_int error = 0;
 	const cl::CommandQueue* queue = *m_queue;
 	ndBrainGpuBuffer* const buffer = deviceBuffer.GetGpuBuffer();
-	error = queue->enqueueWriteBuffer(**buffer->m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, srcMemory);
-	ndAssert(error == CL_SUCCESS);
+	if (buffer->m_memory)
+	{
+		// if the que has to be flush to ge the memory,
+		// then to me, thsi si no diffrent that just calling enqueueWriteBuffer
+		// but I use it in case ther is some different
+		error = m_queue->finish();
+		ndAssert(error == CL_SUCCESS);
+
+		ndAssert(buffer->m_owner->m_isMemoryMapped);
+		ndInt64 size = ndInt64(sizeInBytes / sizeof(ndUnsigned32));
+		ndInt64 offset = ndInt64(offsetInBytes / sizeof(ndUnsigned32));
+		ndMemCpy(&buffer->m_memory[offset], (ndUnsigned32*)srcMemory, size);
+	}
+	else
+	{
+		error = queue->enqueueWriteBuffer(**buffer->m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, srcMemory);
+		ndAssert(error == CL_SUCCESS);
+	}
 }
 
 void ndBrainGpuContext::MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
 {
-	cl_int error = 0;
+	ndAssert((sizeInBytes & 3) == 0);
 	ndAssert(sizeInBytes <= deviceBuffer.SizeInBytes());
 
+	cl_int error = 0;
 	const cl::CommandQueue* queue = *m_queue;
 	const ndBrainGpuBuffer* const buffer = deviceBuffer.GetGpuBuffer();
-	error = queue->enqueueReadBuffer(**buffer->m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, outputMemory);
-	ndAssert(error == CL_SUCCESS);
+	if (buffer->m_memory)
+	{
+		// if the que has to be flush to ge the memory,
+		// then to me, thsi si no diffrent that just calling enqueueReadBuffer
+		// but I use it in case ther is some different
+		error = m_queue->finish();
+		ndAssert(error == CL_SUCCESS);
+
+		ndAssert(buffer->m_owner->m_isMemoryMapped);
+		ndInt64 size = ndInt64(sizeInBytes / sizeof(ndUnsigned32));
+		ndInt64 offset = ndInt64(offsetInBytes / sizeof(ndUnsigned32));
+
+		ndMemCpy((ndUnsigned32*)outputMemory, &buffer->m_memory[offset], size);
+
+		//ndBrainFloat ptr1[1024 * 16];
+		//ndBrainFloat* const ptr0 = (ndBrainFloat*)outputMemory;
+		//ndBrainFloat* const ptr2 = (ndBrainFloat*)buffer->m_memory;
+		//const cl::CommandQueue* queue = *m_queue;
+		//error = queue->enqueueReadBuffer(**buffer->m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, ptr1);
+		//ndAssert(error == CL_SUCCESS);
+		//for (ndInt32 i = 0; i < size; ++i)
+		//{
+		//	ndAssert(ptr0[i] == ptr1[i]);
+		//}
+	}
+	else
+	{
+		error = queue->enqueueReadBuffer(**buffer->m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, outputMemory);
+		ndAssert(error == CL_SUCCESS);
+	}
 }
 
 void ndBrainGpuContext::SyncBufferCommandQueue()

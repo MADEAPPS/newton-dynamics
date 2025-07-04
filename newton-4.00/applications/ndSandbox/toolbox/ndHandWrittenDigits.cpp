@@ -174,6 +174,7 @@ static void MnistTrainingSet()
 
 		ndInt32 ValidateData(ndBrainMatrix* const testLabels, const ndSharedPtr<ndBrainFloatBuffer>& data)
 		{
+			//return 0;
 			ndBrainVector groundTruth;
 			ndBrainVector miniBatchInput;
 			ndBrainVector miniBatchOutput;
@@ -204,6 +205,7 @@ static void MnistTrainingSet()
 				minibatchInputBuffer->CopyBuffer(copyBufferInfo, m_miniBatchSize, **data);
 			
 				m_trainer->MakePrediction();
+				//trainer->GetContext()->SyncBufferCommandQueue();
 				minibatchOutpuBuffer->VectorFromDevice(miniBatchOutput);
 				
 				for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
@@ -224,7 +226,6 @@ static void MnistTrainingSet()
 							maxProbability = output[j];
 						}
 					}
-				
 					ndAssert(maxProbIndex >= 0);
 					if (truth[maxProbIndex] == ndReal(0.0f))
 					{
@@ -244,7 +245,6 @@ static void MnistTrainingSet()
 			////optimizer.SetRegularizer(ndBrainFloat(2.0e-5f));	// 
 			////optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// 
 			//optimizer.SetRegularizer(ndBrainFloat(4.0e-5f));	// 
-
 			
 			ndArray<ndUnsigned32> shuffleBuffer;
 			for (ndInt32 i = 0; i < trainingLabels->GetCount(); ++i)
@@ -295,10 +295,11 @@ static void MnistTrainingSet()
 					m_indirectMiniBatch->MemoryToDevice(0, m_miniBatchSize * sizeof(ndUnsigned32), &shuffleBuffer[batchStart]);
 					minibatchInputBuffer->CopyBufferIndirect(copyBuffer, **m_indirectMiniBatch, **m_trainingData);
 					trainer->MakePrediction();
-					trainer->GetContext()->SyncBufferCommandQueue();
 					
 					//calculate loss
+					//trainer->GetContext()->SyncBufferCommandQueue();
 					minibatchOutpuBuffer->VectorFromDevice(miniBatchOutput);
+
 					for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
 					{
 						ndUnsigned32 index = shuffleBuffer[batchStart + i];
@@ -314,7 +315,6 @@ static void MnistTrainingSet()
 					minibatchOutpuGradientBuffer->VectorToDevice(miniBatchOutputGradients);
 					trainer->BackPropagate();
 					trainer->ApplyLearnRate(); 
-					//trainer->GetContext()->SyncBufferCommandQueue(); // no need to sync here.
 				}
 
 				ndInt64 testFailCount = ValidateData(testLabels, m_testData) + 1;

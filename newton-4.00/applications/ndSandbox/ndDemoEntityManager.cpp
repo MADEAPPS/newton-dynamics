@@ -293,17 +293,15 @@ static void Test1__()
 
 static void SimpleRegressionBrainStressTest()
 {
-	ndSetRandSeed(42);
 	ndSharedPtr<ndBrain> brain(new ndBrain);
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 
-	//ndInt32 hidenLayerWidth = 4096;
-
+	ndSetRandSeed(42);
 	ndInt32 inputSize = 16;
 	ndInt32 minibatchSize = 16;
 	ndInt32 hidenLayerWidth = 16;
-	layers.PushBack(new ndBrainLayerLinear(inputSize, 1));
-	//layers.PushBack(new ndBrainLayerLinear(inputSize, hidenLayerWidth));
+	//ndInt32 hidenLayerWidth = 4096;
+	layers.PushBack(new ndBrainLayerLinear(inputSize, hidenLayerWidth));
 	//layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
 	//layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hidenLayerWidth));
 	//layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
@@ -331,15 +329,6 @@ static void SimpleRegressionBrainStressTest()
 		inputData[i * inputSize + i% inputSize] = 1.0f;
 	}
 
-	//ndCopyBufferCommandInfo copyBuffer;
-	//copyBuffer.m_dstOffsetInByte = 0;
-	//copyBuffer.m_srcOffsetInByte = 0;
-	//copyBuffer.m_strideInByte = inputSize;
-	//copyBuffer.m_srcStrideInByte = inputSize;
-	//copyBuffer.m_dstStrideInByte = inputSize;
-	//ndSharedPtr<ndBrainUniformBuffer> parameterBuffer(ndSharedPtr<ndBrainUniformBuffer>(new ndBrainUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBuffer, true)));
-	//parameters->MemoryToDevice(0, sizeof(ndCopyBufferCommandInfo), &copyBufferInfo);
-
 	ndSharedPtr<ndBrainTrainer> trainer(new ndBrainTrainer(descritor));
 	ndBrainFloatBuffer* const minibatchInputBuffer = trainer->GetInputBuffer();
 	ndBrainFloatBuffer* const minibatchOutpuBuffer = trainer->GetOuputBuffer();
@@ -354,7 +343,7 @@ static void SimpleRegressionBrainStressTest()
 		context->SyncBufferCommandQueue();
 		minibatchOutpuBuffer->VectorFromDevice(outputData);
 
-		// calculate loss here
+		// calculate loss here, for now just pass teh ouput data
 		minibatchOutpuGradientBuffer->VectorFromDevice(outputData);
 		trainer->BackPropagate();
 		trainer->ApplyLearnRate();

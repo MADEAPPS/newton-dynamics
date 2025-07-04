@@ -20,11 +20,12 @@ R""""(
 
     #define ND_GPU_USE_SOFT_SUBGROUPS
     #define ND_GPU_SOFT_SUBGROUPS_WORD_SIZE     32
-    #define ND_GPU_LOCAL_BUFFER_SIZE	        512
     #define ND_GPU_TILED_MATRIX_ROWS_BITS       4
     #define ND_GPU_TILED_MATRIX_COLUMNS_BITS    5
     #define ND_GPU_TILED_MATRIX_ROWS            (1<<ND_GPU_TILED_MATRIX_ROWS_BITS)
     #define ND_GPU_TILED_MATRIX_COLUMNS         (1<<ND_GPU_TILED_MATRIX_COLUMNS_BITS)
+
+    #define ND_GPU_LOCAL_BUFFER_SIZE	        1024 * 6
 
     typedef struct
     {
@@ -229,8 +230,8 @@ R""""(
     
     __kernel void brainLayerSoftmaxActivation(__global const UniformBufferLayerArguments* parameters, __global float* inputOutputData, __global float* notUsed)
     {
-        __local float tmpInputBuffer [ND_GPU_LOCAL_BUFFER_SIZE * 2];
-        __local float reductionBuffer [ND_GPU_LOCAL_BUFFER_SIZE];
+        __local float reductionBuffer [1024];
+        __local float tmpInputBuffer [ND_GPU_LOCAL_BUFFER_SIZE];
 
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
@@ -281,16 +282,6 @@ R""""(
         // barrier reduction loop
         for (uint j = ND_GPU_SOFT_SUBGROUPS_WORD_SIZE / 2; j > 0; j = j >> 1)
         {
-            //if ((itemId >= j) && (itemId < j * 2))
-            //{
-            //    reductionBuffer[itemId - j] = maxArg;
-            //}
-            //if (itemId < j)
-            //{
-            //    float inputValue = reductionBuffer[itemId];
-            //    maxArg = (inputValue > maxArg) ? inputValue : maxArg;
-            //}
-
             if (itemId < j * 2)
             {
                 reductionBuffer[itemId + ND_GPU_SOFT_SUBGROUPS_WORD_SIZE / 2] = maxArg;
@@ -356,16 +347,6 @@ R""""(
         }
         for (uint j = ND_GPU_SOFT_SUBGROUPS_WORD_SIZE / 2; j > 0; j = j >> 1)
         {
-            //if ((itemId >= j) && (itemId < j * 2))
-            //{
-            //    reductionBuffer[itemId - j] = sumArg;
-            //}
-            //if (itemId < j)
-            //{
-            //    float inputValue = reductionBuffer[itemId];
-            //    sumArg += inputValue;
-            //}
-
             if (itemId < j * 2)
             {
                 reductionBuffer[itemId + ND_GPU_SOFT_SUBGROUPS_WORD_SIZE / 2] = sumArg;
@@ -743,9 +724,9 @@ R""""(
             __global float* inputOutputData, 
             __global float* weightsAndBias) 
     {
-        __local float tile_acc[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_ROWS];
         __local float tile_inputs[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_COLUMNS+1];
         __local float tile_weights[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_COLUMNS+1];
+        __local float tile_acc[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_ROWS+1];
         __local float biasCache[ND_GPU_TILED_MATRIX_ROWS * 2];
 
         uint itemId = get_local_id(0);
@@ -774,10 +755,8 @@ R""""(
             biasCache[acc_x + ND_GPU_TILED_MATRIX_ROWS] = a;
         }
         barrier(CLK_LOCAL_MEM_FENCE); 
-        //tile_acc[acc_x][acc_y] = biasCache[acc_x];
-        tile_acc[acc_x][acc_y] = biasCache[itemId & (2 * ND_GPU_TILED_MATRIX_ROWS-1)];
+        tile_acc[acc_x][acc_y] = biasCache[itemId & (2 * ND_GPU_TILED_MATRIX_ROWS - 1)];
         barrier(CLK_LOCAL_MEM_FENCE); 
-
         float acc = tile_acc[acc_y][0];
 
         const uint inputOutputStride = parameters->m_inputOutputSize;
@@ -832,7 +811,7 @@ R""""(
             __global float* inputOutputGradients,
             __global float* weightAndBiasGradients) 
     {
-        __local float cachedInput[ND_GPU_LOCAL_BUFFER_SIZE * 2];
+        __local float cachedInput[ND_GPU_LOCAL_BUFFER_SIZE];
 
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);

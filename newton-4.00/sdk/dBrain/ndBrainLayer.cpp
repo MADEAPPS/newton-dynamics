@@ -239,13 +239,12 @@ ndBrainBufferCommand* ndBrainLayer::CreateGpuFeedForwardCommand(
 	return nullptr;
 }
 
-ndBrainBufferCommand* ndBrainLayer::CreateGpuBackPropagateCommand(
+ndFixSizeArray<ndBrainBufferCommand*, 16> ndBrainLayer::CreateGpuBackPropagateCommand(
 	ndBrainTrainerInference* const, const ndCommandSharedInfo&,
 	ndBrainContext* const, ndInt32, const ndSharedPtr<ndBrainUniformBuffer>&,
 	ndBrainFloatBuffer* const, ndBrainFloatBuffer* const, 
 	ndBrainFloatBuffer* const, ndBrainFloatBuffer* const) const
 {
-	ndAssert(0);
-	return nullptr;
+	return ndFixSizeArray<ndBrainBufferCommand*, 16>(0);
 }
 

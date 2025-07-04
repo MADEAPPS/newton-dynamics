@@ -213,7 +213,7 @@ ndBrainBufferCommand* ndBrainLayerActivationRelu::CreateGpuFeedForwardCommand(
 	}
 }
 
-ndBrainBufferCommand* ndBrainLayerActivationRelu::CreateGpuBackPropagateCommand(
+ndFixSizeArray<ndBrainBufferCommand*, 16> ndBrainLayerActivationRelu::CreateGpuBackPropagateCommand(
 	ndBrainTrainerInference* const owner,
 	const ndCommandSharedInfo& info,
 	ndBrainContext* const context, ndInt32 miniBatchSize,
@@ -236,10 +236,11 @@ ndBrainBufferCommand* ndBrainLayerActivationRelu::CreateGpuBackPropagateCommand(
 	descriptor.PushBack(inputOutputGradients);
 	descriptor.PushBack(weightsAndBiasGradients);
 
+	ndFixSizeArray<ndBrainBufferCommand*, 16> comnands(0);
 	if (context->GetAsCpuContext())
 	{
 		ndBrainBufferCommand* const command = new ndBrainLayerBackPropagateCpuCommand(descriptor, (ndBrainLayer*)this);
-		return command;
+		comnands.PushBack(command);
 	}
 	else
 	{
@@ -248,6 +249,7 @@ ndBrainBufferCommand* ndBrainLayerActivationRelu::CreateGpuBackPropagateCommand(
 		//	owner, info, size_t(this), context, context->m_brainLayerReluBackPropagate,
 		//	miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias, inputOutputGradients, weightsAndBiasGradients);
 		ndBrainBufferCommand* const command = new ndBrainGpuCommand(descriptor);
-		return command;
+		comnands.PushBack(command);
 	}
+	return comnands;
 }
