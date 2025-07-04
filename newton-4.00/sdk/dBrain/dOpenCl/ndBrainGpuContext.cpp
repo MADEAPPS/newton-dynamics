@@ -252,7 +252,6 @@ void ndBrainGpuContext::CopyBuffer(const ndCopyBufferCommandInfo& parameters, nd
 {
 	m_copyBufferParams->MemoryToDevice(0, sizeof(ndCopyBufferCommandInfo), &parameters);
 
-	ndAssert(0);
 	ndBrainBufferCommandDesc& descriptor = m_copyBufferCommand->GetDescriptor();
 	descriptor.SetCount(0);
 	descriptor.PushBack(*m_copyBufferParams);
