@@ -57,7 +57,7 @@ void ndBrainGpuContext::BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVe
 
 void ndBrainGpuContext::CopyBuffer(const ndBrainUniformBuffer& parameterBuffer, ndInt32 numberOfWorkGrups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
 {
-#if 1
+	ndAssert(0);
 	ndBrainBufferCommandDesc& descriptor = m_copyBufferCommand->GetDescriptor();
 	descriptor.SetCount(0);
 	descriptor.PushBack((ndBrainBuffer*)&parameterBuffer);
@@ -67,83 +67,22 @@ void ndBrainGpuContext::CopyBuffer(const ndBrainUniformBuffer& parameterBuffer, 
 	descriptor.m_miniBatchSize = numberOfWorkGrups;
 	descriptor.m_workGroupSize = ND_DEFAULT_WORKGROUP_SIZE;
 	SubmitBufferCommand(*m_copyBufferCommand);
-
-#else
-	const ndSharedPtr<ndBrainGpuBuffer>& gpuBuffer = parameterBuffer.m_gpuBuffer;
-	const ndCopyBufferCommandInfo& data = *((ndCopyBufferCommandInfo*)&gpuBuffer->m_memory[0]);
-	
-	ndInt32 stride = data.m_strideInByte;
-	ndInt32 srcStride = data.m_srcStrideInByte;
-	ndInt32 srcOffset = data.m_srcOffsetInByte;
-	ndInt32 dstStride = data.m_dstStrideInByte;
-	ndInt32 dstOffset = data.m_dstOffsetInByte;
-	
-	ndAssert(stride <= srcStride);
-	ndAssert(stride <= dstStride);
-	
-	ndSharedPtr<ndBrainGpuBuffer>& dstBuffer = dstData.m_gpuBuffer;
-	const ndSharedPtr<ndBrainGpuBuffer>& srcBuffer = srcData.m_gpuBuffer;
-	
-	ndInt8* const dst = &dstBuffer->m_memory[0];
-	const ndInt8* const src = &srcBuffer->m_memory[0];
-	ndAssert(dst);
-	ndAssert(src);
-	
-	for (ndInt32 i = 0; i < numberOfWorkGrups; ++i)
-	{
-		ndAssert((i * dstStride + dstOffset) >= 0);
-		ndAssert((i * srcStride + srcOffset) >= 0);
-		ndMemCpy(&dst[i * dstStride + dstOffset], &src[i * srcStride + srcOffset], stride);
-	}
-#endif
 }
 
-void ndBrainGpuContext::CopyBufferIndirect(const ndBrainUniformBuffer& parameterBuffer, const ndBrainIntegerBuffer& indexData, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
+void ndBrainGpuContext::CopyBufferIndirect(const ndCopyBufferCommandInfo& parameters, const ndBrainIntegerBuffer& indexBuffer, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
 {
-#if 1
+	m_copyBufferParams->MemoryToDevice(0, sizeof(ndCopyBufferCommandInfo), &parameters);
+
 	ndBrainBufferCommandDesc& descriptor = m_copyBufferIndirectCommand->GetDescriptor();
 	descriptor.SetCount(0);
-	descriptor.PushBack((ndBrainBuffer*)&parameterBuffer);
+	descriptor.PushBack(*m_copyBufferParams);
 	descriptor.PushBack((ndBrainBuffer*)&dstData);
 	descriptor.PushBack((ndBrainBuffer*)&srcData);
-	descriptor.PushBack((ndBrainBuffer*)&indexData);
+	descriptor.PushBack((ndBrainBuffer*)&indexBuffer);
 
 	descriptor.m_workGroupSize = ND_DEFAULT_WORKGROUP_SIZE;
-	descriptor.m_miniBatchSize = ndInt32(indexData.SizeInBytes() / sizeof(ndUnsigned32));
+	descriptor.m_miniBatchSize = ndInt32(indexBuffer.SizeInBytes() / sizeof(ndUnsigned32));
 	SubmitBufferCommand(*m_copyBufferIndirectCommand);
-
-#else
-	const ndSharedPtr<ndBrainGpuBuffer>& gpuBuffer = parameterBuffer.m_gpuBuffer;
-	const ndCopyBufferCommandInfo& data = *((ndCopyBufferCommandInfo*)&gpuBuffer->m_memory[0]);
-	ndInt32 stride = data.m_strideInByte;
-	ndInt32 srcStride = data.m_srcStrideInByte;
-	ndInt32 srcOffset = data.m_srcOffsetInByte;
-	ndInt32 dstStride = data.m_dstStrideInByte;
-	ndInt32 dstOffset = data.m_dstOffsetInByte;
-	
-	ndAssert(stride <= srcStride);
-	ndAssert(stride <= dstStride);
-	
-	ndSharedPtr<ndBrainGpuBuffer>& dstBuffer = dstData.m_gpuBuffer;
-	const ndSharedPtr<ndBrainGpuBuffer>& srcBuffer = srcData.m_gpuBuffer;
-	const ndSharedPtr<ndBrainGpuBuffer>& indexBuffer = indexData.m_gpuBuffer;
-	
-	ndInt8* const dst = &dstBuffer->m_memory[0];
-	const ndInt8* const src = &srcBuffer->m_memory[0];
-	const ndUnsigned32* const indexPtr = (ndUnsigned32*)&indexBuffer->m_memory[0];
-	ndAssert(dst);
-	ndAssert(src);
-	ndAssert(indexPtr);
-	
-	ndInt32 count = ndInt32(indexData.SizeInBytes() / sizeof(ndUnsigned32));
-	for (ndInt32 i = 0; i < count; ++i)
-	{
-		ndInt32 index = ndInt32(indexPtr[i]);
-		ndAssert((i * dstStride + dstOffset) >= 0);
-		ndAssert((index * srcStride + srcOffset) >= 0);
-		ndMemCpy(&dst[i * dstStride + dstOffset], &src[index * srcStride + srcOffset], stride);
-	}
-#endif
 }
 
 void ndBrainGpuContext::CreateCopyCommands()
@@ -157,6 +96,9 @@ void ndBrainGpuContext::CreateCopyCommands()
 	copyIndirectDescriptor.m_context = this;
 	copyIndirectDescriptor.m_kernel = m_brainCopyBufferIndirect;
 	m_copyBufferIndirectCommand = ndSharedPtr<ndBrainGpuCommand>(new ndBrainGpuCommand(copyIndirectDescriptor));
+
+	ndCopyBufferCommandInfo copyBuffer;
+	m_copyBufferParams = ndSharedPtr<ndBrainUniformBuffer>(new ndBrainUniformBuffer(this, sizeof(ndCopyBufferCommandInfo), &copyBuffer, true));
 }
 
 void ndBrainGpuContext::MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const

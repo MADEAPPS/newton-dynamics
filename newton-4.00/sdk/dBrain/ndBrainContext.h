@@ -22,6 +22,7 @@ class ndBrainFloatBuffer;
 class ndBrainUniformBuffer;
 class ndBrainIntegerBuffer;
 class ndBrainBufferCommand;
+class ndCopyBufferCommandInfo;
 
 #define ND_DEFAULT_WORKGROUP_SIZE	256
 
@@ -46,7 +47,7 @@ class ndBrainContext : public ndClassAlloc
 	virtual void MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, void* const dstMemory) const = 0;
 
 	virtual void CopyBuffer(const ndBrainUniformBuffer& parameterBuffer, ndInt32 numberOfWorkGrups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData) = 0;
-	virtual void CopyBufferIndirect(const ndBrainUniformBuffer& parameterBuffer, const ndBrainIntegerBuffer& indexBuffer, ndBrainBuffer& dstData, const ndBrainBuffer& srcData) = 0;
+	virtual void CopyBufferIndirect(const ndCopyBufferCommandInfo& descriptor, const ndBrainIntegerBuffer& indexBuffer, ndBrainBuffer& dstData, const ndBrainBuffer& srcData) = 0;
 };
 
 #endif

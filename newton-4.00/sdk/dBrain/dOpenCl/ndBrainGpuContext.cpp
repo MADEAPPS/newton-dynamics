@@ -20,8 +20,6 @@
 #include "ndBrainIntegerBuffer.h"
 #include "ndBrainBufferCommand.h"
 
-
-
 #if 0
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuCommand.h"
@@ -230,9 +228,6 @@ void ndBrainGpuContext::AddCommandQueue(const ndSharedPtr<ndBrainGpuCommand>& co
 
 #endif
 
-#include "ndBrainKernel.h"
-
-
 #define ND_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_ALL
 //#define ND_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_CPU
 //#define ND_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_GPU
@@ -258,11 +253,13 @@ void ndBrainGpuContext::CopyBuffer(const ndBrainUniformBuffer& parameterBuffer, 
 	ndAssert(0);
 }
 
-void ndBrainGpuContext::CopyBufferIndirect(const ndBrainUniformBuffer& parameterBuffer, const ndBrainIntegerBuffer& indexBuffer, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
+void ndBrainGpuContext::CopyBufferIndirect(const ndCopyBufferCommandInfo& parameters, const ndBrainIntegerBuffer& indexBuffer, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
 {
+	m_copyBufferParams->MemoryToDevice(0, sizeof(ndCopyBufferCommandInfo), &parameters);
+
 	ndBrainBufferCommandDesc& descriptor = m_copyBufferIndirectCommand->GetDescriptor();
 	descriptor.SetCount(0);
-	descriptor.PushBack((ndBrainBuffer*)&parameterBuffer);
+	descriptor.PushBack(*m_copyBufferParams);
 	descriptor.PushBack((ndBrainBuffer*)&dstData);
 	descriptor.PushBack((ndBrainBuffer*)&srcData);
 	descriptor.PushBack((ndBrainBuffer*)&indexBuffer);
@@ -415,6 +412,9 @@ void ndBrainGpuContext::CreateCopyCommands()
 	copyIndirectDescriptor.m_context = this;
 	copyIndirectDescriptor.m_kernel = m_brainCopyBufferIndirect;
 	m_copyBufferIndirectCommand = ndSharedPtr<ndBrainGpuCommand>(new ndBrainGpuCommand(copyIndirectDescriptor));
+
+	ndCopyBufferCommandInfo copyBuffer;
+	m_copyBufferParams = ndSharedPtr<ndBrainUniformBuffer>(new ndBrainUniformBuffer(this, sizeof(ndCopyBufferCommandInfo), &copyBuffer, true));
 }
 
 void ndBrainGpuContext::MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, const void* const srcMemory) const

@@ -34,7 +34,7 @@ class ndBrainFloatBuffer : public ndBrainBuffer
 	void MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const;
 
 	void CopyBuffer(const ndBrainUniformBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer);
-	void CopyBufferIndirect(const ndBrainUniformBuffer& parameterBuffer, const ndBrainIntegerBuffer& indexBuffer, const ndBrainFloatBuffer& srcBuffer);
+	void CopyBufferIndirect(const ndCopyBufferCommandInfo& descriptor, const ndBrainIntegerBuffer& indexBuffer, const ndBrainFloatBuffer& srcBuffer);
 
 	protected:
 	ndSharedPtr<ndBrainVector> m_buffer;

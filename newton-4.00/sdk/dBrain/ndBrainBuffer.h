@@ -30,6 +30,15 @@ class ndCopyBufferCommandInfo
 	{
 	}
 
+	//typedef struct
+	//{
+	//	uint m_strideInByte;
+	//	uint m_srcStrideInByte;
+	//	uint m_srcOffsetInByte;
+	//	uint m_dstStrideInByte;
+	//	uint m_dstOffsetInByte;
+	//} CopyBufferCommandInfo;
+
 	ndInt32 m_strideInByte;
 	ndInt32 m_srcStrideInByte;
 	ndInt32 m_srcOffsetInByte;

@@ -357,7 +357,7 @@ static void SimpleRegressionBrainStressTest()
 		// calculate loss here
 		minibatchOutpuGradientBuffer->VectorFromDevice(outputData);
 		trainer->BackPropagate();
-		//trainer->ApplyLearnRate();
+		trainer->ApplyLearnRate();
 	}
 	time = ndGetTimeInMicroseconds() - time;
 
@@ -585,8 +585,8 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	//Test0__();
 	//Test1__();
-	SimpleRegressionBrainStressTest();
-	//ndHandWrittenDigits();
+	//SimpleRegressionBrainStressTest();
+	ndHandWrittenDigits();
 	//ndCifar10ImageClassification();
 	//TargaToPng();
 }
