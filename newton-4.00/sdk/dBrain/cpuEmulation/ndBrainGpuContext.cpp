@@ -55,12 +55,13 @@ void ndBrainGpuContext::BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVe
 	MemoryFromDevice(src, 0, sizeInBytes, &dstVector[0]);
 }
 
-void ndBrainGpuContext::CopyBuffer(const ndBrainUniformBuffer& parameterBuffer, ndInt32 numberOfWorkGrups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
+void ndBrainGpuContext::CopyBuffer(const ndCopyBufferCommandInfo& parameters, ndInt32 numberOfWorkGrups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
 {
-	ndAssert(0);
+	m_copyBufferParams->MemoryToDevice(0, sizeof(ndCopyBufferCommandInfo), &parameters);
+
 	ndBrainBufferCommandDesc& descriptor = m_copyBufferCommand->GetDescriptor();
 	descriptor.SetCount(0);
-	descriptor.PushBack((ndBrainBuffer*)&parameterBuffer);
+	descriptor.PushBack(*m_copyBufferParams);
 	descriptor.PushBack((ndBrainBuffer*)&dstData);
 	descriptor.PushBack((ndBrainBuffer*)&srcData);
 

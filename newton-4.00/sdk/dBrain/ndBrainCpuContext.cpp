@@ -53,15 +53,14 @@ void ndBrainCpuContext::BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVe
 	MemoryFromDevice(src, 0, sizeInBytes, &dstVector[0]);
 }
 
-void ndBrainCpuContext::CopyBuffer(const ndBrainUniformBuffer& parameterBuffer, ndInt32 numberOfWorkGroups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
+//void ndBrainCpuContext::CopyBuffer(const ndBrainUniformBuffer& parameterBuffer, ndInt32 numberOfWorkGroups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
+void ndBrainCpuContext::CopyBuffer(const ndCopyBufferCommandInfo& descriptor, ndInt32 numberOfWorkGroups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
 {
-	const ndFixSizeArray<ndUnsigned32, 256>& bufferData = **parameterBuffer.m_data;
-	const ndCopyBufferCommandInfo& data = *((ndCopyBufferCommandInfo*)&bufferData[0]);
-	ndInt32 stride = ndInt32(data.m_strideInByte);
-	ndInt32 srcStride = ndInt32(data.m_srcStrideInByte);
-	ndInt32 srcOffset = ndInt32(data.m_srcOffsetInByte);
-	ndInt32 dstStride = ndInt32(data.m_dstStrideInByte);
-	ndInt32 dstOffset = ndInt32(data.m_dstOffsetInByte);
+	ndInt32 stride = ndInt32(descriptor.m_strideInByte);
+	ndInt32 srcStride = ndInt32(descriptor.m_srcStrideInByte);
+	ndInt32 srcOffset = ndInt32(descriptor.m_srcOffsetInByte);
+	ndInt32 dstStride = ndInt32(descriptor.m_dstStrideInByte);
+	ndInt32 dstOffset = ndInt32(descriptor.m_dstOffsetInByte);
 
 	ndAssert(stride <= srcStride);
 	ndAssert(stride <= dstStride);

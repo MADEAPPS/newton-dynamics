@@ -930,8 +930,8 @@ R""""(
 
     __kernel void brainCopyBuffer(
         __global const CopyBufferCommandInfo* parameters,
-        __global float* inputData, 
-        __global float* outputData)
+        __global float* outputData,
+        __global float* inputData)
     {                                                                      
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
@@ -939,8 +939,8 @@ R""""(
         
         long dstOffset = (groupId * (long)parameters->m_dstStrideInByte + parameters->m_dstOffsetInByte) / sizeof (uint);
         long srcOffset = (groupId * (long)parameters->m_srcStrideInByte + parameters->m_srcOffsetInByte) / sizeof (uint);
-        
         uint dstStride = parameters->m_strideInByte / sizeof (uint);
+
         uint workGroupSizeReminder = dstStride % workGroupSize;
         uint modWorkGroupSize = dstStride - workGroupSizeReminder;
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)

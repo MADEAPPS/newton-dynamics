@@ -172,7 +172,7 @@ static void MnistTrainingSet()
 			m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descritor));
 		}
 
-		ndInt32 ValidateData(ndSharedPtr<ndBrainUniformBuffer>& parameters, ndBrainMatrix* const testLabels, const ndSharedPtr<ndBrainFloatBuffer>& data)
+		ndInt32 ValidateData(ndBrainMatrix* const testLabels, const ndSharedPtr<ndBrainFloatBuffer>& data)
 		{
 			ndBrainVector groundTruth;
 			ndBrainVector miniBatchInput;
@@ -188,19 +188,20 @@ static void MnistTrainingSet()
 			ndInt32 batchesCount = testLabels->GetRows() / m_miniBatchSize;
 			ndInt32 batchesSize = batchesCount * m_miniBatchSize;
 			
-			size_t size = inputSize * sizeof(ndReal);
+			size_t strideInBytes = inputSize * sizeof(ndReal);
 			ndBrainFloatBuffer* const minibatchInputBuffer = m_trainer->GetInputBuffer();
 			ndBrainFloatBuffer* const minibatchOutpuBuffer = m_trainer->GetOuputBuffer();
 			
 			ndCopyBufferCommandInfo copyBufferInfo;
-			parameters->MemoryFromDevice(0, sizeof(ndCopyBufferCommandInfo), &copyBufferInfo);
-			
+			copyBufferInfo.m_dstOffsetInByte = 0;
 			copyBufferInfo.m_srcOffsetInByte = 0;
+			copyBufferInfo.m_strideInByte = ndInt32(strideInBytes);
+			copyBufferInfo.m_srcStrideInByte = ndInt32(strideInBytes);
+			copyBufferInfo.m_dstStrideInByte = ndInt32(strideInBytes);
 			for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
 			{
-				copyBufferInfo.m_srcOffsetInByte = ndInt32 (batchStart * size);
-				parameters->MemoryToDevice(0, sizeof(ndCopyBufferCommandInfo), &copyBufferInfo);
-				minibatchInputBuffer->CopyBuffer(**parameters, m_miniBatchSize, **data);
+				copyBufferInfo.m_srcOffsetInByte = ndInt32 (batchStart * strideInBytes);
+				minibatchInputBuffer->CopyBuffer(copyBufferInfo, m_miniBatchSize, **data);
 			
 				m_trainer->MakePrediction();
 				minibatchOutpuBuffer->VectorFromDevice(miniBatchOutput);
@@ -285,9 +286,6 @@ static void MnistTrainingSet()
 			copyBuffer.m_strideInByte = ndInt32(strideInBytes);
 			copyBuffer.m_srcStrideInByte = ndInt32(strideInBytes);
 			copyBuffer.m_dstStrideInByte = ndInt32(strideInBytes);
-			
-			ndSharedPtr<ndBrainUniformBuffer> parameterBuffer(ndSharedPtr<ndBrainUniformBuffer>(new ndBrainUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBuffer, true)));
-			//ndSharedPtr<ndBrainUniformBuffer> parameterBufferIndirect(ndSharedPtr<ndBrainUniformBuffer>(new ndBrainUniformBuffer(*m_trainer->GetContext(), sizeof(ndCopyBufferCommandInfo), &copyBuffer, true)));
 
 			for (ndInt32 epoch = 0; epoch < MINIST_NUMBER_OF_EPOCHS; ++epoch)
 			{
@@ -321,7 +319,7 @@ batchStart *= 1;
 					//trainer->GetContext()->SyncBufferCommandQueue(); // no need to sync here.
 				}
 
-				//ndInt64 testFailCount = ValidateData(parameterBuffer, testLabels, m_testData) + 1;
+				ndInt64 testFailCount = ValidateData(testLabels, m_testData) + 1;
 				//if (testFailCount < m_minValidationFail)
 				//{
 				//	//trainer->GetParameterBuffer(parametersBuffer);

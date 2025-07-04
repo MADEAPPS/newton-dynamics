@@ -248,9 +248,20 @@ void ndBrainGpuContext::BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBra
 	MemoryToDevice(dst, 0, sizeInBytes, &srcVector[0]);
 }
 
-void ndBrainGpuContext::CopyBuffer(const ndBrainUniformBuffer& parameterBuffer, ndInt32 numberOfWorkGrups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
+void ndBrainGpuContext::CopyBuffer(const ndCopyBufferCommandInfo& parameters, ndInt32 numberOfWorkGrups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
 {
+	m_copyBufferParams->MemoryToDevice(0, sizeof(ndCopyBufferCommandInfo), &parameters);
+
 	ndAssert(0);
+	ndBrainBufferCommandDesc& descriptor = m_copyBufferCommand->GetDescriptor();
+	descriptor.SetCount(0);
+	descriptor.PushBack(*m_copyBufferParams);
+	descriptor.PushBack((ndBrainBuffer*)&dstData);
+	descriptor.PushBack((ndBrainBuffer*)&srcData);
+
+	descriptor.m_workGroupSize = ND_DEFAULT_WORKGROUP_SIZE;
+	descriptor.m_miniBatchSize = numberOfWorkGrups;
+	SubmitBufferCommand(*m_copyBufferCommand);
 }
 
 void ndBrainGpuContext::CopyBufferIndirect(const ndCopyBufferCommandInfo& parameters, const ndBrainIntegerBuffer& indexBuffer, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
