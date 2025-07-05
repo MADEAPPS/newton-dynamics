@@ -75,13 +75,15 @@ ndBrainFloatBuffer* ndBrainTrainer::GetWeightAndBiasGradientBuffer()
 void ndBrainTrainer::Initialize()
 {
 	ndBrainVector buffer;
-	buffer.Resize(ndInt64(m_weightAndBiasBuffer->GetCount() * m_descriptor.m_minibatchSize));
+	//buffer.Resize(ndInt64(m_weightAndBiasBuffer->GetCount() * m_descriptor.m_minibatchSize));
+	ndInt64 maxSize = ndInt64(ndMax(m_weightAndBiasBuffer->GetCount(), m_inputOutputBuffer->GetCount()));
+	buffer.Resize(maxSize);
 	
 	buffer.SetCount(ndInt64(m_inputOutputBuffer->GetCount()));
 	buffer.Set(ndReal(0.0f));
 	m_inputOutputGradientsBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_descriptor.m_context, buffer));
 	
-	buffer.SetCount(ndInt64(m_weightAndBiasBuffer->GetCount() * m_descriptor.m_minibatchSize));
+	buffer.SetCount(ndInt64(m_weightAndBiasBuffer->GetCount()));
 	buffer.Set(ndReal(0.0f));
 	m_weightAndBiasGradientsBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_descriptor.m_context, buffer));
 
@@ -330,23 +332,25 @@ void ndBrainTrainer::AddOptimizerGradientCommand()
 		} 
 		else
 		{
-			descriptor.m_kernel = descriptor.m_context->GetAsGpuContext()->m_brainAccumulateGradientsAndAverage;
-			ndSharedPtr<ndBrainBufferCommand>command(new ndBrainGpuCommand(descriptor));
-			m_optimizerBufferCommands.Append(command);
+			//descriptor.m_kernel = descriptor.m_context->GetAsGpuContext()->m_brainAccumulateGradientsAndAverage;
+			//ndSharedPtr<ndBrainBufferCommand>command(new ndBrainGpuCommand(descriptor));
+			//m_optimizerBufferCommands.Append(command);
 		}
 	}
 
 	// add the adam optimizer kernel here
 	{
 		ndBrainOptimizerAdam::ndCommandSharedInfo optimizerData(m_optimizer->m_parameters);
+		optimizerData.m_minibathScale = ndBrainFloat(1.0f) / ndBrainFloat (m_descriptor.m_minibatchSize);
 		ndSharedPtr<ndBrainUniformBuffer> adamUniformbuffer(new ndBrainUniformBuffer(*m_descriptor.m_context, sizeof(ndBrainOptimizerAdam::ndCommandSharedInfo), &optimizerData));
 
-		ndBrainBufferCommandDesc descriptor(0);
+		ndBrainBufferCommandDesc descriptor(ndInt32(sizeInFloats) / ND_DEFAULT_WORKGROUP_SIZE);
 		descriptor.m_context = *m_descriptor.m_context;
 		descriptor.m_owner = this;
 		descriptor.m_id = m_adamOptimizerUpdate;
 		descriptor.m_uniformBuffer = adamUniformbuffer;
-		descriptor.m_miniBatchSize = ndInt32(sizeInFloats / descriptor.m_workGroupSize);
+		descriptor.m_workGroupSize = ND_DEFAULT_WORKGROUP_SIZE;
+		//descriptor.m_miniBatchSize = ndInt32(sizeInFloats / descriptor.m_workGroupSize);
 
 		descriptor.PushBack(*adamUniformbuffer);
 		descriptor.PushBack(*m_weightAndBiasBuffer);

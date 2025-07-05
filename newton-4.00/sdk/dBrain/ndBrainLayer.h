@@ -134,6 +134,7 @@ class ndBrainLayer : public ndClassAlloc
 		ndBrainContext* const context,
 		const ndCommandSharedInfo& info,
 		ndInt32 miniBatchSize,
+		ndInt32 tileStride,
 		ndBrainFloatBuffer* const inputOutputData,
 		ndBrainFloatBuffer* const weightsAndBias,
 		ndBrainFloatBuffer* const inputOutputGradients,

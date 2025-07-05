@@ -68,7 +68,6 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 	ndSharedPtr<ndBrainKernel> m_brainLayerDropOutBackPropagate;
 	ndSharedPtr<ndBrainKernel> m_brainLayerCathegoricalSoftmaxBackPropagate;
 	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixBackPropagateInputGradients;
-	//ndSharedPtr<ndBrainKernel> m_brainLayerMatrixBackPropagateWeightAndBiasGradients;
 	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixBackPropagateBiasGradients;
 	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixBackPropagateWeightGradients;
 
@@ -76,7 +75,7 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 	ndSharedPtr<ndBrainKernel> m_brainAdamMomentumUpdate;
 	ndSharedPtr<ndBrainKernel> m_brainAdamRidgeOptimizerUpdate;
 	ndSharedPtr<ndBrainKernel> m_brainAdamLassoOptimizerUpdate;
-	ndSharedPtr<ndBrainKernel> m_brainAccumulateGradientsAndAverage;
+	//ndSharedPtr<ndBrainKernel> m_brainAccumulateGradientsAndAverage;
 
 	// other shader
 	ndSharedPtr<ndBrainKernel> m_brainCopyBuffer;

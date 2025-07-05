@@ -116,7 +116,7 @@ ndFixSizeArray<ndBrainBufferCommand*, 16> ndBrainLayerActivationCategoricalSoftm
 	ndBrainFloatBuffer* const weightsAndBiasGradients) const
 {
 	ndBrainBufferCommandDesc descriptor(MakeBackpropagateDesctriptor(
-		owner, context, info, miniBatchSize,
+		owner, context, info, miniBatchSize, 0,
 		inputOutputData, weightsAndBias,
 		inputOutputGradients, weightsAndBiasGradients));
 

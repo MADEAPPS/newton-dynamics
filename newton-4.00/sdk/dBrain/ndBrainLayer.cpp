@@ -256,13 +256,16 @@ ndFixSizeArray<ndBrainBufferCommand*, 16> ndBrainLayer::CreateGpuBackPropagateCo
 ndBrainBufferCommandDesc ndBrainLayer::MakeBackpropagateDesctriptor(
 	ndBrainTrainerInference* const owner,
 	ndBrainContext* const context,
-	const ndCommandSharedInfo& info,
+	const ndCommandSharedInfo& srcInfo,
 	ndInt32 miniBatchSize,
+	ndInt32 tileStride,
 	ndBrainFloatBuffer* const inputOutputData,
 	ndBrainFloatBuffer* const weightsAndBias,
 	ndBrainFloatBuffer* const inputOutputGradients,
 	ndBrainFloatBuffer* const weightsAndBiasGradients) const
 {
+	ndCommandSharedInfo info(srcInfo);
+	info.m_tiledStride = tileStride;
 	ndSharedPtr<ndBrainUniformBuffer> uniformBuffer(new ndBrainUniformBuffer(context, sizeof(ndCommandSharedInfo), &info));
 	ndBrainBufferCommandDesc descriptor(miniBatchSize);
 	descriptor.m_id = size_t(this);

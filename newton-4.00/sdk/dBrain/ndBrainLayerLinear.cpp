@@ -512,12 +512,12 @@ void ndBrainLayerLinear::BackPropagate(const ndBrainLayerBackPropagateCpuCommand
 	inputDerivative.Set(ndBrainFloat(0.0f));
 	for (ndInt32 i = outputSize - 1; i >= 0; --i)
 	{
-		ndBrainFloat value = outputDerivative[i];
+		ndBrainFloat outDerivative = outputDerivative[i];
 		ndBrainMemVector gradientRow(&weightsMatrixGradients[i * inputSize], inputSize);
-		const ndBrainMemVector weightsRow(&weightsMatrix[i * inputSize], inputSize);
+		gradientRow.ScaleSet(input, outDerivative);
 
-		gradientRow.ScaleSet(input, value);
-		inputDerivative.ScaleAdd(weightsRow, value);
+		const ndBrainMemVector weightsRow(&weightsMatrix[i * inputSize], inputSize);
+		inputDerivative.ScaleAdd(weightsRow, outDerivative);
 	}
 }
 
@@ -576,29 +576,48 @@ ndFixSizeArray<ndBrainBufferCommand*, 16> ndBrainLayerLinear::CreateGpuBackPropa
 	ndBrainFloatBuffer* const inputOutputGradients,
 	ndBrainFloatBuffer* const weightsAndBiasGradients) const
 {
-	ndBrainBufferCommandDesc descriptor(MakeBackpropagateDesctriptor(
-		owner, context, info, miniBatchSize,
-		inputOutputData, weightsAndBias,
-		inputOutputGradients, weightsAndBiasGradients));
-
 	ndFixSizeArray<ndBrainBufferCommand*, 16> comnands(0);
-
 	if (context->GetAsCpuContext())
 	{
+		ndBrainBufferCommandDesc descriptor(MakeBackpropagateDesctriptor(
+			owner, context, info, miniBatchSize, 0,
+			inputOutputData, weightsAndBias,
+			inputOutputGradients, weightsAndBiasGradients));
 		ndBrainBufferCommand* const command = new ndBrainLayerBackPropagateCpuCommand(descriptor, (ndBrainLayer*)this);
 		comnands.PushBack(command);
 	}
 	else
 	{
-		ndAssert(0);
+		// calculate the imput/output gradients
+		ndBrainBufferCommandDesc descriptor(MakeBackpropagateDesctriptor(
+			owner, context, info, miniBatchSize, 0,
+			inputOutputData, weightsAndBias,
+			inputOutputGradients, weightsAndBiasGradients));
+		descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerMatrixBackPropagateInputGradients;
+		ndBrainBufferCommand* const inputGradientCommand = new ndBrainGpuCommand(descriptor);
+		comnands.PushBack(inputGradientCommand);
+
 		// add the bias gradient kernel;
-		//descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerMatrixBackPropagateWeightAndBiasGradients;
-		//ndBrainBufferCommand* const weightsAndBiasCommand = new ndBrainGpuCommand(descriptor);
-		//comnands.PushBack(weightsAndBiasCommand);
-		//
-		//descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerMatrixBackPropagateInputGradients;
-		//ndBrainBufferCommand* const inputGradientCommand = new ndBrainGpuCommand(descriptor);
-		//comnands.PushBack(inputGradientCommand);
+		ndCommandSharedInfo biasInfo(info);
+		ndBrainBufferCommandDesc biasDescriptor(
+			MakeBackpropagateDesctriptor(
+				owner, context, biasInfo, 1, miniBatchSize,
+				inputOutputData, weightsAndBias,
+				inputOutputGradients, weightsAndBiasGradients));
+		biasDescriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerMatrixBackPropagateBiasGradients;
+		ndBrainBufferCommand* const biasCommand = new ndBrainGpuCommand(biasDescriptor);
+		comnands.PushBack(biasCommand);
+
+		// add the weight gradient kernel;
+		ndCommandSharedInfo weightsInfo(info);
+		ndBrainBufferCommandDesc weightsDescriptor(
+			MakeBackpropagateDesctriptor(
+			owner, context, weightsInfo, info.m_outputSize, miniBatchSize,
+			inputOutputData, weightsAndBias,
+			inputOutputGradients, weightsAndBiasGradients));
+		weightsDescriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerMatrixBackPropagateWeightGradients;
+		ndBrainBufferCommand* const weightsCommand = new ndBrainGpuCommand(weightsDescriptor);
+		comnands.PushBack(weightsCommand);
 	}
 	return comnands;
 }
