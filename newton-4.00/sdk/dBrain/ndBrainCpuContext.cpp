@@ -22,7 +22,9 @@ ndBrainCpuContext::ndBrainCpuContext()
 	,ndBrainThreadPool()
 {
 	ndInt32 numOfThreads = (ndBrainThreadPool::GetMaxThreads() + 1) / 2;
-	//numOfThreads = 1;
+#ifdef _DEBUG
+numOfThreads = 1;
+#endif
 	SetThreadCount(numOfThreads);
 }
 
