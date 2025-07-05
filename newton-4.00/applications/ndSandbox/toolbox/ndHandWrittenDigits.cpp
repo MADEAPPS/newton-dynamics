@@ -23,7 +23,7 @@
 //#define MIN_TRAIN_SCORE						0.9999f
 
 //#define MINIST_NUMBER_OF_EPOCHS				70
-#define MINIST_NUMBER_OF_EPOCHS				20
+#define MINIST_NUMBER_OF_EPOCHS					20
 //#define MINIST_NUMBER_OF_EPOCHS					1
 
 #ifdef MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
@@ -36,8 +36,8 @@
 
 //#define MINIST_LINEAR_LAYERS_NEURONS	256
 #define MINIST_LINEAR_LAYERS_NEURONS	512
+//#define MINIST_LINEAR_LAYERS_NEURONS	1024
 
-//#define MINIST_LINEAR_LAYERS_NEURONS	10
 #define MINIST_LINEAR_DROPOUT_RATE		ndFloat32 (0.05f)
 
 #define MINIST_ACTIVATION_TYPE ndBrainLayerActivationRelu
@@ -277,8 +277,8 @@ static void MnistTrainingSet()
 			size_t strideInBytes = size_t(inputSize * sizeof(ndReal));
 			ndBrainFloatBuffer* const minibatchInputBuffer = m_trainer->GetInputBuffer();
 			ndBrainFloatBuffer* const minibatchOutpuBuffer = m_trainer->GetOuputBuffer();
+			ndBrainFloatBuffer* const weightdAndBiasBuffer = m_trainer->GetWeightAndBiasBuffer();
 			ndBrainFloatBuffer* const minibatchOutpuGradientBuffer = m_trainer->GetOuputGradientBuffer();
-			ndBrainFloatBuffer* const weightdAndBiasBuffer = m_trainer->GetWeightAndBiasGradientBuffer();
 			
 			ndCopyBufferCommandInfo copyBuffer;
 			copyBuffer.m_dstOffsetInByte = 0;
@@ -320,9 +320,6 @@ static void MnistTrainingSet()
 				ndInt64 testFailCount = ValidateData(testLabels, m_testData) + 1;
 				if (testFailCount < m_minValidationFail)
 				{
-					//trainer->GetParameterBuffer(parametersBuffer);
-					//trainer->UpdateParameters(parametersBuffer);
-				
 					weightdAndBiasBuffer->VectorFromDevice(weightAndBias);
 					trainer->UpdateParameters(weightAndBias);
 					m_bestBrain->CopyFrom(**trainer->GetBrain());
@@ -512,6 +509,10 @@ static void MnistTestSet()
 		ndInt32 failCount = 0;
 		ndInt32 batchesCount = testDigits->GetRows() / minibatchSize;
 		ndInt32 batchesSize = batchesCount * minibatchSize;
+
+		ndBrainFloatBuffer* const minibatchInputBuffer = inference->GetInputBuffer();
+		ndBrainFloatBuffer* const minibatchOutpuBuffer = inference->GetOuputBuffer();
+
 		for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += minibatchSize)
 		{
 			for (ndInt32 i = 0; i < minibatchSize; ++i)
@@ -520,9 +521,10 @@ static void MnistTestSet()
 				input.SetCount(inputSize);
 				input.Set((**testDigits)[batchStart + i]);
 			}
-			ndAssert(0);
-			//inference->MakePrediction(miniBatchInput);
-			//inference->GetOutput(miniBatchOutput);
+			
+			minibatchInputBuffer->VectorToDevice(miniBatchInput);
+			inference->MakePrediction();
+			minibatchOutpuBuffer->VectorFromDevice(miniBatchOutput);
 		
 			for (ndInt32 i = 0; i < minibatchSize; ++i)
 			{
