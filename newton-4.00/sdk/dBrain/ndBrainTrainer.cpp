@@ -232,20 +232,19 @@ void ndBrainTrainer::AddLayersGradientCommands()
 		ndBrainLayer* const layer = brain[i];
 		ndBrainBufferCommand* const feedForwardLayerCommand = FindCommand(size_t(layer));
 		ndAssert(feedForwardLayerCommand);
-		ndBrainBufferCommandDesc& desc = feedForwardLayerCommand->GetDescriptor();
 
+		const ndBrainBufferCommandDesc& desc = feedForwardLayerCommand->GetDescriptor();
 		ndCommandSharedInfo info(desc.m_info);
-		ndSharedPtr<ndBrainUniformBuffer> uniformBuffer(new ndBrainUniformBuffer(*m_descriptor.m_context, sizeof(ndCommandSharedInfo), &info));
-
+		 
 		ndBrainFloatBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
 		ndBrainFloatBuffer* const weightsAndBiasBuffer = *m_weightAndBiasBuffer;
 		ndBrainFloatBuffer* const inputOutputGradientBuffer = *m_inputOutputGradientsBuffer;
 		ndBrainFloatBuffer* const weightAndBiasGradientsBuffer = *m_weightAndBiasGradientsBuffer;
 
 		ndFixSizeArray<ndBrainBufferCommand*, 16> backCommands(layer->CreateGpuBackPropagateCommand(
-			this, info, *m_descriptor.m_context, m_descriptor.m_minibatchSize,
-			uniformBuffer, inputOutputBuffer, weightsAndBiasBuffer,
-			inputOutputGradientBuffer, weightAndBiasGradientsBuffer));
+			this, *m_descriptor.m_context, desc.m_info, m_descriptor.m_minibatchSize,
+			inputOutputBuffer, weightsAndBiasBuffer, inputOutputGradientBuffer, weightAndBiasGradientsBuffer));
+
 		for (ndInt32 j = 0; j < backCommands.GetCount(); ++j)
 		{
 			ndSharedPtr<ndBrainBufferCommand>command(backCommands[j]);

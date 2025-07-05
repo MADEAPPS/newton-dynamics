@@ -107,26 +107,18 @@ void ndBrainLayerActivationCategoricalSoftmax::BackPropagate(const ndBrainLayerB
 
 ndFixSizeArray<ndBrainBufferCommand*, 16> ndBrainLayerActivationCategoricalSoftmax::CreateGpuBackPropagateCommand(
 	ndBrainTrainerInference* const owner,
+	ndBrainContext* const context, 
 	const ndCommandSharedInfo& info,
-	ndBrainContext* const context, ndInt32 miniBatchSize,
-	const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
+	ndInt32 miniBatchSize,
 	ndBrainFloatBuffer* const inputOutputData,
 	ndBrainFloatBuffer* const weightsAndBias,
 	ndBrainFloatBuffer* const inputOutputGradients,
 	ndBrainFloatBuffer* const weightsAndBiasGradients) const
 {
-	ndBrainBufferCommandDesc descriptor(miniBatchSize);
-	descriptor.m_id = size_t(this);
-	descriptor.m_context = context;
-	descriptor.m_owner = owner;
-	descriptor.m_info = info;
-	descriptor.m_uniformBuffer = uniformBuffer;
-
-	descriptor.PushBack((ndBrainUniformBuffer*)*uniformBuffer);
-	descriptor.PushBack(inputOutputData);
-	descriptor.PushBack(weightsAndBias);
-	descriptor.PushBack(inputOutputGradients);
-	descriptor.PushBack(weightsAndBiasGradients);
+	ndBrainBufferCommandDesc descriptor(MakeBackpropagateDesctriptor(
+		owner, context, info, miniBatchSize,
+		inputOutputData, weightsAndBias,
+		inputOutputGradients, weightsAndBiasGradients));
 
 	ndFixSizeArray<ndBrainBufferCommand*, 16> comnands(0);
 	if (context->GetAsCpuContext())
@@ -137,9 +129,6 @@ ndFixSizeArray<ndBrainBufferCommand*, 16> ndBrainLayerActivationCategoricalSoftm
 	else
 	{
 		descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerCathegoricalSoftmaxBackPropagate;
-		//ndBrainBufferCommand* const command = new ndBrainTrainerGpuCommand(
-		//	owner, info, size_t(this), context, context->m_brainLayerCathegoricalSoftmaxBackPropagate, 
-		//	miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias, inputOutputGradients, weightsAndBiasGradients);
 		ndBrainBufferCommand* const command = new ndBrainGpuCommand(descriptor);
 		comnands.PushBack(command);
 	}

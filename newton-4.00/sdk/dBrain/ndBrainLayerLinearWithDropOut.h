@@ -55,10 +55,11 @@ class ndBrainLayerLinearWithDropOut : public ndBrainLayerActivation
 		ndBrainFloatBuffer* const inputOutputData,
 		ndBrainFloatBuffer* const weightsAndBias) const override;
 
-	virtual ndFixSizeArray<ndBrainBufferCommand*, 16> CreateGpuBackPropagateCommand(ndBrainTrainerInference* const owner,
+	virtual ndFixSizeArray<ndBrainBufferCommand*, 16> CreateGpuBackPropagateCommand(
+		ndBrainTrainerInference* const owner,
+		ndBrainContext* const context, 
 		const ndCommandSharedInfo& info,
-		ndBrainContext* const context, ndInt32 miniBatchSize,
-		const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
+		ndInt32 miniBatchSize,
 		ndBrainFloatBuffer* const inputOutputData,
 		ndBrainFloatBuffer* const weightsAndBias,
 		ndBrainFloatBuffer* const inputOutputGradients,

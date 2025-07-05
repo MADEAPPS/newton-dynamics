@@ -22,6 +22,9 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainLayer.h"
+#include "ndBrainKernel.h"
+#include "ndBrainFloatBuffer.h"
+#include "ndBrainUniformBuffer.h"
 #include "ndBrainBufferCommand.h"
 
 class ndBrainContext;
@@ -240,11 +243,39 @@ ndBrainBufferCommand* ndBrainLayer::CreateGpuFeedForwardCommand(
 }
 
 ndFixSizeArray<ndBrainBufferCommand*, 16> ndBrainLayer::CreateGpuBackPropagateCommand(
-	ndBrainTrainerInference* const, const ndCommandSharedInfo&,
-	ndBrainContext* const, ndInt32, const ndSharedPtr<ndBrainUniformBuffer>&,
+	ndBrainTrainerInference* const,
+	ndBrainContext* const, 
+	const ndCommandSharedInfo&,
+	ndInt32,
 	ndBrainFloatBuffer* const, ndBrainFloatBuffer* const, 
 	ndBrainFloatBuffer* const, ndBrainFloatBuffer* const) const
 {
 	return ndFixSizeArray<ndBrainBufferCommand*, 16>(0);
 }
 
+ndBrainBufferCommandDesc ndBrainLayer::MakeBackpropagateDesctriptor(
+	ndBrainTrainerInference* const owner,
+	ndBrainContext* const context,
+	const ndCommandSharedInfo& info,
+	ndInt32 miniBatchSize,
+	ndBrainFloatBuffer* const inputOutputData,
+	ndBrainFloatBuffer* const weightsAndBias,
+	ndBrainFloatBuffer* const inputOutputGradients,
+	ndBrainFloatBuffer* const weightsAndBiasGradients) const
+{
+	ndSharedPtr<ndBrainUniformBuffer> uniformBuffer(new ndBrainUniformBuffer(context, sizeof(ndCommandSharedInfo), &info));
+	ndBrainBufferCommandDesc descriptor(miniBatchSize);
+	descriptor.m_id = size_t(this);
+	descriptor.m_context = context;
+	descriptor.m_owner = owner;
+	descriptor.m_info = info;
+	descriptor.m_uniformBuffer = uniformBuffer;
+
+	descriptor.PushBack(*uniformBuffer);
+	descriptor.PushBack(inputOutputData);
+	descriptor.PushBack(weightsAndBias);
+	descriptor.PushBack(inputOutputGradients);
+	descriptor.PushBack(weightsAndBiasGradients);
+
+	return descriptor;
+}

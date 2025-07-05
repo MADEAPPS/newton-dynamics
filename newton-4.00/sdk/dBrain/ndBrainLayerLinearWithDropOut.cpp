@@ -175,28 +175,21 @@ ndBrainBufferCommand* ndBrainLayerLinearWithDropOut::CreateGpuFeedForwardCommand
 
 ndFixSizeArray<ndBrainBufferCommand*, 16> ndBrainLayerLinearWithDropOut::CreateGpuBackPropagateCommand(
 	ndBrainTrainerInference* const owner,
+	ndBrainContext* const context, 
 	const ndCommandSharedInfo& info,
-	ndBrainContext* const context, ndInt32 miniBatchSize,
-	const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
+	ndInt32 miniBatchSize,
 	ndBrainFloatBuffer* const inputOutputData,
 	ndBrainFloatBuffer* const weightsAndBias,
 	ndBrainFloatBuffer* const inputOutputGradients,
 	ndBrainFloatBuffer* const weightsAndBiasGradients) const
 {
-	ndBrainBufferCommandDesc descriptor(miniBatchSize);
-	descriptor.m_id = size_t(this);
-	descriptor.m_context = context;
-	descriptor.m_owner = owner;
-	descriptor.m_info = info;
-	descriptor.m_uniformBuffer = uniformBuffer;
-
-	descriptor.PushBack((ndBrainUniformBuffer*)*uniformBuffer);
-	descriptor.PushBack(inputOutputData);
-	descriptor.PushBack(weightsAndBias);
-	descriptor.PushBack(inputOutputGradients);
-	descriptor.PushBack(weightsAndBiasGradients);
+	ndBrainBufferCommandDesc descriptor(MakeBackpropagateDesctriptor(
+		owner, context, info, miniBatchSize,
+		inputOutputData, weightsAndBias,
+		inputOutputGradients, weightsAndBiasGradients));
 
 	ndFixSizeArray<ndBrainBufferCommand*, 16> comnands(0);
+
 	if (context->GetAsCpuContext())
 	{
 		ndBrainBufferCommand* const command = new ndBrainLayerBackPropagateCpuCommand(descriptor, (ndBrainLayer*)this);
@@ -205,9 +198,6 @@ ndFixSizeArray<ndBrainBufferCommand*, 16> ndBrainLayerLinearWithDropOut::CreateG
 	else
 	{
 		descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerDropOutBackPropagate;
-		//ndBrainBufferCommand* const command = new ndBrainBufferCommand*(
-		//	owner, info, size_t(this), context, context->m_brainLayerDropOutBackPropagate,
-		//	miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias, inputOutputGradients, weightsAndBiasGradients);
 		ndBrainBufferCommand* const command = new ndBrainGpuCommand(descriptor);
 		comnands.PushBack(command);
 	}

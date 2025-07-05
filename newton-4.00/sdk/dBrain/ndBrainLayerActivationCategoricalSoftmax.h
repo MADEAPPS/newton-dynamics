@@ -48,10 +48,12 @@ class ndBrainLayerActivationCategoricalSoftmax : public ndBrainLayerActivationSo
 
 	virtual void BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const override;
 
-	virtual ndFixSizeArray<ndBrainBufferCommand*, 16> CreateGpuBackPropagateCommand(ndBrainTrainerInference* const owner,
+	virtual ndFixSizeArray<ndBrainBufferCommand*, 16> CreateGpuBackPropagateCommand(
+		ndBrainTrainerInference* const owner,
+		ndBrainContext* const context, 
 		const ndCommandSharedInfo& info,
-		ndBrainContext* const context, ndInt32 miniBatchSize,
-		const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
+		ndInt32 miniBatchSize,
+		//const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 		ndBrainFloatBuffer* const inputOutputData,
 		ndBrainFloatBuffer* const weightsAndBias,
 		ndBrainFloatBuffer* const inputOutputGradients,
