@@ -1139,19 +1139,19 @@ class brainLayerBrainBackPropagateMatrixBiasGradients : public ndBrainKernel
         const ndInt32 modWorkGroupSize = outputSize - workGroupSizeReminder;
         for (ndInt32 rowBlock = 0; rowBlock < modWorkGroupSize; rowBlock += workGroupSize)
         {
-            for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
             {
                 cachedGradientSum[itemId] = ndBrainFloat(0.0f);
             }
             for (ndInt32 row = 0; row < numberOfRows; ++row)
             {
-                for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+                for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
                 {
                     ndBrainFloat outputDerivative = inputOutputGradients[dstBase + row * inputOutputSize + itemId];
                     cachedGradientSum[itemId] += outputDerivative;
                 }
             }
-            for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
             {
                 ndBrainFloat outputDerivative = cachedGradientSum[itemId];
                 weightAndBiasGradients[parametersStartOffset + rowBlock + itemId] = outputDerivative;
