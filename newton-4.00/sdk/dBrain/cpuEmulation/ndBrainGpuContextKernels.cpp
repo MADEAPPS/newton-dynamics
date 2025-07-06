@@ -768,52 +768,6 @@ public:
     }
 };
 
-// accumulate kernel gradienst
-class brainAccumulateGradientsAndAverage : public ndBrainKernel
-{
-    public:
-    brainAccumulateGradientsAndAverage(ndBrainContext* const context)
-        :ndBrainKernel(context)
-    {
-    }
-
-    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
-    {
-        ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
-        ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
-
-        ndBrainFloat* const gradientBuffer = (ndBrainFloat*)buffer1->GetGpuBuffer()->GetPtr();
-        ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetGpuBuffer()->GetPtr();
-        
-        ndInt64 inputSize = parameters->m_inputSize;
-        ndInt32 miniBatchSize = parameters->m_inputOutputSize;
-        
-        ndInt64 start = groupId * ndInt64(workGroupSize);
-        ndFixSizeArray<ndBrainFloat, 1024> accRegister(1024);
-        for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-        {
-            accRegister[itemId] = ndBrainFloat(0.0f);
-        }
-        for (ndInt32 j = 0; j < miniBatchSize; ++j)
-        {
-            ndInt64 base = start + j * inputSize;
-            ndAssert(base >= 0);
-            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-            {
-                ndBrainFloat a = gradientBuffer[base + itemId];
-                accRegister[itemId] += a;
-            }
-        }
-        // sync here.
-        ndBrainFloat weightFactor = ndBrainFloat(1.0f) / ndBrainFloat(miniBatchSize);
-        for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-        {
-            ndBrainFloat sum = accRegister[itemId];
-            gradientBuffer[start + itemId] = sum * weightFactor;
-        }
-    }
-};
-
 class brainAdamUpdateLassoRegularizer : public ndBrainKernel
 {
     public:
@@ -1522,7 +1476,6 @@ void ndBrainGpuContext::CreateKerners()
     m_brainAdamMomentumUpdate = ndSharedPtr<ndBrainKernel>(new brainAdamMomentumUpdate(this));
     m_brainAdamRidgeOptimizerUpdate = ndSharedPtr<ndBrainKernel>(new brainAdamUpdateRidgeRegularizer(this));
     m_brainAdamLassoOptimizerUpdate = ndSharedPtr<ndBrainKernel>(new brainAdamUpdateLassoRegularizer(this));
-    //m_brainAccumulateGradientsAndAverage = ndSharedPtr<ndBrainKernel>(new brainAccumulateGradientsAndAverage(this));
 
     // optimizer kernels
     m_brainCopyBuffer = ndSharedPtr<ndBrainKernel>(new brainCopyBuffer(this));
