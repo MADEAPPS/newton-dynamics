@@ -1157,7 +1157,7 @@ class brainLayerBrainBackPropagateMatrixBiasGradients : public ndBrainKernel
                 weightAndBiasGradients[parametersStartOffset + rowBlock + itemId] = outputDerivative;
             }
         }
-        //if (workGroupSizeReminder)
+        if (workGroupSizeReminder)
         {
             for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
             {
@@ -1207,9 +1207,6 @@ class brainLayerBrainBackPropagateMatrixWeightsGradients : public ndBrainKernel
         ndInt32 inputSize = parameters->m_inputSize;
         ndInt32 numberOfRows = parameters->m_tiledStride;
         ndInt32 inputOutputSize = parameters->m_inputOutputSize;
-
-//if (inputSize > 512)
-//inputSize *= 1;
 
         ndInt64 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         ndInt64 dstBase = inputOutputStartOffset + __cpuKernelRoundoff(inputSize, workGroupSize);

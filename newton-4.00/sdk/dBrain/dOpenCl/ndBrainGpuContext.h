@@ -91,8 +91,9 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainKernel> m_brainLayerTanhBackPropagate;
 	ndSharedPtr<ndBrainKernel> m_brainLayerDropOutBackPropagate;
 	ndSharedPtr<ndBrainKernel> m_brainLayerCathegoricalSoftmaxBackPropagate;
+	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixBackPropagateBiasGradients;
 	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixBackPropagateInputGradients;
-	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixBackPropagateWeightAndBiasGradients;
+	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixBackPropagateWeightGradients;
 
 	// optimizer shaders
 	ndSharedPtr<ndBrainKernel> m_brainAdamMomentumUpdate;
