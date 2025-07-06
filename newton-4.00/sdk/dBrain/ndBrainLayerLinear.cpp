@@ -608,7 +608,7 @@ ndCommandArray ndBrainLayerLinear::CreateGpuBackPropagateCommand(
 			inputOutputData, weightsAndBias,
 			inputOutputGradients, weightsAndBiasGradients));
 		inputGradDescriptor.m_id += id++;
-		inputGradDescriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerMatrixBackPropagateInputGradients;
+		//inputGradDescriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerMatrixBackPropagateInputGradients;
 		//ndBrainBufferCommand* const inputGradientCommand = new ndBrainGpuCommand(inputGradDescriptor);
 		//comnands.PushBack(inputGradientCommand);
 

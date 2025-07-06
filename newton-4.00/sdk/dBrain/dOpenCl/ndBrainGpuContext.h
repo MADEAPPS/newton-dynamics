@@ -94,6 +94,7 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixBackPropagateBiasGradients;
 	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixBackPropagateInputGradients;
 	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixBackPropagateWeightGradients;
+	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixBackPropagateInputGradientsNaive;
 
 	// optimizer shaders
 	ndSharedPtr<ndBrainKernel> m_brainAdamMomentumUpdate;
@@ -118,6 +119,7 @@ class ndBrainGpuContext : public ndBrainContext
 	static const char* m_feedForwardKernels_3;
 	static const char* m_backPropagateKernels_1;
 	static const char* m_backPropagateKernels_2;
+	static const char* m_matrixWeightsAndBiasGradients;
 
 	friend class ndBrainGpuBuffer;
 };
