@@ -588,14 +588,24 @@ ndFixSizeArray<ndBrainBufferCommand*, 16> ndBrainLayerLinear::CreateGpuBackPropa
 	}
 	else
 	{
-		// calculate the imput/output gradients
-		ndBrainBufferCommandDesc descriptor(MakeBackpropagateDesctriptor(
+		// calculate the imput/output gradients using naive one row at a time multilication 
+		ndBrainBufferCommandDesc inputGradDescriptorNaive(MakeBackpropagateDesctriptor(
 			owner, context, info, miniBatchSize, 0,
 			inputOutputData, weightsAndBias,
 			inputOutputGradients, weightsAndBiasGradients));
-		descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerMatrixBackPropagateInputGradients;
-		ndBrainBufferCommand* const inputGradientCommand = new ndBrainGpuCommand(descriptor);
-		comnands.PushBack(inputGradientCommand);
+		inputGradDescriptorNaive.m_kernel = context->GetAsGpuContext()->m_brainLayerMatrixBackPropagateInputGradientsNaive;
+		ndBrainBufferCommand* const inputGradientCommandNaive = new ndBrainGpuCommand(inputGradDescriptorNaive);
+		comnands.PushBack(inputGradientCommandNaive);
+
+		// calculate the imput/output gradients tile base multiplication 
+		ndBrainBufferCommandDesc inputGradDescriptor(MakeBackpropagateDesctriptor(
+			owner, context, info, miniBatchSize, 0,
+			inputOutputData, weightsAndBias,
+			inputOutputGradients, weightsAndBiasGradients));
+		inputGradDescriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerMatrixBackPropagateInputGradients;
+		//ndBrainBufferCommand* const inputGradientCommand = new ndBrainGpuCommand(inputGradDescriptor);
+		//comnands.PushBack(inputGradientCommand);
+
 
 		// add the bias gradient kernel;
 		ndCommandSharedInfo biasInfo(info);

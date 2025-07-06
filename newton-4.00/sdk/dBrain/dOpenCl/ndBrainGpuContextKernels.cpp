@@ -1159,10 +1159,10 @@ void ndBrainGpuContext::CreateKerners()
     m_brainLayerReluBackPropagate = CreateKerner(program, "brainLayerBrainReluBackPropagate");
     m_brainLayerTanhBackPropagate = CreateKerner(program, "brainLayerBrainTanhBackPropagate");
     m_brainLayerDropOutBackPropagate = CreateKerner(program, "brainLayerBrainDropOutBackPropagate");
-     m_brainLayerCathegoricalSoftmaxBackPropagate = CreateKerner(program, "brainLayerBrainCathegoricalSoftmaxBackPropagate");
-     m_brainLayerMatrixBackPropagateBiasGradients = CreateKerner(program, "brainLayerBrainBackPropagateMatrixBiasGradients");
-     m_brainLayerMatrixBackPropagateInputGradients = CreateKerner(program, "brainLayerBrainBackPropagateMatrixInputGradients");
-     m_brainLayerMatrixBackPropagateWeightGradients = CreateKerner(program, "brainLayerBrainBackPropagateMatrixWeightsGradients");
+    m_brainLayerCathegoricalSoftmaxBackPropagate = CreateKerner(program, "brainLayerBrainCathegoricalSoftmaxBackPropagate");
+    m_brainLayerMatrixBackPropagateBiasGradients = CreateKerner(program, "brainLayerBrainBackPropagateMatrixBiasGradients");
+    m_brainLayerMatrixBackPropagateInputGradients = CreateKerner(program, "brainLayerBrainBackPropagateMatrixInputGradients");
+    m_brainLayerMatrixBackPropagateWeightGradients = CreateKerner(program, "brainLayerBrainBackPropagateMatrixWeightsGradients");
 
     // accumulate gradient kernels and optimizer kernels
     m_brainAdamMomentumUpdate = CreateKerner(program, "brainAdamMomentumUpdate");
