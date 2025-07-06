@@ -158,7 +158,7 @@ void ndBrainLayerActivationTanh::BackPropagate(const ndBrainLayerBackPropagateCp
 	inputDerivative.FlushToZero();
 }
 
-ndBrainBufferCommand* ndBrainLayerActivationTanh::CreateGpuFeedForwardCommand(
+ndCommandArray ndBrainLayerActivationTanh::CreateGpuFeedForwardCommand(
 	ndBrainTrainerInference* const owner,
 	const ndCommandSharedInfo& info,
 	ndBrainContext* const context, ndInt32 miniBatchSize,
@@ -176,22 +176,22 @@ ndBrainBufferCommand* ndBrainLayerActivationTanh::CreateGpuFeedForwardCommand(
 	descriptor.PushBack(inputOutputData);
 	descriptor.PushBack(weightsAndBias);
 
+	ndBrainBufferCommand* command = nullptr;
 	if (context->GetAsCpuContext())
 	{
-		ndBrainBufferCommand* const command = new ndBrainLayerFeedForwardCpuCommand(descriptor, (ndBrainLayer*)this);
-		return command;
+		command = new ndBrainLayerFeedForwardCpuCommand(descriptor, (ndBrainLayer*)this);
 	}
 	else
 	{
 		descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerTanhActivation;
-		//ndBrainBufferCommand* const command = new ndBrainTrainerGpuCommand(owner,
-		//	info, size_t(this), context, context->m_brainLayerTanhActivation, miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias);
-		ndBrainBufferCommand* const command = new ndBrainGpuCommand(descriptor);
-		return command;
+		command = new ndBrainGpuCommand(descriptor);
 	}
+	ndCommandArray commandArray(0);
+	commandArray.PushBack(command);
+	return commandArray;
 }
 
-ndFixSizeArray<ndBrainBufferCommand*, 16> ndBrainLayerActivationTanh::CreateGpuBackPropagateCommand(
+ndCommandArray ndBrainLayerActivationTanh::CreateGpuBackPropagateCommand(
 	ndBrainTrainerInference* const owner,
 	ndBrainContext* const context, 
 	const ndCommandSharedInfo& info,
@@ -206,7 +206,7 @@ ndFixSizeArray<ndBrainBufferCommand*, 16> ndBrainLayerActivationTanh::CreateGpuB
 		inputOutputData, weightsAndBias,
 		inputOutputGradients, weightsAndBiasGradients));
 
-	ndFixSizeArray<ndBrainBufferCommand*, 16> comnands(0);
+	ndCommandArray comnands(0);
 
 	if (context->GetAsCpuContext())
 	{

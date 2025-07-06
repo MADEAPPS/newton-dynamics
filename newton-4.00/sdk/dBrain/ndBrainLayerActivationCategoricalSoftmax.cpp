@@ -105,7 +105,7 @@ void ndBrainLayerActivationCategoricalSoftmax::BackPropagate(const ndBrainLayerB
 	inputDerivative.FlushToZero();
 }
 
-ndFixSizeArray<ndBrainBufferCommand*, 16> ndBrainLayerActivationCategoricalSoftmax::CreateGpuBackPropagateCommand(
+ndCommandArray ndBrainLayerActivationCategoricalSoftmax::CreateGpuBackPropagateCommand(
 	ndBrainTrainerInference* const owner,
 	ndBrainContext* const context, 
 	const ndCommandSharedInfo& info,
@@ -120,7 +120,7 @@ ndFixSizeArray<ndBrainBufferCommand*, 16> ndBrainLayerActivationCategoricalSoftm
 		inputOutputData, weightsAndBias,
 		inputOutputGradients, weightsAndBiasGradients));
 
-	ndFixSizeArray<ndBrainBufferCommand*, 16> comnands(0);
+	ndCommandArray comnands(0);
 	if (context->GetAsCpuContext())
 	{
 		ndBrainBufferCommand* const command = new ndBrainLayerBackPropagateCpuCommand(descriptor, (ndBrainLayer*)this);

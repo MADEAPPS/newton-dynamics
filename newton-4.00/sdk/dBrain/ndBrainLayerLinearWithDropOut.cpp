@@ -139,7 +139,7 @@ void ndBrainLayerLinearWithDropOut::BackPropagate(const ndBrainLayerBackPropagat
 	inputDerivative.Mul(outputDerivative);
 }
 
-ndBrainBufferCommand* ndBrainLayerLinearWithDropOut::CreateGpuFeedForwardCommand(
+ndCommandArray ndBrainLayerLinearWithDropOut::CreateGpuFeedForwardCommand(
 	ndBrainTrainerInference* const owner,
 	const ndCommandSharedInfo& info,
 	ndBrainContext* const context, ndInt32 miniBatchSize,
@@ -158,22 +158,22 @@ ndBrainBufferCommand* ndBrainLayerLinearWithDropOut::CreateGpuFeedForwardCommand
 	descriptor.PushBack(inputOutputData);
 	descriptor.PushBack(weightsAndBias);
 
+	ndBrainBufferCommand* command = nullptr;
 	if (context->GetAsCpuContext())
 	{
-		ndBrainBufferCommand* const command = new ndBrainLayerFeedForwardCpuCommand(descriptor, (ndBrainLayer*)this);
-		return command;
+		command = new ndBrainLayerFeedForwardCpuCommand(descriptor, (ndBrainLayer*)this);
 	}
 	else
 	{
 		descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerDropOutActivation;
-		//ndBrainBufferCommand* const command = new ndBrainBufferCommand*(owner,
-		//	info, size_t(this), context, context->m_brainLayerDropOutActivation, miniBatchSize, uniformBuffer, inputOutputData, weightsAndBias);
-		ndBrainBufferCommand* const command = new ndBrainGpuCommand(descriptor);
-		return command;
+		command = new ndBrainGpuCommand(descriptor);
 	}
+	ndCommandArray commandArray(0);
+	commandArray.PushBack(command);
+	return commandArray;
 }
 
-ndFixSizeArray<ndBrainBufferCommand*, 16> ndBrainLayerLinearWithDropOut::CreateGpuBackPropagateCommand(
+ndCommandArray ndBrainLayerLinearWithDropOut::CreateGpuBackPropagateCommand(
 	ndBrainTrainerInference* const owner,
 	ndBrainContext* const context, 
 	const ndCommandSharedInfo& info,
@@ -188,7 +188,7 @@ ndFixSizeArray<ndBrainBufferCommand*, 16> ndBrainLayerLinearWithDropOut::CreateG
 		inputOutputData, weightsAndBias,
 		inputOutputGradients, weightsAndBiasGradients));
 
-	ndFixSizeArray<ndBrainBufferCommand*, 16> comnands(0);
+	ndCommandArray comnands(0);
 
 	if (context->GetAsCpuContext())
 	{

@@ -243,7 +243,7 @@ void ndBrainTrainer::AddLayersGradientCommands()
 		ndBrainFloatBuffer* const inputOutputGradientBuffer = *m_inputOutputGradientsBuffer;
 		ndBrainFloatBuffer* const weightAndBiasGradientsBuffer = *m_weightAndBiasGradientsBuffer;
 
-		ndFixSizeArray<ndBrainBufferCommand*, 16> backCommands(layer->CreateGpuBackPropagateCommand(
+		ndCommandArray backCommands(layer->CreateGpuBackPropagateCommand(
 			this, *m_descriptor.m_context, desc.m_info, m_descriptor.m_minibatchSize,
 			inputOutputBuffer, weightsAndBiasBuffer, inputOutputGradientBuffer, weightAndBiasGradientsBuffer));
 
@@ -332,6 +332,8 @@ void ndBrainTrainer::AddOptimizerGradientCommand()
 		} 
 		else
 		{
+			// this is not a bug !!!!
+			 
 			//descriptor.m_kernel = descriptor.m_context->GetAsGpuContext()->m_brainAccumulateGradientsAndAverage;
 			//ndSharedPtr<ndBrainBufferCommand>command(new ndBrainGpuCommand(descriptor));
 			//m_optimizerBufferCommands.Append(command);

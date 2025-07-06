@@ -166,7 +166,7 @@ void ndBrainLayerActivationSoftmax::BackPropagate(const ndBrainLayerBackPropagat
 	ndAssert(0);
 }
 
-ndBrainBufferCommand* ndBrainLayerActivationSoftmax::CreateGpuFeedForwardCommand(
+ndCommandArray ndBrainLayerActivationSoftmax::CreateGpuFeedForwardCommand(
 	ndBrainTrainerInference* const owner,
 	const ndCommandSharedInfo& info,
 	ndBrainContext* const context, ndInt32 miniBatchSize,
@@ -185,18 +185,18 @@ ndBrainBufferCommand* ndBrainLayerActivationSoftmax::CreateGpuFeedForwardCommand
 	descriptor.PushBack(inputOutputData);
 	descriptor.PushBack(parameters);
 
+	ndBrainBufferCommand* command = nullptr;
 	if (context->GetAsCpuContext())
 	{
-		ndBrainBufferCommand* const command = new ndBrainLayerFeedForwardCpuCommand(descriptor, (ndBrainLayer*)this);
-		return command;
+		command = new ndBrainLayerFeedForwardCpuCommand(descriptor, (ndBrainLayer*)this);
 	}
 	else
 	{
 		descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerSoftmaxActivation;
-		//ndBrainBufferCommand* const command = new ndBrainTrainerGpuCommand(
-		//	owner, info, size_t(this), context, context->m_brainLayerSoftmaxActivation, 
-		//	miniBatchSize, uniformBuffer, inputOutputData, parameters);
-		ndBrainBufferCommand* const command = new ndBrainGpuCommand(descriptor);
-		return command;
+		command = new ndBrainGpuCommand(descriptor);
 	}
+
+	ndCommandArray commandArray(0);
+	commandArray.PushBack(command);
+	return commandArray;
 }

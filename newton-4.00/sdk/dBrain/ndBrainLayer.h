@@ -58,6 +58,19 @@ class ndBrainLayerBackPropagateCpuCommand : public ndBrainBufferCommandCpu
 	ndBrainLayer* m_layer;
 };
 
+class ndCommandArray: public ndFixSizeArray<ndBrainBufferCommand*, 8>
+{
+	public:
+	ndCommandArray()
+		:ndFixSizeArray<ndBrainBufferCommand*, 8>(0)
+	{
+	}
+	ndCommandArray(ndInt32 initialSize)
+		:ndFixSizeArray<ndBrainBufferCommand*, 8>(initialSize)
+	{
+	}
+};
+
 class ndBrainLayer : public ndClassAlloc
 {
 	public: 
@@ -112,14 +125,16 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void FeedForward(const ndBrainLayerFeedForwardCpuCommand* const info, ndInt32 miniBatchIndex) const;
 	virtual void BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const;
 
-	virtual ndBrainBufferCommand* CreateGpuFeedForwardCommand(ndBrainTrainerInference* const owner,
+	virtual ndCommandArray CreateGpuFeedForwardCommand(
+		ndBrainTrainerInference* const owner,
 		const ndCommandSharedInfo& info,
-		ndBrainContext* const context, ndInt32 miniBatchSize,
+		ndBrainContext* const context, 
+		ndInt32 miniBatchSize,
 		const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 		ndBrainFloatBuffer* const inputOutputData,
 		ndBrainFloatBuffer* const weightsAndBias) const;
 
-	virtual ndFixSizeArray<ndBrainBufferCommand*, 16> CreateGpuBackPropagateCommand(
+	virtual ndCommandArray CreateGpuBackPropagateCommand(
 		ndBrainTrainerInference* const owner,
 		ndBrainContext* const context, 
 		const ndCommandSharedInfo& info,
@@ -139,7 +154,6 @@ class ndBrainLayer : public ndClassAlloc
 		ndBrainFloatBuffer* const weightsAndBias,
 		ndBrainFloatBuffer* const inputOutputGradients,
 		ndBrainFloatBuffer* const weightsAndBiasGradients) const;
-
 };
 
 #endif 

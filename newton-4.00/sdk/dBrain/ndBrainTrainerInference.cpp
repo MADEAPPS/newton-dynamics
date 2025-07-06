@@ -428,8 +428,12 @@ void ndBrainTrainerInference::AddLayersCommands(ndFixSizeArray<ndCommandSharedIn
 		uniformParam.m_layer = layer;
 		ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(*m_descriptor.m_context, sizeof(ndCommandSharedInfo), &uniformParam));
 
-		ndSharedPtr<ndBrainBufferCommand> command(layer->CreateGpuFeedForwardCommand(this, uniformParam, *m_descriptor.m_context, m_descriptor.m_minibatchSize, uniformbuffer, inputOutputBuffer, weightsBuffer));
-		m_feedForwardCommands.Append(command);
+		ndCommandArray backCommands(layer->CreateGpuFeedForwardCommand(this, uniformParam, *m_descriptor.m_context, m_descriptor.m_minibatchSize, uniformbuffer, inputOutputBuffer, weightsBuffer));
+		for (ndInt32 j = 0; j < backCommands.GetCount(); ++j)
+		{
+			ndSharedPtr<ndBrainBufferCommand>command(backCommands[j]);
+			m_feedForwardCommands.Append(command);
+		}
 	}
 }
 

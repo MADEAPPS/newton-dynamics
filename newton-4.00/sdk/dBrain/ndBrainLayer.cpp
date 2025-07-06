@@ -233,16 +233,15 @@ ndCommandSharedInfo ndBrainLayer::GetGpuCommandSharedInfo() const
 	return ndCommandSharedInfo(this);
 }
 
-ndBrainBufferCommand* ndBrainLayer::CreateGpuFeedForwardCommand(
+ndCommandArray ndBrainLayer::CreateGpuFeedForwardCommand(
 	ndBrainTrainerInference* const, const ndCommandSharedInfo&, 
 	ndBrainContext* const, ndInt32, const ndSharedPtr<ndBrainUniformBuffer>&,
 	ndBrainFloatBuffer* const, ndBrainFloatBuffer* const) const
 {
-	ndAssert(0);
-	return nullptr;
+	return ndCommandArray();
 }
 
-ndFixSizeArray<ndBrainBufferCommand*, 16> ndBrainLayer::CreateGpuBackPropagateCommand(
+ndCommandArray ndBrainLayer::CreateGpuBackPropagateCommand(
 	ndBrainTrainerInference* const,
 	ndBrainContext* const, 
 	const ndCommandSharedInfo&,
@@ -250,7 +249,7 @@ ndFixSizeArray<ndBrainBufferCommand*, 16> ndBrainLayer::CreateGpuBackPropagateCo
 	ndBrainFloatBuffer* const, ndBrainFloatBuffer* const, 
 	ndBrainFloatBuffer* const, ndBrainFloatBuffer* const) const
 {
-	return ndFixSizeArray<ndBrainBufferCommand*, 16>(0);
+	return ndCommandArray();
 }
 
 ndBrainBufferCommandDesc ndBrainLayer::MakeBackpropagateDesctriptor(

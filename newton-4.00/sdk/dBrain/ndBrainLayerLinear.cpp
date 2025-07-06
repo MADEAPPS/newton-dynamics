@@ -521,7 +521,7 @@ void ndBrainLayerLinear::BackPropagate(const ndBrainLayerBackPropagateCpuCommand
 	}
 }
 
-ndBrainBufferCommand* ndBrainLayerLinear::CreateGpuFeedForwardCommand(
+ndCommandArray ndBrainLayerLinear::CreateGpuFeedForwardCommand(
 	ndBrainTrainerInference* const owner,
 	const ndCommandSharedInfo& info,
 	ndBrainContext* const context, ndInt32 miniBatchSize,
@@ -542,10 +542,11 @@ ndBrainBufferCommand* ndBrainLayerLinear::CreateGpuFeedForwardCommand(
 	descriptor.PushBack((ndBrainUniformBuffer*)*uniformBuffer);
 	descriptor.PushBack(inputOutputData);
 	descriptor.PushBack(weightsAndBias);
+
+	ndBrainBufferCommand* command = nullptr;
 	if (context->GetAsCpuContext())
 	{
-		ndBrainBufferCommand* const command = new ndBrainLayerFeedForwardCpuCommand(descriptor, (ndBrainLayer*)this);
-		return command;
+		command = new ndBrainLayerFeedForwardCpuCommand(descriptor, (ndBrainLayer*)this);
 	}
 	else
 	{
@@ -561,12 +562,15 @@ ndBrainBufferCommand* ndBrainLayerLinear::CreateGpuFeedForwardCommand(
 		descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerMatrixMatrixMultiply;
 		uniformBuffer->MemoryToDevice(0, sizeof(ndCommandSharedInfo), &descriptor.m_info);
 				
-		ndBrainBufferCommand* const command = new ndBrainGpuCommand(descriptor);
-		return command;
+		command = new ndBrainGpuCommand(descriptor);
 	}
+
+	ndCommandArray commandArray(0);
+	commandArray.PushBack(command);
+	return commandArray;
 }
 
-ndFixSizeArray<ndBrainBufferCommand*, 16> ndBrainLayerLinear::CreateGpuBackPropagateCommand(
+ndCommandArray ndBrainLayerLinear::CreateGpuBackPropagateCommand(
 	ndBrainTrainerInference* const owner,
 	ndBrainContext* const context, 
 	const ndCommandSharedInfo& info,
@@ -576,7 +580,7 @@ ndFixSizeArray<ndBrainBufferCommand*, 16> ndBrainLayerLinear::CreateGpuBackPropa
 	ndBrainFloatBuffer* const inputOutputGradients,
 	ndBrainFloatBuffer* const weightsAndBiasGradients) const
 {
-	ndFixSizeArray<ndBrainBufferCommand*, 16> comnands(0);
+	ndCommandArray comnands(0);
 	if (context->GetAsCpuContext())
 	{
 		ndBrainBufferCommandDesc descriptor(MakeBackpropagateDesctriptor(
