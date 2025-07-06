@@ -127,10 +127,9 @@ class ndBrainLayer : public ndClassAlloc
 
 	virtual ndCommandArray CreateGpuFeedForwardCommand(
 		ndBrainTrainerInference* const owner,
+		ndBrainContext* const context,
 		const ndCommandSharedInfo& info,
-		ndBrainContext* const context, 
 		ndInt32 miniBatchSize,
-		const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
 		ndBrainFloatBuffer* const inputOutputData,
 		ndBrainFloatBuffer* const weightsAndBias) const;
 
@@ -143,6 +142,15 @@ class ndBrainLayer : public ndClassAlloc
 		ndBrainFloatBuffer* const weightsAndBias,
 		ndBrainFloatBuffer* const inputOutputGradients,
 		ndBrainFloatBuffer* const weightsAndBiasGradients) const;
+
+	ndBrainBufferCommandDesc MakeFeedForwardDesctriptor(
+		ndBrainTrainerInference* const owner,
+		ndBrainContext* const context,
+		const ndCommandSharedInfo& info,
+		ndInt32 miniBatchSize,
+		ndInt32 tileStride,
+		ndBrainFloatBuffer* const inputOutputData,
+		ndBrainFloatBuffer* const weightsAndBias) const;
 
 	ndBrainBufferCommandDesc MakeBackpropagateDesctriptor(
 		ndBrainTrainerInference* const owner,

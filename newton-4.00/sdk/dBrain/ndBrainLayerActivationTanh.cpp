@@ -160,21 +160,15 @@ void ndBrainLayerActivationTanh::BackPropagate(const ndBrainLayerBackPropagateCp
 
 ndCommandArray ndBrainLayerActivationTanh::CreateGpuFeedForwardCommand(
 	ndBrainTrainerInference* const owner,
+	ndBrainContext* const context,
 	const ndCommandSharedInfo& info,
-	ndBrainContext* const context, ndInt32 miniBatchSize,
-	const ndSharedPtr<ndBrainUniformBuffer>& uniformBuffer,
+	ndInt32 miniBatchSize,
 	ndBrainFloatBuffer* const inputOutputData,
 	ndBrainFloatBuffer* const weightsAndBias) const
 {
-	ndBrainBufferCommandDesc descriptor(miniBatchSize);
-	descriptor.m_id = size_t(this);
-	descriptor.m_context = context;
-	descriptor.m_owner = owner;
-	descriptor.m_info = info;
-	descriptor.m_uniformBuffer = uniformBuffer;
-	descriptor.PushBack((ndBrainUniformBuffer*)*uniformBuffer);
-	descriptor.PushBack(inputOutputData);
-	descriptor.PushBack(weightsAndBias);
+	ndBrainBufferCommandDesc descriptor(MakeFeedForwardDesctriptor(
+		owner, context, info, miniBatchSize, 0,
+		inputOutputData, weightsAndBias));
 
 	ndBrainBufferCommand* command = nullptr;
 	if (context->GetAsCpuContext())

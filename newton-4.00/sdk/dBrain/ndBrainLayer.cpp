@@ -234,8 +234,10 @@ ndCommandSharedInfo ndBrainLayer::GetGpuCommandSharedInfo() const
 }
 
 ndCommandArray ndBrainLayer::CreateGpuFeedForwardCommand(
-	ndBrainTrainerInference* const, const ndCommandSharedInfo&, 
-	ndBrainContext* const, ndInt32, const ndSharedPtr<ndBrainUniformBuffer>&,
+	ndBrainTrainerInference* const, 
+	ndBrainContext* const,
+	const ndCommandSharedInfo&, 
+	ndInt32,
 	ndBrainFloatBuffer* const, ndBrainFloatBuffer* const) const
 {
 	return ndCommandArray();
@@ -252,6 +254,33 @@ ndCommandArray ndBrainLayer::CreateGpuBackPropagateCommand(
 	return ndCommandArray();
 }
 
+ndBrainBufferCommandDesc ndBrainLayer::MakeFeedForwardDesctriptor(
+	ndBrainTrainerInference* const owner,
+	ndBrainContext* const context,
+	const ndCommandSharedInfo& srcInfo,
+	ndInt32 miniBatchSize,
+	ndInt32 tileStride,
+	ndBrainFloatBuffer* const inputOutputData,
+	ndBrainFloatBuffer* const weightsAndBias) const
+{
+	ndCommandSharedInfo info(srcInfo);
+	info.m_layer = this;
+	info.m_tiledStride = tileStride;
+
+	ndSharedPtr<ndBrainUniformBuffer> uniformBuffer(new ndBrainUniformBuffer(context, sizeof(ndCommandSharedInfo), &info));
+	ndBrainBufferCommandDesc descriptor(miniBatchSize);
+	descriptor.m_id = size_t(this);
+	descriptor.m_context = context;
+	descriptor.m_owner = owner;
+	descriptor.m_info = info;
+	descriptor.m_uniformBuffer = uniformBuffer;
+
+	descriptor.PushBack(*uniformBuffer);
+	descriptor.PushBack(inputOutputData);
+	descriptor.PushBack(weightsAndBias);
+	return descriptor;
+}
+
 ndBrainBufferCommandDesc ndBrainLayer::MakeBackpropagateDesctriptor(
 	ndBrainTrainerInference* const owner,
 	ndBrainContext* const context,
@@ -264,7 +293,9 @@ ndBrainBufferCommandDesc ndBrainLayer::MakeBackpropagateDesctriptor(
 	ndBrainFloatBuffer* const weightsAndBiasGradients) const
 {
 	ndCommandSharedInfo info(srcInfo);
+	info.m_layer = this;
 	info.m_tiledStride = tileStride;
+
 	ndSharedPtr<ndBrainUniformBuffer> uniformBuffer(new ndBrainUniformBuffer(context, sizeof(ndCommandSharedInfo), &info));
 	ndBrainBufferCommandDesc descriptor(miniBatchSize);
 	descriptor.m_id = size_t(this);

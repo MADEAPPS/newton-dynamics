@@ -416,7 +416,6 @@ void ndBrainTrainerInference::AddLayersCommands(ndFixSizeArray<ndCommandSharedIn
 	for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
 	{
 		ndCommandSharedInfo uniformParam;
-
 		ndBrainLayer* const layer = brain[i];
 		const ndCommandSharedInfo& data = layersUniformsData[i];
 		uniformParam.m_inputSize = data.m_inputSize;
@@ -425,10 +424,9 @@ void ndBrainTrainerInference::AddLayersCommands(ndFixSizeArray<ndCommandSharedIn
 		uniformParam.m_inputOutputStartOffset = data.m_inputOutputStartOffset;
 		uniformParam.m_parametersBatchSize = data.m_parametersBatchSize;
 		uniformParam.m_parametersStartOffset = data.m_parametersStartOffset;
-		uniformParam.m_layer = layer;
-		ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(*m_descriptor.m_context, sizeof(ndCommandSharedInfo), &uniformParam));
 
-		ndCommandArray backCommands(layer->CreateGpuFeedForwardCommand(this, uniformParam, *m_descriptor.m_context, m_descriptor.m_minibatchSize, uniformbuffer, inputOutputBuffer, weightsBuffer));
+		ndCommandArray backCommands(layer->CreateGpuFeedForwardCommand(
+			this, *m_descriptor.m_context, uniformParam, m_descriptor.m_minibatchSize, inputOutputBuffer, weightsBuffer));
 		for (ndInt32 j = 0; j < backCommands.GetCount(); ++j)
 		{
 			ndSharedPtr<ndBrainBufferCommand>command(backCommands[j]);
