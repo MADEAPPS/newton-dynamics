@@ -854,7 +854,7 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
     // Unfortunatly OpenCl and my intel cpu do not exposes these instrutions to the user, 
     // maybe one day. for now this will do using avx and cumpute units.
 
-#if 1
+#if 0
     // implement an optimized version with memory coalesing for CPU
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
@@ -1020,6 +1020,14 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
                 ndBrainFloat inputData0 = inputOutputData[inputStartOffset + itemId_y * inputOutputStride + itemId_x];
                 tile_weights[itemId_x][itemId_y] = weight0;
                 tile_inputs[itemId_x][itemId_y] = inputData0;
+
+                // check that the index are bank conflit free 
+                //if (itemId_x % 32 == 0)
+                //{
+                //    ndTrace(("\n"));
+                //}
+                //ndInt32 xxxx = (itemId_x * (ND_GPU_TILED_MATRIX_ROWS + 1) + itemId_y) % 32;
+                //ndTrace(("%d ", xxxx));
 
                 ndBrainFloat weight1 = weightsAndBias[weightOffsetStart + (itemId_y + halfTileStart)* width + itemId_x];
                 ndBrainFloat inputData1 = inputOutputData[inputStartOffset + (itemId_y + halfTileStart) * inputOutputStride + itemId_x];
