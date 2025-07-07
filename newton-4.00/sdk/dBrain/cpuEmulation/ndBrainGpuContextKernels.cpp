@@ -921,14 +921,17 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
             }
 
             // Perform the computation for a single tile
+            // this loop can be unrolled and get faste by the complie fail to do it,
+            // It can be done with intrinsics but I am not doing that.
+            // so far this is quite good.
             for (ndInt32 i = 0; i < ND_GPU_TILED_MATRIX_COLUMNS; ++i)
             {
                 for (ndInt32 itemId_y = 0; itemId_y < ND_GPU_TILED_MATRIX_ROWS; itemId_y++)
                 {
-                    ndBrainFloat a = tile_weights[i][itemId_y];
+                    ndBrainFloat weight = tile_weights[i][itemId_y];
                     for (ndInt32 itemId_x = 0; itemId_x < ND_GPU_TILED_MATRIX_ROWS; itemId_x++)
                     {
-                        tile_acc[itemId_y][itemId_x] += a * tile_inputs[i][itemId_x];
+                        tile_acc[itemId_y][itemId_x] += weight * tile_inputs[i][itemId_x];
                     }
                 }
             }
