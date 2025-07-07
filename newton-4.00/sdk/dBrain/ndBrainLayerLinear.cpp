@@ -585,6 +585,7 @@ ndCommandArray ndBrainLayerLinear::CreateGpuBackPropagateCommand(
 	else
 	{
 		ndInt32 id = 0;
+#if 1
 		// calculate the imput/output gradients using naive one row at a time multilication 
 		ndBrainBufferCommandDesc inputGradDescriptorNaive(MakeBackpropagateDesctriptor(
 			owner, context, info, miniBatchSize, 0,
@@ -594,23 +595,22 @@ ndCommandArray ndBrainLayerLinear::CreateGpuBackPropagateCommand(
 		inputGradDescriptorNaive.m_kernel = context->GetAsGpuContext()->m_brainLayerMatrixBackPropagateInputGradientsNaive;
 		ndBrainBufferCommand* const inputGradientCommandNaive = new ndBrainGpuCommand(inputGradDescriptorNaive);
 		comnands.PushBack(inputGradientCommandNaive);
-
+#else
 		// calculate the imput/output gradients tile base multiplication 
 		ndInt32 width;
 		ndInt32 height;
 		CalculateRoundedSize(width, height);
-		//ndInt32 blockRows = height / ND_GPU_TILED_MATRIX_ROWS;
-		//ndInt32 blockColums = miniBatchSize / ND_GPU_TILED_MATRIX_ROWS;
-		ndInt32 blockColums = width / ND_GPU_TILED_MATRIX_COLUMNS;
-		ndInt32 blockRows = miniBatchSize / ND_GPU_TILED_MATRIX_COLUMNS;
+		ndInt32 blockColums = width / ND_GPU_TILED_MATRIX_ROWS;
+		ndInt32 blockRows = miniBatchSize / ND_GPU_TILED_MATRIX_ROWS;
 		ndBrainBufferCommandDesc inputGradDescriptor(MakeBackpropagateDesctriptor(
-			owner, context, info, blockRows * blockColums, blockRows,
+			owner, context, info, blockRows * blockColums, blockColums,
 			inputOutputData, weightsAndBias,
 			inputOutputGradients, weightsAndBiasGradients));
 		inputGradDescriptor.m_id += id++;
-		//inputGradDescriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerMatrixBackPropagateInputGradients;
-		//ndBrainBufferCommand* const inputGradientCommand = new ndBrainGpuCommand(inputGradDescriptor);
-		//comnands.PushBack(inputGradientCommand);
+		inputGradDescriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerMatrixBackPropagateInputGradients;
+		ndBrainBufferCommand* const inputGradientCommand = new ndBrainGpuCommand(inputGradDescriptor);
+		comnands.PushBack(inputGradientCommand);
+#endif
 
 		// add the bias gradient kernel;
 		ndCommandSharedInfo biasInfo(info);

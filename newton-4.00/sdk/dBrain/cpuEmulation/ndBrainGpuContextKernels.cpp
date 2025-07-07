@@ -854,7 +854,7 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
     // Unfortunatly OpenCl and my intel cpu do not exposes these instrutions to the user, 
     // maybe one day. for now this will do using avx and cumpute units.
 
-#if 0
+#if 1
     // implement an optimized version with memory coalesing for CPU
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
@@ -956,9 +956,9 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
         // not need for bank odd row tricks for PC emulation
-        ndBrainFloat tile_acc[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_ROWS];
-        ndBrainFloat tile_inputs[ND_GPU_TILED_MATRIX_COLUMNS][ND_GPU_TILED_MATRIX_ROWS];
-        ndBrainFloat tile_weights[ND_GPU_TILED_MATRIX_COLUMNS][ND_GPU_TILED_MATRIX_ROWS];
+        ndBrainFloat tile_acc[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_ROWS+1];
+        ndBrainFloat tile_inputs[ND_GPU_TILED_MATRIX_COLUMNS][ND_GPU_TILED_MATRIX_ROWS+1];
+        ndBrainFloat tile_weights[ND_GPU_TILED_MATRIX_COLUMNS][ND_GPU_TILED_MATRIX_ROWS+1];
 
         ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
@@ -1187,95 +1187,143 @@ class brainLayerBrainBackPropagateMatrixInputGradients : public ndBrainKernel
     {
     }
 
-    // tile based matrix x matrix multiplication.
-    // partion that matrices into a M x N block and them doing the block
-    // matrix multiplication. 
-    // reduces the bandwidth by reading blocks of adjance matrices to local matrix
-    // then doing that sub tileA by TileB matrix multiplication in cache memory.
-    // this is the trick that specialized, so call AI instruction do in hardware,
-    // making the operation as fast as teh badwidth allows. Unfortunatly OpenCl 
-    // and my intel cpu do not expose these instrutions to the user, maybe one day.
-    // for now this will do.
-    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    void SetTestMatrix(ndInt32 groupId, ndInt32 workGroupSize)
     {
-        // not need for bank odd row tricks for PC emulation
-        ndBrainFloat tile_acc[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_ROWS];
-        ndBrainFloat tile_inputs[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_COLUMNS];
-        ndBrainFloat tile_weights[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_COLUMNS];
-
-        ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
+        ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
         ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
         ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
 
-        ndBrainFloat* const weightsAndBias = (ndBrainFloat*)buffer2->GetGpuBuffer()->GetPtr();
-        ndBrainFloat* const inputOutputData = (ndBrainFloat*)buffer1->GetGpuBuffer()->GetPtr();
+        ndBrainFloat* const weightAndBias = (ndBrainFloat*)buffer2->GetGpuBuffer()->GetPtr();
+        ndBrainFloat* const inputOutputGradients = (ndBrainFloat*)buffer3->GetGpuBuffer()->GetPtr();
         ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetGpuBuffer()->GetPtr();
 
-        const ndInt32 inputSize = parameters->m_inputSize;
-        const ndInt32 outputSize = parameters->m_outputSize;
-        const ndInt32 height = (outputSize + ND_GPU_TILED_MATRIX_ROWS - 1) & -ND_GPU_TILED_MATRIX_ROWS;
-        const ndInt32 width = (inputSize + ND_GPU_TILED_MATRIX_COLUMNS - 1) & -ND_GPU_TILED_MATRIX_COLUMNS;
+        ndInt32 inputSize = parameters->m_inputSize;
+        ndInt32 outputSize = parameters->m_outputSize;
+        ndInt32 inputOutputSize = parameters->m_inputOutputSize;
+        ndInt64 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+        ndInt64 parametersStartOffset = ndInt64(parameters->m_parametersStartOffset);
 
+        ndInt32 width = (inputSize + ND_GPU_TILED_MATRIX_COLUMNS - 1) & -ND_GPU_TILED_MATRIX_COLUMNS;
+
+        for (ndInt32 j = 0; j < outputSize; ++j)
+        {
+            ndInt64 weightOffset = j * width + parametersStartOffset;
+            for (ndInt32 i = 0; i < inputSize; i++)
+            {
+                weightAndBias[weightOffset + i] = 0.0f;
+            }
+        }
+
+        ndBrainFloat xxx1 = 1.0f;
+        for (ndInt32 j = 0; j < 4; ++j)
+        {
+            ndInt64 weightOffset = j * width + parametersStartOffset;
+            for (ndInt32 i = 0; i < 4; i ++)
+            {
+               weightAndBias[weightOffset + i] = xxx1;
+               xxx1 += 1.0f;
+            }
+        }
+
+        ndBrainFloat xxx = 1.0f;
+        for (ndInt32 i = 0; i < 10; ++i)
+        {
+            groupId = i;
+            ndInt64 srcBase = groupId * ndInt64(inputOutputSize) + inputOutputStartOffset;
+            ndInt64 dstBase = srcBase + __cpuKernelRoundoff(inputSize, workGroupSize);
+            ndInt64 parametersStartOffset = ndInt64(parameters->m_parametersStartOffset);
+            ndAssert(srcBase >= 0);
+            ndAssert(dstBase >= 0);
+            ndAssert(parametersStartOffset >= 0);
+
+            for (ndInt32 j = 0; j < outputSize; ++j)
+            {
+                inputOutputGradients[dstBase + j] = xxx;
+                xxx++;
+            }
+        }
+    }
+
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    {
+        // not need for bank odd row tricks for PC emulation
+        const ndInt32 tileSize = ND_GPU_TILED_MATRIX_ROWS;
+        //const ndInt32 tileSize = 2;
+        ndBrainFloat tile_weights[tileSize][tileSize];
+        ndBrainFloat tile_outputGradients[tileSize][tileSize];
+
+//SetTestMatrix(groupId, workGroupSize);
+//groupId = 2;
+
+        ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
+        ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
+        ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
+
+        ndBrainFloat* const weightAndBias = (ndBrainFloat*)buffer2->GetGpuBuffer()->GetPtr();
+        ndBrainFloat* const inputOutputGradients = (ndBrainFloat*)buffer3->GetGpuBuffer()->GetPtr();
+        ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetGpuBuffer()->GetPtr();
+//parameters->m_tiledStride = 2;
+
+        ndBrainFloat tile_accReg[tileSize][tileSize];
+        for (ndInt32 itemId_y = 0; itemId_y < tileSize; ++itemId_y)
+        {
+            for (ndInt32 itemId_x = 0; itemId_x < tileSize; ++itemId_x)
+            {
+                tile_accReg[itemId_y][itemId_x] = ndBrainFloat(0.0f);
+            }
+        }
+
+        ndInt32 inputSize = parameters->m_inputSize;
+        ndInt32 outputSize = parameters->m_outputSize;
+        ndInt32 inputOutputSize = parameters->m_inputOutputSize;
+        ndInt64 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+
+        const ndInt32 width = (inputSize + tileSize - 1) & -tileSize;
+        const ndInt32 height = (outputSize + tileSize - 1) & -tileSize;
         const ndInt32 groupId_x = groupId % parameters->m_tiledStride;
         const ndInt32 groupId_y = (groupId - groupId_x) / parameters->m_tiledStride;
 
-        //Initialise the accumulation register
-        const ndInt64 blockBase = groupId_x * ND_GPU_TILED_MATRIX_ROWS;
-        const ndInt64 parametersStartOffset = blockBase * width + parameters->m_parametersStartOffset;
-        const ndInt64 parametersBiasOffset = blockBase + width * height + parameters->m_parametersStartOffset;
-        ndAssert(parametersBiasOffset >= 0);
-
-        ndBrainFloat biasValue[ND_GPU_TILED_MATRIX_ROWS];
-        for (ndInt32 itemId_y = 0; itemId_y < ND_GPU_TILED_MATRIX_ROWS; ++itemId_y)
-        {
-            biasValue[itemId_y] = weightsAndBias[parametersBiasOffset + itemId_y];
-        }
-
-        for (ndInt32 itemId_x = 0; itemId_x < ND_GPU_TILED_MATRIX_ROWS; ++itemId_x)
-        {
-            for (ndInt32 itemId_y = 0; itemId_y < ND_GPU_TILED_MATRIX_ROWS; ++itemId_y)
-            {
-                tile_acc[itemId_x][itemId_y] = biasValue[itemId_y];
-            }
-        }
-
         const ndInt32 inputOutputStride = parameters->m_inputOutputSize;
-        const ndInt64 inputOffset = groupId_y * ndInt64(inputOutputStride) * ND_GPU_TILED_MATRIX_ROWS + parameters->m_inputOutputStartOffset;
-        ndAssert(inputOffset >= 0);
+        const ndInt64 parametersStartOffset = groupId_x * ndInt64(tileSize) + parameters->m_parametersStartOffset;
+        const ndInt64 outputOffset = groupId_y * ndInt64(tileSize) * inputOutputStride + parameters->m_inputOutputStartOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
 
         // Loop over all tiles
-        for (ndInt32 tile = 0; tile < width; tile += ND_GPU_TILED_MATRIX_COLUMNS)
+        for (ndInt32 tile = 0; tile < height; tile += tileSize)
         {
-            // Load one tile of A and B into local memory
-            ndInt64 inputStartOffset = tile + inputOffset;
-            ndInt64 weightOffsetStart = tile + parametersStartOffset;
-            for (ndInt32 itemId_y = 0; itemId_y < ND_GPU_TILED_MATRIX_ROWS; ++itemId_y)
+            // Load one transposed tile A and B into local memory (cpu style)
+            ndInt64 outputStartOffset = tile + outputOffset;
+            ndInt64 weightOffsetStart = tile * width + parametersStartOffset;
+            for (ndInt32 itemId_y = 0; itemId_y < tileSize; ++itemId_y)
             {
-                for (ndInt32 itemId_x = 0; itemId_x < ND_GPU_TILED_MATRIX_COLUMNS; ++itemId_x)
+                for (ndInt32 itemId_x = 0; itemId_x < tileSize; ++itemId_x)
                 {
-                    tile_inputs[itemId_y][itemId_x] = inputOutputData[inputStartOffset + itemId_x];
-                    tile_weights[itemId_y][itemId_x] = weightsAndBias[weightOffsetStart + itemId_x];
+                    ndBrainFloat weight = weightAndBias[weightOffsetStart + itemId_x];
+                    ndBrainFloat outputGradient = inputOutputGradients[outputStartOffset + itemId_x];
+                    tile_weights[itemId_y][itemId_x] = weight;
+                    tile_outputGradients[itemId_x][itemId_y] = outputGradient;
                 }
                 weightOffsetStart += width;
-                inputStartOffset += inputOutputStride;
+                outputStartOffset += inputOutputStride;
             }
-            //barrier
-
             // Perform the computation for a single tile
-            for (ndInt32 i = 0; i < ND_GPU_TILED_MATRIX_COLUMNS; ++i)
+            // this loop can be unrolled and get faste by the complie fail to do it,
+            // It can be done with intrinsics but I am not doing that.
+            // so far this is quite good.
+            for (ndInt32 i = 0; i < tileSize; ++i)
             {
-                for (ndInt32 itemId_y = 0; itemId_y < ND_GPU_TILED_MATRIX_ROWS; itemId_y++)
+                for (ndInt32 itemId_y = 0; itemId_y < tileSize; itemId_y++)
                 {
-                    ndBrainFloat a = tile_weights[itemId_y][i];
-                    for (ndInt32 itemId_x = 0; itemId_x < ND_GPU_TILED_MATRIX_ROWS; itemId_x++)
+                    ndBrainFloat outGradients = tile_outputGradients[i][itemId_y];
+                    for (ndInt32 itemId_x = 0; itemId_x < tileSize; itemId_x++)
                     {
-                        tile_acc[itemId_x][itemId_y] += a * tile_inputs[itemId_x][i];
+                        tile_accReg[itemId_y][itemId_x] += outGradients * tile_weights[i][itemId_x];
                     }
                 }
             }
             // barrier
         }
 
+#if 0
         const ndInt32 numberOutput = ((groupId_x + 1) * ND_GPU_TILED_MATRIX_ROWS < outputSize) ? ND_GPU_TILED_MATRIX_ROWS : outputSize - groupId_x * ND_GPU_TILED_MATRIX_ROWS;
         ndInt64 outputOffset = groupId_x * ND_GPU_TILED_MATRIX_ROWS + ndInt64(inputOffset) + __cpuKernelRoundoff(inputSize, workGroupSize);
         ndAssert(outputOffset >= 0);
@@ -1283,11 +1331,12 @@ class brainLayerBrainBackPropagateMatrixInputGradients : public ndBrainKernel
         {
             for (ndInt32 itemId_x = 0; itemId_x < numberOutput; ++itemId_x)
             {
-                float value = tile_acc[itemId_y][itemId_x];
+                float value = tile_acc[itemId_x][itemId_y];
                 inputOutputData[outputOffset + itemId_x] = value;
             }
             outputOffset += inputOutputStride;
         }
+#endif
     }
 };
 
@@ -1306,10 +1355,8 @@ class brainLayerBrainBackPropagateMatrixBiasGradients : public ndBrainKernel
 
         ndBrainFloatBuffer* const buffer4 = (ndBrainFloatBuffer*)m_parameters[4];
         ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
-        //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
 
-        //ndBrainFloat* const inputOutputData = (ndBrainFloat*)buffer1->GetGpuBuffer()->GetPtr();
         ndBrainFloat* const inputOutputGradients = (ndBrainFloat*)buffer3->GetGpuBuffer()->GetPtr();
         ndBrainFloat* const weightAndBiasGradients = (ndBrainFloat*)buffer4->GetGpuBuffer()->GetPtr();
         ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetGpuBuffer()->GetPtr();

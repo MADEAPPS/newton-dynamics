@@ -293,6 +293,7 @@ static void MnistTrainingSet()
 				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
 				for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
 				{
+#if 1
 					m_indirectMiniBatch->MemoryToDevice(0, m_miniBatchSize * sizeof(ndUnsigned32), &shuffleBuffer[batchStart]);
 					minibatchInputBuffer->CopyBufferIndirect(copyBuffer, **m_indirectMiniBatch, **m_trainingData);
 					trainer->MakePrediction();
@@ -300,7 +301,7 @@ static void MnistTrainingSet()
 					//calculate loss
 					//trainer->GetContext()->SyncBufferCommandQueue();
 					minibatchOutpuBuffer->VectorFromDevice(miniBatchOutput);
-
+					
 					for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
 					{
 						ndUnsigned32 index = shuffleBuffer[batchStart + i];
@@ -311,11 +312,16 @@ static void MnistTrainingSet()
 						loss.SetTruth(truth);
 						loss.GetLoss(output, grad);
 					}
-		
+					
 					// backpropagate loss.
 					minibatchOutpuGradientBuffer->VectorToDevice(miniBatchOutputGradients);
 					trainer->BackPropagate();
 					trainer->ApplyLearnRate(); 
+#else
+					trainer->BackPropagate();
+					trainer->ApplyLearnRate(); 
+					trainer->GetContext()->SyncBufferCommandQueue();
+#endif
 				}
 
 				ndInt64 testFailCount = ValidateData(testLabels, m_testData) + 1;

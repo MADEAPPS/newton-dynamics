@@ -297,9 +297,9 @@ static void SimpleRegressionBrainStressTest()
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 
 	ndSetRandSeed(42);
-	ndInt32 inputSize = 16;
-	ndInt32 minibatchSize = 16;
-	ndInt32 hidenLayerWidth = 16;
+	ndInt32 inputSize = 32;
+	ndInt32 minibatchSize = 32;
+	ndInt32 hidenLayerWidth = 32;
 	//ndInt32 hidenLayerWidth = 4096;
 	layers.PushBack(new ndBrainLayerLinear(inputSize, hidenLayerWidth));
 	//layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
