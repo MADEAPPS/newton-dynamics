@@ -532,33 +532,51 @@ ndCommandArray ndBrainLayerLinear::CreateGpuFeedForwardCommand(
 	ndAssert(info.m_parametersBatchSize);
 	ndAssert((miniBatchSize & (ND_GPU_TILED_MATRIX_ROWS - 1)) == 0);
 
-	ndBrainBufferCommand* command = nullptr;
+	ndCommandArray commandArray(0);
 	if (context->GetAsCpuContext())
 	{
 		ndBrainBufferCommandDesc descriptor(MakeFeedForwardDesctriptor(
 			owner, context, info, miniBatchSize, 0,
 			inputOutputData, weightsAndBias));
 
-		command = new ndBrainLayerFeedForwardCpuCommand(descriptor, (ndBrainLayer*)this);
+		ndBrainBufferCommand* const command = new ndBrainLayerFeedForwardCpuCommand(descriptor, (ndBrainLayer*)this);
+		commandArray.PushBack(command);
 	}
 	else
 	{
-		ndInt32 width;
-		ndInt32 height;
-		CalculateRoundedSize(width, height);
-		
-		ndInt32 blockRows = height / ND_GPU_TILED_MATRIX_ROWS;
-		ndInt32 blockColums = miniBatchSize / ND_GPU_TILED_MATRIX_ROWS;
-		 
-		ndBrainBufferCommandDesc descriptor(MakeFeedForwardDesctriptor(
-			owner, context, info, blockRows * blockColums, blockRows,
-			inputOutputData, weightsAndBias));
-		descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerMatrixMatrixMultiply;
-		command = new ndBrainGpuCommand(descriptor);
+		{
+			ndInt32 width;
+			ndInt32 height;
+			CalculateRoundedSize(width, height);
+
+			ndInt32 blockRows = height / ND_GPU_TILED_MATRIX_ROWS;
+			ndInt32 blockColums = miniBatchSize / ND_GPU_TILED_MATRIX_ROWS;
+
+			ndBrainBufferCommandDesc descriptorOld(MakeFeedForwardDesctriptor(
+				owner, context, info, blockRows * blockColums, blockRows,
+				inputOutputData, weightsAndBias));
+			descriptorOld.m_kernel = context->GetAsGpuContext()->m_brainLayerMatrixMatrixMultiplyOld;
+			ndBrainBufferCommand* const commandOld = new ndBrainGpuCommand(descriptorOld);
+			commandArray.PushBack(commandOld);
+		}
+
+		{
+			ndInt32 width;
+			ndInt32 height;
+			CalculateRoundedSize(width, height);
+
+			ndInt32 blockRows = height / ND_GPU_TILED_MATRIX_ROWS;
+			ndInt32 blockColums = miniBatchSize / ND_GPU_TILED_MATRIX_ROWS;
+
+			ndBrainBufferCommandDesc descriptor(MakeFeedForwardDesctriptor(
+				owner, context, info, blockRows * blockColums, blockRows,
+				inputOutputData, weightsAndBias));
+			descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerMatrixMatrixMultiply;
+			ndBrainBufferCommand* const command = new ndBrainGpuCommand(descriptor);
+			commandArray.PushBack(command);
+		}
 	}
-	
-	ndCommandArray commandArray(0);
-	commandArray.PushBack(command);
+
 	return commandArray;
 }
 
