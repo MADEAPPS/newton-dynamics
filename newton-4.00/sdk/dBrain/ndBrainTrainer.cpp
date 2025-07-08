@@ -75,7 +75,7 @@ ndBrainFloatBuffer* ndBrainTrainer::GetWeightAndBiasGradientBuffer()
 void ndBrainTrainer::Initialize()
 {
 	ndBrainVector buffer;
-	//buffer.Resize(ndInt64(m_weightAndBiasBuffer->GetCount() * m_descriptor.m_minibatchSize));
+	//buffer.Resize(ndInt64(m_weightAndBiasBuffer->GetCount() * m_descriptor.m_minibatchSizeExp));
 	ndInt64 maxSize = ndInt64(ndMax(m_weightAndBiasBuffer->GetCount(), m_inputOutputBuffer->GetCount()));
 	buffer.Resize(maxSize);
 	
@@ -118,7 +118,7 @@ void ndBrainTrainer::AddCopyOutputGradientCommand()
 	ndBrainFloatBuffer* const inputOutputGradientBuffer = *m_inputOutputGradientsBuffer;
 	ndBrainFloatBuffer* const miniBatchOutputGradientBuffer = *m_miniBatchOutputGradientBuffer;
 
-	ndBrainBufferCommandDesc descriptor(m_descriptor.m_minibatchSize);
+	ndBrainBufferCommandDesc descriptor(m_descriptor.m_minibatchSizeExp);
 	descriptor.m_context = *m_descriptor.m_context;
 	descriptor.m_owner = this;
 	descriptor.m_id = m_outpuId;
@@ -181,7 +181,7 @@ void ndBrainTrainer::AddCopyInputGradientCommand()
 	ndBrainFloatBuffer* const inputOutputGradientBuffer = *m_inputOutputGradientsBuffer;
 	ndBrainFloatBuffer* const miniBatchInputGradientBuffer = *m_miniBatchInputGradientBuffer;
 
-	ndBrainBufferCommandDesc descriptor(m_descriptor.m_minibatchSize);
+	ndBrainBufferCommandDesc descriptor(m_descriptor.m_minibatchSizeExp);
 	descriptor.m_context = *m_descriptor.m_context;
 	descriptor.m_owner = this;
 	descriptor.m_id = m_inputId;
@@ -244,7 +244,7 @@ void ndBrainTrainer::AddLayersGradientCommands()
 		ndBrainFloatBuffer* const weightAndBiasGradientsBuffer = *m_weightAndBiasGradientsBuffer;
 
 		ndCommandArray backCommands(layer->CreateGpuBackPropagateCommand(
-			this, *m_descriptor.m_context, desc.m_info, m_descriptor.m_minibatchSize,
+			this, *m_descriptor.m_context, desc.m_info, m_descriptor.m_minibatchSizeExp,
 			inputOutputBuffer, weightsAndBiasBuffer, inputOutputGradientBuffer, weightAndBiasGradientsBuffer));
 
 		for (ndInt32 j = 0; j < backCommands.GetCount(); ++j)
@@ -274,7 +274,7 @@ void ndBrainTrainer::AddOptimizerGradientCommand()
 	{
 		ndCommandSharedInfo data;
 		data.m_inputSize = sizeInFloats;
-		data.m_inputOutputSize = m_descriptor.m_minibatchSize;
+		data.m_inputOutputSize = m_descriptor.m_minibatchSizeExp;
 
 		ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(*m_descriptor.m_context, sizeof(ndCommandSharedInfo), &data));
 
@@ -343,7 +343,7 @@ void ndBrainTrainer::AddOptimizerGradientCommand()
 	// add the adam optimizer kernel here
 	{
 		ndBrainOptimizerAdam::ndCommandSharedInfo optimizerData(m_optimizer->m_parameters);
-		optimizerData.m_minibathScale = ndBrainFloat(1.0f) / ndBrainFloat (m_descriptor.m_minibatchSize);
+		optimizerData.m_minibathScale = ndBrainFloat(1.0f) / ndBrainFloat (m_descriptor.m_minibatchSizeExp);
 		ndSharedPtr<ndBrainUniformBuffer> adamUniformbuffer(new ndBrainUniformBuffer(*m_descriptor.m_context, sizeof(ndBrainOptimizerAdam::ndCommandSharedInfo), &optimizerData));
 
 		ndBrainBufferCommandDesc descriptor(ndInt32(sizeInFloats) / ND_DEFAULT_WORKGROUP_SIZE);

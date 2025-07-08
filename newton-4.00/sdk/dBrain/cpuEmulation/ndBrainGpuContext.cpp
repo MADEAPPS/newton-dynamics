@@ -28,6 +28,8 @@ ndBrainGpuContext::ndBrainGpuContext()
 #ifdef _DEBUG
 numOfThreads = 1;
 #endif
+//numOfThreads = 1;
+
 	SetThreadCount(numOfThreads);
 	CreateKerners();
 	CreateCopyCommands();

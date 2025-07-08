@@ -47,7 +47,7 @@ class ndTrainerDescriptor
 	ndSharedPtr<ndBrainContext> m_context;
 	ndBrainFloat m_learnRate;
 	ndBrainFloat m_regularizer;
-	ndInt32 m_minibatchSize;
+	ndInt32 m_minibatchSizeExp;
 	ndRegularizerType m_regularizerType;
 };
 

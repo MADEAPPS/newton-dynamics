@@ -265,7 +265,7 @@ ndBrainBufferCommandDesc ndBrainLayer::MakeFeedForwardDesctriptor(
 {
 	ndCommandSharedInfo info(srcInfo);
 	info.m_layer = this;
-	info.m_tiledStride = tileStride;
+	info.m_minibatchSizeExp = tileStride;
 
 	ndSharedPtr<ndBrainUniformBuffer> uniformBuffer(new ndBrainUniformBuffer(context, sizeof(ndCommandSharedInfo), &info));
 	ndBrainBufferCommandDesc descriptor(miniBatchSize);
@@ -294,7 +294,7 @@ ndBrainBufferCommandDesc ndBrainLayer::MakeBackpropagateDesctriptor(
 {
 	ndCommandSharedInfo info(srcInfo);
 	info.m_layer = this;
-	info.m_tiledStride = tileStride;
+	info.m_minibatchSizeExp = tileStride;
 
 	ndSharedPtr<ndBrainUniformBuffer> uniformBuffer(new ndBrainUniformBuffer(context, sizeof(ndCommandSharedInfo), &info));
 	ndBrainBufferCommandDesc descriptor(miniBatchSize);

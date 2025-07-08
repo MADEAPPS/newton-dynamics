@@ -313,7 +313,7 @@ static void SimpleRegressionBrainStressTest()
 	descritor.m_brain = brain;
 	descritor.m_context = context;
 	descritor.m_learnRate = 1.0e-4f;
-	descritor.m_minibatchSize = minibatchSize;
+	descritor.m_minibatchSizeExp = minibatchSize;
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
 		brain->AddLayer(layers[i]);
@@ -322,11 +322,12 @@ static void SimpleRegressionBrainStressTest()
 
 	ndBrainVector inputData;
 	ndBrainVector outputData;
-	inputData.SetCount(descritor.m_minibatchSize * inputSize);
+	inputData.SetCount(descritor.m_minibatchSizeExp * inputSize);
 	inputData.Set(0.0f);
-	for (ndInt32 i = 0; i < descritor.m_minibatchSize; ++i)
+	//for (ndInt32 i = 0; i < descritor.m_minibatchSizeExp; ++i)
+	for (ndInt32 i = 0; i < inputData.GetCount(); ++i)
 	{
-		inputData[i * inputSize + i% inputSize] = 1.0f;
+		inputData[i] = float(i + 1);
 	}
 
 	ndSharedPtr<ndBrainTrainer> trainer(new ndBrainTrainer(descritor));
@@ -343,8 +344,20 @@ static void SimpleRegressionBrainStressTest()
 		context->SyncBufferCommandQueue();
 		minibatchOutpuBuffer->VectorFromDevice(outputData);
 
-		// calculate loss here, for now just pass teh ouput data
-		minibatchOutpuGradientBuffer->VectorFromDevice(outputData);
+outputData.Set(0.0);
+//for (ndInt32 i = 0; i < minibatchSize; ++i)
+for (ndInt32 i = 0; i < 1; ++i)
+{
+	//for (ndInt32 j = 0; j < 4; ++j)
+	for (ndInt32 j = 0; j < minibatchSize; ++j)
+	{
+		//outputData[j * minibatchSize + i] = float(j * 4 + i + 1);
+		outputData[i * minibatchSize + j] = float(j + 1);
+	}
+}
+
+		// calculate loss here, for now just pass the ouput data
+		minibatchOutpuGradientBuffer->VectorToDevice(outputData);
 		trainer->BackPropagate();
 		trainer->ApplyLearnRate();
 	}

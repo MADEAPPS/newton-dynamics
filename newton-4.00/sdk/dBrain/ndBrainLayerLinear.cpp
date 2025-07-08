@@ -108,18 +108,18 @@ void ndBrainLayerLinear::InitWeights()
 #if 0
 	for (ndInt32 i = 0; i < ndInt32(m_bias.GetCount()); ++i)
 	{
-		m_bias[i] = ndFloat32(i + 1) * 10000.0f;
+		//m_bias[i] = ndFloat32(i + 1) * 10000.0f;
+		m_bias[i] = 0.0f;
 	}
 
-	ndFloat32 xxxx = 1.0f;
-	for (ndInt32 i = 0; i < ndInt32(m_weights.GetCount()); ++i)
+	m_weights[0].Set(ndFloat32(0.0f));
+	m_weights[0][0] = 1.0f;
+	for (ndInt32 i = 1; i < ndInt32(m_weights.GetCount()); ++i)
 	{
 		m_weights[i].Set(ndFloat32(0.0f));
-		for (ndInt32 j = 0; j < ndInt32(m_weights.GetColumns()); ++j)
-		{
-			m_weights[i][j] = xxxx;
-			xxxx += 1.0f;
-		}
+		m_weights[i][i] = ndFloat32(i + 1);
+		m_weights[i - 1][i] = ndFloat32(i + 1);
+		m_weights[i][i-1] = ndFloat32(i);
 	}
 #endif
 }
@@ -585,7 +585,7 @@ ndCommandArray ndBrainLayerLinear::CreateGpuBackPropagateCommand(
 	else
 	{
 		ndInt32 id = 0;
-#if 1
+#if 0
 		// calculate the imput/output gradients using naive one row at a time multilication 
 		ndBrainBufferCommandDesc inputGradDescriptorNaive(MakeBackpropagateDesctriptor(
 			owner, context, info, miniBatchSize, 0,
@@ -603,7 +603,8 @@ ndCommandArray ndBrainLayerLinear::CreateGpuBackPropagateCommand(
 		ndInt32 blockColums = width / ND_GPU_TILED_MATRIX_ROWS;
 		ndInt32 blockRows = miniBatchSize / ND_GPU_TILED_MATRIX_ROWS;
 		ndBrainBufferCommandDesc inputGradDescriptor(MakeBackpropagateDesctriptor(
-			owner, context, info, blockRows * blockColums, blockColums,
+			//owner, context, info, blockRows * blockColums, blockColums,
+			owner, context, info, blockRows * blockColums, ndExp2(miniBatchSize),
 			inputOutputData, weightsAndBias,
 			inputOutputGradients, weightsAndBiasGradients));
 		inputGradDescriptor.m_id += id++;

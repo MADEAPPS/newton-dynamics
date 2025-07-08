@@ -16,8 +16,16 @@
  
 //#define MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
 
-#define MINIST_MINIBATCH_BUFFER_SIZE			512
-//#define MINIST_MINIBATCH_BUFFER_SIZE			256
+//#define MINIST_MINIBATCH_BUFFER_SIZE	32
+//#define MINIST_MINIBATCH_BUFFER_SIZE	256
+#define MINIST_MINIBATCH_BUFFER_SIZE	512
+
+//#define MINIST_LINEAR_LAYERS_NEURONS	32
+#define MINIST_LINEAR_LAYERS_NEURONS	256
+//#define MINIST_LINEAR_LAYERS_NEURONS	512
+//#define MINIST_LINEAR_LAYERS_NEURONS	1024
+
+
 //#define MINIST_MINIBATCH_BUFFER_SIZE			(1 * ND_CPU_MINI_BATCH_SIZE_GRANULARITY)
 
 #define MNIST_CONVOLUTIONAL_FEATURE_MAPS		32
@@ -34,10 +42,6 @@
 		#define MINIST_CONVOLUTIONAL_LAYER	ndBrainLayerConvolutionalWithDropOut_2d
 	#endif
 #endif
-
-#define MINIST_LINEAR_LAYERS_NEURONS	256
-//#define MINIST_LINEAR_LAYERS_NEURONS	512
-//#define MINIST_LINEAR_LAYERS_NEURONS	1024
 
 #define MINIST_LINEAR_DROPOUT_RATE		ndFloat32 (0.05f)
 
@@ -169,7 +173,7 @@ static void MnistTrainingSet()
 			descritor.m_brain = brain;
 			descritor.m_context = context;
 			descritor.m_learnRate = m_learnRate;
-			descritor.m_minibatchSize = m_miniBatchSize;
+			descritor.m_minibatchSizeExp = m_miniBatchSize;
 			m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descritor));
 		}
 
