@@ -111,6 +111,7 @@ class ndBrainFixSizeVector: public ndBrainMemVector
 {
 	public:
 	ndBrainFixSizeVector();
+	ndBrainFixSizeVector(ndInt32 count);
 	ndBrainFixSizeVector(const ndBrainFixSizeVector& src);
 	ndBrainFixSizeVector& operator=(const ndBrainFixSizeVector& src);
 
@@ -122,6 +123,14 @@ template<ndInt32 size>
 ndBrainFixSizeVector<size>::ndBrainFixSizeVector()
 	:ndBrainMemVector(m_buffer, size)
 {
+}
+
+template<ndInt32 size>
+ndBrainFixSizeVector<size>::ndBrainFixSizeVector(ndInt32 count)
+	: ndBrainMemVector(m_buffer, size)
+{
+	ndAssert(count <= size);
+	SetCount(ndMin(count, size));
 }
 
 template<ndInt32 size>
