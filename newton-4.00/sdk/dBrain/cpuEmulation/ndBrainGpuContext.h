@@ -76,7 +76,6 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 	ndSharedPtr<ndBrainKernel> m_brainAdamMomentumUpdate;
 	ndSharedPtr<ndBrainKernel> m_brainAdamRidgeOptimizerUpdate;
 	ndSharedPtr<ndBrainKernel> m_brainAdamLassoOptimizerUpdate;
-	//ndSharedPtr<ndBrainKernel> m_brainAccumulateGradientsAndAverage;
 
 	// other shader
 	ndSharedPtr<ndBrainKernel> m_brainCopyBuffer;

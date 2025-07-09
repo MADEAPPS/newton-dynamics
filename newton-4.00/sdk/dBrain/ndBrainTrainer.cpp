@@ -75,7 +75,6 @@ ndBrainFloatBuffer* ndBrainTrainer::GetWeightAndBiasGradientBuffer()
 void ndBrainTrainer::Initialize()
 {
 	ndBrainVector buffer;
-	//buffer.Resize(ndInt64(m_weightAndBiasBuffer->GetCount() * m_descriptor.m_minibatchSizeExp));
 	ndInt64 maxSize = ndInt64(ndMax(m_weightAndBiasBuffer->GetCount(), m_inputOutputBuffer->GetCount()));
 	buffer.Resize(maxSize);
 	
@@ -118,7 +117,7 @@ void ndBrainTrainer::AddCopyOutputGradientCommand()
 	ndBrainFloatBuffer* const inputOutputGradientBuffer = *m_inputOutputGradientsBuffer;
 	ndBrainFloatBuffer* const miniBatchOutputGradientBuffer = *m_miniBatchOutputGradientBuffer;
 
-	ndBrainBufferCommandDesc descriptor(m_descriptor.m_minibatchSizeExp);
+	ndBrainBufferCommandDesc descriptor(m_descriptor.m_matrixDimensionK);
 	descriptor.m_context = *m_descriptor.m_context;
 	descriptor.m_owner = this;
 	descriptor.m_id = m_outpuId;
@@ -181,7 +180,7 @@ void ndBrainTrainer::AddCopyInputGradientCommand()
 	ndBrainFloatBuffer* const inputOutputGradientBuffer = *m_inputOutputGradientsBuffer;
 	ndBrainFloatBuffer* const miniBatchInputGradientBuffer = *m_miniBatchInputGradientBuffer;
 
-	ndBrainBufferCommandDesc descriptor(m_descriptor.m_minibatchSizeExp);
+	ndBrainBufferCommandDesc descriptor(m_descriptor.m_matrixDimensionK);
 	descriptor.m_context = *m_descriptor.m_context;
 	descriptor.m_owner = this;
 	descriptor.m_id = m_inputId;
@@ -244,7 +243,7 @@ void ndBrainTrainer::AddLayersGradientCommands()
 		ndBrainFloatBuffer* const weightAndBiasGradientsBuffer = *m_weightAndBiasGradientsBuffer;
 
 		ndCommandArray backCommands(layer->CreateGpuBackPropagateCommand(
-			this, *m_descriptor.m_context, desc.m_info, m_descriptor.m_minibatchSizeExp,
+			this, *m_descriptor.m_context, desc.m_info, m_descriptor.m_matrixDimensionK,
 			inputOutputBuffer, weightsAndBiasBuffer, inputOutputGradientBuffer, weightAndBiasGradientsBuffer));
 
 		for (ndInt32 j = 0; j < backCommands.GetCount(); ++j)
@@ -270,80 +269,10 @@ void ndBrainTrainer::AddOptimizerGradientCommand()
 	ndInt32 sizeInFloats = ndInt32(m_weightAndBiasBuffer->SizeInBytes() / sizeof(ndReal));
 	m_optimizer->Init(sizeInFloats, m_descriptor.m_learnRate);
 
-	// add summation kernel
-	{
-		ndCommandSharedInfo data;
-		data.m_inputSize = sizeInFloats;
-		data.m_inputOutputSize = m_descriptor.m_minibatchSizeExp;
-
-		ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(*m_descriptor.m_context, sizeof(ndCommandSharedInfo), &data));
-
-		ndBrainBufferCommandDesc descriptor(0);
-		descriptor.m_context = *m_descriptor.m_context;
-		descriptor.m_owner = this;
-		descriptor.m_id = m_adamOptimizerSum;
-		descriptor.m_info = data;
-		descriptor.m_uniformBuffer = uniformbuffer;
-		descriptor.m_miniBatchSize = ndInt32(sizeInFloats / descriptor.m_workGroupSize);
-		descriptor.PushBack(*uniformbuffer);
-		descriptor.PushBack(*m_weightAndBiasGradientsBuffer);
-
-		if (m_descriptor.m_context->GetAsCpuContext())
-		{
-			class ndBrainAdamAddGradients : public ndBrainBufferCommandCpu
-			{
-				public:
-				ndBrainAdamAddGradients(const ndBrainBufferCommandDesc& desc)
-					:ndBrainBufferCommandCpu(desc)
-				{
-				}
-
-				virtual void Execute(ndInt32 groupId) override
-				{
-					ndInt32 workGroupSize = m_desc.m_workGroupSize;
-
-					const ndCommandSharedInfo* const info = (ndCommandSharedInfo*)m_desc[0]->GetCpuPtr();
-					ndBrainFloat* const weightAndBiasGradient = (ndBrainFloat*)m_desc[1]->GetCpuPtr();
-
-					ndInt32 inputSize = info->m_inputSize;
-					ndInt32 miniBatchSize = info->m_inputOutputSize;
-					ndInt32 start = groupId * workGroupSize;
-
-					for (ndInt32 j = 1; j < miniBatchSize; ++j)
-					{
-						ndInt64 base = start + j * ndInt64(inputSize);
-						ndAssert(base > 0);
-						for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-						{
-							ndBrainFloat a = weightAndBiasGradient[base + itemId];
-							weightAndBiasGradient[start + itemId] += a;
-						}
-					}
-
-					ndBrainFloat weightFactor = ndBrainFloat(1.0f) / ndBrainFloat(miniBatchSize);
-					for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-					{
-						weightAndBiasGradient[start + itemId] *= weightFactor;
-					}
-				}
-			};
-			ndSharedPtr<ndBrainBufferCommand> accumulateGradients(new ndBrainAdamAddGradients(descriptor));
-			m_optimizerBufferCommands.Append(accumulateGradients);
-		} 
-		else
-		{
-			// this is not a bug !!!!
-			 
-			//descriptor.m_kernel = descriptor.m_context->GetAsGpuContext()->m_brainAccumulateGradientsAndAverage;
-			//ndSharedPtr<ndBrainBufferCommand>command(new ndBrainGpuCommand(descriptor));
-			//m_optimizerBufferCommands.Append(command);
-		}
-	}
-
 	// add the adam optimizer kernel here
 	{
 		ndBrainOptimizerAdam::ndCommandSharedInfo optimizerData(m_optimizer->m_parameters);
-		optimizerData.m_minibathScale = ndBrainFloat(1.0f) / ndBrainFloat (m_descriptor.m_minibatchSizeExp);
+		optimizerData.m_minibathScale = ndBrainFloat(1.0f) / ndBrainFloat (m_descriptor.m_matrixDimensionK);
 		ndSharedPtr<ndBrainUniformBuffer> adamUniformbuffer(new ndBrainUniformBuffer(*m_descriptor.m_context, sizeof(ndBrainOptimizerAdam::ndCommandSharedInfo), &optimizerData));
 
 		ndBrainBufferCommandDesc descriptor(ndInt32(sizeInFloats) / ND_DEFAULT_WORKGROUP_SIZE);
@@ -352,7 +281,6 @@ void ndBrainTrainer::AddOptimizerGradientCommand()
 		descriptor.m_id = m_adamOptimizerUpdate;
 		descriptor.m_uniformBuffer = adamUniformbuffer;
 		descriptor.m_workGroupSize = ND_DEFAULT_WORKGROUP_SIZE;
-		//descriptor.m_miniBatchSize = ndInt32(sizeInFloats / descriptor.m_workGroupSize);
 
 		descriptor.PushBack(*adamUniformbuffer);
 		descriptor.PushBack(*m_weightAndBiasBuffer);
@@ -386,9 +314,10 @@ void ndBrainTrainer::AddOptimizerGradientCommand()
 						ndBrainFloat regularizer = -parameters->m_decayRegularizer;
 
 						ndInt32 start = groupId * workGroupSize;
+						ndBrainFloat miniBatchWeight = parameters->m_minibathScale;
 						for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
 						{
-							ndBrainFloat temp = weightAndBiasGradientBuffer[start + itemId];
+							ndBrainFloat temp = miniBatchWeight * weightAndBiasGradientBuffer[start + itemId];
 
 							// calculate moving average
 							ndBrainFloat a = vdw[start + itemId] * parameters->m_alpha + temp * (ndBrainFloat(1.0f) - parameters->m_alpha);

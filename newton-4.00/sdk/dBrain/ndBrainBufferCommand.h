@@ -31,7 +31,7 @@ class ndCommandSharedInfo
 		,m_inputOutputStartOffset(0)
 		,m_parametersBatchSize(0)
 		,m_parametersStartOffset(0)
-		,m_minibatchSizeExp(0)
+		,m_matrixDimensionK(0)
 	{
 	}
 
@@ -43,7 +43,7 @@ class ndCommandSharedInfo
 		,m_inputOutputStartOffset(0)
 		,m_parametersBatchSize(0)
 		,m_parametersStartOffset(0)
-		,m_minibatchSizeExp(0)
+		,m_matrixDimensionK(0)
 	{
 	}
 
@@ -56,7 +56,7 @@ class ndCommandSharedInfo
 	//	uint m_inputOutputStartOffset;
 	//	uint m_parametersBatchSize;
 	//	uint m_parametersStartOffset;
-	//	uint m_minibatchSizeExp;
+	//	uint m_matrixDimensionK;
 	//} UniformBufferLayerArguments;
 
 	const ndBrainLayer* m_layer;
@@ -66,7 +66,7 @@ class ndCommandSharedInfo
 	ndInt32 m_inputOutputStartOffset;
 	ndInt32 m_parametersBatchSize;
 	ndInt32 m_parametersStartOffset;
-	ndInt32	m_minibatchSizeExp;
+	ndInt32	m_matrixDimensionK;
 };
 
 class ndBrainBufferCommandDesc : public ndFixSizeArray<ndBrainBuffer*, 16>

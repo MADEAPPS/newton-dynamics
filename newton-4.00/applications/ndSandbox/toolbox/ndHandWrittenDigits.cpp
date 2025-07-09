@@ -12,7 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndTestDeepBrain.h"
 
-//#define MINIST_USE_CPU_TRAINING
+#define MINIST_USE_CPU_TRAINING
  
 //#define MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
 
@@ -20,9 +20,10 @@
 //#define MINIST_MINIBATCH_BUFFER_SIZE	256
 #define MINIST_MINIBATCH_BUFFER_SIZE	512
 
-//#define MINIST_LINEAR_LAYERS_NEURONS	32
-#define MINIST_LINEAR_LAYERS_NEURONS	256
-//#define MINIST_LINEAR_LAYERS_NEURONS	512
+//#define MINIST_LINEAR_LAYERS_NEURONS	64
+//#define MINIST_LINEAR_LAYERS_NEURONS	128
+//#define MINIST_LINEAR_LAYERS_NEURONS	256
+#define MINIST_LINEAR_LAYERS_NEURONS	512
 //#define MINIST_LINEAR_LAYERS_NEURONS	1024
 
 
@@ -173,7 +174,7 @@ static void MnistTrainingSet()
 			descritor.m_brain = brain;
 			descritor.m_context = context;
 			descritor.m_learnRate = m_learnRate;
-			descritor.m_minibatchSizeExp = m_miniBatchSize;
+			descritor.m_matrixDimensionK = m_miniBatchSize;
 			m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descritor));
 		}
 
@@ -328,38 +329,16 @@ static void MnistTrainingSet()
 #endif
 				}
 
-				ndInt64 testFailCount = ValidateData(testLabels, m_testData) + 1;
+				ndExpandTraceMessage("epoch: %d\n", epoch);
+				ndInt64 testFailCount = ValidateData(testLabels, m_testData);
 				if (testFailCount < m_minValidationFail)
 				{
 					weightdAndBiasBuffer->VectorFromDevice(weightAndBias);
 					trainer->UpdateParameters(weightAndBias);
 					m_bestBrain->CopyFrom(**trainer->GetBrain());
-				
-					m_minValidationFail = testFailCount + 1;
-					ndInt64 trainigFailCount = ValidateData(trainingLabels, m_trainingData) + 1;
-					ndInt64 size = trainingLabels->GetCount();
-					ndFloat32 score = (ndFloat32)(size - trainigFailCount) / (ndFloat32)size;
-					ndExpandTraceMessage("Best model: ");
-					ndExpandTraceMessage("  epoch: %d", epoch);
-					ndExpandTraceMessage("  success rate:%f%%", score * 100.0f);
-					ndExpandTraceMessage("  training fail count:%d", trainigFailCount);
-					ndExpandTraceMessage("  test fail count:%d\n", testFailCount);
+					m_minValidationFail = testFailCount;
+					ndExpandTraceMessage("   best model: test fail count:%d\n", testFailCount);
 				} 
-				else
-				{
-					ndInt64 trainigFailCount = ValidateData(trainingLabels, m_trainingData) + 1;
-					ndInt64 minCombinedScore = testFailCount * trainigFailCount;
-					if (minCombinedScore <= m_minCombinedScore)
-					{
-						m_minCombinedScore = minCombinedScore;
-						ndInt64 size = trainingLabels->GetCount();
-						ndFloat32 score = (ndFloat32)(size - trainigFailCount) / (ndFloat32)size;
-						ndExpandTraceMessage("  epoch: %d", epoch);
-						ndExpandTraceMessage("  success rate:%f%%", score * 100.0f);
-						ndExpandTraceMessage("  training fail count:%d", trainigFailCount);
-						ndExpandTraceMessage("  test fail count:%d\n", testFailCount);
-					}
-				}
 			}
 			trainer->GetBrain()->CopyFrom(**m_bestBrain);
 		}

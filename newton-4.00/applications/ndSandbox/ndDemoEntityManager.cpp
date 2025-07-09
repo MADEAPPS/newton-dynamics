@@ -313,7 +313,7 @@ static void SimpleRegressionBrainStressTest()
 	descritor.m_brain = brain;
 	descritor.m_context = context;
 	descritor.m_learnRate = 1.0e-4f;
-	descritor.m_minibatchSizeExp = minibatchSize;
+	descritor.m_matrixDimensionK = minibatchSize;
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
 		brain->AddLayer(layers[i]);
@@ -322,9 +322,9 @@ static void SimpleRegressionBrainStressTest()
 
 	ndBrainVector inputData;
 	ndBrainVector outputData;
-	inputData.SetCount(descritor.m_minibatchSizeExp * inputSize);
+	inputData.SetCount(descritor.m_matrixDimensionK * inputSize);
 	inputData.Set(0.0f);
-	//for (ndInt32 i = 0; i < descritor.m_minibatchSizeExp; ++i)
+	//for (ndInt32 i = 0; i < descritor.m_matrixDimensionK; ++i)
 	for (ndInt32 i = 0; i < inputData.GetCount(); ++i)
 	{
 		inputData[i] = float(i + 1);
