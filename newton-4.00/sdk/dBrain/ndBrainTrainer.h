@@ -39,6 +39,7 @@ class ndBrainTrainer: public ndBrainTrainerInference
 
 	ndBrainFloatBuffer* GetHiddenLayerGradientBuffer();
 	ndBrainFloatBuffer* GetWeightAndBiasGradientBuffer();
+	ndBrainFloatBuffer* GetPartialSumBiasGradientBuffer();
 
 	
 	//virtual void GetGradientBuffer(ndBrainVector&) const override;
@@ -62,6 +63,7 @@ class ndBrainTrainer: public ndBrainTrainerInference
 	ndSharedPtr<ndBrainFloatBuffer> m_weightAndBiasGradientsBuffer;
 	ndSharedPtr<ndBrainFloatBuffer> m_miniBatchInputGradientBuffer;
 	ndSharedPtr<ndBrainFloatBuffer> m_miniBatchOutputGradientBuffer;
+	ndSharedPtr<ndBrainFloatBuffer> m_biasPartialSumGradientsCacheBuffer;
 
 	ndList<ndSharedPtr<ndBrainBufferCommand>> m_backPropagateCommands;
 	ndList<ndSharedPtr<ndBrainBufferCommand>> m_optimizerBufferCommands;

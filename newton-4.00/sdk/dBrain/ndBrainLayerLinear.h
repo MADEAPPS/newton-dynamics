@@ -82,6 +82,8 @@ class ndBrainLayerLinear : public ndBrainLayer
 		m_biasPass,
 		m_weightsPass,
 		m_inputGradientsPass,
+		m_biasAddPartialSumPass,
+		m_biasCachePartialSumPass,
 		m_dimFactor = 16,
 	};
 
@@ -100,9 +102,12 @@ class ndBrainLayerLinear : public ndBrainLayer
 	virtual bool HasGpuSupport() const override;
 	virtual void FeedForward(const ndBrainLayerFeedForwardCpuCommand* const info, ndInt32 miniBatchIndex) const override;
 	virtual void BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const override;
+
 	void BackPropagateBiasGradients(const ndBrainLayerBackPropagateCpuCommand* const command, ndInt32 miniBatchIndex) const;
 	void BackPropagateInputGradients(const ndBrainLayerBackPropagateCpuCommand* const command, ndInt32 miniBatchIndex) const;
 	void BackPropagateWeightsGradients(const ndBrainLayerBackPropagateCpuCommand* const command, ndInt32 miniBatchIndex) const;
+	void BackPropagateBiasAddPartialSumGradients(const ndBrainLayerBackPropagateCpuCommand* const command, ndInt32 miniBatchIndex) const;
+	void BackPropagateBiasCachePartialSumGradients(const ndBrainLayerBackPropagateCpuCommand* const command, ndInt32 miniBatchIndex) const;
 	
 	virtual ndCommandArray CreateGpuFeedForwardCommand(
 		ndBrainTrainerInference* const owner,

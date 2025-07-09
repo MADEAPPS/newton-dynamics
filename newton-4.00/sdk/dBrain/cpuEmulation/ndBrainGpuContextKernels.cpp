@@ -995,8 +995,8 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
         const ndInt32 height = (outputSize + tileSize - 1) & -tileSize;
         const ndInt32 width = (inputSize + tileSize * 2 - 1) & -tileSize * 2;
 
-        //const ndInt32 groupId_x = groupId & ((1<<parameters->m_matrixDimensionK) - 1);
-        //const ndInt32 groupId_y = (groupId - groupId_x) / parameters->m_matrixDimensionK;
+        //const ndInt32 groupId_x = groupId & ((1<<parameters->m_minibatchSize) - 1);
+        //const ndInt32 groupId_y = (groupId - groupId_x) / parameters->m_minibatchSize;
         ndAssert(0);
         const ndInt32 minibatchBlockExp = parameters->m_matrixDimensionK - tileSizeBits;
         const ndInt32 groupId_x = groupId & ((1<<minibatchBlockExp) - 1);
@@ -1100,8 +1100,8 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
         const ndInt32 height = (outputSize + tileSize - 1) & -tileSize;
         const ndInt32 width = (inputSize + tileSize * 2 - 1) & -tileSize * 2;
 
-        const ndInt32 groupId_x = groupId % parameters->m_matrixDimensionK;
-        const ndInt32 groupId_y = (groupId - groupId_x) / parameters->m_matrixDimensionK;
+        const ndInt32 groupId_x = groupId % parameters->m_minibatchSize;
+        const ndInt32 groupId_y = (groupId - groupId_x) / parameters->m_minibatchSize;
 
         //Initialise the accumulation register
         const ndInt64 blockBase = groupId_x * tileSize;

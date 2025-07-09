@@ -309,11 +309,11 @@ static void SimpleRegressionBrainStressTest()
 
 	ndSharedPtr<ndBrainContext> context(new ndBrainGpuContext);
 	//ndSharedPtr<ndBrainContext> context(new ndBrainCpuContext);
-	ndTrainerDescriptor descritor;
-	descritor.m_brain = brain;
-	descritor.m_context = context;
-	descritor.m_learnRate = 1.0e-4f;
-	descritor.m_matrixDimensionK = minibatchSize;
+	ndTrainerDescriptor descriptor;
+	descriptor.m_brain = brain;
+	descriptor.m_context = context;
+	descriptor.m_learnRate = 1.0e-4f;
+	descriptor.m_minibatchSize = minibatchSize;
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
 		brain->AddLayer(layers[i]);
@@ -322,15 +322,15 @@ static void SimpleRegressionBrainStressTest()
 
 	ndBrainVector inputData;
 	ndBrainVector outputData;
-	inputData.SetCount(descritor.m_matrixDimensionK * inputSize);
+	inputData.SetCount(descriptor.m_minibatchSize * inputSize);
 	inputData.Set(0.0f);
-	//for (ndInt32 i = 0; i < descritor.m_matrixDimensionK; ++i)
+	//for (ndInt32 i = 0; i < descriptor.m_minibatchSize; ++i)
 	for (ndInt32 i = 0; i < inputData.GetCount(); ++i)
 	{
 		inputData[i] = float(i + 1);
 	}
 
-	ndSharedPtr<ndBrainTrainer> trainer(new ndBrainTrainer(descritor));
+	ndSharedPtr<ndBrainTrainer> trainer(new ndBrainTrainer(descriptor));
 	ndBrainFloatBuffer* const minibatchInputBuffer = trainer->GetInputBuffer();
 	ndBrainFloatBuffer* const minibatchOutpuBuffer = trainer->GetOuputBuffer();
 	ndBrainFloatBuffer* const minibatchOutpuGradientBuffer = trainer->GetOuputGradientBuffer();

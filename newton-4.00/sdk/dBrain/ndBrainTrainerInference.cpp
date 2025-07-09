@@ -39,7 +39,7 @@ ndTrainerDescriptor::ndTrainerDescriptor()
 	,m_context()
 	,m_learnRate(ndBrainFloat(1.0e-4f))
 	,m_regularizer(ndBrainFloat(1.0e-4f))
-	,m_matrixDimensionK(256)
+	,m_minibatchSize(256)
 	,m_regularizerType(m_ridge)
 {
 }
@@ -49,7 +49,7 @@ ndTrainerDescriptor::ndTrainerDescriptor(const ndSharedPtr<ndBrain>& brain, cons
 	,m_context(context)
 	,m_learnRate(learnRate)
 	,m_regularizer(ndBrainFloat(1.0e-4f))
-	,m_matrixDimensionK(minibatchSize)
+	,m_minibatchSize(minibatchSize)
 	,m_regularizerType(m_ridge)
 {
 }
@@ -63,7 +63,7 @@ ndBrainTrainerInference::ndBrainTrainerInference(const ndTrainerDescriptor& desc
 	,m_miniBatchOutputBuffer()
 	,m_feedForwardCommands()
 {
-	ndAssert((m_descriptor.m_matrixDimensionK & (ND_GPU_TILED_MATRIX_ROWS - 1)) == 0);
+	ndAssert((m_descriptor.m_minibatchSize & (ND_GPU_TILED_MATRIX_ROWS - 1)) == 0);
 	InitInputOutputBuffer();
 	InitWeightAndBiasBuffer();
 }
@@ -143,8 +143,8 @@ void ndBrainTrainerInference::InitInputOutputBuffer()
 	}
 	
 	ndBrainVector buffer;
-	buffer.Resize(bufferSize * m_descriptor.m_matrixDimensionK);
-	buffer.SetCount(bufferSize * m_descriptor.m_matrixDimensionK);
+	buffer.Resize(bufferSize * m_descriptor.m_minibatchSize);
+	buffer.SetCount(bufferSize * m_descriptor.m_minibatchSize);
 	buffer.Set(ndBrainFloat(0.0f));
 	m_inputOutputBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_descriptor.m_context, buffer));
 	
@@ -153,12 +153,12 @@ void ndBrainTrainerInference::InitInputOutputBuffer()
 	//copyBufferInfo.m_srcOffsetInByte = 0;
 	//copyBufferInfo.m_strideInByte = ndInt32(brain.GetInputSize() * sizeof(ndInt32));
 	//copyBufferInfo.m_srcStrideInByte = copyBufferInfo.m_strideInByte;
-	//copyBufferInfo.m_dstStrideInByte = copyBufferInfo.m_strideInByte * m_descriptor.m_matrixDimensionK;
+	//copyBufferInfo.m_dstStrideInByte = copyBufferInfo.m_strideInByte * m_descriptor.m_minibatchSize;
 	//m_singlePredictionInputBufferParameters = ndSharedPtr<ndBrainUniformBuffer>(new ndBrainUniformBuffer(*m_descriptor.m_context, ndInt64(sizeof(ndCopyBufferCommandInfo)), &copyBufferInfo));
 	//
 	//copyBufferInfo.m_strideInByte = ndInt32(brain.GetOutputSize() * sizeof(ndInt32));
 	//copyBufferInfo.m_srcStrideInByte = copyBufferInfo.m_strideInByte;
-	//copyBufferInfo.m_dstStrideInByte = copyBufferInfo.m_strideInByte * m_descriptor.m_matrixDimensionK;
+	//copyBufferInfo.m_dstStrideInByte = copyBufferInfo.m_strideInByte * m_descriptor.m_minibatchSize;
 	//m_singlePredictionOutputBufferParameters = ndSharedPtr<ndBrainUniformBuffer>(new ndBrainUniformBuffer(*m_descriptor.m_context, ndInt64(sizeof(ndCopyBufferCommandInfo)), &copyBufferInfo));
 	//
 	//m_singlePredictionInputBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_descriptor.m_context, ndInt64(brain.GetInputSize()), true));
@@ -212,11 +212,11 @@ void ndBrainTrainerInference::InitWeightAndBiasBuffer()
 	uniformData[uniformData.GetCount() - 1].m_parametersBatchSize = parametersSizeSum;
 	m_weightAndBiasBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_descriptor.m_context, scratchBuffer));
 
-	scratchBuffer.SetCount(m_descriptor.m_matrixDimensionK * brain.GetInputSize());
+	scratchBuffer.SetCount(m_descriptor.m_minibatchSize * brain.GetInputSize());
 	scratchBuffer.Set(ndBrainFloat(0.0f));
 	m_miniBatchInputBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_descriptor.m_context, scratchBuffer, true));
 
-	scratchBuffer.SetCount(m_descriptor.m_matrixDimensionK * brain.GetOutputSize());
+	scratchBuffer.SetCount(m_descriptor.m_minibatchSize * brain.GetOutputSize());
 	scratchBuffer.Set(ndBrainFloat(0.0f));
 	m_miniBatchOutputBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_descriptor.m_context, scratchBuffer, true));
 
@@ -261,7 +261,7 @@ void ndBrainTrainerInference::AddCopyInputCommand(const ndCommandSharedInfo& uni
 	ndBrainFloatBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
 	ndBrainFloatBuffer* const miniBatchInputBuffer = *m_miniBatchInputBuffer;
 
-	ndBrainBufferCommandDesc descriptor(m_descriptor.m_matrixDimensionK);
+	ndBrainBufferCommandDesc descriptor(m_descriptor.m_minibatchSize);
 	descriptor.m_context = *m_descriptor.m_context;
 	descriptor.m_owner = this;
 	descriptor.m_id = m_inputId;
@@ -325,7 +325,7 @@ void ndBrainTrainerInference::AddCopyOutputCommand()
 	ndBrainFloatBuffer* const inputOutputBuffer = *m_inputOutputBuffer;
 	ndBrainFloatBuffer* const miniBatchOutputBuffer = *m_miniBatchOutputBuffer;
 	
-	ndBrainBufferCommandDesc descriptor(m_descriptor.m_matrixDimensionK);
+	ndBrainBufferCommandDesc descriptor(m_descriptor.m_minibatchSize);
 	descriptor.m_context = *m_descriptor.m_context;
 	descriptor.m_owner = this;
 	descriptor.m_id = m_outpuId;
@@ -426,7 +426,7 @@ void ndBrainTrainerInference::AddLayersCommands(ndFixSizeArray<ndCommandSharedIn
 		uniformParam.m_parametersStartOffset = data.m_parametersStartOffset;
 
 		ndCommandArray backCommands(layer->CreateGpuFeedForwardCommand(
-			this, *m_descriptor.m_context, uniformParam, m_descriptor.m_matrixDimensionK, inputOutputBuffer, weightsBuffer));
+			this, *m_descriptor.m_context, uniformParam, m_descriptor.m_minibatchSize, inputOutputBuffer, weightsBuffer));
 		for (ndInt32 j = 0; j < backCommands.GetCount(); ++j)
 		{
 			ndSharedPtr<ndBrainBufferCommand>command(backCommands[j]);

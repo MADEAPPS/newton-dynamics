@@ -58,15 +58,15 @@ class ndBrainLayerBackPropagateCpuCommand : public ndBrainBufferCommandCpu
 	ndBrainLayer* m_layer;
 };
 
-class ndCommandArray: public ndFixSizeArray<ndBrainBufferCommand*, 8>
+class ndCommandArray: public ndFixSizeArray<ndBrainBufferCommand*, 32>
 {
 	public:
 	ndCommandArray()
-		:ndFixSizeArray<ndBrainBufferCommand*, 8>(0)
+		:ndFixSizeArray<ndBrainBufferCommand*, 32>(0)
 	{
 	}
 	ndCommandArray(ndInt32 initialSize)
-		:ndFixSizeArray<ndBrainBufferCommand*, 8>(initialSize)
+		:ndFixSizeArray<ndBrainBufferCommand*, 32>(initialSize)
 	{
 	}
 };
