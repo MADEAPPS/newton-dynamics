@@ -741,7 +741,7 @@ ndCommandArray ndBrainLayerLinear::CreateGpuBackPropagateCommand(
 			}
 
 			ndBrainBufferCommandDesc descriptor(MakeBackpropagateDesctriptor(
-				owner, context, info, 1, (size * m_dimFactor) + m_biasPass,
+				owner, context, info, 1, m_biasPass,
 				inputOutputData, weightsAndBias,
 				inputOutputGradients, weightsAndBiasGradients));
 			ndBrainBufferCommand* const command = new ndBrainLayerBackPropagateCpuCommand(descriptor, (ndBrainLayer*)this);
@@ -794,8 +794,7 @@ ndCommandArray ndBrainLayerLinear::CreateGpuBackPropagateCommand(
 			ndBrainBufferCommand* const clearBiasCommand = new ndBrainGpuCommand(clearBiasDescriptor);
 			commands.PushBack(clearBiasCommand);
 
-			ndInt32 partitionSize = 8;
-			while (size > partitionSize)
+			while (size > 1)
 			{
 				ndBrainBufferCommandDesc descriptor(
 					MakeBackpropagateDesctriptor(
@@ -815,8 +814,7 @@ ndCommandArray ndBrainLayerLinear::CreateGpuBackPropagateCommand(
 			ndCommandSharedInfo biasInfo(info);
 			ndBrainBufferCommandDesc biasDescriptor(
 				MakeBackpropagateDesctriptor(
-					owner, context, biasInfo, 1, size,
-					//inputOutputData, weightsAndBias,
+					owner, context, biasInfo, 1, 0,
 					inputOutputData, partialBiasSumBuffer,
 					inputOutputGradients, weightsAndBiasGradients));
 			biasDescriptor.m_id += id++;

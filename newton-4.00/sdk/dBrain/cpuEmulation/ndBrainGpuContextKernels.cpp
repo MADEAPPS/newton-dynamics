@@ -1431,11 +1431,9 @@ class brainLayerBrainBackPropagateMatrixBiasGradients : public ndBrainKernel
     {
     }
 
-    #pragma optimize( "", off )
+    //#pragma optimize( "", off )
     void Execute(ndInt32, ndInt32 workGroupSize)
     {
-        ndFixSizeArray<ndBrainFloat, 1024> cachedGradientSum(1024);
-
         ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
         ndBrainFloatBuffer* const buffer4 = (ndBrainFloatBuffer*)m_parameters[4];
         ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
@@ -1446,13 +1444,9 @@ class brainLayerBrainBackPropagateMatrixBiasGradients : public ndBrainKernel
 
         ndInt32 inputSize = parameters->m_inputSize;
         ndInt32 outputSize = parameters->m_outputSize;
-        ndInt32 numberOfRows = parameters->m_matrixDimensionK;
-
         ndInt32 height = (outputSize + ND_GPU_TILED_MATRIX_ROWS - 1) & -ND_GPU_TILED_MATRIX_ROWS;
         ndInt32 width = (inputSize + ND_GPU_TILED_MATRIX_COLUMNS - 1) & -ND_GPU_TILED_MATRIX_COLUMNS;
         ndInt32 matrixSize = width * height;
-
-        ndInt32 alignedOffset = (outputSize + 255) & -256;
         ndInt64 parametersStartOffset = ndInt64(parameters->m_parametersStartOffset) + matrixSize;
 
         const ndInt32 workGroupSizeReminder = outputSize % workGroupSize;
@@ -1461,47 +1455,16 @@ class brainLayerBrainBackPropagateMatrixBiasGradients : public ndBrainKernel
         {
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
             {
-                cachedGradientSum[itemId] = ndBrainFloat(0.0f);
-            }
-            for (ndInt32 row = 0; row < numberOfRows; ++row)
-            {
-                ndInt32 srcOffset = row * alignedOffset + rowBlock;
-                for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-                {
-                    ndBrainFloat biasDerivative = partialBiasSumBuffer[srcOffset + itemId];
-                    ndAssert(ndCheckValidFloat(biasDerivative));
-                    cachedGradientSum[rowBlock + itemId] += biasDerivative;
-                }
-            }
-            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-            {
-                ndBrainFloat biasDerivative = cachedGradientSum[rowBlock + itemId];
-                ndAssert (ndCheckValidFloat(biasDerivative));
+                ndBrainFloat biasDerivative = partialBiasSumBuffer[rowBlock + itemId];
+                //ndAssert(ndCheckValidFloat(biasDerivative));
                 weightAndBiasGradients[parametersStartOffset + rowBlock + itemId] = biasDerivative;
             }
         }
-        if (workGroupSizeReminder)
+        for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
         {
-            for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
-            {
-                cachedGradientSum[itemId] = ndBrainFloat(0.0f);
-            }
-            for (ndInt32 row = 0; row < numberOfRows; ++row)
-            {
-                ndInt32 srcOffset = row * alignedOffset + modWorkGroupSize;
-                for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
-                {
-                    ndBrainFloat biasDerivative = partialBiasSumBuffer[srcOffset + itemId];
-                    ndAssert(ndCheckValidFloat(biasDerivative));
-                    cachedGradientSum[modWorkGroupSize + itemId] += biasDerivative;
-                }
-            }
-            for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
-            {
-                ndBrainFloat biasDerivative = cachedGradientSum[modWorkGroupSize + itemId];
-                ndAssert(ndCheckValidFloat(biasDerivative));
-                weightAndBiasGradients[parametersStartOffset + modWorkGroupSize + itemId] = biasDerivative;
-            }
+            ndBrainFloat biasDerivative = partialBiasSumBuffer[modWorkGroupSize + itemId];
+            //ndAssert(ndCheckValidFloat(biasDerivative));
+            weightAndBiasGradients[parametersStartOffset + modWorkGroupSize + itemId] = biasDerivative;
         }
     }
 };
@@ -1726,8 +1689,8 @@ void ndBrainGpuContext::CreateKerners()
     m_brainLayerMatrixBackPropagateBiasGradients = ndSharedPtr<ndBrainKernel>(new brainLayerBrainBackPropagateMatrixBiasGradients(this));
     m_brainLayerMatrixBackPropagateInputGradients = ndSharedPtr<ndBrainKernel>(new brainLayerBrainBackPropagateMatrixInputGradients(this));
     m_brainLayerMatrixBackPropagateWeightGradients = ndSharedPtr<ndBrainKernel>(new brainLayerBrainBackPropagateMatrixWeightsGradients(this));
-    m_brainLayerMatrixBackPropagateAddBiasGradients = ndSharedPtr<ndBrainKernel>(new brainLayerBrainBackPropagateMatrixPartialSumBiasGradients(this));
     m_brainLayerMatrixBackPropagateClearBiasGradients = ndSharedPtr<ndBrainKernel>(new brainLayerBrainBackPropagateMatrixClearBiasGradients(this));
+    m_brainLayerMatrixBackPropagateAddBiasGradients = ndSharedPtr<ndBrainKernel>(new brainLayerBrainBackPropagateMatrixPartialSumBiasGradients(this));
 
     // optimizer kernels
     m_brainAdamMomentumUpdate = ndSharedPtr<ndBrainKernel>(new brainAdamMomentumUpdate(this));
