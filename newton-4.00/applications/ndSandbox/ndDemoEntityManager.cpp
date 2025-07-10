@@ -297,9 +297,9 @@ static void SimpleRegressionBrainStressTest()
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 
 	ndSetRandSeed(42);
-	ndInt32 inputSize = 32;
-	ndInt32 minibatchSize = 32;
-	ndInt32 hidenLayerWidth = 32;
+	ndInt32 inputSize = 64;
+	ndInt32 minibatchSize = 64;
+	ndInt32 hidenLayerWidth = 64;
 	//ndInt32 hidenLayerWidth = 4096;
 	layers.PushBack(new ndBrainLayerLinear(inputSize, hidenLayerWidth));
 	//layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
@@ -324,10 +324,13 @@ static void SimpleRegressionBrainStressTest()
 	ndBrainVector outputData;
 	inputData.SetCount(descriptor.m_minibatchSize * inputSize);
 	inputData.Set(0.0f);
-	//for (ndInt32 i = 0; i < descriptor.m_minibatchSize; ++i)
-	for (ndInt32 i = 0; i < inputData.GetCount(); ++i)
+	for (ndInt32 j = 0; j < descriptor.m_minibatchSize; ++j)
 	{
-		inputData[i] = float(i + 1);
+		for (ndInt32 i = 0; i < inputSize; ++i)
+		{
+			//inputData[i] = float(i + 1);
+			inputData[j * inputSize + i] = float(j + 1);
+		}
 	}
 
 	ndSharedPtr<ndBrainTrainer> trainer(new ndBrainTrainer(descriptor));
@@ -344,6 +347,15 @@ static void SimpleRegressionBrainStressTest()
 		context->SyncBufferCommandQueue();
 		minibatchOutpuBuffer->VectorFromDevice(outputData);
 
+for (ndInt32 j = 0; j < descriptor.m_minibatchSize; ++j)
+{
+	for (ndInt32 i = 0; i < hidenLayerWidth; ++i)
+	{
+		ndTrace(("%g ", outputData[j * descriptor.m_minibatchSize + i]));
+	}
+	ndTrace(("\n"));
+}
+
 outputData.Set(0.0);
 //for (ndInt32 i = 0; i < minibatchSize; ++i)
 for (ndInt32 i = 0; i < 1; ++i)
@@ -357,9 +369,9 @@ for (ndInt32 i = 0; i < 1; ++i)
 }
 
 		// calculate loss here, for now just pass the ouput data
-		minibatchOutpuGradientBuffer->VectorToDevice(outputData);
-		trainer->BackPropagate();
-		trainer->ApplyLearnRate();
+		//minibatchOutpuGradientBuffer->VectorToDevice(outputData);
+		//trainer->BackPropagate();
+		//trainer->ApplyLearnRate();
 	}
 	time = ndGetTimeInMicroseconds() - time;
 
@@ -587,8 +599,8 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	//Test0__();
 	//Test1__();
-	//SimpleRegressionBrainStressTest();
-	ndHandWrittenDigits();
+	SimpleRegressionBrainStressTest();
+	//ndHandWrittenDigits();
 	//ndCifar10ImageClassification();
 	//TargaToPng();
 }

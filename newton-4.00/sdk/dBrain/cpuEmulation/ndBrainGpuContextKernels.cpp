@@ -990,15 +990,15 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
     // inpement in speciallized instartion to speed up the opertioan 100s of times, 
     // Unfortunatly OpenCl and my intel cpu do not exposes these instrutions to the user, 
     // maybe one day. for now this will do using avx and cumpute units.
-
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
         // not need for bank odd row tricks for PC emulation
         const ndInt32 tileSize = ND_GPU_TILED_MATRIX_ROWS;
         const ndInt32 tileSizeBits = ND_GPU_TILED_MATRIX_ROWS_BITS;
-        ndBrainFloat tile_acc[tileSize][tileSize + 1];
-        ndBrainFloat tile_inputs[tileSize * 2][tileSize + 1];
-        ndBrainFloat tile_weights[tileSize * 2][tileSize + 1];
+
+        ndBrainFloat tile_acc[tileSize][tileSize];
+        ndBrainFloat tile_inputs[tileSize * 2][tileSize];
+        ndBrainFloat tile_weights[tileSize * 2][tileSize];
 
         ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
@@ -1012,9 +1012,6 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
         const ndInt32 outputSize = parameters->m_outputSize;
         const ndInt32 height = (outputSize + tileSize - 1) & -tileSize;
         const ndInt32 width = (inputSize + tileSize * 2 - 1) & -tileSize * 2;
-
-        //const ndInt32 groupId_x = groupId % parameters->m_minibatchSize;
-        //const ndInt32 groupId_y = (groupId - groupId_x) / parameters->m_minibatchSize;
 
         const ndInt32 minibatchBlock = parameters->m_matrixDimensionK >> tileSizeBits;
         const ndInt32 groupId_y = groupId / minibatchBlock;
@@ -1064,14 +1061,6 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
                 ndBrainFloat inputData0 = inputOutputData[inputStartOffset + itemId_y * inputOutputStride + itemId_x];
                 tile_weights[itemId_x][itemId_y] = weight0;
                 tile_inputs[itemId_x][itemId_y] = inputData0;
-
-                // check that the index are bank conflit free 
-                //if (itemId_x % 32 == 0)
-                //{
-                //    ndTrace(("\n"));
-                //}
-                //ndInt32 xxxx = (itemId_x * (tileSize + 1) + itemId_y) % 32;
-                //ndTrace(("%d ", xxxx));
 
                 ndBrainFloat weight1 = weightsAndBias[weightOffsetStart + (itemId_y + halfTileStart) * width + itemId_x];
                 ndBrainFloat inputData1 = inputOutputData[inputStartOffset + (itemId_y + halfTileStart) * inputOutputStride + itemId_x];

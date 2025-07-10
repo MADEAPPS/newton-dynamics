@@ -36,7 +36,7 @@ R""""(
         uint m_inputOutputStartOffset;
         uint m_parametersBatchSize;
         uint m_parametersStartOffset;
-        uint m_tiledStride;
+        uint m_matrixDimensionK;
     } UniformBufferLayerArguments;
 
     typedef struct
@@ -763,7 +763,7 @@ R""""(
         //long dstBase = inputOutputStartOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
         //long parametersStartOffset = (long)parameters->m_parametersStartOffset + matrixSize;
         //
-        //uint numberOfRows = parameters->m_tiledStride;
+        //uint numberOfRows = parameters->m_matrixDimensionK;
         //uint workGroupSizeReminder = outputSize % workGroupSize;
         //uint modWorkGroupSize = outputSize - workGroupSizeReminder;
         //for (uint rowBlock = 0; rowBlock < modWorkGroupSize; rowBlock += workGroupSize)
@@ -812,7 +812,7 @@ R""""(
         uint workGroupSize = get_local_size(0);
         
         uint inputSize = parameters->m_inputSize;
-        uint numberOfRows = parameters->m_tiledStride;
+        uint numberOfRows = parameters->m_matrixDimensionK;
         uint inputOutputSize = parameters->m_inputOutputSize;
 
         long inputOutputStartOffset = parameters->m_inputOutputStartOffset;
@@ -882,74 +882,75 @@ R""""(
             __global float* inputOutputData, 
             __global float* weightsAndBias) 
     {
-        __local float tile_inputs[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_COLUMNS+1];
-        __local float tile_weights[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_COLUMNS+1];
-        __local float tile_acc[ND_GPU_TILED_MATRIX_ROWS][ND_GPU_TILED_MATRIX_ROWS+1];
-        __local float biasCache[ND_GPU_TILED_MATRIX_ROWS * 2];
+        const uint tileSize = ND_GPU_TILED_MATRIX_ROWS;
+        const uint tileSizeBits = ND_GPU_TILED_MATRIX_ROWS_BITS;
+
+        __local float tile_acc[tileSize][tileSize + 1];
+        __local float tile_inputs[tileSize * 2][tileSize + 1];
+        __local float tile_weights[tileSize * 2][tileSize + 1];
+        __local float biasCache[tileSize];
 
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
         uint workGroupSize = get_local_size(0);
-    
+
         const uint inputSize = parameters->m_inputSize;
         const uint outputSize = parameters->m_outputSize;
-        const uint height = (outputSize + ND_GPU_TILED_MATRIX_ROWS - 1) & -ND_GPU_TILED_MATRIX_ROWS;
-        const uint width = (inputSize + ND_GPU_TILED_MATRIX_COLUMNS - 1) & -ND_GPU_TILED_MATRIX_COLUMNS;
+        const uint height = (outputSize + tileSize - 1) & -tileSize;
+        const uint width = (inputSize + tileSize * 2 - 1) & -tileSize * 2;
 
-        uint acc_x = itemId & (ND_GPU_TILED_MATRIX_ROWS-1);
-        uint acc_y = itemId >> ND_GPU_TILED_MATRIX_ROWS_BITS;
-        const uint groupId_x = groupId % parameters->m_tiledStride;
-        const uint groupId_y = (groupId - groupId_x) / parameters->m_tiledStride;
+        const uint minibatchBlock = parameters->m_matrixDimensionK >> tileSizeBits;
+        const uint groupId_y = groupId / minibatchBlock;
+        const uint groupId_x = groupId - groupId_y * minibatchBlock;
 
         //Initialise the accumulation register
-        const long blockBase = (long)(groupId_x * ND_GPU_TILED_MATRIX_ROWS);
+        const long blockBase = groupId_x * tileSize;
         const long parametersStartOffset = blockBase * width + parameters->m_parametersStartOffset;
         const long parametersBiasOffset = blockBase + width * height + parameters->m_parametersStartOffset;
 
-        if (acc_x < ND_GPU_TILED_MATRIX_ROWS)
+        uint acc_x = itemId & (tileSize-1);
+        uint acc_y = itemId >> tileSizeBits;
+        if (acc_x < tileSize)
         {
             float a = weightsAndBias[parametersBiasOffset + acc_x];
             biasCache[acc_x] = a;
-            biasCache[acc_x + ND_GPU_TILED_MATRIX_ROWS] = a;
         }
         barrier(CLK_LOCAL_MEM_FENCE); 
-        tile_acc[acc_x][acc_y] = biasCache[itemId & (2 * ND_GPU_TILED_MATRIX_ROWS - 1)];
-        barrier(CLK_LOCAL_MEM_FENCE); 
-        float acc = tile_acc[acc_y][0];
+        float acc = biasCache[acc_x];
 
         const uint inputOutputStride = parameters->m_inputOutputSize;
-        const long inputOffset = groupId_y * (long)inputOutputStride * ND_GPU_TILED_MATRIX_ROWS + parameters->m_inputOutputStartOffset;
+        const long inputOffset = groupId_y * (long)inputOutputStride * tileSize + parameters->m_inputOutputStartOffset;
 
         // Loop over all tiles
-        const uint tile_x = itemId & (ND_GPU_TILED_MATRIX_COLUMNS-1);
-        const uint tile_y0 = itemId >> ND_GPU_TILED_MATRIX_COLUMNS_BITS;
-        const uint tile_y1 = tile_y0 + ND_GPU_TILED_MATRIX_ROWS/2;
-        for (uint tile = 0; tile < width; tile += ND_GPU_TILED_MATRIX_COLUMNS)
+        uint halfTileStart = tileSize / 2;
+        uint itemId_x = itemId & (tileSize * 2 - 1);
+        uint itemId_y = itemId >> (tileSizeBits + 1);
+
+        for (uint tile = 0; tile < width; tile += tileSize * 2)
         {
-            // Load one tile of weights and one tile of inputs into local memory
+            // read the transpose of the tiles (GPU style, but too slow for CPU)
             long inputStartOffset = tile + inputOffset;
             long weightOffsetStart = tile + parametersStartOffset;
-            tile_weights[tile_y0][tile_x] = weightsAndBias[weightOffsetStart + width * tile_y0 + tile_x];
-            tile_weights[tile_y1][tile_x] = weightsAndBias[weightOffsetStart + width * tile_y1 + tile_x];
-            tile_inputs[tile_y0][tile_x] = inputOutputData[inputStartOffset + inputOutputStride * tile_y0 + tile_x];
-            tile_inputs[tile_y1][tile_x] = inputOutputData[inputStartOffset + inputOutputStride * tile_y1 + tile_x];
+
+            float weight0 = weightsAndBias[weightOffsetStart + itemId_y * width + itemId_x];
+            float inputData0 = inputOutputData[inputStartOffset + itemId_y * inputOutputStride + itemId_x];
+            tile_weights[itemId_x][itemId_y] = weight0;
+            tile_inputs[itemId_x][itemId_y] = inputData0;
+
+            float weight1 = weightsAndBias[weightOffsetStart + (itemId_y + halfTileStart) * width + itemId_x];
+            float inputData1 = inputOutputData[inputStartOffset + (itemId_y + halfTileStart) * inputOutputStride + itemId_x];
+            tile_weights[itemId_x][itemId_y + halfTileStart] = weight1;
+            tile_inputs[itemId_x][itemId_y + halfTileStart] = inputData1;
             barrier(CLK_LOCAL_MEM_FENCE); 
 
-            // Perform the computation for a single tile           
-            // TO DO: experiment by tiling the tile in registers
-            // this funtion does to reads from  shared memory, but
-            // maybe is possible ti remove on read, by using vector operation
-            // and caching a 4 x 4 register tile, further reducing one read shared
-            // so sure how much this will gain, 
-            for (uint i = 0; i < ND_GPU_TILED_MATRIX_COLUMNS; ++i)
+            // Perform the computation for a single tile
+            for (uint i = 0; i < tileSize * 2; ++i)
             {
-                float a = tile_weights[acc_y][i];
-                acc += a * tile_inputs[acc_x][i];
+                float a = tile_weights[i][acc_y];
+                acc += a * tile_inputs[i][acc_x];
             }
-            // it seems a barrier should not be nesserary here, but the kernel fail without one.
             barrier(CLK_LOCAL_MEM_FENCE); 
         }
-
         // transpose the flat array results
         tile_acc[acc_x][acc_y] = acc;
 
