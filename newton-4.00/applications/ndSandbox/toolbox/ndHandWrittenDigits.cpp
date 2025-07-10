@@ -12,7 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndTestDeepBrain.h"
 
-//#define MINIST_USE_CPU_TRAINING
+#define MINIST_USE_CPU_TRAINING
  
 //#define MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
 
@@ -330,7 +330,7 @@ static void MnistTrainingSet()
 				}
 
 				ndExpandTraceMessage("epoch: %d\n", epoch);
-#if 0
+#if 1
 				ndInt64 testFailCount = ValidateData(testLabels, m_testData);
 				if (testFailCount < m_minValidationFail)
 				{

@@ -735,7 +735,7 @@ ndCommandArray ndBrainLayerLinear::CreateGpuBackPropagateCommand(
 			ndBrainBufferCommand* const clearBiasCommand = new ndBrainLayerBackPropagateCpuCommand(clearBiasDescriptor, (ndBrainLayer*)this);
 			commands.PushBack(clearBiasCommand);
 
-			ndInt32 partitionSize = 8;
+			ndInt32 partitionSize = 1;
 			while (size > partitionSize)
 			{
 				ndBrainBufferCommandDesc descriptor(MakeBackpropagateDesctriptor(
@@ -786,12 +786,45 @@ ndCommandArray ndBrainLayerLinear::CreateGpuBackPropagateCommand(
 		}
 
 		{
+			ndInt32 size = miniBatchSize;
+			ndBrainTrainer* const trainer = (ndBrainTrainer*)owner;
+			ndBrainFloatBuffer* const partialBiasSumBuffer = trainer->GetPartialSumBiasGradientBuffer();
+
+			// init bias cradient cache buffer
+			ndBrainBufferCommandDesc clearBiasDescriptor(
+				MakeBackpropagateDesctriptor(
+					owner, context, info, size, (size * m_dimFactor) + m_biasCachePartialSumPass,
+					inputOutputData, partialBiasSumBuffer,
+					inputOutputGradients, weightsAndBiasGradients));
+			clearBiasDescriptor.m_id += id++;
+			clearBiasDescriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerMatrixBackPropagateClearBiasGradients;
+			ndBrainBufferCommand* const clearBiasCommand = new ndBrainGpuCommand(clearBiasDescriptor);
+			commands.PushBack(clearBiasCommand);
+
+			ndInt32 partitionSize = 8;
+			while (size > partitionSize)
+			{
+				ndBrainBufferCommandDesc descriptor(
+					MakeBackpropagateDesctriptor(
+						owner, context, info, size/2, size,
+						inputOutputData, partialBiasSumBuffer,
+						inputOutputGradients, weightsAndBiasGradients));
+				descriptor.m_id += id++;
+				descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerMatrixBackPropagateAddBiasGradients;
+
+				ndBrainBufferCommand* const command = new ndBrainGpuCommand(descriptor);
+				commands.PushBack(command);
+
+				size = size / 2;
+			}
+
 			// add the bias gradient kernel;
 			ndCommandSharedInfo biasInfo(info);
 			ndBrainBufferCommandDesc biasDescriptor(
 				MakeBackpropagateDesctriptor(
-					owner, context, biasInfo, 1, miniBatchSize,
-					inputOutputData, weightsAndBias,
+					owner, context, biasInfo, 1, size,
+					//inputOutputData, weightsAndBias,
+					inputOutputData, partialBiasSumBuffer,
 					inputOutputGradients, weightsAndBiasGradients));
 			biasDescriptor.m_id += id++;
 			biasDescriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerMatrixBackPropagateBiasGradients;

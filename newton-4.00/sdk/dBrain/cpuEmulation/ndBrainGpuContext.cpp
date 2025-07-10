@@ -125,6 +125,7 @@ void ndBrainGpuContext::SyncBufferCommandQueue()
 	// do nothing. cpu kernels always wait for completion.
 }
 
+//#pragma optimize( "", off )
 void ndBrainGpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
 {
 	ndBrainBufferCommandDesc& desc = command->GetDescriptor();
@@ -140,10 +141,11 @@ void ndBrainGpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
 	auto ExecuteCommand = ndMakeObject::ndFunction([this, &iterator, &command](ndInt32, ndInt32)
 	{
 		ndBrainBufferCommandDesc& desc = command->GetDescriptor();
+
+		ndBrainKernel& shader = **desc.m_kernel;
 		ndInt32 workGroupdSize = ndInt32(desc.m_workGroupSize);
 		ndInt32 numberOfWorkGrouds = ndInt32(desc.m_miniBatchSize);
 
-		ndBrainKernel& shader = **desc.m_kernel;
 		for (ndInt32 i = iterator++; i < numberOfWorkGrouds; i = iterator++)
 		{
 			shader.Execute(i, workGroupdSize);
