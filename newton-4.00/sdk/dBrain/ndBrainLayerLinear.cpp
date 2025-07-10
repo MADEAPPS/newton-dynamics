@@ -516,15 +516,8 @@ void ndBrainLayerLinear::BackPropagateBiasGradients(const ndBrainLayerBackPropag
 	ndInt32 matrixSize = inputSize * outputSize;
 
 	ndBrainMemVector biasRowGradients(&weightAndBiasGradients[info.m_parametersStartOffset + matrixSize], outputSize);
-	biasRowGradients.Set(ndBrainFloat(0.0f));
-
-	ndInt32 alignedOffset = (outputSize + 255) & -256;
-	const ndInt32 minibatchSize = info.m_matrixDimensionK / m_dimFactor;
-	for (ndInt32 i = 0; i < minibatchSize; ++i)
-	{
-		const ndBrainMemVector outputDerivative(&partialBiasSumBuffer[i * alignedOffset], outputSize);
-		biasRowGradients.Add(outputDerivative);
-	}
+	const ndBrainMemVector outputDerivative(&partialBiasSumBuffer[0], outputSize);
+	biasRowGradients.Set(outputDerivative);
 }
 
 void ndBrainLayerLinear::BackPropagateBiasCachePartialSumGradients(const ndBrainLayerBackPropagateCpuCommand* const command, ndInt32 miniBatchIndex) const
@@ -735,8 +728,7 @@ ndCommandArray ndBrainLayerLinear::CreateGpuBackPropagateCommand(
 			ndBrainBufferCommand* const clearBiasCommand = new ndBrainLayerBackPropagateCpuCommand(clearBiasDescriptor, (ndBrainLayer*)this);
 			commands.PushBack(clearBiasCommand);
 
-			ndInt32 partitionSize = 1;
-			while (size > partitionSize)
+			while (size > 1)
 			{
 				ndBrainBufferCommandDesc descriptor(MakeBackpropagateDesctriptor(
 					owner, context, info, size/2, (size * m_dimFactor) + m_biasAddPartialSumPass,
@@ -747,6 +739,7 @@ ndCommandArray ndBrainLayerLinear::CreateGpuBackPropagateCommand(
 
 				size = size / 2;
 			}
+
 			ndBrainBufferCommandDesc descriptor(MakeBackpropagateDesctriptor(
 				owner, context, info, 1, (size * m_dimFactor) + m_biasPass,
 				inputOutputData, weightsAndBias,
