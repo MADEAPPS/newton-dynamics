@@ -124,6 +124,7 @@ void ndBrainCpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
 	{
 		const ndBrainBufferCommandDesc& descriptor = command->GetDescriptor();
 		ndBrainBufferCommandCpu* const cpuCommand = (ndBrainBufferCommandCpu*)command;
+
 		for (ndInt32 i = iterator++; i < descriptor.m_miniBatchSize; i = iterator++)
 		{
 			cpuCommand->Execute(i);
