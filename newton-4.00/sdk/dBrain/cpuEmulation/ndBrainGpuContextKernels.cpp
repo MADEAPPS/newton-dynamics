@@ -1343,7 +1343,6 @@ class brainLayerBrainBackPropagateMatrixClearBiasGradients : public ndBrainKerne
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
-//return;
         ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
         ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
         ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
