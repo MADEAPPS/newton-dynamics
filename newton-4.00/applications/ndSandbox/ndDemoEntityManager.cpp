@@ -336,6 +336,7 @@ static void SimpleRegressionBrainStressTest()
 	ndSharedPtr<ndBrainTrainer> trainer(new ndBrainTrainer(descriptor));
 	ndBrainFloatBuffer* const minibatchInputBuffer = trainer->GetInputBuffer();
 	ndBrainFloatBuffer* const minibatchOutpuBuffer = trainer->GetOuputBuffer();
+	ndBrainFloatBuffer* const minibatchInputGradientBuffer = trainer->GetInputGradientBuffer();
 	ndBrainFloatBuffer* const minibatchOutpuGradientBuffer = trainer->GetOuputGradientBuffer();
 
 	minibatchInputBuffer->VectorToDevice(inputData);
@@ -347,31 +348,42 @@ static void SimpleRegressionBrainStressTest()
 		context->SyncBufferCommandQueue();
 		minibatchOutpuBuffer->VectorFromDevice(outputData);
 
+//for (ndInt32 j = 0; j < descriptor.m_minibatchSize; ++j)
+//{
+//	for (ndInt32 i = 0; i < hidenLayerWidth; ++i)
+//	{
+//		ndTrace(("%g ", outputData[j * descriptor.m_minibatchSize + i]));
+//	}
+//	ndTrace(("\n"));
+//}
+
+outputData.Set(0.0);
 for (ndInt32 j = 0; j < descriptor.m_minibatchSize; ++j)
 {
 	for (ndInt32 i = 0; i < hidenLayerWidth; ++i)
 	{
-		ndTrace(("%g ", outputData[j * descriptor.m_minibatchSize + i]));
-	}
-	ndTrace(("\n"));
-}
-
-outputData.Set(0.0);
-//for (ndInt32 i = 0; i < minibatchSize; ++i)
-for (ndInt32 i = 0; i < 1; ++i)
-{
-	//for (ndInt32 j = 0; j < 4; ++j)
-	for (ndInt32 j = 0; j < minibatchSize; ++j)
-	{
-		//outputData[j * minibatchSize + i] = float(j * 4 + i + 1);
-		outputData[i * minibatchSize + j] = float(j + 1);
+		//inputData[i] = float(i + 1);
+		outputData[j * inputSize + i] = float(j + 1);
 	}
 }
 
 		// calculate loss here, for now just pass the ouput data
-		//minibatchOutpuGradientBuffer->VectorToDevice(outputData);
-		//trainer->BackPropagate();
+		minibatchOutpuGradientBuffer->VectorToDevice(outputData);
+		trainer->BackPropagate();
 		//trainer->ApplyLearnRate();
+		minibatchInputGradientBuffer->VectorFromDevice(outputData);
+
+for (ndInt32 j = 0; j < descriptor.m_minibatchSize; ++j)
+{
+	//for (ndInt32 i = 0; i < inputSize; ++i)
+	for (ndInt32 i = 0; i < 10; ++i)
+	{
+		ndTrace(("%g ", outputData[j * descriptor.m_minibatchSize + i]));
+	}
+ 	ndTrace(("\n"));
+}
+
+
 	}
 	time = ndGetTimeInMicroseconds() - time;
 
@@ -599,8 +611,8 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	//Test0__();
 	//Test1__();
-	SimpleRegressionBrainStressTest();
-	//ndHandWrittenDigits();
+	//SimpleRegressionBrainStressTest();
+	ndHandWrittenDigits();
 	//ndCifar10ImageClassification();
 	//TargaToPng();
 }
