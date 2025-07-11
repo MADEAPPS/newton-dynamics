@@ -1151,11 +1151,10 @@ class brainLayerBrainBackPropagateMatrixInputGradients : public ndBrainKernel
         const ndInt32 groupId_y = groupId / minibatchBlock;
         const ndInt32 groupId_x = groupId - groupId_y * minibatchBlock;
 
-        const ndInt32 width = (inputSize + (tileSize * 2) - 1) & -(tileSize * 2);
         const ndInt32 inputOutputStride = parameters->m_inputOutputSize;
+        const ndInt32 width = (inputSize + (tileSize * 2) - 1) & -(tileSize * 2);
         const ndInt64 inputOffset = groupId_x * ndInt64(tileSize) * inputOutputStride + inputOutputStartOffset;
         const ndInt64 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
-
         const ndInt64 parametersStartOffset = groupId_y * ndInt64(tileSize) + parameters->m_parametersStartOffset;
 
         // Loop over all tiles
