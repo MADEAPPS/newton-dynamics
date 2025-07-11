@@ -59,7 +59,6 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 	ndSharedPtr<ndBrainKernel> m_brainLayerSoftmaxActivation;
 	ndSharedPtr<ndBrainKernel> m_brainLayerDropOutActivation;
 	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixMatrixMultiply;
-	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixMatrixMultiplyOld;
 
 	// back propagate shaders
 	ndSharedPtr<ndBrainKernel> m_brainCopyInputGradients;
