@@ -330,7 +330,7 @@ static void MnistTrainingSet()
 				}
 
 				ndExpandTraceMessage("epoch: %d\n", epoch);
-#if 1
+#if 0
 				ndInt64 testFailCount = ValidateData(testLabels, m_testData);
 				if (testFailCount < m_minValidationFail)
 				{
