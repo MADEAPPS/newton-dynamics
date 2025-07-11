@@ -293,19 +293,43 @@ static void Test1__()
 
 static void SimpleRegressionBrainStressTest()
 {
+	ndInt32 nunberOfSamples = 1024 * 32;
+
+	ndBrainVector data;
+	ndBrainVector truth;
+	ndArray<ndUnsigned32> shuffleBuffer;
+	ndBrainFloat sinWavePeriod = 100.0f;
+
+	data.SetCount(nunberOfSamples);
+	truth.SetCount(nunberOfSamples);
+	shuffleBuffer.SetCount(nunberOfSamples);
+	for (ndInt32 i = 0; i < nunberOfSamples; ++i)
+	{
+		ndBrainFloat arg = 2.0f * ndPi * ndBrainFloat(i) / sinWavePeriod;
+		ndBrainFloat a = ndSin(arg);
+		truth[i] = a;
+		data[i] = arg;
+		shuffleBuffer[i] = ndUnsigned32(i);
+	}
+
+	ndSetRandSeed(42);
+	ndInt32 inputSize = 1;
+	ndInt32 minibatchSize = 32;
+	ndInt32 numberOfEpochs = 10;
+	ndInt32 hidenLayerWidth = 32;
 	ndSharedPtr<ndBrain> brain(new ndBrain);
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 
-	ndSetRandSeed(42);
-	ndInt32 inputSize = 64;
-	ndInt32 minibatchSize = 64;
-	ndInt32 hidenLayerWidth = 64;
-	//ndInt32 hidenLayerWidth = 4096;
+#if 0
 	layers.PushBack(new ndBrainLayerLinear(inputSize, hidenLayerWidth));
-	//layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
-	//layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hidenLayerWidth));
-	//layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
-	//layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
+	layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
+	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hidenLayerWidth));
+	layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
+	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
+	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
+#else
+	layers.PushBack(new ndBrainLayerLinear(inputSize, 1));
+#endif
 
 	ndSharedPtr<ndBrainContext> context(new ndBrainGpuContext);
 	//ndSharedPtr<ndBrainContext> context(new ndBrainCpuContext);
@@ -320,58 +344,61 @@ static void SimpleRegressionBrainStressTest()
 	}
 	brain->InitWeights();
 
-	ndBrainVector inputData;
-	ndBrainVector outputData;
-	inputData.SetCount(descriptor.m_minibatchSize * inputSize);
-	inputData.Set(0.0f);
-	for (ndInt32 j = 0; j < descriptor.m_minibatchSize; ++j)
-	{
-		for (ndInt32 i = 0; i < inputSize; ++i)
-		{
-			//inputData[i] = float(i + 1);
-			inputData[j * inputSize + i] = float(j + 1);
-		}
-	}
-
 	ndSharedPtr<ndBrainTrainer> trainer(new ndBrainTrainer(descriptor));
 	ndBrainFloatBuffer* const minibatchInputBuffer = trainer->GetInputBuffer();
 	ndBrainFloatBuffer* const minibatchOutpuBuffer = trainer->GetOuputBuffer();
+	ndBrainFloatBuffer* const minibatchInputGradientBuffer = trainer->GetInputGradientBuffer();
 	ndBrainFloatBuffer* const minibatchOutpuGradientBuffer = trainer->GetOuputGradientBuffer();
 
-	minibatchInputBuffer->VectorToDevice(inputData);
+	ndBrainFloatBuffer trainingData(*context, data);
+	ndBrainIntegerBuffer indirectMiniBatch(*context, minibatchSize, true);
+
+	ndInt32 batchesCount = nunberOfSamples / minibatchSize;
+	ndInt32 batchesSize = batchesCount * minibatchSize;
+	size_t strideInBytes = size_t(inputSize * sizeof(ndReal));
+
+	ndCopyBufferCommandInfo copyBufferInfo;
+	copyBufferInfo.m_dstOffsetInByte = 0;
+	copyBufferInfo.m_srcOffsetInByte = 0;
+	copyBufferInfo.m_strideInByte = ndInt32(strideInBytes);
+	copyBufferInfo.m_srcStrideInByte = ndInt32(strideInBytes);
+	copyBufferInfo.m_dstStrideInByte = ndInt32(strideInBytes);
+
+	ndBrainVector miniBatchOutput;
+	ndBrainVector miniBatchOutputGradients;
+	ndBrainLossLeastSquaredError loss(1);
+	ndBrainVector miniBatchInputGradients;
+
+	miniBatchOutputGradients.SetCount(minibatchSize);
 
 	ndUnsigned64 time = ndGetTimeInMicroseconds();
-	for (ndInt32 epoch = 0; epoch < 5; ++epoch)
+	for (ndInt32 epoch = 0; epoch < numberOfEpochs; ++epoch)
 	{
-		trainer->MakePrediction();
-		context->SyncBufferCommandQueue();
-		minibatchOutpuBuffer->VectorFromDevice(outputData);
+		shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
+		for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += minibatchSize)
+		{
+			indirectMiniBatch.MemoryToDevice(0, minibatchSize * sizeof(ndUnsigned32), &shuffleBuffer[batchStart]);
+			minibatchInputBuffer->CopyBufferIndirect(copyBufferInfo, indirectMiniBatch, trainingData);
 
-for (ndInt32 j = 0; j < descriptor.m_minibatchSize; ++j)
-{
-	for (ndInt32 i = 0; i < hidenLayerWidth; ++i)
-	{
-		ndTrace(("%g ", outputData[j * descriptor.m_minibatchSize + i]));
-	}
-	ndTrace(("\n"));
-}
+			trainer->MakePrediction();
+			minibatchOutpuBuffer->VectorFromDevice(miniBatchOutput);
+			for (ndInt32 i = 0; i < minibatchSize; ++i)
+			{
+				ndUnsigned32 index = shuffleBuffer[batchStart + i];
+				ndBrainMemVector grad(&miniBatchOutputGradients[i], 1);
+				const ndBrainMemVector output(&miniBatchOutput[i], 1);
+				const ndBrainMemVector groundTruth(&truth[index], 1);
+				loss.SetTruth(groundTruth);
+				loss.GetLoss(output, grad);
+			}
+			minibatchOutpuGradientBuffer->VectorToDevice(miniBatchOutputGradients);
+			trainer->BackPropagate();
+			trainer->ApplyLearnRate();
+			context->SyncBufferCommandQueue();
 
-outputData.Set(0.0);
-//for (ndInt32 i = 0; i < minibatchSize; ++i)
-for (ndInt32 i = 0; i < 1; ++i)
-{
-	//for (ndInt32 j = 0; j < 4; ++j)
-	for (ndInt32 j = 0; j < minibatchSize; ++j)
-	{
-		//outputData[j * minibatchSize + i] = float(j * 4 + i + 1);
-		outputData[i * minibatchSize + j] = float(j + 1);
-	}
-}
-
-		// calculate loss here, for now just pass the ouput data
-		//minibatchOutpuGradientBuffer->VectorToDevice(outputData);
-		//trainer->BackPropagate();
-		//trainer->ApplyLearnRate();
+			minibatchInputGradientBuffer->VectorFromDevice(miniBatchInputGradients);
+			epoch *= 1;
+		}
 	}
 	time = ndGetTimeInMicroseconds() - time;
 
@@ -600,7 +627,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//Test0__();
 	//Test1__();
 	SimpleRegressionBrainStressTest();
-	//ndHandWrittenDigits();
+	ndHandWrittenDigits();
 	//ndCifar10ImageClassification();
 	//TargaToPng();
 }

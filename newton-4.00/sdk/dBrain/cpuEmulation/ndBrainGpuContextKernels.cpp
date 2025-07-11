@@ -1151,8 +1151,8 @@ class brainLayerBrainBackPropagateMatrixInputGradients : public ndBrainKernel
         const ndInt32 groupId_y = groupId / minibatchBlock;
         const ndInt32 groupId_x = groupId - groupId_y * minibatchBlock;
 
-        const ndInt32 width = (inputSize + (tileSize * 2) - 1) & -(tileSize * 2);
         const ndInt32 inputOutputStride = parameters->m_inputOutputSize;
+        const ndInt32 width = (inputSize + (tileSize * 2) - 1) & -(tileSize * 2);
         const ndInt64 inputOffset = groupId_x * ndInt64(tileSize) * inputOutputStride + inputOutputStartOffset;
         const ndInt64 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
 
@@ -1395,15 +1395,14 @@ class brainLayerBrainBackPropagateMatrixWeightsGradients : public ndBrainKernel
         ndInt64 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         ndInt64 dstBase = inputOutputStartOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
 
-        for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+        for (ndInt32 i = 0; i < numberOfRows; i += workGroupSize)
         {
-            if (itemId == 0)
+            ndInt64 baseOffset = dstBase + i * inputOutputSize;
+            ndInt32 count = ((i + workGroupSize) < numberOfRows) ? workGroupSize : numberOfRows - i;
+            for (ndInt32 itemId = 0; itemId < count; ++itemId)
             {
-                for (ndInt32 row = 0; row < numberOfRows; ++row)
-                {
-                    ndBrainFloat outputDerivative = inputOutputGradients[dstBase + row * inputOutputSize + groupId];
-                    cachedOutputGradients[row] = outputDerivative;
-                }
+                ndBrainFloat outputDerivative = inputOutputGradients[baseOffset + itemId * inputOutputSize + groupId];
+                cachedOutputGradients[i + itemId] = outputDerivative;
             }
         }
 
