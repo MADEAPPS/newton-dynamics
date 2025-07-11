@@ -1394,14 +1394,15 @@ class brainLayerBrainBackPropagateMatrixWeightsGradients : public ndBrainKernel
         ndInt64 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         ndInt64 dstBase = inputOutputStartOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
 
-        for (ndInt32 i = 0; i < numberOfRows; i += workGroupSize)
+        for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
         {
-            ndInt64 baseOffset = dstBase + i * inputOutputSize;
-            ndInt32 count = ((i + workGroupSize) < numberOfRows) ? workGroupSize : numberOfRows - i;
-            for (ndInt32 itemId = 0; itemId < count; ++itemId)
+            if (itemId == 0)
             {
-                ndBrainFloat outputDerivative = inputOutputGradients[baseOffset + itemId * inputOutputSize + groupId];
-                cachedOutputGradients[i + itemId] = outputDerivative;
+                for (ndInt32 row = 0; row < numberOfRows; ++row)
+                {
+                    ndBrainFloat outputDerivative = inputOutputGradients[dstBase + row * inputOutputSize + groupId];
+                    cachedOutputGradients[row] = outputDerivative;
+                }
             }
         }
 

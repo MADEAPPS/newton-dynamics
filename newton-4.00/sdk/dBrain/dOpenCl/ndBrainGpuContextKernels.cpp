@@ -623,31 +623,6 @@ R""""(
         }
     }
 
-    __kernel void brainAccumulateGradientsAndAverage(
-            __global const UniformBufferLayerArguments* parameters,
-            __global float* gradientBuffer)
-    {
-        uint itemId = get_local_id(0);
-        uint groupId = get_group_id(0);
-        uint workGroupSize = get_local_size(0);
-
-        uint inputSize = parameters->m_inputSize;
-        uint miniBatchSize = parameters->m_inputOutputSize;
-        
-        float sum = 0.0f;
-        long start = (long)groupId * workGroupSize;
-        for (uint j = 0; j < miniBatchSize; ++j)
-        {
-            long base = start + j * inputSize;
-            sum += gradientBuffer[base + itemId];
-        }
-        float weightFactor = 1.0f / (float)miniBatchSize;
-        // is this needed?
-        barrier(CLK_LOCAL_MEM_FENCE); 
-
-        gradientBuffer[start + itemId] = sum * weightFactor;
-    }
-
     __kernel void brainAdamUpdateLassoRegularizer(
         __global const UniformBufferOptimizerArguments* parameters,
         __global float* weightAndBiasBuffer, __global float* weightAndBiasGradientBuffer,
@@ -661,8 +636,9 @@ R""""(
         float regularizer = -parameters->m_decayRegularizer;
 
         uint start = groupId * workGroupSize;
+        float miniBatchWeight = parameters->m_minibathScale;
 
-        float temp = weightAndBiasGradientBuffer[start + itemId];
+        float temp = miniBatchWeight * weightAndBiasGradientBuffer[start + itemId];
         float a = vdw[start + itemId] * parameters->m_alpha + temp * (1.0f - parameters->m_alpha);
         vdw[start + itemId] = a;
             
@@ -695,8 +671,9 @@ R""""(
         float regularizer = -parameters->m_decayRegularizer;
 
         long start = groupId * (long)workGroupSize;
+        float miniBatchWeight = parameters->m_minibathScale;
 
-        float temp = weightAndBiasGradientBuffer[start + itemId];
+        float temp = miniBatchWeight * weightAndBiasGradientBuffer[start + itemId];
         float a = vdw[start + itemId] * parameters->m_alpha + temp * (1.0f - parameters->m_alpha);
         vdw[start + itemId] = a;
             
@@ -721,88 +698,118 @@ const char* ndBrainGpuContext::m_matrixWeightsAndBiasGradients =
 R""""(
 
     __kernel void brainLayerBrainBackPropagateMatrixClearBiasGradients(
-            __global const UniformBufferLayerArguments* parameters, 
-            __global float* inputOutputData, 
-            __global float* weightAndBias, 
-            __global float* inputOutputGradients,
-            __global float* weightAndBiasGradients) 
+        __global const UniformBufferLayerArguments* parameters, 
+        __global float* inputOutputData, 
+        __global float* partialBiasSumBuffer, 
+        __global float* inputOutputGradients,
+        __global float* weightAndBiasGradients) 
     {
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+
+        const uint inputSize = parameters->m_inputSize;
+        const uint outputSize = parameters->m_outputSize;
+        const uint inpuOutputStride = parameters->m_inputOutputSize;
+
+        const uint alignedOffset = (outputSize + 255) & -256;
+        const uint dstOffset = groupId * alignedOffset;
+        const uint srcOffset = parameters->m_inputOutputStartOffset + inputSize + groupId * inpuOutputStride;
+
+        const uint workGroupSizeReminder = outputSize % workGroupSize;
+        const uint modWorkGroupSize = outputSize - workGroupSizeReminder;
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            float outputDerivative = inputOutputGradients[srcOffset + i + itemId];
+            partialBiasSumBuffer[dstOffset + i + itemId] = outputDerivative;
+        }
+        if (itemId < workGroupSizeReminder)
+        {
+            float outputDerivative = inputOutputGradients[srcOffset + modWorkGroupSize + itemId];
+            partialBiasSumBuffer[dstOffset + modWorkGroupSize + itemId] = outputDerivative;
+        }
     }
 
     __kernel void brainLayerBrainBackPropagateMatrixPartialSumBiasGradients(
-            __global const UniformBufferLayerArguments* parameters, 
-            __global float* inputOutputData, 
-            __global float* weightAndBias, 
-            __global float* inputOutputGradients,
-            __global float* weightAndBiasGradients) 
+        __global const UniformBufferLayerArguments* parameters, 
+        __global float* inputOutputData, 
+        __global float* partialBiasSumBuffer, 
+        __global float* inputOutputGradients,
+        __global float* weightAndBiasGradients) 
     {
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+
+        const uint minibatchSize = parameters->m_matrixDimensionK;
+        if ((minibatchSize & 1) == 0)
+        {
+            uint outputSize = parameters->m_outputSize;
+            uint alignedOffset = (outputSize + 255) & -256;
+
+            uint dstOffset = groupId * alignedOffset;
+            uint srcOffset = dstOffset + alignedOffset * minibatchSize / 2;
+
+            const uint workGroupSizeReminder = outputSize % workGroupSize;
+            const uint modWorkGroupSize = outputSize - workGroupSizeReminder;
+            for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+            {
+                float biasGradient = partialBiasSumBuffer[srcOffset + i + itemId];
+                partialBiasSumBuffer[dstOffset + i + itemId] += biasGradient;
+            }
+            if (itemId < workGroupSizeReminder)
+            {
+                float biasGradient = partialBiasSumBuffer[srcOffset + modWorkGroupSize + itemId];
+                partialBiasSumBuffer[dstOffset + modWorkGroupSize + itemId] += biasGradient;
+            }
+        }
     }
 
     __kernel void brainLayerBrainBackPropagateMatrixBiasGradients(
-            __global const UniformBufferLayerArguments* parameters, 
-            __global float* inputOutputData, 
-            __global float* weightAndBias, 
-            __global float* inputOutputGradients,
-            __global float* weightAndBiasGradients) 
+        __global const UniformBufferLayerArguments* parameters, 
+        __global float* inputOutputData, 
+        __global float* partialBiasSumBuffer, 
+        __global float* inputOutputGradients,
+        __global float* weightAndBiasGradients) 
     {
-        //__local float cachedGradientSum[1024];
-        //
-        //uint itemId = get_local_id(0);
-        //uint groupId = get_group_id(0);
-        //uint workGroupSize = get_local_size(0);
-        //
-        //uint inputSize = parameters->m_inputSize;
-        //uint outputSize = parameters->m_outputSize;
-        //uint inputOutputSize = parameters->m_inputOutputSize;
-        //
-        //uint width = (inputSize + ND_GPU_TILED_MATRIX_COLUMNS - 1) & -ND_GPU_TILED_MATRIX_COLUMNS;
-        //uint height = (outputSize + ND_GPU_TILED_MATRIX_ROWS - 1) & -ND_GPU_TILED_MATRIX_ROWS;
-        //uint matrixSize = width * height;
-        //
-        //long inputOutputStartOffset = (long)parameters->m_inputOutputStartOffset;
-        //long dstBase = inputOutputStartOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
-        //long parametersStartOffset = (long)parameters->m_parametersStartOffset + matrixSize;
-        //
-        //uint numberOfRows = parameters->m_matrixDimensionK;
-        //uint workGroupSizeReminder = outputSize % workGroupSize;
-        //uint modWorkGroupSize = outputSize - workGroupSizeReminder;
-        //for (uint rowBlock = 0; rowBlock < modWorkGroupSize; rowBlock += workGroupSize)
-        //{
-        //    cachedGradientSum[itemId] = 0.0f;
-        //    for (uint row = 0; row < numberOfRows; ++row)
-        //    {
-        //        float outputDerivative = inputOutputGradients[dstBase + row * inputOutputSize + itemId];
-        //        cachedGradientSum[itemId] += outputDerivative;
-        //    }
-        //    float outputDerivative = cachedGradientSum[itemId];
-        //    weightAndBiasGradients[parametersStartOffset + rowBlock + itemId] = outputDerivative;
-        //}
-        //
-        //if (workGroupSizeReminder != 0)
-        //{
-        //    cachedGradientSum[itemId] = 0.0f;
-        //    for (uint row = 0; row < numberOfRows; ++row)
-        //    {
-        //        if(itemId < workGroupSizeReminder)
-        //        {
-        //            float outputDerivative = inputOutputGradients[dstBase + row * inputOutputSize + itemId];
-        //            cachedGradientSum[itemId] += outputDerivative;
-        //        }
-        //    }
-        //    if(itemId < workGroupSizeReminder)
-        //    {
-        //        float outputDerivative = cachedGradientSum[itemId];
-        //        weightAndBiasGradients[parametersStartOffset + modWorkGroupSize + itemId] = outputDerivative;
-        //    }
-        //}
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+
+        //floatBuffer* const buffer2 = (floatBuffer*)m_parameters[2];
+        //floatBuffer* const buffer4 = (floatBuffer*)m_parameters[4];
+        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
+        //float* const partialBiasSumBuffer = (float*)buffer2->GetGpuBuffer()->GetPtr();
+        //float* const weightAndBiasGradients = (float*)buffer4->GetGpuBuffer()->GetPtr();
+        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetGpuBuffer()->GetPtr();
+
+        const uint inputSize = parameters->m_inputSize;
+        const uint outputSize = parameters->m_outputSize;
+        const uint height = (outputSize + ND_GPU_TILED_MATRIX_ROWS - 1) & -ND_GPU_TILED_MATRIX_ROWS;
+        const uint width = (inputSize + ND_GPU_TILED_MATRIX_COLUMNS - 1) & -ND_GPU_TILED_MATRIX_COLUMNS;
+        const uint matrixSize = width * height;
+        const uint parametersStartOffset = parameters->m_parametersStartOffset + matrixSize;
+
+        const uint workGroupSizeReminder = outputSize % workGroupSize;
+        const uint modWorkGroupSize = outputSize - workGroupSizeReminder;
+        for (uint rowBlock = 0; rowBlock < modWorkGroupSize; rowBlock += workGroupSize)
+        {
+            float biasDerivative = partialBiasSumBuffer[rowBlock + itemId];
+            weightAndBiasGradients[parametersStartOffset + rowBlock + itemId] = biasDerivative;
+        }
+        if (itemId < workGroupSizeReminder)
+        {
+            float biasDerivative = partialBiasSumBuffer[modWorkGroupSize + itemId];
+            weightAndBiasGradients[parametersStartOffset + modWorkGroupSize + itemId] = biasDerivative;
+        }
     }
 
     __kernel void brainLayerBrainBackPropagateMatrixWeightsGradients(
-            __global const UniformBufferLayerArguments* parameters, 
-            __global float* inputOutputData, 
-            __global float* weightAndBias, 
-            __global float* inputOutputGradients,
-            __global float* weightAndBiasGradients) 
+        __global const UniformBufferLayerArguments* parameters, 
+        __global float* inputOutputData, 
+        __global float* weightAndBias, 
+        __global float* inputOutputGradients,
+        __global float* weightAndBiasGradients) 
     {
         __local float cachedRowGradient[1024];
         __local float cachedOutputGradients[ND_GPU_LOCAL_BUFFER_SIZE];
@@ -818,14 +825,25 @@ R""""(
         long inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         long dstBase = inputOutputStartOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
 
-        if (itemId == 0)
+        //if (itemId == 0)
+        //{
+        //    for (uint row = 0; row < numberOfRows; ++row)
+        //    {
+        //        float outputDerivative = inputOutputGradients[dstBase + row * inputOutputSize + groupId];
+        //        cachedOutputGradients[row] = outputDerivative;
+        //    }
+        //}
+        for (uint i = 0; i < numberOfRows; i += workGroupSize)
         {
-            for (uint row = 0; row < numberOfRows; ++row)
+            long baseOffset = dstBase + i * inputOutputSize;
+            uint count = ((i + workGroupSize) < numberOfRows) ? workGroupSize : numberOfRows - i;
+            if (itemId < count)
             {
-                float outputDerivative = inputOutputGradients[dstBase + row * inputOutputSize + groupId];
-                cachedOutputGradients[row] = outputDerivative;
+                ndBrainFloat outputDerivative = inputOutputGradients[baseOffset + itemId * inputOutputSize + groupId];
+                cachedOutputGradients[i + itemId] = outputDerivative;
             }
         }
+        barrier(CLK_LOCAL_MEM_FENCE); 
 
         const uint workGroupSizeReminder = inputSize % workGroupSize;
         const uint modWorkGroupSize = inputSize - workGroupSizeReminder;
@@ -954,18 +972,6 @@ R""""(
         // transpose the flat array results
         tile_acc[acc_x][acc_y] = acc;
 
-        //const uint numberOutput = ((groupId_x + 1) * tileSize < outputSize) ? tileSize : outputSize - groupId_x * tileSize;
-        //long outputOffset = groupId_x * tileSize + long(inputOffset) + __cpuKernelRoundoff(inputSize, workGroupSize);
-        //ndAssert(outputOffset >= 0);
-        //for (uint itemId = 0; itemId < workGroupSize; ++itemId)
-        //{
-        //    uint itemId_x = itemId & (tileSize - 1);
-        //    uint itemId_y = itemId >> tileSizeBits;
-        //    if (itemId_x < numberOutput)
-        //    {
-        //        inputOutputData[outputOffset + itemId_y * inputOutputStride + acc_x] = value;
-        //    }
-        //}
         const uint numberOutput = ((groupId_x + 1) * ND_GPU_TILED_MATRIX_ROWS < outputSize) ? ND_GPU_TILED_MATRIX_ROWS : outputSize - groupId_x * ND_GPU_TILED_MATRIX_ROWS;
         long outputOffset = groupId_x * ND_GPU_TILED_MATRIX_ROWS + (long)inputOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
         outputOffset += acc_y * inputOutputStride + acc_x;
@@ -982,8 +988,11 @@ R""""(
         __global float* inputOutputGradients,
         __global float* weightAndBiasGradients) 
     {
-        __local float cachedInput[ND_GPU_LOCAL_BUFFER_SIZE];
-        __local float cachedGradients[ND_GPU_LOCAL_BUFFER_SIZE];
+        const uint tileSize = ND_GPU_TILED_MATRIX_ROWS;
+        const uint tileSizeBits = ND_GPU_TILED_MATRIX_ROWS_BITS;
+
+        __local float tile_weights[tileSize][tileSize+1];
+        __local float tile_outputGradients[tileSize][tileSize+1];
 
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
@@ -991,63 +1000,50 @@ R""""(
         
         uint inputSize = parameters->m_inputSize;
         uint outputSize = parameters->m_outputSize;
-        uint inputOutputSize = parameters->m_inputOutputSize;
         uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
 
-        long srcBase = groupId * (long)inputOutputSize + inputOutputStartOffset;
-        long dstBase = srcBase + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
-        long parametersStartOffset = (long)parameters->m_parametersStartOffset;
+        const uint minibatchBlock = parameters->m_matrixDimensionK >> tileSizeBits;
+        const uint groupId_y = groupId / minibatchBlock;
+        const uint groupId_x = groupId - groupId_y * minibatchBlock;
 
-        uint workGroupOutputSizeReminder = outputSize % workGroupSize;
-        uint modWorkGroupOutputSize = outputSize - workGroupOutputSizeReminder;
-        for (uint i = 0; i < modWorkGroupOutputSize; i += workGroupSize)
-        {
-            float a = inputOutputGradients[dstBase + i + itemId];
-            cachedGradients[i + itemId] = a;
-        }
-        if (itemId < workGroupOutputSizeReminder)
-        {
-            float a = inputOutputGradients[dstBase + modWorkGroupOutputSize + itemId];
-            cachedGradients[modWorkGroupOutputSize + itemId] = a;
-        }
+        const uint inputOutputStride = parameters->m_inputOutputSize;
+        const uint width = (inputSize + (tileSize * 2) - 1) & -(tileSize * 2);
+        const long inputOffset = groupId_x * (long)tileSize * inputOutputStride + inputOutputStartOffset;
+        const long outputOffset = inputOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
+        const long parametersStartOffset = groupId_y * (long)tileSize + parameters->m_parametersStartOffset;
 
-        uint workGroupSizeReminder = inputSize % workGroupSize;
-        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
-        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
-        {
-            cachedInput[i + itemId] = 0.0f;
-        }
-        if (itemId < workGroupSizeReminder)
-        {
-            cachedInput[modWorkGroupSize + itemId] = 0.0f;
-        }
-        uint width = (inputSize + ND_GPU_TILED_MATRIX_COLUMNS - 1) & -ND_GPU_TILED_MATRIX_COLUMNS;
-        barrier(CLK_LOCAL_MEM_FENCE); 
+        const uint itemId_x = itemId & (tileSize - 1);
+        const uint itemId_y = itemId >> tileSizeBits;
 
-        // calculate input gradients
-        for (uint j = 0; j < outputSize; ++j)
+        // Loop over all tiles
+        float acc = 0.0f;
+        const uint dimensionK = ((outputSize + tileSize - 1) & -tileSize);
+        for (uint tile = 0; tile < dimensionK; tile += tileSize)
         {
-            float gradient = cachedGradients[j];
-            long weightOffset = j * width + parametersStartOffset;
-            for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+            // Load one transposed tile A and B into local memory (cpu style)
+            long outputStartOffset = tile + outputOffset;
+            long weightOffsetStart = tile * width + parametersStartOffset;
+            float weight = weightAndBias[weightOffsetStart + itemId_y * width + itemId_x];
+            float outputGradient = inputOutputGradients[outputStartOffset + itemId_y * inputOutputStride + itemId_x];
+            tile_weights[itemId_y][itemId_x] = weight;
+            tile_outputGradients[itemId_y][itemId_x] = outputGradient;
+            barrier(CLK_LOCAL_MEM_FENCE); 
+            
+            // Perform the computation for a single tile
+            // this loop can be unrolled and get faste by the complie fail to do it,
+            // It can be done with intrinsics but I am not doing that.
+            // so far this is quite good.
+            for (uint i = 0; i < tileSize; ++i)
             {
-                float weight = weightAndBias[weightOffset + i + itemId];
-                cachedInput[i + itemId] += weight * gradient;
+                float a = tile_outputGradients[itemId_y][i];
+                acc += a * tile_weights[i][itemId_x];
             }
-            if(itemId < workGroupSizeReminder)
-            {
-               float weight = weightAndBias[weightOffset + modWorkGroupSize + itemId];
-               cachedInput[modWorkGroupSize + itemId] += weight * gradient;
-            }
+            barrier(CLK_LOCAL_MEM_FENCE); 
         }
-        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
-        {
-            inputOutputGradients[srcBase + i + itemId] = cachedInput[i + itemId];
-        }
-        if (itemId < workGroupSizeReminder)
-        {
-            inputOutputGradients[srcBase + modWorkGroupSize + itemId] = cachedInput[modWorkGroupSize + itemId];
-        }
+
+        // the result is not transposed
+        long dstOffset = inputOffset + groupId_y * tileSize + itemId_y * inputOutputStride; 
+        inputOutputGradients[dstOffset + itemId_x] = acc;
     }
 
 )"""";
@@ -1197,7 +1193,7 @@ void ndBrainGpuContext::CreateKerners()
     m_brainLayerTanhBackPropagate = CreateKerner(program, "brainLayerBrainTanhBackPropagate");
     m_brainLayerDropOutBackPropagate = CreateKerner(program, "brainLayerBrainDropOutBackPropagate");
     m_brainLayerCathegoricalSoftmaxBackPropagate = CreateKerner(program, "brainLayerBrainCathegoricalSoftmaxBackPropagate");
-    //m_brainLayerMatrixBackPropagateBiasGradients = CreateKerner(program, "brainLayerBrainBackPropagateMatrixBiasGradients");
+    m_brainLayerMatrixBackPropagateBiasGradients = CreateKerner(program, "brainLayerBrainBackPropagateMatrixBiasGradients");
     m_brainLayerMatrixBackPropagateInputGradients = CreateKerner(program, "brainLayerBrainBackPropagateMatrixInputGradients");
     m_brainLayerMatrixBackPropagateWeightGradients = CreateKerner(program, "brainLayerBrainBackPropagateMatrixWeightsGradients");
     m_brainLayerMatrixBackPropagateClearBiasGradients = CreateKerner(program, "brainLayerBrainBackPropagateMatrixClearBiasGradients");
@@ -1207,7 +1203,6 @@ void ndBrainGpuContext::CreateKerners()
     m_brainAdamMomentumUpdate = CreateKerner(program, "brainAdamMomentumUpdate");
     m_brainAdamRidgeOptimizerUpdate = CreateKerner(program, "brainAdamUpdateRidgeRegularizer");
     m_brainAdamLassoOptimizerUpdate = CreateKerner(program, "brainAdamUpdateLassoRegularizer");
-    m_brainAccumulateGradientsAndAverage = CreateKerner(program, "brainAccumulateGradientsAndAverage");
 
     // other shaders
     m_brainCopyBuffer = CreateKerner(program, "brainCopyBuffer");
