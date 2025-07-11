@@ -723,34 +723,10 @@ R""""(
     __kernel void brainLayerBrainBackPropagateMatrixClearBiasGradients(
             __global const UniformBufferLayerArguments* parameters, 
             __global float* inputOutputData, 
-            __global float* partialBiasSumBuffer, 
+            __global float* weightAndBias, 
             __global float* inputOutputGradients,
             __global float* weightAndBiasGradients) 
     {
-        uint itemId = get_local_id(0);
-        uint groupId = get_group_id(0);
-        uint workGroupSize = get_local_size(0);
-
-        const uint inputSize = parameters->m_inputSize;
-        const uint outputSize = parameters->m_outputSize;
-        const uint inpuOutputStride = parameters->m_inputOutputSize;
-
-        const uint alignedOffset = (outputSize + 255) & -256;
-        const uint dstOffset = groupId * alignedOffset;
-        const uint srcOffset = parameters->m_inputOutputStartOffset + inputSize + groupId * inpuOutputStride;
-
-        const uint workGroupSizeReminder = outputSize % workGroupSize;
-        const uint modWorkGroupSize = outputSize - workGroupSizeReminder;
-        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
-        {
-            float outputDerivative = inputOutputGradients[srcOffset + i + itemId];
-            partialBiasSumBuffer[dstOffset + i + itemId] = outputDerivative;
-        }
-        if (itemId < workGroupSizeReminder)
-        {
-            float outputDerivative = inputOutputGradients[srcOffset + modWorkGroupSize + itemId];
-            partialBiasSumBuffer[dstOffset + modWorkGroupSize + itemId] = outputDerivative;
-        }
     }
 
     __kernel void brainLayerBrainBackPropagateMatrixPartialSumBiasGradients(
