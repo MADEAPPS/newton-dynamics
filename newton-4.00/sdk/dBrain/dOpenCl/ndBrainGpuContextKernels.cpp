@@ -970,8 +970,11 @@ R""""(
         __global float* inputOutputGradients,
         __global float* weightAndBiasGradients) 
     {
-        __local float cachedInput[ND_GPU_LOCAL_BUFFER_SIZE];
-        __local float cachedGradients[ND_GPU_LOCAL_BUFFER_SIZE];
+        const uint tileSize = ND_GPU_TILED_MATRIX_ROWS;
+        const uint tileSizeBits = ND_GPU_TILED_MATRIX_ROWS_BITS;
+
+        __local float tile_weights[tileSize][tileSize+1];
+        __local float tile_outputGradients[tileSize][tileSize+1];
 
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
@@ -979,63 +982,50 @@ R""""(
         
         uint inputSize = parameters->m_inputSize;
         uint outputSize = parameters->m_outputSize;
-        uint inputOutputSize = parameters->m_inputOutputSize;
         uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
 
-        long srcBase = groupId * (long)inputOutputSize + inputOutputStartOffset;
-        long dstBase = srcBase + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
-        long parametersStartOffset = (long)parameters->m_parametersStartOffset;
+        const uint minibatchBlock = parameters->m_matrixDimensionK >> tileSizeBits;
+        const uint groupId_y = groupId / minibatchBlock;
+        const uint groupId_x = groupId - groupId_y * minibatchBlock;
 
-        uint workGroupOutputSizeReminder = outputSize % workGroupSize;
-        uint modWorkGroupOutputSize = outputSize - workGroupOutputSizeReminder;
-        for (uint i = 0; i < modWorkGroupOutputSize; i += workGroupSize)
-        {
-            float a = inputOutputGradients[dstBase + i + itemId];
-            cachedGradients[i + itemId] = a;
-        }
-        if (itemId < workGroupOutputSizeReminder)
-        {
-            float a = inputOutputGradients[dstBase + modWorkGroupOutputSize + itemId];
-            cachedGradients[modWorkGroupOutputSize + itemId] = a;
-        }
+        const uint inputOutputStride = parameters->m_inputOutputSize;
+        const uint width = (inputSize + (tileSize * 2) - 1) & -(tileSize * 2);
+        const long inputOffset = groupId_x * (long)tileSize * inputOutputStride + inputOutputStartOffset;
+        const long outputOffset = inputOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
+        const long parametersStartOffset = groupId_y * (long)tileSize + parameters->m_parametersStartOffset;
 
-        uint workGroupSizeReminder = inputSize % workGroupSize;
-        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
-        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
-        {
-            cachedInput[i + itemId] = 0.0f;
-        }
-        if (itemId < workGroupSizeReminder)
-        {
-            cachedInput[modWorkGroupSize + itemId] = 0.0f;
-        }
-        uint width = (inputSize + ND_GPU_TILED_MATRIX_COLUMNS - 1) & -ND_GPU_TILED_MATRIX_COLUMNS;
-        barrier(CLK_LOCAL_MEM_FENCE); 
+        const uint itemId_x = itemId & (tileSize - 1);
+        const uint itemId_y = itemId >> tileSizeBits;
 
-        // calculate input gradients
-        for (uint j = 0; j < outputSize; ++j)
+        // Loop over all tiles
+        float acc = 0.0f;
+        const uint dimensionK = ((outputSize + tileSize - 1) & -tileSize);
+        for (uint tile = 0; tile < dimensionK; tile += tileSize)
         {
-            float gradient = cachedGradients[j];
-            long weightOffset = j * width + parametersStartOffset;
-            for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+            // Load one transposed tile A and B into local memory (cpu style)
+            long outputStartOffset = tile + outputOffset;
+            long weightOffsetStart = tile * width + parametersStartOffset;
+            float weight = weightAndBias[weightOffsetStart + itemId_y * width + itemId_x];
+            float outputGradient = inputOutputGradients[outputStartOffset + itemId_y * inputOutputStride + itemId_x];
+            tile_weights[itemId_y][itemId_x] = weight;
+            tile_outputGradients[itemId_y][itemId_x] = outputGradient;
+            barrier(CLK_LOCAL_MEM_FENCE); 
+            
+            // Perform the computation for a single tile
+            // this loop can be unrolled and get faste by the complie fail to do it,
+            // It can be done with intrinsics but I am not doing that.
+            // so far this is quite good.
+            for (uint i = 0; i < tileSize; ++i)
             {
-                float weight = weightAndBias[weightOffset + i + itemId];
-                cachedInput[i + itemId] += weight * gradient;
+                float a = tile_outputGradients[itemId_y][i];
+                acc += a * tile_weights[i][itemId_x];
             }
-            if(itemId < workGroupSizeReminder)
-            {
-               float weight = weightAndBias[weightOffset + modWorkGroupSize + itemId];
-               cachedInput[modWorkGroupSize + itemId] += weight * gradient;
-            }
+            barrier(CLK_LOCAL_MEM_FENCE); 
         }
-        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
-        {
-            inputOutputGradients[srcBase + i + itemId] = cachedInput[i + itemId];
-        }
-        if (itemId < workGroupSizeReminder)
-        {
-            inputOutputGradients[srcBase + modWorkGroupSize + itemId] = cachedInput[modWorkGroupSize + itemId];
-        }
+
+        // the result is not transposed
+        long dstOffset = inputOffset + groupId_y * tileSize + itemId_y * inputOutputStride; 
+        inputOutputGradients[dstOffset + itemId_x] = acc;
     }
 
 )"""";

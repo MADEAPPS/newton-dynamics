@@ -36,14 +36,11 @@ class ndBrainTrainer: public ndBrainTrainerInference
 	virtual ~ndBrainTrainer();
 
 	ndBrainFloatBuffer* GetOuputGradientBuffer();
+	ndBrainFloatBuffer* GetInputGradientBuffer();
 
 	ndBrainFloatBuffer* GetHiddenLayerGradientBuffer();
 	ndBrainFloatBuffer* GetWeightAndBiasGradientBuffer();
 	ndBrainFloatBuffer* GetPartialSumBiasGradientBuffer();
-
-	
-	//virtual void GetGradientBuffer(ndBrainVector&) const override;
-	//virtual void BackPropagate(const ndBrainVector& outputGradients) override;
 
 	void BackPropagate();
 	void ApplyLearnRate();

@@ -57,6 +57,11 @@ ndBrainTrainer::~ndBrainTrainer()
 {
 }
 
+ndBrainFloatBuffer* ndBrainTrainer::GetInputGradientBuffer()
+{
+	return *m_miniBatchInputGradientBuffer;
+}
+
 ndBrainFloatBuffer* ndBrainTrainer::GetOuputGradientBuffer()
 {
 	return *m_miniBatchOutputGradientBuffer;
