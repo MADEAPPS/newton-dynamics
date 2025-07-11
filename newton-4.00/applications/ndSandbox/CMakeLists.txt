@@ -47,10 +47,7 @@ include_directories(../../thirdParty/hacd/src/VHACD_Lib/public/)
 
 set (openclSDKPath ${CMAKE_SOURCE_DIR}/thirdParty/opencl/OpenCL-SDK-v2024.10.24-Win-x64)
 
-if(NEWTON_ENABLE_VULKAN_SDK)
-	include_directories(../../sdk/dBrain/dVulkan)
-	include_directories ($ENV{VULKAN_SDK}/Include)
-elseif(NEWTON_ENABLE_OPENCL_SDK)
+if(NEWTON_ENABLE_OPENCL_SDK)
 	include_directories(${openclSDKPath}/include)
 	include_directories(../../sdk/dBrain/dOpencl)
 else()
@@ -96,9 +93,7 @@ if (NEWTON_BUILD_PROFILER)
 endif ()
 
 if(MSVC OR MINGW)
-	if(NEWTON_ENABLE_VULKAN_SDK)
-		target_link_libraries (${projectName} PUBLIC $ENV{VULKAN_SDK}/lib/vulkan-1.lib)
-	elseif(NEWTON_ENABLE_OPENCL_SDK)
+	if(NEWTON_ENABLE_OPENCL_SDK)
 		target_link_libraries (${projectName} PUBLIC ${openclSDKPath}/lib/OpenCL.lib)
 	endif()
 
