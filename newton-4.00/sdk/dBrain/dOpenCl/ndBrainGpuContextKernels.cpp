@@ -699,10 +699,10 @@ R""""(
 
     __kernel void brainLayerBrainBackPropagateMatrixClearBiasGradients(
         __global const UniformBufferLayerArguments* parameters, 
-        __global float* , 
+        __global float* dummy0, 
         __global float* partialBiasSumBuffer, 
         __global float* inputOutputGradientsBuffer,
-        __global float* ) 
+        __global float* dummy1) 
     {
         const uint itemId = get_local_id(0);
         const uint groupId = get_group_id(0);
@@ -711,14 +711,14 @@ R""""(
         const uint inputSize = parameters->m_inputSize;
         const uint outputSize = parameters->m_outputSize;
         const uint inpuOutputStride = parameters->m_inputOutputSize;
-
+        
         const uint alignedOffset = (outputSize + 255) & -256;
         const uint dstOffset = groupId * alignedOffset;
         const uint srcOffset = parameters->m_inputOutputStartOffset + inputSize + groupId * inpuOutputStride;
-
+        
         const uint workGroupSizeReminder = outputSize % workGroupSize;
         const uint modWorkGroupSize = outputSize - workGroupSizeReminder;
-
+        
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             float outputDerivative = inputOutputGradientsBuffer[srcOffset + i + itemId];
@@ -733,24 +733,24 @@ R""""(
 
     __kernel void brainLayerBrainBackPropagateMatrixPartialSumBiasGradients(
         __global const UniformBufferLayerArguments* parameters, 
-        __global float* , 
+        __global float* dummy0, 
         __global float* partialBiasSumBuffer, 
-        __global float* ,
-        __global float* ) 
+        __global float* dummy1,
+        __global float* dummy2) 
     {
         const uint itemId = get_local_id(0);
         const uint groupId = get_group_id(0);
         const uint workGroupSize = get_local_size(0);
-
+        
         const uint minibatchSize = parameters->m_matrixDimensionK;
         if ((minibatchSize & 1) == 0)
         {
             const uint outputSize = parameters->m_outputSize;
             const uint alignedOffset = (outputSize + 255) & -256;
-
+        
             const uint dstOffset = groupId * alignedOffset;
             const uint srcOffset = dstOffset + alignedOffset * minibatchSize / 2;
-
+        
             const uint workGroupSizeReminder = outputSize % workGroupSize;
             const uint modWorkGroupSize = outputSize - workGroupSizeReminder;
             for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
@@ -768,22 +768,22 @@ R""""(
 
     __kernel void brainLayerBrainBackPropagateMatrixBiasGradients(
         __global const UniformBufferLayerArguments* parameters, 
-        __global float* , 
+        __global float* dummy0, 
         __global float* partialBiasSumBuffer, 
-        __global float* ,
+        __global float* dummy1,
         __global float* weightAndBiasGradients) 
     {
         const uint itemId = get_local_id(0);
         const uint groupId = get_group_id(0);
         const uint workGroupSize = get_local_size(0);
-
+        
         const uint inputSize = parameters->m_inputSize;
         const uint outputSize = parameters->m_outputSize;
         const uint height = (outputSize + ND_GPU_TILED_MATRIX_ROWS - 1) & -ND_GPU_TILED_MATRIX_ROWS;
         const uint width = (inputSize + ND_GPU_TILED_MATRIX_COLUMNS - 1) & -ND_GPU_TILED_MATRIX_COLUMNS;
         const uint matrixSize = width * height;
         const long parametersStartOffset = (long)parameters->m_parametersStartOffset + matrixSize;
-
+        
         const uint workGroupSizeReminder = outputSize % workGroupSize;
         const uint modWorkGroupSize = outputSize - workGroupSizeReminder;
         for (uint rowBlock = 0; rowBlock < modWorkGroupSize; rowBlock += workGroupSize)
@@ -799,15 +799,15 @@ R""""(
     }
 
     __kernel void brainLayerBrainBackPropagateMatrixWeightsGradients(
-            __global const UniformBufferLayerArguments* parameters, 
-            __global float* inputOutputData, 
-            __global float* weightAndBias, 
-            __global float* inputOutputGradients,
-            __global float* weightAndBiasGradients) 
+        __global const UniformBufferLayerArguments* parameters, 
+        __global float* inputOutputData, 
+        __global float* weightAndBias, 
+        __global float* inputOutputGradients,
+        __global float* weightAndBiasGradients) 
     {
         __local float cachedRowGradient[1024];
         __local float cachedOutputGradients[ND_GPU_LOCAL_BUFFER_SIZE];
-
+        
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
         uint workGroupSize = get_local_size(0);
@@ -815,10 +815,10 @@ R""""(
         uint inputSize = parameters->m_inputSize;
         uint numberOfRows = parameters->m_matrixDimensionK;
         uint inputOutputSize = parameters->m_inputOutputSize;
-
+        
         long inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         long dstBase = inputOutputStartOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
-
+        
         if (itemId == 0)
         {
             for (uint row = 0; row < numberOfRows; ++row)
@@ -827,13 +827,13 @@ R""""(
                 cachedOutputGradients[row] = outputDerivative;
             }
         }
-
+        
         const uint workGroupSizeReminder = inputSize % workGroupSize;
         const uint modWorkGroupSize = inputSize - workGroupSizeReminder;
-
+        
         long parametersStartOffset = (long)parameters->m_parametersStartOffset;
         uint width = (inputSize + ND_GPU_TILED_MATRIX_COLUMNS - 1) & -ND_GPU_TILED_MATRIX_COLUMNS;
-
+        
         barrier(CLK_LOCAL_MEM_FENCE); 
         for (uint rowBlock = 0; rowBlock < modWorkGroupSize; rowBlock += workGroupSize)
         {
@@ -846,7 +846,7 @@ R""""(
             {
                 long inputOffset = inputOffsetBase + row * inputOutputSize;
                 float outputDerivative = cachedOutputGradients[row];
-
+        
                 float inputValue = inputOutputData[inputOffset + itemId];
                 cachedRowGradient[itemId] += outputDerivative * inputValue;
             }
@@ -854,17 +854,17 @@ R""""(
             long parametersOffset = parametersStartOffset + rowBlock + width * groupId;
             weightAndBiasGradients[parametersOffset + itemId] = cachedRowGradient[itemId];
         }
-
+        
         if (itemId < workGroupSizeReminder)
         {
             cachedRowGradient[itemId] = 0.0f;
-
+        
             long inputOffsetBase = inputOutputStartOffset + modWorkGroupSize;
             for (uint row = 0; row < numberOfRows; ++row)
             {
                 long inputOffset = inputOffsetBase + row * inputOutputSize;
                 float outputDerivative = cachedOutputGradients[row];
-
+        
                 float inputValue = inputOutputData[inputOffset + itemId];
                 cachedRowGradient[itemId] += outputDerivative * inputValue;
             }
