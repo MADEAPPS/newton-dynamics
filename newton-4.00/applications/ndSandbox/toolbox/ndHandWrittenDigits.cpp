@@ -329,7 +329,7 @@ static void MnistTrainingSet()
 #endif
 				}
 
-				ndExpandTraceMessage("epoch: %d\n", epoch);
+				
 #if 0
 				ndInt64 testFailCount = ValidateData(testLabels, m_testData);
 				if (testFailCount < m_minValidationFail)
@@ -338,6 +338,8 @@ static void MnistTrainingSet()
 					trainer->UpdateParameters(weightAndBias);
 					m_bestBrain->CopyFrom(**trainer->GetBrain());
 					m_minValidationFail = testFailCount;
+
+					ndExpandTraceMessage("epoch: %d\n", epoch);
 					ndExpandTraceMessage("   best model: test fail count:%d\n", testFailCount);
 				} 
 #else
@@ -352,6 +354,8 @@ static void MnistTrainingSet()
 					ndInt64 trainigFailCount = ValidateData(trainingLabels, m_trainingData) + 1;
 					ndInt64 size = trainingLabels->GetCount();
 					ndFloat32 score = (ndFloat32)(size - trainigFailCount) / (ndFloat32)size;
+
+					ndExpandTraceMessage("epoch: %d\n", epoch);
 					ndExpandTraceMessage("  saving best model:");
 					ndExpandTraceMessage("  success rate:%f%%", score * 100.0f);
 					ndExpandTraceMessage("  training fail count:%d", trainigFailCount);
@@ -366,6 +370,8 @@ static void MnistTrainingSet()
 						m_minCombinedScore = minCombinedScore;
 						ndInt64 size = trainingLabels->GetCount();
 						ndFloat32 score = (ndFloat32)(size - trainigFailCount) / (ndFloat32)size;
+
+						ndExpandTraceMessage("epoch: %d\n", epoch);
 						ndExpandTraceMessage("  success rate:%f%%", score * 100.0f);
 						ndExpandTraceMessage("  training fail count:%d", trainigFailCount);
 						ndExpandTraceMessage("  test fail count:%d\n", testFailCount);
