@@ -313,14 +313,14 @@ static void SimpleRegressionBrainStressTest()
 	}
 
 	ndSetRandSeed(42);
-	ndInt32 inputSize = 1;
+	//ndInt32 inputSize = 1;
 	ndInt32 minibatchSize = 32;
 	ndInt32 numberOfEpochs = 10;
-	ndInt32 hidenLayerWidth = 32;
 	ndSharedPtr<ndBrain> brain(new ndBrain);
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 
 #if 0
+	ndInt32 hidenLayerWidth = 32;
 	layers.PushBack(new ndBrainLayerLinear(inputSize, hidenLayerWidth));
 	layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), hidenLayerWidth));
@@ -328,7 +328,7 @@ static void SimpleRegressionBrainStressTest()
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
 	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 #else
-	layers.PushBack(new ndBrainLayerLinear(inputSize, 1));
+	layers.PushBack(new ndBrainLayerLinear(1, 1));
 #endif
 
 	ndSharedPtr<ndBrainContext> context(new ndBrainGpuContext);
@@ -355,7 +355,7 @@ static void SimpleRegressionBrainStressTest()
 
 	ndInt32 batchesCount = nunberOfSamples / minibatchSize;
 	ndInt32 batchesSize = batchesCount * minibatchSize;
-	size_t strideInBytes = size_t(inputSize * sizeof(ndReal));
+	size_t strideInBytes = size_t(1 * sizeof(ndReal));
 
 	ndCopyBufferCommandInfo copyBufferInfo;
 	copyBufferInfo.m_dstOffsetInByte = 0;

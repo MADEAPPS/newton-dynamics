@@ -661,11 +661,13 @@ ndCommandArray ndBrainLayerLinear::CreateGpuFeedForwardCommand(
 		ndInt32 height;
 		CalculateRoundedSize(width, height);
 
-		ndInt32 blockRows = height / ND_GPU_TILED_MATRIX_ROWS;
-		ndInt32 blockColums = miniBatchSize / ND_GPU_TILED_MATRIX_ROWS;
+		//ndInt32 dim_K = height;
+		ndInt32 dim_M = height / ND_GPU_TILED_MATRIX_ROWS;
+		ndInt32 dim_N = miniBatchSize / ND_GPU_TILED_MATRIX_ROWS;
 
 		ndBrainBufferCommandDesc descriptor(MakeFeedForwardDesctriptor(
-			owner, context, info, blockRows * blockColums, height,
+			//owner, context, info, dim_M * dim_N, dim_K,
+			owner, context, info, dim_M * dim_N, 0,
 			inputOutputData, weightsAndBias));
 		descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerMatrixMatrixMultiply;
 		ndBrainBufferCommand* const command = new ndBrainGpuCommand(descriptor);

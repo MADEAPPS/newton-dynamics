@@ -896,14 +896,15 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
         const ndInt32 height = (outputSize + tileSize - 1) & -tileSize;
         const ndInt32 width = (inputSize + tileSize * 2 - 1) & -tileSize * 2;
 
-        const ndInt32 minibatchBlock = parameters->m_matrixDimensionK >> tileSizeBits;
+        const ndInt32 minibatchBlock = (outputSize + tileSize - 1) >> tileSizeBits;
+        //const ndInt32 minibatchBlock = parameters->m_matrixDimensionK >> tileSizeBits;
         const ndInt32 groupId_y = groupId / minibatchBlock;
         const ndInt32 groupId_x = groupId - groupId_y * minibatchBlock;
 
         //Initialise the accumulation register
-        const ndInt64 blockBase = groupId_x * tileSize;
-        const ndInt64 parametersStartOffset = blockBase * width + parameters->m_parametersStartOffset;
-        const ndInt64 parametersBiasOffset = blockBase + width * height + parameters->m_parametersStartOffset;
+        const ndInt64 parameterBlockBase = groupId_x * tileSize;
+        const ndInt64 parametersStartOffset = parameterBlockBase * width + parameters->m_parametersStartOffset;
+        const ndInt64 parametersBiasOffset = parameterBlockBase + width * height + parameters->m_parametersStartOffset;
         ndAssert(parametersBiasOffset >= 0);
 
         ndBrainFloat biasValue[tileSize];
@@ -959,15 +960,7 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
                     ndBrainFloat a = tile_weights[i][itemId_y];
                     for (ndInt32 itemId_x = 0; itemId_x < tileSize; itemId_x++)
                     {
-                        //ndTrace(("%d ", (i * (tileSize + 1) + itemId_x) % 32));
                         tile_acc[itemId_y][itemId_x] += a * tile_inputs[i][itemId_x];
-
-                        //ndInt32 x = itemId & (tileSize - 1);
-                        //ndInt32 y = itemId >> tileSizeBits;
-                        //ndTrace(("%d ", (i * (tileSize + 1) + itemId_x) % 32));
-                        //ndAssert(x == itemId_x);
-                        //ndAssert(y == itemId_y);
-                        //itemId++;
                     }
                 }
             }
