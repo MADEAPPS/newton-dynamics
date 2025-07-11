@@ -73,7 +73,7 @@ void ndBrainLayerLinear::CalculateRoundedSize(ndInt32& width, ndInt32& height) c
 	width = GetInputSize();
 	height = GetOutputSize();
 	height = (height + ND_GPU_TILED_MATRIX_ROWS - 1) & -ND_GPU_TILED_MATRIX_ROWS;
-	width = (width + ND_GPU_TILED_MATRIX_COLUMNS - 1) & -ND_GPU_TILED_MATRIX_COLUMNS;
+	width = (width + ND_GPU_TILED_MATRIX_ROWS * 2 - 1) & -ND_GPU_TILED_MATRIX_ROWS * 2;
 }
 
 ndBrainVector* ndBrainLayerLinear::GetBias()

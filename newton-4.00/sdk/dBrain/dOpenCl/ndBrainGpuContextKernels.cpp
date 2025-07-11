@@ -900,7 +900,8 @@ R""""(
         const uint height = (outputSize + tileSize - 1) & -tileSize;
         const uint width = (inputSize + tileSize * 2 - 1) & -tileSize * 2;
 
-        const uint minibatchBlock = parameters->m_matrixDimensionK >> tileSizeBits;
+        //const uint minibatchBlock = parameters->m_matrixDimensionK >> tileSizeBits;
+        const uint minibatchBlock = (outputSize + tileSize - 1) >> tileSizeBits;
         const uint groupId_y = groupId / minibatchBlock;
         const uint groupId_x = groupId - groupId_y * minibatchBlock;
 
