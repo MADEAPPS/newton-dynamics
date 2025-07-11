@@ -623,31 +623,6 @@ R""""(
         }
     }
 
-    __kernel void brainAccumulateGradientsAndAverage(
-            __global const UniformBufferLayerArguments* parameters,
-            __global float* gradientBuffer)
-    {
-        uint itemId = get_local_id(0);
-        uint groupId = get_group_id(0);
-        uint workGroupSize = get_local_size(0);
-
-        uint inputSize = parameters->m_inputSize;
-        uint miniBatchSize = parameters->m_inputOutputSize;
-        
-        float sum = 0.0f;
-        long start = (long)groupId * workGroupSize;
-        for (uint j = 0; j < miniBatchSize; ++j)
-        {
-            long base = start + j * inputSize;
-            sum += gradientBuffer[base + itemId];
-        }
-        float weightFactor = 1.0f / (float)miniBatchSize;
-        // is this needed?
-        barrier(CLK_LOCAL_MEM_FENCE); 
-
-        gradientBuffer[start + itemId] = sum * weightFactor;
-    }
-
     __kernel void brainAdamUpdateLassoRegularizer(
         __global const UniformBufferOptimizerArguments* parameters,
         __global float* weightAndBiasBuffer, __global float* weightAndBiasGradientBuffer,
@@ -661,8 +636,9 @@ R""""(
         float regularizer = -parameters->m_decayRegularizer;
 
         uint start = groupId * workGroupSize;
+        float miniBatchWeight = parameters->m_minibathScale;
 
-        float temp = weightAndBiasGradientBuffer[start + itemId];
+        float temp = miniBatchWeight * weightAndBiasGradientBuffer[start + itemId];
         float a = vdw[start + itemId] * parameters->m_alpha + temp * (1.0f - parameters->m_alpha);
         vdw[start + itemId] = a;
             
@@ -695,8 +671,9 @@ R""""(
         float regularizer = -parameters->m_decayRegularizer;
 
         long start = groupId * (long)workGroupSize;
+        float miniBatchWeight = parameters->m_minibathScale;
 
-        float temp = weightAndBiasGradientBuffer[start + itemId];
+        float temp = miniBatchWeight * weightAndBiasGradientBuffer[start + itemId];
         float a = vdw[start + itemId] * parameters->m_alpha + temp * (1.0f - parameters->m_alpha);
         vdw[start + itemId] = a;
             
@@ -1226,7 +1203,6 @@ void ndBrainGpuContext::CreateKerners()
     m_brainAdamMomentumUpdate = CreateKerner(program, "brainAdamMomentumUpdate");
     m_brainAdamRidgeOptimizerUpdate = CreateKerner(program, "brainAdamUpdateRidgeRegularizer");
     m_brainAdamLassoOptimizerUpdate = CreateKerner(program, "brainAdamUpdateLassoRegularizer");
-    m_brainAccumulateGradientsAndAverage = CreateKerner(program, "brainAccumulateGradientsAndAverage");
 
     // other shaders
     m_brainCopyBuffer = CreateKerner(program, "brainCopyBuffer");
