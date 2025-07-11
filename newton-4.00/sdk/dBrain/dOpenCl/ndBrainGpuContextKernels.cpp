@@ -738,11 +738,6 @@ R""""(
         __global float* ,
         __global float* ) 
     {
-        //floatBuffer* const buffer2 = (floatBuffer*)m_parameters[2];
-        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
-        //float* const partialBiasSumBuffer = (float*)buffer2->GetGpuBuffer()->GetPtr();
-        //ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetGpuBuffer()->GetPtr();
-
         const uint itemId = get_local_id(0);
         const uint groupId = get_group_id(0);
         const uint workGroupSize = get_local_size(0);
@@ -773,15 +768,34 @@ R""""(
 
     __kernel void brainLayerBrainBackPropagateMatrixBiasGradients(
         __global const UniformBufferLayerArguments* parameters, 
-        __global float* inputOutputData, 
-        __global float* weightAndBias, 
-        __global float* inputOutputGradients,
+        __global float* , 
+        __global float* partialBiasSumBuffer, 
+        __global float* ,
         __global float* weightAndBiasGradients) 
     {
         const uint itemId = get_local_id(0);
         const uint groupId = get_group_id(0);
         const uint workGroupSize = get_local_size(0);
 
+        const uint inputSize = parameters->m_inputSize;
+        const uint outputSize = parameters->m_outputSize;
+        const uint height = (outputSize + ND_GPU_TILED_MATRIX_ROWS - 1) & -ND_GPU_TILED_MATRIX_ROWS;
+        const uint width = (inputSize + ND_GPU_TILED_MATRIX_COLUMNS - 1) & -ND_GPU_TILED_MATRIX_COLUMNS;
+        const uint matrixSize = width * height;
+        const long parametersStartOffset = (long)parameters->m_parametersStartOffset + matrixSize;
+
+        const uint workGroupSizeReminder = outputSize % workGroupSize;
+        const uint modWorkGroupSize = outputSize - workGroupSizeReminder;
+        for (uint rowBlock = 0; rowBlock < modWorkGroupSize; rowBlock += workGroupSize)
+        {
+            float biasDerivative = partialBiasSumBuffer[rowBlock + itemId];
+            weightAndBiasGradients[parametersStartOffset + rowBlock + itemId] = biasDerivative;
+        }
+        if (itemId < workGroupSizeReminder)
+        {
+            float biasDerivative = partialBiasSumBuffer[modWorkGroupSize + itemId];
+            weightAndBiasGradients[parametersStartOffset + modWorkGroupSize + itemId] = biasDerivative;
+        }
     }
 
     __kernel void brainLayerBrainBackPropagateMatrixWeightsGradients(
