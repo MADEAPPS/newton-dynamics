@@ -20,10 +20,9 @@ R""""(
 
     #define ND_GPU_USE_SOFT_SUBGROUPS
     #define ND_GPU_SOFT_SUBGROUPS_WORD_SIZE     32
+
     #define ND_GPU_TILED_MATRIX_ROWS_BITS       4
-    #define ND_GPU_TILED_MATRIX_COLUMNS_BITS    5
     #define ND_GPU_TILED_MATRIX_ROWS            (1<<ND_GPU_TILED_MATRIX_ROWS_BITS)
-    #define ND_GPU_TILED_MATRIX_COLUMNS         (1<<ND_GPU_TILED_MATRIX_COLUMNS_BITS)
 
     #define ND_GPU_LOCAL_BUFFER_SIZE	        1024 * 4
 
@@ -780,7 +779,7 @@ R""""(
         const uint inputSize = parameters->m_inputSize;
         const uint outputSize = parameters->m_outputSize;
         const uint height = (outputSize + ND_GPU_TILED_MATRIX_ROWS - 1) & -ND_GPU_TILED_MATRIX_ROWS;
-        const uint width = (inputSize + ND_GPU_TILED_MATRIX_COLUMNS - 1) & -ND_GPU_TILED_MATRIX_COLUMNS;
+        const uint width = (inputSize + ND_GPU_TILED_MATRIX_ROWS * 2 - 1) & -ND_GPU_TILED_MATRIX_ROWS * 2;
         const uint matrixSize = width * height;
         const long parametersStartOffset = (long)parameters->m_parametersStartOffset + matrixSize;
         
@@ -832,7 +831,7 @@ R""""(
         const uint modWorkGroupSize = inputSize - workGroupSizeReminder;
         
         long parametersStartOffset = (long)parameters->m_parametersStartOffset;
-        uint width = (inputSize + ND_GPU_TILED_MATRIX_COLUMNS - 1) & -ND_GPU_TILED_MATRIX_COLUMNS;
+        uint width = (inputSize + ND_GPU_TILED_MATRIX_ROWS * 2 - 1) & -ND_GPU_TILED_MATRIX_ROWS * 2;
         
         barrier(CLK_LOCAL_MEM_FENCE); 
         for (uint rowBlock = 0; rowBlock < modWorkGroupSize; rowBlock += workGroupSize)
