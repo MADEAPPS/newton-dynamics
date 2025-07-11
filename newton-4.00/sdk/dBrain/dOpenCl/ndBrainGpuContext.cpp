@@ -20,9 +20,9 @@
 #include "ndBrainIntegerBuffer.h"
 #include "ndBrainBufferCommand.h"
 
-//#define ND_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_ALL
+#define ND_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_ALL
 //#define ND_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_CPU
-#define ND_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_GPU
+//#define ND_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_GPU
 
 ndBrainGpuContext* ndBrainGpuContext::GetAsGpuContext()
 {
