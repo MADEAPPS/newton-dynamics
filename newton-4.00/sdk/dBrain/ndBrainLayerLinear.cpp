@@ -713,13 +713,13 @@ ndCommandArray ndBrainLayerLinear::CreateGpuBackPropagateCommand(
 			while (size > 1)
 			{
 				ndBrainBufferCommandDesc descriptor(MakeBackpropagateDesctriptor(
-					owner, context, info, size/2, (size * m_dimFactor) + m_biasAddPartialSumPass,
+					owner, context, info, (size + 1)/2, (size * m_dimFactor) + m_biasAddPartialSumPass,
 					inputOutputData, weightsAndBias,
 					inputOutputGradients, weightsAndBiasGradients));
 				ndBrainBufferCommand* const command = new ndBrainLayerBackPropagateCpuCommand(descriptor, (ndBrainLayer*)this);
 				commands.PushBack(command);
 
-				size = size / 2;
+				size = (size + 1) / 2;
 			}
 
 			ndBrainBufferCommandDesc descriptor(MakeBackpropagateDesctriptor(
@@ -780,7 +780,7 @@ ndCommandArray ndBrainLayerLinear::CreateGpuBackPropagateCommand(
 			{
 				ndBrainBufferCommandDesc descriptor(
 					MakeBackpropagateDesctriptor(
-						owner, context, info, size/2, size,
+						owner, context, info, (size + 1) /2, size,
 						inputOutputData, partialBiasSumBuffer,
 						inputOutputGradients, weightsAndBiasGradients));
 				descriptor.m_id += id++;
@@ -789,7 +789,7 @@ ndCommandArray ndBrainLayerLinear::CreateGpuBackPropagateCommand(
 				ndBrainBufferCommand* const command = new ndBrainGpuCommand(descriptor);
 				commands.PushBack(command);
 
-				size = size / 2;
+				size = (size + 1) / 2;
 			}
 
 			// add the bias gradient kernel;

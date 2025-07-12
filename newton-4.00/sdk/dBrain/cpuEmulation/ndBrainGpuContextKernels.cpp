@@ -1160,14 +1160,15 @@ class brainLayerBrainBackPropagateMatrixPartialSumBiasGradients : public ndBrain
         ndBrainFloat* const partialBiasSumBuffer = (ndBrainFloat*)buffer2->GetGpuBuffer()->GetPtr();
         ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetGpuBuffer()->GetPtr();
 
-        const ndInt32 minibatchSize = parameters->m_matrixDimensionK;
-        if ((minibatchSize & 1) == 0)
+        const ndInt32 numberOfIndex = parameters->m_matrixDimensionK;
+        const ndInt32 srcIndex = groupId + (numberOfIndex + 1) /2;
+        if (srcIndex < numberOfIndex)
         {
             ndInt32 outputSize = parameters->m_outputSize;
             ndInt32 alignedOffset = (outputSize + 255) & -256;
 
             ndInt32 dstOffset = groupId * alignedOffset;
-            ndInt32 srcOffset = dstOffset + alignedOffset * minibatchSize / 2;
+            ndInt32 srcOffset = srcIndex * alignedOffset;
 
             const ndInt32 workGroupSizeReminder = outputSize % workGroupSize;
             const ndInt32 modWorkGroupSize = outputSize - workGroupSizeReminder;

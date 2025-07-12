@@ -741,14 +741,15 @@ R""""(
         const uint groupId = get_group_id(0);
         const uint workGroupSize = get_local_size(0);
         
-        const uint minibatchSize = parameters->m_matrixDimensionK;
-        if ((minibatchSize & 1) == 0)
+        const uint numberOfIndex = parameters->m_matrixDimensionK;
+        const uint srcIndex = groupId + (numberOfIndex + 1) /2;
+        if (srcIndex < numberOfIndex)
         {
             const uint outputSize = parameters->m_outputSize;
             const uint alignedOffset = (outputSize + 255) & -256;
         
             const uint dstOffset = groupId * alignedOffset;
-            const uint srcOffset = dstOffset + alignedOffset * minibatchSize / 2;
+            const uint srcOffset = srcIndex * alignedOffset;
         
             const uint workGroupSizeReminder = outputSize % workGroupSize;
             const uint modWorkGroupSize = outputSize - workGroupSizeReminder;
