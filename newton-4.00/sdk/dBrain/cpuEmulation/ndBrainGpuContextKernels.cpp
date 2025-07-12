@@ -879,7 +879,7 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
         const ndInt32 tileSize = ND_GPU_TILED_MATRIX_ROWS;
         const ndInt32 tileSizeBits = ND_GPU_TILED_MATRIX_ROWS_BITS;
 
-        ndBrainFloat tile_acc[tileSize][tileSize];
+        ndBrainFloat tile_accReg[tileSize][tileSize];
         ndBrainFloat tile_inputs[tileSize * 2][tileSize];
         ndBrainFloat tile_weights[tileSize * 2][tileSize];
 
@@ -920,7 +920,7 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
             ndInt32 itemId_y = itemId >> tileSizeBits;
             ndAssert(itemId_x < tileSize);
             ndAssert(itemId_y < tileSize);
-            tile_acc[itemId_y][itemId_x] = biasValue[itemId_x];
+            tile_accReg[itemId_y][itemId_x] = biasValue[itemId_x];
         }
 
         const ndInt32 inputOutputStride = parameters->m_inputOutputSize;
@@ -960,12 +960,23 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
                     ndBrainFloat a = tile_weights[i][itemId_y];
                     for (ndInt32 itemId_x = 0; itemId_x < tileSize; itemId_x++)
                     {
-                        tile_acc[itemId_y][itemId_x] += a * tile_inputs[i][itemId_x];
+                        tile_accReg[itemId_y][itemId_x] += a * tile_inputs[i][itemId_x];
                     }
                 }
             }
             // barrier
         }
+
+        // the results are in register, by ther are transposed
+        for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+        {
+            ndInt32 itemId_x = itemId & (tileSize - 1);
+            ndInt32 itemId_y = itemId >> tileSizeBits;
+            ndAssert(itemId_x < tileSize);
+            ndAssert(itemId_y < tileSize);
+            tile_inputs[itemId_x][itemId_y] = tile_accReg[itemId_y][itemId_x];
+        }
+        // barrier
 
         const ndInt32 numberOutput = ((groupId_x + 1) * tileSize < outputSize) ? tileSize : outputSize - groupId_x * tileSize;
         ndInt64 outputOffset = groupId_x * tileSize + ndInt64(inputOffset) + __cpuKernelRoundoff(inputSize, workGroupSize);
@@ -976,7 +987,9 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
             ndInt32 itemId_y = itemId >> tileSizeBits;
             ndAssert(itemId_x < tileSize);
             ndAssert(itemId_y < tileSize);
-            ndBrainFloat value = tile_acc[itemId_x][itemId_y];
+            ndBrainFloat value = tile_inputs[itemId_y][itemId_x];
+            //ndBrainFloat value0 = tile_accReg[itemId_x][itemId_y];
+            //ndAssert(value == value0);
             if (itemId_x < numberOutput)
             {
                 inputOutputData[outputOffset + itemId_y * inputOutputStride + itemId_x] = value;
@@ -998,6 +1011,7 @@ class brainLayerBrainBackPropagateMatrixInputGradients : public ndBrainKernel
         // not need for bank odd row tricks for PC emulation
         const ndInt32 tileSize = ND_GPU_TILED_MATRIX_ROWS;
         const ndInt32 tileSizeBits = ND_GPU_TILED_MATRIX_ROWS_BITS;
+
         ndBrainFloat tile_weights[tileSize][tileSize];
         ndBrainFloat tile_outputGradients[tileSize][tileSize];
 
@@ -1058,23 +1072,6 @@ class brainLayerBrainBackPropagateMatrixInputGradients : public ndBrainKernel
             // this loop can be unrolled and get faste by the complie fail to do it,
             // It can be done with intrinsics but I am not doing that.
             // so far this is quite good.
-
-            //// naive uncoalesced tile multiple
-            //for (ndInt32 itemId_y = 0; itemId_y < tileSize; itemId_y++)
-            //{
-            //    for (ndInt32 itemId_x = 0; itemId_x < tileSize; itemId_x++)
-            //    {
-            //        ndBrainFloat x = ndBrainFloat(0.0f);
-            //        for (ndInt32 i = 0; i < tileSize; ++i)
-            //        {
-            //            ndBrainFloat w = tile_weights[i][itemId_y];
-            //            ndBrainFloat y = tile_outputGradients[i][itemId_x];
-            //            x += w * y;
-            //        }
-            //        tile_accReg[itemId_y][itemId_x] += x;
-            //    }
-            //}
-
             for (ndInt32 i = 0; i < tileSize; ++i)
             {
                 for (ndInt32 itemId_y = 0; itemId_y < tileSize; itemId_y++)

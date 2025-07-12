@@ -885,7 +885,7 @@ R""""(
         const uint tileSize = ND_GPU_TILED_MATRIX_ROWS;
         const uint tileSizeBits = ND_GPU_TILED_MATRIX_ROWS_BITS;
 
-        __local float tile_acc[tileSize][tileSize + 1];
+        //__local float tile_acc[tileSize][tileSize + 1];
         __local float tile_inputs[tileSize * 2][tileSize + 1];
         __local float tile_weights[tileSize * 2][tileSize + 1];
         __local float biasCache[tileSize];
@@ -953,14 +953,16 @@ R""""(
             barrier(CLK_LOCAL_MEM_FENCE); 
         }
         // transpose the flat array results
-        tile_acc[acc_x][acc_y] = acc;
+        //tile_acc[acc_x][acc_y] = acc;
+        tile_inputs[acc_x][acc_y] = acc;
 
         const uint numberOutput = ((groupId_x + 1) * ND_GPU_TILED_MATRIX_ROWS < outputSize) ? ND_GPU_TILED_MATRIX_ROWS : outputSize - groupId_x * ND_GPU_TILED_MATRIX_ROWS;
         long outputOffset = groupId_x * ND_GPU_TILED_MATRIX_ROWS + (long)inputOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
         outputOffset += acc_y * inputOutputStride + acc_x;
         barrier(CLK_LOCAL_MEM_FENCE); 
         
-        float value = tile_acc[acc_y][acc_x];
+        //float value = tile_acc[acc_y][acc_x];
+        float value = tile_inputs[acc_y][acc_x];
         inputOutputData[outputOffset] = value;
     }
 
