@@ -1012,8 +1012,8 @@ class brainLayerBrainBackPropagateMatrixInputGradients : public ndBrainKernel
         const ndInt32 tileSize = ND_GPU_TILED_MATRIX_ROWS;
         const ndInt32 tileSizeBits = ND_GPU_TILED_MATRIX_ROWS_BITS;
 
-        ndBrainFloat tile_weights[tileSize * 2][tileSize];
-        ndBrainFloat tile_outputGradients[tileSize * 2][tileSize];
+        ndBrainFloat tile_weights[tileSize][tileSize];
+        ndBrainFloat tile_outputGradients[tileSize][tileSize];
 
         ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
         ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
@@ -1049,7 +1049,6 @@ class brainLayerBrainBackPropagateMatrixInputGradients : public ndBrainKernel
         const ndInt64 parametersStartOffset = groupId_y * ndInt64(tileSize) + parameters->m_parametersStartOffset;
 
         // Loop over all tiles
-        //ndInt32 halfTileStart = tileSize / 2;
         const ndInt32 dimensionK = ((outputSize + tileSize - 1) & -tileSize);
         for (ndInt32 tile = 0; tile < dimensionK; tile += tileSize)
         {
@@ -1065,15 +1064,13 @@ class brainLayerBrainBackPropagateMatrixInputGradients : public ndBrainKernel
 
                 ndBrainFloat weight0 = weightAndBias[weightOffsetStart + itemId_y * width + itemId_x];
                 ndBrainFloat outputGradient0 = inputOutputGradients[outputStartOffset + itemId_y * inputOutputStride + itemId_x];
-                tile_weights[itemId_x][itemId_y] = weight0;
+                tile_weights[itemId_y][itemId_x] = weight0;
                 tile_outputGradients[itemId_x][itemId_y] = outputGradient0;
             }
             // barrier
 
             // Perform the computation for a single tile
-            // this loop can be unrolled and get faster by the complie fail to do it,
-            // It can be done with intrinsics but I am not doing that.
-            // so far this is quite good.
+            // this loop can be unrolled and get faster but the compiler fail to do it,
             for (ndInt32 i = 0; i < tileSize; ++i)
             {
                 for (ndInt32 itemId_y = 0; itemId_y < tileSize; itemId_y++)
@@ -1081,7 +1078,7 @@ class brainLayerBrainBackPropagateMatrixInputGradients : public ndBrainKernel
                     ndBrainFloat outGradient = tile_outputGradients[i][itemId_y];
                     for (ndInt32 itemId_x = 0; itemId_x < tileSize; itemId_x++)
                     {
-                        ndBrainFloat weight = tile_weights[itemId_x][i];
+                        ndBrainFloat weight = tile_weights[i][itemId_x];
                         tile_accReg[itemId_y][itemId_x] += weight * outGradient;
                     }
                 }

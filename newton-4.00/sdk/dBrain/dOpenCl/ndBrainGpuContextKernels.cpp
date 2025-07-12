@@ -1011,16 +1011,13 @@ R""""(
             float weight = weightAndBias[weightOffsetStart + itemId_y * width + itemId_x];
             float outputGradient = inputOutputGradients[outputStartOffset + itemId_y * inputOutputStride + itemId_x];
             tile_weights[itemId_y][itemId_x] = weight;
-            tile_outputGradients[itemId_y][itemId_x] = outputGradient;
+            tile_outputGradients[itemId_x][itemId_y] = outputGradient;
             barrier(CLK_LOCAL_MEM_FENCE); 
             
             // Perform the computation for a single tile
-            // this loop can be unrolled and get faste by the complie fail to do it,
-            // It can be done with intrinsics but I am not doing that.
-            // so far this is quite good.
             for (uint i = 0; i < tileSize; ++i)
             {
-                float a = tile_outputGradients[itemId_y][i];
+                float a = tile_outputGradients[i][itemId_y];
                 acc += a * tile_weights[i][itemId_x];
             }
             barrier(CLK_LOCAL_MEM_FENCE); 
