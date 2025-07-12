@@ -45,7 +45,9 @@
 
 #define ND_SAC_POLICY_DELAY_MOD			1
 
-class ndBrainOptimizerAdamLegacy;
+
+class ndBrainFloatBuffer;
+class ndBrainIntegerBuffer;
 class ndBrainAgentDeterministicPolicyGradient_Trainer;
 
 class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
@@ -206,6 +208,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	ndSharedPtr<ndBrainTrainer> m_criticTrainer____[ND_SAC_NUMBER_OF_CRITICS];
 	ndSharedPtr<ndBrainTrainer> m_referenceCriticTrainer[ND_SAC_NUMBER_OF_CRITICS];
 
+	ndBrainVector m_parametersBuffer;
 	//ndBrainVector m_actionBatch;
 	//ndBrainVector m_nextActionBatch;
 	//ndBrainVector m_obsevationsBatch;
@@ -222,9 +225,9 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	//ndBrainVector m_criticOutputGradients[ND_SAC_NUMBER_OF_CRITICS];
 
 	ndArray<ndInt32> m_miniBatchIndices;
-	ndSharedPtr<ndBrainBuffer> m_replayBufferFlat;
-	ndSharedPtr<ndBrainBuffer> m_minibatchIndexBuffer;
-	ndSharedPtr<ndBrainBuffer> m_replayFlatBufferCache;
+	ndSharedPtr<ndBrainFloatBuffer> m_replayBufferFlat;
+	ndSharedPtr<ndBrainIntegerBuffer> m_minibatchIndexBuffer;
+	ndSharedPtr<ndBrainFloatBuffer> m_replayFlatBufferCache;
 	ndSharedPtr<ndBrainBuffer> m_replayFlatBufferCacheParameters;
 
 	ndSharedPtr<ndBrainBuffer> m_criticNextActionParameters;

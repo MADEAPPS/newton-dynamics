@@ -21,9 +21,11 @@
 ndBrainFloatBuffer::ndBrainFloatBuffer(ndBrainContext* const context, ndInt64 sizeInFloat, bool memoryMapped)
 	:ndBrainBuffer(context, sizeInFloat * ndInt32(sizeof(ndReal)), memoryMapped)
 {
-	ndAssert(0);
-	//m_buffer.SetCount(sizeInFloat);
-	//m_buffer.Set(ndBrainFloat(0.0f));
+	if (m_context->GetAsCpuContext())
+	{
+		m_buffer = ndSharedPtr<ndBrainVector>(new ndBrainVector());
+		m_buffer->SetCount(ndInt64(sizeInFloat / sizeof (ndReal)));
+	}
 }
 
 ndBrainFloatBuffer::ndBrainFloatBuffer(ndBrainContext* const context, const ndBrainVector& input, bool memoryMapped)
