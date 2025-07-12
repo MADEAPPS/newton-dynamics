@@ -404,13 +404,12 @@ namespace ndQuadruped_1
 			context.DrawPoint(surrogateZmpPoint, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 4);
 
 //ndAssert((surrogateLocalZmpPoint.m_x * scaledLocalZmp.m_x >= 0.0f) && (surrogateLocalZmpPoint.m_z * scaledLocalZmp.m_z >= 0.0f));
-
-static int xxxxx;
-ndTrace(("%d suppostpoints(%d) alpha(%f %f) zmp(%f %f)\n", xxxxx, supportPolygon.GetCount(), dynamics.m_alpha.m_x, dynamics.m_alpha.m_z, localZmp.m_x * 10.0f, localZmp.m_z * 10.0f));
-//if (xxxxx >= 1127)
-if (xxxxx >= 100)
-	xxxxx *= 1;
-xxxxx++;
+//static int xxxxx;
+//ndTrace(("%d suppostpoints(%d) alpha(%f %f) zmp(%f %f)\n", xxxxx, supportPolygon.GetCount(), dynamics.m_alpha.m_x, dynamics.m_alpha.m_z, localZmp.m_x * 10.0f, localZmp.m_z * 10.0f));
+////if (xxxxx >= 1127)
+//if (xxxxx >= 100)
+//	xxxxx *= 1;
+//xxxxx++;
 
 		}
 
@@ -481,7 +480,7 @@ xxxxx++;
 			// build heel
 			ndSharedPtr<ndDemoEntity> heelEntity(calfEntity->GetChildren().GetFirst()->GetInfo());
 			const ndMatrix heelMatrix(heelEntity->GetCurrentMatrix() * calfMatrix);
-			ndSharedPtr<ndBody> heel(CreateRigidBody(heelEntity, heelMatrix, limbMass, calf->GetAsBodyDynamic()));
+			ndSharedPtr<ndBody> heel(CreateRigidBody(heelEntity, heelMatrix, limbMass * 0.5f, calf->GetAsBodyDynamic()));
 
 			ndSharedPtr<ndJointBilateralConstraint> heelHinge(new ndJointHinge(heelMatrix, heel->GetAsBodyKinematic(), calf->GetAsBodyKinematic()));
 			ndModelArticulation::ndNode* const heelNode = model->AddLimb(calfNode, heel, heelHinge);
@@ -490,7 +489,7 @@ xxxxx++;
 			// build soft contact heel
 			ndSharedPtr<ndDemoEntity> contactEntity(heelEntity->GetChildren().GetFirst()->GetInfo());
 			const ndMatrix contactMatrix(contactEntity->GetCurrentMatrix() * heelMatrix);
-			ndSharedPtr<ndBody> contact(CreateRigidBody(contactEntity, contactMatrix, limbMass, heel->GetAsBodyDynamic()));
+			ndSharedPtr<ndBody> contact(CreateRigidBody(contactEntity, contactMatrix, limbMass * 0.5f, heel->GetAsBodyDynamic()));
 
 			const ndMatrix contactAxis (ndRollMatrix(ndFloat32(90.0f) * ndDegreeToRad) * contactMatrix);
 			ndSharedPtr<ndJointBilateralConstraint> softContact(new ndJointSlider(contactAxis, contact->GetAsBodyKinematic(), heel->GetAsBodyKinematic()));
@@ -507,7 +506,7 @@ xxxxx++;
 
 			ndFloat32 regularizer = 0.001f;
 			ndFloat32 effectorStrength = 20.0f * 10.0f * 500.0f;
-			ndSharedPtr<ndJointBilateralConstraint> effector (new ndIkSwivelPositionEffector(effectorRefFrame, rootBody->GetAsBodyKinematic(), footMatrix.m_posit, heel->GetAsBodyKinematic()));
+			ndSharedPtr<ndJointBilateralConstraint> effector (new ndIkSwivelPositionEffector(effectorRefFrame, rootBody->GetAsBodyKinematic(), footMatrix.m_posit, contact->GetAsBodyKinematic()));
 			((ndIkSwivelPositionEffector*)*effector)->SetLinearSpringDamper(regularizer, 4000.0f, 50.0f);
 			((ndIkSwivelPositionEffector*)*effector)->SetAngularSpringDamper(regularizer, 4000.0f, 50.0f);
 			((ndIkSwivelPositionEffector*)*effector)->SetWorkSpaceConstraints(0.0f, 0.75f * 0.9f);
