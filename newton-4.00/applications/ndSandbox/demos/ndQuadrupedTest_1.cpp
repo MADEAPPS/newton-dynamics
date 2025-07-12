@@ -484,13 +484,23 @@ xxxxx++;
 			ndSharedPtr<ndBody> heel(CreateRigidBody(heelEntity, heelMatrix, limbMass, calf->GetAsBodyDynamic()));
 
 			ndSharedPtr<ndJointBilateralConstraint> heelHinge(new ndJointHinge(heelMatrix, heel->GetAsBodyKinematic(), calf->GetAsBodyKinematic()));
-			model->AddLimb(calfNode, heel, heelHinge);
+			ndModelArticulation::ndNode* const heelNode = model->AddLimb(calfNode, heel, heelHinge);
 			((ndJointHinge*)*heelHinge)->SetAsSpringDamper(0.001f, 2000.0f, 50.0f);
 
+			// build soft contact heel
+			ndSharedPtr<ndDemoEntity> contactEntity(heelEntity->GetChildren().GetFirst()->GetInfo());
+			const ndMatrix contactMatrix(contactEntity->GetCurrentMatrix() * heelMatrix);
+			ndSharedPtr<ndBody> contact(CreateRigidBody(contactEntity, contactMatrix, limbMass, heel->GetAsBodyDynamic()));
+
+			const ndMatrix contactAxis (ndRollMatrix(ndFloat32(90.0f) * ndDegreeToRad) * contactMatrix);
+			ndSharedPtr<ndJointBilateralConstraint> softContact(new ndJointSlider(contactAxis, contact->GetAsBodyKinematic(), heel->GetAsBodyKinematic()));
+			model->AddLimb(heelNode, contact, softContact);
+			((ndJointSlider*)*softContact)->SetAsSpringDamper(0.01f, 2000.0f, 10.0f);
+
 			// create effector
-			ndSharedPtr<ndDemoEntity> footEntity(heelEntity->GetChildren().GetFirst()->GetInfo());
+			ndSharedPtr<ndDemoEntity> footEntity(contactEntity->GetChildren().GetFirst()->GetInfo());
 			ndMatrix footMatrix(matrix);
-			footMatrix.m_posit = (footEntity->GetCurrentMatrix() * heelMatrix).m_posit;
+			footMatrix.m_posit = (footEntity->GetCurrentMatrix() * contactMatrix).m_posit;
 
 			ndMatrix effectorRefFrame(footMatrix);
 			effectorRefFrame.m_posit = thighMatrix.m_posit;

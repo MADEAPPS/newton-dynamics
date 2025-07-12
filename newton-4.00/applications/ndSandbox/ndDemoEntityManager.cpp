@@ -30,7 +30,7 @@
 #include "ndHighResolutionTimer.h"
 #include "ndShadowsMapRenderPass.h"
 
-#define DEFAULT_SCENE	0		// basic rigidbody
+//#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
@@ -50,7 +50,7 @@
 //#define DEFAULT_SCENE	17		// cart pole discrete controller
 //#define DEFAULT_SCENE	18		// cart pole continue controller
 //#define DEFAULT_SCENE	19		// unit cycle controller
-//#define DEFAULT_SCENE	20		// quadruped test 1
+#define DEFAULT_SCENE	20		// quadruped test 1
 //#define DEFAULT_SCENE	21		// quadruped test 2
 //#define DEFAULT_SCENE	22		// quadruped test 3
 //#define DEFAULT_SCENE	23		// quadruped test 3
@@ -627,7 +627,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//Test0__();
 	//Test1__();
 	//SimpleRegressionBrainStressTest();
-	ndHandWrittenDigits();
+	//ndHandWrittenDigits();
 	//ndCifar10ImageClassification();
 	//TargaToPng();
 }
