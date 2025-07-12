@@ -245,6 +245,7 @@ namespace ndQuadruped_2
 				:m_calf(nullptr)
 				,m_heel(nullptr)
 				,m_thigh(nullptr)
+				,m_softContact(nullptr)
 				,m_effector(nullptr)
 			{
 			}
@@ -253,10 +254,12 @@ namespace ndQuadruped_2
 				ndJointSpherical* const thigh,
 				ndJointHinge* const calf,
 				ndJointHinge* const heel,
+				ndJointSlider* softContact,
 				ndIkSwivelPositionEffector* const effector)
 				:m_calf(calf)
 				,m_heel(heel)
 				,m_thigh(thigh)
+				,m_softContact(softContact)
 				,m_effector(effector)
 			{
 			}
@@ -264,6 +267,7 @@ namespace ndQuadruped_2
 			ndJointHinge* m_calf;
 			ndJointHinge* m_heel;
 			ndJointSpherical* m_thigh;
+			ndJointSlider* m_softContact;
 			ndIkSwivelPositionEffector* m_effector;
 		};
 
@@ -362,7 +366,6 @@ namespace ndQuadruped_2
 				return ndRayCastClosestHitCallback::OnRayCastAction(contact, intersetParam);
 			}
 		};
-
 
 		public:
 		RobotModelNotify(ndModelArticulation* const robot)
@@ -1075,8 +1078,18 @@ namespace ndQuadruped_2
 			ndSharedPtr<ndBody> heel(CreateRigidBody(heelEntity, heelMatrix, limbMass, calf->GetAsBodyDynamic()));
 
 			ndSharedPtr<ndJointBilateralConstraint> heelHinge(new ndJointHinge(heelMatrix, heel->GetAsBodyKinematic(), calf->GetAsBodyKinematic()));
-			model->AddLimb(calfNode, heel, heelHinge);
+			ndModelArticulation::ndNode* const heelNode = model->AddLimb(calfNode, heel, heelHinge);
 			((ndJointHinge*)*heelHinge)->SetAsSpringDamper(0.001f, 2000.0f, 50.0f);
+
+			// build soft contact heel
+			ndSharedPtr<ndDemoEntity> contactEntity(heelEntity->GetChildren().GetFirst()->GetInfo());
+			const ndMatrix contactMatrix(contactEntity->GetCurrentMatrix() * heelMatrix);
+			ndSharedPtr<ndBody> contact(CreateRigidBody(contactEntity, contactMatrix, limbMass * 0.5f, heel->GetAsBodyDynamic()));
+
+			const ndMatrix contactAxis(ndRollMatrix(ndFloat32(90.0f) * ndDegreeToRad) * contactMatrix);
+			ndSharedPtr<ndJointBilateralConstraint> softContact(new ndJointSlider(contactAxis, contact->GetAsBodyKinematic(), heel->GetAsBodyKinematic()));
+			model->AddLimb(heelNode, contact, softContact);
+			((ndJointSlider*)*softContact)->SetAsSpringDamper(0.01f, 2000.0f, 10.0f);
 
 			// create effector
 			ndSharedPtr<ndDemoEntity> footEntity(heelEntity->GetChildren().GetFirst()->GetInfo());
@@ -1088,7 +1101,7 @@ namespace ndQuadruped_2
 
 			ndFloat32 regularizer = 0.001f;
 			ndFloat32 effectorStrength = 50000.0f;
-			ndSharedPtr<ndJointBilateralConstraint> effector (new ndIkSwivelPositionEffector(effectorRefFrame, rootBody->GetAsBodyKinematic(), footMatrix.m_posit, heel->GetAsBodyKinematic()));
+			ndSharedPtr<ndJointBilateralConstraint> effector (new ndIkSwivelPositionEffector(effectorRefFrame, rootBody->GetAsBodyKinematic(), footMatrix.m_posit, contact->GetAsBodyKinematic()));
 			((ndIkSwivelPositionEffector*)*effector)->SetLinearSpringDamper(regularizer, 4000.0f, 50.0f);
 			((ndIkSwivelPositionEffector*)*effector)->SetAngularSpringDamper(regularizer, 4000.0f, 50.0f);
 			((ndIkSwivelPositionEffector*)*effector)->SetWorkSpaceConstraints(0.0f, 0.75f * 0.9f);
@@ -1100,6 +1113,7 @@ namespace ndQuadruped_2
 			leg.m_calf = (ndJointHinge*)*calfHinge;
 			leg.m_heel = (ndJointHinge*)*heelHinge;
 			leg.m_thigh = (ndJointSpherical*)*ballJoint;
+			leg.m_softContact = (ndJointSlider*)*softContact;
 			leg.m_effector = (ndIkSwivelPositionEffector*)*effector;
 			notify->m_legs.PushBack(leg);
 		}

@@ -41,6 +41,7 @@ namespace ndQuadruped_1
 				:m_calf(nullptr)
 				,m_heel(nullptr)
 				,m_thigh(nullptr)
+				,m_softContact(nullptr)
 				,m_effector(nullptr)
 			{
 			}
@@ -49,10 +50,12 @@ namespace ndQuadruped_1
 				ndJointSpherical* const thigh,
 				ndJointHinge* const calf,
 				ndJointHinge* const foot,
+				ndJointSlider* const sofContact,
 				ndIkSwivelPositionEffector* const effector)
 				:m_calf(calf)
 				,m_heel(foot)
 				,m_thigh(thigh)
+				,m_softContact(sofContact)
 				,m_effector(effector)
 			{
 			}
@@ -60,6 +63,7 @@ namespace ndQuadruped_1
 			ndJointHinge* m_calf;
 			ndJointHinge* m_heel;
 			ndJointSpherical* m_thigh;
+			ndJointSlider* m_softContact;
 			ndIkSwivelPositionEffector* m_effector;
 		};
 
@@ -518,6 +522,7 @@ namespace ndQuadruped_1
 			leg.m_calf = (ndJointHinge*)*calfHinge;
 			leg.m_heel = (ndJointHinge*)*heelHinge;
 			leg.m_thigh = (ndJointSpherical*)*ballJoint;
+			leg.m_softContact = (ndJointSlider*)*softContact;
 			leg.m_effector = (ndIkSwivelPositionEffector*)*effector;
 			notify->m_legs.PushBack(leg);
 		}
