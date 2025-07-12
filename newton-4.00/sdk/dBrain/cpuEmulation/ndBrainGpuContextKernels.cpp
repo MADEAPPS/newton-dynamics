@@ -938,7 +938,7 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
             {
                 ndInt32 itemId_x = itemId & (tileSize * 2 - 1);
                 ndInt32 itemId_y = itemId >> (tileSizeBits + 1);
-                ndAssert(itemId_y < tileSize);
+                ndAssert(itemId_y < tileSize / 2);
                 ndAssert(itemId_x < tileSize * 2);
 
                 ndBrainFloat weight0 = weightsAndBias[weightOffsetStart + itemId_y * width + itemId_x];
@@ -1049,24 +1049,26 @@ class brainLayerBrainBackPropagateMatrixInputGradients : public ndBrainKernel
         const ndInt64 parametersStartOffset = groupId_y * ndInt64(tileSize) + parameters->m_parametersStartOffset;
 
         // Loop over all tiles
+        //ndInt32 halfTileStart = tileSize / 2;
         const ndInt32 dimensionK = ((outputSize + tileSize - 1) & -tileSize);
-        for (ndInt32 tile = 0; tile < dimensionK; tile += tileSize)
+        for (ndInt32 tile = 0; tile < dimensionK; tile += tileSize * 2)
         {
             // Load one transposed tile A and B into local memory (cpu style)
             ndInt64 outputStartOffset = tile + outputOffset;
             ndInt64 weightOffsetStart = tile * width + parametersStartOffset;
-            for (ndInt32 itemId_y = 0; itemId_y < tileSize; ++itemId_y)
-            {
-                for (ndInt32 itemId_x = 0; itemId_x < tileSize; ++itemId_x)
-                {
-                    ndBrainFloat weight = weightAndBias[weightOffsetStart + itemId_x];
-                    ndBrainFloat outputGradient = inputOutputGradients[outputStartOffset + itemId_x];
-                    tile_weights[itemId_y][itemId_x] = weight;
-                    tile_outputGradients[itemId_x][itemId_y] = outputGradient;
-                }
-                weightOffsetStart += width;
-                outputStartOffset += inputOutputStride;
+            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+            { 
+                ndInt32 itemId_x = itemId & (tileSize - 1);
+                ndInt32 itemId_y = itemId >> tileSizeBits;
+                ndAssert(itemId_y < tileSize);
+                ndAssert(itemId_x < tileSize);
+
+                ndBrainFloat weight0 = weightAndBias[weightOffsetStart + itemId_y * width + itemId_x];
+                ndBrainFloat outputGradient0 = inputOutputGradients[outputStartOffset + itemId_y * inputOutputStride + itemId_x];
+                tile_weights[itemId_y][itemId_x] = weight0;
+                tile_outputGradients[itemId_x][itemId_y] = outputGradient0;
             }
+            // barrier
 
             // Perform the computation for a single tile
             // this loop can be unrolled and get faste by the complie fail to do it,
@@ -1093,8 +1095,6 @@ class brainLayerBrainBackPropagateMatrixInputGradients : public ndBrainKernel
             for (ndInt32 itemId_x = 0; itemId_x < tileSize; ++itemId_x)
             {
                 ndBrainFloat value = tile_accReg[itemId_y][itemId_x];
-                //ndBrainFloat value1 = inputOutputGradients[dstOffset + itemId_x];
-                //ndAssert(value == value1);
                 inputOutputGradients[dstOffset + itemId_x] = value;
             }
             dstOffset += inputOutputStride;
