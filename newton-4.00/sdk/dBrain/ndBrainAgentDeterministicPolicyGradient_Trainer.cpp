@@ -778,7 +778,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnQvalueFunction(ndInt3
 	//}
 }
 
-//#pragma optimize( "", off )
+#pragma optimize( "", off )
 void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 {
 	m_miniBatchIndices.SetCount(0);
@@ -876,13 +876,25 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 			criticInputBuffer[i]->CopyBuffer(criticInputObservation, m_parameters.m_miniBatchSize, *policyMinibatchInputBuffer);
 			m_referenceCriticTrainer[i]->MakePrediction();
 
-			ndBrainVector xxxx1;
-			criticInputBuffer[i]->VectorFromDevice(xxxx1);
-			criticOutputBuffer[i]->VectorFromDevice(xxxx1);
-
-			m_context->Multiply(*criticOutputBuffer[i], **m_terminalBatch);
-
+			ndBrainFloatBuffer& qValueBuffer = *criticOutputBuffer[i];
+			m_context->Mul(qValueBuffer, **m_terminalBatch);
+			m_context->Scale(qValueBuffer, m_parameters.m_discountRewardFactor);
+			m_context->Add(qValueBuffer, **m_rewardBatch);
 		}
+
+		ndBrainFloatBuffer& qValueBuffer0 = *criticOutputBuffer[0];
+		for (ndInt32 i = 1; i < ND_SAC_NUMBER_OF_CRITICS; ++i)
+		{
+			ndBrainFloatBuffer& qValueBuffer1 = *criticOutputBuffer[i];
+			m_context->Min(qValueBuffer0, qValueBuffer1);
+		}
+
+		//qValueBuffer.VectorFromDevice(xxxx1);
+		//i *= 1;
+
+		ndBrainVector xxxx0;
+		ndBrainVector xxxx1;
+
 	}
 }
 

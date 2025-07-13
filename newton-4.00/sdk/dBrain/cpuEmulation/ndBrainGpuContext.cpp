@@ -153,7 +153,26 @@ void ndBrainGpuContext::BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVe
 	MemoryFromDevice(src, 0, sizeInBytes, &dstVector[0]);
 }
 
-void ndBrainGpuContext::Multiply(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
+
+void ndBrainGpuContext::Scale(ndBrainFloatBuffer& buffer, ndBrainFloat scale)
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuContext::Min(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
+{
+	//ndBrainVector& dst = **buffer.m_buffer;
+	//const ndBrainVector& src = **srcBuffer.m_buffer;
+	//dst.Min(src);
+	ndAssert(0);
+}
+
+void ndBrainGpuContext::Add(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuContext::Mul(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
 {
 	ndAssert(0);
 }
