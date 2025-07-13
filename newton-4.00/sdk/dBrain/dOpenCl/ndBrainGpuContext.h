@@ -107,8 +107,8 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainKernel> m_brainCopyBuffer;
 	ndSharedPtr<ndBrainKernel> m_brainCopyBufferIndirect;
 
-	ndSharedPtr<ndBrainUniformBuffer> m_copyBufferParams;
 	ndSharedPtr<ndBrainGpuCommand> m_copyBufferCommand;
+	ndSharedPtr<ndBrainUniformBuffer> m_copyBufferParams;
 	ndSharedPtr<ndBrainGpuCommand> m_copyBufferIndirectCommand;
 
 	static const char* m_matrixMultiply;
