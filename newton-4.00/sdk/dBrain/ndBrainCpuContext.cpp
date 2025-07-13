@@ -99,6 +99,9 @@ void ndBrainCpuContext::CopyBufferIndirect(const ndCopyBufferCommandInfo& descri
 	for (ndInt32 i = 0; i < count; ++i)
 	{
 		ndUnsigned32 index = indexPtr[i];
+		//index = 32;
+		//int xxxxxxx = (index * srcStride + srcOffset)/4;
+		//ndBrainMemVector xxxx((ndBrainFloat*) &src[index * srcStride + srcOffset], stride / 4);
 		ndMemCpy(&dst[i * dstStride + dstOffset], &src[index * srcStride + srcOffset], stride);
 	}
 }
@@ -112,9 +115,15 @@ void ndBrainCpuContext::MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size
 
 void ndBrainCpuContext::MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, const void* const inputMemory) const
 {
+	const ndInt8* const src = (ndInt8*)inputMemory;
 	ndInt8* const dst = (ndInt8*)deviceBuffer.GetCpuPtr();
 	ndAssert(dst);
-	ndMemCpy(&dst[offsetInBytes], (ndInt8*)inputMemory, ndInt64(sizeInBytes));
+	ndAssert(src);
+	ndMemCpy(&dst[offsetInBytes], src, ndInt64(sizeInBytes));
+	//for (ndInt64 i = 0; i < ndInt64(sizeInBytes); ++i)
+	//{
+	//	dst[i + offsetInBytes] = src[i];
+	//}
 }
 
 void ndBrainCpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
