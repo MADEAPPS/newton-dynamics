@@ -407,7 +407,12 @@ void ndBrainLayerLinear::FeedForward(const ndBrainLayerFeedForwardCpuCommand* co
 
 	ndInt32 inputSize = info.m_inputSize;
 	ndInt32 outputSize = info.m_outputSize;
-	ndInt32 matrixSize = inputSize * outputSize;
+	//ndInt32 matrixSize = inputSize * outputSize;
+
+	ndInt32 width;
+	ndInt32 height;
+	CalculateRoundedSize(width, height);
+	ndInt32 matrixSize = width * height;
 	const ndBrainMemVector parameters(&weightAndBias[info.m_parametersStartOffset], matrixSize + outputSize);
 	
 	ndInt32 offset = miniBatchIndex * info.m_inputOutputSize + info.m_inputOutputStartOffset;
@@ -417,7 +422,8 @@ void ndBrainLayerLinear::FeedForward(const ndBrainLayerFeedForwardCpuCommand* co
 	ndBrainMemVector output(&inputOutputBuffer[offset + inputSize], outputSize);
 	for (ndInt32 i = outputSize - 1; i >= 0; --i)
 	{
-		const ndBrainMemVector row(&parameters[i * inputSize], inputSize);
+		//const ndBrainMemVector row(&parameters[i * inputSize], inputSize);
+		const ndBrainMemVector row(&parameters[i * width], inputSize);
 		output[i] = row.Dot(input);
 	}
 	
@@ -562,6 +568,7 @@ void ndBrainLayerLinear::BackPropagateInputGradients(const ndBrainLayerBackPropa
 	ndInt32 inputSize = info.m_inputSize;
 	ndInt32 outputSize = info.m_outputSize;
 	ndInt32 matrixSize = inputSize * outputSize;
+	ndAssert(0);
 
 	ndInt32 offset = miniBatchIndex * info.m_inputOutputSize + info.m_inputOutputStartOffset;
 	ndAssert(offset >= 0);
