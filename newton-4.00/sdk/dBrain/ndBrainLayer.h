@@ -112,13 +112,8 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void Save(const ndBrainSave* const loadSave) const;
 	virtual void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon);
 
-	virtual void SetCpuWeights(const ndBrainVector& input);
 	virtual void SetGpuWeights(const ndBrainVector& input);
-
-	virtual void CopyCpuWeights(ndBrainVector& output) const;
 	virtual void CopyGpuWeights(ndBrainVector& output) const;
-
-	virtual ndCommandSharedInfo GetCpuCommandSharedInfo() const;
 	virtual ndCommandSharedInfo GetGpuCommandSharedInfo() const;
 
 	virtual bool HasGpuSupport() const;

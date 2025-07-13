@@ -332,28 +332,6 @@ bool ndBrainLayerLinear::HasGpuSupport() const
 	return true;
 }
 
-void ndBrainLayerLinear::CopyCpuWeights(ndBrainVector& output) const
-{
-	ndInt32 width = GetInputSize();
-	ndInt32 height = GetOutputSize();
-	ndAssert(output.GetCount() >= (GetOutputSize() * GetInputSize() + GetOutputSize()));
-	ndAssert(output.GetCount() >= height * width + GetOutputSize());
-
-	ndInt32 offset = 0;
-	output.Set(ndBrainFloat(0.0f));
-	ndInt32 columns = m_weights.GetColumns();
-	for (ndInt32 i = 0; i < m_weights.GetRows(); ++i)
-	{
-		const ndBrainVector& src = m_weights[i];
-		ndBrainMemVector dst(&output[offset], columns);
-		dst.Set(src);
-		offset += width;
-		ndAssert(offset >= 0);
-	}
-	ndBrainMemVector bias(&output[height * width], m_bias.GetCount());
-	bias.Set(m_bias);
-}
-
 void ndBrainLayerLinear::CopyGpuWeights(ndBrainVector& output) const
 {
 	ndInt32 width;
@@ -378,25 +356,6 @@ void ndBrainLayerLinear::CopyGpuWeights(ndBrainVector& output) const
 	bias.Set(m_bias);
 }
 
-void ndBrainLayerLinear::SetCpuWeights(const ndBrainVector& input)
-{
-	ndInt32 width = GetInputSize();
-	ndAssert(input.GetCount() >= (GetOutputSize() * GetInputSize() + GetOutputSize()));
-
-	ndInt32 offset = 0;
-	ndInt32 columns = m_weights.GetColumns();
-	for (ndInt32 i = 0; i < m_weights.GetRows(); ++i)
-	{
-		ndBrainVector& dst = m_weights[i];
-		const ndBrainMemVector src(&input[offset], columns);
-		dst.Set(src);
-		offset += width;
-		ndAssert(offset >= 0);
-	}
-	const ndBrainMemVector bias(&input[offset], m_bias.GetCount());
-	m_bias.Set(bias);
-}
-
 void ndBrainLayerLinear::SetGpuWeights(const ndBrainVector& weightsAnBias)
 {
 	ndInt32 width;
@@ -419,18 +378,6 @@ void ndBrainLayerLinear::SetGpuWeights(const ndBrainVector& weightsAnBias)
 	m_bias.Set(bias);
 }
 
-ndCommandSharedInfo ndBrainLayerLinear::GetCpuCommandSharedInfo() const
-{
-	ndCommandSharedInfo info(this);
-
-	ndInt32 rows = m_weights.GetRows();
-	ndInt32 columns = m_weights.GetColumns();
-
-	info.m_outputSize = rows;
-	info.m_inputSize = columns;
-	info.m_parametersBatchSize = rows * columns + GetOutputSize();
-	return info;
-}
 
 ndCommandSharedInfo ndBrainLayerLinear::GetGpuCommandSharedInfo() const
 {

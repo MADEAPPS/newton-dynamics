@@ -86,14 +86,9 @@ class ndBrainLayerLinear : public ndBrainLayer
 
 	void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon) override;
 
-	virtual void SetCpuWeights(const ndBrainVector& input) override;
 	virtual void SetGpuWeights(const ndBrainVector& input) override;
-
-	virtual void CopyCpuWeights(ndBrainVector& oput) const override;
 	virtual void CopyGpuWeights(ndBrainVector& oput) const override;
-
 	void CalculateRoundedSize(ndInt32& width, ndInt32& height) const;
-	virtual ndCommandSharedInfo GetCpuCommandSharedInfo() const override;
 	virtual ndCommandSharedInfo GetGpuCommandSharedInfo() const override;
 
 	virtual bool HasGpuSupport() const override;
