@@ -190,6 +190,13 @@ void ndBrainVector::FlushToZero()
 	}
 }
 
+void ndBrainVector::Min(const ndBrainVector& a)
+{
+	ndAssert(GetCount() < (1ll << 32));
+	ndAssert(GetCount() == a.GetCount());
+	ndMin(ndInt32(GetCount()), &(*this)[0], &a[0]);
+}
+
 void ndBrainVector::ScaleSet(const ndBrainVector& a, ndBrainFloat b)
 {
 	ndAssert(GetCount() < (1ll << 32));

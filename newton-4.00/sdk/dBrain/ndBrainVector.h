@@ -40,6 +40,7 @@ class ndBrainVector: public ndArray<ndBrainFloat>
 	void Add(const ndBrainVector& a);
 	void Sub(const ndBrainVector& a);
 	void Mul(const ndBrainVector& a);
+	void Min(const ndBrainVector& a);
 
 	void FlushToZero();
 	void SoftMaxNormalize();
