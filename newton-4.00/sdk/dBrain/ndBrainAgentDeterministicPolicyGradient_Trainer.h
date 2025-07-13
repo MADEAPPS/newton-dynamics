@@ -48,6 +48,7 @@
 
 class ndBrainFloatBuffer;
 class ndBrainIntegerBuffer;
+class ndBrainUniformBuffer;
 class ndBrainAgentDeterministicPolicyGradient_Trainer;
 
 class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
@@ -205,8 +206,8 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 
 	ndSharedPtr<ndBrainContext> m_context;
 	ndSharedPtr<ndBrainTrainer> m_policyTrainer;
-	ndSharedPtr<ndBrainTrainer> m_criticTrainer____[ND_SAC_NUMBER_OF_CRITICS];
-	ndSharedPtr<ndBrainTrainer> m_referenceCriticTrainer[ND_SAC_NUMBER_OF_CRITICS];
+	//ndSharedPtr<ndBrainTrainer> m_criticTrainer____[ND_SAC_NUMBER_OF_CRITICS];
+	ndSharedPtr<ndBrainTrainerInference> m_referenceCriticTrainer[ND_SAC_NUMBER_OF_CRITICS];
 
 	ndBrainVector m_parametersBuffer;
 	//ndBrainVector m_actionBatch;
@@ -226,13 +227,13 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 
 	ndArray<ndInt32> m_miniBatchIndices;
 	ndSharedPtr<ndBrainFloatBuffer> m_replayBufferFlat;
-	ndSharedPtr<ndBrainIntegerBuffer> m_minibatchIndexBuffer;
 	ndSharedPtr<ndBrainFloatBuffer> m_replayFlatBufferCache;
-	ndSharedPtr<ndBrainBuffer> m_replayFlatBufferCacheParameters;
+	ndSharedPtr<ndBrainIntegerBuffer> m_minibatchIndexBuffer;
+	//ndSharedPtr<ndBrainUniformBuffer> m_replayFlatBufferCacheParameters;
 
-	ndSharedPtr<ndBrainBuffer> m_criticNextActionParameters;
-	ndSharedPtr<ndBrainBuffer> m_criticNextObservationParameters;
-	ndSharedPtr<ndBrainBuffer> m_policyNextObservationParameters;
+	//ndSharedPtr<ndBrainBuffer> m_criticNextActionParameters;
+	//ndSharedPtr<ndBrainBuffer> m_criticNextObservationParameters;
+	//ndSharedPtr<ndBrainUniformBuffer> m_policyNextObservationParameters;
 
 	ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory m_replayBuffer;
 	ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory m_replayBufferCache;
