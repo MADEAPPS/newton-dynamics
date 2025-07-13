@@ -44,19 +44,6 @@ ndBrainGpuContext* ndBrainGpuContext::GetAsGpuContext()
 	return this;
 }
 
-void ndBrainGpuContext::BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector)
-{
-	size_t sizeInBytes = ndMin(size_t(dst.SizeInBytes()), size_t(srcVector.GetCount() * sizeof(ndReal)));
-	MemoryToDevice(dst, 0, sizeInBytes, &srcVector[0]);
-}
-
-void ndBrainGpuContext::BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVector& dstVector)
-{
-	ndAssert(0);
-	size_t sizeInBytes = ndMin(size_t(src.SizeInBytes()), size_t(dstVector.GetCount() * sizeof(ndReal)));
-	MemoryFromDevice(src, 0, sizeInBytes, &dstVector[0]);
-}
-
 void ndBrainGpuContext::CopyBuffer(const ndCopyBufferCommandInfo& parameters, ndInt32 numberOfWorkGrups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
 {
 	m_copyBufferParams->MemoryToDevice(0, sizeof(ndCopyBufferCommandInfo), &parameters);
@@ -125,7 +112,6 @@ void ndBrainGpuContext::SyncBufferCommandQueue()
 	// do nothing. cpu kernels always wait for completion.
 }
 
-//#pragma optimize( "", off )
 void ndBrainGpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
 {
 	ndBrainBufferCommandDesc& desc = command->GetDescriptor();
@@ -154,3 +140,20 @@ void ndBrainGpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
 	ParallelExecute(ExecuteCommand);
 }
 
+void ndBrainGpuContext::BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector)
+{
+	size_t sizeInBytes = ndMin(size_t(dst.SizeInBytes()), size_t(srcVector.GetCount() * sizeof(ndReal)));
+	MemoryToDevice(dst, 0, sizeInBytes, &srcVector[0]);
+}
+
+void ndBrainGpuContext::BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVector& dstVector)
+{
+	ndAssert(0);
+	size_t sizeInBytes = ndMin(size_t(src.SizeInBytes()), size_t(dstVector.GetCount() * sizeof(ndReal)));
+	MemoryFromDevice(src, 0, sizeInBytes, &dstVector[0]);
+}
+
+void ndBrainGpuContext::Multiply(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
+{
+	ndAssert(0);
+}

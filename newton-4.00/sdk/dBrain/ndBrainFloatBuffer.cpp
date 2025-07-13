@@ -107,12 +107,13 @@ void ndBrainFloatBuffer::MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes
 
 void ndBrainFloatBuffer::VectorFromDevice(ndBrainVector& vector) const
 {
-	vector.SetCount(ndInt64(m_sizeInBytes / sizeof (ndReal)));
+	vector.SetCount(ndInt64(m_sizeInBytes / sizeof(ndReal)));
 	MemoryFromDevice(0, m_sizeInBytes, &vector[0]);
 }
 
 void ndBrainFloatBuffer::VectorToDevice(const ndBrainVector& vector)
 {
 	ndAssert(vector.GetCount() <= ndInt64(m_sizeInBytes / sizeof(ndReal)));
-	MemoryToDevice(0, vector.GetCount() * sizeof (ndReal), &vector[0]);
+	MemoryToDevice(0, vector.GetCount() * sizeof(ndReal), &vector[0]);
 }
+

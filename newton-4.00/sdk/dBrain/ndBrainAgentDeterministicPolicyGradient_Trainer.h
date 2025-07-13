@@ -98,7 +98,9 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 
 		// for GPU 
 		ndInt32 GetStride() const;
+		ndInt32 GetRewardOffset() const;
 		ndInt32 GetActionOffset() const;
+		ndInt32 GetTerminalOffset() const;
 		ndInt32 GetObsevationOffset() const;
 		ndInt32 GetNextObsevationOffset() const;
 		void GetFlatArray(ndInt32 index, ndBrainVector& output) const;
@@ -221,11 +223,13 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	//ndBrainVector m_nextQValue;
 	//ndBrainVector m_expectedRewards;
 	//ndBrainVector m_criticValue[ND_SAC_NUMBER_OF_CRITICS];
-	ndBrainVector m_rewardBatch[ND_SAC_NUMBER_OF_CRITICS];
+	//ndBrainVector m_rewardBatch[ND_SAC_NUMBER_OF_CRITICS];
 	//ndBrainVector m_criticInputGradients[ND_SAC_NUMBER_OF_CRITICS];
 	//ndBrainVector m_criticOutputGradients[ND_SAC_NUMBER_OF_CRITICS];
 
 	ndArray<ndInt32> m_miniBatchIndices;
+	ndSharedPtr<ndBrainFloatBuffer> m_rewardBatch;
+	ndSharedPtr<ndBrainFloatBuffer> m_terminalBatch;
 	ndSharedPtr<ndBrainFloatBuffer> m_replayBufferFlat;
 	ndSharedPtr<ndBrainFloatBuffer> m_replayFlatBufferCache;
 	ndSharedPtr<ndBrainIntegerBuffer> m_minibatchIndexBuffer;

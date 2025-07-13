@@ -42,19 +42,6 @@ void ndBrainCpuContext::SyncBufferCommandQueue()
 	// do nothing
 }
 
-void ndBrainCpuContext::BrainVectorToDevice(ndBrainFloatBuffer& buffer, const ndBrainVector& srcVector)
-{
-	size_t sizeInBytes = ndMin(size_t(buffer.SizeInBytes()), size_t(srcVector.GetCount() * sizeof(ndReal)));
-	MemoryToDevice(buffer, 0, sizeInBytes, &srcVector[0]);
-}
-
-void ndBrainCpuContext::BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVector& dstVector)
-{
-	ndAssert(0);
-	size_t sizeInBytes = ndMin(size_t(src.SizeInBytes()), size_t(dstVector.GetCount() * sizeof(ndReal)));
-	MemoryFromDevice(src, 0, sizeInBytes, &dstVector[0]);
-}
-
 void ndBrainCpuContext::CopyBuffer(const ndCopyBufferCommandInfo& descriptor, ndInt32 numberOfWorkGroups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
 {
 	ndInt32 stride = ndInt32(descriptor.m_strideInByte);
@@ -120,10 +107,6 @@ void ndBrainCpuContext::MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offse
 	ndAssert(dst);
 	ndAssert(src);
 	ndMemCpy(&dst[offsetInBytes], src, ndInt64(sizeInBytes));
-	//for (ndInt64 i = 0; i < ndInt64(sizeInBytes); ++i)
-	//{
-	//	dst[i + offsetInBytes] = src[i];
-	//}
 }
 
 void ndBrainCpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
@@ -140,4 +123,24 @@ void ndBrainCpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
 		}
 	});
 	ParallelExecute(ExecuteCommand);
+}
+
+void ndBrainCpuContext::BrainVectorToDevice(ndBrainFloatBuffer& buffer, const ndBrainVector& srcVector)
+{
+	size_t sizeInBytes = ndMin(size_t(buffer.SizeInBytes()), size_t(srcVector.GetCount() * sizeof(ndReal)));
+	MemoryToDevice(buffer, 0, sizeInBytes, &srcVector[0]);
+}
+
+void ndBrainCpuContext::BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVector& dstVector)
+{
+	ndAssert(0);
+	size_t sizeInBytes = ndMin(size_t(src.SizeInBytes()), size_t(dstVector.GetCount() * sizeof(ndReal)));
+	MemoryFromDevice(src, 0, sizeInBytes, &dstVector[0]);
+}
+
+void ndBrainCpuContext::Multiply(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
+{
+	ndBrainVector& dst = **buffer.m_buffer;
+	const ndBrainVector& src = **srcBuffer.m_buffer;
+	dst.Mul(src);
 }
