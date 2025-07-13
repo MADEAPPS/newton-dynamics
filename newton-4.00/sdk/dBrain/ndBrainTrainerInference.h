@@ -67,20 +67,9 @@ class ndBrainTrainerInference : public ndClassAlloc
 	ndBrainFloatBuffer* GetHiddenLayerBuffer();
 	ndBrainFloatBuffer* GetWeightAndBiasBuffer();
 
-	//virtual const ndBrainBuffer* GetOutputBuffer() override;
-	//virtual void LoadInput(const ndBrainVector& input) override;
-	//virtual void SaveInput(ndBrainVector& output) const override;
-	//virtual void GetOutput(ndBrainVector& output) const override;
-	//virtual void GetParameterBuffer(ndBrainVector& output) const override;
-	
-	// new methods
 	void MakePrediction();
 	void UpdateParameters(const ndBrainVector& weightAndBias);
-
-	//virtual void SyncQueue() override;
-	//virtual void ApplyLearnRate() override;
-	//virtual void BackPropagate(const ndBrainVector& outputGradients) override;
-	//virtual void MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output) override;
+	void MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output);
 
 	protected:
 	enum ndInputOutputCommandId

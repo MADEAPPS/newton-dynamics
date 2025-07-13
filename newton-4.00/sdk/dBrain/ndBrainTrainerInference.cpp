@@ -435,6 +435,14 @@ void ndBrainTrainerInference::AddLayersCommands(ndFixSizeArray<ndCommandSharedIn
 	}
 }
 
+void ndBrainTrainerInference::MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output)
+{
+	m_miniBatchInputBuffer->VectorToDevice(input);
+	MakePrediction();
+	//m_miniBatchOutputBuffer->VectorFromDevice(output);
+	m_miniBatchOutputBuffer->MemoryFromDevice(0, output.GetCount() * sizeof (ndReal), &output[0]);
+}
+
 void ndBrainTrainerInference::MakePrediction()
 {
 	ndBrainContext* const context = *m_descriptor.m_context;
@@ -445,3 +453,4 @@ void ndBrainTrainerInference::MakePrediction()
 		context->SubmitBufferCommand(*command);
 	}
 }
+
