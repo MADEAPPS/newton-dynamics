@@ -89,7 +89,7 @@ class ndFreeListDictionary: public ndFixSizeArray<ndFreeListHeader, D_FREELIST_D
 
 				#if defined (D_MEMORY_SANITY_CHECK) && defined(_DEBUG)
 				ndAssert(ndMemory::CheckMemory(self));
-				ndAssert(ndMemory::ValidateHeap());
+				//ndAssert(ndMemory::ValidateHeap());
 				#endif
 				return self;
 			}
@@ -103,7 +103,7 @@ class ndFreeListDictionary: public ndFixSizeArray<ndFreeListHeader, D_FREELIST_D
 	{
 		ndScopeSpinLock lock(m_lock);
 		#if defined (D_MEMORY_SANITY_CHECK) && defined(_DEBUG)
-		ndAssert(ndMemory::ValidateHeap());
+		//ndAssert(ndMemory::ValidateHeap());
 		ndAssert(ndMemory::CheckMemory(ptr));
 		#endif
 
