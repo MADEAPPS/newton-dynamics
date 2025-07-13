@@ -30,7 +30,6 @@ ndAtomic<ndUnsigned64> ndMemory::m_memoryUsed(0);
 static ndMemFreeCallback m_freeMemory = free;
 static ndMemAllocCallback m_allocMemory = malloc;
 
-//#define ND_VALIDATE_HEAP 
 #define ND_CHECK_CORRUPT_MEM 0x0a
 
 class ndMemoryHeader
@@ -98,10 +97,6 @@ class ndMemoryCorruptionCheck : public ndTree<ndInt64, void*, ndMemoryCorruption
 	{
 		ndScopeSpinLock lock(m_lock);
 		Insert(m_allocIndex, ptr);
-		if (m_allocIndex == 451)
-		{
-			m_allocIndex *= 1;
-		}
 		m_allocIndex++;
 	}
 
@@ -127,10 +122,6 @@ class ndMemoryCorruptionCheck : public ndTree<ndInt64, void*, ndMemoryCorruption
 		{
 			void* const key = it.GetKey();
 			allocIndex = it.GetNode()->GetInfo();
-			if (allocIndex == 451)
-			{
-				allocIndex *= 1;
-			}
 			valid = valid && ndMemory::CheckMemory(key);
 		}
 		return true;
@@ -183,7 +174,7 @@ void* ndMemory::Malloc(size_t size)
 	#endif
 
 #ifdef ND_VALIDATE_HEAP 
-	ndAssert(ValidateHeap());
+	//ndAssert(ValidateHeap());
 	ndMemoryCorruptionCheck::GetTracker().InsertPointer(ret);
 #endif
 
@@ -196,7 +187,7 @@ void ndMemory::Free(void* const ptr)
 	{
 
 #ifdef ND_VALIDATE_HEAP 
-		ndAssert(ValidateHeap());
+		//ndAssert(ValidateHeap());
 		ndMemoryCorruptionCheck::GetTracker().RemovePointer(ptr);
 #endif
 

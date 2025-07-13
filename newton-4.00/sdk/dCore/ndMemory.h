@@ -30,6 +30,8 @@
 	#define D_MEMORY_SAFE_GUARD		64
 #endif
 
+//#define ND_VALIDATE_HEAP 
+
 typedef void* (*ndMemAllocCallback) (size_t size);
 typedef void (*ndMemFreeCallback) (void* const ptr);
 
