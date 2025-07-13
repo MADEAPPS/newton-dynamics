@@ -230,11 +230,11 @@ void ndBrainGpuContext::MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offse
 	ndBrainGpuBuffer* const buffer = deviceBuffer.GetGpuBuffer();
 	if (buffer->m_memory)
 	{
-		// if the que has to be flush to ge the memory,
-		// then to me, this is no different that just calling enqueueWriteBuffer
+		// if the queue has to be flushed to get the memory,
+		// then to me, this is not different that just calling enqueueWriteBuffer
 		// but I use it in case ther is some different
-		error = m_queue->finish();
-		ndAssert(error == CL_SUCCESS);
+		//error = m_queue->finish();
+		//ndAssert(error == CL_SUCCESS);
 
 		ndAssert(buffer->m_owner->m_isMemoryMapped);
 		ndInt64 size = ndInt64(sizeInBytes / sizeof(ndUnsigned32));
@@ -258,11 +258,11 @@ void ndBrainGpuContext::MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size
 	const ndBrainGpuBuffer* const buffer = deviceBuffer.GetGpuBuffer();
 	if (buffer->m_memory)
 	{
-		// if the que has to be flush to ge the memory,
-		// then to me, thsi si no diffrent that just calling enqueueReadBuffer
+		// if the queue has to be flushed to get the memory,
+		// then to me, this is not different that just calling enqueueWriteBuffer
 		// but I use it in case ther is some different
-		error = m_queue->finish();
-		ndAssert(error == CL_SUCCESS);
+		//error = m_queue->finish();
+		//ndAssert(error == CL_SUCCESS);
 
 		ndAssert(buffer->m_owner->m_isMemoryMapped);
 		ndInt64 size = ndInt64(sizeInBytes / sizeof(ndUnsigned32));
@@ -292,6 +292,7 @@ void ndBrainGpuContext::SyncBufferCommandQueue()
 {
 	cl_int error = 0;
 	error = m_queue->finish();
+	//error = m_queue->flush();
 	ndAssert(error == CL_SUCCESS);
 }
 
