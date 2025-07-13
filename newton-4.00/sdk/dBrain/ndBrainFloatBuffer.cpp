@@ -24,7 +24,7 @@ ndBrainFloatBuffer::ndBrainFloatBuffer(ndBrainContext* const context, ndInt64 si
 	if (m_context->GetAsCpuContext())
 	{
 		m_buffer = ndSharedPtr<ndBrainVector>(new ndBrainVector());
-		m_buffer->SetCount(ndInt64(sizeInFloat / sizeof (ndReal)));
+		m_buffer->SetCount(sizeInFloat);
 	}
 }
 
