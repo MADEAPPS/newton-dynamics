@@ -63,7 +63,8 @@ class ndBrainTrainer: public ndBrainTrainerInference
 	ndSharedPtr<ndBrainFloatBuffer> m_biasPartialSumGradientsCacheBuffer;
 
 	ndList<ndSharedPtr<ndBrainBufferCommand>> m_backPropagateCommands;
-	ndList<ndSharedPtr<ndBrainBufferCommand>> m_optimizerBufferCommands;
+	ndSharedPtr<ndBrainBufferCommand> m_adamOptimizerCommand;
+	ndSharedPtr<ndBrainBufferCommand> m_adamMomentumUpdateCommand;
 };
 
 #endif 

@@ -108,13 +108,15 @@ void ndBrainLayerActivationTanh::FeedForward(const ndBrainLayerFeedForwardCpuCom
 
 	ndInt32 inputSize = info.m_inputSize;
 	ndInt32 outputSize = info.m_outputSize;
+	ndInt32 inputOutputSize = info.m_inputOutputSize;
+	ndInt32 inputOutputStartOffset = info.m_inputOutputStartOffset;
 	
-	ndInt32 offset = miniBatchIndex * info.m_inputOutputSize + info.m_inputOutputStartOffset;
-	ndAssert(offset >= 0);
+	ndInt64 inputOffset = miniBatchIndex * ndInt64(inputOutputSize) + inputOutputStartOffset;
+	ndInt64 outputOffset = inputOffset + trainer->RoundOffOffset(inputSize);
+	
+	const ndBrainMemVector input(&inputOutputBuffer[inputOffset], inputSize);
+	ndBrainMemVector output(&inputOutputBuffer[outputOffset], outputSize);
 
-	const ndBrainMemVector input(&inputOutputBuffer[offset], inputSize);
-	ndBrainMemVector output(&inputOutputBuffer[offset + inputSize], outputSize);
-	
 	const ndBrainSimdFloat8 max(30.0f);
 	const ndBrainSimdFloat8 min(-30.0f);
 	ndBrainFloat* const dst = &output[0];
@@ -142,16 +144,21 @@ void ndBrainLayerActivationTanh::BackPropagate(const ndBrainLayerBackPropagateCp
 
 	const ndBrainFloat* const inputOutputBuffer = (ndBrainFloat*)trainer->GetHiddenLayerBuffer()->GetCpuPtr();
 	const ndBrainFloat* const inputOutputGradientsBuffer = (ndBrainFloat*)trainer->GetHiddenLayerGradientBuffer()->GetCpuPtr();
-	
+
 	ndInt32 inputSize = info.m_inputSize;
-	ndInt32 outputSize = info.m_outputSize;
-	
-	ndInt32 offset = miniBatchIndex * info.m_inputOutputSize + info.m_inputOutputStartOffset;
-	ndAssert(offset >= 0);
-	const ndBrainMemVector output(&inputOutputBuffer[offset + inputSize], outputSize);
-	const ndBrainMemVector outputDerivative(&inputOutputGradientsBuffer[offset + inputSize], outputSize);
-	ndBrainMemVector inputDerivative(&inputOutputGradientsBuffer[offset], inputSize);
-	
+	ndInt32 inputOutputSize = info.m_inputOutputSize;
+	ndInt32 inputOutputStartOffset = info.m_inputOutputStartOffset;
+
+	ndInt64 srcBase = miniBatchIndex * ndInt64(inputOutputSize) + inputOutputStartOffset;
+	ndInt64 dstBase = srcBase + trainer->RoundOffOffset(inputSize);
+	ndAssert(srcBase >= 0);
+	ndAssert(dstBase >= 0);
+	ndAssert(inputSize == info.m_outputSize);
+
+	const ndBrainMemVector output(&inputOutputBuffer[dstBase], inputSize);
+	const ndBrainMemVector outputDerivative(&inputOutputGradientsBuffer[dstBase], inputSize);
+	ndBrainMemVector inputDerivative(&inputOutputGradientsBuffer[srcBase], inputSize);
+
 	inputDerivative.Set(ndBrainFloat(1.0f));
 	inputDerivative.MulSub(output, output);
 	inputDerivative.Mul(outputDerivative);

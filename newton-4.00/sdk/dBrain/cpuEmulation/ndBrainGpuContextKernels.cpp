@@ -1121,7 +1121,8 @@ class brainLayerBrainBackPropagateMatrixClearBiasGradients : public ndBrainKerne
         ndInt32 outputSize = parameters->m_outputSize;
         ndInt32 inpuOutputStride = parameters->m_inputOutputSize;
 
-        ndInt32 alignedOffset = (outputSize + 255) & -256;
+        //ndInt32 alignedOffset = (outputSize + 255) & -256;
+        ndInt32 alignedOffset = (outputSize + workGroupSize - 1) & -workGroupSize;
         const ndInt32 dstOffset = groupId * alignedOffset;
         const ndInt32 srcOffset = parameters->m_inputOutputStartOffset + inputSize + groupId * inpuOutputStride;
 
@@ -1165,7 +1166,8 @@ class brainLayerBrainBackPropagateMatrixPartialSumBiasGradients : public ndBrain
         if (srcIndex < numberOfIndex)
         {
             ndInt32 outputSize = parameters->m_outputSize;
-            ndInt32 alignedOffset = (outputSize + 255) & -256;
+            //ndInt32 alignedOffset = (outputSize + 255) & -256;
+            ndInt32 alignedOffset = (outputSize + workGroupSize - 1) & -workGroupSize;
 
             ndInt32 dstOffset = groupId * alignedOffset;
             ndInt32 srcOffset = srcIndex * alignedOffset;

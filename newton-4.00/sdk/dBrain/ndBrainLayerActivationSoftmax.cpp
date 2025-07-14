@@ -132,13 +132,15 @@ void ndBrainLayerActivationSoftmax::FeedForward(const ndBrainLayerFeedForwardCpu
 
 	ndInt32 inputSize = info.m_inputSize;
 	ndInt32 outputSize = info.m_outputSize;
-	
-	ndInt32 offset = miniBatchIndex * info.m_inputOutputSize + info.m_inputOutputStartOffset;
-	ndAssert(offset >= 0);
+	ndInt32 inputOutputSize = info.m_inputOutputSize;
+	ndInt32 inputOutputStartOffset = info.m_inputOutputStartOffset;
 
-	const ndBrainMemVector input(&inputOutputBuffer[offset], inputSize);
-	ndBrainMemVector output(&inputOutputBuffer[offset + inputSize], outputSize);
-	
+	ndInt64 inputOffset = miniBatchIndex * ndInt64(inputOutputSize) + inputOutputStartOffset;
+	ndInt64 outputOffset = inputOffset + trainer->RoundOffOffset(inputSize);
+
+	const ndBrainMemVector input(&inputOutputBuffer[inputOffset], inputSize);
+	ndBrainMemVector output(&inputOutputBuffer[outputOffset], outputSize);
+
 	ndBrainFloat max = ndBrainFloat(0.0f);
 	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= 0; --i)
 	{

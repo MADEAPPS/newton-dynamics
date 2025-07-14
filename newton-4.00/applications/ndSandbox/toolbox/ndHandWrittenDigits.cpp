@@ -12,7 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndTestDeepBrain.h"
 
-//#define MINIST_USE_CPU_TRAINING
+#define MINIST_USE_CPU_TRAINING
  
 //#define MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
 
@@ -212,7 +212,6 @@ static void MnistTrainingSet()
 				minibatchInputBuffer->CopyBuffer(copyBufferInfo, m_miniBatchSize, **data);
 			
 				m_trainer->MakePrediction();
-				//trainer->GetContext()->SyncBufferCommandQueue();
 				minibatchOutpuBuffer->VectorFromDevice(miniBatchOutput);
 				
 				for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
@@ -296,6 +295,8 @@ static void MnistTrainingSet()
 
 			for (ndInt32 epoch = 0; epoch < MINIST_NUMBER_OF_EPOCHS; ++epoch)
 			{
+				trainer->GetContext()->SyncBufferCommandQueue();
+
 				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
 				for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
 				{
@@ -305,7 +306,6 @@ static void MnistTrainingSet()
 					trainer->MakePrediction();
 					
 					//calculate loss
-					//trainer->GetContext()->SyncBufferCommandQueue();
 					minibatchOutpuBuffer->VectorFromDevice(miniBatchOutput);
 					
 					for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
@@ -326,7 +326,6 @@ static void MnistTrainingSet()
 #else
 					trainer->BackPropagate();
 					trainer->ApplyLearnRate(); 
-					trainer->GetContext()->SyncBufferCommandQueue();
 #endif
 				}
 
@@ -482,6 +481,7 @@ static void MnistTrainingSet()
 		SupervisedTrainer inference(context, optimizer.m_bestBrain);
 		ndInt32 testFailCount = inference.ValidateData(*testLabels, optimizer.m_testData);
 		ndInt32 trainingFailCount = inference.ValidateData(*trainingLabels, optimizer.m_trainingData);
+		context->SyncBufferCommandQueue();
 		
 		ndExpandTraceMessage("\n");
 		ndExpandTraceMessage("results:\n");
@@ -596,6 +596,6 @@ static void MnistTestSet()
 void ndHandWrittenDigits()
 {
 	ndSetRandSeed(53);
-	MnistTrainingSet();
+	//MnistTrainingSet();
 	//MnistTestSet();
 }

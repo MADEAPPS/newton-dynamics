@@ -92,13 +92,19 @@ void ndBrainLayerActivationCategoricalSoftmax::BackPropagate(const ndBrainLayerB
 	const ndBrainFloat* const inputOutputGradientsBuffer = (ndBrainFloat*)trainer->GetHiddenLayerGradientBuffer()->GetCpuPtr();
 	
 	ndInt32 inputSize = info.m_inputSize;
-	ndInt32 outputSize = info.m_outputSize;
-	
-	ndInt32 offset = miniBatchIndex * info.m_inputOutputSize + info.m_inputOutputStartOffset;
-	ndAssert(offset >= 0);
-	const ndBrainMemVector output(&inputOutputBuffer[offset + inputSize], outputSize);
-	const ndBrainMemVector outputDerivative(&inputOutputGradientsBuffer[offset + inputSize], outputSize);
-	ndBrainMemVector inputDerivative (&inputOutputGradientsBuffer[offset], inputSize);
+	//ndInt32 outputSize = info.m_outputSize;
+	ndInt32 inputOutputSize = info.m_inputOutputSize;
+	ndInt32 inputOutputStartOffset = info.m_inputOutputStartOffset;
+
+	ndInt64 srcBase = miniBatchIndex * ndInt64(inputOutputSize) + inputOutputStartOffset;
+	ndInt64 dstBase = srcBase + trainer->RoundOffOffset(inputSize);
+	ndAssert(srcBase >= 0);
+	ndAssert(dstBase >= 0);
+	ndAssert(inputSize == info.m_outputSize);
+
+	const ndBrainMemVector output(&inputOutputBuffer[dstBase], inputSize);
+	const ndBrainMemVector outputDerivative(&inputOutputGradientsBuffer[dstBase], inputSize);
+	ndBrainMemVector inputDerivative(&inputOutputGradientsBuffer[srcBase], inputSize);
 
 	inputDerivative.Set(output);
 	inputDerivative.Sub(outputDerivative);

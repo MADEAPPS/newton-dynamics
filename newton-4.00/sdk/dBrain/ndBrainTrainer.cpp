@@ -99,7 +99,8 @@ void ndBrainTrainer::Initialize()
 		if (partialSum < (layer->GetOutputSize() + 1024))
 		{
 			ndInt32 outSize = layer->GetOutputSize();
-			partialSum = (outSize + 255) & -256;
+			//partialSum = (outSize + 255) & -256;
+			partialSum = RoundOffOffset(outSize);;
 		}
 	}
 	buffer.SetCount(ndInt64(m_descriptor.m_minibatchSize) * partialSum);
@@ -135,7 +136,7 @@ void ndBrainTrainer::AddCopyOutputGradientCommand()
 	data.m_inputSize = 0;
 	data.m_parametersBatchSize = 0;
 	data.m_parametersStartOffset = 0;
-	data.m_inputOutputStartOffset += RoundoffOffset(data.m_inputSize);
+	data.m_inputOutputStartOffset += RoundOffOffset(data.m_inputSize);
 	ndSharedPtr<ndBrainUniformBuffer> uniformbuffer(new ndBrainUniformBuffer(*m_descriptor.m_context, sizeof(ndCommandSharedInfo), &data));
 
 	ndBrainFloatBuffer* const inputOutputGradientBuffer = *m_inputOutputGradientsBuffer;
@@ -359,13 +360,12 @@ void ndBrainTrainer::AddOptimizerGradientCommand()
 
 							ndBrainFloat weight = weightAndBiasBuffer[start + itemId];
 							gradient += weight * regularizer;
-							weightAndBiasBuffer[start + itemId] = weight + gradient * descendRate;
+ 							weightAndBiasBuffer[start + itemId] = weight + gradient * descendRate;
 						}
 					}
 				};
 
-				ndSharedPtr<ndBrainBufferCommand> updateParameters(new ndBrainAdamUpdateParametersRidge(descriptor));
-				m_optimizerBufferCommands.Append(updateParameters);
+				m_adamOptimizerCommand = ndSharedPtr<ndBrainBufferCommand>(new ndBrainAdamUpdateParametersRidge(descriptor));
 			}
 			else
 			{
@@ -382,8 +382,7 @@ void ndBrainTrainer::AddOptimizerGradientCommand()
 			{
 				descriptor.m_kernel = descriptor.m_context->GetAsGpuContext()->m_brainAdamLassoOptimizerUpdate;
 			}
-			ndSharedPtr<ndBrainBufferCommand>command(new ndBrainGpuCommand(descriptor));
-			m_optimizerBufferCommands.Append(command);
+			m_adamOptimizerCommand = ndSharedPtr<ndBrainBufferCommand>(new ndBrainGpuCommand(descriptor));
 		}
 	}
 
@@ -427,14 +426,12 @@ void ndBrainTrainer::AddOptimizerGradientCommand()
 				}
 			};
 
-			ndSharedPtr<ndBrainBufferCommand> momentumUpdate(new ndBrainAdamMomentumUpdate(descriptor));
-			m_optimizerBufferCommands.Append(momentumUpdate);
+			m_adamMomentumUpdateCommand = ndSharedPtr<ndBrainBufferCommand>(new ndBrainAdamMomentumUpdate(descriptor));
 		}
 		else
 		{
 			descriptor.m_kernel = descriptor.m_context->GetAsGpuContext()->m_brainAdamMomentumUpdate;
-			ndSharedPtr<ndBrainBufferCommand>command(new ndBrainGpuCommand(descriptor));
-			m_optimizerBufferCommands.Append(command);
+			m_adamMomentumUpdateCommand = ndSharedPtr<ndBrainBufferCommand>(new ndBrainGpuCommand(descriptor));
 		}
 	}
 }
@@ -442,9 +439,6 @@ void ndBrainTrainer::AddOptimizerGradientCommand()
 void ndBrainTrainer::ApplyLearnRate()
 {
 	ndBrainContext* const context = *m_descriptor.m_context;
-	for (ndList<ndSharedPtr<ndBrainBufferCommand>>::ndNode* node = m_optimizerBufferCommands.GetFirst(); node; node = node->GetNext())
-	{
-		ndSharedPtr<ndBrainBufferCommand>& command = node->GetInfo();
-		context->SubmitBufferCommand(*command);
-	}
+	context->SubmitBufferCommand(*m_adamOptimizerCommand);
+	context->SubmitBufferCommand(*m_adamMomentumUpdateCommand);
 }

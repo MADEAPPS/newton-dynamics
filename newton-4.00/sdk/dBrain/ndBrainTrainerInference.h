@@ -71,6 +71,8 @@ class ndBrainTrainerInference : public ndClassAlloc
 	void UpdateParameters(const ndBrainVector& weightAndBias);
 	void MakeSinglePrediction(const ndBrainVector& input, ndBrainVector& output);
 
+	ndInt32 RoundOffOffset(ndInt32 value) const;
+
 	protected:
 	enum ndInputOutputCommandId
 	{
@@ -84,7 +86,6 @@ class ndBrainTrainerInference : public ndClassAlloc
 	void AddCopyOutputCommand();
 	void InitInputOutputBuffer();
 	void InitWeightAndBiasBuffer();
-	ndInt32 RoundoffOffset(ndInt32 value) const;
 	ndBrainBufferCommand* FindCommand(size_t id) const;
 	void AddCopyInputCommand(const ndCommandSharedInfo& uniformData);
 	void AddLayersCommands(ndFixSizeArray<ndCommandSharedInfo, 256>& layersUniformsData);
