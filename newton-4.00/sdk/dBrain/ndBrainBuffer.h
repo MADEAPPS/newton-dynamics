@@ -49,7 +49,6 @@ class ndCopyBufferCommandInfo
 class ndBrainBuffer : public ndContainersFreeListAlloc<ndBrainBuffer>
 {
 	protected:
-	ndBrainBuffer(const ndBrainBuffer& src);
 	ndBrainBuffer(ndBrainContext* const context, ndInt64 sizeInByte, bool memoryMapped = false);
 
 	public:
