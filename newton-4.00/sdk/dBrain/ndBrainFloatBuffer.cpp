@@ -59,6 +59,17 @@ ndBrainFloatBuffer::ndBrainFloatBuffer(ndBrainContext* const context, const ndBr
 	m_context->BrainVectorToDevice(*this, flatArray);
 }
 
+ndBrainFloatBuffer::ndBrainFloatBuffer(const ndBrainFloatBuffer& src)
+	:ndBrainBuffer(src)
+{
+	if (m_context->GetAsCpuContext())
+	{
+		m_buffer = ndSharedPtr<ndBrainVector>(new ndBrainVector());
+		m_buffer->SetCount(ndInt64(src.m_sizeInBytes / sizeof(ndReal)));
+	}
+	m_context->CopyBuffer(*this, src);
+}
+
 size_t ndBrainFloatBuffer::GetCount() const
 {
 	return m_sizeInBytes / sizeof(ndReal);
@@ -85,14 +96,19 @@ void* ndBrainFloatBuffer::GetCpuPtr() const
 	return nullptr;
 }
 
-void ndBrainFloatBuffer::CopyBufferIndirect(const ndCopyBufferCommandInfo& descriptor, const ndBrainIntegerBuffer& indexBuffer, const ndBrainFloatBuffer& srcBuffer)
+void ndBrainFloatBuffer::CopyBuffer(const ndBrainBuffer& srcBuffer)
 {
-	m_context->CopyBufferIndirect(descriptor, indexBuffer, *this, srcBuffer);
+	m_context->CopyBuffer(*this, srcBuffer);
 }
 
 void ndBrainFloatBuffer::CopyBuffer(const ndCopyBufferCommandInfo& descriptor, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer)
 {
 	m_context->CopyBuffer(descriptor, workGroupCount, *this, srcBuffer);
+}
+
+void ndBrainFloatBuffer::CopyBufferIndirect(const ndCopyBufferCommandInfo& descriptor, const ndBrainIntegerBuffer& indexBuffer, const ndBrainFloatBuffer& srcBuffer)
+{
+	m_context->CopyBufferIndirect(descriptor, indexBuffer, *this, srcBuffer);
 }
 
 void ndBrainFloatBuffer::MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const

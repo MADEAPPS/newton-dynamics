@@ -42,6 +42,16 @@ void ndBrainCpuContext::SyncBufferCommandQueue()
 	// do nothing
 }
 
+void ndBrainCpuContext::CopyBuffer(ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
+{
+	ndAssert(dstData.SizeInBytes() == srcData.SizeInBytes());
+	ndAssert((dstData.SizeInBytes() & (sizeof(ndInt32) - 1)) == 0);
+
+	ndUnsigned32* const dst = (ndUnsigned32*)dstData.GetCpuPtr();
+	const ndUnsigned32* const src = (ndUnsigned32*)srcData.GetCpuPtr();
+	ndMemCpy(dst, src, ndInt64(dstData.SizeInBytes() / sizeof (ndInt32)));
+}
+
 void ndBrainCpuContext::CopyBuffer(const ndCopyBufferCommandInfo& descriptor, ndInt32 numberOfWorkGroups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
 {
 	ndInt32 stride = ndInt32(descriptor.m_strideInByte);
@@ -86,9 +96,6 @@ void ndBrainCpuContext::CopyBufferIndirect(const ndCopyBufferCommandInfo& descri
 	for (ndInt32 i = 0; i < count; ++i)
 	{
 		ndUnsigned32 index = indexPtr[i];
-		//index = 32;
-		//int xxxxxxx = (index * srcStride + srcOffset)/4;
-		//ndBrainMemVector xxxx((ndBrainFloat*) &src[index * srcStride + srcOffset], stride / 4);
 		ndMemCpy(&dst[i * dstStride + dstOffset], &src[index * srcStride + srcOffset], stride);
 	}
 }
@@ -156,6 +163,13 @@ void ndBrainCpuContext::Add(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer
 	ndBrainVector& dst = **buffer.m_buffer;
 	const ndBrainVector& src = **srcBuffer.m_buffer;
 	dst.Add(src);
+}
+
+void ndBrainCpuContext::Sub(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
+{
+	ndBrainVector& dst = **buffer.m_buffer;
+	const ndBrainVector& src = **srcBuffer.m_buffer;
+	dst.Sub(src);
 }
 
 void ndBrainCpuContext::Mul(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)

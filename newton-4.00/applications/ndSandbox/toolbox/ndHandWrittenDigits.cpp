@@ -152,6 +152,241 @@ static ndBrainMatrix* LoadMnistSampleData(const char* const filename)
 	return trainingDigits;
 }
 
+
+class SupervisedTrainer
+{
+	public:
+	SupervisedTrainer(ndSharedPtr<ndBrainContext>& context, const ndSharedPtr<ndBrain>& brain)
+		:m_brain(brain)
+		,m_bestBrain(ndSharedPtr<ndBrain>(new ndBrain(**brain)))
+		,m_learnRate(ndReal(5.0e-4f))
+		,m_miniBatchSize(MINIST_MINIBATCH_BUFFER_SIZE)
+		,m_minCombinedScore(ndInt64(1000000)* ndInt64(1000000))
+		,m_minValidationFail(ndInt64(1000000)* ndInt64(1000000))
+	{
+		ndTrainerDescriptor descriptor;
+		descriptor.m_brain = brain;
+		descriptor.m_context = context;
+		descriptor.m_learnRate = m_learnRate;
+		descriptor.m_minibatchSize = m_miniBatchSize;
+		m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor));
+	}
+
+	ndInt32 ValidateData(ndBrainMatrix* const testLabels, const ndSharedPtr<ndBrainFloatBuffer>& data)
+	{
+		//return 0;
+		ndBrainVector groundTruth;
+		ndBrainVector miniBatchInput;
+		ndBrainVector miniBatchOutput;
+
+		ndInt32 inputSize = m_brain->GetInputSize();
+		ndInt32 outputSize = testLabels->GetColumns();
+
+		groundTruth.SetCount(outputSize * m_miniBatchSize);
+		miniBatchInput.SetCount(inputSize * m_miniBatchSize);
+
+		ndInt32 failCount = 0;
+		ndInt32 batchesCount = testLabels->GetRows() / m_miniBatchSize;
+		ndInt32 batchesSize = batchesCount * m_miniBatchSize;
+
+		size_t strideInBytes = inputSize * sizeof(ndReal);
+		ndBrainFloatBuffer* const minibatchInputBuffer = m_trainer->GetInputBuffer();
+		ndBrainFloatBuffer* const minibatchOutpuBuffer = m_trainer->GetOuputBuffer();
+
+		ndCopyBufferCommandInfo copyBufferInfo;
+		copyBufferInfo.m_dstOffsetInByte = 0;
+		copyBufferInfo.m_srcOffsetInByte = 0;
+		copyBufferInfo.m_strideInByte = ndInt32(strideInBytes);
+		copyBufferInfo.m_srcStrideInByte = ndInt32(strideInBytes);
+		copyBufferInfo.m_dstStrideInByte = ndInt32(strideInBytes);
+		for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
+		{
+			copyBufferInfo.m_srcOffsetInByte = ndInt32(batchStart * strideInBytes);
+			minibatchInputBuffer->CopyBuffer(copyBufferInfo, m_miniBatchSize, **data);
+
+			m_trainer->MakePrediction();
+			minibatchOutpuBuffer->VectorFromDevice(miniBatchOutput);
+
+			for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
+			{
+				ndBrainMemVector truth(&groundTruth[i * outputSize], outputSize);
+				truth.SetCount(outputSize);
+				truth.Set((*testLabels)[batchStart + i]);
+
+				ndInt32 maxProbIndex = -1;
+				ndBrainFloat maxProbability = ndBrainFloat(-1.0f);
+
+				const ndBrainMemVector output(&miniBatchOutput[i * outputSize], outputSize);
+				for (ndInt32 j = 0; j < output.GetCount(); j++)
+				{
+					if (output[j] > maxProbability)
+					{
+						maxProbIndex = j;
+						maxProbability = output[j];
+					}
+				}
+				ndAssert(maxProbIndex >= 0);
+				if (truth[maxProbIndex] == ndReal(0.0f))
+				{
+					failCount++;
+				}
+			}
+		}
+		return failCount;
+	}
+
+	void Optimize(ndBrainMatrix* const trainingLabels, ndBrainMatrix* const testLabels)
+	{
+		//// so far best training result on the mnist data set
+		//optimizer.SetRegularizer(ndBrainFloat(0.0f));		//         training(100.0%) test(99.35%) 
+		////optimizer.SetRegularizer(ndBrainFloat(0.0f));		// dropout training(99.998%) test(99.4%) 
+		////optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// 
+		////optimizer.SetRegularizer(ndBrainFloat(2.0e-5f));	// 
+		////optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// 
+		//optimizer.SetRegularizer(ndBrainFloat(4.0e-5f));	// 
+
+		ndArray<ndUnsigned32> shuffleBuffer;
+		for (ndInt32 i = 0; i < trainingLabels->GetCount(); ++i)
+		{
+			shuffleBuffer.PushBack(ndUnsigned32(i));
+		}
+
+		ndInt32 inputSize = m_brain->GetInputSize();
+		ndInt32 outputSize = m_brain->GetOutputSize();
+		ndBrainTrainer* const trainer = *m_trainer;
+
+		//ndBrainVector groundTruth;
+		ndBrainVector weightAndBias;
+		ndBrainVector miniBatchInput;
+		ndInt32 batchesCount = trainingLabels->GetRows() / m_miniBatchSize;
+		ndInt32 batchesSize = batchesCount * m_miniBatchSize;
+
+		m_bestBrain = ndSharedPtr<ndBrain>(new ndBrain(**trainer->GetBrain()));
+
+		ndBrainLossCategoricalCrossEntropy loss(outputSize);
+
+		ndBrainFloatBuffer* const minibatchInputBuffer = m_trainer->GetInputBuffer();
+		ndBrainFloatBuffer* const minibatchOutpuBuffer = m_trainer->GetOuputBuffer();
+		ndBrainFloatBuffer* const weightdAndBiasBuffer = m_trainer->GetWeightAndBiasBuffer();
+		ndBrainFloatBuffer* const minibatchOutpuGradientBuffer = m_trainer->GetOuputGradientBuffer();
+		ndSharedPtr<ndBrainFloatBuffer> groundTruthMinibatch(ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*minibatchOutpuBuffer)));
+
+		ndCopyBufferCommandInfo copyDataInfo;
+		size_t dataStrideInBytes = size_t(inputSize * sizeof(ndReal));
+		copyDataInfo.m_dstOffsetInByte = 0;
+		copyDataInfo.m_srcOffsetInByte = 0;
+		copyDataInfo.m_strideInByte = ndInt32(dataStrideInBytes);
+		copyDataInfo.m_srcStrideInByte = ndInt32(dataStrideInBytes);
+		copyDataInfo.m_dstStrideInByte = ndInt32(dataStrideInBytes);
+
+		ndCopyBufferCommandInfo copyLabelsInfo;
+		size_t labelsStrideInBytes = size_t(outputSize * sizeof(ndReal));
+		copyLabelsInfo.m_dstOffsetInByte = 0;
+		copyLabelsInfo.m_srcOffsetInByte = 0;
+		copyLabelsInfo.m_strideInByte = ndInt32(labelsStrideInBytes);
+		copyLabelsInfo.m_srcStrideInByte = ndInt32(labelsStrideInBytes);
+		copyLabelsInfo.m_dstStrideInByte = ndInt32(labelsStrideInBytes);
+
+		ndBrainContext* const context = *trainer->GetContext();
+		for (ndInt32 epoch = 0; epoch < MINIST_NUMBER_OF_EPOCHS; ++epoch)
+		{
+			// wait unlit previous epoch is completed
+			context->SyncBufferCommandQueue();
+
+			shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
+			for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
+			{
+#if 1
+				m_indirectMiniBatch->MemoryToDevice(0, m_miniBatchSize * sizeof(ndUnsigned32), &shuffleBuffer[batchStart]);
+				minibatchInputBuffer->CopyBufferIndirect(copyDataInfo, **m_indirectMiniBatch, **m_trainingData);
+				groundTruthMinibatch->CopyBufferIndirect(copyLabelsInfo, **m_indirectMiniBatch, **m_trainingLabels);
+				trainer->MakePrediction();
+
+				//for not categorical soft max, calcuate the least squqre error lost
+				//minibatchOutpuGradientBuffer->CopyBuffer(*minibatchOutpuBuffer);
+				//context->Sub(*minibatchOutpuGradientBuffer, **groundTruthMinibatch);
+				 
+				// categorical softMax just pass the ground truth as gradients
+				minibatchOutpuGradientBuffer->CopyBuffer(**groundTruthMinibatch);
+
+				// backpropagate loss.
+				trainer->BackPropagate();
+				trainer->ApplyLearnRate();
+#else
+				trainer->BackPropagate();
+				trainer->ApplyLearnRate();
+#endif
+			}
+
+
+#if 0
+			ndInt64 testFailCount = ValidateData(testLabels, m_testData);
+			if (testFailCount < m_minValidationFail)
+			{
+				weightdAndBiasBuffer->VectorFromDevice(weightAndBias);
+				trainer->UpdateParameters(weightAndBias);
+				m_bestBrain->CopyFrom(**trainer->GetBrain());
+				m_minValidationFail = testFailCount;
+
+				ndExpandTraceMessage("epoch: %d\n", epoch);
+				ndExpandTraceMessage("   best model: test fail count:%d\n", testFailCount);
+			}
+#else
+			ndInt64 testFailCount = ValidateData(testLabels, m_testData) + 1;
+			if (testFailCount < m_minValidationFail)
+			{
+				weightdAndBiasBuffer->VectorFromDevice(weightAndBias);
+				trainer->UpdateParameters(weightAndBias);
+				m_bestBrain->CopyFrom(**trainer->GetBrain());
+
+				m_minValidationFail = testFailCount + 1;
+				ndInt64 trainigFailCount = ValidateData(trainingLabels, m_trainingData) + 1;
+				ndInt64 size = trainingLabels->GetCount();
+				ndFloat32 score = (ndFloat32)(size - trainigFailCount) / (ndFloat32)size;
+
+				ndExpandTraceMessage("epoch: %d\n", epoch);
+				ndExpandTraceMessage("  saving best model:");
+				ndExpandTraceMessage("  success rate:%f%%", score * 100.0f);
+				ndExpandTraceMessage("  training fail count:%d", trainigFailCount);
+				ndExpandTraceMessage("  test fail count:%d\n", testFailCount);
+			}
+			else
+			{
+				ndInt64 trainigFailCount = ValidateData(trainingLabels, m_trainingData) + 1;
+				ndInt64 minCombinedScore = testFailCount * trainigFailCount;
+				if (minCombinedScore <= m_minCombinedScore)
+				{
+					m_minCombinedScore = minCombinedScore;
+					ndInt64 size = trainingLabels->GetCount();
+					ndFloat32 score = (ndFloat32)(size - trainigFailCount) / (ndFloat32)size;
+
+					ndExpandTraceMessage("epoch: %d\n", epoch);
+					ndExpandTraceMessage("  success rate:%f%%", score * 100.0f);
+					ndExpandTraceMessage("  training fail count:%d", trainigFailCount);
+					ndExpandTraceMessage("  test fail count:%d\n", testFailCount);
+				}
+			}
+#endif
+		}
+		trainer->GetBrain()->CopyFrom(**m_bestBrain);
+	}
+
+	ndSharedPtr<ndBrain> m_brain;
+	ndSharedPtr<ndBrain> m_bestBrain;
+	ndSharedPtr<ndBrainTrainer> m_trainer;
+
+	ndSharedPtr<ndBrainFloatBuffer> m_testData;
+	ndSharedPtr<ndBrainFloatBuffer> m_testLabels;
+	ndSharedPtr<ndBrainFloatBuffer> m_trainingData;
+	ndSharedPtr<ndBrainFloatBuffer> m_trainingLabels;
+	ndSharedPtr<ndBrainIntegerBuffer> m_indirectMiniBatch;
+
+	ndReal m_learnRate;
+	ndInt32 m_miniBatchSize;
+	ndInt64 m_minCombinedScore;
+	ndInt64 m_minValidationFail;
+};
+
 static void MnistTrainingSet()
 {
 	ndSharedPtr<ndBrainMatrix> testLabels(LoadMnistLabelData("mnistDatabase/t10k-labels.idx1-ubyte"));
@@ -159,241 +394,6 @@ static void MnistTrainingSet()
 
 	ndSharedPtr<ndBrainMatrix> testDigits(LoadMnistSampleData("mnistDatabase/t10k-images.idx3-ubyte"));
 	ndSharedPtr<ndBrainMatrix> trainingDigits (LoadMnistSampleData("mnistDatabase/train-images.idx3-ubyte"));
-	
-	class SupervisedTrainer
-	{
-		public:
-		SupervisedTrainer(ndSharedPtr<ndBrainContext>& context, const ndSharedPtr<ndBrain>& brain)
-			:m_brain(brain)
-			,m_bestBrain(ndSharedPtr<ndBrain>(new ndBrain(**brain)))
-			,m_learnRate(ndReal(5.0e-4f))
-			,m_miniBatchSize(MINIST_MINIBATCH_BUFFER_SIZE)
-			,m_minCombinedScore(ndInt64(1000000) * ndInt64(1000000))
-			,m_minValidationFail(ndInt64(1000000) * ndInt64(1000000))
-		{
-			ndTrainerDescriptor descriptor;
-			descriptor.m_brain = brain;
-			descriptor.m_context = context;
-			descriptor.m_learnRate = m_learnRate;
-			descriptor.m_minibatchSize = m_miniBatchSize;
-			m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor));
-		}
-
-		ndInt32 ValidateData(ndBrainMatrix* const testLabels, const ndSharedPtr<ndBrainFloatBuffer>& data)
-		{
-			//return 0;
-			ndBrainVector groundTruth;
-			ndBrainVector miniBatchInput;
-			ndBrainVector miniBatchOutput;
-			
-			ndInt32 inputSize = m_brain->GetInputSize();
-			ndInt32 outputSize = testLabels->GetColumns();
-			
-			groundTruth.SetCount(outputSize * m_miniBatchSize);
-			miniBatchInput.SetCount(inputSize * m_miniBatchSize);
-			
-			ndInt32 failCount = 0;
-			ndInt32 batchesCount = testLabels->GetRows() / m_miniBatchSize;
-			ndInt32 batchesSize = batchesCount * m_miniBatchSize;
-			
-			size_t strideInBytes = inputSize * sizeof(ndReal);
-			ndBrainFloatBuffer* const minibatchInputBuffer = m_trainer->GetInputBuffer();
-			ndBrainFloatBuffer* const minibatchOutpuBuffer = m_trainer->GetOuputBuffer();
-			
-			ndCopyBufferCommandInfo copyBufferInfo;
-			copyBufferInfo.m_dstOffsetInByte = 0;
-			copyBufferInfo.m_srcOffsetInByte = 0;
-			copyBufferInfo.m_strideInByte = ndInt32(strideInBytes);
-			copyBufferInfo.m_srcStrideInByte = ndInt32(strideInBytes);
-			copyBufferInfo.m_dstStrideInByte = ndInt32(strideInBytes);
-			for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
-			{
-				copyBufferInfo.m_srcOffsetInByte = ndInt32 (batchStart * strideInBytes);
-				minibatchInputBuffer->CopyBuffer(copyBufferInfo, m_miniBatchSize, **data);
-			
-				m_trainer->MakePrediction();
-				minibatchOutpuBuffer->VectorFromDevice(miniBatchOutput);
-				
-				for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
-				{
-					ndBrainMemVector truth(&groundTruth[i * outputSize], outputSize);
-					truth.SetCount(outputSize);
-					truth.Set((*testLabels)[batchStart + i]);
-				
-					ndInt32 maxProbIndex = -1;
-					ndBrainFloat maxProbability = ndBrainFloat(-1.0f);
-				
-					const ndBrainMemVector output(&miniBatchOutput[i * outputSize], outputSize);
-					for (ndInt32 j = 0; j < output.GetCount(); j++)
-					{
-						if (output[j] > maxProbability)
-						{
-							maxProbIndex = j;
-							maxProbability = output[j];
-						}
-					}
-					ndAssert(maxProbIndex >= 0);
-					if (truth[maxProbIndex] == ndReal(0.0f))
-					{
-						failCount++;
-					}
-				}
-			}
-			return failCount;
-		}
-
-		void Optimize(ndBrainMatrix* const trainingLabels, ndBrainMatrix* const testLabels)
-		{
-			//// so far best training result on the mnist data set
-			//optimizer.SetRegularizer(ndBrainFloat(0.0f));		//         training(100.0%) test(99.35%) 
-			////optimizer.SetRegularizer(ndBrainFloat(0.0f));		// dropout training(99.998%) test(99.4%) 
-			////optimizer.SetRegularizer(ndBrainFloat(1.0e-5f));	// 
-			////optimizer.SetRegularizer(ndBrainFloat(2.0e-5f));	// 
-			////optimizer.SetRegularizer(ndBrainFloat(3.0e-5f));	// 
-			//optimizer.SetRegularizer(ndBrainFloat(4.0e-5f));	// 
-			
-			ndArray<ndUnsigned32> shuffleBuffer;
-			for (ndInt32 i = 0; i < trainingLabels->GetCount(); ++i)
-			{
-				shuffleBuffer.PushBack(ndUnsigned32(i));
-			}
-			
-			ndInt32 inputSize = m_brain->GetInputSize();
-			ndInt32 outputSize = m_brain->GetOutputSize();
-			ndBrainTrainer* const trainer = *m_trainer;
-			
-			ndBrainVector groundTruth;
-			ndBrainVector weightAndBias;
-			ndBrainVector miniBatchInput;
-			ndBrainVector miniBatchOutput;
-			ndBrainVector miniBatchOutputGradients;
-			
-			groundTruth.SetCount(outputSize * m_miniBatchSize);
-			miniBatchInput.SetCount(inputSize * m_miniBatchSize);
-			miniBatchOutput.SetCount(outputSize * m_miniBatchSize);
-			miniBatchOutputGradients.SetCount(outputSize * m_miniBatchSize);
-			
-			ndInt32 batchesCount = trainingLabels->GetRows() / m_miniBatchSize;
-			ndInt32 batchesSize = batchesCount * m_miniBatchSize;
-			
-			m_bestBrain = ndSharedPtr<ndBrain>(new ndBrain (**trainer->GetBrain()));
-			
-			ndBrainLossCategoricalCrossEntropy loss(outputSize);
-			
-			size_t strideInBytes = size_t(inputSize * sizeof(ndReal));
-			ndBrainFloatBuffer* const minibatchInputBuffer = m_trainer->GetInputBuffer();
-			ndBrainFloatBuffer* const minibatchOutpuBuffer = m_trainer->GetOuputBuffer();
-			ndBrainFloatBuffer* const weightdAndBiasBuffer = m_trainer->GetWeightAndBiasBuffer();
-			ndBrainFloatBuffer* const minibatchOutpuGradientBuffer = m_trainer->GetOuputGradientBuffer();
-			
-			ndCopyBufferCommandInfo copyBuffer;
-			copyBuffer.m_dstOffsetInByte = 0;
-			copyBuffer.m_srcOffsetInByte = 0;
-			copyBuffer.m_strideInByte = ndInt32(strideInBytes);
-			copyBuffer.m_srcStrideInByte = ndInt32(strideInBytes);
-			copyBuffer.m_dstStrideInByte = ndInt32(strideInBytes);
-
-			for (ndInt32 epoch = 0; epoch < MINIST_NUMBER_OF_EPOCHS; ++epoch)
-			{
-				trainer->GetContext()->SyncBufferCommandQueue();
-
-				shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
-				for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
-				{
-#if 1
-					m_indirectMiniBatch->MemoryToDevice(0, m_miniBatchSize * sizeof(ndUnsigned32), &shuffleBuffer[batchStart]);
-					minibatchInputBuffer->CopyBufferIndirect(copyBuffer, **m_indirectMiniBatch, **m_trainingData);
-					trainer->MakePrediction();
-					
-					//calculate loss
-					minibatchOutpuBuffer->VectorFromDevice(miniBatchOutput);
-					
-					for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
-					{
-						ndUnsigned32 index = shuffleBuffer[batchStart + i];
-						ndBrainMemVector grad(&miniBatchOutputGradients[i * outputSize], outputSize);
-						const ndBrainMemVector output(&miniBatchOutput[i * outputSize], outputSize);
-						const ndBrainMemVector truth(&(*trainingLabels)[index][0], outputSize);
-						
-						loss.SetTruth(truth);
-						loss.GetLoss(output, grad);
-					}
-					
-					// backpropagate loss.
-					minibatchOutpuGradientBuffer->VectorToDevice(miniBatchOutputGradients);
-					trainer->BackPropagate();
-					trainer->ApplyLearnRate(); 
-#else
-					trainer->BackPropagate();
-					trainer->ApplyLearnRate(); 
-#endif
-				}
-
-				
-#if 0
-				ndInt64 testFailCount = ValidateData(testLabels, m_testData);
-				if (testFailCount < m_minValidationFail)
-				{
-					weightdAndBiasBuffer->VectorFromDevice(weightAndBias);
-					trainer->UpdateParameters(weightAndBias);
-					m_bestBrain->CopyFrom(**trainer->GetBrain());
-					m_minValidationFail = testFailCount;
-
-					ndExpandTraceMessage("epoch: %d\n", epoch);
-					ndExpandTraceMessage("   best model: test fail count:%d\n", testFailCount);
-				} 
-#else
-				ndInt64 testFailCount = ValidateData(testLabels, m_testData) + 1;
-				if (testFailCount < m_minValidationFail)
-				{
-					weightdAndBiasBuffer->VectorFromDevice(weightAndBias);
-					trainer->UpdateParameters(weightAndBias);
-					m_bestBrain->CopyFrom(**trainer->GetBrain());
-
-					m_minValidationFail = testFailCount + 1;
-					ndInt64 trainigFailCount = ValidateData(trainingLabels, m_trainingData) + 1;
-					ndInt64 size = trainingLabels->GetCount();
-					ndFloat32 score = (ndFloat32)(size - trainigFailCount) / (ndFloat32)size;
-
-					ndExpandTraceMessage("epoch: %d\n", epoch);
-					ndExpandTraceMessage("  saving best model:");
-					ndExpandTraceMessage("  success rate:%f%%", score * 100.0f);
-					ndExpandTraceMessage("  training fail count:%d", trainigFailCount);
-					ndExpandTraceMessage("  test fail count:%d\n", testFailCount);
-				}
-				else
-				{
-					ndInt64 trainigFailCount = ValidateData(trainingLabels, m_trainingData) + 1;
-					ndInt64 minCombinedScore = testFailCount * trainigFailCount;
-					if (minCombinedScore <= m_minCombinedScore)
-					{
-						m_minCombinedScore = minCombinedScore;
-						ndInt64 size = trainingLabels->GetCount();
-						ndFloat32 score = (ndFloat32)(size - trainigFailCount) / (ndFloat32)size;
-
-						ndExpandTraceMessage("epoch: %d\n", epoch);
-						ndExpandTraceMessage("  success rate:%f%%", score * 100.0f);
-						ndExpandTraceMessage("  training fail count:%d", trainigFailCount);
-						ndExpandTraceMessage("  test fail count:%d\n", testFailCount);
-					}
-				}
-#endif
-			}
-			trainer->GetBrain()->CopyFrom(**m_bestBrain);
-		}
-
-		ndSharedPtr<ndBrain> m_brain;
-		ndSharedPtr<ndBrain> m_bestBrain;
-		ndSharedPtr<ndBrainTrainer> m_trainer;
-
-		ndSharedPtr<ndBrainFloatBuffer> m_testData;
-		ndSharedPtr<ndBrainFloatBuffer> m_trainingData;
-		ndSharedPtr<ndBrainIntegerBuffer> m_indirectMiniBatch;
-		ndReal m_learnRate;
-		ndInt32 m_miniBatchSize;
-		ndInt64 m_minCombinedScore;
-		ndInt64 m_minValidationFail;
-	};
 	
 	if (trainingLabels && trainingDigits)
 	{
@@ -462,7 +462,9 @@ static void MnistTrainingSet()
 		SupervisedTrainer optimizer(context, brain);
 
 		optimizer.m_testData = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*context, **testDigits));
+		optimizer.m_testLabels = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*context, **testLabels));
 		optimizer.m_trainingData = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*context, **trainingDigits));
+		optimizer.m_trainingLabels = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*context, **trainingLabels));
 		optimizer.m_indirectMiniBatch = ndSharedPtr<ndBrainIntegerBuffer>(new ndBrainIntegerBuffer(*context, optimizer.m_miniBatchSize, true));
 
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
@@ -596,6 +598,6 @@ static void MnistTestSet()
 void ndHandWrittenDigits()
 {
 	ndSetRandSeed(53);
-	//MnistTrainingSet();
+	MnistTrainingSet();
 	//MnistTestSet();
 }
