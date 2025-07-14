@@ -34,8 +34,8 @@
 //#define MIN_TRAIN_SCORE						0.9999f
 
 //#define MINIST_NUMBER_OF_EPOCHS				70
-#define MINIST_NUMBER_OF_EPOCHS					20
-//#define MINIST_NUMBER_OF_EPOCHS				1
+#define MINIST_NUMBER_OF_EPOCHS					1
+//#define MINIST_NUMBER_OF_EPOCHS					1
 
 #ifdef MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
 	#if 1
@@ -578,6 +578,6 @@ static void MnistTestSet()
 void ndHandWrittenDigits()
 {
 	ndSetRandSeed(53);
-	//MnistTrainingSet();
+	MnistTrainingSet();
 	//MnistTestSet();
 }
