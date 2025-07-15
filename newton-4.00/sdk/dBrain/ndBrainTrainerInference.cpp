@@ -139,14 +139,13 @@ void ndBrainTrainerInference::InitInputOutputBuffer()
 
 void ndBrainTrainerInference::InitWeightAndBiasBuffer()
 {
-	const ndBrain& brain = **m_descriptor.m_brain;
-
 	ndFixSizeArray<ndCommandSharedInfo, 256> uniformData;
+	const ndBrain& brain = **m_descriptor.m_brain;
 	for (ndInt32 i = 0; i < ndInt32(brain.GetCount()); ++i)
 	{
 		ndBrainLayer* const layer = brain[i];
-		ndCommandSharedInfo info(layer->GetGpuCommandSharedInfo());
-		info.m_parametersBatchSize = RoundOffOffset(info.m_parametersBatchSize);
+		ndCommandSharedInfo info(layer->GetCommandSharedInfo(this));
+		ndAssert((info.m_parametersBatchSize & (ND_DEFAULT_WORKGROUP_SIZE - 1)) == 0);
 		uniformData.PushBack(info);
 	}
 	uniformData.PushBack(ndCommandSharedInfo(nullptr));
@@ -157,8 +156,10 @@ void ndBrainTrainerInference::InitWeightAndBiasBuffer()
 		uniformData[i].m_parametersStartOffset = parametersSizeSum;
 		parametersSizeSum += uniformData[i].m_parametersBatchSize;
 	}
-	parametersSizeSum += ND_DEFAULT_WORKGROUP_SIZE;
-	parametersSizeSum = (parametersSizeSum + ND_DEFAULT_WORKGROUP_SIZE - 1) & -ND_DEFAULT_WORKGROUP_SIZE;
+	if (!parametersSizeSum)
+	{
+		parametersSizeSum += ND_DEFAULT_WORKGROUP_SIZE;
+	}
 	ndAssert((parametersSizeSum & (ND_DEFAULT_WORKGROUP_SIZE - 1)) == 0);
 
 	ndBrainVector scratchBuffer;
@@ -176,7 +177,7 @@ void ndBrainTrainerInference::InitWeightAndBiasBuffer()
 		{
 			ndInt32 offset = uniformData[i].m_parametersStartOffset;
 			ndBrainMemVector weights(&scratchBuffer[offset], size);
-			layer->CopyGpuWeights(weights);
+			layer->CopyWeights(this, weights);
 			info.m_parametersBatchSize = parametersSizeSum;
 		}
 	}
@@ -354,14 +355,9 @@ void ndBrainTrainerInference::UpdateParameters(const ndBrainVector& weightAndBia
 		ndBrainLayer* const layer = (ndBrainLayer*)info.m_layer;
 		if (layer)
 		{
-			ndInt32 width;
-			ndInt32 height;
-			ndBrainLayerLinear* const linearLayer = (ndBrainLayerLinear*)layer;
-			linearLayer->CalculateRoundedSize(width, height);
-			ndInt32 size = width * height + info.m_outputSize;
-			ndAssert(size >= 0);
-			const ndBrainMemVector weights(&weightAndBias[info.m_parametersStartOffset], size);
-			layer->SetGpuWeights(weights);
+			ndCommandSharedInfo layerParameterSize(layer->GetCommandSharedInfo(this));
+			const ndBrainMemVector weights(&weightAndBias[info.m_parametersStartOffset], layerParameterSize.m_parametersBatchSize);
+			layer->SetWeights(this, weights);
 		}
 	}
 }

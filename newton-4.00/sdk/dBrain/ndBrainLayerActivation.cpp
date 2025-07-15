@@ -119,7 +119,7 @@ void ndBrainLayerActivation::Blend(const ndBrainLayer&, ndBrainFloat)
 {
 }
 
-ndCommandSharedInfo ndBrainLayerActivation::GetGpuCommandSharedInfo() const
+ndCommandSharedInfo ndBrainLayerActivation::GetCommandSharedInfo(ndBrainTrainerInference* const) const
 {
 	ndCommandSharedInfo info(this);
 	info.m_inputSize = GetInputSize();

@@ -81,14 +81,13 @@ bool ndBrainLayer::HasGpuSupport() const
 	return false;
 }
 
-void ndBrainLayer::CopyGpuWeights(ndBrainVector&) const
+void ndBrainLayer::CopyWeights(ndBrainTrainerInference* const, ndBrainVector&) const
 {
 }
 
-void ndBrainLayer::SetGpuWeights(const ndBrainVector&)
+void ndBrainLayer::SetWeights(ndBrainTrainerInference* const, const ndBrainVector&)
 {
 }
-
 
 void ndBrainLayer::FeedForward(const ndBrainLayerFeedForwardCpuCommand* const, ndInt32) const
 {
@@ -213,7 +212,7 @@ void ndBrainLayer::CalculateParamGradients(const ndBrainVector&, const ndBrainVe
 	ndAssert(0);
 }
 
-ndCommandSharedInfo ndBrainLayer::GetGpuCommandSharedInfo() const
+ndCommandSharedInfo ndBrainLayer::GetCommandSharedInfo(ndBrainTrainerInference* const) const
 {
 	ndAssert(0);
 	return ndCommandSharedInfo(this);

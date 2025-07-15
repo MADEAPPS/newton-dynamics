@@ -21,6 +21,7 @@ R""""(
     #define ND_GPU_TILED_MATRIX_ROWS_BITS       4
     #define ND_GPU_TILED_MATRIX_ROWS            (1<<ND_GPU_TILED_MATRIX_ROWS_BITS)
 
+    #define ND_DEFAULT_WORKGROUP_SIZE           256
     #define ND_GPU_LOCAL_BUFFER_SIZE	        1024 * 4
 
     typedef struct
@@ -750,7 +751,8 @@ R""""(
         const uint outputSize = parameters->m_outputSize;
         const uint height = (outputSize + ND_GPU_TILED_MATRIX_ROWS - 1) & -ND_GPU_TILED_MATRIX_ROWS;
         const uint width = (inputSize + ND_GPU_TILED_MATRIX_ROWS * 2 - 1) & -ND_GPU_TILED_MATRIX_ROWS * 2;
-        const uint matrixSize = width * height;
+        const uint matrixSize = CalculateWorkGroupRoundoff(width * height, ND_DEFAULT_WORKGROUP_SIZE);
+
         const long parametersStartOffset = (long)parameters->m_parametersStartOffset + matrixSize;
         
         const uint workGroupSizeReminder = outputSize % workGroupSize;

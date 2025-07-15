@@ -1128,7 +1128,6 @@ class brainLayerBrainBackPropagateMatrixPartialSumBiasGradients : public ndBrain
         if (srcIndex < numberOfIndex)
         {
             ndInt32 outputSize = parameters->m_outputSize;
-            //ndInt32 alignedOffset = (outputSize + 255) & -256;
             ndInt32 alignedOffset = (outputSize + workGroupSize - 1) & -workGroupSize;
 
             ndInt32 dstOffset = groupId * alignedOffset;
@@ -1176,7 +1175,8 @@ class brainLayerBrainBackPropagateMatrixBiasGradients : public ndBrainKernel
         ndInt32 outputSize = parameters->m_outputSize;
         ndInt32 height = (outputSize + ND_GPU_TILED_MATRIX_ROWS - 1) & -ND_GPU_TILED_MATRIX_ROWS;
         ndInt32 width = (inputSize + ND_GPU_TILED_MATRIX_ROWS * 2 - 1) & -ND_GPU_TILED_MATRIX_ROWS * 2;
-        ndInt32 matrixSize = width * height;
+        ndInt32 matrixSize = __cpuKernelRoundoff(width * height, ND_DEFAULT_WORKGROUP_SIZE);;
+        
         ndInt64 parametersStartOffset = ndInt64(parameters->m_parametersStartOffset) + matrixSize;
 
         const ndInt32 workGroupSizeReminder = outputSize % workGroupSize;

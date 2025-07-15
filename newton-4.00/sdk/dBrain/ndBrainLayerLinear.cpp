@@ -332,17 +332,17 @@ bool ndBrainLayerLinear::HasGpuSupport() const
 	return true;
 }
 
-void ndBrainLayerLinear::CopyGpuWeights(ndBrainVector& output) const
+void ndBrainLayerLinear::CopyWeights(ndBrainTrainerInference* const trainer, ndBrainVector& output) const
 {
 	ndInt32 width;
 	ndInt32 height;
 
 	CalculateRoundedSize(width, height);
-	ndAssert(output.GetCount() >= (GetOutputSize() * GetInputSize() + GetOutputSize()));
-	ndAssert(output.GetCount() >= height * width + GetOutputSize());
+	ndInt32 matrixSize = trainer->RoundOffOffset(width * height);
+	ndAssert(output.GetCount() >= (matrixSize + trainer->RoundOffOffset(GetOutputSize())));
+	output.Set(ndBrainFloat(0.0f));
 
 	ndInt32 offset = 0;
-	output.Set(ndBrainFloat(0.0f));
 	ndInt32 columns = m_weights.GetColumns();
 	for (ndInt32 i = 0; i < m_weights.GetRows(); ++i)
 	{
@@ -352,17 +352,17 @@ void ndBrainLayerLinear::CopyGpuWeights(ndBrainVector& output) const
 		offset += width;
 		ndAssert(offset >= 0);
 	}
-	ndBrainMemVector bias(&output[height * width], m_bias.GetCount());
+	ndBrainMemVector bias(&output[matrixSize], m_bias.GetCount());
 	bias.Set(m_bias);
 }
 
-void ndBrainLayerLinear::SetGpuWeights(const ndBrainVector& weightsAnBias)
+void ndBrainLayerLinear::SetWeights(ndBrainTrainerInference* const trainer, const ndBrainVector& weightsAnBias)
 {
 	ndInt32 width;
 	ndInt32 height;
-
 	CalculateRoundedSize(width, height);
-	ndAssert(weightsAnBias.GetCount() >= (GetOutputSize() * GetInputSize() + GetOutputSize()));
+	ndInt32 matrixSize = trainer->RoundOffOffset(width * height);
+	ndAssert(weightsAnBias.GetCount() >= (matrixSize + trainer->RoundOffOffset(GetOutputSize())));
 
 	ndInt32 offset = 0;
 	ndInt32 columns = m_weights.GetColumns();
@@ -374,12 +374,11 @@ void ndBrainLayerLinear::SetGpuWeights(const ndBrainVector& weightsAnBias)
 		offset += width;
 		ndAssert(offset >= 0);
 	}
-	const ndBrainMemVector bias(&weightsAnBias[offset], m_bias.GetCount());
+	const ndBrainMemVector bias(&weightsAnBias[matrixSize], m_bias.GetCount());
 	m_bias.Set(bias);
 }
 
-
-ndCommandSharedInfo ndBrainLayerLinear::GetGpuCommandSharedInfo() const
+ndCommandSharedInfo ndBrainLayerLinear::GetCommandSharedInfo(ndBrainTrainerInference* const trainer) const
 {
 	ndCommandSharedInfo info(this);
 
@@ -392,7 +391,8 @@ ndCommandSharedInfo ndBrainLayerLinear::GetGpuCommandSharedInfo() const
 	ndInt32 width;
 	ndInt32 height;
 	CalculateRoundedSize(width, height);
-	info.m_parametersBatchSize = width * height + height;
+	ndInt32 matrixSize = trainer->RoundOffOffset(width * height);
+	info.m_parametersBatchSize = matrixSize + trainer->RoundOffOffset(rows);
 	return info;
 }
 
@@ -405,8 +405,6 @@ void ndBrainLayerLinear::FeedForward(const ndBrainLayerFeedForwardCpuCommand* co
 	const ndBrainFloat* const weightAndBias = (ndBrainFloat*)trainer->GetWeightAndBiasBuffer()->GetCpuPtr();
 	const ndBrainFloat* const inputOutputBuffer = (ndBrainFloat*)trainer->GetHiddenLayerBuffer()->GetCpuPtr();
 
-	//ndInt32 inputSize = info.m_inputSize;
-	//ndInt32 outputSize = info.m_outputSize;
 	ndInt32 inputSize = info.m_inputSize;
 	ndInt32 outputSize = info.m_outputSize;
 	ndInt32 inputOutputSize = info.m_inputOutputSize;
@@ -469,7 +467,7 @@ void ndBrainLayerLinear::BackPropagateBiasGradients(const ndBrainLayerBackPropag
 	ndInt32 width;
 	ndInt32 height;
 	CalculateRoundedSize(width, height);
-	ndInt32 matrixSize = width * height;
+	ndInt32 matrixSize = trainer->RoundOffOffset(width * height);
 
 	ndInt32 outputSize = info.m_outputSize;
 	ndBrainMemVector biasRowGradients(&weightAndBiasGradients[info.m_parametersStartOffset + matrixSize], outputSize);

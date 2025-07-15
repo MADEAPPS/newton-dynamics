@@ -84,12 +84,12 @@ class ndBrainLayerLinear : public ndBrainLayer
 		m_dimFactor = 16,
 	};
 
+	void CalculateRoundedSize(ndInt32& width, ndInt32& height) const;
 	void AdamUpdate(const ndBrainLayer& u, const ndBrainLayer& v, ndBrainFloat epsilon) override;
 
-	virtual void SetGpuWeights(const ndBrainVector& input) override;
-	virtual void CopyGpuWeights(ndBrainVector& oput) const override;
-	void CalculateRoundedSize(ndInt32& width, ndInt32& height) const;
-	virtual ndCommandSharedInfo GetGpuCommandSharedInfo() const override;
+	virtual void SetWeights(ndBrainTrainerInference* const trainer, const ndBrainVector& input) override;
+	virtual void CopyWeights(ndBrainTrainerInference* const trainer, ndBrainVector& output) const override;
+	virtual ndCommandSharedInfo GetCommandSharedInfo(ndBrainTrainerInference* const trainer) const override;
 
 	virtual bool HasGpuSupport() const override;
 	virtual void FeedForward(const ndBrainLayerFeedForwardCpuCommand* const info, ndInt32 miniBatchIndex) const override;
