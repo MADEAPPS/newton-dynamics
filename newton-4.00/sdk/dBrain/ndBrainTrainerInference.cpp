@@ -135,22 +135,6 @@ void ndBrainTrainerInference::InitInputOutputBuffer()
 	buffer.SetCount(bufferSize * m_descriptor.m_minibatchSize);
 	buffer.Set(ndBrainFloat(0.0f));
 	m_inputOutputBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_descriptor.m_context, buffer));
-	
-	//ndCopyBufferCommandInfo copyBufferInfo;
-	//copyBufferInfo.m_dstOffsetInByte = 0;
-	//copyBufferInfo.m_srcOffsetInByte = 0;
-	//copyBufferInfo.m_strideInByte = ndInt32(brain.GetInputSize() * sizeof(ndInt32));
-	//copyBufferInfo.m_srcStrideInByte = copyBufferInfo.m_strideInByte;
-	//copyBufferInfo.m_dstStrideInByte = copyBufferInfo.m_strideInByte * m_descriptor.m_minibatchSize;
-	//m_singlePredictionInputBufferParameters = ndSharedPtr<ndBrainUniformBuffer>(new ndBrainUniformBuffer(*m_descriptor.m_context, ndInt64(sizeof(ndCopyBufferCommandInfo)), &copyBufferInfo));
-	//
-	//copyBufferInfo.m_strideInByte = ndInt32(brain.GetOutputSize() * sizeof(ndInt32));
-	//copyBufferInfo.m_srcStrideInByte = copyBufferInfo.m_strideInByte;
-	//copyBufferInfo.m_dstStrideInByte = copyBufferInfo.m_strideInByte * m_descriptor.m_minibatchSize;
-	//m_singlePredictionOutputBufferParameters = ndSharedPtr<ndBrainUniformBuffer>(new ndBrainUniformBuffer(*m_descriptor.m_context, ndInt64(sizeof(ndCopyBufferCommandInfo)), &copyBufferInfo));
-	//
-	//m_singlePredictionInputBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_descriptor.m_context, ndInt64(brain.GetInputSize()), true));
-	//m_singlePredictionOutputBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_descriptor.m_context, ndInt64(brain.GetOutputSize()), true));
 }	
 
 void ndBrainTrainerInference::InitWeightAndBiasBuffer()
