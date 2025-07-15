@@ -95,12 +95,6 @@ class ndBrainTrainerInference : public ndClassAlloc
 	ndSharedPtr<ndBrainFloatBuffer> m_weightAndBiasBuffer;
 	ndSharedPtr<ndBrainFloatBuffer> m_miniBatchInputBuffer;
 	ndSharedPtr<ndBrainFloatBuffer> m_miniBatchOutputBuffer;
-
-	//ndSharedPtr<ndBrainFloatBuffer> m_singlePredictionInputBuffer;
-	//ndSharedPtr<ndBrainFloatBuffer> m_singlePredictionOutputBuffer;
-	//ndSharedPtr<ndBrainUniformBuffer> m_singlePredictionInputBufferParameters;
-	//ndSharedPtr<ndBrainUniformBuffer> m_singlePredictionOutputBufferParameters;
-
 	ndList<ndSharedPtr<ndBrainBufferCommand>> m_feedForwardCommands;
 };
 
