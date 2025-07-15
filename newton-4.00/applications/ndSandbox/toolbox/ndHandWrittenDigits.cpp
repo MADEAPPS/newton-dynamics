@@ -297,9 +297,9 @@ class mnistSupervisedTrainer
 					loss.SetTruth(truth);
 					loss.GetLoss(output, grad);
 				}
+				minibatchOutpuGradientBuffer->VectorToDevice(miniBatchOutputGradients);
 
 				// backpropagate loss.
-				minibatchOutpuGradientBuffer->VectorToDevice(miniBatchOutputGradients);
 				trainer->BackPropagate();
 				trainer->ApplyLearnRate();
 #else
@@ -365,14 +365,15 @@ class mnistSupervisedTrainer
 	ndSharedPtr<ndBrainTrainer> m_trainer;
 
 	ndSharedPtr<ndBrainFloatBuffer> m_testData;
+	ndSharedPtr<ndBrainFloatBuffer> m_testLabels;
 	ndSharedPtr<ndBrainFloatBuffer> m_trainingData;
+	ndSharedPtr<ndBrainFloatBuffer> m_trainingLabels;
 	ndSharedPtr<ndBrainIntegerBuffer> m_indirectMiniBatch;
 
 	ndBrainVector groundTruth;
 	ndBrainVector weightAndBias;
 	ndBrainVector miniBatchInput;
 	ndBrainVector miniBatchOutput;
-	//ndBrainVector miniBatchOutputGradients;
 
 	ndReal m_learnRate;
 	ndInt32 m_miniBatchSize;
@@ -447,8 +448,6 @@ static void MnistTrainingSet()
 		bool isGpuReady = brain->IsGpuReady();
 #ifdef MINIST_USE_CPU_TRAINING
 		isGpuReady = false;
-#else
-		ndAssert(isGpuReady);
 #endif
 
 		ndSharedPtr<ndBrainContext> context(isGpuReady ? (ndBrainContext*)new ndBrainGpuContext : (ndBrainContext*)new ndBrainCpuContext);
