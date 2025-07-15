@@ -50,7 +50,7 @@ void ndBrainGpuContext::CopyBuffer(ndBrainBuffer& dstData, const ndBrainBuffer& 
 	const ndSharedPtr<ndBrainGpuBuffer>& srcBuffer = srcData.m_gpuBuffer;
 	ndAssert(dstData.SizeInBytes() == srcData.SizeInBytes());
 	ndInt32* const dst = (ndInt32*)&dstBuffer->m_memory[0];
-	ndInt32* const src = (ndInt32*)&dstBuffer->m_memory[0];
+	ndInt32* const src = (ndInt32*)&srcBuffer->m_memory[0];
 	ndAssert(src);
 	ndAssert(dst);
 	ndAssert((dstData.SizeInBytes() & (sizeof (ndInt32) - 1)) == 0);
