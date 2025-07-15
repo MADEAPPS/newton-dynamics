@@ -5584,6 +5584,21 @@ static void SetWindowConditionAllowFlags(ImGuiWindow* window, ImGuiCond flags, b
     window->SetWindowDockAllowFlags      = enabled ? (window->SetWindowDockAllowFlags      | flags) : (window->SetWindowDockAllowFlags      & ~flags);
 }
 
+#pragma optimize( "", off )
+ImGuiWindow* ImGui::GetCurrentWindow()
+{
+    ImGuiContext& g = *GImGui;
+    g.CurrentWindow->WriteAccessed = true;
+    return g.CurrentWindow;
+}
+
+#pragma optimize( "", off )
+ImGuiWindow* ImGui::GetCurrentWindowRead()
+{
+    ImGuiContext& g = *GImGui;
+    return g.CurrentWindow;
+}
+
 ImGuiWindow* ImGui::FindWindowByID(ImGuiID id)
 {
     ImGuiContext& g = *GImGui;
