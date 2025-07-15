@@ -44,6 +44,19 @@ ndBrainGpuContext* ndBrainGpuContext::GetAsGpuContext()
 	return this;
 }
 
+void ndBrainGpuContext::CopyBuffer(ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
+{
+	ndSharedPtr<ndBrainGpuBuffer>& dstBuffer = dstData.m_gpuBuffer;
+	const ndSharedPtr<ndBrainGpuBuffer>& srcBuffer = srcData.m_gpuBuffer;
+	ndAssert(dstData.SizeInBytes() == srcData.SizeInBytes());
+	ndInt32* const dst = (ndInt32*)&dstBuffer->m_memory[0];
+	ndInt32* const src = (ndInt32*)&dstBuffer->m_memory[0];
+	ndAssert(src);
+	ndAssert(dst);
+	ndAssert((dstData.SizeInBytes() & (sizeof (ndInt32) - 1)) == 0);
+	ndMemCpy(dst, src, ndInt64(dstData.SizeInBytes() / sizeof (ndInt32)));
+}
+
 void ndBrainGpuContext::CopyBuffer(const ndCopyBufferCommandInfo& parameters, ndInt32 numberOfWorkGrups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
 {
 	m_copyBufferParams->MemoryToDevice(0, sizeof(ndCopyBufferCommandInfo), &parameters);
@@ -152,7 +165,6 @@ void ndBrainGpuContext::BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVe
 	size_t sizeInBytes = ndMin(size_t(src.SizeInBytes()), size_t(dstVector.GetCount() * sizeof(ndReal)));
 	MemoryFromDevice(src, 0, sizeInBytes, &dstVector[0]);
 }
-
 
 void ndBrainGpuContext::Scale(ndBrainFloatBuffer& buffer, ndBrainFloat scale)
 {

@@ -267,19 +267,7 @@ void ndBrainGpuContext::MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size
 		ndAssert(buffer->m_owner->m_isMemoryMapped);
 		ndInt64 size = ndInt64(sizeInBytes / sizeof(ndUnsigned32));
 		ndInt64 offset = ndInt64(offsetInBytes / sizeof(ndUnsigned32));
-
 		ndMemCpy((ndUnsigned32*)outputMemory, &buffer->m_memory[offset], size);
-
-		//ndBrainFloat ptr1[1024 * 16];
-		//ndBrainFloat* const ptr0 = (ndBrainFloat*)outputMemory;
-		//ndBrainFloat* const ptr2 = (ndBrainFloat*)buffer->m_memory;
-		//const cl::CommandQueue* queue = *m_queue;
-		//error = queue->enqueueReadBuffer(**buffer->m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, ptr1);
-		//ndAssert(error == CL_SUCCESS);
-		//for (ndInt32 i = 0; i < size; ++i)
-		//{
-		//	ndAssert(ptr0[i] == ptr1[i]);
-		//}
 	}
 	else
 	{

@@ -19,6 +19,7 @@ class ndBrainIntegerBuffer;
 class ndBrainFloatBuffer : public ndBrainBuffer
 {
 	public:
+	ndBrainFloatBuffer(const ndBrainFloatBuffer& src);
 	ndBrainFloatBuffer(ndBrainContext* const context, ndInt64 size, bool memoryMapped = false);
 	ndBrainFloatBuffer(ndBrainContext* const context, const ndBrainVector& input, bool memoryMapped = false);
 	ndBrainFloatBuffer(ndBrainContext* const context, const ndBrainMatrix& matrix, bool memoryMapped = false);
@@ -33,10 +34,9 @@ class ndBrainFloatBuffer : public ndBrainBuffer
 	void MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData);
 	void MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const;
 
+	void CopyBuffer(const ndBrainBuffer& srcBuffer);
 	void CopyBuffer(const ndCopyBufferCommandInfo& descriptor, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer);
 	void CopyBufferIndirect(const ndCopyBufferCommandInfo& descriptor, const ndBrainIntegerBuffer& indexBuffer, const ndBrainFloatBuffer& srcBuffer);
-
-	void Multiply(const ndBrainBuffer& srcBuffer);
 
 	protected:
 	ndSharedPtr<ndBrainVector> m_buffer;

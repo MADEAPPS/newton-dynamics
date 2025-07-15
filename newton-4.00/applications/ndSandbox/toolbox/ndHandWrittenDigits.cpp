@@ -240,41 +240,48 @@ class mnistSupervisedTrainer
 		ndInt32 outputSize = m_brain->GetOutputSize();
 		ndBrainTrainer* const trainer = *m_trainer;
 
-		groundTruth.SetCount(outputSize * m_miniBatchSize);
-		miniBatchInput.SetCount(inputSize * m_miniBatchSize);
-		miniBatchOutput.SetCount(outputSize * m_miniBatchSize);
-		miniBatchOutputGradients.SetCount(outputSize * m_miniBatchSize);
-
 		ndInt32 batchesCount = trainingLabels->GetRows() / m_miniBatchSize;
 		ndInt32 batchesSize = batchesCount * m_miniBatchSize;
 
 		m_bestBrain = ndSharedPtr<ndBrain>(new ndBrain(**trainer->GetBrain()));
 
 		ndBrainLossCategoricalCrossEntropy loss(outputSize);
-
-		size_t strideInBytes = size_t(inputSize * sizeof(ndReal));
 		ndBrainFloatBuffer* const minibatchInputBuffer = m_trainer->GetInputBuffer();
 		ndBrainFloatBuffer* const minibatchOutpuBuffer = m_trainer->GetOuputBuffer();
 		ndBrainFloatBuffer* const weightdAndBiasBuffer = m_trainer->GetWeightAndBiasBuffer();
 		ndBrainFloatBuffer* const minibatchOutpuGradientBuffer = m_trainer->GetOuputGradientBuffer();
+		ndSharedPtr<ndBrainFloatBuffer> groundTruthMinibatch(ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*minibatchOutpuBuffer)));
 
-		ndCopyBufferCommandInfo copyBuffer;
-		copyBuffer.m_dstOffsetInByte = 0;
-		copyBuffer.m_srcOffsetInByte = 0;
-		copyBuffer.m_strideInByte = ndInt32(strideInBytes);
-		copyBuffer.m_srcStrideInByte = ndInt32(strideInBytes);
-		copyBuffer.m_dstStrideInByte = ndInt32(strideInBytes);
+		ndCopyBufferCommandInfo copyDataInfo;
+		size_t dataStrideInBytes = size_t(inputSize * sizeof(ndReal));
+		copyDataInfo.m_dstOffsetInByte = 0;
+		copyDataInfo.m_srcOffsetInByte = 0;
+		copyDataInfo.m_strideInByte = ndInt32(dataStrideInBytes);
+		copyDataInfo.m_srcStrideInByte = ndInt32(dataStrideInBytes);
+		copyDataInfo.m_dstStrideInByte = ndInt32(dataStrideInBytes);
 
+		ndCopyBufferCommandInfo copyLabelsInfo;
+		size_t labelsStrideInBytes = size_t(outputSize * sizeof(ndReal));
+		copyLabelsInfo.m_dstOffsetInByte = 0;
+		copyLabelsInfo.m_srcOffsetInByte = 0;
+		copyLabelsInfo.m_strideInByte = ndInt32(labelsStrideInBytes);
+		copyLabelsInfo.m_srcStrideInByte = ndInt32(labelsStrideInBytes);
+		copyLabelsInfo.m_dstStrideInByte = ndInt32(labelsStrideInBytes);
+
+		ndBrainVector miniBatchOutputGradients;
+		minibatchOutpuGradientBuffer->VectorFromDevice(miniBatchOutputGradients);
+
+		ndBrainContext* const context = *trainer->GetContext();
 		for (ndInt32 epoch = 0; epoch < MINIST_NUMBER_OF_EPOCHS; ++epoch)
 		{
-			trainer->GetContext()->SyncBufferCommandQueue();
-
 			shuffleBuffer.RandomShuffle(shuffleBuffer.GetCount());
 			for (ndInt32 batchStart = 0; batchStart < batchesSize; batchStart += m_miniBatchSize)
 			{
+				// wait until previous epoch is completed
+				context->SyncBufferCommandQueue();
 #if 1
 				m_indirectMiniBatch->MemoryToDevice(0, m_miniBatchSize * sizeof(ndUnsigned32), &shuffleBuffer[batchStart]);
-				minibatchInputBuffer->CopyBufferIndirect(copyBuffer, **m_indirectMiniBatch, **m_trainingData);
+				minibatchInputBuffer->CopyBufferIndirect(copyDataInfo, **m_indirectMiniBatch, **m_trainingData);
 				trainer->MakePrediction();
 
 				//calculate loss
@@ -300,7 +307,6 @@ class mnistSupervisedTrainer
 				trainer->ApplyLearnRate();
 #endif
 			}
-
 
 #if 0
 			ndInt64 testFailCount = ValidateData(testLabels, m_testData);
@@ -366,7 +372,7 @@ class mnistSupervisedTrainer
 	ndBrainVector weightAndBias;
 	ndBrainVector miniBatchInput;
 	ndBrainVector miniBatchOutput;
-	ndBrainVector miniBatchOutputGradients;
+	//ndBrainVector miniBatchOutputGradients;
 
 	ndReal m_learnRate;
 	ndInt32 m_miniBatchSize;

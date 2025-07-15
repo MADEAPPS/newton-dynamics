@@ -79,6 +79,9 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 	m_hiddenLayersNumberOfNeurons = 256;
 	m_replayBufferStartOptimizeSize = m_maxTrajectorySteps * 4;
 
+
+m_policyUpdatesCount = 1;
+m_criticUpdatesCount = 1;
 m_useGpuBackend = false;
 //m_policyUpdatesCount = 2;
 //m_criticUpdatesCount = 2;
