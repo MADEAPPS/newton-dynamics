@@ -18,9 +18,6 @@
 const char* ndBrainGpuContext::m_commonKernelsInclude =
 R""""(
 
-    //#define ND_GPU_USE_SOFT_SUBGROUPS
-    //#define ND_GPU_SOFT_SUBGROUPS_WORD_SIZE     32
-
     #define ND_GPU_TILED_MATRIX_ROWS_BITS       4
     #define ND_GPU_TILED_MATRIX_ROWS            (1<<ND_GPU_TILED_MATRIX_ROWS_BITS)
 
@@ -261,35 +258,6 @@ R""""(
             maxArg = (inputValue > maxArg) ? inputValue : maxArg;
         }
 
-#ifdef ND_GPU_USE_SOFT_SUBGROUPS
-        // barrier reduction loop
-        for (uint j = workGroupSize / 2; j > ND_GPU_SOFT_SUBGROUPS_WORD_SIZE; j = j >> 1)
-        {
-            barrier(CLK_LOCAL_MEM_FENCE); 
-            if ((itemId >= j) && (itemId < j * 2))
-            {
-                reductionBuffer[itemId - j] = maxArg;
-            }
-        
-            barrier(CLK_LOCAL_MEM_FENCE); 
-            if (itemId < j)
-            {
-                float inputValue = reductionBuffer[itemId];
-                maxArg = (inputValue > maxArg) ? inputValue : maxArg;
-            }
-        }
-        // barrier reduction loop
-        barrier(CLK_LOCAL_MEM_FENCE); 
-        for (uint j = ND_GPU_SOFT_SUBGROUPS_WORD_SIZE; j > 0; j = j >> 1)
-        {
-            if (itemId < ND_GPU_SOFT_SUBGROUPS_WORD_SIZE)
-            {
-                float inputValue = reductionBuffer[itemId + j/2];
-                maxArg = (inputValue > maxArg) ? inputValue : maxArg;
-                reductionBuffer[itemId] = maxArg;
-            }
-        }
-#else
         for (uint j = workGroupSize / 2; j > 0; j = j >> 1)
         {
             barrier(CLK_LOCAL_MEM_FENCE); 
@@ -305,7 +273,7 @@ R""""(
                 maxArg = (inputValue > maxArg) ? inputValue : maxArg;
             }
         }
-#endif
+
         if (itemId == 0)
         {
             reductionBuffer[0] = maxArg;

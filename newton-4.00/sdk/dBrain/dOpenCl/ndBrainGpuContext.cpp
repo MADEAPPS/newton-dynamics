@@ -320,14 +320,14 @@ void ndBrainGpuContext::SubmitMathOperation(const ndSharedPtr<ndBrainKernel>& ke
 	const ndBrainGpuBuffer* const src = srcBuffer->GetGpuBuffer();
 
 	ndInt32 numberOfElements = ndInt32(buffer->SizeInBytes() / sizeof(float));
+	ndInt32 numberOfGroups = (numberOfElements + ND_DEFAULT_WORKGROUP_SIZE - 1) & -ND_DEFAULT_WORKGROUP_SIZE;
+
 	error = shader->setArg(0, numberOfElements);
 	ndAssert(error == CL_SUCCESS);
 	error = shader->setArg(1, **dst->m_buffer);
 	ndAssert(error == CL_SUCCESS);
 	error = shader->setArg(2, **src->m_buffer);
 	ndAssert(error == CL_SUCCESS);
-
-	ndInt32 numberOfGroups = (numberOfElements + ND_DEFAULT_WORKGROUP_SIZE - 1) & -ND_DEFAULT_WORKGROUP_SIZE;
 
 	cl::NDRange offset(0);
 	cl::NDRange local(ND_DEFAULT_WORKGROUP_SIZE);

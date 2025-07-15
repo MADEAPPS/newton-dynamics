@@ -379,9 +379,12 @@ static void SimpleRegressionBrainStressTest()
 		{
 			indirectMiniBatch.MemoryToDevice(0, minibatchSize * sizeof(ndUnsigned32), &shuffleBuffer[batchStart]);
 			minibatchInputBuffer->CopyBufferIndirect(copyBufferInfo, indirectMiniBatch, trainingData);
-
 			trainer->MakePrediction();
+
+			context->SyncBufferCommandQueue();
 			minibatchOutpuBuffer->VectorFromDevice(miniBatchOutput);
+
+
 			for (ndInt32 i = 0; i < minibatchSize; ++i)
 			{
 				ndUnsigned32 index = shuffleBuffer[batchStart + i];
