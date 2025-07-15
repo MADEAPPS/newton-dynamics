@@ -12,7 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndTestDeepBrain.h"
 
-//#define MINIST_USE_CPU_TRAINING
+#define MINIST_USE_CPU_TRAINING
  
 //#define MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
 
@@ -286,19 +286,12 @@ class mnistSupervisedTrainer
 				trainer->MakePrediction();
 
 				//calculate loss
-				minibatchOutpuBuffer->VectorFromDevice(miniBatchOutput);
-
-				for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
-				{
-					ndUnsigned32 index = shuffleBuffer[batchStart + i];
-					ndBrainMemVector grad(&miniBatchOutputGradients[i * outputSize], outputSize);
-					const ndBrainMemVector output(&miniBatchOutput[i * outputSize], outputSize);
-					const ndBrainMemVector truth(&(*trainingLabels)[index][0], outputSize);
-
-					loss.SetTruth(truth);
-					loss.GetLoss(output, grad);
-				}
-				minibatchOutpuGradientBuffer->VectorToDevice(miniBatchOutputGradients);
+				//for not categorical soft max, calculate the least scuare error lost
+				//minibatchOutpuGradientBuffer->CopyBuffer(*minibatchOutpuBuffer);
+				//context->Sub(*minibatchOutpuGradientBuffer, **groundTruthMinibatch);
+				
+				//for categorical soft max, just pass the categorical class as gradient loss
+				minibatchOutpuGradientBuffer->CopyBuffer(**groundTruthMinibatch);
 
 				// backpropagate loss.
 				trainer->BackPropagate();
