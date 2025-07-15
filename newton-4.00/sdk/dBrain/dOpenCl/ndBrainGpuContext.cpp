@@ -208,12 +208,12 @@ void ndBrainGpuContext::CreateCopyCommands()
 {
 	ndBrainBufferCommandDesc copyDescriptor(0);
 	copyDescriptor.m_context = this;
-	copyDescriptor.m_kernel = m_brainCopyBuffer;
+	copyDescriptor.m_kernel = m_brainCopyStridedBuffer;
 	m_copyBufferCommand = ndSharedPtr<ndBrainGpuCommand>(new ndBrainGpuCommand(copyDescriptor));
 
 	ndBrainBufferCommandDesc copyIndirectDescriptor(0);
 	copyIndirectDescriptor.m_context = this;
-	copyIndirectDescriptor.m_kernel = m_brainCopyBufferIndirect;
+	copyIndirectDescriptor.m_kernel = m_brainCopyStridedBufferIndirect;
 	m_copyBufferIndirectCommand = ndSharedPtr<ndBrainGpuCommand>(new ndBrainGpuCommand(copyIndirectDescriptor));
 
 	ndCopyBufferCommandInfo copyBuffer;
@@ -307,4 +307,61 @@ void ndBrainGpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
 	cl::NDRange global(size_t(desc.m_workGroupSize * desc.m_miniBatchSize));
 	error = m_queue->enqueueNDRangeKernel(*shader, offset, global, local);
 	ndAssert(error == CL_SUCCESS);
+}
+
+void ndBrainGpuContext::SubmitMathOperation(const ndSharedPtr<ndBrainKernel>& kernel, ndBrainBuffer* const buffer, const ndBrainBuffer* const srcBuffer)
+{
+	cl_int error = 0;
+	OpenclKernel* const oclKernel = (OpenclKernel*)*kernel;
+	cl::Kernel* const shader = *oclKernel->m_shader;
+
+	//, ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer
+	ndBrainGpuBuffer* const dst = buffer->GetGpuBuffer();
+	const ndBrainGpuBuffer* const src = srcBuffer->GetGpuBuffer();
+
+	ndInt32 numberOfElements = ndInt32(buffer->SizeInBytes() / sizeof(float));
+	error = shader->setArg(0, numberOfElements);
+	ndAssert(error == CL_SUCCESS);
+	error = shader->setArg(1, **dst->m_buffer);
+	ndAssert(error == CL_SUCCESS);
+	error = shader->setArg(2, **src->m_buffer);
+	ndAssert(error == CL_SUCCESS);
+
+	ndInt32 numberOfGroups = (numberOfElements + ND_DEFAULT_WORKGROUP_SIZE - 1) & -ND_DEFAULT_WORKGROUP_SIZE;
+
+	cl::NDRange offset(0);
+	cl::NDRange local(ND_DEFAULT_WORKGROUP_SIZE);
+	cl::NDRange global(numberOfGroups);
+	error = m_queue->enqueueNDRangeKernel(*shader, offset, global, local);
+	ndAssert(error == CL_SUCCESS);
+}
+
+void ndBrainGpuContext::CopyBuffer(ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
+{
+	SubmitMathOperation(m_mathBufferAssigment, &dstData, &srcData);
+}
+
+void ndBrainGpuContext::Scale(ndBrainFloatBuffer& buffer, ndBrainFloat scale)
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuContext::Min(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuContext::Add(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuContext::Sub(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuContext::Mul(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
+{
+	ndAssert(0);
 }

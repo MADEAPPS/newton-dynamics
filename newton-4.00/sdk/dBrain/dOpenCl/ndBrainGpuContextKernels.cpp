@@ -1031,11 +1031,10 @@ R""""(
 
 )"""";
 
-
 const char* ndBrainGpuContext::m_otherShaderFunctions =
 R""""(
 
-    __kernel void brainCopyBuffer(
+    __kernel void brainCopyStridedBuffer(
         __global const CopyBufferCommandInfo* parameters,
         __global float* outputData,
         __global float* inputData)
@@ -1062,7 +1061,7 @@ R""""(
         }
     }
 
-    __kernel void brainCopyBufferIndirect(
+    __kernel void brainCopyStridedBufferIndirect(
         __global const CopyBufferCommandInfo* parameters,
         __global float* outputData,
         __global float* inputData, 
@@ -1089,7 +1088,21 @@ R""""(
             outputData[dstOffset + modWorkGroupSize + itemId] = a;
         }
     }
+)"""";
 
+const char* ndBrainGpuContext::m_mathOpsCommand =
+R""""(
+    __kernel void brainBufferAssigment(
+        int numberOfElements,
+        __global float* outputData,
+        __global float* inputData)
+    {
+        int global_id = get_global_id(0);
+        if (global_id < numberOfElements)
+        {
+            outputData[global_id] = inputData[global_id];
+        }
+    }
 )"""";
 
 ndSharedPtr<ndBrainKernel> ndBrainGpuContext::CreateKerner(const cl::Program& program, const char* const functionMame) const
@@ -1105,6 +1118,7 @@ ndSharedPtr<ndBrainKernel> ndBrainGpuContext::CreateKerner(const cl::Program& pr
 void ndBrainGpuContext::CreateKerners()
 {
     std::string source(m_commonKernelsInclude);
+    source += m_mathOpsCommand;
     source += m_matrixMultiply;
     source += m_optimizerKernels;
     source += m_otherShaderFunctions;
@@ -1188,6 +1202,9 @@ void ndBrainGpuContext::CreateKerners()
     m_brainAdamLassoOptimizerUpdate = CreateKerner(program, "brainAdamUpdateLassoRegularizer");
 
     // other shaders
-    m_brainCopyBuffer = CreateKerner(program, "brainCopyBuffer");
-    m_brainCopyBufferIndirect = CreateKerner(program, "brainCopyBufferIndirect");
+    m_brainCopyStridedBuffer = CreateKerner(program, "brainCopyStridedBuffer");
+    m_brainCopyStridedBufferIndirect = CreateKerner(program, "brainCopyStridedBufferIndirect");
+
+    // math operations
+    m_mathBufferAssigment = CreateKerner(program, "brainBufferAssigment");
 }

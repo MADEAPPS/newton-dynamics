@@ -39,6 +39,7 @@ class ndBrainCpuContext : public ndBrainContext, public ndBrainThreadPool
 	virtual void Scale(ndBrainFloatBuffer& buffer, ndBrainFloat scale) override;
 	virtual void Min(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
 	virtual void Add(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
+	virtual void Sub(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
 	virtual void Mul(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
 };
 

@@ -165,6 +165,13 @@ void ndBrainCpuContext::Add(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer
 	dst.Add(src);
 }
 
+void ndBrainCpuContext::Sub(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
+{
+	ndBrainVector& dst = **buffer.m_buffer;
+	const ndBrainVector& src = **srcBuffer.m_buffer;
+	dst.Sub(src);
+}
+
 void ndBrainCpuContext::Mul(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
 {
 	ndBrainVector& dst = **buffer.m_buffer;

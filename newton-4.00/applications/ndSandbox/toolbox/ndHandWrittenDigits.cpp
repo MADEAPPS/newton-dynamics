@@ -12,7 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndTestDeepBrain.h"
 
-#define MINIST_USE_CPU_TRAINING
+//#define MINIST_USE_CPU_TRAINING
  
 //#define MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
 
@@ -245,7 +245,7 @@ class mnistSupervisedTrainer
 
 		m_bestBrain = ndSharedPtr<ndBrain>(new ndBrain(**trainer->GetBrain()));
 
-		ndBrainLossCategoricalCrossEntropy loss(outputSize);
+		//ndBrainLossCategoricalCrossEntropy loss(outputSize);
 		ndBrainFloatBuffer* const minibatchInputBuffer = m_trainer->GetInputBuffer();
 		ndBrainFloatBuffer* const minibatchOutpuBuffer = m_trainer->GetOuputBuffer();
 		ndBrainFloatBuffer* const weightdAndBiasBuffer = m_trainer->GetWeightAndBiasBuffer();
@@ -267,9 +267,6 @@ class mnistSupervisedTrainer
 		copyLabelsInfo.m_strideInByte = ndInt32(labelsStrideInBytes);
 		copyLabelsInfo.m_srcStrideInByte = ndInt32(labelsStrideInBytes);
 		copyLabelsInfo.m_dstStrideInByte = ndInt32(labelsStrideInBytes);
-
-		ndBrainVector miniBatchOutputGradients;
-		minibatchOutpuGradientBuffer->VectorFromDevice(miniBatchOutputGradients);
 
 		ndBrainContext* const context = *trainer->GetContext();
 		for (ndInt32 epoch = 0; epoch < MINIST_NUMBER_OF_EPOCHS; ++epoch)

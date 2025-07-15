@@ -60,6 +60,12 @@ class ndBrainGpuContext : public ndBrainContext
 	virtual void CopyBuffer(const ndCopyBufferCommandInfo& descriptor, ndInt32 numberOfWorkGrups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData) override;
 	virtual void CopyBufferIndirect(const ndCopyBufferCommandInfo& descriptor, const ndBrainIntegerBuffer& indexBuffer, ndBrainBuffer& dstData, const ndBrainBuffer& srcData) override;
 
+	virtual void Scale(ndBrainFloatBuffer& buffer, ndBrainFloat scale) override;
+	virtual void Min(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
+	virtual void Add(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
+	virtual void Sub(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
+	virtual void Mul(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
+
 	private:
 	void CreateKerners();
 	void CreateCopyCommands();
@@ -67,6 +73,8 @@ class ndBrainGpuContext : public ndBrainContext
 	size_t GetDeviceScore(cl::Device& device);
 	ndSharedPtr<ndBrainKernel> CreateKerner(const cl::Program& program, const char* const functionMame) const;
 	static void CL_CALLBACK clNotification(const char* errinfo, const void* private_info, size_t cb, void* user_data);
+
+	void SubmitMathOperation(const ndSharedPtr<ndBrainKernel>& kernel, ndBrainBuffer* const buffer, const ndBrainBuffer* const srcBuffer);
 
 	ndSharedPtr<cl::Device> m_device;
 	ndSharedPtr<cl::Context> m_context;
@@ -105,13 +113,17 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainKernel> m_brainAdamLassoOptimizerUpdate;
 
 	// other shader
-	ndSharedPtr<ndBrainKernel> m_brainCopyBuffer;
-	ndSharedPtr<ndBrainKernel> m_brainCopyBufferIndirect;
-
-	ndSharedPtr<ndBrainGpuCommand> m_copyBufferCommand;
+	ndSharedPtr<ndBrainKernel> m_brainCopyStridedBuffer;
+	ndSharedPtr<ndBrainKernel> m_brainCopyStridedBufferIndirect;
 	ndSharedPtr<ndBrainUniformBuffer> m_copyBufferParams;
+	ndSharedPtr<ndBrainGpuCommand> m_copyBufferCommand;
 	ndSharedPtr<ndBrainGpuCommand> m_copyBufferIndirectCommand;
 
+
+	// math operations kernels
+	ndSharedPtr<ndBrainKernel> m_mathBufferAssigment;
+
+	static const char* m_mathOpsCommand;
 	static const char* m_matrixMultiply;
 	static const char* m_optimizerKernels;
 	static const char* m_commonKernelsInclude;
