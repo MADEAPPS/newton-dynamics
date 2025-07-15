@@ -451,14 +451,16 @@ static void MnistTrainingSet()
 #endif
 
 		ndSharedPtr<ndBrainContext> context(isGpuReady ? (ndBrainContext*)new ndBrainGpuContext : (ndBrainContext*)new ndBrainCpuContext);
-		mnistSupervisedTrainer optimizer(context, brain);
+		mnistSupervisedTrainer trainer(context, brain);
 
-		optimizer.m_testData = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*context, **testDigits));
-		optimizer.m_trainingData = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*context, **trainingDigits));
-		optimizer.m_indirectMiniBatch = ndSharedPtr<ndBrainIntegerBuffer>(new ndBrainIntegerBuffer(*context, optimizer.m_miniBatchSize, true));
+		trainer.m_testData = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*context, **testDigits));
+		trainer.m_testLabels = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*context, **testLabels));
+		trainer.m_trainingData = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*context, **trainingDigits));
+		trainer.m_trainingLabels = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*context, **trainingLabels));
+		trainer.m_indirectMiniBatch = ndSharedPtr<ndBrainIntegerBuffer>(new ndBrainIntegerBuffer(*context, trainer.m_miniBatchSize, true));
 
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
-		optimizer.Optimize(*trainingLabels, *testLabels);
+		trainer.Optimize(*trainingLabels, *testLabels);
 		time = ndGetTimeInMicroseconds() - time;
 
 		char path[256];
@@ -468,11 +470,11 @@ static void MnistTrainingSet()
 		ndGetWorkingFileName("mnistDatabase/mnist.dnn", path);
 		#endif
 		
-		ndBrainSave::Save(*optimizer.m_bestBrain, path);
+		ndBrainSave::Save(*trainer.m_bestBrain, path);
 		
-		mnistSupervisedTrainer inference(context, optimizer.m_bestBrain);
-		ndInt32 testFailCount = inference.ValidateData(*testLabels, optimizer.m_testData);
-		ndInt32 trainingFailCount = inference.ValidateData(*trainingLabels, optimizer.m_trainingData);
+		mnistSupervisedTrainer inference(context, trainer.m_bestBrain);
+		ndInt32 testFailCount = inference.ValidateData(*testLabels, trainer.m_testData);
+		ndInt32 trainingFailCount = inference.ValidateData(*trainingLabels, trainer.m_trainingData);
 		context->SyncBufferCommandQueue();
 		
 		ndExpandTraceMessage("\n");
