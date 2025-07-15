@@ -18,8 +18,8 @@
 const char* ndBrainGpuContext::m_commonKernelsInclude =
 R""""(
 
-    #define ND_GPU_USE_SOFT_SUBGROUPS
-    #define ND_GPU_SOFT_SUBGROUPS_WORD_SIZE     32
+    //#define ND_GPU_USE_SOFT_SUBGROUPS
+    //#define ND_GPU_SOFT_SUBGROUPS_WORD_SIZE     32
 
     #define ND_GPU_TILED_MATRIX_ROWS_BITS       4
     #define ND_GPU_TILED_MATRIX_ROWS            (1<<ND_GPU_TILED_MATRIX_ROWS_BITS)
@@ -240,11 +240,11 @@ R""""(
         uint inputOutputSize = parameters->m_inputOutputSize;
         uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        uint workGroupSizeReminder = inputSize % workGroupSize;
-        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
-        
         long inputOffset = groupId * (long)inputOutputSize + inputOutputStartOffset;
         long outputOffset = inputOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
+
+        uint workGroupSizeReminder = inputSize % workGroupSize;
+        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
 
         // save input to local buffer, also get the max argument
         float maxArg = -1.0e30f;
@@ -263,7 +263,7 @@ R""""(
 
 #ifdef ND_GPU_USE_SOFT_SUBGROUPS
         // barrier reduction loop
-        for (uint j = workGroupSize / 2; j > ND_GPU_SOFT_SUBGROUPS_WORD_SIZE / 2; j = j >> 1)
+        for (uint j = workGroupSize / 2; j > ND_GPU_SOFT_SUBGROUPS_WORD_SIZE; j = j >> 1)
         {
             barrier(CLK_LOCAL_MEM_FENCE); 
             if ((itemId >= j) && (itemId < j * 2))
@@ -279,13 +279,14 @@ R""""(
             }
         }
         // barrier reduction loop
-        for (uint j = ND_GPU_SOFT_SUBGROUPS_WORD_SIZE / 2; j > 0; j = j >> 1)
+        barrier(CLK_LOCAL_MEM_FENCE); 
+        for (uint j = ND_GPU_SOFT_SUBGROUPS_WORD_SIZE; j > 0; j = j >> 1)
         {
-            if (itemId < j * 2)
+            if (itemId < ND_GPU_SOFT_SUBGROUPS_WORD_SIZE)
             {
-                reductionBuffer[itemId + ND_GPU_SOFT_SUBGROUPS_WORD_SIZE / 2] = maxArg;
-                float inputValue = reductionBuffer[itemId + ND_GPU_SOFT_SUBGROUPS_WORD_SIZE / 2];
+                float inputValue = reductionBuffer[itemId + j/2];
                 maxArg = (inputValue > maxArg) ? inputValue : maxArg;
+                reductionBuffer[itemId] = maxArg;
             }
         }
 #else
