@@ -282,6 +282,7 @@ class mnistSupervisedTrainer
 #if 1
 				m_indirectMiniBatch->MemoryToDevice(0, m_miniBatchSize * sizeof(ndUnsigned32), &shuffleBuffer[batchStart]);
 				minibatchInputBuffer->CopyBufferIndirect(copyDataInfo, **m_indirectMiniBatch, **m_trainingData);
+				groundTruthMinibatch->CopyBufferIndirect(copyLabelsInfo, **m_indirectMiniBatch, **m_trainingLabels);
 				trainer->MakePrediction();
 
 				//calculate loss
