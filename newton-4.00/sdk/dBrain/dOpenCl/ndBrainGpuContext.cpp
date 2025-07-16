@@ -24,54 +24,6 @@
 //#define ND_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_CPU
 //#define ND_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_GPU
 
-ndBrainGpuContext* ndBrainGpuContext::GetAsGpuContext()
-{
-	return this;
-}
-
-void ndBrainGpuContext::BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVector& dstVector)
-{
-	size_t sizeInBytes = ndMin(size_t(src.SizeInBytes()), size_t(dstVector.GetCount() * sizeof(ndReal)));
-	MemoryFromDevice(src, 0, sizeInBytes, &dstVector[0]);
-}
-
-void ndBrainGpuContext::BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector)
-{
-	size_t sizeInBytes = ndMin(size_t(dst.SizeInBytes()), size_t(srcVector.GetCount() * sizeof(ndReal)));
-	MemoryToDevice(dst, 0, sizeInBytes, &srcVector[0]);
-}
-
-void ndBrainGpuContext::CopyBuffer(const ndCopyBufferCommandInfo& parameters, ndInt32 numberOfWorkGrups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
-{
-	m_copyStridedBufferParams->MemoryToDevice(0, sizeof(ndCopyBufferCommandInfo), &parameters);
-
-	ndBrainBufferCommandDesc& descriptor = m_copyStridedBufferCommand->GetDescriptor();
-	descriptor.SetCount(0);
-	descriptor.PushBack(*m_copyStridedBufferParams);
-	descriptor.PushBack((ndBrainBuffer*)&dstData);
-	descriptor.PushBack((ndBrainBuffer*)&srcData);
-
-	descriptor.m_workGroupSize = ND_DEFAULT_WORKGROUP_SIZE;
-	descriptor.m_miniBatchSize = numberOfWorkGrups;
-	SubmitBufferCommand(*m_copyStridedBufferCommand);
-}
-
-void ndBrainGpuContext::CopyBufferIndirect(const ndCopyBufferCommandInfo& parameters, const ndBrainIntegerBuffer& indexBuffer, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
-{
-	m_copyStridedBufferParams->MemoryToDevice(0, sizeof(ndCopyBufferCommandInfo), &parameters);
-
-	ndBrainBufferCommandDesc& descriptor = m_copyStridedBufferIndirectCommand->GetDescriptor();
-	descriptor.SetCount(0);
-	descriptor.PushBack(*m_copyStridedBufferParams);
-	descriptor.PushBack((ndBrainBuffer*)&dstData);
-	descriptor.PushBack((ndBrainBuffer*)&srcData);
-	descriptor.PushBack((ndBrainBuffer*)&indexBuffer);
-
-	descriptor.m_workGroupSize = ND_DEFAULT_WORKGROUP_SIZE;
-	descriptor.m_miniBatchSize = ndInt32(indexBuffer.SizeInBytes() / sizeof(ndUnsigned32));
-	SubmitBufferCommand(*m_copyStridedBufferIndirectCommand);
-}
-
 ndBrainGpuContext::ndBrainGpuContext()
 	:ndBrainContext()
 {
@@ -157,6 +109,11 @@ ndBrainGpuContext::~ndBrainGpuContext()
 {
 }
 
+ndBrainGpuContext* ndBrainGpuContext::GetAsGpuContext()
+{
+	return this;
+}
+
 //void CL_CALLBACK ndBrainGpuContext::clNotification(const char* errinfo, const void* private_info, size_t cb, void* user_data)
 void CL_CALLBACK ndBrainGpuContext::clNotification(const char*, const void*, size_t, void*)
 {
@@ -165,7 +122,8 @@ void CL_CALLBACK ndBrainGpuContext::clNotification(const char*, const void*, siz
 
 bool ndBrainGpuContext::SupportsMappedMemory() const
 {
-	return m_supportMappedMemory;
+	//return m_supportMappedMemory;
+	return false;
 }
 
 size_t ndBrainGpuContext::GetDeviceScore(cl::Device& device)
@@ -274,6 +232,49 @@ void ndBrainGpuContext::MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size
 		error = queue->enqueueReadBuffer(**buffer->m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, outputMemory);
 		ndAssert(error == CL_SUCCESS);
 	}
+}
+
+void ndBrainGpuContext::BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVector& dstVector)
+{
+	size_t sizeInBytes = ndMin(size_t(src.SizeInBytes()), size_t(dstVector.GetCount() * sizeof(ndReal)));
+	MemoryFromDevice(src, 0, sizeInBytes, &dstVector[0]);
+}
+
+void ndBrainGpuContext::BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector)
+{
+	size_t sizeInBytes = ndMin(size_t(dst.SizeInBytes()), size_t(srcVector.GetCount() * sizeof(ndReal)));
+	MemoryToDevice(dst, 0, sizeInBytes, &srcVector[0]);
+}
+
+void ndBrainGpuContext::CopyBuffer(const ndCopyBufferCommandInfo& parameters, ndInt32 numberOfWorkGrups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
+{
+	m_copyStridedBufferParams->MemoryToDevice(0, sizeof(ndCopyBufferCommandInfo), &parameters);
+
+	ndBrainBufferCommandDesc& descriptor = m_copyStridedBufferCommand->GetDescriptor();
+	descriptor.SetCount(0);
+	descriptor.PushBack(*m_copyStridedBufferParams);
+	descriptor.PushBack((ndBrainBuffer*)&dstData);
+	descriptor.PushBack((ndBrainBuffer*)&srcData);
+
+	descriptor.m_workGroupSize = ND_DEFAULT_WORKGROUP_SIZE;
+	descriptor.m_miniBatchSize = numberOfWorkGrups;
+	SubmitBufferCommand(*m_copyStridedBufferCommand);
+}
+
+void ndBrainGpuContext::CopyBufferIndirect(const ndCopyBufferCommandInfo& parameters, const ndBrainIntegerBuffer& indexBuffer, ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
+{
+	m_copyStridedBufferParams->MemoryToDevice(0, sizeof(ndCopyBufferCommandInfo), &parameters);
+
+	ndBrainBufferCommandDesc& descriptor = m_copyStridedBufferIndirectCommand->GetDescriptor();
+	descriptor.SetCount(0);
+	descriptor.PushBack(*m_copyStridedBufferParams);
+	descriptor.PushBack((ndBrainBuffer*)&dstData);
+	descriptor.PushBack((ndBrainBuffer*)&srcData);
+	descriptor.PushBack((ndBrainBuffer*)&indexBuffer);
+
+	descriptor.m_workGroupSize = ND_DEFAULT_WORKGROUP_SIZE;
+	descriptor.m_miniBatchSize = ndInt32(indexBuffer.SizeInBytes() / sizeof(ndUnsigned32));
+	SubmitBufferCommand(*m_copyStridedBufferIndirectCommand);
 }
 
 void ndBrainGpuContext::SyncBufferCommandQueue()

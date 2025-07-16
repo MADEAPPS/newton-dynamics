@@ -14,7 +14,6 @@
 #include "ndBrainGpuBuffer.h"
 #include "ndBrainGpuContext.h"
 
-//ndBrainGpuBuffer::ndBrainGpuBuffer(ndBrainContext* const context, ndInt64 sizeInByte, bool memoryMapped)
 ndBrainGpuBuffer::ndBrainGpuBuffer(const ndBrainBuffer* const owner)
 	:ndClassAlloc()
 	,m_buffer()
@@ -42,7 +41,6 @@ ndBrainGpuBuffer::ndBrainGpuBuffer(const ndBrainBuffer* const owner)
 
 ndBrainGpuBuffer::~ndBrainGpuBuffer()
 {
-	//m_buffer = ndSharedPtr<cl::Buffer>();
 	if (m_owner->m_isMemoryMapped)
 	{
 		clSVMFree(m_owner->m_context->GetAsGpuContext()->m_context->get(), m_memory);
@@ -51,8 +49,6 @@ ndBrainGpuBuffer::~ndBrainGpuBuffer()
 
 void* ndBrainGpuBuffer::GetPtr()
 {
-	ndAssert(0);
 	return nullptr;
-	//return &m_memory[0];
 }
 
