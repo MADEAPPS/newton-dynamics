@@ -66,3 +66,8 @@ void ndBrainIntegerBuffer::MemoryToDevice(size_t offsetInBytes, size_t sizeInByt
 {
 	m_context->MemoryToDevice(*this, offsetInBytes, sizeInBytes, inputData);
 }
+
+void ndBrainIntegerBuffer::CopyBuffer(const ndCopyBufferCommandInfo& descriptor, ndInt32 workGroupCount, const ndBrainIntegerBuffer& srcBuffer)
+{
+	m_context->CopyBuffer(descriptor, workGroupCount, *this, srcBuffer);
+}

@@ -96,12 +96,12 @@ void* ndBrainFloatBuffer::GetCpuPtr() const
 	return nullptr;
 }
 
-void ndBrainFloatBuffer::CopyBuffer(const ndBrainBuffer& srcBuffer)
+void ndBrainFloatBuffer::CopyBuffer(const ndBrainFloatBuffer& srcBuffer)
 {
 	m_context->CopyBuffer(*this, srcBuffer);
 }
 
-void ndBrainFloatBuffer::CopyBuffer(const ndCopyBufferCommandInfo& descriptor, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer)
+void ndBrainFloatBuffer::CopyBuffer(const ndCopyBufferCommandInfo& descriptor, ndInt32 workGroupCount, const ndBrainFloatBuffer& srcBuffer)
 {
 	m_context->CopyBuffer(descriptor, workGroupCount, *this, srcBuffer);
 }

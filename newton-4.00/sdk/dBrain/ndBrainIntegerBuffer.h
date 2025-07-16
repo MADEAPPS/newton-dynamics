@@ -22,26 +22,15 @@ class ndBrainIntegerBuffer : public ndBrainBuffer
 	virtual void* GetCpuPtr() override;
 	virtual void* GetCpuPtr() const override;
 
-	//virtual void BrainVectorToDevice(const ndBrainVector& vector) override;
-	//virtual void BrainVectorFromDevice(ndBrainVector& vector) const override;
-	//
-	//virtual void MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData) override;
-	//virtual void MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const override;
-	//
-	//virtual void CopyBuffer(const ndBrainBuffer& parameterBuffer, ndInt32 workGroupCount, const ndBrainBuffer& srcBuffer) override;
-	//virtual void CopyBufferIndirect(const ndBrainBuffer& parameterBuffer, const ndBrainBuffer& indexBuffer, const ndBrainBuffer& srcBuffer) override;
-	
 	void MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData);
 	void MemoryFromDevice(size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const;
 
-	//protected:
-	//virtual void LoadData(size_t offsetInBytes, size_t sizeInBytes, const void* const sourceData) override;
-	//virtual void UnloadData(size_t offsetInBytes, size_t sizeInBytes, void* const outputData) const override;
+	void CopyBuffer(const ndCopyBufferCommandInfo& descriptor, ndInt32 workGroupCount, const ndBrainIntegerBuffer& srcBuffer);
 
+	private:
 	ndSharedPtr<ndArray<ndUnsigned32>> m_indexArray;
 
 	friend class ndBrainTrainer;
-	//friend class ndBrainCpuContext;
 };
 
 #endif
