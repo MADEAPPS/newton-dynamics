@@ -356,8 +356,11 @@ void ndBrainTrainerInference::UpdateParameters(const ndBrainVector& weightAndBia
 		if (layer)
 		{
 			ndCommandSharedInfo layerParameterSize(layer->GetCommandSharedInfo(this));
-			const ndBrainMemVector weights(&weightAndBias[info.m_parametersStartOffset], layerParameterSize.m_parametersBatchSize);
-			layer->SetWeights(this, weights);
+			if (layerParameterSize.m_parametersBatchSize)
+			{
+				const ndBrainMemVector weights(&weightAndBias[info.m_parametersStartOffset], layerParameterSize.m_parametersBatchSize);
+				layer->SetWeights(this, weights);
+			}
 		}
 	}
 }

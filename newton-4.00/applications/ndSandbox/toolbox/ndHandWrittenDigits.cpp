@@ -235,6 +235,7 @@ class mnistSupervisedTrainer
 		ndInt32 outputSize = m_brain->GetOutputSize();
 		ndBrainTrainer* const trainer = *m_trainer;
 
+		ndBrainVector weightAndBias;
 		ndBrainVector miniBatchOutputGradients;
 
 		groundTruth.SetCount(outputSize * m_miniBatchSize);
@@ -378,7 +379,6 @@ class mnistSupervisedTrainer
 	ndSharedPtr<ndBrainIntegerBuffer> m_indirectMiniBatch;
 
 	ndBrainVector groundTruth;
-	ndBrainVector weightAndBias;
 	ndBrainVector miniBatchInput;
 	ndBrainVector miniBatchOutput;
 
