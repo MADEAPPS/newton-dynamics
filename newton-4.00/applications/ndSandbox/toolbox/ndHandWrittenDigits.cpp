@@ -34,8 +34,8 @@
 //#define MIN_TRAIN_SCORE						0.9999f
 
 //#define MINIST_NUMBER_OF_EPOCHS				70
-#define MINIST_NUMBER_OF_EPOCHS					20
-//#define MINIST_NUMBER_OF_EPOCHS					1
+//#define MINIST_NUMBER_OF_EPOCHS				20
+#define MINIST_NUMBER_OF_EPOCHS					1
 
 #ifdef MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
 	#if 1
@@ -258,7 +258,7 @@ class mnistSupervisedTrainer
 		ndBrainFloatBuffer* const minibatchOutpuGradientBuffer = m_trainer->GetOuputGradientBuffer();
 
 		//ndBrainFloatBuffer* const minibatchInputGradientBuffer = m_trainer->GetInputGradientBuffer();
-		//ndSharedPtr<ndBrainFloatBuffer> groundTruthMinibatch(ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*minibatchOutpuBuffer)));
+		ndSharedPtr<ndBrainFloatBuffer> groundTruthMinibatch(ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*minibatchOutpuBuffer)));
 
 		ndCopyBufferCommandInfo copyDataInfo;
 		size_t dataStrideInBytes = size_t(inputSize * sizeof(ndReal));
@@ -287,11 +287,12 @@ class mnistSupervisedTrainer
 #if 1
 				m_indirectMiniBatch->MemoryToDevice(0, m_miniBatchSize * sizeof(ndUnsigned32), &shuffleBuffer[batchStart]);
 				minibatchInputBuffer->CopyBufferIndirect(copyDataInfo, **m_indirectMiniBatch, **m_trainingData);
+				groundTruthMinibatch->CopyBufferIndirect(copyLabelsInfo, **m_indirectMiniBatch, **m_trainingLabels);
 				trainer->MakePrediction();
 
 				//calculate loss
+#if 1				 
 				minibatchOutpuBuffer->VectorFromDevice(miniBatchOutput);
-
 				for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
 				{
 					ndUnsigned32 index = shuffleBuffer[batchStart + i];
@@ -302,6 +303,14 @@ class mnistSupervisedTrainer
 					loss.GetLoss(output, grad);
 				}
 				minibatchOutpuGradientBuffer->VectorToDevice(miniBatchOutputGradients);
+#else
+				//for non categorical soft max, calculate the least scuare error lost
+				//minibatchOutpuGradientBuffer->CopyBuffer(*minibatchOutpuBuffer);
+				//context->Sub(*minibatchOutpuGradientBuffer, **groundTruthMinibatch);
+
+				//for categorical soft max, just pass the categorical class as gradient loss
+				minibatchOutpuGradientBuffer->CopyBuffer(**groundTruthMinibatch);
+#endif
 
 				// backpropagate loss.
 				trainer->BackPropagate();
@@ -312,7 +321,7 @@ class mnistSupervisedTrainer
 #endif
 			}
 
-#if 0
+#if 1
 			ndInt64 testFailCount = ValidateData(testLabels, m_testData);
 			if (testFailCount < m_minValidationFail)
 			{
@@ -466,9 +475,9 @@ static void MnistTrainingSet()
 		brain->InitWeights();
 
 		bool isGpuReady = brain->IsGpuReady();
-#ifdef MINIST_USE_CPU_TRAINING
-		isGpuReady = false;
-#endif
+		#ifdef MINIST_USE_CPU_TRAINING
+			isGpuReady = false;
+		#endif
 
 		ndSharedPtr<ndBrainContext> context(isGpuReady ? (ndBrainContext*)new ndBrainGpuContext : (ndBrainContext*)new ndBrainCpuContext);
 		mnistSupervisedTrainer trainer(context, brain);

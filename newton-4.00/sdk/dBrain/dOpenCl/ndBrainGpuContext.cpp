@@ -321,7 +321,11 @@ void ndBrainGpuContext::SubmitMathOperation(const ndSharedPtr<ndBrainKernel>& ke
 	size_t numberOfElements = size_t(buffer->SizeInBytes() / sizeof(float));
 	size_t numberOfGroups = (numberOfElements + ND_DEFAULT_WORKGROUP_SIZE - 1) & -ND_DEFAULT_WORKGROUP_SIZE;
 
-	error = shader->setArg(0, numberOfElements);
+	cl_int numberOfParameters = 0;
+	error = shader->getInfo(CL_KERNEL_NUM_ARGS, &numberOfParameters);
+	ndAssert(numberOfParameters == 3);
+
+	error = shader->setArg(0, ndInt32(numberOfElements));
 	ndAssert(error == CL_SUCCESS);
 	error = shader->setArg(1, **dst->m_buffer);
 	ndAssert(error == CL_SUCCESS);
