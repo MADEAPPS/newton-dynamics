@@ -280,7 +280,6 @@ void ndBrainGpuContext::SyncBufferCommandQueue()
 {
 	cl_int error = 0;
 	error = m_queue->finish();
-	//error = m_queue->flush();
 	ndAssert(error == CL_SUCCESS);
 }
 
@@ -319,8 +318,8 @@ void ndBrainGpuContext::SubmitMathOperation(const ndSharedPtr<ndBrainKernel>& ke
 	ndBrainGpuBuffer* const dst = buffer->GetGpuBuffer();
 	const ndBrainGpuBuffer* const src = srcBuffer->GetGpuBuffer();
 
-	ndInt32 numberOfElements = ndInt32(buffer->SizeInBytes() / sizeof(float));
-	ndInt32 numberOfGroups = (numberOfElements + ND_DEFAULT_WORKGROUP_SIZE - 1) & -ND_DEFAULT_WORKGROUP_SIZE;
+	size_t numberOfElements = size_t(buffer->SizeInBytes() / sizeof(float));
+	size_t numberOfGroups = (numberOfElements + ND_DEFAULT_WORKGROUP_SIZE - 1) & -ND_DEFAULT_WORKGROUP_SIZE;
 
 	error = shader->setArg(0, numberOfElements);
 	ndAssert(error == CL_SUCCESS);

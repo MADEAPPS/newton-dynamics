@@ -1014,12 +1014,12 @@ R""""(
         uint groupId = get_group_id(0);
         uint workGroupSize = get_local_size(0);
         
-        uint stride = parameters->m_strideInByte / sizeof (uint);
         long dstOffset = (groupId * (long)parameters->m_dstStrideInByte + parameters->m_dstOffsetInByte) / sizeof (uint);
         long srcOffset = (groupId * (long)parameters->m_srcStrideInByte + parameters->m_srcOffsetInByte) / sizeof (uint);
-       
-        uint workGroupSizeReminder = stride % workGroupSize;
-        uint modWorkGroupSize = stride - workGroupSizeReminder;
+
+        uint dstStride = parameters->m_strideInByte / sizeof (uint);       
+        uint workGroupSizeReminder = dstStride % workGroupSize;
+        uint modWorkGroupSize = dstStride - workGroupSizeReminder;
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             float a = inputData[srcOffset + i + itemId];
