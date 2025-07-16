@@ -202,7 +202,6 @@ class mnistSupervisedTrainer
 			minibatchInputBuffer->CopyBuffer(copyDataInfo, m_miniBatchSize, **data);
 
 			m_trainer->MakePrediction();
-
 			minibatchOutpuBuffer->VectorFromDevice(miniBatchOutput);
 
 			for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
@@ -240,18 +239,26 @@ class mnistSupervisedTrainer
 		ndInt32 outputSize = m_brain->GetOutputSize();
 		ndBrainTrainer* const trainer = *m_trainer;
 
+		ndBrainVector miniBatchOutputGradients;
+
+		groundTruth.SetCount(outputSize * m_miniBatchSize);
+		miniBatchInput.SetCount(inputSize * m_miniBatchSize);
+		miniBatchOutput.SetCount(outputSize * m_miniBatchSize);
+		miniBatchOutputGradients.SetCount(outputSize * m_miniBatchSize);
+
 		ndInt32 batchesCount = trainingLabels->GetRows() / m_miniBatchSize;
 		ndInt32 batchesSize = batchesCount * m_miniBatchSize;
 
 		m_bestBrain = ndSharedPtr<ndBrain>(new ndBrain(**trainer->GetBrain()));
 
-		//ndBrainLossCategoricalCrossEntropy loss(outputSize);
+		ndBrainLossCategoricalCrossEntropy loss(outputSize);
 		ndBrainFloatBuffer* const minibatchInputBuffer = m_trainer->GetInputBuffer();
 		ndBrainFloatBuffer* const minibatchOutpuBuffer = m_trainer->GetOuputBuffer();
 		ndBrainFloatBuffer* const weightdAndBiasBuffer = m_trainer->GetWeightAndBiasBuffer();
 		ndBrainFloatBuffer* const minibatchOutpuGradientBuffer = m_trainer->GetOuputGradientBuffer();
-		ndBrainFloatBuffer* const minibatchInputGradientBuffer = m_trainer->GetInputGradientBuffer();
-		ndSharedPtr<ndBrainFloatBuffer> groundTruthMinibatch(ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*minibatchOutpuBuffer)));
+
+		//ndBrainFloatBuffer* const minibatchInputGradientBuffer = m_trainer->GetInputGradientBuffer();
+		//ndSharedPtr<ndBrainFloatBuffer> groundTruthMinibatch(ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*minibatchOutpuBuffer)));
 
 		ndCopyBufferCommandInfo copyDataInfo;
 		size_t dataStrideInBytes = size_t(inputSize * sizeof(ndReal));
@@ -269,12 +276,6 @@ class mnistSupervisedTrainer
 		copyLabelsInfo.m_srcStrideInByte = ndInt32(labelsStrideInBytes);
 		copyLabelsInfo.m_dstStrideInByte = ndInt32(labelsStrideInBytes);
 
-ndBrainVector xxxx0;
-ndBrainVector xxxx1;
-ndBrainVector xxxx2;
-ndBrainVector xxxx3;
-ndBrainVector xxxx4;
-
 		ndBrainContext* const context = *trainer->GetContext();
 		for (ndInt32 epoch = 0; epoch < MINIST_NUMBER_OF_EPOCHS; ++epoch)
 		{
@@ -286,38 +287,24 @@ ndBrainVector xxxx4;
 #if 1
 				m_indirectMiniBatch->MemoryToDevice(0, m_miniBatchSize * sizeof(ndUnsigned32), &shuffleBuffer[batchStart]);
 				minibatchInputBuffer->CopyBufferIndirect(copyDataInfo, **m_indirectMiniBatch, **m_trainingData);
-
-context->SyncBufferCommandQueue();
-minibatchInputBuffer->VectorFromDevice(xxxx0);
-
-				groundTruthMinibatch->CopyBufferIndirect(copyLabelsInfo, **m_indirectMiniBatch, **m_trainingLabels);
-
-context->SyncBufferCommandQueue();
-minibatchInputBuffer->VectorFromDevice(xxxx1);
-
 				trainer->MakePrediction();
 
-context->SyncBufferCommandQueue();
-minibatchOutpuBuffer->VectorFromDevice(xxxx2);
-
 				//calculate loss
-				//for not categorical soft max, calculate the least scuare error lost
-				//minibatchOutpuGradientBuffer->CopyBuffer(*minibatchOutpuBuffer);
-				//context->Sub(*minibatchOutpuGradientBuffer, **groundTruthMinibatch);
-				
-				//for categorical soft max, just pass the categorical class as gradient loss
-				minibatchOutpuGradientBuffer->CopyBuffer(**groundTruthMinibatch);
+				minibatchOutpuBuffer->VectorFromDevice(miniBatchOutput);
 
-context->SyncBufferCommandQueue();
-minibatchOutpuGradientBuffer->VectorFromDevice(xxxx3);
-
+				for (ndInt32 i = 0; i < m_miniBatchSize; ++i)
+				{
+					ndUnsigned32 index = shuffleBuffer[batchStart + i];
+					ndBrainMemVector grad(&miniBatchOutputGradients[i * outputSize], outputSize);
+					const ndBrainMemVector output(&miniBatchOutput[i * outputSize], outputSize);
+					const ndBrainMemVector truth(&(*trainingLabels)[index][0], outputSize);
+					loss.SetTruth(truth);
+					loss.GetLoss(output, grad);
+				}
+				minibatchOutpuGradientBuffer->VectorToDevice(miniBatchOutputGradients);
 
 				// backpropagate loss.
 				trainer->BackPropagate();
-
-context->SyncBufferCommandQueue();
-minibatchInputGradientBuffer->VectorFromDevice(xxxx4);
-
 				trainer->ApplyLearnRate();
 #else
 				trainer->BackPropagate();
@@ -443,7 +430,7 @@ static void MnistTrainingSet()
 			//layers.PushBack(new ndBrainLayerActivationCategoricalSoftmax(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 		#else
-#if 0
+#if 1
 			layers.PushBack(new ndBrainLayerLinear(trainingDigits->GetColumns(), MINIST_LINEAR_LAYERS_NEURONS));
 			layers.PushBack(new ndBrainLayerLinearWithDropOut(layers[layers.GetCount() - 1]->GetOutputSize()));
 			layers.PushBack(new MINIST_ACTIVATION_TYPE(layers[layers.GetCount() - 1]->GetOutputSize()));

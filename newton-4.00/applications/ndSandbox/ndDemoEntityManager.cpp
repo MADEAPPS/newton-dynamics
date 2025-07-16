@@ -384,7 +384,6 @@ static void SimpleRegressionBrainStressTest()
 			context->SyncBufferCommandQueue();
 			minibatchOutpuBuffer->VectorFromDevice(miniBatchOutput);
 
-
 			for (ndInt32 i = 0; i < minibatchSize; ++i)
 			{
 				ndUnsigned32 index = shuffleBuffer[batchStart + i];

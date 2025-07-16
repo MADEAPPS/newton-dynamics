@@ -233,8 +233,8 @@ void ndBrainGpuContext::MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offse
 		// if the queue has to be flushed to get the memory,
 		// then to me, this is not different that just calling enqueueWriteBuffer
 		// but I use it in case ther is some different
-		//error = m_queue->finish();
-		//ndAssert(error == CL_SUCCESS);
+		error = m_queue->finish();
+		ndAssert(error == CL_SUCCESS);
 
 		ndAssert(buffer->m_owner->m_isMemoryMapped);
 		ndInt64 size = ndInt64(sizeInBytes / sizeof(ndUnsigned32));
@@ -261,8 +261,8 @@ void ndBrainGpuContext::MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size
 		// if the queue has to be flushed to get the memory,
 		// then to me, this is not different that just calling enqueueWriteBuffer
 		// but I use it in case ther is some different
-		//error = m_queue->finish();
-		//ndAssert(error == CL_SUCCESS);
+		error = m_queue->finish();
+		ndAssert(error == CL_SUCCESS);
 
 		ndAssert(buffer->m_owner->m_isMemoryMapped);
 		ndInt64 size = ndInt64(sizeInBytes / sizeof(ndUnsigned32));
