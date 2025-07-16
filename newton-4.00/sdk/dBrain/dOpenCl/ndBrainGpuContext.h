@@ -112,13 +112,12 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainKernel> m_brainAdamRidgeOptimizerUpdate;
 	ndSharedPtr<ndBrainKernel> m_brainAdamLassoOptimizerUpdate;
 
-	// other shader
+	// shader strided buffers
 	ndSharedPtr<ndBrainKernel> m_brainCopyStridedBuffer;
 	ndSharedPtr<ndBrainKernel> m_brainCopyStridedBufferIndirect;
-	ndSharedPtr<ndBrainUniformBuffer> m_copyBufferParams;
-	ndSharedPtr<ndBrainGpuCommand> m_copyBufferCommand;
-	ndSharedPtr<ndBrainGpuCommand> m_copyBufferIndirectCommand;
-
+	ndSharedPtr<ndBrainUniformBuffer> m_copyStridedBufferParams;
+	ndSharedPtr<ndBrainGpuCommand> m_copyStridedBufferCommand;
+	ndSharedPtr<ndBrainGpuCommand> m_copyStridedBufferIndirectCommand;
 
 	// math operations kernels
 	ndSharedPtr<ndBrainKernel> m_mathBufferAssigment;
