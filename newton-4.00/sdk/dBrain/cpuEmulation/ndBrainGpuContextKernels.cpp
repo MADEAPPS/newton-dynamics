@@ -859,7 +859,6 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
         const ndInt32 width = (inputSize + tileSize * 2 - 1) & -tileSize * 2;
 
         const ndInt32 minibatchBlock = (outputSize + tileSize - 1) >> tileSizeBits;
-        //const ndInt32 minibatchBlock = parameters->m_matrixDimensionK >> tileSizeBits;
         const ndInt32 groupId_y = groupId / minibatchBlock;
         const ndInt32 groupId_x = groupId - groupId_y * minibatchBlock;
 
@@ -929,7 +928,7 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
             // barrier
         }
 
-        // the results are in register, by ther are transposed
+        // the results are in register, but they are transposed
         for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
         {
             ndInt32 itemId_x = itemId & (tileSize - 1);
@@ -950,8 +949,6 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
             ndAssert(itemId_x < tileSize);
             ndAssert(itemId_y < tileSize);
             ndBrainFloat value = tile_inputs[itemId_y][itemId_x];
-            //ndBrainFloat value0 = tile_accReg[itemId_x][itemId_y];
-            //ndAssert(value == value0);
             if (itemId_x < numberOutput)
             {
                 inputOutputData[outputOffset + itemId_y * inputOutputStride + itemId_x] = value;
