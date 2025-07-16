@@ -289,8 +289,6 @@ void ndBrainAgentDeterministicPolicyGradient_Agent::Step()
 	ndInt32 entryIndex = m_trajectory.GetCount();
 	m_trajectory.SetCount(entryIndex + 1);
 	m_trajectory.Clear(entryIndex);
-	
-	m_owner->m_context->SyncBufferCommandQueue();
 
 	const ndBrain* const brain = *m_owner->m_policyTrainer->GetBrain();
 	const ndBrainAgentDeterministicPolicyGradient_Trainer* const owner = *m_owner;
@@ -992,6 +990,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::Optimize()
 void ndBrainAgentDeterministicPolicyGradient_Trainer::OptimizeStep()
 {
 	//ndTrace(("todo: ndBrainAgentDeterministicPolicyGradient_Trainer::OptimizeStep()\n"))
+	m_context->SyncBufferCommandQueue();
 
 	SaveTrajectory();
 	if (m_startOptimization)

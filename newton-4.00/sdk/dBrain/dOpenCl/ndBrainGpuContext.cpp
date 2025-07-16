@@ -127,37 +127,11 @@ bool ndBrainGpuContext::SupportsMappedMemory() const
 
 size_t ndBrainGpuContext::GetDeviceScore(cl::Device& device)
 {
-	//std::string name (device.getInfo<CL_DEVICE_VENDOR>());
-	//std::string lowerName;
-	//for (size_t i = 0; i < name.size(); ++i)
-	//{
-	//	int ch = tolower(name[i]);
-	//	lowerName.push_back(char(ch));
-	//}
-	//
-	//// some heuristic to select a device. I am no using specific vendor gpu/cpu/fpga types.
-	//size_t computeUnits = device.getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>();
-	//size_t clockMegaHertz = device.getInfo<CL_DEVICE_MAX_CLOCK_FREQUENCY>();
-	//const bool is_gpu = device.getInfo<CL_DEVICE_TYPE>() == CL_DEVICE_TYPE_GPU;
-	//size_t wavefront = size_t(is_gpu ? 64 : 8);
-	//size_t amd = size_t((lowerName.find("amd") != std::string::npos) ? 1 : 0);
-	//size_t arm = size_t((lowerName.find("arm") != std::string::npos) ? 1 : 0);
-	//size_t intel = size_t((lowerName.find("intel") != std::string::npos) ? 1 : 0);
-	//size_t nvidia = size_t((lowerName.find("nvidia") != std::string::npos) ? 1 : 0);
-	//amd = amd | (size_t((lowerName.find("advanced micro devices, inc.") != std::string::npos) ? 1 : 0));
-	//size_t cores = computeUnits * (nvidia + amd + intel + arm);
-	//size_t megaFlops = cores * wavefront * clockMegaHertz;
-
 	const bool is_gpu = device.getInfo<CL_DEVICE_TYPE>() == CL_DEVICE_TYPE_GPU;
 	size_t computeUnits = device.getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>();
-	size_t wavefront = size_t(is_gpu ? 64 : 8);
+	std::vector<::size_t> workItems(device.getInfo<CL_DEVICE_MAX_WORK_ITEM_SIZES>());
+	size_t wavefront = size_t(is_gpu ? workItems[0] : 8);
 	size_t flopsPerClock = computeUnits * wavefront;
-
-	size_t localMemorySize = device.getInfo<CL_DEVICE_LOCAL_MEM_SIZE>();
-	if (localMemorySize < 1024 * 32)
-	{
-		flopsPerClock = 0;
-	}
 	return flopsPerClock;
 }
 
