@@ -74,6 +74,7 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainKernel> CreateKerner(const cl::Program& program, const char* const functionMame) const;
 	static void CL_CALLBACK clNotification(const char* errinfo, const void* private_info, size_t cb, void* user_data);
 
+	void SubmitMathOperation(const ndSharedPtr<ndBrainKernel>& kernel, ndBrainBuffer* const buffer, float scale);
 	void SubmitMathOperation(const ndSharedPtr<ndBrainKernel>& kernel, ndBrainBuffer* const buffer, const ndBrainBuffer* const srcBuffer);
 
 	ndSharedPtr<cl::Device> m_device;
@@ -119,8 +120,14 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainGpuCommand> m_copyStridedBufferCommand;
 	ndSharedPtr<ndBrainGpuCommand> m_copyStridedBufferIndirectCommand;
 
-	// math operations kernels
-	ndSharedPtr<ndBrainKernel> m_mathBufferAssigment;
+	// arithmetic operations kernels
+	ndSharedPtr<ndBrainKernel> m_brainAdd;
+	ndSharedPtr<ndBrainKernel> m_brainSub;
+	ndSharedPtr<ndBrainKernel> m_brainMul;
+	ndSharedPtr<ndBrainKernel> m_brainMin;
+	ndSharedPtr<ndBrainKernel> m_brainMax;
+	ndSharedPtr<ndBrainKernel> m_brainScale;
+	ndSharedPtr<ndBrainKernel> m_brainAssigment;
 
 	static const char* m_mathOpsCommand;
 	static const char* m_matrixMultiply;

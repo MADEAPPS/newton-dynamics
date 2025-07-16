@@ -1004,9 +1004,12 @@ R""""(
 
 const char* ndBrainGpuContext::m_otherShaderFunctions =
 R""""(
-
     __kernel void brainCopyStridedBuffer(
-        __global const CopyBufferCommandInfo* parameters,
+        uint strideInByte,
+        uint srcStrideInByte,
+        uint srcOffsetInByte,
+        uint dstStrideInByte,
+        uint dstOffsetInByte,
         __global float* outputData,
         __global float* inputData)
     {                                                                      
@@ -1014,10 +1017,10 @@ R""""(
         uint groupId = get_group_id(0);
         uint workGroupSize = get_local_size(0);
         
-        long dstOffset = (groupId * (long)parameters->m_dstStrideInByte + parameters->m_dstOffsetInByte) / sizeof (uint);
-        long srcOffset = (groupId * (long)parameters->m_srcStrideInByte + parameters->m_srcOffsetInByte) / sizeof (uint);
-
-        uint dstStride = parameters->m_strideInByte / sizeof (uint);       
+        long dstOffset = (groupId * (long)dstStrideInByte + dstOffsetInByte) / sizeof (uint);
+        long srcOffset = (groupId * (long)srcStrideInByte + srcOffsetInByte) / sizeof (uint);
+        
+        uint dstStride = strideInByte / sizeof (uint);       
         uint workGroupSizeReminder = dstStride % workGroupSize;
         uint modWorkGroupSize = dstStride - workGroupSizeReminder;
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
@@ -1033,7 +1036,11 @@ R""""(
     }
 
     __kernel void brainCopyStridedBufferIndirect(
-        __global const CopyBufferCommandInfo* parameters,
+        uint strideInByte,
+        uint srcStrideInByte,
+        uint srcOffsetInByte,
+        uint dstStrideInByte,
+        uint dstOffsetInByte,
         __global float* outputData,
         __global float* inputData, 
         __global uint* indexBuffer) 
@@ -1042,10 +1049,10 @@ R""""(
         uint groupId = get_group_id(0);
         uint workGroupSize = get_local_size(0);
 
-        long dstOffset = (groupId * (long) parameters->m_dstStrideInByte + parameters->m_dstOffsetInByte) / sizeof (uint);
-        long srcOffset = (indexBuffer[groupId] * (long) parameters->m_srcStrideInByte + parameters->m_srcOffsetInByte) / sizeof (uint);
-        uint dstStride = parameters->m_strideInByte / sizeof (uint);
-
+        long dstOffset = (groupId * (long) dstStrideInByte + dstOffsetInByte) / sizeof (uint);
+        long srcOffset = (indexBuffer[groupId] * (long) srcStrideInByte + srcOffsetInByte) / sizeof (uint);
+        uint dstStride = strideInByte / sizeof (uint);
+        
         uint workGroupSizeReminder = dstStride % workGroupSize;
         uint modWorkGroupSize = dstStride - workGroupSizeReminder;
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
@@ -1059,6 +1066,7 @@ R""""(
             outputData[dstOffset + modWorkGroupSize + itemId] = a;
         }
     }
+
 )"""";
 
 const char* ndBrainGpuContext::m_mathOpsCommand =
@@ -1074,6 +1082,82 @@ R""""(
             outputData[global_id] = inputData[global_id];
         }
     }
+
+    __kernel void brainAdd(
+        int numberOfElements,
+        __global float* outputData,
+        __global float* inputData)
+    {
+        int global_id = get_global_id(0);
+        if (global_id < numberOfElements)
+        {
+            outputData[global_id] = outputData[global_id] + inputData[global_id];
+        }
+    }
+
+    __kernel void brainSub(
+        int numberOfElements,
+        __global float* outputData,
+        __global float* inputData)
+    {
+        int global_id = get_global_id(0);
+        if (global_id < numberOfElements)
+        {
+            outputData[global_id] = outputData[global_id] - inputData[global_id];
+        }
+    }
+
+    __kernel void brainMul(
+        int numberOfElements,
+        __global float* outputData,
+        __global float* inputData)
+    {
+        int global_id = get_global_id(0);
+        if (global_id < numberOfElements)
+        {
+            outputData[global_id] = outputData[global_id] * inputData[global_id];
+        }
+    }
+
+    __kernel void brainMin(
+        int numberOfElements,
+        __global float* outputData,
+        __global float* inputData)
+    {
+        int global_id = get_global_id(0);
+        if (global_id < numberOfElements)
+        {
+            float a = outputData[global_id];
+            float b = inputData[global_id];
+            outputData[global_id] = (a <= b) ? a : b;
+        }
+    }
+
+    __kernel void brainMax(
+        int numberOfElements,
+        __global float* outputData,
+        __global float* inputData)
+    {
+        int global_id = get_global_id(0);
+        if (global_id < numberOfElements)
+        {
+            float a = outputData[global_id];
+            float b = inputData[global_id];
+            outputData[global_id] = (a >= b) ? a : b;
+        }
+    }
+
+    __kernel void brainScale(
+        int numberOfElements,
+        __global float* outputData, float scale)
+    {
+        int global_id = get_global_id(0);
+        if (global_id < numberOfElements)
+        {
+            outputData[global_id] = outputData[global_id] * scale;
+        }
+    }
+
 )"""";
 
 ndSharedPtr<ndBrainKernel> ndBrainGpuContext::CreateKerner(const cl::Program& program, const char* const functionMame) const
@@ -1177,5 +1261,10 @@ void ndBrainGpuContext::CreateKerners()
     m_brainCopyStridedBufferIndirect = CreateKerner(program, "brainCopyStridedBufferIndirect");
 
     // math operations
-    m_mathBufferAssigment = CreateKerner(program, "brainBufferAssigment");
+    m_brainAdd = CreateKerner(program, "brainAdd");
+    m_brainSub = CreateKerner(program, "brainSub");
+    m_brainMul = CreateKerner(program, "brainMul");
+    m_brainMin = CreateKerner(program, "brainMin");
+    m_brainScale = CreateKerner(program, "brainScale");
+    m_brainAssigment = CreateKerner(program, "brainBufferAssigment");
 }

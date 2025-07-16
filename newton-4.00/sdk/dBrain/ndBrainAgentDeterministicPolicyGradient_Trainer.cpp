@@ -80,9 +80,9 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 	m_replayBufferStartOptimizeSize = m_maxTrajectorySteps * 4;
 
 
-m_policyUpdatesCount = 1;
-m_criticUpdatesCount = 1;
-m_useGpuBackend = false;
+//m_useGpuBackend = false;
+//m_policyUpdatesCount = 1;
+//m_criticUpdatesCount = 1;
 //m_policyUpdatesCount = 2;
 //m_criticUpdatesCount = 2;
 //m_hiddenLayersNumberOfNeurons = 256;
@@ -859,12 +859,15 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 	for (ndInt32 n = 0; n < m_parameters.m_criticUpdatesCount; ++n)
 	{
 		// Get the rewards for this minibatch
+		//m_context->SyncBufferCommandQueue();
+		// for now load the indrect buffer, later this will use a copybuffer
 		m_minibatchIndexBuffer->MemoryToDevice(0, m_parameters.m_miniBatchSize * sizeof(ndUnsigned32), &m_miniBatchIndices[n * m_parameters.m_miniBatchSize]);
+
 		policyMinibatchInputBuffer->CopyBufferIndirect(policyObservation, **m_minibatchIndexBuffer, **m_replayBufferFlat);
 		m_rewardBatch->CopyBufferIndirect(criticOutputReward, **m_minibatchIndexBuffer, **m_replayBufferFlat);
 		m_terminalBatch->CopyBufferIndirect(criticOutputTerminal, **m_minibatchIndexBuffer, **m_replayBufferFlat);
-
 		m_policyTrainer->MakePrediction();
+
 		for (ndInt32 i = 0; i < ND_SAC_NUMBER_OF_CRITICS; ++i)
 		{
 			criticInputBuffer[i]->CopyBuffer(criticInputAction, m_parameters.m_miniBatchSize, *policyMinibatchOutputBuffer);
