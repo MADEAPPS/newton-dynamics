@@ -79,7 +79,6 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 	m_hiddenLayersNumberOfNeurons = 256;
 	m_replayBufferStartOptimizeSize = m_maxTrajectorySteps * 4;
 
-
 //m_useGpuBackend = false;
 //m_policyUpdatesCount = 1;
 //m_criticUpdatesCount = 1;
@@ -506,7 +505,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildCriticClass()
 		ndTrainerDescriptor descriptor(critic, m_context, m_parameters.m_miniBatchSize, m_parameters.m_policyLearnRate);
 		descriptor.m_regularizer = m_parameters.m_criticRegularizer;
 		descriptor.m_regularizerType = m_parameters.m_criticRegularizerType;
-		//m_referenceCriticTrainer[k] = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor));
+		m_criticTrainer[k] = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor));
 		m_referenceCriticTrainer[k] = ndSharedPtr<ndBrainTrainerInference>(new ndBrainTrainerInference(descriptor));
 	}
 }
@@ -743,45 +742,74 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::SaveTrajectory()
 }
 
 //#pragma optimize( "", off )
-//void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnQvalueFunction(ndInt32 criticIndex)
-void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnQvalueFunction(ndInt32)
+void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnQvalueFunction(ndInt32 criticIndex)
 {
-	ndAssert(0);
 	//const ndBrain& brain = **m_policyTrainer->GetBrain();
 	//ndInt32 criticInputSize = brain.GetInputSize() + brain.GetOutputSize();
-	//
 	//m_criticValue[0].SetCount(m_parameters.m_miniBatchSize);
 	//m_criticOutputGradients[0].SetCount(m_parameters.m_miniBatchSize);
 	//m_criticObservationActionBatch.SetCount(m_parameters.m_miniBatchSize * criticInputSize);
-	//
-	//for (ndInt32 n = 0; n < m_parameters.m_criticUpdatesCount; ++n)
-	//{
-	//	ndAssert(0);
-	//	//for (ndInt32 i = 0; i < m_parameters.m_miniBatchSize; ++i)
-	//	//{
-	//	//	const ndInt32 index = m_miniBatchIndices[n * m_parameters.m_miniBatchSize + i];
-	//	//
-	//	//	ndBrainMemVector criticObservationAction(&m_criticObservationActionBatch[i * criticInputSize], criticInputSize);
-	//	//	ndMemCpy(&criticObservationAction[0], m_replayBuffer.GetActions(index), brain.GetOutputSize());
-	//	//	ndMemCpy(&criticObservationAction[brain.GetOutputSize()], m_replayBuffer.GetObservations(index), brain.GetInputSize());
-	//	//}
-	//	//m_criticTrainer[criticIndex]->MakePrediction(m_criticObservationActionBatch);
-	//	//m_criticTrainer[criticIndex]->GetOutput(m_criticValue[0]);
-	//	//
-	//	//ndBrainLossLeastSquaredError loss(1);
-	//	//ndBrainFixSizeVector<1> groundTruth;
-	//	//for (ndInt32 i = 0; i < m_parameters.m_miniBatchSize; ++i)
-	//	//{
-	//	//	groundTruth[0] = m_expectedRewards[n * m_parameters.m_miniBatchSize + i];
-	//	//	loss.SetTruth(groundTruth);
-	//	//	const ndBrainMemVector output(&m_criticValue[0][i], 1);
-	//	//	ndBrainMemVector gradient(&m_criticOutputGradients[0][i], 1);
-	//	//	loss.GetLoss(output, gradient);
-	//	//}
-	//	//m_criticTrainer[criticIndex]->BackPropagate(m_criticOutputGradients[0]);
-	//	//ndAssert(0);
-	//	////m_criticTrainer[criticIndex]->ApplyLearnRate(m_parameters.m_criticLearnRate);
-	//}
+
+	ndCopyBufferCommandInfo copyIndicesInfo;
+	ndInt32 copyIndicesStrideInBytes = ndInt32(m_parameters.m_miniBatchSize * sizeof(ndInt32));
+	copyIndicesInfo.m_dstOffsetInByte = 0;
+	copyIndicesInfo.m_srcOffsetInByte = 0;
+	copyIndicesInfo.m_strideInByte = copyIndicesStrideInBytes;
+	copyIndicesInfo.m_srcStrideInByte = copyIndicesStrideInBytes;
+	copyIndicesInfo.m_dstStrideInByte = copyIndicesStrideInBytes;
+
+	ndInt32 criticInputSize = m_policyTrainer->GetBrain()->GetInputSize() + m_policyTrainer->GetBrain()->GetOutputSize();
+
+	ndCopyBufferCommandInfo criticInputAction;
+	criticInputAction.m_srcOffsetInByte = 0;
+	criticInputAction.m_srcStrideInByte = ndInt32(m_policyTrainer->GetBrain()->GetOutputSize() * sizeof(ndReal));
+	criticInputAction.m_dstOffsetInByte = 0;
+	criticInputAction.m_dstStrideInByte = ndInt32(criticInputSize * sizeof(ndReal));
+	criticInputAction.m_strideInByte = ndInt32(m_policyTrainer->GetBrain()->GetOutputSize() * sizeof(ndReal));
+
+	ndCopyBufferCommandInfo criticInputObservation;
+	criticInputObservation.m_srcOffsetInByte = 0;
+	criticInputObservation.m_srcStrideInByte = ndInt32(m_policyTrainer->GetBrain()->GetInputSize() * sizeof(ndReal));
+	criticInputObservation.m_dstOffsetInByte = ndInt32(m_policyTrainer->GetBrain()->GetOutputSize() * sizeof(ndReal));;
+	criticInputObservation.m_dstStrideInByte = ndInt32(criticInputSize * sizeof(ndReal));
+	criticInputObservation.m_strideInByte = ndInt32(m_policyTrainer->GetBrain()->GetInputSize() * sizeof(ndReal));
+
+	ndBrainTrainer& critic = **m_criticTrainer[criticIndex];
+	ndBrainFloatBuffer* const criticMinibatchInputBuffer = critic.GetInputBuffer();
+
+	for (ndInt32 n = 0; n < m_parameters.m_criticUpdatesCount; ++n)
+	{
+		//for (ndInt32 i = 0; i < m_parameters.m_miniBatchSize; ++i)
+		//{
+		//	const ndInt32 index = m_miniBatchIndices[n * m_parameters.m_miniBatchSize + i];
+		//
+		//	ndBrainMemVector criticObservationAction(&m_criticObservationActionBatch[i * criticInputSize], criticInputSize);
+		//	ndMemCpy(&criticObservationAction[0], m_replayBuffer.GetActions(index), brain.GetOutputSize());
+		//	ndMemCpy(&criticObservationAction[brain.GetOutputSize()], m_replayBuffer.GetObservations(index), brain.GetInputSize());
+		//}
+		copyIndicesInfo.m_srcOffsetInByte = ndInt32(n * sizeof(ndUnsigned32) * m_parameters.m_miniBatchSize);
+		m_minibatchIndexBuffer->CopyBuffer(copyIndicesInfo, 1, **m_randomShuffleBuffer);
+		criticMinibatchInputBuffer->CopyBufferIndirect(criticInputAction, **m_minibatchIndexBuffer, **m_replayBufferFlat);
+		criticMinibatchInputBuffer->CopyBufferIndirect(criticInputObservation, **m_minibatchIndexBuffer, **m_replayBufferFlat);
+		
+		//m_criticTrainer[criticIndex]->MakePrediction(m_criticObservationActionBatch);
+		critic.MakePrediction();
+		//m_criticTrainer[criticIndex]->GetOutput(m_criticValue[0]);
+		
+		//ndBrainLossLeastSquaredError loss(1);
+		//ndBrainFixSizeVector<1> groundTruth;
+		//for (ndInt32 i = 0; i < m_parameters.m_miniBatchSize; ++i)
+		//{
+		//	groundTruth[0] = m_expectedRewards[n * m_parameters.m_miniBatchSize + i];
+		//	loss.SetTruth(groundTruth);
+		//	const ndBrainMemVector output(&m_criticValue[0][i], 1);
+		//	ndBrainMemVector gradient(&m_criticOutputGradients[0][i], 1);
+		//	loss.GetLoss(output, gradient);
+		//}
+		//m_criticTrainer[criticIndex]->BackPropagate(m_criticOutputGradients[0]);
+		//ndAssert(0);
+		////m_criticTrainer[criticIndex]->ApplyLearnRate(m_parameters.m_criticLearnRate);
+	}
 }
 
 #pragma optimize( "", off )
@@ -803,7 +831,6 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 	
 	ndBrainFloatBuffer* criticInputBuffer[ND_SAC_NUMBER_OF_CRITICS];
 	ndBrainFloatBuffer* criticOutputBuffer[ND_SAC_NUMBER_OF_CRITICS];
-	//ndBrainFloatBuffer* const miniBatchOutputGradientBuffer = m_policyTrainer->GetOuputBuffer();
 	ndBrainFloatBuffer* const policyMinibatchInputBuffer = m_policyTrainer->GetInputBuffer();
 	ndBrainFloatBuffer* const policyMinibatchOutputBuffer = m_policyTrainer->GetOuputBuffer();
 	
@@ -983,12 +1010,11 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnPolicyFunction()
 void ndBrainAgentDeterministicPolicyGradient_Trainer::Optimize()
 {
 	CalculateExpectedRewards();
-	//ndTrace(("todo: ndBrainAgentDeterministicPolicyGradient_Trainer::Optimize()\n"));
-	//for (ndInt32 k = 0; k < ndInt32(sizeof(m_referenceCriticTrainer) / sizeof(m_referenceCriticTrainer[0])); ++k)
-	//{
-	//	LearnQvalueFunction(k);
-	//}
-	//
+	for (ndInt32 k = 0; k < ndInt32(sizeof(m_referenceCriticTrainer) / sizeof(m_referenceCriticTrainer[0])); ++k)
+	{
+		LearnQvalueFunction(k);
+	}
+	
 	//if (!ndPolycyDelayMod)
 	//{
 	//	LearnPolicyFunction();

@@ -208,7 +208,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 
 	ndSharedPtr<ndBrainContext> m_context;
 	ndSharedPtr<ndBrainTrainer> m_policyTrainer;
-	//ndSharedPtr<ndBrainTrainer> m_criticTrainer____[ND_SAC_NUMBER_OF_CRITICS];
+	ndSharedPtr<ndBrainTrainer> m_criticTrainer[ND_SAC_NUMBER_OF_CRITICS];
 	ndSharedPtr<ndBrainTrainerInference> m_referenceCriticTrainer[ND_SAC_NUMBER_OF_CRITICS];
 
 	ndBrainVector m_parametersBuffer;
