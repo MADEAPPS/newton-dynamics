@@ -13,6 +13,7 @@
 #include "ndBrainVector.h"
 #include "ndBrainMatrix.h"
 #include "ndBrainContext.h"
+#include "ndBrainGpuBuffer.h"
 #include "ndBrainCpuContext.h"
 #include "ndBrainFloatBuffer.h"
 #include "ndBrainIntegerBuffer.h"
@@ -82,8 +83,8 @@ void* ndBrainFloatBuffer::GetCpuPtr()
 		ndBrainVector& dst = **m_buffer;
 		return &dst[0];
 	}
-	ndAssert(0);
-	return nullptr;
+	ndAssert(GetGpuBuffer());
+	return GetGpuBuffer()->GetPtr();
 }
 
 void* ndBrainFloatBuffer::GetCpuPtr() const
@@ -93,7 +94,8 @@ void* ndBrainFloatBuffer::GetCpuPtr() const
 		const ndBrainVector& dst = **m_buffer;
 		return (void*)&dst[0];
 	}
-	return nullptr;
+	ndAssert(GetGpuBuffer());
+	return (void*)GetGpuBuffer()->GetPtr();
 }
 
 void ndBrainFloatBuffer::CopyBuffer(const ndBrainFloatBuffer& srcBuffer)

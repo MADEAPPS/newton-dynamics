@@ -65,6 +65,7 @@ class ndBrainGpuContext : public ndBrainContext
 	virtual void Add(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
 	virtual void Sub(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
 	virtual void Mul(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
+	virtual void ScaleAdd(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat scale) override;
 
 	private:
 	void CreateKerners();
@@ -76,6 +77,7 @@ class ndBrainGpuContext : public ndBrainContext
 
 	void SubmitMathOperation(const ndSharedPtr<ndBrainKernel>& kernel, ndBrainBuffer* const buffer, float scale);
 	void SubmitMathOperation(const ndSharedPtr<ndBrainKernel>& kernel, ndBrainBuffer* const buffer, const ndBrainBuffer* const srcBuffer);
+	void SubmitMathOperation(const ndSharedPtr<ndBrainKernel>& kernel, ndBrainBuffer* const buffer, const ndBrainBuffer* const srcBuffer, float scale);
 
 	ndSharedPtr<cl::Device> m_device;
 	ndSharedPtr<cl::Context> m_context;
@@ -127,6 +129,7 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainKernel> m_brainMin;
 	ndSharedPtr<ndBrainKernel> m_brainMax;
 	ndSharedPtr<ndBrainKernel> m_brainScale;
+	ndSharedPtr<ndBrainKernel> m_brainScaleAdd;
 	ndSharedPtr<ndBrainKernel> m_brainAssigment;
 
 	static const char* m_mathOpsCommand;

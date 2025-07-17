@@ -408,7 +408,6 @@ void ndBrainTrainerInference::MakeSinglePrediction(const ndBrainVector& input, n
 {
 	m_miniBatchInputBuffer->VectorToDevice(input);
 	MakePrediction();
-	//m_miniBatchOutputBuffer->VectorFromDevice(output);
 	m_miniBatchOutputBuffer->MemoryFromDevice(0, output.GetCount() * sizeof (ndReal), &output[0]);
 }
 

@@ -52,3 +52,7 @@ void* ndBrainGpuBuffer::GetPtr()
 	return nullptr;
 }
 
+const void* ndBrainGpuBuffer::GetPtr() const
+{
+	return nullptr;
+}

@@ -30,8 +30,8 @@
 
 
 //#define MINIST_NUMBER_OF_EPOCHS		70
-#define MINIST_NUMBER_OF_EPOCHS		20
-//#define MINIST_NUMBER_OF_EPOCHS			1
+//#define MINIST_NUMBER_OF_EPOCHS			20
+#define MINIST_NUMBER_OF_EPOCHS			1
 
 #ifdef MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
 	#if 1
@@ -326,18 +326,7 @@ class mnistSupervisedTrainer
 			}
 
 #if 1
-			ndInt64 testFailCount = ValidateData(testLabels, m_testData);
-			if (testFailCount < m_minValidationFail)
-			{
-				weightdAndBiasBuffer->VectorFromDevice(weightAndBias);
-				trainer->UpdateParameters(weightAndBias);
-				m_bestBrain->CopyFrom(**trainer->GetBrain());
-				m_minValidationFail = testFailCount;
-
-				ndExpandTraceMessage("epoch: %d\n", epoch);
-				ndExpandTraceMessage("   best model: test fail count:%d\n", testFailCount);
-			}
-#else
+			// do a detail validation, by counting all the fail in test and tranning set
 			ndInt64 testFailCount = ValidateData(testLabels, m_testData) + 1;
 			if (testFailCount < m_minValidationFail)
 			{
@@ -371,6 +360,18 @@ class mnistSupervisedTrainer
 					ndExpandTraceMessage("  training fail count:%d", trainigFailCount);
 					ndExpandTraceMessage("  test fail count:%d\n", testFailCount);
 				}
+			}
+#else
+			ndInt64 testFailCount = ValidateData(testLabels, m_testData);
+			if (testFailCount < m_minValidationFail)
+			{
+				weightdAndBiasBuffer->VectorFromDevice(weightAndBias);
+				trainer->UpdateParameters(weightAndBias);
+				m_bestBrain->CopyFrom(**trainer->GetBrain());
+				m_minValidationFail = testFailCount;
+
+				ndExpandTraceMessage("epoch: %d\n", epoch);
+				ndExpandTraceMessage("   best model: test fail count:%d\n", testFailCount);
 			}
 #endif
 		}
@@ -611,6 +612,6 @@ static void MnistTestSet()
 void ndHandWrittenDigits()
 {
 	ndSetRandSeed(53);
-	MnistTrainingSet();
+	//MnistTrainingSet();
 	//MnistTestSet();
 }

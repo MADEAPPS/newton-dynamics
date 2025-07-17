@@ -42,6 +42,7 @@ class ndBrainFloatBuffer : public ndBrainBuffer
 	ndSharedPtr<ndBrainVector> m_buffer;
 
 	friend class ndBrainCpuContext;
+	friend class ndBrainGpuContext;
 };
 
 #endif

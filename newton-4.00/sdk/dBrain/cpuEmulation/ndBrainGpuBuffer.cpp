@@ -26,3 +26,8 @@ void* ndBrainGpuBuffer::GetPtr()
 {
 	return &m_memory[0];
 }
+
+const void* ndBrainGpuBuffer::GetPtr() const
+{
+	return &m_memory[0];
+}

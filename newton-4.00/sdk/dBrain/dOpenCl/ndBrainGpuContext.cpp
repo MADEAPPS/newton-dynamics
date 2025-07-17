@@ -1,4 +1,5 @@
 /* Copyright (c) <2003-2022> <Newton Game Dynamics>
+/* Copyright (c) <2003-2022> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -369,13 +370,14 @@ void ndBrainGpuContext::SubmitMathOperation(const ndSharedPtr<ndBrainKernel>& ke
 	ndAssert(error == CL_SUCCESS);
 }
 
+
+
 void ndBrainGpuContext::SubmitMathOperation(const ndSharedPtr<ndBrainKernel>& kernel, ndBrainBuffer* const buffer, const ndBrainBuffer* const srcBuffer)
 {
 	cl_int error = 0;
 	OpenclKernel* const oclKernel = (OpenclKernel*)*kernel;
 	cl::Kernel* const shader = *oclKernel->m_shader;
 
-	//, ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer
 	ndBrainGpuBuffer* const dst = buffer->GetGpuBuffer();
 	const ndBrainGpuBuffer* const src = srcBuffer->GetGpuBuffer();
 
@@ -400,6 +402,38 @@ void ndBrainGpuContext::SubmitMathOperation(const ndSharedPtr<ndBrainKernel>& ke
 	ndAssert(error == CL_SUCCESS);
 }
 
+void ndBrainGpuContext::SubmitMathOperation(const ndSharedPtr<ndBrainKernel>& kernel, ndBrainBuffer* const buffer, const ndBrainBuffer* const srcBuffer, float scale)
+{
+	cl_int error = 0;
+	OpenclKernel* const oclKernel = (OpenclKernel*)*kernel;
+	cl::Kernel* const shader = *oclKernel->m_shader;
+
+	ndBrainGpuBuffer* const dst = buffer->GetGpuBuffer();
+	const ndBrainGpuBuffer* const src = srcBuffer->GetGpuBuffer();
+
+	size_t numberOfElements = size_t(buffer->SizeInBytes() / sizeof(float));
+	size_t numberOfGroups = (numberOfElements + ND_DEFAULT_WORKGROUP_SIZE - 1) & -ND_DEFAULT_WORKGROUP_SIZE;
+
+	cl_int numberOfParameters = 0;
+	error = shader->getInfo(CL_KERNEL_NUM_ARGS, &numberOfParameters);
+	ndAssert(numberOfParameters == 4);
+
+	error = shader->setArg(0, ndInt32(numberOfElements));
+	ndAssert(error == CL_SUCCESS);
+	error = shader->setArg(1, **dst->m_buffer);
+	ndAssert(error == CL_SUCCESS);
+	error = shader->setArg(2, **src->m_buffer);
+	ndAssert(error == CL_SUCCESS);
+	error = shader->setArg(3, scale);
+	ndAssert(error == CL_SUCCESS);
+
+	cl::NDRange offset(0);
+	cl::NDRange local(ND_DEFAULT_WORKGROUP_SIZE);
+	cl::NDRange global(numberOfGroups);
+	error = m_queue->enqueueNDRangeKernel(*shader, offset, global, local);
+	ndAssert(error == CL_SUCCESS);
+}
+
 void ndBrainGpuContext::CopyBuffer(ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
 {
 	SubmitMathOperation(m_brainAssigment, &dstData, &srcData);
@@ -408,6 +442,11 @@ void ndBrainGpuContext::CopyBuffer(ndBrainBuffer& dstData, const ndBrainBuffer& 
 void ndBrainGpuContext::Scale(ndBrainFloatBuffer& buffer, ndBrainFloat scale)
 {
 	SubmitMathOperation(m_brainScale, &buffer, scale);
+}
+
+void ndBrainGpuContext::ScaleAdd(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat scale)
+{
+	SubmitMathOperation(m_brainScaleAdd, &buffer, &srcBuffer, scale);
 }
 
 void ndBrainGpuContext::Min(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)

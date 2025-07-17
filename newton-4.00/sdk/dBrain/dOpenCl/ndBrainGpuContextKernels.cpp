@@ -1158,6 +1158,19 @@ R""""(
         }
     }
 
+    __kernel void brainScaleAdd(
+        int numberOfElements,
+        __global float* outputData, 
+        __global float* inputData, 
+        float scale)
+    {
+        int global_id = get_global_id(0);
+        if (global_id < numberOfElements)
+        {
+            outputData[global_id] = outputData[global_id] + inputData[global_id] * scale;
+        }
+    }
+
 )"""";
 
 ndSharedPtr<ndBrainKernel> ndBrainGpuContext::CreateKerner(const cl::Program& program, const char* const functionMame) const
@@ -1266,5 +1279,6 @@ void ndBrainGpuContext::CreateKerners()
     m_brainMul = CreateKerner(program, "brainMul");
     m_brainMin = CreateKerner(program, "brainMin");
     m_brainScale = CreateKerner(program, "brainScale");
+    m_brainScaleAdd = CreateKerner(program, "brainScaleAdd");
     m_brainAssigment = CreateKerner(program, "brainBufferAssigment");
 }

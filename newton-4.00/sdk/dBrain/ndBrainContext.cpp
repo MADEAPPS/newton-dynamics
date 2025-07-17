@@ -30,3 +30,10 @@ ndBrainGpuContext* ndBrainContext::GetAsGpuContext()
 {
 	return nullptr;
 }
+
+
+void ndBrainContext::Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat scale)
+{
+	Scale(buffer, ndBrainFloat(1.0f) - scale);
+	ScaleAdd(buffer, srcBuffer, scale);
+}

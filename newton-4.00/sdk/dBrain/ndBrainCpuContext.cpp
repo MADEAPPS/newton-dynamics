@@ -179,3 +179,10 @@ void ndBrainCpuContext::Mul(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer
 	const ndBrainVector& src = **srcBuffer.m_buffer;
 	dst.Mul(src);
 }
+
+void ndBrainCpuContext::ScaleAdd(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat scale)
+{
+	ndBrainVector& dst = **buffer.m_buffer;
+	const ndBrainVector& src = **srcBuffer.m_buffer;
+	dst.ScaleAdd(src, scale);
+}

@@ -19,6 +19,7 @@ class ndBrainGpuBuffer : public ndClassAlloc
 {
 	public:
 	void* GetPtr();
+	const void* GetPtr() const;
 
 	~ndBrainGpuBuffer();
 	protected:
