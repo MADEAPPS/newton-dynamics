@@ -351,12 +351,14 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::ndBrainAgentDeterministicPolicy
 	m_replayBuffer.SetCount(parameters.m_replayBufferSize);
 	m_replayBuffer.SetCount(0);
 
-	m_minibatchIndexBuffer = ndSharedPtr<ndBrainIntegerBuffer>(new ndBrainIntegerBuffer(*m_context, m_parameters.m_miniBatchSize, true));
 	m_replayBufferFlat = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_replayBuffer.GetStride() * m_parameters.m_replayBufferSize));
-	m_replayFlatBufferCache = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_replayBuffer.GetStride() * ND_MINI_FLAT_BUFFER_CACHE, true));
+	m_replayFlatBufferCache = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_replayBuffer.GetStride() * ND_MINI_FLAT_BUFFER_CACHE));
 	m_rewardBatch = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_policyTrainer->GetBrain()->GetOutputSize() * m_parameters.m_miniBatchSize));
 	m_terminalBatch = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_policyTrainer->GetBrain()->GetOutputSize() * m_parameters.m_miniBatchSize));
 	m_expectedRewards = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_criticUpdatesCount * m_parameters.m_miniBatchSize));
+
+	m_minibatchIndexBuffer = ndSharedPtr<ndBrainIntegerBuffer>(new ndBrainIntegerBuffer(*m_context, m_parameters.m_miniBatchSize));
+	m_randomShuffleBuffer = ndSharedPtr<ndBrainIntegerBuffer>(new ndBrainIntegerBuffer(*m_context, m_parameters.m_criticUpdatesCount * m_parameters.m_miniBatchSize));
 
 #if 0
 	ndCopyBufferCommandInfo policyInput;
@@ -854,12 +856,25 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 	expectedReward.m_dstStrideInByte = ndInt32(sizeof(ndReal));
 	expectedReward.m_strideInByte = ndInt32(sizeof(ndReal));
 
+	ndCopyBufferCommandInfo copyIndicesInfo;
+	ndInt32 copyIndicesStrideInBytes = ndInt32(m_parameters.m_miniBatchSize * sizeof(ndInt32));
+	copyIndicesInfo.m_dstOffsetInByte = 0;
+	copyIndicesInfo.m_srcOffsetInByte = 0;
+	copyIndicesInfo.m_strideInByte = copyIndicesStrideInBytes;
+	copyIndicesInfo.m_srcStrideInByte = copyIndicesStrideInBytes;
+	copyIndicesInfo.m_dstStrideInByte = copyIndicesStrideInBytes;
+
+	// load all the shuffled indices, they use GPU command to get a minibatch
+	ndAssert(m_randomShuffleBuffer->SizeInBytes() == m_miniBatchIndices.GetCount() * sizeof(ndInt32));
+	m_randomShuffleBuffer->MemoryToDevice(0, m_randomShuffleBuffer->SizeInBytes(), &m_miniBatchIndices[0]);
 	for (ndInt32 n = 0; n < m_parameters.m_criticUpdatesCount; ++n)
 	{
-		// Get the rewards for this minibatch
+		// Get the rewards for this minibatch, try dispaching the entire epoch
 		//m_context->SyncBufferCommandQueue();
-		// for now load the indrect buffer, later this will use a copybuffer
-		m_minibatchIndexBuffer->MemoryToDevice(0, m_parameters.m_miniBatchSize * sizeof(ndUnsigned32), &m_miniBatchIndices[n * m_parameters.m_miniBatchSize]);
+
+		// for now load the indirect buffer, later this will use a copybuffer
+		copyIndicesInfo.m_srcOffsetInByte = ndInt32(n * sizeof(ndUnsigned32) * m_parameters.m_miniBatchSize);
+		m_minibatchIndexBuffer->CopyBuffer(copyIndicesInfo, 1, **m_randomShuffleBuffer);
 
 		policyMinibatchInputBuffer->CopyBufferIndirect(policyObservation, **m_minibatchIndexBuffer, **m_replayBufferFlat);
 		m_rewardBatch->CopyBufferIndirect(criticOutputReward, **m_minibatchIndexBuffer, **m_replayBufferFlat);

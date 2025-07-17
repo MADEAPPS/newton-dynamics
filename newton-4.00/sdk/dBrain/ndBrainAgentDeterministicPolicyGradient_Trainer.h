@@ -233,8 +233,8 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	ndSharedPtr<ndBrainFloatBuffer> m_expectedRewards;
 	ndSharedPtr<ndBrainFloatBuffer> m_replayBufferFlat;
 	ndSharedPtr<ndBrainFloatBuffer> m_replayFlatBufferCache;
+	ndSharedPtr<ndBrainIntegerBuffer> m_randomShuffleBuffer;
 	ndSharedPtr<ndBrainIntegerBuffer> m_minibatchIndexBuffer;
-	//ndSharedPtr<ndBrainUniformBuffer> m_replayFlatBufferCacheParameters;
 
 	//ndSharedPtr<ndBrainBuffer> m_criticNextActionParameters;
 	//ndSharedPtr<ndBrainBuffer> m_criticNextObservationParameters;
