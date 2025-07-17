@@ -1158,6 +1158,18 @@ R""""(
         }
     }
 
+    __kernel void brainSet(
+        int numberOfElements,
+        __global float* outputData, float value)
+    {
+        int global_id = get_global_id(0);
+        if (global_id < numberOfElements)
+        {
+            outputData[global_id] = value;
+        }
+    }
+
+
     __kernel void brainScaleAdd(
         int numberOfElements,
         __global float* outputData, 
@@ -1274,6 +1286,7 @@ void ndBrainGpuContext::CreateKerners()
     m_brainCopyStridedBufferIndirect = CreateKerner(program, "brainCopyStridedBufferIndirect");
 
     // math operations
+    m_brainSet = CreateKerner(program, "brainSet");
     m_brainAdd = CreateKerner(program, "brainAdd");
     m_brainSub = CreateKerner(program, "brainSub");
     m_brainMul = CreateKerner(program, "brainMul");

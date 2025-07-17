@@ -60,7 +60,9 @@ class ndBrainGpuContext : public ndBrainContext
 	virtual void CopyBuffer(const ndCopyBufferCommandInfo& descriptor, ndInt32 numberOfWorkGrups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData) override;
 	virtual void CopyBufferIndirect(const ndCopyBufferCommandInfo& descriptor, const ndBrainIntegerBuffer& indexBuffer, ndBrainBuffer& dstData, const ndBrainBuffer& srcData) override;
 
+	virtual void Set(ndBrainFloatBuffer& dstData, ndBrainFloat value) override;
 	virtual void Scale(ndBrainFloatBuffer& buffer, ndBrainFloat scale) override;
+	virtual void Set(ndBrainFloatBuffer& dstData, const ndBrainFloatBuffer& srcData) override;
 	virtual void Min(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
 	virtual void Add(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
 	virtual void Sub(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
@@ -123,6 +125,7 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainGpuCommand> m_copyStridedBufferIndirectCommand;
 
 	// arithmetic operations kernels
+	ndSharedPtr<ndBrainKernel> m_brainSet;
 	ndSharedPtr<ndBrainKernel> m_brainAdd;
 	ndSharedPtr<ndBrainKernel> m_brainSub;
 	ndSharedPtr<ndBrainKernel> m_brainMul;

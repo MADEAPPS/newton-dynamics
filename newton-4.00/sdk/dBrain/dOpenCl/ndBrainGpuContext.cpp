@@ -370,8 +370,6 @@ void ndBrainGpuContext::SubmitMathOperation(const ndSharedPtr<ndBrainKernel>& ke
 	ndAssert(error == CL_SUCCESS);
 }
 
-
-
 void ndBrainGpuContext::SubmitMathOperation(const ndSharedPtr<ndBrainKernel>& kernel, ndBrainBuffer* const buffer, const ndBrainBuffer* const srcBuffer)
 {
 	cl_int error = 0;
@@ -432,6 +430,16 @@ void ndBrainGpuContext::SubmitMathOperation(const ndSharedPtr<ndBrainKernel>& ke
 	cl::NDRange global(numberOfGroups);
 	error = m_queue->enqueueNDRangeKernel(*shader, offset, global, local);
 	ndAssert(error == CL_SUCCESS);
+}
+
+void ndBrainGpuContext::Set(ndBrainFloatBuffer& dstData, ndBrainFloat value)
+{
+	SubmitMathOperation(m_brainSet, &dstData, value);
+}
+
+void ndBrainGpuContext::Set(ndBrainFloatBuffer& dstData, const ndBrainFloatBuffer& srcData)
+{
+	SubmitMathOperation(m_brainAssigment, &dstData, &srcData);
 }
 
 void ndBrainGpuContext::CopyBuffer(ndBrainBuffer& dstData, const ndBrainBuffer& srcData)

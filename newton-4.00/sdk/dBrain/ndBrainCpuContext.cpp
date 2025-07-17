@@ -146,6 +146,19 @@ void ndBrainCpuContext::BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVe
 	MemoryFromDevice(src, 0, sizeInBytes, &dstVector[0]);
 }
 
+void ndBrainCpuContext::Set(ndBrainFloatBuffer& dstData, ndBrainFloat value)
+{
+	ndBrainVector& dst = **dstData.m_buffer;
+	dst.Set(value);
+}
+
+void ndBrainCpuContext::Set(ndBrainFloatBuffer& dstData, const ndBrainFloatBuffer& srcData)
+{
+	ndBrainVector& dst = **dstData.m_buffer;
+	const ndBrainVector& src = **srcData.m_buffer;
+	dst.Set(src);
+}
+
 void ndBrainCpuContext::Scale(ndBrainFloatBuffer& buffer, ndBrainFloat scale)
 {
 	ndBrainVector& dst = **buffer.m_buffer;
