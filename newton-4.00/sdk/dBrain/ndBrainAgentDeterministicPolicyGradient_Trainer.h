@@ -93,6 +93,9 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 		ndBrainFloat* GetObservations(ndInt32 entry);
 		const ndBrainFloat* GetObservations(ndInt32 entry) const;
 
+		ndBrainFloat* GetNextActions(ndInt32 entry);
+		const ndBrainFloat* GetNextActions(ndInt32 entry) const;
+
 		ndBrainFloat* GetNextObservations(ndInt32 entry);
 		const ndBrainFloat* GetNextObservations(ndInt32 entry) const;
 
@@ -102,6 +105,7 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 		ndInt32 GetActionOffset() const;
 		ndInt32 GetTerminalOffset() const;
 		ndInt32 GetObsevationOffset() const;
+		ndInt32 GetNextActionOffset() const;
 		ndInt32 GetNextObsevationOffset() const;
 		void GetFlatArray(ndInt32 index, ndBrainVector& output) const;
 
@@ -109,6 +113,7 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 		ndBrainVector m_terminal;
 		ndBrainVector m_actions;
 		ndBrainVector m_observations;
+		ndBrainVector m_nextActions;
 		ndBrainVector m_nextObservations;
 		ndInt32 m_actionsSize;
 		ndInt32 m_obsevationsSize;
