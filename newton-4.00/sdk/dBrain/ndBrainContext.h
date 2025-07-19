@@ -50,20 +50,23 @@ class ndBrainContext : public ndClassAlloc
 	virtual void BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVector& dstVector) = 0;
 	virtual void BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector) = 0;
 
-	virtual void Set(ndBrainFloatBuffer& dstData, ndBrainFloat value) = 0;
-	virtual void Scale(ndBrainFloatBuffer& buffer, ndBrainFloat scale) = 0;
 	virtual void Set(ndBrainFloatBuffer& dstData, const ndBrainFloatBuffer& srcData) = 0;
 	virtual void Min(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) = 0;
 	virtual void Add(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) = 0;
 	virtual void Sub(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) = 0;
 	virtual void Mul(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) = 0;
-	virtual void ScaleAdd(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat scale) = 0;
-	virtual void GaussianSample(ndBrainFloatBuffer& mean, const ndBrainFloatBuffer& sigman, const ndBrainFloatBuffer& uniformRandom) = 0;
-
 	virtual void LessEqual(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) = 0;
 	virtual void GreaterEqual(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) = 0;
-	virtual void Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat blend) = 0;
 	virtual void Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, const ndBrainFloatBuffer& blend) = 0;
+	virtual void GaussianSample(ndBrainFloatBuffer& mean, const ndBrainFloatBuffer& sigman, const ndBrainFloatBuffer& uniformRandom) = 0;
+
+	virtual void Set(ndBrainFloatBuffer& dstData, ndBrainFloat value) = 0;
+	virtual void Scale(ndBrainFloatBuffer& buffer, ndBrainFloat scale) = 0;
+	virtual void LessEqual(ndBrainFloatBuffer& buffer, ndBrainFloat test) = 0;
+	virtual void GreaterEqual(ndBrainFloatBuffer& buffer, ndBrainFloat test) = 0;
+	virtual void Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat blend) = 0;
+	virtual void Select(ndBrainFloatBuffer& buffer, ndBrainFloatBuffer& mask, ndBrainFloat a, ndBrainFloat b) = 0;
+	virtual void ScaleAdd(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat scale) = 0;
 };
 
 #endif

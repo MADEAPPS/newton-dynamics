@@ -219,11 +219,30 @@ void ndBrainVector::LessEqual(const ndBrainVector& a)
 	ndLessEqualMask(ndInt32(GetCount()), &(*this)[0], &a[0]);
 }
 
+void ndBrainVector::LessEqual(ndBrainFloat test)
+{
+	ndAssert(GetCount() < (1ll << 32));
+	ndLessEqualMask(ndInt32(GetCount()), &(*this)[0], test);
+}
+
+void ndBrainVector::GreaterEqual(ndBrainFloat test)
+{
+	ndAssert(GetCount() < (1ll << 32));
+	ndGreaterEqualMask(ndInt32(GetCount()), &(*this)[0], test);
+}
+
 void ndBrainVector::GreaterEqual(const ndBrainVector& a)
 {
 	ndAssert(GetCount() < (1ll << 32));
 	ndAssert(GetCount() == a.GetCount());
 	ndGreaterEqualMask(ndInt32(GetCount()), &(*this)[0], &a[0]);
+}
+
+void ndBrainVector::Select(const ndBrainVector& mask, ndFloat32 a, ndFloat32 b)
+{
+	ndAssert(GetCount() < (1ll << 32));
+	ndAssert(GetCount() == mask.GetCount());
+	ndSelect(ndInt32(GetCount()), &(*this)[0], &mask[0], a, b);
 }
 
 void ndBrainVector::ScaleSet(const ndBrainVector& a, ndBrainFloat b)

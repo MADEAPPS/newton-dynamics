@@ -274,3 +274,22 @@ void ndBrainGpuContext::GreaterEqual(ndBrainFloatBuffer& buffer, const ndBrainFl
 	const ndBrainVector& src = **srcBuffer.m_buffer;
 	dst.GreaterEqual(src);
 }
+
+void ndBrainGpuContext::LessEqual(ndBrainFloatBuffer& buffer, ndBrainFloat test)
+{
+	ndBrainVector& dst = **buffer.m_buffer;
+	dst.LessEqual(test);
+}
+
+void ndBrainGpuContext::GreaterEqual(ndBrainFloatBuffer& buffer, ndBrainFloat test)
+{
+	ndBrainVector& dst = **buffer.m_buffer;
+	dst.GreaterEqual(test);
+}
+
+void ndBrainGpuContext::Select(ndBrainFloatBuffer& buffer, ndBrainFloatBuffer& maskBuffer, ndBrainFloat a, ndBrainFloat b)
+{
+	ndBrainVector& dst = **buffer.m_buffer;
+	const ndBrainVector& mask = **maskBuffer.m_buffer;
+	dst.Select(mask, a, b);
+}

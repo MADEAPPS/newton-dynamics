@@ -534,3 +534,18 @@ void ndBrainGpuContext::GreaterEqual(ndBrainFloatBuffer& buffer, const ndBrainFl
 {
 	ndAssert(0);
 }
+
+void ndBrainGpuContext::LessEqual(ndBrainFloatBuffer& buffer, ndBrainFloat test)
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuContext::GreaterEqual(ndBrainFloatBuffer& buffer, ndBrainFloat test)
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuContext::Select(ndBrainFloatBuffer& buffer, ndBrainFloatBuffer& mask, ndBrainFloat a, ndBrainFloat b)
+{
+	ndAssert(0);
+}

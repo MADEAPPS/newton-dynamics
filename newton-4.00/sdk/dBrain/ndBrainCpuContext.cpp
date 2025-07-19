@@ -227,6 +227,12 @@ void ndBrainCpuContext::Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuff
 	dst.Blend(src, blend);
 }
 
+void ndBrainCpuContext::LessEqual(ndBrainFloatBuffer& buffer, ndBrainFloat test)
+{
+	ndBrainVector& dst = **buffer.m_buffer;
+	dst.LessEqual(test);
+}
+
 void ndBrainCpuContext::LessEqual(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
 {
 	ndBrainVector& dst = **buffer.m_buffer;
@@ -234,9 +240,22 @@ void ndBrainCpuContext::LessEqual(ndBrainFloatBuffer& buffer, const ndBrainFloat
 	dst.LessEqual(src);
 }
 
+void ndBrainCpuContext::GreaterEqual(ndBrainFloatBuffer& buffer, ndBrainFloat test)
+{
+	ndBrainVector& dst = **buffer.m_buffer;
+	dst.GreaterEqual(test);
+}
+
 void ndBrainCpuContext::GreaterEqual(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
 {
 	ndBrainVector& dst = **buffer.m_buffer;
 	const ndBrainVector& src = **srcBuffer.m_buffer;
 	dst.GreaterEqual(src);
+}
+
+void ndBrainCpuContext::Select(ndBrainFloatBuffer& buffer, ndBrainFloatBuffer& maskBuffer, ndBrainFloat a, ndBrainFloat b)
+{
+	ndBrainVector& dst = **buffer.m_buffer;
+	const ndBrainVector& mask = **maskBuffer.m_buffer;
+	dst.Select(mask, a, b);
 }
