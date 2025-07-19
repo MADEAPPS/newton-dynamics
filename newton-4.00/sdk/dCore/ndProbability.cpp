@@ -61,7 +61,8 @@ ndFloat32 ndRand()
 	return uniform(GetRandomGenerator());
 }
 
-ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma)
+//ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma)
+ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma, ndFloat32 randomVariable)
 {
 	// It seems the standard library normal random is based of the Box–Muller transform
 	// https://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform
@@ -76,11 +77,10 @@ ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma)
 	//ndScopeSpinLock lock(__lock__);
 	//return gaussian(GetRandomGenerator());
 
-
 	// from Abramowitz and Stegun formula 26.2.23.
 	// calculate a normal value with 0.0 mean and 1.0 deviation 
 	// the absolute value of the error should be less than 4.5e-4.
-	auto NormalCumulativeDistibutionInverse = [](ndFloat32 r)
+	auto NormalCumulativeDistibutionInverseOld = [](ndFloat32 r)
 	{
 		auto RationalApproximation = [](ndFloat32 t)
 		{
@@ -90,33 +90,6 @@ ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma)
 			ndFloat32 denominator = ndFloat32(1.0f) + ((d[2] * t + d[1]) * t + d[0]) * t;
 			return t - numerator / denominator;
 		};
-
-		//auto TailorExpansion = [](ndFloat32 t)
-		//{
-		//	ndFloat32 sum = ndFloat32(1.0f);
-		//
-		//	ndFloat32 t2 = t * t;
-		//	ndFloat32 t2Acc = t2;
-		//	ndFloat32 exp0 = ndFloat32(3.0f);
-		//	ndFloat32 exp1 = ndFloat32(5.0f);
-		//	ndFloat32 oddFactorial = ndFloat32(1.0f);
-		//	ndFloat32 evenFactorial = ndFloat32(2.0f);
-		//	for (ndInt32 i = 0; i < 4; ++i)
-		//	{
-		//		sum -= t2Acc / (exp0 * oddFactorial);
-		//		t2Acc *= t2;
-		//
-		//		sum += t2Acc / (exp1 * evenFactorial);
-		//		t2Acc *= t2;
-		//
-		//		exp0 += ndFloat32(4.0f);
-		//		exp1 += ndFloat32(4.0f);
-		//		oddFactorial = evenFactorial * ndFloat32(2 * i + 3);
-		//		evenFactorial = oddFactorial * ndFloat32(2 * i + 4);
-		//	}
-		//	const ndFloat32 scaleFactor = ndFloat32(0.3989422804f);
-		//	return sum * t * scaleFactor;
-		//};
 
 		ndFloat32 value = ndFloat32(0.0f);
 		if (r < ndFloat32(0.5f))
@@ -137,7 +110,48 @@ ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma)
 		return value;
 	};
 
-	ndFloat32 r = ndClamp(ndRand(), ndFloat32(1.0e-6f), ndFloat32(1.0f - 1.0e-6f));
+	// more GPU portable version
+	auto NormalCumulativeDistibutionInverse = [](ndFloat32 r)
+	{
+		auto RationalApproximation = [](ndFloat32 t)
+		{
+			const ndFloat32 c0 = ndFloat32(2.515517f);
+			const ndFloat32 c1 = ndFloat32(0.802853f);
+			const ndFloat32 c2 = ndFloat32(0.010328f);
+			const ndFloat32 d0 = ndFloat32(1.432788f);
+			const ndFloat32 d1 = ndFloat32(0.189269f);
+			const ndFloat32 d2 = ndFloat32(0.001308f);
+			ndFloat32 numerator = c0 + (c2 * t + c1) * t;
+			ndFloat32 denominator = ndFloat32(1.0f) + ((d2 * t + d1) * t + d0) * t;
+			ndFloat32 r = t - numerator / denominator;
+			return r;
+		};
+
+		ndFloat32 value = ndFloat32(0.0f);
+		if (r >= ndFloat32(0.5f))
+		{
+			// F^-1(p) = G^-1(1-p)
+			ndFloat32 arg = ndFloat32(-2.0f) * ndLog(ndFloat32(1.0f) - r);
+			ndAssert(arg > 0.0f);
+			value = RationalApproximation(ndSqrt(arg));
+		}
+		else
+		{
+			// F^-1(p) = - G^-1(p)
+			ndFloat32 arg = ndFloat32(-2.0f) * ndLog(r);
+			ndAssert(arg > 0.0f);
+			value = -RationalApproximation(ndSqrt(arg));
+		}
+		return value;
+	};
+
+	ndFloat32 r = ndClamp(randomVariable, ndFloat32(1.0e-6f), ndFloat32(1.0f - 1.0e-6f));
 	ndFloat32 normal = NormalCumulativeDistibutionInverse(r);
+	ndAssert(normal == NormalCumulativeDistibutionInverseOld(r));
 	return mean + normal * sigma;
+}
+
+ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma)
+{
+	return ndGaussianRandom(mean, sigma, ndRand());
 }

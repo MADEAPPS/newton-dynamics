@@ -41,6 +41,9 @@ class ndBrainVector: public ndArray<ndBrainFloat>
 	void Sub(const ndBrainVector& a);
 	void Mul(const ndBrainVector& a);
 	void Min(const ndBrainVector& a);
+	void Max(const ndBrainVector& a);
+	void LessEqual(const ndBrainVector& a);
+	void GreaterEqual(const ndBrainVector& a);
 
 	void FlushToZero();
 	void SoftMaxNormalize();
@@ -50,12 +53,14 @@ class ndBrainVector: public ndArray<ndBrainFloat>
 	void ScaleSet(const ndBrainVector& a, ndBrainFloat b);
 	void ScaleAdd(const ndBrainVector& a, ndBrainFloat b);
 	void Blend(const ndBrainVector& target, ndBrainFloat blend);
+	void Blend(const ndBrainVector& target, const ndBrainVector& blend);
 	void MulAdd(const ndBrainVector& a, const ndBrainVector& b);
 	void MulSub(const ndBrainVector& a, const ndBrainVector& b);
 	
 	ndBrainFloat Dot(const ndBrainVector& a) const;
 	void CalculateMeanAndDeviation(ndBrainFloat& mean, ndBrainFloat& deviation) const;
 	void CategoricalSample(const ndBrainVector& probability, ndBrainFloat beta = ndBrainFloat(0.5f));
+	void CalculateMeanAndDeviation(const ndBrainVector& deviation, const ndBrainVector& uniformRand);
 };
 
 class ndBrainMemVector: public ndBrainVector

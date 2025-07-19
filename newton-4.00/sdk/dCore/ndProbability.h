@@ -40,5 +40,8 @@ D_CORE_API void ndSetRandSeed(ndUnsigned32 seed);
 /// Returns a guardian distributed random value with center at mean and standard deviation sigma
 D_CORE_API ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma);
 
+/// Returns a guardian distributed random value with center at mean and standard deviation sigma
+D_CORE_API ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma, ndFloat32 randomVariable);
+
 #endif
 

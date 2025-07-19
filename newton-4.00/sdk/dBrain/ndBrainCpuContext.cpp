@@ -199,3 +199,44 @@ void ndBrainCpuContext::ScaleAdd(ndBrainFloatBuffer& buffer, const ndBrainFloatB
 	const ndBrainVector& src = **srcBuffer.m_buffer;
 	dst.ScaleAdd(src, scale);
 }
+
+void ndBrainCpuContext::GaussianSample(ndBrainFloatBuffer& meanBuffer, const ndBrainFloatBuffer& sigmaBuffer, const ndBrainFloatBuffer& uniformRandomBuffer)
+{
+	ndAssert(meanBuffer.SizeInBytes() == sigmaBuffer.SizeInBytes());
+	ndAssert(meanBuffer.SizeInBytes() == uniformRandomBuffer.SizeInBytes());
+
+	ndInt32 elements = ndInt32(meanBuffer.SizeInBytes() / sizeof(ndBrainFloat));
+	ndBrainMemVector mean((ndBrainFloat*)meanBuffer.GetCpuPtr(), elements);
+	const ndBrainMemVector sigma((ndBrainFloat*)sigmaBuffer.GetCpuPtr(), elements);
+	const ndBrainMemVector uniformRand((ndBrainFloat*)uniformRandomBuffer.GetCpuPtr(), elements);
+	mean.CalculateMeanAndDeviation(sigma, uniformRand);
+}
+
+void ndBrainCpuContext::Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat blend)
+{
+	ndBrainVector& dst = **buffer.m_buffer;
+	const ndBrainVector& src = **srcBuffer.m_buffer;
+	dst.Blend(src, blend);
+}
+
+void ndBrainCpuContext::Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, const ndBrainFloatBuffer& blendBuffer)
+{
+	ndBrainVector& dst = **buffer.m_buffer;
+	const ndBrainVector& src = **srcBuffer.m_buffer;
+	const ndBrainVector& blend = **blendBuffer.m_buffer;
+	dst.Blend(src, blend);
+}
+
+void ndBrainCpuContext::LessEqual(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
+{
+	ndBrainVector& dst = **buffer.m_buffer;
+	const ndBrainVector& src = **srcBuffer.m_buffer;
+	dst.LessEqual(src);
+}
+
+void ndBrainCpuContext::GreaterEqual(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
+{
+	ndBrainVector& dst = **buffer.m_buffer;
+	const ndBrainVector& src = **srcBuffer.m_buffer;
+	dst.GreaterEqual(src);
+}

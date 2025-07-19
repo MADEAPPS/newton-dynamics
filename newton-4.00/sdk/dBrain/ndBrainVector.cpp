@@ -121,6 +121,14 @@ void ndBrainVector::CalculateMeanAndDeviation(ndBrainFloat& mean, ndBrainFloat& 
 	deviation = ndBrainFloat(ndSqrt (variance2));
 }
 
+void ndBrainVector::CalculateMeanAndDeviation(const ndBrainVector& deviation, const ndBrainVector& uniformRand)
+{
+	for (ndInt64 i = GetCount() - 1; i >= 0; --i)
+	{
+		(*this)[i] = ndGaussianRandom((*this)[i], deviation[i], uniformRand[i]);
+	}
+}
+
 void ndBrainVector::GaussianNormalize()
 {
 	ndBrainFloat mean;
@@ -197,6 +205,27 @@ void ndBrainVector::Min(const ndBrainVector& a)
 	ndMin(ndInt32(GetCount()), &(*this)[0], &a[0]);
 }
 
+void ndBrainVector::Max(const ndBrainVector& a)
+{
+	ndAssert(GetCount() < (1ll << 32));
+	ndAssert(GetCount() == a.GetCount());
+	ndMax(ndInt32(GetCount()), &(*this)[0], &a[0]);
+}
+
+void ndBrainVector::LessEqual(const ndBrainVector& a)
+{
+	ndAssert(GetCount() < (1ll << 32));
+	ndAssert(GetCount() == a.GetCount());
+	ndLessEqualMask(ndInt32(GetCount()), &(*this)[0], &a[0]);
+}
+
+void ndBrainVector::GreaterEqual(const ndBrainVector& a)
+{
+	ndAssert(GetCount() < (1ll << 32));
+	ndAssert(GetCount() == a.GetCount());
+	ndGreaterEqualMask(ndInt32(GetCount()), &(*this)[0], &a[0]);
+}
+
 void ndBrainVector::ScaleSet(const ndBrainVector& a, ndBrainFloat b)
 {
 	ndAssert(GetCount() < (1ll << 32));
@@ -260,6 +289,20 @@ void ndBrainVector::Blend(const ndBrainVector& target, ndBrainFloat blend)
 	ndAssert(GetCount() < (1ll << 32));
 	Scale(ndBrainFloat(1.0f) - blend);
 	ScaleAdd(target, blend);
+}
+
+void ndBrainVector::Blend(const ndBrainVector& target, const ndBrainVector& blend)
+{
+	ndAssert(GetCount() < (1ll << 32));
+	//Scale(ndBrainFloat(1.0f) - blend);
+	//ScaleAdd(target, blend);
+	ndAssert(0);
+	for (ndInt64 i = GetCount() - 1; i >= 0; --i)
+	{
+		ndBrainFloat s0 = blend[i];
+		ndBrainFloat s1 = ndBrainFloat(1.0f) - s0;
+		(*this)[i] = (*this)[i] * s1 + target[i] * s0;
+	}
 }
 
 void ndBrainMemVector::SetSize(ndInt64 size)

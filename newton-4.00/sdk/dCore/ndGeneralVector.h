@@ -110,6 +110,36 @@ void ndMin(ndInt32 size, T* const X, const T* const A)
 }
 
 template<class T>
+void ndMax(ndInt32 size, T* const X, const T* const A)
+{
+	for (ndInt32 i = 0; i < size; ++i)
+	{
+		X[i] = ndMax(X[i], A[i]);
+		ndAssert(ndCheckFloat(X[i]));
+	}
+}
+
+template<class T>
+void ndLessEqualMask(ndInt32 size, T* const X, const T* const A)
+{
+	for (ndInt32 i = 0; i < size; ++i)
+	{
+		X[i] = (X[i] <= A[i]) ? T (1.0f) : T(0.0f);
+		ndAssert(ndCheckFloat(X[i]));
+	}
+}
+
+template<class T>
+void ndGreaterEqualMask(ndInt32 size, T* const X, const T* const A)
+{
+	for (ndInt32 i = 0; i < size; ++i)
+	{
+		X[i] = (X[i] >= A[i]) ? T(1.0f) : T(0.0f);
+		ndAssert(ndCheckFloat(X[i]));
+	}
+}
+
+template<class T>
 void ndAdd(ndInt32 size, T* const X, const T* const A)
 {
 	for (ndInt32 i = 0; i < size; ++i)
