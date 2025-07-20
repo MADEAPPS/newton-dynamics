@@ -306,6 +306,7 @@ ndBrainFloat ndBrainVector::Dot(const ndBrainVector& a) const
 void ndBrainVector::Blend(const ndBrainVector& target, ndBrainFloat blend)
 {
 	ndAssert(GetCount() < (1ll << 32));
+	ndAssert(GetCount() == target.GetCount());
 	Scale(ndBrainFloat(1.0f) - blend);
 	ScaleAdd(target, blend);
 }
@@ -313,9 +314,10 @@ void ndBrainVector::Blend(const ndBrainVector& target, ndBrainFloat blend)
 void ndBrainVector::Blend(const ndBrainVector& target, const ndBrainVector& blend)
 {
 	ndAssert(GetCount() < (1ll << 32));
+	ndAssert(GetCount() == blend.GetCount());
+	ndAssert(GetCount() == target.GetCount());
 	//Scale(ndBrainFloat(1.0f) - blend);
 	//ScaleAdd(target, blend);
-	ndAssert(0);
 	for (ndInt64 i = GetCount() - 1; i >= 0; --i)
 	{
 		ndBrainFloat s0 = blend[i];

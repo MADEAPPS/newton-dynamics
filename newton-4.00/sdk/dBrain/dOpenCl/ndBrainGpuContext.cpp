@@ -549,3 +549,8 @@ void ndBrainGpuContext::Select(ndBrainFloatBuffer& buffer, ndBrainFloatBuffer& m
 {
 	ndAssert(0);
 }
+
+void ndBrainGpuContext::BroadcastScaler(ndBrainFloatBuffer& buffer, ndInt32 bufferStrideInFloats, const ndBrainFloatBuffer& srcScalar)
+{
+	ndAssert(0);
+}

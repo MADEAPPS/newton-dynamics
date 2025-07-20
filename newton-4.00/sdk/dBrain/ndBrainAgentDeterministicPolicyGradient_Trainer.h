@@ -93,9 +93,6 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 		ndBrainFloat* GetObservations(ndInt32 entry);
 		const ndBrainFloat* GetObservations(ndInt32 entry) const;
 
-		ndBrainFloat* GetNextActions(ndInt32 entry);
-		const ndBrainFloat* GetNextActions(ndInt32 entry) const;
-
 		ndBrainFloat* GetNextObservations(ndInt32 entry);
 		const ndBrainFloat* GetNextObservations(ndInt32 entry) const;
 
@@ -105,7 +102,6 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 		ndInt32 GetActionOffset() const;
 		ndInt32 GetTerminalOffset() const;
 		ndInt32 GetObsevationOffset() const;
-		ndInt32 GetNextActionOffset() const;
 		ndInt32 GetNextObsevationOffset() const;
 		void GetFlatArray(ndInt32 index, ndBrainVector& output) const;
 
@@ -113,7 +109,6 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 		ndBrainVector m_terminal;
 		ndBrainVector m_actions;
 		ndBrainVector m_observations;
-		ndBrainVector m_nextActions;
 		ndBrainVector m_nextObservations;
 		ndInt32 m_actionsSize;
 		ndInt32 m_obsevationsSize;
@@ -218,10 +213,17 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 
 	ndBrainVector m_parametersBuffer;
 	ndArray<ndInt32> m_miniBatchIndices;
-	ndSharedPtr<ndBrainFloatBuffer> m_rewardBatch;
-	ndSharedPtr<ndBrainFloatBuffer> m_terminalBatch;
+	ndSharedPtr<ndBrainFloatBuffer> m_sigmaMinibatch;
+	ndSharedPtr<ndBrainFloatBuffer> m_rewardMinibatch;
+	ndSharedPtr<ndBrainFloatBuffer> m_terminalMinibatch;
+	ndSharedPtr<ndBrainFloatBuffer> m_uniformRandomMinibatch;
+
+	ndSharedPtr<ndBrainFloatBuffer> m_uniformRandom0;
+	ndSharedPtr<ndBrainFloatBuffer> m_uniformRandom1;
 	ndSharedPtr<ndBrainFloatBuffer> m_expectedRewards;
 	ndSharedPtr<ndBrainFloatBuffer> m_replayBufferFlat;
+	ndSharedPtr<ndBrainFloatBuffer> m_critickInputTest;
+	ndSharedPtr<ndBrainFloatBuffer> m_critickOutputTest;
 	ndSharedPtr<ndBrainFloatBuffer> m_replayFlatBufferCache;
 	ndSharedPtr<ndBrainIntegerBuffer> m_randomShuffleBuffer;
 	ndSharedPtr<ndBrainIntegerBuffer> m_minibatchIndexBuffer;
@@ -229,6 +231,10 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory m_replayBuffer;
 	ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory m_replayBufferCache;
 	ndBrainAgentDeterministicPolicyGradient_Agent* m_agent;
+
+	std::mt19937 m_randomGenerator;
+	std::uniform_real_distribution<ndFloat32> m_uniformDistribution;
+
 	ndArray<ndInt32> m_shuffleBuffer;
 	ndMovingAverage<8> m_averageExpectedRewards;
 	ndMovingAverage<8> m_averageFramesPerEpisodes;

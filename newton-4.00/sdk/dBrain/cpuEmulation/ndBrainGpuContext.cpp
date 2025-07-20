@@ -26,7 +26,7 @@ ndBrainGpuContext::ndBrainGpuContext()
 {
 	ndInt32 numOfThreads = (ndBrainThreadPool::GetMaxThreads() + 1) / 2;
 #ifdef _DEBUG
-//numOfThreads = 1;
+numOfThreads = 1;
 #endif
 //numOfThreads = 1;
 
@@ -248,48 +248,73 @@ void ndBrainGpuContext::GaussianSample(ndBrainFloatBuffer& meanBuffer, const ndB
 
 void ndBrainGpuContext::Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat blend)
 {
-	ndBrainVector& dst = **buffer.m_buffer;
-	const ndBrainVector& src = **srcBuffer.m_buffer;
+	ndAssert(buffer.SizeInBytes() == srcBuffer.SizeInBytes());
+	ndInt32 elements = ndInt32(buffer.SizeInBytes() / sizeof(ndBrainFloat));
+	ndBrainMemVector dst((ndBrainFloat*)buffer.GetCpuPtr(), elements);
+	const ndBrainMemVector src((ndBrainFloat*)srcBuffer.GetCpuPtr(), elements);
 	dst.Blend(src, blend);
 }
 
 void ndBrainGpuContext::Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, const ndBrainFloatBuffer& blendBuffer)
 {
-	ndBrainVector& dst = **buffer.m_buffer;
-	const ndBrainVector& src = **srcBuffer.m_buffer;
-	const ndBrainVector& blend = **blendBuffer.m_buffer;
+	ndAssert(buffer.SizeInBytes() == srcBuffer.SizeInBytes());
+	ndInt32 elements = ndInt32(buffer.SizeInBytes() / sizeof(ndBrainFloat));
+	ndBrainMemVector dst((ndBrainFloat*)buffer.GetCpuPtr(), elements);
+	const ndBrainMemVector src((ndBrainFloat*)srcBuffer.GetCpuPtr(), elements);
+	const ndBrainMemVector blend((ndBrainFloat*)blendBuffer.GetCpuPtr(), elements);
 	dst.Blend(src, blend);
 }
 
 void ndBrainGpuContext::LessEqual(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
 {
-	ndBrainVector& dst = **buffer.m_buffer;
-	const ndBrainVector& src = **srcBuffer.m_buffer;
+	ndAssert(buffer.SizeInBytes() == srcBuffer.SizeInBytes());
+	ndInt32 elements = ndInt32(buffer.SizeInBytes() / sizeof(ndBrainFloat));
+	ndBrainMemVector dst((ndBrainFloat*)buffer.GetCpuPtr(), elements);
+	const ndBrainMemVector src((ndBrainFloat*)srcBuffer.GetCpuPtr(), elements);
 	dst.LessEqual(src);
 }
 
 void ndBrainGpuContext::GreaterEqual(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
 {
-	ndBrainVector& dst = **buffer.m_buffer;
-	const ndBrainVector& src = **srcBuffer.m_buffer;
+	ndAssert(buffer.SizeInBytes() == srcBuffer.SizeInBytes());
+	ndInt32 elements = ndInt32(buffer.SizeInBytes() / sizeof(ndBrainFloat));
+	ndBrainMemVector dst((ndBrainFloat*)buffer.GetCpuPtr(), elements);
+	const ndBrainMemVector src((ndBrainFloat*)srcBuffer.GetCpuPtr(), elements);
 	dst.GreaterEqual(src);
 }
 
 void ndBrainGpuContext::LessEqual(ndBrainFloatBuffer& buffer, ndBrainFloat test)
 {
-	ndBrainVector& dst = **buffer.m_buffer;
+	ndInt32 elements = ndInt32(buffer.SizeInBytes() / sizeof(ndBrainFloat));
+	ndBrainMemVector dst((ndBrainFloat*)buffer.GetCpuPtr(), elements);
 	dst.LessEqual(test);
 }
 
 void ndBrainGpuContext::GreaterEqual(ndBrainFloatBuffer& buffer, ndBrainFloat test)
 {
-	ndBrainVector& dst = **buffer.m_buffer;
+	ndInt32 elements = ndInt32(buffer.SizeInBytes() / sizeof(ndBrainFloat));
+	ndBrainMemVector dst((ndBrainFloat*)buffer.GetCpuPtr(), elements);
 	dst.GreaterEqual(test);
 }
 
 void ndBrainGpuContext::Select(ndBrainFloatBuffer& buffer, ndBrainFloatBuffer& maskBuffer, ndBrainFloat a, ndBrainFloat b)
 {
-	ndBrainVector& dst = **buffer.m_buffer;
-	const ndBrainVector& mask = **maskBuffer.m_buffer;
+	ndAssert(buffer.SizeInBytes() == maskBuffer.SizeInBytes());
+	ndInt32 elements = ndInt32(buffer.SizeInBytes() / sizeof(ndBrainFloat));
+	ndBrainMemVector dst((ndBrainFloat*)buffer.GetCpuPtr(), elements);
+	const ndBrainMemVector mask((ndBrainFloat*)maskBuffer.GetCpuPtr(), elements);
 	dst.Select(mask, a, b);
+}
+
+void ndBrainGpuContext::BroadcastScaler(ndBrainFloatBuffer& buffer, ndInt32 bufferStrideInFloats, const ndBrainFloatBuffer& srcScalar)
+{
+	ndAssert(buffer.SizeInBytes() == srcScalar.SizeInBytes() * bufferStrideInFloats);
+	ndBrainMemVector dst((ndBrainFloat*)buffer.GetCpuPtr(), ndInt32(buffer.SizeInBytes() / sizeof(ndBrainFloat)));
+	const ndBrainMemVector src((ndBrainFloat*)srcScalar.GetCpuPtr(), ndInt32(srcScalar.SizeInBytes() / sizeof(ndBrainFloat)));
+
+	for (ndInt32 i = 0; i < src.GetCount(); ++i)
+	{
+		ndBrainMemVector subVector(&dst[i * bufferStrideInFloats], bufferStrideInFloats);
+		subVector.Set(src[i]);
+	}
 }

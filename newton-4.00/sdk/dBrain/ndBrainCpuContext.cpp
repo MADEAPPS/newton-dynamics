@@ -23,7 +23,7 @@ ndBrainCpuContext::ndBrainCpuContext()
 {
 	ndInt32 numOfThreads = (ndBrainThreadPool::GetMaxThreads() + 1) / 2;
 #ifdef _DEBUG
-//numOfThreads = 1;
+numOfThreads = 1;
 #endif
 
 	SetThreadCount(numOfThreads);
@@ -258,4 +258,16 @@ void ndBrainCpuContext::Select(ndBrainFloatBuffer& buffer, ndBrainFloatBuffer& m
 	ndBrainVector& dst = **buffer.m_buffer;
 	const ndBrainVector& mask = **maskBuffer.m_buffer;
 	dst.Select(mask, a, b);
+}
+
+void ndBrainCpuContext::BroadcastScaler(ndBrainFloatBuffer& buffer, ndInt32 bufferStrideInFloats, const ndBrainFloatBuffer& srcScalar)
+{
+	ndBrainVector& dst = **buffer.m_buffer;
+	const ndBrainVector& src = **srcScalar.m_buffer;
+
+	for (ndInt32 i = 0; i < src.GetCount(); ++i)
+	{
+		ndBrainMemVector subVector(&dst[i * bufferStrideInFloats], bufferStrideInFloats);
+		subVector.Set(src[i]);
+	}
 }
