@@ -34,6 +34,12 @@
 	#define D_VERTEXLIST_INDEX_LIST_BATCH (1024)
 #endif
 
+#pragma optimize( "", off )
+ndFloat32 ndExp_VSFix(ndFloat32 x)
+{
+	return ndExp(x);
+}
+
 ndFloat64 ndRoundToFloat(ndFloat64 val)
 {
 	ndInt32 exp;
