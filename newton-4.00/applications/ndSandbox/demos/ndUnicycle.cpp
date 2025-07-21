@@ -403,18 +403,28 @@ namespace ndUnicycle
 				ndFloat32 reward = r * r;
 				return reward;
 			};
-
-			ndIkSolver& solver = m_controllerTrainer->m_solver;
-			ndFixSizeArray<ndJointBilateralConstraint*, 64> extraJoint;
-			const ndModelArticulation::ndCenterOfMassDynamics comDynamics(GetModel()->GetAsModelArticulation()->CalculateCentreOfMassDynamics(solver, comFrame, extraJoint, m_timestep));
-			const ndVector comOmega(comDynamics.m_omega);
-			const ndVector comAlpha(comDynamics.m_alpha);
 		
-			ndFloat32 omegaReward = PolynomialOmegaReward(comOmega.m_x);
-			ndFloat32 alphaReward = PolynomialAccelerationReward(comAlpha.m_x);
-			ndFloat32 reward = ndFloat32(0.5f) * omegaReward + ndFloat32(0.5f) * alphaReward;
-
-			return ndBrainFloat(reward);
+			if (!IsOnAir())
+			{
+				ndIkSolver& solver = m_controllerTrainer->m_solver;
+				ndFixSizeArray<ndJointBilateralConstraint*, 64> extraJoint;
+				const ndModelArticulation::ndCenterOfMassDynamics comDynamics(GetModel()->GetAsModelArticulation()->CalculateCentreOfMassDynamics(solver, comFrame, extraJoint, m_timestep));
+				const ndVector comOmega(comDynamics.m_omega);
+				const ndVector comAlpha(comDynamics.m_alpha);
+				ndFloat32 omegaReward = PolynomialOmegaReward(comOmega.m_x);
+				ndFloat32 alphaReward = PolynomialAccelerationReward(comAlpha.m_x);
+				ndFloat32 reward = ndFloat32(0.5f) * omegaReward + ndFloat32(0.5f) * alphaReward;
+				return ndBrainFloat(reward);
+			}
+			else
+			{
+				const ndMatrix wheelMatrix(m_wheelJoint->CalculateGlobalMatrix0());
+				const ndVector wheelOmega(m_wheel->GetOmega());
+				ndFloat32 speed = (wheelOmega.DotProduct(wheelMatrix.m_front)).GetScalar();
+				ndFloat32 reward = ndExp(-0.01f * speed * speed);
+				//ndTrace(("%f %f\n", speed, reward));
+				return reward;
+			}
 		}
 
 		//#pragma optimize( "", off )
