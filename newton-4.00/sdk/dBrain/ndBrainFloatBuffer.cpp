@@ -120,6 +120,7 @@ void ndBrainFloatBuffer::MemoryFromDevice(size_t offsetInBytes, size_t sizeInByt
 
 void ndBrainFloatBuffer::MemoryToDevice(size_t offsetInBytes, size_t sizeInBytes, const void* const inputData)
 {
+	ndAssert((offsetInBytes + sizeInBytes) <= SizeInBytes());
 	m_context->MemoryToDevice(*this, offsetInBytes, sizeInBytes, inputData);
 }
 
