@@ -73,6 +73,8 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 	{
 		public:
 		ndTrajectory();
+		ndTrajectory(ndInt32 actionsSize, ndInt32 obsevationsSize);
+
 		void Init(ndInt32 actionsSize, ndInt32 obsevationsSize);
 	
 		ndInt32 GetCount() const;
@@ -129,8 +131,8 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 
 	ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer> m_owner;
 	ndTrajectory m_trajectory;
-	ndInt32 m_trajectoryBaseCount;
 	ndRandomGenerator m_randomeGenerator;
+	ndUnsigned32 m_trajectoryBaseIndex;
 	friend class ndBrainAgentDeterministicPolicyGradient_Trainer;
 };
 
@@ -193,7 +195,13 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 
 	protected:
 	void Optimize();
+	void CalculateScore();
 	void SaveTrajectory();
+	void SaveTrajectoryOld();
+	void SaveTrajectoryLoadBuffer();
+	
+	void SaveTrajectoryTerminal();
+	void SaveTrajectoryNoTerminal();
 	virtual void BuildPolicyClass();
 	virtual void BuildCriticClass();
 	virtual void LearnPolicyFunction();
@@ -211,7 +219,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	ndSharedPtr<ndBrainTrainer> m_criticTrainer[ND_SAC_NUMBER_OF_CRITICS];
 	ndSharedPtr<ndBrainTrainerInference> m_referenceCriticTrainer[ND_SAC_NUMBER_OF_CRITICS];
 
-	ndBrainVector m_parametersBuffer;
+	ndBrainVector m_scratchBuffer;
 	ndArray<ndInt32> m_miniBatchIndices;
 	ndSharedPtr<ndBrainFloatBuffer> m_sigmaMinibatch;
 	ndSharedPtr<ndBrainFloatBuffer> m_rewardMinibatch;
@@ -224,12 +232,8 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	ndSharedPtr<ndBrainFloatBuffer> m_replayBufferFlat;
 	ndSharedPtr<ndBrainFloatBuffer> m_critickInputTest;
 	ndSharedPtr<ndBrainFloatBuffer> m_critickOutputTest;
-	ndSharedPtr<ndBrainFloatBuffer> m_replayFlatBufferCache;
 	ndSharedPtr<ndBrainIntegerBuffer> m_randomShuffleBuffer;
 	ndSharedPtr<ndBrainIntegerBuffer> m_minibatchIndexBuffer;
-
-	ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory m_replayBuffer;
-	ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory m_replayBufferCache;
 	ndBrainAgentDeterministicPolicyGradient_Agent* m_agent;
 
 	std::mt19937 m_randomGenerator;
@@ -241,9 +245,10 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	ndUnsigned32 m_frameCount;
 	ndUnsigned32 m_framesAlive;
 	ndUnsigned32 m_eposideCount;
-	ndInt32 m_replayBufferIndex;
+	ndUnsigned32 m_replayBufferIndex;
 	ndUnsigned32 ndPolycyDelayMod;
 	ndUnsigned32 m_shuffleBatchIndex;
+	bool m_replayIsFilled;
 	bool m_startOptimization;
 
 	friend class ndBrainAgentDeterministicPolicyGradient_Agent;
