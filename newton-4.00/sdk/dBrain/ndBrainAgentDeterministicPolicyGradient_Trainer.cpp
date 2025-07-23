@@ -368,8 +368,8 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::ndBrainAgentDeterministicPolicy
 	ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory trajectory(outputSize, inputSize);
 	m_replayBufferFlat = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, trajectory.GetStride() * m_parameters.m_replayBufferSize));
 	m_expectedRewards = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_criticUpdatesCount * m_parameters.m_miniBatchSize));
-	m_uniformRandom0___ = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_criticUpdatesCount * m_parameters.m_miniBatchSize));
-	m_uniformRandom1___ = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_criticUpdatesCount * m_parameters.m_miniBatchSize));
+	m_uniformRandom0 = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_criticUpdatesCount * m_parameters.m_miniBatchSize));
+	m_uniformRandom1 = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_criticUpdatesCount * m_parameters.m_miniBatchSize));
 
 	m_sigmaMinibatch = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, outputSize * m_parameters.m_miniBatchSize));
 	m_rewardMinibatch = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, outputSize * m_parameters.m_miniBatchSize));
@@ -798,8 +798,8 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 	// get the number of indirect transitions 
 	for (ndInt32 i = 0; i < samplesCount; ++i)
 	{
-//		m_miniBatchIndices.PushBack(m_shuffleBuffer[m_shuffleBatchIndex]);
-m_miniBatchIndices.PushBack(0);
+		m_miniBatchIndices.PushBack(m_shuffleBuffer[m_shuffleBatchIndex]);
+//m_miniBatchIndices.PushBack(0);
 		m_shuffleBatchIndex++;
 		if (m_shuffleBatchIndex >= m_shuffleBuffer.GetCount())
 		{
@@ -882,14 +882,14 @@ m_miniBatchIndices.PushBack(0);
 		//m_context->GaussianSample(*policyMinibatchOutputBuffer, **m_sigmaMinibatch, **m_uniformRandomMinibatch);
 		
 
-ndBrainVector xxx_r;
-ndBrainVector xxx_t;
-ndBrainVector xxx_q;
-ndBrainVector xxx_q1;
-ndBrainVector xxx_exp;
-ndBrainVector xxx_input;
-m_rewardMinibatch->VectorFromDevice(xxx_r);
-m_noTerminalMinibatch->VectorFromDevice(xxx_t);
+//ndBrainVector xxx_r;
+//ndBrainVector xxx_t;
+//ndBrainVector xxx_q;
+//ndBrainVector xxx_q1;
+//ndBrainVector xxx_exp;
+//ndBrainVector xxx_input;
+//m_rewardMinibatch->VectorFromDevice(xxx_r);
+//m_noTerminalMinibatch->VectorFromDevice(xxx_t);
 
 		ndInt32 criticInputSize = m_policyTrainer->GetBrain()->GetInputSize() + m_policyTrainer->GetBrain()->GetOutputSize();
 		ndBrainFloatBuffer* const policyMinibatchOutputBuffer = m_policyTrainer->GetOuputBuffer();
@@ -916,15 +916,15 @@ m_noTerminalMinibatch->VectorFromDevice(xxx_t);
 			m_referenceCriticTrainer[i]->MakePrediction();
 
 			ndBrainFloatBuffer& qValueBuffer = *referenceCritic.GetOuputBuffer();
-criticInputBuffer.VectorFromDevice(xxx_input);
-qValueBuffer.VectorFromDevice(xxx_q);
+//criticInputBuffer.VectorFromDevice(xxx_input);
+//qValueBuffer.VectorFromDevice(xxx_q);
 
 			m_context->Mul(qValueBuffer, **m_noTerminalMinibatch);
 			m_context->Scale(qValueBuffer, m_parameters.m_discountRewardFactor);
-qValueBuffer.VectorFromDevice(xxx_q1);
+//qValueBuffer.VectorFromDevice(xxx_q1);
 			m_context->Add(qValueBuffer, **m_rewardMinibatch);
-qValueBuffer.VectorFromDevice(xxx_exp);
-i *= 1;
+//qValueBuffer.VectorFromDevice(xxx_exp);
+//i *= 1;
 		}
 		
 		ndBrainFloatBuffer& minExpectedReward = *m_referenceCriticTrainer[0]->GetOuputBuffer();
@@ -1054,15 +1054,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnPolicyFunction()
 //#pragma optimize( "", off )
 void ndBrainAgentDeterministicPolicyGradient_Trainer::Optimize()
 {
-static int xxxx;
-xxxx++;
-if (xxxx >= 5000)
-xxxx *= 1;
-
 	CalculateExpectedRewards();
-ndBrainVector xxx;
-m_expectedRewards->VectorFromDevice(xxx);
-
 	for (ndInt32 k = 0; k < ndInt32(sizeof(m_referenceCriticTrainer) / sizeof(m_referenceCriticTrainer[0])); ++k)
 	{
 		LearnQvalueFunction(k);
