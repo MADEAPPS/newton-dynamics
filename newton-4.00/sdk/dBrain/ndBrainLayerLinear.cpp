@@ -607,7 +607,6 @@ ndCommandArray ndBrainLayerLinear::CreateGpuFeedForwardCommand(
 	ndBrainFloatBuffer* const weightsAndBias) const
 {
 	ndAssert(info.m_parametersBatchSize);
-	ndAssert((miniBatchSize & (ND_GPU_TILED_MATRIX_ROWS - 1)) == 0);
 
 	ndCommandArray commandArray(0);
 	if (context->GetAsCpuContext())
@@ -624,13 +623,12 @@ ndCommandArray ndBrainLayerLinear::CreateGpuFeedForwardCommand(
 		ndInt32 width;
 		ndInt32 height;
 		CalculateRoundedSize(width, height);
+		ndAssert((miniBatchSize & (ND_GPU_TILED_MATRIX_ROWS - 1)) == 0);
 
-		//ndInt32 dim_K = height;
 		ndInt32 dim_M = height / ND_GPU_TILED_MATRIX_ROWS;
 		ndInt32 dim_N = miniBatchSize / ND_GPU_TILED_MATRIX_ROWS;
 
 		ndBrainBufferCommandDesc descriptor(MakeFeedForwardDesctriptor(
-			//owner, context, info, dim_M * dim_N, dim_K,
 			owner, context, info, dim_M * dim_N, 0,
 			inputOutputData, weightsAndBias));
 		descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerMatrixMatrixMultiply;

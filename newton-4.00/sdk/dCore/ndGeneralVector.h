@@ -160,12 +160,12 @@ void ndGreaterEqualMask(ndInt32 size, T* const X, const T* const A)
 }
 
 template<class T>
-void ndSelect(ndInt32 size, T* const X, const T* const mask, T a, T b)
+void ndBlend(ndInt32 size, T* const X, const T* const mask, T a, T b)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
-		ndAssert((mask[i] == T(0.0f)) || (mask[i] == T(1.0f)));
-		X[i] = (mask[i] == 1.0f) ? a : b;
+		ndFloat32 s = mask[i];
+		X[i] = a * ndFloat32 (1.0f - s) + b * s;
 		ndAssert(ndCheckFloat(X[i]));
 	}
 }

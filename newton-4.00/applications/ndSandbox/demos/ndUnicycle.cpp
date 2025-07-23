@@ -547,10 +547,6 @@ namespace ndUnicycle
 				ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
 				hyperParameters.m_numberOfActions = m_actionsSize;
 				hyperParameters.m_numberOfObservations = m_observationsSize;
-				//hyperParameters.m_maxTrajectorySteps = ND_TRAJECTORY_STEPS;
-				//hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
-				//hyperParameters.m_policyRegularizerType = ndBrainOptimizer::m_lasso;
-				//hyperParameters.m_criticRegularizerType = ndBrainOptimizer::m_lasso;
 				m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
 			#else
 				m_outFile = fopen("unicycle_pp0.csv", "wb");
@@ -562,8 +558,6 @@ namespace ndUnicycle
 				hyperParameters.m_numberOfObservations = m_observationsSize;
 				hyperParameters.m_maxTrajectorySteps = ND_TRAJECTORY_STEPS;
 				hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
-				//hyperParameters.m_policyRegularizerType = ndBrainOptimizer::m_lasso;
-				//hyperParameters.m_criticRegularizerType = ndBrainOptimizer::m_lasso;
 				m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
 			#endif
 
@@ -706,24 +700,27 @@ namespace ndUnicycle
 				ndFloat32 trajectoryLog = ndLog(m_master->GetAverageFrames() + 0.001f);
 				ndFloat32 rewardTrajectory = m_master->GetAverageScore() * trajectoryLog;
 
-				if (rewardTrajectory >= ndFloat32(m_maxScore))
+				if (!m_master->IsSampling())
 				{
-					if (m_lastEpisode != m_master->GetEposideCount())
+					if (rewardTrajectory >= ndFloat32(m_maxScore))
 					{
-						m_maxScore = rewardTrajectory;
-						m_bestActor->CopyFrom(*m_master->GetPolicyNetwork());
-						ndExpandTraceMessage("best actor episode: %d\treward %f\ttrajectoryFrames: %f\n", m_master->GetEposideCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
-						m_lastEpisode = m_master->GetEposideCount();
+						if (m_lastEpisode != m_master->GetEposideCount())
+						{
+							m_maxScore = rewardTrajectory;
+							m_bestActor->CopyFrom(*m_master->GetPolicyNetwork());
+							ndExpandTraceMessage("best actor episode: %d\treward %f\ttrajectoryFrames: %f\n", m_master->GetEposideCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
+							m_lastEpisode = m_master->GetEposideCount();
+						}
 					}
-				}
 
-				if (episodeCount && !m_master->IsSampling())
-				{
-					ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", m_master->GetFramesCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
-					if (m_outFile)
+					if (episodeCount && !m_master->IsSampling())
 					{
-						fprintf(m_outFile, "%g\n", m_master->GetAverageScore());
-						fflush(m_outFile);
+						ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", m_master->GetFramesCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
+						if (m_outFile)
+						{
+							fprintf(m_outFile, "%g\n", m_master->GetAverageScore());
+							fflush(m_outFile);
+						}
 					}
 				}
 			}

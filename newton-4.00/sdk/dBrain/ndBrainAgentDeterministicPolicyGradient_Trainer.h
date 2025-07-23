@@ -87,7 +87,7 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 		void SetReward(ndInt32 entry, ndBrainFloat reward);
 
 		bool GetTerminalState(ndInt32 entry) const;
-		void SetTerminalState(ndInt32 entry, bool isTernimal);
+		void SetTerminalState(ndInt32 entry, bool isTermimal);
 
 		ndBrainFloat* GetActions(ndInt32 entry);
 		const ndBrainFloat* GetActions(ndInt32 entry) const;
@@ -197,7 +197,6 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	void Optimize();
 	void CalculateScore();
 	void SaveTrajectory();
-	void SaveTrajectoryOld();
 	void SaveTrajectoryLoadBuffer();
 	
 	void SaveTrajectoryTerminal();
@@ -223,11 +222,11 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	ndArray<ndInt32> m_miniBatchIndices;
 	ndSharedPtr<ndBrainFloatBuffer> m_sigmaMinibatch;
 	ndSharedPtr<ndBrainFloatBuffer> m_rewardMinibatch;
-	ndSharedPtr<ndBrainFloatBuffer> m_terminalMinibatch;
+	ndSharedPtr<ndBrainFloatBuffer> m_noTerminalMinibatch;
 	ndSharedPtr<ndBrainFloatBuffer> m_uniformRandomMinibatch;
 
-	ndSharedPtr<ndBrainFloatBuffer> m_uniformRandom0;
-	ndSharedPtr<ndBrainFloatBuffer> m_uniformRandom1;
+	ndSharedPtr<ndBrainFloatBuffer> m_uniformRandom0___;
+	ndSharedPtr<ndBrainFloatBuffer> m_uniformRandom1___;
 	ndSharedPtr<ndBrainFloatBuffer> m_expectedRewards;
 	ndSharedPtr<ndBrainFloatBuffer> m_replayBufferFlat;
 	ndSharedPtr<ndBrainFloatBuffer> m_critickInputTest;

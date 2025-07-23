@@ -303,7 +303,8 @@ void ndBrainGpuContext::Select(ndBrainFloatBuffer& buffer, ndBrainFloatBuffer& m
 	ndInt32 elements = ndInt32(buffer.SizeInBytes() / sizeof(ndBrainFloat));
 	ndBrainMemVector dst((ndBrainFloat*)buffer.GetCpuPtr(), elements);
 	const ndBrainMemVector mask((ndBrainFloat*)maskBuffer.GetCpuPtr(), elements);
-	dst.Select(mask, a, b);
+	ndAssert(0);
+	dst.Blend(mask, a, b);
 }
 
 void ndBrainGpuContext::BroadcastScaler(ndBrainFloatBuffer& buffer, ndInt32 bufferStrideInFloats, const ndBrainFloatBuffer& srcScalar)

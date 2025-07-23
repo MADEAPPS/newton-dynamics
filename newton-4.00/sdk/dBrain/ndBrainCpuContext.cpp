@@ -257,7 +257,7 @@ void ndBrainCpuContext::Select(ndBrainFloatBuffer& buffer, ndBrainFloatBuffer& m
 {
 	ndBrainVector& dst = **buffer.m_buffer;
 	const ndBrainVector& mask = **maskBuffer.m_buffer;
-	dst.Select(mask, a, b);
+	dst.Blend(mask, a, b);
 }
 
 void ndBrainCpuContext::BroadcastScaler(ndBrainFloatBuffer& buffer, ndInt32 bufferStrideInFloats, const ndBrainFloatBuffer& srcScalar)

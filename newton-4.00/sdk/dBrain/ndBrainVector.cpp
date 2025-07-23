@@ -30,10 +30,7 @@ void ndBrainVector::InitGaussianWeights(ndBrainFloat variance)
 		for (ndInt64 i = GetCount() - 1; i >= 0; --i)
 		{
 			(*this)[i] = ndBrainFloat(ndGaussianRandom(ndFloat32(0.0f), ndFloat32(variance)));
-			//(*this)[i] = 0.0f;
 		}
-		//(*this)[0] = 1.0f;
-		//(*this)[GetCount() - 1] = 2.0f;
 	}
 	else
 	{
@@ -238,11 +235,12 @@ void ndBrainVector::GreaterEqual(const ndBrainVector& a)
 	ndGreaterEqualMask(ndInt32(GetCount()), &(*this)[0], &a[0]);
 }
 
-void ndBrainVector::Select(const ndBrainVector& mask, ndFloat32 a, ndFloat32 b)
+//void ndBrainVector::Select(const ndBrainVector& mask, ndFloat32 a, ndFloat32 b)
+void ndBrainVector::Blend(const ndBrainVector& blendMask, ndBrainFloat a, ndBrainFloat b)
 {
 	ndAssert(GetCount() < (1ll << 32));
-	ndAssert(GetCount() == mask.GetCount());
-	ndSelect(ndInt32(GetCount()), &(*this)[0], &mask[0], a, b);
+	ndAssert(GetCount() == blendMask.GetCount());
+	ndBlend(ndInt32(GetCount()), &(*this)[0], &blendMask[0], a, b);
 }
 
 void ndBrainVector::ScaleSet(const ndBrainVector& a, ndBrainFloat b)

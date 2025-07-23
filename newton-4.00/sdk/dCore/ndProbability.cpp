@@ -58,7 +58,8 @@ ndFloat32 ndRand()
 {
 	ndScopeSpinLock lock(GetLock());
 	static std::uniform_real_distribution<ndFloat32> uniform(ndFloat32 (0.0f), ndFloat32(1.0f));
-	return uniform(GetRandomGenerator());
+	ndFloat32 value = uniform(GetRandomGenerator());
+	return value;
 }
 
 //ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma)
