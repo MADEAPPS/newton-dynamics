@@ -453,6 +453,7 @@ namespace ndUnicycle
 
 			ndFloat32 poleOmega(m_pole->GetOmega().DotProduct(poleMatrix.m_front).GetScalar());
 			ndFloat32 wheelOmega(m_wheel->GetOmega().DotProduct(poleMatrix.m_front).GetScalar());
+			wheelOmega *= 1.0f / 20.0f;
 
 			observation[m_poleAngle] = ndBrainFloat(poleAngle);
 			observation[m_poleOmega] = ndBrainFloat(poleOmega);
