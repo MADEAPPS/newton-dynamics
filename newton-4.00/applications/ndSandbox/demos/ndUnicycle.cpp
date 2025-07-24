@@ -99,7 +99,7 @@ namespace ndUnicycle
 		ndSharedPtr<ndJointBilateralConstraint> ballHinge(new ndJointHinge(ballMatrix, ball->GetAsBodyKinematic(), pole->GetAsBodyKinematic()));
 #else
 		ndSharedPtr<ndJointBilateralConstraint> ballHinge(new ndJointRoller(ballMatrix, ball->GetAsBodyKinematic(), pole->GetAsBodyKinematic()));
-		((ndJointRoller*)*ballHinge)->SetAsSpringDamperPosit(0.02f, 1000.0f, 10.0f);
+		((ndJointRoller*)*ballHinge)->SetAsSpringDamperPosit(0.01f, 1000.0f, 15.0f);
 #endif
 		ndModelArticulation::ndNode* const ballHingeNode = model->AddLimb(poleLink, ball, ballHinge);
 		ballHingeNode->m_name = "wheel";
