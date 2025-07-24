@@ -83,9 +83,9 @@ m_useGpuBackend = false;
 //m_criticUpdatesCount = 1;
 //m_miniBatchSize = 16;
 m_miniBatchSize = 128;
-//m_hiddenLayersNumberOfNeurons = 64;
 //m_replayBufferSize = 1024 * 2;
-//m_replayBufferStartOptimizeSize = 1024;
+//m_hiddenLayersNumberOfNeurons = 64;
+m_replayBufferStartOptimizeSize = 1024;
 }
 
 ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::ndTrajectory()
@@ -987,12 +987,16 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnPolicyFunction()
 			criticMinibatchInputBuffer->CopyBuffer(criticInputObservation, m_parameters.m_miniBatchSize, *policyMinibatchInputBuffer);
 			critic.MakePrediction();
 
-			ndBrainFloatBuffer* const criticMinibatchOutputBuffer = critic.GetOuputBuffer();
-			ndBrainFloatBuffer* const criticMinibatchOutputGradientBuffer = critic.GetOuputGradientBuffer();
-			m_context->Set(*criticMinibatchOutputGradientBuffer, *criticMinibatchOutputBuffer);
+			// big mistake here, 
+			//ndBrainFloatBuffer* const criticMinibatchOutputBuffer = critic.GetOuputBuffer();
+			//ndBrainFloatBuffer* const criticMinibatchOutputGradientBuffer = critic.GetOuputGradientBuffer();
+			//m_context->Set(*criticMinibatchOutputGradientBuffer, *criticMinibatchOutputBuffer);
+			//m_context->GreaterEqual(*criticMinibatchOutputGradientBuffer, ndBrainFloat (0.0f));
+			//m_context->Select(*criticMinibatchOutputGradientBuffer, *criticMinibatchOutputGradientBuffer, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
 
-			m_context->GreaterEqual(*criticMinibatchOutputGradientBuffer, ndBrainFloat (0.0f));
-			m_context->Select(*criticMinibatchOutputGradientBuffer, *criticMinibatchOutputGradientBuffer, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
+			//the gradient is just 1.0
+			ndBrainFloatBuffer* const criticMinibatchOutputGradientBuffer = critic.GetOuputGradientBuffer();
+			m_context->Set(*criticMinibatchOutputGradientBuffer, ndBrainFloat(1.0f));
 			critic.BackPropagate();
 		}
 
