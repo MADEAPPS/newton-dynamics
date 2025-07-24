@@ -22,6 +22,8 @@
 
 #define ND_GPU_LOCAL_BUFFER_SIZE	    1024 * 4
 
+#define ND_GPU_LEAKY_LRU_GRADIENT		ndBrainFloat(0.01f)
+
 inline ndInt32 __cpuKernelRoundoff(ndInt32 value, ndInt32 workgroupSize)
 {
     return (value + workgroupSize - 1) & -workgroupSize;
@@ -176,6 +178,50 @@ class brainLayerReluActivation : public ndBrainKernel
         {
             ndBrainFloat inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
             ndBrainFloat outputValue = (inputValue >= ndBrainFloat(0.0f)) ? inputValue : ndBrainFloat(0.0f);
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
+        }
+    }
+};
+
+class brainLayerLeakyReluActivation : public ndBrainKernel
+{
+    public:
+    brainLayerLeakyReluActivation(ndBrainContext* const context)
+        :ndBrainKernel(context)
+    {
+    }
+
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    {
+        ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
+        ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
+
+        ndBrainFloat* const inputOutputData = (ndBrainFloat*)buffer1->GetGpuBuffer()->GetPtr();
+        ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetGpuBuffer()->GetPtr();
+
+        ndInt32 inputSize = parameters->m_inputSize;
+        ndInt32 inputOutputSize = parameters->m_inputOutputSize;
+        ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+
+        ndInt64 inputOffset = groupId * ndInt64(inputOutputSize) + inputOutputStartOffset;
+        ndInt64 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
+        ndAssert(outputOffset >= 0);
+
+        ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
+        ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
+        for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+            {
+                ndBrainFloat inputValue = inputOutputData[inputOffset + i + itemId];
+                ndBrainFloat outputValue = (inputValue >= ndBrainFloat(0.0f)) ? inputValue : ND_GPU_LEAKY_LRU_GRADIENT * inputValue;
+                inputOutputData[outputOffset + i + itemId] = outputValue;
+            }
+        }
+        for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+        {
+            ndBrainFloat inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
+            ndBrainFloat outputValue = (inputValue >= ndBrainFloat(0.0f)) ? inputValue : ND_GPU_LEAKY_LRU_GRADIENT * inputValue;
             inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
         }
     }
@@ -534,6 +580,67 @@ class brainLayerBrainReluBackPropagate : public ndBrainKernel
         {
             ndBrainFloat inpuData = inputOutputData[srcBase + modWorkGroupSize + itemId];
             ndBrainFloat gradient = (inpuData >= ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+            ndBrainFloat outputGrad = inputOutputGradients[dstBase + modWorkGroupSize + itemId];
+            inputOutputGradients[srcBase + modWorkGroupSize + itemId] = gradient * outputGrad;
+        }
+
+        #ifdef _DEBUG
+        {
+            ndInt32 padded = (inputSize + workGroupSize - 1) & -workGroupSize;
+            for (ndInt32 i = inputSize; i < padded; ++i)
+            {
+                ndBrainFloat a = inputOutputGradients[srcBase + i];
+                ndAssert(a == ndBrainFloat(0.0f));
+            }
+        }
+        #endif
+    }
+};
+
+class brainLayerBrainLeakyReluBackPropagate : public ndBrainKernel
+{
+    public:
+    brainLayerBrainLeakyReluBackPropagate(ndBrainContext* const context)
+        :ndBrainKernel(context)
+    {
+    }
+
+    void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    {
+        ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
+        ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
+        ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
+
+        ndBrainFloat* const inputOutputData = (ndBrainFloat*)buffer1->GetGpuBuffer()->GetPtr();
+        ndBrainFloat* const inputOutputGradients = (ndBrainFloat*)buffer3->GetGpuBuffer()->GetPtr();
+        ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetGpuBuffer()->GetPtr();
+
+        ndInt32 inputSize = parameters->m_inputSize;
+        ndInt32 inputOutputSize = parameters->m_inputOutputSize;
+        ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+
+        ndInt64 srcBase = groupId * ndInt64(inputOutputSize) + inputOutputStartOffset;
+        ndInt64 dstBase = srcBase + __cpuKernelRoundoff(inputSize, workGroupSize);
+        ndAssert(srcBase >= 0);
+        ndAssert(dstBase >= 0);
+
+        ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
+        ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
+        for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+            {
+                ndBrainFloat inpuData = inputOutputData[srcBase + i + itemId];
+                ndBrainFloat gradient = (inpuData >= ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ND_GPU_LEAKY_LRU_GRADIENT;
+                ndBrainFloat outputGrad = inputOutputGradients[dstBase + i + itemId];
+                inputOutputGradients[srcBase + i + itemId] = gradient * outputGrad;
+            }
+        }
+
+        for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+        {
+            ndBrainFloat inpuData = inputOutputData[srcBase + modWorkGroupSize + itemId];
+            ndBrainFloat gradient = (inpuData >= ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ND_GPU_LEAKY_LRU_GRADIENT;
             ndBrainFloat outputGrad = inputOutputGradients[dstBase + modWorkGroupSize + itemId];
             inputOutputGradients[srcBase + modWorkGroupSize + itemId] = gradient * outputGrad;
         }
@@ -1402,6 +1509,7 @@ void ndBrainGpuContext::CreateKerners()
     m_brainLayerTanhActivation = ndSharedPtr<ndBrainKernel>(new brainLayerTanhActivation(this));
     m_brainLayerSoftmaxActivation = ndSharedPtr<ndBrainKernel>(new brainLayerSoftmaxActivation(this));
     m_brainLayerDropOutActivation = ndSharedPtr<ndBrainKernel>(new brainLayerLinearDropOutActivation(this));
+    m_brainLayerLeakyReluActivation = ndSharedPtr<ndBrainKernel>(new brainLayerLeakyReluActivation(this));
     m_brainLayerMatrixMatrixMultiply = ndSharedPtr<ndBrainKernel>(new brainLayerMatrixMatrixMultiply(this));
 
     // create all backpropagate shaders
@@ -1409,6 +1517,7 @@ void ndBrainGpuContext::CreateKerners()
     m_brainCopyOutputGradients = ndSharedPtr<ndBrainKernel>(new brainCopyOutputGradients(this));
     m_brainLayerReluBackPropagate = ndSharedPtr<ndBrainKernel>(new brainLayerBrainReluBackPropagate(this));
     m_brainLayerTanhBackPropagate = ndSharedPtr<ndBrainKernel>(new brainLayerBrainTanhBackPropagate(this));
+    m_brainLayerLeakyReluBackPropagate = ndSharedPtr<ndBrainKernel>(new brainLayerBrainLeakyReluBackPropagate(this));
     m_brainLayerDropOutBackPropagate = ndSharedPtr<ndBrainKernel>(new brainLayerBrainLinearDropOutBackPropagate(this));
     m_brainLayerCathegoricalSoftmaxBackPropagate = ndSharedPtr<ndBrainKernel>(new brainLayerBrainCathegoricalSoftmaxBackPropagate(this));
     m_brainLayerMatrixBackPropagateBiasGradients = ndSharedPtr<ndBrainKernel>(new brainLayerBrainBackPropagateMatrixBiasGradients(this));

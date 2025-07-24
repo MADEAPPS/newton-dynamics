@@ -303,7 +303,6 @@ void ndBrainGpuContext::Select(ndBrainFloatBuffer& buffer, ndBrainFloatBuffer& m
 	ndInt32 elements = ndInt32(buffer.SizeInBytes() / sizeof(ndBrainFloat));
 	ndBrainMemVector dst((ndBrainFloat*)buffer.GetCpuPtr(), elements);
 	const ndBrainMemVector mask((ndBrainFloat*)maskBuffer.GetCpuPtr(), elements);
-	ndAssert(0);
 	dst.Blend(mask, a, b);
 }
 

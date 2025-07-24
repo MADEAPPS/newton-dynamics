@@ -210,9 +210,8 @@ ndCommandArray ndBrainLayerActivationLeakyRelu::CreateGpuFeedForwardCommand(
 	}
 	else
 	{
-		ndAssert(0);
-		//descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerReluActivation;
-		//command = new ndBrainGpuCommand(descriptor);
+		descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerLeakyReluActivation;
+		command = new ndBrainGpuCommand(descriptor);
 	}
 
 	ndCommandArray commandArray(0);
@@ -244,10 +243,9 @@ ndCommandArray ndBrainLayerActivationLeakyRelu::CreateGpuBackPropagateCommand(
 	}
 	else
 	{
-		ndAssert(0);
-		//descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerReluBackPropagate;
-		//ndBrainBufferCommand* const command = new ndBrainGpuCommand(descriptor);
-		//comnands.PushBack(command);
+		descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerLeakyReluBackPropagate;
+		ndBrainBufferCommand* const command = new ndBrainGpuCommand(descriptor);
+		comnands.PushBack(command);
 	}
 	return comnands;
 }
