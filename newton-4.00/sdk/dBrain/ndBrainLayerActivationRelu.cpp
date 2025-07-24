@@ -152,16 +152,6 @@ void ndBrainLayerActivationRelu::BackPropagate(const ndBrainLayerBackPropagateCp
 	const ndBrainFloat* const inputOutputBuffer = (ndBrainFloat*)trainer->GetHiddenLayerBuffer()->GetCpuPtr();
 	const ndBrainFloat* const inputOutputGradientsBuffer = (ndBrainFloat*)trainer->GetHiddenLayerGradientBuffer()->GetCpuPtr();
 
-	//ndInt32 inputSize = info.m_inputSize;
-	//ndInt32 outputSize = info.m_outputSize;
-	//
-	//ndInt32 offset = miniBatchIndex * info.m_inputOutputSize + info.m_inputOutputStartOffset;
-	//ndAssert(offset >= 0);
-	//const ndBrainMemVector input(&inputOutputBuffer[offset], inputSize);
-	//const ndBrainMemVector output(&inputOutputBuffer[offset + inputSize], outputSize);
-	//const ndBrainMemVector outputDerivative(&inputOutputGradientsBuffer[offset + inputSize], outputSize);
-	//ndBrainMemVector inputDerivative(&inputOutputGradientsBuffer[offset], inputSize);
-
 	ndInt32 inputSize = info.m_inputSize;
 	ndInt32 inputOutputSize = info.m_inputOutputSize;
 	ndInt32 inputOutputStartOffset = info.m_inputOutputStartOffset;
@@ -173,7 +163,6 @@ void ndBrainLayerActivationRelu::BackPropagate(const ndBrainLayerBackPropagateCp
 	ndAssert(inputSize == info.m_outputSize);
 
 	const ndBrainMemVector input(&inputOutputBuffer[srcBase], inputSize);
-	//const ndBrainMemVector output(&inputOutputBuffer[dstBase], inputSize);
 	const ndBrainMemVector outputDerivative(&inputOutputGradientsBuffer[dstBase], inputSize);
 	ndBrainMemVector inputDerivative(&inputOutputGradientsBuffer[srcBase], inputSize);
 	
