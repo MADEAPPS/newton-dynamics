@@ -65,7 +65,7 @@ void ndBrainLayerActivationLeakyRelu::MakePrediction(const ndBrainVector& input,
 	ndAssert(input.GetCount() == output.GetCount());
 
 	const ndBrainSimdFloat8 zero(0.0f);
-	const ndBrainSimdFloat8 leakyGrad(ND_LEAKY_LRU_NEG_GRADIENT);
+	const ndBrainSimdFloat8 leakyGrad(ND_LEAKY_LRU_GRADIENT);
 	ndBrainFloat* const dst = &output[0];
 	const ndBrainFloat* const src = &input[0];
 	const ndInt32 roundCount = ndInt32(input.GetCount()) & -8;
@@ -79,7 +79,7 @@ void ndBrainLayerActivationLeakyRelu::MakePrediction(const ndBrainVector& input,
 	}
 	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= roundCount; --i)
 	{
-		output[i] = (input[i] >= 0) ? input[i] : ND_LEAKY_LRU_NEG_GRADIENT * input[i];
+		output[i] = (input[i] >= 0) ? input[i] : ND_LEAKY_LRU_GRADIENT * input[i];
 	}
 }
 
@@ -90,7 +90,7 @@ void ndBrainLayerActivationLeakyRelu::InputDerivative(const ndBrainVector& input
 
 	const ndBrainSimdFloat8 one(1.0f);
 	const ndBrainSimdFloat8 zero(0.0f);
-	const ndBrainSimdFloat8 leakyGrad(ND_LEAKY_LRU_NEG_GRADIENT);
+	const ndBrainSimdFloat8 leakyGrad(ND_LEAKY_LRU_GRADIENT);
 	ndBrainFloat* const dst = &inputDerivative[0];
 	const ndBrainFloat* const src = &input[0];
 	const ndInt32 roundCount = ndInt32(input.GetCount()) & -8;
@@ -103,7 +103,7 @@ void ndBrainLayerActivationLeakyRelu::InputDerivative(const ndBrainVector& input
 	}
 	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= roundCount; --i)
 	{
-		inputDerivative[i] = (input[i] >= ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ND_LEAKY_LRU_NEG_GRADIENT;
+		inputDerivative[i] = (input[i] >= ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ND_LEAKY_LRU_GRADIENT;
 	}
 
 	inputDerivative.Mul(outputDerivative);
@@ -145,7 +145,7 @@ void ndBrainLayerActivationLeakyRelu::FeedForward(const ndBrainLayerFeedForwardC
 	}
 	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= roundCount; --i)
 	{
-		output[i] = (input[i] >= 0) ? input[i] : ND_LEAKY_LRU_NEG_GRADIENT * input[i];
+		output[i] = (input[i] >= 0) ? input[i] : ND_LEAKY_LRU_GRADIENT * input[i];
 	}
 }
 
@@ -186,7 +186,7 @@ void ndBrainLayerActivationLeakyRelu::BackPropagate(const ndBrainLayerBackPropag
 	}
 	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= roundCount; --i)
 	{
-		inputDerivative[i] = (input[i] >= ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ND_LEAKY_LRU_NEG_GRADIENT;
+		inputDerivative[i] = (input[i] >= ndBrainFloat(0.0f)) ? ndBrainFloat(1.0f) : ND_LEAKY_LRU_GRADIENT;
 	}
 	inputDerivative.Mul(outputDerivative);
 }

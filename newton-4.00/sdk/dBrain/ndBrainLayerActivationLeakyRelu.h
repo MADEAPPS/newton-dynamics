@@ -25,7 +25,7 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainLayerActivation.h"
 
-#define ND_LEAKY_LRU_NEG_GRADIENT					ndBrainFloat(0.01f)
+#define ND_LEAKY_LRU_GRADIENT						ndBrainFloat(0.01f)
 #define ND_BRAIN_LAYER_ACTIVATION_LEAKY_RELU_NAME	"ndBrainLayerActivationLeakyRelu"
 
 class ndBrainLayerActivationLeakyRelu : public ndBrainLayerActivation
