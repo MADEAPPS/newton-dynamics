@@ -39,6 +39,28 @@ class ndBrainLayerActivationLeakyRelu : public ndBrainLayerActivation
 	const char* GetLabelId() const;
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
+
+	virtual bool HasGpuSupport() const override;
+	virtual void FeedForward(const ndBrainLayerFeedForwardCpuCommand* const info, ndInt32 miniBatchIndex) const override;
+	virtual void BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const override;
+
+	virtual ndCommandArray CreateGpuFeedForwardCommand(
+		ndBrainTrainerInference* const owner,
+		ndBrainContext* const context,
+		const ndCommandSharedInfo& info,
+		ndInt32 miniBatchSize,
+		ndBrainFloatBuffer* const inputOutputData,
+		ndBrainFloatBuffer* const weightsAndBias) const override;
+
+	virtual ndCommandArray CreateGpuBackPropagateCommand(
+		ndBrainTrainerInference* const owner,
+		ndBrainContext* const context,
+		const ndCommandSharedInfo& info,
+		ndInt32 miniBatchSize,
+		ndBrainFloatBuffer* const inputOutputData,
+		ndBrainFloatBuffer* const weightsAndBias,
+		ndBrainFloatBuffer* const inputOutputGradients,
+		ndBrainFloatBuffer* const weightsAndBiasGradients) const override;
 };
 
 #endif 
