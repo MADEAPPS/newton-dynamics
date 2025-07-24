@@ -486,9 +486,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildCriticClass()
 		}
 		critic->InitWeights();
 	
-		// big mistake here ???
 		ndSharedPtr<ndBrain> referenceCritic(new ndBrain(**critic));
-	
 		ndTrainerDescriptor descriptor(critic, m_context, m_parameters.m_miniBatchSize, m_parameters.m_policyLearnRate);
 		descriptor.m_regularizer = m_parameters.m_criticRegularizer;
 		descriptor.m_regularizerType = m_parameters.m_criticRegularizerType;
@@ -986,13 +984,6 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnPolicyFunction()
 			criticInputObservation.m_strideInByte = ndInt32(m_policyTrainer->GetBrain()->GetInputSize() * sizeof(ndReal));
 			criticMinibatchInputBuffer->CopyBuffer(criticInputObservation, m_parameters.m_miniBatchSize, *policyMinibatchInputBuffer);
 			critic.MakePrediction();
-
-			// big mistake here, 
-			//ndBrainFloatBuffer* const criticMinibatchOutputBuffer = critic.GetOuputBuffer();
-			//ndBrainFloatBuffer* const criticMinibatchOutputGradientBuffer = critic.GetOuputGradientBuffer();
-			//m_context->Set(*criticMinibatchOutputGradientBuffer, *criticMinibatchOutputBuffer);
-			//m_context->GreaterEqual(*criticMinibatchOutputGradientBuffer, ndBrainFloat (0.0f));
-			//m_context->Select(*criticMinibatchOutputGradientBuffer, *criticMinibatchOutputGradientBuffer, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
 
 			//the gradient is just 1.0
 			ndBrainFloatBuffer* const criticMinibatchOutputGradientBuffer = critic.GetOuputGradientBuffer();
