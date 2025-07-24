@@ -24,7 +24,7 @@ R""""(
     #define ND_DEFAULT_WORKGROUP_SIZE           256
     #define ND_GPU_LOCAL_BUFFER_SIZE	        1024 * 4
 
-    #define ND_GPU_LEAKY_LRU_GRADIENT		    ndBrainFloat(0.01f)
+    #define ND_GPU_LEAKY_LRU_GRADIENT		    0.01
 
     typedef struct
     {
