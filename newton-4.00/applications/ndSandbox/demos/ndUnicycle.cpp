@@ -94,11 +94,15 @@ namespace ndUnicycle
 		ndSharedPtr<ndDemoEntity> ballEntity(poleEntity->GetChildren().GetFirst()->GetInfo());
 		const ndMatrix ballMatrix(ballEntity->GetCurrentMatrix() * poleMatrix);
 		ndSharedPtr<ndBody> ball(CreateRigidBody(ballEntity, ballMatrix, ballMass, pole->GetAsBodyDynamic()));
+
+#if 0
 		ndSharedPtr<ndJointBilateralConstraint> ballHinge(new ndJointHinge(ballMatrix, ball->GetAsBodyKinematic(), pole->GetAsBodyKinematic()));
+#else
+		ndSharedPtr<ndJointBilateralConstraint> ballHinge(new ndJointRoller(ballMatrix, ball->GetAsBodyKinematic(), pole->GetAsBodyKinematic()));
+		((ndJointRoller*)*ballHinge)->SetAsSpringDamperPosit(0.02f, 1000.0f, 10.0f);
+#endif
 		ndModelArticulation::ndNode* const ballHingeNode = model->AddLimb(poleLink, ball, ballHinge);
 		ballHingeNode->m_name = "wheel";
-		//ball->GetAsBodyKinematic()->SetAngularDamping(ndVector(0.5f));
-		//((ndJointHinge*)*ballHinge)->SetAsSpringDamper(0.02f, 0.0f, 0.1f);
 
 		//ndUrdfFile urdf;
 		//char fileName[256];
