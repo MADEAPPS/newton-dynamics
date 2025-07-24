@@ -108,6 +108,7 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainKernel> m_brainLayerTanhActivation;
 	ndSharedPtr<ndBrainKernel> m_brainLayerSoftmaxActivation;
 	ndSharedPtr<ndBrainKernel> m_brainLayerDropOutActivation;
+	ndSharedPtr<ndBrainKernel> m_brainLayerLeakyReluActivation;
 	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixMatrixMultiply;
 
 	// back propagate shaders
@@ -116,6 +117,7 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainKernel> m_brainLayerReluBackPropagate;
 	ndSharedPtr<ndBrainKernel> m_brainLayerTanhBackPropagate;
 	ndSharedPtr<ndBrainKernel> m_brainLayerDropOutBackPropagate;
+	ndSharedPtr<ndBrainKernel> m_brainLayerLeakyReluBackPropagate;
 	ndSharedPtr<ndBrainKernel> m_brainLayerCathegoricalSoftmaxBackPropagate;
 	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixBackPropagateInputGradients;
 	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixBackPropagateWeightGradients;

@@ -24,6 +24,8 @@ R""""(
     #define ND_DEFAULT_WORKGROUP_SIZE           256
     #define ND_GPU_LOCAL_BUFFER_SIZE	        1024 * 4
 
+    #define ND_GPU_LEAKY_LRU_GRADIENT		    ndBrainFloat(0.01f)
+
     typedef struct
     {
         void* m_unUsed;
@@ -159,6 +161,38 @@ R""""(
         {
             float inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
             float outputValue = (inputValue >= 0.0f) ? inputValue : 0.0f;
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
+        }
+    }
+
+    __kernel void brainLayerLeakyReluActivation(
+        __global const UniformBufferLayerArguments* parameters, 
+        __global float* inputOutputData, 
+        __global float* notUsed)  
+    {
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+        
+        uint inputSize = parameters->m_inputSize;
+        uint inputOutputSize = parameters->m_inputOutputSize;
+        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+        
+        long inputOffset = groupId * (long)inputOutputSize + inputOutputStartOffset;
+        long outputOffset = inputOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
+
+        uint workGroupSizeReminder = inputSize % workGroupSize;
+        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            float inputValue = inputOutputData[inputOffset + i + itemId];
+            float outputValue = (inputValue >= 0.0f) ? inputValue : ND_GPU_LEAKY_LRU_GRADIENT * inputValue;
+            inputOutputData[outputOffset + i + itemId] = outputValue;
+        }
+        if (itemId < workGroupSizeReminder)
+        {
+            float inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
+            float outputValue = (inputValue >= 0.0f) ? inputValue : ND_GPU_LEAKY_LRU_GRADIENT * inputValue;
             inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
         }
     }
@@ -459,6 +493,42 @@ R""""(
         {
             float inpuData = inputOutputData[srcBase + modWorkGroupSize + itemId];
             float gradient = (inpuData >= 0.0f) ? 1.0f : 0.0f;
+            float outputGrad = inputOutputGradients[dstBase + modWorkGroupSize + itemId];
+            inputOutputGradients[srcBase + modWorkGroupSize + itemId] = gradient * outputGrad;
+        }
+    }
+
+    __kernel void brainLayerBrainLeakyReluBackPropagate(
+            __global const UniformBufferLayerArguments* parameters, 
+            __global float* inputOutputData, 
+            __global float* weightsAndBias, 
+            __global float* inputOutputGradients,
+            __global float* weightsAndBiasGradients) 
+    {
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+        
+        uint inputSize = parameters->m_inputSize;
+        uint inputOutputSize = parameters->m_inputOutputSize;
+        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+        
+        long srcBase = groupId * (long)inputOutputSize + inputOutputStartOffset;
+        long dstBase = srcBase + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
+        
+        uint workGroupSizeReminder = inputSize % workGroupSize;
+        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            float inpuData = inputOutputData[srcBase + i + itemId];
+            float gradient = (inpuData >= 0.0f) ? 1.0f : ND_GPU_LEAKY_LRU_GRADIENT;
+            float outputGrad = inputOutputGradients[dstBase + i + itemId];
+            inputOutputGradients[srcBase + i + itemId] = gradient * outputGrad;
+        }
+        if (itemId < workGroupSizeReminder)
+        {
+            float inpuData = inputOutputData[srcBase + modWorkGroupSize + itemId];
+            float gradient = (inpuData >= 0.0f) ? 1.0f : ND_GPU_LEAKY_LRU_GRADIENT;
             float outputGrad = inputOutputGradients[dstBase + modWorkGroupSize + itemId];
             inputOutputGradients[srcBase + modWorkGroupSize + itemId] = gradient * outputGrad;
         }
@@ -1301,6 +1371,7 @@ void ndBrainGpuContext::CreateKerners()
     m_brainLayerTanhActivation = CreateKerner(program, "brainLayerTanhActivation");
     m_brainLayerSoftmaxActivation = CreateKerner(program, "brainLayerSoftmaxActivation");
     m_brainLayerDropOutActivation = CreateKerner(program, "brainLayerDropOutActivation");
+    m_brainLayerLeakyReluActivation = CreateKerner(program, "brainLayerLeakyReluActivation");
     m_brainLayerMatrixMatrixMultiply = CreateKerner(program, "brainLayerMatrixMatrixMultiply");
 
     // create all backpropagate shaders
@@ -1309,6 +1380,7 @@ void ndBrainGpuContext::CreateKerners()
     m_brainLayerReluBackPropagate = CreateKerner(program, "brainLayerBrainReluBackPropagate");
     m_brainLayerTanhBackPropagate = CreateKerner(program, "brainLayerBrainTanhBackPropagate");
     m_brainLayerDropOutBackPropagate = CreateKerner(program, "brainLayerBrainDropOutBackPropagate");
+    m_brainLayerLeakyReluBackPropagate = CreateKerner(program, "brainLayerBrainLeakyReluBackPropagate");
     m_brainLayerCathegoricalSoftmaxBackPropagate = CreateKerner(program, "brainLayerBrainCathegoricalSoftmaxBackPropagate");
     m_brainLayerMatrixBackPropagateBiasGradients = CreateKerner(program, "brainLayerBrainBackPropagateMatrixBiasGradients");
     m_brainLayerMatrixBackPropagateInputGradients = CreateKerner(program, "brainLayerBrainBackPropagateMatrixInputGradients");
