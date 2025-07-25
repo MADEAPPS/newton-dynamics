@@ -70,8 +70,7 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 	m_numberOfObservations = 0;
 
 	m_randomSeed = 47;
-	m_policyUpdatesCount = 16;
-	m_criticUpdatesCount = 16;
+	m_numberOfUpdates = 16;
 	m_numberOfHiddenLayers = 3;
 	m_maxTrajectorySteps = 1024 * 4;
 	m_replayBufferSize = 1024 * 1024;
@@ -79,8 +78,8 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 	m_replayBufferStartOptimizeSize = 1024 * 64;
 
 //m_useGpuBackend = false;
-//m_policyUpdatesCount = 1;
-//m_criticUpdatesCount = 1;
+//m_numberOfUpdates = 1;
+//m_numberOfUpdates = 1;
 //m_miniBatchSize = 16;
 //m_miniBatchSize = 128;
 //m_replayBufferSize = 1024 * 2;
@@ -346,8 +345,8 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::ndBrainAgentDeterministicPolicy
 
 	m_randomGenerator.seed(m_parameters.m_randomSeed);
 	
-	m_parameters.m_criticUpdatesCount = ndMax(m_parameters.m_criticUpdatesCount, 2);
-	m_parameters.m_policyUpdatesCount = ndMax(m_parameters.m_policyUpdatesCount, 2);
+	m_parameters.m_numberOfUpdates = ndMax(m_parameters.m_numberOfUpdates, 2);
+	m_parameters.m_numberOfUpdates = ndMax(m_parameters.m_numberOfUpdates, 2);
 
 	if (m_parameters.m_useGpuBackend)
 	{
@@ -367,9 +366,9 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::ndBrainAgentDeterministicPolicy
 
 	ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory trajectory(outputSize, inputSize);
 	m_replayBufferFlat = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, trajectory.GetStride() * m_parameters.m_replayBufferSize));
-	m_expectedRewards = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_criticUpdatesCount * m_parameters.m_miniBatchSize));
-	m_uniformRandom0 = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_criticUpdatesCount * m_parameters.m_miniBatchSize));
-	m_uniformRandom1 = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_criticUpdatesCount * m_parameters.m_miniBatchSize));
+	m_expectedRewards = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_numberOfUpdates * m_parameters.m_miniBatchSize));
+	m_uniformRandom0 = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_numberOfUpdates * m_parameters.m_miniBatchSize));
+	m_uniformRandom1 = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_numberOfUpdates * m_parameters.m_miniBatchSize));
 
 	m_sigmaMinibatch = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, outputSize * m_parameters.m_miniBatchSize));
 	m_rewardMinibatch = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, outputSize * m_parameters.m_miniBatchSize));
@@ -377,7 +376,7 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::ndBrainAgentDeterministicPolicy
 	m_uniformRandomMinibatch = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, outputSize * m_parameters.m_miniBatchSize));
 
 	m_minibatchIndexBuffer = ndSharedPtr<ndBrainIntegerBuffer>(new ndBrainIntegerBuffer(*m_context, m_parameters.m_miniBatchSize));
-	m_randomShuffleBuffer = ndSharedPtr<ndBrainIntegerBuffer>(new ndBrainIntegerBuffer(*m_context, m_parameters.m_criticUpdatesCount * m_parameters.m_miniBatchSize));
+	m_randomShuffleBuffer = ndSharedPtr<ndBrainIntegerBuffer>(new ndBrainIntegerBuffer(*m_context, m_parameters.m_numberOfUpdates * m_parameters.m_miniBatchSize));
 
 	m_critickOutputTest = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_miniBatchSize));
 	m_critickInputTest = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, (outputSize + inputSize) *m_parameters.m_miniBatchSize));
@@ -730,7 +729,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::TrainCritics(ndInt32 criti
 	ndBrainTrainer& critic = **m_criticTrainer[criticIndex];
 
 	ndInt32 copyIndicesStrideInBytes = ndInt32(m_parameters.m_miniBatchSize * sizeof(ndInt32));
-	for (ndInt32 n = 0; n < m_parameters.m_criticUpdatesCount; ++n)
+	for (ndInt32 n = 0; n < m_parameters.m_numberOfUpdates; ++n)
 	{
 		// calculate q value
 		ndCopyBufferCommandInfo copyIndicesInfo;
@@ -788,7 +787,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::TrainCritics(ndInt32 criti
 void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 {
 	m_miniBatchIndices.SetCount(0);
-	ndInt32 samplesCount = m_parameters.m_criticUpdatesCount * m_parameters.m_miniBatchSize;
+	ndInt32 samplesCount = m_parameters.m_numberOfUpdates * m_parameters.m_miniBatchSize;
 
 	// get the number of indirect transitions 
 	for (ndInt32 i = 0; i < samplesCount; ++i)
@@ -824,7 +823,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 	m_randomShuffleBuffer->MemoryToDevice(0, m_randomShuffleBuffer->SizeInBytes(), &m_miniBatchIndices[0]);
 
 	const ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory& trajectory = m_agent->m_trajectory;
-	for (ndInt32 n = 0; n < m_parameters.m_criticUpdatesCount; ++n)
+	for (ndInt32 n = 0; n < m_parameters.m_numberOfUpdates; ++n)
 	{
 		// Get the rewards for this minibatch, try dispaching the entire epoch
 		ndBrainFloatBuffer* const policyMinibatchInputBuffer = m_policyTrainer->GetInputBuffer();
@@ -927,7 +926,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::TrainPolicy()
 		
 	ndInt32 copyIndicesStrideInBytes = ndInt32(m_parameters.m_miniBatchSize * sizeof(ndInt32));
 	ndInt32 criticInputSize = m_policyTrainer->GetBrain()->GetInputSize() + m_policyTrainer->GetBrain()->GetOutputSize();
-	for (ndInt32 n = 0; n < m_parameters.m_policyUpdatesCount; ++n)
+	for (ndInt32 n = 0; n < m_parameters.m_numberOfUpdates; ++n)
 	{
 		ndCopyBufferCommandInfo copyIndicesInfo;
 		copyIndicesInfo.m_dstOffsetInByte = 0;

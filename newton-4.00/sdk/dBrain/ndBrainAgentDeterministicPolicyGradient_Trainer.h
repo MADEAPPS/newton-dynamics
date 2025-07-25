@@ -163,12 +163,10 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 		ndInt32 m_numberOfHiddenLayers;
 		ndInt32 m_hiddenLayersNumberOfNeurons;
 
+		ndInt32 m_numberOfUpdates;
 		ndInt32 m_replayBufferSize;
 		ndInt32 m_maxTrajectorySteps;
 		ndInt32 m_replayBufferStartOptimizeSize;
-
-		ndInt32 m_criticUpdatesCount;
-		ndInt32 m_policyUpdatesCount;
 
 		bool m_useGpuBackend;
 		bool m_usePerActionSigmas;
