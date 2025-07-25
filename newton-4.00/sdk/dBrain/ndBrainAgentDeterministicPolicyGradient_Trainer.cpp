@@ -541,7 +541,6 @@ ndBrainFloat ndBrainAgentDeterministicPolicyGradient_Trainer::CalculatePolicyPro
 	//return ndMax(prob, ndBrainFloat(1.0e-4f));
 }
 
-//#pragma optimize( "", off )
 //ndBrainFloat ndBrainAgentDeterministicPolicyGradient_Trainer::CalculatePolicyProbability(ndInt32 index) const
 ndBrainFloat ndBrainAgentDeterministicPolicyGradient_Trainer::CalculatePolicyProbability(ndInt32) const
 {
@@ -656,7 +655,6 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::SaveTrajectoryTerminal()
 	nextObservation.Set(srcObservation);
 }
 
-#pragma optimize( "", off )
 void ndBrainAgentDeterministicPolicyGradient_Trainer::SaveTrajectoryLoadBuffer()
 {
 	ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory& trajectory = m_agent->m_trajectory;
@@ -690,7 +688,6 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::SaveTrajectoryLoadBuffer()
 	}
 }
 
-//#pragma optimize( "", off )
 void ndBrainAgentDeterministicPolicyGradient_Trainer::SaveTrajectory()
 {
 	SaveTrajectoryLoadBuffer();
@@ -726,7 +723,6 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::SaveTrajectory()
 	m_startOptimization = m_startOptimization || (ndInt32 (m_replayBufferIndex) > m_parameters.m_replayBufferStartOptimizeSize);
 }
 
-//#pragma optimize( "", off )
 void ndBrainAgentDeterministicPolicyGradient_Trainer::TrainCritics(ndInt32 criticIndex)
 {
 	ndInt32 criticInputSize = m_policyTrainer->GetBrain()->GetInputSize() + m_policyTrainer->GetBrain()->GetOutputSize();
@@ -789,7 +785,6 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::TrainCritics(ndInt32 criti
 	m_context->Blend(*parameterBuffer, *referenceParameterBuffer, m_parameters.m_criticMovingAverageFactor);
 }
 
-//#pragma optimize( "", off )
 void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 {
 	m_miniBatchIndices.SetCount(0);
@@ -926,7 +921,6 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 	}
 }
 
-//#pragma optimize( "", off )
 void ndBrainAgentDeterministicPolicyGradient_Trainer::TrainPolicy()
 {
 	const ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory& trajectory = m_agent->m_trajectory;
@@ -1029,7 +1023,6 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::TrainPolicy()
 	m_policyTrainer->UpdateParameters(m_scratchBuffer);
 }
 
-//#pragma optimize( "", off )
 void ndBrainAgentDeterministicPolicyGradient_Trainer::Optimize()
 {
 	CalculateExpectedRewards();
@@ -1045,7 +1038,6 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::Optimize()
 	ndPolycyDelayMod = (ndPolycyDelayMod + 1) % ND_SAC_POLICY_DELAY_MOD;
 }
 
-//#pragma optimize( "", off )
 void ndBrainAgentDeterministicPolicyGradient_Trainer::OptimizeStep()
 {
 	//m_context->SyncBufferCommandQueue();

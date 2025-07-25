@@ -357,7 +357,7 @@ namespace ndUnicycle
 			return ndBrainFloat(1.0f);
 		};
 
-		#pragma optimize( "", off )
+		//#pragma optimize( "", off )
 		ndBrainFloat CalculateReward()
 		{
 			if (IsTerminal())
