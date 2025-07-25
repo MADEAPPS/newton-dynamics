@@ -1292,6 +1292,23 @@ R""""(
         }
     }
 
+    __kernel void brainBlendVector(
+        int numberOfElements,
+        __global float* outputData, 
+        __global float* inputData,
+        __global float* blendData)
+    {
+        int global_id = get_global_id(0);
+        if (global_id < numberOfElements)
+        {
+            float blend = blendData[global_id];
+            float value = outputData[global_id] * (1.0f - blend) + inputData[global_id] * blend;
+            outputData[global_id] = value;
+        }
+    }
+
+
+
     __kernel void brainBroadcastScalar(
         int numberOfElements,
         __global float* outputData, 
@@ -1471,6 +1488,7 @@ void ndBrainGpuContext::CreateKerners()
     m_brainScaleAdd = CreateKerner(program, "brainScaleAdd");
     m_brainLessEqual = CreateKerner(program, "brainLessEqual");
     m_brainBlendScale = CreateKerner(program, "brainBlendScale");
+    m_brainBlendVector = CreateKerner(program, "brainBlendVector");
     m_brainGreaterEqual = CreateKerner(program, "brainGreaterEqual");
     m_brainAssigment = CreateKerner(program, "brainBufferAssigment");
     m_brainGaussianSample = CreateKerner(program, "brainGaussianSample");

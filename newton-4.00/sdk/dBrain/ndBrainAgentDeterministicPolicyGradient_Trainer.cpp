@@ -82,10 +82,10 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 //m_policyUpdatesCount = 1;
 //m_criticUpdatesCount = 1;
 //m_miniBatchSize = 16;
-m_miniBatchSize = 128;
+//m_miniBatchSize = 128;
 //m_replayBufferSize = 1024 * 2;
 //m_hiddenLayersNumberOfNeurons = 64;
-m_replayBufferStartOptimizeSize = 1024;
+//m_replayBufferStartOptimizeSize = 1024;
 }
 
 ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::ndTrajectory()

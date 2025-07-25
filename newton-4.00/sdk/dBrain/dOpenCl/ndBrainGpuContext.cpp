@@ -475,9 +475,6 @@ void ndBrainGpuContext::BroadcastScaler(ndBrainFloatBuffer& buffer, ndInt32 buff
 	ndBrainGpuBuffer* const dst = buffer.GetGpuBuffer();
 	const ndBrainGpuBuffer* const src = srcScalar.GetGpuBuffer();
 	
-	//size_t numberOfElements = size_t(buffer->SizeInBytes() / sizeof(float));
-	//size_t numberOfGroups = (numberOfElements + ND_DEFAULT_WORKGROUP_SIZE - 1) & -ND_DEFAULT_WORKGROUP_SIZE;
-	
 	cl_int numberOfParameters = 0;
 	error = shader->getInfo(CL_KERNEL_NUM_ARGS, &numberOfParameters);
 	ndAssert(numberOfParameters == 3);
@@ -491,7 +488,7 @@ void ndBrainGpuContext::BroadcastScaler(ndBrainFloatBuffer& buffer, ndInt32 buff
 	
 	cl::NDRange offset(0);
 	cl::NDRange local(ND_DEFAULT_WORKGROUP_SIZE);
-	cl::NDRange global(numberOfParameters * ND_DEFAULT_WORKGROUP_SIZE);
+	cl::NDRange global(size_t(numberOfParameters * ND_DEFAULT_WORKGROUP_SIZE));
 	error = m_queue->enqueueNDRangeKernel(*shader, offset, global, local);
 	ndAssert(error == CL_SUCCESS);
 }
@@ -553,7 +550,7 @@ void ndBrainGpuContext::Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuff
 
 void ndBrainGpuContext::Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, const ndBrainFloatBuffer& blend)
 {
-	ndAssert(0);
+	SubmitMathOperation(m_brainBlendVector, &buffer, &srcBuffer, &blend);
 }
 
 void ndBrainGpuContext::LessEqual(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
