@@ -258,7 +258,6 @@ R""""(
 
 const char* ndBrainGpuContext::m_feedForwardKernels_3 =
 R""""(
-    
     __kernel void brainLayerSoftmaxActivation(__global const UniformBufferLayerArguments* parameters, __global float* inputOutputData, __global float* notUsed)
     {
         __local float reductionBuffer [1024];
@@ -333,31 +332,6 @@ R""""(
             tmpInputBuffer[modWorkGroupSize + itemId] = outputValue;
         }
 
-#ifdef ND_GPU_USE_SOFT_SUBGROUPS        
-        for (uint j = workGroupSize / 2; j > ND_GPU_SOFT_SUBGROUPS_WORD_SIZE / 2; j = j >> 1)
-        {
-            barrier(CLK_LOCAL_MEM_FENCE); 
-            if ((itemId >= j) && (itemId < j * 2))
-            {
-                reductionBuffer[itemId - j] = sumArg;
-            }
-            barrier(CLK_LOCAL_MEM_FENCE); 
-            if (itemId < j)
-            {
-                float inputValue = reductionBuffer[itemId];
-                sumArg += inputValue;
-            }
-        }
-        for (uint j = ND_GPU_SOFT_SUBGROUPS_WORD_SIZE / 2; j > 0; j = j >> 1)
-        {
-            if (itemId < j * 2)
-            {
-                reductionBuffer[itemId + ND_GPU_SOFT_SUBGROUPS_WORD_SIZE / 2] = sumArg;
-                float inputValue = reductionBuffer[itemId + ND_GPU_SOFT_SUBGROUPS_WORD_SIZE / 2];
-                sumArg += inputValue;
-            }
-        }
-#else
         for (uint j = workGroupSize / 2; j > 0; j = j >> 1)
         {
             barrier(CLK_LOCAL_MEM_FENCE); 
@@ -373,7 +347,6 @@ R""""(
                 sumArg += inputValue;
             }
         }
-#endif
         if (itemId == 0)
         {
             reductionBuffer[0] = 1.0f / sumArg;
@@ -640,8 +613,6 @@ R""""(
 
 const char* ndBrainGpuContext::m_optimizerKernels =
 R""""(
-
-    //void Execute(uint groupId, uint workGroupSize)
     __kernel void brainAdamMomentumUpdate(__global UniformBufferOptimizerArguments* parameters) 
     {
         uint itemId = get_local_id(0);
@@ -735,7 +706,6 @@ R""""(
 
 const char* ndBrainGpuContext::m_matrixWeightsAndBiasGradients =
 R""""(
-
     __kernel void brainLayerBrainBackPropagateMatrixClearBiasGradients(
         __global const UniformBufferLayerArguments* parameters, 
         __global float* dummy0, 
@@ -1253,7 +1223,7 @@ R""""(
         }
     }
 
-    __kernel void brainGraeterEqualScalar(
+    __kernel void brainGreaterEqualScalar(
         int numberOfElements,
         __global float* outputData,
         float test)
@@ -1261,7 +1231,7 @@ R""""(
         int global_id = get_global_id(0);
         if (global_id < numberOfElements)
         {
-            outputData[global_id] = (outputData[global_id] >= inputData[global_id]) ? 1.0 : 0.0;
+            outputData[global_id] = (outputData[global_id] >= test) ? 1.0 : 0.0;
         }
     }
 
@@ -1286,7 +1256,7 @@ R""""(
         int global_id = get_global_id(0);
         if (global_id < numberOfElements)
         {
-            float t1 = mask[global_id] 
+            float t1 = mask[global_id];
             float t0 = 1.0 - t1;
             outputData[global_id] = a * t0 + b * t1;
         }
@@ -1411,7 +1381,6 @@ R""""(
             mean[global_id] += normal * sigma[global_id];
         }
     }
-
 )"""";
 
 ndSharedPtr<ndBrainKernel> ndBrainGpuContext::CreateKerner(const cl::Program& program, const char* const functionMame) const
