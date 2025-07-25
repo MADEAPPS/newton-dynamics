@@ -547,7 +547,7 @@ namespace ndUnicycle
 			#ifdef USE_SAC
 				m_outFile = fopen("unicycle_sac.csv", "wb");
 				fprintf(m_outFile, "sac\n");
-				m_stopTraining = 500000;
+				m_stopTraining = 100000;
 
 				ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
 				hyperParameters.m_numberOfActions = m_actionsSize;
@@ -701,7 +701,6 @@ namespace ndUnicycle
 				ndUnsigned32 episodeCount = m_master->GetEposideCount();
 				m_master->OptimizeStep();
 
-				episodeCount -= m_master->GetEposideCount();
 				ndFloat32 trajectoryLog = ndLog(m_master->GetAverageFrames() + 0.001f);
 				ndFloat32 rewardTrajectory = m_master->GetAverageScore() * trajectoryLog;
 
@@ -718,7 +717,7 @@ namespace ndUnicycle
 						}
 					}
 
-					if (episodeCount && !m_master->IsSampling())
+					if (episodeCount != m_master->GetEposideCount())
 					{
 						ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", m_master->GetFramesCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
 						if (m_outFile)
