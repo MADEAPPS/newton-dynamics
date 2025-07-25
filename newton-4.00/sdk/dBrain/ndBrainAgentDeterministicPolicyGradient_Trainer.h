@@ -199,13 +199,13 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	void SaveTrajectory();
 	void SaveTrajectoryLoadBuffer();
 	
+	virtual void TrainsPolicy();
 	void SaveTrajectoryTerminal();
 	void SaveTrajectoryNoTerminal();
 	virtual void BuildPolicyClass();
 	virtual void BuildCriticClass();
-	virtual void LearnPolicyFunction();
 	virtual void CalculateExpectedRewards();
-	void LearnQvalueFunction(ndInt32 criticIndex);
+	void TrainCritics(ndInt32 criticIndex);
 	ndBrainFloat CalculatePolicyProbability(ndInt32 index) const;
 	ndBrainFloat CalculatePolicyProbability(ndInt32 index, const ndBrainVector& distribution) const;
 

@@ -517,7 +517,7 @@ void ndBrainGpuContext::GaussianSample(ndBrainFloatBuffer& mean, const ndBrainFl
 
 void ndBrainGpuContext::Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat blend)
 {
-	ndAssert(0);
+	SubmitMathOperation(m_brainBlendScale, &buffer, &srcBuffer, blend);
 }
 
 void ndBrainGpuContext::Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, const ndBrainFloatBuffer& blend)

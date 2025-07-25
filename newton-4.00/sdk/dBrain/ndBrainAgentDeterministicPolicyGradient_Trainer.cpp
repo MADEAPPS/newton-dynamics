@@ -78,14 +78,14 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 	m_hiddenLayersNumberOfNeurons = 256;
 	m_replayBufferStartOptimizeSize = 1024 * 64;
 
-m_useGpuBackend = false;
+//m_useGpuBackend = false;
 //m_policyUpdatesCount = 1;
 //m_criticUpdatesCount = 1;
 //m_miniBatchSize = 16;
 m_miniBatchSize = 128;
 //m_replayBufferSize = 1024 * 2;
 //m_hiddenLayersNumberOfNeurons = 64;
-//m_replayBufferStartOptimizeSize = 1024;
+m_replayBufferStartOptimizeSize = 1024;
 }
 
 ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory::ndTrajectory()
@@ -727,7 +727,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::SaveTrajectory()
 }
 
 //#pragma optimize( "", off )
-void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnQvalueFunction(ndInt32 criticIndex)
+void ndBrainAgentDeterministicPolicyGradient_Trainer::TrainCritics(ndInt32 criticIndex)
 {
 	ndInt32 criticInputSize = m_policyTrainer->GetBrain()->GetInputSize() + m_policyTrainer->GetBrain()->GetOutputSize();
 
@@ -927,7 +927,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 }
 
 //#pragma optimize( "", off )
-void ndBrainAgentDeterministicPolicyGradient_Trainer::LearnPolicyFunction()
+void ndBrainAgentDeterministicPolicyGradient_Trainer::TrainsPolicy()
 {
 	const ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory& trajectory = m_agent->m_trajectory;
 		
@@ -1035,12 +1035,12 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::Optimize()
 	CalculateExpectedRewards();
 	for (ndInt32 k = 0; k < ndInt32(sizeof(m_referenceCriticTrainer) / sizeof(m_referenceCriticTrainer[0])); ++k)
 	{
-		LearnQvalueFunction(k);
+		TrainCritics(k);
 	}
 	
 	if (!ndPolycyDelayMod)
 	{
-		LearnPolicyFunction();
+		TrainsPolicy();
 	}
 	ndPolycyDelayMod = (ndPolycyDelayMod + 1) % ND_SAC_POLICY_DELAY_MOD;
 }

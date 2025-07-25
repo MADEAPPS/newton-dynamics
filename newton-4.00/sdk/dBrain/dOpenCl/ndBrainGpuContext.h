@@ -148,6 +148,7 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainKernel> m_brainScale;
 	ndSharedPtr<ndBrainKernel> m_brainScaleAdd;
 	ndSharedPtr<ndBrainKernel> m_brainAssigment;
+	ndSharedPtr<ndBrainKernel> m_brainBlendScale;
 	ndSharedPtr<ndBrainKernel> m_brainGaussianSample;
 
 	static const char* m_mathOpsCommand;

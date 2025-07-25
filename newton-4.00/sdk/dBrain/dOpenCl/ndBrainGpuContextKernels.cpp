@@ -1219,7 +1219,8 @@ R""""(
 
     __kernel void brainScale(
         int numberOfElements,
-        __global float* outputData, float scale)
+        __global float* outputData, 
+        float scale)
     {
         int global_id = get_global_id(0);
         if (global_id < numberOfElements)
@@ -1230,7 +1231,8 @@ R""""(
 
     __kernel void brainSet(
         int numberOfElements,
-        __global float* outputData, float value)
+        __global float* outputData, 
+        float value)
     {
         int global_id = get_global_id(0);
         if (global_id < numberOfElements)
@@ -1249,6 +1251,20 @@ R""""(
         if (global_id < numberOfElements)
         {
             outputData[global_id] = outputData[global_id] + inputData[global_id] * scale;
+        }
+    }
+
+    __kernel void brainBlendScale(
+        int numberOfElements,
+        __global float* outputData, 
+        __global float* inputData,
+        float blend)
+    {
+        int global_id = get_global_id(0);
+        if (global_id < numberOfElements)
+        {
+            float value = outputData[global_id] * (1.0f - blend) + inputData[global_id] * blend;
+            outputData[global_id] = value;
         }
     }
 
@@ -1405,6 +1421,7 @@ void ndBrainGpuContext::CreateKerners()
     m_brainMin = CreateKerner(program, "brainMin");
     m_brainScale = CreateKerner(program, "brainScale");
     m_brainScaleAdd = CreateKerner(program, "brainScaleAdd");
+    m_brainBlendScale = CreateKerner(program, "brainBlendScale");
     m_brainAssigment = CreateKerner(program, "brainBufferAssigment");
     m_brainGaussianSample = CreateKerner(program, "brainGaussianSample");
 }
