@@ -210,40 +210,40 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	public:
 	ndString m_name;
 	HyperParameters m_parameters;
-
 	ndSharedPtr<ndBrainContext> m_context;
 	ndSharedPtr<ndBrainTrainer> m_policyTrainer;
 	ndSharedPtr<ndBrainTrainer> m_criticTrainer[ND_SAC_NUMBER_OF_CRITICS];
 	ndSharedPtr<ndBrainTrainerInference> m_referenceCriticTrainer[ND_SAC_NUMBER_OF_CRITICS];
 
-	ndBrainVector m_scratchBuffer;
-	ndArray<ndInt32> m_miniBatchIndices;
-	ndSharedPtr<ndBrainFloatBuffer> m_sigmaMinibatch;
-	ndSharedPtr<ndBrainFloatBuffer> m_rewardMinibatch;
-	ndSharedPtr<ndBrainFloatBuffer> m_noTerminalMinibatch;
-	ndSharedPtr<ndBrainFloatBuffer> m_uniformRandomMinibatch;
-
-	ndSharedPtr<ndBrainFloatBuffer> m_uniformRandom0;
-	ndSharedPtr<ndBrainFloatBuffer> m_uniformRandom1;
-	ndSharedPtr<ndBrainFloatBuffer> m_expectedRewards;
-	ndSharedPtr<ndBrainFloatBuffer> m_replayBufferFlat;
-	ndSharedPtr<ndBrainFloatBuffer> m_critickInputTest;
-	ndSharedPtr<ndBrainFloatBuffer> m_critickOutputTest;
-	ndSharedPtr<ndBrainIntegerBuffer> m_randomShuffleBuffer;
-	ndSharedPtr<ndBrainIntegerBuffer> m_minibatchIndexBuffer;
 	ndBrainAgentDeterministicPolicyGradient_Agent* m_agent;
-
 	std::mt19937 m_randomGenerator;
 	std::uniform_real_distribution<ndFloat32> m_uniformDistribution;
 
+	ndSharedPtr<ndBrainFloatBuffer> m_replayBufferFlat;
+	ndSharedPtr<ndBrainFloatBuffer> m_minibatchRewards;
+	ndSharedPtr<ndBrainFloatBuffer> m_minibatchNoTerminal;
+	ndSharedPtr<ndBrainIntegerBuffer> m_randomShuffleBuffer;
+	ndSharedPtr<ndBrainFloatBuffer> m_minibatchOfTransitions;
+	ndSharedPtr<ndBrainFloatBuffer> m_minibatchExpectedRewards;
+	ndSharedPtr<ndBrainFloatBuffer> m_minibatchCritickInputTest;
+	ndSharedPtr<ndBrainIntegerBuffer> m_minibatchIndexBuffer;
+
+	//ndSharedPtr<ndBrainFloatBuffer> m_sigmaMinibatch;
+	//ndSharedPtr<ndBrainFloatBuffer> m_uniformRandomMinibatch;
+	//ndSharedPtr<ndBrainFloatBuffer> m_uniformRandom0;
+	//ndSharedPtr<ndBrainFloatBuffer> m_uniformRandom1;
+
+	ndBrainVector m_scratchBuffer;
+
 	ndArray<ndInt32> m_shuffleBuffer;
+	ndArray<ndInt32> m_miniBatchIndices;
 	ndMovingAverage<8> m_averageExpectedRewards;
 	ndMovingAverage<8> m_averageFramesPerEpisodes;
+
 	ndUnsigned32 m_frameCount;
-	ndUnsigned32 m_framesAlive;
 	ndUnsigned32 m_eposideCount;
+	ndUnsigned32 m_policyDelayMod;
 	ndUnsigned32 m_replayBufferIndex;
-	ndUnsigned32 ndPolycyDelayMod;
 	ndUnsigned32 m_shuffleBatchIndex;
 	bool m_replayIsFilled;
 	bool m_startOptimization;
