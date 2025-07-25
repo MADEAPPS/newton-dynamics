@@ -599,6 +599,16 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateScore()
 	averageReward /= ndBrainFloat(trajectory.GetCount());
 	m_averageExpectedRewards.Update(averageReward);
 	m_averageFramesPerEpisodes.Update(ndReal(trajectory.GetCount()));
+
+static int xxxx;
+xxxx++;
+if (xxxx >= 100)
+xxxx *= 1;
+
+	if (m_startOptimization)
+	{
+		m_eposideCount++;
+	}
 }
 
 void ndBrainAgentDeterministicPolicyGradient_Trainer::SaveTrajectoryNoTerminal()
@@ -673,7 +683,6 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::SaveTrajectoryLoadBuffer()
 			CalculateScore();
 			SaveTrajectoryTerminal();
 
-			m_eposideCount++;
 			m_agent->ResetModel();
 			trajectory.SetCount(0);
 			m_agent->m_trajectoryBaseIndex = 0;
@@ -685,7 +694,6 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::SaveTrajectoryLoadBuffer()
 	if (trajectory.GetCount() >= m_parameters.m_maxTrajectorySteps)
 	{
 		CalculateScore();
-		m_eposideCount++;
 		m_agent->ResetModel();
 		trajectory.SetCount(0);
 		m_agent->m_trajectoryBaseIndex = 0;
@@ -1027,7 +1035,6 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::OptimizeStep()
 	{
 		//m_context->SyncBufferCommandQueue();
 		Optimize();
+		m_frameCount++;
 	}
-
-	m_frameCount++;
 }
