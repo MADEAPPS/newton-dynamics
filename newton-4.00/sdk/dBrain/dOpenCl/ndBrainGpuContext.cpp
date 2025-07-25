@@ -493,6 +493,41 @@ void ndBrainGpuContext::BroadcastScaler(ndBrainFloatBuffer& buffer, ndInt32 buff
 	ndAssert(error == CL_SUCCESS);
 }
 
+void ndBrainGpuContext::Select(ndBrainFloatBuffer& buffer, ndBrainFloatBuffer& maskBuffer, ndBrainFloat a, ndBrainFloat b)
+{
+	cl_int error = 0;
+
+	OpenclKernel* const oclKernel = (OpenclKernel*)*m_brainSelect;
+	cl::Kernel* const shader = *oclKernel->m_shader;
+	
+	ndBrainGpuBuffer* const dst = buffer.GetGpuBuffer();
+	const ndBrainGpuBuffer* const mask = maskBuffer.GetGpuBuffer();
+	
+	cl_int numberOfParameters = 0;
+	error = shader->getInfo(CL_KERNEL_NUM_ARGS, &numberOfParameters);
+	ndAssert(numberOfParameters == 5);
+
+	size_t numberOfElements = size_t(buffer.SizeInBytes() / sizeof(float));
+	size_t numberOfGroups = (numberOfElements + ND_DEFAULT_WORKGROUP_SIZE - 1) & -ND_DEFAULT_WORKGROUP_SIZE;
+	
+	error = shader->setArg(0, ndInt32(numberOfElements));
+	ndAssert(error == CL_SUCCESS);
+	error = shader->setArg(1, **dst->m_buffer);
+	ndAssert(error == CL_SUCCESS);
+	error = shader->setArg(2, **mask->m_buffer);
+	ndAssert(error == CL_SUCCESS);
+	error = shader->setArg(3, a);
+	ndAssert(error == CL_SUCCESS);
+	error = shader->setArg(4, b);
+	ndAssert(error == CL_SUCCESS);
+
+	cl::NDRange offset(0);
+	cl::NDRange local(ND_DEFAULT_WORKGROUP_SIZE);
+	cl::NDRange global(numberOfGroups);
+	error = m_queue->enqueueNDRangeKernel(*shader, offset, global, local);
+	ndAssert(error == CL_SUCCESS);
+}
+
 void ndBrainGpuContext::Set(ndBrainFloatBuffer& dstData, ndBrainFloat value)
 {
 	SubmitMathOperation(m_brainSet, &dstData, value);
@@ -565,15 +600,10 @@ void ndBrainGpuContext::GreaterEqual(ndBrainFloatBuffer& buffer, const ndBrainFl
 
 void ndBrainGpuContext::LessEqual(ndBrainFloatBuffer& buffer, ndBrainFloat test)
 {
-	ndAssert(0);
+	SubmitMathOperation(m_brainLessEqualScalar, &buffer, test);
 }
 
 void ndBrainGpuContext::GreaterEqual(ndBrainFloatBuffer& buffer, ndBrainFloat test)
 {
-	ndAssert(0);
-}
-
-void ndBrainGpuContext::Select(ndBrainFloatBuffer& buffer, ndBrainFloatBuffer& mask, ndBrainFloat a, ndBrainFloat b)
-{
-	ndAssert(0);
+	SubmitMathOperation(m_brainGreaterEqualScalar, &buffer, test);
 }

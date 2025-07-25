@@ -146,6 +146,7 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainKernel> m_brainMin;
 	ndSharedPtr<ndBrainKernel> m_brainMax;
 	ndSharedPtr<ndBrainKernel> m_brainScale;
+	ndSharedPtr<ndBrainKernel> m_brainSelect;
 	ndSharedPtr<ndBrainKernel> m_brainScaleAdd;
 	ndSharedPtr<ndBrainKernel> m_brainAssigment;
 	ndSharedPtr<ndBrainKernel> m_brainLessEqual;
@@ -153,9 +154,9 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainKernel> m_brainBlendVector;
 	ndSharedPtr<ndBrainKernel> m_brainGreaterEqual;
 	ndSharedPtr<ndBrainKernel> m_brainGaussianSample;
-
+	ndSharedPtr<ndBrainKernel> m_brainLessEqualScalar;
 	ndSharedPtr<ndBrainKernel> m_brainBroadcastScalar;
-
+	ndSharedPtr<ndBrainKernel> m_brainGreaterEqualScalar;
 
 	static const char* m_mathOpsCommand;
 	static const char* m_matrixMultiply;

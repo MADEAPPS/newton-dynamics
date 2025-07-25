@@ -1241,6 +1241,30 @@ R""""(
         }
     }
 
+    __kernel void brainLessEqualScalar(
+        int numberOfElements,
+        __global float* outputData,
+        float test)
+    {
+        int global_id = get_global_id(0);
+        if (global_id < numberOfElements)
+        {
+            outputData[global_id] = (outputData[global_id] <= test) ? 1.0 : 0.0;
+        }
+    }
+
+    __kernel void brainGraeterEqualScalar(
+        int numberOfElements,
+        __global float* outputData,
+        float test)
+    {
+        int global_id = get_global_id(0);
+        if (global_id < numberOfElements)
+        {
+            outputData[global_id] = (outputData[global_id] >= inputData[global_id]) ? 1.0 : 0.0;
+        }
+    }
+
     __kernel void brainScale(
         int numberOfElements,
         __global float* outputData, 
@@ -1250,6 +1274,21 @@ R""""(
         if (global_id < numberOfElements)
         {
             outputData[global_id] = outputData[global_id] * scale;
+        }
+    }
+
+    __kernel void brainSelect(
+        int numberOfElements,
+        __global float* outputData, 
+        __global float* mask, 
+        float a, float b)
+    {
+        int global_id = get_global_id(0);
+        if (global_id < numberOfElements)
+        {
+            float t1 = mask[global_id] 
+            float t0 = 1.0 - t1;
+            outputData[global_id] = a * t0 + b * t1;
         }
     }
 
@@ -1301,13 +1340,12 @@ R""""(
         int global_id = get_global_id(0);
         if (global_id < numberOfElements)
         {
-            float blend = blendData[global_id];
-            float value = outputData[global_id] * (1.0f - blend) + inputData[global_id] * blend;
+            float t1 = blendData[global_id];
+            float t0 = 1.0 - t1;
+            float value = outputData[global_id] * t0 + inputData[global_id] * t1;
             outputData[global_id] = value;
         }
     }
-
-
 
     __kernel void brainBroadcastScalar(
         int numberOfElements,
@@ -1485,6 +1523,7 @@ void ndBrainGpuContext::CreateKerners()
     m_brainMul = CreateKerner(program, "brainMul");
     m_brainMin = CreateKerner(program, "brainMin");
     m_brainScale = CreateKerner(program, "brainScale");
+    m_brainSelect = CreateKerner(program, "brainSelect");
     m_brainScaleAdd = CreateKerner(program, "brainScaleAdd");
     m_brainLessEqual = CreateKerner(program, "brainLessEqual");
     m_brainBlendScale = CreateKerner(program, "brainBlendScale");
@@ -1493,4 +1532,6 @@ void ndBrainGpuContext::CreateKerners()
     m_brainAssigment = CreateKerner(program, "brainBufferAssigment");
     m_brainGaussianSample = CreateKerner(program, "brainGaussianSample");
     m_brainBroadcastScalar = CreateKerner(program, "brainBroadcastScalar");
+    m_brainLessEqualScalar = CreateKerner(program, "brainLessEqualScalar");
+    m_brainGreaterEqualScalar = CreateKerner(program, "brainGreaterEqualScalar");
 }
