@@ -1217,6 +1217,30 @@ R""""(
         }
     }
 
+    __kernel void brainLessEqual(
+        int numberOfElements,
+        __global float* outputData,
+        __global float* inputData)
+    {
+        int global_id = get_global_id(0);
+        if (global_id < numberOfElements)
+        {
+            outputData[global_id] = (outputData[global_id] <= inputData[global_id]) ? 1.0 : 0.0;
+        }
+    }
+
+    __kernel void brainGreaterEqual(
+        int numberOfElements,
+        __global float* outputData,
+        __global float* inputData)
+    {
+        int global_id = get_global_id(0);
+        if (global_id < numberOfElements)
+        {
+            outputData[global_id] = (outputData[global_id] >= inputData[global_id]) ? 1.0 : 0.0;
+        }
+    }
+
     __kernel void brainScale(
         int numberOfElements,
         __global float* outputData, 
@@ -1265,6 +1289,30 @@ R""""(
         {
             float value = outputData[global_id] * (1.0f - blend) + inputData[global_id] * blend;
             outputData[global_id] = value;
+        }
+    }
+
+    __kernel void brainBroadcastScalar(
+        int numberOfElements,
+        __global float* outputData, 
+        __global float* inputData)
+    {
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+
+        uint dstOffset = groupId * numberOfElements;
+        uint workGroupSizeReminder = numberOfElements % workGroupSize;
+        uint modWorkGroupSize = numberOfElements - workGroupSizeReminder;
+
+        float value = inputData[groupId];    
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            outputData[dstOffset + i + itemId] = value;
+        }
+        if (itemId < workGroupSizeReminder)
+        {
+           outputData[dstOffset + modWorkGroupSize + itemId] = value;
         }
     }
 
@@ -1421,7 +1469,10 @@ void ndBrainGpuContext::CreateKerners()
     m_brainMin = CreateKerner(program, "brainMin");
     m_brainScale = CreateKerner(program, "brainScale");
     m_brainScaleAdd = CreateKerner(program, "brainScaleAdd");
+    m_brainLessEqual = CreateKerner(program, "brainLessEqual");
     m_brainBlendScale = CreateKerner(program, "brainBlendScale");
+    m_brainGreaterEqual = CreateKerner(program, "brainGreaterEqual");
     m_brainAssigment = CreateKerner(program, "brainBufferAssigment");
     m_brainGaussianSample = CreateKerner(program, "brainGaussianSample");
+    m_brainBroadcastScalar = CreateKerner(program, "brainBroadcastScalar");
 }

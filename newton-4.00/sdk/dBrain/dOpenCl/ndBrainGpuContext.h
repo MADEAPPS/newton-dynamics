@@ -148,8 +148,13 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainKernel> m_brainScale;
 	ndSharedPtr<ndBrainKernel> m_brainScaleAdd;
 	ndSharedPtr<ndBrainKernel> m_brainAssigment;
+	ndSharedPtr<ndBrainKernel> m_brainLessEqual;
 	ndSharedPtr<ndBrainKernel> m_brainBlendScale;
+	ndSharedPtr<ndBrainKernel> m_brainGreaterEqual;
 	ndSharedPtr<ndBrainKernel> m_brainGaussianSample;
+
+	ndSharedPtr<ndBrainKernel> m_brainBroadcastScalar;
+
 
 	static const char* m_mathOpsCommand;
 	static const char* m_matrixMultiply;

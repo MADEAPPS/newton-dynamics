@@ -199,7 +199,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	void SaveTrajectory();
 	void SaveTrajectoryLoadBuffer();
 	
-	virtual void TrainsPolicy();
+	virtual void TrainPolicy();
 	void SaveTrajectoryTerminal();
 	void SaveTrajectoryNoTerminal();
 	virtual void BuildPolicyClass();

@@ -927,7 +927,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateExpectedRewards()
 }
 
 //#pragma optimize( "", off )
-void ndBrainAgentDeterministicPolicyGradient_Trainer::TrainsPolicy()
+void ndBrainAgentDeterministicPolicyGradient_Trainer::TrainPolicy()
 {
 	const ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory& trajectory = m_agent->m_trajectory;
 		
@@ -1040,7 +1040,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::Optimize()
 	
 	if (!ndPolycyDelayMod)
 	{
-		TrainsPolicy();
+		TrainPolicy();
 	}
 	ndPolycyDelayMod = (ndPolycyDelayMod + 1) % ND_SAC_POLICY_DELAY_MOD;
 }
