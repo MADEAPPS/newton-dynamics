@@ -191,6 +191,8 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	ndFloat32 GetAverageScore() const;
 	ndFloat32 GetAverageFrames() const;
 
+	void Save___();
+
 	protected:
 	void Optimize();
 	void CalculateScore();
