@@ -578,6 +578,7 @@ ndFloat32 ndBrainAgentDeterministicPolicyGradient_Trainer::GetAverageFrames() co
 	return m_averageFramesPerEpisodes.GetAverage();
 }
 
+//#pragma optimize( "", off )
 void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateScore()
 {
 	ndBrainAgentDeterministicPolicyGradient_Agent::ndTrajectory& trajectory = m_agent->m_trajectory;
@@ -592,7 +593,26 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::CalculateScore()
 		stateReward = r + gamma * stateReward;
 		averageReward += stateReward;
 	}
-	averageReward /= ndBrainFloat(trajectory.GetCount());
+	ndInt32 numberOfSteps = trajectory.GetCount();
+	if (!trajectory.GetTerminalState(trajectory.GetCount() - 1))
+	{
+		ndInt32 horizonSteps = ndInt32 (ndFloat32(1.0f) / (ndFloat32(1.0f) - m_parameters.m_discountRewardFactor));
+		numberOfSteps -= horizonSteps;
+		if (numberOfSteps < 100)
+		{
+			numberOfSteps = 100;
+		}
+		stateReward = trajectory.GetReward(trajectory.GetCount() - 1);
+		ndBrainFloat substractAverageReward = trajectory.GetReward(trajectory.GetCount() - 1);
+		for (ndInt32 i = trajectory.GetCount() - 2; i >= numberOfSteps; --i)
+		{
+			ndBrainFloat r = trajectory.GetReward(i);
+			stateReward = r + gamma * stateReward;
+			substractAverageReward += stateReward;
+		}
+		averageReward -= substractAverageReward;
+	}
+	averageReward /= ndBrainFloat(numberOfSteps);
 	m_averageExpectedRewards.Update(averageReward);
 	m_averageFramesPerEpisodes.Update(ndReal(trajectory.GetCount()));
 
