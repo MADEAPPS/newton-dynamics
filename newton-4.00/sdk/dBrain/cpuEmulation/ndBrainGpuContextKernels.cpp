@@ -948,7 +948,6 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
         const ndInt32 tileSize = ND_GPU_TILED_MATRIX_ROWS;
         const ndInt32 tileSizeBits = ND_GPU_TILED_MATRIX_ROWS_BITS;
 
-        ndBrainFloat tile_accReg[tileSize][tileSize];
         ndBrainFloat tile_inputs[tileSize * 2][tileSize];
         ndBrainFloat tile_weights[tileSize * 2][tileSize];
 
@@ -962,7 +961,6 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
 
         const ndInt32 inputSize = parameters->m_inputSize;
         const ndInt32 outputSize = parameters->m_outputSize;
-        const ndInt32 height = (outputSize + tileSize - 1) & -tileSize;
         const ndInt32 width = (inputSize + tileSize * 2 - 1) & -tileSize * 2;
 
         const ndInt32 minibatchBlock = (outputSize + tileSize - 1) >> tileSizeBits;
@@ -972,28 +970,46 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
         //Initialise the accumulation register
         const ndInt64 parameterBlockBase = groupId_x * tileSize;
         const ndInt64 parametersStartOffset = parameterBlockBase * width + parameters->m_parametersStartOffset;
+
+        // load matrix bias to local memory
+        const ndInt32 height = (outputSize + tileSize - 1) & -tileSize;
         const ndInt64 parametersBiasOffset = parameterBlockBase + width * height + parameters->m_parametersStartOffset;
         ndAssert(parametersBiasOffset >= 0);
-
-        ndBrainFloat biasValue[tileSize];
         for (ndInt32 itemId = 0; itemId < tileSize; ++itemId)
         {
-            biasValue[itemId] = weightsAndBias[parametersBiasOffset + itemId];
+            tile_inputs[0][itemId] = weightsAndBias[parametersBiasOffset + itemId];
         }
-        // barrier
+        // barries?
 
+        ndBrainFloat tile_accReg[tileSize][tileSize];
+        for (ndInt32 itemId_y = 0; itemId_y < tileSize; ++itemId_y)
+        {
+            for (ndInt32 itemId_x = 0; itemId_x < tileSize; ++itemId_x)
+            {
+                tile_accReg[itemId_y][itemId_x] = ndBrainFloat(0.0f);
+            }
+        }
+
+        const ndInt32 inputOutputStride = parameters->m_inputOutputSize;
+        const ndInt64 inputOffset = groupId_y * ndInt64(inputOutputStride) * tileSize + parameters->m_inputOutputStartOffset;
+        ndAssert(inputOffset >= 0);
+
+        // load matrix bias to registers and transpose it
+        for (ndInt32 itemId = 0; itemId < tileSize; ++itemId)
+        {
+            tile_inputs[0][itemId] = weightsAndBias[parametersBiasOffset + itemId];
+        }
+        ndBrainFloat biasValueReg[1024];
         for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
         {
             ndInt32 itemId_x = itemId & (tileSize - 1);
             ndInt32 itemId_y = itemId >> tileSizeBits;
             ndAssert(itemId_x < tileSize);
             ndAssert(itemId_y < tileSize);
-            tile_accReg[itemId_y][itemId_x] = biasValue[itemId_x];
+            biasValueReg[itemId] = tile_inputs[0][itemId_y];
         }
-
-        const ndInt32 inputOutputStride = parameters->m_inputOutputSize;
-        const ndInt64 inputOffset = groupId_y * ndInt64(inputOutputStride) * tileSize + parameters->m_inputOutputStartOffset;
-        ndAssert(inputOffset >= 0);
+//if (groupId_x == 15)
+//groupId *= 1;
 
         // Loop over all tiles
         ndInt32 halfTileStart = tileSize / 2;
@@ -1034,15 +1050,16 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
             }
             // barrier
         }
+        // barrier ?
 
-        // the results are in register, but they are transposed
+        // add matrix bias, and transposed the results
         for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
         {
             ndInt32 itemId_x = itemId & (tileSize - 1);
             ndInt32 itemId_y = itemId >> tileSizeBits;
             ndAssert(itemId_x < tileSize);
             ndAssert(itemId_y < tileSize);
-            tile_inputs[itemId_x][itemId_y] = tile_accReg[itemId_y][itemId_x];
+            tile_inputs[itemId_x][itemId_y] = tile_accReg[itemId_y][itemId_x] + biasValueReg[itemId];
         }
         // barrier
 
