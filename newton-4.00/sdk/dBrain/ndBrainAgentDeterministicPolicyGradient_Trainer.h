@@ -228,8 +228,8 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	ndSharedPtr<ndBrainIntegerBuffer> m_randomShuffleBuffer;
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchOfTransitions;
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchExpectedRewards;
-	ndSharedPtr<ndBrainFloatBuffer> m_minibatchCritickInputTest;
-	ndSharedPtr<ndBrainFloatBuffer> m_minibatchReparameterization;
+	ndSharedPtr<ndBrainFloatBuffer> m_minibatchCriticInputTest;
+	ndSharedPtr<ndBrainFloatBuffer> m_minibatchActionReparameterization;
 
 	ndSharedPtr<ndBrainIntegerBuffer> m_minibatchIndexBuffer;
 

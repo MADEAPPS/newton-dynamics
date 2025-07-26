@@ -330,15 +330,16 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::ndBrainAgentDeterministicPolicy
 	,m_agent(nullptr)
 	,m_randomGenerator(std::random_device{}())
 	,m_uniformDistribution(ndFloat32(0.0f), ndFloat32(1.0f))
+	,m_uniformRandom0(nullptr)
 	,m_replayBufferFlat(nullptr)
 	,m_minibatchRewards(nullptr)
 	,m_minibatchNoTerminal(nullptr)
 	,m_randomShuffleBuffer(nullptr)
 	,m_minibatchOfTransitions(nullptr)
 	,m_minibatchExpectedRewards(nullptr)
-	,m_minibatchCritickInputTest(nullptr)
+	,m_minibatchCriticInputTest(nullptr)
+	,m_minibatchActionReparameterization(nullptr)
 	,m_minibatchIndexBuffer(nullptr)
-
 	,m_scratchBuffer()
 	,m_shuffleBuffer()
 	,m_miniBatchIndices()
@@ -384,11 +385,11 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::ndBrainAgentDeterministicPolicy
 	m_randomShuffleBuffer = ndSharedPtr<ndBrainIntegerBuffer>(new ndBrainIntegerBuffer(*m_context, m_parameters.m_numberOfUpdates * m_parameters.m_miniBatchSize));
 	m_minibatchIndexBuffer = ndSharedPtr<ndBrainIntegerBuffer>(new ndBrainIntegerBuffer(*m_context, m_parameters.m_miniBatchSize));
 	m_minibatchExpectedRewards = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_miniBatchSize));
-	m_minibatchCritickInputTest = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, (outputSize + inputSize) * m_parameters.m_miniBatchSize));
+	m_minibatchCriticInputTest = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, (outputSize + inputSize) * m_parameters.m_miniBatchSize));
 
 #ifdef ND_USING_REGULARIZATION
 	m_uniformRandom0 = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_numberOfUpdates * m_parameters.m_miniBatchSize));
-	m_minibatchReparameterization = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_miniBatchSize));
+	m_minibatchActionReparameterization = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_miniBatchSize));
 #endif
 }
 
@@ -937,10 +938,10 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::TrainPolicy()
 		// re using m_minibatchRewards because is not use anymore 
 		m_context->Set(**m_minibatchRewards, *criticMinibatchOutputBuffer1);
 		m_context->LessEqual(**m_minibatchRewards, *criticMinibatchOutputBuffer);
-		m_context->BroadcastScaler(**m_minibatchCritickInputTest, criticInputSize, **m_minibatchRewards);
+		m_context->BroadcastScaler(**m_minibatchCriticInputTest, criticInputSize, **m_minibatchRewards);
 	
 		m_context->Blend(*criticMinibatchOutputBuffer, *criticMinibatchOutputBuffer1, **m_minibatchRewards);
-		m_context->Blend(*criticMinibatchInputGradientBuffer, *criticMinibatchInputGradientBuffer1, **m_minibatchCritickInputTest);
+		m_context->Blend(*criticMinibatchInputGradientBuffer, *criticMinibatchInputGradientBuffer1, **m_minibatchCriticInputTest);
 	}
 	 
 	// gradient ascend
@@ -1036,10 +1037,10 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::Optimize()
 		minibatchReparametization.m_srcOffsetInByte = ndInt32(i * transitionSizeInBytes * m_parameters.m_miniBatchSize);
 		minibatchReparametization.m_srcStrideInByte = transitionSizeInBytes;
 		minibatchReparametization.m_strideInByte = transitionSizeInBytes;
-		m_minibatchReparameterization->CopyBuffer(copyIndicesInfo, 1, **m_uniformRandom0);
+		m_minibatchActionReparameterization->CopyBuffer(copyIndicesInfo, 1, **m_uniformRandom0);
 
 		ndBrainVector xxxx;
-		m_minibatchReparameterization->VectorFromDevice(xxxx);
+		m_minibatchActionReparameterization->VectorFromDevice(xxxx);
 #endif
 
 
