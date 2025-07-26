@@ -900,7 +900,6 @@ R""""(
         //__local float tile_acc[tileSize][tileSize + 1];
         __local float tile_inputs[tileSize * 2][tileSize + 1];
         __local float tile_weights[tileSize * 2][tileSize + 1];
-        __local float biasCache[tileSize];
 
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
@@ -926,10 +925,8 @@ R""""(
         if (acc_x < tileSize)
         {
             float a = weightsAndBias[parametersBiasOffset + acc_x];
-            biasCache[acc_x] = a;
+            tile_inputs[0][acc_x] = a;
         }
-        barrier(CLK_LOCAL_MEM_FENCE); 
-        float acc = biasCache[acc_x];
 
         const uint inputOutputStride = parameters->m_inputOutputSize;
         const long inputOffset = groupId_y * (long)inputOutputStride * tileSize + parameters->m_inputOutputStartOffset;
@@ -938,7 +935,11 @@ R""""(
         uint halfTileStart = tileSize / 2;
         uint itemId_x = itemId & (tileSize * 2 - 1);
         uint itemId_y = itemId >> (tileSizeBits + 1);
+        
+        float acc = 0.0;
+        barrier(CLK_LOCAL_MEM_FENCE); 
 
+        float matrixBias = tile_inputs[0][acc_y];
         for (uint tile = 0; tile < width; tile += tileSize * 2)
         {
             // read the transpose of the tiles (GPU style, but too slow for CPU)
@@ -965,8 +966,7 @@ R""""(
             barrier(CLK_LOCAL_MEM_FENCE); 
         }
         // transpose the flat array results
-        //tile_acc[acc_x][acc_y] = acc;
-        tile_inputs[acc_x][acc_y] = acc;
+        tile_inputs[acc_x][acc_y] = acc + matrixBias;
 
         const uint numberOutput = ((groupId_x + 1) * ND_GPU_TILED_MATRIX_ROWS < outputSize) ? ND_GPU_TILED_MATRIX_ROWS : outputSize - groupId_x * ND_GPU_TILED_MATRIX_ROWS;
         long outputOffset = groupId_x * ND_GPU_TILED_MATRIX_ROWS + (long)inputOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
