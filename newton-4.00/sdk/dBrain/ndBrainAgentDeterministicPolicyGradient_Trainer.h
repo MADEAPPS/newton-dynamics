@@ -221,19 +221,20 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	std::mt19937 m_randomGenerator;
 	std::uniform_real_distribution<ndFloat32> m_uniformDistribution;
 
+	ndSharedPtr<ndBrainFloatBuffer> m_minibatchMean;
+	ndSharedPtr<ndBrainFloatBuffer> m_minibatchSigma;
 	ndSharedPtr<ndBrainFloatBuffer> m_uniformRandom0;
 	ndSharedPtr<ndBrainFloatBuffer> m_replayBufferFlat;
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchRewards;
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchNoTerminal;
-	ndSharedPtr<ndBrainIntegerBuffer> m_randomShuffleBuffer;
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchOfTransitions;
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchExpectedRewards;
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchCriticInputTest;
-	ndSharedPtr<ndBrainFloatBuffer> m_minibatchActionReparameterization;
+	ndSharedPtr<ndBrainFloatBuffer> m_minibatchUniformRandomeDistribution;
 
+	ndSharedPtr<ndBrainIntegerBuffer> m_randomShuffleBuffer;
 	ndSharedPtr<ndBrainIntegerBuffer> m_minibatchIndexBuffer;
 
-	//ndSharedPtr<ndBrainFloatBuffer> m_sigmaMinibatch;
 	//ndSharedPtr<ndBrainFloatBuffer> m_uniformRandom1;
 
 	ndBrainVector m_scratchBuffer;
