@@ -162,7 +162,7 @@ void ndBrainLayerActivationSoftmax::FeedForward(const ndBrainLayerFeedForwardCpu
 	output.FlushToZero();
 }	
 
-//void ndBrainLayerActivationSoftmax::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const
+//void ndBrainLayerActivationSoftmax::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const command, ndInt32 miniBatchIndex) const
 void ndBrainLayerActivationSoftmax::BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const, ndInt32) const
 {
 	ndAssert(0);

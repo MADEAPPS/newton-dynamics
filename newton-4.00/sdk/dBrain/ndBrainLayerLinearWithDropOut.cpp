@@ -88,7 +88,6 @@ void ndBrainLayerLinearWithDropOut::MakePrediction(const ndBrainVector& input, n
 
 void ndBrainLayerLinearWithDropOut::InputDerivative(const ndBrainVector&, const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
-	//inputDerivative.Set(1.0f);
 	inputDerivative.Set(m_dropOut);
 	inputDerivative.Mul(outputDerivative);
 }

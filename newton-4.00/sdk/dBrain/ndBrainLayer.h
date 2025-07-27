@@ -117,8 +117,8 @@ class ndBrainLayer : public ndClassAlloc
 	virtual ndCommandSharedInfo GetCommandSharedInfo(ndBrainTrainerInference* const trainer) const;
 
 	virtual bool HasGpuSupport() const;
-	virtual void FeedForward(const ndBrainLayerFeedForwardCpuCommand* const info, ndInt32 miniBatchIndex) const;
-	virtual void BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const info, ndInt32 miniBatchIndex) const;
+	virtual void FeedForward(const ndBrainLayerFeedForwardCpuCommand* const command, ndInt32 miniBatchIndex) const;
+	virtual void BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const command, ndInt32 miniBatchIndex) const;
 
 	virtual ndCommandArray CreateGpuFeedForwardCommand(
 		ndBrainTrainerInference* const owner,

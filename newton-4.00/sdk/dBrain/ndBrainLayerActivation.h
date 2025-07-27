@@ -63,6 +63,24 @@ class ndBrainLayerActivation : public ndBrainLayer
 
 	virtual void Save(const ndBrainSave* const loadSave) const override;
 
+	virtual ndCommandArray CreateGpuFeedForwardCommand(
+		ndBrainTrainerInference* const owner,
+		ndBrainContext* const context,
+		const ndCommandSharedInfo& info,
+		ndInt32 miniBatchSize,
+		ndBrainFloatBuffer* const inputOutputData,
+		ndBrainFloatBuffer* const weightsAndBias) const override;
+
+	virtual ndCommandArray CreateGpuBackPropagateCommand(
+		ndBrainTrainerInference* const owner,
+		ndBrainContext* const context,
+		const ndCommandSharedInfo& info,
+		ndInt32 miniBatchSize,
+		ndBrainFloatBuffer* const inputOutputData,
+		ndBrainFloatBuffer* const weightsAndBias,
+		ndBrainFloatBuffer* const inputOutputGradients,
+		ndBrainFloatBuffer* const weightsAndBiasGradients) const override;
+
 	ndInt32 m_neurons;
 };
 
