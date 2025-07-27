@@ -165,11 +165,30 @@ void ndBrainCpuContext::Scale(ndBrainFloatBuffer& buffer, ndBrainFloat scale)
 	dst.Scale(scale);
 }
 
+void ndBrainCpuContext::Min(ndBrainFloatBuffer& buffer, ndBrainFloat value)
+{
+	ndBrainVector& dst = **buffer.m_buffer;
+	dst.Min(value);
+}
+
+void ndBrainCpuContext::Max(ndBrainFloatBuffer& buffer, ndBrainFloat value)
+{
+	ndBrainVector& dst = **buffer.m_buffer;
+	dst.Max(value);
+}
+
 void ndBrainCpuContext::Min(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
 {
 	ndBrainVector& dst = **buffer.m_buffer;
 	const ndBrainVector& src = **srcBuffer.m_buffer;
 	dst.Min(src);
+}
+
+void ndBrainCpuContext::Max(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
+{
+	ndBrainVector& dst = **buffer.m_buffer;
+	const ndBrainVector& src = **srcBuffer.m_buffer;
+	dst.Max(src);
 }
 
 void ndBrainCpuContext::Add(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)

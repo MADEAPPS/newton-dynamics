@@ -36,15 +36,9 @@
 // https://spinningup.openai.com/en/latest/algorithms/td3.html
 // https://spinningup.openai.com/en/latest/algorithms/sac.html
 
-#define ND_USE_SAC
-#ifdef ND_USE_SAC
-	#define ND_SAC_NUMBER_OF_CRITICS	2
-#else
-	#define ND_SAC_NUMBER_OF_CRITICS	1
-#endif
-
-#define ND_SAC_POLICY_DELAY_MOD			1
-
+#define ND_DETERMINISTIC_POLICY_FIX_SIGMA			ndBrainFloat(0.5f)
+#define ND_DETERMINISTIC_POLICY_MIN_LOG_SIGMA		ndBrainFloat(-4.0f)
+#define ND_DETERMINISTIC_POLICY_MAX_LOG_SIGMA		ndBrainFloat( 0.0f)
 
 class ndBrainFloatBuffer;
 class ndBrainIntegerBuffer;
@@ -148,9 +142,8 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 		ndBrainFloat m_criticLearnRate;
 		ndBrainFloat m_policyRegularizer;
 		ndBrainFloat m_criticRegularizer;
+		ndBrainFloat m_movingAverageFactor;
 		ndBrainFloat m_discountRewardFactor;
-		ndBrainFloat m_policyMovingAverageFactor;
-		ndBrainFloat m_criticMovingAverageFactor;
 
 		ndBrainFloat m_actionFixSigma;
 		ndBrainFloat m_entropyRegularizerCoef;
@@ -191,8 +184,6 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	ndFloat32 GetAverageScore() const;
 	ndFloat32 GetAverageFrames() const;
 
-	void Save___();
-
 	protected:
 	void Optimize();
 	void CalculateScore();
@@ -214,8 +205,9 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	HyperParameters m_parameters;
 	ndSharedPtr<ndBrainContext> m_context;
 	ndSharedPtr<ndBrainTrainer> m_policyTrainer;
-	ndSharedPtr<ndBrainTrainer> m_criticTrainer[ND_SAC_NUMBER_OF_CRITICS];
-	ndSharedPtr<ndBrainTrainerInference> m_referenceCriticTrainer[ND_SAC_NUMBER_OF_CRITICS];
+	ndSharedPtr<ndBrainTrainer> m_criticTrainer[2];
+	ndSharedPtr<ndBrainTrainerInference> m_referencePolicyTrainer;
+	ndSharedPtr<ndBrainTrainerInference> m_referenceCriticTrainer[2];
 
 	ndBrainAgentDeterministicPolicyGradient_Agent* m_agent;
 	std::mt19937 m_randomGenerator;
@@ -223,6 +215,8 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchMean;
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchSigma;
+	ndSharedPtr<ndBrainFloatBuffer> m_minibatchMeanAction;
+
 	ndSharedPtr<ndBrainFloatBuffer> m_uniformRandom0;
 	ndSharedPtr<ndBrainFloatBuffer> m_replayBufferFlat;
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchRewards;
@@ -230,12 +224,10 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchOfTransitions;
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchExpectedRewards;
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchCriticInputTest;
-	ndSharedPtr<ndBrainFloatBuffer> m_minibatchUniformRandomeDistribution;
+	ndSharedPtr<ndBrainFloatBuffer> m_minibatchUniformRandomDistribution;
 
 	ndSharedPtr<ndBrainIntegerBuffer> m_randomShuffleBuffer;
 	ndSharedPtr<ndBrainIntegerBuffer> m_minibatchIndexBuffer;
-
-	//ndSharedPtr<ndBrainFloatBuffer> m_uniformRandom1;
 
 	ndBrainVector m_scratchBuffer;
 

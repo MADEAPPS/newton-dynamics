@@ -25,6 +25,7 @@
 
 namespace ndDiscreteCarpole
 {
+#if 0
 	//#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME		"cartpoleDiscrete"
 
@@ -581,17 +582,18 @@ namespace ndDiscreteCarpole
 
 			if ((stopTraining >= m_stopTraining) || (100.0f * m_master->GetAverageScore() / m_horizon > 95.0f))
 			{
-				char fileName[1024];
-				m_modelIsTrained = true;
-				m_master->GetPolicyNetwork()->CopyFrom(*(*m_bestActor));
-				ndGetWorkingFileName(m_master->GetName().GetStr(), fileName);
-				m_master->GetPolicyNetwork()->SaveToFile(fileName);
-				ndExpandTraceMessage("saving to file: %s\n", fileName);
-				ndExpandTraceMessage("training complete\n");
-				ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
-				ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
-
-				manager->Terminate();
+				ndAssert(0);
+				//char fileName[1024];
+				//m_modelIsTrained = true;
+				//m_master->GetPolicyNetwork()->CopyFrom(*(*m_bestActor));
+				//ndGetWorkingFileName(m_master->GetName().GetStr(), fileName);
+				//m_master->GetPolicyNetwork()->SaveToFile(fileName);
+				//ndExpandTraceMessage("saving to file: %s\n", fileName);
+				//ndExpandTraceMessage("training complete\n");
+				//ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
+				//ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
+				//
+				//manager->Terminate();
 			}
 		}
 
@@ -608,6 +610,7 @@ namespace ndDiscreteCarpole
 		ndUnsigned32 m_stopTraining;
 		bool m_modelIsTrained;
 	};
+#endif
 }
 
 using namespace ndDiscreteCarpole;
@@ -615,7 +618,8 @@ using namespace ndDiscreteCarpole;
 void ndCartpoleDiscrete(ndDemoEntityManager* const scene)
 {
 	BuildFlatPlane(scene, true);
-	
+
+#if 0
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.11f;
 
@@ -646,4 +650,5 @@ void ndCartpoleDiscrete(ndDemoEntityManager* const scene)
 	matrix.m_posit.m_z = 5.0f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
+#endif
 }

@@ -36,7 +36,6 @@ class ndBrainVector: public ndArray<ndBrainFloat>
 	void Set(ndBrainFloat value);
 	void Set(const ndBrainVector& data);
 
-	void Scale(ndBrainFloat b);
 	void Add(const ndBrainVector& a);
 	void Sub(const ndBrainVector& a);
 	void Mul(const ndBrainVector& a);
@@ -52,6 +51,10 @@ class ndBrainVector: public ndArray<ndBrainFloat>
 	void GaussianNormalize();
 	void Clamp(ndBrainFloat min, ndBrainFloat max);
 	void InitGaussianWeights(ndBrainFloat variance);
+
+	void Min(ndBrainFloat b);
+	void Max(ndBrainFloat b);
+	void Scale(ndBrainFloat b);
 	void ScaleSet(const ndBrainVector& a, ndBrainFloat b);
 	void ScaleAdd(const ndBrainVector& a, ndBrainFloat b);
 	void Blend(const ndBrainVector& target, ndBrainFloat blend);

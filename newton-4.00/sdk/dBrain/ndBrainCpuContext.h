@@ -36,8 +36,9 @@ class ndBrainCpuContext : public ndBrainContext, public ndBrainThreadPool
 	virtual void BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVector& dstVector) override;
 	virtual void BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector) override;
 
-	virtual void Set(ndBrainFloatBuffer& dstData, const ndBrainFloatBuffer& srcData) override;
+	virtual void Set(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
 	virtual void Min(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
+	virtual void Max(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
 	virtual void Add(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
 	virtual void Sub(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
 	virtual void Mul(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
@@ -46,7 +47,9 @@ class ndBrainCpuContext : public ndBrainContext, public ndBrainThreadPool
 	virtual void Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, const ndBrainFloatBuffer& blend) override;
 	virtual void GaussianSample(ndBrainFloatBuffer& mean, const ndBrainFloatBuffer& sigman, const ndBrainFloatBuffer& uniformRandom) override;
 
-	virtual void Set(ndBrainFloatBuffer& dstData, ndBrainFloat value) override;
+	virtual void Set(ndBrainFloatBuffer& buffer, ndBrainFloat value) override;
+	virtual void Min(ndBrainFloatBuffer& buffer, ndBrainFloat value) override;
+	virtual void Max(ndBrainFloatBuffer& buffer, ndBrainFloat value) override;
 	virtual void Scale(ndBrainFloatBuffer& buffer, ndBrainFloat scale) override;
 	virtual void LessEqual(ndBrainFloatBuffer& buffer, ndBrainFloat test) override;
 	virtual void GreaterEqual(ndBrainFloatBuffer& buffer, ndBrainFloat test) override;

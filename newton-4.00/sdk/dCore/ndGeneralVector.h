@@ -100,11 +100,31 @@ void ndScaleAdd(ndInt32 size, T* const X, const T* const A, const T* const B, T 
 }
 
 template<class T>
+void ndMin(ndInt32 size, T* const X, T A)
+{
+	for (ndInt32 i = 0; i < size; ++i)
+	{
+		X[i] = ndMin(X[i], A);
+		ndAssert(ndCheckFloat(X[i]));
+	}
+}
+
+template<class T>
 void ndMin(ndInt32 size, T* const X, const T* const A)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
 		X[i] = ndMin (X[i], A[i]);
+		ndAssert(ndCheckFloat(X[i]));
+	}
+}
+
+template<class T>
+void ndMax(ndInt32 size, T* const X, T A)
+{
+	for (ndInt32 i = 0; i < size; ++i)
+	{
+		X[i] = ndMax(X[i], A);
 		ndAssert(ndCheckFloat(X[i]));
 	}
 }

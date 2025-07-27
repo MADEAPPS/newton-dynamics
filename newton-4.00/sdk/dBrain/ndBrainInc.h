@@ -64,13 +64,11 @@
 #include <ndBrainLayerActivationSoftmax.h>
 #include <ndBrainLayerActivationLeakyRelu.h>
 #include <ndBrainLayerCrossCorrelation_2d.h>
-#include <ndBrainAgentDiscretePolicyGradient.h>
 #include <ndBrainAgentContinuePolicyGradient.h>
 #include <ndBrainLossCategoricalCrossEntropy.h>
 #include <ndBrainLayerActivationSigmoidLinear.h>
 #include <ndBrainLayerConvolutionalWithDropOut_2d.h>
 #include <ndBrainLayerActivationCategoricalSoftmax.h>
-#include <ndBrainAgentDiscretePolicyGradient_Trainer.h>
 #include <ndBrainAgentContinuePolicyGradient_Trainer.h>
 #include <ndBrainAgentDeterministicPolicyGradient_Trainer.h>
 

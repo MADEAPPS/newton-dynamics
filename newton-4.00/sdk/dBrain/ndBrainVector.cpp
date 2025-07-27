@@ -167,6 +167,16 @@ void ndBrainVector::Scale(ndBrainFloat scale)
 	ndScale(ndInt32(GetCount()), &(*this)[0], scale);
 }
 
+void ndBrainVector::Min(ndBrainFloat b)
+{
+	ndMin (ndInt32(GetCount()), &(*this)[0], b);
+}
+
+void ndBrainVector::Max(ndBrainFloat b)
+{
+	ndMax(ndInt32(GetCount()), &(*this)[0], b);
+}
+
 void ndBrainVector::Clamp(ndBrainFloat min, ndBrainFloat max)
 {
 	for (ndInt64 i = GetCount() - 1; i >= 0; --i)
