@@ -24,9 +24,7 @@
 
 #include "ndBrainStdafx.h"
 #include "ndBrainLayerActivation.h"
-//#include "ndBrainLayerLinear.h"
 
-//#define ND_LINEAL_DROPOUT_FACTOR ndBrainFloat(0.7f)
 #define ND_BRAIN_LAYER_ACTIVATION_LINEAR_DROPOUT	"ndBrainLayerLinearWithDropOut"
 
 class ndBrainLayerLinearWithDropOut : public ndBrainLayerActivation
