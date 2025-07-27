@@ -36,9 +36,7 @@
 // https://spinningup.openai.com/en/latest/algorithms/td3.html
 // https://spinningup.openai.com/en/latest/algorithms/sac.html
 
-#define ND_DETERMINISTIC_POLICY_FIX_SIGMA			ndBrainFloat(0.5f)
-#define ND_DETERMINISTIC_POLICY_MIN_LOG_SIGMA		ndBrainFloat(-4.0f)
-#define ND_DETERMINISTIC_POLICY_MAX_LOG_SIGMA		ndBrainFloat( 0.0f)
+#define ND_DETERMINISTIC_POLICY_ACTIVATION_NAME		"ndBrainAgentDeterministicPolicyGradient"
 
 class ndBrainFloatBuffer;
 class ndBrainIntegerBuffer;
@@ -133,6 +131,7 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 {
 	public:
+	class ndActivation;
 	class HyperParameters
 	{
 		public:
