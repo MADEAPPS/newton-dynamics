@@ -65,6 +65,8 @@ class ndBrainLayerActivationLinear : public ndBrainLayerActivation
 
 	ndBrainVector m_slopes;
 	ndBrainVector m_biases;
+	mutable ndSharedPtr<ndBrainFloatBuffer> m_slopesBuffer;
+	mutable ndSharedPtr<ndBrainFloatBuffer> m_biasesBuffer;
 };
 
 #endif 

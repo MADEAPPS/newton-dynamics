@@ -32,6 +32,8 @@ ndBrainLayerActivationLinear::ndBrainLayerActivationLinear(const ndBrainVector& 
 	:ndBrainLayerActivation(ndInt32 (slopes.GetCount()))
 	,m_slopes(slopes)
 	,m_biases(biases)
+	,m_slopesBuffer(nullptr)
+	,m_biasesBuffer(nullptr)
 {
 	ndAssert(slopes.GetCount() == biases.GetCount());
 }
@@ -40,6 +42,8 @@ ndBrainLayerActivationLinear::ndBrainLayerActivationLinear(const ndBrainLayerAct
 	:ndBrainLayerActivation(src)
 	,m_slopes(src.m_slopes)
 	,m_biases(src.m_biases)
+	,m_slopesBuffer(nullptr)
+	,m_biasesBuffer(nullptr)
 {
 }
 
@@ -130,14 +134,12 @@ void ndBrainLayerActivationLinear::MakePrediction(const ndBrainVector& input, nd
 
 void ndBrainLayerActivationLinear::InputDerivative(const ndBrainVector&, const ndBrainVector&, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
-	ndAssert(m_slopes.GetCount() == m_biases.GetCount());
 	ndAssert(m_slopes.GetCount() == outputDerivative.GetCount());
 	ndAssert(inputDerivative.GetCount() == outputDerivative.GetCount());
 
 	inputDerivative.Set(m_slopes);
 	inputDerivative.Mul(outputDerivative);
 }
-
 
 bool ndBrainLayerActivationLinear::HasGpuSupport() const
 {
@@ -211,8 +213,12 @@ ndCommandArray ndBrainLayerActivationLinear::CreateGpuFeedForwardCommand(
 	}
 	else
 	{
-		ndAssert(0);
-		//descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerTanhActivation;
+		m_slopesBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(context, m_slopes));
+		m_biasesBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(context, m_biases));
+		descriptor.PushBack(*m_biasesBuffer);
+		descriptor.PushBack(*m_slopesBuffer);
+
+		descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerLinearActivation;
 		command = new ndBrainGpuCommand(descriptor);
 	}
 	ndCommandArray commandArray(0);
@@ -235,19 +241,22 @@ ndCommandArray ndBrainLayerActivationLinear::CreateGpuBackPropagateCommand(
 		inputOutputData, weightsAndBias,
 		inputOutputGradients, weightsAndBiasGradients));
 
-	ndCommandArray comnands(0);
+	ndCommandArray commands(0);
 
 	if (context->GetAsCpuContext())
 	{
 		ndBrainBufferCommand* const command = new ndBrainLayerBackPropagateCpuCommand(descriptor, (ndBrainLayer*)this);
-		comnands.PushBack(command);
+		commands.PushBack(command);
 	}
 	else
 	{
-		ndAssert(0);
-		//descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerTanhBackPropagate;
+		//descriptor.PushBack(*m_biasesBuffer);
+		descriptor.PushBack(*m_slopesBuffer);
+		descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerLinearPropagate;
 		ndBrainBufferCommand* const command = new ndBrainGpuCommand(descriptor);
-		comnands.PushBack(command);
+		commands.PushBack(command);
 	}
-	return comnands;
+	return commands;
 }
+
+

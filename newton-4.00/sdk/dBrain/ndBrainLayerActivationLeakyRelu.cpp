@@ -234,18 +234,18 @@ ndCommandArray ndBrainLayerActivationLeakyRelu::CreateGpuBackPropagateCommand(
 		inputOutputData, weightsAndBias,
 		inputOutputGradients, weightsAndBiasGradients));
 
-	ndCommandArray comnands(0);
+	ndCommandArray commands(0);
 
 	if (context->GetAsCpuContext())
 	{
 		ndBrainBufferCommand* const command = new ndBrainLayerBackPropagateCpuCommand(descriptor, (ndBrainLayer*)this);
-		comnands.PushBack(command);
+		commands.PushBack(command);
 	}
 	else
 	{
 		descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerLeakyReluBackPropagate;
 		ndBrainBufferCommand* const command = new ndBrainGpuCommand(descriptor);
-		comnands.PushBack(command);
+		commands.PushBack(command);
 	}
-	return comnands;
+	return commands;
 }

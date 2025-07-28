@@ -78,7 +78,7 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters::HyperParameter
 	m_hiddenLayersNumberOfNeurons = 256;
 	m_replayBufferStartOptimizeSize = 1024 * 64;
 
-m_useGpuBackend = false;
+//m_useGpuBackend = false;
 //m_miniBatchSize = 16;
 //m_miniBatchSize = 128;
 //m_hiddenLayersNumberOfNeurons = 64;
@@ -197,7 +197,6 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer::ndActivation : public ndB
 		ndAssert(dstBase >= 0);
 		ndAssert(inputSize == info.m_outputSize);
 
-
 		const ndBrainMemVector output(&inputOutputBuffer[dstBase], inputSize);
 		const ndBrainMemVector outputDerivative(&inputOutputGradientsBuffer[dstBase], inputSize);
 		ndBrainMemVector inputDerivative(&inputOutputGradientsBuffer[srcBase], inputSize);
@@ -234,8 +233,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer::ndActivation : public ndB
 		}
 		else
 		{
-			ndAssert(0);
-			//descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerDropOutActivation;
+			descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerDeterministicPolicyActivation;
 			command = new ndBrainGpuCommand(descriptor);
 		}
 		ndCommandArray commandArray(0);
@@ -258,21 +256,20 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer::ndActivation : public ndB
 			inputOutputData, weightsAndBias,
 			inputOutputGradients, weightsAndBiasGradients));
 
-		ndCommandArray comnands(0);
+		ndCommandArray commands(0);
 
 		if (context->GetAsCpuContext())
 		{
 			ndBrainBufferCommand* const command = new ndBrainLayerBackPropagateCpuCommand(descriptor, (ndBrainLayer*)this);
-			comnands.PushBack(command);
+			commands.PushBack(command);
 		}
 		else
 		{
-			ndAssert(0);
-			//descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerDropOutBackPropagate;
+			descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerDeterministicPolicyBackPropagate;
 			ndBrainBufferCommand* const command = new ndBrainGpuCommand(descriptor);
-			comnands.PushBack(command);
+			commands.PushBack(command);
 		}
-		return comnands;
+		return commands;
 	}
 };
 
@@ -571,6 +568,11 @@ ndBrainAgentDeterministicPolicyGradient_Trainer::~ndBrainAgentDeterministicPolic
 {
 }
 
+ndBrainLayer* ndBrainAgentDeterministicPolicyGradient_Trainer::LoadActivation(const ndBrainLoad* const loadSave)
+{
+	return ndActivation::Load(loadSave);
+}
+
 ndBrain* ndBrainAgentDeterministicPolicyGradient_Trainer::GetPolicyNetwork()
 {
 	return *m_policyTrainer->GetBrain();
@@ -635,7 +637,7 @@ void ndBrainAgentDeterministicPolicyGradient_Trainer::BuildPolicyClass()
 	}
 	policy->InitWeights();
 
-	ndSharedPtr<ndBrain> referencePolicy(policy);
+	ndSharedPtr<ndBrain> referencePolicy(new ndBrain(**policy));
 	ndTrainerDescriptor referenceDescriptor(referencePolicy, m_context, m_parameters.m_miniBatchSize, m_parameters.m_policyLearnRate);
 	referenceDescriptor.m_regularizer = m_parameters.m_policyRegularizer;
 	referenceDescriptor.m_regularizerType = m_parameters.m_policyRegularizerType;

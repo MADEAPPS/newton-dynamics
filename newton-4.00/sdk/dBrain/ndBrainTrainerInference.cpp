@@ -394,11 +394,11 @@ void ndBrainTrainerInference::AddLayersCommands(ndFixSizeArray<ndCommandSharedIn
 		uniformParam.m_parametersBatchSize = data.m_parametersBatchSize;
 		uniformParam.m_parametersStartOffset = data.m_parametersStartOffset;
 
-		ndCommandArray backCommands(layer->CreateGpuFeedForwardCommand(
+		ndCommandArray forwardCommands(layer->CreateGpuFeedForwardCommand(
 			this, *m_descriptor.m_context, uniformParam, m_descriptor.m_minibatchSize, inputOutputBuffer, weightsBuffer));
-		for (ndInt32 j = 0; j < backCommands.GetCount(); ++j)
+		for (ndInt32 j = 0; j < forwardCommands.GetCount(); ++j)
 		{
-			ndSharedPtr<ndBrainBufferCommand>command(backCommands[j]);
+			ndSharedPtr<ndBrainBufferCommand>command(forwardCommands[j]);
 			m_feedForwardCommands.Append(command);
 		}
 	}

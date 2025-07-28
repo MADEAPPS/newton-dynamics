@@ -80,24 +80,29 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 	ndSharedPtr<ndBrainKernel> m_brainCopyOutput;
 	ndSharedPtr<ndBrainKernel> m_brainLayerReluActivation;
 	ndSharedPtr<ndBrainKernel> m_brainLayerTanhActivation;
+	ndSharedPtr<ndBrainKernel> m_brainLayerLinearActivation;
 	ndSharedPtr<ndBrainKernel> m_brainLayerSoftmaxActivation;
 	ndSharedPtr<ndBrainKernel> m_brainLayerDropOutActivation;
 	ndSharedPtr<ndBrainKernel> m_brainLayerLeakyReluActivation;
 	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixMatrixMultiply;
+	ndSharedPtr<ndBrainKernel> m_brainLayerDeterministicPolicyActivation;
 
 	// back propagate shaders
 	ndSharedPtr<ndBrainKernel> m_brainCopyInputGradients;
 	ndSharedPtr<ndBrainKernel> m_brainCopyOutputGradients;
+	ndSharedPtr<ndBrainKernel> m_brainLayerLinearPropagate;
 	ndSharedPtr<ndBrainKernel> m_brainLayerReluBackPropagate;
 	ndSharedPtr<ndBrainKernel> m_brainLayerTanhBackPropagate;
 	ndSharedPtr<ndBrainKernel> m_brainLayerDropOutBackPropagate;
 	ndSharedPtr<ndBrainKernel> m_brainLayerLeakyReluBackPropagate;
+	ndSharedPtr<ndBrainKernel> m_brainLayerDeterministicPolicyBackPropagate;
 	ndSharedPtr<ndBrainKernel> m_brainLayerCathegoricalSoftmaxBackPropagate;
 	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixBackPropagateBiasGradients;
 	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixBackPropagateInputGradients;
 	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixBackPropagateWeightGradients;
 	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixBackPropagateAddBiasGradients;
 	ndSharedPtr<ndBrainKernel> m_brainLayerMatrixBackPropagateClearBiasGradients;
+	
 
 	// optimizer shaders
 	ndSharedPtr<ndBrainKernel> m_brainAdamMomentumUpdate;
