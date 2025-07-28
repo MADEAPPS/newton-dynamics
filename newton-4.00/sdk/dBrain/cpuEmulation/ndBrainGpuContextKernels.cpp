@@ -352,8 +352,8 @@ class brainLayerLinearActivation : public ndBrainKernel
         {
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
             {
-                float  bias = biasPtr[i + itemId];
-                float  slope = slopesPtr[i + itemId];
+                ndBrainFloat bias = biasPtr[i + itemId];
+                ndBrainFloat slope = slopesPtr[i + itemId];
                 ndBrainFloat inputValue = inputOutputData[inputOffset + i + itemId];
                 ndBrainFloat outputValue = bias + slope * inputValue;
                 inputOutputData[outputOffset + i + itemId] = outputValue;
@@ -361,19 +361,20 @@ class brainLayerLinearActivation : public ndBrainKernel
         }
         for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
         {
-            float  bias = biasPtr[modWorkGroupSize + itemId];
-            float  slope = slopesPtr[modWorkGroupSize + itemId];
+            ndBrainFloat bias = biasPtr[modWorkGroupSize + itemId];
+            ndBrainFloat slope = slopesPtr[modWorkGroupSize + itemId];
             ndBrainFloat inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
+
             ndBrainFloat outputValue = bias + slope * inputValue;
             inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
         }
     }
 };
 
-class brainLayerDeterministicPolicyActivation : public ndBrainKernel
+class brainLayerOffPolicyActivation : public ndBrainKernel
 {
     public:
-    brainLayerDeterministicPolicyActivation(ndBrainContext* const context)
+    brainLayerOffPolicyActivation(ndBrainContext* const context)
         :ndBrainKernel(context)
     {
     }
@@ -401,8 +402,8 @@ class brainLayerDeterministicPolicyActivation : public ndBrainKernel
         {
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
             {
-                ndBrainFloat blend1 = ((i + itemId) >= halfSize) ? 1.0f : 0.0f;
-                ndBrainFloat blend0 = 1.0f - blend1;
+                ndBrainFloat blend1 = ((i + itemId) >= halfSize) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+                ndBrainFloat blend0 = ndBrainFloat(1.0f) - blend1;
 
                 ndBrainFloat inputValue = inputOutputData[inputOffset + i + itemId];
                 ndBrainFloat expenential = ndExp_VSFix(inputValue);
@@ -1764,10 +1765,10 @@ void ndBrainGpuContext::CreateKerners()
     m_brainLayerTanhActivation = ndSharedPtr<ndBrainKernel>(new brainLayerTanhActivation(this));
     m_brainLayerLinearActivation = ndSharedPtr<ndBrainKernel>(new brainLayerLinearActivation(this));
     m_brainLayerSoftmaxActivation = ndSharedPtr<ndBrainKernel>(new brainLayerSoftmaxActivation(this));
-    m_brainLayerDropOutActivation = ndSharedPtr<ndBrainKernel>(new brainLayerLinearDropOutActivation(this));
     m_brainLayerLeakyReluActivation = ndSharedPtr<ndBrainKernel>(new brainLayerLeakyReluActivation(this));
+    m_brainLayerOffPolicyActivation = ndSharedPtr<ndBrainKernel>(new brainLayerOffPolicyActivation(this));
+    m_brainLayerDropOutActivation = ndSharedPtr<ndBrainKernel>(new brainLayerLinearDropOutActivation(this));
     m_brainLayerMatrixMatrixMultiply = ndSharedPtr<ndBrainKernel>(new brainLayerMatrixMatrixMultiply(this));
-    m_brainLayerOffPolicyActivation = ndSharedPtr<ndBrainKernel>(new brainLayerDeterministicPolicyActivation(this));
 
     // create all backpropagate shaders
     m_brainCopyInputGradients = ndSharedPtr<ndBrainKernel>(new brainCopyInputGradients(this));

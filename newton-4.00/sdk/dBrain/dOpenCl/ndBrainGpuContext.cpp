@@ -323,6 +323,7 @@ void ndBrainGpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
 	cl_int numberOfParameters = 0;
 	ndBrainBufferCommandDesc& desc = command->GetDescriptor();
 	OpenclKernel* const kernel = (OpenclKernel*)*desc.m_kernel;
+	ndAssert(kernel);
 	cl::Kernel* const shader = *kernel->m_shader;
 
 	error = shader->getInfo(CL_KERNEL_NUM_ARGS, &numberOfParameters);

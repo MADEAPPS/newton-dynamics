@@ -226,7 +226,7 @@ R""""(
         }
     }
 
-    __kernel void brainLayerDropOutActivation(__global const UniformBufferLayerArguments* parameters, __global float* inputOutputData, __global float* notUsed)  
+    __kernel void brainLayerLinearDropOutActivation(__global const UniformBufferLayerArguments* parameters, __global float* inputOutputData, __global float* notUsed)  
     {
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
@@ -254,6 +254,90 @@ R""""(
             inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
         }
     }
+
+    __kernel void brainLayerLinearActivation(
+        __global const UniformBufferLayerArguments* parameters, 
+        __global float* inputOutputData, 
+        __global float* notUsed,
+        __global float* biasPtr,
+        __global float* slopesPtr)
+    {
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+        
+        uint inputSize = parameters->m_inputSize;
+        uint inputOutputSize = parameters->m_inputOutputSize;
+        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+        
+        long inputOffset = groupId * (long)inputOutputSize + inputOutputStartOffset;
+        long outputOffset = inputOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
+
+        uint workGroupSizeReminder = inputSize % workGroupSize;
+        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            float  bias = biasPtr[i + itemId];
+            float  slope = slopesPtr[i + itemId];
+            float inputValue = inputOutputData[inputOffset + i + itemId];
+
+            float outputValue =  bias + slope * inputValue;
+            inputOutputData[outputOffset + i + itemId] = outputValue;
+        }
+        if (itemId < workGroupSizeReminder)
+        {
+            float bias = biasPtr[modWorkGroupSize + itemId];
+            float slope = slopesPtr[modWorkGroupSize + itemId];
+            float inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
+
+            float outputValue = bias + slope * inputValue;
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
+        }
+    }
+
+    __kernel void brainLayerOffPolicyActivation(
+        __global const UniformBufferLayerArguments* parameters, 
+        __global float* inputOutputData, 
+        __global float* notUsed)
+    {
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+        
+        uint inputSize = parameters->m_inputSize;
+        uint inputOutputSize = parameters->m_inputOutputSize;
+        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+        
+        long inputOffset = groupId * (long)inputOutputSize + inputOutputStartOffset;
+        long outputOffset = inputOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
+
+        uint halfSize = inputSize / 2;
+        uint workGroupSizeReminder = inputSize % workGroupSize;
+        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            float blend1 = ((i + itemId) >= halfSize) ? 1.0 : 0.0;
+            float blend0 = 1.0 - blend1;
+
+            float inputValue = inputOutputData[inputOffset + i + itemId];
+            float expenential = exp(inputValue);
+
+            float outputValue = inputValue * blend0 + expenential * blend1;
+            inputOutputData[outputOffset + i + itemId] = outputValue;
+        }
+        if (itemId < workGroupSizeReminder)
+        {
+            float blend1 = ((modWorkGroupSize + itemId) >= halfSize) ? 1.0 : 0.0;
+            float blend0 = 1.0 - blend1;
+
+            float inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
+            float expenential = exp(inputValue);
+
+            float outputValue = inputValue * blend0 + expenential * blend1;
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
+        }
+    }
+
 )"""";
 
 const char* ndBrainGpuContext::m_feedForwardKernels_3 =
@@ -1457,9 +1541,11 @@ void ndBrainGpuContext::CreateKerners()
     m_brainCopyOutput = CreateKerner(program, "brainCopyOutput");
     m_brainLayerReluActivation = CreateKerner(program, "brainLayerReluActivation");
     m_brainLayerTanhActivation = CreateKerner(program, "brainLayerTanhActivation");
+    m_brainLayerLinearActivation = CreateKerner(program, "brainLayerLinearActivation");
     m_brainLayerSoftmaxActivation = CreateKerner(program, "brainLayerSoftmaxActivation");
-    m_brainLayerDropOutActivation = CreateKerner(program, "brainLayerDropOutActivation");
     m_brainLayerLeakyReluActivation = CreateKerner(program, "brainLayerLeakyReluActivation");
+    m_brainLayerOffPolicyActivation = CreateKerner(program, "brainLayerOffPolicyActivation");
+    m_brainLayerDropOutActivation = CreateKerner(program, "brainLayerLinearDropOutActivation");
     m_brainLayerMatrixMatrixMultiply = CreateKerner(program, "brainLayerMatrixMatrixMultiply");
 
     // create all backpropagate shaders
