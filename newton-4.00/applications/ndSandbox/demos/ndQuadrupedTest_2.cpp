@@ -300,15 +300,15 @@ namespace ndQuadruped_2
 		};
 		
 #ifdef USE_DDPG
-		class ndControllerTrainer : public ndBrainAgentDeterministicPolicyGradient_Agent
+		class ndControllerTrainer : public ndBrainAgentOffPolicyGradient_Agent
 #else
 		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Agent
 #endif
 		{
 			public:
 #ifdef USE_DDPG
-			ndControllerTrainer(const ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>& master, RobotModelNotify* const robot)
-				:ndBrainAgentDeterministicPolicyGradient_Agent(master)
+			ndControllerTrainer(const ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master, RobotModelNotify* const robot)
+				:ndBrainAgentOffPolicyGradient_Agent(master)
 #else
 			ndControllerTrainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, RobotModelNotify* const robot)
 				: ndBrainAgentContinuePolicyGradient_Agent(master)
@@ -392,7 +392,7 @@ namespace ndQuadruped_2
 		}
 
 		#ifdef USE_DDPG
-		void SetControllerTrainer(const ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>& master)
+		void SetControllerTrainer(const ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master)
 		#else
 		void SetControllerTrainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
 		#endif
@@ -1150,14 +1150,14 @@ namespace ndQuadruped_2
 				fprintf(m_outFile, "sac\n");
 
 				m_stopTraining = 1000000;
-				ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
+				ndBrainAgentOffPolicyGradient_Trainer::HyperParameters hyperParameters;
 
 				//hyperParameters.m_usePerActionSigmas = true;
 				hyperParameters.m_numberOfActions = numberOfActions;
 				hyperParameters.m_numberOfObservations = numberOfObservations;
 				hyperParameters.m_numberOfHiddenLayers = hiddenLayers;
 				hyperParameters.m_hiddenLayersNumberOfNeurons = hiddenLayersNeurons;
-				m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
+				m_master = ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>(new ndBrainAgentOffPolicyGradient_Trainer(hyperParameters));
 			#else
 				m_outFile = fopen("ndQuadruped_2-ppo.csv", "wb");
 				fprintf(m_outFile, "ppo\n");
@@ -1368,7 +1368,7 @@ namespace ndQuadruped_2
 		}
 
 #ifdef USE_DDPG
-		ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer> m_master;
+		ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer> m_master;
 #else
 		ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
 #endif

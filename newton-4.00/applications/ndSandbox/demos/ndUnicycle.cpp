@@ -168,15 +168,15 @@ namespace ndUnicycle
 		};
 
 #ifdef USE_SAC
-		class ndControllerTrainer : public ndBrainAgentDeterministicPolicyGradient_Agent
+		class ndControllerTrainer : public ndBrainAgentOffPolicyGradient_Agent
 #else
 		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Agent
 #endif
 		{
 			public:
 #ifdef USE_SAC
-			ndControllerTrainer(const ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>& master)
-				:ndBrainAgentDeterministicPolicyGradient_Agent(master)
+			ndControllerTrainer(const ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master)
+				:ndBrainAgentOffPolicyGradient_Agent(master)
 #else
 			ndControllerTrainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
 				:ndBrainAgentContinuePolicyGradient_Agent(master)
@@ -217,7 +217,7 @@ namespace ndUnicycle
 
 		public:
 #ifdef USE_SAC
-		RobotModelNotify(ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>& master, ndModelArticulation* const robot)
+		RobotModelNotify(ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master, ndModelArticulation* const robot)
 #else
 		RobotModelNotify(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot)
 #endif
@@ -549,10 +549,10 @@ namespace ndUnicycle
 				fprintf(m_outFile, "sac\n");
 				m_stopTraining = 50000;
 
-				ndBrainAgentDeterministicPolicyGradient_Trainer::HyperParameters hyperParameters;
+				ndBrainAgentOffPolicyGradient_Trainer::HyperParameters hyperParameters;
 				hyperParameters.m_numberOfActions = m_actionsSize;
 				hyperParameters.m_numberOfObservations = m_observationsSize;
-				m_master = ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>(new ndBrainAgentDeterministicPolicyGradient_Trainer(hyperParameters));
+				m_master = ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>(new ndBrainAgentOffPolicyGradient_Trainer(hyperParameters));
 			#else
 				m_outFile = fopen("unicycle_pp0.csv", "wb");
 				fprintf(m_outFile, "ppo\n");
@@ -745,7 +745,7 @@ namespace ndUnicycle
 		}
 
 #ifdef USE_SAC
-		ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer> m_master;
+		ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer> m_master;
 #else
 		ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
 #endif

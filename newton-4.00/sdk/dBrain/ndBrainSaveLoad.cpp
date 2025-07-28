@@ -38,7 +38,7 @@
 #include "ndBrainLayerActivationSigmoidLinear.h"
 #include "ndBrainLayerActivationCategoricalSoftmax.h"
 //#include "ndBrainAgentContinuePolicyGradient_Trainer.h"
-#include "ndBrainAgentDeterministicPolicyGradient_Trainer.h"
+#include "ndBrainAgentOffPolicyGradient_Trainer.h"
 //#include "ndBrainLayerConvolutionalWithDropOut_2d.h"
 
 ndBrain* ndBrainLoad::Load(const char* const pathName)
@@ -132,10 +132,10 @@ ndBrain* ndBrainLoad::Load() const
 		{
 			layer = ndBrainLayerLinearWithDropOut::Load(this);
 		}
-		else if (!strcmp(layerType, ND_DETERMINISTIC_POLICY_ACTIVATION_NAME))
+		else if (!strcmp(layerType, ND_OFF_POLICY_ACTIVATION_NAME))
 		{
 			// special activation for mapping gaussian deviation in policy gradiends agents
-			layer = ndBrainAgentDeterministicPolicyGradient_Trainer::LoadActivation(this);
+			layer = ndBrainAgentOffPolicyGradient_Trainer::LoadActivation(this);
 		}
 
 		else if (!strcmp(layerType, ND_BRAIN_LAYER_ACTIVATION_CATEGORICAL_SOFTMAX))

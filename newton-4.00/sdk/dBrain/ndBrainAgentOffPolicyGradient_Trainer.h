@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_AGENT_DDPG_TRAINER_H__
-#define _ND_BRAIN_AGENT_DDPG_TRAINER_H__
+#ifndef _ND_BRAIN_AGENT_OFF_POLICY_TRAINER_H__
+#define _ND_BRAIN_AGENT_OFF_POLICY_TRAINER_H__
 
 #include "ndBrainStdafx.h"
 
@@ -35,14 +35,14 @@
 // https://spinningup.openai.com/en/latest/algorithms/td3.html
 // https://spinningup.openai.com/en/latest/algorithms/sac.html
 
-#define ND_DETERMINISTIC_POLICY_ACTIVATION_NAME		"ndBrainAgentDeterministicPolicyGradient"
+#define ND_OFF_POLICY_ACTIVATION_NAME		"ndBrainAgentOffPolicyGradient"
 
 class ndBrainFloatBuffer;
 class ndBrainIntegerBuffer;
 class ndBrainUniformBuffer;
-class ndBrainAgentDeterministicPolicyGradient_Trainer;
+class ndBrainAgentOffPolicyGradient_Trainer;
 
-class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
+class ndBrainAgentOffPolicyGradient_Agent: public ndBrainAgent
 {
 	class ndRandomGenerator
 	{
@@ -108,8 +108,8 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 	};
 
 	public:
-	ndBrainAgentDeterministicPolicyGradient_Agent(const ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer>& master);
-	~ndBrainAgentDeterministicPolicyGradient_Agent();
+	ndBrainAgentOffPolicyGradient_Agent(const ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master);
+	~ndBrainAgentOffPolicyGradient_Agent();
 
 	virtual void Step();
 	virtual void InitWeights() { ndAssert(0); }
@@ -120,14 +120,14 @@ class ndBrainAgentDeterministicPolicyGradient_Agent: public ndBrainAgent
 
 	void SampleActions(ndBrainVector& action);
 
-	ndSharedPtr<ndBrainAgentDeterministicPolicyGradient_Trainer> m_owner;
+	ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer> m_owner;
 	ndTrajectory m_trajectory;
 	ndRandomGenerator m_randomeGenerator;
 	ndUnsigned32 m_trajectoryBaseIndex;
-	friend class ndBrainAgentDeterministicPolicyGradient_Trainer;
+	friend class ndBrainAgentOffPolicyGradient_Trainer;
 };
 
-class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
+class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 {
 	public:
 	class ndActivation;
@@ -165,8 +165,8 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 		ndRegularizerType m_criticRegularizerType;
 	};
 
-	ndBrainAgentDeterministicPolicyGradient_Trainer(const HyperParameters& parameters);
-	virtual ~ndBrainAgentDeterministicPolicyGradient_Trainer();
+	ndBrainAgentOffPolicyGradient_Trainer(const HyperParameters& parameters);
+	virtual ~ndBrainAgentOffPolicyGradient_Trainer();
 
 	const ndString& GetName() const;
 	void SetName(const ndString& name);
@@ -209,7 +209,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	ndSharedPtr<ndBrainTrainerInference> m_referencePolicyTrainer;
 	ndSharedPtr<ndBrainTrainerInference> m_referenceCriticTrainer[2];
 
-	ndBrainAgentDeterministicPolicyGradient_Agent* m_agent;
+	ndBrainAgentOffPolicyGradient_Agent* m_agent;
 	std::mt19937 m_randomGenerator;
 	std::uniform_real_distribution<ndFloat32> m_uniformDistribution;
 
@@ -244,7 +244,7 @@ class ndBrainAgentDeterministicPolicyGradient_Trainer : public ndClassAlloc
 	bool m_replayIsFilled;
 	bool m_startOptimization;
 
-	friend class ndBrainAgentDeterministicPolicyGradient_Agent;
+	friend class ndBrainAgentOffPolicyGradient_Agent;
 };
 
 #endif 
