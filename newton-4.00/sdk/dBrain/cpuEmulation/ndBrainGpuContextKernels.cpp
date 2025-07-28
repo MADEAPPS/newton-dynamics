@@ -1242,7 +1242,6 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
         ndBrainFloat biasValueReg[1024];
         for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
         {
-            //ndInt32 itemId_x = itemId & (tileSize - 1);
             ndInt32 itemId_y = itemId >> tileSizeBits;
             ndAssert((itemId & (tileSize - 1)) < tileSize);
             ndAssert((itemId >> tileSizeBits) < tileSize);
