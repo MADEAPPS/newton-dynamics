@@ -1244,8 +1244,9 @@ class brainLayerMatrixMatrixMultiply : public ndBrainKernel
         {
             //ndInt32 itemId_x = itemId & (tileSize - 1);
             ndInt32 itemId_y = itemId >> tileSizeBits;
-            ndAssert(itemId_x < (itemId & (tileSize - 1)));
-            ndAssert(itemId_y < (itemId >> tileSizeBits));
+            ndAssert((itemId & (tileSize - 1)) < tileSize);
+            ndAssert((itemId >> tileSizeBits) < tileSize);
+
             biasValueReg[itemId] = tile_inputs[0][itemId_y];
         }
 
@@ -1767,7 +1768,7 @@ void ndBrainGpuContext::CreateKerners()
     m_brainLayerDropOutActivation = ndSharedPtr<ndBrainKernel>(new brainLayerLinearDropOutActivation(this));
     m_brainLayerLeakyReluActivation = ndSharedPtr<ndBrainKernel>(new brainLayerLeakyReluActivation(this));
     m_brainLayerMatrixMatrixMultiply = ndSharedPtr<ndBrainKernel>(new brainLayerMatrixMatrixMultiply(this));
-    m_brainLayerDeterministicPolicyActivation = ndSharedPtr<ndBrainKernel>(new brainLayerDeterministicPolicyActivation(this));
+    m_brainLayerOffPolicyActivation = ndSharedPtr<ndBrainKernel>(new brainLayerDeterministicPolicyActivation(this));
 
     // create all backpropagate shaders
     m_brainCopyInputGradients = ndSharedPtr<ndBrainKernel>(new brainCopyInputGradients(this));
@@ -1777,7 +1778,7 @@ void ndBrainGpuContext::CreateKerners()
     m_brainLayerTanhBackPropagate = ndSharedPtr<ndBrainKernel>(new brainLayerBrainTanhBackPropagate(this));
     m_brainLayerLeakyReluBackPropagate = ndSharedPtr<ndBrainKernel>(new brainLayerBrainLeakyReluBackPropagate(this));
     m_brainLayerDropOutBackPropagate = ndSharedPtr<ndBrainKernel>(new brainLayerBrainLinearDropOutBackPropagate(this));
-    m_brainLayerDeterministicPolicyBackPropagate = ndSharedPtr<ndBrainKernel>(new brainLayerBrainDeterministicPolicyBackPropagate(this));
+    m_brainLayerOffPolicyBackPropagate = ndSharedPtr<ndBrainKernel>(new brainLayerBrainDeterministicPolicyBackPropagate(this));
     m_brainLayerCathegoricalSoftmaxBackPropagate = ndSharedPtr<ndBrainKernel>(new brainLayerBrainCathegoricalSoftmaxBackPropagate(this));
     m_brainLayerMatrixBackPropagateBiasGradients = ndSharedPtr<ndBrainKernel>(new brainLayerBrainBackPropagateMatrixBiasGradients(this));
     m_brainLayerMatrixBackPropagateInputGradients = ndSharedPtr<ndBrainKernel>(new brainLayerBrainBackPropagateMatrixInputGradients(this));

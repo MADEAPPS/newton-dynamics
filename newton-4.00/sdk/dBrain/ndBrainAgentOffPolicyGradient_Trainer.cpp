@@ -234,7 +234,7 @@ class ndBrainAgentOffPolicyGradient_Trainer::ndActivation : public ndBrainLayerA
 		}
 		else
 		{
-			descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerDeterministicPolicyActivation;
+			descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerOffPolicyActivation;
 			command = new ndBrainGpuCommand(descriptor);
 		}
 		ndCommandArray commandArray(0);
@@ -266,7 +266,7 @@ class ndBrainAgentOffPolicyGradient_Trainer::ndActivation : public ndBrainLayerA
 		}
 		else
 		{
-			descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerDeterministicPolicyBackPropagate;
+			descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerOffPolicyBackPropagate;
 			ndBrainBufferCommand* const command = new ndBrainGpuCommand(descriptor);
 			commands.PushBack(command);
 		}

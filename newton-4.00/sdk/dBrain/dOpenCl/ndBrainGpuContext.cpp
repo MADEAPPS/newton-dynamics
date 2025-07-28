@@ -543,19 +543,37 @@ void ndBrainGpuContext::CopyBuffer(ndBrainBuffer& dstData, const ndBrainBuffer& 
 	SubmitMathOperation(m_brainAssigment, &dstData, &srcData);
 }
 
-void ndBrainGpuContext::Scale(ndBrainFloatBuffer& buffer, ndBrainFloat scale)
-{
-	SubmitMathOperation(m_brainScale, &buffer, scale);
-}
-
 void ndBrainGpuContext::ScaleAdd(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat scale)
 {
 	SubmitMathOperation(m_brainScaleAdd, &buffer, &srcBuffer, scale);
 }
 
+void ndBrainGpuContext::Scale(ndBrainFloatBuffer& buffer, ndBrainFloat scale)
+{
+	SubmitMathOperation(m_brainScale, &buffer, scale);
+}
+
+void ndBrainGpuContext::Min(ndBrainFloatBuffer& buffer, ndBrainFloat value)
+{
+	ndAssert(0);
+	//SubmitMathOperation(m_brainMin, &buffer, &srcBuffer);
+}
+
+void ndBrainGpuContext::Max(ndBrainFloatBuffer& buffer, ndBrainFloat value)
+{
+	ndAssert(0);
+	//SubmitMathOperation(m_brainMin, &buffer, &srcBuffer);
+}
+
 void ndBrainGpuContext::Min(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
 {
 	SubmitMathOperation(m_brainMin, &buffer, &srcBuffer);
+}
+
+void ndBrainGpuContext::Max(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
+{
+	ndAssert(0);
+	//SubmitMathOperation(m_brainMin, &buffer, &srcBuffer);
 }
 
 void ndBrainGpuContext::Add(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
