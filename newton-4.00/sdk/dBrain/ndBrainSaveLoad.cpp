@@ -22,6 +22,7 @@
 #include "ndBrainStdafx.h"
 #include "ndBrain.h"
 #include "ndBrainSaveLoad.h"
+#include "ndBrainOptimizer.h"
 #include "ndBrainLayerLinear.h"
 #include "ndBrainLayerActivationElu.h"
 #include "ndBrainLayerActivationRelu.h"
@@ -36,7 +37,8 @@
 #include "ndBrainLayerActivationLeakyRelu.h"
 #include "ndBrainLayerActivationSigmoidLinear.h"
 #include "ndBrainLayerActivationCategoricalSoftmax.h"
-#include "ndBrainAgentContinuePolicyGradient_Trainer.h"
+//#include "ndBrainAgentContinuePolicyGradient_Trainer.h"
+#include "ndBrainAgentDeterministicPolicyGradient_Trainer.h"
 //#include "ndBrainLayerConvolutionalWithDropOut_2d.h"
 
 ndBrain* ndBrainLoad::Load(const char* const pathName)
@@ -130,6 +132,12 @@ ndBrain* ndBrainLoad::Load() const
 		{
 			layer = ndBrainLayerLinearWithDropOut::Load(this);
 		}
+		else if (!strcmp(layerType, ND_DETERMINISTIC_POLICY_ACTIVATION_NAME))
+		{
+			// special activation for mapping gaussian deviation in policy gradiends agents
+			layer = ndBrainAgentDeterministicPolicyGradient_Trainer::LoadActivation(this);
+		}
+
 		else if (!strcmp(layerType, ND_BRAIN_LAYER_ACTIVATION_CATEGORICAL_SOFTMAX))
 		{
 			layer = ndBrainLayerActivationCategoricalSoftmax::Load(this);

@@ -26,7 +26,6 @@
 
 #include "ndBrain.h"
 #include "ndBrainAgent.h"
-#include "ndBrainThreadPool.h"
 
 // this is an implementation of the vanilla deep deterministic 
 // policy gradient for continues control re enforcement learning.  
