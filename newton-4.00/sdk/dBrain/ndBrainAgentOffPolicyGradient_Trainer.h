@@ -36,6 +36,7 @@
 // https://spinningup.openai.com/en/latest/algorithms/sac.html
 
 #define ND_OFF_POLICY_ACTIVATION_NAME		"ndBrainAgentOffPolicyGradient"
+#define ND_OFF_POLICY_MOVING_AVERAGE_SCORE	16
 
 class ndBrainFloatBuffer;
 class ndBrainIntegerBuffer;
@@ -233,8 +234,8 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 
 	ndArray<ndInt32> m_shuffleBuffer;
 	ndArray<ndInt32> m_miniBatchIndices;
-	ndMovingAverage<8> m_averageExpectedRewards;
-	ndMovingAverage<8> m_averageFramesPerEpisodes;
+	ndMovingAverage<ND_OFF_POLICY_MOVING_AVERAGE_SCORE> m_averageExpectedRewards;
+	ndMovingAverage<ND_OFF_POLICY_MOVING_AVERAGE_SCORE> m_averageFramesPerEpisodes;
 
 	ndUnsigned32 m_frameCount;
 	ndUnsigned32 m_eposideCount;

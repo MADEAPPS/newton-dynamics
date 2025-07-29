@@ -885,23 +885,26 @@ R""""(
         
         const uint inputSize = parameters->m_inputSize;
         const uint outputSize = parameters->m_outputSize;
-        const uint inpuOutputStride = parameters->m_inputOutputSize;
+        const uint inputOutputSize = parameters->m_inputOutputSize;
+        const uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
         
-        const uint alignedOffset = (outputSize + 255) & -256;
+        const uint alignedOffset = CalculateWorkGroupRoundoff(outputSize, workGroupSize);
         const uint dstOffset = groupId * alignedOffset;
-        const uint srcOffset = parameters->m_inputOutputStartOffset + inputSize + groupId * inpuOutputStride;
+
+        long inputGradientOffset = groupId * (long)inputOutputSize + inputOutputStartOffset;
+        long outputGradientOffset = inputGradientOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
         
         const uint workGroupSizeReminder = outputSize % workGroupSize;
         const uint modWorkGroupSize = outputSize - workGroupSizeReminder;
         
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
-            float outputDerivative = inputOutputGradientsBuffer[srcOffset + i + itemId];
+            float outputDerivative = inputOutputGradientsBuffer[outputGradientOffset + i + itemId];
             partialBiasSumBuffer[dstOffset + i + itemId] = outputDerivative;
         }
         if (itemId < workGroupSizeReminder)
         {
-            float outputDerivative = inputOutputGradientsBuffer[srcOffset + modWorkGroupSize + itemId];
+            float outputDerivative = inputOutputGradientsBuffer[outputGradientOffset + modWorkGroupSize + itemId];
             partialBiasSumBuffer[dstOffset + modWorkGroupSize + itemId] = outputDerivative;
         }
     }

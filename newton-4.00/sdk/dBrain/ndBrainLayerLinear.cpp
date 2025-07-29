@@ -435,7 +435,7 @@ void ndBrainLayerLinear::BackPropagate(const ndBrainLayerBackPropagateCpuCommand
 {
 	const ndBrainBufferCommandDesc& desc = command->GetDescriptor();
 	const ndCommandSharedInfo& info = desc.m_info;
-	switch (info.m_matrixDimensionK & 0x0f)
+	switch (info.m_matrixDimensionK & (m_dimFactor - 1))
 	{
 		case m_biasPass:
 			BackPropagateBiasGradients(command, miniBatchIndex);
@@ -486,13 +486,16 @@ void ndBrainLayerLinear::BackPropagateBiasCachePartialSumGradients(const ndBrain
 
 	ndInt32 inputSize = info.m_inputSize;
 	ndInt32 outputSize = info.m_outputSize;
-	ndInt32 inpuOutputStride = info.m_inputOutputSize;
-	ndInt32 alignedOffset = trainer->RoundOffOffset(outputSize);
-	
-	const ndInt32 dstOffset = miniBatchIndex * alignedOffset;
-	const ndInt32 srcOffset = info.m_inputOutputStartOffset + inputSize + miniBatchIndex * inpuOutputStride;
+	ndInt32 inputOutputSize = info.m_inputOutputSize;
+	ndInt32 inputOutputStartOffset = info.m_inputOutputStartOffset;
 
-	const ndBrainMemVector srcGradients(&inputOutputGradientsBuffer[srcOffset], outputSize);
+	ndInt32 alignedOffset = trainer->RoundOffOffset(outputSize);
+	const ndInt32 dstOffset = miniBatchIndex * alignedOffset;
+
+	ndInt64 inputGradientOffset = miniBatchIndex * ndInt64(inputOutputSize) + inputOutputStartOffset;
+	ndInt64 outputGradientOffset = inputGradientOffset + trainer->RoundOffOffset(inputSize);
+
+	const ndBrainMemVector srcGradients(&inputOutputGradientsBuffer[outputGradientOffset], outputSize);
 	ndBrainMemVector dstBias (&partialBiasSumBuffer[dstOffset], outputSize);
 	dstBias.Set(srcGradients);
 }

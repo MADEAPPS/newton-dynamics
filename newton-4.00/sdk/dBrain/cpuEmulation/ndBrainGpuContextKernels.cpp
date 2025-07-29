@@ -1424,7 +1424,7 @@ class brainLayerBrainBackPropagateMatrixInputGradients : public ndBrainKernel
 class brainLayerBrainBackPropagateMatrixClearBiasGradients : public ndBrainKernel
 {
     public:
-        brainLayerBrainBackPropagateMatrixClearBiasGradients(ndBrainContext* const context)
+    brainLayerBrainBackPropagateMatrixClearBiasGradients(ndBrainContext* const context)
         :ndBrainKernel(context)
     {
     }
@@ -1441,12 +1441,14 @@ class brainLayerBrainBackPropagateMatrixClearBiasGradients : public ndBrainKerne
         
         ndInt32 inputSize = parameters->m_inputSize;
         ndInt32 outputSize = parameters->m_outputSize;
-        ndInt32 inpuOutputStride = parameters->m_inputOutputSize;
+        ndInt32 inputOutputSize = parameters->m_inputOutputSize;
+        ndInt32 inputOutputStartOffset = parameters->m_inputOutputStartOffset;
 
-        //ndInt32 alignedOffset = (outputSize + 255) & -256;
-        ndInt32 alignedOffset = (outputSize + workGroupSize - 1) & -workGroupSize;
+        ndInt32 alignedOffset = __cpuKernelRoundoff(outputSize, workGroupSize);
         const ndInt32 dstOffset = groupId * alignedOffset;
-        const ndInt32 srcOffset = parameters->m_inputOutputStartOffset + inputSize + groupId * inpuOutputStride;
+
+        ndInt64 inputGradientOffset = groupId * ndInt64(inputOutputSize) + inputOutputStartOffset;
+        ndInt64 outputGradientOffset = inputGradientOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
 
         const ndInt32 workGroupSizeReminder = outputSize % workGroupSize;
         const ndInt32 modWorkGroupSize = outputSize - workGroupSizeReminder;
@@ -1455,13 +1457,13 @@ class brainLayerBrainBackPropagateMatrixClearBiasGradients : public ndBrainKerne
         {
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
             {
-                ndBrainFloat outputDerivative = inputOutputGradientsBuffer[srcOffset + i + itemId];
+                ndBrainFloat outputDerivative = inputOutputGradientsBuffer[outputGradientOffset + i + itemId];
                 partialBiasSumBuffer[dstOffset + i + itemId] = outputDerivative;
             }
         }
         for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
         {
-            ndBrainFloat outputDerivative = inputOutputGradientsBuffer[srcOffset + modWorkGroupSize + itemId];
+            ndBrainFloat outputDerivative = inputOutputGradientsBuffer[outputGradientOffset + modWorkGroupSize + itemId];
             partialBiasSumBuffer[dstOffset + modWorkGroupSize + itemId] = outputDerivative;
         }
     }

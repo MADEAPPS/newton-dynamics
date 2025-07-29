@@ -81,9 +81,9 @@ ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 	m_replayBufferStartOptimizeSize = 1024 * 64;
 
 //m_useGpuBackend = false;
+//m_numberOfUpdates = 1;
 //m_miniBatchSize = 16;
-//m_miniBatchSize = 128;
-//m_hiddenLayersNumberOfNeurons = 64;
+//m_numberOfHiddenLayers = 0;
 //m_replayBufferStartOptimizeSize = 1024 * 8;
 }
 
@@ -597,7 +597,6 @@ void ndBrainAgentOffPolicyGradient_Trainer::BuildPolicyClass()
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
 		layers.PushBack(new ND_HIDEN_LAYERS_ACTIVATION(layers[layers.GetCount() - 1]->GetOutputSize()));
 	}
-	//ndInt32 numberOfOutput = m_parameters.m_usePerActionSigmas ? 2 * m_parameters.m_numberOfActions : m_parameters.m_numberOfActions;
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_numberOfActions * 2));
 	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 
