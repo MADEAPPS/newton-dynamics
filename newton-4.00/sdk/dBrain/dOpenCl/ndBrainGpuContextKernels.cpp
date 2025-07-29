@@ -433,7 +433,7 @@ R""""(
         }
         if (itemId == 0)
         {
-            reductionBuffer[0] = 1.0f / sumArg;
+            reductionBuffer[0] = 1.0 / sumArg;
         }
         barrier(CLK_LOCAL_MEM_FENCE); 
         float invDen = reductionBuffer[0];
@@ -542,14 +542,14 @@ R""""(
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             float inpuData = inputOutputData[srcBase + i + itemId];
-            float gradient = (inpuData >= 0.0f) ? 1.0f : 0.0f;
+            float gradient = (inpuData >= 0.0f) ? 1.0 : 0.0f;
             float outputGrad = inputOutputGradients[dstBase + i + itemId];
             inputOutputGradients[srcBase + i + itemId] = gradient * outputGrad;
         }
         if (itemId < workGroupSizeReminder)
         {
             float inpuData = inputOutputData[srcBase + modWorkGroupSize + itemId];
-            float gradient = (inpuData >= 0.0f) ? 1.0f : 0.0f;
+            float gradient = (inpuData >= 0.0f) ? 1.0 : 0.0f;
             float outputGrad = inputOutputGradients[dstBase + modWorkGroupSize + itemId];
             inputOutputGradients[srcBase + modWorkGroupSize + itemId] = gradient * outputGrad;
         }
@@ -578,14 +578,14 @@ R""""(
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             float inpuData = inputOutputData[srcBase + i + itemId];
-            float gradient = (inpuData >= 0.0f) ? 1.0f : ND_GPU_LEAKY_LRU_GRADIENT;
+            float gradient = (inpuData >= 0.0f) ? 1.0 : ND_GPU_LEAKY_LRU_GRADIENT;
             float outputGrad = inputOutputGradients[dstBase + i + itemId];
             inputOutputGradients[srcBase + i + itemId] = gradient * outputGrad;
         }
         if (itemId < workGroupSizeReminder)
         {
             float inpuData = inputOutputData[srcBase + modWorkGroupSize + itemId];
-            float gradient = (inpuData >= 0.0f) ? 1.0f : ND_GPU_LEAKY_LRU_GRADIENT;
+            float gradient = (inpuData >= 0.0f) ? 1.0 : ND_GPU_LEAKY_LRU_GRADIENT;
             float outputGrad = inputOutputGradients[dstBase + modWorkGroupSize + itemId];
             inputOutputGradients[srcBase + modWorkGroupSize + itemId] = gradient * outputGrad;
         }
@@ -614,16 +614,51 @@ R""""(
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             float outputData = inputOutputData[dstBase + i + itemId];
-            float a = 1.0f - outputData * outputData;
+            float a = 1.0 - outputData * outputData;
             float b = inputOutputGradients[dstBase + i + itemId];
             inputOutputGradients[srcBase + i + itemId] = a * b;
         }
         for (uint itemId = 0; itemId < workGroupSizeReminder; ++itemId)
         {
             float outputData = inputOutputData[dstBase + modWorkGroupSize + itemId];
-            float a = 1.0f - outputData * outputData;
+            float a = 1.0 - outputData * outputData;
             float b = inputOutputGradients[dstBase + modWorkGroupSize + itemId];
             inputOutputGradients[srcBase + modWorkGroupSize + itemId] = a * b;
+        }
+    }
+
+    __kernel void brainLayerBrainLinearBackPropagate(
+            __global const UniformBufferLayerArguments* parameters, 
+            __global float* inputOutputData, 
+            __global float* weightsAndBias, 
+            __global float* inputOutputGradients,
+            __global float* weightsAndBiasGradients,
+            __global float* slopesPtr) 
+    {
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+
+        uint inputSize = parameters->m_inputSize;
+        uint inputOutputSize = parameters->m_inputOutputSize;
+        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+
+        long srcBase = groupId * (long)inputOutputSize + inputOutputStartOffset;
+        long dstBase = srcBase + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
+
+        uint workGroupSizeReminder = inputSize % workGroupSize;
+        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            float slope = slopesPtr[i + itemId];
+            float outputGrad = inputOutputGradients[dstBase + i + itemId];
+            inputOutputGradients[srcBase + i + itemId] = slope * outputGrad;
+        }
+        for (uint itemId = 0; itemId < workGroupSizeReminder; ++itemId)
+        {
+            float slope = slopesPtr[modWorkGroupSize + itemId];
+            float outputGrad = inputOutputGradients[dstBase + modWorkGroupSize + itemId];
+            inputOutputGradients[srcBase + modWorkGroupSize + itemId] = slope * outputGrad;
         }
     }
 
@@ -780,17 +815,17 @@ R""""(
         float miniBatchWeight = parameters->m_minibathScale;
 
         float temp = miniBatchWeight * weightAndBiasGradientBuffer[start + itemId];
-        float a = vdw[start + itemId] * parameters->m_alpha + temp * (1.0f - parameters->m_alpha);
+        float a = vdw[start + itemId] * parameters->m_alpha + temp * (1.0 - parameters->m_alpha);
         vdw[start + itemId] = a;
             
         // calcuate RMS
-        float b = vdw2[start + itemId] * parameters->m_beta + temp * temp * (1.0f - parameters->m_beta);
+        float b = vdw2[start + itemId] * parameters->m_beta + temp * temp * (1.0 - parameters->m_beta);
         vdw2[start + itemId] = b;
         
         float vdwCorrected = a * parameters->m_invAlpha;
         float vdw2Corrected = b * parameters->m_invBeta;
             
-        float bias_den = 1.0f / (sqrt(vdw2Corrected) + parameters->m_epsilon);
+        float bias_den = 1.0 / (sqrt(vdw2Corrected) + parameters->m_epsilon);
         float gradient = vdwCorrected * bias_den;
              
         float weight = weightAndBiasBuffer[start + itemId];
@@ -815,17 +850,17 @@ R""""(
         float miniBatchWeight = parameters->m_minibathScale;
 
         float temp = miniBatchWeight * weightAndBiasGradientBuffer[start + itemId];
-        float a = vdw[start + itemId] * parameters->m_alpha + temp * (1.0f - parameters->m_alpha);
+        float a = vdw[start + itemId] * parameters->m_alpha + temp * (1.0 - parameters->m_alpha);
         vdw[start + itemId] = a;
             
         // calcuate RMS
-        float b = vdw2[start + itemId] * parameters->m_beta + temp * temp * (1.0f - parameters->m_beta);
+        float b = vdw2[start + itemId] * parameters->m_beta + temp * temp * (1.0 - parameters->m_beta);
         vdw2[start + itemId] = b;
         
         float vdwCorrected = a * parameters->m_invAlpha;
         float vdw2Corrected = b * parameters->m_invBeta;
             
-        float bias_den = 1.0f / (sqrt(vdw2Corrected) + parameters->m_epsilon);
+        float bias_den = 1.0 / (sqrt(vdw2Corrected) + parameters->m_epsilon);
         float gradient = vdwCorrected * bias_den;
              
         float weight = weightAndBiasBuffer[start + itemId];
@@ -1427,7 +1462,7 @@ R""""(
         int global_id = get_global_id(0);
         if (global_id < numberOfElements)
         {
-            float value = outputData[global_id] * (1.0f - blend) + inputData[global_id] * blend;
+            float value = outputData[global_id] * (1.0 - blend) + inputData[global_id] * blend;
             outputData[global_id] = value;
         }
     }
@@ -1598,6 +1633,7 @@ void ndBrainGpuContext::CreateKerners()
     // create all backpropagate shaders
     m_brainCopyInputGradients = CreateKerner(program, "brainCopyInputGradients");
     m_brainCopyOutputGradients = CreateKerner(program, "brainCopyOutputGradients");
+    m_brainLayerLinearPropagate = CreateKerner(program, "brainLayerBrainLinearBackPropagate");
     m_brainLayerReluBackPropagate = CreateKerner(program, "brainLayerBrainReluBackPropagate");
     m_brainLayerTanhBackPropagate = CreateKerner(program, "brainLayerBrainTanhBackPropagate");
     m_brainLayerDropOutBackPropagate = CreateKerner(program, "brainLayerBrainDropOutBackPropagate");
