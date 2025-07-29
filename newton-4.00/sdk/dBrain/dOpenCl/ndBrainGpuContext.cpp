@@ -343,7 +343,7 @@ void ndBrainGpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
 	ndAssert(error == CL_SUCCESS);
 }
 
-void ndBrainGpuContext::SubmitMathOperation(const ndSharedPtr<ndBrainKernel>& kernel, ndBrainBuffer* const buffer, float scale)
+void ndBrainGpuContext::SubmitMathOperation(const ndSharedPtr<ndBrainKernel>& kernel, ndBrainBuffer* const buffer, float scalarValue)
 {
 	cl_int error = 0;
 	OpenclKernel* const oclKernel = (OpenclKernel*)*kernel;
@@ -361,7 +361,7 @@ void ndBrainGpuContext::SubmitMathOperation(const ndSharedPtr<ndBrainKernel>& ke
 	ndAssert(error == CL_SUCCESS);
 	error = shader->setArg(1, **dst->m_buffer);
 	ndAssert(error == CL_SUCCESS);
-	error = shader->setArg(2, scale);
+	error = shader->setArg(2, scalarValue);
 	ndAssert(error == CL_SUCCESS);
 
 	cl::NDRange offset(0);
@@ -556,14 +556,12 @@ void ndBrainGpuContext::Scale(ndBrainFloatBuffer& buffer, ndBrainFloat scale)
 
 void ndBrainGpuContext::Min(ndBrainFloatBuffer& buffer, ndBrainFloat value)
 {
-	ndAssert(0);
-	//SubmitMathOperation(m_brainMin, &buffer, &srcBuffer);
+	SubmitMathOperation(m_brainMinScalar, &buffer, value);
 }
 
 void ndBrainGpuContext::Max(ndBrainFloatBuffer& buffer, ndBrainFloat value)
 {
-	ndAssert(0);
-	//SubmitMathOperation(m_brainMin, &buffer, &srcBuffer);
+	SubmitMathOperation(m_brainMaxScalar, &buffer, value);
 }
 
 void ndBrainGpuContext::Min(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
@@ -573,8 +571,7 @@ void ndBrainGpuContext::Min(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer
 
 void ndBrainGpuContext::Max(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
 {
-	ndAssert(0);
-	//SubmitMathOperation(m_brainMin, &buffer, &srcBuffer);
+	SubmitMathOperation(m_brainMax, &buffer, &srcBuffer);
 }
 
 void ndBrainGpuContext::Add(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)

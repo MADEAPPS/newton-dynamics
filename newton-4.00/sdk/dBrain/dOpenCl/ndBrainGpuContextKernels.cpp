@@ -1547,6 +1547,33 @@ R""""(
             mean[global_id] += normal * sigma[global_id];
         }
     }
+
+    __kernel void brainMinScalar(
+        int numberOfElements,
+        __global float* outputData,
+        float scalar)
+    {
+        int global_id = get_global_id(0);
+        if (global_id < numberOfElements)
+        {
+            float a = outputData[global_id];
+            outputData[global_id] = (a <= scalar) ? a : scalar;
+        }
+    }
+
+    __kernel void brainMaxScalar(
+        int numberOfElements,
+        __global float* outputData,
+        float scalar)
+    {
+        int global_id = get_global_id(0);
+        if (global_id < numberOfElements)
+        {
+            float a = outputData[global_id];
+            outputData[global_id] = (a >= scalar) ? a : scalar;
+        }
+    }
+
 )"""";
 
 ndSharedPtr<ndBrainKernel> ndBrainGpuContext::CreateKerner(const cl::Program& program, const char* const functionMame) const
@@ -1661,9 +1688,12 @@ void ndBrainGpuContext::CreateKerners()
     m_brainSub = CreateKerner(program, "brainSub");
     m_brainMul = CreateKerner(program, "brainMul");
     m_brainMin = CreateKerner(program, "brainMin");
+    m_brainMax = CreateKerner(program, "brainMax");
     m_brainScale = CreateKerner(program, "brainScale");
     m_brainSelect = CreateKerner(program, "brainSelect");
     m_brainScaleAdd = CreateKerner(program, "brainScaleAdd");
+    m_brainMinScalar = CreateKerner(program, "brainMinScalar");
+    m_brainMaxScalar = CreateKerner(program, "brainMaxScalar");
     m_brainLessEqual = CreateKerner(program, "brainLessEqual");
     m_brainBlendScale = CreateKerner(program, "brainBlendScale");
     m_brainBlendVector = CreateKerner(program, "brainBlendVector");
