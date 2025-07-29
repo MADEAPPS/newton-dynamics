@@ -42,9 +42,10 @@
  
 //#define ND_SAC_MAX_ENTROPY_COEFFICIENT		ndBrainFloat(2.0e-5f)
 
-#define ND_POLICY_MIN_SIGMA						ndBrainFloat(0.01f)
-#define ND_POLICY_MAX_SIGMA						ndBrainFloat(1.0f)
 #define ND_POLICY_CONSTANT_SIGMA				ndBrainFloat(0.5f)
+#define ND_POLICY_MIN_SIGMA						(ndBrainFloat(0.5f) * ND_POLICY_CONSTANT_SIGMA)
+#define ND_POLICY_MAX_SIGMA						(ndBrainFloat(2.0f) * ND_POLICY_CONSTANT_SIGMA)
+
 #define ND_POLICY_TRAINING_EXPLORATION_NOISE	ndBrainFloat(0.2f)
 
 ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
@@ -60,8 +61,8 @@ ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 	m_movingAverageFactor = ndBrainFloat(0.005f);
 
 	m_useGpuBackend = true;
-	m_usePerActionSigmas = false;
-	//m_usePerActionSigmas = true;
+	//m_usePerActionSigmas = false;
+	m_usePerActionSigmas = true;
 	m_actionFixSigma = ND_POLICY_CONSTANT_SIGMA;
 
 	m_policyRegularizerType = m_ridge;
@@ -167,9 +168,6 @@ class ndBrainAgentOffPolicyGradient_Trainer::ndActivation : public ndBrainLayerA
 		const ndBrainMemVector input(&inputOutputBuffer[inputOffset], inputSize);
 		ndBrainMemVector output(&inputOutputBuffer[outputOffset], outputSize);
 
-		//output.Set(input);
-		//output.Mul(m_dropOut);
-
 		ndAssert(input.GetCount() == output.GetCount());
 		const ndInt32 size = ndInt32(input.GetCount() / 2);
 		for (ndInt32 i = size - 1; i >= 0; --i)
@@ -201,9 +199,6 @@ class ndBrainAgentOffPolicyGradient_Trainer::ndActivation : public ndBrainLayerA
 		const ndBrainMemVector output(&inputOutputBuffer[dstBase], inputSize);
 		const ndBrainMemVector outputDerivative(&inputOutputGradientsBuffer[dstBase], inputSize);
 		ndBrainMemVector inputDerivative(&inputOutputGradientsBuffer[srcBase], inputSize);
-
-		//inputDerivative.Set(m_dropOut);
-		//inputDerivative.Mul(outputDerivative);
 
 		ndAssert(inputDerivative.GetCount() == output.GetCount());
 		ndAssert(inputDerivative.GetCount() == outputDerivative.GetCount());
@@ -620,8 +615,8 @@ void ndBrainAgentOffPolicyGradient_Trainer::BuildPolicyClass()
 	{
 		ndBrainFloat minLogSigma = ndLog(ND_POLICY_MIN_SIGMA);
 		ndBrainFloat maxLogSigma = ndLog(ND_POLICY_MAX_SIGMA);
-		slopeVariance.Set((maxLogSigma - minLogSigma) * ndBrainFloat(0.5f));
 		biasVariance.Set((maxLogSigma + minLogSigma) * ndBrainFloat(0.5f));
+		slopeVariance.Set((maxLogSigma - minLogSigma) * ndBrainFloat(0.5f));
 	}
 	else
 	{
@@ -1017,28 +1012,15 @@ void ndBrainAgentOffPolicyGradient_Trainer::CalculateExpectedRewards()
 	minibatchSigma.m_strideInByte = ndInt32(m_referencePolicyTrainer->GetBrain()->GetOutputSize() * sizeof(ndReal) / 2);
 	m_minibatchMeanAction->CopyBuffer(minibatchSigma, m_parameters.m_miniBatchSize, *policyMinibatchOutputBuffer);
 
-//ndBrainVector xxx_r;
-//ndBrainVector xxx_m;
-//ndBrainVector xxx_s;
-//ndBrainVector xxx_n;
-//m_minibatchMeanAction->VectorFromDevice(xxx_m);
-//m_minibatchSigma->VectorFromDevice(xxx_s);
-//m_minibatchUniformRandomDistribution->VectorFromDevice(xxx_r);
-
 	m_context->GaussianSample(**m_minibatchUniformRandomDistribution, **m_minibatchSigma, **m_minibatchUniformRandomDistribution);
-//m_minibatchUniformRandomDistribution->VectorFromDevice(xxx_n);
 
 	// clip exploration noise
 	m_context->Min(**m_minibatchUniformRandomDistribution, ND_POLICY_TRAINING_EXPLORATION_NOISE);
 	m_context->Max(**m_minibatchUniformRandomDistribution, -ND_POLICY_TRAINING_EXPLORATION_NOISE);
 
-//m_minibatchUniformRandomDistribution->VectorFromDevice(xxx_s);
 	m_context->Add(**m_minibatchMeanAction, **m_minibatchUniformRandomDistribution);
 	m_context->Min(**m_minibatchMeanAction, ndBrainFloat(1.0f));
 	m_context->Max(**m_minibatchMeanAction, ndBrainFloat(-1.0f));
-
-//m_minibatchMeanAction->VectorFromDevice(xxx_r);
-//m_minibatchUniformRandomDistribution->VectorFromDevice(xxx_s);
 
 	ndCopyBufferCommandInfo criticOutputReward;
 	criticOutputReward.m_srcOffsetInByte = ndInt32(trajectory.GetRewardOffset() * sizeof(ndReal));
@@ -1085,17 +1067,6 @@ void ndBrainAgentOffPolicyGradient_Trainer::CalculateExpectedRewards()
 		criticInputNextObservation.m_dstOffsetInByte = ndInt32(m_policyTrainer->GetBrain()->GetOutputSize() * sizeof(ndReal));
 		criticInputNextObservation.m_strideInByte = ndInt32(m_policyTrainer->GetBrain()->GetInputSize() * sizeof(ndReal));
 		criticInputBuffer.CopyBuffer(criticInputNextObservation, m_parameters.m_miniBatchSize, *policyMinibatchInputBuffer);
-
-
-//ndBrainVector xxx_m;
-//ndBrainVector xxx_s;
-//ndBrainVector xxx_o;
-//ndBrainVector xxx_cc;
-//m_minibatchMeanAction->VectorFromDevice(xxx_m);
-//m_minibatchSigma->VectorFromDevice(xxx_s);
-//policyMinibatchInputBuffer->VectorFromDevice(xxx_o);
-//criticInputBuffer.VectorFromDevice(xxx_cc);
-
 		m_referenceCriticTrainer[i]->MakePrediction();
 
 		ndBrainFloatBuffer& qValueBuffer = *referenceCritic.GetOuputBuffer();
@@ -1133,7 +1104,6 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainPolicy()
 #if 1
 	// original paper uses the first critic
 	ndBrainFloatBuffer* const policyMinibatchOutputBuffer = m_policyTrainer->GetOuputBuffer();
-	//for (ndInt32 i = 0; i < ndInt32(sizeof(m_referenceCriticTrainer) / sizeof(m_referenceCriticTrainer[0])); ++i)
 
 	ndBrainTrainer& critic = **m_criticTrainer[0];
 	ndBrainFloatBuffer* const criticMinibatchInputBuffer = critic.GetInputBuffer();
