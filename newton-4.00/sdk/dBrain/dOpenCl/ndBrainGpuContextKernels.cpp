@@ -693,6 +693,53 @@ R""""(
         }
     }
 
+    __kernel void brainLayerBrainOffPolicyBackPropagate(
+            __global const UniformBufferLayerArguments* parameters, 
+            __global float* inputOutputData, 
+            __global float* weightsAndBias, 
+            __global float* inputOutputGradients,
+            __global float* weightsAndBiasGradients) 
+    {
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+        
+        uint inputSize = parameters->m_inputSize;
+        uint inputOutputSize = parameters->m_inputOutputSize;
+        uint inputOutputStartOffset = parameters->m_inputOutputStartOffset;
+        
+        long srcBase = groupId * (long)inputOutputSize + inputOutputStartOffset;        
+        long dstBase = srcBase + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
+        
+        uint halfSize = inputSize / 2;
+        uint workGroupSizeReminder = inputSize % workGroupSize;
+        uint modWorkGroupSize = inputSize - workGroupSizeReminder;
+        for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
+        {
+            float blend1 = ((i + itemId) >= halfSize) ? 1.0 : 0.0;
+            float blend0 = 1.0 - blend1;
+            
+            float gradient = 1.0;
+            float outputData = inputOutputData[dstBase + i + itemId];
+            float gradSelect = gradient * blend0 + outputData * blend1;
+
+            float inputGradient = inputOutputGradients[dstBase + i + itemId];
+            inputOutputGradients[srcBase + i + itemId] = gradSelect * inputGradient;
+        }
+        if (itemId < workGroupSizeReminder)
+        {
+            float blend1 = ((modWorkGroupSize + itemId) >= halfSize) ? 1.0 : 0.0;
+            float blend0 = 1.0 - blend1;
+            
+            float gradient = 1.0;
+            float outputData = inputOutputData[dstBase + modWorkGroupSize + itemId];
+            float gradSelect = gradient * blend0 + outputData * blend1;
+
+            float inputGradient = inputOutputGradients[dstBase + modWorkGroupSize + itemId];
+            inputOutputGradients[srcBase + modWorkGroupSize + itemId] = gradSelect * inputGradient;
+        }
+    }
+
 )"""";
 
 const char* ndBrainGpuContext::m_optimizerKernels =
@@ -1555,6 +1602,7 @@ void ndBrainGpuContext::CreateKerners()
     m_brainLayerTanhBackPropagate = CreateKerner(program, "brainLayerBrainTanhBackPropagate");
     m_brainLayerDropOutBackPropagate = CreateKerner(program, "brainLayerBrainDropOutBackPropagate");
     m_brainLayerLeakyReluBackPropagate = CreateKerner(program, "brainLayerBrainLeakyReluBackPropagate");
+    m_brainLayerOffPolicyBackPropagate = CreateKerner(program, "brainLayerBrainOffPolicyBackPropagate");
     m_brainLayerCathegoricalSoftmaxBackPropagate = CreateKerner(program, "brainLayerBrainCathegoricalSoftmaxBackPropagate");
     m_brainLayerMatrixBackPropagateBiasGradients = CreateKerner(program, "brainLayerBrainBackPropagateMatrixBiasGradients");
     m_brainLayerMatrixBackPropagateInputGradients = CreateKerner(program, "brainLayerBrainBackPropagateMatrixInputGradients");
