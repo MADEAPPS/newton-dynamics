@@ -81,7 +81,7 @@ class ndBrainLayerLinear : public ndBrainLayer
 		m_inputGradientsPass,
 		m_biasAddPartialSumPass,
 		m_biasCachePartialSumPass,
-		m_dimFactor = 16,
+		m_dimFactor = 1 << 4,
 	};
 
 	void CalculateRoundedSize(ndInt32& width, ndInt32& height) const;
