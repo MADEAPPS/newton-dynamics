@@ -781,7 +781,7 @@ namespace ndQuadruped_2
 				minAngle = ndMin(ndFloat32(0.0f), minAngle + safeGuardAngle);
 				if ((kneeAngle > maxAngle) || (kneeAngle < minAngle))
 				{
-					// project that target to the sphere of the corrent position
+					// project that target to the sphere of the current position
 					leg.m_effector->SetAsReducedDof();
 				}
 
@@ -1092,9 +1092,9 @@ namespace ndQuadruped_2
 			((ndJointSlider*)*softContact)->SetAsSpringDamper(0.01f, 2000.0f, 10.0f);
 
 			// create effector
-			ndSharedPtr<ndDemoEntity> footEntity(heelEntity->GetChildren().GetFirst()->GetInfo());
+			ndSharedPtr<ndDemoEntity> footEntity(contactEntity->GetChildren().GetFirst()->GetInfo());
 			ndMatrix footMatrix(matrix);
-			footMatrix.m_posit = (footEntity->GetCurrentMatrix() * heelMatrix).m_posit;
+			footMatrix.m_posit = (footEntity->GetCurrentMatrix() * contactMatrix).m_posit;
 
 			ndMatrix effectorRefFrame(footMatrix);
 			effectorRefFrame.m_posit = thighMatrix.m_posit;
@@ -1327,25 +1327,28 @@ namespace ndQuadruped_2
 
 				episodeCount -= m_master->GetEposideCount();
 				ndFloat32 rewardTrajectory = m_master->GetAverageFrames() * m_master->GetAverageScore();
-				if (rewardTrajectory >= ndFloat32(m_maxScore))
-				{
-					if (m_lastEpisode != m_master->GetEposideCount())
-					{
-						m_maxScore = rewardTrajectory;
-						m_bestActor->CopyFrom(*m_master->GetPolicyNetwork());
-						ndExpandTraceMessage("best actor episode: %d\treward %f\ttrajectoryFrames: %f\n", m_master->GetEposideCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
-						m_lastEpisode = m_master->GetEposideCount();
-					}
-				}
 
-   				if (episodeCount && !m_master->IsSampling())
+				if (!m_master->IsSampling())
 				{
-					ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", m_master->GetFramesCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
-					if (m_outFile)
+					if (rewardTrajectory >= ndFloat32(m_maxScore))
 					{
-						fprintf(m_outFile, "%g\n", m_master->GetAverageScore());
-						//fprintf(m_outFile, "%g\n", ndMax (m_master->GetAverageScore(), ndFloat32 (0.0f)));
-						fflush(m_outFile);
+						if (m_lastEpisode != m_master->GetEposideCount())
+						{
+							m_maxScore = rewardTrajectory;
+							m_bestActor->CopyFrom(*m_master->GetPolicyNetwork());
+							ndExpandTraceMessage("   best actor episode: %d\treward %f\ttrajectoryFrames: %f\n", m_master->GetEposideCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
+							m_lastEpisode = m_master->GetEposideCount();
+						}
+					}
+
+					if (episodeCount)
+					{
+						ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", m_master->GetFramesCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
+						if (m_outFile)
+						{
+							fprintf(m_outFile, "%g\n", m_master->GetAverageScore());
+							fflush(m_outFile);
+						}
 					}
 				}
 			}
