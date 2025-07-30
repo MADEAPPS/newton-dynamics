@@ -141,7 +141,7 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 		ndBrainFloat m_criticLearnRate;
 		ndBrainFloat m_policyRegularizer;
 		ndBrainFloat m_criticRegularizer;
-		ndBrainFloat m_movingAverageFactor;
+		ndBrainFloat mm_polyakBlendFactor;
 		ndBrainFloat m_discountRewardFactor;
 
 		ndBrainFloat m_actionFixSigma;
@@ -161,7 +161,9 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 		ndInt32 m_replayBufferStartOptimizeSize;
 
 		bool m_useGpuBackend;
+		bool m_useSofActorCritic;
 		bool m_usePerActionSigmas;
+		
 		ndRegularizerType m_policyRegularizerType;
 		ndRegularizerType m_criticRegularizerType;
 	};

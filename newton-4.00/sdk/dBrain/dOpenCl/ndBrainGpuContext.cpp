@@ -589,11 +589,6 @@ void ndBrainGpuContext::Mul(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer
 	SubmitMathOperation(m_brainMul, &buffer, &srcBuffer);
 }
 
-void ndBrainGpuContext::GaussianSample(ndBrainFloatBuffer& mean, const ndBrainFloatBuffer& sigma, const ndBrainFloatBuffer& uniformRandom)
-{
-	SubmitMathOperation(m_brainGaussianSample, &mean, &sigma, &uniformRandom);
-}
-
 void ndBrainGpuContext::Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat blend)
 {
 	SubmitMathOperation(m_brainBlendScale, &buffer, &srcBuffer, blend);
@@ -622,4 +617,9 @@ void ndBrainGpuContext::LessEqual(ndBrainFloatBuffer& buffer, ndBrainFloat test)
 void ndBrainGpuContext::GreaterEqual(ndBrainFloatBuffer& buffer, ndBrainFloat test)
 {
 	SubmitMathOperation(m_brainGreaterEqualScalar, &buffer, test);
+}
+
+void ndBrainGpuContext::StandardNormalDistribution(ndBrainFloatBuffer&)
+{
+	ndAssert(0);
 }

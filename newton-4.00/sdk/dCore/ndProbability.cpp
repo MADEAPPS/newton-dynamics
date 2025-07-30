@@ -62,8 +62,9 @@ ndFloat32 ndRand()
 	return value;
 }
 
-//ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma)
-ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma, ndFloat32 randomVariable)
+
+//ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma, ndFloat32 randomVariable)
+ndFloat32 ndStandardNormalGaussian(ndFloat32 randomVariable)
 {
 	// It seems the standard library normal random is based of the Box–Muller transform
 	// https://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform
@@ -146,13 +147,11 @@ ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma, ndFloat32 randomVari
 		return value;
 	};
 
+	ndAssert(randomVariable >= ndFloat32(0.0f));
+	ndAssert(randomVariable <= ndFloat32(1.0f));
 	ndFloat32 r = ndClamp(randomVariable, ndFloat32(1.0e-6f), ndFloat32(1.0f - 1.0e-6f));
 	ndFloat32 normal = NormalCumulativeDistibutionInverse(r);
-	ndAssert(normal == NormalCumulativeDistibutionInverseOld(r));
-	return mean + normal * sigma;
-}
-
-ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma)
-{
-	return ndGaussianRandom(mean, sigma, ndRand());
+	//ndAssert(normal == NormalCumulativeDistibutionInverseOld(r));
+	//return mean + normal * sigma;
+	return normal;
 }

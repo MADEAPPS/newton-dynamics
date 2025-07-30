@@ -64,9 +64,10 @@ class ndBrainVector: public ndArray<ndBrainFloat>
 	void MulSub(const ndBrainVector& a, const ndBrainVector& b);
 	
 	ndBrainFloat Dot(const ndBrainVector& a) const;
-	void CalculateMeanAndDeviation(ndBrainFloat& mean, ndBrainFloat& deviation) const;
+	void StandardNormalDistribution();
+	void CalculateMeanAndVariance(ndBrainFloat& mean, ndBrainFloat& variance) const;
 	void CategoricalSample(const ndBrainVector& probability, ndBrainFloat beta = ndBrainFloat(0.5f));
-	void CalculateMeanAndDeviation(const ndBrainVector& deviation, const ndBrainVector& uniformRand);
+	void CalculateMeanAndDeviation____(const ndBrainVector& mean, const ndBrainVector& variance);
 };
 
 class ndBrainMemVector: public ndBrainVector

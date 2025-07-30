@@ -38,6 +38,27 @@ class ndBrainFloatBuffer : public ndBrainBuffer
 	void CopyBuffer(const ndCopyBufferCommandInfo& descriptor, ndInt32 workGroupCount, const ndBrainFloatBuffer& srcBuffer);
 	void CopyBufferIndirect(const ndCopyBufferCommandInfo& descriptor, const ndBrainIntegerBuffer& indexBuffer, const ndBrainFloatBuffer& srcBuffer);
 
+	// math functionality
+	void Set(ndBrainFloat value);
+	void Min(ndBrainFloat value);
+	void Max(ndBrainFloat value);
+	void Scale(ndBrainFloat value);
+	void Blend(const ndBrainFloatBuffer& buffer, ndBrainFloat blendFactor);
+
+	void Set(const ndBrainFloatBuffer& buffer);
+	void Add(const ndBrainFloatBuffer& buffer);
+	void Sub(const ndBrainFloatBuffer& buffer);
+	void Mul(const ndBrainFloatBuffer& buffer);
+	void Min(const ndBrainFloatBuffer& buffer);
+	void Max(const ndBrainFloatBuffer& buffer);
+	void LessEqual(const ndBrainFloatBuffer& buffer);
+	void GreaterEqual(const ndBrainFloatBuffer& buffer);
+	void Blend(const ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& blendFactor);
+
+
+	void StandardNormalDistribution();
+	void BroadcastScaler(const ndBrainFloatBuffer& srcScalars);
+
 	protected:
 	ndSharedPtr<ndBrainVector> m_buffer;
 

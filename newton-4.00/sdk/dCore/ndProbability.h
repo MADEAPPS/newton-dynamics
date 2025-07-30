@@ -38,10 +38,19 @@ D_CORE_API ndUnsigned32 ndRandInt();
 D_CORE_API void ndSetRandSeed(ndUnsigned32 seed);
 
 /// Returns a guardian distributed random value with center at mean and standard deviation sigma
-D_CORE_API ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma);
+D_CORE_API ndFloat32 ndStandardNormalGaussian(ndFloat32 uniformRandomVariable);
 
 /// Returns a guardian distributed random value with center at mean and standard deviation sigma
-D_CORE_API ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma, ndFloat32 randomVariable);
+inline ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma, ndFloat32 uniformRandomVariable)
+{
+	return mean + sigma * ndStandardNormalGaussian(uniformRandomVariable);
+}
+
+/// Returns a guardian distributed random value with center at mean and standard deviation sigma
+inline ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma)
+{
+	return ndGaussianRandom(mean, sigma, ndRand());
+}
 
 #endif
 

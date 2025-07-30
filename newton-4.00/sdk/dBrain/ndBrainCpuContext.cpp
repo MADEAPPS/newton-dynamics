@@ -219,17 +219,19 @@ void ndBrainCpuContext::ScaleAdd(ndBrainFloatBuffer& buffer, const ndBrainFloatB
 	dst.ScaleAdd(src, scale);
 }
 
-void ndBrainCpuContext::GaussianSample(ndBrainFloatBuffer& meanBuffer, const ndBrainFloatBuffer& sigmaBuffer, const ndBrainFloatBuffer& uniformRandomBuffer)
-{
-	ndAssert(meanBuffer.SizeInBytes() == sigmaBuffer.SizeInBytes());
-	ndAssert(meanBuffer.SizeInBytes() == uniformRandomBuffer.SizeInBytes());
-
-	ndInt32 elements = ndInt32(meanBuffer.SizeInBytes() / sizeof(ndBrainFloat));
-	ndBrainMemVector mean((ndBrainFloat*)meanBuffer.GetCpuPtr(), elements);
-	const ndBrainMemVector sigma((ndBrainFloat*)sigmaBuffer.GetCpuPtr(), elements);
-	const ndBrainMemVector uniformRand((ndBrainFloat*)uniformRandomBuffer.GetCpuPtr(), elements);
-	mean.CalculateMeanAndDeviation(sigma, uniformRand);
-}
+//void ndBrainCpuContext::GaussianSample(ndBrainFloatBuffer& meanBuffer, const ndBrainFloatBuffer& sigmaBuffer, const ndBrainFloatBuffer& uniformRandomBuffer)
+//void ndBrainCpuContext::GaussianSample(ndBrainFloatBuffer&, const ndBrainFloatBuffer&, const ndBrainFloatBuffer&)
+//{
+//	ndAssert(0);
+//	//ndAssert(meanBuffer.SizeInBytes() == sigmaBuffer.SizeInBytes());
+//	//ndAssert(meanBuffer.SizeInBytes() == uniformRandomBuffer.SizeInBytes());
+//	//
+//	//ndInt32 elements = ndInt32(meanBuffer.SizeInBytes() / sizeof(ndBrainFloat));
+//	//ndBrainMemVector mean((ndBrainFloat*)meanBuffer.GetCpuPtr(), elements);
+//	//const ndBrainMemVector sigma((ndBrainFloat*)sigmaBuffer.GetCpuPtr(), elements);
+//	//const ndBrainMemVector uniformRand((ndBrainFloat*)uniformRandomBuffer.GetCpuPtr(), elements);
+//	//mean.CalculateMeanAndDeviation(sigma, uniformRand);
+//}
 
 void ndBrainCpuContext::Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat blend)
 {
@@ -289,4 +291,12 @@ void ndBrainCpuContext::BroadcastScaler(ndBrainFloatBuffer& buffer, ndInt32 buff
 		ndBrainMemVector subVector(&dst[i * bufferStrideInFloats], bufferStrideInFloats);
 		subVector.Set(src[i]);
 	}
+}
+
+
+void ndBrainCpuContext::StandardNormalDistribution(ndBrainFloatBuffer& uniformRandomVariable)
+{
+	ndInt32 elements = ndInt32(uniformRandomVariable.SizeInBytes() / sizeof(ndBrainFloat));
+	ndBrainMemVector dst((ndBrainFloat*)uniformRandomVariable.GetCpuPtr(), elements);
+	dst.StandardNormalDistribution();
 }

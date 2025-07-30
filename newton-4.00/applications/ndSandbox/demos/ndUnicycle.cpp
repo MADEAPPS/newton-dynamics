@@ -24,7 +24,7 @@
 
 namespace ndUnicycle
 {
-	//#define ND_TRAIN_AGENT
+	#define ND_TRAIN_AGENT
 	#define ND_USE_OFF_POLICY_TRAINER
 
 #ifdef ND_USE_OFF_POLICY_TRAINER

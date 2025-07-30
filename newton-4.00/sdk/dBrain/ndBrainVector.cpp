@@ -100,7 +100,7 @@ void ndBrainVector::CategoricalSample(const ndBrainVector& probability, ndBrainF
 	Scale(ndBrainFloat(1.0f) / sum);
 }
 
-void ndBrainVector::CalculateMeanAndDeviation(ndBrainFloat& mean, ndBrainFloat& deviation) const
+void ndBrainVector::CalculateMeanAndVariance(ndBrainFloat& mean, ndBrainFloat& deviation) const
 {
 	ndFloat64 sum = ndFloat64(0.0f);
 	ndFloat64 sum2 = ndFloat64(0.0f);
@@ -118,11 +118,25 @@ void ndBrainVector::CalculateMeanAndDeviation(ndBrainFloat& mean, ndBrainFloat& 
 	deviation = ndBrainFloat(ndSqrt (variance2));
 }
 
-void ndBrainVector::CalculateMeanAndDeviation(const ndBrainVector& deviation, const ndBrainVector& uniformRand)
+void ndBrainVector::CalculateMeanAndDeviation____(const ndBrainVector& mean, const ndBrainVector& deviation)
+{
+	//for (ndInt64 i = GetCount() - 1; i >= 0; --i)
+	//{
+	//	(*this)[i] = ndGaussianRandom((*this)[i], deviation[i], uniformRand[i]);
+	//}
+	StandardNormalDistribution();
+	Mul(deviation);
+	Add(mean);
+}
+
+void ndBrainVector::StandardNormalDistribution()
 {
 	for (ndInt64 i = GetCount() - 1; i >= 0; --i)
 	{
-		(*this)[i] = ndGaussianRandom((*this)[i], deviation[i], uniformRand[i]);
+		ndFloat32 uniformRandomVariable = (*this)[i];
+		ndAssert(uniformRandomVariable >= ndFloat32(0.0f));
+		ndAssert(uniformRandomVariable <= ndFloat32(1.0f));
+		(*this)[i] = ndStandardNormalGaussian(uniformRandomVariable);
 	}
 }
 
@@ -130,7 +144,7 @@ void ndBrainVector::GaussianNormalize()
 {
 	ndBrainFloat mean;
 	ndBrainFloat variance;
-	CalculateMeanAndDeviation(mean, variance);
+	CalculateMeanAndVariance(mean, variance);
 	ndBrainFloat invVariance = ndBrainFloat(1.0f) / variance;
 	for (ndInt64 i = GetCount() - 1; i >= 0; --i)
 	{

@@ -135,3 +135,86 @@ void ndBrainFloatBuffer::VectorToDevice(const ndBrainVector& vector)
 	ndAssert(vector.GetCount() <= ndInt64(m_sizeInBytes / sizeof(ndReal)));
 	MemoryToDevice(0, vector.GetCount() * sizeof(ndReal), &vector[0]);
 }
+
+
+void ndBrainFloatBuffer::Set(const ndBrainFloatBuffer& buffer)
+{
+	m_context->Set(*this, buffer);
+}
+
+void ndBrainFloatBuffer::Add(const ndBrainFloatBuffer& buffer)
+{
+	m_context->Add(*this, buffer);
+}
+
+void ndBrainFloatBuffer::Sub(const ndBrainFloatBuffer& buffer)
+{
+	m_context->Sub(*this, buffer);
+}
+
+void ndBrainFloatBuffer::Mul(const ndBrainFloatBuffer& buffer)
+{
+	m_context->Mul(*this, buffer);
+}
+
+void ndBrainFloatBuffer::Min(const ndBrainFloatBuffer& buffer)
+{
+	m_context->Min(*this, buffer);
+}
+
+void ndBrainFloatBuffer::Max(const ndBrainFloatBuffer& buffer)
+{
+	m_context->Max(*this, buffer);
+}
+
+void ndBrainFloatBuffer::LessEqual(const ndBrainFloatBuffer& buffer)
+{
+	m_context->LessEqual(*this, buffer);
+}
+
+void ndBrainFloatBuffer::GreaterEqual(const ndBrainFloatBuffer& buffer)
+{
+	m_context->GreaterEqual(*this, buffer);
+}
+
+void ndBrainFloatBuffer::Set(ndBrainFloat value)
+{
+	m_context->Set(*this, value);
+}
+
+void ndBrainFloatBuffer::Scale(ndBrainFloat value)
+{
+	m_context->Scale(*this, value);
+}
+
+void ndBrainFloatBuffer::Min(ndBrainFloat value)
+{
+	m_context->Min(*this, value);
+}
+
+void ndBrainFloatBuffer::Max(ndBrainFloat value)
+{
+	m_context->Max(*this, value);
+}
+
+void ndBrainFloatBuffer::Blend(const ndBrainFloatBuffer& buffer, ndBrainFloat blendFactor)
+{
+	m_context->Blend(*this, buffer, blendFactor);
+}
+
+void ndBrainFloatBuffer::Blend(const ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& blendFactor)
+{
+	m_context->Blend(*this, buffer, blendFactor);
+}
+
+void ndBrainFloatBuffer::StandardNormalDistribution()
+{
+	m_context->StandardNormalDistribution(*this);
+}
+
+void ndBrainFloatBuffer::BroadcastScaler(const ndBrainFloatBuffer& srcScalars)
+{
+	ndInt32 stride = ndInt32(GetCount() / srcScalars.GetCount());
+	ndAssert(stride * srcScalars.GetCount() == GetCount());
+	m_context->BroadcastScaler(*this, stride, srcScalars);
+}

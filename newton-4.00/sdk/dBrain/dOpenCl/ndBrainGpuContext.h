@@ -69,7 +69,6 @@ class ndBrainGpuContext : public ndBrainContext
 	virtual void LessEqual(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
 	virtual void GreaterEqual(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
 	virtual void Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, const ndBrainFloatBuffer& blend) override;
-	virtual void GaussianSample(ndBrainFloatBuffer& mean, const ndBrainFloatBuffer& sigman, const ndBrainFloatBuffer& uniformRandom) override;
 
 	virtual void Set(ndBrainFloatBuffer& buffer, ndBrainFloat value) override;
 	virtual void Min(ndBrainFloatBuffer& buffer, ndBrainFloat value) override;
@@ -81,7 +80,9 @@ class ndBrainGpuContext : public ndBrainContext
 	virtual void Select(ndBrainFloatBuffer& buffer, ndBrainFloatBuffer& mask, ndBrainFloat a, ndBrainFloat b) override;
 	virtual void ScaleAdd(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat scale) override;
 
+	virtual void StandardNormalDistribution(ndBrainFloatBuffer&) override;
 	virtual void BroadcastScaler(ndBrainFloatBuffer& buffer, ndInt32 bufferStrideInFloats, const ndBrainFloatBuffer& srcScalar) override;
+
 
 	private:
 	void CreateKerners();
@@ -162,10 +163,10 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainKernel> m_brainBlendScale;
 	ndSharedPtr<ndBrainKernel> m_brainBlendVector;
 	ndSharedPtr<ndBrainKernel> m_brainGreaterEqual;
-	ndSharedPtr<ndBrainKernel> m_brainGaussianSample;
 	ndSharedPtr<ndBrainKernel> m_brainLessEqualScalar;
 	ndSharedPtr<ndBrainKernel> m_brainBroadcastScalar;
 	ndSharedPtr<ndBrainKernel> m_brainGreaterEqualScalar;
+	ndSharedPtr<ndBrainKernel> m_brainNormalDistribution;
 
 	static const char* m_mathOpsCommand;
 	static const char* m_matrixMultiply;

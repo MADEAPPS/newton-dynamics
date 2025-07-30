@@ -59,7 +59,6 @@ class ndBrainContext : public ndClassAlloc
 	virtual void LessEqual(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) = 0;
 	virtual void GreaterEqual(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) = 0;
 	virtual void Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, const ndBrainFloatBuffer& blend) = 0;
-	virtual void GaussianSample(ndBrainFloatBuffer& mean, const ndBrainFloatBuffer& sigman, const ndBrainFloatBuffer& uniformRandom) = 0;
 
 	virtual void Set(ndBrainFloatBuffer& buffer, ndBrainFloat value) = 0;
 	virtual void Min(ndBrainFloatBuffer& buffer, ndBrainFloat value) = 0;
@@ -72,6 +71,8 @@ class ndBrainContext : public ndClassAlloc
 	virtual void ScaleAdd(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat scale) = 0;
 
 	virtual void BroadcastScaler(ndBrainFloatBuffer& buffer, ndInt32 bufferStrideInFloats, const ndBrainFloatBuffer& srcScalar) = 0;
+
+	virtual void StandardNormalDistribution(ndBrainFloatBuffer&) { ndAssert(0);}
 };
 
 #endif

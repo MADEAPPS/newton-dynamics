@@ -1702,8 +1702,8 @@ void ndBrainGpuContext::CreateKerners()
     m_brainBlendVector = CreateKerner(program, "brainBlendVector");
     m_brainGreaterEqual = CreateKerner(program, "brainGreaterEqual");
     m_brainAssigment = CreateKerner(program, "brainBufferAssigment");
-    m_brainGaussianSample = CreateKerner(program, "brainGaussianSample");
     m_brainBroadcastScalar = CreateKerner(program, "brainBroadcastScalar");
     m_brainLessEqualScalar = CreateKerner(program, "brainLessEqualScalar");
     m_brainGreaterEqualScalar = CreateKerner(program, "brainGreaterEqualScalar");
+    m_brainNormalDistribution = CreateKerner(program, "brainGaussianSample");
 }
