@@ -84,7 +84,7 @@ m_useSofActorCritic = false;
 //m_numberOfUpdates = 1;
 //m_miniBatchSize = 16;
 //m_numberOfHiddenLayers = 0;
-m_replayBufferStartOptimizeSize = 1024 * 8;
+//m_replayBufferStartOptimizeSize = 1024 * 8;
 }
 
 class ndBrainAgentOffPolicyGradient_Trainer::ndActivation : public ndBrainLayerActivation
@@ -1325,7 +1325,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::Optimize()
 		minibatchReparametization.m_srcOffsetInByte = i * strideSizeInBytes;
 		minibatchReparametization.m_srcStrideInByte = strideSizeInBytes;
 		minibatchReparametization.m_strideInByte = strideSizeInBytes;
-		m_minibatchUniformRandomDistribution->CopyBuffer(copyIndicesInfo, 1, **m_uniformRandom0);
+		m_minibatchUniformRandomDistribution->CopyBuffer(minibatchReparametization, 1, **m_uniformRandom0);
 
 		CalculateExpectedRewards();
 		for (ndInt32 j = 0; j < ndInt32(sizeof(m_referenceCriticTrainer) / sizeof(m_referenceCriticTrainer[0])); ++j)
