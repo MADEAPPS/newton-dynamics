@@ -1510,11 +1510,7 @@ R""""(
         }
     }
 
-    __kernel void brainGaussianSample(
-        int numberOfElements,
-        __global float* mean, 
-        __global float* sigma,
-        __global float* uniformRandom)
+    __kernel void brainNormalDistribution(int numberOfElements, __global float* uniformRandom)
     {
         int global_id = get_global_id(0);
         if (global_id < numberOfElements)
@@ -1542,12 +1538,12 @@ R""""(
 		    float numerator = c0 + (c2 * t + c1) * t;
 		    float denominator = 1.0 + ((d2 * t + d1) * t + d0) * t;
 		    float normal = t - numerator / denominator;
-
             if (clipRand < 0.5)
             {
                 normal = -normal;
             }
-            mean[global_id] += normal * sigma[global_id];
+            //mean[global_id] += normal * sigma[global_id];
+            uniformRandom[global_id] = normal;
         }
     }
 
@@ -1705,5 +1701,5 @@ void ndBrainGpuContext::CreateKerners()
     m_brainBroadcastScalar = CreateKerner(program, "brainBroadcastScalar");
     m_brainLessEqualScalar = CreateKerner(program, "brainLessEqualScalar");
     m_brainGreaterEqualScalar = CreateKerner(program, "brainGreaterEqualScalar");
-    m_brainNormalDistribution = CreateKerner(program, "brainGaussianSample");
+    m_brainNormalDistribution = CreateKerner(program, "brainNormalDistribution");
 }

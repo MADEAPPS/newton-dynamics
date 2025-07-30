@@ -343,6 +343,32 @@ void ndBrainGpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
 	ndAssert(error == CL_SUCCESS);
 }
 
+void ndBrainGpuContext::SubmitMathOperation(const ndSharedPtr<ndBrainKernel>& kernel, ndBrainBuffer* const buffer)
+{
+	cl_int error = 0;
+	OpenclKernel* const oclKernel = (OpenclKernel*)*kernel;
+	cl::Kernel* const shader = *oclKernel->m_shader;
+
+	ndBrainGpuBuffer* const dst = buffer->GetGpuBuffer();
+	size_t numberOfElements = size_t(buffer->SizeInBytes() / sizeof(float));
+	size_t numberOfGroups = (numberOfElements + ND_DEFAULT_WORKGROUP_SIZE - 1) & -ND_DEFAULT_WORKGROUP_SIZE;
+
+	cl_int numberOfParameters = 0;
+	error = shader->getInfo(CL_KERNEL_NUM_ARGS, &numberOfParameters);
+	ndAssert(numberOfParameters == 2);
+
+	error = shader->setArg(0, ndInt32(numberOfElements));
+	ndAssert(error == CL_SUCCESS);
+	error = shader->setArg(1, **dst->m_buffer);
+	ndAssert(error == CL_SUCCESS);
+
+	cl::NDRange offset(0);
+	cl::NDRange local(ND_DEFAULT_WORKGROUP_SIZE);
+	cl::NDRange global(numberOfGroups);
+	error = m_queue->enqueueNDRangeKernel(*shader, offset, global, local);
+	ndAssert(error == CL_SUCCESS);
+}
+
 void ndBrainGpuContext::SubmitMathOperation(const ndSharedPtr<ndBrainKernel>& kernel, ndBrainBuffer* const buffer, float scalarValue)
 {
 	cl_int error = 0;
@@ -362,6 +388,39 @@ void ndBrainGpuContext::SubmitMathOperation(const ndSharedPtr<ndBrainKernel>& ke
 	error = shader->setArg(1, **dst->m_buffer);
 	ndAssert(error == CL_SUCCESS);
 	error = shader->setArg(2, scalarValue);
+	ndAssert(error == CL_SUCCESS);
+
+	cl::NDRange offset(0);
+	cl::NDRange local(ND_DEFAULT_WORKGROUP_SIZE);
+	cl::NDRange global(numberOfGroups);
+	error = m_queue->enqueueNDRangeKernel(*shader, offset, global, local);
+	ndAssert(error == CL_SUCCESS);
+}
+
+void ndBrainGpuContext::SubmitMathOperation(const ndSharedPtr<ndBrainKernel>& kernel, ndBrainBuffer* const buffer, const ndBrainBuffer* const srcBuffer0, const ndBrainBuffer* const srcBuffer1)
+{
+	cl_int error = 0;
+	OpenclKernel* const oclKernel = (OpenclKernel*)*kernel;
+	cl::Kernel* const shader = *oclKernel->m_shader;
+
+	ndBrainGpuBuffer* const dst = buffer->GetGpuBuffer();
+	const ndBrainGpuBuffer* const src0 = srcBuffer0->GetGpuBuffer();
+	const ndBrainGpuBuffer* const src1 = srcBuffer1->GetGpuBuffer();
+
+	size_t numberOfElements = size_t(buffer->SizeInBytes() / sizeof(float));
+	size_t numberOfGroups = (numberOfElements + ND_DEFAULT_WORKGROUP_SIZE - 1) & -ND_DEFAULT_WORKGROUP_SIZE;
+
+	cl_int numberOfParameters = 0;
+	error = shader->getInfo(CL_KERNEL_NUM_ARGS, &numberOfParameters);
+	ndAssert(numberOfParameters == 4);
+
+	error = shader->setArg(0, ndInt32(numberOfElements));
+	ndAssert(error == CL_SUCCESS);
+	error = shader->setArg(1, **dst->m_buffer);
+	ndAssert(error == CL_SUCCESS);
+	error = shader->setArg(2, **src0->m_buffer);
+	ndAssert(error == CL_SUCCESS);
+	error = shader->setArg(3, **src1->m_buffer);
 	ndAssert(error == CL_SUCCESS);
 
 	cl::NDRange offset(0);
@@ -424,39 +483,6 @@ void ndBrainGpuContext::SubmitMathOperation(const ndSharedPtr<ndBrainKernel>& ke
 	error = shader->setArg(2, **src->m_buffer);
 	ndAssert(error == CL_SUCCESS);
 	error = shader->setArg(3, scale);
-	ndAssert(error == CL_SUCCESS);
-
-	cl::NDRange offset(0);
-	cl::NDRange local(ND_DEFAULT_WORKGROUP_SIZE);
-	cl::NDRange global(numberOfGroups);
-	error = m_queue->enqueueNDRangeKernel(*shader, offset, global, local);
-	ndAssert(error == CL_SUCCESS);
-}
-
-void ndBrainGpuContext::SubmitMathOperation(const ndSharedPtr<ndBrainKernel>& kernel, ndBrainBuffer* const buffer, const ndBrainBuffer* const srcBuffer0, const ndBrainBuffer* const srcBuffer1)
-{
-	cl_int error = 0;
-	OpenclKernel* const oclKernel = (OpenclKernel*)*kernel;
-	cl::Kernel* const shader = *oclKernel->m_shader;
-
-	ndBrainGpuBuffer* const dst = buffer->GetGpuBuffer();
-	const ndBrainGpuBuffer* const src0 = srcBuffer0->GetGpuBuffer();
-	const ndBrainGpuBuffer* const src1 = srcBuffer1->GetGpuBuffer();
-
-	size_t numberOfElements = size_t(buffer->SizeInBytes() / sizeof(float));
-	size_t numberOfGroups = (numberOfElements + ND_DEFAULT_WORKGROUP_SIZE - 1) & -ND_DEFAULT_WORKGROUP_SIZE;
-
-	cl_int numberOfParameters = 0;
-	error = shader->getInfo(CL_KERNEL_NUM_ARGS, &numberOfParameters);
-	ndAssert(numberOfParameters == 4);
-
-	error = shader->setArg(0, ndInt32(numberOfElements));
-	ndAssert(error == CL_SUCCESS);
-	error = shader->setArg(1, **dst->m_buffer);
-	ndAssert(error == CL_SUCCESS);
-	error = shader->setArg(2, **src0->m_buffer);
-	ndAssert(error == CL_SUCCESS);
-	error = shader->setArg(3, **src1->m_buffer);
 	ndAssert(error == CL_SUCCESS);
 
 	cl::NDRange offset(0);
@@ -619,7 +645,14 @@ void ndBrainGpuContext::GreaterEqual(ndBrainFloatBuffer& buffer, ndBrainFloat te
 	SubmitMathOperation(m_brainGreaterEqualScalar, &buffer, test);
 }
 
-void ndBrainGpuContext::StandardNormalDistribution(ndBrainFloatBuffer&)
+void ndBrainGpuContext::StandardNormalDistribution(ndBrainFloatBuffer& uniformRandomVariable)
 {
-	ndAssert(0);
+	//ndBrainVector xxx0;
+	//ndBrainVector xxx1;
+	//ndBrainVector xxx2;
+	//uniformRandomVariable.VectorFromDevice(xxx0);
+	//uniformRandomVariable.VectorFromDevice(xxx2);
+	//xxx2.StandardNormalDistribution();
+	SubmitMathOperation(m_brainNormalDistribution, &uniformRandomVariable);
+	//uniformRandomVariable.VectorFromDevice(xxx1);
 }
