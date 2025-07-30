@@ -79,12 +79,12 @@ ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 	m_hiddenLayersNumberOfNeurons = 256;
 	m_replayBufferStartOptimizeSize = 1024 * 64;
 
+m_useGpuBackend = false;
 m_useSofActorCritic = false;
-//m_useGpuBackend = false;
 //m_numberOfUpdates = 1;
 //m_miniBatchSize = 16;
 //m_numberOfHiddenLayers = 0;
-//m_replayBufferStartOptimizeSize = 1024 * 8;
+m_replayBufferStartOptimizeSize = 1024 * 8;
 }
 
 class ndBrainAgentOffPolicyGradient_Trainer::ndActivation : public ndBrainLayerActivation
