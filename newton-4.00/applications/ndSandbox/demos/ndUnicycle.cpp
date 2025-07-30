@@ -24,10 +24,10 @@
 
 namespace ndUnicycle
 {
-	#define ND_TRAIN_AGENT
-	#define USE_SAC
+	//#define ND_TRAIN_AGENT
+	#define ND_USE_OFF_POLICY_TRAINER
 
-#ifdef USE_SAC
+#ifdef ND_USE_OFF_POLICY_TRAINER
 	#define CONTROLLER_NAME			"unicycle_sac.dnn"
 #else
 	#define CONTROLLER_NAME			"unicycle_ppo.dnn"
@@ -167,14 +167,14 @@ namespace ndUnicycle
 			RobotModelNotify* m_robot;
 		};
 
-#ifdef USE_SAC
+#ifdef ND_USE_OFF_POLICY_TRAINER
 		class ndControllerTrainer : public ndBrainAgentOffPolicyGradient_Agent
 #else
 		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Agent
 #endif
 		{
 			public:
-#ifdef USE_SAC
+#ifdef ND_USE_OFF_POLICY_TRAINER
 			ndControllerTrainer(const ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master)
 				:ndBrainAgentOffPolicyGradient_Agent(master)
 #else
@@ -216,7 +216,7 @@ namespace ndUnicycle
 		};
 
 		public:
-#ifdef USE_SAC
+#ifdef ND_USE_OFF_POLICY_TRAINER
 		RobotModelNotify(ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master, ndModelArticulation* const robot)
 #else
 		RobotModelNotify(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot)
@@ -544,7 +544,7 @@ namespace ndUnicycle
 		{
 			ndWorld* const world = scene->GetWorld();
 			
-			#ifdef USE_SAC
+			#ifdef ND_USE_OFF_POLICY_TRAINER
 				m_outFile = fopen("unicycle_sac.csv", "wb");
 				fprintf(m_outFile, "sac\n");
 				m_stopTraining = 250000;
@@ -580,7 +580,7 @@ namespace ndUnicycle
 			visualModel->SetNotifyCallback(new RobotModelNotify(m_master, visualModel->GetAsModelArticulation()));
 			SetMaterial(visualModel->GetAsModelArticulation());
 			
-			#ifndef USE_SAC
+			#ifndef ND_USE_OFF_POLICY_TRAINER
 			// add a hidden battery of model to generate trajectories in parallel
 			//const ndInt32 countX = 0;
 			const ndInt32 countX = 100;
@@ -744,7 +744,7 @@ namespace ndUnicycle
 			}
 		}
 
-#ifdef USE_SAC
+#ifdef ND_USE_OFF_POLICY_TRAINER
 		ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer> m_master;
 #else
 		ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
