@@ -1147,7 +1147,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::CalculateExpectedRewards()
 }
 
 //#pragma optimize( "", off )
-void ndBrainAgentOffPolicyGradient_Trainer::TrainPolicy()
+void ndBrainAgentOffPolicyGradient_Trainer::TrainTd3Policy()
 {
 	const ndBrainAgentOffPolicyGradient_Agent::ndTrajectory& trajectory = m_agent->m_trajectory;
 		
@@ -1163,44 +1163,64 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainPolicy()
 	policyMinibatchInputBuffer->CopyBuffer(policyObservation, m_parameters.m_miniBatchSize, **m_minibatchOfTransitions);
 	m_policyTrainer->MakePrediction();
 
-#if 1
-	// original paper uses the first critic
-	ndBrainFloatBuffer* const policyMinibatchOutputBuffer = m_policyTrainer->GetOuputBuffer();
-
-	ndBrainTrainer& critic = **m_criticTrainer[0];
-	ndBrainFloatBuffer* const criticMinibatchInputBuffer = critic.GetInputBuffer();
-
-	ndCopyBufferCommandInfo criticInputAction;
-	criticInputAction.m_srcOffsetInByte = 0;
-	criticInputAction.m_srcStrideInByte = ndInt32(m_policyTrainer->GetBrain()->GetOutputSize() * sizeof(ndReal));
-	criticInputAction.m_dstOffsetInByte = 0;
-	criticInputAction.m_dstStrideInByte = ndInt32(criticInputSize * sizeof(ndReal));
-	criticInputAction.m_strideInByte = ndInt32(m_policyTrainer->GetBrain()->GetOutputSize() * sizeof(ndReal));
-	criticMinibatchInputBuffer->CopyBuffer(criticInputAction, m_parameters.m_miniBatchSize, *policyMinibatchOutputBuffer);
-
-	ndCopyBufferCommandInfo criticInputObservation;
-	criticInputObservation.m_srcOffsetInByte = 0;
-	criticInputObservation.m_srcStrideInByte = ndInt32(m_policyTrainer->GetBrain()->GetInputSize() * sizeof(ndReal));
-	criticInputObservation.m_dstStrideInByte = ndInt32(criticInputSize * sizeof(ndReal));
-	criticInputObservation.m_dstOffsetInByte = ndInt32(m_policyTrainer->GetBrain()->GetOutputSize() * sizeof(ndReal));
-	criticInputObservation.m_strideInByte = ndInt32(m_policyTrainer->GetBrain()->GetInputSize() * sizeof(ndReal));
-	criticMinibatchInputBuffer->CopyBuffer(criticInputObservation, m_parameters.m_miniBatchSize, *policyMinibatchInputBuffer);
-	critic.MakePrediction();
-
-	//the gradient is just 1.0
-	ndBrainFloatBuffer* const criticMinibatchInputGradientBuffer = critic.GetInputGradientBuffer();
-	ndBrainFloatBuffer* const criticMinibatchOutputGradientBuffer = critic.GetOuputGradientBuffer();
-	criticMinibatchOutputGradientBuffer->Set(ndBrainFloat(1.0f));
-	critic.BackPropagate();
-	
-#else
-	// using the critic with the lower gradient
-	ndBrainFloatBuffer* const policyMinibatchOutputBuffer = m_policyTrainer->GetOuputBuffer();
-	for (ndInt32 i = 0; i < ndInt32(sizeof(m_referenceCriticTrainer) / sizeof(m_referenceCriticTrainer[0])); ++i)
+	if (m_parameters.m_useSofActorCritic)
 	{
-		ndBrainTrainer& critic = **m_criticTrainer[i];
+		// using the critic with the lower gradient
+		ndBrainFloatBuffer* const policyMinibatchOutputBuffer = m_policyTrainer->GetOuputBuffer();
+		for (ndInt32 i = 0; i < ndInt32(sizeof(m_referenceCriticTrainer) / sizeof(m_referenceCriticTrainer[0])); ++i)
+		{
+			ndBrainTrainer& critic = **m_criticTrainer[i];
+			ndBrainFloatBuffer* const criticMinibatchInputBuffer = critic.GetInputBuffer();
+
+			ndCopyBufferCommandInfo criticInputAction;
+			criticInputAction.m_srcOffsetInByte = 0;
+			criticInputAction.m_srcStrideInByte = ndInt32(m_policyTrainer->GetBrain()->GetOutputSize() * sizeof(ndReal));
+			criticInputAction.m_dstOffsetInByte = 0;
+			criticInputAction.m_dstStrideInByte = ndInt32(criticInputSize * sizeof(ndReal));
+			criticInputAction.m_strideInByte = ndInt32(m_policyTrainer->GetBrain()->GetOutputSize() * sizeof(ndReal));
+			criticMinibatchInputBuffer->CopyBuffer(criticInputAction, m_parameters.m_miniBatchSize, *policyMinibatchOutputBuffer);
+
+			ndCopyBufferCommandInfo criticInputObservation;
+			criticInputObservation.m_srcOffsetInByte = 0;
+			criticInputObservation.m_srcStrideInByte = ndInt32(m_policyTrainer->GetBrain()->GetInputSize() * sizeof(ndReal));
+			criticInputObservation.m_dstStrideInByte = ndInt32(criticInputSize * sizeof(ndReal));
+			criticInputObservation.m_dstOffsetInByte = ndInt32(m_policyTrainer->GetBrain()->GetOutputSize() * sizeof(ndReal));
+			criticInputObservation.m_strideInByte = ndInt32(m_policyTrainer->GetBrain()->GetInputSize() * sizeof(ndReal));
+			criticMinibatchInputBuffer->CopyBuffer(criticInputObservation, m_parameters.m_miniBatchSize, *policyMinibatchInputBuffer);
+			critic.MakePrediction();
+
+			//the gradient is just 1.0
+			ndBrainFloatBuffer* const criticMinibatchOutputGradientBuffer = critic.GetOuputGradientBuffer();
+			criticMinibatchOutputGradientBuffer->Set(ndBrainFloat(1.0f));
+			critic.BackPropagate();
+		}
+
+		ndBrainTrainer& critic = **m_criticTrainer[0];
+		ndBrainFloatBuffer* const criticMinibatchOutputBuffer = critic.GetOuputBuffer();
+		ndBrainFloatBuffer* const criticMinibatchInputGradientBuffer = critic.GetInputGradientBuffer();
+		for (ndInt32 i = 1; i < ndInt32(sizeof(m_referenceCriticTrainer) / sizeof(m_referenceCriticTrainer[0])); ++i)
+		{
+			ndBrainTrainer& critic1 = **m_criticTrainer[i];
+			ndBrainFloatBuffer* const criticMinibatchOutputBuffer1 = critic1.GetOuputBuffer();
+			ndBrainFloatBuffer* const criticMinibatchInputGradientBuffer1 = critic1.GetInputGradientBuffer();
+
+			// re using m_minibatchRewards because is not use anymore 
+			m_minibatchRewards->Set(*criticMinibatchOutputBuffer1);
+			m_minibatchRewards->LessEqual(*criticMinibatchOutputBuffer);
+			m_minibatchCriticInputTest->BroadcastScaler(**m_minibatchRewards);
+
+			criticMinibatchOutputBuffer->Blend(*criticMinibatchOutputBuffer1, **m_minibatchRewards);
+			criticMinibatchInputGradientBuffer->Blend(*criticMinibatchInputGradientBuffer1, **m_minibatchCriticInputTest);
+		}
+	}
+	else
+	{
+		// original paper uses the first critic
+		ndBrainFloatBuffer* const policyMinibatchOutputBuffer = m_policyTrainer->GetOuputBuffer();
+
+		ndBrainTrainer& critic = **m_criticTrainer[0];
 		ndBrainFloatBuffer* const criticMinibatchInputBuffer = critic.GetInputBuffer();
-	
+
 		ndCopyBufferCommandInfo criticInputAction;
 		criticInputAction.m_srcOffsetInByte = 0;
 		criticInputAction.m_srcStrideInByte = ndInt32(m_policyTrainer->GetBrain()->GetOutputSize() * sizeof(ndReal));
@@ -1208,7 +1228,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainPolicy()
 		criticInputAction.m_dstStrideInByte = ndInt32(criticInputSize * sizeof(ndReal));
 		criticInputAction.m_strideInByte = ndInt32(m_policyTrainer->GetBrain()->GetOutputSize() * sizeof(ndReal));
 		criticMinibatchInputBuffer->CopyBuffer(criticInputAction, m_parameters.m_miniBatchSize, *policyMinibatchOutputBuffer);
-	
+
 		ndCopyBufferCommandInfo criticInputObservation;
 		criticInputObservation.m_srcOffsetInByte = 0;
 		criticInputObservation.m_srcStrideInByte = ndInt32(m_policyTrainer->GetBrain()->GetInputSize() * sizeof(ndReal));
@@ -1217,33 +1237,17 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainPolicy()
 		criticInputObservation.m_strideInByte = ndInt32(m_policyTrainer->GetBrain()->GetInputSize() * sizeof(ndReal));
 		criticMinibatchInputBuffer->CopyBuffer(criticInputObservation, m_parameters.m_miniBatchSize, *policyMinibatchInputBuffer);
 		critic.MakePrediction();
-	
+
 		//the gradient is just 1.0
+		//ndBrainFloatBuffer* const criticMinibatchInputGradientBuffer = critic.GetInputGradientBuffer();
 		ndBrainFloatBuffer* const criticMinibatchOutputGradientBuffer = critic.GetOuputGradientBuffer();
 		criticMinibatchOutputGradientBuffer->Set(ndBrainFloat(1.0f));
 		critic.BackPropagate();
 	}
-	
-	ndBrainTrainer& critic = **m_criticTrainer[0];
-	ndBrainFloatBuffer* const criticMinibatchOutputBuffer = critic.GetOuputBuffer();
-	ndBrainFloatBuffer* const criticMinibatchInputGradientBuffer = critic.GetInputGradientBuffer();
-	for (ndInt32 i = 1; i < ndInt32(sizeof(m_referenceCriticTrainer) / sizeof(m_referenceCriticTrainer[0])); ++i)
-	{
-		ndBrainTrainer& critic1 = **m_criticTrainer[i];
-		ndBrainFloatBuffer* const criticMinibatchOutputBuffer1 = critic1.GetOuputBuffer();
-		ndBrainFloatBuffer* const criticMinibatchInputGradientBuffer1 = critic1.GetInputGradientBuffer();
-	
-		// re using m_minibatchRewards because is not use anymore 
-		m_minibatchRewards->Set(*criticMinibatchOutputBuffer1);
-		m_minibatchRewards->LessEqual(*criticMinibatchOutputBuffer);
-		m_minibatchCriticInputTest->BroadcastScaler(**m_minibatchRewards);
-	
-		criticMinibatchOutputBuffer->Blend(*criticMinibatchOutputBuffer1, **m_minibatchRewards);
-		criticMinibatchInputGradientBuffer->Blend(*criticMinibatchInputGradientBuffer1, **m_minibatchCriticInputTest);
-	}
- #endif
 
 	// gradient ascend
+	ndBrainTrainer& critic = **m_criticTrainer[0];
+	ndBrainFloatBuffer* const criticMinibatchInputGradientBuffer = critic.GetInputGradientBuffer();
 	criticMinibatchInputGradientBuffer->Scale(ndFloat32(-1.0f));
 	
 	ndCopyBufferCommandInfo policyCopyGradients;
@@ -1343,9 +1347,23 @@ void ndBrainAgentOffPolicyGradient_Trainer::Optimize()
 		}
 
 		m_policyDelayMod = (m_policyDelayMod + 1) % twinDelayModule;
-		if (!m_policyDelayMod)
+		if (m_parameters.m_useSofActorCritic)
 		{
-			TrainPolicy();
+			ndAssert(0);
+
+			for (ndInt32 j = 0; j < ndInt32(sizeof(m_referenceCriticTrainer) / sizeof(m_referenceCriticTrainer[0])); ++j)
+			{
+				ndBrainTrainer* const criticTrainer = *m_criticTrainer[j];
+				ndBrainTrainerInference* const referenceCritic = *m_referenceCriticTrainer[j];
+
+				const ndBrainFloatBuffer* const parameterBuffer = criticTrainer->GetWeightAndBiasBuffer();
+				ndBrainFloatBuffer* const referenceParameterBuffer = referenceCritic->GetWeightAndBiasBuffer();
+				referenceParameterBuffer->Blend(*parameterBuffer, m_parameters.mm_polyakBlendFactor);
+			}
+		}
+		else if (!m_policyDelayMod)
+		{
+			TrainTd3Policy();
 
 			for (ndInt32 j = 0; j < ndInt32(sizeof(m_referenceCriticTrainer) / sizeof(m_referenceCriticTrainer[0])); ++j)
 			{
