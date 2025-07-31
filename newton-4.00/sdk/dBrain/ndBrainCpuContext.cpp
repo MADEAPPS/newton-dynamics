@@ -21,9 +21,9 @@ ndBrainCpuContext::ndBrainCpuContext()
 	:ndBrainContext()
 	,ndBrainThreadPool()
 {
-	ndInt32 numOfThreads = (ndBrainThreadPool::GetMaxThreads() + 1) / 2;
+	ndInt32 numOfThreads = ndBrainThreadPool::GetMaxThreads();
 #ifdef _DEBUG
-numOfThreads = 1;
+//numOfThreads = 1;
 #endif
 
 	SetThreadCount(numOfThreads);
@@ -119,18 +119,32 @@ void ndBrainCpuContext::MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offse
 
 void ndBrainCpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
 {
+#if 0
+	// brute force launches all thread, 
 	ndAtomic<ndInt32> iterator(0);
 	auto ExecuteCommand = ndMakeObject::ndFunction([this, &iterator, command](ndInt32, ndInt32)
 	{
 		const ndBrainBufferCommandDesc& descriptor = command->GetDescriptor();
 		ndBrainBufferCommandCpu* const cpuCommand = (ndBrainBufferCommandCpu*)command;
-
+	
 		for (ndInt32 i = iterator++; i < descriptor.m_miniBatchSize; i = iterator++)
 		{
 			cpuCommand->Execute(i);
 		}
 	});
 	ParallelExecute(ExecuteCommand);
+
+#else
+	// adaptive thread dispacher, in general 50% faster
+	auto ExecuteCommand = ndMakeObject::ndFunction([this, command](ndInt32 groupId, ndInt32)
+	{
+		ndBrainBufferCommandCpu* const cpuCommand = (ndBrainBufferCommandCpu*)command;
+		cpuCommand->Execute(groupId);
+	});
+
+	const ndBrainBufferCommandDesc& descriptor = command->GetDescriptor();
+	ParallelExecuteNew(ExecuteCommand, descriptor.m_miniBatchSize);
+#endif
 }
 
 void ndBrainCpuContext::BrainVectorToDevice(ndBrainFloatBuffer& buffer, const ndBrainVector& srcVector)
