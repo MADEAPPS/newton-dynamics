@@ -193,12 +193,14 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 	void SaveTrajectory();
 	void SaveTrajectoryLoadBuffer();
 	
-	virtual void TrainTd3Policy();
+	void TrainSacPolicy();
+	void TrainTd3Policy();
+	void BuildPolicyClass();
+	void BuildCriticClass();
 	void SaveTrajectoryTerminal();
 	void SaveTrajectoryNoTerminal();
-	virtual void BuildPolicyClass();
-	virtual void BuildCriticClass();
-	virtual void CalculateExpectedRewards();
+	void CalculateTd3ExpectedRewards();
+	void CalculateSacExpectedRewards();
 	void TrainCritics(ndInt32 criticIndex);
 	ndBrainFloat CalculatePolicyProbability(ndInt32 index) const;
 	ndBrainFloat CalculatePolicyProbability(ndInt32 index, const ndBrainVector& distribution) const;
