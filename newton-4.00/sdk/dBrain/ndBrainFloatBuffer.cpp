@@ -218,3 +218,8 @@ void ndBrainFloatBuffer::BroadcastScaler(const ndBrainFloatBuffer& srcScalars)
 	ndAssert(stride * srcScalars.GetCount() == GetCount());
 	m_context->BroadcastScaler(*this, stride, srcScalars);
 }
+
+void ndBrainFloatBuffer::CalculateEntropyRegularization(const ndBrainFloatBuffer& sample, const ndBrainFloatBuffer& sigma, ndBrainFloat regularization)
+{
+	m_context->CalculateEntropyRegularization(*this, sample, sigma, regularization);
+}

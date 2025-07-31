@@ -293,10 +293,29 @@ void ndBrainCpuContext::BroadcastScaler(ndBrainFloatBuffer& buffer, ndInt32 buff
 	}
 }
 
-
 void ndBrainCpuContext::StandardNormalDistribution(ndBrainFloatBuffer& uniformRandomVariable)
 {
 	ndInt32 elements = ndInt32(uniformRandomVariable.SizeInBytes() / sizeof(ndBrainFloat));
 	ndBrainMemVector dst((ndBrainFloat*)uniformRandomVariable.GetCpuPtr(), elements);
 	dst.StandardNormalDistribution();
+}
+
+void ndBrainCpuContext::CalculateEntropyRegularization(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& sampleBuffer, const ndBrainFloatBuffer& sigmaBuffer, ndBrainFloat regularization)
+{
+	const ndInt32 stride = ndInt32(sigmaBuffer.SizeInBytes() / buffer.SizeInBytes());
+	ndAssert(sampleBuffer.SizeInBytes() == sigmaBuffer.SizeInBytes());
+	ndAssert(stride * buffer.SizeInBytes() == sampleBuffer.SizeInBytes());
+
+	const ndInt32 elements = ndInt32(buffer.SizeInBytes() / sizeof(ndBrainFloat));
+
+	ndBrainMemVector dst((ndBrainFloat*)buffer.GetCpuPtr(), elements);
+	const ndBrainMemVector sample((ndBrainFloat*)sampleBuffer.GetCpuPtr(), stride * elements);
+	const ndBrainMemVector sigmas((ndBrainFloat*)sigmaBuffer.GetCpuPtr(), stride * elements);
+
+	for (ndInt32 i = 0; i < elements; ++i)
+	{
+		const ndBrainMemVector sampleMean(&sample[i * stride], stride);
+		const ndBrainMemVector varianceMean(&sigmas[i * stride], stride);
+		dst[i] = sampleMean.CalculateEntropyRegularization(varianceMean, regularization);
+	}
 }

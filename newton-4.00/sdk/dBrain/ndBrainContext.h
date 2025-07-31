@@ -72,7 +72,8 @@ class ndBrainContext : public ndClassAlloc
 
 	virtual void BroadcastScaler(ndBrainFloatBuffer& buffer, ndInt32 bufferStrideInFloats, const ndBrainFloatBuffer& srcScalar) = 0;
 
-	virtual void StandardNormalDistribution(ndBrainFloatBuffer&) { ndAssert(0);}
+	virtual void StandardNormalDistribution(ndBrainFloatBuffer&) = 0;
+	virtual void CalculateEntropyRegularization(ndBrainFloatBuffer&, const ndBrainFloatBuffer&, const ndBrainFloatBuffer&, ndBrainFloat) { ndAssert(0);}
 };
 
 #endif

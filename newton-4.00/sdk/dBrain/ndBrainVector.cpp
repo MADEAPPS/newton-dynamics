@@ -23,21 +23,6 @@
 #include "ndBrainVector.h"
 #include "ndBrainSimdFloat8.h"
 
-void ndBrainVector::InitGaussianWeights(ndBrainFloat variance)
-{
-	if (variance > ndBrainFloat(1.0e-6f))
-	{
-		for (ndInt64 i = GetCount() - 1; i >= 0; --i)
-		{
-			(*this)[i] = ndBrainFloat(ndGaussianRandom(ndFloat32(0.0f), ndFloat32(variance)));
-		}
-	}
-	else
-	{
-		Set(ndFloat32(0.0f));
-	}
-}
-
 void ndBrainVector::Set(ndBrainFloat value)
 {
 	ndMemSet(&(*this)[0], value, GetCount());
@@ -65,116 +50,6 @@ ndInt64 ndBrainVector::ArgMax() const
 	return index;
 }
 
-// using Random variate generation from https://en.wikipedia.org/wiki/Gumbel_distribution 
-void ndBrainVector::CategoricalSample(const ndBrainVector& probability, ndBrainFloat beta)
-{
-	#ifdef _DEBUG
-		ndBrainFloat acc = ndBrainFloat(0.0f);
-		for (ndInt32 i = 0; i < GetCount(); ++i)
-		{
-			acc += probability[i];
-		}
-		ndAssert(ndAbs(acc - ndFloat32(1.0f)) < ndBrainFloat(1.0e-5f));
-	#endif	
-
-	//ndBrainFloat xxx = 0.0f;
-	//for (ndInt32 i = 0; i < 20; ++i)
-	//{
-	//	ndBrainFloat map = ndBrainFloat(0.930159f) * xxx + ndBrainFloat(1.0e-6f);
-	//	ndBrainFloat xxx1 = -ndLog (-ndLog(map));
-	//	xxx += 1.0f / 20.0f;
-	//}
-
-	ndBrainFloat sum = ndBrainFloat(0.0f);
-	for (ndInt32 i = 0; i < GetCount(); ++i)
-	{
-		ndBrainFloat num = ndClamp(probability[i], ndBrainFloat(0.0000001f), ndBrainFloat(0.9999999f));;
-		ndBrainFloat den = ndBrainFloat(1.0f) - num;
-		ndBrainFloat logits = ndBrainFloat (ndLog(num / den));
-		ndBrainFloat r = ndBrainFloat(0.930159f) * ndBrainFloat (ndRand()) + ndBrainFloat(1.0e-6f);
-		ndBrainFloat noise = beta * ndBrainFloat (-ndLog(-ndLog(r)));
-		ndBrainFloat sample = ndBrainFloat (ndExp (logits + noise));
-		sum += sample;
-		(*this)[i] = sample;
-	}
-	Scale(ndBrainFloat(1.0f) / sum);
-}
-
-void ndBrainVector::CalculateMeanAndVariance(ndBrainFloat& mean, ndBrainFloat& deviation) const
-{
-	ndFloat64 sum = ndFloat64(0.0f);
-	ndFloat64 sum2 = ndFloat64(0.0f);
-	for (ndInt64 i = GetCount() - 1; i >= 0; --i)
-	{
-		ndFloat64 x = (*this)[i];
-		sum += x;
-		sum2 += x * x;
-	}
-	ndFloat64 den = ndFloat64(1.0f) / ndBrainFloat(GetCount());
-	ndFloat64 average = sum * den;
-	ndFloat64 variance2 = ndMax((sum2 * den - average * average), ndFloat64(1.0e-12f));
-
-	mean = ndBrainFloat(average);
-	deviation = ndBrainFloat(ndSqrt (variance2));
-}
-
-void ndBrainVector::CalculateMeanAndDeviation____(const ndBrainVector& mean, const ndBrainVector& deviation)
-{
-	//for (ndInt64 i = GetCount() - 1; i >= 0; --i)
-	//{
-	//	(*this)[i] = ndGaussianRandom((*this)[i], deviation[i], uniformRand[i]);
-	//}
-	StandardNormalDistribution();
-	Mul(deviation);
-	Add(mean);
-}
-
-void ndBrainVector::StandardNormalDistribution()
-{
-	for (ndInt64 i = GetCount() - 1; i >= 0; --i)
-	{
-		ndFloat32 uniformRandomVariable = (*this)[i];
-		ndAssert(uniformRandomVariable >= ndFloat32(0.0f));
-		ndAssert(uniformRandomVariable <= ndFloat32(1.0f));
-		(*this)[i] = ndStandardNormalGaussian(uniformRandomVariable);
-	}
-}
-
-void ndBrainVector::GaussianNormalize()
-{
-	ndBrainFloat mean;
-	ndBrainFloat variance;
-	CalculateMeanAndVariance(mean, variance);
-	ndBrainFloat invVariance = ndBrainFloat(1.0f) / variance;
-	for (ndInt64 i = GetCount() - 1; i >= 0; --i)
-	{
-		ndBrainFloat x = (*this)[i];
-		(*this)[i] = (x - mean) * invVariance;
-	}
-}
-
-void ndBrainVector::SoftMaxNormalize()
-{
-	ndBrainFloat max = ndBrainFloat(0.0f);
-	for (ndInt32 i = ndInt32(GetCount() - 1); i >= 0; --i)
-	{
-		max = ndMax((*this)[i], max);
-	}
-
-	ndBrainFloat acc = ndBrainFloat(0.0f);
-	for (ndInt32 i = ndInt32(GetCount() - 1); i >= 0; --i)
-	{
-		ndBrainFloat in = ndMax(((*this)[i] - max), ndBrainFloat(-30.0f));
-		ndAssert(in <= ndBrainFloat(0.0f));
-		ndBrainFloat prob = ndBrainFloat(ndExp(in));
-		(*this)[i] = prob;
-		acc += prob;
-	}
-
-	ndAssert(acc > ndBrainFloat(0.0f));
-	Scale(ndBrainFloat(1.0f) / acc);
-}
-
 void ndBrainVector::Scale(ndBrainFloat scale)
 {
 	ndAssert(GetCount() < (1ll << 32));
@@ -183,7 +58,7 @@ void ndBrainVector::Scale(ndBrainFloat scale)
 
 void ndBrainVector::Min(ndBrainFloat b)
 {
-	ndMin (ndInt32(GetCount()), &(*this)[0], b);
+	ndMin(ndInt32(GetCount()), &(*this)[0], b);
 }
 
 void ndBrainVector::Max(ndBrainFloat b)
@@ -271,7 +146,7 @@ void ndBrainVector::ScaleSet(const ndBrainVector& a, ndBrainFloat b)
 {
 	ndAssert(GetCount() < (1ll << 32));
 	ndAssert(GetCount() == a.GetCount());
-	ndScaleSet(ndInt32 (GetCount()), &(*this)[0], &a[0], b);
+	ndScaleSet(ndInt32(GetCount()), &(*this)[0], &a[0], b);
 }
 
 void ndBrainVector::ScaleAdd(const ndBrainVector& a, ndBrainFloat b)
@@ -338,8 +213,6 @@ void ndBrainVector::Blend(const ndBrainVector& target, const ndBrainVector& blen
 	ndAssert(GetCount() < (1ll << 32));
 	ndAssert(GetCount() == blend.GetCount());
 	ndAssert(GetCount() == target.GetCount());
-	//Scale(ndBrainFloat(1.0f) - blend);
-	//ScaleAdd(target, blend);
 	for (ndInt64 i = GetCount() - 1; i >= 0; --i)
 	{
 		ndBrainFloat s0 = blend[i];
@@ -364,4 +237,137 @@ void ndBrainMemVector::Swap(ndBrainMemVector& src)
 	ndSwap(m_size, src.m_size);
 	ndSwap(m_array, src.m_array);
 	ndSwap(m_capacity, src.m_capacity);
+}
+
+// using Random variate generation from https://en.wikipedia.org/wiki/Gumbel_distribution 
+void ndBrainVector::CategoricalSample(const ndBrainVector& probability, ndBrainFloat beta)
+{
+	#ifdef _DEBUG
+		ndBrainFloat acc = ndBrainFloat(0.0f);
+		for (ndInt32 i = 0; i < GetCount(); ++i)
+		{
+			acc += probability[i];
+		}
+		ndAssert(ndAbs(acc - ndFloat32(1.0f)) < ndBrainFloat(1.0e-5f));
+	#endif	
+
+	//ndBrainFloat xxx = 0.0f;
+	//for (ndInt32 i = 0; i < 20; ++i)
+	//{
+	//	ndBrainFloat map = ndBrainFloat(0.930159f) * xxx + ndBrainFloat(1.0e-6f);
+	//	ndBrainFloat xxx1 = -ndLog (-ndLog(map));
+	//	xxx += 1.0f / 20.0f;
+	//}
+
+	ndBrainFloat sum = ndBrainFloat(0.0f);
+	for (ndInt32 i = 0; i < GetCount(); ++i)
+	{
+		ndBrainFloat num = ndClamp(probability[i], ndBrainFloat(0.0000001f), ndBrainFloat(0.9999999f));;
+		ndBrainFloat den = ndBrainFloat(1.0f) - num;
+		ndBrainFloat logits = ndBrainFloat (ndLog(num / den));
+		ndBrainFloat r = ndBrainFloat(0.930159f) * ndBrainFloat (ndRand()) + ndBrainFloat(1.0e-6f);
+		ndBrainFloat noise = beta * ndBrainFloat (-ndLog(-ndLog(r)));
+		ndBrainFloat sample = ndBrainFloat (ndExp (logits + noise));
+		sum += sample;
+		(*this)[i] = sample;
+	}
+	Scale(ndBrainFloat(1.0f) / sum);
+}
+
+void ndBrainVector::CalculateMeanAndVariance(ndBrainFloat& mean, ndBrainFloat& deviation) const
+{
+	ndFloat64 sum = ndFloat64(0.0f);
+	ndFloat64 sum2 = ndFloat64(0.0f);
+	for (ndInt64 i = GetCount() - 1; i >= 0; --i)
+	{
+		ndFloat64 x = (*this)[i];
+		sum += x;
+		sum2 += x * x;
+	}
+	ndFloat64 den = ndFloat64(1.0f) / ndBrainFloat(GetCount());
+	ndFloat64 average = sum * den;
+	ndFloat64 variance2 = ndMax((sum2 * den - average * average), ndFloat64(1.0e-12f));
+
+	mean = ndBrainFloat(average);
+	deviation = ndBrainFloat(ndSqrt (variance2));
+}
+
+void ndBrainVector::StandardNormalDistribution()
+{
+	for (ndInt64 i = GetCount() - 1; i >= 0; --i)
+	{
+		ndFloat32 uniformRandomVariable = (*this)[i];
+		ndAssert(uniformRandomVariable >= ndFloat32(0.0f));
+		ndAssert(uniformRandomVariable <= ndFloat32(1.0f));
+		(*this)[i] = ndStandardNormalGaussian(uniformRandomVariable);
+	}
+}
+
+void ndBrainVector::InitGaussianWeights(ndBrainFloat variance)
+{
+	if (variance > ndBrainFloat(1.0e-6f))
+	{
+		for (ndInt64 i = GetCount() - 1; i >= 0; --i)
+		{
+			(*this)[i] = ndBrainFloat(ndGaussianRandom(ndFloat32(0.0f), ndFloat32(variance)));
+		}
+	}
+	else
+	{
+		Set(ndFloat32(0.0f));
+	}
+}
+
+void ndBrainVector::GaussianNormalize()
+{
+	ndBrainFloat mean;
+	ndBrainFloat variance;
+	CalculateMeanAndVariance(mean, variance);
+	ndBrainFloat invVariance = ndBrainFloat(1.0f) / variance;
+	for (ndInt64 i = GetCount() - 1; i >= 0; --i)
+	{
+		ndBrainFloat x = (*this)[i];
+		(*this)[i] = (x - mean) * invVariance;
+	}
+}
+
+void ndBrainVector::SoftMaxNormalize()
+{
+	ndBrainFloat max = ndBrainFloat(0.0f);
+	for (ndInt32 i = ndInt32(GetCount() - 1); i >= 0; --i)
+	{
+		max = ndMax((*this)[i], max);
+	}
+
+	ndBrainFloat acc = ndBrainFloat(0.0f);
+	for (ndInt32 i = ndInt32(GetCount() - 1); i >= 0; --i)
+	{
+		ndBrainFloat in = ndMax(((*this)[i] - max), ndBrainFloat(-30.0f));
+		ndAssert(in <= ndBrainFloat(0.0f));
+		ndBrainFloat prob = ndBrainFloat(ndExp(in));
+		(*this)[i] = prob;
+		acc += prob;
+	}
+
+	ndAssert(acc > ndBrainFloat(0.0f));
+	Scale(ndBrainFloat(1.0f) / acc);
+}
+
+ndBrainFloat ndBrainVector::CalculateEntropyRegularization(const ndBrainVector& sigmaBuffer, ndBrainFloat regularization) const
+{
+	ndAssert(GetCount() == sigmaBuffer.GetCount());
+	ndBrainFloat entropy = -ndBrainFloat(0.5f) * ndBrainFloat (GetCount()) * ndLog(ndBrainFloat(2.0f) * ndPi);
+
+	//float xxxx = 1.0f;
+	for (ndInt32 i = 0; i < GetCount(); ++i)
+	{
+		ndFloat32 sample = (*this)[i];
+		ndFloat32 sigma = sigmaBuffer[i];
+		entropy += - ndFloat32(0.5f) * sample * sample / (sigma * sigma) - ndLog(sigma);
+
+		//xxxx = xxxx * (1.0f / (ndSqrt(2.0 * ndPi) * sigma));
+		//xxxx = xxxx * ndExp_VSFix(-ndFloat32(0.5f) * sample * sample / (sigma * sigma));
+	}
+	//xxxx = ndLog(xxxx);
+	return entropy * regularization;
 }
