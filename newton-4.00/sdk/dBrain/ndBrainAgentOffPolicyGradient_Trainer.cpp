@@ -79,7 +79,7 @@ ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 	m_hiddenLayersNumberOfNeurons = 256;
 	m_replayBufferStartOptimizeSize = 1024 * 64;
 
-m_useGpuBackend = false;
+//m_useGpuBackend = false;
 m_useSofActorCritic = false;
 //m_miniBatchSize = 16;
 //m_numberOfUpdates = 1;

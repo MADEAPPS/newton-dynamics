@@ -136,6 +136,7 @@ void ndBrainGpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
 		shader.m_parameters.PushBack(desc[i]);
 	}
 
+#if 0
 	ndAtomic<ndInt32> iterator(0);
 	auto ExecuteCommand = ndMakeObject::ndFunction([this, &iterator, &command](ndInt32, ndInt32)
 	{
@@ -151,6 +152,17 @@ void ndBrainGpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
 		}
 	});
 	ParallelExecute(ExecuteCommand);
+#else
+
+	auto ExecuteCommand = ndMakeObject::ndFunction([this, &command](ndInt32 groupId, ndInt32)
+	{
+		ndBrainBufferCommandDesc& desc = command->GetDescriptor();
+		ndBrainKernel& shader = **desc.m_kernel;
+		ndInt32 workGroupdSize = ndInt32(desc.m_workGroupSize);
+		shader.Execute(groupId, workGroupdSize);
+	});
+	ParallelExecuteNew(ExecuteCommand, desc.m_miniBatchSize);
+#endif
 }
 
 void ndBrainGpuContext::BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector)
@@ -257,18 +269,6 @@ void ndBrainGpuContext::ScaleAdd(ndBrainFloatBuffer& buffer, const ndBrainFloatB
 	const ndBrainMemVector src((ndBrainFloat*)srcBuffer.GetCpuPtr(), elements);
 	dst.ScaleAdd(src, scale);
 }
-
-//void ndBrainGpuContext::GaussianSample(ndBrainFloatBuffer& meanBuffer, const ndBrainFloatBuffer& sigmaBuffer, const ndBrainFloatBuffer& uniformRandomBuffer)
-//{
-//	ndAssert(meanBuffer.SizeInBytes() == sigmaBuffer.SizeInBytes());
-//	ndAssert(meanBuffer.SizeInBytes() == uniformRandomBuffer.SizeInBytes());
-//
-//	ndInt32 elements = ndInt32(meanBuffer.SizeInBytes() / sizeof(ndBrainFloat));
-//	ndBrainMemVector mean((ndBrainFloat*)meanBuffer.GetCpuPtr(), elements);
-//	const ndBrainMemVector sigma((ndBrainFloat*)sigmaBuffer.GetCpuPtr(), elements);
-//	const ndBrainMemVector uniformRand((ndBrainFloat*)uniformRandomBuffer.GetCpuPtr(), elements);
-//	mean.CalculateMeanAndDeviation(sigma, uniformRand);
-//}
 
 void ndBrainGpuContext::StandardNormalDistribution(ndBrainFloatBuffer& uniformRandomVariable)
 {
