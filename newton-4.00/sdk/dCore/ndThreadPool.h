@@ -30,9 +30,6 @@
 #include "ndSemaphore.h"
 #include "ndClassAlloc.h"
 
-//#define	D_USE_SYNC_SEMAPHORE
-
-//#define	D_MAX_THREADS_COUNT	16
 #define	D_MAX_THREADS_COUNT	32
 #define D_WORKER_BATCH_SIZE	32
 
@@ -86,12 +83,7 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 		ndThreadPool* m_owner;
 		ndTask* m_task;
 		ndInt32 m_threadIndex;
-		#ifdef D_USE_SYNC_SEMAPHORE
-		ndSemaphore m_taskReady;
-		//std::binary_semaphore m_taskReady;
-		#else
 		ndUnsigned8 m_taskReady;
-		#endif
 		ndUnsigned8 m_begin;
 		ndUnsigned8 m_stillLooping;
 		friend class ndThreadPool;

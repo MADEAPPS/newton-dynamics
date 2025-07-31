@@ -29,7 +29,6 @@ class ndBrainThreadPool::ndWorker : public ndThread
 		:ndThread()
 		,m_task(nullptr)
 		,m_owner(owner)
-		//,m_threadIndex(threadIndex)
 	{
 		SetName(name);
 	}
@@ -57,7 +56,6 @@ class ndBrainThreadPool::ndWorker : public ndThread
 
 	ndTask* m_task;
 	ndBrainThreadPool* m_owner;
-	//ndInt32 m_threadIndex;
 	friend class ndBrainThreadPool;
 };
 

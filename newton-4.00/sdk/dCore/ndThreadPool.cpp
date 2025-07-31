@@ -31,11 +31,7 @@ ndThreadPool::ndWorker::ndWorker()
 	,m_owner(nullptr)
 	,m_task(nullptr)
 	,m_threadIndex(0)
-#ifdef D_USE_SYNC_SEMAPHORE
-	,m_taskReady()
-#else
 	,m_taskReady(0)
-#endif
 	,m_begin(0)
 	,m_stillLooping(0)
 {
@@ -48,21 +44,13 @@ ndThreadPool::ndWorker::~ndWorker()
 
 ndUnsigned8 ndThreadPool::ndWorker::IsTaskInProgress() const
 {
-	#ifdef D_USE_SYNC_SEMAPHORE
-	return ndUnsigned8 (m_task ? 1 : 0);
-	#else
 	return m_taskReady;
-	#endif
 }
 
 void ndThreadPool::ndWorker::ExecuteTask(ndTask* const task)
 {
 	m_task = task;
-#ifdef D_USE_SYNC_SEMAPHORE
-	m_taskReady.Signal();
-#else
 	m_taskReady = 1;
-#endif
 }
 
 void ndThreadPool::ndWorker::TaskUpdate()
@@ -103,18 +91,7 @@ void ndThreadPool::ndWorker::ThreadFunction()
 {
 #ifndef	D_USE_THREAD_EMULATION
 	m_stillLooping = 1;
-
-#ifdef D_USE_SYNC_SEMAPHORE
-	while (!m_taskReady.Wait() && m_task)
-	{
-		//D_TRACKTIME();
-		m_task->Execute();
-		m_task = nullptr;
-	}
-#else
-
 	m_owner->WorkerUpdate(m_threadIndex);
-#endif
 	m_stillLooping = 0;
 #endif
 }
@@ -218,9 +195,7 @@ void ndThreadPool::End()
 	for (ndInt32 i = 0; i < m_count; ++i)
 	{
 		m_workers[i].ExecuteTask(nullptr);
-		#if !defined(D_USE_SYNC_SEMAPHORE)
 		m_workers[i].m_begin = 0;
-		#endif
 	}
 
 	ndUnsigned8 stillLooping = 1;
