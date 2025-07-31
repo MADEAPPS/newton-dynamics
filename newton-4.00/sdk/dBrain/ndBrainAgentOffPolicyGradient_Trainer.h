@@ -222,7 +222,7 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchSigma;
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchEntropy;
 
-	ndSharedPtr<ndBrainFloatBuffer> m_uniformRandom0;
+	ndSharedPtr<ndBrainFloatBuffer> m_uniformRandom;
 	ndSharedPtr<ndBrainFloatBuffer> m_replayBufferFlat;
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchRewards;
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchNoTerminal;
