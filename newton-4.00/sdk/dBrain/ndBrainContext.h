@@ -64,6 +64,8 @@ class ndBrainContext : public ndClassAlloc
 	virtual void Min(ndBrainFloatBuffer& buffer, ndBrainFloat value) = 0;
 	virtual void Max(ndBrainFloatBuffer& buffer, ndBrainFloat value) = 0;
 	virtual void Scale(ndBrainFloatBuffer& buffer, ndBrainFloat scale) = 0;
+	virtual void Less(ndBrainFloatBuffer& buffer, ndBrainFloat test) { ndAssert(0); }
+	virtual void Greater(ndBrainFloatBuffer& buffer, ndBrainFloat test) { ndAssert(0); }
 	virtual void LessEqual(ndBrainFloatBuffer& buffer, ndBrainFloat test) = 0;
 	virtual void GreaterEqual(ndBrainFloatBuffer& buffer, ndBrainFloat test) = 0;
 	virtual void Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat blend) = 0;
@@ -72,6 +74,8 @@ class ndBrainContext : public ndClassAlloc
 
 	virtual void BroadcastScaler(ndBrainFloatBuffer& buffer, ndInt32 bufferStrideInFloats, const ndBrainFloatBuffer& srcScalar) = 0;
 
+	virtual void SetOrdinal(ndBrainFloatBuffer&) { ndAssert(0); }
+	virtual void ReductionSum(ndBrainFloatBuffer&) { ndAssert(0); }
 	virtual void StandardNormalDistribution(ndBrainFloatBuffer& uniformRandomVariable) = 0;
 	virtual void CalculateEntropyRegularization(ndBrainFloatBuffer&, const ndBrainFloatBuffer&, const ndBrainFloatBuffer&, ndBrainFloat) { ndAssert(0);}
 };

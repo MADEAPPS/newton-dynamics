@@ -43,6 +43,10 @@ class ndBrainFloatBuffer : public ndBrainBuffer
 	void Min(ndBrainFloat value);
 	void Max(ndBrainFloat value);
 	void Scale(ndBrainFloat value);
+	void Less(ndBrainFloat value);
+	void Greater(ndBrainFloat value);
+	void LessEqual(ndBrainFloat value);
+	void GreaterEqual(ndBrainFloat value);
 	void Blend(const ndBrainFloatBuffer& buffer, ndBrainFloat blendFactor);
 
 	void Set(const ndBrainFloatBuffer& buffer);
@@ -55,7 +59,8 @@ class ndBrainFloatBuffer : public ndBrainBuffer
 	void GreaterEqual(const ndBrainFloatBuffer& buffer);
 	void Blend(const ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& blendFactor);
 
-
+	void SetOrdinal();
+	void ReductionSum();
 	void StandardNormalDistribution();
 	void BroadcastScaler(const ndBrainFloatBuffer& srcScalars);
 	void CalculateEntropyRegularization(const ndBrainFloatBuffer& sample, const ndBrainFloatBuffer& sigma, ndBrainFloat regularization);

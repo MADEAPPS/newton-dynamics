@@ -41,6 +41,9 @@ class ndBrainVector: public ndArray<ndBrainFloat>
 	void Mul(const ndBrainVector& a);
 	void Min(const ndBrainVector& a);
 	void Max(const ndBrainVector& a);
+
+	void Less(ndBrainFloat test);
+	void Greater(ndBrainFloat test);
 	void LessEqual(ndBrainFloat test);
 	void GreaterEqual(ndBrainFloat test);
 	void LessEqual(const ndBrainVector& a);
@@ -62,9 +65,11 @@ class ndBrainVector: public ndArray<ndBrainFloat>
 	void Blend(const ndBrainVector& blend, ndBrainFloat a, ndBrainFloat b);
 	void MulAdd(const ndBrainVector& a, const ndBrainVector& b);
 	void MulSub(const ndBrainVector& a, const ndBrainVector& b);
-	
-	ndBrainFloat Dot(const ndBrainVector& a) const;
+
+	void SetOrdinal();
+	void ReductionSum();
 	void StandardNormalDistribution();
+	ndBrainFloat Dot(const ndBrainVector& a) const;
 	void CalculateMeanAndVariance(ndBrainFloat& mean, ndBrainFloat& variance) const;
 	void CategoricalSample(const ndBrainVector& probability, ndBrainFloat beta = ndBrainFloat(0.5f));
 	ndBrainFloat CalculateEntropyRegularization(const ndBrainVector& variance, ndBrainFloat regularization) const;

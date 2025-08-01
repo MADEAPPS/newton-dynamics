@@ -34,6 +34,27 @@ void ndBrainVector::Set(const ndBrainVector& data)
 	ndMemCpy(&(*this)[0], &data[0], GetCount());
 }
 
+void ndBrainVector::SetOrdinal()
+{
+	for (ndInt64 i = 0; i < GetCount(); ++i)
+	{
+		(*this)[i] = ndBrainFloat(i);
+	}
+}
+
+void ndBrainVector::ReductionSum()
+{
+	ndBrainFloat sum = ndBrainFloat(0.0f);
+	for (ndInt64 i = 0; i < GetCount(); ++i)
+	{
+		sum += (*this)[i];
+	}
+	for (ndInt64 i = 0; i < GetCount(); ++i)
+	{
+		(*this)[i] = sum;
+	}
+}
+
 ndInt64 ndBrainVector::ArgMax() const
 {
 	ndInt64 index = 0;
@@ -115,10 +136,22 @@ void ndBrainVector::LessEqual(const ndBrainVector& a)
 	ndLessEqualMask(ndInt32(GetCount()), &(*this)[0], &a[0]);
 }
 
+void ndBrainVector::Less(ndBrainFloat test)
+{
+	ndAssert(GetCount() < (1ll << 32));
+	ndLessMask(ndInt32(GetCount()), &(*this)[0], test);
+}
+
 void ndBrainVector::LessEqual(ndBrainFloat test)
 {
 	ndAssert(GetCount() < (1ll << 32));
 	ndLessEqualMask(ndInt32(GetCount()), &(*this)[0], test);
+}
+
+void ndBrainVector::Greater(ndBrainFloat test)
+{
+	ndAssert(GetCount() < (1ll << 32));
+	ndGreaterMask(ndInt32(GetCount()), &(*this)[0], test);
 }
 
 void ndBrainVector::GreaterEqual(ndBrainFloat test)

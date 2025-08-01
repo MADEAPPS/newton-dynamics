@@ -136,10 +136,19 @@ void ndBrainFloatBuffer::VectorToDevice(const ndBrainVector& vector)
 	MemoryToDevice(0, vector.GetCount() * sizeof(ndReal), &vector[0]);
 }
 
-
 void ndBrainFloatBuffer::Set(const ndBrainFloatBuffer& buffer)
 {
 	m_context->Set(*this, buffer);
+}
+
+void ndBrainFloatBuffer::SetOrdinal()
+{
+	m_context->SetOrdinal(*this);
+}
+
+void ndBrainFloatBuffer::ReductionSum()
+{
+	m_context->ReductionSum(*this);
 }
 
 void ndBrainFloatBuffer::Add(const ndBrainFloatBuffer& buffer)
@@ -195,6 +204,26 @@ void ndBrainFloatBuffer::Min(ndBrainFloat value)
 void ndBrainFloatBuffer::Max(ndBrainFloat value)
 {
 	m_context->Max(*this, value);
+}
+
+void ndBrainFloatBuffer::Less(ndBrainFloat value)
+{
+	m_context->Less(*this, value);
+}
+
+void ndBrainFloatBuffer::Greater(ndBrainFloat value)
+{
+	m_context->Greater(*this, value);
+}
+
+void ndBrainFloatBuffer::LessEqual(ndBrainFloat value)
+{
+	m_context->LessEqual(*this, value);
+}
+
+void ndBrainFloatBuffer::GreaterEqual(ndBrainFloat value)
+{
+	m_context->GreaterEqual(*this, value);
 }
 
 void ndBrainFloatBuffer::Blend(const ndBrainFloatBuffer& buffer, ndBrainFloat blendFactor)

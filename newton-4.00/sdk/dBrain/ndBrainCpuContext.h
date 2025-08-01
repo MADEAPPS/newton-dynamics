@@ -50,12 +50,16 @@ class ndBrainCpuContext : public ndBrainContext, public ndBrainThreadPool
 	virtual void Min(ndBrainFloatBuffer& buffer, ndBrainFloat value) override;
 	virtual void Max(ndBrainFloatBuffer& buffer, ndBrainFloat value) override;
 	virtual void Scale(ndBrainFloatBuffer& buffer, ndBrainFloat scale) override;
+	virtual void Less(ndBrainFloatBuffer& buffer, ndBrainFloat test) override;
+	virtual void Greater(ndBrainFloatBuffer& buffer, ndBrainFloat test) override;
 	virtual void LessEqual(ndBrainFloatBuffer& buffer, ndBrainFloat test) override;
 	virtual void GreaterEqual(ndBrainFloatBuffer& buffer, ndBrainFloat test) override;
 	virtual void Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat blend) override;
 	virtual void Select(ndBrainFloatBuffer& buffer, ndBrainFloatBuffer& mask, ndBrainFloat a, ndBrainFloat b) override;
 	virtual void ScaleAdd(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat scale) override;
 
+	virtual void SetOrdinal(ndBrainFloatBuffer& buffer) override;
+	virtual void ReductionSum(ndBrainFloatBuffer& buffer) override;
 	virtual void StandardNormalDistribution(ndBrainFloatBuffer& uniformRandomVariable) override;
 	virtual void BroadcastScaler(ndBrainFloatBuffer& buffer, ndInt32 bufferStrideInFloats, const ndBrainFloatBuffer& srcScalar) override;
 	virtual void CalculateEntropyRegularization(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& sampleBuffer, const ndBrainFloatBuffer& sigmaBuffer, ndBrainFloat regularization) override;
