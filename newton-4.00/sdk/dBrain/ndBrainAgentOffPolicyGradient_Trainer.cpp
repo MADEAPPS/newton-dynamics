@@ -1323,7 +1323,6 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainTd3Policy()
 	critic.MakePrediction();
 
 	//the gradient is just 1.0
-	//ndBrainFloatBuffer* const criticMinibatchInputGradientBuffer = critic.GetInputGradientBuffer();
 	ndBrainFloatBuffer* const criticMinibatchOutputGradientBuffer = critic.GetOuputGradientBuffer();
 	criticMinibatchOutputGradientBuffer->Set(ndBrainFloat(1.0f));
 	critic.BackPropagate();
@@ -1387,7 +1386,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainSacPolicy()
 	m_minibatchUniformRandomDistribution->Mul(**m_minibatchSigma);
 
 	// calculate entropy Regulatization
-	m_minibatchEntropy->CalculateEntropyRegularization(**m_minibatchUniformRandomDistribution, **m_minibatchSigma, m_parameters.m_entropyRegularizerCoef);
+	//m_minibatchEntropy->CalculateEntropyRegularization(**m_minibatchUniformRandomDistribution, **m_minibatchSigma, m_parameters.m_entropyRegularizerCoef);
 
 	// add noise to the actions mean and clip the result to the actions limits
 	m_minibatchMean->Add(**m_minibatchUniformRandomDistribution);
@@ -1399,14 +1398,6 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainSacPolicy()
 	{
 		ndBrainTrainer& critic = **m_criticTrainer[i];
 		ndBrainFloatBuffer* const criticMinibatchInputBuffer = critic.GetInputBuffer();
-
-		//ndCopyBufferCommandInfo criticInputAction;
-		//criticInputAction.m_srcOffsetInByte = 0;
-		//criticInputAction.m_srcStrideInByte = ndInt32(policy->GetBrain()->GetOutputSize() * sizeof(ndReal));
-		//criticInputAction.m_dstOffsetInByte = 0;
-		//criticInputAction.m_dstStrideInByte = ndInt32(criticInputSize * sizeof(ndReal));
-		//criticInputAction.m_strideInByte = ndInt32(policy->GetBrain()->GetOutputSize() * sizeof(ndReal));
-		//criticMinibatchInputBuffer->CopyBuffer(criticInputAction, m_parameters.m_miniBatchSize, *policyMinibatchOutputBuffer);
 
 		ndCopyBufferCommandInfo criticInputNextActionMean;
 		criticInputNextActionMean.m_srcOffsetInByte = 0;
