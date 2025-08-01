@@ -67,7 +67,8 @@ class ndBrainVector: public ndArray<ndBrainFloat>
 	void StandardNormalDistribution();
 	void CalculateMeanAndVariance(ndBrainFloat& mean, ndBrainFloat& variance) const;
 	void CategoricalSample(const ndBrainVector& probability, ndBrainFloat beta = ndBrainFloat(0.5f));
-	ndBrainFloat CalculateEntropyRegularization(const ndBrainVector& sigmaBuffer, ndBrainFloat regularization) const;
+	ndBrainFloat CalculateEntropyRegularization(const ndBrainVector& variance, ndBrainFloat regularization) const;
+	void CalculateEntropyRegularizationGradient(const ndBrainVector& mean, const ndBrainVector& variance, ndBrainFloat regularization);
 };
 
 class ndBrainMemVector: public ndBrainVector

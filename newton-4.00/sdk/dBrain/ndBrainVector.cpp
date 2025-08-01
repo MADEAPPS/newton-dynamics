@@ -353,7 +353,7 @@ void ndBrainVector::SoftMaxNormalize()
 	Scale(ndBrainFloat(1.0f) / acc);
 }
 
-ndBrainFloat ndBrainVector::CalculateEntropyRegularization(const ndBrainVector& sigmaBuffer, ndBrainFloat regularization) const
+ndBrainFloat ndBrainVector::CalculateEntropyRegularization(const ndBrainVector& varianceBuffer, ndBrainFloat regularization) const
 {
 	ndAssert(GetCount() == sigmaBuffer.GetCount());
 	ndBrainFloat entropy = -ndBrainFloat(0.5f) * ndBrainFloat (GetCount()) * ndLog(ndBrainFloat(2.0f) * ndPi);
@@ -362,7 +362,7 @@ ndBrainFloat ndBrainVector::CalculateEntropyRegularization(const ndBrainVector& 
 	for (ndInt32 i = 0; i < GetCount(); ++i)
 	{
 		ndFloat32 sample = (*this)[i];
-		ndFloat32 sigma = sigmaBuffer[i];
+		ndFloat32 sigma = varianceBuffer[i];
 		entropy += - ndFloat32(0.5f) * sample * sample / (sigma * sigma) - ndLog(sigma);
 
 		//xxxx = xxxx * (1.0f / (ndSqrt(2.0 * ndPi) * sigma));
@@ -370,4 +370,22 @@ ndBrainFloat ndBrainVector::CalculateEntropyRegularization(const ndBrainVector& 
 	}
 	//xxxx = ndLog(xxxx);
 	return entropy * regularization;
+}
+
+void ndBrainVector::CalculateEntropyRegularizationGradient(const ndBrainVector& meanSampleBuffer, const ndBrainVector& varianceBuffer, ndBrainFloat regularization)
+{
+	ndAssert(GetCount() == varianceBuffer.GetCount() * 2);
+	ndAssert(meanSampleBuffer.GetCount() == varianceBuffer.GetCount());
+
+	const ndInt32 base = ndInt32 (GetCount());
+	for (ndInt32 i = 0; i < base; ++i)
+	{
+		ndFloat32 sigma = varianceBuffer[i];
+		ndFloat32 sample = meanSampleBuffer[i];
+		ndFloat32 invSigma = ndFloat32(1.0f) / sigma;
+		ndFloat32 invSigma2 = invSigma * invSigma;
+
+		(*this)[i] = regularization * sample * invSigma2;
+		(*this)[i + base] = regularization * invSigma * (sample * sample * invSigma2 - ndFloat32(1.0f));
+	}
 }
