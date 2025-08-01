@@ -355,7 +355,7 @@ void ndBrainVector::SoftMaxNormalize()
 
 ndBrainFloat ndBrainVector::CalculateEntropyRegularization(const ndBrainVector& varianceBuffer, ndBrainFloat regularization) const
 {
-	ndAssert(GetCount() == sigmaBuffer.GetCount());
+	ndAssert(GetCount() == varianceBuffer.GetCount());
 	ndBrainFloat entropy = -ndBrainFloat(0.5f) * ndBrainFloat (GetCount()) * ndLog(ndBrainFloat(2.0f) * ndPi);
 
 	//float xxxx = 1.0f;
