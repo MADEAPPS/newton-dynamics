@@ -1140,8 +1140,8 @@ namespace ndQuadruped_2
 		{
 			ndWorld* const world = scene->GetWorld();
 
-			ndInt32 hiddenLayers = 4;
-			ndInt32 hiddenLayersNeurons = 64;
+			//ndInt32 hiddenLayers = 4;
+			//ndInt32 hiddenLayersNeurons = 64;
 			ndInt32 numberOfActions = m_actionsSize;
 			ndInt32 numberOfObservations = m_observationSize * 4 + 2;
 
@@ -1155,8 +1155,8 @@ namespace ndQuadruped_2
 				//hyperParameters.m_usePerActionSigmas = true;
 				hyperParameters.m_numberOfActions = numberOfActions;
 				hyperParameters.m_numberOfObservations = numberOfObservations;
-				hyperParameters.m_numberOfHiddenLayers = hiddenLayers;
-				hyperParameters.m_hiddenLayersNumberOfNeurons = hiddenLayersNeurons;
+				//hyperParameters.m_numberOfHiddenLayers = hiddenLayers;
+				//hyperParameters.m_hiddenLayersNumberOfNeurons = hiddenLayersNeurons;
 				m_master = ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>(new ndBrainAgentOffPolicyGradient_Trainer(hyperParameters));
 			#else
 				m_outFile = fopen("ndQuadruped_2-ppo.csv", "wb");
