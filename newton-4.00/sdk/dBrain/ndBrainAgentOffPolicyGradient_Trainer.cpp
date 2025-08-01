@@ -1227,9 +1227,6 @@ void ndBrainAgentOffPolicyGradient_Trainer::CalculateSacExpectedRewards()
 	m_minibatchUniformRandomDistribution->StandardNormalDistribution();
 	m_minibatchUniformRandomDistribution->Mul(**m_minibatchSigma);
 
-	// calculate entropy Regulatization
-	m_minibatchEntropy->CalculateEntropyRegularization(**m_minibatchUniformRandomDistribution, **m_minibatchSigma, m_parameters.m_entropyRegularizerCoef);
-
 	// add noise to the actions mean and clip the result to the actions limits
 	m_minibatchMean->Add(**m_minibatchUniformRandomDistribution);
 	m_minibatchMean->Min(ndBrainFloat(1.0f));
@@ -1265,21 +1262,22 @@ void ndBrainAgentOffPolicyGradient_Trainer::CalculateSacExpectedRewards()
 		criticInputNextObservation.m_strideInByte = ndInt32(policy->GetBrain()->GetInputSize() * sizeof(ndReal));
 		criticInputBuffer.CopyBuffer(criticInputNextObservation, m_parameters.m_miniBatchSize, *policyMinibatchInputBuffer);
 		m_referenceCriticTrainer[i]->MakePrediction();
-
-		ndBrainFloatBuffer& qValueBuffer = *referenceCritic.GetOuputBuffer();
-		qValueBuffer.Mul(**m_minibatchNoTerminal);
-		qValueBuffer.Scale(m_parameters.m_discountRewardFactor);
-		qValueBuffer.Add(**m_minibatchRewards);
 	}
 
-	ndBrainFloatBuffer& minExpectedReward = *m_referenceCriticTrainer[0]->GetOuputBuffer();
+	ndBrainFloatBuffer& qValue = *m_referenceCriticTrainer[0]->GetOuputBuffer();
 	for (ndInt32 i = 1; i < ndInt32(sizeof(m_criticTrainer) / sizeof(m_criticTrainer[0])); ++i)
 	{
-		const ndBrainFloatBuffer& qValueBuffer1 = *m_referenceCriticTrainer[i]->GetOuputBuffer();
-		minExpectedReward.Min(qValueBuffer1);
+		const ndBrainFloatBuffer& qValue1 = *m_referenceCriticTrainer[i]->GetOuputBuffer();
+		qValue.Min(qValue1);
 	}
-	minExpectedReward.Sub(**m_minibatchEntropy);
-	m_minibatchExpectedRewards->Set(minExpectedReward);
+
+	// calculate and add entropy regulatization to the q value
+	m_minibatchEntropy->CalculateEntropyRegularization(**m_minibatchUniformRandomDistribution, **m_minibatchSigma, m_parameters.m_entropyRegularizerCoef);
+	qValue.Sub(**m_minibatchEntropy);
+	qValue.Mul(**m_minibatchNoTerminal);
+	qValue.Scale(m_parameters.m_discountRewardFactor);
+	qValue.Add(**m_minibatchRewards);
+	m_minibatchExpectedRewards->Set(qValue);
 }
 
 //#pragma optimize( "", off )
