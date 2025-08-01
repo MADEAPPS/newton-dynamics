@@ -191,7 +191,7 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 	void Optimize();
 	void CalculateScore();
 	void SaveTrajectory();
-	void SaveTrajectoryLoadBuffer();
+	void CacheTrajectoryTransitions();
 	
 	void TrainSacPolicy();
 	void TrainTd3Policy();
