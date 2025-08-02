@@ -1631,7 +1631,6 @@ R""""(
                 ent += reductionBuffer[i];
             }
             outputBuffer[groupId] = -ent * regularizationTemperature;
-            outputBuffer[groupId] *= 0.1;
         }
 
         //if (groupId < 32) printf ("item(%d) size(%d) gId(%d) elements(%d) e(%f)\n", itemId, workGroupSize, groupId, numberOfElements, outputBuffer[groupId]);
