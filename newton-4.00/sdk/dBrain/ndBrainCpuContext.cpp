@@ -331,13 +331,13 @@ void ndBrainCpuContext::CalculateEntropyRegularization(ndBrainFloatBuffer& buffe
 	ndAssert(sampleBuffer.SizeInBytes() == sigmaBuffer.SizeInBytes());
 	ndAssert(stride * buffer.SizeInBytes() == sampleBuffer.SizeInBytes());
 
-	const ndInt32 elements = ndInt32(buffer.SizeInBytes() / sizeof(ndBrainFloat));
+	const ndInt32 numberOfGroups = ndInt32(buffer.SizeInBytes() / sizeof(ndBrainFloat));
 
-	ndBrainMemVector dst((ndBrainFloat*)buffer.GetCpuPtr(), elements);
-	const ndBrainMemVector sample((ndBrainFloat*)sampleBuffer.GetCpuPtr(), stride * elements);
-	const ndBrainMemVector sigmas((ndBrainFloat*)sigmaBuffer.GetCpuPtr(), stride * elements);
+	ndBrainMemVector dst((ndBrainFloat*)buffer.GetCpuPtr(), numberOfGroups);
+	const ndBrainMemVector sample((ndBrainFloat*)sampleBuffer.GetCpuPtr(), stride * numberOfGroups);
+	const ndBrainMemVector sigmas((ndBrainFloat*)sigmaBuffer.GetCpuPtr(), stride * numberOfGroups);
 
-	for (ndInt32 i = 0; i < elements; ++i)
+	for (ndInt32 i = 0; i < numberOfGroups; ++i)
 	{
 		const ndBrainMemVector sampleMean(&sample[i * stride], stride);
 		const ndBrainMemVector varianceMean(&sigmas[i * stride], stride);

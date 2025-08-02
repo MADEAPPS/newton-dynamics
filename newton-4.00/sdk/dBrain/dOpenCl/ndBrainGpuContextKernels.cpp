@@ -1380,6 +1380,30 @@ R""""(
         }
     }
 
+    __kernel void brainLessScalar(
+        int numberOfElements,
+        __global float* outputData,
+        float test)
+    {
+        int global_id = get_global_id(0);
+        if (global_id < numberOfElements)
+        {
+            outputData[global_id] = (outputData[global_id] < test) ? 1.0 : 0.0;
+        }
+    }
+
+    __kernel void brainGreaterScalar(
+        int numberOfElements,
+        __global float* outputData,
+        float test)
+    {
+        int global_id = get_global_id(0);
+        if (global_id < numberOfElements)
+        {
+            outputData[global_id] = (outputData[global_id] > test) ? 1.0 : 0.0;
+        }
+    }
+
     __kernel void brainLessEqualScalar(
         int numberOfElements,
         __global float* outputData,
@@ -1510,6 +1534,36 @@ R""""(
         }
     }
 
+    __kernel void brainMinScalar(
+        int numberOfElements,
+        __global float* outputData,
+        float scalar)
+    {
+        int global_id = get_global_id(0);
+        if (global_id < numberOfElements)
+        {
+            float a = outputData[global_id];
+            outputData[global_id] = (a <= scalar) ? a : scalar;
+        }
+    }
+
+    __kernel void brainMaxScalar(
+        int numberOfElements,
+        __global float* outputData,
+        float scalar)
+    {
+        int global_id = get_global_id(0);
+        if (global_id < numberOfElements)
+        {
+            float a = outputData[global_id];
+            outputData[global_id] = (a >= scalar) ? a : scalar;
+        }
+    }
+
+)"""";
+
+const char* ndBrainGpuContext::m_probabilitiesKernels =
+R""""(
     __kernel void brainNormalDistribution(int numberOfElements, __global float* uniformRandom)
     {
         int global_id = get_global_id(0);
@@ -1542,38 +1596,49 @@ R""""(
             {
                 normal = -normal;
             }
-            //mean[global_id] += normal * sigma[global_id];
             uniformRandom[global_id] = normal;
         }
     }
 
-    __kernel void brainMinScalar(
+    __kernel void brainEntropyReqularization(
         int numberOfElements,
-        __global float* outputData,
-        float scalar)
+        __global float* outputBuffer,
+        __global float* meanBuffer,
+        __global float* varianceBuffer,
+        float regularizationTemperature)
     {
-        int global_id = get_global_id(0);
-        if (global_id < numberOfElements)
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+        
+        __local float reductionBuffer [1024];
+        
+        uint srcOffset = groupId * numberOfElements;
+        
+        float entropy = 0.0;
+        //if (itemId < numberOfElements)
+        //{
+		    float sample = meanBuffer[srcOffset + itemId];
+		    float sigma = varianceBuffer[srcOffset + itemId];
+		    entropy = - 0.5 * sample * sample / (sigma * sigma) - log(sigma);
+        //}
+        reductionBuffer[itemId] = entropy;
+        barrier(CLK_LOCAL_MEM_FENCE); 
+        
+        if (itemId == 0)
         {
-            float a = outputData[global_id];
-            outputData[global_id] = (a <= scalar) ? a : scalar;
+            //float ent = -0.5 * ((float)numberOfElements) * log(2.0 * 3.14159265);
+            float ent = -0.5 * 1.837877 * (float)numberOfElements;
+            for (int i = 0; i < numberOfElements; ++i)
+            {
+                ent += reductionBuffer[i];
+            }
+            outputBuffer[groupId] = ent * regularizationTemperature;
         }
     }
-
-    __kernel void brainMaxScalar(
-        int numberOfElements,
-        __global float* outputData,
-        float scalar)
-    {
-        int global_id = get_global_id(0);
-        if (global_id < numberOfElements)
-        {
-            float a = outputData[global_id];
-            outputData[global_id] = (a >= scalar) ? a : scalar;
-        }
-    }
-
+   
 )"""";
+
 
 ndSharedPtr<ndBrainKernel> ndBrainGpuContext::CreateKerner(const cl::Program& program, const char* const functionMame) const
 {
@@ -1595,6 +1660,7 @@ void ndBrainGpuContext::CreateKerners()
     source += m_feedForwardKernels_1;
     source += m_feedForwardKernels_2;
     source += m_feedForwardKernels_3;
+    source += m_probabilitiesKernels;
     source += m_backPropagateKernels_1;
     source += m_backPropagateKernels_2;
     source += m_matrixWeightsAndBiasGradients;
@@ -1695,11 +1761,14 @@ void ndBrainGpuContext::CreateKerners()
     m_brainMaxScalar = CreateKerner(program, "brainMaxScalar");
     m_brainLessEqual = CreateKerner(program, "brainLessEqual");
     m_brainBlendScale = CreateKerner(program, "brainBlendScale");
+    m_brainLessScalar = CreateKerner(program, "brainLessScalar");
     m_brainBlendVector = CreateKerner(program, "brainBlendVector");
     m_brainGreaterEqual = CreateKerner(program, "brainGreaterEqual");
     m_brainAssigment = CreateKerner(program, "brainBufferAssigment");
+    m_brainGreaterScalar = CreateKerner(program, "brainGreaterScalar");
     m_brainBroadcastScalar = CreateKerner(program, "brainBroadcastScalar");
     m_brainLessEqualScalar = CreateKerner(program, "brainLessEqualScalar");
     m_brainGreaterEqualScalar = CreateKerner(program, "brainGreaterEqualScalar");
     m_brainNormalDistribution = CreateKerner(program, "brainNormalDistribution");
+    m_brainEntropyReqularization = CreateKerner(program, "brainEntropyReqularization");
 }

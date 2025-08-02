@@ -73,7 +73,9 @@ class ndBrainGpuContext : public ndBrainContext
 	virtual void Set(ndBrainFloatBuffer& buffer, ndBrainFloat value) override;
 	virtual void Min(ndBrainFloatBuffer& buffer, ndBrainFloat value) override;
 	virtual void Max(ndBrainFloatBuffer& buffer, ndBrainFloat value) override;
+	virtual void Less(ndBrainFloatBuffer& buffer, ndBrainFloat test) override;
 	virtual void Scale(ndBrainFloatBuffer& buffer, ndBrainFloat scale) override;
+	virtual void Greater(ndBrainFloatBuffer& buffer, ndBrainFloat test) override;
 	virtual void LessEqual(ndBrainFloatBuffer& buffer, ndBrainFloat test) override;
 	virtual void GreaterEqual(ndBrainFloatBuffer& buffer, ndBrainFloat test) override;
 	virtual void Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat blend) override;
@@ -82,7 +84,7 @@ class ndBrainGpuContext : public ndBrainContext
 
 	virtual void StandardNormalDistribution(ndBrainFloatBuffer& uniformRandomVariable) override;
 	virtual void BroadcastScaler(ndBrainFloatBuffer& buffer, ndInt32 bufferStrideInFloats, const ndBrainFloatBuffer& srcScalar) override;
-
+	virtual void CalculateEntropyRegularization(ndBrainFloatBuffer&, const ndBrainFloatBuffer&, const ndBrainFloatBuffer&, ndBrainFloat) override;
 
 	private:
 	void CreateKerners();
@@ -162,17 +164,21 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainKernel> m_brainMinScalar;
 	ndSharedPtr<ndBrainKernel> m_brainMaxScalar;
 	ndSharedPtr<ndBrainKernel> m_brainBlendScale;
+	ndSharedPtr<ndBrainKernel> m_brainLessScalar;
 	ndSharedPtr<ndBrainKernel> m_brainBlendVector;
 	ndSharedPtr<ndBrainKernel> m_brainGreaterEqual;
+	ndSharedPtr<ndBrainKernel> m_brainGreaterScalar;
 	ndSharedPtr<ndBrainKernel> m_brainLessEqualScalar;
 	ndSharedPtr<ndBrainKernel> m_brainBroadcastScalar;
 	ndSharedPtr<ndBrainKernel> m_brainGreaterEqualScalar;
 	ndSharedPtr<ndBrainKernel> m_brainNormalDistribution;
+	ndSharedPtr<ndBrainKernel> m_brainEntropyReqularization;
 
 	static const char* m_mathOpsCommand;
 	static const char* m_matrixMultiply;
 	static const char* m_optimizerKernels;
 	static const char* m_commonKernelsInclude;
+	static const char* m_probabilitiesKernels;
 	static const char* m_otherShaderFunctions;
 	static const char* m_feedForwardKernels_1;
 	static const char* m_feedForwardKernels_2;

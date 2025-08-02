@@ -555,6 +555,57 @@ void ndBrainGpuContext::Select(ndBrainFloatBuffer& buffer, ndBrainFloatBuffer& m
 	ndAssert(error == CL_SUCCESS);
 }
 
+void ndBrainGpuContext::CalculateEntropyRegularization(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& sampleBuffer, const ndBrainFloatBuffer& varianceBuffer, ndBrainFloat regularization)
+{
+	cl_int error = 0;
+
+	OpenclKernel* const oclKernel = (OpenclKernel*)*m_brainEntropyReqularization;
+	cl::Kernel* const shader = *oclKernel->m_shader;
+
+	ndBrainGpuBuffer* const dst = buffer.GetGpuBuffer();
+	const ndBrainGpuBuffer* const samples = sampleBuffer.GetGpuBuffer();
+	const ndBrainGpuBuffer* const variance = varianceBuffer.GetGpuBuffer();
+
+	cl_int numberOfParameters = 0;
+	error = shader->getInfo(CL_KERNEL_NUM_ARGS, &numberOfParameters);
+	ndAssert(numberOfParameters == 5);
+
+	size_t numberOfElements = size_t(sampleBuffer.SizeInBytes() / buffer.SizeInBytes());
+	size_t numberOfGroups = sampleBuffer.SizeInBytes() / sizeof(float);
+	
+	error = shader->setArg(0, ndInt32(numberOfElements));
+	ndAssert(error == CL_SUCCESS);
+	error = shader->setArg(1, **dst->m_buffer);
+	ndAssert(error == CL_SUCCESS);
+	error = shader->setArg(2, **samples->m_buffer);
+	ndAssert(error == CL_SUCCESS);
+	error = shader->setArg(3, **variance->m_buffer);
+	ndAssert(error == CL_SUCCESS);
+	error = shader->setArg(4, regularization);
+	ndAssert(error == CL_SUCCESS);
+	
+	cl::NDRange offset(0);
+	cl::NDRange local(numberOfElements);
+	cl::NDRange global(numberOfGroups * numberOfElements);
+	error = m_queue->enqueueNDRangeKernel(*shader, offset, global, local);
+	ndAssert(error == CL_SUCCESS);
+
+//ndBrainVector xxxxx0;
+//ndBrainVector xxxxx1;
+//ndBrainVector xxxxx2;
+//ndBrainVector xxxxx3;
+//buffer.VectorFromDevice(xxxxx3);
+//buffer.VectorFromDevice(xxxxx0);
+//sampleBuffer.VectorFromDevice(xxxxx1);
+//varianceBuffer.VectorFromDevice(xxxxx2);
+//for (ndInt32 i = 0; i < numberOfGroups; ++i)
+//{
+//	const ndBrainMemVector sampleMean(&xxxxx1[i * numberOfElements], numberOfElements);
+//	const ndBrainMemVector varianceMean(&xxxxx2[i * numberOfElements], numberOfElements);
+//	xxxxx1[i] = sampleMean.CalculateEntropyRegularization(varianceMean, regularization);
+//}
+}
+
 void ndBrainGpuContext::Set(ndBrainFloatBuffer& dstData, ndBrainFloat value)
 {
 	SubmitMathOperation(m_brainSet, &dstData, value);
@@ -588,6 +639,16 @@ void ndBrainGpuContext::Min(ndBrainFloatBuffer& buffer, ndBrainFloat value)
 void ndBrainGpuContext::Max(ndBrainFloatBuffer& buffer, ndBrainFloat value)
 {
 	SubmitMathOperation(m_brainMaxScalar, &buffer, value);
+}
+
+void ndBrainGpuContext::Less(ndBrainFloatBuffer& buffer, ndBrainFloat value)
+{
+	SubmitMathOperation(m_brainLessScalar, &buffer, value);
+}
+
+void ndBrainGpuContext::Greater(ndBrainFloatBuffer& buffer, ndBrainFloat value)
+{
+	SubmitMathOperation(m_brainGreaterScalar, &buffer, value);
 }
 
 void ndBrainGpuContext::Min(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
@@ -647,12 +708,5 @@ void ndBrainGpuContext::GreaterEqual(ndBrainFloatBuffer& buffer, ndBrainFloat te
 
 void ndBrainGpuContext::StandardNormalDistribution(ndBrainFloatBuffer& uniformRandomVariable)
 {
-	//ndBrainVector xxx0;
-	//ndBrainVector xxx1;
-	//ndBrainVector xxx2;
-	//uniformRandomVariable.VectorFromDevice(xxx0);
-	//uniformRandomVariable.VectorFromDevice(xxx2);
-	//xxx2.StandardNormalDistribution();
 	SubmitMathOperation(m_brainNormalDistribution, &uniformRandomVariable);
-	//uniformRandomVariable.VectorFromDevice(xxx1);
 }

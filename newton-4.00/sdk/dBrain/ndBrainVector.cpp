@@ -396,12 +396,11 @@ ndBrainFloat ndBrainVector::CalculateEntropyRegularization(const ndBrainVector& 
 	{
 		ndFloat32 sample = (*this)[i];
 		ndFloat32 sigma = varianceBuffer[i];
-		entropy += - ndFloat32(0.5f) * sample * sample / (sigma * sigma) - ndLog(sigma);
+		entropy += (- ndFloat32(0.5f) * sample * sample / (sigma * sigma) - ndLog(sigma));
 
 		//xxxx = xxxx * (1.0f / (ndSqrt(2.0 * ndPi) * sigma));
 		//xxxx = xxxx * ndExp_VSFix(-ndFloat32(0.5f) * sample * sample / (sigma * sigma));
 	}
-	//xxxx = ndLog(xxxx);
 	return entropy * regularization;
 }
 
