@@ -20,7 +20,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoSplinePathMesh.h"
 
-ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix& matrix)
+ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix& matrix, bool kinematic)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 
@@ -48,7 +48,7 @@ ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix&
 	return body->GetAsBodyDynamic();
 }
 
-ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized)
+ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized, bool kinematic)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndVector floor[] =
@@ -91,7 +91,50 @@ ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized
 	return body->GetAsBodyDynamic();
 }
 
-ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation)
+ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized, bool kinematic)
+{
+	ndPhysicsWorld* const world = scene->GetWorld();
+	ndVector floor[] =
+	{
+		{ 200.0f, 0.0f,  200.0f, 1.0f },
+		{ 200.0f, 0.0f, -200.0f, 1.0f },
+		{ -200.0f, 0.0f, -200.0f, 1.0f },
+		{ -200.0f, 0.0f,  200.0f, 1.0f },
+	};
+	ndInt32 index[][3] = { { 0, 1, 2 },{ 0, 2, 3 } };
+
+	ndPolygonSoupBuilder meshBuilder;
+	meshBuilder.Begin();
+	//meshBuilder.LoadPLY("sword.ply");
+	//meshBuilder.LoadPLY("static_mesh.ply");
+	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(ndVector), 31, &index[0][0], 3);
+	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(ndVector), 31, &index[1][0], 3);
+	meshBuilder.End(optimized);
+
+	ndShapeInstance plane(new ndShapeStatic_bvh(meshBuilder));
+	ndMatrix uvMatrix(ndGetIdentityMatrix());
+	uvMatrix[0][0] *= 1.0f / 50.0f;
+	uvMatrix[1][1] *= 1.0f / 50.0f;
+	uvMatrix[2][2] *= 1.0f / 50.0f;
+
+	ndSharedPtr<ndDemoMeshInterface>geometry(new ndDemoMesh("box", scene->GetShaderCache(), &plane, "marbleCheckBoard.png", "marbleCheckBoard.png", "marbleCheckBoard.png", 1.0f, uvMatrix));
+
+	ndMatrix matrix(ndGetIdentityMatrix());
+	ndSharedPtr<ndDemoEntity>entity(new ndDemoEntity(matrix));
+	entity->SetMesh(geometry);
+	entity->SetShadowMode(false);
+
+	ndSharedPtr<ndBody> body(new ndBodyDynamic());
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+	body->SetMatrix(matrix);
+	body->GetAsBodyDynamic()->SetCollisionShape(plane);
+
+	world->AddBody(body);
+	scene->AddEntity(entity);
+	return body->GetAsBodyDynamic();
+}
+
+ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation, bool kinematic)
 {
 	ndVector origin(-(ndFloat32)grids * gridSize * 0.5f, 0.0f, -(ndFloat32)grids * gridSize * 0.5f, 1.0f);
 
@@ -196,7 +239,7 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids,
 	return body->GetAsBodyDynamic();
 }
 
-ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* const meshName, bool optimized)
+ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* const meshName, bool optimized, bool kinematic)
 {
 	ndMeshLoader loader;
 	ndSharedPtr<ndMesh> meshEffectNode (loader.LoadMesh(meshName));
@@ -276,118 +319,6 @@ ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* c
 	return body->GetAsBodyDynamic();
 }
 
-#if 0
-static ndMatrix GetMatrixAtLocation(const ndBezierSpline& spline, const ndVector& location)
-{
-	// assume the up vector is vertical
-	ndVector up(ndVector::m_zero);
-	up.m_y = 1.0f;
-
-	ndBigVector closestPointOnCurve;
-	ndFloat64 u = spline.FindClosestKnot(closestPointOnCurve, location);
-	ndBigVector tangent(spline.CurveDerivative(u));
-	ndFloat64 mang2 = tangent.DotProduct(tangent).GetScalar();
-	if (mang2 < ndFloat32(1.0e-8f))
-	{
-		// do a back prodedure to get the tangent
-		ndFloat64 u1 = ndFmod(u + 1.0e-3, 1.0);
-		//ndFloat64 u0 = ndFmod(u - 1.0e-3, 1.0);
-		//if (u0 < 0)
-		//{
-		//	u0 += 1.0;
-		//}
-		ndBigVector p0(spline.CurvePoint(u));
-		ndBigVector p1(spline.CurvePoint(u1));
-		tangent = p1 - p0;
-	}
-	ndVector xdir(tangent.Normalize());
-
-	ndMatrix matrix;
-	matrix.m_posit = closestPointOnCurve;
-	matrix.m_posit.m_w = 1.0f;
-
-	matrix.m_front = xdir;
-	matrix.m_right = (matrix.m_front.CrossProduct(up)).Normalize();
-	matrix.m_up = matrix.m_right.CrossProduct(matrix.m_front);
-	return matrix;
-}
-
-ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* const meshName, bool optimized)
-{
-	ndBigVector control[] =
-	{
-		ndBigVector(-16.0f, 1.0f, -10.0f, 1.0f),
-		ndBigVector(-36.0f, 2.0f,   4.0f, 1.0f),
-		ndBigVector(  4.0f, 3.0f,  15.0f, 1.0f),
-		ndBigVector( 44.0f, 2.0f,   4.0f, 1.0f),
-		ndBigVector(  4.0f, 1.0f, -22.0f, 1.0f),
-		ndBigVector(-16.0f, 1.0f, -10.0f, 1.0f),
-	};
-
-	ndMatrix matrix(ndGetIdentityMatrix());
-	{
-		//// build using control points
-		//ndBezierSpline spline;
-		//ndFloat64 knots[] = { 0.0f, 1.0f / 3.0f, 2.0f / 3.0f, 1.0f };
-		//spline.CreateFromKnotVectorAndControlPoints(3, sizeof(knots) / sizeof(knots[0]), knots, control);
-		//
-		//// recreate the spline from sample points at equally spaced distance 
-		//ndDemoSplinePathMesh* const splineMesh = new ndDemoSplinePathMesh(spline, scene->GetShaderCache(), 500);
-		//splineMesh->SetColor(ndVector(1.0f, 0.0f, 0.0f, 1.0f));
-		//ndDemoEntity* const splineEntity = new ndDemoEntity(matrix, nullptr);
-		//scene->AddEntity(splineEntity);
-		//splineEntity->SetMesh(splineMesh, ndGetIdentityMatrix());
-		//splineMesh->SetVisible(true);
-		//splineMesh->Release();
-	}
-
-	{
-		// fix a spline to the points array
-		ndInt32 size = sizeof(control) / sizeof(control[0]);
-
-		//ndBigVector derivP0(control[1] - control[size-1]);
-		ndBigVector derivP0(0.0);
-		//ndBigVector derivP1(control[0] - control[size - 2]);
-
-		ndBezierSpline spline;
-		spline.GlobalCubicInterpolation(size, control, derivP0, derivP0);
-
-		spline.Trace();
-
-		//ndBigVector xxxx (spline.CurveDerivative(0.25f));
-		//ndVector xxxx1;
-		//ndVector xxxx2;
-		for (ndInt32 i = 0; i < size; ++i)
-		{
-			//GetPointAndTangentAtLocation(spline, matrix, control[i], xxxx1, xxxx2);
-			ndMatrix matrix1 (GetMatrixAtLocation(spline, control[i]));
-			printf("px: %.3f py: %.3f pz: %.3f \n", matrix1.m_posit.m_x, matrix1.m_posit.m_y, matrix1.m_posit.m_z);
-			//printf("tx: %.3f ty: %.3f tz: %.3f \n", xxxx2.m_x, xxxx2.m_y, xxxx2.m_z);
-		}
-
-
-		//ndFloat64 u = (knots[1] + knots[2]) * 0.5f;
-		//spline.InsertKnot(u);
-		//spline.InsertKnot(u);
-		//spline.InsertKnot(u);
-		//spline.InsertKnot(u);
-		//spline.InsertKnot(u);
-		//spline.RemoveKnot(u, 1.0e-3f);
-		
-		ndSharedPtr<ndDemoMeshInterface> splineMesh (new ndDemoSplinePathMesh(spline, scene->GetShaderCache(), 500));
-		((ndDemoSplinePathMesh*)*splineMesh)->SetColor(ndVector(0.0f, 1.0f, 0.0f, 1.0f));
-		ndDemoEntity* const splineEntity = new ndDemoEntity(matrix, nullptr);
-		splineEntity->SetShadowMode(false);
-		scene->AddEntity(splineEntity);
-		splineEntity->SetMesh(splineMesh);
-		splineMesh->SetVisible(true);
-	}
-
-	return BuildStaticMesh(scene, meshName, optimized);
-}
-#endif
-
-
 static ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInstance& shape, const ndMatrix& location, ndFloat32 mass)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
@@ -410,7 +341,7 @@ static ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndSha
 	return body->GetAsBodyDynamic();
 }
 
-ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
+ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene, bool kinematic)
 {
 	ndMeshLoader loader;
 	ndSharedPtr<ndMesh>meshEffectNode (loader.LoadMesh("playerarena.fbx"));

@@ -15,11 +15,11 @@
 #include "ndSandboxStdafx.h"
 class ndDemoEntityManager;
 
-ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene);
-ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized);
-ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix& location);
-ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* const meshName, bool optimized);
-ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* const meshName, bool optimized);
-ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation);
+ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene, bool kinematic = false);
+ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized, bool kinematic = false);
+ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix& location, bool kinematic = false);
+ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* const meshName, bool optimized, bool kinematic = false);
+ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* const meshName, bool optimized, bool kinematic = false);
+ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation, bool kinematic = false);
 
 #endif
