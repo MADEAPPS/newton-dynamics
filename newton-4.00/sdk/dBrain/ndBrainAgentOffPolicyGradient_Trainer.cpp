@@ -496,7 +496,7 @@ ndBrainAgentOffPolicyGradient_Trainer::ndBrainAgentOffPolicyGradient_Trainer(con
 	,m_minibatchSigma(nullptr)
 	,m_uniformRandom(nullptr)
 	,m_replayBufferFlat(nullptr)
-	,m_minibatchRewards(nullptr)
+	//,m_minibatchRewards(nullptr)
 	,m_minibatchNoTerminal(nullptr)
 	,m_minibatchOfTransitions(nullptr)
 	,m_minibatchExpectedRewards(nullptr)
@@ -542,7 +542,7 @@ ndBrainAgentOffPolicyGradient_Trainer::ndBrainAgentOffPolicyGradient_Trainer(con
 	ndInt32 outputSize = m_policyTrainer->GetBrain()->GetOutputSize();
 	ndBrainAgentOffPolicyGradient_Agent::ndTrajectory trajectory(outputSize, inputSize);
 
-	m_minibatchRewards = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_miniBatchSize));
+	//m_minibatchRewards = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_miniBatchSize));
 	m_minibatchNoTerminal = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_miniBatchSize));
 	m_minibatchIndexBuffer = ndSharedPtr<ndBrainIntegerBuffer>(new ndBrainIntegerBuffer(*m_context, m_parameters.m_miniBatchSize));
 	m_minibatchExpectedRewards = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_miniBatchSize));
@@ -1069,14 +1069,6 @@ void ndBrainAgentOffPolicyGradient_Trainer::CalculateTd3ExpectedRewards()
 	const ndBrainAgentOffPolicyGradient_Agent::ndTrajectory& trajectory = m_agent->m_trajectory;
 	ndInt32 transitionStrideInBytes = ndInt32(trajectory.GetStride() * sizeof(ndReal));
 
-	ndCopyBufferCommandInfo criticOutputReward;
-	criticOutputReward.m_srcOffsetInByte = ndInt32(trajectory.GetRewardOffset() * sizeof(ndReal));
-	criticOutputReward.m_srcStrideInByte = transitionStrideInBytes;
-	criticOutputReward.m_dstOffsetInByte = 0;
-	criticOutputReward.m_dstStrideInByte = ndInt32(sizeof(ndReal));
-	criticOutputReward.m_strideInByte = ndInt32(sizeof(ndReal));
-	m_minibatchRewards->CopyBuffer(criticOutputReward, m_parameters.m_miniBatchSize, **m_minibatchOfTransitions);
-
 	ndCopyBufferCommandInfo criticOutputTerminal;
 	criticOutputTerminal.m_srcOffsetInByte = ndInt32(trajectory.GetTerminalOffset() * sizeof(ndReal));
 	criticOutputTerminal.m_srcStrideInByte = transitionStrideInBytes;
@@ -1155,19 +1147,31 @@ void ndBrainAgentOffPolicyGradient_Trainer::CalculateTd3ExpectedRewards()
 		criticInputBuffer.CopyBuffer(criticInputNextObservation, m_parameters.m_miniBatchSize, *policyMinibatchInputBuffer);
 		m_referenceCriticTrainer[i]->MakePrediction();
 
-		ndBrainFloatBuffer& qValueBuffer = *referenceCritic.GetOuputBuffer();
-		qValueBuffer.Mul(**m_minibatchNoTerminal);
-		qValueBuffer.Scale(m_parameters.m_discountRewardFactor);
-		qValueBuffer.Add(**m_minibatchRewards);
+		//ndBrainFloatBuffer& qValueBuffer = *referenceCritic.GetOuputBuffer();
+		//qValueBuffer.Mul(**m_minibatchNoTerminal);
+		//qValueBuffer.Scale(m_parameters.m_discountRewardFactor);
+		//qValueBuffer.Add(**m_minibatchRewards);
 	}
 
-	ndBrainFloatBuffer& minExpectedReward = *m_referenceCriticTrainer[0]->GetOuputBuffer();
+	ndBrainFloatBuffer& qValue = *m_referenceCriticTrainer[0]->GetOuputBuffer();
 	for (ndInt32 i = 1; i < ndInt32(sizeof(m_criticTrainer) / sizeof(m_criticTrainer[0])); ++i)
 	{
-		const ndBrainFloatBuffer& qValueBuffer1 = *m_referenceCriticTrainer[i]->GetOuputBuffer();
-		minExpectedReward.Min(qValueBuffer1);
+		const ndBrainFloatBuffer& qValue1 = *m_referenceCriticTrainer[i]->GetOuputBuffer();
+		qValue.Min(qValue1);
 	}
-	m_minibatchExpectedRewards->Set(minExpectedReward);
+
+	qValue.Mul(**m_minibatchNoTerminal);
+	qValue.Scale(m_parameters.m_discountRewardFactor);
+
+	ndCopyBufferCommandInfo criticOutputReward;
+	criticOutputReward.m_srcOffsetInByte = ndInt32(trajectory.GetRewardOffset() * sizeof(ndReal));
+	criticOutputReward.m_srcStrideInByte = transitionStrideInBytes;
+	criticOutputReward.m_dstOffsetInByte = 0;
+	criticOutputReward.m_dstStrideInByte = ndInt32(sizeof(ndReal));
+	criticOutputReward.m_strideInByte = ndInt32(sizeof(ndReal));
+	//m_minibatchRewards->CopyBuffer(criticOutputReward, m_parameters.m_miniBatchSize, **m_minibatchOfTransitions);
+	m_minibatchExpectedRewards->CopyBuffer(criticOutputReward, m_parameters.m_miniBatchSize, **m_minibatchOfTransitions);
+	m_minibatchExpectedRewards->Add(qValue);
 }
 
 void ndBrainAgentOffPolicyGradient_Trainer::CalculateSacExpectedRewards()
@@ -1180,14 +1184,6 @@ void ndBrainAgentOffPolicyGradient_Trainer::CalculateSacExpectedRewards()
 
 	const ndBrainAgentOffPolicyGradient_Agent::ndTrajectory& trajectory = m_agent->m_trajectory;
 	ndInt32 transitionStrideInBytes = ndInt32(trajectory.GetStride() * sizeof(ndReal));
-
-	ndCopyBufferCommandInfo criticOutputReward;
-	criticOutputReward.m_srcOffsetInByte = ndInt32(trajectory.GetRewardOffset() * sizeof(ndReal));
-	criticOutputReward.m_srcStrideInByte = transitionStrideInBytes;
-	criticOutputReward.m_dstOffsetInByte = 0;
-	criticOutputReward.m_dstStrideInByte = ndInt32(sizeof(ndReal));
-	criticOutputReward.m_strideInByte = ndInt32(sizeof(ndReal));
-	m_minibatchRewards->CopyBuffer(criticOutputReward, m_parameters.m_miniBatchSize, **m_minibatchOfTransitions);
 
 	ndCopyBufferCommandInfo criticOutputTerminal;
 	criticOutputTerminal.m_srcOffsetInByte = ndInt32(trajectory.GetTerminalOffset() * sizeof(ndReal));
@@ -1271,13 +1267,23 @@ void ndBrainAgentOffPolicyGradient_Trainer::CalculateSacExpectedRewards()
 		qValue.Min(qValue1);
 	}
 
-	// calculate and add entropy regulatization to the q value
-	m_minibatchEntropy->CalculateEntropyRegularization(**m_minibatchUniformRandomDistribution, **m_minibatchSigma, m_parameters.m_entropyRegularizerCoef);
-	qValue.Sub(**m_minibatchEntropy);
-	qValue.Mul(**m_minibatchNoTerminal);
-	qValue.Scale(m_parameters.m_discountRewardFactor);
-	qValue.Add(**m_minibatchRewards);
-	m_minibatchExpectedRewards->Set(qValue);
+	ndAssert(0);
+	//// calculate and add entropy regulatization to the q value
+	//m_minibatchEntropy->CalculateEntropyRegularization(**m_minibatchUniformRandomDistribution, **m_minibatchSigma, m_parameters.m_entropyRegularizerCoef);
+	//qValue.Sub(**m_minibatchEntropy);
+	//qValue.Mul(**m_minibatchNoTerminal);
+	//qValue.Scale(m_parameters.m_discountRewardFactor);
+	////qValue.Add(**m_minibatchRewards);
+	//
+	//ndCopyBufferCommandInfo criticOutputReward;
+	//criticOutputReward.m_srcOffsetInByte = ndInt32(trajectory.GetRewardOffset() * sizeof(ndReal));
+	//criticOutputReward.m_srcStrideInByte = transitionStrideInBytes;
+	//criticOutputReward.m_dstOffsetInByte = 0;
+	//criticOutputReward.m_dstStrideInByte = ndInt32(sizeof(ndReal));
+	//criticOutputReward.m_strideInByte = ndInt32(sizeof(ndReal));
+	////m_minibatchRewards->CopyBuffer(criticOutputReward, m_parameters.m_miniBatchSize, **m_minibatchOfTransitions);
+	//m_minibatchExpectedRewards->CopyBuffer(criticOutputReward, m_parameters.m_miniBatchSize, **m_minibatchOfTransitions);
+	//m_minibatchExpectedRewards->Set(qValue);
 }
 
 //#pragma optimize( "", off )
@@ -1437,13 +1443,13 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainSacPolicy()
 		ndBrainTrainer& critic1 = **m_criticTrainer[i];
 		ndBrainFloatBuffer* const criticMinibatchOutputBuffer1 = critic1.GetOuputBuffer();
 		ndBrainFloatBuffer* const criticMinibatchInputGradientBuffer1 = critic1.GetInputGradientBuffer();
-
+		
 		// re using m_minibatchRewards because is not use anymore 
-		m_minibatchRewards->Set(*criticMinibatchOutputBuffer1);
-		m_minibatchRewards->LessEqual(*criticMinibatchOutputBuffer);
-		m_minibatchCriticInputTest->BroadcastScaler(**m_minibatchRewards);
-
-		criticMinibatchOutputBuffer->Blend(*criticMinibatchOutputBuffer1, **m_minibatchRewards);
+		m_minibatchExpectedRewards->Set(*criticMinibatchOutputBuffer1);
+		m_minibatchExpectedRewards->LessEqual(*criticMinibatchOutputBuffer);
+		m_minibatchCriticInputTest->BroadcastScaler(**m_minibatchExpectedRewards);
+		
+		criticMinibatchOutputBuffer->Blend(*criticMinibatchOutputBuffer1, **m_minibatchExpectedRewards);
 		criticMinibatchInputGradientBuffer->Blend(*criticMinibatchInputGradientBuffer1, **m_minibatchCriticInputTest);
 	}
 
@@ -1543,7 +1549,8 @@ void ndBrainAgentOffPolicyGradient_Trainer::Optimize()
 
 		if (m_parameters.m_useSofActorCritic)
 		{
-			CalculateSacExpectedRewards();
+			//CalculateSacExpectedRewards();
+			CalculateTd3ExpectedRewards();
 		}
 		else
 		{

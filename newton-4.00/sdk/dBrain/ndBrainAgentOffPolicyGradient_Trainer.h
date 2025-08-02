@@ -31,7 +31,6 @@
 // policy gradient for continues control re enforcement learning.  
 // ddpg algorithm as described in: https://arxiv.org/pdf/1509.02971.pdf
 // pseudo code sample:
-// https://spinningup.openai.com/en/latest/algorithms/ddpg.html
 // https://spinningup.openai.com/en/latest/algorithms/td3.html
 // https://spinningup.openai.com/en/latest/algorithms/sac.html
 
@@ -224,7 +223,7 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 
 	ndSharedPtr<ndBrainFloatBuffer> m_uniformRandom;
 	ndSharedPtr<ndBrainFloatBuffer> m_replayBufferFlat;
-	ndSharedPtr<ndBrainFloatBuffer> m_minibatchRewards;
+	//ndSharedPtr<ndBrainFloatBuffer> m_minibatchRewards;
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchNoTerminal;
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchOfTransitions;
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchExpectedRewards;
