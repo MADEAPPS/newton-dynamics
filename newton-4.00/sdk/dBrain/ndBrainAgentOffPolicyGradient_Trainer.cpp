@@ -1263,8 +1263,12 @@ void ndBrainAgentOffPolicyGradient_Trainer::CalculateSacExpectedRewards()
 	m_minibatchNoTerminal->CopyBuffer(criticOutputTerminal, m_parameters.m_miniBatchSize, **m_minibatchOfTransitions);
 
 	// calculate and add entropy regulatization to the q value
-	//m_minibatchEntropy->CalculateEntropyRegularization(**m_minibatchUniformRandomDistribution, **m_minibatchSigma, m_parameters.m_entropyTemperature);
-	//qValue.Sub(**m_minibatchEntropy);
+	m_minibatchEntropy->CalculateEntropyRegularization(**m_minibatchUniformRandomDistribution, **m_minibatchSigma, m_parameters.m_entropyTemperature);
+//m_context->SyncBufferCommandQueue();
+//ndBrainVector xxxxx;
+//m_minibatchEntropy->VectorFromDevice(xxxxx);
+
+	qValue.Sub(**m_minibatchEntropy);
 	qValue.Mul(**m_minibatchNoTerminal);
 	qValue.Scale(m_parameters.m_discountRewardFactor);
 
