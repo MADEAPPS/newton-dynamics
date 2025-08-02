@@ -300,7 +300,7 @@ void ndBrainVector::CategoricalSample(const ndBrainVector& probability, ndBrainF
 		ndBrainFloat logits = ndBrainFloat (ndLog(num / den));
 		ndBrainFloat r = ndBrainFloat(0.930159f) * ndBrainFloat (ndRand()) + ndBrainFloat(1.0e-6f);
 		ndBrainFloat noise = beta * ndBrainFloat (-ndLog(-ndLog(r)));
-		ndBrainFloat sample = ndBrainFloat (ndExp (logits + noise));
+		ndBrainFloat sample = ndBrainFloat (ndExp_VSFix(logits + noise));
 		sum += sample;
 		(*this)[i] = sample;
 	}
@@ -377,7 +377,7 @@ void ndBrainVector::SoftMaxNormalize()
 	{
 		ndBrainFloat in = ndMax(((*this)[i] - max), ndBrainFloat(-30.0f));
 		ndAssert(in <= ndBrainFloat(0.0f));
-		ndBrainFloat prob = ndBrainFloat(ndExp(in));
+		ndBrainFloat prob = ndBrainFloat(ndExp_VSFix(in));
 		(*this)[i] = prob;
 		acc += prob;
 	}
