@@ -72,7 +72,7 @@ ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 	m_numberOfObservations = 0;
 
 	m_randomSeed = 47;
-	m_numberOfUpdates = 16;
+	m_numberOfUpdates = 8;
 	m_numberOfHiddenLayers = 3;
 	m_maxTrajectorySteps = 1024 * 4;
 	m_replayBufferSize = 1024 * 1024;
@@ -1263,8 +1263,8 @@ void ndBrainAgentOffPolicyGradient_Trainer::CalculateSacExpectedRewards()
 	m_minibatchNoTerminal->CopyBuffer(criticOutputTerminal, m_parameters.m_miniBatchSize, **m_minibatchOfTransitions);
 
 	// calculate and add entropy regulatization to the q value
-	m_minibatchEntropy->CalculateEntropyRegularization(**m_minibatchUniformRandomDistribution, **m_minibatchSigma, m_parameters.m_entropyTemperature);
-	qValue.Sub(**m_minibatchEntropy);
+	//m_minibatchEntropy->CalculateEntropyRegularization(**m_minibatchUniformRandomDistribution, **m_minibatchSigma, m_parameters.m_entropyTemperature);
+	//qValue.Sub(**m_minibatchEntropy);
 	qValue.Mul(**m_minibatchNoTerminal);
 	qValue.Scale(m_parameters.m_discountRewardFactor);
 
@@ -1494,7 +1494,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::Optimize()
 	// get a vector of randon numbers
 	m_scratchBuffer.SetCount(0);
 
-	ndInt32 policyOutputSize = m_referencePolicyTrainer->GetBrain()->GetOutputSize();
+	ndInt32 policyOutputSize = m_policyTrainer->GetBrain()->GetOutputSize();
 	for (ndInt32 i = numberOfSamples - 1; i >= 0; --i)
 	{
 		for (ndInt32 j = policyOutputSize / 2 - 1; j >= 0; --j)
