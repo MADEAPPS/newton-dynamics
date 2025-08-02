@@ -137,7 +137,7 @@ class ndBrainAgentContinuePolicyGradient_TrainerMaster: public ndClassAlloc
 		ndBrainFloat m_generalizedAdvangeDiscount;
 
 		ndBrainFloat m_actionFixSigma;
-		ndBrainFloat m_entropyRegularizerCoef;
+		ndBrainFloat m_entropyTemperature;
 
 		ndInt32 m_threadsCount;
 		ndInt32 m_numberOfActions;

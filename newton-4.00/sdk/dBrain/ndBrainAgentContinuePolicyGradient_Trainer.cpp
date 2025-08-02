@@ -60,8 +60,8 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters::HyperParamete
 	m_policyLearnRate = ndBrainFloat(1.0e-4f);
 	m_criticLearnRate = m_policyLearnRate;
 
-	m_entropyRegularizerCoef = ndBrainFloat(0.0f);
-	//m_entropyRegularizerCoef = ndBrainFloat(0.25f);
+	m_entropyTemperature = ndBrainFloat(0.0f);
+	//m_entropyTemperature = ndBrainFloat(0.25f);
 
 	m_policyRegularizer = ndBrainFloat(1.0e-4f);
 	m_criticRegularizer = ndBrainFloat(5.0e-3f);
@@ -439,8 +439,8 @@ ndBrainAgentContinuePolicyGradient_TrainerMaster::ndBrainAgentContinuePolicyGrad
 	BuildPolicyClass();
 	BuildCriticClass();
 
-	ndBrainFloat unitEntropy = ndClamp(m_parameters.m_entropyRegularizerCoef, ndBrainFloat(0.0f), ndBrainFloat(1.0f));
-	m_parameters.m_entropyRegularizerCoef = ND_CONTINUE_PROXIMA_POLICY_ENTROPY_CONFICIENT * unitEntropy;
+	ndBrainFloat unitEntropy = ndClamp(m_parameters.m_entropyTemperature, ndBrainFloat(0.0f), ndBrainFloat(1.0f));
+	m_parameters.m_entropyTemperature = ND_CONTINUE_PROXIMA_POLICY_ENTROPY_CONFICIENT * unitEntropy;
 }
 
 ndBrainAgentContinuePolicyGradient_TrainerMaster::~ndBrainAgentContinuePolicyGradient_TrainerMaster()
@@ -1044,13 +1044,13 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizePolicy()
 
 					const ndBrainFloat advantage = m_owner->m_advantage[m_index];
 
-					if (m_owner->m_parameters.m_entropyRegularizerCoef > ndBrainFloat(1.0e-6f))
+					if (m_owner->m_parameters.m_entropyTemperature > ndBrainFloat(1.0e-6f))
 					{
 						if (m_owner->m_parameters.m_usePerActionSigmas)
 						{
 							// calculate and add the Gradient of entropy (grad of log probability)
 							const ndInt32 size = numberOfActions / 2;
-							ndBrainFloat entropyRegularizerCoef = m_owner->m_parameters.m_entropyRegularizerCoef;
+							ndBrainFloat entropyRegularizerCoef = m_owner->m_parameters.m_entropyTemperature;
 							for (ndInt32 i = size - 1; i >= 0; --i)
 							{
 								ndBrainFloat sigma = probabilityDistribution[size + i];
@@ -1191,12 +1191,12 @@ ndAssert(0);
 						}
 					}
 
-					if (m_owner->m_parameters.m_entropyRegularizerCoef > ndBrainFloat(1.0e-6f))
+					if (m_owner->m_parameters.m_entropyTemperature > ndBrainFloat(1.0e-6f))
 					{
 						// calculate and add the Gradient of entropy (grad of log probability)
 						if (m_owner->m_parameters.m_usePerActionSigmas)
 						{
-							ndBrainFloat entropyRegularizerCoef = m_owner->m_parameters.m_entropyRegularizerCoef;
+							ndBrainFloat entropyRegularizerCoef = m_owner->m_parameters.m_entropyTemperature;
 							const ndInt32 size = numberOfActions / 2;
 							for (ndInt32 i = size - 1; i >= 0; --i)
 							{
@@ -1359,7 +1359,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 						stateValue[0] += gamma * stateQValue[0];
 					}
 
-					if (m_parameters.m_entropyRegularizerCoef > ndBrainFloat(1.0e-6f))
+					if (m_parameters.m_entropyTemperature > ndBrainFloat(1.0e-6f))
 					{
 						ndBrainFixSizeVector<256> entropyActions;
 						entropyActions.SetCount(m_policy.GetOutputSize());
@@ -1368,7 +1368,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 						m_policy.MakePrediction(observation, entropyActions);
 						ndBrainFloat prob = CalculatePolicyProbability(index, entropyActions);
 						ndBrainFloat logProb = ndBrainFloat(ndLog(prob));
-						stateValue[0] -= m_parameters.m_entropyRegularizerCoef * logProb;
+						stateValue[0] -= m_parameters.m_entropyTemperature * logProb;
 					}
 
 					loss.SetTruth(stateValue);
@@ -1387,7 +1387,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 					ndBrainTrainer& trainer = *m_criticTrainers[i];
 					stateValue[0] = m_trajectoryAccumulator.GetExpectedReward(index);
 
-					if (m_parameters.m_entropyRegularizerCoef > ndBrainFloat(1.0e-6f))
+					if (m_parameters.m_entropyTemperature > ndBrainFloat(1.0e-6f))
 					{
 						ndBrainFixSizeVector<256> entropyActions;
 						entropyActions.SetCount(m_policy.GetOutputSize());
@@ -1396,7 +1396,7 @@ void ndBrainAgentContinuePolicyGradient_TrainerMaster::OptimizeCritic()
 						m_policy.MakePrediction(observation, entropyActions);
 						ndBrainFloat prob = CalculatePolicyProbability(index, entropyActions);
 						ndBrainFloat logProb = ndBrainFloat(ndLog(prob));
-						stateValue[0] -= m_parameters.m_entropyRegularizerCoef * logProb;
+						stateValue[0] -= m_parameters.m_entropyTemperature * logProb;
 					}
 
 					loss.SetTruth(stateValue);
