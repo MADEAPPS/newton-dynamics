@@ -27,10 +27,10 @@
 #include "ndBrain.h"
 #include "ndBrainAgent.h"
 
-// this is an implementation of the vanilla deep deterministic 
-// policy gradient for continues control re enforcement learning.  
-// ddpg algorithm as described in: https://arxiv.org/pdf/1509.02971.pdf
-// pseudo code sample:
+// this is an implementation of the different versions of deep deterministic 
+// policy gradient for continue control re enforcement learning.  
+// the core algorithm is DDPG as described in: https://arxiv.org/pdf/1509.02971.pdf
+// pseudo code samples of variance of the same algorithm can be found at:
 // https://spinningup.openai.com/en/latest/algorithms/td3.html
 // https://spinningup.openai.com/en/latest/algorithms/sac.html
 
@@ -140,11 +140,11 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 		ndBrainFloat m_criticLearnRate;
 		ndBrainFloat m_policyRegularizer;
 		ndBrainFloat m_criticRegularizer;
-		ndBrainFloat mm_polyakBlendFactor;
+		ndBrainFloat m_polyakBlendFactor;
 		ndBrainFloat m_discountRewardFactor;
 
 		ndBrainFloat m_actionFixSigma;
-		ndBrainFloat m_entropyRegularizerCoef;
+		ndBrainFloat m_entropyTemperature;
 
 		ndUnsigned32 m_randomSeed;
 		ndInt32 m_miniBatchSize;
