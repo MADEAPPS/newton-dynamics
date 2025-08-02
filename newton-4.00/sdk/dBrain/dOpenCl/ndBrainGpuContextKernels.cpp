@@ -1615,26 +1615,25 @@ R""""(
         
         uint srcOffset = groupId * numberOfElements;
         
-        float entropy = 0.0;
-        //if (itemId < numberOfElements)
-        //{
-		    float sample = meanBuffer[srcOffset + itemId];
-		    float sigma = varianceBuffer[srcOffset + itemId];
-		    entropy = - 0.5 * sample * sample / (sigma * sigma) - log(sigma);
-        //}
+		float sample = meanBuffer[srcOffset + itemId];
+		float sigma = varianceBuffer[srcOffset + itemId];
+    	//float entropy = - 0.5 * sample * sample / (sigma * sigma) - log(sigma);
+        float entropy = 0.5 * sample * sample / (sigma * sigma) + log(sigma);
         reductionBuffer[itemId] = entropy;
         barrier(CLK_LOCAL_MEM_FENCE); 
         
         if (itemId == 0)
         {
             //float ent = -0.5 * ((float)numberOfElements) * log(2.0 * 3.14159265);
-            float ent = -0.5 * 1.837877 * (float)numberOfElements;
+            float ent = 0.5 * 1.837877 * (float)numberOfElements;
             for (int i = 0; i < numberOfElements; ++i)
             {
                 ent += reductionBuffer[i];
             }
-            outputBuffer[groupId] = ent * regularizationTemperature;
+            outputBuffer[groupId] = -ent * regularizationTemperature;
         }
+
+        //if (groupId < 32) printf ("item(%d) size(%d) gId(%d) elements(%d) e(%f)\n", itemId, workGroupSize, groupId, numberOfElements, outputBuffer[groupId]);
     }
    
 )"""";
