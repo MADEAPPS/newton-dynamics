@@ -15,11 +15,17 @@
 #include "ndSandboxStdafx.h"
 class ndDemoEntityManager;
 
-ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene, bool kinematic = false);
-ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized, bool kinematic = false);
-ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix& location, bool kinematic = false);
-ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* const meshName, bool optimized, bool kinematic = false);
-ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* const meshName, bool optimized, bool kinematic = false);
-ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation, bool kinematic = false);
+//ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene, bool kinematic = false);
+//ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized, bool kinematic = false);
+//ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix& location, bool kinematic = false);
+//ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* const meshName, bool optimized, bool kinematic = false);
+//ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* const meshName, bool optimized, bool kinematic = false);
+//ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation, bool kinematic = false);
+
+ndSharedPtr<ndBody> BuildPlayArena(ndDemoEntityManager* const scene, bool kinematic = false);
+ndSharedPtr<ndBody> BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized, bool kinematic = false);
+ndSharedPtr<ndBody> BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix& location, bool kinematic = false);
+ndSharedPtr<ndBody> BuildStaticMesh(ndDemoEntityManager* const scene, const char* const meshName, bool optimized, bool kinematic = false);
+ndSharedPtr<ndBody> BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation, bool kinematic = false);
 
 #endif

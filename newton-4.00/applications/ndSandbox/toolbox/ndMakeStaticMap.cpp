@@ -20,7 +20,72 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoSplinePathMesh.h"
 
-ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix& matrix, bool kinematic)
+static ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInstance& shape, const ndMatrix& location, ndFloat32 mass)
+{
+	ndPhysicsWorld* const world = scene->GetWorld();
+
+	const char* const textName = "wood_1.png";
+	ndMatrix matrix(FindFloor(*world, location, shape, 200.0f));
+	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, textName, textName, textName));
+
+	ndSharedPtr<ndBody> body (new ndBodyDynamic());
+	ndSharedPtr<ndDemoEntity>entity(new ndDemoEntity(matrix));
+	entity->SetMesh(mesh);
+
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+	body->SetMatrix(matrix);
+	body->GetAsBodyDynamic()->SetCollisionShape(shape);
+	body->GetAsBodyDynamic()->SetMassMatrix(mass, shape);
+
+	world->AddBody(body);
+	scene->AddEntity(entity);
+	return body->GetAsBodyDynamic();
+}
+
+ndSharedPtr<ndBody> BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized, bool kinematic)
+{
+	ndPhysicsWorld* const world = scene->GetWorld();
+	ndVector floor[] =
+	{
+		{ 200.0f, 0.0f,  200.0f, 1.0f },
+		{ 200.0f, 0.0f, -200.0f, 1.0f },
+		{ -200.0f, 0.0f, -200.0f, 1.0f },
+		{ -200.0f, 0.0f,  200.0f, 1.0f },
+	};
+	ndInt32 index[][3] = { { 0, 1, 2 },{ 0, 2, 3 } };
+
+	ndPolygonSoupBuilder meshBuilder;
+	meshBuilder.Begin();
+	//meshBuilder.LoadPLY("sword.ply");
+	//meshBuilder.LoadPLY("static_mesh.ply");
+	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(ndVector), 31, &index[0][0], 3);
+	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(ndVector), 31, &index[1][0], 3);
+	meshBuilder.End(optimized);
+
+	ndShapeInstance plane(new ndShapeStatic_bvh(meshBuilder));
+	ndMatrix uvMatrix(ndGetIdentityMatrix());
+	uvMatrix[0][0] *= 1.0f / 50.0f;
+	uvMatrix[1][1] *= 1.0f / 50.0f;
+	uvMatrix[2][2] *= 1.0f / 50.0f;
+
+	ndSharedPtr<ndDemoMeshInterface>geometry(new ndDemoMesh("box", scene->GetShaderCache(), &plane, "marbleCheckBoard.png", "marbleCheckBoard.png", "marbleCheckBoard.png", 1.0f, uvMatrix));
+
+	ndMatrix matrix(ndGetIdentityMatrix());
+	ndSharedPtr<ndDemoEntity>entity(new ndDemoEntity(matrix));
+	entity->SetMesh(geometry);
+	entity->SetShadowMode(false);
+
+	ndSharedPtr<ndBody> body(kinematic ? new ndBodyKinematic() : new ndBodyDynamic());
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+	body->SetMatrix(matrix);
+	body->GetAsBodyKinematic()->SetCollisionShape(plane);
+
+	world->AddBody(body);
+	scene->AddEntity(entity);
+	return body;
+}
+
+ndSharedPtr<ndBody> BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix& matrix, bool kinematic)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 
@@ -30,111 +95,25 @@ ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix&
 	uvMatrix[1][1] *= 1.0f / 4.0f;
 	uvMatrix[2][2] *= 1.0f / 4.0f;
 
-	ndSharedPtr<ndDemoMeshInterface>geometry (new ndDemoMesh("box", scene->GetShaderCache(), &box, "marbleCheckBoard.png", "marbleCheckBoard.png", "marbleCheckBoard.png", 1.0f, uvMatrix, false));
+	ndSharedPtr<ndDemoMeshInterface>geometry(new ndDemoMesh("box", scene->GetShaderCache(), &box, "marbleCheckBoard.png", "marbleCheckBoard.png", "marbleCheckBoard.png", 1.0f, uvMatrix, false));
 
 	ndMatrix location(matrix);
 	location.m_posit.m_y -= 0.5f;
-	ndSharedPtr<ndDemoEntity>entity (new ndDemoEntity(location));
+	ndSharedPtr<ndDemoEntity>entity(new ndDemoEntity(location));
 	entity->SetMesh(geometry);
 	entity->SetShadowMode(false);
 
-	ndSharedPtr<ndBody> body(new ndBodyDynamic());
+	ndSharedPtr<ndBody> body(kinematic ? new ndBodyKinematic() : new ndBodyDynamic());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(location);
-	body->GetAsBodyDynamic()->SetCollisionShape(box);
+	body->GetAsBodyKinematic()->SetCollisionShape(box);
 
 	world->AddBody(body);
 	scene->AddEntity(entity);
-	return body->GetAsBodyDynamic();
+	return body;
 }
 
-ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized, bool kinematic)
-{
-	ndPhysicsWorld* const world = scene->GetWorld();
-	ndVector floor[] =
-	{
-		{ 200.0f, 0.0f,  200.0f, 1.0f },
-		{ 200.0f, 0.0f, -200.0f, 1.0f },
-		{ -200.0f, 0.0f, -200.0f, 1.0f },
-		{ -200.0f, 0.0f,  200.0f, 1.0f },
-	};
-	ndInt32 index[][3] = { { 0, 1, 2 },{ 0, 2, 3 } };
-
-	ndPolygonSoupBuilder meshBuilder;
-	meshBuilder.Begin();
-	//meshBuilder.LoadPLY("sword.ply");
-	//meshBuilder.LoadPLY("static_mesh.ply");
-	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(ndVector), 31, &index[0][0], 3);
-	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(ndVector), 31, &index[1][0], 3);
-	meshBuilder.End(optimized);
-
-	ndShapeInstance plane(new ndShapeStatic_bvh(meshBuilder));
-	ndMatrix uvMatrix(ndGetIdentityMatrix());
-	uvMatrix[0][0] *= 1.0f / 50.0f;
-	uvMatrix[1][1] *= 1.0f / 50.0f;
-	uvMatrix[2][2] *= 1.0f / 50.0f;
-
-	ndSharedPtr<ndDemoMeshInterface>geometry(new ndDemoMesh("box", scene->GetShaderCache(), &plane, "marbleCheckBoard.png", "marbleCheckBoard.png", "marbleCheckBoard.png", 1.0f, uvMatrix));
-
-	ndMatrix matrix(ndGetIdentityMatrix());
-	ndSharedPtr<ndDemoEntity>entity(new ndDemoEntity(matrix));
-	entity->SetMesh(geometry);
-	entity->SetShadowMode(false);
-
-	ndSharedPtr<ndBody> body (new ndBodyDynamic());
-	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-	body->SetMatrix(matrix);
-	body->GetAsBodyDynamic()->SetCollisionShape(plane);
-
-	world->AddBody(body);
-	scene->AddEntity(entity);
-	return body->GetAsBodyDynamic();
-}
-
-ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized, bool kinematic)
-{
-	ndPhysicsWorld* const world = scene->GetWorld();
-	ndVector floor[] =
-	{
-		{ 200.0f, 0.0f,  200.0f, 1.0f },
-		{ 200.0f, 0.0f, -200.0f, 1.0f },
-		{ -200.0f, 0.0f, -200.0f, 1.0f },
-		{ -200.0f, 0.0f,  200.0f, 1.0f },
-	};
-	ndInt32 index[][3] = { { 0, 1, 2 },{ 0, 2, 3 } };
-
-	ndPolygonSoupBuilder meshBuilder;
-	meshBuilder.Begin();
-	//meshBuilder.LoadPLY("sword.ply");
-	//meshBuilder.LoadPLY("static_mesh.ply");
-	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(ndVector), 31, &index[0][0], 3);
-	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(ndVector), 31, &index[1][0], 3);
-	meshBuilder.End(optimized);
-
-	ndShapeInstance plane(new ndShapeStatic_bvh(meshBuilder));
-	ndMatrix uvMatrix(ndGetIdentityMatrix());
-	uvMatrix[0][0] *= 1.0f / 50.0f;
-	uvMatrix[1][1] *= 1.0f / 50.0f;
-	uvMatrix[2][2] *= 1.0f / 50.0f;
-
-	ndSharedPtr<ndDemoMeshInterface>geometry(new ndDemoMesh("box", scene->GetShaderCache(), &plane, "marbleCheckBoard.png", "marbleCheckBoard.png", "marbleCheckBoard.png", 1.0f, uvMatrix));
-
-	ndMatrix matrix(ndGetIdentityMatrix());
-	ndSharedPtr<ndDemoEntity>entity(new ndDemoEntity(matrix));
-	entity->SetMesh(geometry);
-	entity->SetShadowMode(false);
-
-	ndSharedPtr<ndBody> body(new ndBodyDynamic());
-	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-	body->SetMatrix(matrix);
-	body->GetAsBodyDynamic()->SetCollisionShape(plane);
-
-	world->AddBody(body);
-	scene->AddEntity(entity);
-	return body->GetAsBodyDynamic();
-}
-
-ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation, bool kinematic)
+ndSharedPtr<ndBody> BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation, bool kinematic)
 {
 	ndVector origin(-(ndFloat32)grids * gridSize * 0.5f, 0.0f, -(ndFloat32)grids * gridSize * 0.5f, 1.0f);
 
@@ -164,7 +143,7 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids,
 	ndFloat32 uvScale = 1.0 / 16.0f;
 	ndInt32 materialIndex = 0;
 	for (ndInt32 iz = 0; iz < grids; iz++)
-	{ 
+	{
 		for (ndInt32 ix = 0; ix < grids; ix++)
 		{
 			ndVector p0(points[(ix + 0) * (grids + 1) + iz + 0]);
@@ -173,20 +152,20 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids,
 			ndVector p3(points[(ix + 0) * (grids + 1) + iz + 1]);
 
 			meshEffect.BeginBuildFace();
-				meshEffect.AddMaterial(materialIndex);
-				meshEffect.AddPoint(p0.m_x, p0.m_y, p0.m_z);
-				meshEffect.AddNormal(0.0f, 1.0f, 0.0f);
-				meshEffect.AddUV0(p0.m_x * uvScale, p0.m_z * uvScale);
+			meshEffect.AddMaterial(materialIndex);
+			meshEffect.AddPoint(p0.m_x, p0.m_y, p0.m_z);
+			meshEffect.AddNormal(0.0f, 1.0f, 0.0f);
+			meshEffect.AddUV0(p0.m_x * uvScale, p0.m_z * uvScale);
 
-				meshEffect.AddMaterial(materialIndex);
-				meshEffect.AddPoint(p1.m_x, p1.m_y, p1.m_z);
-				meshEffect.AddNormal(0.0f, 1.0f, 0.0f);
-				meshEffect.AddUV0(p1.m_x * uvScale, p1.m_z * uvScale);
+			meshEffect.AddMaterial(materialIndex);
+			meshEffect.AddPoint(p1.m_x, p1.m_y, p1.m_z);
+			meshEffect.AddNormal(0.0f, 1.0f, 0.0f);
+			meshEffect.AddUV0(p1.m_x * uvScale, p1.m_z * uvScale);
 
-				meshEffect.AddMaterial(materialIndex);
-				meshEffect.AddPoint(p2.m_x, p2.m_y, p2.m_z);
-				meshEffect.AddNormal(0.0f, 1.0f, 0.0f);
-				meshEffect.AddUV0(p2.m_x * uvScale, p2.m_z * uvScale);
+			meshEffect.AddMaterial(materialIndex);
+			meshEffect.AddPoint(p2.m_x, p2.m_y, p2.m_z);
+			meshEffect.AddNormal(0.0f, 1.0f, 0.0f);
+			meshEffect.AddUV0(p2.m_x * uvScale, p2.m_z * uvScale);
 			meshEffect.EndBuildFace();
 
 			face[0] = p0;
@@ -195,20 +174,20 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids,
 			meshBuilder.AddFace(&face[0].m_x, sizeof(ndVector), 3, materialIndex);
 
 			meshEffect.BeginBuildFace();
-				meshEffect.AddMaterial(0);
-				meshEffect.AddPoint(p0.m_x, p0.m_y, p0.m_z);
-				meshEffect.AddNormal(0.0f, 1.0f, 0.0f);
-				meshEffect.AddUV0(p0.m_x * uvScale, p0.m_z * uvScale);
+			meshEffect.AddMaterial(0);
+			meshEffect.AddPoint(p0.m_x, p0.m_y, p0.m_z);
+			meshEffect.AddNormal(0.0f, 1.0f, 0.0f);
+			meshEffect.AddUV0(p0.m_x * uvScale, p0.m_z * uvScale);
 
-				meshEffect.AddMaterial(0);
-				meshEffect.AddPoint(p2.m_x, p2.m_y, p2.m_z);
-				meshEffect.AddNormal(0.0f, 1.0f, 0.0f);
-				meshEffect.AddUV0(p2.m_x * uvScale, p2.m_z * uvScale);
+			meshEffect.AddMaterial(0);
+			meshEffect.AddPoint(p2.m_x, p2.m_y, p2.m_z);
+			meshEffect.AddNormal(0.0f, 1.0f, 0.0f);
+			meshEffect.AddUV0(p2.m_x * uvScale, p2.m_z * uvScale);
 
-				meshEffect.AddMaterial(0);
-				meshEffect.AddPoint(p3.m_x, p3.m_y, p3.m_z);
-				meshEffect.AddNormal(0.0f, 1.0f, 0.0f);
-				meshEffect.AddUV0(p3.m_x * uvScale, p3.m_z * uvScale);
+			meshEffect.AddMaterial(0);
+			meshEffect.AddPoint(p3.m_x, p3.m_y, p3.m_z);
+			meshEffect.AddNormal(0.0f, 1.0f, 0.0f);
+			meshEffect.AddUV0(p3.m_x * uvScale, p3.m_z * uvScale);
 			meshEffect.EndBuildFace();
 
 			face[0] = p0;
@@ -221,59 +200,60 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids,
 	meshBuilder.End(false);
 
 	ndShapeInstance plane(new ndShapeStatic_bvh(meshBuilder));
-	ndSharedPtr<ndDemoMeshInterface>geometry (new ndDemoMesh("plane", &meshEffect, scene->GetShaderCache()));
+	ndSharedPtr<ndDemoMeshInterface>geometry(new ndDemoMesh("plane", &meshEffect, scene->GetShaderCache()));
 
 	ndMatrix matrix(ndGetIdentityMatrix());
-	ndSharedPtr<ndDemoEntity>entity (new ndDemoEntity(matrix));
+	ndSharedPtr<ndDemoEntity>entity(new ndDemoEntity(matrix));
 	entity->SetMesh(geometry);
 	entity->SetShadowMode(false);
 
 	ndPhysicsWorld* const world = scene->GetWorld();
-	ndSharedPtr<ndBody> body (new ndBodyDynamic());
+	//ndSharedPtr<ndBody> body(new ndBodyDynamic());
+	ndSharedPtr<ndBody> body(kinematic ? new ndBodyKinematic() : new ndBodyDynamic());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
-	body->GetAsBodyDynamic()->SetCollisionShape(plane);
+	body->GetAsBodyKinematic()->SetCollisionShape(plane);
 
 	world->AddBody(body);
 	scene->AddEntity(entity);
-	return body->GetAsBodyDynamic();
+	return body;
 }
 
-ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* const meshName, bool optimized, bool kinematic)
+ndSharedPtr<ndBody> BuildStaticMesh(ndDemoEntityManager* const scene, const char* const meshName, bool optimized, bool kinematic)
 {
 	ndMeshLoader loader;
-	ndSharedPtr<ndMesh> meshEffectNode (loader.LoadMesh(meshName));
+	ndSharedPtr<ndMesh> meshEffectNode(loader.LoadMesh(meshName));
 	ndAssert(*meshEffectNode);
 
-	ndSharedPtr<ndDemoEntity> visualEntity (new ndDemoEntity(scene, *meshEffectNode));
+	ndSharedPtr<ndDemoEntity> visualEntity(new ndDemoEntity(scene, *meshEffectNode));
 	visualEntity->SetShadowMode(false);
 	scene->AddEntity(visualEntity);
-	
+
 	ndPolygonSoupBuilder meshBuilder;
 	meshBuilder.Begin();
-	
+
 	ndInt32 stack = 1;
 	ndMatrix matrixBuffer[1024];
 	ndMesh* entBuffer[1024];
-	
+
 	entBuffer[0] = *meshEffectNode;
 	matrixBuffer[0] = meshEffectNode->m_matrix.OrthoInverse();
-	
+
 	while (stack)
 	{
 		stack--;
 		ndMesh* const ent = entBuffer[stack];
-		ndMatrix matrix (ent->m_matrix * matrixBuffer[stack]);
-	
+		ndMatrix matrix(ent->m_matrix * matrixBuffer[stack]);
+
 		ndSharedPtr<ndMeshEffect> meshEffect = ent->GetMesh();
 		if (*meshEffect)
 		{
-			ndInt32 vertexStride = meshEffect->GetVertexStrideInByte() / ndInt32(sizeof (ndFloat64));
+			ndInt32 vertexStride = meshEffect->GetVertexStrideInByte() / ndInt32(sizeof(ndFloat64));
 			const ndFloat64* const vertexData = meshEffect->GetVertexPool();
-	
+
 			ndInt32 mark = meshEffect->IncLRU();
 			ndPolyhedra::Iterator iter(*(*meshEffect));
-			
+
 			ndVector face[256];
 			ndMatrix worldMatrix(ent->m_meshMatrix * matrix);
 			for (iter.Begin(); iter; iter++)
@@ -292,13 +272,13 @@ ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* c
 						ptr->m_mark = mark;
 						ptr = ptr->m_next;
 					} while (ptr != edge);
-	
+
 					ndInt32 materialIndex = meshEffect->GetFaceMaterial(edge);
 					meshBuilder.AddFace(&face[0].m_x, sizeof(ndVector), 3, materialIndex);
 				}
 			}
 		}
-	
+
 		for (ndMesh* child = ent->GetFirstChild(); child; child = child->GetNext())
 		{
 			entBuffer[stack] = child;
@@ -308,44 +288,23 @@ ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* c
 	}
 	meshBuilder.End(optimized);
 	ndShapeInstance shape(new ndShapeStatic_bvh(meshBuilder));
-	
+
 	ndMatrix matrix(visualEntity->GetCurrentMatrix());
-	ndSharedPtr<ndBody> body (new ndBodyDynamic());
+	//ndSharedPtr<ndBody> body(new ndBodyDynamic());
+	ndSharedPtr<ndBody> body(kinematic ? new ndBodyKinematic() : new ndBodyDynamic());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, visualEntity));
 	body->SetMatrix(matrix);
-	body->GetAsBodyDynamic()->SetCollisionShape(shape);
-	
+	body->GetAsBodyKinematic()->SetCollisionShape(shape);
+
 	scene->GetWorld()->AddBody(body);
-	return body->GetAsBodyDynamic();
+	return body;
 }
 
-static ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInstance& shape, const ndMatrix& location, ndFloat32 mass)
-{
-	ndPhysicsWorld* const world = scene->GetWorld();
-
-	const char* const textName = "wood_1.png";
-	ndMatrix matrix(FindFloor(*world, location, shape, 200.0f));
-	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, textName, textName, textName));
-
-	ndSharedPtr<ndBody> body (new ndBodyDynamic());
-	ndSharedPtr<ndDemoEntity>entity(new ndDemoEntity(matrix));
-	entity->SetMesh(mesh);
-
-	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-	body->SetMatrix(matrix);
-	body->GetAsBodyDynamic()->SetCollisionShape(shape);
-	body->GetAsBodyDynamic()->SetMassMatrix(mass, shape);
-
-	world->AddBody(body);
-	scene->AddEntity(entity);
-	return body->GetAsBodyDynamic();
-}
-
-ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene, bool kinematic)
+ndSharedPtr<ndBody> BuildPlayArena(ndDemoEntityManager* const scene, bool kinematic)
 {
 	ndMeshLoader loader;
-	ndSharedPtr<ndMesh>meshEffectNode (loader.LoadMesh("playerarena.fbx"));
-	ndSharedPtr<ndDemoEntity> entity (new ndDemoEntity(scene, *meshEffectNode));
+	ndSharedPtr<ndMesh>meshEffectNode(loader.LoadMesh("playerarena.fbx"));
+	ndSharedPtr<ndDemoEntity> entity(new ndDemoEntity(scene, *meshEffectNode));
 	entity->SetShadowMode(false);
 	scene->AddEntity(entity);
 
@@ -407,14 +366,15 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene, bool kinematic
 	ndShapeInstance shape(new ndShapeStatic_bvh(meshBuilder));
 	ndMatrix matrix(entity->GetCurrentMatrix());
 
-	ndSharedPtr<ndBody> body (new ndBodyDynamic());
+	//ndSharedPtr<ndBody> body(new ndBodyDynamic());
+	ndSharedPtr<ndBody> body(kinematic ? new ndBodyKinematic() : new ndBodyDynamic());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
-	body->GetAsBodyDynamic()->SetCollisionShape(shape);
+	body->GetAsBodyKinematic()->SetCollisionShape(shape);
 	scene->GetWorld()->AddBody(body);
 
-	ndSharedPtr<ndDemoEntity> pivot0 (entity->Find(entity, "pivot1"));
-	ndSharedPtr<ndDemoEntity> pivot1 (entity->Find(entity, "pivot0"));
+	ndSharedPtr<ndDemoEntity> pivot0(entity->Find(entity, "pivot1"));
+	ndSharedPtr<ndDemoEntity> pivot1(entity->Find(entity, "pivot0"));
 	if (*pivot0 && *pivot1)
 	{
 		ndMatrix matrix0(pivot0->CalculateGlobalMatrix());
@@ -492,5 +452,5 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene, bool kinematic
 		}
 	}
 
-	return body->GetAsBodyKinematic();
+	return body;
 }

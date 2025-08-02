@@ -689,7 +689,8 @@ using namespace ndSimpleRobot;
 void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	ndBodyKinematic* const floor = BuildFloorBox(scene, ndGetIdentityMatrix());
+	//ndBodyKinematic* const floor = BuildFloorBox(scene, ndGetIdentityMatrix());
+	ndSharedPtr<ndBody>floor (BuildFloorBox(scene, ndGetIdentityMatrix()));
 	
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
 	ndMeshLoader loader;
@@ -706,7 +707,7 @@ void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 		model->SetNotifyCallback(new RobotModelNotify(model->GetAsModelArticulation(), true, backGround));
 		((RobotModelNotify*)*model->GetNotifyCallback())->ResetModel();
 
-		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), floor));
+		ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(model->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), floor->GetAsBodyKinematic()));
 		world->AddJoint(fixJoint);
 		return model;
 	};
