@@ -56,7 +56,9 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 	virtual void Set(ndBrainFloatBuffer& buffer, ndBrainFloat value) override;
 	virtual void Min(ndBrainFloatBuffer& buffer, ndBrainFloat value) override;
 	virtual void Max(ndBrainFloatBuffer& buffer, ndBrainFloat value) override;
+	virtual void Less(ndBrainFloatBuffer& buffer, ndBrainFloat test) override;
 	virtual void Scale(ndBrainFloatBuffer& buffer, ndBrainFloat scale) override;
+	virtual void Greater(ndBrainFloatBuffer& buffer, ndBrainFloat test) override;
 	virtual void LessEqual(ndBrainFloatBuffer& buffer, ndBrainFloat test) override;
 	virtual void GreaterEqual(ndBrainFloatBuffer& buffer, ndBrainFloat test) override;
 	virtual void Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat blend) override;

@@ -95,7 +95,8 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	//BuildFloorBox(scene, ndGetIdentityMatrix());
-	BuildFlatPlane(scene, true);
+	ndSharedPtr<ndBody> body(BuildFlatPlane(scene, true, true));
+	body->GetAsBodyKinematic()->SetVelocity(ndVector (1.0f, 0.0f, 0.0f, 0.0f));
 
 	ndMatrix matrix(ndGetIdentityMatrix());
 #if 0
@@ -155,8 +156,9 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 	ndMatrix origin1(ndGetIdentityMatrix());
 	origin1.m_posit.m_x = 20.0f;
 
+	AddPlanks(scene, origin1, 1.0f, 4);
 	//AddSphere(scene, origin1, 1.0f, 0.5f);
-	AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 1, 2, 7);
+	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 1, 2, 7);
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 4, 4, 4);
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 2, 2, 7);

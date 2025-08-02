@@ -227,6 +227,20 @@ void ndBrainGpuContext::Min(ndBrainFloatBuffer& buffer, ndBrainFloat value)
 	dst.Min(value);
 }
 
+void ndBrainGpuContext::Less(ndBrainFloatBuffer& buffer, ndBrainFloat test)
+{
+	ndInt32 elements = ndInt32(buffer.SizeInBytes() / sizeof(ndBrainFloat));
+	ndBrainMemVector dst((ndBrainFloat*)buffer.GetCpuPtr(), elements);
+	dst.Less(test);
+}
+
+void ndBrainGpuContext::Greater(ndBrainFloatBuffer& buffer, ndBrainFloat test)
+{
+	ndInt32 elements = ndInt32(buffer.SizeInBytes() / sizeof(ndBrainFloat));
+	ndBrainMemVector dst((ndBrainFloat*)buffer.GetCpuPtr(), elements);
+	dst.Greater(test);
+}
+
 void ndBrainGpuContext::Max(ndBrainFloatBuffer& buffer, ndBrainFloat value)
 {
 	ndInt32 elements = ndInt32(buffer.SizeInBytes() / sizeof(ndBrainFloat));

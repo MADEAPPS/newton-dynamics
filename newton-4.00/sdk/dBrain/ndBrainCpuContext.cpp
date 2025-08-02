@@ -260,7 +260,6 @@ void ndBrainCpuContext::Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuff
 	dst.Blend(src, blend);
 }
 
-
 void ndBrainCpuContext::Less(ndBrainFloatBuffer& buffer, ndBrainFloat test)
 {
 	ndBrainVector& dst = **buffer.m_buffer;

@@ -689,8 +689,7 @@ using namespace ndSimpleRobot;
 void ndSimpleIndustrialRobot (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	//ndBodyKinematic* const floor = BuildFloorBox(scene, ndGetIdentityMatrix());
-	ndSharedPtr<ndBody>floor (BuildFloorBox(scene, ndGetIdentityMatrix()));
+	ndSharedPtr<ndBody> floor (BuildFloorBox(scene, ndGetIdentityMatrix()));
 	
 	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
 	ndMeshLoader loader;
