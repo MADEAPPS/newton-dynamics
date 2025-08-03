@@ -1165,6 +1165,371 @@ ndInt32 ndContactSolver::PruneSupport(ndInt32 count, const ndVector& dir, const 
 	return index;
 }
 
+ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, ndContactPoint* const contactArray, ndInt32 maxCount) const
+{
+#if 0
+	ndFixSizeArray<ndVector, D_MAX_CONTATCS> array;
+	ndFloat32 max_x = ndFloat32(1.0e20f);
+	ndInt32 maxIndex = 0;
+	array.SetCount(count);
+	for (ndInt32 i = 0; i < count; ++i)
+	{
+		array[i] = matrix.UntransformVector(contactArray[i].m_point);
+		array[i].m_w = ndFloat32(i);
+		if (array[i].m_x < max_x)
+		{
+			maxIndex = i;
+			max_x = array[i].m_x;
+		}
+	}
+	dSwap(array[0], array[maxIndex]);
+
+	for (ndInt32 i = 2; i < count; ++i)
+	{
+		ndInt32 j = i;
+		ndVector tmp(array[i]);
+		for (; array[j - 1].m_x > tmp.m_x; --j)
+		{
+			dAssert(j > 0);
+			array[j] = array[j - 1];
+		}
+		array[j] = tmp;
+	}
+
+	ndFloat32 window = ndFloat32(2.5e-3f);
+	do
+	{
+		ndInt32 packContacts = 0;
+		window *= ndFloat32(2.0f);
+		const ndFloat32 window2 = window * window;
+
+		ndUnsigned8 mask[D_MAX_CONTATCS];
+		//memset(mask, 0, count * sizeof(ndUnsigned8));
+		ndMemSet(mask, ndUnsigned8(0), count);
+		for (ndInt32 i = 0; i < count; ++i)
+		{
+			if (!mask[i])
+			{
+				const ndFloat32 val = array[i].m_x + window;
+				for (ndInt32 j = i + 1; (j < count) && (array[j].m_x < val); ++j)
+				{
+					if (!mask[j])
+					{
+						ndVector dp((array[j] - array[i]) & ndVector::m_triplexMask);
+						dAssert(dp.m_w == ndFloat32(0.0f));
+						ndFloat32 dist2 = dp.DotProduct(dp).GetScalar();
+						if (dist2 < window2)
+						{
+							mask[j] = 1;
+							packContacts = 1;
+						}
+					}
+				}
+			}
+		}
+
+		if (packContacts)
+		{
+			ndInt32 j = 0;
+			for (ndInt32 i = 0; i < count; ++i)
+			{
+				if (!mask[i])
+				{
+					array[j] = array[i];
+					j++;
+				}
+			}
+			count = j;
+		}
+	} while (count > maxCount);
+
+	//ndContactPoint tmpContact[16];
+	ndFixSizeArray<ndContactPoint, D_MAX_CONTATCS> tmpContact;
+	tmpContact.SetCount(count);
+	for (ndInt32 i = 0; i < count; ++i)
+	{
+		ndInt32 index = ndInt32(array[i].m_w);
+		tmpContact[i] = contactArray[index];
+	}
+
+	for (ndInt32 i = count - 1; i >= 0; --i)
+	{
+		contactArray[i] = tmpContact[i];
+	}
+
+	return count;
+#else
+
+	class ndCluster
+	{
+	public:
+		ndVector m_sum;
+		ndVector m_sum2;
+		ndInt32 m_start;
+		ndInt32 m_count;
+	};
+
+	ndCluster cluster;
+	cluster.m_start = 0;
+	cluster.m_count = count;
+	cluster.m_sum = ndVector::m_zero;
+	cluster.m_sum2 = ndVector::m_zero;
+
+	ndFixSizeArray<ndVector, D_MAX_CONTATCS> array;
+	array.SetCount(count);
+	for (ndInt32 i = 0; i < count; ++i)
+	{
+		//const ndVector p(matrix.UntransformVector(contactArray[i].m_point));
+		const ndVector p(matrix.TransformVector(contactArray[i].m_point));
+		array[i] = p;
+		array[i].m_w = ndFloat32(i);
+		cluster.m_sum += p;
+		cluster.m_sum2 += p * p;
+	}
+
+	ndInt32 baseCount = 0;
+	const ndInt32 clusterSize = 8;
+	if (cluster.m_count > clusterSize)
+	{
+		ndCluster spliteStack[128];
+		spliteStack[0] = cluster;
+
+		baseCount = 0;
+		ndInt32 stack = 1;
+		while (stack)
+		{
+			stack--;
+			cluster = spliteStack[stack];
+
+			const ndVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count));
+			const ndVector variance2(cluster.m_sum2.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count) - origin * origin);
+			ndFloat32 maxVariance2 = ndMax(ndMax(variance2.m_x, variance2.m_y), variance2.m_z);
+
+			if ((cluster.m_count <= clusterSize) || (stack > (ndInt32(sizeof(spliteStack) / sizeof(spliteStack[0])) - 4)) || (maxVariance2 < ndFloat32(1.e-4f)))
+			{
+				ndAssert(baseCount <= cluster.m_start);
+				const ndFloat32 window = ndFloat32(2.5e-3f);
+				ndFloat32 window2 = window * window;
+				for (ndInt32 i = 0; i < cluster.m_count - 1; ++i)
+				{
+					const ndVector test(array[cluster.m_start + i]);
+					for (ndInt32 j = i + 1; j < cluster.m_count; ++j)
+					{
+						const ndVector error(test - array[cluster.m_start + j]);
+						ndFloat32 dist2 = error.DotProduct(error).GetScalar();
+						if (dist2 < window2)
+						{
+							array[cluster.m_start + j] = array[cluster.m_start + cluster.m_count - 1];
+							cluster.m_count--;
+							i--;
+							break;
+						}
+					}
+				}
+
+				for (ndInt32 i = 0; i < cluster.m_count; ++i)
+				{
+					array[baseCount] = array[cluster.m_start + i];
+					baseCount++;
+				}
+			}
+			else
+			{
+				ndInt32 firstSortAxis = 0;
+				if ((variance2.m_y >= variance2.m_x) && (variance2.m_y >= variance2.m_z))
+				{
+					firstSortAxis = 1;
+				}
+				else if ((variance2.m_z >= variance2.m_x) && (variance2.m_z >= variance2.m_y))
+				{
+					firstSortAxis = 2;
+				}
+				ndFloat32 axisVal = origin[firstSortAxis];
+
+				ndInt32 i0 = 0;
+				ndInt32 i1 = cluster.m_count - 1;
+
+				const ndInt32 start = cluster.m_start;
+				while (i0 < i1)
+				{
+					while ((array[start + i0][firstSortAxis] <= axisVal) && (i0 < i1))
+					{
+						++i0;
+					};
+
+					while ((array[start + i1][firstSortAxis] > axisVal) && (i0 < i1))
+					{
+						--i1;
+					}
+
+					ndAssert(i0 <= i1);
+					if (i0 < i1)
+					{
+						ndSwap(array[start + i0], array[start + i1]);
+						++i0;
+						--i1;
+					}
+				}
+
+				while ((array[start + i0][firstSortAxis] <= axisVal) && (i0 < cluster.m_count))
+				{
+					++i0;
+				};
+
+#ifdef _DEBUG
+				for (ndInt32 i = 0; i < i0; ++i)
+				{
+					ndAssert(array[start + i][firstSortAxis] <= axisVal);
+				}
+
+				for (ndInt32 i = i0; i < cluster.m_count; ++i)
+				{
+					ndAssert(array[start + i][firstSortAxis] > axisVal);
+				}
+#endif
+
+				ndVector xc(ndVector::m_zero);
+				ndVector x2c(ndVector::m_zero);
+				for (ndInt32 i = 0; i < i0; ++i)
+				{
+					const ndVector x(array[start + i]);
+					xc += x;
+					x2c += x * x;
+				}
+
+				ndCluster cluster_i1(cluster);
+				cluster_i1.m_start = start + i0;
+				cluster_i1.m_count = cluster.m_count - i0;
+				cluster_i1.m_sum -= xc;
+				cluster_i1.m_sum2 -= x2c;
+				spliteStack[stack] = cluster_i1;
+				stack++;
+
+				ndCluster cluster_i0(cluster);
+				cluster_i0.m_start = start;
+				cluster_i0.m_count = i0;
+				cluster_i0.m_sum = xc;
+				cluster_i0.m_sum2 = x2c;
+				spliteStack[stack] = cluster_i0;
+				stack++;
+			}
+		}
+	}
+	else
+	{
+		ndAssert(cluster.m_start == 0);
+		const ndFloat32 window = ndFloat32(2.5e-3f);
+		ndFloat32 window2 = window * window;
+		for (ndInt32 i = 0; i < cluster.m_count - 1; ++i)
+		{
+			const ndVector test(array[i]);
+			for (ndInt32 j = i + 1; j < cluster.m_count; ++j)
+			{
+				const ndVector error(test - array[j]);
+				ndFloat32 dist2 = error.DotProduct(error).GetScalar();
+				if (dist2 < window2)
+				{
+					array[j] = array[cluster.m_count - 1];
+					cluster.m_count--;
+					i--;
+					break;
+				}
+			}
+		}
+		baseCount = cluster.m_count;
+	}
+
+	count = baseCount;
+	if (baseCount > maxCount)
+	{
+		ndInt32 maxIndex = 0;
+		ndFloat32 min_x = ndFloat32(1.0e20f);
+		for (ndInt32 i = 0; i < count; ++i)
+		{
+			if (array[i].m_x < min_x)
+			{
+				maxIndex = i;
+				min_x = array[i].m_x;
+			}
+		}
+		ndSwap(array[0], array[maxIndex]);
+
+		for (ndInt32 i = 2; i < count; ++i)
+		{
+			ndInt32 j = i;
+			ndVector tmp(array[i]);
+			for (; array[j - 1].m_x > tmp.m_x; --j)
+			{
+				ndAssert(j > 0);
+				array[j] = array[j - 1];
+			}
+			array[j] = tmp;
+		}
+
+		ndFloat32 window = ndFloat32(2.5e-3f);
+		do
+		{
+			ndInt32 packContacts = 0;
+			window *= ndFloat32(2.0f);
+			const ndFloat32 window2 = window * window;
+
+			ndUnsigned8 mask[D_MAX_CONTATCS];
+			//memset(mask, 0, count * sizeof(ndUnsigned8));
+			ndMemSet(mask, ndUnsigned8(0), count);
+			for (ndInt32 i = 0; i < count; ++i)
+			{
+				if (!mask[i])
+				{
+					const ndFloat32 val = array[i].m_x + window;
+					for (ndInt32 j = i + 1; (j < count) && (array[j].m_x < val); ++j)
+					{
+						if (!mask[j])
+						{
+							ndVector dp((array[j] - array[i]) & ndVector::m_triplexMask);
+							ndAssert(dp.m_w == ndFloat32(0.0f));
+							ndFloat32 dist2 = dp.DotProduct(dp).GetScalar();
+							if (dist2 < window2)
+							{
+								mask[j] = 1;
+								packContacts = 1;
+							}
+						}
+					}
+				}
+			}
+
+			if (packContacts)
+			{
+				ndInt32 j = 0;
+				for (ndInt32 i = 0; i < count; ++i)
+				{
+					if (!mask[i])
+					{
+						array[j] = array[i];
+						j++;
+					}
+				}
+				count = j;
+			}
+		} while (count > maxCount);
+	}
+
+	ndFixSizeArray<ndContactPoint, D_MAX_CONTATCS> tmpContact;
+	tmpContact.SetCount(count);
+	for (ndInt32 i = 0; i < count; ++i)
+	{
+		ndInt32 index = ndInt32(array[i].m_w);
+		tmpContact[i] = contactArray[index];
+	}
+
+	for (ndInt32 i = count - 1; i >= 0; --i)
+	{
+		contactArray[i] = tmpContact[i];
+	}
+	return count;
+#endif
+}
+
 ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, ndContactPoint* const contactArray, ndInt32 maxCount) const
 {
 	if (count <= 3)
@@ -1320,369 +1685,68 @@ ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, 
 	return buffer.GetCount();
 }
 
-ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, ndContactPoint* const contactArray, ndInt32 maxCount) const
+ndInt32 ndContactSolver::Prune1dContacts(const ndMatrix& matrix, ndInt32 count, ndContactPoint* const contactArray, ndInt32 maxCount) const
 {
-#if 0
-	ndFixSizeArray<ndVector, D_MAX_CONTATCS> array;
-	ndFloat32 max_x = ndFloat32(1.0e20f);
-	ndInt32 maxIndex = 0;
-	array.SetCount(count);
-	for (ndInt32 i = 0; i < count; ++i) 
+	if (count < 2)
 	{
-		array[i] = matrix.UntransformVector(contactArray[i].m_point);
-		array[i].m_w = ndFloat32(i);
-		if (array[i].m_x < max_x) 
-		{
-			maxIndex = i;
-			max_x = array[i].m_x;
-		}
+		return 1;
 	}
-	dSwap(array[0], array[maxIndex]);
-
-	for (ndInt32 i = 2; i < count; ++i) 
+	if (count == 2)
 	{
-		ndInt32 j = i;
-		ndVector tmp(array[i]);
-		for (; array[j - 1].m_x > tmp.m_x; --j) 
-		{
-			dAssert(j > 0);
-			array[j] = array[j - 1];
-		}
-		array[j] = tmp;
+		ndVector segment(contactArray[1].m_point - contactArray[0].m_point);
+		ndFloat32 dist2 = segment.DotProduct(segment).GetScalar();
+		return (dist2 < ndFloat32(5.0e-3f * 5.0e-3f)) ? 1 : 2;
 	}
 
-	ndFloat32 window = ndFloat32(2.5e-3f);
-	do 
-	{
-		ndInt32 packContacts = 0;
-		window *= ndFloat32(2.0f);
-		const ndFloat32 window2 = window * window;
+	ndFixSizeArray<ndContactPoint, 32> buffer;
+	ndFixSizeArray<ndVector, D_MAX_CONTATCS> array(D_MAX_CONTATCS);
 
-		ndUnsigned8 mask[D_MAX_CONTATCS];
-		//memset(mask, 0, count * sizeof(ndUnsigned8));
-		ndMemSet(mask, ndUnsigned8(0), count);
-		for (ndInt32 i = 0; i < count; ++i) 
-		{
-			if (!mask[i]) 
-			{
-				const ndFloat32 val = array[i].m_x + window;
-				for (ndInt32 j = i + 1; (j < count) && (array[j].m_x < val); ++j) 
-				{
-					if (!mask[j]) 
-					{
-						ndVector dp((array[j] - array[i]) & ndVector::m_triplexMask);
-						dAssert(dp.m_w == ndFloat32(0.0f));
-						ndFloat32 dist2 = dp.DotProduct(dp).GetScalar();
-						if (dist2 < window2) 
-						{
-							mask[j] = 1;
-							packContacts = 1;
-						}
-					}
-				}
-			}
-		}
-
-		if (packContacts) 
-		{
-			ndInt32 j = 0;
-			for (ndInt32 i = 0; i < count; ++i) 
-			{
-				if (!mask[i]) 
-				{
-					array[j] = array[i];
-					j++;
-				}
-			}
-			count = j;
-		}
-	} while (count > maxCount);
-
-	//ndContactPoint tmpContact[16];
-	ndFixSizeArray<ndContactPoint, D_MAX_CONTATCS> tmpContact;
-	tmpContact.SetCount(count);
-	for (ndInt32 i = 0; i < count; ++i) 
-	{
-		ndInt32 index = ndInt32(array[i].m_w);
-		tmpContact[i] = contactArray[index];
-	}
-
-	for (ndInt32 i = count - 1; i >= 0; --i)
-	{
-		contactArray[i] = tmpContact[i];
-	}
-
-	return count;
-#else
-
-	class ndCluster
-	{
-		public:
-		ndVector m_sum;
-		ndVector m_sum2;
-		ndInt32 m_start;
-		ndInt32 m_count;
-	};
-
-	ndCluster cluster;
-	cluster.m_start = 0;
-	cluster.m_count = count;
-	cluster.m_sum = ndVector::m_zero;
-	cluster.m_sum2 = ndVector::m_zero;
-
-	ndFixSizeArray<ndVector, D_MAX_CONTATCS> array;
-	array.SetCount(count);
+	array.SetCount(0);
+	const ndVector xyMask(ndVector::m_xMask | ndVector::m_yMask);
 	for (ndInt32 i = 0; i < count; ++i)
 	{
-		//const ndVector p(matrix.UntransformVector(contactArray[i].m_point));
-		const ndVector p(matrix.TransformVector(contactArray[i].m_point));
-		array[i] = p;
-		array[i].m_w = ndFloat32(i);
-		cluster.m_sum += p;
-		cluster.m_sum2 += p * p;
+		ndVector p(matrix.TransformVector(contactArray[i].m_point) & xyMask);
+		array.PushBack(p);
 	}
-	
-	ndInt32 baseCount = 0;
-	const ndInt32 clusterSize = 8;
-	if (cluster.m_count > clusterSize)
+
+	ndInt32 j0 = 0;
+	ndInt32 j1 = 0;
+	ndFloat32 maxValue = ndFloat32(-1.0e10f);
+	ndFloat32 minValue = ndFloat32(1.0e10f);
+	for (ndInt32 i = count-1; i >= 0 ; --i)
 	{
-		ndCluster spliteStack[128];
-		spliteStack[0] = cluster;
-
-		baseCount = 0;
-		ndInt32 stack = 1;
-		while (stack)
+		ndFloat32 dist = array[i].m_x;
+		if (dist > maxValue) 
 		{
-			stack--;
-			cluster = spliteStack[stack];
-
-			const ndVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count));
-			const ndVector variance2(cluster.m_sum2.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count) - origin * origin);
-			ndFloat32 maxVariance2 = ndMax(ndMax(variance2.m_x, variance2.m_y), variance2.m_z);
-
-			if ((cluster.m_count <= clusterSize) || (stack >  (ndInt32(sizeof(spliteStack) / sizeof(spliteStack[0])) - 4)) || (maxVariance2 < ndFloat32(1.e-4f)))
-			{
-				ndAssert(baseCount <= cluster.m_start);
-				const ndFloat32 window = ndFloat32(2.5e-3f);
-				ndFloat32 window2 = window * window;
-				for (ndInt32 i = 0; i < cluster.m_count - 1; ++i)
-				{
-					const ndVector test(array[cluster.m_start + i]);
-					for (ndInt32 j = i + 1; j < cluster.m_count; ++j)
-					{
-						const ndVector error(test - array[cluster.m_start + j]);
-						ndFloat32 dist2 = error.DotProduct(error).GetScalar();
-						if (dist2 < window2)
-						{
-							array[cluster.m_start + j] = array[cluster.m_start + cluster.m_count - 1];
-							cluster.m_count--;
-							i--;
-							break;
-						}
-					}
-				}
-
-				for (ndInt32 i = 0; i < cluster.m_count; ++i)
-				{
-					array[baseCount] = array[cluster.m_start + i];
-					baseCount++;
-				}
-			}
-			else
-			{
-				ndInt32 firstSortAxis = 0;
-				if ((variance2.m_y >= variance2.m_x) && (variance2.m_y >= variance2.m_z))
-				{
-					firstSortAxis = 1;
-				}
-				else if ((variance2.m_z >= variance2.m_x) && (variance2.m_z >= variance2.m_y))
-				{
-					firstSortAxis = 2;
-				}
-				ndFloat32 axisVal = origin[firstSortAxis];
-
-				ndInt32 i0 = 0;
-				ndInt32 i1 = cluster.m_count - 1;
-
-				const ndInt32 start = cluster.m_start;
-				while (i0 < i1)
-				{
-					while ((array[start + i0][firstSortAxis] <= axisVal) && (i0 < i1))
-					{
-						++i0;
-					};
-
-					while ((array[start + i1][firstSortAxis] > axisVal) && (i0 < i1))
-					{
-						--i1;
-					}
-					
-					ndAssert(i0 <= i1);
-					if (i0 < i1)
-					{
-						ndSwap(array[start + i0], array[start + i1]);
-						++i0;
-						--i1;
-					}
-				}
-
-				while ((array[start + i0][firstSortAxis] <= axisVal) && (i0 < cluster.m_count))
-				{
-					++i0;
-				};
-
-				#ifdef _DEBUG
-				for (ndInt32 i = 0; i < i0; ++i)
-				{
-					ndAssert(array[start + i][firstSortAxis] <= axisVal);
-				}
-
-				for (ndInt32 i = i0; i < cluster.m_count; ++i)
-				{
-					ndAssert(array[start + i][firstSortAxis] > axisVal);
-				}
-				#endif
-
-				ndVector xc(ndVector::m_zero);
-				ndVector x2c(ndVector::m_zero);
-				for (ndInt32 i = 0; i < i0; ++i)
-				{
-					const ndVector x(array[start + i]);
-					xc += x;
-					x2c += x * x;
-				}
-
-				ndCluster cluster_i1(cluster);
-				cluster_i1.m_start = start + i0;
-				cluster_i1.m_count = cluster.m_count - i0;
-				cluster_i1.m_sum -= xc;
-				cluster_i1.m_sum2 -= x2c;
-				spliteStack[stack] = cluster_i1;
-				stack++;
-
-				ndCluster cluster_i0(cluster);
-				cluster_i0.m_start = start;
-				cluster_i0.m_count = i0;
-				cluster_i0.m_sum = xc;
-				cluster_i0.m_sum2 = x2c;
-				spliteStack[stack] = cluster_i0;
-				stack++;
-			}
+			j0 = i;
+			maxValue = dist;
+		}
+		if (dist < minValue)
+		{
+			j1 = i;
+			minValue = dist;
 		}
 	}
-	else
+	if (ndAbs(maxValue - minValue) < ndFloat32(1.0e-3f))
 	{
-		ndAssert(cluster.m_start == 0);
-		const ndFloat32 window = ndFloat32(2.5e-3f);
-		ndFloat32 window2 = window * window;
-		for (ndInt32 i = 0; i < cluster.m_count - 1; ++i)
-		{
-			const ndVector test(array[i]);
-			for (ndInt32 j = i + 1; j < cluster.m_count; ++j)
-			{
-				const ndVector error(test - array[j]);
-				ndFloat32 dist2 = error.DotProduct(error).GetScalar();
-				if (dist2 < window2)
-				{
-					array[j] = array[cluster.m_count - 1];
-					cluster.m_count--;
-					i--;
-					break;
-				}
-			}
-		}
-		baseCount = cluster.m_count;
+		return 1;
 	}
 
-	count = baseCount;
-	if (baseCount > maxCount)
-	{
-		ndInt32 maxIndex = 0;
-		ndFloat32 min_x = ndFloat32(1.0e20f);
-		for (ndInt32 i = 0; i < count; ++i)
-		{
-			if (array[i].m_x < min_x)
-			{
-				maxIndex = i;
-				min_x = array[i].m_x;
-			}
-		}
-		ndSwap(array[0], array[maxIndex]);
-
-		for (ndInt32 i = 2; i < count; ++i)
-		{
-			ndInt32 j = i;
-			ndVector tmp(array[i]);
-			for (; array[j - 1].m_x > tmp.m_x; --j)
-			{
-				ndAssert(j > 0);
-				array[j] = array[j - 1];
-			}
-			array[j] = tmp;
-		}
-
-		ndFloat32 window = ndFloat32(2.5e-3f);
-		do
-		{
-			ndInt32 packContacts = 0;
-			window *= ndFloat32(2.0f);
-			const ndFloat32 window2 = window * window;
-
-			ndUnsigned8 mask[D_MAX_CONTATCS];
-			//memset(mask, 0, count * sizeof(ndUnsigned8));
-			ndMemSet(mask, ndUnsigned8(0), count);
-			for (ndInt32 i = 0; i < count; ++i)
-			{
-				if (!mask[i])
-				{
-					const ndFloat32 val = array[i].m_x + window;
-					for (ndInt32 j = i + 1; (j < count) && (array[j].m_x < val); ++j)
-					{
-						if (!mask[j])
-						{
-							ndVector dp((array[j] - array[i]) & ndVector::m_triplexMask);
-							ndAssert(dp.m_w == ndFloat32(0.0f));
-							ndFloat32 dist2 = dp.DotProduct(dp).GetScalar();
-							if (dist2 < window2)
-							{
-								mask[j] = 1;
-								packContacts = 1;
-							}
-						}
-					}
-				}
-			}
-
-			if (packContacts)
-			{
-				ndInt32 j = 0;
-				for (ndInt32 i = 0; i < count; ++i)
-				{
-					if (!mask[i])
-					{
-						array[j] = array[i];
-						j++;
-					}
-				}
-				count = j;
-			}
-		} while (count > maxCount);
-	}
-
-	ndFixSizeArray<ndContactPoint, D_MAX_CONTATCS> tmpContact;
-	tmpContact.SetCount(count);
-	for (ndInt32 i = 0; i < count; ++i)
-	{
-		ndInt32 index = ndInt32(array[i].m_w);
-		tmpContact[i] = contactArray[index];
-	}
-
+	const ndVector ref(array[j1]);
 	for (ndInt32 i = count - 1; i >= 0; --i)
 	{
-		contactArray[i] = tmpContact[i];
+		ndFloat32 sizeDist = array[i].m_y - ref.m_y;
+		if (ndAbs(sizeDist) > ndFloat32(1.0e-3f))
+		{
+			return Prune2dContacts(matrix, count, contactArray, maxCount);
+		}
 	}
-	return count;
-#endif
+
+	ndContactPoint c0(contactArray[j0]);
+	ndContactPoint c1(contactArray[j1]);
+	contactArray[0] = c0;
+	contactArray[1] = c1;
+	return 2;
 }
 
 ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
@@ -1755,60 +1819,24 @@ ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
 	ndAssert(eigen[1] >= eigen[2]);
 
 	const ndFloat32 magnificationFactor = ndFloat32(8.0f);
-	if (eigen[0] > (magnificationFactor * eigen[1]))
-	{
-		// is a 2d or 1d convex hull
-		return Prune2dContacts(covariance, count, contactArray, maxCount);
-	}
 	if (eigen[1] > (magnificationFactor * eigen[2]))
+	{
+		// the contact form a flat surface, we have to check if is a line of a polygon.
+		if (eigen[1] < ndFloat32 (1.0e-4f))
+		{
+			return Prune1dContacts(covariance, count, contactArray, maxCount);
+		}
+		else
+		{
+			return Prune2dContacts(covariance, count, contactArray, maxCount);
+		}
+	}
+	else if (eigen[2] > ndFloat32(1.0e-4f))
 	{
 		// 3d convex Hull
 		return Prune3dContacts(covariance, count, contactArray, maxCount);
 	}
-	else if (eigen[0] > ndFloat32(1.0e-4f))
-	{
-		// is a line or a point convex hull
-		if (count > 2) 
-		{
-			ndInt32 j0 = 0;
-			ndInt32 j1 = 0;
-			ndFloat32 maxValue = ndFloat32(-1.0e10f);
-			ndFloat32 minValue = ndFloat32(1.0e10f);
-			for (ndInt32 i = count-1; i >= 0 ; --i)
-			{
-				ndFloat32 dist = contactArray[i].m_point.DotProduct(covariance.m_front).GetScalar();
-				if (dist > maxValue) 
-				{
-					j0 = i;
-					maxValue = dist;
-				}
-				ndFloat32 distNeg = dist * ndFloat32(1.0f);
-				if (distNeg < minValue)
-				{
-					j1 = i;
-					minValue = distNeg;
-				}
-			}
-			ndContactPoint c0(contactArray[j0]);
-			ndContactPoint c1(contactArray[j1]);
-			contactArray[0] = c0;
-			contactArray[1] = c1;
-			count = 2;
-		}
-		if (count == 2)
-		{
-			ndVector segment(contactArray[1].m_point - contactArray[0].m_point);
-			ndFloat32 dist2 = segment.DotProduct(segment).GetScalar();
-			if (dist2 < ndFloat32(5.0e-3f * 5.0e-3f))
-			{
-				count = 1;
-			}
-		}
-		//ndAssert(count <= 1);
-		return count;
-	}
-
-	return 1;
+	return Prune1dContacts(covariance, count, contactArray, maxCount);
 }
 
 ndFloat32 ndContactSolver::RayCast(const ndVector& localP0, const ndVector& localP1, ndContactPoint& contactOut)
