@@ -220,39 +220,36 @@ public:
 	void* m_applicationUserData;
 };
 
-
-
-
-static ndBodyDynamic* BuildBox(ndWorld& world, const ndMatrix& xform, ndFloat32 mass, const ndVector dim)
-{
-	ndShapeInstance box(new ndShapeBox(dim[0], dim[1], dim[2]));
-	ndBodyDynamic* const body = new ndBodyDynamic();
-
-	body->SetNotifyCallback(new BodyNotify);
-	body->SetMatrix(xform);
-	body->SetCollisionShape(box);
-	if (mass > 0.f) body->SetMassMatrix(mass, box);
-
-	ndSharedPtr<ndBody> bodyPtr(body);
-	world.AddBody(bodyPtr);
-	return body;
-}
-
-static ndBodyKinematic* BuildKinematicBox(ndWorld& world, const ndMatrix& xform, ndFloat32 mass, const ndVector dim)
-{
-	assert(mass > 0.f);
-	ndShapeInstance box(new ndShapeBox(dim[0], dim[1], dim[2]));
-	ndBodyKinematic* const body = new ndBodyKinematic();
-
-	body->SetNotifyCallback(new BodyNotify);
-	body->SetMatrix(xform);
-	body->SetCollisionShape(box);
-	if (mass > 0.f) body->SetMassMatrix(mass, box);
-
-	ndSharedPtr<ndBody> bodyPtr(body);
-	world.AddBody(bodyPtr);
-	return body;
-}
+//static ndBodyDynamic* BuildBox(ndWorld& world, const ndMatrix& xform, ndFloat32 mass, const ndVector dim)
+//{
+//	ndShapeInstance box(new ndShapeBox(dim[0], dim[1], dim[2]));
+//	ndBodyDynamic* const body = new ndBodyDynamic();
+//
+//	body->SetNotifyCallback(new BodyNotify);
+//	body->SetMatrix(xform);
+//	body->SetCollisionShape(box);
+//	if (mass > 0.f) body->SetMassMatrix(mass, box);
+//
+//	ndSharedPtr<ndBody> bodyPtr(body);
+//	world.AddBody(bodyPtr);
+//	return body;
+//}
+//
+//static ndBodyKinematic* BuildKinematicBox(ndWorld& world, const ndMatrix& xform, ndFloat32 mass, const ndVector dim)
+//{
+//	assert(mass > 0.f);
+//	ndShapeInstance box(new ndShapeBox(dim[0], dim[1], dim[2]));
+//	ndBodyKinematic* const body = new ndBodyKinematic();
+//
+//	body->SetNotifyCallback(new BodyNotify);
+//	body->SetMatrix(xform);
+//	body->SetCollisionShape(box);
+//	if (mass > 0.f) body->SetMassMatrix(mass, box);
+//
+//	ndSharedPtr<ndBody> bodyPtr(body);
+//	world.AddBody(bodyPtr);
+//	return body;
+//}
 
 
 void ndBasicRigidBody(ndDemoEntityManager* const scene)
@@ -279,36 +276,43 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 		ndQuaternion q(ndVector(0.f, 0.f, 1.f, 0.f), angle);
 		groundXF = ndCalculateMatrix(q, origin + ndVector(15.f, groundHeight + 4.f, 0.f, 0.f));
 
-		ndFloat32 size = 100;
 		groundXF.m_posit = origin + ndVector(0.f, -.5f + groundHeight, 0.f, 0.f);
+
+		//ndFloat32 size = 100;
 		//ndBodyDynamic* bodyFloor = BuildBox(world, groundXF, 0.f, ndVector(size * 2.f, 1.0f, size * 2.f, 0.0f));
 		//ndBodyKinematic* bodyFloor = BuildKinematicBox(world, groundXF, 10000.f, ndVector(size * 2.f, 1.0f, size * 2.f, 0.0f));
-		//ndSharedPtr<ndBody> bodyFloor (BuildFloorBox(scene, groundXF, true));
-		ndSharedPtr<ndBody> bodyFloor(BuildFlatPlane(scene, true, true));
+		ndSharedPtr<ndBody> bodyFloor (BuildFloorBox(scene, groundXF, true));
+		//ndSharedPtr<ndBody> bodyFloor(BuildFlatPlane(scene, true, true));
+		//ndSharedPtr<ndBody> bodyFloor(BuildFlatPlane(scene, true));
 
 		groundBody = *bodyFloor;
 		// does not work; dynamic box stops moving and starts wobbling after 10 sec (newton bug?)
 		bodyFloor->SetVelocity(ndVector(0.f, 0.f, -0.1f, 0.f)); 
-		bodyFloor->SetVelocity(ndVector(0.f, 0.f, 0.0f, 0.f));
+		//bodyFloor->SetVelocity(ndVector(0.f, 0.f, 0.0f, 0.f));
 
-		ndMatrix xf = groundXF;
-		xf.m_posit = origin + xf.RotateVector(ndVector(size, 0.f, 0.f, 0.f)); BuildBox(world, xf, 0.f, ndVector(1.0f, 5.0f, size * 2.f, 0.0f));
-		xf.m_posit = origin + xf.RotateVector(ndVector(-size, 0.f, 0.f, 0.f)); BuildBox(world, xf, 0.f, ndVector(1.0f, 5.0f, size * 2.f, 0.0f));
-		xf.m_posit = origin + xf.RotateVector(ndVector(0.f, 0.f, size, 0.f)); BuildBox(world, xf, 0.f, ndVector(size * 2.f, 5.0f, 1.0f, 0.0f));
-		xf.m_posit = origin + xf.RotateVector(ndVector(0.f, 0.f, -size, 0.f)); BuildBox(world, xf, 0.f, ndVector(size * 2.f, 5.0f, 1.0f, 0.0f));
+		//ndMatrix xf = groundXF;
+		//xf.m_posit = origin + xf.RotateVector(ndVector(size, 0.f, 0.f, 0.f)); 
+		//BuildBox(world, xf, 0.f, ndVector(1.0f, 5.0f, size * 2.f, 0.0f));
+		//
+		//xf.m_posit = origin + xf.RotateVector(ndVector(-size, 0.f, 0.f, 0.f)); 
+		//BuildBox(world, xf, 0.f, ndVector(1.0f, 5.0f, size * 2.f, 0.0f));
+		//
+		//xf.m_posit = origin + xf.RotateVector(ndVector(0.f, 0.f, size, 0.f)); 
+		//BuildBox(world, xf, 0.f, ndVector(size * 2.f, 5.0f, 1.0f, 0.0f));
+		//
+		//xf.m_posit = origin + xf.RotateVector(ndVector(0.f, 0.f, -size, 0.f)); 
+		//BuildBox(world, xf, 0.f, ndVector(size * 2.f, 5.0f, 1.0f, 0.0f));
 	}
 
 	if (1) // dynamic box, stops and starts wobbling
 	{
-		//xform.m_posit = origin + ndVector(7.0f, 10.0f, 0.0f, 0.0f);
-		xform.m_posit = origin + ndVector(2.0f, 2.0f, 2.0f, 0.0f);
-
+		xform.m_posit = origin + ndVector(7.0f, 10.0f, 0.0f, 0.0f);
 		//ndBodyDynamic* box = BuildBox(world, xform, 10.f, ndVector(5.f, 0.5f, 1.0f, 0.f));
 		ndBodyKinematic* const box = AddBox(scene, xform, 10.0f, 5.0f, 0.5f, 1.0f);
 		box->SetMatrix(xform);
 	}
 
-	if (0) // another dynamic box, stops at the same time
+	if (1) // another dynamic box, stops at the same time
 	{
 		xform.m_posit = origin + ndVector(0.0f, 7.0f, 0.0f, 0.0f);
 		//ndBodyDynamic* box = BuildBox(world, xform, 10.f, ndVector(1.f, 0.5f, 1.0f, 0.f));
