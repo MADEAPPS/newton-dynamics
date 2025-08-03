@@ -819,15 +819,14 @@ void ndAabbPolygonSoup::Deserialize (const char* const path)
 
 ndVector ndAabbPolygonSoup::ForAllSectorsSupportVertex (const ndVector& dir) const
 {
-	ndVector supportVertex (ndFloat32 (0.0f));
+	ndVector supportVertex (ndVector::m_zero);
 	if (m_aabb) 
 	{
-		ndFloat32 aabbProjection[DG_STACK_DEPTH];
-		const ndNode *stackPool[DG_STACK_DEPTH];
+		ndFixSizeArray<ndNode*, DG_STACK_DEPTH> stackPool;
+		ndFixSizeArray<ndFloat32, DG_STACK_DEPTH> aabbProjection;
 
-		ndInt32 stack = 1;
-		stackPool[0] = m_aabb;
-		aabbProjection[0] = ndFloat32 (1.0e10f);
+		stackPool.PushBack(m_aabb);
+		aabbProjection.PushBack(ndFloat32 (1.0e10f));
 		const ndTriplex* const boxArray = (ndTriplex*)m_localVertex;
 
 		ndFloat32 maxProj = ndFloat32 (-1.0e20f); 
@@ -835,25 +834,23 @@ ndVector ndAabbPolygonSoup::ForAllSectorsSupportVertex (const ndVector& dir) con
 		ndInt32 iy = (dir[1] > ndFloat32 (0.0f)) ? 1 : 0;
 		ndInt32 iz = (dir[2] > ndFloat32 (0.0f)) ? 1 : 0;
 
-		while (stack) 
+		while (stackPool.GetCount())
 		{
-			ndFloat32 boxSupportValue;
-
-			stack--;
-			boxSupportValue = aabbProjection[stack];
-			if (boxSupportValue > maxProj) {
+			const ndNode* const me = stackPool.Pop();
+			ndFloat32 boxSupportValue = boxSupportValue = aabbProjection.Pop();
+			if (boxSupportValue > maxProj) 
+			{
 				ndFloat32 backSupportDist = ndFloat32 (0.0f);
 				ndFloat32 frontSupportDist = ndFloat32 (0.0f);
-				const ndNode* const me = stackPool[stack];
 				if (me->m_left.IsLeaf()) 
 				{
 					backSupportDist = ndFloat32 (-1.0e20f);
-					ndInt32 index = ndInt32 (me->m_left.GetIndex());
-					ndInt32 vCount = ndInt32 (me->m_left.GetCount());
-					ndVector vertex (ndFloat32 (0.0f));
+					const ndInt32 index = ndInt32 (me->m_left.GetIndex());
+					const ndInt32 vCount = ndInt32 (me->m_left.GetCount());
+					ndVector vertex (ndVector::m_zero);
 					for (ndInt32 j = 0; j < vCount; ++j) 
 					{
-						ndInt32 i0 = m_indices[index + j] * ndInt32 (sizeof (ndTriplex) / sizeof (ndFloat32));
+						ndInt32 i0 = m_indices[index + j];
 						ndVector p (&boxArray[i0].m_x);
 						p = p & ndVector::m_triplexMask;
 						ndFloat32 dist = p.DotProduct(dir).GetScalar();
@@ -869,7 +866,6 @@ ndVector ndAabbPolygonSoup::ForAllSectorsSupportVertex (const ndVector& dir) con
 						maxProj = backSupportDist;
 						supportVertex = vertex; 
 					}
-
 				} 
 				else 
 				{
@@ -889,12 +885,12 @@ ndVector ndAabbPolygonSoup::ForAllSectorsSupportVertex (const ndVector& dir) con
 				if (me->m_right.IsLeaf()) 
 				{
 					frontSupportDist = ndFloat32 (-1.0e20f);
-					ndInt32 index = ndInt32 (me->m_right.GetIndex());
-					ndInt32 vCount = ndInt32 (me->m_right.GetCount());
-					ndVector vertex (ndFloat32 (0.0f));
+					const ndInt32 index = ndInt32 (me->m_right.GetIndex());
+					const ndInt32 vCount = ndInt32 (me->m_right.GetCount());
+					ndVector vertex(ndVector::m_zero);
 					for (ndInt32 j = 0; j < vCount; ++j) 
 					{
-						ndInt32 i0 = m_indices[index + j] * ndInt32 (sizeof (ndTriplex) / sizeof (ndFloat32));
+						ndInt32 i0 = m_indices[index + j];
 						ndVector p (&boxArray[i0].m_x);
 						p = p & ndVector::m_triplexMask;
 						ndFloat32 dist = p.DotProduct(dir).GetScalar();
@@ -909,7 +905,6 @@ ndVector ndAabbPolygonSoup::ForAllSectorsSupportVertex (const ndVector& dir) con
 						maxProj = frontSupportDist;
 						supportVertex = vertex; 
 					}
-
 				} 
 				else 
 				{
@@ -930,16 +925,14 @@ ndVector ndAabbPolygonSoup::ForAllSectorsSupportVertex (const ndVector& dir) con
 				{
 					if (!me->m_left.IsLeaf()) 
 					{
-						aabbProjection[stack] = backSupportDist;
-						stackPool[stack] = me->m_left.GetNode(m_aabb);
-						stack++;
+						aabbProjection.PushBack(backSupportDist);
+						stackPool.PushBack(me->m_left.GetNode(m_aabb));
 					}
 
 					if (!me->m_right.IsLeaf()) 
 					{
-						aabbProjection[stack] = frontSupportDist;
-						stackPool[stack] = me->m_right.GetNode(m_aabb);
-						stack++;
+						aabbProjection.PushBack(frontSupportDist);
+						stackPool.PushBack(me->m_right.GetNode(m_aabb));
 					}
 
 				} 
@@ -947,16 +940,14 @@ ndVector ndAabbPolygonSoup::ForAllSectorsSupportVertex (const ndVector& dir) con
 				{
 					if (!me->m_right.IsLeaf()) 
 					{
-						aabbProjection[stack] = frontSupportDist;
-						stackPool[stack] = me->m_right.GetNode(m_aabb);
-						stack++;
+						aabbProjection.PushBack(frontSupportDist);
+						stackPool.PushBack(me->m_right.GetNode(m_aabb));
 					}
 
 					if (!me->m_left.IsLeaf()) 
 					{
-						aabbProjection[stack] = backSupportDist;
-						stackPool[stack] = me->m_left.GetNode(m_aabb);
-						stack++;
+						aabbProjection.PushBack(backSupportDist);
+						stackPool.PushBack(me->m_left.GetNode(m_aabb));
 					}
 				}
 			}
