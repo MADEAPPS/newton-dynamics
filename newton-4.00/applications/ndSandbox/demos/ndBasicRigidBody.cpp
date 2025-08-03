@@ -175,15 +175,14 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 
 class ContactNotify : public ndContactNotify
 {
-public:
-
+	public:
 	bool disable = 0;
 
 	ContactNotify(ndScene* const scene) : ndContactNotify(scene)
 	{
 	}
 
-	bool OnAabbOverlap(const ndContact* const contact, ndFloat32 timestep) const
+	bool OnAabbOverlap(const ndContact* const, ndFloat32) const
 	{
 		return (!disable);
 	}
@@ -259,7 +258,7 @@ static ndBodyKinematic* BuildKinematicBox(ndWorld& world, const ndMatrix& xform,
 void ndBasicRigidBody(ndDemoEntityManager* const scene)
 {
 	constexpr ndFloat32 groundHeight = 0.f;
-	constexpr double PI = 3.1415926535897932384626433832795029;
+	//constexpr double PI = 3.1415926535897932384626433832795029;
 
 	ndPhysicsWorld& world = *scene->GetWorld();
 
@@ -276,7 +275,7 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 	ndBody* groundBody = 0;
 	if (1) // flat floor and walls
 	{
-		ndFloat32 angle = 0.f / 180.f * float(PI);
+		ndFloat32 angle = 0.f / 180.f * float(ndPi);
 		ndQuaternion q(ndVector(0.f, 0.f, 1.f, 0.f), angle);
 		groundXF = ndCalculateMatrix(q, origin + ndVector(15.f, groundHeight + 4.f, 0.f, 0.f));
 
@@ -284,7 +283,9 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 		groundXF.m_posit = origin + ndVector(0.f, -.5f + groundHeight, 0.f, 0.f);
 		//ndBodyDynamic* bodyFloor = BuildBox(world, groundXF, 0.f, ndVector(size * 2.f, 1.0f, size * 2.f, 0.0f));
 		//ndBodyKinematic* bodyFloor = BuildKinematicBox(world, groundXF, 10000.f, ndVector(size * 2.f, 1.0f, size * 2.f, 0.0f));
-		ndSharedPtr<ndBody> bodyFloor (BuildFloorBox(scene, groundXF, true));
+		//ndSharedPtr<ndBody> bodyFloor (BuildFloorBox(scene, groundXF, true));
+		ndSharedPtr<ndBody> bodyFloor(BuildFlatPlane(scene, true, true));
+
 		groundBody = *bodyFloor;
 		bodyFloor->SetVelocity(ndVector(0.f, 0.f, -0.1f, 0.f)); // does not work; dynamic box stops moving and starts wobbling after 10 sec (newton bug?)
 
@@ -297,13 +298,15 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 
 	if (1) // dynamic box, stops and starts wobbling
 	{
-		xform.m_posit = origin + ndVector(7.0f, 10.0f, 0.0f, 0.0f);
+		//xform.m_posit = origin + ndVector(7.0f, 10.0f, 0.0f, 0.0f);
+		xform.m_posit = origin + ndVector(2.0f, 2.0f, 2.0f, 0.0f);
+
 		//ndBodyDynamic* box = BuildBox(world, xform, 10.f, ndVector(5.f, 0.5f, 1.0f, 0.f));
 		ndBodyKinematic* const box = AddBox(scene, xform, 10.0f, 5.0f, 0.5f, 1.0f);
 		box->SetMatrix(xform);
 	}
 
-	if (1) // another dynamic box, stops at the same time
+	if (0) // another dynamic box, stops at the same time
 	{
 		xform.m_posit = origin + ndVector(0.0f, 7.0f, 0.0f, 0.0f);
 		//ndBodyDynamic* box = BuildBox(world, xform, 10.f, ndVector(1.f, 0.5f, 1.0f, 0.f));
@@ -317,9 +320,6 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), -30.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
-
-
-
 
 #endif
 
