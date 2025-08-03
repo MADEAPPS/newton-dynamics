@@ -56,6 +56,9 @@ class ndShapeStatic_bvh: public ndShapeStaticMesh, public ndAabbPolygonSoup
 			void* const context, const ndFloat32* const polygon, ndInt32 strideInBytes,
 			const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32 hitDistance);
 
+	D_COLLISION_API virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin) const override;
+
+
 	ndInt32 m_trianglesCount;
 	friend class ndContactSolver;
 } D_GCC_NEWTON_CLASS_ALIGN_32;

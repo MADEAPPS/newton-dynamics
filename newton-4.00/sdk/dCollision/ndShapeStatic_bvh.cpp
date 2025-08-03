@@ -247,3 +247,9 @@ ndUnsigned64 ndShapeStatic_bvh::GetHash(ndUnsigned64 hash) const
 
 	return tempHash;
 }
+
+ndVector ndShapeStatic_bvh::SupportVertexSpecial(const ndVector& dir, ndFloat32) const
+{
+	ndVector support (ForAllSectorsSupportVertex(dir));
+	return support;
+}
