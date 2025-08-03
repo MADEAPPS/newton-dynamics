@@ -189,19 +189,19 @@ ndVector ndShapeInstance::SupportVertexSpecial(const ndVector& inDir) const
 	ndAssert(ndAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-2f));
 	switch (m_scaleType)
 	{
-	case m_unit:
-	{
-		return m_shape->SupportVertexSpecial(dir, m_skinMargin);
-	}
-	case m_uniform:
-	{
-		return m_scale * m_shape->SupportVertexSpecial(dir, m_skinMargin);
-	}
+		case m_unit:
+		{
+			return m_shape->SupportVertexSpecial(dir, m_skinMargin);
+		}
+		case m_uniform:
+		{
+			return m_scale * m_shape->SupportVertexSpecial(dir, m_skinMargin);
+		}
 
-	case m_global:
-	case m_nonUniform:
-	default:
-		return SupportVertex(dir);
+		case m_global:
+		case m_nonUniform:
+		default:
+			return SupportVertex(dir);
 	}
 }
 
