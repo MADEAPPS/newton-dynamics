@@ -287,7 +287,9 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 		ndSharedPtr<ndBody> bodyFloor(BuildFlatPlane(scene, true, true));
 
 		groundBody = *bodyFloor;
-		bodyFloor->SetVelocity(ndVector(0.f, 0.f, -0.1f, 0.f)); // does not work; dynamic box stops moving and starts wobbling after 10 sec (newton bug?)
+		// does not work; dynamic box stops moving and starts wobbling after 10 sec (newton bug?)
+		bodyFloor->SetVelocity(ndVector(0.f, 0.f, -0.1f, 0.f)); 
+		bodyFloor->SetVelocity(ndVector(0.f, 0.f, 0.0f, 0.f));
 
 		ndMatrix xf = groundXF;
 		xf.m_posit = origin + xf.RotateVector(ndVector(size, 0.f, 0.f, 0.f)); BuildBox(world, xf, 0.f, ndVector(1.0f, 5.0f, size * 2.f, 0.0f));
