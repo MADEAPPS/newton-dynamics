@@ -40,13 +40,12 @@
 //#define ND_HIDEN_LAYERS_ACTIVATION			ndBrainLayerActivationTanh
 //#define ND_HIDEN_LAYERS_ACTIVATION			ndBrainLayerActivationLeakyRelu
  
-#define ND_POLICY_DEFAULT_ENTROPY_TEMPERATURE	ndBrainFloat(0.1f)
+#define ND_POLICY_DEFAULT_ENTROPY_TEMPERATURE	ndBrainFloat(0.05f)
+#define ND_POLICY_TRAINING_EXPLORATION_NOISE	ndBrainFloat(0.2f)
 #define ND_POLICY_DEFAULT_POLYAK_BLEND			ndBrainFloat(0.005f)
 #define ND_POLICY_CONSTANT_SIGMA				ndBrainFloat(0.5f)
 #define ND_POLICY_MIN_SIGMA						(ndBrainFloat(0.5f) * ND_POLICY_CONSTANT_SIGMA)
 #define ND_POLICY_MAX_SIGMA						(ndBrainFloat(2.0f) * ND_POLICY_CONSTANT_SIGMA)
-
-#define ND_POLICY_TRAINING_EXPLORATION_NOISE	ndBrainFloat(0.2f)
 
 ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 {
@@ -496,7 +495,6 @@ ndBrainAgentOffPolicyGradient_Trainer::ndBrainAgentOffPolicyGradient_Trainer(con
 	,m_minibatchSigma(nullptr)
 	,m_uniformRandom(nullptr)
 	,m_replayBufferFlat(nullptr)
-	//,m_minibatchRewards(nullptr)
 	,m_minibatchNoTerminal(nullptr)
 	,m_minibatchOfTransitions(nullptr)
 	,m_minibatchExpectedRewards(nullptr)
@@ -542,7 +540,6 @@ ndBrainAgentOffPolicyGradient_Trainer::ndBrainAgentOffPolicyGradient_Trainer(con
 	ndInt32 outputSize = m_policyTrainer->GetBrain()->GetOutputSize();
 	ndBrainAgentOffPolicyGradient_Agent::ndTrajectory trajectory(outputSize, inputSize);
 
-	//m_minibatchRewards = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_miniBatchSize));
 	m_minibatchNoTerminal = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_miniBatchSize));
 	m_minibatchIndexBuffer = ndSharedPtr<ndBrainIntegerBuffer>(new ndBrainIntegerBuffer(*m_context, m_parameters.m_miniBatchSize));
 	m_minibatchExpectedRewards = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_miniBatchSize));
@@ -1264,32 +1261,30 @@ void ndBrainAgentOffPolicyGradient_Trainer::CalculateSacExpectedRewards()
 
 	// calculate and add entropy regulatization to the q value
 
-ndBrainVector minibatchSigma_;
-ndBrainVector minibatchSample;
-ndBrainVector minibatchEntropy0;
-m_minibatchSigma->VectorFromDevice(minibatchSigma_);
-m_minibatchEntropy->VectorFromDevice(minibatchEntropy0);
-m_minibatchUniformRandomDistribution->VectorFromDevice(minibatchSample);
-for (ndInt32 i = 0; i < m_parameters.m_miniBatchSize; ++i)
-{
-	const ndBrainMemVector sampleMean(&minibatchSample[i * 1], 1);
-	const ndBrainMemVector varianceMean(&minibatchSigma_[i * 1], 1);
-	minibatchEntropy0[i] = sampleMean.CalculateEntropyRegularization(varianceMean, m_parameters.m_entropyTemperature);
-}
+//ndBrainVector minibatchSigma_;
+//ndBrainVector minibatchSample;
+//ndBrainVector minibatchEntropy0;
+//m_minibatchSigma->VectorFromDevice(minibatchSigma_);
+//m_minibatchEntropy->VectorFromDevice(minibatchEntropy0);
+//m_minibatchUniformRandomDistribution->VectorFromDevice(minibatchSample);
+//for (ndInt32 i = 0; i < m_parameters.m_miniBatchSize; ++i)
+//{
+//	const ndBrainMemVector sampleMean(&minibatchSample[i * 1], 1);
+//	const ndBrainMemVector varianceMean(&minibatchSigma_[i * 1], 1);
+//	minibatchEntropy0[i] = sampleMean.CalculateEntropyRegularization(varianceMean, m_parameters.m_entropyTemperature);
+//}
 
 	m_minibatchEntropy->CalculateEntropyRegularization(**m_minibatchUniformRandomDistribution, **m_minibatchSigma, m_parameters.m_entropyTemperature);
 
-ndBrainVector minibatchEntropy1;
-m_minibatchEntropy->VectorFromDevice(minibatchEntropy1);
-m_context->SyncBufferCommandQueue();
-
-for (ndInt32 i = 0; i < m_parameters.m_miniBatchSize; ++i)
-{
-	ndFloat32 a = minibatchEntropy0[i];
-	ndFloat32 b = minibatchEntropy1[i];
-	ndAssert(ndAreEqual(a, b, 1.0e-4f));
-}
-
+//ndBrainVector minibatchEntropy1;
+//m_minibatchEntropy->VectorFromDevice(minibatchEntropy1);
+//m_context->SyncBufferCommandQueue();
+//for (ndInt32 i = 0; i < m_parameters.m_miniBatchSize; ++i)
+//{
+//	ndFloat32 a = minibatchEntropy0[i];
+//	ndFloat32 b = minibatchEntropy1[i];
+//	ndAssert(ndAreEqual(a, b, 1.0e-4f));
+//}
 
 	qValue.Sub(**m_minibatchEntropy);
 	qValue.Mul(**m_minibatchNoTerminal);
@@ -1463,7 +1458,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainSacPolicy()
 		ndBrainFloatBuffer* const criticMinibatchOutputBuffer1 = critic1.GetOuputBuffer();
 		ndBrainFloatBuffer* const criticMinibatchInputGradientBuffer1 = critic1.GetInputGradientBuffer();
 		
-		// re using m_minibatchRewards because is not use anymore 
+		// re using m_minibatchExpectedRewards because is not use anymore 
 		m_minibatchExpectedRewards->Set(*criticMinibatchOutputBuffer1);
 		m_minibatchExpectedRewards->LessEqual(*criticMinibatchOutputBuffer);
 		m_minibatchCriticInputTest->BroadcastScaler(**m_minibatchExpectedRewards);
