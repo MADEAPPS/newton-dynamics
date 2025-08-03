@@ -1190,7 +1190,6 @@ ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, 
 	array.SetCount(0);
 	for (ndInt32 i = 0; i < count; ++i)
 	{
-		//ndVector p(matrix.UntransformVector(contactArray[i].m_point) & xyMask);
 		ndVector p(matrix.TransformVector(contactArray[i].m_point) & xyMask);
 		p.m_w = ndFloat32(i);
 		array.PushBack(p);
