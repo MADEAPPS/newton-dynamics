@@ -1210,7 +1210,6 @@ ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, 
 	array.SetCount(count);
 	for (ndInt32 i = 0; i < count; ++i)
 	{
-		//const ndVector p(matrix.UntransformVector(contactArray[i].m_point));
 		const ndVector p(matrix.TransformVector(contactArray[i].m_point));
 		array[i] = p;
 		array[i].m_w = ndFloat32(i);
@@ -1307,7 +1306,7 @@ ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, 
 					++i0;
 				};
 
-#ifdef _DEBUG
+				#ifdef _DEBUG
 				for (ndInt32 i = 0; i < i0; ++i)
 				{
 					ndAssert(array[start + i][firstSortAxis] <= axisVal);
@@ -1317,7 +1316,7 @@ ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, 
 				{
 					ndAssert(array[start + i][firstSortAxis] > axisVal);
 				}
-#endif
+				#endif
 
 				ndVector xc(ndVector::m_zero);
 				ndVector x2c(ndVector::m_zero);
@@ -1460,13 +1459,8 @@ ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, 
 	return count;
 }
 
-ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, ndContactPoint* const contactArray, ndInt32 maxCount) const
+ndInt32 ndContactSolver::Prune2dContacts(ndFixSizeArray<ndVector, D_MAX_CONTATCS>& planeProjection, ndContactPoint* const contactArray, ndInt32 maxCount) const
 {
-	if (count <= 3)
-	{
-		return PruneBruteForceSmallContacts(count, contactArray);
-	}
-
 	class ndConvexFaceNode
 	{
 		public:
@@ -1475,26 +1469,18 @@ ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, 
 		ndConvexFaceNode* m_prev;
 		ndInt32 m_mask;
 	};
-	
-	ndFixSizeArray<ndContactPoint, 32> buffer;
-	ndFixSizeArray<ndVector, D_MAX_CONTATCS> array(D_MAX_CONTATCS);
+
+	ndFixSizeArray<ndContactPoint, D_MAX_CONTATCS> buffer;
 	ndFixSizeArray<ndConvexFaceNode, D_MAX_CONTATCS> convexHull;
 	const ndVector xyMask(ndVector::m_xMask | ndVector::m_yMask);
-	ndUpHeap<ndConvexFaceNode*, ndFloat32> sortHeap(&array[0], D_MAX_CONTATCS * array.GetCapacity());
-	
-	array.SetCount(0);
-	for (ndInt32 i = 0; i < count; ++i)
-	{
-		ndVector p(matrix.TransformVector(contactArray[i].m_point) & xyMask);
-		p.m_w = ndFloat32(i);
-		array.PushBack(p);
-	}
-	ndInt32 hullCount = ndConvexHull2d(&array[0], array.GetCount());
+	ndUpHeap<ndConvexFaceNode*, ndFloat32> sortHeap(&planeProjection[0], D_MAX_CONTATCS * planeProjection.GetCapacity());
+
+	ndInt32 hullCount = ndConvexHull2d(&planeProjection[0], planeProjection.GetCount());
 	if (hullCount <= 3)
 	{
 		for (ndInt32 i = hullCount - 1; i >= 0; --i)
 		{
-			ndInt32 index = ndInt32 (array[i].m_w);
+			ndInt32 index = ndInt32(planeProjection[i].m_w);
 			buffer.PushBack(contactArray[index]);
 		}
 
@@ -1509,19 +1495,19 @@ ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, 
 	convexHull.SetCount(hullCount + 1);
 	for (ndInt32 i = 0; i < hullCount; ++i)
 	{
-		convexHull[i].m_point2d = array[i];
+		convexHull[i].m_point2d = planeProjection[i];
 		convexHull[i].m_next = &convexHull[i + 1];
 		convexHull[i].m_prev = &convexHull[last];
 		convexHull[i].m_mask = 0;
 		last = i;
 	}
 	convexHull[last].m_next = &convexHull[0];
-	
+
 	ndFloat32 totalArea = ndFloat32(0.0f);
-	ndVector areaEdge0(array[1] - array[0]);
+	ndVector areaEdge0(planeProjection[1] - planeProjection[0]);
 	for (ndInt32 i = 2; i < hullCount; ++i)
 	{
-		const ndVector areaEdge1(array[i] - array[0]);
+		const ndVector areaEdge1(planeProjection[i] - planeProjection[0]);
 		ndFloat32 area = areaEdge0.m_y * areaEdge1.m_x - areaEdge0.m_x * areaEdge1.m_y;
 		totalArea += area;
 		areaEdge0 = areaEdge1;
@@ -1615,37 +1601,48 @@ ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, 
 	return buffer.GetCount();
 }
 
-ndInt32 ndContactSolver::Prune1dContacts(const ndMatrix& matrix, ndInt32 count, ndContactPoint* const contactArray, ndInt32 maxCount) const
+ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, ndContactPoint* const contactArray, ndInt32 maxCount) const
 {
-	if (count < 2)
+	if (count <= 3)
 	{
-		return 1;
-	}
-	if (count == 2)
-	{
-		ndVector segment(contactArray[1].m_point - contactArray[0].m_point);
-		ndFloat32 dist2 = segment.DotProduct(segment).GetScalar();
-		return (dist2 < ndFloat32(5.0e-3f * 5.0e-3f)) ? 1 : 2;
+		return PruneBruteForceSmallContacts(count, contactArray);
 	}
 
-	ndFixSizeArray<ndContactPoint, 32> buffer;
-	ndFixSizeArray<ndVector, D_MAX_CONTATCS> array(D_MAX_CONTATCS);
-
-	array.SetCount(0);
+	ndFixSizeArray<ndVector, D_MAX_CONTATCS> planeProjection(0);
 	const ndVector xyMask(ndVector::m_xMask | ndVector::m_yMask);
 	for (ndInt32 i = 0; i < count; ++i)
 	{
 		ndVector p(matrix.TransformVector(contactArray[i].m_point) & xyMask);
-		array.PushBack(p);
+		p.m_w = ndFloat32(i);
+		planeProjection.PushBack(p);
+	}
+	return Prune2dContacts(planeProjection, contactArray, maxCount);
+}
+
+ndInt32 ndContactSolver::Prune1dContacts(const ndMatrix& matrix, ndInt32 count, ndContactPoint* const contactArray, ndInt32 maxCount) const
+{
+	if (count <= 2)
+	{
+		return PruneBruteForceSmallContacts(count, contactArray);
+	}
+
+	ndFixSizeArray<ndVector, D_MAX_CONTATCS> planeProjection(0);
+
+	const ndVector xyMask(ndVector::m_xMask | ndVector::m_yMask);
+	for (ndInt32 i = 0; i < count; ++i)
+	{
+		ndVector p(matrix.TransformVector(contactArray[i].m_point) & xyMask);
+		p.m_w = ndFloat32(i);
+		planeProjection.PushBack(p);
 	}
 
 	ndInt32 j0 = 0;
 	ndInt32 j1 = 0;
-	ndFloat32 maxValue = ndFloat32(-1.0e10f);
 	ndFloat32 minValue = ndFloat32(1.0e10f);
+	ndFloat32 maxValue = ndFloat32(-1.0e10f);
 	for (ndInt32 i = count-1; i >= 0 ; --i)
 	{
-		ndFloat32 dist = array[i].m_x;
+		ndFloat32 dist = planeProjection[i].m_x;
 		if (dist > maxValue) 
 		{
 			j0 = i;
@@ -1662,13 +1659,13 @@ ndInt32 ndContactSolver::Prune1dContacts(const ndMatrix& matrix, ndInt32 count, 
 		return 1;
 	}
 
-	const ndVector ref(array[j1]);
+	const ndVector ref(planeProjection[j1]);
 	for (ndInt32 i = count - 1; i >= 0; --i)
 	{
-		ndFloat32 sizeDist = array[i].m_y - ref.m_y;
+		ndFloat32 sizeDist = planeProjection[i].m_y - ref.m_y;
 		if (ndAbs(sizeDist) > ndFloat32(1.0e-3f))
 		{
-			return Prune2dContacts(matrix, count, contactArray, maxCount);
+			return Prune2dContacts(planeProjection, contactArray, maxCount);
 		}
 	}
 
@@ -1747,26 +1744,6 @@ ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
 	}
 	ndAssert(eigen[0] >= eigen[1]);
 	ndAssert(eigen[1] >= eigen[2]);
-
-	//const ndFloat32 magnificationFactor = ndFloat32(8.0f);
-	//if (eigen[1] > (magnificationFactor * eigen[2]))
-	//{
-	//	// the contact form a flat surface, we have to check if is a line of a polygon.
-	//	if (eigen[1] < ndFloat32 (1.0e-4f))
-	//	{
-	//		return Prune1dContacts(covariance, count, contactArray, maxCount);
-	//	}
-	//	else
-	//	{
-	//		return Prune2dContacts(covariance, count, contactArray, maxCount);
-	//	}
-	//}
-	//else if (eigen[2] > ndFloat32(1.0e-4f))
-	//{
-	//	// 3d convex Hull
-	//	return Prune3dContacts(covariance, count, contactArray, maxCount);
-	//}
-	//return Prune1dContacts(covariance, count, contactArray, maxCount);
 
 	if (eigen[2] > ndFloat32(1.0e-4f))
 	{

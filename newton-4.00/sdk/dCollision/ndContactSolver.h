@@ -31,10 +31,9 @@ class ndBodyKinematic;
 class ndContactNotify;
 class ndPolygonMeshDesc;
 
-//D_MSV_NEWTON_CLASS_ALIGN_32
 class ndMinkFace
 {
-public:
+	public:
 	ndPlane m_plane;
 	ndMinkFace* m_twin[3];
 	ndInt16 m_vertex[3];
@@ -43,6 +42,7 @@ public:
 	//} D_GCC_NEWTON_CLASS_ALIGN_32 ;
 };
 
+#define D_MAX_CONTATCS					128
 #define D_SEPARATION_PLANES_ITERATIONS	8
 #define D_CONVEX_MINK_STACK_SIZE		64
 #define D_CONNICS_CONTATS_ITERATIONS	32
@@ -129,6 +129,7 @@ class ndContactSolver: public ndDownHeap<ndMinkFace *, ndFloat32>
 	ndInt32 Prune1dContacts(const ndMatrix& matrix, ndInt32 count, ndContactPoint* const contactArray, ndInt32 maxCount) const;
 	ndInt32 Prune2dContacts(const ndMatrix& matrix, ndInt32 count, ndContactPoint* const contactArray, ndInt32 maxCount) const;
 	ndInt32 Prune3dContacts(const ndMatrix& matrix, ndInt32 count, ndContactPoint* const contactArray, ndInt32 maxCount) const;
+	ndInt32 Prune2dContacts(ndFixSizeArray<ndVector, D_MAX_CONTATCS>& planeProjection, ndContactPoint* const contactArray, ndInt32 maxCount) const;
 
 	ndInt32 ConvexPolygonsIntersection(const ndVector& normal, ndInt32 count1, ndVector* const shape1, ndInt32 count2, ndVector* const shape2, ndVector* const contactOut, ndInt32 maxContacts) const;
 	ndInt32 ConvexPolygonToLineIntersection(const ndVector& normal, ndInt32 count1, ndVector* const shape1, ndInt32 count2, ndVector* const shape2, ndVector* const contactOut, ndVector* const mem) const;
