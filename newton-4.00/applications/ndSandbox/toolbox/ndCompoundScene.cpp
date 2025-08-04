@@ -211,8 +211,8 @@ ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const ndMa
 		ndFixSizeArray<ndBodyKinematic*, plankCount> array;
 		for (ndInt32 i = 0; i < plankCount; ++i)
 		{
-			//array.PushBack(CreateBody(scene, plankShape, matrix, 20.0f));
-			array.PushBack(AddBox(scene, matrix, 20.0f, sizex, sizey, sizez + deflection));
+			ndSharedPtr<ndBody> bodyPart(AddBox(scene, matrix, 20.0f, sizex, sizey, sizez + deflection));
+			array.PushBack(bodyPart->GetAsBodyKinematic());
 			matrix.m_posit.m_z += sizez;
 		}
 

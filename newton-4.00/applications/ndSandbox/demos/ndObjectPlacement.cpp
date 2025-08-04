@@ -24,34 +24,34 @@
 
 static void AddBox(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 density, ndFloat32 mass)
 {
-	ndBodyKinematic* const body = AddBox(scene, origin, mass, 1.0f, 1.0f, 1.0f);
+	ndSharedPtr<ndBody> body = AddBox(scene, origin, mass, 1.0f, 1.0f, 1.0f);
 	ndShapeMaterial material;
 	material.m_userParam[ndDemoContactCallback::m_density].m_floatData = density;
-	body->GetCollisionShape().SetMaterial(material);
+	body->GetAsBodyKinematic()->GetCollisionShape().SetMaterial(material);
 }
 
 static void AddSphere1(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 density, ndFloat32 mass)
 {
-	ndBodyKinematic* const body = AddSphere(scene, origin, mass, 0.5f);
+	ndSharedPtr<ndBody> body = AddSphere(scene, origin, mass, 0.5f);
 	ndShapeMaterial material;
 	material.m_userParam[ndDemoContactCallback::m_density].m_floatData = density;
-	body->GetCollisionShape().SetMaterial(material);
+	body->GetAsBodyKinematic()->GetCollisionShape().SetMaterial(material);
 }
 
 static void AddCapsule(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 density, ndFloat32 mass)
 {
-	ndBodyKinematic* const body = AddCapsule(scene, origin, mass, 0.5f, 0.5f, 1.0f);
+	ndSharedPtr<ndBody> body = AddCapsule(scene, origin, mass, 0.5f, 0.5f, 1.0f);
 	ndShapeMaterial material;
 	material.m_userParam[ndDemoContactCallback::m_density].m_floatData = density;
-	body->GetCollisionShape().SetMaterial(material);
+	body->GetAsBodyKinematic()->GetCollisionShape().SetMaterial(material);
 }
 
 static void AddConvexHull(ndDemoEntityManager* const scene, const ndMatrix& origin, const ndInt32 segments, ndFloat32 radius, ndFloat32 high, ndFloat32 density, ndFloat32 mass)
 {
-	ndBodyKinematic* const body = AddConvexHull(scene, origin, mass, radius, high, segments);
+	ndSharedPtr<ndBody> body = AddConvexHull(scene, origin, mass, radius, high, segments);
 	ndShapeMaterial material;
 	material.m_userParam[ndDemoContactCallback::m_density].m_floatData = density;
-	body->GetCollisionShape().SetMaterial(material);
+	body->GetAsBodyKinematic()->GetCollisionShape().SetMaterial(material);
 }
 
 class NewtonPhantom : public ndModelNotify

@@ -145,24 +145,24 @@ static ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndSha
 	return body;
 }
 
-ndBodyKinematic* CreateSphere(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius, const char* const textName)
+ndSharedPtr<ndBody> CreateSphere(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius, const char* const textName)
 {
 	ndShapeInstance shape(new ndShapeSphere(radius));
-	ndBodyKinematic* const body = CreateBody(scene, shape, location, mass, textName);
+	ndSharedPtr<ndBody> body (CreateBody(scene, shape, location, mass, textName));
 	return body;
 }
 
-ndBodyKinematic* CreateBox(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez, const char* const textName)
+ndSharedPtr<ndBody> CreateBox(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez, const char* const textName)
 {
 	ndShapeInstance shape(new ndShapeBox(sizex, sizey, sizez));
-	ndBodyKinematic* const body = CreateBody(scene, shape, location, mass, textName);
+	ndSharedPtr<ndBody> body (CreateBody(scene, shape, location, mass, textName));
 	return body;
 }
 
-ndBodyKinematic* CreateCapsule(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, const char* const textName)
+ndSharedPtr<ndBody> CreateCapsule(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, const char* const textName)
 {
 	ndShapeInstance shape(new ndShapeCapsule(radius0, radius1, high));
-	ndBodyKinematic* const body = CreateBody(scene, shape, location, mass, textName);
+	ndSharedPtr<ndBody> body (CreateBody(scene, shape, location, mass, textName));
 	return body;
 }
 
@@ -213,7 +213,7 @@ void AddCapsulesStacks(ndDemoEntityManager* const scene, const ndMatrix& locatio
 	}
 }
 
-ndBodyKinematic* AddSphere(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius, const char* const textName)
+ndSharedPtr<ndBody> AddSphere(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius, const char* const textName)
 {
 	ndSharedPtr<ndBody> body(CreateSphere(scene, location, mass, radius, textName));
 
@@ -222,10 +222,10 @@ ndBodyKinematic* AddSphere(ndDemoEntityManager* const scene, const ndMatrix& loc
 
 	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)body->GetNotifyCallback();
 	scene->AddEntity(notify->m_entity);
-	return body->GetAsBodyDynamic();
+	return body;
 }
 
-ndBodyKinematic* AddBox(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez, const char* const textName)
+ndSharedPtr<ndBody> AddBox(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez, const char* const textName)
 {
 	ndSharedPtr<ndBody> body (CreateBox(scene, location, mass, sizex, sizey, sizez, textName));
 
@@ -234,10 +234,10 @@ ndBodyKinematic* AddBox(ndDemoEntityManager* const scene, const ndMatrix& locati
 
 	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)body->GetNotifyCallback();
 	scene->AddEntity(notify->m_entity);
-	return body->GetAsBodyDynamic();
+	return body;
 }
 
-ndBodyKinematic* AddCapsule(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, const char* const textName)
+ndSharedPtr<ndBody> AddCapsule(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, const char* const textName)
 {
 	ndSharedPtr<ndBody> body = CreateCapsule(scene, location, mass, radius0, radius1, high, textName);
 
@@ -246,10 +246,10 @@ ndBodyKinematic* AddCapsule(ndDemoEntityManager* const scene, const ndMatrix& lo
 
 	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)body->GetNotifyCallback();
 	scene->AddEntity(notify->m_entity);
-	return body->GetAsBodyDynamic();
+	return body;
 }
 
-ndBodyKinematic* AddConvexHull(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius, ndFloat32 high, ndInt32 segments, const char* const textName)
+ndSharedPtr<ndBody> AddConvexHull(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius, ndFloat32 high, ndInt32 segments, const char* const textName)
 {
 	ndArray<ndVector> points;
 	ndFloat32 den = ndFloat32(segments);
@@ -273,5 +273,5 @@ ndBodyKinematic* AddConvexHull(ndDemoEntityManager* const scene, const ndMatrix&
 	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)body->GetNotifyCallback();
 	scene->AddEntity(notify->m_entity);
 
-	return body->GetAsBodyDynamic();
+	return body;
 }

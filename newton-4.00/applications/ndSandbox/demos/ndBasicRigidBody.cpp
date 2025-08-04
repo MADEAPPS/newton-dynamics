@@ -192,7 +192,7 @@ static ndVector gravity(0.0f, -10.0f, 0.0f, 0.0f);
 
 class BodyNotify : public ndBodyNotify
 {
-public:
+	public:
 	BodyNotify()
 		:ndBodyNotify(gravity)
 	{
@@ -287,7 +287,7 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 
 		groundBody = *bodyFloor;
 		// does not work; dynamic box stops moving and starts wobbling after 10 sec (newton bug?)
-		bodyFloor->SetVelocity(ndVector(0.f, 0.f, -0.1f, 0.f)); 
+		bodyFloor->SetVelocity(ndVector(0.f, 0.f, -1.0f, 0.f)); 
 
 #if 1
 		// Joe, this works, but maybe you should check what is the 
@@ -295,16 +295,20 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 		ndFloat32 size = 100;
 		ndMatrix xf = groundXF;
 		xf.m_posit = origin + xf.RotateVector(ndVector(size, 0.f, 0.f, 0.f)); 
-		BuildBox(world, xf, 0.f, ndVector(1.0f, 5.0f, size * 2.f, 0.0f));
+		//BuildBox(world, xf, 0.f, ndVector(1.0f, 5.0f, size * 2.f, 0.0f));
+		AddBox(scene, xf, 0.0f, 1.0f, 5.0f, size * 2.f);
 		
 		xf.m_posit = origin + xf.RotateVector(ndVector(-size, 0.f, 0.f, 0.f)); 
-		BuildBox(world, xf, 0.f, ndVector(1.0f, 5.0f, size * 2.f, 0.0f));
+		//BuildBox(world, xf, 0.f, ndVector(1.0f, 5.0f, size * 2.f, 0.0f));
+		AddBox(scene, xf, 0.0f, 1.0f, 5.0f, size * 2.f);
 		
 		xf.m_posit = origin + xf.RotateVector(ndVector(0.f, 0.f, size, 0.f)); 
-		BuildBox(world, xf, 0.f, ndVector(size * 2.f, 5.0f, 1.0f, 0.0f));
+		//BuildBox(world, xf, 0.f, ndVector(size * 2.f, 5.0f, 1.0f, 0.0f));
+		AddBox(scene, xf, 0.0f, size * 1.98f, 5.0f, 1.0f);
 		
 		xf.m_posit = origin + xf.RotateVector(ndVector(0.f, 0.f, -size, 0.f)); 
-		BuildBox(world, xf, 0.f, ndVector(size * 2.f, 5.0f, 1.0f, 0.0f));
+		//BuildBox(world, xf, 0.f, ndVector(size * 2.f, 5.0f, 1.0f, 0.0f));
+		AddBox(scene, xf, 0.0f, size * 1.98f, 5.0f, 1.0f);
 #endif
 	}
 
@@ -312,7 +316,7 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 	{
 		xform.m_posit = origin + ndVector(7.0f, 10.0f, 0.0f, 0.0f);
 		//ndBodyDynamic* box = BuildBox(world, xform, 10.f, ndVector(5.f, 0.5f, 1.0f, 0.f));
-		ndBodyKinematic* const box = AddBox(scene, xform, 10.0f, 5.0f, 0.5f, 1.0f);
+		ndSharedPtr<ndBody> box (AddBox(scene, xform, 10.0f, 5.0f, 0.5f, 1.0f));
 		box->SetMatrix(xform);
 	}
 
@@ -320,7 +324,7 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 	{
 		xform.m_posit = origin + ndVector(0.0f, 7.0f, 0.0f, 0.0f);
 		//ndBodyDynamic* box = BuildBox(world, xform, 10.f, ndVector(1.f, 0.5f, 1.0f, 0.f));
-		ndBodyKinematic* const box = AddBox(scene, xform, 10.0f, 5.0f, 0.5f, 1.0f);
+		ndSharedPtr<ndBody> box (AddBox(scene, xform, 10.0f, 5.0f, 0.5f, 1.0f));
 		box->SetMatrix(xform);
 	}
 

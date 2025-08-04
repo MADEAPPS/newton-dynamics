@@ -60,7 +60,7 @@ namespace ndContinueCarpole
 		ndModelArticulation* const model = new ndModelArticulation();
 
 		// make cart
-		ndSharedPtr<ndBody> cartBody(world->GetBody(AddBox(scene, location, cartMass, xSize, ySize, zSize, "wood_0.png")));
+		ndSharedPtr<ndBody> cartBody(AddBox(scene, location, cartMass, xSize, ySize, zSize, "wood_0.png"));
 		ndModelArticulation::ndNode* const modelRoot = model->AddRootBody(cartBody);
 		ndMatrix matrix(location);
 		matrix.m_posit.m_y += ySize / 2.0f + 0.05f;
@@ -70,7 +70,7 @@ namespace ndContinueCarpole
 		matrix.m_posit.m_y += ySize / 2.0f;
 
 		// make pole leg
-		ndSharedPtr<ndBody> poleBody(world->GetBody(AddCapsule(scene, ndGetIdentityMatrix(), poleMass, poleRadio, poleRadio, poleLength, "smilli.png")));
+		ndSharedPtr<ndBody> poleBody(AddCapsule(scene, ndGetIdentityMatrix(), poleMass, poleRadio, poleRadio, poleLength, "smilli.png"));
 		ndMatrix poleLocation(ndRollMatrix(90.0f * ndDegreeToRad) * matrix);
 		poleLocation.m_posit.m_y += poleLength * 0.5f;
 		poleBody->SetMatrix(poleLocation);
