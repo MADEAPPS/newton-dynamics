@@ -1692,9 +1692,9 @@ ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
 	ndMatrix covariance(ndGetZeroMatrix());
 	for (ndInt32 i = count - 1; i >= 0; --i)
 	{
-		ndVector p((contactArray[i].m_point - origin) & ndVector::m_triplexMask);
+		const ndVector p((contactArray[i].m_point - origin) & ndVector::m_triplexMask);
 		ndAssert(p.m_w == ndFloat32(0.0f));
-		ndMatrix matrix(ndCovarianceMatrix(p, p));
+		const ndMatrix matrix(ndCovarianceMatrix(p, p));
 		covariance.m_front += matrix.m_front;
 		covariance.m_up += matrix.m_up;
 		covariance.m_right += matrix.m_right;
