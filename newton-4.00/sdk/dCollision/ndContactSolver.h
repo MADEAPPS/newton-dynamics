@@ -123,11 +123,13 @@ class ndContactSolver: public ndDownHeap<ndMinkFace *, ndFloat32>
 	
 	ndInt32 CalculateIntersectingPlane(ndInt32 count);
 	ndInt32 PruneContacts(ndInt32 count, ndInt32 maxCount) const;
+	ndInt32 PruneBruteForceSmallContacts(ndInt32 count, ndContactPoint* const contactArray) const;
 	ndInt32 PruneSupport(ndInt32 count, const ndVector& dir, const ndVector* const points) const;
 	ndInt32 CalculateContacts(const ndVector& point0, const ndVector& point1, const ndVector& normal);
 	ndInt32 Prune1dContacts(const ndMatrix& matrix, ndInt32 count, ndContactPoint* const contactArray, ndInt32 maxCount) const;
 	ndInt32 Prune2dContacts(const ndMatrix& matrix, ndInt32 count, ndContactPoint* const contactArray, ndInt32 maxCount) const;
 	ndInt32 Prune3dContacts(const ndMatrix& matrix, ndInt32 count, ndContactPoint* const contactArray, ndInt32 maxCount) const;
+
 	ndInt32 ConvexPolygonsIntersection(const ndVector& normal, ndInt32 count1, ndVector* const shape1, ndInt32 count2, ndVector* const shape2, ndVector* const contactOut, ndInt32 maxContacts) const;
 	ndInt32 ConvexPolygonToLineIntersection(const ndVector& normal, ndInt32 count1, ndVector* const shape1, ndInt32 count2, ndVector* const shape2, ndVector* const contactOut, ndVector* const mem) const;
 

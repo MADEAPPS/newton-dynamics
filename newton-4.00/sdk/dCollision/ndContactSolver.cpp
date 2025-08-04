@@ -1165,104 +1165,35 @@ ndInt32 ndContactSolver::PruneSupport(ndInt32 count, const ndVector& dir, const 
 	return index;
 }
 
+ndInt32 ndContactSolver::PruneBruteForceSmallContacts(ndInt32 count, ndContactPoint* const contactArray) const
+{
+	for (ndInt32 i = count - 1; i > 0; i--)
+	{
+		for (ndInt32 j = i - 1; j >= 0; j--)
+		{
+			ndVector dist(contactArray[i].m_point - contactArray[j].m_point);
+			ndFloat32 error2 = dist.DotProduct(dist & ndVector::m_triplexMask).GetScalar();
+			if (error2 < ndFloat32(1.0e-5f))
+			{
+				count--;
+				contactArray[j] = contactArray[count];
+				break;
+			}
+		}
+	}
+	return count;
+}
+
 ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, ndContactPoint* const contactArray, ndInt32 maxCount) const
 {
-#if 0
-	ndFixSizeArray<ndVector, D_MAX_CONTATCS> array;
-	ndFloat32 max_x = ndFloat32(1.0e20f);
-	ndInt32 maxIndex = 0;
-	array.SetCount(count);
-	for (ndInt32 i = 0; i < count; ++i)
+	if (count <= 3)
 	{
-		array[i] = matrix.UntransformVector(contactArray[i].m_point);
-		array[i].m_w = ndFloat32(i);
-		if (array[i].m_x < max_x)
-		{
-			maxIndex = i;
-			max_x = array[i].m_x;
-		}
+		return PruneBruteForceSmallContacts(count, contactArray);
 	}
-	dSwap(array[0], array[maxIndex]);
-
-	for (ndInt32 i = 2; i < count; ++i)
-	{
-		ndInt32 j = i;
-		ndVector tmp(array[i]);
-		for (; array[j - 1].m_x > tmp.m_x; --j)
-		{
-			dAssert(j > 0);
-			array[j] = array[j - 1];
-		}
-		array[j] = tmp;
-	}
-
-	ndFloat32 window = ndFloat32(2.5e-3f);
-	do
-	{
-		ndInt32 packContacts = 0;
-		window *= ndFloat32(2.0f);
-		const ndFloat32 window2 = window * window;
-
-		ndUnsigned8 mask[D_MAX_CONTATCS];
-		//memset(mask, 0, count * sizeof(ndUnsigned8));
-		ndMemSet(mask, ndUnsigned8(0), count);
-		for (ndInt32 i = 0; i < count; ++i)
-		{
-			if (!mask[i])
-			{
-				const ndFloat32 val = array[i].m_x + window;
-				for (ndInt32 j = i + 1; (j < count) && (array[j].m_x < val); ++j)
-				{
-					if (!mask[j])
-					{
-						ndVector dp((array[j] - array[i]) & ndVector::m_triplexMask);
-						dAssert(dp.m_w == ndFloat32(0.0f));
-						ndFloat32 dist2 = dp.DotProduct(dp).GetScalar();
-						if (dist2 < window2)
-						{
-							mask[j] = 1;
-							packContacts = 1;
-						}
-					}
-				}
-			}
-		}
-
-		if (packContacts)
-		{
-			ndInt32 j = 0;
-			for (ndInt32 i = 0; i < count; ++i)
-			{
-				if (!mask[i])
-				{
-					array[j] = array[i];
-					j++;
-				}
-			}
-			count = j;
-		}
-	} while (count > maxCount);
-
-	//ndContactPoint tmpContact[16];
-	ndFixSizeArray<ndContactPoint, D_MAX_CONTATCS> tmpContact;
-	tmpContact.SetCount(count);
-	for (ndInt32 i = 0; i < count; ++i)
-	{
-		ndInt32 index = ndInt32(array[i].m_w);
-		tmpContact[i] = contactArray[index];
-	}
-
-	for (ndInt32 i = count - 1; i >= 0; --i)
-	{
-		contactArray[i] = tmpContact[i];
-	}
-
-	return count;
-#else
 
 	class ndCluster
 	{
-	public:
+		public:
 		ndVector m_sum;
 		ndVector m_sum2;
 		ndInt32 m_start;
@@ -1527,14 +1458,13 @@ ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, 
 		contactArray[i] = tmpContact[i];
 	}
 	return count;
-#endif
 }
 
 ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, ndContactPoint* const contactArray, ndInt32 maxCount) const
 {
 	if (count <= 3)
 	{
-		return count;
+		return PruneBruteForceSmallContacts(count, contactArray);
 	}
 
 	class ndConvexFaceNode
@@ -1818,23 +1748,35 @@ ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
 	ndAssert(eigen[0] >= eigen[1]);
 	ndAssert(eigen[1] >= eigen[2]);
 
-	const ndFloat32 magnificationFactor = ndFloat32(8.0f);
-	if (eigen[1] > (magnificationFactor * eigen[2]))
-	{
-		// the contact form a flat surface, we have to check if is a line of a polygon.
-		if (eigen[1] < ndFloat32 (1.0e-4f))
-		{
-			return Prune1dContacts(covariance, count, contactArray, maxCount);
-		}
-		else
-		{
-			return Prune2dContacts(covariance, count, contactArray, maxCount);
-		}
-	}
-	else if (eigen[2] > ndFloat32(1.0e-4f))
+	//const ndFloat32 magnificationFactor = ndFloat32(8.0f);
+	//if (eigen[1] > (magnificationFactor * eigen[2]))
+	//{
+	//	// the contact form a flat surface, we have to check if is a line of a polygon.
+	//	if (eigen[1] < ndFloat32 (1.0e-4f))
+	//	{
+	//		return Prune1dContacts(covariance, count, contactArray, maxCount);
+	//	}
+	//	else
+	//	{
+	//		return Prune2dContacts(covariance, count, contactArray, maxCount);
+	//	}
+	//}
+	//else if (eigen[2] > ndFloat32(1.0e-4f))
+	//{
+	//	// 3d convex Hull
+	//	return Prune3dContacts(covariance, count, contactArray, maxCount);
+	//}
+	//return Prune1dContacts(covariance, count, contactArray, maxCount);
+
+	if (eigen[2] > ndFloat32(1.0e-4f))
 	{
 		// 3d convex Hull
 		return Prune3dContacts(covariance, count, contactArray, maxCount);
+	}
+	if (eigen[1] > ndFloat32(1.0e-4f))
+	{
+		// 2d convex Hull
+		return Prune2dContacts(covariance, count, contactArray, maxCount);
 	}
 	return Prune1dContacts(covariance, count, contactArray, maxCount);
 }
