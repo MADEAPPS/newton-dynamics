@@ -63,6 +63,7 @@ class ndBrainCpuContext : public ndBrainContext, public ndBrainThreadPool
 	virtual void StandardNormalDistribution(ndBrainFloatBuffer& uniformRandomVariable) override;
 	virtual void BroadcastScaler(ndBrainFloatBuffer& buffer, ndInt32 bufferStrideInFloats, const ndBrainFloatBuffer& srcScalar) override;
 	virtual void CalculateEntropyRegularization(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& sampleBuffer, const ndBrainFloatBuffer& sigmaBuffer, ndBrainFloat regularization) override;
+	virtual void CalculateEntropyRegularizationGradient(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& sampleBuffer, const ndBrainFloatBuffer& sigmaBuffer, ndBrainFloat regularization, ndInt32 inputSize) override;
 };
 
 #endif

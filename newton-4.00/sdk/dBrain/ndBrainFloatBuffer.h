@@ -64,6 +64,7 @@ class ndBrainFloatBuffer : public ndBrainBuffer
 	void StandardNormalDistribution();
 	void BroadcastScaler(const ndBrainFloatBuffer& srcScalars);
 	void CalculateEntropyRegularization(const ndBrainFloatBuffer& sample, const ndBrainFloatBuffer& sigma, ndBrainFloat regularization);
+	void CalculateEntropyRegularizationGradient(const ndBrainFloatBuffer& sample, const ndBrainFloatBuffer& sigma, ndBrainFloat regularization, ndInt32 inputSize);
 
 	protected:
 	ndSharedPtr<ndBrainVector> m_buffer;

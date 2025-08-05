@@ -252,3 +252,8 @@ void ndBrainFloatBuffer::CalculateEntropyRegularization(const ndBrainFloatBuffer
 {
 	m_context->CalculateEntropyRegularization(*this, sample, sigma, regularization);
 }
+
+void ndBrainFloatBuffer::CalculateEntropyRegularizationGradient(const ndBrainFloatBuffer& sample, const ndBrainFloatBuffer& sigma, ndBrainFloat regularization, ndInt32 inputSize)
+{
+	m_context->CalculateEntropyRegularizationGradient(*this, sample, sigma, regularization, inputSize);
+}
