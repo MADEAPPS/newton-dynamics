@@ -1477,8 +1477,8 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainSacPolicy()
 	ndBrainFloatBuffer* const policyMinibatchOutputGradientBuffer = m_policyTrainer->GetOuputGradientBuffer();
 	policyMinibatchOutputGradientBuffer->CalculateEntropyRegularizationGradient(**m_minibatchUniformRandomDistribution, **m_minibatchSigma, m_parameters.m_entropyTemperature, ndInt32(meanOutputSizeInBytes / sizeof(ndReal)));
 
-	// subtact the gradient of the q value fropm the entropy gradinet
-	// the subtraction order is revertse in order to realice gradinet ascend.
+	// substract the qValue gradinet from the entropy gradient
+	// because it is a gradient ascend, the sustration order is in revese order.
 	policyMinibatchOutputGradientBuffer->Sub(*policyMinibatchOutputBuffer);
 	m_policyTrainer->BackPropagate();
 
