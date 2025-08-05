@@ -23,16 +23,115 @@
 #include "ndSort.h"
 #include "ndConvexHull2d.h"
 
-static ndFloat32 Cross(const ndVector &O, const ndVector &A, const ndVector &B)
-{
-	const ndVector A0(A - O);
-	const ndVector B0(B - O);
-	const ndFloat32 sign = A0.m_y * B0.m_x - A0.m_x * B0.m_y;
-	return sign;
-}
+
+//ndInt32 ndConvexHull2d_new(ndVector* const vertexCloud2d, ndInt32 count)
+//{
+//	auto Cross = [](const ndVector& O, const ndVector& A, const ndVector& B)
+//		{
+//			const ndVector a0(A - O);
+//			const ndVector b0(B - O);
+//			const ndFloat32 sign = a0.m_y * b0.m_x - a0.m_x * b0.m_y;
+//			return sign;
+//		};
+//
+//	if (count <= 3)
+//	{
+//		if (count == 3)
+//		{
+//			ndFloat32 area = Cross(vertexCloud2d[0], vertexCloud2d[1], vertexCloud2d[2]);
+//			if (area < ndFloat32(0.0f))
+//			{
+//				ndSwap(vertexCloud2d[1], vertexCloud2d[2]);
+//			}
+//		}
+//		return count;
+//	}
+//
+//
+//	class ndConvexFaceNode
+//	{
+//	public:
+//		ndVector m_point2d;
+//		ndConvexFaceNode* m_next;
+//		ndConvexFaceNode* m_prev;
+//		ndInt32 m_mask;
+//	};
+//
+//	ndFixSizeArray<ndVector, 256> points(256);
+//	ndFixSizeArray<ndConvexFaceNode, 256> hull(256);
+//
+//	ndInt32 j0 = 0;
+//	ndInt32 j1 = 0;
+//	ndFloat32 minValue = ndFloat32(1.0e10f);
+//	ndFloat32 maxValue = ndFloat32(-1.0e10f);
+//	for (ndInt32 i = count - 1; i >= 0; --i)
+//	{
+//		points[i] = vertexCloud2d[i];
+//		ndFloat32 dist = vertexCloud2d[i].m_x;
+//		if (dist > maxValue)
+//		{
+//			j0 = i;
+//			maxValue = dist;
+//		}
+//		if (dist < minValue)
+//		{
+//			j1 = i;
+//			minValue = dist;
+//		}
+//	}
+//
+//	ndConvexFaceNode& edge0 = hull[0];
+//	ndConvexFaceNode& edge1 = hull[1];
+//
+//	edge0.m_point2d = vertexCloud2d[j0];
+//	edge1.m_point2d = vertexCloud2d[j1];
+//
+//	edge0.m_next = &edge1;
+//	edge0.m_prev = &edge1;
+//	edge1.m_next = &edge0;
+//	edge1.m_prev = &edge0;
+//
+//	points[j0] = points[count - 1];
+//	points[j1] = points[count - 2];
+//	count -= 2;
+//
+//	ndInt32 head = 0;
+//	ndInt32 tail = 0;
+//	ndFixSizeArray<ndConvexFaceNode*, 256> queue(256);
+//
+//	queue[head++] = &edge0;
+//	queue[head++] = &edge1;
+//
+//	while (tail != head)
+//	{
+//		ndConvexFaceNode* const edge = queue[tail++];
+//		const ndVector p0(edge->m_point2d);
+//		const ndVector p1(edge->m_next->m_point2d);
+//	}
+//
+//
+//	return 0;
+//}
+
+//static ndFloat32 Cross(const ndVector &O, const ndVector &A, const ndVector &B)
+//{
+//	const ndVector A0(A - O);
+//	const ndVector B0(B - O);
+//	const ndFloat32 sign = A0.m_y * B0.m_x - A0.m_x * B0.m_y;
+//	return sign;
+//}
 
 ndInt32 ndConvexHull2d(ndVector* const vertexCloud2d, ndInt32 count)
 {
+
+	auto Cross = [](const ndVector& O, const ndVector& A, const ndVector& B)
+	{
+		const ndVector A0(A - O);
+		const ndVector B0(B - O);
+		const ndFloat32 sign = A0.m_y * B0.m_x - A0.m_x * B0.m_y;
+		return sign;
+	};
+
 	if (count <= 3)
 	{
 		if (count == 3)
@@ -45,8 +144,6 @@ ndInt32 ndConvexHull2d(ndVector* const vertexCloud2d, ndInt32 count)
 		}
 		return count;
 	}
-
-	ndVector* const hull = ndAlloca(ndVector, 2 * count);
 
 	// Sort points lexicographically
 	class CompareVertex
@@ -82,6 +179,9 @@ ndInt32 ndConvexHull2d(ndVector* const vertexCloud2d, ndInt32 count)
 	};
 	ndSort<ndVector, CompareVertex>(vertexCloud2d, count, nullptr);
 
+	//ndVector* const hull = ndAlloca(ndVector, 2 * count);
+	ndFixSizeArray<ndVector, 256> hull(2 * count);
+
 	// Build lower hull
 	ndInt32 k = 0;
 	for (ndInt32 i = 0; i < count; ++i) 
@@ -112,3 +212,4 @@ ndInt32 ndConvexHull2d(ndVector* const vertexCloud2d, ndInt32 count)
 	}
 	return k;
 }
+
