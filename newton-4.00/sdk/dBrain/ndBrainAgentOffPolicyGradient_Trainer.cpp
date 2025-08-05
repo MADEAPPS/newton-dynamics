@@ -78,7 +78,7 @@ ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 	m_hiddenLayersNumberOfNeurons = 256;
 	m_replayBufferStartOptimizeSize = 1024 * 64;
 
-m_useGpuBackend = false;
+//m_useGpuBackend = false;
 //m_useSofActorCritic = false;
 //m_numberOfUpdates = 1;
 //m_replayBufferStartOptimizeSize = 1024 * 8;
@@ -1477,8 +1477,8 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainSacPolicy()
 	ndBrainFloatBuffer* const policyMinibatchOutputGradientBuffer = m_policyTrainer->GetOuputGradientBuffer();
 	policyMinibatchOutputGradientBuffer->CalculateEntropyRegularizationGradient(**m_minibatchUniformRandomDistribution, **m_minibatchSigma, m_parameters.m_entropyTemperature, ndInt32(meanOutputSizeInBytes / sizeof(ndReal)));
 
-	// substract the qValue gradinet from the entropy gradient
-	// because it is a gradient ascend, the sustration order is in revese order.
+	// substract the qValue gradinet from the entropy gradient.
+	// The sustration order is in revese order, to get the gradient asscend.
 	policyMinibatchOutputGradientBuffer->Sub(*policyMinibatchOutputBuffer);
 	m_policyTrainer->BackPropagate();
 

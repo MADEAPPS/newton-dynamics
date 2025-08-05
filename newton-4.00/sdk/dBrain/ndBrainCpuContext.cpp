@@ -348,8 +348,6 @@ void ndBrainCpuContext::CalculateEntropyRegularizationGradient(ndBrainFloatBuffe
 {
 	ndAssert(sampleBuffer.SizeInBytes() == sigmaBuffer.SizeInBytes());
 	ndAssert(2 * sampleBuffer.SizeInBytes() == buffer.SizeInBytes());
-	//ndAssert(2 * inputSize * sampleBuffer.SizeInBytes() == buffer.SizeInBytes());
-
 	const ndInt32 numberOfGroups = ndInt32(sampleBuffer.SizeInBytes() / sizeof(ndBrainFloat)) / inputSize;
 
 	ndBrainMemVector dst((ndBrainFloat*)buffer.GetCpuPtr(), ndInt64(buffer.SizeInBytes() / sizeof (ndReal)));
@@ -363,5 +361,4 @@ void ndBrainCpuContext::CalculateEntropyRegularizationGradient(ndBrainFloatBuffe
 		const ndBrainMemVector variance(&sigmas[i * inputSize], inputSize);
 		gradient.CalculateEntropyRegularizationGradient(meanSample, variance, regularization);
 	}
-//dst.Set(ndBrainFloat(0.0f));
 }

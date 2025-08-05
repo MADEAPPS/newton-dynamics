@@ -383,3 +383,22 @@ void ndBrainGpuContext::CalculateEntropyRegularization(ndBrainFloatBuffer& buffe
 		dst[i] = sampleMean.CalculateEntropyRegularization(varianceMean, regularization);
 	}
 }
+
+void ndBrainGpuContext::CalculateEntropyRegularizationGradient(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& sampleBuffer, const ndBrainFloatBuffer& sigmaBuffer, ndBrainFloat regularization, ndInt32 inputSize)
+{
+	ndAssert(sampleBuffer.SizeInBytes() == sigmaBuffer.SizeInBytes());
+	ndAssert(2 * sampleBuffer.SizeInBytes() == buffer.SizeInBytes());
+	const ndInt32 numberOfGroups = ndInt32(sampleBuffer.SizeInBytes() / sizeof(ndBrainFloat)) / inputSize;
+	
+	ndBrainMemVector dst((ndBrainFloat*)buffer.GetCpuPtr(), ndInt64(buffer.SizeInBytes() / sizeof(ndReal)));
+	const ndBrainMemVector sigmas((ndBrainFloat*)sigmaBuffer.GetCpuPtr(), ndInt64(sigmaBuffer.SizeInBytes() / sizeof(ndReal)));
+	const ndBrainMemVector sample((ndBrainFloat*)sampleBuffer.GetCpuPtr(), ndInt64(sampleBuffer.SizeInBytes() / sizeof(ndReal)));
+	
+	for (ndInt32 i = 0; i < numberOfGroups; ++i)
+	{
+		ndBrainMemVector gradient(&dst[2 * i * inputSize], 2 * inputSize);
+		const ndBrainMemVector meanSample(&sample[i * inputSize], inputSize);
+		const ndBrainMemVector variance(&sigmas[i * inputSize], inputSize);
+		gradient.CalculateEntropyRegularizationGradient(meanSample, variance, regularization);
+	}
+}
