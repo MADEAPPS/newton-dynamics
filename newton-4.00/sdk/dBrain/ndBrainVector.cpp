@@ -409,7 +409,7 @@ void ndBrainVector::CalculateEntropyRegularizationGradient(const ndBrainVector& 
 	ndAssert(GetCount() == varianceBuffer.GetCount() * 2);
 	ndAssert(meanSampleBuffer.GetCount() == varianceBuffer.GetCount());
 
-	const ndInt32 base = ndInt32 (GetCount());
+	const ndInt32 base = ndInt32 (GetCount()/2);
 	for (ndInt32 i = 0; i < base; ++i)
 	{
 		ndFloat32 sigma = varianceBuffer[i];
