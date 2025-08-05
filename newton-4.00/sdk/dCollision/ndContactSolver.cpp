@@ -1472,7 +1472,6 @@ ndInt32 ndContactSolver::Prune2dContacts(ndFixSizeArray<ndVector, D_MAX_CONTATCS
 
 	ndFixSizeArray<ndContactPoint, D_MAX_CONTATCS> buffer;
 	ndFixSizeArray<ndConvexFaceNode, D_MAX_CONTATCS> convexHull;
-	const ndVector xyMask(ndVector::m_xMask | ndVector::m_yMask);
 	ndUpHeap<ndConvexFaceNode*, ndFloat32> sortHeap(&planeProjection[0], D_MAX_CONTATCS * planeProjection.GetCapacity());
 
 	ndInt32 hullCount = ndConvexHull2d(&planeProjection[0], planeProjection.GetCount());
