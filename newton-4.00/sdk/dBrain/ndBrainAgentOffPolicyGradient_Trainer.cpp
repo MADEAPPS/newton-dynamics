@@ -53,7 +53,7 @@ ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 	m_criticLearnRate = ndBrainFloat(1.0e-4f);
 	m_policyRegularizer = ndBrainFloat(1.0e-4f);
 	m_criticRegularizer = ndBrainFloat(1.0e-4f);
-	m_discountRewardFactor = ndBrainFloat(0.99f);
+	m_discountRewardFactor = ndBrainFloat(0.998f);
 
 	m_polyakBlendFactor = ND_POLICY_DEFAULT_POLYAK_BLEND;
 	m_entropyTemperature = ND_POLICY_DEFAULT_ENTROPY_TEMPERATURE;

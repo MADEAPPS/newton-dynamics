@@ -1222,13 +1222,14 @@ namespace ndQuadruped_2
 		//#pragma optimize( "", off )
 		virtual void Update(ndDemoEntityManager* const manager, ndFloat32)
 		{
+			ndUnsigned32 episodeCount = 0;
 			ndUnsigned32 stopTraining = m_master->GetFramesCount();
 			if (stopTraining <= m_stopTraining)
 			{
-				ndUnsigned32 episodeCount = m_master->GetEposideCount();
+				episodeCount = m_master->GetEposideCount();
 				m_master->OptimizeStep();
-
 				episodeCount -= m_master->GetEposideCount();
+
 				ndFloat32 rewardTrajectory = m_master->GetAverageFrames() * m_master->GetAverageScore();
 
 				if (!m_master->IsSampling())
@@ -1257,19 +1258,24 @@ namespace ndQuadruped_2
 			}
 			
 			ndFloat32 stopScore = 100.0f * ndFloat32(m_master->GetAverageFrames() * m_master->GetAverageScore()) / m_horizon;
-			if ((stopTraining >= m_stopTraining) || (stopScore > 95.0f * ndFloat32(m_master->m_parameters.m_maxTrajectorySteps)))
+			if ((stopTraining >= m_stopTraining) || (stopScore > ndFloat32(95.0f) * ndFloat32(m_master->m_parameters.m_maxTrajectorySteps)))
 			{
 				char fileName[1024];
 				m_modelIsTrained = true;
 				ndGetWorkingFileName(m_master->GetName().GetStr(), fileName);
-				//m_master->GetPolicyNetwork()->CopyFrom(*(*m_bestActor));
-				//m_master->GetPolicyNetwork()->SaveToFile(fileName);
 				m_bestActor->SaveToFile(fileName);
 				ndExpandTraceMessage("saving to file: %s\n", fileName);
 				ndExpandTraceMessage("training complete\n");
 				ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
 				ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
 				manager->Terminate();
+			} 
+			else if (episodeCount && (stopScore > ndFloat32(91.0f) * ndFloat32(m_master->m_parameters.m_maxTrajectorySteps)))
+			{
+				char fileName[1024];
+				ndGetWorkingFileName(m_master->GetName().GetStr(), fileName);
+				m_bestActor->SaveToFile(fileName);
+				ndExpandTraceMessage("saving to file: %s\n", fileName);
 			}
 		}
 
