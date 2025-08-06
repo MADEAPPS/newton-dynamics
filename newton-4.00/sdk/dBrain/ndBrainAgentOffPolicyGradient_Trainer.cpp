@@ -760,7 +760,9 @@ ndUnsigned32 ndBrainAgentOffPolicyGradient_Trainer::GetEposideCount() const
 
 ndFloat32 ndBrainAgentOffPolicyGradient_Trainer::GetAverageScore() const
 {
-	return m_averageExpectedRewards.GetAverage();
+	ndBrainFloat horizon = ndBrainFloat(1.0f) / (ndFloat32(1.0f) - m_parameters.m_discountRewardFactor);
+	ndBrainFloat score = ndBrainFloat(100.0f) * m_averageExpectedRewards.GetAverage() / horizon;
+	return score;
 }
 
 ndFloat32 ndBrainAgentOffPolicyGradient_Trainer::GetAverageFrames() const
@@ -812,11 +814,11 @@ void ndBrainAgentOffPolicyGradient_Trainer::CalculateScore()
 		m_eposideCount++;
 	}
 #else
-	// using the critic to determine a more acuare score
+	// using the critic to determine a more accurate score
 
 	// this seems a good method to calculate the score, 
-	// however the q value fuction is too eratic at the begging 
-	// of training generation urelible scores.
+	// however the q value function is too erratic at the begging 
+	// of training generation unreliable scores.
 	 
 	//ndAssert(m_trajectoyTranstionIndex.GetCount() <= trajectory.GetCount());
 	//ndInt32 transitionsCount = ndInt32(m_trajectoyTranstionIndex.GetCount());

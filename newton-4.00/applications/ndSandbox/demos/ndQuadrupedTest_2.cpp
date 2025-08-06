@@ -1087,8 +1087,6 @@ namespace ndQuadruped_2
 			,m_outFile(nullptr)
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
-			,m_discountRewardFactor(0.99f)
-			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountRewardFactor))
 			,m_lastEpisode(0xffffffff)
 			,m_stopTraining(0)
 			,m_modelIsTrained(false)
@@ -1240,14 +1238,14 @@ namespace ndQuadruped_2
 						{
 							m_maxScore = rewardTrajectory;
 							m_bestActor->CopyFrom(*m_master->GetPolicyNetwork());
-							ndExpandTraceMessage("   best actor episode: %d\treward %f\ttrajectoryFrames: %f\n", m_master->GetEposideCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
+							ndExpandTraceMessage("   best actor episode: %d\treward %f\ttrajectoryFrames: %f\n", m_master->GetEposideCount(), m_master->GetAverageScore(), m_master->GetAverageFrames());
 							m_lastEpisode = m_master->GetEposideCount();
 						}
 					}
 
 					if (episodeCount)
 					{
-						ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", m_master->GetFramesCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
+						ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", m_master->GetFramesCount(), m_master->GetAverageScore(), m_master->GetAverageFrames());
 						if (m_outFile)
 						{
 							fprintf(m_outFile, "%g\n", m_master->GetAverageScore());
@@ -1257,7 +1255,7 @@ namespace ndQuadruped_2
 				}
 			}
 			
-			ndFloat32 stopScore = 100.0f * ndFloat32(m_master->GetAverageFrames() * m_master->GetAverageScore()) / m_horizon;
+			ndFloat32 stopScore = ndFloat32(m_master->GetAverageFrames() * m_master->GetAverageScore());
 			if ((stopTraining >= m_stopTraining) || (stopScore > ndFloat32(95.0f) * ndFloat32(m_master->m_parameters.m_maxTrajectorySteps)))
 			{
 				char fileName[1024];
@@ -1285,8 +1283,6 @@ namespace ndQuadruped_2
 		FILE* m_outFile;
 		ndUnsigned64 m_timer;
 		ndFloat32 m_maxScore;
-		ndFloat32 m_discountRewardFactor;
-		ndFloat32 m_horizon;
 		ndUnsigned32 m_lastEpisode;
 		ndUnsigned32 m_stopTraining;
 		bool m_modelIsTrained;

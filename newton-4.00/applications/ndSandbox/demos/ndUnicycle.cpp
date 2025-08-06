@@ -25,13 +25,7 @@
 namespace ndUnicycle
 {
 	#define ND_TRAIN_AGENT
-	#define ND_USE_OFF_POLICY_TRAINER
-
-#ifdef ND_USE_OFF_POLICY_TRAINER
 	#define CONTROLLER_NAME			"unicycle_sac.dnn"
-#else
-	#define CONTROLLER_NAME			"unicycle_ppo.dnn"
-#endif
 
 	#define ND_MAX_LEG_JOINT_ANGLE	(ndFloat32 (45.0f) * ndDegreeToRad)
 
@@ -167,20 +161,11 @@ namespace ndUnicycle
 			RobotModelNotify* m_robot;
 		};
 
-#ifdef ND_USE_OFF_POLICY_TRAINER
 		class ndControllerTrainer : public ndBrainAgentOffPolicyGradient_Agent
-#else
-		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Agent
-#endif
 		{
 			public:
-#ifdef ND_USE_OFF_POLICY_TRAINER
 			ndControllerTrainer(const ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master)
 				:ndBrainAgentOffPolicyGradient_Agent(master)
-#else
-			ndControllerTrainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
-				:ndBrainAgentContinuePolicyGradient_Agent(master)
-#endif	
 				,m_solver()
 				,m_robot(nullptr)
 			{
@@ -216,11 +201,7 @@ namespace ndUnicycle
 		};
 
 		public:
-#ifdef ND_USE_OFF_POLICY_TRAINER
 		RobotModelNotify(ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master, ndModelArticulation* const robot)
-#else
-		RobotModelNotify(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot)
-#endif
 			:ndModelNotify()
 			,m_controller(nullptr)
 			,m_controllerTrainer(nullptr)
@@ -536,35 +517,20 @@ namespace ndUnicycle
 			,m_outFile(nullptr)
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
-			,m_discountRewardFactor(0.99f)
-			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountRewardFactor))
 			,m_lastEpisode(0xffffffff)
 			,m_stopTraining(100 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
 			
-			#ifdef ND_USE_OFF_POLICY_TRAINER
-				m_outFile = fopen("unicycle_sac.csv", "wb");
-				fprintf(m_outFile, "sac\n");
-				m_stopTraining = 100000;
+			m_outFile = fopen("unicycle_sac.csv", "wb");
+			fprintf(m_outFile, "sac\n");
+			m_stopTraining = 100000;
 
-				ndBrainAgentOffPolicyGradient_Trainer::HyperParameters hyperParameters;
-				hyperParameters.m_numberOfActions = m_actionsSize;
-				hyperParameters.m_numberOfObservations = m_observationsSize;
-				m_master = ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>(new ndBrainAgentOffPolicyGradient_Trainer(hyperParameters));
-			#else
-				m_outFile = fopen("unicycle_pp0.csv", "wb");
-				fprintf(m_outFile, "ppo\n");
-				m_stopTraining = 150 * 1000000;
-
-				ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
-				hyperParameters.m_numberOfActions = m_actionsSize;
-				hyperParameters.m_numberOfObservations = m_observationsSize;
-				hyperParameters.m_maxTrajectorySteps = ND_TRAJECTORY_STEPS;
-				hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
-				m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
-			#endif
+			ndBrainAgentOffPolicyGradient_Trainer::HyperParameters hyperParameters;
+			hyperParameters.m_numberOfActions = m_actionsSize;
+			hyperParameters.m_numberOfObservations = m_observationsSize;
+			m_master = ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>(new ndBrainAgentOffPolicyGradient_Trainer(hyperParameters));
 
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
 			m_master->SetName(CONTROLLER_NAME);
@@ -579,31 +545,6 @@ namespace ndUnicycle
 			
 			visualModel->SetNotifyCallback(new RobotModelNotify(m_master, visualModel->GetAsModelArticulation()));
 			SetMaterial(visualModel->GetAsModelArticulation());
-			
-			#ifndef ND_USE_OFF_POLICY_TRAINER
-			// add a hidden battery of model to generate trajectories in parallel
-			//const ndInt32 countX = 0;
-			const ndInt32 countX = 100;
-			for (ndInt32 i = 0; i < countX; ++i)
-			{
-				ndMatrix location(matrix);
-				ndFloat32 step = 20.0f * (ndRand() - 0.5f);
-				location.m_posit.m_x += step;
-			 	
-				ndSharedPtr<ndModel>model (CreateModel(scene, location, modelMesh));
-				ndBodyKinematic* const body = model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic();
-				ndSharedPtr<ndJointBilateralConstraint> planeJoint(new ndJointPlane(body->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), body, world->GetSentinelBody()));
-				world->AddJoint(planeJoint);
-				
-				model->SetNotifyCallback(new RobotModelNotify(m_master, model->GetAsModelArticulation()));
-				SetMaterial(model->GetAsModelArticulation());
-				
-				world->AddModel(model);
-				model->AddBodiesAndJointsToWorld();
-				
-				m_models.Append(model->GetAsModelArticulation());
-			}
-			#endif
 
 			scene->SetAcceleratedUpdate();
 		}
@@ -712,14 +653,14 @@ namespace ndUnicycle
 						{
 							m_maxScore = rewardTrajectory;
 							m_bestActor->CopyFrom(*m_master->GetPolicyNetwork());
-							ndExpandTraceMessage("   best actor episode: %d\treward %f\ttrajectoryFrames: %f\n", m_master->GetEposideCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
+							ndExpandTraceMessage("   best actor episode: %d\treward %f\ttrajectoryFrames: %f\n", m_master->GetEposideCount(), m_master->GetAverageScore(), m_master->GetAverageFrames());
 							m_lastEpisode = m_master->GetEposideCount();
 						}
 					}
 
 					if (episodeCount != m_master->GetEposideCount())
 					{
-						ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", m_master->GetFramesCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
+						ndExpandTraceMessage("steps: %d\treward: %g\t  trajectoryFrames: %g\n", m_master->GetFramesCount(), m_master->GetAverageScore(), m_master->GetAverageFrames());
 						if (m_outFile)
 						{
 							fprintf(m_outFile, "%g\n", m_master->GetAverageScore());
@@ -729,7 +670,7 @@ namespace ndUnicycle
 				}
 			}
 
-			if ((stopTraining >= m_stopTraining) || (100.0f * m_master->GetAverageScore() / m_horizon > 95.0f))
+			if ((stopTraining >= m_stopTraining) || (m_master->GetAverageScore() > 95.0f))
 			{
 				char fileName[1024];
 				m_modelIsTrained = true;
@@ -744,18 +685,12 @@ namespace ndUnicycle
 			}
 		}
 
-#ifdef ND_USE_OFF_POLICY_TRAINER
 		ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer> m_master;
-#else
-		ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
-#endif
 		ndSharedPtr<ndBrain> m_bestActor;
 		ndList<ndModelArticulation*> m_models;
 		FILE* m_outFile;
 		ndUnsigned64 m_timer;
 		ndFloat32 m_maxScore;
-		ndFloat32 m_discountRewardFactor;
-		ndFloat32 m_horizon;
 		ndUnsigned32 m_lastEpisode;
 		ndUnsigned32 m_stopTraining;
 		bool m_modelIsTrained;
