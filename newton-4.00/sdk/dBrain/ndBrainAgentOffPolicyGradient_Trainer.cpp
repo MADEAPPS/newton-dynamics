@@ -1260,31 +1260,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::CalculateSacExpectedRewards()
 	m_minibatchNoTerminal->CopyBuffer(criticOutputTerminal, m_parameters.m_miniBatchSize, **m_minibatchOfTransitions);
 
 	// calculate and add entropy regulatization to the q value
-
-//ndBrainVector minibatchSigma_;
-//ndBrainVector minibatchSample;
-//ndBrainVector minibatchEntropy0;
-//m_minibatchSigma->VectorFromDevice(minibatchSigma_);
-//m_minibatchEntropy->VectorFromDevice(minibatchEntropy0);
-//m_minibatchUniformRandomDistribution->VectorFromDevice(minibatchSample);
-//for (ndInt32 i = 0; i < m_parameters.m_miniBatchSize; ++i)
-//{
-//	const ndBrainMemVector sampleMean(&minibatchSample[i * 1], 1);
-//	const ndBrainMemVector varianceMean(&minibatchSigma_[i * 1], 1);
-//	minibatchEntropy0[i] = sampleMean.CalculateEntropyRegularization(varianceMean, m_parameters.m_entropyTemperature);
-//}
-
 	m_minibatchEntropy->CalculateEntropyRegularization(**m_minibatchUniformRandomDistribution, **m_minibatchSigma, m_parameters.m_entropyTemperature);
-
-//ndBrainVector minibatchEntropy1;
-//m_minibatchEntropy->VectorFromDevice(minibatchEntropy1);
-//m_context->SyncBufferCommandQueue();
-//for (ndInt32 i = 0; i < m_parameters.m_miniBatchSize; ++i)
-//{
-//	ndFloat32 a = minibatchEntropy0[i];
-//	ndFloat32 b = minibatchEntropy1[i];
-//	ndAssert(ndAreEqual(a, b, 1.0e-4f));
-//}
 
 	qValue.Sub(**m_minibatchEntropy);
 	qValue.Mul(**m_minibatchNoTerminal);

@@ -559,7 +559,7 @@ void ndBrainGpuContext::CalculateEntropyRegularization(ndBrainFloatBuffer& buffe
 {
 	cl_int error = 0;
 
-	OpenclKernel* const oclKernel = (OpenclKernel*)*m_brainEntropyReqularization;
+	OpenclKernel* const oclKernel = (OpenclKernel*)*m_brainEntropyRegularization;
 	cl::Kernel* const shader = *oclKernel->m_shader;
 
 	ndBrainGpuBuffer* const dst = buffer.GetGpuBuffer();
@@ -604,6 +604,58 @@ void ndBrainGpuContext::CalculateEntropyRegularization(ndBrainFloatBuffer& buffe
 //	const ndBrainMemVector varianceMean(&xxxxx2[i * numberOfElements], numberOfElements);
 //	xxxxx1[i] = sampleMean.CalculateEntropyRegularization(varianceMean, regularization);
 //}
+}
+
+void ndBrainGpuContext::CalculateEntropyRegularizationGradient(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& sampleBuffer, const ndBrainFloatBuffer& varianceBuffer, ndBrainFloat regularization, ndInt32 inputSize)
+{
+	cl_int error = 0;
+
+	ndAssert(sampleBuffer.SizeInBytes() == varianceBuffer.SizeInBytes());
+	ndAssert(2 * varianceBuffer.SizeInBytes() == buffer.SizeInBytes());
+
+	OpenclKernel* const oclKernel = (OpenclKernel*)*m_brainEntropyRegularizationGradient;
+	cl::Kernel* const shader = *oclKernel->m_shader;
+
+	ndBrainGpuBuffer* const dst = buffer.GetGpuBuffer();
+	const ndBrainGpuBuffer* const samples = sampleBuffer.GetGpuBuffer();
+	const ndBrainGpuBuffer* const variance = varianceBuffer.GetGpuBuffer();
+
+	cl_int numberOfParameters = 0;
+	error = shader->getInfo(CL_KERNEL_NUM_ARGS, &numberOfParameters);
+	ndAssert(numberOfParameters == 5);
+
+	const ndInt32 numberOfGroups = ndInt32(sampleBuffer.SizeInBytes() / sizeof(ndBrainFloat)) / inputSize;
+	ndAssert(sampleBuffer.SizeInBytes() == numberOfGroups * inputSize * sizeof(ndReal));
+
+	error = shader->setArg(0, ndInt32(inputSize));
+	ndAssert(error == CL_SUCCESS);
+	error = shader->setArg(1, **dst->m_buffer);
+	ndAssert(error == CL_SUCCESS);
+	error = shader->setArg(2, **samples->m_buffer);
+	ndAssert(error == CL_SUCCESS);
+	error = shader->setArg(3, **variance->m_buffer);
+	ndAssert(error == CL_SUCCESS);
+	error = shader->setArg(4, regularization);
+	ndAssert(error == CL_SUCCESS);
+
+	size_t localSize = size_t(inputSize);
+	size_t globalSize = size_t(numberOfGroups * inputSize);
+
+	cl::NDRange offset(0);
+	cl::NDRange local(localSize);
+	cl::NDRange global(globalSize);
+	error = m_queue->enqueueNDRangeKernel(*shader, offset, global, local);
+	ndAssert(error == CL_SUCCESS);
+
+//SyncBufferCommandQueue();
+//ndBrainVector xxxxx1;
+//buffer.VectorFromDevice(xxxxx1);
+//ndBrainVector xxxxx2;
+//ndBrainVector xxxxx3;
+//sampleBuffer.VectorFromDevice(xxxxx2);
+//varianceBuffer.VectorFromDevice(xxxxx3);
+//buffer.VectorFromDevice(xxxxx1);
+//buffer.VectorFromDevice(xxxxx1);
 }
 
 void ndBrainGpuContext::Set(ndBrainFloatBuffer& dstData, ndBrainFloat value)

@@ -85,6 +85,7 @@ class ndBrainGpuContext : public ndBrainContext
 	virtual void StandardNormalDistribution(ndBrainFloatBuffer& uniformRandomVariable) override;
 	virtual void BroadcastScaler(ndBrainFloatBuffer& buffer, ndInt32 bufferStrideInFloats, const ndBrainFloatBuffer& srcScalar) override;
 	virtual void CalculateEntropyRegularization(ndBrainFloatBuffer&, const ndBrainFloatBuffer&, const ndBrainFloatBuffer&, ndBrainFloat) override;
+	virtual void CalculateEntropyRegularizationGradient(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& sampleBuffer, const ndBrainFloatBuffer& sigmaBuffer, ndBrainFloat regularization, ndInt32 inputSize) override;
 
 	private:
 	void CreateKerners();
@@ -172,7 +173,9 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainKernel> m_brainBroadcastScalar;
 	ndSharedPtr<ndBrainKernel> m_brainGreaterEqualScalar;
 	ndSharedPtr<ndBrainKernel> m_brainNormalDistribution;
-	ndSharedPtr<ndBrainKernel> m_brainEntropyReqularization;
+	ndSharedPtr<ndBrainKernel> m_brainEntropyRegularization;
+	ndSharedPtr<ndBrainKernel> m_brainEntropyRegularizationGradient;
+
 
 	static const char* m_mathOpsCommand;
 	static const char* m_matrixMultiply;

@@ -1617,14 +1617,12 @@ R""""(
         
 		float sample = meanBuffer[srcOffset + itemId];
 		float sigma = varianceBuffer[srcOffset + itemId];
-    	//float entropy = - 0.5 * sample * sample / (sigma * sigma) - log(sigma);
         float entropy = 0.5 * sample * sample / (sigma * sigma) + log(sigma);
         reductionBuffer[itemId] = entropy;
         barrier(CLK_LOCAL_MEM_FENCE); 
         
         if (itemId == 0)
         {
-            //float ent = -0.5 * ((float)numberOfElements) * log(2.0 * 3.14159265);
             float ent = 0.5 * 1.837877 * (float)numberOfElements;
             for (int i = 0; i < numberOfElements; ++i)
             {
@@ -1632,8 +1630,33 @@ R""""(
             }
             outputBuffer[groupId] = -ent * regularizationTemperature;
         }
+    }
 
-        //if (groupId < 32) printf ("item(%d) size(%d) gId(%d) elements(%d) e(%f)\n", itemId, workGroupSize, groupId, numberOfElements, outputBuffer[groupId]);
+    __kernel void brainEntropyReqularizationGradient(
+        int numberOfElements,
+        __global float* outputBuffer,
+        __global float* meanBuffer,
+        __global float* varianceBuffer,
+        float regularizationTemperature)
+    {
+        uint itemId = get_local_id(0);
+        uint groupId = get_group_id(0);
+        uint workGroupSize = get_local_size(0);
+
+        uint srcOffset = groupId * numberOfElements;
+        uint dstOffset = srcOffset * 2;
+        
+		float sample = meanBuffer[srcOffset + itemId];
+		float sigma = varianceBuffer[srcOffset + itemId];
+
+        float invSigma = 1.0 / sigma;
+        float invSigma2 = invSigma * invSigma;
+        
+        float meanGradient = regularizationTemperature * sample * invSigma2;
+        float sigmaGradient = regularizationTemperature * invSigma * (sample * sample * invSigma2 - 1.0);;
+        
+        outputBuffer[dstOffset + itemId] = meanGradient;
+        outputBuffer[dstOffset + numberOfElements + itemId] = sigmaGradient;
     }
    
 )"""";
@@ -1769,5 +1792,6 @@ void ndBrainGpuContext::CreateKerners()
     m_brainLessEqualScalar = CreateKerner(program, "brainLessEqualScalar");
     m_brainGreaterEqualScalar = CreateKerner(program, "brainGreaterEqualScalar");
     m_brainNormalDistribution = CreateKerner(program, "brainNormalDistribution");
-    m_brainEntropyReqularization = CreateKerner(program, "brainEntropyReqularization");
+    m_brainEntropyRegularization = CreateKerner(program, "brainEntropyReqularization");
+    m_brainEntropyRegularizationGradient = CreateKerner(program, "brainEntropyReqularizationGradient");
 }

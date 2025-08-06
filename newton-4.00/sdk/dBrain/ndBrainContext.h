@@ -78,7 +78,7 @@ class ndBrainContext : public ndClassAlloc
 	virtual void ReductionSum(ndBrainFloatBuffer&) { ndAssert(0); }
 	virtual void StandardNormalDistribution(ndBrainFloatBuffer& uniformRandomVariable) = 0;
 	virtual void CalculateEntropyRegularization(ndBrainFloatBuffer&, const ndBrainFloatBuffer&, const ndBrainFloatBuffer&, ndBrainFloat) = 0;
-	virtual void CalculateEntropyRegularizationGradient(ndBrainFloatBuffer&, const ndBrainFloatBuffer&, const ndBrainFloatBuffer&, ndBrainFloat, ndInt32) { ndAssert(0);}
+	virtual void CalculateEntropyRegularizationGradient(ndBrainFloatBuffer&, const ndBrainFloatBuffer&, const ndBrainFloatBuffer&, ndBrainFloat, ndInt32) = 0;
 };
 
 #endif
