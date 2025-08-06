@@ -22,33 +22,6 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-/*
-This demo trains a simple robot using a policy gradient method
-either vanilla policy gradients, Proximal Policy Optimization(PPO), or a custom variant.
-
-While policy gradient methods tend to be more stable than Q value based methods, 
-they require collecting a large amount of data, which can be impractical on hardware with limited resources.
-As model complexity grows from medium to large scale, The variance in the collected data increases exponentially.
-This happens because uncertainty in the data stems from all control outputs, 
-and any moderately complex robot typically deals with an input vector composed of dozens of signals.
-
-To manage this high variance,one common solution is to train thousands of agents in parallel.
-This approach is motivated by the theoretical foundation of policy gradient methods, 
-which update model parameters based on the expected reward over all possible trajectories.
-However, in practice, we must estimate this expectation from a finite set of sampled trajectories.
-The challenge arises because, while our ability to generate data grows linearly(or sub linearly) with system resources,
-the variance of that data increases exponentially with the size of the action vector.
-This becomes a major bottleneck for small to medium sized systems.
-
-In fact, even a high end single GPU system may struggle with this demand, 
-which often limits the practical use of policy gradient methods to organizations with access 
-to large scale computing resources such as supercomputers plus a large number of humans in the 
-loop to supervise data generation.
-
-therefore, it is my opinion and conclusion that Q base methods like DDPG, TD3 and SAC
-are more suitable for medium small systems.
-*/
-
 // This model attempts to take animation poses and use a reward system to generate a policy  
 // that produces the animation.  
 // If this phase is successful, we will adapt the reward so that the robot can adjust  
@@ -57,13 +30,8 @@ namespace ndQuadruped_2
 {
 	#define ND_TRAIN_MODEL
 
-	#define USE_DDPG
 
-	#ifdef USE_DDPG
-		#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
-	#else	
-		#define CONTROLLER_NAME "ndQuadruped_2-ppo.dnn"
-	#endif
+	#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
 
 	enum Actions
 	{
@@ -299,20 +267,11 @@ namespace ndQuadruped_2
 			RobotModelNotify* m_robot;
 		};
 		
-#ifdef USE_DDPG
 		class ndControllerTrainer : public ndBrainAgentOffPolicyGradient_Agent
-#else
-		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Agent
-#endif
 		{
 			public:
-#ifdef USE_DDPG
 			ndControllerTrainer(const ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master, RobotModelNotify* const robot)
 				:ndBrainAgentOffPolicyGradient_Agent(master)
-#else
-			ndControllerTrainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, RobotModelNotify* const robot)
-				: ndBrainAgentContinuePolicyGradient_Agent(master)
-#endif
 				,m_robot(robot)
 			{
 			}
@@ -391,11 +350,7 @@ namespace ndQuadruped_2
 		{
 		}
 
-		#ifdef USE_DDPG
 		void SetControllerTrainer(const ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master)
-		#else
-		void SetControllerTrainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
-		#endif
 		{
 			m_controllerTrainer = ndSharedPtr<ndControllerTrainer>(new ndControllerTrainer(master, this));
 		}
@@ -1145,33 +1100,18 @@ namespace ndQuadruped_2
 			ndInt32 numberOfActions = m_actionsSize;
 			ndInt32 numberOfObservations = m_observationSize * 4 + 2;
 
-			#ifdef USE_DDPG
-				m_outFile = fopen("ndQuadruped_2-sac.csv", "wb");
-				fprintf(m_outFile, "sac\n");
+			m_outFile = fopen("ndQuadruped_2-sac.csv", "wb");
+			fprintf(m_outFile, "sac\n");
 
-				m_stopTraining = 1000000;
-				ndBrainAgentOffPolicyGradient_Trainer::HyperParameters hyperParameters;
+			m_stopTraining = 1000000;
+			ndBrainAgentOffPolicyGradient_Trainer::HyperParameters hyperParameters;
 
-				//hyperParameters.m_usePerActionSigmas = true;
-				hyperParameters.m_numberOfActions = numberOfActions;
-				hyperParameters.m_numberOfObservations = numberOfObservations;
-				//hyperParameters.m_numberOfHiddenLayers = hiddenLayers;
-				//hyperParameters.m_hiddenLayersNumberOfNeurons = hiddenLayersNeurons;
-				m_master = ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>(new ndBrainAgentOffPolicyGradient_Trainer(hyperParameters));
-			#else
-				m_outFile = fopen("ndQuadruped_2-ppo.csv", "wb");
-				fprintf(m_outFile, "ppo\n");
-
-				m_stopTraining = 500 * 1000000;
-				ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
-
-				//hyperParameters.m_usePerActionSigmas = false;
-				hyperParameters.m_numberOfActions = numberOfActions;
-				hyperParameters.m_numberOfObservations = numberOfObservations;
-				hyperParameters.m_numberOfHiddenLayers = hiddenLayers;
-				hyperParameters.m_hiddenLayersNumberOfNeurons = hiddenLayersNeurons;
-				m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
-			#endif
+			//hyperParameters.m_usePerActionSigmas = true;
+			hyperParameters.m_numberOfActions = numberOfActions;
+			hyperParameters.m_numberOfObservations = numberOfObservations;
+			//hyperParameters.m_numberOfHiddenLayers = hiddenLayers;
+			//hyperParameters.m_hiddenLayersNumberOfNeurons = hiddenLayersNeurons;
+			m_master = ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>(new ndBrainAgentOffPolicyGradient_Trainer(hyperParameters));
 
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
 
@@ -1191,43 +1131,6 @@ namespace ndQuadruped_2
 			//world->AddJoint(fixJoint);
 
 			// add a hidden battery of model to generate trajectories in parallel
-#ifndef USE_DDPG
-			ndInt32 countX = 10;
-			ndInt32 countZ = 10;
-			//countX = 0;
-			//countZ = 0;
-			
-			ndInt32 enumeration = 1;
-			// add a hidden battery of model to generate trajectories in parallel
-			for (ndInt32 i = 0; i < countZ; ++i)
-			{
-				for (ndInt32 j = 0; j < countX; ++j)
-				{
-					ndMatrix location(matrix);
-					location.m_posit.m_x += 20.0f * (ndRand() - 0.5f);
-					location.m_posit.m_z += 20.0f * (ndRand() - 0.5f);
-
-					ndFloat32 step = 20.0f * (ndRand() - 0.5f);
-					location.m_posit.m_x += step;
-
-					ndSharedPtr<ndModel>model(CreateModel(scene, location, modelMesh));
-					RobotModelNotify* const notify1 = (RobotModelNotify*)*model->GetAsModel()->GetNotifyCallback();
-					notify1->SetControllerTrainer(m_master);
-					notify1->m_modelEnum = enumeration;
-					enumeration++;
-
-					SetMaterial(model->GetAsModelArticulation());
-					world->AddModel(model);
-					model->AddBodiesAndJointsToWorld();
-
-					m_models.Append(model->GetAsModelArticulation());
-
-					ndBodyKinematic* const rootBody1 = model->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic();
-					ndSharedPtr<ndJointBilateralConstraint> fixJoint1(new ndJointFix6dof(rootBody1->GetMatrix(), rootBody1, world->GetSentinelBody()));
-					//world->AddJoint(fixJoint1);
-				}
-			}
-#endif
 			scene->SetAcceleratedUpdate();
 		}
 
@@ -1370,11 +1273,7 @@ namespace ndQuadruped_2
 			}
 		}
 
-#ifdef USE_DDPG
 		ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer> m_master;
-#else
-		ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
-#endif
 		ndSharedPtr<ndBrain> m_bestActor;
 		ndList<ndModelArticulation*> m_models;
 		FILE* m_outFile;

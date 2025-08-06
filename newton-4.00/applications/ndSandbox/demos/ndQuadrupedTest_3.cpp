@@ -32,7 +32,7 @@
 namespace ndQuadruped_3
 {
 	#define ND_TRAIN_MODEL
-	#define CONTROLLER_NAME "ndQuadruped_3-ddpg.dnn"
+	#define CONTROLLER_NAME "ndQuadruped_3-sac.dnn"
 
 	enum ndActionSpace
 	{

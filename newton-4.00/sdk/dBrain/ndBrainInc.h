@@ -34,7 +34,6 @@
 #include <ndBrainContext.h>
 #include <ndBrainTrainer.h>
 #include <ndBrainSaveLoad.h>
-#include <ndBrainAgentDQN.h>
 #include <ndBrainOptimizer.h>
 #include <ndBrainGpuBuffer.h>
 #include <ndBrainCpuContext.h>
@@ -50,7 +49,6 @@
 #include <ndBrainBufferCommand.h>
 #include <ndBrainOptimizerAdam.h>
 #include <ndBrainLayerActivation.h>
-#include <ndBrainAgentDQN_Trainer.h>
 #include <ndBrainLayerImagePadding.h>
 #include <ndBrainLayerActivationElu.h>
 #include <ndBrainLayerActivationRelu.h>
