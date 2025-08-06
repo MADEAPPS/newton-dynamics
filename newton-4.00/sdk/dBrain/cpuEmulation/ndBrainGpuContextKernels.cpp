@@ -406,7 +406,7 @@ class brainLayerOffPolicyActivation : public ndBrainKernel
                 ndBrainFloat blend0 = ndBrainFloat(1.0f) - blend1;
 
                 ndBrainFloat inputValue = inputOutputData[inputOffset + i + itemId];
-                ndBrainFloat expenential = ndExp_VSFix(inputValue);
+                ndBrainFloat expenential = ndExp(inputValue);
 
                 ndBrainFloat outputValue = inputValue * blend0 + expenential * blend1;
                 inputOutputData[outputOffset + i + itemId] = outputValue;
@@ -419,7 +419,7 @@ class brainLayerOffPolicyActivation : public ndBrainKernel
             ndBrainFloat blend0 = ndBrainFloat(1.0f) - blend1;
 
             ndBrainFloat inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
-            ndBrainFloat expenential = ndExp_VSFix(inputValue);
+            ndBrainFloat expenential = ndExp(inputValue);
 
             ndBrainFloat outputValue = inputValue * blend0 + expenential * blend1;
             inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
@@ -511,7 +511,7 @@ class brainLayerSoftmaxActivation : public ndBrainKernel
             {
                 ndBrainFloat inputValue = tmpInputBuffer[i + itemId] - maxArgReg[itemId];
                 //ndBrainFloat outputValue = exp(inputValue);
-                ndBrainFloat outputValue = ndExp_VSFix(inputValue);
+                ndBrainFloat outputValue = ndExp(inputValue);
                 sumArgReg[itemId] += outputValue;
                 tmpInputBuffer[i + itemId] = outputValue;
             }
@@ -520,7 +520,7 @@ class brainLayerSoftmaxActivation : public ndBrainKernel
         {
             ndBrainFloat inputValue = tmpInputBuffer[modWorkGroupSize + itemId] - maxArgReg[itemId];
             //ndBrainFloat outputValue = exp(inputValue);
-            ndBrainFloat outputValue = ndExp_VSFix(inputValue);
+            ndBrainFloat outputValue = ndExp(inputValue);
             sumArgReg[itemId] += outputValue;
             tmpInputBuffer[modWorkGroupSize + itemId] = outputValue;
         }
