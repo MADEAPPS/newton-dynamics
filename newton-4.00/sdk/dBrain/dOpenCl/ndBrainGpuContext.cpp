@@ -647,15 +647,30 @@ void ndBrainGpuContext::CalculateEntropyRegularizationGradient(ndBrainFloatBuffe
 	error = m_queue->enqueueNDRangeKernel(*shader, offset, global, local);
 	ndAssert(error == CL_SUCCESS);
 
-//SyncBufferCommandQueue();
+//ndBrainVector xxxxx0;
 //ndBrainVector xxxxx1;
-//buffer.VectorFromDevice(xxxxx1);
 //ndBrainVector xxxxx2;
 //ndBrainVector xxxxx3;
+//SyncBufferCommandQueue();
+//buffer.VectorFromDevice(xxxxx0);
+//buffer.VectorFromDevice(xxxxx1);
+//xxxxx1.Set(0.0f);
 //sampleBuffer.VectorFromDevice(xxxxx2);
 //varianceBuffer.VectorFromDevice(xxxxx3);
-//buffer.VectorFromDevice(xxxxx1);
-//buffer.VectorFromDevice(xxxxx1);
+//for (ndInt32 i = 0; i < numberOfGroups; ++i)
+//{
+//	ndBrainMemVector gradient(&xxxxx1[2 * i * inputSize], 2 * inputSize);
+//	const ndBrainMemVector meanSample(&xxxxx2[i * inputSize], inputSize);
+//	const ndBrainMemVector variance1(&xxxxx3[i * inputSize], inputSize);
+//	gradient.CalculateEntropyRegularizationGradient(meanSample, variance1, regularization);
+//}
+//for (ndInt32 i = 0; i < xxxxx0.GetCount(); ++i)
+//{
+//	ndBrainFloat a = xxxxx0[i];
+//	ndBrainFloat b = xxxxx0[i];
+//	ndAssert(ndAreEqual(a, b, 1.0e-4f));
+//}
+
 }
 
 void ndBrainGpuContext::Set(ndBrainFloatBuffer& dstData, ndBrainFloat value)

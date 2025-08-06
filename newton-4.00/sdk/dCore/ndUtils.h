@@ -213,6 +213,10 @@ inline void strtolwr(char* const string)
 	}
 }
 
+// visual studion work around since microsf does not want to admit that
+// that ther is a bug in function exp, that can race exeption in some cases.
+D_CORE_API ndFloat32 ndExp_VS__Fix(ndFloat32 x);
+
 /// Returns the time in micro seconds since application started 
 D_CORE_API ndUnsigned64 ndGetTimeInMicroseconds();
 
@@ -226,8 +230,6 @@ D_CORE_API ndInt32 ndVertexListToIndexList(ndReal* const vertexList, ndInt32 str
 
 /// removed all duplicate points from an array and place the location in the index array
 D_CORE_API ndInt32 ndVertexListToIndexList(ndFloat64* const vertexList, ndInt32 strideInBytes, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, ndFloat64 tolerance = ndEpsilon);
-
-D_CORE_API ndFloat32 ndExp_VSFix(ndFloat32 x);
 
 /// Simple moving average class, useful for stuff like frame rate smoothing
 template <ndInt32 size>

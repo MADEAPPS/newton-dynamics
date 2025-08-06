@@ -425,7 +425,7 @@ namespace ndUnicycle
 				ndFloat32 speed = (wheelOmega.DotProduct(wheelMatrix.m_front)).GetScalar();
 
 				ndFloat32 arg = -0.05f * speed * speed;
-				reward = ndExp_VSFix(arg);
+				reward = ndExp(arg);
 			}
 			return ndBrainFloat(reward);
 		}

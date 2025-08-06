@@ -35,9 +35,9 @@
 #endif
 
 #pragma optimize( "", off )
-ndFloat32 ndExp_VSFix(ndFloat32 x)
+ndFloat32 ndExp_VS__Fix(ndFloat32 x)
 {
-	return ndExp(x);
+	return ndFloat32 (exp(x));
 }
 
 ndFloat64 ndRoundToFloat(ndFloat64 val)

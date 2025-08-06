@@ -126,7 +126,7 @@ class ndBrainAgentOffPolicyGradient_Trainer::ndActivation : public ndBrainLayerA
 		for (ndInt32 i = size - 1; i >= 0; --i)
 		{
 			output[i] = input[i];
-			output[size + i] = ndExp_VSFix(input[size + i]);
+			output[size + i] = ndExp(input[size + i]);
 		}
 	}
 
@@ -170,7 +170,7 @@ class ndBrainAgentOffPolicyGradient_Trainer::ndActivation : public ndBrainLayerA
 		for (ndInt32 i = size - 1; i >= 0; --i)
 		{
 			output[i] = input[i];
-			output[size + i] = ndExp_VSFix(input[size + i]);
+			output[size + i] = ndExp(input[size + i]);
 		}
 	}
 

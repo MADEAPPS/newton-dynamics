@@ -300,7 +300,7 @@ void ndBrainVector::CategoricalSample(const ndBrainVector& probability, ndBrainF
 		ndBrainFloat logits = ndBrainFloat (ndLog(num / den));
 		ndBrainFloat r = ndBrainFloat(0.930159f) * ndBrainFloat (ndRand()) + ndBrainFloat(1.0e-6f);
 		ndBrainFloat noise = beta * ndBrainFloat (-ndLog(-ndLog(r)));
-		ndBrainFloat sample = ndBrainFloat (ndExp_VSFix(logits + noise));
+		ndBrainFloat sample = ndBrainFloat (ndExp(logits + noise));
 		sum += sample;
 		(*this)[i] = sample;
 	}
@@ -377,7 +377,7 @@ void ndBrainVector::SoftMaxNormalize()
 	{
 		ndBrainFloat in = ndMax(((*this)[i] - max), ndBrainFloat(-30.0f));
 		ndAssert(in <= ndBrainFloat(0.0f));
-		ndBrainFloat prob = ndBrainFloat(ndExp_VSFix(in));
+		ndBrainFloat prob = ndBrainFloat(ndExp(in));
 		(*this)[i] = prob;
 		acc += prob;
 	}
@@ -399,7 +399,7 @@ ndBrainFloat ndBrainVector::CalculateEntropyRegularization(const ndBrainVector& 
 		entropy += (- ndFloat32(0.5f) * sample * sample / (sigma * sigma) - ndLog(sigma));
 
 		//xxxx = xxxx * (1.0f / (ndSqrt(2.0 * ndPi) * sigma));
-		//xxxx = xxxx * ndExp_VSFix(-ndFloat32(0.5f) * sample * sample / (sigma * sigma));
+		//xxxx = xxxx * ndExp(-ndFloat32(0.5f) * sample * sample / (sigma * sigma));
 	}
 	return entropy * regularization;
 }
