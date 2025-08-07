@@ -518,14 +518,13 @@ namespace ndUnicycle
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
 			,m_lastEpisode(0xffffffff)
-			,m_stopTraining(100 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
 			
 			m_outFile = fopen("unicycle_sac.csv", "wb");
 			fprintf(m_outFile, "sac\n");
-			m_stopTraining = 100000;
+			m_stopTraining = 500000;
 
 			ndBrainAgentOffPolicyGradient_Trainer::HyperParameters hyperParameters;
 			hyperParameters.m_numberOfActions = m_actionsSize;
