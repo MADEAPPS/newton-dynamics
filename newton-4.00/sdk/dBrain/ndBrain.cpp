@@ -161,7 +161,7 @@ void ndBrain::ResetDropOut()
 	ApplyDropOutRate(ndFloat32(0.0f));
 }
 
-ndInt32 ndBrain::CalculateWorkingBufferSize() const
+ndInt32 ndBrain::CalculateMaxLayerBufferSize() const
 {
 	const ndArray<ndBrainLayer*>& layers = *this;
 	ndInt32 maxSize = layers[0]->GetInputSize();
@@ -169,41 +169,39 @@ ndInt32 ndBrain::CalculateWorkingBufferSize() const
 	{
 		maxSize = ndMax(maxSize, layers[i]->GetOutputBufferSize());
 	}
-	return maxSize * 2 + 256;
+	return (maxSize + 1024 - 1) & -1024;
 }
-
 
 void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
-	const ndInt32 maxMemory = CalculateWorkingBufferSize();
-	ndBrainFloat* const buffer = ndAlloca(ndBrainFloat, maxMemory + 256);
-	ndBrainMemVector workingBuffer(buffer, maxMemory + 256);
+	const ndInt32 maxMemory = CalculateMaxLayerBufferSize();
+	ndBrainFloat* const buffer = ndAlloca(ndBrainFloat, 2 * maxMemory);
+	ndBrainMemVector workingBuffer(buffer, 2 * maxMemory);
 	MakePrediction(input, output, workingBuffer);
 }
 
 void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output, ndBrainVector& workingBuffer) const
 {
 	const ndArray<ndBrainLayer*>& layers = *this;
-	ndInt32 maxSize = layers[0]->GetInputSize();
-	for (ndInt32 i = 0; i < GetCount(); ++i)
+	const ndInt32 maxMemory = CalculateMaxLayerBufferSize();
+	if ((2 * maxMemory) > workingBuffer.GetCapacity())
 	{
-		maxSize = ndMax(maxSize, layers[i]->GetOutputBufferSize());
+		workingBuffer.SetCount(2 * maxMemory);
 	}
+	workingBuffer.SetCount(2 * maxMemory);
 
-	const ndInt32 maxMemory = CalculateWorkingBufferSize();
-	if (maxMemory > workingBuffer.GetCapacity())
-	{
-		workingBuffer.SetCount(maxMemory);
-	}
-	workingBuffer.SetCount(maxMemory);
-
-	ndBrainMemVector in(&workingBuffer[0], input.GetCount());
-	ndBrainMemVector out(&workingBuffer[maxSize + 128], input.GetCount());
+	ndBrainMemVector in(&workingBuffer[maxMemory * 0], input.GetCount());
+	ndBrainMemVector out(&workingBuffer[maxMemory * 1], input.GetCount());
 
 	in.Set(input);
 	for (ndInt32 i = 0; i < GetCount(); ++i)
 	{
 		out.SetSize(layers[i]->GetOutputSize());
+for (int j = 0; j < in.GetCount(); ++j)
+{
+ndAssert((in[j] >= -1000.0f) && (in[j] <= 1000.0f));
+}
+
 		layers[i]->MakePrediction(in, out);
 		in.Swap(out);
 	}
