@@ -114,10 +114,15 @@ ndBrainGpuContext* ndBrainGpuContext::GetAsGpuContext()
 	return this;
 }
 
-//void CL_CALLBACK ndBrainGpuContext::clNotification(const char* errinfo, const void* private_info, size_t cb, void* user_data)
-void CL_CALLBACK ndBrainGpuContext::clNotification(const char*, const void*, size_t, void*)
+void CL_CALLBACK ndBrainGpuContext::clNotification(const char* errinfo, const void* private_info, size_t cb, void* user_data)
+//void CL_CALLBACK ndBrainGpuContext::clNotification(const char*, const void*, size_t, void*)
 {
+
+	ndExpandTraceMessage("%s\n", errinfo);
 	ndAssert(0);
+	cb = 0;
+	user_data = nullptr;
+	private_info = nullptr;
 }
 
 bool ndBrainGpuContext::SupportsMappedMemory() const

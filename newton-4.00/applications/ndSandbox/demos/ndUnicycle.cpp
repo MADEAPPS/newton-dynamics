@@ -528,7 +528,7 @@ namespace ndUnicycle
 			
 			m_outFile = fopen("unicycle_sac.csv", "wb");
 			fprintf(m_outFile, "sac\n");
-			m_stopTraining = 500000;
+			m_stopTraining = 200000;
 
 			ndBrainAgentOffPolicyGradient_Trainer::HyperParameters hyperParameters;
 			hyperParameters.m_numberOfActions = m_actionsSize;
