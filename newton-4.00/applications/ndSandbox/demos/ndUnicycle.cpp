@@ -396,7 +396,7 @@ namespace ndUnicycle
 			const ndVector comAlpha(comDynamics.m_alpha);
 			const ndVector comVeloc(comDynamics.m_veloc);
 
-			ndFloat32 speedReward = ndExp(-100.0f * comVeloc.m_z * comVeloc.m_z);
+			ndFloat32 speedReward = ndExp(-1.0f * comVeloc.m_z * comVeloc.m_z);
 
 			ndFloat32 omegaReward = PolynomialOmegaReward(comOmega.m_x);
 			ndFloat32 alphaReward = PolynomialAccelerationReward(comAlpha.m_x);
