@@ -1592,6 +1592,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::Optimize()
 		}
 	}
 	
+	m_context->SyncBufferCommandQueue();
 	m_policyTrainer->GetWeightAndBiasBuffer()->VectorFromDevice(m_scratchBuffer);
 	m_policyTrainer->UpdateParameters(m_scratchBuffer);
 }
