@@ -565,8 +565,9 @@ void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
 	world->AddModel(referenceModel);
 	referenceModel->AddBodiesAndJointsToWorld();
 		
-	ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
-	//world->AddJoint(fixJoint);
+	//ndSharedPtr<ndJointBilateralConstraint> fixJoint(new ndJointFix6dof(referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetMatrix(), referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
+	ndSharedPtr<ndJointBilateralConstraint> upVector(new ndJointUpVector(ndVector (0.0f, 1.0f, 0.0f, 0.0f), referenceModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic(), world->GetSentinelBody()));
+	world->AddJoint(upVector);
 	
 	matrix.m_posit.m_x -= 4.0f;
 	matrix.m_posit.m_y += 1.0f;
