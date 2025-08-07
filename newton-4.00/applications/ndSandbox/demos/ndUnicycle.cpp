@@ -394,9 +394,13 @@ namespace ndUnicycle
 			const ndModelArticulation::ndCenterOfMassDynamics comDynamics(GetModel()->GetAsModelArticulation()->CalculateCentreOfMassDynamics(solver, comFrame, extraJoint, m_timestep));
 			const ndVector comOmega(comDynamics.m_omega);
 			const ndVector comAlpha(comDynamics.m_alpha);
+			const ndVector comVeloc(comDynamics.m_veloc);
+
+			ndFloat32 speedReward = ndExp(-100.0f * comVeloc.m_z * comVeloc.m_z);
+
 			ndFloat32 omegaReward = PolynomialOmegaReward(comOmega.m_x);
 			ndFloat32 alphaReward = PolynomialAccelerationReward(comAlpha.m_x);
-			ndFloat32 reward = ndFloat32(0.5f) * omegaReward + ndFloat32(0.5f) * alphaReward;
+			ndFloat32 reward = ndFloat32(0.2f) * speedReward +  ndFloat32(0.4f) * omegaReward + ndFloat32(0.4f) * alphaReward;
 
 			if (IsOnAir())
 			{
@@ -405,7 +409,7 @@ namespace ndUnicycle
 				const ndVector wheelOmega(m_wheel->GetOmega());
 				ndFloat32 speed = (wheelOmega.DotProduct(wheelMatrix.m_front)).GetScalar();
 
-				ndFloat32 arg = -0.05f * speed * speed;
+				ndFloat32 arg = -0.5f * speed * speed;
 				reward = ndExp(arg);
 			}
 			return ndBrainFloat(reward);
