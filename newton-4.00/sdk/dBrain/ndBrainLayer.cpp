@@ -132,7 +132,12 @@ void ndBrainLayer::ApplyDropOut(ndFloat32)
 {
 }
 
-void ndBrainLayer::InitWeights()
+void ndBrainLayer::InitWeights_he()
+{
+	ndAssert(0);
+}
+
+void ndBrainLayer::InitWeights_xavier()
 {
 	ndAssert(0);
 }

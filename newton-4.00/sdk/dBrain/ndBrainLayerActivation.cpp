@@ -111,9 +111,9 @@ void ndBrainLayerActivation::AdamUpdate(const ndBrainLayer&, const ndBrainLayer&
 	ndAssert(0);
 }
 
-void ndBrainLayerActivation::InitWeights()
-{
-}
+//void ndBrainLayerActivation::InitWeights()
+//{
+//}
 
 void ndBrainLayerActivation::Blend(const ndBrainLayer&, ndBrainFloat)
 {

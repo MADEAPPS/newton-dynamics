@@ -79,6 +79,8 @@ void ndBrainLayerActivationTanh::MakePrediction(const ndBrainVector& input, ndBr
 	{
 		ndBrainFloat value = ndClamp(src[i], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
 		dst[i] = ndBrainFloat(ndTanh(value));
+		ndAssert(dst[i] <= ndFloat32(1000.0f));
+		ndAssert(dst[i] >= ndFloat32(-1000.0f));
 	}
 	output.FlushToZero();
 }

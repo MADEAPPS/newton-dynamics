@@ -25,7 +25,10 @@
 #include "ndBrainTrainer.h"
 #include "ndBrainSaveLoad.h"
 #include "ndBrainContext.h"
+#include "ndBrainLayerLinear.h"
+#include "ndBrainLayerActivationRelu.h"
 #include "ndBrainLossLeastSquaredError.h"
+#include "ndBrainLayerActivationLeakyRelu.h"
 
 ndBrain::ndBrain()
 	:ndArray<ndBrainLayer*>()
@@ -143,7 +146,29 @@ void ndBrain::InitWeights()
 	for (ndInt32 i = ndInt32(layers.GetCount() - 1); i >= 0; --i)
 	{
 		ndBrainLayer* const layer = layers[i];
-		layer->InitWeights();
+		if (strcmp(layer->GetLabelId(), ND_BRAIN_LAYER_LINEAR_NAME) == 0)
+		{
+			if ((i + 1) < layers.GetCount())
+			{
+				ndBrainLayer* const activationLayer = layers[i + 1];
+				if ((strcmp(activationLayer->GetLabelId(), ND_BRAIN_LAYER_ACTIVATION_RELU_NAME) == 0) ||
+					//strcmp(activationLayer->GetLabelId(), ND_BRAIN_LAYER_ACTIVATION_RELU_NAME) == 0) ||
+					(strcmp(activationLayer->GetLabelId(), ND_BRAIN_LAYER_ACTIVATION_LEAKY_RELU_NAME) == 0))
+				{
+					layer->InitWeights_he();
+				}
+				else
+				{
+					layer->InitWeights_xavier();
+				}
+			}
+			else
+			{
+				layer->InitWeights_xavier();
+			}
+
+			//layer->InitWeights();
+		}
 	}
 }
 

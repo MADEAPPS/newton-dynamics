@@ -76,6 +76,8 @@ void ndBrainLayerActivationRelu::MakePrediction(const ndBrainVector& input, ndBr
 	for (ndInt32 i = ndInt32(input.GetCount() - 1); i >= roundCount; --i)
 	{
 		output[i] = ndMax (input[i], ndBrainFloat (0.0f));
+		ndAssert(output[i] <= ndFloat32(1000.0f));
+		ndAssert(output[i] >= ndFloat32(-1000.0f));
 	}
 }
 

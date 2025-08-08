@@ -36,9 +36,11 @@
 #include "ndBrainLayerActivationLeakyRelu.h"
 #include "ndBrainAgentOffPolicyGradient_Trainer.h"
 
-#define ND_HIDEN_LAYERS_ACTIVATION				ndBrainLayerActivationRelu
+// this activation suffers a lot form expodict gradienst, when many neuron die, 
+//#define ND_HIDEN_LAYERS_ACTIVATION				ndBrainLayerActivationRelu
+// trying leaky linear retifies to see if is better at dealy with banishing gradient
+#define ND_HIDEN_LAYERS_ACTIVATION			ndBrainLayerActivationLeakyRelu
 //#define ND_HIDEN_LAYERS_ACTIVATION			ndBrainLayerActivationTanh
-//#define ND_HIDEN_LAYERS_ACTIVATION			ndBrainLayerActivationLeakyRelu
  
 #define ND_POLICY_DEFAULT_ENTROPY_TEMPERATURE	ndBrainFloat(0.05f)
 #define ND_POLICY_TRAINING_EXPLORATION_NOISE	ndBrainFloat(0.2f)
@@ -127,6 +129,11 @@ class ndBrainAgentOffPolicyGradient_Trainer::ndActivation : public ndBrainLayerA
 		{
 			output[i] = input[i];
 			output[size + i] = ndExp(input[size + i]);
+
+			ndAssert(output[i] <= ndFloat32(1000.0f));
+			ndAssert(output[i] >= ndFloat32(-1000.0f));
+			ndAssert(output[size + i] <= ndFloat32(1000.0f));
+			ndAssert(output[size + i] >= ndFloat32(-1000.0f));
 		}
 	}
 

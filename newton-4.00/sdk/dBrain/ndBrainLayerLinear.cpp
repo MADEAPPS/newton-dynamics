@@ -96,33 +96,26 @@ bool ndBrainLayerLinear::HasParameters() const
 	return true;
 }
 
-void ndBrainLayerLinear::InitWeights()
+void ndBrainLayerLinear::InitWeights_he()
 {
 	m_bias.Set(ndBrainFloat(0.0f));
-	ndBrainFloat variance = ndBrainFloat(ndSqrt(ndFloat32(1.0f) / ndFloat32(GetOutputSize())));
+	ndBrainFloat variance = ndBrainFloat(ndSqrt(ndFloat32(2.0f) / ndFloat32(GetInputSize())));
 	for (ndInt32 i = ndInt32(m_weights.GetCount() - 1); i >= 0; --i)
 	{
 		m_weights[i].InitGaussianWeights(variance);
 	}
-
-#if 0
-	for (ndInt32 i = 0; i < ndInt32(m_bias.GetCount()); ++i)
-	{
-		//m_bias[i] = ndFloat32(i + 1) * 10000.0f;
-		m_bias[i] = 0.0f;
-	}
-
-	m_weights[0].Set(ndFloat32(0.0f));
-	m_weights[0][0] = 1.0f;
-	for (ndInt32 i = 1; i < ndInt32(m_weights.GetCount()); ++i)
-	{
-		m_weights[i].Set(ndFloat32(0.0f));
-		m_weights[i][i] = ndFloat32(i + 1);
-		m_weights[i - 1][i] = ndFloat32(i + 1);
-		m_weights[i][i-1] = ndFloat32(i);
-	}
-#endif
 }
+
+void ndBrainLayerLinear::InitWeights_xavier()
+{
+	m_bias.Set(ndBrainFloat(0.0f));
+	ndBrainFloat variance = ndBrainFloat(ndSqrt(ndFloat32(2.0f) / ndFloat32(GetOutputSize() + GetInputSize())));
+	for (ndInt32 i = ndInt32(m_weights.GetCount() - 1); i >= 0; --i)
+	{
+		m_weights[i].InitGaussianWeights(variance);
+	}
+}
+
 
 void ndBrainLayerLinear::Clear()
 {

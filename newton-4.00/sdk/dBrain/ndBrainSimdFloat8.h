@@ -125,6 +125,8 @@ inline ndBrainSimdFloat8 ndBrainSimdFloat8::Max(const ndBrainSimdFloat8& max) co
 	for (ndInt32 i = 0; i < 8; ++i)
 	{
 		tmp.m_f[i] = ndMax(m_f[i], max.m_f[i]);
+		ndAssert(tmp.m_f[i] <= ndFloat32(1000.0f));
+		ndAssert(tmp.m_f[i] >= ndFloat32(-1000.0f));
 	}
 	return tmp;
 
@@ -136,6 +138,8 @@ inline ndBrainSimdFloat8 ndBrainSimdFloat8::Tanh() const
 	for (ndInt32 i = 0; i < 8; ++i)
 	{
 		tmp.m_f[i] = ndBrainFloat(ndTanh(m_f[i]));
+		ndAssert(tmp.m_f[i] <= ndFloat32(1000.0f));
+		ndAssert(tmp.m_f[i] >= ndFloat32(-1000.0f));
 	}
 	return tmp;
 }

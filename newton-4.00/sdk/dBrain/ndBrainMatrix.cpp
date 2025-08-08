@@ -194,6 +194,9 @@ void ndBrainMatrix::Mul(const ndBrainVector& input, ndBrainVector& output) const
 	{
 		const ndBrainVector& row = me[i];
 		output[i] = ndDotProduct(columns, &row[0], &input[0]);
+		// exploding gradients
+		ndAssert(output[i] <= ndFloat32(1000.0f));
+		ndAssert(output[i] >= ndFloat32(-1000.0f));
 	}
 }
 

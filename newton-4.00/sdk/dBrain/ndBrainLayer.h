@@ -99,9 +99,10 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void AddReqularizerL1(const ndBrainLayer& weights, ndBrainFloat regularizer);
 	virtual void AddReqularizerL2(const ndBrainLayer& weights, ndBrainFloat regularizer);
 
-	virtual void ApplyDropOut(ndFloat32 rate);
-	virtual void InitWeights();
+	virtual void InitWeights_he();
+	virtual void InitWeights_xavier();
 
+	virtual void ApplyDropOut(ndFloat32 rate);
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	virtual void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
 
