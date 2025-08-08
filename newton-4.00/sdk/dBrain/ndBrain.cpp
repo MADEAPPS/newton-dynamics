@@ -222,11 +222,6 @@ void ndBrain::MakePrediction(const ndBrainVector& input, ndBrainVector& output, 
 	for (ndInt32 i = 0; i < GetCount(); ++i)
 	{
 		out.SetSize(layers[i]->GetOutputSize());
-for (int j = 0; j < in.GetCount(); ++j)
-{
-ndAssert((in[j] >= -1000.0f) && (in[j] <= 1000.0f));
-}
-
 		layers[i]->MakePrediction(in, out);
 		in.Swap(out);
 	}
