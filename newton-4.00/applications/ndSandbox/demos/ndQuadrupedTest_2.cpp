@@ -1254,7 +1254,7 @@ namespace ndQuadruped_2
 			}
 			
 			ndFloat32 stopScore = ndFloat32(m_master->GetAverageFrames() * m_master->GetAverageScore());
-			if ((stopTraining >= m_stopTraining) || (stopScore > ndFloat32(95.0f) * ndFloat32(m_master->m_parameters.m_maxTrajectorySteps)))
+			if ((stopTraining >= m_stopTraining) || (stopScore > ndFloat32(0.95f) * ndFloat32(m_master->m_parameters.m_maxTrajectorySteps)))
 			{
 				char fileName[1024];
 				m_modelIsTrained = true;
@@ -1265,13 +1265,6 @@ namespace ndQuadruped_2
 				ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
 				ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
 				manager->Terminate();
-			} 
-			else if (episodeCount && (stopScore > ndFloat32(91.0f) * ndFloat32(m_master->m_parameters.m_maxTrajectorySteps)))
-			{
-				char fileName[1024];
-				ndGetWorkingFileName(m_master->GetName().GetStr(), fileName);
-				m_bestActor->SaveToFile(fileName);
-				ndExpandTraceMessage("saving to file: %s\n", fileName);
 			}
 		}
 

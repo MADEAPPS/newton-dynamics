@@ -55,7 +55,7 @@ ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 	m_criticLearnRate = ndBrainFloat(1.0e-4f);
 	m_policyRegularizer = ndBrainFloat(1.0e-4f);
 	m_criticRegularizer = ndBrainFloat(1.0e-4f);
-	m_discountRewardFactor = ndBrainFloat(0.998f);
+	m_discountRewardFactor = ndBrainFloat(0.995f);
 
 	m_polyakBlendFactor = ND_POLICY_DEFAULT_POLYAK_BLEND;
 	m_entropyTemperature = ND_POLICY_DEFAULT_ENTROPY_TEMPERATURE;
@@ -497,9 +497,9 @@ ndBrainAgentOffPolicyGradient_Trainer::ndBrainAgentOffPolicyGradient_Trainer(con
 	,m_agent(nullptr)
 	,m_randomGenerator(std::random_device{}())
 	,m_uniformDistribution(ndFloat32(0.0f), ndFloat32(1.0f))
+	, m_uniformRandom(nullptr)
 	,m_minibatchMean(nullptr)
 	,m_minibatchSigma(nullptr)
-	,m_uniformRandom(nullptr)
 	,m_replayBufferFlat(nullptr)
 	,m_minibatchNoTerminal(nullptr)
 	,m_minibatchOfTransitions(nullptr)
@@ -514,6 +514,7 @@ ndBrainAgentOffPolicyGradient_Trainer::ndBrainAgentOffPolicyGradient_Trainer(con
 	,m_averageExpectedRewards()
 	,m_averageFramesPerEpisodes()
 	,m_frameCount(0)
+	,m_horizonSteps(0)
 	,m_eposideCount(0)
 	,m_policyDelayMod(0)
 	,m_replayBufferIndex(0)
@@ -536,6 +537,15 @@ ndBrainAgentOffPolicyGradient_Trainer::ndBrainAgentOffPolicyGradient_Trainer(con
 	else
 	{
 		m_context = ndSharedPtr<ndBrainContext>(new ndBrainCpuContext);
+	}
+
+	
+	ndFloat32 gain = ndFloat32(1.0f);
+	ndFloat32 maxGain = ndFloat32(0.98f) / (ndFloat32(1.0f) - m_parameters.m_discountRewardFactor);
+	for (ndInt32 i = 0; (i < m_parameters.m_maxTrajectorySteps / 4) && (gain < maxGain); ++i)
+	{
+		gain = ndFloat32(1.0f) + m_parameters.m_discountRewardFactor * gain;
+		m_horizonSteps++;
 	}
 
 	// create actor class
@@ -767,8 +777,8 @@ ndUnsigned32 ndBrainAgentOffPolicyGradient_Trainer::GetEposideCount() const
 
 ndFloat32 ndBrainAgentOffPolicyGradient_Trainer::GetAverageScore() const
 {
-	ndBrainFloat horizon = ndBrainFloat(1.0f) / (ndFloat32(1.0f) - m_parameters.m_discountRewardFactor);
-	ndBrainFloat score = ndBrainFloat(100.0f) * m_averageExpectedRewards.GetAverage() / horizon;
+	ndBrainFloat maxScopre = ndBrainFloat(1.0f) / (ndFloat32(1.0f) - m_parameters.m_discountRewardFactor);
+	ndBrainFloat score = ndBrainFloat(1.0f) * m_averageExpectedRewards.GetAverage() / maxScopre;
 	return score;
 }
 
@@ -796,8 +806,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::CalculateScore()
 	ndInt32 numberOfSteps = trajectory.GetCount();
 	if (!trajectory.GetTerminalState(trajectory.GetCount() - 1))
 	{
-		ndInt32 horizonSteps = ndInt32 (ndFloat32(1.0f) / (ndFloat32(1.0f) - m_parameters.m_discountRewardFactor));
-		numberOfSteps -= horizonSteps;
+		numberOfSteps -= m_horizonSteps;
 		if (numberOfSteps < 100)
 		{
 			numberOfSteps = 100;

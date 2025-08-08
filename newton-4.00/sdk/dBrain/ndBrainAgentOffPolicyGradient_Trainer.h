@@ -217,12 +217,10 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 	std::mt19937 m_randomGenerator;
 	std::uniform_real_distribution<ndFloat32> m_uniformDistribution;
 
+	ndSharedPtr<ndBrainFloatBuffer> m_uniformRandom;
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchMean;
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchSigma;
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchEntropy;
-	//ndSharedPtr<ndBrainFloatBuffer> m_minibatchEntropyGradient;
-
-	ndSharedPtr<ndBrainFloatBuffer> m_uniformRandom;
 	ndSharedPtr<ndBrainFloatBuffer> m_replayBufferFlat;
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchNoTerminal;
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchOfTransitions;
@@ -241,10 +239,12 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 	ndMovingAverage<ND_OFF_POLICY_MOVING_AVERAGE_SCORE> m_averageFramesPerEpisodes;
 
 	ndUnsigned32 m_frameCount;
+	ndUnsigned32 m_horizonSteps;
 	ndUnsigned32 m_eposideCount;
 	ndUnsigned32 m_policyDelayMod;
 	ndUnsigned32 m_replayBufferIndex;
 	ndUnsigned32 m_shuffleBatchIndex;
+	
 	bool m_replayIsFilled;
 	bool m_startOptimization;
 

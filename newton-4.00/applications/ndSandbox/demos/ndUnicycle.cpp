@@ -45,6 +45,7 @@ namespace ndUnicycle
 		m_poleAngle,
 		m_poleOmega,
 		m_wheelOmega,
+		m_velocity,
 		m_hasSupportContact,
 		m_observationsSize
 	};
@@ -76,6 +77,7 @@ namespace ndUnicycle
 		ndSharedPtr<ndBody> rootBody(CreateRigidBody(entity, matrix, boxMass, nullptr));
 		ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(rootBody);
 		rootBody->GetAsBodyKinematic()->SetAngularDamping(ndVector(0.5f));
+		modelRootNode->m_name = "box";
 
 		ndSharedPtr<ndDemoEntity> poleEntity(entity->GetChildren().GetFirst()->GetInfo());
 		const ndMatrix poleMatrix(poleEntity->GetCurrentMatrix() * matrix);
@@ -248,6 +250,8 @@ namespace ndUnicycle
 			SetModel(model);
 			m_poleJoint = (ndJointHinge*)*model->FindByName("leg")->m_joint;
 			m_wheelJoint = (ndJointHinge*)*model->FindByName("wheel")->m_joint;
+
+			m_box = model->FindByName("box")->m_body->GetAsBodyDynamic();
 			m_wheel = model->FindByName("wheel")->m_body->GetAsBodyDynamic();
 			m_pole = model->FindByName("leg")->m_body->GetAsBodyDynamic();
 
@@ -394,9 +398,9 @@ namespace ndUnicycle
 			const ndModelArticulation::ndCenterOfMassDynamics comDynamics(GetModel()->GetAsModelArticulation()->CalculateCentreOfMassDynamics(solver, comFrame, extraJoint, m_timestep));
 			const ndVector comOmega(comDynamics.m_omega);
 			const ndVector comAlpha(comDynamics.m_alpha);
-			const ndVector comVeloc(comDynamics.m_veloc);
 
-			ndFloat32 speedReward = ndExp(-1.0f * comVeloc.m_z * comVeloc.m_z);
+			ndVector veloc(m_box->GetVelocity());
+			ndFloat32 speedReward = ndExp(-100.0f * veloc.m_x * veloc.m_x);
 
 			ndFloat32 omegaReward = PolynomialOmegaReward(comOmega.m_x);
 			ndFloat32 alphaReward = PolynomialAccelerationReward(comAlpha.m_x);
@@ -444,6 +448,10 @@ namespace ndUnicycle
 			ndFloat32 wheelOmega(m_wheel->GetOmega().DotProduct(poleMatrix.m_front).GetScalar());
 			wheelOmega *= 1.0f / 20.0f;
 
+			ndVector veloc(m_box->GetVelocity());
+			ndBrainFloat speed = ndClamp(ndBrainFloat(veloc.m_x), ndBrainFloat(-6.0f), ndBrainFloat(6.0f)) / 6.0f;
+
+			observation[m_velocity] = speed;
 			observation[m_poleAngle] = ndBrainFloat(poleAngle);
 			observation[m_poleOmega] = ndBrainFloat(poleOmega);
 			observation[m_wheelOmega] = ndBrainFloat(wheelOmega);
@@ -506,6 +514,7 @@ namespace ndUnicycle
 		ndControllerTrainer* m_controllerTrainer;
 		ndJointHinge* m_poleJoint;
 		ndJointHinge* m_wheelJoint;
+		ndBodyKinematic* m_box;
 		ndBodyKinematic* m_wheel;
 		ndBodyKinematic* m_pole;
 		ndFloat32 m_timestep;
@@ -673,7 +682,7 @@ namespace ndUnicycle
 				}
 			}
 
-			if ((stopTraining >= m_stopTraining) || (m_master->GetAverageScore() > 95.0f))
+			if ((stopTraining >= m_stopTraining) || (m_master->GetAverageScore() > 0.95f))
 			{
 				char fileName[1024];
 				m_modelIsTrained = true;
