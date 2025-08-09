@@ -127,13 +127,13 @@ class ndBrainTaskImplementNew : public ndTask
 		ndInt32 jobsCount,
 		ndInt32 jobsStride,
 		ndInt32 threadIndex)
-		:ndTask(0)
+		:ndTask(m_threadIndex)
 		,m_function(function)
 		,m_threadPool(threadPool)
 		,m_threadIterator(threadIterator)
 		,m_jobsCount(jobsCount)
 		,m_jobsStride(jobsStride)
-		,m_threadIndex(threadIndex)
+		//,m_threadIndex(threadIndex)
 	{
 	}
 
@@ -157,7 +157,7 @@ class ndBrainTaskImplementNew : public ndTask
 	ndAtomic<ndInt32>& m_threadIterator;
 	const ndInt32 m_jobsCount;
 	const ndInt32 m_jobsStride;
-	const ndInt32 m_threadIndex;
+	//const ndInt32 m_threadIndex;
 	friend class ndBrainThreadPool;
 };
 
