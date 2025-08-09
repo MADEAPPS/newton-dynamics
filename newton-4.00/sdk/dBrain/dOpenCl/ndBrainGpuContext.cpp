@@ -28,8 +28,6 @@
 ndBrainGpuContext::ndBrainGpuContext()
 	:ndBrainContext()
 {
-	m_supportMappedMemory = false;
-
 	// get all devices of all platforms
 	std::vector<cl::Device> cl_devices;
 	{
@@ -69,15 +67,16 @@ ndBrainGpuContext::ndBrainGpuContext()
 		const std::string name(m_device->getInfo<CL_DEVICE_NAME>());
 		const std::string version(m_device->getInfo<CL_DEVICE_VERSION>());
 		size_t localMemorySize = m_device->getInfo<CL_DEVICE_LOCAL_MEM_SIZE>();
-		size_t compute_units = m_device->getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>();
+		size_t computeUnits = m_device->getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>();
+		m_maxBufferSize = m_device->getInfo<CL_DEVICE_MAX_MEM_ALLOC_SIZE>();
 
 		ndExpandTraceMessage("\n");
 		ndExpandTraceMessage("selecting:\n");
-		ndExpandTraceMessage("opencl device name: %s\n", name.c_str());
-		ndExpandTraceMessage("opencl device version: %s\n", version.c_str());
+		ndExpandTraceMessage("open cl device name: %s\n", name.c_str());
+		ndExpandTraceMessage("open cl device version: %s\n", version.c_str());
 
-		ndExpandTraceMessage("opencl device compute units: %d\n", compute_units);
-		ndExpandTraceMessage("opencl device local memory: %d\n", localMemorySize);
+		ndExpandTraceMessage("open cl device compute units: %d\n", computeUnits);
+		ndExpandTraceMessage("open cl device local memory: %d\n", localMemorySize);
 		ndExpandTraceMessage("\n");
 
 		cl_int error = 0;
@@ -90,15 +89,8 @@ ndBrainGpuContext::ndBrainGpuContext()
 
 		m_emptyBuffer = cl::Buffer(**m_context, CL_MEM_READ_WRITE, 256);
 
-		cl_device_svm_capabilities svm_caps(m_device->getInfo<CL_DEVICE_SVM_CAPABILITIES>(&error));
-
-		if (error == CL_SUCCESS)
-		{
-			if (svm_caps & CL_DEVICE_SVM_FINE_GRAIN_BUFFER)
-			{
-				m_supportMappedMemory = true;
-			}
-		}
+		
+		
 
 		CreateKerners();
 		CreateCopyCommands();
@@ -125,12 +117,6 @@ void CL_CALLBACK ndBrainGpuContext::clNotification(const char* errinfo, const vo
 	private_info = nullptr;
 }
 
-bool ndBrainGpuContext::SupportsMappedMemory() const
-{
-	//return m_supportMappedMemory;
-	return false;
-}
-
 size_t ndBrainGpuContext::GetDeviceScore(cl::Device& device)
 {
 	const bool is_gpu = device.getInfo<CL_DEVICE_TYPE>() == CL_DEVICE_TYPE_GPU;
@@ -154,7 +140,7 @@ void ndBrainGpuContext::CreateCopyCommands()
 	m_copyStridedBufferIndirectCommand = ndSharedPtr<ndBrainGpuCommand>(new ndBrainGpuCommand(copyIndirectDescriptor));
 
 	ndCopyBufferCommandInfo copyBuffer;
-	m_copyStridedBufferParams = ndSharedPtr<ndBrainUniformBuffer>(new ndBrainUniformBuffer(this, sizeof(ndCopyBufferCommandInfo), &copyBuffer, true));
+	m_copyStridedBufferParams = ndSharedPtr<ndBrainUniformBuffer>(new ndBrainUniformBuffer(this, sizeof(ndCopyBufferCommandInfo), &copyBuffer));
 }
 
 void ndBrainGpuContext::MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, const void* const srcMemory) const
@@ -166,24 +152,9 @@ void ndBrainGpuContext::MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offse
 	cl_int error = 0;
 	const cl::CommandQueue* queue = *m_queue;
 	ndBrainGpuBuffer* const buffer = deviceBuffer.GetGpuBuffer();
-	if (buffer->m_memory)
-	{
-		// if the queue has to be flushed to get the memory,
-		// then to me, this is not different that just calling enqueueWriteBuffer
-		// but I use it in case there is some different
-		error = m_queue->finish();
-		ndAssert(error == CL_SUCCESS);
+	error = queue->enqueueWriteBuffer(**buffer->m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, srcMemory);
+	ndAssert(error == CL_SUCCESS);
 
-		ndAssert(buffer->m_owner->m_isMemoryMapped);
-		ndInt64 size = ndInt64(sizeInBytes / sizeof(ndUnsigned32));
-		ndInt64 offset = ndInt64(offsetInBytes / sizeof(ndUnsigned32));
-		ndMemCpy(&buffer->m_memory[offset], (ndUnsigned32*)srcMemory, size);
-	}
-	else
-	{
-		error = queue->enqueueWriteBuffer(**buffer->m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, srcMemory);
-		ndAssert(error == CL_SUCCESS);
-	}
 }
 
 void ndBrainGpuContext::MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
@@ -195,24 +166,8 @@ void ndBrainGpuContext::MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size
 	cl_int error = 0;
 	const cl::CommandQueue* queue = *m_queue;
 	const ndBrainGpuBuffer* const buffer = deviceBuffer.GetGpuBuffer();
-	if (buffer->m_memory)
-	{
-		// if the queue has to be flushed to get the memory,
-		// then to me, this is not different that just calling enqueueWriteBuffer
-		// but I use it in case there is some different
-		error = m_queue->finish();
-		ndAssert(error == CL_SUCCESS);
-
-		ndAssert(buffer->m_owner->m_isMemoryMapped);
-		ndInt64 size = ndInt64(sizeInBytes / sizeof(ndUnsigned32));
-		ndInt64 offset = ndInt64(offsetInBytes / sizeof(ndUnsigned32));
-		ndMemCpy((ndUnsigned32*)outputMemory, &buffer->m_memory[offset], size);
-	}
-	else
-	{
-		error = queue->enqueueReadBuffer(**buffer->m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, outputMemory);
-		ndAssert(error == CL_SUCCESS);
-	}
+	error = queue->enqueueReadBuffer(**buffer->m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, outputMemory);
+	ndAssert(error == CL_SUCCESS);
 }
 
 void ndBrainGpuContext::BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVector& dstVector)

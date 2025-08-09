@@ -113,11 +113,11 @@ void ndBrainTrainer::Initialize()
 
 	buffer.SetCount(ndInt64(m_miniBatchInputBuffer->GetCount()));
 	buffer.Set(ndReal(0.0f));
-	m_miniBatchInputGradientBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_descriptor.m_context, buffer, true));
+	m_miniBatchInputGradientBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_descriptor.m_context, buffer));
 
 	buffer.SetCount(ndInt64(m_miniBatchOutputBuffer->GetCount()));
 	buffer.Set(ndReal(0.0f));
-	m_miniBatchOutputGradientBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_descriptor.m_context, buffer, true));
+	m_miniBatchOutputGradientBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_descriptor.m_context, buffer));
 	
 	AddCopyOutputGradientCommand();
 	AddLayersGradientCommands();

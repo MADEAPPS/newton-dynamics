@@ -27,7 +27,6 @@ class ndBrainGpuBuffer : public ndClassAlloc
 
 	ndSharedPtr<cl::Buffer> m_buffer;
 	ndBrainBuffer* m_owner;
-	ndUnsigned32* m_memory;
 
 	friend class ndBrainBuffer;
 	friend class ndBrainGpuContext;

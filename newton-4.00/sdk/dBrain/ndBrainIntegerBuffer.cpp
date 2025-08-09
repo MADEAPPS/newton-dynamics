@@ -15,8 +15,8 @@
 #include "ndBrainCpuContext.h"
 #include "ndBrainIntegerBuffer.h"
 
-ndBrainIntegerBuffer::ndBrainIntegerBuffer(ndBrainContext* const context, ndInt64 sizeInElements, bool memoryMapped)
-	:ndBrainBuffer(context, sizeInElements * ndInt64(sizeof(ndUnsigned32)), memoryMapped)
+ndBrainIntegerBuffer::ndBrainIntegerBuffer(ndBrainContext* const context, ndInt64 sizeInElements)
+	:ndBrainBuffer(context, sizeInElements * ndInt64(sizeof(ndUnsigned32)))
 {
 	if (m_context->GetAsCpuContext())
 	{
@@ -26,8 +26,8 @@ ndBrainIntegerBuffer::ndBrainIntegerBuffer(ndBrainContext* const context, ndInt6
 	//m_context->MemoryToDevice(*this, 0, flatArray);
 }
 
-ndBrainIntegerBuffer::ndBrainIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32* const indexArray, bool memoryMapped)
-	:ndBrainBuffer(context, numberOfElements * ndInt64(sizeof(ndUnsigned32)), memoryMapped)
+ndBrainIntegerBuffer::ndBrainIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32* const indexArray)
+	:ndBrainBuffer(context, numberOfElements * ndInt64(sizeof(ndUnsigned32)))
 {
 	if (m_context->GetAsCpuContext())
 	{

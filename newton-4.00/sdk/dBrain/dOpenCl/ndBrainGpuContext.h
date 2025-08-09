@@ -90,7 +90,6 @@ class ndBrainGpuContext : public ndBrainContext
 	private:
 	void CreateKerners();
 	void CreateCopyCommands();
-	bool SupportsMappedMemory() const;
 	size_t GetDeviceScore(cl::Device& device);
 	ndSharedPtr<ndBrainKernel> CreateKerner(const cl::Program& program, const char* const functionMame) const;
 	static void CL_CALLBACK clNotification(const char* errinfo, const void* private_info, size_t cb, void* user_data);
@@ -106,10 +105,10 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<cl::CommandQueue> m_queue;
 	cl::Buffer m_emptyBuffer;
 
-	bool m_supportMappedMemory;
+	size_t m_maxBufferSize;
 
 	public:
-	// feed foward shaders
+	// feed forward shaders
 	ndSharedPtr<ndBrainKernel> m_brainCopyInput;
 	ndSharedPtr<ndBrainKernel> m_brainCopyOutput;
 	ndSharedPtr<ndBrainKernel> m_brainLayerReluActivation;
@@ -143,7 +142,7 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainKernel> m_brainAdamRidgeOptimizerUpdate;
 	ndSharedPtr<ndBrainKernel> m_brainAdamLassoOptimizerUpdate;
 
-	// shader strided buffers
+	// shader stride buffers
 	ndSharedPtr<ndBrainKernel> m_brainCopyStridedBuffer;
 	ndSharedPtr<ndBrainKernel> m_brainCopyStridedBufferIndirect;
 	ndSharedPtr<ndBrainUniformBuffer> m_copyStridedBufferParams;
@@ -175,7 +174,6 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainKernel> m_brainNormalDistribution;
 	ndSharedPtr<ndBrainKernel> m_brainEntropyRegularization;
 	ndSharedPtr<ndBrainKernel> m_brainEntropyRegularizationGradient;
-
 
 	static const char* m_mathOpsCommand;
 	static const char* m_matrixMultiply;

@@ -479,7 +479,7 @@ static void MnistTrainingSet()
 		trainer.m_testLabels = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*context, **testLabels));
 		trainer.m_trainingData = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*context, **trainingDigits));
 		trainer.m_trainingLabels = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*context, **trainingLabels));
-		trainer.m_indirectMiniBatch = ndSharedPtr<ndBrainIntegerBuffer>(new ndBrainIntegerBuffer(*context, trainer.m_miniBatchSize, true));
+		trainer.m_indirectMiniBatch = ndSharedPtr<ndBrainIntegerBuffer>(new ndBrainIntegerBuffer(*context, trainer.m_miniBatchSize));
 
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
 		trainer.Optimize(*trainingLabels, *testLabels);

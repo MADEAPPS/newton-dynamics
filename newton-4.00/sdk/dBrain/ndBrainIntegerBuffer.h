@@ -16,8 +16,8 @@
 class ndBrainIntegerBuffer : public ndBrainBuffer
 {
 	public:
-	ndBrainIntegerBuffer(ndBrainContext* const context, ndInt64 sizeInElements, bool memoryMapped = false);
-	ndBrainIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32* const indexArray, bool memoryMapped = false);
+	ndBrainIntegerBuffer(ndBrainContext* const context, ndInt64 sizeInElements);
+	ndBrainIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32* const indexArray);
 
 	virtual void* GetCpuPtr() override;
 	virtual void* GetCpuPtr() const override;

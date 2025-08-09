@@ -16,8 +16,8 @@
 class ndBrainUniformBuffer : public ndBrainBuffer
 {
 	public:
-	ndBrainUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, bool memoryMapped = false);
-	ndBrainUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, const void* const data, bool memoryMapped = false);
+	ndBrainUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes);
+	ndBrainUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, const void* const data);
 
 	virtual void* GetCpuPtr() override;
 	virtual void* GetCpuPtr() const override;

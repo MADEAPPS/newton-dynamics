@@ -14,8 +14,8 @@
 #include "ndBrainCpuContext.h"
 #include "ndBrainUniformBuffer.h"
 
-ndBrainUniformBuffer::ndBrainUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, bool memoryMapped)
-	:ndBrainBuffer(context, sizeInBytes, memoryMapped)
+ndBrainUniformBuffer::ndBrainUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes)
+	:ndBrainBuffer(context, sizeInBytes)
 {
 	if (m_context->GetAsCpuContext())
 	{
@@ -27,8 +27,8 @@ ndBrainUniformBuffer::ndBrainUniformBuffer(ndBrainContext* const context, ndInt3
 	}
 }
 
-ndBrainUniformBuffer::ndBrainUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, const void* const data, bool memoryMapped)
-	:ndBrainBuffer(context, sizeInBytes, memoryMapped)
+ndBrainUniformBuffer::ndBrainUniformBuffer(ndBrainContext* const context, ndInt32 sizeInBytes, const void* const data)
+	:ndBrainBuffer(context, sizeInBytes)
 {
 	sizeInBytes += (sizeof(ndUnsigned32) - 1) & -ndInt32 (sizeof(ndUnsigned32));
 	if (m_context->GetAsCpuContext())

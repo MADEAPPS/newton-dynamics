@@ -50,7 +50,7 @@ class ndBrainBuffer : public ndContainersFreeListAlloc<ndBrainBuffer>
 {
 	protected:
 	ndBrainBuffer(const ndBrainBuffer& src);
-	ndBrainBuffer(ndBrainContext* const context, ndInt64 sizeInByte, bool memoryMapped = false);
+	ndBrainBuffer(ndBrainContext* const context, ndInt64 sizeInByte);
 
 	public:
 	virtual ~ndBrainBuffer();
@@ -66,7 +66,6 @@ class ndBrainBuffer : public ndContainersFreeListAlloc<ndBrainBuffer>
 	ndBrainContext* m_context;
 	ndSharedPtr<ndBrainGpuBuffer> m_gpuBuffer;
 	size_t m_sizeInBytes;
-	bool m_isMemoryMapped;
 
 	friend class ndBrainGpuBuffer;
 	friend class ndBrainGpuContext;

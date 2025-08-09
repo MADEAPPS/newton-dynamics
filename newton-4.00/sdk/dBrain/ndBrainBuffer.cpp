@@ -18,7 +18,6 @@ ndBrainBuffer::ndBrainBuffer(const ndBrainBuffer& src)
 	:ndContainersFreeListAlloc<ndBrainBuffer>()
 	,m_context(src.m_context)
 	,m_sizeInBytes(src.m_sizeInBytes)
-	,m_isMemoryMapped(src.m_isMemoryMapped)
 {
 	if (m_context->GetAsGpuContext())
 	{
@@ -26,11 +25,10 @@ ndBrainBuffer::ndBrainBuffer(const ndBrainBuffer& src)
 	}
 }
 
-ndBrainBuffer::ndBrainBuffer(ndBrainContext* const context, ndInt64 sizeInByte, bool memoryMapped)
+ndBrainBuffer::ndBrainBuffer(ndBrainContext* const context, ndInt64 sizeInByte)
 	:ndContainersFreeListAlloc<ndBrainBuffer>()
 	,m_context(context)
 	,m_sizeInBytes(size_t(sizeInByte))
-	,m_isMemoryMapped(memoryMapped)
 {
 	if (m_context->GetAsGpuContext())
 	{
