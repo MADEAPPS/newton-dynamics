@@ -201,8 +201,6 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 	void CalculateSacExpectedRewards();
 	void CalculateTd3ExpectedRewards();
 	void TrainCritics(ndInt32 criticIndex);
-	ndBrainFloat CalculatePolicyProbability(ndInt32 index) const;
-	ndBrainFloat CalculatePolicyProbability(ndInt32 index, const ndBrainVector& distribution) const;
 
 	public:
 	ndString m_name;

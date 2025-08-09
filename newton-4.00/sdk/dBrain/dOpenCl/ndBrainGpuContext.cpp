@@ -161,6 +161,7 @@ void ndBrainGpuContext::MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offse
 {
 	ndAssert((sizeInBytes & 3) == 0);
 	ndAssert(sizeInBytes <= deviceBuffer.SizeInBytes());
+	ndAssert((offsetInBytes + sizeInBytes) <= deviceBuffer.SizeInBytes());
 
 	cl_int error = 0;
 	const cl::CommandQueue* queue = *m_queue;
@@ -169,7 +170,7 @@ void ndBrainGpuContext::MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offse
 	{
 		// if the queue has to be flushed to get the memory,
 		// then to me, this is not different that just calling enqueueWriteBuffer
-		// but I use it in case ther is some different
+		// but I use it in case there is some different
 		error = m_queue->finish();
 		ndAssert(error == CL_SUCCESS);
 
@@ -189,6 +190,7 @@ void ndBrainGpuContext::MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size
 {
 	ndAssert((sizeInBytes & 3) == 0);
 	ndAssert(sizeInBytes <= deviceBuffer.SizeInBytes());
+	ndAssert((offsetInBytes + sizeInBytes) <= deviceBuffer.SizeInBytes());
 
 	cl_int error = 0;
 	const cl::CommandQueue* queue = *m_queue;
@@ -197,7 +199,7 @@ void ndBrainGpuContext::MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size
 	{
 		// if the queue has to be flushed to get the memory,
 		// then to me, this is not different that just calling enqueueWriteBuffer
-		// but I use it in case ther is some different
+		// but I use it in case there is some different
 		error = m_queue->finish();
 		ndAssert(error == CL_SUCCESS);
 
