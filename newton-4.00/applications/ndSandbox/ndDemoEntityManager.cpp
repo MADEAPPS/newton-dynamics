@@ -35,7 +35,7 @@
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
 //#define DEFAULT_SCENE	4		// conservation of momentum 
-//#define DEFAULT_SCENE	5		// basic Stacks
+#define DEFAULT_SCENE	5		// basic Stacks
 //#define DEFAULT_SCENE	6		// basic Trigger
 //#define DEFAULT_SCENE	7		// object Placement
 //#define DEFAULT_SCENE	8		// particle fluid
@@ -49,7 +49,7 @@
 //#define DEFAULT_SCENE	16		// rag doll
 //#define DEFAULT_SCENE	17		// cart pole discrete controller
 //#define DEFAULT_SCENE	18		// cart pole continue controller
-#define DEFAULT_SCENE	19		// unit cycle controller
+//#define DEFAULT_SCENE	19		// unit cycle controller
 //#define DEFAULT_SCENE	20		// quadruped test 1
 //#define DEFAULT_SCENE	21		// quadruped test 2
 //#define DEFAULT_SCENE	22		// quadruped test 3
@@ -351,7 +351,7 @@ static void SimpleRegressionBrainStressTest()
 	ndBrainFloatBuffer* const minibatchOutpuGradientBuffer = trainer->GetOuputGradientBuffer();
 
 	ndBrainFloatBuffer trainingData(*context, data);
-	ndBrainIntegerBuffer indirectMiniBatch(*context, minibatchSize, true);
+	ndBrainIntegerBuffer indirectMiniBatch(*context, minibatchSize);
 
 	ndInt32 batchesCount = nunberOfSamples / minibatchSize;
 	ndInt32 batchesSize = batchesCount * minibatchSize;
@@ -603,7 +603,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	m_solverMode = ndWorld::ndStandardSolver;
 	//m_solverMode = ndWorld::ndSimdAvx2Solver;
 	//m_solverPasses = 4;
-	//m_workerThreads = 8;
+	m_workerThreads = 8;
 	//m_solverSubSteps = 2;
 	//m_showRaycastHit = true;
 	//m_showCenterOfMass = false;
