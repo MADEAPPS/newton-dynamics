@@ -29,6 +29,7 @@ ndBrainGpuContext::ndBrainGpuContext()
 	:ndBrainContext()
 {
 	// get all devices of all platforms
+	m_numberOfQueueUpdates = 0;
 	std::vector<cl::Device> cl_devices;
 	{
 		std::vector<cl::Platform> cl_platforms;
@@ -83,14 +84,12 @@ ndBrainGpuContext::ndBrainGpuContext()
 		m_context = ndSharedPtr<cl::Context>(new cl::Context(**m_device, nullptr, clNotification, this, &error));
 		ndAssert(error == CL_SUCCESS);
 
-		cl_command_queue_properties properties = CL_QUEUE_PROFILING_ENABLE;
+		//cl_command_queue_properties properties = CL_QUEUE_PROFILING_ENABLE;
+		cl_command_queue_properties properties = 0;
 		m_queue = ndSharedPtr<cl::CommandQueue>(new cl::CommandQueue(**m_context, **m_device, properties, &error));
 		ndAssert(error == CL_SUCCESS);
 
 		m_emptyBuffer = cl::Buffer(**m_context, CL_MEM_READ_WRITE, 256);
-
-		
-		
 
 		CreateKerners();
 		CreateCopyCommands();
@@ -154,7 +153,6 @@ void ndBrainGpuContext::MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offse
 	ndBrainGpuBuffer* const buffer = deviceBuffer.GetGpuBuffer();
 	error = queue->enqueueWriteBuffer(**buffer->m_buffer, CL_TRUE, offsetInBytes, sizeInBytes, srcMemory);
 	ndAssert(error == CL_SUCCESS);
-
 }
 
 void ndBrainGpuContext::MemoryFromDevice(const ndBrainBuffer& deviceBuffer, size_t offsetInBytes, size_t sizeInBytes, void* const outputMemory) const
@@ -277,6 +275,17 @@ void ndBrainGpuContext::SyncBufferCommandQueue()
 	cl_int error = 0;
 	error = m_queue->finish();
 	ndAssert(error == CL_SUCCESS);
+
+	// hack to go around the CL_OUT_OF_RESURCE_ERROR
+	if (m_numberOfQueueUpdates >= 1024 * 2)
+	{
+		// destroy old queue and create a new one
+		m_numberOfQueueUpdates = 0;
+		cl_command_queue_properties properties = 0;
+		m_queue = ndSharedPtr<cl::CommandQueue>(new cl::CommandQueue(**m_context, **m_device, properties, &error));
+		ndAssert(error == CL_SUCCESS);
+	}
+	m_numberOfQueueUpdates++;
 }
 
 void ndBrainGpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
