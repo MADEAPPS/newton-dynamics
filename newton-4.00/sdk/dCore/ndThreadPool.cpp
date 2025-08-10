@@ -254,9 +254,5 @@ void ndThreadPool::WaitForWorkers()
 			iterations++;
 		}
 	} while (jobsInProgress);
-	//if (iterations > 10000)
-	//{
-	//	ndExpandTraceMessage("xxx %d\n", iterations);
-	//}
 }
 
