@@ -84,9 +84,23 @@ ndBrainGpuContext::ndBrainGpuContext()
 		m_context = ndSharedPtr<cl::Context>(new cl::Context(**m_device, nullptr, clNotification, this, &error));
 		ndAssert(error == CL_SUCCESS);
 
+		cl_int clGetCommandQueueInfo(
+			cl_command_queue command_queue,
+			cl_command_queue_info param_name,
+			size_t param_value_size,
+			void* param_value,
+			size_t * param_value_size_ret
+		);
 		//cl_command_queue_properties properties = CL_QUEUE_PROFILING_ENABLE;
-		cl_command_queue_properties properties = 0;
+		cl_command_queue_properties properties = CL_QUEUE_ON_DEVICE;
 		m_queue = ndSharedPtr<cl::CommandQueue>(new cl::CommandQueue(**m_context, **m_device, properties, &error));
+		if (error != CL_SUCCESS)
+		{
+			// nvidia does does not allow this feature, because they make CUDA dominant, by blocking dynamics parallelism 
+			// basically the old trick make yourself better by making kneecapping the competition.
+			properties = 0;
+			m_queue = ndSharedPtr<cl::CommandQueue>(new cl::CommandQueue(**m_context, **m_device, properties, &error));
+		}
 		ndAssert(error == CL_SUCCESS);
 
 		m_emptyBuffer = cl::Buffer(**m_context, CL_MEM_READ_WRITE, 256);
@@ -279,10 +293,15 @@ void ndBrainGpuContext::SyncBufferCommandQueue()
 	// hack to go around the CL_OUT_OF_RESURCE_ERROR
 	if (m_numberOfQueueUpdates >= 1024 * 2)
 	{
-		// destroy old queue and create a new one
-		m_numberOfQueueUpdates = 0;
-		cl_command_queue_properties properties = 0;
+		cl_command_queue_properties properties = CL_QUEUE_ON_DEVICE;
 		m_queue = ndSharedPtr<cl::CommandQueue>(new cl::CommandQueue(**m_context, **m_device, properties, &error));
+		if (error != CL_SUCCESS)
+		{
+			// nvidia does does not allow this feature, because they make CUDA dominant, by blocking dynamics parallelism 
+			// basically the old trick make yourself better by making kneecapping the competition.
+			properties = 0;
+			m_queue = ndSharedPtr<cl::CommandQueue>(new cl::CommandQueue(**m_context, **m_device, properties, &error));
+		}
 		ndAssert(error == CL_SUCCESS);
 	}
 	m_numberOfQueueUpdates++;
