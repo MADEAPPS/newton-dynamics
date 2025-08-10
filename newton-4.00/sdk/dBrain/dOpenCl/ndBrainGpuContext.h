@@ -88,6 +88,7 @@ class ndBrainGpuContext : public ndBrainContext
 	virtual void CalculateEntropyRegularizationGradient(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& sampleBuffer, const ndBrainFloatBuffer& sigmaBuffer, ndBrainFloat regularization, ndInt32 inputSize) override;
 
 	private:
+	void CreateQueue();
 	void CreateKerners();
 	void CreateCopyCommands();
 	size_t GetDeviceScore(cl::Device& device);
