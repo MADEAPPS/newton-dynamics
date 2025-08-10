@@ -1346,10 +1346,6 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainSacPolicy()
 	m_policyTrainer->ApplyLearnRate();
 }
 
-static int xxxxx = 1;
-static int xxxxx1;
-
-
 //#pragma optimize( "", off )
 void ndBrainAgentOffPolicyGradient_Trainer::Optimize()
 {
@@ -1480,16 +1476,12 @@ void ndBrainAgentOffPolicyGradient_Trainer::Optimize()
 	}
 	
 	m_context->SyncBufferCommandQueue();
-//if (xxxxx)
 	m_policyTrainer->GetWeightAndBiasBuffer()->VectorFromDevice(m_scratchBuffer);
 	m_policyTrainer->UpdateParameters(m_scratchBuffer);
 }
 
 void ndBrainAgentOffPolicyGradient_Trainer::OptimizeStep()
 {
-xxxxx1 ++;
-if (xxxxx)
-
 	SaveTrajectory();
 	if (m_startOptimization)
 	{
