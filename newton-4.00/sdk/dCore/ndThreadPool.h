@@ -33,8 +33,6 @@
 #define	D_MAX_THREADS_COUNT	32
 #define D_WORKER_BATCH_SIZE	32
 
-#define D_USE_ADAPTIVE_THREAD_DISPACHER
-
 class ndThreadPool;
 
 class ndStartEnd
@@ -106,15 +104,6 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 
 	template <typename Function>
 	void ParallelExecute(const Function& function);
-
-	// lanches a job in each hardware thread, good fo huge tasks
-	template <typename Function>
-	void ParallelExecuteNew(const Function& function);
-
-	// detemine how many hardwere trad are needed, reducing overhead of dispaching threads went the task is small
-	template <typename Function>
-	void ParallelExecuteNew(const Function& function, ndInt32 numberOfJobs, ndInt32 numberOfJobsBatch = D_WORKER_BATCH_SIZE);
-
 	D_CORE_API void TaskUpdate(ndInt32 threadIndex);
 
 	private:
@@ -189,187 +178,31 @@ class ndTaskImplement : public ndTask
 template <typename Function>
 void ndThreadPool::ParallelExecute(const Function& callback)
 {
-	//ndAssert(0);
-	const ndInt32 threadCount = GetThreadCount();
-	ndTaskImplement<Function>* const jobsArray = ndAlloca(ndTaskImplement<Function>, threadCount);
-
-	for (ndInt32 i = 0; i < threadCount; ++i)
-	{
-		ndTaskImplement<Function>* const job = &jobsArray[i];
-		new (job) ndTaskImplement<Function>(i, this, callback);
-	}
-
-	ndInt32 workerCount = threadCount - 1;
+	const ndInt32 workerCount = GetThreadCount() - 1;
 	if (workerCount > 0)
 	{
 		#ifdef	D_USE_THREAD_EMULATION
-			for (ndInt32 i = 0; i < threadCount; ++i)
+			for (ndInt32 i = 0; i < (workerCount + 1); ++i)
 			{
-				ndTaskImplement<Function>* const job = &jobsArray[i];
-				callback(job->m_threadIndex, job->m_threadCount);
+				callback(i, workerCount + 1);
 			}
-		#else
+		#else	
+			ndTaskImplement<Function>* const jobsArray = ndAlloca(ndTaskImplement<Function>, workerCount);
+			ndFixSizeArray<ndTask*, D_MAX_THREADS_COUNT> taskArray;
 			for (ndInt32 i = 0; i < workerCount; ++i)
 			{
-				ndTaskImplement<Function>* const job = &jobsArray[i + 1];
+				ndTaskImplement<Function>* const job = &jobsArray[i];
+				taskArray.PushBack(new (job) ndTaskImplement<Function>(i + 1, this, callback));
 				m_workers[i].ExecuteTask(job);
 			}
-	
-			ndTaskImplement<Function>* const job = &jobsArray[0];
-			callback(job->m_threadIndex, job->m_threadCount);
+
+			callback(0, workerCount + 1);
 			WaitForWorkers();
 		#endif
 	}
 	else
 	{
-		ndTaskImplement<Function>* const job = &jobsArray[0];
-		callback(job->m_threadIndex, job->m_threadCount);
+		callback(0, 1);
 	}
 }
-
-template <typename Function>
-void ndThreadPool::ParallelExecuteNew(const Function& callback)
-{
-	const ndInt32 threadCount = GetThreadCount();
-	ndTaskImplement<Function>* const jobsArray = ndAlloca(ndTaskImplement<Function>, threadCount);
-
-	for (ndInt32 i = 0; i < threadCount; ++i)
-	{
-		ndTaskImplement<Function>* const job = &jobsArray[i];
-		new (job) ndTaskImplement<Function>(i, this, callback);
-	}
-
-	ndInt32 workerCount = threadCount - 1;
-	if (workerCount > 0)
-	{
-#ifdef	D_USE_THREAD_EMULATION
-		for (ndInt32 i = 0; i < threadCount; ++i)
-		{
-			ndTaskImplement<Function>* const job = &jobsArray[i];
-			callback(job->m_threadIndex, job->m_threadCount);
-		}
-#else
-		for (ndInt32 i = 0; i < workerCount; ++i)
-		{
-			ndTaskImplement<Function>* const job = &jobsArray[i + 1];
-			m_workers[i].ExecuteTask(job);
-		}
-
-		ndTaskImplement<Function>* const job = &jobsArray[0];
-		callback(job->m_threadIndex, job->m_threadCount);
-		WaitForWorkers();
-#endif
-	}
-	else
-	{
-		ndTaskImplement<Function>* const job = &jobsArray[0];
-		callback(job->m_threadIndex, job->m_threadCount);
-	}
-}
-
-
-
-template <typename Function>
-class ndThreadPoolAdaptiveTask : public ndTask
-{
-	public:
-	ndThreadPoolAdaptiveTask(
-		ndThreadPool* const threadPool,
-		const Function& function,
-		ndAtomic<ndInt32>& threadIterator,
-		ndInt32 jobsCount,
-		ndInt32 jobsStride,
-		ndInt32 threadIndex)
-		:ndTask(threadIndex)
-		,m_function(function)
-		,m_threadPool(threadPool)
-		,m_threadIterator(threadIterator)
-		,m_jobsCount(jobsCount)
-		,m_jobsStride(jobsStride)
-	{
-	}
-
-	private:
-	void Execute() const
-	{
-		for (ndInt32 batchIndex = m_threadIterator.fetch_add(m_jobsStride); batchIndex < m_jobsCount; batchIndex = m_threadIterator.fetch_add(m_jobsStride))
-		{
-			//ndTrace(("t(%d) bat(%d) %x\n", m_threadIndex, batchIndex, &m_threadIterator));
-			const ndInt32 count = ((batchIndex + m_jobsStride) < m_jobsCount) ? m_jobsStride : m_jobsCount - batchIndex;
-			ndAssert(count <= m_jobsStride);
-			for (ndInt32 j = 0; j < count; ++j)
-			{
-				m_function(batchIndex + j, 0);
-			}
-		}
-	}
-
-	Function m_function;
-	ndThreadPool* m_threadPool;
-	ndAtomic<ndInt32>& m_threadIterator;
-	const ndInt32 m_jobsCount;
-	const ndInt32 m_jobsStride;
-	friend class ndThreadPool;
-};
-
-template <typename Function>
-void ndThreadPool::ParallelExecuteNew(const Function& function, ndInt32 numberOfJobs, ndInt32 numberOfJobsBatch)
-{
-	const ndInt32 threadCount = GetThreadCount();
-	if (threadCount <= 1)
-	{
-		// in single threaded, just execute all jobs in the main thread
-		for (ndInt32 i = 0; i < numberOfJobs; ++i)
-		{
-			function(i, 0);
-		}
-	}
-	else
-	{
-		// calculate number of thread needed
-		ndAssert(numberOfJobsBatch >= 1);
-		const ndInt32 virtualThreadCount = numberOfJobs / numberOfJobsBatch;
-		if (virtualThreadCount < 2)
-		{
-			// not enough jobs to use all cores, just dispach all job in main thread
-			for (ndInt32 i = 0; i < numberOfJobs; ++i)
-			{
-				function(i, 0);
-			}
-		}
-		else
-		{
-			// enough work to use more than one core. get number of cores needed using batch size
-			ndAtomic<ndInt32> threadIterator(0);
-			const ndInt32 numberOfThreads = ndMin(virtualThreadCount, threadCount);
-			ndThreadPoolAdaptiveTask<Function>* const jobsArray = ndAlloca(ndThreadPoolAdaptiveTask<Function>, numberOfThreads);
-			for (ndInt32 i = 0; i < numberOfThreads; ++i)
-			{
-				ndThreadPoolAdaptiveTask<Function>* const job = &jobsArray[i];
-				new (job) ndThreadPoolAdaptiveTask<Function>(this, function, threadIterator, numberOfJobs, numberOfJobsBatch, i);
-			}
-		
-			//ndTrace(("start batches\n"));
-			for (ndInt32 i = numberOfThreads - 1; i > 0; --i)
-			{
-				ndInt32 threadSlot = i - 1;
-				ndThreadPoolAdaptiveTask<Function>* const job = &jobsArray[i];
-				m_workers[threadSlot].ExecuteTask(job);
-			}
-		
-			for (ndInt32 batchIndex = threadIterator.fetch_add(numberOfJobsBatch); batchIndex < numberOfJobs; batchIndex = threadIterator.fetch_add(numberOfJobsBatch))
-			{
-				const ndInt32 count = ((batchIndex + numberOfJobsBatch) < numberOfJobs) ? numberOfJobsBatch : numberOfJobs - batchIndex;
-				for (ndInt32 j = 0; j < count; ++j)
-				{
-					function(batchIndex + j, 0);
-				}
-			}
-		
-			Sync();
-		}
-	}
-}
-
-
 #endif

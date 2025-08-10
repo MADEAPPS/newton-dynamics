@@ -26,6 +26,8 @@
 #include "ndThreadPool.h"
 #include "ndThreadSyncUtils.h"
 
+#define	ND_THREAD_IDLE_ITERATIONS		32
+
 ndThreadPool::ndWorker::ndWorker()
 	:ndThread()
 	,m_owner(nullptr)
@@ -72,7 +74,7 @@ void ndThreadPool::ndWorker::TaskUpdate()
 		}
 		else
 		{
-			if (iterations == 32)
+			if (iterations >= ND_THREAD_IDLE_ITERATIONS)
 			{
 				// make sure that OS has the chance to task switch
 				ndThreadYield();
@@ -243,9 +245,10 @@ void ndThreadPool::WaitForWorkers()
 		jobsInProgress = ndUnsigned8 (jobsInProgress & inProgess);
 		if (jobsInProgress)
 		{
-			if ((iterations & -32) == -32)
+			if (iterations >= ND_THREAD_IDLE_ITERATIONS)
 			{
 				ndThreadYield();
+				iterations = 0;
 			}
 			else
 			{
