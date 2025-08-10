@@ -115,7 +115,6 @@ void ndBrainThreadPool::ParallelExecute(const Function& callback)
 	}
 }
 
-
 template <typename Function>
 class ndBrainTaskImplementNew : public ndTask
 {
