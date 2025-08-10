@@ -511,6 +511,7 @@ ndBrainAgentOffPolicyGradient_Trainer::ndBrainAgentOffPolicyGradient_Trainer(con
 	,m_minibatchUniformRandomDistribution(nullptr)
 	,m_randomShuffleBuffer(nullptr)
 	,m_minibatchIndexBuffer(nullptr)
+	,m_lastPolicy()
 	,m_scratchBuffer()
 	,m_shuffleBuffer()
 	,m_miniBatchIndices()
@@ -1550,10 +1551,6 @@ void ndBrainAgentOffPolicyGradient_Trainer::Optimize()
 			referenceParameterBuffer->Blend(*parameterBuffer, m_parameters.m_polyakBlendFactor);
 		}
 	}
-	
-	m_context->SyncBufferCommandQueue();
-	m_policyTrainer->GetWeightAndBiasBuffer()->VectorFromDevice(m_scratchBuffer);
-	m_policyTrainer->UpdateParameters(m_scratchBuffer);
 }
 
 void ndBrainAgentOffPolicyGradient_Trainer::OptimizeStep()
@@ -1561,6 +1558,10 @@ void ndBrainAgentOffPolicyGradient_Trainer::OptimizeStep()
 	SaveTrajectory();
 	if (m_startOptimization)
 	{
+		m_policyTrainer->GetWeightAndBiasBuffer()->VectorFromDevice(m_lastPolicy);
+		m_context->SyncBufferCommandQueue();
+		m_policyTrainer->UpdateParameters(m_lastPolicy);
+
 		Optimize();
 		m_frameCount++;
 	}

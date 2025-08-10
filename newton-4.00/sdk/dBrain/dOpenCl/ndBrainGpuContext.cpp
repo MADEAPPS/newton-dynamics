@@ -63,6 +63,7 @@ ndBrainGpuContext::ndBrainGpuContext()
 				bestDeviceIndex = i;
 			}
 		}
+		//bestDeviceIndex = 4;
 
 		m_device = ndSharedPtr<cl::Device>(new cl::Device(cl_devices[bestDeviceIndex]));
 		const std::string name(m_device->getInfo<CL_DEVICE_NAME>());
