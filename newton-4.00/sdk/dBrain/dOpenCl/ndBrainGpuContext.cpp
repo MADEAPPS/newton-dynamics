@@ -104,26 +104,20 @@ ndBrainGpuContext* ndBrainGpuContext::GetAsGpuContext()
 void ndBrainGpuContext::CreateQueue()
 {
 	cl_int error = CL_SUCCESS;
-	//cl_int clGetCommandQueueInfo(
-	//	cl_command_queue command_queue,
-	//	cl_command_queue_info param_name,
-	//	size_t param_value_size,
-	//	void* param_value,
-	//	size_t * param_value_size_ret
-	//);
 	//cl_command_queue_properties properties = CL_QUEUE_PROFILING_ENABLE;
 
 	//cl_command_queue_properties properties = CL_QUEUE_ON_DEVICE;
 	//m_queue = ndSharedPtr<cl::CommandQueue>(new cl::CommandQueue(**m_context, **m_device, properties, &error));
 	//if (error != CL_SUCCESS)
 	//{
-	//	// basically the old trick make yourself better by making kneecapping the competition.
-	//	// nvidia does does not allow this feature, because a way to make CUDA dominant is by blocking dynamics parallelism. 
 	//	properties = 0;
 	//	m_queue = ndSharedPtr<cl::CommandQueue>(new cl::CommandQueue(**m_context, **m_device, properties, &error));
 	//}
 	//ndAssert(error == CL_SUCCESS);
 
+	// nvidia still practicing the old trick make yourself better by kneecapping the competition.
+	// nvidia does not allow this feature, because blocking dynamics parallelism is a way to make CUDA dominant. 
+	// this forces Opencl developers to go with the lower common denominator set of feactures
 	cl_command_queue_properties properties = 0;
 	m_queue = ndSharedPtr<cl::CommandQueue>(new cl::CommandQueue(**m_context, **m_device, properties, &error));
 	ndAssert(error == CL_SUCCESS);
