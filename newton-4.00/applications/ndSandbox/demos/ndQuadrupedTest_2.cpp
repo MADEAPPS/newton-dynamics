@@ -1244,7 +1244,7 @@ namespace ndQuadruped_2
 						}
 					}
 
-					if (m_saveStateCount >= 1024 * 2)
+					if (m_saveStateCount >= 1024 * 16)
 					{
 						m_saveStateCount = 0;
 						m_master->SaveState("recovery");
