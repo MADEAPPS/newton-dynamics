@@ -590,6 +590,77 @@ ndBrain* ndBrainAgentOffPolicyGradient_Trainer::GetPolicyNetwork()
 	return *m_policyTrainer->GetBrain();
 }
 
+void ndBrainAgentOffPolicyGradient_Trainer::SaveState(const char* const baseName)
+{
+	m_context->SyncBufferCommandQueue();
+
+	char fileName[256];
+	sprintf(fileName, "%s_policy.dnn", baseName);
+	m_policyTrainer->GetWeightAndBiasBuffer()->VectorFromDevice(m_scratchBuffer);
+	m_policyTrainer->UpdateParameters(m_scratchBuffer);
+	m_policyTrainer->GetBrain()->SaveToFile(fileName);
+
+	if (!m_parameters.m_useSofActorCritic)
+	{
+		sprintf(fileName, "%s_referencePolicy.dnn", baseName);
+		m_referencePolicyTrainer->GetWeightAndBiasBuffer()->VectorFromDevice(m_scratchBuffer);
+		m_referencePolicyTrainer->UpdateParameters(m_scratchBuffer);
+		m_referencePolicyTrainer->GetBrain()->SaveToFile(fileName);
+	}
+
+	for (ndInt32 j = 0; j < ndInt32(sizeof(m_referenceCriticTrainer) / sizeof(m_referenceCriticTrainer[0])); ++j)
+	{
+		sprintf(fileName, "%s_critic_%d.dnn", baseName, j);
+		m_criticTrainer[j]->GetWeightAndBiasBuffer()->VectorFromDevice(m_scratchBuffer);
+		m_criticTrainer[j]->UpdateParameters(m_scratchBuffer);
+		m_criticTrainer[j]->GetBrain()->SaveToFile(fileName);
+
+		sprintf(fileName, "%s_referenceCritic_%d.dnn", baseName, j);
+		m_referenceCriticTrainer[j]->GetWeightAndBiasBuffer()->VectorFromDevice(m_scratchBuffer);
+		m_referenceCriticTrainer[j]->UpdateParameters(m_scratchBuffer);
+		m_referenceCriticTrainer[j]->GetBrain()->SaveToFile(fileName);
+	}
+}
+
+void ndBrainAgentOffPolicyGradient_Trainer::RecoverState(const char* baseName)
+{
+	m_context->SyncBufferCommandQueue();
+
+	char fileName[256];
+	if (!m_parameters.m_useSofActorCritic)
+	{
+			ndSharedPtr<ndBrain> referencePolicy(ndBrainLoad::Load(fileName));
+		ndTrainerDescriptor descriptor(referencePolicy, m_context, m_parameters.m_miniBatchSize, m_parameters.m_policyLearnRate);
+		descriptor.m_regularizer = m_parameters.m_policyRegularizer;
+		descriptor.m_regularizerType = m_parameters.m_policyRegularizerType;
+		m_referencePolicyTrainer = ndSharedPtr<ndBrainTrainerInference>(new ndBrainTrainerInference(descriptor));
+	}
+
+	sprintf(fileName, "%s_policy.dnn", baseName);
+	ndSharedPtr<ndBrain> policy(ndBrainLoad::Load(fileName));
+	ndTrainerDescriptor descriptor(policy, m_context, m_parameters.m_miniBatchSize, m_parameters.m_policyLearnRate);
+	descriptor.m_regularizer = m_parameters.m_policyRegularizer;
+	descriptor.m_regularizerType = m_parameters.m_policyRegularizerType;
+	m_policyTrainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor));
+
+	for (ndInt32 j = 0; j < ndInt32(sizeof(m_referenceCriticTrainer) / sizeof(m_referenceCriticTrainer[0])); ++j)
+	{
+		sprintf(fileName, "%s_critic_%d.dnn", baseName, j);
+		ndSharedPtr<ndBrain> critic(ndBrainLoad::Load(fileName));
+		ndTrainerDescriptor descriptorDescriptor(critic, m_context, m_parameters.m_miniBatchSize, m_parameters.m_policyLearnRate);
+		descriptorDescriptor.m_regularizer = m_parameters.m_criticRegularizer;
+		descriptorDescriptor.m_regularizerType = m_parameters.m_criticRegularizerType;
+		m_criticTrainer[j] = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptorDescriptor));
+
+		sprintf(fileName, "%s_referenceCritic_%d.dnn", baseName, j);
+		ndSharedPtr<ndBrain> referenceCritic(ndBrainLoad::Load(fileName));
+		ndTrainerDescriptor referenceCriticDescriptor(referenceCritic, m_context, m_parameters.m_miniBatchSize, m_parameters.m_policyLearnRate);
+		referenceCriticDescriptor.m_regularizer = m_parameters.m_criticRegularizer;
+		referenceCriticDescriptor.m_regularizerType = m_parameters.m_criticRegularizerType;
+		m_referenceCriticTrainer[j] = ndSharedPtr<ndBrainTrainerInference>(new ndBrainTrainerInference(referenceCriticDescriptor));
+	}
+}
+
 const ndString& ndBrainAgentOffPolicyGradient_Trainer::GetName() const
 {
 	return m_name;
@@ -706,6 +777,11 @@ void ndBrainAgentOffPolicyGradient_Trainer::BuildCriticClass()
 		descriptor.m_regularizerType = m_parameters.m_criticRegularizerType;
 		m_criticTrainer[j] = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor));
 	}
+}
+
+bool ndBrainAgentOffPolicyGradient_Trainer::IsValid() const
+{
+	return m_context->IsValid();
 }
 
 bool ndBrainAgentOffPolicyGradient_Trainer::IsSampling() const

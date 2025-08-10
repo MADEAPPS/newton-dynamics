@@ -177,12 +177,16 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 
 	void OptimizeStep();
 
+	bool IsValid() const;
 	bool IsSampling() const;
 	ndUnsigned32 GetFramesCount() const;
 	ndUnsigned32 GetEposideCount() const;
 
 	ndFloat32 GetAverageScore() const;
 	ndFloat32 GetAverageFrames() const;
+
+	void SaveState(const char* baseName);
+	void RecoverState(const char* baseName);
 
 	static ndBrainLayer* LoadActivation(const ndBrainLoad* const loadSave);
 

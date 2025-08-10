@@ -29,7 +29,7 @@ ndBrainGpuContext::ndBrainGpuContext()
 	:ndBrainContext()
 {
 	// get all devices of all platforms
-	m_numberOfQueueUpdates = 0;
+	m_isValid = true;
 	std::vector<cl::Device> cl_devices;
 	{
 		std::vector<cl::Platform> cl_platforms;
@@ -96,6 +96,11 @@ ndBrainGpuContext::~ndBrainGpuContext()
 {
 }
 
+bool ndBrainGpuContext::IsValid() const
+{
+	return m_isValid;
+}
+
 ndBrainGpuContext* ndBrainGpuContext::GetAsGpuContext()
 {
 	return this;
@@ -124,14 +129,14 @@ void ndBrainGpuContext::CreateQueue()
 }
 
 void CL_CALLBACK ndBrainGpuContext::clNotification(const char* errinfo, const void* private_info, size_t cb, void* user_data)
-//void CL_CALLBACK ndBrainGpuContext::clNotification(const char*, const void*, size_t, void*)
 {
-
+	ndBrainGpuContext* const context = (ndBrainGpuContext*)user_data;
 	ndExpandTraceMessage("%s\n", errinfo);
-	ndAssert(0);
+	
 	cb = 0;
 	user_data = nullptr;
 	private_info = nullptr;
+	context->m_isValid = false;
 }
 
 size_t ndBrainGpuContext::GetDeviceScore(cl::Device& device)
@@ -293,14 +298,10 @@ void ndBrainGpuContext::SyncBufferCommandQueue()
 	cl_int error = 0;
 	error = m_queue->finish();
 	ndAssert(error == CL_SUCCESS);
-
-	// hack to go around the CL_OUT_OF_RESURCE_ERROR
-	if (m_numberOfQueueUpdates >= 1024 * 2)
+	if (error != CL_SUCCESS)
 	{
-		CreateQueue();
-		m_numberOfQueueUpdates = 0;
+		m_isValid = false;
 	}
-	m_numberOfQueueUpdates++;
 }
 
 void ndBrainGpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)

@@ -45,6 +45,7 @@ class ndBrainGpuContext : public ndBrainContext
 	ndBrainGpuContext();
 	virtual ~ndBrainGpuContext();
 
+	virtual bool IsValid() const;
 	virtual void SyncBufferCommandQueue() override;
 	virtual ndBrainGpuContext* GetAsGpuContext() override;
 
@@ -106,7 +107,7 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<cl::CommandQueue> m_queue;
 	cl::Buffer m_emptyBuffer;
 	size_t m_maxBufferSize;
-	ndInt32 m_numberOfQueueUpdates;
+	bool m_isValid;
 
 	public:
 	// feed forward shaders

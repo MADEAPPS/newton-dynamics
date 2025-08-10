@@ -21,6 +21,11 @@ ndBrainContext::~ndBrainContext()
 {
 }
 
+bool ndBrainContext::IsValid() const
+{
+	return true;
+}
+
 ndBrainCpuContext* ndBrainContext::GetAsCpuContext()
 {
 	return nullptr;

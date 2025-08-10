@@ -339,7 +339,6 @@ namespace ndQuadruped_2
 			,m_comX(ndFloat32(0.0f))
 			,m_comZ(ndFloat32(0.0f))
 			,m_timestep(ndFloat32(0.0f))
-			,m_modelEnum(0)
 		{
 			SetModel(robot);
 		}
@@ -856,11 +855,6 @@ namespace ndQuadruped_2
 
 		virtual void Debug(ndConstraintDebugCallback& context) const
 		{
-			if (m_modelEnum != 0)
-			{
-				return;
-			}
-
 			ndVector blackColor(ndVector::m_wOne);
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
@@ -966,7 +960,6 @@ namespace ndQuadruped_2
 		ndFloat32 m_comX;
 		ndFloat32 m_comZ;
 		ndFloat32 m_timestep;
-		ndInt32 m_modelEnum;
 	};
 
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndSharedPtr<ndDemoEntity>& modelMesh)
@@ -1087,6 +1080,7 @@ namespace ndQuadruped_2
 			,m_maxScore(ndFloat32(-1.0e10f))
 			,m_lastEpisode(0xffffffff)
 			,m_stopTraining(0)
+			,m_saveStateCount(0)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
@@ -1116,7 +1110,6 @@ namespace ndQuadruped_2
 			ndSharedPtr<ndModel>visualModel(CreateModel(scene, matrix, modelMesh));
 			RobotModelNotify* const notify = (RobotModelNotify*)*visualModel->GetAsModel()->GetNotifyCallback();
 			notify->SetControllerTrainer(m_master);
-			notify->m_modelEnum = 0;
 			
 			SetMaterial(visualModel->GetAsModelArticulation());
 			world->AddModel(visualModel);
@@ -1250,6 +1243,23 @@ namespace ndQuadruped_2
 							fflush(m_outFile);
 						}
 					}
+
+					if (m_saveStateCount >= 1024 * 2)
+					{
+						m_saveStateCount = 0;
+						m_master->SaveState("recovery");
+						//m_master->RecoverState("recovery");
+					}
+					m_saveStateCount++;
+
+					if (!m_master->IsValid())
+					{
+						ndExpandTraceMessage("\n");
+						ndExpandTraceMessage("trainer terminate adnormally beaice an opengl internal error\n");
+						ndExpandTraceMessage("you can resume training by re starting the simulation, and initalizing the trainer to the recovery file\n");
+						ndExpandTraceMessage("\n");
+						m_stopTraining = 0;
+					}
 				}
 			}
 			
@@ -1276,6 +1286,7 @@ namespace ndQuadruped_2
 		ndFloat32 m_maxScore;
 		ndUnsigned32 m_lastEpisode;
 		ndUnsigned32 m_stopTraining;
+		ndUnsigned32 m_saveStateCount;
 		bool m_modelIsTrained;
 	};
 }

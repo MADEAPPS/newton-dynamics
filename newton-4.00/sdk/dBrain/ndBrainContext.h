@@ -32,6 +32,7 @@ class ndBrainContext : public ndClassAlloc
 	ndBrainContext();
 	virtual ~ndBrainContext();
 
+	virtual bool IsValid() const;
 	virtual ndBrainGpuContext* GetAsGpuContext();
 	virtual ndBrainCpuContext* GetAsCpuContext();
 
