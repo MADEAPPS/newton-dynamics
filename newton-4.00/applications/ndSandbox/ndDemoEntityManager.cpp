@@ -49,9 +49,9 @@
 //#define DEFAULT_SCENE	16		// rag doll
 //#define DEFAULT_SCENE	17		// cart pole discrete controller
 //#define DEFAULT_SCENE	18		// cart pole continue controller
-#define DEFAULT_SCENE	19		// unit cycle controller
+//#define DEFAULT_SCENE	19		// unit cycle controller
 //#define DEFAULT_SCENE	20		// quadruped test 1
-//#define DEFAULT_SCENE	21		// quadruped test 2
+#define DEFAULT_SCENE	21		// quadruped test 2
 //#define DEFAULT_SCENE	22		// quadruped test 3
 //#define DEFAULT_SCENE	23		// quadruped test 3
 //#define DEFAULT_SCENE	24		// quadruped test 4
@@ -351,7 +351,7 @@ static void SimpleRegressionBrainStressTest()
 	ndBrainFloatBuffer* const minibatchOutpuGradientBuffer = trainer->GetOuputGradientBuffer();
 
 	ndBrainFloatBuffer trainingData(*context, data);
-	ndBrainIntegerBuffer indirectMiniBatch(*context, minibatchSize, true);
+	ndBrainIntegerBuffer indirectMiniBatch(*context, minibatchSize);
 
 	ndInt32 batchesCount = nunberOfSamples / minibatchSize;
 	ndInt32 batchesSize = batchesCount * minibatchSize;
