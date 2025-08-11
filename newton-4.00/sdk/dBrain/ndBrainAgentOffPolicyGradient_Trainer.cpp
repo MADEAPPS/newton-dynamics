@@ -1012,7 +1012,11 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainCritics(ndInt32 criticIndex)
 	ndBrainFloatBuffer* const criticMinibatchOutputGradientBuffer = critic.GetOuputGradientBuffer();
 	criticMinibatchOutputGradientBuffer->Set(*criticMinibatchOutputBuffer);
 	criticMinibatchOutputGradientBuffer->Sub(**m_minibatchExpectedRewards);
-	
+
+	// using a hubber loss to prevent exploding gradient
+	criticMinibatchOutputGradientBuffer->Min(ndBrainFloat(1.0f));
+	criticMinibatchOutputGradientBuffer->Max(ndBrainFloat(-1.0f));
+
 	// back propagate loss
 	critic.BackPropagate();
 
@@ -1299,6 +1303,16 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainTd3Policy()
 	m_policyTrainer->BackPropagate();
 	
 	m_policyTrainer->ApplyLearnRate();
+
+m_policyTrainer->GetWeightAndBiasBuffer()->VectorFromDevice(m_lastPolicy);
+m_context->SyncBufferCommandQueue();
+m_policyTrainer->UpdateParameters(m_lastPolicy);
+for (ndInt32 i = 0; i < m_lastPolicy.GetCount(); ++i)
+{
+	ndAssert(m_lastPolicy[i] >= -10.0f);
+	ndAssert(m_lastPolicy[i] <= 10.0f);
+}
+
 }
 
 void ndBrainAgentOffPolicyGradient_Trainer::TrainSacPolicy()
