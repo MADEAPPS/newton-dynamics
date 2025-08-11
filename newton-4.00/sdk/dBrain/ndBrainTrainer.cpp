@@ -279,16 +279,6 @@ void ndBrainTrainer::AddLayersGradientCommands()
 	}
 }
 
-void ndBrainTrainer::BackPropagate()
-{
-	ndBrainContext* const context = *m_descriptor.m_context;
-	for (ndList<ndSharedPtr<ndBrainBufferCommand>>::ndNode* node = m_backPropagateCommands.GetFirst(); node; node = node->GetNext())
-	{
-		ndSharedPtr<ndBrainBufferCommand>& command = node->GetInfo();
-		context->SubmitBufferCommand(*command);
-	}
-}
-
 void ndBrainTrainer::AddOptimizerGradientCommand()
 {
 	ndInt32 sizeInFloats = ndInt32(m_weightAndBiasBuffer->SizeInBytes() / sizeof(ndReal));
@@ -441,4 +431,14 @@ void ndBrainTrainer::ApplyLearnRate()
 	ndBrainContext* const context = *m_descriptor.m_context;
 	context->SubmitBufferCommand(*m_adamOptimizerCommand);
 	context->SubmitBufferCommand(*m_adamMomentumUpdateCommand);
+}
+
+void ndBrainTrainer::BackPropagate()
+{
+	ndBrainContext* const context = *m_descriptor.m_context;
+	for (ndList<ndSharedPtr<ndBrainBufferCommand>>::ndNode* node = m_backPropagateCommands.GetFirst(); node; node = node->GetNext())
+	{
+		ndSharedPtr<ndBrainBufferCommand>& command = node->GetInfo();
+		context->SubmitBufferCommand(*command);
+	}
 }
