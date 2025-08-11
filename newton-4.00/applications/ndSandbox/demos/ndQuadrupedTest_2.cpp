@@ -1255,8 +1255,8 @@ namespace ndQuadruped_2
 					if (!m_master->IsValid())
 					{
 						ndExpandTraceMessage("\n");
-						ndExpandTraceMessage("trainer terminated abnormally because an open cl internal error\n");
-						ndExpandTraceMessage("you can resume training by re starting the simulation, and initializing the trainer to the recovery file\n");
+						ndExpandTraceMessage("trainer terminate adnormally beaice an opengl internal error\n");
+						ndExpandTraceMessage("you can resume training by re starting the simulation, and initalizing the trainer to the recovery file\n");
 						ndExpandTraceMessage("\n");
 						m_stopTraining = 0;
 					}
