@@ -572,7 +572,6 @@ ndBrainAgentOffPolicyGradient_Trainer::ndBrainAgentOffPolicyGradient_Trainer(con
 	m_minibatchEntropy = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_miniBatchSize));
 	m_minibatchMean = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, outputSize * m_parameters.m_miniBatchSize / 2));
 	m_minibatchSigma = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, outputSize * m_parameters.m_miniBatchSize / 2));
-	//m_minibatchEntropyGradient = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, outputSize * m_parameters.m_miniBatchSize));
 	m_minibatchUniformRandomDistribution = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, outputSize * m_parameters.m_miniBatchSize / 2));
 	m_uniformRandom = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, outputSize * m_parameters.m_numberOfUpdates * 2 * m_parameters.m_miniBatchSize / 2));
 }
@@ -1013,9 +1012,11 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainCritics(ndInt32 criticIndex)
 	criticMinibatchOutputGradientBuffer->Set(*criticMinibatchOutputBuffer);
 	criticMinibatchOutputGradientBuffer->Sub(**m_minibatchExpectedRewards);
 
-	// using a hubber loss to prevent exploding gradient
-	criticMinibatchOutputGradientBuffer->Min(ndBrainFloat(1.0f));
-	criticMinibatchOutputGradientBuffer->Max(ndBrainFloat(-1.0f));
+	// using a Huber loss to prevent exploding gradient
+	//const ndBrainFloat huberSlope = ndSqrt(2.0f);
+	const ndBrainFloat huberSlope = ndBrainFloat(4.0f);
+	criticMinibatchOutputGradientBuffer->Min(huberSlope);
+	criticMinibatchOutputGradientBuffer->Max(-huberSlope);
 
 	// back propagate loss
 	critic.BackPropagate();
@@ -1304,16 +1305,16 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainTd3Policy()
 	
 	m_policyTrainer->ApplyLearnRate();
 
-m_policyTrainer->GetWeightAndBiasGradientBuffer()->VectorFromDevice(m_lastPolicy);
-m_context->SyncBufferCommandQueue();
-m_policyTrainer->UpdateParameters(m_lastPolicy);
-for (ndInt32 i = 0; i < m_lastPolicy.GetCount(); ++i)
-{
-	ndBrainFloat x = m_lastPolicy[i];
-	ndAssert(_finite(x) && !_isnan(x));
-	ndAssert(x >= -100.0f);
-	ndAssert(x <= 100.0f);
-}
+//m_policyTrainer->GetWeightAndBiasGradientBuffer()->VectorFromDevice(m_lastPolicy);
+//m_context->SyncBufferCommandQueue();
+//m_policyTrainer->UpdateParameters(m_lastPolicy);
+//for (ndInt32 i = 0; i < m_lastPolicy.GetCount(); ++i)
+//{
+//	ndBrainFloat x = m_lastPolicy[i];
+//	ndAssert(_finite(x) && !_isnan(x));
+//	ndAssert(x >= -100.0f);
+//	ndAssert(x <= 100.0f);
+//}
 
 }
 
