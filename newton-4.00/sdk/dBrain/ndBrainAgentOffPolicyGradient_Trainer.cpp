@@ -1304,13 +1304,15 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainTd3Policy()
 	
 	m_policyTrainer->ApplyLearnRate();
 
-m_policyTrainer->GetWeightAndBiasBuffer()->VectorFromDevice(m_lastPolicy);
+m_policyTrainer->GetWeightAndBiasGradientBuffer()->VectorFromDevice(m_lastPolicy);
 m_context->SyncBufferCommandQueue();
 m_policyTrainer->UpdateParameters(m_lastPolicy);
 for (ndInt32 i = 0; i < m_lastPolicy.GetCount(); ++i)
 {
-	ndAssert(m_lastPolicy[i] >= -10.0f);
-	ndAssert(m_lastPolicy[i] <= 10.0f);
+	ndBrainFloat x = m_lastPolicy[i];
+	ndAssert(_finite(x) && !_isnan(x));
+	ndAssert(x >= -100.0f);
+	ndAssert(x <= 100.0f);
 }
 
 }
