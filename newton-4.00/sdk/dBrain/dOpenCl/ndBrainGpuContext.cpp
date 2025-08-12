@@ -559,7 +559,7 @@ void ndBrainGpuContext::CalculateEntropyRegularization(ndBrainFloatBuffer& buffe
 	ndAssert(numberOfParameters == 5);
 
 	size_t numberOfElements = size_t(sampleBuffer.SizeInBytes() / buffer.SizeInBytes());
-	size_t numberOfGroups = sampleBuffer.SizeInBytes() / sizeof(float);
+	size_t numberOfGroups = buffer.SizeInBytes() / sizeof(float);
 	
 	error = shader->setArg(0, ndInt32(numberOfElements));
 	ndAssert(error == CL_SUCCESS);
@@ -581,17 +581,23 @@ void ndBrainGpuContext::CalculateEntropyRegularization(ndBrainFloatBuffer& buffe
 //ndBrainVector xxxxx0;
 //ndBrainVector xxxxx1;
 //ndBrainVector xxxxx2;
-//ndBrainVector xxxxx3;
-//buffer.VectorFromDevice(xxxxx3);
+////ndBrainVector xxxxx3;
+////buffer.VectorFromDevice(xxxxx3);
 //buffer.VectorFromDevice(xxxxx0);
 //sampleBuffer.VectorFromDevice(xxxxx1);
 //varianceBuffer.VectorFromDevice(xxxxx2);
-//for (ndInt32 i = 0; i < numberOfGroups; ++i)
+////for (ndInt32 i = 0; i < numberOfGroups; ++i)
+////{
+////	const ndBrainMemVector sampleMean(&xxxxx1[i * numberOfElements], numberOfElements);
+////	const ndBrainMemVector varianceMean(&xxxxx2[i * numberOfElements], numberOfElements);
+////	xxxxx1[i] = sampleMean.CalculateEntropyRegularization(varianceMean, regularization);
+////}
+//for (ndInt32 i = 0; i < xxxxx0.GetCount(); ++i)
 //{
-//	const ndBrainMemVector sampleMean(&xxxxx1[i * numberOfElements], numberOfElements);
-//	const ndBrainMemVector varianceMean(&xxxxx2[i * numberOfElements], numberOfElements);
-//	xxxxx1[i] = sampleMean.CalculateEntropyRegularization(varianceMean, regularization);
+//	ndBrainFloat x = xxxxx0[i];
+//	ndCheckFloat(x);
 //}
+
 }
 
 void ndBrainGpuContext::CalculateEntropyRegularizationGradient(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& sampleBuffer, const ndBrainFloatBuffer& varianceBuffer, ndBrainFloat regularization, ndInt32 inputSize)
@@ -612,7 +618,7 @@ void ndBrainGpuContext::CalculateEntropyRegularizationGradient(ndBrainFloatBuffe
 	error = shader->getInfo(CL_KERNEL_NUM_ARGS, &numberOfParameters);
 	ndAssert(numberOfParameters == 5);
 
-	const ndInt32 numberOfGroups = ndInt32(sampleBuffer.SizeInBytes() / sizeof(ndBrainFloat)) / inputSize;
+	const ndInt32 numberOfGroups = ndInt32(sampleBuffer.SizeInBytes() / sizeof(ndReal)) / inputSize;
 	ndAssert(sampleBuffer.SizeInBytes() == numberOfGroups * inputSize * sizeof(ndReal));
 
 	error = shader->setArg(0, ndInt32(inputSize));
