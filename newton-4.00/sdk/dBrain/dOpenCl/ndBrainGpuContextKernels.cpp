@@ -1653,8 +1653,8 @@ R""""(
         float invSigma2 = invSigma * invSigma;
         
         float meanGradient = regularizationTemperature * sample * invSigma2;
-        float sigmaGradient = regularizationTemperature * invSigma * (sample * sample * invSigma2 - 1.0);;
-        
+        float sigmaGradient = regularizationTemperature * invSigma * (sample * sample * invSigma2 - 1.0);
+
         outputBuffer[dstOffset + itemId] = meanGradient;
         outputBuffer[dstOffset + numberOfElements + itemId] = sigmaGradient;
     }
