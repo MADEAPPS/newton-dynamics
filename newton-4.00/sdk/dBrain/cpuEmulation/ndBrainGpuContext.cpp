@@ -375,7 +375,6 @@ void ndBrainGpuContext::CalculateEntropyRegularization(ndBrainFloatBuffer& buffe
 	ndBrainMemVector dst((ndBrainFloat*)buffer.GetCpuPtr(), elements);
 	const ndBrainMemVector sample((ndBrainFloat*)sampleBuffer.GetCpuPtr(), stride * elements);
 	const ndBrainMemVector sigmas((ndBrainFloat*)sigmaBuffer.GetCpuPtr(), stride * elements);
-	ndAssert(0);
 	for (ndInt32 i = 0; i < elements; ++i)
 	{
 		const ndBrainMemVector sampleMean(&sample[i * stride], stride);
@@ -393,8 +392,6 @@ void ndBrainGpuContext::CalculateEntropyRegularizationGradient(ndBrainFloatBuffe
 	ndBrainMemVector dst((ndBrainFloat*)buffer.GetCpuPtr(), ndInt64(buffer.SizeInBytes() / sizeof(ndReal)));
 	const ndBrainMemVector sigmas((ndBrainFloat*)sigmaBuffer.GetCpuPtr(), ndInt64(sigmaBuffer.SizeInBytes() / sizeof(ndReal)));
 	const ndBrainMemVector sample((ndBrainFloat*)sampleBuffer.GetCpuPtr(), ndInt64(sampleBuffer.SizeInBytes() / sizeof(ndReal)));
-
-	ndAssert(0);
 	for (ndInt32 i = 0; i < numberOfGroups; ++i)
 	{
 		ndBrainMemVector gradient(&dst[2 * i * inputSize], 2 * inputSize);
