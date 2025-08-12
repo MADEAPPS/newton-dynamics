@@ -1288,7 +1288,8 @@ void ndBrainAgentOffPolicyGradient_Trainer::Optimize()
 		ndCopyBufferCommandInfo minibatchOfTransitions;
 		minibatchOfTransitions.m_dstOffsetInByte = 0;
 		minibatchOfTransitions.m_dstStrideInByte = transitionSizeInBytes;
-		minibatchOfTransitions.m_srcOffsetInByte = ndInt32(i * transitionSizeInBytes * m_parameters.m_miniBatchSize);
+		//minibatchOfTransitions.m_srcOffsetInByte = ndInt32(i * transitionSizeInBytes * m_parameters.m_miniBatchSize);
+		minibatchOfTransitions.m_srcOffsetInByte = 0;
 		minibatchOfTransitions.m_srcStrideInByte = transitionSizeInBytes;
 		minibatchOfTransitions.m_strideInByte = transitionSizeInBytes;
 		m_minibatchOfTransitions->CopyBufferIndirect(minibatchOfTransitions, **m_minibatchIndexBuffer, **m_replayBufferFlat);
