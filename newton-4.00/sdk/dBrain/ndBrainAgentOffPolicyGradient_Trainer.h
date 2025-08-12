@@ -160,7 +160,6 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 		ndInt32 m_replayBufferStartOptimizeSize;
 
 		bool m_useGpuBackend;
-		bool m_useSofActorCritic;
 		bool m_usePerActionSigmas;
 		
 		ndRegularizerType m_policyRegularizerType;
@@ -196,14 +195,12 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 	void SaveTrajectory();
 	void CacheTrajectoryTransitions();
 	
-	void TrainSacPolicy();
-	void TrainTd3Policy();
+	void TrainPolicy();
 	void BuildPolicyClass();
 	void BuildCriticClass();
 	void SaveTrajectoryTerminal();
 	void SaveTrajectoryNoTerminal();
-	void CalculateSacExpectedRewards();
-	void CalculateTd3ExpectedRewards();
+	void CalculateExpectedRewards();
 	void TrainCritics(ndInt32 criticIndex);
 
 	public:
@@ -212,7 +209,6 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 	ndSharedPtr<ndBrainContext> m_context;
 	ndSharedPtr<ndBrainTrainer> m_policyTrainer;
 	ndSharedPtr<ndBrainTrainer> m_criticTrainer[2];
-	ndSharedPtr<ndBrainTrainerInference> m_referencePolicyTrainer;
 	ndSharedPtr<ndBrainTrainerInference> m_referenceCriticTrainer[2];
 
 	ndBrainAgentOffPolicyGradient_Agent* m_agent;
@@ -244,7 +240,6 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 	ndUnsigned32 m_frameCount;
 	ndUnsigned32 m_horizonSteps;
 	ndUnsigned32 m_eposideCount;
-	ndUnsigned32 m_policyDelayMod;
 	ndUnsigned32 m_replayBufferIndex;
 	ndUnsigned32 m_shuffleBatchIndex;
 	
