@@ -1276,7 +1276,17 @@ void ndBrainAgentOffPolicyGradient_Trainer::Optimize()
 
 	for (ndInt32 i = 0; i < m_parameters.m_numberOfUpdates; ++i)
 	{
-		// sample a random mini batch of transitions
+		// get a mini batch of uniform distributed random number form 0.0 to 1.0
+		ndCopyBufferCommandInfo minibatchReparametization;
+		ndInt32 strideSizeInBytes = ndInt32(sizeof(ndInt32)) * (policyOutputSize / 2) * m_parameters.m_miniBatchSize;
+		minibatchReparametization.m_dstOffsetInByte = 0;
+		minibatchReparametization.m_dstStrideInByte = strideSizeInBytes;
+		minibatchReparametization.m_srcOffsetInByte = i * strideSizeInBytes;
+		minibatchReparametization.m_srcStrideInByte = strideSizeInBytes;
+		minibatchReparametization.m_strideInByte = strideSizeInBytes;
+		m_minibatchUniformRandomDistribution->CopyBuffer(minibatchReparametization, 1, **m_uniformRandom);
+
+		// sample a random mini batch of shufled transitions indices
 		ndCopyBufferCommandInfo copyIndicesInfo;
 		copyIndicesInfo.m_dstOffsetInByte = 0;
 		copyIndicesInfo.m_dstStrideInByte = copyIndicesStrideInBytes;
@@ -1285,24 +1295,16 @@ void ndBrainAgentOffPolicyGradient_Trainer::Optimize()
 		copyIndicesInfo.m_strideInByte = copyIndicesStrideInBytes;
 		m_minibatchIndexBuffer->CopyBuffer(copyIndicesInfo, 1, **m_randomShuffleBuffer);
 
+		// get an indirect mini batch of transition from flat array
 		ndCopyBufferCommandInfo minibatchOfTransitions;
 		minibatchOfTransitions.m_dstOffsetInByte = 0;
 		minibatchOfTransitions.m_dstStrideInByte = transitionSizeInBytes;
-		//minibatchOfTransitions.m_srcOffsetInByte = ndInt32(i * transitionSizeInBytes * m_parameters.m_miniBatchSize);
 		minibatchOfTransitions.m_srcOffsetInByte = 0;
 		minibatchOfTransitions.m_srcStrideInByte = transitionSizeInBytes;
 		minibatchOfTransitions.m_strideInByte = transitionSizeInBytes;
 		m_minibatchOfTransitions->CopyBufferIndirect(minibatchOfTransitions, **m_minibatchIndexBuffer, **m_replayBufferFlat);
 
-		// get a mini batch of uniform distributed random number form 0.0 to 1.0
-		ndCopyBufferCommandInfo minibatchReparametization;
-		ndInt32 strideSizeInBytes = ndInt32(sizeof (ndInt32)) * (policyOutputSize / 2) * m_parameters.m_miniBatchSize;
-		minibatchReparametization.m_dstOffsetInByte = 0;
-		minibatchReparametization.m_dstStrideInByte = strideSizeInBytes;
-		minibatchReparametization.m_srcOffsetInByte = i * strideSizeInBytes;
-		minibatchReparametization.m_srcStrideInByte = strideSizeInBytes;
-		minibatchReparametization.m_strideInByte = strideSizeInBytes;
-		m_minibatchUniformRandomDistribution->CopyBuffer(minibatchReparametization, 1, **m_uniformRandom);
+		// calculate expected rewards for thsi mini batch
 		CalculateExpectedRewards();
 
 		for (ndInt32 j = 0; j < ndInt32(sizeof(m_referenceCriticTrainer) / sizeof(m_referenceCriticTrainer[0])); ++j)
