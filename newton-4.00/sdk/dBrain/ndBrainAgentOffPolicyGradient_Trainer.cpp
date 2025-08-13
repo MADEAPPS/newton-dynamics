@@ -37,10 +37,10 @@
 #include "ndBrainAgentOffPolicyGradient_Trainer.h"
 
 // this activation suffers a lot form exploding gradients, when many neuron die, 
-//#define ND_HIDEN_LAYERS_ACTIVATION				ndBrainLayerActivationRelu
+#define ND_HIDEN_LAYERS_ACTIVATION				ndBrainLayerActivationRelu
  
 // trying leaky linear rectifier to see if is better at dealing with banishing and exploding gradients
-#define ND_HIDEN_LAYERS_ACTIVATION			ndBrainLayerActivationLeakyRelu
+//#define ND_HIDEN_LAYERS_ACTIVATION			ndBrainLayerActivationLeakyRelu
 
 // not exploding gradients but too slow to convergence
 //#define ND_HIDEN_LAYERS_ACTIVATION			ndBrainLayerActivationTanh
