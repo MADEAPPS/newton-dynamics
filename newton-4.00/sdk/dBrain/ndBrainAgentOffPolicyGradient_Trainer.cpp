@@ -37,10 +37,10 @@
 #include "ndBrainAgentOffPolicyGradient_Trainer.h"
 
 // this activation suffers a lot form exploding gradients, when many neuron die, 
-//#define ND_HIDEN_LAYERS_ACTIVATION				ndBrainLayerActivationRelu
+#define ND_HIDEN_LAYERS_ACTIVATION				ndBrainLayerActivationRelu
  
 // trying leaky linear rectifier to see if is better at dealing with banishing and exploding gradients
-#define ND_HIDEN_LAYERS_ACTIVATION			ndBrainLayerActivationLeakyRelu
+//#define ND_HIDEN_LAYERS_ACTIVATION			ndBrainLayerActivationLeakyRelu
 
 // not exploding gradients but too slow to convergence
 //#define ND_HIDEN_LAYERS_ACTIVATION			ndBrainLayerActivationTanh
@@ -499,7 +499,7 @@ ndBrainAgentOffPolicyGradient_Trainer::ndBrainAgentOffPolicyGradient_Trainer(con
 	,m_agent(nullptr)
 	,m_randomGenerator(std::random_device{}())
 	,m_uniformDistribution(ndFloat32(0.0f), ndFloat32(1.0f))
-	, m_uniformRandom(nullptr)
+	,m_uniformRandom(nullptr)
 	,m_minibatchMean(nullptr)
 	,m_minibatchSigma(nullptr)
 	,m_replayBufferFlat(nullptr)
@@ -1286,7 +1286,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::Optimize()
 		minibatchReparametization.m_strideInByte = strideSizeInBytes;
 		m_minibatchUniformRandomDistribution->CopyBuffer(minibatchReparametization, 1, **m_uniformRandom);
 
-		// sample a random mini batch of shufled transitions indices
+		// sample a random mini batch of shuffled transitions indices
 		ndCopyBufferCommandInfo copyIndicesInfo;
 		copyIndicesInfo.m_dstOffsetInByte = 0;
 		copyIndicesInfo.m_dstStrideInByte = copyIndicesStrideInBytes;
@@ -1313,7 +1313,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::Optimize()
 		}
 
 		// load another uniform random array
-		minibatchReparametization.m_srcOffsetInByte += ndInt32 (m_uniformRandom->SizeInBytes() / 2);
+		//minibatchReparametization.m_srcOffsetInByte += ndInt32 (m_uniformRandom->SizeInBytes() / 2);
 		m_minibatchUniformRandomDistribution->CopyBuffer(minibatchReparametization, 1, **m_uniformRandom);
 
 		TrainPolicy();

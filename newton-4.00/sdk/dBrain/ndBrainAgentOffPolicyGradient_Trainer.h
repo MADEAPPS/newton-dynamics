@@ -189,7 +189,7 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 
 	static ndBrainLayer* LoadActivation(const ndBrainLoad* const loadSave);
 
-	protected:
+	private:
 	void Optimize();
 	void CalculateScore();
 	void SaveTrajectory();

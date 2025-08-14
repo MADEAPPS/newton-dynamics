@@ -23,7 +23,6 @@ ndBrainIntegerBuffer::ndBrainIntegerBuffer(ndBrainContext* const context, ndInt6
 		m_indexArray = ndSharedPtr<ndArray<ndUnsigned32>>(new ndArray<ndUnsigned32>);
 		m_indexArray->SetCount(sizeInElements);
 	}
-	//m_context->MemoryToDevice(*this, 0, flatArray);
 }
 
 ndBrainIntegerBuffer::ndBrainIntegerBuffer(ndBrainContext* const context, ndInt64 numberOfElements, const ndUnsigned32* const indexArray)
