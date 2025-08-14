@@ -275,10 +275,10 @@ template<class T>
 void ndArray<T>::RandomShuffle(ndInt64 count)
 {
 	const ndInt64 size = ndMin (count, GetCount());
-	for (ndInt64 i = 0; i < size; ++i)
+	for (ndInt64 i = size - 1; i > 0; --i)
 	{
 		ndInt64 randomIndex = ndRandInt();
-		ndInt64 j = randomIndex % size;
+		ndInt64 j = randomIndex % i;
 		ndSwap (m_array[i], m_array[j]);
 	}
 }
