@@ -28,7 +28,7 @@
 // to the environment with increasing complexity
 namespace ndQuadruped_2
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
 
 	enum Actions
@@ -1244,19 +1244,18 @@ namespace ndQuadruped_2
 						}
 					}
 
-					if (m_saveStateCount >= 1024 * 16)
-					{
-						m_saveStateCount = 0;
-						m_master->SaveState("recovery");
-						//m_master->RecoverState("recovery");
-					}
-					m_saveStateCount++;
+					//if (m_saveStateCount >= 1024 * 16)
+					//{
+					//	m_saveStateCount = 0;
+					//	m_master->SaveState("recovery");
+					//}
+					//m_saveStateCount++;
 
 					if (!m_master->IsValid())
 					{
 						ndExpandTraceMessage("\n");
-						ndExpandTraceMessage("trainer terminate adnormally beaice an opengl internal error\n");
-						ndExpandTraceMessage("you can resume training by re starting the simulation, and initalizing the trainer to the recovery file\n");
+						ndExpandTraceMessage("trainer terminate abnormally because an open cll internal error\n");
+						ndExpandTraceMessage("you can resume training by re starting the simulation, and initializing the trainer to the recovery file\n");
 						ndExpandTraceMessage("\n");
 						m_stopTraining = 0;
 					}
