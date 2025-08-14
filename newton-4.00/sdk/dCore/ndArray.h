@@ -275,7 +275,7 @@ template<class T>
 void ndArray<T>::RandomShuffle(ndInt64 count)
 {
 	const ndInt64 size = ndMin (count, GetCount());
-	for (ndInt64 i = size - 1; i >= 0; --i)
+	for (ndInt64 i = 0; i < size; ++i)
 	{
 		ndInt64 randomIndex = ndRandInt();
 		ndInt64 j = randomIndex % size;
