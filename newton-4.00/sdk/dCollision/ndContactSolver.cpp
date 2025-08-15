@@ -1470,6 +1470,186 @@ ndInt32 ndContactSolver::Prune2dContacts(ndFixSizeArray<ndVector, D_MAX_CONTATCS
 		ndInt32 m_mask;
 	};
 
+#if 0
+	// build an optimal 2d convex hull in place
+	// have quadratic time complexity, but for a small number of point (16 max)
+	// it is much faster and more important, generates higher quality contacts.
+
+	const ndInt32 queueSize = 128;
+	class ndQueue : public ndFixSizeArray<ndConvexFaceNode*, queueSize>
+	{
+		public:
+		ndQueue()
+			:ndFixSizeArray<ndConvexFaceNode*, queueSize>(queueSize)
+			,m_mod(sizeof(m_array) / sizeof(m_array[0]))
+		{
+			m_lastIndex = 0;
+			m_firstIndex = 0;
+		}
+
+		void Push(ndConvexFaceNode* const node)
+		{
+			(*this)[m_firstIndex] = node;
+			m_firstIndex++;
+			ndAssert(m_firstIndex != m_lastIndex);
+		}
+
+		ndConvexFaceNode* Pop()
+		{
+			ndAssert(m_firstIndex != m_lastIndex);
+			ndConvexFaceNode* const node = (*this)[m_lastIndex];
+			m_lastIndex++;
+			return node;
+		}
+		
+		bool IsEmpty() const
+		{
+			return (m_firstIndex == m_lastIndex);
+		}
+
+		ndInt32 m_lastIndex;
+		ndInt32 m_firstIndex;
+		ndInt32 m_mod;
+	};
+
+
+	const ndVector p0(planeProjection[0]);
+	planeProjection[0] = planeProjection[planeProjection.GetCount()-1];
+	planeProjection.SetCount(planeProjection.GetCount() - 1);
+
+	ndInt32 index = 0;
+	ndFloat32 maxErr2 = ndFloat32(0.0f);
+	for (ndInt32 i = planeProjection.GetCount() - 1; i >= 0; --i)
+	{
+		ndFloat32 dx = planeProjection[i].m_x - p0.m_x;
+		ndFloat32 dy = planeProjection[i].m_y - p0.m_y;
+		ndFloat32 err2 = dx * dx + dy * dy;
+		if (err2 > maxErr2)
+		{
+			index = i;
+			maxErr2 = err2;
+		}
+	}
+	ndAssert(maxErr2 > ndFloat32(1.0e-6f));
+	ndVector p1(planeProjection[index]);
+	planeProjection[index] = planeProjection[planeProjection.GetCount() - 1];
+	planeProjection.SetCount(planeProjection.GetCount() - 1);
+
+	const ndVector xyMask(ndVector::m_xMask | ndVector::m_yMask);
+	const ndVector edgeDir(((p1 - p0) & xyMask).Normalize());
+	const ndVector sideDir0(edgeDir.m_y, -edgeDir.m_x, ndFloat32(0.0f), ndFloat32(0.0f));
+	const ndVector sideDir1(-edgeDir.m_y, edgeDir.m_x, ndFloat32(0.0f), ndFloat32(0.0f));
+
+	ndInt32 index2 = -1;
+	ndFloat32 maxDist = ndFloat32(-1.0e20f);
+	for (ndInt32 i = planeProjection.GetCount() - 1; i >= 0; --i)
+	{
+		const ndVector err(planeProjection[i] - p0);
+		ndFloat32 dist0 = ndAbs(sideDir0.DotProduct(err).GetScalar());
+		if (dist0 > maxDist)
+		{
+			index2 = i;
+			maxDist = dist0;
+		}
+		ndFloat32 dist1 = ndAbs(sideDir1.DotProduct(err).GetScalar());
+		if (dist1 > maxDist)
+		{
+			index2 = i;
+			maxDist = dist1;
+		}
+	}
+
+	ndVector p2(planeProjection[index2]);
+	planeProjection[index2] = planeProjection[planeProjection.GetCount() - 1];
+	planeProjection.SetCount(planeProjection.GetCount() - 1);
+
+	const ndVector edge0(p1 - p0);
+	const ndVector edge1(p2 - p0);
+	ndFloat32 upDir = edge0.m_x * edge1.m_y - edge0.m_y * edge1.m_x;
+	ndAssert(ndAbs(upDir) > ndFloat32(0.0f));
+	if (upDir < ndFloat32(0.0f))
+	{
+		ndSwap(p1, p2);
+	}
+
+	ndFixSizeArray<ndConvexFaceNode, D_MAX_CONTATCS> convexHull;
+	convexHull.SetCount(3);
+	
+	convexHull[0].m_point2d = p0;
+	convexHull[1].m_point2d = p1;
+	convexHull[2].m_point2d = p2;
+	
+	convexHull[0].m_next = &convexHull[1];
+	convexHull[1].m_next = &convexHull[2];
+	convexHull[2].m_next = &convexHull[0];
+	
+	convexHull[0].m_prev = &convexHull[2];
+	convexHull[1].m_prev = &convexHull[0];
+	convexHull[2].m_prev = &convexHull[1];
+	
+	ndQueue queue;
+	queue.Push(&convexHull[0]);
+	queue.Push(&convexHull[1]);
+	queue.Push(&convexHull[2]);
+	
+	ndInt32 vertexCount = 3;
+	while (!queue.IsEmpty() && (vertexCount < maxCount) && planeProjection.GetCount())
+	{
+		ndConvexFaceNode* const edge = queue.Pop();
+		const ndVector origin(edge->m_point2d);
+		const ndVector dir(((edge->m_next->m_point2d - origin) & xyMask).Normalize());
+		const ndVector sideDir(dir.m_y, -dir.m_x, ndFloat32(0.0f), ndFloat32(0.0f));
+	
+		ndInt32 hullVertexIndex = -1;
+		ndFloat32 supportDist2 = ndFloat32(-1.0e20f);
+		for (ndInt32 i = planeProjection.GetCount() - 1; i >= 0; --i)
+		{
+			const ndVector err(planeProjection[i] - origin);
+			ndFloat32 dist2 = sideDir.DotProduct(err).GetScalar();
+			if (dist2 > supportDist2)
+			{
+				hullVertexIndex = i;
+				supportDist2 = dist2;
+			}
+		}
+		if (supportDist2 > ndFloat32(1.0e-3f))
+		{
+			ndAssert(hullVertexIndex >= 0);
+			convexHull.SetCount(convexHull.GetCount() + 1);
+			ndConvexFaceNode* const newEdge = &convexHull[convexHull.GetCount() - 1];
+			newEdge->m_point2d = planeProjection[hullVertexIndex];
+	
+			newEdge->m_prev = edge;
+			newEdge->m_next = edge->m_next;
+	
+			edge->m_next->m_prev = newEdge;
+			edge->m_next = newEdge;
+	
+			queue.Push(edge);
+			queue.Push(newEdge);
+			planeProjection[hullVertexIndex] = planeProjection[planeProjection.GetCount() - 1];
+			planeProjection.SetCount(planeProjection.GetCount() - 1);
+	
+			vertexCount++;
+		}
+	}
+	
+	ndFixSizeArray<ndContactPoint, D_MAX_CONTATCS> buffer;
+	ndConvexFaceNode* hull = &convexHull[0];
+	do 
+	{
+		ndInt32 hullIndex = ndInt32(hull->m_point2d.m_w);
+		buffer.PushBack(contactArray[hullIndex]);
+		hull = hull->m_next;
+	} while (hull != &convexHull[0]);
+	
+	for (ndInt32 i = buffer.GetCount() - 1; i >= 0; --i)
+	{
+		contactArray[i] = buffer[i];
+	}
+	return ndInt32 (buffer.GetCount());
+
+#else
 	ndFixSizeArray<ndContactPoint, D_MAX_CONTATCS> buffer;
 	ndFixSizeArray<ndConvexFaceNode, D_MAX_CONTATCS> convexHull;
 	ndUpHeap<ndConvexFaceNode*, ndFloat32> sortHeap(&planeProjection[0], D_MAX_CONTATCS * planeProjection.GetCapacity());
@@ -1598,6 +1778,8 @@ ndInt32 ndContactSolver::Prune2dContacts(ndFixSizeArray<ndVector, D_MAX_CONTATCS
 		contactArray[i] = buffer[i];
 	}
 	return buffer.GetCount();
+#endif
+
 }
 
 ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, ndContactPoint* const contactArray, ndInt32 maxCount) const
@@ -1656,6 +1838,11 @@ ndInt32 ndContactSolver::Prune1dContacts(const ndMatrix& matrix, ndInt32 count, 
 	if (ndAbs(maxValue - minValue) < ndFloat32(1.0e-3f))
 	{
 		return 1;
+	}
+
+	if (count == 3)
+	{
+		return PruneBruteForceSmallContacts(count, contactArray);
 	}
 
 	const ndVector ref(planeProjection[j1]);
