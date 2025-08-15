@@ -1513,26 +1513,39 @@ ndInt32 ndContactSolver::Prune2dContacts(ndFixSizeArray<ndVector, D_MAX_CONTATCS
 	};
 
 
-	const ndVector p0(planeProjection[0]);
-	planeProjection[0] = planeProjection[planeProjection.GetCount()-1];
+	ndInt32 index0 = -1;
+	ndFloat32 maxErr0 = ndFloat32(-1.0e20f);
+	for (ndInt32 i = planeProjection.GetCount() - 1; i >= 0; --i)
+	{
+		ndFloat32 x = planeProjection[i].m_x;
+		if (x > maxErr0)
+		{
+			index0 = i;
+			maxErr0 = x;
+		}
+	}
+	ndAssert(index0 >= 0);
+	const ndVector p0(planeProjection[index0]);
+	planeProjection[index0] = planeProjection[planeProjection.GetCount()-1];
 	planeProjection.SetCount(planeProjection.GetCount() - 1);
 
-	ndInt32 index = 0;
-	ndFloat32 maxErr2 = ndFloat32(0.0f);
+	ndInt32 index1 = -1;
+	ndFloat32 maxErr1 = ndFloat32(0.0f);
 	for (ndInt32 i = planeProjection.GetCount() - 1; i >= 0; --i)
 	{
 		ndFloat32 dx = planeProjection[i].m_x - p0.m_x;
 		ndFloat32 dy = planeProjection[i].m_y - p0.m_y;
 		ndFloat32 err2 = dx * dx + dy * dy;
-		if (err2 > maxErr2)
+		if (err2 > maxErr1)
 		{
-			index = i;
-			maxErr2 = err2;
+			index1 = i;
+			maxErr1 = err2;
 		}
 	}
-	ndAssert(maxErr2 > ndFloat32(1.0e-6f));
-	ndVector p1(planeProjection[index]);
-	planeProjection[index] = planeProjection[planeProjection.GetCount() - 1];
+	ndAssert(index1 >= 0);
+	ndAssert(maxErr1 > ndFloat32(1.0e-6f));
+	ndVector p1(planeProjection[index1]);
+	planeProjection[index1] = planeProjection[planeProjection.GetCount() - 1];
 	planeProjection.SetCount(planeProjection.GetCount() - 1);
 
 	const ndVector xyMask(ndVector::m_xMask | ndVector::m_yMask);
@@ -1558,7 +1571,7 @@ ndInt32 ndContactSolver::Prune2dContacts(ndFixSizeArray<ndVector, D_MAX_CONTATCS
 			maxDist = dist1;
 		}
 	}
-
+	ndAssert(index2 >= 0);
 	ndVector p2(planeProjection[index2]);
 	planeProjection[index2] = planeProjection[planeProjection.GetCount() - 1];
 	planeProjection.SetCount(planeProjection.GetCount() - 1);
