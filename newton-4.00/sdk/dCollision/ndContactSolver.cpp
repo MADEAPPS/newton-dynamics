@@ -1470,7 +1470,7 @@ ndInt32 ndContactSolver::Prune2dContacts(ndFixSizeArray<ndVector, D_MAX_CONTATCS
 		ndInt32 m_mask;
 	};
 
-#if 0
+#if 1
 	// build an optimal 2d convex hull in place
 	// have quadratic time complexity, but for a small number of point (16 max)
 	// it is much faster and more important, generates higher quality contacts.
