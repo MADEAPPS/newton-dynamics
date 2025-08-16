@@ -1653,6 +1653,14 @@ ndInt32 ndContactSolver::Prune2dContacts(ndFixSizeArray<ndVector, D_MAX_CONTATCS
 	{
 		ndInt32 hullIndex = ndInt32(hull->m_point2d.m_w);
 		buffer.PushBack(contactArray[hullIndex]);
+
+#ifdef _DEBUG
+		ndVector e1(hull->m_point2d - hull->m_next->m_point2d);
+		ndVector e0(hull->m_next->m_next->m_point2d - hull->m_next->m_point2d);
+		ndFloat32 n = e0.m_x * e1.m_y - e0.m_y * e1.m_x;
+		ndAssert(n >= ndFloat32(0.0f));
+#endif
+
 		hull = hull->m_next;
 	} while (hull != &convexHull[0]);
 	
