@@ -88,7 +88,7 @@ ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 	m_entropyFrameStar = 0;
 	m_entropyFrameEnd = 1024 * 256;
 
-m_useGpuBackend = false;
+//m_useGpuBackend = false;
 //m_numberOfUpdates = 1;
 //m_replayBufferStartOptimizeSize = 1024 * 2;
 }
@@ -1340,7 +1340,6 @@ void ndBrainAgentOffPolicyGradient_Trainer::OptimizeStep()
 		ndFloat64 t = ndClamp(ndFloat64(m_frameCount - m_parameters.m_entropyFrameStar) / ndFloat64(m_parameters.m_entropyFrameEnd - m_parameters.m_entropyFrameStar), ndFloat64(0.0f), ndFloat64(1.0f));
 		m_parameters.m_entropyTemperature = ndBrainFloat(m_parameters.m_entropyMaxTemperature + t * (m_parameters.m_entropyMinTemperature - m_parameters.m_entropyMaxTemperature));
 
-m_parameters.m_entropyTemperature = m_parameters.m_entropyMinTemperature;
 		Optimize();
 		m_frameCount++;
 
