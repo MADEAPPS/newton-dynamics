@@ -145,6 +145,10 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 
 		ndBrainFloat m_actionFixSigma;
 		ndBrainFloat m_entropyTemperature;
+		ndBrainFloat m_entropyMaxTemperature;
+		ndBrainFloat m_entropyMinTemperature;
+		ndInt32	m_entropyFrameStar;
+		ndInt32	m_entropyFrameEnd;
 
 		ndUnsigned32 m_randomSeed;
 		ndInt32 m_miniBatchSize;

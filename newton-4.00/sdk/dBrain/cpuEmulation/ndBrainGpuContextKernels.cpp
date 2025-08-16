@@ -395,9 +395,9 @@ class brainLayerOffPolicyActivation : public ndBrainKernel
         ndInt64 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
         ndAssert(outputOffset >= 0);
 
-        ndInt32 halfSize = inputSize / 2;
-        ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
-        ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
+        const ndInt32 halfSize = inputSize / 2;
+        const ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
+        const ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
         for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
@@ -461,8 +461,8 @@ class brainLayerSoftmaxActivation : public ndBrainKernel
             maxArgReg[itemId] = ndBrainFloat(-1.0e30f);
         }
 
-        ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
-        ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
+        const ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
+        const ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
         for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
@@ -510,7 +510,6 @@ class brainLayerSoftmaxActivation : public ndBrainKernel
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
             {
                 ndBrainFloat inputValue = tmpInputBuffer[i + itemId] - maxArgReg[itemId];
-                //ndBrainFloat outputValue = exp(inputValue);
                 ndBrainFloat outputValue = ndExp(inputValue);
                 sumArgReg[itemId] += outputValue;
                 tmpInputBuffer[i + itemId] = outputValue;
@@ -519,7 +518,6 @@ class brainLayerSoftmaxActivation : public ndBrainKernel
         for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
         {
             ndBrainFloat inputValue = tmpInputBuffer[modWorkGroupSize + itemId] - maxArgReg[itemId];
-            //ndBrainFloat outputValue = exp(inputValue);
             ndBrainFloat outputValue = ndExp(inputValue);
             sumArgReg[itemId] += outputValue;
             tmpInputBuffer[modWorkGroupSize + itemId] = outputValue;

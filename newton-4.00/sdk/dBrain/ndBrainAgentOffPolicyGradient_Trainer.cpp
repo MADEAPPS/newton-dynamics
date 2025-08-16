@@ -45,7 +45,9 @@
 // not exploding gradients but too slow to convergence
 //#define ND_HIDEN_LAYERS_ACTIVATION			ndBrainLayerActivationTanh
  
-#define ND_POLICY_DEFAULT_ENTROPY_TEMPERATURE	ndBrainFloat(0.05f)
+#define ND_POLICY_MAX_ENTROPY_TEMPERATURE		ndBrainFloat(0.1f)
+#define ND_POLICY_MIN_ENTROPY_TEMPERATURE		ndBrainFloat(0.01f)
+
 #define ND_POLICY_TRAINING_EXPLORATION_NOISE	ndBrainFloat(0.2f)
 #define ND_POLICY_DEFAULT_POLYAK_BLEND			ndBrainFloat(0.005f)
 #define ND_POLICY_CONSTANT_SIGMA				ndBrainFloat(0.5f)
@@ -61,8 +63,6 @@ ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 	m_discountRewardFactor = ndBrainFloat(0.995f);
 
 	m_polyakBlendFactor = ND_POLICY_DEFAULT_POLYAK_BLEND;
-	m_entropyTemperature = ND_POLICY_DEFAULT_ENTROPY_TEMPERATURE;
-
 	m_useGpuBackend = true;
 	m_usePerActionSigmas = true;
 	m_actionFixSigma = ND_POLICY_CONSTANT_SIGMA;
@@ -82,8 +82,13 @@ ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 	m_hiddenLayersNumberOfNeurons = 256;
 	m_replayBufferStartOptimizeSize = 1024 * 64;
 
-//m_useGpuBackend = false;
-//m_useSofActorCritic = false;
+	m_entropyTemperature = ND_POLICY_MAX_ENTROPY_TEMPERATURE;
+	m_entropyMinTemperature = ND_POLICY_MIN_ENTROPY_TEMPERATURE;
+	m_entropyMaxTemperature = ND_POLICY_MAX_ENTROPY_TEMPERATURE;
+	m_entropyFrameStar = 0;
+	m_entropyFrameEnd = 1024 * 256;
+
+m_useGpuBackend = false;
 //m_numberOfUpdates = 1;
 //m_replayBufferStartOptimizeSize = 1024 * 2;
 }
@@ -139,15 +144,15 @@ class ndBrainAgentOffPolicyGradient_Trainer::ndActivation : public ndBrainLayerA
 		}
 	}
 
-	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const override
+	void InputDerivative(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const override
 	{
-		ndAssert(input.GetCount() == output.GetCount());
-		ndAssert(input.GetCount() == outputDerivative.GetCount());
-		const ndInt32 size = ndInt32(input.GetCount() / 2);
-		for (ndInt32 i = size - 1; i >= 0; --i)
+		//ndAssert(input.GetCount() == output.GetCount());
+		ndAssert(output.GetCount() == outputDerivative.GetCount());
+		const ndInt32 actionSize = ndInt32(inputDerivative.GetCount() / 2);
+		for (ndInt32 i = 0; i < actionSize; ++i)
 		{
 			inputDerivative[i] = outputDerivative[i];
-			inputDerivative[size + i] = output[size + i] * outputDerivative[size + i];
+			inputDerivative[actionSize + i] = output[actionSize + i] * outputDerivative[actionSize + i];
 		}
 	}
 
@@ -540,7 +545,6 @@ ndBrainAgentOffPolicyGradient_Trainer::ndBrainAgentOffPolicyGradient_Trainer(con
 	{
 		m_context = ndSharedPtr<ndBrainContext>(new ndBrainCpuContext);
 	}
-
 	
 	ndFloat32 gain = ndFloat32(1.0f);
 	ndFloat32 maxGain = ndFloat32(0.98f) / (ndFloat32(1.0f) - m_parameters.m_discountRewardFactor);
@@ -556,6 +560,7 @@ ndBrainAgentOffPolicyGradient_Trainer::ndBrainAgentOffPolicyGradient_Trainer(con
 
 	ndInt32 inputSize = m_policyTrainer->GetBrain()->GetInputSize();
 	ndInt32 outputSize = m_policyTrainer->GetBrain()->GetOutputSize();
+	ndInt32 actionsSize = outputSize / 2;
 	ndBrainAgentOffPolicyGradient_Agent::ndTrajectory trajectory(outputSize, inputSize);
 
 	m_minibatchNoTerminal = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_miniBatchSize));
@@ -568,10 +573,10 @@ ndBrainAgentOffPolicyGradient_Trainer::ndBrainAgentOffPolicyGradient_Trainer(con
 	m_randomShuffleBuffer = ndSharedPtr<ndBrainIntegerBuffer>(new ndBrainIntegerBuffer(*m_context, m_parameters.m_numberOfUpdates * m_parameters.m_miniBatchSize));
 
 	m_minibatchEntropy = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_miniBatchSize));
-	m_minibatchMean = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, outputSize * m_parameters.m_miniBatchSize / 2));
-	m_minibatchSigma = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, outputSize * m_parameters.m_miniBatchSize / 2));
-	m_minibatchUniformRandomDistribution = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, outputSize * m_parameters.m_miniBatchSize / 2));
-	m_uniformRandom = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, outputSize * m_parameters.m_numberOfUpdates * 2 * m_parameters.m_miniBatchSize / 2));
+	m_minibatchMean = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, actionsSize * m_parameters.m_miniBatchSize));
+	m_minibatchSigma = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, actionsSize * m_parameters.m_miniBatchSize));
+	m_minibatchUniformRandomDistribution = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, actionsSize * m_parameters.m_miniBatchSize));
+	m_uniformRandom = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, actionsSize * m_parameters.m_numberOfUpdates * m_parameters.m_miniBatchSize));
 }
 
 ndBrainAgentOffPolicyGradient_Trainer::~ndBrainAgentOffPolicyGradient_Trainer()
@@ -1227,20 +1232,20 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainPolicy()
 	m_policyTrainer->ApplyLearnRate();
 }
 
-//#pragma optimize( "", off )
+#pragma optimize( "", off )
 void ndBrainAgentOffPolicyGradient_Trainer::Optimize()
 {
 	// get the number of indirect transitions 
 	m_miniBatchIndices.SetCount(0);
-	ndInt32 numberOfSamples = m_parameters.m_numberOfUpdates * m_parameters.m_miniBatchSize;
-
+	const ndInt32 numberOfSamples = m_parameters.m_numberOfUpdates * m_parameters.m_miniBatchSize;
 	if ((numberOfSamples + m_shuffleBatchIndex) >= (m_shuffleBuffer.GetCount() - numberOfSamples))
 	{
 		// re shuffle after every pass.
 		m_shuffleBatchIndex = 0;
 		m_shuffleBuffer.RandomShuffle(m_shuffleBuffer.GetCount());
 	}
-	for (ndInt32 i = numberOfSamples - 1; i >= 0; --i)
+
+	for (ndInt32 i = 0; i < numberOfSamples; ++i)
 	{
 		m_miniBatchIndices.PushBack(m_shuffleBuffer[m_shuffleBatchIndex]);
 		m_shuffleBatchIndex++;
@@ -1258,13 +1263,11 @@ void ndBrainAgentOffPolicyGradient_Trainer::Optimize()
 
 	// get a vector of random numbers
 	m_scratchBuffer.SetCount(0);
-
-	ndInt32 policyOutputSize = m_policyTrainer->GetBrain()->GetOutputSize();
-	for (ndInt32 i = numberOfSamples - 1; i >= 0; --i)
+	const ndInt32 numberOfActions = m_policyTrainer->GetBrain()->GetOutputSize() / 2;
+	for (ndInt32 i = 0; i < numberOfSamples; ++i)
 	{
-		for (ndInt32 j = policyOutputSize / 2 - 1; j >= 0; --j)
+		for (ndInt32 j = 0; j < numberOfActions; ++j)
 		{
-			m_scratchBuffer.PushBack(m_uniformDistribution(m_randomGenerator));
 			m_scratchBuffer.PushBack(m_uniformDistribution(m_randomGenerator));
 		}
 	}
@@ -1278,7 +1281,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::Optimize()
 	{
 		// get a mini batch of uniform distributed random number form 0.0 to 1.0
 		ndCopyBufferCommandInfo minibatchReparametization;
-		ndInt32 strideSizeInBytes = ndInt32(sizeof(ndInt32)) * (policyOutputSize / 2) * m_parameters.m_miniBatchSize;
+		ndInt32 strideSizeInBytes = ndInt32(sizeof(ndInt32)) * numberOfActions * m_parameters.m_miniBatchSize;
 		minibatchReparametization.m_dstOffsetInByte = 0;
 		minibatchReparametization.m_dstStrideInByte = strideSizeInBytes;
 		minibatchReparametization.m_srcOffsetInByte = i * strideSizeInBytes;
@@ -1313,9 +1316,8 @@ void ndBrainAgentOffPolicyGradient_Trainer::Optimize()
 		}
 
 		// load another uniform random array
-		//minibatchReparametization.m_srcOffsetInByte += ndInt32 (m_uniformRandom->SizeInBytes() / 2);
+		//m_minibatchUniformRandomDistribution->CopyBuffer(minibatchReparametization, 1, **m_uniformRandom1);
 		m_minibatchUniformRandomDistribution->CopyBuffer(minibatchReparametization, 1, **m_uniformRandom);
-
 		TrainPolicy();
 
 		for (ndInt32 j = 0; j < ndInt32(sizeof(m_referenceCriticTrainer) / sizeof(m_referenceCriticTrainer[0])); ++j)
@@ -1335,6 +1337,10 @@ void ndBrainAgentOffPolicyGradient_Trainer::OptimizeStep()
 	SaveTrajectory();
 	if (m_startOptimization)
 	{
+		ndFloat64 t = ndClamp(ndFloat64(m_frameCount - m_parameters.m_entropyFrameStar) / ndFloat64(m_parameters.m_entropyFrameEnd - m_parameters.m_entropyFrameStar), ndFloat64(0.0f), ndFloat64(1.0f));
+		m_parameters.m_entropyTemperature = ndBrainFloat(m_parameters.m_entropyMaxTemperature + t * (m_parameters.m_entropyMinTemperature - m_parameters.m_entropyMaxTemperature));
+
+m_parameters.m_entropyTemperature = m_parameters.m_entropyMinTemperature;
 		Optimize();
 		m_frameCount++;
 

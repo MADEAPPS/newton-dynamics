@@ -28,7 +28,7 @@
 // to the environment with increasing complexity
 namespace ndQuadruped_2
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
 
 	enum Actions
