@@ -76,8 +76,8 @@ void ndHeavyVehicle(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
 void ndBasicGpuTest0(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
-void ndQuadrupedTest_1(ndDemoEntityManager* const scene);
-void ndQuadrupedTest_2(ndDemoEntityManager* const scene);
+void ndQuadruped_animation_test(ndDemoEntityManager* const scene);
+void ndQuadruped_sac_test(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_3(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_4(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_4(ndDemoEntityManager* const scene);
@@ -125,8 +125,8 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "cartpole discrete controller", ndCartpoleDiscrete},
 	{ "cartpole continue controller", ndCartpoleContinue},
 	{ "unicycle controller", ndUnicycleController},
-	{ "quadruped test 1", ndQuadrupedTest_1},
-	{ "quadruped test 2", ndQuadrupedTest_2},
+	{ "quadruped test 1", ndQuadruped_animation_test},
+	{ "quadruped test 2", ndQuadruped_sac_test},
 	{ "quadruped test 3", ndQuadrupedTest_3},
 //	{ "quadruped test 4", ndQuadrupedTest_4},
 //	{ "quadruped test 5", ndQuadrupedTest_4},

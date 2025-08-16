@@ -23,7 +23,7 @@
 #include "ndDemoInstanceEntity.h"
 
 // this model just plays the animation by injecting the poses to the end effectors
-namespace ndQuadruped_1
+namespace ndQuadruped_animation
 {
 	#define D_CYCLE_PERIOD		ndFloat32(4.0f)
 	#define D_CYCLE_STRIDE_X	ndFloat32(0.4f)
@@ -531,9 +531,9 @@ namespace ndQuadruped_1
 	}
 }
 
-using namespace ndQuadruped_1;
+using namespace ndQuadruped_animation;
 
-void ndQuadrupedTest_1(ndDemoEntityManager* const scene)
+void ndQuadruped_animation_test(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	ndSetRandSeed(94157);

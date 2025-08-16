@@ -26,7 +26,7 @@
 // that produces the animation.  
 // If this phase is successful, we will adapt the reward so that the robot can adjust  
 // to the environment with increasing complexity
-namespace ndQuadruped_2
+namespace ndQuadruped_sac
 {
 	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
@@ -1290,9 +1290,9 @@ namespace ndQuadruped_2
 	};
 }
 
-using namespace ndQuadruped_2;
+using namespace ndQuadruped_sac;
 
-void ndQuadrupedTest_2(ndDemoEntityManager* const scene)
+void ndQuadruped_sac_test(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	ndSetRandSeed(94157);
