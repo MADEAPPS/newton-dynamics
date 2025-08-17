@@ -247,9 +247,11 @@ ndFloat32 ndShapeBox::RayCast(ndRayCastNotify&, const ndVector& localP0, const n
 	ndFloat32 signDir = ndFloat32(0.0f);
 	ndFloat32 tmin = ndFloat32(0.0f);
 	ndFloat32 tmax = ndFloat32(1.0f);
+	const ndVector diff(localP1 - localP0);
 	for (ndInt32 i = 0; i < 3; ++i) 
 	{
-		ndFloat32 dp = localP1[i] - localP0[i];
+		//ndFloat32 dp = localP1[i] - localP0[i];
+		ndFloat32 dp = diff[i];
 		if (ndAbs(dp) < ndFloat32(1.0e-8f)) 
 		{
 			if (localP0[i] <= m_size[1][i] || localP0[i] >= m_size[0][i]) 
