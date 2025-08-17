@@ -1010,7 +1010,11 @@ void ndScene::UpdateSpecial()
 	}
 }
 
-bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndBvhNode** stackPool, ndFloat32* const stackDistance, ndInt32 stack, const ndFastRay& ray, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const
+bool ndScene::ConvexCast(
+	ndConvexCastNotify& callback, 
+	ndFixSizeArray<const ndBvhNode*, D_SCENE_MAX_STACK_DEPTH> stackPool, 
+	ndFixSizeArray<ndFloat32, D_SCENE_MAX_STACK_DEPTH>& stackDistance,
+	const ndFastRay& ray, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const
 {
 	ndVector boxP0;
 	ndVector boxP1;
@@ -1018,13 +1022,33 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndBvhNode** stackPo
 	ndAssert(globalOrigin.TestOrthogonal());
 	convexShape.CalculateAabb(globalOrigin, boxP0, boxP1);
 	
+	auto InsertNode = [&stackDistance, &stackPool](const ndBvhNode* const node, ndFloat32 dist)
+	{
+		stackPool.PushBack(node);
+		stackDistance.PushBack(dist);
+		ndInt32 slotIndex = stackDistance.GetCount() - 2;
+
+		for (; (slotIndex >= 0) && (stackDistance[slotIndex + 1] > stackDistance[slotIndex]); --slotIndex)
+		{
+			ndSwap(stackPool[slotIndex], stackPool[slotIndex + 1]);
+			ndSwap(stackDistance[slotIndex], stackDistance[slotIndex + 1]);
+		}
+
+		#ifdef _DEBUG
+		for (ndInt32 i = stackDistance.GetCount() - 1; i > 0; --i)
+		{
+			ndAssert(stackDistance[i - 1] >= stackDistance[i]);
+		}
+		#endif
+	};
+
 	callback.m_contacts.SetCount(0);
 	callback.m_param = ndFloat32(1.2f);
 	callback.m_cachedScene = (ndScene*)this;
-	while (stack && (stack < (D_SCENE_MAX_STACK_DEPTH - 4)))
+	while (stackPool.GetCount())
 	{
-		stack--;
-		ndFloat32 dist = stackDistance[stack];
+		ndFloat32 dist = stackDistance.Pop();
+		const ndBvhNode* const me = stackPool.Pop();
 		
 		if (dist > callback.m_param)
 		{
@@ -1032,8 +1056,6 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndBvhNode** stackPo
 		}
 		else 
 		{
-			const ndBvhNode* const me = stackPool[stack];
-		
 			ndBody* const body = me->GetBody();
 			if (body) 
 			{
@@ -1057,7 +1079,7 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndBvhNode** stackPo
 								{
 									const ndVector diff(callback.m_contacts[j].m_point - contact.m_point);
 									ndFloat32 mag2 = diff.DotProduct(diff & ndVector::m_triplexMask).GetScalar();
-									newPoint = newPoint & (mag2 > ndFloat32(1.0e-5f));
+									newPoint = newPoint && (mag2 > ndFloat32(1.0e-5f));
 								}
 								if (newPoint && (callback.m_contacts.GetCount() < callback.m_contacts.GetCapacity()))
 								{
@@ -1112,16 +1134,17 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndBvhNode** stackPo
 					ndFloat32 dist1 = ray.BoxIntersect(minBox, maxBox);
 					if (dist1 < callback.m_param)
 					{
-						ndInt32 j = stack;
-						for (; j && (dist1 > stackDistance[j - 1]); j--)
-						{
-							stackPool[j] = stackPool[j - 1];
-							stackDistance[j] = stackDistance[j - 1];
-						}
-						stackPool[j] = left;
-						stackDistance[j] = dist1;
-						stack++;
-						ndAssert(stack < D_SCENE_MAX_STACK_DEPTH);
+						//ndInt32 j = ndInt32 (stackPool.GetCount());
+						//for (; j && (dist1 > stackDistance[j - 1]); j--)
+						//{
+						//	stackPool[j] = stackPool[j - 1];
+						//	stackDistance[j] = stackDistance[j - 1];
+						//}
+						//stackPool[j] = left;
+						//stackDistance[j] = dist1;
+						//stack++;
+						//ndAssert(stack < D_SCENE_MAX_STACK_DEPTH);
+						InsertNode(left, dist1);
 					}
 				}
 		
@@ -1133,16 +1156,17 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndBvhNode** stackPo
 					ndFloat32 dist1 = ray.BoxIntersect(minBox, maxBox);
 					if (dist1 < callback.m_param)
 					{
-						ndInt32 j = stack;
-						for (; j && (dist1 > stackDistance[j - 1]); j--) 
-						{
-							stackPool[j] = stackPool[j - 1];
-							stackDistance[j] = stackDistance[j - 1];
-						}
-						stackPool[j] = right;
-						stackDistance[j] = dist1;
-						stack++;
-						ndAssert(stack < D_SCENE_MAX_STACK_DEPTH);
+						//ndInt32 j = stack;
+						//for (; j && (dist1 > stackDistance[j - 1]); j--) 
+						//{
+						//	stackPool[j] = stackPool[j - 1];
+						//	stackDistance[j] = stackDistance[j - 1];
+						//}
+						//stackPool[j] = right;
+						//stackDistance[j] = dist1;
+						//stack++;
+						//ndAssert(stack < D_SCENE_MAX_STACK_DEPTH);
+						InsertNode(right, dist1);
 					}
 				}
 			}
@@ -1153,21 +1177,45 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndBvhNode** stackPo
 	return callback.m_contacts.GetCount() > 0;
 }
 
-bool ndScene::RayCast(ndRayCastNotify& callback, const ndBvhNode** stackPool, ndFloat32* const stackDistance, ndInt32 stack, const ndFastRay& ray) const
+bool ndScene::RayCast(
+	ndRayCastNotify& callback, 
+	ndFixSizeArray<const ndBvhNode*, D_SCENE_MAX_STACK_DEPTH> stackPool,
+	ndFixSizeArray<ndFloat32, D_SCENE_MAX_STACK_DEPTH>& stackDistance,
+	const ndFastRay& ray) const
 {
-	bool state = false;
-	while (stack && (stack < (D_SCENE_MAX_STACK_DEPTH - 4)))
+	auto InsertNode = [&stackDistance, &stackPool](const ndBvhNode* const node, ndFloat32 dist)
 	{
-		stack--;
-		ndFloat32 dist = stackDistance[stack];
+		stackPool.PushBack(node);
+		stackDistance.PushBack(dist);
+		ndInt32 slotIndex = stackDistance.GetCount() - 2;
+
+		for (; (slotIndex >= 0) && (stackDistance[slotIndex + 1] > stackDistance[slotIndex]); --slotIndex)
+		{
+			ndSwap(stackPool[slotIndex], stackPool[slotIndex + 1]);
+			ndSwap(stackDistance[slotIndex], stackDistance[slotIndex + 1]);
+		}
+
+		#ifdef _DEBUG
+		for (ndInt32 i = stackDistance.GetCount() - 1; i > 0; --i)
+		{
+			ndAssert(stackDistance[i - 1] >= stackDistance[i]);
+		}
+		#endif
+	};
+
+	bool state = false;
+	while (stackPool.GetCount())
+	{
+		ndFloat32 dist = stackDistance.Pop();
+		const ndBvhNode* const me = stackPool.Pop();
+		ndAssert(me);
+
 		if (dist > callback.m_param)
 		{
 			break;
 		}
 		else
 		{
-			const ndBvhNode* const me = stackPool[stack];
-			ndAssert(me);
 			ndBodyKinematic* const body = me->GetBody();
 			if (body)
 			{
@@ -1185,38 +1233,44 @@ bool ndScene::RayCast(ndRayCastNotify& callback, const ndBvhNode** stackPool, nd
 			}
 			else
 			{
-				const ndBvhNode* const left = me->GetLeft();
-				ndAssert(left);
-				ndFloat32 dist1 = ray.BoxIntersect(left->m_minBox, left->m_maxBox);
-				if (dist1 < callback.m_param)
 				{
-					ndInt32 j = stack;
-					for (; j && (dist1 > stackDistance[j - 1]); j--)
+					const ndBvhNode* const left = me->GetLeft();
+					ndAssert(left);
+					ndFloat32 dist1 = ray.BoxIntersect(left->m_minBox, left->m_maxBox);
+					if (dist1 < callback.m_param)
 					{
-						stackPool[j] = stackPool[j - 1];
-						stackDistance[j] = stackDistance[j - 1];
+						//ndInt32 j = stack;
+						//for (; j && (dist1 > stackDistance[j - 1]); j--)
+						//{
+						//	stackPool[j] = stackPool[j - 1];
+						//	stackDistance[j] = stackDistance[j - 1];
+						//}
+						//stackPool[j] = left;
+						//stackDistance[j] = dist1;
+						//stack++;
+						//ndAssert(stack < D_SCENE_MAX_STACK_DEPTH);
+						InsertNode(left, dist1);
 					}
-					stackPool[j] = left;
-					stackDistance[j] = dist1;
-					stack++;
-					ndAssert(stack < D_SCENE_MAX_STACK_DEPTH);
 				}
-	
-				const ndBvhNode* const right = me->GetRight();
-				ndAssert(right);
-				dist1 = ray.BoxIntersect(right->m_minBox, right->m_maxBox);
-				if (dist1 < callback.m_param)
+				
 				{
-					ndInt32 j = stack;
-					for (; j && (dist1 > stackDistance[j - 1]); j--)
+					const ndBvhNode* const right = me->GetRight();
+					ndAssert(right);
+					ndFloat32 dist1 = ray.BoxIntersect(right->m_minBox, right->m_maxBox);
+					if (dist1 < callback.m_param)
 					{
-						stackPool[j] = stackPool[j - 1];
-						stackDistance[j] = stackDistance[j - 1];
+						//ndInt32 j = stack;
+						//for (; j && (dist1 > stackDistance[j - 1]); j--)
+						//{
+						//	stackPool[j] = stackPool[j - 1];
+						//	stackDistance[j] = stackDistance[j - 1];
+						//}
+						//stackPool[j] = right;
+						//stackDistance[j] = dist1;
+						//stack++;
+						//ndAssert(stack < D_SCENE_MAX_STACK_DEPTH);
+						InsertNode(right, dist1);
 					}
-					stackPool[j] = right;
-					stackDistance[j] = dist1;
-					stack++;
-					ndAssert(stack < D_SCENE_MAX_STACK_DEPTH);
 				}
 			}
 		}
@@ -1313,14 +1367,13 @@ bool ndScene::RayCast(ndRayCastNotify& callback, const ndVector& globalOrigin, c
 		ndFloat32 dist2 = segment.DotProduct(segment).GetScalar();
 		if (dist2 > ndFloat32(1.0e-8f))
 		{
-			ndFloat32 distance[D_SCENE_MAX_STACK_DEPTH];
-			const ndBvhNode* stackPool[D_SCENE_MAX_STACK_DEPTH];
+			ndFixSizeArray<ndFloat32, D_SCENE_MAX_STACK_DEPTH> distance;
+			ndFixSizeArray<const ndBvhNode*, D_SCENE_MAX_STACK_DEPTH> stackPool;
 
 			ndFastRay ray(p0, p1);
-
-			stackPool[0] = m_rootNode;
-			distance[0] = ray.BoxIntersect(m_rootNode->m_minBox, m_rootNode->m_maxBox);
-			state = RayCast(callback, stackPool, distance, 1, ray);
+			stackPool.PushBack(m_rootNode);
+			distance.PushBack(ray.BoxIntersect(m_rootNode->m_minBox, m_rootNode->m_maxBox));
+			state = RayCast(callback, stackPool, distance, ray);
 		}
 	}
 	return state;
@@ -1337,8 +1390,8 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& co
 		ndAssert(globalOrigin.TestOrthogonal());
 		convexShape.CalculateAabb(globalOrigin, boxP0, boxP1);
 
-		ndFloat32 distance[D_SCENE_MAX_STACK_DEPTH];
-		const ndBvhNode* stackPool[D_SCENE_MAX_STACK_DEPTH];
+		ndFixSizeArray<ndFloat32, D_SCENE_MAX_STACK_DEPTH> distance;
+		ndFixSizeArray<const ndBvhNode*, D_SCENE_MAX_STACK_DEPTH> stackPool;
 
 		const ndVector velocB(ndVector::m_zero);
 		const ndVector velocA((globalDest - globalOrigin.m_posit) & ndVector::m_triplexMask);
@@ -1346,9 +1399,9 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& co
 		const ndVector maxBox(m_rootNode->m_maxBox - boxP0);
 		ndFastRay ray(ndVector::m_zero, velocA);
 
-		stackPool[0] = m_rootNode;
-		distance[0] = ray.BoxIntersect(minBox, maxBox);
-		state = ConvexCast(callback, stackPool, distance, 1, ray, convexShape, globalOrigin, globalDest);
+		stackPool.PushBack(m_rootNode);
+		distance.PushBack(ray.BoxIntersect(minBox, maxBox));
+		state = ConvexCast(callback, stackPool, distance, ray, convexShape, globalOrigin, globalDest);
 	}
 	return state;
 }

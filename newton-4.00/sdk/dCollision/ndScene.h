@@ -133,8 +133,8 @@ class ndScene : public ndThreadPool
 	void ProcessContacts(ndInt32 threadIndex, ndInt32 contactCount, ndContactSolver* const contactSolver);
 
 	ndJointBilateralConstraint* FindBilateralJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
-	bool RayCast(ndRayCastNotify& callback, const ndBvhNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray) const;
-	bool ConvexCast(ndConvexCastNotify& callback, const ndBvhNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const;
+	bool RayCast(ndRayCastNotify& callback, ndFixSizeArray<const ndBvhNode*, D_SCENE_MAX_STACK_DEPTH> stackPool, ndFixSizeArray<ndFloat32, D_SCENE_MAX_STACK_DEPTH>& distance, const ndFastRay& ray) const;
+	bool ConvexCast(ndConvexCastNotify& callback, ndFixSizeArray<const ndBvhNode*, D_SCENE_MAX_STACK_DEPTH> stackPool, ndFixSizeArray<ndFloat32, D_SCENE_MAX_STACK_DEPTH>& distance, const ndFastRay& ray, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const;
 
 	// call from sub steps update
 	D_COLLISION_API virtual void ApplyExtForce();
