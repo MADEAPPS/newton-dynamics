@@ -2855,29 +2855,46 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsDiscrete()
 	const ndMatrix& matrix1 = compoundInstance->GetGlobalMatrix();
 	ndBoxBoxDistance2 data(matrix0, matrix1);
 
-	ndInt32 stack = 1;
 	ndInt32 contactCount = 0;
-	ndFloat32 stackDistance[D_SCENE_MAX_STACK_DEPTH];
-	const ndShapeCompound::ndNodeBase* stackPool[D_COMPOUND_STACK_DEPTH];
+	ndFixSizeArray<ndFloat32, D_SCENE_MAX_STACK_DEPTH> stackDistance;
+	ndFixSizeArray<const ndShapeCompound::ndNodeBase*, D_SCENE_MAX_STACK_DEPTH> stackPool;
 
-	stackPool[0] = compoundShape->m_root;
-	stackDistance[0] = data.CalculateDistance2(origin, size, compoundShape->m_root->m_origin, compoundShape->m_root->m_size);
+	stackPool.PushBack(compoundShape->m_root);
+	stackDistance.PushBack(data.CalculateDistance2(origin, size, compoundShape->m_root->m_origin, compoundShape->m_root->m_size));
 	ndFloat32 closestDist2 = (stackDistance[0] > ndFloat32(0.0f)) ? stackDistance[0] : ndFloat32(1.0e10f);
 
-	while (stack)
+	auto InsertNode = [&stackDistance, &stackPool](const ndShapeCompound::ndNodeBase* const node, ndFloat32 dist)
 	{
-		stack--;
-		
-		ndFloat32 dist2 = stackDistance[stack];
+		stackPool.PushBack(node);
+		stackDistance.PushBack(dist);
+		ndInt32 slotIndex = stackDistance.GetCount() - 2;
+
+		for (; (slotIndex >= 0) && (stackDistance[slotIndex + 1] > stackDistance[slotIndex]); --slotIndex)
+		{
+			ndSwap(stackPool[slotIndex], stackPool[slotIndex + 1]);
+			ndSwap(stackDistance[slotIndex], stackDistance[slotIndex + 1]);
+		}
+
+		#ifdef _DEBUG
+		for (ndInt32 i = stackDistance.GetCount() - 1; i > 0; --i)
+		{
+			ndAssert(stackDistance[i - 1] >= stackDistance[i]);
+		}
+		#endif
+	};
+
+	while (stackDistance.GetCount())
+	{
+		//ndFloat32 dist2 = stackDistance[stack];
+		ndFloat32 dist2 = stackDistance.Pop();
+		const ndShapeCompound::ndNodeBase* const node = stackPool.Pop();
 		if (dist2 > ndFloat32(0.0f))
 		{
 			closestDist2 = ndMin (closestDist2, dist2);
 			break;
 		}
 
-		const ndShapeCompound::ndNodeBase* const node = stackPool[stack];
 		ndAssert(node);
-
 		if (node->m_type == ndShapeCompound::m_leaf)
 		{
 			ndShapeInstance* const subShape = node->GetShape();
@@ -2912,39 +2929,41 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsDiscrete()
 				}
 			}
 		}
-		else if (stack < (ndInt32(sizeof(stackPool) / sizeof(stackPool[0])) - 2))
+		//else if (stack < (ndInt32(sizeof(stackPool) / sizeof(stackPool[0])) - 2))
 		{
 			ndAssert(node->m_type == ndShapeCompound::m_node);
 			{
 				const ndShapeCompound::ndNodeBase* const left = node->m_left;
 				ndAssert(left);
 				ndFloat32 subDist2 = data.CalculateDistance2(origin, size, left->m_origin, left->m_size);
-				ndInt32 j = stack;
-				for (; j && (subDist2 > stackDistance[j - 1]); --j)
-				{
-					stackPool[j] = stackPool[j - 1];
-					stackDistance[j] = stackDistance[j - 1];
-				}
-				stackPool[j] = left;
-				stackDistance[j] = subDist2;
-				stack++;
-				ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0])));
+				//ndInt32 j = stack;
+				//for (; j && (subDist2 > stackDistance[j - 1]); --j)
+				//{
+				//	stackPool[j] = stackPool[j - 1];
+				//	stackDistance[j] = stackDistance[j - 1];
+				//}
+				//stackPool[j] = left;
+				//stackDistance[j] = subDist2;
+				//stack++;
+				//ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0])));
+				InsertNode(left, subDist2);
 			}
 
 			{
 				const ndShapeCompound::ndNodeBase* const right = node->m_right;
 				ndAssert(right);
 				ndFloat32 subDist2 = data.CalculateDistance2(origin, size, right->m_origin, right->m_size);
-				ndInt32 j = stack;
-				for (; j && (subDist2 > stackDistance[j - 1]); --j)
-				{
-					stackPool[j] = stackPool[j - 1];
-					stackDistance[j] = stackDistance[j - 1];
-				}
-				stackPool[j] = right;
-				stackDistance[j] = subDist2;
-				stack++;
-				ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0])));
+				//ndInt32 j = stack;
+				//for (; j && (subDist2 > stackDistance[j - 1]); --j)
+				//{
+				//	stackPool[j] = stackPool[j - 1];
+				//	stackDistance[j] = stackDistance[j - 1];
+				//}
+				//stackPool[j] = right;
+				//stackDistance[j] = subDist2;
+				//stack++;
+				//ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0])));
+				InsertNode(right, subDist2);
 			}
 		}
 	}
@@ -2978,26 +2997,43 @@ ndInt32 ndContactSolver::CompoundToConvexContactsDiscrete()
 	ndShapeCompound* const compoundShape = m_instance0.GetShape()->GetAsShapeCompound();
 	ndAssert(compoundShape);
 
-	ndFloat32 stackDistance[D_SCENE_MAX_STACK_DEPTH];
-	const ndShapeCompound::ndNodeBase* stackPool[D_COMPOUND_STACK_DEPTH];
+	ndFixSizeArray<ndFloat32, D_SCENE_MAX_STACK_DEPTH> stackDistance;
+	ndFixSizeArray<const ndShapeCompound::ndNodeBase*, D_SCENE_MAX_STACK_DEPTH> stackPool;
 
-	ndInt32 stack = 1;
 	ndInt32 contactCount = 0;
-	stackPool[0] = compoundShape->m_root;
-	stackDistance[0] = data.CalculateDistance2(compoundShape->m_root->m_origin, compoundShape->m_root->m_size, origin, size);
+	stackPool.PushBack(compoundShape->m_root);
+	stackDistance.PushBack(data.CalculateDistance2(compoundShape->m_root->m_origin, compoundShape->m_root->m_size, origin, size));
 	ndFloat32 closestDist2 = (stackDistance[0] > ndFloat32(0.0f)) ? stackDistance[0] : ndFloat32(1.0e10f);
 
-	while (stack)
+	auto InsertNode = [&stackDistance, &stackPool](const ndShapeCompound::ndNodeBase* const node, ndFloat32 dist)
 	{
-		stack--;
+		stackPool.PushBack(node);
+		stackDistance.PushBack(dist);
+		ndInt32 slotIndex = stackDistance.GetCount() - 2;
 
-		ndFloat32 dist2 = stackDistance[stack];
+		for (; (slotIndex >= 0) && (stackDistance[slotIndex + 1] > stackDistance[slotIndex]); --slotIndex)
+		{
+			ndSwap(stackPool[slotIndex], stackPool[slotIndex + 1]);
+			ndSwap(stackDistance[slotIndex], stackDistance[slotIndex + 1]);
+		}
+
+		#ifdef _DEBUG
+		for (ndInt32 i = stackDistance.GetCount() - 1; i > 0; --i)
+		{
+			ndAssert(stackDistance[i - 1] >= stackDistance[i]);
+		}
+		#endif
+	};
+
+	while (stackDistance.GetCount())
+	{
+		ndFloat32 dist2 = stackDistance.Pop();
+		const ndShapeCompound::ndNodeBase* const node = stackPool.Pop();
 		if (dist2 > ndFloat32(0.0f))
 		{
 			closestDist2 = ndMin(closestDist2, dist2);
 			break;
 		}
-		const ndShapeCompound::ndNodeBase* const node = stackPool[stack];
 		ndAssert(node);
 
 		if (node->m_type == ndShapeCompound::m_leaf)
@@ -3034,39 +3070,41 @@ ndInt32 ndContactSolver::CompoundToConvexContactsDiscrete()
 				}
 			}
 		}
-		else if (stack < (ndInt32(sizeof(stackPool) / sizeof(stackPool[0])) - 2))
+		//else if (stack < (ndInt32(sizeof(stackPool) / sizeof(stackPool[0])) - 2))
 		{
 			ndAssert(node->m_type == ndShapeCompound::m_node);
 			{
 				const ndShapeCompound::ndNodeBase* const left = node->m_left;
 				ndAssert(left);
 				ndFloat32 subDist2 = data.CalculateDistance2(left->m_origin, left->m_size, origin, size);
-				ndInt32 j = stack;
-				for (; j && (subDist2 > stackDistance[j - 1]); --j)
-				{
-					stackPool[j] = stackPool[j - 1];
-					stackDistance[j] = stackDistance[j - 1];
-				}
-				stackPool[j] = left;
-				stackDistance[j] = subDist2;
-				stack++;
-				ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0])));
+				//ndInt32 j = stack;
+				//for (; j && (subDist2 > stackDistance[j - 1]); --j)
+				//{
+				//	stackPool[j] = stackPool[j - 1];
+				//	stackDistance[j] = stackDistance[j - 1];
+				//}
+				//stackPool[j] = left;
+				//stackDistance[j] = subDist2;
+				//stack++;
+				//ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0])));
+				InsertNode(left, subDist2);
 			}
 
 			{
 				const ndShapeCompound::ndNodeBase* const right = node->m_right;
 				ndAssert(right);
 				ndFloat32 subDist2 = data.CalculateDistance2(right->m_origin, right->m_size, origin, size);
-				ndInt32 j = stack;
-				for (; j && (subDist2 > stackDistance[j - 1]); --j)
-				{
-					stackPool[j] = stackPool[j - 1];
-					stackDistance[j] = stackDistance[j - 1];
-				}
-				stackPool[j] = right;
-				stackDistance[j] = subDist2;
-				stack++;
-				ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0])));
+				//ndInt32 j = stack;
+				//for (; j && (subDist2 > stackDistance[j - 1]); --j)
+				//{
+				//	stackPool[j] = stackPool[j - 1];
+				//	stackDistance[j] = stackDistance[j - 1];
+				//}
+				//stackPool[j] = right;
+				//stackDistance[j] = subDist2;
+				//stack++;
+				//ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0])));
+				InsertNode(right, subDist2);
 			}
 		}
 	}
@@ -3432,28 +3470,45 @@ ndInt32 ndContactSolver::CompoundToStaticHeightfieldContactsDiscrete()
 	const ndMatrix& heightfieldMatrix = heightfieldInstance->GetGlobalMatrix();
 	ndBoxBoxDistance2 data(compoundMatrix, heightfieldMatrix);
 
-	ndFloat32 stackDistance[D_SCENE_MAX_STACK_DEPTH];
-	const ndShapeCompound::ndNodeBase* stackPool[D_COMPOUND_STACK_DEPTH];
+	ndFixSizeArray<ndFloat32, D_SCENE_MAX_STACK_DEPTH> stackDistance;
+	ndFixSizeArray<const ndShapeCompound::ndNodeBase*, D_SCENE_MAX_STACK_DEPTH> stackPool;
 
 	ndStackEntry callback;
-	ndInt32 stack = 1;
 	ndInt32 contactCount = 0;
-	stackPool[0] = compoundShape->m_root;
-	stackDistance[0] = callback.CalculateHeighfieldDist2(data, compoundShape->m_root, heightfieldInstance);
+	stackPool.PushBack(compoundShape->m_root);
+	stackDistance.PushBack(callback.CalculateHeighfieldDist2(data, compoundShape->m_root, heightfieldInstance));
 	ndFloat32 closestDist2 = (stackDistance[0] > ndFloat32(0.0f)) ? stackDistance[0] : ndFloat32(1.0e10f);
 
-	while (stack)
+	auto InsertNode = [&stackDistance, &stackPool](const ndShapeCompound::ndNodeBase* const node, ndFloat32 dist)
 	{
-		stack--;
+		stackPool.PushBack(node);
+		stackDistance.PushBack(dist);
+		ndInt32 slotIndex = stackDistance.GetCount() - 2;
 
-		ndFloat32 dist2 = stackDistance[stack];
+		for (; (slotIndex >= 0) && (stackDistance[slotIndex + 1] > stackDistance[slotIndex]); --slotIndex)
+		{
+			ndSwap(stackPool[slotIndex], stackPool[slotIndex + 1]);
+			ndSwap(stackDistance[slotIndex], stackDistance[slotIndex + 1]);
+		}
+
+		#ifdef _DEBUG
+		for (ndInt32 i = stackDistance.GetCount() - 1; i > 0; --i)
+		{
+			ndAssert(stackDistance[i - 1] >= stackDistance[i]);
+		}
+		#endif
+	};
+
+	while (stackDistance.GetCount())
+	{
+		ndFloat32 dist2 = stackDistance.Pop();
+		const ndShapeCompound::ndNodeBase* const node = stackPool.Pop();
+
 		if (dist2 > ndFloat32(0.0f))
 		{
 			closestDist2 = ndMin(closestDist2, dist2);
 			break;
 		}
-
-		const ndShapeCompound::ndNodeBase* const node = stackPool[stack];
 		ndAssert(node);
 
 		if (node->m_type == ndShapeCompound::m_leaf)
@@ -3490,39 +3545,41 @@ ndInt32 ndContactSolver::CompoundToStaticHeightfieldContactsDiscrete()
 				}
 			}
 		}
-		else if (stack < (ndInt32(sizeof(stackPool) / sizeof(stackPool[0]))- 2))
+		//else if (stack < (ndInt32(sizeof(stackPool) / sizeof(stackPool[0]))- 2))
 		{
 			ndAssert(node->m_type == ndShapeCompound::m_node);
 			{
 				const ndShapeCompound::ndNodeBase* const left = node->m_left;
 				ndAssert(left);
 				ndFloat32 subDist2 = callback.CalculateHeighfieldDist2(data, left, heightfieldInstance);
-				ndInt32 j = stack;
-				for (; j && (subDist2 > stackDistance[j - 1]); --j)
-				{
-					stackPool[j] = stackPool[j - 1];
-					stackDistance[j] = stackDistance[j - 1];
-				}
-				stackPool[j] = left;
-				stackDistance[j] = subDist2;
-				stack++;
-				ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0])));
+				//ndInt32 j = stack;
+				//for (; j && (subDist2 > stackDistance[j - 1]); --j)
+				//{
+				//	stackPool[j] = stackPool[j - 1];
+				//	stackDistance[j] = stackDistance[j - 1];
+				//}
+				//stackPool[j] = left;
+				//stackDistance[j] = subDist2;
+				//stack++;
+				//ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0])));
+				InsertNode(left, subDist2);
 			}
 
 			{
 				const ndShapeCompound::ndNodeBase* const right = node->m_right;
 				ndAssert(right);
 				ndFloat32 subDist2 = callback.CalculateHeighfieldDist2(data, right, heightfieldInstance);
-				ndInt32 j = stack;
-				for (; j && (subDist2 > stackDistance[j - 1]); --j)
-				{
-					stackPool[j] = stackPool[j - 1];
-					stackDistance[j] = stackDistance[j - 1];
-				}
-				stackPool[j] = right;
-				stackDistance[j] = subDist2;
-				stack++;
-				ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0])));
+				//ndInt32 j = stack;
+				//for (; j && (subDist2 > stackDistance[j - 1]); --j)
+				//{
+				//	stackPool[j] = stackPool[j - 1];
+				//	stackDistance[j] = stackDistance[j - 1];
+				//}
+				//stackPool[j] = right;
+				//stackDistance[j] = subDist2;
+				//stack++;
+				//ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0])));
+				InsertNode(right, subDist2);
 			}
 		}
 	}
@@ -3556,30 +3613,46 @@ ndInt32 ndContactSolver::CompoundToStaticProceduralMesh()
 	const ndMatrix& ProceduralMatrix = ProceduralInstance->GetGlobalMatrix();
 	ndBoxBoxDistance2 data(compoundMatrix, ProceduralMatrix);
 
-	ndFloat32 stackDistance[D_SCENE_MAX_STACK_DEPTH];
-	const ndShapeCompound::ndNodeBase* stackPool[D_COMPOUND_STACK_DEPTH];
+	ndFixSizeArray<ndFloat32, D_SCENE_MAX_STACK_DEPTH> stackDistance;
+	ndFixSizeArray<const ndShapeCompound::ndNodeBase*, D_SCENE_MAX_STACK_DEPTH> stackPool;
 
 	ndStackEntry callback;
-	ndInt32 stack = 1;
 	ndInt32 contactCount = 0;
-	stackPool[0] = compoundShape->m_root;
-	stackDistance[0] = callback.CalculateProceduralDist2(data, compoundShape->m_root, ProceduralInstance);
+	stackPool.PushBack(compoundShape->m_root);
+	stackDistance.PushBack(callback.CalculateProceduralDist2(data, compoundShape->m_root, ProceduralInstance));
 	ndFloat32 closestDist2 = (stackDistance[0] > ndFloat32(0.0f)) ? stackDistance[0] : ndFloat32(1.0e10f);
 
-	while (stack)
+	auto InsertNode = [&stackDistance, &stackPool](const ndShapeCompound::ndNodeBase* const node, ndFloat32 dist)
 	{
-		stack--;
+		stackPool.PushBack(node);
+		stackDistance.PushBack(dist);
+		ndInt32 slotIndex = stackDistance.GetCount() - 2;
 
-		ndFloat32 dist2 = stackDistance[stack];
+		for (; (slotIndex >= 0) && (stackDistance[slotIndex + 1] > stackDistance[slotIndex]); --slotIndex)
+		{
+			ndSwap(stackPool[slotIndex], stackPool[slotIndex + 1]);
+			ndSwap(stackDistance[slotIndex], stackDistance[slotIndex + 1]);
+		}
+
+		#ifdef _DEBUG
+		for (ndInt32 i = stackDistance.GetCount() - 1; i > 0; --i)
+		{
+			ndAssert(stackDistance[i - 1] >= stackDistance[i]);
+		}
+		#endif
+	};
+
+	while (stackDistance.GetCount())
+	{
+		ndFloat32 dist2 = stackDistance.Pop();
+		const ndShapeCompound::ndNodeBase* const node = stackPool.Pop();
 		if (dist2 > ndFloat32(0.0f))
 		{
 			closestDist2 = ndMin(closestDist2, dist2);
 			break;
 		}
 
-		const ndShapeCompound::ndNodeBase* const node = stackPool[stack];
 		ndAssert(node);
-
 		if (node->m_type == ndShapeCompound::m_leaf)
 		{
 			ndShapeInstance* const subShape = node->GetShape();
@@ -3614,39 +3687,41 @@ ndInt32 ndContactSolver::CompoundToStaticProceduralMesh()
 				}
 			}
 		}
-		else if (stack < (ndInt32(sizeof(stackPool) / sizeof(stackPool[0])) - 2))
+		//else if (stack < (ndInt32(sizeof(stackPool) / sizeof(stackPool[0])) - 2))
 		{
 			ndAssert(node->m_type == ndShapeCompound::m_node);
 			{
 				const ndShapeCompound::ndNodeBase* const left = node->m_left;
 				ndAssert(left);
 				ndFloat32 subDist2 = callback.CalculateProceduralDist2(data, left, ProceduralInstance);
-				ndInt32 j = stack;
-				for (; j && (subDist2 > stackDistance[j - 1]); --j)
-				{
-					stackPool[j] = stackPool[j - 1];
-					stackDistance[j] = stackDistance[j - 1];
-				}
-				stackPool[j] = left;
-				stackDistance[j] = subDist2;
-				stack++;
-				ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0])));
+				//ndInt32 j = stack;
+				//for (; j && (subDist2 > stackDistance[j - 1]); --j)
+				//{
+				//	stackPool[j] = stackPool[j - 1];
+				//	stackDistance[j] = stackDistance[j - 1];
+				//}
+				//stackPool[j] = left;
+				//stackDistance[j] = subDist2;
+				//stack++;
+				//ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0])));
+				InsertNode(left, subDist2);
 			}
 
 			{
 				const ndShapeCompound::ndNodeBase* const right = node->m_right;
 				ndAssert(right);
 				ndFloat32 subDist2 = callback.CalculateProceduralDist2(data, right, ProceduralInstance);
-				ndInt32 j = stack;
-				for (; j && (subDist2 > stackDistance[j - 1]); --j)
-				{
-					stackPool[j] = stackPool[j - 1];
-					stackDistance[j] = stackDistance[j - 1];
-				}
-				stackPool[j] = right;
-				stackDistance[j] = subDist2;
-				stack++;
-				ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0])));
+				//ndInt32 j = stack;
+				//for (; j && (subDist2 > stackDistance[j - 1]); --j)
+				//{
+				//	stackPool[j] = stackPool[j - 1];
+				//	stackDistance[j] = stackDistance[j - 1];
+				//}
+				//stackPool[j] = right;
+				//stackDistance[j] = subDist2;
+				//stack++;
+				//ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0])));
+				InsertNode(right, subDist2);
 			}
 		}
 	}
@@ -3907,26 +3982,44 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsContinue()
 	ndVector closestPoint1(ndVector::m_zero);
 	ndVector separatingVector(ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f));
 
-	ndFloat32 impactTime[D_SCENE_MAX_STACK_DEPTH];
-	const ndShapeCompound::ndNodeBase* stackPool[D_COMPOUND_STACK_DEPTH];
+	ndFixSizeArray<ndFloat32, D_SCENE_MAX_STACK_DEPTH> impactTime;
+	ndFixSizeArray<const ndShapeCompound::ndNodeBase*, D_SCENE_MAX_STACK_DEPTH> stackPool;
 
-	ndInt32 stack = 1;
 	ndInt32 contactCount = 0;
 	ndFloat32 minTimeStep = m_timestep;
+	stackPool.PushBack(compoundShape->m_root);
+	impactTime.PushBack(ray.BoxIntersect(rootMinBox, rootMaxBox));
 
-	stackPool[0] = compoundShape->m_root;
-	impactTime[0] = ray.BoxIntersect(rootMinBox, rootMaxBox);
-	while (stack)
+	auto InsertNode = [&impactTime, &stackPool](const ndShapeCompound::ndNodeBase* const node, ndFloat32 dist)
 	{
-		stack--;
-		ndFloat32 dist = impactTime[stack];
+		stackPool.PushBack(node);
+		impactTime.PushBack(dist);
+		ndInt32 slotIndex = impactTime.GetCount() - 2;
+
+		for (; (slotIndex >= 0) && (impactTime[slotIndex + 1] > impactTime[slotIndex]); --slotIndex)
+		{
+			ndSwap(stackPool[slotIndex], stackPool[slotIndex + 1]);
+			ndSwap(impactTime[slotIndex], impactTime[slotIndex + 1]);
+		}
+
+		#ifdef _DEBUG
+		for (ndInt32 i = impactTime.GetCount() - 1; i > 0; --i)
+		{
+			ndAssert(impactTime[i - 1] >= impactTime[i]);
+		}
+		#endif
+	};
+
+	while (impactTime.GetCount())
+	{
+		ndFloat32 dist = impactTime.Pop();
+		const ndShapeCompound::ndNodeBase* const node = stackPool.Pop();
 		if (dist > ndFloat32 (1.0f))
 		{
 			break;
 		}
 
-		ndAssert(stackPool[stack]);
-		const ndShapeCompound::ndNodeBase* const node = stackPool[stack];
+		ndAssert(node);
 		if (node->m_type == ndShapeCompound::m_leaf)
 		{
 			ndShapeInstance* const subShape = node->GetShape();
@@ -3982,7 +4075,7 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsContinue()
 				}
 			}
 		}
-		else if (stack < (ndInt32(sizeof(stackPool) / sizeof(stackPool[0]))- 2))
+		//else if (stack < (ndInt32(sizeof(stackPool) / sizeof(stackPool[0]))- 2))
 		{
 			ndAssert(node->m_type == ndShapeCompound::m_node);
 			{
@@ -3993,16 +4086,17 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsContinue()
 				ndFloat32 dist1 = ray.BoxIntersect(minBox, maxBox);
 				if (dist1 <= ndFloat32 (1.0f))
 				{
-					ndInt32 j = stack;
-					for (; j && (dist1 > impactTime[j - 1]); --j)
-					{
-						stackPool[j] = stackPool[j - 1];
-						impactTime[j] = impactTime[j - 1];
-					}
-					stackPool[j] = left;
-					impactTime[j] = dist1;
-					stack++;
-					ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0])));
+					//ndInt32 j = stack;
+					//for (; j && (dist1 > impactTime[j - 1]); --j)
+					//{
+					//	stackPool[j] = stackPool[j - 1];
+					//	impactTime[j] = impactTime[j - 1];
+					//}
+					//stackPool[j] = left;
+					//impactTime[j] = dist1;
+					//stack++;
+					//ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0])));
+					InsertNode(left, dist1);
 				}
 			}
 
@@ -4014,16 +4108,17 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsContinue()
 				ndFloat32 dist1 = ray.BoxIntersect(minBox, maxBox);
 				if (dist1 <= ndFloat32(1.0f))
 				{
-					ndInt32 j = stack;
-					for (; j && (dist1 > impactTime[j - 1]); --j)
-					{
-						stackPool[j] = stackPool[j - 1];
-						impactTime[j] = impactTime[j - 1];
-					}
-					stackPool[j] = right;
-					impactTime[j] = dist1;
-					stack++;
-					ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0])));
+					//ndInt32 j = stack;
+					//for (; j && (dist1 > impactTime[j - 1]); --j)
+					//{
+					//	stackPool[j] = stackPool[j - 1];
+					//	impactTime[j] = impactTime[j - 1];
+					//}
+					//stackPool[j] = right;
+					//impactTime[j] = dist1;
+					//stack++;
+					//ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0])));
+					InsertNode(right, dist1);
 				}
 			}
 		}

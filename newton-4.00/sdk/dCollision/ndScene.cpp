@@ -728,14 +728,13 @@ void ndScene::ProcessContacts(ndInt32, ndInt32 contactCount, ndContactSolver* co
 		contactPointList.Remove(nodes[i]);
 	}
 	
-	//contact->m_maxDof = ndUnsigned32(3 * contactPointList.GetCount());
 	contact->m_maxDof = ndUnsigned8(3 * contactPointList.GetCount());
 	m_contactNotifyCallback->OnContactCallback(contact, m_timestep);
 }
 
 void ndScene::SubmitPairs(ndBvhLeafNode* const leafNode, ndBvhNode* const node, bool forward, ndInt32 threadId)
 {
-	ndBvhNode* pool[D_SCENE_MAX_STACK_DEPTH];
+	ndFixSizeArray<ndBvhNode*, D_SCENE_MAX_STACK_DEPTH> pool;
 
 	ndBodyKinematic* const body0 = leafNode->GetBody() ? leafNode->GetBody() : nullptr;
 	ndAssert(body0);
@@ -747,12 +746,10 @@ void ndScene::SubmitPairs(ndBvhLeafNode* const leafNode, ndBvhNode* const node, 
 
 	ndBodyNotify* const notify = body0->GetNotifyCallback();
 
-	pool[0] = node;
-	ndInt32 stack = 1;
-	while (stack && (stack < (D_SCENE_MAX_STACK_DEPTH - 16)))
+	pool.PushBack(node);
+	while (pool.GetCount() && (pool.GetCount() < (D_SCENE_MAX_STACK_DEPTH - 16)))
 	{
-		stack--;
-		ndBvhNode* const rootNode = pool[stack];
+		ndBvhNode* const rootNode = pool.Pop();
 		if (ndOverlapTest(rootNode->m_minBox, rootNode->m_maxBox, boxP0, boxP1)) 
 		{
 			if (rootNode->GetAsSceneBodyNode()) 
@@ -777,19 +774,13 @@ void ndScene::SubmitPairs(ndBvhLeafNode* const leafNode, ndBvhNode* const node, 
 				ndBvhInternalNode* const tmpNode = rootNode->GetAsSceneTreeNode();
 				ndAssert(tmpNode->m_left);
 				ndAssert(tmpNode->m_right);
-		
-				pool[stack] = tmpNode->m_left;
-				stack++;
-				ndAssert(stack < ndInt32(sizeof(pool) / sizeof(pool[0])));
-		
-				pool[stack] = tmpNode->m_right;
-				stack++;
-				ndAssert(stack < ndInt32(sizeof(pool) / sizeof(pool[0])));
+				pool.PushBack(tmpNode->m_left);
+				pool.PushBack(tmpNode->m_right);
 			}
 		}
 	}
 
-	if (stack)
+	if (pool.GetCount())
 	{
 		m_forceBalanceSceneCounter = 0;
 	}
@@ -1283,14 +1274,11 @@ void ndScene::BodiesInAabb(ndBodiesInAabbNotify& callback, const ndVector& minBo
 	callback.Reset();
 	if (m_rootNode)
 	{
-		const ndBvhNode* stackPool[D_SCENE_MAX_STACK_DEPTH];
-		stackPool[0] = m_rootNode;
-		ndInt32 stack = 1;
-		while (stack && (stack < (D_SCENE_MAX_STACK_DEPTH - 4)))
+		ndFixSizeArray<const ndBvhNode*, D_SCENE_MAX_STACK_DEPTH> stackPool;
+		stackPool.PushBack(m_rootNode);
+		while (stackPool.GetCount())
 		{
-			stack--;
-			
-			const ndBvhNode* const rootNode = stackPool[stack];
+			const ndBvhNode* const rootNode = stackPool.Pop();
 			ndAssert(rootNode);
 			if (ndOverlapTest(rootNode->m_minBox, rootNode->m_maxBox, minBox, maxBox))
 			{
@@ -1307,16 +1295,10 @@ void ndScene::BodiesInAabb(ndBodiesInAabbNotify& callback, const ndVector& minBo
 				else
 				{
 					const ndBvhNode* const left = rootNode->GetLeft();
-					ndAssert(left);
-					stackPool[stack] = left;
-					stack++;
-					ndAssert(stack < D_SCENE_MAX_STACK_DEPTH);
+					stackPool.PushBack(left);
 
 					const ndBvhNode* const right = rootNode->GetRight();
-					ndAssert(right);
-					stackPool[stack] = right;
-					stack++;
-					ndAssert(stack < D_SCENE_MAX_STACK_DEPTH);
+					stackPool.PushBack(right);
 				}
 			}
 		}
