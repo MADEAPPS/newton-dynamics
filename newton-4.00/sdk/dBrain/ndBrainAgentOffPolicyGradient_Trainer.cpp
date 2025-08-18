@@ -75,7 +75,7 @@ ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 	m_numberOfActions = 0;
 	m_numberOfObservations = 0;
 
-	m_randomSeed = 47;
+	m_randomSeed = 42;
 	m_numberOfUpdates = 8;
 	m_numberOfHiddenLayers = 3;
 	m_maxTrajectorySteps = 1024 * 4;
