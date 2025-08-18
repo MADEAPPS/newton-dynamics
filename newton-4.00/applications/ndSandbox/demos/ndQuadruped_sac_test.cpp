@@ -28,7 +28,7 @@
 // to the environment with increasing complexity
 namespace ndQuadruped_sac
 {
-	#define ND_TRAIN_MODEL
+	//#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
 
 	enum Actions
@@ -62,6 +62,7 @@ namespace ndQuadruped_sac
 	#define D_CYCLE_STRIDE_Z		ndFloat32(0.3f)
 	#define D_CYCLE_AMPLITUDE		ndFloat32(0.27f)
 	#define D_POSE_REST_POSITION_Y	ndFloat32(-0.3f)
+	#define D_REWARD_FOR_DYING		ndFloat32(-50.0f)
 
 	#define D_ACTION_SENSITIVITY	ndReal(0.002f)
 
@@ -395,12 +396,13 @@ namespace ndQuadruped_sac
 			m_controller = ndSharedPtr<ndController> (new ndController(policy, robot));
 		}
 
-		//#pragma optimize( "", off )
+		#pragma optimize( "", off )
 		bool IsTerminal() const
 		{
 			const ndModelArticulation::ndNode* const rootNode = GetModel()->GetAsModelArticulation()->GetRoot();
 			const ndVector upDir (rootNode->m_body->GetMatrix().m_up);
-			if (upDir.m_y < ndCos(D_TILT_MAX_TILL_ANGLE * ndFloat32 (1.5f)))
+			//if (upDir.m_y < ndCos(D_TILT_MAX_TILL_ANGLE * ndFloat32 (1.5f)))
+			if (upDir.m_y < ndCos(D_TILT_MAX_TILL_ANGLE))
 			{
 				return true;
 			}
@@ -502,11 +504,16 @@ namespace ndQuadruped_sac
 
 		ndFloat32 CalculateFloorDistance(const ndEffectorInfo& leg) const
 		{
-			ndWorld* const world = GetModel()->GetWorld();
-			const ndRayCastFloor caster(world, leg);
-			ndFloat32 hitDist = ndClamp(caster.m_param, ndFloat32(0.1284f), (D_CYCLE_AMPLITUDE));
-			hitDist = (hitDist - ndFloat32(0.1284f)) / D_CYCLE_AMPLITUDE;
-			return hitDist;
+			const ndContact* const contact = GetContact(leg.m_effector);
+			if (!contact)
+			{
+				ndWorld* const world = GetModel()->GetWorld();
+				const ndRayCastFloor caster(world, leg);
+
+				// just return the paramertic hit
+				return caster.m_param;
+			}
+			return ndFloat32(0.0f);
 		}
 
 		//#pragma optimize( "", off )
@@ -514,54 +521,8 @@ namespace ndQuadruped_sac
 		{
 			if (IsTerminal())
 			{
-				return ndBrainFloat (-50.0f);
+				return D_REWARD_FOR_DYING;
 			}
-
-#if 0
-			auto PolynomialOmegaReward = [](ndFloat32 omega, ndFloat32 maxValue)
-			{
-				omega = ndClamp(omega, -maxValue, maxValue);
-				ndFloat32 r = ndFloat32(1.0f) - ndAbs(omega) / maxValue;
-				ndFloat32 reward = r * r * r * r;
-				return reward;
-			};
-
-			auto PolynomialAccelerationReward = [](ndFloat32 alpha, ndFloat32 maxValue)
-			{
-				alpha = ndClamp(alpha, -maxValue, maxValue);
-				ndFloat32 r = ndFloat32(1.0f) - ndAbs(alpha) / maxValue;
-				ndFloat32 reward = r * r;
-				return reward;
-			};
-
-			// calculate a surrogate zero moment point
-			const ndModelArticulation::ndCenterOfMassDynamics comDynamics(CalculateDynamics(m_timestep));
-
-			ndFloat32 xAlpha = comDynamics.m_alpha.m_z / DEMO_GRAVITY;
-			ndFloat32 zAlpha = -comDynamics.m_alpha.m_x / DEMO_GRAVITY;
-			const ndVector surrogateLocalZmpPoint(xAlpha, ndFloat32(0.0f), zAlpha, ndFloat32(1.0f));
-			ndVector scaledSurrogateLocalZmpPoint(surrogateLocalZmpPoint.Scale(ndFloat32 (0.25f)));
-			scaledSurrogateLocalZmpPoint.m_w = ndFloat32 (1.0f);
-
-			static float xxxxx = 0.0f;
-			static float zzzzz = 0.0f;
-			if ((ndAbs(scaledSurrogateLocalZmpPoint.m_x) > xxxxx) || (ndAbs(scaledSurrogateLocalZmpPoint.m_z) > zzzzz))
-			{
-				xxxxx = ndMax(xxxxx, ndAbs(scaledSurrogateLocalZmpPoint.m_x));
-				zzzzz = ndMax(zzzzz, ndAbs(scaledSurrogateLocalZmpPoint.m_z));
-				ndTrace(("zmp(%f %f)\n", xxxxx, zzzzz));
-			}
-
-			ndFloat32 dist = CalculateSupportDistance(comDynamics);
-			if (dist < 0.001f)
-			{
-				return ndFloat32(1.0f);
-			}
-
-			ndFloat32 alphaReward_x = PolynomialAccelerationReward(scaledSurrogateLocalZmpPoint.m_x, 4.0f);
-			ndFloat32 alphaReward_z = PolynomialAccelerationReward(scaledSurrogateLocalZmpPoint.m_z, 2.0f);
-			return ndFloat32(0.5f) * (alphaReward_x + alphaReward_z);
-#endif
 
 			ndFloat32 contacSlideSpeed = 0.0f;
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
@@ -598,9 +559,15 @@ namespace ndQuadruped_sac
 				return SparseReward(slideSpeed, ndFloat32(2.0f));
 			};
 
-			auto CalculateSparceTiltReward = [SparseReward](const ndFloat32 sinAngle)
+			auto CalculateSparceTiltReward___ = [SparseReward](const ndFloat32 sinAngle)
 			{
 				ndFloat32 angle = ndAsin(ndClamp(sinAngle, ndFloat32(-1.0f), ndFloat32(1.0f)));
+				return SparseReward(angle, D_TILT_MAX_TILL_ANGLE);
+			};
+
+			auto CalculateSparceTiltReward = [SparseReward](const ndFloat32 cosAngle)
+			{
+				ndFloat32 angle = ndAcos(ndClamp(cosAngle, ndFloat32(-1.0f), ndFloat32(1.0f)));
 				return SparseReward(angle, D_TILT_MAX_TILL_ANGLE);
 			};
 
@@ -612,22 +579,12 @@ namespace ndQuadruped_sac
 
 			const ndVector upDir (referenceFrame.UnrotateVector(rootNode->m_body->GetMatrix().m_up));
 
-			if (upDir.m_y < ndCos(D_TILT_MAX_TILL_ANGLE))
-			{
-				// add a penalty for few frames before dying
-				return ndBrainFloat(-5.0f);
-			}
-
-			//ndFloat32 xxx0 = CalculateSparceTiltReward(0.0f);
-			//ndFloat32 xxx1 = CalculateSparceTiltReward(0.01f);
-			//ndFloat32 xxx2 = CalculateSparceTiltReward(0.1f);
-			//ndFloat32 xxx3 = CalculateSparceTiltReward(0.5f);
-
 			ndFloat32 slideReward = ContacSlidingReward(contacSlideSpeed);
-			ndFloat32 tiltReward_x = CalculateSparceTiltReward(upDir.m_x);
-			ndFloat32 tiltReward_z = CalculateSparceTiltReward(upDir.m_z);
-
-			return tiltReward_x * 0.3f + tiltReward_z * 0.3f + slideReward * 0.4f;
+			//ndFloat32 tiltReward_x = CalculateSparceTiltReward(upDir.m_x);
+			//ndFloat32 tiltReward_z = CalculateSparceTiltReward(upDir.m_z);
+			//return tiltReward_x * 0.4f + tiltReward_z * 0.4f + slideReward * 0.2f;
+			ndFloat32 tiltReward = CalculateSparceTiltReward(upDir.m_y);
+			return tiltReward * 0.7f + slideReward * 0.3f;
 		}
 
 		//#pragma optimize( "", off )
@@ -675,8 +632,6 @@ namespace ndQuadruped_sac
 				const ndVector keyFramePosit0(keyFrame0.m_posit);
 				const ndVector keyFramePosit1(keyFrame1.m_posit);
 
-				ndFloat32 floorDistance = CalculateFloorDistance(leg);
-
 				ndInt32 base = m_observationSize * i;
 				observations[base + m_posePosit_x] = ndBrainFloat(keyFramePosit0.m_x);
 				observations[base + m_posePosit_y] = ndBrainFloat(keyFramePosit0.m_y);
@@ -692,7 +647,8 @@ namespace ndQuadruped_sac
 				observations[base + m_effectorVeloc_y] = ndBrainFloat(effectorVeloc.m_y);
 				observations[base + m_effectorVeloc_z] = ndBrainFloat(effectorVeloc.m_z);
 
-				observations[base + m_contactDistance] = ndBrainFloat(floorDistance);
+				ndFloat32 floorDistanceParameter = CalculateFloorDistance(leg);
+				observations[base + m_contactDistance] = ndBrainFloat(floorDistanceParameter);
 			}
 
 			observations[m_observationSize * m_legs.GetCount() + 0] = m_comX / D_CYCLE_STRIDE_X;
@@ -1096,11 +1052,10 @@ namespace ndQuadruped_sac
 			m_stopTraining = 1000000;
 			ndBrainAgentOffPolicyGradient_Trainer::HyperParameters hyperParameters;
 
-			//hyperParameters.m_usePerActionSigmas = true;
+			hyperParameters.m_numberOfHiddenLayers = 2;
+			hyperParameters.m_discountRewardFactor = 0.999f;
 			hyperParameters.m_numberOfActions = numberOfActions;
 			hyperParameters.m_numberOfObservations = numberOfObservations;
-			//hyperParameters.m_numberOfHiddenLayers = hiddenLayers;
-			//hyperParameters.m_hiddenLayersNumberOfNeurons = hiddenLayersNeurons;
 			m_master = ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>(new ndBrainAgentOffPolicyGradient_Trainer(hyperParameters));
 
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
