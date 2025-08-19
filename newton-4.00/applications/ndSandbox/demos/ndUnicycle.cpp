@@ -24,7 +24,7 @@
 
 namespace ndUnicycle
 {
-	//#define ND_TRAIN_AGENT
+	#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME			"unicycle_sac.dnn"
 
 	#define ND_MAX_LEG_JOINT_ANGLE	(ndFloat32 (45.0f) * ndDegreeToRad)
@@ -144,9 +144,9 @@ namespace ndUnicycle
 		class ndController : public ndBrainAgentContinuePolicyGradient
 		{
 			public:
-			ndController(const ndSharedPtr<ndBrain>& brain)
+			ndController(const ndSharedPtr<ndBrain>& brain, RobotModelNotify* const robot)
 				:ndBrainAgentContinuePolicyGradient(brain)
-				,m_robot(nullptr)
+				,m_robot(robot)
 			{
 			}
 
@@ -166,10 +166,10 @@ namespace ndUnicycle
 		class ndControllerTrainer : public ndBrainAgentOffPolicyGradient_Agent
 		{
 			public:
-			ndControllerTrainer(ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master)
+			ndControllerTrainer(ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master, RobotModelNotify* const robot)
 				:ndBrainAgentOffPolicyGradient_Agent(*master)
 				,m_solver()
-				,m_robot(nullptr)
+				,m_robot(robot)
 			{
 			}
 
@@ -203,35 +203,27 @@ namespace ndUnicycle
 		};
 
 		public:
-		RobotModelNotify(ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master, ndModelArticulation* const robot)
+		RobotModelNotify()
 			:ndModelNotify()
 			,m_controller____(nullptr)
-			,m_controllerTrainer____(nullptr)
+			,m_controllerTrainer(nullptr)
 		{
 			ndAssert(0);
-			//m_timestep = 0.0f;
-			//m_controllerTrainer = new ndControllerTrainer(master);
-			//m_controllerTrainer->m_robot = this;
-			//Init(robot);
-		}
-
-		RobotModelNotify(const ndSharedPtr<ndBrain>& policy, ndModelArticulation* const model)
-			:ndModelNotify()
-			,m_controller____(nullptr)
-			,m_controllerTrainer____(nullptr)
-		{
-			ndAssert(0);
-			//m_timestep = 0.0f;
-			//m_controller = new ndController(policy);
-			//m_controller->m_robot = this;
-			//Init(model);
+			m_timestep = 0.0f;
 		}
 
 		RobotModelNotify(const RobotModelNotify& src)
 			:ndModelNotify(src)
 		{
-			//Init(robot);
 			ndAssert(0);
+			m_timestep = 0.0f;
+		}
+
+		void SetControllerTrainer(ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master, ndModelArticulation* const model)
+		{
+			m_controllerTrainer = ndSharedPtr<ndBrainAgentOffPolicyGradient_Agent>(new ndControllerTrainer(master, this));
+			master->SetAgent(m_controllerTrainer);
+			Init(model);
 		}
 
 		void Init(ndModelArticulation* const model)
@@ -382,32 +374,31 @@ namespace ndUnicycle
 				return reward;
 			};
 
-			ndAssert(0);
-			return 0;
-			//ndIkSolver& solver = m_controllerTrainer->m_solver;
-			//ndFixSizeArray<ndJointBilateralConstraint*, 64> extraJoint;
-			//const ndModelArticulation::ndCenterOfMassDynamics comDynamics(GetModel()->GetAsModelArticulation()->CalculateCentreOfMassDynamics(solver, comFrame, extraJoint, m_timestep));
-			//const ndVector comOmega(comDynamics.m_omega);
-			//const ndVector comAlpha(comDynamics.m_alpha);
-			//
-			//ndVector veloc(m_box->GetVelocity());
-			//ndFloat32 speedReward = ndExp(-100.0f * veloc.m_x * veloc.m_x);
-			//
-			//ndFloat32 omegaReward = PolynomialOmegaReward(comOmega.m_x);
-			//ndFloat32 alphaReward = PolynomialAccelerationReward(comAlpha.m_x);
-			//ndFloat32 reward = ndFloat32(0.2f) * speedReward +  ndFloat32(0.4f) * omegaReward + ndFloat32(0.4f) * alphaReward;
-			//
-			//if (IsOnAir())
-			//{
-			//	// penalize air borne high angular velocity
-			//	const ndMatrix wheelMatrix(m_wheelJoint->CalculateGlobalMatrix0());
-			//	const ndVector wheelOmega(m_wheel->GetOmega());
-			//	ndFloat32 speed = (wheelOmega.DotProduct(wheelMatrix.m_front)).GetScalar();
-			//
-			//	ndFloat32 arg = -0.5f * speed * speed;
-			//	reward = ndExp(arg);
-			//}
-			//return ndBrainFloat(reward);
+			ndControllerTrainer* const controllerTrainer = (ndControllerTrainer*)*m_controllerTrainer;
+			ndIkSolver& solver = controllerTrainer->m_solver;
+			ndFixSizeArray<ndJointBilateralConstraint*, 64> extraJoint;
+			const ndModelArticulation::ndCenterOfMassDynamics comDynamics(GetModel()->GetAsModelArticulation()->CalculateCentreOfMassDynamics(solver, comFrame, extraJoint, m_timestep));
+			const ndVector comOmega(comDynamics.m_omega);
+			const ndVector comAlpha(comDynamics.m_alpha);
+			
+			ndVector veloc(m_box->GetVelocity());
+			ndFloat32 speedReward = ndExp(-100.0f * veloc.m_x * veloc.m_x);
+			
+			ndFloat32 omegaReward = PolynomialOmegaReward(comOmega.m_x);
+			ndFloat32 alphaReward = PolynomialAccelerationReward(comAlpha.m_x);
+			ndFloat32 reward = ndFloat32(0.2f) * speedReward +  ndFloat32(0.4f) * omegaReward + ndFloat32(0.4f) * alphaReward;
+			
+			if (IsOnAir())
+			{
+				// penalize air borne high angular velocity
+				const ndMatrix wheelMatrix(m_wheelJoint->CalculateGlobalMatrix0());
+				const ndVector wheelOmega(m_wheel->GetOmega());
+				ndFloat32 speed = (wheelOmega.DotProduct(wheelMatrix.m_front)).GetScalar();
+			
+				ndFloat32 arg = -0.5f * speed * speed;
+				reward = ndExp(arg);
+			}
+			return ndBrainFloat(reward);
 		}
 
 		//#pragma optimize( "", off )
@@ -475,16 +466,17 @@ namespace ndUnicycle
 		}
 		void Update(ndFloat32 timestep)
 		{
-			ndAssert(0);
-			//m_timestep = timestep;
-			//if (m_controllerTrainer)
-			//{
-			//	m_controllerTrainer->Step();
-			//}
-			//else
-			//{
-			//	m_controller->Step();
-			//}
+			m_timestep = timestep;
+			if (*m_controllerTrainer)
+			{
+				m_controllerTrainer->Step();
+			}
+			else
+			{
+				ndAssert(0);
+				//ndAssert(*m_controller);
+				//m_controller->Step();
+			}
 		}
 
 		void PostUpdate(ndFloat32)
@@ -502,10 +494,8 @@ namespace ndUnicycle
 		ndFixSizeArray<ndBasePose, 8> m_basePose;
 		ndFixSizeArray<ndBodyDynamic*, 8> m_bodies;
 
-		//ndController* m_controller;
-		//ndControllerTrainer* m_controllerTrainer;
 		ndSharedPtr<ndController> m_controller____;
-		ndSharedPtr<ndBrainAgentOffPolicyGradient_Agent> m_controllerTrainer____;
+		ndSharedPtr<ndBrainAgentOffPolicyGradient_Agent> m_controllerTrainer;
 		ndJointHinge* m_poleJoint;
 		ndJointHinge* m_wheelJoint;
 		ndBodyKinematic* m_box;
@@ -533,27 +523,30 @@ namespace ndUnicycle
 			fprintf(m_outFile, "sac\n");
 			m_stopTraining = 200000;
 
-			ndAssert(0);
-			//ndBrainAgentOffPolicyGradient_Trainer::HyperParameters hyperParameters;
-			//hyperParameters.m_numberOfActions = m_actionsSize;
-			//hyperParameters.m_numberOfObservations = m_observationsSize;
-			//m_master = ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>(new ndBrainAgentOffPolicyGradient_Trainer(hyperParameters));
-			//
-			//m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
-			//m_master->SetName(CONTROLLER_NAME);
-			//
-			//ndSharedPtr<ndModel>visualModel (CreateModel(scene, matrix, modelMesh));
-			//world->AddModel(visualModel);
-			//visualModel->AddBodiesAndJointsToWorld();
-			//
-			//ndBodyKinematic* const rootBody = visualModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic();
-			//ndSharedPtr<ndJointBilateralConstraint> visualPlaneJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
-			//world->AddJoint(visualPlaneJoint);
-			//
-			//visualModel->SetNotifyCallback(new RobotModelNotify(m_master, visualModel->GetAsModelArticulation()));
-			//SetMaterial(visualModel->GetAsModelArticulation());
-			//
-			//scene->SetAcceleratedUpdate();
+			ndBrainAgentOffPolicyGradient_Trainer::HyperParameters hyperParameters;
+			hyperParameters.m_numberOfActions = m_actionsSize;
+			hyperParameters.m_numberOfObservations = m_observationsSize;
+			m_master = ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>(new ndBrainAgentOffPolicyGradient_Trainer(hyperParameters));
+			
+			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
+			m_master->SetName(CONTROLLER_NAME);
+			
+			ndSharedPtr<ndModel>visualModel (CreateModel(scene, matrix, modelMesh));
+			world->AddModel(visualModel);
+			visualModel->AddBodiesAndJointsToWorld();
+			
+			ndBodyKinematic* const rootBody = visualModel->GetAsModelArticulation()->GetRoot()->m_body->GetAsBodyKinematic();
+			ndSharedPtr<ndJointBilateralConstraint> visualPlaneJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
+			world->AddJoint(visualPlaneJoint);
+			
+			//RobotModelNotify* const notify = new RobotModelNotify(m_master, visualModel->GetAsModelArticulation());
+			RobotModelNotify* const notify = new RobotModelNotify();
+			visualModel->SetNotifyCallback(notify);
+			notify->SetControllerTrainer(m_master, visualModel->GetAsModelArticulation());
+
+			SetMaterial(visualModel->GetAsModelArticulation());
+			
+			scene->SetAcceleratedUpdate();
 		}
 
 		~TrainingUpdata()
