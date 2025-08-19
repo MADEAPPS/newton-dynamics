@@ -50,9 +50,9 @@
 //#define DEFAULT_SCENE	17		// cart pole discrete controller
 //#define DEFAULT_SCENE	18		// cart pole continue controller
 //#define DEFAULT_SCENE	19		// unit cycle controller
-//#define DEFAULT_SCENE	20		// quadruped test 1
-#define DEFAULT_SCENE	21		// quadruped test 2
-//#define DEFAULT_SCENE	22		// quadruped test 3
+//#define DEFAULT_SCENE	20		// quadruped animated 1
+//#define DEFAULT_SCENE	21		// quadruped sac trained
+#define DEFAULT_SCENE	22		// quadruped ppo trained
 //#define DEFAULT_SCENE	23		// quadruped test 3
 //#define DEFAULT_SCENE	24		// quadruped test 4
 //#define DEFAULT_SCENE	25		// simple industrial robot
@@ -76,8 +76,6 @@ void ndHeavyVehicle(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
 void ndBasicGpuTest0(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
-void ndQuadruped_animation_test(ndDemoEntityManager* const scene);
-void ndQuadruped_sac_test(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_3(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_4(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_4(ndDemoEntityManager* const scene);
@@ -88,12 +86,17 @@ void ndPlayerCapsuleDemo(ndDemoEntityManager* const scene);
 void ndBipedTest_2Trainer(ndDemoEntityManager* const scene);
 void ndBasicParticleFluid(ndDemoEntityManager* const scene);
 void ndUnicycleController(ndDemoEntityManager* const scene);
+void ndQuadruped_sac_test(ndDemoEntityManager* const scene);
+void ndQuadruped_ppo_test(ndDemoEntityManager* const scene);
+
 void ndBasicAngularMomentum(ndDemoEntityManager* const scene);
 void ndBagroundLowLodVehicle(ndDemoEntityManager* const scene);
 void ndSimpleIndustrialRobot(ndDemoEntityManager* const scene);
 void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene);
 void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene);
 void ndBasicExplodeConvexShape(ndDemoEntityManager* const scene);
+
+void ndQuadruped_animation_test(ndDemoEntityManager* const scene);
 void ndCartpoleDiscrete(ndDemoEntityManager* const scene);
 void ndCartpoleContinue(ndDemoEntityManager* const scene);
 
@@ -125,9 +128,10 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "cartpole discrete controller", ndCartpoleDiscrete},
 	{ "cartpole continue controller", ndCartpoleContinue},
 	{ "unicycle controller", ndUnicycleController},
-	{ "quadruped test 1", ndQuadruped_animation_test},
-	{ "quadruped test 2", ndQuadruped_sac_test},
-	{ "quadruped test 3", ndQuadrupedTest_3},
+	{ "quadruped animated", ndQuadruped_animation_test},
+	{ "quadruped sac", ndQuadruped_sac_test},
+	{ "quadruped ppo", ndQuadruped_ppo_test},
+//	{ "quadruped test 3", ndQuadrupedTest_3},
 //	{ "quadruped test 4", ndQuadrupedTest_4},
 //	{ "quadruped test 5", ndQuadrupedTest_4},
 	{ "simple industrial robot", ndSimpleIndustrialRobot},
