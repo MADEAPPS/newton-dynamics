@@ -87,7 +87,7 @@ ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 	m_entropyMinTemperature = ND_POLICY_MIN_ENTROPY_TEMPERATURE;
 	m_entropyMaxTemperature = ND_POLICY_MAX_ENTROPY_TEMPERATURE;
 	m_entropyFrameStar = 0;
-	m_entropyFrameEnd = m_replayBufferStartOptimizeSize;
+	m_entropyFrameEnd = m_replayBufferStartOptimizeSize * 2;
 
 //m_useGpuBackend = false;
 //m_numberOfUpdates = 1;
