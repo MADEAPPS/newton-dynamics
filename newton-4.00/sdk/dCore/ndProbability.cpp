@@ -27,12 +27,17 @@
 
 static std::mt19937& GetRandomGenerator()
 {
-	// for debugging this is better than a hardware generator.
-	//static std::mt19937 generator;
-
+	class ndRandom : public std::mt19937
+	{
+		public: 
+		ndRandom()
+			:std::mt19937(std::random_device{}())
+		{
+			seed(42);
+		}
+	};
 	// using hardware non deterministic random generator if found
-	static std::mt19937 generator(std::random_device{}());
-
+	static ndRandom generator;
 	return generator;
 }
 
@@ -44,6 +49,7 @@ static ndSpinLock& GetLock()
 
 void ndSetRandSeed(ndUnsigned32 seed)
 {
+	static ndSpinLock lock;
 	GetRandomGenerator().seed(seed);
 }
 
@@ -61,7 +67,6 @@ ndFloat32 ndRand()
 	ndFloat32 value = uniform(GetRandomGenerator());
 	return value;
 }
-
 
 //ndFloat32 ndGaussianRandom(ndFloat32 mean, ndFloat32 sigma, ndFloat32 randomVariable)
 ndFloat32 ndStandardNormalGaussian(ndFloat32 randomVariable)
@@ -151,7 +156,5 @@ ndFloat32 ndStandardNormalGaussian(ndFloat32 randomVariable)
 	ndAssert(randomVariable <= ndFloat32(1.0f));
 	ndFloat32 r = ndClamp(randomVariable, ndFloat32(1.0e-6f), ndFloat32(1.0f - 1.0e-6f));
 	ndFloat32 normal = NormalCumulativeDistibutionInverse(r);
-	//ndAssert(normal == NormalCumulativeDistibutionInverseOld(r));
-	//return mean + normal * sigma;
 	return normal;
 }
