@@ -36,9 +36,8 @@
 #include "ndBrainLayerCrossCorrelation_2d.h"
 #include "ndBrainLayerActivationLeakyRelu.h"
 #include "ndBrainLayerActivationSigmoidLinear.h"
-#include "ndBrainLayerActivationCategoricalSoftmax.h"
-//#include "ndBrainAgentContinuePolicyGradient_Trainer.h"
 #include "ndBrainAgentOffPolicyGradient_Trainer.h"
+#include "ndBrainLayerActivationCategoricalSoftmax.h"
 //#include "ndBrainLayerConvolutionalWithDropOut_2d.h"
 
 ndBrain* ndBrainLoad::Load(const char* const pathName)
