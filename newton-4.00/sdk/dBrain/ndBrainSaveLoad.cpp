@@ -36,6 +36,8 @@
 #include "ndBrainLayerCrossCorrelation_2d.h"
 #include "ndBrainLayerActivationLeakyRelu.h"
 #include "ndBrainLayerActivationSigmoidLinear.h"
+#include "ndBrainAgentPolicyGradientActivation.h"
+#include "ndBrainAgentOnPolicyGradient_Trainer.h"
 #include "ndBrainAgentOffPolicyGradient_Trainer.h"
 #include "ndBrainLayerActivationCategoricalSoftmax.h"
 //#include "ndBrainLayerConvolutionalWithDropOut_2d.h"
@@ -131,7 +133,7 @@ ndBrain* ndBrainLoad::Load() const
 		{
 			layer = ndBrainLayerLinearWithDropOut::Load(this);
 		}
-		else if (!strcmp(layerType, ND_OFF_POLICY_ACTIVATION_NAME))
+		else if (!strcmp(layerType, ND_POLICY_GRADIENT_ACTIVATION_NAME))
 		{
 			// special activation for mapping gaussian deviation in policy gradiends agents
 			layer = ndBrainAgentOffPolicyGradient_Trainer::LoadActivation(this);

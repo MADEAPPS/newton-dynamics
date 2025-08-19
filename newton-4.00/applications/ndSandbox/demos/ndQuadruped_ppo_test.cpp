@@ -266,11 +266,11 @@ namespace ndQuadruped_ppo
 			RobotModelNotify* m_robot;
 		};
 		
-		class ndControllerTrainer : public ndBrainAgentOffPolicyGradient_Agent
+		class ndControllerTrainer : public ndBrainAgentOnPolicyGradient_Agent
 		{
 			public:
-			ndControllerTrainer(const ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master, RobotModelNotify* const robot)
-				:ndBrainAgentOffPolicyGradient_Agent(master)
+			ndControllerTrainer(const ndSharedPtr<ndBrainAgentOnPolicyGradient_Trainer>& master, RobotModelNotify* const robot)
+				:ndBrainAgentOnPolicyGradient_Agent(master)
 				,m_robot(robot)
 			{
 			}
@@ -348,7 +348,7 @@ namespace ndQuadruped_ppo
 		{
 		}
 
-		void SetControllerTrainer(const ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master)
+		void SetControllerTrainer(const ndSharedPtr<ndBrainAgentOnPolicyGradient_Trainer>& master)
 		{
 			m_controllerTrainer = ndSharedPtr<ndControllerTrainer>(new ndControllerTrainer(master, this));
 		}
@@ -1053,13 +1053,13 @@ namespace ndQuadruped_ppo
 			fprintf(m_outFile, "sac\n");
 
 			m_stopTraining = 1000000;
-			ndBrainAgentOffPolicyGradient_Trainer::HyperParameters hyperParameters;
+			ndBrainAgentOnPolicyGradient_Trainer::HyperParameters hyperParameters;
 
 			hyperParameters.m_numberOfHiddenLayers = 2;
 			hyperParameters.m_discountRewardFactor = 0.999f;
 			hyperParameters.m_numberOfActions = numberOfActions;
 			hyperParameters.m_numberOfObservations = numberOfObservations;
-			m_master = ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>(new ndBrainAgentOffPolicyGradient_Trainer(hyperParameters));
+			m_master = ndSharedPtr<ndBrainAgentOnPolicyGradient_Trainer>(new ndBrainAgentOnPolicyGradient_Trainer(hyperParameters));
 
 			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
 
@@ -1235,7 +1235,7 @@ namespace ndQuadruped_ppo
 			}
 		}
 
-		ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer> m_master;
+		ndSharedPtr<ndBrainAgentOnPolicyGradient_Trainer> m_master;
 		ndSharedPtr<ndBrain> m_bestActor;
 		ndList<ndModelArticulation*> m_models;
 		FILE* m_outFile;

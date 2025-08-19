@@ -19,29 +19,29 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _ND_BRAIN_AGENT_OFF_POLICY_TRAINER_H__
-#define _ND_BRAIN_AGENT_OFF_POLICY_TRAINER_H__
+#ifndef _ND_BRAIN_AGENT_ON_POLICY_TRAINER_H__
+#define _ND_BRAIN_AGENT_ON_POLICY_TRAINER_H__
 
 #include "ndBrainStdafx.h"
 
 #include "ndBrain.h"
 #include "ndBrainAgent.h"
 
-// this is an implementation of the different versions of deep deterministic 
-// policy gradient for continue control re enforcement learning.  
-// the core algorithm is DDPG as described in: https://arxiv.org/pdf/1509.02971.pdf
+// this is an implementation of the different versions of the  
+// on policy gradient for continue control re enforcement learning.  
 // pseudo code samples of variance of the same algorithm can be found at:
-// https://spinningup.openai.com/en/latest/algorithms/td3.html
-// https://spinningup.openai.com/en/latest/algorithms/sac.html
+// https://spinningup.openai.com/en/latest/algorithms/vpg.html
+// https://spinningup.openai.com/en/latest/algorithms/ppo.html
 
-#define ND_OFF_POLICY_MOVING_AVERAGE_SCORE	8
+
+#define ND_ON_POLICY_MOVING_AVERAGE_SCORE	8
 
 class ndBrainFloatBuffer;
 class ndBrainIntegerBuffer;
 class ndBrainUniformBuffer;
-class ndBrainAgentOffPolicyGradient_Trainer;
+class ndBrainAgentOnPolicyGradient_Trainer;
 
-class ndBrainAgentOffPolicyGradient_Agent: public ndBrainAgent
+class ndBrainAgentOnPolicyGradient_Agent: public ndBrainAgent
 {
 	class ndRandomGenerator
 	{
@@ -107,8 +107,8 @@ class ndBrainAgentOffPolicyGradient_Agent: public ndBrainAgent
 	};
 
 	public:
-	ndBrainAgentOffPolicyGradient_Agent(const ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master);
-	~ndBrainAgentOffPolicyGradient_Agent();
+	ndBrainAgentOnPolicyGradient_Agent(const ndSharedPtr<ndBrainAgentOnPolicyGradient_Trainer>& master);
+	~ndBrainAgentOnPolicyGradient_Agent();
 
 	virtual void Step();
 	virtual void InitWeights() { ndAssert(0); }
@@ -119,14 +119,14 @@ class ndBrainAgentOffPolicyGradient_Agent: public ndBrainAgent
 
 	void SampleActions(ndBrainVector& action);
 
-	ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer> m_owner;
+	ndSharedPtr<ndBrainAgentOnPolicyGradient_Trainer> m_owner;
 	ndTrajectory m_trajectory;
 	ndRandomGenerator m_randomeGenerator;
 	ndUnsigned32 m_trajectoryBaseIndex;
-	friend class ndBrainAgentOffPolicyGradient_Trainer;
+	friend class ndBrainAgentOnPolicyGradient_Trainer;
 };
 
-class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
+class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 {
 	public:
 	class HyperParameters
@@ -158,14 +158,15 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 		ndInt32 m_replayBufferSize;
 		ndInt32 m_maxTrajectorySteps;
 		ndInt32 m_replayBufferStartOptimizeSize;
+
 		bool m_useGpuBackend;
 		
 		ndRegularizerType m_policyRegularizerType;
 		ndRegularizerType m_criticRegularizerType;
 	};
 
-	ndBrainAgentOffPolicyGradient_Trainer(const HyperParameters& parameters);
-	virtual ~ndBrainAgentOffPolicyGradient_Trainer();
+	ndBrainAgentOnPolicyGradient_Trainer(const HyperParameters& parameters);
+	virtual ~ndBrainAgentOnPolicyGradient_Trainer();
 
 	const ndString& GetName() const;
 	void SetName(const ndString& name);
@@ -209,7 +210,7 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 	ndSharedPtr<ndBrainTrainer> m_criticTrainer[2];
 	ndSharedPtr<ndBrainTrainerInference> m_referenceCriticTrainer[2];
 
-	ndBrainAgentOffPolicyGradient_Agent* m_agent;
+	ndBrainAgentOnPolicyGradient_Agent* m_agent;
 	std::mt19937 m_randomGenerator;
 	std::uniform_real_distribution<ndFloat32> m_uniformDistribution;
 
@@ -232,8 +233,8 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 
 	ndArray<ndInt32> m_shuffleBuffer;
 	ndArray<ndInt32> m_miniBatchIndices;
-	ndMovingAverage<ND_OFF_POLICY_MOVING_AVERAGE_SCORE> m_averageExpectedRewards;
-	ndMovingAverage<ND_OFF_POLICY_MOVING_AVERAGE_SCORE> m_averageFramesPerEpisodes;
+	ndMovingAverage<ND_ON_POLICY_MOVING_AVERAGE_SCORE> m_averageExpectedRewards;
+	ndMovingAverage<ND_ON_POLICY_MOVING_AVERAGE_SCORE> m_averageFramesPerEpisodes;
 
 	ndUnsigned32 m_frameCount;
 	ndUnsigned32 m_horizonSteps;
@@ -244,7 +245,7 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 	bool m_replayIsFilled;
 	bool m_startOptimization;
 
-	friend class ndBrainAgentOffPolicyGradient_Agent;
+	friend class ndBrainAgentOnPolicyGradient_Agent;
 };
 
 #endif 
