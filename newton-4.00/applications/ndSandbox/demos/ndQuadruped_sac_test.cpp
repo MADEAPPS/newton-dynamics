@@ -28,7 +28,7 @@
 // to the environment with increasing complexity
 namespace ndQuadruped_sac
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
 
 	enum Actions
@@ -622,30 +622,33 @@ namespace ndQuadruped_sac
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
 				ndEffectorInfo& leg = m_legs[i];
+				ndInt32 base = m_observationSize * i;
+
 				ndJointBilateralConstraint::ndKinematicState kinematicState[4];
 				leg.m_effector->GetKinematicState(kinematicState);
+
+				const ndVector restPosit(leg.m_effector->GetRestPosit());
 				const ndVector effectorPosit(kinematicState[0].m_posit, kinematicState[1].m_posit, kinematicState[2].m_posit, 0.0f);
 				const ndVector effectorVeloc(kinematicState[0].m_velocity, kinematicState[1].m_velocity, kinematicState[2].m_velocity, 0.0f);
+				const ndVector relPosit(effectorPosit - restPosit);
+				const ndVector normalPosit(relPosit.m_x / D_CYCLE_STRIDE_X, relPosit.m_y / D_CYCLE_AMPLITUDE, relPosit.m_y / D_CYCLE_STRIDE_Z, ndFloat32(0.0f));
+				observations[base + m_effectorPosit_x] = ndBrainFloat(normalPosit.m_x);
+				observations[base + m_effectorPosit_y] = ndBrainFloat(normalPosit.m_y);
+				observations[base + m_effectorPosit_z] = ndBrainFloat(normalPosit.m_z);
+				observations[base + m_effectorVeloc_x] = ndBrainFloat(effectorVeloc.m_x);
+				observations[base + m_effectorVeloc_y] = ndBrainFloat(effectorVeloc.m_y);
+				observations[base + m_effectorVeloc_z] = ndBrainFloat(effectorVeloc.m_z);
 
-				const ndAnimKeyframe keyFrame0 = m_animPose0[i];
-				const ndAnimKeyframe keyFrame1 = m_animPose1[i];
-				const ndVector keyFramePosit0(keyFrame0.m_posit);
-				const ndVector keyFramePosit1(keyFrame1.m_posit);
-
-				ndInt32 base = m_observationSize * i;
+				const ndAnimKeyframe keyFrame0(m_animPose0[i]);
+				const ndAnimKeyframe keyFrame1(m_animPose1[i]);
+				const ndVector keyFramePosit0(keyFrame0.m_posit - restPosit);
+				const ndVector keyFramePosit1(keyFrame1.m_posit - restPosit);
 				observations[base + m_posePosit_x] = ndBrainFloat(keyFramePosit0.m_x);
 				observations[base + m_posePosit_y] = ndBrainFloat(keyFramePosit0.m_y);
 				observations[base + m_posePosit_z] = ndBrainFloat(keyFramePosit0.m_z);
 				observations[base + m_poseVeloc_x] = ndBrainFloat((keyFramePosit1.m_x - keyFramePosit0.m_x) * invTimestep);
 				observations[base + m_poseVeloc_y] = ndBrainFloat((keyFramePosit1.m_y - keyFramePosit0.m_y) * invTimestep);
 				observations[base + m_poseVeloc_z] = ndBrainFloat((keyFramePosit1.m_z - keyFramePosit0.m_z) * invTimestep);
-
-				observations[base + m_effectorPosit_x] = ndBrainFloat(effectorPosit.m_x);
-				observations[base + m_effectorPosit_y] = ndBrainFloat(effectorPosit.m_y);
-				observations[base + m_effectorPosit_z] = ndBrainFloat(effectorPosit.m_z);
-				observations[base + m_effectorVeloc_x] = ndBrainFloat(effectorVeloc.m_x);
-				observations[base + m_effectorVeloc_y] = ndBrainFloat(effectorVeloc.m_y);
-				observations[base + m_effectorVeloc_z] = ndBrainFloat(effectorVeloc.m_z);
 
 				ndFloat32 floorDistanceParameter = CalculateFloorDistance(leg);
 				observations[base + m_contactDistance] = ndBrainFloat(floorDistanceParameter);
@@ -661,7 +664,7 @@ namespace ndQuadruped_sac
 
 			const ndVector upVector(rootBody->GetMatrix().m_up);
 
-			ndFloat32 y = ndFloat32(0.0f);
+			ndFloat32 y = ndFloat32(-0.1f);
 			m_comX = ndClamp(m_comX + actions[m_actionPosit_x] * D_ACTION_SENSITIVITY, -ndFloat32(0.25f) * D_CYCLE_STRIDE_X, ndFloat32(0.25f) * D_CYCLE_STRIDE_X);
 			m_comZ = ndClamp(m_comZ + actions[m_actionPosit_z] * D_ACTION_SENSITIVITY, -ndFloat32(0.25f) * D_CYCLE_STRIDE_Z, ndFloat32(0.25f) * D_CYCLE_STRIDE_Z);
 
@@ -678,8 +681,6 @@ namespace ndQuadruped_sac
 				posit.m_y += y;
 				posit.m_z += m_comZ;
 			
-				ndFloat32 swivelAngle = effector->CalculateLookAtSwivelAngle(upVector);
-
 				ndFloat32 minAngle;
 				ndFloat32 maxAngle;
 				ndFloat32 kneeAngle = leg.m_calf->GetAngle();
@@ -687,6 +688,8 @@ namespace ndQuadruped_sac
 				ndFloat32 safeGuardAngle = ndFloat32(3.0f * ndDegreeToRad);
 				maxAngle = ndMax(ndFloat32(0.0f), maxAngle - safeGuardAngle);
 				minAngle = ndMin(ndFloat32(0.0f), minAngle + safeGuardAngle);
+				ndFloat32 swivelAngle = effector->CalculateLookAtSwivelAngle(upVector);
+
 				if ((kneeAngle > maxAngle) || (kneeAngle < minAngle))
 				{
 					// project that target to the sphere of the current position
@@ -1250,7 +1253,7 @@ using namespace ndQuadruped_sac;
 void ndQuadruped_sac_test(ndDemoEntityManager* const scene)
 {
 	// build a floor
-	ndSetRandSeed(94157);
+	ndSetRandSeed(47);
 
 	BuildFloorBox(scene, ndGetIdentityMatrix());
 	//BuildFlatPlane(scene, true);
