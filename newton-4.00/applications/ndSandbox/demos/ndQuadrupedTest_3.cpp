@@ -269,8 +269,9 @@ namespace ndQuadruped_3
 				ndFloat32 m_stride_z;
 			};
 
-			ndControllerAgent(const ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master, RobotModelNotify* const robot)
-				:ndBrainAgentOffPolicyGradient_Agent(master)
+			//ndControllerAgent(const ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master, RobotModelNotify* const robot)
+			ndControllerAgent(ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master, RobotModelNotify* const robot)
+				:ndBrainAgentOffPolicyGradient_Agent(*master)
 				,m_robot(robot)
 				,m_animPose()
 				,m_poseGenerator()
@@ -416,7 +417,7 @@ namespace ndQuadruped_3
 		{
 		}
 
-		void SetControllerTrainer(const ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master)
+		void SetControllerTrainer(ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master)
 		{
 			m_controllerTrainer = ndSharedPtr<ndControllerAgent>(new ndControllerAgent(master, this));
 			m_controllerTrainer->InitAnimation();

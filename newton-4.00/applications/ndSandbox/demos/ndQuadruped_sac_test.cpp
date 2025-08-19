@@ -269,8 +269,8 @@ namespace ndQuadruped_sac
 		class ndControllerTrainer : public ndBrainAgentOffPolicyGradient_Agent
 		{
 			public:
-			ndControllerTrainer(const ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master, RobotModelNotify* const robot)
-				:ndBrainAgentOffPolicyGradient_Agent(master)
+			ndControllerTrainer(ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master, RobotModelNotify* const robot)
+				:ndBrainAgentOffPolicyGradient_Agent(*master)
 				,m_robot(robot)
 			{
 			}
@@ -344,13 +344,10 @@ namespace ndQuadruped_sac
 			SetModel(robot);
 		}
 
-		~RobotModelNotify()
+		void SetControllerTrainer(ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master)
 		{
-		}
-
-		void SetControllerTrainer(const ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master)
-		{
-			m_controllerTrainer = ndSharedPtr<ndControllerTrainer>(new ndControllerTrainer(master, this));
+			m_controllerTrainer = ndSharedPtr<ndBrainAgentOffPolicyGradient_Agent>(new ndControllerTrainer(master, this));
+			master->SetAgent(m_controllerTrainer);
 		}
 
 		void InitAnimation()
@@ -914,7 +911,7 @@ namespace ndQuadruped_sac
 		ndFixSizeArray<ndBasePose, 32> m_basePose;
 		ndFixSizeArray<ndEffectorInfo, 4> m_legs;
 		ndSharedPtr<ndController> m_controller;
-		ndSharedPtr<ndControllerTrainer> m_controllerTrainer;
+		ndSharedPtr<ndBrainAgentOffPolicyGradient_Agent> m_controllerTrainer;
 
 		ndFloat32 m_comX;
 		ndFloat32 m_comZ;

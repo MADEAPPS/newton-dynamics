@@ -108,7 +108,6 @@ class ndBrainAgentOnPolicyGradient_Agent: public ndBrainAgent
 
 	public:
 	ndBrainAgentOnPolicyGradient_Agent(const ndSharedPtr<ndBrainAgentOnPolicyGradient_Trainer>& master);
-	~ndBrainAgentOnPolicyGradient_Agent();
 
 	virtual void Step();
 	virtual void InitWeights() { ndAssert(0); }
@@ -166,7 +165,6 @@ class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 	};
 
 	ndBrainAgentOnPolicyGradient_Trainer(const HyperParameters& parameters);
-	virtual ~ndBrainAgentOnPolicyGradient_Trainer();
 
 	const ndString& GetName() const;
 	void SetName(const ndString& name);
@@ -185,8 +183,6 @@ class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 
 	void SaveState(const char* baseName);
 	void RecoverState(const char* baseName);
-
-	static ndBrainLayer* LoadActivation(const ndBrainLoad* const loadSave);
 
 	private:
 	void Optimize();
@@ -210,7 +206,8 @@ class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 	ndSharedPtr<ndBrainTrainer> m_criticTrainer[2];
 	ndSharedPtr<ndBrainTrainerInference> m_referenceCriticTrainer[2];
 
-	ndBrainAgentOnPolicyGradient_Agent* m_agent;
+	//ndBrainAgentOnPolicyGradient_Agent* m_agent;
+	ndList<ndBrainAgentOnPolicyGradient_Agent*> m_agents;
 	std::mt19937 m_randomGenerator;
 	std::uniform_real_distribution<ndFloat32> m_uniformDistribution;
 

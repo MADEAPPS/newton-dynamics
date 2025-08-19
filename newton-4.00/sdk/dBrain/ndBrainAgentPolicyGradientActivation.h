@@ -33,6 +33,7 @@
 
 #define ND_POLICY_GRADIENT_ACTIVATION_NAME		"ndBrainAgentPolicyGradientActivation"
 
+
 class ndBrainAgentPolicyGradientActivation : public ndBrainLayerActivation
 {
 	public:
