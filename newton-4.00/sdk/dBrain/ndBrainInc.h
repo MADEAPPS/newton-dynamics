@@ -65,10 +65,10 @@
 #include <ndBrainAgentContinuePolicyGradient.h>
 #include <ndBrainLossCategoricalCrossEntropy.h>
 #include <ndBrainLayerActivationSigmoidLinear.h>
+#include <ndBrainAgentOffPolicyGradient_Trainer.h>
 #include <ndBrainLayerConvolutionalWithDropOut_2d.h>
 #include <ndBrainLayerActivationCategoricalSoftmax.h>
 #include <ndBrainAgentContinuePolicyGradient_Trainer.h>
-#include <ndBrainAgentOffPolicyGradient_Trainer.h>
 
 #endif 
 
