@@ -51,9 +51,10 @@
 
 #define ND_POLICY_TRAINING_EXPLORATION_NOISE	ndBrainFloat(0.2f)
 #define ND_POLICY_DEFAULT_POLYAK_BLEND			ndBrainFloat(0.005f)
-#define ND_POLICY_CONSTANT_SIGMA____				ndBrainFloat(0.5f)
-#define ND_POLICY_MIN_SIGMA						(ndBrainFloat(0.5f) * ND_POLICY_CONSTANT_SIGMA____)
-#define ND_POLICY_MAX_SIGMA						(ndBrainFloat(2.0f) * ND_POLICY_CONSTANT_SIGMA____)
+#define ND_POLICY_MIN_SIGMA						(ndBrainFloat(0.01f))
+#define ND_POLICY_MAX_SIGMA						(ndBrainFloat(0.10f))
+
+//#define ND_USING_TANGH_AS_LAST_LINEAR_LAYER
 
 ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 {
@@ -76,7 +77,7 @@ ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 
 	m_randomSeed = 42;
 	m_numberOfUpdates = 8;
-	m_numberOfHiddenLayers = 3;
+	m_numberOfHiddenLayers = 2;
 	m_maxTrajectorySteps = 1024 * 4;
 	m_replayBufferSize = 1024 * 1024;
 	m_hiddenLayersNumberOfNeurons = 256;
@@ -257,7 +258,6 @@ ndBrainAgentOffPolicyGradient_Agent::ndBrainAgentOffPolicyGradient_Agent(ndBrain
 	,m_randomeGenerator()
 	,m_trajectoryBaseIndex(0)
 {
-	//m_owner->m_agent = this;
 	const ndBrain* const brain = *master->m_policyTrainer->GetBrain();
 	m_trajectory.Init(brain->GetOutputSize(), master->m_parameters.m_numberOfObservations);
 	m_randomeGenerator.m_gen.seed(master->m_parameters.m_randomSeed);
@@ -298,7 +298,8 @@ void ndBrainAgentOffPolicyGradient_Agent::Step()
 	GetObservation(&observation[0]);
 
 	bool isdead = IsTerminal();
-	ndBrainFloat reward = CalculateReward();
+	ndFloat32 rewardScale = ndFloat32(1.0f) - owner->m_parameters.m_discountRewardFactor;
+	ndBrainFloat reward = CalculateReward() * rewardScale;
 
 	m_trajectory.SetReward(entryIndex, reward);
 	m_trajectory.SetTerminalState(entryIndex, isdead);
@@ -348,6 +349,7 @@ ndBrainAgentOffPolicyGradient_Trainer::ndBrainAgentOffPolicyGradient_Trainer(con
 	
 	m_parameters.m_numberOfUpdates = ndMax(m_parameters.m_numberOfUpdates, 2);
 	m_parameters.m_numberOfUpdates = ndMax(m_parameters.m_numberOfUpdates, 2);
+	m_parameters.m_discountRewardFactor = ndClamp(m_parameters.m_discountRewardFactor, ndBrainFloat(0.1f), ndBrainFloat(0.999f));
 
 	if (m_parameters.m_useGpuBackend)
 	{
@@ -481,7 +483,6 @@ void ndBrainAgentOffPolicyGradient_Trainer::BuildPolicyClass()
 	}
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_numberOfActions * 2));
 
-
 	ndBrainVector bias;
 	ndBrainVector slope;
 	bias.SetCount(layers[layers.GetCount() - 1]->GetOutputSize());
@@ -515,42 +516,50 @@ void ndBrainAgentOffPolicyGradient_Trainer::BuildPolicyClass()
 
 void ndBrainAgentOffPolicyGradient_Trainer::BuildCriticClass()
 {
-	ndFixSizeArray<ndBrainLayer*, 32> layers;
-	const ndBrain& policy = **m_policyTrainer->GetBrain();
-	for (ndInt32 j = 0; j < ndInt32(sizeof(m_referenceCriticTrainer) / sizeof(m_referenceCriticTrainer[0])); ++j)
+	auto BuildNeuralNetwork = [this]()
 	{
+		const ndBrain& policy = **m_policyTrainer->GetBrain();
+		ndFixSizeArray<ndBrainLayer*, 32> layers;
 		layers.SetCount(0);
 		layers.PushBack(new ndBrainLayerLinear(policy.GetOutputSize() + policy.GetInputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
 		layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
-	
-		for (ndInt32 i = 0; i < m_parameters.m_numberOfHiddenLayers-1; ++i)
+
+		for (ndInt32 i = 0; i < m_parameters.m_numberOfHiddenLayers; ++i)
 		{
 			ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == m_parameters.m_hiddenLayersNumberOfNeurons);
 			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
 			layers.PushBack(new ND_HIDEN_LAYERS_ACTIVATION(layers[layers.GetCount() - 1]->GetOutputSize()));
 		}
 
-		// prevent exploding gradients. 
-		// it does not seem to make a difference bu the weighs and bias are much smaller. 
-		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
-		layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
+		#ifdef ND_USING_TANGH_AS_LAST_LINEAR_LAYER
+			// prevent exploding gradients. 
+			// it does not seem to make a difference bu the weighs and bias are much smaller. 
+			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
+			layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
+		#endif
 
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
 		layers.PushBack(new ndBrainLayerActivationLeakyRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
-	
+
 		ndSharedPtr<ndBrain> critic(new ndBrain);
 		for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 		{
 			critic->AddLayer(layers[i]);
 		}
 		critic->InitWeights();
+		return critic;
+	};
+
+	for (ndInt32 j = 0; j < ndInt32(sizeof(m_referenceCriticTrainer) / sizeof(m_referenceCriticTrainer[0])); ++j)
+	{
+		ndSharedPtr<ndBrain> critic(BuildNeuralNetwork());
 
 		ndSharedPtr<ndBrain> referenceCritic(new ndBrain(**critic));
 		ndTrainerDescriptor referenceDescriptor(referenceCritic, m_context, m_parameters.m_miniBatchSize, m_parameters.m_learnRate);
 		referenceDescriptor.m_regularizer = m_parameters.m_criticRegularizer;
 		referenceDescriptor.m_regularizerType = m_parameters.m_criticRegularizerType;
 		m_referenceCriticTrainer[j] = ndSharedPtr<ndBrainTrainerInference>(new ndBrainTrainerInference(referenceDescriptor));
-
+		
 		ndTrainerDescriptor descriptor(critic, m_context, m_parameters.m_miniBatchSize, m_parameters.m_learnRate);
 		descriptor.m_regularizer = m_parameters.m_criticRegularizer;
 		descriptor.m_regularizerType = m_parameters.m_criticRegularizerType;
@@ -580,9 +589,10 @@ ndUnsigned32 ndBrainAgentOffPolicyGradient_Trainer::GetEposideCount() const
 
 ndFloat32 ndBrainAgentOffPolicyGradient_Trainer::GetAverageScore() const
 {
-	ndBrainFloat maxScopre = ndBrainFloat(1.0f) / (ndFloat32(1.0f) - m_parameters.m_discountRewardFactor);
-	ndBrainFloat score = ndBrainFloat(1.0f) * m_averageExpectedRewards.GetAverage() / maxScopre;
-	return score;
+	//ndBrainFloat maxScopre = ndBrainFloat(1.0f) / (ndFloat32(1.0f) - m_parameters.m_discountRewardFactor);
+	//ndBrainFloat score = ndBrainFloat(1.0f) * m_averageExpectedRewards.GetAverage() / maxScopre;
+	//return score;
+	return m_averageExpectedRewards.GetAverage();
 }
 
 ndFloat32 ndBrainAgentOffPolicyGradient_Trainer::GetAverageFrames() const
@@ -848,18 +858,6 @@ void ndBrainAgentOffPolicyGradient_Trainer::CalculateExpectedRewards()
 		qValue.Min(qValue1);
 	}
 
-	//static ndBrainVector xxxx;
-	//qValue.VectorFromDevice(xxxx);
-	//ndBrainFloat maxxxx = 1.0f / (1.0f - m_parameters.m_discountRewardFactor);
-	//for (ndInt32 i = 0; i < xxxx.GetCount(); ++i)
-	//{
-	//	ndBrainFloat q = xxxx[i];
-	//	if (q > maxxxx)
-	//	{
-	//		xxxx[i] *= 1.0f;
-	//	}
-	//}
-
 	ndCopyBufferCommandInfo criticOutputTerminal;
 	criticOutputTerminal.m_srcOffsetInByte = ndInt32(trajectory.GetTerminalOffset() * sizeof(ndReal));
 	criticOutputTerminal.m_srcStrideInByte = transitionStrideInBytes;
@@ -914,33 +912,14 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainCritics(ndInt32 criticIndex)
 	
 	// calculate loss
 	const ndBrainFloatBuffer* const criticMinibatchOutputBuffer = critic.GetOuputBuffer();
-
-
 	ndBrainFloatBuffer* const criticMinibatchOutputGradientBuffer = critic.GetOuputGradientBuffer();
 	criticMinibatchOutputGradientBuffer->Set(*criticMinibatchOutputBuffer);
 	criticMinibatchOutputGradientBuffer->Sub(**m_minibatchExpectedRewards);
-
-//static ndBrainVector xxxx0;
-//static ndBrainVector xxxx1;
-//criticMinibatchOutputBuffer->VectorFromDevice(xxxx0);
-//criticMinibatchOutputGradientBuffer->VectorFromDevice(xxxx1);
-//ndBrainFloat maxxxx = 2.0f / (1.0f - m_parameters.m_discountRewardFactor);
-//for (ndInt32 i = 0; i < xxxx0.GetCount(); ++i)
-//{
-//	ndBrainFloat q = xxxx0[i];
-//	if (q > maxxxx)
-//	{
-//		xxxx0[i] *= 1.0f;
-//	}
-//}
 
 	//// using a Huber loss to prevent exploding gradient
 	//const ndBrainFloat huberSlope = ndBrainFloat(8.0f);
 	//criticMinibatchOutputGradientBuffer->Min(huberSlope);
 	//criticMinibatchOutputGradientBuffer->Max(-huberSlope);
-
-//static ndBrainVector xxxx2;
-//criticMinibatchOutputGradientBuffer->VectorFromDevice(xxxx2);
 
 	// back propagate loss
 	critic.BackPropagate();

@@ -29,7 +29,7 @@
 namespace ndQuadruped_ppo
 {
 	#define ND_TRAIN_MODEL
-	#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
+	#define CONTROLLER_NAME "ndQuadruped_2-ppo.dnn"
 
 	enum Actions
 	{
@@ -269,8 +269,8 @@ namespace ndQuadruped_ppo
 		class ndControllerTrainer : public ndBrainAgentOnPolicyGradient_Agent
 		{
 			public:
-			ndControllerTrainer(const ndSharedPtr<ndBrainAgentOnPolicyGradient_Trainer>& master, RobotModelNotify* const robot)
-				:ndBrainAgentOnPolicyGradient_Agent(master)
+			ndControllerTrainer(ndSharedPtr<ndBrainAgentOnPolicyGradient_Trainer>& master, RobotModelNotify* const robot)
+				:ndBrainAgentOnPolicyGradient_Agent(*master)
 				,m_robot(robot)
 			{
 			}
@@ -348,9 +348,10 @@ namespace ndQuadruped_ppo
 		{
 		}
 
-		void SetControllerTrainer(const ndSharedPtr<ndBrainAgentOnPolicyGradient_Trainer>& master)
+		void SetControllerTrainer(ndSharedPtr<ndBrainAgentOnPolicyGradient_Trainer>& master)
 		{
-			m_controllerTrainer = ndSharedPtr<ndControllerTrainer>(new ndControllerTrainer(master, this));
+			m_controllerTrainer = ndSharedPtr<ndBrainAgentOnPolicyGradient_Agent>(new ndControllerTrainer(master, this));
+			master->AddAgent(m_controllerTrainer);
 		}
 
 		void InitAnimation()
@@ -914,7 +915,7 @@ namespace ndQuadruped_ppo
 		ndFixSizeArray<ndBasePose, 32> m_basePose;
 		ndFixSizeArray<ndEffectorInfo, 4> m_legs;
 		ndSharedPtr<ndController> m_controller;
-		ndSharedPtr<ndControllerTrainer> m_controllerTrainer;
+		ndSharedPtr<ndBrainAgentOnPolicyGradient_Agent> m_controllerTrainer;
 
 		ndFloat32 m_comX;
 		ndFloat32 m_comZ;

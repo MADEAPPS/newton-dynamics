@@ -182,7 +182,6 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 
 	void SaveState(const char* baseName);
 	void RecoverState(const char* baseName);
-
 	void SetAgent(ndSharedPtr<ndBrainAgentOffPolicyGradient_Agent>& agent);
 
 	private:

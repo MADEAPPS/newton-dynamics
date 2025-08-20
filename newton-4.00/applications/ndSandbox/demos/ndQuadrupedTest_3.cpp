@@ -196,6 +196,7 @@ namespace ndQuadruped_3
 				void CalculatePose(ndAnimationPose& output, ndFloat32 param) override
 				{
 					// generate a procedural in place march gait
+					param = 0.0f;
 					ndAssert(param >= ndFloat32(0.0f));
 					ndAssert(param <= ndFloat32(1.0f));
 
