@@ -1041,8 +1041,6 @@ namespace ndQuadruped_sac
 		{
 			ndWorld* const world = scene->GetWorld();
 
-			//ndInt32 hiddenLayers = 4;
-			//ndInt32 hiddenLayersNeurons = 64;
 			ndInt32 numberOfActions = m_actionsSize;
 			ndInt32 numberOfObservations = m_observationSize * 4 + 2;
 
@@ -1052,7 +1050,7 @@ namespace ndQuadruped_sac
 			m_stopTraining = 1000000;
 			ndBrainAgentOffPolicyGradient_Trainer::HyperParameters hyperParameters;
 
-			hyperParameters.m_numberOfHiddenLayers = 2;
+			//hyperParameters.m_numberOfHiddenLayers = 2;
 			hyperParameters.m_discountRewardFactor = 0.999f;
 			hyperParameters.m_numberOfActions = numberOfActions;
 			hyperParameters.m_numberOfObservations = numberOfObservations;
