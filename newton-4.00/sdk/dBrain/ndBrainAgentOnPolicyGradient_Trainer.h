@@ -199,9 +199,8 @@ class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 	//void TrainCritics(ndInt32 criticIndex);
 
 	void UpdateScore();
+	void CalculateAdvantage();
 	void TrajectoryToGpuBuffers();
-
-	//void CalculateAdvantage();
 
 	public:
 	ndString m_name;
@@ -228,6 +227,8 @@ class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 	//ndSharedPtr<ndBrainIntegerBuffer> m_minibatchIndexBuffer;
 
 	ndSharedPtr<ndBrainFloatBuffer> m_trainingBuffer;
+	ndSharedPtr<ndBrainFloatBuffer> m_advantageBuffer;
+	ndSharedPtr<ndBrainFloatBuffer> m_advantageMinibatchBuffer;
 
 	ndBrainVector m_lastPolicy;
 	ndBrainVector m_scratchBuffer;
