@@ -298,7 +298,8 @@ void ndBrainAgentOffPolicyGradient_Agent::Step()
 	GetObservation(&observation[0]);
 
 	bool isdead = IsTerminal();
-	ndFloat32 rewardScale = ndFloat32(1.0f) - owner->m_parameters.m_discountRewardFactor;
+	//ndBrainFloat rewardScale = ndFloat32(1.0f) - owner->m_parameters.m_discountRewardFactor;
+	ndBrainFloat rewardScale = ndFloat32(1.0f);
 	ndBrainFloat reward = CalculateReward() * rewardScale;
 
 	m_trajectory.SetReward(entryIndex, reward);
@@ -589,10 +590,10 @@ ndUnsigned32 ndBrainAgentOffPolicyGradient_Trainer::GetEposideCount() const
 
 ndFloat32 ndBrainAgentOffPolicyGradient_Trainer::GetAverageScore() const
 {
-	//ndBrainFloat maxScopre = ndBrainFloat(1.0f) / (ndFloat32(1.0f) - m_parameters.m_discountRewardFactor);
-	//ndBrainFloat score = ndBrainFloat(1.0f) * m_averageExpectedRewards.GetAverage() / maxScopre;
-	//return score;
-	return m_averageExpectedRewards.GetAverage();
+	ndBrainFloat maxScopre = ndBrainFloat(1.0f) / (ndFloat32(1.0f) - m_parameters.m_discountRewardFactor);
+	ndBrainFloat score = ndBrainFloat(1.0f) * m_averageExpectedRewards.GetAverage() / maxScopre;
+	return score;
+	//return m_averageExpectedRewards.GetAverage();
 }
 
 ndFloat32 ndBrainAgentOffPolicyGradient_Trainer::GetAverageFrames() const
