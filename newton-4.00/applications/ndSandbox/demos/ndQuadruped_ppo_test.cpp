@@ -870,7 +870,7 @@ namespace ndQuadruped_ppo
 			context.DrawPoint(zmp, ndVector(1.0f, 0.0f, 0.0f, 1.0f), 4);
 
 			//// draw zero moment point surrogate point, define as: 
-			//// a point propertinal to the center of mass angular acceleration
+			//// a point proportional to the center of mass angular acceleration
 			//// projected onto the support polygon plane.
 			//ndFloat32 xAlpha = dynamics.m_alpha.m_z / gravityForce;
 			//ndFloat32 zAlpha = -dynamics.m_alpha.m_x / gravityForce;
@@ -959,7 +959,7 @@ namespace ndQuadruped_ppo
 		ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(rootBody);
 		for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = entity->GetChildren().GetFirst(); node; node = node->GetNext())
 		{
-			// build thig
+			// build thigh
 			ndSharedPtr<ndDemoEntity> thighEntity(node->GetInfo());
 			const ndMatrix thighMatrix(thighEntity->GetCurrentMatrix() * matrix);
 			ndSharedPtr<ndBody> thigh(CreateRigidBody(thighEntity, thighMatrix, limbMass, rootBody->GetAsBodyDynamic()));
