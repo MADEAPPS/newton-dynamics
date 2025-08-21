@@ -188,6 +188,7 @@ class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 	void Optimize();
 	void UpdateScore();
 	void OptimizeCritic();
+	void OptimizePolicy();
 	void BuildPolicyClass();
 	void BuildCriticClass();
 	void CalculateAdvantage();
@@ -208,6 +209,7 @@ class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 	ndSharedPtr<ndBrainFloatBuffer> m_trainingBuffer;
 	ndSharedPtr<ndBrainFloatBuffer> m_advantageBuffer;
 	ndSharedPtr<ndBrainIntegerBuffer> m_randomShuffleBuffer;
+	ndSharedPtr<ndBrainFloatBuffer> m_policyGradientAccumulator;
 
 	ndSharedPtr<ndBrainFloatBuffer> m_advantageMinibatchBuffer;
 	ndSharedPtr<ndBrainIntegerBuffer> m_randomShuffleMinibatchBuffer;
