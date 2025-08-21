@@ -1030,8 +1030,6 @@ class brainLayerBrainPolicyGradientBackPropagate : public ndBrainKernel
         ndBrainFloat logVarianceBias = logVariance[0];
         ndBrainFloat logVarianceSlope = logVariance[1];
 
-ndBrainMemVector xxxx(&inputOutputGradients[srcBase], inputSize);
-
         const ndInt32 halfSize = inputSize / 2;
         const ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
         const ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
@@ -1039,15 +1037,6 @@ ndBrainMemVector xxxx(&inputOutputGradients[srcBase], inputSize);
         {
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
             {
-                //ndBrainFloat blend1 = ((i + itemId) >= halfSize) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
-                //ndBrainFloat blend0 = ndBrainFloat(1.0f) - blend1;
-                //
-                //ndBrainFloat gradient = ndBrainFloat(1.0);
-                //ndBrainFloat outputData = inputOutputData[dstBase + i + itemId];
-                //ndBrainFloat gradSelect = gradient * blend0 + outputData * blend1;
-                //ndBrainFloat inputGradient = inputOutputGradients[dstBase + i + itemId];
-                //inputOutputGradients[srcBase + i + itemId] = gradSelect * inputGradient;
-
                 ndBrainFloat in = inputOutputData[srcBase + i + itemId];
                 ndBrainFloat out = inputOutputData[dstBase + i + itemId];
                 ndBrainFloat x1 = ndBrainFloat(ndTanh(in));
