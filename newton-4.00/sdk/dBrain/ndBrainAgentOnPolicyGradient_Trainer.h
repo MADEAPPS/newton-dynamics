@@ -186,21 +186,14 @@ class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 
 	private:
 	void Optimize();
-	//void CalculateScore();
-	//void CacheTrajectoryTransitions();
-	void SaveTrajectory(ndBrainAgentOnPolicyGradient_Agent* const agent);
-	
-	//void TrainPolicy();
+	void UpdateScore();
+	void OptimizeCritic();
+	void OptimizePolicy();
 	void BuildPolicyClass();
 	void BuildCriticClass();
-	//void SaveTrajectoryTerminal();
-	//void SaveTrajectoryNoTerminal();
-	//void CalculateExpectedRewards();
-	//void TrainCritics(ndInt32 criticIndex);
-
-	void UpdateScore();
 	void CalculateAdvantage();
 	void TrajectoryToGpuBuffers();
+	void SaveTrajectory(ndBrainAgentOnPolicyGradient_Agent* const agent);
 
 	public:
 	ndString m_name;
@@ -213,26 +206,17 @@ class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 	std::uniform_real_distribution<ndFloat32> m_uniformDistribution;
 	ndList<ndSharedPtr<ndBrainAgentOnPolicyGradient_Agent>> m_agents;
 
-	//ndSharedPtr<ndBrainFloatBuffer> m_uniformRandom;
-	//ndSharedPtr<ndBrainFloatBuffer> m_minibatchMean;
-	//ndSharedPtr<ndBrainFloatBuffer> m_minibatchSigma;
-	//ndSharedPtr<ndBrainFloatBuffer> m_minibatchEntropy;
-	//ndSharedPtr<ndBrainFloatBuffer> m_replayBufferFlat;
-	//ndSharedPtr<ndBrainFloatBuffer> m_minibatchNoTerminal;
-	//ndSharedPtr<ndBrainFloatBuffer> m_minibatchOfTransitions;
-	//ndSharedPtr<ndBrainFloatBuffer> m_minibatchExpectedRewards;
-	//ndSharedPtr<ndBrainFloatBuffer> m_minibatchCriticInputTest;
-	//ndSharedPtr<ndBrainFloatBuffer> m_minibatchUniformRandomDistribution;
-	//ndSharedPtr<ndBrainIntegerBuffer> m_randomShuffleBuffer;
-	//ndSharedPtr<ndBrainIntegerBuffer> m_minibatchIndexBuffer;
-
 	ndSharedPtr<ndBrainFloatBuffer> m_trainingBuffer;
 	ndSharedPtr<ndBrainFloatBuffer> m_advantageBuffer;
+	ndSharedPtr<ndBrainIntegerBuffer> m_randomShuffleBuffer;
+	ndSharedPtr<ndBrainFloatBuffer> m_policyGradientAccumulator;
+
 	ndSharedPtr<ndBrainFloatBuffer> m_advantageMinibatchBuffer;
+	ndSharedPtr<ndBrainIntegerBuffer> m_randomShuffleMinibatchBuffer;
 
 	ndBrainVector m_lastPolicy;
 	ndBrainVector m_scratchBuffer;
-	//ndArray<ndInt32> m_shuffleBuffer;
+	ndArray<ndInt32> m_shuffleBuffer;
 	//ndArray<ndInt32> m_miniBatchIndices;
 	ndBrainAgentOnPolicyGradient_Agent::ndTrajectory m_trajectoryAccumulator;
 	ndMovingAverage<ND_ON_POLICY_MOVING_AVERAGE_SCORE> m_averageExpectedRewards;
@@ -242,7 +226,8 @@ class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 	ndUnsigned32 m_horizonSteps;
 	ndUnsigned32 m_eposideCount;
 	ndUnsigned32 m_trajectiesCount;
-	//ndUnsigned32 m_shuffleBatchIndex;
+	ndUnsigned32 m_numberOfMinibatches;
+
 	friend class ndBrainAgentOnPolicyGradient_Agent;
 };
 

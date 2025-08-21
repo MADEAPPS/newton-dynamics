@@ -303,8 +303,7 @@ void ndBrainAgentOnPolicyGradient_Agent::Step()
 	GetObservation(&observation[0]);
 
 	bool isdead = IsTerminal();
-	ndFloat32 rewardScale = ndFloat32(1.0f) - owner->m_parameters.m_discountRewardFactor;
-	ndBrainFloat reward = CalculateReward() * rewardScale;
+	ndBrainFloat reward = CalculateReward();
 
 	m_trajectory.SetReward(entryIndex, reward);
 	m_trajectory.SetTerminalState(entryIndex, isdead);
@@ -325,24 +324,14 @@ ndBrainAgentOnPolicyGradient_Trainer::ndBrainAgentOnPolicyGradient_Trainer(const
 	,m_randomGenerator(std::random_device{}())
 	,m_uniformDistribution(ndFloat32(0.0f), ndFloat32(1.0f))
 	,m_agents()
-	//,m_uniformRandom(nullptr)
-	//,m_minibatchMean(nullptr)
-	//,m_minibatchSigma(nullptr)
-	//,m_replayBufferFlat(nullptr)
-	//,m_minibatchNoTerminal(nullptr)
-	//,m_minibatchOfTransitions(nullptr)
-	//,m_minibatchExpectedRewards(nullptr)
-	//,m_minibatchCriticInputTest(nullptr)
-	//,m_minibatchUniformRandomDistribution(nullptr)
-	//,m_randomShuffleBuffer(nullptr)
-	//,m_minibatchIndexBuffer(nullptr)
-	
-	//,m_shuffleBuffer()
-	//,m_miniBatchIndices()
 	,m_trainingBuffer(nullptr)
 	,m_advantageBuffer(nullptr)
+	,m_randomShuffleBuffer(nullptr)
+	,m_policyGradientAccumulator(nullptr)
+	,m_advantageMinibatchBuffer(nullptr)
 	,m_lastPolicy()
 	,m_scratchBuffer()
+	,m_shuffleBuffer()
 	,m_trajectoryAccumulator()
 	,m_averageExpectedRewards()
 	,m_averageFramesPerEpisodes()
@@ -350,7 +339,7 @@ ndBrainAgentOnPolicyGradient_Trainer::ndBrainAgentOnPolicyGradient_Trainer(const
 	,m_horizonSteps(0)
 	,m_eposideCount(0)
 	,m_trajectiesCount(0)
-	//,m_shuffleBatchIndex(0)
+	,m_numberOfMinibatches(0)
 {
 	ndAssert(m_parameters.m_numberOfActions);
 	ndAssert(m_parameters.m_numberOfObservations);
@@ -380,29 +369,13 @@ ndBrainAgentOnPolicyGradient_Trainer::ndBrainAgentOnPolicyGradient_Trainer(const
 	BuildPolicyClass();
 	BuildCriticClass();
 
-	//ndInt32 inputSize = m_policyTrainer->GetBrain()->GetInputSize();
-	//ndInt32 outputSize = m_policyTrainer->GetBrain()->GetOutputSize();
-	//ndInt32 actionsSize = m_policyTrainer->GetBrain()->GetOutputSize() / 2;
-	//ndBrainAgentOnPolicyGradient_Agent::ndTrajectory trajectory(outputSize, inputSize);
-	//
-	//m_minibatchNoTerminal = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_miniBatchSize));
-	//m_minibatchIndexBuffer = ndSharedPtr<ndBrainIntegerBuffer>(new ndBrainIntegerBuffer(*m_context, m_parameters.m_miniBatchSize));
-	//m_minibatchExpectedRewards = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_miniBatchSize));
-	//
-	//m_replayBufferFlat = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_replayBufferSize * trajectory.GetStride()));
-	//m_minibatchOfTransitions = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_miniBatchSize * trajectory.GetStride()));
-	//m_minibatchCriticInputTest = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, (outputSize + inputSize) * m_parameters.m_miniBatchSize));
-	//m_randomShuffleBuffer = ndSharedPtr<ndBrainIntegerBuffer>(new ndBrainIntegerBuffer(*m_context, m_parameters.m_numberOfUpdates * m_parameters.m_miniBatchSize));
-	//
-	//m_minibatchEntropy = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_miniBatchSize));
-	//m_minibatchMean = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, actionsSize * m_parameters.m_miniBatchSize));
-	//m_minibatchSigma = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, actionsSize * m_parameters.m_miniBatchSize));
-	//m_minibatchUniformRandomDistribution = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, actionsSize * m_parameters.m_miniBatchSize));
-	//m_uniformRandom = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, actionsSize * m_parameters.m_numberOfUpdates * m_parameters.m_miniBatchSize));
+	m_advantageMinibatchBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_miniBatchSize));
+	m_randomShuffleMinibatchBuffer = ndSharedPtr<ndBrainIntegerBuffer>(new ndBrainIntegerBuffer(*m_context, m_parameters.m_miniBatchSize));
 
-	m_advantageMinibatchBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_maxTrajectorySteps));
 	m_advantageBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_parameters.m_batchTrajectoryCount * m_parameters.m_maxTrajectorySteps));
+	m_randomShuffleBuffer = ndSharedPtr<ndBrainIntegerBuffer>(new ndBrainIntegerBuffer(*m_context, m_parameters.m_batchTrajectoryCount * m_parameters.m_maxTrajectorySteps));
 	m_trainingBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, m_trajectoryAccumulator.GetStride() * m_parameters.m_batchTrajectoryCount * m_parameters.m_maxTrajectorySteps));
+	m_policyGradientAccumulator = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_policyTrainer->GetWeightAndBiasGradientBuffer()));
 }
 
 ndBrain* ndBrainAgentOnPolicyGradient_Trainer::GetPolicyNetwork()
@@ -588,10 +561,9 @@ ndUnsigned32 ndBrainAgentOnPolicyGradient_Trainer::GetEposideCount() const
 
 ndFloat32 ndBrainAgentOnPolicyGradient_Trainer::GetAverageScore() const
 {
-	//ndBrainFloat maxScopre = ndBrainFloat(1.0f) / (ndFloat32(1.0f) - m_parameters.m_discountRewardFactor);
-	//ndBrainFloat score = ndBrainFloat(1.0f) * m_averageExpectedRewards.GetAverage() / maxScopre;
-	//return score;
-	return m_averageExpectedRewards.GetAverage();
+	ndBrainFloat maxScopre = ndBrainFloat(1.0f) / (ndFloat32(1.0f) - m_parameters.m_discountRewardFactor);
+	ndBrainFloat score = ndBrainFloat(1.0f) * m_averageExpectedRewards.GetAverage() / maxScopre;
+	return score;
 }
 
 ndFloat32 ndBrainAgentOnPolicyGradient_Trainer::GetAverageFrames() const
@@ -1119,22 +1091,26 @@ void ndBrainAgentOnPolicyGradient_Trainer::TrajectoryToGpuBuffers()
 	ndInt32 stride = m_trajectoryAccumulator.GetStride();
 	const ndInt32 count = m_trajectoryAccumulator.GetCount();
 
+	m_shuffleBuffer.SetCount(0);
 	m_scratchBuffer.SetCount(count * stride);
 	for (ndInt32 i = 0; i < count; ++i)
 	{
+		m_shuffleBuffer.PushBack(i);
 		ndBrainMemVector dst(&m_scratchBuffer[i * stride], stride);
 		m_trajectoryAccumulator.GetFlatArray(i, dst);
 	}
 	m_trainingBuffer->VectorToDevice(m_scratchBuffer);
+	m_shuffleBuffer.RandomShuffle(count);
+	m_randomShuffleBuffer->MemoryToDevice(0, count * sizeof(ndInt32), &m_shuffleBuffer[0]);
+
+	m_numberOfMinibatches = ndUnsigned32(m_trajectoryAccumulator.GetCount() - m_trajectoryAccumulator.GetCount() % m_parameters.m_miniBatchSize);
 }
 
 #pragma optimize( "", off )
 void ndBrainAgentOnPolicyGradient_Trainer::CalculateAdvantage()
 {
 	ndBrainFloatBuffer* const inputBuffer = m_criticTrainer->GetInputBuffer();
-	ndBrainFloatBuffer* const outputBuffer = m_criticTrainer->GetInputBuffer();
-
-	const ndInt32 numberOfMinibatches = ndInt32(m_trajectoryAccumulator.GetCount() - m_trajectoryAccumulator.GetCount() % m_parameters.m_miniBatchSize);
+	ndBrainFloatBuffer* const outputBuffer = m_criticTrainer->GetOuputBuffer();
 
 	ndCopyBufferCommandInfo advantageInfo;
 	advantageInfo.m_srcStrideInByte = ndInt32(m_parameters.m_miniBatchSize * sizeof(ndReal));
@@ -1159,7 +1135,7 @@ void ndBrainAgentOnPolicyGradient_Trainer::CalculateAdvantage()
 
 	const ndInt32 dstStride = ndInt32(m_parameters.m_miniBatchSize * sizeof(ndReal));
 	const ndInt32 srcStride = ndInt32(m_parameters.m_miniBatchSize * m_trajectoryAccumulator.GetStride() * sizeof(ndReal));
-	for (ndInt32 i = 0; i < numberOfMinibatches; i += m_parameters.m_miniBatchSize)
+	for (ndInt32 i = 0; i < ndInt32(m_numberOfMinibatches); i += m_parameters.m_miniBatchSize)
 	{
 		m_advantageMinibatchBuffer->CopyBuffer(expectedRewardInfo, m_parameters.m_miniBatchSize, **m_trainingBuffer);
 		inputBuffer->CopyBuffer(observationInfo, m_parameters.m_miniBatchSize, **m_trainingBuffer);
@@ -1177,11 +1153,182 @@ void ndBrainAgentOnPolicyGradient_Trainer::CalculateAdvantage()
 }
 
 #pragma optimize( "", off )
+void ndBrainAgentOnPolicyGradient_Trainer::OptimizeCritic()
+{
+	ndCopyBufferCommandInfo shuffleBufferInfo;
+	shuffleBufferInfo.m_srcStrideInByte = ndInt32(m_parameters.m_miniBatchSize * sizeof(ndReal));
+	shuffleBufferInfo.m_srcOffsetInByte = 0;
+	shuffleBufferInfo.m_dstOffsetInByte = 0;
+	shuffleBufferInfo.m_dstStrideInByte = shuffleBufferInfo.m_srcStrideInByte;
+	shuffleBufferInfo.m_strideInByte = shuffleBufferInfo.m_srcStrideInByte;
+
+	ndCopyBufferCommandInfo advantageInfo;
+	advantageInfo.m_srcOffsetInByte = 0;
+	advantageInfo.m_srcStrideInByte = ndInt32(sizeof(ndReal));
+	advantageInfo.m_dstOffsetInByte = 0;
+	advantageInfo.m_dstStrideInByte = ndInt32(sizeof(ndReal));
+	advantageInfo.m_strideInByte = advantageInfo.m_dstStrideInByte;
+
+	ndCopyBufferCommandInfo observationInfo;
+	observationInfo.m_srcOffsetInByte = 0;
+	observationInfo.m_srcStrideInByte = ndInt32(m_trajectoryAccumulator.GetStride() * sizeof(ndReal));
+	observationInfo.m_dstOffsetInByte = 0;
+	observationInfo.m_dstStrideInByte = ndInt32(m_criticTrainer->GetBrain()->GetInputSize() * sizeof(ndReal));
+	observationInfo.m_strideInByte = observationInfo.m_dstStrideInByte;
+
+	ndBrainFloatBuffer* const inputBuffer = m_criticTrainer->GetInputBuffer();
+	ndBrainFloatBuffer* const outputBuffer = m_criticTrainer->GetOuputBuffer();
+	ndBrainFloatBuffer* const outputGradientBuffer = m_criticTrainer->GetOuputGradientBuffer();
+	for (ndInt32 i = 0; i < ndInt32(m_numberOfMinibatches); i += m_parameters.m_miniBatchSize)
+	{
+		m_randomShuffleMinibatchBuffer->CopyBuffer(shuffleBufferInfo, 1, **m_randomShuffleBuffer);
+		inputBuffer->CopyBufferIndirect(observationInfo, **m_randomShuffleMinibatchBuffer, **m_trainingBuffer);
+		m_advantageMinibatchBuffer->CopyBufferIndirect(advantageInfo, **m_randomShuffleMinibatchBuffer, **m_advantageBuffer);
+		m_criticTrainer->MakePrediction();
+		outputGradientBuffer->Set(*outputBuffer);
+		outputGradientBuffer->Sub(**m_advantageMinibatchBuffer);
+		m_criticTrainer->BackPropagate();
+		m_criticTrainer->ApplyLearnRate();
+
+//ndUnsigned32 xxxx[256];
+//m_randomShuffleMinibatchBuffer->MemoryFromDevice(0, sizeof(xxxx), xxxx);
+
+		shuffleBufferInfo.m_srcOffsetInByte += ndInt32(m_parameters.m_miniBatchSize * sizeof(ndReal));
+	}
+}
+
+#pragma optimize( "", off )
+void ndBrainAgentOnPolicyGradient_Trainer::OptimizePolicy()
+{
+//	ndAtomic<ndInt32> iterator(0);
+//	auto ClearGradients = ndMakeObject::ndFunction([this, &iterator](ndInt32, ndInt32)
+//	{
+//		for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
+//		{
+//			ndBrainTrainer* const trainer = m_policyTrainers[i];
+//			trainer->ClearGradients();
+//		}
+//	});
+//	ndBrainThreadPool::ParallelExecute(ClearGradients);
+//
+//	ndAssert(m_trajectoryAccumulator.GetCount() % m_parameters.m_miniBatchSize == 0);
+//
+//	const ndInt32 steps = m_trajectoryAccumulator.GetCount();
+//	ndBrainFloat gradientScale = ndBrainFloat(m_parameters.m_miniBatchSize) / ndBrainFloat(steps);
+//	for (ndInt32 base = 0; base < steps; base += m_parameters.m_miniBatchSize)
+//	{
+//		auto CalculateGradients = ndMakeObject::ndFunction([this, &iterator, base](ndInt32, ndInt32)
+//		{
+//			class MaxLikelihoodLoss : public ndBrainLoss
+//			{
+//				public:
+//				MaxLikelihoodLoss(ndBrainTrainer& trainer, ndBrainAgentContinuePolicyGradient_TrainerMaster* const owner, ndInt32 index)
+//					:ndBrainLoss()
+//					,m_trainer(trainer)
+//					,m_owner(owner)
+//					,m_index(index)
+//				{
+//				}
+//	
+//				void GetLoss(const ndBrainVector& probabilityDistribution, ndBrainVector& loss)
+//				{
+//					// as I understand it, this is just a special case of maximum likelihood optimization.
+//					// given a multivariate Gaussian process with zero cross covariance to the actions.
+//					// calculate the log of prob of a multivariate Gaussian
+//	
+//					const ndInt32 numberOfActions = m_owner->m_policy.GetOutputSize();
+//					const ndBrainMemVector sampledProbability(m_owner->m_trajectoryAccumulator.GetActions(m_index), numberOfActions);
+//					if (m_owner->m_parameters.m_usePerActionSigmas)
+//					{
+//						const ndInt32 size = ndInt32(m_owner->m_policy.GetOutputSize()) / 2;
+//						for (ndInt32 i = size - 1; i >= 0; --i)
+//						{
+//							ndBrainFloat sigma = probabilityDistribution[size + i];
+//							ndBrainFloat invSigma = ndBrainFloat(1.0f) / sigma;
+//							ndBrainFloat z = sampledProbability[i] - probabilityDistribution[i];
+//							ndBrainFloat meanGrad = z * invSigma * invSigma;
+//							ndBrainFloat sigmaGrad = z * z * invSigma * invSigma * invSigma - sigma;
+//
+//							loss[i] = meanGrad;
+//							loss[size + i] = sigmaGrad;
+//						}
+//					}
+//					else
+//					{
+//						ndFloat32 sigma = m_owner->m_parameters.m_actionFixSigma;
+//						ndFloat32 sigma2 = sigma * sigma;
+//						ndBrainFloat invSigma2 = ndBrainFloat(1.0f) / sigma2;
+//						const ndInt32 size = ndInt32(m_owner->m_policy.GetOutputSize());
+//						for (ndInt32 i = size - 1; i >= 0; --i)
+//						{
+//							ndBrainFloat z = sampledProbability[i] - probabilityDistribution[i];
+//							ndBrainFloat meanGrad = z * invSigma2;
+//							loss[i] = meanGrad;
+//						}
+//					}
+//					const ndBrainFloat advantage = m_owner->m_advantage[m_index];
+//	
+//					//negate the gradient for gradient ascend?
+//					ndBrainFloat ascend = ndBrainFloat(-1.0f) * advantage;
+//					loss.Scale(ascend);
+//				}
+//	
+//				ndBrainTrainer& m_trainer;
+//				ndBrainAgentContinuePolicyGradient_TrainerMaster* m_owner;
+//				ndInt32 m_index;
+//			};
+//	
+//			for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
+//			{
+//				ndBrainTrainer& trainer = *m_policyAuxiliaryTrainers[i];
+//				ndInt32 index = base + i;
+//				MaxLikelihoodLoss loss(trainer, this, index);
+//				const ndBrainMemVector observation(m_trajectoryAccumulator.GetObservations(index), m_parameters.m_numberOfObservations);
+//				trainer.BackPropagate(observation, loss);
+//			}
+//		});
+//	
+//		auto AddGradients = ndMakeObject::ndFunction([this, &iterator, gradientScale](ndInt32, ndInt32)
+//		{
+//			for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
+//			{
+//				ndBrainTrainer* const trainer = m_policyTrainers[i];
+//				ndBrainTrainer* const auxiliaryTrainer = m_policyAuxiliaryTrainers[i];
+//				auxiliaryTrainer->ScaleWeights(gradientScale);
+//				trainer->AddGradients(auxiliaryTrainer);
+//			}
+//		});
+//	
+//		iterator = 0;
+//		ndBrainThreadPool::ParallelExecute(CalculateGradients);
+//		iterator = 0;
+//		ndBrainThreadPool::ParallelExecute(AddGradients);
+//	}
+//	m_policyOptimizer->Update(this, m_policyTrainers, m_parameters.m_policyLearnRate);
+
+	m_policyGradientAccumulator->Set(ndBrainFloat(0.0f));
+	ndBrainFloatBuffer* const weightAndBiasGradientBuffer = m_policyTrainer->GetWeightAndBiasGradientBuffer();;
+	ndBrainFloat scale = ndBrainFloat(0.0f);
+	for (ndInt32 i = 0; i < ndInt32(m_numberOfMinibatches); i += m_parameters.m_miniBatchSize)
+	{
+
+		scale += ndBrainFloat(1.0f);
+		m_policyGradientAccumulator->Add(*weightAndBiasGradientBuffer);
+	}
+	m_policyGradientAccumulator->Scale(1.0f / scale);
+	weightAndBiasGradientBuffer->Set(m_policyGradientAccumulator);
+	m_policyTrainer->ApplyLearnRate();
+}
+
+#pragma optimize( "", off )
 void ndBrainAgentOnPolicyGradient_Trainer::Optimize()
 {
 	UpdateScore();
 	TrajectoryToGpuBuffers();
 	CalculateAdvantage();
+
+	OptimizePolicy();
+	OptimizeCritic();
 }
 
 #pragma optimize( "", off )
