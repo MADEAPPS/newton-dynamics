@@ -38,10 +38,6 @@ ndBrainAgentPolicyGradientActivation::ndBrainAgentPolicyGradientActivation(ndInt
 	:ndBrainLayerActivation(neurons)
 	,m_logVarianceBuffer(nullptr)
 {
-	//ndBrainFloat minLogSigma = ndLog(minVariance);
-	//ndBrainFloat maxLogSigma = ndLog(maxVariance);
-	//biasVariance.Set((maxLogSigma + minLogSigma) * ndBrainFloat(0.5f));
-	//slopeVariance.Set((maxLogSigma - minLogSigma) * ndBrainFloat(0.5f));
 	m_logVarianceBias = (maxLogVariance + minLogVariance) * ndBrainFloat(0.5f);
 	m_logVarianceSlope = (maxLogVariance - minLogVariance) * ndBrainFloat(0.5f);
 }
@@ -116,15 +112,25 @@ void ndBrainAgentPolicyGradientActivation::MakePrediction(const ndBrainVector& i
 	}
 }
 
-void ndBrainAgentPolicyGradientActivation::InputDerivative(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
+void ndBrainAgentPolicyGradientActivation::InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
-	ndAssert(0);
+	ndAssert(input.GetCount() == outputDerivative.GetCount());
 	ndAssert(output.GetCount() == outputDerivative.GetCount());
-	const ndInt32 actionSize = ndInt32(inputDerivative.GetCount() / 2);
-	for (ndInt32 i = 0; i < actionSize; ++i)
+	const ndInt32 size = ndInt32(input.GetCount());
+	for (ndInt32 i = 0; i < size; ++i)
 	{
-		inputDerivative[i] = outputDerivative[i];
-		inputDerivative[actionSize + i] = output[actionSize + i] * outputDerivative[actionSize + i];
+		ndBrainFloat in = input[i];
+		ndBrainFloat out = output[i];
+		ndBrainFloat x1 = ndBrainFloat(ndTanh(in));
+		ndBrainFloat x2 = m_logVarianceBias + m_logVarianceSlope * x1;
+
+		ndBrainFloat meanGrad = ndBrainFloat(1.0f) - out * out;
+		ndBrainFloat sigmaGrad = m_logVarianceSlope * ndExp(x2) * (ndBrainFloat(1.0f) - x1 * x1);
+
+		ndBrainFloat blend = (i < size / 2) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+		ndBrainFloat gradiend = meanGrad * blend + sigmaGrad * (ndBrainFloat(1.0f) - blend);
+
+		inputDerivative[i] = gradiend * outputDerivative[i];
 	}
 }
 
