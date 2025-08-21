@@ -295,10 +295,11 @@ R""""(
         }
     }
 
-    __kernel void brainLayerOffPolicyActivation(
+    __kernel void brainLayerPolicyGradientActivation(
         __global const UniformBufferLayerArguments* parameters, 
         __global float* inputOutputData, 
-        __global float* notUsed)
+        __global float* notUsed,
+        __global float* logVariance)
     {
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
@@ -311,30 +312,29 @@ R""""(
         long inputOffset = groupId * (long)inputOutputSize + inputOutputStartOffset;
         long outputOffset = inputOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
 
+        float logVarianceBias = logVariance[0];
+        float logVarianceSlope = logVariance[1];
+
         uint halfSize = inputSize / 2;
         uint workGroupSizeReminder = inputSize % workGroupSize;
         uint modWorkGroupSize = inputSize - workGroupSizeReminder;
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
-            float blend1 = ((i + itemId) >= halfSize) ? 1.0 : 0.0;
-            float blend0 = 1.0 - blend1;
-
-            float inputValue = inputOutputData[inputOffset + i + itemId];
-            float expenential = exp(inputValue);
-
-            float outputValue = inputValue * blend0 + expenential * blend1;
-            inputOutputData[outputOffset + i + itemId] = outputValue;
+            float x = inputOutputData[inputOffset + i + itemId];
+            float value = (x < -30.0) ? -30.0 : ((x > 30.0) ? 30.0 : x);
+            float out0 = tanh(value);
+            float out1 = logVarianceBias + out0 * logVarianceSlope;
+            float out2 = exp(out1);
+            inputOutputData[outputOffset + i + itemId] = ((i + itemId) < halfSize) ? out0 : out2;
         }
         if (itemId < workGroupSizeReminder)
         {
-            float blend1 = ((modWorkGroupSize + itemId) >= halfSize) ? 1.0 : 0.0;
-            float blend0 = 1.0 - blend1;
-
-            float inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
-            float expenential = exp(inputValue);
-
-            float outputValue = inputValue * blend0 + expenential * blend1;
-            inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
+            float x = inputOutputData[inputOffset + modWorkGroupSize + itemId];
+            float value = (x < -30.0) ? -30.0 : ((x > 30.0) ? 30.0 : x);
+            float out0 = tanh(value);
+            float out1 = logVarianceBias + out0 * logVarianceSlope;
+            float out2 = exp(out1);
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = ((modWorkGroupSize + itemId) < halfSize) ? out0 : out2;
         }
     }
 
@@ -728,12 +728,13 @@ R""""(
         }
     }
 
-    __kernel void brainLayerBrainOffPolicyBackPropagate(
+    __kernel void brainLayerBrainPolicyGradientBackPropagate(
             __global const UniformBufferLayerArguments* parameters, 
             __global float* inputOutputData, 
             __global float* weightsAndBias, 
             __global float* inputOutputGradients,
-            __global float* weightsAndBiasGradients) 
+            __global float* weightsAndBiasGradients,
+            __global float* logVariance) 
     {
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
@@ -746,32 +747,45 @@ R""""(
         long srcBase = groupId * (long)inputOutputSize + inputOutputStartOffset;        
         long dstBase = srcBase + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
         
+        float logVarianceBias = logVariance[0];
+        float logVarianceSlope = logVariance[1];
+
         uint halfSize = inputSize / 2;
         uint workGroupSizeReminder = inputSize % workGroupSize;
         uint modWorkGroupSize = inputSize - workGroupSizeReminder;
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
-            float blend1 = ((i + itemId) >= halfSize) ? 1.0 : 0.0;
-            float blend0 = 1.0 - blend1;
-            
-            float gradient = 1.0;
-            float outputData = inputOutputData[dstBase + i + itemId];
-            float gradSelect = gradient * blend0 + outputData * blend1;
+            float in = inputOutputData[srcBase + i + itemId];
+            float out = inputOutputData[dstBase + i + itemId];
 
+            float x1 = tanh(in);
+            float x2 = logVarianceBias + logVarianceSlope * x1;
+
+            float meanGrad = 1.0 - out * out;
+            float sigmaGrad = logVarianceSlope * exp(x2) * (1.0 - x1 * x1);
+
+            float blend = ((i + itemId) < halfSize) ? 1.0 : 0.0;
+            float gradiend = meanGrad * blend + sigmaGrad * (1.0 - blend);
+          
             float inputGradient = inputOutputGradients[dstBase + i + itemId];
-            inputOutputGradients[srcBase + i + itemId] = gradSelect * inputGradient;
+            inputOutputGradients[srcBase + i + itemId] = gradiend * inputGradient;
         }
         if (itemId < workGroupSizeReminder)
         {
-            float blend1 = ((modWorkGroupSize + itemId) >= halfSize) ? 1.0 : 0.0;
-            float blend0 = 1.0 - blend1;
-            
-            float gradient = 1.0;
-            float outputData = inputOutputData[dstBase + modWorkGroupSize + itemId];
-            float gradSelect = gradient * blend0 + outputData * blend1;
+            float in = inputOutputData[srcBase + modWorkGroupSize + itemId];
+            float out = inputOutputData[dstBase + modWorkGroupSize + itemId];
 
+            float x1 = tanh(in);
+            float x2 = logVarianceBias + logVarianceSlope * x1;
+
+            float meanGrad = 1.0 - out * out;
+            float sigmaGrad = logVarianceSlope * exp(x2) * (1.0 - x1 * x1);
+
+            float blend = ((modWorkGroupSize + itemId) < halfSize) ? 1.0 : 0.0;
+            float gradiend = meanGrad * blend + sigmaGrad * (1.0 - blend);
+          
             float inputGradient = inputOutputGradients[dstBase + modWorkGroupSize + itemId];
-            inputOutputGradients[srcBase + modWorkGroupSize + itemId] = gradSelect * inputGradient;
+            inputOutputGradients[srcBase + modWorkGroupSize + itemId] = gradiend * inputGradient;
         }
     }
 
@@ -1740,9 +1754,9 @@ void ndBrainGpuContext::CreateKerners()
     m_brainLayerLinearActivation = CreateKerner(program, "brainLayerLinearActivation");
     m_brainLayerSoftmaxActivation = CreateKerner(program, "brainLayerSoftmaxActivation");
     m_brainLayerLeakyReluActivation = CreateKerner(program, "brainLayerLeakyReluActivation");
-    m_brainLayerOffPolicyActivation = CreateKerner(program, "brainLayerOffPolicyActivation");
     m_brainLayerDropOutActivation = CreateKerner(program, "brainLayerLinearDropOutActivation");
     m_brainLayerMatrixMatrixMultiply = CreateKerner(program, "brainLayerMatrixMatrixMultiply");
+    m_brainLayerPolicyGradientActivation = CreateKerner(program, "brainLayerPolicyGradientActivation");
 
     // create all backpropagate shaders
     m_brainCopyInputGradients = CreateKerner(program, "brainCopyInputGradients");
@@ -1752,7 +1766,7 @@ void ndBrainGpuContext::CreateKerners()
     m_brainLayerTanhBackPropagate = CreateKerner(program, "brainLayerBrainTanhBackPropagate");
     m_brainLayerDropOutBackPropagate = CreateKerner(program, "brainLayerBrainDropOutBackPropagate");
     m_brainLayerLeakyReluBackPropagate = CreateKerner(program, "brainLayerBrainLeakyReluBackPropagate");
-    m_brainLayerOffPolicyBackPropagate = CreateKerner(program, "brainLayerBrainOffPolicyBackPropagate");
+    m_brainLayerPolicyGradientBackPropagate = CreateKerner(program, "brainLayerBrainPolicyGradientBackPropagate");
     m_brainLayerCathegoricalSoftmaxBackPropagate = CreateKerner(program, "brainLayerBrainCathegoricalSoftmaxBackPropagate");
     m_brainLayerMatrixBackPropagateBiasGradients = CreateKerner(program, "brainLayerBrainBackPropagateMatrixBiasGradients");
     m_brainLayerMatrixBackPropagateInputGradients = CreateKerner(program, "brainLayerBrainBackPropagateMatrixInputGradients");
