@@ -91,7 +91,7 @@ ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 
 //m_useGpuBackend = false;
 //m_numberOfUpdates = 1;
-//m_replayBufferStartOptimizeSize = 1024 * 2;
+m_replayBufferStartOptimizeSize = 1024 * 2;
 }
 
 ndBrainAgentOffPolicyGradient_Agent::ndTrajectory::ndTrajectory()
@@ -483,24 +483,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::BuildPolicyClass()
 		layers.PushBack(new ND_HIDEN_LAYERS_ACTIVATION(layers[layers.GetCount() - 1]->GetOutputSize()));
 	}
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_numberOfActions * 2));
-
-	ndBrainVector bias;
-	ndBrainVector slope;
-	bias.SetCount(layers[layers.GetCount() - 1]->GetOutputSize());
-	slope.SetCount(layers[layers.GetCount() - 1]->GetOutputSize());
-	bias.Set(ndBrainFloat(0.0f));
-	slope.Set(ndBrainFloat(1.0f));
-	ndInt32 elements = ndInt32(bias.GetCount() / 2);
-	ndBrainMemVector biasVariance(&bias[elements], elements);
-	ndBrainMemVector slopeVariance(&slope[elements], elements);
-	ndBrainFloat minLogSigma = ndLog(ND_POLICY_MIN_SIGMA);
-	ndBrainFloat maxLogSigma = ndLog(ND_POLICY_MAX_SIGMA);
-	biasVariance.Set((maxLogSigma + minLogSigma) * ndBrainFloat(0.5f));
-	slopeVariance.Set((maxLogSigma - minLogSigma) * ndBrainFloat(0.5f));
-
-	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
-	layers.PushBack(new ndBrainLayerActivationLinear(slope, bias));
-	layers.PushBack(new ndBrainAgentPolicyGradientActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
+	layers.PushBack(new ndBrainAgentPolicyGradientActivation(layers[layers.GetCount() - 1]->GetOutputSize(), ndLog(ND_POLICY_MIN_SIGMA), ndLog(ND_POLICY_MAX_SIGMA)));
 
 	ndSharedPtr<ndBrain> policy (new ndBrain);
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)

@@ -37,13 +37,14 @@
 class ndBrainAgentPolicyGradientActivation : public ndBrainLayerActivation
 {
 	public:
-	ndBrainAgentPolicyGradientActivation(ndInt32 neurons);
+	ndBrainAgentPolicyGradientActivation(ndInt32 neurons, ndBrainFloat minLogVariance, ndBrainFloat maxLogVariance);
 	ndBrainAgentPolicyGradientActivation(const ndBrainAgentPolicyGradientActivation& src);
 
 	virtual bool HasGpuSupport() const override;
 	virtual ndBrainLayer* Clone() const override;
 	virtual const char* GetLabelId() const override;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
+	virtual void Save(const ndBrainSave* const loadSave) const override;
 
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const override;
 	virtual void InputDerivative(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const override;
@@ -59,5 +60,9 @@ class ndBrainAgentPolicyGradientActivation : public ndBrainLayerActivation
 		ndBrainTrainerInference* const owner, ndBrainContext* const context, const ndCommandSharedInfo& info,
 		ndInt32 miniBatchSize, ndBrainFloatBuffer* const inputOutputData, ndBrainFloatBuffer* const weightsAndBias,
 		ndBrainFloatBuffer* const inputOutputGradients, ndBrainFloatBuffer* const weightsAndBiasGradients) const override;
+
+	ndBrainFloat m_logVarianceBias;
+	ndBrainFloat m_logVarianceSlope;
+	mutable ndSharedPtr<ndBrainUniformBuffer> m_logVarianceBuffer;
 };
 #endif 

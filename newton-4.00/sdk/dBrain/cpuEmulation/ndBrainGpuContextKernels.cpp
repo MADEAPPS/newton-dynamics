@@ -371,19 +371,21 @@ class brainLayerLinearActivation : public ndBrainKernel
     }
 };
 
-class brainLayerOffPolicyActivation : public ndBrainKernel
+class brainLayerPolicyGradientActivation : public ndBrainKernel
 {
     public:
-    brainLayerOffPolicyActivation(ndBrainContext* const context)
+    brainLayerPolicyGradientActivation(ndBrainContext* const context)
         :ndBrainKernel(context)
     {
     }
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
+        ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
         ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
         
+        ndBrainFloat* const logVariance = (ndBrainFloat*)buffer3->GetGpuBuffer()->GetPtr();
         ndBrainFloat* const inputOutputData = (ndBrainFloat*)buffer1->GetGpuBuffer()->GetPtr();
         ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetGpuBuffer()->GetPtr();
         
@@ -395,6 +397,9 @@ class brainLayerOffPolicyActivation : public ndBrainKernel
         ndInt64 outputOffset = inputOffset + __cpuKernelRoundoff(inputSize, workGroupSize);
         ndAssert(outputOffset >= 0);
 
+        ndBrainFloat logVarianceBias = logVariance[0];
+        ndBrainFloat logVarianceSlope = logVariance[1];
+
         const ndInt32 halfSize = inputSize / 2;
         const ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
         const ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
@@ -402,27 +407,21 @@ class brainLayerOffPolicyActivation : public ndBrainKernel
         {
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
             {
-                ndBrainFloat blend1 = ((i + itemId) >= halfSize) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
-                ndBrainFloat blend0 = ndBrainFloat(1.0f) - blend1;
-
-                ndBrainFloat inputValue = inputOutputData[inputOffset + i + itemId];
-                ndBrainFloat expenential = ndExp(inputValue);
-
-                ndBrainFloat outputValue = inputValue * blend0 + expenential * blend1;
-                inputOutputData[outputOffset + i + itemId] = outputValue;
+                ndBrainFloat value = ndClamp(inputOutputData[inputOffset + i + itemId], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
+                ndBrainFloat out0 = ndBrainFloat(ndTanh(value));
+                ndBrainFloat out1 = logVarianceBias + out0 * logVarianceSlope;
+                ndBrainFloat out2 = ndExp(out1);
+                inputOutputData[outputOffset + i + itemId] = ((i + itemId) < halfSize) ? out0 : out2;
             }
         }
         
         for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
         {
-            ndBrainFloat blend1 = ((modWorkGroupSize + itemId) >= halfSize) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
-            ndBrainFloat blend0 = ndBrainFloat(1.0f) - blend1;
-
-            ndBrainFloat inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
-            ndBrainFloat expenential = ndExp(inputValue);
-
-            ndBrainFloat outputValue = inputValue * blend0 + expenential * blend1;
-            inputOutputData[outputOffset + modWorkGroupSize + itemId] = outputValue;
+            ndBrainFloat value = ndClamp(inputOutputData[inputOffset + modWorkGroupSize + itemId], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
+            ndBrainFloat out0 = ndBrainFloat(ndTanh(value));
+            ndBrainFloat out1 = logVarianceBias + out0 * logVarianceSlope;
+            ndBrainFloat out2 = ndExp(out1);
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = ((modWorkGroupSize + itemId) < halfSize) ? out0 : out2;
         }
     }
 };
@@ -999,20 +998,22 @@ class brainLayerBrainLinearBackPropagate : public ndBrainKernel
     }
 };
 
-class brainLayerBrainOffPolicyBackPropagate : public ndBrainKernel
+class brainLayerBrainPolicyGradientBackPropagate : public ndBrainKernel
 {
     public:
-    brainLayerBrainOffPolicyBackPropagate(ndBrainContext* const context)
+    brainLayerBrainPolicyGradientBackPropagate(ndBrainContext* const context)
         :ndBrainKernel(context)
     {
     }
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
+        ndBrainFloatBuffer* const buffer5 = (ndBrainFloatBuffer*)m_parameters[5];
         ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
         ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
         ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
-        
+
+        ndBrainFloat* const logVariance = (ndBrainFloat*)buffer5->GetGpuBuffer()->GetPtr();
         ndBrainFloat* const inputOutputData = (ndBrainFloat*)buffer1->GetGpuBuffer()->GetPtr();
         ndBrainFloat* const inputOutputGradients = (ndBrainFloat*)buffer3->GetGpuBuffer()->GetPtr();
         ndCommandSharedInfo* const parameters = (ndCommandSharedInfo*)buffer0->GetGpuBuffer()->GetPtr();
@@ -1026,36 +1027,59 @@ class brainLayerBrainOffPolicyBackPropagate : public ndBrainKernel
         ndAssert(srcBase >= 0);
         ndAssert(dstBase >= 0);
 
-        ndInt32 halfSize = inputSize / 2;
-        ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
-        ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
+        ndBrainFloat logVarianceBias = logVariance[0];
+        ndBrainFloat logVarianceSlope = logVariance[1];
+
+ndBrainMemVector xxxx(&inputOutputGradients[srcBase], inputSize);
+
+        const ndInt32 halfSize = inputSize / 2;
+        const ndInt32 workGroupSizeReminder = inputSize % workGroupSize;
+        const ndInt32 modWorkGroupSize = inputSize - workGroupSizeReminder;
         for (ndInt32 i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
             {
-                ndBrainFloat blend1 = ((i + itemId) >= halfSize) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
-                ndBrainFloat blend0 = ndBrainFloat(1.0f) - blend1;
+                //ndBrainFloat blend1 = ((i + itemId) >= halfSize) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+                //ndBrainFloat blend0 = ndBrainFloat(1.0f) - blend1;
+                //
+                //ndBrainFloat gradient = ndBrainFloat(1.0);
+                //ndBrainFloat outputData = inputOutputData[dstBase + i + itemId];
+                //ndBrainFloat gradSelect = gradient * blend0 + outputData * blend1;
+                //ndBrainFloat inputGradient = inputOutputGradients[dstBase + i + itemId];
+                //inputOutputGradients[srcBase + i + itemId] = gradSelect * inputGradient;
 
-                ndBrainFloat gradient = ndBrainFloat(1.0);
-                ndBrainFloat outputData = inputOutputData[dstBase + i + itemId];
-                ndBrainFloat gradSelect = gradient * blend0 + outputData * blend1;
-                ndBrainFloat inputGradient = inputOutputGradients[dstBase + i + itemId];
-                inputOutputGradients[srcBase + i + itemId] = gradSelect * inputGradient;
+                ndBrainFloat in = inputOutputData[srcBase + i + itemId];
+                ndBrainFloat out = inputOutputData[dstBase + i + itemId];
+                ndBrainFloat x1 = ndBrainFloat(ndTanh(in));
+                ndBrainFloat x2 = logVarianceBias + logVarianceSlope * x1;
+
+                ndBrainFloat meanGrad = ndBrainFloat(1.0f) - out * out;
+                ndBrainFloat sigmaGrad = logVarianceSlope * ndExp(x2) * (ndBrainFloat(1.0f) - x1 * x1);
+
+                ndBrainFloat blend = ((i + itemId) < halfSize) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+                ndBrainFloat gradiend = meanGrad * blend + sigmaGrad * (ndBrainFloat(1.0f) - blend);
+
+                ndBrainFloat inputGradient = inputOutputGradients[dstBase + modWorkGroupSize + itemId];
+                inputOutputGradients[srcBase + i + itemId] = gradiend * inputGradient;
             }
         }
         for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
         {
-            ndBrainFloat blend1 = ((modWorkGroupSize + itemId) >= halfSize) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
-            ndBrainFloat blend0 = ndBrainFloat(1.0f) - blend1;
+            ndBrainFloat in = inputOutputData[srcBase + modWorkGroupSize + itemId];
+            ndBrainFloat out = inputOutputData[dstBase + modWorkGroupSize + itemId];
+            ndBrainFloat x1 = ndBrainFloat(ndTanh(in));
+            ndBrainFloat x2 = logVarianceBias + logVarianceSlope * x1;
 
-            ndBrainFloat gradient = ndBrainFloat(1.0);
-            ndBrainFloat outputData = inputOutputData[dstBase + modWorkGroupSize + itemId];
-            ndBrainFloat gradSelect = gradient * blend0 + outputData * blend1;
+            ndBrainFloat meanGrad = ndBrainFloat(1.0f) - out * out;
+            ndBrainFloat sigmaGrad = logVarianceSlope * ndExp(x2) * (ndBrainFloat(1.0f) - x1 * x1);
+
+            ndBrainFloat blend = ((modWorkGroupSize + itemId) < halfSize) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+            ndBrainFloat gradiend = meanGrad * blend + sigmaGrad * (ndBrainFloat(1.0f) - blend);
+          
             ndBrainFloat inputGradient = inputOutputGradients[dstBase + modWorkGroupSize + itemId];
-
-            inputOutputGradients[srcBase + modWorkGroupSize + itemId] = gradSelect * inputGradient;
+            inputOutputGradients[srcBase + modWorkGroupSize + itemId] = gradiend * inputGradient;
         }
-        
+
         #ifdef _DEBUG
         {
             ndInt32 padded = (inputSize + workGroupSize - 1) & -workGroupSize;
@@ -1766,9 +1790,9 @@ void ndBrainGpuContext::CreateKerners()
     m_brainLayerLinearActivation = ndSharedPtr<ndBrainKernel>(new brainLayerLinearActivation(this));
     m_brainLayerSoftmaxActivation = ndSharedPtr<ndBrainKernel>(new brainLayerSoftmaxActivation(this));
     m_brainLayerLeakyReluActivation = ndSharedPtr<ndBrainKernel>(new brainLayerLeakyReluActivation(this));
-    m_brainLayerOffPolicyActivation = ndSharedPtr<ndBrainKernel>(new brainLayerOffPolicyActivation(this));
     m_brainLayerDropOutActivation = ndSharedPtr<ndBrainKernel>(new brainLayerLinearDropOutActivation(this));
     m_brainLayerMatrixMatrixMultiply = ndSharedPtr<ndBrainKernel>(new brainLayerMatrixMatrixMultiply(this));
+    m_brainLayerPolicyGradientActivation = ndSharedPtr<ndBrainKernel>(new brainLayerPolicyGradientActivation(this));
 
     // create all backpropagate shaders
     m_brainCopyInputGradients = ndSharedPtr<ndBrainKernel>(new brainCopyInputGradients(this));
@@ -1777,8 +1801,8 @@ void ndBrainGpuContext::CreateKerners()
     m_brainLayerReluBackPropagate = ndSharedPtr<ndBrainKernel>(new brainLayerBrainReluBackPropagate(this));
     m_brainLayerTanhBackPropagate = ndSharedPtr<ndBrainKernel>(new brainLayerBrainTanhBackPropagate(this));
     m_brainLayerLeakyReluBackPropagate = ndSharedPtr<ndBrainKernel>(new brainLayerBrainLeakyReluBackPropagate(this));
-    m_brainLayerOffPolicyBackPropagate = ndSharedPtr<ndBrainKernel>(new brainLayerBrainOffPolicyBackPropagate(this));
     m_brainLayerDropOutBackPropagate = ndSharedPtr<ndBrainKernel>(new brainLayerBrainLinearDropOutBackPropagate(this));
+    m_brainLayerPolicyGradientBackPropagate = ndSharedPtr<ndBrainKernel>(new brainLayerBrainPolicyGradientBackPropagate(this));
     m_brainLayerCathegoricalSoftmaxBackPropagate = ndSharedPtr<ndBrainKernel>(new brainLayerBrainCathegoricalSoftmaxBackPropagate(this));
     m_brainLayerMatrixBackPropagateBiasGradients = ndSharedPtr<ndBrainKernel>(new brainLayerBrainBackPropagateMatrixBiasGradients(this));
     m_brainLayerMatrixBackPropagateInputGradients = ndSharedPtr<ndBrainKernel>(new brainLayerBrainBackPropagateMatrixInputGradients(this));

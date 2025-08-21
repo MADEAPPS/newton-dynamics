@@ -34,13 +34,23 @@
 #include "ndBrainUniformBuffer.h"
 #include "ndBrainAgentPolicyGradientActivation.h"
 
-ndBrainAgentPolicyGradientActivation::ndBrainAgentPolicyGradientActivation(ndInt32 neurons)
+ndBrainAgentPolicyGradientActivation::ndBrainAgentPolicyGradientActivation(ndInt32 neurons, ndBrainFloat minLogVariance, ndBrainFloat maxLogVariance)
 	:ndBrainLayerActivation(neurons)
+	,m_logVarianceBuffer(nullptr)
 {
+	//ndBrainFloat minLogSigma = ndLog(minVariance);
+	//ndBrainFloat maxLogSigma = ndLog(maxVariance);
+	//biasVariance.Set((maxLogSigma + minLogSigma) * ndBrainFloat(0.5f));
+	//slopeVariance.Set((maxLogSigma - minLogSigma) * ndBrainFloat(0.5f));
+	m_logVarianceBias = (maxLogVariance + minLogVariance) * ndBrainFloat(0.5f);
+	m_logVarianceSlope = (maxLogVariance - minLogVariance) * ndBrainFloat(0.5f);
 }
 
 ndBrainAgentPolicyGradientActivation::ndBrainAgentPolicyGradientActivation(const ndBrainAgentPolicyGradientActivation& src)
 	:ndBrainLayerActivation(src)
+	,m_logVarianceBias(src.m_logVarianceBias)
+	,m_logVarianceSlope(src.m_logVarianceSlope)
+	,m_logVarianceBuffer(nullptr)
 {
 }
 
@@ -61,9 +71,31 @@ ndBrainLayer* ndBrainAgentPolicyGradientActivation::Load(const ndBrainLoad* cons
 
 	loadSave->ReadString(buffer);
 	ndInt32 inputs = loadSave->ReadInt();
-	ndBrainAgentPolicyGradientActivation* const layer = new ndBrainAgentPolicyGradientActivation(inputs);
+
+	loadSave->ReadString(buffer);
+	ndBrainFloat minLogVariance = loadSave->ReadFloat();
+
+	loadSave->ReadString(buffer);
+	ndBrainFloat maxLogVariance = loadSave->ReadFloat();
+
+	ndBrainAgentPolicyGradientActivation* const layer = new ndBrainAgentPolicyGradientActivation(inputs, minLogVariance, maxLogVariance);
 	loadSave->ReadString(buffer);
 	return layer;
+}
+
+void ndBrainAgentPolicyGradientActivation::Save(const ndBrainSave* const loadSave) const
+{
+	ndBrainLayerActivation::Save(loadSave);
+
+	ndBrainFloat maxLogVariance = m_logVarianceSlope + m_logVarianceBias;
+	ndBrainFloat minLogVariance = m_logVarianceBias - m_logVarianceSlope;
+
+	char buffer[1024];
+	snprintf(buffer, sizeof(buffer), "\tminVariance %f\n", minLogVariance);
+	loadSave->WriteData(buffer);
+
+	snprintf(buffer, sizeof(buffer), "\tmaxVariance %f\n", maxLogVariance);
+	loadSave->WriteData(buffer);
 }
 
 const char* ndBrainAgentPolicyGradientActivation::GetLabelId() const
@@ -73,23 +105,20 @@ const char* ndBrainAgentPolicyGradientActivation::GetLabelId() const
 
 void ndBrainAgentPolicyGradientActivation::MakePrediction(const ndBrainVector& input, ndBrainVector& output) const
 {
-	ndAssert(input.GetCount() == output.GetCount());
-	const ndInt32 size = ndInt32 (input.GetCount() / 2);
-	for (ndInt32 i = size - 1; i >= 0; --i)
+	const ndInt32 size = ndInt32(input.GetCount());
+	for (ndInt32 i = 0; i < size; ++i)
 	{
-		output[i] = input[i];
-		output[size + i] = ndExp(input[size + i]);
-
-		ndAssert(output[i] <= ndFloat32(1000.0f));
-		ndAssert(output[i] >= ndFloat32(-1000.0f));
-		ndAssert(output[size + i] <= ndFloat32(1000.0f));
-		ndAssert(output[size + i] >= ndFloat32(-1000.0f));
+		ndBrainFloat value = ndClamp(input[i], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
+		ndBrainFloat out0 = ndBrainFloat(ndTanh(value));
+		ndBrainFloat out1 = m_logVarianceBias + out0 * m_logVarianceSlope;
+		ndBrainFloat out2 = ndExp(out1);
+		output[i] = (i < size / 2) ? out0 : out2;
 	}
 }
 
 void ndBrainAgentPolicyGradientActivation::InputDerivative(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const
 {
-	//ndAssert(input.GetCount() == output.GetCount());
+	ndAssert(0);
 	ndAssert(output.GetCount() == outputDerivative.GetCount());
 	const ndInt32 actionSize = ndInt32(inputDerivative.GetCount() / 2);
 	for (ndInt32 i = 0; i < actionSize; ++i)
@@ -117,12 +146,14 @@ void ndBrainAgentPolicyGradientActivation::FeedForward(const ndBrainLayerFeedFor
 	const ndBrainMemVector input(&inputOutputBuffer[inputOffset], inputSize);
 	ndBrainMemVector output(&inputOutputBuffer[outputOffset], outputSize);
 
-	ndAssert(input.GetCount() == output.GetCount());
-	const ndInt32 size = ndInt32(input.GetCount() / 2);
-	for (ndInt32 i = size - 1; i >= 0; --i)
+	const ndInt32 size = ndInt32(input.GetCount());
+	for (ndInt32 i = 0; i < size; ++i)
 	{
-		output[i] = input[i];
-		output[size + i] = ndExp(input[size + i]);
+		ndBrainFloat value = ndClamp(input[i], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
+		ndBrainFloat out0 = ndBrainFloat(ndTanh(value));
+		ndBrainFloat out1 = m_logVarianceBias + out0 * m_logVarianceSlope;
+		ndBrainFloat out2 = ndExp(out1);
+		output[i] = (i < size / 2) ? out0 : out2;
 	}
 }
 
@@ -145,17 +176,29 @@ void ndBrainAgentPolicyGradientActivation::BackPropagate(const ndBrainLayerBackP
 	ndAssert(dstBase >= 0);
 	ndAssert(inputSize == info.m_outputSize);
 
+	const ndBrainMemVector input(&inputOutputBuffer[srcBase], inputSize);
 	const ndBrainMemVector output(&inputOutputBuffer[dstBase], inputSize);
 	const ndBrainMemVector outputDerivative(&inputOutputGradientsBuffer[dstBase], inputSize);
 	ndBrainMemVector inputDerivative(&inputOutputGradientsBuffer[srcBase], inputSize);
 
 	ndAssert(inputDerivative.GetCount() == output.GetCount());
 	ndAssert(inputDerivative.GetCount() == outputDerivative.GetCount());
-	const ndInt32 size = ndInt32(output.GetCount() / 2);
-	for (ndInt32 i = size - 1; i >= 0; --i)
+
+	const ndInt32 size = ndInt32(output.GetCount());
+	for (ndInt32 i = 0; i < size; ++i)
 	{
-		inputDerivative[i] = outputDerivative[i];
-		inputDerivative[size + i] = output[size + i] * outputDerivative[size + i];
+		ndBrainFloat in = input[i];
+		ndBrainFloat out = output[i];
+		ndBrainFloat x1 = ndBrainFloat(ndTanh(in));
+		ndBrainFloat x2 = m_logVarianceBias + m_logVarianceSlope * x1;
+
+		ndBrainFloat meanGrad = ndBrainFloat(1.0f) - out * out;
+		ndBrainFloat sigmaGrad = m_logVarianceSlope * ndExp(x2) * (ndBrainFloat(1.0f) - x1 * x1);
+
+		ndBrainFloat blend = (i < size / 2) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
+		ndBrainFloat gradiend = meanGrad * blend + sigmaGrad * (ndBrainFloat(1.0f) - blend);
+
+		inputDerivative[i] = gradiend * outputDerivative[i];
 	}
 }
 
@@ -178,7 +221,18 @@ ndCommandArray ndBrainAgentPolicyGradientActivation::CreateGpuFeedForwardCommand
 	}
 	else
 	{
-		descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerOffPolicyActivation;
+		struct LogVarianceParams
+		{
+			ndReal m_bias;
+			ndReal m_slope;
+		};
+		LogVarianceParams variance;
+		variance.m_bias = m_logVarianceBias;
+		variance.m_slope = m_logVarianceSlope;
+		m_logVarianceBuffer = ndSharedPtr<ndBrainUniformBuffer> (new ndBrainUniformBuffer(context, sizeof (LogVarianceParams), &variance));
+		descriptor.PushBack(*m_logVarianceBuffer);
+
+		descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerPolicyGradientActivation;
 		command = new ndBrainGpuCommand(descriptor);
 	}
 	ndCommandArray commandArray(0);
@@ -210,7 +264,8 @@ ndCommandArray ndBrainAgentPolicyGradientActivation::CreateGpuBackPropagateComma
 	}
 	else
 	{
-		descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerOffPolicyBackPropagate;
+		descriptor.PushBack(*m_logVarianceBuffer);
+		descriptor.m_kernel = context->GetAsGpuContext()->m_brainLayerPolicyGradientBackPropagate;
 		ndBrainBufferCommand* const command = new ndBrainGpuCommand(descriptor);
 		commands.PushBack(command);
 	}
