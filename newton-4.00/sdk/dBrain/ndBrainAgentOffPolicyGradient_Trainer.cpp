@@ -410,7 +410,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::SaveState(const char* const baseName
 	m_context->SyncBufferCommandQueue();
 
 	char fileName[256];
-	sprintf(fileName, "%s_policy.dnn", baseName);
+	snprintf(fileName, sizeof (fileName), "%s_policy.dnn", baseName);
 	m_policyTrainer->GetWeightAndBiasBuffer()->VectorFromDevice(m_scratchBuffer);
 	m_policyTrainer->UpdateParameters(m_scratchBuffer);
 	m_policyTrainer->GetBrain()->SaveToFile(fileName);

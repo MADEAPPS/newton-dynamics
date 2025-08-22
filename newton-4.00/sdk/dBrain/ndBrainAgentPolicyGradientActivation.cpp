@@ -87,10 +87,10 @@ void ndBrainAgentPolicyGradientActivation::Save(const ndBrainSave* const loadSav
 	ndBrainFloat minLogVariance = m_logVarianceBias - m_logVarianceSlope;
 
 	char buffer[1024];
-	snprintf(buffer, sizeof(buffer), "\tminVariance %f\n", minLogVariance);
+	snprintf(buffer, sizeof(buffer), "\tminLogVariance %f\n", minLogVariance);
 	loadSave->WriteData(buffer);
 
-	snprintf(buffer, sizeof(buffer), "\tmaxVariance %f\n", maxLogVariance);
+	snprintf(buffer, sizeof(buffer), "\tmaxLogVariance %f\n", maxLogVariance);
 	loadSave->WriteData(buffer);
 }
 
