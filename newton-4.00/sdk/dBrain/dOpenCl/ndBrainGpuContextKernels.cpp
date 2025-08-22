@@ -45,7 +45,6 @@ R""""(
 		float m_epsilon;
 		float m_betaAcc;
 		float m_alphaAcc;
-		float m_learnRate;
 		float m_invBeta;
 		float m_invAlpha;
 		float m_minibathScale;
@@ -834,7 +833,7 @@ R""""(
         float a = vdw[start + itemId] * parameters->m_alpha + temp * (1.0 - parameters->m_alpha);
         vdw[start + itemId] = a;
             
-        // calcuate RMS
+        // calculate RMS
         float b = vdw2[start + itemId] * parameters->m_beta + temp * temp * (1.0 - parameters->m_beta);
         vdw2[start + itemId] = b;
         
@@ -871,7 +870,7 @@ R""""(
         float a = vdw[start + itemId] * parameters->m_alpha + temp * (1.0 - parameters->m_alpha);
         vdw[start + itemId] = a;
             
-        // calcuate RMS
+        // calculate RMS
         float b = vdw2[start + itemId] * parameters->m_beta + temp * temp * (1.0 - parameters->m_beta);
         vdw2[start + itemId] = b;
         
