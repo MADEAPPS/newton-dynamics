@@ -17,9 +17,11 @@
 #include "ndBrainGpuCommand.h"
 #include "ndBrainGpuContext.h"
 #include "ndBrainFloatBuffer.h"
+#include "ndBrainOptimizerAdam.h"
 #include "ndBrainUniformBuffer.h"
 #include "ndBrainIntegerBuffer.h"
 #include "ndBrainBufferCommand.h"
+#include "ndBrainTrainerInference.h"
 
 #define ND_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_ALL
 //#define ND_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_CPU
@@ -577,27 +579,6 @@ void ndBrainGpuContext::CalculateEntropyRegularization(ndBrainFloatBuffer& buffe
 	cl::NDRange global(numberOfGroups * numberOfElements);
 	error = m_queue->enqueueNDRangeKernel(*shader, offset, global, local);
 	ndAssert(error == CL_SUCCESS);
-
-//ndBrainVector xxxxx0;
-//ndBrainVector xxxxx1;
-//ndBrainVector xxxxx2;
-////ndBrainVector xxxxx3;
-////buffer.VectorFromDevice(xxxxx3);
-//buffer.VectorFromDevice(xxxxx0);
-//sampleBuffer.VectorFromDevice(xxxxx1);
-//varianceBuffer.VectorFromDevice(xxxxx2);
-////for (ndInt32 i = 0; i < numberOfGroups; ++i)
-////{
-////	const ndBrainMemVector sampleMean(&xxxxx1[i * numberOfElements], numberOfElements);
-////	const ndBrainMemVector varianceMean(&xxxxx2[i * numberOfElements], numberOfElements);
-////	xxxxx1[i] = sampleMean.CalculateEntropyRegularization(varianceMean, regularization);
-////}
-//for (ndInt32 i = 0; i < xxxxx0.GetCount(); ++i)
-//{
-//	ndBrainFloat x = xxxxx0[i];
-//	ndCheckFloat(x);
-//}
-
 }
 
 void ndBrainGpuContext::CalculateEntropyRegularizationGradient(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& sampleBuffer, const ndBrainFloatBuffer& varianceBuffer, ndBrainFloat regularization, ndInt32 inputSize)
@@ -640,31 +621,87 @@ void ndBrainGpuContext::CalculateEntropyRegularizationGradient(ndBrainFloatBuffe
 	cl::NDRange global(globalSize);
 	error = m_queue->enqueueNDRangeKernel(*shader, offset, global, local);
 	ndAssert(error == CL_SUCCESS);
+}
 
-//ndBrainVector xxxxx0;
-//ndBrainVector xxxxx1;
-//ndBrainVector xxxxx2;
-//ndBrainVector xxxxx3;
-//SyncBufferCommandQueue();
-//buffer.VectorFromDevice(xxxxx0);
-//buffer.VectorFromDevice(xxxxx1);
-//xxxxx1.Set(0.0f);
-//sampleBuffer.VectorFromDevice(xxxxx2);
-//varianceBuffer.VectorFromDevice(xxxxx3);
-//for (ndInt32 i = 0; i < numberOfGroups; ++i)
-//{
-//	ndBrainMemVector gradient(&xxxxx1[2 * i * inputSize], 2 * inputSize);
-//	const ndBrainMemVector meanSample(&xxxxx2[i * inputSize], inputSize);
-//	const ndBrainMemVector variance1(&xxxxx3[i * inputSize], inputSize);
-//	gradient.CalculateEntropyRegularizationGradient(meanSample, variance1, regularization);
-//}
-//for (ndInt32 i = 0; i < xxxxx0.GetCount(); ++i)
-//{
-//	ndBrainFloat a = xxxxx0[i];
-//	ndBrainFloat b = xxxxx0[i];
-//	ndAssert(ndAreEqual(a, b, 1.0e-4f));
-//}
+void ndBrainGpuContext::ApplyLeanRateCommands(ndBrainBufferCommand* const command, ndBrainFloat learnRate)
+{
+	cl_int error = 0;
+	cl_int numberOfParameters = 0;
+	ndBrainBufferCommandDesc& desc = command->GetDescriptor();
+	OpenclKernel* const kernel = (OpenclKernel*)*desc.m_kernel;
+	ndAssert(kernel);
+	cl::Kernel* const shader = *kernel->m_shader;
 
+	error = shader->getInfo(CL_KERNEL_NUM_ARGS, &numberOfParameters);
+	ndAssert(error == CL_SUCCESS);
+	for (ndInt32 i = 0; i < numberOfParameters - 1; ++i)
+	{
+		ndBrainGpuBuffer* const arg = *desc[i]->m_gpuBuffer;
+		error = shader->setArg(cl_uint(i), arg ? **arg->m_buffer : m_emptyBuffer);
+		ndAssert(error == CL_SUCCESS);
+	}
+	error = shader->setArg(5, learnRate);
+	ndAssert(error == CL_SUCCESS);
+
+	cl::NDRange offset(0);
+	cl::NDRange local(size_t(desc.m_workGroupSize));
+	cl::NDRange global(size_t(desc.m_workGroupSize * desc.m_miniBatchSize));
+	error = m_queue->enqueueNDRangeKernel(*shader, offset, global, local);
+	ndAssert(error == CL_SUCCESS);
+}
+
+void ndBrainGpuContext::SetLeanRateCommandBuffers(ndBrainOptimizerAdam& optimizer, ndInt32 minibatchSize, ndBrainFloatBuffer& weightsAndBiasBuffer, ndBrainFloatBuffer& weightsAndBiasGradientBuffer)
+{
+	ndInt32 sizeInFloats = ndInt32(weightsAndBiasBuffer.SizeInBytes() / sizeof(ndReal));
+	optimizer.Init(sizeInFloats);
+
+	ndBrainOptimizerAdam::ndCommandSharedInfo optimizerData(optimizer.m_parameters);
+	// add the adam optimizer kernel here
+	{
+		optimizerData.m_minibathScale = ndBrainFloat(1.0f) / ndBrainFloat(minibatchSize);
+		ndSharedPtr<ndBrainUniformBuffer> adamUniformbuffer(new ndBrainUniformBuffer(this, sizeof(ndBrainOptimizerAdam::ndCommandSharedInfo), &optimizerData));
+
+		ndBrainBufferCommandDesc descriptor(ndInt32(sizeInFloats) / ND_DEFAULT_WORKGROUP_SIZE);
+		descriptor.m_context = this;
+		descriptor.m_owner = nullptr;
+		descriptor.m_id = ndBrainTrainerInference::m_adamOptimizerUpdate;
+		descriptor.m_uniformBuffer = adamUniformbuffer;
+		descriptor.m_workGroupSize = ND_DEFAULT_WORKGROUP_SIZE;
+
+		descriptor.PushBack(*adamUniformbuffer);
+		descriptor.PushBack(&weightsAndBiasBuffer);
+		descriptor.PushBack(&weightsAndBiasGradientBuffer);
+		descriptor.PushBack(*optimizer.m_vdw);
+		descriptor.PushBack(*optimizer.m_vdw2);
+
+		if (optimizer.GetRegularizerType() != m_lasso)
+		{
+			descriptor.m_kernel = descriptor.m_context->GetAsGpuContext()->m_brainAdamRidgeOptimizerUpdate;
+		}
+		else
+		{
+			descriptor.m_kernel = descriptor.m_context->GetAsGpuContext()->m_brainAdamLassoOptimizerUpdate;
+		}
+		//m_adamOptimizerCommand = ndSharedPtr<ndBrainBufferCommand>(new ndBrainGpuCommand(descriptor));
+		optimizer.m_commands.Append(ndSharedPtr<ndBrainBufferCommand>(new ndBrainGpuCommand(descriptor)));
+	}
+
+	// add adam momentum update
+	{
+		ndSharedPtr<ndBrainUniformBuffer> adamUniformbuffer(new ndBrainUniformBuffer(this, sizeof(ndBrainOptimizerAdam::ndCommandSharedInfo), &optimizerData));
+
+		ndBrainBufferCommandDesc descriptor(0);
+		descriptor.m_context = this;
+		descriptor.m_owner = nullptr;
+		descriptor.m_id = ndBrainTrainerInference::m_adamOptimizerMomentum;
+		descriptor.m_uniformBuffer = adamUniformbuffer;
+		descriptor.m_miniBatchSize = 1;
+		descriptor.PushBack(*adamUniformbuffer);
+
+		descriptor.m_kernel = descriptor.m_context->GetAsGpuContext()->m_brainAdamMomentumUpdate;
+		//m_adamMomentumUpdateCommand = ndSharedPtr<ndBrainBufferCommand>(new ndBrainGpuCommand(descriptor));
+		optimizer.m_commands.Append(ndSharedPtr<ndBrainBufferCommand>(new ndBrainGpuCommand(descriptor)));
+	}
 }
 
 void ndBrainGpuContext::Set(ndBrainFloatBuffer& dstData, ndBrainFloat value)

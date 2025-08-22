@@ -88,7 +88,7 @@ ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 	
 //m_useGpuBackend = false;
 //m_numberOfUpdates = 1;
-m_replayBufferStartOptimizeSize = 1024 * 2;
+//m_replayBufferStartOptimizeSize = 1024 * 2;
 }
 
 ndBrainAgentOffPolicyGradient_Agent::ndTrajectory::ndTrajectory()

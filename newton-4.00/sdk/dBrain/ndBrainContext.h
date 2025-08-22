@@ -84,8 +84,8 @@ class ndBrainContext : public ndClassAlloc
 	virtual void CalculateEntropyRegularizationGradient(ndBrainFloatBuffer&, const ndBrainFloatBuffer&, const ndBrainFloatBuffer&, ndBrainFloat, ndInt32) = 0;
 
 	// learnRate commands
-	virtual void SetLeanRateCommandBuffers(ndBrainOptimizerAdam&, ndInt32, ndBrainFloatBuffer&, ndBrainFloatBuffer&) { ndAssert(0);}
-	virtual void ApplyLeanRateCommands(ndBrainBufferCommand*, ndBrainFloat ) { ndAssert(0); }
+	virtual void ApplyLeanRateCommands(ndBrainBufferCommand*, ndBrainFloat) = 0;
+	virtual void SetLeanRateCommandBuffers(ndBrainOptimizerAdam&, ndInt32, ndBrainFloatBuffer&, ndBrainFloatBuffer&) = 0;
 };
 
 #endif

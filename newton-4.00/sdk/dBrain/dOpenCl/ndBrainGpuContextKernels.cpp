@@ -816,13 +816,15 @@ R""""(
     __kernel void brainAdamUpdateLassoRegularizer(
         __global const UniformBufferOptimizerArguments* parameters,
         __global float* weightAndBiasBuffer, __global float* weightAndBiasGradientBuffer,
-        __global float* vdw, __global float* vdw2)
+        __global float* vdw, __global float* vdw2,
+        float learnRate)
     {
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
         uint workGroupSize = get_local_size(0);
 
-        float descendRate = -parameters->m_learnRate;
+        //float descendRate = -parameters->m_learnRate;
+        float descendRate = -learnRate;
         float regularizer = -parameters->m_decayRegularizer;
 
         uint start = groupId * workGroupSize;
@@ -851,13 +853,15 @@ R""""(
     __kernel void brainAdamUpdateRidgeRegularizer(
         __global const UniformBufferOptimizerArguments* parameters,
         __global float* weightAndBiasBuffer, __global float* weightAndBiasGradientBuffer,
-        __global float* vdw, __global float* vdw2)
+        __global float* vdw, __global float* vdw2,
+        float learnRate)
     {
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
         uint workGroupSize = get_local_size(0);
 
-        float descendRate = -parameters->m_learnRate;
+        //float descendRate = -parameters->m_learnRate;
+        float descendRate = -learnRate;
         float regularizer = -parameters->m_decayRegularizer;
 
         long start = groupId * (long)workGroupSize;
