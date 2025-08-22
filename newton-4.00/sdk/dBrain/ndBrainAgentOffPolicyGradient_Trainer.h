@@ -142,8 +142,6 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 		ndBrainFloat m_entropyTemperature;
 		ndBrainFloat m_entropyMaxTemperature;
 		ndBrainFloat m_entropyMinTemperature;
-		ndInt32	m_entropyFrameStar;
-		ndInt32	m_entropyFrameEnd;
 
 		ndUnsigned32 m_randomSeed;
 		ndInt32 m_miniBatchSize;
@@ -156,6 +154,7 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 		ndInt32 m_numberOfUpdates;
 		ndInt32 m_replayBufferSize;
 		ndInt32 m_maxTrajectorySteps;
+		ndInt32 m_maxNumberOfTrainingSteps;
 		ndInt32 m_replayBufferStartOptimizeSize;
 		bool m_useGpuBackend;
 		
@@ -232,6 +231,7 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 	ndMovingAverage<ND_OFF_POLICY_MOVING_AVERAGE_SCORE> m_averageExpectedRewards;
 	ndMovingAverage<ND_OFF_POLICY_MOVING_AVERAGE_SCORE> m_averageFramesPerEpisodes;
 
+	ndBrainFloat m_learnRate;
 	ndUnsigned32 m_frameCount;
 	ndUnsigned32 m_horizonSteps;
 	ndUnsigned32 m_eposideCount;

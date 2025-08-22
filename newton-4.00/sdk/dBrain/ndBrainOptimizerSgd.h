@@ -30,8 +30,7 @@ class ndBrainOptimizerSgd : public ndBrainOptimizer
 	public: 
 	ndBrainOptimizerSgd();
 	virtual ~ndBrainOptimizerSgd();
-
-	virtual void Update(ndBrainVector& parameters, const ndBrainVector& gradients) override;
+//	virtual void Update(ndBrainVector& parameters, const ndBrainVector& gradients) override;
 };
 
 

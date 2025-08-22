@@ -336,11 +336,9 @@ static void SimpleRegressionBrainStressTest()
 #endif
 
 	ndSharedPtr<ndBrainContext> context(new ndBrainGpuContext);
-	//ndSharedPtr<ndBrainContext> context(new ndBrainCpuContext);
 	ndTrainerDescriptor descriptor;
 	descriptor.m_brain = brain;
 	descriptor.m_context = context;
-	descriptor.m_learnRate = 1.0e-4f;
 	descriptor.m_minibatchSize = minibatchSize;
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
 	{
@@ -399,7 +397,7 @@ static void SimpleRegressionBrainStressTest()
 			}
 			minibatchOutpuGradientBuffer->VectorToDevice(miniBatchOutputGradients);
 			trainer->BackPropagate();
-			trainer->ApplyLearnRate();
+			trainer->ApplyLearnRate(ndBrainFloat(1.0e-4f));
 			context->SyncBufferCommandQueue();
 
 			minibatchInputGradientBuffer->VectorFromDevice(miniBatchInputGradients);

@@ -16,9 +16,11 @@
 class ndBrainBuffer;
 class ndBrainVector;
 class ndBrainContext;
+class ndBrainOptimizer;
 class ndBrainCpuContext;
 class ndBrainGpuContext;
 class ndBrainFloatBuffer;
+class ndBrainOptimizerAdam;
 class ndBrainUniformBuffer;
 class ndBrainIntegerBuffer;
 class ndBrainBufferCommand;
@@ -80,6 +82,10 @@ class ndBrainContext : public ndClassAlloc
 	virtual void StandardNormalDistribution(ndBrainFloatBuffer& uniformRandomVariable) = 0;
 	virtual void CalculateEntropyRegularization(ndBrainFloatBuffer&, const ndBrainFloatBuffer&, const ndBrainFloatBuffer&, ndBrainFloat) = 0;
 	virtual void CalculateEntropyRegularizationGradient(ndBrainFloatBuffer&, const ndBrainFloatBuffer&, const ndBrainFloatBuffer&, ndBrainFloat, ndInt32) = 0;
+
+	// learnRate commands
+	virtual void SetLeanRateCommandBuffers(ndBrainOptimizerAdam&, ndInt32, ndBrainFloatBuffer&, ndBrainFloatBuffer&) { ndAssert(0);}
+	virtual void ApplyLeanRateCommands(ndBrainBufferCommand*, ndBrainFloat ) { ndAssert(0); }
 };
 
 #endif

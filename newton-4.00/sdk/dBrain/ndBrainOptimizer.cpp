@@ -31,6 +31,7 @@ ndBrainOptimizer::ndBrainOptimizer(const ndSharedPtr<ndBrainContext>& context)
 	,m_learnRate(ndBrainFloat(1.0e-4f))
 	,m_weighDecayRegularizer(ndBrainFloat(0.0f))
 	,m_regularizerType(m_ridge)
+	,m_commands()
 {
 }
 

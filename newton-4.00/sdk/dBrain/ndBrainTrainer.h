@@ -43,7 +43,7 @@ class ndBrainTrainer: public ndBrainTrainerInference
 	ndBrainFloatBuffer* GetPartialSumBiasGradientBuffer();
 
 	void BackPropagate();
-	void ApplyLearnRate();
+	void ApplyLearnRate(ndBrainFloat learnRate);
 	
 	protected:
 	void Initialize();
@@ -63,8 +63,8 @@ class ndBrainTrainer: public ndBrainTrainerInference
 	ndSharedPtr<ndBrainFloatBuffer> m_biasPartialSumGradientsCacheBuffer;
 
 	ndList<ndSharedPtr<ndBrainBufferCommand>> m_backPropagateCommands;
-	ndSharedPtr<ndBrainBufferCommand> m_adamOptimizerCommand;
-	ndSharedPtr<ndBrainBufferCommand> m_adamMomentumUpdateCommand;
+	//ndSharedPtr<ndBrainBufferCommand> m_adamOptimizerCommand;
+	//ndSharedPtr<ndBrainBufferCommand> m_adamMomentumUpdateCommand;
 };
 
 #endif 

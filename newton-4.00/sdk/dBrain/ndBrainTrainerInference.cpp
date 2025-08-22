@@ -37,17 +37,15 @@
 ndTrainerDescriptor::ndTrainerDescriptor()
 	:m_brain()
 	,m_context()
-	,m_learnRate(ndBrainFloat(1.0e-4f))
 	,m_regularizer(ndBrainFloat(1.0e-4f))
 	,m_minibatchSize(256)
 	,m_regularizerType(m_ridge)
 {
 }
 
-ndTrainerDescriptor::ndTrainerDescriptor(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndInt32 minibatchSize, ndBrainFloat learnRate)
+ndTrainerDescriptor::ndTrainerDescriptor(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndInt32 minibatchSize)
 	:m_brain(brain)
 	,m_context(context)
-	,m_learnRate(learnRate)
 	,m_regularizer(ndBrainFloat(1.0e-4f))
 	,m_minibatchSize(minibatchSize)
 	,m_regularizerType(m_ridge)

@@ -59,8 +59,6 @@
 ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 {
 	m_learnRate = ndBrainFloat(1.0e-4f);
-	//m_policyRegularizer = ndBrainFloat(0.0f);
-	//m_criticRegularizer = ndBrainFloat(0.0f);
 	m_policyRegularizer = ndBrainFloat(1.0e-4f);
 	m_criticRegularizer = ndBrainFloat(1.0e-4f);
 	m_discountRewardFactor = ndBrainFloat(0.995f);
@@ -83,15 +81,14 @@ ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 	m_hiddenLayersNumberOfNeurons = 256;
 	m_replayBufferStartOptimizeSize = 1024 * 64;
 
+	m_maxNumberOfTrainingSteps = 1024 * 256;
 	m_entropyTemperature = ND_POLICY_MAX_ENTROPY_TEMPERATURE;
 	m_entropyMinTemperature = ND_POLICY_MIN_ENTROPY_TEMPERATURE;
 	m_entropyMaxTemperature = ND_POLICY_MAX_ENTROPY_TEMPERATURE;
-	m_entropyFrameStar = 0;
-	m_entropyFrameEnd = m_replayBufferStartOptimizeSize * 2;
-
-//m_useGpuBackend = false;
+	
+m_useGpuBackend = false;
 //m_numberOfUpdates = 1;
-//m_replayBufferStartOptimizeSize = 1024 * 2;
+m_replayBufferStartOptimizeSize = 1024 * 2;
 }
 
 ndBrainAgentOffPolicyGradient_Agent::ndTrajectory::ndTrajectory()
@@ -335,6 +332,7 @@ ndBrainAgentOffPolicyGradient_Trainer::ndBrainAgentOffPolicyGradient_Trainer(con
 	,m_miniBatchIndices()
 	,m_averageExpectedRewards()
 	,m_averageFramesPerEpisodes()
+	,m_learnRate(m_parameters.m_learnRate)
 	,m_frameCount(0)
 	,m_horizonSteps(0)
 	,m_eposideCount(0)
@@ -436,7 +434,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::RecoverState(const char* baseName)
 	char fileName[256];
 	snprintf(fileName, sizeof (fileName), "%s_policy.dnn", baseName);
 	ndSharedPtr<ndBrain> policy(ndBrainLoad::Load(fileName));
-	ndTrainerDescriptor descriptor(policy, m_context, m_parameters.m_miniBatchSize, m_parameters.m_learnRate);
+	ndTrainerDescriptor descriptor(policy, m_context, m_parameters.m_miniBatchSize);
 	descriptor.m_regularizer = m_parameters.m_policyRegularizer;
 	descriptor.m_regularizerType = m_parameters.m_policyRegularizerType;
 	m_policyTrainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor));
@@ -445,14 +443,14 @@ void ndBrainAgentOffPolicyGradient_Trainer::RecoverState(const char* baseName)
 	{
 		snprintf(fileName, sizeof (fileName), "%s_critic_%d.dnn", baseName, j);
 		ndSharedPtr<ndBrain> critic(ndBrainLoad::Load(fileName));
-		ndTrainerDescriptor descriptorDescriptor(critic, m_context, m_parameters.m_miniBatchSize, m_parameters.m_learnRate);
+		ndTrainerDescriptor descriptorDescriptor(critic, m_context, m_parameters.m_miniBatchSize);
 		descriptorDescriptor.m_regularizer = m_parameters.m_criticRegularizer;
 		descriptorDescriptor.m_regularizerType = m_parameters.m_criticRegularizerType;
 		m_criticTrainer[j] = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptorDescriptor));
 
 		snprintf(fileName, sizeof (fileName), "%s_referenceCritic_%d.dnn", baseName, j);
 		ndSharedPtr<ndBrain> referenceCritic(ndBrainLoad::Load(fileName));
-		ndTrainerDescriptor referenceCriticDescriptor(referenceCritic, m_context, m_parameters.m_miniBatchSize, m_parameters.m_learnRate);
+		ndTrainerDescriptor referenceCriticDescriptor(referenceCritic, m_context, m_parameters.m_miniBatchSize);
 		referenceCriticDescriptor.m_regularizer = m_parameters.m_criticRegularizer;
 		referenceCriticDescriptor.m_regularizerType = m_parameters.m_criticRegularizerType;
 		m_referenceCriticTrainer[j] = ndSharedPtr<ndBrainTrainerInference>(new ndBrainTrainerInference(referenceCriticDescriptor));
@@ -492,7 +490,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::BuildPolicyClass()
 	}
 	policy->InitWeights();
 
-	ndTrainerDescriptor descriptor(policy, m_context, m_parameters.m_miniBatchSize, m_parameters.m_learnRate);
+	ndTrainerDescriptor descriptor(policy, m_context, m_parameters.m_miniBatchSize);
 	descriptor.m_regularizer = m_parameters.m_policyRegularizer;
 	descriptor.m_regularizerType = m_parameters.m_policyRegularizerType;
 	m_policyTrainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor));
@@ -539,12 +537,12 @@ void ndBrainAgentOffPolicyGradient_Trainer::BuildCriticClass()
 		ndSharedPtr<ndBrain> critic(BuildNeuralNetwork());
 
 		ndSharedPtr<ndBrain> referenceCritic(new ndBrain(**critic));
-		ndTrainerDescriptor referenceDescriptor(referenceCritic, m_context, m_parameters.m_miniBatchSize, m_parameters.m_learnRate);
+		ndTrainerDescriptor referenceDescriptor(referenceCritic, m_context, m_parameters.m_miniBatchSize);
 		referenceDescriptor.m_regularizer = m_parameters.m_criticRegularizer;
 		referenceDescriptor.m_regularizerType = m_parameters.m_criticRegularizerType;
 		m_referenceCriticTrainer[j] = ndSharedPtr<ndBrainTrainerInference>(new ndBrainTrainerInference(referenceDescriptor));
 		
-		ndTrainerDescriptor descriptor(critic, m_context, m_parameters.m_miniBatchSize, m_parameters.m_learnRate);
+		ndTrainerDescriptor descriptor(critic, m_context, m_parameters.m_miniBatchSize);
 		descriptor.m_regularizer = m_parameters.m_criticRegularizer;
 		descriptor.m_regularizerType = m_parameters.m_criticRegularizerType;
 		m_criticTrainer[j] = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor));
@@ -909,7 +907,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainCritics(ndInt32 criticIndex)
 	critic.BackPropagate();
 
 	// update parameters
-	critic.ApplyLearnRate();
+	critic.ApplyLearnRate(m_learnRate);
 }
 
 void ndBrainAgentOffPolicyGradient_Trainer::TrainPolicy()
@@ -1031,7 +1029,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainPolicy()
 	policyMinibatchOutputGradientBuffer->Sub(*policyMinibatchOutputBuffer);
 	m_policyTrainer->BackPropagate();
 
-	m_policyTrainer->ApplyLearnRate();
+	m_policyTrainer->ApplyLearnRate(m_learnRate);
 }
 
 //#pragma optimize( "", off )
@@ -1139,8 +1137,16 @@ void ndBrainAgentOffPolicyGradient_Trainer::OptimizeStep()
 	SaveTrajectory();
 	if (m_startOptimization)
 	{
-		ndFloat64 t = ndClamp(ndFloat64(m_frameCount - m_parameters.m_entropyFrameStar) / ndFloat64(m_parameters.m_entropyFrameEnd - m_parameters.m_entropyFrameStar), ndFloat64(0.0f), ndFloat64(1.0f));
-		m_parameters.m_entropyTemperature = ndBrainFloat(m_parameters.m_entropyMaxTemperature + t * (m_parameters.m_entropyMinTemperature - m_parameters.m_entropyMaxTemperature));
+		// calculate aneling paremater
+		ndFloat64 num = ndFloat64(m_frameCount - m_parameters.m_replayBufferStartOptimizeSize);
+		ndFloat64 den = ndFloat64(m_parameters.m_maxNumberOfTrainingSteps - m_parameters.m_replayBufferStartOptimizeSize);
+		ndFloat32 param = ndFloat32(ndClamp(num / den, ndFloat64(0.0f), ndFloat64(1.0f)));
+
+		// linearly aneal entropy
+		m_parameters.m_entropyTemperature = m_parameters.m_entropyMaxTemperature + param * (m_parameters.m_entropyMinTemperature - m_parameters.m_entropyMaxTemperature);
+
+		// linearly aneal lear rate;
+		m_learnRate = m_parameters.m_learnRate * param;
 
 		Optimize();
 		m_frameCount++;

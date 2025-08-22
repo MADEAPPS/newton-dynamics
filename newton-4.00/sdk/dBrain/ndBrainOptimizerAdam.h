@@ -40,7 +40,6 @@ class ndBrainOptimizerAdam : public ndBrainOptimizer
 			,m_epsilon(ndBrainFloat(1.0e-6f))
 			,m_betaAcc(m_beta)
 			,m_alphaAcc(m_alpha)
-			,m_learnRate(ndBrainFloat(1.0e-4f))
 			,m_invBeta(ndBrainFloat(1.0f)/ (ndBrainFloat(1.0f) - m_beta))
 			,m_invAlpha(ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) - m_alpha))
 			,m_minibathScale(ndBrainFloat(1.0f) / ndBrainFloat(ND_DEFAULT_WORKGROUP_SIZE))
@@ -53,7 +52,6 @@ class ndBrainOptimizerAdam : public ndBrainOptimizer
 		ndBrainFloat m_epsilon;
 		ndBrainFloat m_betaAcc;
 		ndBrainFloat m_alphaAcc;
-		ndBrainFloat m_learnRate;
 		ndBrainFloat m_invBeta;
 		ndBrainFloat m_invAlpha;
 		ndBrainFloat m_minibathScale;
@@ -63,10 +61,8 @@ class ndBrainOptimizerAdam : public ndBrainOptimizer
 
 	ndBrainOptimizerAdam(const ndSharedPtr<ndBrainContext>& context);
 
-	virtual void Update(ndBrainVector& parameters, const ndBrainVector& gradients) override;
-
-	// new system
-	virtual void Init(ndInt32 parametersBufferSizeInFloats, ndBrainFloat m_learnRate) override;
+	virtual void ApplyLearnRate(ndBrainFloat learnRate) override;
+	virtual void Init(ndInt32 parametersBufferSizeInFloats) override;
 
 	private:
 	ndSharedPtr<ndBrainFloatBuffer> m_vdw;
@@ -74,6 +70,7 @@ class ndBrainOptimizerAdam : public ndBrainOptimizer
 	ndCommandSharedInfo m_parameters;
 
 	friend class ndBrainTrainer;
+	friend class ndBrainCpuContext;
 };
 
 #endif 

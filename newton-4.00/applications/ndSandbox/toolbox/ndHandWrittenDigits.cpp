@@ -162,7 +162,6 @@ class mnistSupervisedTrainer
 		ndTrainerDescriptor descriptor;
 		descriptor.m_brain = brain;
 		descriptor.m_context = context;
-		descriptor.m_learnRate = m_learnRate;
 		descriptor.m_minibatchSize = m_miniBatchSize;
 		m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor));
 	}
@@ -322,7 +321,7 @@ class mnistSupervisedTrainer
 #endif
 				// back propagate loss.
 				trainer->BackPropagate();
-				trainer->ApplyLearnRate();
+				trainer->ApplyLearnRate(m_learnRate);
 			}
 
 #if 1
@@ -537,7 +536,7 @@ static void MnistTestSet()
 
 		ndInt32 minibatchSize = 256;
 		ndSharedPtr<ndBrainContext> context(new ndBrainCpuContext);
-		ndTrainerDescriptor descriptor(brain, context, minibatchSize, 0);
+		ndTrainerDescriptor descriptor(brain, context, minibatchSize);
 		ndSharedPtr<ndBrainTrainerInference> inference(ndSharedPtr<ndBrainTrainerInference>(new ndBrainTrainerInference(descriptor)));
 		
 		ndBrainVector groundTruth;

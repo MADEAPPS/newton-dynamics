@@ -335,6 +335,7 @@ ndBrainAgentOnPolicyGradient_Trainer::ndBrainAgentOnPolicyGradient_Trainer(const
 	,m_trajectoryAccumulator()
 	,m_averageExpectedRewards()
 	,m_averageFramesPerEpisodes()
+	,m_learnRate(m_parameters.m_learnRate)
 	,m_frameCount(0)
 	,m_horizonSteps(0)
 	,m_eposideCount(0)
@@ -480,7 +481,7 @@ void ndBrainAgentOnPolicyGradient_Trainer::BuildPolicyClass()
 	}
 	policy->InitWeights();
 
-	ndTrainerDescriptor descriptor(policy, m_context, m_parameters.m_miniBatchSize, m_parameters.m_learnRate);
+	ndTrainerDescriptor descriptor(policy, m_context, m_parameters.m_miniBatchSize);
 	descriptor.m_regularizer = m_parameters.m_policyRegularizer;
 	descriptor.m_regularizerType = m_parameters.m_policyRegularizerType;
 	m_policyTrainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor));
@@ -515,7 +516,7 @@ void ndBrainAgentOnPolicyGradient_Trainer::BuildCriticClass()
 	}
 	critic->InitWeights();
 	
-	ndTrainerDescriptor descriptor(critic, m_context, m_parameters.m_miniBatchSize, m_parameters.m_learnRate);
+	ndTrainerDescriptor descriptor(critic, m_context, m_parameters.m_miniBatchSize);
 	descriptor.m_regularizer = m_parameters.m_criticRegularizer;
 	descriptor.m_regularizerType = m_parameters.m_criticRegularizerType;
 	m_criticTrainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor));
@@ -1170,7 +1171,7 @@ void ndBrainAgentOnPolicyGradient_Trainer::OptimizeCritic()
 		outputGradientBuffer->Set(*outputBuffer);
 		outputGradientBuffer->Sub(**m_advantageMinibatchBuffer);
 		m_criticTrainer->BackPropagate();
-		m_criticTrainer->ApplyLearnRate();
+		m_criticTrainer->ApplyLearnRate(m_learnRate);
 
 //ndUnsigned32 xxxx[256];
 //m_randomShuffleMinibatchBuffer->MemoryFromDevice(0, sizeof(xxxx), xxxx);
@@ -1287,7 +1288,7 @@ void ndBrainAgentOnPolicyGradient_Trainer::OptimizePolicy()
 	}
 	m_policyGradientAccumulator->Scale(1.0f / scale);
 	weightAndBiasGradientBuffer->Set(m_policyGradientAccumulator);
-	m_policyTrainer->ApplyLearnRate();
+	m_policyTrainer->ApplyLearnRate(m_learnRate);
 }
 
 #pragma optimize( "", off )

@@ -41,11 +41,12 @@ class ndTrainerDescriptor
 {
 	public:
 	ndTrainerDescriptor();
-	ndTrainerDescriptor(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndInt32 minibatchSize, ndBrainFloat learnRate);
+	//ndTrainerDescriptor(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndInt32 minibatchSize, ndBrainFloat learnRate);
+	ndTrainerDescriptor(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndInt32 minibatchSize);
 
 	ndSharedPtr<ndBrain> m_brain;
 	ndSharedPtr<ndBrainContext> m_context;
-	ndBrainFloat m_learnRate;
+	//ndBrainFloat m_learnRate;
 	ndBrainFloat m_regularizer;
 	ndInt32 m_minibatchSize;
 	ndRegularizerType m_regularizerType;
@@ -96,6 +97,8 @@ class ndBrainTrainerInference : public ndClassAlloc
 	ndSharedPtr<ndBrainFloatBuffer> m_miniBatchInputBuffer;
 	ndSharedPtr<ndBrainFloatBuffer> m_miniBatchOutputBuffer;
 	ndList<ndSharedPtr<ndBrainBufferCommand>> m_feedForwardCommands;
+
+	friend class ndBrainCpuContext;
 };
 
 #endif 

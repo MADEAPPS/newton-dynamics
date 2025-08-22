@@ -28,7 +28,7 @@
 // to the environment with increasing complexity
 namespace ndQuadruped_sac
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
 
 	enum Actions
@@ -1035,23 +1035,22 @@ namespace ndQuadruped_sac
 			,m_timer(ndGetTimeInMicroseconds())
 			,m_maxScore(ndFloat32(-1.0e10f))
 			,m_lastEpisode(0xffffffff)
-			,m_stopTraining(0)
 			,m_saveStateCount(0)
 			,m_modelIsTrained(false)
 		{
 			ndWorld* const world = scene->GetWorld();
-
 			ndInt32 numberOfActions = m_actionsSize;
 			ndInt32 numberOfObservations = m_observationSize * 4 + 2;
 
 			m_outFile = fopen("ndQuadruped_2-sac.csv", "wb");
 			fprintf(m_outFile, "sac\n");
 
-			m_stopTraining = 1000000;
+
 			ndBrainAgentOffPolicyGradient_Trainer::HyperParameters hyperParameters;
 
 			//hyperParameters.m_numberOfHiddenLayers = 2;
 			hyperParameters.m_discountRewardFactor = 0.999f;
+			hyperParameters.m_maxNumberOfTrainingSteps = 1000000;
 			hyperParameters.m_numberOfActions = numberOfActions;
 			hyperParameters.m_numberOfObservations = numberOfObservations;
 			m_master = ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>(new ndBrainAgentOffPolicyGradient_Trainer(hyperParameters));
@@ -1165,8 +1164,9 @@ namespace ndQuadruped_sac
 		virtual void Update(ndDemoEntityManager* const manager, ndFloat32)
 		{
 			ndUnsigned32 episodeCount = 0;
-			ndUnsigned32 stopTraining = m_master->GetFramesCount();
-			if (stopTraining <= m_stopTraining)
+			ndInt32 stopTraining = ndInt32(m_master->GetFramesCount());
+			ndBrainAgentOffPolicyGradient_Trainer::HyperParameters& hyperParameters = m_master->m_parameters;
+			if (stopTraining <= hyperParameters.m_maxNumberOfTrainingSteps)
 			{
 				episodeCount = m_master->GetEposideCount();
 				m_master->OptimizeStep();
@@ -1210,13 +1210,12 @@ namespace ndQuadruped_sac
 						ndExpandTraceMessage("trainer terminate abnormally because an open cll internal error\n");
 						ndExpandTraceMessage("you can resume training by re starting the simulation, and initializing the trainer to the recovery file\n");
 						ndExpandTraceMessage("\n");
-						m_stopTraining = 0;
 					}
 				}
 			}
 			
 			ndFloat32 stopScore = ndFloat32(m_master->GetAverageFrames() * m_master->GetAverageScore());
-			if ((stopTraining >= m_stopTraining) || (stopScore > ndFloat32(0.95f) * ndFloat32(m_master->m_parameters.m_maxTrajectorySteps)))
+			if ((stopTraining >= hyperParameters.m_maxNumberOfTrainingSteps) || (stopScore > ndFloat32(0.95f) * ndFloat32(m_master->m_parameters.m_maxTrajectorySteps)))
 			{
 				char fileName[1024];
 				m_modelIsTrained = true;
@@ -1237,7 +1236,6 @@ namespace ndQuadruped_sac
 		ndUnsigned64 m_timer;
 		ndFloat32 m_maxScore;
 		ndUnsigned32 m_lastEpisode;
-		ndUnsigned32 m_stopTraining;
 		ndUnsigned32 m_saveStateCount;
 		bool m_modelIsTrained;
 	};

@@ -281,8 +281,9 @@ void ndBrainTrainer::AddLayersGradientCommands()
 
 void ndBrainTrainer::AddOptimizerGradientCommand()
 {
+#if 0
 	ndInt32 sizeInFloats = ndInt32(m_weightAndBiasBuffer->SizeInBytes() / sizeof(ndReal));
-	m_optimizer->Init(sizeInFloats, m_descriptor.m_learnRate);
+	m_optimizer->Init(sizeInFloats);
 
 	// add the adam optimizer kernel here
 	{
@@ -312,6 +313,7 @@ void ndBrainTrainer::AddOptimizerGradientCommand()
 					public:
 					ndBrainAdamUpdateParametersRidge(const ndBrainBufferCommandDesc& desc)
 						:ndBrainBufferCommandCpu(desc)
+						,m_learnRate(ndBrainFloat(1.0e-4f))
 					{
 					}
 
@@ -325,34 +327,37 @@ void ndBrainTrainer::AddOptimizerGradientCommand()
 						ndBrainFloat* const vdw = (ndBrainFloat*)m_desc[3]->GetCpuPtr();
 						ndBrainFloat* const vdw2 = (ndBrainFloat*)m_desc[4]->GetCpuPtr();
 
-						ndBrainFloat descendRate = -parameters->m_learnRate;
+						//ndBrainFloat descendRate = -parameters->m_learnRate;
+						ndBrainFloat descendRate = -m_learnRate;
 						ndBrainFloat regularizer = -parameters->m_decayRegularizer;
-
+						
 						ndInt32 start = groupId * workGroupSize;
 						ndBrainFloat miniBatchWeight = parameters->m_minibathScale;
 						for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
 						{
 							ndBrainFloat temp = miniBatchWeight * weightAndBiasGradientBuffer[start + itemId];
-
+						
 							// calculate moving average
 							ndBrainFloat a = vdw[start + itemId] * parameters->m_alpha + temp * (ndBrainFloat(1.0f) - parameters->m_alpha);
 							vdw[start + itemId] = a;
-
+						
 							// caluate RMS
 							ndBrainFloat b = vdw2[start + itemId] * parameters->m_beta + temp * temp * (ndBrainFloat(1.0f) - parameters->m_beta);
 							vdw2[start + itemId] = b;
-
+						
 							ndBrainFloat vdwCorrected = a * parameters->m_invAlpha;
 							ndBrainFloat vdw2Corrected = b * parameters->m_invBeta;
-
+						
 							ndBrainFloat bias_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(vdw2Corrected)) + parameters->m_epsilon);
 							ndBrainFloat gradient = vdwCorrected * bias_den;
-
+						
 							ndBrainFloat weight = weightAndBiasBuffer[start + itemId];
 							gradient += weight * regularizer;
  							weightAndBiasBuffer[start + itemId] = weight + gradient * descendRate;
 						}
 					}
+
+					ndBrainFloat m_learnRate;
 				};
 
 				m_adamOptimizerCommand = ndSharedPtr<ndBrainBufferCommand>(new ndBrainAdamUpdateParametersRidge(descriptor));
@@ -424,13 +429,18 @@ void ndBrainTrainer::AddOptimizerGradientCommand()
 			m_adamMomentumUpdateCommand = ndSharedPtr<ndBrainBufferCommand>(new ndBrainGpuCommand(descriptor));
 		}
 	}
+#endif
+	ndBrainContext* const context = *m_descriptor.m_context;
+	context->SetLeanRateCommandBuffers(**m_optimizer, m_descriptor.m_minibatchSize, **m_weightAndBiasBuffer, **m_weightAndBiasGradientsBuffer);
 }
 
-void ndBrainTrainer::ApplyLearnRate()
+void ndBrainTrainer::ApplyLearnRate(ndBrainFloat learnRate)
 {
-	ndBrainContext* const context = *m_descriptor.m_context;
-	context->SubmitBufferCommand(*m_adamOptimizerCommand);
-	context->SubmitBufferCommand(*m_adamMomentumUpdateCommand);
+	//ndBrainContext* const context = *m_descriptor.m_context;
+	//context->SubmitBufferCommand(*m_adamOptimizerCommand);
+	//context->SubmitBufferCommand(*m_adamMomentumUpdateCommand);
+	//context->SubmitLeanRateCommands(learnRate);
+	m_optimizer->ApplyLearnRate(learnRate);
 }
 
 void ndBrainTrainer::BackPropagate()
