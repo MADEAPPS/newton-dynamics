@@ -80,7 +80,7 @@ ndBrainAgentOnPolicyGradient_Trainer::HyperParameters::HyperParameters()
 	m_hiddenLayersNumberOfNeurons = 256;
 	m_replayBufferStartOptimizeSize = 1024 * 64;
 
-//m_useGpuBackend = false;
+m_useGpuBackend = false;
 //m_numberOfUpdates = 1;
 //m_batchTrajectoryCount = 10;
 //m_replayBufferStartOptimizeSize = 1024 * 2;
@@ -396,19 +396,19 @@ void ndBrainAgentOnPolicyGradient_Trainer::SaveState(const char* const)
 	//m_context->SyncBufferCommandQueue();
 	//
 	//char fileName[256];
-	//sprintf(fileName, "%s_policy.dnn", baseName);
+	//snprintf(fileName, sizeof (fileName), "%s_policy.dnn", baseName);
 	//m_policyTrainer->GetWeightAndBiasBuffer()->VectorFromDevice(m_scratchBuffer);
 	//m_policyTrainer->UpdateParameters(m_scratchBuffer);
 	//m_policyTrainer->GetBrain()->SaveToFile(fileName);
 	//
 	//for (ndInt32 j = 0; j < ndInt32(sizeof(m_referenceCriticTrainer) / sizeof(m_referenceCriticTrainer[0])); ++j)
 	//{
-	//	sprintf(fileName, "%s_critic_%d.dnn", baseName, j);
+	//	snprintf(fileName, sizeof (fileName), "%s_critic_%d.dnn", baseName, j);
 	//	m_criticTrainer[j]->GetWeightAndBiasBuffer()->VectorFromDevice(m_scratchBuffer);
 	//	m_criticTrainer[j]->UpdateParameters(m_scratchBuffer);
 	//	m_criticTrainer[j]->GetBrain()->SaveToFile(fileName);
 	//
-	//	sprintf(fileName, "%s_referenceCritic_%d.dnn", baseName, j);
+	//	snprintf(fileName, sizeof (fileName), "%s_referenceCritic_%d.dnn", baseName, j);
 	//	m_referenceCriticTrainer[j]->GetWeightAndBiasBuffer()->VectorFromDevice(m_scratchBuffer);
 	//	m_referenceCriticTrainer[j]->UpdateParameters(m_scratchBuffer);
 	//	m_referenceCriticTrainer[j]->GetBrain()->SaveToFile(fileName);
@@ -422,7 +422,7 @@ void ndBrainAgentOnPolicyGradient_Trainer::RecoverState(const char*)
 	//m_context->SyncBufferCommandQueue();
 	//
 	//char fileName[256];
-	//sprintf(fileName, "%s_policy.dnn", baseName);
+	//snprintf(fileName, sizeof (fileName), "%s_policy.dnn", baseName);
 	//ndSharedPtr<ndBrain> policy(ndBrainLoad::Load(fileName));
 	//ndTrainerDescriptor descriptor(policy, m_context, m_parameters.m_miniBatchSize, m_parameters.m_learnRate);
 	//descriptor.m_regularizer = m_parameters.m_policyRegularizer;
@@ -431,14 +431,14 @@ void ndBrainAgentOnPolicyGradient_Trainer::RecoverState(const char*)
 	//
 	//for (ndInt32 j = 0; j < ndInt32(sizeof(m_referenceCriticTrainer) / sizeof(m_referenceCriticTrainer[0])); ++j)
 	//{
-	//	sprintf(fileName, "%s_critic_%d.dnn", baseName, j);
+	//	snprintf(fileName, sizeof (fileName), "%s_critic_%d.dnn", baseName, j);
 	//	ndSharedPtr<ndBrain> critic(ndBrainLoad::Load(fileName));
 	//	ndTrainerDescriptor descriptorDescriptor(critic, m_context, m_parameters.m_miniBatchSize, m_parameters.m_learnRate);
 	//	descriptorDescriptor.m_regularizer = m_parameters.m_criticRegularizer;
 	//	descriptorDescriptor.m_regularizerType = m_parameters.m_criticRegularizerType;
 	//	m_criticTrainer[j] = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptorDescriptor));
 	//
-	//	sprintf(fileName, "%s_referenceCritic_%d.dnn", baseName, j);
+	//	snprintf(fileName, sizeof (fileName), "%s_referenceCritic_%d.dnn", baseName, j);
 	//	ndSharedPtr<ndBrain> referenceCritic(ndBrainLoad::Load(fileName));
 	//	ndTrainerDescriptor referenceCriticDescriptor(referenceCritic, m_context, m_parameters.m_miniBatchSize, m_parameters.m_learnRate);
 	//	referenceCriticDescriptor.m_regularizer = m_parameters.m_criticRegularizer;
@@ -471,23 +471,6 @@ void ndBrainAgentOnPolicyGradient_Trainer::BuildPolicyClass()
 		layers.PushBack(new ND_HIDEN_LAYERS_ACTIVATION(layers[layers.GetCount() - 1]->GetOutputSize()));
 	}
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_numberOfActions * 2));
-
-	//ndBrainVector bias;
-	//ndBrainVector slope;
-	//bias.SetCount(layers[layers.GetCount() - 1]->GetOutputSize());
-	//slope.SetCount(layers[layers.GetCount() - 1]->GetOutputSize());
-	//bias.Set(ndBrainFloat(0.0f));
-	//slope.Set(ndBrainFloat(1.0f));
-	//ndInt32 elements = ndInt32(bias.GetCount() / 2);
-	//ndBrainMemVector biasVariance(&bias[elements], elements);
-	//ndBrainMemVector slopeVariance(&slope[elements], elements);
-	//ndBrainFloat minLogSigma = ndLog(ND_POLICY_MIN_SIGMA);
-	//ndBrainFloat maxLogSigma = ndLog(ND_POLICY_MAX_SIGMA);
-	//biasVariance.Set((maxLogSigma + minLogSigma) * ndBrainFloat(0.5f));
-	//slopeVariance.Set((maxLogSigma - minLogSigma) * ndBrainFloat(0.5f));
-	//layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
-	//layers.PushBack(new ndBrainLayerActivationLinear(slope, bias));
-	//layers.PushBack(new ndBrainAgentPolicyGradientActivation(layers[layers.GetCount() - 1]->GetOutputSize()));
 	layers.PushBack(new ndBrainAgentPolicyGradientActivation(layers[layers.GetCount() - 1]->GetOutputSize(), ndLog(ND_POLICY_MIN_SIGMA), ndLog(ND_POLICY_MAX_SIGMA)));
 
 	ndSharedPtr<ndBrain> policy (new ndBrain);
@@ -1286,18 +1269,6 @@ void ndBrainAgentOnPolicyGradient_Trainer::OptimizePolicy()
 //				trainer.BackPropagate(observation, loss);
 //			}
 //		});
-//	
-//		auto AddGradients = ndMakeObject::ndFunction([this, &iterator, gradientScale](ndInt32, ndInt32)
-//		{
-//			for (ndInt32 i = iterator++; i < m_parameters.m_miniBatchSize; i = iterator++)
-//			{
-//				ndBrainTrainer* const trainer = m_policyTrainers[i];
-//				ndBrainTrainer* const auxiliaryTrainer = m_policyAuxiliaryTrainers[i];
-//				auxiliaryTrainer->ScaleWeights(gradientScale);
-//				trainer->AddGradients(auxiliaryTrainer);
-//			}
-//		});
-//	
 //		iterator = 0;
 //		ndBrainThreadPool::ParallelExecute(CalculateGradients);
 //		iterator = 0;
@@ -1325,7 +1296,6 @@ void ndBrainAgentOnPolicyGradient_Trainer::Optimize()
 	UpdateScore();
 	TrajectoryToGpuBuffers();
 	CalculateAdvantage();
-
 	OptimizePolicy();
 	OptimizeCritic();
 }
