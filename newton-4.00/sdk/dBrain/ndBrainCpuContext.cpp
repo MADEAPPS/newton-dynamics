@@ -504,10 +504,6 @@ void ndBrainCpuContext::SetLeanRateCommandBuffers(
 
 void ndBrainCpuContext::ApplyLeanRateCommands(ndBrainBufferCommand* const command, ndBrainFloat learnRate)
 {
-	//ndBrainContext* const context = *m_context;
-//context->SubmitBufferCommand(*m_adamOptimizerCommand);
-//context->SubmitBufferCommand(*m_adamMomentumUpdateCommand);
-//context->SubmitLeanRateCommands(learnRate);
 	ndBrainAdamUpdateParametersRidge* const gradientUpdateCommand = (ndBrainAdamUpdateParametersRidge*)command;
 	ndAssert(gradientUpdateCommand->GetDescriptor().m_id == ndBrainTrainerInference::m_adamOptimizerUpdate);
 	gradientUpdateCommand->m_learnRate = learnRate;

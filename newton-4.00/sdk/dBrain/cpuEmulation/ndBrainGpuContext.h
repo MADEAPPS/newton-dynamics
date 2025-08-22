@@ -70,6 +70,10 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 	virtual void CalculateEntropyRegularization(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& sampleBuffer, const ndBrainFloatBuffer& sigmaBuffer, ndBrainFloat regularization) override;
 	virtual void CalculateEntropyRegularizationGradient(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& sampleBuffer, const ndBrainFloatBuffer& sigmaBuffer, ndBrainFloat regularization, ndInt32 inputSize) override;
 
+	// learnRate commands
+	virtual void ApplyLeanRateCommands(ndBrainBufferCommand* const command, ndBrainFloat learRate) override;
+	virtual void SetLeanRateCommandBuffers(ndBrainOptimizerAdam& optimizer, ndInt32 minibatchSize, ndBrainFloatBuffer& weightsAndBiasBuffer, ndBrainFloatBuffer& weightsAndBiasGradientBuffer) override;
+
 	private:
 	void CreateKerners();
 	void CreateCopyCommands();

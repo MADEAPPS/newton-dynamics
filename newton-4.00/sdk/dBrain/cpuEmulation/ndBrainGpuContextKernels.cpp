@@ -1129,52 +1129,54 @@ class brainAdamUpdateRidgeRegularizer : public ndBrainKernel
     public:
     brainAdamUpdateRidgeRegularizer(ndBrainContext* const context)
         :ndBrainKernel(context)
+        ,m_learRate(ndBrainFloat (1.0e-4f))
     {
     }
 
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
-        ndAssert(0);
-        //ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
-        //ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
-        //ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
-        //ndBrainFloatBuffer* const buffer4 = (ndBrainFloatBuffer*)m_parameters[4];
-        //ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
-        //
-        //ndBrainFloat* const vdw2 = (ndBrainFloat*)buffer4->GetGpuBuffer()->GetPtr();
-        //ndBrainFloat* const vdw = (ndBrainFloat*)buffer3->GetGpuBuffer()->GetPtr();
-        //ndBrainFloat* const weightAndBiasGradientBuffer = (ndBrainFloat*)buffer2->GetGpuBuffer()->GetPtr();
-        //ndBrainFloat* const weightAndBiasBuffer = (ndBrainFloat*)buffer1->GetGpuBuffer()->GetPtr();
-        //ndBrainOptimizerAdam::ndCommandSharedInfo* const parameters = (ndBrainOptimizerAdam::ndCommandSharedInfo*)buffer0->GetGpuBuffer()->GetPtr();
-        //
-        //ndBrainFloat descendRate = -parameters->m_learnRate;
-        //ndBrainFloat regularizer = -parameters->m_decayRegularizer;
-        //
-        //ndInt64 start = groupId * ndInt64(workGroupSize);
-        //ndBrainFloat miniBatchWeight = parameters->m_minibathScale;
-        //for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
-        //{
-        //    ndBrainFloat weightAndBiasGradient = miniBatchWeight * weightAndBiasGradientBuffer[start + itemId];
-        //    
-        //    // calculate moving average
-        //    ndBrainFloat a = vdw[start + itemId] * parameters->m_alpha + weightAndBiasGradient * (ndBrainFloat(1.0f) - parameters->m_alpha);
-        //    vdw[start + itemId] = a;
-        //    
-        //    // caluate RMS
-        //    ndBrainFloat b = vdw2[start + itemId] * parameters->m_beta + weightAndBiasGradient * weightAndBiasGradient * (ndBrainFloat(1.0f) - parameters->m_beta);
-        //    vdw2[start + itemId] = b;
-        //    
-        //    ndBrainFloat vdwCorrected = a * parameters->m_invAlpha;
-        //    ndBrainFloat vdw2Corrected = b * parameters->m_invBeta;
-        //    
-        //    ndBrainFloat bias_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(vdw2Corrected)) + parameters->m_epsilon);
-        //    ndBrainFloat gradient = vdwCorrected * bias_den;
-        //     
-        //    ndBrainFloat weight = weightAndBiasBuffer[start + itemId];
-        //    gradient += weight * regularizer;
-        //    weightAndBiasBuffer[start + itemId] = weight + gradient * descendRate;
-        //}
+        ndBrainFloat* const buffer5 = (ndBrainFloat*)m_parameters[5];
+        ndBrainFloatBuffer* const buffer1 = (ndBrainFloatBuffer*)m_parameters[1];
+        ndBrainFloatBuffer* const buffer2 = (ndBrainFloatBuffer*)m_parameters[2];
+        ndBrainFloatBuffer* const buffer3 = (ndBrainFloatBuffer*)m_parameters[3];
+        ndBrainFloatBuffer* const buffer4 = (ndBrainFloatBuffer*)m_parameters[4];
+        ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
+        
+        ndBrainFloat* const vdw2 = (ndBrainFloat*)buffer4->GetGpuBuffer()->GetPtr();
+        ndBrainFloat* const vdw = (ndBrainFloat*)buffer3->GetGpuBuffer()->GetPtr();
+        ndBrainFloat* const weightAndBiasGradientBuffer = (ndBrainFloat*)buffer2->GetGpuBuffer()->GetPtr();
+        ndBrainFloat* const weightAndBiasBuffer = (ndBrainFloat*)buffer1->GetGpuBuffer()->GetPtr();
+        ndBrainOptimizerAdam::ndCommandSharedInfo* const parameters = (ndBrainOptimizerAdam::ndCommandSharedInfo*)buffer0->GetGpuBuffer()->GetPtr();
+        
+        ndBrainFloat descendRate = - *buffer5;
+        ndBrainFloat regularizer = -parameters->m_decayRegularizer;
+        
+        ndInt64 start = groupId * ndInt64(workGroupSize);
+        ndBrainFloat miniBatchWeight = parameters->m_minibathScale;
+        for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
+        {
+            ndBrainFloat weightAndBiasGradient = miniBatchWeight * weightAndBiasGradientBuffer[start + itemId];
+            
+            // calculate moving average
+            ndBrainFloat a = vdw[start + itemId] * parameters->m_alpha + weightAndBiasGradient * (ndBrainFloat(1.0f) - parameters->m_alpha);
+            vdw[start + itemId] = a;
+            
+            // caluate RMS
+            ndBrainFloat b = vdw2[start + itemId] * parameters->m_beta + weightAndBiasGradient * weightAndBiasGradient * (ndBrainFloat(1.0f) - parameters->m_beta);
+            vdw2[start + itemId] = b;
+            
+            ndBrainFloat vdwCorrected = a * parameters->m_invAlpha;
+            ndBrainFloat vdw2Corrected = b * parameters->m_invBeta;
+            
+            ndBrainFloat bias_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(vdw2Corrected)) + parameters->m_epsilon);
+            ndBrainFloat gradient = vdwCorrected * bias_den;
+             
+            ndBrainFloat weight = weightAndBiasBuffer[start + itemId];
+            gradient += weight * regularizer;
+            weightAndBiasBuffer[start + itemId] = weight + gradient * descendRate;
+        }
     }
+    ndBrainFloat m_learRate;
 };
 
 // matrix vector operation kernels.

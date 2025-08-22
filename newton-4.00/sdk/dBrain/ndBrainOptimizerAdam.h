@@ -71,6 +71,7 @@ class ndBrainOptimizerAdam : public ndBrainOptimizer
 
 	friend class ndBrainTrainer;
 	friend class ndBrainCpuContext;
+	friend class ndBrainGpuContext;
 };
 
 #endif 

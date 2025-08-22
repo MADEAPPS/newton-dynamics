@@ -99,6 +99,7 @@ class ndBrainTrainerInference : public ndClassAlloc
 	ndList<ndSharedPtr<ndBrainBufferCommand>> m_feedForwardCommands;
 
 	friend class ndBrainCpuContext;
+	friend class ndBrainGpuContext;
 };
 
 #endif 
