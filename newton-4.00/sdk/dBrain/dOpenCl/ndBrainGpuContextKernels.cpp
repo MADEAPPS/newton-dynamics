@@ -863,6 +863,18 @@ R""""(
         float descendRate = -learnRate;
         float regularizer = -parameters->m_decayRegularizer;
 
+		//float m_beta;
+		//float m_alpha;
+		//float m_epsilon;
+		//float m_betaAcc;
+		//float m_alphaAcc;
+		//float m_invBeta;
+		//float m_invAlpha;
+		//float m_minibathScale;
+        //float m_decayRegularizer;
+        //if (groupId == 0)
+        //printf ("%f %f %f %f %f\n", learnRate, parameters->m_beta, parameters->m_invBeta, parameters->m_minibathScale, parameters->m_decayRegularizer);
+
         long start = groupId * (long)workGroupSize;
         float miniBatchWeight = parameters->m_minibathScale;
 

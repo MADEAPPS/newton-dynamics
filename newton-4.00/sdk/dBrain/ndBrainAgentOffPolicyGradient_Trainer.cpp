@@ -82,7 +82,6 @@ ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 	m_replayBufferStartOptimizeSize = 1024 * 64;
 
 	m_maxNumberOfTrainingSteps = 1024 * 256;
-	m_entropyTemperature = ND_POLICY_MAX_ENTROPY_TEMPERATURE;
 	m_entropyMinTemperature = ND_POLICY_MIN_ENTROPY_TEMPERATURE;
 	m_entropyMaxTemperature = ND_POLICY_MAX_ENTROPY_TEMPERATURE;
 	
@@ -333,6 +332,7 @@ ndBrainAgentOffPolicyGradient_Trainer::ndBrainAgentOffPolicyGradient_Trainer(con
 	,m_averageExpectedRewards()
 	,m_averageFramesPerEpisodes()
 	,m_learnRate(m_parameters.m_learnRate)
+	,m_entropyTemperature(m_parameters.m_entropyMaxTemperature)
 	,m_frameCount(0)
 	,m_horizonSteps(0)
 	,m_eposideCount(0)
@@ -849,7 +849,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::CalculateExpectedRewards()
 	m_minibatchNoTerminal->CopyBuffer(criticOutputTerminal, m_parameters.m_miniBatchSize, **m_minibatchOfTransitions);
 
 	// calculate and add entropy regularization to the q value
-	m_minibatchEntropy->CalculateEntropyRegularization(**m_minibatchUniformRandomDistribution, **m_minibatchSigma, m_parameters.m_entropyTemperature);
+	m_minibatchEntropy->CalculateEntropyRegularization(**m_minibatchUniformRandomDistribution, **m_minibatchSigma, m_entropyTemperature);
 
 	qValue.Sub(**m_minibatchEntropy);
 	qValue.Mul(**m_minibatchNoTerminal);
@@ -1022,7 +1022,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainPolicy()
 	policyCopyGradients.m_strideInByte = ndInt32(m_policyTrainer->GetBrain()->GetOutputSize() * sizeof(ndReal));
 	policyMinibatchOutputBuffer->CopyBuffer(policyCopyGradients, m_parameters.m_miniBatchSize, *criticMinibatchInputGradientBuffer);
 	ndBrainFloatBuffer* const policyMinibatchOutputGradientBuffer = m_policyTrainer->GetOuputGradientBuffer();
-	policyMinibatchOutputGradientBuffer->CalculateEntropyRegularizationGradient(**m_minibatchUniformRandomDistribution, **m_minibatchSigma, m_parameters.m_entropyTemperature, ndInt32(meanOutputSizeInBytes / sizeof(ndReal)));
+	policyMinibatchOutputGradientBuffer->CalculateEntropyRegularizationGradient(**m_minibatchUniformRandomDistribution, **m_minibatchSigma, m_entropyTemperature, ndInt32(meanOutputSizeInBytes / sizeof(ndReal)));
 
 	// subtract the qValue gradient from the entropy gradient.
 	// The subtraction order is in reverse order, to get the gradient ascend.
@@ -1132,20 +1132,21 @@ void ndBrainAgentOffPolicyGradient_Trainer::Optimize()
 	}
 }
 
+#pragma optimize( "", off )
 void ndBrainAgentOffPolicyGradient_Trainer::OptimizeStep()
 {
 	SaveTrajectory();
 	if (m_startOptimization)
 	{
 		// calculate aneling paremater
-		ndFloat64 num = ndFloat64(m_frameCount - m_parameters.m_replayBufferStartOptimizeSize);
+		ndFloat64 num = ndFloat64(m_frameCount);
 		ndFloat64 den = ndFloat64(m_parameters.m_maxNumberOfTrainingSteps - m_parameters.m_replayBufferStartOptimizeSize);
-		ndFloat32 param = ndFloat32(ndClamp(num / den, ndFloat64(0.0f), ndFloat64(1.0f)));
+		ndBrainFloat param = ndBrainFloat((ndFloat64(1.0f) - ndClamp(num / den, ndFloat64(0.0f), ndFloat64(1.0f))));
 
-		// linearly aneal entropy
-		m_parameters.m_entropyTemperature = m_parameters.m_entropyMaxTemperature + param * (m_parameters.m_entropyMinTemperature - m_parameters.m_entropyMaxTemperature);
+		// linearly anneal entropy
+		m_entropyTemperature = m_parameters.m_entropyMinTemperature + param * (m_parameters.m_entropyMaxTemperature - m_parameters.m_entropyMinTemperature);
 
-		// linearly aneal lear rate;
+		// linearly anneal lear rate;
 		m_learnRate = m_parameters.m_learnRate * param;
 
 		Optimize();

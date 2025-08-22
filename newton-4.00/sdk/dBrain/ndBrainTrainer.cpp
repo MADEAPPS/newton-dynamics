@@ -88,6 +88,9 @@ void ndBrainTrainer::Initialize()
 	ndInt64 maxSize = ndInt64(ndMax(m_weightAndBiasBuffer->GetCount(), m_inputOutputBuffer->GetCount()));
 	buffer.Resize(maxSize);
 	
+	m_optimizer->SetRegularizer(m_descriptor.m_regularizer);
+	m_optimizer->SetRegularizerType(m_descriptor.m_regularizerType);
+
 	buffer.SetCount(ndInt64(m_inputOutputBuffer->GetCount()));
 	buffer.Set(ndReal(0.0f));
 	m_inputOutputGradientsBuffer = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_descriptor.m_context, buffer));
@@ -99,8 +102,7 @@ void ndBrainTrainer::Initialize()
 		if (partialSum < (layer->GetOutputSize() + 1024))
 		{
 			ndInt32 outSize = layer->GetOutputSize();
-			//partialSum = (outSize + 255) & -256;
-			partialSum = RoundOffOffset(outSize);;
+			partialSum = RoundOffOffset(outSize);
 		}
 	}
 	buffer.SetCount(ndInt64(m_descriptor.m_minibatchSize) * partialSum);

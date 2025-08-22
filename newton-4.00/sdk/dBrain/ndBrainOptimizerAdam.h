@@ -56,7 +56,6 @@ class ndBrainOptimizerAdam : public ndBrainOptimizer
 		ndBrainFloat m_invAlpha;
 		ndBrainFloat m_minibathScale;
 		ndBrainFloat m_decayRegularizer;
-		
 	};
 
 	ndBrainOptimizerAdam(const ndSharedPtr<ndBrainContext>& context);

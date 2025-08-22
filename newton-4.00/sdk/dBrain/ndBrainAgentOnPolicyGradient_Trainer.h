@@ -155,6 +155,7 @@ class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 		ndInt32 m_replayBufferSize;
 		ndInt32 m_maxTrajectorySteps;
 		ndInt32 m_batchTrajectoryCount;
+		ndInt32 m_maxNumberOfTrainingSteps;
 		ndInt32 m_replayBufferStartOptimizeSize;
 
 		bool m_useGpuBackend;

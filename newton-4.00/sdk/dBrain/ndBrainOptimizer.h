@@ -46,6 +46,7 @@ class ndBrainOptimizer : public ndClassAlloc
 
 	void SetRegularizer(ndBrainFloat regularizer);
 	void SetRegularizerType(ndRegularizerType type);
+
 	virtual void ApplyLearnRate(ndBrainFloat) { ndAssert(0); }
 	virtual void Init(ndInt32 parametersBufferSizeInFloats) = 0;
 

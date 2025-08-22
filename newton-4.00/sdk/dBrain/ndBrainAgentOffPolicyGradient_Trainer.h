@@ -138,8 +138,6 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 		ndBrainFloat m_criticRegularizer;
 		ndBrainFloat m_polyakBlendFactor;
 		ndBrainFloat m_discountRewardFactor;
-
-		ndBrainFloat m_entropyTemperature;
 		ndBrainFloat m_entropyMaxTemperature;
 		ndBrainFloat m_entropyMinTemperature;
 
@@ -232,6 +230,8 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 	ndMovingAverage<ND_OFF_POLICY_MOVING_AVERAGE_SCORE> m_averageFramesPerEpisodes;
 
 	ndBrainFloat m_learnRate;
+	ndBrainFloat m_entropyTemperature;
+
 	ndUnsigned32 m_frameCount;
 	ndUnsigned32 m_horizonSteps;
 	ndUnsigned32 m_eposideCount;
