@@ -31,7 +31,7 @@ class ndBrainOptimizerAdam;
 class ndBrainTrainer: public ndBrainTrainerInference
 {
 	public: 
-	ndBrainTrainer(const ndTrainerDescriptor& descriptor);
+	ndBrainTrainer(const ndTrainerDescriptor& descriptor, ndSharedPtr<ndBrainOptimizer> optimizer);
 	ndBrainTrainer(const ndBrainTrainer& src);
 	virtual ~ndBrainTrainer();
 
@@ -52,7 +52,8 @@ class ndBrainTrainer: public ndBrainTrainerInference
 	void AddOptimizerGradientCommand();
 	void AddCopyOutputGradientCommand();
 
-	ndSharedPtr<ndBrainOptimizerAdam> m_optimizer;
+	//ndSharedPtr<ndBrainOptimizerAdam> m_optimizer;
+	ndSharedPtr<ndBrainOptimizer> m_optimizer;
 	ndSharedPtr<ndBrainBufferCommand> m_adamOtimizerUpdate;
 	ndSharedPtr<ndBrainBufferCommand> m_adamMomentumUpdate;
 

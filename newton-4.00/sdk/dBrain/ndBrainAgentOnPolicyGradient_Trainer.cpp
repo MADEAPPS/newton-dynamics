@@ -483,7 +483,9 @@ void ndBrainAgentOnPolicyGradient_Trainer::BuildPolicyClass()
 	ndTrainerDescriptor descriptor(policy, m_context, m_parameters.m_miniBatchSize);
 	descriptor.m_regularizer = m_parameters.m_policyRegularizer;
 	descriptor.m_regularizerType = m_parameters.m_policyRegularizerType;
-	m_policyTrainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor));
+
+	ndAssert(0);
+	//m_policyTrainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor));
 }
 
 void ndBrainAgentOnPolicyGradient_Trainer::BuildCriticClass()
@@ -518,7 +520,8 @@ void ndBrainAgentOnPolicyGradient_Trainer::BuildCriticClass()
 	ndTrainerDescriptor descriptor(critic, m_context, m_parameters.m_miniBatchSize);
 	descriptor.m_regularizer = m_parameters.m_criticRegularizer;
 	descriptor.m_regularizerType = m_parameters.m_criticRegularizerType;
-	m_criticTrainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor));
+	ndAssert(0);
+	//m_criticTrainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor));
 }
 
 bool ndBrainAgentOnPolicyGradient_Trainer::IsValid() const

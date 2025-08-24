@@ -36,15 +36,17 @@ ndBrainOptimizerAdam::ndBrainOptimizerAdam(const ndSharedPtr<ndBrainContext>& co
 {
 }
 
-void ndBrainOptimizerAdam::Init(ndInt32 parametersBufferSizeInFloats)
+//void ndBrainOptimizerAdam::Init(ndInt32 parametersBufferSizeInFloats)
+void ndBrainOptimizerAdam::Init(ndInt32 minibatchSize, ndBrainFloatBuffer& weightsAndBiasBuffer, ndBrainFloatBuffer& weightsAndBiasGradientBuffer)
 {
 	ndBrainVector buffer;
-	buffer.SetCount(parametersBufferSizeInFloats);
+	ndInt32 sizeInFloats = ndInt32 (weightsAndBiasBuffer.SizeInBytes() / sizeof(ndReal));
+	buffer.SetCount(sizeInFloats);
 	buffer.Set(ndReal(0.0f));
-
-	m_parameters.m_decayRegularizer = GetRegularizer();
+	
 	m_vdw = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, buffer));
 	m_vdw2 = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, buffer));
+	m_context->SetLeanRateCommandBuffers(*this, minibatchSize, weightsAndBiasBuffer, weightsAndBiasGradientBuffer);
 }
 
 void ndBrainOptimizerAdam::ApplyLearnRate(ndBrainFloat learnRate)

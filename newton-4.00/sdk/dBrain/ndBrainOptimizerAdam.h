@@ -61,7 +61,7 @@ class ndBrainOptimizerAdam : public ndBrainOptimizer
 	ndBrainOptimizerAdam(const ndSharedPtr<ndBrainContext>& context);
 
 	virtual void ApplyLearnRate(ndBrainFloat learnRate) override;
-	virtual void Init(ndInt32 parametersBufferSizeInFloats) override;
+	virtual void Init(ndInt32 minibatchSize, ndBrainFloatBuffer& weightsAndBiasBuffer, ndBrainFloatBuffer& weightsAndBiasGradientBuffer) override;
 
 	private:
 	ndSharedPtr<ndBrainFloatBuffer> m_vdw;
