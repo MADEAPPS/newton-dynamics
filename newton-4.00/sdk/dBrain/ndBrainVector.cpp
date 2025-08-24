@@ -332,7 +332,7 @@ void ndBrainVector::StandardNormalDistribution()
 		ndFloat32 uniformRandomVariable = (*this)[i];
 		ndAssert(uniformRandomVariable >= ndFloat32(0.0f));
 		ndAssert(uniformRandomVariable <= ndFloat32(1.0f));
-		(*this)[i] = ndStandardNormalGaussian(uniformRandomVariable);
+		(*this)[i] = ndBrainFloat(ndStandardNormalGaussian(uniformRandomVariable));
 	}
 }
 
@@ -389,17 +389,13 @@ void ndBrainVector::SoftMaxNormalize()
 ndBrainFloat ndBrainVector::CalculateEntropyRegularization(const ndBrainVector& varianceBuffer, ndBrainFloat regularization) const
 {
 	ndAssert(GetCount() == varianceBuffer.GetCount());
-	ndBrainFloat entropy = -ndBrainFloat(0.5f) * ndBrainFloat (GetCount()) * ndLog(ndBrainFloat(2.0f) * ndPi);
+	ndBrainFloat entropy = -ndBrainFloat(0.5f) * ndBrainFloat (GetCount()) * ndBrainFloat(ndLog(ndBrainFloat(2.0f) * ndPi));
 
-	//float xxxx = 1.0f;
 	for (ndInt32 i = 0; i < GetCount(); ++i)
 	{
-		ndFloat32 sample = (*this)[i];
-		ndFloat32 sigma = varianceBuffer[i];
-		entropy += (- ndFloat32(0.5f) * sample * sample / (sigma * sigma) - ndLog(sigma));
-
-		//xxxx = xxxx * (1.0f / (ndSqrt(2.0 * ndPi) * sigma));
-		//xxxx = xxxx * ndExp(-ndFloat32(0.5f) * sample * sample / (sigma * sigma));
+		ndBrainFloat sample = (*this)[i];
+		ndBrainFloat sigma = varianceBuffer[i];
+		entropy -= (ndBrainFloat(0.5f) * sample * sample / (sigma * sigma) + ndBrainFloat(ndLog(sigma)));
 	}
 	return entropy * regularization;
 }
@@ -412,12 +408,12 @@ void ndBrainVector::CalculateEntropyRegularizationGradient(const ndBrainVector& 
 	const ndInt32 base = ndInt32 (GetCount()/2);
 	for (ndInt32 i = 0; i < base; ++i)
 	{
-		ndFloat32 sigma = varianceBuffer[i];
-		ndFloat32 sample = meanSampleBuffer[i];
-		ndFloat32 invSigma = ndFloat32(1.0f) / sigma;
-		ndFloat32 invSigma2 = invSigma * invSigma;
+		ndBrainFloat sigma = varianceBuffer[i];
+		ndBrainFloat sample = meanSampleBuffer[i];
+		ndBrainFloat invSigma = ndBrainFloat(1.0f) / sigma;
+		ndBrainFloat invSigma2 = invSigma * invSigma;
 
 		(*this)[i] = regularization * sample * invSigma2;
-		(*this)[i + base] = regularization * invSigma * (sample * sample * invSigma2 - ndFloat32(1.0f));
+		(*this)[i + base] = regularization * invSigma * (sample * sample * invSigma2 - ndBrainFloat(1.0f));
 	}
 }

@@ -20,38 +20,12 @@
 #include "ndBrainBufferCommand.h"
 #include "ndBrainTrainerInference.h"
 
-class ndBrainAdamMomentumUpdate : public ndBrainBufferCommandCpu
-{
-	public:
-	ndBrainAdamMomentumUpdate(const ndBrainBufferCommandDesc& desc)
-		:ndBrainBufferCommandCpu(desc)
-	{
-	}
-
-	virtual void Execute(ndInt32) override
-	{
-		ndBrainOptimizerAdam::ndCommandSharedInfo* const parameters = (ndBrainOptimizerAdam::ndCommandSharedInfo*)m_desc[0]->GetCpuPtr();
-
-		parameters->m_betaAcc *= parameters->m_beta;
-		parameters->m_alphaAcc *= parameters->m_alpha;
-		if (parameters->m_betaAcc < ndBrainFloat(1.0e-7f))
-		{
-			parameters->m_betaAcc = ndBrainFloat(0.0f);
-		}
-		if (parameters->m_alphaAcc < ndBrainFloat(1.0e-7f))
-		{
-			parameters->m_alphaAcc = ndBrainFloat(0.0f);
-		}
-	}
-};
-
-
 class ndBrainAdamUpdateParametersRidge : public ndBrainBufferCommandCpu
 {
 	public:
 	ndBrainAdamUpdateParametersRidge(const ndBrainBufferCommandDesc& desc)
 		:ndBrainBufferCommandCpu(desc)
-		, m_learnRate(ndBrainFloat(1.0e-4f))
+		,m_learnRate(ndBrainFloat(1.0e-4f))
 	{
 	}
 
@@ -98,6 +72,30 @@ class ndBrainAdamUpdateParametersRidge : public ndBrainBufferCommandCpu
 	ndBrainFloat m_learnRate;
 };
 
+class ndBrainAdamMomentumUpdate : public ndBrainBufferCommandCpu
+{
+	public:
+	ndBrainAdamMomentumUpdate(const ndBrainBufferCommandDesc& desc)
+		:ndBrainBufferCommandCpu(desc)
+	{
+	}
+
+	virtual void Execute(ndInt32) override
+	{
+		ndBrainOptimizerAdam::ndCommandSharedInfo* const parameters = (ndBrainOptimizerAdam::ndCommandSharedInfo*)m_desc[0]->GetCpuPtr();
+
+		parameters->m_betaAcc *= parameters->m_beta;
+		parameters->m_alphaAcc *= parameters->m_alpha;
+		if (parameters->m_betaAcc < ndBrainFloat(1.0e-7f))
+		{
+			parameters->m_betaAcc = ndBrainFloat(0.0f);
+		}
+		if (parameters->m_alphaAcc < ndBrainFloat(1.0e-7f))
+		{
+			parameters->m_alphaAcc = ndBrainFloat(0.0f);
+		}
+	}
+};
 
 ndBrainCpuContext::ndBrainCpuContext()
 	:ndBrainContext()

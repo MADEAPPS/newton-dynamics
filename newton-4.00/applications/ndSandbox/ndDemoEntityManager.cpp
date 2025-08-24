@@ -309,8 +309,8 @@ static void SimpleRegressionBrainStressTest()
 	shuffleBuffer.SetCount(nunberOfSamples);
 	for (ndInt32 i = 0; i < nunberOfSamples; ++i)
 	{
-		ndBrainFloat arg = 2.0f * ndPi * ndBrainFloat(i) / sinWavePeriod;
-		ndBrainFloat a = ndSin(arg);
+		ndBrainFloat arg = ndBrainFloat (2.0f * ndPi * ndBrainFloat(i) / sinWavePeriod);
+		ndBrainFloat a = ndBrainFloat(ndSin(arg));
 		truth[i] = a;
 		data[i] = arg;
 		shuffleBuffer[i] = ndUnsigned32(i);

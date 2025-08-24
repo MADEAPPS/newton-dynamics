@@ -239,7 +239,7 @@ typedef double ndFloat64;
 #define ndDegreeToRad	ndFloat32 (ndPi / 180.0f)
 #define ndRadToDegree  	ndFloat32 (180.0f / ndPi)
 
-extern D_CORE_API ndFloat32 ndExp_VS__Fix(ndFloat32 x);
+extern D_CORE_API ndFloat32 ndExp_VS__Fix(ndFloat64 x);
 
 #define ndSqrt(x)		ndFloat32 (sqrt(x))	
 #define ndSin(x)		ndFloat32 (sin(x))

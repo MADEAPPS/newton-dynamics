@@ -205,7 +205,7 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 
 	ndSharedPtr<ndBrainAgentOffPolicyGradient_Agent> m_agent;
 	std::mt19937 m_randomGenerator;
-	std::uniform_real_distribution<ndFloat32> m_uniformDistribution;
+	std::uniform_real_distribution<ndReal> m_uniformDistribution;
 
 	ndSharedPtr<ndBrainFloatBuffer> m_uniformRandom;
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchMean;

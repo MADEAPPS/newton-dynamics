@@ -293,7 +293,7 @@ void ndBrainAgentContinuePolicyGradient_Agent::SampleActions(ndBrainVector& acti
 	}
 	else
 	{
-		ndFloat32 sigma = m_owner->m_parameters.m_actionFixSigma;
+		ndBrainFloat sigma = m_owner->m_parameters.m_actionFixSigma;
 		const ndInt32 size = ndInt32(actions.GetCount());
 		for (ndInt32 i = size - 1; i >= 0; --i)
 		{
@@ -491,7 +491,7 @@ ndBrainFloat ndBrainAgentContinuePolicyGradient_TrainerMaster::CalculatePolicyPr
 {
 	ndBrainFloat z2 = ndBrainFloat(0.0f);
 	ndBrainFloat invSigma2Det = ndBrainFloat(1.0f);
-	ndBrainFloat invSqrtPi = ndBrainFloat(1.0f) / ndSqrt(2.0f * ndPi);
+	ndBrainFloat invSqrtPi = ndBrainFloat(1.0f) / ndBrainFloat(ndSqrt(2.0f * ndPi));
 
 	ndBrainFloat prob = 1.0f;
 	if (m_parameters.m_usePerActionSigmas)

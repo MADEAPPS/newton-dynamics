@@ -585,7 +585,7 @@ namespace ndQuadruped_ppo
 			//ndFloat32 tiltReward_z = CalculateSparceTiltReward(upDir.m_z);
 			//return tiltReward_x * 0.4f + tiltReward_z * 0.4f + slideReward * 0.2f;
 			ndFloat32 tiltReward = CalculateSparceTiltReward(upDir.m_y);
-			return tiltReward * 0.7f + slideReward * 0.3f;
+			return ndBrainFloat(tiltReward * 0.7f + slideReward * 0.3f);
 		}
 
 		//#pragma optimize( "", off )
@@ -655,8 +655,8 @@ namespace ndQuadruped_ppo
 				observations[base + m_contactDistance] = ndBrainFloat(floorDistanceParameter);
 			}
 
-			observations[m_observationSize * m_legs.GetCount() + 0] = m_comX / D_CYCLE_STRIDE_X;
-			observations[m_observationSize * m_legs.GetCount() + 1] = m_comZ / D_CYCLE_STRIDE_Z;
+			observations[m_observationSize * m_legs.GetCount() + 0] = ndBrainFloat(m_comX / D_CYCLE_STRIDE_X);
+			observations[m_observationSize * m_legs.GetCount() + 1] = ndBrainFloat(m_comZ / D_CYCLE_STRIDE_Z);
 		}
 
 		void ApplyActions(ndBrainFloat* const actions)

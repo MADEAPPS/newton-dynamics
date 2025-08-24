@@ -69,10 +69,10 @@ ndBrainLayer* ndBrainAgentPolicyGradientActivation::Load(const ndBrainLoad* cons
 	ndInt32 inputs = loadSave->ReadInt();
 
 	loadSave->ReadString(buffer);
-	ndBrainFloat minLogVariance = loadSave->ReadFloat();
+	ndBrainFloat minLogVariance = ndBrainFloat(loadSave->ReadFloat());
 
 	loadSave->ReadString(buffer);
-	ndBrainFloat maxLogVariance = loadSave->ReadFloat();
+	ndBrainFloat maxLogVariance = ndBrainFloat(loadSave->ReadFloat());
 
 	ndBrainAgentPolicyGradientActivation* const layer = new ndBrainAgentPolicyGradientActivation(inputs, minLogVariance, maxLogVariance);
 	loadSave->ReadString(buffer);
@@ -107,7 +107,7 @@ void ndBrainAgentPolicyGradientActivation::MakePrediction(const ndBrainVector& i
 		ndBrainFloat value = ndClamp(input[i], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
 		ndBrainFloat out0 = ndBrainFloat(ndTanh(value));
 		ndBrainFloat out1 = m_logVarianceBias + out0 * m_logVarianceSlope;
-		ndBrainFloat out2 = ndExp(out1);
+		ndBrainFloat out2 = ndBrainFloat(ndExp(out1));
 		output[i] = (i < size / 2) ? out0 : out2;
 	}
 }
@@ -125,7 +125,7 @@ void ndBrainAgentPolicyGradientActivation::InputDerivative(const ndBrainVector& 
 		ndBrainFloat x2 = m_logVarianceBias + m_logVarianceSlope * x1;
 
 		ndBrainFloat meanGrad = ndBrainFloat(1.0f) - out * out;
-		ndBrainFloat sigmaGrad = m_logVarianceSlope * ndExp(x2) * (ndBrainFloat(1.0f) - x1 * x1);
+		ndBrainFloat sigmaGrad = m_logVarianceSlope * ndBrainFloat(ndExp(x2)) * (ndBrainFloat(1.0f) - x1 * x1);
 
 		ndBrainFloat blend = (i < size / 2) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
 		ndBrainFloat gradiend = meanGrad * blend + sigmaGrad * (ndBrainFloat(1.0f) - blend);
@@ -158,7 +158,7 @@ void ndBrainAgentPolicyGradientActivation::FeedForward(const ndBrainLayerFeedFor
 		ndBrainFloat value = ndClamp(input[i], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
 		ndBrainFloat out0 = ndBrainFloat(ndTanh(value));
 		ndBrainFloat out1 = m_logVarianceBias + out0 * m_logVarianceSlope;
-		ndBrainFloat out2 = ndExp(out1);
+		ndBrainFloat out2 = ndBrainFloat(ndExp(out1));
 		output[i] = (i < size / 2) ? out0 : out2;
 	}
 }
@@ -199,7 +199,7 @@ void ndBrainAgentPolicyGradientActivation::BackPropagate(const ndBrainLayerBackP
 		ndBrainFloat x2 = m_logVarianceBias + m_logVarianceSlope * x1;
 
 		ndBrainFloat meanGrad = ndBrainFloat(1.0f) - out * out;
-		ndBrainFloat sigmaGrad = m_logVarianceSlope * ndExp(x2) * (ndBrainFloat(1.0f) - x1 * x1);
+		ndBrainFloat sigmaGrad = m_logVarianceSlope * ndBrainFloat(ndExp(x2)) * (ndBrainFloat(1.0f) - x1 * x1);
 
 		ndBrainFloat blend = (i < size / 2) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
 		ndBrainFloat gradiend = meanGrad * blend + sigmaGrad * (ndBrainFloat(1.0f) - blend);

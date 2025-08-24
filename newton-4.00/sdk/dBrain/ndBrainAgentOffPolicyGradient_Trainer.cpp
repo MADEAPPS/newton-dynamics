@@ -481,7 +481,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::BuildPolicyClass()
 		layers.PushBack(new ND_HIDEN_LAYERS_ACTIVATION(layers[layers.GetCount() - 1]->GetOutputSize()));
 	}
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_numberOfActions * 2));
-	layers.PushBack(new ndBrainAgentPolicyGradientActivation(layers[layers.GetCount() - 1]->GetOutputSize(), ndLog(ND_POLICY_MIN_SIGMA), ndLog(ND_POLICY_MAX_SIGMA)));
+	layers.PushBack(new ndBrainAgentPolicyGradientActivation(layers[layers.GetCount() - 1]->GetOutputSize(), ndBrainFloat(ndLog(ND_POLICY_MIN_SIGMA)), ndBrainFloat(ndLog(ND_POLICY_MAX_SIGMA))));
 
 	ndSharedPtr<ndBrain> policy (new ndBrain);
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
@@ -571,7 +571,7 @@ ndUnsigned32 ndBrainAgentOffPolicyGradient_Trainer::GetEposideCount() const
 
 ndFloat32 ndBrainAgentOffPolicyGradient_Trainer::GetAverageScore() const
 {
-	ndBrainFloat maxScopre = ndBrainFloat(1.0f) / (ndFloat32(1.0f) - m_parameters.m_discountRewardFactor);
+	ndBrainFloat maxScopre = ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) - m_parameters.m_discountRewardFactor);
 	ndBrainFloat score = ndBrainFloat(1.0f) * m_averageExpectedRewards.GetAverage() / maxScopre;
 	return score;
 	//return m_averageExpectedRewards.GetAverage();
@@ -1147,7 +1147,9 @@ void ndBrainAgentOffPolicyGradient_Trainer::OptimizeStep()
 		m_entropyTemperature = m_parameters.m_entropyMinTemperature + param * (m_parameters.m_entropyMaxTemperature - m_parameters.m_entropyMinTemperature);
 
 		// linearly anneal lear rate;
-		m_learnRate = m_parameters.m_learnRate * param;
+		ndBrainFloat maxRate = m_parameters.m_learnRate;
+		ndBrainFloat minRate = ndMax(maxRate * ndBrainFloat(0.1f), ndBrainFloat(1.0e-6f));
+		m_learnRate = minRate + param * (maxRate - minRate);
 
 		Optimize();
 		m_frameCount++;

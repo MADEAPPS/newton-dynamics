@@ -76,7 +76,7 @@ void ndBrainLayerLinearWithDropOut::ApplyDropOut(ndFloat32 rate)
 	}
 	
 	ndAssert(activeCount > 0);
-	ndFloat32 dropoutScale = ndBrainFloat(m_dropOut.GetCount()) / ndBrainFloat(activeCount);
+	ndBrainFloat dropoutScale = ndBrainFloat(m_dropOut.GetCount()) / ndBrainFloat(activeCount);
 	m_dropOut.Scale(dropoutScale);
 }
 

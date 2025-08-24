@@ -434,7 +434,6 @@ void ndBrainGpuContext::SetLeanRateCommandBuffers(ndBrainOptimizerAdam& optimize
 		{
 			descriptor.m_kernel = descriptor.m_context->GetAsGpuContext()->m_brainAdamLassoOptimizerUpdate;
 		}
-		//m_adamOptimizerCommand = ndSharedPtr<ndBrainBufferCommand>(new ndBrainGpuCommand(descriptor));
 		optimizer.m_commands.Append(ndSharedPtr<ndBrainBufferCommand>(new ndBrainGpuCommand(descriptor)));
 	}
 
@@ -451,7 +450,6 @@ void ndBrainGpuContext::SetLeanRateCommandBuffers(ndBrainOptimizerAdam& optimize
 		descriptor.PushBack(*adamUniformbuffer);
 
 		descriptor.m_kernel = descriptor.m_context->GetAsGpuContext()->m_brainAdamMomentumUpdate;
-		//m_adamMomentumUpdateCommand = ndSharedPtr<ndBrainBufferCommand>(new ndBrainGpuCommand(descriptor));
 		optimizer.m_commands.Append(ndSharedPtr<ndBrainBufferCommand>(new ndBrainGpuCommand(descriptor)));
 	}
 }

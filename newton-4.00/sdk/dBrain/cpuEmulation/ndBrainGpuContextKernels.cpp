@@ -260,14 +260,14 @@ class brainLayerTanhActivation : public ndBrainKernel
             {
                 ndBrainFloat inputValue = inputOutputData[inputOffset + i + itemId];
                 ndBrainFloat outputValue = (inputValue > ndBrainFloat(-30.0f)) ? ((inputValue < ndBrainFloat(30.0f)) ? inputValue : ndBrainFloat(30.0f)) : ndBrainFloat(-30.0f);
-                inputOutputData[outputOffset + i + itemId] = ndTanh(outputValue);
+                inputOutputData[outputOffset + i + itemId] = ndBrainFloat(ndTanh(outputValue));
             }
         }
         for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
         {
             ndBrainFloat inputValue = inputOutputData[inputOffset + modWorkGroupSize + itemId];
             ndBrainFloat outputValue = (inputValue > ndBrainFloat (-30.0f)) ? ((inputValue < ndBrainFloat(30.0f)) ? inputValue : ndBrainFloat(30.0f)) : ndBrainFloat (-30.0f);
-            inputOutputData[outputOffset + modWorkGroupSize + itemId] = ndTanh(outputValue);
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = ndBrainFloat(ndTanh(outputValue));
         }
     }
 };
@@ -410,7 +410,7 @@ class brainLayerPolicyGradientActivation : public ndBrainKernel
                 ndBrainFloat value = ndClamp(inputOutputData[inputOffset + i + itemId], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
                 ndBrainFloat out0 = ndBrainFloat(ndTanh(value));
                 ndBrainFloat out1 = logVarianceBias + out0 * logVarianceSlope;
-                ndBrainFloat out2 = ndExp(out1);
+                ndBrainFloat out2 = ndBrainFloat(ndExp(out1));
                 inputOutputData[outputOffset + i + itemId] = ((i + itemId) < halfSize) ? out0 : out2;
             }
         }
@@ -420,7 +420,7 @@ class brainLayerPolicyGradientActivation : public ndBrainKernel
             ndBrainFloat value = ndClamp(inputOutputData[inputOffset + modWorkGroupSize + itemId], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
             ndBrainFloat out0 = ndBrainFloat(ndTanh(value));
             ndBrainFloat out1 = logVarianceBias + out0 * logVarianceSlope;
-            ndBrainFloat out2 = ndExp(out1);
+            ndBrainFloat out2 = ndBrainFloat(ndExp(out1));
             inputOutputData[outputOffset + modWorkGroupSize + itemId] = ((modWorkGroupSize + itemId) < halfSize) ? out0 : out2;
         }
     }
@@ -509,7 +509,7 @@ class brainLayerSoftmaxActivation : public ndBrainKernel
             for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
             {
                 ndBrainFloat inputValue = tmpInputBuffer[i + itemId] - maxArgReg[itemId];
-                ndBrainFloat outputValue = ndExp(inputValue);
+                ndBrainFloat outputValue = ndBrainFloat(ndExp(inputValue));
                 sumArgReg[itemId] += outputValue;
                 tmpInputBuffer[i + itemId] = outputValue;
             }
@@ -517,7 +517,7 @@ class brainLayerSoftmaxActivation : public ndBrainKernel
         for (ndInt32 itemId = 0; itemId < workGroupSizeReminder; ++itemId)
         {
             ndBrainFloat inputValue = tmpInputBuffer[modWorkGroupSize + itemId] - maxArgReg[itemId];
-            ndBrainFloat outputValue = ndExp(inputValue);
+            ndBrainFloat outputValue = ndBrainFloat(ndExp(inputValue));
             sumArgReg[itemId] += outputValue;
             tmpInputBuffer[modWorkGroupSize + itemId] = outputValue;
         }
@@ -1043,7 +1043,7 @@ class brainLayerBrainPolicyGradientBackPropagate : public ndBrainKernel
                 ndBrainFloat x2 = logVarianceBias + logVarianceSlope * x1;
 
                 ndBrainFloat meanGrad = ndBrainFloat(1.0f) - out * out;
-                ndBrainFloat sigmaGrad = logVarianceSlope * ndExp(x2) * (ndBrainFloat(1.0f) - x1 * x1);
+                ndBrainFloat sigmaGrad = logVarianceSlope * ndBrainFloat(ndExp(x2)) * (ndBrainFloat(1.0f) - x1 * x1);
 
                 ndBrainFloat blend = ((i + itemId) < halfSize) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
                 ndBrainFloat gradiend = meanGrad * blend + sigmaGrad * (ndBrainFloat(1.0f) - blend);
@@ -1060,7 +1060,7 @@ class brainLayerBrainPolicyGradientBackPropagate : public ndBrainKernel
             ndBrainFloat x2 = logVarianceBias + logVarianceSlope * x1;
 
             ndBrainFloat meanGrad = ndBrainFloat(1.0f) - out * out;
-            ndBrainFloat sigmaGrad = logVarianceSlope * ndExp(x2) * (ndBrainFloat(1.0f) - x1 * x1);
+            ndBrainFloat sigmaGrad = logVarianceSlope * ndBrainFloat(ndExp(x2)) * (ndBrainFloat(1.0f) - x1 * x1);
 
             ndBrainFloat blend = ((modWorkGroupSize + itemId) < halfSize) ? ndBrainFloat(1.0f) : ndBrainFloat(0.0f);
             ndBrainFloat gradiend = meanGrad * blend + sigmaGrad * (ndBrainFloat(1.0f) - blend);

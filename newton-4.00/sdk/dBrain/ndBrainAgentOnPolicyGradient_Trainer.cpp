@@ -471,7 +471,7 @@ void ndBrainAgentOnPolicyGradient_Trainer::BuildPolicyClass()
 		layers.PushBack(new ND_HIDEN_LAYERS_ACTIVATION(layers[layers.GetCount() - 1]->GetOutputSize()));
 	}
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_numberOfActions * 2));
-	layers.PushBack(new ndBrainAgentPolicyGradientActivation(layers[layers.GetCount() - 1]->GetOutputSize(), ndLog(ND_POLICY_MIN_SIGMA), ndLog(ND_POLICY_MAX_SIGMA)));
+	layers.PushBack(new ndBrainAgentPolicyGradientActivation(layers[layers.GetCount() - 1]->GetOutputSize(), ndBrainFloat(ndLog(ND_POLICY_MIN_SIGMA)), ndBrainFloat(ndLog(ND_POLICY_MAX_SIGMA))));
 
 	ndSharedPtr<ndBrain> policy (new ndBrain);
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
@@ -543,7 +543,7 @@ ndUnsigned32 ndBrainAgentOnPolicyGradient_Trainer::GetEposideCount() const
 
 ndFloat32 ndBrainAgentOnPolicyGradient_Trainer::GetAverageScore() const
 {
-	ndBrainFloat maxScopre = ndBrainFloat(1.0f) / (ndFloat32(1.0f) - m_parameters.m_discountRewardFactor);
+	ndBrainFloat maxScopre = ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) - m_parameters.m_discountRewardFactor);
 	ndBrainFloat score = ndBrainFloat(1.0f) * m_averageExpectedRewards.GetAverage() / maxScopre;
 	return score;
 }
