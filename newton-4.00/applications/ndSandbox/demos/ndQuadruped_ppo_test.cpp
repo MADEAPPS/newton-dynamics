@@ -572,13 +572,16 @@ namespace ndQuadruped_ppo
 				return SparseReward(angle, D_TILT_MAX_TILL_ANGLE);
 			};
 
+			const ndVector globalUpDir(0.0f, 1.0f, 0.0f, 0.0f);
 			const ndModelArticulation::ndNode* const rootNode = GetModel()->GetAsModelArticulation()->GetRoot();
-			ndMatrix referenceFrame(rootNode->m_body->GetMatrix());
-			referenceFrame.m_up = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
+			const ndMatrix rootMatrx(rootNode->m_body->GetMatrix());
+
+			ndMatrix referenceFrame(rootMatrx);
+			referenceFrame.m_up = globalUpDir;
 			referenceFrame.m_right = referenceFrame.m_front.CrossProduct(referenceFrame.m_up).Normalize();
 			referenceFrame.m_front = referenceFrame.m_up.CrossProduct(referenceFrame.m_right).Normalize();
 
-			const ndVector upDir (referenceFrame.UnrotateVector(rootNode->m_body->GetMatrix().m_up));
+			const ndVector upDir(referenceFrame.UnrotateVector(rootMatrx.m_up));
 
 			ndFloat32 slideReward = ContacSlidingReward(contacSlideSpeed);
 			//ndFloat32 tiltReward_x = CalculateSparceTiltReward(upDir.m_x);

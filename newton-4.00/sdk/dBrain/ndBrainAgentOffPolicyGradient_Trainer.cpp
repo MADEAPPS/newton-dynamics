@@ -29,6 +29,7 @@
 #include "ndBrainLayerLinear.h"
 #include "ndBrainFloatBuffer.h"
 #include "ndBrainIntegerBuffer.h"
+#include "ndBrainOptimizerAdam.h"
 #include "ndBrainLayerActivationRelu.h"
 #include "ndBrainLayerActivationTanh.h"
 #include "ndBrainLossLeastSquaredError.h"
@@ -427,34 +428,36 @@ void ndBrainAgentOffPolicyGradient_Trainer::SaveState(const char* const baseName
 	}
 }
 
-void ndBrainAgentOffPolicyGradient_Trainer::RecoverState(const char* baseName)
+//void ndBrainAgentOffPolicyGradient_Trainer::RecoverState(const char* const baseName)
+void ndBrainAgentOffPolicyGradient_Trainer::RecoverState(const char*)
 {
-	m_context->SyncBufferCommandQueue();
-
-	char fileName[256];
-	snprintf(fileName, sizeof (fileName), "%s_policy.dnn", baseName);
-	ndSharedPtr<ndBrain> policy(ndBrainLoad::Load(fileName));
-	ndTrainerDescriptor descriptor(policy, m_context, m_parameters.m_miniBatchSize);
-	descriptor.m_regularizer = m_parameters.m_policyRegularizer;
-	descriptor.m_regularizerType = m_parameters.m_policyRegularizerType;
-	m_policyTrainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor));
-
-	for (ndInt32 j = 0; j < ndInt32(sizeof(m_referenceCriticTrainer) / sizeof(m_referenceCriticTrainer[0])); ++j)
-	{
-		snprintf(fileName, sizeof (fileName), "%s_critic_%d.dnn", baseName, j);
-		ndSharedPtr<ndBrain> critic(ndBrainLoad::Load(fileName));
-		ndTrainerDescriptor descriptorDescriptor(critic, m_context, m_parameters.m_miniBatchSize);
-		descriptorDescriptor.m_regularizer = m_parameters.m_criticRegularizer;
-		descriptorDescriptor.m_regularizerType = m_parameters.m_criticRegularizerType;
-		m_criticTrainer[j] = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptorDescriptor));
-
-		snprintf(fileName, sizeof (fileName), "%s_referenceCritic_%d.dnn", baseName, j);
-		ndSharedPtr<ndBrain> referenceCritic(ndBrainLoad::Load(fileName));
-		ndTrainerDescriptor referenceCriticDescriptor(referenceCritic, m_context, m_parameters.m_miniBatchSize);
-		referenceCriticDescriptor.m_regularizer = m_parameters.m_criticRegularizer;
-		referenceCriticDescriptor.m_regularizerType = m_parameters.m_criticRegularizerType;
-		m_referenceCriticTrainer[j] = ndSharedPtr<ndBrainTrainerInference>(new ndBrainTrainerInference(referenceCriticDescriptor));
-	}
+	ndAssert(0);
+	//m_context->SyncBufferCommandQueue();
+	//
+	//char fileName[256];
+	//snprintf(fileName, sizeof (fileName), "%s_policy.dnn", baseName);
+	//ndSharedPtr<ndBrain> policy(ndBrainLoad::Load(fileName));
+	//ndTrainerDescriptor descriptor(policy, m_context, m_parameters.m_miniBatchSize);
+	//descriptor.m_regularizer = m_parameters.m_policyRegularizer;
+	//descriptor.m_regularizerType = m_parameters.m_policyRegularizerType;
+	//m_policyTrainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor));
+	//
+	//for (ndInt32 j = 0; j < ndInt32(sizeof(m_referenceCriticTrainer) / sizeof(m_referenceCriticTrainer[0])); ++j)
+	//{
+	//	snprintf(fileName, sizeof (fileName), "%s_critic_%d.dnn", baseName, j);
+	//	ndSharedPtr<ndBrain> critic(ndBrainLoad::Load(fileName));
+	//	ndTrainerDescriptor descriptorDescriptor(critic, m_context, m_parameters.m_miniBatchSize);
+	//	descriptorDescriptor.m_regularizer = m_parameters.m_criticRegularizer;
+	//	descriptorDescriptor.m_regularizerType = m_parameters.m_criticRegularizerType;
+	//	m_criticTrainer[j] = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptorDescriptor));
+	//
+	//	snprintf(fileName, sizeof (fileName), "%s_referenceCritic_%d.dnn", baseName, j);
+	//	ndSharedPtr<ndBrain> referenceCritic(ndBrainLoad::Load(fileName));
+	//	ndTrainerDescriptor referenceCriticDescriptor(referenceCritic, m_context, m_parameters.m_miniBatchSize);
+	//	referenceCriticDescriptor.m_regularizer = m_parameters.m_criticRegularizer;
+	//	referenceCriticDescriptor.m_regularizerType = m_parameters.m_criticRegularizerType;
+	//	m_referenceCriticTrainer[j] = ndSharedPtr<ndBrainTrainerInference>(new ndBrainTrainerInference(referenceCriticDescriptor));
+	//}
 }
 
 const ndString& ndBrainAgentOffPolicyGradient_Trainer::GetName() const
@@ -493,7 +496,11 @@ void ndBrainAgentOffPolicyGradient_Trainer::BuildPolicyClass()
 	ndTrainerDescriptor descriptor(policy, m_context, m_parameters.m_miniBatchSize);
 	descriptor.m_regularizer = m_parameters.m_policyRegularizer;
 	descriptor.m_regularizerType = m_parameters.m_policyRegularizerType;
-	m_policyTrainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor));
+
+	ndSharedPtr<ndBrainOptimizer> optimizer (new ndBrainOptimizerAdam(m_context));
+	optimizer->SetRegularizer(m_parameters.m_policyRegularizer);
+	optimizer->SetRegularizerType(m_parameters.m_policyRegularizerType);
+	m_policyTrainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor, optimizer));
 }
 
 void ndBrainAgentOffPolicyGradient_Trainer::BuildCriticClass()
@@ -545,7 +552,11 @@ void ndBrainAgentOffPolicyGradient_Trainer::BuildCriticClass()
 		ndTrainerDescriptor descriptor(critic, m_context, m_parameters.m_miniBatchSize);
 		descriptor.m_regularizer = m_parameters.m_criticRegularizer;
 		descriptor.m_regularizerType = m_parameters.m_criticRegularizerType;
-		m_criticTrainer[j] = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor));
+
+		ndSharedPtr<ndBrainOptimizer> optimizer(new ndBrainOptimizerAdam(m_context));
+		optimizer->SetRegularizer(m_parameters.m_criticRegularizer);
+		optimizer->SetRegularizerType(m_parameters.m_criticRegularizerType);
+		m_criticTrainer[j] = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor, optimizer));
 	}
 }
 

@@ -163,7 +163,7 @@ class mnistSupervisedTrainer
 		descriptor.m_brain = brain;
 		descriptor.m_context = context;
 		descriptor.m_minibatchSize = m_miniBatchSize;
-		m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor));
+		m_trainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor, ndSharedPtr<ndBrainOptimizer>(new ndBrainOptimizerAdam(context))));
 	}
 
 	ndInt32 ValidateData(ndBrainMatrix* const testLabels, const ndSharedPtr<ndBrainFloatBuffer>& data)

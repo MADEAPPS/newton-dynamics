@@ -48,16 +48,14 @@ class ndBrainOptimizer : public ndClassAlloc
 	void SetRegularizerType(ndRegularizerType type);
 
 	virtual void ApplyLearnRate(ndBrainFloat) { ndAssert(0); }
-	virtual void Init(ndInt32 parametersBufferSizeInFloats) = 0;
+	virtual void Init(ndInt32, ndBrainFloatBuffer&, ndBrainFloatBuffer&) = 0;
 
 	protected:
 	ndSharedPtr<ndBrainContext> m_context;
-	ndBrainFloat m_learnRate;
 	ndBrainFloat m_weighDecayRegularizer;
 	ndRegularizerType m_regularizerType;
 	ndList<ndSharedPtr<ndBrainBufferCommand>> m_commands;
 };
-
 
 #endif 
 

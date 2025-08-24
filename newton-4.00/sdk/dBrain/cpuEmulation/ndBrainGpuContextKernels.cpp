@@ -1149,7 +1149,8 @@ class brainAdamUpdateRidgeRegularizer : public ndBrainKernel
         ndBrainOptimizerAdam::ndCommandSharedInfo* const parameters = (ndBrainOptimizerAdam::ndCommandSharedInfo*)buffer0->GetGpuBuffer()->GetPtr();
         
         ndBrainFloat descendRate = - *buffer5;
-        ndBrainFloat regularizer = -parameters->m_decayRegularizer;
+        //ndBrainFloat regularizer = -parameters->m_decayRegularizer;
+        ndBrainFloat regularizer = parameters->m_decayRegularizer;
         
         ndInt64 start = groupId * ndInt64(workGroupSize);
         ndBrainFloat miniBatchWeight = parameters->m_minibathScale;

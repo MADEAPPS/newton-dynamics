@@ -346,33 +346,34 @@ static void SimpleRegressionBrainStressTest()
 	}
 	brain->InitWeights();
 
-	ndSharedPtr<ndBrainTrainer> trainer(new ndBrainTrainer(descriptor));
+	ndBrainOptimizerAdam::ndCommandSharedInfo optimizeInfo;
+	ndSharedPtr<ndBrainTrainer> trainer(new ndBrainTrainer(descriptor, ndSharedPtr<ndBrainOptimizer>(new ndBrainOptimizerAdam(context))));
 	ndBrainFloatBuffer* const minibatchInputBuffer = trainer->GetInputBuffer();
 	ndBrainFloatBuffer* const minibatchOutpuBuffer = trainer->GetOuputBuffer();
 	ndBrainFloatBuffer* const minibatchInputGradientBuffer = trainer->GetInputGradientBuffer();
 	ndBrainFloatBuffer* const minibatchOutpuGradientBuffer = trainer->GetOuputGradientBuffer();
-
+	
 	ndBrainFloatBuffer trainingData(*context, data);
 	ndBrainIntegerBuffer indirectMiniBatch(*context, minibatchSize);
-
+	
 	ndInt32 batchesCount = nunberOfSamples / minibatchSize;
 	ndInt32 batchesSize = batchesCount * minibatchSize;
 	size_t strideInBytes = size_t(1 * sizeof(ndReal));
-
+	
 	ndCopyBufferCommandInfo copyBufferInfo;
 	copyBufferInfo.m_dstOffsetInByte = 0;
 	copyBufferInfo.m_srcOffsetInByte = 0;
 	copyBufferInfo.m_strideInByte = ndInt32(strideInBytes);
 	copyBufferInfo.m_srcStrideInByte = ndInt32(strideInBytes);
 	copyBufferInfo.m_dstStrideInByte = ndInt32(strideInBytes);
-
+	
 	ndBrainVector miniBatchOutput;
 	ndBrainVector miniBatchOutputGradients;
 	ndBrainLossLeastSquaredError loss(1);
 	ndBrainVector miniBatchInputGradients;
-
+	
 	miniBatchOutputGradients.SetCount(minibatchSize);
-
+	
 	ndUnsigned64 time = ndGetTimeInMicroseconds();
 	for (ndInt32 epoch = 0; epoch < numberOfEpochs; ++epoch)
 	{
@@ -382,10 +383,10 @@ static void SimpleRegressionBrainStressTest()
 			indirectMiniBatch.MemoryToDevice(0, minibatchSize * sizeof(ndUnsigned32), &shuffleBuffer[batchStart]);
 			minibatchInputBuffer->CopyBufferIndirect(copyBufferInfo, indirectMiniBatch, trainingData);
 			trainer->MakePrediction();
-
+	
 			context->SyncBufferCommandQueue();
 			minibatchOutpuBuffer->VectorFromDevice(miniBatchOutput);
-
+	
 			for (ndInt32 i = 0; i < minibatchSize; ++i)
 			{
 				ndUnsigned32 index = shuffleBuffer[batchStart + i];
@@ -399,13 +400,13 @@ static void SimpleRegressionBrainStressTest()
 			trainer->BackPropagate();
 			trainer->ApplyLearnRate(ndBrainFloat(1.0e-4f));
 			context->SyncBufferCommandQueue();
-
+	
 			minibatchInputGradientBuffer->VectorFromDevice(miniBatchInputGradients);
 			epoch *= 1;
 		}
 	}
 	time = ndGetTimeInMicroseconds() - time;
-
+	
 	ndExpandTraceMessage("Stress test Regresion\n");
 	ndExpandTraceMessage(" training time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
 }
