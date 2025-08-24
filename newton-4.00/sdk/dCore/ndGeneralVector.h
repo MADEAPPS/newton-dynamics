@@ -204,8 +204,8 @@ void ndBlend(ndInt32 size, T* const X, const T* const mask, T a, T b)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
-		ndFloat32 s = mask[i];
-		X[i] = a * ndFloat32 (1.0f - s) + b * s;
+		T s = mask[i];
+		X[i] = a * (T(1.0f) - s) + b * s;
 		ndAssert(ndCheckFloat(X[i]));
 	}
 }
