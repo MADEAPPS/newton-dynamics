@@ -652,15 +652,13 @@ void ndBrainGpuContext::ApplyLeanRateCommands(ndBrainBufferCommand* const comman
 
 void ndBrainGpuContext::SetLeanRateCommandBuffers(ndBrainOptimizerAdam& optimizer, ndInt32 minibatchSize, ndBrainFloatBuffer& weightsAndBiasBuffer, ndBrainFloatBuffer& weightsAndBiasGradientBuffer)
 {
-	ndInt32 sizeInFloats = ndInt32(weightsAndBiasBuffer.SizeInBytes() / sizeof(ndReal));
-	optimizer.Init(sizeInFloats);
-
 	ndBrainOptimizerAdam::ndCommandSharedInfo optimizerData(optimizer.m_parameters);
 	{
-		// add the Adam optimizer kernel here
+		// add the adam optimizer kernel here
 		optimizerData.m_minibathScale = ndBrainFloat(1.0f) / ndBrainFloat(minibatchSize);
 		ndSharedPtr<ndBrainUniformBuffer> adamUniformbuffer(new ndBrainUniformBuffer(this, sizeof(ndBrainOptimizerAdam::ndCommandSharedInfo), &optimizerData));
 
+		ndInt32 sizeInFloats = ndInt32(weightsAndBiasBuffer.SizeInBytes() / sizeof(ndReal));
 		ndBrainBufferCommandDesc descriptor(ndInt32(sizeInFloats) / ND_DEFAULT_WORKGROUP_SIZE);
 		descriptor.m_context = this;
 		descriptor.m_owner = nullptr;
@@ -686,7 +684,7 @@ void ndBrainGpuContext::SetLeanRateCommandBuffers(ndBrainOptimizerAdam& optimize
 	}
 
 	{
-		// add Adam momentum bias update
+		// add adam momentum bias update
 		ndSharedPtr<ndBrainUniformBuffer> adamUniformbuffer(new ndBrainUniformBuffer(this, sizeof(ndBrainOptimizerAdam::ndCommandSharedInfo), &optimizerData));
 
 		ndBrainBufferCommandDesc descriptor(0);

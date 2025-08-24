@@ -824,6 +824,7 @@ R""""(
 
         //float descendRate = -parameters->m_learnRate;
         float descendRate = -learnRate;
+        //float regularizer = -parameters->m_decayRegularizer;
         float regularizer = parameters->m_decayRegularizer;
 
         uint start = groupId * workGroupSize;
@@ -861,6 +862,7 @@ R""""(
 
         //float descendRate = -parameters->m_learnRate;
         float descendRate = -learnRate;
+        //float regularizer = -parameters->m_decayRegularizer;
         float regularizer = parameters->m_decayRegularizer;
 
 		//float m_beta;
