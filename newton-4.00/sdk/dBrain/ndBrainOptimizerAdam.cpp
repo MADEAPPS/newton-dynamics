@@ -36,7 +36,6 @@ ndBrainOptimizerAdam::ndBrainOptimizerAdam(const ndSharedPtr<ndBrainContext>& co
 {
 }
 
-//void ndBrainOptimizerAdam::Init(ndInt32 parametersBufferSizeInFloats)
 void ndBrainOptimizerAdam::Init(ndInt32 minibatchSize, ndBrainFloatBuffer& weightsAndBiasBuffer, ndBrainFloatBuffer& weightsAndBiasGradientBuffer)
 {
 	ndBrainVector buffer;
