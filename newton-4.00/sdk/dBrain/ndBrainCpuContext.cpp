@@ -39,9 +39,8 @@ class ndBrainAdamUpdateParametersRidge : public ndBrainBufferCommandCpu
 		ndBrainFloat* const vdw = (ndBrainFloat*)m_desc[3]->GetCpuPtr();
 		ndBrainFloat* const vdw2 = (ndBrainFloat*)m_desc[4]->GetCpuPtr();
 
-		//ndBrainFloat descendRate = -parameters->m_learnRate;
 		ndBrainFloat descendRate = -m_learnRate;
-		ndBrainFloat regularizer = -parameters->m_decayRegularizer;
+		ndBrainFloat regularizer = parameters->m_decayRegularizer;
 
 		ndInt32 start = groupId * workGroupSize;
 		ndBrainFloat miniBatchWeight = parameters->m_minibathScale;
@@ -53,7 +52,7 @@ class ndBrainAdamUpdateParametersRidge : public ndBrainBufferCommandCpu
 			ndBrainFloat a = vdw[start + itemId] * parameters->m_alpha + temp * (ndBrainFloat(1.0f) - parameters->m_alpha);
 			vdw[start + itemId] = a;
 
-			// caluate RMS
+			// calcuate RMS
 			ndBrainFloat b = vdw2[start + itemId] * parameters->m_beta + temp * temp * (ndBrainFloat(1.0f) - parameters->m_beta);
 			vdw2[start + itemId] = b;
 

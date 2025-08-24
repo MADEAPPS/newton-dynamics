@@ -824,7 +824,7 @@ R""""(
 
         //float descendRate = -parameters->m_learnRate;
         float descendRate = -learnRate;
-        float regularizer = -parameters->m_decayRegularizer;
+        float regularizer = parameters->m_decayRegularizer;
 
         uint start = groupId * workGroupSize;
         float miniBatchWeight = parameters->m_minibathScale;
@@ -861,7 +861,7 @@ R""""(
 
         //float descendRate = -parameters->m_learnRate;
         float descendRate = -learnRate;
-        float regularizer = -parameters->m_decayRegularizer;
+        float regularizer = parameters->m_decayRegularizer;
 
 		//float m_beta;
 		//float m_alpha;
