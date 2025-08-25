@@ -1090,7 +1090,7 @@ class brainAdamMomentumUpdate : public ndBrainKernel
     {
     }
 
-    //void Execute(ndInt32 groupId, ndInt32 workGroupSize)
+    #pragma optimize( "", off )
     void Execute(ndInt32, ndInt32)
     {
         ndBrainUniformBuffer* const buffer0 = (ndBrainUniformBuffer*)m_parameters[0];
@@ -1106,6 +1106,9 @@ class brainAdamMomentumUpdate : public ndBrainKernel
         {
             parameters->m_alphaAcc = ndBrainFloat(0.0f);
         }
+
+        parameters->m_invBeta = (ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) - parameters->m_betaAcc));
+        parameters->m_invAlpha = (ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) - parameters->m_alphaAcc));
     }
 };
 
@@ -1133,6 +1136,7 @@ class brainAdamUpdateRidgeRegularizer : public ndBrainKernel
     {
     }
 
+    #pragma optimize( "", off )
     void Execute(ndInt32 groupId, ndInt32 workGroupSize)
     {
         ndBrainFloat* const buffer5 = (ndBrainFloat*)m_parameters[5];
@@ -1149,8 +1153,7 @@ class brainAdamUpdateRidgeRegularizer : public ndBrainKernel
         ndBrainOptimizerAdam::ndCommandSharedInfo* const parameters = (ndBrainOptimizerAdam::ndCommandSharedInfo*)buffer0->GetGpuBuffer()->GetPtr();
         
         ndBrainFloat descendRate = - *buffer5;
-        //ndBrainFloat regularizer = -parameters->m_decayRegularizer;
-        ndBrainFloat regularizer = parameters->m_decayRegularizer;
+        ndBrainFloat regularizer = -parameters->m_decayRegularizer;
         
         ndInt64 start = groupId * ndInt64(workGroupSize);
         ndBrainFloat miniBatchWeight = parameters->m_minibathScale;

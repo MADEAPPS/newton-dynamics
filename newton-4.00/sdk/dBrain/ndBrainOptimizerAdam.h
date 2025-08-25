@@ -40,8 +40,8 @@ class ndBrainOptimizerAdam : public ndBrainOptimizer
 			,m_epsilon(ndBrainFloat(1.0e-6f))
 			,m_betaAcc(m_beta)
 			,m_alphaAcc(m_alpha)
-			,m_invBeta(ndBrainFloat(1.0f)/ (ndBrainFloat(1.0f) - m_beta))
-			,m_invAlpha(ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) - m_alpha))
+			,m_invBeta(ndBrainFloat(1.0f)/ (ndBrainFloat(1.0f) - m_betaAcc))
+			,m_invAlpha(ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) - m_alphaAcc))
 			,m_minibathScale(ndBrainFloat(1.0f) / ndBrainFloat(ND_DEFAULT_WORKGROUP_SIZE))
 			,m_decayRegularizer(ndBrainFloat(1.0e-4f))
 		{

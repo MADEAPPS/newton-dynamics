@@ -799,16 +799,35 @@ R""""(
 
         if (itemId == 0)
         {
-            parameters->m_betaAcc *= parameters->m_beta;
-            parameters->m_alphaAcc *= parameters->m_alpha;
-            if (parameters->m_betaAcc < 1.0e-6f)
+            float betaAcc = parameters->m_betaAcc;
+            float alphaAcc = parameters->m_alphaAcc;
+
+            betaAcc *= parameters->m_beta;
+            alphaAcc *= parameters->m_alpha;
+            if (betaAcc < 1.0e-6)
             {
-                parameters->m_betaAcc = 0.0f;
+                betaAcc = 0.0;
             }
-            if (parameters->m_alphaAcc < 1.0e-6f)
+            if (alphaAcc < 1.0e-6)
             {
-                parameters->m_alphaAcc = 0.0f;
+                alphaAcc = 0.0f;
             }
+
+            parameters->m_betaAcc = betaAcc;
+            parameters->m_alphaAcc = alphaAcc;
+		    parameters->m_invBeta = 1.0 / (1.0 - betaAcc);
+		    parameters->m_invAlpha = 1.0 / (1.0 - alphaAcc);
+
+		    //float m_beta;
+		    //float m_alpha;
+		    //float m_epsilon;
+		    //float m_betaAcc;
+		    //float m_alphaAcc;
+		    //float m_invBeta;
+		    //float m_invAlpha;
+		    //float m_minibathScale;
+            //float m_decayRegularizer;
+            //printf ("%f %f %f %f %f %f\n", parameters->m_alpha, parameters->m_beta, parameters->m_invAlpha, parameters->m_invBeta,parameters->m_minibathScale, parameters->m_decayRegularizer);
         }
     }
 
@@ -822,10 +841,8 @@ R""""(
         uint groupId = get_group_id(0);
         uint workGroupSize = get_local_size(0);
 
-        //float descendRate = -parameters->m_learnRate;
         float descendRate = -learnRate;
-        //float regularizer = -parameters->m_decayRegularizer;
-        float regularizer = parameters->m_decayRegularizer;
+        float regularizer = -parameters->m_decayRegularizer;
 
         uint start = groupId * workGroupSize;
         float miniBatchWeight = parameters->m_minibathScale;
@@ -860,22 +877,8 @@ R""""(
         uint groupId = get_group_id(0);
         uint workGroupSize = get_local_size(0);
 
-        //float descendRate = -parameters->m_learnRate;
         float descendRate = -learnRate;
-        //float regularizer = -parameters->m_decayRegularizer;
-        float regularizer = parameters->m_decayRegularizer;
-
-		//float m_beta;
-		//float m_alpha;
-		//float m_epsilon;
-		//float m_betaAcc;
-		//float m_alphaAcc;
-		//float m_invBeta;
-		//float m_invAlpha;
-		//float m_minibathScale;
-        //float m_decayRegularizer;
-        //if (groupId == 0)
-        //printf ("%f %f %f %f %f\n", learnRate, parameters->m_beta, parameters->m_invBeta, parameters->m_minibathScale, parameters->m_decayRegularizer);
+        float regularizer = -parameters->m_decayRegularizer;
 
         long start = groupId * (long)workGroupSize;
         float miniBatchWeight = parameters->m_minibathScale;

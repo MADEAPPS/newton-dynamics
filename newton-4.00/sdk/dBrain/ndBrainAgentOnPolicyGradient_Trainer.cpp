@@ -546,8 +546,8 @@ ndUnsigned32 ndBrainAgentOnPolicyGradient_Trainer::GetEposideCount() const
 
 ndFloat32 ndBrainAgentOnPolicyGradient_Trainer::GetAverageScore() const
 {
-	ndBrainFloat maxScopre = ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) - m_parameters.m_discountRewardFactor);
-	ndBrainFloat score = ndBrainFloat(1.0f) * m_averageExpectedRewards.GetAverage() / maxScopre;
+	ndBrainFloat maxScore = ndBrainFloat(1.0f) / (ndBrainFloat(1.0f) - m_parameters.m_discountRewardFactor);
+	ndBrainFloat score = ndBrainFloat(1.0f) * m_averageExpectedRewards.GetAverage() / maxScore;
 	return score;
 }
 
