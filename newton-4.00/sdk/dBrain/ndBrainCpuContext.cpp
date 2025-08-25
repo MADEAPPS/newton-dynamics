@@ -43,8 +43,6 @@ class ndBrainAdamUpdateParametersRidge : public ndBrainBufferCommandCpu
 		ndBrainFloat descendRate = -m_learnRate;
 		ndBrainFloat regularizer = -parameters->m_decayRegularizer;
 
-		static ndFloat32 xxxxxx = 0;
-
 		ndInt32 start = groupId * workGroupSize;
 		ndBrainFloat miniBatchWeight = parameters->m_minibathScale;
 		for (ndInt32 itemId = 0; itemId < workGroupSize; ++itemId)
@@ -69,11 +67,6 @@ class ndBrainAdamUpdateParametersRidge : public ndBrainBufferCommandCpu
 
 			ndBrainFloat bias_den = ndBrainFloat(1.0f) / (ndBrainFloat(ndSqrt(vdw2Corrected)) + parameters->m_epsilon);
 			ndBrainFloat gradient = vdwCorrected * bias_den;
-
-			if (ndAbs(gradient) > xxxxxx)
-			{
-				xxxxxx = ndAbs(gradient);
-			}
 
 			ndBrainFloat weight = weightAndBiasBuffer[start + itemId];
 			gradient += weight * regularizer;
