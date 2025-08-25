@@ -29,7 +29,7 @@ class ndBrainAdamUpdateParametersRidge : public ndBrainBufferCommandCpu
 	{
 	}
 
-	#pragma optimize( "", off )
+	//#pragma optimize( "", off )
 	virtual void Execute(ndInt32 groupId) override
 	{
 		ndInt32 workGroupSize = m_desc.m_workGroupSize;
@@ -85,7 +85,7 @@ class ndBrainAdamMomentumUpdate : public ndBrainBufferCommandCpu
 	{
 	}
 
-	#pragma optimize( "", off )
+	//#pragma optimize( "", off )
 	virtual void Execute(ndInt32) override
 	{
 		ndBrainOptimizerAdam::ndCommandSharedInfo* const parameters = (ndBrainOptimizerAdam::ndCommandSharedInfo*)m_desc[0]->GetCpuPtr();
