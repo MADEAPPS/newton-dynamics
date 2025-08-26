@@ -1151,7 +1151,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::OptimizeStep()
 	SaveTrajectory();
 	if (m_startOptimization)
 	{
-		// calculate aneling paremater
+		// calculate anneal parameter
 		ndFloat64 num = ndFloat64(m_frameCount);
 		ndFloat64 den = ndFloat64(m_parameters.m_maxNumberOfTrainingSteps - m_parameters.m_replayBufferStartOptimizeSize);
 		ndBrainFloat param = ndBrainFloat((ndFloat64(1.0f) - ndClamp(num / den, ndFloat64(0.0f), ndFloat64(1.0f))));

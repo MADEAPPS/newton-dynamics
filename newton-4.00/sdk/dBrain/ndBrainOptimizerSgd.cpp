@@ -52,7 +52,7 @@ void ndBrainOptimizerSgd::Init(ndInt32 minibatchSize, ndBrainFloatBuffer& weight
 
 void ndBrainOptimizerSgd::ApplyLearnRate(ndBrainFloat learnRate)
 {
-	// TO DO remenet to add the reqularizer part
+	// TO DO remenber to add the reqularizer part
 	m_weightsAndBiasGradientBuffer->Scale(m_miniBatchScale);
 	m_vdw->Blend(*m_weightsAndBiasGradientBuffer, m_blendFactor);
 	m_weightsAndBiasGradientBuffer->Set(m_vdw);
