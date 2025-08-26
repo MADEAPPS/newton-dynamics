@@ -1129,13 +1129,6 @@ dgFloat32 dgContactSolver::RayCast (const dgVector& localP0, const dgVector& loc
 				break;
 			}
 
-			maxIterations--;
-			if (maxIterations <= 0)
-			{
-				index = -1;
-				break;
-			}
-
 			if (distance < minDist) {
 				minDist = distance;
 				cycling = -1;
@@ -1183,6 +1176,13 @@ dgFloat32 dgContactSolver::RayCast (const dgVector& localP0, const dgVector& loc
 
 			iter ++;
 		} while (iter < DG_CONNICS_CONTATS_ITERATIONS); 
+
+		maxIterations--;
+		if (maxIterations <= 0)
+		{
+			index = -1;
+			break;
+		}
 
 		dgAssert (index);
 		if (index > 0) {
