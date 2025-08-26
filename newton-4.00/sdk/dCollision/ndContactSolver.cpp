@@ -1989,6 +1989,7 @@ ndFloat32 ndContactSolver::RayCast(const ndVector& localP0, const ndVector& loca
 	m_hullDiff[0] = shape->SupportVertex(dir1) - point;
 	ndBigVector v(m_hullDiff[0]);
 	index = 1;
+	ndInt32 maxIterations = 100;
 	do 
 	{
 		ndInt32 iter = 0;
@@ -2056,6 +2057,13 @@ ndFloat32 ndContactSolver::RayCast(const ndVector& localP0, const ndVector& loca
 		} while (iter < D_CONNICS_CONTATS_ITERATIONS);
 
 		ndAssert(index);
+
+		maxIterations--;
+		if (maxIterations <= 0)
+		{
+			index = -1;
+			break;
+		}
 		if (index > 0) 
 		{
 			ndVector q(v + point);
