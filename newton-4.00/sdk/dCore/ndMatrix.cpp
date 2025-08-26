@@ -359,6 +359,8 @@ ndVector ndMatrix::EigenVectors ()
 	if (dAbs(m_front.m_z) > dFloat32(1.0e-6f)) {
 		// calculate initial guess by convert to tridiagonal matrix using householder
 		// but this fail since it changes the oder of the Eigen values and Eigen vectors
+		// this is actually a big mistake since householder transforms aren't egenvector matrics. 
+		// there are methods by using a QR or RQ, but at that poinst it seems more expensive.
 		dVector u(m_front);
 		u.m_x = dFloat32(0.0f);
 		dVector v(dVector::m_zero);
