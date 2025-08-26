@@ -28,9 +28,16 @@
 class ndBrainOptimizerSgd : public ndBrainOptimizer
 {
 	public: 
-	ndBrainOptimizerSgd();
-	virtual ~ndBrainOptimizerSgd();
-//	virtual void Update(ndBrainVector& parameters, const ndBrainVector& gradients) override;
+	ndBrainOptimizerSgd(const ndSharedPtr<ndBrainContext>& context);
+
+	virtual void ApplyLearnRate(ndBrainFloat learnRate) override;
+	virtual void Init(ndInt32 minibatchSize, ndBrainFloatBuffer& weightsAndBiasBuffer, ndBrainFloatBuffer& weightsAndBiasGradientBuffer) override;
+
+	ndSharedPtr<ndBrainFloatBuffer> m_vdw;
+	ndBrainFloatBuffer* m_weightsAndBiasBuffer;
+	ndBrainFloatBuffer* m_weightsAndBiasGradientBuffer;
+	ndBrainFloat m_blendFactor;
+	ndBrainFloat m_miniBatchScale;
 };
 
 

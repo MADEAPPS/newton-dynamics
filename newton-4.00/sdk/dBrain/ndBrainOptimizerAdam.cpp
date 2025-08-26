@@ -38,8 +38,9 @@ ndBrainOptimizerAdam::ndBrainOptimizerAdam(const ndSharedPtr<ndBrainContext>& co
 
 void ndBrainOptimizerAdam::Init(ndInt32 minibatchSize, ndBrainFloatBuffer& weightsAndBiasBuffer, ndBrainFloatBuffer& weightsAndBiasGradientBuffer)
 {
-	ndBrainVector buffer;
 	ndInt32 sizeInFloats = ndInt32 (weightsAndBiasBuffer.SizeInBytes() / sizeof(ndReal));
+
+	ndBrainVector buffer;
 	buffer.SetCount(sizeInFloats);
 	buffer.Set(ndReal(0.0f));
 	

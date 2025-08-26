@@ -23,63 +23,39 @@
 #include "ndBrain.h"
 #include "ndBrainMatrix.h"
 #include "ndBrainThreadPool.h"
+#include "ndBrainFloatBuffer.h"
 #include "ndBrainOptimizerSgd.h"
 
-ndBrainOptimizerSgd::ndBrainOptimizerSgd()
-	:ndBrainOptimizer(ndSharedPtr<ndBrainContext>())
+ndBrainOptimizerSgd::ndBrainOptimizerSgd(const ndSharedPtr<ndBrainContext>& context)
+	:ndBrainOptimizer(context)
+	,m_vdw()
+	,m_weightsAndBiasBuffer(nullptr)
+	,m_weightsAndBiasGradientBuffer(nullptr)
+	,m_blendFactor(ndBrainFloat(1.0f - 0.99f))
+	,m_miniBatchScale(ndBrainFloat(1.0f))
 {
 }
 
-ndBrainOptimizerSgd::~ndBrainOptimizerSgd()
+void ndBrainOptimizerSgd::Init(ndInt32 minibatchSize, ndBrainFloatBuffer& weightsAndBiasBuffer, ndBrainFloatBuffer& weightsAndBiasGradientBuffer)
 {
+	ndInt32 sizeInFloats = ndInt32(weightsAndBiasBuffer.SizeInBytes() / sizeof(ndReal));
+	m_miniBatchScale = ndBrainFloat(1.0f) / ndBrainFloat(minibatchSize);
+
+	ndBrainVector buffer;
+	buffer.SetCount(sizeInFloats);
+	buffer.Set(ndReal(0.0f));
+	m_vdw = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, buffer));
+
+	m_weightsAndBiasBuffer = &weightsAndBiasBuffer;
+	m_weightsAndBiasGradientBuffer = &weightsAndBiasGradientBuffer;
 }
 
-#if 0
-//void ndBrainOptimizerSgd::Update(ndBrainThreadPool* const threadPool, ndArray<ndBrainTrainer*>& partialGradients, ndBrainFloat learnRate)
-//void ndBrainOptimizerSgd::Update(ndBrainVector& parameters, const ndBrainVector& gradients, ndBrainFloat learnRate)
-void ndBrainOptimizerSgd::Update(ndBrainVector&, const ndBrainVector&)
+void ndBrainOptimizerSgd::ApplyLearnRate(ndBrainFloat learnRate)
 {
-	ndAssert(0);
-	ndBrainTrainerCpuLegacy* const trainer = (ndBrainTrainerCpuLegacy*)partialGradients[0];
-	ndBrain& brain = **trainer->GetBrain();
-	
-	ndFixSizeArray<ndInt32, 256> paramLayer;
-	for (ndInt32 i = 0; i < brain.GetCount(); ++i)
-	{
-		if (brain[i]->HasParameters())
-		{
-			paramLayer.PushBack(i);
-		}
-	}
-	
-	auto UpdateGradients = ndMakeObject::ndFunction([this, learnRate, &paramLayer, &partialGradients](ndInt32 threadIndex, ndInt32 threadCount)
-	{
-		//ndBrainTrainer* const trainer = partialGradients[0];
-		ndBrainTrainerCpuLegacy* const trainer = (ndBrainTrainerCpuLegacy*)partialGradients[0];
-		ndBrainFloat regularizer = -GetRegularizer();
-		ndBrainFloat descendRate = -learnRate / ndBrainFloat(partialGradients.GetCount());
-	
-		const ndStartEnd startEnd(paramLayer.GetCount(), threadIndex, threadCount);
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-		{
-			ndInt32 index = paramLayer[i];
-			ndAssert((**trainer->GetBrain())[index]->HasParameters());
-			
-			ndBrainLayer& weights = *trainer->GetWeightsLayer(index);
-			ndBrainLayer& gradients = *trainer->GetGradientLayer(index);
-	
-			for (ndInt32 j = 1; j < partialGradients.GetCount(); ++j)
-			{
-				ndBrainTrainerCpuLegacy* const src = (ndBrainTrainerCpuLegacy*)partialGradients[j];
-				trainer->AcculumateGradients(*src, index);
-			}
-			
-			gradients.Scale(descendRate);
-			gradients.ScaleAdd(weights, regularizer);
-			weights.Add(gradients);
-			weights.FlushToZero();
-		}
-	});
-	threadPool->ndBrainThreadPool::ParallelExecute(UpdateGradients);
+	// TO DO remenet to add the reqularizer part
+	m_weightsAndBiasGradientBuffer->Scale(m_miniBatchScale);
+	m_vdw->Blend(*m_weightsAndBiasGradientBuffer, m_blendFactor);
+	m_weightsAndBiasGradientBuffer->Set(m_vdw);
+	m_weightsAndBiasGradientBuffer->Scale(learnRate * -1.0f);
+	m_weightsAndBiasBuffer->Add(*m_weightsAndBiasGradientBuffer);
 }
-#endif
