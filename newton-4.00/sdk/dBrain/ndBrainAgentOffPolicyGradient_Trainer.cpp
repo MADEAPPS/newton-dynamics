@@ -75,7 +75,7 @@ ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 	m_numberOfActions = 0;
 	m_numberOfObservations = 0;
 
-	m_randomSeed = 42;
+	m_randomSeed = 1001;
 	m_numberOfUpdates = 8;
 	m_numberOfHiddenLayers = 2;
 	m_maxTrajectorySteps = 1024 * 4;
@@ -346,7 +346,8 @@ ndBrainAgentOffPolicyGradient_Trainer::ndBrainAgentOffPolicyGradient_Trainer(con
 	ndAssert(m_parameters.m_numberOfActions);
 	ndAssert(m_parameters.m_numberOfObservations);
 
-	m_randomGenerator.seed(m_parameters.m_randomSeed);
+	ndSetRandSeed(m_parameters.m_randomSeed);
+	m_randomGenerator.seed(ndRandInt());
 	
 	m_parameters.m_numberOfUpdates = ndMax(m_parameters.m_numberOfUpdates, 2);
 	m_parameters.m_numberOfUpdates = ndMax(m_parameters.m_numberOfUpdates, 2);
