@@ -55,17 +55,17 @@ void ndThreadYield()
 
 void ndThreadPause()
 {
-	//#if 0
-	#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
-	for (ndInt32 i = 0; i < 4; ++i)
-	{
-		_mm_pause();
-		_mm_pause();
-		_mm_pause();
-		_mm_pause();
-	}
+	#if 0
+	//#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
+		for (ndInt32 i = 0; i < 4; ++i)
+		{
+			_mm_pause();
+			_mm_pause();
+			_mm_pause();
+			_mm_pause();
+		}
 	#else
-	std::this_thread::yield();
+		ndThreadYield();
 	#endif
 }
 
