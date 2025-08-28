@@ -156,7 +156,6 @@ class ndBrainTaskImplementNew : public ndTask
 	ndAtomic<ndInt32>& m_threadIterator;
 	const ndInt32 m_jobsCount;
 	const ndInt32 m_jobsStride;
-	//const ndInt32 m_threadIndex;
 	friend class ndBrainThreadPool;
 };
 
