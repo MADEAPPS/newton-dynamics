@@ -28,7 +28,7 @@
 // to the environment with increasing complexity
 namespace ndQuadruped_sac
 {
-	//#define ND_TRAIN_MODEL
+	#define ND_TRAIN_MODEL
 	#define CONTROLLER_NAME "ndQuadruped_2-sac.dnn"
 
 	enum Actions
@@ -1268,7 +1268,7 @@ void ndQuadruped_sac_test(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("quadrupeSpider.fbx", scene));
 
 	ndMatrix matrix(ndGetIdentityMatrix());
-	matrix.m_posit.m_y = 0.5f;
+	matrix.m_posit.m_y = 0.45f;
 
 	#ifdef ND_TRAIN_MODEL
 		scene->RegisterPostUpdate(new TrainingUpdata(scene, matrix, modelMesh));
