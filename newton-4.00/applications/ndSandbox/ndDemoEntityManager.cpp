@@ -35,7 +35,7 @@
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
 //#define DEFAULT_SCENE	4		// conservation of momentum 
-//#define DEFAULT_SCENE	5		// basic Stacks
+#define DEFAULT_SCENE	5		// basic Stacks
 //#define DEFAULT_SCENE	6		// basic Trigger
 //#define DEFAULT_SCENE	7		// object Placement
 //#define DEFAULT_SCENE	8		// particle fluid
@@ -51,7 +51,7 @@
 //#define DEFAULT_SCENE	18		// cart pole continue controller
 //#define DEFAULT_SCENE	19		// unit cycle controller
 //#define DEFAULT_SCENE	20		// quadruped animated 1
-#define DEFAULT_SCENE	21		// quadruped sac trained
+//#define DEFAULT_SCENE	21		// quadruped sac trained
 //#define DEFAULT_SCENE	22		// quadruped ppo trained
 //#define DEFAULT_SCENE	23		// quadruped test 3
 //#define DEFAULT_SCENE	24		// quadruped test 4
@@ -156,7 +156,7 @@ ndInt32 ndDemoEntityManager::ButtonKey::UpdateTrigger (bool triggerValue)
 {
 	m_memory0 = m_memory1;
 	m_memory1 = triggerValue;
-	return (!m_memory0 & m_memory1) ? 1 : 0;
+	return (!m_memory0 && m_memory1) ? 1 : 0;
 }
 
 ndInt32 ndDemoEntityManager::ButtonKey::UpdatePushButton (bool triggerValue)
@@ -430,7 +430,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	,m_framesCount(0)
 	,m_physicsFramesCount(0)
 	,m_currentPlugin(0)
-	,m_solverPasses(4)
+	,m_solverPasses(6)
 	,m_solverSubSteps(2)
 	,m_workerThreads(1)
 	,m_debugDisplayMode(0)
@@ -603,8 +603,8 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//m_hideVisualMeshes = true;
 	//m_solverMode = ndWorld::ndCudaSolver;
 	//m_solverMode = ndWorld::ndSimdSoaSolver;
-	m_solverMode = ndWorld::ndStandardSolver;
-	//m_solverMode = ndWorld::ndSimdAvx2Solver;
+	//m_solverMode = ndWorld::ndStandardSolver;
+	m_solverMode = ndWorld::ndSimdAvx2Solver;
 	//m_solverPasses = 4;
 	m_workerThreads = 4;
 	//m_solverSubSteps = 2;

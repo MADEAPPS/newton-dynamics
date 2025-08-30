@@ -33,7 +33,6 @@ ndThreadPool::ndWorker::ndWorker()
 	,m_owner(nullptr)
 	,m_task(nullptr)
 	,m_threadIndex(0)
-	,m_taskReady(0)
 	,m_begin(0)
 	,m_stillLooping(0)
 {
@@ -44,47 +43,27 @@ ndThreadPool::ndWorker::~ndWorker()
 	Finish();
 }
 
-ndUnsigned8 ndThreadPool::ndWorker::IsTaskInProgress() const
-{
-	return m_taskReady;
-}
-
 void ndThreadPool::ndWorker::ExecuteTask(ndTask* const task)
 {
 	m_task = task;
-	m_taskReady = 1;
 }
 
 void ndThreadPool::ndWorker::TaskUpdate()
 {
 	m_begin = 1;
-	ndInt32 iterations = 0;
 	while (m_begin)
 	{
-		if (m_taskReady)
+		//D_TRACKTIME();
+		if (m_task)
 		{
-			//D_TRACKTIME();
-			if (m_task)
-			{
-				ndAssert(m_task->m_threadIndex == m_threadIndex);
-				m_task->Execute();
-			}
-			iterations = 0;
-			m_taskReady = 0;
-		}
+			ndAssert(m_task->m_threadIndex == m_threadIndex);
+			m_task->Execute();
+			m_task = nullptr;
+			m_owner->m_taskInProgress.fetch_add(-1);
+		} 
 		else
-		{
-			if (iterations >= ND_THREAD_IDLE_ITERATIONS)
-			{
-				// make sure that OS has the chance to task switch
-				ndThreadYield();
-				iterations = 0;
-			}
-			else
-			{
-				ndThreadPause();
-			}
-			iterations++;
+		{ 
+			ndThreadYield();
 		}
 	}
 }
@@ -188,7 +167,7 @@ void ndThreadPool::Begin()
 	{
 		D_TRACKTIME_NAMED(BeginJobs);
 	});
-	ParallelExecute(BeginJobs);
+	ParallelExecute(BeginJobs, GetThreadCount(), 1);
 }
 
 void ndThreadPool::End()
@@ -196,7 +175,6 @@ void ndThreadPool::End()
 	#ifndef	D_USE_THREAD_EMULATION
 	for (ndInt32 i = 0; i < m_count; ++i)
 	{
-		m_workers[i].ExecuteTask(nullptr);
 		m_workers[i].m_begin = 0;
 	}
 
@@ -209,7 +187,7 @@ void ndThreadPool::End()
 			looping = ndUnsigned8(looping | m_workers[i].m_stillLooping);
 		}
 		stillLooping = ndUnsigned8(stillLooping & looping);
-		if (m_count)
+		if (m_count && stillLooping)
 		{
 			ndThreadYield();
 		}
@@ -231,31 +209,24 @@ void ndThreadPool::TickOne()
 #endif
 }
 
-void ndThreadPool::WaitForWorkers()
+ndInt32 ndThreadPool::OptimalGroupBatch(ndInt32 numberOfGroups) const
 {
-	ndInt32 iterations = 0;
-	ndUnsigned8 jobsInProgress = 1;
-	do
-	{
-		ndUnsigned8 inProgess = 0;
-		for (ndInt32 i = 0; i < m_count; ++i)
-		{
-			inProgess = ndUnsigned8(inProgess | (m_workers[i].IsTaskInProgress()));
-		}
-		jobsInProgress = ndUnsigned8 (jobsInProgress & inProgess);
-		if (jobsInProgress)
-		{
-			if (iterations >= ND_THREAD_IDLE_ITERATIONS)
-			{
-				ndThreadYield();
-				iterations = 0;
-			}
-			else
-			{
-				ndThreadPause();
-			}
-			iterations++;
-		}
-	} while (jobsInProgress);
+	// one of no more than two batches per hardware thread.
+	ndInt32 threadCount = GetThreadCount() * 2;
+	ndInt32 batchSize = ndMax(D_WORKER_BATCH_SIZE, numberOfGroups / threadCount);
+
+	ndInt32 batchSizePowerOfTwo = D_WORKER_BATCH_SIZE;
+	for (ndInt32 i = 0; (i < 5) && (batchSize > batchSizePowerOfTwo); ++i)
+	{ 
+		batchSizePowerOfTwo *= 2;
+	}
+	return batchSizePowerOfTwo;
 }
 
+void ndThreadPool::WaitForWorkers()
+{
+	for (ndInt32 test = 0; !m_taskInProgress.compare_exchange_weak(test, 0); test = 0)
+	{
+		ndThreadYield();
+	}
+}

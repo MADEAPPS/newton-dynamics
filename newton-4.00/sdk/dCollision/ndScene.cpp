@@ -762,7 +762,6 @@ void ndScene::SubmitPairs(ndBvhLeafNode* const leafNode, ndBvhNode* const node, 
 				const ndUnsigned8 test = ndUnsigned8((body1->m_sceneEquilibrium | fowardTest) & (test0 | ndUnsigned8(!body1->m_equilibrium)));
 				if (test)
 				{
-					//if (notify->OnSceneAabbOverlap(body1))
 					if (!notify || notify->OnSceneAabbOverlap(body1))
 					{
 						AddPair(body0, body1, threadId);
@@ -875,24 +874,17 @@ void ndScene::UpdateTransform()
 		}
 	}
 
-	ndAtomic<ndInt32> iterator(0);
-	auto TransformUpdate = ndMakeObject::ndFunction([this, &iterator](ndInt32 threadIndex, ndInt32)
+	auto TransformUpdate = ndMakeObject::ndFunction([this](ndInt32 groupId, ndInt32 threadIndex)
 	{
 		D_TRACKTIME_NAMED(TransformUpdate);
 		const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
 
-		const ndInt32 count = ndInt32(bodyArray.GetCount()) - 1;
-		for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
-		{
-			const ndInt32 maxSpan = ((count - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : count - i;
-			for (ndInt32 j = 0; j < maxSpan; ++j)
-			{
-				ndBodyKinematic* const body = bodyArray[i + j];
-				UpdateTransformNotify(threadIndex, body);
-			}
-		}
+		ndBodyKinematic* const body = bodyArray[groupId];
+		UpdateTransformNotify(threadIndex, body);
 	});
-	ParallelExecute(TransformUpdate);
+	const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
+	const ndInt32 count = ndInt32(bodyArray.GetCount()) - 1;
+	ParallelExecute(TransformUpdate, count, OptimalGroupBatch(count));
 }
 
 void ndScene::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)
@@ -979,7 +971,7 @@ void ndScene::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)
 		contact->m_sceneLru = m_lru;
 	}
 
-	if (!contact->m_isDead && (body0->m_equilibrium & body1->m_equilibrium & !contact->IsActive()))
+	if (!contact->m_isDead && (body0->m_equilibrium & body1->m_equilibrium & ndUnsigned8(!contact->IsActive())))
 	{
 		const ndBvhLeafNode* const bodyNode0 = m_bvhSceneManager.GetLeafNode(contact->GetBody0());
 		const ndBvhLeafNode* const bodyNode1 = m_bvhSceneManager.GetLeafNode(contact->GetBody1());
@@ -1447,40 +1439,21 @@ void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1
 void ndScene::FindCollidingPairs()
 {
 	D_TRACKTIME();
-	ndAtomic<ndInt32> iterator0(0);
-	auto FindPairsForward = ndMakeObject::ndFunction([this, &iterator0](ndInt32 threadIndex, ndInt32)
+	auto FindPairsForward = ndMakeObject::ndFunction([this](ndInt32 groupId, ndInt32 threadIndex)
 	{
 		D_TRACKTIME_NAMED(FindPairsForward);
 		const ndArray<ndBodyKinematic*>& bodyArray = m_sceneBodyArray;
-
-		const ndInt32 count = ndInt32(m_sceneBodyArray.GetCount());
-		for (ndInt32 i = iterator0.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator0.fetch_add(D_WORKER_BATCH_SIZE))
-		{
-			const ndInt32 maxSpan = ((count - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : count - i;
-			for (ndInt32 j = 0; j < maxSpan; ++j)
-			{
-				ndBodyKinematic* const body = bodyArray[i + j];
-				FindCollidingPairsForward(body, threadIndex);
-			}
-		}
+		ndBodyKinematic* const body = bodyArray[groupId];
+		FindCollidingPairsForward(body, threadIndex);
 	});
 
-	ndAtomic<ndInt32> iterator1(0);
-	auto FindPairsBackward = ndMakeObject::ndFunction([this, &iterator1](ndInt32 threadIndex, ndInt32)
+	auto FindPairsBackward = ndMakeObject::ndFunction([this](ndInt32 groupId, ndInt32 threadIndex)
 	{
 		D_TRACKTIME_NAMED(FindPairsBackward);
 		const ndArray<ndBodyKinematic*>& bodyArray = m_sceneBodyArray;
 
-		const ndInt32 count = ndInt32(m_sceneBodyArray.GetCount());
-		for (ndInt32 i = iterator1.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator1.fetch_add(D_WORKER_BATCH_SIZE))
-		{
-			const ndInt32 maxSpan = ((count - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : count - i;
-			for (ndInt32 j = 0; j < maxSpan; ++j)
-			{
-				ndBodyKinematic* const body = bodyArray[i + j];
-				FindCollidingPairsBackward(body, threadIndex);
-			}
-		}
+		ndBodyKinematic* const body = bodyArray[groupId];
+		FindCollidingPairsBackward(body, threadIndex);
 	});
 
 	for (ndInt32 i = GetThreadCount() - 1; i >= 0; --i)
@@ -1488,12 +1461,12 @@ void ndScene::FindCollidingPairs()
 		m_partialNewPairs[i].SetCount(0);
 	}
 
-	const ndInt32 threadCount = GetThreadCount();
-
-	ParallelExecute(FindPairsForward);
-	ParallelExecute(FindPairsBackward);
+	const ndInt32 numOfgroups = ndInt32(m_sceneBodyArray.GetCount());
+	ParallelExecute(FindPairsForward, numOfgroups, 1);
+	ParallelExecute(FindPairsBackward, numOfgroups, 1);
 
 	ndInt32 sum = 0;
+	const ndInt32 threadCount = GetThreadCount();
 	for (ndInt32 i = 0; i < threadCount; ++i)
 	{
 		sum += ndInt32(m_partialNewPairs[i].GetCount());
@@ -1525,72 +1498,55 @@ void ndScene::UpdateBodyList()
 void ndScene::ApplyExtForce()
 {
 	D_TRACKTIME();
-	ndAtomic<ndInt32> iterator(0);
-	auto ApplyForce = ndMakeObject::ndFunction([this, &iterator](ndInt32 threadIndex, ndInt32)
+	auto ApplyForce = ndMakeObject::ndFunction([this](ndInt32 groupId, ndInt32)
 	{
 		D_TRACKTIME_NAMED(ApplyForce);
 		const ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
 
 		const ndFloat32 timestep = m_timestep;
-
-		const ndInt32 count = ndInt32(view.GetCount()) - 1;
-		for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
-		{
-			const ndInt32 maxSpan = ((count - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : count - i;
-			for (ndInt32 j = 0; j < maxSpan; ++j)
-			{
-				ndBodyKinematic* const body = view[i + j];
-				body->ApplyExternalForces(threadIndex, timestep);
-			}
-		}
+		ndBodyKinematic* const body = view[groupId];
+		body->ApplyExternalForces(0, timestep);
 	});
-	ParallelExecute(ApplyForce);
+
+	const ndInt32 count = ndInt32(GetActiveBodyArray().GetCount()) - 1;
+	ParallelExecute(ApplyForce, count, OptimalGroupBatch(count));
 }
 
 void ndScene::InitBodyArray()
 {
 	D_TRACKTIME();
-	ndAtomic<ndInt32> iterator(0);
-	auto BuildBodyArray = ndMakeObject::ndFunction([this, &iterator](ndInt32, ndInt32)
+	auto BuildBodyArray = ndMakeObject::ndFunction([this](ndInt32 groupId, ndInt32)
 	{
 		D_TRACKTIME_NAMED(BuildBodyArray);
 		const ndArray<ndBodyKinematic*>& view = GetActiveBodyArray();
 
 		ndBvhNodeArray& array = m_bvhSceneManager.GetNodeArray();
-		const ndInt32 count = ndInt32(view.GetCount()) - 1;
-		for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
+		ndBodyKinematic* const body = view[groupId];
+		body->PrepareStep(groupId);
+		ndUnsigned8 sceneEquilibrium = 1;
+		ndUnsigned8 sceneForceUpdate = body->m_sceneForceUpdate;
+		ndUnsigned8 moving = ndUnsigned8(!body->m_equilibrium);
+		if (moving | sceneForceUpdate)
 		{
-			const ndInt32 maxSpan = ((count - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : count - i;
-			for (ndInt32 j = 0; j < maxSpan; ++j)
+			ndBvhLeafNode* const bodyNode = (ndBvhLeafNode*)array[body->m_bodyNodeIndex];
+			ndAssert(bodyNode->GetAsSceneBodyNode());
+			ndAssert(bodyNode->m_body == body);
+			ndAssert(!bodyNode->GetLeft());
+			ndAssert(!bodyNode->GetRight());
+
+			body->UpdateCollisionMatrix();
+			const ndInt32 test = ndBoxInclusionTest(body->m_minAabb, body->m_maxAabb, bodyNode->m_minBox, bodyNode->m_maxBox);
+			if (!test)
 			{
-				ndBodyKinematic* const body = view[i + j];
-				body->PrepareStep(i + j);
-				ndUnsigned8 sceneEquilibrium = 1;
-				ndUnsigned8 sceneForceUpdate = body->m_sceneForceUpdate;
-				ndUnsigned8 moving = ndUnsigned8(!body->m_equilibrium);
-				if (moving | sceneForceUpdate)
-				{
-					ndBvhLeafNode* const bodyNode = (ndBvhLeafNode*)array[body->m_bodyNodeIndex];
-					ndAssert(bodyNode->GetAsSceneBodyNode());
-					ndAssert(bodyNode->m_body == body);
-					ndAssert(!bodyNode->GetLeft());
-					ndAssert(!bodyNode->GetRight());
-
-					body->UpdateCollisionMatrix();
-					const ndInt32 test = ndBoxInclusionTest(body->m_minAabb, body->m_maxAabb, bodyNode->m_minBox, bodyNode->m_maxBox);
-					if (!test)
-					{
-						bodyNode->SetAabb(body->m_minAabb, body->m_maxAabb);
-					}
-					sceneEquilibrium = ndUnsigned8(!sceneForceUpdate & (test != 0));
-				}
-				body->m_sceneForceUpdate = 0;
-				body->m_sceneEquilibrium = sceneEquilibrium;
+				bodyNode->SetAabb(body->m_minAabb, body->m_maxAabb);
 			}
+			sceneEquilibrium = ndUnsigned8(!sceneForceUpdate & (test != 0));
 		}
+		body->m_sceneForceUpdate = 0;
+		body->m_sceneEquilibrium = sceneEquilibrium;
 	});
-
-	ParallelExecute(BuildBodyArray);
+	const ndInt32 count = ndInt32(GetActiveBodyArray().GetCount()) - 1;
+	ParallelExecute(BuildBodyArray, count, OptimalGroupBatch(count));
 
 	ndUnsigned32 scans[4];
 	class ndSortCompactKey
@@ -1623,45 +1579,38 @@ void ndScene::InitBodyArray()
 		const ndInt32 cutoffCount = (ndExp2(bodyCount) + 1) * movingBodyCount;
 		if (cutoffCount < bodyCount)
 		{
-			ndAtomic<ndInt32> iterator1(0);
-			auto UpdateSceneBvh = ndMakeObject::ndFunction([this, &iterator1](ndInt32, ndInt32)
+			auto UpdateSceneBvh = ndMakeObject::ndFunction([this](ndInt32 groupId, ndInt32)
 			{
 				D_TRACKTIME_NAMED(UpdateSceneBvh);
 				const ndArray<ndBodyKinematic*>& view = m_sceneBodyArray;
 				ndBvhNodeArray& array = m_bvhSceneManager.GetNodeArray();
 
-				const ndInt32 count = ndInt32(view.GetCount());
-				for (ndInt32 i = iterator1.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator1.fetch_add(D_WORKER_BATCH_SIZE))
-				{
-					const ndInt32 maxSpan = ((count - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : count - i;
-					for (ndInt32 j = 0; j < maxSpan; ++j)
-					{
-						ndBodyKinematic* const body = view[i + j];
-						ndBvhLeafNode* const bodyNode = (ndBvhLeafNode*)array[body->m_bodyNodeIndex];
-						ndAssert(bodyNode->GetAsSceneBodyNode());
-						ndAssert(bodyNode->GetBody() == body);
+				ndBodyKinematic* const body = view[groupId];
+				ndBvhLeafNode* const bodyNode = (ndBvhLeafNode*)array[body->m_bodyNodeIndex];
+				ndAssert(bodyNode->GetAsSceneBodyNode());
+				ndAssert(bodyNode->GetBody() == body);
 
-						const ndBvhNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? nullptr : m_rootNode;
-						ndAssert(root == nullptr);
-						for (ndBvhInternalNode* parent = (ndBvhInternalNode*)bodyNode->m_parent; parent != root; parent = (ndBvhInternalNode*)parent->m_parent)
-						{
-							ndAssert(parent->GetAsSceneTreeNode());
-							ndScopeSpinLock lock(parent->m_lock);
-							const ndVector minBox(parent->m_left->m_minBox.GetMin(parent->m_right->m_minBox));
-							const ndVector maxBox(parent->m_left->m_maxBox.GetMax(parent->m_right->m_maxBox));
-							if (ndBoxInclusionTest(minBox, maxBox, parent->m_minBox, parent->m_maxBox))
-							{
-								break;
-							}
-							parent->m_minBox = minBox;
-							parent->m_maxBox = maxBox;
-						}
+				const ndBvhNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? nullptr : m_rootNode;
+				ndAssert(root == nullptr);
+				for (ndBvhInternalNode* parent = (ndBvhInternalNode*)bodyNode->m_parent; parent != root; parent = (ndBvhInternalNode*)parent->m_parent)
+				{
+					ndAssert(parent->GetAsSceneTreeNode());
+					ndScopeSpinLock lock(parent->m_lock);
+					const ndVector minBox(parent->m_left->m_minBox.GetMin(parent->m_right->m_minBox));
+					const ndVector maxBox(parent->m_left->m_maxBox.GetMax(parent->m_right->m_maxBox));
+					if (ndBoxInclusionTest(minBox, maxBox, parent->m_minBox, parent->m_maxBox))
+					{
+						break;
 					}
+					parent->m_minBox = minBox;
+					parent->m_maxBox = maxBox;
 				}
 			});
 	
 			D_TRACKTIME_NAMED(UpdateSceneBvhLight);
-			ParallelExecute(UpdateSceneBvh);
+			//const ndArray<ndBodyKinematic*>& view = m_sceneBodyArray;
+			const ndInt32 viewBodyCount = ndInt32(m_sceneBodyArray.GetCount());
+			ParallelExecute(UpdateSceneBvh, viewBodyCount, OptimalGroupBatch(viewBodyCount));
 		}
 		else
 		{
@@ -1692,36 +1641,28 @@ void ndScene::CreateNewContacts()
 	ndContact** const tmpJointsArray = (ndContact**)&m_scratchBuffer[0];
 	if (m_newPairs.GetCount())
 	{ 
-		ndAtomic<ndInt32> iterator(0);
-		auto CreateNewContacts = ndMakeObject::ndFunction([this, &iterator, tmpJointsArray](ndInt32, ndInt32)
+		auto CreateNewContacts = ndMakeObject::ndFunction([this, tmpJointsArray](ndInt32 groupId, ndInt32)
 		{
 			D_TRACKTIME_NAMED(CreateNewContacts);
 			const ndArray<ndContactPairs>& newPairs = m_newPairs;
 			ndBodyKinematic** const bodyArray = &GetActiveBodyArray()[0];
 
-			const ndInt32 count = ndInt32(newPairs.GetCount());
-			for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
-			{
-				const ndInt32 maxSpan = ((count - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : count - i;
-				for (ndInt32 j = 0; j < maxSpan; ++j)
-				{
-					const ndContactPairs& pair = newPairs[i + j];
-					ndBodyKinematic* const body0 = bodyArray[pair.m_body0];
-					ndBodyKinematic* const body1 = bodyArray[pair.m_body1];
-					ndAssert(ndUnsigned32(body0->m_index) == pair.m_body0);
-					ndAssert(ndUnsigned32(body1->m_index) == pair.m_body1);
+			const ndContactPairs& pair = newPairs[groupId];
+			ndBodyKinematic* const body0 = bodyArray[pair.m_body0];
+			ndBodyKinematic* const body1 = bodyArray[pair.m_body1];
+			ndAssert(ndUnsigned32(body0->m_index) == pair.m_body0);
+			ndAssert(ndUnsigned32(body1->m_index) == pair.m_body1);
 
-					ndContact* const contact = new ndContact;
-					contact->SetBodies(body0, body1);
-					contact->AttachToBodies();
+			ndContact* const contact = new ndContact;
+			contact->SetBodies(body0, body1);
+			contact->AttachToBodies();
 
-					ndAssert(contact->m_body0->GetInvMass() != ndFloat32(0.0f));
-					contact->m_material = m_contactNotifyCallback->GetMaterial(contact, body0->GetCollisionShape(), body1->GetCollisionShape());
-					tmpJointsArray[i + j] = contact;
-				}
-			}
+			ndAssert(contact->m_body0->GetInvMass() != ndFloat32(0.0f));
+			contact->m_material = m_contactNotifyCallback->GetMaterial(contact, body0->GetCollisionShape(), body1->GetCollisionShape());
+			tmpJointsArray[groupId] = contact;
 		});
-		ParallelExecute(CreateNewContacts);
+		const ndInt32 count = ndInt32(m_newPairs.GetCount());
+		ParallelExecute(CreateNewContacts, count, 1);
 	}
 
 	if (contactCount)
@@ -1748,27 +1689,19 @@ void ndScene::CalculateContacts()
 	{
 		ndContact** const tmpJointsArray = (ndContact**)&m_scratchBuffer[0];
 
-		ndAtomic<ndInt32> iterator(0);
-		auto CalculateContactPoints = ndMakeObject::ndFunction([this, &iterator, tmpJointsArray](ndInt32 threadIndex, ndInt32)
+		auto CalculateContactPoints = ndMakeObject::ndFunction([this, tmpJointsArray](ndInt32 groupId, ndInt32 threadIndex)
 		{
 			D_TRACKTIME_NAMED(CalculateContactPoints);
 
-			const ndInt32 jointCount = ndInt32(m_contactArray.GetCount());
-			for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < jointCount; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
+			ndContact* const contact = tmpJointsArray[groupId];
+			ndAssert(contact);
+			if (!contact->m_isDead)
 			{
-				const ndInt32 maxSpan = ((jointCount - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : jointCount - i;
-				for (ndInt32 j = 0; j < maxSpan; ++j)
-				{
-					ndContact* const contact = tmpJointsArray[i + j];
-					ndAssert(contact);
-					if (!contact->m_isDead)
-					{
-						CalculateContacts(threadIndex, contact);
-					}
-				}
+				CalculateContacts(threadIndex, contact);
 			}
 		});
-		ParallelExecute(CalculateContactPoints);
+		const ndInt32 jointCount = ndInt32(m_contactArray.GetCount());
+		ParallelExecute(CalculateContactPoints, jointCount, OptimalGroupBatch(jointCount));
 	}
 }
 
@@ -1810,31 +1743,23 @@ void ndScene::DeleteDeadContacts()
 		ndCountingSort<ndContact*, ndJointActive, 2>(*this, tmpJointsArray, &m_contactArray[0], ndInt32(m_contactArray.GetCount()), prefixScan, nullptr);
 		if (prefixScan[m_dead + 1] != prefixScan[m_dead])
 		{
-			ndAtomic<ndInt32> iterator(0);
-			auto DeleteContactArray = ndMakeObject::ndFunction([this, &iterator, &prefixScan](ndInt32, ndInt32)
+			auto DeleteContactArray = ndMakeObject::ndFunction([this, &prefixScan](ndInt32 groupId, ndInt32)
 			{
 				D_TRACKTIME_NAMED(DeleteContactArray);
 				ndArray<ndContact*>& contactArray = m_contactArray;
 
 				const ndInt32 start = ndInt32(prefixScan[m_dead]);
-				const ndInt32 count = ndInt32(prefixScan[m_dead + 1] - start);
-				for (ndInt32 i = iterator.fetch_add(D_WORKER_BATCH_SIZE); i < count; i = iterator.fetch_add(D_WORKER_BATCH_SIZE))
+				ndContact* const contact = contactArray[start + groupId];
+				ndAssert(contact->m_isDead);
+				if (contact->m_isAttached)
 				{
-					const ndInt32 maxSpan = ((count - i) >= D_WORKER_BATCH_SIZE) ? D_WORKER_BATCH_SIZE : count - i;
-					for (ndInt32 j = 0; j < maxSpan; ++j)
-					{
-						ndContact* const contact = contactArray[start + i + j];
-						ndAssert(contact->m_isDead);
-						if (contact->m_isAttached)
-						{
-							contact->DetachFromBodies();
-						}
-						delete contact;
-					}
+					contact->DetachFromBodies();
 				}
+				delete contact;
 			});
+			const ndInt32 count = ndInt32(prefixScan[m_dead + 1] - prefixScan[m_dead]);
+			ParallelExecute(DeleteContactArray, count, 1);
 
-			ParallelExecute(DeleteContactArray);
 			m_contactArray.SetCount(ndInt32(prefixScan[m_inactive + 1]));
 		}
 

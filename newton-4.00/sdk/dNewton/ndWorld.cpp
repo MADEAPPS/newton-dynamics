@@ -449,7 +449,6 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 	// second pass on models
 	ModelPostUpdate();
 
-
 	OnSubStepPostUpdate(timestep);
 
 	m_scene->m_subStepNumber++;
@@ -464,75 +463,62 @@ void ndWorld::ParticleUpdate(ndFloat32 timestep)
 void ndWorld::ModelUpdate()
 {
 	D_TRACKTIME();
-	ndAtomic<ndInt32> iterator(0);
-	auto ModelUpdate = ndMakeObject::ndFunction([this, &iterator](ndInt32, ndInt32)
+	auto ModelUpdate = ndMakeObject::ndFunction([this](ndInt32 groupId, ndInt32)
 	{
 		D_TRACKTIME_NAMED(ModelUpdate);
 		const ndFloat32 timestep = m_scene->GetTimestep();
 		const ndArray<ndModel*>& modelList = m_modelList.GetUpdateList();
 
-		const ndInt32 modelCount = ndInt32(modelList.GetCount());
-		for (ndInt32 i = iterator++; i < modelCount; i = iterator++)
+		ndModel* const model = modelList[groupId];
+		if (*model->m_notifyCallback)
 		{
-			D_TRACKTIME_NAMED(ModelUpdate);
-			ndModel* const model = modelList[i];
-			if (*model->m_notifyCallback)
-			{
-				model->m_notifyCallback->Update(timestep);
-			}
+			model->m_notifyCallback->Update(timestep);
 		}
 	});
 
 	m_modelList.UpdateDirtyList();
-	m_scene->ParallelExecute(ModelUpdate);
+	const ndInt32 modelCount = ndInt32(m_modelList.GetCount());
+	m_scene->ParallelExecute(ModelUpdate, modelCount, 4);
 }
 
 void ndWorld::ModelPostUpdate()
 {
 	D_TRACKTIME();
-	ndAtomic<ndInt32> iterator(0);
-	auto ModelPostUpdate = ndMakeObject::ndFunction([this, &iterator](ndInt32, ndInt32)
+	auto ModelPostUpdate = ndMakeObject::ndFunction([this](ndInt32 groupId, ndInt32)
 	{
 		D_TRACKTIME_NAMED(ModelPostUpdate);
 		const ndFloat32 timestep = m_scene->GetTimestep();
 		const ndArray<ndModel*>& modelList = m_modelList.GetUpdateList();
 
-		const ndInt32 modelCount = ndInt32(modelList.GetCount());
-		for (ndInt32 i = iterator++; i < modelCount; i = iterator++)
+		ndModel* const model = modelList[groupId];
+		if (*model->m_notifyCallback)
 		{
-			ndModel* const model = modelList[i];
-			if (*model->m_notifyCallback)
-			{
-				model->m_notifyCallback->PostUpdate(timestep);
-			}
+			model->m_notifyCallback->PostUpdate(timestep);
 		}
 	});
-	m_scene->ParallelExecute(ModelPostUpdate);
+	const ndInt32 modelCount = ndInt32(m_modelList.GetCount());
+	m_scene->ParallelExecute(ModelPostUpdate, modelCount, 4);
 }
 
 void ndWorld::PostModelTransform()
 {
 	D_TRACKTIME();
-	ndAtomic<ndInt32> iterator(0);
-	auto PostModelTransform = ndMakeObject::ndFunction([this, &iterator](ndInt32, ndInt32)
+	auto PostModelTransform = ndMakeObject::ndFunction([this](ndInt32 groupId, ndInt32)
 	{
 		D_TRACKTIME_NAMED(PostModelTransform);
 		const ndFloat32 timestep = m_scene->GetTimestep();
 		const ndArray<ndModel*>& modelList = m_modelList.GetUpdateList();
 
-		const ndInt32 modelCount = ndInt32(modelList.GetCount());
-		for (ndInt32 i = iterator++; i < modelCount; i = iterator++)
+		ndModel* const model = modelList[groupId];
+		if (*model->m_notifyCallback)
 		{
-			ndModel* const model = modelList[i];
-			if (*model->m_notifyCallback)
-			{
-				model->m_notifyCallback->PostTransformUpdate(timestep);
-			}
+			model->m_notifyCallback->PostTransformUpdate(timestep);
 		}
 	});
 
 	m_modelList.UpdateDirtyList();
-	m_scene->ParallelExecute(PostModelTransform);
+	const ndInt32 modelCount = ndInt32(m_modelList.GetCount());
+	m_scene->ParallelExecute(PostModelTransform, modelCount, 4);
 }
 
 bool ndWorld::SkeletonJointTest(ndJointBilateralConstraint* const constraint) const

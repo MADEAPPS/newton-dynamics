@@ -1671,22 +1671,23 @@ void ndBodySphFluid::CalculateScans(ndThreadPool* const threadPool)
 			acc0++;
 		}
 	}
-	scans[threadCount] = particleCount;
-	threadPool->ParallelExecute(CountGridScans);
-
-	ndInt32 scansCount = 0;
-
-	for (ndInt32 i = 0; i < threadCount; ++i)
-	{
-		sums[i] = scansCount;
-		scansCount += ndInt32(data.m_partialsGridScans[i].GetCount());
-	}
-	sums[threadCount] = scansCount;
-
-	data.m_gridScans.SetCount(scansCount + 1);
-	threadPool->ParallelExecute(CalculateScans);
-
-	data.m_gridScans[scansCount] = scans[threadCount];
+	ndAssert(0);
+	//scans[threadCount] = particleCount;
+	//threadPool->ParallelExecute(CountGridScans);
+	//
+	//ndInt32 scansCount = 0;
+	//
+	//for (ndInt32 i = 0; i < threadCount; ++i)
+	//{
+	//	sums[i] = scansCount;
+	//	scansCount += ndInt32(data.m_partialsGridScans[i].GetCount());
+	//}
+	//sums[threadCount] = scansCount;
+	//
+	//data.m_gridScans.SetCount(scansCount + 1);
+	//threadPool->ParallelExecute(CalculateScans);
+	//
+	//data.m_gridScans[scansCount] = scans[threadCount];
 }
 
 void ndBodySphFluid::SortGrids(ndThreadPool* const threadPool)
@@ -1939,7 +1940,8 @@ void ndBodySphFluid::BuildBuckets(ndThreadPool* const)
 #endif    
 }
 
-void ndBodySphFluid::CalculateParticlesDensity(ndThreadPool* const threadPool)
+//void ndBodySphFluid::CalculateParticlesDensity(ndThreadPool* const threadPool)
+void ndBodySphFluid::CalculateParticlesDensity(ndThreadPool* const)
 {
 	D_TRACKTIME();
 	ndWorkingBuffers& data = *m_workingBuffers;
@@ -1980,11 +1982,12 @@ void ndBodySphFluid::CalculateParticlesDensity(ndThreadPool* const threadPool)
 			data.m_invDensity[i] = ndFloat32(1.0f) / density;
 		}
 	});
-
-	threadPool->ParallelExecute(CalculateDensity);
+	ndAssert(0);
+	//threadPool->ParallelExecute(CalculateDensity);
 }
 
-void ndBodySphFluid::CalculateAccelerations(ndThreadPool* const threadPool)
+//void ndBodySphFluid::CalculateAccelerations(ndThreadPool* const threadPool)
+void ndBodySphFluid::CalculateAccelerations(ndThreadPool* const)
 {
 	D_TRACKTIME();
 	ndWorkingBuffers& data = *m_workingBuffers;
@@ -2056,11 +2059,12 @@ void ndBodySphFluid::CalculateAccelerations(ndThreadPool* const threadPool)
 			data.m_accel[i0] = accel;
 		}
 	});
-
-	threadPool->ParallelExecute(CalculateAcceleration);
+	ndAssert(0);
+	//threadPool->ParallelExecute(CalculateAcceleration);
 }
 
-void ndBodySphFluid::IntegrateParticles(ndThreadPool* const threadPool)
+//void ndBodySphFluid::IntegrateParticles(ndThreadPool* const threadPool)
+void ndBodySphFluid::IntegrateParticles(ndThreadPool* const)
 {
 	D_TRACKTIME();
 	ndWorkingBuffers& data = *m_workingBuffers;
@@ -2088,8 +2092,8 @@ void ndBodySphFluid::IntegrateParticles(ndThreadPool* const threadPool)
 			}
 		}
 	});
-
-	threadPool->ParallelExecute(IntegrateParticles);
+	ndAssert(0);
+	//threadPool->ParallelExecute(IntegrateParticles);
 }
 
 void ndBodySphFluid::CaculateAabb(ndThreadPool* const threadPool)
@@ -2121,8 +2125,8 @@ void ndBodySphFluid::CaculateAabb(ndThreadPool* const threadPool)
 		}
 		boxes[threadIndex] = box;
 	});
-
-	threadPool->ParallelExecute(CalculateAabb);
+	ndAssert(0);
+	//threadPool->ParallelExecute(CalculateAabb);
 
 	ndBox box;
 	const ndInt32 threadCount = threadPool->GetThreadCount();
@@ -2157,7 +2161,8 @@ void ndBodySphFluid::CaculateAabb(ndThreadPool* const threadPool)
 	data.SetWorldToGridMapping(gridSize, m_box1, m_box0);
 }
 
-void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
+//void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
+void ndBodySphFluid::CreateGrids(ndThreadPool* const)
 {
 	D_TRACKTIME();
 	class ndGridNeighborInfo
@@ -2301,9 +2306,10 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 		}
 	});
 
-	data.m_gridScans.SetCount(m_posit.GetCount() + 1);
-	data.m_gridScans[m_posit.GetCount()] = 0;
-	threadPool->ParallelExecute(CountGrids);
+	ndAssert(0);
+	//data.m_gridScans.SetCount(m_posit.GetCount() + 1);
+	//data.m_gridScans[m_posit.GetCount()] = 0;
+	//threadPool->ParallelExecute(CountGrids);
 
 	ndInt32 gridCount = 0;
 	const ndInt32 itemsCount = ndInt32 (data.m_gridScans.GetCount()) & (-8);
@@ -2323,9 +2329,10 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 		gridCount += count;
 	}
 
-	data.m_hashGridMap.SetCount(gridCount);
-	threadPool->ParallelExecute(CreateGrids);
-	data.m_hashGridMapScratchBuffer.SetCount(gridCount);
+	ndAssert(0);
+	//data.m_hashGridMap.SetCount(gridCount);
+	//threadPool->ParallelExecute(CreateGrids);
+	//data.m_hashGridMapScratchBuffer.SetCount(gridCount);
 
 	//ndAssert(TraceHashes());
 }
