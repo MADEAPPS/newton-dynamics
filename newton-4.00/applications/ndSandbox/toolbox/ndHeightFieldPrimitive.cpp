@@ -208,7 +208,7 @@ void AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShapeInstance& s
 	compound->AddCollision(&heighfieldInstance);
 }
 
-ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene, const ndMatrix& location)
+ndSharedPtr<ndBody> BuildHeightFieldTerrain(ndDemoEntityManager* const scene, const ndMatrix& location)
 {
 	ndArray<ndVector> heightfield(D_TERRAIN_WIDTH * D_TERRAIN_HEIGHT);
 	MakeNoiseHeightfield(heightfield);
@@ -243,5 +243,6 @@ ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene, const
 
 	world->AddBody(body);
 	scene->AddEntity(entity);
-	return body->GetAsBodyDynamic();
+	//return body->GetAsBodyDynamic();
+	return body;
 }

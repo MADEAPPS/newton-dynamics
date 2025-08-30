@@ -813,3 +813,10 @@ ndUnsigned64 ndShapeHeightfield::GetHash(ndUnsigned64 hash) const
 	hash = ndCRC64(&m_elevationMap[0], ndInt32(m_elevationMap.GetCount()) * ndInt32(sizeof(ndReal)), hash);
 	return hash;
 }
+
+ndVector ndShapeHeightfield::SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin) const
+{
+	//return SupportVertex(dir);
+	ndAssert(0);
+	return ndVector::m_zero;
+}

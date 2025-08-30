@@ -74,7 +74,7 @@ class BackGroundVehicleController : public ndModel
 			,m_pAiBody(body)
 			,m_dDesiredSpeed(4.1667f)      // 4.1667f m/s = 15 km/h (9.3 mph) 33.3333 m/s = 120km/h (74.6mph)
 			,m_dCurrentSpeed(0.0f)
-			,m_dSpeedProportional(3000.0f)
+			,m_dSpeedProportional(4000.0f)
 			,m_dIntegral(0.0f)
 			,m_dIntegralGain(3000.0f)
 			,m_dDerivativeGain(600.0f)
@@ -99,8 +99,12 @@ class BackGroundVehicleController : public ndModel
 			ndVector vOffset(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0));
 			ndVector vOffsetLS = mMatrix.TransformVector(vOffset);      // Offset in local space
 			ndVector vForceLS = mMatrix.TransformVector(vForce);      // Force in local space
-			pAiBody->SetForce(pAiBody->GetForce() + vForceLS);
-			pAiBody->SetTorque(pAiBody->GetTorque() + (vOffsetLS.CrossProduct(vForceLS)));
+
+			ndVector force(pAiBody->GetForce() + vForceLS);
+			ndVector torque(pAiBody->GetTorque() + (vOffsetLS.CrossProduct(vForceLS)));
+			pAiBody->SetForce(force);
+			pAiBody->SetTorque(torque);
+
 			_ApplyLateralForces(timestep);
 			
 			// Get the camera to follow the vehicle
@@ -294,18 +298,18 @@ void ndBagroundLowLodVehicle(ndDemoEntityManager* const scene)
 	heighfieldLocation.m_posit.m_x = -200.0f;
 	heighfieldLocation.m_posit.m_z = -200.0f;
 
-	//ndBodyKinematic* const mapBody = BuildPlayArena(scene);
-	//ndBodyKinematic* const mapBody = BuildFlatPlane(scene, true);
-	//ndBodyKinematic* const mapBody = BuildGridPlane(scene, 400, 4.0f, 0.0f);
-	//ndBodyKinematic* const mapBody = BuildCompoundScene(scene, heighfieldLocation);
-	ndBodyKinematic* const mapBody = BuildHeightFieldTerrain(scene, heighfieldLocation);
-	//ndBodyKinematic* const mapBody = BuildStaticMesh(scene, "flatPlane.fbx", false);
-	//ndBodyKinematic* const mapBody = BuildProceduralMap(scene, 200, 2.0f, 0.0f);
-	//ndBodyKinematic* const mapBody = BuildStaticMesh(scene, "track.fbx", false);
+	//ndSharedPtr<ndBody> mapBody(BuildPlayArena(scene));
+	//ndSharedPtr<ndBody> mapBody(BuildFlatPlane(scene, true));
+	//ndSharedPtr<ndBody> mapBody(BuildGridPlane(scene, 400, 4.0f, 0.0f));
+	//ndSharedPtr<ndBody> mapBody(BuildCompoundScene(scene, heighfieldLocation));
+	ndSharedPtr<ndBody> mapBody(BuildHeightFieldTerrain(scene, heighfieldLocation));
+	//ndSharedPtr<ndBody> mapBody(BuildStaticMesh(scene, "flatPlane.fbx", false));
+	//ndSharedPtr<ndBody> mapBody(BuildProceduralMap(scene, 200, 2.0f, 0.0f));
+	//ndSharedPtr<ndBody> mapBody(BuildStaticMesh(scene, "track.fbx", false));
 
-	ndShapeMaterial mapMaterial(mapBody->GetCollisionShape().GetMaterial());
+	ndShapeMaterial mapMaterial(mapBody->GetAsBodyKinematic()->GetCollisionShape().GetMaterial());
 	mapMaterial.m_userId = ndDemoContactCallback::m_aiTerrain;
-	mapBody->GetCollisionShape().SetMaterial(mapMaterial);
+	mapBody->GetAsBodyKinematic()->GetCollisionShape().SetMaterial(mapMaterial);
 	
 	AddAiVehicle(scene);
 }

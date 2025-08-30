@@ -4532,9 +4532,18 @@ ndInt32 ndContactSolver::ConvexToStaticMeshContactsDiscrete()
 	}
 	if (!(count && data.m_staticMeshQuery->m_faceIndexCount.GetCount()))
 	{
-		CalculateClosestPoints();
-		ndFloat32 penetration = m_separatingVector.DotProduct(m_closestPoint1 - m_closestPoint0).GetScalar() - m_skinMargin - D_PENETRATION_TOL;
-		m_separationDistance = penetration;
+		if (polysoup->GetAsShapeHeightfield())
+		{
+			m_separationDistance = ndFloat32(0.0f);
+			m_separatingVector = ndVector::m_zero;
+			m_separatingVector.m_y = ndFloat32(1.0f);
+		}
+		else
+		{
+			CalculateClosestPoints();
+			ndFloat32 penetration = m_separatingVector.DotProduct(m_closestPoint1 - m_closestPoint0).GetScalar() - m_skinMargin - D_PENETRATION_TOL;
+			m_separationDistance = penetration;
+		}
 	}
 
 	ndAssert(!count || (m_separationDistance < ndFloat32(1.0e6f)));

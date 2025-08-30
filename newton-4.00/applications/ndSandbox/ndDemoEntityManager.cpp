@@ -35,7 +35,7 @@
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
 //#define DEFAULT_SCENE	4		// conservation of momentum 
-#define DEFAULT_SCENE	5		// basic Stacks
+//#define DEFAULT_SCENE	5		// basic Stacks
 //#define DEFAULT_SCENE	6		// basic Trigger
 //#define DEFAULT_SCENE	7		// object Placement
 //#define DEFAULT_SCENE	8		// particle fluid
@@ -44,7 +44,7 @@
 //#define DEFAULT_SCENE	11		// basic joints
 //#define DEFAULT_SCENE	12		// basic vehicle
 //#define DEFAULT_SCENE	13		// heavy vehicle
-//#define DEFAULT_SCENE	14		// background vehicle prop
+#define DEFAULT_SCENE	14		// background vehicle prop
 //#define DEFAULT_SCENE	15		// basic player
 //#define DEFAULT_SCENE	16		// rag doll
 //#define DEFAULT_SCENE	17		// cart pole discrete controller
@@ -606,7 +606,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//m_solverMode = ndWorld::ndStandardSolver;
 	m_solverMode = ndWorld::ndSimdAvx2Solver;
 	//m_solverPasses = 4;
-	m_workerThreads = 4;
+	m_workerThreads = 1;
 	//m_solverSubSteps = 2;
 	//m_showRaycastHit = true;
 	//m_showCenterOfMass = false;
