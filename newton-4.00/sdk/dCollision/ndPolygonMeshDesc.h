@@ -82,7 +82,6 @@ class ndPolygonMeshDesc: public ndFastAabb
 	};
 
 	// colliding box in polygonSoup local space
-	//D_COLLISION_API ndPolygonMeshDesc();
 	D_COLLISION_API ndPolygonMeshDesc(ndContactSolver& proxy, bool ccdMode);
 	D_COLLISION_API ~ndPolygonMeshDesc();
 
