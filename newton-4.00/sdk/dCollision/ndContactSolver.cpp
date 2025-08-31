@@ -2938,6 +2938,7 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsDiscrete()
 			}
 		}
 		//else if (stack < (ndInt32(sizeof(stackPool) / sizeof(stackPool[0])) - 2))
+		else
 		{
 			ndAssert(node->m_type == ndShapeCompound::m_node);
 			{
@@ -3079,6 +3080,7 @@ ndInt32 ndContactSolver::CompoundToConvexContactsDiscrete()
 			}
 		}
 		//else if (stack < (ndInt32(sizeof(stackPool) / sizeof(stackPool[0])) - 2))
+		else
 		{
 			ndAssert(node->m_type == ndShapeCompound::m_node);
 			{
@@ -3554,6 +3556,7 @@ ndInt32 ndContactSolver::CompoundToStaticHeightfieldContactsDiscrete()
 			}
 		}
 		//else if (stack < (ndInt32(sizeof(stackPool) / sizeof(stackPool[0]))- 2))
+		else
 		{
 			ndAssert(node->m_type == ndShapeCompound::m_node);
 			{
@@ -3696,6 +3699,7 @@ ndInt32 ndContactSolver::CompoundToStaticProceduralMesh()
 			}
 		}
 		//else if (stack < (ndInt32(sizeof(stackPool) / sizeof(stackPool[0])) - 2))
+		else
 		{
 			ndAssert(node->m_type == ndShapeCompound::m_node);
 			{
@@ -4084,6 +4088,7 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsContinue()
 			}
 		}
 		//else if (stack < (ndInt32(sizeof(stackPool) / sizeof(stackPool[0]))- 2))
+		else
 		{
 			ndAssert(node->m_type == ndShapeCompound::m_node);
 			{
