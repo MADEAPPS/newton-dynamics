@@ -28,11 +28,7 @@
 
 #define D_USE_YZ_VARIANCE
 
-#ifdef D_USE_YZ_VARIANCE
-	#define D_VERTEXLIST_INDEX_LIST_BATCH (1024 * 8)
-#else
-	#define D_VERTEXLIST_INDEX_LIST_BATCH (1024)
-#endif
+#define D_VERTEXLIST_INDEX_LIST_BATCH (1024 * 64)
 
 #pragma optimize( "", off )
 ndFloat32 ndExp_VS__Fix(ndReal x)
@@ -232,7 +228,7 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 	}
 
 	ndInt32 sortIndex = 0;
-	#ifdef D_USE_YZ_VARIANCE
+#ifdef D_USE_YZ_VARIANCE
 	const ndBigVector originScale(cluster.m_sum.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count));
 	const ndBigVector varianceScale2((cluster.m_sum2.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count) - originScale * originScale).GetMax (ndBigVector(1.0e-6f)));
 	ndFloat64 maxValue = varianceScale2.m_x;
@@ -247,7 +243,7 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 	ndInt32 varianceIndex0 = (sortIndex + 1) % 3;
 	ndInt32 varianceIndex1 = (varianceIndex0 + 1) % 3;
 	const ndBigVector stdScale(ndFloat64(1.0f) / varianceScale2.m_x, ndFloat64(1.0f) / varianceScale2.m_y, ndFloat64(1.0f) / varianceScale2.m_z, ndFloat64(0.0f));
-	#endif
+#endif
 
 	ndInt32 baseCount = 0;
 	if (cluster.m_count > D_VERTEXLIST_INDEX_LIST_BATCH)
@@ -268,6 +264,7 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 				ndFloat64 clusterVariance2_1 = stdScale[varianceIndex1] * ndMax(variance2[varianceIndex1], ndFloat64(0.0f));
 				ndFloat64 maxNormalizedVariance = ndMax (clusterVariance2_0, clusterVariance2_1);
 				bool doSort = (maxNormalizedVariance < ndFloat32(1.0f/8.0f)) || (spliteStack.GetCount() > (spliteStack.GetCapacity() - 4));
+				doSort = doSort && (cluster.m_count < D_VERTEXLIST_INDEX_LIST_BATCH);
 			#else
 				ndFloat64 maxVariance2 = ndMax(ndMax(variance2.m_x, variance2.m_y), variance2.m_z);
 				bool doSort = (cluster.m_count <= D_VERTEXLIST_INDEX_LIST_BATCH) || (spliteStack.GetCount() > (spliteStack.GetCapacity() - 4)) || (maxVariance2 < ndFloat32(4.0f));
@@ -280,7 +277,6 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 			else
 			{
 				#ifdef D_USE_YZ_VARIANCE
-					//ndInt32 firstSortAxis = (variance2.m_y >= variance2.m_z) ? 1 : 2;
 					ndInt32 firstSortAxis = (clusterVariance2_0 > clusterVariance2_1) ? varianceIndex0 : varianceIndex1;
 				#else
 					ndInt32 firstSortAxis = 0;
@@ -392,12 +388,6 @@ ndInt32 ndVertexListToIndexList(ndFloat64* const vertList, ndInt32 strideInBytes
 	return count;
 }
 
-//ndInt32 ndVertexListToIndexList(ndFloat64* const vertexList, ndInt32 strideInBytes, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, ndFloat64 tolerance)
-//{
-//	//ndInt32 count = ndVertexListToIndexListInternal(vertexList, strideInBytes, compareCount, vertexCount, indexListOut, ndFloat64(tolerance));
-//	return count;
-//}
-
 ndInt32 ndVertexListToIndexList(ndReal* const vertexList, ndInt32 strideInBytes, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, ndFloat64 tolerance)
 {
 	ndInt32 stride = ndInt32(strideInBytes / sizeof(ndReal));
@@ -414,7 +404,6 @@ ndInt32 ndVertexListToIndexList(ndReal* const vertexList, ndInt32 strideInBytes,
 		}
 	}
 
-	//ndInt32 count = ndVertexListToIndexListInternal(data, ndInt32(stride * sizeof(ndFloat64)), compareCount, vertexCount, indexListOut, ndFloat64(tolerance));
 	ndInt32 count = ndVertexListToIndexList(data, ndInt32(stride * sizeof(ndFloat64)), compareCount, vertexCount, indexListOut, ndFloat64(tolerance));
 	for (ndInt32 i = 0; i < count; ++i)
 	{
