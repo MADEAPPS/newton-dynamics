@@ -301,7 +301,6 @@ void ndBagroundLowLodVehicle(ndDemoEntityManager* const scene)
 	//ndSharedPtr<ndBody> mapBody(BuildPlayArena(scene));
 	//ndSharedPtr<ndBody> mapBody(BuildFlatPlane(scene, true));
 	//ndSharedPtr<ndBody> mapBody(BuildGridPlane(scene, 400, 4.0f, 0.0f));
-	//ndSharedPtr<ndBody> mapBody(BuildCompoundScene(scene, heighfieldLocation));
 	ndSharedPtr<ndBody> mapBody(BuildHeightFieldTerrain(scene, heighfieldLocation));
 	//ndSharedPtr<ndBody> mapBody(BuildStaticMesh(scene, "flatPlane.fbx", false));
 	//ndSharedPtr<ndBody> mapBody(BuildProceduralMap(scene, 200, 2.0f, 0.0f));
