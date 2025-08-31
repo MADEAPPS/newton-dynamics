@@ -814,7 +814,8 @@ ndUnsigned64 ndShapeHeightfield::GetHash(ndUnsigned64 hash) const
 	return hash;
 }
 
-ndVector ndShapeHeightfield::SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin) const
+//ndVector ndShapeHeightfield::SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin) const
+ndVector ndShapeHeightfield::SupportVertexSpecial(const ndVector&, ndFloat32) const
 {
 	//return SupportVertex(dir);
 	ndAssert(0);
