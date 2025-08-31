@@ -9,12 +9,12 @@
 * freely
 */
 
-#ifndef __SceneCompoundCollision_h__
-#define __SceneCompoundCollision_h__
+#ifndef __COMPOUND_SCENE_h__
+#define __COMPOUND_SCENE_h__
 
 #include "ndSandboxStdafx.h"
 
 class ndDemoEntityManager;
-ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const ndMatrix& location = ndGetIdentityMatrix());
+ndSharedPtr<ndBody> BuildCompoundScene(ndDemoEntityManager* const scene, const ndMatrix& location = ndGetIdentityMatrix());
 #endif 
 

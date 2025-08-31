@@ -154,7 +154,7 @@ static void AddBoxSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sc
 	compound->AddCollision(&box);
 }
 
-ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const ndMatrix& location)
+ndSharedPtr<ndBody> BuildCompoundScene(ndDemoEntityManager* const scene, const ndMatrix& location)
 {
 	ndSharedPtr<ndDemoEntity> rootEntity (new ndDemoEntity(location));
 	rootEntity->SetName("arena");
@@ -271,5 +271,5 @@ ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const ndMa
 	ndPhysicsWorld* const world = scene->GetWorld();
 	world->AddBody(body);
 	scene->AddEntity(rootEntity);
-	return body->GetAsBodyDynamic();
+	return body;
 }
