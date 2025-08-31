@@ -65,16 +65,14 @@ if (MSVC OR MINGW)
 
 elseif(APPLE)
 	message ("adding required Apple frameworks")
-    add_definitions(-DGL_SILENCE_DEPRECATION)
 
-	target_link_libraries(${projectName} PUBLIC glfw)
-
+    #add_definitions(-DGL_SILENCE_DEPRECATION)
+	#target_link_libraries(${projectName} PUBLIC glfw)
 	#target_link_libraries(${projectName} PUBLIC glfw glut)
     #target_link_libraries(${projectName} PRIVATE "-framework IOKit")
     #target_link_libraries(${projectName} PRIVATE "-framework CoreGraphics")
 	#target_link_libraries(${projectName} PRIVATE "-framework CoreGraphics" "-framework Foundation" "-framework AppKit")
-
-	target_link_libraries(${projectName} PUBLIC "-framework OpenGL")
+	#target_link_libraries(${projectName} PUBLIC "-framework OpenGL")
     target_link_libraries(${projectName} PRIVATE "-framework CoreFoundation")
 	#set_target_properties(${projectName} PROPERTIES LINK_FLAGS "-Wl,-F/Library/Frameworks")
 
