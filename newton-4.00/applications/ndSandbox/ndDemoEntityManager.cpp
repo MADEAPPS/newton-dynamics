@@ -500,8 +500,6 @@ ndDemoEntityManager::ndDemoEntityManager()
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 	#endif
 
-	//m_hasJoytick = glfwJoystickPresent(0) ? true : false;
-
 	// Create window with graphics context
 	char version[256];
 	snprintf(version, sizeof (version), "Newton Dynamics %d.%.2i sandbox demos", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION);
@@ -512,7 +510,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	 // Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	ImGuiIO& io = ImGui::GetIO();
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 	//io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
