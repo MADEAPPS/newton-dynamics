@@ -34,7 +34,7 @@ void ReleaseTexture (GLuint texture);
 
 const char* FindTextureById (GLuint textureID);
 
-void TargaToPng();
+
 
 #endif
 

@@ -289,7 +289,6 @@ GLuint LoadCubeMapTexture(
 	return texture->m_textureID;
 }
 
-
 void ReleaseTexture (GLuint texture)
 {
 	ndTextureCache::GetChache().RemoveById (texture);
@@ -309,111 +308,6 @@ void TextureCacheCleanUp()
 
 static void TargaToPng(const char* const filename)
 {
-	//char fullPathName[2048];
-	//ndGetWorkingFileName(filename, fullPathName);
-	//strcat(fullPathName, ".tga");
-	//
-	//FILE* const pFile = fopen(fullPathName, "rb");
-	//ndAssert(pFile);
-	//
-	//TGAHEADER tgaHeader;		
-	//size_t ret = fread(&tgaHeader, 18, 1, pFile);
-	//ret = 0;
-	//
-	//// Do byte swap for big vs little endian
-	//tgaHeader.colorMapStart = SWAP_INT16(tgaHeader.colorMapStart);
-	//tgaHeader.colorMapLength = SWAP_INT16(tgaHeader.colorMapLength);
-	//tgaHeader.xstart = SWAP_INT16(tgaHeader.xstart);
-	//tgaHeader.ystart = SWAP_INT16(tgaHeader.ystart);
-	//tgaHeader.width = SWAP_INT16(tgaHeader.width);
-	//tgaHeader.height = SWAP_INT16(tgaHeader.height);
-	//
-	//// Get width, height, and depth of texture
-	//ndUnsigned32 width = tgaHeader.width;
-	//ndUnsigned32 height = tgaHeader.height;
-	//short sDepth = tgaHeader.bits / 8;
-	//ndAssert((sDepth == 3) || (sDepth == 4));
-	//
-	//// Put some validity checks here. Very simply, I only understand
-	//// or care about 8, 24, or 32 bit targa's.
-	////if(tgaHeader.bits != 8 && tgaHeader.bits != 24 && tgaHeader.bits != 32) 
-	//if (!((tgaHeader.bits == 8) || (tgaHeader.bits == 24) || (tgaHeader.bits == 32)))
-	//{
-	//	fclose(pFile);
-	//	return;
-	//}
-	//
-	//// Calculate size of image buffer
-	//ndUnsigned32 lImageSize = ndUnsigned32(width * height * sDepth);
-	//
-	//// Allocate memory and check for success
-	//unsigned char* const pBits = (unsigned char*)ndMemory::Malloc(width * height * sizeof(ndInt32));
-	//if (pBits == nullptr)
-	//{
-	//	fclose(pFile);
-	//	return;
-	//}
-	//
-	//// Read in the bits
-	//// Check for read error. This should catch RLE or other 
-	//// weird formats that I don't want to recognize
-	//ndInt32 readret = ndInt32(fread(pBits, lImageSize, 1, pFile));
-	//if (readret != 1)
-	//{
-	//	fclose(pFile);
-	//	ndMemory::Free(pBits);
-	//	return;
-	//}
-	//
-	//ndGetWorkingFileName(filename, fullPathName);
-	//strcat(fullPathName, ".png");
-	//
-	//switch (sDepth)
-	//{
-	//	case 1:
-	//	{
-	//		ndAssert(0);
-	//		//	format = m_luminace;
-	//		break;
-	//	}
-	//
-	//	case 3:
-	//	{
-	//		for (ndInt32 i = ndInt32(height * width * 3 - 3); i >= 0; i -= 3)
-	//		{
-	//			unsigned char r = pBits[i + 0];
-	//			unsigned char g = pBits[i + 1];
-	//			unsigned char b = pBits[i + 2];
-	//			pBits[i + 2] = r;
-	//			pBits[i + 1] = g;
-	//			pBits[i + 0] = b;
-	//		}
-	//		lodepng_encode_file(fullPathName, pBits, width, height, LCT_RGB, 8);
-	//		break;
-	//	}
-	//
-	//	case 4:
-	//	{
-	//		for (ndInt32 i = ndInt32(height * width * 4 - 4); i >= 0; i -= 4)
-	//		{
-	//			unsigned char r = pBits[i + 0];
-	//			unsigned char g = pBits[i + 1];
-	//			unsigned char b = pBits[i + 2];
-	//			unsigned char a = pBits[i + 3];
-	//			pBits[i + 0] = b;
-	//			pBits[i + 1] = g;
-	//			pBits[i + 2] = r;
-	//			pBits[i + 3] = a;
-	//		}
-	//		lodepng_encode_file(fullPathName, pBits, width, height, LCT_RGBA, 8);
-	//		break;
-	//	}
-	//};
-	//
-	//// Done with File
-	//fclose(pFile);
-	//ndMemory::Free(pBits);
-
 	char fullPathName[2048];
 	ndGetWorkingFileName(filename, fullPathName);
 	strcat(fullPathName, ".png");
@@ -437,39 +331,3 @@ static void TargaToPng(const char* const filename)
 	lodepng_free(pBits);
 }
 
-void TargaToPng()
-{
-	//TargaToPng("smilli");
-//#if (defined(WIN32) || defined(_WIN32))
-#if 0
-	char appPath[1024];
-	char outPathName[1024];
-	GetModuleFileNameA(nullptr, appPath, sizeof(appPath));
-	strtolwr(appPath);
-	
-	char* const end = strstr(appPath, "applications");
-	end[0] = 0;
-	snprintf(outPathName, sizeof (outPathName), "%sapplications/media", appPath);
-	
-	char rootPath[2048];
-	snprintf(rootPath, sizeof(rootPath), "%s/*.png", outPathName);
-	
-	WIN32_FIND_DATAA data;
-	HANDLE handle = FindFirstFile(rootPath, &data);
-	
-	if (handle != INVALID_HANDLE_VALUE)
-	{
-		do
-		{
-			char fileName[256];
-			snprintf(fileName, sizeof(fileName), "%s", data.cFileName);
-			strtolwr(fileName);
-			char* const fileNameEnd = strstr(fileName, ".png");
-			*fileNameEnd = 0;
-	
-			TargaToPng(fileName);
-		} while (FindNextFile(handle, &data));
-		FindClose(handle);
-	}
-#endif
-}
