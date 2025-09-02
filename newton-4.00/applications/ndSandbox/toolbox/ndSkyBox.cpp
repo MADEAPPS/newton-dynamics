@@ -38,17 +38,15 @@ ndSkyBox::ndSkyBox(GLuint shader)
 		3, 1, 2,
 	};
 
-	//m_textureMatrix[1][1] = ndFloat32(-1.0f);
-
 	//m_texturecubemap = LoadCubeMapTexture(
-	//	"NewtonSky0003.png", "NewtonSky0001.png",
-	//	"NewtonSky0006.png", "NewtonSky0005.png",
-	//	"NewtonSky0002.png", "NewtonSky0004.png");
+	//	"proceduralEnv/skyBox_front.png", "proceduralEnv/skyBox_back.png",
+	//	"proceduralEnv/skyBox_top.png", "proceduralEnv/skyBox_botton.png",
+	//	"proceduralEnv/skyBox_left.png", "proceduralEnv/skyBox_right.png");
 
 	m_texturecubemap = LoadCubeMapTexture(
-		"skyBox_front.png", "skyBox_back.png",
-		"skyBox_top.png", "skyBox_botton.png",
-		"skyBox_left.png", "skyBox_right.png");
+		"Sorsele3/negx.png", "Sorsele3/posx.png",
+		"Sorsele3/posy.png", "Sorsele3/negy.png",
+		"Sorsele3/negz.png", "Sorsele3/posz.png");
 
 	glGenVertexArrays(1, &m_vertextArrayBuffer);
 	glBindVertexArray(m_vertextArrayBuffer);

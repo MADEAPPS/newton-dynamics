@@ -30,7 +30,7 @@
 #include "ndHighResolutionTimer.h"
 #include "ndShadowsMapRenderPass.h"
 
-//#define DEFAULT_SCENE	0		// basic rigidbody
+#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// Gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
@@ -44,7 +44,7 @@
 //#define DEFAULT_SCENE	11		// basic joints
 //#define DEFAULT_SCENE	12		// basic vehicle
 //#define DEFAULT_SCENE	13		// heavy vehicle
-#define DEFAULT_SCENE	14		// background vehicle prop
+//#define DEFAULT_SCENE	14		// background vehicle prop
 //#define DEFAULT_SCENE	15		// basic player
 //#define DEFAULT_SCENE	16		// rag doll
 //#define DEFAULT_SCENE	17		// cart pole discrete controller
