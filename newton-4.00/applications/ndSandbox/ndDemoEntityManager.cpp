@@ -632,7 +632,6 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//SimpleRegressionBrainStressTest();
 	ndHandWrittenDigits();
 	//ndCifar10ImageClassification();
-	//TargaToPng();
 }
 
 ndDemoEntityManager::~ndDemoEntityManager ()
