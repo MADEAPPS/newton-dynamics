@@ -306,28 +306,3 @@ void TextureCacheCleanUp()
 	cache.CleanUp();
 }
 
-static void TargaToPng(const char* const filename)
-{
-	char fullPathName[2048];
-	ndGetWorkingFileName(filename, fullPathName);
-	strcat(fullPathName, ".png");
-
-	unsigned width;
-	unsigned height;
-	unsigned char* pBits;
-	lodepng_decode_file(&pBits, &width, &height, fullPathName, LCT_RGBA, 8);
-
-	unsigned* const ptr = (ndUnsigned32*)pBits;
-	for (unsigned y = 0; y < height / 2; ++y)
-	{
-		unsigned* const ptr0 = ptr + y * width;
-		unsigned* const ptr1 = ptr + (height - y - 1) * width;
-		for (unsigned x = 0; x < width; ++x)
-		{
-			ndSwap(ptr0[x], ptr1[x]);
-		}
-	}
-	lodepng_encode_file(fullPathName, pBits, width, height, LCT_RGBA, 8);
-	lodepng_free(pBits);
-}
-
