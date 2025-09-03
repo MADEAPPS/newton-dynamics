@@ -720,17 +720,19 @@ void ndBodyKinematic::SetMatrixUpdateScene(const ndMatrix& matrix)
 	ndScene* const scene = GetScene();
 	if (scene)
 	{
-		ndUnsigned8 sceneEquilibrium = 1;
-		ndUnsigned8 sceneForceUpdate = m_sceneForceUpdate;
+		//ndUnsigned8 sceneEquilibrium = 1;
+		//ndUnsigned8 sceneForceUpdate = m_sceneForceUpdate;
 
 		ndContactMap::Iterator it(GetContactMap());
 		for (it.Begin(); it; it++)
 		{
 			ndContact* const contact = it.GetNode()->GetInfo();
-			contact->ClearSeparatingDistance();
+			//contact->ClearSeparatingDistance();
+			contact->InvalicatdeCache();
 		}
 
-		if (ndUnsigned8(!m_equilibrium) | sceneForceUpdate)
+		//if (ndUnsigned8(!m_equilibrium) | sceneForceUpdate)
+		//if (!m_equilibrium)
 		{
 			ndBvhLeafNode* const bodyNode = scene->m_bvhSceneManager.GetLeafNode(this);
 			ndAssert(bodyNode->GetAsSceneBodyNode());
@@ -744,10 +746,14 @@ void ndBodyKinematic::SetMatrixUpdateScene(const ndMatrix& matrix)
 			{
 				bodyNode->SetAabb(m_minAabb, m_maxAabb);
 			}
-			sceneEquilibrium = ndUnsigned8(!sceneForceUpdate & (test != 0));
+			//sceneEquilibrium = ndUnsigned8(!sceneForceUpdate & (test != 0));
 		}
-		m_sceneForceUpdate = 0;
-		m_sceneEquilibrium = sceneEquilibrium;
+		//m_sceneForceUpdate = 0;
+		//m_sceneEquilibrium = sceneEquilibrium;
+
+		m_equilibrium = 0;
+		m_sceneEquilibrium = 0;
+		m_sceneForceUpdate = 1;
 	}
 }
 
