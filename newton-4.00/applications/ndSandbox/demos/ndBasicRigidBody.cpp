@@ -297,7 +297,7 @@ class CBasicBodyModel : public ndModel
 		{
 			ndMatrix mBodyMatrix (m_rootNode->m_body->GetMatrix());
 
-#if 1
+#if 0
 			timestep = 0;
 			mBodyMatrix.m_posit += vPosIncrement;
 			m_rootNode->m_body->GetAsBodyKinematic()->SetMatrixUpdateScene(mBodyMatrix);
@@ -417,6 +417,4 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
 
-
 #endif
-
