@@ -234,6 +234,99 @@ class ContactNotify : public ndContactNotify
 //	return body;
 //}
 
+class CBasicBodyModel : public ndModel
+{
+	class ndNode : public ndNodeHierarchy<ndNode>
+	{
+		public:
+		ndNode(const ndNode& src)
+			:ndNodeHierarchy<ndNode>(src)
+			,m_body(src.m_body)
+			,m_joint(src.m_joint)
+			,m_name(src.m_name)
+		{
+		}
+		ndNode(const ndSharedPtr<ndBody>& body, const ndSharedPtr<ndJointBilateralConstraint>& joint, ndNode* const parent)
+			:ndNodeHierarchy<ndNode>()
+			, m_body(body)
+			, m_joint(joint)
+			, m_name("")
+		{
+			if (parent)
+			{
+				Attach(parent);
+			}
+		}
+		virtual ~ndNode()
+		{
+
+		}
+
+		ndSharedPtr<ndBody> m_body;
+		ndSharedPtr<ndJointBilateralConstraint> m_joint;
+		ndString m_name;
+	};
+
+	public:
+	CBasicBodyModel()
+		:ndModel()
+		,m_rootNode(nullptr)
+	{
+
+	}
+	CBasicBodyModel(const CBasicBodyModel& src)
+		:ndModel(src)
+		,m_rootNode(nullptr)
+	{
+
+	}
+	virtual ~CBasicBodyModel()
+	{
+		if (m_rootNode)
+			delete m_rootNode;
+	}
+	void AddRootBody(const ndSharedPtr<ndBody>& rootBody)
+	{
+		ndSharedPtr <ndJointBilateralConstraint> dummyJoint;
+		m_rootNode = new ndNode(rootBody, dummyJoint, nullptr);
+	}
+	void IncrementRootPosition(const ndVector& vPosIncrement)
+	{
+		if (m_rootNode && m_rootNode->m_body)
+		{
+			ndMatrix mBodyMatrix (m_rootNode->m_body->GetMatrix());
+			mBodyMatrix.m_posit += vPosIncrement;
+			m_rootNode->m_body->GetAsBodyKinematic()->SetMatrixUpdateScene(mBodyMatrix);
+		}
+	}
+
+	private:
+	ndNode* m_rootNode;
+};
+
+class CBasicBodyModelNotify : public ndModelNotify
+{
+	public:
+	CBasicBodyModelNotify(CBasicBodyModel* const basicBodyModel)
+		:ndModelNotify()
+	{
+		SetModel(basicBodyModel);
+	}
+	virtual void PostUpdate(ndFloat32 timestep) override
+	{
+		ndModelNotify::PostUpdate(timestep);
+
+		auto myModel = (CBasicBodyModel*)GetModel();
+		ndPhysicsWorld* const world = (ndPhysicsWorld*)myModel->GetWorld();
+		ndDemoEntityManager* const scene = world->GetManager();
+
+		if (scene->GetKeyState(ImGuiKey_LeftArrow))
+			myModel->IncrementRootPosition(ndVector(-0.01f, 0.f, 0.f, 0.f));
+		else if (scene->GetKeyState(ImGuiKey_RightArrow))
+			myModel->IncrementRootPosition(ndVector(0.01f, 0.f, 0.f, 0.f));
+	}
+};
+
 void ndBasicRigidBody(ndDemoEntityManager* const scene)
 {
 	constexpr ndFloat32 groundHeight = 0.f;
@@ -251,7 +344,7 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 	ndMatrix xform = ndGetIdentityMatrix();
 
 	ndMatrix groundXF;
-	ndBody* groundBody = 0;
+	//ndBody* groundBody = 0;
 	if (1) // flat floor and walls
 	{
 		ndFloat32 angle = 0.f / 180.f * float(ndPi);
@@ -267,11 +360,9 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 		//ndSharedPtr<ndBody> bodyFloor(BuildFlatPlane(scene, true, true));
 		//ndSharedPtr<ndBody> bodyFloor(BuildFlatPlane(scene, true));
 
-		groundBody = *bodyFloor;
 		// does not work; dynamic box stops moving and starts wobbling after 10 sec (newton bug?)
-		bodyFloor->SetVelocity(ndVector(0.f, 0.f, -1.0f, 0.f)); 
+		//bodyFloor->SetVelocity(ndVector(0.f, 0.f, -1.0f, 0.f)); 
 
-#if 1
 		ndFloat32 size = 100;
 		ndMatrix xf = groundXF;
 		xf.m_posit = origin + xf.RotateVector(ndVector(size, 0.f, 0.f, 0.f)); 
@@ -285,7 +376,6 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 		
 		xf.m_posit = origin + xf.RotateVector(ndVector(0.f, 0.f, -size, 0.f)); 
 		AddBox(scene, xf, 0.0f, size * 1.98f, 5.0f, 1.0f);
-#endif
 	}
 
 	if (1) // dynamic box, stops and starts wobbling
@@ -302,6 +392,11 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 		//ndBodyDynamic* box = BuildBox(world, xform, 10.f, ndVector(1.f, 0.5f, 1.0f, 0.f));
 		ndSharedPtr<ndBody> box (AddBox(scene, xform, 10.0f, 5.0f, 0.5f, 1.0f));
 		box->SetMatrix(xform);
+
+		CBasicBodyModel* pModel(new CBasicBodyModel());
+		pModel->AddRootBody(box);
+		pModel->SetNotifyCallback(ndSharedPtr<ndModelNotify>(new CBasicBodyModelNotify(pModel)));
+		scene->GetWorld()->AddModel(pModel);
 	}
 
 	ndMatrix matrix(ndGetIdentityMatrix());
