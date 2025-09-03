@@ -290,13 +290,24 @@ class CBasicBodyModel : public ndModel
 		ndSharedPtr <ndJointBilateralConstraint> dummyJoint;
 		m_rootNode = new ndNode(rootBody, dummyJoint, nullptr);
 	}
-	void IncrementRootPosition(const ndVector& vPosIncrement)
+
+	void IncrementRootPosition(const ndVector& vPosIncrement, ndFloat32 timestep)
 	{
 		if (m_rootNode && m_rootNode->m_body)
 		{
 			ndMatrix mBodyMatrix (m_rootNode->m_body->GetMatrix());
+
+#if 1
+			timestep = 0;
 			mBodyMatrix.m_posit += vPosIncrement;
 			m_rootNode->m_body->GetAsBodyKinematic()->SetMatrixUpdateScene(mBodyMatrix);
+#else
+			ndVector veloc(m_rootNode->m_body->GetVelocity());
+			ndVector newVeloc(vPosIncrement.Scale(1.0f / timestep));
+			ndVector deltaVeloc(newVeloc - veloc);
+			ndVector impulse(deltaVeloc.Scale(1.0f / m_rootNode->m_body->GetInvMass()));
+			m_rootNode->m_body->GetAsBodyKinematic()->ApplyImpulsePair(impulse, ndVector::m_zero, timestep);      // 0.8 = momentum canceling factor
+#endif
 		}
 	}
 
@@ -321,9 +332,9 @@ class CBasicBodyModelNotify : public ndModelNotify
 		ndDemoEntityManager* const scene = world->GetManager();
 
 		if (scene->GetKeyState(ImGuiKey_LeftArrow))
-			myModel->IncrementRootPosition(ndVector(-0.01f, 0.f, 0.f, 0.f));
+			myModel->IncrementRootPosition(ndVector(-0.01f, 0.f, 0.f, 0.f), timestep);
 		else if (scene->GetKeyState(ImGuiKey_RightArrow))
-			myModel->IncrementRootPosition(ndVector(0.01f, 0.f, 0.f, 0.f));
+			myModel->IncrementRootPosition(ndVector(0.01f, 0.f, 0.f, 0.f), timestep);
 	}
 };
 
