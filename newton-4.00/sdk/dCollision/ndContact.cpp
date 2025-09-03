@@ -107,7 +107,7 @@ void ndContact::SetBodies(ndBodyKinematic* const body0, ndBodyKinematic* const b
 
 void ndContact::ClearSeparatingDistance()
 {
-	m_separationDistance = 0;
+	m_separationDistance = ndFloat32(0.0f);
 }
 
 void ndContact::InvalicatdeCache()
