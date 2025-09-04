@@ -21,7 +21,6 @@ class ndSharedPtr
 		ndRefCounter();
 		void AddRef();
 		ndInt32 Release();
-		ndAtomic<ndInt32> m_weakRef;
 		ndAtomic<ndInt32> m_sharedRef;
 	};
 
@@ -51,7 +50,6 @@ class ndSharedPtr
 template <typename T>
 ndSharedPtr<T>::ndRefCounter::ndRefCounter()
 	:ndContainersFreeListAlloc<ndRefCounter>()
-	,m_weakRef(0)
 	,m_sharedRef(0)
 {
 }

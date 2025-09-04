@@ -40,7 +40,6 @@
 #include <ndMemory.h>
 #include <ndGoogol.h>
 #include <ndString.h>
-#include <ndWeakPtr.h>
 #include <ndFastRay.h>
 #include <ndFastAabb.h>
 #include <ndProfiler.h>

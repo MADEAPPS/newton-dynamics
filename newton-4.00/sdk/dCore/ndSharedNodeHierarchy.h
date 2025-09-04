@@ -14,7 +14,6 @@
 
 #include "ndCoreStdafx.h"
 #include "ndList.h"
-#include "ndWeakPtr.h"
 #include "ndSharedPtr.h"
 #include "ndContainersAlloc.h"
 
