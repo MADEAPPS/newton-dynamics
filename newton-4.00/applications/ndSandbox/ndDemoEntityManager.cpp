@@ -30,8 +30,8 @@
 #include "ndHighResolutionTimer.h"
 #include "ndShadowsMapRenderPass.h"
 
-#define DEFAULT_SCENE	0		// basic rigidbody
-//#define DEFAULT_SCENE	1		// Gpu basic rigidbody
+//#define DEFAULT_SCENE	0		// basic rigidbody
+#define DEFAULT_SCENE	1		// simple conveyor belt ground
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
 //#define DEFAULT_SCENE	4		// conservation of momentum 
@@ -74,7 +74,6 @@ void ndBasicJoints(ndDemoEntityManager* const scene);
 void ndBasicVehicle(ndDemoEntityManager* const scene);
 void ndHeavyVehicle(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
-void ndBasicGpuTest0(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_3(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_4(ndDemoEntityManager* const scene);
@@ -88,11 +87,11 @@ void ndBasicParticleFluid(ndDemoEntityManager* const scene);
 void ndUnicycleController(ndDemoEntityManager* const scene);
 void ndQuadruped_sac_test(ndDemoEntityManager* const scene);
 void ndQuadruped_ppo_test(ndDemoEntityManager* const scene);
-
 void ndBasicAngularMomentum(ndDemoEntityManager* const scene);
 void ndBagroundLowLodVehicle(ndDemoEntityManager* const scene);
 void ndSimpleIndustrialRobot(ndDemoEntityManager* const scene);
 void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene);
+void ndBasicContactProperties(ndDemoEntityManager* const scene);
 void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene);
 void ndBasicExplodeConvexShape(ndDemoEntityManager* const scene);
 
@@ -109,7 +108,8 @@ void ndStaticUserMeshCollisionDemo(ndDemoEntityManager* const scene);
 ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
 {
 	{ "basic rigidbody", ndBasicRigidBody},
-	{ "basic gpu rigidbody", ndBasicGpuRigidBody},
+	//{ "basic gpu rigidbody", ndBasicGpuRigidBody},
+	{ "basic conveyor bell", ndBasicContactProperties},
 	{ "basic friction ramp", ndBasicFrictionRamp},
 	{ "basic compound shapes", ndBasicCompoundShapeDemo},
 	{ "basic conservation of momentum", ndBasicAngularMomentum},
@@ -1595,7 +1595,7 @@ void ndDemoEntityManager::RenderScene()
 	m_cameraManager->InterpolateMatrices (this, interpolateParam);
 
 	// apply pre-render passes
-	m_shadowRenderPass->RenderScene(timestep);
+	//m_shadowRenderPass->RenderScene(timestep);
 	m_colorRenderPass->RenderScene(timestep);
 }
 
