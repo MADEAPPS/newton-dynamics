@@ -22,19 +22,25 @@ include_directories(../../sdk/dCollision)
 include_directories(../../thirdParty/png)
 include_directories(../../thirdParty/imgui/)
 
-if (NOT APPLE) 
+if (APPLE) 
+	include_directories(Backends/RenderBlank)
+	file(GLOB CPP_SOURCE 
+		*.h
+		*.cpp 
+		Backends/RenderBlank/*.h
+		Backends/RenderBlank/*.cpp)
+else()
 	include_directories(Backends/RenderOpenGl)
 	include_directories(../../thirdParty/glfw/)
 	include_directories(../../thirdParty/glfw/include/)
 	include_directories(../../thirdParty/glatter/include/glatter/)
-
+	
 	file(GLOB CPP_SOURCE 
 		*.h
 		*.cpp 
 		Backends/RenderOpenGl/*.h
 		Backends/RenderOpenGl/*.cpp)
-else()
-	message ("!!!!!!!!!!!!! add apply support !!!!!!!!")
+	#message ("!!!!!!!!!!!!! add apply support !!!!!!!!")
 endif()
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})

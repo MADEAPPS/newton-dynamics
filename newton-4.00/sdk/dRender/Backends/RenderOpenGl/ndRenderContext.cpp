@@ -22,7 +22,9 @@
 #include "ndRenderStdafx.h"
 #include "ndRender.h"
 #include "ndRenderContext.h"
+#include "ndRenderTexture.h"
 #include "ndRenderShaderCache.h"
+#include "ndRenderTextureImage.h"
 
 ndRenderContext::ndRenderContext(ndRender* const owner, ndInt32 width, ndInt32 height, const char* const title)
 	:ndClassAlloc()
@@ -452,4 +454,83 @@ void ndRenderContext::ClearFrameBuffer(const ndVector& color)
 {
 	glClearColor(GLfloat(color.m_x), GLfloat(color.m_y), GLfloat(color.m_z), GLfloat(color.m_w));
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+ndSharedPtr<ndRenderTexture> ndRenderContext::LoadTexture(const ndString& pathname)
+{
+	char tmp[256];
+	snprintf(tmp, sizeof(tmp), "%s", pathname.GetStr());
+	strtolwr(tmp);
+	const char* const fileNameEnd = strstr(tmp, ".png");
+	if (!fileNameEnd)
+	{
+		strcat(tmp, ".png");
+		ndTrace(("subtitute texture %s with %s version\n", pathname.GetStr(), tmp));
+		ndAssert(0);
+	}
+
+	ndSharedPtr<ndRenderTexture> texture(nullptr);
+	unsigned width;
+	unsigned height;
+	unsigned char* pBits;
+	unsigned ret = lodepng_decode_file(&pBits, &width, &height, tmp, LCT_RGBA, 8);
+	ndAssert(!ret);
+	if (!ret)
+	{
+		// from targa legacy reasons, the texture is upsizedown, 
+		// so I have to flip it
+		unsigned* const buffer = (unsigned*)pBits;
+		for (ndInt32 i = 0; i < ndInt32(height / 2); i++)
+		{
+			unsigned* const row0 = &buffer[i * width];
+			unsigned* const row1 = &buffer[(height - 1 - i) * width];
+			for (ndInt32 j = 0; j < ndInt32(width); ++j)
+			{
+				ndSwap(row0[j], row1[j]);
+			}
+		}
+		texture = ndSharedPtr<ndRenderTexture>(new ndRenderTextureImage(pBits, int(width), int(height), ndRenderTexture::m_rgba));
+		lodepng_free(pBits);
+	}
+	return texture;
+}
+
+ndSharedPtr<ndRenderTexture> ndRenderContext::LoadCubeMap(const ndFixSizeArray<ndString, 6>& pathnames)
+{
+	ndFixSizeArray<ndUnsigned32, 6> faceArray;
+	faceArray.PushBack(GL_TEXTURE_CUBE_MAP_POSITIVE_X);
+	faceArray.PushBack(GL_TEXTURE_CUBE_MAP_NEGATIVE_X);
+	faceArray.PushBack(GL_TEXTURE_CUBE_MAP_POSITIVE_Y);
+	faceArray.PushBack(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y);
+	faceArray.PushBack(GL_TEXTURE_CUBE_MAP_POSITIVE_Z);
+	faceArray.PushBack(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z);
+
+	ndSharedPtr<ndRenderTexture> texture(new ndRenderTextureCubeMapImage());
+	ndRenderTextureCubeMapImage* const cubeMap = (ndRenderTextureCubeMapImage*)*texture;
+	for (ndInt32 i = 0; i < pathnames.GetCount(); ++i)
+	{
+		ndAssert(pathnames[i].Size());
+		char tmp[256];
+		snprintf(tmp, sizeof(tmp), "%s", pathnames[i].GetStr());
+		strtolwr(tmp);
+		char* const fileNameEnd = strstr(tmp, ".png");
+		if (!fileNameEnd)
+		{
+			ndAssert(0);
+			*fileNameEnd = 0;
+			strcat(tmp, ".png");
+			ndTrace(("subtitute texture %s with %s version\n", pathnames[i].GetStr(), tmp));
+		}
+
+		unsigned width;
+		unsigned height;
+		unsigned char* pBits = nullptr;
+		lodepng_decode_file(&pBits, &width, &height, tmp, LCT_RGBA, 8);
+		ndAssert(pBits);
+
+		cubeMap->LoadFace(faceArray[i], pBits, int(width), int(height), ndRenderTexture::m_rgba);
+		lodepng_free(pBits);
+	}
+
+	return texture;
 }

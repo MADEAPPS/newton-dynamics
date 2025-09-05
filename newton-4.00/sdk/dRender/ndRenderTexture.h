@@ -24,6 +24,7 @@
 
 #include "ndRenderStdafx.h"
 
+class ndRenderContext;
 class ndRenderTexture: public ndContainersFreeListAlloc<ndRenderTexture>
 {
 	public:
@@ -37,8 +38,8 @@ class ndRenderTexture: public ndContainersFreeListAlloc<ndRenderTexture>
 	ndRenderTexture();
 	virtual ~ndRenderTexture();
 
-	static ndSharedPtr<ndRenderTexture> Load(const ndString& pathname);
-	static ndSharedPtr<ndRenderTexture> LoadCubeMap(const ndFixSizeArray<ndString, 6>& pathnames);
+	static ndSharedPtr<ndRenderTexture> Load(ndRenderContext* const context, const ndString& pathname);
+	static ndSharedPtr<ndRenderTexture> LoadCubeMap(ndRenderContext* const context, const ndFixSizeArray<ndString, 6>& pathnames);
 
 	private:
 	ndUnsigned64 m_hash;

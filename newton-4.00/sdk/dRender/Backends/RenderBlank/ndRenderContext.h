@@ -33,14 +33,9 @@
 	#include <commctrl.h>
 	#include <crtdbg.h>
 
-	#include <glatter.h>
-	#include <GL/glu.h>
-	#include <GL/gl.h>
-	#include <GLFW/glfw3.h>
-	#include <GLFW/glfw3native.h>
-
-	#include <backends/imgui_impl_glfw.h>
-	#include <backends/imgui_impl_opengl3.h>
+	// insert the Im gui back end here
+	//#include <backends/imgui_impl_glfw.h>
+	//#include <backends/imgui_impl_opengl3.h>
 
 #else
 	#error 
@@ -83,24 +78,11 @@ class ndRenderContext: public ndClassAlloc
 	void SetCollorPassRenderStates();
 
 	void SetViewport(ndInt32 width, ndInt32 height);
-	static void ErrorCallback(ndInt32 error, const char* const description);
-
-	static void CharCallback(GLFWwindow* window, ndUnsigned32 ch);
-	static void CursorposCallback(GLFWwindow* const window, double x, double y);
-	static void MouseScrollCallback(GLFWwindow* const window, double x, double y);
-	static void MouseButtonCallback(GLFWwindow* const window, ndInt32 button, ndInt32 action, ndInt32 mods);
-	static void KeyCallback(GLFWwindow* const window, ndInt32 key, ndInt32, ndInt32 action, ndInt32 mods);
-
-#if (defined(_DEBUG) && defined(WIN32))
-	static void APIENTRY OpenMessageCallback(
-		GLenum source, GLenum type, GLuint id, GLenum severity,
-		GLsizei length, const GLchar* message, const void* userParam);
-#endif
 
 	ndRender* m_owner;
-	GLFWwindow* m_mainFrame;
+
 	ndSharedPtr<ndRenderShaderCache> m_shaderCache;
-	GLint m_defaultFont;
+
 	ndInt32 m_prevKey;
 	bool m_imGuiEnabled;
 	bool m_mousePressed[3];

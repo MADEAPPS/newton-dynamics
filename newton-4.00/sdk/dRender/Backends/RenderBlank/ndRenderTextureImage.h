@@ -19,27 +19,31 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "ndRenderStdafx.h"
+#ifndef _ND_RENDER_TEXTURE_IMAGE_H__
+#define _ND_RENDER_TEXTURE_IMAGE_H__
+
 #include "ndRenderContext.h"
 #include "ndRenderTexture.h"
-//#include "ndRenderTextureImage.h"
 
-ndRenderTexture::ndRenderTexture()
-	:ndContainersFreeListAlloc<ndRenderTexture>()
-	,m_hash(0)
+class ndRenderTextureImageCommon : public ndRenderTexture
 {
-}
+	public:
+	ndRenderTextureImageCommon();
+	~ndRenderTextureImageCommon();
+};
 
-ndRenderTexture::~ndRenderTexture()
+class ndRenderTextureImage: public ndRenderTextureImageCommon
 {
-}
+	public:
+	ndRenderTextureImage(const unsigned char* const buffer, ndInt32 width, ndInt32 hight, TextureImageFormat format);
+};
 
-ndSharedPtr<ndRenderTexture> ndRenderTexture::Load(ndRenderContext* const context, const ndString& pathname)
+class ndRenderTextureCubeMapImage : public ndRenderTextureImageCommon
 {
-	return context->LoadTexture(pathname);
-}
+	public:
+	ndRenderTextureCubeMapImage();
+	void LoadFace(unsigned mapSide, const unsigned char* const buffer, ndInt32 width, ndInt32 hight, TextureImageFormat format);
+};
 
-ndSharedPtr<ndRenderTexture> ndRenderTexture::LoadCubeMap(ndRenderContext* const context, const ndFixSizeArray<ndString, 6>& pathnames)
-{
-	return context->LoadCubeMap(pathnames);
-}
+#endif 
+

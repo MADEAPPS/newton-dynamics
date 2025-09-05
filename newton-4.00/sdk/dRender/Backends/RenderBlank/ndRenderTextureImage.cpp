@@ -20,26 +20,27 @@
 */
 
 #include "ndRenderStdafx.h"
-#include "ndRenderContext.h"
-#include "ndRenderTexture.h"
-//#include "ndRenderTextureImage.h"
+#include "ndRenderTextureImage.h"
 
-ndRenderTexture::ndRenderTexture()
-	:ndContainersFreeListAlloc<ndRenderTexture>()
-	,m_hash(0)
+ndRenderTextureImageCommon::ndRenderTextureImageCommon()
+	:ndRenderTexture()
 {
 }
 
-ndRenderTexture::~ndRenderTexture()
+ndRenderTextureImageCommon::~ndRenderTextureImageCommon()
 {
 }
 
-ndSharedPtr<ndRenderTexture> ndRenderTexture::Load(ndRenderContext* const context, const ndString& pathname)
+ndRenderTextureImage::ndRenderTextureImage(const unsigned char* const buffer, ndInt32 width, ndInt32 hight, TextureImageFormat format)
+	:ndRenderTextureImageCommon()
 {
-	return context->LoadTexture(pathname);
 }
 
-ndSharedPtr<ndRenderTexture> ndRenderTexture::LoadCubeMap(ndRenderContext* const context, const ndFixSizeArray<ndString, 6>& pathnames)
+ndRenderTextureCubeMapImage::ndRenderTextureCubeMapImage()
+	:ndRenderTextureImageCommon()
 {
-	return context->LoadCubeMap(pathnames);
+}
+
+void ndRenderTextureCubeMapImage::LoadFace(unsigned mapSide, const unsigned char* const buffer, ndInt32 width, ndInt32 height, TextureImageFormat)
+{
 }
