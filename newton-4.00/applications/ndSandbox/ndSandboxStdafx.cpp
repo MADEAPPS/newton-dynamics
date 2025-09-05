@@ -33,7 +33,7 @@ void ndGetWorkingFileName (const char* const name, char* const outPathName)
         CFStringGetCString (filePath, tmp, PATH_MAX, kCFStringEncodingUTF8);
         //char* const ptr = strstr (tmp, "applications");
         //ptr [0] = 0;
-        snprintf (outPathName, sizeof (tmp) + 20, "%s/Contents/Resources/%s", tmp, name);
+        snprintf (outPathName, sizeof (tmp), "%s/Contents/Resources/%s", tmp, name);
 
 		// Clean up 
 		CFRelease( appURL ); 
