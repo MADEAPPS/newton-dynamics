@@ -39,20 +39,10 @@
 	#include <windows.h>
 	#include <commctrl.h>
 	#include <crtdbg.h>
-	
-
-	#include <glatter.h> // TODO to be removed later
-	#include <GL/glu.h>
-	#include <GL/gl.h>
 #endif
 	
 #if defined (__linux__ )
 	#include <unistd.h>
-
-	#include <glatter.h>
-	#include <GL/glu.h>
-	#include <GL/gl.h>
-	#include <GLFW/glfw3.h>
 #endif
 
 #if defined (__APPLE__)
@@ -60,9 +50,6 @@
 	//#include <mach/ndr.h>
 	#include <mach/mach.h>
 	#include <unistd.h>
-	#include <OpenGL/gl3.h>
-	#include <OpenGL/glext.h>
-	#include <GLFW/glfw3.h>
 #endif
 
 // some third party libraries includes here
