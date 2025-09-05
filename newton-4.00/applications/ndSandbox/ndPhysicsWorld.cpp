@@ -14,6 +14,7 @@
 #include "ndDemoCamera.h"
 #include "ndPhysicsWorld.h"
 #include "ndContactCallback.h"
+#include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndArchimedesBuoyancyVolume.h"
 
@@ -174,7 +175,18 @@ void ndPhysicsWorld::PostUpdate(ndFloat32 timestep)
 {
 	ndWorld::PostUpdate(timestep);
 	//RemoveDeadBodies();
-	
+
+	ndScopeSpinLock Lock(m_lock);
+	const ndBodyListView& bodyArray = GetBodyList();
+	const ndArray<ndBodyKinematic*>& view = bodyArray.GetView();
+	for (ndInt32 i = ndInt32(view.GetCount()) - 2; i >= 0; --i)
+	{
+		ndBodyKinematic* const body = view[i];
+		ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)body->GetNotifyCallback();
+		ndAssert(notify);
+		notify->m_entity->SetTransform(notify->m_transform.m_rotation, notify->m_transform.m_position);
+	}
+
 	ndDemoCamera* const camera = (ndDemoCamera*)*m_manager->m_renderer->GetCamera();
 	ndAssert(camera);
 	camera->TickUpdate(timestep);
@@ -236,7 +248,11 @@ void ndPhysicsWorld::AdvanceTime(ndFloat32 timestep)
 		}
 	}
 
-	m_manager->m_renderer->InterpolateTransforms(m_timeAccumulator / descreteStep);
+	{
+		ndScopeSpinLock Lock(m_lock);
+		ndFloat32 param = m_timeAccumulator / descreteStep;
+		m_manager->m_renderer->InterpolateTransforms(param);
+	}
 
 	if (m_manager->m_synchronousPhysicsUpdate)
 	{

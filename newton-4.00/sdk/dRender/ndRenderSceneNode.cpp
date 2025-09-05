@@ -72,10 +72,13 @@ void ndRenderSceneNode::SetMatrix(const ndQuaternion& rotation, const ndVector& 
 
 void ndRenderSceneNode::SetTransform(const ndQuaternion& rotation, const ndVector& position)
 {
-	ndScopeSpinLock lock(m_lock);
 	m_transform0 = m_transform1;
 	m_transform1.m_position = position;
 	m_transform1.m_rotation = rotation;
+	if (m_transform0.m_rotation.DotProduct(m_transform1.m_rotation).GetScalar() < ndFloat32(0.0f))
+	{
+		m_transform1.m_rotation = m_transform1.m_rotation.Scale(ndFloat32 (-1.0f));
+	}
 }
 
 void ndRenderSceneNode::InterpolateTransforms(ndFloat32 param)
@@ -86,7 +89,6 @@ void ndRenderSceneNode::InterpolateTransforms(ndFloat32 param)
 	{
 		ndRenderSceneNode* const rooNode = stack.Pop();
 		{
-			ndScopeSpinLock lock(m_lock);
 			const ndVector p0(rooNode->m_transform0.m_position);
 			const ndVector p1(rooNode->m_transform1.m_position);
 			const ndQuaternion r0(rooNode->m_transform0.m_rotation);

@@ -10,15 +10,13 @@
 */
 
 #include "ndSandboxStdafx.h"
-//#include "ndDemoMesh.h"
-//#include "ndDemoEntity.h"
-//#include "ndPhysicsWorld.h"
 #include "ndDemoEntityNotify.h"
 
 ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, const ndSharedPtr<ndRenderSceneNode>& entity, ndBodyKinematic* const parentBody, ndFloat32 gravity)
 	:ndModelBodyNotify(parentBody, ndVector(0.0f, gravity, 0.0f, 0.0f))
 	,m_manager(manager)
 	,m_entity(entity)
+	,m_transform()
 {
 }
 
@@ -26,6 +24,7 @@ ndDemoEntityNotify::ndDemoEntityNotify(const ndDemoEntityNotify& notify)
 	:ndModelBodyNotify(notify)
 	,m_manager(notify.m_manager)
 	,m_entity(notify.m_entity)
+	,m_transform()
 {
 }
 
@@ -38,10 +37,9 @@ void ndDemoEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
 	// apply this transformation matrix to the application user data.
 	if (*m_entity)
 	{
-		ndVector posit;
-		ndQuaternion rot;
-		CalculateMatrix(matrix, rot, posit);
-		m_entity->SetTransform (rot, posit);
+		ndBody* const body = GetBody();
+		m_transform.m_position = matrix.m_posit;
+		m_transform.m_rotation = body->GetRotation();
 	}
 
 	//if (!CheckInWorld(matrix))

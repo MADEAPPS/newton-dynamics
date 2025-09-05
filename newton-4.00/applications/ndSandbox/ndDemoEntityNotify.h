@@ -15,11 +15,6 @@
 #include "ndDemoEntityManager.h"
 #include "ndPhysicsUtils.h"
 
-//class ndDemoEntity;
-//class ndShaderCache;
-//class ndAnimKeyframe;
-//class ndDemoMeshInterface;
-
 class ndDemoEntityNotify : public ndModelBodyNotify
 {
 	public:
@@ -46,6 +41,7 @@ class ndDemoEntityNotify : public ndModelBodyNotify
 
 	ndDemoEntityManager* m_manager;
 	ndSharedPtr<ndRenderSceneNode> m_entity;
+	ndTransform m_transform;
 };
 
 class ndBindingRagdollEntityNotify : public ndDemoEntityNotify

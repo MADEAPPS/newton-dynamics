@@ -48,8 +48,7 @@ void ndDemoCamera::TickUpdate(ndFloat32 timestep)
 	// slow down the Camera if we have a Body
 	ndFloat32 slowDownFactor = scene->IsShiftKeyDown() ? 0.5f / 10.0f : 0.5f;
 
-	//ndMatrix targetMatrix(m_camera->GetNextMatrix());
-	ndMatrix targetMatrix(GetMatrix());
+	ndMatrix targetMatrix(ndCalculateMatrix(m_transform1.m_rotation, m_transform1.m_position));
 
 	// do camera translation
 	if (scene->GetKeyState('W'))
@@ -116,7 +115,9 @@ void ndDemoCamera::TickUpdate(ndFloat32 timestep)
 	m_mousePosY = mouseY;
 
 	ndMatrix matrix(ndRollMatrix(m_pitch) * ndYawMatrix(m_yaw));
-	ndRenderSceneCamera::SetTransform(ndQuaternion(matrix), targetMatrix.m_posit);
+	ndQuaternion newRotation(matrix);
+	//ndTrace(("(%f %f %f %f)\n", newRotation.m_x, newRotation.m_y, newRotation.m_z, newRotation.m_w));
+	ndRenderSceneCamera::SetTransform(newRotation, targetMatrix.m_posit);
 
 #if 0
 	// get the mouse pick parameter so that we can do replay for debugging

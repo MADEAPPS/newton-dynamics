@@ -49,8 +49,6 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 	ndTransform m_transform0;
 	ndTransform m_transform1;
 
-	ndSpinLock m_lock;
-
 	protected:
 	ndRender* m_owner;
 	ndRenderSceneNode* m_parent;
