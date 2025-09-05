@@ -56,7 +56,7 @@ void ndGetWorkingFileName (const char* const name, char* const outPathName)
 
 ndString ndGetWorkingFileName(const char* const name)
 {
-	char outPathName[1024];
+	char outPathName[2048];
 	ndGetWorkingFileName(name, outPathName);
 	return ndString(outPathName);
 }
