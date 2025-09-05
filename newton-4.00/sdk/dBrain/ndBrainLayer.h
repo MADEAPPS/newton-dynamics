@@ -78,9 +78,9 @@ class ndBrainLayer : public ndClassAlloc
 	ndBrainLayer(const ndBrainLayer& src);
 
 	virtual ~ndBrainLayer();
-	virtual ndBrainLayer* Clone() const;
 
 	virtual bool HasParameters() const;
+	virtual ndBrainLayer* Clone() const;
 	virtual const char* GetLabelId() const;
 	virtual ndInt32 GetNumberOfParameters() const;
 

@@ -33,7 +33,7 @@ class ndBrainLayerActivationLeakyRelu : public ndBrainLayerActivation
 	public:
 	ndBrainLayerActivationLeakyRelu(ndInt32 neurons);
 	ndBrainLayerActivationLeakyRelu(const ndBrainLayerActivationLeakyRelu& src);
-	ndBrainLayer* Clone() const;
+	virtual ndBrainLayer* Clone() const override;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
 	const char* GetLabelId() const override;

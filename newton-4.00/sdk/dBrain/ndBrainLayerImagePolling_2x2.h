@@ -30,7 +30,7 @@ class ndBrainLayerImagePolling_2x2 : public ndBrainLayerActivation
 	public:
 	ndBrainLayerImagePolling_2x2(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth);
 	ndBrainLayerImagePolling_2x2(const ndBrainLayerImagePolling_2x2& src);
-	ndBrainLayer* Clone() const;
+	virtual ndBrainLayer* Clone() const override;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
 	ndInt32 GetInputWidth() const;

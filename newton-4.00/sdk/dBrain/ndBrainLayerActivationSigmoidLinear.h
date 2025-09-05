@@ -32,7 +32,7 @@ class ndBrainLayerActivationSigmoidLinear : public ndBrainLayerActivation
 	public:
 	ndBrainLayerActivationSigmoidLinear(ndInt32 neurons);
 	ndBrainLayerActivationSigmoidLinear(const ndBrainLayerActivationSigmoidLinear& src);
-	ndBrainLayer* Clone() const;
+	virtual ndBrainLayer* Clone() const override;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
 	const char* GetLabelId() const override;

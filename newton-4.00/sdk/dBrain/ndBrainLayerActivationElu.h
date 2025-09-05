@@ -31,7 +31,7 @@ class ndBrainLayerActivationElu : public ndBrainLayerActivation
 	public:
 	ndBrainLayerActivationElu(ndInt32 neurons);
 	ndBrainLayerActivationElu(const ndBrainLayerActivationElu& src);
-	ndBrainLayer* Clone() const;
+	virtual ndBrainLayer* Clone() const override;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
 	const char* GetLabelId() const override;

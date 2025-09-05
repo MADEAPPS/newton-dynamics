@@ -30,7 +30,7 @@ class ndBrainLayerImagePadding : public ndBrainLayerActivation
 	public:
 	ndBrainLayerImagePadding(ndInt32 inputWidth, ndInt32 inputHeight, ndInt32 inputDepth, ndInt32 filterSize);
 	ndBrainLayerImagePadding(const ndBrainLayerImagePadding& src);
-	ndBrainLayer* Clone() const;
+	virtual ndBrainLayer* Clone() const override;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
 	ndInt32 GetInputWidth() const;
