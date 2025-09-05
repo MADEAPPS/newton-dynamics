@@ -10,15 +10,11 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndDemoMesh.h"
+
 #include "ndDemoCamera.h"
 #include "ndPhysicsWorld.h"
 #include "ndContactCallback.h"
-#include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
-#include "ndDemoCameraManager.h"
-#include "ndDemoMeshInterface.h"
-#include "ndBasicPlayerCapsule.h"
 #include "ndArchimedesBuoyancyVolume.h"
 
 #define MAX_PHYSICS_STEPS			1
@@ -48,23 +44,25 @@ void ndPhysicsWorld::ndDefferentDeleteEntities::Update()
 	SetCount(0);
 }
 
-void ndPhysicsWorld::ndDefferentDeleteEntities::RemoveEntity(ndDemoEntity* const entity)
+//void ndPhysicsWorld::ndDefferentDeleteEntities::RemoveEntity(ndDemoEntity* const entity)
+void ndPhysicsWorld::ndDefferentDeleteEntities::RemoveEntity(ndDemoEntity* const)
 {
-	ndAssert(entity->m_rootNode);
-	if (m_renderThreadId == std::this_thread::get_id())
-	{
-		m_manager->RemoveEntity(entity);
-		delete entity;
-	}
-	else
-	{
-		ndScopeSpinLock lock(entity->m_lock);
-		if (!entity->m_isDead)
-		{
-			entity->m_isDead = true;
-			PushBack(entity);
-		}
-	}
+	ndAssert(0);
+	//ndAssert(entity->m_rootNode);
+	//if (m_renderThreadId == std::this_thread::get_id())
+	//{
+	//	m_manager->RemoveEntity(entity);
+	//	delete entity;
+	//}
+	//else
+	//{
+	//	ndScopeSpinLock lock(entity->m_lock);
+	//	if (!entity->m_isDead)
+	//	{
+	//		entity->m_isDead = true;
+	//		PushBack(entity);
+	//	}
+	//}
 }
 
 ndPhysicsWorld::ndPhysicsWorld(ndDemoEntityManager* const manager)
@@ -88,10 +86,12 @@ void ndPhysicsWorld::CleanUp()
 	ndWorld::CleanUp();
 }
 
-void ndPhysicsWorld::RemoveEntity(ndDemoEntity* const entity)
+//void ndPhysicsWorld::RemoveEntity(ndDemoEntity* const entity)
+void ndPhysicsWorld::RemoveEntity(ndDemoEntity* const)
 {
-	ndAssert(entity->m_rootNode);
-	m_deadEntities.RemoveEntity(entity);
+	ndAssert(0);
+	//ndAssert(entity->m_rootNode);
+	//m_deadEntities.RemoveEntity(entity);
 }
 
 ndDemoEntityManager* ndPhysicsWorld::GetManager() const
@@ -172,19 +172,22 @@ void ndPhysicsWorld::RemoveDeadBodies()
 void ndPhysicsWorld::PostUpdate(ndFloat32 timestep)
 {
 	ndWorld::PostUpdate(timestep);
-	RemoveDeadBodies();
+	//RemoveDeadBodies();
+	
+	ndDemoCamera* const camera = (ndDemoCamera*)*m_manager->m_renderer->GetCamera();
+	ndAssert(camera);
+	camera->TickUpdate(timestep);
 
-	m_manager->m_cameraManager->FixUpdate(m_manager, timestep);
-	if (m_manager->m_updateCamera)
-	{
-		m_manager->m_updateCamera(m_manager, m_manager->m_updateCameraContext, timestep);
-	}
-
-	if (m_manager->m_onPostUpdate)
-	{
-		m_manager->m_onPostUpdate->Update(m_manager, timestep);
-		m_manager->m_onPostUpdate->OnDebug(m_manager, m_manager->m_hidePostUpdate);
-	}
+	//if (m_manager->m_updateCamera)
+	//{
+	//	m_manager->m_updateCamera(m_manager, m_manager->m_updateCameraContext, timestep);
+	//}
+	//
+	//if (m_manager->m_onPostUpdate)
+	//{
+	//	m_manager->m_onPostUpdate->Update(m_manager, timestep);
+	//	m_manager->m_onPostUpdate->OnDebug(m_manager, m_manager->m_hidePostUpdate);
+	//}
 }
 
 void ndPhysicsWorld::OnSubStepPostUpdate(ndFloat32 timestep)

@@ -79,7 +79,7 @@ ndDemoCameraManager::~ndDemoCameraManager()
 void ndDemoCameraManager::SetCameraMatrix(const ndQuaternion& rotation, const ndVector& position)
 {
 	m_camera->SetMatrix(rotation, position);
-	//m_camera->SetMatrix(rotation, position);
+	m_camera->SetMatrix(rotation, position);
 	m_yaw = m_camera->GetYawAngle();
 	m_pitch = m_camera->GetPichAngle();
 }

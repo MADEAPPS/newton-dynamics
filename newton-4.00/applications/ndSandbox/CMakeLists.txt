@@ -35,15 +35,21 @@ include_directories(../../sdk/dCollision)
 include_directories(../../sdk/dFileFormat)
 
 include_directories(../../sdk/dBrain)
+include_directories(../../sdk/dRender)
 
 include_directories(../../thirdParty/png/)
-include_directories(../../thirdParty/glfw/)
 include_directories(../../thirdParty/imgui/)
 include_directories(../../thirdParty/openFBX/src/)
-include_directories(../../thirdParty/glfw/include/)
-include_directories(../../thirdParty/imgui/backends)
-include_directories(../../thirdParty/glatter/include/glatter/)
 include_directories(../../thirdParty/hacd/src/VHACD_Lib/public/)
+
+#include_directories(../../thirdParty/imgui/backends)
+include_directories(../../thirdParty/glatter/include/glatter/)
+
+if (NOT APPLE) 
+	#include_directories(../../thirdParty/glfw/)
+	#include_directories(../../thirdParty/glfw/include/)
+else()
+endif()
 
 set (openclSDKPath ${CMAKE_SOURCE_DIR}/thirdParty/opencl/OpenCL-SDK-v2024.10.24-Win-x64)
 
@@ -57,7 +63,7 @@ endif()
 add_executable(${projectName} ${CPP_SOURCE})
 
 message ("adding project libraries")
-target_link_libraries (${projectName} PUBLIC ndNewton ndBrain ndModel vhacd openfbx lodepng imgui)
+target_link_libraries (${projectName} PUBLIC ndRender ndNewton ndBrain ndModel vhacd openfbx lodepng imgui)
 
 if (MSVC OR MINGW)
 	message ("adding required third party opengl libraries")
@@ -80,7 +86,6 @@ else(UNIX)
 	message ("adding required posit system libraries")
 	target_link_libraries (${projectName} PUBLIC glatter glfw dl GL X11 pthread ${X11_Xcursor_LIBRARIES} ${X11_Xinerama_LIBRARIES})
 endif()
-
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	target_link_libraries (${projectName} PUBLIC ndCollision ndCore)

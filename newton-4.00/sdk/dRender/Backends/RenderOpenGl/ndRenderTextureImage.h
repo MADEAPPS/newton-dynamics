@@ -19,14 +19,33 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#ifndef _ND_RENDER_TEXTURE_IMAGE_H__
+#define _ND_RENDER_TEXTURE_IMAGE_H__
 
-#ifndef _ND_RENDER_STDAFX_H__
-#define _ND_RENDER_STDAFX_H__
+#include "ndRenderContext.h"
+#include "ndRenderTexture.h"
 
-#include <imgui.h>
-#include <lodepng.h>
-#include <ndNewton.h>
+class ndRenderTextureImageCommon : public ndRenderTexture
+{
+	public:
+	ndRenderTextureImageCommon();
+	~ndRenderTextureImageCommon();
 
+	GLuint m_texture;
+};
+
+class ndRenderTextureImage: public ndRenderTextureImageCommon
+{
+	public:
+	ndRenderTextureImage(const unsigned char* const buffer, ndInt32 width, ndInt32 hight, TextureImageFormat format);
+};
+
+class ndRenderTextureCubeMapImage : public ndRenderTextureImageCommon
+{
+	public:
+	ndRenderTextureCubeMapImage();
+	void LoadFace(unsigned mapSide, const unsigned char* const buffer, ndInt32 width, ndInt32 hight, TextureImageFormat format);
+};
 
 #endif 
 

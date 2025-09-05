@@ -11,27 +11,59 @@
 #ifndef __DEMO_MAIN_FRAME_H__
 #define __DEMO_MAIN_FRAME_H__
 
-#include "ndShaderCache.h"
-
 struct GLFWwindow;
 struct ImDrawData;
 
 class ndDemoMesh;
 class ndUIEntity;
 class ndRenderPass;
-class ndDemoEntity;
 class ndMeshLoader;
-class ndDemoCamera;
 class ndPhysicsWorld;
 class ndAnimationSequence;
 class ndDemoMeshInterface;
-class ndDemoCameraManager;
-class ndShadowMapRenderPass;
 
-//class ndDemoEntityManager: public ndList <ndDemoEntity*>
-class ndDemoEntityManager : public ndList <ndSharedPtr<ndDemoEntity>>
+//class ndDemoEntityManager : public ndList <ndSharedPtr<ndDemoEntity>>
+class ndDemoEntityManager : public ndClassAlloc
 {
 	public:
+	class ndRenderCallback : public ndRender::ndUserCallback
+	{
+		public:
+		ndRenderCallback(ndDemoEntityManager* const owner)
+			:ndRender::ndUserCallback()
+			,m_owner(owner)
+		{
+		}
+
+		virtual void KeyCallback(ndInt32 key, ndInt32 action) override
+		{
+			m_owner->KeyCallback(key, action);
+		}
+
+		virtual void CharCallback(ndUnsigned32 ch)
+		{
+			m_owner->CharCallback(ch);
+		}
+
+		virtual void CursorposCallback(ndReal x, ndReal y)
+		{
+			m_owner->CursorposCallback(x, y);
+		}
+
+		virtual void MouseScrollCallback(ndReal x, ndReal y)
+		{
+			m_owner->MouseScrollCallback(x, y);
+		}
+
+		virtual void MouseButtonCallback(ndInt32 button, ndInt32 action)
+		{
+			m_owner->MouseButtonCallback(button, action);
+		}
+
+		ndDemoEntityManager* m_owner;
+	};
+
+
 	typedef void (*LaunchSDKDemoCallback) (ndDemoEntityManager* const scene);
 	typedef void(*UpdateCameraCallback) (ndDemoEntityManager* const manager, void* const context, ndFloat32 timestep);
 
@@ -142,21 +174,17 @@ class ndDemoEntityManager : public ndList <ndSharedPtr<ndDemoEntity>>
 
 	void Run();
 
-	void AddEntity(const ndSharedPtr<ndDemoEntity>& entity);
-	void RemoveEntity(const ndSharedPtr<ndDemoEntity>& entity);
-
 	ndInt32 GetWidth() const;
 	ndInt32 GetHeight() const;
 	
 	ndPhysicsWorld* GetWorld() const;
+	ndSharedPtr<ndRender>& GetRenderer();
+
+	void AddEntity(const ndSharedPtr<ndRenderSceneNode>& entity);
+	void RemoveEntity(const ndSharedPtr<ndRenderSceneNode>& entity);
 	
-	void CreateSkyBox();
 	void ResetTimer();
 	void ImportPLYfile (const char* const name);
-
-	ndDemoCamera* GetCamera() const;
-	ndDemoCameraManager* GetCameraManager() const;
-	const ndShadowMapRenderPass* GetShadowMapRenderPass() const;
 
 	bool GetMouseSpeed(ndFloat32& posX, ndFloat32& posY) const;
 	bool GetMousePosition (ndFloat32& posX, ndFloat32& posY) const;
@@ -178,6 +206,12 @@ class ndDemoEntityManager : public ndList <ndSharedPtr<ndDemoEntity>>
 
 	void Terminate();
 
+	void CharCallback(ndUnsigned32 ch);
+	void CursorposCallback(ndReal x, ndReal y);
+	void MouseScrollCallback(ndReal x, ndReal y);
+	void KeyCallback(ndInt32 key, ndInt32 action);
+	void MouseButtonCallback(ndInt32 button, ndInt32 action);
+
 	bool GetCaptured () const;
 	bool GetMouseKeyState (ndInt32 button ) const;
 	ndInt32 Print (const ndVector& color, const char *fmt, ... ) const;
@@ -186,15 +220,11 @@ class ndDemoEntityManager : public ndList <ndSharedPtr<ndDemoEntity>>
 
 	void SetAcceleratedUpdate(); 
 	ndVector GetDirectionsLight() const;
-	const ndShaderCache& GetShaderCache() const;  
 	ndSharedPtr<ndAnimationSequence> GetAnimationSequence(ndMeshLoader& loader, const char* const meshName);
 	void RegisterPostUpdate(OnPostUpdate* const postUpdate);
-	
-	private:
-	bool PollEvents();
-	void BeginFrame();
+
 	void RenderStats();
-	void LoadFont();
+	private:
 	void Cleanup();
 
 	void RenderScene();
@@ -208,37 +238,25 @@ class ndDemoEntityManager : public ndList <ndSharedPtr<ndDemoEntity>>
 	
 	void ShowMainMenuBar();
 	void ToggleProfiler();
-	void RenderScene(ImDrawData* const draw_data);
-
-	static void CharCallback(GLFWwindow* window, ndUnsigned32 ch);
-	static void KeyCallback(GLFWwindow* const window, ndInt32 key, ndInt32, ndInt32 action, ndInt32 mods);
-	static void CursorposCallback  (GLFWwindow* const window, double x, double y);
-	static void MouseScrollCallback (GLFWwindow* const window, double x, double y);
-	static void MouseButtonCallback(GLFWwindow* const window, ndInt32 button, ndInt32 action, ndInt32 mods);
-	static void ErrorCallback(ndInt32 error, const char* const description);
-#if (defined(_DEBUG) && defined(WIN32))
-	static void APIENTRY OpenMessageCallback(
-		GLenum source, GLenum type, GLuint id, GLenum severity,
-		GLsizei length, const GLchar* message, const void* userParam);
-#endif
 
 	void ApplyMenuOptions();
 	void LoadDemo(ndInt32 menu);
 	void OnSubStepPostUpdate(ndFloat32 timestep);
 
 	void TestImGui();
-	
-	GLFWwindow* m_mainFrame;
-	GLint m_defaultFont;
-	bool m_mousePressed[3];
 
-	ndDemoEntity* m_sky;
+	
+	ndSharedPtr<ndRender> m_renderer;
+	ndSharedPtr<ndRenderPass> m_menuRenderPass;
+	ndSharedPtr<ndRenderPass> m_colorRenderPass;
+	ndSharedPtr<ndRenderPass> m_shadowRenderPass;
+	ndSharedPtr<ndRenderPass> m_environmentRenderPass;
+	ndSharedPtr<ndRenderTexture> m_environmentTexture;
+
 	ndPhysicsWorld* m_world;
-	ndDemoCameraManager* m_cameraManager;
-	ndShaderCache m_shaderCache;
 	void* m_updateCameraContext;
 	
-	ndSharedPtr<ndUIEntity> m_renderDemoGUI;
+	//ndSharedPtr<ndUIEntity> m_renderDemoGUI;
 	UpdateCameraCallback m_updateCamera;
 
 	ndUnsigned64 m_microsecunds;
@@ -289,18 +307,19 @@ class ndDemoEntityManager : public ndList <ndSharedPtr<ndDemoEntity>>
 	ndWorld::ndSolverModes m_solverMode;
 
 	ndVector m_diretionalLightDir;
-	ndRenderPass* m_colorRenderPass;
-	ndRenderPass* m_shadowRenderPass;
 	static SDKDemos m_demosSelection[];
 
 	friend class ndPhysicsWorld;
-	friend class ndColorRenderPass;
-	friend class ndShadowMapRenderPass;
 };
 
 inline ndPhysicsWorld* ndDemoEntityManager::GetWorld() const
 {
 	return m_world;
+}
+
+inline ndSharedPtr<ndRender>& ndDemoEntityManager::GetRenderer()
+{
+	return m_renderer;
 }
 
 inline ndInt32 ndDemoEntityManager::GetDebugDisplay() const
@@ -312,16 +331,6 @@ inline ndInt32 ndDemoEntityManager::GetDebugDisplay() const
 inline void ndDemoEntityManager::SetDebugDisplay(ndInt32) const
 {
 	ndAssert (0);
-}
-
-inline const ndShaderCache& ndDemoEntityManager::GetShaderCache() const
-{
-	return m_shaderCache;
-}
-
-inline ndDemoCameraManager* ndDemoEntityManager::GetCameraManager() const
-{
-	return m_cameraManager;
 }
 
 inline void ndDemoEntityManager::SetSelectedModel(ndModel* const model)

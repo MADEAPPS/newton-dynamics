@@ -10,28 +10,24 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndSkyBox.h"
-#include "ndDemoMesh.h"
-#include "ndVehicleUI.h"
-#include "ndMeshLoader.h"
-#include "ndDemoEntity.h"
+//#include "ndVehicleUI.h"
+//#include "ndMeshLoader.h"
+//#include "ndDemoEntity.h"
 #include "ndDemoCamera.h"
-#include "ndShaderCache.h"
 #include "ndFileBrowser.h"
-#include "ndPngToOpenGl.h"
-#include "ndDebugDisplay.h"
+//#include "ndPngToOpenGl.h"
+//#include "ndDebugDisplay.h"
 #include "ndPhysicsWorld.h"
 #include "ndPhysicsUtils.h"
 #include "ndTestDeepBrain.h"
+#include "ndMenuRenderPass.h"
 #include "ndColorRenderPass.h"
-#include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
-#include "ndDemoCameraManager.h"
+//#include "ndDemoCameraManager.h"
 #include "ndHighResolutionTimer.h"
-#include "ndShadowsMapRenderPass.h"
 
-//#define DEFAULT_SCENE	0		// basic rigidbody
-#define DEFAULT_SCENE	1		// simple conveyor belt ground
+#define DEFAULT_SCENE	0		// basic rigidbody
+//#define DEFAULT_SCENE	1		// Gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
 //#define DEFAULT_SCENE	4		// conservation of momentum 
@@ -74,6 +70,7 @@ void ndBasicJoints(ndDemoEntityManager* const scene);
 void ndBasicVehicle(ndDemoEntityManager* const scene);
 void ndHeavyVehicle(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
+void ndBasicGpuTest0(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_3(ndDemoEntityManager* const scene);
 void ndQuadrupedTest_4(ndDemoEntityManager* const scene);
@@ -87,11 +84,11 @@ void ndBasicParticleFluid(ndDemoEntityManager* const scene);
 void ndUnicycleController(ndDemoEntityManager* const scene);
 void ndQuadruped_sac_test(ndDemoEntityManager* const scene);
 void ndQuadruped_ppo_test(ndDemoEntityManager* const scene);
+
 void ndBasicAngularMomentum(ndDemoEntityManager* const scene);
 void ndBagroundLowLodVehicle(ndDemoEntityManager* const scene);
 void ndSimpleIndustrialRobot(ndDemoEntityManager* const scene);
 void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene);
-void ndBasicContactProperties(ndDemoEntityManager* const scene);
 void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene);
 void ndBasicExplodeConvexShape(ndDemoEntityManager* const scene);
 
@@ -108,8 +105,8 @@ void ndStaticUserMeshCollisionDemo(ndDemoEntityManager* const scene);
 ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
 {
 	{ "basic rigidbody", ndBasicRigidBody},
-	//{ "basic gpu rigidbody", ndBasicGpuRigidBody},
-	{ "basic conveyor bell", ndBasicContactProperties},
+#if 0
+	{ "basic gpu rigidbody", ndBasicGpuRigidBody},
 	{ "basic friction ramp", ndBasicFrictionRamp},
 	{ "basic compound shapes", ndBasicCompoundShapeDemo},
 	{ "basic conservation of momentum", ndBasicAngularMomentum},
@@ -131,18 +128,19 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "quadruped animated", ndQuadruped_animation_test},
 	{ "quadruped sac", ndQuadruped_sac_test},
 	{ "quadruped ppo", ndQuadruped_ppo_test},
-//	{ "quadruped test 3", ndQuadrupedTest_3},
-//	{ "quadruped test 4", ndQuadrupedTest_4},
-//	{ "quadruped test 5", ndQuadrupedTest_4},
+	//{ "quadruped test 3", ndQuadrupedTest_3},
+	//{ "quadruped test 4", ndQuadrupedTest_4},
+	//{ "quadruped test 5", ndQuadrupedTest_4},
 	{ "simple industrial robot", ndSimpleIndustrialRobot},
 	{ "advanced industrial robot", ndAdvancedIndustrialRobot},
-//	{ "biped test one", ndBipedTest_1},
-//	{ "biped test two", ndBipedTest_2},
-//	{ "train biped test two", ndBipedTest_2Trainer},
-//	{ "simple convex fracture", ndBasicExplodeConvexShape},
-//	//{ "basic convex fracture", ndBasicFracture_0},
-//	//{ "linked convex fracture", ndBasicFracture_2},
-//	//{ "simple skin peeling fracture", ndBasicFracture_4},
+	//{ "biped test one", ndBipedTest_1},
+	//{ "biped test two", ndBipedTest_2},
+	//{ "train biped test two", ndBipedTest_2Trainer},
+	//{ "simple convex fracture", ndBasicExplodeConvexShape},
+	//{ "basic convex fracture", ndBasicFracture_0},
+	//{ "linked convex fracture", ndBasicFracture_2},
+	//{ "simple skin peeling fracture", ndBasicFracture_4},
+#endif
 };
 
 ndDemoEntityManager::ButtonKey::ButtonKey (bool state)
@@ -407,20 +405,25 @@ static void SimpleRegressionBrainStressTest()
 	}
 	time = ndGetTimeInMicroseconds() - time;
 	
-	ndExpandTraceMessage("Stress test Regresion\n");
+	ndExpandTraceMessage("stress test Regression\n");
 	ndExpandTraceMessage(" training time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
 }
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
 // If you are new to ImGui, see examples/README.txt and documentation at the top of imgui.cpp.
 ndDemoEntityManager::ndDemoEntityManager()
-	:m_mainFrame(nullptr)
-	,m_defaultFont(0)
-	,m_sky(nullptr)
+	:ndClassAlloc()
+	,m_renderer(nullptr)
+	,m_menuRenderPass(nullptr)
+	,m_colorRenderPass(nullptr)
+	,m_shadowRenderPass(nullptr)
+	,m_environmentRenderPass(nullptr)
+	,m_environmentTexture(nullptr)
+
 	,m_world(nullptr)
-	,m_cameraManager(nullptr)
+
 	,m_updateCameraContext(nullptr)
-	,m_renderDemoGUI()
+	//,m_renderDemoGUI()
 	,m_updateCamera(nullptr)
 	,m_microsecunds(0)
 	,m_transparentHeap()
@@ -464,132 +467,46 @@ ndDemoEntityManager::ndDemoEntityManager()
 	,m_showRaycastHit(false)
 	,m_profilerMode(false)
 	,m_solverMode(ndWorld::ndSimdSoaSolver)
-	,m_colorRenderPass(new ndColorRenderPass())
-	,m_shadowRenderPass(new ndShadowMapRenderPass())
 {
 	// Setup window
-	glfwSetErrorCallback(ErrorCallback);
-	glfwInit();
+	char title[256];
 
-	// Decide GL+GLSL versions
-	#if defined(IMGUI_IMPL_OPENGL_ES2)
-	// GL ES 2.0 + GLSL 100
-	const char* glsl_version = "#version 100";
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
-	#elif defined(__APPLE__)
-	// GL 3.2 + GLSL 150
-	const char* glsl_version = "#version 150";
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // Required on Mac
-	#else
-	// GL 3.0 + GLSL 130
-	const char* glsl_version = "#version 130";
-	glfwWindowHint(GLFW_SAMPLES, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+	ndSharedPtr<ndRender::ndUserCallback> callbacks(new ndRenderCallback(this));
+	snprintf(title, sizeof(title), "Newton Dynamics %d.%.2i sandbox demos", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION);
+	m_renderer = ndSharedPtr<ndRender>(new ndRender(callbacks, 1280, 768, title));
 
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
-	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
-	#endif
+	char fontPathName[2048];
+	//char* const name = "calibri.ttf";
+	//char* const name = "courbd.ttf";
+	const char* const name = "Cousine-Regular.ttf";
+	ndGetWorkingFileName(name, fontPathName);
+	m_renderer->InitImGui(fontPathName);
 
-	#if defined (_DEBUG)
-	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-	#endif
+	// load the environment texture
+	ndFixSizeArray<ndString, 6> environmentTexturePath;
+	environmentTexturePath.PushBack(ndGetWorkingFileName("Sorsele3/negx.png"));
+	environmentTexturePath.PushBack(ndGetWorkingFileName("Sorsele3/posx.png"));
+	environmentTexturePath.PushBack(ndGetWorkingFileName("Sorsele3/posy.png"));
+	environmentTexturePath.PushBack(ndGetWorkingFileName("Sorsele3/negy.png"));
+	environmentTexturePath.PushBack(ndGetWorkingFileName("Sorsele3/negz.png"));
+	environmentTexturePath.PushBack(ndGetWorkingFileName("Sorsele3/posz.png"));
+	m_environmentTexture = m_renderer->GetTextureCache()->GetCubeMap(environmentTexturePath);
 
-	// Create window with graphics context
-	char version[256];
-	snprintf(version, sizeof (version), "Newton Dynamics %d.%.2i sandbox demos", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION);
-	m_mainFrame = glfwCreateWindow(1280, 768, version, nullptr, nullptr);
-	glfwMakeContextCurrent(m_mainFrame);
-	glfwSwapInterval(0); // Enable vsync
+	// create render passes
+	m_colorRenderPass = ndSharedPtr<ndRenderPass>(new ndColorRenderPass(*m_renderer));
+	m_menuRenderPass = ndSharedPtr<ndRenderPass>(new ndMenuRenderPass(this));
+	m_environmentRenderPass = ndSharedPtr<ndRenderPass>(new ndEnvironmentRenderPass(*m_renderer, m_environmentTexture));
+	//m_shadowRenderPass->Init(this, 1, m_shaderCache.m_shadowMaps);
 
-	 // Setup Dear ImGui context
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO();
-	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-	//io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+	// add render passes in order of execution
+	m_renderer->AddRenderPass(m_colorRenderPass);
+	m_renderer->AddRenderPass(m_environmentRenderPass);
+	m_renderer->AddRenderPass(m_menuRenderPass);
 
-	ndInt32 monitorsCount;
-	GLFWmonitor** monitors = glfwGetMonitors(&monitorsCount);
-	if (monitorsCount > 1)
-	{
-		ndInt32 window_x;
-		ndInt32 window_y;
-		ndInt32 monitor_x;
-		ndInt32 monitor_y;
+	// add a demo camera, and main directional light
+	m_renderer->SetCamera(ndSharedPtr<ndRenderSceneCamera>(new ndDemoCamera(*m_renderer)));
+	m_renderer->SetSunLight(ndVector(-0.5f, 1.0f, -0.5f, 0.0f), ndVector(0.7f, 0.7f, 0.7f, 0.0f));
 
-		glfwGetMonitorPos(monitors[1], &monitor_x, &monitor_y);
-		glfwGetWindowPos(m_mainFrame, &window_x, &window_y);
-		glfwSetWindowPos(m_mainFrame, monitor_x + window_x, monitor_y + 64);
-	}
-
-	// Setup Dear ImGui style
-	//ImGui::StyleColorsDark();
-	ImGui::StyleColorsLight();
-	//ImGui::StyleColorsClassic();
-	ImGuiStyle* const style = &ImGui::GetStyle();
-	style->Colors[ImGuiCol_WindowBg] = ImVec4(0.94f, 0.94f, 0.94f, 0.5f);
-
-	// Setup Platform/Renderer back ends
-	ImGui_ImplGlfw_InitForOpenGL(m_mainFrame, true);
-	ImGui_ImplOpenGL3_Init(glsl_version);
-
-	// attach myself to the main frame
-	glfwSetWindowUserPointer(m_mainFrame, this);
-
-#if (defined(_DEBUG) && defined(WIN32))	
-	glDebugMessageCallback(OpenMessageCallback, m_mainFrame);
-	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-#endif
-
-	// Load Fonts
-	LoadFont();
-
-	glfwSetKeyCallback(m_mainFrame, KeyCallback);
-	glfwSetCharCallback(m_mainFrame, CharCallback);
-	glfwSetScrollCallback(m_mainFrame, MouseScrollCallback);
-	glfwSetCursorPosCallback(m_mainFrame, CursorposCallback);
-	glfwSetMouseButtonCallback(m_mainFrame, MouseButtonCallback);
-
-	// Setup ImGui binding
-	io.UserData = this;
-
-	// Keyboard mapping. ImGui will use those indices to peek into the io.KeyDown[] array.
-	io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;
-	io.KeyMap[ImGuiKey_LeftArrow] = GLFW_KEY_LEFT;
-	io.KeyMap[ImGuiKey_RightArrow] = GLFW_KEY_RIGHT;
-	io.KeyMap[ImGuiKey_UpArrow] = GLFW_KEY_UP;
-	io.KeyMap[ImGuiKey_DownArrow] = GLFW_KEY_DOWN;
-	io.KeyMap[ImGuiKey_PageUp] = GLFW_KEY_PAGE_UP;
-	io.KeyMap[ImGuiKey_PageDown] = GLFW_KEY_PAGE_DOWN;
-	io.KeyMap[ImGuiKey_Home] = GLFW_KEY_HOME;
-	io.KeyMap[ImGuiKey_End] = GLFW_KEY_END;
-	io.KeyMap[ImGuiKey_Delete] = GLFW_KEY_DELETE;
-	io.KeyMap[ImGuiKey_Backspace] = GLFW_KEY_BACKSPACE;
-	io.KeyMap[ImGuiKey_Enter] = GLFW_KEY_ENTER;
-	io.KeyMap[ImGuiKey_Escape] = GLFW_KEY_ESCAPE;
-	io.KeyMap[ImGuiKey_A] = GLFW_KEY_A;
-	io.KeyMap[ImGuiKey_C] = GLFW_KEY_C;
-	io.KeyMap[ImGuiKey_V] = GLFW_KEY_V;
-	io.KeyMap[ImGuiKey_X] = GLFW_KEY_X;
-	io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
-	io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
-
-	#ifdef _MSC_VER 
-	io.ImeWindowHandle = glfwGetWin32Window(m_mainFrame);
-	#endif
-
-	m_mousePressed[0] = false;
-	m_mousePressed[1] = false;
-	m_mousePressed[2] = false;
-	
 	// initialized the physics world for the new scene
 	//m_showUI = false;
 	//m_showAABB = true;
@@ -618,13 +535,9 @@ ndDemoEntityManager::ndDemoEntityManager()
 	m_synchronousPhysicsUpdate = true;
 	m_synchronousParticlesUpdate = true;
 
-	m_shaderCache.CreateAllEffects();
-	m_colorRenderPass->Init(this, 0);
-	m_shadowRenderPass->Init(this, 1, m_shaderCache.m_shadowMaps);
-
 	Cleanup();
 	ResetTimer();
-
+#if 0
 	m_diretionalLightDir = ndVector(-1.0f, 1.0f, 1.0f, 0.0f).Normalize();
 
 	//Test0__();
@@ -632,104 +545,33 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//SimpleRegressionBrainStressTest();
 	ndHandWrittenDigits();
 	//ndCifar10ImageClassification();
+#endif
 }
 
 ndDemoEntityManager::~ndDemoEntityManager ()
 {
 	Cleanup ();
 
-	if (m_cameraManager)
-	{
-		delete m_cameraManager;
-	}
-
 	// destroy the empty world
 	if (m_world) 
 	{
 		delete m_world;
 	}
-
-	delete m_colorRenderPass;
-	delete m_shadowRenderPass;
-
-	// Cleanup
-	GLuint font_texture = GLuint(m_defaultFont);
-	glDeleteTextures(1, &font_texture);
-	ImGui::GetIO().Fonts->TexID = 0;
-
-	m_shaderCache.Cleanup();
-	TextureCacheCleanUp();
-
-	// Cleanup
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
-	ImGui::DestroyContext();
-
-	glfwDestroyWindow(m_mainFrame);
-	glfwTerminate();
 }
 
 void ndDemoEntityManager::Terminate()
 {
-	glfwSetWindowShouldClose(m_mainFrame, 1);
+	m_renderer->Terminate();
 }
-
-#if (defined(_DEBUG) && defined(WIN32))
-void APIENTRY ndDemoEntityManager::OpenMessageCallback(GLenum source,
-	GLenum type,
-	GLuint id,
-	GLenum severity,
-	GLsizei length,
-	const GLchar* message,
-	const void* userParam)
-{
-	if (userParam)
-	{
-		switch(id)
-		{
-			case 2:		 // no sure why on Intel embedded systems I get this warding, 
-				         // ID_RECOMPILE_FRAGMENT_SHADER performance warning has been generated.
-						 // Fragment shader recompiled due to state change., length = 120
-			case 131154:  // Pixel-path performance warning: Pixel transfer is synchronized with 3D rendering.
-			case 131185:  // nvidia driver report will use VIDEO memory as the source for buffer object operations
-			case 131139: //	for some reason when using different target I get this on nvidia gpus.
-						 //	no one seems to know what cause this
-					     // Rasterization quality warning : A non - fullscreen clear caused a fallback from CSAA to MSAA.
-				return;
-		}
-		ndTrace(("GL CALLBACK: %s source = 0x%x, type = 0x%x, id = %d, severity = 0x%x, message = %s, length = %d \n",
-			(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), source, type, id, severity, message, length));
-		ndAssert(0);
-	}
-}
-#endif
 
 ndInt32 ndDemoEntityManager::GetWidth() const
 {
-	//ImGuiIO& io = ImGui::GetIO();
-	//return (ndInt32)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
-	ndInt32 w, h;
-	glfwGetWindowSize(m_mainFrame, &w, &h);
-	return w;
+	return m_renderer->GetWidth();
 }
 
 ndInt32 ndDemoEntityManager::GetHeight() const
 {
-	//ImGuiIO& io = ImGui::GetIO();
-	//return (ndInt32)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
-	ndInt32 w, h;
-	glfwGetWindowSize(m_mainFrame, &w, &h);
-	return h;
-}
-
-ndDemoCamera* ndDemoEntityManager::GetCamera() const
-{
-	return m_cameraManager->GetCamera();
-}
-
-const ndShadowMapRenderPass* ndDemoEntityManager::GetShadowMapRenderPass() const
-{
-	return (ndShadowMapRenderPass*)m_shadowRenderPass;
+	return m_renderer->GetHeight();
 }
 
 bool ndDemoEntityManager::GetKeyState(ndInt32 key) const
@@ -752,32 +594,98 @@ bool ndDemoEntityManager::AnyKeyDown() const
 	return false;
 }
 
-ndSharedPtr<ndAnimationSequence> ndDemoEntityManager::GetAnimationSequence(ndMeshLoader& loader, const char* const fileName)
+void ndDemoEntityManager::CharCallback(ndUnsigned32 ch)
 {
-	ndTree<ndSharedPtr<ndAnimationSequence>, ndString>::ndNode* node = m_animationCache.Find(fileName);
-	if (!node)
+	ImGuiIO& io = ImGui::GetIO();
+	io.AddInputCharacter((unsigned short)ch);
+}
+
+void ndDemoEntityManager::CursorposCallback(ndReal x, ndReal y)
+{
+	ImGuiIO& io = ImGui::GetIO();
+	io.MousePos = ImVec2(x, y);
+}
+
+//void ndDemoEntityManager::MouseScrollCallback(ndReal x, ndReal y)
+void ndDemoEntityManager::MouseScrollCallback(ndReal, ndReal y)
+{
+	//ndTrace(("%f %f\n", x, y));
+	ImGuiIO& io = ImGui::GetIO();
+	io.MouseWheel += y;
+}
+
+void ndDemoEntityManager::MouseButtonCallback(ndInt32 button, ndInt32 action)
+{
+	const ndInt32 KEY_PRESS = 1;
+	const ndInt32 KEY_RELEASE = 0;
+
+	if (button >= 0 && button < 3) 
 	{
-		ndAnimationSequence* const sequence = loader.LoadAnimation(fileName);
-		if (sequence)
+		ImGuiIO& io = ImGui::GetIO();
+		if (action == KEY_PRESS)
 		{
-			node = m_animationCache.Insert(sequence, fileName);
+			io.MouseDown[button] = true;    
+		} 
+		else if (action == KEY_RELEASE)
+		{
+			io.MouseDown[button] = false;    
 		}
 	}
-	return node ? node->GetInfo() : nullptr;
+}
+
+//void ndDemoEntityManager::KeyCallback(ndInt32 key, ndInt32 action)
+void ndDemoEntityManager::KeyCallback(ndInt32 key, ndInt32)
+{
+	// handle special ke events
+	const ndInt32 F1_key = 290;
+	const ndInt32 F10_key = 299;
+	if (key == F1_key)
+	{
+		// reload the demo. 
+		const ndMatrix matrix(m_renderer->GetCamera()->GetMatrix());
+		LoadDemo(m_lastCurrentScene);
+		m_renderer->GetCamera()->SetMatrix(matrix, matrix.m_posit);
+	}
+	else if (key == F10_key)
+	{
+		// set debug tracer here;
+		//ndAssert(0);
+	}
+}
+
+//ndSharedPtr<ndAnimationSequence> ndDemoEntityManager::GetAnimationSequence(ndMeshLoader& loader, const char* const fileName)
+ndSharedPtr<ndAnimationSequence> ndDemoEntityManager::GetAnimationSequence(ndMeshLoader&, const char* const)
+{
+	ndAssert(0);
+	return ndSharedPtr<ndAnimationSequence>();
+	//ndTree<ndSharedPtr<ndAnimationSequence>, ndString>::ndNode* node = m_animationCache.Find(fileName);
+	//if (!node)
+	//{
+	//	ndAnimationSequence* const sequence = loader.LoadAnimation(fileName);
+	//	if (sequence)
+	//	{
+	//		node = m_animationCache.Insert(sequence, fileName);
+	//	}
+	//}
+	//return node ? node->GetInfo() : nullptr;
 }
 
 bool ndDemoEntityManager::IsShiftKeyDown () const
 {
 	const ImGuiIO& io = ImGui::GetIO();
-	bool state = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
+	const ndInt32 KEY_LEFT_SHIFT = 340;
+	const ndInt32 KEY_RIGHT_SHIFT = 344;
+	bool state = io.KeysDown[KEY_LEFT_SHIFT] || io.KeysDown[KEY_RIGHT_SHIFT];
 	return state;
 }
 
 bool ndDemoEntityManager::IsControlKeyDown () const
 {
-	const ImGuiIO& io = ImGui::GetIO();
-	bool state = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
-	return state;
+	ndAssert(0);
+	return 0;
+	//const ImGuiIO& io = ImGui::GetIO();
+	//bool state = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
+	//return state;
 }
 
 bool ndDemoEntityManager::GetCaptured() const
@@ -792,9 +700,10 @@ bool ndDemoEntityManager::GetMouseKeyState (ndInt32 button) const
 	return io.MouseDown[button];
 }
 
-void ndDemoEntityManager::Set2DDisplayRenderFunction(ndSharedPtr<ndUIEntity>& demoGui)
+//void ndDemoEntityManager::Set2DDisplayRenderFunction(ndSharedPtr<ndUIEntity>& demoGui)
+void ndDemoEntityManager::Set2DDisplayRenderFunction(ndSharedPtr<ndUIEntity>&)
 {
-	m_renderDemoGUI = demoGui;
+	//m_renderDemoGUI = demoGui;
 }
 
 void* ndDemoEntityManager::GetUpdateCameraContext() const
@@ -810,73 +719,79 @@ void ndDemoEntityManager::SetUpdateCameraFunction(UpdateCameraCallback callback,
 
 bool ndDemoEntityManager::JoystickDetected() const
 {
-	return glfwJoystickPresent(0) ? true : false;
+	ndAssert(0);
+	return 0;
+	//return glfwJoystickPresent(0) ? true : false;
 }
 
-void ndDemoEntityManager::GetJoystickAxis (ndFixSizeArray<ndFloat32, 8>& axisValues)
+//void ndDemoEntityManager::GetJoystickAxis (ndFixSizeArray<ndFloat32, 8>& axisValues)
+void ndDemoEntityManager::GetJoystickAxis(ndFixSizeArray<ndFloat32, 8>&)
 {
-	if (JoystickDetected())
-	{
-		bool isInitialized = false;
-		static ndFixSizeArray<ndFloat32, 8> initialValues;
-		if (!initialValues.GetCount())
-		{
-			ndInt32 axisCount = 0;
-			const float* const axis = glfwGetJoystickAxes(0, &axisCount);
-			axisCount = ndMin(axisCount, axisValues.GetCapacity());
-			for (ndInt32 i = 0; i < axisCount; ++i)
-			{
-				initialValues.PushBack(axis[i]);
-			}
-		}
-		
-		if (!isInitialized)
-		{
-			ndInt32 axisCount = 0;
-			const float* const axis = glfwGetJoystickAxes(0, &axisCount);
-			for (ndInt32 i = 0; i < axisCount; ++i)
-			{
-				ndFloat32 diff = ndAbs(axis[i] - initialValues[i]);
-				isInitialized = isInitialized || (diff != ndFloat32(0.0f));
-			}
-		}
-
-		axisValues.SetCount(0);
-		for (ndInt32 i = 0; i < axisValues.GetCapacity(); ++i)
-		{
-			axisValues.PushBack(ndFloat32 (1.0f));
-		}
-		axisValues[0] = 0.0f;
-
-		if (isInitialized)
-		{
-			ndInt32 axisCount = 0;
-			const float* const axis = glfwGetJoystickAxes(0, &axisCount);
-			axisCount = ndMin(axisCount, axisValues.GetCapacity());
-
-			axisValues.SetCount(0);
-			for (ndInt32 i = 0; i < axisCount; ++i)
-			{
-				axisValues.PushBack(axis[i]);
-			}
-		}
-	}
+	ndAssert(0);
+	//if (JoystickDetected())
+	//{
+	//	bool isInitialized = false;
+	//	static ndFixSizeArray<ndFloat32, 8> initialValues;
+	//	if (!initialValues.GetCount())
+	//	{
+	//		ndInt32 axisCount = 0;
+	//		const float* const axis = glfwGetJoystickAxes(0, &axisCount);
+	//		axisCount = ndMin(axisCount, axisValues.GetCapacity());
+	//		for (ndInt32 i = 0; i < axisCount; ++i)
+	//		{
+	//			initialValues.PushBack(axis[i]);
+	//		}
+	//	}
+	//	
+	//	if (!isInitialized)
+	//	{
+	//		ndInt32 axisCount = 0;
+	//		const float* const axis = glfwGetJoystickAxes(0, &axisCount);
+	//		for (ndInt32 i = 0; i < axisCount; ++i)
+	//		{
+	//			ndFloat32 diff = ndAbs(axis[i] - initialValues[i]);
+	//			isInitialized = isInitialized || (diff != ndFloat32(0.0f));
+	//		}
+	//	}
+	//
+	//	axisValues.SetCount(0);
+	//	for (ndInt32 i = 0; i < axisValues.GetCapacity(); ++i)
+	//	{
+	//		axisValues.PushBack(ndFloat32 (1.0f));
+	//	}
+	//	axisValues[0] = 0.0f;
+	//
+	//	if (isInitialized)
+	//	{
+	//		ndInt32 axisCount = 0;
+	//		const float* const axis = glfwGetJoystickAxes(0, &axisCount);
+	//		axisCount = ndMin(axisCount, axisValues.GetCapacity());
+	//
+	//		axisValues.SetCount(0);
+	//		for (ndInt32 i = 0; i < axisCount; ++i)
+	//		{
+	//			axisValues.PushBack(axis[i]);
+	//		}
+	//	}
+	//}
 }
 
-void ndDemoEntityManager::GetJoystickButtons(ndFixSizeArray<char, 32>& axisbuttons)
+//void ndDemoEntityManager::GetJoystickButtons(ndFixSizeArray<char, 32>& axisbuttons)
+void ndDemoEntityManager::GetJoystickButtons(ndFixSizeArray<char, 32>&)
 {
-	if (JoystickDetected())
-	{
-		ndInt32 buttonsCount = 0;
-		axisbuttons.SetCount(0);
-		const unsigned char* const buttons = glfwGetJoystickButtons(0, &buttonsCount);
-		buttonsCount = ndMin(buttonsCount, axisbuttons.GetCapacity());
-
-		for (ndInt32 i = 0; i < buttonsCount; ++i)
-		{
-			axisbuttons.PushBack(char(buttons[i]));
-		}
-	}
+	ndAssert(0);
+	//if (JoystickDetected())
+	//{
+	//	ndInt32 buttonsCount = 0;
+	//	axisbuttons.SetCount(0);
+	//	const unsigned char* const buttons = glfwGetJoystickButtons(0, &buttonsCount);
+	//	buttonsCount = ndMin(buttonsCount, axisbuttons.GetCapacity());
+	//
+	//	for (ndInt32 i = 0; i < buttonsCount; ++i)
+	//	{
+	//		axisbuttons.PushBack(char(buttons[i]));
+	//	}
+	//}
 }
 
 void ndDemoEntityManager::ResetTimer()
@@ -885,18 +800,16 @@ void ndDemoEntityManager::ResetTimer()
 	m_microsecunds = ndGetTimeInMicroseconds ();
 }
 
-void ndDemoEntityManager::AddEntity(const ndSharedPtr<ndDemoEntity>& entity)
+void ndDemoEntityManager::AddEntity(const ndSharedPtr<ndRenderSceneNode>& entity)
 {
 	ndScopeSpinLock lock(m_addDeleteLock);
-	ndAssert(!entity->m_rootNode);
-	entity->m_rootNode = Append(entity);
+	m_renderer->AddSceneNode(entity);
 }
 
-void ndDemoEntityManager::RemoveEntity (const ndSharedPtr<ndDemoEntity>& entity)
+void ndDemoEntityManager::RemoveEntity (const ndSharedPtr<ndRenderSceneNode>& entity)
 {
 	ndScopeSpinLock lock(m_addDeleteLock);
-	ndAssert(entity->m_rootNode);
-	Remove(entity->m_rootNode);
+	m_renderer->RemoveSceneNode(entity);
 }
 
 void ndDemoEntityManager::Cleanup ()
@@ -906,31 +819,11 @@ void ndDemoEntityManager::Cleanup ()
 	{
 		m_world->Sync();
 	}
-	
-	//ndTree<ndAnimationSequence*, ndString>::Iterator iter(m_animationCache);
-	//for (iter.Begin(); iter; iter++)
-	//{
-	//	delete *iter;
-	//}
 
 	RegisterPostUpdate(nullptr);
 	m_animationCache.RemoveAll();
 	
-	m_colorRenderPass->Cleanup();
-	m_shadowRenderPass->Cleanup();
-	
-	if (m_cameraManager) 
-	{
-		delete m_cameraManager;
-		m_cameraManager = nullptr;
-	}
-
-	if (m_sky)
-	{
-		delete m_sky;
-	}
-	
-	m_sky = nullptr;
+	m_renderer->ResetScene();
 	m_updateCamera = nullptr;
 	
 	// destroy the Newton world
@@ -941,70 +834,12 @@ void ndDemoEntityManager::Cleanup ()
 		delete m_world;
 	}
 	
-	// destroy all remaining visual objects
-	while (GetFirst())
-	{
-		RemoveEntity(GetFirst()->GetInfo());
-	}
-	
 	// create the newton world
 	m_world = new ndPhysicsWorld(this);
-	
-	// add the camera manager
-	m_cameraManager = new ndDemoCameraManager(this);
-	
 	ApplyMenuOptions();
 	
 	// we start without 2d render
-	m_renderDemoGUI = ndSharedPtr<ndUIEntity>();
-
-	m_colorRenderPass->Init(this, 0);
-	m_shadowRenderPass->Init(this, 1, m_shaderCache.m_shadowMaps);
-}
-
-void ndDemoEntityManager::LoadFont()
-{
-	// Build texture atlas
-	ImGuiIO& io = ImGui::GetIO();
-
-    // Load Fonts
-    // (there is a default font, this is only if you want to change it. see extra_fonts/README.txt for more details)
-    //io.Fonts->AddFontDefault();
-
-	float pixedSize = 18;
-	char pathName[2048];
-	const char* const name = "Cousine-Regular.ttf";
-	//char* const name = "calibri.ttf";
-	//char* const name = "courbd.ttf";
-
-	ndGetWorkingFileName (name, pathName);
-    io.Fonts->AddFontFromFileTTF(pathName, pixedSize);
-    //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
-
-	// Load as RGBA 32-bits (75% of the memory is wasted, but default font is so small) 
-	// because it is more likely to be compatible with user's existing shaders. 
-	// If your ImTextureId represent a higher-level concept than just a GL texture id, 
-	// consider calling GetTexDataAsAlpha8() instead to save on GPU memory.
-	unsigned char* pixels;
-	ndInt32 width, height;
-	io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);   
-
-	// Upload texture to graphics system
-	GLint last_texture;
-	GLuint font_texture;
-	glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
-	glGenTextures(1, &font_texture);
-	glBindTexture(GL_TEXTURE_2D, font_texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-
-	// Store our identifier
-	m_defaultFont = GLint(font_texture);
-	io.Fonts->TexID = (void *)(intptr_t)m_defaultFont;
-
-	// Restore state
-	glBindTexture(GL_TEXTURE_2D, GLuint(last_texture));
+	//m_renderDemoGUI = ndSharedPtr<ndUIEntity>();
 }
 
 void ndDemoEntityManager::ApplyMenuOptions()
@@ -1035,47 +870,33 @@ void ndDemoEntityManager::ShowMainMenuBar()
 		if (ImGui::BeginMenu("File")) 
 		{
 			m_suspendPhysicsUpdate = true;
-
+	
 			if (ImGui::MenuItem("Preferences", "")) 
 			{
 				ndAssert (0);
 			}
 			ImGui::Separator();
-
+	
 			if (ImGui::MenuItem("New", "")) 
 			{
 				menuSelection = m_new;
 			}
-
-			//ImGui::Separator();
-			//if (ImGui::MenuItem("Open", "")) 
-			//{
-			//	menuSelection = m_load;
-			//}
-			//if (ImGui::MenuItem("Save", "")) 
-			//{
-			//	menuSelection = m_save;
-			//}
-			//if (ImGui::MenuItem("Save model", ""))
-			//{
-			//	menuSelection = m_saveModel;
-			//}
-
+	
 			ImGui::Separator();
 			if (ImGui::MenuItem("import ply file", "")) 
 			{
 				//mainMenu = 4;
 			}
-
+	
 			ImGui::Separator();
 			if (ImGui::MenuItem("Exit", "")) 
 			{
-				glfwSetWindowShouldClose (m_mainFrame, 1);
+				m_renderer->Terminate();
 			}
-
+	
 			ImGui::EndMenu();
 		}
-
+	
 		if (ImGui::BeginMenu("Demos")) 
 		{
 			m_suspendPhysicsUpdate = true;
@@ -1087,33 +908,33 @@ void ndDemoEntityManager::ShowMainMenuBar()
 					m_currentScene = i;
 				}
 			}
-
+	
 			ImGui::EndMenu();
 		}
-
+	
 		bool optionsOn = ImGui::BeginMenu("Options");
 		if (optionsOn) 
 		{
 			m_updateMenuOptions = true;
 			m_suspendPhysicsUpdate = true;
-
+	
 			ImGui::Checkbox("auto sleep mode", &m_autoSleepMode);
 			ImGui::Checkbox("show UI", &m_showUI);
 			ImGui::Checkbox("show stats", &m_showStats);
 			ImGui::Checkbox("synchronous physics update", &m_synchronousPhysicsUpdate);
 			ImGui::Checkbox("synchronous particle update", &m_synchronousParticlesUpdate);
 			ImGui::Separator();
-
+	
 			ImGui::Text("solvers");
 			ndInt32 solverMode(m_solverMode);
 			ImGui::RadioButton("default", &solverMode, ndWorld::ndStandardSolver);
 			ImGui::RadioButton("sse", &solverMode, ndWorld::ndSimdSoaSolver);
 			ImGui::RadioButton("avx2", &solverMode, ndWorld::ndSimdAvx2Solver);
 			ImGui::RadioButton("cuda", &solverMode, ndWorld::ndCudaSolver);
-
+	
 			m_solverMode = ndWorld::ndSolverModes(solverMode);
 			ImGui::Separator();
-
+	
 			ImGui::Text("solver sub steps");
 			ImGui::SliderInt("##solv", &m_solverSubSteps, 2, 8);
 			ImGui::Text("iterative solver passes");
@@ -1121,13 +942,13 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Text("worker threads");
 			ImGui::SliderInt("##worker", &m_workerThreads, 1, ndThreadPool::GetMaxThreads());
 			ImGui::Separator();
-
+	
 			ImGui::RadioButton("hide collision Mesh", &m_collisionDisplayMode, 0);
 			ImGui::RadioButton("show solid collision", &m_collisionDisplayMode, 1);
 			ImGui::RadioButton("show wire frame collision", &m_collisionDisplayMode, 2);
 			ImGui::RadioButton("show hidden wire frame collision", &m_collisionDisplayMode, 3);
 			ImGui::Separator();
-
+	
 			ImGui::Checkbox("show aabb", &m_showAABB);
 			ImGui::Checkbox("show broad phase", &m_showScene);
 			ImGui::Checkbox("show concave edges", &m_showConcaveEdge);
@@ -1142,41 +963,42 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("show joints debug info", &m_showJointDebugInfo);
 			ImGui::Checkbox("show models debug info", &m_showModelsDebugInfo);
 			ImGui::Checkbox("show colliding faces", &m_showCollidingFaces);
-
+	
 			ImGui::EndMenu();
-
+	
 			SetParticleUpdateMode();
 		}
-
+	
 		if (ImGui::BeginMenu("Help")) 
 		{
 			m_suspendPhysicsUpdate = true;
 			ImGui::EndMenu();
 		}
-
+	
 		ImGui::EndMainMenuBar();
-
+	
 		if (!optionsOn && m_updateMenuOptions) 
 		{
 			m_updateMenuOptions = false;
 			ApplyMenuOptions();
 		}
 	}
-
+	
 	switch (menuSelection)
 	{
 		case m_new:
 		{
 			// menu new 
-			ndMatrix matrix (GetCamera()->GetCurrentMatrix());
-			Cleanup();
-			ApplyMenuOptions();
-			ResetTimer();
-			m_currentScene = -1;
-			SetCameraMatrix(ndQuaternion(matrix), matrix.m_posit);
+			ndAssert(0);
+			//ndMatrix matrix (GetCamera()->GetCurrentMatrix());
+			//Cleanup();
+			//ApplyMenuOptions();
+			//ResetTimer();
+			//m_currentScene = -1;
+			//SetCameraMatrix(ndQuaternion(matrix), matrix.m_posit);
 			break;
 		}
-
+	
 		//case m_load:
 		//{
 		//	break;
@@ -1191,7 +1013,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 		//{
 		//	break;
 		//}
-
+	
 		case m_none:
 		default:
 		{
@@ -1210,54 +1032,17 @@ void ndDemoEntityManager::ShowMainMenuBar()
 
 void ndDemoEntityManager::LoadDemo(ndInt32 menu)
 {
-	char newTitle[256];
 	Cleanup();
-
-	// make the sky box 
-	CreateSkyBox();
+	
+	char newTitle[256];
 	m_demosSelection[menu].m_launchDemoCallback(this);
-
+	
 	snprintf(newTitle, sizeof(newTitle), "Newton Dynamics %d.%.2i demo: %s", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION, m_demosSelection[menu].m_name);
-	glfwSetWindowTitle(m_mainFrame, newTitle);
+	m_renderer->SetTitle(newTitle);
 	ApplyMenuOptions();
 	ResetTimer();
-
+	
 	ndAssert (m_world->ValidateScene());
-}
-
-void ndDemoEntityManager::ErrorCallback(ndInt32 error, const char* description)
-{
-	ndTrace (("Error %d: %s\n", error, description));
-	fprintf(stderr, "Error %d: %s\n", error, description);
-	ndAssert (0);
-}
-
-void ndDemoEntityManager::MouseButtonCallback(GLFWwindow*, ndInt32 button, ndInt32 action, ndInt32)
-{
-	if (button >= 0 && button < 3) 
-	{
-		ImGuiIO& io = ImGui::GetIO();
-		if (action == GLFW_PRESS) 
-		{
-			io.MouseDown[button] = true;    
-		} 
-		else if (action == GLFW_RELEASE) 
-		{
-			io.MouseDown[button] = false;    
-		}
-	}
-}
-
-void ndDemoEntityManager::MouseScrollCallback(GLFWwindow* const, double, double y)
-{
-	ImGuiIO& io = ImGui::GetIO();
-	io.MouseWheel += float (y);
-}
-
-void ndDemoEntityManager::CursorposCallback  (GLFWwindow* , double x, double y)
-{
-	ImGuiIO& io = ImGui::GetIO();
-	io.MousePos = ImVec2((float)x, (float)y);
 }
 
 bool ndDemoEntityManager::GetMouseSpeed(ndFloat32& speedX, ndFloat32& speedY) const
@@ -1276,48 +1061,6 @@ bool ndDemoEntityManager::GetMousePosition (ndFloat32& posX, ndFloat32& posY) co
 	return true;
 }
 
-void ndDemoEntityManager::CharCallback(GLFWwindow*, ndUnsigned32 ch)
-{
-	ImGuiIO& io = ImGui::GetIO();
-	io.AddInputCharacter((unsigned short)ch);
-}
-
-void ndDemoEntityManager::KeyCallback(GLFWwindow* const window, ndInt32 key, ndInt32, ndInt32 action, ndInt32 mods)
-{
-	ImGuiIO& io = ImGui::GetIO();
-	if (action == GLFW_PRESS)
-		io.KeysDown[key] = true;
-	if (action == GLFW_RELEASE)
-		io.KeysDown[key] = false;
-
-	(void)mods; // Modifiers are not reliable across systems
-	io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
-	io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
-	io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
-	io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
-	
-	static ndInt32 prevKey;
-	ndDemoEntityManager* const manager = (ndDemoEntityManager*)glfwGetWindowUserPointer(window);
-	if ((key == GLFW_KEY_F10) && (key != prevKey)) 
-	{
-		manager->m_profilerMode = true;
-	}
-
-	if (key == GLFW_KEY_ESCAPE)
-	{
-		glfwSetWindowShouldClose (window, 1);
-	}
-
-	if (key == GLFW_KEY_F1) 
-	{
-		ndMatrix cameraMatrix(manager->GetCamera()->GetCurrentMatrix());
-		manager->LoadDemo(manager->m_lastCurrentScene);
-		manager->SetCameraMatrix(cameraMatrix, cameraMatrix.m_posit);
-	}
-
-	prevKey = io.KeysDown[key] ? key : 0;
-}
-
 void ndDemoEntityManager::ToggleProfiler()
 {
 	#ifdef D_PROFILER
@@ -1326,38 +1069,6 @@ void ndDemoEntityManager::ToggleProfiler()
 		m_world->Sync();
 		dProfilerEnableProling();
 	#endif
-}
-
-bool ndDemoEntityManager::PollEvents()
-{
-	// Poll and handle events (inputs, window resize, etc.)
-	// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
-	// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
-	// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
-	// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
-	glfwPollEvents();
-
-	ndInt32 w, h;
-	glfwGetWindowSize(m_mainFrame, &w, &h);
-	return (w != 0) && (h != 0);
-}
-
-void ndDemoEntityManager::BeginFrame()
-{
-	ImGuiIO& io = ImGui::GetIO();
-
-	// Setup display size (every frame to accommodate for window resizing)
-	ndInt32 w, h;
-	ndInt32 display_w, display_h;
-	glfwGetWindowSize(m_mainFrame, &w, &h);
-	glfwGetFramebufferSize(m_mainFrame, &display_w, &display_h);
-	io.DisplaySize = ImVec2((ndReal)w, (ndReal)h);
-	io.DisplayFramebufferScale = ImVec2(w > 0 ? ((ndReal)display_w / (ndReal)w) : 0, h > 0 ? ((ndReal)display_h / (ndReal)h) : 0);
-
-	// Start the Dear ImGui frame
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
-	ImGui::NewFrame();
 }
 
 ndInt32 ndDemoEntityManager::ParticleCount() const
@@ -1392,57 +1103,57 @@ void ndDemoEntityManager::RenderStats()
 		{
 			snprintf(text, sizeof (text), "fps:            %6.3f", m_fps);
 			ImGui::Text(text, "");
-
+	
 			snprintf(text, sizeof (text), "physics time:  %6.3f ms", m_world->GetAverageUpdateTime() * 1.0e3f);
 			ImGui::Text(text, "");
-
+	
 			snprintf(text, sizeof (text), "update mode:    %s", m_synchronousPhysicsUpdate ? "synchronous" : "asynchronous");
 			ImGui::Text(text, "");
-
+	
 			snprintf(text, sizeof (text), "particle mode:  %s", m_synchronousParticlesUpdate ? "synchronous" : "asynchronous");
 			ImGui::Text(text, "");
-
+	
 			snprintf(text, sizeof (text), "bodies:         %d", m_world->GetBodyList().GetCount());
 			ImGui::Text(text, "");
-
+	
 			snprintf(text, sizeof (text), "joints:         %d", m_world->GetJointList().GetCount());
 			ImGui::Text(text, "");
-
+	
 			snprintf(text, sizeof (text), "contact joints: %d", m_world->GetContactList().GetActiveContacts());
 			ImGui::Text(text, "");
-
+	
 			snprintf(text, sizeof (text), "particles:      %d", ParticleCount());
 			ImGui::Text(text, "");
-
+	
 			snprintf(text, sizeof (text), "memory used:   %6.3f mbytes", ndFloat32(ndFloat64(ndMemory::GetMemoryUsed()) / (1024 * 1024)));
 			ImGui::Text(text, "");
-
+	
 			snprintf(text, sizeof (text), "threads:        %d", m_world->GetThreadCount());
 			ImGui::Text(text, "");
-
+	
 			snprintf(text, sizeof (text), "iterations:     %d", m_world->GetSolverIterations());
 			ImGui::Text(text, "");
-
+	
 			snprintf(text, sizeof (text), "Substeps:       %d", m_world->GetSubSteps());
 			ImGui::Text(text, "");
-
+	
 			snprintf(text, sizeof (text), "solver:         %s", m_world->GetSolverString());
 			ImGui::Text(text, "");
-
+	
 			m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsWindowHovered() && ImGui::IsMouseDown(0));
 			ImGui::End();
 		}
 	}
-
-	if (m_showUI && *m_renderDemoGUI)
-	{
-		if (ImGui::Begin("User Interface", &m_showUI))
-		{
-			m_renderDemoGUI->RenderHelp();
-			ImGui::End();
-		}
-	}
-
+	
+	//if (m_showUI && *m_renderDemoGUI)
+	//{
+	//	if (ImGui::Begin("User Interface", &m_showUI))
+	//	{
+	//		m_renderDemoGUI->RenderHelp();
+	//		ImGui::End();
+	//	}
+	//}
+	
 	ShowMainMenuBar();
 }
 
@@ -1468,24 +1179,14 @@ void ndDemoEntityManager::CalculateFPS(ndFloat32 timestep)
 	}
 }
 
-void ndDemoEntityManager::CreateSkyBox()
+//void ndDemoEntityManager::PushTransparentMesh (const ndDemoMeshInterface* const mesh, const ndMatrix& modelMatrix)
+void ndDemoEntityManager::PushTransparentMesh(const ndDemoMeshInterface* const, const ndMatrix&)
 {
-	if (!m_sky)
-	{
-		m_sky = new ndSkyBox(m_shaderCache.m_skyBox);
-		//ndScopeSpinLock lock(m_addDeleteLock);
-		//ndAssert(!m_sky->m_rootNode);
-		//m_sky->m_rootNode = Addtop(m_sky);
-	}
+	ndAssert(0);
+	//ndVector dist (m_cameraManager->GetCamera()->GetInvViewMatrix().TransformVector(modelMatrix.m_posit));
+	//TransparentMesh entry (modelMatrix, (ndDemoMesh*) mesh);
+	//m_transparentHeap.Push (entry, dist.m_z);
 }
-
-void ndDemoEntityManager::PushTransparentMesh (const ndDemoMeshInterface* const mesh, const ndMatrix& modelMatrix)
-{
-	ndVector dist (m_cameraManager->GetCamera()->GetInvViewMatrix().TransformVector(modelMatrix.m_posit));
-	TransparentMesh entry (modelMatrix, (ndDemoMesh*) mesh);
-	m_transparentHeap.Push (entry, dist.m_z);
-}
-
 
 //void ndDemoEntityManager::ImportPLYfile (const char* const fileName)
 void ndDemoEntityManager::ImportPLYfile(const char* const)
@@ -1509,7 +1210,7 @@ ndInt32 ndDemoEntityManager::Print (const ndVector&, const char *fmt, ... ) cons
 
 void ndDemoEntityManager::SetCameraMatrix (const ndQuaternion& rotation, const ndVector& position)
 {
-	m_cameraManager->SetCameraMatrix(rotation, position);
+	m_renderer->GetCamera()->SetMatrix(rotation, position);
 }
 
 void ndDemoEntityManager::UpdatePhysics(ndFloat32 timestep)
@@ -1533,26 +1234,27 @@ ndFloat32 ndDemoEntityManager::CalculateInteplationParam () const
 	return param;
 }
 
-void ndDemoEntityManager::RenderScene(ImDrawData* const)
-{
-	// Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
-	ImGuiIO& io = ImGui::GetIO();
-
-	ndInt32 fb_width = (ndInt32)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
-	ndInt32 fb_height = (ndInt32)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
-	if (fb_width == 0 || fb_height == 0)
-	{
-		return;
-	}
-
-	ndDemoEntityManager* const window = (ndDemoEntityManager*)io.UserData;
-	window->RenderScene();
-
-	if (*window->m_renderDemoGUI) 
-	{
-		window->m_renderDemoGUI->RenderUI();
-	}
-}
+//void ndDemoEntityManager::RenderScene()
+//{
+//	ndAssert(0);
+//	//// Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
+//	//ImGuiIO& io = ImGui::GetIO();
+//	//
+//	//ndInt32 fb_width = (ndInt32)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
+//	//ndInt32 fb_height = (ndInt32)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
+//	//if (fb_width == 0 || fb_height == 0)
+//	//{
+//	//	return;
+//	//}
+//	//
+//	//ndDemoEntityManager* const window = (ndDemoEntityManager*)io.UserData;
+//	//window->RenderScene();
+//	//
+//	//if (*window->m_renderDemoGUI) 
+//	//{
+//	//	window->m_renderDemoGUI->RenderUI();
+//	//}
+//}
 
 void ndDemoEntityManager::SetAcceleratedUpdate()
 {
@@ -1568,12 +1270,13 @@ void ndDemoEntityManager::RegisterPostUpdate(OnPostUpdate* const postUpdate)
 	m_onPostUpdate = postUpdate;
 }
 
-void ndDemoEntityManager::OnSubStepPostUpdate(ndFloat32 timestep)
+//void ndDemoEntityManager::OnSubStepPostUpdate(ndFloat32 timestep)
+void ndDemoEntityManager::OnSubStepPostUpdate(ndFloat32)
 {
-	if (m_colorRenderPass)
-	{
-		((ndColorRenderPass*)m_colorRenderPass)->UpdateDebugDisplay(timestep);
-	}
+	//if (m_colorRenderPass)
+	//{
+	////	((ndColorRenderPass*)m_colorRenderPass)->UpdateDebugDisplay(timestep);
+	//}
 }
 
 void ndDemoEntityManager::RenderScene()
@@ -1582,21 +1285,8 @@ void ndDemoEntityManager::RenderScene()
 	ndFloat32 timestep = dGetElapsedSeconds();	
 	CalculateFPS(timestep);
 	UpdatePhysics(timestep);
-	
-	ImGuiIO& io = ImGui::GetIO();
-	ndInt32 display_w = (ndInt32)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
-	ndInt32 display_h = (ndInt32)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
 
-	ndDemoCamera* const camera = GetCamera();
-	camera->SetViewMatrix(display_w, display_h);
-
-	// Get the interpolated location of each body in the scene
-	ndFloat32 interpolateParam = CalculateInteplationParam();
-	m_cameraManager->InterpolateMatrices (this, interpolateParam);
-
-	// apply pre-render passes
-	//m_shadowRenderPass->RenderScene(timestep);
-	m_colorRenderPass->RenderScene(timestep);
+	m_renderer->Render(timestep);
 }
 
 void ndDemoEntityManager::TestImGui()
@@ -1647,30 +1337,28 @@ void ndDemoEntityManager::TestImGui()
 		}
 		ImGui::End();
 	}
+	ImGui::Render();
 }
 
 void ndDemoEntityManager::Run()
 {
 	// Main loop
 	ndFloatExceptions exception;
-	while (!glfwWindowShouldClose(m_mainFrame))
+	while (!m_renderer->ShouldFinish())
 	{
 		if (m_profilerMode)
 		{
 			ToggleProfiler();
 			m_profilerMode = false;
 		}
-
+	
 		m_suspendPhysicsUpdate = false;
 		D_TRACKTIME();
-
-		if (PollEvents())
+	
+		if (m_renderer->PollEvents())
 		{
-			BeginFrame();
-			//TestImGui();
-			RenderScene(ImGui::GetDrawData());
-
-			glfwSwapBuffers(m_mainFrame);
+			//m_renderer->Render(0.0f);
+			RenderScene();
 		}
 	}
 }

@@ -10,16 +10,14 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndDemoMesh.h"
-#include "ndMeshLoader.h"
-#include "ndDemoEntity.h"
+//#include "ndMeshLoader.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
-#include "ndDemoSplinePathMesh.h"
 
+#if 0
 static ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInstance& shape, const ndMatrix& location, ndFloat32 mass)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
@@ -86,33 +84,6 @@ ndSharedPtr<ndBody> BuildFlatPlane(ndDemoEntityManager* const scene, bool optimi
 	return body;
 }
 
-ndSharedPtr<ndBody> BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix& matrix, bool kinematic)
-{
-	ndPhysicsWorld* const world = scene->GetWorld();
-
-	ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
-	ndMatrix uvMatrix(ndGetIdentityMatrix());
-	uvMatrix[0][0] *= 1.0f / 4.0f;
-	uvMatrix[1][1] *= 1.0f / 4.0f;
-	uvMatrix[2][2] *= 1.0f / 4.0f;
-
-	ndSharedPtr<ndDemoMeshInterface>geometry(new ndDemoMesh("box", scene->GetShaderCache(), &box, "marbleCheckBoard.png", "marbleCheckBoard.png", "marbleCheckBoard.png", 1.0f, uvMatrix, false));
-
-	ndMatrix location(matrix);
-	location.m_posit.m_y -= 0.5f;
-	ndSharedPtr<ndDemoEntity>entity(new ndDemoEntity(location));
-	entity->SetMesh(geometry);
-	entity->SetShadowMode(false);
-
-	ndSharedPtr<ndBody> body(kinematic ? new ndBodyKinematic() : new ndBodyDynamic());
-	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-	body->SetMatrix(location);
-	body->GetAsBodyKinematic()->SetCollisionShape(box);
-
-	world->AddBody(body);
-	scene->AddEntity(entity);
-	return body;
-}
 
 ndSharedPtr<ndBody> BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation, bool kinematic)
 {
@@ -453,5 +424,37 @@ ndSharedPtr<ndBody> BuildPlayArena(ndDemoEntityManager* const scene, bool kinema
 		}
 	}
 
+	return body;
+}
+#endif
+
+ndSharedPtr<ndBody> BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix& matrix, bool kinematic)
+{
+	ndPhysicsWorld* const world = scene->GetWorld();
+
+	ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
+	ndMatrix uvMatrix(ndGetIdentityMatrix());
+	uvMatrix[0][0] *= 1.0f / 4.0f;
+	uvMatrix[1][1] *= 1.0f / 4.0f;
+	uvMatrix[2][2] *= 1.0f / 4.0f;
+
+	ndRender* const render = *scene->GetRenderer();
+	ndRenderPrimitiveMeshMaterial material;
+	material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("marbleCheckBoard.png"));
+	ndSharedPtr<ndRenderPrimitive> geometry(ndRenderPrimitiveMesh::CreateFromCollisionShape(render, &box, material, ndRenderPrimitiveMesh::m_box, uvMatrix, false));
+	
+	ndMatrix location(matrix);
+	location.m_posit.m_y -= 0.5f;
+	ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(location));
+	entity->SetPrimitive(geometry);
+	//entity->SetShadowMode(false);
+	
+	ndSharedPtr<ndBody> body(kinematic ? new ndBodyKinematic() : new ndBodyDynamic());
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+	body->SetMatrix(location);
+	body->GetAsBodyKinematic()->SetCollisionShape(box);
+	
+	world->AddBody(body);
+	scene->AddEntity(entity);
 	return body;
 }

@@ -20,10 +20,10 @@ class ndDemoEntityManager;
 
 class ndParamMapper
 {
-public:
+	public:
 	ndParamMapper()
 		:m_x0(0.0f)
-		, m_scale(0.0f)
+		,m_scale(0.0f)
 	{
 	}
 
@@ -57,8 +57,9 @@ void SetModelVisualMesh(ndDemoEntityManager* const scene, ndModelArticulation* c
 //ndSharedPtr<ndBody> CreateSphere(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 radius, const char* const textName = "wood_0.png");
 //ndSharedPtr<ndBody> CreateCapsule(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, const char* const textName = "wood_1.png");
 
+
+ndSharedPtr<ndBody> AddSphere(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 radius, const char* const textName = "smilli.png");
 ndSharedPtr<ndBody> AddBox(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez, const char* const textName = "wood_0.png");
-ndSharedPtr<ndBody> AddSphere(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 radius, const char* const textName = "wood_0.png");
 ndSharedPtr<ndBody> AddCapsule(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, const char* const textName = "wood_1.png");
 ndSharedPtr<ndBody> AddConvexHull(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 radius, ndFloat32 high, ndInt32 segments, const char* const textName = "wood_0.png");
 

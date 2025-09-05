@@ -15,16 +15,16 @@
 #include "ndDemoEntityManager.h"
 #include "ndPhysicsUtils.h"
 
-class ndDemoEntity;
-class ndShaderCache;
-class ndAnimKeyframe;
-class ndDemoMeshInterface;
+//class ndDemoEntity;
+//class ndShaderCache;
+//class ndAnimKeyframe;
+//class ndDemoMeshInterface;
 
 class ndDemoEntityNotify : public ndModelBodyNotify
 {
 	public:
 	ndDemoEntityNotify(const ndDemoEntityNotify& notify);
-	ndDemoEntityNotify(ndDemoEntityManager* const manager, const ndSharedPtr<ndDemoEntity>& entity, ndBodyKinematic* const parentBody = nullptr, ndFloat32 gravity = DEMO_GRAVITY);
+	ndDemoEntityNotify(ndDemoEntityManager* const manager, const ndSharedPtr<ndRenderSceneNode>& entity, ndBodyKinematic* const parentBody = nullptr, ndFloat32 gravity = DEMO_GRAVITY);
 
 	ndBodyNotify* Clone() const
 	{
@@ -35,21 +35,23 @@ class ndDemoEntityNotify : public ndModelBodyNotify
 
 	void* GetUserData() const
 	{
-		const ndDemoEntity* const ent = *m_entity;
-		return (void*)ent;
+		ndAssert(0);
+		return nullptr;
+		//const ndDemoEntity* const ent = *m_entity;
+		//return (void*)ent;
 	}
 
 	//virtual void OnObjectPick() const;
 	virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix);
 
 	ndDemoEntityManager* m_manager;
-	ndSharedPtr<ndDemoEntity> m_entity;
+	ndSharedPtr<ndRenderSceneNode> m_entity;
 };
 
 class ndBindingRagdollEntityNotify : public ndDemoEntityNotify
 {
 	public:
-	ndBindingRagdollEntityNotify(ndDemoEntityManager* const manager, const ndSharedPtr<ndDemoEntity>& entity, ndBodyDynamic* const parentBody, ndFloat32 campSpeed);
+	ndBindingRagdollEntityNotify(ndDemoEntityManager* const manager, const ndSharedPtr<ndRenderSceneNode>& entity, ndBodyDynamic* const parentBody, ndFloat32 campSpeed);
 	~ndBindingRagdollEntityNotify();
 
 	void OnTransform(ndInt32, const ndMatrix& matrix);

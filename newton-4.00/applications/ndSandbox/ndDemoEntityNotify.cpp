@@ -10,12 +10,12 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndDemoMesh.h"
-#include "ndDemoEntity.h"
-#include "ndPhysicsWorld.h"
+//#include "ndDemoMesh.h"
+//#include "ndDemoEntity.h"
+//#include "ndPhysicsWorld.h"
 #include "ndDemoEntityNotify.h"
 
-ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, const ndSharedPtr<ndDemoEntity>& entity, ndBodyKinematic* const parentBody, ndFloat32 gravity)
+ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, const ndSharedPtr<ndRenderSceneNode>& entity, ndBodyKinematic* const parentBody, ndFloat32 gravity)
 	:ndModelBodyNotify(parentBody, ndVector(0.0f, gravity, 0.0f, 0.0f))
 	,m_manager(manager)
 	,m_entity(entity)
@@ -36,7 +36,7 @@ ndDemoEntityNotify::~ndDemoEntityNotify()
 void ndDemoEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
 {
 	// apply this transformation matrix to the application user data.
-	if (m_entity)
+	if (*m_entity)
 	{
 		ndVector posit;
 		ndQuaternion rot;
@@ -58,30 +58,31 @@ void ndDemoEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
 //	world->RemoveBody(body);
 //}
 
-ndBindingRagdollEntityNotify::ndBindingRagdollEntityNotify(ndDemoEntityManager* const manager, const ndSharedPtr<ndDemoEntity>& entity, ndBodyDynamic* const parentBody, ndFloat32 capSpeed)
+ndBindingRagdollEntityNotify::ndBindingRagdollEntityNotify(ndDemoEntityManager* const manager, const ndSharedPtr<ndRenderSceneNode>& entity, ndBodyDynamic* const parentBody, ndFloat32 capSpeed)
 	:ndDemoEntityNotify(manager, entity, parentBody)
 	,m_bindMatrix(ndGetIdentityMatrix())
 	,m_capSpeed(capSpeed)
 {
-	if (m_parentBody)
-	{
-		ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)parentBody->GetNotifyCallback();
-		const ndDemoEntity* const parentEntity = *notify->m_entity;
-
-		ndMatrix matrix(ndGetIdentityMatrix());
-		for (const ndDemoEntity* parent = entity->GetParent(); parent != parentEntity; parent = parent->GetParent())
-		{
-			const ndMatrix parentMatrix(parent->GetCurrentMatrix());
-			matrix = matrix * parentMatrix;
-		}
-		m_bindMatrix = matrix;
-	}
-	else
-	{
-		//const ndMatrix parentMatrix(entity->GetParent()->CalculateGlobalMatrix());
-		const ndMatrix parentMatrix(entity->GetParent() ? entity->GetParent()->CalculateGlobalMatrix() : ndGetIdentityMatrix());
-		m_bindMatrix = parentMatrix.OrthoInverse();
-	}
+	ndAssert(0);
+	//if (m_parentBody)
+	//{
+	//	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)parentBody->GetNotifyCallback();
+	//	const ndDemoEntity* const parentEntity = *notify->m_entity;
+	//
+	//	ndMatrix matrix(ndGetIdentityMatrix());
+	//	for (const ndDemoEntity* parent = entity->GetParent(); parent != parentEntity; parent = parent->GetParent())
+	//	{
+	//		const ndMatrix parentMatrix(parent->GetCurrentMatrix());
+	//		matrix = matrix * parentMatrix;
+	//	}
+	//	m_bindMatrix = matrix;
+	//}
+	//else
+	//{
+	//	//const ndMatrix parentMatrix(entity->GetParent()->CalculateGlobalMatrix());
+	//	const ndMatrix parentMatrix(entity->GetParent() ? entity->GetParent()->CalculateGlobalMatrix() : ndGetIdentityMatrix());
+	//	m_bindMatrix = parentMatrix.OrthoInverse();
+	//}
 }
 
 ndBindingRagdollEntityNotify::~ndBindingRagdollEntityNotify()

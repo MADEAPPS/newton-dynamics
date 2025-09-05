@@ -40,11 +40,10 @@
 	#include <commctrl.h>
 	#include <crtdbg.h>
 	
-	#include <glatter.h>
+
+	#include <glatter.h> // TODO to be removed later
 	#include <GL/glu.h>
 	#include <GL/gl.h>
-	#include <GLFW/glfw3.h>
-	#include <GLFW/glfw3native.h>
 #endif
 	
 #if defined (__linux__ )
@@ -70,14 +69,14 @@
 #include <VHACD.h>
 #include <imgui.h>
 #include <lodepng.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
 
 // SDK includes
 #include <ndNewton.h>
 #include <ndModelInc.h>
 #include <ndBrainInc.h>
+#include <ndRenderInc.h>
 
+ndString ndGetWorkingFileName(const char* const name);
 void ndGetWorkingFileName (const char* const name, char* const outPathName);
 
 // endian conversion

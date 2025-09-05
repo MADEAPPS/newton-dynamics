@@ -19,14 +19,30 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#ifndef _ND_RENDER_TEXTURE_H__
+#define _ND_RENDER_TEXTURE_H__
 
-#ifndef _ND_RENDER_STDAFX_H__
-#define _ND_RENDER_STDAFX_H__
+#include "ndRenderStdafx.h"
 
-#include <imgui.h>
-#include <lodepng.h>
-#include <ndNewton.h>
+class ndRenderTexture: public ndContainersFreeListAlloc<ndRenderTexture>
+{
+	public:
+	enum TextureImageFormat
+	{
+		m_rgb,
+		m_rgba,
+		m_luminace,
+	};
 
+	ndRenderTexture();
+	virtual ~ndRenderTexture();
+
+	static ndSharedPtr<ndRenderTexture> Load(const ndString& pathname);
+	static ndSharedPtr<ndRenderTexture> LoadCubeMap(const ndFixSizeArray<ndString, 6>& pathnames);
+
+	private:
+	ndUnsigned64 m_hash;
+};
 
 #endif 
 

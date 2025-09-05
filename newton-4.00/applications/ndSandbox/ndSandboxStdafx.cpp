@@ -54,6 +54,13 @@ void ndGetWorkingFileName (const char* const name, char* const outPathName)
 	#endif
 }
 
+ndString ndGetWorkingFileName(const char* const name)
+{
+	char outPathName[1024];
+	ndGetWorkingFileName(name, outPathName);
+	return ndString(outPathName);
+}
+
 ndUnsigned16 ndIndian16(ndUnsigned16 x)
 {
 	return ndUnsigned16 (((x >> 8) & 0xff) + ((x & 0xff) << 8));

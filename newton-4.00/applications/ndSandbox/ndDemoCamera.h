@@ -18,96 +18,23 @@
 #define __DEMO_CAMERA_H__
 
 #include "ndSandboxStdafx.h"
-#include "ndDemoEntity.h"
 
-class ndDemoCamera: public ndDemoEntity
+class ndDemoCamera: public ndRenderSceneCamera
 {
 	public:
-	ndDemoCamera();
-	~ndDemoCamera();
+	ndDemoCamera(ndRender* const owner);
 
-	ndFloat32 GetYawAngle() const;
-	ndFloat32 GetPichAngle() const;
+	void TickUpdate(ndFloat32 timestep);
+	virtual void SetMatrix(const ndQuaternion& rotation, const ndVector& position) override;
 
-	const ndMatrix& GetViewMatrix() const;
-	const ndMatrix& GetInvViewMatrix() const;
-	const ndMatrix& GetProjectionMatrix() const;
-	const ndMatrix& GetInvProjectionMatrix() const;
-	const ndMatrix& GetInvViewProjectionMatrix() const;
-
-	const ndMatrix& GetWorlToGlMatrix() const;
-
-	void SetMatrix (const ndQuaternion& rotation, const ndVector& position);
-	void SetViewMatrix (ndInt32 width, ndInt32 height);
-
-	virtual void Render(ndFloat32 timeStep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
-
-	ndVector ScreenToWorld (const ndVector& screenPoint) const;
-	ndVector WorldToScreen (const ndVector& worldPoint) const;
-	
-	private:
-	ndMatrix CreateLookAtMatrix(const ndVector& eye, const ndVector& center, const ndVector& normUp);
-	ndMatrix CreateMatrixFromFrustum(ndFloat32 Left, ndFloat32 Right, ndFloat32 Bottom, ndFloat32 Top, ndFloat32 ZNear, ndFloat32 ZFar);
-	ndMatrix CreatePerspectiveMatrix(ndFloat32 FOV, ndFloat32 Aspect, ndFloat32 ZNear, ndFloat32 ZFar);
-
-	ndMatrix m_viewMatrix;
-	ndMatrix m_invViewMatrix;
-	ndMatrix m_projectionMatrix;
-	ndMatrix m_invProjectionMatrix;
-	ndMatrix m_invViewRrojectionMatrix;
-	ndVector m_frustum[8];
-
-	ndFloat32 m_fov;
-	ndFloat32 m_backPlane;
-	ndFloat32 m_frontPlane;
-	ndFloat32 m_cameraYaw;
-	ndFloat32 m_cameraPitch;
-
-	static ndMatrix m_worldToOpenGl;
-
-	ndInt32 m_viewport[4]; 
-	friend class ndDemoEntity;
-	friend class ndShadowMapRenderPass;
+	ndFloat32 m_yaw;
+	ndFloat32 m_pitch;
+	ndFloat32 m_yawRate;
+	ndFloat32 m_pitchRate;
+	ndFloat32 m_mousePosX;
+	ndFloat32 m_mousePosY;
+	ndFloat32 m_frontSpeed;
+	ndFloat32 m_sidewaysSpeed;
 };
-
-inline ndFloat32 ndDemoCamera::GetYawAngle() const
-{
-	return m_cameraYaw;
-}
-
-inline ndFloat32 ndDemoCamera::GetPichAngle() const
-{
-	return m_cameraPitch;
-}
-
-inline const ndMatrix& ndDemoCamera::GetProjectionMatrix() const
-{
-	return m_projectionMatrix;
-}
-
-inline const ndMatrix& ndDemoCamera::GetInvProjectionMatrix() const
-{
-	return m_invProjectionMatrix;
-}
-
-inline const ndMatrix& ndDemoCamera::GetViewMatrix() const
-{
-	return m_viewMatrix;
-}
-
-inline const ndMatrix& ndDemoCamera::GetInvViewMatrix() const
-{
-	return m_invViewMatrix;
-}
-
-inline const ndMatrix& ndDemoCamera::GetInvViewProjectionMatrix() const
-{
-	return m_invViewRrojectionMatrix;
-}
-
-inline const ndMatrix& ndDemoCamera::GetWorlToGlMatrix() const
-{
-	return m_worldToOpenGl;
-}
 
 #endif 

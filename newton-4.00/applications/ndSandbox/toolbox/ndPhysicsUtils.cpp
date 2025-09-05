@@ -10,16 +10,12 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndDemoMesh.h"
-#include "ndDemoEntity.h"
 #include "ndPhysicsUtils.h"
-#include "ndDemoEntityManager.h"
-#include "ndOpenGlUtil.h"
-#include "ndDebugDisplay.h"
 #include "ndPhysicsWorld.h"
+//#include "ndDebugDisplay.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
-#include "ndDemoInstanceEntity.h"
+//#include "ndDemoInstanceEntity.h"
 #include "ndHighResolutionTimer.h"
 
 ndVector FindFloor(const ndWorld& world, const ndVector& origin, ndFloat32 dist)
@@ -60,6 +56,9 @@ ndMatrix FindFloor(const ndWorld& world, const ndMatrix& origin, const ndShapeIn
 	matrix.m_posit.m_y -= dist * castShape.m_param;
 	return matrix;
 }
+
+#if 0
+
 
 ndBodyKinematic* MousePickBody(ndWorld* const world, const ndVector& origin, const ndVector& end, ndFloat32& paramterOut, ndVector& positionOut, ndVector& normalOut)
 {
@@ -127,30 +126,6 @@ void SetModelVisualMesh(ndDemoEntityManager* const scene, ndModelArticulation* c
 	}
 }
 
-static ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInstance& shape, const ndMatrix& location, ndFloat32 mass, const char* const textName)
-{
-	ndPhysicsWorld* const world = scene->GetWorld();
-
-	ndMatrix matrix(FindFloor(*world, location, shape, 200.0f));
-	ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, textName, textName, textName));
-
-	ndBodyKinematic* const body = new ndBodyDynamic();
-	ndSharedPtr<ndDemoEntity> entity(new ndDemoEntity(matrix));
-	entity->SetMesh(mesh);
-
-	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-	body->SetMatrix(matrix);
-	body->SetCollisionShape(shape);
-	body->SetMassMatrix(mass, shape);
-	return body;
-}
-
-ndSharedPtr<ndBody> CreateSphere(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius, const char* const textName)
-{
-	ndShapeInstance shape(new ndShapeSphere(radius));
-	ndSharedPtr<ndBody> body (CreateBody(scene, shape, location, mass, textName));
-	return body;
-}
 
 ndSharedPtr<ndBody> CreateBox(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez, const char* const textName)
 {
@@ -213,18 +188,6 @@ void AddCapsulesStacks(ndDemoEntityManager* const scene, const ndMatrix& locatio
 	}
 }
 
-ndSharedPtr<ndBody> AddSphere(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius, const char* const textName)
-{
-	ndSharedPtr<ndBody> body(CreateSphere(scene, location, mass, radius, textName));
-
-	ndPhysicsWorld* const world = scene->GetWorld();
-	world->AddBody(body);
-
-	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)body->GetNotifyCallback();
-	scene->AddEntity(notify->m_entity);
-	return body;
-}
-
 ndSharedPtr<ndBody> AddBox(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez, const char* const textName)
 {
 	ndSharedPtr<ndBody> body (CreateBox(scene, location, mass, sizex, sizey, sizez, textName));
@@ -273,5 +236,54 @@ ndSharedPtr<ndBody> AddConvexHull(ndDemoEntityManager* const scene, const ndMatr
 	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)body->GetNotifyCallback();
 	scene->AddEntity(notify->m_entity);
 
+	return body;
+}
+#endif
+
+
+static ndBodyKinematic* CreateBody(
+	ndDemoEntityManager* const scene, 
+	const ndShapeInstance& shape, 
+	const ndMatrix& location, 
+	ndFloat32 mass, 
+	const char* const textName,
+	ndRenderPrimitiveMesh::ndUvMapingMode mappingMode)
+{
+	ndPhysicsWorld* const world = scene->GetWorld();
+	ndRender* const render = *scene->GetRenderer();
+
+	ndMatrix matrix(FindFloor(*world, location, shape, 200.0f));
+
+	ndRenderPrimitiveMeshMaterial material;
+	material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textName));
+
+	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateFromCollisionShape(render, &shape, material, mappingMode));
+	ndBodyKinematic* const body = new ndBodyDynamic();
+	ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(matrix));
+	entity->SetPrimitive(mesh);
+
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+	body->SetMatrix(matrix);
+	body->SetCollisionShape(shape);
+	body->SetMassMatrix(mass, shape);
+	return body;
+}
+
+ndSharedPtr<ndBody> CreateSphere(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius, const char* const textName)
+{
+	ndShapeInstance shape(new ndShapeSphere(radius));
+	ndSharedPtr<ndBody> body(CreateBody(scene, shape, location, mass, textName, ndRenderPrimitiveMesh::m_spherical));
+	return body;
+}
+
+ndSharedPtr<ndBody> AddSphere(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius, const char* const textName)
+{
+	ndSharedPtr<ndBody> body(CreateSphere(scene, location, mass, radius, textName));
+	
+	ndPhysicsWorld* const world = scene->GetWorld();
+	world->AddBody(body);
+	
+	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)body->GetNotifyCallback();
+	scene->AddEntity(notify->m_entity);
 	return body;
 }

@@ -10,23 +10,22 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndHighResolutionTimer.h"
+#include "ndMenuRenderPass.h"
+#include "ndDemoEntityManager.h"
 
-static ndUnsigned64 m_prevTime = 0;
-
-void dResetTimer()
+ndMenuRenderPass::ndMenuRenderPass(ndDemoEntityManager* const owner)
+	:ndGuiRenderPass(*owner->GetRenderer())
+	,m_owner(owner)
 {
-	m_prevTime = ndGetTimeInMicroseconds();
 }
 
-ndFloat32 dGetElapsedSeconds()
+ndMenuRenderPass::~ndMenuRenderPass()
 {
-	const ndFloat64 TICKS2SEC = 1.0e-6f;
-	ndUnsigned64 microseconds = ndGetTimeInMicroseconds();
+}
 
-	ndFloat32 timeStep = ndFloat32 ((ndFloat64)(microseconds - m_prevTime) * TICKS2SEC);
-	m_prevTime = microseconds;
-
-	return timeStep;
-} 
-
+void ndMenuRenderPass::RenderScene(ndFloat32)
+{
+	StateBegin();
+	m_owner->RenderStats();
+	StateEnd();
+}

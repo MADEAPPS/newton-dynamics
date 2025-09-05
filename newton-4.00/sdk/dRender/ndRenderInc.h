@@ -24,6 +24,16 @@
 
 #include <ndRenderStdafx.h>
 #include <ndRender.h>
+#include <ndRenderPass.h>
+#include <ndRenderTexture.h>
+#include <ndGuiRenderPass.h>
+#include <ndRenderPrimitive.h>
+#include <ndColorRenderPass.h>
+#include <ndRenderSceneNode.h>
+#include <ndRenderSceneCamera.h>
+#include <ndRenderTextureCache.h>
+#include <ndRenderPrimitiveMesh.h>
+#include <ndEnvironmentRenderPass.h>
 
 #endif 
 

@@ -66,21 +66,22 @@ void ndGameControllerInputs::Update(ndDemoEntityManager* const scene)
 	if (scene->JoystickDetected())
 	{
 #if !defined (__APPLE__)
-		char joystickName[256];
-		strcpy(&joystickName[0], glfwGetJoystickName(0));
-		strtolwr(joystickName);
-		if (strstr(joystickName, "wheel"))
-		{
-			GetWheelJoystickInputs(scene);
-		}
-		else if (strstr(joystickName, "xbox"))
-		{
-			GetXboxJoystickInputs(scene);
-		}
-		else
-		{
-			GetJoystickInputs(scene);
-		}
+		ndAssert(0);
+		//char joystickName[256];
+		//strcpy(&joystickName[0], glfwGetJoystickName(0));
+		//strtolwr(joystickName);
+		//if (strstr(joystickName, "wheel"))
+		//{
+		//	GetWheelJoystickInputs(scene);
+		//}
+		//else if (strstr(joystickName, "xbox"))
+		//{
+		//	GetXboxJoystickInputs(scene);
+		//}
+		//else
+		//{
+		//	GetJoystickInputs(scene);
+		//}
 #endif
 	}
 	GetKeyboardInputs(scene);
