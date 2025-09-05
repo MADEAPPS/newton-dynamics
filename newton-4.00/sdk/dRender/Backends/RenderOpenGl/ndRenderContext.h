@@ -24,13 +24,14 @@
 
 #include "ndRenderStdafx.h"
 
-// Exclude rarely-used stuff from Windows headers
-#define WIN32_LEAN_AND_MEAN		
+#if (defined(WIN32) || defined(_WIN32))
+	#define WIN32_LEAN_AND_MEAN		
 	
-#define GLFW_EXPOSE_NATIVE_WIN32
-#include <windows.h>
-#include <commctrl.h>
-#include <crtdbg.h>
+	#define GLFW_EXPOSE_NATIVE_WIN32
+	#include <windows.h>
+	#include <commctrl.h>
+	#include <crtdbg.h>
+#endif
 
 #include <glatter.h>
 #include <GL/glu.h>
