@@ -24,23 +24,8 @@
 
 #include "ndRenderStdafx.h"
 
-#if (defined(WIN32) || defined(_WIN32))
-	// Exclude rarely-used stuff from Windows headers
-	#define WIN32_LEAN_AND_MEAN		
-	
-	#define GLFW_EXPOSE_NATIVE_WIN32
-	#include <windows.h>
-	#include <commctrl.h>
-	#include <crtdbg.h>
-
-	// insert the Im gui back end here
-	//#include <backends/imgui_impl_glfw.h>
-	//#include <backends/imgui_impl_opengl3.h>
-
-#else
-	#error 
-#endif
-
+// include all the Mac OS header need for Meta here
+#include <CoreFoundation/CoreFoundation.h> 
 
 class ndRender;
 class ndRenderTexture;

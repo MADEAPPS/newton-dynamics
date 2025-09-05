@@ -24,28 +24,22 @@
 
 #include "ndRenderStdafx.h"
 
-#if (defined(WIN32) || defined(_WIN32))
-	// Exclude rarely-used stuff from Windows headers
-	#define WIN32_LEAN_AND_MEAN		
+// Exclude rarely-used stuff from Windows headers
+#define WIN32_LEAN_AND_MEAN		
 	
-	#define GLFW_EXPOSE_NATIVE_WIN32
-	#include <windows.h>
-	#include <commctrl.h>
-	#include <crtdbg.h>
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <windows.h>
+#include <commctrl.h>
+#include <crtdbg.h>
 
-	#include <glatter.h>
-	#include <GL/glu.h>
-	#include <GL/gl.h>
-	#include <GLFW/glfw3.h>
-	#include <GLFW/glfw3native.h>
+#include <glatter.h>
+#include <GL/glu.h>
+#include <GL/gl.h>
+#include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
 
-	#include <backends/imgui_impl_glfw.h>
-	#include <backends/imgui_impl_opengl3.h>
-
-#else
-	#error 
-#endif
-
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
 
 class ndRender;
 class ndRenderTexture;
