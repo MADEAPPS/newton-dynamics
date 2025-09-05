@@ -23,12 +23,12 @@ include_directories(../../thirdParty/png)
 include_directories(../../thirdParty/imgui/)
 
 if (APPLE) 
-	include_directories(Backends/RenderBlank)
+	include_directories(Backends/RenderMacOS)
 	file(GLOB CPP_SOURCE 
 		*.h
 		*.cpp 
-		Backends/RenderBlank/*.h
-		Backends/RenderBlank/*.cpp)
+		Backends/RenderMacOS/*.h
+		Backends/RenderMacOS/*.cpp)
 else()
 	include_directories(Backends/RenderOpenGl)
 	include_directories(../../thirdParty/glfw/)
