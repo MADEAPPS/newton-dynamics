@@ -42,7 +42,7 @@ class ndBrainLayerCrossCorrelation_2d : public ndBrainLayer
 	virtual bool HasParameters() const;
 	virtual ndInt32 GetOutputSize() const;
 	virtual ndInt32 GetInputSize() const;
-	virtual const char* GetLabelId() const;
+	virtual const char* GetLabelId() const override;
 	virtual ndInt32 GetOutputBufferSize() const;
 	virtual ndInt32 GetNumberOfParameters() const;
 	

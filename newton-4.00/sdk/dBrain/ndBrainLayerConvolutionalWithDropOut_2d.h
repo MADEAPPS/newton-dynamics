@@ -37,7 +37,7 @@ class ndBrainLayerConvolutionalWithDropOut_2d : public ndBrainLayerConvolutional
 
 	virtual void UpdateDropOut();
 	virtual void EnableDropOut(bool state);
-	virtual const char* GetLabelId() const;
+	virtual const char* GetLabelId() const override;
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	virtual void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
 

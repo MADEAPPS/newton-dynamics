@@ -35,7 +35,7 @@ class ndBrainLayerActivationSigmoidLinear : public ndBrainLayerActivation
 	ndBrainLayer* Clone() const;
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
-	const char* GetLabelId() const;
+	const char* GetLabelId() const override;
 	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
 	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
 };
