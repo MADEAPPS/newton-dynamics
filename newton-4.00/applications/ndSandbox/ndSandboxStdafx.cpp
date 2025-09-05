@@ -40,7 +40,7 @@ void ndGetWorkingFileName (const char* const name, char* const outPathName)
 		CFRelease( filePath );
 	#elif defined(__linux__)
 		char id[2048];
-		char appPath[2048];
+		char appPath[2048 - 256];
 
 		snprintf(id, sizeof (id), "/proc/%d/exe", getpid());
 		memset (appPath, 0, sizeof (appPath));
