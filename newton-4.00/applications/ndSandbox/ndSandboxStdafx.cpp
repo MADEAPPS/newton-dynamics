@@ -15,7 +15,7 @@
 
 #include "ndSandboxStdafx.h"
 
-// Windows user assets path
+// find user assets path
 void ndGetWorkingFileName (const char* const name, char* const outPathName)
 {
 	#if (defined(WIN32) || defined(_WIN32))
@@ -48,7 +48,7 @@ void ndGetWorkingFileName (const char* const name, char* const outPathName)
 		ret = 0;
 		char* const end = strstr (appPath, "applications");
 		*end = 0;
-		snprintf (outPathName, sizeof(appPath), "%sapplications/media/%s", appPath, name);
+		sprintf (outPathName, "%sapplications/media/%s", appPath, name);
 	#else
 		#error  "error: need to implement \"dGetWorkingFileName\" here for this platform"
 	#endif
