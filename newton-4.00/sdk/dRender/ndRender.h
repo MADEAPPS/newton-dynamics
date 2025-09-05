@@ -82,6 +82,8 @@ class ndRender: public ndClassAlloc
 	ndSharedPtr<ndRenderSceneCamera> GetCamera() const;
 	ndSharedPtr<ndRenderTextureCache>& GetTextureCache();
 
+	void InterpolateTransforms(ndFloat32 param);
+
 	private:
 	ndSharedPtr<ndUserCallback> m_owner;
 	ndSharedPtr<ndRenderContext> m_context;

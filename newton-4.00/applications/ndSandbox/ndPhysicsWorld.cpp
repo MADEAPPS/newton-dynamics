@@ -69,6 +69,7 @@ ndPhysicsWorld::ndPhysicsWorld(ndDemoEntityManager* const manager)
 	:ndWorld()
 	,m_manager(manager)
 	,m_timeAccumulator(0.0f)
+	,m_interplationParameter(0.0f)
 	,m_deadEntities(manager)
 	,m_acceleratedUpdate(false)
 {
@@ -234,6 +235,8 @@ void ndPhysicsWorld::AdvanceTime(ndFloat32 timestep)
 			m_timeAccumulator -= descreteStep;
 		}
 	}
+
+	m_manager->m_renderer->InterpolateTransforms(m_timeAccumulator / descreteStep);
 
 	if (m_manager->m_synchronousPhysicsUpdate)
 	{

@@ -21,7 +21,7 @@ void dResetTimer()
 
 ndFloat32 dGetElapsedSeconds()
 {
-	const ndFloat64 TICKS2SEC = 1.0e-6f;
+	const ndFloat64 TICKS2SEC = ndFloat32(1.0e-6f);
 	ndUnsigned64 microseconds = ndGetTimeInMicroseconds();
 
 	ndFloat32 timeStep = ndFloat32 ((ndFloat64)(microseconds - m_prevTime) * TICKS2SEC);

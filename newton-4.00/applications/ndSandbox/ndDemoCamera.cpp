@@ -26,10 +26,9 @@ ndDemoCamera::ndDemoCamera(ndRender* const owner)
 {
 }
 
-void ndDemoCamera::SetMatrix(const ndQuaternion& rotation, const ndVector& position)
+void ndDemoCamera::SetTransform(const ndQuaternion& rotation, const ndVector& position)
 {
-	ndRenderSceneCamera::SetMatrix(rotation, position);
-
+	ndRenderSceneCamera::SetTransform(rotation, position);
 	const ndMatrix matrix(GetMatrix());
 	m_pitch = ndAsin(matrix.m_front.m_y);
 	m_yaw = ndAtan2(-matrix.m_front.m_z, matrix.m_front.m_x);
@@ -117,8 +116,7 @@ void ndDemoCamera::TickUpdate(ndFloat32 timestep)
 	m_mousePosY = mouseY;
 
 	ndMatrix matrix(ndRollMatrix(m_pitch) * ndYawMatrix(m_yaw));
-	//ndQuaternion rot(matrix);
-	SetMatrix(ndQuaternion(matrix), targetMatrix.m_posit);
+	ndRenderSceneCamera::SetTransform(ndQuaternion(matrix), targetMatrix.m_posit);
 
 #if 0
 	// get the mouse pick parameter so that we can do replay for debugging

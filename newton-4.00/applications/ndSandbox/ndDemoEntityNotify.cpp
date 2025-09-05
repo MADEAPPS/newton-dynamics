@@ -41,7 +41,7 @@ void ndDemoEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
 		ndVector posit;
 		ndQuaternion rot;
 		CalculateMatrix(matrix, rot, posit);
-		m_entity->SetMatrix(rot, posit);
+		m_entity->SetTransform (rot, posit);
 	}
 
 	//if (!CheckInWorld(matrix))

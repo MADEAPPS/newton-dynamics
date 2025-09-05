@@ -14,10 +14,24 @@
 #include "ndRenderSceneNode.h"
 #include "ndRenderPrimitive.h"
 
+ndTransform::ndTransform()
+	:m_position(ndVector::m_wOne)
+	,m_rotation()
+{
+}
+
+ndTransform::ndTransform(const ndMatrix& matrix)
+	:m_position(matrix.m_posit)
+	,m_rotation(matrix)
+{
+}
+
 ndRenderSceneNode::ndRenderSceneNode(const ndMatrix& matrix)
 	:ndContainersFreeListAlloc<ndRenderSceneNode>()
 	,m_matrix(matrix)
 	,m_primitiveMatrix(ndGetIdentityMatrix())
+	,m_transform0(matrix)
+	,m_transform1(m_transform0)
 	,m_owner(nullptr)
 	,m_parent(nullptr)
 	,m_children()
@@ -52,8 +66,42 @@ ndMatrix ndRenderSceneNode::GetMatrix() const
 
 void ndRenderSceneNode::SetMatrix(const ndQuaternion& rotation, const ndVector& position)
 {
-	// for now jut set the matrix;
+	// for now just set the matrix;
 	m_matrix = ndCalculateMatrix(rotation, position);
+}
+
+void ndRenderSceneNode::SetTransform(const ndQuaternion& rotation, const ndVector& position)
+{
+	ndScopeSpinLock lock(m_lock);
+	m_transform0 = m_transform1;
+	m_transform1.m_position = position;
+	m_transform1.m_rotation = rotation;
+}
+
+void ndRenderSceneNode::InterpolateTransforms(ndFloat32 param)
+{
+	ndFixSizeArray<ndRenderSceneNode*, 128> stack;
+	stack.PushBack(this);
+	while (stack.GetCount())
+	{
+		ndRenderSceneNode* const rooNode = stack.Pop();
+		{
+			ndScopeSpinLock lock(m_lock);
+			const ndVector p0(rooNode->m_transform0.m_position);
+			const ndVector p1(rooNode->m_transform1.m_position);
+			const ndQuaternion r0(rooNode->m_transform0.m_rotation);
+			const ndQuaternion r1(rooNode->m_transform1.m_rotation);
+			const ndVector posit(p0 + (p1 - p0).Scale(param));
+			const ndQuaternion rotation(r0.Slerp(r1, param));
+			rooNode->SetMatrix(rotation, posit);
+		}
+
+		for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = m_children.GetFirst(); node; node = node->GetNext())
+		{
+			ndRenderSceneNode* const childNode = *node->GetInfo();
+			stack.PushBack(childNode);
+		}
+	}
 }
 
 void ndRenderSceneNode::Render(const ndRender* const owner, ndFloat32 timestep, const ndMatrix& parentMatrix) const

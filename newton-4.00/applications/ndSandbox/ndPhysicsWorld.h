@@ -89,6 +89,8 @@ class ndPhysicsWorld: public ndWorld
 
 	ndDemoEntityManager* m_manager;
 	ndFloat32 m_timeAccumulator;
+	ndFloat32 m_interplationParameter;
+
 	ndDefferentDeleteEntities m_deadEntities;
 	bool m_acceleratedUpdate;
 };

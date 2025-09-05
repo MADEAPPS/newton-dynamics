@@ -12,10 +12,8 @@
 #include "ndSandboxStdafx.h"
 //#include "ndVehicleUI.h"
 //#include "ndMeshLoader.h"
-//#include "ndDemoEntity.h"
 #include "ndDemoCamera.h"
 #include "ndFileBrowser.h"
-//#include "ndPngToOpenGl.h"
 //#include "ndDebugDisplay.h"
 #include "ndPhysicsWorld.h"
 #include "ndPhysicsUtils.h"
@@ -23,7 +21,6 @@
 #include "ndMenuRenderPass.h"
 #include "ndColorRenderPass.h"
 #include "ndDemoEntityManager.h"
-//#include "ndDemoCameraManager.h"
 #include "ndHighResolutionTimer.h"
 
 #define DEFAULT_SCENE	0		// basic rigidbody
@@ -1210,7 +1207,8 @@ ndInt32 ndDemoEntityManager::Print (const ndVector&, const char *fmt, ... ) cons
 
 void ndDemoEntityManager::SetCameraMatrix (const ndQuaternion& rotation, const ndVector& position)
 {
-	m_renderer->GetCamera()->SetMatrix(rotation, position);
+	m_renderer->GetCamera()->SetTransform(rotation, position);
+	m_renderer->GetCamera()->SetTransform(rotation, position);
 }
 
 void ndDemoEntityManager::UpdatePhysics(ndFloat32 timestep)
@@ -1222,17 +1220,17 @@ void ndDemoEntityManager::UpdatePhysics(ndFloat32 timestep)
 	}
 }
 
-ndFloat32 ndDemoEntityManager::CalculateInteplationParam () const
-{
-	ndUnsigned64 timeStep = ndGetTimeInMicroseconds () - m_microsecunds;		
-	ndFloat32 param = (ndFloat32 (timeStep) * MAX_PHYSICS_FPS) / 1.0e6f;
-	ndAssert (param >= 0.0f);
-	if (param > 1.0f) 
-	{
-		param = 1.0f;
-	}
-	return param;
-}
+//ndFloat32 ndDemoEntityManager::CalculateInteplationParam () const
+//{
+//	ndUnsigned64 timeStep = ndGetTimeInMicroseconds () - m_microsecunds;		
+//	ndFloat32 param = (ndFloat32 (timeStep) * MAX_PHYSICS_FPS) / 1.0e6f;
+//	ndAssert (param >= 0.0f);
+//	if (param > 1.0f) 
+//	{
+//		param = 1.0f;
+//	}
+//	return param;
+//}
 
 //void ndDemoEntityManager::RenderScene()
 //{
@@ -1285,6 +1283,8 @@ void ndDemoEntityManager::RenderScene()
 	ndFloat32 timestep = dGetElapsedSeconds();	
 	CalculateFPS(timestep);
 	UpdatePhysics(timestep);
+
+	//ndFloat32 interpolateParam = CalculateInteplationParam();
 
 	m_renderer->Render(timestep);
 }
@@ -1357,7 +1357,6 @@ void ndDemoEntityManager::Run()
 	
 		if (m_renderer->PollEvents())
 		{
-			//m_renderer->Render(0.0f);
 			RenderScene();
 		}
 	}

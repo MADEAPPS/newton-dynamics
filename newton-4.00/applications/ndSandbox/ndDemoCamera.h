@@ -25,7 +25,8 @@ class ndDemoCamera: public ndRenderSceneCamera
 	ndDemoCamera(ndRender* const owner);
 
 	void TickUpdate(ndFloat32 timestep);
-	virtual void SetMatrix(const ndQuaternion& rotation, const ndVector& position) override;
+	//virtual void SetMatrix(const ndQuaternion& rotation, const ndVector& position) override;
+	virtual void SetTransform(const ndQuaternion& rotation, const ndVector& position) override;
 
 	ndFloat32 m_yaw;
 	ndFloat32 m_pitch;

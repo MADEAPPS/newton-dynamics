@@ -232,7 +232,7 @@ class ndDemoEntityManager : public ndClassAlloc
 	void SetParticleUpdateMode() const;
 	
 	void UpdatePhysics(ndFloat32 timestep);
-	ndFloat32 CalculateInteplationParam () const;
+	//ndFloat32 CalculateInteplationParam () const;
 
 	void CalculateFPS(ndFloat32 timestep);
 	

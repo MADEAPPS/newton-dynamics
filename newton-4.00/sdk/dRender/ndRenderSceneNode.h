@@ -16,6 +16,16 @@
 class ndRender;
 class ndRenderPrimitive;
 
+class ndTransform
+{
+	public:
+	ndTransform();
+	ndTransform(const ndMatrix& matrix);
+	
+	ndVector m_position;
+	ndQuaternion m_rotation;
+};
+
 class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 {
 	public:
@@ -30,9 +40,16 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 	virtual void SetMatrix(const ndQuaternion& rotation, const ndVector& position);
 	virtual void Render(const ndRender* const owner, ndFloat32 timeStep, const ndMatrix& parentMatrix) const;
 
+	virtual void SetTransform(const ndQuaternion& rotation, const ndVector& position);
+	void InterpolateTransforms(ndFloat32 param);
+
 	public:
 	ndMatrix m_matrix;			// interpolated matrix
 	ndMatrix m_primitiveMatrix;
+	ndTransform m_transform0;
+	ndTransform m_transform1;
+
+	ndSpinLock m_lock;
 
 	protected:
 	ndRender* m_owner;
