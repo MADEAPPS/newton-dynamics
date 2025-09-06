@@ -31,10 +31,18 @@
 	#include <windows.h>
 	#include <commctrl.h>
 	#include <crtdbg.h>
+
+
+#else
+	#include <unistd.h>
+	//#include <glatter.h>
+	//#include <GL/gl.h>
+	//#include <GLFW/glfw3.h>
+	//#include <GLFW/glfw3native.h>
 #endif
 
 #include <glatter.h>
-#include <GL/glu.h>
+//#include <GL/glu.h>
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
