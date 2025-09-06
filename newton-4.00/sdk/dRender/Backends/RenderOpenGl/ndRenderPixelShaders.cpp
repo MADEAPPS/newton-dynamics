@@ -26,6 +26,15 @@ R""""(
 	}
 )"""";
 
+const char* ndRenderShaderCache::m_shadowMapPixel =
+R""""(
+	#version 450 core
+                                                                                    
+	void main()
+	{
+	}
+)"""";
+
 const char* ndRenderShaderCache::m_directionalDiffusePixel =
 R""""(
 	#version 450 core
@@ -73,3 +82,5 @@ R""""(
 	}
 
 )"""";
+
+

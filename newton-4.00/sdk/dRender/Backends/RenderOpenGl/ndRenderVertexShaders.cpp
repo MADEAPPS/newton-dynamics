@@ -28,6 +28,22 @@ R""""(
 	}
 )"""";
 
+const char* ndRenderShaderCache::m_shadowMapVertex =
+R""""(
+	#version 450 core
+
+	// using the same vertex buffer
+	layout(location = 0) in vec3 in_position;
+	layout(location = 1) in vec3 in_normal;
+	layout(location = 2) in vec2 in_uv;
+
+	uniform mat4 viewModelProjectionMatrix;
+	void main()
+	{
+		gl_Position = viewModelProjectionMatrix * vec4(in_position, 1.0);
+	}
+)"""";
+
 const char* ndRenderShaderCache::m_directionalDiffuseVertex =
 R""""(
 	#version 450 core
