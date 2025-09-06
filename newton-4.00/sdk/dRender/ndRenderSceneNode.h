@@ -12,9 +12,9 @@
 #define __ND_RENDER_SCENE_NODE_H__
 
 #include "ndRenderStdafx.h"
+#include "ndRenderPrimitive.h"
 
 class ndRender;
-class ndRenderPrimitive;
 class ndRenderPassShadowsImplement;
 
 class ndTransform
@@ -42,8 +42,7 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 	virtual void SetTransform(const ndQuaternion& rotation, const ndVector& position);
 	void InterpolateTransforms(ndFloat32 param);
 
-	virtual void Render(const ndRender* const owner, ndFloat32 timeStep, const ndMatrix& parentMatrix) const;
-	virtual void RenderShadowMap(ndRenderPassShadowsImplement* const owner, const ndMatrix& lightMatrix) const;
+	virtual void Render(const ndRender* const owner, ndFloat32 timeStep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const;
 
 	public:
 	ndMatrix m_matrix;			// interpolated matrix

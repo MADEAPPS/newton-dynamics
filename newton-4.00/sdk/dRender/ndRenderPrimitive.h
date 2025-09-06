@@ -15,14 +15,21 @@
 
 class ndRenderPassShadowsImplement;
 
+enum ndRenderPassMode
+{
+	m_shadowMap,
+	m_solidColor,
+	m_transparency,
+	m_shadowSolidColor,
+};
+
 class ndRenderPrimitive : public ndContainersFreeListAlloc<ndRenderPrimitive>
 {
 	public:
 	ndRenderPrimitive();
 	virtual ~ndRenderPrimitive();
 
-	virtual void Render(const ndRender* const render, const ndMatrix& modelViewMatrix) const = 0;
-	virtual void RenderShadowMap(ndRenderPassShadowsImplement* const owner, const ndMatrix& lightMatrix) const = 0;
+	virtual void Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderPassMode) const = 0;
 };
 
 #endif

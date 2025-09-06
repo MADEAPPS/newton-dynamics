@@ -106,7 +106,7 @@ void ndRenderSceneNode::InterpolateTransforms(ndFloat32 param)
 	}
 }
 
-void ndRenderSceneNode::Render(const ndRender* const owner, ndFloat32 timestep, const ndMatrix& parentMatrix) const
+void ndRenderSceneNode::Render(const ndRender* const owner, ndFloat32 timestep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const
 {
 	ndAssert(!m_owner || (m_owner == owner));
 	const ndMatrix nodeMatrix(m_matrix * parentMatrix);
@@ -115,7 +115,7 @@ void ndRenderSceneNode::Render(const ndRender* const owner, ndFloat32 timestep, 
 	{
 		// Render mesh if there is one 
 		const ndMatrix modelMatrix(m_primitiveMatrix * nodeMatrix);
-		mesh->Render(owner, modelMatrix);
+		mesh->Render(owner, modelMatrix, renderMode);
 	}
 
 	//RenderBone(scene, nodeMatrix);
@@ -123,26 +123,6 @@ void ndRenderSceneNode::Render(const ndRender* const owner, ndFloat32 timestep, 
 	{
 		ndAssert(0);
 		ndRenderSceneNode* const childNode = *node->GetInfo();
-		childNode->Render(owner, timestep, nodeMatrix);
-	}
-}
-
-void ndRenderSceneNode::RenderShadowMap(ndRenderPassShadowsImplement* const owner, const ndMatrix& lightMatrix) const
-{
-	const ndMatrix nodeMatrix(m_matrix * lightMatrix);
-
-	//ndDemoMeshInterface* const mesh = (ndDemoMeshInterface*)*m_mesh;
-	const ndRenderPrimitive* const mesh = *m_primitve;
-	if (m_isVisible && mesh)
-	{
-		// Render mesh if there is one 
-		const ndMatrix modelMatrix(m_primitiveMatrix * nodeMatrix);
-		mesh->RenderShadowMap(owner, modelMatrix);
-	}
-
-	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = m_children.GetFirst(); node; node = node->GetNext())
-	{
-		ndRenderSceneNode* const childNode = *node->GetInfo();
-		childNode->RenderShadowMap(owner, nodeMatrix);
+		childNode->Render(owner, timestep, nodeMatrix, renderMode);
 	}
 }

@@ -129,10 +129,12 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(
 		//segment->m_material.SetTexture(material);
 		//segment->SetOpacity(opacity);
 		//hasTransparency = hasTransparency | segment->m_hasTranparency;
+		
 		segment.m_material.m_texture = material.m_texture;
 		segment.m_material.m_diffuse = material.m_diffuse;
-		segment.m_material.m_specular = material.m_specular;
 		segment.m_material.m_opacity = material.m_opacity;
+		segment.m_material.m_specular = material.m_specular;
+		segment.m_material.m_castShadows = material.m_castShadows;
 		segment.m_material.m_specularPower = material.m_specularPower;
 	
 		segment.m_indexCount = mesh.GetMaterialIndexCount(geometryHandle, handle);
@@ -235,8 +237,41 @@ void ndRenderPrimitiveMeshImplement::OptimizeForRender(
 	m_indexCount = indexCount;
 }
 
-void ndRenderPrimitiveMeshImplement::Render(const ndRender* const render, const ndMatrix& modelMatrix) const
+void ndRenderPrimitiveMeshImplement::Render(const ndRender* const render, const ndMatrix& modelMatrix, ndRenderPassMode renderMode) const
 {
+	switch (renderMode)
+	{
+		case m_shadowMap:
+			RenderShadowMap(render, modelMatrix);
+			break;
+
+		case m_solidColor:
+			RenderSolidColor(render, modelMatrix);
+			break;
+
+		case m_shadowSolidColor:
+			RenderShadowSolidColor(render, modelMatrix);
+			break;
+		
+		default:
+		ndAssert(0);
+	}
+}
+
+void ndRenderPrimitiveMeshImplement::RenderSolidColor(const ndRender* const render, const ndMatrix& modelMatrix) const
+{
+	bool castShadow = true;
+	for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = m_segments.GetFirst(); node && castShadow; node = node->GetNext())
+	{
+		ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
+		castShadow = castShadow && segment.m_material.m_castShadows;
+	}
+
+	if (castShadow)
+	{
+		return;
+	}
+
 	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
 
 	GLuint shader = m_context->m_shaderCache->m_diffuseEffect;
@@ -266,7 +301,7 @@ void ndRenderPrimitiveMeshImplement::Render(const ndRender* const render, const 
 	for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = m_segments.GetFirst(); node; node = node->GetNext())
 	{
 		ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
-		//if (!segment.m_hasTranparency)
+		if (!segment.m_material.m_castShadows)
 		{
 			const ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
 			const ndRenderTextureImageCommon* const image = (ndRenderTextureImageCommon*) *material->m_texture;
@@ -288,8 +323,76 @@ void ndRenderPrimitiveMeshImplement::Render(const ndRender* const render, const 
 	glUseProgram(0);
 }
 
-void ndRenderPrimitiveMeshImplement::RenderShadowMap(ndRenderPassShadowsImplement* const owner, const ndMatrix& lightMatrix) const
+void ndRenderPrimitiveMeshImplement::RenderShadowSolidColor(const ndRender* const render, const ndMatrix& modelMatrix) const
 {
+	bool castShadow = true;
+	for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = m_segments.GetFirst(); node && castShadow; node = node->GetNext())
+	{
+		ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
+		castShadow = castShadow && segment.m_material.m_castShadows;
+	}
+
+	if (!castShadow)
+	{
+		return;
+	}
+
+	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
+
+	GLuint shader = m_context->m_shaderCache->m_diffuseEffect;
+	glUseProgram(shader);
+
+	const ndMatrix viewMatrix(camera->m_invViewMatrix);
+	const ndMatrix modelViewMatrix(modelMatrix * viewMatrix);
+
+	const glMatrix glViewModelMatrix(modelViewMatrix);
+	const glMatrix glProjectionMatrix(camera->m_projectionMatrix);
+
+	const glVector4 glSunlightAmbient(render->m_sunLightAmbient);
+	const glVector4 glSunlightIntensity(render->m_sunLightIntesity);
+	const glVector4 glSunlightDir(viewMatrix.RotateVector(render->m_sunLightDir));
+
+	glUniform3fv(m_directionalLightDirection, 1, &glSunlightDir[0]);
+	glUniform3fv(m_directionalLightAmbient, 1, &glSunlightAmbient[0]);
+	glUniform3fv(m_directionalLightIntesity, 1, &glSunlightIntensity[0]);
+
+	glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &glViewModelMatrix[0][0]);
+	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &glProjectionMatrix[0][0]);
+	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &glViewModelMatrix[0][0]);
+
+	glBindVertexArray(m_vertextArrayBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+
+	for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = m_segments.GetFirst(); node; node = node->GetNext())
+	{
+		ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
+		if (segment.m_material.m_castShadows)
+		{
+			const ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
+			const ndRenderTextureImageCommon* const image = (ndRenderTextureImageCommon*)*material->m_texture;
+			ndAssert(image);
+
+			const glVector4 diffuse(material->m_diffuse);
+			const glVector4 specular(material->m_specular);
+			glUniform3fv(m_diffuseColor, 1, &diffuse[0]);
+			glUniform3fv(m_specularColor, 1, &specular[0]);
+			glUniform1fv(m_specularAlpha, 1, &material->m_specularPower);
+
+			glBindTexture(GL_TEXTURE_2D, image->m_texture);
+			glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
+		}
+	}
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	glUseProgram(0);
+}
+
+void ndRenderPrimitiveMeshImplement::RenderShadowMap(const ndRender* const render, const ndMatrix& lightMatrix) const
+{
+	ndRenderPassShadowsImplement* const owner = render->m_cachedShadowPass;
+	ndAssert(owner);
+
 	bool castShadow = true;
 	for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = m_segments.GetFirst(); node && castShadow; node = node->GetNext())
 	{

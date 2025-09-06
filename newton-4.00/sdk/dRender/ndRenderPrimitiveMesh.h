@@ -54,8 +54,7 @@ class ndRenderPrimitiveMesh : public ndRenderPrimitive
 	ndRenderPrimitiveMesh();
 	virtual ~ndRenderPrimitiveMesh();
 
-	virtual void Render(const ndRender* const render, const ndMatrix& modelViewMatrix) const override;
-	virtual void RenderShadowMap(ndRenderPassShadowsImplement* const owner, const ndMatrix& lightMatrix) const override;
+	virtual void Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderPassMode) const override;
 
 	static ndSharedPtr<ndRenderPrimitive> CreateFromCollisionShape(
 		const ndRender* const render,

@@ -20,10 +20,12 @@ ndRenderPassShadows::ndRenderPassShadows(ndRender* const owner)
 	:ndRenderPass(owner)
 	,m_implement(new ndRenderPassShadowsImplement(*m_owner->m_context))
 {
+	owner->m_cachedShadowPass = *m_implement;
 }
 
 ndRenderPassShadows::~ndRenderPassShadows()
 {
+	m_owner->m_cachedShadowPass = nullptr;
 }
 
 void ndRenderPassShadows::RenderScene(ndFloat32)

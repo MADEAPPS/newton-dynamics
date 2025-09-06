@@ -229,7 +229,7 @@ void ndRenderPassShadowsImplement::RenderScene(const ndRenderSceneCamera* const 
 		for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = scene.GetFirst(); node; node = node->GetNext())
 		{
 			ndRenderSceneNode* const sceneNode = *node->GetInfo();
-			sceneNode->RenderShadowMap(this, lightSpaceMatrix);
+			sceneNode->Render(owner, 0.0f, lightSpaceMatrix, m_shadowMap);
 		}
 	}
 	

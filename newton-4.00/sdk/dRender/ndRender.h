@@ -29,6 +29,7 @@ class ndRenderContext;
 class ndRenderSceneNode;
 class ndRenderSceneCamera;
 class ndRenderTextureCache;
+class ndRenderPassShadowsImplement;
 
 class ndRender: public ndClassAlloc
 {
@@ -89,7 +90,6 @@ class ndRender: public ndClassAlloc
 	ndSharedPtr<ndRenderContext> m_context;
 	ndSharedPtr<ndRenderSceneCamera> m_camera;
 	ndSharedPtr<ndRenderTextureCache> m_textureCache;
-
 	ndList<ndSharedPtr<ndRenderSceneNode>> m_scene;
 	ndList<ndSharedPtr<ndRenderPass>> m_renderPasses;
 
@@ -97,6 +97,8 @@ class ndRender: public ndClassAlloc
 	ndVector m_sunLightAmbient;
 	ndVector m_sunLightIntesity;
 	ndVector m_backgroundColor;
+
+	ndRenderPassShadowsImplement* m_cachedShadowPass;
 
 	friend class ndRenderContext;
 	friend class ndRenderPassGui;

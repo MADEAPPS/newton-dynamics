@@ -56,12 +56,7 @@ ndSharedPtr<ndRenderPrimitive> ndRenderPrimitiveMesh::CreateFromCollisionShape(
 	return ndSharedPtr<ndRenderPrimitive>(primtive);
 }
 
-void ndRenderPrimitiveMesh::Render(const ndRender* const render, const ndMatrix& modelViewMatrix) const
+void ndRenderPrimitiveMesh::Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderPassMode) const
 {
-	m_implementation->Render(render, modelViewMatrix);
-}
-
-void ndRenderPrimitiveMesh::RenderShadowMap(ndRenderPassShadowsImplement* const owner, const ndMatrix& lightMatrix) const
-{
-	m_implementation->RenderShadowMap(owner, lightMatrix);
+	m_implementation->Render(render, modelViewMatrix, renderPassMode);
 }

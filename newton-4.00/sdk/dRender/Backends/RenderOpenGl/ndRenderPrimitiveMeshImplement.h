@@ -27,14 +27,17 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 		const ndMatrix& uvMatrix, bool stretchMaping);
 	~ndRenderPrimitiveMeshImplement();
 
-	void Render(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
-	void RenderShadowMap(ndRenderPassShadowsImplement* const owner, const ndMatrix& lightMatrix) const;
-
+	void Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderMode) const;
+	
 	private:
 	void ResetOptimization();
 	void OptimizeForRender(
 		const glPositionNormalUV* const points, ndInt32 pointCount,
 		const ndInt32* const indices, ndInt32 indexCount);
+
+	void RenderShadowMap(const ndRender* const render, const ndMatrix& lightMatrix) const;
+	void RenderSolidColor(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
+	void RenderShadowSolidColor(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
 
 	const ndRenderContext* m_context;
 	ndList<ndRenderPrimitiveMeshSegment> m_segments;
