@@ -14,7 +14,7 @@
 #include "ndDemoEntityManager.h"
 
 ndMenuRenderPass::ndMenuRenderPass(ndDemoEntityManager* const owner)
-	:ndGuiRenderPass(*owner->GetRenderer())
+	:ndRenderPassGui(*owner->GetRenderer())
 	,m_owner(owner)
 {
 }

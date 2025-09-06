@@ -13,7 +13,7 @@
 
 class ndDemoEntityManager;
 
-class ndMenuRenderPass: public ndGuiRenderPass
+class ndMenuRenderPass: public ndRenderPassGui
 {
 	public:
 	ndMenuRenderPass(ndDemoEntityManager* const owner);

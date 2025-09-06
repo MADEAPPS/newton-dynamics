@@ -99,7 +99,7 @@ class ndRender: public ndClassAlloc
 	ndVector m_backgroundColor;
 
 	friend class ndRenderContext;
-	friend class ndGuiRenderPass;
+	friend class ndRenderPassGui;
 	friend class ndRenderPassColor;
 	friend class ndRenderSceneCamera;
 	friend class ndRenderTextureCache;

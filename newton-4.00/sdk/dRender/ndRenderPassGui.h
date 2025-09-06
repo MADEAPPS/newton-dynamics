@@ -13,11 +13,11 @@
 
 #include "ndRenderPass.h"
 
-class ndGuiRenderPass: public ndRenderPass
+class ndRenderPassGui: public ndRenderPass
 {
 	public:
-	ndGuiRenderPass(ndRender* const owner);
-	virtual ~ndGuiRenderPass();
+	ndRenderPassGui(ndRender* const owner);
+	virtual ~ndRenderPassGui();
 
 	void StateBegin();
 	void StateEnd();

@@ -26,7 +26,7 @@
 #include <ndRender.h>
 #include <ndRenderPass.h>
 #include <ndRenderTexture.h>
-#include <ndGuiRenderPass.h>
+#include <ndRenderPassGui.h>
 #include <ndRenderPrimitive.h>
 #include <ndRenderPassColor.h>
 #include <ndRenderSceneNode.h>
