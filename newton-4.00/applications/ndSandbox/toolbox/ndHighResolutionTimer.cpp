@@ -14,12 +14,12 @@
 
 static ndUnsigned64 m_prevTime = 0;
 
-void dResetTimer()
+void ndResetTimer()
 {
 	m_prevTime = ndGetTimeInMicroseconds();
 }
 
-ndFloat32 dGetElapsedSeconds()
+ndFloat32 ndGetElapsedSeconds()
 {
 	const ndFloat64 TICKS2SEC = ndFloat32(1.0e-6f);
 	ndUnsigned64 microseconds = ndGetTimeInMicroseconds();

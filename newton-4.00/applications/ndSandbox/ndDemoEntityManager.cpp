@@ -422,7 +422,6 @@ ndDemoEntityManager::ndDemoEntityManager()
 	,m_updateCameraContext(nullptr)
 	//,m_renderDemoGUI()
 	,m_updateCamera(nullptr)
-	,m_microsecunds(0)
 	,m_transparentHeap()
 	,m_animationCache()
 	,m_currentScene(DEFAULT_SCENE)
@@ -533,7 +532,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	m_synchronousParticlesUpdate = true;
 
 	Cleanup();
-	ResetTimer();
+	ndResetTimer();
 #if 0
 	m_diretionalLightDir = ndVector(-1.0f, 1.0f, 1.0f, 0.0f).Normalize();
 
@@ -791,12 +790,6 @@ void ndDemoEntityManager::GetJoystickButtons(ndFixSizeArray<char, 32>&)
 	//}
 }
 
-void ndDemoEntityManager::ResetTimer()
-{
-	dResetTimer();
-	m_microsecunds = ndGetTimeInMicroseconds ();
-}
-
 void ndDemoEntityManager::AddEntity(const ndSharedPtr<ndRenderSceneNode>& entity)
 {
 	ndScopeSpinLock lock(m_addDeleteLock);
@@ -1037,7 +1030,7 @@ void ndDemoEntityManager::LoadDemo(ndInt32 menu)
 	snprintf(newTitle, sizeof(newTitle), "Newton Dynamics %d.%.2i demo: %s", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION, m_demosSelection[menu].m_name);
 	m_renderer->SetTitle(newTitle);
 	ApplyMenuOptions();
-	ResetTimer();
+	ndResetTimer();
 	
 	ndAssert (m_world->ValidateScene());
 }
@@ -1220,40 +1213,6 @@ void ndDemoEntityManager::UpdatePhysics(ndFloat32 timestep)
 	}
 }
 
-//ndFloat32 ndDemoEntityManager::CalculateInteplationParam () const
-//{
-//	ndUnsigned64 timeStep = ndGetTimeInMicroseconds () - m_microsecunds;		
-//	ndFloat32 param = (ndFloat32 (timeStep) * MAX_PHYSICS_FPS) / 1.0e6f;
-//	ndAssert (param >= 0.0f);
-//	if (param > 1.0f) 
-//	{
-//		param = 1.0f;
-//	}
-//	return param;
-//}
-
-//void ndDemoEntityManager::RenderScene()
-//{
-//	ndAssert(0);
-//	//// Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
-//	//ImGuiIO& io = ImGui::GetIO();
-//	//
-//	//ndInt32 fb_width = (ndInt32)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
-//	//ndInt32 fb_height = (ndInt32)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
-//	//if (fb_width == 0 || fb_height == 0)
-//	//{
-//	//	return;
-//	//}
-//	//
-//	//ndDemoEntityManager* const window = (ndDemoEntityManager*)io.UserData;
-//	//window->RenderScene();
-//	//
-//	//if (*window->m_renderDemoGUI) 
-//	//{
-//	//	window->m_renderDemoGUI->RenderUI();
-//	//}
-//}
-
 void ndDemoEntityManager::SetAcceleratedUpdate()
 {
 	m_world->AccelerateUpdates();
@@ -1280,7 +1239,7 @@ void ndDemoEntityManager::OnSubStepPostUpdate(ndFloat32)
 void ndDemoEntityManager::RenderScene()
 {
 	D_TRACKTIME();
-	ndFloat32 timestep = dGetElapsedSeconds();	
+	ndFloat32 timestep = ndGetElapsedSeconds();	
 	CalculateFPS(timestep);
 	UpdatePhysics(timestep);
 	m_renderer->Render(timestep);

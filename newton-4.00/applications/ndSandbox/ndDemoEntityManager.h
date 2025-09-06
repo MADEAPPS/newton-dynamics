@@ -181,8 +181,7 @@ class ndDemoEntityManager : public ndClassAlloc
 
 	void AddEntity(const ndSharedPtr<ndRenderSceneNode>& entity);
 	void RemoveEntity(const ndSharedPtr<ndRenderSceneNode>& entity);
-	
-	void ResetTimer();
+
 	void ImportPLYfile (const char* const name);
 
 	bool GetMouseSpeed(ndFloat32& posX, ndFloat32& posY) const;
@@ -258,7 +257,6 @@ class ndDemoEntityManager : public ndClassAlloc
 	//ndSharedPtr<ndUIEntity> m_renderDemoGUI;
 	UpdateCameraCallback m_updateCamera;
 
-	ndUnsigned64 m_microsecunds;
 	TransparentHeap m_transparentHeap;
 	ndTree<ndSharedPtr<ndAnimationSequence>, ndString> m_animationCache;
 
