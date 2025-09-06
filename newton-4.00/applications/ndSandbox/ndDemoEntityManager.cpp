@@ -58,45 +58,46 @@
 //#define DEFAULT_SCENE	34		// skin peel fracture
 						 
 // demos forward declaration 
-void ndRagdollTest(ndDemoEntityManager* const scene);
-void ndBipedTest_1(ndDemoEntityManager* const scene);
-void ndBipedTest_2(ndDemoEntityManager* const scene);
-void ndBasicStacks(ndDemoEntityManager* const scene);
-void ndBasicJoints(ndDemoEntityManager* const scene);
-void ndBasicVehicle(ndDemoEntityManager* const scene);
-void ndHeavyVehicle(ndDemoEntityManager* const scene);
-void ndBasicTrigger(ndDemoEntityManager* const scene);
-void ndBasicGpuTest0(ndDemoEntityManager* const scene);
+//void ndRagdollTest(ndDemoEntityManager* const scene);
+//void ndBipedTest_1(ndDemoEntityManager* const scene);
+//void ndBipedTest_2(ndDemoEntityManager* const scene);
+//void ndBasicStacks(ndDemoEntityManager* const scene);
+//void ndBasicJoints(ndDemoEntityManager* const scene);
+//void ndBasicVehicle(ndDemoEntityManager* const scene);
+//void ndHeavyVehicle(ndDemoEntityManager* const scene);
+//void ndBasicTrigger(ndDemoEntityManager* const scene);
+//void ndBasicGpuTest0(ndDemoEntityManager* const scene);
+//void ndQuadrupedTest_3(ndDemoEntityManager* const scene);
+//void ndQuadrupedTest_4(ndDemoEntityManager* const scene);
+//void ndQuadrupedTest_4(ndDemoEntityManager* const scene);
+//void ndObjectPlacement(ndDemoEntityManager* const scene);
+//void ndBasicGpuRigidBody(ndDemoEntityManager* const scene);
+//void ndBasicFrictionRamp(ndDemoEntityManager* const scene);
+//void ndPlayerCapsuleDemo(ndDemoEntityManager* const scene);
+//void ndBipedTest_2Trainer(ndDemoEntityManager* const scene);
+//void ndBasicParticleFluid(ndDemoEntityManager* const scene);
+//void ndUnicycleController(ndDemoEntityManager* const scene);
+//void ndQuadruped_sac_test(ndDemoEntityManager* const scene);
+//void ndQuadruped_ppo_test(ndDemoEntityManager* const scene);
+//
+//void ndBasicAngularMomentum(ndDemoEntityManager* const scene);
+//void ndBagroundLowLodVehicle(ndDemoEntityManager* const scene);
+//void ndSimpleIndustrialRobot(ndDemoEntityManager* const scene);
+//void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene);
+//void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene);
+//void ndBasicExplodeConvexShape(ndDemoEntityManager* const scene);
+//
+//void ndQuadruped_animation_test(ndDemoEntityManager* const scene);
+//void ndCartpoleDiscrete(ndDemoEntityManager* const scene);
+//void ndCartpoleContinue(ndDemoEntityManager* const scene);
+//
+////void ndBasicFracture_0(ndDemoEntityManager* const scene);
+////void ndBasicFracture_2(ndDemoEntityManager* const scene);
+////void ndBasicFracture_4(ndDemoEntityManager* const scene);
+//void ndStaticMeshCollisionDemo(ndDemoEntityManager* const scene);
+//void ndStaticUserMeshCollisionDemo(ndDemoEntityManager* const scene);
+
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
-void ndQuadrupedTest_3(ndDemoEntityManager* const scene);
-void ndQuadrupedTest_4(ndDemoEntityManager* const scene);
-void ndQuadrupedTest_4(ndDemoEntityManager* const scene);
-void ndObjectPlacement(ndDemoEntityManager* const scene);
-void ndBasicGpuRigidBody(ndDemoEntityManager* const scene);
-void ndBasicFrictionRamp(ndDemoEntityManager* const scene);
-void ndPlayerCapsuleDemo(ndDemoEntityManager* const scene);
-void ndBipedTest_2Trainer(ndDemoEntityManager* const scene);
-void ndBasicParticleFluid(ndDemoEntityManager* const scene);
-void ndUnicycleController(ndDemoEntityManager* const scene);
-void ndQuadruped_sac_test(ndDemoEntityManager* const scene);
-void ndQuadruped_ppo_test(ndDemoEntityManager* const scene);
-
-void ndBasicAngularMomentum(ndDemoEntityManager* const scene);
-void ndBagroundLowLodVehicle(ndDemoEntityManager* const scene);
-void ndSimpleIndustrialRobot(ndDemoEntityManager* const scene);
-void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene);
-void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene);
-void ndBasicExplodeConvexShape(ndDemoEntityManager* const scene);
-
-void ndQuadruped_animation_test(ndDemoEntityManager* const scene);
-void ndCartpoleDiscrete(ndDemoEntityManager* const scene);
-void ndCartpoleContinue(ndDemoEntityManager* const scene);
-
-//void ndBasicFracture_0(ndDemoEntityManager* const scene);
-//void ndBasicFracture_2(ndDemoEntityManager* const scene);
-//void ndBasicFracture_4(ndDemoEntityManager* const scene);
-void ndStaticMeshCollisionDemo(ndDemoEntityManager* const scene);
-void ndStaticUserMeshCollisionDemo(ndDemoEntityManager* const scene);
 
 ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
 {
