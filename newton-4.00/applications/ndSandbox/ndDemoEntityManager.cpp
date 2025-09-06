@@ -489,12 +489,13 @@ ndDemoEntityManager::ndDemoEntityManager()
 	m_environmentTexture = m_renderer->GetTextureCache()->GetCubeMap(environmentTexturePath);
 
 	// create render passes
-	m_colorRenderPass = ndSharedPtr<ndRenderPass>(new ndRenderPassColor(*m_renderer));
 	m_menuRenderPass = ndSharedPtr<ndRenderPass>(new ndMenuRenderPass(this));
+	m_colorRenderPass = ndSharedPtr<ndRenderPass>(new ndRenderPassColor(*m_renderer));
+	m_shadowRenderPass = ndSharedPtr<ndRenderPass>(new ndRenderPassShadows(*m_renderer));
 	m_environmentRenderPass = ndSharedPtr<ndRenderPass>(new ndRenderPassEnvironment(*m_renderer, m_environmentTexture));
-	//m_shadowRenderPass->Init(this, 1, m_shaderCache.m_shadowMaps);
 
 	// add render passes in order of execution
+	m_renderer->AddRenderPass(m_shadowRenderPass);
 	m_renderer->AddRenderPass(m_colorRenderPass);
 	m_renderer->AddRenderPass(m_environmentRenderPass);
 	m_renderer->AddRenderPass(m_menuRenderPass);

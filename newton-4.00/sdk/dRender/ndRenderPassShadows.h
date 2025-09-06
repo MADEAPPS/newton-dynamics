@@ -8,16 +8,16 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
-#ifndef __ND_RENDER_PASS_COLOR_H__
-#define __ND_RENDER_PASS_COLOR_H__
+#ifndef __ND_RENDER_PASS_SHADOWS_H__
+#define __ND_RENDER_PASS_SHADOWS_H__
 
 #include "ndRenderPass.h"
 
-class ndRenderPassColor: public ndRenderPass
+class ndRenderPassShadows: public ndRenderPass
 {
 	public:
-	ndRenderPassColor(ndRender* const owner);
-	virtual ~ndRenderPassColor();
+	ndRenderPassShadows(ndRender* const owner);
+	virtual ~ndRenderPassShadows();
 
 	virtual void RenderScene(ndFloat32 timestep) override;
 };

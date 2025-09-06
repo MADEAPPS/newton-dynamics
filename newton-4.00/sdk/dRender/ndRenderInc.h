@@ -31,6 +31,7 @@
 #include <ndRenderPassColor.h>
 #include <ndRenderSceneNode.h>
 #include <ndRenderSceneCamera.h>
+#include <ndRenderPassShadows.h>
 #include <ndRenderTextureCache.h>
 #include <ndRenderPrimitiveMesh.h>
 #include <ndRenderPassEnvironment.h>

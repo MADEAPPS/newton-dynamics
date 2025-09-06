@@ -8,8 +8,8 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
-#ifndef __ND_ENVIRONMENT_RENDER_PASS_H__
-#define __ND_ENVIRONMENT_RENDER_PASS_H__
+#ifndef __ND_RENDER_PASS_ENVIRONMENT_H__
+#define __ND_RENDER_PASS_ENVIRONMENT_H__
 
 #include "ndRenderPass.h"
 
