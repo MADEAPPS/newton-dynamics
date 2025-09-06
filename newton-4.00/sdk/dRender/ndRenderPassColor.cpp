@@ -12,8 +12,8 @@
 #include "ndRenderStdafx.h"
 #include "ndRender.h"
 #include "ndRenderContext.h"
-#include "ndRenderPassColor.h"
 #include "ndRenderSceneNode.h"
+#include "ndRenderPassColor.h"
 
 ndRenderPassColor::ndRenderPassColor(ndRender* const owner)
 	:ndRenderPass(owner)

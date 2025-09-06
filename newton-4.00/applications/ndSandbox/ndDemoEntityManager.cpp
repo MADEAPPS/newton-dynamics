@@ -19,7 +19,6 @@
 #include "ndPhysicsUtils.h"
 #include "ndTestDeepBrain.h"
 #include "ndMenuRenderPass.h"
-#include "ndColorRenderPass.h"
 #include "ndDemoEntityManager.h"
 #include "ndHighResolutionTimer.h"
 
@@ -490,9 +489,9 @@ ndDemoEntityManager::ndDemoEntityManager()
 	m_environmentTexture = m_renderer->GetTextureCache()->GetCubeMap(environmentTexturePath);
 
 	// create render passes
-	m_colorRenderPass = ndSharedPtr<ndRenderPass>(new ndColorRenderPass(*m_renderer));
+	m_colorRenderPass = ndSharedPtr<ndRenderPass>(new ndRenderPassColor(*m_renderer));
 	m_menuRenderPass = ndSharedPtr<ndRenderPass>(new ndMenuRenderPass(this));
-	m_environmentRenderPass = ndSharedPtr<ndRenderPass>(new ndEnvironmentRenderPass(*m_renderer, m_environmentTexture));
+	m_environmentRenderPass = ndSharedPtr<ndRenderPass>(new ndRenderPassEnvironment(*m_renderer, m_environmentTexture));
 	//m_shadowRenderPass->Init(this, 1, m_shaderCache.m_shadowMaps);
 
 	// add render passes in order of execution
@@ -1273,7 +1272,7 @@ void ndDemoEntityManager::OnSubStepPostUpdate(ndFloat32)
 {
 	//if (m_colorRenderPass)
 	//{
-	////	((ndColorRenderPass*)m_colorRenderPass)->UpdateDebugDisplay(timestep);
+	////	((ndRenderPassColor*)m_colorRenderPass)->UpdateDebugDisplay(timestep);
 	//}
 }
 
