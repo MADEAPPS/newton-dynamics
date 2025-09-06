@@ -49,23 +49,28 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	GLuint m_vertexBuffer;
 	GLuint m_vertextArrayBuffer;
 
-	//GLint m_textureLocation;
-	//GLint m_transparencyLocation;
+	struct SolidColorBlock
+	{
+		GLint m_diffuseColor;
+		GLint m_specularColor;
+		GLint m_directionalLightAmbient;
+		GLint m_directionalLightIntesity;
+		GLint m_directionalLightDirection;
+		GLint m_specularAlpha;
 
-	GLint m_diffuseColor;
-	GLint m_specularColor;
-	GLint m_directionalLightAmbient;
-	GLint m_directionalLightIntesity;
-	GLint m_directionalLightDirection;
-	GLint m_specularAlpha;
+		GLint m_projectMatrixLocation;
+		GLint m_viewModelMatrixLocation;
+	};
+	struct SolidShadowColorBlock : public SolidColorBlock
+	{
+		GLint m_worldMatrix;
+		GLint m_shadowSlices;
+		GLint m_depthMapTexture;
+		GLint m_directionLightViewProjectionMatrixShadow;
+	};
 
-	GLint m_normalMatrixLocation;
-	GLint m_projectMatrixLocation;
-	GLint m_viewModelMatrixLocation;
-	//GLint m_materialAmbientLocation;
-	//GLint m_materialDiffuseLocation;
-	//GLint m_materialSpecularLocation;
-	//GLint m_directionalLightDirLocation;
+	SolidColorBlock m_solidColorBlock;
+	SolidShadowColorBlock m_solidShadowColorBlock;
 };
 
 #endif

@@ -34,6 +34,8 @@ class ndRenderShaderCache
 			GLuint m_skyBox;
 			GLuint m_shadowMaps;
 			GLuint m_diffuseEffect;
+			GLuint m_diffuseShadowEffect;
+
 			//GLuint m_wireFrame;
 			//GLuint m_colorPoint;
 			//GLuint m_flatShaded;
@@ -52,10 +54,12 @@ class ndRenderShaderCache
 	static const char* m_skyBoxVertex;
 	static const char* m_shadowMapVertex;
 	static const char* m_directionalDiffuseVertex;
+	static const char* m_directionalDiffuseShadowVertex;
 
 	static const char* m_skyBoxPixel;
 	static const char* m_shadowMapPixel;
 	static const char* m_directionalDiffusePixel;
+	static const char* m_directionalDiffuseShadowPixel;
 
 	friend class ndRenderContext;
 };

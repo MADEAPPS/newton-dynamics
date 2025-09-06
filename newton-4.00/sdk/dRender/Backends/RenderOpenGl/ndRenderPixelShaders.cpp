@@ -84,3 +84,87 @@ R""""(
 )"""";
 
 
+const char* ndRenderShaderCache::m_directionalDiffuseShadowPixel =
+R""""(
+	#version 450 core
+
+	uniform sampler2D texture0;
+	uniform sampler2D shadowMapTexture;
+
+	uniform vec3 diffuseColor;
+	uniform vec3 specularColor;
+	uniform vec3 directionalLightAmbient;
+	uniform vec3 directionalLightIntesity;
+	uniform vec3 directionalLightDirection;
+	uniform float specularAlpha;
+
+	uniform mat4 directionaLightViewProjectionMatrix[4];
+	uniform vec4 shadowSlices; 
+
+	in vec4 worldPosit;
+	in vec3 posit;
+	in vec3 normal;
+	in vec2 uv;
+
+	out vec4 pixelColor;
+	
+	// implement a simple blinn model
+	void main()
+	{
+		vec3 normalDir = normalize (normal);
+
+		// calculate emisive, just a constant;
+		vec3 emissive = diffuseColor * directionalLightAmbient;
+
+		// calculate lambert diffuse component
+		float diffuseReflection = max (dot (normalDir, directionalLightDirection), 0.0);
+		vec3 diffuse = diffuseColor * directionalLightIntesity * diffuseReflection;
+
+		// calculate Blinn specular component
+		vec3 cameraDir = - normalize(posit);
+		vec3 blinnDir = normalize(cameraDir + directionalLightDirection);
+		float reflectionSign = (diffuseReflection >= 0.01) ? 1.0 : 0.0;
+		float specularReflection = reflectionSign * pow(max (dot (normalDir, blinnDir), 0.0), specularAlpha);
+		vec3 specular = specularColor * directionalLightIntesity * specularReflection;
+
+		// add all contributions
+		//vec3 color = emissive + diffuse;
+		//vec3 color = emissive + specular;
+		vec3 color = (emissive + diffuse + specular) * vec3 (texture(texture0, uv));
+
+		// claculate the shadow coeficent 
+		int index = 4;
+		if (gl_FragCoord.z < shadowSlices.x)
+		{
+			index = 0;
+		}
+		else if (gl_FragCoord.z < shadowSlices.y)
+		{
+			index = 1;
+		}
+		else if (gl_FragCoord.z < shadowSlices.z)
+		{
+			index = 2;
+		}
+		else if (gl_FragCoord.z < shadowSlices.w)
+		{
+			index = 3;
+		}
+
+		if (index < 4)
+		{
+			vec4 pointInDepthMapSpace = directionaLightViewProjectionMatrix[index] * worldPosit;
+
+			pointInDepthMapSpace.z = clamp (pointInDepthMapSpace.z, 0.0f, 1.0f);
+			float textDepth = texture(shadowMapTexture, vec2(pointInDepthMapSpace)).x;
+			if (textDepth < pointInDepthMapSpace.z)
+			{
+				color = color * 0.1f;
+			}
+		}
+		
+		pixelColor = vec4(color, 1.0);
+	}
+
+)"""";
+

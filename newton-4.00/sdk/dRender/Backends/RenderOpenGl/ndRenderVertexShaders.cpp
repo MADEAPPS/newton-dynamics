@@ -52,7 +52,7 @@ R""""(
 	layout(location = 1) in vec3 in_normal;
 	layout(location = 2) in vec2 in_uv;
 
-	uniform mat4 normalMatrix;
+	//uniform mat4 normalMatrix;
 	uniform mat4 viewModelMatrix;
 	uniform mat4 projectionMatrix;
 
@@ -63,7 +63,36 @@ R""""(
 	void main()
 	{
 		posit = vec3(viewModelMatrix * vec4(in_position, 1.0));
-		normal = vec3(normalize(normalMatrix * vec4(in_normal, 0.0)));
+		//normal = vec3(normalize(normalMatrix * vec4(in_normal, 0.0)));
+		normal = vec3(normalize(viewModelMatrix * vec4(in_normal, 0.0)));
+		uv = in_uv;
+		gl_Position = projectionMatrix * vec4(posit, 1.0);
+	}
+
+)"""";
+
+const char* ndRenderShaderCache::m_directionalDiffuseShadowVertex =
+R""""(
+	#version 450 core
+
+	layout(location = 0) in vec3 in_position;
+	layout(location = 1) in vec3 in_normal;
+	layout(location = 2) in vec2 in_uv;
+
+	uniform mat4 viewModelMatrix;
+	uniform mat4 projectionMatrix;
+	uniform mat4 modelWorldMatrix;
+
+	out vec4 worldPosit;
+	out vec3 posit;
+	out vec3 normal;
+	out vec2 uv;
+
+	void main()
+	{
+		worldPosit = modelWorldMatrix * vec4(in_position, 1.0);
+		posit = vec3(viewModelMatrix * vec4(in_position, 1.0));
+		normal = vec3(normalize(viewModelMatrix * vec4(in_normal, 0.0)));
 		uv = in_uv;
 		gl_Position = projectionMatrix * vec4(posit, 1.0);
 	}
