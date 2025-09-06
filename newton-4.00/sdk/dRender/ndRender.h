@@ -101,6 +101,7 @@ class ndRender: public ndClassAlloc
 	friend class ndRenderContext;
 	friend class ndRenderPassGui;
 	friend class ndRenderPassColor;
+	friend class ndRenderPassShadows;
 	friend class ndRenderSceneCamera;
 	friend class ndRenderTextureCache;
 	friend class ndRenderPassEnvironment;

@@ -14,9 +14,11 @@
 #include "ndRenderContext.h"
 #include "ndRenderSceneNode.h"
 #include "ndRenderPassShadows.h"
+#include "ndRenderPassShadowsImplement.h"
 
 ndRenderPassShadows::ndRenderPassShadows(ndRender* const owner)
 	:ndRenderPass(owner)
+	,m_implement(new ndRenderPassShadowsImplement(*m_owner->m_context))
 {
 }
 
@@ -24,7 +26,7 @@ ndRenderPassShadows::~ndRenderPassShadows()
 {
 }
 
-void ndRenderPassShadows::RenderScene(ndFloat32 timestep)
+void ndRenderPassShadows::RenderScene(ndFloat32)
 {
 	//m_owner->m_context->SetCollorPassRenderStates();
 	//

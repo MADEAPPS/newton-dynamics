@@ -8,22 +8,19 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
-#ifndef __ND_RENDER_PASS_SHADOWS_H__
-#define __ND_RENDER_PASS_SHADOWS_H__
+#ifndef __ND_RENDER_PASS_SHADOWS_IMPLEMNETH__
+#define __ND_RENDER_PASS_SHADOWS_IMPLEMNETH__
 
 #include "ndRenderPass.h"
 
-class ndRenderPassShadowsImplement;
-
-class ndRenderPassShadows: public ndRenderPass
+class ndRenderPassShadowsImplement : public ndClassAlloc
 {
 	public:
-	ndRenderPassShadows(ndRender* const owner);
-	virtual ~ndRenderPassShadows();
+	ndRenderPassShadowsImplement(ndRenderContext* const context);
+	virtual ~ndRenderPassShadowsImplement();
 
-	virtual void RenderScene(ndFloat32 timestep) override;
-
-	ndSharedPtr<ndRenderPassShadowsImplement> m_implement;
+	//virtual void RenderScene(ndFloat32 timestep) override;
+	ndRenderContext* m_context;
 };
 
 #endif
