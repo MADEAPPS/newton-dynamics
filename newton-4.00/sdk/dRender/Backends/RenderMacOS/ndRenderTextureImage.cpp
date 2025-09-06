@@ -31,7 +31,7 @@ ndRenderTextureImageCommon::~ndRenderTextureImageCommon()
 {
 }
 
-ndRenderTextureImage::ndRenderTextureImage(const unsigned char* const buffer, ndInt32 width, ndInt32 hight, TextureImageFormat format)
+ndRenderTextureImage::ndRenderTextureImage(const unsigned char* const, ndInt32, ndInt32, TextureImageFormat)
 	:ndRenderTextureImageCommon()
 {
 }
@@ -41,6 +41,6 @@ ndRenderTextureCubeMapImage::ndRenderTextureCubeMapImage()
 {
 }
 
-void ndRenderTextureCubeMapImage::LoadFace(unsigned mapSide, const unsigned char* const buffer, ndInt32 width, ndInt32 height, TextureImageFormat)
+void ndRenderTextureCubeMapImage::LoadFace(unsigned, const unsigned char* const, ndInt32, ndInt32, TextureImageFormat)
 {
 }

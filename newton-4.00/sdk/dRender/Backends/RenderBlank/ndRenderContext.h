@@ -73,10 +73,10 @@ class ndRenderContext: public ndClassAlloc
 
 	friend class ndRenderTexture;
 	friend class ndGuiRenderPass;
-	friend class ndColorRenderPass;
+	friend class ndRenderPassColor;
 	friend class ndRenderSceneCamera;
 	friend class ndRenderPrimitiveMeshImplement;
-	friend class ndEnvironmentRenderPassImplement;
+	friend class ndRenderPassEnvironmentImplement;
 };
 
 #endif 

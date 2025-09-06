@@ -26,7 +26,7 @@
 #include "ndRenderShaderCache.h"
 #include "ndRenderTextureImage.h"
 
-ndRenderContext::ndRenderContext(ndRender* const owner, ndInt32 width, ndInt32 height, const char* const title)
+ndRenderContext::ndRenderContext(ndRender* const owner, ndInt32, ndInt32, const char* const)
 	:ndClassAlloc()
 	,m_owner (owner)
 	,m_shaderCache(nullptr)
@@ -39,7 +39,7 @@ ndRenderContext::~ndRenderContext()
 {
 }
 
-void ndRenderContext::SetTitle(const char* const title)
+void ndRenderContext::SetTitle(const char* const)
 {
 }
 
@@ -47,7 +47,7 @@ void ndRenderContext::Terminate()
 {
 }
 
-void ndRenderContext::SetViewport(ndInt32 width, ndInt32 height)
+void ndRenderContext::SetViewport(ndInt32, ndInt32)
 {
 }
 
@@ -55,7 +55,7 @@ void ndRenderContext::EndGuiRenderStates()
 {
 }
 
-void ndRenderContext::InitImGui(const char* const fontPathName)
+void ndRenderContext::InitImGui(const char* const)
 {
 }
 
@@ -63,7 +63,7 @@ void ndRenderContext::SetInputCallbacks()
 {
 }
 
-void ndRenderContext::LoadFont(const char* const fontPathName)
+void ndRenderContext::LoadFont(const char* const)
 {
 }
 
@@ -108,16 +108,16 @@ void ndRenderContext::SetCollorPassRenderStates()
 {
 }
 
-void ndRenderContext::ClearFrameBuffer(const ndVector& color)
+void ndRenderContext::ClearFrameBuffer(const ndVector&)
 {
 }
 
-ndSharedPtr<ndRenderTexture> ndRenderContext::LoadTexture(const ndString& pathname)
+ndSharedPtr<ndRenderTexture> ndRenderContext::LoadTexture(const ndString&)
 {
 	return ndSharedPtr<ndRenderTexture>();
 }
 
-ndSharedPtr<ndRenderTexture> ndRenderContext::LoadCubeMap(const ndFixSizeArray<ndString, 6>& pathnames)
+ndSharedPtr<ndRenderTexture> ndRenderContext::LoadCubeMap(const ndFixSizeArray<ndString, 6>&)
 {
 	return ndSharedPtr<ndRenderTexture>();
 }

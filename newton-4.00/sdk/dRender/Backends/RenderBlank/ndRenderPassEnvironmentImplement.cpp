@@ -15,19 +15,19 @@
 #include "ndRenderSceneCamera.h"
 #include "ndRenderShaderCache.h"
 #include "ndRenderTextureImage.h"
-#include "ndEnvironmentRenderPassImplement.h"
+#include "ndRenderPassEnvironmentImplement.h"
 
-ndEnvironmentRenderPassImplement::ndEnvironmentRenderPassImplement(ndRenderContext* const context)
+ndRenderPassEnvironmentImplement::ndRenderPassEnvironmentImplement(ndRenderContext* const context)
 	:ndClassAlloc()
 	,m_context(context)
 {
 }
 
-ndEnvironmentRenderPassImplement::~ndEnvironmentRenderPassImplement()
+ndRenderPassEnvironmentImplement::~ndRenderPassEnvironmentImplement()
 {
 }
 
-void ndEnvironmentRenderPassImplement::RenderScene(const ndRenderSceneCamera* const camera, const ndRenderTexture* const texture)
+void ndRenderPassEnvironmentImplement::RenderScene(const ndRenderSceneCamera* const camera, const ndRenderTexture* const texture)
 {
 }
 
