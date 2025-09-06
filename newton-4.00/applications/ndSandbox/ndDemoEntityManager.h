@@ -22,7 +22,6 @@ class ndPhysicsWorld;
 class ndAnimationSequence;
 class ndDemoMeshInterface;
 
-//class ndDemoEntityManager : public ndList <ndSharedPtr<ndDemoEntity>>
 class ndDemoEntityManager : public ndClassAlloc
 {
 	public:
