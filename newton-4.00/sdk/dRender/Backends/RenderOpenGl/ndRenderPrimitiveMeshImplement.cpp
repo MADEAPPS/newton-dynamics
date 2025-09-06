@@ -42,44 +42,6 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(
 {
 	ndMeshEffect mesh(*collision);
 
-	//ndShapeInfo info(collision->GetShapeInfo());
-	//switch (info.m_collisionType)
-	//{
-	//	case ndShapeID::m_sphere:
-	//	case ndShapeID::m_capsule:
-	//	{
-	//		ndMatrix flipMatrix(ndGetIdentityMatrix());
-	//		flipMatrix[0][0] = ndFloat32(-1.0f);
-	//		ndMatrix aligmentUV(flipMatrix * uvMatrix);
-	//		mesh.SphericalMapping(tex0, aligmentUV);
-	//		break;
-	//	}
-	//
-	//	case ndShapeID::m_box:
-	//	{
-	//		//ndInt32 tex1 = LoadTexture(texture1);
-	//		//ndInt32 tex2 = LoadTexture(texture2);
-	//		if (stretchMaping)
-	//		{
-	//			mesh.BoxMapping(tex0, tex0, tex0, uvMatrix);
-	//		}
-	//		else
-	//		{
-	//			mesh.UniformBoxMapping(tex0, uvMatrix);
-	//		}
-	//		break;
-	//	}
-	//
-	//	default:
-	//	{
-	//		//ndInt32 tex0 = LoadTexture(texture0);
-	//		//ndInt32 tex1 = LoadTexture(texture1);
-	//		//ndInt32 tex2 = LoadTexture(texture2);
-	//		//NewtonMeshApplyBoxMapping(mesh, tex0, tex1, tex2, &aligmentUV[0][0]);
-	//		mesh.UniformBoxMapping(tex0, uvMatrix);
-	//	}
-	//}
-
 	ndRenderTextureImageCommon* const image = (ndRenderTextureImageCommon*)*material.m_texture;
 	ndInt32 textureId = ndInt32(image->m_texture);
 	switch (mapping)
@@ -290,8 +252,6 @@ void ndRenderPrimitiveMeshImplement::Render(const ndRender* const render, const 
 	const glVector4 glSunlightIntensity(render->m_sunLightIntesity);
 	const glVector4 glSunlightDir(viewMatrix.RotateVector(render->m_sunLightDir));
 	
-	//glUniform1i(m_textureLocation, 0);
-	//glUniform1f(m_transparencyLocation, 1.0f);
 	glUniform3fv(m_directionalLightDirection, 1, &glSunlightDir[0]);
 	glUniform3fv(m_directionalLightAmbient, 1, &glSunlightAmbient[0]);
 	glUniform3fv(m_directionalLightIntesity, 1, &glSunlightIntensity[0]);
@@ -309,7 +269,6 @@ void ndRenderPrimitiveMeshImplement::Render(const ndRender* const render, const 
 		//if (!segment.m_hasTranparency)
 		{
 			const ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
-			//const ndSharedPtr<ndRenderTexture>& texture = material->m_texture;
 			const ndRenderTextureImageCommon* const image = (ndRenderTextureImageCommon*) *material->m_texture;
 			ndAssert(image);
 
@@ -319,7 +278,6 @@ void ndRenderPrimitiveMeshImplement::Render(const ndRender* const render, const 
 			glUniform3fv(m_specularColor, 1, &specular[0]);
 			glUniform1fv(m_specularAlpha, 1, &material->m_specularPower);
 			
-			////glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 			glBindTexture(GL_TEXTURE_2D, image->m_texture);
 			glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
 		}

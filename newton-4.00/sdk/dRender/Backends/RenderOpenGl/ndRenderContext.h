@@ -79,6 +79,7 @@ class ndRenderContext: public ndClassAlloc
 
 	void SetViewport(ndInt32 width, ndInt32 height);
 	static void ErrorCallback(ndInt32 error, const char* const description);
+	static void FramebufferSizeCallback(GLFWwindow* window, int x, int y);
 
 	static void CharCallback(GLFWwindow* window, ndUnsigned32 ch);
 	static void CursorposCallback(GLFWwindow* const window, double x, double y);

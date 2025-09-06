@@ -87,6 +87,8 @@ ndRenderContext::ndRenderContext(ndRender* const owner, ndInt32 width, ndInt32 h
 	glfwSetWindowUserPointer(m_mainFrame, this);
 
 	SetInputCallbacks();
+	//void ndRenderContext::FramebufferSizeCallback(GLFWwindow * window, int x, int y)
+	glfwSetFramebufferSizeCallback(m_mainFrame, FramebufferSizeCallback);
 
 #if (defined(_DEBUG) && defined(WIN32))	
 	glDebugMessageCallback(OpenMessageCallback, m_mainFrame);
@@ -178,7 +180,7 @@ void ndRenderContext::InitImGui(const char* const fontPathName)
 	style->Colors[ImGuiCol_WindowBg] = ImVec4(0.94f, 0.94f, 0.94f, 0.5f);
 	
 	// Setup Platform/Renderer back ends
-	const char* glsl_version = "#version 130";
+	const char* glsl_version = "#version 450";
 	ImGui_ImplGlfw_InitForOpenGL(m_mainFrame, true);
 	ImGui_ImplOpenGL3_Init(glsl_version);
 
@@ -231,6 +233,12 @@ void ndRenderContext::ErrorCallback(ndInt32 error, const char* description)
 	ndTrace(("Error %d: %s\n", error, description));
 	fprintf(stderr, "Error %d: %s\n", error, description);
 	ndAssert(0);
+}
+
+void ndRenderContext::FramebufferSizeCallback(GLFWwindow* window, int width, int height)
+{
+	ndRenderContext* const self = (ndRenderContext*)glfwGetWindowUserPointer(window);
+	self->SetViewport(width, height);
 }
 
 void ndRenderContext::LoadFont(const char* const fontPathName)

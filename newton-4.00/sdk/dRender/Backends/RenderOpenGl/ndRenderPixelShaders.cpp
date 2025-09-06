@@ -17,13 +17,12 @@ R""""(
 	#version 450 core
 
 	in vec3 texCoord;
-	layout(location = 0) out vec4 color;
-
+	out vec4 pixelColor;
 	uniform samplerCube cubemap;
 
 	void main (void) 
 	{	
-		color = texture(cubemap, texCoord);
+		pixelColor = texture(cubemap, texCoord);
 	}
 )"""";
 

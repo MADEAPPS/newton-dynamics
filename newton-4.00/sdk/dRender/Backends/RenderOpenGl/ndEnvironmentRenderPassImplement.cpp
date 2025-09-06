@@ -87,7 +87,6 @@ void ndEnvironmentRenderPassImplement::RenderScene(const ndRenderSceneCamera* co
 	ndMatrix viewMatrix(camera->m_viewMatrix);
 	viewMatrix.m_posit = ndVector::m_wOne;
 	viewMatrix.m_posit.m_y = ndFloat32(-10.0f);
-	//glMatrix invViewModelProjectionTextureMatrix(camera->m_invProjectionMatrix * viewMatrix * m_textureMatrix);
 	glMatrix invViewModelProjectionTextureMatrix(camera->m_invProjectionMatrix * viewMatrix);
 	
 	GLuint shader = m_context->m_shaderCache->m_skyBox;

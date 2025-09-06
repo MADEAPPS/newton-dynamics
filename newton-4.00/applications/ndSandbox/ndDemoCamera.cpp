@@ -78,12 +78,12 @@ void ndDemoCamera::TickUpdate(ndFloat32 timestep)
 		targetMatrix.m_posit += targetMatrix.m_up.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
 	}
 
-	//bool mouseState = !scene->GetCaptured() && (scene->GetMouseKeyState(0) && !scene->GetMouseKeyState(1));
+	bool mouseState = !scene->GetCaptured() && (scene->GetMouseKeyState(0) && !scene->GetMouseKeyState(1));
 
 	// do camera rotation, only if we do not have anything picked
 	//bool buttonState = m_mouseLockState || mouseState;
 	//if (!*m_pickJoint && buttonState)
-	if (1)
+	if (mouseState)
 	{
 		ndFloat32 mouseSpeedX = mouseX - m_mousePosX;
 		ndFloat32 mouseSpeedY = mouseY - m_mousePosY;
