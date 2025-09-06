@@ -59,7 +59,7 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 	public:
 	bool m_isVisible;
 	friend class ndRender;
-	friend class ndColorRenderPass;
+	friend class ndRenderPassColor;
 };
 
 #endif

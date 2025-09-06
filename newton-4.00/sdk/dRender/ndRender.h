@@ -100,10 +100,10 @@ class ndRender: public ndClassAlloc
 
 	friend class ndRenderContext;
 	friend class ndGuiRenderPass;
-	friend class ndColorRenderPass;
+	friend class ndRenderPassColor;
 	friend class ndRenderSceneCamera;
 	friend class ndRenderTextureCache;
-	friend class ndEnvironmentRenderPass;
+	friend class ndRenderPassEnvironment;
 	friend class ndRenderPrimitiveMeshImplement;
 };
 

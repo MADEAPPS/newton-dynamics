@@ -13,17 +13,17 @@
 #include "ndRender.h"
 #include "ndRenderContext.h"
 #include "ndRenderTexture.h"
-#include "ndEnvironmentRenderPass.h"
-#include "ndEnvironmentRenderPassImplement.h"
+#include "ndRenderPassEnvironment.h"
+#include "ndRenderPassEnvironmentImplement.h"
 
-ndEnvironmentRenderPass::ndEnvironmentRenderPass(ndRender* const owner, ndSharedPtr<ndRenderTexture>& cubeMap)
+ndRenderPassEnvironment::ndRenderPassEnvironment(ndRender* const owner, ndSharedPtr<ndRenderTexture>& cubeMap)
 	:ndRenderPass(owner)
 	,m_cubeMap(cubeMap)
-	,m_implement(new ndEnvironmentRenderPassImplement(*m_owner->m_context))
+	,m_implement(new ndRenderPassEnvironmentImplement(*m_owner->m_context))
 {
 }
 
-void ndEnvironmentRenderPass::RenderScene(ndFloat32)
+void ndRenderPassEnvironment::RenderScene(ndFloat32)
 {
 	const ndRenderSceneCamera* const camera = *m_owner->m_camera;
 	m_implement->RenderScene(camera, *m_cubeMap);

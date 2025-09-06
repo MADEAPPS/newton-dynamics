@@ -12,19 +12,19 @@
 #include "ndRenderStdafx.h"
 #include "ndRender.h"
 #include "ndRenderContext.h"
-#include "ndColorRenderPass.h"
+#include "ndRenderPassColor.h"
 #include "ndRenderSceneNode.h"
 
-ndColorRenderPass::ndColorRenderPass(ndRender* const owner)
+ndRenderPassColor::ndRenderPassColor(ndRender* const owner)
 	:ndRenderPass(owner)
 {
 }
 
-ndColorRenderPass::~ndColorRenderPass()
+ndRenderPassColor::~ndRenderPassColor()
 {
 }
 
-void ndColorRenderPass::RenderScene(ndFloat32 timestep)
+void ndRenderPassColor::RenderScene(ndFloat32 timestep)
 {
 	m_owner->m_context->SetCollorPassRenderStates();
 

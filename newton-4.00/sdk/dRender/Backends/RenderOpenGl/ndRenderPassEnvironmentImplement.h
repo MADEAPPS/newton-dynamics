@@ -16,11 +16,11 @@
 
 class ndRenderSceneCamera;
 
-class ndEnvironmentRenderPassImplement : public ndClassAlloc
+class ndRenderPassEnvironmentImplement : public ndClassAlloc
 {
 	public:
-	ndEnvironmentRenderPassImplement(ndRenderContext* const context);
-	~ndEnvironmentRenderPassImplement();
+	ndRenderPassEnvironmentImplement(ndRenderContext* const context);
+	~ndRenderPassEnvironmentImplement();
 	void RenderScene(const ndRenderSceneCamera* const camera, const ndRenderTexture* const texture);
 
 	ndRenderContext* m_context;

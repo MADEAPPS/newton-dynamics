@@ -13,11 +13,11 @@
 
 #include "ndRenderPass.h"
 
-class ndColorRenderPass: public ndRenderPass
+class ndRenderPassColor: public ndRenderPass
 {
 	public:
-	ndColorRenderPass(ndRender* const owner);
-	virtual ~ndColorRenderPass();
+	ndRenderPassColor(ndRender* const owner);
+	virtual ~ndRenderPassColor();
 
 	virtual void RenderScene(ndFloat32 timestep) override;
 };

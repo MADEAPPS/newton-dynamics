@@ -28,12 +28,12 @@
 #include <ndRenderTexture.h>
 #include <ndGuiRenderPass.h>
 #include <ndRenderPrimitive.h>
-#include <ndColorRenderPass.h>
+#include <ndRenderPassColor.h>
 #include <ndRenderSceneNode.h>
 #include <ndRenderSceneCamera.h>
 #include <ndRenderTextureCache.h>
 #include <ndRenderPrimitiveMesh.h>
-#include <ndEnvironmentRenderPass.h>
+#include <ndRenderPassEnvironment.h>
 
 #endif 
 

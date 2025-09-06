@@ -14,17 +14,17 @@
 #include "ndRenderPass.h"
 
 class ndRenderTexture;
-class ndEnvironmentRenderPassImplement;
+class ndRenderPassEnvironmentImplement;
 
-class ndEnvironmentRenderPass: public ndRenderPass
+class ndRenderPassEnvironment: public ndRenderPass
 {
 	public:
-	ndEnvironmentRenderPass(ndRender* const owner, ndSharedPtr<ndRenderTexture>& cubeMap);
+	ndRenderPassEnvironment(ndRender* const owner, ndSharedPtr<ndRenderTexture>& cubeMap);
 
 	virtual void RenderScene(ndFloat32 timestep) override;
 	
 	ndSharedPtr<ndRenderTexture>& m_cubeMap;
-	ndSharedPtr<ndEnvironmentRenderPassImplement> m_implement;
+	ndSharedPtr<ndRenderPassEnvironmentImplement> m_implement;
 };
 
 #endif
