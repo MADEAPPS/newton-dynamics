@@ -16,9 +16,9 @@
 #include "ndRenderSceneCamera.h"
 #include "ndRenderShaderCache.h"
 #include "ndRenderTextureImage.h"
-#include "ndEnvironmentRenderPassImplement.h"
+#include "ndRenderPassEnvironmentImplement.h"
 
-ndEnvironmentRenderPassImplement::ndEnvironmentRenderPassImplement(ndRenderContext* const context)
+ndRenderPassEnvironmentImplement::ndRenderPassEnvironmentImplement(ndRenderContext* const context)
 	:ndClassAlloc()
 	,m_context(context)
 {
@@ -64,7 +64,7 @@ ndEnvironmentRenderPassImplement::ndEnvironmentRenderPassImplement(ndRenderConte
 	//SetShadowMode(false);
 }
 
-ndEnvironmentRenderPassImplement::~ndEnvironmentRenderPassImplement()
+ndRenderPassEnvironmentImplement::~ndRenderPassEnvironmentImplement()
 {
 	if (m_indexBuffer)
 	{
@@ -82,7 +82,7 @@ ndEnvironmentRenderPassImplement::~ndEnvironmentRenderPassImplement()
 	}
 }
 
-void ndEnvironmentRenderPassImplement::RenderScene(const ndRenderSceneCamera* const camera, const ndRenderTexture* const texture)
+void ndRenderPassEnvironmentImplement::RenderScene(const ndRenderSceneCamera* const camera, const ndRenderTexture* const texture)
 {
 	ndMatrix viewMatrix(camera->m_viewMatrix);
 	viewMatrix.m_posit = ndVector::m_wOne;
