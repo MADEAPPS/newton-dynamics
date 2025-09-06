@@ -20,7 +20,17 @@ class ndRenderPassShadowsImplement : public ndClassAlloc
 	virtual ~ndRenderPassShadowsImplement();
 
 	//virtual void RenderScene(ndFloat32 timestep) override;
+
+	ndMatrix m_lightProjectToTextureSpace;
+	ndVector m_viewPortTiles[4];
 	ndRenderContext* m_context;
+
+	ndInt32 m_width;
+	ndInt32 m_height;
+	GLuint m_shadowMapTexture;
+	GLuint m_frameBufferObject;
+	GLuint m_modelProjectionMatrixLocation;
+
 };
 
 #endif

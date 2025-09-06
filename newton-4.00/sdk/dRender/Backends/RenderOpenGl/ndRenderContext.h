@@ -113,6 +113,7 @@ class ndRenderContext: public ndClassAlloc
 	friend class ndRenderPassGui;
 	friend class ndRenderPassColor;
 	friend class ndRenderSceneCamera;
+	friend class ndRenderPassShadowsImplement;
 	friend class ndRenderPrimitiveMeshImplement;
 	friend class ndRenderPassEnvironmentImplement;
 };
