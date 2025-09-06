@@ -40,6 +40,8 @@ class ndRenderSceneCamera : public ndRenderSceneNode
 	ndFloat32 m_pitch;
 	ndInt32 m_viewport[4];
 	static ndMatrix m_worldToOpenGl;
+
+	friend class ndRenderPassShadowsImplement;
 };
 
 #endif

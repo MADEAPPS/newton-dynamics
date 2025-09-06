@@ -60,8 +60,6 @@ ndRenderPassEnvironmentImplement::ndRenderPassEnvironmentImplement(ndRenderConte
 	glUseProgram(shader);
 	m_invViewModelProjectionTextureMatrix = glGetUniformLocation(shader, "invViewModelProjectionTextureMatrix");
 	glUseProgram(0);
-	
-	//SetShadowMode(false);
 }
 
 ndRenderPassEnvironmentImplement::~ndRenderPassEnvironmentImplement()

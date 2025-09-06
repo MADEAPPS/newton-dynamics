@@ -105,6 +105,7 @@ class ndRender: public ndClassAlloc
 	friend class ndRenderSceneCamera;
 	friend class ndRenderTextureCache;
 	friend class ndRenderPassEnvironment;
+	friend class ndRenderPassShadowsImplement;
 	friend class ndRenderPrimitiveMeshImplement;
 };
 

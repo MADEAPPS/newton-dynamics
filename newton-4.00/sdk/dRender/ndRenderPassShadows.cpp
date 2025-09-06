@@ -28,13 +28,6 @@ ndRenderPassShadows::~ndRenderPassShadows()
 
 void ndRenderPassShadows::RenderScene(ndFloat32)
 {
-	//m_owner->m_context->SetCollorPassRenderStates();
-	//
-	//const ndMatrix globalMatrix(ndGetIdentityMatrix());
-	//ndList<ndSharedPtr<ndRenderSceneNode>>& scene = m_owner->m_scene;
-	//for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = scene.GetFirst(); node; node = node->GetNext())
-	//{
-	//	ndRenderSceneNode* const sceneNode = *node->GetInfo();
-	//	sceneNode->Render(sceneNode->m_owner, timestep, globalMatrix);
-	//}
+	const ndRenderSceneCamera* const camera = *m_owner->m_camera;
+	m_implement->RenderScene(camera);
 }

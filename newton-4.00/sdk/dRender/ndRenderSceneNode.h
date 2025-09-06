@@ -15,6 +15,7 @@
 
 class ndRender;
 class ndRenderPrimitive;
+class ndRenderPassShadowsImplement;
 
 class ndTransform
 {
@@ -38,10 +39,11 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 	ndRender* GetOwner() const;
 	virtual ndMatrix GetMatrix() const;
 	virtual void SetMatrix(const ndQuaternion& rotation, const ndVector& position);
-	virtual void Render(const ndRender* const owner, ndFloat32 timeStep, const ndMatrix& parentMatrix) const;
-
 	virtual void SetTransform(const ndQuaternion& rotation, const ndVector& position);
 	void InterpolateTransforms(ndFloat32 param);
+
+	virtual void Render(const ndRender* const owner, ndFloat32 timeStep, const ndMatrix& parentMatrix) const;
+	virtual void RenderShadowMap(ndRenderPassShadowsImplement* const owner, const ndMatrix& lightMatrix) const;
 
 	public:
 	ndMatrix m_matrix;			// interpolated matrix

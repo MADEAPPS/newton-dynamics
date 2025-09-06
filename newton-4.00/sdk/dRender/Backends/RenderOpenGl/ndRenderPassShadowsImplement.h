@@ -19,10 +19,22 @@ class ndRenderPassShadowsImplement : public ndClassAlloc
 	ndRenderPassShadowsImplement(ndRenderContext* const context);
 	virtual ~ndRenderPassShadowsImplement();
 
-	//virtual void RenderScene(ndFloat32 timestep) override;
+	virtual void RenderScene(const ndRenderSceneCamera* const camera);
+
+	private:
+	ndMatrix CreateLightMatrix(const ndVector& origin) const;
+	void UpdateCascadeSplits(const ndRenderSceneCamera* const camera);
+	ndMatrix CalculateLightSpaceMatrix(const ndRenderSceneCamera* const camera, ndInt32 sliceIndex) const;
+	void CalculateWorldSpaceSubFrustum(const ndRenderSceneCamera* const camera, ndVector* const frustum, ndInt32 sliceIndex) const;
 
 	ndMatrix m_lightProjectToTextureSpace;
+	ndMatrix m_lighProjectionMatrix[4];
 	ndVector m_viewPortTiles[4];
+	ndVector m_nearFrustumPlanes;
+	ndVector m_farFrustumPlanes;
+	
+	ndVector m_cameraSpaceSplits;
+
 	ndRenderContext* m_context;
 
 	ndInt32 m_width;
