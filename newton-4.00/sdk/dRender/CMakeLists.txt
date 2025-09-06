@@ -29,7 +29,7 @@ if (APPLE)
 		*.cpp 
 		Backends/RenderMacOS/*.h
 		Backends/RenderMacOS/*.cpp)
-else()
+elseif(WIN32 OR UNIX)
 	include_directories(Backends/RenderOpenGl)
 	include_directories(../../thirdParty/glfw/)
 	include_directories(../../thirdParty/glfw/include/)
@@ -40,7 +40,14 @@ else()
 		*.cpp 
 		Backends/RenderOpenGl/*.h
 		Backends/RenderOpenGl/*.cpp)
-	#message ("!!!!!!!!!!!!! add apply support !!!!!!!!")
+else()
+	include_directories(Backends/RenderBlank)
+	message ("!!!!!!!!!!!!! add apply support !!!!!!!!")
+		file(GLOB CPP_SOURCE 
+		*.h
+		*.cpp 
+		Backends/RenderBlank/*.h
+		Backends/RenderBlank/*.cpp)
 endif()
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})

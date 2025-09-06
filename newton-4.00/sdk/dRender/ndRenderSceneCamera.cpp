@@ -14,7 +14,6 @@
 #include "ndRenderContext.h"
 #include "ndRenderSceneCamera.h"
 
-
 #define D_RENDER_CAMERA_ANGLE	60.0f
 
 ndMatrix ndRenderSceneCamera::m_worldToOpenGl(
