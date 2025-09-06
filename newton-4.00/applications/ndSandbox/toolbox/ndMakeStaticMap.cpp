@@ -442,6 +442,8 @@ ndSharedPtr<ndBody> BuildFloorBox(ndDemoEntityManager* const scene, const ndMatr
 	ndRenderPrimitiveMeshMaterial material;
 	//material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("marbleCheckBoard.png"));
 	material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("blueCheckerboard.png"));
+
+	material.m_castShadows = false;
 	ndSharedPtr<ndRenderPrimitive> geometry(ndRenderPrimitiveMesh::CreateFromCollisionShape(render, &box, material, ndRenderPrimitiveMesh::m_box, uvMatrix, false));
 	
 	ndMatrix location(matrix);
