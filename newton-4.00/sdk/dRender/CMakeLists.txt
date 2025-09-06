@@ -23,6 +23,7 @@ include_directories(../../thirdParty/png)
 include_directories(../../thirdParty/imgui/)
 
 if (APPLE) 
+	message ("render library with metal backend")
 	include_directories(Backends/RenderMacOS)
 	file(GLOB CPP_SOURCE 
 		*.h
@@ -30,6 +31,7 @@ if (APPLE)
 		Backends/RenderMacOS/*.h
 		Backends/RenderMacOS/*.cpp)
 elseif(WIN32 OR UNIX)
+	message ("render library with opengl backend")
 	include_directories(Backends/RenderOpenGl)
 	include_directories(../../thirdParty/glfw/)
 	include_directories(../../thirdParty/glfw/include/)
