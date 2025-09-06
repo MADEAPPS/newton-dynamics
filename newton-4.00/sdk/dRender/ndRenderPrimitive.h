@@ -13,6 +13,7 @@
 
 #include "ndRenderStdafx.h"
 
+class ndRenderPassShadowsImplement;
 
 class ndRenderPrimitive : public ndContainersFreeListAlloc<ndRenderPrimitive>
 {
@@ -21,7 +22,7 @@ class ndRenderPrimitive : public ndContainersFreeListAlloc<ndRenderPrimitive>
 	virtual ~ndRenderPrimitive();
 
 	virtual void Render(const ndRender* const render, const ndMatrix& modelViewMatrix) const = 0;
-
+	virtual void RenderShadowMap(ndRenderPassShadowsImplement* const owner, const ndMatrix& lightMatrix) const = 0;
 };
 
 #endif

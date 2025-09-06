@@ -18,7 +18,7 @@
 #include "ndRenderSceneCamera.h"
 #include "ndRenderTextureImage.h"
 #include "ndRenderPrimitiveMesh.h"
-
+#include "ndRenderPassShadowsImplement.h"
 #include "ndRenderPrimitiveMeshImplement.h"
 
 ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(
@@ -286,4 +286,34 @@ void ndRenderPrimitiveMeshImplement::Render(const ndRender* const render, const 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 	glUseProgram(0);
+}
+
+void ndRenderPrimitiveMeshImplement::RenderShadowMap(ndRenderPassShadowsImplement* const owner, const ndMatrix& lightMatrix) const
+{
+	bool castShadow = true;
+	for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = m_segments.GetFirst(); node && castShadow; node = node->GetNext())
+	{
+		ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
+		castShadow = castShadow && segment.m_material.m_castShadows;
+	}
+
+	if (castShadow)
+	{
+		glMatrix matrix(lightMatrix);
+		glUniformMatrix4fv(GLint(owner->m_modelProjectionMatrixLocation), 1, false, &matrix[0][0]);
+
+		glBindVertexArray(m_vertextArrayBuffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+
+		for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = m_segments.GetFirst(); node; node = node->GetNext())
+		{
+			ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
+			if (segment.m_material.m_castShadows)
+			{
+				glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
+			}
+		}
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+	}
 }

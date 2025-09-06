@@ -28,6 +28,7 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	~ndRenderPrimitiveMeshImplement();
 
 	void Render(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
+	void RenderShadowMap(ndRenderPassShadowsImplement* const owner, const ndMatrix& lightMatrix) const;
 
 	private:
 	void ResetOptimization();

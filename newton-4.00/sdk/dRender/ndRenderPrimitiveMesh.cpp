@@ -13,6 +13,7 @@
 #include "ndRender.h"
 #include "ndRenderTexture.h"
 #include "ndRenderPrimitiveMesh.h"
+#include "ndRenderPassShadowsImplement.h"
 #include "ndRenderPrimitiveMeshImplement.h"
 
 ndRenderPrimitiveMeshMaterial::ndRenderPrimitiveMeshMaterial()
@@ -21,6 +22,7 @@ ndRenderPrimitiveMeshMaterial::ndRenderPrimitiveMeshMaterial()
 	,m_specularPower(250.0f)
 	,m_opacity(1.0f)
 	,m_texture(nullptr)
+	,m_castShadows(true)
 {
 }
 
@@ -57,4 +59,9 @@ ndSharedPtr<ndRenderPrimitive> ndRenderPrimitiveMesh::CreateFromCollisionShape(
 void ndRenderPrimitiveMesh::Render(const ndRender* const render, const ndMatrix& modelViewMatrix) const
 {
 	m_implementation->Render(render, modelViewMatrix);
+}
+
+void ndRenderPrimitiveMesh::RenderShadowMap(ndRenderPassShadowsImplement* const owner, const ndMatrix& lightMatrix) const
+{
+	m_implementation->RenderShadowMap(owner, lightMatrix);
 }

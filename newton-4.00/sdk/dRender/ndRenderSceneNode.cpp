@@ -129,16 +129,16 @@ void ndRenderSceneNode::Render(const ndRender* const owner, ndFloat32 timestep, 
 
 void ndRenderSceneNode::RenderShadowMap(ndRenderPassShadowsImplement* const owner, const ndMatrix& lightMatrix) const
 {
-	ndMatrix nodeMatrix(m_matrix * lightMatrix);
+	const ndMatrix nodeMatrix(m_matrix * lightMatrix);
 
 	//ndDemoMeshInterface* const mesh = (ndDemoMeshInterface*)*m_mesh;
 	const ndRenderPrimitive* const mesh = *m_primitve;
-	//if (m_isVisible && mesh && m_castShadow)
-	//{
-	//	// Render mesh if there is one 
-	//	const ndMatrix modelMatrix(m_meshMatrix * nodeMatrix);
-	//	mesh->RenderShadowMap(shadowMap, modelMatrix);
-	//}
+	if (m_isVisible && mesh)
+	{
+		// Render mesh if there is one 
+		const ndMatrix modelMatrix(m_primitiveMatrix * nodeMatrix);
+		mesh->RenderShadowMap(owner, modelMatrix);
+	}
 
 	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = m_children.GetFirst(); node; node = node->GetNext())
 	{
