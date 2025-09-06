@@ -55,6 +55,7 @@ ndRenderContext::ndRenderContext(ndRender* const owner, ndInt32 width, ndInt32 h
 	// GL 3.0 + GLSL 130
 	//const char* glsl_version = "#version 130";
 	glfwWindowHint(GLFW_SAMPLES, 4);
+	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
@@ -70,6 +71,16 @@ ndRenderContext::ndRenderContext(ndRender* const owner, ndInt32 width, ndInt32 h
 	glfwMakeContextCurrent(m_mainFrame);
 	glfwSwapInterval(0); // Enable vsync
 
+	// attach myself to the main frame
+	glfwSetWindowUserPointer(m_mainFrame, this);
+
+	SetInputCallbacks();
+	glfwSetWindowSizeCallback(m_mainFrame, ResizeWindowsCallback);
+	//glfwSetFramebufferSizeCallback(m_mainFrame, ResizeWindowsCallback);
+
+	glfwSetWindowSize(m_mainFrame, width, height);
+	SetViewport(width, height);
+
 	ndInt32 monitorsCount;
 	GLFWmonitor** monitors = glfwGetMonitors(&monitorsCount);
 	if (monitorsCount > 1)
@@ -83,12 +94,6 @@ ndRenderContext::ndRenderContext(ndRender* const owner, ndInt32 width, ndInt32 h
 		glfwGetWindowPos(m_mainFrame, &window_x, &window_y);
 		glfwSetWindowPos(m_mainFrame, monitor_x + window_x, monitor_y + 64);
 	}
-	// attach myself to the main frame
-	glfwSetWindowUserPointer(m_mainFrame, this);
-
-	SetInputCallbacks();
-	//void ndRenderContext::FramebufferSizeCallback(GLFWwindow * window, int x, int y)
-	glfwSetFramebufferSizeCallback(m_mainFrame, FramebufferSizeCallback);
 
 #if (defined(_DEBUG) && defined(WIN32))	
 	glDebugMessageCallback(OpenMessageCallback, m_mainFrame);
@@ -235,7 +240,7 @@ void ndRenderContext::ErrorCallback(ndInt32 error, const char* description)
 	ndAssert(0);
 }
 
-void ndRenderContext::FramebufferSizeCallback(GLFWwindow* window, int width, int height)
+void ndRenderContext::ResizeWindowsCallback(GLFWwindow* window, int width, int height)
 {
 	ndRenderContext* const self = (ndRenderContext*)glfwGetWindowUserPointer(window);
 	self->SetViewport(width, height);

@@ -1283,9 +1283,6 @@ void ndDemoEntityManager::RenderScene()
 	ndFloat32 timestep = dGetElapsedSeconds();	
 	CalculateFPS(timestep);
 	UpdatePhysics(timestep);
-
-	//ndFloat32 interpolateParam = CalculateInteplationParam();
-
 	m_renderer->Render(timestep);
 }
 

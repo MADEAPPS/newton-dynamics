@@ -91,7 +91,7 @@ void ndRenderSceneCamera::SetViewMatrix(ndInt32 width, ndInt32 height)
 	m_viewport[2] = width;
 	m_viewport[3] = height;
 
-	m_owner->m_context->SetViewport(width, height);
+	//m_owner->m_context->SetViewport(width, height);
 
 	// set the model view matrix 
 	const ndVector pointOfInterest(m_matrix.m_posit + m_matrix.m_front);
