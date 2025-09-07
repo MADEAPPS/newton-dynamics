@@ -545,5 +545,8 @@ ndSharedPtr<ndRenderTexture> ndRenderContext::LoadCubeMap(const ndFixSizeArray<n
 		lodepng_free(pBits);
 	}
 
+	glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+	ndAssert(glGetError() == GL_NO_ERROR);
+
 	return texture;
 }
