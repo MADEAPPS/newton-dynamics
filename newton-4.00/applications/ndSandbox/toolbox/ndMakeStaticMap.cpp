@@ -428,21 +428,20 @@ ndSharedPtr<ndBody> BuildPlayArena(ndDemoEntityManager* const scene, bool kinema
 }
 #endif
 
-ndSharedPtr<ndBody> BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix& matrix, bool kinematic)
+ndSharedPtr<ndBody> BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix& matrix, const char* const textureName, ndFloat32 uvTiling, bool kinematic)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 
 	ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
 	ndMatrix uvMatrix(ndGetIdentityMatrix());
-	uvMatrix[0][0] *= 1.0f / 4.0f;
-	uvMatrix[1][1] *= 1.0f / 4.0f;
-	uvMatrix[2][2] *= 1.0f / 4.0f;
+	uvMatrix[0][0] *= uvTiling;
+	uvMatrix[1][1] *= uvTiling;
+	uvMatrix[2][2] *= uvTiling;
 
 	ndRender* const render = *scene->GetRenderer();
 	ndRenderPrimitiveMeshMaterial material;
 	material.m_specular = ndVector::m_zero;
-	material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("marbleCheckBoard.png"));
-	//material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("blueCheckerboard.png"));
+	material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textureName));
 
 	material.m_castShadows = false;
 	ndSharedPtr<ndRenderPrimitive> geometry(ndRenderPrimitiveMesh::CreateFromCollisionShape(render, &box, material, ndRenderPrimitiveMesh::m_box, uvMatrix, false));

@@ -48,7 +48,6 @@ class ndRayCastNotify : public ndClassAlloc
 
 	virtual ndFloat32 OnRayCastAction(const ndContactPoint& contact, ndFloat32 intersetParam) = 0;
 
-
 	ndContactPoint m_contact;
 	ndFloat32 m_param;
 

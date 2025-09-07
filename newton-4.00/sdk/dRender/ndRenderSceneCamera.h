@@ -26,6 +26,8 @@ class ndRenderSceneCamera : public ndRenderSceneNode
 	ndMatrix CreateLookAtMatrix(const ndVector& eyepoint, const ndVector& eyepointTarget, const ndVector& normUp) const;
 	ndMatrix CreateMatrixFromFrustum(ndFloat32 left, ndFloat32 right, ndFloat32 bottom, ndFloat32 top, ndFloat32 front, ndFloat32 back) const;
 
+	ndVector ScreenToWorld(const ndVector& screenPoint) const;
+
 	ndMatrix m_viewMatrix;
 	ndMatrix m_invViewMatrix;
 	ndMatrix m_projectionMatrix;

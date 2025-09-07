@@ -133,3 +133,23 @@ void ndRenderSceneCamera::SetMatrix(const ndQuaternion& rotation, const ndVector
 {
 	ndRenderSceneNode::SetMatrix(rotation, position);
 }
+
+ndVector ndRenderSceneCamera::ScreenToWorld(const ndVector& screenPoint) const
+{
+	ndVector sp(screenPoint);
+	sp.m_y = (ndFloat32)m_viewport[3] - sp.m_y;
+
+	sp.m_x = ndFloat32(2.0f) * (sp.m_x - (ndFloat32)m_viewport[0]) / (ndFloat32)m_viewport[2] - ndFloat32(1.0f);
+	sp.m_y = ndFloat32(2.0f) * (sp.m_y - (ndFloat32)m_viewport[1]) / (ndFloat32)m_viewport[3] - ndFloat32(1.0f);
+	sp.m_z = ndFloat32(2.0f) * sp.m_z - ndFloat32(1.0f);
+	sp.m_w = ndFloat32(1.0f);
+
+	//sp = viewPoint * ViewMatrx * projeMatrix;
+	//ndVector viewPoint(m_viewMatrix.OrthoInverse().TransformVector1x4(m_invProjectionMatrix.TransformVector1x4(sp)));
+	ndVector viewPoint(m_viewMatrix.TransformVector1x4(m_invProjectionMatrix.TransformVector1x4(sp)));
+	if (viewPoint.m_w != ndFloat32 (0.0f))
+	{
+		viewPoint = viewPoint.Scale(1.0f / viewPoint.m_w);
+	}
+	return viewPoint;
+}
