@@ -19,7 +19,7 @@
 ndRenderPrimitiveMeshMaterial::ndRenderPrimitiveMeshMaterial()
 	:m_diffuse(ndFloat32(1.0f))
 	,m_specular(ndFloat32(1.0f))
-	,m_reflection(ndFloat32(0.4f))
+	,m_reflection(ndFloat32(0.15f))
 	,m_specularPower(ndFloat32(250.0f))
 	,m_opacity(ndFloat32(1.0f))
 	,m_texture(nullptr)

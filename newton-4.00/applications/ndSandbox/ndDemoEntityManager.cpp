@@ -22,9 +22,9 @@
 #include "ndDemoEntityManager.h"
 #include "ndHighResolutionTimer.h"
 
-#define DEFAULT_SCENE	0		// basic rigidbody
+//#define DEFAULT_SCENE	0		// basic rigidbody
+#define DEFAULT_SCENE	1		// basic friction
 //#define DEFAULT_SCENE	1		// Gpu basic rigidbody
-//#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// basic compound shapes
 //#define DEFAULT_SCENE	4		// conservation of momentum 
 //#define DEFAULT_SCENE	5		// basic Stacks
@@ -97,11 +97,13 @@
 //void ndStaticMeshCollisionDemo(ndDemoEntityManager* const scene);
 //void ndStaticUserMeshCollisionDemo(ndDemoEntityManager* const scene);
 
+void ndBasicFriction(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
 
 ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
 {
 	{ "basic rigidbody", ndBasicRigidBody},
+	{ "basic friction", ndBasicFriction},
 #if 0
 	{ "basic gpu rigidbody", ndBasicGpuRigidBody},
 	{ "basic friction ramp", ndBasicFrictionRamp},

@@ -450,7 +450,6 @@ ndSharedPtr<ndBody> BuildFloorBox(ndDemoEntityManager* const scene, const ndMatr
 	location.m_posit.m_y -= 0.5f;
 	ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(location));
 	entity->SetPrimitive(geometry);
-	//entity->SetShadowMode(false);
 	
 	ndSharedPtr<ndBody> body(kinematic ? new ndBodyKinematic() : new ndBodyDynamic());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));

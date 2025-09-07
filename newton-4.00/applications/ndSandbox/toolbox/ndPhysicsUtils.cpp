@@ -142,7 +142,7 @@ static void AddShape(ndDemoEntityManager* const scene,
 //******************************************************************************
 // Create simple rigi body with a collsion shspe and render primitev but is not added to the scene
 //******************************************************************************
-static ndBodyKinematic* CreateBody(
+ndSharedPtr<ndBody> CreateBody(
 	ndDemoEntityManager* const scene, 
 	const ndShapeInstance& shape, 
 	const ndMatrix& location, 
@@ -159,31 +159,32 @@ static ndBodyKinematic* CreateBody(
 	material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textName));
 
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateFromCollisionShape(render, &shape, material, mappingMode));
-	ndBodyKinematic* const body = new ndBodyDynamic();
+	//ndBodyKinematic* const body = new ndBodyDynamic();
+	ndSharedPtr<ndBody> body (new ndBodyDynamic());
 	ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(matrix));
 	entity->SetPrimitive(mesh);
 
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
-	body->SetCollisionShape(shape);
-	body->SetMassMatrix(mass, shape);
+	body->GetAsBodyKinematic()->SetCollisionShape(shape);
+	body->GetAsBodyKinematic()->SetMassMatrix(mass, shape);
 	return body;
 }
 
 //******************************************************************************
 // Create simple primitive but is no added to the scene
 //******************************************************************************
-ndSharedPtr<ndBody> CreateSphere(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius, const char* const textName)
-{
-	ndShapeInstance shape(new ndShapeSphere(radius));
-	ndSharedPtr<ndBody> body(CreateBody(scene, shape, location, mass, textName, ndRenderPrimitiveMesh::m_spherical));
-	return body;
-}
-
 ndSharedPtr<ndBody> CreateBox(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez, const char* const textName)
 {
 	ndShapeInstance shape(new ndShapeBox(sizex, sizey, sizez));
 	ndSharedPtr<ndBody> body(CreateBody(scene, shape, location, mass, textName, ndRenderPrimitiveMesh::m_box));
+	return body;
+}
+
+ndSharedPtr<ndBody> CreateSphere(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius, const char* const textName)
+{
+	ndShapeInstance shape(new ndShapeSphere(radius));
+	ndSharedPtr<ndBody> body(CreateBody(scene, shape, location, mass, textName, ndRenderPrimitiveMesh::m_spherical));
 	return body;
 }
 
