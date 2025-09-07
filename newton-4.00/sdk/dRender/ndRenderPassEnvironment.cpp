@@ -21,6 +21,12 @@ ndRenderPassEnvironment::ndRenderPassEnvironment(ndRender* const owner, ndShared
 	,m_cubeMap(cubeMap)
 	,m_implement(new ndRenderPassEnvironmentImplement(*m_owner->m_context))
 {
+	owner->m_cachedEnvironmentPass = this;
+}
+
+ndRenderPassEnvironment::~ndRenderPassEnvironment()
+{
+	m_owner->m_cachedShadowPass = nullptr;
 }
 
 void ndRenderPassEnvironment::RenderScene(ndFloat32)

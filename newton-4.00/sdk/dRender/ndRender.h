@@ -29,6 +29,7 @@ class ndRenderContext;
 class ndRenderSceneNode;
 class ndRenderSceneCamera;
 class ndRenderTextureCache;
+class ndRenderPassEnvironment;
 class ndRenderPassShadowsImplement;
 
 class ndRender: public ndClassAlloc
@@ -99,6 +100,7 @@ class ndRender: public ndClassAlloc
 	ndVector m_backgroundColor;
 
 	ndRenderPassShadowsImplement* m_cachedShadowPass;
+	ndRenderPassEnvironment* m_cachedEnvironmentPass;
 
 	friend class ndRenderContext;
 	friend class ndRenderPassGui;

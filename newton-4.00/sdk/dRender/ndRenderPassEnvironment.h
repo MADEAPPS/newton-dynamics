@@ -20,6 +20,7 @@ class ndRenderPassEnvironment: public ndRenderPass
 {
 	public:
 	ndRenderPassEnvironment(ndRender* const owner, ndSharedPtr<ndRenderTexture>& cubeMap);
+	~ndRenderPassEnvironment();
 
 	virtual void RenderScene(ndFloat32 timestep) override;
 	
