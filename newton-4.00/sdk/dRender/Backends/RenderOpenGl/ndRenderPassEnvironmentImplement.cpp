@@ -89,10 +89,6 @@ void ndRenderPassEnvironmentImplement::RenderScene(const ndRenderSceneCamera* co
 
 	//GLint viewport[4];
 	//glGetIntegerv(GL_VIEWPORT, viewport);
-	//if (memcmp(previousViewport, viewport, sizeof(viewport))) {
-	//	printf("Viewport set to (%d, %d, %d, %d)\n", viewport[0], viewport[1], viewport[2], viewport[3]);
-	//	memcpy(previousViewport, viewport, sizeof(viewport));
-	//}
 
 	glDisable(GL_SCISSOR_TEST);
 	GLuint shader = m_context->m_shaderCache->m_skyBox;
