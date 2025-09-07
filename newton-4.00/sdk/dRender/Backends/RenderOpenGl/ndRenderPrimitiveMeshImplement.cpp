@@ -18,6 +18,7 @@
 #include "ndRenderSceneCamera.h"
 #include "ndRenderTextureImage.h"
 #include "ndRenderPrimitiveMesh.h"
+#include "ndRenderPassEnvironment.h"
 #include "ndRenderPassShadowsImplement.h"
 #include "ndRenderPrimitiveMeshImplement.h"
 
@@ -66,10 +67,6 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(
 			break;
 		}
 		default:
-			//ndInt32 tex0 = LoadTexture(texture0);
-			//ndInt32 tex1 = LoadTexture(texture1);
-			//ndInt32 tex2 = LoadTexture(texture2);
-			//NewtonMeshApplyBoxMapping(mesh, tex0, tex1, tex2, &aligmentUV[0][0]);
 			mesh.UniformBoxMapping(textureId, uvMatrix);
 	}
 
@@ -188,10 +185,14 @@ void ndRenderPrimitiveMeshImplement::OptimizeForRender(
 		GLuint shader = m_context->m_shaderCache->m_diffuseEffect;
 		glUseProgram(shader);
 		//m_normalMatrixLocation = glGetUniformLocation(shader, "normalMatrix");
+		m_solidColorBlock.m_texture = glGetUniformLocation(shader, "texture0");
+		m_solidColorBlock.m_environmentMap = glGetUniformLocation(shader, "environmentMap");
+
 		m_solidColorBlock.m_projectMatrixLocation = glGetUniformLocation(shader, "projectionMatrix");
 		m_solidColorBlock.m_viewModelMatrixLocation = glGetUniformLocation(shader, "viewModelMatrix");
 		m_solidColorBlock.m_diffuseColor = glGetUniformLocation(shader, "diffuseColor");
 		m_solidColorBlock.m_specularColor = glGetUniformLocation(shader, "specularColor");
+		m_solidColorBlock.m_reflectionColor = glGetUniformLocation(shader, "reflectionColor");
 		m_solidColorBlock.m_directionalLightAmbient = glGetUniformLocation(shader, "directionalLightAmbient");
 		m_solidColorBlock.m_directionalLightIntesity = glGetUniformLocation(shader, "directionalLightIntesity");
 		m_solidColorBlock.m_directionalLightDirection = glGetUniformLocation(shader, "directionalLightDirection");
@@ -201,27 +202,18 @@ void ndRenderPrimitiveMeshImplement::OptimizeForRender(
 
 	{
 		GLuint shader = m_context->m_shaderCache->m_diffuseShadowEffect;
-		//glUseProgram(shader);
-		//m_textureLocationShadow = glGetUniformLocation(m_shaderShadow, "texture0");
-		//m_transparencyLocationShadow = glGetUniformLocation(m_shaderShadow, "transparency");
-		//m_projectMatrixLocationShadow = glGetUniformLocation(m_shaderShadow, "projectionMatrix");
-		//m_viewModelMatrixLocationShadow = glGetUniformLocation(m_shaderShadow, "viewModelMatrix");
-		//m_materialAmbientLocationShadow = glGetUniformLocation(m_shaderShadow, "material_ambient");
-		//m_materialDiffuseLocationShadow = glGetUniformLocation(m_shaderShadow, "material_diffuse");
-		//m_materialSpecularLocationShadow = glGetUniformLocation(m_shaderShadow, "material_specular");
-		//m_directionalLightDirLocationShadow = glGetUniformLocation(m_shaderShadow, "directionalLightDir");
-		//
-		//m_shadowSlices = glGetUniformLocation(m_shaderShadow, "shadowSlices");
-		//m_worldMatrix = glGetUniformLocation(m_shaderShadow, "modelWorldMatrix");
-		//m_depthMapTexture = glGetUniformLocation(m_shaderShadow, "depthMapTexture");
-		//m_directionLightViewProjectionMatrixShadow = glGetUniformLocation(m_shaderShadow, "directionaLightViewProjectionMatrix");
-
 		glUseProgram(shader);
 		//m_normalMatrixLocation = glGetUniformLocation(shader, "normalMatrix");
+
+		m_solidShadowColorBlock.m_texture = glGetUniformLocation(shader, "texture0");
+		m_solidShadowColorBlock.m_environmentMap = glGetUniformLocation(shader, "environmentMap");
+		m_solidShadowColorBlock.m_depthMapTexture = glGetUniformLocation(shader, "shadowMapTexture");
+
 		m_solidShadowColorBlock.m_projectMatrixLocation = glGetUniformLocation(shader, "projectionMatrix");
 		m_solidShadowColorBlock.m_viewModelMatrixLocation = glGetUniformLocation(shader, "viewModelMatrix");
 		m_solidShadowColorBlock.m_diffuseColor = glGetUniformLocation(shader, "diffuseColor");
 		m_solidShadowColorBlock.m_specularColor = glGetUniformLocation(shader, "specularColor");
+		m_solidShadowColorBlock.m_reflectionColor = glGetUniformLocation(shader, "reflectionColor");
 		m_solidShadowColorBlock.m_directionalLightAmbient = glGetUniformLocation(shader, "directionalLightAmbient");
 		m_solidShadowColorBlock.m_directionalLightIntesity = glGetUniformLocation(shader, "directionalLightIntesity");
 		m_solidShadowColorBlock.m_directionalLightDirection = glGetUniformLocation(shader, "directionalLightDirection");
@@ -229,9 +221,7 @@ void ndRenderPrimitiveMeshImplement::OptimizeForRender(
 
 		m_solidShadowColorBlock.m_shadowSlices = glGetUniformLocation(shader, "shadowSlices");
 		m_solidShadowColorBlock.m_worldMatrix = glGetUniformLocation(shader, "modelWorldMatrix");
-		m_solidShadowColorBlock.m_depthMapTexture = glGetUniformLocation(shader, "shadowMapTexture");
 		m_solidShadowColorBlock.m_directionLightViewProjectionMatrixShadow = glGetUniformLocation(shader, "directionaLightViewProjectionMatrix");
-
 		glUseProgram(0);
 	}
 
@@ -329,7 +319,14 @@ void ndRenderPrimitiveMeshImplement::RenderSolidColor(const ndRender* const rend
 	//glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &glViewModelMatrix[0][0]);
 	glUniformMatrix4fv(m_solidColorBlock.m_projectMatrixLocation, 1, false, &glProjectionMatrix[0][0]);
 	glUniformMatrix4fv(m_solidColorBlock.m_viewModelMatrixLocation, 1, false, &glViewModelMatrix[0][0]);
-	
+
+	ndRenderPassEnvironment* const environment = render->m_cachedEnvironmentPass;
+	ndAssert(environment);
+	ndRenderTextureImage* const environmentTexture = (ndRenderTextureImage*)*environment->m_cubeMap;
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, environmentTexture->m_texture);
+
 	glBindVertexArray(m_vertextArrayBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 	
@@ -345,8 +342,11 @@ void ndRenderPrimitiveMeshImplement::RenderSolidColor(const ndRender* const rend
 
 			const glVector4 diffuse(material->m_diffuse);
 			const glVector4 specular(material->m_specular);
+			const glVector4 reflection(material->m_reflection);
+
 			glUniform3fv(m_solidColorBlock.m_diffuseColor, 1, &diffuse[0]);
 			glUniform3fv(m_solidColorBlock.m_specularColor, 1, &specular[0]);
+			glUniform3fv(m_solidColorBlock.m_reflectionColor, 1, &reflection[0]);
 			glUniform1fv(m_solidColorBlock.m_specularAlpha, 1, &material->m_specularPower);
 			
 			glBindTexture(GL_TEXTURE_2D, image->m_texture);
@@ -397,22 +397,29 @@ void ndRenderPrimitiveMeshImplement::RenderShadowSolidColor(const ndRender* cons
 	glUniformMatrix4fv(m_solidShadowColorBlock.m_projectMatrixLocation, 1, false, &glProjectionMatrix[0][0]);
 	glUniformMatrix4fv(m_solidShadowColorBlock.m_viewModelMatrixLocation, 1, false, &glViewModelMatrix[0][0]);
 
-	ndRenderPassShadowsImplement* const owner = render->m_cachedShadowPass;
-	ndAssert(owner);
+	ndRenderPassShadowsImplement* const shadowPass = render->m_cachedShadowPass;
+	ndAssert(shadowPass);
 
-	glVector4 cameraSpaceSplits(owner->m_cameraSpaceSplits);
+	glVector4 cameraSpaceSplits(shadowPass->m_cameraSpaceSplits);
 	glMatrix lightViewProjectMatrix[4];
 	for (ndInt32 i = 0; i < 4; ++i)
 	{
-		lightViewProjectMatrix[i] = owner->m_lighProjectionMatrix[i];
+		lightViewProjectMatrix[i] = shadowPass->m_lighProjectionMatrix[i];
 	}
 	glUniform1i(m_solidShadowColorBlock.m_depthMapTexture, 1);
 	glUniformMatrix4fv(m_solidShadowColorBlock.m_worldMatrix, 1, GL_FALSE, &worldMatrix[0][0]);
 	glUniformMatrix4fv(m_solidShadowColorBlock.m_directionLightViewProjectionMatrixShadow, 4, GL_FALSE, &lightViewProjectMatrix[0][0][0]);
 	glUniform4fv(m_solidShadowColorBlock.m_shadowSlices, 1, &cameraSpaceSplits[0]);
 
+	ndRenderPassEnvironment* const environment = render->m_cachedEnvironmentPass;
+	ndAssert(environment);
+	ndRenderTextureImage* const environmentTexture = (ndRenderTextureImage*)*environment->m_cubeMap;
+
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, environmentTexture->m_texture);
+
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, owner->m_shadowMapTexture);
+	glBindTexture(GL_TEXTURE_2D, shadowPass->m_shadowMapTexture);
 
 	glBindVertexArray(m_vertextArrayBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
@@ -429,8 +436,11 @@ void ndRenderPrimitiveMeshImplement::RenderShadowSolidColor(const ndRender* cons
 	
 			const glVector4 diffuse(material->m_diffuse);
 			const glVector4 specular(material->m_specular);
+			const glVector4 reflection(material->m_reflection);
+
 			glUniform3fv(m_solidShadowColorBlock.m_diffuseColor, 1, &diffuse[0]);
 			glUniform3fv(m_solidShadowColorBlock.m_specularColor, 1, &specular[0]);
+			glUniform3fv(m_solidShadowColorBlock.m_reflectionColor, 1, &reflection[0]);
 			glUniform1fv(m_solidShadowColorBlock.m_specularAlpha, 1, &material->m_specularPower);
 	
 			glBindTexture(GL_TEXTURE_2D, image->m_texture);

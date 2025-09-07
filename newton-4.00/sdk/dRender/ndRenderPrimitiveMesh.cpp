@@ -17,10 +17,11 @@
 #include "ndRenderPrimitiveMeshImplement.h"
 
 ndRenderPrimitiveMeshMaterial::ndRenderPrimitiveMeshMaterial()
-	:m_diffuse(1.0f, 1.0f, 1.0f, 1.0f)
-	,m_specular(1.0f, 1.0f, 1.0f, 1.0f)
-	,m_specularPower(250.0f)
-	,m_opacity(1.0f)
+	:m_diffuse(ndFloat32(1.0f))
+	,m_specular(ndFloat32(1.0f))
+	,m_reflection(ndFloat32(0.4f))
+	,m_specularPower(ndFloat32(250.0f))
+	,m_opacity(ndFloat32(1.0f))
 	,m_texture(nullptr)
 	,m_castShadows(true)
 {

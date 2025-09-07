@@ -51,8 +51,11 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 
 	struct SolidColorBlock
 	{
+		GLint m_texture;
+		GLint m_environmentMap;
 		GLint m_diffuseColor;
 		GLint m_specularColor;
+		GLint m_reflectionColor;
 		GLint m_directionalLightAmbient;
 		GLint m_directionalLightIntesity;
 		GLint m_directionalLightDirection;

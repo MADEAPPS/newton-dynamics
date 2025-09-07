@@ -101,6 +101,7 @@ GLuint ndRenderShaderCache::CreateShaderEffect (const char* const vertexShaderCo
 		GLsizei length;  
 		glGetShaderInfoLog(vertexShader, sizeof (errorLog), &length, errorLog);
 		ndTrace ((errorLog));
+		ndAssert(0);
 	}
 	glAttachShader(program, vertexShader);
 	
@@ -126,7 +127,6 @@ GLuint ndRenderShaderCache::CreateShaderEffect (const char* const vertexShaderCo
 	}
 	
 	GLuint pixelShader = glCreateShader(GL_FRAGMENT_SHADER);
-	
 	glShaderSource(pixelShader, 1, &pixelShaderCode, nullptr);
 	glCompileShader(pixelShader);
 	glGetShaderiv(pixelShader, GL_COMPILE_STATUS, &state); 
@@ -135,6 +135,7 @@ GLuint ndRenderShaderCache::CreateShaderEffect (const char* const vertexShaderCo
 		GLsizei length;  
 		glGetShaderInfoLog(pixelShader, sizeof(errorLog), &length, errorLog);
 		ndTrace((errorLog));
+		ndAssert(0);
 	}
 	glAttachShader(program, pixelShader);
 	
@@ -145,11 +146,18 @@ GLuint ndRenderShaderCache::CreateShaderEffect (const char* const vertexShaderCo
 		GLsizei length;  
 		glGetProgramInfoLog(program, sizeof(errorLog), &length, errorLog);
 		ndTrace((errorLog));
+		ndAssert(0);
 	}
 	
 	glValidateProgram(program);
 	glGetProgramiv(program,  GL_VALIDATE_STATUS, &state);   
-	ndAssert (state == GL_TRUE);
+	if (state != GL_TRUE)
+	{
+		GLsizei length;
+		glGetProgramInfoLog(program, sizeof(errorLog), &length, errorLog);
+		ndTrace((errorLog));
+		ndAssert(0);
+	}
 	
 	if (geometryShader)
 	{

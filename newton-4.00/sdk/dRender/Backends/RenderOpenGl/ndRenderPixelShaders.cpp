@@ -39,10 +39,13 @@ const char* ndRenderShaderCache::m_directionalDiffusePixel =
 R""""(
 	#version 450 core
 
-	uniform sampler2D texture0;
+	layout(binding = 0) uniform sampler2D texture0;
+	layout(binding = 1) uniform samplerCube environmentMap;
 
 	uniform vec3 diffuseColor;
 	uniform vec3 specularColor;
+	uniform vec3 reflectionColor;
+
 	uniform vec3 directionalLightAmbient;
 	uniform vec3 directionalLightIntesity;
 	uniform vec3 directionalLightDirection;
@@ -73,10 +76,16 @@ R""""(
 		float specularReflection = reflectionSign * pow(max (dot (normalDir, blinnDir), 0.0), specularAlpha);
 		vec3 specular = specularColor * directionalLightIntesity * specularReflection;
 
+		// calculate reflection	
+		vec3 reflectionDir = normalDir * (2.0 * dot(cameraDir, normalDir)) - cameraDir;
+		vec3 reflection = reflectionColor * vec3(texture(environmentMap, reflectionDir));
+
 		// add all contributions
+		//vec3 color = vec3(1.0, 0.0, 0.0);
+		//vec3 color = reflection;
 		//vec3 color = emissive + diffuse;
 		//vec3 color = emissive + specular;
-		vec3 color = (emissive + diffuse + specular) * vec3 (texture(texture0, uv));
+		vec3 color = reflection + (emissive + diffuse + specular) * vec3 (texture(texture0, uv));
 
 		pixelColor = vec4(color, 1.0);
 	}
@@ -88,11 +97,14 @@ const char* ndRenderShaderCache::m_directionalDiffuseShadowPixel =
 R""""(
 	#version 450 core
 
-	uniform sampler2D texture0;
-	uniform sampler2D shadowMapTexture;
+	layout(binding = 0) uniform sampler2D texture0;
+	layout(binding = 1) uniform sampler2D shadowMapTexture;
+	layout(binding = 2) uniform samplerCube environmentMap;
 
 	uniform vec3 diffuseColor;
 	uniform vec3 specularColor;
+	uniform vec3 reflectionColor;
+
 	uniform vec3 directionalLightAmbient;
 	uniform vec3 directionalLightIntesity;
 	uniform vec3 directionalLightDirection;
@@ -159,10 +171,14 @@ R""""(
 				color = vec3(0.0, 0.0, 0.0);
 			}
 		}
-
+		// calculate reflection	
+		vec3 reflectionDir = normalDir * (2.0 * dot(cameraDir, normalDir)) - cameraDir;
+		vec3 reflection = reflectionColor * vec3(texture(environmentMap, reflectionDir));
+		
 		// add all contributions
 		color = color + emissive;
 		color = color * vec3 (texture(texture0, uv));
+		color = color + reflection;
 		
 		pixelColor = vec4(color, 1.0);
 	}
