@@ -26,6 +26,12 @@ ndTransform::ndTransform(const ndMatrix& matrix)
 {
 }
 
+ndTransform::ndTransform(const ndQuaternion& rotation, const ndVector& position)
+	:m_position(position)
+	,m_rotation(rotation)
+{
+}
+
 ndRenderSceneNode::ndRenderSceneNode(const ndMatrix& matrix)
 	:ndContainersFreeListAlloc<ndRenderSceneNode>()
 	,m_matrix(matrix)
@@ -73,12 +79,21 @@ void ndRenderSceneNode::SetMatrix(const ndQuaternion& rotation, const ndVector& 
 void ndRenderSceneNode::SetTransform(const ndQuaternion& rotation, const ndVector& position)
 {
 	m_transform0 = m_transform1;
-	m_transform1.m_position = position;
-	m_transform1.m_rotation = rotation;
+	m_transform1 = ndTransform(rotation, position);
 	if (m_transform0.m_rotation.DotProduct(m_transform1.m_rotation).GetScalar() < ndFloat32(0.0f))
 	{
 		m_transform1.m_rotation = m_transform1.m_rotation.Scale(ndFloat32 (-1.0f));
 	}
+}
+
+ndTransform ndRenderSceneNode::GetTransform() const
+{
+	return m_transform1;
+}
+
+void ndRenderSceneNode::SetTransform(const ndTransform& transform)
+{
+	SetTransform(transform.m_rotation, transform.m_position);
 }
 
 void ndRenderSceneNode::InterpolateTransforms(ndFloat32 param)

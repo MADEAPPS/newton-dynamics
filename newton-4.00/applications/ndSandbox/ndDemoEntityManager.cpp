@@ -639,9 +639,10 @@ void ndDemoEntityManager::KeyCallback(ndInt32 key, ndInt32)
 	if (key == F1_key)
 	{
 		// reload the demo. 
-		const ndMatrix matrix(m_renderer->GetCamera()->GetMatrix());
+		const ndTransform transform(m_renderer->GetCamera()->GetTransform());
 		LoadDemo(m_lastCurrentScene);
-		m_renderer->GetCamera()->SetMatrix(matrix, matrix.m_posit);
+		m_renderer->GetCamera()->SetTransform(transform);
+		m_renderer->GetCamera()->SetTransform(transform);
 	}
 	else if (key == F10_key)
 	{

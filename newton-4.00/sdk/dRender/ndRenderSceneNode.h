@@ -22,6 +22,7 @@ class ndTransform
 	public:
 	ndTransform();
 	ndTransform(const ndMatrix& matrix);
+	ndTransform(const ndQuaternion& rotation, const ndVector& position);
 	
 	ndVector m_position;
 	ndQuaternion m_rotation;
@@ -40,7 +41,11 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 	virtual ndMatrix GetMatrix() const;
 	virtual void SetMatrix(const ndQuaternion& rotation, const ndVector& position);
 	virtual void SetTransform(const ndQuaternion& rotation, const ndVector& position);
+
 	void InterpolateTransforms(ndFloat32 param);
+
+	ndTransform GetTransform() const;
+	void SetTransform(const ndTransform& transform);
 
 	virtual void Render(const ndRender* const owner, ndFloat32 timeStep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const;
 
