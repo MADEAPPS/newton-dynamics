@@ -32,7 +32,8 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 	body->SetOmega(ndVector(0.0f, 2.0f, 0.0f, 0.0f));
 	body->SetMatrix(origin1);
 
-	AddPlanks(scene, origin1, 1.0f, 4);
+	AddPlanks(scene, origin1, 1.0f, 1);
+	//AddPlanks(scene, origin1, 1.0f, 4);
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 1, 2, 7);
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 4, 4, 4);
