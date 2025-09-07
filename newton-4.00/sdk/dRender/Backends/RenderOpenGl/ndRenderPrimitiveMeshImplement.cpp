@@ -361,17 +361,17 @@ void ndRenderPrimitiveMeshImplement::RenderSolidColor(const ndRender* const rend
 
 void ndRenderPrimitiveMeshImplement::RenderShadowSolidColor(const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	bool castShadow = true;
-	for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = m_segments.GetFirst(); node && castShadow; node = node->GetNext())
-	{
-		ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
-		castShadow = castShadow && segment.m_material.m_castShadows;
-	}
-	
-	if (!castShadow)
-	{
-		return;
-	}
+	//bool castShadow = true;
+	//for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = m_segments.GetFirst(); node && castShadow; node = node->GetNext())
+	//{
+	//	ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
+	//	castShadow = castShadow && segment.m_material.m_castShadows;
+	//}
+	//
+	//if (!castShadow)
+	//{
+	//	return;
+	//}
 	
 	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
 	
@@ -421,7 +421,7 @@ void ndRenderPrimitiveMeshImplement::RenderShadowSolidColor(const ndRender* cons
 	for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = m_segments.GetFirst(); node; node = node->GetNext())
 	{
 		ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
-		if (segment.m_material.m_castShadows)
+		//if (segment.m_material.m_castShadows)
 		{
 			const ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
 			const ndRenderTextureImageCommon* const image = (ndRenderTextureImageCommon*)*material->m_texture;

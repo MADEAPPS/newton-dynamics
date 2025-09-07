@@ -127,41 +127,42 @@ R""""(
 		float specularReflection = reflectionSign * pow(max (dot (normalDir, blinnDir), 0.0), specularAlpha);
 		vec3 specular = specularColor * directionalLightIntesity * specularReflection;
 
-		// add all contributions
-		//vec3 color = emissive + diffuse;
-		//vec3 color = emissive + specular;
-		vec3 color = (emissive + diffuse + specular) * vec3 (texture(texture0, uv));
+		vec3 color = specular + diffuse;
 
-		// claculate the shadow coeficent 
+		// calculate the shadow tile
 		int index = 4;
-		if (gl_FragCoord.z < shadowSlices.x)
-		{
-			index = 0;
-		}
-		else if (gl_FragCoord.z < shadowSlices.y)
-		{
-			index = 1;
-		}
-		else if (gl_FragCoord.z < shadowSlices.z)
-		{
-			index = 2;
-		}
-		else if (gl_FragCoord.z < shadowSlices.w)
+		if (gl_FragCoord.z < shadowSlices.w)
 		{
 			index = 3;
+			if (gl_FragCoord.z < shadowSlices.z)
+			{
+				index = 2;
+				if (gl_FragCoord.z < shadowSlices.y)
+				{
+					index = 1;
+					if (gl_FragCoord.z < shadowSlices.x)
+					{
+						index = 0;
+					}
+				}
+			}
 		}
 
 		if (index < 4)
 		{
 			vec4 pointInDepthMapSpace = directionaLightViewProjectionMatrix[index] * worldPosit;
 
-			pointInDepthMapSpace.z = clamp (pointInDepthMapSpace.z, 0.0f, 1.0f);
+			pointInDepthMapSpace.z = clamp (pointInDepthMapSpace.z, 0.0, 1.0);
 			float textDepth = texture(shadowMapTexture, vec2(pointInDepthMapSpace)).x;
 			if (textDepth < pointInDepthMapSpace.z)
 			{
-				color = color * 0.1f;
+				color = vec3(0.0, 0.0, 0.0);
 			}
 		}
+
+		// add all contributions
+		color = color + emissive;
+		color = color * vec3 (texture(texture0, uv));
 		
 		pixelColor = vec4(color, 1.0);
 	}

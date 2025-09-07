@@ -440,6 +440,7 @@ ndSharedPtr<ndBody> BuildFloorBox(ndDemoEntityManager* const scene, const ndMatr
 
 	ndRender* const render = *scene->GetRenderer();
 	ndRenderPrimitiveMeshMaterial material;
+	material.m_specular = ndVector::m_zero;
 	material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("marbleCheckBoard.png"));
 	//material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("blueCheckerboard.png"));
 

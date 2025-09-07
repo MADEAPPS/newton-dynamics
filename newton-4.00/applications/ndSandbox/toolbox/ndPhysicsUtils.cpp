@@ -271,9 +271,6 @@ void AddPlanks(ndDemoEntityManager* const scene, const ndMatrix& location, ndFlo
 		{
 			matrix.m_posit = location.m_posit + ndVector(((ndFloat32)i - 2) * 5.0f, 0.0f, ((ndFloat32)j - 2) * 5.0f, 0.0f);
 			ndSharedPtr<ndBody> body (AddBox(scene, matrix, mass, 4.0f, 0.25f, 3.0f));
-matrix.m_posit = ndVector::m_wOne;
-matrix.m_posit.m_y = 1.0f;
-			body->SetMatrix(matrix);
 		}
 	}
 }
