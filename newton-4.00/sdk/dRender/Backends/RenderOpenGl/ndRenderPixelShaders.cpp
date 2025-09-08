@@ -92,7 +92,6 @@ R""""(
 
 )"""";
 
-
 const char* ndRenderShaderCache::m_directionalDiffuseShadowPixel =
 R""""(
 	#version 450 core
@@ -185,3 +184,57 @@ R""""(
 
 )"""";
 
+const char* ndRenderShaderCache::m_directionalDiffuseTransparentPixel =
+R""""(
+	#version 450 core
+
+	layout(binding = 0) uniform sampler2D texture0;
+	layout(binding = 1) uniform samplerCube environmentMap;
+
+	uniform vec3 diffuseColor;
+	uniform vec3 specularColor;
+	uniform vec3 reflectionColor;
+
+	uniform vec3 directionalLightAmbient;
+	uniform vec3 directionalLightIntesity;
+	uniform vec3 directionalLightDirection;
+
+	uniform float opacity;
+	uniform float specularAlpha;
+
+	in vec3 posit;
+	in vec3 normal;
+	in vec2 uv;
+
+	out vec4 pixelColor;
+	
+	// implement a simple blinn model
+	void main()
+	{
+		vec3 normalDir = normalize (normal);
+
+		// calculate emisive, just a constant;
+		vec3 emissive = diffuseColor * directionalLightAmbient;
+
+		// calculate lambert diffuse component
+		float diffuseReflection = max (dot (normalDir, directionalLightDirection), 0.0);
+		vec3 diffuse = diffuseColor * directionalLightIntesity * diffuseReflection;
+
+		// calculate Blinn specular component
+		vec3 cameraDir = - normalize(posit);
+		vec3 blinnDir = normalize(cameraDir + directionalLightDirection);
+		float reflectionSign = (diffuseReflection >= 0.01) ? 1.0 : 0.0;
+		float specularReflection = reflectionSign * pow(max (dot (normalDir, blinnDir), 0.0), specularAlpha);
+		vec3 specular = specularColor * directionalLightIntesity * specularReflection;
+
+		// calculate reflection	
+		vec3 reflectionDir = normalDir * (2.0 * dot(cameraDir, normalDir)) - cameraDir;
+		vec3 reflection = reflectionColor * vec3(texture(environmentMap, reflectionDir));
+
+		// add all contributions
+		vec3 color = reflection + (emissive + diffuse + specular) * vec3 (texture(texture0, uv));
+
+		pixelColor = vec4(color, opacity);
+	}
+
+)"""";

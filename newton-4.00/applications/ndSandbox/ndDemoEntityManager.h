@@ -249,6 +249,7 @@ class ndDemoEntityManager : public ndClassAlloc
 	ndSharedPtr<ndRenderPass> m_colorRenderPass;
 	ndSharedPtr<ndRenderPass> m_shadowRenderPass;
 	ndSharedPtr<ndRenderPass> m_environmentRenderPass;
+	ndSharedPtr<ndRenderPass> m_transparentRenderPass;
 	ndSharedPtr<ndRenderTexture> m_environmentTexture;
 
 	ndPhysicsWorld* m_world;

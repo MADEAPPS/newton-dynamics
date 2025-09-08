@@ -35,6 +35,7 @@ class ndRenderShaderCache
 			GLuint m_shadowMaps;
 			GLuint m_diffuseEffect;
 			GLuint m_diffuseShadowEffect;
+			GLuint m_diffuseTransparentEffect;
 
 			//GLuint m_wireFrame;
 			//GLuint m_colorPoint;
@@ -60,6 +61,7 @@ class ndRenderShaderCache
 	static const char* m_shadowMapPixel;
 	static const char* m_directionalDiffusePixel;
 	static const char* m_directionalDiffuseShadowPixel;
+	static const char* m_directionalDiffuseTransparentPixel;
 
 	friend class ndRenderContext;
 };

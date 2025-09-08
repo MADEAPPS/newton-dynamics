@@ -8,6 +8,18 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
+#ifndef __ND_RENDER_PASS_COLOR_TRANSPARENCY_H__
+#define __ND_RENDER_PASS_COLOR_TRANSPARENCY_H__
 
+#include "ndRenderPass.h"
 
-void wglSwapIntervalEXT (void* const context);
+class ndRenderPassTransparency: public ndRenderPass
+{
+	public:
+	ndRenderPassTransparency(ndRender* const owner);
+	virtual ~ndRenderPassTransparency();
+
+	virtual void RenderScene(ndFloat32 timestep) override;
+};
+
+#endif

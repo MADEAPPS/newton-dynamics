@@ -41,49 +41,21 @@ bool ndRenderShaderCache::CreateAllEffects()
 	m_shadowMaps = CreateShaderEffect(m_shadowMapVertex, m_shadowMapPixel);
 	m_diffuseEffect = CreateShaderEffect(m_directionalDiffuseVertex, m_directionalDiffusePixel);
 	m_diffuseShadowEffect = CreateShaderEffect(m_directionalDiffuseShadowVertex, m_directionalDiffuseShadowPixel);
+	m_diffuseTransparentEffect = CreateShaderEffect(m_directionalDiffuseVertex, m_directionalDiffuseTransparentPixel);
 	
 	//m_wireFrame = CreateShaderEffect("WireFrame", "FlatShaded");
 	//m_flatShaded = CreateShaderEffect("FlatShaded", "FlatShaded");
 	//m_colorPoint = CreateShaderEffect("ColorPoint", "FlatShaded");
 	//m_zBufferDebug = CreateShaderEffect("zBufferDebug", "zBufferDebug");
 	//m_texturedDecal = CreateShaderEffect ("TextureDecal", "TextureDecal");
-	
 	//m_diffuseDebrisEffect = CreateShaderEffect("DirectionalDebriDiffuse", "DirectionalDebriDiffuse");
 	//m_skinningDiffuseEffect = CreateShaderEffect ("SkinningDirectionalDiffuse", "DirectionalDiffuse");
 	//m_diffuseIntanceEffect = CreateShaderEffect ("DirectionalDiffuseInstance", "DirectionalDiffuse");
 	//m_thickPoints = CreateShaderEffect("ThickPoint", "ThickPoint", "ThickPoint");
 	//m_spriteSpheres = CreateShaderEffect("DirectionalDiffuseSprite", "DirectionalDiffuseSprite", "DirectionalDiffuseSprite");
-	//
-	//// shadow programs
-	//m_shadowMaps = CreateShaderEffect("ShadowMap", "ShadowMap");
-	//m_diffuseShadowEffect = CreateShaderEffect("DirectionalDiffuseShadow", "DirectionalDiffuseShadow");
 
 	return true;
 }
-
-//void ndRenderShaderCache::LoadShaderCode (const char* const filename, char* const buffer)
-//{
-//	ndAssert(0);
-//	//size_t size;
-//	//FILE* file;
-//	//char fullPathName[2048];
-//	//
-//	//ndGetWorkingFileName (filename, fullPathName);
-//	//
-//	//file = fopen (fullPathName, "rb");
-//	//ndAssert (file);
-//	//fseek (file, 0, SEEK_END); 
-//	//
-//	//size_t error = 0;
-//	//size = size_t(ftell (file));
-//	//fseek (file, 0, SEEK_SET); 
-//	//error = fread (buffer, size_t(size), 1, file);
-//	//
-//	//ndAssert (error);
-//	//fclose (file);
-//	//buffer[size] = 0;
-//	//buffer[size + 1] = 0;
-//}
 
 GLuint ndRenderShaderCache::CreateShaderEffect (const char* const vertexShaderCode, const char* const pixelShaderCode, const char* const geometryShaderCode)
 {

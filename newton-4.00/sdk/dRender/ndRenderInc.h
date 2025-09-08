@@ -35,6 +35,7 @@
 #include <ndRenderTextureCache.h>
 #include <ndRenderPrimitiveMesh.h>
 #include <ndRenderPassEnvironment.h>
+#include <ndRenderPassTransparency.h>
 
 #endif 
 

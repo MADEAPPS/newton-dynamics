@@ -424,8 +424,8 @@ ndDemoEntityManager::ndDemoEntityManager()
 	,m_colorRenderPass(nullptr)
 	,m_shadowRenderPass(nullptr)
 	,m_environmentRenderPass(nullptr)
+	,m_transparentRenderPass(nullptr)
 	,m_environmentTexture(nullptr)
-
 	,m_world(nullptr)
 
 	,m_updateCameraContext(nullptr)
@@ -501,12 +501,14 @@ ndDemoEntityManager::ndDemoEntityManager()
 	m_menuRenderPass = ndSharedPtr<ndRenderPass>(new ndMenuRenderPass(this));
 	m_colorRenderPass = ndSharedPtr<ndRenderPass>(new ndRenderPassColor(*m_renderer));
 	m_shadowRenderPass = ndSharedPtr<ndRenderPass>(new ndRenderPassShadows(*m_renderer));
+	m_transparentRenderPass = ndSharedPtr<ndRenderPass>(new ndRenderPassTransparency(*m_renderer));
 	m_environmentRenderPass = ndSharedPtr<ndRenderPass>(new ndRenderPassEnvironment(*m_renderer, m_environmentTexture));
 
 	// add render passes in order of execution
 	m_renderer->AddRenderPass(m_shadowRenderPass);
 	m_renderer->AddRenderPass(m_colorRenderPass);
 	m_renderer->AddRenderPass(m_environmentRenderPass);
+	m_renderer->AddRenderPass(m_transparentRenderPass);
 	m_renderer->AddRenderPass(m_menuRenderPass);
 
 	// add a demo camera, and main directional light

@@ -25,14 +25,17 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 	
 	// make the matrix for this body
 	ndVector floor(FindFloor(*world, ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	ndMatrix matrix(ndGetIdentityMatrix());
+	ndMatrix matrix(ndYawMatrix (ndFloat32(30.0f) * ndDegreeToRad));
 	matrix.m_posit = floor;
 	matrix.m_posit.m_w = 1.0f;
 	matrix.m_posit.m_y += 2.0f;
 
-	// make a visual mesh
+	// make a triger volume
 	ndShapeInstance shape(new ndShapeBox(20.0f, 10.0f, 20.0f));
+
+	// make a tranparent visual mesh
 	ndRenderPrimitiveMeshMaterial material;
+	material.m_opacity = 0.5f;
 	material.m_texture = scene->GetRenderer()->GetTextureCache()->GetTexture(ndGetWorkingFileName("metal_30.png"));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateFromCollisionShape(*scene->GetRenderer(), &shape, material, ndRenderPrimitiveMesh::m_box));
 	ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(matrix));

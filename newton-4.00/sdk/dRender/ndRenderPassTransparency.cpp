@@ -13,34 +13,34 @@
 #include "ndRender.h"
 #include "ndRenderContext.h"
 #include "ndRenderSceneNode.h"
-#include "ndRenderPassColor.h"
+#include "ndRenderPassTransparency.h"
 
-ndRenderPassColor::ndRenderPassColor(ndRender* const owner)
+ndRenderPassTransparency::ndRenderPassTransparency(ndRender* const owner)
 	:ndRenderPass(owner)
 {
 }
 
-ndRenderPassColor::~ndRenderPassColor()
+ndRenderPassTransparency::~ndRenderPassTransparency()
 {
 }
 
-void ndRenderPassColor::RenderScene(ndFloat32 timestep)
+void ndRenderPassTransparency::RenderScene(ndFloat32 timestep)
 {
 	m_owner->m_context->SetCollorPassRenderStates();
 
-	// first render solid that do not has shadows
 	const ndMatrix globalMatrix(ndGetIdentityMatrix());
 	ndList<ndSharedPtr<ndRenderSceneNode>>& scene = m_owner->m_scene;
-	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = scene.GetFirst(); node; node = node->GetNext())
-	{
-		ndRenderSceneNode* const sceneNode = *node->GetInfo();
-		sceneNode->Render(sceneNode->m_owner, timestep, globalMatrix, m_solidColor);
-	}
 
-	// render all meshes that cast shadows
+	// here we can do a least two passes of depth peeling transparency, maybe three.
 	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = scene.GetFirst(); node; node = node->GetNext())
 	{
 		ndRenderSceneNode* const sceneNode = *node->GetInfo();
-		sceneNode->Render(sceneNode->m_owner, timestep, globalMatrix, m_shadowSolidColor);
+		sceneNode->Render(sceneNode->m_owner, timestep, globalMatrix, m_transparencyBackface);
+	}
+	
+	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = scene.GetFirst(); node; node = node->GetNext())
+	{
+		ndRenderSceneNode* const sceneNode = *node->GetInfo();
+		sceneNode->Render(sceneNode->m_owner, timestep, globalMatrix, m_transparencyFrontface);
 	}
 }

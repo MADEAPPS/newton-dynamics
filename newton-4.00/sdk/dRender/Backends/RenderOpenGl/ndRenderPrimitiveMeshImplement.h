@@ -38,6 +38,7 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	void RenderShadowMap(const ndRender* const render, const ndMatrix& lightMatrix) const;
 	void RenderSolidColor(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
 	void RenderShadowSolidColor(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
+	void RenderTransparency(const ndRender* const render, const ndMatrix& modelViewMatrix, bool backface) const;
 
 	const ndRenderContext* m_context;
 	ndList<ndRenderPrimitiveMeshSegment> m_segments;
@@ -72,8 +73,15 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 		GLint m_directionLightViewProjectionMatrixShadow;
 	};
 
+	struct TransparentColorBlock : public SolidColorBlock
+	{
+		GLint m_opacity;
+	};
+
+
 	SolidColorBlock m_solidColorBlock;
 	SolidShadowColorBlock m_solidShadowColorBlock;
+	TransparentColorBlock m_transparencyColorBlock;
 };
 
 #endif

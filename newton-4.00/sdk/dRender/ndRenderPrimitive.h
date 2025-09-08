@@ -19,8 +19,9 @@ enum ndRenderPassMode
 {
 	m_shadowMap,
 	m_solidColor,
-	m_transparency,
 	m_shadowSolidColor,
+	m_transparencyBackface,
+	m_transparencyFrontface,
 };
 
 class ndRenderPrimitive : public ndContainersFreeListAlloc<ndRenderPrimitive>
