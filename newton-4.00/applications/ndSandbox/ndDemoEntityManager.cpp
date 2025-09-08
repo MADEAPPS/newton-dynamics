@@ -23,8 +23,8 @@
 #include "ndHighResolutionTimer.h"
 
 //#define DEFAULT_SCENE	0		// basic rigidbody
-#define DEFAULT_SCENE	1		// basic friction
-//#define DEFAULT_SCENE	1		// Gpu basic rigidbody
+//#define DEFAULT_SCENE	1		// basic friction
+#define DEFAULT_SCENE	2		// simple sliding static ground
 //#define DEFAULT_SCENE	3		// basic compound shapes
 //#define DEFAULT_SCENE	4		// conservation of momentum 
 //#define DEFAULT_SCENE	5		// basic Stacks
@@ -99,14 +99,14 @@
 
 void ndBasicFriction(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
+void ndKinematicMovingGround(ndDemoEntityManager* const scene);
 
 ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
 {
 	{ "basic rigidbody", ndBasicRigidBody},
 	{ "basic friction", ndBasicFriction},
+	{ "slipery ground", ndKinematicMovingGround},
 #if 0
-	{ "basic gpu rigidbody", ndBasicGpuRigidBody},
-	{ "basic friction ramp", ndBasicFrictionRamp},
 	{ "basic compound shapes", ndBasicCompoundShapeDemo},
 	{ "basic conservation of momentum", ndBasicAngularMomentum},
 	{ "basic stack", ndBasicStacks},

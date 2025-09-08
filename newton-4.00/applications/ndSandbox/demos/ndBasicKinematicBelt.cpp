@@ -10,16 +10,12 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndSkyBox.h"
-#include "ndDemoMesh.h"
 #include "ndDemoCamera.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
-#include "ndDemoInstanceEntity.h"
-
 
 class ContactNotify : public ndContactNotify
 {
@@ -35,7 +31,6 @@ class ContactNotify : public ndContactNotify
 		return (!disable);
 	}
 };
-
 
 class SimpleConveyorFloor : public ndModel
 {
@@ -143,7 +138,7 @@ class CBasicBodyModelNotify : public ndModelNotify
 	}
 };
 
-void ndBasicContactProperties(ndDemoEntityManager* const scene)
+void ndKinematicMovingGround(ndDemoEntityManager* const scene)
 {
 	constexpr ndFloat32 groundHeight = 0.f;
 
@@ -159,8 +154,7 @@ void ndBasicContactProperties(ndDemoEntityManager* const scene)
 	ndMatrix xform = ndGetIdentityMatrix();
 
 	ndMatrix groundXF;
-	//ndBody* groundBody = 0;
-	if (1) // flat floor and walls
+	// flat floor and walls
 	{
 		ndFloat32 angle = 0.f / 180.f * float(ndPi);
 		ndQuaternion q(ndVector(0.f, 0.f, 1.f, 0.f), angle);
@@ -168,16 +162,13 @@ void ndBasicContactProperties(ndDemoEntityManager* const scene)
 
 		groundXF.m_posit = origin + ndVector(0.f, -.5f + groundHeight, 0.f, 0.f);
 
-		//ndFloat32 size = 100;
-		//ndBodyDynamic* bodyFloor = BuildBox(world, groundXF, 0.f, ndVector(size * 2.f, 1.0f, size * 2.f, 0.0f));
-		//ndBodyKinematic* bodyFloor = BuildKinematicBox(world, groundXF, 10000.f, ndVector(size * 2.f, 1.0f, size * 2.f, 0.0f));
-		ndSharedPtr<ndBody> bodyFloor (BuildFloorBox(scene, groundXF, true));
-		//ndSharedPtr<ndBody> bodyFloor(BuildFlatPlane(scene, true, true));
-		//ndSharedPtr<ndBody> bodyFloor(BuildFlatPlane(scene, true));
+		//ndSharedPtr<ndBody> bodyFloor (BuildFloorBox(scene, groundXF, true));
+		// add a kinematic body and set some velocity
+		ndSharedPtr<ndBody> bodyFloor (BuildFloorBox(scene, groundXF, "marbleCheckBoard.png", 0.1f, true));
 
-		// does not work; dynamic box stops moving and starts wobbling after 10 sec (newton bug?)
 		bodyFloor->SetVelocity(ndVector(0.f, 0.f, -1.0f, 0.f)); 
 
+		// build a fence around the limits
 		ndFloat32 size = 100;
 		ndMatrix xf = groundXF;
 		xf.m_posit = origin + xf.RotateVector(ndVector(size, 0.f, 0.f, 0.f)); 
@@ -193,18 +184,16 @@ void ndBasicContactProperties(ndDemoEntityManager* const scene)
 		AddBox(scene, xf, 0.0f, size * 1.98f, 5.0f, 1.0f);
 	}
 
-	if (1) // dynamic box, stops and starts wobbling
+	// add dynamic box, 
 	{
 		xform.m_posit = origin + ndVector(7.0f, 10.0f, 0.0f, 0.0f);
-		//ndBodyDynamic* box = BuildBox(world, xform, 10.f, ndVector(5.f, 0.5f, 1.0f, 0.f));
 		ndSharedPtr<ndBody> box (AddBox(scene, xform, 10.0f, 5.0f, 0.5f, 1.0f));
 		box->SetMatrix(xform);
 	}
 
-	if (1) // another dynamic box, stops at the same time
+	if (1) // another dynamic box
 	{
 		xform.m_posit = origin + ndVector(0.0f, 7.0f, 0.0f, 0.0f);
-		//ndBodyDynamic* box = BuildBox(world, xform, 10.f, ndVector(1.f, 0.5f, 1.0f, 0.f));
 		ndSharedPtr<ndBody> box (AddBox(scene, xform, 10.0f, 5.0f, 0.5f, 1.0f));
 		box->SetMatrix(xform);
 
