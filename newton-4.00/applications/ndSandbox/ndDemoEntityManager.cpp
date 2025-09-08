@@ -966,6 +966,10 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("show joints debug info", &m_showJointDebugInfo);
 			ImGui::Checkbox("show models debug info", &m_showModelsDebugInfo);
 			ImGui::Checkbox("show colliding faces", &m_showCollidingFaces);
+
+			m_colorRenderPass->MakeActive(!m_hideVisualMeshes);
+			m_shadowRenderPass->MakeActive(!m_hideVisualMeshes);
+			m_transparentRenderPass->MakeActive(!m_hideVisualMeshes);
 	
 			ImGui::EndMenu();
 	

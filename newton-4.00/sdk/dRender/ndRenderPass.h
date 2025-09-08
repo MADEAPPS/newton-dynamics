@@ -21,11 +21,14 @@ class ndRenderPass: public ndClassAlloc
 	ndRenderPass(ndRender* const owner);
 	virtual ~ndRenderPass();
 
+	void MakeActive(bool mode);
+
 	virtual void ResetScene() {}
 	virtual void RenderScene(ndFloat32 timestep) = 0;
 
 	protected:
 	ndRender* m_owner;
+	bool m_active;
 
 	friend class ndRender;
 };

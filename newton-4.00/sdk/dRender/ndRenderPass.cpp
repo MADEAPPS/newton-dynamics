@@ -16,9 +16,15 @@
 ndRenderPass::ndRenderPass(ndRender* const owner)
 	:ndClassAlloc()
 	,m_owner(owner)
+	,m_active(true)
 {
 }
 
 ndRenderPass::~ndRenderPass()
 {
+}
+
+void ndRenderPass::MakeActive(bool mode)
+{
+	m_active = mode;
 }

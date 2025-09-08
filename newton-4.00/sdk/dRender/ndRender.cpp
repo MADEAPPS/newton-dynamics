@@ -179,18 +179,15 @@ void ndRender::Render(ndFloat32 timestep)
 		ndInt32 display_h = m_context->GetHeight();
 		m_camera->SetViewMatrix(display_w, display_h);
 
-		if (m_renderPasses.GetCount())
+		for (ndList<ndSharedPtr<ndRenderPass>>::ndNode* node = m_renderPasses.GetFirst(); node; node = node->GetNext())
 		{
-			for (ndList<ndSharedPtr<ndRenderPass>>::ndNode* node = m_renderPasses.GetFirst(); node; node = node->GetNext())
+			const ndSharedPtr<ndRenderPass>& pass = node->GetInfo();
+			if (pass->m_active)
 			{
-				const ndSharedPtr<ndRenderPass>& pass = node->GetInfo();
 				pass->RenderScene(timestep);
 			}
 		}
-		else
-		{
-			m_context->EndFrame();
-		}
+		m_context->EndFrame();
 	}
 	Present();
 }
