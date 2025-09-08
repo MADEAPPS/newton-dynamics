@@ -13,6 +13,8 @@
 #include "ndPhysicsWorld.h"
 #include "ndArchimedesBuoyancyVolume.h"
 
+#define FLUID_VISCOSITY	ndFloat32 (0.995f)
+
 ndArchimedesBuoyancyVolume::ndArchimedesBuoyancyVolume()
 	:ndBodyTriggerVolume()
 	,m_plane(ndVector::m_zero)
@@ -78,11 +80,11 @@ void ndArchimedesBuoyancyVolume::OnTrigger(ndBodyKinematic* const kinBody, ndFlo
 		ndFloat32 volume = collision.CalculateBuoyancyCenterOfPresure (centerOfPreasure, matrix, m_plane);
 		if (volume > 0.0f)
 		{
-			// if some part of the shape si under water, calculate the buoyancy force base on 
-			// Archimedes's buoyancy principle, which is the buoyancy force is equal to the 
-			// weight of the fluid displaced by the volume under water. 
-			//ndVector cog(ndVector::m_zero);
-			const ndFloat32 viscousDrag = 0.99f;
+			// if some part of the shape is under water, 
+			// calculate the buoyancy force base on Archimedes's buoyancy principle, 
+			// which is the buoyancy force is equal to the weight of the fluid 
+			// displaced by the volume under water. 
+			const ndFloat32 viscousDrag = FLUID_VISCOSITY;
 
 			ndShapeMaterial material(collision.GetMaterial());
 			body->GetCollisionShape().SetMaterial(material);
@@ -107,14 +109,6 @@ void ndArchimedesBuoyancyVolume::OnTrigger(ndBodyKinematic* const kinBody, ndFlo
 			veloc = veloc.Scale(viscousDrag);
 			body->SetOmega(omega);
 			body->SetVelocity(veloc);
-				
-			//// test delete bodies inside trigger
-			//collisionMaterial.m_userParam[1].m_float += timestep;
-			//NewtonCollisionSetMaterial(collision, &collisionMaterial);
-			//if (collisionMaterial.m_userParam[1].m_float >= 30.0f) {
-			//	// delete body after 2 minutes inside the pool
-			//	NewtonDestroyBody(visitor);
-			//}
 		}
 	}
 }

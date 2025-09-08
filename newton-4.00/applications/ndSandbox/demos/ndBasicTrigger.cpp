@@ -50,37 +50,37 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 	scene->AddEntity(entity);
 }
 
-//static void AddBox(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 density, ndFloat32 mass)
-//{
-//	ndSharedPtr<ndBody> body = AddBox(scene, origin, mass, 1.0f, 1.0f, 1.0f);
-//	ndShapeMaterial material;
-//	material.m_userParam[ndDemoContactCallback::m_density].m_floatData = density;
-//	body->GetAsBodyKinematic()->GetCollisionShape().SetMaterial(material);
-//}
-//
-//static void AddSphere1(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 density, ndFloat32 mass)
-//{
-//	ndSharedPtr<ndBody> body = AddSphere(scene, origin, mass, 0.5f);
-//	ndShapeMaterial material;
-//	material.m_userParam[ndDemoContactCallback::m_density].m_floatData = density;
-//	body->GetAsBodyKinematic()->GetCollisionShape().SetMaterial(material);
-//}
-//
-//static void AddCapsule(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 density, ndFloat32 mass)
-//{
-//	ndSharedPtr<ndBody> body = AddCapsule(scene, origin, mass, 0.5f, 0.5f, 1.0f);
-//	ndShapeMaterial material;
-//	material.m_userParam[ndDemoContactCallback::m_density].m_floatData = density;
-//	body->GetAsBodyKinematic()->GetCollisionShape().SetMaterial(material);
-//}
-//
-//static void AddConvexHull(ndDemoEntityManager* const scene, const ndMatrix& origin, const ndInt32 segments, ndFloat32 radius, ndFloat32 high, ndFloat32 density, ndFloat32 mass)
-//{
-//	ndSharedPtr<ndBody> body = AddConvexHull(scene, origin, mass, radius, high, segments);
-//	ndShapeMaterial material;
-//	material.m_userParam[ndDemoContactCallback::m_density].m_floatData = density;
-//	body->GetAsBodyKinematic()->GetCollisionShape().SetMaterial(material);
-//}
+static void AddBox(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 density, ndFloat32 mass)
+{
+	ndSharedPtr<ndBody> body = AddBox(scene, origin, mass, 1.0f, 1.0f, 1.0f);
+	ndShapeMaterial material;
+	material.m_userParam[ndDemoContactCallback::m_density].m_floatData = density;
+	body->GetAsBodyKinematic()->GetCollisionShape().SetMaterial(material);
+}
+
+static void AddSphere1(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 density, ndFloat32 mass)
+{
+	ndSharedPtr<ndBody> body = AddSphere(scene, origin, mass, 0.5f);
+	ndShapeMaterial material;
+	material.m_userParam[ndDemoContactCallback::m_density].m_floatData = density;
+	body->GetAsBodyKinematic()->GetCollisionShape().SetMaterial(material);
+}
+
+static void AddCapsule(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 density, ndFloat32 mass)
+{
+	ndSharedPtr<ndBody> body = AddCapsule(scene, origin, mass, 0.5f, 0.5f, 1.0f);
+	ndShapeMaterial material;
+	material.m_userParam[ndDemoContactCallback::m_density].m_floatData = density;
+	body->GetAsBodyKinematic()->GetCollisionShape().SetMaterial(material);
+}
+
+static void AddConvexHull(ndDemoEntityManager* const scene, const ndMatrix& origin, const ndInt32 segments, ndFloat32 radius, ndFloat32 high, ndFloat32 density, ndFloat32 mass)
+{
+	ndSharedPtr<ndBody> body = AddConvexHull(scene, origin, mass, radius, high, segments);
+	ndShapeMaterial material;
+	material.m_userParam[ndDemoContactCallback::m_density].m_floatData = density;
+	body->GetAsBodyKinematic()->GetCollisionShape().SetMaterial(material);
+}
 
 void ndBasicTrigger (ndDemoEntityManager* const scene)
 {
@@ -90,26 +90,26 @@ void ndBasicTrigger (ndDemoEntityManager* const scene)
 	// add a trigger and make trasparent
 	AddTrigger(scene);
 
-	//class PlaceMatrix : public ndMatrix
-	//{
-	//	public:
-	//	PlaceMatrix(ndFloat32 x, ndFloat32 y, ndFloat32 z)
-	//		:ndMatrix(ndGetIdentityMatrix())
-	//	{
-	//		m_posit.m_x = x;
-	//		m_posit.m_y = y;
-	//		m_posit.m_z = z;
-	//	}
-	//};
-	//
-	//AddBox(scene, PlaceMatrix(0.0f, 20.0f, -3.0f), 0.6f, 10.0f);
-	//AddSphere1(scene, PlaceMatrix(0.0f, 5.0f, 0.0f), 0.5f, 10.0f);
-	//AddCapsule(scene, PlaceMatrix(0.0f, 5.0f, 3.0f), 0.7f, 10.0f);
-	//AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f, -2.0f), 7, 1.0f, 1.5f, 0.8f, 10.0f);
-	//AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f,  2.0f), 21, 1.0f, 1.5f, 0.7f, 10.0f);
-	//AddConvexHull(scene, PlaceMatrix( 2.0f, 5.0f,  3.0f), 210, 1.0f, 1.5f, 0.9f, 10.0f);
+	class PlaceMatrix : public ndMatrix
+	{
+		public:
+		PlaceMatrix(ndFloat32 x, ndFloat32 y, ndFloat32 z)
+			:ndMatrix(ndGetIdentityMatrix())
+		{
+			m_posit.m_x = x;
+			m_posit.m_y = y;
+			m_posit.m_z = z;
+		}
+	};
+	
+	AddBox(scene, PlaceMatrix(0.0f, 20.0f, -3.0f), 0.6f, 10.0f);
+	AddSphere1(scene, PlaceMatrix(0.0f, 5.0f, 0.0f), 0.5f, 10.0f);
+	AddCapsule(scene, PlaceMatrix(0.0f, 5.0f, 3.0f), 0.7f, 10.0f);
+	AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f, -2.0f), 7, 1.0f, 1.5f, 0.8f, 10.0f);
+	AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f,  2.0f), 21, 1.0f, 1.5f, 0.7f, 10.0f);
+	AddConvexHull(scene, PlaceMatrix( 2.0f, 5.0f,  3.0f), 210, 1.0f, 1.5f, 0.9f, 10.0f);
 
 	ndQuaternion rot;
-	ndVector origin(-40.0f, 5.0f, 0.0f, 1.0f);
+	ndVector origin(-30.0f, 10.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
