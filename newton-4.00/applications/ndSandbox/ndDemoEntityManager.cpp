@@ -99,13 +99,13 @@
 
 void ndBasicFriction(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
-void ndKinematicMovingGround(ndDemoEntityManager* const scene);
+void ndKinematicGroundPlatform(ndDemoEntityManager* const scene);
 
 ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
 {
 	{ "basic rigidbody", ndBasicRigidBody},
 	{ "basic friction", ndBasicFriction},
-	{ "slipery ground", ndKinematicMovingGround},
+	{ "slipery ground", ndKinematicGroundPlatform},
 #if 0
 	{ "basic compound shapes", ndBasicCompoundShapeDemo},
 	{ "basic conservation of momentum", ndBasicAngularMomentum},

@@ -138,7 +138,7 @@ class CBasicBodyModelNotify : public ndModelNotify
 	}
 };
 
-void ndKinematicMovingGround(ndDemoEntityManager* const scene)
+void ndKinematicGroundPlatform(ndDemoEntityManager* const scene)
 {
 	constexpr ndFloat32 groundHeight = 0.f;
 
