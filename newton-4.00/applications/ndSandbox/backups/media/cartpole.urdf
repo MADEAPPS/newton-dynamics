@@ -1,0 +1,54 @@
+<?xml version="1.0" ?>
+<robot name="robot_model">
+    <material name="material_0">
+        <color rgba="1.0 1.0 1.0 1.0" />
+        <texture filename="wood_0.png" />
+    </material>
+    <link name="base_link">
+        <visual>
+            <geometry>
+                <box size="0.25 0.125 0.15" />
+            </geometry>
+            <origin rpy="1.5708 0 0" xyz="0 0 0" />
+            <material name="material_0" />
+        </visual>
+        <collision>
+            <geometry>
+                <box size="0.25 0.125 0.15" />
+            </geometry>
+            <origin rpy="1.5708 -0 0" xyz="0 0 0" />
+        </collision>
+        <inertial>
+            <origin rpy="0 0 0" xyz="0 0 0" />
+            <mass value="5" />
+            <inertia xx="0.0158854" xy="0" xz="0" yy="0.0354167" yz="0" zz="0.0325521" />
+        </inertial>
+    </link>
+    <link name="pole_link">
+        <visual>
+            <geometry>
+                <cylinder length="0.5" radius="0.05" />
+                <newton replaceWith="capsule" />
+            </geometry>
+            <origin rpy="3.14159 0.0 3.14159" xyz="0.0 0.0 0.2" />
+            <material name="material_0" />
+        </visual>
+        <collision>
+            <geometry>
+                <cylinder length="0.5" radius="0.05" />
+                <newton replaceWith="capsule" />
+            </geometry>
+            <origin rpy="3.14159 0.0 3.14159" xyz="0.0 0.0 0.2" />
+        </collision>
+        <inertial>
+            <origin rpy="0 0 0" xyz="0.0 0.0 0.0" />
+            <mass value="10" />
+            <inertia xx="0.2" xy="0.0" xz="0" yy="0.02" yz="0.0" zz="0.2" />
+        </inertial>
+    </link>
+    <joint name="pole_link_to_base_link" type="continuous">
+        <parent link="base_link" />
+        <child link="pole_link" />
+        <origin rpy="0.0 0.0 1.5708" xyz="0 0.0 0.0625" />
+    </joint>
+</robot>
