@@ -57,16 +57,15 @@ class ndPhysicsWorld: public ndWorld
 	public:
 	D_CLASS_REFLECTION(ndPhysicsWorld, ndWorld)
 
-	class ndDefferentDeleteEntities : public ndArray<ndDemoEntity*>
+	class ndDeffereDeadBodies : public ndArray<ndBody*>
 	{
 		public:
-		ndDefferentDeleteEntities(ndDemoEntityManager* const manager);
+		ndDeffereDeadBodies();
 
-		void Update();
-		void RemoveEntity(ndDemoEntity* const entity);
+		void RemovePendingBodies();
+		void RemoveBody(ndBody* const body);
 
-		ndDemoEntityManager* m_manager;
-		std::thread::id m_renderThreadId;
+		ndPhysicsWorld* m_owner;
 	};
 
 	ndPhysicsWorld(ndDemoEntityManager* const manager);
@@ -75,10 +74,10 @@ class ndPhysicsWorld: public ndWorld
 
 	void AdvanceTime(ndFloat32 timestep);
 	ndDemoEntityManager* GetManager() const;
-	void RemoveEntity(ndDemoEntity* const entity);
 
 	void NormalUpdates();
 	void AccelerateUpdates();
+	void DefferedRemoveBody(ndBody* const body);
 
 	private:
 	void PreUpdate(ndFloat32 timestep) override;
@@ -86,13 +85,15 @@ class ndPhysicsWorld: public ndWorld
 	void OnSubStepPostUpdate(ndFloat32 timestep) override;
 
 	void RemoveDeadBodies();
+	void RemoveDeadEntities();
 
 	ndDemoEntityManager* m_manager;
 	ndFloat32 m_timeAccumulator;
 	ndFloat32 m_interplationParameter;
 	ndSpinLock m_lock;
 
-	ndDefferentDeleteEntities m_deadEntities;
+	ndDeffereDeadBodies m_deadBodies;
+	ndList<ndSharedPtr<ndRenderSceneNode>> m_defferedDeadEntities;
 	bool m_acceleratedUpdate;
 };
 

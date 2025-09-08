@@ -106,6 +106,7 @@ void ndBasicFriction (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene, ndGetIdentityMatrix(), "marbleCheckBoard.png", 0.1f, true);
+	//BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true);
 	BuildFrictionRamp(scene);
 
 	ndMatrix camMatrix(ndRollMatrix(10.0f * ndDegreeToRad) *  ndYawMatrix(20.0f * ndDegreeToRad));

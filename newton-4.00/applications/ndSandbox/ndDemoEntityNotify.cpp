@@ -10,6 +10,7 @@
 */
 
 #include "ndSandboxStdafx.h"
+#include "ndPhysicsWorld.h"
 #include "ndDemoEntityNotify.h"
 
 ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, const ndSharedPtr<ndRenderSceneNode>& entity, ndBodyKinematic* const parentBody, ndFloat32 gravity)
@@ -42,19 +43,19 @@ void ndDemoEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
 		m_transform.m_rotation = body->GetRotation();
 	}
 
-	//if (!CheckInWorld(matrix))
-	//{
-	//	RemoveBody();
-	//}
+	if (!CheckInWorld(matrix))
+	{
+		RemoveBody();
+	}
 }
 
-//void ndDemoEntityNotify::RemoveBody()
-//{
-//	// check world bounds
-//	ndBody* const body = GetBody();
-//	ndPhysicsWorld* const world = m_manager->GetWorld();
-//	world->RemoveBody(body);
-//}
+void ndDemoEntityNotify::RemoveBody()
+{
+	// check world bounds
+	ndBody* const body = GetBody();
+	ndPhysicsWorld* const world = m_manager->GetWorld();
+	world->DefferedRemoveBody(body);
+}
 
 ndBindingRagdollEntityNotify::ndBindingRagdollEntityNotify(ndDemoEntityManager* const manager, const ndSharedPtr<ndRenderSceneNode>& entity, ndBodyDynamic* const parentBody, ndFloat32 capSpeed)
 	:ndDemoEntityNotify(manager, entity, parentBody)
@@ -104,10 +105,10 @@ void ndBindingRagdollEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
 		m_entity->SetMatrix(rot, localMatrix.m_posit);
 	}
 
-	//if (!CheckInWorld(matrix))
-	//{
-	//	RemoveBody();
-	//}
+	if (!CheckInWorld(matrix))
+	{
+		RemoveBody();
+	}
 }
 
 void ndBindingRagdollEntityNotify::OnApplyExternalForce(ndInt32 thread, ndFloat32 timestep)

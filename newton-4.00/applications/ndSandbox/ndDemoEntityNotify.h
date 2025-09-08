@@ -28,15 +28,12 @@ class ndDemoEntityNotify : public ndModelBodyNotify
 
 	virtual ~ndDemoEntityNotify();
 
-	void* GetUserData() const
+	ndSharedPtr<ndRenderSceneNode> GetUserData() const
 	{
-		ndAssert(0);
-		return nullptr;
-		//const ndDemoEntity* const ent = *m_entity;
-		//return (void*)ent;
+		return m_entity;
 	}
 
-	//virtual void OnObjectPick() const;
+	void RemoveBody();
 	virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix);
 
 	ndDemoEntityManager* m_manager;
@@ -56,6 +53,4 @@ class ndBindingRagdollEntityNotify : public ndDemoEntityNotify
 	ndMatrix m_bindMatrix;
 	ndFloat32 m_capSpeed;
 };
-
-
 #endif

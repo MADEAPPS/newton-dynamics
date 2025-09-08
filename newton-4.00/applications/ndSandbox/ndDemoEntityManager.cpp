@@ -23,8 +23,8 @@
 #include "ndHighResolutionTimer.h"
 
 //#define DEFAULT_SCENE	0		// basic rigidbody
-//#define DEFAULT_SCENE	1		// basic friction
-#define DEFAULT_SCENE	2		// simple sliding static ground
+#define DEFAULT_SCENE	1		// basic friction
+//#define DEFAULT_SCENE	2		// simple sliding static ground
 //#define DEFAULT_SCENE	3		// basic compound shapes
 //#define DEFAULT_SCENE	4		// conservation of momentum 
 //#define DEFAULT_SCENE	5		// basic Stacks

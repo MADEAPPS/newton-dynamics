@@ -29,41 +29,56 @@ ndDemoContactCallback::~ndDemoContactCallback()
 {
 }
 
-ndPhysicsWorld::ndDefferentDeleteEntities::ndDefferentDeleteEntities(ndDemoEntityManager* const manager)
-	:ndArray<ndDemoEntity*>()
-	,m_manager(manager)
-	,m_renderThreadId(std::this_thread::get_id())
+ndPhysicsWorld::ndDeffereDeadBodies::ndDeffereDeadBodies()
+	:ndArray<ndBody*>()
+	,m_owner(nullptr)
 {
 }
 
-void ndPhysicsWorld::ndDefferentDeleteEntities::Update()
+void ndPhysicsWorld::ndDeffereDeadBodies::RemovePendingBodies()
 {
+	if (!GetCount())
+	{
+		return;
+	}
+
+	ndTree<ndInt32, ndBodyKinematic*> filter;
+
 	for (ndInt32 i = 0; i < GetCount(); ++i)
 	{
-		RemoveEntity((*this)[i]);
+		ndBodyKinematic* const body = (*this)[i]->GetAsBodyKinematic();
+		if (body->GetInvMass() > ndFloat32(0.0f))
+		{
+			const ndBodyKinematic::ndJointList& joints = body->GetJointList();
+			for (ndBodyKinematic::ndJointList::ndNode* jointNode = joints.GetFirst(); jointNode; jointNode = jointNode->GetNext())
+			{
+				ndJointBilateralConstraint* const joint = jointNode->GetInfo();
+				ndBodyKinematic* const body1 = (joint->GetBody0() == body) ? joint->GetBody1() : joint->GetBody0();
+				ndTree<ndInt32, ndBodyKinematic*>::ndNode* const deadNode = filter.Insert(0, body1);
+				if (deadNode)
+				{
+					ndAssert(0);
+					PushBack(body1);
+				}
+			}
+		}
 	}
+		
+	for (ndInt32 i = ndInt32 (GetCount()) - 1; i >= 0 ; --i)
+	{
+		ndBodyKinematic* const body = (*this)[i]->GetAsBodyKinematic();
+		ndDemoEntityNotify* const notification = (ndDemoEntityNotify*)body->GetNotifyCallback();
+		m_owner->m_defferedDeadEntities.Append(notification->GetUserData());
+		m_owner->RemoveBody(body);
+	}
+
 	SetCount(0);
 }
 
-//void ndPhysicsWorld::ndDefferentDeleteEntities::RemoveEntity(ndDemoEntity* const entity)
-void ndPhysicsWorld::ndDefferentDeleteEntities::RemoveEntity(ndDemoEntity* const)
+void ndPhysicsWorld::ndDeffereDeadBodies::RemoveBody(ndBody* const body)
 {
-	ndAssert(0);
-	//ndAssert(entity->m_rootNode);
-	//if (m_renderThreadId == std::this_thread::get_id())
-	//{
-	//	m_manager->RemoveEntity(entity);
-	//	delete entity;
-	//}
-	//else
-	//{
-	//	ndScopeSpinLock lock(entity->m_lock);
-	//	if (!entity->m_isDead)
-	//	{
-	//		entity->m_isDead = true;
-	//		PushBack(entity);
-	//	}
-	//}
+	ndScopeSpinLock Lock(m_owner->m_lock);
+	PushBack(body);
 }
 
 ndPhysicsWorld::ndPhysicsWorld(ndDemoEntityManager* const manager)
@@ -71,10 +86,12 @@ ndPhysicsWorld::ndPhysicsWorld(ndDemoEntityManager* const manager)
 	,m_manager(manager)
 	,m_timeAccumulator(0.0f)
 	,m_interplationParameter(0.0f)
-	,m_deadEntities(manager)
+	,m_deadBodies()
+	,m_defferedDeadEntities()
 	,m_acceleratedUpdate(false)
 {
 	ClearCache();
+	m_deadBodies.m_owner = this;
 	SetContactNotify(new ndDemoContactCallback);
 }
 
@@ -88,14 +105,6 @@ void ndPhysicsWorld::CleanUp()
 	ndWorld::CleanUp();
 }
 
-//void ndPhysicsWorld::RemoveEntity(ndDemoEntity* const entity)
-void ndPhysicsWorld::RemoveEntity(ndDemoEntity* const)
-{
-	ndAssert(0);
-	//ndAssert(entity->m_rootNode);
-	//m_deadEntities.RemoveEntity(entity);
-}
-
 ndDemoEntityManager* ndPhysicsWorld::GetManager() const
 {
 	return m_manager;
@@ -104,103 +113,6 @@ ndDemoEntityManager* ndPhysicsWorld::GetManager() const
 void ndPhysicsWorld::PreUpdate(ndFloat32 timestep)
 {
 	ndWorld::PreUpdate(timestep);
-}
-
-void ndPhysicsWorld::RemoveDeadBodies()
-{
-	const ndBodyListView& bodyList = GetBodyList();
-	ndTree<ndInt32, ndBodyKinematic*> deadBodies;
-	for (ndBodyListView::ndNode* node = bodyList.GetFirst(); node; )
-	{
-		ndBodyKinematic* const body = node->GetInfo()->GetAsBodyKinematic();
-		node = node->GetNext();
-
-		const ndMatrix matrix = body->GetMatrix();
-		if (matrix.m_posit.m_y < -100.0f)
-		{
-			deadBodies.Insert(0, body);
-		}
-	}
-
-	while (deadBodies.GetCount())
-	{
-		ndTree<ndInt32, ndBodyKinematic*>::ndNode* const node = deadBodies.GetRoot();
-		if (node->GetInfo())
-		{
-			ndBodyKinematic* const body = node->GetKey();
-			RemoveBody(body);
-			deadBodies.Remove(node);
-		}
-		else
-		{
-			ndTree<ndInt32, ndBodyKinematic*> filter;
-			ndFixSizeArray<ndBodyKinematic*, 1024> array;
-			array.PushBack(node->GetKey());
-			filter.Insert(0, node->GetKey());
-			for (ndInt32 i = 0; i < array.GetCount(); ++i)
-			{
-				ndBodyKinematic* const body = array[i];
-				if (body->GetInvMass() > ndFloat32(0.0f))
-				{
-					const ndBodyKinematic::ndJointList& joints = body->GetJointList();
-					for (ndBodyKinematic::ndJointList::ndNode* jointNode = joints.GetFirst(); jointNode; jointNode = jointNode->GetNext())
-					{
-						ndJointBilateralConstraint* const joint = jointNode->GetInfo();
-						ndBodyKinematic* const body1 = (joint->GetBody0() == body) ? joint->GetBody1() : joint->GetBody0();
-						ndTree<ndInt32, ndBodyKinematic*>::ndNode* const deadNode = filter.Insert(0, body1);
-						if (deadNode)
-						{
-							array.PushBack(body1);
-						}
-					}
-				}
-			}
-
-			node->GetInfo() = 1;
-			for (ndInt32 i = 1; i < array.GetCount(); ++i)
-			{
-				ndBodyKinematic* const body = array[i];
-				ndTree<ndInt32, ndBodyKinematic*>::ndNode* deadNode = deadBodies.Insert(1, body);
-				if (!deadNode)
-				{
-					deadNode = deadBodies.Find(body);
-					deadNode->GetInfo() = 1;
-				}
-			}
-		}
-	}
-}
-
-void ndPhysicsWorld::PostUpdate(ndFloat32 timestep)
-{
-	ndWorld::PostUpdate(timestep);
-	//RemoveDeadBodies();
-
-	ndScopeSpinLock Lock(m_lock);
-	const ndBodyListView& bodyArray = GetBodyList();
-	const ndArray<ndBodyKinematic*>& view = bodyArray.GetView();
-	for (ndInt32 i = ndInt32(view.GetCount()) - 2; i >= 0; --i)
-	{
-		ndBodyKinematic* const body = view[i];
-		ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)body->GetNotifyCallback();
-		ndAssert(notify);
-		notify->m_entity->SetTransform(notify->m_transform.m_rotation, notify->m_transform.m_position);
-	}
-
-	ndDemoCamera* const camera = (ndDemoCamera*)*m_manager->m_renderer->GetCamera();
-	ndAssert(camera);
-	camera->TickUpdate(timestep);
-
-	//if (m_manager->m_updateCamera)
-	//{
-	//	m_manager->m_updateCamera(m_manager, m_manager->m_updateCameraContext, timestep);
-	//}
-	//
-	//if (m_manager->m_onPostUpdate)
-	//{
-	//	m_manager->m_onPostUpdate->Update(m_manager, timestep);
-	//	m_manager->m_onPostUpdate->OnDebug(m_manager, m_manager->m_hidePostUpdate);
-	//}
 }
 
 void ndPhysicsWorld::OnSubStepPostUpdate(ndFloat32 timestep)
@@ -219,6 +131,49 @@ void ndPhysicsWorld::AccelerateUpdates()
 	m_acceleratedUpdate = true;
 }
 
+void ndPhysicsWorld::PostUpdate(ndFloat32 timestep)
+{
+	ndWorld::PostUpdate(timestep);
+
+	ndScopeSpinLock Lock(m_lock);
+	const ndBodyListView& bodyArray = GetBodyList();
+	const ndArray<ndBodyKinematic*>& view = bodyArray.GetView();
+	for (ndInt32 i = ndInt32(view.GetCount()) - 2; i >= 0; --i)
+	{
+		ndBodyKinematic* const body = view[i];
+		ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)body->GetNotifyCallback();
+		ndAssert(notify);
+		notify->m_entity->SetTransform(notify->m_transform.m_rotation, notify->m_transform.m_position);
+	}
+
+	ndDemoCamera* const camera = (ndDemoCamera*)*m_manager->m_renderer->GetCamera();
+	ndAssert(camera);
+	camera->TickUpdate(timestep);
+
+	RemoveDeadBodies();
+}
+
+void ndPhysicsWorld::RemoveDeadBodies()
+{
+	m_deadBodies.RemovePendingBodies();
+}
+
+void ndPhysicsWorld::DefferedRemoveBody(ndBody* const body)
+{
+	m_deadBodies.RemoveBody(body);
+}
+
+void ndPhysicsWorld::RemoveDeadEntities()
+{
+	ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* nextNode;
+	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = m_defferedDeadEntities.GetFirst(); node; node = nextNode)
+	{
+		nextNode = node->GetNext();
+		m_manager->RemoveEntity(node->GetInfo());
+		m_defferedDeadEntities.Remove(node);
+	}
+}
+
 void ndPhysicsWorld::AdvanceTime(ndFloat32 timestep)
 {
 	D_TRACKTIME();
@@ -227,6 +182,7 @@ void ndPhysicsWorld::AdvanceTime(ndFloat32 timestep)
 	if (m_acceleratedUpdate)
 	{
 		Update(descreteStep);
+		RemoveDeadEntities();
 	} 
 	else
 	{
@@ -245,6 +201,7 @@ void ndPhysicsWorld::AdvanceTime(ndFloat32 timestep)
 		{
 			Update(descreteStep);
 			m_timeAccumulator -= descreteStep;
+			RemoveDeadEntities();
 		}
 	}
 
@@ -258,6 +215,4 @@ void ndPhysicsWorld::AdvanceTime(ndFloat32 timestep)
 	{
 		Sync();
 	}
-
-	m_deadEntities.Update();
 }
