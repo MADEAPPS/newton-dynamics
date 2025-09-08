@@ -159,7 +159,6 @@ ndSharedPtr<ndBody> CreateBody(
 	material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textName));
 
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateFromCollisionShape(render, &shape, material, mappingMode));
-	//ndBodyKinematic* const body = new ndBodyDynamic();
 	ndSharedPtr<ndBody> body (new ndBodyDynamic());
 	ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(matrix));
 	entity->SetPrimitive(mesh);

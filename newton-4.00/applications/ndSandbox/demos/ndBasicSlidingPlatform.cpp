@@ -17,21 +17,8 @@
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 
-class ContactNotify : public ndContactNotify
-{
-	public:
-	bool disable = 0;
 
-	ContactNotify(ndScene* const scene) : ndContactNotify(scene)
-	{
-	}
-
-	bool OnAabbOverlap(const ndContact* const, ndFloat32) const
-	{
-		return (!disable);
-	}
-};
-
+// this classs is is onle to show how to take control of the rigiody body in the scene.
 class SimpleConveyorFloor : public ndModel
 {
 	class ndNode : public ndNodeHierarchy<ndNode>
@@ -138,17 +125,9 @@ class CBasicBodyModelNotify : public ndModelNotify
 	}
 };
 
-void ndKinematicGroundPlatform(ndDemoEntityManager* const scene)
+void ndBasicSlidingPlatform(ndDemoEntityManager* const scene)
 {
 	constexpr ndFloat32 groundHeight = 0.f;
-
-	ndPhysicsWorld& world = *scene->GetWorld();
-
-	world.SetSubSteps(2);
-	world.SetSolverIterations(12);
-	world.SetThreadCount(1);
-	ContactNotify* contactNotify = new ContactNotify(world.GetScene());
-	world.SetContactNotify(contactNotify);
 
 	ndVector origin(0.0f, 0.0f, 0.0f, 1.0f);
 	ndMatrix xform = ndGetIdentityMatrix();
