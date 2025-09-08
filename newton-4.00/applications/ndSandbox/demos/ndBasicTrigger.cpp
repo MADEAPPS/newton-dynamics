@@ -35,7 +35,7 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 
 	// make a tranparent visual mesh
 	ndRenderPrimitiveMeshMaterial material;
-	material.m_opacity = 0.5f;
+	material.m_opacity = ndFloat32(0.5f);
 	material.m_texture = scene->GetRenderer()->GetTextureCache()->GetTexture(ndGetWorkingFileName("metal_30.png"));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateFromCollisionShape(*scene->GetRenderer(), &shape, material, ndRenderPrimitiveMesh::m_box));
 	ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(matrix));
