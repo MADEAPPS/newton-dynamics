@@ -15,18 +15,30 @@ message (${projectName})
 
 include_directories(.)
 include_directories(backends)
-include_directories(../glfw/include)
+if (APPLE)
 
-# low level core
-file(GLOB HEADERS *.h)
-file(GLOB CPP_SOURCE 
-	*.h 
-	*.cpp 
-	backends/imgui_impl_glfw.h
-	backends/imgui_impl_glfw.cpp
-	backends/imgui_impl_opengl3.h
-	backends/imgui_impl_opengl3.cpp
-)
+    file(GLOB CPP_SOURCE 
+	    *.h 
+	    *.cpp
+        backends/imgui_impl_osx.h
+        backends/imgui_impl_osx.mm
+        backends/imgui_impl_metal.h
+	    backends/imgui_impl_metal.mm
+    )
+
+else()
+    include_directories(../glfw/include)
+
+    # low level core
+    file(GLOB CPP_SOURCE 
+	    *.h 
+	    *.cpp 
+	    backends/imgui_impl_glfw.h
+	    backends/imgui_impl_glfw.cpp
+	    backends/imgui_impl_opengl3.h
+	    backends/imgui_impl_opengl3.cpp
+    )
+endif()
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
