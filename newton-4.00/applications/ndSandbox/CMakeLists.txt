@@ -93,6 +93,12 @@ elseif(APPLE)
     endif()
     target_link_libraries(${projectName} PRIVATE ${CoreFoundationFramework})
 
+	find_library(CoreGraphicsFramework CoreGraphics)
+    if (NOT CoreGraphicsFramework)
+        message(FATAL_ERROR "CoreGraphics not found")
+    endif()
+    target_link_libraries(${projectName} PRIVATE ${CoreGraphicsFramework})
+
 	find_library(MetalFramework Metal)
     if (NOT MetalFramework)
         message(FATAL_ERROR "Metal not found")
