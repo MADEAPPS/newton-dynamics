@@ -39,7 +39,8 @@ class ndDebugDisplayRenderPass : public ndRenderPass
 
 	void SetDisplayMode(ndInt32 mode);
 
-	void RenderScene(ndFloat32 timestep);
+	virtual void ResetScene() override;
+	virtual void RenderScene(ndFloat32 timestep) override;
 
 	ndDebugMesh* CreateRenderPrimitive(const ndShapeInstance& shapeInstance) const;
 

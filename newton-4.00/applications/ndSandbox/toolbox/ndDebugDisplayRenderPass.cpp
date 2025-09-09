@@ -39,6 +39,11 @@ void ndDebugDisplayRenderPass::SetDisplayMode(ndInt32 mode)
 	m_active = true;
 }
 
+void ndDebugDisplayRenderPass::ResetScene()
+{
+	m_meshCache.RemoveAll();
+}
+
 ndDebugDisplayRenderPass::ndDebugMesh* ndDebugDisplayRenderPass::CreateRenderPrimitive(const ndShapeInstance& shapeInstance) const
 {
 	ndShapeInstance shape(shapeInstance);
@@ -69,7 +74,6 @@ void ndDebugDisplayRenderPass::RenderScene(ndFloat32)
 	ndPhysicsWorld* const world = m_manager->GetWorld();
 	const ndBodyListView& bodyList = world->GetBodyList();
 
-	//ndRenderPrimitiveMeshImplement* const meshReander = m_im
 	for (ndBodyListView::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	{
 		ndBodyKinematic* const body = bodyNode->GetInfo()->GetAsBodyKinematic();
@@ -95,10 +99,10 @@ void ndDebugDisplayRenderPass::RenderScene(ndFloat32)
 			ndSharedPtr<ndDebugMesh>& debugMesh = node->GetInfo();
 			const ndVector color((body->GetSleepState() == 1) ? m_sleepColor : m_awakeColor);
 
-			//ndRenderPrimitiveMesh* const mesh = (ndRenderPrimitiveMesh*)*debugMesh->m_flatShaded;
-			//ndRenderPrimitiveMeshImplement* const implement = *mesh->m_implementation;
-			//ndRenderPrimitiveMeshSegment& segment = implement->m_segments.GetFirst()->GetInfo();
-			//const ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
+			ndRenderPrimitiveMesh* const mesh = (ndRenderPrimitiveMesh*)*debugMesh->m_flatShaded;
+			ndRenderPrimitiveMeshSegment& segment = mesh->m_segments.GetFirst()->GetInfo();
+			ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
+			material->m_diffuse = color;
 
 			debugMesh->m_flatShaded->Render(m_owner, matrix, m_debugDisplaySolidMesh);
 		}

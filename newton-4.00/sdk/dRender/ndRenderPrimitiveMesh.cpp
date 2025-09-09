@@ -53,7 +53,7 @@ ndSharedPtr<ndRenderPrimitive> ndRenderPrimitiveMesh::CreateFromCollisionShape(
 	const ndMatrix& uvMatrix, bool stretchMaping)
 {
 	ndRenderPrimitiveMesh* const primtive = new ndRenderPrimitiveMesh();
-	primtive->m_implementation = ndSharedPtr<ndRenderPrimitiveMeshImplement>(new ndRenderPrimitiveMeshImplement(render, collision, material, mapping, uvMatrix, stretchMaping));
+	primtive->m_implementation = ndSharedPtr<ndRenderPrimitiveMeshImplement>(new ndRenderPrimitiveMeshImplement(primtive, render, collision, material, mapping, uvMatrix, stretchMaping));
 	return ndSharedPtr<ndRenderPrimitive>(primtive);
 }
 
@@ -62,7 +62,7 @@ ndSharedPtr<ndRenderPrimitive> ndRenderPrimitiveMesh::CreateFromCollisionShape(
 	const ndShapeInstance* const collision)
 {
 	ndRenderPrimitiveMesh* const primtive = new ndRenderPrimitiveMesh();
-	primtive->m_implementation = ndSharedPtr<ndRenderPrimitiveMeshImplement>(new ndRenderPrimitiveMeshImplement(render, collision));
+	primtive->m_implementation = ndSharedPtr<ndRenderPrimitiveMeshImplement>(new ndRenderPrimitiveMeshImplement(primtive, render, collision));
 	return ndSharedPtr<ndRenderPrimitive>(primtive);
 }
 

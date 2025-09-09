@@ -68,6 +68,7 @@ class ndRenderPrimitiveMesh : public ndRenderPrimitive
 		ndUvMapingMode mapping = m_box,
 		const ndMatrix& uvMatrix = ndGetIdentityMatrix(), bool stretchMaping = true);
 
+	ndList<ndRenderPrimitiveMeshSegment> m_segments;
 	ndSharedPtr<ndRenderPrimitiveMeshImplement> m_implementation;
 };
 

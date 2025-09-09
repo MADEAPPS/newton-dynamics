@@ -21,9 +21,10 @@ class ndRenderPrimitiveMeshSegment;
 class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRenderPrimitiveMeshImplement>
 {
 	public:
-	ndRenderPrimitiveMeshImplement(const ndRender* const render, const ndShapeInstance* const collision);
+	ndRenderPrimitiveMeshImplement(ndRenderPrimitiveMesh* const owner, const ndRender* const render, const ndShapeInstance* const collision);
 
 	ndRenderPrimitiveMeshImplement(
+		ndRenderPrimitiveMesh* const owner,
 		const ndRender* const render, const ndShapeInstance* const collision, 
 		const ndRenderPrimitiveMeshMaterial& material, ndRenderPrimitiveMesh::ndUvMapingMode mapping,
 		const ndMatrix& uvMatrix, bool stretchMaping);
@@ -44,8 +45,9 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	void RenderShadowSolidColor(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
 	void RenderTransparency(const ndRender* const render, const ndMatrix& modelViewMatrix, bool backface) const;
 
+	ndRenderPrimitiveMesh* m_owner;
 	const ndRenderContext* m_context;
-	ndList<ndRenderPrimitiveMeshSegment> m_segments;
+	//ndList<ndRenderPrimitiveMeshSegment> m_segments;
 
 	GLint m_indexCount;
 	GLint m_vertexCount;
