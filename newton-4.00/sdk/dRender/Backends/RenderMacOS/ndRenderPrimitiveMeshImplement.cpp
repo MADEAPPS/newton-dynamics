@@ -20,34 +20,26 @@
 
 #include "ndRenderPrimitiveMeshImplement.h"
 
-ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(
-	const ndRender* const render,
-	const ndShapeInstance* const collision, 
-	const ndRenderPrimitiveMeshMaterial& material,
-	ndRenderPrimitiveMesh::ndUvMapingMode mapping,
-	const ndMatrix& uvMatrix, 
-	bool stretchMaping)
-	:ndContainersFreeListAlloc<ndRenderPrimitiveMeshImplement>()
-	,m_context(*render->m_context)
-	,m_segments()
+ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(ndRenderPrimitiveMesh* const owner, const ndRender* const render, const ndShapeInstance* const collision)
 {
+
+}
+
+ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(
+	ndRenderPrimitiveMesh* const owner,
+	const ndRender* const render, const ndShapeInstance* const collision,
+	const ndRenderPrimitiveMeshMaterial& material, ndRenderPrimitiveMesh::ndUvMapingMode mapping,
+	const ndMatrix& uvMatrix, bool stretchMaping)
+{
+
 }
 
 ndRenderPrimitiveMeshImplement::~ndRenderPrimitiveMeshImplement()
 {
-	ResetOptimization();
+
 }
 
-void ndRenderPrimitiveMeshImplement::ResetOptimization()
+void ndRenderPrimitiveMeshImplement::Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderMode) const
 {
-}
 
-void ndRenderPrimitiveMeshImplement::OptimizeForRender(
-	const glPositionNormalUV* const points, ndInt32 pointCount,
-	const ndInt32* const indices, ndInt32 indexCount)
-{
-}
-
-void ndRenderPrimitiveMeshImplement::Render(const ndRender* const render, const ndMatrix& modelMatrix) const
-{
 }

@@ -47,7 +47,6 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 
 	ndRenderPrimitiveMesh* m_owner;
 	const ndRenderContext* m_context;
-	//ndList<ndRenderPrimitiveMeshSegment> m_segments;
 
 	GLint m_indexCount;
 	GLint m_vertexCount;
@@ -73,12 +72,6 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 		GLint m_specularColor;
 		GLint m_specularAlpha;
 		GLint m_reflectionColor;
-		//GLint m_diffuseColor;
-		//GLint m_directionalLightAmbient;
-		//GLint m_directionalLightIntesity;
-		//GLint m_directionalLightDirection;
-		//GLint m_projectMatrixLocation;
-		//GLint m_viewModelMatrixLocation;
 	};
 	struct SolidShadowColorBlock : public SolidColorBlock
 	{
