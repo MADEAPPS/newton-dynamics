@@ -84,8 +84,8 @@ if (MSVC OR MINGW)
 
 elseif(APPLE)
 	message ("adding required Apple frameworks")
-	target_link_libraries(${projectName} PUBLIC "$<LINK_LIBRARY:FRAMEWORK, Metal>")
-	target_link_libraries(${projectName} PUBLIC "$<LINK_LIBRARY:FRAMEWORK, CoreFoundation>")
+	target_link_libraries(${projectName} PUBLIC "-framework Metal")
+	target_link_libraries(${projectName} PUBLIC "-framework, CoreFoundation")
 
 else(UNIX)
 	message ("adding required posit system libraries")
