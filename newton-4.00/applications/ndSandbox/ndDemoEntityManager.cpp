@@ -14,13 +14,13 @@
 //#include "ndMeshLoader.h"
 #include "ndDemoCamera.h"
 #include "ndFileBrowser.h"
-//#include "ndDebugDisplay.h"
 #include "ndPhysicsWorld.h"
 #include "ndPhysicsUtils.h"
 #include "ndTestDeepBrain.h"
 #include "ndMenuRenderPass.h"
 #include "ndDemoEntityManager.h"
 #include "ndHighResolutionTimer.h"
+#include "ndDebugDisplayRenderPass.h"
 
 //#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// basic friction
@@ -419,19 +419,17 @@ static void SimpleRegressionBrainStressTest()
 // If you are new to ImGui, see examples/README.txt and documentation at the top of imgui.cpp.
 ndDemoEntityManager::ndDemoEntityManager()
 	:ndClassAlloc()
+	,m_world(nullptr)
 	,m_renderer(nullptr)
 	,m_menuRenderPass(nullptr)
 	,m_colorRenderPass(nullptr)
 	,m_shadowRenderPass(nullptr)
 	,m_environmentRenderPass(nullptr)
 	,m_transparentRenderPass(nullptr)
+	,m_debugDisplayRenderPass(nullptr)
 	,m_environmentTexture(nullptr)
-	,m_world(nullptr)
 
-	,m_updateCameraContext(nullptr)
 	//,m_renderDemoGUI()
-	,m_updateCamera(nullptr)
-	,m_transparentHeap()
 	,m_animationCache()
 	,m_currentScene(DEFAULT_SCENE)
 	,m_lastCurrentScene(DEFAULT_SCENE)
@@ -499,6 +497,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	// create render passes
 	m_menuRenderPass = ndSharedPtr<ndRenderPass>(new ndMenuRenderPass(this));
+	m_debugDisplayRenderPass = ndSharedPtr<ndRenderPass>(new ndDebugDisplayRenderPass(this));
 	m_colorRenderPass = ndSharedPtr<ndRenderPass>(new ndRenderPassColor(*m_renderer));
 	m_shadowRenderPass = ndSharedPtr<ndRenderPass>(new ndRenderPassShadows(*m_renderer));
 	m_transparentRenderPass = ndSharedPtr<ndRenderPass>(new ndRenderPassTransparency(*m_renderer));
@@ -510,6 +509,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	m_renderer->AddRenderPass(m_environmentRenderPass);
 	m_renderer->AddRenderPass(m_transparentRenderPass);
 	m_renderer->AddRenderPass(m_menuRenderPass);
+	m_renderer->AddRenderPass(m_debugDisplayRenderPass);
 
 	// add a demo camera, and main directional light
 	m_renderer->SetCamera(ndSharedPtr<ndRenderSceneCamera>(new ndDemoCamera(*m_renderer)));
@@ -715,17 +715,6 @@ void ndDemoEntityManager::Set2DDisplayRenderFunction(ndSharedPtr<ndUIEntity>&)
 	//m_renderDemoGUI = demoGui;
 }
 
-void* ndDemoEntityManager::GetUpdateCameraContext() const
-{
-	return m_updateCameraContext;
-}
-
-void ndDemoEntityManager::SetUpdateCameraFunction(UpdateCameraCallback callback, void* const context)
-{
-	m_updateCamera = callback;
-	m_updateCameraContext = context;
-}
-
 bool ndDemoEntityManager::JoystickDetected() const
 {
 	ndAssert(0);
@@ -827,7 +816,6 @@ void ndDemoEntityManager::Cleanup ()
 	m_animationCache.RemoveAll();
 	
 	m_renderer->ResetScene();
-	m_updateCamera = nullptr;
 	
 	// destroy the Newton world
 	if (m_world) 
@@ -970,6 +958,9 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			m_colorRenderPass->MakeActive(!m_hideVisualMeshes);
 			m_shadowRenderPass->MakeActive(!m_hideVisualMeshes);
 			m_transparentRenderPass->MakeActive(!m_hideVisualMeshes);
+
+			ndDebugDisplayRenderPass* const debugDisplay = (ndDebugDisplayRenderPass*)*m_debugDisplayRenderPass;
+			debugDisplay->SetDisplayMode(m_collisionDisplayMode);
 	
 			ImGui::EndMenu();
 	
@@ -1184,15 +1175,6 @@ void ndDemoEntityManager::CalculateFPS(ndFloat32 timestep)
 		m_timestepAcc -= movingAverage;
 		m_framesCount = 0;
 	}
-}
-
-//void ndDemoEntityManager::PushTransparentMesh (const ndDemoMeshInterface* const mesh, const ndMatrix& modelMatrix)
-void ndDemoEntityManager::PushTransparentMesh(const ndDemoMeshInterface* const, const ndMatrix&)
-{
-	ndAssert(0);
-	//ndVector dist (m_cameraManager->GetCamera()->GetInvViewMatrix().TransformVector(modelMatrix.m_posit));
-	//TransparentMesh entry (modelMatrix, (ndDemoMesh*) mesh);
-	//m_transparentHeap.Push (entry, dist.m_z);
 }
 
 //void ndDemoEntityManager::ImportPLYfile (const char* const fileName)

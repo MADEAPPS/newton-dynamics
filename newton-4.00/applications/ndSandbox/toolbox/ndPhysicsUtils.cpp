@@ -12,7 +12,6 @@
 #include "ndSandboxStdafx.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
-//#include "ndDebugDisplay.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 //#include "ndDemoInstanceEntity.h"
@@ -58,38 +57,6 @@ ndMatrix FindFloor(const ndWorld& world, const ndMatrix& origin, const ndShapeIn
 }
 
 #if 0
-ndBodyKinematic* MousePickBody(ndWorld* const world, const ndVector& origin, const ndVector& end, ndFloat32& paramterOut, ndVector& positionOut, ndVector& normalOut)
-{
-	class ndRayPickingCallback: public ndRayCastClosestHitCallback
-	{
-		public: 
-		ndRayPickingCallback()
-			:ndRayCastClosestHitCallback()
-		{
-		}
-
-		ndFloat32 OnRayCastAction(const ndContactPoint& contact, ndFloat32 intersetParam)
-		{
-			if (contact.m_body0->GetInvMass() == ndFloat32(0.0f)) 
-			{
-				return 1.2f;
-			}
-			return ndRayCastClosestHitCallback::OnRayCastAction(contact, intersetParam);
-		}
-	};
-
-	ndRayPickingCallback rayCaster;
-	if (world->RayCast(rayCaster, origin, end))
-	{
-		paramterOut = rayCaster.m_param;
-		positionOut = rayCaster.m_contact.m_point;
-		normalOut = rayCaster.m_contact.m_normal;
-		return ((ndBody*)rayCaster.m_contact.m_body0)->GetAsBodyKinematic();
-	}
-
-	return nullptr;
-}
-
 void SetModelVisualMesh(ndDemoEntityManager* const scene, ndModelArticulation* const model)
 {
 	for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())

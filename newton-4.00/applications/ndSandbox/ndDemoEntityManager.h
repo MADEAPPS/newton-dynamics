@@ -11,16 +11,10 @@
 #ifndef __DEMO_MAIN_FRAME_H__
 #define __DEMO_MAIN_FRAME_H__
 
-struct GLFWwindow;
-struct ImDrawData;
-
-class ndDemoMesh;
 class ndUIEntity;
-class ndRenderPass;
 class ndMeshLoader;
 class ndPhysicsWorld;
 class ndAnimationSequence;
-class ndDemoMeshInterface;
 
 class ndDemoEntityManager : public ndClassAlloc
 {
@@ -109,44 +103,6 @@ class ndDemoEntityManager : public ndClassAlloc
 		bool m_memory;
 	};
 
-	class ndLightSource
-	{
-		public:
-		ndVector m_position;
-		ndVector m_ambient;
-		ndVector m_diffuse;
-		ndVector m_specular;
-		ndFloat32 m_shininess;
-	};
-
-	class TransparentMesh
-	{
-		public: 
-		TransparentMesh()
-			:m_matrix(ndGetIdentityMatrix())
-			,m_mesh(nullptr)
-		{
-		}
-
-		TransparentMesh(const ndMatrix& matrix, ndDemoMesh* const mesh)
-			:m_matrix(matrix)
-			,m_mesh(mesh)
-		{
-		}
-
-		ndMatrix m_matrix;
-		ndDemoMesh* m_mesh;
-	};
-
-	class TransparentHeap: public ndUpHeap <TransparentMesh, ndFloat32>
-	{
-		public:
-		TransparentHeap()
-			:ndUpHeap <TransparentMesh, ndFloat32>(2048)
-		{
-		}
-	};
-
 	class SDKDemos
 	{
 		public:
@@ -188,10 +144,7 @@ class ndDemoEntityManager : public ndClassAlloc
 	bool GetMousePosition (ndFloat32& posX, ndFloat32& posY) const;
 	void SetCameraMatrix (const ndQuaternion& rotation, const ndVector& position);
 	
-	void* GetUpdateCameraContext() const;
 	void SetSelectedModel(ndModel* const model);
-	void SetUpdateCameraFunction(UpdateCameraCallback callback, void* const context);
-	void PushTransparentMesh(const ndDemoMeshInterface* const mesh, const ndMatrix& modelMatrix);
 	void Set2DDisplayRenderFunction(ndSharedPtr<ndUIEntity>& demoGui);
 
 	bool AnyKeyDown() const;
@@ -228,11 +181,9 @@ class ndDemoEntityManager : public ndClassAlloc
 	void RenderScene();
 	ndInt32 ParticleCount() const;
 	void SetParticleUpdateMode() const;
-	
-	void UpdatePhysics(ndFloat32 timestep);
-	//ndFloat32 CalculateInteplationParam () const;
 
 	void CalculateFPS(ndFloat32 timestep);
+	void UpdatePhysics(ndFloat32 timestep);
 	
 	void ShowMainMenuBar();
 	void ToggleProfiler();
@@ -242,23 +193,18 @@ class ndDemoEntityManager : public ndClassAlloc
 	void OnSubStepPostUpdate(ndFloat32 timestep);
 
 	void TestImGui();
-
 	
+	ndPhysicsWorld* m_world;
 	ndSharedPtr<ndRender> m_renderer;
 	ndSharedPtr<ndRenderPass> m_menuRenderPass;
 	ndSharedPtr<ndRenderPass> m_colorRenderPass;
 	ndSharedPtr<ndRenderPass> m_shadowRenderPass;
 	ndSharedPtr<ndRenderPass> m_environmentRenderPass;
 	ndSharedPtr<ndRenderPass> m_transparentRenderPass;
+	ndSharedPtr<ndRenderPass> m_debugDisplayRenderPass;
 	ndSharedPtr<ndRenderTexture> m_environmentTexture;
 
-	ndPhysicsWorld* m_world;
-	void* m_updateCameraContext;
 	
-	//ndSharedPtr<ndUIEntity> m_renderDemoGUI;
-	UpdateCameraCallback m_updateCamera;
-
-	TransparentHeap m_transparentHeap;
 	ndTree<ndSharedPtr<ndAnimationSequence>, ndString> m_animationCache;
 
 	ndInt32 m_currentScene;
