@@ -165,6 +165,16 @@ void ndRender::RemoveSceneNode(const ndSharedPtr<ndRenderSceneNode>& node)
 	}
 }
 
+void ndRender::InterpolateTransforms(ndFloat32 param)
+{
+	m_camera->InterpolateTransforms(param);
+	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = m_scene.GetFirst(); node; node = node->GetNext())
+	{
+		ndRenderSceneNode* const sceneNode = *node->GetInfo();
+		sceneNode->InterpolateTransforms(param);
+	}
+}
+
 void ndRender::Render(ndFloat32 timestep)
 {
 	m_context->BeginFrame();
@@ -190,14 +200,4 @@ void ndRender::Render(ndFloat32 timestep)
 		m_context->EndFrame();
 	}
 	Present();
-}
-
-void ndRender::InterpolateTransforms(ndFloat32 param)
-{
-	m_camera->InterpolateTransforms(param);
-	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = m_scene.GetFirst(); node; node = node->GetNext())
-	{
-		ndRenderSceneNode* const sceneNode = *node->GetInfo();
-		sceneNode->InterpolateTransforms(param);
-	}
 }

@@ -508,8 +508,8 @@ ndDemoEntityManager::ndDemoEntityManager()
 	m_renderer->AddRenderPass(m_colorRenderPass);
 	m_renderer->AddRenderPass(m_environmentRenderPass);
 	m_renderer->AddRenderPass(m_transparentRenderPass);
-	m_renderer->AddRenderPass(m_menuRenderPass);
 	m_renderer->AddRenderPass(m_debugDisplayRenderPass);
+	m_renderer->AddRenderPass(m_menuRenderPass);
 
 	// add a demo camera, and main directional light
 	m_renderer->SetCamera(ndSharedPtr<ndRenderSceneCamera>(new ndDemoCamera(*m_renderer)));

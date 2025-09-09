@@ -694,7 +694,48 @@ void ndRenderPrimitiveMeshImplement::RenderTransparency(const ndRender* const re
 	glUseProgram(0);
 }
 
-void ndRenderPrimitiveMeshImplement::RenderDebugShape(const ndRender* const render, const ndMatrix& modelViewMatrix) const
+void ndRenderPrimitiveMeshImplement::RenderDebugShape(const ndRender* const render, const ndMatrix& modelMatrix) const
 {
+	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
 
+	const ndMatrix viewMatrix(camera->m_invViewMatrix);
+	const ndMatrix modelViewMatrix(modelMatrix * viewMatrix);
+
+	const glMatrix glViewModelMatrix(modelViewMatrix);
+	const glMatrix glProjectionMatrix(camera->m_projectionMatrix);
+
+	ndRenderPrimitiveMeshSegment& segment = m_segments.GetFirst()->GetInfo();
+	const ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
+
+	const glVector4 diffuse(material->m_diffuse);
+	const glVector4 glSunlightAmbient(render->m_sunLightAmbient);
+	const glVector4 glSunlightIntensity(render->m_sunLightIntesity);
+	const glVector4 glSunlightDir(viewMatrix.RotateVector(render->m_sunLightDir));
+
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
+	glDisable(GL_BLEND);
+	glDepthFunc(GL_LEQUAL);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+
+	GLuint shader = m_context->m_shaderCache->m_debugDiffuseSolidEffect;
+	glUseProgram(shader);
+
+	//glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+	glUniformMatrix4fv(m_debugSolidColorBlock.m_projectMatrixLocation, 1, false, &glProjectionMatrix[0][0]);
+	glUniformMatrix4fv(m_debugSolidColorBlock.m_viewModelMatrixLocation, 1, false, &glViewModelMatrix[0][0]);
+	glUniform3fv(m_debugSolidColorBlock.m_diffuseColor, 1, &diffuse[0]);
+	glUniform3fv(m_debugSolidColorBlock.m_directionalLightDirection, 1, &glSunlightDir[0]);
+	glUniform3fv(m_debugSolidColorBlock.m_directionalLightAmbient, 1, &glSunlightAmbient[0]);
+	glUniform3fv(m_debugSolidColorBlock.m_directionalLightIntesity, 1, &glSunlightIntensity[0]);
+
+	glBindVertexArray(m_vertextArrayBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+	
+	glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, (void*)0);
+	
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	glUseProgram(0);
 }

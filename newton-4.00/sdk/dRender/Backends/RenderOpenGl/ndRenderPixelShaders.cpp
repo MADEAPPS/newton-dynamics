@@ -40,7 +40,6 @@ R""""(
 	#version 450 core
 
 	uniform vec3 diffuseColor;
-
 	uniform vec3 directionalLightAmbient;
 	uniform vec3 directionalLightIntesity;
 	uniform vec3 directionalLightDirection;

@@ -43,6 +43,8 @@ class ndDebugDisplayRenderPass : public ndRenderPass
 
 	ndDebugMesh* CreateRenderPrimitive(const ndShapeInstance& shapeInstance) const;
 
+	ndVector m_awakeColor;
+	ndVector m_sleepColor;
 	ndDemoEntityManager* m_manager;
 	ndTree<ndSharedPtr<ndDebugMesh>, ndShape*> m_meshCache;
 	ndInt32 m_collisionDisplayMode;

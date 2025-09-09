@@ -251,17 +251,7 @@ void ndRenderContext::LoadFont(const char* const fontPathName)
 	// Build texture atlas
 	ImGuiIO& io = ImGui::GetIO();
 
-	// Load Fonts
-	// (there is a default font, this is only if you want to change it. see extra_fonts/README.txt for more details)
-	//io.Fonts->AddFontDefault();
-
 	float pixedSize = 18;
-	//char pathName[2048];
-	//const char* const name = "Cousine-Regular.ttf";
-	////char* const name = "calibri.ttf";
-	////char* const name = "courbd.ttf";
-	//
-	//ndGetWorkingFileName(name, pathName);
 	io.Fonts->AddFontFromFileTTF(fontPathName, pixedSize);
 	//io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
 
@@ -360,26 +350,12 @@ void ndRenderContext::EndFrame()
 
 void ndRenderContext::MouseButtonCallback(GLFWwindow* window, ndInt32 button, ndInt32 action, ndInt32)
 {
-	//if (button >= 0 && button < 3) 
-	//{
-	//	ImGuiIO& io = ImGui::GetIO();
-	//	if (action == GLFW_PRESS) 
-	//	{
-	//		io.MouseDown[button] = true;    
-	//	} 
-	//	else if (action == GLFW_RELEASE) 
-	//	{
-	//		io.MouseDown[button] = false;    
-	//	}
-	//}
 	ndRenderContext* const self = (ndRenderContext*)glfwGetWindowUserPointer(window);
 	self->m_owner->m_owner->MouseButtonCallback(button, action);
 }
 
 void ndRenderContext::CharCallback(GLFWwindow* window, ndUnsigned32 ch)
 {
-	//ImGuiIO& io = ImGui::GetIO();
-	//io.AddInputCharacter((unsigned short)ch);
 	ndRenderContext* const self = (ndRenderContext*)glfwGetWindowUserPointer(window);
 	self->m_owner->m_owner->CharCallback(ch);
 }
@@ -387,20 +363,15 @@ void ndRenderContext::CharCallback(GLFWwindow* window, ndUnsigned32 ch)
 void ndRenderContext::CursorposCallback(GLFWwindow* window, double x, double y)
 {
 	ndRenderContext* const self = (ndRenderContext*)glfwGetWindowUserPointer(window);
-	//ImGuiIO& io = ImGui::GetIO();
-	//io.MousePos = ImVec2((float)x, (float)y);
 	self->m_owner->m_owner->CursorposCallback(ndReal(x), ndReal(y));
 }
 
 void ndRenderContext::MouseScrollCallback(GLFWwindow* window, double x, double y)
 {
 	ndRenderContext* const self = (ndRenderContext*)glfwGetWindowUserPointer(window);
-	//ImGuiIO& io = ImGui::GetIO();
-	//io.MouseWheel += float(y);
 	self->m_owner->m_owner->MouseScrollCallback(ndReal(x), ndReal(y));
 }
 
-//void ndDemoEntityManager::KeyCallback(GLFWwindow* const window, ndInt32 key, ndInt32, ndInt32 action, ndInt32 mods)
 void ndRenderContext::KeyCallback(GLFWwindow* const window, ndInt32 key, ndInt32, ndInt32 action, ndInt32)
 {
 	ndRenderContext* const self = (ndRenderContext*)glfwGetWindowUserPointer(window);

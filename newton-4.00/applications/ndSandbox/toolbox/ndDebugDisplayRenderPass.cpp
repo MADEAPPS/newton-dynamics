@@ -16,12 +16,12 @@
 
 ndDebugDisplayRenderPass::ndDebugDisplayRenderPass(ndDemoEntityManager* const owner)
 	:ndRenderPass(*owner->GetRenderer())
+	,m_awakeColor(ndFloat32 (1.0f))
+	,m_sleepColor(ndFloat32(0.42f), ndFloat32(0.73f), ndFloat32(0.98f), ndFloat32(1.0f))
 	,m_manager(owner)
 	,m_meshCache()
 	,m_collisionDisplayMode(0)
 {
-	//m_active = false;
-	m_collisionDisplayMode = 3;
 }
 
 ndDebugDisplayRenderPass::~ndDebugDisplayRenderPass()
@@ -36,7 +36,6 @@ void ndDebugDisplayRenderPass::SetDisplayMode(ndInt32 mode)
 		m_active = false;
 		return;
 	}
-
 	m_active = true;
 }
 
@@ -89,10 +88,18 @@ void ndDebugDisplayRenderPass::RenderScene(ndFloat32)
 			node = m_meshCache.Insert(debugMesh, key);
 		}
 
-		if (m_collisionDisplayMode == 3)
+		if (m_collisionDisplayMode == 1)
 		{
+			// render solid color collsion mesh
 			const ndMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
 			ndSharedPtr<ndDebugMesh>& debugMesh = node->GetInfo();
+			const ndVector color((body->GetSleepState() == 1) ? m_sleepColor : m_awakeColor);
+
+			//ndRenderPrimitiveMesh* const mesh = (ndRenderPrimitiveMesh*)*debugMesh->m_flatShaded;
+			//ndRenderPrimitiveMeshImplement* const implement = *mesh->m_implementation;
+			//ndRenderPrimitiveMeshSegment& segment = implement->m_segments.GetFirst()->GetInfo();
+			//const ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
+
 			debugMesh->m_flatShaded->Render(m_owner, matrix, m_debugDisplaySolidMesh);
 		}
 	}

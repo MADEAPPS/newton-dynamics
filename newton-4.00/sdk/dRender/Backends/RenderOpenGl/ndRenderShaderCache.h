@@ -23,7 +23,6 @@ class ndRenderShaderCache
 	private:
 	void Cleanup();
 	bool CreateAllEffects();
-	//void LoadShaderCode (const char* const name, char* const buffer);
 	GLuint CreateShaderEffect (const char* const vertexShader, const char* const pixelShader, const char* const geometryShader = nullptr);
 
 	public:
@@ -35,9 +34,8 @@ class ndRenderShaderCache
 			GLuint m_shadowMaps;
 			GLuint m_diffuseEffect;
 			GLuint m_diffuseShadowEffect;
-			GLuint m_diffuseTransparentEffect;
-
 			GLuint m_debugDiffuseSolidEffect;
+			GLuint m_diffuseTransparentEffect;
 
 			//GLuint m_wireFrame;
 			//GLuint m_colorPoint;
