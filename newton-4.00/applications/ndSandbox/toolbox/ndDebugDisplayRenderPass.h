@@ -23,7 +23,8 @@ class ndDebugDisplayRenderPass : public ndRenderPass
 
 	void RenderScene(ndFloat32 timestep);
 
-	ndDemoEntityManager* m_owner;
+	ndDemoEntityManager* m_manager;
+	ndInt32 m_collisionDisplayMode;
 };
 
 #endif
