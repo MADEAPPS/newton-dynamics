@@ -14,14 +14,27 @@ set (projectName "ndSandbox")
 message (${projectName})
 
 # source and header files
-file(GLOB CPP_SOURCE 
-	*.h
-	*.cpp
-	demos/*.h
-	demos/*.cpp
-	toolbox/*.h
-	toolbox/*.cpp 
-)
+if (APPLE) 
+	file(GLOB CPP_SOURCE 
+		*.h
+		*.cpp
+		demos/*.h
+		demos/*.cpp
+		toolbox/*.h
+		toolbox/*.cpp 
+		plaforms/macos/*.mm 	
+	)
+else()
+	file(GLOB CPP_SOURCE 
+		*.h
+		*.cpp
+		demos/*.h
+		demos/*.cpp
+		toolbox/*.h
+		toolbox/*.cpp 
+		plaforms/opengl/*.cpp 
+	)
+endif()
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
