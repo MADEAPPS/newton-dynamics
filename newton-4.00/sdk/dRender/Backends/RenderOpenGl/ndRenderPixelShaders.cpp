@@ -35,6 +35,41 @@ R""""(
 	}
 )"""";
 
+const char* ndRenderShaderCache::m_debugFlatDiffusePixel =
+R""""(
+	#version 450 core
+
+	uniform vec3 diffuseColor;
+
+	uniform vec3 directionalLightAmbient;
+	uniform vec3 directionalLightIntesity;
+	uniform vec3 directionalLightDirection;
+
+	in vec3 posit;
+	in vec3 normal;
+
+	out vec4 pixelColor;
+	
+	// implement a simple blinn model
+	void main()
+	{
+		vec3 normalDir = normalize (normal);
+
+		// calculate emisive, just a constant;
+		vec3 emissive = diffuseColor * directionalLightAmbient;
+
+		// calculate lambert diffuse component
+		float diffuseReflection = max (dot (normalDir, directionalLightDirection), 0.0);
+		vec3 diffuse = diffuseColor * directionalLightIntesity * diffuseReflection;
+	
+		// add all contributions
+		vec3 color = emissive + diffuse;
+
+		pixelColor = vec4(color, 1.0);
+	}
+
+)"""";
+
 const char* ndRenderShaderCache::m_directionalDiffusePixel =
 R""""(
 	#version 450 core

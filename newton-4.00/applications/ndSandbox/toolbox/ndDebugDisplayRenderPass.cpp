@@ -17,9 +17,11 @@
 ndDebugDisplayRenderPass::ndDebugDisplayRenderPass(ndDemoEntityManager* const owner)
 	:ndRenderPass(*owner->GetRenderer())
 	,m_manager(owner)
+	,m_meshCache()
 	,m_collisionDisplayMode(0)
 {
-	m_active = false;
+	//m_active = false;
+	m_collisionDisplayMode = 3;
 }
 
 ndDebugDisplayRenderPass::~ndDebugDisplayRenderPass()
@@ -38,28 +40,60 @@ void ndDebugDisplayRenderPass::SetDisplayMode(ndInt32 mode)
 	m_active = true;
 }
 
+ndDebugDisplayRenderPass::ndDebugMesh* ndDebugDisplayRenderPass::CreateRenderPrimitive(const ndShapeInstance& shapeInstance) const
+{
+	ndShapeInstance shape(shapeInstance);
+	shape.SetScale(ndVector(1.0f));
+	shape.SetLocalMatrix(ndGetIdentityMatrix());
+
+	ndRender* const render = m_owner;
+	ndDebugMesh* const debugMesh = new ndDebugMesh;
+
+	debugMesh->m_flatShaded = ndSharedPtr<ndRenderPrimitive> (ndRenderPrimitiveMesh::CreateFromCollisionShape(render, &shape));
+
+	//ndDebugMesh debugMesh;
+	//debugMesh.m_flatShaded = new ndFlatShadedDebugMesh(scene->GetShaderCache(), &shape);
+	//debugMesh.m_zBufferShaded = new ndZbufferDebugMesh(scene->GetShaderCache(), &shape);
+	//debugMesh.m_wireFrameShareEdge = new ndWireFrameDebugMesh(scene->GetShaderCache(), &shape);
+	//if (shape.GetShape()->GetAsShapeStaticBVH())
+	//{
+	//	debugMesh.m_wireFrameOpenEdge = new ndWireFrameDebugMesh(scene->GetShaderCache(), &shape, ndShapeDebugNotify::ndEdgeType::m_open);
+	//	debugMesh.m_wireFrameOpenEdge->SetColor(ndVector(1.0f, 0.0f, 1.0f, 1.0f));
+	//}
+	//shapeNode = m_meshCache.Insert(debugMesh, key);
+
+	return debugMesh;
+}
+
 void ndDebugDisplayRenderPass::RenderScene(ndFloat32)
 {
-	//ndUserCallback
-
 	ndPhysicsWorld* const world = m_manager->GetWorld();
 	const ndBodyListView& bodyList = world->GetBodyList();
 
+	//ndRenderPrimitiveMeshImplement* const meshReander = m_im
 	for (ndBodyListView::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	{
 		ndBodyKinematic* const body = bodyNode->GetInfo()->GetAsBodyKinematic();
 		const ndShapeInstance& shapeInstance = body->GetCollisionShape();
 
 		ndShape* const key = (ndShape*)shapeInstance.GetShape();
-		if (!(key->GetAsShapeNull() || key->GetAsShapeStaticProceduralMesh()))
+		if (key->GetAsShapeNull() || key->GetAsShapeStaticProceduralMesh())
 		{
-			ndAssert(0);
-			//const ndMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
+			continue;
+		}
+
+		ndTree<ndSharedPtr<ndDebugMesh>, ndShape*>::ndNode* node = m_meshCache.Find(key);
+		if (!node)
+		{
+			ndSharedPtr<ndDebugMesh> debugMesh(CreateRenderPrimitive(shapeInstance));
+			node = m_meshCache.Insert(debugMesh, key);
 		}
 
 		if (m_collisionDisplayMode == 3)
 		{
-			ndAssert(0);
+			const ndMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
+			ndSharedPtr<ndDebugMesh>& debugMesh = node->GetInfo();
+			debugMesh->m_flatShaded->Render(m_owner, matrix, m_debugDisplaySolidMesh);
 		}
 	}
 }

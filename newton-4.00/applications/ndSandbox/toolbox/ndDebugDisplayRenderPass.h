@@ -16,6 +16,24 @@ class ndDemoEntityManager;
 class ndDebugDisplayRenderPass : public ndRenderPass
 {
 	public:
+
+	class ndDebugMesh
+	{
+		public:
+		ndDebugMesh()
+			:m_flatShaded()
+			//,m_zBufferShaded()
+			//,m_wireFrameOpenEdge()
+			//,m_wireFrameShareEdge()
+		{
+		}
+
+		//ndSharedPtr<ndZbufferDebugMesh> m_zBufferShaded;
+		ndSharedPtr<ndRenderPrimitive> m_flatShaded;
+		//ndSharedPtr<ndWireFrameDebugMesh> m_wireFrameOpenEdge;
+		//ndSharedPtr<ndWireFrameDebugMesh> m_wireFrameShareEdge;
+	};
+
 	ndDebugDisplayRenderPass(ndDemoEntityManager* const owner);
 	~ndDebugDisplayRenderPass();
 
@@ -23,7 +41,10 @@ class ndDebugDisplayRenderPass : public ndRenderPass
 
 	void RenderScene(ndFloat32 timestep);
 
+	ndDebugMesh* CreateRenderPrimitive(const ndShapeInstance& shapeInstance) const;
+
 	ndDemoEntityManager* m_manager;
+	ndTree<ndSharedPtr<ndDebugMesh>, ndShape*> m_meshCache;
 	ndInt32 m_collisionDisplayMode;
 };
 

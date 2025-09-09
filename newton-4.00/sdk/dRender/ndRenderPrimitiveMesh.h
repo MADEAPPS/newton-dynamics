@@ -59,6 +59,10 @@ class ndRenderPrimitiveMesh : public ndRenderPrimitive
 
 	static ndSharedPtr<ndRenderPrimitive> CreateFromCollisionShape(
 		const ndRender* const render,
+		const ndShapeInstance* const collision);
+
+	static ndSharedPtr<ndRenderPrimitive> CreateFromCollisionShape(
+		const ndRender* const render,
 		const ndShapeInstance* const collision,
 		const ndRenderPrimitiveMeshMaterial& material,
 		ndUvMapingMode mapping = m_box,

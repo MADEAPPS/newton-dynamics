@@ -21,10 +21,13 @@ class ndRenderPrimitiveMeshSegment;
 class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRenderPrimitiveMeshImplement>
 {
 	public:
+	ndRenderPrimitiveMeshImplement(const ndRender* const render, const ndShapeInstance* const collision);
+
 	ndRenderPrimitiveMeshImplement(
 		const ndRender* const render, const ndShapeInstance* const collision, 
 		const ndRenderPrimitiveMeshMaterial& material, ndRenderPrimitiveMesh::ndUvMapingMode mapping,
 		const ndMatrix& uvMatrix, bool stretchMaping);
+
 	~ndRenderPrimitiveMeshImplement();
 
 	void Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderMode) const;
@@ -37,6 +40,7 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 
 	void RenderShadowMap(const ndRender* const render, const ndMatrix& lightMatrix) const;
 	void RenderSolidColor(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
+	void RenderDebugShape(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
 	void RenderShadowSolidColor(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
 	void RenderTransparency(const ndRender* const render, const ndMatrix& modelViewMatrix, bool backface) const;
 
@@ -50,20 +54,29 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	GLuint m_vertexBuffer;
 	GLuint m_vertextArrayBuffer;
 
-	struct SolidColorBlock
+	struct DebugSolidColorBlock
 	{
-		GLint m_texture;
-		GLint m_environmentMap;
 		GLint m_diffuseColor;
-		GLint m_specularColor;
-		GLint m_reflectionColor;
 		GLint m_directionalLightAmbient;
 		GLint m_directionalLightIntesity;
 		GLint m_directionalLightDirection;
-		GLint m_specularAlpha;
-
 		GLint m_projectMatrixLocation;
 		GLint m_viewModelMatrixLocation;
+	};
+
+	struct SolidColorBlock: public DebugSolidColorBlock
+	{
+		GLint m_texture;
+		GLint m_environmentMap;
+		GLint m_specularColor;
+		GLint m_specularAlpha;
+		GLint m_reflectionColor;
+		//GLint m_diffuseColor;
+		//GLint m_directionalLightAmbient;
+		//GLint m_directionalLightIntesity;
+		//GLint m_directionalLightDirection;
+		//GLint m_projectMatrixLocation;
+		//GLint m_viewModelMatrixLocation;
 	};
 	struct SolidShadowColorBlock : public SolidColorBlock
 	{
@@ -78,8 +91,8 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 		GLint m_opacity;
 	};
 
-
 	SolidColorBlock m_solidColorBlock;
+	DebugSolidColorBlock m_debugSolidColorBlock;
 	SolidShadowColorBlock m_solidShadowColorBlock;
 	TransparentColorBlock m_transparencyColorBlock;
 };
