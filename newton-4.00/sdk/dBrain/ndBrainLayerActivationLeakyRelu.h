@@ -37,8 +37,8 @@ class ndBrainLayerActivationLeakyRelu : public ndBrainLayerActivation
 	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
 
 	const char* GetLabelId() const override;
-	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const;
-	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const;
+	void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const override;
+	void InputDerivative(const ndBrainVector& input, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const override;
 
 	virtual bool HasGpuSupport() const override;
 	virtual void FeedForward(const ndBrainLayerFeedForwardCpuCommand* const command, ndInt32 miniBatchIndex) const override;
