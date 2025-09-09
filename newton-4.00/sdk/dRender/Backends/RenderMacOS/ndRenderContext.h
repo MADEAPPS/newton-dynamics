@@ -73,9 +73,11 @@ class ndRenderContext: public ndClassAlloc
 	bool m_mousePressed[3];
 
 	friend class ndRenderTexture;
-	friend class ndGuiRenderPass;
+	friend class ndRenderPassGui;
 	friend class ndRenderPassColor;
 	friend class ndRenderSceneCamera;
+	friend class ndRenderPassTransparency;
+	friend class ndRenderPassShadowsImplement;
 	friend class ndRenderPrimitiveMeshImplement;
 	friend class ndRenderPassEnvironmentImplement;
 };
