@@ -36,6 +36,7 @@
 #include <ndRenderPrimitiveMesh.h>
 #include <ndRenderPassEnvironment.h>
 #include <ndRenderPassTransparency.h>
+#include <ndRenderSceneNodeInstance.h>
 
 #endif 
 

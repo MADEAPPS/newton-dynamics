@@ -22,9 +22,9 @@
 #include "ndHighResolutionTimer.h"
 #include "ndDebugDisplayRenderPass.h"
 
-//#define DEFAULT_SCENE	0		// basic rigidbody
+#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// basic friction
-#define DEFAULT_SCENE	2		// basic Trigger
+//#define DEFAULT_SCENE	2		// basic Trigger
 //#define DEFAULT_SCENE	3		// basic sliding platform
  
  

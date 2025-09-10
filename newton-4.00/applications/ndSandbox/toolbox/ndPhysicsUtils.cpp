@@ -14,7 +14,6 @@
 #include "ndPhysicsWorld.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
-//#include "ndDemoInstanceEntity.h"
 #include "ndHighResolutionTimer.h"
 
 ndVector FindFloor(const ndWorld& world, const ndVector& origin, ndFloat32 dist)
@@ -242,22 +241,54 @@ void AddPlanks(ndDemoEntityManager* const scene, const ndMatrix& location, ndFlo
 	}
 }
 
-//void AddCapsulesStacks(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, ndInt32 rows_x, ndInt32 rows_z, ndInt32 columHigh)
-//{
-//	ndShapeInstance shape(new ndShapeCapsule(radius0, radius1, high));
+void AddCapsulesStacks(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, ndInt32 rows_x, ndInt32 rows_z, ndInt32 columHigh)
+{
+	ndShapeInstance shape(new ndShapeCapsule(radius0, radius1, high));
 //	ndSharedPtr<ndDemoMeshIntance> instanceMesh(new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.png", "marble.png", "marble.png"));
-//
-//	ndSharedPtr<ndDemoEntity>rootEntity(new ndDemoInstanceEntity(instanceMesh));
-//	scene->AddEntity(rootEntity);
-//
-//	ndFloat32 spacing = 2.0f;
-//	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
-//	for (ndInt32 z = 0; z < rows_z; ++z)
-//	{
-//		for (ndInt32 x = 0; x < rows_x; ++x)
-//		{
+
+	ndRenderPrimitiveMeshMaterial material;
+	ndRender* const render = *scene->GetRenderer();
+	material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("marble.png"));
+	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateFromCollisionShape(render, &shape, material, ndRenderPrimitiveMesh::m_spherical));
+
+	ndSharedPtr<ndRenderSceneNode>root(new ndRenderSceneNodeInstance(location));
+	scene->AddEntity(root);
+
+	ndFloat32 spacing = 2.0f;
+	const ndMatrix startMatrix(ndRollMatrix(90.0f * ndDegreeToRad));
+
+	ndPhysicsWorld* const world = scene->GetWorld();
+	for (ndInt32 z = 0; z < rows_z; ++z)
+	{
+		for (ndInt32 x = 0; x < rows_x; ++x)
+		{
 //			matrix.m_posit = location.m_posit + ndVector((ndFloat32)(x - rows_x / 2) * spacing, 0.0f, (ndFloat32)(z - rows_z / 2) * spacing, 0.0f);
 //			AddShape(scene, rootEntity, shape, mass, matrix, high, columHigh);
-//		}
-//	}
-//}
+			ndMatrix matrix(startMatrix);
+			matrix.m_posit = location.m_posit + ndVector((ndFloat32)(x - rows_x / 2) * spacing, 0.0f, (ndFloat32)(z - rows_z / 2) * spacing, ndFloat32(0.0f));
+
+			ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+			matrix.m_posit.m_y = floor.m_y + high + 7.0f;
+
+			for (ndInt32 i = 0; i < columHigh; ++i)
+			{
+			//	ndSharedPtr<ndBody> body(new ndBodyDynamic());
+			//	ndSharedPtr<ndDemoEntity>entity(new ndDemoEntity(matrix));
+			//	root->AddChild(entity);
+			
+				ndSharedPtr<ndRenderSceneNode>instanceMesh(new ndRenderSceneNode(matrix));
+				instanceMesh->SetPrimitive(mesh);
+				root->AddChild(instanceMesh);
+
+			//	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+			//	body->SetMatrix(matrix);
+			//	body->GetAsBodyDynamic()->SetCollisionShape(shape);
+			//	body->GetAsBodyDynamic()->SetMassMatrix(mass, shape);
+			//	body->GetAsBodyDynamic()->SetAngularDamping(ndVector(ndFloat32(0.5f)));
+			//
+			//	world->AddBody(body);
+				matrix.m_posit.m_y += high * 2.5f;
+			}
+		}
+	}
+}

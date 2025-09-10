@@ -50,6 +50,28 @@ ndRenderSceneNode::~ndRenderSceneNode()
 {
 }
 
+void ndRenderSceneNode::AddChild(const ndSharedPtr<ndRenderSceneNode>& child)
+{
+	ndAssert(child->m_parent == nullptr);
+	child->m_parent = this;
+	m_children.Append(child);
+}
+
+void ndRenderSceneNode::RemoveChild(const ndSharedPtr<ndRenderSceneNode> child)
+{
+	ndAssert(child->m_parent);
+	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = m_children.GetFirst(); node; node = node->GetNext())
+	{
+		ndRenderSceneNode* const childNode = *node->GetInfo();
+		if (childNode == *child)
+		{
+			child->m_parent = nullptr;
+			m_children.Remove(node);
+			break;
+		}
+	}
+}
+
 void ndRenderSceneNode::SetPrimitiveMatrix(const ndMatrix& matrix)
 {
 	m_primitiveMatrix = matrix;
@@ -98,26 +120,17 @@ void ndRenderSceneNode::SetTransform(const ndTransform& transform)
 
 void ndRenderSceneNode::InterpolateTransforms(ndFloat32 param)
 {
-	ndFixSizeArray<ndRenderSceneNode*, 128> stack;
-	stack.PushBack(this);
-	while (stack.GetCount())
-	{
-		ndRenderSceneNode* const rooNode = stack.Pop();
-		{
-			const ndVector p0(rooNode->m_transform0.m_position);
-			const ndVector p1(rooNode->m_transform1.m_position);
-			const ndQuaternion r0(rooNode->m_transform0.m_rotation);
-			const ndQuaternion r1(rooNode->m_transform1.m_rotation);
-			const ndVector posit(p0 + (p1 - p0).Scale(param));
-			const ndQuaternion rotation(r0.Slerp(r1, param));
-			rooNode->SetMatrix(rotation, posit);
-		}
+	const ndVector p0(m_transform0.m_position);
+	const ndVector p1(m_transform1.m_position);
+	const ndQuaternion r0(m_transform0.m_rotation);
+	const ndQuaternion r1(m_transform1.m_rotation);
+	const ndVector posit(p0 + (p1 - p0).Scale(param));
+	const ndQuaternion rotation(r0.Slerp(r1, param));
 
-		for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = m_children.GetFirst(); node; node = node->GetNext())
-		{
-			ndRenderSceneNode* const childNode = *node->GetInfo();
-			stack.PushBack(childNode);
-		}
+	SetMatrix(rotation, posit);
+	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = m_children.GetFirst(); node; node = node->GetNext())
+	{
+		node->GetInfo()->InterpolateTransforms(param);
 	}
 }
 
@@ -136,7 +149,6 @@ void ndRenderSceneNode::Render(const ndRender* const owner, ndFloat32 timestep, 
 	//RenderBone(scene, nodeMatrix);
 	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = m_children.GetFirst(); node; node = node->GetNext())
 	{
-		ndAssert(0);
 		ndRenderSceneNode* const childNode = *node->GetInfo();
 		childNode->Render(owner, timestep, nodeMatrix, renderMode);
 	}
