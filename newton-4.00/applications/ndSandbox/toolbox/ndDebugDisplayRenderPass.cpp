@@ -55,18 +55,8 @@ ndDebugDisplayRenderPass::ndDebugMesh* ndDebugDisplayRenderPass::CreateRenderPri
 	ndDebugMesh* const debugMesh = new ndDebugMesh;
 
 	debugMesh->m_flatShaded = ndSharedPtr<ndRenderPrimitive> (ndRenderPrimitiveMesh::CreateFromCollisionShape(render, &shape));
+	debugMesh->m_zBuffer = ndSharedPtr<ndRenderPrimitive>(ndRenderPrimitiveMesh::CreateSetZbufferCollisionShape(render, &shape));
 	debugMesh->m_wireFrameShareEdge = ndSharedPtr<ndRenderPrimitive>(ndRenderPrimitiveMesh::CreateWireFrameFromCollisionShape(render, &shape));
-
-	//ndDebugMesh debugMesh;
-	//debugMesh.m_flatShaded = new ndFlatShadedDebugMesh(scene->GetShaderCache(), &shape);
-	//debugMesh.m_zBufferShaded = new ndZbufferDebugMesh(scene->GetShaderCache(), &shape);
-	//debugMesh.m_wireFrameShareEdge = new ndWireFrameDebugMesh(scene->GetShaderCache(), &shape);
-	//if (shape.GetShape()->GetAsShapeStaticBVH())
-	//{
-	//	debugMesh.m_wireFrameOpenEdge = new ndWireFrameDebugMesh(scene->GetShaderCache(), &shape, ndShapeDebugNotify::ndEdgeType::m_open);
-	//	debugMesh.m_wireFrameOpenEdge->SetColor(ndVector(1.0f, 0.0f, 1.0f, 1.0f));
-	//}
-	//shapeNode = m_meshCache.Insert(debugMesh, key);
 
 	return debugMesh;
 }
@@ -119,10 +109,36 @@ void ndDebugDisplayRenderPass::RenderScene(ndFloat32)
 				break;
 			}
 
+			case 3:
 			default:
 			{
-				ndAssert(0);
+				debugMesh->m_zBuffer->Render(m_owner, matrix, m_debugDisplaySetZbuffer);
 			}
+		}
+	}
+
+	if (m_collisionDisplayMode == 3)
+	{
+		for (ndBodyListView::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+		{
+			ndBodyKinematic* const body = bodyNode->GetInfo()->GetAsBodyKinematic();
+			const ndShapeInstance& shapeInstance = body->GetCollisionShape();
+			ndShape* const key = (ndShape*)shapeInstance.GetShape();
+			if (key->GetAsShapeNull() || key->GetAsShapeStaticProceduralMesh())
+			{
+				continue;
+			}
+			ndTree<ndSharedPtr<ndDebugMesh>, ndShape*>::ndNode* const node = m_meshCache.Find(key);
+			ndAssert(node);
+			const ndMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
+			ndSharedPtr<ndDebugMesh>& debugMesh = node->GetInfo();
+			const ndVector color((body->GetSleepState() == 1) ? m_sleepColor : m_awakeColor);
+
+			ndRenderPrimitiveMesh* const mesh = (ndRenderPrimitiveMesh*)*debugMesh->m_flatShaded;
+			ndRenderPrimitiveMeshSegment& segment = mesh->m_segments.GetFirst()->GetInfo();
+			ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
+			material->m_diffuse = color;
+			debugMesh->m_wireFrameShareEdge->Render(m_owner, matrix, m_debugDisplayWireFrameMesh);
 		}
 	}
 }

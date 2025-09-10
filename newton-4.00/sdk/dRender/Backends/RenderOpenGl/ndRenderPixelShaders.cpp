@@ -26,12 +26,14 @@ R""""(
 	}
 )"""";
 
-const char* ndRenderShaderCache::m_shadowMapPixel =
+const char* ndRenderShaderCache::m_doNothingPixel =
 R""""(
 	#version 450 core
-                                                                                    
+                        
+	//out vec4 pixelColor;
 	void main()
-	{
+	{	
+		//pixelColor = vec4(0.5, 0.5, 0.5, 1.0);
 	}
 )"""";
 

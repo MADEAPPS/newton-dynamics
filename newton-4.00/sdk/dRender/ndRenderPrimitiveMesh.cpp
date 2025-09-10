@@ -45,12 +45,21 @@ ndRenderPrimitiveMesh::~ndRenderPrimitiveMesh()
 {
 }
 
+ndSharedPtr<ndRenderPrimitive> ndRenderPrimitiveMesh::CreateSetZbufferCollisionShape(
+	const ndRender* const render,
+	const ndShapeInstance* const collision)
+{
+	ndRenderPrimitiveMesh* const primtive = new ndRenderPrimitiveMesh();
+	primtive->m_implementation = ndSharedPtr<ndRenderPrimitiveMeshImplement>(new ndRenderPrimitiveMeshImplement(primtive, render, collision, ndRenderPrimitiveMeshImplement::m_hidenLines));
+	return ndSharedPtr<ndRenderPrimitive>(primtive);
+}
+
 ndSharedPtr<ndRenderPrimitive> ndRenderPrimitiveMesh::CreateWireFrameFromCollisionShape(
 	const ndRender* const render,
 	const ndShapeInstance* const collision)
 {
 	ndRenderPrimitiveMesh* const primtive = new ndRenderPrimitiveMesh();
-	primtive->m_implementation = ndSharedPtr<ndRenderPrimitiveMeshImplement>(new ndRenderPrimitiveMeshImplement(primtive, render, collision, true));
+	primtive->m_implementation = ndSharedPtr<ndRenderPrimitiveMeshImplement>(new ndRenderPrimitiveMeshImplement(primtive, render, collision, ndRenderPrimitiveMeshImplement::m_wireFrame));
 	return ndSharedPtr<ndRenderPrimitive>(primtive);
 }
 
@@ -59,7 +68,7 @@ ndSharedPtr<ndRenderPrimitive> ndRenderPrimitiveMesh::CreateFromCollisionShape(
 	const ndShapeInstance* const collision)
 {
 	ndRenderPrimitiveMesh* const primtive = new ndRenderPrimitiveMesh();
-	primtive->m_implementation = ndSharedPtr<ndRenderPrimitiveMeshImplement>(new ndRenderPrimitiveMeshImplement(primtive, render, collision, false));
+	primtive->m_implementation = ndSharedPtr<ndRenderPrimitiveMeshImplement>(new ndRenderPrimitiveMeshImplement(primtive, render, collision, ndRenderPrimitiveMeshImplement::m_solid));
 	return ndSharedPtr<ndRenderPrimitive>(primtive);
 }
 

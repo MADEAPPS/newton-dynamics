@@ -21,11 +21,17 @@ class ndRenderPrimitiveMeshSegment;
 class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRenderPrimitiveMeshImplement>
 {
 	public:
+	enum ndDebugModeCreate
+	{
+		m_solid,
+		m_wireFrame,
+		m_hidenLines,
+	};
 	ndRenderPrimitiveMeshImplement(
 		ndRenderPrimitiveMesh* const owner, 
 		const ndRender* const render, 
 		const ndShapeInstance* const collision,
-		bool wireFrame);
+		ndDebugModeCreate mode);
 
 	ndRenderPrimitiveMeshImplement(
 		ndRenderPrimitiveMesh* const owner,
@@ -45,11 +51,13 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 
 	void BuildSolidDebugMesh(const ndShapeInstance* const collision);
 	void BuildWireframeDebugMesh(const ndShapeInstance* const collision);
+	void BuildSetZBufferDebugMesh(const ndShapeInstance* const collision);
 
 	void RenderShadowMap(const ndRender* const render, const ndMatrix& lightMatrix) const;
 	void RenderSolidColor(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
-	void RenderShadowSolidColor(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
+	void RenderDebugSetZbuffer(const ndRender* const render, const ndMatrix& modelMatrix) const;
 	void RenderDebugShapeSolid(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
+	void RenderShadowSolidColor(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
 	void RenderDebugShapeWireFrame(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
 	void RenderTransparency(const ndRender* const render, const ndMatrix& modelViewMatrix, bool backface) const;
 
@@ -71,6 +79,11 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 		GLint m_directionalLightDirection;
 		GLint m_projectMatrixLocation;
 		GLint m_viewModelMatrixLocation;
+	};
+
+	struct SetZbufferCleanBlock
+	{
+		GLint viewModelProjectionMatrix;
 	};
 
 	struct SolidColorBlock: public DebugSolidColorBlock
@@ -95,6 +108,7 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	};
 
 	SolidColorBlock m_solidColorBlock;
+	SetZbufferCleanBlock m_setZbufferBlock;
 	DebugSolidColorBlock m_debugSolidColorBlock;
 	SolidShadowColorBlock m_solidShadowColorBlock;
 	TransparentColorBlock m_transparencyColorBlock;

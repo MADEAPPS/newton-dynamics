@@ -14,6 +14,7 @@
 #include "ndRenderStdafx.h"
 #include "ndRenderPrimitive.h"
 
+class ndRender;
 class ndRenderTexture;
 class ndRenderPrimitiveMeshImplement;
 
@@ -56,6 +57,10 @@ class ndRenderPrimitiveMesh : public ndRenderPrimitive
 	virtual ~ndRenderPrimitiveMesh();
 
 	virtual void Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderPassMode) const override;
+
+	static ndSharedPtr<ndRenderPrimitive> CreateSetZbufferCollisionShape(
+		const ndRender* const render,
+		const ndShapeInstance* const collision);
 
 	static ndSharedPtr<ndRenderPrimitive> CreateWireFrameFromCollisionShape(
 		const ndRender* const render,

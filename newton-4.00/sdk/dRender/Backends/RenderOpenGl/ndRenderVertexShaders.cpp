@@ -28,6 +28,21 @@ R""""(
 	}
 )"""";
 
+const char* ndRenderShaderCache::m_setZbufferVertex =
+R""""(
+	#version 450 core
+
+	// using the same vertex buffer
+	layout(location = 0) in vec3 in_position;
+
+	uniform mat4 viewModelProjectionMatrix;
+	void main()
+	{
+		gl_Position = viewModelProjectionMatrix * vec4(in_position, 1.0);
+	}
+)"""";
+
+
 const char* ndRenderShaderCache::m_shadowMapVertex =
 R""""(
 	#version 450 core

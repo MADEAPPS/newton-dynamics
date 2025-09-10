@@ -37,8 +37,9 @@ void ndRenderShaderCache::Cleanup()
 
 bool ndRenderShaderCache::CreateAllEffects()
 {
-	m_skyBox = CreateShaderEffect(m_skyBoxVertex, m_skyBoxPixel);
-	m_shadowMaps = CreateShaderEffect(m_shadowMapVertex, m_shadowMapPixel);
+	m_skyBoxEffect = CreateShaderEffect(m_skyBoxVertex, m_skyBoxPixel);
+	m_setZbufferEffect = CreateShaderEffect(m_setZbufferVertex, m_doNothingPixel);
+	m_shadowMapsEffect = CreateShaderEffect(m_shadowMapVertex, m_doNothingPixel);
 	m_diffuseEffect = CreateShaderEffect(m_directionalDiffuseVertex, m_directionalDiffusePixel);
 	m_debugDiffuseSolidEffect = CreateShaderEffect(m_debugFlatDiffuseVertex, m_debugFlatDiffusePixel);
 	m_diffuseShadowEffect = CreateShaderEffect(m_directionalDiffuseShadowVertex, m_directionalDiffuseShadowPixel);
@@ -47,9 +48,6 @@ bool ndRenderShaderCache::CreateAllEffects()
 	//m_wireFrame = CreateShaderEffect("WireFrame", "FlatShaded");
 	//m_flatShaded = CreateShaderEffect("FlatShaded", "FlatShaded");
 	//m_colorPoint = CreateShaderEffect("ColorPoint", "FlatShaded");
-	 
-	 
-	//m_zBufferDebug = CreateShaderEffect("zBufferDebug", "zBufferDebug");
 	//m_texturedDecal = CreateShaderEffect ("TextureDecal", "TextureDecal");
 	//m_diffuseDebrisEffect = CreateShaderEffect("DirectionalDebriDiffuse", "DirectionalDebriDiffuse");
 	//m_skinningDiffuseEffect = CreateShaderEffect ("SkinningDirectionalDiffuse", "DirectionalDiffuse");

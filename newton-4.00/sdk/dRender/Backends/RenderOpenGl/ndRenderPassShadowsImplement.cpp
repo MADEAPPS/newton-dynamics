@@ -48,7 +48,7 @@ ndRenderPassShadowsImplement::ndRenderPassShadowsImplement(ndRenderContext* cons
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_shadowMapTexture, 0);
 	
-	GLuint shader = m_context->m_shaderCache->m_shadowMaps;
+	GLuint shader = m_context->m_shaderCache->m_shadowMapsEffect;
 	glUseProgram(shader);
 	m_modelProjectionMatrixLocation = GLuint(glGetUniformLocation(shader, "viewModelProjectionMatrix"));
 	glUseProgram(0);
@@ -192,7 +192,7 @@ void ndRenderPassShadowsImplement::RenderScene(const ndRenderSceneCamera* const 
 	
 	glClear(GL_DEPTH_BUFFER_BIT);
 	
-	GLuint shader = m_context->m_shaderCache->m_shadowMaps;
+	GLuint shader = m_context->m_shaderCache->m_shadowMapsEffect;
 	glUseProgram(shader);
 	
 	glPolygonOffset(GLfloat(1.0f), GLfloat(1024.0f * 8.0f));

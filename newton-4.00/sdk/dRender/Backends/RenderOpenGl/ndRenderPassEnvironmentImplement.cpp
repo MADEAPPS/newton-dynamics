@@ -56,7 +56,7 @@ ndRenderPassEnvironmentImplement::ndRenderPassEnvironmentImplement(ndRenderConte
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	
-	GLuint shader = m_context->m_shaderCache->m_skyBox;
+	GLuint shader = m_context->m_shaderCache->m_skyBoxEffect;
 	glUseProgram(shader);
 	m_invViewModelProjectionTextureMatrix = glGetUniformLocation(shader, "invViewModelProjectionTextureMatrix");
 	glUseProgram(0);
@@ -91,7 +91,7 @@ void ndRenderPassEnvironmentImplement::RenderScene(const ndRenderSceneCamera* co
 	//glGetIntegerv(GL_VIEWPORT, viewport);
 
 	glDisable(GL_SCISSOR_TEST);
-	GLuint shader = m_context->m_shaderCache->m_skyBox;
+	GLuint shader = m_context->m_shaderCache->m_skyBoxEffect;
 	glUseProgram(shader);
 	glUniformMatrix4fv(m_invViewModelProjectionTextureMatrix, 1, false, &invViewModelProjectionTextureMatrix[0][0]);
 	

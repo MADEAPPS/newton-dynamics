@@ -30,18 +30,18 @@ class ndRenderShaderCache
 	{
 		struct
 		{
-			GLuint m_skyBox;
-			GLuint m_shadowMaps;
+			GLuint m_skyBoxEffect;
 			GLuint m_diffuseEffect;
+			GLuint m_setZbufferEffect;
+			GLuint m_shadowMapsEffect;
 			GLuint m_diffuseShadowEffect;
 			GLuint m_debugDiffuseSolidEffect;
 			GLuint m_diffuseTransparentEffect;
 
-			//GLuint m_wireFrame;
+
 			//GLuint m_colorPoint;
 			//GLuint m_flatShaded;
 			//GLuint m_thickPoints;
-			//GLuint m_zBufferDebug;
 			//GLuint m_texturedDecal;
 			//GLuint m_spriteSpheres;
 			//GLuint m_diffuseShadowEffect;
@@ -54,12 +54,13 @@ class ndRenderShaderCache
 
 	static const char* m_skyBoxVertex;
 	static const char* m_shadowMapVertex;
+	static const char* m_setZbufferVertex;
 	static const char* m_debugFlatDiffuseVertex;
 	static const char* m_directionalDiffuseVertex;
 	static const char* m_directionalDiffuseShadowVertex;
 
 	static const char* m_skyBoxPixel;
-	static const char* m_shadowMapPixel;
+	static const char* m_doNothingPixel;
 	static const char* m_debugFlatDiffusePixel;
 	static const char* m_directionalDiffusePixel;
 	static const char* m_directionalDiffuseShadowPixel;

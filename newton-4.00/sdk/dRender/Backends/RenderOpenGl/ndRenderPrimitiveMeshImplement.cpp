@@ -26,7 +26,7 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(
 	ndRenderPrimitiveMesh* const owner,
 	const ndRender* const render, 
 	const ndShapeInstance* const collision,
-	bool wireframe)
+	ndDebugModeCreate mode)
 	:ndContainersFreeListAlloc<ndRenderPrimitiveMeshImplement>()
 	,m_owner(owner)
 	,m_context(*render->m_context)
@@ -36,13 +36,18 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(
 	,m_vertexBuffer(0)
 	,m_vertextArrayBuffer(0)
 {
-	if (wireframe)
+	if (mode == m_wireFrame)
 	{
 		BuildWireframeDebugMesh(collision);
 	}
-	else
+	else if (mode == m_solid)
 	{
 		BuildSolidDebugMesh(collision);
+	}
+	else
+	{
+		ndAssert(mode == m_hidenLines);
+		BuildSetZBufferDebugMesh(collision);
 	}
 }
 
@@ -267,6 +272,91 @@ void ndRenderPrimitiveMeshImplement::BuildSolidDebugMesh(const ndShapeInstance* 
 		m_debugSolidColorBlock.m_directionalLightAmbient = glGetUniformLocation(shader, "directionalLightAmbient");
 		m_debugSolidColorBlock.m_directionalLightIntesity = glGetUniformLocation(shader, "directionalLightIntesity");
 		m_debugSolidColorBlock.m_directionalLightDirection = glGetUniformLocation(shader, "directionalLightDirection");
+		glUseProgram(0);
+	}
+}
+
+void ndRenderPrimitiveMeshImplement::BuildSetZBufferDebugMesh(const ndShapeInstance* const collision)
+{
+	class ndDrawShape : public ndShapeDebugNotify
+	{
+		public:
+		ndDrawShape()
+			:ndShapeDebugNotify()
+			,m_triangles(1024)
+		{
+		}
+
+		virtual void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceVertex, const ndEdgeType* const)
+		{
+			ndVector p0(faceVertex[0]);
+			ndVector p1(faceVertex[1]);
+			ndVector p2(faceVertex[2]);
+
+			for (ndInt32 i = 2; i < vertexCount; ++i)
+			{
+				glVector3 point;
+				point.m_x = GLfloat(faceVertex[0].m_x);
+				point.m_y = GLfloat(faceVertex[0].m_y);
+				point.m_z = GLfloat(faceVertex[0].m_z);
+				m_triangles.PushBack(point);
+
+				point.m_x = GLfloat(faceVertex[i - 1].m_x);
+				point.m_y = GLfloat(faceVertex[i - 1].m_y);
+				point.m_z = GLfloat(faceVertex[i - 1].m_z);
+				m_triangles.PushBack(point);
+
+				point.m_x = GLfloat(faceVertex[i].m_x);
+				point.m_y = GLfloat(faceVertex[i].m_y);
+				point.m_z = GLfloat(faceVertex[i].m_z);
+				m_triangles.PushBack(point);
+			}
+		}
+
+		ndArray<glVector3> m_triangles;
+	};
+
+	ndDrawShape drawShapes;
+	collision->DebugShape(ndGetIdentityMatrix(), drawShapes);
+	if (drawShapes.m_triangles.GetCount())
+	{
+		ndArray<ndInt32> m_triangles(drawShapes.m_triangles.GetCount());
+		m_triangles.SetCount(drawShapes.m_triangles.GetCount());
+
+		m_indexCount = ndInt32(m_triangles.GetCount());
+		ndInt32 vertexCount = ndVertexListToIndexList(&drawShapes.m_triangles[0].m_x, sizeof(glVector3), 3, ndInt32(drawShapes.m_triangles.GetCount()), &m_triangles[0], GLfloat(1.0e-6f));
+
+		glGenVertexArrays(1, &m_vertextArrayBuffer);
+		glBindVertexArray(m_vertextArrayBuffer);
+
+		glGenBuffers(1, &m_vertexBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+
+		glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(vertexCount * sizeof(glVector3)), &drawShapes.m_triangles[0].m_x, GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glVector3), 0);
+
+		glGenBuffers(1, &m_indexBuffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, GLsizeiptr(m_indexCount * sizeof(GLuint)), &m_triangles[0], GL_STATIC_DRAW);
+
+		glBindVertexArray(0);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		ndRenderPrimitiveMeshSegment& segment = m_owner->m_segments.Append()->GetInfo();
+
+		segment.m_material.m_specular = ndVector::m_zero;
+		segment.m_material.m_reflection = ndVector::m_zero;
+
+		segment.m_segmentStart = 0;
+		segment.m_indexCount = m_indexCount;
+
+		GLuint shader = m_context->m_shaderCache->m_setZbufferEffect;
+		glUseProgram(shader);
+		m_setZbufferBlock.viewModelProjectionMatrix = glGetUniformLocation(shader, "viewModelProjectionMatrix");
 		glUseProgram(0);
 	}
 }
@@ -511,6 +601,10 @@ void ndRenderPrimitiveMeshImplement::Render(const ndRender* const render, const 
 
 		case m_debugDisplayWireFrameMesh:
 			RenderDebugShapeWireFrame(render, modelMatrix);
+			break;
+
+		case m_debugDisplaySetZbuffer:
+			RenderDebugSetZbuffer(render, modelMatrix);
 			break;
 
 		default:
@@ -892,6 +986,36 @@ void ndRenderPrimitiveMeshImplement::RenderDebugShapeWireFrame(const ndRender* c
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 
 	glDrawElements(GL_LINES, m_indexCount, GL_UNSIGNED_INT, (void*)0);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	glUseProgram(0);
+}
+
+void ndRenderPrimitiveMeshImplement::RenderDebugSetZbuffer(const ndRender* const render, const ndMatrix& modelMatrix) const
+{
+	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
+
+	//const ndMatrix modelViewProjectionMatrixMatrix(modelMatrix * camera->m_invViewMatrix * camera->m_projectionMatrix);
+	const ndMatrix modelViewProjectionMatrixMatrix(modelMatrix * camera->m_invViewRrojectionMatrix);
+	const glMatrix glViewModelProjectionMatrix(modelViewProjectionMatrixMatrix);
+
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
+	glDisable(GL_BLEND);
+	glDepthFunc(GL_LEQUAL);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+
+	GLuint shader = m_context->m_shaderCache->m_setZbufferEffect;
+	glUseProgram(shader);
+
+	glUniformMatrix4fv(m_setZbufferBlock.viewModelProjectionMatrix, 1, false, &glViewModelProjectionMatrix[0][0]);
+
+	glBindVertexArray(m_vertextArrayBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+
+	glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, (void*)0);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);

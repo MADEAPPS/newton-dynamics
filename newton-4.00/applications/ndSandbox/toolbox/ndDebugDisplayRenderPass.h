@@ -21,14 +21,14 @@ class ndDebugDisplayRenderPass : public ndRenderPass
 	{
 		public:
 		ndDebugMesh()
-			:m_flatShaded()
-			//,m_zBufferShaded()
+			:m_zBuffer()
+			,m_flatShaded()
 			//,m_wireFrameOpenEdge()
 			,m_wireFrameShareEdge()
 		{
 		}
 
-		//ndSharedPtr<ndZbufferDebugMesh> m_zBufferShaded;
+		ndSharedPtr<ndRenderPrimitive> m_zBuffer;
 		ndSharedPtr<ndRenderPrimitive> m_flatShaded;
 		ndSharedPtr<ndRenderPrimitive> m_wireFrameShareEdge;
 		//ndSharedPtr<ndWireFrameDebugMesh> m_wireFrameOpenEdge;
