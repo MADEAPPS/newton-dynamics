@@ -35,6 +35,7 @@ class ndRenderShaderCache
 			GLuint m_setZbufferEffect;
 			GLuint m_shadowMapsEffect;
 			GLuint m_diffuseShadowEffect;
+			GLuint m_diffuseIntanceEffect;
 			GLuint m_debugDiffuseSolidEffect;
 			GLuint m_diffuseTransparentEffect;
 
@@ -46,7 +47,7 @@ class ndRenderShaderCache
 			//GLuint m_spriteSpheres;
 			//GLuint m_diffuseShadowEffect;
 			//GLuint m_diffuseDebrisEffect;
-			//GLuint m_diffuseIntanceEffect;
+			
 			//GLuint m_skinningDiffuseEffect;
 		};
 		GLuint m_shaders[128];
@@ -58,6 +59,7 @@ class ndRenderShaderCache
 	static const char* m_debugFlatDiffuseVertex;
 	static const char* m_directionalDiffuseVertex;
 	static const char* m_directionalDiffuseShadowVertex;
+	static const char* m_directionalDiffuseInstanceVertex;
 
 	static const char* m_skyBoxPixel;
 	static const char* m_doNothingPixel;
