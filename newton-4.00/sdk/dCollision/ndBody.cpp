@@ -97,12 +97,12 @@ ndBody::~ndBody()
 	}
 }
 
-bool ndBody::GetSeletonSelfCollision() const
+bool ndBody::GetSkeletonSelfCollision() const
 {
 	return m_skeletonSelfCollision ? true : false;
 }
 
-void ndBody::SetSeletonSelfCollision(bool state)
+void ndBody::SetSkeletonSelfCollision(bool state)
 {
 	m_skeletonSelfCollision = ndUnsigned8(state ? 1 : 0);
 }

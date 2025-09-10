@@ -1405,7 +1405,7 @@ void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1
 		const bool isCollidable = bilateral ? bilateral->IsCollidable() : true;
 		if (isCollidable)
 		{
-			bool selfSkelCollidable = body0->GetSeletonSelfCollision() && body1->GetSeletonSelfCollision();
+			bool selfSkelCollidable = body0->GetSkeletonSelfCollision() && body1->GetSkeletonSelfCollision();
 			if (!selfSkelCollidable)
 			{
 				const ndSkeletonContainer* skel0 = body0->GetSkeleton();

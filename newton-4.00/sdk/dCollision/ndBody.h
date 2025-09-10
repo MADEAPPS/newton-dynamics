@@ -62,8 +62,8 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	D_COLLISION_API ndUnsigned32 GetId() const;
 	D_COLLISION_API void GetAABB(ndVector& p0, ndVector& p1) const;
 
-	D_COLLISION_API bool GetSeletonSelfCollision() const;
-	D_COLLISION_API void SetSeletonSelfCollision(bool state);
+	D_COLLISION_API bool GetSkeletonSelfCollision() const;
+	D_COLLISION_API void SetSkeletonSelfCollision(bool state);
 
 	D_COLLISION_API virtual ndFloat32 GetInvMass() const;
 	D_COLLISION_API virtual bool RayCast(ndRayCastNotify& callback, const ndFastRay& ray, const ndFloat32 maxT) const = 0;
