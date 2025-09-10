@@ -21,7 +21,11 @@ class ndRenderPrimitiveMeshSegment;
 class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRenderPrimitiveMeshImplement>
 {
 	public:
-	ndRenderPrimitiveMeshImplement(ndRenderPrimitiveMesh* const owner, const ndRender* const render, const ndShapeInstance* const collision);
+	ndRenderPrimitiveMeshImplement(
+		ndRenderPrimitiveMesh* const owner, 
+		const ndRender* const render, 
+		const ndShapeInstance* const collision,
+		bool wireFrame);
 
 	ndRenderPrimitiveMeshImplement(
 		ndRenderPrimitiveMesh* const owner,
@@ -39,10 +43,14 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 		const glPositionNormalUV* const points, ndInt32 pointCount,
 		const ndInt32* const indices, ndInt32 indexCount);
 
+	void BuildSolidDebugMesh(const ndShapeInstance* const collision);
+	void BuildWireframeDebugMesh(const ndShapeInstance* const collision);
+
 	void RenderShadowMap(const ndRender* const render, const ndMatrix& lightMatrix) const;
 	void RenderSolidColor(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
-	void RenderDebugShape(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
 	void RenderShadowSolidColor(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
+	void RenderDebugShapeSolid(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
+	void RenderDebugShapeWireFrame(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
 	void RenderTransparency(const ndRender* const render, const ndMatrix& modelViewMatrix, bool backface) const;
 
 	ndRenderPrimitiveMesh* m_owner;

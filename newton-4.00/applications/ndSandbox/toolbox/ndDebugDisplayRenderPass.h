@@ -24,14 +24,14 @@ class ndDebugDisplayRenderPass : public ndRenderPass
 			:m_flatShaded()
 			//,m_zBufferShaded()
 			//,m_wireFrameOpenEdge()
-			//,m_wireFrameShareEdge()
+			,m_wireFrameShareEdge()
 		{
 		}
 
 		//ndSharedPtr<ndZbufferDebugMesh> m_zBufferShaded;
 		ndSharedPtr<ndRenderPrimitive> m_flatShaded;
+		ndSharedPtr<ndRenderPrimitive> m_wireFrameShareEdge;
 		//ndSharedPtr<ndWireFrameDebugMesh> m_wireFrameOpenEdge;
-		//ndSharedPtr<ndWireFrameDebugMesh> m_wireFrameShareEdge;
 	};
 
 	ndDebugDisplayRenderPass(ndDemoEntityManager* const owner);

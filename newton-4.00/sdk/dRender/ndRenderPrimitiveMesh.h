@@ -57,6 +57,10 @@ class ndRenderPrimitiveMesh : public ndRenderPrimitive
 
 	virtual void Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderPassMode) const override;
 
+	static ndSharedPtr<ndRenderPrimitive> CreateWireFrameFromCollisionShape(
+		const ndRender* const render,
+		const ndShapeInstance* const collision);
+
 	static ndSharedPtr<ndRenderPrimitive> CreateFromCollisionShape(
 		const ndRender* const render,
 		const ndShapeInstance* const collision);

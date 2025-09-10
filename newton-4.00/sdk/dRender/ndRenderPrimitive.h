@@ -23,6 +23,7 @@ enum ndRenderPassMode
 	m_transparencyBackface,
 	m_transparencyFrontface,
 	m_debugDisplaySolidMesh,
+	m_debugDisplayWireFrameMesh,
 };
 
 class ndRenderPrimitive : public ndContainersFreeListAlloc<ndRenderPrimitive>

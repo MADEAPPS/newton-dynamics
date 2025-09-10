@@ -22,6 +22,7 @@ ndDebugDisplayRenderPass::ndDebugDisplayRenderPass(ndDemoEntityManager* const ow
 	,m_meshCache()
 	,m_collisionDisplayMode(0)
 {
+	m_active = false;
 }
 
 ndDebugDisplayRenderPass::~ndDebugDisplayRenderPass()
@@ -54,6 +55,7 @@ ndDebugDisplayRenderPass::ndDebugMesh* ndDebugDisplayRenderPass::CreateRenderPri
 	ndDebugMesh* const debugMesh = new ndDebugMesh;
 
 	debugMesh->m_flatShaded = ndSharedPtr<ndRenderPrimitive> (ndRenderPrimitiveMesh::CreateFromCollisionShape(render, &shape));
+	debugMesh->m_wireFrameShareEdge = ndSharedPtr<ndRenderPrimitive>(ndRenderPrimitiveMesh::CreateWireFrameFromCollisionShape(render, &shape));
 
 	//ndDebugMesh debugMesh;
 	//debugMesh.m_flatShaded = new ndFlatShadedDebugMesh(scene->GetShaderCache(), &shape);
@@ -92,19 +94,35 @@ void ndDebugDisplayRenderPass::RenderScene(ndFloat32)
 			node = m_meshCache.Insert(debugMesh, key);
 		}
 
-		if (m_collisionDisplayMode == 1)
+		const ndMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
+		ndSharedPtr<ndDebugMesh>& debugMesh = node->GetInfo();
+		const ndVector color((body->GetSleepState() == 1) ? m_sleepColor : m_awakeColor);
+
+		ndRenderPrimitiveMesh* const mesh = (ndRenderPrimitiveMesh*)*debugMesh->m_flatShaded;
+		ndRenderPrimitiveMeshSegment& segment = mesh->m_segments.GetFirst()->GetInfo();
+		ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
+		material->m_diffuse = color;
+
+		switch (m_collisionDisplayMode)
 		{
-			// render solid color collsion mesh
-			const ndMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
-			ndSharedPtr<ndDebugMesh>& debugMesh = node->GetInfo();
-			const ndVector color((body->GetSleepState() == 1) ? m_sleepColor : m_awakeColor);
+			case 1:
+			{
+				// render solid color collsion mesh
+				debugMesh->m_flatShaded->Render(m_owner, matrix, m_debugDisplaySolidMesh);
+				break;
+			}
 
-			ndRenderPrimitiveMesh* const mesh = (ndRenderPrimitiveMesh*)*debugMesh->m_flatShaded;
-			ndRenderPrimitiveMeshSegment& segment = mesh->m_segments.GetFirst()->GetInfo();
-			ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
-			material->m_diffuse = color;
+			case 2:
+			{
+				// render solid color collsion mesh
+				debugMesh->m_wireFrameShareEdge->Render(m_owner, matrix, m_debugDisplayWireFrameMesh);
+				break;
+			}
 
-			debugMesh->m_flatShaded->Render(m_owner, matrix, m_debugDisplaySolidMesh);
+			default:
+			{
+				ndAssert(0);
+			}
 		}
 	}
 }
