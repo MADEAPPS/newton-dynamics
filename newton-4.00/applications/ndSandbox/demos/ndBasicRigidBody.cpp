@@ -20,8 +20,8 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 	// build a floor
 	//BuildFloorBox(scene, ndGetIdentityMatrix());
 	//ndSharedPtr<ndBody> body(BuildFlatPlane(scene, true, true));
-	//ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "marbleCheckBoard.png", 0.1f, true));
-	ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
+	ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "marbleCheckBoard.png", 0.1f, true));
+	//ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
 
 	ndMatrix matrix(ndGetIdentityMatrix());
 
@@ -29,13 +29,17 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene)
 	origin1.m_posit.m_x = 20.0f;
 	origin1.m_posit.m_y = 5.0f;
 
-	//ndSharedPtr<ndBody> body(AddSphere(scene, origin1, 1.0f, 5.0f));
-	//body->SetOmega(ndVector(0.0f, 2.0f, 0.0f, 0.0f));
+	ndSharedPtr<ndBody> body(AddSphere(scene, origin1, 100.0f, 2.0f));
+	body->SetOmega(ndVector(0.0f, 2.0f, 0.0f, 0.0f));
 	//body->SetMatrix(origin1);
-	//
-	//AddPlanks(scene, origin1, 1.0f, 4);
-	AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 1, 2, 7);
-	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
+	body->GetAsBodyKinematic()->SetMatrixUpdateScene(origin1);
+	
+	AddPlanks(scene, origin1, 1.0f, 4);
+
+	origin1.m_posit.m_x += 20.0f;
+	origin1.m_posit.m_z += 15.0f;
+	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 1, 2, 7);
+	AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 4, 4, 4);
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 2, 2, 7);
 
