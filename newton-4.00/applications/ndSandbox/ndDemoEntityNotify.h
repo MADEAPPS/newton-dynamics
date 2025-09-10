@@ -39,18 +39,20 @@ class ndDemoEntityNotify : public ndModelBodyNotify
 	ndDemoEntityManager* m_manager;
 	ndSharedPtr<ndRenderSceneNode> m_entity;
 	ndTransform m_transform;
-};
-
-class ndBindingRagdollEntityNotify : public ndDemoEntityNotify
-{
-	public:
-	ndBindingRagdollEntityNotify(ndDemoEntityManager* const manager, const ndSharedPtr<ndRenderSceneNode>& entity, ndBodyDynamic* const parentBody, ndFloat32 campSpeed);
-	~ndBindingRagdollEntityNotify();
-
-	void OnTransform(ndInt32, const ndMatrix& matrix);
-	void OnApplyExternalForce(ndInt32 thread, ndFloat32 timestep);
-
 	ndMatrix m_bindMatrix;
 	ndFloat32 m_capSpeed;
 };
+
+//class ndBindingRagdollEntityNotify : public ndDemoEntityNotify
+//{
+//	public:
+//	ndBindingRagdollEntityNotify(ndDemoEntityManager* const manager, const ndSharedPtr<ndRenderSceneNode>& entity, ndBodyDynamic* const parentBody, ndFloat32 campSpeed);
+//	~ndBindingRagdollEntityNotify();
+//
+//	void OnTransform(ndInt32, const ndMatrix& matrix);
+//	void OnApplyExternalForce(ndInt32 thread, ndFloat32 timestep);
+//
+//	ndMatrix m_bindMatrix;
+//	ndFloat32 m_capSpeed;
+//};
 #endif

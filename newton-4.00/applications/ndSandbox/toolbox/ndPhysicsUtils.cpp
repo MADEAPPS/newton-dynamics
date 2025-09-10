@@ -75,35 +75,7 @@ void SetModelVisualMesh(ndDemoEntityManager* const scene, ndModelArticulation* c
 		}
 	}
 }
-
-static void AddShape(ndDemoEntityManager* const scene,
-	ndSharedPtr<ndDemoEntity>& root, const ndShapeInstance& shape,
-	ndFloat32 mass, const ndMatrix& location, const ndFloat32 high, ndInt32 count)
-{
-	ndMatrix matrix(location);
-	ndPhysicsWorld* const world = scene->GetWorld();
-	
-	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y = floor.m_y + high + 7.0f;
-	
-	for (ndInt32 i = 0; i < count; ++i)
-	{
-		ndSharedPtr<ndBody> body(new ndBodyDynamic());
-		ndSharedPtr<ndDemoEntity>entity(new ndDemoEntity(matrix));
-		root->AddChild(entity);
-	
-		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-		body->SetMatrix(matrix);
-		body->GetAsBodyDynamic()->SetCollisionShape(shape);
-		body->GetAsBodyDynamic()->SetMassMatrix(mass, shape);
-		body->GetAsBodyDynamic()->SetAngularDamping(ndVector(ndFloat32(0.5f)));
-	
-		world->AddBody(body);
-		matrix.m_posit.m_y += high * 2.5f;
-	}
-}
 #endif
-
 
 //******************************************************************************
 // Create simple rigi body with a collsion shspe and render primitev but is not added to the scene
@@ -244,7 +216,6 @@ void AddPlanks(ndDemoEntityManager* const scene, const ndMatrix& location, ndFlo
 void AddCapsulesStacks(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, ndInt32 rows_x, ndInt32 rows_z, ndInt32 columHigh)
 {
 	ndShapeInstance shape(new ndShapeCapsule(radius0, radius1, high));
-//	ndSharedPtr<ndDemoMeshIntance> instanceMesh(new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.png", "marble.png", "marble.png"));
 
 	ndRenderPrimitiveMeshMaterial material;
 	ndRender* const render = *scene->GetRenderer();
@@ -257,13 +228,12 @@ void AddCapsulesStacks(ndDemoEntityManager* const scene, const ndMatrix& locatio
 	ndFloat32 spacing = 2.0f;
 	const ndMatrix startMatrix(ndRollMatrix(90.0f * ndDegreeToRad));
 
+	const ndMatrix invLocation(location.OrthoInverse());
 	ndPhysicsWorld* const world = scene->GetWorld();
 	for (ndInt32 z = 0; z < rows_z; ++z)
 	{
 		for (ndInt32 x = 0; x < rows_x; ++x)
 		{
-//			matrix.m_posit = location.m_posit + ndVector((ndFloat32)(x - rows_x / 2) * spacing, 0.0f, (ndFloat32)(z - rows_z / 2) * spacing, 0.0f);
-//			AddShape(scene, rootEntity, shape, mass, matrix, high, columHigh);
 			ndMatrix matrix(startMatrix);
 			matrix.m_posit = location.m_posit + ndVector((ndFloat32)(x - rows_x / 2) * spacing, 0.0f, (ndFloat32)(z - rows_z / 2) * spacing, ndFloat32(0.0f));
 
@@ -272,21 +242,18 @@ void AddCapsulesStacks(ndDemoEntityManager* const scene, const ndMatrix& locatio
 
 			for (ndInt32 i = 0; i < columHigh; ++i)
 			{
-			//	ndSharedPtr<ndBody> body(new ndBodyDynamic());
-			//	ndSharedPtr<ndDemoEntity>entity(new ndDemoEntity(matrix));
-			//	root->AddChild(entity);
-			
-				ndSharedPtr<ndRenderSceneNode>instanceMesh(new ndRenderSceneNode(matrix));
-				instanceMesh->SetPrimitive(mesh);
-				root->AddChild(instanceMesh);
+				const ndMatrix localMatrix(matrix * invLocation);
+				ndSharedPtr<ndRenderSceneNode>instance(new ndRenderSceneNode(localMatrix));
+				instance->SetPrimitive(mesh);
+				root->AddChild(instance);
 
-			//	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-			//	body->SetMatrix(matrix);
-			//	body->GetAsBodyDynamic()->SetCollisionShape(shape);
-			//	body->GetAsBodyDynamic()->SetMassMatrix(mass, shape);
-			//	body->GetAsBodyDynamic()->SetAngularDamping(ndVector(ndFloat32(0.5f)));
-			//
-			//	world->AddBody(body);
+				ndSharedPtr<ndBody> body(new ndBodyDynamic());
+				body->SetNotifyCallback(new ndDemoEntityNotify(scene, instance));
+				body->SetMatrix(matrix);
+				body->GetAsBodyKinematic()->SetCollisionShape(shape);
+				body->GetAsBodyKinematic()->SetMassMatrix(mass, shape);
+				body->GetAsBodyDynamic()->SetAngularDamping(ndVector(ndFloat32(0.5f)));
+				world->AddBody(body);
 				matrix.m_posit.m_y += high * 2.5f;
 			}
 		}

@@ -23,6 +23,9 @@ class ndModelBodyNotify: public ndBodyNotify
 	ndModelBodyNotify(ndBodyKinematic* const parentBody = nullptr, ndVector gravity = ndVector (ndFloat32 (0.0f), ndFloat32(-10.0f), ndFloat32(0.0f), ndFloat32(0.0f)));
 	virtual ~ndModelBodyNotify();
 
+	ndBodyKinematic* GetParentBody() const;
+	void SetParentBody(ndBodyKinematic* const kinematicBody);
+
 	ndBodyNotify* Clone() const override
 	{
 		return new ndModelBodyNotify(*this);

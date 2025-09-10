@@ -28,6 +28,16 @@ ndModelBodyNotify::~ndModelBodyNotify()
 {
 }
 
+ndBodyKinematic* ndModelBodyNotify::GetParentBody() const
+{
+	return m_parentBody;
+}
+
+void ndModelBodyNotify::SetParentBody(ndBodyKinematic* const kinematicBody)
+{
+	m_parentBody = kinematicBody;
+}
+
 void ndModelBodyNotify::OnApplyExternalForce(ndInt32, ndFloat32)
 {
 	ndBodyKinematic* const body = GetBody()->GetAsBodyKinematic();

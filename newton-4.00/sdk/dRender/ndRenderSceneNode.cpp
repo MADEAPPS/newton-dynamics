@@ -32,6 +32,11 @@ ndTransform::ndTransform(const ndQuaternion& rotation, const ndVector& position)
 {
 }
 
+ndMatrix ndTransform::GetMatrix() const
+{
+	return ndCalculateMatrix(m_rotation, m_position);
+}
+
 ndRenderSceneNode::ndRenderSceneNode(const ndMatrix& matrix)
 	:ndContainersFreeListAlloc<ndRenderSceneNode>()
 	,m_matrix(matrix)
@@ -48,6 +53,11 @@ ndRenderSceneNode::ndRenderSceneNode(const ndMatrix& matrix)
 
 ndRenderSceneNode::~ndRenderSceneNode()
 {
+}
+
+ndRenderSceneNode* ndRenderSceneNode::GetParent() const
+{
+	return m_parent;
 }
 
 void ndRenderSceneNode::AddChild(const ndSharedPtr<ndRenderSceneNode>& child)
@@ -106,6 +116,20 @@ void ndRenderSceneNode::SetTransform(const ndQuaternion& rotation, const ndVecto
 	{
 		m_transform1.m_rotation = m_transform1.m_rotation.Scale(ndFloat32 (-1.0f));
 	}
+}
+
+ndMatrix ndRenderSceneNode::CalculateGlobalMatrix(const ndRenderSceneNode* const root) const
+{
+	ndMatrix matrix(GetTransform().GetMatrix());
+	if (this != root)
+	{
+		for (const ndRenderSceneNode* parent = GetParent(); parent != root; parent = parent->GetParent())
+		{
+			const ndMatrix parentMatrix(parent->GetTransform().GetMatrix());
+			matrix = matrix * parentMatrix;
+		}
+	}
+	return matrix;
 }
 
 ndTransform ndRenderSceneNode::GetTransform() const

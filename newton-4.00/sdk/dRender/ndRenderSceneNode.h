@@ -24,6 +24,8 @@ class ndTransform
 	ndTransform(const ndMatrix& matrix);
 	ndTransform(const ndQuaternion& rotation, const ndVector& position);
 	
+	ndMatrix GetMatrix() const;
+
 	ndVector m_position;
 	ndQuaternion m_rotation;
 };
@@ -43,10 +45,12 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 	virtual void SetTransform(const ndQuaternion& rotation, const ndVector& position);
 
 	void InterpolateTransforms(ndFloat32 param);
+	ndMatrix CalculateGlobalMatrix(const ndRenderSceneNode* const root = nullptr) const;
 
 	ndTransform GetTransform() const;
 	void SetTransform(const ndTransform& transform);
 
+	ndRenderSceneNode* GetParent() const;
 	virtual void AddChild(const ndSharedPtr<ndRenderSceneNode>& child);
 	virtual void RemoveChild(const ndSharedPtr<ndRenderSceneNode> child);
 
