@@ -91,7 +91,7 @@ ndSharedPtr<ndBody> CreateBody(
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndRender* const render = *scene->GetRenderer();
 
-	ndMatrix matrix(FindFloor(*world, location, shape, 200.0f));
+	const ndMatrix matrix(FindFloor(*world, location, shape, 200.0f));
 
 	ndRenderPrimitiveMeshMaterial material;
 	material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textName));
@@ -203,6 +203,7 @@ ndSharedPtr<ndBody> AddConvexHull(ndDemoEntityManager* const scene, const ndMatr
 void AddPlanks(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndInt32 count)
 {
 	ndMatrix matrix(location);
+
 	for (ndInt32 i = 0; i < count; ++i)
 	{
 		for (ndInt32 j = 0; j < count; ++j)
