@@ -69,7 +69,7 @@ void ndRenderSceneNode::AddChild(const ndSharedPtr<ndRenderSceneNode>& child)
 
 void ndRenderSceneNode::RemoveChild(const ndSharedPtr<ndRenderSceneNode> child)
 {
-	ndAssert(child->m_parent);
+	ndAssert(child->m_parent && (child->m_parent == this));
 	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = m_children.GetFirst(); node; node = node->GetNext())
 	{
 		ndRenderSceneNode* const childNode = *node->GetInfo();

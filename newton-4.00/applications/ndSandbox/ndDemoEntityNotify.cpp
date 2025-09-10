@@ -138,14 +138,7 @@ void ndDemoEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
 		}
 		else
 		{
-			//ndAssert(0);
-			//m_transform.m_position = matrix.m_posit;
-			//m_transform.m_rotation = body->GetRotation();
-
-			const ndMatrix localMatrix(matrix * m_bindMatrix);
-			const ndQuaternion rot(localMatrix);
-			//m_entity->SetMatrix(rot, localMatrix.m_posit);
-			m_transform = ndTransform(localMatrix);
+			m_transform = ndTransform(matrix * m_bindMatrix);
 		}
 	}
 

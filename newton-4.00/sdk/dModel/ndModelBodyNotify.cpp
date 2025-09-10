@@ -53,7 +53,7 @@ void ndModelBodyNotify::OnApplyExternalForce(ndInt32, ndFloat32)
 
 bool ndModelBodyNotify::CheckInWorld(const ndMatrix& matrix) const
 {
-	return matrix.m_posit.m_y > -100.0f;
+	return matrix.m_posit.m_y > ndFloat32 (-100.0f);
 }
 
 void ndModelBodyNotify::CalculateMatrix(const ndMatrix& matrix, ndQuaternion& rot, ndVector& posit) const

@@ -163,6 +163,16 @@ void ndRender::RemoveSceneNode(const ndSharedPtr<ndRenderSceneNode>& node)
 		node->m_sceneHandle = nullptr;
 		m_scene.Remove(handle);
 	}
+	else
+	{
+		// see if this node is part of the scene
+		const ndRenderSceneNode* parent = node->GetParent();
+		for (; parent && !parent->m_sceneHandle; parent = parent->GetParent());
+		if (parent)
+		{
+			node->GetParent()->RemoveChild(node);
+		}
+	}
 }
 
 void ndRender::InterpolateTransforms(ndFloat32 param)
