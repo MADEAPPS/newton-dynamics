@@ -13,13 +13,18 @@
 #include "ndRender.h"
 #include "ndRenderContext.h"
 #include "ndRenderSceneNodeInstance.h"
+#include "ndRenderSceneNodeInstanceImplement.h"
 
 ndRenderSceneNodeInstance::ndRenderSceneNodeInstance(const ndMatrix& matrix)
 	:ndRenderSceneNode(matrix)
+	,m_implement()
 {
+	m_implement = ndSharedPtr<ndRenderSceneNodeInstanceImplement>(new ndRenderSceneNodeInstanceImplement(this));
 }
 
 void ndRenderSceneNodeInstance::Render(const ndRender* const owner, ndFloat32 timeStep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const
 {
-	ndRenderSceneNode::Render(owner, timeStep, parentMatrix, renderMode);
+	// instance node do no recurse
+	//ndRenderSceneNode::Render(owner, timeStep, parentMatrix, renderMode);
+	m_implement->Render(owner, timeStep, m_matrix * parentMatrix, renderMode);
 }

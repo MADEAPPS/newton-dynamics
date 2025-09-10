@@ -60,6 +60,11 @@ ndRenderSceneNode* ndRenderSceneNode::GetParent() const
 	return m_parent;
 }
 
+const ndList<ndSharedPtr<ndRenderSceneNode>>& ndRenderSceneNode::GetChilden() const
+{
+	return m_children;
+}
+
 void ndRenderSceneNode::AddChild(const ndSharedPtr<ndRenderSceneNode>& child)
 {
 	ndAssert(child->m_parent == nullptr);

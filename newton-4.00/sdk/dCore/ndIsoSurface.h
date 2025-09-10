@@ -58,7 +58,7 @@ class ndIsoSurface: public ndClassAlloc
 	private:
 	ndVector m_origin;
 	ndArray<ndVector> m_points;
-	ndImplementation* m_implementation;
+	ndImplementation* m_implement;
 	ndFloat32 m_gridSize;
 	ndInt32 m_volumeSizeX;
 	ndInt32 m_volumeSizeY;

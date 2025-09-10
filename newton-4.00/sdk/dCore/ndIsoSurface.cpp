@@ -3384,7 +3384,7 @@ void ndIsoSurface::ndImplementation::BuildLowResolutionMesh(ndIsoSurface* const 
 ndIsoSurface::ndIsoSurface()
 	:m_origin(ndVector::m_zero)
 	,m_points(1024)
-	,m_implementation(new ndImplementation())
+	,m_implement(new ndImplementation())
 	,m_gridSize(ndFloat32(1.0f))
 	,m_volumeSizeX(1)
 	,m_volumeSizeY(1)
@@ -3396,9 +3396,9 @@ ndIsoSurface::ndIsoSurface()
 ndIsoSurface::~ndIsoSurface()
 {
 	//GetImplementation().Clear();
-	if (m_implementation)
+	if (m_implement)
 	{
-		delete m_implementation;
+		delete m_implement;
 	}
 }
 
@@ -3409,19 +3409,19 @@ void ndIsoSurface::GenerateMesh(const ndArray<ndVector>& pointCloud, ndFloat32 g
 		if (!computeIsoValue)
 		{
 			m_isLowRes = true;
-			m_implementation->BuildLowResolutionMesh(this, pointCloud, gridSize);
+			m_implement->BuildLowResolutionMesh(this, pointCloud, gridSize);
 		}
 		else
 		{
 			ndAssert(0);
 			m_isLowRes = false;
-			m_implementation->BuildHighResolutionMesh(this, pointCloud, gridSize, computeIsoValue);
+			m_implement->BuildHighResolutionMesh(this, pointCloud, gridSize, computeIsoValue);
 		}
 		m_gridSize = gridSize;
-		m_origin = m_implementation->GetOrigin();
-		m_volumeSizeX = m_implementation->m_volumeSizeX;
-		m_volumeSizeY = m_implementation->m_volumeSizeY;
-		m_volumeSizeZ = m_implementation->m_volumeSizeZ;
+		m_origin = m_implement->GetOrigin();
+		m_volumeSizeX = m_implement->m_volumeSizeX;
+		m_volumeSizeY = m_implement->m_volumeSizeY;
+		m_volumeSizeZ = m_implement->m_volumeSizeZ;
 	}
 }
 
@@ -3430,7 +3430,7 @@ ndInt32 ndIsoSurface::GenerateListIndexList(ndInt32* const indexList, ndInt32 st
 	ndInt32 vertexCount = 0;
 	if (m_isLowRes)
 	{
-		vertexCount = m_implementation->GenerateLowResIndexList(this, indexList, strideInFloats, posit, normals);
+		vertexCount = m_implement->GenerateLowResIndexList(this, indexList, strideInFloats, posit, normals);
 	}
 	else
 	{

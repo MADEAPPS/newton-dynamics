@@ -78,7 +78,7 @@ class ndRenderPrimitiveMesh : public ndRenderPrimitive
 		const ndMatrix& uvMatrix = ndGetIdentityMatrix(), bool stretchMaping = true);
 
 	ndList<ndRenderPrimitiveMeshSegment> m_segments;
-	ndSharedPtr<ndRenderPrimitiveMeshImplement> m_implementation;
+	ndSharedPtr<ndRenderPrimitiveMeshImplement> m_implement;
 };
 
 #endif

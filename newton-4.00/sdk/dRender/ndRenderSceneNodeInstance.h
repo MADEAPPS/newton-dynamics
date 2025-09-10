@@ -14,12 +14,15 @@
 #include "ndRenderStdafx.h"
 #include "ndRenderSceneNode.h"
 
+class ndRenderSceneNodeInstanceImplement;
 class ndRenderSceneNodeInstance : public ndRenderSceneNode
 {
 	public:
 	ndRenderSceneNodeInstance(const ndMatrix& matrix);
 
 	virtual void Render(const ndRender* const owner, ndFloat32 timeStep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const override;
+
+	ndSharedPtr<ndRenderSceneNodeInstanceImplement> m_implement;
 };
 
 #endif
