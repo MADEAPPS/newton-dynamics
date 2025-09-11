@@ -22,11 +22,15 @@ class ndRenderSceneNodeInstanceImplement : public ndContainersFreeListAlloc<ndRe
 {
 	public:
 	ndRenderSceneNodeInstanceImplement(ndRenderSceneNodeInstance* const owner);
+	~ndRenderSceneNodeInstanceImplement();
 
+	void Finalize();
 	void Render(const ndRender* const owner, ndFloat32 timeStep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const;
 
 	mutable ndArray<glMatrix> m_matrixPallete;
 	ndRenderSceneNodeInstance* m_owner;
+
+	GLuint m_matrixOffsetBuffer;
 };
 
 #endif

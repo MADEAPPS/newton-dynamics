@@ -34,14 +34,17 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 	ndShapeInstance shape(new ndShapeBox(20.0f, 10.0f, 20.0f));
 
 	// make a tranparent visual mesh
-	ndRenderPrimitiveMeshMaterial material;
-	material.m_opacity = ndFloat32(0.5f);
-	material.m_texture = scene->GetRenderer()->GetTextureCache()->GetTexture(ndGetWorkingFileName("metal_30.png"));
-	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateFromCollisionShape(*scene->GetRenderer(), &shape, material, ndRenderPrimitiveMesh::m_box));
+	ndRenderPrimitiveMesh::ndDescriptor descriptor(*scene->GetRenderer());
+	descriptor.m_collision = &shape;
+	descriptor.m_material.m_opacity = ndFloat32(0.3f);
+	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
+	descriptor.m_material.m_texture = scene->GetRenderer()->GetTextureCache()->GetTexture(ndGetWorkingFileName("metal_30.png"));
+	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
+
 	ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(matrix));
 	entity->SetPrimitive(mesh);
 
-	// make a trigger rigid body and asign mesh and collsion to the rigid body
+	// make a trigger rigid body and asign mesh and collision
 	ndSharedPtr<ndBody> body(new ndArchimedesBuoyancyVolume());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);

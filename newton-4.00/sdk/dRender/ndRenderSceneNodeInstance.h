@@ -20,6 +20,7 @@ class ndRenderSceneNodeInstance : public ndRenderSceneNode
 	public:
 	ndRenderSceneNodeInstance(const ndMatrix& matrix);
 
+	void Finalize();
 	virtual void Render(const ndRender* const owner, ndFloat32 timeStep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const override;
 
 	ndSharedPtr<ndRenderSceneNodeInstanceImplement> m_implement;

@@ -439,12 +439,16 @@ ndSharedPtr<ndBody> BuildFloorBox(ndDemoEntityManager* const scene, const ndMatr
 	uvMatrix[2][2] *= uvTiling;
 
 	ndRender* const render = *scene->GetRenderer();
-	ndRenderPrimitiveMeshMaterial material;
-	material.m_specular = ndVector::m_zero;
-	material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textureName));
 
-	material.m_castShadows = false;
-	ndSharedPtr<ndRenderPrimitive> geometry(ndRenderPrimitiveMesh::CreateFromCollisionShape(render, &box, material, ndRenderPrimitiveMesh::m_box, uvMatrix, false));
+	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
+	descriptor.m_collision = &box;
+	descriptor.m_uvMatrix = uvMatrix;
+	descriptor.m_stretchMaping = false;
+	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
+	descriptor.m_material.m_castShadows = false;
+	descriptor.m_material.m_specular = ndVector::m_zero;
+	descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textureName));
+	ndSharedPtr<ndRenderPrimitive> geometry(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 	
 	ndMatrix location(matrix);
 	location.m_posit.m_y -= 0.5f;

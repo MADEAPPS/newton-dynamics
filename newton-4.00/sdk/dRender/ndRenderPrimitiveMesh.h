@@ -53,29 +53,43 @@ class ndRenderPrimitiveMesh : public ndRenderPrimitive
 		m_cylindrical
 	};
 
+	enum ndDebugMode
+	{
+		m_none,
+		m_solid,
+		m_wireFrame,
+		m_hidenLines,
+	};
+
+	class ndDescriptor
+	{
+		public:
+		ndDescriptor(ndRender* const render)
+			:m_render(render)
+			,m_collision(nullptr)
+			,m_material()
+			,m_mapping(m_box)
+			,m_uvMatrix(ndGetIdentityMatrix())
+			,m_debugMode(m_none)
+			,m_stretchMaping(true)
+		{
+		}
+
+		ndRender* m_render;
+		const ndShapeInstance* m_collision;
+		ndRenderPrimitiveMeshMaterial m_material;
+		ndUvMapingMode m_mapping;
+		ndMatrix m_uvMatrix;
+		ndDebugMode m_debugMode;
+		bool m_stretchMaping;
+	};
+
 	ndRenderPrimitiveMesh();
 	virtual ~ndRenderPrimitiveMesh();
 
 	virtual void Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderPassMode) const override;
 
-	static ndSharedPtr<ndRenderPrimitive> CreateSetZbufferCollisionShape(
-		const ndRender* const render,
-		const ndShapeInstance* const collision);
-
-	static ndSharedPtr<ndRenderPrimitive> CreateWireFrameFromCollisionShape(
-		const ndRender* const render,
-		const ndShapeInstance* const collision);
-
-	static ndSharedPtr<ndRenderPrimitive> CreateFromCollisionShape(
-		const ndRender* const render,
-		const ndShapeInstance* const collision);
-
-	static ndSharedPtr<ndRenderPrimitive> CreateFromCollisionShape(
-		const ndRender* const render,
-		const ndShapeInstance* const collision,
-		const ndRenderPrimitiveMeshMaterial& material,
-		ndUvMapingMode mapping = m_box,
-		const ndMatrix& uvMatrix = ndGetIdentityMatrix(), bool stretchMaping = true);
+	static ndSharedPtr<ndRenderPrimitive> CreateMeshPrimitive(const ndDescriptor& descriptor);
 
 	ndList<ndRenderPrimitiveMeshSegment> m_segments;
 	ndSharedPtr<ndRenderPrimitiveMeshImplement> m_implement;

@@ -22,6 +22,11 @@ ndRenderSceneNodeInstance::ndRenderSceneNodeInstance(const ndMatrix& matrix)
 	m_implement = ndSharedPtr<ndRenderSceneNodeInstanceImplement>(new ndRenderSceneNodeInstanceImplement(this));
 }
 
+void ndRenderSceneNodeInstance::Finalize()
+{
+	m_implement->Finalize();
+}
+
 void ndRenderSceneNodeInstance::Render(const ndRender* const owner, ndFloat32 timeStep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const
 {
 	// instance node do no recurse

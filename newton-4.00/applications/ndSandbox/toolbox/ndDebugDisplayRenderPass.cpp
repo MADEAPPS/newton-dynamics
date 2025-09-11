@@ -54,9 +54,17 @@ ndDebugDisplayRenderPass::ndDebugMesh* ndDebugDisplayRenderPass::CreateRenderPri
 	ndRender* const render = m_owner;
 	ndDebugMesh* const debugMesh = new ndDebugMesh;
 
-	debugMesh->m_flatShaded = ndSharedPtr<ndRenderPrimitive> (ndRenderPrimitiveMesh::CreateFromCollisionShape(render, &shape));
-	debugMesh->m_zBuffer = ndSharedPtr<ndRenderPrimitive>(ndRenderPrimitiveMesh::CreateSetZbufferCollisionShape(render, &shape));
-	debugMesh->m_wireFrameShareEdge = ndSharedPtr<ndRenderPrimitive>(ndRenderPrimitiveMesh::CreateWireFrameFromCollisionShape(render, &shape));
+	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
+	descriptor.m_collision = &shape;
+
+	descriptor.m_debugMode = ndRenderPrimitiveMesh::m_solid;
+	debugMesh->m_flatShaded = ndSharedPtr<ndRenderPrimitive>(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
+
+	descriptor.m_debugMode = ndRenderPrimitiveMesh::m_hidenLines;
+	debugMesh->m_zBuffer = ndSharedPtr<ndRenderPrimitive>(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
+
+	descriptor.m_debugMode = ndRenderPrimitiveMesh::m_wireFrame;
+	debugMesh->m_wireFrameShareEdge = ndSharedPtr<ndRenderPrimitive>(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 
 	return debugMesh;
 }

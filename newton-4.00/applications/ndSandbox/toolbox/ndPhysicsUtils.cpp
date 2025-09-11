@@ -93,10 +93,19 @@ ndSharedPtr<ndBody> CreateBody(
 
 	const ndMatrix matrix(FindFloor(*world, location, shape, 200.0f));
 
-	ndRenderPrimitiveMeshMaterial material;
-	material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textName));
+	//ndRenderPrimitiveMeshMaterial material;
+	//material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textName));
+	//ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateFromCollisionShape(render, &shape, material, mappingMode));
 
-	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateFromCollisionShape(render, &shape, material, mappingMode));
+	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
+	descriptor.m_collision = &shape;
+	//descriptor.m_uvMatrix = uvMatrix;
+	//descriptor.m_stretchMaping = false;
+	descriptor.m_mapping = mappingMode;
+	descriptor.m_material.m_castShadows = true;
+	descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textName));
+	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
+
 	ndSharedPtr<ndBody> body (new ndBodyDynamic());
 	ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(matrix));
 	entity->SetPrimitive(mesh);
@@ -218,12 +227,16 @@ void AddCapsulesStacks(ndDemoEntityManager* const scene, const ndMatrix& locatio
 {
 	ndShapeInstance shape(new ndShapeCapsule(radius0, radius1, high));
 
-	ndRenderPrimitiveMeshMaterial material;
 	ndRender* const render = *scene->GetRenderer();
-	material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("marble.png"));
-	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateFromCollisionShape(render, &shape, material, ndRenderPrimitiveMesh::m_spherical));
+	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
+	descriptor.m_collision = &shape;
+	descriptor.m_stretchMaping = false;
+	descriptor.m_mapping = ndRenderPrimitiveMesh::m_spherical;
+	descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("marble.png"));
+	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 
 	ndSharedPtr<ndRenderSceneNode>root(new ndRenderSceneNodeInstance(location));
+	root->SetPrimitive(mesh);
 	scene->AddEntity(root);
 
 	ndFloat32 spacing = 2.0f;
@@ -240,12 +253,10 @@ void AddCapsulesStacks(ndDemoEntityManager* const scene, const ndMatrix& locatio
 
 			ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 			matrix.m_posit.m_y = floor.m_y + high + 7.0f;
-
 			for (ndInt32 i = 0; i < columHigh; ++i)
 			{
 				const ndMatrix localMatrix(matrix * invLocation);
 				ndSharedPtr<ndRenderSceneNode>instance(new ndRenderSceneNode(localMatrix));
-				instance->SetPrimitive(mesh);
 				root->AddChild(instance);
 
 				ndSharedPtr<ndBody> body(new ndBodyDynamic());
@@ -259,4 +270,7 @@ void AddCapsulesStacks(ndDemoEntityManager* const scene, const ndMatrix& locatio
 			}
 		}
 	}
+
+	ndRenderSceneNodeInstance* const instanceRoot = (ndRenderSceneNodeInstance*)*root;
+	instanceRoot->Finalize();
 }

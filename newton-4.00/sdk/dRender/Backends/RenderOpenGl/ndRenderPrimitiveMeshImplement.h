@@ -21,23 +21,13 @@ class ndRenderPrimitiveMeshSegment;
 class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRenderPrimitiveMeshImplement>
 {
 	public:
-	enum ndDebugModeCreate
-	{
-		m_solid,
-		m_wireFrame,
-		m_hidenLines,
-	};
-	ndRenderPrimitiveMeshImplement(
-		ndRenderPrimitiveMesh* const owner, 
-		const ndRender* const render, 
-		const ndShapeInstance* const collision,
-		ndDebugModeCreate mode);
+	ndRenderPrimitiveMeshImplement(ndRenderPrimitiveMesh* const owner, const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
 
-	ndRenderPrimitiveMeshImplement(
-		ndRenderPrimitiveMesh* const owner,
-		const ndRender* const render, const ndShapeInstance* const collision, 
-		const ndRenderPrimitiveMeshMaterial& material, ndRenderPrimitiveMesh::ndUvMapingMode mapping,
-		const ndMatrix& uvMatrix, bool stretchMaping);
+	//ndRenderPrimitiveMeshImplement(
+	//	ndRenderPrimitiveMesh* const owner, 
+	//	const ndRender* const render, 
+	//	const ndShapeInstance* const collision,
+	//	ndRenderPrimitiveMesh::ndDebugMode mode);
 
 	~ndRenderPrimitiveMeshImplement();
 
@@ -49,9 +39,10 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 		const glPositionNormalUV* const points, ndInt32 pointCount,
 		const ndInt32* const indices, ndInt32 indexCount);
 
-	void BuildSolidDebugMesh(const ndShapeInstance* const collision);
-	void BuildWireframeDebugMesh(const ndShapeInstance* const collision);
-	void BuildSetZBufferDebugMesh(const ndShapeInstance* const collision);
+	void BuildRenderMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
+	void BuildSolidDebugMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
+	void BuildWireframeDebugMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
+	void BuildSetZBufferDebugMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
 
 	void RenderShadowMap(const ndRender* const render, const ndMatrix& lightMatrix) const;
 	void RenderSolidColor(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
