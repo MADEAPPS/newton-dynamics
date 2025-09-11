@@ -14,6 +14,47 @@
 #include "ndRenderStdafx.h"
 #include "ndRenderContext.h"
 
+class ndRenderPrimitiveMeshImplement;
+
+class ShaderBlockBlock
+{
+	public:
+	virtual ~ShaderBlockBlock();
+
+	virtual void GetShaderParameters(ndRenderPrimitiveMeshImplement* const self) = 0;
+	virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const = 0;
+};
+
+// *********************************************************************
+// 
+// *********************************************************************
+class SetZbufferCleanBlock : public ShaderBlockBlock
+{
+	public:
+	virtual void GetShaderParameters(ndRenderPrimitiveMeshImplement* const self) override;
+	virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
+
+	GLint viewModelProjectionMatrix;
+};
+
+// *********************************************************************
+// 
+// *********************************************************************
+class DiffusedOpaqueBlock
+{
+	public:
+	GLint m_diffuseColor;
+	GLint m_directionalLightAmbient;
+	GLint m_directionalLightIntesity;
+	GLint m_directionalLightDirection;
+	GLint m_projectMatrixLocation;
+	GLint m_viewModelMatrixLocation;
+};
+
+
+// *********************************************************************
+// 
+// *********************************************************************
 class ndRenderShaderCache
 {
 	public:
@@ -69,6 +110,7 @@ class ndRenderShaderCache
 	static const char* m_directionalDiffuseTransparentPixel;
 
 	friend class ndRenderContext;
+	friend class SetZbufferCleanBlock;
 };
 
 

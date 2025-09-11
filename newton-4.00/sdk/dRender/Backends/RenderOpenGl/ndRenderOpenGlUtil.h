@@ -194,15 +194,5 @@ class glMatrix
 	glVector4 m_data[4];
 };
 
-
-//class dMOUSE_POINT
-//{
-//	public:
-//	ndInt32 x;
-//	ndInt32 y;
-//};
-//void GetCursorPos(dMOUSE_POINT& point);
-//void ShowMousePicking (const ndVector& p0, const ndVector& p1, const ndVector& originColor = ndVector (1.0f, 1.0f, 0.0f, 0.0f), const ndVector& lineColor =  ndVector (1.0f, 1.0f, 1.0f, 0.0f)); 
-
 #endif 
 

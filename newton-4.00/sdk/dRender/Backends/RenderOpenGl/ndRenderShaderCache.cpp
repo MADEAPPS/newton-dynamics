@@ -10,8 +10,18 @@
 */
 
 #include "ndRenderStdafx.h"
+#include "ndRender.h"
 #include "ndRenderContext.h"
+#include "ndRenderOpenGlUtil.h"
+#include "ndRenderSceneCamera.h"
 #include "ndRenderShaderCache.h"
+#include "ndRenderTextureImage.h"
+#include "ndRenderPassShadowsImplement.h"
+#include "ndRenderPrimitiveMeshImplement.h"
+
+ShaderBlockBlock::~ShaderBlockBlock()
+{
+}
 
 ndRenderShaderCache::ndRenderShaderCache(void)
 {
@@ -23,18 +33,9 @@ ndRenderShaderCache::~ndRenderShaderCache(void)
 {
 }
 
-void ndRenderShaderCache::Cleanup()
-{
-	for (ndInt32 i = 0; i < ndInt32(sizeof(m_shaders) / sizeof(m_shaders[0])); ++i)
-	{
-		if (m_shaders[i])
-		{
-			glDeleteProgram(m_shaders[i]);
-			m_shaders[i] = 0;
-		}
-	}
-}
-
+// *********************************************************************
+// 
+// *********************************************************************
 bool ndRenderShaderCache::CreateAllEffects()
 {
 	m_skyBoxEffect = CreateShaderEffect(m_skyBoxVertex, m_skyBoxPixel);
@@ -141,4 +142,57 @@ GLuint ndRenderShaderCache::CreateShaderEffect (const char* const vertexShaderCo
 	glDeleteShader(pixelShader);
 	glDeleteShader(vertexShader);
 	return program;
+}
+
+void ndRenderShaderCache::Cleanup()
+{
+	for (ndInt32 i = 0; i < ndInt32(sizeof(m_shaders) / sizeof(m_shaders[0])); ++i)
+	{
+		if (m_shaders[i])
+		{
+			glDeleteProgram(m_shaders[i]);
+			m_shaders[i] = 0;
+		}
+	}
+}
+
+// *********************************************************************
+// 
+// *********************************************************************
+void SetZbufferCleanBlock::GetShaderParameters(ndRenderPrimitiveMeshImplement* const self)
+{
+	GLuint shader = self->m_context->m_shaderCache->m_setZbufferEffect;
+	glUseProgram(shader);
+	viewModelProjectionMatrix = glGetUniformLocation(shader, "viewModelProjectionMatrix");
+	glUseProgram(0);
+}
+
+void SetZbufferCleanBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
+{
+	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
+
+	//const ndMatrix modelViewProjectionMatrixMatrix(modelMatrix * camera->m_invViewMatrix * camera->m_projectionMatrix);
+	const ndMatrix modelViewProjectionMatrixMatrix(modelMatrix * camera->m_invViewRrojectionMatrix);
+	const glMatrix glViewModelProjectionMatrix(modelViewProjectionMatrixMatrix);
+
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
+	glDisable(GL_BLEND);
+	glDepthFunc(GL_LEQUAL);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+
+	GLuint shader = self->m_context->m_shaderCache->m_setZbufferEffect;
+	glUseProgram(shader);
+
+	glUniformMatrix4fv(viewModelProjectionMatrix, 1, false, &glViewModelProjectionMatrix[0][0]);
+
+	glBindVertexArray(self->m_vertextArrayBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
+
+	glDrawElements(GL_TRIANGLES, self->m_indexCount, GL_UNSIGNED_INT, (void*)0);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	glUseProgram(0);
 }

@@ -22,45 +22,6 @@
 #include "ndRenderPassShadowsImplement.h"
 #include "ndRenderPrimitiveMeshImplement.h"
 
-
-void ndRenderPrimitiveMeshImplement::SetZbufferCleanBlock::GetShaderParameters(ndRenderPrimitiveMeshImplement* const self)
-{
-	GLuint shader = self->m_context->m_shaderCache->m_setZbufferEffect;
-	glUseProgram(shader);
-	viewModelProjectionMatrix = glGetUniformLocation(shader, "viewModelProjectionMatrix");
-	glUseProgram(0);
-}
-
-void ndRenderPrimitiveMeshImplement::SetZbufferCleanBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
-{
-	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
-
-	//const ndMatrix modelViewProjectionMatrixMatrix(modelMatrix * camera->m_invViewMatrix * camera->m_projectionMatrix);
-	const ndMatrix modelViewProjectionMatrixMatrix(modelMatrix * camera->m_invViewRrojectionMatrix);
-	const glMatrix glViewModelProjectionMatrix(modelViewProjectionMatrixMatrix);
-
-	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW);
-	glDisable(GL_BLEND);
-	glDepthFunc(GL_LEQUAL);
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
-
-	GLuint shader = self->m_context->m_shaderCache->m_setZbufferEffect;
-	glUseProgram(shader);
-
-	glUniformMatrix4fv(viewModelProjectionMatrix, 1, false, &glViewModelProjectionMatrix[0][0]);
-
-	glBindVertexArray(self->m_vertextArrayBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
-
-	glDrawElements(GL_TRIANGLES, self->m_indexCount, GL_UNSIGNED_INT, (void*)0);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-	glUseProgram(0);
-}
-
 ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(ndRenderPrimitiveMesh* const owner, const ndRenderPrimitiveMesh::ndDescriptor& descriptor)
 	:ndContainersFreeListAlloc<ndRenderPrimitiveMeshImplement>()
 	,m_owner(owner)

@@ -13,6 +13,7 @@
 
 #include "ndRenderStdafx.h"
 #include "ndRenderContext.h"
+#include "ndRenderShaderCache.h"
 #include "ndRenderPrimitiveMesh.h"
 
 class glPositionNormalUV;
@@ -23,18 +24,11 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	public:
 	ndRenderPrimitiveMeshImplement(ndRenderPrimitiveMesh* const owner, const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
 
-	//ndRenderPrimitiveMeshImplement(
-	//	ndRenderPrimitiveMesh* const owner, 
-	//	const ndRender* const render, 
-	//	const ndShapeInstance* const collision,
-	//	ndRenderPrimitiveMesh::ndMeshBuildMode mode);
-
 	~ndRenderPrimitiveMeshImplement();
 
 	void Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderMode) const;
 	
 	private:
-	void ResetOptimization____();
 	void OptimizeForRender(
 		const glPositionNormalUV* const points, ndInt32 pointCount,
 		const ndInt32* const indices, ndInt32 indexCount);
@@ -63,33 +57,7 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	GLuint m_vertexBuffer;
 	GLuint m_vertextArrayBuffer;
 
-	struct ShaderBlockBlock
-	{
-		virtual ~ShaderBlockBlock() {}
-
-		virtual void GetShaderParameters(ndRenderPrimitiveMeshImplement* const self) = 0;
-		virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const = 0;
-	};
-
-	struct SetZbufferCleanBlock: public ShaderBlockBlock
-	{
-		virtual void GetShaderParameters(ndRenderPrimitiveMeshImplement* const self) override;
-		virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
-
-		GLint viewModelProjectionMatrix;
-	};
-
-	struct DebugSolidColorBlock
-	{
-		GLint m_diffuseColor;
-		GLint m_directionalLightAmbient;
-		GLint m_directionalLightIntesity;
-		GLint m_directionalLightDirection;
-		GLint m_projectMatrixLocation;
-		GLint m_viewModelMatrixLocation;
-	};
-
-	struct SolidColorBlock: public DebugSolidColorBlock
+	struct SolidColorBlock: public DiffusedOpaqueBlock
 	{
 		GLint m_texture;
 		GLint m_environmentMap;
@@ -118,10 +86,12 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 
 	SolidColorBlock m_solidColorBlock;
 	SetZbufferCleanBlock m_setZbufferBlock;
-	DebugSolidColorBlock m_debugSolidColorBlock;
+	DiffusedOpaqueBlock m_debugSolidColorBlock;
 	SolidShadowColorBlock m_solidShadowColorBlock;
 	TransparentColorBlock m_transparencyColorBlock;
 	InstancedSolidShadowColorBlock m_instancedShadowColorBlock;
+
+	friend class SetZbufferCleanBlock;
 };
 
 #endif
