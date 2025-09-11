@@ -16,22 +16,25 @@
 
 class ndRenderPrimitiveMeshImplement;
 
-class ShaderBlockBlock
+class ndRenderShaderBlock
 {
 	public:
-	virtual ~ShaderBlockBlock();
+	ndRenderShaderBlock();
+	virtual ~ndRenderShaderBlock();
 
-	virtual void GetShaderParameters(ndRenderPrimitiveMeshImplement* const self) = 0;
+	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) = 0;
 	virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const = 0;
+
+	GLuint m_shader;
 };
 
 // *********************************************************************
 // 
 // *********************************************************************
-class SetZbufferCleanBlock : public ShaderBlockBlock
+class ndRenderSetZbufferCleanBlock : public ndRenderShaderBlock
 {
 	public:
-	virtual void GetShaderParameters(ndRenderPrimitiveMeshImplement* const self) override;
+	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) override;
 	virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
 
 	GLint viewModelProjectionMatrix;
@@ -40,9 +43,25 @@ class SetZbufferCleanBlock : public ShaderBlockBlock
 // *********************************************************************
 // 
 // *********************************************************************
-class DiffusedOpaqueBlock
+class ndRenderGenerateShadowMapBlock : public ndRenderSetZbufferCleanBlock
 {
 	public:
+	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) override;
+
+	void EndRender();
+	void BeginRender();
+	virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
+};
+
+// *********************************************************************
+// 
+// *********************************************************************
+class ndDebugFlatShadedDiffusedBlock : public ndRenderShaderBlock
+{
+	public:
+	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) override;
+	virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
+
 	GLint m_diffuseColor;
 	GLint m_directionalLightAmbient;
 	GLint m_directionalLightIntesity;
@@ -51,6 +70,14 @@ class DiffusedOpaqueBlock
 	GLint m_viewModelMatrixLocation;
 };
 
+// *********************************************************************
+// 
+// *********************************************************************
+class ndDebugWireframeDiffuseBlock : public ndDebugFlatShadedDiffusedBlock
+{
+	public:
+	virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
+};
 
 // *********************************************************************
 // 
@@ -74,44 +101,33 @@ class ndRenderShaderCache
 			GLuint m_skyBoxEffect;
 			GLuint m_diffuseEffect;
 			GLuint m_setZbufferEffect;
-			GLuint m_shadowMapsEffect;
 			GLuint m_diffuseShadowEffect;
 			GLuint m_diffuseIntanceEffect;
-			GLuint m_debugDiffuseSolidEffect;
 			GLuint m_diffuseTransparentEffect;
-
-
-			//GLuint m_colorPoint;
-			//GLuint m_flatShaded;
-			//GLuint m_thickPoints;
-			//GLuint m_texturedDecal;
-			//GLuint m_spriteSpheres;
-			//GLuint m_diffuseShadowEffect;
-			//GLuint m_diffuseDebrisEffect;
-			
-			//GLuint m_skinningDiffuseEffect;
+			GLuint m_generateShadowMapsEffect;
+			GLuint m_debugFlatShadedDiffuseEffect;
 		};
 		GLuint m_shaders[128];
 	};
 
 	static const char* m_skyBoxVertex;
-	static const char* m_shadowMapVertex;
 	static const char* m_setZbufferVertex;
-	static const char* m_debugFlatDiffuseVertex;
+	static const char* m_generateShadowMapVertex;
 	static const char* m_directionalDiffuseVertex;
+	static const char* m_debugFlatShadedDiffuseVertex;
 	static const char* m_directionalDiffuseShadowVertex;
 	static const char* m_directionalDiffuseInstanceVertex;
 
 	static const char* m_skyBoxPixel;
 	static const char* m_doNothingPixel;
-	static const char* m_debugFlatDiffusePixel;
 	static const char* m_directionalDiffusePixel;
+	static const char* m_debugFlatShadedDiffusePixel;
 	static const char* m_directionalDiffuseShadowPixel;
 	static const char* m_directionalDiffuseTransparentPixel;
 
 	friend class ndRenderContext;
-	friend class SetZbufferCleanBlock;
+	friend class ndRenderSetZbufferCleanBlock;
+	friend class ndDebugWireframeDiffuseBlock;
+	friend class ndDebugFlatShadedDiffusedBlock;
 };
-
-
 #endif

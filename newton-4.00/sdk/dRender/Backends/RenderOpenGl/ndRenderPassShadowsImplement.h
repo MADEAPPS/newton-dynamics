@@ -13,6 +13,7 @@
 
 #include "ndRenderPass.h"
 #include "ndRenderContext.h"
+#include "ndRenderShaderCache.h"
 
 class ndRenderPassShadowsImplement : public ndClassAlloc
 {
@@ -42,7 +43,8 @@ class ndRenderPassShadowsImplement : public ndClassAlloc
 	ndInt32 m_height;
 	GLuint m_shadowMapTexture;
 	GLuint m_frameBufferObject;
-	GLuint m_modelProjectionMatrixLocation;
+	ndRenderGenerateShadowMapBlock m_generateShadowMapsBlock;
+	//GLuint m_modelProjectionMatrixLocation;
 	friend class ndRenderPrimitiveMeshImplement;
 };
 

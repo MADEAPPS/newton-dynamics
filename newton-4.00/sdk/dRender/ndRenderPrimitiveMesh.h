@@ -50,7 +50,7 @@ class ndRenderPrimitiveMesh : public ndRenderPrimitive
 	{
 		m_simplePrimitve,
 		m_instancePrimitve,
-		m_debugSolid,
+		m_debugFlatShaded,
 		m_debugWireFrame,
 		m_debugHiddenLines,
 	};

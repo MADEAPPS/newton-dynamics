@@ -43,7 +43,7 @@ R""""(
 )"""";
 
 
-const char* ndRenderShaderCache::m_shadowMapVertex =
+const char* ndRenderShaderCache::m_generateShadowMapVertex =
 R""""(
 	#version 450 core
 
@@ -59,7 +59,7 @@ R""""(
 	}
 )"""";
 
-const char* ndRenderShaderCache::m_debugFlatDiffuseVertex =
+const char* ndRenderShaderCache::m_debugFlatShadedDiffuseVertex =
 R""""(
 	#version 450 core
 

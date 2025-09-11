@@ -52,9 +52,9 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(ndRenderPrimitive
 			break;
 		}
 
-		case ndRenderPrimitiveMesh::m_debugSolid:
+		case ndRenderPrimitiveMesh::m_debugFlatShaded:
 		{
-			BuildSolidDebugMesh(descriptor);
+			BuildDebugFlatShadedMesh(descriptor);
 			break;
 		}
 
@@ -291,7 +291,7 @@ void ndRenderPrimitiveMeshImplement::BuildRenderInstanceMesh(const ndRenderPrimi
 	OptimizeForRender(&points[0], vertexCount, &indices[0], indexCount);
 }
 
-void ndRenderPrimitiveMeshImplement::BuildSolidDebugMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor)
+void ndRenderPrimitiveMeshImplement::BuildDebugFlatShadedMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor)
 {
 	class ndDrawShape : public ndShapeDebugNotify
 	{
@@ -382,16 +382,97 @@ void ndRenderPrimitiveMeshImplement::BuildSolidDebugMesh(const ndRenderPrimitive
 
 		segment.m_segmentStart = 0;
 		segment.m_indexCount = m_indexCount;
+		m_debugFlatShadedColorBlock.GetShaderParameters(*m_context->m_shaderCache);
+	}
+}
 
-		GLuint shader = m_context->m_shaderCache->m_debugDiffuseSolidEffect;
-		glUseProgram(shader);
-		m_debugSolidColorBlock.m_projectMatrixLocation = glGetUniformLocation(shader, "projectionMatrix");
-		m_debugSolidColorBlock.m_viewModelMatrixLocation = glGetUniformLocation(shader, "viewModelMatrix");
-		m_debugSolidColorBlock.m_diffuseColor = glGetUniformLocation(shader, "diffuseColor");
-		m_debugSolidColorBlock.m_directionalLightAmbient = glGetUniformLocation(shader, "directionalLightAmbient");
-		m_debugSolidColorBlock.m_directionalLightIntesity = glGetUniformLocation(shader, "directionalLightIntesity");
-		m_debugSolidColorBlock.m_directionalLightDirection = glGetUniformLocation(shader, "directionalLightDirection");
-		glUseProgram(0);
+void ndRenderPrimitiveMeshImplement::BuildWireframeDebugMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor)
+{
+	class ndDrawShape : public ndShapeDebugNotify
+	{
+		public:
+		ndDrawShape()
+			:ndShapeDebugNotify()
+			,m_lines(1024)
+		{
+		}
+
+		virtual void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceVertex, const ndEdgeType* const)
+		{
+			ndVector p0(faceVertex[0]);
+			ndVector p1(faceVertex[1]);
+			ndVector p2(faceVertex[2]);
+
+			ndVector normal((p1 - p0).CrossProduct(p2 - p0));
+			normal = normal.Normalize();
+			ndInt32 i0 = vertexCount - 1;
+			for (ndInt32 i = 0; i < vertexCount; ++i)
+			{
+				glPositionNormal point;
+				point.m_posit.m_x = GLfloat(faceVertex[i].m_x);
+				point.m_posit.m_y = GLfloat(faceVertex[i].m_y);
+				point.m_posit.m_z = GLfloat(faceVertex[i].m_z);
+				point.m_normal.m_x = GLfloat(normal.m_x);
+				point.m_normal.m_y = GLfloat(normal.m_y);
+				point.m_normal.m_z = GLfloat(normal.m_z);
+				m_lines.PushBack(point);
+
+				point.m_posit.m_x = GLfloat(faceVertex[i0].m_x);
+				point.m_posit.m_y = GLfloat(faceVertex[i0].m_y);
+				point.m_posit.m_z = GLfloat(faceVertex[i0].m_z);
+				point.m_normal.m_x = GLfloat(normal.m_x);
+				point.m_normal.m_y = GLfloat(normal.m_y);
+				point.m_normal.m_z = GLfloat(normal.m_z);
+				m_lines.PushBack(point);
+				i0 = i;
+			}
+		}
+
+		ndArray<glPositionNormal> m_lines;
+	};
+
+	ndDrawShape drawShapes;
+	descriptor.m_collision->DebugShape(ndGetIdentityMatrix(), drawShapes);
+	if (drawShapes.m_lines.GetCount())
+	{
+		ndArray<ndInt32> m_lines(drawShapes.m_lines.GetCount());
+		m_lines.SetCount(drawShapes.m_lines.GetCount());
+
+		m_indexCount = ndInt32(m_lines.GetCount());
+		ndInt32 vertexCount = ndVertexListToIndexList(&drawShapes.m_lines[0].m_posit.m_x, sizeof(glPositionNormal), 6, ndInt32(drawShapes.m_lines.GetCount()), &m_lines[0], GLfloat(1.0e-6f));
+
+		glGenVertexArrays(1, &m_vertextArrayBuffer);
+		glBindVertexArray(m_vertextArrayBuffer);
+
+		glGenBuffers(1, &m_vertexBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+
+		glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(vertexCount * sizeof(glPositionNormal)), &drawShapes.m_lines[0].m_posit.m_x, GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormal), (void*)OFFSETOF(glPositionNormal, m_posit));
+
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormal), (void*)OFFSETOF(glPositionNormal, m_normal));
+
+		glGenBuffers(1, &m_indexBuffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, GLsizeiptr(m_indexCount * sizeof(GLuint)), &m_lines[0], GL_STATIC_DRAW);
+
+		glBindVertexArray(0);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		ndRenderPrimitiveMeshSegment& segment = m_owner->m_segments.Append()->GetInfo();
+
+		segment.m_material.m_specular = ndVector::m_zero;
+		segment.m_material.m_reflection = ndVector::m_zero;
+
+		segment.m_segmentStart = 0;
+		segment.m_indexCount = m_indexCount;
+
+		m_debugWireframeColorBlock.GetShaderParameters(*m_context->m_shaderCache);
 	}
 }
 
@@ -472,105 +553,7 @@ void ndRenderPrimitiveMeshImplement::BuildSetZBufferDebugMesh(const ndRenderPrim
 
 		segment.m_segmentStart = 0;
 		segment.m_indexCount = m_indexCount;
-		m_setZbufferBlock.GetShaderParameters(this);
-	}
-}
-
-void ndRenderPrimitiveMeshImplement::BuildWireframeDebugMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor)
-{
-	class ndDrawShape : public ndShapeDebugNotify
-	{
-		public:
-		ndDrawShape()
-			:ndShapeDebugNotify()
-			,m_lines(1024)
-		{
-		}
-
-		virtual void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceVertex, const ndEdgeType* const)
-		{
-			ndVector p0(faceVertex[0]);
-			ndVector p1(faceVertex[1]);
-			ndVector p2(faceVertex[2]);
-
-			ndVector normal((p1 - p0).CrossProduct(p2 - p0));
-			normal = normal.Normalize();
-			ndInt32 i0 = vertexCount - 1;
-			for (ndInt32 i = 0; i < vertexCount; ++i)
-			{
-				glPositionNormal point;
-				point.m_posit.m_x = GLfloat(faceVertex[i].m_x);
-				point.m_posit.m_y = GLfloat(faceVertex[i].m_y);
-				point.m_posit.m_z = GLfloat(faceVertex[i].m_z);
-				point.m_normal.m_x = GLfloat(normal.m_x);
-				point.m_normal.m_y = GLfloat(normal.m_y);
-				point.m_normal.m_z = GLfloat(normal.m_z);
-				m_lines.PushBack(point);
-
-				point.m_posit.m_x = GLfloat(faceVertex[i0].m_x);
-				point.m_posit.m_y = GLfloat(faceVertex[i0].m_y);
-				point.m_posit.m_z = GLfloat(faceVertex[i0].m_z);
-				point.m_normal.m_x = GLfloat(normal.m_x);
-				point.m_normal.m_y = GLfloat(normal.m_y);
-				point.m_normal.m_z = GLfloat(normal.m_z);
-				m_lines.PushBack(point);
-				i0 = i;
-			}
-		}
-
-		ndArray<glPositionNormal> m_lines;
-	};
-
-	ndDrawShape drawShapes;
-	descriptor.m_collision->DebugShape(ndGetIdentityMatrix(), drawShapes);
-	if (drawShapes.m_lines.GetCount())
-	{
-		ndArray<ndInt32> m_lines(drawShapes.m_lines.GetCount());
-		m_lines.SetCount(drawShapes.m_lines.GetCount());
-	
-		m_indexCount = ndInt32(m_lines.GetCount());
-		ndInt32 vertexCount = ndVertexListToIndexList(&drawShapes.m_lines[0].m_posit.m_x, sizeof(glPositionNormal), 6, ndInt32(drawShapes.m_lines.GetCount()), &m_lines[0], GLfloat(1.0e-6f));
-	
-		glGenVertexArrays(1, &m_vertextArrayBuffer);
-		glBindVertexArray(m_vertextArrayBuffer);
-	
-		glGenBuffers(1, &m_vertexBuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-	
-		glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(vertexCount * sizeof(glPositionNormal)), &drawShapes.m_lines[0].m_posit.m_x, GL_STATIC_DRAW);
-	
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormal), (void*)OFFSETOF(glPositionNormal, m_posit));
-	
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormal), (void*)OFFSETOF(glPositionNormal, m_normal));
-	
-		glGenBuffers(1, &m_indexBuffer);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, GLsizeiptr(m_indexCount * sizeof(GLuint)), &m_lines[0], GL_STATIC_DRAW);
-	
-		glBindVertexArray(0);
-	
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-	
-		ndRenderPrimitiveMeshSegment& segment = m_owner->m_segments.Append()->GetInfo();
-	
-		segment.m_material.m_specular = ndVector::m_zero;
-		segment.m_material.m_reflection = ndVector::m_zero;
-	
-		segment.m_segmentStart = 0;
-		segment.m_indexCount = m_indexCount;
-	
-		GLuint shader = m_context->m_shaderCache->m_debugDiffuseSolidEffect;
-		glUseProgram(shader);
-		m_debugSolidColorBlock.m_projectMatrixLocation = glGetUniformLocation(shader, "projectionMatrix");
-		m_debugSolidColorBlock.m_viewModelMatrixLocation = glGetUniformLocation(shader, "viewModelMatrix");
-		m_debugSolidColorBlock.m_diffuseColor = glGetUniformLocation(shader, "diffuseColor");
-		m_debugSolidColorBlock.m_directionalLightAmbient = glGetUniformLocation(shader, "directionalLightAmbient");
-		m_debugSolidColorBlock.m_directionalLightIntesity = glGetUniformLocation(shader, "directionalLightIntesity");
-		m_debugSolidColorBlock.m_directionalLightDirection = glGetUniformLocation(shader, "directionalLightDirection");
-		glUseProgram(0);
+		m_setZbufferBlock.GetShaderParameters(*m_context->m_shaderCache);
 	}
 }
 
@@ -601,6 +584,28 @@ void ndRenderPrimitiveMeshImplement::OptimizeForRender(
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, GLsizeiptr(indexCount * sizeof(GLuint)), &indices[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+
+	//{
+	//	// Generate shaddow map
+	//	GLuint shader = m_context->m_shaderCache->m_diffuseEffect;
+	//	ndAssert(0);
+	//	glUseProgram(shader);
+	//	//m_normalMatrixLocation = glGetUniformLocation(shader, "normalMatrix");
+	//	m_solidColorBlock.m_texture = glGetUniformLocation(shader, "texture0");
+	//	m_solidColorBlock.m_environmentMap = glGetUniformLocation(shader, "environmentMap");
+	//
+	//	m_solidColorBlock.m_projectMatrixLocation = glGetUniformLocation(shader, "projectionMatrix");
+	//	m_solidColorBlock.m_viewModelMatrixLocation = glGetUniformLocation(shader, "viewModelMatrix");
+	//	m_solidColorBlock.m_diffuseColor = glGetUniformLocation(shader, "diffuseColor");
+	//	m_solidColorBlock.m_specularColor = glGetUniformLocation(shader, "specularColor");
+	//	m_solidColorBlock.m_reflectionColor = glGetUniformLocation(shader, "reflectionColor");
+	//	m_solidColorBlock.m_directionalLightAmbient = glGetUniformLocation(shader, "directionalLightAmbient");
+	//	m_solidColorBlock.m_directionalLightIntesity = glGetUniformLocation(shader, "directionalLightIntesity");
+	//	m_solidColorBlock.m_directionalLightDirection = glGetUniformLocation(shader, "directionalLightDirection");
+	//	m_solidColorBlock.m_specularAlpha = glGetUniformLocation(shader, "specularAlpha");
+	//	glUseProgram(0);
+	//}
 
 	{
 		// solid color no shadow
@@ -703,8 +708,8 @@ void ndRenderPrimitiveMeshImplement::Render(const ndRender* const render, const 
 {
 	switch (renderMode)
 	{
-		case m_shadowMap:
-			RenderShadowMap(render, modelMatrix);
+		case m_generateShadowMapsBlock:
+			RenderGenerateShadowMaps(render, modelMatrix);
 			break;
 
 		case m_solidColor:
@@ -737,39 +742,6 @@ void ndRenderPrimitiveMeshImplement::Render(const ndRender* const render, const 
 
 		default:
 		ndAssert(0);
-	}
-}
-
-void ndRenderPrimitiveMeshImplement::RenderShadowMap(const ndRender* const render, const ndMatrix& lightMatrix) const
-{
-	ndRenderPassShadowsImplement* const owner = render->m_cachedShadowPass;
-	ndAssert(owner);
-
-	bool castShadow = true;
-	for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = m_owner->m_segments.GetFirst(); node && castShadow; node = node->GetNext())
-	{
-		ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
-		castShadow = castShadow && segment.m_material.m_castShadows;
-	}
-
-	if (castShadow)
-	{
-		glMatrix matrix(lightMatrix);
-		glUniformMatrix4fv(GLint(owner->m_modelProjectionMatrixLocation), 1, false, &matrix[0][0]);
-
-		glBindVertexArray(m_vertextArrayBuffer);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
-
-		for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = m_owner->m_segments.GetFirst(); node; node = node->GetNext())
-		{
-			ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
-			if (segment.m_material.m_castShadows)
-			{
-				glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
-			}
-		}
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
 	}
 }
 
@@ -1028,99 +1000,36 @@ void ndRenderPrimitiveMeshImplement::RenderTransparency(const ndRender* const re
 	glUseProgram(0);
 }
 
+void ndRenderPrimitiveMeshImplement::RenderDebugSetZbuffer(const ndRender* const render, const ndMatrix& modelMatrix) const
+{
+	m_setZbufferBlock.Render(this, render, modelMatrix);
+}
+
 void ndRenderPrimitiveMeshImplement::RenderDebugShapeSolid(const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
-
-	const ndMatrix viewMatrix(camera->m_invViewMatrix);
-	const ndMatrix modelViewMatrix(modelMatrix * viewMatrix);
-
-	const glMatrix glViewModelMatrix(modelViewMatrix);
-	const glMatrix glProjectionMatrix(camera->m_projectionMatrix);
-
-	ndRenderPrimitiveMeshSegment& segment = m_owner->m_segments.GetFirst()->GetInfo();
-	const ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
-
-	const glVector4 diffuse(material->m_diffuse);
-	const glVector4 glSunlightAmbient(render->m_sunLightAmbient);
-	const glVector4 glSunlightIntensity(render->m_sunLightIntesity);
-	const glVector4 glSunlightDir(viewMatrix.RotateVector(render->m_sunLightDir));
-
-	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW);
-	glDisable(GL_BLEND);
-	glDepthFunc(GL_LEQUAL);
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-	GLuint shader = m_context->m_shaderCache->m_debugDiffuseSolidEffect;
-	glUseProgram(shader);
-
-	//glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
-	glUniformMatrix4fv(m_debugSolidColorBlock.m_projectMatrixLocation, 1, false, &glProjectionMatrix[0][0]);
-	glUniformMatrix4fv(m_debugSolidColorBlock.m_viewModelMatrixLocation, 1, false, &glViewModelMatrix[0][0]);
-	glUniform3fv(m_debugSolidColorBlock.m_diffuseColor, 1, &diffuse[0]);
-	glUniform3fv(m_debugSolidColorBlock.m_directionalLightDirection, 1, &glSunlightDir[0]);
-	glUniform3fv(m_debugSolidColorBlock.m_directionalLightAmbient, 1, &glSunlightAmbient[0]);
-	glUniform3fv(m_debugSolidColorBlock.m_directionalLightIntesity, 1, &glSunlightIntensity[0]);
-
-	glBindVertexArray(m_vertextArrayBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
-	
-	glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, (void*)0);
-	
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-	glUseProgram(0);
+	m_debugFlatShadedColorBlock.Render(this, render, modelMatrix);
 }
 
 void ndRenderPrimitiveMeshImplement::RenderDebugShapeWireFrame(const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
-
-	const ndMatrix viewMatrix(camera->m_invViewMatrix);
-	const ndMatrix modelViewMatrix(modelMatrix * viewMatrix);
-
-	const glMatrix glViewModelMatrix(modelViewMatrix);
-	const glMatrix glProjectionMatrix(camera->m_projectionMatrix);
-
-	ndRenderPrimitiveMeshSegment& segment = m_owner->m_segments.GetFirst()->GetInfo();
-	const ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
-
-	const glVector4 diffuse(material->m_diffuse);
-	const glVector4 glSunlightAmbient(render->m_sunLightAmbient);
-	const glVector4 glSunlightIntensity(render->m_sunLightIntesity);
-	const glVector4 glSunlightDir(viewMatrix.RotateVector(render->m_sunLightDir));
-
-	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW);
-	glDisable(GL_BLEND);
-	glDepthFunc(GL_LEQUAL);
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
-
-	GLuint shader = m_context->m_shaderCache->m_debugDiffuseSolidEffect;
-	glUseProgram(shader);
-
-	glUniformMatrix4fv(m_debugSolidColorBlock.m_projectMatrixLocation, 1, false, &glProjectionMatrix[0][0]);
-	glUniformMatrix4fv(m_debugSolidColorBlock.m_viewModelMatrixLocation, 1, false, &glViewModelMatrix[0][0]);
-	glUniform3fv(m_debugSolidColorBlock.m_diffuseColor, 1, &diffuse[0]);
-	glUniform3fv(m_debugSolidColorBlock.m_directionalLightDirection, 1, &glSunlightDir[0]);
-	glUniform3fv(m_debugSolidColorBlock.m_directionalLightAmbient, 1, &glSunlightAmbient[0]);
-	glUniform3fv(m_debugSolidColorBlock.m_directionalLightIntesity, 1, &glSunlightIntensity[0]);
-
-	glBindVertexArray(m_vertextArrayBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
-
-	glDrawElements(GL_LINES, m_indexCount, GL_UNSIGNED_INT, (void*)0);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-	glUseProgram(0);
+	m_debugWireframeColorBlock.Render(this, render, modelMatrix);
 }
 
-void ndRenderPrimitiveMeshImplement::RenderDebugSetZbuffer(const ndRender* const render, const ndMatrix& modelMatrix) const
+void ndRenderPrimitiveMeshImplement::RenderGenerateShadowMaps(const ndRender* const render, const ndMatrix& lightMatrix) const
 {
-	m_setZbufferBlock.Render(this, render, modelMatrix);
+	ndRenderPassShadowsImplement* const owner = render->m_cachedShadowPass;
+	ndAssert(owner);
+
+	bool castShadow = true;
+	for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = m_owner->m_segments.GetFirst(); node && castShadow; node = node->GetNext())
+	{
+		ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
+		castShadow = castShadow && segment.m_material.m_castShadows;
+	}
+
+	if (castShadow)
+	{
+		const ndRenderPassShadowsImplement* const shadowPass = render->m_cachedShadowPass;
+		shadowPass->m_generateShadowMapsBlock.Render(this, render, lightMatrix);
+	}
 }

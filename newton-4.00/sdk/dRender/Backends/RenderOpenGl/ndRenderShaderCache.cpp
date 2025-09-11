@@ -19,13 +19,21 @@
 #include "ndRenderPassShadowsImplement.h"
 #include "ndRenderPrimitiveMeshImplement.h"
 
-ShaderBlockBlock::~ShaderBlockBlock()
+ndRenderShaderBlock::ndRenderShaderBlock()
+	:m_shader(0)
 {
 }
 
+ndRenderShaderBlock::~ndRenderShaderBlock()
+{
+}
+
+// *********************************************************************
+// 
+// *********************************************************************
 ndRenderShaderCache::ndRenderShaderCache(void)
 {
-	ndMemSet(m_shaders, GLuint(0), sizeof(m_shaders)/sizeof(GLuint));
+	ndMemSet(m_shaders, GLuint(0), sizeof(m_shaders) / sizeof(GLuint));
 	CreateAllEffects();
 }
 
@@ -33,19 +41,17 @@ ndRenderShaderCache::~ndRenderShaderCache(void)
 {
 }
 
-// *********************************************************************
-// 
-// *********************************************************************
 bool ndRenderShaderCache::CreateAllEffects()
 {
 	m_skyBoxEffect = CreateShaderEffect(m_skyBoxVertex, m_skyBoxPixel);
 	m_setZbufferEffect = CreateShaderEffect(m_setZbufferVertex, m_doNothingPixel);
-	m_shadowMapsEffect = CreateShaderEffect(m_shadowMapVertex, m_doNothingPixel);
 	m_diffuseEffect = CreateShaderEffect(m_directionalDiffuseVertex, m_directionalDiffusePixel);
+	m_generateShadowMapsEffect = CreateShaderEffect(m_generateShadowMapVertex, m_doNothingPixel);
 	m_diffuseIntanceEffect = CreateShaderEffect(m_directionalDiffuseInstanceVertex, m_directionalDiffusePixel);
-	m_debugDiffuseSolidEffect = CreateShaderEffect(m_debugFlatDiffuseVertex, m_debugFlatDiffusePixel);
 	m_diffuseShadowEffect = CreateShaderEffect(m_directionalDiffuseShadowVertex, m_directionalDiffuseShadowPixel);
 	m_diffuseTransparentEffect = CreateShaderEffect(m_directionalDiffuseVertex, m_directionalDiffuseTransparentPixel);
+
+	m_debugFlatShadedDiffuseEffect = CreateShaderEffect(m_debugFlatShadedDiffuseVertex, m_debugFlatShadedDiffusePixel);
 
 	//m_wireFrame = CreateShaderEffect("WireFrame", "FlatShaded");
 	//m_flatShaded = CreateShaderEffect("FlatShaded", "FlatShaded");
@@ -159,15 +165,15 @@ void ndRenderShaderCache::Cleanup()
 // *********************************************************************
 // 
 // *********************************************************************
-void SetZbufferCleanBlock::GetShaderParameters(ndRenderPrimitiveMeshImplement* const self)
+void ndRenderSetZbufferCleanBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
 {
-	GLuint shader = self->m_context->m_shaderCache->m_setZbufferEffect;
-	glUseProgram(shader);
-	viewModelProjectionMatrix = glGetUniformLocation(shader, "viewModelProjectionMatrix");
+	m_shader = shaderCache->m_setZbufferEffect;
+	glUseProgram(m_shader);
+	viewModelProjectionMatrix = glGetUniformLocation(m_shader, "viewModelProjectionMatrix");
 	glUseProgram(0);
 }
 
-void SetZbufferCleanBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
+void ndRenderSetZbufferCleanBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
 	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
 
@@ -182,8 +188,7 @@ void SetZbufferCleanBlock::Render(const ndRenderPrimitiveMeshImplement* const se
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 
-	GLuint shader = self->m_context->m_shaderCache->m_setZbufferEffect;
-	glUseProgram(shader);
+	glUseProgram(m_shader);
 
 	glUniformMatrix4fv(viewModelProjectionMatrix, 1, false, &glViewModelProjectionMatrix[0][0]);
 
@@ -196,3 +201,163 @@ void SetZbufferCleanBlock::Render(const ndRenderPrimitiveMeshImplement* const se
 	glBindVertexArray(0);
 	glUseProgram(0);
 }
+
+// *********************************************************************
+// 
+// *********************************************************************
+void ndRenderGenerateShadowMapBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
+{
+	m_shader = shaderCache->m_setZbufferEffect;
+	glUseProgram(m_shader);
+	viewModelProjectionMatrix = glGetUniformLocation(m_shader, "viewModelProjectionMatrix");
+	glUseProgram(0);
+}
+
+void ndRenderGenerateShadowMapBlock::BeginRender()
+{
+	glDisable(GL_SCISSOR_TEST);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+	
+	glClear(GL_DEPTH_BUFFER_BIT);
+	
+	glUseProgram(m_shader);
+	
+	glPolygonOffset(GLfloat(1.0f), GLfloat(1024.0f * 8.0f));
+	glEnable(GL_POLYGON_OFFSET_FILL);
+}
+
+void ndRenderGenerateShadowMapBlock::EndRender()
+{
+	glDisable(GL_POLYGON_OFFSET_FILL);
+	ndAssert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+	glUseProgram(0);
+}
+
+void ndRenderGenerateShadowMapBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const, const ndMatrix& modelMatrix) const
+{
+	glMatrix matrix(modelMatrix);
+	glUniformMatrix4fv(viewModelProjectionMatrix, 1, false, &matrix[0][0]);
+
+	glBindVertexArray(self->m_vertextArrayBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
+		
+	for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
+	{
+		ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
+		if (segment.m_material.m_castShadows)
+		{
+			glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
+		}
+	}
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}	
+
+// *********************************************************************
+// 
+// *********************************************************************
+void ndDebugFlatShadedDiffusedBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
+{
+	m_shader = shaderCache->m_debugFlatShadedDiffuseEffect;
+	glUseProgram(m_shader);
+	m_diffuseColor = glGetUniformLocation(m_shader, "diffuseColor");
+	m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
+	m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
+	m_directionalLightAmbient = glGetUniformLocation(m_shader, "directionalLightAmbient");
+	m_directionalLightIntesity = glGetUniformLocation(m_shader, "directionalLightIntesity");
+	m_directionalLightDirection = glGetUniformLocation(m_shader, "directionalLightDirection");
+	glUseProgram(0);
+}
+
+void ndDebugFlatShadedDiffusedBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
+{
+	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
+	
+	const ndMatrix viewMatrix(camera->m_invViewMatrix);
+	const ndMatrix modelViewMatrix(modelMatrix * viewMatrix);
+	
+	const glMatrix glViewModelMatrix(modelViewMatrix);
+	const glMatrix glProjectionMatrix(camera->m_projectionMatrix);
+	
+	ndRenderPrimitiveMeshSegment& segment = self->m_owner->m_segments.GetFirst()->GetInfo();
+	const ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
+	
+	const glVector4 diffuse(material->m_diffuse);
+	const glVector4 glSunlightAmbient(render->m_sunLightAmbient);
+	const glVector4 glSunlightIntensity(render->m_sunLightIntesity);
+	const glVector4 glSunlightDir(viewMatrix.RotateVector(render->m_sunLightDir));
+	
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
+	glDisable(GL_BLEND);
+	glDepthFunc(GL_LEQUAL);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	
+	glUseProgram(m_shader);
+	
+	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &glProjectionMatrix[0][0]);
+	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &glViewModelMatrix[0][0]);
+	glUniform3fv(m_diffuseColor, 1, &diffuse[0]);
+	glUniform3fv(m_directionalLightDirection, 1, &glSunlightDir[0]);
+	glUniform3fv(m_directionalLightAmbient, 1, &glSunlightAmbient[0]);
+	glUniform3fv(m_directionalLightIntesity, 1, &glSunlightIntensity[0]);
+	
+	glBindVertexArray(self->m_vertextArrayBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
+	
+	glDrawElements(GL_TRIANGLES, self->m_indexCount, GL_UNSIGNED_INT, (void*)0);
+	
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	glUseProgram(0);
+}
+
+// *********************************************************************
+// 
+// *********************************************************************
+void ndDebugWireframeDiffuseBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
+{
+	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
+	
+	const ndMatrix viewMatrix(camera->m_invViewMatrix);
+	const ndMatrix modelViewMatrix(modelMatrix * viewMatrix);
+	
+	const glMatrix glViewModelMatrix(modelViewMatrix);
+	const glMatrix glProjectionMatrix(camera->m_projectionMatrix);
+	
+	ndRenderPrimitiveMeshSegment& segment = self->m_owner->m_segments.GetFirst()->GetInfo();
+	const ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
+	
+	const glVector4 diffuse(material->m_diffuse);
+	const glVector4 glSunlightAmbient(render->m_sunLightAmbient);
+	const glVector4 glSunlightIntensity(render->m_sunLightIntesity);
+	const glVector4 glSunlightDir(viewMatrix.RotateVector(render->m_sunLightDir));
+	
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
+	glDisable(GL_BLEND);
+	glDepthFunc(GL_LEQUAL);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	
+	glUseProgram(m_shader);
+	
+	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &glProjectionMatrix[0][0]);
+	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &glViewModelMatrix[0][0]);
+	glUniform3fv(m_diffuseColor, 1, &diffuse[0]);
+	glUniform3fv(m_directionalLightDirection, 1, &glSunlightDir[0]);
+	glUniform3fv(m_directionalLightAmbient, 1, &glSunlightAmbient[0]);
+	glUniform3fv(m_directionalLightIntesity, 1, &glSunlightIntensity[0]);
+	
+	glBindVertexArray(self->m_vertextArrayBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
+	
+	glDrawElements(GL_LINES, self->m_indexCount, GL_UNSIGNED_INT, (void*)0);
+	
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	glUseProgram(0);
+}
+

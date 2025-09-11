@@ -57,14 +57,14 @@ ndDebugDisplayRenderPass::ndDebugMesh* ndDebugDisplayRenderPass::CreateRenderPri
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
 	descriptor.m_collision = &shape;
 
-	descriptor.m_meshBuildMode = ndRenderPrimitiveMesh::m_debugSolid;
+	descriptor.m_meshBuildMode = ndRenderPrimitiveMesh::m_debugFlatShaded;
 	debugMesh->m_flatShaded = ndSharedPtr<ndRenderPrimitive>(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
-
-	descriptor.m_meshBuildMode = ndRenderPrimitiveMesh::m_debugHiddenLines;
-	debugMesh->m_zBuffer = ndSharedPtr<ndRenderPrimitive>(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 
 	descriptor.m_meshBuildMode = ndRenderPrimitiveMesh::m_debugWireFrame;
 	debugMesh->m_wireFrameShareEdge = ndSharedPtr<ndRenderPrimitive>(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
+
+	descriptor.m_meshBuildMode = ndRenderPrimitiveMesh::m_debugHiddenLines;
+	debugMesh->m_zBuffer = ndSharedPtr<ndRenderPrimitive>(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 
 	return debugMesh;
 }
@@ -121,6 +121,7 @@ void ndDebugDisplayRenderPass::RenderScene(ndFloat32)
 			default:
 			{
 				debugMesh->m_zBuffer->Render(m_owner, matrix, m_debugDisplaySetZbuffer);
+				break;
 			}
 		}
 	}
@@ -141,7 +142,7 @@ void ndDebugDisplayRenderPass::RenderScene(ndFloat32)
 			const ndMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
 			ndSharedPtr<ndDebugMesh>& debugMesh = node->GetInfo();
 			const ndVector color((body->GetSleepState() == 1) ? m_sleepColor : m_awakeColor);
-
+		
 			ndRenderPrimitiveMesh* const mesh = (ndRenderPrimitiveMesh*)*debugMesh->m_flatShaded;
 			ndRenderPrimitiveMeshSegment& segment = mesh->m_segments.GetFirst()->GetInfo();
 			ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;

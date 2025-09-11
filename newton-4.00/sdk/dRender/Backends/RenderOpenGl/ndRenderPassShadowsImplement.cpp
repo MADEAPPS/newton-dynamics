@@ -48,13 +48,14 @@ ndRenderPassShadowsImplement::ndRenderPassShadowsImplement(ndRenderContext* cons
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_shadowMapTexture, 0);
 	
-	GLuint shader = m_context->m_shaderCache->m_shadowMapsEffect;
-	glUseProgram(shader);
-	m_modelProjectionMatrixLocation = GLuint(glGetUniformLocation(shader, "viewModelProjectionMatrix"));
-	glUseProgram(0);
-	
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	ndAssert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+
+	//GLuint shader = m_context->m_shaderCache->m_generateShadowMapsEffect;
+	//glUseProgram(shader);
+	//m_modelProjectionMatrixLocation = GLuint(glGetUniformLocation(shader, "viewModelProjectionMatrix"));
+	//glUseProgram(0);
+	m_generateShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
 	
 	m_viewPortTiles[0] = ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.5f), ndFloat32(0.5f));
 	m_viewPortTiles[1] = ndVector(ndFloat32(0.5f), ndFloat32(0.0f), ndFloat32(0.5f), ndFloat32(0.5f));
@@ -186,17 +187,18 @@ void ndRenderPassShadowsImplement::UpdateCascadeSplits(const ndRenderSceneCamera
 void ndRenderPassShadowsImplement::RenderScene(const ndRenderSceneCamera* const camera)
 {
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_frameBufferObject);
-	glDisable(GL_SCISSOR_TEST);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LEQUAL);
-	
-	glClear(GL_DEPTH_BUFFER_BIT);
-	
-	GLuint shader = m_context->m_shaderCache->m_shadowMapsEffect;
-	glUseProgram(shader);
-	
-	glPolygonOffset(GLfloat(1.0f), GLfloat(1024.0f * 8.0f));
-	glEnable(GL_POLYGON_OFFSET_FILL);
+	//glDisable(GL_SCISSOR_TEST);
+	//glEnable(GL_DEPTH_TEST);
+	//glDepthFunc(GL_LEQUAL);
+	//
+	//glClear(GL_DEPTH_BUFFER_BIT);
+	//
+	//GLuint shader = m_context->m_shaderCache->m_generateShadowMapsEffect;
+	//glUseProgram(shader);
+	//
+	//glPolygonOffset(GLfloat(1.0f), GLfloat(1024.0f * 8.0f));
+	//glEnable(GL_POLYGON_OFFSET_FILL);
+	m_generateShadowMapsBlock.BeginRender();
 	
 	UpdateCascadeSplits(camera);
 	
@@ -225,18 +227,18 @@ void ndRenderPassShadowsImplement::RenderScene(const ndRenderSceneCamera* const 
 		m_lighProjectionMatrix[i] = lightSpaceMatrix * m_lightProjectToTextureSpace * tileMatrix;
 	
 		glViewport(vp_x, vp_y, m_width, m_height);
-	
 		for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = scene.GetFirst(); node; node = node->GetNext())
 		{
 			ndRenderSceneNode* const sceneNode = *node->GetInfo();
-			sceneNode->Render(owner, 0.0f, lightSpaceMatrix, m_shadowMap);
+			sceneNode->Render(owner, 0.0f, lightSpaceMatrix, ndRenderPassMode::m_generateShadowMapsBlock);
 		}
 	}
 	
-	glDisable(GL_POLYGON_OFFSET_FILL);
-	ndAssert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-	glUseProgram(0);
+	//glDisable(GL_POLYGON_OFFSET_FILL);
+	//ndAssert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+	//glUseProgram(0);
+	m_generateShadowMapsBlock.EndRender();
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-
+	
 	m_context->SetViewport(m_context->GetWidth(), m_context->GetHeight());
 }

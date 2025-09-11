@@ -34,12 +34,12 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 		const ndInt32* const indices, ndInt32 indexCount);
 
 	void BuildRenderMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
-	void BuildSolidDebugMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
+	void BuildDebugFlatShadedMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
 	void BuildRenderInstanceMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
 	void BuildWireframeDebugMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
 	void BuildSetZBufferDebugMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
 
-	void RenderShadowMap(const ndRender* const render, const ndMatrix& lightMatrix) const;
+	void RenderGenerateShadowMaps(const ndRender* const render, const ndMatrix& lightMatrix) const;
 	void RenderSolidColor(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
 	void RenderDebugSetZbuffer(const ndRender* const render, const ndMatrix& modelMatrix) const;
 	void RenderDebugShapeSolid(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
@@ -57,7 +57,7 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	GLuint m_vertexBuffer;
 	GLuint m_vertextArrayBuffer;
 
-	struct SolidColorBlock: public DiffusedOpaqueBlock
+	struct SolidColorBlock: public ndDebugFlatShadedDiffusedBlock
 	{
 		GLint m_texture;
 		GLint m_environmentMap;
@@ -85,13 +85,18 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	};
 
 	SolidColorBlock m_solidColorBlock;
-	SetZbufferCleanBlock m_setZbufferBlock;
-	DiffusedOpaqueBlock m_debugSolidColorBlock;
+	ndRenderSetZbufferCleanBlock m_setZbufferBlock;
 	SolidShadowColorBlock m_solidShadowColorBlock;
 	TransparentColorBlock m_transparencyColorBlock;
 	InstancedSolidShadowColorBlock m_instancedShadowColorBlock;
 
-	friend class SetZbufferCleanBlock;
+	ndDebugWireframeDiffuseBlock m_debugWireframeColorBlock;
+	ndDebugFlatShadedDiffusedBlock m_debugFlatShadedColorBlock;
+
+	friend class ndRenderSetZbufferCleanBlock;
+	friend class ndDebugWireframeDiffuseBlock;
+	friend class ndDebugFlatShadedDiffusedBlock;
+	friend class ndRenderGenerateShadowMapBlock;
 };
 
 #endif

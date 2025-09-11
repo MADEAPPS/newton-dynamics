@@ -37,7 +37,7 @@ R""""(
 	}
 )"""";
 
-const char* ndRenderShaderCache::m_debugFlatDiffusePixel =
+const char* ndRenderShaderCache::m_debugFlatShadedDiffusePixel =
 R""""(
 	#version 450 core
 
