@@ -28,19 +28,19 @@ void ndRenderPassColor::RenderScene(ndFloat32 timestep)
 {
 	m_owner->m_context->SetCollorPassRenderStates();
 
-	// first render solid that do not has shadows
+	// first render solid that do not get shadows
 	const ndMatrix globalMatrix(ndGetIdentityMatrix());
 	ndList<ndSharedPtr<ndRenderSceneNode>>& scene = m_owner->m_scene;
 	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = scene.GetFirst(); node; node = node->GetNext())
 	{
 		ndRenderSceneNode* const sceneNode = *node->GetInfo();
-		sceneNode->Render(sceneNode->m_owner, timestep, globalMatrix, m_solidColor);
+		sceneNode->Render(sceneNode->m_owner, timestep, globalMatrix, m_directionlDifusseNoShadow);
 	}
 
-	// render all meshes that cast shadows
+	// render all meshes that get shadows
 	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = scene.GetFirst(); node; node = node->GetNext())
 	{
 		ndRenderSceneNode* const sceneNode = *node->GetInfo();
-		sceneNode->Render(sceneNode->m_owner, timestep, globalMatrix, m_shadowSolidColor);
+		sceneNode->Render(sceneNode->m_owner, timestep, globalMatrix, m_directionlDifusseShadow);
 	}
 }

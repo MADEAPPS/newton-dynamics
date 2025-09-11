@@ -113,8 +113,10 @@ class ndRender: public ndClassAlloc
 	friend class ndRenderPassShadowsImplement;
 	friend class ndRenderPrimitiveMeshImplement;
 
-	friend class ndDebugWireframeDiffuseBlock;
-	friend class ndDebugFlatShadedDiffusedBlock;
+	friend class ndRenderShaderOpaqueDiffusedColorBlock;
+	friend class ndRenderShaderDebugWireframeDiffuseBlock;
+	friend class ndRenderShaderDebugFlatShadedDiffusedBlock;
+	friend class ndRenderShaderOpaqueDiffusedShadowColorBlock;
 };
 
 #endif 

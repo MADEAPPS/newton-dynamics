@@ -17,13 +17,13 @@ class ndRenderPassShadowsImplement;
 
 enum ndRenderPassMode
 {
-	m_solidColor,
-	m_shadowSolidColor,
-	m_generateShadowMapsBlock,
+	m_generateShadowMaps,
 	m_transparencyBackface,
 	m_transparencyFrontface,
 	m_debugDisplaySolidMesh,
 	m_debugDisplaySetZbuffer,
+	m_directionlDifusseShadow,
+	m_directionlDifusseNoShadow,
 	m_debugDisplayWireFrameMesh,
 };
 

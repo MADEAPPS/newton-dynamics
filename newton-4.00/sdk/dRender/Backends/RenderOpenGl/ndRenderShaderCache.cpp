@@ -15,7 +15,9 @@
 #include "ndRenderOpenGlUtil.h"
 #include "ndRenderSceneCamera.h"
 #include "ndRenderShaderCache.h"
+#include "ndRenderPassShadows.h"
 #include "ndRenderTextureImage.h"
+#include "ndRenderPassEnvironment.h"
 #include "ndRenderPassShadowsImplement.h"
 #include "ndRenderPrimitiveMeshImplement.h"
 
@@ -165,7 +167,7 @@ void ndRenderShaderCache::Cleanup()
 // *********************************************************************
 // 
 // *********************************************************************
-void ndRenderSetZbufferCleanBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
+void ndRenderShaderSetZbufferCleanBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
 {
 	m_shader = shaderCache->m_setZbufferEffect;
 	glUseProgram(m_shader);
@@ -173,7 +175,7 @@ void ndRenderSetZbufferCleanBlock::GetShaderParameters(const ndRenderShaderCache
 	glUseProgram(0);
 }
 
-void ndRenderSetZbufferCleanBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
+void ndRenderShaderSetZbufferCleanBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
 	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
 
@@ -205,7 +207,7 @@ void ndRenderSetZbufferCleanBlock::Render(const ndRenderPrimitiveMeshImplement* 
 // *********************************************************************
 // 
 // *********************************************************************
-void ndRenderGenerateShadowMapBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
+void ndRenderShaderGenerateShadowMapBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
 {
 	m_shader = shaderCache->m_setZbufferEffect;
 	glUseProgram(m_shader);
@@ -213,7 +215,7 @@ void ndRenderGenerateShadowMapBlock::GetShaderParameters(const ndRenderShaderCac
 	glUseProgram(0);
 }
 
-void ndRenderGenerateShadowMapBlock::BeginRender()
+void ndRenderShaderGenerateShadowMapBlock::BeginRender()
 {
 	glDisable(GL_SCISSOR_TEST);
 	glEnable(GL_DEPTH_TEST);
@@ -227,14 +229,14 @@ void ndRenderGenerateShadowMapBlock::BeginRender()
 	glEnable(GL_POLYGON_OFFSET_FILL);
 }
 
-void ndRenderGenerateShadowMapBlock::EndRender()
+void ndRenderShaderGenerateShadowMapBlock::EndRender()
 {
 	glDisable(GL_POLYGON_OFFSET_FILL);
 	ndAssert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 	glUseProgram(0);
 }
 
-void ndRenderGenerateShadowMapBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const, const ndMatrix& modelMatrix) const
+void ndRenderShaderGenerateShadowMapBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const, const ndMatrix& modelMatrix) const
 {
 	glMatrix matrix(modelMatrix);
 	glUniformMatrix4fv(viewModelProjectionMatrix, 1, false, &matrix[0][0]);
@@ -257,7 +259,7 @@ void ndRenderGenerateShadowMapBlock::Render(const ndRenderPrimitiveMeshImplement
 // *********************************************************************
 // 
 // *********************************************************************
-void ndDebugFlatShadedDiffusedBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
+void ndRenderShaderDebugFlatShadedDiffusedBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
 {
 	m_shader = shaderCache->m_debugFlatShadedDiffuseEffect;
 	glUseProgram(m_shader);
@@ -270,7 +272,7 @@ void ndDebugFlatShadedDiffusedBlock::GetShaderParameters(const ndRenderShaderCac
 	glUseProgram(0);
 }
 
-void ndDebugFlatShadedDiffusedBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
+void ndRenderShaderDebugFlatShadedDiffusedBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
 	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
 	
@@ -317,7 +319,7 @@ void ndDebugFlatShadedDiffusedBlock::Render(const ndRenderPrimitiveMeshImplement
 // *********************************************************************
 // 
 // *********************************************************************
-void ndDebugWireframeDiffuseBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
+void ndRenderShaderDebugWireframeDiffuseBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
 	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
 	
@@ -361,3 +363,198 @@ void ndDebugWireframeDiffuseBlock::Render(const ndRenderPrimitiveMeshImplement* 
 	glUseProgram(0);
 }
 
+// *********************************************************************
+// 
+// *********************************************************************
+void ndRenderShaderOpaqueDiffusedColorBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
+{
+	m_shader = shaderCache->m_diffuseEffect;
+	glUseProgram(m_shader);
+	//m_normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
+	m_texture = glGetUniformLocation(m_shader, "texture0");
+	m_environmentMap = glGetUniformLocation(m_shader, "environmentMap");
+	m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
+	m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
+	m_diffuseColor = glGetUniformLocation(m_shader, "diffuseColor");
+	m_specularColor = glGetUniformLocation(m_shader, "specularColor");
+	m_reflectionColor = glGetUniformLocation(m_shader, "reflectionColor");
+	m_directionalLightAmbient = glGetUniformLocation(m_shader, "directionalLightAmbient");
+	m_directionalLightIntesity = glGetUniformLocation(m_shader, "directionalLightIntesity");
+	m_directionalLightDirection = glGetUniformLocation(m_shader, "directionalLightDirection");
+	m_specularAlpha = glGetUniformLocation(m_shader, "specularAlpha");
+	glUseProgram(0);
+}
+
+void ndRenderShaderOpaqueDiffusedColorBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
+{
+	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
+
+	glUseProgram(m_shader);
+
+	const ndMatrix viewMatrix(camera->m_invViewMatrix);
+	const ndMatrix modelViewMatrix(modelMatrix * viewMatrix);
+
+	const glMatrix glViewModelMatrix(modelViewMatrix);
+	const glMatrix glProjectionMatrix(camera->m_projectionMatrix);
+
+	const glVector4 glSunlightAmbient(render->m_sunLightAmbient);
+	const glVector4 glSunlightIntensity(render->m_sunLightIntesity);
+	const glVector4 glSunlightDir(viewMatrix.RotateVector(render->m_sunLightDir));
+
+	glUniform3fv(m_directionalLightDirection, 1, &glSunlightDir[0]);
+	glUniform3fv(m_directionalLightAmbient, 1, &glSunlightAmbient[0]);
+	glUniform3fv(m_directionalLightIntesity, 1, &glSunlightIntensity[0]);
+
+	//glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &glViewModelMatrix[0][0]);
+	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &glProjectionMatrix[0][0]);
+	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &glViewModelMatrix[0][0]);
+
+	ndRenderPassEnvironment* const environment = render->m_cachedEnvironmentPass;
+	ndAssert(environment);
+	ndRenderTextureImage* const environmentTexture = (ndRenderTextureImage*)*environment->m_cubeMap;
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, environmentTexture->m_texture);
+
+	glBindVertexArray(self->m_vertextArrayBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
+
+	glActiveTexture(GL_TEXTURE0);
+	for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
+	{
+		ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
+		if (!segment.m_material.m_castShadows && (segment.m_material.m_opacity > ndFloat32(0.99f)))
+		{
+			const ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
+			const ndRenderTextureImageCommon* const image = (ndRenderTextureImageCommon*)*material->m_texture;
+			ndAssert(image);
+
+			const glVector4 diffuse(material->m_diffuse);
+			const glVector4 specular(material->m_specular);
+			const glVector4 reflection(material->m_reflection);
+
+			glUniform3fv(m_diffuseColor, 1, &diffuse[0]);
+			glUniform3fv(m_specularColor, 1, &specular[0]);
+			glUniform3fv(m_reflectionColor, 1, &reflection[0]);
+			glUniform1fv(m_specularAlpha, 1, &material->m_specularPower);
+
+			glBindTexture(GL_TEXTURE_2D, image->m_texture);
+			glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
+		}
+	}
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	glUseProgram(0);
+}
+
+
+// *********************************************************************
+// 
+// *********************************************************************
+void ndRenderShaderOpaqueDiffusedShadowColorBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
+{
+	m_shader = shaderCache->m_diffuseShadowEffect;
+	glUseProgram(m_shader);
+	//m_normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
+
+	m_texture = glGetUniformLocation(m_shader, "texture0");
+	m_environmentMap = glGetUniformLocation(m_shader, "environmentMap");
+	m_depthMapTexture = glGetUniformLocation(m_shader, "shadowMapTexture");
+
+	m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
+	m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
+	m_diffuseColor = glGetUniformLocation(m_shader, "diffuseColor");
+	m_specularColor = glGetUniformLocation(m_shader, "specularColor");
+	m_reflectionColor = glGetUniformLocation(m_shader, "reflectionColor");
+	m_directionalLightAmbient = glGetUniformLocation(m_shader, "directionalLightAmbient");
+	m_directionalLightIntesity = glGetUniformLocation(m_shader, "directionalLightIntesity");
+	m_directionalLightDirection = glGetUniformLocation(m_shader, "directionalLightDirection");
+	m_specularAlpha = glGetUniformLocation(m_shader, "specularAlpha");
+
+	m_shadowSlices = glGetUniformLocation(m_shader, "shadowSlices");
+	m_worldMatrix = glGetUniformLocation(m_shader, "modelWorldMatrix");
+	m_directionLightViewProjectionMatrixShadow = glGetUniformLocation(m_shader, "directionaLightViewProjectionMatrix");
+	glUseProgram(0);
+}
+
+void ndRenderShaderOpaqueDiffusedShadowColorBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
+{
+	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
+	
+	const ndMatrix viewMatrix(camera->m_invViewMatrix);
+	const ndMatrix modelViewMatrix(modelMatrix * viewMatrix);
+	
+	const glMatrix worldMatrix(modelMatrix);
+	const glMatrix glViewModelMatrix(modelViewMatrix);
+	const glMatrix glProjectionMatrix(camera->m_projectionMatrix);
+	
+	const glVector4 glSunlightAmbient(render->m_sunLightAmbient);
+	const glVector4 glSunlightIntensity(render->m_sunLightIntesity);
+	const glVector4 glSunlightDir(viewMatrix.RotateVector(render->m_sunLightDir));
+
+	glUseProgram(m_shader);
+
+	glUniform3fv(m_directionalLightDirection, 1, &glSunlightDir[0]);
+	glUniform3fv(m_directionalLightAmbient, 1, &glSunlightAmbient[0]);
+	glUniform3fv(m_directionalLightIntesity, 1, &glSunlightIntensity[0]);
+	
+	//glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &glViewModelMatrix[0][0]);
+	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &glProjectionMatrix[0][0]);
+	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &glViewModelMatrix[0][0]);
+	
+	ndRenderPassShadowsImplement* const shadowPass = render->m_cachedShadowPass;
+	ndAssert(shadowPass);
+	
+	glVector4 cameraSpaceSplits(shadowPass->m_cameraSpaceSplits);
+	glMatrix lightViewProjectMatrix[4];
+	for (ndInt32 i = 0; i < 4; ++i)
+	{
+		lightViewProjectMatrix[i] = shadowPass->m_lighProjectionMatrix[i];
+	}
+	glUniform1i(m_depthMapTexture, 1);
+	glUniformMatrix4fv(m_worldMatrix, 1, GL_FALSE, &worldMatrix[0][0]);
+	glUniformMatrix4fv(m_directionLightViewProjectionMatrixShadow, 4, GL_FALSE, &lightViewProjectMatrix[0][0][0]);
+	glUniform4fv(m_shadowSlices, 1, &cameraSpaceSplits[0]);
+	
+	ndRenderPassEnvironment* const environment = render->m_cachedEnvironmentPass;
+	ndAssert(environment);
+	ndRenderTextureImage* const environmentTexture = (ndRenderTextureImage*)*environment->m_cubeMap;
+	
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, environmentTexture->m_texture);
+	
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, shadowPass->m_shadowMapTexture);
+	
+	glBindVertexArray(self->m_vertextArrayBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
+	
+	glActiveTexture(GL_TEXTURE0);
+	for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
+	{
+		ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
+		if (segment.m_material.m_opacity > ndFloat32(0.99f))
+		{
+			const ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
+			const ndRenderTextureImageCommon* const image = (ndRenderTextureImageCommon*)*material->m_texture;
+			ndAssert(image);
+	
+			const glVector4 diffuse(material->m_diffuse);
+			const glVector4 specular(material->m_specular);
+			const glVector4 reflection(material->m_reflection);
+	
+			glUniform3fv(m_diffuseColor, 1, &diffuse[0]);
+			glUniform3fv(m_specularColor, 1, &specular[0]);
+			glUniform3fv(m_reflectionColor, 1, &reflection[0]);
+			glUniform1fv(m_specularAlpha, 1, &material->m_specularPower);
+	
+			glBindTexture(GL_TEXTURE_2D, image->m_texture);
+			glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
+		}
+	}
+	
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	glUseProgram(0);
+}

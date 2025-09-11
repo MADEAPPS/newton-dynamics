@@ -40,10 +40,10 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	void BuildSetZBufferDebugMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
 
 	void RenderGenerateShadowMaps(const ndRender* const render, const ndMatrix& lightMatrix) const;
-	void RenderSolidColor(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
+	void RenderDirectionslDifuseColorNoShadow(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
 	void RenderDebugSetZbuffer(const ndRender* const render, const ndMatrix& modelMatrix) const;
 	void RenderDebugShapeSolid(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
-	void RenderShadowSolidColor(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
+	void RenderDirectionslDifuseColorShadow(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
 	void RenderDebugShapeWireFrame(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
 	void RenderTransparency(const ndRender* const render, const ndMatrix& modelViewMatrix, bool backface) const;
 
@@ -57,7 +57,7 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	GLuint m_vertexBuffer;
 	GLuint m_vertextArrayBuffer;
 
-	struct SolidColorBlock: public ndDebugFlatShadedDiffusedBlock
+	struct SolidColorBlock: public ndRenderShaderDebugFlatShadedDiffusedBlock
 	{
 		GLint m_texture;
 		GLint m_environmentMap;
@@ -65,38 +65,31 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 		GLint m_specularAlpha;
 		GLint m_reflectionColor;
 	};
-
 	struct TransparentColorBlock : public SolidColorBlock
 	{
 		GLint m_opacity;
 	};
-
-	struct SolidShadowColorBlock : public SolidColorBlock
-	{
-		GLint m_worldMatrix;
-		GLint m_shadowSlices;
-		GLint m_depthMapTexture;
-		GLint m_directionLightViewProjectionMatrixShadow;
-	};
-
-	struct InstancedSolidShadowColorBlock : public SolidShadowColorBlock
-	{
-		GLint m_matrixPalette;
-	};
-
-	SolidColorBlock m_solidColorBlock;
-	ndRenderSetZbufferCleanBlock m_setZbufferBlock;
-	SolidShadowColorBlock m_solidShadowColorBlock;
+	 
+	//struct InstancedSolidShadowColorBlock : public SolidShadowColorBlock
+	//{
+	//	GLint m_matrixPalette;
+	//};
+	
 	TransparentColorBlock m_transparencyColorBlock;
-	InstancedSolidShadowColorBlock m_instancedShadowColorBlock;
+	//InstancedSolidShadowColorBlock m_instancedShadowColorBlock;
+	
+	ndRenderShaderSetZbufferCleanBlock m_setZbufferBlock;
+	ndRenderShaderDebugWireframeDiffuseBlock m_debugWireframeColorBlock;
+	ndRenderShaderDebugFlatShadedDiffusedBlock m_debugFlatShadedColorBlock;
+	ndRenderShaderOpaqueDiffusedColorBlock m_opaqueDifusedColorNoShadowBlock;
+	ndRenderShaderOpaqueDiffusedShadowColorBlock m_opaqueDifusedColorShadowBlock;
 
-	ndDebugWireframeDiffuseBlock m_debugWireframeColorBlock;
-	ndDebugFlatShadedDiffusedBlock m_debugFlatShadedColorBlock;
-
-	friend class ndRenderSetZbufferCleanBlock;
-	friend class ndDebugWireframeDiffuseBlock;
-	friend class ndDebugFlatShadedDiffusedBlock;
-	friend class ndRenderGenerateShadowMapBlock;
+	friend class ndRenderShaderSetZbufferCleanBlock;
+	friend class ndRenderShaderGenerateShadowMapBlock;
+	friend class ndRenderShaderOpaqueDiffusedColorBlock;
+	friend class ndRenderShaderDebugWireframeDiffuseBlock;
+	friend class ndRenderShaderDebugFlatShadedDiffusedBlock;
+	friend class ndRenderShaderOpaqueDiffusedShadowColorBlock;
 };
 
 #endif

@@ -31,7 +31,7 @@ class ndRenderShaderBlock
 // *********************************************************************
 // 
 // *********************************************************************
-class ndRenderSetZbufferCleanBlock : public ndRenderShaderBlock
+class ndRenderShaderSetZbufferCleanBlock : public ndRenderShaderBlock
 {
 	public:
 	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) override;
@@ -43,7 +43,7 @@ class ndRenderSetZbufferCleanBlock : public ndRenderShaderBlock
 // *********************************************************************
 // 
 // *********************************************************************
-class ndRenderGenerateShadowMapBlock : public ndRenderSetZbufferCleanBlock
+class ndRenderShaderGenerateShadowMapBlock : public ndRenderShaderSetZbufferCleanBlock
 {
 	public:
 	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) override;
@@ -56,7 +56,7 @@ class ndRenderGenerateShadowMapBlock : public ndRenderSetZbufferCleanBlock
 // *********************************************************************
 // 
 // *********************************************************************
-class ndDebugFlatShadedDiffusedBlock : public ndRenderShaderBlock
+class ndRenderShaderDebugFlatShadedDiffusedBlock : public ndRenderShaderBlock
 {
 	public:
 	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) override;
@@ -73,7 +73,38 @@ class ndDebugFlatShadedDiffusedBlock : public ndRenderShaderBlock
 // *********************************************************************
 // 
 // *********************************************************************
-class ndDebugWireframeDiffuseBlock : public ndDebugFlatShadedDiffusedBlock
+class ndRenderShaderOpaqueDiffusedColorBlock : public ndRenderShaderDebugFlatShadedDiffusedBlock
+{
+	public:
+	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) override;
+	virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
+
+	GLint m_texture;
+	GLint m_environmentMap;
+	GLint m_specularColor;
+	GLint m_specularAlpha;
+	GLint m_reflectionColor;
+};
+
+// *********************************************************************
+// 
+// *********************************************************************
+class ndRenderShaderOpaqueDiffusedShadowColorBlock : public ndRenderShaderOpaqueDiffusedColorBlock
+{
+	public:
+	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) override;
+	virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
+
+	GLint m_worldMatrix;
+	GLint m_shadowSlices;
+	GLint m_depthMapTexture;
+	GLint m_directionLightViewProjectionMatrixShadow;
+};
+
+// *********************************************************************
+// 
+// *********************************************************************
+class ndRenderShaderDebugWireframeDiffuseBlock : public ndRenderShaderDebugFlatShadedDiffusedBlock
 {
 	public:
 	virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
@@ -126,8 +157,8 @@ class ndRenderShaderCache
 	static const char* m_directionalDiffuseTransparentPixel;
 
 	friend class ndRenderContext;
-	friend class ndRenderSetZbufferCleanBlock;
-	friend class ndDebugWireframeDiffuseBlock;
-	friend class ndDebugFlatShadedDiffusedBlock;
+	friend class ndRenderShaderSetZbufferCleanBlock;
+	friend class ndRenderShaderDebugWireframeDiffuseBlock;
+	friend class ndRenderShaderDebugFlatShadedDiffusedBlock;
 };
 #endif

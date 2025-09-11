@@ -187,17 +187,6 @@ void ndRenderPassShadowsImplement::UpdateCascadeSplits(const ndRenderSceneCamera
 void ndRenderPassShadowsImplement::RenderScene(const ndRenderSceneCamera* const camera)
 {
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_frameBufferObject);
-	//glDisable(GL_SCISSOR_TEST);
-	//glEnable(GL_DEPTH_TEST);
-	//glDepthFunc(GL_LEQUAL);
-	//
-	//glClear(GL_DEPTH_BUFFER_BIT);
-	//
-	//GLuint shader = m_context->m_shaderCache->m_generateShadowMapsEffect;
-	//glUseProgram(shader);
-	//
-	//glPolygonOffset(GLfloat(1.0f), GLfloat(1024.0f * 8.0f));
-	//glEnable(GL_POLYGON_OFFSET_FILL);
 	m_generateShadowMapsBlock.BeginRender();
 	
 	UpdateCascadeSplits(camera);
@@ -230,13 +219,10 @@ void ndRenderPassShadowsImplement::RenderScene(const ndRenderSceneCamera* const 
 		for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = scene.GetFirst(); node; node = node->GetNext())
 		{
 			ndRenderSceneNode* const sceneNode = *node->GetInfo();
-			sceneNode->Render(owner, 0.0f, lightSpaceMatrix, ndRenderPassMode::m_generateShadowMapsBlock);
+			sceneNode->Render(owner, 0.0f, lightSpaceMatrix, m_generateShadowMaps);
 		}
 	}
 	
-	//glDisable(GL_POLYGON_OFFSET_FILL);
-	//ndAssert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-	//glUseProgram(0);
 	m_generateShadowMapsBlock.EndRender();
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	
