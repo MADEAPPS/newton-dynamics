@@ -27,20 +27,21 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	//	ndRenderPrimitiveMesh* const owner, 
 	//	const ndRender* const render, 
 	//	const ndShapeInstance* const collision,
-	//	ndRenderPrimitiveMesh::ndDebugMode mode);
+	//	ndRenderPrimitiveMesh::ndMeshBuildMode mode);
 
 	~ndRenderPrimitiveMeshImplement();
 
 	void Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderMode) const;
 	
 	private:
-	void ResetOptimization();
+	void ResetOptimization____();
 	void OptimizeForRender(
 		const glPositionNormalUV* const points, ndInt32 pointCount,
 		const ndInt32* const indices, ndInt32 indexCount);
 
 	void BuildRenderMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
 	void BuildSolidDebugMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
+	void BuildRenderInstanceMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
 	void BuildWireframeDebugMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
 	void BuildSetZBufferDebugMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
 
@@ -62,6 +63,22 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	GLuint m_vertexBuffer;
 	GLuint m_vertextArrayBuffer;
 
+	struct ShaderBlockBlock
+	{
+		virtual ~ShaderBlockBlock() {}
+
+		virtual void GetShaderParameters(ndRenderPrimitiveMeshImplement* const self) = 0;
+		virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const = 0;
+	};
+
+	struct SetZbufferCleanBlock: public ShaderBlockBlock
+	{
+		virtual void GetShaderParameters(ndRenderPrimitiveMeshImplement* const self) override;
+		virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
+
+		GLint viewModelProjectionMatrix;
+	};
+
 	struct DebugSolidColorBlock
 	{
 		GLint m_diffuseColor;
@@ -72,11 +89,6 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 		GLint m_viewModelMatrixLocation;
 	};
 
-	struct SetZbufferCleanBlock
-	{
-		GLint viewModelProjectionMatrix;
-	};
-
 	struct SolidColorBlock: public DebugSolidColorBlock
 	{
 		GLint m_texture;
@@ -85,6 +97,12 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 		GLint m_specularAlpha;
 		GLint m_reflectionColor;
 	};
+
+	struct TransparentColorBlock : public SolidColorBlock
+	{
+		GLint m_opacity;
+	};
+
 	struct SolidShadowColorBlock : public SolidColorBlock
 	{
 		GLint m_worldMatrix;
@@ -93,9 +111,9 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 		GLint m_directionLightViewProjectionMatrixShadow;
 	};
 
-	struct TransparentColorBlock : public SolidColorBlock
+	struct InstancedSolidShadowColorBlock : public SolidShadowColorBlock
 	{
-		GLint m_opacity;
+		GLint m_matrixPalette;
 	};
 
 	SolidColorBlock m_solidColorBlock;
@@ -103,6 +121,7 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	DebugSolidColorBlock m_debugSolidColorBlock;
 	SolidShadowColorBlock m_solidShadowColorBlock;
 	TransparentColorBlock m_transparencyColorBlock;
+	InstancedSolidShadowColorBlock m_instancedShadowColorBlock;
 };
 
 #endif

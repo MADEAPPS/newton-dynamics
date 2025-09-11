@@ -22,6 +22,45 @@
 #include "ndRenderPassShadowsImplement.h"
 #include "ndRenderPrimitiveMeshImplement.h"
 
+
+void ndRenderPrimitiveMeshImplement::SetZbufferCleanBlock::GetShaderParameters(ndRenderPrimitiveMeshImplement* const self)
+{
+	GLuint shader = self->m_context->m_shaderCache->m_setZbufferEffect;
+	glUseProgram(shader);
+	viewModelProjectionMatrix = glGetUniformLocation(shader, "viewModelProjectionMatrix");
+	glUseProgram(0);
+}
+
+void ndRenderPrimitiveMeshImplement::SetZbufferCleanBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
+{
+	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
+
+	//const ndMatrix modelViewProjectionMatrixMatrix(modelMatrix * camera->m_invViewMatrix * camera->m_projectionMatrix);
+	const ndMatrix modelViewProjectionMatrixMatrix(modelMatrix * camera->m_invViewRrojectionMatrix);
+	const glMatrix glViewModelProjectionMatrix(modelViewProjectionMatrixMatrix);
+
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
+	glDisable(GL_BLEND);
+	glDepthFunc(GL_LEQUAL);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+
+	GLuint shader = self->m_context->m_shaderCache->m_setZbufferEffect;
+	glUseProgram(shader);
+
+	glUniformMatrix4fv(viewModelProjectionMatrix, 1, false, &glViewModelProjectionMatrix[0][0]);
+
+	glBindVertexArray(self->m_vertextArrayBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
+
+	glDrawElements(GL_TRIANGLES, self->m_indexCount, GL_UNSIGNED_INT, (void*)0);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	glUseProgram(0);
+}
+
 ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(ndRenderPrimitiveMesh* const owner, const ndRenderPrimitiveMesh::ndDescriptor& descriptor)
 	:ndContainersFreeListAlloc<ndRenderPrimitiveMeshImplement>()
 	,m_owner(owner)
@@ -32,27 +71,33 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(ndRenderPrimitive
 	,m_vertexBuffer(0)
 	,m_vertextArrayBuffer(0)
 {
-	switch (descriptor.m_debugMode)
+	switch (descriptor.m_meshBuildMode)
 	{
-		case ndRenderPrimitiveMesh::m_none:
+		case ndRenderPrimitiveMesh::m_simplePrimitve:
 		{
 			BuildRenderMesh(descriptor);
 			break;
 		}
 
-		case ndRenderPrimitiveMesh::m_wireFrame:
+		case ndRenderPrimitiveMesh::m_instancePrimitve:
+		{
+			BuildRenderInstanceMesh(descriptor);
+			break;
+		}
+
+		case ndRenderPrimitiveMesh::m_debugWireFrame:
 		{
 			BuildWireframeDebugMesh(descriptor);
 			break;
 		}
 
-		case ndRenderPrimitiveMesh::m_solid:
+		case ndRenderPrimitiveMesh::m_debugSolid:
 		{
 			BuildSolidDebugMesh(descriptor);
 			break;
 		}
 
-		case ndRenderPrimitiveMesh::m_hidenLines:
+		case ndRenderPrimitiveMesh::m_debugHiddenLines:
 		{
 			BuildSetZBufferDebugMesh(descriptor);
 			break;
@@ -67,7 +112,20 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(ndRenderPrimitive
 
 ndRenderPrimitiveMeshImplement::~ndRenderPrimitiveMeshImplement()
 {
-	ResetOptimization();
+	if (m_indexBuffer)
+	{
+		glDeleteBuffers(1, &m_indexBuffer);
+	}
+
+	if (m_vertexBuffer)
+	{
+		glDeleteBuffers(1, &m_vertexBuffer);
+	}
+
+	if (m_vertextArrayBuffer)
+	{
+		glDeleteVertexArrays(1, &m_vertextArrayBuffer);
+	}
 }
 
 void ndRenderPrimitiveMeshImplement::BuildRenderMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor)
@@ -78,32 +136,133 @@ void ndRenderPrimitiveMeshImplement::BuildRenderMesh(const ndRenderPrimitiveMesh
 	ndInt32 textureId = ndInt32(image->m_texture);
 	switch (descriptor.m_mapping)
 	{
-	case ndRenderPrimitiveMesh::m_spherical:
-	case ndRenderPrimitiveMesh::m_cylindrical:
-	{
-		ndMatrix flipMatrix(ndGetIdentityMatrix());
-		flipMatrix[0][0] = ndFloat32(-1.0f);
-		ndMatrix aligmentUV(flipMatrix * descriptor.m_uvMatrix);
-		mesh.SphericalMapping(textureId, aligmentUV);
-		break;
-	}
-
-	case ndRenderPrimitiveMesh::m_box:
-	{
-		if (descriptor.m_stretchMaping)
+		case ndRenderPrimitiveMesh::m_spherical:
+		case ndRenderPrimitiveMesh::m_cylindrical:
 		{
-			mesh.BoxMapping(textureId, textureId, textureId, descriptor.m_uvMatrix);
+			ndMatrix flipMatrix(ndGetIdentityMatrix());
+			flipMatrix[0][0] = ndFloat32(-1.0f);
+			ndMatrix aligmentUV(flipMatrix * descriptor.m_uvMatrix);
+			mesh.SphericalMapping(textureId, aligmentUV);
+			break;
 		}
-		else
+
+		case ndRenderPrimitiveMesh::m_box:
+		{
+			if (descriptor.m_stretchMaping)
+			{
+				mesh.BoxMapping(textureId, textureId, textureId, descriptor.m_uvMatrix);
+			}
+			else
+			{
+				mesh.UniformBoxMapping(textureId, descriptor.m_uvMatrix);
+			}
+			break;
+		}
+		default:
 		{
 			mesh.UniformBoxMapping(textureId, descriptor.m_uvMatrix);
 		}
-		break;
 	}
-	default:
+
+	ndIndexArray* const geometryHandle = mesh.MaterialGeometryBegin();
+
+	// extract vertex data  from the newton mesh
+	ndInt32 indexCount = 0;
+	ndInt32 vertexCount = mesh.GetPropertiesCount();
+	for (ndInt32 handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
 	{
-		mesh.UniformBoxMapping(textureId, descriptor.m_uvMatrix);
+		indexCount += mesh.GetMaterialIndexCount(geometryHandle, handle);
 	}
+
+	struct dTmpData
+	{
+		ndReal m_posit[3];
+		ndReal m_normal[3];
+		ndReal m_uv[2];
+	};
+
+	ndArray<dTmpData> tmp;
+	ndArray<ndInt32> indices;
+	ndArray<glPositionNormalUV> points;
+
+	tmp.SetCount(vertexCount);
+	points.SetCount(vertexCount);
+	indices.SetCount(indexCount);
+
+	mesh.GetVertexChannel(sizeof(dTmpData), &tmp[0].m_posit[0]);
+	mesh.GetNormalChannel(sizeof(dTmpData), &tmp[0].m_normal[0]);
+	mesh.GetUV0Channel(sizeof(dTmpData), &tmp[0].m_uv[0]);
+
+	for (ndInt32 i = 0; i < vertexCount; ++i)
+	{
+		points[i].m_posit.m_x = GLfloat(tmp[i].m_posit[0]);
+		points[i].m_posit.m_y = GLfloat(tmp[i].m_posit[1]);
+		points[i].m_posit.m_z = GLfloat(tmp[i].m_posit[2]);
+		points[i].m_normal.m_x = GLfloat(tmp[i].m_normal[0]);
+		points[i].m_normal.m_y = GLfloat(tmp[i].m_normal[1]);
+		points[i].m_normal.m_z = GLfloat(tmp[i].m_normal[2]);
+		points[i].m_uv.m_u = GLfloat(tmp[i].m_uv[0]);
+		points[i].m_uv.m_v = GLfloat(tmp[i].m_uv[1]);
+	}
+
+	ndInt32 segmentStart = 0;
+	for (ndInt32 handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
+	{
+		ndRenderPrimitiveMeshSegment& segment = m_owner->m_segments.Append()->GetInfo();
+
+		segment.m_material.m_texture = descriptor.m_material.m_texture;
+		segment.m_material.m_diffuse = descriptor.m_material.m_diffuse;
+		segment.m_material.m_opacity = descriptor.m_material.m_opacity;
+		segment.m_material.m_specular = descriptor.m_material.m_specular;
+		segment.m_material.m_castShadows = descriptor.m_material.m_castShadows;
+		segment.m_material.m_specularPower = descriptor.m_material.m_specularPower;
+
+		segment.m_indexCount = mesh.GetMaterialIndexCount(geometryHandle, handle);
+
+		segment.m_segmentStart = segmentStart;
+		mesh.GetMaterialGetIndexStream(geometryHandle, handle, &indices[segmentStart]);
+		segmentStart += segment.m_indexCount;
+	}
+	mesh.MaterialGeometryEnd(geometryHandle);
+
+	// optimize this mesh for hardware buffers if possible
+	OptimizeForRender(&points[0], vertexCount, &indices[0], indexCount);
+}
+
+void ndRenderPrimitiveMeshImplement::BuildRenderInstanceMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor)
+{
+	ndMeshEffect mesh(*descriptor.m_collision);
+
+	ndRenderTextureImageCommon* const image = (ndRenderTextureImageCommon*)*descriptor.m_material.m_texture;
+	ndInt32 textureId = ndInt32(image->m_texture);
+	switch (descriptor.m_mapping)
+	{
+		case ndRenderPrimitiveMesh::m_spherical:
+		case ndRenderPrimitiveMesh::m_cylindrical:
+		{
+			ndMatrix flipMatrix(ndGetIdentityMatrix());
+			flipMatrix[0][0] = ndFloat32(-1.0f);
+			ndMatrix aligmentUV(flipMatrix * descriptor.m_uvMatrix);
+			mesh.SphericalMapping(textureId, aligmentUV);
+			break;
+		}
+
+		case ndRenderPrimitiveMesh::m_box:
+		{
+			if (descriptor.m_stretchMaping)
+			{
+				mesh.BoxMapping(textureId, textureId, textureId, descriptor.m_uvMatrix);
+			}
+			else
+			{
+				mesh.UniformBoxMapping(textureId, descriptor.m_uvMatrix);
+			}
+			break;
+		}
+		default:
+		{
+			mesh.UniformBoxMapping(textureId, descriptor.m_uvMatrix);
+		}
 	}
 
 	ndIndexArray* const geometryHandle = mesh.MaterialGeometryBegin();
@@ -352,11 +511,7 @@ void ndRenderPrimitiveMeshImplement::BuildSetZBufferDebugMesh(const ndRenderPrim
 
 		segment.m_segmentStart = 0;
 		segment.m_indexCount = m_indexCount;
-
-		GLuint shader = m_context->m_shaderCache->m_setZbufferEffect;
-		glUseProgram(shader);
-		m_setZbufferBlock.viewModelProjectionMatrix = glGetUniformLocation(shader, "viewModelProjectionMatrix");
-		glUseProgram(0);
+		m_setZbufferBlock.GetShaderParameters(this);
 	}
 }
 
@@ -458,23 +613,10 @@ void ndRenderPrimitiveMeshImplement::BuildWireframeDebugMesh(const ndRenderPrimi
 	}
 }
 
-void ndRenderPrimitiveMeshImplement::ResetOptimization()
-{
-	if (m_vertextArrayBuffer)
-	{
-		glDeleteBuffers(1, &m_indexBuffer);
-		glDeleteBuffers(1, &m_vertexBuffer);
-		glDeleteVertexArrays(1, &m_vertextArrayBuffer);
-	}
-}
-
 void ndRenderPrimitiveMeshImplement::OptimizeForRender(
 	const glPositionNormalUV* const points, ndInt32 pointCount,
 	const ndInt32* const indices, ndInt32 indexCount)
 {
-	// first make sure the previous optimization is removed
-	ResetOptimization();
-
 	glGenVertexArrays(1, &m_vertextArrayBuffer);
 	glBindVertexArray(m_vertextArrayBuffer);
 
@@ -546,7 +688,7 @@ void ndRenderPrimitiveMeshImplement::OptimizeForRender(
 	}
 
 	{
-		// transparent color plus shadowes
+		// transparent color plus shadows
 		GLuint shader = m_context->m_shaderCache->m_diffuseTransparentEffect;
 		glUseProgram(shader);
 		//m_normalMatrixLocation = glGetUniformLocation(shader, "normalMatrix");
@@ -564,6 +706,32 @@ void ndRenderPrimitiveMeshImplement::OptimizeForRender(
 		m_transparencyColorBlock.m_specularAlpha = glGetUniformLocation(shader, "specularAlpha");
 		m_transparencyColorBlock.m_opacity = glGetUniformLocation(shader, "opacity");
 		glUseProgram(0);
+	}
+
+	{
+		// instanced mesh, solid diffused and shadow
+		//GLuint shader = m_context->m_shaderCache->m_diffuseIntanceEffect;
+		//glUseProgram(shader);
+		////m_normalMatrixLocation = glGetUniformLocation(shader, "normalMatrix");
+		//
+		//m_instancedShadowColorBlock.m_texture = glGetUniformLocation(shader, "texture0");
+		//m_instancedShadowColorBlock.m_environmentMap = glGetUniformLocation(shader, "environmentMap");
+		//m_instancedShadowColorBlock.m_depthMapTexture = glGetUniformLocation(shader, "shadowMapTexture");
+		//
+		//m_instancedShadowColorBlock.m_projectMatrixLocation = glGetUniformLocation(shader, "projectionMatrix");
+		//m_instancedShadowColorBlock.m_viewModelMatrixLocation = glGetUniformLocation(shader, "viewModelMatrix");
+		//m_instancedShadowColorBlock.m_diffuseColor = glGetUniformLocation(shader, "diffuseColor");
+		//m_instancedShadowColorBlock.m_specularColor = glGetUniformLocation(shader, "specularColor");
+		//m_instancedShadowColorBlock.m_reflectionColor = glGetUniformLocation(shader, "reflectionColor");
+		//m_instancedShadowColorBlock.m_directionalLightAmbient = glGetUniformLocation(shader, "directionalLightAmbient");
+		//m_instancedShadowColorBlock.m_directionalLightIntesity = glGetUniformLocation(shader, "directionalLightIntesity");
+		//m_instancedShadowColorBlock.m_directionalLightDirection = glGetUniformLocation(shader, "directionalLightDirection");
+		//m_instancedShadowColorBlock.m_specularAlpha = glGetUniformLocation(shader, "specularAlpha");
+		//
+		//m_instancedShadowColorBlock.m_shadowSlices = glGetUniformLocation(shader, "shadowSlices");
+		//m_instancedShadowColorBlock.m_worldMatrix = glGetUniformLocation(shader, "modelWorldMatrix");
+		//m_instancedShadowColorBlock.m_directionLightViewProjectionMatrixShadow = glGetUniformLocation(shader, "directionaLightViewProjectionMatrix");
+		//glUseProgram(0);
 	}
 
 	m_vertexCount = pointCount;
@@ -993,30 +1161,5 @@ void ndRenderPrimitiveMeshImplement::RenderDebugShapeWireFrame(const ndRender* c
 
 void ndRenderPrimitiveMeshImplement::RenderDebugSetZbuffer(const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
-
-	//const ndMatrix modelViewProjectionMatrixMatrix(modelMatrix * camera->m_invViewMatrix * camera->m_projectionMatrix);
-	const ndMatrix modelViewProjectionMatrixMatrix(modelMatrix * camera->m_invViewRrojectionMatrix);
-	const glMatrix glViewModelProjectionMatrix(modelViewProjectionMatrixMatrix);
-
-	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW);
-	glDisable(GL_BLEND);
-	glDepthFunc(GL_LEQUAL);
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
-
-	GLuint shader = m_context->m_shaderCache->m_setZbufferEffect;
-	glUseProgram(shader);
-
-	glUniformMatrix4fv(m_setZbufferBlock.viewModelProjectionMatrix, 1, false, &glViewModelProjectionMatrix[0][0]);
-
-	glBindVertexArray(m_vertextArrayBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
-
-	glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, (void*)0);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-	glUseProgram(0);
+	m_setZbufferBlock.Render(this, render, modelMatrix);
 }

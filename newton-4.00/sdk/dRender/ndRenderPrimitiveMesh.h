@@ -46,19 +46,20 @@ class ndRenderPrimitiveMeshSegment
 class ndRenderPrimitiveMesh : public ndRenderPrimitive
 {
 	public:
+	enum ndMeshBuildMode
+	{
+		m_simplePrimitve,
+		m_instancePrimitve,
+		m_debugSolid,
+		m_debugWireFrame,
+		m_debugHiddenLines,
+	};
+
 	enum ndUvMapingMode
 	{
 		m_box,
 		m_spherical,
 		m_cylindrical
-	};
-
-	enum ndDebugMode
-	{
-		m_none,
-		m_solid,
-		m_wireFrame,
-		m_hidenLines,
 	};
 
 	class ndDescriptor
@@ -70,7 +71,7 @@ class ndRenderPrimitiveMesh : public ndRenderPrimitive
 			,m_material()
 			,m_mapping(m_box)
 			,m_uvMatrix(ndGetIdentityMatrix())
-			,m_debugMode(m_none)
+			,m_meshBuildMode(m_simplePrimitve)
 			,m_stretchMaping(true)
 		{
 		}
@@ -80,7 +81,7 @@ class ndRenderPrimitiveMesh : public ndRenderPrimitive
 		ndRenderPrimitiveMeshMaterial m_material;
 		ndUvMapingMode m_mapping;
 		ndMatrix m_uvMatrix;
-		ndDebugMode m_debugMode;
+		ndMeshBuildMode m_meshBuildMode;
 		bool m_stretchMaping;
 	};
 

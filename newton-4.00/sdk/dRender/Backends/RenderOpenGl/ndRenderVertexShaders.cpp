@@ -136,7 +136,6 @@ R""""(
 
 )"""";
 
-
 const char* ndRenderShaderCache::m_directionalDiffuseInstanceVertex =
 R""""(
 	#version 450 core
@@ -144,7 +143,7 @@ R""""(
 	layout(location = 0) in vec3 in_position;
 	layout(location = 1) in vec3 in_normal;
 	layout(location = 2) in vec2 in_uv;
-	layout(location = 3) in mat4 in_matrixOffset;
+	layout(location = 3) in mat4 in_matrixPalette;
 
 	uniform mat4 viewModelMatrix;
 	uniform mat4 projectionMatrix;
@@ -155,11 +154,8 @@ R""""(
 
 	void main()
 	{
-		vec4 instancePosit = in_matrixOffset * vec4(in_position, 1.0);
-		vec3 instanceNormal = vec3(in_matrixOffset * vec4(in_normal, 0.0));
-
-		//posit = vec3(viewModelMatrix * vec4(in_position, 1.0));
-		//normal = vec3(normalize(viewModelMatrix * vec4(in_normal, 0.0)));
+		vec4 instancePosit = in_matrixPalette * vec4(in_position, 1.0);
+		vec3 instanceNormal = vec3(in_matrixPalette * vec4(in_normal, 0.0));
 
 		posit = vec3(viewModelMatrix * instancePosit);
 		normal = vec3(normalize(viewModelMatrix * vec4(instanceNormal, 0.0)));
