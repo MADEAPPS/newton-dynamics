@@ -30,10 +30,6 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	void Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderMode) const;
 	
 	private:
-	void OptimizeForRender(
-		const glPositionNormalUV* const points, ndInt32 pointCount,
-		const ndInt32* const indices, ndInt32 indexCount);
-
 	void BuildRenderMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
 	void BuildDebugFlatShadedMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
 	void BuildRenderInstanceMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
@@ -57,6 +53,7 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	GLuint m_indexBuffer;
 	GLuint m_vertexBuffer;
 	GLuint m_vertextArrayBuffer;
+	GLuint m_matrixOffsetBuffer;
 	
 	ndRenderShaderSetZbufferCleanBlock m_setZbufferBlock;
 	ndRenderShaderDebugWireframeDiffuseBlock m_debugWireframeColorBlock;
@@ -64,6 +61,7 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	ndRenderShaderOpaqueDiffusedColorBlock m_opaqueDifusedColorNoShadowBlock;
 	ndRenderShaderOpaqueDiffusedShadowColorBlock m_opaqueDifusedColorShadowBlock;
 	ndRenderShaderTransparentDiffusedShadowColorBlock m_transparencyDiffusedBlock;
+	ndRenderShaderInstancedOpaqueDiffusedShadowBlock m_opaqueDifusedColorNoShadowInstanceBlock;
 
 	friend class ndRenderShaderSetZbufferCleanBlock;
 	friend class ndRenderShaderGenerateShadowMapBlock;

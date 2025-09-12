@@ -232,12 +232,8 @@ void AddCapsulesStacks(ndDemoEntityManager* const scene, const ndMatrix& locatio
 	descriptor.m_collision = &shape;
 	descriptor.m_stretchMaping = false;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_spherical;
-	descriptor.m_meshBuildMode = ndRenderPrimitiveMesh::m_instancePrimitve;
 	descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("marble.png"));
-	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
-
-	ndSharedPtr<ndRenderSceneNode>root(new ndRenderSceneNodeInstance(location));
-	root->SetPrimitive(mesh);
+	ndSharedPtr<ndRenderSceneNode>root(new ndRenderSceneNodeInstance(location, descriptor));
 	scene->AddEntity(root);
 
 	ndFloat32 spacing = 2.0f;

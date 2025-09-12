@@ -66,7 +66,7 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 	protected:
 	ndRender* m_owner;
 	ndRenderSceneNode* m_parent;
-	ndSharedPtr<ndRenderPrimitive> m_primitve;
+	ndSharedPtr<ndRenderPrimitive> m_primitive;
 	ndList<ndSharedPtr<ndRenderSceneNode>> m_children;
 	ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* m_sceneHandle;
 
@@ -75,6 +75,7 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 	friend class ndRender;
 	friend class ndRenderPassColor;
 	friend class ndRenderPassTransparency;
+	friend class ndRenderSceneNodeInstanceImplement;
 };
 
 #endif

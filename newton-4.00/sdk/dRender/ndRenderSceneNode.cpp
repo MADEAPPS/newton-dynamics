@@ -94,7 +94,7 @@ void ndRenderSceneNode::SetPrimitiveMatrix(const ndMatrix& matrix)
 
 void ndRenderSceneNode::SetPrimitive(const ndSharedPtr<ndRenderPrimitive>& primitive)
 {
-	m_primitve = primitive;
+	m_primitive = primitive;
 }
 
 ndRender* ndRenderSceneNode::GetOwner() const
@@ -167,7 +167,7 @@ void ndRenderSceneNode::Render(const ndRender* const owner, ndFloat32 timestep, 
 {
 	ndAssert(!m_owner || (m_owner == owner));
 	const ndMatrix nodeMatrix(m_matrix * parentMatrix);
-	const ndRenderPrimitive* const mesh = *m_primitve;
+	const ndRenderPrimitive* const mesh = *m_primitive;
 	if (m_isVisible && mesh)
 	{
 		// Render mesh if there is one 

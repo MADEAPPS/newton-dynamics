@@ -31,15 +31,30 @@ ndRenderShaderBlock::~ndRenderShaderBlock()
 {
 }
 
+void ndRenderShaderBlock::SetParameters(GLuint shader)
+{
+	m_shader = shader;
+	glUseProgram(m_shader);
+}
+
+void ndRenderShaderBlock::EndParameters()
+{
+	glUseProgram(0);
+}
+
 // *********************************************************************
 // 
 // *********************************************************************
 void ndRenderShaderSetZbufferCleanBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
 {
-	m_shader = shaderCache->m_setZbufferEffect;
-	glUseProgram(m_shader);
+	SetParameters(shaderCache->m_setZbufferEffect);
+	EndParameters();
+}
+
+void ndRenderShaderSetZbufferCleanBlock::SetParameters(GLuint shader)
+{
+	ndRenderShaderBlock::SetParameters(shader);
 	viewModelProjectionMatrix = glGetUniformLocation(m_shader, "viewModelProjectionMatrix");
-	glUseProgram(0);
 }
 
 void ndRenderShaderSetZbufferCleanBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
@@ -76,10 +91,14 @@ void ndRenderShaderSetZbufferCleanBlock::Render(const ndRenderPrimitiveMeshImple
 // *********************************************************************
 void ndRenderShaderGenerateShadowMapBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
 {
-	m_shader = shaderCache->m_setZbufferEffect;
-	glUseProgram(m_shader);
+	SetParameters(shaderCache->m_setZbufferEffect);
+	EndParameters();
+}
+
+void ndRenderShaderGenerateShadowMapBlock::SetParameters(GLuint shader)
+{
+	ndRenderShaderSetZbufferCleanBlock::SetParameters(shader);
 	viewModelProjectionMatrix = glGetUniformLocation(m_shader, "viewModelProjectionMatrix");
-	glUseProgram(0);
 }
 
 void ndRenderShaderGenerateShadowMapBlock::BeginRender()
@@ -128,15 +147,19 @@ void ndRenderShaderGenerateShadowMapBlock::Render(const ndRenderPrimitiveMeshImp
 // *********************************************************************
 void ndRenderShaderDebugFlatShadedDiffusedBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
 {
-	m_shader = shaderCache->m_debugFlatShadedDiffuseEffect;
-	glUseProgram(m_shader);
+	SetParameters(shaderCache->m_debugFlatShadedDiffuseEffect);
+	EndParameters();
+}
+
+void ndRenderShaderDebugFlatShadedDiffusedBlock::SetParameters(GLuint shader)
+{
+	ndRenderShaderBlock::SetParameters(shader);
 	m_diffuseColor = glGetUniformLocation(m_shader, "diffuseColor");
 	m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
 	m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
 	m_directionalLightAmbient = glGetUniformLocation(m_shader, "directionalLightAmbient");
 	m_directionalLightIntesity = glGetUniformLocation(m_shader, "directionalLightIntesity");
 	m_directionalLightDirection = glGetUniformLocation(m_shader, "directionalLightDirection");
-	glUseProgram(0);
 }
 
 void ndRenderShaderDebugFlatShadedDiffusedBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
@@ -235,21 +258,18 @@ void ndRenderShaderDebugWireframeDiffuseBlock::Render(const ndRenderPrimitiveMes
 // *********************************************************************
 void ndRenderShaderOpaqueDiffusedColorBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
 {
-	m_shader = shaderCache->m_diffuseEffect;
-	glUseProgram(m_shader);
-	//m_normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
+	SetParameters(shaderCache->m_diffuseEffect);
+	EndParameters();
+}
+
+void ndRenderShaderOpaqueDiffusedColorBlock::SetParameters(GLuint shader)
+{
+	ndRenderShaderDebugFlatShadedDiffusedBlock::SetParameters(shader);
 	m_texture = glGetUniformLocation(m_shader, "texture0");
 	m_environmentMap = glGetUniformLocation(m_shader, "environmentMap");
-	m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
-	m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
-	m_diffuseColor = glGetUniformLocation(m_shader, "diffuseColor");
 	m_specularColor = glGetUniformLocation(m_shader, "specularColor");
 	m_reflectionColor = glGetUniformLocation(m_shader, "reflectionColor");
-	m_directionalLightAmbient = glGetUniformLocation(m_shader, "directionalLightAmbient");
-	m_directionalLightIntesity = glGetUniformLocation(m_shader, "directionalLightIntesity");
-	m_directionalLightDirection = glGetUniformLocation(m_shader, "directionalLightDirection");
 	m_specularAlpha = glGetUniformLocation(m_shader, "specularAlpha");
-	glUseProgram(0);
 }
 
 void ndRenderShaderOpaqueDiffusedColorBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
@@ -320,28 +340,17 @@ void ndRenderShaderOpaqueDiffusedColorBlock::Render(const ndRenderPrimitiveMeshI
 // *********************************************************************
 void ndRenderShaderOpaqueDiffusedShadowColorBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
 {
-	m_shader = shaderCache->m_diffuseShadowEffect;
-	glUseProgram(m_shader);
-	//m_normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
+	SetParameters(shaderCache->m_diffuseShadowEffect);
+	EndParameters();
+}
 
-	m_texture = glGetUniformLocation(m_shader, "texture0");
-	m_environmentMap = glGetUniformLocation(m_shader, "environmentMap");
-	m_depthMapTexture = glGetUniformLocation(m_shader, "shadowMapTexture");
-
-	m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
-	m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
-	m_diffuseColor = glGetUniformLocation(m_shader, "diffuseColor");
-	m_specularColor = glGetUniformLocation(m_shader, "specularColor");
-	m_reflectionColor = glGetUniformLocation(m_shader, "reflectionColor");
-	m_directionalLightAmbient = glGetUniformLocation(m_shader, "directionalLightAmbient");
-	m_directionalLightIntesity = glGetUniformLocation(m_shader, "directionalLightIntesity");
-	m_directionalLightDirection = glGetUniformLocation(m_shader, "directionalLightDirection");
-	m_specularAlpha = glGetUniformLocation(m_shader, "specularAlpha");
-
+void ndRenderShaderOpaqueDiffusedShadowColorBlock::SetParameters(GLuint shader)
+{
+	ndRenderShaderOpaqueDiffusedColorBlock::SetParameters(shader);
 	m_shadowSlices = glGetUniformLocation(m_shader, "shadowSlices");
 	m_worldMatrix = glGetUniformLocation(m_shader, "modelWorldMatrix");
+	m_depthMapTexture = glGetUniformLocation(m_shader, "shadowMapTexture");
 	m_directionLightViewProjectionMatrixShadow = glGetUniformLocation(m_shader, "directionaLightViewProjectionMatrix");
-	glUseProgram(0);
 }
 
 void ndRenderShaderOpaqueDiffusedShadowColorBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
@@ -431,23 +440,14 @@ void ndRenderShaderOpaqueDiffusedShadowColorBlock::Render(const ndRenderPrimitiv
 void ndRenderShaderTransparentDiffusedShadowColorBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
 {
 	// transparent color plus shadows
-	m_shader = shaderCache->m_diffuseTransparentEffect;
-	glUseProgram(m_shader);
-	//m_normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
-	m_texture = glGetUniformLocation(m_shader, "texture0");
-	m_environmentMap = glGetUniformLocation(m_shader, "environmentMap");
+	SetParameters(shaderCache->m_diffuseTransparentEffect);
+	EndParameters();
+}
 
-	m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
-	m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
-	m_diffuseColor = glGetUniformLocation(m_shader, "diffuseColor");
-	m_specularColor = glGetUniformLocation(m_shader, "specularColor");
-	m_reflectionColor = glGetUniformLocation(m_shader, "reflectionColor");
-	m_directionalLightAmbient = glGetUniformLocation(m_shader, "directionalLightAmbient");
-	m_directionalLightIntesity = glGetUniformLocation(m_shader, "directionalLightIntesity");
-	m_directionalLightDirection = glGetUniformLocation(m_shader, "directionalLightDirection");
-	m_specularAlpha = glGetUniformLocation(m_shader, "specularAlpha");
+void ndRenderShaderTransparentDiffusedShadowColorBlock::SetParameters(GLuint shader)
+{
+	ndRenderShaderOpaqueDiffusedColorBlock::SetParameters(shader);
 	m_opacity = glGetUniformLocation(m_shader, "opacity");
-	glUseProgram(0);
 }
 
 void ndRenderShaderTransparentDiffusedShadowColorBlock::SetWidingMode(bool clockwise) const
@@ -529,12 +529,20 @@ void ndRenderShaderTransparentDiffusedShadowColorBlock::Render(const ndRenderPri
 // *********************************************************************
 // 
 // *********************************************************************
-void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
+//void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
+void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::GetShaderParameters(const ndRenderShaderCache* const)
 {
-
+	ndAssert(0);
 }
 
-void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
+//void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
+void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::Render(const ndRenderPrimitiveMeshImplement* const, const ndRender* const, const ndMatrix&) const
 {
+	ndAssert(0);
+}
 
+//void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::SetParameters(GLuint shader)
+void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::SetParameters(GLuint)
+{
+	ndAssert(0);
 }

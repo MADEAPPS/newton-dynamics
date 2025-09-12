@@ -22,7 +22,6 @@
 #include "ndRenderStdafx.h"
 #include "ndRenderContext.h"
 #include "ndRenderTexture.h"
-//#include "ndRenderTextureImage.h"
 
 ndRenderTexture::ndRenderTexture()
 	:ndContainersFreeListAlloc<ndRenderTexture>()

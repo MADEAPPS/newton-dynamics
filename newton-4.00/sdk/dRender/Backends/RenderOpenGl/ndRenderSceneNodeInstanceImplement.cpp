@@ -12,6 +12,8 @@
 #include "ndRenderStdafx.h"
 #include "ndRender.h"
 #include "ndRenderContext.h"
+#include "ndRenderTexture.h"
+#include "ndRenderPrimitiveMesh.h"
 #include "ndRenderSceneNodeInstance.h"
 #include "ndRenderSceneNodeInstanceImplement.h"
 
@@ -24,10 +26,18 @@ ndRenderSceneNodeInstanceImplement::ndRenderSceneNodeInstanceImplement(ndRenderS
 void ndRenderSceneNodeInstanceImplement::Finalize()
 {
 	//const ndList<ndSharedPtr<ndRenderSceneNode>>& children = m_owner->GetChilden();
-	//
-	//ndInt32 instanceCount = children.GetCount();
-	//m_matrixPallete.SetCount(children.GetCount());
-	//
+	
+	ndRenderSceneNodeInstance* const owner = (ndRenderSceneNodeInstance*)m_owner;
+
+	const ndRenderPrimitiveMesh::ndDescriptor& descriptor = owner->m_descriptor;
+	ndAssert(descriptor.m_numberOfInstances > 0);
+	ndAssert(descriptor.m_meshBuildMode == ndRenderPrimitiveMesh::m_instancePrimitve);
+
+	m_matrixPallete.SetCount(descriptor.m_numberOfInstances);
+	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
+	owner->SetPrimitive(mesh);
+	
+	//m_renderShader.GetShaderParameters()
 	//glGenBuffers(1, &m_matrixOffsetBuffer);
 	//glBindBuffer(GL_ARRAY_BUFFER, m_matrixOffsetBuffer);
 	//glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(instanceCount * sizeof(glMatrix)), &m_matrixPallete[0][0][0], GL_STATIC_DRAW);

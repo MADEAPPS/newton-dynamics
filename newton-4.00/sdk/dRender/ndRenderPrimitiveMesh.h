@@ -72,6 +72,7 @@ class ndRenderPrimitiveMesh : public ndRenderPrimitive
 			,m_mapping(m_box)
 			,m_uvMatrix(ndGetIdentityMatrix())
 			,m_meshBuildMode(m_simplePrimitve)
+			,m_numberOfInstances(0)
 			,m_stretchMaping(true)
 		{
 		}
@@ -82,6 +83,7 @@ class ndRenderPrimitiveMesh : public ndRenderPrimitive
 		ndUvMapingMode m_mapping;
 		ndMatrix m_uvMatrix;
 		ndMeshBuildMode m_meshBuildMode;
+		ndInt32 m_numberOfInstances;
 		bool m_stretchMaping;
 	};
 

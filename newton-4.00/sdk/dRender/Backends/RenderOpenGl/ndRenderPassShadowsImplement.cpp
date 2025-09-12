@@ -51,10 +51,6 @@ ndRenderPassShadowsImplement::ndRenderPassShadowsImplement(ndRenderContext* cons
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	ndAssert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
-	//GLuint shader = m_context->m_shaderCache->m_generateShadowMapsEffect;
-	//glUseProgram(shader);
-	//m_modelProjectionMatrixLocation = GLuint(glGetUniformLocation(shader, "viewModelProjectionMatrix"));
-	//glUseProgram(0);
 	m_generateShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
 	
 	m_viewPortTiles[0] = ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.5f), ndFloat32(0.5f));
