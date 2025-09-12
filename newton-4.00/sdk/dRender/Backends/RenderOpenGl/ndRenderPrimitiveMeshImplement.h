@@ -56,33 +56,13 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	GLuint m_indexBuffer;
 	GLuint m_vertexBuffer;
 	GLuint m_vertextArrayBuffer;
-
-	struct SolidColorBlock: public ndRenderShaderDebugFlatShadedDiffusedBlock
-	{
-		GLint m_texture;
-		GLint m_environmentMap;
-		GLint m_specularColor;
-		GLint m_specularAlpha;
-		GLint m_reflectionColor;
-	};
-	struct TransparentColorBlock : public SolidColorBlock
-	{
-		GLint m_opacity;
-	};
-	 
-	//struct InstancedSolidShadowColorBlock : public SolidShadowColorBlock
-	//{
-	//	GLint m_matrixPalette;
-	//};
-	
-	TransparentColorBlock m_transparencyColorBlock;
-	//InstancedSolidShadowColorBlock m_instancedShadowColorBlock;
 	
 	ndRenderShaderSetZbufferCleanBlock m_setZbufferBlock;
 	ndRenderShaderDebugWireframeDiffuseBlock m_debugWireframeColorBlock;
 	ndRenderShaderDebugFlatShadedDiffusedBlock m_debugFlatShadedColorBlock;
 	ndRenderShaderOpaqueDiffusedColorBlock m_opaqueDifusedColorNoShadowBlock;
 	ndRenderShaderOpaqueDiffusedShadowColorBlock m_opaqueDifusedColorShadowBlock;
+	ndRenderShaderTransparentDiffusedShadowColorBlock m_transparencyDiffusedBlock;
 
 	friend class ndRenderShaderSetZbufferCleanBlock;
 	friend class ndRenderShaderGenerateShadowMapBlock;
@@ -90,6 +70,7 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	friend class ndRenderShaderDebugWireframeDiffuseBlock;
 	friend class ndRenderShaderDebugFlatShadedDiffusedBlock;
 	friend class ndRenderShaderOpaqueDiffusedShadowColorBlock;
+	friend class ndRenderShaderTransparentDiffusedShadowColorBlock;
 };
 
 #endif

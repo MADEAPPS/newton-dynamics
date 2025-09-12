@@ -448,7 +448,6 @@ void ndRenderShaderOpaqueDiffusedColorBlock::Render(const ndRenderPrimitiveMeshI
 	glUseProgram(0);
 }
 
-
 // *********************************************************************
 // 
 // *********************************************************************
@@ -554,6 +553,108 @@ void ndRenderShaderOpaqueDiffusedShadowColorBlock::Render(const ndRenderPrimitiv
 		}
 	}
 	
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	glUseProgram(0);
+}
+
+
+// *********************************************************************
+// 
+// *********************************************************************
+void ndRenderShaderTransparentDiffusedShadowColorBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
+{
+	// transparent color plus shadows
+	m_shader = shaderCache->m_diffuseTransparentEffect;
+	glUseProgram(m_shader);
+	//m_normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
+	m_texture = glGetUniformLocation(m_shader, "texture0");
+	m_environmentMap = glGetUniformLocation(m_shader, "environmentMap");
+
+	m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
+	m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
+	m_diffuseColor = glGetUniformLocation(m_shader, "diffuseColor");
+	m_specularColor = glGetUniformLocation(m_shader, "specularColor");
+	m_reflectionColor = glGetUniformLocation(m_shader, "reflectionColor");
+	m_directionalLightAmbient = glGetUniformLocation(m_shader, "directionalLightAmbient");
+	m_directionalLightIntesity = glGetUniformLocation(m_shader, "directionalLightIntesity");
+	m_directionalLightDirection = glGetUniformLocation(m_shader, "directionalLightDirection");
+	m_specularAlpha = glGetUniformLocation(m_shader, "specularAlpha");
+	m_opacity = glGetUniformLocation(m_shader, "opacity");
+	glUseProgram(0);
+}
+
+void ndRenderShaderTransparentDiffusedShadowColorBlock::SetWidingMode(bool clockwise) const
+{
+	clockwise ? glFrontFace(GL_CW) : glFrontFace(GL_CCW);
+}
+
+void ndRenderShaderTransparentDiffusedShadowColorBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
+{
+	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
+	
+	glUseProgram(m_shader);
+
+	const ndMatrix viewMatrix(camera->m_invViewMatrix);
+	const ndMatrix modelViewMatrix(modelMatrix * viewMatrix);
+
+	const glMatrix glViewModelMatrix(modelViewMatrix);
+	const glMatrix glProjectionMatrix(camera->m_projectionMatrix);
+
+	const glVector4 glSunlightAmbient(render->m_sunLightAmbient);
+	const glVector4 glSunlightIntensity(render->m_sunLightIntesity);
+	const glVector4 glSunlightDir(viewMatrix.RotateVector(render->m_sunLightDir));
+
+	glUniform3fv(m_directionalLightDirection, 1, &glSunlightDir[0]);
+	glUniform3fv(m_directionalLightAmbient, 1, &glSunlightAmbient[0]);
+	glUniform3fv(m_directionalLightIntesity, 1, &glSunlightIntensity[0]);
+
+	//glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &glViewModelMatrix[0][0]);
+	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &glProjectionMatrix[0][0]);
+	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &glViewModelMatrix[0][0]);
+
+	ndRenderPassEnvironment* const environment = render->m_cachedEnvironmentPass;
+	ndAssert(environment);
+	ndRenderTextureImage* const environmentTexture = (ndRenderTextureImage*)*environment->m_cubeMap;
+
+	glDepthMask(GL_FALSE);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, environmentTexture->m_texture);
+
+	glBindVertexArray(self->m_vertextArrayBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
+
+	glActiveTexture(GL_TEXTURE0);
+	for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
+	{
+		ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
+		if (segment.m_material.m_opacity <= ndFloat32(0.99f))
+		{
+			const ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
+			const ndRenderTextureImageCommon* const image = (ndRenderTextureImageCommon*)*material->m_texture;
+			ndAssert(image);
+
+			const glVector4 diffuse(material->m_diffuse);
+			const glVector4 specular(material->m_specular);
+			const glVector4 reflection(material->m_reflection);
+
+			glUniform3fv(m_diffuseColor, 1, &diffuse[0]);
+			glUniform3fv(m_specularColor, 1, &specular[0]);
+			glUniform3fv(m_reflectionColor, 1, &reflection[0]);
+			glUniform1fv(m_specularAlpha, 1, &material->m_specularPower);
+			glUniform1fv(m_opacity, 1, &material->m_opacity);
+
+			glBindTexture(GL_TEXTURE_2D, image->m_texture);
+			glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
+		}
+	}
+
+	glDisable(GL_BLEND);
+	glDepthMask(GL_TRUE);
+
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 	glUseProgram(0);
