@@ -12,6 +12,7 @@
 #define __ND_RENDER_PASS_SHADOWS_IMPLEMNETH__
 
 #include "ndRenderPass.h"
+#include "ndRenderShader.h"
 #include "ndRenderContext.h"
 #include "ndRenderShaderCache.h"
 

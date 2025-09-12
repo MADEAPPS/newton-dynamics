@@ -12,6 +12,7 @@
 #define __ND_RENDER_PRIMITIVE_MESH_IMPLEMENT_H__
 
 #include "ndRenderStdafx.h"
+#include "ndRenderShader.h"
 #include "ndRenderContext.h"
 #include "ndRenderShaderCache.h"
 #include "ndRenderPrimitiveMesh.h"
