@@ -12,7 +12,6 @@
 #include "ndRenderStdafx.h"
 #include "ndRenderShaderCache.h"
 
-
 const char* ndRenderShaderCache::m_skyBoxVertex =
 R""""(
 	#version 450 core
@@ -41,7 +40,6 @@ R""""(
 		gl_Position = viewModelProjectionMatrix * vec4(in_position, 1.0);
 	}
 )"""";
-
 
 const char* ndRenderShaderCache::m_generateShadowMapVertex =
 R""""(
@@ -134,6 +132,24 @@ R""""(
 		gl_Position = projectionMatrix * vec4(posit, 1.0);
 	}
 
+)"""";
+
+const char* ndRenderShaderCache::m_generateInstancedShadowMapVertex =
+R""""(
+	#version 450 core
+
+	// using the same vertex buffer
+	layout(location = 0) in vec3 in_position;
+	layout(location = 1) in vec3 in_normal;
+	layout(location = 2) in vec2 in_uv;
+	layout(location = 3) in mat4 in_matrixPalette;
+
+	uniform mat4 viewModelProjectionMatrix;
+	void main()
+	{
+		vec4 instancePosit = in_matrixPalette * vec4(in_position, 1.0);
+		gl_Position = viewModelProjectionMatrix * instancePosit;
+	}
 )"""";
 
 const char* ndRenderShaderCache::m_directionalDiffuseInstanceVertex =

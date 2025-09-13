@@ -38,6 +38,7 @@ class ndRenderShaderCache
 			GLuint m_generateShadowMapsEffect;
 			GLuint m_diffuseShadowIntanceEffect;
 			GLuint m_debugFlatShadedDiffuseEffect;
+			GLuint m_generateInstancedShadowMapsEffect;
 		};
 		GLuint m_shaders[128];
 	};
@@ -49,6 +50,7 @@ class ndRenderShaderCache
 	static const char* m_debugFlatShadedDiffuseVertex;
 	static const char* m_directionalDiffuseShadowVertex;
 	static const char* m_directionalDiffuseInstanceVertex;
+	static const char* m_generateInstancedShadowMapVertex;
 
 	static const char* m_skyBoxPixel;
 	static const char* m_doNothingPixel;
@@ -56,6 +58,7 @@ class ndRenderShaderCache
 	static const char* m_debugFlatShadedDiffusePixel;
 	static const char* m_directionalDiffuseShadowPixel;
 	static const char* m_directionalDiffuseTransparentPixel;
+	
 
 	friend class ndRenderContext;
 	friend class ndRenderShaderSetZbufferCleanBlock;

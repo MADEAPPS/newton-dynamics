@@ -41,6 +41,7 @@ bool ndRenderShaderCache::CreateAllEffects()
 	m_diffuseTransparentEffect = CreateShaderEffect(m_directionalDiffuseVertex, m_directionalDiffuseTransparentPixel);
 	m_debugFlatShadedDiffuseEffect = CreateShaderEffect(m_debugFlatShadedDiffuseVertex, m_debugFlatShadedDiffusePixel);
 	m_diffuseShadowIntanceEffect = CreateShaderEffect(m_directionalDiffuseInstanceVertex, m_directionalDiffuseShadowPixel);
+	m_generateInstancedShadowMapsEffect = CreateShaderEffect(m_generateInstancedShadowMapVertex, m_doNothingPixel);
 
 	//m_wireFrame = CreateShaderEffect("WireFrame", "FlatShaded");
 	//m_flatShaded = CreateShaderEffect("FlatShaded", "FlatShaded");
