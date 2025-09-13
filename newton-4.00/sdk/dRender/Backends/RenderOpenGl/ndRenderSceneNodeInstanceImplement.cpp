@@ -48,18 +48,23 @@ ndRenderSceneNodeInstanceImplement::~ndRenderSceneNodeInstanceImplement()
 	//glDeleteBuffers(1, &m_matrixOffsetBuffer);
 }
 
-void ndRenderSceneNodeInstanceImplement::Render(const ndRender* const owner, ndFloat32 timeStep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const
+void ndRenderSceneNodeInstanceImplement::Render(const ndRender* const owner, ndFloat32, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const
 {
-	const ndList<ndSharedPtr<ndRenderSceneNode>>& children = m_owner->GetChilden();
-
-	m_matrixPallete.SetCount(0);
-	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = children.GetFirst(); node; node = node->GetNext())
+	if (renderMode == m_directionalDiffusseShadow)
 	{
-		ndRenderSceneNode* const child = *node->GetInfo();
-		const ndMatrix matrix(child->GetMatrix() * parentMatrix);
-		m_matrixPallete.PushBack(glMatrix(matrix));
+		const ndList<ndSharedPtr<ndRenderSceneNode>>& children = m_owner->GetChilden();
 
-		// for now just call render
-		child->Render(owner, timeStep, parentMatrix, renderMode);
+		const ndRenderPrimitive* const mesh = *m_owner->m_primitive;
+		m_matrixPallete.SetCount(0);
+		for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = children.GetFirst(); node; node = node->GetNext())
+		{
+			ndRenderSceneNode* const child = *node->GetInfo();
+			//const ndMatrix matrix(child->GetMatrix() * parentMatrix);
+			m_matrixPallete.PushBack(glMatrix(child->GetMatrix()));
+
+			//	// for now just call render
+			//	//child->Render(owner, timeStep, parentMatrix, renderMode);
+		}
+		mesh->Render(owner, parentMatrix, m_directionalDiffusseInstanceShadow);
 	}
 }

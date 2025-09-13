@@ -155,7 +155,7 @@ class ndRenderShaderInstancedOpaqueDiffusedShadowBlock : public ndRenderShaderOp
 
 	protected:
 	virtual void SetParameters(GLuint shader) override;
-	GLint in_matrixPalette;
+	//GLint m_matrixPalette;
 };
 
 #endif

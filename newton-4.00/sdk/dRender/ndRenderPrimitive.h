@@ -22,9 +22,10 @@ enum ndRenderPassMode
 	m_transparencyFrontface,
 	m_debugDisplaySolidMesh,
 	m_debugDisplaySetZbuffer,
-	m_directionlDifusseShadow,
-	m_directionlDifusseNoShadow,
 	m_debugDisplayWireFrameMesh,
+	m_directionalDiffusseShadow,
+	m_directionalDiffusseNoShadow,
+	m_directionalDiffusseInstanceShadow,
 };
 
 class ndRenderPrimitive : public ndContainersFreeListAlloc<ndRenderPrimitive>

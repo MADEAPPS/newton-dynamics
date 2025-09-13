@@ -529,20 +529,21 @@ void ndRenderShaderTransparentDiffusedShadowColorBlock::Render(const ndRenderPri
 // *********************************************************************
 // 
 // *********************************************************************
-//void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
-void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::GetShaderParameters(const ndRenderShaderCache* const)
+void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
 {
-	ndAssert(0);
+	SetParameters(shaderCache->m_diffuseShadowIntanceEffect);
+	EndParameters();
+}
+
+void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::SetParameters(GLuint shader)
+{
+	ndRenderShaderOpaqueDiffusedShadowColorBlock::SetParameters(shader);
+	//m_matrixPalette = glGetUniformLocation(m_shader, "in_matrixPalette");
 }
 
 //void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::Render(const ndRenderPrimitiveMeshImplement* const, const ndRender* const, const ndMatrix&) const
 {
-	ndAssert(0);
+	//ndAssert(0);
 }
 
-//void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::SetParameters(GLuint shader)
-void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::SetParameters(GLuint)
-{
-	ndAssert(0);
-}

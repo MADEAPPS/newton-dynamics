@@ -656,12 +656,12 @@ void ndRenderPrimitiveMeshImplement::Render(const ndRender* const render, const 
 			RenderGenerateShadowMaps(render, modelMatrix);
 			break;
 
-		case m_directionlDifusseNoShadow:
-			RenderDirectionslDifuseColorNoShadow(render, modelMatrix);
+		case m_directionalDiffusseNoShadow:
+			RenderDirectionalDiffuseColorNoShadow(render, modelMatrix);
 			break;
 
-		case m_directionlDifusseShadow:
-			RenderDirectionslDifuseColorShadow(render, modelMatrix);
+		case m_directionalDiffusseShadow:
+			RenderDirectionalDiffuseColorShadow(render, modelMatrix);
 			break;
 
 		case m_transparencyBackface:
@@ -684,8 +684,12 @@ void ndRenderPrimitiveMeshImplement::Render(const ndRender* const render, const 
 			RenderDebugSetZbuffer(render, modelMatrix);
 			break;
 
+		case m_directionalDiffusseInstanceShadow:
+			RenderDirectionalDiffuseColorInstanceShadow(render, modelMatrix);
+			break;
+
 		default:
-		ndAssert(0);
+			ndAssert(0);
 	}
 }
 
@@ -723,7 +727,7 @@ void ndRenderPrimitiveMeshImplement::RenderGenerateShadowMaps(const ndRender* co
 	}
 }
 
-void ndRenderPrimitiveMeshImplement::RenderDirectionslDifuseColorNoShadow(const ndRender* const render, const ndMatrix& modelMatrix) const
+void ndRenderPrimitiveMeshImplement::RenderDirectionalDiffuseColorNoShadow(const ndRender* const render, const ndMatrix& modelMatrix) const
 {
 	bool castShadow = true;
 	for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = m_owner->m_segments.GetFirst(); node && castShadow; node = node->GetNext())
@@ -740,7 +744,7 @@ void ndRenderPrimitiveMeshImplement::RenderDirectionslDifuseColorNoShadow(const 
 	m_opaqueDifusedColorNoShadowBlock.Render(this, render, modelMatrix);
 }
 
-void ndRenderPrimitiveMeshImplement::RenderDirectionslDifuseColorShadow(const ndRender* const render, const ndMatrix& modelMatrix) const
+void ndRenderPrimitiveMeshImplement::RenderDirectionalDiffuseColorShadow(const ndRender* const render, const ndMatrix& modelMatrix) const
 {
 	//bool castShadow = true;
 	//for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = m_segments.GetFirst(); node && castShadow; node = node->GetNext())
@@ -772,4 +776,9 @@ void ndRenderPrimitiveMeshImplement::RenderTransparency(const ndRender* const re
 
 	m_transparencyDiffusedBlock.SetWidingMode(backface);
 	m_transparencyDiffusedBlock.Render(this, render, modelMatrix);
+}
+
+void ndRenderPrimitiveMeshImplement::RenderDirectionalDiffuseColorInstanceShadow(const ndRender* const render, const ndMatrix& modelMatrix) const
+{
+	m_opaqueDifusedColorNoShadowInstanceBlock.Render(this, render, modelMatrix);
 }
