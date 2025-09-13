@@ -37,13 +37,14 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	void BuildWireframeDebugMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
 	void BuildSetZBufferDebugMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
 
-	void RenderGenerateShadowMaps(const ndRender* const render, const ndMatrix& lightMatrix) const;
-	void RenderDirectionalDiffuseColorNoShadow(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
 	void RenderDebugSetZbuffer(const ndRender* const render, const ndMatrix& modelMatrix) const;
+	void RenderGenerateShadowMaps(const ndRender* const render, const ndMatrix& lightMatrix) const;
 	void RenderDebugShapeSolid(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
 	void RenderDebugShapeWireFrame(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
+	void RenderGenerateInstancedShadowMaps(const ndRender* const render, const ndMatrix& lightMatrix) const;
 	void RenderTransparency(const ndRender* const render, const ndMatrix& modelViewMatrix, bool backface) const;
 	void RenderDirectionalDiffuseColorShadow(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
+	void RenderDirectionalDiffuseColorNoShadow(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
 	void RenderDirectionalDiffuseColorInstanceShadow(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
 
 	ndRenderPrimitiveMesh* m_owner;

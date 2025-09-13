@@ -33,7 +33,6 @@ void ndRenderSceneNodeInstance::Finalize()
 
 void ndRenderSceneNodeInstance::Render(const ndRender* const owner, ndFloat32 timeStep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const
 {
-	// instance node do no recurse
-	//ndRenderSceneNode::Render(owner, timeStep, parentMatrix, renderMode);
+	// instance node do not recurse, the just render all the child intances.
 	m_implement->Render(owner, timeStep, m_matrix * parentMatrix, renderMode);
 }

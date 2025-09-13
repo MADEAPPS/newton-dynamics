@@ -689,6 +689,10 @@ void ndRenderPrimitiveMeshImplement::Render(const ndRender* const render, const 
 			RenderDirectionalDiffuseColorInstanceShadow(render, modelMatrix);
 			break;
 
+		case m_m_generateInstanceShadowMaps:
+			RenderGenerateInstancedShadowMaps(render, modelMatrix);
+			break;
+
 		default:
 			ndAssert(0);
 	}
@@ -711,8 +715,8 @@ void ndRenderPrimitiveMeshImplement::RenderDebugShapeWireFrame(const ndRender* c
 
 void ndRenderPrimitiveMeshImplement::RenderGenerateShadowMaps(const ndRender* const render, const ndMatrix& lightMatrix) const
 {
-	ndRenderPassShadowsImplement* const owner = render->m_cachedShadowPass;
-	ndAssert(owner);
+	//ndRenderPassShadowsImplement* const owner = render->m_cachedShadowPass;
+	//ndAssert(owner);
 
 	bool castShadow = true;
 	for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = m_owner->m_segments.GetFirst(); node && castShadow; node = node->GetNext())
@@ -782,4 +786,9 @@ void ndRenderPrimitiveMeshImplement::RenderTransparency(const ndRender* const re
 void ndRenderPrimitiveMeshImplement::RenderDirectionalDiffuseColorInstanceShadow(const ndRender* const render, const ndMatrix& modelMatrix) const
 {
 	m_opaqueDifusedColorNoShadowInstanceBlock.Render(this, render, modelMatrix);
+}
+
+void ndRenderPrimitiveMeshImplement::RenderGenerateInstancedShadowMaps(const ndRender* const render, const ndMatrix& lightMatrix) const
+{
+
 }
