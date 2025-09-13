@@ -14,6 +14,7 @@
 #include "ndRenderStdafx.h"
 #include "ndRenderShader.h"
 #include "ndRenderContext.h"
+#include "ndRenderOpenGlUtil.h"
 #include "ndRenderShaderCache.h"
 #include "ndRenderPrimitiveMesh.h"
 
@@ -47,6 +48,7 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 
 	ndRenderPrimitiveMesh* m_owner;
 	const ndRenderContext* m_context;
+	ndArray<glMatrix> m_instanceRenderMatrixPallete;
 
 	GLint m_indexCount;
 	GLint m_vertexCount;
@@ -54,7 +56,7 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	GLuint m_indexBuffer;
 	GLuint m_vertexBuffer;
 	GLuint m_vertextArrayBuffer;
-	GLuint m_matrixOffsetBuffer;
+	GLuint m_instanceRenderMatrixPalleteBuffer;
 	
 	ndRenderShaderSetZbufferCleanBlock m_setZbufferBlock;
 	ndRenderShaderDebugWireframeDiffuseBlock m_debugWireframeColorBlock;
@@ -64,12 +66,14 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	ndRenderShaderTransparentDiffusedShadowColorBlock m_transparencyDiffusedBlock;
 	ndRenderShaderInstancedOpaqueDiffusedShadowBlock m_opaqueDifusedColorNoShadowInstanceBlock;
 
+	friend class ndRenderSceneNodeInstanceImplement;
 	friend class ndRenderShaderSetZbufferCleanBlock;
 	friend class ndRenderShaderGenerateShadowMapBlock;
 	friend class ndRenderShaderOpaqueDiffusedColorBlock;
 	friend class ndRenderShaderDebugWireframeDiffuseBlock;
 	friend class ndRenderShaderDebugFlatShadedDiffusedBlock;
 	friend class ndRenderShaderOpaqueDiffusedShadowColorBlock;
+	friend class ndRenderShaderInstancedOpaqueDiffusedShadowBlock;
 	friend class ndRenderShaderTransparentDiffusedShadowColorBlock;
 };
 

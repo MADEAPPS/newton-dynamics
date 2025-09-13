@@ -48,6 +48,7 @@ class ndRenderPassShadowsImplement : public ndClassAlloc
 	
 	friend class ndRenderPrimitiveMeshImplement;
 	friend class ndRenderShaderOpaqueDiffusedShadowColorBlock;
+	friend class ndRenderShaderInstancedOpaqueDiffusedShadowBlock;
 };
 
 #endif

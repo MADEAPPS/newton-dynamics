@@ -117,6 +117,7 @@ class ndRender: public ndClassAlloc
 	friend class ndRenderShaderDebugWireframeDiffuseBlock;
 	friend class ndRenderShaderDebugFlatShadedDiffusedBlock;
 	friend class ndRenderShaderOpaqueDiffusedShadowColorBlock;
+	friend class ndRenderShaderInstancedOpaqueDiffusedShadowBlock;
 	friend class ndRenderShaderTransparentDiffusedShadowColorBlock;
 };
 

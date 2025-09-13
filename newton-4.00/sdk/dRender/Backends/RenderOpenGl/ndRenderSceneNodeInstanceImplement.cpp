@@ -15,6 +15,7 @@
 #include "ndRenderTexture.h"
 #include "ndRenderPrimitiveMesh.h"
 #include "ndRenderSceneNodeInstance.h"
+#include "ndRenderPrimitiveMeshImplement.h"
 #include "ndRenderSceneNodeInstanceImplement.h"
 
 ndRenderSceneNodeInstanceImplement::ndRenderSceneNodeInstanceImplement(ndRenderSceneNodeInstance* const owner)
@@ -25,45 +26,38 @@ ndRenderSceneNodeInstanceImplement::ndRenderSceneNodeInstanceImplement(ndRenderS
 
 void ndRenderSceneNodeInstanceImplement::Finalize()
 {
-	//const ndList<ndSharedPtr<ndRenderSceneNode>>& children = m_owner->GetChilden();
-	
 	ndRenderSceneNodeInstance* const owner = (ndRenderSceneNodeInstance*)m_owner;
 
 	const ndRenderPrimitiveMesh::ndDescriptor& descriptor = owner->m_descriptor;
 	ndAssert(descriptor.m_numberOfInstances > 0);
 	ndAssert(descriptor.m_meshBuildMode == ndRenderPrimitiveMesh::m_instancePrimitve);
-
-	m_matrixPallete.SetCount(descriptor.m_numberOfInstances);
+	
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 	owner->SetPrimitive(mesh);
-	
-	//m_renderShader.GetShaderParameters()
-	//glGenBuffers(1, &m_matrixOffsetBuffer);
-	//glBindBuffer(GL_ARRAY_BUFFER, m_matrixOffsetBuffer);
-	//glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(instanceCount * sizeof(glMatrix)), &m_matrixPallete[0][0][0], GL_STATIC_DRAW);
 }
 
 ndRenderSceneNodeInstanceImplement::~ndRenderSceneNodeInstanceImplement()
 {
-	//glDeleteBuffers(1, &m_matrixOffsetBuffer);
+	//glDeleteBuffers(1, &m_instanceRenderMatrixPalleteBuffer);
 }
 
 void ndRenderSceneNodeInstanceImplement::Render(const ndRender* const owner, ndFloat32, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const
 {
 	if (renderMode == m_directionalDiffusseShadow)
 	{
-		const ndList<ndSharedPtr<ndRenderSceneNode>>& children = m_owner->GetChilden();
+		const ndMatrix primitiveMatrix(m_owner->m_primitiveMatrix);
 
-		const ndRenderPrimitive* const mesh = *m_owner->m_primitive;
-		m_matrixPallete.SetCount(0);
+		ndRenderPrimitiveMesh* const mesh = (ndRenderPrimitiveMesh*)*m_owner->m_primitive;
+		ndRenderPrimitiveMeshImplement* const meshImplement = *mesh->m_implement;
+		
+		ndArray<glMatrix>& matrixPallete = meshImplement->m_instanceRenderMatrixPallete;
+
+		matrixPallete.SetCount(0);
+		const ndList<ndSharedPtr<ndRenderSceneNode>>& children = m_owner->GetChilden();
 		for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = children.GetFirst(); node; node = node->GetNext())
 		{
 			ndRenderSceneNode* const child = *node->GetInfo();
-			//const ndMatrix matrix(child->GetMatrix() * parentMatrix);
-			m_matrixPallete.PushBack(glMatrix(child->GetMatrix()));
-
-			//	// for now just call render
-			//	//child->Render(owner, timeStep, parentMatrix, renderMode);
+			matrixPallete.PushBack(glMatrix(primitiveMatrix * child->GetMatrix()));
 		}
 		mesh->Render(owner, parentMatrix, m_directionalDiffusseInstanceShadow);
 	}

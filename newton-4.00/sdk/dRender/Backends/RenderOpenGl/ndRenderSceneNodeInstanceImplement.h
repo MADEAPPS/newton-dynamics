@@ -29,7 +29,6 @@ class ndRenderSceneNodeInstanceImplement : public ndContainersFreeListAlloc<ndRe
 	void Render(const ndRender* const owner, ndFloat32 timeStep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const;
 
 	ndRenderSceneNodeInstance* m_owner;
-	mutable ndArray<glMatrix> m_matrixPallete;
 };
 
 #endif

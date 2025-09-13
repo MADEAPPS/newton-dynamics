@@ -9,8 +9,5 @@
 * freely
 */
 
-// OpenGlUtil.cpp: implementation of the OpenGlUtil class.
-//
-
 #include "ndRenderStdafx.h"
 #include "ndRenderOpenGlUtil.h"

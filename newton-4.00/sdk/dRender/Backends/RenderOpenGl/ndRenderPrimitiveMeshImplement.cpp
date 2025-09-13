@@ -31,7 +31,7 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(ndRenderPrimitive
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vertextArrayBuffer(0)
-	,m_matrixOffsetBuffer(0)
+	,m_instanceRenderMatrixPalleteBuffer(0)
 {
 	ndAssert(descriptor.m_collision);
 	switch (descriptor.m_meshBuildMode)
@@ -75,9 +75,9 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(ndRenderPrimitive
 
 ndRenderPrimitiveMeshImplement::~ndRenderPrimitiveMeshImplement()
 {
-	if (m_matrixOffsetBuffer)
+	if (m_instanceRenderMatrixPalleteBuffer)
 	{
-		glDeleteBuffers(1, &m_matrixOffsetBuffer);
+		glDeleteBuffers(1, &m_instanceRenderMatrixPalleteBuffer);
 	}
 
 	if (m_indexBuffer)
@@ -617,11 +617,12 @@ void ndRenderPrimitiveMeshImplement::BuildRenderInstanceMesh(const ndRenderPrimi
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(glPositionNormalUV), (void*)OFFSETOF(glPositionNormalUV, m_uv));
 
-
 	// set vertex buffer for matrix instances
-	glGenBuffers(1, &m_matrixOffsetBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, m_matrixOffsetBuffer);
-	//glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(descriptor.m_numberOfInstances * sizeof(glMatrix)), &offsets[0], GL_STATIC_DRAW);
+	m_instanceRenderMatrixPallete.SetCount(descriptor.m_numberOfInstances);
+
+	glGenBuffers(1, &m_instanceRenderMatrixPalleteBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_instanceRenderMatrixPalleteBuffer);
+	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(descriptor.m_numberOfInstances * sizeof(glMatrix)), &m_instanceRenderMatrixPallete[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(3);
 	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glMatrix), (void*)(0 * sizeof(glVector4)));
