@@ -15,6 +15,7 @@
 #include "ndRenderPrimitive.h"
 
 class ndRender;
+class ndRenderSceneNodeInstance;
 class ndRenderPassShadowsImplement;
 
 class ndTransform
@@ -36,6 +37,8 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 	ndRenderSceneNode(const ndMatrix& matrix);
 	virtual ~ndRenderSceneNode();
 
+	virtual const ndRenderSceneNodeInstance* GetAsInstance() const;
+
 	void SetPrimitiveMatrix(const ndMatrix& matrix);
 	void SetPrimitive(const ndSharedPtr<ndRenderPrimitive>& primitive);
 
@@ -49,6 +52,8 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 
 	ndTransform GetTransform() const;
 	void SetTransform(const ndTransform& transform);
+
+	
 
 	ndRenderSceneNode* GetParent() const;
 	const ndList<ndSharedPtr<ndRenderSceneNode>>& GetChilden() const;

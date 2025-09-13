@@ -25,6 +25,11 @@ ndRenderSceneNodeInstance::ndRenderSceneNodeInstance(const ndMatrix& matrix, con
 	m_implement = ndSharedPtr<ndRenderSceneNodeInstanceImplement>(new ndRenderSceneNodeInstanceImplement(this));
 }
 
+const ndRenderSceneNodeInstance* ndRenderSceneNodeInstance::GetAsInstance() const
+{
+	return this;
+}
+
 void ndRenderSceneNodeInstance::Finalize()
 {
 	m_descriptor.m_numberOfInstances = ndInt32 (m_children.GetCount());

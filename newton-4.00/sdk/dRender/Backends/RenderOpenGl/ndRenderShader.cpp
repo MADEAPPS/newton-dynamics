@@ -91,7 +91,7 @@ void ndRenderShaderSetZbufferCleanBlock::Render(const ndRenderPrimitiveMeshImple
 // *********************************************************************
 void ndRenderShaderGenerateShadowMapBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
 {
-	SetParameters(shaderCache->m_setZbufferEffect);
+	SetParameters(shaderCache->m_generateShadowMapsEffect);
 	EndParameters();
 }
 
@@ -141,6 +141,64 @@ void ndRenderShaderGenerateShadowMapBlock::Render(const ndRenderPrimitiveMeshImp
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }	
+
+// *********************************************************************
+// 
+// *********************************************************************
+void ndRenderShaderGenerateInstanceShadowMapBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
+{
+	SetParameters(shaderCache->m_generateInstancedShadowMapsEffect);
+	EndParameters();
+}
+
+void ndRenderShaderGenerateInstanceShadowMapBlock::SetParameters(GLuint shader)
+{
+	ndRenderShaderGenerateShadowMapBlock::SetParameters(shader);
+}
+
+void ndRenderShaderGenerateInstanceShadowMapBlock::BeginRender()
+{
+	//glDisable(GL_SCISSOR_TEST);
+	//glEnable(GL_DEPTH_TEST);
+	//glDepthFunc(GL_LEQUAL);
+	//
+	//glClear(GL_DEPTH_BUFFER_BIT);
+	//
+	//glUseProgram(m_shader);
+	//
+	//glPolygonOffset(GLfloat(1.0f), GLfloat(1024.0f * 8.0f));
+	//glEnable(GL_POLYGON_OFFSET_FILL);
+	ndRenderShaderGenerateShadowMapBlock::BeginRender();
+}
+
+void ndRenderShaderGenerateInstanceShadowMapBlock::EndRender()
+{
+	//glDisable(GL_POLYGON_OFFSET_FILL);
+	//ndAssert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+	//glUseProgram(0);
+	ndRenderShaderGenerateShadowMapBlock::EndRender();
+}
+
+void ndRenderShaderGenerateInstanceShadowMapBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const, const ndMatrix& modelMatrix) const
+{
+	ndAssert(0);
+	//glMatrix matrix(modelMatrix);
+	//glUniformMatrix4fv(viewModelProjectionMatrix, 1, false, &matrix[0][0]);
+	//
+	//glBindVertexArray(self->m_vertextArrayBuffer);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
+	//
+	//for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
+	//{
+	//	ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
+	//	if (segment.m_material.m_castShadows)
+	//	{
+	//		glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
+	//	}
+	//}
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	//glBindVertexArray(0);
+}
 
 // *********************************************************************
 // 

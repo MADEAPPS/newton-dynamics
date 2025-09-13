@@ -52,6 +52,7 @@ ndRenderPassShadowsImplement::ndRenderPassShadowsImplement(ndRenderContext* cons
 	ndAssert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
 	m_generateShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
+	m_generateIntanceShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
 	
 	m_viewPortTiles[0] = ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.5f), ndFloat32(0.5f));
 	m_viewPortTiles[1] = ndVector(ndFloat32(0.5f), ndFloat32(0.0f), ndFloat32(0.5f), ndFloat32(0.5f));
@@ -183,8 +184,6 @@ void ndRenderPassShadowsImplement::UpdateCascadeSplits(const ndRenderSceneCamera
 void ndRenderPassShadowsImplement::RenderScene(const ndRenderSceneCamera* const camera)
 {
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_frameBufferObject);
-	m_generateShadowMapsBlock.BeginRender();
-	
 	UpdateCascadeSplits(camera);
 	
 	ndMatrix tileMatrix(ndGetIdentityMatrix());
@@ -195,32 +194,44 @@ void ndRenderPassShadowsImplement::RenderScene(const ndRenderSceneCamera* const 
 	const ndMatrix& cameraProjection = camera->m_projectionMatrix;
 	
 	ndRender* const owner = m_context->m_owner;
-	const ndList<ndSharedPtr<ndRenderSceneNode>>& scene = owner->m_scene;
-	for (ndInt32 i = 0; i < 4; i++)
+
+	auto RenderPrimitive = [this, &owner, camera, &cameraTestPoint, &cameraProjection, &tileMatrix](ndRenderPassMode modepass)
 	{
-		const ndMatrix lightSpaceMatrix(CalculateLightSpaceMatrix(camera, i));
-		const ndVector viewPortTile(m_viewPortTiles[i]);
-		ndInt32 vp_x = ndInt32(viewPortTile.m_x * ndFloat32(2 * m_width));
-		ndInt32 vp_y = ndInt32(viewPortTile.m_y * ndFloat32(2 * m_height));
-	
-		cameraTestPoint.m_x = m_farFrustumPlanes[i];
-		const ndVector cameraPoint(cameraProjection.TransformVector1x4(cameraTestPoint));
-		m_cameraSpaceSplits[i] = GLfloat(ndFloat32(0.5f) * cameraPoint.m_z / cameraPoint.m_w + ndFloat32(0.5f));
-	
-		tileMatrix[3][0] = viewPortTile.m_x;
-		tileMatrix[3][1] = viewPortTile.m_y;
-		m_lighProjectionMatrix[i] = lightSpaceMatrix * m_lightProjectToTextureSpace * tileMatrix;
-	
-		glViewport(vp_x, vp_y, m_width, m_height);
-		for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = scene.GetFirst(); node; node = node->GetNext())
+		const ndList<ndSharedPtr<ndRenderSceneNode>>& scene = owner->m_scene;
+		for (ndInt32 i = 0; i < 4; i++)
 		{
-			ndRenderSceneNode* const sceneNode = *node->GetInfo();
-			sceneNode->Render(owner, 0.0f, lightSpaceMatrix, m_generateShadowMaps);
+			const ndMatrix lightSpaceMatrix(CalculateLightSpaceMatrix(camera, i));
+			const ndVector viewPortTile(m_viewPortTiles[i]);
+			ndInt32 vp_x = ndInt32(viewPortTile.m_x * ndFloat32(2 * m_width));
+			ndInt32 vp_y = ndInt32(viewPortTile.m_y * ndFloat32(2 * m_height));
+
+			cameraTestPoint.m_x = m_farFrustumPlanes[i];
+			const ndVector cameraPoint(cameraProjection.TransformVector1x4(cameraTestPoint));
+			m_cameraSpaceSplits[i] = GLfloat(ndFloat32(0.5f) * cameraPoint.m_z / cameraPoint.m_w + ndFloat32(0.5f));
+
+			tileMatrix[3][0] = viewPortTile.m_x;
+			tileMatrix[3][1] = viewPortTile.m_y;
+			m_lighProjectionMatrix[i] = lightSpaceMatrix * m_lightProjectToTextureSpace * tileMatrix;
+
+			glViewport(vp_x, vp_y, m_width, m_height);
+			for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = scene.GetFirst(); node; node = node->GetNext())
+			{
+				ndRenderSceneNode* const sceneNode = *node->GetInfo();
+				sceneNode->Render(owner, 0.0f, lightSpaceMatrix, modepass);
+			}
 		}
-	}
-	
+	};
+
+	// render simple primitve pass
+	m_generateShadowMapsBlock.BeginRender();
+	RenderPrimitive(m_generateShadowMaps);
 	m_generateShadowMapsBlock.EndRender();
+
+	// render instance primitives, fucking big mistake
+	//m_generateIntanceShadowMapsBlock.BeginRender();
+	//RenderPrimitive(m_m_generateInstanceShadowMaps);
+	//m_generateIntanceShadowMapsBlock.EndRender();
+
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-	
 	m_context->SetViewport(m_context->GetWidth(), m_context->GetHeight());
 }
