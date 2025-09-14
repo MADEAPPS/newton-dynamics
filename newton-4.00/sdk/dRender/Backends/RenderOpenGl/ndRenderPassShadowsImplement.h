@@ -44,7 +44,7 @@ class ndRenderPassShadowsImplement : public ndClassAlloc
 	ndInt32 m_height;
 	GLuint m_shadowMapTexture;
 	GLuint m_frameBufferObject;
-	ndRenderShaderGenerateShadowMapBlock m_generateShadowMapsBlock;
+
 	ndRenderShaderGenerateInstanceShadowMapBlock m_generateIntanceShadowMapsBlock;
 	
 	friend class ndRenderPrimitiveMeshImplement;

@@ -51,7 +51,7 @@ ndRenderPassShadowsImplement::ndRenderPassShadowsImplement(ndRenderContext* cons
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	ndAssert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
-	m_generateShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
+	//m_generateShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_generateIntanceShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
 	
 	m_viewPortTiles[0] = ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.5f), ndFloat32(0.5f));
@@ -184,6 +184,11 @@ void ndRenderPassShadowsImplement::UpdateCascadeSplits(const ndRenderSceneCamera
 void ndRenderPassShadowsImplement::RenderScene(const ndRenderSceneCamera* const camera)
 {
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_frameBufferObject);
+	glDisable(GL_SCISSOR_TEST);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+	glClear(GL_DEPTH_BUFFER_BIT);
+
 	UpdateCascadeSplits(camera);
 	
 	ndMatrix tileMatrix(ndGetIdentityMatrix());
@@ -222,13 +227,10 @@ void ndRenderPassShadowsImplement::RenderScene(const ndRenderSceneCamera* const 
 		}
 	};
 
-	// render simple primitve pass
-	m_generateShadowMapsBlock.BeginRender();
+	// render simple primitive pass
 	RenderPrimitive(m_generateShadowMaps);
-	m_generateShadowMapsBlock.EndRender();
 
 	// render instance primitives, fucking big mistake
-	//m_generateIntanceShadowMapsBlock.BeginRender();
 	//RenderPrimitive(m_m_generateInstanceShadowMaps);
 	//m_generateIntanceShadowMapsBlock.EndRender();
 

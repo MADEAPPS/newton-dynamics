@@ -43,7 +43,7 @@ class ndRenderShaderSetZbufferCleanBlock : public ndRenderShaderBlock
 
 	protected:
 	virtual void SetParameters(GLuint shader) override;
-	GLint viewModelProjectionMatrix;
+	GLint m_viewModelProjectionMatrix;
 };
 
 // *********************************************************************
@@ -53,9 +53,6 @@ class ndRenderShaderGenerateShadowMapBlock : public ndRenderShaderSetZbufferClea
 {
 	public:
 	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) override;
-
-	void EndRender();
-	void BeginRender();
 	virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
 
 	protected:
@@ -70,8 +67,6 @@ class ndRenderShaderGenerateInstanceShadowMapBlock : public ndRenderShaderGenera
 	public:
 	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) override;
 
-	void EndRender();
-	void BeginRender();
 	virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
 
 	protected:

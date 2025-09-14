@@ -170,35 +170,6 @@ void ndRenderSceneNode::InterpolateTransforms(ndFloat32 param)
 
 void ndRenderSceneNode::Render(const ndRender* const owner, ndFloat32 timestep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const
 {
-	// this is a big mistake
-	//const void* const isInstance = GetAsInstance();
-	//if (isInstance)
-	//{
-	//	switch (renderMode)
-	//	{
-	//		case m_generateShadowMaps:
-	//		case m_transparencyBackface:
-	//		case m_transparencyFrontface:
-	//		case m_debugDisplaySolidMesh:
-	//		case m_debugDisplaySetZbuffer:
-	//		case m_debugDisplayWireFrameMesh:
-	//		case m_directionalDiffusseShadow:
-	//		case m_directionalDiffusseNoShadow:
-	//			return;
-	//		default:;
-	//	}
-	//}
-	//else 
-	//{
-	//	switch (renderMode)
-	//	{
-	//		case m_m_generateInstanceShadowMaps:
-	//		case m_directionalDiffusseInstanceShadow:
-	//			return;
-	//		default:;
-	//	}
-	//}
-
 	ndAssert(!m_owner || (m_owner == owner));
 	const ndMatrix nodeMatrix(m_matrix * parentMatrix);
 	const ndRenderPrimitive* const mesh = *m_primitive;
@@ -209,7 +180,6 @@ void ndRenderSceneNode::Render(const ndRender* const owner, ndFloat32 timestep, 
 		mesh->Render(owner, modelMatrix, renderMode);
 	}
 
-	//RenderBone(scene, nodeMatrix);
 	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = m_children.GetFirst(); node; node = node->GetNext())
 	{
 		ndRenderSceneNode* const childNode = *node->GetInfo();

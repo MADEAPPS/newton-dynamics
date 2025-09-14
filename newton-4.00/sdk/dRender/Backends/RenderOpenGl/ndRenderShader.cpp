@@ -54,7 +54,7 @@ void ndRenderShaderSetZbufferCleanBlock::GetShaderParameters(const ndRenderShade
 void ndRenderShaderSetZbufferCleanBlock::SetParameters(GLuint shader)
 {
 	ndRenderShaderBlock::SetParameters(shader);
-	viewModelProjectionMatrix = glGetUniformLocation(m_shader, "viewModelProjectionMatrix");
+	m_viewModelProjectionMatrix = glGetUniformLocation(m_shader, "viewModelProjectionMatrix");
 }
 
 void ndRenderShaderSetZbufferCleanBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
@@ -74,7 +74,7 @@ void ndRenderShaderSetZbufferCleanBlock::Render(const ndRenderPrimitiveMeshImple
 
 	glUseProgram(m_shader);
 
-	glUniformMatrix4fv(viewModelProjectionMatrix, 1, false, &glViewModelProjectionMatrix[0][0]);
+	glUniformMatrix4fv(m_viewModelProjectionMatrix, 1, false, &glViewModelProjectionMatrix[0][0]);
 
 	glBindVertexArray(self->m_vertextArrayBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
@@ -98,34 +98,17 @@ void ndRenderShaderGenerateShadowMapBlock::GetShaderParameters(const ndRenderSha
 void ndRenderShaderGenerateShadowMapBlock::SetParameters(GLuint shader)
 {
 	ndRenderShaderSetZbufferCleanBlock::SetParameters(shader);
-	viewModelProjectionMatrix = glGetUniformLocation(m_shader, "viewModelProjectionMatrix");
-}
-
-void ndRenderShaderGenerateShadowMapBlock::BeginRender()
-{
-	glDisable(GL_SCISSOR_TEST);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LEQUAL);
-	
-	glClear(GL_DEPTH_BUFFER_BIT);
-	
-	glUseProgram(m_shader);
-	
-	glPolygonOffset(GLfloat(1.0f), GLfloat(1024.0f * 8.0f));
-	glEnable(GL_POLYGON_OFFSET_FILL);
-}
-
-void ndRenderShaderGenerateShadowMapBlock::EndRender()
-{
-	glDisable(GL_POLYGON_OFFSET_FILL);
-	ndAssert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-	glUseProgram(0);
 }
 
 void ndRenderShaderGenerateShadowMapBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const, const ndMatrix& modelMatrix) const
 {
 	glMatrix matrix(modelMatrix);
-	glUniformMatrix4fv(viewModelProjectionMatrix, 1, false, &matrix[0][0]);
+	glUseProgram(m_shader);
+
+	glUniformMatrix4fv(m_viewModelProjectionMatrix, 1, false, &matrix[0][0]);
+
+	glPolygonOffset(GLfloat(1.0f), GLfloat(1024.0f * 8.0f));
+	glEnable(GL_POLYGON_OFFSET_FILL);
 
 	glBindVertexArray(self->m_vertextArrayBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
@@ -140,6 +123,10 @@ void ndRenderShaderGenerateShadowMapBlock::Render(const ndRenderPrimitiveMeshImp
 	}
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+
+	glDisable(GL_POLYGON_OFFSET_FILL);
+	ndAssert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+	glUseProgram(0);
 }	
 
 // *********************************************************************
@@ -156,28 +143,6 @@ void ndRenderShaderGenerateInstanceShadowMapBlock::SetParameters(GLuint shader)
 	ndRenderShaderGenerateShadowMapBlock::SetParameters(shader);
 }
 
-void ndRenderShaderGenerateInstanceShadowMapBlock::BeginRender()
-{
-	//glDisable(GL_SCISSOR_TEST);
-	//glEnable(GL_DEPTH_TEST);
-	//glDepthFunc(GL_LEQUAL);
-	//
-	//glClear(GL_DEPTH_BUFFER_BIT);
-	//
-	//glUseProgram(m_shader);
-	//
-	//glPolygonOffset(GLfloat(1.0f), GLfloat(1024.0f * 8.0f));
-	//glEnable(GL_POLYGON_OFFSET_FILL);
-	ndRenderShaderGenerateShadowMapBlock::BeginRender();
-}
-
-void ndRenderShaderGenerateInstanceShadowMapBlock::EndRender()
-{
-	//glDisable(GL_POLYGON_OFFSET_FILL);
-	//ndAssert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-	//glUseProgram(0);
-	ndRenderShaderGenerateShadowMapBlock::EndRender();
-}
 
 void ndRenderShaderGenerateInstanceShadowMapBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const, const ndMatrix& modelMatrix) const
 {

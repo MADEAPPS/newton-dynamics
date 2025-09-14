@@ -222,6 +222,7 @@ void ndRenderPrimitiveMeshImplement::BuildRenderMesh(const ndRenderPrimitiveMesh
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
+	m_generateShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_transparencyDiffusedBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_opaqueDifusedColorShadowBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_opaqueDifusedColorNoShadowBlock.GetShaderParameters(*m_context->m_shaderCache);
@@ -643,9 +644,7 @@ void ndRenderPrimitiveMeshImplement::BuildRenderInstanceMesh(const ndRenderPrimi
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	//m_transparencyDiffusedBlock.GetShaderParameters(*m_context->m_shaderCache);
-	//m_opaqueDifusedColorShadowBlock.GetShaderParameters(*m_context->m_shaderCache);
-	//m_opaqueDifusedColorNoShadowBlock.GetShaderParameters(*m_context->m_shaderCache);
+	m_generateIntanceShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_opaqueDifusedColorNoShadowInstanceBlock.GetShaderParameters(*m_context->m_shaderCache);
 }
 
@@ -727,8 +726,7 @@ void ndRenderPrimitiveMeshImplement::RenderGenerateShadowMaps(const ndRender* co
 
 	if (castShadow)
 	{
-		const ndRenderPassShadowsImplement* const shadowPass = render->m_cachedShadowPass;
-		shadowPass->m_generateShadowMapsBlock.Render(this, render, lightMatrix);
+		m_generateShadowMapsBlock.Render(this, render, lightMatrix);
 	}
 }
 
