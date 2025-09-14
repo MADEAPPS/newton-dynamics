@@ -77,6 +77,7 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	friend class ndRenderShaderDebugWireframeDiffuseBlock;
 	friend class ndRenderShaderDebugFlatShadedDiffusedBlock;
 	friend class ndRenderShaderOpaqueDiffusedShadowColorBlock;
+	friend class ndRenderShaderGenerateInstanceShadowMapBlock;
 	friend class ndRenderShaderInstancedOpaqueDiffusedShadowBlock;
 	friend class ndRenderShaderTransparentDiffusedShadowColorBlock;
 };

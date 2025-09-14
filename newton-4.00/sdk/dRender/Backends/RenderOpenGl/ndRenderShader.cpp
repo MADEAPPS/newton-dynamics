@@ -102,13 +102,10 @@ void ndRenderShaderGenerateShadowMapBlock::SetParameters(GLuint shader)
 
 void ndRenderShaderGenerateShadowMapBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const, const ndMatrix& modelMatrix) const
 {
-	glMatrix matrix(modelMatrix);
 	glUseProgram(m_shader);
 
+	const glMatrix matrix(modelMatrix);
 	glUniformMatrix4fv(m_viewModelProjectionMatrix, 1, false, &matrix[0][0]);
-
-	//glPolygonOffset(GLfloat(1.0f), GLfloat(1024.0f * 8.0f));
-	//glEnable(GL_POLYGON_OFFSET_FILL);
 
 	glBindVertexArray(self->m_vertextArrayBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
@@ -144,23 +141,31 @@ void ndRenderShaderGenerateInstanceShadowMapBlock::SetParameters(GLuint shader)
 
 void ndRenderShaderGenerateInstanceShadowMapBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const, const ndMatrix& modelMatrix) const
 {
-	//ndAssert(0);
-	//glMatrix matrix(modelMatrix);
-	//glUniformMatrix4fv(viewModelProjectionMatrix, 1, false, &matrix[0][0]);
-	//
-	//glBindVertexArray(self->m_vertextArrayBuffer);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
-	//
-	//for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
-	//{
-	//	ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
-	//	if (segment.m_material.m_castShadows)
-	//	{
-	//		glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
-	//	}
-	//}
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	//glBindVertexArray(0);
+	glUseProgram(m_shader);
+
+	const glMatrix matrix(modelMatrix);
+	glUniformMatrix4fv(m_viewModelProjectionMatrix, 1, false, &matrix[0][0]);
+
+	glBindVertexArray(self->m_vertextArrayBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
+
+	//ndRenderPrimitiveMeshSegment& segment = self->m_owner->m_segments.GetFirst()->GetInfo();
+	//glDrawElementsInstanced(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)), GLsizei(self->m_instanceRenderMatrixPallete.GetCount()));
+	for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
+	{
+		ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
+		if (segment.m_material.m_castShadows)
+		{
+			//glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
+			glDrawElementsInstanced(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)), GLsizei(self->m_instanceRenderMatrixPallete.GetCount()));
+		}
+	}
+	
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+	ndAssert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+	glUseProgram(0);
 }
 
 // *********************************************************************
