@@ -223,7 +223,7 @@ void AddPlanks(ndDemoEntityManager* const scene, const ndMatrix& location, ndFlo
 	}
 }
 
-void AddCapsulesStacks(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, ndInt32 rows_x, ndInt32 rows_z, ndInt32 columHigh)
+void AddCapsuleStacks(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, ndInt32 rows_x, ndInt32 rows_z, ndInt32 columHigh)
 {
 	ndShapeInstance shape(new ndShapeCapsule(radius0, radius1, high));
 
@@ -239,7 +239,7 @@ void AddCapsulesStacks(ndDemoEntityManager* const scene, const ndMatrix& locatio
 	ndFloat32 spacing = 2.0f;
 	const ndMatrix startMatrix(ndRollMatrix(90.0f * ndDegreeToRad));
 
-	const ndMatrix invLocation(location.OrthoInverse());
+	const ndMatrix bindMatrix(location.OrthoInverse());
 	ndPhysicsWorld* const world = scene->GetWorld();
 	for (ndInt32 z = 0; z < rows_z; ++z)
 	{
@@ -252,7 +252,7 @@ void AddCapsulesStacks(ndDemoEntityManager* const scene, const ndMatrix& locatio
 			matrix.m_posit.m_y = floor.m_y + high + 7.0f;
 			for (ndInt32 i = 0; i < columHigh; ++i)
 			{
-				const ndMatrix localMatrix(matrix * invLocation);
+				const ndMatrix localMatrix(matrix * bindMatrix);
 				ndSharedPtr<ndRenderSceneNode>instance(new ndRenderSceneNode(localMatrix));
 				root->AddChild(instance);
 

@@ -58,6 +58,7 @@ class ndRenderPrimitiveMesh : public ndRenderPrimitive
 	enum ndUvMapingMode
 	{
 		m_box,
+		m_capsule,
 		m_spherical,
 		m_cylindrical
 	};

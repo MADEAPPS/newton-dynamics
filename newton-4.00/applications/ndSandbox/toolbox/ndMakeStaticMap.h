@@ -23,10 +23,11 @@ class ndDemoEntityManager;
 //ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation, bool kinematic = false);
 
 ndSharedPtr<ndBody> BuildPlayArena(ndDemoEntityManager* const scene, bool kinematic = false);
-ndSharedPtr<ndBody> BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized, bool kinematic = false);
+
 ndSharedPtr<ndBody> BuildStaticMesh(ndDemoEntityManager* const scene, const char* const meshName, bool optimized, bool kinematic = false);
 ndSharedPtr<ndBody> BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation, bool kinematic = false);
 
+ndSharedPtr<ndBody> BuildFlatPlane(ndDemoEntityManager* const scene, const ndMatrix& location, const char* const textureName, bool optimized, bool kinematic = false);
 ndSharedPtr<ndBody> BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix& location, const char* const textureName, ndFloat32 uvTiling, bool kinematic = false);
 
 #endif

@@ -22,15 +22,16 @@
 #include "ndHighResolutionTimer.h"
 #include "ndDebugDisplayRenderPass.h"
 
-#define DEFAULT_SCENE	0		// basic rigidbody
-//#define DEFAULT_SCENE	1		// basic friction
-//#define DEFAULT_SCENE	2		// basic Trigger
+//#define DEFAULT_SCENE	0		// basic rigidbody
+#define DEFAULT_SCENE	1		// basic Stacks 
+//#define DEFAULT_SCENE	2		// basic friction
 //#define DEFAULT_SCENE	3		// basic sliding platform
- 
- 
+//#define DEFAULT_SCENE	4		// basic Trigger
+
+
+
 //#define DEFAULT_SCENE	3		// basic compound shapes
 //#define DEFAULT_SCENE	4		// conservation of momentum 
-//#define DEFAULT_SCENE	5		// basic Stacks
 //#define DEFAULT_SCENE	7		// object Placement
 //#define DEFAULT_SCENE	8		// particle fluid
 //#define DEFAULT_SCENE	9		// static mesh collision 
@@ -99,7 +100,7 @@
 //void ndStaticMeshCollisionDemo(ndDemoEntityManager* const scene);
 //void ndStaticUserMeshCollisionDemo(ndDemoEntityManager* const scene);
 
-
+void ndBasicStacks(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
 void ndBasicFriction(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
@@ -108,9 +109,11 @@ void ndBasicSlidingPlatform(ndDemoEntityManager* const scene);
 ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
 {
 	{ "basic rigidbody", ndBasicRigidBody},
+	{ "basic friction", ndBasicStacks},
 	{ "basic friction", ndBasicFriction},
-	{ "basic triger", ndBasicTrigger},
 	{ "basic sliding ground", ndBasicSlidingPlatform},
+	{ "basic triger", ndBasicTrigger},
+	
 
 
 #if 0

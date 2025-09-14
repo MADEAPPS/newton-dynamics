@@ -55,6 +55,11 @@ ndRenderSceneNode::~ndRenderSceneNode()
 {
 }
 
+ndRenderSceneNodeInstance* ndRenderSceneNode::GetAsInstance()
+{
+	return nullptr;
+}
+
 const ndRenderSceneNodeInstance* ndRenderSceneNode::GetAsInstance() const
 {
 	return nullptr;

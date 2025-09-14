@@ -49,16 +49,15 @@ class ndParamMapper
 
 ndVector FindFloor(const ndWorld& world, const ndVector& origin, ndFloat32 dist);
 ndMatrix FindFloor(const ndWorld& world, const ndMatrix& origin, const ndShapeInstance& shape, ndFloat32 dist);
-ndBodyKinematic* MousePickBody(ndWorld* const nWorld, const ndVector& origin, const ndVector& end, ndFloat32& paramter, ndVector& positionOut, ndVector& normalOut);
 
 void SetModelVisualMesh(ndDemoEntityManager* const scene, ndModelArticulation* const model);
 
-ndSharedPtr<ndBody> CreateRigidNody(ndDemoEntityManager* const scene,
-	const ndShapeInstance& shape,
-	const ndMatrix& location,
-	ndFloat32 mass,
-	const char* const textName,
-	ndRenderPrimitiveMesh::ndUvMapingMode mappingMode);
+//ndSharedPtr<ndBody> CreateRigidbody(ndDemoEntityManager* const scene,
+//	const ndShapeInstance& shape,
+//	const ndMatrix& location,
+//	ndFloat32 mass,
+//	const char* const textName,
+//	ndRenderPrimitiveMesh::ndUvMapingMode mappingMode);
 
 ndSharedPtr<ndBody> CreateBox(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez, const char* const textName = "wood_0.png");
 ndSharedPtr<ndBody> CreateSphere(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 radius, const char* const textName = "wood_0.png");
@@ -70,6 +69,6 @@ ndSharedPtr<ndBody> AddCapsule(ndDemoEntityManager* const scene, const ndMatrix&
 ndSharedPtr<ndBody> AddConvexHull(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 radius, ndFloat32 high, ndInt32 segments, const char* const textName = "wood_0.png");
 
 void AddPlanks(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndInt32 count);
-void AddCapsulesStacks(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, ndInt32 rows_x, ndInt32 rows_z, ndInt32 columHigh);
+void AddCapsuleStacks(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, ndInt32 rows_x, ndInt32 rows_z, ndInt32 columHigh);
 
 #endif

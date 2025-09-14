@@ -112,8 +112,9 @@ void ndRenderPrimitiveMeshImplement::BuildRenderMesh(const ndRenderPrimitiveMesh
 	ndInt32 textureId = ndInt32(image->m_texture);
 	switch (descriptor.m_mapping)
 	{
+		case ndRenderPrimitiveMesh::m_capsule:
 		case ndRenderPrimitiveMesh::m_spherical:
-		case ndRenderPrimitiveMesh::m_cylindrical:
+		//case ndRenderPrimitiveMesh::m_cylindrical:
 		{
 			ndMatrix flipMatrix(ndGetIdentityMatrix());
 			flipMatrix[0][0] = ndFloat32(-1.0f);
@@ -505,8 +506,8 @@ void ndRenderPrimitiveMeshImplement::BuildRenderInstanceMesh(const ndRenderPrimi
 	ndInt32 textureId = ndInt32(image->m_texture);
 	switch (descriptor.m_mapping)
 	{
+		case ndRenderPrimitiveMesh::m_capsule:
 		case ndRenderPrimitiveMesh::m_spherical:
-		case ndRenderPrimitiveMesh::m_cylindrical:
 		{
 			ndMatrix flipMatrix(ndGetIdentityMatrix());
 			flipMatrix[0][0] = ndFloat32(-1.0f);
@@ -529,7 +530,6 @@ void ndRenderPrimitiveMeshImplement::BuildRenderInstanceMesh(const ndRenderPrimi
 		}
 		default:
 		{
-			ndAssert(0);
 			mesh.UniformBoxMapping(textureId, descriptor.m_uvMatrix);
 		}
 	}

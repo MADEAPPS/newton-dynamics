@@ -37,6 +37,7 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 	ndRenderSceneNode(const ndMatrix& matrix);
 	virtual ~ndRenderSceneNode();
 
+	virtual ndRenderSceneNodeInstance* GetAsInstance();
 	virtual const ndRenderSceneNodeInstance* GetAsInstance() const;
 
 	void SetPrimitiveMatrix(const ndMatrix& matrix);

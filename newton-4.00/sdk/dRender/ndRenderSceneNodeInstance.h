@@ -21,13 +21,16 @@ class ndRenderSceneNodeInstance : public ndRenderSceneNode
 	public:
 	ndRenderSceneNodeInstance(const ndMatrix& matrix, const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
 
+	virtual ndRenderSceneNodeInstance* GetAsInstance() override;
 	virtual const ndRenderSceneNodeInstance* GetAsInstance() const override;
 
 	void Finalize();
 	virtual void Render(const ndRender* const owner, ndFloat32 timeStep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const override;
 
+	ndSharedPtr<ndShapeInstance> m_savedShape;
 	ndRenderPrimitiveMesh::ndDescriptor m_descriptor;
 	ndSharedPtr<ndRenderSceneNodeInstanceImplement> m_implement;
+	bool m_isInitialized;
 };
 
 #endif
