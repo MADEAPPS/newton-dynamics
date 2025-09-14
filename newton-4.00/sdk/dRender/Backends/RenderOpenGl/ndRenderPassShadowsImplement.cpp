@@ -189,7 +189,8 @@ void ndRenderPassShadowsImplement::RenderScene(const ndRenderSceneCamera* const 
 	glDepthFunc(GL_LEQUAL);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	glPolygonOffset(GLfloat(1.0f), GLfloat(1024.0f * 8.0f));
+	//glPolygonOffset(GLfloat(1.0f), GLfloat(1024.0f * 8.0f));
+	glPolygonOffset(GLfloat(1.0f), GLfloat(1024.0f * 16.0f));
 	glEnable(GL_POLYGON_OFFSET_FILL);
 
 	UpdateCascadeSplits(camera);
