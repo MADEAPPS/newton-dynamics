@@ -146,7 +146,7 @@ void ndRenderShaderGenerateInstanceShadowMapBlock::SetParameters(GLuint shader)
 
 void ndRenderShaderGenerateInstanceShadowMapBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const, const ndMatrix& modelMatrix) const
 {
-	ndAssert(0);
+	//ndAssert(0);
 	//glMatrix matrix(modelMatrix);
 	//glUniformMatrix4fv(viewModelProjectionMatrix, 1, false, &matrix[0][0]);
 	//

@@ -788,5 +788,5 @@ void ndRenderPrimitiveMeshImplement::RenderDirectionalDiffuseColorInstanceShadow
 
 void ndRenderPrimitiveMeshImplement::RenderGenerateInstancedShadowMaps(const ndRender* const render, const ndMatrix& lightMatrix) const
 {
-
+	m_generateIntanceShadowMapsBlock.Render(this, render, lightMatrix);
 }

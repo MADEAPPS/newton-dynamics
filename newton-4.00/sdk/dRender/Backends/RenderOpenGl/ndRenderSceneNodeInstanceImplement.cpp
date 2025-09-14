@@ -38,7 +38,7 @@ void ndRenderSceneNodeInstanceImplement::Finalize()
 
 void ndRenderSceneNodeInstanceImplement::Render(const ndRender* const owner, ndFloat32, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const
 {
-	if ((renderMode == m_generateShadowMaps) || (renderMode == m_directionalDiffusseShadow))
+	if ((renderMode == m_m_generateInstanceShadowMaps) || (renderMode == m_generateShadowMaps) || (renderMode == m_directionalDiffusseShadow))
 	{
 		const ndMatrix primitiveMatrix(m_owner->m_primitiveMatrix);
 
@@ -55,7 +55,7 @@ void ndRenderSceneNodeInstanceImplement::Render(const ndRender* const owner, ndF
 			matrixPallete.PushBack(glMatrix(primitiveMatrix * child->GetMatrix()));
 		}
 
-		ndRenderPassMode overrideRenderMode = (renderMode == m_directionalDiffusseShadow) ? m_directionalDiffusseInstanceShadow : m_m_generateInstanceShadowMaps;
+		ndRenderPassMode overrideRenderMode = (renderMode == m_directionalDiffusseShadow) ? m_directionalDiffusseInstanceShadow : renderMode;
 		mesh->Render(owner, parentMatrix, overrideRenderMode);
 	}
 }

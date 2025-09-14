@@ -228,11 +228,10 @@ void ndRenderPassShadowsImplement::RenderScene(const ndRenderSceneCamera* const 
 	};
 
 	// render simple primitive pass
-	RenderPrimitive(m_generateShadowMaps);
+	//RenderPrimitive(m_generateShadowMaps);
 
 	// render instance primitives, fucking big mistake
-	//RenderPrimitive(m_m_generateInstanceShadowMaps);
-	//m_generateIntanceShadowMapsBlock.EndRender();
+	RenderPrimitive(m_m_generateInstanceShadowMaps);
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	m_context->SetViewport(m_context->GetWidth(), m_context->GetHeight());
