@@ -38,7 +38,8 @@ void ndRenderSceneNodeInstanceImplement::Finalize()
 
 void ndRenderSceneNodeInstanceImplement::Render(const ndRender* const owner, ndFloat32, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const
 {
-	if ((renderMode == m_m_generateInstanceShadowMaps) || (renderMode == m_generateShadowMaps) || (renderMode == m_directionalDiffusseShadow))
+	//if ((renderMode == m_m_generateInstanceShadowMaps) || (renderMode == m_generateShadowMaps) || (renderMode == m_directionalDiffusseShadow))
+	if ((renderMode == m_m_generateInstanceShadowMaps) || (renderMode == m_directionalDiffusseShadow))
 	{
 		const ndMatrix primitiveMatrix(m_owner->m_primitiveMatrix);
 

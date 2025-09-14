@@ -36,7 +36,8 @@ ndDemoCamera::ndDemoCamera(ndRender* const owner)
 void ndDemoCamera::SetTransform(const ndQuaternion& rotation, const ndVector& position)
 {
 	ndRenderSceneCamera::SetTransform(rotation, position);
-	const ndMatrix matrix(GetMatrix());
+	//const ndMatrix matrix(GetMatrix());
+	const ndMatrix matrix(GetTransform().GetMatrix());
 	m_pitch = ndAsin(matrix.m_front.m_y);
 	m_yaw = ndAtan2(-matrix.m_front.m_z, matrix.m_front.m_x);
 }

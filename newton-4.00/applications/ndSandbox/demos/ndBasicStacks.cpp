@@ -269,9 +269,9 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	ndVector origin(ndVector::m_zero);
 
 	//ndInt32 pyramidHigh = 1;
-	ndInt32 pyramidHigh = 10;
+	//ndInt32 pyramidHigh = 10;
 	//ndInt32 pyramidHigh = 20;
-	//ndInt32 pyramidHigh = 30;
+	ndInt32 pyramidHigh = 30;
 	//ndInt32 pyramidHigh = 50;
 	//for (ndInt32 i = 0; i < 4; ++i)
 	for (ndInt32 i = 0; i < 4; ++i)
@@ -299,9 +299,9 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	origin.m_x -= 3.0f;
 	origin.m_y += 5.0f;
 
-	origin.m_x -= 30.0f;
-	origin.m_z -= 5.0f;
+	origin.m_x -= 15.0f;
+	origin.m_z -= 15.0f;
 
-	ndQuaternion rot(ndYawMatrix(45.0f * ndDegreeToRad));
+	ndQuaternion rot(ndYawMatrix(-30.0f * ndDegreeToRad));
 	scene->SetCameraMatrix(rot, origin);
 }
