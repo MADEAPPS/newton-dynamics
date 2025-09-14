@@ -228,7 +228,7 @@ void ndRenderPassShadowsImplement::RenderScene(const ndRenderSceneCamera* const 
 	};
 
 	// render simple primitive pass
-	//RenderPrimitive(m_generateShadowMaps);
+	RenderPrimitive(m_generateShadowMaps);
 
 	// render instance primitives, fucking big mistake
 	RenderPrimitive(m_m_generateInstanceShadowMaps);

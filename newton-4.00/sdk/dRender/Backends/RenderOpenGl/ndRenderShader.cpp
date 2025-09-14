@@ -143,7 +143,6 @@ void ndRenderShaderGenerateInstanceShadowMapBlock::SetParameters(GLuint shader)
 	ndRenderShaderGenerateShadowMapBlock::SetParameters(shader);
 }
 
-
 void ndRenderShaderGenerateInstanceShadowMapBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const, const ndMatrix& modelMatrix) const
 {
 	//ndAssert(0);
