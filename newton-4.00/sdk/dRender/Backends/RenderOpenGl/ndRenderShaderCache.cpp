@@ -43,13 +43,10 @@ bool ndRenderShaderCache::CreateAllEffects()
 	m_diffuseShadowIntanceEffect = CreateShaderEffect(m_directionalDiffuseInstanceVertex, m_directionalDiffuseShadowPixel);
 	m_generateInstancedShadowMapsEffect = CreateShaderEffect(m_generateInstancedShadowMapVertex, m_doNothingPixel);
 
-	//m_wireFrame = CreateShaderEffect("WireFrame", "FlatShaded");
-	//m_flatShaded = CreateShaderEffect("FlatShaded", "FlatShaded");
 	//m_colorPoint = CreateShaderEffect("ColorPoint", "FlatShaded");
 	//m_texturedDecal = CreateShaderEffect ("TextureDecal", "TextureDecal");
 	//m_diffuseDebrisEffect = CreateShaderEffect("DirectionalDebriDiffuse", "DirectionalDebriDiffuse");
 	//m_skinningDiffuseEffect = CreateShaderEffect ("SkinningDirectionalDiffuse", "DirectionalDiffuse");
-	//m_diffuseIntanceEffect = CreateShaderEffect ("DirectionalDiffuseInstance", "DirectionalDiffuse");
 	//m_thickPoints = CreateShaderEffect("ThickPoint", "ThickPoint", "ThickPoint");
 	//m_spriteSpheres = CreateShaderEffect("DirectionalDiffuseSprite", "DirectionalDiffuseSprite", "DirectionalDiffuseSprite");
 

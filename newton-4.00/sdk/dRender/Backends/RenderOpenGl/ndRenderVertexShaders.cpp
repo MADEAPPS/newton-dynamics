@@ -163,7 +163,9 @@ R""""(
 
 	uniform mat4 viewModelMatrix;
 	uniform mat4 projectionMatrix;
+	uniform mat4 modelWorldMatrix;
 
+	out vec4 worldPosit;
 	out vec3 posit;
 	out vec3 normal;
 	out vec2 uv;
@@ -173,6 +175,7 @@ R""""(
 		vec4 instancePosit = in_matrixPalette * vec4(in_position, 1.0);
 		vec3 instanceNormal = vec3(in_matrixPalette * vec4(in_normal, 0.0));
 
+		worldPosit = modelWorldMatrix * instancePosit;
 		posit = vec3(viewModelMatrix * instancePosit);
 		normal = vec3(normalize(viewModelMatrix * vec4(instanceNormal, 0.0)));
 
