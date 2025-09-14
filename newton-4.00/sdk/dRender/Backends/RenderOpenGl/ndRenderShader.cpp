@@ -107,8 +107,8 @@ void ndRenderShaderGenerateShadowMapBlock::Render(const ndRenderPrimitiveMeshImp
 
 	glUniformMatrix4fv(m_viewModelProjectionMatrix, 1, false, &matrix[0][0]);
 
-	glPolygonOffset(GLfloat(1.0f), GLfloat(1024.0f * 8.0f));
-	glEnable(GL_POLYGON_OFFSET_FILL);
+	//glPolygonOffset(GLfloat(1.0f), GLfloat(1024.0f * 8.0f));
+	//glEnable(GL_POLYGON_OFFSET_FILL);
 
 	glBindVertexArray(self->m_vertextArrayBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
@@ -124,7 +124,6 @@ void ndRenderShaderGenerateShadowMapBlock::Render(const ndRenderPrimitiveMeshImp
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	glDisable(GL_POLYGON_OFFSET_FILL);
 	ndAssert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 	glUseProgram(0);
 }	

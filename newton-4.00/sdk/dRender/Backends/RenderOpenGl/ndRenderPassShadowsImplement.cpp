@@ -189,6 +189,9 @@ void ndRenderPassShadowsImplement::RenderScene(const ndRenderSceneCamera* const 
 	glDepthFunc(GL_LEQUAL);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
+	glPolygonOffset(GLfloat(1.0f), GLfloat(1024.0f * 8.0f));
+	glEnable(GL_POLYGON_OFFSET_FILL);
+
 	UpdateCascadeSplits(camera);
 	
 	ndMatrix tileMatrix(ndGetIdentityMatrix());
@@ -233,6 +236,7 @@ void ndRenderPassShadowsImplement::RenderScene(const ndRenderSceneCamera* const 
 	// render instance primitives, fucking big mistake
 	RenderPrimitive(m_m_generateInstanceShadowMaps);
 
+	glDisable(GL_POLYGON_OFFSET_FILL);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	m_context->SetViewport(m_context->GetWidth(), m_context->GetHeight());
 }
