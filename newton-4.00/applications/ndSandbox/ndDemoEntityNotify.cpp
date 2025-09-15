@@ -93,8 +93,8 @@
 //}
 
 
-ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, const ndSharedPtr<ndRenderSceneNode>& entity, ndBodyKinematic* const parentBody, ndFloat32 gravity)
-	:ndModelBodyNotify(parentBody, ndVector(0.0f, gravity, 0.0f, 0.0f))
+ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, const ndSharedPtr<ndRenderSceneNode>& entity, ndBodyKinematic* const parentBody, const ndVector& gravity)
+	:ndModelBodyNotify(parentBody, gravity)
 	,m_manager(manager)
 	,m_entity(entity)
 	,m_transform()

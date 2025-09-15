@@ -92,24 +92,17 @@ ndSharedPtr<ndBody> CreateBody(
 	ndRender* const render = *scene->GetRenderer();
 
 	const ndMatrix matrix(FindFloor(*world, location, shape, 200.0f));
-
-	//ndRenderPrimitiveMeshMaterial material;
-	//material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textName));
-	//ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateFromCollisionShape(render, &shape, material, mappingMode));
+	ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(matrix));
 
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
 	descriptor.m_collision = &shape;
-	//descriptor.m_uvMatrix = uvMatrix;
-	//descriptor.m_stretchMaping = false;
 	descriptor.m_mapping = mappingMode;
 	descriptor.m_material.m_castShadows = true;
 	descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textName));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
-
-	ndSharedPtr<ndBody> body (new ndBodyDynamic());
-	ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(matrix));
 	entity->SetPrimitive(mesh);
 
+	ndSharedPtr<ndBody> body (new ndBodyDynamic());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
 	body->GetAsBodyKinematic()->SetCollisionShape(shape);

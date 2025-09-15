@@ -18,7 +18,6 @@
 void ndBasicRigidBody(ndDemoEntityManager* const scene)
 {
 	// build a floor
-	//BuildFloorBox(scene, ndGetIdentityMatrix());
 	//ndSharedPtr<ndBody> body(BuildFlatPlane(scene, true, true));
 	//ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "marbleCheckBoard.png", 0.1f, true));
 	ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));

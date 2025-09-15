@@ -37,13 +37,6 @@ static ndSharedPtr<ndBody> AddRigidBody(ndDemoEntityManager* const scene,
 	return body;
 }
 
-#if 0
-
-
-
-
-#endif
-
 static void BuildPyramid(ndDemoEntityManager* const scene,
 	ndRenderSceneNodeInstance* const rootEntity, const ndShapeInstance& shape,
 	ndFloat32 mass, const ndVector& origin, const ndVector& boxSize, ndInt32 count)
@@ -216,7 +209,6 @@ static void BuildCapsuleStack(ndDemoEntityManager* const scene, ndFloat32 mass, 
 
 	ndVector blockBoxSize(size);
 
-	//ndMatrix uvMatrix(ndPitchMatrix(ndPi));
 	ndShapeInstance shape(new ndShapeCapsule(blockBoxSize.m_x, blockBoxSize.m_x, blockBoxSize.m_z));
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
 	descriptor.m_collision = &shape;

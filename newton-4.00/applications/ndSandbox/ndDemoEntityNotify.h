@@ -19,7 +19,11 @@ class ndDemoEntityNotify : public ndModelBodyNotify
 {
 	public:
 	ndDemoEntityNotify(const ndDemoEntityNotify& notify);
-	ndDemoEntityNotify(ndDemoEntityManager* const manager, const ndSharedPtr<ndRenderSceneNode>& entity, ndBodyKinematic* const parentBody = nullptr, ndFloat32 gravity = DEMO_GRAVITY);
+	ndDemoEntityNotify(
+		ndDemoEntityManager* const manager, 
+		const ndSharedPtr<ndRenderSceneNode>& entity, 
+		ndBodyKinematic* const parentBody = nullptr, 
+		const ndVector& gravity = ndVector(0.0f, DEMO_GRAVITY, 0.0f, 0.0f));
 
 	ndBodyNotify* Clone() const
 	{
