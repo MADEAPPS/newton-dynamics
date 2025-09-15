@@ -184,7 +184,8 @@ static void BuildCylinderColumn(ndDemoEntityManager* const scene, ndFloat32 mass
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
 	descriptor.m_collision = &shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_cylindrical;
-	descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png"));
+	descriptor.m_uvMatrix = shape.GetLocalMatrix();
+	descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("smilli.png"));
 	ndSharedPtr<ndRenderSceneNode>root(new ndRenderSceneNodeInstance(ndGetIdentityMatrix(), descriptor));
 	scene->AddEntity(root);
 
