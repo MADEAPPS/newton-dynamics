@@ -10,8 +10,6 @@
 */
 
 #include "ndSandboxStdafx.h"
-//#include "ndVehicleUI.h"
-//#include "ndMeshLoader.h"
 #include "ndDemoCamera.h"
 #include "ndFileBrowser.h"
 #include "ndPhysicsWorld.h"
@@ -27,15 +25,15 @@
 //#define DEFAULT_SCENE	2		// basic friction
 //#define DEFAULT_SCENE	3		// basic sliding platform
 //#define DEFAULT_SCENE	4		// basic Trigger
-#define DEFAULT_SCENE	5		// conservation of momentum 
-
+//#define DEFAULT_SCENE	5		// conservation of momentum 
+#define DEFAULT_SCENE	6		// basic joints
 
 //#define DEFAULT_SCENE	3		// basic compound shapes
 //#define DEFAULT_SCENE	7		// object Placement
 //#define DEFAULT_SCENE	8		// particle fluid
 //#define DEFAULT_SCENE	9		// static mesh collision 
 //#define DEFAULT_SCENE	10		// static user mesh collision 
-//#define DEFAULT_SCENE	11		// basic joints
+
 //#define DEFAULT_SCENE	12		// basic vehicle
 //#define DEFAULT_SCENE	13		// heavy vehicle
 //#define DEFAULT_SCENE	14		// background vehicle prop
@@ -99,6 +97,7 @@
 //void ndStaticMeshCollisionDemo(ndDemoEntityManager* const scene);
 //void ndStaticUserMeshCollisionDemo(ndDemoEntityManager* const scene);
 
+void ndBasicJoints(ndDemoEntityManager* const scene);
 void ndBasicStacks(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
 void ndBasicFriction(ndDemoEntityManager* const scene);
@@ -114,8 +113,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic sliding ground", ndBasicSlidingPlatform},
 	{ "basic triger", ndBasicTrigger},
 	{ "basic momentum consevation", ndBasicAngularMomentum},
-
-
+	{ "basic joints", ndBasicJoints},
 
 #if 0
 	{ "basic compound shapes", ndBasicCompoundShapeDemo},
@@ -126,7 +124,6 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic particle fluid", ndBasicParticleFluid},
 	{ "static mesh", ndStaticMeshCollisionDemo},
 	{ "static user mesh", ndStaticUserMeshCollisionDemo},
-	{ "basic joints", ndBasicJoints},
 	{ "basic vehicle", ndBasicVehicle},
 	{ "heavy vehicle", ndHeavyVehicle},
 	{ "low lod vehicle", ndBagroundLowLodVehicle},

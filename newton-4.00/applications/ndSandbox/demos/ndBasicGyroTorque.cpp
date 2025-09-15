@@ -16,68 +16,6 @@
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 
-#if 0
-static void TippeTop(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat32 angularSpeed, const ndVector& origin)
-{
-	class TippeTopShape : public ndShapeUserDefinedImplicit
-	{
-		public:
-		TippeTopShape()
-			:ndShapeUserDefinedImplicit()
-		{
-		}
-	};
-
-
-	//ndMatrix matrix(ndGetIdentityMatrix());
-	ndMatrix matrix(ndPitchMatrix(15.0f * ndDegreeToRad));
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-	matrix.m_posit.m_y += 1.0f;
-	
-	ndMeshLoader loader;
-	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("tippeTop.fbx", scene));
-	//ndSharedPtr<ndDemoMeshInterface> mesh (modelMesh->GetFirstChild()->GetMesh());
-	ndSharedPtr<ndDemoMeshInterface> mesh(modelMesh->GetChildren().GetFirst()->GetInfo()->GetMesh());
-
-	ndArray<ndVector> meshPoints;
-	((ndDemoMesh*)(*mesh))->GetVertexArray(meshPoints);
-	//ndArray<ndBigVector> points;
-	//for (ndInt32 i = ndInt32 (meshPoints.GetCount() - 1); i >= 0; --i)
-	//{
-	//	points.PushBack(meshPoints[i]);
-	//}
-	//ndConvexHull3d hull(&points[0].m_x, sizeof(ndBigVector), ndInt32 (points.GetCount()), 1.0e-3f);
-	//ndShapeInstance shape(new ndShapeSphere(0.64f));
-	//ndShapeInstance shape (new TippeTopShape());
-	ndShapeInstance shape(new ndShapeConvexHull(ndInt32 (meshPoints.GetCount()), sizeof (ndVector), 0.0f, &meshPoints[0].m_x));
-	
-	ndVector omega(matrix.m_up.Scale (angularSpeed));
-	ndSharedPtr<ndBody> body (new ndBodyDynamic());
-	ndSharedPtr<ndDemoEntity>entity (modelMesh->CreateClone());
-	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-	
-	body->SetOmega(omega);
-	body->SetMatrix(matrix);
-	body->GetAsBodyDynamic()->SetCollisionShape(shape);
-	body->GetAsBodyDynamic()->SetMassMatrix(mass, shape);
-
-	ndVector inertia (body->GetAsBodyDynamic()->GetMassMatrix());
-	inertia.m_y *= .5f;
-	//inertia.m_x *= 1.75f;
-	//inertia.m_z *= 1.75f;
-	body->GetAsBodyDynamic()->SetMassMatrix(inertia);
-
-	ndVector com(body->GetCentreOfMass());
-	com.m_y -= 0.2f;
-	body->SetCentreOfMass(com);
-	
-	ndPhysicsWorld* const world = scene->GetWorld();
-	world->AddBody(body);
-	scene->AddEntity(entity);
-}
-#endif
-
 static ndSharedPtr<ndBody> CreateFlyWheel(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 speed, ndFloat32 radius, ndFloat32 lenght, ndFloat32 tiltAnsgle)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
@@ -283,6 +221,68 @@ static ndSharedPtr<ndBody> RattleBack(ndDemoEntityManager* const scene, ndFloat3
 	scene->AddEntity(entity);
 	return body;
 }
+
+#if 0
+static void TippeTop(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat32 angularSpeed, const ndVector& origin)
+{
+	class TippeTopShape : public ndShapeUserDefinedImplicit
+	{
+	public:
+		TippeTopShape()
+			:ndShapeUserDefinedImplicit()
+		{
+		}
+	};
+
+
+	//ndMatrix matrix(ndGetIdentityMatrix());
+	ndMatrix matrix(ndPitchMatrix(15.0f * ndDegreeToRad));
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+	matrix.m_posit.m_y += 1.0f;
+
+	ndMeshLoader loader;
+	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("tippeTop.fbx", scene));
+	//ndSharedPtr<ndDemoMeshInterface> mesh (modelMesh->GetFirstChild()->GetMesh());
+	ndSharedPtr<ndDemoMeshInterface> mesh(modelMesh->GetChildren().GetFirst()->GetInfo()->GetMesh());
+
+	ndArray<ndVector> meshPoints;
+	((ndDemoMesh*)(*mesh))->GetVertexArray(meshPoints);
+	//ndArray<ndBigVector> points;
+	//for (ndInt32 i = ndInt32 (meshPoints.GetCount() - 1); i >= 0; --i)
+	//{
+	//	points.PushBack(meshPoints[i]);
+	//}
+	//ndConvexHull3d hull(&points[0].m_x, sizeof(ndBigVector), ndInt32 (points.GetCount()), 1.0e-3f);
+	//ndShapeInstance shape(new ndShapeSphere(0.64f));
+	//ndShapeInstance shape (new TippeTopShape());
+	ndShapeInstance shape(new ndShapeConvexHull(ndInt32(meshPoints.GetCount()), sizeof(ndVector), 0.0f, &meshPoints[0].m_x));
+
+	ndVector omega(matrix.m_up.Scale(angularSpeed));
+	ndSharedPtr<ndBody> body(new ndBodyDynamic());
+	ndSharedPtr<ndDemoEntity>entity(modelMesh->CreateClone());
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+
+	body->SetOmega(omega);
+	body->SetMatrix(matrix);
+	body->GetAsBodyDynamic()->SetCollisionShape(shape);
+	body->GetAsBodyDynamic()->SetMassMatrix(mass, shape);
+
+	ndVector inertia(body->GetAsBodyDynamic()->GetMassMatrix());
+	inertia.m_y *= .5f;
+	//inertia.m_x *= 1.75f;
+	//inertia.m_z *= 1.75f;
+	body->GetAsBodyDynamic()->SetMassMatrix(inertia);
+
+	ndVector com(body->GetCentreOfMass());
+	com.m_y -= 0.2f;
+	body->SetCentreOfMass(com);
+
+	ndPhysicsWorld* const world = scene->GetWorld();
+	world->AddBody(body);
+	scene->AddEntity(entity);
+}
+#endif
 
 void ndBasicAngularMomentum (ndDemoEntityManager* const scene)
 {
