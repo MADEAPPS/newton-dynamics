@@ -1942,3 +1942,120 @@ void ndMeshEffect::SphericalMapping(ndInt32 material, const ndMatrix& textureMat
 
 	PackAttibuteData();
 }
+
+
+void ndMeshEffect::CylindricalMapping(ndInt32 material, const ndMatrix& textureMatrix)
+{
+	ndBigVector origin(GetOrigin());
+	ndStack<ndBigVector>buffer(ndInt32(m_points.m_vertex.GetCount()));
+
+	ndBigVector pMin(ndFloat64(1.0e10f), ndFloat64(1.0e10f), ndFloat64(1.0e10f), ndFloat64(0.0f));
+	ndBigVector pMax(ndFloat64(-1.0e10f), ndFloat64(-1.0e10f), ndFloat64(-1.0e10f), ndFloat64(0.0f));
+	for (ndInt32 i = 0; i < m_points.m_vertex.GetCount(); ++i)
+	{
+		buffer[i] = textureMatrix.RotateVector(m_points.m_vertex[i] - origin);
+		const ndBigVector& tmp = buffer[i];
+		pMin.m_x = ndMin(pMin.m_x, tmp.m_x);
+		pMax.m_x = ndMax(pMax.m_x, tmp.m_x);
+		pMin.m_y = ndMin(pMin.m_y, tmp.m_y);
+		pMax.m_y = ndMax(pMax.m_y, tmp.m_y);
+		pMin.m_z = ndMin(pMin.m_z, tmp.m_z);
+		pMax.m_z = ndMax(pMax.m_z, tmp.m_z);
+	}
+
+	UnpackAttibuteData();
+	
+	m_attrib.m_uv0Channel.Resize(m_attrib.m_pointChannel.GetCount());
+	m_attrib.m_uv0Channel.SetCount(m_attrib.m_pointChannel.GetCount());
+	
+	m_attrib.m_materialChannel.Resize(m_attrib.m_pointChannel.GetCount());
+	m_attrib.m_materialChannel.SetCount(m_attrib.m_pointChannel.GetCount());
+	
+	m_attrib.m_uv0Channel.m_isValid = true;
+	m_attrib.m_materialChannel.m_isValid = true;
+
+	ndBigVector dist(pMax);
+	dist[0] = ndMax(ndFloat64(1.0e-3f), dist[0]);
+	dist[1] = ndMax(ndFloat64(1.0e-3f), dist[1]);
+	dist[2] = ndMax(ndFloat64(1.0e-3f), dist[2]);
+	ndBigVector scale(ndFloat64(0.5f) / dist[0], ndFloat64(0.5f) / dist[1], ndFloat64(0.5f) / dist[2], ndFloat64(0.0f));
+	
+	ndInt32 mark = IncLRU();
+	ndPolyhedra::Iterator iter(*this);
+	for (iter.Begin(); iter; iter++)
+	{
+		ndEdge* const edge = &(*iter);
+		if ((edge->m_mark < mark) && (edge->m_incidentFace > 0))
+		{
+			const ndBigVector& p0 = buffer[edge->m_incidentVertex];
+			const ndBigVector& p1 = buffer[edge->m_next->m_incidentVertex];
+			const ndBigVector& p2 = buffer[edge->m_prev->m_incidentVertex];
+
+			edge->m_mark = mark;
+			edge->m_next->m_mark = mark;
+			edge->m_prev->m_mark = mark;
+
+			ndBigVector e0(p1 - p0);
+			ndBigVector e1(p2 - p0);
+			ndBigVector n(e0.CrossProduct(e1).Normalize());
+			if (ndAbs(n.m_x) > ndFloat32 (0.85f))
+			{
+				ndEdge* ptr = edge;
+				do
+				{
+					ndVector p(scale * buffer[ptr->m_incidentVertex] - ndFloat32(0.5f));
+					ndUV uv(p.m_y, p.m_z);
+					m_attrib.m_uv0Channel[ndInt32(ptr->m_userData)] = uv;
+					m_attrib.m_materialChannel[ndInt32(ptr->m_userData)] = material;
+					ptr = ptr->m_next;
+				} while (ptr != edge);
+			}
+			else
+			{
+				ndFixSizeArray<ndUV, 32> aliasUV;
+				ndEdge* ptr = edge;
+
+				ndInt32 neg = 0;
+				ndInt32 pos = 0;
+				do
+				{
+					ndVector p(buffer[ptr->m_incidentVertex]);
+					ndFloat32 u = ndFloat32(scale.m_x * p.m_x - ndFloat32(0.5f));
+					ndFloat32 v = ndAtan2(p.m_y, p.m_z) / ndPi;
+					ndUV uv(u, v);
+					aliasUV.PushBack(uv);
+
+					neg += (v < ndFloat32(0.0f)) ? 1 : 0;
+					pos += (v > ndFloat32(0.0f)) ? 1 : 0;
+					ptr = ptr->m_next;
+				} while (ptr != edge);
+
+				if ((neg != 0) && (pos != 0))
+				{
+					for (ndInt32 i = 0; i < aliasUV.GetCount(); ++i)
+					{
+						if (aliasUV[i].m_v < ndFloat32(-0.5f))
+						{
+							aliasUV[i].m_v += ndFloat32(2.0f);
+						}
+					}
+				}
+
+				ndInt32 index = 0;
+				do
+				{
+					ndUV uv(aliasUV[index]);
+					uv.m_v *= ndFloat32(0.5f);
+					ndSwap(uv.m_u, uv.m_v);
+
+					m_attrib.m_uv0Channel[ndInt32(ptr->m_userData)] = uv;
+					m_attrib.m_materialChannel[ndInt32(ptr->m_userData)] = material;
+					ptr = ptr->m_next;
+					index++;
+				} while (ptr != edge);
+			}
+		}
+	}
+	
+	PackAttibuteData();
+}
