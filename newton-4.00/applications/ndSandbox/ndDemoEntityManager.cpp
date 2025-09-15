@@ -26,9 +26,9 @@
 //#define DEFAULT_SCENE	3		// basic sliding platform
 //#define DEFAULT_SCENE	4		// basic Trigger
 //#define DEFAULT_SCENE	5		// conservation of momentum 
-#define DEFAULT_SCENE	6		// basic joints
+//#define DEFAULT_SCENE	6		// basic joints
+#define DEFAULT_SCENE	7		// basic compound shapes
 
-//#define DEFAULT_SCENE	3		// basic compound shapes
 //#define DEFAULT_SCENE	7		// object Placement
 //#define DEFAULT_SCENE	8		// particle fluid
 //#define DEFAULT_SCENE	9		// static mesh collision 
@@ -104,6 +104,7 @@ void ndBasicFriction(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
 void ndBasicAngularMomentum(ndDemoEntityManager* const scene);
 void ndBasicSlidingPlatform(ndDemoEntityManager* const scene);
+void ndBasicCompoundCollision(ndDemoEntityManager* const scene);
 
 ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
 {
@@ -114,12 +115,10 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic triger", ndBasicTrigger},
 	{ "basic momentum consevation", ndBasicAngularMomentum},
 	{ "basic joints", ndBasicJoints},
+	{ "basic compound collision", ndBasicCompoundCollision},
 
 #if 0
-	{ "basic compound shapes", ndBasicCompoundShapeDemo},
 	{ "basic conservation of momentum", ndBasicAngularMomentum},
-	{ "basic stack", ndBasicStacks},
-	{ "basic trigger", ndBasicTrigger},
 	{ "basic object placement", ndObjectPlacement},
 	{ "basic particle fluid", ndBasicParticleFluid},
 	{ "static mesh", ndStaticMeshCollisionDemo},

@@ -89,8 +89,10 @@ class ndRenderPrimitiveMesh : public ndRenderPrimitive
 	};
 
 	ndRenderPrimitiveMesh();
+	ndRenderPrimitiveMesh(const ndRenderPrimitiveMesh& src);
 	virtual ~ndRenderPrimitiveMesh();
 
+	virtual ndRenderPrimitive* Clone() override;
 	virtual void Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderPassMode) const override;
 
 	static ndSharedPtr<ndRenderPrimitive> CreateMeshPrimitive(const ndDescriptor& descriptor);

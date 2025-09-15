@@ -41,8 +41,19 @@ ndRenderPrimitiveMesh::ndRenderPrimitiveMesh()
 {
 }
 
+ndRenderPrimitiveMesh::ndRenderPrimitiveMesh(const ndRenderPrimitiveMesh& src)
+	:ndRenderPrimitive(src)
+{
+	ndAssert(0);
+}
+
 ndRenderPrimitiveMesh::~ndRenderPrimitiveMesh()
 {
+}
+
+ndRenderPrimitive* ndRenderPrimitiveMesh::Clone()
+{
+	return new ndRenderPrimitiveMesh(*this);
 }
 
 ndSharedPtr<ndRenderPrimitive> ndRenderPrimitiveMesh::CreateMeshPrimitive(const ndDescriptor& descriptor)

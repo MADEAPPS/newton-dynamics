@@ -18,6 +18,13 @@ ndRenderPrimitive::ndRenderPrimitive()
 {
 }
 
+ndRenderPrimitive::ndRenderPrimitive(const ndRenderPrimitive&)
+	:ndContainersFreeListAlloc<ndRenderPrimitive>()
+{
+}
+
 ndRenderPrimitive::~ndRenderPrimitive()
 {
 }
+
+

@@ -202,8 +202,6 @@ static void BuildPathFollow(ndDemoEntityManager* const scene, const ndVector& or
 static ndSharedPtr<ndBody> MakePrimitive(ndDemoEntityManager* const scene, const ndMatrix& matrix, const ndShapeInstance& shape, ndSharedPtr<ndRenderPrimitive> mesh, ndFloat32 mass)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
-	//ndSharedPtr<ndDemoEntity> entity(new ndDemoEntity(matrix));
-
 	ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(ndGetIdentityMatrix()));
 	entity->SetPrimitive(mesh);
 

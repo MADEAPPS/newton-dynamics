@@ -35,7 +35,10 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 {
 	public:
 	ndRenderSceneNode(const ndMatrix& matrix);
+	ndRenderSceneNode(const ndRenderSceneNode& src);
 	virtual ~ndRenderSceneNode();
+
+	virtual ndRenderSceneNode* Clone() const;
 
 	virtual ndRenderSceneNodeInstance* GetAsInstance();
 	virtual const ndRenderSceneNodeInstance* GetAsInstance() const;
@@ -53,8 +56,6 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 
 	ndTransform GetTransform() const;
 	void SetTransform(const ndTransform& transform);
-
-	
 
 	ndRenderSceneNode* GetParent() const;
 	const ndList<ndSharedPtr<ndRenderSceneNode>>& GetChilden() const;

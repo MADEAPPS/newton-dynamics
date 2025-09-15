@@ -45,14 +45,47 @@ ndRenderSceneNode::ndRenderSceneNode(const ndMatrix& matrix)
 	,m_transform1(m_transform0)
 	,m_owner(nullptr)
 	,m_parent(nullptr)
+	,m_primitive(nullptr)
 	,m_children()
 	,m_sceneHandle(nullptr)
 	,m_isVisible(true)
 {
 }
 
+ndRenderSceneNode::ndRenderSceneNode(const ndRenderSceneNode& src)
+	:ndContainersFreeListAlloc<ndRenderSceneNode>()
+	,m_matrix(src.m_matrix)
+	,m_primitiveMatrix(src.m_primitiveMatrix)
+	,m_transform0(src.m_transform0)
+	,m_transform1(src.m_transform1)
+	,m_owner(nullptr)
+	,m_parent(nullptr)
+	,m_primitive(nullptr)
+	,m_children()
+	,m_sceneHandle(nullptr)
+	,m_isVisible(true)
+{
+	if (*src.m_primitive)
+	{
+		//m_primitive = ndSharedPtr<ndRenderPrimitive>(src.m_primitive->Clone());
+		m_primitive = src.m_primitive;
+	}
+
+	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = src.m_children.GetFirst(); node; node = node->GetNext())
+	{
+		ndAssert(0);
+		ndRenderSceneNode* const childNode = *node->GetInfo();
+		AddChild(childNode->Clone());
+	}
+}
+
 ndRenderSceneNode::~ndRenderSceneNode()
 {
+}
+
+ndRenderSceneNode* ndRenderSceneNode::Clone() const
+{
+	return new ndRenderSceneNode(*this);
 }
 
 ndRenderSceneNodeInstance* ndRenderSceneNode::GetAsInstance()
