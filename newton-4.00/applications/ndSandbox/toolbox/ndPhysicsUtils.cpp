@@ -130,7 +130,7 @@ ndSharedPtr<ndBody> CreateSphere(ndDemoEntityManager* const scene, const ndMatri
 ndSharedPtr<ndBody> CreateCapsule(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, const char* const textName)
 {
 	ndShapeInstance shape(new ndShapeCapsule(radius0, radius1, high));
-	ndSharedPtr<ndBody> body(CreateBody(scene, shape, location, mass, textName, ndRenderPrimitiveMesh::m_cylindrical));
+	ndSharedPtr<ndBody> body(CreateBody(scene, shape, location, mass, textName, ndRenderPrimitiveMesh::m_capsule));
 	return body;
 }
 
