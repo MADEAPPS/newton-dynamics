@@ -114,12 +114,20 @@ void ndRenderPrimitiveMeshImplement::BuildRenderMesh(const ndRenderPrimitiveMesh
 	{
 		case ndRenderPrimitiveMesh::m_capsule:
 		case ndRenderPrimitiveMesh::m_spherical:
-		//case ndRenderPrimitiveMesh::m_cylindrical:
 		{
 			ndMatrix flipMatrix(ndGetIdentityMatrix());
 			flipMatrix[0][0] = ndFloat32(-1.0f);
 			ndMatrix aligmentUV(flipMatrix * descriptor.m_uvMatrix);
 			mesh.SphericalMapping(textureId, aligmentUV);
+			break;
+		}
+
+		case ndRenderPrimitiveMesh::m_cylindrical:
+		{
+			ndMatrix flipMatrix(ndGetIdentityMatrix());
+			flipMatrix[0][0] = ndFloat32(-1.0f);
+			ndMatrix aligmentUV(flipMatrix * descriptor.m_uvMatrix);
+			mesh.CylindricalMapping(textureId, aligmentUV);
 			break;
 		}
 
@@ -513,6 +521,15 @@ void ndRenderPrimitiveMeshImplement::BuildRenderInstanceMesh(const ndRenderPrimi
 			flipMatrix[0][0] = ndFloat32(-1.0f);
 			ndMatrix aligmentUV(flipMatrix * descriptor.m_uvMatrix);
 			mesh.SphericalMapping(textureId, aligmentUV);
+			break;
+		}
+
+		case ndRenderPrimitiveMesh::m_cylindrical:
+		{
+			ndMatrix flipMatrix(ndGetIdentityMatrix());
+			flipMatrix[0][0] = ndFloat32(-1.0f);
+			ndMatrix aligmentUV(flipMatrix * descriptor.m_uvMatrix);
+			mesh.CylindricalMapping(textureId, aligmentUV);
 			break;
 		}
 
