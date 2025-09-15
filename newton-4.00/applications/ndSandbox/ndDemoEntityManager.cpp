@@ -108,7 +108,7 @@ void ndBasicSlidingPlatform(ndDemoEntityManager* const scene);
 ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
 {
 	{ "basic rigidbody", ndBasicRigidBody},
-	{ "basic friction", ndBasicStacks},
+	{ "basic stacking", ndBasicStacks},
 	{ "basic friction", ndBasicFriction},
 	{ "basic sliding ground", ndBasicSlidingPlatform},
 	{ "basic triger", ndBasicTrigger},
