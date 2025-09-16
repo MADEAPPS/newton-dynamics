@@ -85,6 +85,13 @@ ndSharedPtr<ndRenderSceneNode> ndMeshLoader::LoadEntity(ndRender* const renderer
 			}
 		}
 
+		const char* ptr = strrchr(fbxPathMeshName.GetStr(), '/');
+		if (!ptr)
+		{
+			ptr = strrchr(fbxPathMeshName.GetStr(), '\\');
+		}
+		const ndString path(fbxPathMeshName.GetStr(), ndInt32 (fbxPathMeshName.Size() - strlen(ptr + 1)));
+
 		for (ndInt32 i = 0; i < meshList.GetCount(); ++i)
 		{
 			ndRenderSceneNode* const entity = meshList[i].m_entity;
@@ -103,16 +110,21 @@ ndSharedPtr<ndRenderSceneNode> ndMeshLoader::LoadEntity(ndRender* const renderer
 			else
 			{
 				ndRenderPrimitiveMesh::ndDescriptor descriptor(renderer);
-				//descriptor.m_collision = &compoundShapeInstance;
 				descriptor.m_meshNode = *meshEffect;
-				//descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
-				//descriptor.m_material.m_texture = renderer->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png"));
-				ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
-
-				ndAssert(0);
-				//mesh = new ndDemoMesh(effectNode->GetName().GetStr(), *meshEffect, scene->GetShaderCache());
+				for (ndInt32 j = 0; j < materials.GetCount(); ++j)
+				{
+					const ndString teturePath(path + materials[i].m_textureName);
+					ndRenderPrimitiveMeshMaterial& material = descriptor.AddMaterial(renderer->GetTextureCache()->GetTexture(teturePath));
+					material.m_castShadows = true;
+					material.m_diffuse = materials[i].m_diffuse;
+					material.m_specular = materials[i].m_specular;
+					material.m_reflection = materials[i].m_specular;
+					material.m_specularPower = materials[i].m_shiness;
+					material.m_opacity = materials[i].m_opacity;
+				}
+				geometry = ndSharedPtr<ndRenderPrimitive>(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 			}
-			//entity->SetMesh(ndSharedPtr<ndDemoMeshInterface>(mesh), effectNode->m_meshMatrix);
+
 			entity->SetPrimitive(geometry);
 			entity->SetPrimitiveMatrix(effectNode->m_meshMatrix);
 

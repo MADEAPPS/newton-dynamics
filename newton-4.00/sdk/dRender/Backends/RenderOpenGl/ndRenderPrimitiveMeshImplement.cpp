@@ -33,43 +33,14 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(ndRenderPrimitive
 	,m_vertextArrayBuffer(0)
 	,m_instanceRenderMatrixPalleteBuffer(0)
 {
-	ndAssert(descriptor.m_collision);
-	switch (descriptor.m_meshBuildMode)
+	if (descriptor.m_collision)
 	{
-		case ndRenderPrimitiveMesh::m_simplePrimitve:
-		{
-			BuildRenderMesh(descriptor);
-			break;
-		}
-
-		case ndRenderPrimitiveMesh::m_instancePrimitve:
-		{
-			BuildRenderInstanceMesh(descriptor);
-			break;
-		}
-
-		case ndRenderPrimitiveMesh::m_debugWireFrame:
-		{
-			BuildWireframeDebugMesh(descriptor);
-			break;
-		}
-
-		case ndRenderPrimitiveMesh::m_debugFlatShaded:
-		{
-			BuildDebugFlatShadedMesh(descriptor);
-			break;
-		}
-
-		case ndRenderPrimitiveMesh::m_debugHiddenLines:
-		{
-			BuildSetZBufferDebugMesh(descriptor);
-			break;
-		}
-
-		default:
-		{
-			ndAssert(0);
-		}
+		BuildFromCollisionShape(descriptor);
+	}
+	else
+	{
+		ndAssert(descriptor.m_meshNode);
+		BuildFromMesh(descriptor);
 	}
 
 	m_generateShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
@@ -103,7 +74,65 @@ ndRenderPrimitiveMeshImplement::~ndRenderPrimitiveMeshImplement()
 	}
 }
 
-void ndRenderPrimitiveMeshImplement::BuildRenderMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor)
+void ndRenderPrimitiveMeshImplement::BuildFromCollisionShape(const ndRenderPrimitiveMesh::ndDescriptor& descriptor)
+{
+	switch (descriptor.m_meshBuildMode)
+	{
+		case ndRenderPrimitiveMesh::m_simplePrimitve:
+		{
+			BuildRenderMeshFromCollisionShape(descriptor);
+			break;
+		}
+
+		case ndRenderPrimitiveMesh::m_instancePrimitve:
+		{
+			BuildRenderInstanceMesh(descriptor);
+			break;
+		}
+
+		case ndRenderPrimitiveMesh::m_debugWireFrame:
+		{
+			BuildWireframeDebugMesh(descriptor);
+			break;
+		}
+
+		case ndRenderPrimitiveMesh::m_debugFlatShaded:
+		{
+			BuildDebugFlatShadedMesh(descriptor);
+			break;
+		}
+
+		case ndRenderPrimitiveMesh::m_debugHiddenLines:
+		{
+			BuildSetZBufferDebugMesh(descriptor);
+			break;
+		}
+
+		default:
+		{
+			ndAssert(0);
+		}
+	}
+}
+
+void ndRenderPrimitiveMeshImplement::BuildFromMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor)
+{
+	switch (descriptor.m_meshBuildMode)
+	{
+		case ndRenderPrimitiveMesh::m_simplePrimitve:
+		{
+			BuildRenderMeshFromMeshEffect(descriptor);
+			break;
+		}
+		default:
+		{
+			ndAssert(0);
+		}
+	}
+
+}
+
+void ndRenderPrimitiveMeshImplement::BuildRenderMeshFromCollisionShape(const ndRenderPrimitiveMesh::ndDescriptor& descriptor)
 {
 	ndAssert(descriptor.m_collision);
 	ndMeshEffect mesh(*descriptor.m_collision);
@@ -215,6 +244,148 @@ void ndRenderPrimitiveMeshImplement::BuildRenderMesh(const ndRenderPrimitiveMesh
 	// optimize this mesh for hardware buffers if possible
 	m_indexCount = indexCount;
 	m_vertexCount = ndInt32(points.GetCount()); 
+
+	glGenBuffers(1, &m_indexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, GLsizeiptr(indexCount * sizeof(GLuint)), &indices[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	glGenVertexArrays(1, &m_vertextArrayBuffer);
+	glBindVertexArray(m_vertextArrayBuffer);
+
+	glGenBuffers(1, &m_vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(points.GetCount() * sizeof(glPositionNormalUV)), &points[0], GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormalUV), (void*)OFFSETOF(glPositionNormalUV, m_posit));
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormalUV), (void*)OFFSETOF(glPositionNormalUV, m_normal));
+
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(glPositionNormalUV), (void*)OFFSETOF(glPositionNormalUV, m_uv));
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
+
+void ndRenderPrimitiveMeshImplement::BuildRenderMeshFromMeshEffect(const ndRenderPrimitiveMesh::ndDescriptor& descriptor)
+{
+	ndMeshEffect& mesh = *((ndMeshEffect*)descriptor.m_meshNode);
+
+	ndAssert(descriptor.m_materials.GetCount());
+	//const ndRenderPrimitiveMeshMaterial& material = descriptor.m_materials.GetFirst()->GetInfo();
+	//ndRenderTextureImageCommon* const image = (ndRenderTextureImageCommon*)*material.m_texture;
+	//ndInt32 textureId = ndInt32(image->m_texture);
+	//switch (descriptor.m_mapping)
+	//{
+	//case ndRenderPrimitiveMesh::m_capsule:
+	//case ndRenderPrimitiveMesh::m_spherical:
+	//{
+	//	ndMatrix flipMatrix(ndGetIdentityMatrix());
+	//	flipMatrix[0][0] = ndFloat32(-1.0f);
+	//	ndMatrix aligmentUV(flipMatrix * descriptor.m_uvMatrix);
+	//	mesh.SphericalMapping(textureId, aligmentUV);
+	//	break;
+	//}
+	//
+	//case ndRenderPrimitiveMesh::m_cylindrical:
+	//{
+	//	ndMatrix flipMatrix(ndGetIdentityMatrix());
+	//	flipMatrix[0][0] = ndFloat32(-1.0f);
+	//	ndMatrix aligmentUV(flipMatrix * descriptor.m_uvMatrix);
+	//	mesh.CylindricalMapping(textureId, aligmentUV);
+	//	break;
+	//}
+	//
+	//case ndRenderPrimitiveMesh::m_box:
+	//{
+	//	if (descriptor.m_stretchMaping)
+	//	{
+	//		mesh.BoxMapping(textureId, textureId, textureId, descriptor.m_uvMatrix);
+	//	}
+	//	else
+	//	{
+	//		mesh.UniformBoxMapping(textureId, descriptor.m_uvMatrix);
+	//	}
+	//	break;
+	//}
+	//default:
+	//{
+	//	mesh.UniformBoxMapping(textureId, descriptor.m_uvMatrix);
+	//}
+	//}
+
+	ndIndexArray* const geometryHandle = mesh.MaterialGeometryBegin();
+
+	// extract vertex data  from the newton mesh
+	ndInt32 indexCount = 0;
+	ndInt32 vertexCount = mesh.GetPropertiesCount();
+	for (ndInt32 handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
+	{
+		indexCount += mesh.GetMaterialIndexCount(geometryHandle, handle);
+	}
+
+	struct dTmpData
+	{
+		ndReal m_posit[3];
+		ndReal m_normal[3];
+		ndReal m_uv[2];
+	};
+
+	ndArray<dTmpData> tmp;
+	ndArray<ndInt32> indices;
+	ndArray<glPositionNormalUV> points;
+
+	tmp.SetCount(vertexCount);
+	points.SetCount(vertexCount);
+	indices.SetCount(indexCount);
+
+	mesh.GetVertexChannel(sizeof(dTmpData), &tmp[0].m_posit[0]);
+	mesh.GetNormalChannel(sizeof(dTmpData), &tmp[0].m_normal[0]);
+	mesh.GetUV0Channel(sizeof(dTmpData), &tmp[0].m_uv[0]);
+
+	for (ndInt32 i = 0; i < vertexCount; ++i)
+	{
+		points[i].m_posit.m_x = GLfloat(tmp[i].m_posit[0]);
+		points[i].m_posit.m_y = GLfloat(tmp[i].m_posit[1]);
+		points[i].m_posit.m_z = GLfloat(tmp[i].m_posit[2]);
+		points[i].m_normal.m_x = GLfloat(tmp[i].m_normal[0]);
+		points[i].m_normal.m_y = GLfloat(tmp[i].m_normal[1]);
+		points[i].m_normal.m_z = GLfloat(tmp[i].m_normal[2]);
+		points[i].m_uv.m_u = GLfloat(tmp[i].m_uv[0]);
+		points[i].m_uv.m_v = GLfloat(tmp[i].m_uv[1]);
+	}
+
+	ndInt32 segmentStart = 0;
+	ndList<ndRenderPrimitiveMeshMaterial>::ndNode* materialNodes = descriptor.m_materials.GetFirst();
+	for (ndInt32 handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
+	{
+		const ndRenderPrimitiveMeshMaterial& material = materialNodes->GetInfo();
+		
+		ndRenderPrimitiveMeshSegment& segment = m_owner->m_segments.Append()->GetInfo();
+		
+		segment.m_material.m_texture = material.m_texture;
+		segment.m_material.m_diffuse = material.m_diffuse;
+		segment.m_material.m_opacity = material.m_opacity;
+		segment.m_material.m_specular = material.m_specular;
+		segment.m_material.m_castShadows = material.m_castShadows;
+		segment.m_material.m_specularPower = material.m_specularPower;
+		
+		segment.m_indexCount = mesh.GetMaterialIndexCount(geometryHandle, handle);
+		
+		segment.m_segmentStart = segmentStart;
+		mesh.GetMaterialGetIndexStream(geometryHandle, handle, &indices[segmentStart]);
+		segmentStart += segment.m_indexCount;
+
+		materialNodes = materialNodes->GetNext();
+	}
+	mesh.MaterialGeometryEnd(geometryHandle);
+
+	// optimize this mesh for hardware buffers if possible
+	m_indexCount = indexCount;
+	m_vertexCount = ndInt32(points.GetCount());
 
 	glGenBuffers(1, &m_indexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);

@@ -25,13 +25,16 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 {
 	public:
 	ndRenderPrimitiveMeshImplement(ndRenderPrimitiveMesh* const owner, const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
-
 	~ndRenderPrimitiveMeshImplement();
+
+	void BuildFromMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
+	void BuildFromCollisionShape(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
 
 	void Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderMode) const;
 	
 	private:
-	void BuildRenderMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
+	void BuildRenderMeshFromMeshEffect(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
+	void BuildRenderMeshFromCollisionShape(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
 	void BuildDebugFlatShadedMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
 	void BuildRenderInstanceMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
 	void BuildWireframeDebugMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
