@@ -402,9 +402,10 @@ ndSharedPtr<ndBody> BuildFloorBox(ndDemoEntityManager* const scene, const ndMatr
 	descriptor.m_uvMatrix = uvMatrix;
 	descriptor.m_stretchMaping = false;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
-	descriptor.m_material.m_castShadows = false;
-	descriptor.m_material.m_specular = ndVector::m_zero;
-	descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textureName));
+	ndRenderPrimitiveMeshMaterial& material = descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textureName)));
+	material.m_castShadows = false;
+	material.m_specular = ndVector::m_zero;
+
 	ndSharedPtr<ndRenderPrimitive> geometry(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 	
 	ndMatrix location(matrix);
@@ -454,9 +455,10 @@ ndSharedPtr<ndBody> BuildFlatPlane(ndDemoEntityManager* const scene, const ndMat
 	descriptor.m_uvMatrix = uvMatrix;
 	descriptor.m_stretchMaping = false;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
-	descriptor.m_material.m_castShadows = false;
-	descriptor.m_material.m_specular = ndVector::m_zero;
-	descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textureName));
+	ndRenderPrimitiveMeshMaterial& material = descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textureName)));
+	material.m_castShadows = false;
+	material.m_specular = ndVector::m_zero;
+
 	ndSharedPtr<ndRenderPrimitive> geometry(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 
 	ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(matrix));

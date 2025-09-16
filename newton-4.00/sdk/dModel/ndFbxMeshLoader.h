@@ -17,6 +17,8 @@ class ndAnimationSequence;
 
 using namespace ofbx;
 
+#define ND_FBX_MAX_CHILDREN	1024
+
 class ndFbxMeshLoader : public ndClassAlloc
 {
 	class ndFbxAnimationTrack;
@@ -28,7 +30,7 @@ class ndFbxMeshLoader : public ndClassAlloc
 	virtual ~ndFbxMeshLoader();
 
 	virtual ndAnimationSequence* LoadAnimation(const char* const fullPathName);
-	virtual ndMesh* LoadMesh(const char* const fullPathName, bool loadAnimation);
+	virtual ndSharedPtr<ndMesh> LoadMesh(const char* const fullPathName, bool loadAnimation);
 
 	private:
 	void FreezeScale(ndMesh* const entity);
@@ -44,12 +46,13 @@ class ndFbxMeshLoader : public ndClassAlloc
 	void LoadAnimation(const ofbx::IScene* const fbxScene, ndMesh* const model);
 	void ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNodeMap& nodeMap);
 	void ImportMaterials(const ofbx::Mesh* const fbxMesh, ndMeshEffect* const mesh);
-	ndInt32 GetChildrenNodes(const ofbx::Object* const node, ofbx::Object** buffer);
+	ndFixSizeArray<ofbx::Object*, ND_FBX_MAX_CHILDREN> GetChildrenNodes(const ofbx::Object* const node);
 	ndAnimationSequence* CreateSequence(ndMesh* const model, const char* const name);
 	ndMesh* CreateMeshHierarchy(ofbx::IScene* const fbxScene, ndFbx2ndMeshNodeMap& nodeMap);
 	ndMatrix GetKeyframe(ndMesh::ndCurveValue& scale, ndMesh::ndCurveValue& position, ndMesh::ndCurveValue& rotation);
 	void LoadAnimationLayer(ndTree <ndFbxAnimationTrack, ndString>& tracks, const ofbx::IScene* const fbxScene, const ofbx::AnimationLayer* const animLayer);
 	void LoadAnimationCurve(ndTree <ndFbxAnimationTrack, ndString>& tracks, const ofbx::IScene* const, const ofbx::Object* const bone, const ofbx::AnimationLayer* const animLayer, ndFloat32 duration, ndInt32 framesCount);
+	
 };
 
 #endif

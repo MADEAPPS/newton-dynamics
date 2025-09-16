@@ -25,7 +25,7 @@
 #include "ndCollisionStdafx.h"
 #include "ndMeshEffect.h"
 
-class ndMesh : public ndNodeHierarchy<ndMesh>
+class ndMesh : public ndClassAlloc
 {
 	public:
 	class ndCurveValue
@@ -49,12 +49,16 @@ class ndMesh : public ndNodeHierarchy<ndMesh>
 	};
 
 	
+	ndMesh();
 	ndMesh(const ndMesh& src);
-	ndMesh(ndMesh* const parent);
 	ndMesh(const ndShapeInstance& src);
 
 	~ndMesh();
 	ndMesh* CreateClone() const;
+
+	void AddChild(const ndSharedPtr<ndMesh>& child);
+	void RemoveChild(const ndSharedPtr<ndMesh>& child);
+	ndList<ndSharedPtr<ndMesh>>& GetChildren();
 
 	ndSharedPtr<ndMeshEffect>& GetMesh();
 	const ndSharedPtr<ndMeshEffect>& GetMesh() const;
@@ -83,6 +87,9 @@ class ndMesh : public ndNodeHierarchy<ndMesh>
 	ndCurve m_scale;
 	ndCurve m_posit;
 	ndCurve m_rotation;
+	ndMesh* m_parent;
+	ndList<ndSharedPtr<ndMesh>>::ndNode* m_childNode;
+	ndList<ndSharedPtr<ndMesh>> m_children;
 
 	friend class ndMeshFile;
 };

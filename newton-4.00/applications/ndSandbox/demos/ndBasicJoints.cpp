@@ -261,7 +261,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
 	descriptor.m_collision = &shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_capsule;
-	descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("smilli.png"));
+	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("smilli.png")));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 
 	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
@@ -420,7 +420,7 @@ static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin,
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
 	descriptor.m_collision = &shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
-	descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png"));
+	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png")));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 
 	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
@@ -505,7 +505,7 @@ static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
 	descriptor.m_collision = &shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
-	descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png"));
+	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png")));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 
 	ndMatrix matrix(ndGetIdentityMatrix());
@@ -562,7 +562,7 @@ static void BuildGear(ndDemoEntityManager* const scene, const ndVector& origin, 
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
 	descriptor.m_collision = &shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
-	descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png"));
+	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png")));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 
 	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
@@ -625,7 +625,7 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& o
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
 	descriptor.m_collision = &shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_cylindrical;
-	descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png"));
+	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png")));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 
 	ndMatrix matrix(ndYawMatrix(90.0f * ndDegreeToRad));
@@ -668,7 +668,7 @@ static void BuildRoller(ndDemoEntityManager* const scene, const ndVector& origin
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
 	descriptor.m_collision = &shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_cylindrical;
-	descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png"));
+	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png")));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 
 	ndMatrix matrix(ndGetIdentityMatrix());
@@ -701,7 +701,7 @@ static void BuildCylindrical(ndDemoEntityManager* const scene, const ndVector& o
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
 	descriptor.m_collision = &shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_cylindrical;
-	descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png"));
+	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png")));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 
 	ndMatrix matrix(ndYawMatrix(90.0f * ndDegreeToRad));
@@ -734,7 +734,7 @@ void BuildFixDistanceJoints(ndDemoEntityManager* const scene, const ndVector& or
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
 	descriptor.m_collision = &shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_spherical;
-	descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("earthmap.png"));
+	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("earthmap.png")));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 
 	ndMatrix matrix(ndGetIdentityMatrix());
@@ -791,7 +791,7 @@ static void BuildRollingFriction(ndDemoEntityManager* const scene, const ndVecto
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
 	descriptor.m_collision = &shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_spherical;
-	descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("earthmap.png"));
+	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("earthmap.png")));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 
 	matrix.m_posit.m_y += 5.0f;

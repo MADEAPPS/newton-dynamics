@@ -97,8 +97,9 @@ ndSharedPtr<ndBody> CreateBody(
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
 	descriptor.m_collision = &shape;
 	descriptor.m_mapping = mappingMode;
-	descriptor.m_material.m_castShadows = true;
-	descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textName));
+	//descriptor.m_material.m_castShadows = true;
+	//descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textName));
+	descriptor.AddMaterial (render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textName)));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 	entity->SetPrimitive(mesh);
 
@@ -225,7 +226,8 @@ void AddCapsuleStacks(ndDemoEntityManager* const scene, const ndMatrix& location
 	descriptor.m_collision = &shape;
 	descriptor.m_stretchMaping = false;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_spherical;
-	descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("marble.png"));
+	//descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("marble.png"));
+	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("marble.png")));
 	ndSharedPtr<ndRenderSceneNode>root(new ndRenderSceneNodeInstance(location, descriptor));
 	scene->AddEntity(root);
 

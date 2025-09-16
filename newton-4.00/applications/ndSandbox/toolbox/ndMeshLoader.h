@@ -12,7 +12,6 @@
 #ifndef _ND_MESH_LOADER_H_
 #define _ND_MESH_LOADER_H_
 
-class ndDemoEntity;
 class ndDemoEntityManager;
 
 class ndMeshLoader: public ndFbxMeshLoader
@@ -21,8 +20,10 @@ class ndMeshLoader: public ndFbxMeshLoader
 	ndMeshLoader();
 	virtual ~ndMeshLoader();
 
-	virtual ndMesh* LoadMesh(const char* const fbxMeshName, bool loadAnimation = false);
-	virtual ndDemoEntity* LoadEntity(const char* const fbxMeshName, ndDemoEntityManager* const scene);
+	//virtual ndSharedPtr<ndMesh> LoadMesh(const ndString& fbxPathMeshName, bool loadAnimation = false);
+	virtual ndSharedPtr<ndRenderSceneNode> LoadEntity(ndRender* const renderer, const ndString& fbxPathMeshName);
+
+	ndSharedPtr<ndMesh> m_mesh;
 };
 
 #endif

@@ -10,33 +10,12 @@
 */
 
 #include "ndSandboxStdafx.h"
+#include "ndMeshLoader.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
-
-#if 0
-
-static void AddSimpleConcaveMesh(ndDemoEntityManager* const scene, const ndMatrix& matrix, const char* const meshName, int count = 1)
-{
-	ndMeshLoader loader;
-	ndSharedPtr<ndDemoEntity> rootEntity (loader.LoadEntity(meshName, scene));
-	ndSharedPtr<ndDemoEntity> childEntity (rootEntity->GetChildren().GetFirst()->GetInfo());
-	ndSharedPtr<ndShapeInstance>compoundShapeInstance (childEntity->CreateCompoundFromMesh());
-	
-	ndMatrix originMatrix (matrix);
-	for (ndInt32 i = 0; i < count; ++i)
-	{
-		ndDemoEntity* const entity = childEntity->CreateClone();
-		originMatrix.m_posit.m_z += 2.0f;
-		ndVector floor(FindFloor(*scene->GetWorld(), originMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-		originMatrix.m_posit.m_y = floor.m_y + 2.0f;
-		AddRigidBody(scene, originMatrix, *(*compoundShapeInstance), entity, 5.0f);
-	}
-}
-#endif
-
 
 static ndSharedPtr<ndBody> AddRigidBody(
 	ndDemoEntityManager* const scene,
@@ -64,7 +43,8 @@ static void AddSphere(ndDemoEntityManager* const scene)
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
 	descriptor.m_collision = &shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_spherical;
-	descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("earthmap.png"));
+	//descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("earthmap.png"));
+	descriptor.AddMaterial (render->GetTextureCache()->GetTexture(ndGetWorkingFileName("earthmap.png")));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 
 	ndSharedPtr<ndRenderSceneNode>origEntity(new ndRenderSceneNode(ndGetIdentityMatrix()));
@@ -129,7 +109,8 @@ static void AddEmptyBox(ndDemoEntityManager* const scene)
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
 	descriptor.m_collision = &compoundShapeInstance;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
-	descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png"));
+	//descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png"));
+	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png")));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 
 	ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(ndGetIdentityMatrix()));
@@ -141,6 +122,24 @@ static void AddEmptyBox(ndDemoEntityManager* const scene)
 	mBodyMatrix.m_posit.m_y = floor.m_y + 1.5f;
 
 	AddRigidBody(scene, mBodyMatrix, compoundShapeInstance, entity, 10.0f);
+}
+
+static void AddSimpleConcaveMesh(ndDemoEntityManager* const scene, const ndMatrix& matrix, const char* const meshName, int count = 1)
+{
+	ndMeshLoader loader;
+	//ndSharedPtr<ndRenderSceneNode> rootEntity(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName(meshName)));
+	//ndSharedPtr<ndDemoEntity> childEntity(rootEntity->GetChildren().GetFirst()->GetInfo());
+	//ndSharedPtr<ndShapeInstance>compoundShapeInstance(childEntity->CreateCompoundFromMesh());
+	//
+	//ndMatrix originMatrix(matrix);
+	//for (ndInt32 i = 0; i < count; ++i)
+	//{
+	//	ndDemoEntity* const entity = childEntity->CreateClone();
+	//	originMatrix.m_posit.m_z += 2.0f;
+	//	ndVector floor(FindFloor(*scene->GetWorld(), originMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	//	originMatrix.m_posit.m_y = floor.m_y + 2.0f;
+	//	AddRigidBody(scene, originMatrix, *(*compoundShapeInstance), entity, 5.0f);
+	//}
 }
 
 void ndBasicCompoundCollision(ndDemoEntityManager* const scene)
@@ -161,12 +160,12 @@ void ndBasicCompoundCollision(ndDemoEntityManager* const scene)
 
 	ndMatrix location(ndGetIdentityMatrix());
 
-	AddSphere(scene);
-	AddEmptyBox(scene);
+	//AddSphere(scene);
+	//AddEmptyBox(scene);
 
 	location.m_posit.m_y = 0.5f;
 	location.m_posit.m_z = -3.0f;
-	//AddSimpleConcaveMesh(scene, location, "bowl.fbx", 1);
+	AddSimpleConcaveMesh(scene, location, "bowl.fbx", 1);
 
 	location.m_posit.m_z = -5.0f;
 	//AddSimpleConcaveMesh(scene, location, "testConcave.fbx", 1);

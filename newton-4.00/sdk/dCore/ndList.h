@@ -221,7 +221,6 @@ class ndList: public ndClassAlloc
 	void InsertBefore (ndNode* const root, ndNode* const node);
 
 	ndNode* Find (const T &element) const;
-	ndNode* GetNodeFromInfo (T &m_info) const;
 	void Remove (ndNode* const node);
 	void Remove (const T &element);
 	void RemoveAll ();
@@ -556,17 +555,6 @@ typename ndList<T,allocator>::ndNode *ndList<T,allocator>::Find (const T &elemen
 		}
 	}
 	return node;
-}
-
-template<class T, class allocator>
-typename ndList<T,allocator>::ndNode *ndList<T,allocator>::GetNodeFromInfo (T &info) const
-{
-	ndNode* const node = (ndNode *) &info;
-	ndInt64 offset = ((char*) &node->m_info) - ((char *) node);
-	ndNode* const retnode = (ndNode *) (((char *) node) - offset);
-
-	ndAssert (&retnode->GetInfo () == &info);
-	return retnode;
 }
 
 template<class T, class allocator> 

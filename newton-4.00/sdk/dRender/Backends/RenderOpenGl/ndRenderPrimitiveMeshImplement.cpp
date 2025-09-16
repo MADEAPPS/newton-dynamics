@@ -108,7 +108,9 @@ void ndRenderPrimitiveMeshImplement::BuildRenderMesh(const ndRenderPrimitiveMesh
 	ndAssert(descriptor.m_collision);
 	ndMeshEffect mesh(*descriptor.m_collision);
 
-	ndRenderTextureImageCommon* const image = (ndRenderTextureImageCommon*)*descriptor.m_material.m_texture;
+	ndAssert(descriptor.m_materials.GetCount());
+	const ndRenderPrimitiveMeshMaterial& material = descriptor.m_materials.GetFirst()->GetInfo();
+	ndRenderTextureImageCommon* const image = (ndRenderTextureImageCommon*)*material.m_texture;
 	ndInt32 textureId = ndInt32(image->m_texture);
 	switch (descriptor.m_mapping)
 	{
@@ -195,12 +197,12 @@ void ndRenderPrimitiveMeshImplement::BuildRenderMesh(const ndRenderPrimitiveMesh
 	{
 		ndRenderPrimitiveMeshSegment& segment = m_owner->m_segments.Append()->GetInfo();
 
-		segment.m_material.m_texture = descriptor.m_material.m_texture;
-		segment.m_material.m_diffuse = descriptor.m_material.m_diffuse;
-		segment.m_material.m_opacity = descriptor.m_material.m_opacity;
-		segment.m_material.m_specular = descriptor.m_material.m_specular;
-		segment.m_material.m_castShadows = descriptor.m_material.m_castShadows;
-		segment.m_material.m_specularPower = descriptor.m_material.m_specularPower;
+		segment.m_material.m_texture = material.m_texture;
+		segment.m_material.m_diffuse = material.m_diffuse;
+		segment.m_material.m_opacity = material.m_opacity;
+		segment.m_material.m_specular = material.m_specular;
+		segment.m_material.m_castShadows = material.m_castShadows;
+		segment.m_material.m_specularPower = material.m_specularPower;
 
 		segment.m_indexCount = mesh.GetMaterialIndexCount(geometryHandle, handle);
 
@@ -510,7 +512,9 @@ void ndRenderPrimitiveMeshImplement::BuildRenderInstanceMesh(const ndRenderPrimi
 	ndAssert(descriptor.m_collision);
 	ndMeshEffect mesh(*descriptor.m_collision);
 
-	ndRenderTextureImageCommon* const image = (ndRenderTextureImageCommon*)*descriptor.m_material.m_texture;
+	ndAssert(descriptor.m_materials.GetCount());
+	const ndRenderPrimitiveMeshMaterial& material = descriptor.m_materials.GetFirst()->GetInfo();
+	ndRenderTextureImageCommon* const image = (ndRenderTextureImageCommon*)*material.m_texture;
 	ndInt32 textureId = ndInt32(image->m_texture);
 	switch (descriptor.m_mapping)
 	{
@@ -597,12 +601,12 @@ void ndRenderPrimitiveMeshImplement::BuildRenderInstanceMesh(const ndRenderPrimi
 	{
 		ndRenderPrimitiveMeshSegment& segment = m_owner->m_segments.Append()->GetInfo();
 
-		segment.m_material.m_texture = descriptor.m_material.m_texture;
-		segment.m_material.m_diffuse = descriptor.m_material.m_diffuse;
-		segment.m_material.m_opacity = descriptor.m_material.m_opacity;
-		segment.m_material.m_specular = descriptor.m_material.m_specular;
-		segment.m_material.m_castShadows = descriptor.m_material.m_castShadows;
-		segment.m_material.m_specularPower = descriptor.m_material.m_specularPower;
+		segment.m_material.m_texture = material.m_texture;
+		segment.m_material.m_diffuse = material.m_diffuse;
+		segment.m_material.m_opacity = material.m_opacity;
+		segment.m_material.m_specular = material.m_specular;
+		segment.m_material.m_castShadows = material.m_castShadows;
+		segment.m_material.m_specularPower = material.m_specularPower;
 
 		segment.m_indexCount = mesh.GetMaterialIndexCount(geometryHandle, handle);
 

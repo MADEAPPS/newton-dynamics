@@ -29,7 +29,6 @@ class ndSharedPtr
 	ndSharedPtr(T* const ptr);
 	ndSharedPtr(const ndSharedPtr<T>& sp);
 	~ndSharedPtr();
-	ndSharedPtr<T>& operator = (const ndSharedPtr<T>& sp);
 
 	void Swap(ndSharedPtr& src);
 
@@ -40,6 +39,9 @@ class ndSharedPtr
 	const T* operator* () const;
 
 	operator bool() const;
+	bool operator == (const ndSharedPtr<T>& other) const;
+	ndSharedPtr<T>& operator = (const ndSharedPtr<T>& sp);
+
 	ndInt32 GetRefCount() const;
 
 	protected:
@@ -164,9 +166,15 @@ ndSharedPtr<T>::operator bool() const
 }
 
 template <typename T>
+bool ndSharedPtr<T>::operator ==(const ndSharedPtr<T>& other) const
+{
+	return m_ptr == other.m_ptr;
+}
+
+template <typename T>
 ndInt32 ndSharedPtr<T>::GetRefCount() const
 {
-	return m_references->load();
+	return m_references->m_sharedRef.load();
 }
 #endif 
 

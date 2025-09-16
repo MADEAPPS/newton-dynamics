@@ -27,6 +27,5 @@
 #include <lodepng.h>
 #include <ndNewton.h>
 
-
 #endif 
 

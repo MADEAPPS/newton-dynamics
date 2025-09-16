@@ -22,8 +22,8 @@
 #include "ndModelStdafx.h"
 #include "ndMesh.h"
 
-ndMesh::ndMesh(ndMesh* const parent)
-	:ndNodeHierarchy<ndMesh>()
+ndMesh::ndMesh()
+	:ndClassAlloc()
 	,m_matrix(ndGetIdentityMatrix())
 	,m_meshMatrix(ndGetIdentityMatrix())
 	,m_name()
@@ -31,15 +31,13 @@ ndMesh::ndMesh(ndMesh* const parent)
 	,m_scale()
 	,m_posit()
 	,m_rotation()
+	,m_parent(nullptr)
+	,m_childNode(nullptr)
 {
-	if (parent)
-	{
-		Attach(parent);
-	}
 }
 
 ndMesh::ndMesh(const ndMesh& src)
-	:ndNodeHierarchy<ndMesh>(src)
+	:ndClassAlloc()
 	,m_matrix(src.m_matrix)
 	,m_meshMatrix(src.m_meshMatrix)
 	,m_name(src.m_name)
@@ -47,26 +45,29 @@ ndMesh::ndMesh(const ndMesh& src)
 	,m_scale()
 	,m_posit()
 	,m_rotation()
+	,m_parent(nullptr)
+	,m_childNode(nullptr)
 {
-	for (ndCurve::ndNode* node = src.m_scale.GetFirst(); node; node = node->GetNext())
-	{
-		m_scale.Append(node->GetInfo());
-	}
-
-	for (ndCurve::ndNode* node = src.m_posit.GetFirst(); node; node = node->GetNext())
-	{
-		m_posit.Append(node->GetInfo());
-	}
-
-	for (ndCurve::ndNode* node = src.m_rotation.GetFirst(); node; node = node->GetNext())
-	{
-		m_rotation.Append(node->GetInfo());
-	}
+	ndAssert(0);
+	//for (ndCurve::ndNode* node = src.m_scale.GetFirst(); node; node = node->GetNext())
+	//{
+	//	m_scale.Append(node->GetInfo());
+	//}
+	//
+	//for (ndCurve::ndNode* node = src.m_posit.GetFirst(); node; node = node->GetNext())
+	//{
+	//	m_posit.Append(node->GetInfo());
+	//}
+	//
+	//for (ndCurve::ndNode* node = src.m_rotation.GetFirst(); node; node = node->GetNext())
+	//{
+	//	m_rotation.Append(node->GetInfo());
+	//}
 }
 
 //ndMesh::ndMesh(const ndShapeInstance& src)
 ndMesh::ndMesh(const ndShapeInstance&)
-	:ndNodeHierarchy<ndMesh>()
+	:ndClassAlloc()
 	,m_matrix(ndGetIdentityMatrix())
 	,m_meshMatrix(ndGetIdentityMatrix())
 	,m_name()
@@ -74,6 +75,8 @@ ndMesh::ndMesh(const ndShapeInstance&)
 	,m_scale()
 	,m_posit()
 	,m_rotation()
+	,m_parent(nullptr)
+	,m_childNode(nullptr)
 {
 	ndAssert(0);
 	// TO DO: build the mesh form the collision shape;
@@ -81,6 +84,30 @@ ndMesh::ndMesh(const ndShapeInstance&)
 
 ndMesh::~ndMesh()
 {
+}
+
+void ndMesh::AddChild(const ndSharedPtr<ndMesh>& child)
+{
+	ndAssert(!child->m_parent);
+	child->m_parent = this;
+	child->m_childNode = m_children.Append(child);
+}
+
+void ndMesh::RemoveChild(const ndSharedPtr<ndMesh>& child)
+{
+	ndAssert(child->m_childNode);
+	ndAssert(child->m_parent && (child->m_parent == this));
+
+	ndList<ndSharedPtr<ndMesh>>::ndNode* const node = child->m_childNode;
+	child->m_parent = nullptr;
+	child->m_childNode = nullptr;
+
+	m_children.Remove(node);
+}
+
+ndList<ndSharedPtr<ndMesh>>& ndMesh::GetChildren()
+{
+	return m_children;
 }
 
 const ndString& ndMesh::GetName() const
@@ -146,17 +173,17 @@ void ndMesh::SetMesh(const ndSharedPtr<ndMeshEffect>& mesh)
 ndMatrix ndMesh::CalculateGlobalMatrix(ndMesh* const parent) const
 {
 	ndMatrix matrix(ndGetIdentityMatrix());
-	for (const ndMesh* ptr = this; ptr != parent; ptr = ptr->GetParent())
-	{
-		matrix = matrix * ptr->m_matrix;
-	}
+	ndAssert(0);
+	//for (const ndMesh* ptr = this; ptr != parent; ptr = ptr->GetParent())
+	//{
+	//	matrix = matrix * ptr->m_matrix;
+	//}
 	return matrix;
 }
 
 void ndMesh::ApplyTransform(const ndMatrix& transform)
 {
-	ndInt32 stack = 1;
-	ndMesh* entBuffer[1024];
+	ndFixSizeArray<ndMesh*, 1024> entBuffer(0);
 
 	auto GetKeyframe = [](const ndCurveValue& scale, const ndCurveValue& position, const ndCurveValue& rotation)
 	{
@@ -169,12 +196,11 @@ void ndMesh::ApplyTransform(const ndMatrix& transform)
 		return matrix;
 	};
 
-	entBuffer[0] = this;
+	entBuffer.PushBack(this);
 	ndMatrix invTransform(transform.Inverse4x4());
-	while (stack)
+	while (entBuffer.GetCount())
 	{
-		stack--;
-		ndMesh* const node = entBuffer[stack];
+		ndMesh* const node = entBuffer.Pop();
 
 		ndMatrix entMatrix(invTransform * node->m_matrix * transform);
 		node->m_matrix = entMatrix;
@@ -225,11 +251,10 @@ void ndMesh::ApplyTransform(const ndMatrix& transform)
 			}
 		}
 
-		for (ndMesh* child = node->GetFirstChild(); child; child = child->GetNext())
+		for (ndList<ndSharedPtr<ndMesh>>::ndNode* childNode = node->GetChildren().GetFirst(); childNode; childNode = childNode->GetNext())
 		{
-			entBuffer[stack] = child;
-			stack++;
-			ndAssert(stack < ndInt32(sizeof(entBuffer) / sizeof (entBuffer[0])));
+			ndMesh* const child = *childNode->GetInfo();
+			entBuffer.PushBack(child);
 		}
 	}
 }

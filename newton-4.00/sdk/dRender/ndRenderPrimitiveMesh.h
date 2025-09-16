@@ -68,8 +68,9 @@ class ndRenderPrimitiveMesh : public ndRenderPrimitive
 		public:
 		ndDescriptor(ndRender* const render)
 			:m_render(render)
+			,m_meshNode(nullptr)
 			,m_collision(nullptr)
-			,m_material()
+			,m_materials()
 			,m_mapping(m_box)
 			,m_uvMatrix(ndGetIdentityMatrix())
 			,m_meshBuildMode(m_simplePrimitve)
@@ -78,9 +79,18 @@ class ndRenderPrimitiveMesh : public ndRenderPrimitive
 		{
 		}
 
+		ndRenderPrimitiveMeshMaterial& AddMaterial(const ndSharedPtr<ndRenderTexture>& texture)
+		{
+			ndList<ndRenderPrimitiveMeshMaterial>::ndNode* const node = m_materials.Append();
+			node->GetInfo().m_texture = texture;
+			return node->GetInfo();
+		}
+
 		ndRender* m_render;
+		const ndMeshEffect* m_meshNode;
 		const ndShapeInstance* m_collision;
-		ndRenderPrimitiveMeshMaterial m_material;
+		//ndRenderPrimitiveMeshMaterial m_material;
+		ndList<ndRenderPrimitiveMeshMaterial> m_materials;
 		ndUvMapingMode m_mapping;
 		ndMatrix m_uvMatrix;
 		ndMeshBuildMode m_meshBuildMode;
