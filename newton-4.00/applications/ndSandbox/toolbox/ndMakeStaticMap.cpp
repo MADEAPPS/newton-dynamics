@@ -389,7 +389,7 @@ ndSharedPtr<ndBody> BuildFloorBox(ndDemoEntityManager* const scene, const ndMatr
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
+	ndSharedPtr<ndShapeInstance>box(new ndShapeInstance(new ndShapeBox(200.0f, 1.0f, 200.f)));
 	ndMatrix uvMatrix(ndGetIdentityMatrix());
 	uvMatrix[0][0] *= uvTiling;
 	uvMatrix[1][1] *= uvTiling;
@@ -398,7 +398,7 @@ ndSharedPtr<ndBody> BuildFloorBox(ndDemoEntityManager* const scene, const ndMatr
 	ndRender* const render = *scene->GetRenderer();
 
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
-	descriptor.m_collision = &box;
+	descriptor.m_collision = box;
 	descriptor.m_uvMatrix = uvMatrix;
 	descriptor.m_stretchMaping = false;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
@@ -416,7 +416,7 @@ ndSharedPtr<ndBody> BuildFloorBox(ndDemoEntityManager* const scene, const ndMatr
 	ndSharedPtr<ndBody> body(kinematic ? new ndBodyKinematic() : new ndBodyDynamic());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(location);
-	body->GetAsBodyKinematic()->SetCollisionShape(box);
+	body->GetAsBodyKinematic()->SetCollisionShape(**box);
 	
 	world->AddBody(body);
 	scene->AddEntity(entity);
@@ -443,7 +443,7 @@ ndSharedPtr<ndBody> BuildFlatPlane(ndDemoEntityManager* const scene, const ndMat
 	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(ndVector), 31, &index[1][0], 3);
 	meshBuilder.End(optimized);
 	
-	ndShapeInstance plane(new ndShapeStatic_bvh(meshBuilder));
+	ndSharedPtr<ndShapeInstance>plane(new ndShapeInstance(new ndShapeStatic_bvh(meshBuilder)));
 	ndMatrix uvMatrix(ndGetIdentityMatrix());
 	uvMatrix[0][0] *= 1.0f / 10.0f;
 	uvMatrix[1][1] *= 1.0f / 10.0f;
@@ -451,7 +451,7 @@ ndSharedPtr<ndBody> BuildFlatPlane(ndDemoEntityManager* const scene, const ndMat
 
 	ndRender* const render = *scene->GetRenderer();
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
-	descriptor.m_collision = &plane;
+	descriptor.m_collision = plane;
 	descriptor.m_uvMatrix = uvMatrix;
 	descriptor.m_stretchMaping = false;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
@@ -467,7 +467,7 @@ ndSharedPtr<ndBody> BuildFlatPlane(ndDemoEntityManager* const scene, const ndMat
 	ndSharedPtr<ndBody> body(kinematic ? new ndBodyKinematic() : new ndBodyDynamic());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
-	body->GetAsBodyKinematic()->SetCollisionShape(plane);
+	body->GetAsBodyKinematic()->SetCollisionShape(**plane);
 	
 	world->AddBody(body);
 	scene->AddEntity(entity);

@@ -257,9 +257,9 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 
 	ndFloat32 mass = 1.0f;
 	ndFloat32 diameter = 0.5f;
-	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.25f, diameter * 0.25f, diameter * 1.0f));
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeCapsule(diameter * 0.25f, diameter * 0.25f, diameter * 1.0f)));
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
-	descriptor.m_collision = &shape;
+	descriptor.m_collision = shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_capsule;
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("smilli.png")));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
@@ -272,7 +272,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 		// add a spherical motor.
 		matrix.m_posit.m_y = floor.m_y;
 		matrix.m_posit.m_y += diameter;
-		ndSharedPtr<ndBody> body (MakePrimitive(scene, matrix, shape, mesh, mass));
+		ndSharedPtr<ndBody> body (MakePrimitive(scene, matrix, **shape, mesh, mass));
 		ndMatrix pinAlign(ndRollMatrix(180.0f * ndDegreeToRad));
 		ndMatrix bodyMatrix0(pinAlign * body->GetMatrix());
 		bodyMatrix0.m_posit.m_y += diameter * 0.5f + diameter * 0.25f;
@@ -291,7 +291,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 		for (ndInt32 i = 0; i < count; ++i)
 		{
 			matrix.m_posit.m_y += diameter;
-			ndSharedPtr<ndBody> body (MakePrimitive(scene, matrix, shape, mesh, mass));
+			ndSharedPtr<ndBody> body (MakePrimitive(scene, matrix, **shape, mesh, mass));
 			array[i] = body->GetAsBodyDynamic();
 		}
 
@@ -331,7 +331,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 		for (ndInt32 i = 0; i < count; ++i)
 		{
 			matrix.m_posit.m_y += diameter;
-			ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, shape, mesh, mass));
+			ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, **shape, mesh, mass));
 			//ndVector inertia(body->GetMassMatrix());
 			//ndFloat32 maxI(dMax(dMax(inertia.m_x, inertia.m_z), inertia.m_z));
 			//inertia.m_x = maxI;
@@ -414,11 +414,9 @@ static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin,
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndRender* const render = *scene->GetRenderer();
 
-	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
-	//ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
-
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeBox(diameter, diameter, diameter)));
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
-	descriptor.m_collision = &shape;
+	descriptor.m_collision = shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png")));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
@@ -434,7 +432,7 @@ static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin,
 	{
 		// spring damper and limits
 		matrix.m_posit.m_y += 2.0f;
-		ndSharedPtr<ndBody> body (MakePrimitive(scene, matrix, shape, mesh, mass));
+		ndSharedPtr<ndBody> body (MakePrimitive(scene, matrix, **shape, mesh, mass));
 		ndJointHinge* const joint = new ndJointHinge(matrix, body->GetAsBodyDynamic(), fixBody);
 		joint->SetAsSpringDamper(0.1f, 20.0f, 1.0f);
 		joint->SetLimits(-3.0f, 3.0f);
@@ -446,7 +444,7 @@ static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin,
 	{
 		// viscous friction and limits
 		matrix.m_posit.m_y += 1.2f;
-		ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, shape, mesh, mass));
+		ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, **shape, mesh, mass));
 		ndJointHinge* const joint = new ndJointHinge(matrix, body->GetAsBodyDynamic(), fixBody);
 		joint->SetAsSpringDamper(0.1f, 0.0f, 1.0f);
 		joint->SetLimits(-10.0f, 15.0f);
@@ -458,7 +456,7 @@ static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin,
 	{
 		// proportional derivative hinge oscillator with limits
 		matrix.m_posit.m_y += 1.2f;
-		ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, shape, mesh, mass));
+		ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, **shape, mesh, mass));
 		ndJointHinge* const joint = new ndJointHingeOscillator(matrix, body->GetAsBodyDynamic(), fixBody);
 		joint->SetAsSpringDamper(0.1f, 1500.0f, 10.0f);
 		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
@@ -468,7 +466,7 @@ static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin,
 	{
 		// proportional derivative hinge motor with limits
 		matrix.m_posit.m_y += 1.2f;
-		ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, shape, mesh, mass));
+		ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, **shape, mesh, mass));
 		ndJointHinge* const joint = new ndJointHingeMotor(matrix, body->GetAsBodyDynamic(), fixBody);
 		joint->SetAsSpringDamper(0.1f, 1500.0f, 10.0f);
 		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
@@ -501,9 +499,9 @@ static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndRender* const render = *scene->GetRenderer();
 
-	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeBox(diameter, diameter, diameter)));
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
-	descriptor.m_collision = &shape;
+	descriptor.m_collision = shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png")));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
@@ -519,7 +517,7 @@ static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin
 	{
 		// spring damper slider with limits
 		matrix.m_posit.m_y += 2.0f;
-		ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, shape, mesh, mass));
+		ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, **shape, mesh, mass));
 		ndJointSlider* const joint = new ndJointSlider(ndYawMatrix(90.0f * ndDegreeToRad) * matrix, body->GetAsBodyDynamic(), fixBody);
 		joint->SetAsSpringDamper(0.1f, 100.0f, 5.0f);
 		joint->SetLimits(-1.0f, 1.0f);
@@ -531,7 +529,7 @@ static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin
 	{
 		// viscous damper slider with limits
 		matrix.m_posit.m_y += 1.2f;
-		ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, shape, mesh, mass));
+		ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, **shape, mesh, mass));
 		ndJointSlider* const joint = new ndJointSlider(ndYawMatrix(90.0f * ndDegreeToRad) * matrix, body->GetAsBodyDynamic(), fixBody);
 		joint->SetAsSpringDamper(0.1f, 0.0f, 10.0f);
 		joint->SetLimits(-1.0f, 1.0f);
@@ -543,7 +541,7 @@ static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin
 	{
 		// proportional derivative slider oscillator with limits
 		matrix.m_posit.m_y += 1.2f;
-		ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, shape, mesh, mass));
+		ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, **shape, mesh, mass));
 		ndJointSlider* const joint = new ndJointSliderOscillator(ndYawMatrix(90.0f * ndDegreeToRad) * matrix, body->GetAsBodyDynamic(), fixBody);
 		joint->SetAsSpringDamper(0.1f, 500.0f, 10.0f);
 		joint->SetLimits(-1.0f, 1.0f);
@@ -558,9 +556,9 @@ static void BuildGear(ndDemoEntityManager* const scene, const ndVector& origin, 
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndRender* const render = *scene->GetRenderer();
 
-	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeBox(diameter, diameter, diameter)));
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
-	descriptor.m_collision = &shape;
+	descriptor.m_collision = shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png")));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
@@ -575,10 +573,10 @@ static void BuildGear(ndDemoEntityManager* const scene, const ndVector& origin, 
 	matrix.m_posit.m_y += 2.0f;
 
 	ndBodyKinematic* const fixBody = world->GetSentinelBody();
-	ndSharedPtr<ndBody> body0 (MakePrimitive(scene, matrix, shape, mesh, mass));
+	ndSharedPtr<ndBody> body0 (MakePrimitive(scene, matrix, **shape, mesh, mass));
 
 	matrix.m_posit.m_y += diameter * 1.5f;
-	ndSharedPtr<ndBody> body1 (MakePrimitive(scene, matrix, shape, mesh, mass));
+	ndSharedPtr<ndBody> body1 (MakePrimitive(scene, matrix, **shape, mesh, mass));
 
 	ndVector pin(matrix.m_front);
 	ndSharedPtr<ndJointBilateralConstraint> joint0(new ndJointHinge(matrix, body0->GetAsBodyDynamic(), fixBody));
@@ -621,9 +619,9 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& o
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndRender* const render = *scene->GetRenderer();
 
-	ndShapeInstance shape(new ndShapeCylinder(diameter, diameter, diameter * 0.5f));
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeCylinder(diameter, diameter, diameter * 0.5f)));
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
-	descriptor.m_collision = &shape;
+	descriptor.m_collision = shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_cylindrical;
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png")));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
@@ -639,7 +637,7 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& o
 
 	ndBodyKinematic* const fixBody = world->GetSentinelBody();
 	{
-		ndSharedPtr<ndBody> body (MakePrimitive(scene, matrix, shape, mesh, mass));
+		ndSharedPtr<ndBody> body (MakePrimitive(scene, matrix, **shape, mesh, mass));
 		body->SetOmega(ndVector(0.0f, 10.0f, 20.0f, 0.0f));
 
 		ndJointDoubleHinge* const joint = new ndJointDoubleHinge(matrix, body->GetAsBodyDynamic(), fixBody);
@@ -650,7 +648,7 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& o
 	{
 		// proportional derivative double hinge motor
 		matrix.m_posit.m_z += 1.8f;
-		ndSharedPtr<ndBody> body (MakePrimitive(scene, matrix, shape, mesh, mass));
+		ndSharedPtr<ndBody> body (MakePrimitive(scene, matrix, **shape, mesh, mass));
 		ndJointDoubleHinge* const joint = new ndJointDoubleHingeMotor(matrix, body->GetAsBodyDynamic(), fixBody);
 		joint->SetAsSpringDamper0(0.1f, 1500.0f, 10.0f);
 		joint->SetAsSpringDamper1(0.1f, 1500.0f, 10.0f);
@@ -664,9 +662,9 @@ static void BuildRoller(ndDemoEntityManager* const scene, const ndVector& origin
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndRender* const render = *scene->GetRenderer();
 
-	ndShapeInstance shape(new ndShapeChamferCylinder(diameter * 0.5f, diameter));
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeChamferCylinder(diameter * 0.5f, diameter)));
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
-	descriptor.m_collision = &shape;
+	descriptor.m_collision = shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_cylindrical;
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png")));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
@@ -682,7 +680,7 @@ static void BuildRoller(ndDemoEntityManager* const scene, const ndVector& origin
 	{
 		// spring damper slider with limits
 		matrix.m_posit.m_y += 2.0f;
-		ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, shape, mesh, mass));
+		ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, **shape, mesh, mass));
 		ndJointRoller* const joint = new ndJointRoller(ndPitchMatrix(90.0f * ndDegreeToRad) * matrix, body->GetAsBodyDynamic(), fixBody);
 		joint->SetAsSpringDamperPosit(0.1f, 100.0f, 5.0f);
 		joint->SetLimitsPosit(-1.0f, 1.0f);
@@ -697,9 +695,9 @@ static void BuildCylindrical(ndDemoEntityManager* const scene, const ndVector& o
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndRender* const render = *scene->GetRenderer();
 
-	ndShapeInstance shape(new ndShapeChamferCylinder(diameter * 0.5f, diameter));
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeChamferCylinder(diameter * 0.5f, diameter)));
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
-	descriptor.m_collision = &shape;
+	descriptor.m_collision = shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_cylindrical;
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png")));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
@@ -715,7 +713,7 @@ static void BuildCylindrical(ndDemoEntityManager* const scene, const ndVector& o
 	{
 		// spring damper slider with limits
 		matrix.m_posit.m_y += 2.0f;
-		ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, shape, mesh, mass));
+		ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, **shape, mesh, mass));
 		ndJointCylinder* const joint = new ndJointCylinder(matrix, body->GetAsBodyDynamic(), fixBody);
 		joint->SetAsSpringDamperPosit(0.1f, 100.0f, 5.0f);
 		joint->SetLimitsPosit(-1.0f, 1.0f);
@@ -730,9 +728,9 @@ void BuildFixDistanceJoints(ndDemoEntityManager* const scene, const ndVector& or
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndRender* const render = *scene->GetRenderer();
 
-	ndShapeInstance shape(new ndShapeSphere(0.25f));
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeSphere(0.25f)));
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
-	descriptor.m_collision = &shape;
+	descriptor.m_collision = shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_spherical;
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("earthmap.png")));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
@@ -742,28 +740,28 @@ void BuildFixDistanceJoints(ndDemoEntityManager* const scene, const ndVector& or
 	ndBodyDynamic* bodies[8];
 
 	matrix.m_posit = origin + ndVector(0.0f, 4.0f, 0.0f, 0.0f);
-	bodies[0] = MakePrimitive(scene, matrix, shape, mesh, 5.0f)->GetAsBodyDynamic();
+	bodies[0] = MakePrimitive(scene, matrix, **shape, mesh, 5.0f)->GetAsBodyDynamic();
 
 	matrix.m_posit = origin + ndVector(2.0f, 4.0f, 0.0f, 0.0f);
-	bodies[1] = MakePrimitive(scene, matrix, shape, mesh, 5.0f)->GetAsBodyDynamic();
+	bodies[1] = MakePrimitive(scene, matrix, **shape, mesh, 5.0f)->GetAsBodyDynamic();
 
 	matrix.m_posit = origin + ndVector(2.0f, 4.0f, 2.0f, 0.0f);
-	bodies[2] = MakePrimitive(scene, matrix, shape, mesh, 5.0f)->GetAsBodyDynamic();
+	bodies[2] = MakePrimitive(scene, matrix, **shape, mesh, 5.0f)->GetAsBodyDynamic();
 
 	matrix.m_posit = origin + ndVector(0.0f, 4.0f, 2.0f, 0.0f);
-	bodies[3] = MakePrimitive(scene, matrix, shape, mesh, 5.0f)->GetAsBodyDynamic();
+	bodies[3] = MakePrimitive(scene, matrix, **shape, mesh, 5.0f)->GetAsBodyDynamic();
 
 	matrix.m_posit = origin + ndVector(0.0f, 6.0f, 0.0f, 0.0f);
-	bodies[4] = MakePrimitive(scene, matrix, shape, mesh, 5.0f)->GetAsBodyDynamic();
+	bodies[4] = MakePrimitive(scene, matrix, **shape, mesh, 5.0f)->GetAsBodyDynamic();
 
 	matrix.m_posit = origin + ndVector(2.0f, 6.0f, 0.0f, 0.0f);
-	bodies[5] = MakePrimitive(scene, matrix, shape, mesh, 5.0f)->GetAsBodyDynamic();
+	bodies[5] = MakePrimitive(scene, matrix, **shape, mesh, 5.0f)->GetAsBodyDynamic();
 
 	matrix.m_posit = origin + ndVector(2.0f, 6.0f, 2.0f, 0.0f);
-	bodies[6] = MakePrimitive(scene, matrix, shape, mesh, 5.0f)->GetAsBodyDynamic();
+	bodies[6] = MakePrimitive(scene, matrix, **shape, mesh, 5.0f)->GetAsBodyDynamic();
 
 	matrix.m_posit = origin + ndVector(0.0f, 6.0f, 2.0f, 0.0f);
-	bodies[7] = MakePrimitive(scene, matrix, shape, mesh, 5.0f)->GetAsBodyDynamic();
+	bodies[7] = MakePrimitive(scene, matrix, **shape, mesh, 5.0f)->GetAsBodyDynamic();
 
 	for (ndInt32 i = 0; i < 8; ++i)
 	{
@@ -787,9 +785,9 @@ static void BuildRollingFriction(ndDemoEntityManager* const scene, const ndVecto
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
-	ndShapeInstance shape(new ndShapeSphere(diameter * 0.5f));
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeSphere(diameter * 0.5f)));
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
-	descriptor.m_collision = &shape;
+	descriptor.m_collision = shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_spherical;
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("earthmap.png")));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
@@ -798,7 +796,7 @@ static void BuildRollingFriction(ndDemoEntityManager* const scene, const ndVecto
 	ndVector posit(matrix.m_posit);
 	for (ndInt32 i = 0; i < 8; ++i)
 	{
-		ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, shape, mesh, mass));
+		ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, **shape, mesh, mass));
 		ndJointBilateralConstraint* const joint = new ndJointDryRollingFriction(body->GetAsBodyDynamic(), world->GetSentinelBody(), 0.5f);
 		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
 		world->AddJoint(jointPtr);

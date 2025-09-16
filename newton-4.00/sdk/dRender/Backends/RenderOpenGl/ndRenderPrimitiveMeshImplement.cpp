@@ -33,13 +33,13 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(ndRenderPrimitive
 	,m_vertextArrayBuffer(0)
 	,m_instanceRenderMatrixPalleteBuffer(0)
 {
-	if (descriptor.m_collision)
+	if (*descriptor.m_collision)
 	{
 		BuildFromCollisionShape(descriptor);
 	}
 	else
 	{
-		ndAssert(*descriptor.m_meshNode____);
+		ndAssert(*descriptor.m_meshNode);
 		BuildFromMesh(descriptor);
 	}
 
@@ -134,8 +134,8 @@ void ndRenderPrimitiveMeshImplement::BuildFromMesh(const ndRenderPrimitiveMesh::
 
 void ndRenderPrimitiveMeshImplement::BuildRenderMeshFromCollisionShape(const ndRenderPrimitiveMesh::ndDescriptor& descriptor)
 {
-	ndAssert(descriptor.m_collision);
-	ndMeshEffect mesh(*descriptor.m_collision);
+	ndAssert(*descriptor.m_collision);
+	ndMeshEffect mesh(**descriptor.m_collision);
 
 	ndAssert(descriptor.m_materials.GetCount());
 	const ndRenderPrimitiveMeshMaterial& material = descriptor.m_materials.GetFirst()->GetInfo();
@@ -272,7 +272,7 @@ void ndRenderPrimitiveMeshImplement::BuildRenderMeshFromCollisionShape(const ndR
 
 void ndRenderPrimitiveMeshImplement::BuildRenderMeshFromMeshEffect(const ndRenderPrimitiveMesh::ndDescriptor& descriptor)
 {
-	ndMeshEffect& mesh = *((ndMeshEffect*)*descriptor.m_meshNode____);
+	ndMeshEffect& mesh = *((ndMeshEffect*)*descriptor.m_meshNode);
 
 	ndAssert(descriptor.m_materials.GetCount());
 	//const ndRenderPrimitiveMeshMaterial& material = descriptor.m_materials.GetFirst()->GetInfo();
@@ -681,7 +681,7 @@ void ndRenderPrimitiveMeshImplement::BuildSetZBufferDebugMesh(const ndRenderPrim
 void ndRenderPrimitiveMeshImplement::BuildRenderInstanceMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor)
 {
 	ndAssert(descriptor.m_collision);
-	ndMeshEffect mesh(*descriptor.m_collision);
+	ndMeshEffect mesh(**descriptor.m_collision);
 
 	ndAssert(descriptor.m_materials.GetCount());
 	const ndRenderPrimitiveMeshMaterial& material = descriptor.m_materials.GetFirst()->GetInfo();

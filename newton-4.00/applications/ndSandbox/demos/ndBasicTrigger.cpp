@@ -31,11 +31,11 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 	matrix.m_posit.m_y += 2.0f;
 
 	// make a triger volume
-	ndShapeInstance shape(new ndShapeBox(20.0f, 10.0f, 20.0f));
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeBox(20.0f, 10.0f, 20.0f)));
 
 	// make a tranparent visual mesh
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(*scene->GetRenderer());
-	descriptor.m_collision = &shape;
+	descriptor.m_collision = shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
 	ndRenderPrimitiveMeshMaterial& material = descriptor.AddMaterial(scene->GetRenderer()->GetTextureCache()->GetTexture(ndGetWorkingFileName("metal_30.png")));
 	material.m_opacity = ndFloat32(0.3f);
@@ -49,7 +49,7 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndBody> body(new ndArchimedesBuoyancyVolume());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
-	body->GetAsBodyKinematic()->SetCollisionShape(shape);
+	body->GetAsBodyKinematic()->SetCollisionShape(**shape);
 	world->AddBody(body);
 	scene->AddEntity(entity);
 }

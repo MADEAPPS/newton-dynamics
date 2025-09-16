@@ -18,17 +18,10 @@
 
 ndRenderSceneNodeInstance::ndRenderSceneNodeInstance(const ndMatrix& matrix, const ndRenderPrimitiveMesh::ndDescriptor& descriptor)
 	:ndRenderSceneNode(matrix)
-	,m_savedShape(nullptr)
 	,m_descriptor(descriptor)
 	,m_implement()
 	,m_isInitialized(false)
 {
-	if (m_descriptor.m_collision)
-	{
-		ndAssert(0);
-		m_savedShape = ndSharedPtr<ndShapeInstance>(new ndShapeInstance(*m_descriptor.m_collision));
-		m_descriptor.m_collision = *m_savedShape;
-	}
 	m_descriptor.m_meshBuildMode = ndRenderPrimitiveMesh::m_instancePrimitve;
 	m_implement = ndSharedPtr<ndRenderSceneNodeInstanceImplement>(new ndRenderSceneNodeInstanceImplement(this));
 }

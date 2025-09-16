@@ -28,11 +28,12 @@ static ndSharedPtr<ndBody> CreateFlyWheel(ndDemoEntityManager* const scene, cons
 	ndMatrix offset(ndGetIdentityMatrix());
 	offset.m_posit.m_x = lenght * 0.5f;
 	wheel.SetLocalMatrix(offset);
-	ndShapeInstance flyWheelShape(new ndShapeCompound());
-	ndShapeCompound* const compound = flyWheelShape.GetShape()->GetAsShapeCompound();
+	//ndShapeInstance flyWheelShape(new ndShapeCompound());
+	ndSharedPtr<ndShapeInstance>flyWheelShape(new ndShapeInstance(new ndShapeCompound()));
+	ndShapeCompound* const compound = flyWheelShape->GetShape()->GetAsShapeCompound();
 	compound->BeginAddRemove();
-	compound->AddCollision(&rod);
-	compound->AddCollision(&wheel);
+		compound->AddCollision(&rod);
+		compound->AddCollision(&wheel);
 	compound->EndAddRemove();
 	
 	ndMatrix matrix(ndRollMatrix(tiltAnsgle * ndDegreeToRad));
@@ -41,7 +42,7 @@ static ndSharedPtr<ndBody> CreateFlyWheel(ndDemoEntityManager* const scene, cons
 	matrix.m_posit.m_w = 1.0f;
 
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
-	descriptor.m_collision = &flyWheelShape;
+	descriptor.m_collision = flyWheelShape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("smilli.png")));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
@@ -52,8 +53,8 @@ static ndSharedPtr<ndBody> CreateFlyWheel(ndDemoEntityManager* const scene, cons
 	ndSharedPtr<ndBody> body (new ndBodyDynamic());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
-	body->GetAsBodyDynamic()->SetCollisionShape(flyWheelShape);
-	body->GetAsBodyDynamic()->SetMassMatrix(mass, flyWheelShape);
+	body->GetAsBodyDynamic()->SetCollisionShape(**flyWheelShape);
+	body->GetAsBodyDynamic()->SetMassMatrix(mass, **flyWheelShape);
 	ndVector omega(matrix.m_front.Scale (speed));
 	body->SetOmega(omega);
 	
@@ -77,9 +78,9 @@ static ndSharedPtr<ndBody> DzhanibekovEffect(ndDemoEntityManager* const scene, n
 	ndPhysicsWorld* const world = scene->GetWorld();
 	matrix.m_posit.m_y += 5.0f;
 
-	ndShapeInstance shape(new ndShapeBox(2.0f, 0.5f, 1.0));
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeBox(2.0f, 0.5f, 1.0)));
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
-	descriptor.m_collision = &shape;
+	descriptor.m_collision = shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("smilli.png")));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
@@ -93,8 +94,8 @@ static ndSharedPtr<ndBody> DzhanibekovEffect(ndDemoEntityManager* const scene, n
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity, nullptr, ndVector (ndFloat32 (0.0f))));
 	body->SetOmega(omega);
 	body->SetMatrix(matrix);
-	body->GetAsBodyDynamic()->SetCollisionShape(shape);
-	body->GetAsBodyDynamic()->SetMassMatrix(mass, shape);
+	body->GetAsBodyDynamic()->SetCollisionShape(**shape);
+	body->GetAsBodyDynamic()->SetMassMatrix(mass, **shape);
 
 	world->AddBody(body);
 	scene->AddEntity(entity);
@@ -111,11 +112,11 @@ static ndSharedPtr<ndBody> Phitop(ndDemoEntityManager* const scene, ndFloat32 ma
 	ndPhysicsWorld* const world = scene->GetWorld();
 	matrix.m_posit.m_y += 0.5f;
 
-	ndShapeInstance shape(new ndShapeSphere(1.0f));
-	shape.SetScale(ndVector(0.5f, 0.5f, 1.0f, 0.0f));
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeSphere(1.0f)));
+	shape->SetScale(ndVector(0.5f, 0.5f, 1.0f, 0.0f));
 
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
-	descriptor.m_collision = &shape;
+	descriptor.m_collision = shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_spherical;
 	descriptor.m_uvMatrix = ndPitchMatrix(ndPi);
 	//descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("marble.png"));
@@ -131,8 +132,8 @@ static ndSharedPtr<ndBody> Phitop(ndDemoEntityManager* const scene, ndFloat32 ma
 
 	body->SetOmega(omega);
 	body->SetMatrix(matrix);
-	body->GetAsBodyDynamic()->SetCollisionShape(shape);
-	body->GetAsBodyDynamic()->SetMassMatrix(mass, shape);
+	body->GetAsBodyDynamic()->SetCollisionShape(**shape);
+	body->GetAsBodyDynamic()->SetMassMatrix(mass, **shape);
 
 	world->AddBody(body);
 	scene->AddEntity(entity);
@@ -144,15 +145,15 @@ static ndSharedPtr<ndBody> PrecessingTop(ndDemoEntityManager* const scene, const
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndRender* const render = *scene->GetRenderer();
 
-	ndShapeInstance shape(new ndShapeCone(0.7f, 1.0f));
-	shape.SetLocalMatrix(ndRollMatrix(-90.0f * ndDegreeToRad));
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeCone(0.7f, 1.0f)));
+	shape->SetLocalMatrix(ndRollMatrix(-90.0f * ndDegreeToRad));
 
 	ndMatrix matrix(ndPitchMatrix(15.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
-	descriptor.m_collision = &shape;
+	descriptor.m_collision = shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_cylindrical;
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("smilli.png")));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
@@ -166,8 +167,8 @@ static ndSharedPtr<ndBody> PrecessingTop(ndDemoEntityManager* const scene, const
 	ndSharedPtr<ndBody> body(new ndBodyDynamic());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
-	body->GetAsBodyDynamic()->SetCollisionShape(shape);
-	body->GetAsBodyDynamic()->SetMassMatrix(mass, shape);
+	body->GetAsBodyDynamic()->SetCollisionShape(**shape);
+	body->GetAsBodyDynamic()->SetMassMatrix(mass, **shape);
 	body->SetOmega(matrix.m_up.Scale(40.0f));
 
 	world->AddBody(body);
@@ -187,11 +188,11 @@ static ndSharedPtr<ndBody> RattleBack(ndDemoEntityManager* const scene, ndFloat3
 
 	ndMatrix shapeMatrix(ndYawMatrix(5.0f * ndDegreeToRad));
 
-	ndShapeInstance shape(new ndShapeSphere(1.0f));
-	shape.SetScale(ndVector(0.3f, 0.25f, 1.0f, 0.0f));
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeSphere(1.0f)));
+	shape->SetScale(ndVector(0.3f, 0.25f, 1.0f, 0.0f));
 
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
-	descriptor.m_collision = &shape;
+	descriptor.m_collision = shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_spherical;
 
 	descriptor.m_uvMatrix = ndRollMatrix(-ndPi * 0.5f) * ndPitchMatrix(ndPi * 0.5f);
@@ -202,16 +203,17 @@ static ndSharedPtr<ndBody> RattleBack(ndDemoEntityManager* const scene, ndFloat3
 	ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(ndGetIdentityMatrix()));
 	entity->SetPrimitive(mesh);
 
-	matrix = FindFloor(*world, matrix, shape, 200.0f);
+	matrix = FindFloor(*world, matrix, **shape, 200.0f);
 
 	ndSharedPtr<ndBody> body(new ndBodyDynamic());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 
 	body->SetMatrix(matrix);
-	body->GetAsBodyDynamic()->SetCollisionShape(shape);
+
 	// skew the inertia matrix for rattle effect
-	shape.SetLocalMatrix(shapeMatrix);
-	body->GetAsBodyDynamic()->SetMassMatrix(mass, shape, true);
+	shape->SetLocalMatrix(shapeMatrix);
+	body->GetAsBodyDynamic()->SetCollisionShape(**shape);
+	body->GetAsBodyDynamic()->SetMassMatrix(mass, **shape, true);
 	body->SetCentreOfMass(ndVector(0.0f, -0.1f, 0.0f, 0.0f));
 
 	ndVector omega(0.0f, speed, 0.0f, 0.0f);

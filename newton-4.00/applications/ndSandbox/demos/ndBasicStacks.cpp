@@ -77,9 +77,9 @@ void BuildPyramidStacks(ndDemoEntityManager* const scene, ndFloat32 mass, const 
 
 	ndRender* const render = *scene->GetRenderer();
 
-	ndShapeInstance shape(new ndShapeBox(size.m_x, size.m_y, size.m_z));
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeBox(size.m_x, size.m_y, size.m_z)));
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
-	descriptor.m_collision = &shape;
+	descriptor.m_collision = shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png")));
 	ndSharedPtr<ndRenderSceneNode>root(new ndRenderSceneNodeInstance(ndGetIdentityMatrix(), descriptor));
@@ -88,7 +88,7 @@ void BuildPyramidStacks(ndDemoEntityManager* const scene, ndFloat32 mass, const 
 	origin1.m_z = 0.0f;
 	origin1.m_x += 3.0f;
 	ndRenderSceneNodeInstance* const instanceRoot = root->GetAsInstance();
-	BuildPyramid(scene, instanceRoot, shape, mass, origin1, boxSize, stackHigh);
+	BuildPyramid(scene, instanceRoot, **shape, mass, origin1, boxSize, stackHigh);
 	
 	instanceRoot->Finalize();
 }
@@ -102,11 +102,11 @@ static void BuildSphereColumn(ndDemoEntityManager* const scene, ndFloat32 mass, 
 	ndVector blockBoxSize(size);
 	// create the stack
 	ndMatrix baseMatrix(ndGetIdentityMatrix());
-	ndShapeInstance shape(new ndShapeSphere(blockBoxSize.m_x));
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeSphere(blockBoxSize.m_x)));
 
 	// add a instance root scene node
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
-	descriptor.m_collision = &shape;
+	descriptor.m_collision = shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_spherical;
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("earthmap.png")));
 	ndSharedPtr<ndRenderSceneNode>root(new ndRenderSceneNodeInstance(ndGetIdentityMatrix(), descriptor));
@@ -118,8 +118,8 @@ static void BuildSphereColumn(ndDemoEntityManager* const scene, ndFloat32 mass, 
 	ndRenderSceneNodeInstance* const instanceRoot = root->GetAsInstance();
 	for (ndInt32 i = 0; i < count; ++i)
 	{
-		baseMatrix = FindFloor(*world, baseMatrix, shape, 100.0f);
-		AddRigidBody(scene, baseMatrix, shape, instanceRoot, mass);
+		baseMatrix = FindFloor(*world, baseMatrix, **shape, 100.0f);
+		AddRigidBody(scene, baseMatrix, **shape, instanceRoot, mass);
 	}
 	instanceRoot->Finalize();
 }
@@ -135,11 +135,11 @@ static void BuildBoxColumn(ndDemoEntityManager* const scene, ndFloat32 mass, con
 
 	// create the stack
 	ndMatrix baseMatrix(ndGetIdentityMatrix());
-	ndShapeInstance shape(new ndShapeBox(blockBoxSize.m_x, blockBoxSize.m_y, blockBoxSize.m_z));
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeBox(blockBoxSize.m_x, blockBoxSize.m_y, blockBoxSize.m_z)));
 
 	// add a instance root scene node
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
-	descriptor.m_collision = &shape;
+	descriptor.m_collision = shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png")));
 	ndSharedPtr<ndRenderSceneNode>root(new ndRenderSceneNodeInstance(ndGetIdentityMatrix(), descriptor));
@@ -155,8 +155,8 @@ static void BuildBoxColumn(ndDemoEntityManager* const scene, ndFloat32 mass, con
 	ndRenderSceneNodeInstance* const instanceRoot = root->GetAsInstance();
 	for (ndInt32 i = 0; i < count; ++i)
 	{
-		baseMatrix = FindFloor(*world, baseMatrix, shape, 100.0f);
-		AddRigidBody(scene, baseMatrix, shape, instanceRoot, mass);
+		baseMatrix = FindFloor(*world, baseMatrix, **shape, 100.0f);
+		AddRigidBody(scene, baseMatrix, **shape, instanceRoot, mass);
 		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x);
 		baseMatrix = rotation * baseMatrix;
 	}
@@ -178,13 +178,13 @@ static void BuildCylinderColumn(ndDemoEntityManager* const scene, ndFloat32 mass
 	baseMatrix.m_posit.m_x = origin.m_x;
 	baseMatrix.m_posit.m_z = origin.m_z;
 
-	ndShapeInstance shape(new ndShapeCylinder(blockBoxSize.m_x, blockBoxSize.m_y, blockBoxSize.m_z));
-	shape.SetLocalMatrix(ndRollMatrix(ndPi * 0.5f));
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeCylinder(blockBoxSize.m_x, blockBoxSize.m_y, blockBoxSize.m_z)));
+	shape->SetLocalMatrix(ndRollMatrix(ndPi * 0.5f));
 
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
-	descriptor.m_collision = &shape;
+	descriptor.m_collision = shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_cylindrical;
-	descriptor.m_uvMatrix = shape.GetLocalMatrix();
+	descriptor.m_uvMatrix = shape->GetLocalMatrix();
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("smilli.png")));
 	ndSharedPtr<ndRenderSceneNode>root(new ndRenderSceneNodeInstance(ndGetIdentityMatrix(), descriptor));
 	scene->AddEntity(root);
@@ -194,8 +194,8 @@ static void BuildCylinderColumn(ndDemoEntityManager* const scene, ndFloat32 mass
 	ndRenderSceneNodeInstance* const instanceRoot = root->GetAsInstance();
 	for (ndInt32 i = 0; i < count; ++i)
 	{
-		baseMatrix = FindFloor(*world, baseMatrix, shape, 100.0f);
-		AddRigidBody(scene, baseMatrix, shape, instanceRoot, mass);
+		baseMatrix = FindFloor(*world, baseMatrix, **shape, 100.0f);
+		AddRigidBody(scene, baseMatrix, **shape, instanceRoot, mass);
 		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_z);
 		baseMatrix = rotation * baseMatrix;
 	}
@@ -210,9 +210,10 @@ static void BuildCapsuleStack(ndDemoEntityManager* const scene, ndFloat32 mass, 
 
 	ndVector blockBoxSize(size);
 
-	ndShapeInstance shape(new ndShapeCapsule(blockBoxSize.m_x, blockBoxSize.m_x, blockBoxSize.m_z));
+	//ndShapeInstance shape(new ndShapeCapsule(blockBoxSize.m_x, blockBoxSize.m_x, blockBoxSize.m_z));
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeCapsule(blockBoxSize.m_x, blockBoxSize.m_x, blockBoxSize.m_z)));
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
-	descriptor.m_collision = &shape;
+	descriptor.m_collision = shape;
 	descriptor.m_uvMatrix = ndPitchMatrix(ndPi);
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_capsule;
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("smilli.png")));
@@ -226,7 +227,7 @@ static void BuildCapsuleStack(ndDemoEntityManager* const scene, ndFloat32 mass, 
 	matrix0.m_posit = origin;
 	matrix0.m_posit.m_y += blockBoxSize.m_x;
 	matrix0.m_posit.m_w = 1.0f;
-	matrix0 = FindFloor(*world, matrix0, shape, 100.0f);
+	matrix0 = FindFloor(*world, matrix0, **shape, 100.0f);
 
 	ndMatrix matrix1(matrix0);
 	matrix1.m_posit.m_z += horizontalStep;
@@ -242,10 +243,10 @@ static void BuildCapsuleStack(ndDemoEntityManager* const scene, ndFloat32 mass, 
 	ndRenderSceneNodeInstance* const instanceRoot = root->GetAsInstance();
 	for (ndInt32 i = 0; i < stackHigh / 2; ++i)
 	{
-		AddRigidBody(scene, matrix0, shape, instanceRoot, mass);
-		AddRigidBody(scene, matrix1, shape, instanceRoot, mass);
-		AddRigidBody(scene, matrix2, shape, instanceRoot, mass);
-		AddRigidBody(scene, matrix3, shape, instanceRoot, mass);
+		AddRigidBody(scene, matrix0, **shape, instanceRoot, mass);
+		AddRigidBody(scene, matrix1, **shape, instanceRoot, mass);
+		AddRigidBody(scene, matrix2, **shape, instanceRoot, mass);
+		AddRigidBody(scene, matrix3, **shape, instanceRoot, mass);
 
 		matrix0.m_posit.m_y += vertialStep * 2.0f;
 		matrix1.m_posit.m_y += vertialStep * 2.0f;

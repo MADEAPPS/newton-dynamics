@@ -110,7 +110,7 @@ ndSharedPtr<ndRenderSceneNode> ndMeshLoader::LoadEntity(ndRender* const renderer
 			else
 			{
 				ndRenderPrimitiveMesh::ndDescriptor descriptor(renderer);
-				descriptor.m_meshNode____ = meshEffect;
+				descriptor.m_meshNode = meshEffect;
 				for (ndInt32 j = 0; j < materials.GetCount(); ++j)
 				{
 					const ndString teturePath(path + materials[i].m_textureName);

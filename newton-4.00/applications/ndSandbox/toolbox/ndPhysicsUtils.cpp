@@ -80,9 +80,10 @@ void SetModelVisualMesh(ndDemoEntityManager* const scene, ndModelArticulation* c
 //******************************************************************************
 // Create simple rigi body with a collsion shspe and render primitev but is not added to the scene
 //******************************************************************************
-ndSharedPtr<ndBody> CreateBody(
+static ndSharedPtr<ndBody> CreateBody(
 	ndDemoEntityManager* const scene, 
-	const ndShapeInstance& shape, 
+	//const ndShapeInstance& shape, 
+	ndSharedPtr<ndShapeInstance>& shape,
 	const ndMatrix& location, 
 	ndFloat32 mass, 
 	const char* const textName,
@@ -91,11 +92,11 @@ ndSharedPtr<ndBody> CreateBody(
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndRender* const render = *scene->GetRenderer();
 
-	const ndMatrix matrix(FindFloor(*world, location, shape, 200.0f));
+	const ndMatrix matrix(FindFloor(*world, location, **shape, 200.0f));
 	ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(matrix));
 
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
-	descriptor.m_collision = &shape;
+	descriptor.m_collision = shape;
 	descriptor.m_mapping = mappingMode;
 	//descriptor.m_material.m_castShadows = true;
 	//descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textName));
@@ -106,8 +107,8 @@ ndSharedPtr<ndBody> CreateBody(
 	ndSharedPtr<ndBody> body (new ndBodyDynamic());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
-	body->GetAsBodyKinematic()->SetCollisionShape(shape);
-	body->GetAsBodyKinematic()->SetMassMatrix(mass, shape);
+	body->GetAsBodyKinematic()->SetCollisionShape(**shape);
+	body->GetAsBodyKinematic()->SetMassMatrix(mass, **shape);
 	return body;
 }
 
@@ -116,21 +117,22 @@ ndSharedPtr<ndBody> CreateBody(
 //******************************************************************************
 ndSharedPtr<ndBody> CreateBox(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez, const char* const textName)
 {
-	ndShapeInstance shape(new ndShapeBox(sizex, sizey, sizez));
+	//ndShapeInstance shape(new ndShapeBox(sizex, sizey, sizez));
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeBox(sizex, sizey, sizez)));
 	ndSharedPtr<ndBody> body(CreateBody(scene, shape, location, mass, textName, ndRenderPrimitiveMesh::m_box));
 	return body;
 }
 
 ndSharedPtr<ndBody> CreateSphere(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius, const char* const textName)
 {
-	ndShapeInstance shape(new ndShapeSphere(radius));
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeSphere(radius)));
 	ndSharedPtr<ndBody> body(CreateBody(scene, shape, location, mass, textName, ndRenderPrimitiveMesh::m_spherical));
 	return body;
 }
 
 ndSharedPtr<ndBody> CreateCapsule(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, const char* const textName)
 {
-	ndShapeInstance shape(new ndShapeCapsule(radius0, radius1, high));
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeCapsule(radius0, radius1, high)));
 	ndSharedPtr<ndBody> body(CreateBody(scene, shape, location, mass, textName, ndRenderPrimitiveMesh::m_capsule));
 	return body;
 }
@@ -189,7 +191,7 @@ ndSharedPtr<ndBody> AddConvexHull(ndDemoEntityManager* const scene, const ndMatr
 		points.PushBack(ndVector(x, high * 0.25f, z, 0.0f));
 	}
 
-	ndShapeInstance shape(new ndShapeConvexHull(ndInt32(points.GetCount()), sizeof(ndVector), 0.0f, &points[0].m_x));
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeConvexHull(ndInt32(points.GetCount()), sizeof(ndVector), 0.0f, &points[0].m_x)));
 	ndSharedPtr<ndBody> body(CreateBody(scene, shape, location, mass, textName, ndRenderPrimitiveMesh::m_box));
 
 	ndPhysicsWorld* const world = scene->GetWorld();
@@ -219,14 +221,13 @@ void AddPlanks(ndDemoEntityManager* const scene, const ndMatrix& location, ndFlo
 
 void AddCapsuleStacks(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, ndInt32 rows_x, ndInt32 rows_z, ndInt32 columHigh)
 {
-	ndShapeInstance shape(new ndShapeCapsule(radius0, radius1, high));
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeCapsule(radius0, radius1, high)));
 
 	ndRender* const render = *scene->GetRenderer();
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
-	descriptor.m_collision = &shape;
+	descriptor.m_collision = shape;
 	descriptor.m_stretchMaping = false;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_spherical;
-	//descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("marble.png"));
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("marble.png")));
 	ndSharedPtr<ndRenderSceneNode>root(new ndRenderSceneNodeInstance(location, descriptor));
 	scene->AddEntity(root);
@@ -254,8 +255,8 @@ void AddCapsuleStacks(ndDemoEntityManager* const scene, const ndMatrix& location
 				ndSharedPtr<ndBody> body(new ndBodyDynamic());
 				body->SetNotifyCallback(new ndDemoEntityNotify(scene, instance));
 				body->SetMatrix(matrix);
-				body->GetAsBodyKinematic()->SetCollisionShape(shape);
-				body->GetAsBodyKinematic()->SetMassMatrix(mass, shape);
+				body->GetAsBodyKinematic()->SetCollisionShape(**shape);
+				body->GetAsBodyKinematic()->SetMassMatrix(mass, **shape);
 				body->GetAsBodyDynamic()->SetAngularDamping(ndVector(ndFloat32(0.5f)));
 				world->AddBody(body);
 				matrix.m_posit.m_y += high * 2.5f;

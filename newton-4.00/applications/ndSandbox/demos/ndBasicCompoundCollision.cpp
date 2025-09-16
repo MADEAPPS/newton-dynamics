@@ -39,9 +39,10 @@ static void AddSphere(ndDemoEntityManager* const scene)
 {
 	ndRender* const render = *scene->GetRenderer();
 
-	ndShapeInstance shape(new ndShapeSphere(0.125f));
+	//ndShapeInstance shape(new ndShapeSphere(0.125f));
+	ndSharedPtr<ndShapeInstance> shape(new ndShapeInstance(new ndShapeSphere(0.125f)));
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
-	descriptor.m_collision = &shape;
+	descriptor.m_collision = shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_spherical;
 	//descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("earthmap.png"));
 	descriptor.AddMaterial (render->GetTextureCache()->GetTexture(ndGetWorkingFileName("earthmap.png")));
@@ -57,7 +58,7 @@ static void AddSphere(ndDemoEntityManager* const scene)
 		ndSharedPtr<ndRenderSceneNode> entity(origEntity->Clone());
 		ndVector floor(FindFloor(*scene->GetWorld(), mOrigMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		mOrigMatrix.m_posit.m_y = floor.m_y + 1.0f;
-		AddRigidBody(scene, mOrigMatrix, shape, entity, 1.0);
+		AddRigidBody(scene, mOrigMatrix, **shape, entity, 1.0);
 	}
 }
 
@@ -103,11 +104,12 @@ static void CreateBoxCompoundShape(ndShapeInstance& parentInstance)
 static void AddEmptyBox(ndDemoEntityManager* const scene)
 {
 	ndRender* const render = *scene->GetRenderer();
-	ndShapeInstance compoundShapeInstance(new ndShapeCompound());
-	CreateBoxCompoundShape(compoundShapeInstance);
+	//ndShapeInstance compoundShapeInstance(new ndShapeCompound());
+	ndSharedPtr<ndShapeInstance>compoundShapeInstance(new ndShapeInstance(new ndShapeCompound()));
+	CreateBoxCompoundShape(**compoundShapeInstance);
 
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
-	descriptor.m_collision = &compoundShapeInstance;
+	descriptor.m_collision = compoundShapeInstance;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
 	//descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png"));
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png")));
@@ -121,7 +123,7 @@ static void AddEmptyBox(ndDemoEntityManager* const scene)
 	ndVector floor(FindFloor(*scene->GetWorld(), mBodyMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	mBodyMatrix.m_posit.m_y = floor.m_y + 1.5f;
 
-	AddRigidBody(scene, mBodyMatrix, compoundShapeInstance, entity, 10.0f);
+	AddRigidBody(scene, mBodyMatrix, **compoundShapeInstance, entity, 10.0f);
 }
 
 static void AddSimpleConcaveMesh(ndDemoEntityManager* const scene, const ndMatrix& matrix, const char* const meshName, int count = 1)
