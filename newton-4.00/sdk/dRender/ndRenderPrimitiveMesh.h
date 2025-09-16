@@ -68,7 +68,7 @@ class ndRenderPrimitiveMesh : public ndRenderPrimitive
 		public:
 		ndDescriptor(ndRender* const render)
 			:m_render(render)
-			,m_meshNode(nullptr)
+			,m_meshNode____(nullptr)
 			,m_collision(nullptr)
 			,m_materials()
 			,m_mapping(m_box)
@@ -79,6 +79,23 @@ class ndRenderPrimitiveMesh : public ndRenderPrimitive
 		{
 		}
 
+		ndDescriptor(const ndDescriptor& src)
+			:m_render(src.m_render)
+			,m_meshNode____(src.m_meshNode____)
+			,m_collision(src.m_collision)
+			,m_materials()
+			,m_mapping(src.m_mapping)
+			,m_uvMatrix(src.m_uvMatrix)
+			,m_meshBuildMode(src.m_meshBuildMode)
+			,m_numberOfInstances(src.m_numberOfInstances)
+			,m_stretchMaping(src.m_stretchMaping)
+		{
+			for (ndList<ndRenderPrimitiveMeshMaterial>::ndNode* node = src.m_materials.GetFirst(); node; node = node->GetNext())
+			{
+				m_materials.Append(node->GetInfo());
+			}
+		}
+
 		ndRenderPrimitiveMeshMaterial& AddMaterial(const ndSharedPtr<ndRenderTexture>& texture)
 		{
 			ndList<ndRenderPrimitiveMeshMaterial>::ndNode* const node = m_materials.Append();
@@ -87,9 +104,8 @@ class ndRenderPrimitiveMesh : public ndRenderPrimitive
 		}
 
 		ndRender* m_render;
-		const ndMeshEffect* m_meshNode;
+		ndSharedPtr<ndMeshEffect> m_meshNode____;
 		const ndShapeInstance* m_collision;
-		//ndRenderPrimitiveMeshMaterial m_material;
 		ndList<ndRenderPrimitiveMeshMaterial> m_materials;
 		ndUvMapingMode m_mapping;
 		ndMatrix m_uvMatrix;

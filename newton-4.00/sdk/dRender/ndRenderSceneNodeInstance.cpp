@@ -25,6 +25,7 @@ ndRenderSceneNodeInstance::ndRenderSceneNodeInstance(const ndMatrix& matrix, con
 {
 	if (m_descriptor.m_collision)
 	{
+		ndAssert(0);
 		m_savedShape = ndSharedPtr<ndShapeInstance>(new ndShapeInstance(*m_descriptor.m_collision));
 		m_descriptor.m_collision = *m_savedShape;
 	}

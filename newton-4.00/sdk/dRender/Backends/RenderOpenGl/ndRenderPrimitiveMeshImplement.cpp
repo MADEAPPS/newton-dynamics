@@ -39,7 +39,7 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(ndRenderPrimitive
 	}
 	else
 	{
-		ndAssert(descriptor.m_meshNode);
+		ndAssert(*descriptor.m_meshNode____);
 		BuildFromMesh(descriptor);
 	}
 
@@ -272,7 +272,7 @@ void ndRenderPrimitiveMeshImplement::BuildRenderMeshFromCollisionShape(const ndR
 
 void ndRenderPrimitiveMeshImplement::BuildRenderMeshFromMeshEffect(const ndRenderPrimitiveMesh::ndDescriptor& descriptor)
 {
-	ndMeshEffect& mesh = *((ndMeshEffect*)descriptor.m_meshNode);
+	ndMeshEffect& mesh = *((ndMeshEffect*)*descriptor.m_meshNode____);
 
 	ndAssert(descriptor.m_materials.GetCount());
 	//const ndRenderPrimitiveMeshMaterial& material = descriptor.m_materials.GetFirst()->GetInfo();
