@@ -18,12 +18,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndHeightFieldPrimitive.h"
 
-
-//#define D_HEIGHTFIELD_GRID_SIZE     2.0f
-//#define D_HEIGHTFIELD_WIDTH			16
-//#define D_HEIGHTFIELD_HEIGHT		16
-//#define D_HEIGHTFIELD_TILE_SIZE      2
-
+#if 0
 class BackgroundLowLodCVehicleMaterial : public ndApplicationMaterial
 {
 	public:
@@ -56,7 +51,7 @@ class BackgroundLowLodCVehicleMaterial : public ndApplicationMaterial
 	}
 };
 
-#if 0
+
 class BackGroundVehicleController : public ndModel
 {
 	public:
@@ -286,9 +281,9 @@ static void AddAiVehicle(ndDemoEntityManager* const scene)
 
 void ndBasicHeighfieldCollision(ndDemoEntityManager* const scene)
 {
-	BackgroundLowLodCVehicleMaterial material;
-	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
-	callback->RegisterMaterial(material, ndDemoContactCallback::m_aiCar, ndDemoContactCallback::m_aiTerrain);
+	//BackgroundLowLodCVehicleMaterial material;
+	//ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
+	//callback->RegisterMaterial(material, ndDemoContactCallback::m_aiCar, ndDemoContactCallback::m_aiTerrain);
 
 	ndSharedPtr<ndBody> mapBody(BuildHeightFieldTerrain(scene, "grass.png", ndGetIdentityMatrix()));
 
@@ -309,14 +304,12 @@ void ndBasicHeighfieldCollision(ndDemoEntityManager* const scene)
 	ndQuaternion rot(ndYawMatrix(180.0f * ndDegreeToRad));
 
 	ndMatrix origin(ndCalculateMatrix(rot, floor));
-	origin.m_posit += origin.m_front.Scale (20.0f);
+	origin.m_posit += origin.m_front.Scale (40.0f);
 	AddCapsuleStacks(scene, origin, 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
 
 	origin.m_posit += origin.m_right.Scale(20.0f);
 	AddPlanks(scene, origin, 1.0f, 4);
 
-	floor.m_y += 5.0f;
-	//floor.m_x += 10.0f;
+	floor.m_y += 15.0f;
 	scene->SetCameraMatrix(rot, floor);
-
 }
