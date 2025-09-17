@@ -15,7 +15,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndHeightFieldPrimitive.h"
 
-//#define D_TERRAIN_WIDTH				1024
+//#define D_TERRAIN_WIDTH			1024
 //#define D_TERRAIN_HEIGHT			1024
 #define D_TERRAIN_WIDTH				512
 #define D_TERRAIN_HEIGHT			512
