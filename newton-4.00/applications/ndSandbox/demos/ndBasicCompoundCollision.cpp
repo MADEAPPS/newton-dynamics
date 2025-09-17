@@ -49,14 +49,18 @@ static void AddSphere(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndRenderSceneNode>origEntity(new ndRenderSceneNode(ndGetIdentityMatrix()));
 	origEntity->SetPrimitive(mesh);
 
-	ndMatrix mOrigMatrix = ndGetIdentityMatrix();
-	mOrigMatrix.m_posit.m_x = 2.0f;
+	ndMatrix originMatrix = ndGetIdentityMatrix();
+	originMatrix.m_posit.m_x = 2.0f;
 	for (ndInt32 i = 0; i < 4; ++i)
 	{
 		ndSharedPtr<ndRenderSceneNode> entity(origEntity->Clone());
-		ndVector floor(FindFloor(*scene->GetWorld(), mOrigMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-		mOrigMatrix.m_posit.m_y = floor.m_y + 1.0f;
-		AddRigidBody(scene, mOrigMatrix, **shape, entity, 1.0);
+		ndVector floor(FindFloor(*scene->GetWorld(), originMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+		originMatrix.m_posit.m_y = floor.m_y + 1.0f;
+
+		// make sure the visual is initialized properlly
+		entity->SetTransform(originMatrix, originMatrix.m_posit);
+		entity->SetTransform(originMatrix, originMatrix.m_posit);
+		AddRigidBody(scene, originMatrix, **shape, entity, 1.0);
 	}
 }
 

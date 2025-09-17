@@ -27,7 +27,8 @@
 //#define DEFAULT_SCENE	4		// basic Trigger
 //#define DEFAULT_SCENE	5		// conservation of momentum 
 //#define DEFAULT_SCENE	6		// basic joints
-#define DEFAULT_SCENE	7		// basic compound shapes
+#define DEFAULT_SCENE	7		// background vehicle prop
+//#define DEFAULT_SCENE	8		// basic compound shapes
 
 //#define DEFAULT_SCENE	7		// object Placement
 //#define DEFAULT_SCENE	8		// particle fluid
@@ -36,7 +37,7 @@
 
 //#define DEFAULT_SCENE	12		// basic vehicle
 //#define DEFAULT_SCENE	13		// heavy vehicle
-//#define DEFAULT_SCENE	14		// background vehicle prop
+
 //#define DEFAULT_SCENE	15		// basic player
 //#define DEFAULT_SCENE	16		// rag doll
 //#define DEFAULT_SCENE	17		// cart pole discrete controller
@@ -105,6 +106,7 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene);
 void ndBasicAngularMomentum(ndDemoEntityManager* const scene);
 void ndBasicSlidingPlatform(ndDemoEntityManager* const scene);
 void ndBasicCompoundCollision(ndDemoEntityManager* const scene);
+void ndBasicHeighfieldCollision(ndDemoEntityManager* const scene);
 
 ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
 {
@@ -115,6 +117,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic triger", ndBasicTrigger},
 	{ "basic momentum consevation", ndBasicAngularMomentum},
 	{ "basic joints", ndBasicJoints},
+	{ "basic heighfield", ndBasicHeighfieldCollision},
 	{ "basic compound collision", ndBasicCompoundCollision},
 
 #if 0

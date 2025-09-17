@@ -26,8 +26,6 @@
 #include "ndVector.h"
 #include "ndMatrix.h"
 
-#define D_USE_YZ_VARIANCE
-
 #define D_VERTEXLIST_INDEX_LIST_BATCH (1024 * 64)
 
 #pragma optimize( "", off )
@@ -81,7 +79,6 @@ static ndInt32 SortVertices(
 	ndSortKey* const remapIndex,
 	const ndSortCluster& cluster, ndInt32 baseCount, ndInt32 firstSortAxis)
 {
-#ifndef D_USE_YZ_VARIANCE
 	firstSortAxis = 0;
 	const ndBigVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count));
 	const ndBigVector variance(ndBigVector::m_zero.GetMax(cluster.m_sum2.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count) - origin * origin).Sqrt());
@@ -94,7 +91,6 @@ static ndInt32 SortVertices(
 	{
 		firstSortAxis = 2;
 	}
-#endif
 
 	class dVertexSortData
 	{
@@ -136,12 +132,8 @@ static ndInt32 SortVertices(
 	};
 	ndSort<ndSortKey, ndCompareKey>(remapIndex, cluster.m_count, &sortContext);
 
-#ifdef D_USE_YZ_VARIANCE
-	const ndFloat64 tolerance = ndMax(ndFloat64(tol), ndFloat64(1.0e-8f));
-#else
 	const ndFloat64 minDist = ndMin(ndMin(variance.m_x, variance.m_y), variance.m_z);
 	const ndFloat64 tolerance = ndMax(ndMin(minDist, ndFloat64(tol)), ndFloat64(1.0e-8f));
-#endif
 	const ndFloat64 sweptWindow = ndFloat64(2.0f) * tolerance;
 	
 	ndInt32 newCount = 0;
@@ -228,23 +220,6 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 	}
 
 	ndInt32 sortIndex = 0;
-#ifdef D_USE_YZ_VARIANCE
-	const ndBigVector originScale(cluster.m_sum.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count));
-	const ndBigVector varianceScale2((cluster.m_sum2.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count) - originScale * originScale).GetMax (ndBigVector(1.0e-6f)));
-	ndFloat64 maxValue = varianceScale2.m_x;
-	for (ndInt32 i = 1; i < 3; ++i)
-	{
-		if (varianceScale2[i] > maxValue)
-		{
-			sortIndex = i;
-			maxValue = varianceScale2[i];
-		}
-	}
-	ndInt32 varianceIndex0 = (sortIndex + 1) % 3;
-	ndInt32 varianceIndex1 = (varianceIndex0 + 1) % 3;
-	const ndBigVector stdScale(ndFloat64(1.0f) / varianceScale2.m_x, ndFloat64(1.0f) / varianceScale2.m_y, ndFloat64(1.0f) / varianceScale2.m_z, ndFloat64(0.0f));
-#endif
-
 	ndInt32 baseCount = 0;
 	if (cluster.m_count > D_VERTEXLIST_INDEX_LIST_BATCH)
 	{
@@ -259,16 +234,8 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 			const ndBigVector variance2(cluster.m_sum2.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count) - origin * origin);
 			ndSortKey* const remapIndex = &indirectList[cluster.m_start];
 
-			#ifdef D_USE_YZ_VARIANCE
-				ndFloat64 clusterVariance2_0 = stdScale[varianceIndex0] * ndMax(variance2[varianceIndex0], ndFloat64(0.0f));
-				ndFloat64 clusterVariance2_1 = stdScale[varianceIndex1] * ndMax(variance2[varianceIndex1], ndFloat64(0.0f));
-				ndFloat64 maxNormalizedVariance = ndMax (clusterVariance2_0, clusterVariance2_1);
-				bool doSort = (maxNormalizedVariance < ndFloat32(1.0f/8.0f)) || (spliteStack.GetCount() > (spliteStack.GetCapacity() - 4));
-				doSort = doSort && (cluster.m_count < D_VERTEXLIST_INDEX_LIST_BATCH);
-			#else
-				ndFloat64 maxVariance2 = ndMax(ndMax(variance2.m_x, variance2.m_y), variance2.m_z);
-				bool doSort = (cluster.m_count <= D_VERTEXLIST_INDEX_LIST_BATCH) || (spliteStack.GetCount() > (spliteStack.GetCapacity() - 4)) || (maxVariance2 < ndFloat32(4.0f));
-			#endif
+			ndFloat64 maxVariance2 = ndMax(ndMax(variance2.m_x, variance2.m_y), variance2.m_z);
+			bool doSort = (cluster.m_count <= D_VERTEXLIST_INDEX_LIST_BATCH) || (spliteStack.GetCount() > (spliteStack.GetCapacity() - 4)) || (maxVariance2 < ndFloat32(4.0f));
 			if (doSort)
 			{
 				ndInt32 newCount = SortVertices(vertListOut, indexListOut, vertList, stride, compareCount, tolerance, remapIndex, cluster, baseCount, sortIndex);
@@ -276,19 +243,15 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 			}
 			else
 			{
-				#ifdef D_USE_YZ_VARIANCE
-					ndInt32 firstSortAxis = (clusterVariance2_0 > clusterVariance2_1) ? varianceIndex0 : varianceIndex1;
-				#else
-					ndInt32 firstSortAxis = 0;
-					if ((variance2.m_y >= variance2.m_x) && (variance2.m_y >= variance2.m_z))
-					{
-						firstSortAxis = 1;
-					}
-					else if ((variance2.m_z >= variance2.m_x) && (variance2.m_z >= variance2.m_y))
-					{
-						firstSortAxis = 2;
-					}
-				#endif
+				ndInt32 firstSortAxis = 0;
+				if ((variance2.m_y >= variance2.m_x) && (variance2.m_y >= variance2.m_z))
+				{
+					firstSortAxis = 1;
+				}
+				else if ((variance2.m_z >= variance2.m_x) && (variance2.m_z >= variance2.m_y))
+				{
+					firstSortAxis = 2;
+				}
 				ndFloat64 axisVal = origin[firstSortAxis];
 	
 				ndInt32 i0 = 0;

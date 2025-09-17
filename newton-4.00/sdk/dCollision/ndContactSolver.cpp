@@ -1437,11 +1437,15 @@ ndInt32 ndContactSolver::Prune2dContacts(ndFixSizeArray<ndVector, D_MAX_CONTATCS
 		ndInt32 m_mask;
 	};
 
-#if 1
+
+static int xxxxx;
+xxxxx++;
+if (xxxxx == 210)
+xxxxx *= 1;
+
 	// build an optimal 2d convex hull in place
 	// have quadratic time complexity, but for a small number of point (16 max)
 	// it is much faster and more important, generates higher quality contacts.
-
 	const ndInt32 queueSize = 128;
 	class ndQueue : public ndFixSizeArray<ndConvexFaceNode*, queueSize>
 	{
@@ -1478,7 +1482,6 @@ ndInt32 ndContactSolver::Prune2dContacts(ndFixSizeArray<ndVector, D_MAX_CONTATCS
 		ndInt32 m_firstIndex;
 		ndInt32 m_mod;
 	};
-
 
 	ndInt32 index0 = -1;
 	ndFloat32 maxErr0 = ndFloat32(-1.0e20f);
@@ -1636,138 +1639,6 @@ ndInt32 ndContactSolver::Prune2dContacts(ndFixSizeArray<ndVector, D_MAX_CONTATCS
 		contactArray[i] = buffer[i];
 	}
 	return ndInt32 (buffer.GetCount());
-
-#else
-	ndFixSizeArray<ndContactPoint, D_MAX_CONTATCS> buffer;
-	ndFixSizeArray<ndConvexFaceNode, D_MAX_CONTATCS> convexHull;
-	ndUpHeap<ndConvexFaceNode*, ndFloat32> sortHeap(&planeProjection[0], D_MAX_CONTATCS * planeProjection.GetCapacity());
-
-	ndInt32 hullCount = ndConvexHull2d(&planeProjection[0], planeProjection.GetCount());
-	if (hullCount <= 3)
-	{
-		for (ndInt32 i = hullCount - 1; i >= 0; --i)
-		{
-			ndInt32 index = ndInt32(planeProjection[i].m_w);
-			buffer.PushBack(contactArray[index]);
-		}
-
-		for (ndInt32 i = hullCount - 1; i >= 0; --i)
-		{
-			contactArray[i] = buffer[i];
-		}
-		return hullCount;
-	}
-
-	ndInt32 last = hullCount - 1;
-	convexHull.SetCount(hullCount + 1);
-	for (ndInt32 i = 0; i < hullCount; ++i)
-	{
-		convexHull[i].m_point2d = planeProjection[i];
-		convexHull[i].m_next = &convexHull[i + 1];
-		convexHull[i].m_prev = &convexHull[last];
-		convexHull[i].m_mask = 0;
-		last = i;
-	}
-	convexHull[last].m_next = &convexHull[0];
-
-	ndFloat32 totalArea = ndFloat32(0.0f);
-	ndVector areaEdge0(planeProjection[1] - planeProjection[0]);
-	for (ndInt32 i = 2; i < hullCount; ++i)
-	{
-		const ndVector areaEdge1(planeProjection[i] - planeProjection[0]);
-		ndFloat32 area = areaEdge0.m_y * areaEdge1.m_x - areaEdge0.m_x * areaEdge1.m_y;
-		totalArea += area;
-		areaEdge0 = areaEdge1;
-	}
-
-	ndAssert(totalArea >= ndFloat32(0.0f));
-	bool hasLinearCombination = true;
-	ndConvexFaceNode* hullPoint = &convexHull[0];
-	while (hasLinearCombination)
-	{
-		sortHeap.Flush();
-		hasLinearCombination = false;
-		ndConvexFaceNode* ptr = hullPoint;
-		ndVector e0(ptr->m_next->m_point2d - ptr->m_point2d);
-		do
-		{
-			const ndVector e1(ptr->m_next->m_next->m_point2d - ptr->m_next->m_point2d);
-			ndFloat32 area = e0.m_y * e1.m_x - e0.m_x * e1.m_y;
-			sortHeap.Push(ptr->m_next, area);
-			e0 = e1;
-			ptr->m_mask = 1;
-			ptr = ptr->m_next;
-		} while (ptr != hullPoint);
-
-		while (sortHeap.GetCount() && (sortHeap.Value() * ndFloat32(16.0f) < totalArea))
-		{
-			ndConvexFaceNode* const corner = sortHeap[0];
-			if (corner->m_mask && corner->m_prev->m_mask)
-			{
-				if (hullPoint == corner)
-				{
-					hullPoint = corner->m_prev;
-				}
-				hullCount--;
-				hasLinearCombination = true;
-				corner->m_prev->m_mask = 0;
-				corner->m_next->m_prev = corner->m_prev;
-				corner->m_prev->m_next = corner->m_next;
-			}
-			sortHeap.Pop();
-		}
-	}
-
-	while (hullCount > maxCount)
-	{
-		sortHeap.Flush();
-		ndConvexFaceNode* ptr = hullPoint;
-		ndVector e0(ptr->m_next->m_point2d - ptr->m_point2d);
-		do
-		{
-			ndVector e1(ptr->m_next->m_next->m_point2d - ptr->m_next->m_point2d);
-			ndFloat32 area = e0.m_y * e1.m_x - e0.m_x * e1.m_y;
-			sortHeap.Push(ptr->m_next, area);
-			e0 = e1;
-			ptr->m_mask = 1;
-			ptr = ptr->m_next;
-		} while (ptr != hullPoint);
-
-		while (sortHeap.GetCount() && (hullCount > maxCount))
-		{
-			ndConvexFaceNode* const corner = sortHeap[0];
-			if (corner->m_mask && corner->m_prev->m_mask)
-			{
-				if (hullPoint == corner)
-				{
-					hullPoint = corner->m_prev;
-				}
-				hullCount--;
-				ndAssert(hullCount >= 1);
-				hasLinearCombination = true;
-				corner->m_prev->m_mask = 0;
-				corner->m_next->m_prev = corner->m_prev;
-				corner->m_prev->m_next = corner->m_next;
-			}
-			sortHeap.Pop();
-		}
-	}
-
-	ndConvexFaceNode* ptr = hullPoint;
-	do
-	{
-		ndInt32 index = ndInt32(ptr->m_point2d.m_w);
-		buffer.PushBack(contactArray[index]);
-		ptr = ptr->m_next;
-	} while (ptr != hullPoint);
-
-	for (ndInt32 i = buffer.GetCount() - 1; i >= 0; --i)
-	{
-		contactArray[i] = buffer[i];
-	}
-	return buffer.GetCount();
-#endif
-
 }
 
 ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, ndContactPoint* const contactArray, ndInt32 maxCount) const

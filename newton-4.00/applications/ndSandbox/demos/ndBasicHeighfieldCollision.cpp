@@ -10,25 +10,19 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndSkyBox.h"
-#include "ndDemoMesh.h"
-#include "ndDemoCamera.h"
+#include "ndMeshLoader.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
-#include "ndCompoundScene.h"
-#include "ndContactCallback.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
-#include "ndDemoInstanceEntity.h"
 #include "ndHeightFieldPrimitive.h"
-#include "ndMakeProceduralStaticMap.h"
 
 
-#define D_HEIGHTFIELD_GRID_SIZE     2.0f
-#define D_HEIGHTFIELD_WIDTH			16
-#define D_HEIGHTFIELD_HEIGHT		16
-#define D_HEIGHTFIELD_TILE_SIZE      2
+//#define D_HEIGHTFIELD_GRID_SIZE     2.0f
+//#define D_HEIGHTFIELD_WIDTH			16
+//#define D_HEIGHTFIELD_HEIGHT		16
+//#define D_HEIGHTFIELD_TILE_SIZE      2
 
 class BackgroundLowLodCVehicleMaterial : public ndApplicationMaterial
 {
@@ -62,6 +56,7 @@ class BackgroundLowLodCVehicleMaterial : public ndApplicationMaterial
 	}
 };
 
+#if 0
 class BackGroundVehicleController : public ndModel
 {
 	public:
@@ -287,28 +282,38 @@ static void AddAiVehicle(ndDemoEntityManager* const scene)
 	origin.m_x += 10.0f;
 	scene->SetCameraMatrix(rot, origin);
 }
+#endif
 
-void ndBagroundLowLodVehicle(ndDemoEntityManager* const scene)
+void ndBasicHeighfieldCollision(ndDemoEntityManager* const scene)
 {
 	BackgroundLowLodCVehicleMaterial material;
 	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
 	callback->RegisterMaterial(material, ndDemoContactCallback::m_aiCar, ndDemoContactCallback::m_aiTerrain);
 
-	ndMatrix heighfieldLocation(ndGetIdentityMatrix());
-	heighfieldLocation.m_posit.m_x = -200.0f;
-	heighfieldLocation.m_posit.m_z = -200.0f;
+	ndSharedPtr<ndBody> mapBody(BuildHeightFieldTerrain(scene, "grass.png", ndGetIdentityMatrix()));
 
-	//ndSharedPtr<ndBody> mapBody(BuildPlayArena(scene));
-	//ndSharedPtr<ndBody> mapBody(BuildFlatPlane(scene, true));
-	//ndSharedPtr<ndBody> mapBody(BuildGridPlane(scene, 400, 4.0f, 0.0f));
-	ndSharedPtr<ndBody> mapBody(BuildHeightFieldTerrain(scene, heighfieldLocation));
-	//ndSharedPtr<ndBody> mapBody(BuildStaticMesh(scene, "flatPlane.fbx", false));
-	//ndSharedPtr<ndBody> mapBody(BuildProceduralMap(scene, 200, 2.0f, 0.0f));
-	//ndSharedPtr<ndBody> mapBody(BuildStaticMesh(scene, "track.fbx", false));
+	ndShapeHeightfield* const heighfield = mapBody->GetAsBodyKinematic()->GetCollisionShape().GetShape()->GetAsShapeHeightfield();
+	ndMatrix heighfieldLocation(ndGetIdentityMatrix());
+	heighfieldLocation.m_posit.m_x = -0.5f * ndFloat32(heighfield->GetWith()) * heighfield->GetWithScale();
+	heighfieldLocation.m_posit.m_z = -0.5f * ndFloat32(heighfield->GetHeight()) * heighfield->GetHeightScale();
+
+	mapBody->GetAsBodyKinematic()->SetMatrixUpdateScene(heighfieldLocation);
 
 	ndShapeMaterial mapMaterial(mapBody->GetAsBodyKinematic()->GetCollisionShape().GetMaterial());
 	mapMaterial.m_userId = ndDemoContactCallback::m_aiTerrain;
 	mapBody->GetAsBodyKinematic()->GetCollisionShape().SetMaterial(mapMaterial);
 	
-	AddAiVehicle(scene);
+	//AddAiVehicle(scene);
+
+	ndVector floor(FindFloor(*scene->GetWorld(), ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	ndQuaternion rot(ndYawMatrix(180.0f * ndDegreeToRad));
+
+	ndMatrix origin(ndCalculateMatrix(rot, floor));
+	//AddCapsuleStacks(scene, origin, 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
+
+
+	floor.m_y += 5.0f;
+	//floor.m_x += 10.0f;
+	scene->SetCameraMatrix(rot, floor);
+
 }

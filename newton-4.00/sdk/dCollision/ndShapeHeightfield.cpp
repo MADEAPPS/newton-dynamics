@@ -106,6 +106,34 @@ const ndArray<ndInt8>& ndShapeHeightfield::GetAttributeMap() const
 	return m_attributeMap;
 }
 
+ndInt32 ndShapeHeightfield::GetWith() const
+{
+	return m_width;
+}
+
+ndInt32 ndShapeHeightfield::GetHeight() const
+{
+	return m_height;
+}
+
+ndFloat32 ndShapeHeightfield::GetWithScale() const
+{
+	return m_horizontalScale_x;
+}
+
+ndFloat32 ndShapeHeightfield::GetHeightScale() const
+{
+	return m_horizontalScale_z;
+}
+
+ndVector ndShapeHeightfield::GetLocation(ndInt32 x, ndInt32 z) const
+{
+	x = ndClamp(x, ndInt32(0), m_width - 1);
+	z = ndClamp(z, ndInt32(0), m_height - 1);
+	ndReal h = ndFloat32(m_elevationMap[z * m_width + x]);
+	return ndVector(ndFloat32(x) * m_horizontalScaleInv_x, h, ndFloat32(z) * m_horizontalScaleInv_z, ndFloat32(0.0f));
+}
+
 ndInt32 ndShapeHeightfield::FastInt(ndFloat32 x) const
 {
 	ndInt32 i = ndInt32(x);
@@ -149,7 +177,8 @@ void ndShapeHeightfield::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& 
 	ndVector triangle[3];
 
 	ndShapeDebugNotify::ndEdgeType edgeType[4];
-	memset(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType));
+	//memset(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType));
+	ndMemSet(edgeType, ndShapeDebugNotify::m_shared, 4);
 
 	const ndInt32* const indirectIndex = GetIndexList();
 	const ndInt32 i0 = indirectIndex[0];
