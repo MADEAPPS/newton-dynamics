@@ -1152,11 +1152,6 @@ ndInt32 ndContactSolver::PruneBruteForceSmallContacts(ndInt32 count, ndContactPo
 
 ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, ndContactPoint* const contactArray, ndInt32 maxCount) const
 {
-	if (count <= 3)
-	{
-		return PruneBruteForceSmallContacts(count, contactArray);
-	}
-
 	class ndCluster
 	{
 		public:
@@ -1437,12 +1432,6 @@ ndInt32 ndContactSolver::Prune2dContacts(ndFixSizeArray<ndVector, D_MAX_CONTATCS
 		ndInt32 m_mask;
 	};
 
-
-static int xxxxx;
-xxxxx++;
-if (xxxxx == 210)
-xxxxx *= 1;
-
 	// build an optimal 2d convex hull in place
 	// have quadratic time complexity, but for a small number of point (16 max)
 	// it is much faster and more important, generates higher quality contacts.
@@ -1549,7 +1538,11 @@ xxxxx *= 1;
 	const ndVector edge0(p1 - p0);
 	const ndVector edge1(p2 - p0);
 	ndFloat32 upDir = edge0.m_x * edge1.m_y - edge0.m_y * edge1.m_x;
-	ndAssert(ndAbs(upDir) > ndFloat32(0.0f));
+	if (ndAbs(upDir) < ndFloat32(1.0e-6f))
+	{
+		// this is a line
+		ndAssert(0);
+	}
 	if (upDir < ndFloat32(0.0f))
 	{
 		ndSwap(p1, p2);
@@ -1643,11 +1636,6 @@ xxxxx *= 1;
 
 ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, ndContactPoint* const contactArray, ndInt32 maxCount) const
 {
-	if (count <= 3)
-	{
-		return PruneBruteForceSmallContacts(count, contactArray);
-	}
-
 	ndFixSizeArray<ndVector, D_MAX_CONTATCS> planeProjection(0);
 	const ndVector xyMask(ndVector::m_xMask | ndVector::m_yMask);
 	for (ndInt32 i = 0; i < count; ++i)
@@ -1661,11 +1649,6 @@ ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, 
 
 ndInt32 ndContactSolver::Prune1dContacts(const ndMatrix& matrix, ndInt32 count, ndContactPoint* const contactArray, ndInt32 maxCount) const
 {
-	if (count <= 2)
-	{
-		return PruneBruteForceSmallContacts(count, contactArray);
-	}
-
 	ndFixSizeArray<ndVector, D_MAX_CONTATCS> planeProjection(0);
 
 	const ndVector xyMask(ndVector::m_xMask | ndVector::m_yMask);
@@ -1699,11 +1682,6 @@ ndInt32 ndContactSolver::Prune1dContacts(const ndMatrix& matrix, ndInt32 count, 
 		return 1;
 	}
 
-	if (count == 3)
-	{
-		return PruneBruteForceSmallContacts(count, contactArray);
-	}
-
 	const ndVector ref(planeProjection[j1]);
 	for (ndInt32 i = count - 1; i >= 0; --i)
 	{
@@ -1725,6 +1703,12 @@ ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
 {
 	ndVector origin(ndVector::m_zero);
 	ndContactPoint* const contactArray = m_contactBuffer;
+
+	count = PruneBruteForceSmallContacts(count, contactArray);
+	if (count <= 3)
+	{
+		return count;
+	}
 
 	for (ndInt32 i = count - 1; i >= 0; --i)
 	{
@@ -1789,6 +1773,7 @@ ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
 	}
 	ndAssert(eigen[0] >= eigen[1]);
 	ndAssert(eigen[1] >= eigen[2]);
+
 
 	if (eigen[2] > ndFloat32(1.0e-4f))
 	{
