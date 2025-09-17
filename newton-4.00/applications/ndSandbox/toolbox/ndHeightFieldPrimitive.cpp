@@ -194,9 +194,7 @@ ndSharedPtr<ndBody> BuildHeightFieldTerrain(ndDemoEntityManager* const scene, co
 	}
 	shape->UpdateElevationMapAabb();
 
-	// make a tiled rendered node.
-	// the terrain is a array of tile subtable for colling,
-	// by in thsi case we are rendering brute force
+	// add tile base sence node
 	ndRender* const render = *scene->GetRenderer();
 	ndSharedPtr<ndRenderTexture> texture(render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textureName)));
 	ndSharedPtr<ndRenderSceneNode> entity(new ndHeightfieldMesh(render, shape, texture, location));
