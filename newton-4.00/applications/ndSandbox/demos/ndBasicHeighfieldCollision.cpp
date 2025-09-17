@@ -309,8 +309,11 @@ void ndBasicHeighfieldCollision(ndDemoEntityManager* const scene)
 	ndQuaternion rot(ndYawMatrix(180.0f * ndDegreeToRad));
 
 	ndMatrix origin(ndCalculateMatrix(rot, floor));
-	//AddCapsuleStacks(scene, origin, 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
+	origin.m_posit += origin.m_front.Scale (20.0f);
+	AddCapsuleStacks(scene, origin, 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
 
+	origin.m_posit += origin.m_right.Scale(20.0f);
+	AddPlanks(scene, origin, 1.0f, 4);
 
 	floor.m_y += 5.0f;
 	//floor.m_x += 10.0f;
