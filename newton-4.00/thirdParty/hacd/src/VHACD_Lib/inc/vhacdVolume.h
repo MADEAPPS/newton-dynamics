@@ -19,7 +19,7 @@
 #include "vhacdMesh.h"
 #include "vhacdVector.h"
 
-namespace nd_
+namespace nd
 {
 	namespace VHACD {
 

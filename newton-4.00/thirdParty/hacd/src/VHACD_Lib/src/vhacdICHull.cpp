@@ -16,7 +16,7 @@
 #include "vhacdICHull.h"
 
 
-namespace nd_
+namespace nd
 {
 	namespace VHACD 
 	{

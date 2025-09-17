@@ -17,7 +17,7 @@
 #define ND_VHACD_CIRCULAR_LIST_H
 #include "vhacdDefines.h"
 
-namespace nd_
+namespace nd
 {
 	namespace VHACD 
 	{

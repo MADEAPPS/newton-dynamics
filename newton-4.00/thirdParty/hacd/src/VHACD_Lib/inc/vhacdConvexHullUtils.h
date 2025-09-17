@@ -29,7 +29,7 @@
 #define _ASSERT(x)
 #endif
 
-namespace nd_
+namespace nd
 {
 	namespace VHACD 
 	{

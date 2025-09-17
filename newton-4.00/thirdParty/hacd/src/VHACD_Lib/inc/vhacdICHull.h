@@ -24,7 +24,7 @@
 	#include <unistd.h>
 #endif
 
-namespace nd_
+namespace nd
 {
 	namespace VHACD 
 	{

@@ -21,6 +21,7 @@ include_directories(../dProfiler)
 include_directories(../dCollision)
 
 include_directories(../../thirdParty/openFBX/src)
+include_directories(../../thirdParty/hacd/src/VHACD_Lib/public/)
 
 include_directories(animation)
 

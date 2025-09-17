@@ -66,8 +66,7 @@
 #include <thread>
 #include <condition_variable>
 
-
-namespace nd_
+namespace nd
 {
 	namespace VHACD 
 	{

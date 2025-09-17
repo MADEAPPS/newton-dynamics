@@ -165,7 +165,9 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 		const ndArray<ndBigVector>& hullVertexArray = convexHull->GetVertexPool();
 
 		ndStack<ndInt8> mask(ndInt32(hullVertexArray.GetCount()));
-		memset(&mask[0], 1, size_t(mask.GetSizeInBytes()));
+		//memset(&mask[0], 1, size_t(mask.GetSizeInBytes()));
+		ndMemSet(&mask[0], ndInt8(1), mask.GetElementsCount());
+
 		for (ndConvexHull3d::ndNode* node = convexHull->GetFirst(); node; node = node->GetNext()) 
 		{
 			ndConvexHull3dFace& face = node->GetInfo();
@@ -205,7 +207,6 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 		if (!success) 
 		{
 			ndInt32 count1 = 0;
-			//ndInt32 vertexCount = convexHull->GetVertexCount();
 			const ndInt32 vertexCount = ndInt32(convexHull->GetVertexPool().GetCount());
 			for (ndInt32 i = 0; i < vertexCount; ++i) 
 			{
@@ -221,7 +222,6 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 	}
 
 	ndAssert(convexHull);
-	//ndInt32 vertexCount = convexHull->GetVertexCount();
 	ndInt32 vertexCount = ndInt32(convexHull->GetVertexPool().GetCount());
 	if (vertexCount < 4) 
 	{
@@ -229,7 +229,6 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 		return false;
 	}
 
-	//const ndBigVector* const hullVertexArray = convexHull->GetVertexPool();
 	const ndArray<ndBigVector>& hullVertexArray = convexHull->GetVertexPool();
 	ndPolyhedra polyhedra;
 	polyhedra.BeginFace();
@@ -246,7 +245,8 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 	}
 
 	ndStack<ndInt32> vertexMap(vertexCount);
-	memset(&vertexMap[0], -1, vertexCount * sizeof(ndInt32));
+	//memset(&vertexMap[0], -1, vertexCount * sizeof(ndInt32));
+	ndMemSet(&vertexMap[0], -1, vertexCount);
 
 	ndInt32 mark = polyhedra.IncLRU();
 	ndPolyhedra::Iterator iter(polyhedra);
@@ -309,7 +309,8 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 
 	m_faceCount = 0;
 	ndStack<char> faceMarks(m_edgeCount);
-	memset(&faceMarks[0], 0, m_edgeCount * sizeof(ndInt8));
+	//memset(&faceMarks[0], 0, m_edgeCount * sizeof(ndInt8));
+	ndMemSet(&faceMarks[0], char(0), m_edgeCount);
 
 	ndStack<ndConvexSimplexEdge*> faceArray(m_edgeCount);
 
@@ -980,7 +981,9 @@ void ndShapeConvexHull::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& d
 {
 	ndVector vertex[512];
 	ndShapeDebugNotify::ndEdgeType edgeType[512];
-	memset(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType));
+	//memset(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType));
+	ndMemSet(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType)/ sizeof(edgeType[0]));
+
 	for (ndInt32 i = 0; i < m_faceCount; ++i) 
 	{
 		ndConvexSimplexEdge* const face = m_faceArray[i];

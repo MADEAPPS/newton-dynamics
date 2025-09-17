@@ -3,7 +3,7 @@
 
 #include "vhacdDefines.h"
 
-namespace nd_
+namespace nd
 {
 	namespace VHACD
 	{

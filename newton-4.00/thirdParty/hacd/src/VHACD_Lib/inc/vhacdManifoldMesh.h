@@ -21,7 +21,7 @@ All rights reserved.
 #include "vhacdSArray.h"
 #include "vhacdVector.h"
 
-namespace nd_
+namespace nd
 {
 	namespace VHACD 
 	{

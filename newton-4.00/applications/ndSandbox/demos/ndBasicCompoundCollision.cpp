@@ -39,12 +39,10 @@ static void AddSphere(ndDemoEntityManager* const scene)
 {
 	ndRender* const render = *scene->GetRenderer();
 
-	//ndShapeInstance shape(new ndShapeSphere(0.125f));
 	ndSharedPtr<ndShapeInstance> shape(new ndShapeInstance(new ndShapeSphere(0.125f)));
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
 	descriptor.m_collision = shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_spherical;
-	//descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("earthmap.png"));
 	descriptor.AddMaterial (render->GetTextureCache()->GetTexture(ndGetWorkingFileName("earthmap.png")));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 
@@ -130,21 +128,17 @@ static void AddSimpleConcaveMesh(ndDemoEntityManager* const scene, const ndMatri
 {
 	ndMeshLoader loader;
 	ndSharedPtr<ndRenderSceneNode> rootEntity(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName(meshName)));
-	//ndSharedPtr<ndDemoEntity> childEntity(rootEntity->GetChildren().GetFirst()->GetInfo());
-	//ndSharedPtr<ndShapeInstance>compoundShapeInstance(childEntity->CreateCompoundFromMesh());
-
-rootEntity->SetTransform(matrix, matrix.m_posit);
-scene->AddEntity(rootEntity);
+	ndSharedPtr<ndShapeInstance>compoundShapeInstance(loader.m_mesh->CreateCompoundShape());
 	
-	//ndMatrix originMatrix(matrix);
-	//for (ndInt32 i = 0; i < count; ++i)
-	//{
-	//	ndDemoEntity* const entity = childEntity->CreateClone();
-	//	originMatrix.m_posit.m_z += 2.0f;
-	//	ndVector floor(FindFloor(*scene->GetWorld(), originMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	//	originMatrix.m_posit.m_y = floor.m_y + 2.0f;
-	//	AddRigidBody(scene, originMatrix, *(*compoundShapeInstance), entity, 5.0f);
-	//}
+	ndMatrix originMatrix(matrix);
+	for (ndInt32 i = 0; i < count; ++i)
+	{
+		ndSharedPtr<ndRenderSceneNode> cloneEntity(rootEntity->Clone());
+		originMatrix.m_posit.m_z += 2.0f;
+		ndVector floor(FindFloor(*scene->GetWorld(), originMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+		originMatrix.m_posit.m_y = floor.m_y + 2.0f;
+		AddRigidBody(scene, originMatrix, *(*compoundShapeInstance), cloneEntity, 5.0f);
+	}
 }
 
 void ndBasicCompoundCollision(ndDemoEntityManager* const scene)
@@ -165,8 +159,8 @@ void ndBasicCompoundCollision(ndDemoEntityManager* const scene)
 
 	ndMatrix location(ndGetIdentityMatrix());
 
-	//AddSphere(scene);
-	//AddEmptyBox(scene);
+	AddSphere(scene);
+	AddEmptyBox(scene);
 
 	location.m_posit.m_y = 0.5f;
 	location.m_posit.m_z = -3.0f;

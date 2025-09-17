@@ -7,7 +7,7 @@
 #include "FloatMath.h"
 #include <vector>
 
-namespace nd_
+namespace nd
 {
 	namespace FLOAT_MATH
 	{

@@ -25,7 +25,7 @@
 #include "vhacdDefines.h"
 #include "vhacdConvexHullUtils.h"
 
-namespace nd_
+namespace nd
 {
 	namespace VHACD
 	{

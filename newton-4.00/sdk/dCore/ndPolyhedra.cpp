@@ -3145,8 +3145,6 @@ ndMatrix ndPolyhedra::CalculateSphere(ndBigVector& size, const ndFloat64* const 
 			ndAssert((trianglesCount * 3) <= triangleList.GetElementsCount());
 		}
 		
-		//ndVector* const dst = (ndVector*)&pool[0].m_x;
-		//ndInt32 vertexCount = convexHull->GetVertexPool().GetCount();
 		const ndArray<ndBigVector>& hullVertexArray = convexHull.GetVertexPool();
 		for (ndInt32 i = 0; i < hullVertexArray.GetCount(); ++i)
 		{

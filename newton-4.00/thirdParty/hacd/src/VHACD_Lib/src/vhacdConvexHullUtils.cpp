@@ -22,7 +22,7 @@
 #include <string.h>
 #include "vhacdConvexHullUtils.h"
 
-namespace nd_
+namespace nd
 {
 	namespace VHACD
 	{

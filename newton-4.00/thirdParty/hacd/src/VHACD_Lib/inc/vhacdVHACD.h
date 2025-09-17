@@ -19,7 +19,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 #include "vhacdVolume.h"
 #include "vhacdRaycastMesh.h"
 
-namespace nd_
+namespace nd
 {
 	#define CH_APP_MIN_NUM_PRIMITIVES 64000
 	namespace VHACD 

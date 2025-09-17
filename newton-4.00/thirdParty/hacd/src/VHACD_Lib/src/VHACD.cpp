@@ -30,7 +30,7 @@
 #include "vhacdVolume.h"
 #include "FloatMath.h"
 
-namespace nd_
+namespace nd
 {
 	#define MAX(a, b) (((a) > (b)) ? (a) : (b))
 	#define MIN(a, b) (((a) < (b)) ? (a) : (b))
@@ -283,7 +283,7 @@ namespace nd_
 	#endif // DEBUG_TEMP
 
 
-		class CommonData
+	class CommonData
 	{
 		public:
 		CommonData(VHACD* me, const Parameters& params)
@@ -307,7 +307,7 @@ namespace nd_
 		PrimitiveSet** m_psets;
 	};
 
-		class BestClippingPlaneJob : public Job
+	class BestClippingPlaneJob : public Job
 	{
 		public:
 		BestClippingPlaneJob()

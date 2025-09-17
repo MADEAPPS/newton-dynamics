@@ -1,7 +1,7 @@
 #pragma once
 #ifndef ND_HACD_CIRCULAR_LIST_INL
 #define ND_HACD_CIRCULAR_LIST_INL
-namespace nd_
+namespace nd
 {
 	namespace VHACD
 	{

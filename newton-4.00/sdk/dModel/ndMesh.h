@@ -78,6 +78,8 @@ class ndMesh : public ndClassAlloc
 	void ApplyTransform(const ndMatrix& transform);
 	ndMatrix CalculateGlobalMatrix(ndMesh* const parent = nullptr) const;
 
+	ndSharedPtr<ndShapeInstance> CreateCompoundShape(bool lowDetail = false);
+
 	ndMatrix m_matrix;
 	ndMatrix m_meshMatrix;
 

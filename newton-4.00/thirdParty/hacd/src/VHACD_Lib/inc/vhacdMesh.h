@@ -21,7 +21,7 @@
 #include "vhacdVector.h"
 
 
-namespace nd_
+namespace nd
 {
 	//#define VHACD_DEBUG_MESH
 
