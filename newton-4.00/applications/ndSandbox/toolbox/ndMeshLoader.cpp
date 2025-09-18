@@ -48,7 +48,7 @@ ndSharedPtr<ndRenderSceneNode> ndMeshLoader::LoadEntity(ndRender* const renderer
 
 		ndFixSizeArray<EntityMeshPair, 2048> meshList;
 		ndFixSizeArray<ndMesh*, 1024> effectNodeBuffer;
-		ndFixSizeArray<const ndRenderSceneNode*, 1024> parentEntityBuffer;
+		ndFixSizeArray<ndRenderSceneNode*, 1024> parentEntityBuffer;
 
 		parentEntityBuffer.PushBack(nullptr);
 		effectNodeBuffer.PushBack(*m_mesh);
@@ -56,7 +56,7 @@ ndSharedPtr<ndRenderSceneNode> ndMeshLoader::LoadEntity(ndRender* const renderer
 		while (effectNodeBuffer.GetCount())
 		{
 			ndMesh* const mesh = effectNodeBuffer.Pop();
-			const ndRenderSceneNode* parentNode = parentEntityBuffer.Pop();
+			ndRenderSceneNode* parentNode = parentEntityBuffer.Pop();
 
 			ndRenderSceneNode* entity = nullptr;
 			if (!parentNode)
@@ -67,7 +67,9 @@ ndSharedPtr<ndRenderSceneNode> ndMeshLoader::LoadEntity(ndRender* const renderer
 			}
 			else
 			{
-				ndAssert(0);
+				ndSharedPtr<ndRenderSceneNode> childNode(new ndRenderSceneNode(mesh->m_matrix));
+				parentNode->AddChild(childNode);
+				entity = *childNode;
 			}
 
 			ndSharedPtr<ndMeshEffect> meshEffect(mesh->GetMesh());
@@ -78,7 +80,6 @@ ndSharedPtr<ndRenderSceneNode> ndMeshLoader::LoadEntity(ndRender* const renderer
 
 			for (ndList<ndSharedPtr<ndMesh>>::ndNode* childNode = mesh->GetChildren().GetFirst(); childNode; childNode = childNode->GetNext())
 			{
-				ndAssert(0);
 				ndMesh* const child = *childNode->GetInfo();
 				effectNodeBuffer.PushBack(child);
 				parentEntityBuffer.PushBack(entity);
@@ -113,8 +114,8 @@ ndSharedPtr<ndRenderSceneNode> ndMeshLoader::LoadEntity(ndRender* const renderer
 				descriptor.m_meshNode = meshEffect;
 				for (ndInt32 j = 0; j < materials.GetCount(); ++j)
 				{
-					const ndString teturePath(path + materials[i].m_textureName);
-					ndRenderPrimitiveMeshMaterial& material = descriptor.AddMaterial(renderer->GetTextureCache()->GetTexture(teturePath));
+					const ndString texturePathName(path + materials[j].m_textureName);
+					ndRenderPrimitiveMeshMaterial& material = descriptor.AddMaterial(renderer->GetTextureCache()->GetTexture(texturePathName));
 					material.m_castShadows = true;
 					material.m_diffuse = materials[i].m_diffuse;
 					material.m_specular = materials[i].m_specular;
@@ -135,11 +136,8 @@ ndSharedPtr<ndRenderSceneNode> ndMeshLoader::LoadEntity(ndRender* const renderer
 				//entity->m_isVisible = false;
 				//entity->m_castShadow = false;
 			}
-
 		}
-
 	}
-
 
 	return sceneNode;
 }
