@@ -18,18 +18,92 @@
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 
-static void BuildPlayGround(ndDemoEntityManager* const scene)
+static void BuildPlaygroundHangingBridge(ndDemoEntityManager* const scene, const ndSharedPtr<ndMesh>& mesh, const ndSharedPtr<ndBody>& playgroundBody)
 {
+	//ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)playgroundBody->GetNotifyCallback();
+	//ndSharedPtr<ndRenderSceneNode> entity (notify->GetUserData());
+
+	// add a hanging bridge as a feature.
+	const ndMesh* const end(mesh->FindChild("rampEnd"));
+	const ndMesh* const start(mesh->FindChild("rampStart"));
+	
+	ndMatrix endMatrix(end->CalculateGlobalMatrix());
+	ndMatrix startMatrix(start->CalculateGlobalMatrix());
+	ndFloat32 dist = ndAbs(startMatrix.m_right.DotProduct(endMatrix.m_posit - startMatrix.m_posit).GetScalar());
+
+	ndInt32 numberOfPlank = 1;
+	while (dist > 2.0f)
+	{
+		numberOfPlank *= 2;
+		dist *= ndFloat32(0.5f);
+	}
+
+	//ndFloat32 slackDist = dist * 1.05f;
+	ndFloat32 slackDist = dist * 0.9f;
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeBox(11.0f, 0.2f, slackDist)));
+
+	ndRender* const render = *scene->GetRenderer();
+	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
+	descriptor.m_collision = shape;
+	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
+	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png")));
+
+	ndSharedPtr<ndRenderSceneNode> bridgeMesh(new ndRenderSceneNodeInstance(startMatrix, descriptor));
+	scene->AddEntity(bridgeMesh);
+
+	ndMatrix localMatrix(ndGetIdentityMatrix());
+	localMatrix.m_posit.m_z = dist * ndFloat32(0.5f);
+	localMatrix.m_posit.m_y = -ndFloat32(0.1f);
+
+	ndPhysicsWorld* const world = scene->GetWorld();
+
+	ndFloat32 linkMass = 100.0f;
+	ndFixSizeArray<ndBodyDynamic*, 256> bodyLinks;
+	for (ndInt32 i = 0; i < numberOfPlank; ++i)
+	{
+		ndSharedPtr<ndRenderSceneNode>visualLink(new ndRenderSceneNode(localMatrix));
+		bridgeMesh->AddChild(visualLink);
+
+		ndSharedPtr<ndBody> body(new ndBodyDynamic());
+		body->SetNotifyCallback(new ndDemoEntityNotify(scene, visualLink));
+		body->SetMatrix(visualLink->CalculateGlobalMatrix());
+		body->GetAsBodyKinematic()->SetCollisionShape(**shape);
+		body->GetAsBodyKinematic()->SetMassMatrix(linkMass, **shape);
+		body->GetAsBodyDynamic()->SetAngularDamping(ndVector(ndFloat32(0.5f)));
+		world->AddBody(body);
+
+		localMatrix.m_posit.m_z += dist;
+	}
+	ndRenderSceneNodeInstance* const instanceRoot = (ndRenderSceneNodeInstance*)*bridgeMesh;
+	instanceRoot->Finalize();
+}
+
+static void BuildPlayground(ndDemoEntityManager* const scene)
+{
+	// build the background collsion mesh
 	ndMeshLoader loader;
 	ndSharedPtr<ndRenderSceneNode> playground(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("playground.fbx")));
+	const ndMesh* const levelMesh = loader.m_mesh->FindChild("levelGeometry");
+	ndAssert(levelMesh);
+	ndSharedPtr<ndShapeInstance>collision(loader.m_mesh->CreateCollisionTree());
 
+	ndMatrix location(loader.m_mesh->CalculateGlobalMatrix());
+	// generate a rigibody and added to the scene and world
+	ndPhysicsWorld* const world = scene->GetWorld();
+	ndSharedPtr<ndBody> body(new ndBodyDynamic());
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, playground));
+	body->SetMatrix(location);
+	body->GetAsBodyDynamic()->SetCollisionShape(**collision);
+	
+	world->AddBody(body);
 	scene->AddEntity(playground);
 
+	BuildPlaygroundHangingBridge(scene, loader.m_mesh, body);
 }
 
 void ndBasicStaticMeshCollision (ndDemoEntityManager* const scene)
 {
-	BuildPlayGround(scene);
+	BuildPlayground(scene);
 
 	//ndMatrix location(ndGetIdentityMatrix());
 	//location.m_posit.m_y += 2.0f;
@@ -52,7 +126,7 @@ void ndBasicStaticMeshCollision (ndDemoEntityManager* const scene)
 	//
 	//location.m_posit.m_z += 4.0f;
 	////new ndBasicPlayerCapsule(scene, man, localAxis, location, mass, radio, height, height / 4.0f);
-	//
+	
 	class PlaceMatrix : public ndMatrix
 	{
 		public:
@@ -74,11 +148,10 @@ void ndBasicStaticMeshCollision (ndDemoEntityManager* const scene)
 	//AddConvexHull(scene, PlaceMatrix(1.0f, 1.0f, 2.0f), 10.0f, 0.6f, 1.0f, 15);
 	//AddConvexHull(scene, PlaceMatrix(2.0f, 1.0f, 0.0f), 10.0f, 0.7f, 1.0f, 10);
 	//AddConvexHull(scene, PlaceMatrix(1.0f, 1.0f, 1.0f), 10.0f, 0.5f, 1.2f, 6);
-	//
 	////AddCapsulesStacks(scene, PlaceMatrix(45.0f, 0.0f, 0.0f), 10.0f, 0.5f, 0.5f, 1.0f, 5, 8, 7);
 	
 	ndQuaternion rot(ndYawMatrix(30.0f * ndDegreeToRad));
-	ndVector origin(-3.0f, 10.0f, 2.0f, 1.0f);
+	ndVector origin(-40.0f, 15.0f, 20.0f, 1.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
 

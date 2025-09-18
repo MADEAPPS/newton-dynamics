@@ -22,6 +22,8 @@
 #include "ndModelStdafx.h"
 #include "ndMesh.h"
 
+#define ND_MESH_MAX_STACK_DEPTH	2048
+
 ndMesh::ndMesh()
 	:ndClassAlloc()
 	,m_matrix(ndGetIdentityMatrix())
@@ -110,6 +112,11 @@ ndList<ndSharedPtr<ndMesh>>& ndMesh::GetChildren()
 	return m_children;
 }
 
+const ndList<ndSharedPtr<ndMesh>>& ndMesh::GetChildren() const
+{
+	return m_children;
+}
+
 const ndString& ndMesh::GetName() const
 {
 	return m_name;
@@ -170,6 +177,29 @@ void ndMesh::SetMesh(const ndSharedPtr<ndMeshEffect>& mesh)
 	m_mesh = mesh;
 }
 
+ndMesh* ndMesh::FindChild(const char* const name) const
+{
+	ndFixSizeArray<ndMesh*, ND_MESH_MAX_STACK_DEPTH> stack(0);
+	
+	stack.PushBack((ndMesh*)this);
+	while (stack.GetCount())
+	{
+		ndMesh* const node = stack.Pop();
+		if (!strcmp(node->m_name.GetStr(), name))
+		{
+			return node;
+		}
+
+		for (ndList<ndSharedPtr<ndMesh>>::ndNode* childNode = node->GetChildren().GetFirst(); childNode; childNode = childNode->GetNext())
+		{
+			ndMesh* const child = *childNode->GetInfo();
+			stack.PushBack(child);
+		}
+	}
+
+	return nullptr;
+}
+
 ndMatrix ndMesh::CalculateGlobalMatrix(ndMesh* const parent) const
 {
 	ndMatrix matrix(ndGetIdentityMatrix());
@@ -182,7 +212,7 @@ ndMatrix ndMesh::CalculateGlobalMatrix(ndMesh* const parent) const
 
 void ndMesh::ApplyTransform(const ndMatrix& transform)
 {
-	ndFixSizeArray<ndMesh*, 1024> entBuffer(0);
+	ndFixSizeArray<ndMesh*, ND_MESH_MAX_STACK_DEPTH> entBuffer(0);
 
 	auto GetKeyframe = [](const ndCurveValue& scale, const ndCurveValue& position, const ndCurveValue& rotation)
 	{
@@ -258,26 +288,68 @@ void ndMesh::ApplyTransform(const ndMatrix& transform)
 	}
 }
 
-ndSharedPtr<ndShapeInstance> ndMesh::CreateCompoundShape(bool lowDetail)
+ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionTree(bool optimize)
 {
-	//ndArray<ndVector> points;
-	//ndArray<ndInt32> indices;
-	//ndArray<ndInt32> remapIndex;
-	//const ndSharedPtr<ndDemoMeshInterface> meshPtr = GetMesh();
-	//ndDemoMesh* const mesh = (ndDemoMesh*)*meshPtr;
-	//ndAssert(mesh);
-	//mesh->GetVertexArray(points);
-	//mesh->GetIndexArray(indices);
-	//
-	//remapIndex.SetCount(points.GetCount());
-	//
-	//ndInt32 vCount = ndVertexListToIndexList(&points[0].m_x, sizeof(ndVector), 3, ndInt32(points.GetCount()), &remapIndex[0], ndFloat32(1.0e-6f));
-	//for (ndInt32 i = ndInt32(indices.GetCount()) - 1; i >= 0; --i)
-	//{
-	//	ndInt32 j = indices[i];
-	//	indices[i] = remapIndex[j];
-	//}
+	ndPolygonSoupBuilder meshBuilder;
+	meshBuilder.Begin();
 
+	ndFixSizeArray<ndMesh*, 1024> entBuffer;
+	ndFixSizeArray<ndMatrix, 1024> matrixBuffer;
+
+	entBuffer.PushBack(this);
+	matrixBuffer.PushBack(m_matrix.OrthoInverse());
+
+	while (entBuffer.GetCount())
+	{
+		ndMesh* node = entBuffer.Pop();
+		ndMatrix matrix(node->m_matrix * matrixBuffer.Pop());
+
+		ndSharedPtr<ndMeshEffect> meshEffect = node->GetMesh();
+		if (*meshEffect)
+		{
+			ndInt32 vertexStride = meshEffect->GetVertexStrideInByte() / ndInt32(sizeof(ndFloat64));
+			const ndFloat64* const vertexData = meshEffect->GetVertexPool();
+		
+			ndInt32 mark = meshEffect->IncLRU();
+			ndPolyhedra::Iterator iter(*(*meshEffect));
+		
+			ndMatrix worldMatrix(node->m_meshMatrix * matrix);
+			for (iter.Begin(); iter; iter++)
+			{
+				ndEdge* const edge = &(*iter);
+				if ((edge->m_incidentFace >= 0) && (edge->m_mark != mark))
+				{
+					ndFixSizeArray<ndVector, 256> face;
+					ndEdge* ptr = edge;
+					do
+					{
+						ndInt32 i = ptr->m_incidentVertex * vertexStride;
+						ndVector point(ndFloat32(vertexData[i + 0]), ndFloat32(vertexData[i + 1]), ndFloat32(vertexData[i + 2]), ndFloat32(1.0f));
+						face.PushBack(worldMatrix.TransformVector(point));
+						ptr->m_mark = mark;
+						ptr = ptr->m_next;
+					} while (ptr != edge);
+		
+					ndInt32 materialIndex = meshEffect->GetFaceMaterial(edge);
+					meshBuilder.AddFace(&face[0].m_x, sizeof(ndVector), face.GetCount(), materialIndex);
+				}
+			}
+		}
+
+		for (ndList<ndSharedPtr<ndMesh>>::ndNode* childNode = node->GetChildren().GetFirst(); childNode; childNode = childNode->GetNext())
+		{
+			ndMesh* const child = *childNode->GetInfo();
+			entBuffer.PushBack(child);
+			matrixBuffer.PushBack(matrix);
+		}
+	}
+	meshBuilder.End(optimize);
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeStatic_bvh(meshBuilder)));
+	return shape;
+}
+
+ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionCompound(bool lowDetail)
+{
 	const ndInt32 pointsCount = m_mesh->GetVertexCount();
 	const ndInt32 pointsStride = ndInt32 (m_mesh->GetVertexStrideInByte() / sizeof (ndFloat64));
 	const ndFloat64* const pointsBuffer = m_mesh->GetVertexPool();

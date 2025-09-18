@@ -58,7 +58,11 @@ class ndMesh : public ndClassAlloc
 
 	void AddChild(const ndSharedPtr<ndMesh>& child);
 	void RemoveChild(const ndSharedPtr<ndMesh>& child);
+
 	ndList<ndSharedPtr<ndMesh>>& GetChildren();
+	const ndList<ndSharedPtr<ndMesh>>& GetChildren() const;
+
+	ndMesh* FindChild(const char* const name) const;
 
 	ndSharedPtr<ndMeshEffect>& GetMesh();
 	const ndSharedPtr<ndMeshEffect>& GetMesh() const;
@@ -78,7 +82,8 @@ class ndMesh : public ndClassAlloc
 	void ApplyTransform(const ndMatrix& transform);
 	ndMatrix CalculateGlobalMatrix(ndMesh* const parent = nullptr) const;
 
-	ndSharedPtr<ndShapeInstance> CreateCompoundShape(bool lowDetail = false);
+	ndSharedPtr<ndShapeInstance> CreateCollisionTree(bool optimize = true);
+	ndSharedPtr<ndShapeInstance> CreateCollisionCompound(bool lowDetail = false);
 
 	ndMatrix m_matrix;
 	ndMatrix m_meshMatrix;

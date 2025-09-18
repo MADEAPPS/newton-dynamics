@@ -130,7 +130,7 @@ static void AddSimpleConcaveMesh(ndDemoEntityManager* const scene, const ndMatri
 {
 	ndMeshLoader loader;
 	ndSharedPtr<ndRenderSceneNode> rootEntity(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName(meshName)));
-	ndSharedPtr<ndShapeInstance>compoundShapeInstance(loader.m_mesh->CreateCompoundShape());
+	ndSharedPtr<ndShapeInstance>compoundShapeInstance(loader.m_mesh->CreateCollisionCompound());
 	
 	ndMatrix originMatrix(matrix);
 	for (ndInt32 i = 0; i < count; ++i)

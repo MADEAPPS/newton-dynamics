@@ -573,7 +573,7 @@ void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::SetParameters(GLuint shad
 
 void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	// upload matrix pallet to the gpu vertex buffer
+	// upload matrix pallete to the gpu vertex buffer
 	glBindBuffer(GL_ARRAY_BUFFER, self->m_instanceRenderMatrixPalleteBuffer);
 	glMatrix* const matrixBuffer = (glMatrix*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
 	ndMemCpy(matrixBuffer, &self->m_instanceRenderMatrixPallete[0], self->m_instanceRenderMatrixPallete.GetCount());
