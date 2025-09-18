@@ -19,7 +19,8 @@
 
 void ndBasicStaticMeshCollision (ndDemoEntityManager* const scene)
 {
-	ndSharedPtr<ndBody> background(BuildPlayground(scene));
+	//ndSharedPtr<ndBody> background(BuildPlayground(scene));
+	ndSharedPtr<ndBody> BuildCompoundScene(BuildPlayground(scene));
 
 	//ndMatrix location(ndGetIdentityMatrix());
 	//location.m_posit.m_y += 2.0f;
