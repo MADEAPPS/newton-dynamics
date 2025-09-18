@@ -28,6 +28,7 @@ static void BuildPlaygroundHangingBridge(ndDemoEntityManager* const scene, const
 	ndMatrix startMatrix(start->CalculateGlobalMatrix());
 	ndFloat32 dist = ndAbs(startMatrix.m_right.DotProduct(endMatrix.m_posit - startMatrix.m_posit).GetScalar());
 
+	// calculate ho wmany plank can be inserted between the two hardpoints.
 	ndInt32 numberOfPlank = 1;
 	while (dist > 2.0f)
 	{
