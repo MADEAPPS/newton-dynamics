@@ -456,3 +456,8 @@ ndSharedPtr<ndBody> BuildPlayground(ndDemoEntityManager* const scene, bool kinem
 	BuildPlaygroundHangingBridge(scene, loader.m_mesh, body);
 	return body;
 }
+
+ndSharedPtr<ndBody> BuildCompoundScene(ndDemoEntityManager* const scene, const ndMatrix& location)
+{
+	return ndSharedPtr<ndBody>();
+}

@@ -27,5 +27,6 @@ class ndDemoEntityManager;
 ndSharedPtr<ndBody> BuildFlatPlane(ndDemoEntityManager* const scene, const ndMatrix& location, const char* const textureName, bool optimized, bool kinematic = false);
 ndSharedPtr<ndBody> BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix& location, const char* const textureName, ndFloat32 uvTiling, bool kinematic = false);
 ndSharedPtr<ndBody> BuildPlayground(ndDemoEntityManager* const scene, bool kinematic = false);
+ndSharedPtr<ndBody> BuildCompoundScene(ndDemoEntityManager* const scene, const ndMatrix& location);
 
 #endif
