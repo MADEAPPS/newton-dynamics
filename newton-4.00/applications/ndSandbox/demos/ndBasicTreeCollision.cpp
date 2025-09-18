@@ -38,27 +38,29 @@ static void BuildPlaygroundHangingBridge(ndDemoEntityManager* const scene, const
 		dist *= ndFloat32(0.5f);
 	}
 
-	//ndFloat32 slackDist = dist * 1.05f;
-	ndFloat32 slackDist = dist * 0.9f;
-	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeBox(11.0f, 0.2f, slackDist)));
+	ndFloat32 plankSickness = 0.2f;
+	ndFloat32 slackDist = dist * 1.05f;
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeBox(11.0f, plankSickness, slackDist)));
 
 	ndRender* const render = *scene->GetRenderer();
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
 	descriptor.m_collision = shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
-	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png")));
+	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_1.png")));
 
 	ndSharedPtr<ndRenderSceneNode> bridgeMesh(new ndRenderSceneNodeInstance(startMatrix, descriptor));
 	scene->AddEntity(bridgeMesh);
 
 	ndMatrix localMatrix(ndGetIdentityMatrix());
 	localMatrix.m_posit.m_z = dist * ndFloat32(0.5f);
-	localMatrix.m_posit.m_y = -ndFloat32(0.1f);
+	localMatrix.m_posit.m_y = -ndFloat32(0.5f) * plankSickness;
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 
 	ndFloat32 linkMass = 100.0f;
 	ndFixSizeArray<ndBodyDynamic*, 256> bodyLinks;
+
+	// create all the links and attach the to the parent scene node
 	for (ndInt32 i = 0; i < numberOfPlank; ++i)
 	{
 		ndSharedPtr<ndRenderSceneNode>visualLink(new ndRenderSceneNode(localMatrix));
@@ -71,11 +73,32 @@ static void BuildPlaygroundHangingBridge(ndDemoEntityManager* const scene, const
 		body->GetAsBodyKinematic()->SetMassMatrix(linkMass, **shape);
 		body->GetAsBodyDynamic()->SetAngularDamping(ndVector(ndFloat32(0.5f)));
 		world->AddBody(body);
+		bodyLinks.PushBack(body->GetAsBodyDynamic());
 
 		localMatrix.m_posit.m_z += dist;
 	}
 	ndRenderSceneNodeInstance* const instanceRoot = (ndRenderSceneNodeInstance*)*bridgeMesh;
 	instanceRoot->Finalize();
+
+	//connect every two adjecent link with a hinge joint
+	ndMatrix matrix0(ndGetIdentityMatrix());
+	ndMatrix matrix1(ndGetIdentityMatrix());
+
+	matrix0.m_posit.m_z = slackDist * 0.5f;
+	matrix0.m_posit.m_y = ndFloat32(0.5f) * plankSickness;
+
+	matrix1.m_posit.m_z = -slackDist * 0.5f;
+	matrix1.m_posit.m_y = ndFloat32(0.5f) * plankSickness;
+
+	for (ndInt32 i = 0; i < bodyLinks.GetCount() - 1; ++i)
+	{
+		ndBodyDynamic* const body0 = bodyLinks[i];
+		ndBodyDynamic* const body1 = bodyLinks[i + 1];
+		ndSharedPtr<ndJointBilateralConstraint> joint (new ndJointHinge(matrix0 * body0->GetMatrix(), matrix1 * body1->GetMatrix(), body0, body1));
+		ndJointHinge* const hinge = (ndJointHinge*)*joint;
+		hinge->SetAsSpringDamper(0.02f, 0.0f, 20.0f);
+		world->AddJoint(joint);
+	}
 }
 
 static void BuildPlayground(ndDemoEntityManager* const scene)
