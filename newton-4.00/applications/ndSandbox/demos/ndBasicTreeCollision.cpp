@@ -39,7 +39,7 @@ static void BuildPlaygroundHangingBridge(ndDemoEntityManager* const scene, const
 	}
 
 	ndFloat32 plankSickness = 0.2f;
-	ndFloat32 slackDist = dist * 1.05f;
+	ndFloat32 slackDist = dist * 1.01f;
 	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeBox(11.0f, plankSickness, slackDist)));
 
 	ndRender* const render = *scene->GetRenderer();
@@ -95,6 +95,33 @@ static void BuildPlaygroundHangingBridge(ndDemoEntityManager* const scene, const
 		ndBodyDynamic* const body0 = bodyLinks[i];
 		ndBodyDynamic* const body1 = bodyLinks[i + 1];
 		ndSharedPtr<ndJointBilateralConstraint> joint (new ndJointHinge(matrix0 * body0->GetMatrix(), matrix1 * body1->GetMatrix(), body0, body1));
+		ndJointHinge* const hinge = (ndJointHinge*)*joint;
+		hinge->SetAsSpringDamper(0.02f, 0.0f, 20.0f);
+		world->AddJoint(joint);
+	}
+
+	// connect the two ends
+	{
+		ndBodyDynamic* const body0 = bodyLinks[0];
+		ndBodyDynamic* const body1 = playgroundBody->GetAsBodyDynamic();
+		ndMatrix body0Matrix(matrix1 * body0->GetMatrix());
+		ndMatrix body1Matrix(body0Matrix);
+		body1Matrix.m_posit += body1Matrix.m_right.Scale(ndFloat32(0.5f) * (slackDist - dist));
+
+		ndSharedPtr<ndJointBilateralConstraint> joint(new ndJointHinge(body0Matrix, body1Matrix, body0, body1));
+		ndJointHinge* const hinge = (ndJointHinge*)*joint;
+		hinge->SetAsSpringDamper(0.02f, 0.0f, 20.0f);
+		world->AddJoint(joint);
+	}
+
+	{
+		ndBodyDynamic* const body0 = bodyLinks[bodyLinks.GetCount() - 1];
+		ndBodyDynamic* const body1 = playgroundBody->GetAsBodyDynamic();
+		ndMatrix body0Matrix(matrix0 * body0->GetMatrix());
+		ndMatrix body1Matrix(body0Matrix);
+		body1Matrix.m_posit -= body1Matrix.m_right.Scale(ndFloat32(0.5f) * (slackDist - dist));
+
+		ndSharedPtr<ndJointBilateralConstraint> joint(new ndJointHinge(body0Matrix, body1Matrix, body0, body1));
 		ndJointHinge* const hinge = (ndJointHinge*)*joint;
 		hinge->SetAsSpringDamper(0.02f, 0.0f, 20.0f);
 		world->AddJoint(joint);
