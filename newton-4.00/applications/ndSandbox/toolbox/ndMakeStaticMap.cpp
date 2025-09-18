@@ -10,7 +10,7 @@
 */
 
 #include "ndSandboxStdafx.h"
-//#include "ndMeshLoader.h"
+#include "ndMeshLoader.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
@@ -229,160 +229,7 @@ ndSharedPtr<ndBody> BuildStaticMesh(ndDemoEntityManager* const scene, const char
 	return body;
 }
 
-ndSharedPtr<ndBody> BuildPlayArena(ndDemoEntityManager* const scene, bool kinematic)
-{
-	ndMeshLoader loader;
-	ndSharedPtr<ndMesh>meshEffectNode(loader.LoadMesh("playerarena.fbx"));
-	ndSharedPtr<ndDemoEntity> entity(new ndDemoEntity(scene, *meshEffectNode));
-	entity->SetShadowMode(false);
-	scene->AddEntity(entity);
 
-	ndPolygonSoupBuilder meshBuilder;
-	meshBuilder.Begin();
-
-	ndFixSizeArray<ndMesh*, 1024> entBuffer;
-	ndFixSizeArray<ndMatrix, 1024> matrixBuffer;
-
-	entBuffer.PushBack(*meshEffectNode);
-	matrixBuffer.PushBack(meshEffectNode->m_matrix.OrthoInverse());
-
-	while (entBuffer.GetCount())
-	{
-		ndMesh* ent = entBuffer.Pop();
-		ndMatrix matrix(ent->m_matrix * matrixBuffer.Pop());
-
-		ndSharedPtr<ndMeshEffect> meshEffect = ent->GetMesh();
-		if (*meshEffect)
-		{
-			ndInt32 vertexStride = meshEffect->GetVertexStrideInByte() / ndInt32(sizeof(ndFloat64));
-			const ndFloat64* const vertexData = meshEffect->GetVertexPool();
-
-			ndInt32 mark = meshEffect->IncLRU();
-			ndPolyhedra::Iterator iter(*(*meshEffect));
-
-			ndVector face[256];
-			ndMatrix worldMatrix(ent->m_meshMatrix * matrix);
-			for (iter.Begin(); iter; iter++)
-			{
-				ndEdge* const edge = &(*iter);
-				if ((edge->m_incidentFace >= 0) && (edge->m_mark != mark))
-				{
-					ndInt32 count = 0;
-					ndEdge* ptr = edge;
-					do
-					{
-						ndInt32 i = ptr->m_incidentVertex * vertexStride;
-						ndVector point(ndFloat32(vertexData[i + 0]), ndFloat32(vertexData[i + 1]), ndFloat32(vertexData[i + 2]), ndFloat32(1.0f));
-						face[count] = worldMatrix.TransformVector(point);
-						count++;
-						ptr->m_mark = mark;
-						ptr = ptr->m_next;
-					} while (ptr != edge);
-
-					ndInt32 materialIndex = meshEffect->GetFaceMaterial(edge);
-					meshBuilder.AddFace(&face[0].m_x, sizeof(ndVector), 3, materialIndex);
-				}
-			}
-		}
-
-		for (ndMesh* child = ent->GetFirstChild(); child; child = child->GetNext())
-		{
-			entBuffer.PushBack(child);
-			matrixBuffer.PushBack(matrix);
-		}
-	}
-	meshBuilder.End(true);
-	ndShapeInstance shape(new ndShapeStatic_bvh(meshBuilder));
-	ndMatrix matrix(entity->GetCurrentMatrix());
-
-	//ndSharedPtr<ndBody> body(new ndBodyDynamic());
-	ndSharedPtr<ndBody> body(kinematic ? new ndBodyKinematic() : new ndBodyDynamic());
-	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-	body->SetMatrix(matrix);
-	body->GetAsBodyKinematic()->SetCollisionShape(shape);
-	scene->GetWorld()->AddBody(body);
-
-	ndSharedPtr<ndDemoEntity> pivot0(entity->Find(entity, "pivot1"));
-	ndSharedPtr<ndDemoEntity> pivot1(entity->Find(entity, "pivot0"));
-	if (*pivot0 && *pivot1)
-	{
-		ndMatrix matrix0(pivot0->CalculateGlobalMatrix());
-		ndMatrix matrix1(pivot1->CalculateGlobalMatrix());
-		ndVector dir(matrix1.m_posit - matrix0.m_posit);
-		ndFloat32 lenght = ndSqrt(dir.DotProduct(dir).GetScalar());
-
-		const ndInt32 plankCount = 30;
-		ndFloat32 sizex = 10.0f;
-		ndFloat32 sizey = 0.25f;
-		ndFloat32 sizez = lenght / plankCount;
-		ndFloat32 deflection = 0.02f;
-
-		matrix = matrix0;
-		matrix.m_posit.m_y -= sizey * 0.5f;
-		matrix.m_posit.m_z += sizez * 0.5f;
-		ndShapeInstance plankShape(new ndShapeBox(sizex, sizey, sizez + deflection));
-
-		ndFixSizeArray<ndBodyKinematic*, plankCount> array;
-		for (ndInt32 i = 0; i < plankCount; ++i)
-		{
-			array.PushBack(CreateBody(scene, plankShape, matrix, 20.0f));
-			matrix.m_posit.m_z += sizez;
-		}
-
-		for (ndInt32 i = 1; i < plankCount; ++i)
-		{
-			ndBodyKinematic* body0 = array[i - 1];
-			ndBodyKinematic* body1 = array[i];
-			ndMatrix linkMatrix(body0->GetMatrix());
-			linkMatrix.m_posit = ndVector::m_half * (body0->GetMatrix().m_posit + body1->GetMatrix().m_posit);
-			linkMatrix.m_posit.m_y += sizey * 0.5f;
-			ndMatrix matrix_0(linkMatrix);
-			ndMatrix matrix_1(linkMatrix);
-			matrix_0.m_posit.m_z += deflection * 0.5f;
-			matrix_1.m_posit.m_z -= deflection * 0.5f;
-			ndJointHinge* const hinge = new ndJointHinge(matrix_0, matrix_1, body0, body1);
-			hinge->SetAsSpringDamper(0.02f, 0.0f, 20.0f);
-			ndSharedPtr<ndJointBilateralConstraint> jointptr(hinge);
-			scene->GetWorld()->AddJoint(jointptr);
-		}
-
-		{
-			ndBodyKinematic* body0 = array[0];
-			ndBodyKinematic* body1 = body->GetAsBodyKinematic();
-			ndMatrix linkMatrix(body0->GetMatrix());
-			linkMatrix.m_posit = body0->GetMatrix().m_posit;
-			linkMatrix.m_posit.m_z -= (sizez + deflection) * 0.5f;
-			linkMatrix.m_posit.m_y += sizey * 0.5f;
-			ndMatrix matrix_0(linkMatrix);
-			ndMatrix matrix_1(linkMatrix);
-			matrix_0.m_posit.m_z += deflection * 0.5f;
-			matrix_1.m_posit.m_z -= deflection * 0.5f;
-			ndJointHinge* const hinge = new ndJointHinge(matrix_0, matrix_1, body0, body1);
-			hinge->SetAsSpringDamper(0.02f, 0.0f, 20.0f);
-			ndSharedPtr<ndJointBilateralConstraint> jointptr(hinge);
-			scene->GetWorld()->AddJoint(jointptr);
-		}
-
-		{
-			ndBodyKinematic* body0 = array[plankCount - 1];
-			ndBodyKinematic* body1 = body->GetAsBodyKinematic();
-			ndMatrix linkMatrix(body0->GetMatrix());
-			linkMatrix.m_posit = body0->GetMatrix().m_posit;
-			linkMatrix.m_posit.m_z += (sizez + deflection) * 0.5f;
-			linkMatrix.m_posit.m_y += sizey * 0.5f;
-			ndMatrix matrix_0(linkMatrix);
-			ndMatrix matrix_1(linkMatrix);
-			matrix_0.m_posit.m_z += deflection * 0.5f;
-			matrix_1.m_posit.m_z -= deflection * 0.5f;
-			ndJointHinge* const hinge = new ndJointHinge(matrix_0, matrix_1, body0, body1);
-			hinge->SetAsSpringDamper(0.02f, 0.0f, 20.0f);
-			ndSharedPtr<ndJointBilateralConstraint> jointptr(hinge);
-			scene->GetWorld()->AddJoint(jointptr);
-		}
-	}
-
-	return body;
-}
 #endif
 
 ndSharedPtr<ndBody> BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix& matrix, const char* const textureName, ndFloat32 uvTiling, bool kinematic)
@@ -471,5 +318,141 @@ ndSharedPtr<ndBody> BuildFlatPlane(ndDemoEntityManager* const scene, const ndMat
 	
 	world->AddBody(body);
 	scene->AddEntity(entity);
+	return body;
+}
+
+
+static void BuildPlaygroundHangingBridge(ndDemoEntityManager* const scene, const ndSharedPtr<ndMesh>& mesh, const ndSharedPtr<ndBody>& playgroundBody)
+{
+	// add a hanging bridge as a feature.
+	const ndMesh* const end(mesh->FindChild("rampEnd"));
+	const ndMesh* const start(mesh->FindChild("rampStart"));
+
+	ndMatrix endMatrix(end->CalculateGlobalMatrix());
+	ndMatrix startMatrix(start->CalculateGlobalMatrix());
+	ndFloat32 dist = ndAbs(startMatrix.m_right.DotProduct(endMatrix.m_posit - startMatrix.m_posit).GetScalar());
+
+	// calculate ho wmany plank can be inserted between the two hardpoints.
+	ndInt32 numberOfPlank = 1;
+	while (dist > 2.0f)
+	{
+		numberOfPlank *= 2;
+		dist *= ndFloat32(0.5f);
+	}
+
+	ndFloat32 plankSickness = 0.2f;
+	ndFloat32 slackDist = dist * 1.01f;
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeBox(11.0f, plankSickness, slackDist)));
+
+	ndRender* const render = *scene->GetRenderer();
+	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
+	descriptor.m_collision = shape;
+	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
+	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_1.png")));
+
+	ndSharedPtr<ndRenderSceneNode> bridgeMesh(new ndRenderSceneNodeInstance(startMatrix, descriptor));
+	scene->AddEntity(bridgeMesh);
+
+	ndMatrix localMatrix(ndGetIdentityMatrix());
+	localMatrix.m_posit.m_z = dist * ndFloat32(0.5f);
+	localMatrix.m_posit.m_y = -ndFloat32(0.5f) * plankSickness;
+
+	ndPhysicsWorld* const world = scene->GetWorld();
+
+	ndFloat32 linkMass = 100.0f;
+	ndFixSizeArray<ndBodyDynamic*, 256> bodyLinks;
+
+	// create all the links and attach them to the parent scene node
+	for (ndInt32 i = 0; i < numberOfPlank; ++i)
+	{
+		ndSharedPtr<ndRenderSceneNode>visualLink(new ndRenderSceneNode(localMatrix));
+		bridgeMesh->AddChild(visualLink);
+
+		ndSharedPtr<ndBody> body(new ndBodyDynamic());
+		body->SetNotifyCallback(new ndDemoEntityNotify(scene, visualLink));
+		body->SetMatrix(visualLink->CalculateGlobalMatrix());
+		body->GetAsBodyKinematic()->SetCollisionShape(**shape);
+		body->GetAsBodyKinematic()->SetMassMatrix(linkMass, **shape);
+		body->GetAsBodyDynamic()->SetAngularDamping(ndVector(ndFloat32(0.5f)));
+		world->AddBody(body);
+		bodyLinks.PushBack(body->GetAsBodyDynamic());
+
+		localMatrix.m_posit.m_z += dist;
+	}
+	ndRenderSceneNodeInstance* const instanceRoot = (ndRenderSceneNodeInstance*)*bridgeMesh;
+	instanceRoot->Finalize();
+
+	//connect every two adjecent link with a hinge joint
+	ndMatrix matrix0(ndGetIdentityMatrix());
+	ndMatrix matrix1(ndGetIdentityMatrix());
+
+	matrix0.m_posit.m_z = slackDist * 0.5f;
+	matrix0.m_posit.m_y = ndFloat32(0.5f) * plankSickness;
+
+	matrix1.m_posit.m_z = -slackDist * 0.5f;
+	matrix1.m_posit.m_y = ndFloat32(0.5f) * plankSickness;
+
+	for (ndInt32 i = 0; i < bodyLinks.GetCount() - 1; ++i)
+	{
+		ndBodyDynamic* const body0 = bodyLinks[i];
+		ndBodyDynamic* const body1 = bodyLinks[i + 1];
+		ndSharedPtr<ndJointBilateralConstraint> joint(new ndJointHinge(matrix0 * body0->GetMatrix(), matrix1 * body1->GetMatrix(), body0, body1));
+		ndJointHinge* const hinge = (ndJointHinge*)*joint;
+		hinge->SetAsSpringDamper(0.02f, 0.0f, 20.0f);
+		world->AddJoint(joint);
+	}
+
+	// connect the two ends
+	{
+		// start plank
+		ndBodyDynamic* const body0 = bodyLinks[0];
+		ndBodyDynamic* const body1 = playgroundBody->GetAsBodyDynamic();
+		ndMatrix body0Matrix(matrix1 * body0->GetMatrix());
+		ndMatrix body1Matrix(body0Matrix);
+		body1Matrix.m_posit += body1Matrix.m_right.Scale(ndFloat32(0.5f) * (slackDist - dist));
+
+		ndSharedPtr<ndJointBilateralConstraint> joint(new ndJointHinge(body0Matrix, body1Matrix, body0, body1));
+		ndJointHinge* const hinge = (ndJointHinge*)*joint;
+		hinge->SetAsSpringDamper(0.02f, 0.0f, 20.0f);
+		world->AddJoint(joint);
+	}
+
+	{
+		// end plank
+		ndBodyDynamic* const body0 = bodyLinks[bodyLinks.GetCount() - 1];
+		ndBodyDynamic* const body1 = playgroundBody->GetAsBodyDynamic();
+		ndMatrix body0Matrix(matrix0 * body0->GetMatrix());
+		ndMatrix body1Matrix(body0Matrix);
+		body1Matrix.m_posit -= body1Matrix.m_right.Scale(ndFloat32(0.5f) * (slackDist - dist));
+
+		ndSharedPtr<ndJointBilateralConstraint> joint(new ndJointHinge(body0Matrix, body1Matrix, body0, body1));
+		ndJointHinge* const hinge = (ndJointHinge*)*joint;
+		hinge->SetAsSpringDamper(0.02f, 0.0f, 20.0f);
+		world->AddJoint(joint);
+	}
+}
+
+ndSharedPtr<ndBody> BuildPlayground(ndDemoEntityManager* const scene, bool kinematic)
+{
+	ndMeshLoader loader;
+	ndSharedPtr<ndRenderSceneNode> playground(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("playground.fbx")));
+	ndMesh* const levelMesh = loader.m_mesh->FindChild("levelGeometry");
+	ndAssert(levelMesh);
+	ndSharedPtr<ndShapeInstance>collision(levelMesh->CreateCollisionTree());
+
+	kinematic = false;
+
+	ndMatrix location(loader.m_mesh->CalculateGlobalMatrix());
+	// generate a rigibody and added to the scene and world
+	ndPhysicsWorld* const world = scene->GetWorld();
+	ndSharedPtr<ndBody> body(new ndBodyDynamic());
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, playground));
+	body->SetMatrix(location);
+	body->GetAsBodyDynamic()->SetCollisionShape(**collision);
+
+	world->AddBody(body);
+	scene->AddEntity(playground);
+
+	BuildPlaygroundHangingBridge(scene, loader.m_mesh, body);
 	return body;
 }
