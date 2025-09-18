@@ -97,16 +97,15 @@ void ndDebugDisplayRenderPass::RenderScene(ndFloat32)
 		ndSharedPtr<ndDebugMesh>& debugMesh = node->GetInfo();
 		const ndVector color((body->GetSleepState() == 1) ? m_sleepColor : m_awakeColor);
 
-		ndRenderPrimitiveMesh* const mesh = (ndRenderPrimitiveMesh*)*debugMesh->m_flatShaded;
-		ndRenderPrimitiveMeshSegment& segment = mesh->m_segments.GetFirst()->GetInfo();
-		ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
-		material->m_diffuse = color;
-
 		switch (m_collisionDisplayMode)
 		{
 			case 1:
 			{
 				// render solid color collsion mesh
+				ndRenderPrimitiveMesh* const mesh = (ndRenderPrimitiveMesh*)*debugMesh->m_flatShaded;
+				ndRenderPrimitiveMeshSegment& segment = mesh->m_segments.GetFirst()->GetInfo();
+				ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
+				material->m_diffuse = color;
 				debugMesh->m_flatShaded->Render(m_owner, matrix, m_debugDisplaySolidMesh);
 				break;
 			}
@@ -114,6 +113,10 @@ void ndDebugDisplayRenderPass::RenderScene(ndFloat32)
 			case 2:
 			{
 				// render solid color collsion mesh
+				ndRenderPrimitiveMesh* const mesh = (ndRenderPrimitiveMesh*)*debugMesh->m_wireFrameShareEdge;
+				ndRenderPrimitiveMeshSegment& segment = mesh->m_segments.GetFirst()->GetInfo();
+				ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
+				material->m_diffuse = color;
 				debugMesh->m_wireFrameShareEdge->Render(m_owner, matrix, m_debugDisplayWireFrameMesh);
 				break;
 			}
@@ -144,7 +147,7 @@ void ndDebugDisplayRenderPass::RenderScene(ndFloat32)
 			ndSharedPtr<ndDebugMesh>& debugMesh = node->GetInfo();
 			const ndVector color((body->GetSleepState() == 1) ? m_sleepColor : m_awakeColor);
 		
-			ndRenderPrimitiveMesh* const mesh = (ndRenderPrimitiveMesh*)*debugMesh->m_flatShaded;
+			ndRenderPrimitiveMesh* const mesh = (ndRenderPrimitiveMesh*)*debugMesh->m_wireFrameShareEdge;
 			ndRenderPrimitiveMeshSegment& segment = mesh->m_segments.GetFirst()->GetInfo();
 			ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
 			material->m_diffuse = color;
