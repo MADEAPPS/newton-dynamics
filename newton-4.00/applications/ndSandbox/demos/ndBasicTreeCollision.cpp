@@ -57,14 +57,14 @@ void ndBasicStaticMeshCollision (ndDemoEntityManager* const scene)
 	};
 	
 	AddBox(scene, PlaceMatrix(10.0f, 1.0f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
-	AddBox(scene, PlaceMatrix(12.0f, 1.5f, 1.125f), 30.0f, 2.0f, 0.25f, 2.5f);
-	AddBox(scene, PlaceMatrix(13.0f, 1.0f, 0.0f), 30.0f, 1.0f, 0.25f, 1.0f);
-	AddConvexHull(scene, PlaceMatrix(11.0f, 1.0f, 2.0f), 40.0f, 0.6f, 1.0f, 15);
-	AddConvexHull(scene, PlaceMatrix(11.0f, 1.0f, 0.0f), 40.0f, 0.7f, 1.0f, 10);
-	AddConvexHull(scene, PlaceMatrix(12.0f, 1.0f, 0.0f), 40.0f, 0.5f, 1.2f, 6);
-	AddConvexHull(scene, PlaceMatrix(13.0f, 1.0f, 2.0f), 40.0f, 0.6f, 1.0f, 15);
-	AddConvexHull(scene, PlaceMatrix(13.0f, 1.0f, 0.0f), 40.0f, 0.7f, 1.0f, 10);
-	AddConvexHull(scene, PlaceMatrix(12.0f, 1.0f, 1.0f), 40.0f, 0.5f, 1.2f, 6);
+	AddBox(scene, PlaceMatrix(12.0f, 1.5f, 1.5f), 30.0f, 2.0f, 0.25f, 2.5f);
+	AddBox(scene, PlaceMatrix(13.0f, 1.0f, -1.0f), 30.0f, 1.0f, 0.25f, 1.0f);
+	AddConvexHull(scene, PlaceMatrix(12.0f, 1.0f, 3.0f), 40.0f, 0.6f, 1.0f, 15);
+	AddConvexHull(scene, PlaceMatrix(12.0f, 1.0f, 1.0f), 40.0f, 0.7f, 1.0f, 10);
+	AddConvexHull(scene, PlaceMatrix(13.0f, 1.0f, 2.0f), 40.0f, 0.5f, 1.2f, 6);
+	AddConvexHull(scene, PlaceMatrix(14.0f, 1.0f, 4.0f), 40.0f, 0.6f, 1.0f, 15);
+	AddConvexHull(scene, PlaceMatrix(14.0f, 1.0f, -1.0f), 40.0f, 0.7f, 1.0f, 10);
+	AddConvexHull(scene, PlaceMatrix(13.0f, 1.0f, -2.0f), 40.0f, 0.5f, 1.2f, 6);
 	//AddCapsulesStacks(scene, PlaceMatrix(45.0f, 0.0f, 0.0f), 10.0f, 0.5f, 0.5f, 1.0f, 5, 8, 7);
 	
 	ndQuaternion rot(ndYawMatrix(30.0f * ndDegreeToRad));
