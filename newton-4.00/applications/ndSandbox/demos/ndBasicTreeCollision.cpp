@@ -20,9 +20,6 @@
 
 static void BuildPlaygroundHangingBridge(ndDemoEntityManager* const scene, const ndSharedPtr<ndMesh>& mesh, const ndSharedPtr<ndBody>& playgroundBody)
 {
-	//ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)playgroundBody->GetNotifyCallback();
-	//ndSharedPtr<ndRenderSceneNode> entity (notify->GetUserData());
-
 	// add a hanging bridge as a feature.
 	const ndMesh* const end(mesh->FindChild("rampEnd"));
 	const ndMesh* const start(mesh->FindChild("rampStart"));
@@ -60,7 +57,7 @@ static void BuildPlaygroundHangingBridge(ndDemoEntityManager* const scene, const
 	ndFloat32 linkMass = 100.0f;
 	ndFixSizeArray<ndBodyDynamic*, 256> bodyLinks;
 
-	// create all the links and attach the to the parent scene node
+	// create all the links and attach them to the parent scene node
 	for (ndInt32 i = 0; i < numberOfPlank; ++i)
 	{
 		ndSharedPtr<ndRenderSceneNode>visualLink(new ndRenderSceneNode(localMatrix));
@@ -102,6 +99,7 @@ static void BuildPlaygroundHangingBridge(ndDemoEntityManager* const scene, const
 
 	// connect the two ends
 	{
+		// start plank
 		ndBodyDynamic* const body0 = bodyLinks[0];
 		ndBodyDynamic* const body1 = playgroundBody->GetAsBodyDynamic();
 		ndMatrix body0Matrix(matrix1 * body0->GetMatrix());
@@ -115,6 +113,7 @@ static void BuildPlaygroundHangingBridge(ndDemoEntityManager* const scene, const
 	}
 
 	{
+		// end plank
 		ndBodyDynamic* const body0 = bodyLinks[bodyLinks.GetCount() - 1];
 		ndBodyDynamic* const body1 = playgroundBody->GetAsBodyDynamic();
 		ndMatrix body0Matrix(matrix0 * body0->GetMatrix());
@@ -133,9 +132,9 @@ static void BuildPlayground(ndDemoEntityManager* const scene)
 	// build the background collsion mesh
 	ndMeshLoader loader;
 	ndSharedPtr<ndRenderSceneNode> playground(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("playground.fbx")));
-	const ndMesh* const levelMesh = loader.m_mesh->FindChild("levelGeometry");
+	ndMesh* const levelMesh = loader.m_mesh->FindChild("levelGeometry");
 	ndAssert(levelMesh);
-	ndSharedPtr<ndShapeInstance>collision(loader.m_mesh->CreateCollisionTree());
+	ndSharedPtr<ndShapeInstance>collision(levelMesh->CreateCollisionTree());
 
 	ndMatrix location(loader.m_mesh->CalculateGlobalMatrix());
 	// generate a rigibody and added to the scene and world
