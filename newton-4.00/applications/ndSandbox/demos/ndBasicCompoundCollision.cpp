@@ -106,14 +106,12 @@ static void CreateBoxCompoundShape(ndShapeInstance& parentInstance)
 static void AddEmptyBox(ndDemoEntityManager* const scene)
 {
 	ndRender* const render = *scene->GetRenderer();
-	//ndShapeInstance compoundShapeInstance(new ndShapeCompound());
 	ndSharedPtr<ndShapeInstance>compoundShapeInstance(new ndShapeInstance(new ndShapeCompound()));
 	CreateBoxCompoundShape(**compoundShapeInstance);
 
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
 	descriptor.m_collision = compoundShapeInstance;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
-	//descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png"));
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png")));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 
@@ -147,18 +145,6 @@ static void AddSimpleConcaveMesh(ndDemoEntityManager* const scene, const ndMatri
 
 void ndBasicCompoundCollision(ndDemoEntityManager* const scene)
 {
-	//ndMatrix heighfieldLocation(ndGetIdentityMatrix());
-	//heighfieldLocation.m_posit.m_x = -200.0f;
-	//heighfieldLocation.m_posit.m_z = -200.0f;
-
-	// build a floor
-	//BuildPlayArena(scene);
-	//BuildFlatPlane(scene, true);
-	//BuildFloorBox(scene, ndGetIdentityMatrix());
-	//BuildCompoundScene(scene, ndGetIdentityMatrix());
-	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
-	//BuildHeightFieldTerrain(scene, heighfieldLocation);
-	//BuildProceduralMap(scene, 120, 4.0f, 0.0f);
 	ndSharedPtr<ndBody> ground(BuildFlatPlane(scene, ndGetIdentityMatrix(), "grass.png", true));
 
 	ndMatrix location(ndGetIdentityMatrix());
