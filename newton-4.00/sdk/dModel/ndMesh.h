@@ -62,10 +62,9 @@ class ndMesh : public ndClassAlloc
 	ndList<ndSharedPtr<ndMesh>>& GetChildren();
 	const ndList<ndSharedPtr<ndMesh>>& GetChildren() const;
 
-	ndMesh* FindChild(const char* const name) const;
-
+	ndMesh* IteratorNext();
 	ndMesh* IteratorFirst();
-	ndMesh* IteratorNext(const ndMesh* const node);
+	ndMesh* FindChild(const char* const name) const;
 
 	ndSharedPtr<ndMeshEffect>& GetMesh();
 	const ndSharedPtr<ndMeshEffect>& GetMesh() const;

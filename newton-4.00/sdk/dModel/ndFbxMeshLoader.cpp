@@ -381,7 +381,7 @@ void ndFbxMeshLoader::AlignToWorld(ndMesh* const mesh)
 	ndVector posit(rotation.m_posit);
 	rotation.m_posit = ndVector::m_wOne;
 
-	ndMatrix invRotation(rotation.OrthoInverse());
+	const ndMatrix invRotation(rotation.OrthoInverse());
 	for (ndList<ndSharedPtr<ndMesh>>::ndNode* node = mesh->GetChildren().GetFirst(); node; node = node->GetNext())
 	{
 		ndMesh* const child = *node->GetInfo();
@@ -399,7 +399,7 @@ void ndFbxMeshLoader::AlignToWorld(ndMesh* const mesh)
 	{
 		ndMesh* const meshNode = entBuffer.Pop();
 
-		ndMatrix entMatrix(invRotation * meshNode->m_matrix * rotation);
+		const ndMatrix entMatrix(invRotation * meshNode->m_matrix * rotation);
 		meshNode->m_matrix = entMatrix;
 
 		ndSharedPtr<ndMeshEffect> effectMesh (meshNode->GetMesh());
@@ -453,7 +453,6 @@ void ndFbxMeshLoader::AlignToWorld(ndMesh* const mesh)
 			scaleCurve.RemoveAll();
 		}
 
-		//for (ndMesh* child = meshNode->GetFirstChild(); child; child = child->GetNext())
 		for (ndList<ndSharedPtr<ndMesh>>::ndNode* node = meshNode->GetChildren().GetFirst(); node; node = node->GetNext())
 		{
 			ndMesh* const child = *node->GetInfo();

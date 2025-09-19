@@ -210,20 +210,23 @@ ndMesh* ndMesh::IteratorFirst()
 	return ptr;
 }
 
-ndMesh* ndMesh::IteratorNext(const ndMesh* const node)
+ndMesh* ndMesh::IteratorNext()
 {
-	ndList<ndSharedPtr<ndMesh>>::ndNode* next = node->m_childNode->GetNext();
-	if (next)
+	if (m_childNode)
 	{
-		if (next->GetInfo()->m_children.GetCount())
+		ndList<ndSharedPtr<ndMesh>>::ndNode* next = m_childNode->GetNext();
+		if (next)
 		{
-			return next->GetInfo()->IteratorFirst();
+			if (next->GetInfo()->m_children.GetCount())
+			{
+				return next->GetInfo()->IteratorFirst();
+			}
+			return *next->GetInfo();
 		}
-		return *next->GetInfo();
+		return m_parent;
 	}
-	return m_parent;
+	return nullptr;
 }
-
 
 ndMatrix ndMesh::CalculateGlobalMatrix(ndMesh* const parent) const
 {
@@ -248,13 +251,9 @@ void ndMesh::ApplyTransform(const ndMatrix& transform)
 		return matrix;
 	};
 
-	ndFixSizeArray<ndMesh*, ND_MESH_MAX_STACK_DEPTH> entBuffer(0);
-	entBuffer.PushBack(this);
-	ndMatrix invTransform(transform.Inverse4x4());
-	while (entBuffer.GetCount())
+	const ndMatrix invTransform(transform.Inverse4x4());
+	for (ndMesh* node = IteratorFirst(); node; node = node->IteratorNext())
 	{
-		ndMesh* const node = entBuffer.Pop();
-
 		const ndMatrix entMatrix(invTransform * node->m_matrix * transform);
 		node->m_matrix = entMatrix;
 
@@ -302,12 +301,6 @@ void ndMesh::ApplyTransform(const ndMatrix& transform)
 				positNode = positNode->GetNext();
 				rotationNode = rotationNode->GetNext();
 			}
-		}
-
-		for (ndList<ndSharedPtr<ndMesh>>::ndNode* childNode = node->GetChildren().GetFirst(); childNode; childNode = childNode->GetNext())
-		{
-			ndMesh* const child = *childNode->GetInfo();
-			entBuffer.PushBack(child);
 		}
 	}
 }
