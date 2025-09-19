@@ -64,6 +64,9 @@ class ndMesh : public ndClassAlloc
 
 	ndMesh* FindChild(const char* const name) const;
 
+	ndMesh* IteratorFirst();
+	ndMesh* IteratorNext(const ndMesh* const node);
+
 	ndSharedPtr<ndMeshEffect>& GetMesh();
 	const ndSharedPtr<ndMeshEffect>& GetMesh() const;
 	void SetMesh(const ndSharedPtr<ndMeshEffect>& mesh);

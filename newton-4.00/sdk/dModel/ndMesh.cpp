@@ -200,6 +200,31 @@ ndMesh* ndMesh::FindChild(const char* const name) const
 	return nullptr;
 }
 
+ndMesh* ndMesh::IteratorFirst()
+{
+	ndMesh* ptr = this;
+	while (ptr->m_children.GetCount())
+	{
+		ptr = *ptr->m_children.GetFirst()->GetInfo();
+	}
+	return ptr;
+}
+
+ndMesh* ndMesh::IteratorNext(const ndMesh* const node)
+{
+	ndList<ndSharedPtr<ndMesh>>::ndNode* next = node->m_childNode->GetNext();
+	if (next)
+	{
+		if (next->GetInfo()->m_children.GetCount())
+		{
+			return next->GetInfo()->IteratorFirst();
+		}
+		return *next->GetInfo();
+	}
+	return m_parent;
+}
+
+
 ndMatrix ndMesh::CalculateGlobalMatrix(ndMesh* const parent) const
 {
 	ndMatrix matrix(ndGetIdentityMatrix());
@@ -212,8 +237,6 @@ ndMatrix ndMesh::CalculateGlobalMatrix(ndMesh* const parent) const
 
 void ndMesh::ApplyTransform(const ndMatrix& transform)
 {
-	ndFixSizeArray<ndMesh*, ND_MESH_MAX_STACK_DEPTH> entBuffer(0);
-
 	auto GetKeyframe = [](const ndCurveValue& scale, const ndCurveValue& position, const ndCurveValue& rotation)
 	{
 		ndMatrix scaleMatrix(ndGetIdentityMatrix());
@@ -225,19 +248,20 @@ void ndMesh::ApplyTransform(const ndMatrix& transform)
 		return matrix;
 	};
 
+	ndFixSizeArray<ndMesh*, ND_MESH_MAX_STACK_DEPTH> entBuffer(0);
 	entBuffer.PushBack(this);
 	ndMatrix invTransform(transform.Inverse4x4());
 	while (entBuffer.GetCount())
 	{
 		ndMesh* const node = entBuffer.Pop();
 
-		ndMatrix entMatrix(invTransform * node->m_matrix * transform);
+		const ndMatrix entMatrix(invTransform * node->m_matrix * transform);
 		node->m_matrix = entMatrix;
 
 		ndSharedPtr<ndMeshEffect> mesh (node->GetMesh());
 		if (mesh)
 		{
-			ndMatrix meshMatrix(invTransform * node->m_meshMatrix * transform);
+			const ndMatrix meshMatrix(invTransform * node->m_meshMatrix * transform);
 			node->m_meshMatrix = meshMatrix;
 			mesh->ApplyTransform(transform);
 		}
@@ -286,6 +310,79 @@ void ndMesh::ApplyTransform(const ndMatrix& transform)
 			entBuffer.PushBack(child);
 		}
 	}
+}
+
+ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionCompound(bool lowDetail)
+{
+	const ndInt32 pointsCount = m_mesh->GetVertexCount();
+	const ndInt32 pointsStride = ndInt32(m_mesh->GetVertexStrideInByte() / sizeof(ndFloat64));
+	const ndFloat64* const pointsBuffer = m_mesh->GetVertexPool();
+
+	ndArray<ndReal> meshPoints;
+	for (ndInt32 i = 0; i < pointsCount; ++i)
+	{
+		meshPoints.PushBack(ndReal(pointsBuffer[i * pointsStride + 0]));
+		meshPoints.PushBack(ndReal(pointsBuffer[i * pointsStride + 1]));
+		meshPoints.PushBack(ndReal(pointsBuffer[i * pointsStride + 2]));
+	}
+
+	ndArray<ndInt32> indices;
+	ndInt32 mark = m_mesh->IncLRU();
+	ndPolyhedra::Iterator iter(**m_mesh);
+	for (iter.Begin(); iter; iter++)
+	{
+		ndEdge* const face = &iter.GetNode()->GetInfo();
+		if ((face->m_mark != mark) && (face->m_incidentFace > 0))
+		{
+			ndEdge* ptr = face;
+			ptr->m_mark = mark;
+			indices.PushBack(ptr->m_incidentVertex);
+
+			ptr = ptr->m_next;
+			ptr->m_mark = mark;
+			indices.PushBack(ptr->m_incidentVertex);
+
+			ptr = ptr->m_next;
+			do
+			{
+				indices.PushBack(ptr->m_incidentVertex);
+				ptr->m_mark = mark;
+
+				ptr = ptr->m_next;
+			} while (ptr != face);
+		}
+	}
+
+	nd::VHACD::IVHACD* const interfaceVHACD = nd::VHACD::CreateVHACD();
+	nd::VHACD::IVHACD::Parameters paramsVHACD;
+	paramsVHACD.m_concavityToVolumeWeigh = lowDetail ? 1.0f : 0.5f;
+	interfaceVHACD->Compute(&meshPoints[0], uint32_t(meshPoints.GetCount() / 3), (uint32_t*)&indices[0], uint32_t(indices.GetCount() / 3), paramsVHACD);
+
+	ndSharedPtr<ndShapeInstance> compoundShapeInstance(new ndShapeInstance(new ndShapeCompound()));
+	ndShapeCompound* const compoundShape = compoundShapeInstance->GetShape()->GetAsShapeCompound();
+	compoundShape->BeginAddRemove();
+	ndInt32 hullCount = ndInt32(interfaceVHACD->GetNConvexHulls());
+	ndArray<ndVector> convexMeshPoints;
+	for (ndInt32 i = 0; i < hullCount; ++i)
+	{
+		nd::VHACD::IVHACD::ConvexHull ch;
+		interfaceVHACD->GetConvexHull(uint32_t(i), ch);
+		convexMeshPoints.SetCount(ndInt32(ch.m_nPoints));
+		for (ndInt32 j = 0; j < ndInt32(ch.m_nPoints); ++j)
+		{
+			ndVector p(ndFloat32(ch.m_points[j * 3 + 0]), ndFloat32(ch.m_points[j * 3 + 1]), ndFloat32(ch.m_points[j * 3 + 2]), ndFloat32(0.0f));
+			convexMeshPoints[j] = p;
+		}
+		ndShapeInstance hullShape(new ndShapeConvexHull(ndInt32(convexMeshPoints.GetCount()), sizeof(ndVector), 0.01f, &convexMeshPoints[0].m_x));
+		compoundShape->AddCollision(&hullShape);
+	}
+	compoundShape->EndAddRemove();
+	compoundShapeInstance->SetLocalMatrix(m_meshMatrix);
+
+	interfaceVHACD->Clean();
+	interfaceVHACD->Release();
+
+	return compoundShapeInstance;
 }
 
 ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionTree(bool optimize)
@@ -346,77 +443,4 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionTree(bool optimize)
 	meshBuilder.End(optimize);
 	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeStatic_bvh(meshBuilder)));
 	return shape;
-}
-
-ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionCompound(bool lowDetail)
-{
-	const ndInt32 pointsCount = m_mesh->GetVertexCount();
-	const ndInt32 pointsStride = ndInt32 (m_mesh->GetVertexStrideInByte() / sizeof (ndFloat64));
-	const ndFloat64* const pointsBuffer = m_mesh->GetVertexPool();
-
-	ndArray<ndReal> meshPoints;
-	for (ndInt32 i = 0; i < pointsCount; ++i)
-	{
-		meshPoints.PushBack(ndReal(pointsBuffer[i * pointsStride + 0]));
-		meshPoints.PushBack(ndReal(pointsBuffer[i * pointsStride + 1]));
-		meshPoints.PushBack(ndReal(pointsBuffer[i * pointsStride + 2]));
-	}
-
-	ndArray<ndInt32> indices;
-	ndInt32 mark = m_mesh->IncLRU();
-	ndPolyhedra::Iterator iter(**m_mesh);
-	for (iter.Begin(); iter; iter++)
-	{
-		ndEdge* const face = &iter.GetNode()->GetInfo();
-		if ((face->m_mark != mark) && (face->m_incidentFace > 0))
-		{
-			ndEdge* ptr = face;
-			ptr->m_mark = mark;
-			indices.PushBack(ptr->m_incidentVertex);
-
-			ptr = ptr->m_next;
-			ptr->m_mark = mark;
-			indices.PushBack(ptr->m_incidentVertex);
-
-			ptr = ptr->m_next;
-			do
-			{
-				indices.PushBack(ptr->m_incidentVertex);
-				ptr->m_mark = mark;
-	
-				ptr = ptr->m_next;
-			} while (ptr != face);
-		}
-	}
-	
-	nd::VHACD::IVHACD* const interfaceVHACD = nd::VHACD::CreateVHACD();
-	nd::VHACD::IVHACD::Parameters paramsVHACD;
-	paramsVHACD.m_concavityToVolumeWeigh = lowDetail ? 1.0f : 0.5f;
-	interfaceVHACD->Compute(&meshPoints[0], uint32_t(meshPoints.GetCount() / 3), (uint32_t*)&indices[0], uint32_t(indices.GetCount() / 3), paramsVHACD);
-	
-	ndSharedPtr<ndShapeInstance> compoundShapeInstance (new ndShapeInstance(new ndShapeCompound()));
-	ndShapeCompound* const compoundShape = compoundShapeInstance->GetShape()->GetAsShapeCompound();
-	compoundShape->BeginAddRemove();
-	ndInt32 hullCount = ndInt32(interfaceVHACD->GetNConvexHulls());
-	ndArray<ndVector> convexMeshPoints;
-	for (ndInt32 i = 0; i < hullCount; ++i)
-	{
-		nd::VHACD::IVHACD::ConvexHull ch;
-		interfaceVHACD->GetConvexHull(uint32_t(i), ch);
-		convexMeshPoints.SetCount(ndInt32(ch.m_nPoints));
-		for (ndInt32 j = 0; j < ndInt32(ch.m_nPoints); ++j)
-		{
-			ndVector p(ndFloat32(ch.m_points[j * 3 + 0]), ndFloat32(ch.m_points[j * 3 + 1]), ndFloat32(ch.m_points[j * 3 + 2]), ndFloat32(0.0f));
-			convexMeshPoints[j] = p;
-		}
-		ndShapeInstance hullShape(new ndShapeConvexHull(ndInt32(convexMeshPoints.GetCount()), sizeof(ndVector), 0.01f, &convexMeshPoints[0].m_x));
-		compoundShape->AddCollision(&hullShape);
-	}
-	compoundShape->EndAddRemove();
-	compoundShapeInstance->SetLocalMatrix(m_meshMatrix);
-	
-	interfaceVHACD->Clean();
-	interfaceVHACD->Release();
-
-	return compoundShapeInstance;
 }
