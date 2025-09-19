@@ -242,7 +242,7 @@ static void BuildPlaygroundHangingBridge(ndDemoEntityManager* const scene, const
 	ndMatrix startMatrix(start->CalculateGlobalMatrix());
 	ndFloat32 dist = ndAbs(startMatrix.m_right.DotProduct(endMatrix.m_posit - startMatrix.m_posit).GetScalar());
 
-	// calculate ho wmany plank can be inserted between the two hardpoints.
+	// calculate how many planks can be inserted between the two hardpoints.
 	ndInt32 numberOfPlank = 1;
 	while (dist > 2.0f)
 	{
@@ -456,58 +456,59 @@ ndSharedPtr<ndBody> BuildPlayground(ndDemoEntityManager* const scene, bool kinem
 	return body;
 }
 
-
 class ndSceneMesh : public ndRenderSceneNode
 {
 	public:
-	ndSceneMesh(ndDemoEntityManager* const scene, const ndMatrix& matrix)
+	ndSceneMesh(
+		ndDemoEntityManager* const scene, 
+		ndMeshLoader& loader,
+		const ndSharedPtr<ndRenderSceneNode>& playground, 
+		const ndMatrix& matrix)
 		:ndRenderSceneNode(matrix)
+		,m_compoundScene(new ndShapeInstance(new ndShapeCompound()))
 	{
-		ndShapeInstance sceneInstance(new ndShapeCompound());
-		ndShapeCompound* const compound = sceneInstance.GetShape()->GetAsShapeCompound();
+		ndShapeCompound* const compound = m_compoundScene->GetShape()->GetAsShapeCompound();
 		compound->BeginAddRemove();
 
-		ndMatrix subShapeLocation(ndGetIdentityMatrix());
+			ndMatrix subShapeLocation(ndGetIdentityMatrix());
 
-		// add the collision tree map
-		ndMeshLoader loader;
-		ndSharedPtr<ndRenderSceneNode> playground(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("playground.fbx")));
-		playground->SetTransform(subShapeLocation);
-		playground->SetTransform(subShapeLocation);
-		AddChild(playground);
-		AddPlayground(compound, subShapeLocation, loader);
+			// add the collision tree map
+			playground->SetTransform(subShapeLocation);
+			playground->SetTransform(subShapeLocation);
+			AddChild(playground);
+			AddPlayground(subShapeLocation, loader);
 
-		// add an array of cylinders
-		subShapeLocation.m_posit.m_x += 10.0f;
-		AddSpeedBumpsSubShape(scene, compound, subShapeLocation, 14);
+			// add an array of cylinders
+			subShapeLocation.m_posit.m_x += 10.0f;
+			AddSpeedBumpsSubShape(scene, subShapeLocation, 14);
 		
-		// we can add a lot more stuff
-		subShapeLocation.m_posit.m_z -= 15.0f;
-		AddBoxSubShape(scene, compound, subShapeLocation);
+			// we can add a lot more stuff
+			subShapeLocation.m_posit.m_z -= 15.0f;
+			AddBoxSubShape(scene, subShapeLocation);
 		
-		subShapeLocation.m_posit.m_z += 30.0f;
-		AddBoxSubShape(scene, compound, subShapeLocation);
+			subShapeLocation.m_posit.m_z += 30.0f;
+			AddBoxSubShape(scene, subShapeLocation);
 		
-		subShapeLocation.m_posit.m_z += 5.0f;
-		AddBoxSubShape(scene, compound, subShapeLocation);
+			subShapeLocation.m_posit.m_z += 5.0f;
+			AddBoxSubShape(scene, subShapeLocation);
 
-		// keep add more stuff .... 
-
+			// keep add more stuff .... 
 
 		compound->EndAddRemove();
 	}
 
 	private:
-	void AddPlayground(ndShapeCompound* const compound, const ndMatrix& location, const ndMeshLoader& loader)
+	void AddPlayground(const ndMatrix& location, const ndMeshLoader& loader)
 	{
 		ndMesh* const levelMesh = loader.m_mesh->FindChild("levelGeometry");
 		ndAssert(levelMesh);
 		ndSharedPtr<ndShapeInstance>collision(levelMesh->CreateCollisionTree());
 		collision->SetLocalMatrix(location);
+		ndShapeCompound* const compound = m_compoundScene->GetShape()->GetAsShapeCompound();
 		compound->AddCollision(*collision);
 	}
 
-	void AddBoxSubShape(ndDemoEntityManager* const scene, ndShapeCompound* const compound, const ndMatrix& location)
+	void AddBoxSubShape(ndDemoEntityManager* const scene, const ndMatrix& location)
 	{
 		ndSharedPtr<ndShapeInstance> box(new ndShapeInstance(new ndShapeBox(0.5f, 4.0f, 0.5f)));
 
@@ -530,10 +531,11 @@ class ndSceneMesh : public ndRenderSceneNode
 		box->SetMaterial(material);
 
 		box->SetLocalMatrix(matrix);
+		ndShapeCompound* const compound = m_compoundScene->GetShape()->GetAsShapeCompound();
 		compound->AddCollision(*box);
 	}
 
-	void AddSpeedBumpsSubShape(ndDemoEntityManager* const scene, ndShapeCompound* const compound, const ndMatrix& location, ndInt32 count)
+	void AddSpeedBumpsSubShape(ndDemoEntityManager* const scene, const ndMatrix& location, ndInt32 count)
 	{
 		ndSharedPtr<ndShapeInstance>capsule (new ndShapeInstance(new ndShapeCapsule(0.75f, 0.75f, 10.0f)));
 		ndMatrix uvMatrix(ndGetIdentityMatrix());
@@ -555,6 +557,8 @@ class ndSceneMesh : public ndRenderSceneNode
 		matrix.m_posit.m_y += -0.2f;
 		matrix.m_posit.m_z -= (ndFloat32)(count / 2) * spacing;
 		ndShapeMaterial material(capsule->GetMaterial());
+
+		ndShapeCompound* const compound = m_compoundScene->GetShape()->GetAsShapeCompound();
 		for (ndInt32 i = 0; i < count; ++i)
 		{
 			ndSharedPtr<ndRenderSceneNode>speedBump(new ndRenderSceneNode(matrix));
@@ -576,13 +580,30 @@ class ndSceneMesh : public ndRenderSceneNode
 		// but in this demo we are just rendering the entire scene brute force.
 		ndRenderSceneNode::Render(owner, timeStep, parentMatrix, renderMode);
 	}
+
+	public:
+	ndSharedPtr<ndShapeInstance> m_compoundScene;
 };
 
 ndSharedPtr<ndBody> BuildCompoundScene(ndDemoEntityManager* const scene, const ndMatrix& location)
 {
-	ndSharedPtr<ndRenderSceneNode> rootScene(new ndSceneMesh(scene, location));
+	// load the player arena map
+	ndMeshLoader loader;
+	ndSharedPtr<ndRenderSceneNode> playground(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("playground.fbx")));
+	ndSharedPtr<ndRenderSceneNode> rootScene(new ndSceneMesh(scene, loader, playground, location));
+
+	ndSceneMesh* const sceneMesh = (ndSceneMesh*)*rootScene;
+	ndPhysicsWorld* const world = scene->GetWorld();
+	ndSharedPtr<ndBody> body(new ndBodyDynamic());
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, rootScene));
+	body->SetMatrix(location);
+	body->GetAsBodyDynamic()->SetCollisionShape(**sceneMesh->m_compoundScene);
+
+	world->AddBody(body);
 	scene->AddEntity(rootScene);
 
-	//return BuildPlayground(scene);
-	return ndSharedPtr<ndBody>();
+	// add the dynamics bodies part of the scene
+	BuildPlaygroundHangingBridge(scene, loader.m_mesh, body);
+
+	return body;
 }
