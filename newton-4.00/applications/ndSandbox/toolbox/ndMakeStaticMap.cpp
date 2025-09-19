@@ -509,7 +509,7 @@ class ndSceneMesh : public ndRenderSceneNode
 
 	void AddBoxSubShape(ndDemoEntityManager* const scene, ndShapeCompound* const compound, const ndMatrix& location)
 	{
-		ndSharedPtr<ndShapeInstance> box(new ndShapeInstance(new ndShapeBox(0.25f, 4.0f, 0.25f)));
+		ndSharedPtr<ndShapeInstance> box(new ndShapeInstance(new ndShapeBox(0.5f, 4.0f, 0.5f)));
 
 		ndRender* const render = *scene->GetRenderer();
 		ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
