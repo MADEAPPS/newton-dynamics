@@ -477,8 +477,22 @@ class ndSceneMesh : public ndRenderSceneNode
 		AddChild(playground);
 		AddPlayground(compound, subShapeLocation, loader);
 
+		// add an array of cylinders
 		subShapeLocation.m_posit.m_x += 10.0f;
 		AddSpeedBumpsSubShape(scene, compound, subShapeLocation, 14);
+
+		// we can add a lot more stuff
+		subShapeLocation.m_posit.m_z -= 15.0f;
+		AddBoxSubShape(scene, compound, subShapeLocation);
+
+		subShapeLocation.m_posit.m_z += 30.0f;
+		AddBoxSubShape(scene, compound, subShapeLocation);
+
+		subShapeLocation.m_posit.m_z += 5.0f;
+		AddBoxSubShape(scene, compound, subShapeLocation);
+
+		// kepp add more stuff .... 
+
 
 		compound->EndAddRemove();
 	}
@@ -491,6 +505,32 @@ class ndSceneMesh : public ndRenderSceneNode
 		ndSharedPtr<ndShapeInstance>collision(levelMesh->CreateCollisionTree());
 		collision->SetLocalMatrix(location);
 		compound->AddCollision(*collision);
+	}
+
+	void AddBoxSubShape(ndDemoEntityManager* const scene, ndShapeCompound* const compound, const ndMatrix& location)
+	{
+		ndSharedPtr<ndShapeInstance> box(new ndShapeInstance(new ndShapeBox(0.25f, 4.0f, 0.25f)));
+
+		ndRender* const render = *scene->GetRenderer();
+		ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
+		descriptor.m_collision = box;
+		descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
+		descriptor.m_stretchMaping = false;
+		descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("blueCheckerboard.png")));
+		ndSharedPtr<ndRenderPrimitive> geometry(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
+
+		ndMatrix matrix(location);
+		matrix.m_posit.m_y += ndFloat32(1.9f);
+		ndSharedPtr<ndRenderSceneNode>pole(new ndRenderSceneNode(matrix));
+		pole->SetPrimitive(geometry);
+		AddChild(pole);
+
+		ndShapeMaterial material(box->GetMaterial());
+		material.m_data.m_userData = *pole;
+		box->SetMaterial(material);
+
+		box->SetLocalMatrix(matrix);
+		compound->AddCollision(*box);
 	}
 
 	void AddSpeedBumpsSubShape(ndDemoEntityManager* const scene, ndShapeCompound* const compound, const ndMatrix& location, ndInt32 count)
@@ -532,9 +572,9 @@ class ndSceneMesh : public ndRenderSceneNode
 
 	virtual void Render(const ndRender* const owner, ndFloat32 timeStep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const
 	{
-		// make a tiled rendered node.
-		// the terrain is a array of tile subtable for colling,
-		// but in this demo we are just rendering the map brute force
+		// here we can  do a visibility test to check what chile node is visible 
+		// from the camera, but in this demo we are just rendering the 
+		// entire scene brute force.
 		ndRenderSceneNode::Render(owner, timeStep, parentMatrix, renderMode);
 	}
 };
