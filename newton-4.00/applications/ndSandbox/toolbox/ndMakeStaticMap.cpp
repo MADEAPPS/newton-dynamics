@@ -467,25 +467,67 @@ class ndSceneMesh : public ndRenderSceneNode
 		ndShapeCompound* const compound = sceneInstance.GetShape()->GetAsShapeCompound();
 		compound->BeginAddRemove();
 
+		ndMatrix subShapeLocation(ndGetIdentityMatrix());
+
 		// add the collision tree map
 		ndMeshLoader loader;
 		ndSharedPtr<ndRenderSceneNode> playground(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("playground.fbx")));
-		playground->SetTransform(ndGetIdentityMatrix());
-		playground->SetTransform(ndGetIdentityMatrix());
+		playground->SetTransform(subShapeLocation);
+		playground->SetTransform(subShapeLocation);
 		AddChild(playground);
+		AddPlayground(compound, subShapeLocation, loader);
+
+		subShapeLocation.m_posit.m_x += 10.0f;
+		AddSpeedBumpsSubShape(scene, compound, subShapeLocation, 14);
 
 		compound->EndAddRemove();
 	}
 
 	private:
-	//void AddPlayground(ndDemoEntityManager* const scene, ndShapeCompound* const compound, const ndMatrix& subShapeLocation)
-		void AddPlayground(const ndMeshLoader& loader, ndShapeCompound* const compound)
+	void AddPlayground(ndShapeCompound* const compound, const ndMatrix& location, const ndMeshLoader& loader)
 	{
 		ndMesh* const levelMesh = loader.m_mesh->FindChild("levelGeometry");
 		ndAssert(levelMesh);
 		ndSharedPtr<ndShapeInstance>collision(levelMesh->CreateCollisionTree());
-		collision->SetLocalMatrix(levelMesh->m_matrix);
+		collision->SetLocalMatrix(location);
 		compound->AddCollision(*collision);
+	}
+
+	void AddSpeedBumpsSubShape(ndDemoEntityManager* const scene, ndShapeCompound* const compound, const ndMatrix& location, ndInt32 count)
+	{
+		ndSharedPtr<ndShapeInstance>capsule (new ndShapeInstance(new ndShapeCapsule(0.75f, 0.75f, 10.0f)));
+		ndMatrix uvMatrix(ndGetIdentityMatrix());
+		uvMatrix[0][0] *= 0.025f;
+		uvMatrix[1][1] *= 0.025f;
+		uvMatrix[2][2] *= 0.025f;
+
+		ndRender* const render = *scene->GetRenderer();
+		ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
+		descriptor.m_collision = capsule;
+		descriptor.m_mapping = ndRenderPrimitiveMesh::m_capsule;
+		descriptor.m_uvMatrix = uvMatrix;
+		descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("concrete_011_color.png")));
+		ndSharedPtr<ndRenderPrimitive> geometry(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
+
+		ndFloat32 spacing = 3.0f;
+		ndMatrix matrix(location);
+		matrix.m_posit.m_x += 10.0f;
+		matrix.m_posit.m_y += -0.2f;
+		matrix.m_posit.m_z -= (ndFloat32)(count / 2) * spacing;
+		ndShapeMaterial material(capsule->GetMaterial());
+		for (ndInt32 i = 0; i < count; ++i)
+		{
+			ndSharedPtr<ndRenderSceneNode>speedBump(new ndRenderSceneNode(matrix));
+			speedBump->SetPrimitive(geometry);
+			AddChild(speedBump);
+
+			material.m_data.m_userData = *speedBump;
+			capsule->SetMaterial(material);
+			capsule->SetLocalMatrix(matrix);
+			compound->AddCollision(*capsule);
+
+			matrix.m_posit.m_z += spacing;
+		}
 	}
 
 	virtual void Render(const ndRender* const owner, ndFloat32 timeStep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const
@@ -497,13 +539,11 @@ class ndSceneMesh : public ndRenderSceneNode
 	}
 };
 
-
 ndSharedPtr<ndBody> BuildCompoundScene(ndDemoEntityManager* const scene, const ndMatrix& location)
 {
 	ndSharedPtr<ndRenderSceneNode> rootScene(new ndSceneMesh(scene, location));
-
-
 	scene->AddEntity(rootScene);
+
 	//return BuildPlayground(scene);
 	return ndSharedPtr<ndBody>();
 }
