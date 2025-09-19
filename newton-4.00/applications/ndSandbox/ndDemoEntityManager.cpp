@@ -20,25 +20,23 @@
 #include "ndHighResolutionTimer.h"
 #include "ndDebugDisplayRenderPass.h"
 
-//#define DEFAULT_SCENE	0		// basic rigidbody
+#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// basic Stacks 
 //#define DEFAULT_SCENE	2		// basic friction
 //#define DEFAULT_SCENE	3		// basic sliding platform
 //#define DEFAULT_SCENE	4		// basic Trigger
 //#define DEFAULT_SCENE	5		// conservation of momentum 
 //#define DEFAULT_SCENE	6		// basic joints
-#define DEFAULT_SCENE	7		// static mesh collision
-//#define DEFAULT_SCENE	8		// heighfield collision
-//#define DEFAULT_SCENE	9		// basic compound shapes
+//#define DEFAULT_SCENE	7		// heighfield collision
+//#define DEFAULT_SCENE	8		// static mesh collision
+//#define DEFAULT_SCENE	9		// static compound scene collision
+//#define DEFAULT_SCENE	10		// basic compound shapes
 
 //#define DEFAULT_SCENE	7		// object Placement
 //#define DEFAULT_SCENE	8		// particle fluid
-//#define DEFAULT_SCENE	9		// static mesh collision 
 //#define DEFAULT_SCENE	10		// static user mesh collision 
-
 //#define DEFAULT_SCENE	12		// basic vehicle
 //#define DEFAULT_SCENE	13		// heavy vehicle
-
 //#define DEFAULT_SCENE	15		// basic player
 //#define DEFAULT_SCENE	16		// rag doll
 //#define DEFAULT_SCENE	17		// cart pole discrete controller
@@ -59,56 +57,17 @@
 //#define DEFAULT_SCENE	33		// linked fracture
 //#define DEFAULT_SCENE	34		// skin peel fracture
 						 
-// demos forward declaration 
-//void ndRagdollTest(ndDemoEntityManager* const scene);
-//void ndBipedTest_1(ndDemoEntityManager* const scene);
-//void ndBipedTest_2(ndDemoEntityManager* const scene);
-//void ndBasicStacks(ndDemoEntityManager* const scene);
-//void ndBasicJoints(ndDemoEntityManager* const scene);
-//void ndBasicVehicle(ndDemoEntityManager* const scene);
-//void ndHeavyVehicle(ndDemoEntityManager* const scene);
-//void ndBasicTrigger(ndDemoEntityManager* const scene);
-//void ndBasicGpuTest0(ndDemoEntityManager* const scene);
-//void ndQuadrupedTest_3(ndDemoEntityManager* const scene);
-//void ndQuadrupedTest_4(ndDemoEntityManager* const scene);
-//void ndQuadrupedTest_4(ndDemoEntityManager* const scene);
-//void ndObjectPlacement(ndDemoEntityManager* const scene);
-//void ndBasicGpuRigidBody(ndDemoEntityManager* const scene);
-//void ndBasicFrictionRamp(ndDemoEntityManager* const scene);
-//void ndPlayerCapsuleDemo(ndDemoEntityManager* const scene);
-//void ndBipedTest_2Trainer(ndDemoEntityManager* const scene);
-//void ndBasicParticleFluid(ndDemoEntityManager* const scene);
-//void ndUnicycleController(ndDemoEntityManager* const scene);
-//void ndQuadruped_sac_test(ndDemoEntityManager* const scene);
-//void ndQuadruped_ppo_test(ndDemoEntityManager* const scene);
-//
-//void ndBasicAngularMomentum(ndDemoEntityManager* const scene);
-//void ndBagroundLowLodVehicle(ndDemoEntityManager* const scene);
-//void ndSimpleIndustrialRobot(ndDemoEntityManager* const scene);
-//void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene);
-//void ndAdvancedIndustrialRobot(ndDemoEntityManager* const scene);
-//void ndBasicExplodeConvexShape(ndDemoEntityManager* const scene);
-//
-//void ndQuadruped_animation_test(ndDemoEntityManager* const scene);
-//void ndCartpoleDiscrete(ndDemoEntityManager* const scene);
-//void ndCartpoleContinue(ndDemoEntityManager* const scene);
-//
-////void ndBasicFracture_0(ndDemoEntityManager* const scene);
-////void ndBasicFracture_2(ndDemoEntityManager* const scene);
-////void ndBasicFracture_4(ndDemoEntityManager* const scene);
-//void ndStaticMeshCollisionDemo(ndDemoEntityManager* const scene);
-//void ndStaticUserMeshCollisionDemo(ndDemoEntityManager* const scene);
-
 void ndBasicJoints(ndDemoEntityManager* const scene);
 void ndBasicStacks(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
 void ndBasicFriction(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
-void ndBasicStaticMeshCollision(ndDemoEntityManager* const scene);
 void ndBasicAngularMomentum(ndDemoEntityManager* const scene);
 void ndBasicSlidingPlatform(ndDemoEntityManager* const scene);
 void ndBasicCompoundCollision(ndDemoEntityManager* const scene);
 void ndBasicHeighfieldCollision(ndDemoEntityManager* const scene);
+void ndBasicStaticMeshCollision(ndDemoEntityManager* const scene);
+void ndBasicSceneCompoundCollision(ndDemoEntityManager* const scene);
 
 ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
 {
@@ -119,16 +78,15 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic triger", ndBasicTrigger},
 	{ "basic momentum consevation", ndBasicAngularMomentum},
 	{ "basic joints", ndBasicJoints},
-	{ "basic static mesh collision", ndBasicStaticMeshCollision},
 	{ "basic heighfield collision", ndBasicHeighfieldCollision},
+	{ "basic static mesh collision", ndBasicStaticMeshCollision},
+	{ "basic static compound scene collision", ndBasicSceneCompoundCollision},
 	{ "basic compound collision", ndBasicCompoundCollision},
+	
 
 #if 0
-	{ "basic conservation of momentum", ndBasicAngularMomentum},
 	{ "basic object placement", ndObjectPlacement},
 	{ "basic particle fluid", ndBasicParticleFluid},
-	{ "static mesh", ndStaticMeshCollisionDemo},
-	{ "static user mesh", ndStaticUserMeshCollisionDemo},
 	{ "basic vehicle", ndBasicVehicle},
 	{ "heavy vehicle", ndHeavyVehicle},
 	{ "low lod vehicle", ndBagroundLowLodVehicle},

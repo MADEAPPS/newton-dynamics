@@ -19,8 +19,7 @@
 
 void ndBasicStaticMeshCollision (ndDemoEntityManager* const scene)
 {
-	//ndSharedPtr<ndBody> background(BuildPlayground(scene));
-	ndSharedPtr<ndBody> BuildCompoundScene(BuildCompoundScene(scene, ndGetIdentityMatrix()));
+	ndSharedPtr<ndBody> background(BuildPlayground(scene));
 
 	//ndMatrix location(ndGetIdentityMatrix());
 	//location.m_posit.m_y += 2.0f;
@@ -72,3 +71,34 @@ void ndBasicStaticMeshCollision (ndDemoEntityManager* const scene)
 	scene->SetCameraMatrix(rot, origin);
 }
 
+void ndBasicSceneCompoundCollision(ndDemoEntityManager* const scene)
+{
+	ndSharedPtr<ndBody> BuildCompoundScene(BuildCompoundScene(scene, ndGetIdentityMatrix()));
+
+	class PlaceMatrix : public ndMatrix
+	{
+		public:
+		PlaceMatrix(ndFloat32 x, ndFloat32 y, ndFloat32 z)
+			:ndMatrix(ndGetIdentityMatrix())
+		{
+			m_posit.m_x = x;
+			m_posit.m_y = y;
+			m_posit.m_z = z;
+		}
+	};
+
+	AddBox(scene, PlaceMatrix(10.0f, 1.0f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
+	AddBox(scene, PlaceMatrix(12.0f, 1.5f, 1.5f), 30.0f, 2.0f, 0.25f, 2.5f);
+	AddBox(scene, PlaceMatrix(13.0f, 1.0f, -1.0f), 30.0f, 1.0f, 0.25f, 1.0f);
+	AddConvexHull(scene, PlaceMatrix(12.0f, 1.0f, 3.0f), 40.0f, 0.6f, 1.0f, 15);
+	AddConvexHull(scene, PlaceMatrix(12.0f, 1.0f, 1.0f), 40.0f, 0.7f, 1.0f, 10);
+	AddConvexHull(scene, PlaceMatrix(13.0f, 1.0f, 2.0f), 40.0f, 0.5f, 1.2f, 6);
+	AddConvexHull(scene, PlaceMatrix(14.0f, 1.0f, 4.0f), 40.0f, 0.6f, 1.0f, 15);
+	AddConvexHull(scene, PlaceMatrix(14.0f, 1.0f, -1.0f), 40.0f, 0.7f, 1.0f, 10);
+	AddConvexHull(scene, PlaceMatrix(13.0f, 1.0f, -2.0f), 40.0f, 0.5f, 1.2f, 6);
+	//AddCapsulesStacks(scene, PlaceMatrix(45.0f, 0.0f, 0.0f), 10.0f, 0.5f, 0.5f, 1.0f, 5, 8, 7);
+
+	ndQuaternion rot(ndYawMatrix(30.0f * ndDegreeToRad));
+	ndVector origin(-40.0f, 15.0f, 20.0f, 1.0f);
+	scene->SetCameraMatrix(rot, origin);
+}
