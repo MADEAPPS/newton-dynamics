@@ -275,47 +275,6 @@ void ndRenderPrimitiveMeshImplement::BuildRenderMeshFromMeshEffect(const ndRende
 	ndMeshEffect& mesh = *((ndMeshEffect*)*descriptor.m_meshNode);
 
 	ndAssert(descriptor.m_materials.GetCount());
-	//const ndRenderPrimitiveMeshMaterial& material = descriptor.m_materials.GetFirst()->GetInfo();
-	//ndRenderTextureImageCommon* const image = (ndRenderTextureImageCommon*)*material.m_texture;
-	//ndInt32 textureId = ndInt32(image->m_texture);
-	//switch (descriptor.m_mapping)
-	//{
-	//case ndRenderPrimitiveMesh::m_capsule:
-	//case ndRenderPrimitiveMesh::m_spherical:
-	//{
-	//	ndMatrix flipMatrix(ndGetIdentityMatrix());
-	//	flipMatrix[0][0] = ndFloat32(-1.0f);
-	//	ndMatrix aligmentUV(flipMatrix * descriptor.m_uvMatrix);
-	//	mesh.SphericalMapping(textureId, aligmentUV);
-	//	break;
-	//}
-	//
-	//case ndRenderPrimitiveMesh::m_cylindrical:
-	//{
-	//	ndMatrix flipMatrix(ndGetIdentityMatrix());
-	//	flipMatrix[0][0] = ndFloat32(-1.0f);
-	//	ndMatrix aligmentUV(flipMatrix * descriptor.m_uvMatrix);
-	//	mesh.CylindricalMapping(textureId, aligmentUV);
-	//	break;
-	//}
-	//
-	//case ndRenderPrimitiveMesh::m_box:
-	//{
-	//	if (descriptor.m_stretchMaping)
-	//	{
-	//		mesh.BoxMapping(textureId, textureId, textureId, descriptor.m_uvMatrix);
-	//	}
-	//	else
-	//	{
-	//		mesh.UniformBoxMapping(textureId, descriptor.m_uvMatrix);
-	//	}
-	//	break;
-	//}
-	//default:
-	//{
-	//	mesh.UniformBoxMapping(textureId, descriptor.m_uvMatrix);
-	//}
-	//}
 
 	ndIndexArray* const geometryHandle = mesh.MaterialGeometryBegin();
 
@@ -370,6 +329,7 @@ void ndRenderPrimitiveMeshImplement::BuildRenderMeshFromMeshEffect(const ndRende
 		segment.m_material.m_diffuse = material.m_diffuse;
 		segment.m_material.m_opacity = material.m_opacity;
 		segment.m_material.m_specular = material.m_specular;
+		segment.m_material.m_reflection = material.m_reflection;
 		segment.m_material.m_castShadows = material.m_castShadows;
 		segment.m_material.m_specularPower = material.m_specularPower;
 		
