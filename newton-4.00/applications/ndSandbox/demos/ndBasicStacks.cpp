@@ -259,7 +259,7 @@ static void BuildCapsuleStack(ndDemoEntityManager* const scene, ndFloat32 mass, 
 void ndBasicStacks (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFlatPlane(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", true);
+	ndSharedPtr<ndBody> body (BuildFlatPlane(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", true));
 	ndVector origin(ndVector::m_zero);
 
 	//ndInt32 pyramidHigh = 1;

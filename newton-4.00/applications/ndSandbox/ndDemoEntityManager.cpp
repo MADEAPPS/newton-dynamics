@@ -20,7 +20,7 @@
 #include "ndHighResolutionTimer.h"
 #include "ndDebugDisplayRenderPass.h"
 
-#define DEFAULT_SCENE	0		// basic rigidbody
+//#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// basic Stacks 
 //#define DEFAULT_SCENE	2		// basic friction
 //#define DEFAULT_SCENE	3		// basic sliding platform
@@ -31,8 +31,8 @@
 //#define DEFAULT_SCENE	8		// static mesh collision
 //#define DEFAULT_SCENE	9		// static compound scene collision
 //#define DEFAULT_SCENE	10		// basic compound shapes
-
-//#define DEFAULT_SCENE	7		// object Placement
+#define DEFAULT_SCENE	11		// object Placement
+ 
 //#define DEFAULT_SCENE	8		// particle fluid
 //#define DEFAULT_SCENE	10		// static user mesh collision 
 //#define DEFAULT_SCENE	12		// basic vehicle
@@ -62,6 +62,7 @@ void ndBasicStacks(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
 void ndBasicFriction(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
+void ndObjectPlacement(ndDemoEntityManager* const scene);
 void ndBasicAngularMomentum(ndDemoEntityManager* const scene);
 void ndBasicSlidingPlatform(ndDemoEntityManager* const scene);
 void ndBasicCompoundCollision(ndDemoEntityManager* const scene);
@@ -69,7 +70,7 @@ void ndBasicHeighfieldCollision(ndDemoEntityManager* const scene);
 void ndBasicStaticMeshCollision(ndDemoEntityManager* const scene);
 void ndBasicSceneCompoundCollision(ndDemoEntityManager* const scene);
 
-ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
+ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 {
 	{ "basic rigidbody", ndBasicRigidBody},
 	{ "basic stacking", ndBasicStacks},
@@ -82,6 +83,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic static mesh collision", ndBasicStaticMeshCollision},
 	{ "basic static compound scene collision", ndBasicSceneCompoundCollision},
 	{ "basic compound collision", ndBasicCompoundCollision},
+	{ "object placement", ndObjectPlacement},
 	
 
 #if 0
