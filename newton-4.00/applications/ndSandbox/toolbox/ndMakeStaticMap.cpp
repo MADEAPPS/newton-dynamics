@@ -480,18 +480,18 @@ class ndSceneMesh : public ndRenderSceneNode
 		// add an array of cylinders
 		subShapeLocation.m_posit.m_x += 10.0f;
 		AddSpeedBumpsSubShape(scene, compound, subShapeLocation, 14);
-
+		
 		// we can add a lot more stuff
 		subShapeLocation.m_posit.m_z -= 15.0f;
 		AddBoxSubShape(scene, compound, subShapeLocation);
-
+		
 		subShapeLocation.m_posit.m_z += 30.0f;
 		AddBoxSubShape(scene, compound, subShapeLocation);
-
+		
 		subShapeLocation.m_posit.m_z += 5.0f;
 		AddBoxSubShape(scene, compound, subShapeLocation);
 
-		// kepp add more stuff .... 
+		// keep add more stuff .... 
 
 
 		compound->EndAddRemove();
@@ -572,9 +572,8 @@ class ndSceneMesh : public ndRenderSceneNode
 
 	virtual void Render(const ndRender* const owner, ndFloat32 timeStep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const
 	{
-		// here we can  do a visibility test to check what chile node is visible 
-		// from the camera, but in this demo we are just rendering the 
-		// entire scene brute force.
+		// here we can  do a visibility test to check which children are visible from the camera, 
+		// but in this demo we are just rendering the entire scene brute force.
 		ndRenderSceneNode::Render(owner, timeStep, parentMatrix, renderMode);
 	}
 };
