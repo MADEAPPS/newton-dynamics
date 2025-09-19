@@ -155,7 +155,7 @@ R""""(
 
 	out vec4 pixelColor;
 	
-	// implement a simple blinn model
+	// implement a simple Blinn model
 	void main()
 	{
 		vec3 normalDir = normalize (normal);
@@ -163,7 +163,7 @@ R""""(
 		// calculate emisive, just a constant;
 		vec3 emissive = diffuseColor * directionalLightAmbient;
 
-		// calculate lambert diffuse component
+		// calculate Lambert diffuse component
 		float diffuseReflection = max (dot (normalDir, directionalLightDirection), 0.0);
 		vec3 diffuse = diffuseColor * directionalLightIntesity * diffuseReflection;
 
@@ -244,7 +244,7 @@ R""""(
 
 	out vec4 pixelColor;
 	
-	// implement a simple blinn model
+	// implement a simple Blinn model
 	void main()
 	{
 		vec3 normalDir = normalize (normal);
@@ -252,7 +252,7 @@ R""""(
 		// calculate emisive, just a constant;
 		vec3 emissive = diffuseColor * directionalLightAmbient;
 
-		// calculate lambert diffuse component
+		// calculate Lambert diffuse component
 		float diffuseReflection = max (dot (normalDir, directionalLightDirection), 0.0);
 		vec3 diffuse = diffuseColor * directionalLightIntesity * diffuseReflection;
 
