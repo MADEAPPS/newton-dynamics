@@ -99,43 +99,13 @@ class BackGroundVehicleController : public ndModel
 			:ndModelNotify()
 			,m_scene(pScene)
 			,m_vehicleBody(body)
-			,m_desiredSpeed(4.1667f)      // 4.1667f m/s = 15 km/h (9.3 mph) 33.3333 m/s = 120km/h (74.6mph)
-			,m_currentSpeed(0.0f)
-			,m_dSpeedProportional(4000.0f)
-			,m_integral(0.0f)
-			,m_integralGain(3000.0f)
-			,m_derivativeGain(600.0f)
-			,m_previousError(0.0f)
-			,m_combinedMaximumForce()
+			,m_desiredSpeed(3.0f) // 15 km/h
 		{
-			// Mass * Maximum acceleration of 6m/s/s
-			m_combinedMaximumForce = body->GetAsBodyDynamic()->GetMassMatrix().m_w * ndFloat32(6.0);
 		}
 
 		void Update(ndFloat32 timestep)
 		{
-			ndBodyDynamic* const vehicleBody = m_vehicleBody->GetAsBodyDynamic();
-
-			ndMatrix matrix(ndCalculateMatrix(m_vehicleBody->GetRotation(), ndVector::m_wOne));
-			ndVector forward = matrix.TransformVector(ndVector(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0), ndFloat32(0.0)));
-			ndVector velocity = m_vehicleBody->GetVelocity();
-
-			m_currentSpeed = forward.DotProduct(velocity).GetScalar();
-			ndFloat32 speedDifference = m_desiredSpeed - m_currentSpeed;
-			ndFloat32 longForceMag (UpdatePIDForDriveForces(speedDifference, timestep));
-
-			longForceMag = ndClamp(longForceMag, -m_combinedMaximumForce, m_combinedMaximumForce);
-			ndVector engineForce(ndFloat32(0.0), ndFloat32(0.0), longForceMag, ndFloat32(0.0));
-			ndVector localOffset(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0));
-			ndVector globalSpaceOffset = matrix.TransformVector(localOffset);      // Offset in local space
-			ndVector globalSpaceForce = matrix.TransformVector(engineForce);      // Force in local space
-
-			ndVector force(vehicleBody->GetForce() + globalSpaceForce);
-			ndVector torque(vehicleBody->GetTorque() + (globalSpaceOffset.CrossProduct(globalSpaceForce)));
-
-			vehicleBody->SetForce(force);
-			vehicleBody->SetTorque(torque);
-
+			ApplyLongitudinalImpulse(timestep);
 			ApplyLateralForces(timestep);
 
 			// Get the camera to follow the vehicle
@@ -146,81 +116,73 @@ class BackGroundVehicleController : public ndModel
 		}
 
 		private:
-		ndFloat32 UpdatePIDForDriveForces(ndFloat32 error, ndFloat32 dTimestep)
-		{
-			ndFloat32 proportional = m_dSpeedProportional * error;
-			m_integral = m_integral + m_integralGain * error * dTimestep;
-
-			// Make sure our integral remains inside reasonable bounds relative to the maximum force we are supposed to use
-			m_integral = ndClamp(m_integral, -m_combinedMaximumForce, m_combinedMaximumForce);
-
-			// Reset integral so that we don't overshoot stopping, and don't move slightly when our speed should be zero.
-			if (abs(m_desiredSpeed) < 0.01 && abs(m_currentSpeed) < 0.01)
-			{
-				m_integral = 0;
-			}
-
-			ndFloat32 derivative = m_derivativeGain * (error - m_previousError) / dTimestep;
-			ndFloat32 output = m_integral + derivative + proportional;
-			m_previousError = error;
-			return output;
-		}
-
-		void ApplyLateralForces(ndFloat32 dTimestep)
+		void ApplyLongitudinalImpulse(ndFloat32 timestep)
 		{
 			ndBodyDynamic* const vehicleBody = m_vehicleBody->GetAsBodyDynamic();
 
-			ndMatrix matrix(ndCalculateMatrix(vehicleBody->GetRotation()));
-			ndVector forward = matrix.TransformVector(ndVector(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0), ndFloat32(0.0)));
-			forward.m_w = ndFloat32(0.0);
+			const ndMatrix matrix(vehicleBody->GetMatrix());
+			const ndVector velocity(m_vehicleBody->GetVelocity());
+			ndFloat32 speed = matrix.m_front.DotProduct(velocity).GetScalar();
+			ndFloat32 speedError = m_desiredSpeed - speed;
+			ndFloat32 impulseMag = 0.4f * speedError * vehicleBody->GetMassMatrix().m_w;
+			vehicleBody->ApplyImpulsePair(matrix.m_front.Scale (impulseMag), ndVector::m_zero, timestep); 
+		}
 
-			ndVector upDir (matrix.TransformVector(ndVector(ndFloat32(0.0), ndFloat32(1.0), ndFloat32(0.0), ndFloat32(0.0))));
-			upDir.m_w = ndFloat32(0.0);
+		void ApplyLateralForces(ndFloat32 timestep)
+		{
+			ndBodyDynamic* const vehicleBody = m_vehicleBody->GetAsBodyDynamic();
+
+			const ndMatrix matrix(vehicleBody->GetMatrix());
+			const ndVector forward (matrix.m_front);
+			const ndVector upDir (matrix.m_up);
 
 			// Get some info about our current velocity
+			const ndVector velocity = m_vehicleBody->GetVelocity();
+
+			// Work out lateral force to stop sliding (all in world space)
+			const ndVector sidewayVelocity = velocity - forward.Scale(velocity.DotProduct(forward).GetScalar()) - upDir.Scale(velocity.DotProduct(upDir).GetScalar());
+			const ndVector velocityUp = velocity - forward.Scale(velocity.DotProduct(forward).GetScalar()) - sidewayVelocity;
+			const ndVector sidewaysMomentum = sidewayVelocity.Scale(vehicleBody->GetMassMatrix().m_w);
+			const ndVector verticalMomentum = velocityUp.Scale(vehicleBody->GetMassMatrix().m_w);
+
+			// 0.8 = momentum canceling factor
+			vehicleBody->ApplyImpulsePair(ndVector::m_negOne * sidewaysMomentum * 0.8f, ndVector(0.0f), timestep);
+		}
+
+		void ApplyTurningTorque()
+		{
+			ndBodyDynamic* const vehicleBody = m_vehicleBody->GetAsBodyDynamic();
+			const ndMatrix matrix(vehicleBody->GetMatrix());
+			const ndVector forward(matrix.m_front);
+			const ndVector upDir(matrix.m_up);
+
 			ndVector velocity = m_vehicleBody->GetVelocity();
 			ndFloat32 speed2 = velocity.DotProduct(velocity).GetScalar();
-			// Work out lateral force to stop sliding (all in world space)
-			ndVector sidewayVelocity = velocity - forward.Scale(velocity.DotProduct(forward).GetScalar()) - upDir.Scale(velocity.DotProduct(upDir).GetScalar());
-			ndVector velocityUp = velocity - forward.Scale(velocity.DotProduct(forward).GetScalar()) - sidewayVelocity;
-			ndVector sidewaysMomentum = sidewayVelocity.Scale(vehicleBody->GetMassMatrix().m_w);
-			ndVector verticalMomentum = velocityUp.Scale(vehicleBody->GetMassMatrix().m_w);
-
-			vehicleBody->ApplyImpulsePair(ndVector::m_negOne * sidewaysMomentum * 0.8f, ndVector(0.0f), dTimestep);      // 0.8 = momentum canceling factor
-			vehicleBody->ApplyImpulsePair(ndVector::m_negOne * verticalMomentum * 0.0f, ndVector(0.0f), dTimestep);
 
 			// Work out steering forces
-			ndFloat32 steering = 0.0;               // Keep the vehicle traveling straight
-			ndFloat32 maxTorque = 50000;
-			ndFloat32 desiredAngularSpeedFactor = 1.0;
+			ndFloat32 steering = 0.0f;               // Keep the vehicle traveling straight
+			ndFloat32 maxTorque = 50000.0f;
+			ndFloat32 desiredAngularSpeedFactor = 1.0f;
 			ndFloat32 desiredAngularSpeed = desiredAngularSpeedFactor * speed2 * steering / (ndPi);   // Steering is a value from -pi to pi
 
-			if (m_currentSpeed < 0)
-			{
-				// Flip desired angular speed for reversing
-				desiredAngularSpeed *= -1;
-			}
+			//if (m_currentSpeed < 0)
+			//{
+			//	// Flip desired angular speed for reversing
+			//	desiredAngularSpeed *= -1;
+			//}
 
 			ndFloat32 angularSpeed = upDir.DotProduct(m_vehicleBody->GetOmega()).GetScalar();  // Component of the angular velocity about the up vector
 			ndFloat32 angularSpeedDifference = desiredAngularSpeed - angularSpeed;
 			angularSpeedDifference = ndClamp(angularSpeedDifference, ndFloat32(-0.3), ndFloat32(0.3));
 			angularSpeedDifference = angularSpeedDifference / ndFloat32(0.3);  // Normalise to between -1 and 1;
 			ndFloat32 torque = angularSpeedDifference * maxTorque;
-			ndVector yAxisMoment = ndVector(ndFloat32(0.0), torque, ndFloat32(0.0), ndFloat32(0.0));                        // Vehicle space torque
-			ndVector worldMoment = matrix.TransformVector(yAxisMoment);      // Get the torque to world space
-			vehicleBody->SetTorque(vehicleBody->GetTorque() + worldMoment);
+			const ndVector turnTorque (upDir.Scale(torque));                     // Vehicle space torque
+			vehicleBody->SetTorque(vehicleBody->GetTorque() + turnTorque);
 		}
 
 		ndDemoEntityManager* m_scene;
 		ndSharedPtr<ndBody> m_vehicleBody;
 		ndFloat32 m_desiredSpeed;
-		ndFloat32 m_currentSpeed;
-		ndFloat32 m_dSpeedProportional;
-		ndFloat32 m_integral;
-		ndFloat32 m_integralGain;
-		ndFloat32 m_derivativeGain;
-		ndFloat32 m_previousError;
-		ndFloat32 m_combinedMaximumForce;
 	};
 
 	BackGroundVehicleController(ndDemoEntityManager* pScene, const ndSharedPtr<ndBody>& body)
@@ -252,8 +214,8 @@ static ndSharedPtr<ndBody> CreateAiPropVehicle(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndModel> controller(new BackGroundVehicleController(scene, vehicleBody));
 
 	world->AddBody(vehicleBody);
-	scene->AddEntity(vehicleMesh);
 	world->AddModel(controller);
+	scene->AddEntity(vehicleMesh);
 
 	return vehicleBody;
 }
