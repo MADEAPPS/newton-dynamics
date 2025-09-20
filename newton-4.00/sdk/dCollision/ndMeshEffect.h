@@ -415,7 +415,7 @@ class ndMeshEffect: public ndPolyhedra
 			,m_diffuse(ndFloat32(0.8f), ndFloat32(0.8f), ndFloat32(0.8f), ndFloat32(1.0f))
 			,m_specular(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(1.0f))
 			,m_opacity(ndFloat32(1.0f))
-			,m_shiness(ndFloat32 (60.0f))
+			,m_shiness(ndFloat32 (250.0f))
 		{
 			strcpy_s(m_textureName, sizeof(m_textureName), "default.png");
 		}
