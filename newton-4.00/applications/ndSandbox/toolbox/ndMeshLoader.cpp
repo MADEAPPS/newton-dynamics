@@ -116,12 +116,12 @@ ndSharedPtr<ndRenderSceneNode> ndMeshLoader::LoadEntity(ndRender* const renderer
 				{
 					const ndString texturePathName(path + materials[j].m_textureName);
 					ndRenderPrimitiveMeshMaterial& material = descriptor.AddMaterial(renderer->GetTextureCache()->GetTexture(texturePathName));
-					material.m_castShadows = true;
 					material.m_diffuse = materials[i].m_diffuse;
 					material.m_specular = materials[i].m_specular;
 					material.m_reflection = materials[i].m_specular;
 					material.m_specularPower = materials[i].m_shiness;
 					material.m_opacity = materials[i].m_opacity;
+					material.m_castShadows = true;
 				}
 				geometry = ndSharedPtr<ndRenderPrimitive>(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 			}
