@@ -4178,13 +4178,13 @@ ndIndexArray* ndMeshEffect::MaterialGeometryBegin()
 	ndInt32 streamIndexMap[256];
 
 	ndInt32 count = 0;
-	ndInt32 materialCount = 0;
 
 	ndIndexArray* const array = (ndIndexArray*)ndMemory::Malloc(size_t(4 * sizeof(ndInt32) * GetCount() + sizeof(ndIndexArray) + 2048));
 	array->m_indexList = (ndInt32*)&array[1];
 
 	ndInt32 mark = IncLRU();
 	ndPolyhedra::Iterator iter(*this);
+	ndMemSet(materials, 0, sizeof(materials) / sizeof(materials[0]));
 	ndMemSet(streamIndexMap, 0, sizeof(streamIndexMap) / sizeof(streamIndexMap[0]));
 	for (iter.Begin(); iter; iter++)
 	{
@@ -4221,7 +4221,6 @@ ndIndexArray* ndMeshEffect::MaterialGeometryBegin()
 	}
 
 	array->m_indexCount = count;
-	array->m_materialCount = materialCount;
 
 	count = 0;
 	for (ndInt32 i = 0; i < 256; ++i)
