@@ -51,163 +51,8 @@ class BackgroundLowLodCVehicleMaterial : public ndApplicationMaterial
 	}
 };
 
-
-class BackGroundVehicleController : public ndModel
-{
-	public:
-	class ndNotify : public ndModelNotify
-	{
-		public:
-		ndNotify(ndDemoEntityManager* pScene, const ndSharedPtr<ndBody>& body)
-			:ndModelNotify()
-			,m_pScene(pScene)
-			,m_pAiBody(body)
-			,m_dDesiredSpeed(4.1667f)      // 4.1667f m/s = 15 km/h (9.3 mph) 33.3333 m/s = 120km/h (74.6mph)
-			,m_dCurrentSpeed(0.0f)
-			,m_dSpeedProportional(4000.0f)
-			,m_dIntegral(0.0f)
-			,m_dIntegralGain(3000.0f)
-			,m_dDerivativeGain(600.0f)
-			,m_dPreviousError(0.0f)
-			,m_dCombinedMaximumForce()
-		{
-			// Mass * Maximum acceleration of 6m/s/s
-			m_dCombinedMaximumForce = body->GetAsBodyDynamic()->GetMassMatrix().m_w * ndFloat32(6.0);
-		}
-
-		void Update(ndFloat32 timestep)
-		{
-			ndBodyDynamic* const pAiBody = m_pAiBody->GetAsBodyDynamic();
-			ndMatrix mMatrix(ndCalculateMatrix(m_pAiBody->GetRotation(), ndVector::m_wOne));
-			ndVector vForward = mMatrix.TransformVector(ndVector(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0), ndFloat32(0.0)));
-			ndVector vVelocity = m_pAiBody->GetVelocity();
-			m_dCurrentSpeed = (vForward.DotProduct(vVelocity)).GetScalar();
-			ndFloat32 dSpeedDifference = m_dDesiredSpeed - m_dCurrentSpeed;
-			ndFloat32 dForce = _UpdatePIDForDriveForces(dSpeedDifference, timestep);
-			dForce = ndClamp(dForce, -m_dCombinedMaximumForce, m_dCombinedMaximumForce);
-			ndVector vForce(ndFloat32(0.0), ndFloat32(0.0), dForce, ndFloat32(0.0));
-			ndVector vOffset(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0));
-			ndVector vOffsetLS = mMatrix.TransformVector(vOffset);      // Offset in local space
-			ndVector vForceLS = mMatrix.TransformVector(vForce);      // Force in local space
-
-			ndVector force(pAiBody->GetForce() + vForceLS);
-			ndVector torque(pAiBody->GetTorque() + (vOffsetLS.CrossProduct(vForceLS)));
-			pAiBody->SetForce(force);
-			pAiBody->SetTorque(torque);
-
-			_ApplyLateralForces(timestep);
-			
-			// Get the camera to follow the vehicle
-			ndVector origin(m_pAiBody->GetPosition());
-			ndQuaternion rot(ndYawMatrix(180.0f * ndDegreeToRad));
-			origin.m_x += 10.0f;
-			m_pScene->SetCameraMatrix(rot, origin);
-		}
-
-		private:
-		ndFloat32 _UpdatePIDForDriveForces(ndFloat32 dError, ndFloat32 dTimestep)
-		{
-			ndFloat32 dProportional = m_dSpeedProportional * dError;
-			m_dIntegral = m_dIntegral + m_dIntegralGain * dError * dTimestep;
-			
-			// Make sure our integral remains inside reasonable bounds relative to the maximum force we are supposed to use
-			m_dIntegral = ndClamp(m_dIntegral, -m_dCombinedMaximumForce, m_dCombinedMaximumForce);
-			
-			// Reset integral so that we don't overshoot stopping, and don't move slightly when our speed should be zero.
-			if (abs(m_dDesiredSpeed) < 0.01 && abs(m_dCurrentSpeed) < 0.01)
-				m_dIntegral = 0;
-			
-			ndFloat32 dDerivative = m_dDerivativeGain * (dError - m_dPreviousError) / dTimestep;
-			ndFloat32 dOutput = m_dIntegral + dDerivative + dProportional;
-			m_dPreviousError = dError;
-			return dOutput;
-		}
-
-		void _ApplyLateralForces(ndFloat32 dTimestep)
-		{
-			ndBodyDynamic* const pAiBody = m_pAiBody->GetAsBodyDynamic();
-			ndMatrix mMatrix(ndCalculateMatrix(pAiBody->GetRotation()));
-			ndVector vForward = mMatrix.TransformVector(ndVector(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0), ndFloat32(0.0)));
-			vForward.m_w = ndFloat32(0.0);
-			ndVector vUp = mMatrix.TransformVector(ndVector(ndFloat32(0.0), ndFloat32(1.0), ndFloat32(0.0), ndFloat32(0.0)));
-			vUp.m_w = ndFloat32(0.0);
-			// Get some info about our current velocity
-			ndVector vVelocity = m_pAiBody->GetVelocity();
-			ndFloat32 dVelocity = vVelocity.DotProduct(vVelocity).GetScalar();
-			// Work out lateral force to stop sliding (all in world space)
-			ndVector vVelocitySideways = vVelocity - vForward.Scale(vVelocity.DotProduct(vForward).GetScalar()) - vUp.Scale(vVelocity.DotProduct(vUp).GetScalar());
-			ndVector vVelocityUp = vVelocity - vForward.Scale(vVelocity.DotProduct(vForward).GetScalar()) - vVelocitySideways;
-			ndVector vSidewaysMomentum = vVelocitySideways.Scale(pAiBody->GetMassMatrix().m_w);
-			ndVector vVerticalMomentum = vVelocityUp.Scale(pAiBody->GetMassMatrix().m_w);
-			pAiBody->ApplyImpulsePair(ndVector::m_negOne * vSidewaysMomentum * 0.8f, ndVector(0.0f), dTimestep);      // 0.8 = momentum canceling factor
-			pAiBody->ApplyImpulsePair(ndVector::m_negOne * vVerticalMomentum * 0.0f, ndVector(0.0f), dTimestep);
-		
-			// Work out steering forces
-			ndFloat32 dSteering = 0.0;               // Keep the vehicle traveling straight
-			ndFloat32 dMaxTorque = 50000;
-			ndFloat32 dDesiredAngularSpeedFactor = 1.0;
-			ndFloat32 dDesiredAngularSpeed = dDesiredAngularSpeedFactor * dVelocity * dSteering / (ndPi);   // Steering is a value from -pi to pi
-		
-			if (m_dCurrentSpeed < 0)   // Flip desired angular speed for reversing
-				dDesiredAngularSpeed *= -1;
-		
-			ndFloat32 dAngularSpeed = vUp.DotProduct(m_pAiBody->GetOmega()).GetScalar();  // Component of the angular velocity about the up vector
-			ndFloat32 dAngularSpeedDifference = dDesiredAngularSpeed - dAngularSpeed;
-			dAngularSpeedDifference = ndClamp(dAngularSpeedDifference, ndFloat32(-0.3), ndFloat32(0.3));
-			dAngularSpeedDifference = dAngularSpeedDifference / ndFloat32(0.3);  // Normalise to between -1 and 1;
-			ndFloat32 dTorque = dAngularSpeedDifference * dMaxTorque;
-			ndVector vYAxisMoment = ndVector(ndFloat32(0.0), dTorque, ndFloat32(0.0), ndFloat32(0.0));                        // Vehicle space torque
-			ndVector vWorldMoment = mMatrix.TransformVector(vYAxisMoment);      // Get the torque to world space
-			pAiBody->SetTorque(pAiBody->GetTorque() + vWorldMoment);
-		}
-
-		ndDemoEntityManager* m_pScene;
-		ndSharedPtr<ndBody> m_pAiBody;
-		ndFloat32 m_dDesiredSpeed;
-		ndFloat32 m_dCurrentSpeed;
-		ndFloat32 m_dSpeedProportional;
-		ndFloat32 m_dIntegral;
-		ndFloat32 m_dIntegralGain;
-		ndFloat32 m_dDerivativeGain;
-		ndFloat32 m_dPreviousError;
-		ndFloat32 m_dCombinedMaximumForce;
-	};
-
-	BackGroundVehicleController(ndDemoEntityManager* pScene, const ndSharedPtr<ndBody>& body)
-		:ndModel()
-	{
-		SetNotifyCallback(ndSharedPtr<ndModelNotify>(new ndNotify(pScene, body)));
-	}
-};
-
-
 static ndShapeInstance CreateCompoundCollision()
 {
-	ndFloat32 convexHullPoints[336] = { 
-		2.64974f,  0.903322f,  -0.766362f,  2.64974f,  0.903322f,  -0.0842047f,  0.677557f,  0.903322f,  0.662591f,  -0.596817f,  0.903322f,  0.662591f,  -2.77764f,  0.903321f,  0.0424131f,
-		-2.77764f,  0.903321f,  -0.766362f,  -1.56248f,  0.903322f,  -0.766362f,  -0.784835f,  0.903322f,  -0.766362f,  1.46171f,  0.903322f,  -0.766362f,  2.22016f,  0.903322f,  -0.766362f,
-		-2.77764f,  -0.918637f,  -0.766362f,  -2.77764f,  -0.918637f,  0.0424131f,  -0.596817f,  -0.918637f,  0.662591f,  0.677557f,  -0.918636f,  0.662591f,  2.64974f,  -0.918636f,  -0.0842047f,
-		-1.56248f,  -0.918637f,  -0.766362f,  -0.784834f,  -0.918637f,  -0.766362f,  1.46171f,  -0.918636f,  -0.766362f,  2.22016f,  -0.918636f,  -0.766362f,  2.64974f,  -0.918636f,  -0.766362f,
-		2.22016f,  -0.654416f,  -0.766362f,  2.22016f,  -0.918636f,  -0.766362f,  2.64974f,  -0.918636f,  -0.766362f,  2.22016f,  0.661676f,  -0.766362f,  2.22016f,  0.903322f,  -0.766362f,
-		2.64974f,  0.903322f,  -0.766362f,  -2.77764f,  0.903321f,  -0.766362f,  -2.77764f,  0.903321f,  0.0424131f,  -2.77764f,  -0.918637f,  0.0424131f,  -2.77764f,  -0.918637f,  -0.766362f,
-		-2.77764f,  0.903321f,  0.0424131f,  -0.596817f,  0.903322f,  0.662591f,  -0.596817f,  -0.918637f,  0.662591f,  -2.77764f,  -0.918637f,  0.0424131f,  2.64974f,  0.903322f,  -0.0842047f,
-		2.64974f,  0.903322f,  -0.766362f,  2.64974f,  -0.918636f,  -0.766362f,  2.64974f,  -0.918636f,  -0.0842047f,  0.677557f,  0.903322f,  0.662591f,  2.64974f,  0.903322f,  -0.0842047f,
-		2.64974f,  -0.918636f,  -0.0842047f,  0.677557f,  -0.918636f,  0.662591f,  -2.77764f,  -0.918637f,  -0.766362f,  -1.56248f,  -0.918637f,  -0.766362f,  -1.56248f,  -0.654416f,  -0.766362f,
-		-2.77764f,  0.903321f,  -0.766362f,  -1.56248f,  0.661676f,  -0.766362f,  -1.56248f,  0.903322f,  -0.766362f,  -0.784834f,  -0.654416f,  -0.766362f,  -0.784835f,  0.661676f,  -0.766362f,
-		-0.784834f,  -0.918637f,  -0.766362f,  1.46171f,  -0.918636f,  -0.766362f,    1.46171f,  -0.654416f,  -0.766362f,  1.46171f,  0.661676f,  -0.766362f,  -0.784835f,  0.903322f,  -0.766362f,
-		1.46171f,  0.903322f,  -0.766362f,  -0.784834f,  -0.654416f,  -0.766362f,  -1.56248f,  -0.654416f,  -0.766362f,  -1.17366f,  -0.654417f,  -1.15761f,  -1.56248f,  -0.654416f,  -0.766362f,
-		-1.56248f,  -0.918637f,  -0.766362f,  -1.17366f,  -0.918637f,  -1.15761f,  -1.17366f,  -0.654417f,  -1.15761f,  -1.56248f,  -0.918637f,  -0.766362f,  -0.784834f,  -0.918637f,  -0.766362f,
-		-1.17366f,  -0.918637f,  -1.15761f,  -0.784834f,  -0.918637f,  -0.766362f,  -0.784834f,  -0.654416f,  -0.766362f,  -1.17366f,  -0.654417f,  -1.15761f,  -1.17366f,  -0.918637f,  -1.15761f,
-		-1.56248f,  0.661676f,  -0.766362f,  -0.784835f,  0.661676f,  -0.766362f,  -1.17366f,  0.661676f,  -1.15761f,  -0.784835f,  0.661676f,  -0.766362f,  -0.784835f,  0.903322f,  -0.766362f,
-		-1.17366f,  0.903322f,  -1.15761f,  -1.17366f,  0.661676f,  -1.15761f,  -0.784835f,  0.903322f,  -0.766362f,  -1.56248f,  0.903322f,  -0.766362f,  -1.17366f,  0.903322f,  -1.15761f,
-		-1.56248f,  0.903322f,  -0.766362f,  -1.56248f,  0.661676f,  -0.766362f,  -1.17366f,  0.661676f,  -1.15761f,  -1.17366f,  0.903322f,  -1.15761f,  2.22016f,  -0.654416f,  -0.766362f,
-		1.46171f,  -0.654416f,  -0.766362f,  1.84093f,  -0.654416f,  -1.15761f,  1.46171f,  -0.654416f,  -0.766362f,  1.46171f,  -0.918636f,  -0.766362f,  1.84093f,  -0.918636f,  -1.15761f,
-		1.84093f,  -0.654416f,  -1.15761f,  1.46171f,  -0.918636f,  -0.766362f,  2.22016f,  -0.918636f,  -0.766362f,  1.84093f,  -0.918636f,  -1.15761f,  2.22016f,  -0.918636f,  -0.766362f,
-		2.22016f,  -0.654416f,  -0.766362f,  1.84093f,  -0.654416f,  -1.15761f,  1.84093f,  -0.918636f,  -1.15761f,  1.46171f,  0.661676f,  -0.766362f,  2.22016f,  0.661676f,  -0.766362f,
-		1.84093f,  0.661676f,  -1.15761f,  2.22016f,  0.661676f,  -0.766362f,  2.22016f,  0.903322f,  -0.766362f,  1.84093f,  0.903322f,  -1.15761f,  1.84093f,  0.661676f,  -1.15761f,
-		2.22016f,  0.903322f,  -0.766362f,  1.46171f,  0.903322f,  -0.766362f,  1.84093f,  0.903322f,  -1.15761f,  1.46171f,  0.903322f,  -0.766362f,  1.46171f,  0.661676f,  -0.766362f,
-		1.84093f,  0.661676f,  -1.15761f,  1.84093f,  0.903322f,  -1.15761f };
-
 	ndMatrix mParentInv = ndGetIdentityMatrix();
 	mParentInv.m_posit = ndVector(ndFloat32(0.0), ndFloat32(-1.0), ndFloat32(0.0), ndFloat32(1.0));
 	ndMatrix mChildWorld = ndGetIdentityMatrix();
@@ -244,23 +89,157 @@ static ndShapeInstance CreateCompoundCollision()
 }
 #endif
 
-static ndSharedPtr<ndBody> AddAiVehicle(ndDemoEntityManager* const scene)
+class BackGroundVehicleController : public ndModel
 {
-	//ndShapeInstance shapeInstance = CreateCompoundCollision();
-	//ndDemoMeshIntance* const aiGeometry = new ndDemoMeshIntance("AiVehicle", scene->GetShaderCache(), &shapeInstance, "earthmap.png", "earthmap.png", "earthmap.png");
-	//ndSharedPtr<ndDemoEntity> aiEntity(new ndDemoInstanceEntity(aiGeometry));
-	//scene->AddEntity(aiEntity);
-	//ndMatrix mBodyMatrix = ndGetIdentityMatrix();
-	//mBodyMatrix.m_posit = ndVector(0.0f, 5.0f, 0.0f, 1.0f);
-	////mBodyMatrix.m_posit = ndVector(0.0f, 1.2f, 0.0f, 1.0f);
-	 
+	public:
+	class ndNotify : public ndModelNotify
+	{
+		public:
+		ndNotify(ndDemoEntityManager* pScene, const ndSharedPtr<ndBody>& body)
+			:ndModelNotify()
+			,m_scene(pScene)
+			,m_vehicleBody(body)
+			,m_desiredSpeed(4.1667f)      // 4.1667f m/s = 15 km/h (9.3 mph) 33.3333 m/s = 120km/h (74.6mph)
+			,m_currentSpeed(0.0f)
+			,m_dSpeedProportional(4000.0f)
+			,m_integral(0.0f)
+			,m_integralGain(3000.0f)
+			,m_derivativeGain(600.0f)
+			,m_previousError(0.0f)
+			,m_combinedMaximumForce()
+		{
+			// Mass * Maximum acceleration of 6m/s/s
+			m_combinedMaximumForce = body->GetAsBodyDynamic()->GetMassMatrix().m_w * ndFloat32(6.0);
+		}
+
+		void Update(ndFloat32 timestep)
+		{
+			ndBodyDynamic* const vehicleBody = m_vehicleBody->GetAsBodyDynamic();
+
+			ndMatrix matrix(ndCalculateMatrix(m_vehicleBody->GetRotation(), ndVector::m_wOne));
+			ndVector forward = matrix.TransformVector(ndVector(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0), ndFloat32(0.0)));
+			ndVector velocity = m_vehicleBody->GetVelocity();
+
+			m_currentSpeed = forward.DotProduct(velocity).GetScalar();
+			ndFloat32 speedDifference = m_desiredSpeed - m_currentSpeed;
+			ndFloat32 longForceMag (UpdatePIDForDriveForces(speedDifference, timestep));
+
+			longForceMag = ndClamp(longForceMag, -m_combinedMaximumForce, m_combinedMaximumForce);
+			ndVector engineForce(ndFloat32(0.0), ndFloat32(0.0), longForceMag, ndFloat32(0.0));
+			ndVector localOffset(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0));
+			ndVector globalSpaceOffset = matrix.TransformVector(localOffset);      // Offset in local space
+			ndVector globalSpaceForce = matrix.TransformVector(engineForce);      // Force in local space
+
+			ndVector force(vehicleBody->GetForce() + globalSpaceForce);
+			ndVector torque(vehicleBody->GetTorque() + (globalSpaceOffset.CrossProduct(globalSpaceForce)));
+
+			vehicleBody->SetForce(force);
+			vehicleBody->SetTorque(torque);
+
+			ApplyLateralForces(timestep);
+
+			// Get the camera to follow the vehicle
+			//ndVector origin(m_vehicleBody->GetPosition());
+			//ndQuaternion rot(ndYawMatrix(180.0f * ndDegreeToRad));
+			//origin.m_x += 10.0f;
+			//m_scene->SetCameraMatrix(rot, origin);
+		}
+
+		private:
+		ndFloat32 UpdatePIDForDriveForces(ndFloat32 error, ndFloat32 dTimestep)
+		{
+			ndFloat32 proportional = m_dSpeedProportional * error;
+			m_integral = m_integral + m_integralGain * error * dTimestep;
+
+			// Make sure our integral remains inside reasonable bounds relative to the maximum force we are supposed to use
+			m_integral = ndClamp(m_integral, -m_combinedMaximumForce, m_combinedMaximumForce);
+
+			// Reset integral so that we don't overshoot stopping, and don't move slightly when our speed should be zero.
+			if (abs(m_desiredSpeed) < 0.01 && abs(m_currentSpeed) < 0.01)
+			{
+				m_integral = 0;
+			}
+
+			ndFloat32 derivative = m_derivativeGain * (error - m_previousError) / dTimestep;
+			ndFloat32 output = m_integral + derivative + proportional;
+			m_previousError = error;
+			return output;
+		}
+
+		void ApplyLateralForces(ndFloat32 dTimestep)
+		{
+			ndBodyDynamic* const vehicleBody = m_vehicleBody->GetAsBodyDynamic();
+
+			ndMatrix matrix(ndCalculateMatrix(vehicleBody->GetRotation()));
+			ndVector forward = matrix.TransformVector(ndVector(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0), ndFloat32(0.0)));
+			forward.m_w = ndFloat32(0.0);
+
+			ndVector upDir (matrix.TransformVector(ndVector(ndFloat32(0.0), ndFloat32(1.0), ndFloat32(0.0), ndFloat32(0.0))));
+			upDir.m_w = ndFloat32(0.0);
+
+			// Get some info about our current velocity
+			ndVector velocity = m_vehicleBody->GetVelocity();
+			ndFloat32 speed2 = velocity.DotProduct(velocity).GetScalar();
+			// Work out lateral force to stop sliding (all in world space)
+			ndVector sidewayVelocity = velocity - forward.Scale(velocity.DotProduct(forward).GetScalar()) - upDir.Scale(velocity.DotProduct(upDir).GetScalar());
+			ndVector velocityUp = velocity - forward.Scale(velocity.DotProduct(forward).GetScalar()) - sidewayVelocity;
+			ndVector sidewaysMomentum = sidewayVelocity.Scale(vehicleBody->GetMassMatrix().m_w);
+			ndVector verticalMomentum = velocityUp.Scale(vehicleBody->GetMassMatrix().m_w);
+
+			vehicleBody->ApplyImpulsePair(ndVector::m_negOne * sidewaysMomentum * 0.8f, ndVector(0.0f), dTimestep);      // 0.8 = momentum canceling factor
+			vehicleBody->ApplyImpulsePair(ndVector::m_negOne * verticalMomentum * 0.0f, ndVector(0.0f), dTimestep);
+
+			// Work out steering forces
+			ndFloat32 steering = 0.0;               // Keep the vehicle traveling straight
+			ndFloat32 maxTorque = 50000;
+			ndFloat32 desiredAngularSpeedFactor = 1.0;
+			ndFloat32 desiredAngularSpeed = desiredAngularSpeedFactor * speed2 * steering / (ndPi);   // Steering is a value from -pi to pi
+
+			if (m_currentSpeed < 0)
+			{
+				// Flip desired angular speed for reversing
+				desiredAngularSpeed *= -1;
+			}
+
+			ndFloat32 angularSpeed = upDir.DotProduct(m_vehicleBody->GetOmega()).GetScalar();  // Component of the angular velocity about the up vector
+			ndFloat32 angularSpeedDifference = desiredAngularSpeed - angularSpeed;
+			angularSpeedDifference = ndClamp(angularSpeedDifference, ndFloat32(-0.3), ndFloat32(0.3));
+			angularSpeedDifference = angularSpeedDifference / ndFloat32(0.3);  // Normalise to between -1 and 1;
+			ndFloat32 torque = angularSpeedDifference * maxTorque;
+			ndVector yAxisMoment = ndVector(ndFloat32(0.0), torque, ndFloat32(0.0), ndFloat32(0.0));                        // Vehicle space torque
+			ndVector worldMoment = matrix.TransformVector(yAxisMoment);      // Get the torque to world space
+			vehicleBody->SetTorque(vehicleBody->GetTorque() + worldMoment);
+		}
+
+		ndDemoEntityManager* m_scene;
+		ndSharedPtr<ndBody> m_vehicleBody;
+		ndFloat32 m_desiredSpeed;
+		ndFloat32 m_currentSpeed;
+		ndFloat32 m_dSpeedProportional;
+		ndFloat32 m_integral;
+		ndFloat32 m_integralGain;
+		ndFloat32 m_derivativeGain;
+		ndFloat32 m_previousError;
+		ndFloat32 m_combinedMaximumForce;
+	};
+
+	BackGroundVehicleController(ndDemoEntityManager* pScene, const ndSharedPtr<ndBody>& body)
+		:ndModel()
+	{
+		SetNotifyCallback(ndSharedPtr<ndModelNotify>(new ndNotify(pScene, body)));
+	}
+};
+
+static ndSharedPtr<ndBody> CreateAiPropVehicle(ndDemoEntityManager* const scene)
+{
 	ndMeshLoader loader;
 	ndSharedPtr<ndRenderSceneNode> vehicleMesh(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("vmw.fbx")));
 	ndMatrix matrix (ndGetIdentityMatrix());
-	matrix.m_posit = ndVector(0.0f, 5.0f, 0.0f, 1.0f);
+	ndVector floor(FindFloor(*scene->GetWorld(), ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	floor.m_y += ndFloat32 (1.0f);
+	matrix.m_posit = floor;
 
 	ndSharedPtr<ndShapeInstance> collision(loader.m_mesh->CreateCollisionConvex());
-	//ndSharedPtr<ndBody> aiVehicleBody (AddRigidBody(scene, matrix, **collision, vehicle, 1000.0f));
 
 	ndWorld* const world = scene->GetWorld();
 
@@ -270,9 +249,11 @@ static ndSharedPtr<ndBody> AddAiVehicle(ndDemoEntityManager* const scene)
 	vehicleBody->GetAsBodyDynamic()->SetCollisionShape(**collision);
 	vehicleBody->GetAsBodyDynamic()->SetMassMatrix(1000.0f, **collision);
 
+	ndSharedPtr<ndModel> controller(new BackGroundVehicleController(scene, vehicleBody));
+
 	world->AddBody(vehicleBody);
 	scene->AddEntity(vehicleMesh);
-	//world->AddModel(controller);
+	world->AddModel(controller);
 
 	return vehicleBody;
 }
@@ -290,9 +271,9 @@ void ndBasicModel(ndDemoEntityManager* const scene)
 	//mapMaterial.m_userId = ndDemoContactCallback::m_aiTerrain;
 	//mapBody->GetAsBodyKinematic()->GetCollisionShape().SetMaterial(mapMaterial);
 	
-	ndSharedPtr<ndBody> vehuicleBody(AddAiVehicle(scene));
+	ndSharedPtr<ndBody> vehicleBody(CreateAiPropVehicle(scene));
 
-	//ndVector origin(pAiBody->GetPosition());
+	//ndVector origin(vehicleBody->GetPosition());
 	//ndQuaternion rot(ndYawMatrix(180.0f * ndDegreeToRad));
 	//origin.m_x += 10.0f;
 	//scene->SetCameraMatrix(rot, origin);
