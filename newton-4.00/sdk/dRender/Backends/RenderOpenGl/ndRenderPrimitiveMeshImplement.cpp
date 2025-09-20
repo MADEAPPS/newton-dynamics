@@ -276,11 +276,10 @@ void ndRenderPrimitiveMeshImplement::BuildRenderMeshFromMeshEffect(const ndRende
 
 	ndAssert(descriptor.m_materials.GetCount());
 
-	ndIndexArray* const geometryHandle = mesh.MaterialGeometryBegin();
-
 	// extract vertex data  from the newton mesh
 	ndInt32 indexCount = 0;
 	ndInt32 vertexCount = mesh.GetPropertiesCount();
+	ndIndexArray* const geometryHandle = mesh.MaterialGeometryBegin();
 	for (ndInt32 handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
 	{
 		indexCount += mesh.GetMaterialIndexCount(geometryHandle, handle);
@@ -318,9 +317,14 @@ void ndRenderPrimitiveMeshImplement::BuildRenderMeshFromMeshEffect(const ndRende
 	}
 
 	ndInt32 segmentStart = 0;
-	ndList<ndRenderPrimitiveMeshMaterial>::ndNode* materialNodes = descriptor.m_materials.GetFirst();
 	for (ndInt32 handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
 	{
+		ndInt32 materialIndex = mesh.GetMaterialID(geometryHandle, handle);
+		ndList<ndRenderPrimitiveMeshMaterial>::ndNode* materialNodes = descriptor.m_materials.GetFirst();
+		for (ndInt32 i = 0; i < materialIndex; ++i)
+		{
+			materialNodes = materialNodes->GetNext();
+		}
 		const ndRenderPrimitiveMeshMaterial& material = materialNodes->GetInfo();
 		
 		ndRenderPrimitiveMeshSegment& segment = m_owner->m_segments.Append()->GetInfo();
@@ -338,8 +342,6 @@ void ndRenderPrimitiveMeshImplement::BuildRenderMeshFromMeshEffect(const ndRende
 		segment.m_segmentStart = segmentStart;
 		mesh.GetMaterialGetIndexStream(geometryHandle, handle, &indices[segmentStart]);
 		segmentStart += segment.m_indexCount;
-
-		materialNodes = materialNodes->GetNext();
 	}
 	mesh.MaterialGeometryEnd(geometryHandle);
 
