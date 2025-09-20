@@ -114,7 +114,7 @@ R""""(
 
 		// calculate reflection	
 		vec3 reflectionDir = normalDir * (2.0 * dot(cameraDir, normalDir)) - cameraDir;
-		vec3 reflection = reflectionColor * vec3(texture(environmentMap, reflectionDir));
+		vec3 reflection = directionalLightAmbient * reflectionColor * vec3(texture(environmentMap, reflectionDir));
 
 		// add all contributions
 		//vec3 color = vec3(1.0, 0.0, 0.0);
@@ -208,7 +208,7 @@ R""""(
 		}
 		// calculate reflection	
 		vec3 reflectionDir = normalDir * (2.0 * dot(cameraDir, normalDir)) - cameraDir;
-		vec3 reflection = reflectionColor * vec3(texture(environmentMap, reflectionDir));
+		vec3 reflection = directionalLightAmbient * reflectionColor * vec3(texture(environmentMap, reflectionDir));
 		
 		// add all contributions
 		color = color + emissive;
