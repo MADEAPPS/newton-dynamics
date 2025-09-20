@@ -180,23 +180,6 @@ class BackGroundVehicleController : public ndModel
 	}
 };
 
-static ndBodyDynamic* AddRigidBody(ndDemoEntityManager* const scene, const ndMatrix& matrix, const ndShapeInstance& shape, const ndSharedPtr<ndDemoEntity>& rootEntity, ndFloat32 mass)
-{
-	ndWorld* const world = scene->GetWorld();
-	
-	ndSharedPtr<ndBody> body (new ndBodyDynamic());
-	ndSharedPtr<ndDemoEntity> pEntity (new ndDemoEntity(matrix));
-	rootEntity->AddChild(pEntity);
-	body->SetNotifyCallback(new ndDemoEntityNotify(scene, pEntity));
-	body->SetMatrix(matrix);
-	body->GetAsBodyDynamic()->SetCollisionShape(shape);
-	body->GetAsBodyDynamic()->SetMassMatrix(mass, shape);
-	ndSharedPtr<ndModel> controller (new BackGroundVehicleController(scene, body));
-
-	world->AddBody(body);
-	world->AddModel(controller);
-	return body->GetAsBodyDynamic();
-}
 
 static ndShapeInstance CreateCompoundCollision()
 {
@@ -261,7 +244,7 @@ static ndShapeInstance CreateCompoundCollision()
 }
 #endif
 
-static void AddAiVehicle(ndDemoEntityManager* const scene)
+static ndSharedPtr<ndBody> AddAiVehicle(ndDemoEntityManager* const scene)
 {
 	//ndShapeInstance shapeInstance = CreateCompoundCollision();
 	//ndDemoMeshIntance* const aiGeometry = new ndDemoMeshIntance("AiVehicle", scene->GetShaderCache(), &shapeInstance, "earthmap.png", "earthmap.png", "earthmap.png");
@@ -272,15 +255,26 @@ static void AddAiVehicle(ndDemoEntityManager* const scene)
 	////mBodyMatrix.m_posit = ndVector(0.0f, 1.2f, 0.0f, 1.0f);
 	 
 	ndMeshLoader loader;
-	ndSharedPtr<ndRenderSceneNode> vehicle(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("vmw.fbx")));
-	scene->AddEntity(vehicle);
-	 
-	//auto pAiBody = AddRigidBody(scene, mBodyMatrix, shapeInstance, aiEntity, 1000.0);
-	
-	//ndVector origin(pAiBody->GetPosition());
-	//ndQuaternion rot(ndYawMatrix(180.0f * ndDegreeToRad));
-	//origin.m_x += 10.0f;
-	//scene->SetCameraMatrix(rot, origin);
+	ndSharedPtr<ndRenderSceneNode> vehicleMesh(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("vmw.fbx")));
+	ndMatrix matrix (ndGetIdentityMatrix());
+	matrix.m_posit = ndVector(0.0f, 5.0f, 0.0f, 1.0f);
+
+	ndSharedPtr<ndShapeInstance> collision(loader.m_mesh->CreateCollisionConvex());
+	//ndSharedPtr<ndBody> aiVehicleBody (AddRigidBody(scene, matrix, **collision, vehicle, 1000.0f));
+
+	ndWorld* const world = scene->GetWorld();
+
+	ndSharedPtr<ndBody> vehicleBody(new ndBodyDynamic());
+	vehicleBody->SetNotifyCallback(new ndDemoEntityNotify(scene, vehicleMesh));
+	vehicleBody->SetMatrix(matrix);
+	vehicleBody->GetAsBodyDynamic()->SetCollisionShape(**collision);
+	vehicleBody->GetAsBodyDynamic()->SetMassMatrix(1000.0f, **collision);
+
+	world->AddBody(vehicleBody);
+	scene->AddEntity(vehicleMesh);
+	//world->AddModel(controller);
+
+	return vehicleBody;
 }
 
 void ndBasicModel(ndDemoEntityManager* const scene)
@@ -292,12 +286,16 @@ void ndBasicModel(ndDemoEntityManager* const scene)
 	//heighfieldLocation.m_posit.m_x = -0.5f * ndFloat32(heighfield->GetWith()) * heighfield->GetWithScale();
 	//heighfieldLocation.m_posit.m_z = -0.5f * ndFloat32(heighfield->GetHeight()) * heighfield->GetHeightScale();
 	//mapBody->GetAsBodyKinematic()->SetMatrixUpdateScene(heighfieldLocation);
-
 	//ndShapeMaterial mapMaterial(mapBody->GetAsBodyKinematic()->GetCollisionShape().GetMaterial());
 	//mapMaterial.m_userId = ndDemoContactCallback::m_aiTerrain;
 	//mapBody->GetAsBodyKinematic()->GetCollisionShape().SetMaterial(mapMaterial);
 	
-	AddAiVehicle(scene);
+	ndSharedPtr<ndBody> vehuicleBody(AddAiVehicle(scene));
+
+	//ndVector origin(pAiBody->GetPosition());
+	//ndQuaternion rot(ndYawMatrix(180.0f * ndDegreeToRad));
+	//origin.m_x += 10.0f;
+	//scene->SetCameraMatrix(rot, origin);
 
 	ndVector floor(FindFloor(*scene->GetWorld(), ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	ndQuaternion rot(ndYawMatrix(0.0f * ndDegreeToRad));

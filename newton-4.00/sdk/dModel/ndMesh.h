@@ -84,6 +84,7 @@ class ndMesh : public ndClassAlloc
 	void ApplyTransform(const ndMatrix& transform);
 	ndMatrix CalculateGlobalMatrix(ndMesh* const parent = nullptr) const;
 
+	ndSharedPtr<ndShapeInstance> CreateCollisionConvex();
 	ndSharedPtr<ndShapeInstance> CreateCollisionTree(bool optimize = true);
 	ndSharedPtr<ndShapeInstance> CreateCollisionCompound(bool lowDetail = false);
 

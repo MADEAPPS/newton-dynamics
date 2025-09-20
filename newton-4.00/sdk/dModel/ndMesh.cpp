@@ -437,3 +437,10 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionTree(bool optimize)
 	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeStatic_bvh(meshBuilder)));
 	return shape;
 }
+
+ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionConvex()
+{
+	ndAssert(*m_mesh);
+	ndSharedPtr<ndShapeInstance>shape(m_mesh->CreateConvexCollision(1.0e-3f));
+	return shape;
+}
