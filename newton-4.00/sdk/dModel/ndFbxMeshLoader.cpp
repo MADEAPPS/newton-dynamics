@@ -1087,7 +1087,7 @@ ndSharedPtr<ndMesh> ndFbxMeshLoader::LoadMesh(const char* const fullPathName, bo
 	ndSharedPtr<ofbx::IScene> fbxScene(ofbx::load(&content[0], ndInt32(file_size), (ofbx::u64)ofbx::LoadFlags::TRIANGULATE));
 
 	const ndMatrix convertMatrix(GetCoordinateSystemMatrix(*fbxScene));
-	//ndMesh* mesh = Fbx2ndMesh(*fbxScene);
+
 	ndSharedPtr<ndMesh> mesh(Fbx2ndMesh(*fbxScene));
 	if (loadAnimation)
 	{
