@@ -285,7 +285,7 @@ static void AddAiVehicle(ndDemoEntityManager* const scene)
 
 void ndBasicModel(ndDemoEntityManager* const scene)
 {
-	//ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
+	ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
 	//ndSharedPtr<ndBody> mapBody(BuildHeightFieldTerrain(scene, "grass.png", ndGetIdentityMatrix()));
 	//ndShapeHeightfield* const heighfield = mapBody->GetAsBodyKinematic()->GetCollisionShape().GetShape()->GetAsShapeHeightfield();
 	//ndMatrix heighfieldLocation(ndGetIdentityMatrix());
@@ -299,10 +299,9 @@ void ndBasicModel(ndDemoEntityManager* const scene)
 	
 	AddAiVehicle(scene);
 
-	//ndVector floor(FindFloor(*scene->GetWorld(), ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	ndVector floor(FindFloor(*scene->GetWorld(), ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	ndQuaternion rot(ndYawMatrix(0.0f * ndDegreeToRad));
 
-	ndVector floor(ndVector::m_wOne);
 	floor.m_x -= 10.0f;
 	floor.m_y += 2.0f;
 	scene->SetCameraMatrix(rot, floor);
