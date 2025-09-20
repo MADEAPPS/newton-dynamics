@@ -336,6 +336,6 @@ void ndObjectPlacement(ndDemoEntityManager* const scene)
 	//scene->GetWorld()->AddModel(phantomPtr);
 
 	ndQuaternion rot;
-	ndVector origin(-40.0f, 5.0f, 0.0f, 1.0f);
+	ndVector origin(-20.0f, 5.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

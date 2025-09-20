@@ -234,7 +234,8 @@ void ndFbxMeshLoader::ImportMaterials(const ofbx::Mesh* const fbxMesh, ndMeshEff
 			material.m_specular = ndVector(color.r, color.g, color.b, 1.0f);
 			
 			material.m_opacity = ndFloat32(fbxMaterial->getOpacityFactor());
-			material.m_shiness = ndFloat32(fbxMaterial->getShininess());
+			//material.m_shiness = ndFloat32(fbxMaterial->getShininess());
+			material.m_shiness = ndFloat32(fbxMaterial->getShininessExponent());
 			
 			const ofbx::Texture* const texture = fbxMaterial->getTexture(ofbx::Texture::DIFFUSE);
 			if (texture)
@@ -564,7 +565,6 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 		for (ndInt32 i = 0; i < indexCount; ++i)
 		{
 			ofbx::Vec2 n = uv[i];
-			//uvArray[i] = ndMeshEffect::ndUV(ndFloat32(n.x), ndFloat32(1.0f - n.y));
 			uvArray[i] = ndMeshEffect::ndUV(ndFloat32(n.x), ndFloat32(n.y));
 		}
 		format.m_uv0.m_data = &uvArray[0].m_u;
@@ -573,7 +573,6 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 	}
 	
 	// import skin if there is any
-	//if (0)
 	if (geom->getSkin())
 	{
 		const ofbx::Skin* const skin = geom->getSkin();

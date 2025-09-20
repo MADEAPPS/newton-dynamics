@@ -31,7 +31,8 @@
 //#define DEFAULT_SCENE	8		// static mesh collision
 //#define DEFAULT_SCENE	9		// static compound scene collision
 //#define DEFAULT_SCENE	10		// basic compound shapes
-#define DEFAULT_SCENE	11		// object Placement
+#define DEFAULT_SCENE	11		// basic model
+//#define DEFAULT_SCENE	12		// object Placement
  
 //#define DEFAULT_SCENE	8		// particle fluid
 //#define DEFAULT_SCENE	10		// static user mesh collision 
@@ -57,6 +58,7 @@
 //#define DEFAULT_SCENE	33		// linked fracture
 //#define DEFAULT_SCENE	34		// skin peel fracture
 						 
+void ndBasicModel(ndDemoEntityManager* const scene);
 void ndBasicJoints(ndDemoEntityManager* const scene);
 void ndBasicStacks(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
@@ -83,6 +85,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic static mesh collision", ndBasicStaticMeshCollision},
 	{ "basic static compound scene collision", ndBasicSceneCompoundCollision},
 	{ "basic compound collision", ndBasicCompoundCollision},
+	{ "basic model", ndBasicModel},
 	{ "object placement", ndObjectPlacement},
 	
 
@@ -91,7 +94,6 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic particle fluid", ndBasicParticleFluid},
 	{ "basic vehicle", ndBasicVehicle},
 	{ "heavy vehicle", ndHeavyVehicle},
-	{ "low lod vehicle", ndBagroundLowLodVehicle},
 	{ "basic player", ndPlayerCapsuleDemo},
 	{ "rag doll", ndRagdollTest},
 	{ "cartpole discrete controller", ndCartpoleDiscrete},

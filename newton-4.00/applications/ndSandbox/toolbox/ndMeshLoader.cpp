@@ -112,17 +112,31 @@ ndSharedPtr<ndRenderSceneNode> ndMeshLoader::LoadEntity(ndRender* const renderer
 			{
 				ndRenderPrimitiveMesh::ndDescriptor descriptor(renderer);
 				descriptor.m_meshNode = meshEffect;
+
 				for (ndInt32 j = 0; j < materials.GetCount(); ++j)
 				{
 					const ndString texturePathName(path + materials[j].m_textureName);
 					ndRenderPrimitiveMeshMaterial& material = descriptor.AddMaterial(renderer->GetTextureCache()->GetTexture(texturePathName));
-					material.m_diffuse = materials[i].m_diffuse;
-					material.m_specular = materials[i].m_specular;
-					material.m_reflection = materials[i].m_specular;
-					material.m_specularPower = materials[i].m_shiness;
-					material.m_opacity = materials[i].m_opacity;
+					material.m_diffuse = materials[j].m_diffuse;
+					material.m_specular = materials[j].m_specular;
+					material.m_reflection = materials[j].m_specular;
+					material.m_specularPower = materials[j].m_shiness;
+					material.m_opacity = materials[j].m_opacity;
 					material.m_castShadows = true;
 				}
+
+				for (ndInt32 j = 0; j < materials.GetCount(); ++j)
+				{
+					const ndString texturePathName(path + materials[j].m_textureName);
+					ndRenderPrimitiveMeshMaterial& material = descriptor.AddMaterial(renderer->GetTextureCache()->GetTexture(texturePathName));
+					material.m_diffuse = ndVector::m_zero;;
+					material.m_specular = ndVector::m_zero;;
+					material.m_reflection = ndVector::m_zero;;
+					material.m_specularPower = materials[j].m_shiness;
+					material.m_opacity = materials[j].m_opacity;
+					material.m_castShadows = true;
+				}
+
 				geometry = ndSharedPtr<ndRenderPrimitive>(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 			}
 
