@@ -512,7 +512,7 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 	faceMaterialArray.SetCount(faceCount);
 	ImportMaterials(fbxMesh, *meshEffect);
 	const ndArray<ndMeshEffect::ndMaterial>& materialArray = meshEffect->GetMaterials();
-	ndInt32 materialId = (materialArray.GetCount() <= 1) ? 0 : -1;
+	ndInt32 defaultMaterialId = (materialArray.GetCount() <= 1) ? 0 : -1;
 	for (ndInt32 i = 0; i < indexCount; ++i)
 	{
 		count++;
@@ -520,9 +520,9 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 		{
 			indexArray[i] = -indexArray[i] - 1;
 			faceIndexArray[faceIndex] = count;
-			if (materialId == 0)
+			if (defaultMaterialId == 0)
 			{
-				faceMaterialArray[faceIndex] = materialId;
+				faceMaterialArray[faceIndex] = defaultMaterialId;
 			}
 			else
 			{
