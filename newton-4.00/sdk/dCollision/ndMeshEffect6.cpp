@@ -1991,9 +1991,9 @@ void ndMeshEffect::CylindricalMapping(ndInt32 material, const ndMatrix& textureM
 			const ndBigVector& p1 = buffer[edge->m_next->m_incidentVertex];
 			const ndBigVector& p2 = buffer[edge->m_prev->m_incidentVertex];
 
-			edge->m_mark = mark;
-			edge->m_next->m_mark = mark;
-			edge->m_prev->m_mark = mark;
+			//edge->m_mark = mark;
+			//edge->m_next->m_mark = mark;
+			//edge->m_prev->m_mark = mark;
 
 			ndBigVector e0(p1 - p0);
 			ndBigVector e1(p2 - p0);
@@ -2007,12 +2007,13 @@ void ndMeshEffect::CylindricalMapping(ndInt32 material, const ndMatrix& textureM
 					ndUV uv(p.m_y, p.m_z);
 					m_attrib.m_uv0Channel[ndInt32(ptr->m_userData)] = uv;
 					m_attrib.m_materialChannel[ndInt32(ptr->m_userData)] = material;
+					ptr->m_mark = mark;
 					ptr = ptr->m_next;
 				} while (ptr != edge);
 			}
 			else
 			{
-				ndFixSizeArray<ndUV, 32> aliasUV;
+				ndFixSizeArray<ndUV, 256> aliasUV;
 				ndEdge* ptr = edge;
 
 				ndInt32 neg = 0;
@@ -2027,6 +2028,8 @@ void ndMeshEffect::CylindricalMapping(ndInt32 material, const ndMatrix& textureM
 
 					neg += (v < ndFloat32(0.0f)) ? 1 : 0;
 					pos += (v > ndFloat32(0.0f)) ? 1 : 0;
+
+					ptr->m_mark = mark;
 					ptr = ptr->m_next;
 				} while (ptr != edge);
 
