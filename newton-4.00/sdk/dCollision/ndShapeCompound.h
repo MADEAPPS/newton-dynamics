@@ -52,8 +52,6 @@ class ndShapeCompound: public ndShape
 	D_COLLISION_API ndShapeCompound();
 	D_COLLISION_API virtual ~ndShapeCompound();
 
-	//void SetOwner(const ndShapeInstance* const myInstance);
-
 	D_COLLISION_API const ndTreeArray& GetTree() const;
 	D_COLLISION_API virtual ndUnsigned64 GetHash(ndUnsigned64 hash) const override;
 
