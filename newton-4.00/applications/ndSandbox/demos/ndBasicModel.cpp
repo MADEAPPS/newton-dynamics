@@ -105,8 +105,8 @@ class BackGroundVehicleController : public ndModel
 
 		void Update(ndFloat32 timestep)
 		{
-			ApplyLongitudinalImpulse(timestep);
-			ApplyLateralForces(timestep);
+			//ApplyLongitudinalImpulse(timestep);
+			//ApplyLateralForces(timestep);
 
 			// Get the camera to follow the vehicle
 			//ndVector origin(m_vehicleBody->GetPosition());
@@ -201,15 +201,40 @@ static ndSharedPtr<ndBody> CreateAiPropVehicle(ndDemoEntityManager* const scene)
 	floor.m_y += ndFloat32 (1.0f);
 	matrix.m_posit = floor;
 
-	ndSharedPtr<ndShapeInstance> collision(loader.m_mesh->CreateCollision());
+	// build a compound collision shape with chassis and tires
+	ndSharedPtr<ndShapeInstance> compoundShapeInstance(new ndShapeInstance(new ndShapeCompound()));
+	ndShapeCompound* const compoundShape = compoundShapeInstance->GetShape()->GetAsShapeCompound();
+	compoundShape->BeginAddRemove();
+		
+		//add chassis shape
+		ndSharedPtr<ndShapeInstance> chassisShape (loader.m_mesh->CreateCollision());
+		compoundShape->AddCollision(*chassisShape);
+
+		// add all tires
+		ndString tirename("tire");
+		const ndList<ndSharedPtr<ndMesh>>& children = loader.m_mesh->GetChildren();
+		for (ndList<ndSharedPtr<ndMesh>>::ndNode* node = children.GetFirst(); node; node = node->GetNext())
+		{
+			ndMesh* const child = *node->GetInfo();
+			if (child->GetName().Find(tirename) >= 0)
+			{
+				// we can use a convex hull for simplicity, 
+				// but a tire capsule is much better choice because it generates 
+				// only one contact
+				ndSharedPtr<ndShapeInstance> tireShape(child->CreateCollision());
+				tireShape->SetLocalMatrix(tireShape->GetLocalMatrix() * child->m_matrix);
+				compoundShape->AddCollision(*tireShape);
+			}
+		}
+	compoundShape->EndAddRemove();
+
 
 	ndWorld* const world = scene->GetWorld();
-
 	ndSharedPtr<ndBody> vehicleBody(new ndBodyDynamic());
 	vehicleBody->SetNotifyCallback(new ndDemoEntityNotify(scene, vehicleMesh));
 	vehicleBody->SetMatrix(matrix);
-	vehicleBody->GetAsBodyDynamic()->SetCollisionShape(**collision);
-	vehicleBody->GetAsBodyDynamic()->SetMassMatrix(1000.0f, **collision);
+	vehicleBody->GetAsBodyDynamic()->SetCollisionShape(**compoundShapeInstance);
+	vehicleBody->GetAsBodyDynamic()->SetMassMatrix(1000.0f, **chassisShape);
 
 	ndSharedPtr<ndModel> controller(new BackGroundVehicleController(scene, vehicleBody));
 
