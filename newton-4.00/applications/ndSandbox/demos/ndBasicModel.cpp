@@ -105,8 +105,12 @@ class BackGroundVehicleController : public ndModel
 
 		void Update(ndFloat32 timestep)
 		{
-			//ApplyLongitudinalImpulse(timestep);
-			//ApplyLateralForces(timestep);
+			if (IsOnGround())
+			{
+				ApplyTurningTorque();
+				ApplyLateralForces(timestep);
+				ApplyLongitudinalImpulse(timestep);
+			}
 
 			// Get the camera to follow the vehicle
 			//ndVector origin(m_vehicleBody->GetPosition());
@@ -116,6 +120,37 @@ class BackGroundVehicleController : public ndModel
 		}
 
 		private:
+		bool IsOnGround() const
+		{
+			const ndBodyKinematic* const vehicleBody = m_vehicleBody->GetAsBodyKinematic();
+			ndInt32 wheelContacts = 0;
+			ndBodyKinematic::ndContactMap::Iterator it(vehicleBody->GetContactMap());
+			for (it.Begin(); it; it++)
+			{
+				const ndContact* const contact = it.GetNode()->GetInfo();
+				if (contact->IsActive())
+				{
+					const ndContactPointList& contactPoints = contact->GetContactPoints();
+					for (ndContactPointList::ndNode* node = contactPoints.GetFirst(); node; node = node->GetNext())
+					{
+						const ndContactMaterial& contactPoint = node->GetInfo();
+						const ndShapeInstance* const instance = (contactPoint.m_body0 == vehicleBody) ? contactPoint.m_shapeInstance0 : contactPoint.m_shapeInstance1;
+						const ndShape* const shape = instance->GetShape();
+						const ndShapeChamferCylinder* const wheel = ((ndShape*)shape)->GetAsShapeChamferCylinder();
+						if (wheel)
+						{
+							wheelContacts++;
+							if (wheelContacts >= 3)
+							{
+								return true;
+							}
+						}
+					}
+				}
+			}
+			return false;
+		}
+
 		void ApplyLongitudinalImpulse(ndFloat32 timestep)
 		{
 			ndBodyDynamic* const vehicleBody = m_vehicleBody->GetAsBodyDynamic();
