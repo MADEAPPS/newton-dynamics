@@ -42,8 +42,11 @@ class BackGroundVehicleController : public ndModel
 			ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)body->GetAsBodyKinematic()->GetNotifyCallback();
 			ndSharedPtr<ndRenderSceneNode> vehicleMesh(notify->GetUserData());
 
-			const ndVector rightDir(vehicleMesh->GetTransform().GetMatrix().m_right);
+			// iterate ove each animated mesh part, 
+			// and save the nessery information to play the animation.
+			// is this example we only spin the tires.
 			const ndString tireId("tire");
+			const ndVector rightDir(vehicleMesh->GetTransform().GetMatrix().m_right);
 			const ndList<ndSharedPtr<ndRenderSceneNode>>& children = vehicleMesh->GetChilden();
 			for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = children.GetFirst(); node; node = node->GetNext())
 			{
@@ -51,9 +54,8 @@ class BackGroundVehicleController : public ndModel
 				if (child->m_name.Find(tireId) >= 0)
 				{
 					ndWheelSpin wheel;
-					wheel.m_bindMatrix = child->GetTransform().GetMatrix();
 					wheel.m_wheelNode = child;
-
+					wheel.m_bindMatrix = child->GetTransform().GetMatrix();
 					ndFloat32 dir = wheel.m_bindMatrix.m_front.DotProduct(rightDir).GetScalar();
 					wheel.m_angle = ndFloat32 (0.0f);
 					wheel.m_invRadius = (dir < 0.0f) ? ndFloat32 (1.0f/0.4f) : ndFloat32(-1.0f / 0.4f);
