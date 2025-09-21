@@ -4537,13 +4537,15 @@ void ndMeshEffect::CalculateAABB(ndBigVector& minBox, ndBigVector& maxBox) const
 		ndEdge* const edge = &(*iter);
 		const ndBigVector& p(points[edge->m_incidentVertex]);
 
-		minP.m_x = ndMin(p.m_x, minP.m_x);
-		minP.m_y = ndMin(p.m_y, minP.m_y);
-		minP.m_z = ndMin(p.m_z, minP.m_z);
-
-		maxP.m_x = ndMax(p.m_x, maxP.m_x);
-		maxP.m_y = ndMax(p.m_y, maxP.m_y);
-		maxP.m_z = ndMax(p.m_z, maxP.m_z);
+		//minP.m_x = ndMin(p.m_x, minP.m_x);
+		//minP.m_y = ndMin(p.m_y, minP.m_y);
+		//minP.m_z = ndMin(p.m_z, minP.m_z);
+		//
+		//maxP.m_x = ndMax(p.m_x, maxP.m_x);
+		//maxP.m_y = ndMax(p.m_y, maxP.m_y);
+		//maxP.m_z = ndMax(p.m_z, maxP.m_z);
+		minP = minP.GetMin(p);
+		maxP = maxP.GetMax(p);
 	}
 
 	minBox = minP;
