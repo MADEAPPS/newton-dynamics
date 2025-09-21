@@ -442,17 +442,6 @@ ndShapeInfo ndShapeCompound::GetShapeInfo() const
 	return info;
 }
 
-//void DebugShape(ndShapeCompound* const shapeInstance)
-//{
-//	const ndShapeCompound::ndTreeArray& shapeList = shapeInstance->GetTree();
-//	ndShapeCompound::ndTreeArray::Iterator iter(shapeList);
-//	for (iter.Begin(); iter; iter++)
-//	{
-//		ndShapeInstance* const collision = iter.GetNode()->GetInfo()->GetShape();
-//		/// do what you wnat here
-//	}
-//}
-
 void ndShapeCompound::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const
 {
 	ndTreeArray::Iterator iter(m_array);
@@ -920,16 +909,14 @@ void ndShapeCompound::EndAddRemove()
 			node->CalculateAABB();
 		}
 
-		ndInt32 stack = 1;
 		ndInt32 nodeCount = 0;
 		ndNodeBase** nodeArray = ndAlloca(ndNodeBase*, m_array.GetCount() + 10);
-		ndNodeBase* stackBuffer[D_COMPOUND_STACK_DEPTH];
+		ndFixSizeArray<ndNodeBase*, D_COMPOUND_STACK_DEPTH> stackBuffer;
 
-		stackBuffer[0] = m_root;
-		while (stack) 
+		stackBuffer.PushBack(m_root);
+		while (stackBuffer.GetCount())
 		{
-			stack--;
-			ndNodeBase* const node = stackBuffer[stack];
+			ndNodeBase* const node = stackBuffer.Pop();
 		
 			if (node->m_type == m_node) 
 			{
@@ -937,13 +924,8 @@ void ndShapeCompound::EndAddRemove()
 				nodeCount++;
 				ndAssert(nodeCount <= m_array.GetCount());
 
-				stackBuffer[stack] = node->m_right;
-				stack++;
-				ndAssert(stack < ndInt32 (sizeof(stackBuffer) / sizeof(stackBuffer[0])));
-
-				stackBuffer[stack] = node->m_left;
-				stack++;
-				ndAssert(stack < ndInt32(sizeof(stackBuffer) / sizeof(stackBuffer[0])));
+				stackBuffer.PushBack(node->m_right);
+				stackBuffer.PushBack(node->m_left);
 			}
 		}
 		
@@ -1184,7 +1166,6 @@ void ndShapeCompound::ApplyScale(const ndVector& scale)
 	{
 		ndNodeBase* const node = iter.GetNode()->GetInfo();
 		ndShapeInstance* const collision = node->GetShape();
-		//const ndMatrix matrix(collision->GetScaledTransform(scaleMatrix));
 		const ndMatrix matrix(collision->GetLocalMatrix() * scaleMatrix);
 		collision->SetLocalMatrix(ndGetIdentityMatrix());
 		collision->SetGlobalScale(matrix);
