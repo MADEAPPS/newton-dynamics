@@ -47,9 +47,8 @@ void ndDebugDisplayRenderPass::ResetScene()
 
 ndDebugDisplayRenderPass::ndDebugMesh* ndDebugDisplayRenderPass::CreateRenderPrimitive(const ndShapeInstance& shapeInstance) const
 {
-	//ndShapeInstance shape(shapeInstance);
 	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(shapeInstance));
-	shape->SetScale(ndVector(1.0f));
+	//shape->SetScale(ndVector(1.0f));
 	shape->SetLocalMatrix(ndGetIdentityMatrix());
 
 	ndRender* const render = m_owner;
