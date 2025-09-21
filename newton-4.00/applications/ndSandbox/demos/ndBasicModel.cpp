@@ -30,7 +30,7 @@ class BackGroundVehicleController : public ndModel
 			ndMatrix m_bindMatrix;
 			ndRenderSceneNode* m_wheelNode;
 			ndFloat32 m_angle;
-			ndFloat32 m_radius;
+			ndFloat32 m_invRadius;
 		};
 
 		ndNotify(ndDemoEntityManager* pScene, const ndSharedPtr<ndBody>& body)
@@ -42,6 +42,7 @@ class BackGroundVehicleController : public ndModel
 			ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)body->GetAsBodyKinematic()->GetNotifyCallback();
 			ndSharedPtr<ndRenderSceneNode> vehicleMesh(notify->GetUserData());
 
+			const ndVector rightDir(vehicleMesh->GetTransform().GetMatrix().m_right);
 			const ndString tireId("tire");
 			const ndList<ndSharedPtr<ndRenderSceneNode>>& children = vehicleMesh->GetChilden();
 			for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = children.GetFirst(); node; node = node->GetNext())
@@ -51,9 +52,11 @@ class BackGroundVehicleController : public ndModel
 				{
 					ndWheelSpin wheel;
 					wheel.m_bindMatrix = child->GetTransform().GetMatrix();
-					wheel.m_angle = 0.0f;
 					wheel.m_wheelNode = child;
-					wheel.m_radius = 0.25f;
+
+					ndFloat32 dir = wheel.m_bindMatrix.m_front.DotProduct(rightDir).GetScalar();
+					wheel.m_angle = ndFloat32 (0.0f);
+					wheel.m_invRadius = (dir < 0.0f) ? ndFloat32 (1.0f/0.4f) : ndFloat32(-1.0f / 0.4f);
 					m_wheelAnimation.PushBack(wheel);
 				}
 			}
@@ -70,7 +73,7 @@ class BackGroundVehicleController : public ndModel
 			}
 		}
 
-		// update the body part, stuff liek animation the wheele,
+		// update the body part stuff like animations of the wheels,
 		// setting the follow camera, apply controls, etc;
 		void PostTransformUpdate(ndFloat32 timestep)
 		{
@@ -81,10 +84,10 @@ class BackGroundVehicleController : public ndModel
 			ndFloat32 step = speed * timestep;
 			for (ndInt32 i = 0; i < m_wheelAnimation.GetCount(); ++i)
 			{
-				ndFloat32 angleAngle = step / m_wheelAnimation[i].m_radius;
+				ndFloat32 angleAngle = step * m_wheelAnimation[i].m_invRadius;
 				m_wheelAnimation[i].m_angle += angleAngle;
-				ndMatrix matrix(ndPitchMatrix(m_wheelAnimation[i].m_angle) * m_wheelAnimation[i].m_bindMatrix);
-				m_wheelAnimation[i].m_wheelNode->SetTransform(matrix, matrix.m_posit);
+				const ndMatrix wheelMatrix(ndPitchMatrix(m_wheelAnimation[i].m_angle) * m_wheelAnimation[i].m_bindMatrix);
+				m_wheelAnimation[i].m_wheelNode->SetTransform(wheelMatrix, wheelMatrix.m_posit);
 			}
 		}
 
@@ -168,12 +171,6 @@ class BackGroundVehicleController : public ndModel
 			ndFloat32 maxTorque = 50000.0f;
 			ndFloat32 desiredAngularSpeedFactor = 1.0f;
 			ndFloat32 desiredAngularSpeed = desiredAngularSpeedFactor * speed2 * steering / (ndPi);   // Steering is a value from -pi to pi
-
-			//if (m_currentSpeed < 0)
-			//{
-			//	// Flip desired angular speed for reversing
-			//	desiredAngularSpeed *= -1;
-			//}
 
 			ndFloat32 angularSpeed = upDir.DotProduct(m_vehicleBody->GetOmega()).GetScalar();  // Component of the angular velocity about the up vector
 			ndFloat32 angularSpeedDifference = desiredAngularSpeed - angularSpeed;
