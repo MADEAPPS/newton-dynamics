@@ -24,6 +24,15 @@ class BackGroundVehicleController : public ndModel
 	class ndNotify : public ndModelNotify
 	{
 		public:
+		class ndWheelSpin
+		{
+			public:
+			ndMatrix m_bindMatrix;
+			ndRenderSceneNode* m_wheelNode;
+			ndFloat32 m_angle;
+			ndFloat32 m_radius;
+		};
+
 		ndNotify(ndDemoEntityManager* pScene, const ndSharedPtr<ndBody>& body)
 			:ndModelNotify()
 			,m_scene(pScene)
@@ -40,7 +49,12 @@ class BackGroundVehicleController : public ndModel
 				ndRenderSceneNode* const child = *node->GetInfo();
 				if (child->m_name.Find(tireId) >= 0)
 				{
-					//ndAssert(0);
+					ndWheelSpin wheel;
+					wheel.m_bindMatrix = child->GetTransform().GetMatrix();
+					wheel.m_angle = 0.0f;
+					wheel.m_wheelNode = child;
+					wheel.m_radius = 0.25f;
+					m_wheelAnimation.PushBack(wheel);
 				}
 			}
 		}
@@ -60,7 +74,18 @@ class BackGroundVehicleController : public ndModel
 		// setting the follow camera, apply controls, etc;
 		void PostTransformUpdate(ndFloat32 timestep)
 		{
-
+			const ndBodyKinematic* const vehicleBody = m_vehicleBody->GetAsBodyKinematic();
+			const ndMatrix& matrix = vehicleBody->GetMatrix();
+			const ndVector veloc (vehicleBody->GetVelocity());
+			ndFloat32 speed = veloc.DotProduct(matrix.m_front).GetScalar();
+			ndFloat32 step = speed * timestep;
+			for (ndInt32 i = 0; i < m_wheelAnimation.GetCount(); ++i)
+			{
+				ndFloat32 angleAngle = step / m_wheelAnimation[i].m_radius;
+				m_wheelAnimation[i].m_angle += angleAngle;
+				ndMatrix matrix(ndPitchMatrix(m_wheelAnimation[i].m_angle) * m_wheelAnimation[i].m_bindMatrix);
+				m_wheelAnimation[i].m_wheelNode->SetTransform(matrix, matrix.m_posit);
+			}
 		}
 
 		private:
@@ -162,6 +187,7 @@ class BackGroundVehicleController : public ndModel
 		ndDemoEntityManager* m_scene;
 		ndSharedPtr<ndBody> m_vehicleBody;
 		ndFloat32 m_desiredSpeed;
+		ndFixSizeArray<ndWheelSpin, 8> m_wheelAnimation;
 	};
 
 	BackGroundVehicleController(ndDemoEntityManager* pScene, const ndSharedPtr<ndBody>& body)
