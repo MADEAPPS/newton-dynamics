@@ -98,7 +98,7 @@ class ndShapeMaterial
 		ndUnsigned64 m_alignPad;
 	} m_data;
 
-	union dExtraData
+	union ndExtraData
 	{
 		void* m_ptrData;
 		ndFloat32 m_floatData;
