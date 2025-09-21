@@ -127,6 +127,7 @@ ndSharedPtr<ndRenderSceneNode> ndMeshLoader::LoadEntity(ndRender* const renderer
 				geometry = ndSharedPtr<ndRenderPrimitive>(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 			}
 
+			entity->m_name = effectNode->GetName();
 			entity->SetPrimitive(geometry);
 			entity->SetPrimitiveMatrix(effectNode->m_meshMatrix);
 
