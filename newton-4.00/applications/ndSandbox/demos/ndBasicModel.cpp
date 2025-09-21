@@ -201,7 +201,7 @@ static ndSharedPtr<ndBody> CreateAiPropVehicle(ndDemoEntityManager* const scene)
 	floor.m_y += ndFloat32 (1.0f);
 	matrix.m_posit = floor;
 
-	ndSharedPtr<ndShapeInstance> collision(loader.m_mesh->CreateCollisionConvex());
+	ndSharedPtr<ndShapeInstance> collision(loader.m_mesh->CreateCollision());
 
 	ndWorld* const world = scene->GetWorld();
 

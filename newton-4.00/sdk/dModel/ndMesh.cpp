@@ -444,3 +444,27 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionConvex()
 	ndSharedPtr<ndShapeInstance>shape(m_mesh->CreateConvexCollision(1.0e-3f));
 	return shape;
 }
+
+ndSharedPtr<ndShapeInstance> ndMesh::CreateCollision()
+{
+	ndString tmpName(GetName());
+	tmpName.ToLower();
+	const char* const name = tmpName.GetStr();
+	if (strstr(name, "collisiontree"))
+	{
+		return CreateCollisionTree();
+	}
+	else if(strstr(name, "convexapproximation"))
+	{
+		return CreateCollisionCompound();
+	}
+	else if(strstr(name, "convexhull"))
+	{
+		return ndSharedPtr<ndShapeInstance>(m_mesh->CreateConvexCollision(1.0e-3f));
+	}
+	else
+	{
+		ndAssert(0);
+	}
+	return ndSharedPtr<ndShapeInstance>(m_mesh->CreateConvexCollision(1.0e-3f));
+}

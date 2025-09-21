@@ -435,9 +435,8 @@ ndSharedPtr<ndBody> BuildPlayground(ndDemoEntityManager* const scene, bool kinem
 {
 	ndMeshLoader loader;
 	ndSharedPtr<ndRenderSceneNode> playground(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("playground.fbx")));
-	ndMesh* const levelMesh = loader.m_mesh->FindChild("levelGeometry");
-	ndAssert(levelMesh);
-	ndSharedPtr<ndShapeInstance>collision(levelMesh->CreateCollisionTree());
+	//ndSharedPtr<ndShapeInstance>collision(levelMesh->CreateCollisionTree());
+	ndSharedPtr<ndShapeInstance>collision(loader.m_mesh->CreateCollision());
 
 	kinematic = false;
 
@@ -500,9 +499,7 @@ class ndSceneMesh : public ndRenderSceneNode
 	private:
 	void AddPlayground(const ndMatrix& location, const ndMeshLoader& loader)
 	{
-		ndMesh* const levelMesh = loader.m_mesh->FindChild("levelGeometry");
-		ndAssert(levelMesh);
-		ndSharedPtr<ndShapeInstance>collision(levelMesh->CreateCollisionTree());
+		ndSharedPtr<ndShapeInstance>collision(loader.m_mesh->CreateCollision());
 		collision->SetLocalMatrix(location);
 		ndShapeCompound* const compound = m_compoundScene->GetShape()->GetAsShapeCompound();
 		compound->AddCollision(*collision);
