@@ -154,7 +154,9 @@ static ndSharedPtr<ndBody> PrecessingTop(ndDemoEntityManager* const scene, const
 
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
 	descriptor.m_collision = shape;
-	descriptor.m_mapping = ndRenderPrimitiveMesh::m_cylindrical;
+	descriptor.m_uvMatrix = shape->GetLocalMatrix();
+	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
+	descriptor.m_stretchMaping = false;
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("smilli.png")));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 
