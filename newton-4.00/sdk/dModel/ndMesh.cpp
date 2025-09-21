@@ -305,6 +305,13 @@ void ndMesh::ApplyTransform(const ndMatrix& transform)
 	}
 }
 
+ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionConvex()
+{
+	ndAssert(*m_mesh);
+	ndSharedPtr<ndShapeInstance>shape(m_mesh->CreateConvexCollision(1.0e-3f));
+	return shape;
+}
+
 ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionCompound(bool lowDetail)
 {
 	const ndInt32 pointsCount = m_mesh->GetVertexCount();
@@ -438,39 +445,36 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionTree(bool optimize)
 	return shape;
 }
 
-ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionConvex()
-{
-	ndAssert(*m_mesh);
-	ndSharedPtr<ndShapeInstance>shape(m_mesh->CreateConvexCollision(1.0e-3f));
-	return shape;
-}
-
 ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionTire()
 {
+	ndSharedPtr<ndMeshEffect> meshEffect = GetMesh();
+	ndAssert(*meshEffect);
 
-	//ndDemoMesh* const mesh = (ndDemoMesh*)*GetMesh();
-	//ndAssert(mesh);
-	//mesh->GetVertexArray(points);
-	//ndVector minP(ndFloat32(1.0e10f));
-	//ndVector maxP(ndFloat32(-1.0e10f));
-	//for (ndInt32 i = 0; i < mesh->m_vertexCount; ++i)
-	//{
-	//	minP = minP.GetMin(points[i]);
-	//	maxP = maxP.GetMax(points[i]);
-	//}
-	//ndVector size(ndVector::m_half * (maxP - minP));
-	//ndVector origin(ndVector::m_half * (maxP + minP));
-	//ndFloat32 high = 2.0f * ndMax(size.m_y - size.m_x, ndFloat32(0.05f));
-	//ndMatrix alighMatrix(ndRollMatrix(90.0f * ndDegreeToRad));
-	//alighMatrix.m_posit = origin;
-	//alighMatrix.m_posit.m_w = ndFloat32(1.0f);
-	//const ndMatrix matrix(alighMatrix * GetMeshMatrix());
-	//
-	//instance = new ndShapeInstance(new ndShapeCapsule(size.m_x, size.m_x, high));
-	//instance->SetLocalMatrix(matrix);
+	const ndInt32 pointsCount = meshEffect->GetVertexCount();
+	const ndInt32 pointsStride = ndInt32(meshEffect->GetVertexStrideInByte() / sizeof(ndFloat64));
+	const ndFloat64* const pointsBuffer = meshEffect->GetVertexPool();
 
+	ndVector minBox(ndFloat32(1.0e10f));
+	ndVector maxBox(ndFloat32(-1.0e10f));
+	const ndMatrix localMatrix(m_meshMatrix);
+	for (ndInt32 i = 0; i < pointsCount; ++i)
+	{
+		ndFloat32 x = ndFloat32(pointsBuffer[i * pointsStride + 0]);
+		ndFloat32 y = ndFloat32(pointsBuffer[i * pointsStride + 1]);
+		ndFloat32 z = ndFloat32(pointsBuffer[i * pointsStride + 2]);
+		const ndVector p(localMatrix.TransformVector(ndVector(x, y, z, ndFloat32(1.0f))));
+		minBox = minBox.GetMin(p);
+		maxBox = maxBox.GetMax(p);
+	}
+	ndFloat32 width = ndMax(maxBox.m_x, ndAbs(minBox.m_x));
+	ndFloat32 radius = ndMax(ndMax(maxBox.m_y, ndAbs(minBox.m_y)), ndMax(maxBox.m_z, ndAbs(minBox.m_z)));
 
-	return CreateCollisionConvex();
+	ndSharedPtr<ndShapeInstance> tireShape(new ndShapeInstance(new ndShapeChamferCylinder(ndFloat32(0.75f), ndFloat32(0.5f))));
+
+	ndVector scale(ndFloat32(4.0f) * width, radius, radius, 0.0f);
+	tireShape->SetScale(scale);
+	tireShape->SetLocalMatrix(localMatrix.OrthoInverse());
+	return tireShape;
 }
 
 ndSharedPtr<ndShapeInstance> ndMesh::CreateCollision()
