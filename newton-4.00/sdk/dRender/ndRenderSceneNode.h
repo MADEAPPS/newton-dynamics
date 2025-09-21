@@ -69,6 +69,7 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 	ndMatrix m_primitiveMatrix;
 	ndTransform m_transform0;
 	ndTransform m_transform1;
+	ndString m_name;
 
 	protected:
 	ndRender* m_owner;
