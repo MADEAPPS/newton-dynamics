@@ -445,26 +445,62 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionConvex()
 	return shape;
 }
 
+ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionTire()
+{
+
+	//ndDemoMesh* const mesh = (ndDemoMesh*)*GetMesh();
+	//ndAssert(mesh);
+	//mesh->GetVertexArray(points);
+	//ndVector minP(ndFloat32(1.0e10f));
+	//ndVector maxP(ndFloat32(-1.0e10f));
+	//for (ndInt32 i = 0; i < mesh->m_vertexCount; ++i)
+	//{
+	//	minP = minP.GetMin(points[i]);
+	//	maxP = maxP.GetMax(points[i]);
+	//}
+	//ndVector size(ndVector::m_half * (maxP - minP));
+	//ndVector origin(ndVector::m_half * (maxP + minP));
+	//ndFloat32 high = 2.0f * ndMax(size.m_y - size.m_x, ndFloat32(0.05f));
+	//ndMatrix alighMatrix(ndRollMatrix(90.0f * ndDegreeToRad));
+	//alighMatrix.m_posit = origin;
+	//alighMatrix.m_posit.m_w = ndFloat32(1.0f);
+	//const ndMatrix matrix(alighMatrix * GetMeshMatrix());
+	//
+	//instance = new ndShapeInstance(new ndShapeCapsule(size.m_x, size.m_x, high));
+	//instance->SetLocalMatrix(matrix);
+
+
+	return CreateCollisionConvex();
+}
+
 ndSharedPtr<ndShapeInstance> ndMesh::CreateCollision()
 {
 	ndString tmpName(GetName());
 	tmpName.ToLower();
 	const char* const name = tmpName.GetStr();
+
+	ndSharedPtr<ndShapeInstance> shape(new ndShapeInstance(new ndShapeNull()));
 	if (strstr(name, "collisiontree"))
 	{
-		return CreateCollisionTree();
+		shape = CreateCollisionTree();
 	}
 	else if(strstr(name, "convexapproximation"))
 	{
-		return CreateCollisionCompound();
+		shape = CreateCollisionCompound();
 	}
 	else if(strstr(name, "convexhull"))
 	{
-		return ndSharedPtr<ndShapeInstance>(m_mesh->CreateConvexCollision(1.0e-3f));
+		shape = ndSharedPtr<ndShapeInstance>(m_mesh->CreateConvexCollision(1.0e-3f));
+	}
+	else if (strstr(name, "tire"))
+	{
+		shape = CreateCollisionTire();
 	}
 	else
 	{
 		ndAssert(0);
 	}
-	return ndSharedPtr<ndShapeInstance>(m_mesh->CreateConvexCollision(1.0e-3f));
+
+	shape->SetLocalMatrix(shape->GetLocalMatrix() * m_meshMatrix);
+	return shape;
 }
