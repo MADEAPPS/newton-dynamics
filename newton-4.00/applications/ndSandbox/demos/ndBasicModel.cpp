@@ -18,77 +18,6 @@
 #include "ndDemoEntityManager.h"
 #include "ndHeightFieldPrimitive.h"
 
-#if 0
-class BackgroundLowLodCVehicleMaterial : public ndApplicationMaterial
-{
-	public:
-	BackgroundLowLodCVehicleMaterial()
-		:ndApplicationMaterial()
-	{
-	}
-
-	BackgroundLowLodCVehicleMaterial(const BackgroundLowLodCVehicleMaterial& src)
-		:ndApplicationMaterial(src)
-	{
-	}
-
-	ndApplicationMaterial* Clone() const
-	{
-		return new BackgroundLowLodCVehicleMaterial(*this);
-	}
-
-	virtual void OnContactCallback(const ndContact* const joint, ndFloat32) const
-	{
-		if (joint->IsActive())
-		{
-			const ndContactPointList& contactPoints = joint->GetContactPoints();
-			for (ndContactPointList::ndNode* contactPointsNode = contactPoints.GetFirst(); contactPointsNode; contactPointsNode = contactPointsNode->GetNext())
-			{
-				// do some logic here
-				//ndContactPoint& contactPoint = contactPointsNode->GetInfo();
-			}
-		}
-	}
-};
-
-static ndShapeInstance CreateCompoundCollision()
-{
-	ndMatrix mParentInv = ndGetIdentityMatrix();
-	mParentInv.m_posit = ndVector(ndFloat32(0.0), ndFloat32(-1.0), ndFloat32(0.0), ndFloat32(1.0));
-	ndMatrix mChildWorld = ndGetIdentityMatrix();
-	mChildWorld.m_front = ndVector(ndFloat32(0.0), ndFloat32(0.0), ndFloat32(1.0), ndFloat32(0.0));
-	mChildWorld.m_up = ndVector(ndFloat32(1.0), ndFloat32(0.0), ndFloat32(0.0), ndFloat32(0.0));
-	mChildWorld.m_right = ndVector(ndFloat32(0.0), ndFloat32(1.0), ndFloat32(0.0), ndFloat32(0.0));
-	mChildWorld.m_posit = ndVector(ndFloat32(0.0), ndFloat32(1.158), ndFloat32(-0.508), ndFloat32(1.0));
-	ndMatrix mChildLocal = mChildWorld * mParentInv;
-
-#if 0
-	ndShapeInstance shapeInstance(new ndShapeCompound());
-
-	shapeInstance.GetShape()->GetAsShapeCompound()->BeginAddRemove();
-	ndShapeInstance childShapeInstance(new ndShapeConvexHull(336 / 3, sizeof(ndFloat32) * 3, 0.0, &convexHullPoints[0]));
-
-	// set material ID
-	ndShapeMaterial childMaterial(childShapeInstance.GetMaterial());
-	childMaterial.m_userId = ndApplicationMaterial::m_aiCar;
-	childShapeInstance.SetMaterial(childMaterial);
-
-	childShapeInstance.SetLocalMatrix(mChildLocal);
-	shapeInstance.GetShape()->GetAsShapeCompound()->AddCollision(&childShapeInstance);
-	shapeInstance.GetShape()->GetAsShapeCompound()->EndAddRemove();
-#else
-	ndShapeInstance shapeInstance(new ndShapeConvexHull(336 / 3, sizeof(ndFloat32) * 3, 0.0, &convexHullPoints[0]));
-	shapeInstance.SetLocalMatrix(mChildLocal);
-#endif
-
-	// set material ID
-	ndShapeMaterial material(shapeInstance.GetMaterial());
-	material.m_userId = ndDemoContactCallback::m_aiCar;
-	shapeInstance.SetMaterial(material);
-	return shapeInstance;
-}
-#endif
-
 class BackGroundVehicleController : public ndModel
 {
 	public:
@@ -101,8 +30,22 @@ class BackGroundVehicleController : public ndModel
 			,m_vehicleBody(body)
 			,m_desiredSpeed(3.0f) // 15 km/h
 		{
+			ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)body->GetAsBodyKinematic()->GetNotifyCallback();
+			ndSharedPtr<ndRenderSceneNode> vehicleMesh(notify->GetUserData());
+
+			const ndString tireId("tire");
+			const ndList<ndSharedPtr<ndRenderSceneNode>>& children = vehicleMesh->GetChilden();
+			for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = children.GetFirst(); node; node = node->GetNext())
+			{
+				ndRenderSceneNode* const child = *node->GetInfo();
+				if (child->m_name.Find(tireId) >= 0)
+				{
+					//ndAssert(0);
+				}
+			}
 		}
 
+		// update pseudo physics every substep
 		void Update(ndFloat32 timestep)
 		{
 			if (IsOnGround())
@@ -111,12 +54,13 @@ class BackGroundVehicleController : public ndModel
 				ApplyLateralForces(timestep);
 				ApplyLongitudinalImpulse(timestep);
 			}
+		}
 
-			// Get the camera to follow the vehicle
-			//ndVector origin(m_vehicleBody->GetPosition());
-			//ndQuaternion rot(ndYawMatrix(180.0f * ndDegreeToRad));
-			//origin.m_x += 10.0f;
-			//m_scene->SetCameraMatrix(rot, origin);
+		// update the body part, stuff liek animation the wheele,
+		// setting the follow camera, apply controls, etc;
+		void PostTransformUpdate(ndFloat32 timestep)
+		{
+
 		}
 
 		private:
@@ -236,6 +180,8 @@ static ndSharedPtr<ndBody> CreateAiPropVehicle(ndDemoEntityManager* const scene)
 	floor.m_y += ndFloat32 (1.0f);
 	matrix.m_posit = floor;
 
+	ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* renderChildren = vehicleMesh->GetChilden().GetFirst();
+
 	// build a compound collision shape with chassis and tires
 	ndSharedPtr<ndShapeInstance> compoundShapeInstance(new ndShapeInstance(new ndShapeCompound()));
 	ndShapeCompound* const compoundShape = compoundShapeInstance->GetShape()->GetAsShapeCompound();
@@ -260,6 +206,7 @@ static ndSharedPtr<ndBody> CreateAiPropVehicle(ndDemoEntityManager* const scene)
 				tireShape->SetLocalMatrix(tireShape->GetLocalMatrix() * child->m_matrix);
 				compoundShape->AddCollision(*tireShape);
 			}
+			renderChildren = renderChildren->GetNext();
 		}
 	compoundShape->EndAddRemove();
 
@@ -288,10 +235,6 @@ void ndBasicModel(ndDemoEntityManager* const scene)
 	//ndMatrix heighfieldLocation(ndGetIdentityMatrix());
 	//heighfieldLocation.m_posit.m_x = -0.5f * ndFloat32(heighfield->GetWith()) * heighfield->GetWithScale();
 	//heighfieldLocation.m_posit.m_z = -0.5f * ndFloat32(heighfield->GetHeight()) * heighfield->GetHeightScale();
-	//mapBody->GetAsBodyKinematic()->SetMatrixUpdateScene(heighfieldLocation);
-	//ndShapeMaterial mapMaterial(mapBody->GetAsBodyKinematic()->GetCollisionShape().GetMaterial());
-	//mapMaterial.m_userId = ndDemoContactCallback::m_aiTerrain;
-	//mapBody->GetAsBodyKinematic()->GetCollisionShape().SetMaterial(mapMaterial);
 	
 	ndSharedPtr<ndBody> vehicleBody(CreateAiPropVehicle(scene));
 
