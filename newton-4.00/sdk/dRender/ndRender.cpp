@@ -77,6 +77,7 @@ ndSharedPtr<ndRender::ndUserCallback>& ndRender::GetOwner()
 
 void ndRender::SetCamera(const ndSharedPtr<ndRenderSceneNode>& camera)
 {
+	ndAssert(camera->FindCameraNode());
 	m_camera = camera;
 }
 

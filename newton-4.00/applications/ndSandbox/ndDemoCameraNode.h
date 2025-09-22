@@ -10,57 +10,17 @@
 */
 
 
-#ifndef __DEMO_CAMERA_H__
-#define __DEMO_CAMERA_H__
+#ifndef __DEMO_CAMERA_NODE_H__
+#define __DEMO_CAMERA_NODE_H__
 
 #include "ndSandboxStdafx.h"
 
-class ndDemoCameraNode: public ndRenderSceneCamera
+class ndDemoCameraNode: public ndRenderSceneNode
 {
-	class ndDemoCameraPickBodyJoint : public ndJointKinematicController
-	{
-		public:
-		ndDemoCameraPickBodyJoint(ndBodyKinematic* const childBody, ndBodyKinematic* const worldBody, const ndVector& attachmentPointInGlobalSpace, ndDemoCameraNode* const camera)
-			:ndJointKinematicController(childBody, worldBody, attachmentPointInGlobalSpace)
-			,m_owner(camera)
-		{
-		}
-
-		~ndDemoCameraPickBodyJoint()
-		{
-			if (m_owner)
-			{
-				ndAssert(0);
-				//m_owner->ResetPickBody();
-			}
-		}
-
-		ndDemoCameraNode* m_owner;
-	};
-
 	public:
 	ndDemoCameraNode(ndRender* const owner);
 
-	void TickUpdate(ndFloat32 timestep);
-	void ResetPickBody();
-	void UpdatePickBody(bool mousePickState, const ndVector& p0, const ndVector& p1);
-
-	virtual void SetTransform(const ndQuaternion& rotation, const ndVector& position) override;
-
-	ndVector m_pickedBodyTargetPosition;
-	ndSharedPtr<ndJointBilateralConstraint> m_pickJoint;
-
-	ndFloat32 m_yaw;
-	ndFloat32 m_pitch;
-	ndFloat32 m_yawRate;
-	ndFloat32 m_pitchRate;
-	ndFloat32 m_mousePosX;
-	ndFloat32 m_mousePosY;
-	ndFloat32 m_frontSpeed;
-	ndFloat32 m_sidewaysSpeed;
-	ndFloat32 m_pickedBodyParam;
-	bool m_pickingMode;
-	bool m_prevMouseState;
+	virtual void TickUpdate(ndFloat32 timestep);
 };
 
 #endif 

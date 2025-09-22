@@ -19,6 +19,7 @@
 #include "ndMenuRenderPass.h"
 #include "ndDemoEntityManager.h"
 #include "ndHighResolutionTimer.h"
+#include "ndDemoCameraNodeFlyby.h"
 #include "ndDebugDisplayRenderPass.h"
 
 //#define DEFAULT_SCENE	0		// basic rigidbody
@@ -1000,7 +1001,7 @@ void ndDemoEntityManager::LoadDemo(ndInt32 menu)
 	char newTitle[256];
 
 	// add a demo camera per demo
-	m_renderer->SetCamera(ndSharedPtr<ndRenderSceneNode>(new ndDemoCameraNode(*m_renderer)));
+	m_renderer->SetCamera(ndSharedPtr<ndRenderSceneNode>(new ndDemoCameraNodeFlyby(*m_renderer)));
 	m_demosSelection[menu].m_launchDemoCallback(this);
 	
 	snprintf(newTitle, sizeof(newTitle), "Newton Dynamics %d.%.2i demo: %s", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION, m_demosSelection[menu].m_name);
@@ -1167,8 +1168,9 @@ ndInt32 ndDemoEntityManager::Print (const ndVector&, const char *fmt, ... ) cons
 
 void ndDemoEntityManager::SetCameraMatrix (const ndQuaternion& rotation, const ndVector& position)
 {
-	m_renderer->GetCamera()->SetTransform(rotation, position);
-	m_renderer->GetCamera()->SetTransform(rotation, position);
+	ndRenderSceneNode* const cameraNode = *m_renderer->GetCamera();
+	cameraNode->SetTransform(rotation, position);
+	cameraNode->SetTransform(rotation, position);
 }
 
 void ndDemoEntityManager::UpdatePhysics(ndFloat32 timestep)

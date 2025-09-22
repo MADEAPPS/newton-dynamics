@@ -64,6 +64,7 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 
 	void InterpolateTransforms(ndFloat32 param);
 	ndMatrix CalculateGlobalMatrix(const ndRenderSceneNode* const root = nullptr) const;
+	ndMatrix CalculateGlobalTransform(const ndRenderSceneNode* const root = nullptr) const;
 
 	ndTransform GetTransform() const;
 	void SetTransform(const ndTransform& transform);

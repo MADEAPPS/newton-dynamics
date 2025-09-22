@@ -280,7 +280,7 @@ static void BuildPlaygroundHangingBridge(ndDemoEntityManager* const scene, const
 
 		ndSharedPtr<ndBody> body(new ndBodyDynamic());
 		body->SetNotifyCallback(new ndDemoEntityNotify(scene, visualLink));
-		body->SetMatrix(visualLink->CalculateGlobalMatrix());
+		body->SetMatrix(visualLink->CalculateGlobalTransform());
 		body->GetAsBodyKinematic()->SetCollisionShape(**shape);
 		body->GetAsBodyKinematic()->SetMassMatrix(linkMass, **shape);
 		body->GetAsBodyDynamic()->SetAngularDamping(ndVector(ndFloat32(0.5f)));
