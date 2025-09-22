@@ -612,10 +612,7 @@ void ndDemoEntityManager::MouseButtonCallback(ndInt32 button, ndInt32 action)
 //void ndDemoEntityManager::KeyCallback(ndInt32 key, ndInt32 action)
 void ndDemoEntityManager::KeyCallback(ndInt32 key, ndInt32)
 {
-	// handle special ke events
-	const ndInt32 F1_key = 290;
-	const ndInt32 F10_key = 299;
-	if (key == F1_key)
+	if (key == ImGuiKey_F1)
 	{
 		// reload the demo. 
 		const ndTransform transform(m_renderer->GetCamera()->GetTransform());
@@ -623,7 +620,7 @@ void ndDemoEntityManager::KeyCallback(ndInt32 key, ndInt32)
 		m_renderer->GetCamera()->SetTransform(transform);
 		m_renderer->GetCamera()->SetTransform(transform);
 	}
-	else if (key == F10_key)
+	else if (key == ImGuiKey_F10)
 	{
 		// set debug tracer here;
 		//ndAssert(0);
