@@ -71,7 +71,7 @@ void ndModelBodyNotify::CalculateMatrix(const ndMatrix& matrix, ndQuaternion& ro
 	posit = localMatrix.m_posit;
 }
 
-void ndModelBodyNotify::OnTransform(ndInt32, const ndMatrix&)
+void ndModelBodyNotify::OnTransform(ndFloat32, const ndMatrix&)
 {
 	//ndAssert(0);
 }

@@ -128,39 +128,6 @@ void ndDemoCamera::TickUpdate(ndFloat32 timestep)
 	const ndVector p0(ScreenToWorld(ndVector(mouseX, mouseY, ndFloat32(0.0f), ndFloat32(0.0f))));
 	const ndVector p1(ScreenToWorld(ndVector(mouseX, mouseY, ndFloat32(1.0f), ndFloat32(0.0f))));
 
-#if 0
-#ifdef D_ENABLE_CAMERA_REPLAY
-	struct ndReplay
-	{
-		ndVector m_p0;
-		ndVector m_p1;
-		ndInt32 m_mouseState;
-	};
-	ndReplay replay;
-
-#ifdef D_RECORD_CAMERA
-	replay.m_p0 = p0;
-	replay.m_p1 = p1;
-	replay.m_mouseState = mouseState ? 1 : 0;
-
-	static FILE* file = fopen("cameraLog.bin", "wb");
-	if (file)
-	{
-		fwrite(&replay, sizeof(ndReplay), 1, file);
-		fflush(file);
-	}
-#else 
-	static FILE* file = fopen("cameraLog.bin", "rb");
-	if (file)
-	{
-		fread(&replay, sizeof(ndReplay), 1, file);
-		p0 = replay.m_p0;
-		p1 = replay.m_p1;
-		mouseState = replay.m_mouseState ? true : false;
-	}
-#endif
-#endif
-#endif
 	//dTrace(("frame: %d  camera angle: %f\n", scene->GetWorld()->GetFrameIndex(), m_yaw * dRadToDegree));
 	UpdatePickBody(mouseState, p0, p1);
 }

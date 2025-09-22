@@ -78,7 +78,12 @@ void ndBodyNotify::SetGravity(const ndVector & defaultGravity)
 	m_defaultGravity = defaultGravity;
 }
 
-void ndBodyNotify::OnTransform(ndInt32, const ndMatrix&)
+//void ndBodyNotify::OnTransform(ndInt32, const ndMatrix&)
+//{
+//	ndTrace(("please use new inteface %s\n", __FUNCTION__));
+//}
+
+void ndBodyNotify::OnTransform(ndFloat32, const ndMatrix&)
 {
 }
 

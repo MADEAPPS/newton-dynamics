@@ -149,7 +149,8 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API virtual void DeleteDeadContacts();
 
 	D_COLLISION_API virtual void CalculateContacts(ndInt32 threadIndex, ndContact* const contact);
-	D_COLLISION_API virtual void UpdateTransformNotify(ndInt32 threadIndex, ndBodyKinematic* const body);
+	//D_COLLISION_API virtual void UpdateTransformNotify(ndInt32 threadIndex, ndBodyKinematic* const body);
+	D_COLLISION_API virtual void UpdateTransformNotify(ndFloat32 timestep, ndBodyKinematic* const body);
 
 	D_COLLISION_API virtual void ParticleUpdate(ndFloat32 timestep);
 	D_COLLISION_API virtual bool AddParticle(const ndSharedPtr<ndBody>& particle);

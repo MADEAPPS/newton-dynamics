@@ -416,7 +416,8 @@ void ndScene::BalanceScene()
 	}
 }
 
-void ndScene::UpdateTransformNotify(ndInt32 threadIndex, ndBodyKinematic* const body)
+//void ndScene::UpdateTransformNotify(ndInt32 threadIndex, ndBodyKinematic* const body)
+void ndScene::UpdateTransformNotify(ndFloat32 timestep, ndBodyKinematic* const body)
 {
 	if (body->m_transformIsDirty)
 	{
@@ -424,7 +425,8 @@ void ndScene::UpdateTransformNotify(ndInt32 threadIndex, ndBodyKinematic* const 
 		ndBodyNotify* const notify = body->GetNotifyCallback();
 		if (notify)
 		{
-			notify->OnTransform(threadIndex, body->GetMatrix());
+			//notify->OnTransform(threadIndex, body->GetMatrix());
+			notify->OnTransform(timestep, body->GetMatrix());
 		}
 	}
 }
@@ -874,13 +876,15 @@ void ndScene::UpdateTransform()
 		}
 	}
 
-	auto TransformUpdate = ndMakeObject::ndFunction([this](ndInt32 groupId, ndInt32 threadIndex)
+	ndFloat32 timestep = GetTimestep();
+	auto TransformUpdate = ndMakeObject::ndFunction([this, timestep](ndInt32 groupId, ndInt32 threadIndex)
 	{
 		D_TRACKTIME_NAMED(TransformUpdate);
 		const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
 
 		ndBodyKinematic* const body = bodyArray[groupId];
-		UpdateTransformNotify(threadIndex, body);
+		//UpdateTransformNotify(threadIndex, body);
+		UpdateTransformNotify(timestep, body);
 	});
 	const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
 	const ndInt32 count = ndInt32(bodyArray.GetCount()) - 1;

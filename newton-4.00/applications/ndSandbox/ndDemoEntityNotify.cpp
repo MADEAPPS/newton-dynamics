@@ -126,7 +126,8 @@ ndDemoEntityNotify::~ndDemoEntityNotify()
 {
 }
 
-void ndDemoEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
+//void ndDemoEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
+void ndDemoEntityNotify::OnTransform(ndFloat32, const ndMatrix& matrix)
 {
 	// apply this transformation matrix to the application user data.
 	if (*m_entity)

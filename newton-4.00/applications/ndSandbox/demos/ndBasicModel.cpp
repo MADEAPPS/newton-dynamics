@@ -213,7 +213,6 @@ class BackGroundVehicleController : public ndModel
 				return;
 			}
 
-
 			ndBodyDynamic* const vehicleBody = m_vehicleBody->GetAsBodyDynamic();
 			const ndMatrix matrix(vehicleBody->GetMatrix());
 
