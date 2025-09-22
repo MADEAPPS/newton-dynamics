@@ -37,7 +37,8 @@ class BackGroundVehicleController : public ndModel
 			:ndModelNotify()
 			,m_scene(pScene)
 			,m_vehicleBody(body)
-			,m_desiredSpeed(3.0f) // 15 km/h
+			,m_desiredSpeed(ndFloat32 (0.0f))
+			,m_desiredAngularSpeedFactor(ndFloat32(0.0f))
 		{
 			ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)body->GetAsBodyKinematic()->GetNotifyCallback();
 			ndSharedPtr<ndRenderSceneNode> vehicleMesh(notify->GetUserData());
@@ -70,8 +71,8 @@ class BackGroundVehicleController : public ndModel
 			ndModelNotify::Update(timestep);
 			if (IsOnGround())
 			{
-				ApplyTurningTorque();
-				ApplyLateralForces(timestep);
+				ApplyTurningImpulse(timestep);
+				ApplyLateralImpulse(timestep);
 				ApplyLongitudinalImpulse(timestep);
 			}
 		}
@@ -82,45 +83,39 @@ class BackGroundVehicleController : public ndModel
 		{
 			ndModelNotify::PostTransformUpdate(timestep);
 
-			// animate the wheels
-			const ndBodyKinematic* const vehicleBody = m_vehicleBody->GetAsBodyKinematic();
-			const ndMatrix& matrix = vehicleBody->GetMatrix();
-			const ndVector veloc (vehicleBody->GetVelocity());
-			ndFloat32 speed = veloc.DotProduct(matrix.m_front).GetScalar();
-			ndFloat32 step = speed * timestep;
-			for (ndInt32 i = 0; i < m_wheelAnimation.GetCount(); ++i)
-			{
-				ndFloat32 angleAngle = step * m_wheelAnimation[i].m_invRadius;
-				ndFloat32 angle = m_wheelAnimation[i].m_angle + angleAngle;
-				if (angle > ndPi * ndFloat32(2.0f))
-				{
-					angle -= ndPi * ndFloat32(2.0f);
-				}
-				else if (angle < -ndPi * ndFloat32(2.0f))
-				{
-					angle += ndPi * ndFloat32(2.0f);
-				}
-				m_wheelAnimation[i].m_angle = angle;
+			// apply vehicle control 
+			ApplyImpulControls();
 
-				const ndMatrix wheelMatrix(ndPitchMatrix(angle) * m_wheelAnimation[i].m_bindMatrix);
-				m_wheelAnimation[i].m_wheelNode->SetTransform(wheelMatrix, wheelMatrix.m_posit);
-			}
-
-			// apply controls
-			if (m_scene->GetKeyState(ImGuiKey_UpArrow))
-			{
-				ndTrace (("go foward\n"))
-				//myModel->IncrementRootPosition(ndVector(-0.01f, 0.f, 0.f, 0.f), timestep);
-			}
-			else if (m_scene->GetKeyState(ImGuiKey_DownArrow))
-			{
-				ndTrace(("go back\n"))
-				//myModel->IncrementRootPosition(ndVector(0.01f, 0.f, 0.f, 0.f), timestep);
-			}
-
+			// apply tire animation and othe stuff if nessesary
+			AnimateTires(timestep);
 		}
 
 		private:
+		void ApplyImpulControls()
+		{
+			// apply forward controls
+			m_desiredSpeed = ndFloat32(0.0f);
+			if (m_scene->GetKeyState(ImGuiKey_UpArrow))
+			{
+				m_desiredSpeed = ndFloat32(3.0f);
+			}
+			else if (m_scene->GetKeyState(ImGuiKey_DownArrow))
+			{
+				m_desiredSpeed = ndFloat32(-1.5f);
+			}
+
+			// apply turning controls
+			m_desiredAngularSpeedFactor = ndFloat32(0.0f);
+			if (m_scene->GetKeyState(ImGuiKey_LeftArrow))
+			{
+				m_desiredAngularSpeedFactor = ndFloat32(0.5f);
+			}
+			else if (m_scene->GetKeyState(ImGuiKey_RightArrow))
+			{
+				m_desiredAngularSpeedFactor = ndFloat32(-0.5f);
+			}
+		}
+
 		bool IsOnGround() const
 		{
 			const ndBodyKinematic* const vehicleBody = m_vehicleBody->GetAsBodyKinematic();
@@ -152,6 +147,32 @@ class BackGroundVehicleController : public ndModel
 			return false;
 		}
 
+		void AnimateTires(ndFloat32 timestep)
+		{
+			const ndBodyKinematic* const vehicleBody = m_vehicleBody->GetAsBodyKinematic();
+			const ndMatrix& matrix = vehicleBody->GetMatrix();
+			const ndVector veloc(vehicleBody->GetVelocity());
+			ndFloat32 speed = veloc.DotProduct(matrix.m_front).GetScalar();
+			ndFloat32 step = speed * timestep;
+			for (ndInt32 i = 0; i < m_wheelAnimation.GetCount(); ++i)
+			{
+				ndFloat32 angleAngle = step * m_wheelAnimation[i].m_invRadius;
+				ndFloat32 angle = m_wheelAnimation[i].m_angle + angleAngle;
+				if (angle > ndPi * ndFloat32(2.0f))
+				{
+					angle -= ndPi * ndFloat32(2.0f);
+				}
+				else if (angle < -ndPi * ndFloat32(2.0f))
+				{
+					angle += ndPi * ndFloat32(2.0f);
+				}
+				m_wheelAnimation[i].m_angle = angle;
+
+				const ndMatrix wheelMatrix(ndPitchMatrix(angle) * m_wheelAnimation[i].m_bindMatrix);
+				m_wheelAnimation[i].m_wheelNode->SetTransform(wheelMatrix, wheelMatrix.m_posit);
+			}
+		}
+
 		void ApplyLongitudinalImpulse(ndFloat32 timestep)
 		{
 			ndBodyDynamic* const vehicleBody = m_vehicleBody->GetAsBodyDynamic();
@@ -160,11 +181,11 @@ class BackGroundVehicleController : public ndModel
 			const ndVector velocity(m_vehicleBody->GetVelocity());
 			ndFloat32 speed = matrix.m_front.DotProduct(velocity).GetScalar();
 			ndFloat32 speedError = m_desiredSpeed - speed;
-			ndFloat32 impulseMag = 0.4f * speedError * vehicleBody->GetMassMatrix().m_w;
+			ndFloat32 impulseMag = ndFloat32(0.4f) * speedError * vehicleBody->GetMassMatrix().m_w;
 			vehicleBody->ApplyImpulsePair(matrix.m_front.Scale (impulseMag), ndVector::m_zero, timestep); 
 		}
 
-		void ApplyLateralForces(ndFloat32 timestep)
+		void ApplyLateralImpulse(ndFloat32 timestep)
 		{
 			ndBodyDynamic* const vehicleBody = m_vehicleBody->GetAsBodyDynamic();
 
@@ -185,34 +206,30 @@ class BackGroundVehicleController : public ndModel
 			vehicleBody->ApplyImpulsePair(ndVector::m_negOne * sidewaysMomentum * 0.8f, ndVector(0.0f), timestep);
 		}
 
-		void ApplyTurningTorque()
+		void ApplyTurningImpulse(ndFloat32 timestep)
 		{
+			if (m_desiredSpeed == 0.0f)
+			{
+				return;
+			}
+
+
 			ndBodyDynamic* const vehicleBody = m_vehicleBody->GetAsBodyDynamic();
 			const ndMatrix matrix(vehicleBody->GetMatrix());
-			const ndVector forward(matrix.m_front);
+
 			const ndVector upDir(matrix.m_up);
 
-			ndVector velocity = m_vehicleBody->GetVelocity();
-			ndFloat32 speed2 = velocity.DotProduct(velocity).GetScalar();
-
-			// Work out steering forces
-			ndFloat32 steering = 0.0f;               // Keep the vehicle traveling straight
-			ndFloat32 maxTorque = 50000.0f;
-			ndFloat32 desiredAngularSpeedFactor = 1.0f;
-			ndFloat32 desiredAngularSpeed = desiredAngularSpeedFactor * speed2 * steering / (ndPi);   // Steering is a value from -pi to pi
-
-			ndFloat32 angularSpeed = upDir.DotProduct(m_vehicleBody->GetOmega()).GetScalar();  // Component of the angular velocity about the up vector
-			ndFloat32 angularSpeedDifference = desiredAngularSpeed - angularSpeed;
-			angularSpeedDifference = ndClamp(angularSpeedDifference, ndFloat32(-0.3), ndFloat32(0.3));
-			angularSpeedDifference = angularSpeedDifference / ndFloat32(0.3);  // Normalise to between -1 and 1;
-			ndFloat32 torque = angularSpeedDifference * maxTorque;
-			const ndVector turnTorque (upDir.Scale(torque));                     // Vehicle space torque
-			vehicleBody->SetTorque(vehicleBody->GetTorque() + turnTorque);
+			ndFloat32 turningSign = ndSign(m_desiredSpeed);
+			ndFloat32 omega = upDir.DotProduct(m_vehicleBody->GetOmega()).GetScalar();
+			ndFloat32 deltaOmega = turningSign * m_desiredAngularSpeedFactor - omega;
+			ndFloat32 angularImpulse = ndFloat32(0.3f) * deltaOmega * vehicleBody->GetMassMatrix().m_y;
+			vehicleBody->ApplyImpulsePair(ndVector::m_zero, upDir.Scale(angularImpulse), timestep);
 		}
 
 		ndDemoEntityManager* m_scene;
 		ndSharedPtr<ndBody> m_vehicleBody;
 		ndFloat32 m_desiredSpeed;
+		ndFloat32 m_desiredAngularSpeedFactor;
 		ndFixSizeArray<ndWheelSpin, 8> m_wheelAnimation;
 	};
 
