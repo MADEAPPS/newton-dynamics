@@ -15,12 +15,46 @@
 
 #include "ndSandboxStdafx.h"
 
+class ndDemoCameraNode;
+class ndDemoCameraPickBodyJoint : public ndJointKinematicController
+{
+	public:
+	ndDemoCameraPickBodyJoint(ndBodyKinematic* const childBody, ndBodyKinematic* const worldBody, 
+		const ndVector& attachmentPointInGlobalSpace, ndDemoCameraNode* const camera)
+		:ndJointKinematicController(childBody, worldBody, attachmentPointInGlobalSpace)
+		,m_owner(camera)
+	{
+	}
+
+	~ndDemoCameraPickBodyJoint()
+	{
+		if (m_owner)
+		{
+			ndAssert(0);
+			//m_owner->ResetPickBody();
+		}
+	}
+
+	ndDemoCameraNode* m_owner;
+};
+
 class ndDemoCameraNode: public ndRenderSceneNode
 {
 	public:
 	ndDemoCameraNode(ndRender* const owner);
 
-	virtual void TickUpdate(ndFloat32 timestep);
+	virtual void TickUpdate(ndFloat32 timestep) = 0;
+	
+	protected:
+	void ResetPickBody();
+	void UpdatePickBody();
+
+	ndVector m_pickedBodyTargetPosition;
+	ndSharedPtr<ndJointBilateralConstraint> m_pickJoint;
+
+	ndFloat32 m_pickedBodyParam;
+	bool m_pickingMode;
+	bool m_prevMouseState;
 };
 
 #endif 
