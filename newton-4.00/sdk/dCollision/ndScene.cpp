@@ -877,7 +877,7 @@ void ndScene::UpdateTransform()
 	}
 
 	ndFloat32 timestep = GetTimestep();
-	auto TransformUpdate = ndMakeObject::ndFunction([this, timestep](ndInt32 groupId, ndInt32 threadIndex)
+	auto TransformUpdate = ndMakeObject::ndFunction([this, timestep](ndInt32 groupId, ndInt32)
 	{
 		D_TRACKTIME_NAMED(TransformUpdate);
 		const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
