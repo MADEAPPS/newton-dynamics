@@ -179,31 +179,33 @@ ndSharedPtr<ndBody> BuildHeightFieldTerrain(ndDemoEntityManager* const scene, co
 	MakeNoiseHeightfield(heightfield);
 
 	// create the height field collision and rigid body
-	ndShapeInstance heighfieldInstance(
-		new ndShapeHeightfield(D_TERRAIN_WIDTH, D_TERRAIN_WIDTH,
-			ndShapeHeightfield::m_invertedDiagonals,
-			D_TERRAIN_GRID_SIZE, D_TERRAIN_GRID_SIZE));
+	ndShapeInstance heighfieldInstance(new ndShapeHeightfield(D_TERRAIN_WIDTH, D_TERRAIN_WIDTH,
+			ndShapeHeightfield::m_invertedDiagonals, D_TERRAIN_GRID_SIZE, D_TERRAIN_GRID_SIZE));
 	
-	ndShapeHeightfield* const shape = heighfieldInstance.GetShape()->GetAsShapeHeightfield();
-	ndArray<ndReal>& heightMap = shape->GetElevationMap();
+	ndShapeHeightfield* const heighfield = heighfieldInstance.GetShape()->GetAsShapeHeightfield();
+	ndArray<ndReal>& heightMap = heighfield->GetElevationMap();
 	ndAssert(heightMap.GetCount() == heightfield.GetCount());
 	for (ndInt32 i = 0; i < heightfield.GetCount(); ++i)
 	{
 		ndFloat32 high = heightfield[i].m_y;
 		heightMap[i] = ndReal(high);
 	}
-	shape->UpdateElevationMapAabb();
+	heighfield->UpdateElevationMapAabb();
+
+	ndMatrix heighfieldLocation(location);
+	heighfieldLocation.m_posit.m_x -= 0.5f * ndFloat32(heighfield->GetWith()) * heighfield->GetWithScale();
+	heighfieldLocation.m_posit.m_z -= 0.5f * ndFloat32(heighfield->GetHeight()) * heighfield->GetHeightScale();
 
 	// add tile base sence node
 	ndRender* const render = *scene->GetRenderer();
 	ndSharedPtr<ndRenderTexture> texture(render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textureName)));
-	ndSharedPtr<ndRenderSceneNode> entity(new ndHeightfieldMesh(render, shape, texture, location));
+	ndSharedPtr<ndRenderSceneNode> entity(new ndHeightfieldMesh(render, heighfield, texture, heighfieldLocation));
 	
 	// generate a rigibody and added to the scene and world
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndSharedPtr<ndBody> body (new ndBodyDynamic());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-	body->SetMatrix(location);
+	body->SetMatrix(heighfieldLocation);
 	body->GetAsBodyDynamic()->SetCollisionShape(heighfieldInstance);
 	
 	world->AddBody(body);
