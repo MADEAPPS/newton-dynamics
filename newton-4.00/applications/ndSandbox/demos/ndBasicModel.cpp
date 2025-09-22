@@ -19,7 +19,7 @@
 #include "ndHeightFieldPrimitive.h"
 
 // 16 mps approximatly 60 kmp
-#define MAX_VEHICLE_PRO_SPEED	16.0f
+#define MAX_VEHICLE_PRO_SPEED	12.0f
 
 class BackGroundVehicleController : public ndModel
 {
@@ -104,7 +104,7 @@ class BackGroundVehicleController : public ndModel
 			}
 			else if (m_scene->GetKeyState(ImGuiKey_DownArrow))
 			{
-				m_desiredSpeed = -0.25f * MAX_VEHICLE_PRO_SPEED;
+				m_desiredSpeed = -0.5f * MAX_VEHICLE_PRO_SPEED;
 			}
 
 			// apply turning controls
