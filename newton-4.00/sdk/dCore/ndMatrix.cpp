@@ -578,11 +578,11 @@ ndMatrix ndCalculateMatrix(const ndQuaternion& quat, const ndVector& position)
 	const ndFloat32 yw = quat0.m_y * quat1.m_w;
 	const ndFloat32 zw = quat0.m_z * quat1.m_w;
 
-	ndVector front(ndFloat32(1.0f) - y2 - z2, xy + zw, xz - yw, ndFloat32(0.0f));
-	ndVector up(xy - zw, ndFloat32(1.0f) - x2 - z2, yz + xw, ndFloat32(0.0f));
-	ndVector right(xz + yw, yz - xw, ndFloat32(1.0f) - x2 - y2, ndFloat32(0.0f));
-	//ndVector posit (position);
-	return ndMatrix(front, up, right, position);
+	const ndVector front(ndFloat32(1.0f) - y2 - z2, xy + zw, xz - yw, ndFloat32(0.0f));
+	const ndVector up(xy - zw, ndFloat32(1.0f) - x2 - z2, yz + xw, ndFloat32(0.0f));
+	const ndVector right(xz + yw, yz - xw, ndFloat32(1.0f) - x2 - y2, ndFloat32(0.0f));
+	const ndVector posit (position & ndVector::m_triplexMask);
+	return ndMatrix(front, up, right, position | ndVector::m_wOne);
 }
 
 ndMatrix ndCovarianceMatrix(const ndVector& p, const ndVector& q)
