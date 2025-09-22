@@ -37,6 +37,16 @@ ndRenderSceneCamera::ndRenderSceneCamera(ndRender* const owner)
 	m_owner = owner;
 }
 
+ndRenderSceneCamera* ndRenderSceneCamera::GetAsCamera()
+{
+	return this;
+}
+
+const ndRenderSceneCamera* ndRenderSceneCamera::GetAsCamera() const
+{
+	return this;
+}
+
 ndMatrix ndRenderSceneCamera::CreateMatrixFromFrustum(ndFloat32 left, ndFloat32 right, ndFloat32 bottom, ndFloat32 top, ndFloat32 front, ndFloat32 back) const
 {
 	ndMatrix projectionMatrix(ndGetIdentityMatrix());

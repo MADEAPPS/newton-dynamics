@@ -45,8 +45,14 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 	virtual void AddChild(const ndSharedPtr<ndRenderSceneNode>& child);
 	virtual void RemoveChild(const ndSharedPtr<ndRenderSceneNode> child);
 
+	virtual ndRenderSceneCamera* GetAsCamera();
+	virtual const ndRenderSceneCamera* GetAsCamera() const;
+
 	virtual ndRenderSceneNodeInstance* GetAsInstance();
 	virtual const ndRenderSceneNodeInstance* GetAsInstance() const;
+
+	ndRenderSceneCamera* FindCameraNode();
+	const ndRenderSceneCamera* FindCameraNode() const;
 
 	void SetPrimitiveMatrix(const ndMatrix& matrix);
 	void SetPrimitive(const ndSharedPtr<ndRenderPrimitive>& primitive);

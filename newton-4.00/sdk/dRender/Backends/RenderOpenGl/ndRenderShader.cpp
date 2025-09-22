@@ -59,7 +59,8 @@ void ndRenderShaderSetZbufferCleanBlock::SetParameters(GLuint shader)
 
 void ndRenderShaderSetZbufferCleanBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
+	//const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
+	const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
 
 	//const ndMatrix modelViewProjectionMatrixMatrix(modelMatrix * camera->m_invViewMatrix * camera->m_projectionMatrix);
 	const ndMatrix modelViewProjectionMatrixMatrix(modelMatrix * camera->m_invViewRrojectionMatrix);
@@ -195,7 +196,8 @@ void ndRenderShaderDebugFlatShadedDiffusedBlock::SetParameters(GLuint shader)
 
 void ndRenderShaderDebugFlatShadedDiffusedBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
+	//const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
+	const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
 	
 	const ndMatrix viewMatrix(camera->m_invViewMatrix);
 	const ndMatrix modelViewMatrix(modelMatrix * viewMatrix);
@@ -242,7 +244,8 @@ void ndRenderShaderDebugFlatShadedDiffusedBlock::Render(const ndRenderPrimitiveM
 // *********************************************************************
 void ndRenderShaderDebugWireframeDiffuseBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
+	//const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
+	const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
 	
 	const ndMatrix viewMatrix(camera->m_invViewMatrix);
 	const ndMatrix modelViewMatrix(modelMatrix * viewMatrix);
@@ -305,7 +308,8 @@ void ndRenderShaderOpaqueDiffusedColorBlock::SetParameters(GLuint shader)
 
 void ndRenderShaderOpaqueDiffusedColorBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
+	//const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
+	const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
 
 	glUseProgram(m_shader);
 
@@ -386,7 +390,8 @@ void ndRenderShaderOpaqueDiffusedShadowColorBlock::SetParameters(GLuint shader)
 
 void ndRenderShaderOpaqueDiffusedShadowColorBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
+	//const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
+	const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
 	
 	const ndMatrix viewMatrix(camera->m_invViewMatrix);
 	const ndMatrix modelViewMatrix(modelMatrix * viewMatrix);
@@ -488,7 +493,8 @@ void ndRenderShaderTransparentDiffusedShadowColorBlock::SetWidingMode(bool clock
 
 void ndRenderShaderTransparentDiffusedShadowColorBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
+	//const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
+	const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
 	
 	glUseProgram(m_shader);
 
@@ -580,7 +586,8 @@ void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::Render(const ndRenderPrim
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
+	//const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
+	const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
 
 	const ndMatrix viewMatrix(camera->m_invViewMatrix);
 	const ndMatrix modelViewMatrix(modelMatrix * viewMatrix);

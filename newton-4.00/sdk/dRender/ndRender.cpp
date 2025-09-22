@@ -45,7 +45,8 @@ ndRender::ndRender(ndSharedPtr<ndUserCallback>& owner, ndInt32 width, ndInt32 he
 {
 	m_context = ndSharedPtr<ndRenderContext>(new ndRenderContext(this, width, height, title));
 
-	m_camera = ndSharedPtr< ndRenderSceneCamera>(new ndRenderSceneCamera(this));
+	//m_camera = ndSharedPtr<ndRenderSceneCamera>(new ndRenderSceneCamera(this));
+	m_camera = ndSharedPtr<ndRenderSceneNode>(new ndRenderSceneCamera(this));
 	m_textureCache = ndSharedPtr<ndRenderTextureCache>(new ndRenderTextureCache(this));
 }
 
@@ -74,17 +75,17 @@ ndSharedPtr<ndRender::ndUserCallback>& ndRender::GetOwner()
 	return m_owner;
 }
 
-void ndRender::SetCamera(const ndSharedPtr<ndRenderSceneCamera>& camera)
+void ndRender::SetCamera(const ndSharedPtr<ndRenderSceneNode>& camera)
 {
 	m_camera = camera;
 }
 
-ndSharedPtr<ndRenderSceneCamera>& ndRender::GetCamera()
+ndSharedPtr<ndRenderSceneNode>& ndRender::GetCamera()
 {
 	return m_camera;
 }
 
-ndSharedPtr<ndRenderSceneCamera> ndRender::GetCamera() const
+ndSharedPtr<ndRenderSceneNode> ndRender::GetCamera() const
 {
 	return m_camera;
 }
@@ -197,7 +198,8 @@ void ndRender::Render(ndFloat32 timestep)
 	{
 		ndInt32 display_w = m_context->GetWidth();
 		ndInt32 display_h = m_context->GetHeight();
-		m_camera->SetViewMatrix(display_w, display_h);
+		ndRenderSceneCamera* const camera = m_camera->FindCameraNode();
+		camera->SetViewMatrix(display_w, display_h);
 
 		for (ndList<ndSharedPtr<ndRenderPass>>::ndNode* node = m_renderPasses.GetFirst(); node; node = node->GetNext())
 		{

@@ -13,6 +13,7 @@
 #include "ndRender.h"
 #include "ndRenderContext.h"
 #include "ndRenderTexture.h"
+#include "ndRenderSceneNode.h"
 #include "ndRenderPassEnvironment.h"
 #include "ndRenderPassEnvironmentImplement.h"
 
@@ -31,7 +32,7 @@ ndRenderPassEnvironment::~ndRenderPassEnvironment()
 
 void ndRenderPassEnvironment::RenderScene(ndFloat32)
 {
-	const ndRenderSceneCamera* const camera = *m_owner->m_camera;
+	const ndRenderSceneCamera* const camera = m_owner->m_camera->FindCameraNode();
 	m_implement->RenderScene(camera, *m_cubeMap);
 }
 

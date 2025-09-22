@@ -479,8 +479,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	m_renderer->AddRenderPass(m_debugDisplayRenderPass);
 	m_renderer->AddRenderPass(m_menuRenderPass);
 
-	// add a demo camera, and main directional light
-	m_renderer->SetCamera(ndSharedPtr<ndRenderSceneCamera>(new ndDemoCamera(*m_renderer)));
+	//add main directional light
 	m_renderer->SetSunLight(ndVector(-0.5f, 1.0f, -0.5f, 0.0f), ndVector(0.7f, 0.7f, 0.7f, 0.0f));
 
 	// initialized the physics world for the new scene
@@ -998,6 +997,9 @@ void ndDemoEntityManager::LoadDemo(ndInt32 menu)
 	Cleanup();
 	
 	char newTitle[256];
+
+	// add a demo camera per demo
+	m_renderer->SetCamera(ndSharedPtr<ndRenderSceneNode>(new ndDemoCamera(*m_renderer)));
 	m_demosSelection[menu].m_launchDemoCallback(this);
 	
 	snprintf(newTitle, sizeof(newTitle), "Newton Dynamics %d.%.2i demo: %s", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION, m_demosSelection[menu].m_name);

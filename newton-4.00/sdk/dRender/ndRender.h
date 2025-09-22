@@ -76,12 +76,12 @@ class ndRender: public ndClassAlloc
 	void AddSceneNode(const ndSharedPtr<ndRenderSceneNode>& body);
 	void RemoveSceneNode(const ndSharedPtr<ndRenderSceneNode>& body);
 
-	void SetCamera(const ndSharedPtr<ndRenderSceneCamera>& camera);
+	void SetCamera(const ndSharedPtr<ndRenderSceneNode>& camera);
 	void SetSunLight(const ndVector& direction, const ndVector& intensity);
 
 	ndSharedPtr<ndUserCallback>& GetOwner();
-	ndSharedPtr<ndRenderSceneCamera>& GetCamera();
-	ndSharedPtr<ndRenderSceneCamera> GetCamera() const;
+	ndSharedPtr<ndRenderSceneNode>& GetCamera();
+	ndSharedPtr<ndRenderSceneNode> GetCamera() const;
 	ndSharedPtr<ndRenderTextureCache>& GetTextureCache();
 
 	void InterpolateTransforms(ndFloat32 param);
@@ -89,7 +89,8 @@ class ndRender: public ndClassAlloc
 	private:
 	ndSharedPtr<ndUserCallback> m_owner;
 	ndSharedPtr<ndRenderContext> m_context;
-	ndSharedPtr<ndRenderSceneCamera> m_camera;
+	//ndSharedPtr<ndRenderSceneCamera> m_camera;
+	ndSharedPtr<ndRenderSceneNode> m_camera;
 	ndSharedPtr<ndRenderTextureCache> m_textureCache;
 	ndList<ndSharedPtr<ndRenderSceneNode>> m_scene;
 	ndList<ndSharedPtr<ndRenderPass>> m_renderPasses;

@@ -90,6 +90,16 @@ ndRenderSceneNode* ndRenderSceneNode::Clone() const
 	return new ndRenderSceneNode(*this);
 }
 
+ndRenderSceneCamera* ndRenderSceneNode::GetAsCamera()
+{
+	return nullptr;
+}
+
+const ndRenderSceneCamera* ndRenderSceneNode::GetAsCamera() const
+{
+	return nullptr;
+}
+
 ndRenderSceneNodeInstance* ndRenderSceneNode::GetAsInstance()
 {
 	return nullptr;
@@ -108,6 +118,54 @@ ndRenderSceneNode* ndRenderSceneNode::GetParent() const
 const ndList<ndSharedPtr<ndRenderSceneNode>>& ndRenderSceneNode::GetChilden() const
 {
 	return m_children;
+}
+
+ndRenderSceneCamera* ndRenderSceneNode::FindCameraNode()
+{
+	ndFixSizeArray<ndRenderSceneNode*, 256> stack;
+	
+	stack.PushBack(this);
+	while (stack.GetCount())
+	{
+		ndRenderSceneNode* const node = stack.Pop();
+		ndRenderSceneCamera* const camera = node->GetAsCamera();
+		if (camera)
+		{
+			return camera;
+		}
+
+		for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* childNode = m_children.GetFirst(); childNode; childNode = childNode->GetNext())
+		{
+			stack.PushBack(*childNode->GetInfo());
+		}
+	}
+
+	ndAssert(0);
+	return nullptr;
+}
+
+const ndRenderSceneCamera* ndRenderSceneNode::FindCameraNode() const
+{
+	ndFixSizeArray<const ndRenderSceneNode*, 256> stack;
+
+	stack.PushBack(this);
+	while (stack.GetCount())
+	{
+		const ndRenderSceneNode* const node = stack.Pop();
+		const ndRenderSceneCamera* const camera = node->GetAsCamera();
+		if (camera)
+		{
+			return camera;
+		}
+
+		for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* childNode = m_children.GetFirst(); childNode; childNode = childNode->GetNext())
+		{
+			stack.PushBack(*childNode->GetInfo());
+		}
+	}
+
+	ndAssert(0);
+	return nullptr;
 }
 
 void ndRenderSceneNode::AddChild(const ndSharedPtr<ndRenderSceneNode>& child)

@@ -19,6 +19,9 @@ class ndRenderSceneCamera : public ndRenderSceneNode
 	public:
 	ndRenderSceneCamera(ndRender* const owner);
 
+	virtual ndRenderSceneCamera* GetAsCamera() override;
+	virtual const ndRenderSceneCamera* GetAsCamera() const override;
+
 	virtual void SetMatrix(const ndQuaternion& rotation, const ndVector& position) override;
 
 	void SetViewMatrix(ndInt32 width, ndInt32 height);

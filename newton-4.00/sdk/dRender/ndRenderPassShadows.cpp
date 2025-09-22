@@ -30,6 +30,7 @@ ndRenderPassShadows::~ndRenderPassShadows()
 
 void ndRenderPassShadows::RenderScene(ndFloat32)
 {
-	const ndRenderSceneCamera* const camera = *m_owner->m_camera;
+	//const ndRenderSceneCamera* const camera = *m_owner->m_camera;
+	const ndRenderSceneCamera* const camera = m_owner->m_camera->FindCameraNode();
 	m_implement->RenderScene(camera);
 }
