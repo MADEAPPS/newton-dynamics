@@ -1955,12 +1955,8 @@ void ndMeshEffect::CylindricalMapping(ndInt32 material, const ndMatrix& textureM
 	{
 		buffer[i] = textureMatrix.RotateVector(m_points.m_vertex[i] - origin);
 		const ndBigVector& tmp = buffer[i];
-		pMin.m_x = ndMin(pMin.m_x, tmp.m_x);
-		pMax.m_x = ndMax(pMax.m_x, tmp.m_x);
-		pMin.m_y = ndMin(pMin.m_y, tmp.m_y);
-		pMax.m_y = ndMax(pMax.m_y, tmp.m_y);
-		pMin.m_z = ndMin(pMin.m_z, tmp.m_z);
-		pMax.m_z = ndMax(pMax.m_z, tmp.m_z);
+		pMin = pMin.GetMin(tmp);
+		pMax = pMax.GetMax(tmp);
 	}
 
 	UnpackAttibuteData();
@@ -1974,11 +1970,11 @@ void ndMeshEffect::CylindricalMapping(ndInt32 material, const ndMatrix& textureM
 	m_attrib.m_uv0Channel.m_isValid = true;
 	m_attrib.m_materialChannel.m_isValid = true;
 
-	ndBigVector dist(pMax);
+	ndBigVector dist(pMax - pMin);
 	dist[0] = ndMax(ndFloat64(1.0e-3f), dist[0]);
 	dist[1] = ndMax(ndFloat64(1.0e-3f), dist[1]);
 	dist[2] = ndMax(ndFloat64(1.0e-3f), dist[2]);
-	ndBigVector scale(ndFloat64(0.5f) / dist[0], ndFloat64(0.5f) / dist[1], ndFloat64(0.5f) / dist[2], ndFloat64(0.0f));
+	ndBigVector scale(ndFloat64(1.0f) / dist[0], ndFloat64(1.0f) / dist[1], ndFloat64(1.0f) / dist[2], ndFloat64(0.0f));
 	
 	ndInt32 mark = IncLRU();
 	ndPolyhedra::Iterator iter(*this);
@@ -1990,10 +1986,6 @@ void ndMeshEffect::CylindricalMapping(ndInt32 material, const ndMatrix& textureM
 			const ndBigVector& p0 = buffer[edge->m_incidentVertex];
 			const ndBigVector& p1 = buffer[edge->m_next->m_incidentVertex];
 			const ndBigVector& p2 = buffer[edge->m_prev->m_incidentVertex];
-
-			//edge->m_mark = mark;
-			//edge->m_next->m_mark = mark;
-			//edge->m_prev->m_mark = mark;
 
 			ndBigVector e0(p1 - p0);
 			ndBigVector e1(p2 - p0);
