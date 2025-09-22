@@ -170,10 +170,10 @@ void ndBodyDynamic::ApplyImpulsePair(const ndVector& linearImpulseIn, const ndVe
 	if ((linearImpulse.DotProduct(linearImpulse).GetScalar() > ndFloat32(1.0e-6f)) ||
 		(angularImpulse.DotProduct(angularImpulse).GetScalar() > ndFloat32(1.0e-6f))) 
 	{
-		m_impulseForce += linearImpulse.Scale(1.0f / timestep);
-		m_impulseTorque += angularImpulse.Scale(1.0f / timestep);
-
 		m_equilibrium = false;
+		ndFloat32 invTimestep = ndFloat32(1.0f) / timestep;
+		m_impulseForce += linearImpulse.Scale(invTimestep);
+		m_impulseTorque += angularImpulse.Scale(invTimestep);
 	}
 }
 
