@@ -59,29 +59,29 @@ void ndDemoCamera::TickUpdate(ndFloat32 timestep)
 	ndMatrix targetMatrix(ndCalculateMatrix(m_transform1.m_rotation, m_transform1.m_position));
 
 	// do camera translation
-	if (scene->GetKeyState('W'))
+	if (scene->GetKeyState(ImGuiKey_W))
 	{
 		targetMatrix.m_posit += targetMatrix.m_front.Scale(m_frontSpeed * timestep * slowDownFactor);
 	}
-	if (scene->GetKeyState('S'))
+	if (scene->GetKeyState(ImGuiKey_S))
 	{
 		targetMatrix.m_posit -= targetMatrix.m_front.Scale(m_frontSpeed * timestep * slowDownFactor);
 	}
-	if (scene->GetKeyState('A'))
+	if (scene->GetKeyState(ImGuiKey_A))
 	{
 		targetMatrix.m_posit -= targetMatrix.m_right.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
 	}
-	if (scene->GetKeyState('D'))
+	if (scene->GetKeyState(ImGuiKey_D))
 	{
 		targetMatrix.m_posit += targetMatrix.m_right.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
 	}
 
-	if (scene->GetKeyState('Q'))
+	if (scene->GetKeyState(ImGuiKey_Q))
 	{
 		targetMatrix.m_posit -= targetMatrix.m_up.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
 	}
 
-	if (scene->GetKeyState('E'))
+	if (scene->GetKeyState(ImGuiKey_E))
 	{
 		targetMatrix.m_posit += targetMatrix.m_up.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
 	}
