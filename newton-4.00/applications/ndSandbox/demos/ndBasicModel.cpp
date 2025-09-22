@@ -67,6 +67,7 @@ class BackGroundVehicleController : public ndModel
 		// update pseudo physics every substep
 		void Update(ndFloat32 timestep)
 		{
+			ndModelNotify::Update(timestep);
 			if (IsOnGround())
 			{
 				ApplyTurningTorque();
@@ -79,6 +80,9 @@ class BackGroundVehicleController : public ndModel
 		// setting the follow camera, apply controls, etc;
 		void PostTransformUpdate(ndFloat32 timestep)
 		{
+			ndModelNotify::PostTransformUpdate(timestep);
+
+			// animate the wheels
 			const ndBodyKinematic* const vehicleBody = m_vehicleBody->GetAsBodyKinematic();
 			const ndMatrix& matrix = vehicleBody->GetMatrix();
 			const ndVector veloc (vehicleBody->GetVelocity());
@@ -91,6 +95,19 @@ class BackGroundVehicleController : public ndModel
 				const ndMatrix wheelMatrix(ndPitchMatrix(m_wheelAnimation[i].m_angle) * m_wheelAnimation[i].m_bindMatrix);
 				m_wheelAnimation[i].m_wheelNode->SetTransform(wheelMatrix, wheelMatrix.m_posit);
 			}
+
+			// apply controls
+			if (m_scene->GetKeyState(ImGuiKey_UpArrow))
+			{
+				ndTrace (("go foward\n"))
+				//myModel->IncrementRootPosition(ndVector(-0.01f, 0.f, 0.f, 0.f), timestep);
+			}
+			else if (m_scene->GetKeyState(ImGuiKey_DownArrow))
+			{
+				ndTrace(("go back\n"))
+				//myModel->IncrementRootPosition(ndVector(0.01f, 0.f, 0.f, 0.f), timestep);
+			}
+
 		}
 
 		private:
