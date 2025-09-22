@@ -15,6 +15,7 @@
 #include "ndRenderPrimitive.h"
 
 class ndRender;
+class ndRenderSceneCamera;
 class ndRenderSceneNodeInstance;
 class ndRenderPassShadowsImplement;
 
