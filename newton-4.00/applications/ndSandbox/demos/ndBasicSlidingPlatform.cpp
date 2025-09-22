@@ -13,9 +13,9 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
+#include "ndDemoCameraNode.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
-#include "ndDemoFlybyCameraNode.h"
 
 // this class is is only to show how to take control of the rigid body in the scene.
 class SimpleConveyorFloor : public ndModel

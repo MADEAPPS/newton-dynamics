@@ -13,10 +13,11 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
+#include "ndDemoCameraNode.h"
 #include "ndContactCallback.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
-#include "ndDemoFlybyCameraNode.h"
+
 
 #if 0
 class NewtonPhantom : public ndModelNotify

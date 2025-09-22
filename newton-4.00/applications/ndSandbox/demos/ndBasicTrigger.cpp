@@ -13,10 +13,10 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
+#include "ndDemoCameraNode.h"
 #include "ndContactCallback.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
-#include "ndDemoFlybyCameraNode.h"
 #include "ndArchimedesBuoyancyVolume.h"
 
 static void AddTrigger(ndDemoEntityManager* const scene)

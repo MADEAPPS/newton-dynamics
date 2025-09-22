@@ -15,12 +15,12 @@
 
 #include "ndSandboxStdafx.h"
 
-class ndDemoFlybyCameraNode: public ndRenderSceneCamera
+class ndDemoCameraNode: public ndRenderSceneCamera
 {
 	class ndDemoCameraPickBodyJoint : public ndJointKinematicController
 	{
 		public:
-		ndDemoCameraPickBodyJoint(ndBodyKinematic* const childBody, ndBodyKinematic* const worldBody, const ndVector& attachmentPointInGlobalSpace, ndDemoFlybyCameraNode* const camera)
+		ndDemoCameraPickBodyJoint(ndBodyKinematic* const childBody, ndBodyKinematic* const worldBody, const ndVector& attachmentPointInGlobalSpace, ndDemoCameraNode* const camera)
 			:ndJointKinematicController(childBody, worldBody, attachmentPointInGlobalSpace)
 			,m_owner(camera)
 		{
@@ -35,11 +35,11 @@ class ndDemoFlybyCameraNode: public ndRenderSceneCamera
 			}
 		}
 
-		ndDemoFlybyCameraNode* m_owner;
+		ndDemoCameraNode* m_owner;
 	};
 
 	public:
-	ndDemoFlybyCameraNode(ndRender* const owner);
+	ndDemoCameraNode(ndRender* const owner);
 
 	void TickUpdate(ndFloat32 timestep);
 	void ResetPickBody();

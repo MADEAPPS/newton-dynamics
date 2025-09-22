@@ -12,10 +12,10 @@
 #include "ndSandboxStdafx.h"
 #include "ndPhysicsWorld.h"
 #include "ndPhysicsUtils.h"
+#include "ndDemoCameraNode.h"
 #include "ndDemoEntityManager.h"
-#include "ndDemoFlybyCameraNode.h"
 
-ndDemoFlybyCameraNode::ndDemoFlybyCameraNode(ndRender* const owner)
+ndDemoCameraNode::ndDemoCameraNode(ndRender* const owner)
 	:ndRenderSceneCamera(owner)
 	,m_pickedBodyTargetPosition(ndVector::m_wOne)
 	,m_pickJoint(nullptr)
@@ -33,7 +33,7 @@ ndDemoFlybyCameraNode::ndDemoFlybyCameraNode(ndRender* const owner)
 {
 }
 
-void ndDemoFlybyCameraNode::SetTransform(const ndQuaternion& rotation, const ndVector& position)
+void ndDemoCameraNode::SetTransform(const ndQuaternion& rotation, const ndVector& position)
 {
 	ndRenderSceneCamera::SetTransform(rotation, position);
 	const ndMatrix matrix(GetTransform().GetMatrix());
@@ -41,7 +41,7 @@ void ndDemoFlybyCameraNode::SetTransform(const ndQuaternion& rotation, const ndV
 	m_yaw = ndAtan2(-matrix.m_front.m_z, matrix.m_front.m_x);
 }
 
-void ndDemoFlybyCameraNode::TickUpdate(ndFloat32 timestep)
+void ndDemoCameraNode::TickUpdate(ndFloat32 timestep)
 {
 	ndRender* const renderer = GetOwner();
 	ndAssert(renderer);
@@ -131,7 +131,7 @@ void ndDemoFlybyCameraNode::TickUpdate(ndFloat32 timestep)
 	UpdatePickBody(mouseState, p0, p1);
 }
 
-void ndDemoFlybyCameraNode::UpdatePickBody(bool mousePickState, const ndVector& p0, const ndVector& p1)
+void ndDemoCameraNode::UpdatePickBody(bool mousePickState, const ndVector& p0, const ndVector& p1)
 {
 	// handle pick body from the screen
 	ndRender* const renderer = GetOwner();
@@ -217,7 +217,7 @@ void ndDemoFlybyCameraNode::UpdatePickBody(bool mousePickState, const ndVector& 
 	m_prevMouseState = mousePickState;
 }
 
-void ndDemoFlybyCameraNode::ResetPickBody()
+void ndDemoCameraNode::ResetPickBody()
 {
 	if (*m_pickJoint)
 	{
