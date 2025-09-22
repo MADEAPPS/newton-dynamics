@@ -16,6 +16,7 @@
 #include "ndMakeStaticMap.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
+#include "ndDemoCameraNodeFollow.h"
 #include "ndHeightFieldPrimitive.h"
 
 // 16 mps approximatly 60 kmp
@@ -310,7 +311,7 @@ void ndBasicModel(ndDemoEntityManager* const scene)
 	ndRender* const renderer = *scene->GetRenderer();
 	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)vehicleBody->GetAsBodyKinematic()->GetNotifyCallback();
 	ndSharedPtr<ndRenderSceneNode> vehicleMesh(notify->GetUserData());
-	ndSharedPtr<ndRenderSceneNode> camera(new ndDemoCameraNodeFlyby(renderer));
+	ndSharedPtr<ndRenderSceneNode> camera(new ndDemoCameraNodeFollow(renderer));
 	renderer->SetCamera(camera);
 	vehicleMesh->AddChild(camera);
 	
