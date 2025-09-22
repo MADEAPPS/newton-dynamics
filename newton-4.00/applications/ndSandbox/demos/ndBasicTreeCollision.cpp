@@ -10,12 +10,12 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndDemoCamera.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
+#include "ndDemoFlybyCameraNode.h"
 
 void ndBasicStaticMeshCollision (ndDemoEntityManager* const scene)
 {

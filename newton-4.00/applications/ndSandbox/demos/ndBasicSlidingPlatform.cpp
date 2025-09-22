@@ -10,15 +10,14 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndDemoCamera.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
+#include "ndDemoFlybyCameraNode.h"
 
-
-// this classs is is onle to show how to take control of the rigiody body in the scene.
+// this class is is only to show how to take control of the rigid body in the scene.
 class SimpleConveyorFloor : public ndModel
 {
 	class ndNode : public ndNodeHierarchy<ndNode>

@@ -10,13 +10,14 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndDemoCamera.h"
+
 #include "ndFileBrowser.h"
 #include "ndPhysicsWorld.h"
 #include "ndPhysicsUtils.h"
 #include "ndTestDeepBrain.h"
 #include "ndMenuRenderPass.h"
 #include "ndDemoEntityManager.h"
+#include "ndDemoFlybyCameraNode.h"
 #include "ndHighResolutionTimer.h"
 #include "ndDebugDisplayRenderPass.h"
 
@@ -999,7 +1000,7 @@ void ndDemoEntityManager::LoadDemo(ndInt32 menu)
 	char newTitle[256];
 
 	// add a demo camera per demo
-	m_renderer->SetCamera(ndSharedPtr<ndRenderSceneNode>(new ndDemoCamera(*m_renderer)));
+	m_renderer->SetCamera(ndSharedPtr<ndRenderSceneNode>(new ndDemoFlybyCameraNode(*m_renderer)));
 	m_demosSelection[menu].m_launchDemoCallback(this);
 	
 	snprintf(newTitle, sizeof(newTitle), "Newton Dynamics %d.%.2i demo: %s", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION, m_demosSelection[menu].m_name);

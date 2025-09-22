@@ -11,11 +11,11 @@
 
 #include "ndSandboxStdafx.h"
 
-#include "ndDemoCamera.h"
 #include "ndPhysicsWorld.h"
 #include "ndContactCallback.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
+#include "ndDemoFlybyCameraNode.h"
 #include "ndArchimedesBuoyancyVolume.h"
 
 #define MAX_PHYSICS_STEPS			1
@@ -146,7 +146,7 @@ void ndPhysicsWorld::PostUpdate(ndFloat32 timestep)
 		notify->m_entity->SetTransform(notify->m_transform.m_rotation, notify->m_transform.m_position);
 	}
 
-	ndDemoCamera* const camera = (ndDemoCamera*)*m_manager->m_renderer->GetCamera();
+	ndDemoFlybyCameraNode* const camera = (ndDemoFlybyCameraNode*)*m_manager->m_renderer->GetCamera();
 	ndAssert(camera);
 	camera->TickUpdate(timestep);
 
