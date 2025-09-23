@@ -323,6 +323,12 @@ class ndObjectPlacementHelp : public ndDemoEntityManager::ndDemoHelper
 class ndObjectPlacementCamera : public ndDemoCameraNode
 {
 	public:
+	enum ndPlacementState
+	{
+		m_inTraceMode,
+		m_none,
+	};
+
 	ndObjectPlacementCamera(ndRender* const owner)
 		:ndDemoCameraNode(owner)
 		,m_yaw(ndFloat32(0.0f))
@@ -333,6 +339,7 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		,m_mousePosY(ndFloat32(0.0f))
 		,m_frontSpeed(ndFloat32(15.0f))
 		,m_sidewaysSpeed(ndFloat32(10.0f))
+		,m_state(m_none)
 	{
 	}
 
@@ -343,7 +350,14 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		// render the object placemnet Icon
 		//const ndMatrix modelMatrix(m_primitiveMatrix * nodeMatrix);
 		//mesh->Render(owner, modelMatrix, renderMode);
+	}
 
+	virtual void SetTransform(const ndQuaternion& rotation, const ndVector& position) override
+	{
+		ndDemoCameraNode::SetTransform(rotation, position);
+		const ndMatrix matrix(GetTransform().GetMatrix());
+		m_pitch = ndAsin(matrix.m_front.m_y);
+		m_yaw = ndAtan2(-matrix.m_front.m_z, matrix.m_front.m_x);
 	}
 
 	void TickUpdate(ndFloat32 timestep)
@@ -394,7 +408,7 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		ndQuaternion newRotation(matrix);
 		ndDemoCameraNode::SetTransform(newRotation, targetMatrix.m_posit);
 
-		bool mouseState = !scene->GetCaptured() && (scene->GetMouseKeyState(0) && !scene->GetMouseKeyState(1));
+		bool mouseState = !scene->GetCaptured() && (scene->GetMouseKeyState(0) || scene->GetMouseKeyState(1));
 		// do camera rotation, only if we do not have anything picked
 		if (mouseState)
 		{
@@ -431,15 +445,41 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 
 	void DoPlacement()
 	{
+		switch (m_state)
+		{
+			case m_inTraceMode:
+			{
+				if (!ImGui::IsMouseDown(1))
+				{
+					m_state = m_none;
+				}
+				else
+				{
+					TraceLocation();
+				}
+				break;
+			}
 
+			case m_none:
+			default:
+			{
+				if (ImGui::IsMouseDown(1))
+				{
+					m_state = m_inTraceMode;
+				}
+				break;
+			}
+		}
 	}
 
-	virtual void SetTransform(const ndQuaternion& rotation, const ndVector& position) override
+	bool InTraceMode() const
 	{
-		ndDemoCameraNode::SetTransform(rotation, position);
-		const ndMatrix matrix(GetTransform().GetMatrix());
-		m_pitch = ndAsin(matrix.m_front.m_y);
-		m_yaw = ndAtan2(-matrix.m_front.m_z, matrix.m_front.m_x);
+		return true;
+	}
+
+	void TraceLocation()
+	{
+
 	}
 
 	ndFloat32 m_yaw;
@@ -450,6 +490,7 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 	ndFloat32 m_mousePosY;
 	ndFloat32 m_frontSpeed;
 	ndFloat32 m_sidewaysSpeed;
+	ndPlacementState m_state;
 };
 
 void ndObjectPlacement(ndDemoEntityManager* const scene)
