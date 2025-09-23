@@ -40,7 +40,7 @@ void ndDemoCameraNodeFollow::SetTransform(const ndQuaternion& rotation, const nd
 	m_yaw = ndAtan2(-matrix.m_front.m_z, matrix.m_front.m_x);
 }
 
-void ndDemoCameraNodeFollow::TickUpdate(ndFloat32 timestep)
+void ndDemoCameraNodeFollow::TickUpdate(ndFloat32)
 {
 	ndRender* const renderer = GetOwner();
 	ndAssert(renderer);
@@ -51,21 +51,18 @@ void ndDemoCameraNodeFollow::TickUpdate(ndFloat32 timestep)
 	ndFloat32 mouseY;
 	scene->GetMousePosition(mouseX, mouseY);
 	
-	//ndMatrix targetMatrix(m_transform1.GetMatrix());
-	//targetMatrix.m_posit += m_pivot;
-	
-	//if (scene->GetKeyState(ImGuiKey_Q))
-	//{
-	//	targetMatrix.m_posit -= targetMatrix.m_up.Scale(m_sidewaysSpeed * timestep);
-	//}
-	//
-	//if (scene->GetKeyState(ImGuiKey_E))
-	//{
-	//	targetMatrix.m_posit += targetMatrix.m_up.Scale(m_sidewaysSpeed * timestep);
-	//}
 
-	ndMatrix matrix(ndRollMatrix(m_pitch) * ndYawMatrix(m_yaw));
-	ndQuaternion newRotation(matrix);
+	ndAssert(m_parent);
+	const ndMatrix globalMatrix(m_parent->CalculateGlobalMatrix());
+	ndMatrix uprightMatrix(ndGetIdentityMatrix());
+	uprightMatrix.m_right = globalMatrix.m_front.CrossProduct(uprightMatrix.m_up).Normalize();
+	uprightMatrix.m_front = uprightMatrix.m_up.CrossProduct(uprightMatrix.m_right).Normalize();
+	uprightMatrix.m_posit = globalMatrix.m_posit;
+	ndAssert(uprightMatrix.TestOrthogonal());
+	const ndMatrix localUpMatrix(uprightMatrix * globalMatrix.OrthoInverse());
+
+	const ndMatrix camMatrix(ndRollMatrix(m_pitch) * ndYawMatrix(m_yaw) * localUpMatrix);
+	ndQuaternion newRotation(camMatrix);
 	ndDemoCameraNode::SetTransform(newRotation, m_pivot);
 
 	bool mouseState = !scene->GetCaptured() && (scene->GetMouseKeyState(0) && !scene->GetMouseKeyState(1));

@@ -303,8 +303,8 @@ static ndSharedPtr<ndBody> CreateAiPropVehicle(ndDemoEntityManager* const scene)
 
 void ndBasicModel(ndDemoEntityManager* const scene)
 {
-	ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
-	//ndSharedPtr<ndBody> mapBody(BuildHeightFieldTerrain(scene, "grass.png", ndGetIdentityMatrix()));
+	//ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
+	ndSharedPtr<ndBody> mapBody(BuildHeightFieldTerrain(scene, "grass.png", ndGetIdentityMatrix()));
 	
 	ndSharedPtr<ndBody> vehicleBody(CreateAiPropVehicle(scene));
 
