@@ -33,8 +33,8 @@
 //#define DEFAULT_SCENE	8		// static mesh collision
 //#define DEFAULT_SCENE	9		// static compound scene collision
 //#define DEFAULT_SCENE	10		// basic compound shapes
-#define DEFAULT_SCENE	11		// basic model
-//#define DEFAULT_SCENE	12		// object Placement
+//#define DEFAULT_SCENE	11		// basic model
+#define DEFAULT_SCENE	12		// object Placement
  
 //#define DEFAULT_SCENE	8		// particle fluid
 //#define DEFAULT_SCENE	10		// static user mesh collision 
@@ -74,7 +74,7 @@ void ndBasicHeighfieldCollision(ndDemoEntityManager* const scene);
 void ndBasicStaticMeshCollision(ndDemoEntityManager* const scene);
 void ndBasicSceneCompoundCollision(ndDemoEntityManager* const scene);
 
-ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
+ndDemoEntityManager::ndDemos ndDemoEntityManager::m_demosSelection[] =
 {
 	{ "basic rigidbody", ndBasicRigidBody},
 	{ "basic stacking", ndBasicStacks},
@@ -398,9 +398,8 @@ ndDemoEntityManager::ndDemoEntityManager()
 	,m_transparentRenderPass(nullptr)
 	,m_debugDisplayRenderPass(nullptr)
 	,m_environmentTexture(nullptr)
-
-	//,m_renderDemoGUI()
 	,m_animationCache()
+	,m_demoHelper(nullptr)
 	,m_currentScene(DEFAULT_SCENE)
 	,m_lastCurrentScene(DEFAULT_SCENE)
 	,m_framesCount(0)
@@ -411,8 +410,8 @@ ndDemoEntityManager::ndDemoEntityManager()
 	,m_workerThreads(1)
 	,m_debugDisplayMode(0)
 	,m_collisionDisplayMode(0)
-	,m_selectedModel(nullptr)
-	,m_onPostUpdate(nullptr)
+	//,m_selectedModel(nullptr)
+	//,m_onPostUpdate(nullptr)
 	,m_fps(0.0f)
 	,m_timestepAcc(0.0f)
 	,m_currentListenerTimestep(0.0f)
@@ -515,8 +514,6 @@ ndDemoEntityManager::ndDemoEntityManager()
 	Cleanup();
 	ndResetTimer();
 #if 0
-	m_diretionalLightDir = ndVector(-1.0f, 1.0f, 1.0f, 0.0f).Normalize();
-
 	//Test0__();
 	//Test1__();
 	//SimpleRegressionBrainStressTest();
@@ -675,11 +672,11 @@ bool ndDemoEntityManager::GetMouseKeyState (ndInt32 button) const
 	return io.MouseDown[button];
 }
 
-//void ndDemoEntityManager::Set2DDisplayRenderFunction(ndSharedPtr<ndUIEntity>& demoGui)
-void ndDemoEntityManager::Set2DDisplayRenderFunction(ndSharedPtr<ndUIEntity>&)
-{
-	//m_renderDemoGUI = demoGui;
-}
+////void ndDemoEntityManager::Set2DDisplayRenderFunction(ndSharedPtr<ndUIEntity>& demoGui)
+//void ndDemoEntityManager::Set2DDisplayRenderFunction(ndSharedPtr<ndUIEntity>&)
+//{
+//	//m_renderDemoGUI = demoGui;
+//}
 
 bool ndDemoEntityManager::JoystickDetected() const
 {
@@ -778,7 +775,7 @@ void ndDemoEntityManager::Cleanup ()
 		m_world->Sync();
 	}
 
-	RegisterPostUpdate(nullptr);
+	//RegisterPostUpdate(nullptr);
 	m_animationCache.RemoveAll();
 	
 	m_renderer->ResetScene();
@@ -984,8 +981,8 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			// load a demo 
 			if (m_currentScene != -1) 
 			{
-				m_selectedModel = nullptr;
-				RegisterPostUpdate(nullptr);
+				//m_selectedModel = nullptr;
+				//RegisterPostUpdate(nullptr);
 				LoadDemo(m_currentScene);
 				m_lastCurrentScene = m_currentScene;
 				m_currentScene = -1;
@@ -1001,8 +998,9 @@ void ndDemoEntityManager::LoadDemo(ndInt32 menu)
 	char newTitle[256];
 
 	// add a demo camera per demo
+	m_demoHelper = ndSharedPtr<ndDemoHelper>(nullptr);
 	m_renderer->SetCamera(ndSharedPtr<ndRenderSceneNode>(new ndDemoCameraNodeFlyby(*m_renderer)));
-	m_demosSelection[menu].m_launchDemoCallback(this);
+	m_demosSelection[menu].m_demoLauncher(this);
 	
 	snprintf(newTitle, sizeof(newTitle), "Newton Dynamics %d.%.2i demo: %s", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION, m_demosSelection[menu].m_name);
 	m_renderer->SetTitle(newTitle);
@@ -1112,16 +1110,26 @@ void ndDemoEntityManager::RenderStats()
 		}
 	}
 	
-	//if (m_showUI && *m_renderDemoGUI)
-	//{
-	//	if (ImGui::Begin("User Interface", &m_showUI))
-	//	{
-	//		m_renderDemoGUI->RenderHelp();
-	//		ImGui::End();
-	//	}
-	//}
+	if (*m_demoHelper)
+	{
+		if (ImGui::Begin("User Interface", &m_showUI))
+		{
+			m_demoHelper->PresentHelp(this);
+			ImGui::End();
+		}
+
+		if (m_demoHelper->ExpirationTime())
+		{
+			m_demoHelper = ndSharedPtr<ndDemoHelper>(nullptr);
+		}
+	}
 	
 	ShowMainMenuBar();
+}
+
+void ndDemoEntityManager::SetDemoHelp(ndSharedPtr<ndDemoHelper>& helper)
+{
+	m_demoHelper = helper;
 }
 
 void ndDemoEntityManager::CalculateFPS(ndFloat32 timestep)
@@ -1187,15 +1195,15 @@ void ndDemoEntityManager::SetAcceleratedUpdate()
 	m_world->AccelerateUpdates();
 }
 
-void ndDemoEntityManager::RegisterPostUpdate(OnPostUpdate* const postUpdate)
-{
-	if (m_onPostUpdate)
-	{
-		delete m_onPostUpdate;
-	}
-	m_onPostUpdate = postUpdate;
-}
-
+//void ndDemoEntityManager::RegisterPostUpdate(OnPostUpdate* const postUpdate)
+//{
+//	if (m_onPostUpdate)
+//	{
+//		delete m_onPostUpdate;
+//	}
+//	m_onPostUpdate = postUpdate;
+//}
+//
 //void ndDemoEntityManager::OnSubStepPostUpdate(ndFloat32 timestep)
 void ndDemoEntityManager::OnSubStepPostUpdate(ndFloat32)
 {

@@ -306,35 +306,189 @@ class NewtonPhantom : public ndModelNotify
 
 #endif
 
+class ndObjectPlacementHelp : public ndDemoEntityManager::ndDemoHelper
+{
+	virtual void PresentHelp(ndDemoEntityManager* const scene) override
+	{
+		ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		scene->Print(color, "Basic object placement");
+		scene->Print(color, "Right click and drag the location where");
+		scene->Print(color, "where you want to place a dynamic body.");
+		scene->Print(color, "Left click while keeping right click down");
+		scene->Print(color, "to place a dynamics body at the location.");
+		scene->Print(color, "An object will spawn only if the location is stable.");
+	}
+};
+
+class ndObjectPlacementCamera : public ndDemoCameraNode
+{
+	public:
+	ndObjectPlacementCamera(ndRender* const owner)
+		:ndDemoCameraNode(owner)
+		,m_yaw(ndFloat32(0.0f))
+		,m_pitch(ndFloat32(0.0f))
+		,m_yawRate(ndFloat32(0.04f))
+		,m_pitchRate(ndFloat32(0.02f))
+		,m_mousePosX(ndFloat32(0.0f))
+		,m_mousePosY(ndFloat32(0.0f))
+		,m_frontSpeed(ndFloat32(15.0f))
+		,m_sidewaysSpeed(ndFloat32(10.0f))
+	{
+	}
+
+	void Render(const ndRender* const owner, ndFloat32 timeStep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const override
+	{
+		ndDemoCameraNode::Render(owner, timeStep, parentMatrix, renderMode);
+
+		// render the object placemnet Icon
+		//const ndMatrix modelMatrix(m_primitiveMatrix * nodeMatrix);
+		//mesh->Render(owner, modelMatrix, renderMode);
+
+	}
+
+	void TickUpdate(ndFloat32 timestep)
+	{
+		ndRender* const renderer = GetOwner();
+		ndAssert(renderer);
+		ndDemoEntityManager::ndRenderCallback* const renderCallback = (ndDemoEntityManager::ndRenderCallback*)*renderer->GetOwner();
+		ndDemoEntityManager* const scene = renderCallback->m_owner;
+
+		ndFloat32 mouseX;
+		ndFloat32 mouseY;
+		scene->GetMousePosition(mouseX, mouseY);
+
+		// slow down the Camera if we have a Body
+		ndFloat32 slowDownFactor = scene->IsShiftKeyDown() ? 0.5f / 10.0f : 0.5f;
+
+		ndMatrix targetMatrix(m_transform1.GetMatrix());
+
+		// do camera translation
+		if (scene->GetKeyState(ImGuiKey_W))
+		{
+			targetMatrix.m_posit += targetMatrix.m_front.Scale(m_frontSpeed * timestep * slowDownFactor);
+		}
+		if (scene->GetKeyState(ImGuiKey_S))
+		{
+			targetMatrix.m_posit -= targetMatrix.m_front.Scale(m_frontSpeed * timestep * slowDownFactor);
+		}
+		if (scene->GetKeyState(ImGuiKey_A))
+		{
+			targetMatrix.m_posit -= targetMatrix.m_right.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
+		}
+		if (scene->GetKeyState(ImGuiKey_D))
+		{
+			targetMatrix.m_posit += targetMatrix.m_right.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
+		}
+
+		if (scene->GetKeyState(ImGuiKey_Q))
+		{
+			targetMatrix.m_posit -= targetMatrix.m_up.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
+		}
+
+		if (scene->GetKeyState(ImGuiKey_E))
+		{
+			targetMatrix.m_posit += targetMatrix.m_up.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
+		}
+
+		ndMatrix matrix(ndRollMatrix(m_pitch) * ndYawMatrix(m_yaw));
+		ndQuaternion newRotation(matrix);
+		ndDemoCameraNode::SetTransform(newRotation, targetMatrix.m_posit);
+
+		bool mouseState = !scene->GetCaptured() && (scene->GetMouseKeyState(0) && !scene->GetMouseKeyState(1));
+		// do camera rotation, only if we do not have anything picked
+		if (mouseState)
+		{
+			ndFloat32 mouseSpeedX = mouseX - m_mousePosX;
+			ndFloat32 mouseSpeedY = mouseY - m_mousePosY;
+
+			if (ImGui::IsMouseDown(0))
+			{
+				if (mouseSpeedX > 0.0f)
+				{
+					m_yaw = ndAnglesAdd(m_yaw, m_yawRate);
+				}
+				else if (mouseSpeedX < 0.0f)
+				{
+					m_yaw = ndAnglesAdd(m_yaw, -m_yawRate);
+				}
+
+				if (mouseSpeedY > 0.0f)
+				{
+					m_pitch += m_pitchRate;
+				}
+				else if (mouseSpeedY < 0.0f)
+				{
+					m_pitch -= m_pitchRate;
+				}
+				m_pitch = ndClamp(m_pitch, ndFloat32(-80.0f * ndDegreeToRad), ndFloat32(80.0f * ndDegreeToRad));
+			}
+			DoPlacement();
+		}
+
+		m_mousePosX = mouseX;
+		m_mousePosY = mouseY;
+	}
+
+	void DoPlacement()
+	{
+
+	}
+
+	virtual void SetTransform(const ndQuaternion& rotation, const ndVector& position) override
+	{
+		ndDemoCameraNode::SetTransform(rotation, position);
+		const ndMatrix matrix(GetTransform().GetMatrix());
+		m_pitch = ndAsin(matrix.m_front.m_y);
+		m_yaw = ndAtan2(-matrix.m_front.m_z, matrix.m_front.m_x);
+	}
+
+	ndFloat32 m_yaw;
+	ndFloat32 m_pitch;
+	ndFloat32 m_yawRate;
+	ndFloat32 m_pitchRate;
+	ndFloat32 m_mousePosX;
+	ndFloat32 m_mousePosY;
+	ndFloat32 m_frontSpeed;
+	ndFloat32 m_sidewaysSpeed;
+};
+
 void ndObjectPlacement(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
 
-	class PlaceMatrix : public ndMatrix
-	{
-		public:
-		PlaceMatrix(ndFloat32 x, ndFloat32 y, ndFloat32 z)
-			:ndMatrix(ndGetIdentityMatrix())
-		{
-			m_posit.m_x = x;
-			m_posit.m_y = y;
-			m_posit.m_z = z;
-		}
-	};
-
-	
-	AddBox(scene, PlaceMatrix(0.0f, 20.0f, -3.0f), 10.0f, 1.0f, 1.0f, 1.6f);
-	AddSphere(scene, PlaceMatrix(0.0f, 5.0f, 0.0f), 10.0f, 0.5f);
-	AddCapsule(scene, PlaceMatrix(0.0f, 5.0f, 3.0f), 10.0f, 0.25f, 0.7f, 10.0f);
-	AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f, -2.0f), 7.0f, 1.0f, 1.5f, 10);
-	AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f,  2.0f), 10.0f, 1.0f, 1.5f, 20);
-	AddConvexHull(scene, PlaceMatrix( 2.0f, 5.0f,  3.0f), 30.0f, 1.0f, 1.5f, 40);
+	//class PlaceMatrix : public ndMatrix
+	//{
+	//	public:
+	//	PlaceMatrix(ndFloat32 x, ndFloat32 y, ndFloat32 z)
+	//		:ndMatrix(ndGetIdentityMatrix())
+	//	{
+	//		m_posit.m_x = x;
+	//		m_posit.m_y = y;
+	//		m_posit.m_z = z;
+	//	}
+	//};
+	//
+	//
+	//AddBox(scene, PlaceMatrix(0.0f, 20.0f, -3.0f), 10.0f, 1.0f, 1.0f, 1.6f);
+	//AddSphere(scene, PlaceMatrix(0.0f, 5.0f, 0.0f), 10.0f, 0.5f);
+	//AddCapsule(scene, PlaceMatrix(0.0f, 5.0f, 3.0f), 10.0f, 0.25f, 0.7f, 10.0f);
+	//AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f, -2.0f), 7.0f, 1.0f, 1.5f, 10);
+	//AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f,  2.0f), 10.0f, 1.0f, 1.5f, 20);
+	//AddConvexHull(scene, PlaceMatrix( 2.0f, 5.0f,  3.0f), 30.0f, 1.0f, 1.5f, 40);
 
 	// create a Phantom model that contains a collision shape and transform matrix
 	//ndSharedPtr<ndModel> phantomPtr(new ndModel);
 	//phantomPtr->SetNotifyCallback(new NewtonPhantom(scene));
 	//scene->GetWorld()->AddModel(phantomPtr);
+
+	ndSharedPtr<ndDemoEntityManager::ndDemoHelper> demoHelper(new ndObjectPlacementHelp());
+	scene->SetDemoHelp(demoHelper);
+
+	// set a special object placemnet Camera;
+	ndRender* const renderer = *scene->GetRenderer();
+	ndSharedPtr<ndRenderSceneNode> camera(new ndObjectPlacementCamera(renderer));
+	renderer->SetCamera(camera);
 
 	ndQuaternion rot;
 	ndVector origin(-20.0f, 5.0f, 0.0f, 1.0f);
