@@ -19,19 +19,18 @@
 class ndDemoCameraNodeFollow: public ndDemoCameraNode
 {
 	public:
-	ndDemoCameraNodeFollow(ndRender* const owner);
+	ndDemoCameraNodeFollow(ndRender* const owner, const ndVector& pivot, ndFloat32 distance);
 
 	void TickUpdate(ndFloat32 timestep);
 	virtual void SetTransform(const ndQuaternion& rotation, const ndVector& position) override;
 
+	ndVector m_pivot;
 	ndFloat32 m_yaw;
 	ndFloat32 m_pitch;
 	ndFloat32 m_yawRate;
 	ndFloat32 m_pitchRate;
 	ndFloat32 m_mousePosX;
 	ndFloat32 m_mousePosY;
-	ndFloat32 m_frontSpeed;
-	ndFloat32 m_sidewaysSpeed;
 };
 
 #endif 

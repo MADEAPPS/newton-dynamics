@@ -22,6 +22,8 @@
 // 16 mps approximatly 60 kmp
 #define MAX_VEHICLE_PRO_SPEED	12.0f
 
+#define CAMERA_DISTANCE			-7.0f
+
 class BackGroundVehicleController : public ndModel
 {
 	public:
@@ -99,22 +101,22 @@ class BackGroundVehicleController : public ndModel
 		{
 			// apply forward controls
 			m_desiredSpeed = ndFloat32(0.0f);
-			if (m_scene->GetKeyState(ImGuiKey_UpArrow))
+			if (m_scene->GetKeyState(ImGuiKey_W))
 			{
 				m_desiredSpeed = MAX_VEHICLE_PRO_SPEED;
 			}
-			else if (m_scene->GetKeyState(ImGuiKey_DownArrow))
+			else if (m_scene->GetKeyState(ImGuiKey_S))
 			{
 				m_desiredSpeed = -0.5f * MAX_VEHICLE_PRO_SPEED;
 			}
 
 			// apply turning controls
 			m_desiredAngularSpeedFactor = ndFloat32(0.0f);
-			if (m_scene->GetKeyState(ImGuiKey_LeftArrow))
+			if (m_scene->GetKeyState(ImGuiKey_A))
 			{
 				m_desiredAngularSpeedFactor = ndFloat32(0.5f);
 			}
-			else if (m_scene->GetKeyState(ImGuiKey_RightArrow))
+			else if (m_scene->GetKeyState(ImGuiKey_D))
 			{
 				m_desiredAngularSpeedFactor = ndFloat32(-0.5f);
 			}
@@ -299,7 +301,6 @@ static ndSharedPtr<ndBody> CreateAiPropVehicle(ndDemoEntityManager* const scene)
 	return vehicleBody;
 }
 
-#include "ndDemoCameraNodeFlyby.h"
 void ndBasicModel(ndDemoEntityManager* const scene)
 {
 	ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
@@ -308,17 +309,11 @@ void ndBasicModel(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndBody> vehicleBody(CreateAiPropVehicle(scene));
 
 	// attach a follow camera to the vehicle prop
+	const ndVector cameraPivot(0.0f, 2.0f, 0.0f, 0.0f);
 	ndRender* const renderer = *scene->GetRenderer();
 	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)vehicleBody->GetAsBodyKinematic()->GetNotifyCallback();
 	ndSharedPtr<ndRenderSceneNode> vehicleMesh(notify->GetUserData());
-	ndSharedPtr<ndRenderSceneNode> camera(new ndDemoCameraNodeFollow(renderer));
+	ndSharedPtr<ndRenderSceneNode> camera(new ndDemoCameraNodeFollow(renderer, cameraPivot, CAMERA_DISTANCE));
 	renderer->SetCamera(camera);
 	vehicleMesh->AddChild(camera);
-	
-	
-	ndVector floor(FindFloor(*scene->GetWorld(), ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	ndQuaternion rot(ndYawMatrix(0.0f * ndDegreeToRad));
-	floor.m_x -= 10.0f;
-	floor.m_y += 2.0f;
-	scene->SetCameraMatrix(rot, floor);
 }

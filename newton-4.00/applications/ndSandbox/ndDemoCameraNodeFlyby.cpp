@@ -50,7 +50,7 @@ void ndDemoCameraNodeFlyby::TickUpdate(ndFloat32 timestep)
 	// slow down the Camera if we have a Body
 	ndFloat32 slowDownFactor = scene->IsShiftKeyDown() ? 0.5f / 10.0f : 0.5f;
 	
-	ndMatrix targetMatrix(ndCalculateMatrix(m_transform1.m_rotation, m_transform1.m_position));
+	ndMatrix targetMatrix(m_transform1.GetMatrix());
 	
 	// do camera translation
 	if (scene->GetKeyState(ImGuiKey_W))

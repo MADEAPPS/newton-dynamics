@@ -15,17 +15,21 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoCameraNodeFollow.h"
 
-ndDemoCameraNodeFollow::ndDemoCameraNodeFollow(ndRender* const owner)
+ndDemoCameraNodeFollow::ndDemoCameraNodeFollow(ndRender* const owner, const ndVector& pivot, ndFloat32 distance)
 	:ndDemoCameraNode(owner)
+	,m_pivot((pivot & ndVector::m_triplexMask) | ndVector::m_wOne)
 	,m_yaw(ndFloat32(0.0f))
 	,m_pitch(ndFloat32(0.0f))
 	,m_yawRate(ndFloat32(0.04f))
 	,m_pitchRate(ndFloat32(0.02f))
 	,m_mousePosX(ndFloat32(0.0f))
 	,m_mousePosY(ndFloat32(0.0f))
-	,m_frontSpeed(ndFloat32(15.0f))
-	,m_sidewaysSpeed(ndFloat32(10.0f))
 {
+	ndRenderSceneCamera* const camera = FindCameraNode();
+	ndTransform transform (camera->GetTransform());
+	transform.m_position.m_x = distance;
+	camera->SetTransform(transform);
+	camera->SetTransform(transform);
 }
 
 void ndDemoCameraNodeFollow::SetTransform(const ndQuaternion& rotation, const ndVector& position)
@@ -47,42 +51,22 @@ void ndDemoCameraNodeFollow::TickUpdate(ndFloat32 timestep)
 	ndFloat32 mouseY;
 	scene->GetMousePosition(mouseX, mouseY);
 	
-	// slow down the Camera if we have a Body
-	ndFloat32 slowDownFactor = scene->IsShiftKeyDown() ? 0.5f / 10.0f : 0.5f;
+	//ndMatrix targetMatrix(m_transform1.GetMatrix());
+	//targetMatrix.m_posit += m_pivot;
 	
-	ndMatrix targetMatrix(ndCalculateMatrix(m_transform1.m_rotation, m_transform1.m_position));
-	
-	// do camera translation
-	if (scene->GetKeyState(ImGuiKey_W))
-	{
-		targetMatrix.m_posit += targetMatrix.m_front.Scale(m_frontSpeed * timestep * slowDownFactor);
-	}
-	if (scene->GetKeyState(ImGuiKey_S))
-	{
-		targetMatrix.m_posit -= targetMatrix.m_front.Scale(m_frontSpeed * timestep * slowDownFactor);
-	}
-	if (scene->GetKeyState(ImGuiKey_A))
-	{
-		targetMatrix.m_posit -= targetMatrix.m_right.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
-	}
-	if (scene->GetKeyState(ImGuiKey_D))
-	{
-		targetMatrix.m_posit += targetMatrix.m_right.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
-	}
-	
-	if (scene->GetKeyState(ImGuiKey_Q))
-	{
-		targetMatrix.m_posit -= targetMatrix.m_up.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
-	}
-	
-	if (scene->GetKeyState(ImGuiKey_E))
-	{
-		targetMatrix.m_posit += targetMatrix.m_up.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
-	}
+	//if (scene->GetKeyState(ImGuiKey_Q))
+	//{
+	//	targetMatrix.m_posit -= targetMatrix.m_up.Scale(m_sidewaysSpeed * timestep);
+	//}
+	//
+	//if (scene->GetKeyState(ImGuiKey_E))
+	//{
+	//	targetMatrix.m_posit += targetMatrix.m_up.Scale(m_sidewaysSpeed * timestep);
+	//}
 
 	ndMatrix matrix(ndRollMatrix(m_pitch) * ndYawMatrix(m_yaw));
 	ndQuaternion newRotation(matrix);
-	ndDemoCameraNode::SetTransform(newRotation, targetMatrix.m_posit);
+	ndDemoCameraNode::SetTransform(newRotation, m_pivot);
 
 	bool mouseState = !scene->GetCaptured() && (scene->GetMouseKeyState(0) && !scene->GetMouseKeyState(1));
 	// do camera rotation, only if we do not have anything picked
@@ -117,5 +101,5 @@ void ndDemoCameraNodeFollow::TickUpdate(ndFloat32 timestep)
 	m_mousePosX = mouseX;
 	m_mousePosY = mouseY;
 	
-	UpdatePickBody();
+	//UpdatePickBody();
 }
