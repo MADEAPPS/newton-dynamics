@@ -1115,7 +1115,7 @@ dgFloat32 dgContactSolver::RayCast (const dgVector& localP0, const dgVector& loc
 	m_hullDiff[0] = collision->SupportVertex (dir1, NULL) - point;
 	dgBigVector v (m_hullDiff[0]);
 	index = 1;
-	ndInt32 maxIterations = 100;
+	dgInt32 maxIterations = 100;
 	do {
 		dgInt32 iter = 0;
 		dgInt32 cycling = 0;
