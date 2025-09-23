@@ -245,7 +245,7 @@ class BackGroundVehicleController : public ndModel
 	}
 };
 
-static ndSharedPtr<ndBody> CreateAiPropVehicle(ndDemoEntityManager* const scene)
+static ndSharedPtr<ndBody> CreateAiVehicleProp(ndDemoEntityManager* const scene)
 {
 	ndMeshLoader loader;
 	ndSharedPtr<ndRenderSceneNode> vehicleMesh(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("vmw.fbx")));
@@ -306,7 +306,7 @@ void ndBasicModel(ndDemoEntityManager* const scene)
 	//ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
 	ndSharedPtr<ndBody> mapBody(BuildHeightFieldTerrain(scene, "grass.png", ndGetIdentityMatrix()));
 	
-	ndSharedPtr<ndBody> vehicleBody(CreateAiPropVehicle(scene));
+	ndSharedPtr<ndBody> vehicleBody(CreateAiVehicleProp(scene));
 
 	// attach a follow camera to the vehicle prop
 	const ndVector cameraPivot(0.0f, 2.0f, 0.0f, 0.0f);
