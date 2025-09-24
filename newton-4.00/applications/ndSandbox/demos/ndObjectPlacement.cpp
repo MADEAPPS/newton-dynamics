@@ -90,7 +90,6 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		m_meshInventory = entity->GetPrimitive();
 		
 		//ndSharedPtr<ndRenderPrimitive> xxxxx(m_meshInventory->Clone());
-		//m_showIcon = false;
 
 		m_castingShape = loader.m_mesh->CreateCollision();
 	}

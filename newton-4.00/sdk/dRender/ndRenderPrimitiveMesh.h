@@ -22,6 +22,7 @@ class ndRenderPrimitiveMeshMaterial
 {
 	public:
 	ndRenderPrimitiveMeshMaterial();
+	ndRenderPrimitiveMeshMaterial(const ndRenderPrimitiveMeshMaterial& src);
 
 	ndVector m_diffuse;
 	ndVector m_specular;
@@ -36,6 +37,7 @@ class ndRenderPrimitiveMeshSegment
 {
 	public:
 	ndRenderPrimitiveMeshSegment();
+	ndRenderPrimitiveMeshSegment(const ndRenderPrimitiveMeshSegment& src);
 
 	ndRenderPrimitiveMeshMaterial m_material;
 	ndInt32 m_indexCount;

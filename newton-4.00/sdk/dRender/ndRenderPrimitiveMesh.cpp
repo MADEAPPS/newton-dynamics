@@ -27,11 +27,30 @@ ndRenderPrimitiveMeshMaterial::ndRenderPrimitiveMeshMaterial()
 {
 }
 
+ndRenderPrimitiveMeshMaterial::ndRenderPrimitiveMeshMaterial(const ndRenderPrimitiveMeshMaterial& src)
+	:m_diffuse(src.m_diffuse)
+	,m_specular(src.m_specular)
+	,m_reflection(src.m_reflection)
+	,m_specularPower(src.m_specularPower)
+	,m_opacity(src.m_opacity)
+	,m_texture(src.m_texture)
+	,m_castShadows(src.m_castShadows)
+{
+}
+
 ndRenderPrimitiveMeshSegment::ndRenderPrimitiveMeshSegment()
 	:m_material()
 	,m_indexCount(0)
 	,m_segmentStart(0)
 	,m_hasTranparency(0)
+{
+}
+
+ndRenderPrimitiveMeshSegment::ndRenderPrimitiveMeshSegment(const ndRenderPrimitiveMeshSegment& src)
+	:m_material(src.m_material)
+	,m_indexCount(src.m_indexCount)
+	,m_segmentStart(src.m_segmentStart)
+	,m_hasTranparency(src.m_hasTranparency)
 {
 }
 
@@ -46,6 +65,12 @@ ndRenderPrimitiveMesh::ndRenderPrimitiveMesh(const ndRenderPrimitiveMesh& src)
 	,m_implement(nullptr)
 {
 	m_implement = ndSharedPtr<ndRenderPrimitiveMeshImplement>(src.m_implement->Clone(this));
+
+	for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = src.m_segments.GetFirst(); node; node = node->GetNext())
+	{
+		ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
+		m_segments.Append(ndRenderPrimitiveMeshSegment(segment));
+	}
 }
 
 ndRenderPrimitiveMesh::~ndRenderPrimitiveMesh()
