@@ -100,11 +100,10 @@ void ndRenderSceneCamera::SetViewMatrix(ndInt32 width, ndInt32 height)
 	m_viewport[2] = width;
 	m_viewport[3] = height;
 
-	//m_owner->m_context->SetViewport(width, height);
-
 	// set the model view matrix 
-	const ndVector pointOfInterest(m_matrix.m_posit + m_matrix.m_front);
-	m_viewMatrix = CreateLookAtMatrix(m_matrix.m_posit, pointOfInterest, m_matrix.m_up);
+	const ndMatrix matrix(CalculateGlobalMatrix());
+	const ndVector pointOfInterest(matrix.m_posit + matrix.m_front);
+	m_viewMatrix = CreateLookAtMatrix(matrix.m_posit, pointOfInterest, matrix.m_up);
 	m_invViewMatrix = m_viewMatrix.OrthoInverse();
 	
 	// calculate projection matrix

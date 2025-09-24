@@ -228,14 +228,22 @@ void ndRenderSceneNode::SetTransform(const ndQuaternion& rotation, const ndVecto
 
 ndMatrix ndRenderSceneNode::CalculateGlobalMatrix(const ndRenderSceneNode* const root) const
 {
-	ndMatrix matrix(GetTransform().GetMatrix());
-	if (this != root)
+	ndMatrix matrix(m_matrix);
+	for (const ndRenderSceneNode* parent = GetParent(); parent != root; parent = parent->GetParent())
 	{
-		for (const ndRenderSceneNode* parent = GetParent(); parent != root; parent = parent->GetParent())
-		{
-			const ndMatrix parentMatrix(parent->GetTransform().GetMatrix());
-			matrix = matrix * parentMatrix;
-		}
+		const ndMatrix& parentMatrix = parent->m_matrix;
+		matrix = matrix * parentMatrix;
+	}
+	return matrix;
+}
+
+ndMatrix ndRenderSceneNode::CalculateGlobalTransform(const ndRenderSceneNode* const root) const
+{
+	ndMatrix matrix(GetTransform().GetMatrix());
+	for (const ndRenderSceneNode* parent = GetParent(); parent != root; parent = parent->GetParent())
+	{
+		const ndMatrix parentMatrix(parent->GetTransform().GetMatrix());
+		matrix = matrix * parentMatrix;
 	}
 	return matrix;
 }

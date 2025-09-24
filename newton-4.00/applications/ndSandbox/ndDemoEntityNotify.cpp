@@ -101,7 +101,7 @@ ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, const
 	,m_capSpeed(100.0f)
 {
 	ndRenderSceneNode* const parent = entity->GetParent();
-	const ndMatrix parentMatrix(parent ? parent->CalculateGlobalMatrix() : ndGetIdentityMatrix());
+	const ndMatrix parentMatrix(parent ? parent->CalculateGlobalTransform() : ndGetIdentityMatrix());
 	m_bindMatrix = parentMatrix.OrthoInverse();
 }
 

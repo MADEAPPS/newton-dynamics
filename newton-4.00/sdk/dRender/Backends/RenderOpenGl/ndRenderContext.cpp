@@ -76,7 +76,6 @@ ndRenderContext::ndRenderContext(ndRender* const owner, ndInt32 width, ndInt32 h
 
 	SetInputCallbacks();
 	glfwSetWindowSizeCallback(m_mainFrame, ResizeWindowsCallback);
-	//glfwSetFramebufferSizeCallback(m_mainFrame, ResizeWindowsCallback);
 
 	glfwSetWindowSize(m_mainFrame, width, height);
 	SetViewport(width, height);
@@ -180,9 +179,18 @@ void ndRenderContext::InitImGui(const char* const fontPathName)
 	
 	// Setup Dear ImGui style
 	//ImGui::StyleColorsDark();
-	ImGui::StyleColorsLight();
+	//ImGui::StyleColorsLight();
+	//ImGui::StyleColorsClassic();
 	ImGuiStyle* const style = &ImGui::GetStyle();
-	style->Colors[ImGuiCol_WindowBg] = ImVec4(0.94f, 0.94f, 0.94f, 0.5f);
+	ImVec4 paneColor(style->Colors[ImGuiCol_TitleBgActive]);
+	ImVec4 paneActiveColor(paneColor);
+	paneActiveColor.x *= ndReal(1.5f);
+	paneActiveColor.y *= ndReal(1.5f);
+	paneActiveColor.z *= ndReal(1.5f);
+
+	style->Colors[ImGuiCol_TitleBg] = paneColor;
+	style->Colors[ImGuiCol_TitleBgActive] = paneActiveColor;
+	style->Colors[ImGuiCol_MenuBarBg] = paneActiveColor;
 	
 	// Setup Platform/Renderer back ends
 	const char* glsl_version = "#version 450";

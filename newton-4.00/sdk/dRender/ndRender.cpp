@@ -77,6 +77,7 @@ ndSharedPtr<ndRender::ndUserCallback>& ndRender::GetOwner()
 
 void ndRender::SetCamera(const ndSharedPtr<ndRenderSceneNode>& camera)
 {
+	ndAssert(camera->FindCameraNode());
 	m_camera = camera;
 }
 
@@ -200,6 +201,12 @@ void ndRender::Render(ndFloat32 timestep)
 		ndInt32 display_h = m_context->GetHeight();
 		ndRenderSceneCamera* const camera = m_camera->FindCameraNode();
 		camera->SetViewMatrix(display_w, display_h);
+
+		// render the camera mesh, usuattlt an icon
+		if (!m_camera->m_parent)
+		{
+			m_camera->Render(m_camera->m_owner, timestep, ndGetIdentityMatrix(), m_directionalDiffusseNoShadow);
+		}
 
 		for (ndList<ndSharedPtr<ndRenderPass>>::ndNode* node = m_renderPasses.GetFirst(); node; node = node->GetNext())
 		{

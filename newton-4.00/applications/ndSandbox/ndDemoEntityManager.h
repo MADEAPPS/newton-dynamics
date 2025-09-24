@@ -56,25 +56,23 @@ class ndDemoEntityManager : public ndClassAlloc
 		ndDemoEntityManager* m_owner;
 	};
 
-
-	typedef void (*LaunchSDKDemoCallback) (ndDemoEntityManager* const scene);
-	typedef void(*UpdateCameraCallback) (ndDemoEntityManager* const manager, void* const context, ndFloat32 timestep);
-
-	class OnPostUpdate: public ndClassAlloc
-	{
-		public:
-		OnPostUpdate()
-			:ndClassAlloc()
-		{
-		}
-
-		virtual ~OnPostUpdate()
-		{
-		}
-		
-		virtual void OnDebug(ndDemoEntityManager* const, bool) {}
-		virtual void Update(ndDemoEntityManager* const scene, ndFloat32 timestep) = 0;
-	};
+	typedef void (*ndDemoCallbackLauncher) (ndDemoEntityManager* const scene);
+	//typedef void(*UpdateCameraCallback) (ndDemoEntityManager* const manager, void* const context, ndFloat32 timestep);
+	//class OnPostUpdate: public ndClassAlloc
+	//{
+	//	public:
+	//	OnPostUpdate()
+	//		:ndClassAlloc()
+	//	{
+	//	}
+	//
+	//	virtual ~OnPostUpdate()
+	//	{
+	//	}
+	//	
+	//	virtual void OnDebug(ndDemoEntityManager* const, bool) {}
+	//	virtual void Update(ndDemoEntityManager* const scene, ndFloat32 timestep) = 0;
+	//};
 
 	enum ndMenuSelection
 	{
@@ -103,11 +101,32 @@ class ndDemoEntityManager : public ndClassAlloc
 		bool m_memory;
 	};
 
-	class SDKDemos
+	class ndDemos
 	{
 		public:
 		const char *m_name;
-		LaunchSDKDemoCallback m_launchDemoCallback;
+		ndDemoCallbackLauncher m_demoLauncher;
+	};
+
+	class ndDemoHelper: public ndClassAlloc
+	{
+		public:
+		ndDemoHelper()
+			:ndClassAlloc()
+			,m_currentTime(ndGetTimeInMicroseconds())
+		{
+		}
+
+		bool ExpirationTime() const
+		{
+			ndUnsigned64 timestep = ndGetTimeInMicroseconds() - m_currentTime;
+			return timestep > 10 * 1024 * 1024;
+		}
+
+		virtual ~ndDemoHelper() {}
+		virtual void PresentHelp(ndDemoEntityManager* const scene) = 0;
+
+		ndUnsigned64 m_currentTime;
 	};
 
 	class ButtonKey
@@ -144,8 +163,8 @@ class ndDemoEntityManager : public ndClassAlloc
 	bool GetMousePosition (ndFloat32& posX, ndFloat32& posY) const;
 	void SetCameraMatrix (const ndQuaternion& rotation, const ndVector& position);
 	
-	void SetSelectedModel(ndModel* const model);
-	void Set2DDisplayRenderFunction(ndSharedPtr<ndUIEntity>& demoGui);
+	//void SetSelectedModel(ndModel* const model);
+	//void Set2DDisplayRenderFunction(ndSharedPtr<ndUIEntity>& demoGui);
 
 	bool AnyKeyDown() const;
 	bool IsShiftKeyDown () const;
@@ -170,11 +189,14 @@ class ndDemoEntityManager : public ndClassAlloc
 	void SetDebugDisplay(ndInt32 mode) const;
 
 	void SetAcceleratedUpdate(); 
-	ndVector GetDirectionsLight() const;
+	//ndVector GetDirectionsLight() const;
 	ndSharedPtr<ndAnimationSequence> GetAnimationSequence(ndMeshLoader& loader, const char* const meshName);
-	void RegisterPostUpdate(OnPostUpdate* const postUpdate);
+
+	//void RegisterPostUpdate(OnPostUpdate* const postUpdate);
 
 	void RenderStats();
+	void SetDemoHelp(ndSharedPtr<ndDemoHelper>& helper);
+
 	private:
 	void Cleanup();
 
@@ -203,9 +225,10 @@ class ndDemoEntityManager : public ndClassAlloc
 	ndSharedPtr<ndRenderPass> m_transparentRenderPass;
 	ndSharedPtr<ndRenderPass> m_debugDisplayRenderPass;
 	ndSharedPtr<ndRenderTexture> m_environmentTexture;
-
 	
 	ndTree<ndSharedPtr<ndAnimationSequence>, ndString> m_animationCache;
+
+	ndSharedPtr<ndDemoHelper> m_demoHelper;
 
 	ndInt32 m_currentScene;
 	ndInt32 m_lastCurrentScene;
@@ -217,8 +240,8 @@ class ndDemoEntityManager : public ndClassAlloc
 	ndInt32 m_workerThreads;
 	ndInt32 m_debugDisplayMode;
 	ndInt32 m_collisionDisplayMode;
-	ndModel* m_selectedModel;
-	OnPostUpdate* m_onPostUpdate;
+	//ndModel* m_selectedModel;
+	//OnPostUpdate* m_onPostUpdate;
 
 	ndFloat32 m_fps;
 	ndFloat32 m_timestepAcc;
@@ -250,8 +273,8 @@ class ndDemoEntityManager : public ndClassAlloc
 	
 	ndWorld::ndSolverModes m_solverMode;
 
-	ndVector m_diretionalLightDir;
-	static SDKDemos m_demosSelection[];
+	//ndVector m_diretionalLightDir;
+	static ndDemos m_demosSelection[];
 
 	friend class ndPhysicsWorld;
 };
@@ -277,14 +300,14 @@ inline void ndDemoEntityManager::SetDebugDisplay(ndInt32) const
 	ndAssert (0);
 }
 
-inline void ndDemoEntityManager::SetSelectedModel(ndModel* const model)
-{
-	m_selectedModel = model;
-}
-
-inline ndVector ndDemoEntityManager::GetDirectionsLight() const
-{
-	return m_diretionalLightDir;
-}
+//inline void ndDemoEntityManager::SetSelectedModel(ndModel* const model)
+//{
+//	m_selectedModel = model;
+//}
+//
+//inline ndVector ndDemoEntityManager::GetDirectionsLight() const
+//{
+//	return m_diretionalLightDir;
+//}
 
 #endif
