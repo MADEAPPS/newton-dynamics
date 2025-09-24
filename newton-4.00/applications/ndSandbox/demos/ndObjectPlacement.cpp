@@ -88,6 +88,10 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		ndSharedPtr<ndRenderSceneNode> entity(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("tpot.fbx")));
 		m_primitiveOffsetMatrix = entity->m_primitiveMatrix;
 		m_meshInventory = entity->GetPrimitive();
+		
+		//ndSharedPtr<ndRenderPrimitive> xxxxx(m_meshInventory->Clone());
+		//m_showIcon = false;
+
 		m_castingShape = loader.m_mesh->CreateCollision();
 	}
 
@@ -98,6 +102,7 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		if (m_showIcon)
 		{
 			const ndMatrix modelMatrix(m_primitiveOffsetMatrix * m_placementMatrix);
+			//m_meshInventory->Render(owner, modelMatrix, renderMode);
 			m_meshInventory->Render(owner, modelMatrix, m_directionalDiffusseShadow);
 		}
 	}

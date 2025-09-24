@@ -51,6 +51,27 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(ndRenderPrimitive
 	m_opaqueDifusedColorNoShadowInstanceBlock.GetShaderParameters(*m_context->m_shaderCache);
 }
 
+ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(const ndRenderPrimitiveMeshImplement& src)
+	:ndContainersFreeListAlloc<ndRenderPrimitiveMeshImplement>()
+	,m_owner(nullptr)
+	,m_context(src.m_context)
+	,m_indexCount(src.m_indexCount)
+	,m_vertexCount(src.m_vertexCount)
+	,m_indexBuffer(0)
+	,m_vertexBuffer(0)
+	,m_vertextArrayBuffer(0)
+	,m_instanceRenderMatrixPalleteBuffer(0)
+{
+	m_indexCount *= 1;
+
+	//m_generateShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
+	//m_transparencyDiffusedBlock.GetShaderParameters(*m_context->m_shaderCache);
+	//m_opaqueDifusedColorShadowBlock.GetShaderParameters(*m_context->m_shaderCache);
+	//m_generateIntanceShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
+	//m_opaqueDifusedColorNoShadowBlock.GetShaderParameters(*m_context->m_shaderCache);
+	//m_opaqueDifusedColorNoShadowInstanceBlock.GetShaderParameters(*m_context->m_shaderCache);
+}
+
 ndRenderPrimitiveMeshImplement::~ndRenderPrimitiveMeshImplement()
 {
 	if (m_instanceRenderMatrixPalleteBuffer)
@@ -72,6 +93,13 @@ ndRenderPrimitiveMeshImplement::~ndRenderPrimitiveMeshImplement()
 	{
 		glDeleteVertexArrays(1, &m_vertextArrayBuffer);
 	}
+}
+
+ndRenderPrimitiveMeshImplement* ndRenderPrimitiveMeshImplement::Clone(ndRenderPrimitiveMesh* const owner) const
+{
+	ndRenderPrimitiveMeshImplement* const mesh = new ndRenderPrimitiveMeshImplement(*this);
+	mesh->m_owner = owner;
+	return mesh;
 }
 
 void ndRenderPrimitiveMeshImplement::BuildFromCollisionShape(const ndRenderPrimitiveMesh::ndDescriptor& descriptor)

@@ -43,8 +43,9 @@ ndRenderPrimitiveMesh::ndRenderPrimitiveMesh()
 
 ndRenderPrimitiveMesh::ndRenderPrimitiveMesh(const ndRenderPrimitiveMesh& src)
 	:ndRenderPrimitive(src)
+	,m_implement(nullptr)
 {
-	ndAssert(0);
+	m_implement = ndSharedPtr<ndRenderPrimitiveMeshImplement>(src.m_implement->Clone(this));
 }
 
 ndRenderPrimitiveMesh::~ndRenderPrimitiveMesh()
@@ -58,9 +59,9 @@ ndRenderPrimitive* ndRenderPrimitiveMesh::Clone()
 
 ndSharedPtr<ndRenderPrimitive> ndRenderPrimitiveMesh::CreateMeshPrimitive(const ndDescriptor& descriptor)
 {
-	ndRenderPrimitiveMesh* const primtive = new ndRenderPrimitiveMesh();
-	primtive->m_implement = ndSharedPtr<ndRenderPrimitiveMeshImplement>(new ndRenderPrimitiveMeshImplement(primtive, descriptor));
-	return ndSharedPtr<ndRenderPrimitive>(primtive);
+	ndRenderPrimitiveMesh* const primitive = new ndRenderPrimitiveMesh();
+	primitive->m_implement = ndSharedPtr<ndRenderPrimitiveMeshImplement>(new ndRenderPrimitiveMeshImplement(primitive, descriptor));
+	return ndSharedPtr<ndRenderPrimitive>(primitive);
 }
 
 void ndRenderPrimitiveMesh::Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderPassMode) const

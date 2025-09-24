@@ -12,11 +12,9 @@
 #define __ND_RENDER_SCENE_NODE_INSTANCE_IMPLEMENT_H__
 
 #include "ndRenderStdafx.h"
-//#include "ndRenderShader.h"
 #include "ndRenderContext.h"
 #include "ndRenderSceneNode.h"
 #include "ndRenderOpenGlUtil.h"
-//#include "ndRenderShaderCache.h"
 
 class ndRenderSceneNodeInstance;
 class ndRenderSceneNodeInstanceImplement : public ndContainersFreeListAlloc<ndRenderSceneNodeInstanceImplement>

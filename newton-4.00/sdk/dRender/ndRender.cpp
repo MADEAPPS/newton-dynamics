@@ -214,7 +214,7 @@ void ndRender::Render(ndFloat32 timestep)
 		// render the camera mesh, usually an icon
 		if (!m_camera->m_parent)
 		{
-			m_camera->Render(m_camera->m_owner, timestep, ndGetIdentityMatrix(), m_directionalDiffusseShadow);
+			m_camera->Render(m_camera->m_owner, timestep, ndGetIdentityMatrix(), m_directionalDiffusseNoShadow);
 		}
 
 		m_context->EndFrame();

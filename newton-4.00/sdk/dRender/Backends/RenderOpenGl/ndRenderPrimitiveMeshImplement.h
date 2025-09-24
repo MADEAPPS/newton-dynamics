@@ -24,8 +24,11 @@ class ndRenderPrimitiveMeshSegment;
 class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRenderPrimitiveMeshImplement>
 {
 	public:
+	ndRenderPrimitiveMeshImplement(const ndRenderPrimitiveMeshImplement& src);
 	ndRenderPrimitiveMeshImplement(ndRenderPrimitiveMesh* const owner, const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
 	~ndRenderPrimitiveMeshImplement();
+
+	ndRenderPrimitiveMeshImplement* Clone(ndRenderPrimitiveMesh* const owner) const;
 
 	void BuildFromMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
 	void BuildFromCollisionShape(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
