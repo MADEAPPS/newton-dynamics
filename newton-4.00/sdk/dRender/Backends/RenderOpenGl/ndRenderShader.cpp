@@ -390,7 +390,6 @@ void ndRenderShaderOpaqueDiffusedShadowColorBlock::SetParameters(GLuint shader)
 
 void ndRenderShaderOpaqueDiffusedShadowColorBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	//const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
 	const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
 	
 	const ndMatrix viewMatrix(camera->m_invViewMatrix);
@@ -410,7 +409,6 @@ void ndRenderShaderOpaqueDiffusedShadowColorBlock::Render(const ndRenderPrimitiv
 	glUniform3fv(m_directionalLightAmbient, 1, &glSunlightAmbient[0]);
 	glUniform3fv(m_directionalLightIntesity, 1, &glSunlightIntensity[0]);
 	
-	//glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &glViewModelMatrix[0][0]);
 	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &glProjectionMatrix[0][0]);
 	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &glViewModelMatrix[0][0]);
 	
@@ -493,7 +491,6 @@ void ndRenderShaderTransparentDiffusedShadowColorBlock::SetWidingMode(bool clock
 
 void ndRenderShaderTransparentDiffusedShadowColorBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	//const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
 	const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
 	
 	glUseProgram(m_shader);
