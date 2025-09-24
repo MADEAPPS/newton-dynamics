@@ -63,6 +63,7 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 
 	ndObjectPlacementCamera(ndRender* const owner)
 		:ndDemoCameraNode(owner)
+		,m_placementMatrix(ndGetIdentityMatrix())
 		,m_meshInventory(nullptr)
 		,m_castingSphere(new ndShapeSphere(ndFloat32(0.125f)))
 		,m_placementColor(0.0f, 0.0f, 0.0f, 0.0f)
@@ -77,6 +78,7 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		,m_frontSpeed(ndFloat32(15.0f))
 		,m_sidewaysSpeed(ndFloat32(10.0f))
 		,m_state(m_none)
+		,m_showIcon(false)
 	{
 		ndMeshLoader loader;
 		ndDemoEntityManager::ndRenderCallback* const renderCallback = (ndDemoEntityManager::ndRenderCallback*)*owner->GetOwner();
@@ -93,11 +95,7 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 
 		if (m_showIcon)
 		{
-			ndMatrix xxxxx(ndGetIdentityMatrix());
-			xxxxx.m_posit.m_x = 5.0f;
-
-			// render the object placement primitive icon
-			const ndMatrix modelMatrix(m_primitiveOffsetMatrix * xxxxx * m_matrix * parentMatrix);
+			const ndMatrix modelMatrix(m_primitiveOffsetMatrix * m_placementMatrix);
 			m_meshInventory->Render(owner, modelMatrix, m_directionalDiffusseShadow);
 		}
 	}
@@ -246,6 +244,8 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		if (CastRay(scene, matrixStart))
 		{
 			m_showIcon = true;
+
+			m_placementMatrix = matrixStart;
 			if (CalculatePlacementMatrix(matrixStart))
 			{
 				m_placementColor = m_validPlacement;
@@ -277,13 +277,14 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		{
 			matrixStart = ndGetIdentityMatrix();
 			matrixStart.m_posit = p0 + (p1 - p0).Scale(caster.m_param);
-			matrixStart.m_posit.m_w = ndFloat32(0.0f);
+			matrixStart.m_posit.m_w = ndFloat32(1.0f);
 			return true;
 		}
 		return false;
 	}
 
 	// for now just sone mesh
+	ndMatrix m_placementMatrix;
 	ndMatrix m_primitiveOffsetMatrix;
 	ndSharedPtr<ndRenderPrimitive> m_meshInventory;
 	ndShapeInstance m_castingSphere;
@@ -300,7 +301,6 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 	ndFloat32 m_sidewaysSpeed;
 	ndPlacementState m_state;
 	bool m_showIcon;
-	
 };
 
 void ndObjectPlacement(ndDemoEntityManager* const scene)
