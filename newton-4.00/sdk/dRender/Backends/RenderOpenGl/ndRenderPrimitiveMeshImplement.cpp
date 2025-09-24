@@ -62,7 +62,38 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(const ndRenderPri
 	,m_vertextArrayBuffer(0)
 	,m_instanceRenderMatrixPalleteBuffer(0)
 {
-	m_indexCount *= 1;
+	if (src.m_instanceRenderMatrixPalleteBuffer)
+	{
+		ndAssert(0);
+		//glDeleteBuffers(1, &m_instanceRenderMatrixPalleteBuffer);
+	}
+
+	if (src.m_indexBuffer)
+	{
+		ndArray<ndInt32> indices;
+		indices.SetCount(m_indexCount);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, src.m_indexBuffer);
+		ndInt32* const srcData = (ndInt32*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY);
+		ndMemCpy(&indices[0], srcData, m_indexCount);
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		glGenBuffers(1, &m_indexBuffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, GLsizeiptr(m_indexCount * sizeof(GLuint)), &indices[0], GL_STATIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	}
+
+	if (src.m_vertexBuffer)
+	{
+		ndAssert(0);
+		//glDeleteBuffers(1, &m_vertexBuffer);
+	}
+
+	if (src.m_vertextArrayBuffer)
+	{
+		ndAssert(0);
+		//glDeleteVertexArrays(1, &m_vertextArrayBuffer);
+	}
 
 	//m_generateShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
 	//m_transparencyDiffusedBlock.GetShaderParameters(*m_context->m_shaderCache);
