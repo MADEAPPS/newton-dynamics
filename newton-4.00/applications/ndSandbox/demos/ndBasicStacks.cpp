@@ -24,11 +24,11 @@ static ndSharedPtr<ndBody> AddRigidBody(ndDemoEntityManager* const scene,
 
 	const ndMatrix bindMatrix(rootEntity->GetTransform().GetMatrix());
 	const ndMatrix localMatrix(matrix* bindMatrix);
-	ndSharedPtr<ndRenderSceneNode>instance(new ndRenderSceneNode(localMatrix));
-	rootEntity->AddChild(instance);
+	ndSharedPtr<ndRenderSceneNode>sceneNode(new ndRenderSceneNode(localMatrix));
+	rootEntity->AddChild(sceneNode);
 
 	ndSharedPtr<ndBody> body(new ndBodyDynamic());
-	body->SetNotifyCallback(new ndDemoEntityNotify(scene, instance));
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, sceneNode));
 	body->SetMatrix(matrix);
 	body->GetAsBodyKinematic()->SetCollisionShape(shape);
 	body->GetAsBodyKinematic()->SetMassMatrix(mass, shape);
