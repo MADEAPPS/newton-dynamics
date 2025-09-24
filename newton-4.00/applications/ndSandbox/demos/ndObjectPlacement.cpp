@@ -40,6 +40,7 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 	{
 		m_inTraceMode,
 		m_hasValidPlacement,
+		m_releasePlacemnet,
 		m_none,
 	};
 
@@ -65,7 +66,7 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		:ndDemoCameraNode(owner)
 		,m_placementMatrix(ndGetIdentityMatrix())
 		,m_meshInventory(nullptr)
-		,m_castingSphere(new ndShapeSphere(ndFloat32(0.125f)))
+		,m_castingShape(nullptr)
 		,m_placementColor(0.0f, 0.0f, 0.0f, 0.0f)
 		,m_validPlacement(0.0f, 0.0f, 1.0f, 0.0f)
 		,m_invalidPlacement(1.0f, 0.0f, 0.0f, 0.0f)
@@ -87,6 +88,7 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		ndSharedPtr<ndRenderSceneNode> entity(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("tpot.fbx")));
 		m_primitiveOffsetMatrix = entity->m_primitiveMatrix;
 		m_meshInventory = entity->GetPrimitive();
+		m_castingShape = loader.m_mesh->CreateCollision();
 	}
 
 	void Render(const ndRender* const owner, ndFloat32 timestep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const override
@@ -158,7 +160,7 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 
 		bool mouseState = !scene->GetCaptured() && (scene->GetMouseKeyState(0) || scene->GetMouseKeyState(1));
 		// do camera rotation, only if we do not have anything picked
-		if (mouseState)
+		if (mouseState && (m_state == m_none))
 		{
 			ndFloat32 mouseSpeedX = mouseX - m_mousePosX;
 			ndFloat32 mouseSpeedY = mouseY - m_mousePosY;
@@ -205,14 +207,30 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 				}
 				else
 				{
-					TraceLocation(scene);
+					if (TraceLocation(scene) && ImGui::IsMouseDown(0))
+					{
+						m_state = m_hasValidPlacement;
+					}
 				}
 				break;
 			}
 
 			case m_hasValidPlacement:
 			{
-				ndAssert(0);
+				// place an object at this location and move to the freeze state
+				SpawnObjectAtLocation();
+				m_state = m_releasePlacemnet;
+				break;
+			}
+
+			case m_releasePlacemnet:
+			{
+				TraceLocation(scene);
+				if (!(ImGui::IsMouseDown(0) && ImGui::IsMouseDown(1)))
+				{
+					// start the cicle again
+					m_state = m_none;
+				}
 				break;
 			}
 
@@ -257,7 +275,7 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 
 	bool CalculatePlacementMatrix(const ndMatrix matrixStart)
 	{
-		return false;
+		return true;
 	}
 
 	bool CastRay(ndDemoEntityManager* const scene, ndMatrix& matrixStart) const
@@ -271,7 +289,7 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		const ndVector p0(camera->ScreenToWorld(ndVector(mouseX, mouseY, ndFloat32(0.0f), ndFloat32(0.0f))));
 		const ndVector p1(camera->ScreenToWorld(ndVector(mouseX, mouseY, ndFloat32(1.0f), ndFloat32(0.0f))));
 
-		ndSphereCast caster(*world, p0, p1, m_castingSphere);
+		ndSphereCast caster(*world, p0, p1, **m_castingShape);
 
 		if (caster.m_param <= ndFloat32(1.0f))
 		{
@@ -283,11 +301,16 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		return false;
 	}
 
+	void SpawnObjectAtLocation()
+	{
+		ndTrace(("place object\n"));
+	}
+
 	// for now just sone mesh
 	ndMatrix m_placementMatrix;
 	ndMatrix m_primitiveOffsetMatrix;
 	ndSharedPtr<ndRenderPrimitive> m_meshInventory;
-	ndShapeInstance m_castingSphere;
+	ndSharedPtr<ndShapeInstance> m_castingShape;
 	ndVector m_placementColor;
 	ndVector m_validPlacement;
 	ndVector m_invalidPlacement;
