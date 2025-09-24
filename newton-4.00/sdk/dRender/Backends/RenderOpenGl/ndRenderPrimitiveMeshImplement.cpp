@@ -28,6 +28,7 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(ndRenderPrimitive
 	,m_context(*descriptor.m_render->m_context)
 	,m_indexCount(0)
 	,m_vertexCount(0)
+	,m_vertexSize(0)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vertextArrayBuffer(0)
@@ -57,6 +58,7 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(const ndRenderPri
 	,m_context(src.m_context)
 	,m_indexCount(src.m_indexCount)
 	,m_vertexCount(src.m_vertexCount)
+	,m_vertexSize(src.m_vertexSize)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vertextArrayBuffer(0)
@@ -75,7 +77,6 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(const ndRenderPri
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, src.m_indexBuffer);
 		ndInt32* const srcData = (ndInt32*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY);
 		ndMemCpy(&indices[0], srcData, m_indexCount);
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 		glGenBuffers(1, &m_indexBuffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
@@ -85,22 +86,47 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(const ndRenderPri
 
 	if (src.m_vertexBuffer)
 	{
-		ndAssert(0);
-		//glDeleteBuffers(1, &m_vertexBuffer);
+		ndArray<ndInt32> vertexBuffer;
+		vertexBuffer.SetCount(m_vertexSize * m_vertexCount);
+		glBindBuffer(GL_ARRAY_BUFFER, src.m_vertexBuffer);
+		ndInt32* const srcData = (ndInt32*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
+		ndMemCpy(&vertexBuffer[0], srcData, m_vertexSize * m_vertexCount);
+		
+		glGenBuffers(1, &m_vertexBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+		glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(m_vertexSize * m_vertexCount), &vertexBuffer[0], GL_STATIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
 	if (src.m_vertextArrayBuffer)
 	{
-		ndAssert(0);
-		//glDeleteVertexArrays(1, &m_vertextArrayBuffer);
+		glGenVertexArrays(1, &m_vertextArrayBuffer);
+		glBindVertexArray(m_vertextArrayBuffer);
+
+		size_t offset = 0;
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, GLsizei(m_vertexSize), (void*)offset);
+		offset += 3 * sizeof(ndReal);
+		if (offset < size_t(m_vertexSize))
+		{
+			glEnableVertexAttribArray(1);
+			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, GLsizei(m_vertexSize), (void*)offset);
+			offset += 3 * sizeof(ndReal);
+			if (offset < size_t(m_vertexSize))
+			{
+				glEnableVertexAttribArray(2);
+				glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, GLsizei(m_vertexSize), (void*)offset);
+			}
+		}
+		glBindVertexArray(0);
 	}
 
-	//m_generateShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
-	//m_transparencyDiffusedBlock.GetShaderParameters(*m_context->m_shaderCache);
-	//m_opaqueDifusedColorShadowBlock.GetShaderParameters(*m_context->m_shaderCache);
-	//m_generateIntanceShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
-	//m_opaqueDifusedColorNoShadowBlock.GetShaderParameters(*m_context->m_shaderCache);
-	//m_opaqueDifusedColorNoShadowInstanceBlock.GetShaderParameters(*m_context->m_shaderCache);
+	m_generateShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
+	m_transparencyDiffusedBlock.GetShaderParameters(*m_context->m_shaderCache);
+	m_opaqueDifusedColorShadowBlock.GetShaderParameters(*m_context->m_shaderCache);
+	m_generateIntanceShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
+	m_opaqueDifusedColorNoShadowBlock.GetShaderParameters(*m_context->m_shaderCache);
+	m_opaqueDifusedColorNoShadowInstanceBlock.GetShaderParameters(*m_context->m_shaderCache);
 }
 
 ndRenderPrimitiveMeshImplement::~ndRenderPrimitiveMeshImplement()
@@ -315,6 +341,7 @@ void ndRenderPrimitiveMeshImplement::BuildRenderMeshFromCollisionShape(const ndR
 	glGenBuffers(1, &m_vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(points.GetCount() * sizeof(glPositionNormalUV)), &points[0], GL_STATIC_DRAW);
+	m_vertexSize = sizeof(glPositionNormalUV);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormalUV), (void*)OFFSETOF(glPositionNormalUV, m_posit));
@@ -419,6 +446,7 @@ void ndRenderPrimitiveMeshImplement::BuildRenderMeshFromMeshEffect(const ndRende
 	glGenBuffers(1, &m_vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(points.GetCount() * sizeof(glPositionNormalUV)), &points[0], GL_STATIC_DRAW);
+	m_vertexSize = sizeof(glPositionNormalUV);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormalUV), (void*)OFFSETOF(glPositionNormalUV, m_posit));
@@ -501,6 +529,7 @@ void ndRenderPrimitiveMeshImplement::BuildDebugFlatShadedMesh(const ndRenderPrim
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 
 		glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(vertexCount * sizeof(glPositionNormal)), &drawShapes.m_triangles[0].m_posit.m_x, GL_STATIC_DRAW);
+		m_vertexSize = sizeof(glPositionNormal);
 
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormal), (void*)OFFSETOF(glPositionNormal, m_posit));
@@ -590,6 +619,7 @@ void ndRenderPrimitiveMeshImplement::BuildWireframeDebugMesh(const ndRenderPrimi
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 
 		glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(vertexCount * sizeof(glPositionNormal)), &drawShapes.m_lines[0].m_posit.m_x, GL_STATIC_DRAW);
+		m_vertexSize = sizeof(glPositionNormal);
 
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormal), (void*)OFFSETOF(glPositionNormal, m_posit));
@@ -675,6 +705,7 @@ void ndRenderPrimitiveMeshImplement::BuildSetZBufferDebugMesh(const ndRenderPrim
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 
 		glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(vertexCount * sizeof(glVector3)), &drawShapes.m_triangles[0].m_x, GL_STATIC_DRAW);
+		m_vertexSize = sizeof(glVector3);
 
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glVector3), 0);
@@ -823,6 +854,7 @@ void ndRenderPrimitiveMeshImplement::BuildRenderInstanceMesh(const ndRenderPrimi
 	glGenBuffers(1, &m_vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(points.GetCount() * sizeof(glPositionNormalUV)), &points[0], GL_STATIC_DRAW);
+	m_vertexSize = sizeof(glPositionNormalUV);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormalUV), (void*)OFFSETOF(glPositionNormalUV, m_posit));

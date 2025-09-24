@@ -59,6 +59,7 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 
 	GLint m_indexCount;
 	GLint m_vertexCount;
+	GLint m_vertexSize;
 
 	GLuint m_indexBuffer;
 	GLuint m_vertexBuffer;
