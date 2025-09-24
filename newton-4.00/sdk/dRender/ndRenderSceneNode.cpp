@@ -200,6 +200,11 @@ void ndRenderSceneNode::SetPrimitive(const ndSharedPtr<ndRenderPrimitive>& primi
 	m_primitive = primitive;
 }
 
+ndSharedPtr<ndRenderPrimitive> ndRenderSceneNode::GetPrimitive() const
+{
+	return m_primitive;
+}
+
 ndRender* ndRenderSceneNode::GetOwner() const
 {
 	return m_owner;

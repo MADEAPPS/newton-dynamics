@@ -63,7 +63,8 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 
 	ndObjectPlacementCamera(ndRender* const owner)
 		:ndDemoCameraNode(owner)
-		,m_meshInvetory(nullptr)
+		,m_placementMatrix(ndGetIdentityMatrix())
+		,m_meshInventory(nullptr)
 		,m_castingSphere(new ndShapeSphere(ndFloat32(0.125f)))
 		,m_placementColor(0.0f, 0.0f, 0.0f, 0.0f)
 		,m_validPlacement(0.0f, 0.0f, 1.0f, 0.0f)
@@ -77,25 +78,26 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		,m_frontSpeed(ndFloat32(15.0f))
 		,m_sidewaysSpeed(ndFloat32(10.0f))
 		,m_state(m_none)
+		,m_showIcon(false)
 	{
 		ndMeshLoader loader;
 		ndDemoEntityManager::ndRenderCallback* const renderCallback = (ndDemoEntityManager::ndRenderCallback*)*owner->GetOwner();
 		ndDemoEntityManager* const scene = renderCallback->m_owner;
 
-		m_meshInvetory = loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("tpot.fbx"));
-		//ndSharedPtr<ndShapeInstance>compoundShapeInstance(loader.m_mesh->CreateCollision());
+		ndSharedPtr<ndRenderSceneNode> entity(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("tpot.fbx")));
+		m_primitiveOffsetMatrix = entity->m_primitiveMatrix;
+		m_meshInventory = entity->GetPrimitive();
 	}
 
 	void Render(const ndRender* const owner, ndFloat32 timestep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const override
 	{
 		ndDemoCameraNode::Render(owner, timestep, parentMatrix, renderMode);
 
-		ndMatrix xxxxx(ndGetIdentityMatrix());
-		xxxxx.m_posit.m_x = 10.0f;
-
-		// render the object placemnet Icon
-		const ndMatrix modelMatrix(xxxxx * m_matrix * parentMatrix);
-		m_meshInvetory->Render(owner, timestep, modelMatrix, m_directionalDiffusseShadow);
+		if (m_showIcon)
+		{
+			const ndMatrix modelMatrix(m_primitiveOffsetMatrix * m_placementMatrix);
+			m_meshInventory->Render(owner, modelMatrix, m_directionalDiffusseShadow);
+		}
 	}
 
 	virtual void SetTransform(const ndQuaternion& rotation, const ndVector& position) override
@@ -242,6 +244,8 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		if (CastRay(scene, matrixStart))
 		{
 			m_showIcon = true;
+
+			m_placementMatrix = matrixStart;
 			if (CalculatePlacementMatrix(matrixStart))
 			{
 				m_placementColor = m_validPlacement;
@@ -273,14 +277,16 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		{
 			matrixStart = ndGetIdentityMatrix();
 			matrixStart.m_posit = p0 + (p1 - p0).Scale(caster.m_param);
-			matrixStart.m_posit.m_w = ndFloat32(0.0f);
+			matrixStart.m_posit.m_w = ndFloat32(1.0f);
 			return true;
 		}
 		return false;
 	}
 
-	// for now jut sone mesh
-	ndSharedPtr<ndRenderSceneNode> m_meshInvetory;
+	// for now just sone mesh
+	ndMatrix m_placementMatrix;
+	ndMatrix m_primitiveOffsetMatrix;
+	ndSharedPtr<ndRenderPrimitive> m_meshInventory;
 	ndShapeInstance m_castingSphere;
 	ndVector m_placementColor;
 	ndVector m_validPlacement;
@@ -295,7 +301,6 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 	ndFloat32 m_sidewaysSpeed;
 	ndPlacementState m_state;
 	bool m_showIcon;
-	
 };
 
 void ndObjectPlacement(ndDemoEntityManager* const scene)
