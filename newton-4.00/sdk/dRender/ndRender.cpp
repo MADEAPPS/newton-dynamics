@@ -202,12 +202,6 @@ void ndRender::Render(ndFloat32 timestep)
 		ndRenderSceneCamera* const camera = m_camera->FindCameraNode();
 		camera->SetViewMatrix(display_w, display_h);
 
-		// render the camera mesh, usuattlt an icon
-		if (!m_camera->m_parent)
-		{
-			m_camera->Render(m_camera->m_owner, timestep, ndGetIdentityMatrix(), m_directionalDiffusseNoShadow);
-		}
-
 		for (ndList<ndSharedPtr<ndRenderPass>>::ndNode* node = m_renderPasses.GetFirst(); node; node = node->GetNext())
 		{
 			const ndSharedPtr<ndRenderPass>& pass = node->GetInfo();
@@ -216,6 +210,13 @@ void ndRender::Render(ndFloat32 timestep)
 				pass->RenderScene(timestep);
 			}
 		}
+
+		// render the camera mesh, usually an icon
+		if (!m_camera->m_parent)
+		{
+			m_camera->Render(m_camera->m_owner, timestep, ndGetIdentityMatrix(), m_directionalDiffusseShadow);
+		}
+
 		m_context->EndFrame();
 	}
 	Present();
