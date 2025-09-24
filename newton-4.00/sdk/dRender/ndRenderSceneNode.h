@@ -56,6 +56,7 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 	const ndRenderSceneCamera* FindCameraNode() const;
 
 	void SetPrimitiveMatrix(const ndMatrix& matrix);
+	ndSharedPtr<ndRenderPrimitive>GetPrimitive() const;
 	void SetPrimitive(const ndSharedPtr<ndRenderPrimitive>& primitive);
 
 	ndRender* GetOwner() const;
