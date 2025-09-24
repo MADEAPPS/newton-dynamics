@@ -65,8 +65,8 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 	ndObjectPlacementCamera(ndRender* const owner)
 		:ndDemoCameraNode(owner)
 		,m_placementMatrix(ndGetIdentityMatrix())
-		,m_meshInventory(nullptr)
 		,m_castingShape(nullptr)
+		,m_meshInventory(nullptr)
 		,m_placementColor(0.0f, 0.0f, 0.0f, 0.0f)
 		,m_validPlacement(0.0f, 0.0f, 1.0f, 0.0f)
 		,m_invalidPlacement(1.0f, 0.0f, 0.0f, 0.0f)
@@ -218,7 +218,7 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 			case m_hasValidPlacement:
 			{
 				// place an object at this location and move to the freeze state
-				SpawnObjectAtLocation();
+				SpawnObjectAtLocation(scene);
 				m_state = m_releasePlacemnet;
 				break;
 			}
@@ -301,16 +301,31 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		return false;
 	}
 
-	void SpawnObjectAtLocation()
+	void SpawnObjectAtLocation(ndDemoEntityManager* const scene)
 	{
 		ndTrace(("place object\n"));
+		ndPhysicsWorld* const world = scene->GetWorld();
+		ndRender* const render = *scene->GetRenderer();
+
+		ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(m_placementMatrix));
+		entity->SetPrimitive(m_meshInventory);
+		entity->SetPrimitiveMatrix(m_primitiveOffsetMatrix);
+
+		//ndSharedPtr<ndBody> body(new ndBodyDynamic());
+		//body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+		//body->SetMatrix(matrix);
+		//body->GetAsBodyKinematic()->SetCollisionShape(**shape);
+		//body->GetAsBodyKinematic()->SetMassMatrix(mass, **shape);
+		//return body;
+
+		scene->AddEntity(entity);
 	}
 
 	// for now just sone mesh
 	ndMatrix m_placementMatrix;
 	ndMatrix m_primitiveOffsetMatrix;
-	ndSharedPtr<ndRenderPrimitive> m_meshInventory;
 	ndSharedPtr<ndShapeInstance> m_castingShape;
+	ndSharedPtr<ndRenderPrimitive> m_meshInventory;
 	ndVector m_placementColor;
 	ndVector m_validPlacement;
 	ndVector m_invalidPlacement;
