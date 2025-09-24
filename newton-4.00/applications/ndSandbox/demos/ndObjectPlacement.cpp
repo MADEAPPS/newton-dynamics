@@ -38,16 +38,16 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 	public:
 	enum ndPlacementState
 	{
-		m_inTraceMode,
-		m_hasValidPlacement,
-		m_releasePlacemnet,
 		m_none,
+		m_inTraceMode,
+		m_releasePlacemnet,
+		m_hasValidPlacement,
 	};
 
-	class ndSphereCast : public ndConvexCastNotify
+	class ndShapeCast : public ndConvexCastNotify
 	{
 		public:
-		ndSphereCast(const ndWorld& world, const ndVector& start, const ndVector& end, const ndShapeInstance& shape)
+		ndShapeCast(const ndWorld& world, const ndVector& start, const ndVector& end, const ndShapeInstance& shape)
 			:ndConvexCastNotify()
 		{
 			ndMatrix origin(ndGetIdentityMatrix());
@@ -160,7 +160,7 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 
 		bool mouseState = !scene->GetCaptured() && (scene->GetMouseKeyState(0) || scene->GetMouseKeyState(1));
 		// do camera rotation, only if we do not have anything picked
-		if (mouseState && (m_state == m_none))
+		if (!UpdatePickBody() && mouseState && (m_state == m_none))
 		{
 			ndFloat32 mouseSpeedX = mouseX - m_mousePosX;
 			ndFloat32 mouseSpeedY = mouseY - m_mousePosY;
@@ -261,8 +261,13 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		ndMatrix matrixStart;
 		if (CastRay(scene, matrixStart))
 		{
-			m_showIcon = true;
+			//ndWorld* const world = scene->GetWorld();
+			//ndMatrix xxx (FindFloor(*world, matrixStart, **m_castingShape, ndFloat32(1.0f)));
+			//ndTrace(("(%f %f %f) (%f %f %f)\n", 
+			//	xxx.m_posit.m_x, xxx.m_posit.m_y, xxx.m_posit.m_z, 
+			//	matrixStart.m_posit.m_x, matrixStart.m_posit.m_y, matrixStart.m_posit.m_z));
 
+			m_showIcon = true;
 			m_placementMatrix = matrixStart;
 			if (CalculatePlacementMatrix(matrixStart))
 			{
@@ -289,7 +294,7 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		const ndVector p0(camera->ScreenToWorld(ndVector(mouseX, mouseY, ndFloat32(0.0f), ndFloat32(0.0f))));
 		const ndVector p1(camera->ScreenToWorld(ndVector(mouseX, mouseY, ndFloat32(1.0f), ndFloat32(0.0f))));
 
-		ndSphereCast caster(*world, p0, p1, **m_castingShape);
+		ndShapeCast caster(*world, p0, p1, **m_castingShape);
 
 		if (caster.m_param <= ndFloat32(1.0f))
 		{
@@ -303,21 +308,21 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 
 	void SpawnObjectAtLocation(ndDemoEntityManager* const scene)
 	{
-		ndTrace(("place object\n"));
+		//ndTrace(("place object\n"));
 		ndPhysicsWorld* const world = scene->GetWorld();
-		ndRender* const render = *scene->GetRenderer();
 
 		ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(m_placementMatrix));
 		entity->SetPrimitive(m_meshInventory);
 		entity->SetPrimitiveMatrix(m_primitiveOffsetMatrix);
 
-		//ndSharedPtr<ndBody> body(new ndBodyDynamic());
-		//body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-		//body->SetMatrix(matrix);
-		//body->GetAsBodyKinematic()->SetCollisionShape(**shape);
-		//body->GetAsBodyKinematic()->SetMassMatrix(mass, **shape);
-		//return body;
+		ndFloat32 mass = ndFloat32 (10.0f);
+		ndSharedPtr<ndBody> body(new ndBodyDynamic());
+		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+		body->SetMatrix(m_placementMatrix);
+		body->GetAsBodyKinematic()->SetCollisionShape(**m_castingShape);
+		body->GetAsBodyKinematic()->SetMassMatrix(mass, **m_castingShape);
 
+		world->AddBody(body);
 		scene->AddEntity(entity);
 	}
 
@@ -346,30 +351,23 @@ void ndObjectPlacement(ndDemoEntityManager* const scene)
 	// build a floor
 	ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
 
-	//class PlaceMatrix : public ndMatrix
-	//{
-	//	public:
-	//	PlaceMatrix(ndFloat32 x, ndFloat32 y, ndFloat32 z)
-	//		:ndMatrix(ndGetIdentityMatrix())
-	//	{
-	//		m_posit.m_x = x;
-	//		m_posit.m_y = y;
-	//		m_posit.m_z = z;
-	//	}
-	//};
-	//
-	//
-	//AddBox(scene, PlaceMatrix(0.0f, 20.0f, -3.0f), 10.0f, 1.0f, 1.0f, 1.6f);
-	//AddSphere(scene, PlaceMatrix(0.0f, 5.0f, 0.0f), 10.0f, 0.5f);
-	//AddCapsule(scene, PlaceMatrix(0.0f, 5.0f, 3.0f), 10.0f, 0.25f, 0.7f, 10.0f);
-	//AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f, -2.0f), 7.0f, 1.0f, 1.5f, 10);
-	//AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f,  2.0f), 10.0f, 1.0f, 1.5f, 20);
-	//AddConvexHull(scene, PlaceMatrix( 2.0f, 5.0f,  3.0f), 30.0f, 1.0f, 1.5f, 40);
-
-	// create a Phantom model that contains a collision shape and transform matrix
-	//ndSharedPtr<ndModel> phantomPtr(new ndModel);
-	//phantomPtr->SetNotifyCallback(new NewtonPhantom(scene));
-	//scene->GetWorld()->AddModel(phantomPtr);
+	class PlaceMatrix : public ndMatrix
+	{
+		public:
+		PlaceMatrix(ndFloat32 x, ndFloat32 y, ndFloat32 z)
+			:ndMatrix(ndGetIdentityMatrix())
+		{
+			m_posit.m_x = x;
+			m_posit.m_y = y;
+			m_posit.m_z = z;
+		}
+	};
+	AddBox(scene, PlaceMatrix(0.0f, 20.0f, -3.0f), 10.0f, 1.0f, 1.0f, 1.6f);
+	AddSphere(scene, PlaceMatrix(0.0f, 5.0f, 0.0f), 10.0f, 0.5f);
+	AddCapsule(scene, PlaceMatrix(0.0f, 5.0f, 3.0f), 10.0f, 0.25f, 0.7f, 10.0f);
+	AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f, -5.0f), 7.0f, 1.0f, 1.5f, 10);
+	AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f,  5.0f), 10.0f, 1.0f, 1.5f, 15);
+	AddConvexHull(scene, PlaceMatrix( 2.0f, 5.0f,  3.0f), 30.0f, 1.0f, 1.5f, 20);
 
 	ndSharedPtr<ndDemoEntityManager::ndDemoHelper> demoHelper(new ndObjectPlacementHelp());
 	scene->SetDemoHelp(demoHelper);

@@ -47,7 +47,7 @@ class ndDemoCameraNode: public ndRenderSceneNode
 	
 	protected:
 	void ResetPickBody();
-	void UpdatePickBody();
+	bool UpdatePickBody();
 
 	ndVector m_pickedBodyTargetPosition;
 	ndSharedPtr<ndJointBilateralConstraint> m_pickJoint;

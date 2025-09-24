@@ -28,7 +28,7 @@ ndDemoCameraNode::ndDemoCameraNode(ndRender* const owner)
 	AddChild(camera);
 }
 
-void ndDemoCameraNode::UpdatePickBody()
+bool ndDemoCameraNode::UpdatePickBody()
 {
 	// handle pick body from the screen
 	ndRender* const renderer = GetOwner();
@@ -47,10 +47,12 @@ void ndDemoCameraNode::UpdatePickBody()
 
 	bool mousePickState = !scene->GetCaptured() && (scene->GetMouseKeyState(0) && !scene->GetMouseKeyState(1));
 
+	bool retValue = false;
 	if (!*m_pickJoint)
 	{
 		if (!m_prevMouseState && mousePickState)
 		{
+			retValue = true;
 			class ndRayPickingCallback : public ndRayCastClosestHitCallback
 			{
 				public:
@@ -106,6 +108,7 @@ void ndDemoCameraNode::UpdatePickBody()
 	{
 		if (mousePickState)
 		{
+			retValue = true;
 			m_pickedBodyTargetPosition = p0 + (p1 - p0).Scale(m_pickedBodyParam);
 
 			if (*m_pickJoint)
@@ -122,6 +125,7 @@ void ndDemoCameraNode::UpdatePickBody()
 	}
 
 	m_prevMouseState = mousePickState;
+	return retValue;
 }
 
 void ndDemoCameraNode::ResetPickBody()

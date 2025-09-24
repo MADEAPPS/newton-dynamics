@@ -86,7 +86,7 @@ void ndDemoCameraNodeFlyby::TickUpdate(ndFloat32 timestep)
 
 	bool mouseState = !scene->GetCaptured() && (scene->GetMouseKeyState(0) && !scene->GetMouseKeyState(1));
 	// do camera rotation, only if we do not have anything picked
-	if (!*m_pickJoint && mouseState)
+	if (!UpdatePickBody() && mouseState)
 	{
 		ndFloat32 mouseSpeedX = mouseX - m_mousePosX;
 		ndFloat32 mouseSpeedY = mouseY - m_mousePosY;
@@ -116,6 +116,4 @@ void ndDemoCameraNodeFlyby::TickUpdate(ndFloat32 timestep)
 	
 	m_mousePosX = mouseX;
 	m_mousePosY = mouseY;
-	
-	UpdatePickBody();
 }
