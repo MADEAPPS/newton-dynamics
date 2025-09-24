@@ -82,7 +82,6 @@ void SetModelVisualMesh(ndDemoEntityManager* const scene, ndModelArticulation* c
 //******************************************************************************
 static ndSharedPtr<ndBody> CreateBody(
 	ndDemoEntityManager* const scene, 
-	//const ndShapeInstance& shape, 
 	ndSharedPtr<ndShapeInstance>& shape,
 	const ndMatrix& location, 
 	ndFloat32 mass, 
@@ -98,8 +97,6 @@ static ndSharedPtr<ndBody> CreateBody(
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
 	descriptor.m_collision = shape;
 	descriptor.m_mapping = mappingMode;
-	//descriptor.m_material.m_castShadows = true;
-	//descriptor.m_material.m_texture = render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textName));
 	descriptor.AddMaterial (render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textName)));
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 	entity->SetPrimitive(mesh);
@@ -117,7 +114,6 @@ static ndSharedPtr<ndBody> CreateBody(
 //******************************************************************************
 ndSharedPtr<ndBody> CreateBox(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez, const char* const textName)
 {
-	//ndShapeInstance shape(new ndShapeBox(sizex, sizey, sizez));
 	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeBox(sizex, sizey, sizez)));
 	ndSharedPtr<ndBody> body(CreateBody(scene, shape, location, mass, textName, ndRenderPrimitiveMesh::m_box));
 	return body;
