@@ -159,57 +159,35 @@ ndQuaternion ndQuaternion::IntegrateOmega(const ndVector& omega, ndFloat32 times
 
 ndQuaternion ndQuaternion::Slerp (const ndQuaternion &q1, ndFloat32 t) const 
 {
-	ndQuaternion q0;
-
-	ndFloat32 dot = DotProduct(q1).GetScalar();
-	if ((dot + ndFloat32(1.0f)) > ndEpsilon) 
+	auto Slerp = [this](const ndQuaternion& q1, const ndFloat32 dot, ndFloat32 param)
 	{
-		ndFloat32 Sclp;
-		ndFloat32 Sclq;
-		if (dot < (ndFloat32(1.0f) - ndEpsilon) ) 
-		{
-			ndFloat32 ang = ndAcos (dot);
+		const ndFloat32 epsilon = ndFloat32(1.0e-7f);
+		const ndFloat32 maxDot = ndFloat32(1.0f) - epsilon;
+		ndAssert(dot >= ndFloat32(0.0f));
 
-			ndFloat32 sinAng = ndSin (ang);
+		if (dot < maxDot)
+		{
+			ndFloat32 ang = ndAcos(dot);
+			ndFloat32 sinAng = ndSin(ang);
 			ndFloat32 den = ndFloat32(1.0f) / sinAng;
 
-			Sclp = ndSin ((ndFloat32(1.0f) - t ) * ang) * den;
-			Sclq = ndSin (t * ang) * den;
-		} 
-		else
-		{
-			Sclp = ndFloat32(1.0f) - t;
-			Sclq = t;
+			ndFloat32 sclp = ndSin((ndFloat32(1.0f) - param) * ang) * den;
+			ndFloat32 sclq = ndSin(param * ang) * den;
+			return Scale(sclp) + q1.Scale(sclq);
 		}
+		return *this;
+	};
 
-		q0.m_w = m_w * Sclp + q1.m_w * Sclq;
-		q0.m_x = m_x * Sclp + q1.m_x * Sclq;
-		q0.m_y = m_y * Sclp + q1.m_y * Sclq;
-		q0.m_z = m_z * Sclp + q1.m_z * Sclq;
-	} 
-	else 
+	ndFloat32 dot = DotProduct(q1).GetScalar();
+	if (dot >= ndFloat32(0.0f))
 	{
-		q0.m_w =  m_z;
-		q0.m_x = -m_y;
-		q0.m_y =  m_x;
-		q0.m_z =  m_w;
-
-		ndFloat32 Sclp = ndSin ((ndFloat32(1.0f) - t) * ndPi * ndFloat32 (0.5f));
-		ndFloat32 Sclq = ndSin (t * ndPi * ndFloat32 (0.5f));
-
-		q0.m_w = m_w * Sclp + q0.m_w * Sclq;
-		q0.m_x = m_x * Sclp + q0.m_x * Sclq;
-		q0.m_y = m_y * Sclp + q0.m_y * Sclq;
-		q0.m_z = m_z * Sclp + q0.m_z * Sclq;
+		return Slerp(q1, dot, t);
 	}
-
-	dot = q0.DotProduct (q0).GetScalar();
-	if (ndAbs (dot - ndFloat32(1.0f)) > ndEpsilon) 
+	else
 	{
-		dot = ndRsqrt (dot);
-		q0 = q0.Scale(dot);
+		const ndQuaternion q2(q1.Scale(ndFloat32 (-1.0f)));
+		return Slerp(q2, -dot, t);
 	}
-	return q0;
 }
 
 ndVector ndQuaternion::GetEulerAngles(ndVector& euler) const
