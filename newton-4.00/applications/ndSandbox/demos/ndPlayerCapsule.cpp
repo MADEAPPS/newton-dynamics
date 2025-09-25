@@ -207,13 +207,13 @@ entity->SetTransform(entity->GetTransform());
 	//AddBox(scene, PlaceMatrix(10.0f, 1.0f, 1.250f), 30.0f, 2.0f, 0.25f, 2.5f);
 
 	// attach a Camera to the player.
-	const ndVector cameraPivot(0.0f, 2.0f, 0.0f, 0.0f);
+	const ndVector cameraPivot(0.0f, 0.25f, 0.0f, 0.0f);
 	ndRender* const renderer = *scene->GetRenderer();
 	ndSharedPtr<ndRenderSceneNode> camera(new ndDemoCameraNodeFollow(renderer, cameraPivot, ND_THIRD_PERSON_CAMERA_DIST));
 	renderer->SetCamera(camera);
 
-	// in this peroson make the camera a child of the hip 
-	ndRenderSceneNode* const hips = entity->FindByName("mixamorig:Hips");
-	ndAssert(hips);
-	hips->AddChild(camera);
+	// in this person make the camera a child of the hip 
+	ndRenderSceneNode* const cameraNodePivot = entity->FindByName("cameraPivot");
+	ndAssert(cameraNodePivot);
+	cameraNodePivot->AddChild(camera);
 }
