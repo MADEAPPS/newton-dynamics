@@ -116,6 +116,12 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(const ndRenderPri
 			{
 				glEnableVertexAttribArray(2);
 				glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, GLsizei(m_vertexSize), (void*)offset);
+				offset += 2 * sizeof(ndReal);
+				if (offset < size_t(m_vertexSize))
+				{
+					// ndAssert (0);
+					// TODO: clone a skinned mesh weights and matric index
+				}
 			}
 		}
 		glBindVertexArray(0);
@@ -206,7 +212,14 @@ void ndRenderPrimitiveMeshImplement::BuildFromMesh(const ndRenderPrimitiveMesh::
 	{
 		case ndRenderPrimitiveMesh::m_simplePrimitve:
 		{
-			BuildRenderMeshFromMeshEffect(descriptor);
+			if (descriptor.m_meshNode->GetVertexWeights().GetCount())
+			{
+				BuildRenderSkinnedMeshFromMeshEffect(descriptor);
+			}
+			else
+			{
+				BuildRenderSimpleMeshFromMeshEffect(descriptor);
+			}
 			break;
 		}
 		default:
@@ -356,10 +369,9 @@ void ndRenderPrimitiveMeshImplement::BuildRenderMeshFromCollisionShape(const ndR
 	glBindVertexArray(0);
 }
 
-void ndRenderPrimitiveMeshImplement::BuildRenderMeshFromMeshEffect(const ndRenderPrimitiveMesh::ndDescriptor& descriptor)
+void ndRenderPrimitiveMeshImplement::BuildRenderSimpleMeshFromMeshEffect(const ndRenderPrimitiveMesh::ndDescriptor& descriptor)
 {
 	ndMeshEffect& mesh = *((ndMeshEffect*)*descriptor.m_meshNode);
-
 	ndAssert(descriptor.m_materials.GetCount());
 
 	// extract vertex data  from the newton mesh
@@ -371,14 +383,14 @@ void ndRenderPrimitiveMeshImplement::BuildRenderMeshFromMeshEffect(const ndRende
 		indexCount += mesh.GetMaterialIndexCount(geometryHandle, handle);
 	}
 
-	struct dTmpData
+	struct ndTmpData
 	{
 		ndReal m_posit[3];
 		ndReal m_normal[3];
 		ndReal m_uv[2];
 	};
 
-	ndArray<dTmpData> tmp;
+	ndArray<ndTmpData> tmp;
 	ndArray<ndInt32> indices;
 	ndArray<glPositionNormalUV> points;
 
@@ -386,9 +398,9 @@ void ndRenderPrimitiveMeshImplement::BuildRenderMeshFromMeshEffect(const ndRende
 	points.SetCount(vertexCount);
 	indices.SetCount(indexCount);
 
-	mesh.GetVertexChannel(sizeof(dTmpData), &tmp[0].m_posit[0]);
-	mesh.GetNormalChannel(sizeof(dTmpData), &tmp[0].m_normal[0]);
-	mesh.GetUV0Channel(sizeof(dTmpData), &tmp[0].m_uv[0]);
+	mesh.GetVertexChannel(sizeof(ndTmpData), &tmp[0].m_posit[0]);
+	mesh.GetNormalChannel(sizeof(ndTmpData), &tmp[0].m_normal[0]);
+	mesh.GetUV0Channel(sizeof(ndTmpData), &tmp[0].m_uv[0]);
 
 	for (ndInt32 i = 0; i < vertexCount; ++i)
 	{
@@ -412,9 +424,9 @@ void ndRenderPrimitiveMeshImplement::BuildRenderMeshFromMeshEffect(const ndRende
 			materialNodes = materialNodes->GetNext();
 		}
 		const ndRenderPrimitiveMeshMaterial& material = materialNodes->GetInfo();
-		
+
 		ndRenderPrimitiveMeshSegment& segment = m_owner->m_segments.Append()->GetInfo();
-		
+
 		segment.m_material.m_texture = material.m_texture;
 		segment.m_material.m_diffuse = material.m_diffuse;
 		segment.m_material.m_opacity = material.m_opacity;
@@ -422,9 +434,9 @@ void ndRenderPrimitiveMeshImplement::BuildRenderMeshFromMeshEffect(const ndRende
 		segment.m_material.m_reflection = material.m_reflection;
 		segment.m_material.m_castShadows = material.m_castShadows;
 		segment.m_material.m_specularPower = material.m_specularPower;
-		
+
 		segment.m_indexCount = mesh.GetMaterialIndexCount(geometryHandle, handle);
-		
+
 		segment.m_segmentStart = segmentStart;
 		mesh.GetMaterialGetIndexStream(geometryHandle, handle, &indices[segmentStart]);
 		segmentStart += segment.m_indexCount;
@@ -459,6 +471,11 @@ void ndRenderPrimitiveMeshImplement::BuildRenderMeshFromMeshEffect(const ndRende
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+}
+
+void ndRenderPrimitiveMeshImplement::BuildRenderSkinnedMeshFromMeshEffect(const ndRenderPrimitiveMesh::ndDescriptor& descriptor)
+{
+	BuildRenderSimpleMeshFromMeshEffect(descriptor);
 }
 
 void ndRenderPrimitiveMeshImplement::BuildDebugFlatShadedMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor)

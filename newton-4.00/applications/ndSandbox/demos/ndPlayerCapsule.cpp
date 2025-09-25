@@ -39,7 +39,7 @@ class ndMopcapRetargetMeshLoader : public ndMeshLoader
 	}
 
 	//ndMesh* LoadMesh(const char* const fbxMeshName, bool loadAnimation)
-	ndSharedPtr<ndRenderSceneNode> LoadEntity(ndRender* const renderer, const ndString& fbxPathMeshName)
+	ndSharedPtr<ndRenderSceneNode> LoadEntity(ndRender* const renderer, const ndString& fbxPathMeshName) override
 	{
 		ndSharedPtr<ndRenderSceneNode> mesh (ndMeshLoader::LoadEntity(renderer, fbxPathMeshName));
 
@@ -155,7 +155,8 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	//BuildPlayArena(scene);
-	ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
+	//ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
+	ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "marblecheckboard.png", 0.1f, true));
 
 	//ndMatrix location(ndGetIdentityMatrix());
 	//location.m_posit.m_y += 2.0f;
@@ -170,10 +171,11 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 	//ndFloat32 mass = 100.0f;
 	ndMopcapRetargetMeshLoader loader(1.0f);
 	//ndPhysicsWorld* const world = scene->GetWorld();
-	//ndSharedPtr<ndRenderSceneNode> entity(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("humanoidRobot.fbx")));
+	ndSharedPtr<ndRenderSceneNode> entity(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("humanoidRobot.fbx")));
 	//ndSharedPtr<ndBody> player0(new ndBasicPlayerCapsule(scene, loader, *entity, localAxis, location, mass, radio, height, height / 4.0f, true));
 	//world->AddBody(player0);
 
+scene->AddEntity(entity);
 
 	//ndSharedPtr<ndBody> player1(new ndBasicPlayerCapsule(scene, loader, *entity, localAxis, location, mass, radio, height, height/4.0f));
 	//world->AddBody(player1);

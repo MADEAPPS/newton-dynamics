@@ -102,30 +102,31 @@ ndSharedPtr<ndRenderSceneNode> ndMeshLoader::LoadEntity(ndRender* const renderer
 			ndSharedPtr<ndMeshEffect> meshEffect(effectNode->GetMesh());
 			ndArray<ndMeshEffect::ndMaterial>& materials = meshEffect->GetMaterials();
 
-			ndSharedPtr<ndRenderPrimitive> geometry(nullptr);
-			if (meshEffect->GetVertexWeights().GetCount())
+			ndRenderPrimitiveMesh::ndDescriptor descriptor(renderer);
+			descriptor.m_meshNode = meshEffect;
+			for (ndInt32 j = 0; j < materials.GetCount(); ++j)
 			{
-				ndAssert(0);
-				//mesh = new ndDemoSkinMesh(entity, *meshEffect, scene->GetShaderCache());
+				const ndString texturePathName(path + materials[j].m_textureName);
+				ndRenderPrimitiveMeshMaterial& material = descriptor.AddMaterial(renderer->GetTextureCache()->GetTexture(texturePathName));
+				material.m_diffuse = materials[j].m_diffuse;
+				material.m_specular = materials[j].m_specular;
+				material.m_reflection = materials[j].m_specular;
+				material.m_specularPower = materials[j].m_shiness;
+				material.m_opacity = materials[j].m_opacity;
+				material.m_castShadows = true;
 			}
-			else
-			{
-				ndRenderPrimitiveMesh::ndDescriptor descriptor(renderer);
-				descriptor.m_meshNode = meshEffect;
 
-				for (ndInt32 j = 0; j < materials.GetCount(); ++j)
-				{
-					const ndString texturePathName(path + materials[j].m_textureName);
-					ndRenderPrimitiveMeshMaterial& material = descriptor.AddMaterial(renderer->GetTextureCache()->GetTexture(texturePathName));
-					material.m_diffuse = materials[j].m_diffuse;
-					material.m_specular = materials[j].m_specular;
-					material.m_reflection = materials[j].m_specular;
-					material.m_specularPower = materials[j].m_shiness;
-					material.m_opacity = materials[j].m_opacity;
-					material.m_castShadows = true;
-				}
-				geometry = ndSharedPtr<ndRenderPrimitive>(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
-			}
+			//ndSharedPtr<ndRenderPrimitive> geometry(nullptr);
+			//if (meshEffect->GetVertexWeights().GetCount())
+			//{
+			//	ndAssert(0);
+			//	//mesh = new ndDemoSkinMesh(entity, *meshEffect, scene->GetShaderCache());
+			//}
+			//else
+			//{
+			//	geometry = ndSharedPtr<ndRenderPrimitive>(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
+			//}
+			ndSharedPtr<ndRenderPrimitive> geometry(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 
 			entity->m_name = effectNode->GetName();
 			entity->SetPrimitive(geometry);
