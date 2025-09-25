@@ -64,7 +64,7 @@
 #include <ndRenderInc.h>
 
 ndString ndGetWorkingFileName(const char* const name);
-void ndGetWorkingFileName (const char* const name, char* const outPathName);
+//void ndGetWorkingFileName (const char* const name, char* const outPathName);
 
 // endian conversion
 ndUnsigned32 SWAP_INT32(ndUnsigned32 x);

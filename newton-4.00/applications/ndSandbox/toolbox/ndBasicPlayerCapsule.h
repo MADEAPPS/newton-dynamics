@@ -14,8 +14,6 @@
 
 #include "ndSandboxStdafx.h"
 
-class ndDemoMesh;
-class ndDemoEntity;
 class ndPhysicsWorld;
 class ndDemoEntityManager;
 class ndAnimationBlendTreeNode;
@@ -44,7 +42,7 @@ class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 	ndBasicPlayerCapsule();
 	ndBasicPlayerCapsule(
 		ndDemoEntityManager* const scene, ndMeshLoader& loader,
-		const ndDemoEntity* const modelEntity, const ndMatrix& localAxis, const ndMatrix& location,
+		ndSharedPtr<ndRenderSceneNode>& modelEntity, const ndMatrix& localAxis, const ndMatrix& location,
 		ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight, bool isPlayer = false);
 	~ndBasicPlayerCapsule();
 
