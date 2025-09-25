@@ -10,18 +10,22 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndSkyBox.h"
-#include "ndDemoMesh.h"
-#include "ndMeshLoader.h"
-#include "ndDemoCamera.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
-#include "ndCompoundScene.h"
+#include "ndDemoCameraNode.h"
+#include "ndContactCallback.h"
+#include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
-#include "ndDemoInstanceEntity.h"
-#include "ndBasicPlayerCapsule.h"
 
+//#include "ndMeshLoader.h"
+//#include "ndPhysicsUtils.h"
+//#include "ndPhysicsWorld.h"
+//#include "ndMakeStaticMap.h"
+//#include "ndDemoEntityManager.h"
+//#include "ndBasicPlayerCapsule.h"
+
+#if 0
 class ndMopcapRetargetMeshLoader : public ndMeshLoader
 {
 	public:
@@ -145,12 +149,13 @@ class ndMopcapRetargetMeshLoader : public ndMeshLoader
 	ndFloat32 m_scale;
 };
 
-void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
+#endif
+
+void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	//BuildPlayArena(scene);
-	BuildFloorBox(scene, ndGetIdentityMatrix());
-	//BuildCompoundScene(scene, ndGetIdentityMatrix());
+	ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
 
 	ndMatrix location(ndGetIdentityMatrix());
 	location.m_posit.m_y += 2.0f;
@@ -160,22 +165,20 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 	localAxis[1] = ndVector(1.0f, 0.0f, 0.0f, 0.0f);
 	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
 
-	ndFloat32 height = 1.9f;
-	ndFloat32 radio = 0.5f;
-	ndFloat32 mass = 100.0f;
-
-	ndMopcapRetargetMeshLoader loader(1.0f);
-	ndPhysicsWorld* const world = scene->GetWorld();
+	//ndFloat32 height = 1.9f;
+	//ndFloat32 radio = 0.5f;
+	//ndFloat32 mass = 100.0f;
+	//ndMopcapRetargetMeshLoader loader(1.0f);
+	//ndPhysicsWorld* const world = scene->GetWorld();
 	//ndSharedPtr<ndDemoEntity> entity(loader.LoadEntity("box.fbx", scene));
 	//ndSharedPtr<ndDemoEntity> entity(loader.LoadEntity("skinTest.fbx", scene));
 	//ndSharedPtr<ndDemoEntity> entity(loader.LoadEntity("dummy.fbx", scene));
 	//ndSharedPtr<ndDemoEntity> entity(loader.LoadEntity("robotsuit.fbx", scene));
 	//ndSharedPtr<ndDemoEntity> entity(loader.LoadEntity("YBot.fbx", scene));
 	//ndSharedPtr<ndDemoEntity> entity(loader.LoadEntity("YBot_mixamo.fbx", scene));
-	ndSharedPtr<ndDemoEntity> entity(loader.LoadEntity("YBot_blender.fbx", scene));
-	
-	ndSharedPtr<ndBody> player0(new ndBasicPlayerCapsule(scene, loader, *entity, localAxis, location, mass, radio, height, height / 4.0f, true));
-	world->AddBody(player0);
+	//ndSharedPtr<ndDemoEntity> entity(loader.LoadEntity("YBot_blender.fbx", scene));
+	//ndSharedPtr<ndBody> player0(new ndBasicPlayerCapsule(scene, loader, *entity, localAxis, location, mass, radio, height, height / 4.0f, true));
+	//world->AddBody(player0);
 
 #if 0	
 	ndSharedPtr<ndBody> player1(new ndBasicPlayerCapsule(scene, loader, *entity, localAxis, location, mass, radio, height, height/4.0f));

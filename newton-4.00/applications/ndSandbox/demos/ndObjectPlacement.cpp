@@ -288,7 +288,8 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		return m_inTraceMode;
 	}
 
-	bool CalculatePlacementMatrix(const ndMatrix matrixStart)
+	//bool CalculatePlacementMatrix(const ndMatrix& matrixStart)
+	bool CalculatePlacementMatrix(const ndMatrix& )
 	{
 		return true;
 	}

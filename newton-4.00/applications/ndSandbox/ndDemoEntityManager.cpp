@@ -10,7 +10,6 @@
 */
 
 #include "ndSandboxStdafx.h"
-
 #include "ndFileBrowser.h"
 #include "ndPhysicsWorld.h"
 #include "ndPhysicsUtils.h"
@@ -34,13 +33,13 @@
 //#define DEFAULT_SCENE	9		// static compound scene collision
 //#define DEFAULT_SCENE	10		// basic compound shapes
 //#define DEFAULT_SCENE	11		// basic model
-#define DEFAULT_SCENE	12		// object Placement
+//#define DEFAULT_SCENE	12		// object Placement
+#define DEFAULT_SCENE	13		// third person player cpasule
  
 //#define DEFAULT_SCENE	8		// particle fluid
 //#define DEFAULT_SCENE	10		// static user mesh collision 
 //#define DEFAULT_SCENE	12		// basic vehicle
 //#define DEFAULT_SCENE	13		// heavy vehicle
-//#define DEFAULT_SCENE	15		// basic player
 //#define DEFAULT_SCENE	16		// rag doll
 //#define DEFAULT_SCENE	17		// cart pole discrete controller
 //#define DEFAULT_SCENE	18		// cart pole continue controller
@@ -72,7 +71,9 @@ void ndBasicSlidingPlatform(ndDemoEntityManager* const scene);
 void ndBasicCompoundCollision(ndDemoEntityManager* const scene);
 void ndBasicHeighfieldCollision(ndDemoEntityManager* const scene);
 void ndBasicStaticMeshCollision(ndDemoEntityManager* const scene);
+void ndPlayerCapsule_ThirdPerson(ndDemoEntityManager* const scene);
 void ndBasicSceneCompoundCollision(ndDemoEntityManager* const scene);
+
 
 ndDemoEntityManager::ndDemos ndDemoEntityManager::m_demosSelection[] =
 {
@@ -81,7 +82,7 @@ ndDemoEntityManager::ndDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic friction", ndBasicFriction},
 	{ "basic sliding ground", ndBasicSlidingPlatform},
 	{ "basic triger", ndBasicTrigger},
-	{ "basic momentum consevation", ndBasicAngularMomentum},
+	{ "basic momentum conservation", ndBasicAngularMomentum},
 	{ "basic joints", ndBasicJoints},
 	{ "basic heighfield collision", ndBasicHeighfieldCollision},
 	{ "basic static mesh collision", ndBasicStaticMeshCollision},
@@ -89,6 +90,7 @@ ndDemoEntityManager::ndDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic compound collision", ndBasicCompoundCollision},
 	{ "basic model", ndBasicModel},
 	{ "object placement", ndObjectPlacement},
+	{ "basic player", ndPlayerCapsule_ThirdPerson},
 	
 
 #if 0
@@ -96,7 +98,7 @@ ndDemoEntityManager::ndDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic particle fluid", ndBasicParticleFluid},
 	{ "basic vehicle", ndBasicVehicle},
 	{ "heavy vehicle", ndHeavyVehicle},
-	{ "basic player", ndPlayerCapsuleDemo},
+
 	{ "rag doll", ndRagdollTest},
 	{ "cartpole discrete controller", ndCartpoleDiscrete},
 	{ "cartpole continue controller", ndCartpoleContinue},
@@ -533,6 +535,17 @@ ndDemoEntityManager::~ndDemoEntityManager ()
 	}
 }
 
+ndPhysicsWorld* ndDemoEntityManager::GetWorld() const
+{
+	return m_world;
+}
+
+ndSharedPtr<ndRender>& ndDemoEntityManager::GetRenderer()
+{
+	return m_renderer;
+}
+
+
 void ndDemoEntityManager::Terminate()
 {
 	m_renderer->Terminate();
@@ -960,21 +973,6 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			break;
 		}
 	
-		//case m_load:
-		//{
-		//	break;
-		//}
-		//
-		//case m_save:
-		//{
-		//	break;
-		//}
-		//
-		//case m_saveModel:
-		//{
-		//	break;
-		//}
-	
 		case m_none:
 		default:
 		{
@@ -1195,15 +1193,6 @@ void ndDemoEntityManager::SetAcceleratedUpdate()
 	m_world->AccelerateUpdates();
 }
 
-//void ndDemoEntityManager::RegisterPostUpdate(OnPostUpdate* const postUpdate)
-//{
-//	if (m_onPostUpdate)
-//	{
-//		delete m_onPostUpdate;
-//	}
-//	m_onPostUpdate = postUpdate;
-//}
-//
 //void ndDemoEntityManager::OnSubStepPostUpdate(ndFloat32 timestep)
 void ndDemoEntityManager::OnSubStepPostUpdate(ndFloat32)
 {

@@ -57,22 +57,6 @@ class ndDemoEntityManager : public ndClassAlloc
 	};
 
 	typedef void (*ndDemoCallbackLauncher) (ndDemoEntityManager* const scene);
-	//typedef void(*UpdateCameraCallback) (ndDemoEntityManager* const manager, void* const context, ndFloat32 timestep);
-	//class OnPostUpdate: public ndClassAlloc
-	//{
-	//	public:
-	//	OnPostUpdate()
-	//		:ndClassAlloc()
-	//	{
-	//	}
-	//
-	//	virtual ~OnPostUpdate()
-	//	{
-	//	}
-	//	
-	//	virtual void OnDebug(ndDemoEntityManager* const, bool) {}
-	//	virtual void Update(ndDemoEntityManager* const scene, ndFloat32 timestep) = 0;
-	//};
 
 	enum ndMenuSelection
 	{
@@ -163,9 +147,6 @@ class ndDemoEntityManager : public ndClassAlloc
 	bool GetMousePosition (ndFloat32& posX, ndFloat32& posY) const;
 	void SetCameraMatrix (const ndQuaternion& rotation, const ndVector& position);
 	
-	//void SetSelectedModel(ndModel* const model);
-	//void Set2DDisplayRenderFunction(ndSharedPtr<ndUIEntity>& demoGui);
-
 	bool AnyKeyDown() const;
 	bool IsShiftKeyDown () const;
 	bool JoystickDetected() const;
@@ -185,16 +166,11 @@ class ndDemoEntityManager : public ndClassAlloc
 	bool GetCaptured () const;
 	bool GetMouseKeyState (ndInt32 button ) const;
 	ndInt32 Print (const ndVector& color, const char *fmt, ... ) const;
-	ndInt32 GetDebugDisplay() const;
-	void SetDebugDisplay(ndInt32 mode) const;
-
-	void SetAcceleratedUpdate(); 
-	//ndVector GetDirectionsLight() const;
+	
 	ndSharedPtr<ndAnimationSequence> GetAnimationSequence(ndMeshLoader& loader, const char* const meshName);
 
-	//void RegisterPostUpdate(OnPostUpdate* const postUpdate);
-
 	void RenderStats();
+	void SetAcceleratedUpdate();
 	void SetDemoHelp(ndSharedPtr<ndDemoHelper>& helper);
 
 	private:
@@ -240,8 +216,6 @@ class ndDemoEntityManager : public ndClassAlloc
 	ndInt32 m_workerThreads;
 	ndInt32 m_debugDisplayMode;
 	ndInt32 m_collisionDisplayMode;
-	//ndModel* m_selectedModel;
-	//OnPostUpdate* m_onPostUpdate;
 
 	ndFloat32 m_fps;
 	ndFloat32 m_timestepAcc;
@@ -272,42 +246,10 @@ class ndDemoEntityManager : public ndClassAlloc
 	bool m_profilerMode;
 	
 	ndWorld::ndSolverModes m_solverMode;
-
-	//ndVector m_diretionalLightDir;
 	static ndDemos m_demosSelection[];
 
 	friend class ndPhysicsWorld;
 };
 
-inline ndPhysicsWorld* ndDemoEntityManager::GetWorld() const
-{
-	return m_world;
-}
-
-inline ndSharedPtr<ndRender>& ndDemoEntityManager::GetRenderer()
-{
-	return m_renderer;
-}
-
-inline ndInt32 ndDemoEntityManager::GetDebugDisplay() const
-{
-	ndAssert (0);
-	return 0;
-}
-
-inline void ndDemoEntityManager::SetDebugDisplay(ndInt32) const
-{
-	ndAssert (0);
-}
-
-//inline void ndDemoEntityManager::SetSelectedModel(ndModel* const model)
-//{
-//	m_selectedModel = model;
-//}
-//
-//inline ndVector ndDemoEntityManager::GetDirectionsLight() const
-//{
-//	return m_diretionalLightDir;
-//}
 
 #endif
