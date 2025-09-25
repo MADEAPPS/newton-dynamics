@@ -18,12 +18,10 @@
 #include "ndContactCallback.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
-
-//#include "ndPhysicsUtils.h"
-//#include "ndPhysicsWorld.h"
-//#include "ndMakeStaticMap.h"
-//#include "ndDemoEntityManager.h"
 #include "ndBasicPlayerCapsule.h"
+#include "ndDemoCameraNodeFollow.h"
+
+#define ND_THIRD_PERSON_CAMERA_DIST ndFloat32(-5.0f)
 
 class ndMopcapRetargetMeshLoader : public ndMeshLoader
 {
@@ -176,6 +174,9 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 	//world->AddBody(player0);
 
 scene->AddEntity(entity);
+entity->SetTransform(entity->GetTransform());
+entity->SetTransform(entity->GetTransform());
+
 
 	//ndSharedPtr<ndBody> player1(new ndBasicPlayerCapsule(scene, loader, *entity, localAxis, location, mass, radio, height, height/4.0f));
 	//world->AddBody(player1);
@@ -189,24 +190,30 @@ scene->AddEntity(entity);
 	//world->AddBody(player3);
 #endif
 
-	class PlaceMatrix : public ndMatrix
-	{
-		public:
-		PlaceMatrix(ndFloat32 x, ndFloat32 y, ndFloat32 z)
-			:ndMatrix(ndGetIdentityMatrix())
-		{
-			m_posit.m_x = x;
-			m_posit.m_y = y;
-			m_posit.m_z = z;
-		}
-	};
-
+	//class PlaceMatrix : public ndMatrix
+	//{
+	//	public:
+	//	PlaceMatrix(ndFloat32 x, ndFloat32 y, ndFloat32 z)
+	//		:ndMatrix(ndGetIdentityMatrix())
+	//	{
+	//		m_posit.m_x = x;
+	//		m_posit.m_y = y;
+	//		m_posit.m_z = z;
+	//	}
+	//};
 	//AddCapsulesStacks___(scene, PlaceMatrix(32.0f, 0.0f, 0.0f), 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
 	//AddBox(scene, PlaceMatrix(10.0f, 0.0f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
 	//AddBox(scene, PlaceMatrix(10.0f, 0.5f, 1.125f), 30.0f, 2.0f, 0.25f, 2.5f);
 	//AddBox(scene, PlaceMatrix(10.0f, 1.0f, 1.250f), 30.0f, 2.0f, 0.25f, 2.5f);
 
-	ndQuaternion rot;
-	ndVector origin(-10.0f, 5.0f, 0.0f, 1.0f);
-	scene->SetCameraMatrix(rot, origin);
+	// attach a Camera to the player.
+	const ndVector cameraPivot(0.0f, 2.0f, 0.0f, 0.0f);
+	ndRender* const renderer = *scene->GetRenderer();
+	ndSharedPtr<ndRenderSceneNode> camera(new ndDemoCameraNodeFollow(renderer, cameraPivot, ND_THIRD_PERSON_CAMERA_DIST));
+	renderer->SetCamera(camera);
+
+	// in this peroson make the camera a child of the hip 
+	ndRenderSceneNode* const hips = entity->FindByName("mixamorig:Hips");
+	ndAssert(hips);
+	hips->AddChild(camera);
 }
