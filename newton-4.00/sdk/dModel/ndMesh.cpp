@@ -179,24 +179,15 @@ void ndMesh::SetMesh(const ndSharedPtr<ndMeshEffect>& mesh)
 
 ndMesh* ndMesh::FindChild(const char* const name) const
 {
-	ndFixSizeArray<ndMesh*, ND_MESH_MAX_STACK_DEPTH> stack(0);
-	
-	stack.PushBack((ndMesh*)this);
-	while (stack.GetCount())
+	const ndString testName(name);
+	ndMesh* const self = (ndMesh*)this;
+	for (ndMesh* node = self->IteratorFirst(); node; node = node->IteratorNext())
 	{
-		ndMesh* const node = stack.Pop();
-		if (!strcmp(node->m_name.GetStr(), name))
+		if (testName == node->m_name)
 		{
 			return node;
 		}
-
-		for (ndList<ndSharedPtr<ndMesh>>::ndNode* childNode = node->GetChildren().GetFirst(); childNode; childNode = childNode->GetNext())
-		{
-			ndMesh* const child = *childNode->GetInfo();
-			stack.PushBack(child);
-		}
 	}
-
 	return nullptr;
 }
 
