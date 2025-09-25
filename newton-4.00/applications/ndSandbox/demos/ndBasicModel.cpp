@@ -20,9 +20,8 @@
 #include "ndHeightFieldPrimitive.h"
 
 // 16 mps approximatly 60 kmp
-#define MAX_VEHICLE_PRO_SPEED	12.0f
-
-#define CAMERA_DISTANCE			-7.0f
+#define ND_MAX_PROP_VEHICLE_SPEED		ndFloat32(12.0f)
+#define ND_PROP_VEHICLE_CAMERA_DISTANCE	ndFloat32(-7.0f)
 
 class BackGroundVehicleController : public ndModel
 {
@@ -103,11 +102,11 @@ class BackGroundVehicleController : public ndModel
 			m_desiredSpeed = ndFloat32(0.0f);
 			if (m_scene->GetKeyState(ImGuiKey_W))
 			{
-				m_desiredSpeed = MAX_VEHICLE_PRO_SPEED;
+				m_desiredSpeed = ND_MAX_PROP_VEHICLE_SPEED;
 			}
 			else if (m_scene->GetKeyState(ImGuiKey_S))
 			{
-				m_desiredSpeed = -0.5f * MAX_VEHICLE_PRO_SPEED;
+				m_desiredSpeed = -0.5f * ND_MAX_PROP_VEHICLE_SPEED;
 			}
 
 			// apply turning controls
@@ -313,7 +312,7 @@ void ndBasicModel(ndDemoEntityManager* const scene)
 	ndRender* const renderer = *scene->GetRenderer();
 	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)vehicleBody->GetAsBodyKinematic()->GetNotifyCallback();
 	ndSharedPtr<ndRenderSceneNode> vehicleMesh(notify->GetUserData());
-	ndSharedPtr<ndRenderSceneNode> camera(new ndDemoCameraNodeFollow(renderer, cameraPivot, CAMERA_DISTANCE));
+	ndSharedPtr<ndRenderSceneNode> camera(new ndDemoCameraNodeFollow(renderer, cameraPivot, ND_PROP_VEHICLE_CAMERA_DISTANCE));
 	renderer->SetCamera(camera);
 	vehicleMesh->AddChild(camera);
 }
