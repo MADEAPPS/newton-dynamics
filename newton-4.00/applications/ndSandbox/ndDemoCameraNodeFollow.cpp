@@ -50,7 +50,6 @@ void ndDemoCameraNodeFollow::TickUpdate(ndFloat32)
 	ndFloat32 mouseX;
 	ndFloat32 mouseY;
 	scene->GetMousePosition(mouseX, mouseY);
-	
 
 	ndAssert(m_parent);
 	const ndMatrix globalMatrix(m_parent->CalculateGlobalMatrix());
@@ -62,12 +61,11 @@ void ndDemoCameraNodeFollow::TickUpdate(ndFloat32)
 	const ndMatrix localUpMatrix(uprightMatrix * globalMatrix.OrthoInverse());
 
 	const ndMatrix camMatrix(ndRollMatrix(m_pitch) * ndYawMatrix(m_yaw) * localUpMatrix);
-	ndQuaternion newRotation(camMatrix);
-	ndDemoCameraNode::SetTransform(newRotation, m_pivot);
+	ndDemoCameraNode::SetTransform(camMatrix, m_pivot);
 
 	bool mouseState = !scene->GetCaptured() && (scene->GetMouseKeyState(0) && !scene->GetMouseKeyState(1));
 	// do camera rotation, only if we do not have anything picked
-	if (!*m_pickJoint && mouseState)
+	if (!UpdatePickBody() && mouseState)
 	{
 		ndFloat32 mouseSpeedX = mouseX - m_mousePosX;
 		ndFloat32 mouseSpeedY = mouseY - m_mousePosY;
@@ -97,6 +95,4 @@ void ndDemoCameraNodeFollow::TickUpdate(ndFloat32)
 	
 	m_mousePosX = mouseX;
 	m_mousePosY = mouseY;
-	
-	//UpdatePickBody();
 }
