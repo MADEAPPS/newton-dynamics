@@ -78,7 +78,6 @@ ndRenderSceneNode::ndRenderSceneNode(const ndRenderSceneNode& src)
 
 	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = src.m_children.GetFirst(); node; node = node->GetNext())
 	{
-		ndAssert(0);
 		ndRenderSceneNode* const childNode = *node->GetInfo();
 		AddChild(childNode->Clone());
 	}
