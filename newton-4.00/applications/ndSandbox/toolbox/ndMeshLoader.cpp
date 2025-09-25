@@ -71,6 +71,7 @@ ndSharedPtr<ndRenderSceneNode> ndMeshLoader::LoadEntity(ndRender* const renderer
 				parentNode->AddChild(childNode);
 				entity = *childNode;
 			}
+			entity->m_name = mesh->GetName();
 
 			ndSharedPtr<ndMeshEffect> meshEffect(mesh->GetMesh());
 			if (*meshEffect)
