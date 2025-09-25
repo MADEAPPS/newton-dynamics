@@ -634,7 +634,6 @@ ndMesh* ndFbxMeshLoader::CreateMeshHierarchy(ofbx::IScene* const fbxScene, ndFbx
 		for (ndInt32 i = 0; i < children.GetCount(); ++i)
 		{
 			ofbx::Object* const child = children[i];
-			//nodeStack[i] = ndFbx2MeshNodeStackData(child, mesh);
 			nodeStack.PushBack(ndFbx2MeshNodeStackData(child, mesh));
 		}
 	 }
