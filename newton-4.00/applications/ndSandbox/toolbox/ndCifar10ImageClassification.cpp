@@ -16,8 +16,7 @@ static void LoadTrainingData(ndSharedPtr<ndBrainMatrix>& trainingImages, ndShare
 {
 	const ndInt32 batches = 5;
 	const ndInt32 pixelSize = 32 * 32;
-	char filename[1024];
-	char outPathName[1024];
+	//char outPathName[1024];
 	ndUnsigned8 data[pixelSize * 3];
 
 	trainingLabels = new ndBrainMatrix(ndInt32(batches * 10000), ndInt32(10));
@@ -30,11 +29,13 @@ static void LoadTrainingData(ndSharedPtr<ndBrainMatrix>& trainingImages, ndShare
 
 	ndInt32 base = 0;
 	labelMatrix.Set(ndBrainFloat(0.0f));
+	char filename[1024];
 	for (ndInt32 i = 0; i < batches; ++i)
 	{
 		snprintf(filename, sizeof (filename), "cifar-10-batches-bin/data_batch_%d.bin", i + 1);
-		ndGetWorkingFileName(filename, outPathName);
-		FILE* const fp = fopen(outPathName, "rb");
+		//ndGetWorkingFileName(filename, outPathName);
+		const ndString outPathName(ndGetWorkingFileName(filename));
+		FILE* const fp = fopen(outPathName.GetStr(), "rb");
 		if (fp)
 		{
 			for (ndInt32 j = 0; j < 10000; ++j)
@@ -91,7 +92,7 @@ static void SaveImage(const ndBrainVector& input, const char* const name)
 static void LoadTestData(ndSharedPtr<ndBrainMatrix>& images, ndSharedPtr<ndBrainMatrix>& srcImages, ndSharedPtr<ndBrainMatrix>& labels)
 {
 	const ndInt32 pixelSize = 32 * 32;
-	char outPathName[1024];
+	//char outPathName[1024];
 	ndUnsigned8 data[pixelSize * 3];
 
 	labels = new ndBrainMatrix(ndInt32(10000), ndInt32(10));
@@ -103,8 +104,9 @@ static void LoadTestData(ndSharedPtr<ndBrainMatrix>& images, ndSharedPtr<ndBrain
 	ndBrainMatrix& srcImageMatrix = *(*srcImages);
 
 	labelMatrix.Set(ndBrainFloat(0.0f));
-	ndGetWorkingFileName("cifar-10-batches-bin/test_batch.bin", outPathName);
-	FILE* const fp = fopen(outPathName, "rb");
+	//ndGetWorkingFileName("cifar-10-batches-bin/test_batch.bin", outPathName);
+	const ndString outPathName(ndGetWorkingFileName("cifar-10-batches-bin/test_batch.bin"));
+	FILE* const fp = fopen(outPathName.GetStr(), "rb");
 	if (fp)
 	{
 		for (ndInt32 j = 0; j < 10000; ++j)
@@ -479,10 +481,11 @@ ndAssert(0);
 		optimizer.Optimize(*trainingLabels, *trainingImages, *testLabels, *testImages);
 		time = ndGetTimeInMicroseconds() - time;
 	
-		char path[256];
-		ndGetWorkingFileName("cifar-10-batches-bin/cifar-cnn-dnn", path);
+		//char path[256];
+		//ndGetWorkingFileName("cifar-10-batches-bin/cifar-cnn-dnn", path);
+		const ndString path(ndGetWorkingFileName("cifar-10-batches-bin/cifar-cnn-dnn"));
 		
-		ndBrainSave::Save(&brain, path);
+		ndBrainSave::Save(&brain, path.GetStr());
 		ValidateData("training data", brain, *trainingLabels, *trainingImages, *srcTrainingImages);
 		ndExpandTraceMessage("time %f (sec)\n\n", ndFloat64(time) / 1000000.0f);
 	}
@@ -497,10 +500,11 @@ static void Cifar10TestSet()
 	
 	if (testLabels && testImages)
 	{
-		char path[256];
-		ndGetWorkingFileName("cifar-10-batches-bin/cifar-cnn-dnn", path);
+		//char path[256];
+		//ndGetWorkingFileName("cifar-10-batches-bin/cifar-cnn-dnn", path);
+		const ndString path(ndGetWorkingFileName("cifar-10-batches-bin/cifar-cnn-dnn"));
 	
-		ndSharedPtr<ndBrain> brain (ndBrainLoad::Load(path));
+		ndSharedPtr<ndBrain> brain (ndBrainLoad::Load(path.GetStr()));
 		ndUnsigned64 time = ndGetTimeInMicroseconds();
 		ndInt32 numbeOfParam = brain->GetNumberOfParameters();
 		ndExpandTraceMessage("cifar-10 database, number of Parameters %d\n", numbeOfParam);

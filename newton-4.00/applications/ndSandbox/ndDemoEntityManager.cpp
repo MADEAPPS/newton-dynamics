@@ -449,12 +449,12 @@ ndDemoEntityManager::ndDemoEntityManager()
 	snprintf(title, sizeof(title), "Newton Dynamics %d.%.2i sandbox demos", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION);
 	m_renderer = ndSharedPtr<ndRender>(new ndRender(callbacks, 1280, 768, title));
 
-	char fontPathName[2048];
+	//char fontPathName[2048];
 	//char* const name = "calibri.ttf";
 	//char* const name = "courbd.ttf";
-	const char* const name = "Cousine-Regular.ttf";
-	ndGetWorkingFileName(name, fontPathName);
-	m_renderer->InitImGui(fontPathName);
+	//const char* const name = "Cousine-Regular.ttf";
+	const ndString fontPathName(ndGetWorkingFileName("Cousine-Regular.ttf"));
+	m_renderer->InitImGui(fontPathName.GetStr());
 
 	// load the environment texture
 	ndFixSizeArray<ndString, 6> environmentTexturePath;
@@ -544,7 +544,6 @@ ndSharedPtr<ndRender>& ndDemoEntityManager::GetRenderer()
 {
 	return m_renderer;
 }
-
 
 void ndDemoEntityManager::Terminate()
 {

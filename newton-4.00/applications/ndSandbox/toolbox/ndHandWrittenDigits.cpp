@@ -59,9 +59,8 @@ static ndBrainMatrix* LoadMnistLabelData(const char* const filename)
 {
 	ndBrainMatrix* labelData = nullptr;
 
-	char outPathName[1024];
-	ndGetWorkingFileName(filename, outPathName);
-	FILE* fp = fopen(outPathName, "rb");
+	const ndString outPathName(ndGetWorkingFileName(filename));
+	FILE* const fp = fopen(outPathName.GetStr(), "rb");
 	if (fp)
 	{
 		// read training labels
@@ -99,9 +98,10 @@ static ndBrainMatrix* LoadMnistSampleData(const char* const filename)
 {
 	ndBrainMatrix* trainingDigits = nullptr;
 
-	char outPathName[1024];
-	ndGetWorkingFileName(filename, outPathName);
-	FILE* const fp = fopen(outPathName, "rb");
+	//char outPathName[1024];
+	//ndGetWorkingFileName(filename, outPathName);
+	ndString outPathName(ndGetWorkingFileName(filename));
+	FILE* const fp = fopen(outPathName.GetStr(), "rb");
 	if (fp)
 	{
 		//[offset] [type]          [value]          [description]
@@ -484,14 +484,13 @@ static void MnistTrainingSet()
 		trainer.Optimize(*trainingLabels, *testLabels);
 		time = ndGetTimeInMicroseconds() - time;
 
-		char path[256];
 		#ifdef MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
-		ndGetWorkingFileName("mnistDatabase/mnist-cnn.dnn", path);
+		const ndString path(ndGetWorkingFileName("mnistDatabase/mnist-cnn.dnn"));
 		#else
-		ndGetWorkingFileName("mnistDatabase/mnist.dnn", path);
+		const ndString path(ndGetWorkingFileName("mnistDatabase/mnist.dnn"));
 		#endif
 		
-		ndBrainSave::Save(*trainer.m_bestBrain, path);
+		ndBrainSave::Save(*trainer.m_bestBrain, path.GetStr());
 		
 		mnistSupervisedTrainer inference(context, trainer.m_bestBrain);
 		ndInt32 testFailCount = inference.ValidateData(*testLabels, trainer.m_testData);
@@ -524,14 +523,16 @@ static void MnistTestSet()
 
 	if (testLabels && testDigits)
 	{
-		char path[256];
+		//char path[256];
 		#ifdef MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
-		ndGetWorkingFileName("mnistDatabase/mnist-cnn.dnn", path);
+		//ndGetWorkingFileName("mnistDatabase/mnist-cnn.dnn", path);
+		const ndString path(ndGetWorkingFileName("mnistDatabase/mnist-cnn.dnn"));
 		#else
-		ndGetWorkingFileName("mnistDatabase/mnist.dnn", path);
+		//ndGetWorkingFileName("mnistDatabase/mnist.dnn", path);
+		const ndString path(ndGetWorkingFileName("mnistDatabase/mnist.dnn"));
 		#endif
 
-		ndSharedPtr<ndBrain> brain (ndBrainLoad::Load(path));
+		ndSharedPtr<ndBrain> brain (ndBrainLoad::Load(path.GetStr()));
 		ndInt32 numbeOfParam = brain->GetNumberOfParameters();
 
 		ndInt32 minibatchSize = 256;
