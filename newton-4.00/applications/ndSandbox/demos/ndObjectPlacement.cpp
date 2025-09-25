@@ -66,10 +66,8 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		:ndDemoCameraNode(owner)
 		,m_placementMatrix(ndGetIdentityMatrix())
 		,m_castingShape(nullptr)
-		,m_meshInventory(nullptr)
-		,m_placementColor(0.0f, 0.0f, 0.0f, 0.0f)
-		,m_validPlacement(0.0f, 0.0f, 1.0f, 0.0f)
-		,m_invalidPlacement(1.0f, 0.0f, 0.0f, 0.0f)
+		,m_meshPrimitive(nullptr)
+		,m_ghostPrimitive(nullptr)
 		,m_yaw(ndFloat32(0.0f))
 		,m_pitch(ndFloat32(0.0f))
 		,m_yawRate(ndFloat32(0.04f))
@@ -86,12 +84,21 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		ndDemoEntityManager* const scene = renderCallback->m_owner;
 
 		ndSharedPtr<ndRenderSceneNode> entity(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("tpot.fbx")));
-		m_primitiveOffsetMatrix = entity->m_primitiveMatrix;
-		m_meshInventory = entity->GetPrimitive();
-		
-		ndSharedPtr<ndRenderPrimitive> xxxxx(m_meshInventory->Clone());
-
 		m_castingShape = loader.m_mesh->CreateCollision();
+
+		m_primitiveOffsetMatrix = entity->m_primitiveMatrix;
+		m_meshPrimitive = entity->GetPrimitive();
+
+		m_ghostPrimitive = ndSharedPtr<ndRenderPrimitive>(m_meshPrimitive->Clone());
+		ndRenderPrimitiveMesh* const ghoshMesh = (ndRenderPrimitiveMesh*)*m_ghostPrimitive;
+		for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* ptr = ghoshMesh->m_segments.GetFirst(); ptr; ptr = ptr->GetNext())
+		{
+			ndRenderPrimitiveMeshSegment& segment = ptr->GetInfo();
+			segment.m_material.m_opacity = ndFloat32 (0.3f);
+			segment.m_material.m_diffuse = ndVector(1.0f, 1.0f, 1.0f, 1.0f);
+			segment.m_material.m_specular = ndVector(0.0f, 0.0f, 0.0f, 1.0f);
+			segment.m_material.m_reflection = ndVector(0.0f, 0.0f, 0.0f, 1.0f);
+		}
 	}
 
 	void Render(const ndRender* const owner, ndFloat32 timestep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const override
@@ -101,8 +108,9 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		if (m_showIcon)
 		{
 			const ndMatrix modelMatrix(m_primitiveOffsetMatrix * m_placementMatrix);
-			//m_meshInventory->Render(owner, modelMatrix, renderMode);
-			m_meshInventory->Render(owner, modelMatrix, m_directionalDiffusseShadow);
+			//m_meshPrimitive->Render(owner, modelMatrix, m_directionalDiffusseShadow);
+			m_ghostPrimitive->Render(owner, modelMatrix, m_transparencyBackface);
+			m_ghostPrimitive->Render(owner, modelMatrix, m_transparencyFrontface);
 		}
 	}
 
@@ -200,7 +208,6 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 	void DoPlacement(ndDemoEntityManager* const scene)
 	{
 		m_showIcon = false;
-		m_placementColor = m_invalidPlacement;
 		switch (m_state)
 		{
 			case m_inTraceMode:
@@ -229,7 +236,7 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 
 			case m_releasePlacemnet:
 			{
-				TraceLocation(scene);
+				//TraceLocation(scene);
 				if (!(ImGui::IsMouseDown(0) && ImGui::IsMouseDown(1)))
 				{
 					// start the cicle again
@@ -275,7 +282,6 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 			m_placementMatrix = matrixStart;
 			if (CalculatePlacementMatrix(matrixStart))
 			{
-				m_placementColor = m_validPlacement;
 				return m_hasValidPlacement;
 			}
 		}
@@ -316,7 +322,7 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		ndPhysicsWorld* const world = scene->GetWorld();
 
 		ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(m_placementMatrix));
-		entity->SetPrimitive(m_meshInventory);
+		entity->SetPrimitive(m_meshPrimitive);
 		entity->SetPrimitiveMatrix(m_primitiveOffsetMatrix);
 
 		ndFloat32 mass = ndFloat32 (10.0f);
@@ -334,10 +340,8 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 	ndMatrix m_placementMatrix;
 	ndMatrix m_primitiveOffsetMatrix;
 	ndSharedPtr<ndShapeInstance> m_castingShape;
-	ndSharedPtr<ndRenderPrimitive> m_meshInventory;
-	ndVector m_placementColor;
-	ndVector m_validPlacement;
-	ndVector m_invalidPlacement;
+	ndSharedPtr<ndRenderPrimitive> m_meshPrimitive;
+	ndSharedPtr<ndRenderPrimitive> m_ghostPrimitive;
 	ndFloat32 m_yaw;
 	ndFloat32 m_pitch;
 	ndFloat32 m_yawRate;
