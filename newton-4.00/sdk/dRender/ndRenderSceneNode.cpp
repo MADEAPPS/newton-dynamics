@@ -14,6 +14,8 @@
 #include "ndRenderSceneNode.h"
 #include "ndRenderPrimitive.h"
 
+#define ND_STACK_DEPTH 512
+
 ndTransform::ndTransform()
 	:m_position(ndVector::m_wOne)
 	,m_rotation()
@@ -48,6 +50,7 @@ ndRenderSceneNode::ndRenderSceneNode(const ndMatrix& matrix)
 	,m_parent(nullptr)
 	,m_primitive(nullptr)
 	,m_children()
+	,m_childNode(nullptr)
 	,m_sceneHandle(nullptr)
 	,m_isVisible(true)
 {
@@ -120,74 +123,106 @@ const ndList<ndSharedPtr<ndRenderSceneNode>>& ndRenderSceneNode::GetChilden() co
 	return m_children;
 }
 
+ndRenderSceneNode* ndRenderSceneNode::IteratorFirst()
+{
+	ndRenderSceneNode* ptr = this;
+	while (ptr->m_children.GetCount())
+	{
+		ptr = *ptr->m_children.GetFirst()->GetInfo();
+	}
+	return ptr;
+}
+
+ndRenderSceneNode* ndRenderSceneNode::IteratorNext()
+{
+	if (m_childNode)
+	{
+		ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* next = m_childNode->GetNext();
+		if (next)
+		{
+			if (next->GetInfo()->m_children.GetCount())
+			{
+				return next->GetInfo()->IteratorFirst();
+			}
+			return *next->GetInfo();
+		}
+		return m_parent;
+	}
+	return nullptr;
+}
+
 ndRenderSceneCamera* ndRenderSceneNode::FindCameraNode()
 {
-	ndFixSizeArray<ndRenderSceneNode*, 256> stack;
-	
-	stack.PushBack(this);
-	while (stack.GetCount())
+	for (ndRenderSceneNode* node = IteratorFirst(); node; node = node->IteratorNext())
 	{
-		ndRenderSceneNode* const node = stack.Pop();
 		ndRenderSceneCamera* const camera = node->GetAsCamera();
 		if (camera)
 		{
 			return camera;
 		}
-
-		for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* childNode = m_children.GetFirst(); childNode; childNode = childNode->GetNext())
-		{
-			stack.PushBack(*childNode->GetInfo());
-		}
 	}
-
 	ndAssert(0);
 	return nullptr;
 }
 
 const ndRenderSceneCamera* ndRenderSceneNode::FindCameraNode() const
 {
-	ndFixSizeArray<const ndRenderSceneNode*, 256> stack;
-
-	stack.PushBack(this);
-	while (stack.GetCount())
+	ndRenderSceneNode* const self = (ndRenderSceneNode*)this;
+	for (ndRenderSceneNode* node = self->IteratorFirst(); node; node = node->IteratorNext())
 	{
-		const ndRenderSceneNode* const node = stack.Pop();
-		const ndRenderSceneCamera* const camera = node->GetAsCamera();
+		ndRenderSceneCamera* const camera = node->GetAsCamera();
 		if (camera)
 		{
 			return camera;
 		}
+	}
+	ndAssert(0);
+	return nullptr;
+}
 
-		for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* childNode = m_children.GetFirst(); childNode; childNode = childNode->GetNext())
+ndRenderSceneNode* ndRenderSceneNode::FindByName(const ndString& name) const
+{
+	ndRenderSceneNode* const self = (ndRenderSceneNode*)this;
+	for (ndRenderSceneNode* node = self->IteratorFirst(); node; node = node->IteratorNext())
+	{
+		if (name == node->m_name)
 		{
-			stack.PushBack(*childNode->GetInfo());
+			return node;
 		}
 	}
-
-	ndAssert(0);
 	return nullptr;
 }
 
 void ndRenderSceneNode::AddChild(const ndSharedPtr<ndRenderSceneNode>& child)
 {
 	ndAssert(child->m_parent == nullptr);
+
+	ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* const childNode = m_children.Append(child);
 	child->m_parent = this;
-	m_children.Append(child);
+	child->m_childNode = childNode;
 }
 
 void ndRenderSceneNode::RemoveChild(const ndSharedPtr<ndRenderSceneNode> child)
 {
+	//ndAssert(child->m_parent && (child->m_parent == this));
+	//for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = m_children.GetFirst(); node; node = node->GetNext())
+	//{
+	//	ndRenderSceneNode* const childNode = *node->GetInfo();
+	//	if (childNode == *child)
+	//	{
+	//		child->m_parent = nullptr;
+	//		m_children.Remove(node);
+	//		break;
+	//	}
+	//}
+	ndAssert(child->m_childNode);
 	ndAssert(child->m_parent && (child->m_parent == this));
-	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = m_children.GetFirst(); node; node = node->GetNext())
-	{
-		ndRenderSceneNode* const childNode = *node->GetInfo();
-		if (childNode == *child)
-		{
-			child->m_parent = nullptr;
-			m_children.Remove(node);
-			break;
-		}
-	}
+
+	ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* const node = child->m_childNode;
+	child->m_parent = nullptr;
+	child->m_childNode = nullptr;
+
+	m_children.Remove(node);
 }
 
 void ndRenderSceneNode::SetPrimitiveMatrix(const ndMatrix& matrix)
@@ -269,10 +304,12 @@ void ndRenderSceneNode::InterpolateTransforms(ndFloat32 param)
 	const ndVector p1(m_transform1.m_position);
 	const ndQuaternion r0(m_transform0.m_rotation);
 	const ndQuaternion r1(m_transform1.m_rotation);
-	const ndVector posit(p0 + (p1 - p0).Scale(param));
+
 	const ndQuaternion rotation(r0.Slerp(r1, param));
+	const ndVector posit(p0 + (p1 - p0).Scale(param));
 
 	SetMatrix(rotation, posit);
+
 	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = m_children.GetFirst(); node; node = node->GetNext())
 	{
 		node->GetInfo()->InterpolateTransforms(param);

@@ -55,6 +55,8 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 	ndRenderSceneCamera* FindCameraNode();
 	const ndRenderSceneCamera* FindCameraNode() const;
 
+	ndRenderSceneNode* FindByName(const ndString& name) const;
+
 	void SetPrimitiveMatrix(const ndMatrix& matrix);
 	ndSharedPtr<ndRenderPrimitive>GetPrimitive() const;
 	void SetPrimitive(const ndSharedPtr<ndRenderPrimitive>& primitive);
@@ -71,6 +73,9 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 	ndTransform GetTransform() const;
 	void SetTransform(const ndTransform& transform);
 
+	ndRenderSceneNode* IteratorNext();
+	ndRenderSceneNode* IteratorFirst();
+
 	virtual void Render(const ndRender* const owner, ndFloat32 timeStep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const;
 
 	public:
@@ -85,6 +90,7 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 	ndRenderSceneNode* m_parent;
 	ndSharedPtr<ndRenderPrimitive> m_primitive;
 	ndList<ndSharedPtr<ndRenderSceneNode>> m_children;
+	ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* m_childNode;
 	ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* m_sceneHandle;
 
 	public:
