@@ -149,6 +149,33 @@ class ndMopcapRetargetMeshLoader : public ndMeshLoader
 	ndFloat32 m_scale;
 };
 
+
+static ndSharedPtr<ndBody> CreatePlayer(
+	ndDemoEntityManager* const scene, 
+	ndMopcapRetargetMeshLoader& loader,
+	ndSharedPtr<ndRenderSceneNode>& entity,
+	const ndMatrix& matrix)
+{
+	ndMatrix location(matrix);
+	location.m_posit.m_y += 2.0f;
+
+	ndMatrix localAxis(ndGetIdentityMatrix());
+	localAxis[0] = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
+	localAxis[1] = ndVector(1.0f, 0.0f, 0.0f, 0.0f);
+	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
+
+	ndFloat32 height = 1.9f;
+	ndFloat32 radio = 0.15f;
+	ndFloat32 mass = 100.0f;
+	ndSharedPtr<ndBody> player0(new ndBasicPlayerCapsule(scene, loader, entity, localAxis, location, mass, radio, height, height / 4.0f, true));
+
+	// add body and mesh to the world
+	ndWorld* const world = scene->GetWorld();
+	scene->AddEntity(entity);
+	world->AddBody(player0);
+	return player0;
+}
+
 void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 {
 	// build a floor
@@ -156,31 +183,18 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 	//ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
 	ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "marblecheckboard.png", 0.1f, true));
 
-	//ndMatrix location(ndGetIdentityMatrix());
-	//location.m_posit.m_y += 2.0f;
-	//
-	//ndMatrix localAxis(ndGetIdentityMatrix());
-	//localAxis[0] = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
-	//localAxis[1] = ndVector(1.0f, 0.0f, 0.0f, 0.0f);
-	//localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
-
-	//ndFloat32 height = 1.9f;
-	//ndFloat32 radio = 0.5f;
-	//ndFloat32 mass = 100.0f;
+	// load the visual mesh, and animations.
 	ndMopcapRetargetMeshLoader loader(1.0f);
-	//ndPhysicsWorld* const world = scene->GetWorld();
 	ndSharedPtr<ndRenderSceneNode> entity(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("humanoidRobot.fbx")));
-	//ndSharedPtr<ndBody> player0(new ndBasicPlayerCapsule(scene, loader, *entity, localAxis, location, mass, radio, height, height / 4.0f, true));
-	//world->AddBody(player0);
 
-scene->AddEntity(entity);
-entity->SetTransform(entity->GetTransform());
-entity->SetTransform(entity->GetTransform());
+	// create one player capsule, th emesh will be duplicated
+	ndMatrix location(ndGetIdentityMatrix());
+	ndSharedPtr<ndBody> player0(CreatePlayer(scene, loader, entity, location));
 
-
+#if 0		
 	//ndSharedPtr<ndBody> player1(new ndBasicPlayerCapsule(scene, loader, *entity, localAxis, location, mass, radio, height, height/4.0f));
 	//world->AddBody(player1);
-#if 0		
+
 	location.m_posit.m_z += 2.0f;
 	ndSharedPtr<ndBody> player2(new ndBasicPlayerCapsule(scene, loader, *entity, localAxis, location, mass, radio, height, height / 4.0f));
 	//world->AddBody(player2);
@@ -206,14 +220,20 @@ entity->SetTransform(entity->GetTransform());
 	//AddBox(scene, PlaceMatrix(10.0f, 0.5f, 1.125f), 30.0f, 2.0f, 0.25f, 2.5f);
 	//AddBox(scene, PlaceMatrix(10.0f, 1.0f, 1.250f), 30.0f, 2.0f, 0.25f, 2.5f);
 
-	// attach a Camera to the player.
+
+
+	// create a follow camera
 	const ndVector cameraPivot(0.0f, 0.25f, 0.0f, 0.0f);
 	ndRender* const renderer = *scene->GetRenderer();
 	ndSharedPtr<ndRenderSceneNode> camera(new ndDemoCameraNodeFollow(renderer, cameraPivot, ND_THIRD_PERSON_CAMERA_DIST));
 	renderer->SetCamera(camera);
 
+	// attach a Camera to the player.
+	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)player0->GetAsBodyKinematic()->GetNotifyCallback();
+	ndSharedPtr<ndRenderSceneNode> vehicleMesh(notify->GetUserData());
+
 	// in this person make the camera a child of the hip 
-	ndRenderSceneNode* const cameraNodePivot = entity->FindByName("cameraPivot");
+	ndRenderSceneNode* const cameraNodePivot = vehicleMesh->FindByName("cameraPivot");
 	ndAssert(cameraNodePivot);
 	cameraNodePivot->AddChild(camera);
 }

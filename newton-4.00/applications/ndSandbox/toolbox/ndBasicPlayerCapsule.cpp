@@ -10,11 +10,8 @@
 */
 
 #include "ndSandboxStdafx.h"
-//#include "ndSkyBox.h"
-//#include "ndDemoMesh.h"
-//#include "ndDemoCamera.h"
-//#include "ndPhysicsUtils.h"
-//#include "ndPhysicsWorld.h"
+#include "ndPhysicsUtils.h"
+#include "ndPhysicsWorld.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 #include "ndBasicPlayerCapsule.h"
@@ -109,24 +106,18 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	,m_idleWalkBlend(nullptr)
 	,m_animBlendTree(nullptr)
 {
-	ndAssert(0);
-	//ndMatrix matrix(location);
-	//ndPhysicsWorld* const world = scene->GetWorld();
-	//ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	//matrix.m_posit.m_y = floor.m_y;
-	//
-	//ndSharedPtr<ndRenderSceneNode> entity (modelEntity->CreateClone());
-	//
-	//SetMatrix(matrix);
-	//scene->AddEntity(entity);
-	//
+	ndMatrix matrix(location);
+	ndPhysicsWorld* const world = scene->GetWorld();
+	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	matrix.m_posit.m_y = floor.m_y;
+
+	SetMatrix(matrix);
+	ndSharedPtr<ndRenderSceneNode> entity (modelEntity->Clone());
+
+	
 	//SetNotifyCallback(new ndBasicPlayerCapsuleNotify(scene, entity));
-	//
-	//if (isPlayer)
-	//{
-	//	scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
-	//}
-	//
+	SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+	
 	//// create an animation blend tree
 	////ndSharedPtr<ndAnimationSequence> idleSequence__(scene->GetAnimationSequence(loader, "box.fbx"));
 	////ndSharedPtr<ndAnimationSequence> idleSequence(scene->GetAnimationSequence(loader, "mocap_ide0.fbx"));
