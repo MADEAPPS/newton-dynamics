@@ -86,15 +86,16 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(const ndRenderPri
 
 	if (src.m_vertexBuffer)
 	{
-		ndArray<ndInt32> vertexBuffer;
-		vertexBuffer.SetCount(m_vertexSize * m_vertexCount);
+		ndArray<ndReal> vertexBuffer;
+		ndInt32 sizeInReals = ndInt32 (m_vertexSize * m_vertexCount / sizeof(ndReal));
+		vertexBuffer.SetCount(sizeInReals);
 		glBindBuffer(GL_ARRAY_BUFFER, src.m_vertexBuffer);
-		ndInt32* const srcData = (ndInt32*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
-		ndMemCpy(&vertexBuffer[0], srcData, m_vertexSize * m_vertexCount);
+		const ndReal* const srcData = (ndReal*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
+		ndMemCpy(&vertexBuffer[0], srcData, sizeInReals);
 		
 		glGenBuffers(1, &m_vertexBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-		glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(m_vertexSize * m_vertexCount), &vertexBuffer[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(sizeInReals * sizeof(ndReal)), &vertexBuffer[0], GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
