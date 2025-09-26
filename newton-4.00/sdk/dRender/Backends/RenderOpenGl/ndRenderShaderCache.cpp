@@ -38,6 +38,7 @@ bool ndRenderShaderCache::CreateAllEffects()
 	m_diffuseEffect = CreateShaderEffect(m_directionalDiffuseVertex, m_directionalDiffusePixel);
 	m_generateShadowMapsEffect = CreateShaderEffect(m_generateShadowMapVertex, m_doNothingPixel);
 	m_diffuseShadowEffect = CreateShaderEffect(m_directionalDiffuseShadowVertex, m_directionalDiffuseShadowPixel);
+	m_diffuseShadowSkinEffect = CreateShaderEffect(m_directionalDiffuseShadowSkinVertex, m_directionalDiffuseShadowPixel);
 	m_diffuseTransparentEffect = CreateShaderEffect(m_directionalDiffuseVertex, m_directionalDiffuseTransparentPixel);
 	m_debugFlatShadedDiffuseEffect = CreateShaderEffect(m_debugFlatShadedDiffuseVertex, m_debugFlatShadedDiffusePixel);
 	m_diffuseShadowIntanceEffect = CreateShaderEffect(m_directionalDiffuseInstanceVertex, m_directionalDiffuseShadowPixel);

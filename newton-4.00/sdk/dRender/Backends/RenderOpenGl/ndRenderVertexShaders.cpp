@@ -185,3 +185,50 @@ R""""(
 
 )"""";
 
+const char* ndRenderShaderCache::m_directionalDiffuseShadowSkinVertex =
+R""""(
+	#version 450 core
+
+	layout(location = 0) in vec3 in_position;
+	layout(location = 1) in vec3 in_normal;
+	layout(location = 2) in vec2 in_uv;
+	layout(location = 3) in vec4 in_boneWeights;
+	layout(location = 4) in vec4 in_boneIndices;
+
+	uniform mat4 viewModelMatrix;
+	uniform mat4 projectionMatrix;
+	uniform mat4 modelWorldMatrix;
+	uniform mat4 matrixPallete[128];
+
+	out vec4 worldPosit;
+	out vec3 posit;
+	out vec3 normal;
+	out vec2 uv;
+
+	void main()
+	{
+		vec4 weightedNormal = vec4 (0.0f, 0.0f, 0.0f, 0.0f);	
+		vec4 weightedVertex = vec4 (0.0f, 0.0f, 0.0f, 1.0f);	
+		vec4 pointNormal = vec4(in_normal, 0.0f);
+		vec4 pointVertex = vec4(in_position, 1.0f);
+		for (int i = 0; i < 4; i++) 
+		{
+			int matrixIndex = int (in_boneIndices[i]);
+			weightedVertex += matrixPallete[matrixIndex] * pointVertex * in_boneWeights[i];
+			weightedNormal += matrixPallete[matrixIndex] * pointNormal * in_boneWeights[i];
+		}
+		weightedVertex.w = 1.0;
+		weightedNormal = normalize (weightedNormal);
+
+		//worldPosit = modelWorldMatrix * vec4(in_position, 1.0);
+		//posit = vec3(viewModelMatrix * vec4(in_position, 1.0));
+		//normal = vec3(normalize(viewModelMatrix * vec4(in_normal, 0.0)));
+
+		posit = vec3 (viewModelMatrix * weightedVertex);
+		normal = vec3 (viewModelMatrix * weightedNormal);
+
+		uv = in_uv;
+		gl_Position = projectionMatrix * vec4(posit, 1.0);
+	}
+
+)"""";

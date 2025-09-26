@@ -476,7 +476,106 @@ void ndRenderPrimitiveMeshImplement::BuildRenderSimpleMeshFromMeshEffect(const n
 
 void ndRenderPrimitiveMeshImplement::BuildRenderSkinnedMeshFromMeshEffect(const ndRenderPrimitiveMesh::ndDescriptor& descriptor)
 {
-	BuildRenderSimpleMeshFromMeshEffect(descriptor);
+	ndMeshEffect& mesh = *((ndMeshEffect*)*descriptor.m_meshNode);
+	ndAssert(descriptor.m_materials.GetCount());
+
+	// extract vertex data  from the newton mesh
+	ndInt32 indexCount = 0;
+	ndInt32 vertexCount = mesh.GetPropertiesCount();
+	ndIndexArray* const geometryHandle = mesh.MaterialGeometryBegin();
+	for (ndInt32 handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
+	{
+		indexCount += mesh.GetMaterialIndexCount(geometryHandle, handle);
+	}
+
+	struct ndTmpData
+	{
+		ndReal m_posit[3];
+		ndReal m_normal[3];
+		ndReal m_uv[2];
+	};
+
+	ndArray<ndTmpData> tmp;
+	ndArray<ndInt32> indices;
+	ndArray<glPositionNormalUV> points;
+
+	tmp.SetCount(vertexCount);
+	points.SetCount(vertexCount);
+	indices.SetCount(indexCount);
+
+	mesh.GetVertexChannel(sizeof(ndTmpData), &tmp[0].m_posit[0]);
+	mesh.GetNormalChannel(sizeof(ndTmpData), &tmp[0].m_normal[0]);
+	mesh.GetUV0Channel(sizeof(ndTmpData), &tmp[0].m_uv[0]);
+
+	for (ndInt32 i = 0; i < vertexCount; ++i)
+	{
+		points[i].m_posit.m_x = GLfloat(tmp[i].m_posit[0]);
+		points[i].m_posit.m_y = GLfloat(tmp[i].m_posit[1]);
+		points[i].m_posit.m_z = GLfloat(tmp[i].m_posit[2]);
+		points[i].m_normal.m_x = GLfloat(tmp[i].m_normal[0]);
+		points[i].m_normal.m_y = GLfloat(tmp[i].m_normal[1]);
+		points[i].m_normal.m_z = GLfloat(tmp[i].m_normal[2]);
+		points[i].m_uv.m_u = GLfloat(tmp[i].m_uv[0]);
+		points[i].m_uv.m_v = GLfloat(tmp[i].m_uv[1]);
+	}
+
+	ndInt32 segmentStart = 0;
+	for (ndInt32 handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
+	{
+		ndInt32 materialIndex = mesh.GetMaterialID(geometryHandle, handle);
+		ndList<ndRenderPrimitiveMeshMaterial>::ndNode* materialNodes = descriptor.m_materials.GetFirst();
+		for (ndInt32 i = 0; i < materialIndex; ++i)
+		{
+			materialNodes = materialNodes->GetNext();
+		}
+		const ndRenderPrimitiveMeshMaterial& material = materialNodes->GetInfo();
+
+		ndRenderPrimitiveMeshSegment& segment = m_owner->m_segments.Append()->GetInfo();
+
+		segment.m_material.m_texture = material.m_texture;
+		segment.m_material.m_diffuse = material.m_diffuse;
+		segment.m_material.m_opacity = material.m_opacity;
+		segment.m_material.m_specular = material.m_specular;
+		segment.m_material.m_reflection = material.m_reflection;
+		segment.m_material.m_castShadows = material.m_castShadows;
+		segment.m_material.m_specularPower = material.m_specularPower;
+
+		segment.m_indexCount = mesh.GetMaterialIndexCount(geometryHandle, handle);
+
+		segment.m_segmentStart = segmentStart;
+		mesh.GetMaterialGetIndexStream(geometryHandle, handle, &indices[segmentStart]);
+		segmentStart += segment.m_indexCount;
+	}
+	mesh.MaterialGeometryEnd(geometryHandle);
+
+	// optimize this mesh for hardware buffers if possible
+	m_indexCount = indexCount;
+	m_vertexCount = ndInt32(points.GetCount());
+
+	glGenBuffers(1, &m_indexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, GLsizeiptr(indexCount * sizeof(GLuint)), &indices[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	glGenVertexArrays(1, &m_vertextArrayBuffer);
+	glBindVertexArray(m_vertextArrayBuffer);
+
+	glGenBuffers(1, &m_vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(points.GetCount() * sizeof(glPositionNormalUV)), &points[0], GL_STATIC_DRAW);
+	m_vertexSize = sizeof(glPositionNormalUV);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormalUV), (void*)OFFSETOF(glPositionNormalUV, m_posit));
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormalUV), (void*)OFFSETOF(glPositionNormalUV, m_normal));
+
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(glPositionNormalUV), (void*)OFFSETOF(glPositionNormalUV, m_uv));
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 }
 
 void ndRenderPrimitiveMeshImplement::BuildDebugFlatShadedMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor)
