@@ -368,7 +368,7 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionCompound(bool lowDetail)
 		compoundShape->AddCollision(&hullShape);
 	}
 	compoundShape->EndAddRemove();
-	compoundShapeInstance->SetLocalMatrix(m_meshMatrix);
+	//compoundShapeInstance->SetLocalMatrix(m_meshMatrix);
 
 	interfaceVHACD->Clean();
 	interfaceVHACD->Release();
