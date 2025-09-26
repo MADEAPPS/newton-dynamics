@@ -228,7 +228,7 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 	ndSharedPtr<ndRenderSceneNode> camera(new ndDemoCameraNodeFollow(renderer, cameraPivot, ND_THIRD_PERSON_CAMERA_DIST));
 	renderer->SetCamera(camera);
 
-	// attach a Camera to the player.
+	// attach a Camera to one of the players.
 	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)player0->GetAsBodyKinematic()->GetNotifyCallback();
 	ndSharedPtr<ndRenderSceneNode> vehicleMesh(notify->GetUserData());
 
