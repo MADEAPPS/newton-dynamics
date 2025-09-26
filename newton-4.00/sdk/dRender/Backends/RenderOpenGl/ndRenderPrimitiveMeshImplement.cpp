@@ -229,7 +229,6 @@ void ndRenderPrimitiveMeshImplement::BuildFromMesh(const ndRenderPrimitiveMesh::
 			ndAssert(0);
 		}
 	}
-
 }
 
 void ndRenderPrimitiveMeshImplement::BuildRenderMeshFromCollisionShape(const ndRenderPrimitiveMesh::ndDescriptor& descriptor)
@@ -487,28 +486,35 @@ void ndRenderPrimitiveMeshImplement::BuildRenderSkinnedMeshFromMeshEffect(const 
 	ndFixSizeArray<ndRenderSceneNode*, 128> entityArray;
 
 	parentMatrix.PushBack(ndGetIdentityMatrix());
-	//pool.PushBack((ndRenderSceneNode*)owner->GetRoot());
-	//ndMatrix shapeBindMatrix(m_ownerEntity->GetMeshMatrix() * m_ownerEntity->CalculateGlobalMatrix());
-	//
-	//ndTree<ndInt32, ndInt32> boneHashIdMap;
-	//while (pool.GetCount())
-	//{
-	//	ndDemoEntity* const entity = pool.Pop();
-	//	ndInt32 hash = ndInt32(ndCRC64(entity->GetName().GetStr()) & 0xffffffff);
-	//	boneHashIdMap.Insert(ndInt32(entityArray.GetCount()), hash);
-	//
-	//	const ndMatrix boneMatrix(entity->GetCurrentMatrix() * parentMatrix.Pop());
-	//	const ndMatrix palleteMatrix(shapeBindMatrix * boneMatrix.OrthoInverse());
-	//	entityArray.PushBack(entity);
-	//	bindMatrixArray.PushBack(palleteMatrix);
-	//
-	//	for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = entity->GetChildren().GetFirst(); node; node = node->GetNext())
-	//	{
-	//		pool.PushBack(*node->GetInfo());
-	//		parentMatrix.PushBack(boneMatrix);
-	//	}
-	//}
+	pool.PushBack(descriptor.m_skeleton->GetRoot());
+	ndMatrix shapeBindMatrix(descriptor.m_skeleton->m_primitiveMatrix * descriptor.m_skeleton->CalculateGlobalTransform());
+	
+	ndTree<ndInt32, ndInt32> boneHashIdMap;
+	while (pool.GetCount())
+	{
+		ndRenderSceneNode* const entity = pool.Pop();
+		ndInt32 hash = ndInt32(ndCRC64(entity->m_name.GetStr()) & 0xffffffff);
+		boneHashIdMap.Insert(ndInt32(entityArray.GetCount()), hash);
+	
+		const ndMatrix boneMatrix(entity->GetTransform().GetMatrix() * parentMatrix.Pop());
+		const ndMatrix palleteMatrix(shapeBindMatrix * boneMatrix.OrthoInverse());
+		entityArray.PushBack(entity);
+		bindMatrixArray.PushBack(palleteMatrix);
+	
+		for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = entity->GetChildren().GetFirst(); node; node = node->GetNext())
+		{
+			pool.PushBack(*node->GetInfo());
+			parentMatrix.PushBack(boneMatrix);
+		}
+	}
 
+	//m_nodeCount = ndInt32(entityArray.GetCount());
+	//m_bindingMatrixArray.SetCount(m_nodeCount);
+	m_instanceRenderMatrixPallete.SetCount(0);
+	for (ndInt32 i = 0; i < entityArray.GetCount(); ++i)
+	{
+		m_instanceRenderMatrixPallete.PushBack(glMatrix(bindMatrixArray[i]));
+	}
 
 	// extract vertex data  from the newton mesh
 	ndInt32 indexCount = 0;
@@ -529,12 +535,15 @@ void ndRenderPrimitiveMeshImplement::BuildRenderSkinnedMeshFromMeshEffect(const 
 
 	ndArray<ndTmpData> tmp;
 	ndArray<ndInt32> indices;
+	ndArray<ndInt32> vertexIndex;
 	ndArray<glPositionNormalUV> points;
 
 	tmp.SetCount(vertexCount);
 	points.SetCount(vertexCount);
 	indices.SetCount(indexCount);
+	vertexIndex.SetCount(vertexCount);
 
+	mesh.GetVertexIndexChannel(&vertexIndex[0]);
 	mesh.GetVertexChannel(sizeof(ndTmpData), &tmp[0].m_posit[0]);
 	mesh.GetNormalChannel(sizeof(ndTmpData), &tmp[0].m_normal[0]);
 	mesh.GetUV0Channel(sizeof(ndTmpData), &tmp[0].m_uv[0]);

@@ -117,7 +117,17 @@ ndRenderSceneNode* ndRenderSceneNode::GetParent() const
 	return m_parent;
 }
 
-const ndList<ndSharedPtr<ndRenderSceneNode>>& ndRenderSceneNode::GetChilden() const
+ndRenderSceneNode* ndRenderSceneNode::GetRoot() const
+{
+	const ndRenderSceneNode* self = this;
+	while (self->m_parent)
+	{
+		self = self->m_parent;
+	}
+	return (ndRenderSceneNode*)self;
+}
+
+const ndList<ndSharedPtr<ndRenderSceneNode>>& ndRenderSceneNode::GetChildren() const
 {
 	return m_children;
 }

@@ -49,7 +49,7 @@ void ndRenderSceneNodeInstanceImplement::Render(const ndRender* const owner, ndF
 		ndArray<glMatrix>& matrixPallete = meshImplement->m_instanceRenderMatrixPallete;
 
 		matrixPallete.SetCount(0);
-		const ndList<ndSharedPtr<ndRenderSceneNode>>& children = m_owner->GetChilden();
+		const ndList<ndSharedPtr<ndRenderSceneNode>>& children = m_owner->GetChildren();
 		for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = children.GetFirst(); node; node = node->GetNext())
 		{
 			ndRenderSceneNode* const child = *node->GetInfo();

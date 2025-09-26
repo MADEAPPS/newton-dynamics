@@ -50,7 +50,7 @@ class ndBackGroundVehicleController : public ndModelNotify
 		// is this example we only spin the tires.
 		const ndString tireId("tire");
 		const ndVector rightDir(vehicleMesh->GetTransform().GetMatrix().m_right);
-		const ndList<ndSharedPtr<ndRenderSceneNode>>& children = vehicleMesh->GetChilden();
+		const ndList<ndSharedPtr<ndRenderSceneNode>>& children = vehicleMesh->GetChildren();
 		for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = children.GetFirst(); node; node = node->GetNext())
 		{
 			ndRenderSceneNode* const child = *node->GetInfo();
@@ -78,7 +78,7 @@ class ndBackGroundVehicleController : public ndModelNotify
 		floor.m_y += ndFloat32(1.0f);
 		matrix.m_posit = floor;
 
-		ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* renderChildren = vehicleMesh->GetChilden().GetFirst();
+		ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* renderChildren = vehicleMesh->GetChildren().GetFirst();
 
 		// build a compound collision shape with chassis and tires
 		ndSharedPtr<ndShapeInstance> compoundShapeInstance(new ndShapeInstance(new ndShapeCompound()));

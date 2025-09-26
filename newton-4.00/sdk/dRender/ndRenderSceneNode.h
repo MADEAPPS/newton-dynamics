@@ -41,8 +41,10 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 
 	virtual ndRenderSceneNode* Clone() const;
 
+	ndRenderSceneNode* GetRoot() const;
 	ndRenderSceneNode* GetParent() const;
-	const ndList<ndSharedPtr<ndRenderSceneNode>>& GetChilden() const;
+	const ndList<ndSharedPtr<ndRenderSceneNode>>& GetChildren() const;
+
 	virtual void AddChild(const ndSharedPtr<ndRenderSceneNode>& child);
 	virtual void RemoveChild(const ndSharedPtr<ndRenderSceneNode> child);
 
