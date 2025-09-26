@@ -72,6 +72,7 @@ class ndRenderPrimitiveMesh : public ndRenderPrimitive
 			:m_render(render)
 			,m_meshNode(nullptr)
 			,m_collision(nullptr)
+			,m_skeleton(nullptr)
 			,m_materials()
 			,m_mapping(m_box)
 			,m_uvMatrix(ndGetIdentityMatrix())
@@ -85,6 +86,7 @@ class ndRenderPrimitiveMesh : public ndRenderPrimitive
 			:m_render(src.m_render)
 			,m_meshNode(src.m_meshNode)
 			,m_collision(src.m_collision)
+			,m_skeleton(nullptr)
 			,m_materials()
 			,m_mapping(src.m_mapping)
 			,m_uvMatrix(src.m_uvMatrix)
@@ -108,6 +110,7 @@ class ndRenderPrimitiveMesh : public ndRenderPrimitive
 		ndRender* m_render;
 		ndSharedPtr<ndMeshEffect> m_meshNode;
 		ndSharedPtr<ndShapeInstance> m_collision;
+		ndSharedPtr<ndRenderSceneNode> m_skeleton;
 		ndList<ndRenderPrimitiveMeshMaterial> m_materials;
 		ndUvMapingMode m_mapping;
 		ndMatrix m_uvMatrix;
