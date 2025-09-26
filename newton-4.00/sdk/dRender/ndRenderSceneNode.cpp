@@ -11,8 +11,8 @@
 
 #include "ndRenderStdafx.h"
 #include "ndRender.h"
-#include "ndRenderSceneNode.h"
 #include "ndRenderPrimitive.h"
+#include "ndRenderSceneNode.h"
 
 #define ND_STACK_DEPTH 512
 
