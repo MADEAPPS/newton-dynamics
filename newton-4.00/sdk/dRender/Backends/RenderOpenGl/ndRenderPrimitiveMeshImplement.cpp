@@ -215,7 +215,8 @@ void ndRenderPrimitiveMeshImplement::BuildFromMesh(const ndRenderPrimitiveMesh::
 		{
 			if (descriptor.m_meshNode->GetVertexWeights().GetCount())
 			{
-				BuildRenderSkinnedMeshFromMeshEffect(descriptor);
+				//BuildRenderSkinnedMeshFromMeshEffect(descriptor);
+				BuildRenderSimpleMeshFromMeshEffect(descriptor);
 			}
 			else
 			{
@@ -477,7 +478,37 @@ void ndRenderPrimitiveMeshImplement::BuildRenderSimpleMeshFromMeshEffect(const n
 void ndRenderPrimitiveMeshImplement::BuildRenderSkinnedMeshFromMeshEffect(const ndRenderPrimitiveMesh::ndDescriptor& descriptor)
 {
 	ndMeshEffect& mesh = *((ndMeshEffect*)*descriptor.m_meshNode);
+	ndAssert(*descriptor.m_skeleton);
 	ndAssert(descriptor.m_materials.GetCount());
+
+	ndFixSizeArray<ndRenderSceneNode*, 128> pool;
+	ndFixSizeArray<ndMatrix, 128> parentMatrix;
+	ndFixSizeArray<ndMatrix, 128> bindMatrixArray;
+	ndFixSizeArray<ndRenderSceneNode*, 128> entityArray;
+
+	parentMatrix.PushBack(ndGetIdentityMatrix());
+	//pool.PushBack((ndRenderSceneNode*)owner->GetRoot());
+	//ndMatrix shapeBindMatrix(m_ownerEntity->GetMeshMatrix() * m_ownerEntity->CalculateGlobalMatrix());
+	//
+	//ndTree<ndInt32, ndInt32> boneHashIdMap;
+	//while (pool.GetCount())
+	//{
+	//	ndDemoEntity* const entity = pool.Pop();
+	//	ndInt32 hash = ndInt32(ndCRC64(entity->GetName().GetStr()) & 0xffffffff);
+	//	boneHashIdMap.Insert(ndInt32(entityArray.GetCount()), hash);
+	//
+	//	const ndMatrix boneMatrix(entity->GetCurrentMatrix() * parentMatrix.Pop());
+	//	const ndMatrix palleteMatrix(shapeBindMatrix * boneMatrix.OrthoInverse());
+	//	entityArray.PushBack(entity);
+	//	bindMatrixArray.PushBack(palleteMatrix);
+	//
+	//	for (ndList<ndSharedPtr<ndDemoEntity>>::ndNode* node = entity->GetChildren().GetFirst(); node; node = node->GetNext())
+	//	{
+	//		pool.PushBack(*node->GetInfo());
+	//		parentMatrix.PushBack(boneMatrix);
+	//	}
+	//}
+
 
 	// extract vertex data  from the newton mesh
 	ndInt32 indexCount = 0;
@@ -493,6 +524,7 @@ void ndRenderPrimitiveMeshImplement::BuildRenderSkinnedMeshFromMeshEffect(const 
 		ndReal m_posit[3];
 		ndReal m_normal[3];
 		ndReal m_uv[2];
+		ndMeshEffect::ndVertexWeight m_weights;
 	};
 
 	ndArray<ndTmpData> tmp;
@@ -506,6 +538,7 @@ void ndRenderPrimitiveMeshImplement::BuildRenderSkinnedMeshFromMeshEffect(const 
 	mesh.GetVertexChannel(sizeof(ndTmpData), &tmp[0].m_posit[0]);
 	mesh.GetNormalChannel(sizeof(ndTmpData), &tmp[0].m_normal[0]);
 	mesh.GetUV0Channel(sizeof(ndTmpData), &tmp[0].m_uv[0]);
+	mesh.GetVertexWeightChannel(sizeof(ndTmpData), &tmp[0].m_weights);
 
 	for (ndInt32 i = 0; i < vertexCount; ++i)
 	{
