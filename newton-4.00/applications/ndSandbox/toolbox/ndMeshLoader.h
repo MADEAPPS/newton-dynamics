@@ -19,11 +19,10 @@ class ndMeshLoader: public ndFbxMeshLoader
 	public:
 	ndMeshLoader();
 	virtual ~ndMeshLoader();
-
-	//virtual ndSharedPtr<ndMesh> LoadMesh(const ndString& fbxPathMeshName, bool loadAnimation = false);
-	virtual ndSharedPtr<ndRenderSceneNode> LoadEntity(ndRender* const renderer, const ndString& fbxPathMeshName);
+	virtual bool LoadEntity(ndRender* const renderer, const ndString& fbxPathMeshName);
 
 	ndSharedPtr<ndMesh> m_mesh;
+	ndSharedPtr<ndRenderSceneNode> m_renderMesh;
 };
 
 #endif

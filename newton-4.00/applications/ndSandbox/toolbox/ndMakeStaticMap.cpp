@@ -434,8 +434,7 @@ ndSharedPtr<ndBody> BuildFlatPlane(ndDemoEntityManager* const scene, const ndMat
 ndSharedPtr<ndBody> BuildPlayground(ndDemoEntityManager* const scene, bool kinematic)
 {
 	ndMeshLoader loader;
-	ndSharedPtr<ndRenderSceneNode> playground(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("playground.fbx")));
-	//ndSharedPtr<ndShapeInstance>collision(levelMesh->CreateCollisionTree());
+	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("playground.fbx"));
 	ndSharedPtr<ndShapeInstance>collision(loader.m_mesh->CreateCollision());
 
 	kinematic = false;
@@ -444,12 +443,12 @@ ndSharedPtr<ndBody> BuildPlayground(ndDemoEntityManager* const scene, bool kinem
 	// generate a rigibody and added to the scene and world
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndSharedPtr<ndBody> body(new ndBodyDynamic());
-	body->SetNotifyCallback(new ndDemoEntityNotify(scene, playground));
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, loader.m_renderMesh));
 	body->SetMatrix(location);
 	body->GetAsBodyDynamic()->SetCollisionShape(**collision);
 
 	world->AddBody(body);
-	scene->AddEntity(playground);
+	scene->AddEntity(loader.m_renderMesh);
 
 	BuildPlaygroundHangingBridge(scene, loader.m_mesh, body);
 	return body;
@@ -586,8 +585,8 @@ ndSharedPtr<ndBody> BuildCompoundScene(ndDemoEntityManager* const scene, const n
 {
 	// load the player arena map
 	ndMeshLoader loader;
-	ndSharedPtr<ndRenderSceneNode> playground(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("playground.fbx")));
-	ndSharedPtr<ndRenderSceneNode> rootScene(new ndSceneMesh(scene, loader, playground, location));
+	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("playground.fbx"));
+	ndSharedPtr<ndRenderSceneNode> rootScene(new ndSceneMesh(scene, loader, loader.m_renderMesh, location));
 
 	ndSceneMesh* const sceneMesh = (ndSceneMesh*)*rootScene;
 	ndPhysicsWorld* const world = scene->GetWorld();

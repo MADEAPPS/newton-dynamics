@@ -129,13 +129,13 @@ static void AddEmptyBox(ndDemoEntityManager* const scene)
 static void AddSimpleConcaveMesh(ndDemoEntityManager* const scene, const ndMatrix& matrix, const char* const meshName, int count = 1)
 {
 	ndMeshLoader loader;
-	ndSharedPtr<ndRenderSceneNode> rootEntity(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName(meshName)));
+	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName(meshName));
 	ndSharedPtr<ndShapeInstance>compoundShapeInstance(loader.m_mesh->CreateCollision());
 	
 	ndMatrix originMatrix(matrix);
 	for (ndInt32 i = 0; i < count; ++i)
 	{
-		ndSharedPtr<ndRenderSceneNode> cloneEntity(rootEntity->Clone());
+		ndSharedPtr<ndRenderSceneNode> cloneEntity(loader.m_renderMesh->Clone());
 		originMatrix.m_posit.m_z += 2.0f;
 		ndVector floor(FindFloor(*scene->GetWorld(), originMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		originMatrix.m_posit.m_y = floor.m_y + 2.0f;

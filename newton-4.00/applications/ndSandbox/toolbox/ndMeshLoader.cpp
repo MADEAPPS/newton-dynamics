@@ -15,6 +15,7 @@
 ndMeshLoader::ndMeshLoader()
 	:ndFbxMeshLoader()
 	,m_mesh(nullptr)
+	,m_renderMesh(nullptr)
 {
 }
 
@@ -22,11 +23,11 @@ ndMeshLoader::~ndMeshLoader()
 {
 }
 
-ndSharedPtr<ndRenderSceneNode> ndMeshLoader::LoadEntity(ndRender* const renderer, const ndString& fbxPathMeshName)
+bool ndMeshLoader::LoadEntity(ndRender* const renderer, const ndString& fbxPathMeshName)
 {
+	m_renderMesh = ndSharedPtr<ndRenderSceneNode>(nullptr);
 	m_mesh = ndSharedPtr<ndMesh>(ndFbxMeshLoader::LoadMesh(fbxPathMeshName.GetStr(), false));
 
-	ndSharedPtr<ndRenderSceneNode> sceneNode;
 	if (*m_mesh)
 	{	
 		class EntityMeshPair
@@ -61,9 +62,8 @@ ndSharedPtr<ndRenderSceneNode> ndMeshLoader::LoadEntity(ndRender* const renderer
 			ndRenderSceneNode* entity = nullptr;
 			if (!parentNode)
 			{
-				sceneNode = ndSharedPtr<ndRenderSceneNode>(new ndRenderSceneNode(mesh->m_matrix));
-
-				entity = *sceneNode;
+				m_renderMesh = ndSharedPtr<ndRenderSceneNode>(new ndRenderSceneNode(mesh->m_matrix));
+				entity = *m_renderMesh;
 			}
 			else
 			{
@@ -143,5 +143,5 @@ ndSharedPtr<ndRenderSceneNode> ndMeshLoader::LoadEntity(ndRender* const renderer
 		}
 	}
 
-	return sceneNode;
+	return *m_mesh && *m_renderMesh;
 }

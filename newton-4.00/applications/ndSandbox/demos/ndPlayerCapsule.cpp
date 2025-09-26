@@ -167,7 +167,6 @@ class ndPlayerCapsuleController : public ndModelNotify
 	static ndSharedPtr<ndModelNotify> CreatePlayer(
 		ndDemoEntityManager* const scene,
 		ndMeshLoader& loader,
-		ndSharedPtr<ndRenderSceneNode>& entity,
 		const ndMatrix& matrix)
 	{
 		ndMatrix location(matrix);
@@ -181,7 +180,7 @@ class ndPlayerCapsuleController : public ndModelNotify
 		ndFloat32 height = 1.9f;
 		ndFloat32 radio = 0.15f;
 		ndFloat32 mass = 100.0f;
-		ndSharedPtr<ndRenderSceneNode> entityDuplicate(entity->Clone());
+		ndSharedPtr<ndRenderSceneNode> entityDuplicate(loader.m_renderMesh->Clone());
 		ndSharedPtr<ndBody> playerBody(new ndBasicPlayerCapsule(scene, loader, entityDuplicate, localAxis, location, mass, radio, height, height / 4.0f, true));
 
 		ndSharedPtr<ndModel> model(new ndModel());
@@ -274,12 +273,12 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 	 
 	// load the visual mesh, and animations.
 	ndMeshLoader loader;
-	ndSharedPtr<ndRenderSceneNode> entity(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("humanoidRobot.fbx")));
+	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("humanoidRobot.fbx"));
 
 	// create one player capsule, the mesh will be duplicated
 	ndMatrix location(ndGetIdentityMatrix());
 
-	ndSharedPtr<ndModelNotify> modelNotity0(ndPlayerCapsuleController::CreatePlayer(scene, loader, entity, location));
+	ndSharedPtr<ndModelNotify> modelNotity0(ndPlayerCapsuleController::CreatePlayer(scene, loader, location));
 	ndPlayerCapsuleController* const playerController0 = (ndPlayerCapsuleController*)*modelNotity0;
 	playerController0->SetCamera();
 

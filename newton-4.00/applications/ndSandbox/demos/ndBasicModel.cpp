@@ -70,7 +70,9 @@ class ndBackGroundVehicleController : public ndModelNotify
 	static ndSharedPtr<ndModelNotify> CreateAiVehicleProp(ndDemoEntityManager* const scene)
 	{
 		ndMeshLoader loader;
-		ndSharedPtr<ndRenderSceneNode> vehicleMesh(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("vmw.fbx")));
+		loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("vmw.fbx"));
+
+		ndSharedPtr<ndRenderSceneNode> vehicleMesh(loader.m_renderMesh);
 		ndMatrix matrix(ndGetIdentityMatrix());
 		ndVector floor(FindFloor(*scene->GetWorld(), ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		floor.m_y += ndFloat32(1.0f);

@@ -79,15 +79,15 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		,m_state(m_none)
 		,m_showIcon(false)
 	{
-		ndMeshLoader loader;
 		ndDemoEntityManager::ndRenderCallback* const renderCallback = (ndDemoEntityManager::ndRenderCallback*)*owner->GetOwner();
 		ndDemoEntityManager* const scene = renderCallback->m_owner;
 
-		ndSharedPtr<ndRenderSceneNode> entity(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("tpot.fbx")));
+		ndMeshLoader loader;
+		loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("tpot.fbx"));
 		m_castingShape = loader.m_mesh->CreateCollision();
 
-		m_primitiveOffsetMatrix = entity->m_primitiveMatrix;
-		m_meshPrimitive = entity->GetPrimitive();
+		m_meshPrimitive = loader.m_renderMesh->GetPrimitive();
+		m_primitiveOffsetMatrix = loader.m_renderMesh->m_primitiveMatrix;
 
 		m_ghostPrimitive = ndSharedPtr<ndRenderPrimitive>(m_meshPrimitive->Clone());
 		ndRenderPrimitiveMesh* const ghoshMesh = (ndRenderPrimitiveMesh*)*m_ghostPrimitive;
