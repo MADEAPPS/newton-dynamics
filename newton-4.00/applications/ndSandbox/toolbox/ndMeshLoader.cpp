@@ -34,6 +34,14 @@ bool ndMeshLoader::LoadEntity(ndRender* const renderer, const ndString& fbxPathM
 		{
 			public:
 			EntityMeshPair()
+				:m_effectNode(nullptr)
+				,m_entity(nullptr)
+			{
+			}
+
+			EntityMeshPair(const EntityMeshPair& src)
+				:m_effectNode(src.m_effectNode)
+				,m_entity(src.m_entity)
 			{
 			}
 
@@ -47,17 +55,21 @@ bool ndMeshLoader::LoadEntity(ndRender* const renderer, const ndString& fbxPathM
 			ndRenderSceneNode* m_entity;
 		};
 
-		ndFixSizeArray<EntityMeshPair, 2048> meshList;
-		ndFixSizeArray<ndMesh*, 1024> effectNodeBuffer;
-		ndFixSizeArray<ndRenderSceneNode*, 1024> parentEntityBuffer;
+		//ndFixSizeArray<EntityMeshPair, 2048> meshList;
+		ndFixSizeArray<ndMesh*, 1024> effectNodeList;
+		ndFixSizeArray<ndRenderSceneNode*, 1024> parentEntityList;
 
-		parentEntityBuffer.PushBack(nullptr);
-		effectNodeBuffer.PushBack(*m_mesh);
+		ndList<EntityMeshPair> meshList;
+		//ndList<ndMesh*> effectNodeList;
+		//ndList<ndSharedPtr<ndRenderSceneNode>> parentEntityList;
 
-		while (effectNodeBuffer.GetCount())
+		parentEntityList.PushBack(nullptr);
+		effectNodeList.PushBack(*m_mesh);
+
+		while (effectNodeList.GetCount())
 		{
-			ndMesh* const mesh = effectNodeBuffer.Pop();
-			ndRenderSceneNode* parentNode = parentEntityBuffer.Pop();
+			ndMesh* const mesh = effectNodeList.Pop();
+			ndRenderSceneNode* parentNode = parentEntityList.Pop();
 
 			ndRenderSceneNode* entity = nullptr;
 			if (!parentNode)
@@ -76,14 +88,14 @@ bool ndMeshLoader::LoadEntity(ndRender* const renderer, const ndString& fbxPathM
 			ndSharedPtr<ndMeshEffect> meshEffect(mesh->GetMesh());
 			if (*meshEffect)
 			{
-				meshList.PushBack(EntityMeshPair(entity, mesh));
+				meshList.Append(EntityMeshPair(entity, mesh));
 			}
 
 			for (ndList<ndSharedPtr<ndMesh>>::ndNode* childNode = mesh->GetChildren().GetFirst(); childNode; childNode = childNode->GetNext())
 			{
 				ndMesh* const child = *childNode->GetInfo();
-				effectNodeBuffer.PushBack(child);
-				parentEntityBuffer.PushBack(entity);
+				effectNodeList.PushBack(child);
+				parentEntityList.PushBack(entity);
 			}
 		}
 
@@ -94,13 +106,17 @@ bool ndMeshLoader::LoadEntity(ndRender* const renderer, const ndString& fbxPathM
 		}
 		const ndString path(fbxPathMeshName.GetStr(), ndInt32 (fbxPathMeshName.Size() - strlen(ptr + 1)));
 
-		for (ndInt32 i = 0; i < meshList.GetCount(); ++i)
+		//for (ndInt32 i = 0; i < meshList.GetCount(); ++i)
+		//{
+		for (ndList<EntityMeshPair>::ndNode* node = meshList.GetFirst(); node; node = node->GetNext())
 		{
-			ndRenderSceneNode* const entity = meshList[i].m_entity;
-			ndMesh* const effectNode = meshList[i].m_effectNode;
+			EntityMeshPair& pair = node->GetInfo();
+			//ndRenderSceneNode* const entity = meshList[i].m_entity;
+			//ndMesh* const effectNode = meshList[i].m_effectNode;
 
-			ndAssert(effectNode);
-			ndSharedPtr<ndMeshEffect> meshEffect(effectNode->GetMesh());
+			ndAssert(pair.m_entity);
+			ndAssert(pair.m_effectNode);
+			ndSharedPtr<ndMeshEffect> meshEffect(pair.m_effectNode->GetMesh());
 			ndArray<ndMeshEffect::ndMaterial>& materials = meshEffect->GetMaterials();
 
 			ndRenderPrimitiveMesh::ndDescriptor descriptor(renderer);
@@ -118,9 +134,9 @@ bool ndMeshLoader::LoadEntity(ndRender* const renderer, const ndString& fbxPathM
 			}
 			ndSharedPtr<ndRenderPrimitive> geometry(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 
-			entity->m_name = effectNode->GetName();
-			entity->SetPrimitive(geometry);
-			entity->SetPrimitiveMatrix(effectNode->m_meshMatrix);
+			//pair.m_entity->m_name = effectNode->GetName();
+			pair.m_entity->SetPrimitive(geometry);
+			pair.m_entity->SetPrimitiveMatrix(pair.m_effectNode->m_meshMatrix);
 
 			//if ((effectNode->GetName().Find("hidden") >= 0) || (effectNode->GetName().Find("Hidden") >= 0))
 			//{
