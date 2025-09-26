@@ -13,6 +13,7 @@
 #include "ndRender.h"
 #include "ndRenderContext.h"
 #include "ndRenderTexture.h"
+#include "ndRenderSceneNode.h"
 #include "ndRenderSceneNodeInstance.h"
 #include "ndRenderSceneNodeInstanceImplement.h"
 
