@@ -179,11 +179,12 @@ class ndPlayerCapsuleController : public ndModelNotify
 		ndFloat32 height = 1.9f;
 		ndFloat32 radio = 0.15f;
 		ndFloat32 mass = 100.0f;
+		ndSharedPtr<ndRenderSceneNode> entityDuplicate(entity->Clone());
+		ndSharedPtr<ndBody> playerBody(new ndBasicPlayerCapsule(scene, loader, entityDuplicate, localAxis, location, mass, radio, height, height / 4.0f, true));
 
 		ndSharedPtr<ndModel> model(new ndModel());
-		ndSharedPtr<ndRenderSceneNode> entityDuplicate(entity->Clone());
-		ndSharedPtr<ndBody> playerBody (new ndBasicPlayerCapsule(scene, loader, entityDuplicate, localAxis, location, mass, radio, height, height / 4.0f, true));
 		ndSharedPtr<ndModelNotify> controller(new ndPlayerCapsuleController(scene, playerBody));
+		model->SetNotifyCallback(controller);
 		
 		// add body and mesh to the world
 		ndWorld* const world = scene->GetWorld();
@@ -207,6 +208,23 @@ class ndPlayerCapsuleController : public ndModelNotify
 		ndRenderSceneNode* const cameraNodePivot = playerMesh->FindByName("cameraPivot");
 		ndAssert(cameraNodePivot);
 		cameraNodePivot->AddChild(camera);
+	}
+	private:
+	void Update(ndFloat32 timestep) override
+	{
+		ndModelNotify::Update(timestep);
+
+		ndBasicPlayerCapsule* const player = (ndBasicPlayerCapsule*)m_playerBody->GetAsBodyPlayerCapsule();
+		ndAssert(player);
+		player->m_playerInput.m_forwardSpeed = ndFloat32 (0.0f);
+		if (m_scene->GetKeyState(ImGuiKey_W))
+		{
+			player->m_playerInput.m_forwardSpeed = ndFloat32(2.0f);
+		}
+		else if (m_scene->GetKeyState(ImGuiKey_S))
+		{
+			player->m_playerInput.m_forwardSpeed = ndFloat32(-1.0f);
+		}
 	}
 
 	ndDemoEntityManager* m_scene;
