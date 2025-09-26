@@ -159,6 +159,8 @@ class ndPlayerCapsuleController : public ndModelNotify
 		:ndModelNotify()
 		,m_scene(scene)
 		,m_playerBody(body)
+		,m_camera(nullptr)
+		,m_cameraAngle(0.0f)
 	{
 	}
 
@@ -197,10 +199,11 @@ class ndPlayerCapsuleController : public ndModelNotify
 	void SetCamera()
 	{
 		// create a follow camera and set as teh active camera
-		const ndVector cameraPivot(0.0f, 0.25f, 0.0f, 0.0f);
+		const ndVector cameraPivot(0.0f, 0.5f, 0.0f, 0.0f);
 		ndRender* const renderer = *m_scene->GetRenderer();
 		ndSharedPtr<ndRenderSceneNode> camera(new ndDemoCameraNodeFollow(renderer, cameraPivot, ND_THIRD_PERSON_CAMERA_DIST));
 		renderer->SetCamera(camera);
+		m_camera = (ndDemoCameraNodeFollow*)*camera;
 
 		// attach the camera to the pivot node
 		ndDemoEntityNotify* const playerNotify = (ndDemoEntityNotify*)(m_playerBody->GetAsBodyKinematic()->GetNotifyCallback());
@@ -225,10 +228,20 @@ class ndPlayerCapsuleController : public ndModelNotify
 		{
 			player->m_playerInput.m_forwardSpeed = ndFloat32(-1.0f);
 		}
+
+		const ndFloat32 headingSpeed = ndFloat32(0.25f);
+		m_cameraAngle = ndAnglesAdd(m_cameraAngle, m_camera->m_yaw);
+		m_headingAngle = ndAnglesAdd(m_headingAngle, headingSpeed * ndAnglesSub(m_cameraAngle, m_headingAngle));
+		player->m_playerInput.m_heading = m_headingAngle;
+
+		m_camera->m_yaw = ndFloat32(0.0f);
 	}
 
 	ndDemoEntityManager* m_scene;
 	ndSharedPtr<ndBody> m_playerBody;
+	ndDemoCameraNodeFollow* m_camera;
+	ndFloat32 m_cameraAngle;
+	ndFloat32 m_headingAngle;
 };
 
 //static void AddSomeProps(ndDemoEntityManager* const scene)

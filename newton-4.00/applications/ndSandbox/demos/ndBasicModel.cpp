@@ -228,19 +228,10 @@ class ndBackGroundVehicleController : public ndModelNotify
 		ndFloat32 step = speed * timestep;
 		for (ndInt32 i = 0; i < m_wheelAnimation.GetCount(); ++i)
 		{
-			ndFloat32 angleAngle = step * m_wheelAnimation[i].m_invRadius;
-			ndFloat32 angle = m_wheelAnimation[i].m_angle + angleAngle;
-			if (angle > ndPi * ndFloat32(2.0f))
-			{
-				angle -= ndPi * ndFloat32(2.0f);
-			}
-			else if (angle < -ndPi * ndFloat32(2.0f))
-			{
-				angle += ndPi * ndFloat32(2.0f);
-			}
-			m_wheelAnimation[i].m_angle = angle;
+			ndFloat32 angleStep = step * m_wheelAnimation[i].m_invRadius;
+			m_wheelAnimation[i].m_angle = ndAnglesAdd(m_wheelAnimation[i].m_angle, angleStep);
 
-			const ndMatrix wheelMatrix(ndPitchMatrix(angle) * m_wheelAnimation[i].m_bindMatrix);
+			const ndMatrix wheelMatrix(ndPitchMatrix(m_wheelAnimation[i].m_angle) * m_wheelAnimation[i].m_bindMatrix);
 			m_wheelAnimation[i].m_wheelNode->SetTransform(wheelMatrix, wheelMatrix.m_posit);
 		}
 	}
