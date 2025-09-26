@@ -289,36 +289,15 @@ void ndRenderPrimitiveMeshImplement::BuildRenderMeshFromCollisionShape(const ndR
 		indexCount += mesh.GetMaterialIndexCount(geometryHandle, handle);
 	}
 
-	struct dTmpData
-	{
-		ndReal m_posit[3];
-		ndReal m_normal[3];
-		ndReal m_uv[2];
-	};
-
-	ndArray<dTmpData> tmp;
 	ndArray<ndInt32> indices;
 	ndArray<glPositionNormalUV> points;
 
-	tmp.SetCount(vertexCount);
 	points.SetCount(vertexCount);
 	indices.SetCount(indexCount);
 
-	mesh.GetVertexChannel(sizeof(dTmpData), &tmp[0].m_posit[0]);
-	mesh.GetNormalChannel(sizeof(dTmpData), &tmp[0].m_normal[0]);
-	mesh.GetUV0Channel(sizeof(dTmpData), &tmp[0].m_uv[0]);
-
-	for (ndInt32 i = 0; i < vertexCount; ++i)
-	{
-		points[i].m_posit.m_x = GLfloat(tmp[i].m_posit[0]);
-		points[i].m_posit.m_y = GLfloat(tmp[i].m_posit[1]);
-		points[i].m_posit.m_z = GLfloat(tmp[i].m_posit[2]);
-		points[i].m_normal.m_x = GLfloat(tmp[i].m_normal[0]);
-		points[i].m_normal.m_y = GLfloat(tmp[i].m_normal[1]);
-		points[i].m_normal.m_z = GLfloat(tmp[i].m_normal[2]);
-		points[i].m_uv.m_u = GLfloat(tmp[i].m_uv[0]);
-		points[i].m_uv.m_v = GLfloat(tmp[i].m_uv[1]);
-	}
+	mesh.GetVertexChannel(sizeof(glPositionNormalUV), &points[0].m_posit[0]);
+	mesh.GetNormalChannel(sizeof(glPositionNormalUV), &points[0].m_normal[0]);
+	mesh.GetUV0Channel(sizeof(glPositionNormalUV), &points[0].m_uv.m_u);
 
 	ndInt32 segmentStart = 0;
 	for (ndInt32 handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
@@ -384,36 +363,15 @@ void ndRenderPrimitiveMeshImplement::BuildRenderSimpleMeshFromMeshEffect(const n
 		indexCount += mesh.GetMaterialIndexCount(geometryHandle, handle);
 	}
 
-	struct ndTmpData
-	{
-		ndReal m_posit[3];
-		ndReal m_normal[3];
-		ndReal m_uv[2];
-	};
-
-	ndArray<ndTmpData> tmp;
 	ndArray<ndInt32> indices;
 	ndArray<glPositionNormalUV> points;
 
-	tmp.SetCount(vertexCount);
 	points.SetCount(vertexCount);
 	indices.SetCount(indexCount);
 
-	mesh.GetVertexChannel(sizeof(ndTmpData), &tmp[0].m_posit[0]);
-	mesh.GetNormalChannel(sizeof(ndTmpData), &tmp[0].m_normal[0]);
-	mesh.GetUV0Channel(sizeof(ndTmpData), &tmp[0].m_uv[0]);
-
-	for (ndInt32 i = 0; i < vertexCount; ++i)
-	{
-		points[i].m_posit.m_x = GLfloat(tmp[i].m_posit[0]);
-		points[i].m_posit.m_y = GLfloat(tmp[i].m_posit[1]);
-		points[i].m_posit.m_z = GLfloat(tmp[i].m_posit[2]);
-		points[i].m_normal.m_x = GLfloat(tmp[i].m_normal[0]);
-		points[i].m_normal.m_y = GLfloat(tmp[i].m_normal[1]);
-		points[i].m_normal.m_z = GLfloat(tmp[i].m_normal[2]);
-		points[i].m_uv.m_u = GLfloat(tmp[i].m_uv[0]);
-		points[i].m_uv.m_v = GLfloat(tmp[i].m_uv[1]);
-	}
+	mesh.GetVertexChannel(sizeof(glPositionNormalUV), &points[0].m_posit[0]);
+	mesh.GetNormalChannel(sizeof(glPositionNormalUV), &points[0].m_normal[0]);
+	mesh.GetUV0Channel(sizeof(glPositionNormalUV), &points[0].m_uv.m_u);
 
 	ndInt32 segmentStart = 0;
 	for (ndInt32 handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
@@ -559,6 +517,10 @@ void ndRenderPrimitiveMeshImplement::BuildRenderSkinnedMeshFromMeshEffect(const 
 		points[i].m_normal.m_z = GLfloat(tmp[i].m_normal[2]);
 		points[i].m_uv.m_u = GLfloat(tmp[i].m_uv[0]);
 		points[i].m_uv.m_v = GLfloat(tmp[i].m_uv[1]);
+
+		//glPoint.m_weighs = glVector4();
+		//glPoint.m_boneIndex = glVector4();
+
 	}
 
 	ndInt32 segmentStart = 0;
@@ -947,36 +909,15 @@ void ndRenderPrimitiveMeshImplement::BuildRenderInstanceMesh(const ndRenderPrimi
 		indexCount += mesh.GetMaterialIndexCount(geometryHandle, handle);
 	}
 
-	struct dTmpData
-	{
-		ndReal m_posit[3];
-		ndReal m_normal[3];
-		ndReal m_uv[2];
-	};
-
-	ndArray<dTmpData> tmp;
 	ndArray<ndInt32> indices;
 	ndArray<glPositionNormalUV> points;
 
-	tmp.SetCount(vertexCount);
 	points.SetCount(vertexCount);
 	indices.SetCount(indexCount);
 
-	mesh.GetVertexChannel(sizeof(dTmpData), &tmp[0].m_posit[0]);
-	mesh.GetNormalChannel(sizeof(dTmpData), &tmp[0].m_normal[0]);
-	mesh.GetUV0Channel(sizeof(dTmpData), &tmp[0].m_uv[0]);
-
-	for (ndInt32 i = 0; i < vertexCount; ++i)
-	{
-		points[i].m_posit.m_x = GLfloat(tmp[i].m_posit[0]);
-		points[i].m_posit.m_y = GLfloat(tmp[i].m_posit[1]);
-		points[i].m_posit.m_z = GLfloat(tmp[i].m_posit[2]);
-		points[i].m_normal.m_x = GLfloat(tmp[i].m_normal[0]);
-		points[i].m_normal.m_y = GLfloat(tmp[i].m_normal[1]);
-		points[i].m_normal.m_z = GLfloat(tmp[i].m_normal[2]);
-		points[i].m_uv.m_u = GLfloat(tmp[i].m_uv[0]);
-		points[i].m_uv.m_v = GLfloat(tmp[i].m_uv[1]);
-	}
+	mesh.GetVertexChannel(sizeof(glPositionNormalUV), &points[0].m_posit[0]);
+	mesh.GetNormalChannel(sizeof(glPositionNormalUV), &points[0].m_normal[0]);
+	mesh.GetUV0Channel(sizeof(glPositionNormalUV), &points[0].m_uv.m_u);
 
 	ndInt32 segmentStart = 0;
 	for (ndInt32 handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
