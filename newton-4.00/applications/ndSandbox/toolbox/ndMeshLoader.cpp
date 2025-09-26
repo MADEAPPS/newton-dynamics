@@ -116,30 +116,19 @@ bool ndMeshLoader::LoadEntity(ndRender* const renderer, const ndString& fbxPathM
 				material.m_opacity = materials[j].m_opacity;
 				material.m_castShadows = true;
 			}
-
-			//ndSharedPtr<ndRenderPrimitive> geometry(nullptr);
-			//if (meshEffect->GetVertexWeights().GetCount())
-			//{
-			//	ndAssert(0);
-			//	//mesh = new ndDemoSkinMesh(entity, *meshEffect, scene->GetShaderCache());
-			//}
-			//else
-			//{
-			//	geometry = ndSharedPtr<ndRenderPrimitive>(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
-			//}
 			ndSharedPtr<ndRenderPrimitive> geometry(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 
 			entity->m_name = effectNode->GetName();
 			entity->SetPrimitive(geometry);
 			entity->SetPrimitiveMatrix(effectNode->m_meshMatrix);
 
-			if ((effectNode->GetName().Find("hidden") >= 0) || (effectNode->GetName().Find("Hidden") >= 0))
-			{
-				ndAssert(0);
-				//mesh->m_isVisible = false;
-				//entity->m_isVisible = false;
-				//entity->m_castShadow = false;
-			}
+			//if ((effectNode->GetName().Find("hidden") >= 0) || (effectNode->GetName().Find("Hidden") >= 0))
+			//{
+			//	ndAssert(0);
+			//	//mesh->m_isVisible = false;
+			//	//entity->m_isVisible = false;
+			//	//entity->m_castShadow = false;
+			//}
 		}
 	}
 
