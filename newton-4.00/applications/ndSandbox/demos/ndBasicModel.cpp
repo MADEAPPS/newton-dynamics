@@ -139,7 +139,7 @@ class ndBackGroundVehicleController : public ndModelNotify
 
 	private:
 	// update pseudo physics every substep
-	void Update(ndFloat32 timestep)
+	void Update(ndFloat32 timestep) override
 	{
 		ndModelNotify::Update(timestep);
 		if (IsOnGround())
