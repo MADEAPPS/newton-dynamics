@@ -56,20 +56,24 @@ bool ndMeshLoader::LoadEntity(ndRender* const renderer, const ndString& fbxPathM
 		};
 
 		//ndFixSizeArray<EntityMeshPair, 2048> meshList;
-		ndFixSizeArray<ndMesh*, 1024> effectNodeList;
-		ndFixSizeArray<ndRenderSceneNode*, 1024> parentEntityList;
+		//ndFixSizeArray<ndMesh*, 1024> effectNodeList;
+		//ndFixSizeArray<ndRenderSceneNode*, 1024> parentEntityList;
 
 		ndList<EntityMeshPair> meshList;
-		//ndList<ndMesh*> effectNodeList;
-		//ndList<ndSharedPtr<ndRenderSceneNode>> parentEntityList;
+		ndList<ndMesh*> effectNodeList;
+		ndList<ndRenderSceneNode*> parentEntityList;
 
-		parentEntityList.PushBack(nullptr);
-		effectNodeList.PushBack(*m_mesh);
+		effectNodeList.Append(*m_mesh);
+		//parentEntityList.Append(ndSharedPtr<ndRenderSceneNode>(nullptr));
+		parentEntityList.Append((ndRenderSceneNode*)nullptr);
 
 		while (effectNodeList.GetCount())
 		{
-			ndMesh* const mesh = effectNodeList.Pop();
-			ndRenderSceneNode* parentNode = parentEntityList.Pop();
+			ndMesh* const mesh = effectNodeList.GetLast()->GetInfo();
+			ndRenderSceneNode* parentNode = parentEntityList.GetLast()->GetInfo();
+
+			effectNodeList.Remove(effectNodeList.GetLast());
+			parentEntityList.Remove(parentEntityList.GetLast());
 
 			ndRenderSceneNode* entity = nullptr;
 			if (!parentNode)
@@ -94,8 +98,8 @@ bool ndMeshLoader::LoadEntity(ndRender* const renderer, const ndString& fbxPathM
 			for (ndList<ndSharedPtr<ndMesh>>::ndNode* childNode = mesh->GetChildren().GetFirst(); childNode; childNode = childNode->GetNext())
 			{
 				ndMesh* const child = *childNode->GetInfo();
-				effectNodeList.PushBack(child);
-				parentEntityList.PushBack(entity);
+				effectNodeList.Append(child);
+				parentEntityList.Append(entity);
 			}
 		}
 
