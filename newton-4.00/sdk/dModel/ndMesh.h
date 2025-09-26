@@ -53,7 +53,7 @@ class ndMesh : public ndClassAlloc
 	ndMesh(const ndMesh& src);
 	ndMesh(const ndShapeInstance& src);
 
-	~ndMesh();
+	virtual ~ndMesh();
 	ndMesh* CreateClone() const;
 
 	void AddChild(const ndSharedPtr<ndMesh>& child);
