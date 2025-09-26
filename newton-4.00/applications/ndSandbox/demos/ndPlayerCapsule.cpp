@@ -213,14 +213,9 @@ class ndPlayerCapsuleController : public ndModelNotify
 	ndSharedPtr<ndBody> m_playerBody;
 };
 
-void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
+//static void AddSomeProps(ndDemoEntityManager* const scene)
+static void AddSomeProps(ndDemoEntityManager* const)
 {
-	// build a floor
-	//BuildPlayArena(scene);
-	//ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
-	ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "marblecheckboard.png", 0.1f, true));
-
-
 	//class PlaceMatrix : public ndMatrix
 	//{
 	//	public:
@@ -236,7 +231,15 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 	//AddBox(scene, PlaceMatrix(10.0f, 0.0f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
 	//AddBox(scene, PlaceMatrix(10.0f, 0.5f, 1.125f), 30.0f, 2.0f, 0.25f, 2.5f);
 	//AddBox(scene, PlaceMatrix(10.0f, 1.0f, 1.250f), 30.0f, 2.0f, 0.25f, 2.5f);
-	 
+}
+
+void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
+{
+	// build a floor
+	//ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
+	ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "marblecheckboard.png", 0.1f, true));
+
+	AddSomeProps(scene);
 	 
 	// load the visual mesh, and animations.
 	ndMeshLoader loader;
