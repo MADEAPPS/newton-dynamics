@@ -45,42 +45,42 @@ bool ndMeshLoader::LoadEntity(ndRender* const renderer, const ndString& fbxPathM
 			{
 			}
 
-			EntityMeshPair(ndRenderSceneNode* const entity, const ndSharedPtr<ndMesh>& mesh)
+			EntityMeshPair(const ndSharedPtr<ndRenderSceneNode>& entity, const ndSharedPtr<ndMesh>& mesh)
 				:m_mesh(mesh)
 				,m_entity(entity)
 			{
 			}
 
 			ndSharedPtr<ndMesh> m_mesh;
-			ndRenderSceneNode* m_entity;
+			ndSharedPtr<ndRenderSceneNode> m_entity;
 		};
 
 		ndList<EntityMeshPair> meshList;
 		ndList<ndSharedPtr<ndMesh>> effectNodeList;
-		ndList<ndRenderSceneNode*> parentEntityList;
+		ndList<ndSharedPtr<ndRenderSceneNode>> parentEntityList;
 
 		effectNodeList.Append(m_mesh);
-		parentEntityList.Append((ndRenderSceneNode*)nullptr);
+		parentEntityList.Append(ndSharedPtr<ndRenderSceneNode>(nullptr));
 
 		while (effectNodeList.GetCount())
 		{
 			ndSharedPtr<ndMesh> mesh (effectNodeList.GetLast()->GetInfo());
-			ndRenderSceneNode* parentNode = parentEntityList.GetLast()->GetInfo();
+			ndSharedPtr<ndRenderSceneNode> parentNode (parentEntityList.GetLast()->GetInfo());
 
 			effectNodeList.Remove(effectNodeList.GetLast());
 			parentEntityList.Remove(parentEntityList.GetLast());
 
-			ndRenderSceneNode* entity = nullptr;
-			if (!parentNode)
+			ndSharedPtr<ndRenderSceneNode> entity(nullptr);
+			if (!(*parentNode))
 			{
 				m_renderMesh = ndSharedPtr<ndRenderSceneNode>(new ndRenderSceneNode(mesh->m_matrix));
-				entity = *m_renderMesh;
+				entity = m_renderMesh;
 			}
 			else
 			{
 				ndSharedPtr<ndRenderSceneNode> childNode(new ndRenderSceneNode(mesh->m_matrix));
 				parentNode->AddChild(childNode);
-				entity = *childNode;
+				entity = childNode;
 			}
 			entity->m_name = mesh->GetName();
 
@@ -107,16 +107,17 @@ bool ndMeshLoader::LoadEntity(ndRender* const renderer, const ndString& fbxPathM
 		for (ndList<EntityMeshPair>::ndNode* node = meshList.GetFirst(); node; node = node->GetNext())
 		{
 			EntityMeshPair& pair = node->GetInfo();
-			//ndRenderSceneNode* const entity = meshList[i].m_entity;
-			//ndMesh* const effectNode = meshList[i].m_effectNode;
 
-			ndAssert(pair.m_entity);
 			ndAssert(*pair.m_mesh);
+			ndAssert(*pair.m_entity);
+			
 			ndSharedPtr<ndMeshEffect> meshEffect(pair.m_mesh->GetMesh());
 			ndArray<ndMeshEffect::ndMaterial>& materials = meshEffect->GetMaterials();
 
 			ndRenderPrimitiveMesh::ndDescriptor descriptor(renderer);
 			descriptor.m_meshNode = meshEffect;
+			descriptor.m_skeleton = pair.m_entity;
+
 			for (ndInt32 j = 0; j < materials.GetCount(); ++j)
 			{
 				const ndString texturePathName(path + materials[j].m_textureName);
