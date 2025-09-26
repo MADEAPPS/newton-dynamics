@@ -113,15 +113,28 @@ class ndBackGroundVehicleController : public ndModelNotify
 		vehicleBody->GetAsBodyDynamic()->SetCollisionShape(**compoundShapeInstance);
 		vehicleBody->GetAsBodyDynamic()->SetMassMatrix(1000.0f, **chassisShape);
 
-		//ndSharedPtr<ndModel> controller(new BackGroundVehicleController(scene, vehicleBody));
 		ndSharedPtr<ndModel> model(new ndModel());
 		ndSharedPtr<ndModelNotify> controller(new ndBackGroundVehicleController(scene, vehicleBody));
 		model->SetNotifyCallback(controller);
 
 		world->AddBody(vehicleBody);
-		world->AddModel(model);
 		scene->AddEntity(vehicleMesh);
+		world->AddModel(model);
 		return controller;
+	}
+
+	void SetCamera()
+	{
+		//ndSharedPtr<ndBody> vehicleBody = vehicleController->m_vehicleBody;
+
+		// attach a follow camera to the vehicle prop
+		const ndVector cameraPivot(0.0f, 2.0f, 0.0f, 0.0f);
+		ndRender* const renderer = *m_scene->GetRenderer();
+		ndDemoEntityNotify* const bodyNotify = (ndDemoEntityNotify*)(m_vehicleBody->GetAsBodyKinematic()->GetNotifyCallback());
+		ndSharedPtr<ndRenderSceneNode> vehicleMesh(bodyNotify->GetUserData());
+		ndSharedPtr<ndRenderSceneNode> camera(new ndDemoCameraNodeFollow(renderer, cameraPivot, ND_PROP_VEHICLE_CAMERA_DISTANCE));
+		renderer->SetCamera(camera);
+		vehicleMesh->AddChild(camera);
 	}
 
 	private:
@@ -296,18 +309,8 @@ void ndBasicModel(ndDemoEntityManager* const scene)
 {
 	//ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
 	ndSharedPtr<ndBody> mapBody(BuildHeightFieldTerrain(scene, "grass.png", ndGetIdentityMatrix()));
-	
-	//ndSharedPtr<ndBody> vehicleBody(ndBackGroundVehicleController::CreateAiVehicleProp(scene));
+
 	ndSharedPtr<ndModelNotify> modelController(ndBackGroundVehicleController::CreateAiVehicleProp(scene));
 	ndBackGroundVehicleController* const vehicleController = (ndBackGroundVehicleController*)*modelController;
-	ndSharedPtr<ndBody> vehicleBody = vehicleController->m_vehicleBody;
-
-	// attach a follow camera to the vehicle prop
-	const ndVector cameraPivot(0.0f, 2.0f, 0.0f, 0.0f);
-	ndRender* const renderer = *scene->GetRenderer();
-	ndDemoEntityNotify* const bodyNotify = (ndDemoEntityNotify*)(vehicleBody->GetAsBodyKinematic()->GetNotifyCallback());
-	ndSharedPtr<ndRenderSceneNode> vehicleMesh(bodyNotify->GetUserData());
-	ndSharedPtr<ndRenderSceneNode> camera(new ndDemoCameraNodeFollow(renderer, cameraPivot, ND_PROP_VEHICLE_CAMERA_DISTANCE));
-	renderer->SetCamera(camera);
-	vehicleMesh->AddChild(camera);
+	vehicleController->SetCamera();
 }

@@ -98,7 +98,7 @@ class ndAnimationBlendTansition: public ndAnimationTwoWayBlend
 
 ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	ndDemoEntityManager* const scene, ndMeshLoader& loader,
-	ndSharedPtr<ndRenderSceneNode>& modelEntity, const ndMatrix& localAxis, const ndMatrix& location,
+	ndSharedPtr<ndRenderSceneNode>& entity, const ndMatrix& localAxis, const ndMatrix& location,
 	ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight, bool isPlayer)
 	:ndBodyPlayerCapsule(localAxis, mass, radius, height, stepHeight)
 	,m_isPlayer(isPlayer)
@@ -112,10 +112,6 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	matrix.m_posit.m_y = floor.m_y;
 
 	SetMatrix(matrix);
-	ndSharedPtr<ndRenderSceneNode> entity (modelEntity->Clone());
-
-	
-	//SetNotifyCallback(new ndBasicPlayerCapsuleNotify(scene, entity));
 	SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	
 	//// create an animation blend tree
@@ -179,61 +175,3 @@ ndFloat32 ndBasicPlayerCapsule::ContactFrictionCallback(const ndVector&, const n
 	return ndFloat32(2.0f);
 }
 
-void ndBasicPlayerCapsule::SetCamera(ndDemoEntityManager* const scene)
-{
-	ndAssert(0);
-	//if (m_isPlayer)
-	//{
-	//	ndDemoCamera* const camera = scene->GetCamera();
-	//	ndMatrix camMatrix(camera->GetNextMatrix());
-	//
-	//	ndBasicPlayerCapsuleNotify* const notify = (ndBasicPlayerCapsuleNotify*)GetNotifyCallback();
-	//	ndDemoEntity* const player = *notify->m_entity;
-	//	ndMatrix playerMatrix(player->GetNextMatrix());
-	//
-	//	const ndFloat32 height = m_height;
-	//	const ndVector frontDir(camMatrix[0]);
-	//	const ndVector upDir(0.0f, 1.0f, 0.0f, 0.0f);
-	//	ndVector camOrigin = playerMatrix.TransformVector(upDir.Scale(height));
-	//	camOrigin -= frontDir.Scale(PLAYER_THIRD_PERSON_VIEW_DIST);
-	//
-	//	camera->SetNextMatrix(camMatrix, camOrigin);
-	//
-	//	ndFloat32 angle0 = camera->GetYawAngle();
-	//	ndFloat32 angle1 = GetHeadingAngle();
-	//	ndFloat32 error = ndAnglesAdd(angle1, -angle0);
-	//
-	//	if ((ndAbs (error) > 1.0e-3f) ||
-	//		scene->GetKeyState(' ') ||
-	//		scene->GetKeyState('A') ||
-	//		scene->GetKeyState('D') ||
-	//		scene->GetKeyState('W') ||
-	//		scene->GetKeyState('S'))
-	//	{
-	//		SetSleepState(false);
-	//	}
-	//
-	//	m_playerInput.m_heading = camera->GetYawAngle();
-	//	m_playerInput.m_forwardSpeed = (ndFloat32)(ndInt32(scene->GetKeyState('W')) - ndInt32(scene->GetKeyState('S'))) * PLAYER_WALK_SPEED;
-	//	m_playerInput.m_strafeSpeed = (ndFloat32)(ndInt32(scene->GetKeyState('D')) - ndInt32(scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
-	//	m_playerInput.m_jump = scene->GetKeyState(' ') && IsOnFloor();
-	//
-	//	//m_idleWalkBlend->SetParam(m_playerInput.m_forwardSpeed ? 1.0f : 0.0f);
-	//	ndAnimationBlendTansition* const blender = (ndAnimationBlendTansition*) m_idleWalkBlend;
-	//	blender->SetTransition(m_playerInput.m_forwardSpeed ? 1.0f : 0.0f);
-	//
-	//	if (m_playerInput.m_forwardSpeed || m_playerInput.m_strafeSpeed)
-	//	{
-	//		ndFloat32 speed = notify->m_veloc.m_x;
-	//		ndFloat32 invMag = speed / ndSqrt(m_playerInput.m_forwardSpeed * m_playerInput.m_forwardSpeed + m_playerInput.m_strafeSpeed * m_playerInput.m_strafeSpeed);
-	//		m_playerInput.m_forwardSpeed *= invMag;
-	//		m_playerInput.m_strafeSpeed *= invMag;
-	//	}
-	//}
-}
-
-void ndBasicPlayerCapsule::UpdateCameraCallback(ndDemoEntityManager* const manager, void* const context, ndFloat32)
-{
-	ndBasicPlayerCapsule* const me = (ndBasicPlayerCapsule*)context;
-	me->SetCamera(manager);
-}
