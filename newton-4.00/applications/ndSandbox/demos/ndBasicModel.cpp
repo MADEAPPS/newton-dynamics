@@ -23,245 +23,68 @@
 #define ND_MAX_PROP_VEHICLE_SPEED		ndFloat32(12.0f)
 #define ND_PROP_VEHICLE_CAMERA_DISTANCE	ndFloat32(-7.0f)
 
-class BackGroundVehicleController : public ndModel
+class ndBackGroundVehicleController : public ndModelNotify
 {
 	public:
-	class ndNotify : public ndModelNotify
+	class ndWheelSpin
 	{
 		public:
-		class ndWheelSpin
-		{
-			public:
-			ndMatrix m_bindMatrix;
-			ndRenderSceneNode* m_wheelNode;
-			ndFloat32 m_angle;
-			ndFloat32 m_invRadius;
-		};
-
-		ndNotify(ndDemoEntityManager* pScene, const ndSharedPtr<ndBody>& body)
-			:ndModelNotify()
-			,m_scene(pScene)
-			,m_vehicleBody(body)
-			,m_desiredSpeed(ndFloat32 (0.0f))
-			,m_desiredAngularSpeedFactor(ndFloat32(0.0f))
-		{
-			ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)body->GetAsBodyKinematic()->GetNotifyCallback();
-			ndSharedPtr<ndRenderSceneNode> vehicleMesh(notify->GetUserData());
-
-			// iterate ove each animated mesh part, 
-			// and save the nessery information to play the animation.
-			// is this example we only spin the tires.
-			const ndString tireId("tire");
-			const ndVector rightDir(vehicleMesh->GetTransform().GetMatrix().m_right);
-			const ndList<ndSharedPtr<ndRenderSceneNode>>& children = vehicleMesh->GetChilden();
-			for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = children.GetFirst(); node; node = node->GetNext())
-			{
-				ndRenderSceneNode* const child = *node->GetInfo();
-				if (child->m_name.Find(tireId) >= 0)
-				{
-					ndWheelSpin wheel;
-					wheel.m_wheelNode = child;
-					wheel.m_bindMatrix = child->GetTransform().GetMatrix();
-					ndFloat32 dir = wheel.m_bindMatrix.m_front.DotProduct(rightDir).GetScalar();
-					wheel.m_angle = ndFloat32 (0.0f);
-					wheel.m_invRadius = (dir < 0.0f) ? ndFloat32 (1.0f/0.4f) : ndFloat32(-1.0f / 0.4f);
-					m_wheelAnimation.PushBack(wheel);
-				}
-			}
-		}
-
-		// update pseudo physics every substep
-		void Update(ndFloat32 timestep)
-		{
-			ndModelNotify::Update(timestep);
-			if (IsOnGround())
-			{
-				ApplyTurningImpulse(timestep);
-				ApplyLateralImpulse(timestep);
-				ApplyLongitudinalImpulse(timestep);
-			}
-		}
-
-		// update the body part stuff like animations of the wheels,
-		// setting the follow camera, apply controls, etc;
-		void PostTransformUpdate(ndFloat32 timestep)
-		{
-			ndModelNotify::PostTransformUpdate(timestep);
-
-			// apply vehicle control 
-			ApplyImpulControls();
-
-			// apply tire animation and othe stuff if nessesary
-			AnimateTires(timestep);
-		}
-
-		private:
-		void ApplyImpulControls()
-		{
-			// apply forward controls
-			m_desiredSpeed = ndFloat32(0.0f);
-			if (m_scene->GetKeyState(ImGuiKey_W))
-			{
-				m_desiredSpeed = ND_MAX_PROP_VEHICLE_SPEED;
-			}
-			else if (m_scene->GetKeyState(ImGuiKey_S))
-			{
-				m_desiredSpeed = -0.5f * ND_MAX_PROP_VEHICLE_SPEED;
-			}
-
-			// apply turning controls
-			m_desiredAngularSpeedFactor = ndFloat32(0.0f);
-			if (m_scene->GetKeyState(ImGuiKey_A))
-			{
-				m_desiredAngularSpeedFactor = ndFloat32(0.5f);
-			}
-			else if (m_scene->GetKeyState(ImGuiKey_D))
-			{
-				m_desiredAngularSpeedFactor = ndFloat32(-0.5f);
-			}
-		}
-
-		bool IsOnGround() const
-		{
-			const ndBodyKinematic* const vehicleBody = m_vehicleBody->GetAsBodyKinematic();
-			ndInt32 wheelContacts = 0;
-			ndBodyKinematic::ndContactMap::Iterator it(vehicleBody->GetContactMap());
-			for (it.Begin(); it; it++)
-			{
-				const ndContact* const contact = it.GetNode()->GetInfo();
-				if (contact->IsActive())
-				{
-					const ndContactPointList& contactPoints = contact->GetContactPoints();
-					for (ndContactPointList::ndNode* node = contactPoints.GetFirst(); node; node = node->GetNext())
-					{
-						const ndContactMaterial& contactPoint = node->GetInfo();
-						const ndShapeInstance* const instance = (contactPoint.m_body0 == vehicleBody) ? contactPoint.m_shapeInstance0 : contactPoint.m_shapeInstance1;
-						const ndShape* const shape = instance->GetShape();
-						const ndShapeChamferCylinder* const wheel = ((ndShape*)shape)->GetAsShapeChamferCylinder();
-						if (wheel)
-						{
-							wheelContacts++;
-							if (wheelContacts >= 3)
-							{
-								return true;
-							}
-						}
-					}
-				}
-			}
-			return false;
-		}
-
-		void AnimateTires(ndFloat32 timestep)
-		{
-			const ndBodyKinematic* const vehicleBody = m_vehicleBody->GetAsBodyKinematic();
-			const ndMatrix& matrix = vehicleBody->GetMatrix();
-			const ndVector veloc(vehicleBody->GetVelocity());
-			ndFloat32 speed = veloc.DotProduct(matrix.m_front).GetScalar();
-			ndFloat32 step = speed * timestep;
-			for (ndInt32 i = 0; i < m_wheelAnimation.GetCount(); ++i)
-			{
-				ndFloat32 angleAngle = step * m_wheelAnimation[i].m_invRadius;
-				ndFloat32 angle = m_wheelAnimation[i].m_angle + angleAngle;
-				if (angle > ndPi * ndFloat32(2.0f))
-				{
-					angle -= ndPi * ndFloat32(2.0f);
-				}
-				else if (angle < -ndPi * ndFloat32(2.0f))
-				{
-					angle += ndPi * ndFloat32(2.0f);
-				}
-				m_wheelAnimation[i].m_angle = angle;
-
-				const ndMatrix wheelMatrix(ndPitchMatrix(angle) * m_wheelAnimation[i].m_bindMatrix);
-				m_wheelAnimation[i].m_wheelNode->SetTransform(wheelMatrix, wheelMatrix.m_posit);
-			}
-		}
-
-		void ApplyLongitudinalImpulse(ndFloat32 timestep)
-		{
-			ndBodyDynamic* const vehicleBody = m_vehicleBody->GetAsBodyDynamic();
-
-			const ndMatrix matrix(vehicleBody->GetMatrix());
-			const ndVector velocity(m_vehicleBody->GetVelocity());
-			ndFloat32 speed = matrix.m_front.DotProduct(velocity).GetScalar();
-			ndFloat32 speedError = m_desiredSpeed - speed;
-			ndFloat32 impulseMag = ndFloat32(0.05f) * speedError * vehicleBody->GetMassMatrix().m_w;
-			vehicleBody->ApplyImpulsePair(matrix.m_front.Scale (impulseMag), ndVector::m_zero, timestep); 
-		}
-
-		void ApplyLateralImpulse(ndFloat32 timestep)
-		{
-			ndBodyDynamic* const vehicleBody = m_vehicleBody->GetAsBodyDynamic();
-
-			const ndMatrix matrix(vehicleBody->GetMatrix());
-			const ndVector forward (matrix.m_front);
-			const ndVector upDir (matrix.m_up);
-
-			// Get some info about our current velocity
-			const ndVector velocity = m_vehicleBody->GetVelocity();
-
-			// Work out lateral force to stop sliding (all in world space)
-			const ndVector sidewayVelocity = velocity - forward.Scale(velocity.DotProduct(forward).GetScalar()) - upDir.Scale(velocity.DotProduct(upDir).GetScalar());
-			const ndVector velocityUp = velocity - forward.Scale(velocity.DotProduct(forward).GetScalar()) - sidewayVelocity;
-			const ndVector sidewaysMomentum = sidewayVelocity.Scale(vehicleBody->GetMassMatrix().m_w);
-			const ndVector verticalMomentum = velocityUp.Scale(vehicleBody->GetMassMatrix().m_w);
-
-			// 0.8 = momentum canceling factor
-			vehicleBody->ApplyImpulsePair(ndVector::m_negOne * sidewaysMomentum * 0.8f, ndVector(0.0f), timestep);
-		}
-
-		void ApplyTurningImpulse(ndFloat32 timestep)
-		{
-			if (m_desiredSpeed == 0.0f)
-			{
-				return;
-			}
-
-			ndBodyDynamic* const vehicleBody = m_vehicleBody->GetAsBodyDynamic();
-			const ndMatrix matrix(vehicleBody->GetMatrix());
-
-			const ndVector upDir(matrix.m_up);
-
-			ndFloat32 turningSign = ndSign(m_desiredSpeed);
-			ndFloat32 omega = upDir.DotProduct(m_vehicleBody->GetOmega()).GetScalar();
-			ndFloat32 deltaOmega = turningSign * m_desiredAngularSpeedFactor - omega;
-			ndFloat32 angularImpulse = ndFloat32(0.3f) * deltaOmega * vehicleBody->GetMassMatrix().m_y;
-			vehicleBody->ApplyImpulsePair(ndVector::m_zero, upDir.Scale(angularImpulse), timestep);
-		}
-
-		ndDemoEntityManager* m_scene;
-		ndSharedPtr<ndBody> m_vehicleBody;
-		ndFloat32 m_desiredSpeed;
-		ndFloat32 m_desiredAngularSpeedFactor;
-		ndFixSizeArray<ndWheelSpin, 8> m_wheelAnimation;
+		ndMatrix m_bindMatrix;
+		ndRenderSceneNode* m_wheelNode;
+		ndFloat32 m_angle;
+		ndFloat32 m_invRadius;
 	};
 
-	BackGroundVehicleController(ndDemoEntityManager* pScene, const ndSharedPtr<ndBody>& body)
-		:ndModel()
+	ndBackGroundVehicleController(ndDemoEntityManager* const scene, const ndSharedPtr<ndBody>& body)
+		:ndModelNotify()
+		,m_scene(scene)
+		,m_vehicleBody(body)
+		,m_desiredSpeed(ndFloat32(0.0f))
+		,m_desiredAngularSpeedFactor(ndFloat32(0.0f))
 	{
-		SetNotifyCallback(ndSharedPtr<ndModelNotify>(new ndNotify(pScene, body)));
+		ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)body->GetAsBodyKinematic()->GetNotifyCallback();
+		ndSharedPtr<ndRenderSceneNode> vehicleMesh(notify->GetUserData());
+
+		// iterate ove each animated mesh part, 
+		// and save the nessery information to play the animation.
+		// is this example we only spin the tires.
+		const ndString tireId("tire");
+		const ndVector rightDir(vehicleMesh->GetTransform().GetMatrix().m_right);
+		const ndList<ndSharedPtr<ndRenderSceneNode>>& children = vehicleMesh->GetChilden();
+		for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = children.GetFirst(); node; node = node->GetNext())
+		{
+			ndRenderSceneNode* const child = *node->GetInfo();
+			if (child->m_name.Find(tireId) >= 0)
+			{
+				ndWheelSpin wheel;
+				wheel.m_wheelNode = child;
+				wheel.m_bindMatrix = child->GetTransform().GetMatrix();
+				ndFloat32 dir = wheel.m_bindMatrix.m_front.DotProduct(rightDir).GetScalar();
+				wheel.m_angle = ndFloat32(0.0f);
+				wheel.m_invRadius = (dir < 0.0f) ? ndFloat32(1.0f / 0.4f) : ndFloat32(-1.0f / 0.4f);
+				m_wheelAnimation.PushBack(wheel);
+			}
+		}
 	}
-};
 
-static ndSharedPtr<ndBody> CreateAiVehicleProp(ndDemoEntityManager* const scene)
-{
-	ndMeshLoader loader;
-	ndSharedPtr<ndRenderSceneNode> vehicleMesh(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("vmw.fbx")));
-	ndMatrix matrix (ndGetIdentityMatrix());
-	ndVector floor(FindFloor(*scene->GetWorld(), ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	floor.m_y += ndFloat32 (1.0f);
-	matrix.m_posit = floor;
+	static ndSharedPtr<ndModelNotify> CreateAiVehicleProp(ndDemoEntityManager* const scene)
+	{
+		ndMeshLoader loader;
+		ndSharedPtr<ndRenderSceneNode> vehicleMesh(loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("vmw.fbx")));
+		ndMatrix matrix(ndGetIdentityMatrix());
+		ndVector floor(FindFloor(*scene->GetWorld(), ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+		floor.m_y += ndFloat32(1.0f);
+		matrix.m_posit = floor;
 
-	ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* renderChildren = vehicleMesh->GetChilden().GetFirst();
+		ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* renderChildren = vehicleMesh->GetChilden().GetFirst();
 
-	// build a compound collision shape with chassis and tires
-	ndSharedPtr<ndShapeInstance> compoundShapeInstance(new ndShapeInstance(new ndShapeCompound()));
-	ndShapeCompound* const compoundShape = compoundShapeInstance->GetShape()->GetAsShapeCompound();
-	compoundShape->BeginAddRemove();
-		
+		// build a compound collision shape with chassis and tires
+		ndSharedPtr<ndShapeInstance> compoundShapeInstance(new ndShapeInstance(new ndShapeCompound()));
+		ndShapeCompound* const compoundShape = compoundShapeInstance->GetShape()->GetAsShapeCompound();
+		compoundShape->BeginAddRemove();
+
 		//add chassis shape
-		ndSharedPtr<ndShapeInstance> chassisShape (loader.m_mesh->CreateCollision());
+		ndSharedPtr<ndShapeInstance> chassisShape(loader.m_mesh->CreateCollision());
 		compoundShape->AddCollision(*chassisShape);
 
 		// add all tires
@@ -281,37 +104,209 @@ static ndSharedPtr<ndBody> CreateAiVehicleProp(ndDemoEntityManager* const scene)
 			}
 			renderChildren = renderChildren->GetNext();
 		}
-	compoundShape->EndAddRemove();
+		compoundShape->EndAddRemove();
 
+		ndWorld* const world = scene->GetWorld();
+		ndSharedPtr<ndBody> vehicleBody(new ndBodyDynamic());
+		vehicleBody->SetNotifyCallback(new ndDemoEntityNotify(scene, vehicleMesh));
+		vehicleBody->SetMatrix(matrix);
+		vehicleBody->GetAsBodyDynamic()->SetCollisionShape(**compoundShapeInstance);
+		vehicleBody->GetAsBodyDynamic()->SetMassMatrix(1000.0f, **chassisShape);
 
-	ndWorld* const world = scene->GetWorld();
-	ndSharedPtr<ndBody> vehicleBody(new ndBodyDynamic());
-	vehicleBody->SetNotifyCallback(new ndDemoEntityNotify(scene, vehicleMesh));
-	vehicleBody->SetMatrix(matrix);
-	vehicleBody->GetAsBodyDynamic()->SetCollisionShape(**compoundShapeInstance);
-	vehicleBody->GetAsBodyDynamic()->SetMassMatrix(1000.0f, **chassisShape);
+		//ndSharedPtr<ndModel> controller(new BackGroundVehicleController(scene, vehicleBody));
+		ndSharedPtr<ndModel> model(new ndModel());
+		ndSharedPtr<ndModelNotify> controller(new ndBackGroundVehicleController(scene, vehicleBody));
+		model->SetNotifyCallback(controller);
 
-	ndSharedPtr<ndModel> controller(new BackGroundVehicleController(scene, vehicleBody));
+		world->AddBody(vehicleBody);
+		world->AddModel(model);
+		scene->AddEntity(vehicleMesh);
+		return controller;
+	}
 
-	world->AddBody(vehicleBody);
-	world->AddModel(controller);
-	scene->AddEntity(vehicleMesh);
+	private:
+	// update pseudo physics every substep
+	void Update(ndFloat32 timestep)
+	{
+		ndModelNotify::Update(timestep);
+		if (IsOnGround())
+		{
+			ApplyTurningImpulse(timestep);
+			ApplyLateralImpulse(timestep);
+			ApplyLongitudinalImpulse(timestep);
+		}
+	}
 
-	return vehicleBody;
-}
+	// update the body part stuff like animations of the wheels,
+	// setting the follow camera, apply controls, etc;
+	void PostTransformUpdate(ndFloat32 timestep)
+	{
+		ndModelNotify::PostTransformUpdate(timestep);
+
+		// apply vehicle control 
+		ApplyImpulControls();
+
+		// apply tire animation and othe stuff if nessesary
+		AnimateTires(timestep);
+	}
+
+	void ApplyImpulControls()
+	{
+		// apply forward controls
+		m_desiredSpeed = ndFloat32(0.0f);
+		if (m_scene->GetKeyState(ImGuiKey_W))
+		{
+			m_desiredSpeed = ND_MAX_PROP_VEHICLE_SPEED;
+		}
+		else if (m_scene->GetKeyState(ImGuiKey_S))
+		{
+			m_desiredSpeed = -0.5f * ND_MAX_PROP_VEHICLE_SPEED;
+		}
+
+		// apply turning controls
+		m_desiredAngularSpeedFactor = ndFloat32(0.0f);
+		if (m_scene->GetKeyState(ImGuiKey_A))
+		{
+			m_desiredAngularSpeedFactor = ndFloat32(0.5f);
+		}
+		else if (m_scene->GetKeyState(ImGuiKey_D))
+		{
+			m_desiredAngularSpeedFactor = ndFloat32(-0.5f);
+		}
+	}
+
+	bool IsOnGround() const
+	{
+		const ndBodyKinematic* const vehicleBody = m_vehicleBody->GetAsBodyKinematic();
+		ndInt32 wheelContacts = 0;
+		ndBodyKinematic::ndContactMap::Iterator it(vehicleBody->GetContactMap());
+		for (it.Begin(); it; it++)
+		{
+			const ndContact* const contact = it.GetNode()->GetInfo();
+			if (contact->IsActive())
+			{
+				const ndContactPointList& contactPoints = contact->GetContactPoints();
+				for (ndContactPointList::ndNode* node = contactPoints.GetFirst(); node; node = node->GetNext())
+				{
+					const ndContactMaterial& contactPoint = node->GetInfo();
+					const ndShapeInstance* const instance = (contactPoint.m_body0 == vehicleBody) ? contactPoint.m_shapeInstance0 : contactPoint.m_shapeInstance1;
+					const ndShape* const shape = instance->GetShape();
+					const ndShapeChamferCylinder* const wheel = ((ndShape*)shape)->GetAsShapeChamferCylinder();
+					if (wheel)
+					{
+						wheelContacts++;
+						if (wheelContacts >= 3)
+						{
+							return true;
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	void AnimateTires(ndFloat32 timestep)
+	{
+		const ndBodyKinematic* const vehicleBody = m_vehicleBody->GetAsBodyKinematic();
+		const ndMatrix& matrix = vehicleBody->GetMatrix();
+		const ndVector veloc(vehicleBody->GetVelocity());
+		ndFloat32 speed = veloc.DotProduct(matrix.m_front).GetScalar();
+		ndFloat32 step = speed * timestep;
+		for (ndInt32 i = 0; i < m_wheelAnimation.GetCount(); ++i)
+		{
+			ndFloat32 angleAngle = step * m_wheelAnimation[i].m_invRadius;
+			ndFloat32 angle = m_wheelAnimation[i].m_angle + angleAngle;
+			if (angle > ndPi * ndFloat32(2.0f))
+			{
+				angle -= ndPi * ndFloat32(2.0f);
+			}
+			else if (angle < -ndPi * ndFloat32(2.0f))
+			{
+				angle += ndPi * ndFloat32(2.0f);
+			}
+			m_wheelAnimation[i].m_angle = angle;
+
+			const ndMatrix wheelMatrix(ndPitchMatrix(angle) * m_wheelAnimation[i].m_bindMatrix);
+			m_wheelAnimation[i].m_wheelNode->SetTransform(wheelMatrix, wheelMatrix.m_posit);
+		}
+	}
+
+	void ApplyLongitudinalImpulse(ndFloat32 timestep)
+	{
+		ndBodyDynamic* const vehicleBody = m_vehicleBody->GetAsBodyDynamic();
+
+		const ndMatrix matrix(vehicleBody->GetMatrix());
+		const ndVector velocity(m_vehicleBody->GetVelocity());
+		ndFloat32 speed = matrix.m_front.DotProduct(velocity).GetScalar();
+		ndFloat32 speedError = m_desiredSpeed - speed;
+		ndFloat32 impulseMag = ndFloat32(0.05f) * speedError * vehicleBody->GetMassMatrix().m_w;
+		vehicleBody->ApplyImpulsePair(matrix.m_front.Scale(impulseMag), ndVector::m_zero, timestep);
+	}
+
+	void ApplyLateralImpulse(ndFloat32 timestep)
+	{
+		ndBodyDynamic* const vehicleBody = m_vehicleBody->GetAsBodyDynamic();
+
+		const ndMatrix matrix(vehicleBody->GetMatrix());
+		const ndVector forward(matrix.m_front);
+		const ndVector upDir(matrix.m_up);
+
+		// Get some info about our current velocity
+		const ndVector velocity = m_vehicleBody->GetVelocity();
+
+		// Work out lateral force to stop sliding (all in world space)
+		const ndVector sidewayVelocity = velocity - forward.Scale(velocity.DotProduct(forward).GetScalar()) - upDir.Scale(velocity.DotProduct(upDir).GetScalar());
+		const ndVector velocityUp = velocity - forward.Scale(velocity.DotProduct(forward).GetScalar()) - sidewayVelocity;
+		const ndVector sidewaysMomentum = sidewayVelocity.Scale(vehicleBody->GetMassMatrix().m_w);
+		const ndVector verticalMomentum = velocityUp.Scale(vehicleBody->GetMassMatrix().m_w);
+
+		// 0.8 = momentum canceling factor
+		vehicleBody->ApplyImpulsePair(ndVector::m_negOne * sidewaysMomentum * 0.8f, ndVector(0.0f), timestep);
+	}
+
+	void ApplyTurningImpulse(ndFloat32 timestep)
+	{
+		if (m_desiredSpeed == 0.0f)
+		{
+			return;
+		}
+
+		ndBodyDynamic* const vehicleBody = m_vehicleBody->GetAsBodyDynamic();
+		const ndMatrix matrix(vehicleBody->GetMatrix());
+
+		const ndVector upDir(matrix.m_up);
+
+		ndFloat32 turningSign = ndSign(m_desiredSpeed);
+		ndFloat32 omega = upDir.DotProduct(m_vehicleBody->GetOmega()).GetScalar();
+		ndFloat32 deltaOmega = turningSign * m_desiredAngularSpeedFactor - omega;
+		ndFloat32 angularImpulse = ndFloat32(0.3f) * deltaOmega * vehicleBody->GetMassMatrix().m_y;
+		vehicleBody->ApplyImpulsePair(ndVector::m_zero, upDir.Scale(angularImpulse), timestep);
+	}
+
+	public:
+	ndDemoEntityManager* m_scene;
+	ndSharedPtr<ndBody> m_vehicleBody;
+	ndFloat32 m_desiredSpeed;
+	ndFloat32 m_desiredAngularSpeedFactor;
+	ndFixSizeArray<ndWheelSpin, 8> m_wheelAnimation;
+};
 
 void ndBasicModel(ndDemoEntityManager* const scene)
 {
 	//ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
 	ndSharedPtr<ndBody> mapBody(BuildHeightFieldTerrain(scene, "grass.png", ndGetIdentityMatrix()));
 	
-	ndSharedPtr<ndBody> vehicleBody(CreateAiVehicleProp(scene));
+	//ndSharedPtr<ndBody> vehicleBody(ndBackGroundVehicleController::CreateAiVehicleProp(scene));
+	ndSharedPtr<ndModelNotify> modelController(ndBackGroundVehicleController::CreateAiVehicleProp(scene));
+	ndBackGroundVehicleController* const vehicleController = (ndBackGroundVehicleController*)*modelController;
+	ndSharedPtr<ndBody> vehicleBody = vehicleController->m_vehicleBody;
 
 	// attach a follow camera to the vehicle prop
 	const ndVector cameraPivot(0.0f, 2.0f, 0.0f, 0.0f);
 	ndRender* const renderer = *scene->GetRenderer();
-	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)vehicleBody->GetAsBodyKinematic()->GetNotifyCallback();
-	ndSharedPtr<ndRenderSceneNode> vehicleMesh(notify->GetUserData());
+	ndDemoEntityNotify* const bodyNotify = (ndDemoEntityNotify*)(vehicleBody->GetAsBodyKinematic()->GetNotifyCallback());
+	ndSharedPtr<ndRenderSceneNode> vehicleMesh(bodyNotify->GetUserData());
 	ndSharedPtr<ndRenderSceneNode> camera(new ndDemoCameraNodeFollow(renderer, cameraPivot, ND_PROP_VEHICLE_CAMERA_DISTANCE));
 	renderer->SetCamera(camera);
 	vehicleMesh->AddChild(camera);
