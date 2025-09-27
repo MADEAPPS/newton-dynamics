@@ -22,7 +22,7 @@ class ndRenderPassEnvironment: public ndRenderPass
 	ndRenderPassEnvironment(ndRender* const owner, ndSharedPtr<ndRenderTexture>& cubeMap);
 	~ndRenderPassEnvironment();
 
-	virtual void RenderScene(ndFloat32 timestep) override;
+	virtual void RenderScene() override;
 	
 	ndSharedPtr<ndRenderTexture>& m_cubeMap;
 	ndSharedPtr<ndRenderPassEnvironmentImplement> m_implement;

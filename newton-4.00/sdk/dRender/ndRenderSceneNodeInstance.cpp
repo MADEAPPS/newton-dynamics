@@ -44,12 +44,13 @@ void ndRenderSceneNodeInstance::Finalize()
 	m_implement->Finalize();
 }
 
-void ndRenderSceneNodeInstance::Render(const ndRender* const owner, ndFloat32 timeStep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const
+void ndRenderSceneNodeInstance::Render(const ndRender* const owner, const ndMatrix& modelViewMatrix, ndRenderPassMode renderMode) const
 {
 	// instance node do not recurse, the just render all the child intances.
 	ndAssert(m_isInitialized);
 	if (m_isInitialized)
 	{
-		m_implement->Render(owner, timeStep, m_matrix * parentMatrix, renderMode);
+		//m_implement->Render(owner, m_matrix * modelViewMatrix, renderMode);
+		m_implement->Render(owner, modelViewMatrix, renderMode);
 	}
 }

@@ -23,7 +23,7 @@ ndMenuRenderPass::~ndMenuRenderPass()
 {
 }
 
-void ndMenuRenderPass::RenderScene(ndFloat32)
+void ndMenuRenderPass::RenderScene()
 {
 	StateBegin();
 	m_owner->RenderStats();

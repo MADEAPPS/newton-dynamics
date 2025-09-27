@@ -187,7 +187,35 @@ void ndRender::InterpolateTransforms(ndFloat32 param)
 	}
 }
 
-void ndRender::Render(ndFloat32 timestep)
+void ndRender::UpdateGlobalMatrices() const
+{
+	ndList<ndRenderSceneNode*, ndContainersFreeListAlloc<ndRenderSceneNode*>> stackList;
+	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* rootSceneNode = m_scene.GetFirst(); rootSceneNode; rootSceneNode = rootSceneNode->GetNext())
+	{
+		stackList.RemoveAll();
+		ndRenderSceneNode* const rootNode = *rootSceneNode->GetInfo();
+		rootNode->m_globalMatrix = rootNode->m_matrix;
+		for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* childSceneNode = rootNode->m_children.GetFirst(); childSceneNode; childSceneNode = childSceneNode->GetNext())
+		{
+			ndRenderSceneNode* const child = *childSceneNode->GetInfo();
+			stackList.Append(child);
+		}
+
+		while (stackList.GetCount())
+		{
+			ndRenderSceneNode* const sceneNode = stackList.GetLast()->GetInfo();
+			stackList.Remove(stackList.GetLast());
+			sceneNode->m_globalMatrix = sceneNode->m_matrix * sceneNode->m_parent->m_globalMatrix;
+			for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* childSceneNode = sceneNode->m_children.GetFirst(); childSceneNode; childSceneNode = childSceneNode->GetNext())
+			{
+				ndRenderSceneNode* const child = *childSceneNode->GetInfo();
+				stackList.Append(child);
+			}
+		}
+	}
+}
+
+void ndRender::Render()
 {
 	m_context->BeginFrame();
 	m_context->ClearFrameBuffer(m_backgroundColor);
@@ -197,6 +225,9 @@ void ndRender::Render(ndFloat32 timestep)
 	ndInt32 fb_height = (ndInt32)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
 	if (!(fb_width == 0 || fb_height == 0))
 	{
+		// calaculate all grbal matrices
+		UpdateGlobalMatrices();
+
 		ndInt32 display_w = m_context->GetWidth();
 		ndInt32 display_h = m_context->GetHeight();
 		ndRenderSceneCamera* const camera = m_camera->FindCameraNode();
@@ -207,14 +238,14 @@ void ndRender::Render(ndFloat32 timestep)
 			const ndSharedPtr<ndRenderPass>& pass = node->GetInfo();
 			if (pass->m_active)
 			{
-				pass->RenderScene(timestep);
+				pass->RenderScene();
 			}
 		}
 
 		// render the camera mesh, usually an icon
 		if (!m_camera->m_parent)
 		{
-			m_camera->Render(m_camera->m_owner, timestep, ndGetIdentityMatrix(), m_directionalDiffusseNoShadow);
+			m_camera->Render(m_camera->m_owner, ndGetIdentityMatrix(), m_directionalDiffusseNoShadow);
 		}
 
 		m_context->EndFrame();

@@ -142,7 +142,35 @@ ndRenderSceneNode* ndRenderSceneNode::IteratorFirst()
 	return ptr;
 }
 
+const ndRenderSceneNode* ndRenderSceneNode::IteratorFirst() const
+{
+	const ndRenderSceneNode* ptr = this;
+	while (ptr->m_children.GetCount())
+	{
+		ptr = *ptr->m_children.GetFirst()->GetInfo();
+	}
+	return ptr;
+}
+
 ndRenderSceneNode* ndRenderSceneNode::IteratorNext()
+{
+	if (m_childNode)
+	{
+		ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* next = m_childNode->GetNext();
+		if (next)
+		{
+			if (next->GetInfo()->m_children.GetCount())
+			{
+				return next->GetInfo()->IteratorFirst();
+			}
+			return *next->GetInfo();
+		}
+		return m_parent;
+	}
+	return nullptr;
+}
+
+const ndRenderSceneNode* ndRenderSceneNode::IteratorNext() const
 {
 	if (m_childNode)
 	{
@@ -325,21 +353,28 @@ void ndRenderSceneNode::InterpolateTransforms(ndFloat32 param)
 	}
 }
 
-void ndRenderSceneNode::Render(const ndRender* const owner, ndFloat32 timestep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const
+void ndRenderSceneNode::Render(const ndRender* const owner, const ndMatrix& modelViewMatrix, ndRenderPassMode renderMode) const
 {
 	ndAssert(!m_owner || (m_owner == owner));
-	const ndMatrix nodeMatrix(m_matrix * parentMatrix);
-	const ndRenderPrimitive* const mesh = *m_primitive;
-	if (m_isVisible && mesh)
+	//const ndMatrix nodeMatrix(m_matrix * modelViewMatrix);
+	//const ndRenderPrimitive* const mesh = *m_primitive;
+	//if (m_isVisible && mesh)
+	//{
+	//	// Render mesh if there is one 
+	//	const ndMatrix modelMatrix(m_primitiveMatrix * nodeMatrix);
+	//	mesh->Render(owner, modelMatrix, renderMode);
+	//}
+
+	if (m_isVisible && *m_primitive)
 	{
-		// Render mesh if there is one 
-		const ndMatrix modelMatrix(m_primitiveMatrix * nodeMatrix);
+		const ndRenderPrimitive* const mesh = *m_primitive;
+		const ndMatrix modelMatrix(m_primitiveMatrix * m_globalMatrix * modelViewMatrix);
 		mesh->Render(owner, modelMatrix, renderMode);
 	}
 
 	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = m_children.GetFirst(); node; node = node->GetNext())
 	{
 		ndRenderSceneNode* const childNode = *node->GetInfo();
-		childNode->Render(owner, timestep, nodeMatrix, renderMode);
+		childNode->Render(owner, modelViewMatrix, renderMode);
 	}
 }

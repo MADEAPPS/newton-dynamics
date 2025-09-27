@@ -69,7 +69,7 @@ ndDebugDisplayRenderPass::ndDebugMesh* ndDebugDisplayRenderPass::CreateRenderPri
 	return debugMesh;
 }
 
-void ndDebugDisplayRenderPass::RenderScene(ndFloat32)
+void ndDebugDisplayRenderPass::RenderScene()
 {
 	ndPhysicsWorld* const world = m_manager->GetWorld();
 	const ndBodyListView& bodyList = world->GetBodyList();

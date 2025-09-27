@@ -24,7 +24,7 @@ ndRenderPassTransparency::~ndRenderPassTransparency()
 {
 }
 
-void ndRenderPassTransparency::RenderScene(ndFloat32 timestep)
+void ndRenderPassTransparency::RenderScene()
 {
 	m_owner->m_context->SetCollorPassRenderStates();
 
@@ -35,12 +35,12 @@ void ndRenderPassTransparency::RenderScene(ndFloat32 timestep)
 	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = scene.GetFirst(); node; node = node->GetNext())
 	{
 		ndRenderSceneNode* const sceneNode = *node->GetInfo();
-		sceneNode->Render(sceneNode->m_owner, timestep, globalMatrix, m_transparencyBackface);
+		sceneNode->Render(sceneNode->m_owner, globalMatrix, m_transparencyBackface);
 	}
 	
 	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = scene.GetFirst(); node; node = node->GetNext())
 	{
 		ndRenderSceneNode* const sceneNode = *node->GetInfo();
-		sceneNode->Render(sceneNode->m_owner, timestep, globalMatrix, m_transparencyFrontface);
+		sceneNode->Render(sceneNode->m_owner, globalMatrix, m_transparencyFrontface);
 	}
 }

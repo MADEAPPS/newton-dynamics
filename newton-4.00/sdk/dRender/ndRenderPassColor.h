@@ -19,7 +19,7 @@ class ndRenderPassColor: public ndRenderPass
 	ndRenderPassColor(ndRender* const owner);
 	virtual ~ndRenderPassColor();
 
-	virtual void RenderScene(ndFloat32 timestep) override;
+	virtual void RenderScene() override;
 };
 
 #endif

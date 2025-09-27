@@ -19,7 +19,7 @@ class ndRenderPassTransparency: public ndRenderPass
 	ndRenderPassTransparency(ndRender* const owner);
 	virtual ~ndRenderPassTransparency();
 
-	virtual void RenderScene(ndFloat32 timestep) override;
+	virtual void RenderScene() override;
 };
 
 #endif

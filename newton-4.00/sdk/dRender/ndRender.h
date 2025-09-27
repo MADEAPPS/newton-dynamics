@@ -68,7 +68,7 @@ class ndRender: public ndClassAlloc
 	ndInt32 GetHeight() const;
 	
 	void ResetScene();
-	void Render(ndFloat32 timestep);
+	void Render();
 
 	void ClearFrameBuffer(const ndVector& color);
 	void AddRenderPass(const ndSharedPtr<ndRenderPass>& renderPass);
@@ -87,9 +87,10 @@ class ndRender: public ndClassAlloc
 	void InterpolateTransforms(ndFloat32 param);
 
 	private:
+	void UpdateGlobalMatrices() const;
+
 	ndSharedPtr<ndUserCallback> m_owner;
 	ndSharedPtr<ndRenderContext> m_context;
-	//ndSharedPtr<ndRenderSceneCamera> m_camera;
 	ndSharedPtr<ndRenderSceneNode> m_camera;
 	ndSharedPtr<ndRenderTextureCache> m_textureCache;
 	ndList<ndSharedPtr<ndRenderSceneNode>> m_scene;

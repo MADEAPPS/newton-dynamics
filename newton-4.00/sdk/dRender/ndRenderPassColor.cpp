@@ -24,7 +24,7 @@ ndRenderPassColor::~ndRenderPassColor()
 {
 }
 
-void ndRenderPassColor::RenderScene(ndFloat32 timestep)
+void ndRenderPassColor::RenderScene()
 {
 	m_owner->m_context->SetCollorPassRenderStates();
 
@@ -34,13 +34,13 @@ void ndRenderPassColor::RenderScene(ndFloat32 timestep)
 	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = scene.GetFirst(); node; node = node->GetNext())
 	{
 		ndRenderSceneNode* const sceneNode = *node->GetInfo();
-		sceneNode->Render(sceneNode->m_owner, timestep, globalMatrix, m_directionalDiffusseNoShadow);
+		sceneNode->Render(sceneNode->m_owner, globalMatrix, m_directionalDiffusseNoShadow);
 	}
 
 	// render all meshes that get shadows
 	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = scene.GetFirst(); node; node = node->GetNext())
 	{
 		ndRenderSceneNode* const sceneNode = *node->GetInfo();
-		sceneNode->Render(sceneNode->m_owner, timestep, globalMatrix, m_directionalDiffusseShadow);
+		sceneNode->Render(sceneNode->m_owner, globalMatrix, m_directionalDiffusseShadow);
 	}
 }

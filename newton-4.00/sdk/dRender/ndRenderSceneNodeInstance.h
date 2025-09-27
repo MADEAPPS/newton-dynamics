@@ -25,7 +25,7 @@ class ndRenderSceneNodeInstance : public ndRenderSceneNode
 	virtual const ndRenderSceneNodeInstance* GetAsInstance() const override;
 
 	void Finalize();
-	virtual void Render(const ndRender* const owner, ndFloat32 timeStep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const override;
+	virtual void Render(const ndRender* const owner, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const override;
 
 	ndRenderPrimitiveMesh::ndDescriptor m_descriptor;
 	ndSharedPtr<ndRenderSceneNodeInstanceImplement> m_implement;

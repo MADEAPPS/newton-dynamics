@@ -21,7 +21,7 @@ class ndRenderPassShadows: public ndRenderPass
 	ndRenderPassShadows(ndRender* const owner);
 	virtual ~ndRenderPassShadows();
 
-	virtual void RenderScene(ndFloat32 timestep) override;
+	virtual void RenderScene() override;
 
 	ndSharedPtr<ndRenderPassShadowsImplement> m_implement;
 };

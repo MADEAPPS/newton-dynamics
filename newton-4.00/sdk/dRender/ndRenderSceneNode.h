@@ -77,11 +77,14 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 
 	ndRenderSceneNode* IteratorNext();
 	ndRenderSceneNode* IteratorFirst();
+	const ndRenderSceneNode* IteratorNext() const;
+	const ndRenderSceneNode* IteratorFirst() const;
 
-	virtual void Render(const ndRender* const owner, ndFloat32 timeStep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const;
+	virtual void Render(const ndRender* const owner, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const;
 
 	public:
-	ndMatrix m_matrix;			// interpolated matrix
+	ndMatrix m_matrix;			// interpolated local matrix
+	ndMatrix m_globalMatrix;	// world space matrix calculated each frame for rendering
 	ndMatrix m_primitiveMatrix;
 	ndTransform m_transform0;
 	ndTransform m_transform1;

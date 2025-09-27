@@ -23,7 +23,7 @@ class ndRenderSceneNodeInstanceImplement : public ndContainersFreeListAlloc<ndRe
 	ndRenderSceneNodeInstanceImplement(ndRenderSceneNodeInstance* const owner);
 
 	void Finalize();
-	void Render(const ndRender* const owner, ndFloat32 timeStep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const;
+	void Render(const ndRender* const owner, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const;
 
 	ndRenderSceneNodeInstance* m_owner;
 };

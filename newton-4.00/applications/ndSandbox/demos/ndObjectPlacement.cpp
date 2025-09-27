@@ -101,9 +101,9 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		}
 	}
 
-	void Render(const ndRender* const owner, ndFloat32 timestep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const override
+	void Render(const ndRender* const owner, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const override
 	{
-		ndDemoCameraNode::Render(owner, timestep, parentMatrix, renderMode);
+		ndDemoCameraNode::Render(owner, parentMatrix, renderMode);
 
 		if (m_showIcon)
 		{

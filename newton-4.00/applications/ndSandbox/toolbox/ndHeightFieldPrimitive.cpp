@@ -143,12 +143,12 @@ class ndHeightfieldMesh : public ndRenderSceneNode
 	}
 
 	private:
-	virtual void Render(const ndRender* const owner, ndFloat32 timeStep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const
+	virtual void Render(const ndRender* const owner, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const override
 	{
 		// make a tiled rendered node.
 		// the terrain is a array of tile subtable for colling,
 		// but in this demo we are just rendering the map brute force
-		ndRenderSceneNode::Render(owner, timeStep, parentMatrix, renderMode);
+		ndRenderSceneNode::Render(owner, parentMatrix, renderMode);
 	}
 
 	ndSharedPtr<ndShapeInstance> BuildTile(const ndShapeHeightfield* const shape, ndInt32 x0, ndInt32 z0)

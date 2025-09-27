@@ -24,7 +24,7 @@ class ndRenderPass: public ndClassAlloc
 	void MakeActive(bool mode);
 
 	virtual void ResetScene() {}
-	virtual void RenderScene(ndFloat32 timestep) = 0;
+	virtual void RenderScene() = 0;
 
 	protected:
 	ndRender* m_owner;

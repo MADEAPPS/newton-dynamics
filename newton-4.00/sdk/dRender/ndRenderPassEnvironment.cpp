@@ -30,7 +30,7 @@ ndRenderPassEnvironment::~ndRenderPassEnvironment()
 	m_owner->m_cachedShadowPass = nullptr;
 }
 
-void ndRenderPassEnvironment::RenderScene(ndFloat32)
+void ndRenderPassEnvironment::RenderScene()
 {
 	const ndRenderSceneCamera* const camera = m_owner->m_camera->FindCameraNode();
 	m_implement->RenderScene(camera, *m_cubeMap);

@@ -570,11 +570,11 @@ class ndSceneMesh : public ndRenderSceneNode
 		}
 	}
 
-	virtual void Render(const ndRender* const owner, ndFloat32 timeStep, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const
+	virtual void Render(const ndRender* const owner, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const override
 	{
 		// here we can  do a visibility test to check which children are visible from the camera, 
 		// but in this demo we are just rendering the entire scene brute force.
-		ndRenderSceneNode::Render(owner, timeStep, parentMatrix, renderMode);
+		ndRenderSceneNode::Render(owner, parentMatrix, renderMode);
 	}
 
 	public:
