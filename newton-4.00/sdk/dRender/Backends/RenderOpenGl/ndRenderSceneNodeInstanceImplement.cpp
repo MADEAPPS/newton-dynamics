@@ -15,7 +15,7 @@
 #include "ndRenderTexture.h"
 #include "ndRenderPrimitive.h"
 #include "ndRenderSceneNodeInstance.h"
-#include "ndRenderPrimitiveMeshImplement.h"
+#include "ndRenderPrimitiveImplement.h"
 #include "ndRenderSceneNodeInstanceImplement.h"
 
 ndRenderSceneNodeInstanceImplement::ndRenderSceneNodeInstanceImplement(ndRenderSceneNodeInstance* const owner)
@@ -44,7 +44,7 @@ void ndRenderSceneNodeInstanceImplement::Render(const ndRender* const owner, con
 		const ndMatrix primitiveMatrix(m_owner->m_primitiveMatrix);
 
 		ndRenderPrimitive* const mesh = (ndRenderPrimitive*)*m_owner->m_primitive;
-		ndRenderPrimitiveMeshImplement* const meshImplement = *mesh->m_implement;
+		ndRenderPrimitiveImplement* const meshImplement = *mesh->m_implement;
 		
 		ndArray<glMatrix>& matrixPallete = meshImplement->m_genericMatricArray;
 

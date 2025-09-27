@@ -19,11 +19,11 @@
 #include "ndRenderSceneCamera.h"
 #include "ndRenderTextureImage.h"
 #include "ndRenderPassEnvironment.h"
+#include "ndRenderPrimitiveImplement.h"
 #include "ndRenderPassShadowsImplement.h"
-#include "ndRenderPrimitiveMeshImplement.h"
 
-ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(ndRenderPrimitive* const owner, const ndRenderPrimitive::ndDescriptor& descriptor)
-	:ndContainersFreeListAlloc<ndRenderPrimitiveMeshImplement>()
+ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(ndRenderPrimitive* const owner, const ndRenderPrimitive::ndDescriptor& descriptor)
+	:ndContainersFreeListAlloc<ndRenderPrimitiveImplement>()
 	,m_owner(owner)
 	,m_context(*descriptor.m_render->m_context)
 	,m_skinSceneNode(nullptr)
@@ -55,8 +55,8 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(ndRenderPrimitive
 	m_opaqueDifusedColorNoShadowInstanceBlock.GetShaderParameters(*m_context->m_shaderCache);
 }
 
-ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(const ndRenderPrimitiveMeshImplement& src)
-	:ndContainersFreeListAlloc<ndRenderPrimitiveMeshImplement>()
+ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(const ndRenderPrimitiveImplement& src)
+	:ndContainersFreeListAlloc<ndRenderPrimitiveImplement>()
 	,m_owner(nullptr)
 	,m_context(src.m_context)
 	,m_skinSceneNode(nullptr)
@@ -142,7 +142,7 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(const ndRenderPri
 	m_opaqueDifusedColorNoShadowInstanceBlock.GetShaderParameters(*m_context->m_shaderCache);
 }
 
-ndRenderPrimitiveMeshImplement::~ndRenderPrimitiveMeshImplement()
+ndRenderPrimitiveImplement::~ndRenderPrimitiveImplement()
 {
 	if (m_instanceRenderMatrixPalleteBuffer)
 	{
@@ -165,19 +165,19 @@ ndRenderPrimitiveMeshImplement::~ndRenderPrimitiveMeshImplement()
 	}
 }
 
-bool ndRenderPrimitiveMeshImplement::IsSKinnedMesh() const
+bool ndRenderPrimitiveImplement::IsSKinnedMesh() const
 {
 	return m_skinSceneNode ? true : false;
 }
 
-ndRenderPrimitiveMeshImplement* ndRenderPrimitiveMeshImplement::Clone(ndRenderPrimitive* const owner) const
+ndRenderPrimitiveImplement* ndRenderPrimitiveImplement::Clone(ndRenderPrimitive* const owner) const
 {
-	ndRenderPrimitiveMeshImplement* const mesh = new ndRenderPrimitiveMeshImplement(*this);
+	ndRenderPrimitiveImplement* const mesh = new ndRenderPrimitiveImplement(*this);
 	mesh->m_owner = owner;
 	return mesh;
 }
 
-void ndRenderPrimitiveMeshImplement::BuildFromCollisionShape(const ndRenderPrimitive::ndDescriptor& descriptor)
+void ndRenderPrimitiveImplement::BuildFromCollisionShape(const ndRenderPrimitive::ndDescriptor& descriptor)
 {
 	switch (descriptor.m_meshBuildMode)
 	{
@@ -218,7 +218,7 @@ void ndRenderPrimitiveMeshImplement::BuildFromCollisionShape(const ndRenderPrimi
 	}
 }
 
-void ndRenderPrimitiveMeshImplement::BuildFromMesh(const ndRenderPrimitive::ndDescriptor& descriptor)
+void ndRenderPrimitiveImplement::BuildFromMesh(const ndRenderPrimitive::ndDescriptor& descriptor)
 {
 	switch (descriptor.m_meshBuildMode)
 	{
@@ -242,7 +242,7 @@ void ndRenderPrimitiveMeshImplement::BuildFromMesh(const ndRenderPrimitive::ndDe
 	}
 }
 
-void ndRenderPrimitiveMeshImplement::BuildRenderMeshFromCollisionShape(const ndRenderPrimitive::ndDescriptor& descriptor)
+void ndRenderPrimitiveImplement::BuildRenderMeshFromCollisionShape(const ndRenderPrimitive::ndDescriptor& descriptor)
 {
 	ndAssert(*descriptor.m_collision);
 	ndMeshEffect mesh(**descriptor.m_collision);
@@ -360,7 +360,7 @@ void ndRenderPrimitiveMeshImplement::BuildRenderMeshFromCollisionShape(const ndR
 	glBindVertexArray(0);
 }
 
-void ndRenderPrimitiveMeshImplement::BuildRenderSimpleMeshFromMeshEffect(const ndRenderPrimitive::ndDescriptor& descriptor)
+void ndRenderPrimitiveImplement::BuildRenderSimpleMeshFromMeshEffect(const ndRenderPrimitive::ndDescriptor& descriptor)
 {
 	ndMeshEffect& mesh = *((ndMeshEffect*)*descriptor.m_meshNode);
 	ndAssert(descriptor.m_materials.GetCount());
@@ -443,7 +443,7 @@ void ndRenderPrimitiveMeshImplement::BuildRenderSimpleMeshFromMeshEffect(const n
 	glBindVertexArray(0);
 }
 
-void ndRenderPrimitiveMeshImplement::BuildRenderSkinnedMeshFromMeshEffect(const ndRenderPrimitive::ndDescriptor& descriptor)
+void ndRenderPrimitiveImplement::BuildRenderSkinnedMeshFromMeshEffect(const ndRenderPrimitive::ndDescriptor& descriptor)
 {
 	ndMeshEffect& mesh = *((ndMeshEffect*)*descriptor.m_meshNode);
 	ndAssert(*descriptor.m_skeleton);
@@ -596,7 +596,7 @@ void ndRenderPrimitiveMeshImplement::BuildRenderSkinnedMeshFromMeshEffect(const 
 	glBindVertexArray(0);
 }
 
-void ndRenderPrimitiveMeshImplement::BuildDebugFlatShadedMesh(const ndRenderPrimitive::ndDescriptor& descriptor)
+void ndRenderPrimitiveImplement::BuildDebugFlatShadedMesh(const ndRenderPrimitive::ndDescriptor& descriptor)
 {
 	class ndDrawShape : public ndShapeDebugNotify
 	{
@@ -692,7 +692,7 @@ void ndRenderPrimitiveMeshImplement::BuildDebugFlatShadedMesh(const ndRenderPrim
 	}
 }
 
-void ndRenderPrimitiveMeshImplement::BuildWireframeDebugMesh(const ndRenderPrimitive::ndDescriptor& descriptor)
+void ndRenderPrimitiveImplement::BuildWireframeDebugMesh(const ndRenderPrimitive::ndDescriptor& descriptor)
 {
 	class ndDrawShape : public ndShapeDebugNotify
 	{
@@ -783,7 +783,7 @@ void ndRenderPrimitiveMeshImplement::BuildWireframeDebugMesh(const ndRenderPrimi
 	}
 }
 
-void ndRenderPrimitiveMeshImplement::BuildSetZBufferDebugMesh(const ndRenderPrimitive::ndDescriptor& descriptor)
+void ndRenderPrimitiveImplement::BuildSetZBufferDebugMesh(const ndRenderPrimitive::ndDescriptor& descriptor)
 {
 	class ndDrawShape : public ndShapeDebugNotify
 	{
@@ -865,7 +865,7 @@ void ndRenderPrimitiveMeshImplement::BuildSetZBufferDebugMesh(const ndRenderPrim
 	}
 }
 
-void ndRenderPrimitiveMeshImplement::BuildRenderInstanceMesh(const ndRenderPrimitive::ndDescriptor& descriptor)
+void ndRenderPrimitiveImplement::BuildRenderInstanceMesh(const ndRenderPrimitive::ndDescriptor& descriptor)
 {
 	ndAssert(descriptor.m_collision);
 	ndMeshEffect mesh(**descriptor.m_collision);
@@ -1006,7 +1006,7 @@ void ndRenderPrimitiveMeshImplement::BuildRenderInstanceMesh(const ndRenderPrimi
 	glBindVertexArray(0);
 }
 
-void ndRenderPrimitiveMeshImplement::Render(const ndRender* const render, const ndMatrix& modelMatrix, ndRenderPassMode renderMode) const
+void ndRenderPrimitiveImplement::Render(const ndRender* const render, const ndMatrix& modelMatrix, ndRenderPassMode renderMode) const
 {
 	switch (renderMode)
 	{
@@ -1055,22 +1055,22 @@ void ndRenderPrimitiveMeshImplement::Render(const ndRender* const render, const 
 	}
 }
 
-void ndRenderPrimitiveMeshImplement::RenderDebugSetZbuffer(const ndRender* const render, const ndMatrix& modelMatrix) const
+void ndRenderPrimitiveImplement::RenderDebugSetZbuffer(const ndRender* const render, const ndMatrix& modelMatrix) const
 {
 	m_setZbufferBlock.Render(this, render, modelMatrix);
 }
 
-void ndRenderPrimitiveMeshImplement::RenderDebugShapeSolid(const ndRender* const render, const ndMatrix& modelMatrix) const
+void ndRenderPrimitiveImplement::RenderDebugShapeSolid(const ndRender* const render, const ndMatrix& modelMatrix) const
 {
 	m_debugFlatShadedColorBlock.Render(this, render, modelMatrix);
 }
 
-void ndRenderPrimitiveMeshImplement::RenderDebugShapeWireFrame(const ndRender* const render, const ndMatrix& modelMatrix) const
+void ndRenderPrimitiveImplement::RenderDebugShapeWireFrame(const ndRender* const render, const ndMatrix& modelMatrix) const
 {
 	m_debugWireframeColorBlock.Render(this, render, modelMatrix);
 }
 
-void ndRenderPrimitiveMeshImplement::RenderGenerateShadowMaps(const ndRender* const render, const ndMatrix& lightMatrix) const
+void ndRenderPrimitiveImplement::RenderGenerateShadowMaps(const ndRender* const render, const ndMatrix& lightMatrix) const
 {
 	bool castShadow = true;
 	for (ndList<ndRenderPrimitiveSegment>::ndNode* node = m_owner->m_segments.GetFirst(); node && castShadow; node = node->GetNext())
@@ -1092,7 +1092,7 @@ void ndRenderPrimitiveMeshImplement::RenderGenerateShadowMaps(const ndRender* co
 	}
 }
 
-void ndRenderPrimitiveMeshImplement::RenderGenerateInstancedShadowMaps(const ndRender* const render, const ndMatrix& lightMatrix) const
+void ndRenderPrimitiveImplement::RenderGenerateInstancedShadowMaps(const ndRender* const render, const ndMatrix& lightMatrix) const
 {
 	bool castShadow = true;
 	for (ndList<ndRenderPrimitiveSegment>::ndNode* node = m_owner->m_segments.GetFirst(); node && castShadow; node = node->GetNext())
@@ -1107,7 +1107,7 @@ void ndRenderPrimitiveMeshImplement::RenderGenerateInstancedShadowMaps(const ndR
 	}
 }
 
-void ndRenderPrimitiveMeshImplement::RenderDirectionalDiffuseColorNoShadow(const ndRender* const render, const ndMatrix& modelMatrix) const
+void ndRenderPrimitiveImplement::RenderDirectionalDiffuseColorNoShadow(const ndRender* const render, const ndMatrix& modelMatrix) const
 {
 	bool castShadow = true;
 	for (ndList<ndRenderPrimitiveSegment>::ndNode* node = m_owner->m_segments.GetFirst(); node && castShadow; node = node->GetNext())
@@ -1124,7 +1124,7 @@ void ndRenderPrimitiveMeshImplement::RenderDirectionalDiffuseColorNoShadow(const
 	m_opaqueDifusedColorNoShadowBlock.Render(this, render, modelMatrix);
 }
 
-void ndRenderPrimitiveMeshImplement::RenderDirectionalDiffuseColorShadow(const ndRender* const render, const ndMatrix& modelMatrix) const
+void ndRenderPrimitiveImplement::RenderDirectionalDiffuseColorShadow(const ndRender* const render, const ndMatrix& modelMatrix) const
 {
 	//bool castShadow = true;
 	//for (ndList<ndRenderPrimitiveSegment>::ndNode* node = m_segments.GetFirst(); node && castShadow; node = node->GetNext())
@@ -1141,7 +1141,7 @@ void ndRenderPrimitiveMeshImplement::RenderDirectionalDiffuseColorShadow(const n
 	m_opaqueDifusedColorShadowBlock.Render(this, render, modelMatrix);
 }
 
-void ndRenderPrimitiveMeshImplement::RenderTransparency(const ndRender* const render, const ndMatrix& modelMatrix, bool backface) const
+void ndRenderPrimitiveImplement::RenderTransparency(const ndRender* const render, const ndMatrix& modelMatrix, bool backface) const
 {
 	bool isOpaque = true;
 	for (ndList<ndRenderPrimitiveSegment>::ndNode* node = m_owner->m_segments.GetFirst(); node && isOpaque; node = node->GetNext())
@@ -1158,7 +1158,7 @@ void ndRenderPrimitiveMeshImplement::RenderTransparency(const ndRender* const re
 	m_transparencyDiffusedBlock.Render(this, render, modelMatrix);
 }
 
-void ndRenderPrimitiveMeshImplement::RenderDirectionalDiffuseColorInstanceShadow(const ndRender* const render, const ndMatrix& modelMatrix) const
+void ndRenderPrimitiveImplement::RenderDirectionalDiffuseColorInstanceShadow(const ndRender* const render, const ndMatrix& modelMatrix) const
 {
 	m_opaqueDifusedColorNoShadowInstanceBlock.Render(this, render, modelMatrix);
 }

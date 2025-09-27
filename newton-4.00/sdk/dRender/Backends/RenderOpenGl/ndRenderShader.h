@@ -14,7 +14,7 @@
 #include "ndRenderStdafx.h"
 #include "ndRenderContext.h"
 
-class ndRenderPrimitiveMeshImplement;
+class ndRenderPrimitiveImplement;
 
 class ndRenderShaderBlock
 {
@@ -23,7 +23,7 @@ class ndRenderShaderBlock
 	virtual ~ndRenderShaderBlock();
 
 	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) = 0;
-	virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const = 0;
+	virtual void Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const = 0;
 
 	protected:
 	void EndParameters();
@@ -39,7 +39,7 @@ class ndRenderShaderSetZbufferCleanBlock : public ndRenderShaderBlock
 {
 	public:
 	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) override;
-	virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
+	virtual void Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
 
 	protected:
 	virtual void SetParameters(GLuint shader) override;
@@ -53,7 +53,7 @@ class ndRenderShaderGenerateShadowMapBlock : public ndRenderShaderSetZbufferClea
 {
 	public:
 	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) override;
-	virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
+	virtual void Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
 
 	protected:
 	virtual void SetParameters(GLuint shader) override;
@@ -66,7 +66,7 @@ class ndRenderShaderGenerateSkinShadowMapBlock : public ndRenderShaderGenerateSh
 {
 	public:
 	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) override;
-	virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
+	virtual void Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
 
 	protected:
 	virtual void SetParameters(GLuint shader) override;
@@ -82,7 +82,7 @@ class ndRenderShaderGenerateInstanceShadowMapBlock : public ndRenderShaderGenera
 	public:
 	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) override;
 
-	virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
+	virtual void Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
 
 	protected:
 	virtual void SetParameters(GLuint shader) override;
@@ -95,7 +95,7 @@ class ndRenderShaderDebugFlatShadedDiffusedBlock : public ndRenderShaderBlock
 {
 	public:
 	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) override;
-	virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
+	virtual void Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
 
 	protected:
 	virtual void SetParameters(GLuint shader) override;
@@ -114,7 +114,7 @@ class ndRenderShaderDebugFlatShadedDiffusedBlock : public ndRenderShaderBlock
 class ndRenderShaderDebugWireframeDiffuseBlock : public ndRenderShaderDebugFlatShadedDiffusedBlock
 {
 	public:
-	virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
+	virtual void Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
 };
 
 // *********************************************************************
@@ -124,7 +124,7 @@ class ndRenderShaderOpaqueDiffusedColorBlock : public ndRenderShaderDebugFlatSha
 {
 	public:
 	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) override;
-	virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
+	virtual void Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
 
 	protected:
 	virtual void SetParameters(GLuint shader) override;
@@ -143,7 +143,7 @@ class ndRenderShaderOpaqueDiffusedShadowColorBlock : public ndRenderShaderOpaque
 {
 	public:
 	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) override;
-	virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
+	virtual void Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
 
 	protected:
 	virtual void SetParameters(GLuint shader) override;
@@ -162,7 +162,7 @@ class ndRenderShaderTransparentDiffusedShadowColorBlock : public ndRenderShaderO
 	public:
 	void SetWidingMode(bool clockwise) const;
 	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) override;
-	virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
+	virtual void Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
 
 	protected:
 	virtual void SetParameters(GLuint shader) override;
@@ -177,7 +177,7 @@ class ndRenderShaderInstancedOpaqueDiffusedShadowBlock : public ndRenderShaderOp
 {
 	public:
 	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) override;
-	virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
+	virtual void Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
 
 	protected:
 	virtual void SetParameters(GLuint shader) override;
@@ -190,7 +190,7 @@ class ndRenderShaderOpaqueDiffusedShadowSkinColorBlock : public ndRenderShaderOp
 {
 	public:
 	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) override;
-	virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
+	virtual void Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
 
 	protected:
 	virtual void SetParameters(GLuint shader) override;

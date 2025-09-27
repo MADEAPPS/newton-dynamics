@@ -18,8 +18,8 @@
 #include "ndRenderPassShadows.h"
 #include "ndRenderTextureImage.h"
 #include "ndRenderPassEnvironment.h"
+#include "ndRenderPrimitiveImplement.h"
 #include "ndRenderPassShadowsImplement.h"
-#include "ndRenderPrimitiveMeshImplement.h"
 
 ndRenderShaderCache::ndRenderShaderCache(void)
 {

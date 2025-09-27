@@ -19,8 +19,8 @@
 #include "ndRenderPassShadows.h"
 #include "ndRenderTextureImage.h"
 #include "ndRenderPassEnvironment.h"
+#include "ndRenderPrimitiveImplement.h"
 #include "ndRenderPassShadowsImplement.h"
-#include "ndRenderPrimitiveMeshImplement.h"
 
 ndRenderShaderBlock::ndRenderShaderBlock()
 	:m_shader(0)
@@ -57,7 +57,7 @@ void ndRenderShaderSetZbufferCleanBlock::SetParameters(GLuint shader)
 	m_viewModelProjectionMatrix = glGetUniformLocation(m_shader, "viewModelProjectionMatrix");
 }
 
-void ndRenderShaderSetZbufferCleanBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
+void ndRenderShaderSetZbufferCleanBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
 	//const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
 	const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
@@ -101,7 +101,7 @@ void ndRenderShaderGenerateShadowMapBlock::SetParameters(GLuint shader)
 	ndRenderShaderSetZbufferCleanBlock::SetParameters(shader);
 }
 
-void ndRenderShaderGenerateShadowMapBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const, const ndMatrix& modelMatrix) const
+void ndRenderShaderGenerateShadowMapBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const, const ndMatrix& modelMatrix) const
 {
 	glUseProgram(m_shader);
 
@@ -141,7 +141,7 @@ void ndRenderShaderGenerateSkinShadowMapBlock::SetParameters(GLuint shader)
 	m_matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
 }
 
-void ndRenderShaderGenerateSkinShadowMapBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const, const ndMatrix& modelMatrix) const
+void ndRenderShaderGenerateSkinShadowMapBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const, const ndMatrix& modelMatrix) const
 {
 	ndAssert(0);
 	//glUseProgram(m_shader);
@@ -181,7 +181,7 @@ void ndRenderShaderGenerateInstanceShadowMapBlock::SetParameters(GLuint shader)
 	ndRenderShaderGenerateShadowMapBlock::SetParameters(shader);
 }
 
-void ndRenderShaderGenerateInstanceShadowMapBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const, const ndMatrix& modelMatrix) const
+void ndRenderShaderGenerateInstanceShadowMapBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const, const ndMatrix& modelMatrix) const
 {
 	glUseProgram(m_shader);
 
@@ -231,7 +231,7 @@ void ndRenderShaderDebugFlatShadedDiffusedBlock::SetParameters(GLuint shader)
 	m_directionalLightDirection = glGetUniformLocation(m_shader, "directionalLightDirection");
 }
 
-void ndRenderShaderDebugFlatShadedDiffusedBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
+void ndRenderShaderDebugFlatShadedDiffusedBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
 	//const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
 	const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
@@ -279,7 +279,7 @@ void ndRenderShaderDebugFlatShadedDiffusedBlock::Render(const ndRenderPrimitiveM
 // *********************************************************************
 // 
 // *********************************************************************
-void ndRenderShaderDebugWireframeDiffuseBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
+void ndRenderShaderDebugWireframeDiffuseBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
 	//const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
 	const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
@@ -343,7 +343,7 @@ void ndRenderShaderOpaqueDiffusedColorBlock::SetParameters(GLuint shader)
 	m_specularAlpha = glGetUniformLocation(m_shader, "specularAlpha");
 }
 
-void ndRenderShaderOpaqueDiffusedColorBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
+void ndRenderShaderOpaqueDiffusedColorBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
 	//const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
 	const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
@@ -425,7 +425,7 @@ void ndRenderShaderOpaqueDiffusedShadowColorBlock::SetParameters(GLuint shader)
 	m_directionLightViewProjectionMatrixShadow = glGetUniformLocation(m_shader, "directionaLightViewProjectionMatrix");
 }
 
-void ndRenderShaderOpaqueDiffusedShadowColorBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
+void ndRenderShaderOpaqueDiffusedShadowColorBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
 	const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
 	
@@ -526,7 +526,7 @@ void ndRenderShaderTransparentDiffusedShadowColorBlock::SetWidingMode(bool clock
 	clockwise ? glFrontFace(GL_CW) : glFrontFace(GL_CCW);
 }
 
-void ndRenderShaderTransparentDiffusedShadowColorBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
+void ndRenderShaderTransparentDiffusedShadowColorBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
 	const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
 	
@@ -611,7 +611,7 @@ void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::SetParameters(GLuint shad
 	ndRenderShaderOpaqueDiffusedShadowColorBlock::SetParameters(shader);
 }
 
-void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
+void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
 	// upload matrix pallete to the gpu vertex buffer
 	glBindBuffer(GL_ARRAY_BUFFER, self->m_instanceRenderMatrixPalleteBuffer);
@@ -717,7 +717,7 @@ void ndRenderShaderOpaqueDiffusedShadowSkinColorBlock::SetParameters(GLuint shad
 	m_matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
 }
 
-void ndRenderShaderOpaqueDiffusedShadowSkinColorBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
+void ndRenderShaderOpaqueDiffusedShadowSkinColorBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
 	ndAssert(0);
 }

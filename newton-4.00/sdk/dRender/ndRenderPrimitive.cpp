@@ -14,7 +14,7 @@
 #include "ndRenderTexture.h"
 #include "ndRenderPrimitive.h"
 #include "ndRenderSceneNode.h"
-#include "ndRenderPrimitiveMeshImplement.h"
+#include "ndRenderPrimitiveImplement.h"
 
 ndRenderPrimitiveMaterial::ndRenderPrimitiveMaterial()
 	:m_diffuse(ndFloat32(1.0f))
@@ -102,14 +102,14 @@ ndRenderPrimitive::ndRenderPrimitive()
 ndRenderPrimitive::ndRenderPrimitive(const ndDescriptor& descriptor)
 	:m_implement(nullptr)
 {
-	m_implement = ndSharedPtr<ndRenderPrimitiveMeshImplement>(new ndRenderPrimitiveMeshImplement(this, descriptor));
+	m_implement = ndSharedPtr<ndRenderPrimitiveImplement>(new ndRenderPrimitiveImplement(this, descriptor));
 }
 
 ndRenderPrimitive::ndRenderPrimitive(const ndRenderPrimitive& src)
 	:ndContainersFreeListAlloc<ndRenderPrimitive>()
 	,m_implement(nullptr)
 {
-	m_implement = ndSharedPtr<ndRenderPrimitiveMeshImplement>(src.m_implement->Clone(this));
+	m_implement = ndSharedPtr<ndRenderPrimitiveImplement>(src.m_implement->Clone(this));
 	
 	for (ndList<ndRenderPrimitiveSegment>::ndNode* node = src.m_segments.GetFirst(); node; node = node->GetNext())
 	{

@@ -17,7 +17,7 @@ class ndRender;
 class ndRenderTexture;
 class ndRenderSceneNode;
 class ndRenderPassShadowsImplement;
-class ndRenderPrimitiveMeshImplement;
+class ndRenderPrimitiveImplement;
 
 enum ndRenderPassMode
 {
@@ -109,7 +109,7 @@ class ndRenderPrimitive : public ndContainersFreeListAlloc<ndRenderPrimitive>
 	void Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderPassMode) const;
 
 	ndList<ndRenderPrimitiveSegment> m_segments;
-	ndSharedPtr<ndRenderPrimitiveMeshImplement> m_implement;
+	ndSharedPtr<ndRenderPrimitiveImplement> m_implement;
 };
 
 #endif

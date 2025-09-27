@@ -21,14 +21,14 @@
 class glPositionNormalUV;
 class ndRenderPrimitiveSegment;
 
-class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRenderPrimitiveMeshImplement>
+class ndRenderPrimitiveImplement : public ndContainersFreeListAlloc<ndRenderPrimitiveImplement>
 {
 	public:
-	ndRenderPrimitiveMeshImplement(const ndRenderPrimitiveMeshImplement& src);
-	ndRenderPrimitiveMeshImplement(ndRenderPrimitive* const owner, const ndRenderPrimitive::ndDescriptor& descriptor);
-	~ndRenderPrimitiveMeshImplement();
+	ndRenderPrimitiveImplement(const ndRenderPrimitiveImplement& src);
+	ndRenderPrimitiveImplement(ndRenderPrimitive* const owner, const ndRenderPrimitive::ndDescriptor& descriptor);
+	~ndRenderPrimitiveImplement();
 
-	ndRenderPrimitiveMeshImplement* Clone(ndRenderPrimitive* const owner) const;
+	ndRenderPrimitiveImplement* Clone(ndRenderPrimitive* const owner) const;
 
 	void BuildFromMesh(const ndRenderPrimitive::ndDescriptor& descriptor);
 	void BuildFromCollisionShape(const ndRenderPrimitive::ndDescriptor& descriptor);
