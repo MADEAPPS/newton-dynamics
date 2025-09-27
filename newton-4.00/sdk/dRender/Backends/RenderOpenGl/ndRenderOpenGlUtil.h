@@ -88,26 +88,6 @@ class glVector3
 	};
 };
 
-class glPositionNormal
-{
-	public:
-	glVector3 m_posit;
-	glVector3 m_normal;
-};
-
-class glPositionUV
-{
-	public:
-	glVector3 m_posit;
-	glUV m_uv;
-};
-
-class glPositionNormalUV : public glPositionNormal
-{
-	public:
-	glUV m_uv;
-};
-
 class glVector4
 {
 	public:
@@ -193,6 +173,34 @@ class glMatrix
 
 	glVector4 m_data[4];
 };
+
+class glPositionNormal
+{
+	public:
+	glVector3 m_posit;
+	glVector3 m_normal;
+};
+
+class glPositionUV
+{
+	public:
+	glVector3 m_posit;
+	glUV m_uv;
+};
+
+class glPositionNormalUV : public glPositionNormal
+{
+	public:
+	glUV m_uv;
+};
+
+class glSkinVertex : public glPositionNormalUV
+{
+	public:
+	glVector4 m_weighs;
+	ndInt32 m_boneIndex[4];
+};
+
 
 #endif 
 
