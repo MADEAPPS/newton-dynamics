@@ -193,7 +193,7 @@ R""""(
 	layout(location = 1) in vec3 in_normal;
 	layout(location = 2) in vec2 in_uv;
 	layout(location = 3) in vec4 in_boneWeights;
-	layout(location = 4) in vec4 in_boneIndices;
+	layout(location = 4) in ivec4 in_boneIndices;
 
 	uniform mat4 viewModelMatrix;
 	uniform mat4 projectionMatrix;
@@ -213,17 +213,14 @@ R""""(
 		vec4 pointVertex = vec4(in_position, 1.0f);
 		for (int i = 0; i < 4; i++) 
 		{
-			int matrixIndex = int (in_boneIndices[i]);
+			int matrixIndex = in_boneIndices[i];
 			weightedVertex += matrixPallete[matrixIndex] * pointVertex * in_boneWeights[i];
 			weightedNormal += matrixPallete[matrixIndex] * pointNormal * in_boneWeights[i];
 		}
 		weightedVertex.w = 1.0;
 		weightedNormal = normalize (weightedNormal);
 
-		//worldPosit = modelWorldMatrix * vec4(in_position, 1.0);
-		//posit = vec3(viewModelMatrix * vec4(in_position, 1.0));
-		//normal = vec3(normalize(viewModelMatrix * vec4(in_normal, 0.0)));
-
+		worldPosit = modelWorldMatrix * weightedVertex;
 		posit = vec3 (viewModelMatrix * weightedVertex);
 		normal = vec3 (viewModelMatrix * weightedNormal);
 
