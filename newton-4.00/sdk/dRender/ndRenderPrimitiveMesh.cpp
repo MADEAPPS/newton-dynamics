@@ -12,6 +12,7 @@
 #include "ndRenderStdafx.h"
 #include "ndRender.h"
 #include "ndRenderTexture.h"
+#include "ndRenderSceneNode.h"
 #include "ndRenderPrimitiveMesh.h"
 #include "ndRenderPassShadowsImplement.h"
 #include "ndRenderPrimitiveMeshImplement.h"
