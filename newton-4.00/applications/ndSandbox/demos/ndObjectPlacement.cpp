@@ -89,11 +89,11 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		m_meshPrimitive = loader.m_renderMesh->GetPrimitive();
 		m_primitiveOffsetMatrix = loader.m_renderMesh->m_primitiveMatrix;
 
-		m_ghostPrimitive = ndSharedPtr<ndRenderPrimitive>(m_meshPrimitive->Clone());
-		ndRenderPrimitiveMesh* const ghoshMesh = (ndRenderPrimitiveMesh*)*m_ghostPrimitive;
-		for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* ptr = ghoshMesh->m_segments.GetFirst(); ptr; ptr = ptr->GetNext())
+		m_ghostPrimitive = ndSharedPtr<ndRenderPrimitive>(new ndRenderPrimitive (**m_meshPrimitive));
+		ndRenderPrimitive* const ghoshMesh = *m_ghostPrimitive;
+		for (ndList<ndRenderPrimitiveSegment>::ndNode* ptr = ghoshMesh->m_segments.GetFirst(); ptr; ptr = ptr->GetNext())
 		{
-			ndRenderPrimitiveMeshSegment& segment = ptr->GetInfo();
+			ndRenderPrimitiveSegment& segment = ptr->GetInfo();
 			segment.m_material.m_opacity = ndFloat32 (0.3f);
 			segment.m_material.m_diffuse = ndVector(1.0f, 1.0f, 1.0f, 1.0f);
 			segment.m_material.m_specular = ndVector(0.0f, 0.0f, 0.0f, 1.0f);

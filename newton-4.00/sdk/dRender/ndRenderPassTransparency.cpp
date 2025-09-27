@@ -11,6 +11,7 @@
 
 #include "ndRenderStdafx.h"
 #include "ndRender.h"
+#include "ndRenderTexture.h"
 #include "ndRenderContext.h"
 #include "ndRenderSceneNode.h"
 #include "ndRenderPassTransparency.h"

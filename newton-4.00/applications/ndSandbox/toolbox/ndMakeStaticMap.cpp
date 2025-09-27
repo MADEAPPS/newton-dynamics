@@ -255,9 +255,9 @@ static void BuildPlaygroundHangingBridge(ndDemoEntityManager* const scene, const
 	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeBox(11.0f, plankSickness, slackDist)));
 
 	ndRender* const render = *scene->GetRenderer();
-	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
+	ndRenderPrimitive::ndDescriptor descriptor(render);
 	descriptor.m_collision = shape;
-	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
+	descriptor.m_mapping = ndRenderPrimitive::m_box;
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_1.png")));
 
 	ndSharedPtr<ndRenderSceneNode> bridgeMesh(new ndRenderSceneNodeInstance(startMatrix, descriptor));
@@ -354,16 +354,17 @@ ndSharedPtr<ndBody> BuildFloorBox(ndDemoEntityManager* const scene, const ndMatr
 
 	ndRender* const render = *scene->GetRenderer();
 
-	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
+	ndRenderPrimitive::ndDescriptor descriptor(render);
 	descriptor.m_collision = box;
 	descriptor.m_uvMatrix = uvMatrix;
 	descriptor.m_stretchMaping = false;
-	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
+	descriptor.m_mapping = ndRenderPrimitive::m_box;
 	ndRenderPrimitiveMaterial& material = descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textureName)));
 	material.m_castShadows = false;
 	material.m_specular = ndVector::m_zero;
 
-	ndSharedPtr<ndRenderPrimitive> geometry(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
+	//ndSharedPtr<ndRenderPrimitive> geometry(ndRenderPrimitive::CreateMeshPrimitive(descriptor));
+	ndSharedPtr<ndRenderPrimitive> geometry(new ndRenderPrimitive(descriptor));
 	
 	ndMatrix location(matrix);
 	location.m_posit.m_y -= 0.5f;
@@ -407,16 +408,16 @@ ndSharedPtr<ndBody> BuildFlatPlane(ndDemoEntityManager* const scene, const ndMat
 	uvMatrix[2][2] *= 1.0f / 10.0f;
 
 	ndRender* const render = *scene->GetRenderer();
-	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
+	ndRenderPrimitive::ndDescriptor descriptor(render);
 	descriptor.m_collision = plane;
 	descriptor.m_uvMatrix = uvMatrix;
 	descriptor.m_stretchMaping = false;
-	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
+	descriptor.m_mapping = ndRenderPrimitive::m_box;
 	ndRenderPrimitiveMaterial& material = descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textureName)));
 	material.m_castShadows = false;
 	material.m_specular = ndVector::m_zero;
 
-	ndSharedPtr<ndRenderPrimitive> geometry(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
+	ndSharedPtr<ndRenderPrimitive> geometry(new ndRenderPrimitive(descriptor));
 
 	ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(matrix));
 	entity->SetPrimitive(geometry);
@@ -509,12 +510,12 @@ class ndSceneMesh : public ndRenderSceneNode
 		ndSharedPtr<ndShapeInstance> box(new ndShapeInstance(new ndShapeBox(0.5f, 4.0f, 0.5f)));
 
 		ndRender* const render = *scene->GetRenderer();
-		ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
+		ndRenderPrimitive::ndDescriptor descriptor(render);
 		descriptor.m_collision = box;
-		descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
+		descriptor.m_mapping = ndRenderPrimitive::m_box;
 		descriptor.m_stretchMaping = false;
 		descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("blueCheckerboard.png")));
-		ndSharedPtr<ndRenderPrimitive> geometry(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
+		ndSharedPtr<ndRenderPrimitive> geometry(new ndRenderPrimitive(descriptor));
 
 		ndMatrix matrix(location);
 		matrix.m_posit.m_y += ndFloat32(1.9f);
@@ -540,12 +541,12 @@ class ndSceneMesh : public ndRenderSceneNode
 		uvMatrix[2][2] *= 0.025f;
 
 		ndRender* const render = *scene->GetRenderer();
-		ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
+		ndRenderPrimitive::ndDescriptor descriptor(render);
 		descriptor.m_collision = capsule;
-		descriptor.m_mapping = ndRenderPrimitiveMesh::m_capsule;
+		descriptor.m_mapping = ndRenderPrimitive::m_capsule;
 		descriptor.m_uvMatrix = uvMatrix;
 		descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("concrete_011_color.png")));
-		ndSharedPtr<ndRenderPrimitive> geometry(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
+		ndSharedPtr<ndRenderPrimitive> geometry(new ndRenderPrimitive(descriptor));
 
 		ndFloat32 spacing = 3.0f;
 		ndMatrix matrix(location);

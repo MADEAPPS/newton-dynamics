@@ -33,7 +33,6 @@
 #include <ndRenderSceneCamera.h>
 #include <ndRenderPassShadows.h>
 #include <ndRenderTextureCache.h>
-#include <ndRenderPrimitiveMesh.h>
 #include <ndRenderPassEnvironment.h>
 #include <ndRenderPassTransparency.h>
 #include <ndRenderSceneNodeInstance.h>

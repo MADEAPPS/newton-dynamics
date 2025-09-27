@@ -13,8 +13,11 @@
 
 #include "ndRenderStdafx.h"
 
+class ndRender;
 class ndRenderTexture;
+class ndRenderSceneNode;
 class ndRenderPassShadowsImplement;
+class ndRenderPrimitiveMeshImplement;
 
 enum ndRenderPassMode
 {
@@ -39,23 +42,74 @@ class ndRenderPrimitiveMaterial
 	ndVector m_diffuse;
 	ndVector m_specular;
 	ndVector m_reflection;
-	ndReal m_specularPower;
+	ndReal m_specularPower; 
 	ndReal m_opacity;
 	ndSharedPtr<ndRenderTexture> m_texture;
 	bool m_castShadows;
 };
 
+class ndRenderPrimitiveSegment
+{
+	public:
+	ndRenderPrimitiveSegment();
+	ndRenderPrimitiveSegment(const ndRenderPrimitiveSegment& src);
+
+	ndRenderPrimitiveMaterial m_material;
+	ndInt32 m_indexCount;
+	ndInt32 m_segmentStart;
+	bool m_hasTranparency;
+};
 
 class ndRenderPrimitive : public ndContainersFreeListAlloc<ndRenderPrimitive>
 {
 	public:
+
+	enum ndMeshBuildMode
+	{
+		m_simplePrimitve,
+		m_instancePrimitve,
+		m_debugFlatShaded,
+		m_debugWireFrame,
+		m_debugHiddenLines,
+	};
+
+	enum ndUvMapingMode
+	{
+		m_box,
+		m_capsule,
+		m_spherical,
+		m_cylindrical
+	};
+
+	class ndDescriptor
+	{
+		public:
+		ndDescriptor(ndRender* const render);
+		ndDescriptor(const ndDescriptor& src);
+		ndRenderPrimitiveMaterial& AddMaterial(const ndSharedPtr<ndRenderTexture>& texture);
+	
+		ndRender* m_render;
+		ndSharedPtr<ndMeshEffect> m_meshNode;
+		ndSharedPtr<ndShapeInstance> m_collision;
+		ndSharedPtr<ndRenderSceneNode> m_skeleton;
+		ndList<ndRenderPrimitiveMaterial> m_materials;
+		ndUvMapingMode m_mapping;
+		ndMatrix m_uvMatrix;
+		ndMeshBuildMode m_meshBuildMode;
+		ndInt32 m_numberOfInstances;
+		bool m_stretchMaping;
+	};
+
 	ndRenderPrimitive();
 	ndRenderPrimitive(const ndRenderPrimitive& src);
+	ndRenderPrimitive(const ndDescriptor& descriptor);
 	virtual ~ndRenderPrimitive();
 
-	virtual bool IsSKinnedMesh() const = 0;
-	virtual ndRenderPrimitive* Clone() = 0;
-	virtual void Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderPassMode) const = 0;
+	bool IsSKinnedMesh() const;
+	void Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderPassMode) const;
+
+	ndList<ndRenderPrimitiveSegment> m_segments;
+	ndSharedPtr<ndRenderPrimitiveMeshImplement> m_implement;
 };
 
 #endif

@@ -78,9 +78,9 @@ void BuildPyramidStacks(ndDemoEntityManager* const scene, ndFloat32 mass, const 
 	ndRender* const render = *scene->GetRenderer();
 
 	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeBox(size.m_x, size.m_y, size.m_z)));
-	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
+	ndRenderPrimitive::ndDescriptor descriptor(render);
 	descriptor.m_collision = shape;
-	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
+	descriptor.m_mapping = ndRenderPrimitive::m_box;
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png")));
 	ndSharedPtr<ndRenderSceneNode>root(new ndRenderSceneNodeInstance(ndGetIdentityMatrix(), descriptor));
 	scene->AddEntity(root);
@@ -105,9 +105,9 @@ static void BuildSphereColumn(ndDemoEntityManager* const scene, ndFloat32 mass, 
 	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeSphere(blockBoxSize.m_x)));
 
 	// add a instance root scene node
-	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
+	ndRenderPrimitive::ndDescriptor descriptor(render);
 	descriptor.m_collision = shape;
-	descriptor.m_mapping = ndRenderPrimitiveMesh::m_spherical;
+	descriptor.m_mapping = ndRenderPrimitive::m_spherical;
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("earthmap.png")));
 	ndSharedPtr<ndRenderSceneNode>root(new ndRenderSceneNodeInstance(ndGetIdentityMatrix(), descriptor));
 	scene->AddEntity(root);
@@ -138,9 +138,9 @@ static void BuildBoxColumn(ndDemoEntityManager* const scene, ndFloat32 mass, con
 	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeBox(blockBoxSize.m_x, blockBoxSize.m_y, blockBoxSize.m_z)));
 
 	// add a instance root scene node
-	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
+	ndRenderPrimitive::ndDescriptor descriptor(render);
 	descriptor.m_collision = shape;
-	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
+	descriptor.m_mapping = ndRenderPrimitive::m_box;
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png")));
 	ndSharedPtr<ndRenderSceneNode>root(new ndRenderSceneNodeInstance(ndGetIdentityMatrix(), descriptor));
 	scene->AddEntity(root);
@@ -181,9 +181,9 @@ static void BuildCylinderColumn(ndDemoEntityManager* const scene, ndFloat32 mass
 	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeCylinder(blockBoxSize.m_x, blockBoxSize.m_y, blockBoxSize.m_z)));
 	shape->SetLocalMatrix(ndRollMatrix(ndPi * 0.5f));
 
-	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
+	ndRenderPrimitive::ndDescriptor descriptor(render);
 	descriptor.m_collision = shape;
-	descriptor.m_mapping = ndRenderPrimitiveMesh::m_cylindrical;
+	descriptor.m_mapping = ndRenderPrimitive::m_cylindrical;
 	descriptor.m_uvMatrix = shape->GetLocalMatrix();
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("smilli.png")));
 	ndSharedPtr<ndRenderSceneNode>root(new ndRenderSceneNodeInstance(ndGetIdentityMatrix(), descriptor));
@@ -212,10 +212,10 @@ static void BuildCapsuleStack(ndDemoEntityManager* const scene, ndFloat32 mass, 
 
 	//ndShapeInstance shape(new ndShapeCapsule(blockBoxSize.m_x, blockBoxSize.m_x, blockBoxSize.m_z));
 	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeCapsule(blockBoxSize.m_x, blockBoxSize.m_x, blockBoxSize.m_z)));
-	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
+	ndRenderPrimitive::ndDescriptor descriptor(render);
 	descriptor.m_collision = shape;
 	descriptor.m_uvMatrix = ndPitchMatrix(ndPi);
-	descriptor.m_mapping = ndRenderPrimitiveMesh::m_capsule;
+	descriptor.m_mapping = ndRenderPrimitive::m_capsule;
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("smilli.png")));
 	ndSharedPtr<ndRenderSceneNode>root(new ndRenderSceneNodeInstance(ndGetIdentityMatrix(), descriptor));
 	scene->AddEntity(root);

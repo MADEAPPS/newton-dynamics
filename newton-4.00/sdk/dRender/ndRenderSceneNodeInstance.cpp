@@ -17,13 +17,13 @@
 #include "ndRenderSceneNodeInstance.h"
 #include "ndRenderSceneNodeInstanceImplement.h"
 
-ndRenderSceneNodeInstance::ndRenderSceneNodeInstance(const ndMatrix& matrix, const ndRenderPrimitiveMesh::ndDescriptor& descriptor)
+ndRenderSceneNodeInstance::ndRenderSceneNodeInstance(const ndMatrix& matrix, const ndRenderPrimitive::ndDescriptor& descriptor)
 	:ndRenderSceneNode(matrix)
 	,m_descriptor(descriptor)
 	,m_implement()
 	,m_isInitialized(false)
 {
-	m_descriptor.m_meshBuildMode = ndRenderPrimitiveMesh::m_instancePrimitve;
+	m_descriptor.m_meshBuildMode = ndRenderPrimitive::m_instancePrimitve;
 	m_implement = ndSharedPtr<ndRenderSceneNodeInstanceImplement>(new ndRenderSceneNodeInstanceImplement(this));
 }
 

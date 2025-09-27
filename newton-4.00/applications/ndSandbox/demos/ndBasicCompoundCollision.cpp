@@ -40,12 +40,12 @@ static void AddSphere(ndDemoEntityManager* const scene)
 	ndRender* const render = *scene->GetRenderer();
 
 	ndSharedPtr<ndShapeInstance> shape(new ndShapeInstance(new ndShapeSphere(0.125f)));
-	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
+	ndRenderPrimitive::ndDescriptor descriptor(render);
 	descriptor.m_collision = shape;
-	descriptor.m_mapping = ndRenderPrimitiveMesh::m_spherical;
+	descriptor.m_mapping = ndRenderPrimitive::m_spherical;
 	descriptor.AddMaterial (render->GetTextureCache()->GetTexture(ndGetWorkingFileName("earthmap.png")));
-	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 
+	ndSharedPtr<ndRenderPrimitive> mesh(new ndRenderPrimitive(descriptor));
 	ndSharedPtr<ndRenderSceneNode>origEntity(new ndRenderSceneNode(ndGetIdentityMatrix()));
 	origEntity->SetPrimitive(mesh);
 
@@ -109,12 +109,12 @@ static void AddEmptyBox(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndShapeInstance>compoundShapeInstance(new ndShapeInstance(new ndShapeCompound()));
 	CreateBoxCompoundShape(**compoundShapeInstance);
 
-	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
+	ndRenderPrimitive::ndDescriptor descriptor(render);
 	descriptor.m_collision = compoundShapeInstance;
-	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
+	descriptor.m_mapping = ndRenderPrimitive::m_box;
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png")));
-	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 
+	ndSharedPtr<ndRenderPrimitive> mesh(new ndRenderPrimitive(descriptor));
 	ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(ndGetIdentityMatrix()));
 	entity->SetPrimitive(mesh);
 

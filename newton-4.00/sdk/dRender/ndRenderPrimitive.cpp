@@ -13,6 +13,8 @@
 #include "ndRender.h"
 #include "ndRenderTexture.h"
 #include "ndRenderPrimitive.h"
+#include "ndRenderSceneNode.h"
+#include "ndRenderPrimitiveMeshImplement.h"
 
 ndRenderPrimitiveMaterial::ndRenderPrimitiveMaterial()
 	:m_diffuse(ndFloat32(1.0f))
@@ -36,19 +38,97 @@ ndRenderPrimitiveMaterial::ndRenderPrimitiveMaterial(const ndRenderPrimitiveMate
 {
 }
 
-
-ndRenderPrimitive::ndRenderPrimitive()
-	:ndContainersFreeListAlloc<ndRenderPrimitive>()
+ndRenderPrimitiveSegment::ndRenderPrimitiveSegment()
+	:m_material()
+	,m_indexCount(0)
+	,m_segmentStart(0)
+	,m_hasTranparency(0)
 {
 }
 
-ndRenderPrimitive::ndRenderPrimitive(const ndRenderPrimitive&)
-	:ndContainersFreeListAlloc<ndRenderPrimitive>()
+ndRenderPrimitiveSegment::ndRenderPrimitiveSegment(const ndRenderPrimitiveSegment& src)
+	:m_material(src.m_material)
+	,m_indexCount(src.m_indexCount)
+	,m_segmentStart(src.m_segmentStart)
+	,m_hasTranparency(src.m_hasTranparency)
 {
+}
+
+ndRenderPrimitive::ndDescriptor::ndDescriptor(ndRender* const render)
+	:m_render(render)
+	,m_meshNode(nullptr)
+	,m_collision(nullptr)
+	,m_skeleton(nullptr)
+	,m_materials()
+	,m_mapping(m_box)
+	,m_uvMatrix(ndGetIdentityMatrix())
+	,m_meshBuildMode(m_simplePrimitve)
+	,m_numberOfInstances(0)
+	,m_stretchMaping(true)
+{
+}
+
+ndRenderPrimitive::ndDescriptor::ndDescriptor(const ndDescriptor& src)
+	:m_render(src.m_render)
+	,m_meshNode(src.m_meshNode)
+	,m_collision(src.m_collision)
+	,m_skeleton(nullptr)
+	,m_materials()
+	,m_mapping(src.m_mapping)
+	,m_uvMatrix(src.m_uvMatrix)
+	,m_meshBuildMode(src.m_meshBuildMode)
+	,m_numberOfInstances(src.m_numberOfInstances)
+	,m_stretchMaping(src.m_stretchMaping)
+{
+	for (ndList<ndRenderPrimitiveMaterial>::ndNode* node = src.m_materials.GetFirst(); node; node = node->GetNext())
+	{
+		m_materials.Append(node->GetInfo());
+	}
+}
+
+ndRenderPrimitiveMaterial& ndRenderPrimitive::ndDescriptor::AddMaterial(const ndSharedPtr<ndRenderTexture>& texture)
+{
+	ndList<ndRenderPrimitiveMaterial>::ndNode* const node = m_materials.Append();
+	node->GetInfo().m_texture = texture;
+	return node->GetInfo();
+}
+
+ndRenderPrimitive::ndRenderPrimitive()
+	:ndContainersFreeListAlloc<ndRenderPrimitive>()
+	,m_implement(nullptr)
+{
+}
+
+ndRenderPrimitive::ndRenderPrimitive(const ndDescriptor& descriptor)
+	:m_implement(nullptr)
+{
+	m_implement = ndSharedPtr<ndRenderPrimitiveMeshImplement>(new ndRenderPrimitiveMeshImplement(this, descriptor));
+}
+
+ndRenderPrimitive::ndRenderPrimitive(const ndRenderPrimitive& src)
+	:ndContainersFreeListAlloc<ndRenderPrimitive>()
+	,m_implement(nullptr)
+{
+	m_implement = ndSharedPtr<ndRenderPrimitiveMeshImplement>(src.m_implement->Clone(this));
+	
+	for (ndList<ndRenderPrimitiveSegment>::ndNode* node = src.m_segments.GetFirst(); node; node = node->GetNext())
+	{
+		ndRenderPrimitiveSegment& segment = node->GetInfo();
+		m_segments.Append(ndRenderPrimitiveSegment(segment));
+	}
 }
 
 ndRenderPrimitive::~ndRenderPrimitive()
 {
 }
 
+bool ndRenderPrimitive::IsSKinnedMesh() const
+{
+	//return m_implement->m_skinSceneNode ? true : false;
+	return m_implement->IsSKinnedMesh();
+}
 
+void ndRenderPrimitive::Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderPassMode) const
+{
+	m_implement->Render(render, modelViewMatrix, renderPassMode);
+}

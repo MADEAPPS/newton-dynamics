@@ -14,36 +14,36 @@
 #include "ndRenderStdafx.h"
 #include "ndRenderShader.h"
 #include "ndRenderContext.h"
+#include "ndRenderPrimitive.h"
 #include "ndRenderOpenGlUtil.h"
 #include "ndRenderShaderCache.h"
-#include "ndRenderPrimitiveMesh.h"
 
 class glPositionNormalUV;
-class ndRenderPrimitiveMeshSegment;
+class ndRenderPrimitiveSegment;
 
 class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRenderPrimitiveMeshImplement>
 {
 	public:
 	ndRenderPrimitiveMeshImplement(const ndRenderPrimitiveMeshImplement& src);
-	ndRenderPrimitiveMeshImplement(ndRenderPrimitiveMesh* const owner, const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
+	ndRenderPrimitiveMeshImplement(ndRenderPrimitive* const owner, const ndRenderPrimitive::ndDescriptor& descriptor);
 	~ndRenderPrimitiveMeshImplement();
 
-	ndRenderPrimitiveMeshImplement* Clone(ndRenderPrimitiveMesh* const owner) const;
+	ndRenderPrimitiveMeshImplement* Clone(ndRenderPrimitive* const owner) const;
 
-	void BuildFromMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
-	void BuildFromCollisionShape(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
+	void BuildFromMesh(const ndRenderPrimitive::ndDescriptor& descriptor);
+	void BuildFromCollisionShape(const ndRenderPrimitive::ndDescriptor& descriptor);
 
 	bool IsSKinnedMesh() const;
 	void Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderMode) const;
 	
 	private:
-	void BuildRenderMeshFromCollisionShape(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
-	void BuildRenderSimpleMeshFromMeshEffect(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
-	void BuildRenderSkinnedMeshFromMeshEffect(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
-	void BuildDebugFlatShadedMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
-	void BuildRenderInstanceMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
-	void BuildWireframeDebugMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
-	void BuildSetZBufferDebugMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
+	void BuildRenderMeshFromCollisionShape(const ndRenderPrimitive::ndDescriptor& descriptor);
+	void BuildRenderSimpleMeshFromMeshEffect(const ndRenderPrimitive::ndDescriptor& descriptor);
+	void BuildRenderSkinnedMeshFromMeshEffect(const ndRenderPrimitive::ndDescriptor& descriptor);
+	void BuildDebugFlatShadedMesh(const ndRenderPrimitive::ndDescriptor& descriptor);
+	void BuildRenderInstanceMesh(const ndRenderPrimitive::ndDescriptor& descriptor);
+	void BuildWireframeDebugMesh(const ndRenderPrimitive::ndDescriptor& descriptor);
+	void BuildSetZBufferDebugMesh(const ndRenderPrimitive::ndDescriptor& descriptor);
 
 	void RenderDebugSetZbuffer(const ndRender* const render, const ndMatrix& modelMatrix) const;
 	void RenderGenerateShadowMaps(const ndRender* const render, const ndMatrix& lightMatrix) const;
@@ -55,7 +55,7 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	void RenderDirectionalDiffuseColorNoShadow(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
 	void RenderDirectionalDiffuseColorInstanceShadow(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
 
-	ndRenderPrimitiveMesh* m_owner;
+	ndRenderPrimitive* m_owner;
 	const ndRenderContext* m_context;
 	ndRenderSceneNode* m_skinSceneNode;
 	ndArray<glMatrix> m_genericMatricArray;

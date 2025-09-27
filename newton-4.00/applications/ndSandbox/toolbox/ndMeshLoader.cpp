@@ -114,7 +114,7 @@ bool ndMeshLoader::LoadEntity(ndRender* const renderer, const ndString& fbxPathM
 			ndSharedPtr<ndMeshEffect> meshEffect(pair.m_mesh->GetMesh());
 			ndArray<ndMeshEffect::ndMaterial>& materials = meshEffect->GetMaterials();
 
-			ndRenderPrimitiveMesh::ndDescriptor descriptor(renderer);
+			ndRenderPrimitive::ndDescriptor descriptor(renderer);
 			descriptor.m_meshNode = meshEffect;
 			descriptor.m_skeleton = pair.m_entity;
 
@@ -129,7 +129,8 @@ bool ndMeshLoader::LoadEntity(ndRender* const renderer, const ndString& fbxPathM
 				material.m_opacity = ndReal(materials[j].m_opacity);
 				material.m_castShadows = true;
 			}
-			ndSharedPtr<ndRenderPrimitive> geometry(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
+			//ndSharedPtr<ndRenderPrimitive> geometry(ndRenderPrimitive::CreateMeshPrimitive(descriptor));
+			ndSharedPtr<ndRenderPrimitive> geometry(new ndRenderPrimitive(descriptor));
 
 			//pair.m_entity->m_name = effectNode->GetName();
 			pair.m_entity->SetPrimitive(geometry);

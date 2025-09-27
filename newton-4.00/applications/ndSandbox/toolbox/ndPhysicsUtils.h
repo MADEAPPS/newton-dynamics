@@ -57,7 +57,7 @@ void SetModelVisualMesh(ndDemoEntityManager* const scene, ndModelArticulation* c
 //	const ndMatrix& location,
 //	ndFloat32 mass,
 //	const char* const textName,
-//	ndRenderPrimitiveMesh::ndUvMapingMode mappingMode);
+//	ndRenderPrimitive::ndUvMapingMode mappingMode);
 
 ndSharedPtr<ndBody> CreateBox(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez, const char* const textName = "wood_0.png");
 ndSharedPtr<ndBody> CreateSphere(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 radius, const char* const textName = "wood_0.png");

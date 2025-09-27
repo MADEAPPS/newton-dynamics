@@ -11,8 +11,10 @@
 
 #include "ndRenderStdafx.h"
 #include "ndRender.h"
+#include "ndRenderTexture.h"
 #include "ndRenderPrimitive.h"
 #include "ndRenderSceneNode.h"
+#include "ndRenderPrimitiveMeshImplement.h"
 
 #define ND_STACK_DEPTH 512
 

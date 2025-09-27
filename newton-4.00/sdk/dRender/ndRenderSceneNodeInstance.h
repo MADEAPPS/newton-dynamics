@@ -13,13 +13,13 @@
 
 #include "ndRenderStdafx.h"
 #include "ndRenderSceneNode.h"
-#include "ndRenderPrimitiveMesh.h"
+#include "ndRenderPrimitive.h"
 
 class ndRenderSceneNodeInstanceImplement;
 class ndRenderSceneNodeInstance : public ndRenderSceneNode
 {
 	public:
-	ndRenderSceneNodeInstance(const ndMatrix& matrix, const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
+	ndRenderSceneNodeInstance(const ndMatrix& matrix, const ndRenderPrimitive::ndDescriptor& descriptor);
 
 	virtual ndRenderSceneNodeInstance* GetAsInstance() override;
 	virtual const ndRenderSceneNodeInstance* GetAsInstance() const override;
@@ -27,7 +27,7 @@ class ndRenderSceneNodeInstance : public ndRenderSceneNode
 	void Finalize();
 	virtual void Render(const ndRender* const owner, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const override;
 
-	ndRenderPrimitiveMesh::ndDescriptor m_descriptor;
+	ndRenderPrimitive::ndDescriptor m_descriptor;
 	ndSharedPtr<ndRenderSceneNodeInstanceImplement> m_implement;
 	bool m_isInitialized;
 };

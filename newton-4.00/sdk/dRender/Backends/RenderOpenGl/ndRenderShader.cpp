@@ -111,9 +111,9 @@ void ndRenderShaderGenerateShadowMapBlock::Render(const ndRenderPrimitiveMeshImp
 	glBindVertexArray(self->m_vertextArrayBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
 		
-	for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
+	for (ndList<ndRenderPrimitiveSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
 	{
-		ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
+		ndRenderPrimitiveSegment& segment = node->GetInfo();
 		if (segment.m_material.m_castShadows)
 		{
 			glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
@@ -152,9 +152,9 @@ void ndRenderShaderGenerateSkinShadowMapBlock::Render(const ndRenderPrimitiveMes
 	//glBindVertexArray(self->m_vertextArrayBuffer);
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
 	//
-	//for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
+	//for (ndList<ndRenderPrimitiveSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
 	//{
-	//	ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
+	//	ndRenderPrimitiveSegment& segment = node->GetInfo();
 	//	if (segment.m_material.m_castShadows)
 	//	{
 	//		glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
@@ -194,9 +194,9 @@ void ndRenderShaderGenerateInstanceShadowMapBlock::Render(const ndRenderPrimitiv
 	glBindVertexArray(self->m_vertextArrayBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
 
-	for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
+	for (ndList<ndRenderPrimitiveSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
 	{
-		ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
+		ndRenderPrimitiveSegment& segment = node->GetInfo();
 		if (segment.m_material.m_castShadows)
 		{
 			glDrawElementsInstanced(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)), GLsizei(self->m_genericMatricArray.GetCount()));
@@ -242,7 +242,7 @@ void ndRenderShaderDebugFlatShadedDiffusedBlock::Render(const ndRenderPrimitiveM
 	const glMatrix glViewModelMatrix(modelViewMatrix);
 	const glMatrix glProjectionMatrix(camera->m_projectionMatrix);
 	
-	ndRenderPrimitiveMeshSegment& segment = self->m_owner->m_segments.GetFirst()->GetInfo();
+	ndRenderPrimitiveSegment& segment = self->m_owner->m_segments.GetFirst()->GetInfo();
 	const ndRenderPrimitiveMaterial* const material = &segment.m_material;
 	
 	const glVector4 diffuse(material->m_diffuse);
@@ -290,7 +290,7 @@ void ndRenderShaderDebugWireframeDiffuseBlock::Render(const ndRenderPrimitiveMes
 	const glMatrix glViewModelMatrix(modelViewMatrix);
 	const glMatrix glProjectionMatrix(camera->m_projectionMatrix);
 	
-	ndRenderPrimitiveMeshSegment& segment = self->m_owner->m_segments.GetFirst()->GetInfo();
+	ndRenderPrimitiveSegment& segment = self->m_owner->m_segments.GetFirst()->GetInfo();
 	const ndRenderPrimitiveMaterial* const material = &segment.m_material;
 	
 	const glVector4 diffuse(material->m_diffuse);
@@ -379,9 +379,9 @@ void ndRenderShaderOpaqueDiffusedColorBlock::Render(const ndRenderPrimitiveMeshI
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
 
 	glActiveTexture(GL_TEXTURE0);
-	for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
+	for (ndList<ndRenderPrimitiveSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
 	{
-		ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
+		ndRenderPrimitiveSegment& segment = node->GetInfo();
 		if (!segment.m_material.m_castShadows && (segment.m_material.m_opacity > ndFloat32(0.99f)))
 		{
 			const ndRenderPrimitiveMaterial* const material = &segment.m_material;
@@ -477,9 +477,9 @@ void ndRenderShaderOpaqueDiffusedShadowColorBlock::Render(const ndRenderPrimitiv
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
 	
 	glActiveTexture(GL_TEXTURE0);
-	for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
+	for (ndList<ndRenderPrimitiveSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
 	{
-		ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
+		ndRenderPrimitiveSegment& segment = node->GetInfo();
 		if (segment.m_material.m_opacity > ndFloat32(0.99f))
 		{
 			const ndRenderPrimitiveMaterial* const material = &segment.m_material;
@@ -565,9 +565,9 @@ void ndRenderShaderTransparentDiffusedShadowColorBlock::Render(const ndRenderPri
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
 
 	glActiveTexture(GL_TEXTURE0);
-	for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
+	for (ndList<ndRenderPrimitiveSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
 	{
-		ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
+		ndRenderPrimitiveSegment& segment = node->GetInfo();
 		if (segment.m_material.m_opacity <= ndFloat32(0.99f))
 		{
 			const ndRenderPrimitiveMaterial* const material = &segment.m_material;
@@ -672,9 +672,9 @@ void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::Render(const ndRenderPrim
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
 
 	glActiveTexture(GL_TEXTURE0);
-	for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
+	for (ndList<ndRenderPrimitiveSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
 	{
-		ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
+		ndRenderPrimitiveSegment& segment = node->GetInfo();
 		if (segment.m_material.m_opacity > ndFloat32(0.99f))
 		{
 			const ndRenderPrimitiveMaterial* const material = &segment.m_material;

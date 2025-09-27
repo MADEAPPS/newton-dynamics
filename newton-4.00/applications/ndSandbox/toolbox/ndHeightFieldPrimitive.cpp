@@ -129,14 +129,15 @@ class ndHeightfieldMesh : public ndRenderSceneNode
 				ndSharedPtr<ndRenderSceneNode> tileNode(new ndRenderSceneNode(tileMatrix));
 				AddChild(tileNode);
 
-				ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
+				ndRenderPrimitive::ndDescriptor descriptor(render);
 				descriptor.m_collision = tileShape;
 				descriptor.m_stretchMaping = false;
 				descriptor.m_uvMatrix = uvMapping;
-				descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
+				descriptor.m_mapping = ndRenderPrimitive::m_box;
 				ndRenderPrimitiveMaterial& material = descriptor.AddMaterial(texture);
 				material.m_castShadows = false;
-				ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
+
+				ndSharedPtr<ndRenderPrimitive> mesh(new ndRenderPrimitive(descriptor));
 				tileNode->SetPrimitive(mesh);
 			}
 		}

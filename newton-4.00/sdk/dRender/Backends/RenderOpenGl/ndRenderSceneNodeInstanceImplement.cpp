@@ -13,7 +13,7 @@
 #include "ndRender.h"
 #include "ndRenderContext.h"
 #include "ndRenderTexture.h"
-#include "ndRenderPrimitiveMesh.h"
+#include "ndRenderPrimitive.h"
 #include "ndRenderSceneNodeInstance.h"
 #include "ndRenderPrimitiveMeshImplement.h"
 #include "ndRenderSceneNodeInstanceImplement.h"
@@ -28,11 +28,11 @@ void ndRenderSceneNodeInstanceImplement::Finalize()
 {
 	ndRenderSceneNodeInstance* const owner = (ndRenderSceneNodeInstance*)m_owner;
 
-	const ndRenderPrimitiveMesh::ndDescriptor& descriptor = owner->m_descriptor;
+	const ndRenderPrimitive::ndDescriptor& descriptor = owner->m_descriptor;
 	ndAssert(descriptor.m_numberOfInstances > 0);
-	ndAssert(descriptor.m_meshBuildMode == ndRenderPrimitiveMesh::m_instancePrimitve);
+	ndAssert(descriptor.m_meshBuildMode == ndRenderPrimitive::m_instancePrimitve);
 	
-	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
+	ndSharedPtr<ndRenderPrimitive> mesh(new ndRenderPrimitive(descriptor));
 	owner->SetPrimitive(mesh);
 }
 
@@ -43,7 +43,7 @@ void ndRenderSceneNodeInstanceImplement::Render(const ndRender* const owner, con
 	{
 		const ndMatrix primitiveMatrix(m_owner->m_primitiveMatrix);
 
-		ndRenderPrimitiveMesh* const mesh = (ndRenderPrimitiveMesh*)*m_owner->m_primitive;
+		ndRenderPrimitive* const mesh = (ndRenderPrimitive*)*m_owner->m_primitive;
 		ndRenderPrimitiveMeshImplement* const meshImplement = *mesh->m_implement;
 		
 		ndArray<glMatrix>& matrixPallete = meshImplement->m_genericMatricArray;

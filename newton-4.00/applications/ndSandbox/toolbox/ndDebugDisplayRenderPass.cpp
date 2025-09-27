@@ -54,17 +54,17 @@ ndDebugDisplayRenderPass::ndDebugMesh* ndDebugDisplayRenderPass::CreateRenderPri
 	ndRender* const render = m_owner;
 	ndDebugMesh* const debugMesh = new ndDebugMesh;
 
-	ndRenderPrimitiveMesh::ndDescriptor descriptor(render);
+	ndRenderPrimitive::ndDescriptor descriptor(render);
 	descriptor.m_collision = shape;
 
-	descriptor.m_meshBuildMode = ndRenderPrimitiveMesh::m_debugFlatShaded;
-	debugMesh->m_flatShaded = ndSharedPtr<ndRenderPrimitive>(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
+	descriptor.m_meshBuildMode = ndRenderPrimitive::m_debugFlatShaded;
+	debugMesh->m_flatShaded = ndSharedPtr<ndRenderPrimitive>(new ndRenderPrimitive(descriptor));
 
-	descriptor.m_meshBuildMode = ndRenderPrimitiveMesh::m_debugWireFrame;
-	debugMesh->m_wireFrameShareEdge = ndSharedPtr<ndRenderPrimitive>(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
+	descriptor.m_meshBuildMode = ndRenderPrimitive::m_debugWireFrame;
+	debugMesh->m_wireFrameShareEdge = ndSharedPtr<ndRenderPrimitive>(new ndRenderPrimitive(descriptor));
 
-	descriptor.m_meshBuildMode = ndRenderPrimitiveMesh::m_debugHiddenLines;
-	debugMesh->m_zBuffer = ndSharedPtr<ndRenderPrimitive>(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
+	descriptor.m_meshBuildMode = ndRenderPrimitive::m_debugHiddenLines;
+	debugMesh->m_zBuffer = ndSharedPtr<ndRenderPrimitive>(new ndRenderPrimitive(descriptor));
 
 	return debugMesh;
 }
@@ -101,8 +101,8 @@ void ndDebugDisplayRenderPass::RenderScene()
 			case 1:
 			{
 				// render solid color collsion mesh
-				ndRenderPrimitiveMesh* const mesh = (ndRenderPrimitiveMesh*)*debugMesh->m_flatShaded;
-				ndRenderPrimitiveMeshSegment& segment = mesh->m_segments.GetFirst()->GetInfo();
+				ndRenderPrimitive* const mesh = *debugMesh->m_flatShaded;
+				ndRenderPrimitiveSegment& segment = mesh->m_segments.GetFirst()->GetInfo();
 				ndRenderPrimitiveMaterial* const material = &segment.m_material;
 				material->m_diffuse = color;
 				debugMesh->m_flatShaded->Render(m_owner, matrix, m_debugDisplaySolidMesh);
@@ -112,8 +112,8 @@ void ndDebugDisplayRenderPass::RenderScene()
 			case 2:
 			{
 				// render solid color collsion mesh
-				ndRenderPrimitiveMesh* const mesh = (ndRenderPrimitiveMesh*)*debugMesh->m_wireFrameShareEdge;
-				ndRenderPrimitiveMeshSegment& segment = mesh->m_segments.GetFirst()->GetInfo();
+				ndRenderPrimitive* const mesh = *debugMesh->m_wireFrameShareEdge;
+				ndRenderPrimitiveSegment& segment = mesh->m_segments.GetFirst()->GetInfo();
 				ndRenderPrimitiveMaterial* const material = &segment.m_material;
 				material->m_diffuse = color;
 				debugMesh->m_wireFrameShareEdge->Render(m_owner, matrix, m_debugDisplayWireFrameMesh);
@@ -146,8 +146,8 @@ void ndDebugDisplayRenderPass::RenderScene()
 			ndSharedPtr<ndDebugMesh>& debugMesh = node->GetInfo();
 			const ndVector color((body->GetSleepState() == 1) ? m_sleepColor : m_awakeColor);
 		
-			ndRenderPrimitiveMesh* const mesh = (ndRenderPrimitiveMesh*)*debugMesh->m_wireFrameShareEdge;
-			ndRenderPrimitiveMeshSegment& segment = mesh->m_segments.GetFirst()->GetInfo();
+			ndRenderPrimitive* const mesh = *debugMesh->m_wireFrameShareEdge;
+			ndRenderPrimitiveSegment& segment = mesh->m_segments.GetFirst()->GetInfo();
 			ndRenderPrimitiveMaterial* const material = &segment.m_material;
 			material->m_diffuse = color;
 			debugMesh->m_wireFrameShareEdge->Render(m_owner, matrix, m_debugDisplayWireFrameMesh);
