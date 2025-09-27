@@ -38,6 +38,7 @@ class ndRenderShaderCache
 			GLuint m_diffuseTransparentEffect;
 			GLuint m_generateShadowMapsEffect;
 			GLuint m_diffuseShadowIntanceEffect;
+			GLuint m_generateShadowMapsSkinEffect;
 			GLuint m_debugFlatShadedDiffuseEffect;
 			GLuint m_generateInstancedShadowMapsEffect;
 		};
@@ -49,6 +50,7 @@ class ndRenderShaderCache
 	static const char* m_setZbufferVertex;
 	static const char* m_generateShadowMapVertex;
 	static const char* m_directionalDiffuseVertex;
+	static const char* m_generateShadowMapSkinVertex;
 	static const char* m_debugFlatShadedDiffuseVertex;
 	static const char* m_directionalDiffuseShadowVertex;
 	static const char* m_directionalDiffuseInstanceVertex;

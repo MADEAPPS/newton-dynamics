@@ -26,6 +26,7 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(ndRenderPrimitive
 	:ndContainersFreeListAlloc<ndRenderPrimitiveMeshImplement>()
 	,m_owner(owner)
 	,m_context(*descriptor.m_render->m_context)
+	,m_skinSceneNode(nullptr)
 	,m_indexCount(0)
 	,m_vertexCount(0)
 	,m_vertexSize(0)
@@ -46,6 +47,7 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(ndRenderPrimitive
 
 	m_generateShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_transparencyDiffusedBlock.GetShaderParameters(*m_context->m_shaderCache);
+	m_generateSkinShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_opaqueDifusedColorShadowBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_generateIntanceShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_opaqueDifusedColorNoShadowBlock.GetShaderParameters(*m_context->m_shaderCache);
@@ -57,6 +59,7 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(const ndRenderPri
 	:ndContainersFreeListAlloc<ndRenderPrimitiveMeshImplement>()
 	,m_owner(nullptr)
 	,m_context(src.m_context)
+	,m_skinSceneNode(nullptr)
 	,m_indexCount(src.m_indexCount)
 	,m_vertexCount(src.m_vertexCount)
 	,m_vertexSize(src.m_vertexSize)
@@ -121,7 +124,7 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(const ndRenderPri
 				offset += 2 * sizeof(ndReal);
 				if (offset < size_t(m_vertexSize))
 				{
-					// ndAssert (0);
+					 ndAssert (0);
 					// TODO: clone a skinned mesh weights and matric index
 				}
 			}
@@ -131,6 +134,7 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(const ndRenderPri
 
 	m_generateShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_transparencyDiffusedBlock.GetShaderParameters(*m_context->m_shaderCache);
+	m_generateSkinShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_opaqueDifusedColorShadowBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_generateIntanceShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_opaqueDifusedColorNoShadowBlock.GetShaderParameters(*m_context->m_shaderCache);
@@ -444,9 +448,10 @@ void ndRenderPrimitiveMeshImplement::BuildRenderSkinnedMeshFromMeshEffect(const 
 	ndFixSizeArray<ndMatrix, 128> parentMatrix;
 	ndFixSizeArray<ndMatrix, 128> bindMatrixArray;
 	ndFixSizeArray<ndRenderSceneNode*, 128> entityArray;
+	m_skinSceneNode = descriptor.m_skeleton->GetRoot();
 
+	pool.PushBack(m_skinSceneNode);
 	parentMatrix.PushBack(ndGetIdentityMatrix());
-	pool.PushBack(descriptor.m_skeleton->GetRoot());
 	ndMatrix shapeBindMatrix(descriptor.m_skeleton->m_primitiveMatrix * descriptor.m_skeleton->CalculateGlobalTransform());
 	
 	ndTree<ndInt32, ndInt32> boneHashIdMap;
@@ -1073,7 +1078,14 @@ void ndRenderPrimitiveMeshImplement::RenderGenerateShadowMaps(const ndRender* co
 
 	if (castShadow)
 	{
-		m_generateShadowMapsBlock.Render(this, render, lightMatrix);
+		if (m_skinSceneNode)
+		{
+			m_generateSkinShadowMapsBlock.Render(this, render, lightMatrix);
+		}
+		else
+		{
+			m_generateShadowMapsBlock.Render(this, render, lightMatrix);
+		}
 	}
 }
 

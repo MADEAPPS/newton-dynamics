@@ -56,6 +56,7 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 
 	ndRenderPrimitiveMesh* m_owner;
 	const ndRenderContext* m_context;
+	ndRenderSceneNode* m_skinSceneNode;
 	ndArray<glMatrix> m_instanceRenderMatrixPallete;
 
 	GLint m_indexCount;
@@ -68,6 +69,7 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	GLuint m_instanceRenderMatrixPalleteBuffer;
 	
 	ndRenderShaderGenerateShadowMapBlock m_generateShadowMapsBlock;
+	ndRenderShaderGenerateSkinShadowMapBlock m_generateSkinShadowMapsBlock;
 	ndRenderShaderOpaqueDiffusedColorBlock m_opaqueDifusedColorNoShadowBlock;
 	ndRenderShaderOpaqueDiffusedShadowColorBlock m_opaqueDifusedColorShadowBlock;
 	ndRenderShaderTransparentDiffusedShadowColorBlock m_transparencyDiffusedBlock;

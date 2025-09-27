@@ -33,23 +33,23 @@ ndRenderShaderCache::~ndRenderShaderCache(void)
 
 bool ndRenderShaderCache::CreateAllEffects()
 {
+	// unique render effect
 	m_skyBoxEffect = CreateShaderEffect(m_skyBoxVertex, m_skyBoxPixel);
 	m_setZbufferEffect = CreateShaderEffect(m_setZbufferVertex, m_doNothingPixel);
 	m_diffuseEffect = CreateShaderEffect(m_directionalDiffuseVertex, m_directionalDiffusePixel);
-	m_generateShadowMapsEffect = CreateShaderEffect(m_generateShadowMapVertex, m_doNothingPixel);
-	m_diffuseShadowEffect = CreateShaderEffect(m_directionalDiffuseShadowVertex, m_directionalDiffuseShadowPixel);
-	m_diffuseShadowSkinEffect = CreateShaderEffect(m_directionalDiffuseShadowSkinVertex, m_directionalDiffuseShadowPixel);
 	m_diffuseTransparentEffect = CreateShaderEffect(m_directionalDiffuseVertex, m_directionalDiffuseTransparentPixel);
 	m_debugFlatShadedDiffuseEffect = CreateShaderEffect(m_debugFlatShadedDiffuseVertex, m_debugFlatShadedDiffusePixel);
-	m_diffuseShadowIntanceEffect = CreateShaderEffect(m_directionalDiffuseInstanceVertex, m_directionalDiffuseShadowPixel);
+
+	// generation of shadow map render effects
+	m_generateShadowMapsEffect = CreateShaderEffect(m_generateShadowMapVertex, m_doNothingPixel);
+	m_generateShadowMapsSkinEffect = CreateShaderEffect(m_generateShadowMapSkinVertex, m_doNothingPixel);
 	m_generateInstancedShadowMapsEffect = CreateShaderEffect(m_generateInstancedShadowMapVertex, m_doNothingPixel);
 
-	//m_colorPoint = CreateShaderEffect("ColorPoint", "FlatShaded");
-	//m_texturedDecal = CreateShaderEffect ("TextureDecal", "TextureDecal");
-	//m_diffuseDebrisEffect = CreateShaderEffect("DirectionalDebriDiffuse", "DirectionalDebriDiffuse");
-	//m_skinningDiffuseEffect = CreateShaderEffect ("SkinningDirectionalDiffuse", "DirectionalDiffuse");
-	//m_thickPoints = CreateShaderEffect("ThickPoint", "ThickPoint", "ThickPoint");
-	//m_spriteSpheres = CreateShaderEffect("DirectionalDiffuseSprite", "DirectionalDiffuseSprite", "DirectionalDiffuseSprite");
+	// basic primitive effect, a mesh with a Blinn ilumination, 
+	// with environment reflection, casting and recieving shadows
+	m_diffuseShadowEffect = CreateShaderEffect(m_directionalDiffuseShadowVertex, m_directionalDiffuseShadowPixel);
+	m_diffuseShadowIntanceEffect = CreateShaderEffect(m_directionalDiffuseInstanceVertex, m_directionalDiffuseShadowPixel);
+	m_diffuseShadowSkinEffect = CreateShaderEffect(m_directionalDiffuseShadowSkinVertex, m_directionalDiffuseShadowPixel);
 
 	return true;
 }
@@ -57,7 +57,7 @@ bool ndRenderShaderCache::CreateAllEffects()
 GLuint ndRenderShaderCache::CreateShaderEffect (const char* const vertexShaderCode, const char* const pixelShaderCode, const char* const geometryShaderCode)
 {
 	GLint state;
-	char errorLog[GL_INFO_LOG_LENGTH];
+	char errorLog[1024 * 16];
 
 	GLuint program = glCreateProgram();
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);

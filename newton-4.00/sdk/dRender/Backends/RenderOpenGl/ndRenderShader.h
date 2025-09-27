@@ -62,6 +62,21 @@ class ndRenderShaderGenerateShadowMapBlock : public ndRenderShaderSetZbufferClea
 // *********************************************************************
 // 
 // *********************************************************************
+class ndRenderShaderGenerateSkinShadowMapBlock : public ndRenderShaderGenerateShadowMapBlock
+{
+	public:
+	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) override;
+	virtual void Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
+
+	protected:
+	virtual void SetParameters(GLuint shader) override;
+
+	GLint m_matrixPalette;
+};
+
+// *********************************************************************
+// 
+// *********************************************************************
 class ndRenderShaderGenerateInstanceShadowMapBlock : public ndRenderShaderGenerateShadowMapBlock
 {
 	public:

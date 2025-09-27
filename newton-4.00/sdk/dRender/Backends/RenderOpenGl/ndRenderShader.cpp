@@ -108,9 +108,6 @@ void ndRenderShaderGenerateShadowMapBlock::Render(const ndRenderPrimitiveMeshImp
 	const glMatrix matrix(modelMatrix);
 	glUniformMatrix4fv(m_viewModelProjectionMatrix, 1, false, &matrix[0][0]);
 
-	//glPolygonOffset(GLfloat(1.0f), GLfloat(1024.0f * 8.0f));
-	//glEnable(GL_POLYGON_OFFSET_FILL);
-
 	glBindVertexArray(self->m_vertextArrayBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
 		
@@ -125,10 +122,50 @@ void ndRenderShaderGenerateShadowMapBlock::Render(const ndRenderPrimitiveMeshImp
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	//glDisable(GL_POLYGON_OFFSET_FILL);
 	ndAssert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 	glUseProgram(0);
 }	
+
+// *********************************************************************
+// 
+// *********************************************************************
+void ndRenderShaderGenerateSkinShadowMapBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
+{
+	SetParameters(shaderCache->m_generateShadowMapsSkinEffect);
+	EndParameters();
+}
+
+void ndRenderShaderGenerateSkinShadowMapBlock::SetParameters(GLuint shader)
+{
+	ndRenderShaderGenerateShadowMapBlock::SetParameters(shader);
+	m_matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
+}
+
+void ndRenderShaderGenerateSkinShadowMapBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const, const ndMatrix& modelMatrix) const
+{
+	ndAssert(0);
+	//glUseProgram(m_shader);
+	//
+	//const glMatrix matrix(modelMatrix);
+	//glUniformMatrix4fv(m_viewModelProjectionMatrix, 1, false, &matrix[0][0]);
+	//
+	//glBindVertexArray(self->m_vertextArrayBuffer);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
+	//
+	//for (ndList<ndRenderPrimitiveMeshSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
+	//{
+	//	ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
+	//	if (segment.m_material.m_castShadows)
+	//	{
+	//		glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
+	//	}
+	//}
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	//glBindVertexArray(0);
+	//
+	//ndAssert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+	//glUseProgram(0);
+}
 
 // *********************************************************************
 // 
@@ -682,6 +719,6 @@ void ndRenderShaderOpaqueDiffusedShadowSkinColorBlock::SetParameters(GLuint shad
 
 void ndRenderShaderOpaqueDiffusedShadowSkinColorBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	//ndAssert(0);
+	ndAssert(0);
 }
 
