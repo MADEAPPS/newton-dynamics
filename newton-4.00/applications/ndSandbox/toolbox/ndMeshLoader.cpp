@@ -125,8 +125,8 @@ bool ndMeshLoader::LoadEntity(ndRender* const renderer, const ndString& fbxPathM
 				material.m_diffuse = materials[j].m_diffuse;
 				material.m_specular = materials[j].m_specular;
 				material.m_reflection = materials[j].m_specular;
-				material.m_specularPower = materials[j].m_shiness;
-				material.m_opacity = materials[j].m_opacity;
+				material.m_specularPower = ndReal(materials[j].m_shiness);
+				material.m_opacity = ndReal(materials[j].m_opacity);
 				material.m_castShadows = true;
 			}
 			ndSharedPtr<ndRenderPrimitive> geometry(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));

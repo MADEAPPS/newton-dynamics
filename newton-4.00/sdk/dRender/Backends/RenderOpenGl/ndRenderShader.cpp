@@ -199,7 +199,7 @@ void ndRenderShaderGenerateInstanceShadowMapBlock::Render(const ndRenderPrimitiv
 		ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
 		if (segment.m_material.m_castShadows)
 		{
-			glDrawElementsInstanced(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)), GLsizei(self->m_instanceRenderMatrixPallete.GetCount()));
+			glDrawElementsInstanced(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)), GLsizei(self->m_genericMatricArray.GetCount()));
 		}
 	}
 	
@@ -616,7 +616,7 @@ void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::Render(const ndRenderPrim
 	// upload matrix pallete to the gpu vertex buffer
 	glBindBuffer(GL_ARRAY_BUFFER, self->m_instanceRenderMatrixPalleteBuffer);
 	glMatrix* const matrixBuffer = (glMatrix*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-	ndMemCpy(matrixBuffer, &self->m_instanceRenderMatrixPallete[0], self->m_instanceRenderMatrixPallete.GetCount());
+	ndMemCpy(matrixBuffer, &self->m_genericMatricArray[0], self->m_genericMatricArray.GetCount());
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -692,7 +692,7 @@ void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::Render(const ndRenderPrim
 
 			glBindTexture(GL_TEXTURE_2D, image->m_texture);
 			//glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
-			glDrawElementsInstanced(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)), GLsizei(self->m_instanceRenderMatrixPallete.GetCount()));
+			glDrawElementsInstanced(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)), GLsizei(self->m_genericMatricArray.GetCount()));
 		}
 	}
 

@@ -3749,7 +3749,7 @@ void ndMeshEffect::GetVertexChannel64(ndInt32 strideInByte, ndFloat64* const buf
 	}
 }
 
-void ndMeshEffect::GetVertexChannel(ndInt32 strideInByte, ndFloat32* const bufferOut) const
+void ndMeshEffect::GetVertexChannel(ndInt32 strideInByte, ndReal* const bufferOut) const
 {
 	ndInt32 stride = strideInByte / ndInt32(sizeof(ndFloat32));
 	for (ndInt32 i = 0; i < m_attrib.m_pointChannel.GetCount(); ++i)
@@ -3757,9 +3757,9 @@ void ndMeshEffect::GetVertexChannel(ndInt32 strideInByte, ndFloat32* const buffe
 		const ndInt32 j = i * stride;
 		const ndInt32 index = m_attrib.m_pointChannel[i];
 		const ndBigVector& p = m_points.m_vertex[index];
-		bufferOut[j + 0] = ndFloat32(p.m_x);
-		bufferOut[j + 1] = ndFloat32(p.m_y);
-		bufferOut[j + 2] = ndFloat32(p.m_z);
+		bufferOut[j + 0] = ndReal(p.m_x);
+		bufferOut[j + 1] = ndReal(p.m_y);
+		bufferOut[j + 2] = ndReal(p.m_z);
 	}
 }
 
@@ -3777,62 +3777,62 @@ void ndMeshEffect::GetVertexWeightChannel(ndInt32 strideInByte, ndVertexWeight* 
 	}
 }
 
-void ndMeshEffect::GetNormalChannel(ndInt32 strideInByte, ndFloat32* const bufferOut) const
+void ndMeshEffect::GetNormalChannel(ndInt32 strideInByte, ndReal* const bufferOut) const
 {
 	ndInt32 stride = strideInByte / ndInt32(sizeof(ndFloat32));
 	for (ndInt32 i = 0; i < m_attrib.m_normalChannel.GetCount(); ++i)
 	{
 		const ndInt32 j = i * stride;
-		bufferOut[j + 0] = ndFloat32(m_attrib.m_normalChannel[i].m_x);
-		bufferOut[j + 1] = ndFloat32(m_attrib.m_normalChannel[i].m_y);
-		bufferOut[j + 2] = ndFloat32(m_attrib.m_normalChannel[i].m_z);
+		bufferOut[j + 0] = m_attrib.m_normalChannel[i].m_x;
+		bufferOut[j + 1] = m_attrib.m_normalChannel[i].m_y;
+		bufferOut[j + 2] = m_attrib.m_normalChannel[i].m_z;
 	}
 }
 
-void ndMeshEffect::GetBinormalChannel(ndInt32 strideInByte, ndFloat32* const bufferOut) const
+void ndMeshEffect::GetBinormalChannel(ndInt32 strideInByte, ndReal* const bufferOut) const
 {
 	ndInt32 stride = strideInByte / ndInt32(sizeof(ndFloat32));
 	for (ndInt32 i = 0; i < m_attrib.m_binormalChannel.GetCount(); ++i)
 	{
 		const ndInt32 j = i * stride;
-		bufferOut[j + 0] = ndFloat32(m_attrib.m_binormalChannel[i].m_x);
-		bufferOut[j + 1] = ndFloat32(m_attrib.m_binormalChannel[i].m_y);
-		bufferOut[j + 2] = ndFloat32(m_attrib.m_binormalChannel[i].m_z);
+		bufferOut[j + 0] = m_attrib.m_binormalChannel[i].m_x;
+		bufferOut[j + 1] = m_attrib.m_binormalChannel[i].m_y;
+		bufferOut[j + 2] = m_attrib.m_binormalChannel[i].m_z;
 	}
 }
 
-void ndMeshEffect::GetUV0Channel(ndInt32 strideInByte, ndFloat32* const bufferOut) const
+void ndMeshEffect::GetUV0Channel(ndInt32 strideInByte, ndReal* const bufferOut) const
 {
 	ndInt32 stride = strideInByte / ndInt32(sizeof(ndFloat32));
 	for (ndInt32 i = 0; i < m_attrib.m_uv0Channel.GetCount(); ++i)
 	{
 		const ndInt32 j = i * stride;
-		bufferOut[j + 0] = ndFloat32(m_attrib.m_uv0Channel[i].m_u);
-		bufferOut[j + 1] = ndFloat32(m_attrib.m_uv0Channel[i].m_v);
+		bufferOut[j + 0] = m_attrib.m_uv0Channel[i].m_u;
+		bufferOut[j + 1] = m_attrib.m_uv0Channel[i].m_v;
 	}
 }
 
-void ndMeshEffect::GetUV1Channel(ndInt32 strideInByte, ndFloat32* const bufferOut) const
+void ndMeshEffect::GetUV1Channel(ndInt32 strideInByte, ndReal* const bufferOut) const
 {
 	ndInt32 stride = strideInByte / ndInt32(sizeof(ndFloat32));
 	for (ndInt32 i = 0; i < m_attrib.m_uv1Channel.GetCount(); ++i)
 	{
 		const ndInt32 j = i * stride;
-		bufferOut[j + 0] = ndFloat32(m_attrib.m_uv1Channel[i].m_u);
-		bufferOut[j + 1] = ndFloat32(m_attrib.m_uv1Channel[i].m_v);
+		bufferOut[j + 0] = m_attrib.m_uv1Channel[i].m_u;
+		bufferOut[j + 1] = m_attrib.m_uv1Channel[i].m_v;
 	}
 }
 
-void ndMeshEffect::GetVertexColorChannel(ndInt32 strideInByte, ndFloat32* const bufferOut) const
+void ndMeshEffect::GetVertexColorChannel(ndInt32 strideInByte, ndReal* const bufferOut) const
 {
 	ndInt32 stride = strideInByte / ndInt32(sizeof(ndFloat32));
 	for (ndInt32 i = 0; i < m_attrib.m_colorChannel.GetCount(); ++i)
 	{
 		const ndInt32 j = i * stride;
-		bufferOut[j + 0] = ndFloat32(m_attrib.m_colorChannel[i].m_x);
-		bufferOut[j + 1] = ndFloat32(m_attrib.m_colorChannel[i].m_y);
-		bufferOut[j + 2] = ndFloat32(m_attrib.m_colorChannel[i].m_z);
-		bufferOut[j + 3] = ndFloat32(m_attrib.m_colorChannel[i].m_w);
+		bufferOut[j + 0] = m_attrib.m_colorChannel[i].m_x;
+		bufferOut[j + 1] = m_attrib.m_colorChannel[i].m_y;
+		bufferOut[j + 2] = m_attrib.m_colorChannel[i].m_z;
+		bufferOut[j + 3] = m_attrib.m_colorChannel[i].m_w;
 	}
 }
 

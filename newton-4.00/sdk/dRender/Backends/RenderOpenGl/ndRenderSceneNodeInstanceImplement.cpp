@@ -46,7 +46,7 @@ void ndRenderSceneNodeInstanceImplement::Render(const ndRender* const owner, con
 		ndRenderPrimitiveMesh* const mesh = (ndRenderPrimitiveMesh*)*m_owner->m_primitive;
 		ndRenderPrimitiveMeshImplement* const meshImplement = *mesh->m_implement;
 		
-		ndArray<glMatrix>& matrixPallete = meshImplement->m_instanceRenderMatrixPallete;
+		ndArray<glMatrix>& matrixPallete = meshImplement->m_genericMatricArray;
 
 		matrixPallete.SetCount(0);
 		const ndList<ndSharedPtr<ndRenderSceneNode>>& children = m_owner->GetChildren();

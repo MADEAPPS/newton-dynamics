@@ -97,8 +97,9 @@ class ndAnimationBlendTansition: public ndAnimationTwoWayBlend
 };
 
 ndBasicPlayerCapsule::ndBasicPlayerCapsule(
-	ndDemoEntityManager* const scene, ndMeshLoader& loader,
-	ndSharedPtr<ndRenderSceneNode>& entity, const ndMatrix& localAxis, const ndMatrix& location,
+	ndDemoEntityManager* const scene, 
+	ndMeshLoader& loader, ndSharedPtr<ndRenderSceneNode>& entity, 
+	const ndMatrix& localAxis, const ndMatrix& location,
 	ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight, bool isPlayer)
 	:ndBodyPlayerCapsule(localAxis, mass, radius, height, stepHeight)
 	,m_isPlayer(isPlayer)

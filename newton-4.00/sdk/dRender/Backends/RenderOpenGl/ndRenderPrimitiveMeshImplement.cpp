@@ -478,12 +478,10 @@ void ndRenderPrimitiveMeshImplement::BuildRenderSkinnedMeshFromMeshEffect(const 
 		}
 	}
 
-	//m_nodeCount = ndInt32(entityArray.GetCount());
-	//m_bindingMatrixArray.SetCount(m_nodeCount);
-	m_instanceRenderMatrixPallete.SetCount(0);
+	m_genericMatricArray.SetCount(0);
 	for (ndInt32 i = 0; i < entityArray.GetCount(); ++i)
 	{
-		m_instanceRenderMatrixPallete.PushBack(glMatrix(bindMatrixArray[i]));
+		m_genericMatricArray.PushBack(glMatrix(bindMatrixArray[i]));
 	}
 
 	// extract vertex data  from the newton mesh
@@ -982,11 +980,11 @@ void ndRenderPrimitiveMeshImplement::BuildRenderInstanceMesh(const ndRenderPrimi
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(glPositionNormalUV), (void*)OFFSETOF(glPositionNormalUV, m_uv));
 
 	// set vertex buffer for matrix instances
-	m_instanceRenderMatrixPallete.SetCount(descriptor.m_numberOfInstances);
+	m_genericMatricArray.SetCount(descriptor.m_numberOfInstances);
 
 	glGenBuffers(1, &m_instanceRenderMatrixPalleteBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_instanceRenderMatrixPalleteBuffer);
-	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(descriptor.m_numberOfInstances * sizeof(glMatrix)), &m_instanceRenderMatrixPallete[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(descriptor.m_numberOfInstances * sizeof(glMatrix)), &m_genericMatricArray[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(3);
 	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glMatrix), (void*)(0 * sizeof(glVector4)));

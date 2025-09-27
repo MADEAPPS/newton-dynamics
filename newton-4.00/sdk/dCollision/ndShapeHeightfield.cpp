@@ -130,7 +130,7 @@ ndVector ndShapeHeightfield::GetLocation(ndInt32 x, ndInt32 z) const
 {
 	x = ndClamp(x, ndInt32(0), m_width - 1);
 	z = ndClamp(z, ndInt32(0), m_height - 1);
-	ndReal h = ndFloat32(m_elevationMap[z * m_width + x]);
+	ndFloat32 h = ndFloat32(m_elevationMap[z * m_width + x]);
 	return ndVector(ndFloat32(x) * m_horizontalScaleInv_x, h, ndFloat32(z) * m_horizontalScaleInv_z, ndFloat32(0.0f));
 }
 

@@ -27,8 +27,8 @@ class ndRenderPrimitiveMeshMaterial
 	ndVector m_diffuse;
 	ndVector m_specular;
 	ndVector m_reflection;
-	ndFloat32 m_specularPower;
-	ndFloat32 m_opacity;
+	ndReal m_specularPower;
+	ndReal m_opacity;
 	ndSharedPtr<ndRenderTexture> m_texture;
 	bool m_castShadows;
 };

@@ -518,12 +518,12 @@ class ndMeshEffect: public ndPolyhedra
 	
 	D_COLLISION_API void GetVertexIndexChannel(ndInt32* const bufferOut) const;
 	D_COLLISION_API void GetVertexChannel64(ndInt32 strideInByte, ndFloat64* const bufferOut) const;
-	D_COLLISION_API void GetVertexChannel(ndInt32 strideInByte, ndFloat32* const bufferOut) const;
-	D_COLLISION_API void GetNormalChannel(ndInt32 strideInByte, ndFloat32* const bufferOut) const;
-	D_COLLISION_API void GetBinormalChannel(ndInt32 strideInByte, ndFloat32* const bufferOut) const;
-	D_COLLISION_API void GetUV0Channel(ndInt32 strideInByte, ndFloat32* const bufferOut) const;
-	D_COLLISION_API void GetUV1Channel(ndInt32 strideInByte, ndFloat32* const bufferOut) const;
-	D_COLLISION_API void GetVertexColorChannel(ndInt32 strideInByte, ndFloat32* const bufferOut) const;
+	D_COLLISION_API void GetVertexChannel(ndInt32 strideInByte, ndReal* const bufferOut) const;
+	D_COLLISION_API void GetNormalChannel(ndInt32 strideInByte, ndReal* const bufferOut) const;
+	D_COLLISION_API void GetBinormalChannel(ndInt32 strideInByte, ndReal* const bufferOut) const;
+	D_COLLISION_API void GetUV0Channel(ndInt32 strideInByte, ndReal* const bufferOut) const;
+	D_COLLISION_API void GetUV1Channel(ndInt32 strideInByte, ndReal* const bufferOut) const;
+	D_COLLISION_API void GetVertexColorChannel(ndInt32 strideInByte, ndReal* const bufferOut) const;
 	D_COLLISION_API void GetVertexWeightChannel(ndInt32 strideInByte, ndVertexWeight* const bufferOut) const;
 
 	D_COLLISION_API ndIndexArray* MaterialGeometryBegin();

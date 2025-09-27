@@ -58,7 +58,7 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	ndRenderPrimitiveMesh* m_owner;
 	const ndRenderContext* m_context;
 	ndRenderSceneNode* m_skinSceneNode;
-	ndArray<glMatrix> m_instanceRenderMatrixPallete;
+	ndArray<glMatrix> m_genericMatricArray;
 
 	GLint m_indexCount;
 	GLint m_vertexCount;
