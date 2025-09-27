@@ -248,7 +248,7 @@ void ndRenderPrimitiveMeshImplement::BuildRenderMeshFromCollisionShape(const ndR
 	ndMeshEffect mesh(**descriptor.m_collision);
 
 	ndAssert(descriptor.m_materials.GetCount());
-	const ndRenderPrimitiveMeshMaterial& material = descriptor.m_materials.GetFirst()->GetInfo();
+	const ndRenderPrimitiveMaterial& material = descriptor.m_materials.GetFirst()->GetInfo();
 	ndRenderTextureImageCommon* const image = (ndRenderTextureImageCommon*)*material.m_texture;
 	ndInt32 textureId = ndInt32(image->m_texture);
 	switch (descriptor.m_mapping)
@@ -388,12 +388,12 @@ void ndRenderPrimitiveMeshImplement::BuildRenderSimpleMeshFromMeshEffect(const n
 	for (ndInt32 handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
 	{
 		ndInt32 materialIndex = mesh.GetMaterialID(geometryHandle, handle);
-		ndList<ndRenderPrimitiveMeshMaterial>::ndNode* materialNodes = descriptor.m_materials.GetFirst();
+		ndList<ndRenderPrimitiveMaterial>::ndNode* materialNodes = descriptor.m_materials.GetFirst();
 		for (ndInt32 i = 0; i < materialIndex; ++i)
 		{
 			materialNodes = materialNodes->GetNext();
 		}
-		const ndRenderPrimitiveMeshMaterial& material = materialNodes->GetInfo();
+		const ndRenderPrimitiveMaterial& material = materialNodes->GetInfo();
 
 		ndRenderPrimitiveMeshSegment& segment = m_owner->m_segments.Append()->GetInfo();
 
@@ -535,12 +535,12 @@ void ndRenderPrimitiveMeshImplement::BuildRenderSkinnedMeshFromMeshEffect(const 
 	for (ndInt32 handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
 	{
 		ndInt32 materialIndex = mesh.GetMaterialID(geometryHandle, handle);
-		ndList<ndRenderPrimitiveMeshMaterial>::ndNode* materialNodes = descriptor.m_materials.GetFirst();
+		ndList<ndRenderPrimitiveMaterial>::ndNode* materialNodes = descriptor.m_materials.GetFirst();
 		for (ndInt32 i = 0; i < materialIndex; ++i)
 		{
 			materialNodes = materialNodes->GetNext();
 		}
-		const ndRenderPrimitiveMeshMaterial& material = materialNodes->GetInfo();
+		const ndRenderPrimitiveMaterial& material = materialNodes->GetInfo();
 
 		ndRenderPrimitiveMeshSegment& segment = m_owner->m_segments.Append()->GetInfo();
 
@@ -871,7 +871,7 @@ void ndRenderPrimitiveMeshImplement::BuildRenderInstanceMesh(const ndRenderPrimi
 	ndMeshEffect mesh(**descriptor.m_collision);
 
 	ndAssert(descriptor.m_materials.GetCount());
-	const ndRenderPrimitiveMeshMaterial& material = descriptor.m_materials.GetFirst()->GetInfo();
+	const ndRenderPrimitiveMaterial& material = descriptor.m_materials.GetFirst()->GetInfo();
 	ndRenderTextureImageCommon* const image = (ndRenderTextureImageCommon*)*material.m_texture;
 	ndInt32 textureId = ndInt32(image->m_texture);
 	switch (descriptor.m_mapping)

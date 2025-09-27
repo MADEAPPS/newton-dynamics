@@ -103,7 +103,7 @@ void ndDebugDisplayRenderPass::RenderScene()
 				// render solid color collsion mesh
 				ndRenderPrimitiveMesh* const mesh = (ndRenderPrimitiveMesh*)*debugMesh->m_flatShaded;
 				ndRenderPrimitiveMeshSegment& segment = mesh->m_segments.GetFirst()->GetInfo();
-				ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
+				ndRenderPrimitiveMaterial* const material = &segment.m_material;
 				material->m_diffuse = color;
 				debugMesh->m_flatShaded->Render(m_owner, matrix, m_debugDisplaySolidMesh);
 				break;
@@ -114,7 +114,7 @@ void ndDebugDisplayRenderPass::RenderScene()
 				// render solid color collsion mesh
 				ndRenderPrimitiveMesh* const mesh = (ndRenderPrimitiveMesh*)*debugMesh->m_wireFrameShareEdge;
 				ndRenderPrimitiveMeshSegment& segment = mesh->m_segments.GetFirst()->GetInfo();
-				ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
+				ndRenderPrimitiveMaterial* const material = &segment.m_material;
 				material->m_diffuse = color;
 				debugMesh->m_wireFrameShareEdge->Render(m_owner, matrix, m_debugDisplayWireFrameMesh);
 				break;
@@ -148,7 +148,7 @@ void ndDebugDisplayRenderPass::RenderScene()
 		
 			ndRenderPrimitiveMesh* const mesh = (ndRenderPrimitiveMesh*)*debugMesh->m_wireFrameShareEdge;
 			ndRenderPrimitiveMeshSegment& segment = mesh->m_segments.GetFirst()->GetInfo();
-			ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
+			ndRenderPrimitiveMaterial* const material = &segment.m_material;
 			material->m_diffuse = color;
 			debugMesh->m_wireFrameShareEdge->Render(m_owner, matrix, m_debugDisplayWireFrameMesh);
 		}

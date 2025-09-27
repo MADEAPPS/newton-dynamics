@@ -243,7 +243,7 @@ void ndRenderShaderDebugFlatShadedDiffusedBlock::Render(const ndRenderPrimitiveM
 	const glMatrix glProjectionMatrix(camera->m_projectionMatrix);
 	
 	ndRenderPrimitiveMeshSegment& segment = self->m_owner->m_segments.GetFirst()->GetInfo();
-	const ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
+	const ndRenderPrimitiveMaterial* const material = &segment.m_material;
 	
 	const glVector4 diffuse(material->m_diffuse);
 	const glVector4 glSunlightAmbient(render->m_sunLightAmbient);
@@ -291,7 +291,7 @@ void ndRenderShaderDebugWireframeDiffuseBlock::Render(const ndRenderPrimitiveMes
 	const glMatrix glProjectionMatrix(camera->m_projectionMatrix);
 	
 	ndRenderPrimitiveMeshSegment& segment = self->m_owner->m_segments.GetFirst()->GetInfo();
-	const ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
+	const ndRenderPrimitiveMaterial* const material = &segment.m_material;
 	
 	const glVector4 diffuse(material->m_diffuse);
 	const glVector4 glSunlightAmbient(render->m_sunLightAmbient);
@@ -384,7 +384,7 @@ void ndRenderShaderOpaqueDiffusedColorBlock::Render(const ndRenderPrimitiveMeshI
 		ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
 		if (!segment.m_material.m_castShadows && (segment.m_material.m_opacity > ndFloat32(0.99f)))
 		{
-			const ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
+			const ndRenderPrimitiveMaterial* const material = &segment.m_material;
 			const ndRenderTextureImageCommon* const image = (ndRenderTextureImageCommon*)*material->m_texture;
 			ndAssert(image);
 
@@ -482,7 +482,7 @@ void ndRenderShaderOpaqueDiffusedShadowColorBlock::Render(const ndRenderPrimitiv
 		ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
 		if (segment.m_material.m_opacity > ndFloat32(0.99f))
 		{
-			const ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
+			const ndRenderPrimitiveMaterial* const material = &segment.m_material;
 			const ndRenderTextureImageCommon* const image = (ndRenderTextureImageCommon*)*material->m_texture;
 			ndAssert(image);
 	
@@ -570,7 +570,7 @@ void ndRenderShaderTransparentDiffusedShadowColorBlock::Render(const ndRenderPri
 		ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
 		if (segment.m_material.m_opacity <= ndFloat32(0.99f))
 		{
-			const ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
+			const ndRenderPrimitiveMaterial* const material = &segment.m_material;
 			const ndRenderTextureImageCommon* const image = (ndRenderTextureImageCommon*)*material->m_texture;
 			ndAssert(image);
 
@@ -677,7 +677,7 @@ void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::Render(const ndRenderPrim
 		ndRenderPrimitiveMeshSegment& segment = node->GetInfo();
 		if (segment.m_material.m_opacity > ndFloat32(0.99f))
 		{
-			const ndRenderPrimitiveMeshMaterial* const material = &segment.m_material;
+			const ndRenderPrimitiveMaterial* const material = &segment.m_material;
 			const ndRenderTextureImageCommon* const image = (ndRenderTextureImageCommon*)*material->m_texture;
 			ndAssert(image);
 

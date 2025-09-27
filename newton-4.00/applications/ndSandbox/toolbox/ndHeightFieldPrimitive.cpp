@@ -134,7 +134,7 @@ class ndHeightfieldMesh : public ndRenderSceneNode
 				descriptor.m_stretchMaping = false;
 				descriptor.m_uvMatrix = uvMapping;
 				descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
-				ndRenderPrimitiveMeshMaterial& material = descriptor.AddMaterial(texture);
+				ndRenderPrimitiveMaterial& material = descriptor.AddMaterial(texture);
 				material.m_castShadows = false;
 				ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));
 				tileNode->SetPrimitive(mesh);

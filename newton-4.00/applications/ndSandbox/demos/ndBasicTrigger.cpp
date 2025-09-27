@@ -37,7 +37,7 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 	ndRenderPrimitiveMesh::ndDescriptor descriptor(*scene->GetRenderer());
 	descriptor.m_collision = shape;
 	descriptor.m_mapping = ndRenderPrimitiveMesh::m_box;
-	ndRenderPrimitiveMeshMaterial& material = descriptor.AddMaterial(scene->GetRenderer()->GetTextureCache()->GetTexture(ndGetWorkingFileName("metal_30.png")));
+	ndRenderPrimitiveMaterial& material = descriptor.AddMaterial(scene->GetRenderer()->GetTextureCache()->GetTexture(ndGetWorkingFileName("metal_30.png")));
 	material.m_opacity = ndFloat32(0.3f);
 
 	ndSharedPtr<ndRenderPrimitive> mesh(ndRenderPrimitiveMesh::CreateMeshPrimitive(descriptor));

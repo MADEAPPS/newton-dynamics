@@ -18,20 +18,6 @@ class ndRender;
 class ndRenderTexture;
 class ndRenderPrimitiveMeshImplement;
 
-class ndRenderPrimitiveMeshMaterial
-{
-	public:
-	ndRenderPrimitiveMeshMaterial();
-	ndRenderPrimitiveMeshMaterial(const ndRenderPrimitiveMeshMaterial& src);
-
-	ndVector m_diffuse;
-	ndVector m_specular;
-	ndVector m_reflection;
-	ndReal m_specularPower;
-	ndReal m_opacity;
-	ndSharedPtr<ndRenderTexture> m_texture;
-	bool m_castShadows;
-};
 
 class ndRenderPrimitiveMeshSegment
 {
@@ -39,7 +25,7 @@ class ndRenderPrimitiveMeshSegment
 	ndRenderPrimitiveMeshSegment();
 	ndRenderPrimitiveMeshSegment(const ndRenderPrimitiveMeshSegment& src);
 
-	ndRenderPrimitiveMeshMaterial m_material;
+	ndRenderPrimitiveMaterial m_material;
 	ndInt32 m_indexCount;
 	ndInt32 m_segmentStart;
 	bool m_hasTranparency;
@@ -94,15 +80,15 @@ class ndRenderPrimitiveMesh : public ndRenderPrimitive
 			,m_numberOfInstances(src.m_numberOfInstances)
 			,m_stretchMaping(src.m_stretchMaping)
 		{
-			for (ndList<ndRenderPrimitiveMeshMaterial>::ndNode* node = src.m_materials.GetFirst(); node; node = node->GetNext())
+			for (ndList<ndRenderPrimitiveMaterial>::ndNode* node = src.m_materials.GetFirst(); node; node = node->GetNext())
 			{
 				m_materials.Append(node->GetInfo());
 			}
 		}
 
-		ndRenderPrimitiveMeshMaterial& AddMaterial(const ndSharedPtr<ndRenderTexture>& texture)
+		ndRenderPrimitiveMaterial& AddMaterial(const ndSharedPtr<ndRenderTexture>& texture)
 		{
-			ndList<ndRenderPrimitiveMeshMaterial>::ndNode* const node = m_materials.Append();
+			ndList<ndRenderPrimitiveMaterial>::ndNode* const node = m_materials.Append();
 			node->GetInfo().m_texture = texture;
 			return node->GetInfo();
 		}
@@ -111,7 +97,7 @@ class ndRenderPrimitiveMesh : public ndRenderPrimitive
 		ndSharedPtr<ndMeshEffect> m_meshNode;
 		ndSharedPtr<ndShapeInstance> m_collision;
 		ndSharedPtr<ndRenderSceneNode> m_skeleton;
-		ndList<ndRenderPrimitiveMeshMaterial> m_materials;
+		ndList<ndRenderPrimitiveMaterial> m_materials;
 		ndUvMapingMode m_mapping;
 		ndMatrix m_uvMatrix;
 		ndMeshBuildMode m_meshBuildMode;

@@ -17,27 +17,6 @@
 #include "ndRenderPassShadowsImplement.h"
 #include "ndRenderPrimitiveMeshImplement.h"
 
-ndRenderPrimitiveMeshMaterial::ndRenderPrimitiveMeshMaterial()
-	:m_diffuse(ndFloat32(1.0f))
-	,m_specular(ndFloat32(1.0f))
-	,m_reflection(ndFloat32(0.5f))
-	,m_specularPower(ndFloat32(250.0f))
-	,m_opacity(ndFloat32(1.0f))
-	,m_texture(nullptr)
-	,m_castShadows(true)
-{
-}
-
-ndRenderPrimitiveMeshMaterial::ndRenderPrimitiveMeshMaterial(const ndRenderPrimitiveMeshMaterial& src)
-	:m_diffuse(src.m_diffuse)
-	,m_specular(src.m_specular)
-	,m_reflection(src.m_reflection)
-	,m_specularPower(src.m_specularPower)
-	,m_opacity(src.m_opacity)
-	,m_texture(src.m_texture)
-	,m_castShadows(src.m_castShadows)
-{
-}
 
 ndRenderPrimitiveMeshSegment::ndRenderPrimitiveMeshSegment()
 	:m_material()

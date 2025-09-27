@@ -13,6 +13,7 @@
 
 #include "ndRenderStdafx.h"
 
+class ndRenderTexture;
 class ndRenderPassShadowsImplement;
 
 enum ndRenderPassMode
@@ -28,6 +29,22 @@ enum ndRenderPassMode
 	m_m_generateInstanceShadowMaps,
 	m_directionalDiffusseInstanceShadow,
 };
+
+class ndRenderPrimitiveMaterial
+{
+	public:
+	ndRenderPrimitiveMaterial();
+	ndRenderPrimitiveMaterial(const ndRenderPrimitiveMaterial& src);
+
+	ndVector m_diffuse;
+	ndVector m_specular;
+	ndVector m_reflection;
+	ndReal m_specularPower;
+	ndReal m_opacity;
+	ndSharedPtr<ndRenderTexture> m_texture;
+	bool m_castShadows;
+};
+
 
 class ndRenderPrimitive : public ndContainersFreeListAlloc<ndRenderPrimitive>
 {

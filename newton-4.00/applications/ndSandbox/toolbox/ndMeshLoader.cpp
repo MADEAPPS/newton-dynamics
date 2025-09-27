@@ -121,7 +121,7 @@ bool ndMeshLoader::LoadEntity(ndRender* const renderer, const ndString& fbxPathM
 			for (ndInt32 j = 0; j < materials.GetCount(); ++j)
 			{
 				const ndString texturePathName(path + materials[j].m_textureName);
-				ndRenderPrimitiveMeshMaterial& material = descriptor.AddMaterial(renderer->GetTextureCache()->GetTexture(texturePathName));
+				ndRenderPrimitiveMaterial& material = descriptor.AddMaterial(renderer->GetTextureCache()->GetTexture(texturePathName));
 				material.m_diffuse = materials[j].m_diffuse;
 				material.m_specular = materials[j].m_specular;
 				material.m_reflection = materials[j].m_specular;
