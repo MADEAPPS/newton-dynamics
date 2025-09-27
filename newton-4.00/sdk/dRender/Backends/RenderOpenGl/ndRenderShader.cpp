@@ -665,3 +665,23 @@ void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::Render(const ndRenderPrim
 	glUseProgram(0);
 }
 
+// *********************************************************************
+// 
+// *********************************************************************
+void ndRenderShaderOpaqueDiffusedShadowSkinColorBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
+{
+	SetParameters(shaderCache->m_diffuseShadowSkinEffect);
+	EndParameters();
+}
+
+void ndRenderShaderOpaqueDiffusedShadowSkinColorBlock::SetParameters(GLuint shader)
+{
+	ndRenderShaderOpaqueDiffusedShadowColorBlock::SetParameters(shader);
+	m_matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
+}
+
+void ndRenderShaderOpaqueDiffusedShadowSkinColorBlock::Render(const ndRenderPrimitiveMeshImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
+{
+	//ndAssert(0);
+}
+

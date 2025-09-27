@@ -49,6 +49,7 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(ndRenderPrimitive
 	m_opaqueDifusedColorShadowBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_generateIntanceShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_opaqueDifusedColorNoShadowBlock.GetShaderParameters(*m_context->m_shaderCache);
+	m_opaqueDifusedColorShadowSkinBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_opaqueDifusedColorNoShadowInstanceBlock.GetShaderParameters(*m_context->m_shaderCache);
 }
 
@@ -133,6 +134,7 @@ ndRenderPrimitiveMeshImplement::ndRenderPrimitiveMeshImplement(const ndRenderPri
 	m_opaqueDifusedColorShadowBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_generateIntanceShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_opaqueDifusedColorNoShadowBlock.GetShaderParameters(*m_context->m_shaderCache);
+	m_opaqueDifusedColorShadowSkinBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_opaqueDifusedColorNoShadowInstanceBlock.GetShaderParameters(*m_context->m_shaderCache);
 }
 
@@ -483,44 +485,42 @@ void ndRenderPrimitiveMeshImplement::BuildRenderSkinnedMeshFromMeshEffect(const 
 		indexCount += mesh.GetMaterialIndexCount(geometryHandle, handle);
 	}
 
-	struct ndTmpData
-	{
-		ndReal m_posit[3];
-		ndReal m_normal[3];
-		ndReal m_uv[2];
-		ndMeshEffect::ndVertexWeight m_weights;
-	};
-
-	ndArray<ndTmpData> tmp;
 	ndArray<ndInt32> indices;
 	ndArray<ndInt32> vertexIndex;
-	ndArray<glPositionNormalUV> points;
+	ndArray<glSkinVertex> points;
 
-	tmp.SetCount(vertexCount);
 	points.SetCount(vertexCount);
 	indices.SetCount(indexCount);
 	vertexIndex.SetCount(vertexCount);
 
 	mesh.GetVertexIndexChannel(&vertexIndex[0]);
-	mesh.GetVertexChannel(sizeof(ndTmpData), &tmp[0].m_posit[0]);
-	mesh.GetNormalChannel(sizeof(ndTmpData), &tmp[0].m_normal[0]);
-	mesh.GetUV0Channel(sizeof(ndTmpData), &tmp[0].m_uv[0]);
-	mesh.GetVertexWeightChannel(sizeof(ndTmpData), &tmp[0].m_weights);
+	mesh.GetVertexChannel(sizeof(glSkinVertex), &points[0].m_posit[0]);
+	mesh.GetNormalChannel(sizeof(glSkinVertex), &points[0].m_normal[0]);
+	mesh.GetUV0Channel(sizeof(glSkinVertex), &points[0].m_uv.m_u);
+	mesh.GetVertexWeightChannel(sizeof(glSkinVertex), (ndMeshEffect::ndVertexWeight*)&points[0].m_weighs[0]);
 
 	for (ndInt32 i = 0; i < vertexCount; ++i)
 	{
-		points[i].m_posit.m_x = GLfloat(tmp[i].m_posit[0]);
-		points[i].m_posit.m_y = GLfloat(tmp[i].m_posit[1]);
-		points[i].m_posit.m_z = GLfloat(tmp[i].m_posit[2]);
-		points[i].m_normal.m_x = GLfloat(tmp[i].m_normal[0]);
-		points[i].m_normal.m_y = GLfloat(tmp[i].m_normal[1]);
-		points[i].m_normal.m_z = GLfloat(tmp[i].m_normal[2]);
-		points[i].m_uv.m_u = GLfloat(tmp[i].m_uv[0]);
-		points[i].m_uv.m_v = GLfloat(tmp[i].m_uv[1]);
+		ndAssert(ND_VERTEX_WEIGHT_SIZE == 4);
+		ndInt32 boneIndexSet[4];
+		glVector4 weighs (points[i].m_weighs);
+		ndMemCpy(boneIndexSet, points[i].m_boneIndex, 4);
+		ndMemSet(points[i].m_boneIndex, ndInt32(0), 4);
 
-		//glPoint.m_weighs = glVector4();
-		//glPoint.m_boneIndex = glVector4();
-
+		for (ndInt32 j = 0; j < ND_VERTEX_WEIGHT_SIZE; ++j)
+		{
+			ndInt32 boneIndex = 0;
+			ndInt32 hashId = boneIndexSet[j];
+			if (hashId != -1)
+			{
+				ndTree<ndInt32, ndInt32>::ndNode* const entNode = boneHashIdMap.Find(hashId);
+				ndAssert(entNode);
+				boneIndex = entNode->GetInfo();
+				
+				points[i].m_boneIndex[j] = boneIndex;
+				points[i].m_weighs[j] = weighs[j];
+			}
+		}
 	}
 
 	ndInt32 segmentStart = 0;
@@ -566,17 +566,23 @@ void ndRenderPrimitiveMeshImplement::BuildRenderSkinnedMeshFromMeshEffect(const 
 
 	glGenBuffers(1, &m_vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(points.GetCount() * sizeof(glPositionNormalUV)), &points[0], GL_STATIC_DRAW);
-	m_vertexSize = sizeof(glPositionNormalUV);
+	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(points.GetCount() * sizeof(glSkinVertex)), &points[0], GL_STATIC_DRAW);
+	m_vertexSize = sizeof(glSkinVertex);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormalUV), (void*)OFFSETOF(glPositionNormalUV, m_posit));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glSkinVertex), (void*)OFFSETOF(glSkinVertex, m_posit));
 
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormalUV), (void*)OFFSETOF(glPositionNormalUV, m_normal));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glSkinVertex), (void*)OFFSETOF(glSkinVertex, m_normal));
 
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(glPositionNormalUV), (void*)OFFSETOF(glPositionNormalUV, m_uv));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(glSkinVertex), (void*)OFFSETOF(glSkinVertex, m_uv));
+
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glSkinVertex), (void*)OFFSETOF(glSkinVertex, m_weighs));
+
+	glEnableVertexAttribArray(4);
+	glVertexAttribPointer(4, 4, GL_INT, GL_FALSE, sizeof(glSkinVertex), (void*)OFFSETOF(glSkinVertex, m_boneIndex));
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
