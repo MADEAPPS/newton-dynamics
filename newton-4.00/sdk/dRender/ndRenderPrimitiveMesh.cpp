@@ -90,6 +90,12 @@ ndSharedPtr<ndRenderPrimitive> ndRenderPrimitiveMesh::CreateMeshPrimitive(const 
 	return ndSharedPtr<ndRenderPrimitive>(primitive);
 }
 
+bool ndRenderPrimitiveMesh::IsSKinnedMesh() const
+{
+	//return m_implement->m_skinSceneNode ? true : false;
+	return m_implement->IsSKinnedMesh();
+}
+
 void ndRenderPrimitiveMesh::Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderPassMode) const
 {
 	m_implement->Render(render, modelViewMatrix, renderPassMode);

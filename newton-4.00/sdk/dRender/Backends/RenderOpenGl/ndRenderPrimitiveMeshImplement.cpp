@@ -165,6 +165,11 @@ ndRenderPrimitiveMeshImplement::~ndRenderPrimitiveMeshImplement()
 	}
 }
 
+bool ndRenderPrimitiveMeshImplement::IsSKinnedMesh() const
+{
+	return m_skinSceneNode ? true : false;
+}
+
 ndRenderPrimitiveMeshImplement* ndRenderPrimitiveMeshImplement::Clone(ndRenderPrimitiveMesh* const owner) const
 {
 	ndRenderPrimitiveMeshImplement* const mesh = new ndRenderPrimitiveMeshImplement(*this);

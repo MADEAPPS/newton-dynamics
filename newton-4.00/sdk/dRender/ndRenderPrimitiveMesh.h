@@ -123,6 +123,7 @@ class ndRenderPrimitiveMesh : public ndRenderPrimitive
 	ndRenderPrimitiveMesh(const ndRenderPrimitiveMesh& src);
 	virtual ~ndRenderPrimitiveMesh();
 
+	bool IsSKinnedMesh() const override;
 	virtual ndRenderPrimitive* Clone() override;
 	virtual void Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderPassMode) const override;
 

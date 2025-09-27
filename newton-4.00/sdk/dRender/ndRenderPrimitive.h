@@ -36,6 +36,7 @@ class ndRenderPrimitive : public ndContainersFreeListAlloc<ndRenderPrimitive>
 	ndRenderPrimitive(const ndRenderPrimitive& src);
 	virtual ~ndRenderPrimitive();
 
+	virtual bool IsSKinnedMesh() const = 0;
 	virtual ndRenderPrimitive* Clone() = 0;
 	virtual void Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderPassMode) const = 0;
 };

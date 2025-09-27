@@ -190,6 +190,7 @@ void ndRender::InterpolateTransforms(ndFloat32 param)
 void ndRender::UpdateGlobalMatrices() const
 {
 	ndList<ndRenderSceneNode*, ndContainersFreeListAlloc<ndRenderSceneNode*>> stackList;
+	ndList<ndRenderSceneNode*, ndContainersFreeListAlloc<ndRenderSceneNode*>> skinnedNodes;
 	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* rootSceneNode = m_scene.GetFirst(); rootSceneNode; rootSceneNode = rootSceneNode->GetNext())
 	{
 		stackList.RemoveAll();
@@ -204,6 +205,12 @@ void ndRender::UpdateGlobalMatrices() const
 		while (stackList.GetCount())
 		{
 			ndRenderSceneNode* const sceneNode = stackList.GetLast()->GetInfo();
+
+			if (*sceneNode->m_primitive && sceneNode->m_primitive->IsSKinnedMesh())
+			{
+				skinnedNodes.Append(sceneNode);
+			}
+
 			stackList.Remove(stackList.GetLast());
 			sceneNode->m_globalMatrix = sceneNode->m_matrix * sceneNode->m_parent->m_globalMatrix;
 			for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* childSceneNode = sceneNode->m_children.GetFirst(); childSceneNode; childSceneNode = childSceneNode->GetNext())
@@ -211,6 +218,12 @@ void ndRender::UpdateGlobalMatrices() const
 				ndRenderSceneNode* const child = *childSceneNode->GetInfo();
 				stackList.Append(child);
 			}
+		}
+
+		for (ndList<ndRenderSceneNode*, ndContainersFreeListAlloc<ndRenderSceneNode*>>::ndNode* node = skinnedNodes.GetFirst();	node; node = node->GetNext())
+		{
+			ndAssert(0);
+			ndRenderSceneNode* const skinnedNode = node->GetInfo();
 		}
 	}
 }

@@ -33,6 +33,7 @@ class ndRenderPrimitiveMeshImplement : public ndContainersFreeListAlloc<ndRender
 	void BuildFromMesh(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
 	void BuildFromCollisionShape(const ndRenderPrimitiveMesh::ndDescriptor& descriptor);
 
+	bool IsSKinnedMesh() const;
 	void Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderMode) const;
 	
 	private:
