@@ -195,6 +195,7 @@ void ndRender::UpdateGlobalMatrices() const
 	{
 		stackList.RemoveAll();
 		ndRenderSceneNode* const rootNode = *rootSceneNode->GetInfo();
+
 		rootNode->m_globalMatrix = rootNode->m_matrix;
 		for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* childSceneNode = rootNode->m_children.GetFirst(); childSceneNode; childSceneNode = childSceneNode->GetNext())
 		{
@@ -202,6 +203,13 @@ void ndRender::UpdateGlobalMatrices() const
 			stackList.Append(child);
 		}
 
+		// add root primitive to the skinning list
+		if (*rootNode->m_primitive && rootNode->m_primitive->IsSKinnedMesh())
+		{
+			skinnedNodes.Append(rootNode);
+		}
+
+		// add all children primitive the skinning list
 		while (stackList.GetCount())
 		{
 			ndRenderSceneNode* const sceneNode = stackList.GetLast()->GetInfo();

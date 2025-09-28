@@ -742,9 +742,9 @@ void ndRenderShaderOpaqueDiffusedShadowSkinColorBlock::Render(const ndRenderPrim
 	glUniform3fv(m_directionalLightAmbient, 1, &glSunlightAmbient[0]);
 	glUniform3fv(m_directionalLightIntesity, 1, &glSunlightIntensity[0]);
 
-	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &glProjectionMatrix[0][0]);
-	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &glViewModelMatrix[0][0]);
 	glUniformMatrix4fv(m_matrixPalette, count, GL_FALSE, &glMatrixPallete[0][0][0]);
+	glUniformMatrix4fv(m_projectMatrixLocation, 1, GL_FALSE, &glProjectionMatrix[0][0]);
+	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, GL_FALSE, &glViewModelMatrix[0][0]);
 
 	ndRenderPassShadowsImplement* const shadowPass = render->m_cachedShadowPass;
 	ndAssert(shadowPass);

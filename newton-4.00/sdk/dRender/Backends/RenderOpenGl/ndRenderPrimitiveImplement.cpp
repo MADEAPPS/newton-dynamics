@@ -218,11 +218,12 @@ void ndRenderPrimitiveImplement::UpdateSkinPalleteMatrix()
 	}
 
 	m_genericMatricArray.SetCount(0);
-	ndMatrix shapeBindMatrix((m_skinSceneNode->m_primitiveMatrix * m_skinSceneNode->m_matrix).OrthoInverse());
+	ndMatrix shapeBindMatrix((m_skinSceneNode->m_primitiveMatrix * m_skinSceneNode->m_globalMatrix).OrthoInverse());
 	for (ndInt32 i = 0; i < ndInt32(m_skeleton.GetCount()); ++i)
 	{
 		const ndRenderSceneNode* const bone = m_skeleton[i];
-		m_genericMatricArray.PushBack(glMatrix(m_bindingSkinMatrixArray[i] * bone->m_globalMatrix * shapeBindMatrix));
+		const ndMatrix palleteMatrix(m_bindingSkinMatrixArray[i] * bone->m_globalMatrix * shapeBindMatrix);
+		m_genericMatricArray.PushBack(glMatrix(palleteMatrix));
 	}
 }
 
@@ -548,44 +549,25 @@ void ndRenderPrimitiveImplement::BuildRenderSkinnedMeshFromMeshEffect(const ndRe
 		{
 			if (points[i].m_boneIndex[j] != -1)
 			{
-				if (!boneToIndexMap.Find(points[i].m_boneIndex[j]))
+				ndTree<ndInt32, ndInt32>::ndNode* vertexMapNode = boneToIndexMap.Find(points[i].m_boneIndex[j]);
+				if (!vertexMapNode)
 				{
 					ndTree<ndRenderSceneNode*, ndInt32>::ndNode* const boneNode = boneHashIdMap.Find(points[i].m_boneIndex[j]);
 					ndAssert(boneNode);
-					ndRenderSceneNode* const entity = boneNode->GetInfo();
-					boneToIndexMap.Insert(ndInt32(m_skeleton.GetCount()), points[i].m_boneIndex[j]);
-					m_skeleton.PushBack(entity);
+					vertexMapNode = boneToIndexMap.Insert(ndInt32(m_skeleton.GetCount()), points[i].m_boneIndex[j]);
 
+					ndRenderSceneNode* const entity = boneNode->GetInfo();
+					m_skeleton.PushBack(entity);
 					//const ndMatrix boneMatrix(entity->GetTransform().GetMatrix() * parentMatrix.Pop());
 					const ndMatrix boneMatrix(entity->CalculateGlobalTransform());
 					const ndMatrix palleteMatrix(shapeBindMatrix * boneMatrix.OrthoInverse());
 					m_bindingSkinMatrixArray.PushBack(palleteMatrix);
 				}
+				points[i].m_boneIndex[j] = vertexMapNode->GetInfo();
 			}
-		}
-	}
-
-	// map all vetex weight to that ordinal bone id.
-	for (ndInt32 i = 0; i < vertexCount; ++i)
-	{
-		ndAssert(ND_VERTEX_WEIGHT_SIZE == 4);
-		ndInt32 boneIndexSet[4];
-		glVector4 weighs (points[i].m_weighs);
-		ndMemCpy(boneIndexSet, points[i].m_boneIndex, 4);
-		ndMemSet(points[i].m_boneIndex, ndInt32(0), 4);
-
-		for (ndInt32 j = 0; j < ND_VERTEX_WEIGHT_SIZE; ++j)
-		{
-			ndInt32 boneIndex = 0;
-			ndInt32 hashId = boneIndexSet[j];
-			if (hashId != -1)
+			else
 			{
-				ndTree<ndInt32, ndInt32>::ndNode* const entNode = boneToIndexMap.Find(hashId);
-				ndAssert(entNode);
-				boneIndex = entNode->GetInfo();
-
-				points[i].m_weighs[j] = weighs[j];
-				points[i].m_boneIndex[j] = boneIndex;
+				points[i].m_boneIndex[j] = 0;
 			}
 		}
 	}
@@ -626,7 +608,7 @@ void ndRenderPrimitiveImplement::BuildRenderSkinnedMeshFromMeshEffect(const ndRe
 
 	glGenBuffers(1, &m_instanceRenderMatrixPalleteBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_instanceRenderMatrixPalleteBuffer);
-	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(descriptor.m_numberOfInstances * sizeof(glMatrix)), &m_bindingSkinMatrixArray[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(m_bindingSkinMatrixArray.GetCount() * sizeof(glMatrix)), &m_bindingSkinMatrixArray[0], GL_STATIC_DRAW);
 
 	glGenBuffers(1, &m_indexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);

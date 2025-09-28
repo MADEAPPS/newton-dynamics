@@ -240,10 +240,11 @@ R""""(
 
 	void main()
 	{
-		vec4 weightedNormal = vec4 (0.0f, 0.0f, 0.0f, 0.0f);	
-		vec4 weightedVertex = vec4 (0.0f, 0.0f, 0.0f, 1.0f);	
 		vec4 pointNormal = vec4(in_normal, 0.0f);
 		vec4 pointVertex = vec4(in_position, 1.0f);
+
+		vec4 weightedNormal = vec4 (0.0f, 0.0f, 0.0f, 0.0f);	
+		vec4 weightedVertex = vec4 (0.0f, 0.0f, 0.0f, 1.0f);	
 		for (int i = 0; i < 4; i++) 
 		{
 			int matrixIndex = in_boneIndices[i];
