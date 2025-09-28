@@ -720,6 +720,85 @@ void ndRenderShaderOpaqueDiffusedShadowSkinColorBlock::SetParameters(GLuint shad
 
 void ndRenderShaderOpaqueDiffusedShadowSkinColorBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	//ndTrace(("render skin color\n"));
+	const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
+
+	const ndMatrix viewMatrix(camera->m_invViewMatrix);
+	const ndMatrix modelViewMatrix(modelMatrix * viewMatrix);
+
+	const glMatrix worldMatrix(modelMatrix);
+	const glMatrix glViewModelMatrix(modelViewMatrix);
+	const glMatrix glProjectionMatrix(camera->m_projectionMatrix);
+
+	const glVector4 glSunlightAmbient(render->m_sunLightAmbient);
+	const glVector4 glSunlightIntensity(render->m_sunLightIntesity);
+	const glVector4 glSunlightDir(viewMatrix.RotateVector(render->m_sunLightDir));
+
+	const glMatrix* const glMatrixPallete = &self->m_genericMatricArray[0];
+
+	ndInt32 count = ndInt32 (self->m_genericMatricArray.GetCount());
+	glUseProgram(m_shader);
+
+	glUniform3fv(m_directionalLightDirection, 1, &glSunlightDir[0]);
+	glUniform3fv(m_directionalLightAmbient, 1, &glSunlightAmbient[0]);
+	glUniform3fv(m_directionalLightIntesity, 1, &glSunlightIntensity[0]);
+
+	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &glProjectionMatrix[0][0]);
+	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &glViewModelMatrix[0][0]);
+	glUniformMatrix4fv(m_matrixPalette, count, GL_FALSE, &glMatrixPallete[0][0][0]);
+
+	ndRenderPassShadowsImplement* const shadowPass = render->m_cachedShadowPass;
+	ndAssert(shadowPass);
+
+	glVector4 cameraSpaceSplits(shadowPass->m_cameraSpaceSplits);
+	glMatrix lightViewProjectMatrix[4];
+	for (ndInt32 i = 0; i < 4; ++i)
+	{
+		lightViewProjectMatrix[i] = shadowPass->m_lighProjectionMatrix[i];
+	}
+	glUniform1i(m_depthMapTexture, 1);
+	glUniformMatrix4fv(m_worldMatrix, 1, GL_FALSE, &worldMatrix[0][0]);
+	glUniformMatrix4fv(m_directionLightViewProjectionMatrixShadow, 4, GL_FALSE, &lightViewProjectMatrix[0][0][0]);
+	glUniform4fv(m_shadowSlices, 1, &cameraSpaceSplits[0]);
+
+	ndRenderPassEnvironment* const environment = render->m_cachedEnvironmentPass;
+	ndAssert(environment);
+	ndRenderTextureImage* const environmentTexture = (ndRenderTextureImage*)*environment->m_cubeMap;
+
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, environmentTexture->m_texture);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, shadowPass->m_shadowMapTexture);
+
+	glBindVertexArray(self->m_vertextArrayBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
+
+	glActiveTexture(GL_TEXTURE0);
+	for (ndList<ndRenderPrimitiveSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
+	{
+		ndRenderPrimitiveSegment& segment = node->GetInfo();
+		if (segment.m_material.m_opacity > ndFloat32(0.99f))
+		{
+			const ndRenderPrimitiveMaterial* const material = &segment.m_material;
+			const ndRenderTextureImageCommon* const image = (ndRenderTextureImageCommon*)*material->m_texture;
+			ndAssert(image);
+
+			const glVector4 diffuse(material->m_diffuse);
+			const glVector4 specular(material->m_specular);
+			const glVector4 reflection(material->m_reflection);
+
+			glUniform3fv(m_diffuseColor, 1, &diffuse[0]);
+			glUniform3fv(m_specularColor, 1, &specular[0]);
+			glUniform3fv(m_reflectionColor, 1, &reflection[0]);
+			glUniform1fv(m_specularAlpha, 1, &material->m_specularPower);
+
+			glBindTexture(GL_TEXTURE_2D, image->m_texture);
+			glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
+		}
+	}
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	glUseProgram(0);
 }
 

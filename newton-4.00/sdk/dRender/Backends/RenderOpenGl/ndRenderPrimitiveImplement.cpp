@@ -283,8 +283,8 @@ void ndRenderPrimitiveImplement::BuildFromMesh(const ndRenderPrimitive::ndDescri
 		{
 			if (descriptor.m_meshNode->GetVertexWeights().GetCount())
 			{
-				//BuildRenderSkinnedMeshFromMeshEffect(descriptor);
-				BuildRenderSimpleMeshFromMeshEffect(descriptor);
+				BuildRenderSkinnedMeshFromMeshEffect(descriptor);
+				//BuildRenderSimpleMeshFromMeshEffect(descriptor);
 			}
 			else
 			{
