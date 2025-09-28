@@ -143,7 +143,8 @@ void ndRenderShaderGenerateSkinShadowMapBlock::SetParameters(GLuint shader)
 
 void ndRenderShaderGenerateSkinShadowMapBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const, const ndMatrix& modelMatrix) const
 {
-	ndAssert(0);
+	//ndTrace(("render skin wip\n"));
+	//ndAssert(0);
 	//glUseProgram(m_shader);
 	//
 	//const glMatrix matrix(modelMatrix);
@@ -719,6 +720,6 @@ void ndRenderShaderOpaqueDiffusedShadowSkinColorBlock::SetParameters(GLuint shad
 
 void ndRenderShaderOpaqueDiffusedShadowSkinColorBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	ndAssert(0);
+	//ndTrace(("render skin color\n"));
 }
 
