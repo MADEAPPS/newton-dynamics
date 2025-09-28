@@ -114,8 +114,8 @@ class ndRenderContext: public ndClassAlloc
 	friend class ndRenderPassColor;
 	friend class ndRenderSceneCamera;
 	friend class ndRenderPassTransparency;
-	friend class ndRenderPassShadowsImplement;
 	friend class ndRenderPrimitiveImplement;
+	friend class ndRenderPassShadowsImplement;
 	friend class ndRenderPassEnvironmentImplement;
 };
 
