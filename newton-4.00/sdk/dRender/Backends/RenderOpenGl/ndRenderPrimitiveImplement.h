@@ -25,10 +25,11 @@ class ndRenderPrimitiveImplement : public ndContainersFreeListAlloc<ndRenderPrim
 {
 	public:
 	ndRenderPrimitiveImplement(const ndRenderPrimitiveImplement& src);
+	ndRenderPrimitiveImplement(const ndRenderPrimitiveImplement& src, const ndRenderSceneNode* const srcSkeleton);
 	ndRenderPrimitiveImplement(ndRenderPrimitive* const owner, const ndRenderPrimitive::ndDescriptor& descriptor);
 	~ndRenderPrimitiveImplement();
 
-	ndRenderPrimitiveImplement* Clone(ndRenderPrimitive* const owner) const;
+	ndRenderPrimitiveImplement* Clone(ndRenderPrimitive* const owner, const ndRenderSceneNode* const skeletonOwner) const;
 
 	void BuildFromMesh(const ndRenderPrimitive::ndDescriptor& descriptor);
 	void BuildFromCollisionShape(const ndRenderPrimitive::ndDescriptor& descriptor);
@@ -59,6 +60,7 @@ class ndRenderPrimitiveImplement : public ndContainersFreeListAlloc<ndRenderPrim
 
 	ndRenderPrimitive* m_owner;
 	const ndRenderContext* m_context;
+	ndRenderSceneNode* m_skinSceneNode;
 	ndArray<ndRenderSceneNode*> m_skeleton;
 	ndArray<glMatrix> m_genericMatricArray;
 	ndArray<ndMatrix> m_bindingSkinMatrixArray;
@@ -72,14 +74,15 @@ class ndRenderPrimitiveImplement : public ndContainersFreeListAlloc<ndRenderPrim
 	GLuint m_vertextArrayBuffer;
 	GLuint m_instanceRenderMatrixPalleteBuffer;
 	
+	ndRenderShaderOpaqueDiffusedColorBlock m_opaqueDifusedColorNoShadowBlock;
+	ndRenderShaderOpaqueDiffusedShadowColorBlock m_opaqueDiffusedColorShadowBlock;
+	ndRenderShaderTransparentDiffusedShadowColorBlock m_transparencyDiffusedBlock;
+	ndRenderShaderOpaqueDiffusedShadowSkinColorBlock m_opaqueDiffusedColorShadowSkinBlock;
+	ndRenderShaderInstancedOpaqueDiffusedShadowBlock m_opaqueDifusedColorNoShadowInstanceBlock;
+
 	ndRenderShaderGenerateShadowMapBlock m_generateShadowMapsBlock;
 	ndRenderShaderGenerateSkinShadowMapBlock m_generateSkinShadowMapsBlock;
-	ndRenderShaderOpaqueDiffusedColorBlock m_opaqueDifusedColorNoShadowBlock;
-	ndRenderShaderOpaqueDiffusedShadowColorBlock m_opaqueDifusedColorShadowBlock;
-	ndRenderShaderTransparentDiffusedShadowColorBlock m_transparencyDiffusedBlock;
 	ndRenderShaderGenerateInstanceShadowMapBlock m_generateIntanceShadowMapsBlock;
-	ndRenderShaderOpaqueDiffusedShadowSkinColorBlock m_opaqueDifusedColorShadowSkinBlock;
-	ndRenderShaderInstancedOpaqueDiffusedShadowBlock m_opaqueDifusedColorNoShadowInstanceBlock;
 
 	ndRenderShaderSetZbufferCleanBlock m_setZbufferBlock;
 	ndRenderShaderDebugWireframeDiffuseBlock m_debugWireframeColorBlock;

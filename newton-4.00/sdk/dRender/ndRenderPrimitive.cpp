@@ -105,12 +105,18 @@ ndRenderPrimitive::ndRenderPrimitive(const ndDescriptor& descriptor)
 	m_implement = ndSharedPtr<ndRenderPrimitiveImplement>(new ndRenderPrimitiveImplement(this, descriptor));
 }
 
-ndRenderPrimitive::ndRenderPrimitive(const ndRenderPrimitive& src)
+ndRenderPrimitive::ndRenderPrimitive(const ndRenderPrimitive&)
+	:m_implement(nullptr)
+{
+	ndAssert(0);
+}
+
+ndRenderPrimitive::ndRenderPrimitive(const ndRenderPrimitive& src, const ndRenderSceneNode* const skeleton)
 	:ndContainersFreeListAlloc<ndRenderPrimitive>()
 	,m_implement(nullptr)
 {
-	m_implement = ndSharedPtr<ndRenderPrimitiveImplement>(src.m_implement->Clone(this));
-	
+	m_implement = ndSharedPtr<ndRenderPrimitiveImplement>(src.m_implement->Clone(this, skeleton));
+
 	for (ndList<ndRenderPrimitiveSegment>::ndNode* node = src.m_segments.GetFirst(); node; node = node->GetNext())
 	{
 		ndRenderPrimitiveSegment& segment = node->GetInfo();

@@ -35,6 +35,7 @@ class ndTransform
 class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 {
 	public:
+
 	ndRenderSceneNode(const ndMatrix& matrix);
 	ndRenderSceneNode(const ndRenderSceneNode& src);
 	virtual ~ndRenderSceneNode();
@@ -82,7 +83,6 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 
 	virtual void Render(const ndRender* const owner, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const;
 
-	public:
 	ndMatrix m_matrix;			// interpolated local matrix
 	ndMatrix m_globalMatrix;	// world space matrix calculated each frame for rendering
 	ndMatrix m_primitiveMatrix;
@@ -91,6 +91,9 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 	ndString m_name;
 
 	protected:
+	virtual ndRenderSceneNode* CloneSkeleton() const;
+	void ClonePrimitives(const ndRenderSceneNode& src);
+	
 	ndRender* m_owner;
 	ndRenderSceneNode* m_parent;
 	ndSharedPtr<ndRenderPrimitive> m_primitive;

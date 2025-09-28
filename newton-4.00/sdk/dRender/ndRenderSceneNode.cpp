@@ -73,17 +73,10 @@ ndRenderSceneNode::ndRenderSceneNode(const ndRenderSceneNode& src)
 	,m_sceneHandle(nullptr)
 	,m_isVisible(true)
 {
-	if (*src.m_primitive)
-	{
-		//m_primitive = ndSharedPtr<ndRenderPrimitive>(src.m_primitive->Clone());
-		//m_primitive = src.m_primitive;
-		m_primitive = ndSharedPtr<ndRenderPrimitive>(new ndRenderPrimitive(**src.m_primitive));
-	}
-
 	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = src.m_children.GetFirst(); node; node = node->GetNext())
 	{
 		ndRenderSceneNode* const childNode = *node->GetInfo();
-		AddChild(childNode->Clone());
+		AddChild(childNode->CloneSkeleton());
 	}
 }
 
@@ -91,7 +84,28 @@ ndRenderSceneNode::~ndRenderSceneNode()
 {
 }
 
+void ndRenderSceneNode::ClonePrimitives(const ndRenderSceneNode& src)
+{
+	const ndRenderSceneNode* srcEntity = src.IteratorFirst();
+	for (ndRenderSceneNode* entity = IteratorFirst(); entity; entity = entity->IteratorNext())
+	{
+		ndAssert(entity->m_name == srcEntity->m_name);
+		if (*srcEntity->m_primitive)
+		{
+			entity->m_primitive = ndSharedPtr<ndRenderPrimitive>(new ndRenderPrimitive(**srcEntity->m_primitive, entity));
+		}
+		srcEntity = srcEntity->IteratorNext();
+	}
+}
+
 ndRenderSceneNode* ndRenderSceneNode::Clone() const
+{
+	ndRenderSceneNode* const rootNode = new ndRenderSceneNode(*this);
+	rootNode->ClonePrimitives(*this);
+	return rootNode;
+}
+
+ndRenderSceneNode* ndRenderSceneNode::CloneSkeleton() const
 {
 	return new ndRenderSceneNode(*this);
 }

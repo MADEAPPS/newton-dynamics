@@ -16,8 +16,8 @@
 class ndRender;
 class ndRenderTexture;
 class ndRenderSceneNode;
-class ndRenderPassShadowsImplement;
 class ndRenderPrimitiveImplement;
+class ndRenderPassShadowsImplement;
 
 enum ndRenderPassMode
 {
@@ -103,6 +103,7 @@ class ndRenderPrimitive : public ndContainersFreeListAlloc<ndRenderPrimitive>
 	ndRenderPrimitive();
 	ndRenderPrimitive(const ndRenderPrimitive& src);
 	ndRenderPrimitive(const ndDescriptor& descriptor);
+	ndRenderPrimitive(const ndRenderPrimitive& src, const ndRenderSceneNode* const skeleton);
 	virtual ~ndRenderPrimitive();
 
 	bool IsSKinnedMesh() const;
