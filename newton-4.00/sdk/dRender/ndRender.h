@@ -112,8 +112,8 @@ class ndRender: public ndClassAlloc
 	friend class ndRenderTextureCache;
 	friend class ndRenderPassEnvironment;
 	friend class ndRenderPassTransparency;
-	friend class ndRenderPassShadowsImplement;
 	friend class ndRenderPrimitiveImplement;
+	friend class ndRenderPassShadowsImplement;
 
 	friend class ndRenderShaderOpaqueDiffusedColorBlock;
 	friend class ndRenderShaderDebugWireframeDiffuseBlock;
