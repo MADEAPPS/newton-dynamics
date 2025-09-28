@@ -124,8 +124,12 @@ ndRenderPrimitive::~ndRenderPrimitive()
 
 bool ndRenderPrimitive::IsSKinnedMesh() const
 {
-	//return m_implement->m_skinSceneNode ? true : false;
 	return m_implement->IsSKinnedMesh();
+}
+
+void ndRenderPrimitive::UpdateSkinPalleteMatrix()
+{
+	m_implement->UpdateSkinPalleteMatrix();
 }
 
 void ndRenderPrimitive::Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderPassMode) const

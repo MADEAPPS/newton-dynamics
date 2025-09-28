@@ -22,11 +22,12 @@
 #include "ndRenderPrimitiveImplement.h"
 #include "ndRenderPassShadowsImplement.h"
 
+#define ND_MAX_SKINNED_BONES	128
+
 ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(ndRenderPrimitive* const owner, const ndRenderPrimitive::ndDescriptor& descriptor)
 	:ndContainersFreeListAlloc<ndRenderPrimitiveImplement>()
 	,m_owner(owner)
 	,m_context(*descriptor.m_render->m_context)
-	,m_skinSceneNode(nullptr)
 	,m_indexCount(0)
 	,m_vertexCount(0)
 	,m_vertexSize(0)
@@ -44,22 +45,13 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(ndRenderPrimitive* const 
 		ndAssert(*descriptor.m_meshNode);
 		BuildFromMesh(descriptor);
 	}
-
-	m_generateShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
-	m_transparencyDiffusedBlock.GetShaderParameters(*m_context->m_shaderCache);
-	m_generateSkinShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
-	m_opaqueDifusedColorShadowBlock.GetShaderParameters(*m_context->m_shaderCache);
-	m_generateIntanceShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
-	m_opaqueDifusedColorNoShadowBlock.GetShaderParameters(*m_context->m_shaderCache);
-	m_opaqueDifusedColorShadowSkinBlock.GetShaderParameters(*m_context->m_shaderCache);
-	m_opaqueDifusedColorNoShadowInstanceBlock.GetShaderParameters(*m_context->m_shaderCache);
+	InitShaderBlocks();
 }
 
 ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(const ndRenderPrimitiveImplement& src)
 	:ndContainersFreeListAlloc<ndRenderPrimitiveImplement>()
 	,m_owner(nullptr)
 	,m_context(src.m_context)
-	,m_skinSceneNode(nullptr)
 	,m_indexCount(src.m_indexCount)
 	,m_vertexCount(src.m_vertexCount)
 	,m_vertexSize(src.m_vertexSize)
@@ -131,15 +123,7 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(const ndRenderPrimitiveIm
 		}
 		glBindVertexArray(0);
 	}
-
-	m_generateShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
-	m_transparencyDiffusedBlock.GetShaderParameters(*m_context->m_shaderCache);
-	m_generateSkinShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
-	m_opaqueDifusedColorShadowBlock.GetShaderParameters(*m_context->m_shaderCache);
-	m_generateIntanceShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
-	m_opaqueDifusedColorNoShadowBlock.GetShaderParameters(*m_context->m_shaderCache);
-	m_opaqueDifusedColorShadowSkinBlock.GetShaderParameters(*m_context->m_shaderCache);
-	m_opaqueDifusedColorNoShadowInstanceBlock.GetShaderParameters(*m_context->m_shaderCache);
+	InitShaderBlocks();
 }
 
 ndRenderPrimitiveImplement::~ndRenderPrimitiveImplement()
@@ -165,9 +149,50 @@ ndRenderPrimitiveImplement::~ndRenderPrimitiveImplement()
 	}
 }
 
+void ndRenderPrimitiveImplement::InitShaderBlocks()
+{
+	m_generateShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
+	m_transparencyDiffusedBlock.GetShaderParameters(*m_context->m_shaderCache);
+	m_generateSkinShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
+	m_opaqueDifusedColorShadowBlock.GetShaderParameters(*m_context->m_shaderCache);
+	m_generateIntanceShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
+	m_opaqueDifusedColorNoShadowBlock.GetShaderParameters(*m_context->m_shaderCache);
+	m_opaqueDifusedColorShadowSkinBlock.GetShaderParameters(*m_context->m_shaderCache);
+	m_opaqueDifusedColorNoShadowInstanceBlock.GetShaderParameters(*m_context->m_shaderCache);
+}
+
 bool ndRenderPrimitiveImplement::IsSKinnedMesh() const
 {
-	return m_skinSceneNode ? true : false;
+	return m_skeleton.GetCount() ? true : false;
+}
+
+void ndRenderPrimitiveImplement::UpdateSkinPalleteMatrix()
+{
+	if (!IsSKinnedMesh())
+	{
+		return;
+	}
+
+	ndAssert(0);
+	//ndFixSizeArray <ndRenderSceneNode*, ND_MAX_SKINNED_BONES> pool;
+	//ndAssert(m_skinSceneNode->GetParent());
+	//
+	//ndInt32 count = 0;
+	//pool.PushBack(m_skinSceneNode->GetRoot());
+	//
+	//m_genericMatricArray.SetCount(0);
+	//ndMatrix shapeBindMatrix((m_skinSceneNode->m_primitiveMatrix * m_skinSceneNode->m_matrix).OrthoInverse());
+	//while (pool.GetCount())
+	//{
+	//	ndRenderSceneNode* const entity = pool.Pop();
+	//	m_genericMatricArray.PushBack (glMatrix(m_bindingSkinMatrixArray[count] * entity->m_globalMatrix * shapeBindMatrix));
+	//	count++;
+	//	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = entity->GetChildren().GetFirst(); node; node = node->GetNext())
+	//	{
+	//		pool.PushBack(*node->GetInfo());
+	//	}
+	//}
+	//ndAssert(count == m_bindingSkinMatrixArray.GetCount());
 }
 
 ndRenderPrimitiveImplement* ndRenderPrimitiveImplement::Clone(ndRenderPrimitive* const owner) const
@@ -449,40 +474,55 @@ void ndRenderPrimitiveImplement::BuildRenderSkinnedMeshFromMeshEffect(const ndRe
 	ndAssert(*descriptor.m_skeleton);
 	ndAssert(descriptor.m_materials.GetCount());
 
-	ndFixSizeArray<ndRenderSceneNode*, 128> pool;
-	ndFixSizeArray<ndMatrix, 128> parentMatrix;
-	ndFixSizeArray<ndMatrix, 128> bindMatrixArray;
-	ndFixSizeArray<ndRenderSceneNode*, 128> entityArray;
-	m_skinSceneNode = descriptor.m_skeleton->GetRoot();
+	//ndFixSizeArray<ndMatrix, ND_MAX_SKINNED_BONES> parentMatrix;
+	//ndFixSizeArray<ndMatrix, ND_MAX_SKINNED_BONES> bindMatrixArray;
+	//ndFixSizeArray<ndRenderSceneNode*, ND_MAX_SKINNED_BONES> pool;
+	//ndFixSizeArray<ndRenderSceneNode*, ND_MAX_SKINNED_BONES> entityArray;
 
-	pool.PushBack(m_skinSceneNode);
-	parentMatrix.PushBack(ndGetIdentityMatrix());
-	ndMatrix shapeBindMatrix(descriptor.m_skeleton->m_primitiveMatrix * descriptor.m_skeleton->CalculateGlobalTransform());
-	
-	ndTree<ndInt32, ndInt32> boneHashIdMap;
-	while (pool.GetCount())
-	{
-		ndRenderSceneNode* const entity = pool.Pop();
-		ndInt32 hash = ndInt32(ndCRC64(entity->m_name.GetStr()) & 0xffffffff);
-		boneHashIdMap.Insert(ndInt32(entityArray.GetCount()), hash);
-	
-		const ndMatrix boneMatrix(entity->GetTransform().GetMatrix() * parentMatrix.Pop());
-		const ndMatrix palleteMatrix(shapeBindMatrix * boneMatrix.OrthoInverse());
-		entityArray.PushBack(entity);
-		bindMatrixArray.PushBack(palleteMatrix);
-	
-		for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = entity->GetChildren().GetFirst(); node; node = node->GetNext())
-		{
-			pool.PushBack(*node->GetInfo());
-			parentMatrix.PushBack(boneMatrix);
-		}
-	}
+	//m_bindingSkinMatrixArray.SetCount(0);
+	//while (pool.GetCount())
+	//{
+	//	ndRenderSceneNode* const entity = pool.Pop();
+	//	ndInt32 hash = ndInt32(ndCRC64(entity->m_name.GetStr()) & 0xffffffff);
+	//	//boneHashIdMap.Insert(ndInt32(entityArray.GetCount()), hash);
+	//	//
+	//	//const ndMatrix boneMatrix(entity->GetTransform().GetMatrix() * parentMatrix.Pop());
+	//	//const ndMatrix palleteMatrix(shapeBindMatrix * boneMatrix.OrthoInverse());
+	//	//entityArray.PushBack(entity);
+	//	//m_bindingSkinMatrixArray.PushBack(palleteMatrix);
+	//	//
+	//	//for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = entity->GetChildren().GetFirst(); node; node = node->GetNext())
+	//	//{
+	//	//	pool.PushBack(*node->GetInfo());
+	//	//	parentMatrix.PushBack(boneMatrix);
+	//	//}
+	//}
 
-	m_genericMatricArray.SetCount(0);
-	for (ndInt32 i = 0; i < entityArray.GetCount(); ++i)
-	{
-		m_genericMatricArray.PushBack(glMatrix(bindMatrixArray[i]));
-	}
+	//m_skinSceneNode = (ndRenderSceneNode*)*descriptor.m_skeleton;
+	//pool.PushBack(m_skinSceneNode->GetRoot());
+	//parentMatrix.PushBack(ndGetIdentityMatrix());
+	//ndMatrix shapeBindMatrix(descriptor.m_skeleton->m_primitiveMatrix * descriptor.m_skeleton->CalculateGlobalTransform());
+
+
+	//ndTree<ndInt32, ndInt32> boneHashIdMap;
+	//m_bindingSkinMatrixArray.SetCount(0);
+	//while (pool.GetCount())
+	//{
+	//	ndRenderSceneNode* const entity = pool.Pop();
+	//	ndInt32 hash = ndInt32(ndCRC64(entity->m_name.GetStr()) & 0xffffffff);
+	//	boneHashIdMap.Insert(ndInt32(entityArray.GetCount()), hash);
+	//
+	//	const ndMatrix boneMatrix(entity->GetTransform().GetMatrix() * parentMatrix.Pop());
+	//	const ndMatrix palleteMatrix(shapeBindMatrix * boneMatrix.OrthoInverse());
+	//	entityArray.PushBack(entity);
+	//	m_bindingSkinMatrixArray.PushBack(palleteMatrix);
+	//
+	//	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = entity->GetChildren().GetFirst(); node; node = node->GetNext())
+	//	{
+	//		pool.PushBack(*node->GetInfo());
+	//		parentMatrix.PushBack(boneMatrix);
+	//	}
+	//}
 
 	// extract vertex data  from the newton mesh
 	ndInt32 indexCount = 0;
@@ -507,6 +547,41 @@ void ndRenderPrimitiveImplement::BuildRenderSkinnedMeshFromMeshEffect(const ndRe
 	mesh.GetUV0Channel(sizeof(glSkinVertex), &points[0].m_uv.m_u);
 	mesh.GetVertexWeightChannel(sizeof(glSkinVertex), (ndMeshEffect::ndVertexWeight*)&points[0].m_weighs[0]);
 
+	// encode all bone by theier hash name
+	ndTree<ndRenderSceneNode*, ndInt32> boneHashIdMap;
+	ndRenderSceneNode* const root = descriptor.m_skeleton->GetRoot();
+	for (ndRenderSceneNode* entity = root->IteratorFirst(); entity; entity = entity->IteratorNext())
+	{
+		ndInt32 hash = ndInt32(ndCRC64(entity->m_name.GetStr()) & 0xffffffff);
+		boneHashIdMap.Insert(entity, hash);
+	}
+	// build a mapping for bone to index for all bone active in the vertex weigh
+	ndTree<ndInt32, ndInt32> boneToIndexMap;
+	ndMatrix shapeBindMatrix(descriptor.m_skeleton->m_primitiveMatrix * descriptor.m_skeleton->CalculateGlobalTransform());
+	for (ndInt32 i = 0; i < vertexCount; ++i)
+	{
+		for (ndInt32 j = 0; j < ND_VERTEX_WEIGHT_SIZE; ++j)
+		{
+			if (points[i].m_boneIndex[j] != -1)
+			{
+				if (!boneToIndexMap.Find(points[i].m_boneIndex[j]))
+				{
+					ndTree<ndRenderSceneNode*, ndInt32>::ndNode* const boneNode = boneHashIdMap.Find(points[i].m_boneIndex[j]);
+					ndAssert(boneNode);
+					ndRenderSceneNode* const entity = boneNode->GetInfo();
+					boneToIndexMap.Insert(ndInt32(m_skeleton.GetCount()), points[i].m_boneIndex[j]);
+					m_skeleton.PushBack(entity);
+
+					//const ndMatrix boneMatrix(entity->GetTransform().GetMatrix() * parentMatrix.Pop());
+					const ndMatrix boneMatrix(entity->CalculateGlobalTransform());
+					const ndMatrix palleteMatrix(shapeBindMatrix * boneMatrix.OrthoInverse());
+					m_bindingSkinMatrixArray.PushBack(palleteMatrix);
+				}
+			}
+		}
+	}
+
+	// map all vetex weight to that ordinal bone id.
 	for (ndInt32 i = 0; i < vertexCount; ++i)
 	{
 		ndAssert(ND_VERTEX_WEIGHT_SIZE == 4);
@@ -521,16 +596,17 @@ void ndRenderPrimitiveImplement::BuildRenderSkinnedMeshFromMeshEffect(const ndRe
 			ndInt32 hashId = boneIndexSet[j];
 			if (hashId != -1)
 			{
-				ndTree<ndInt32, ndInt32>::ndNode* const entNode = boneHashIdMap.Find(hashId);
+				ndTree<ndInt32, ndInt32>::ndNode* const entNode = boneToIndexMap.Find(hashId);
 				ndAssert(entNode);
 				boneIndex = entNode->GetInfo();
-				
-				points[i].m_boneIndex[j] = boneIndex;
+
 				points[i].m_weighs[j] = weighs[j];
+				points[i].m_boneIndex[j] = boneIndex;
 			}
 		}
 	}
 
+	// build the skin mesh 
 	ndInt32 segmentStart = 0;
 	for (ndInt32 handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
 	{
@@ -594,6 +670,7 @@ void ndRenderPrimitiveImplement::BuildRenderSkinnedMeshFromMeshEffect(const ndRe
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+
 }
 
 void ndRenderPrimitiveImplement::BuildDebugFlatShadedMesh(const ndRenderPrimitive::ndDescriptor& descriptor)
@@ -1081,7 +1158,7 @@ void ndRenderPrimitiveImplement::RenderGenerateShadowMaps(const ndRender* const 
 
 	if (castShadow)
 	{
-		if (m_skinSceneNode)
+		if (IsSKinnedMesh())
 		{
 			m_generateSkinShadowMapsBlock.Render(this, render, lightMatrix);
 		}

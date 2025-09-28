@@ -69,13 +69,15 @@ ndRenderSceneNode::ndRenderSceneNode(const ndRenderSceneNode& src)
 	,m_parent(nullptr)
 	,m_primitive(nullptr)
 	,m_children()
+	,m_childNode(nullptr)
 	,m_sceneHandle(nullptr)
 	,m_isVisible(true)
 {
 	if (*src.m_primitive)
 	{
 		//m_primitive = ndSharedPtr<ndRenderPrimitive>(src.m_primitive->Clone());
-		m_primitive = src.m_primitive;
+		//m_primitive = src.m_primitive;
+		m_primitive = ndSharedPtr<ndRenderPrimitive>(new ndRenderPrimitive(**src.m_primitive));
 	}
 
 	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = src.m_children.GetFirst(); node; node = node->GetNext())

@@ -222,8 +222,8 @@ void ndRender::UpdateGlobalMatrices() const
 
 		for (ndList<ndRenderSceneNode*, ndContainersFreeListAlloc<ndRenderSceneNode*>>::ndNode* node = skinnedNodes.GetFirst();	node; node = node->GetNext())
 		{
-			ndAssert(0);
-			//ndRenderSceneNode* const skinnedNode = node->GetInfo();
+			ndRenderSceneNode* const skinnedNode = node->GetInfo();
+			skinnedNode->GetPrimitive()->UpdateSkinPalleteMatrix();
 		}
 	}
 }

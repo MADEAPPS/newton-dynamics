@@ -34,9 +34,11 @@ class ndRenderPrimitiveImplement : public ndContainersFreeListAlloc<ndRenderPrim
 	void BuildFromCollisionShape(const ndRenderPrimitive::ndDescriptor& descriptor);
 
 	bool IsSKinnedMesh() const;
+	void UpdateSkinPalleteMatrix();
 	void Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderMode) const;
 	
 	private:
+	void InitShaderBlocks();
 	void BuildRenderMeshFromCollisionShape(const ndRenderPrimitive::ndDescriptor& descriptor);
 	void BuildRenderSimpleMeshFromMeshEffect(const ndRenderPrimitive::ndDescriptor& descriptor);
 	void BuildRenderSkinnedMeshFromMeshEffect(const ndRenderPrimitive::ndDescriptor& descriptor);
@@ -57,8 +59,9 @@ class ndRenderPrimitiveImplement : public ndContainersFreeListAlloc<ndRenderPrim
 
 	ndRenderPrimitive* m_owner;
 	const ndRenderContext* m_context;
-	ndRenderSceneNode* m_skinSceneNode;
+	ndArray<ndRenderSceneNode*> m_skeleton;
 	ndArray<glMatrix> m_genericMatricArray;
+	ndArray<ndMatrix> m_bindingSkinMatrixArray;
 
 	GLint m_indexCount;
 	GLint m_vertexCount;
