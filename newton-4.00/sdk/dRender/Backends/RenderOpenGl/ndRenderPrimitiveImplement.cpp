@@ -124,7 +124,6 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
 		ndAssert(srcData);
 		ndMemCpy(&vertexBuffer[0], srcData, sizeInReals);
 		glUnmapBuffer(GL_ARRAY_BUFFER);
-		//glSkinVertex* xxx = (glSkinVertex*)srcData;
 		
 		glGenBuffers(1, &m_vertexBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
@@ -1187,18 +1186,6 @@ void ndRenderPrimitiveImplement::RenderDirectionalDiffuseColorNoShadow(const ndR
 
 void ndRenderPrimitiveImplement::RenderDirectionalDiffuseColorShadow(const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	//bool castShadow = true;
-	//for (ndList<ndRenderPrimitiveSegment>::ndNode* node = m_segments.GetFirst(); node && castShadow; node = node->GetNext())
-	//{
-	//	ndRenderPrimitiveSegment& segment = node->GetInfo();
-	//	castShadow = castShadow && segment.m_material.m_castShadows;
-	//}
-	//
-	//if (!castShadow)
-	//{
-	//	return;
-	//}
-
 	if (IsSKinnedMesh())
 	{
 		m_opaqueDiffusedColorShadowSkinBlock.Render(this, render, modelMatrix);
