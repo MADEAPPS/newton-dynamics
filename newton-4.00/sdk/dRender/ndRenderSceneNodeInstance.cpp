@@ -63,6 +63,7 @@ void ndRenderSceneNodeInstance::ApplyPrimitiveTransforms()
 		ndRenderSceneNode* const child = *node->GetInfo();
 		matrixPalette.PushBack(glMatrix(primitiveMatrix * child->m_globalMatrix));
 	}
+	ndAssert(matrixPalette.GetCount() <= meshImplement->m_instanceCount);
 }
 
 void ndRenderSceneNodeInstance::Render(const ndRender* const owner, const ndMatrix& modelViewMatrix, ndRenderPassMode renderMode) const

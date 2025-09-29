@@ -755,6 +755,7 @@ void ndRenderShaderOpaqueDiffusedShadowSkinColorBlock::Render(const ndRenderPrim
 	glUniformMatrix4fv(m_worldMatrix, 1, GL_FALSE, &worldMatrix[0][0]);
 	glUniformMatrix4fv(m_directionLightViewProjectionMatrixShadow, 4, GL_FALSE, &lightViewProjectMatrix[0][0][0]);
 	glUniform4fv(m_shadowSlices, 1, &cameraSpaceSplits[0]);
+	glUniformMatrix4fv(m_matrixPalette, ndInt32(self->m_skinPaletteMatrixArray.GetCount()), GL_FALSE, &self->m_skinPaletteMatrixArray[0][0][0]);
 
 	ndRenderPassEnvironment* const environment = render->m_cachedEnvironmentPass;
 	ndAssert(environment);
@@ -765,46 +766,36 @@ void ndRenderShaderOpaqueDiffusedShadowSkinColorBlock::Render(const ndRenderPrim
 
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, shadowPass->m_shadowMapTexture);
-
-	ndAssert(0);
-	//const glMatrix* const glMatrixPalette = &self->m_instanceMatrixArray[0];
-	//glUniformMatrix4fv(m_matrixPalette, ndInt32(self->m_instanceMatrixArray.GetCount()), GL_FALSE, &glMatrixPalette[0][0][0]);
-	//
-	////glBindBuffer(GL_ARRAY_BUFFER, self->m_instanceMatrixBuffer);
-	////glMatrix* const matrixBuffer = (glMatrix*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-	////ndMemCpy(matrixBuffer, &self->m_instanceMatricArray[0], self->m_instanceMatricArray.GetCount());
-	////glUnmapBuffer(GL_ARRAY_BUFFER);
-	//
-	//glBindVertexArray(self->m_vertextArrayBuffer);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
-	//
-	//glActiveTexture(GL_TEXTURE0);
-	//for (ndList<ndRenderPrimitiveSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
-	//{
-	//	ndRenderPrimitiveSegment& segment = node->GetInfo();
-	//	if (segment.m_material.m_opacity > ndFloat32(0.99f))
-	//	{
-	//		const ndRenderPrimitiveMaterial* const material = &segment.m_material;
-	//		const ndRenderTextureImageCommon* const image = (ndRenderTextureImageCommon*)*material->m_texture;
-	//		ndAssert(image);
-	//
-	//		const glVector4 diffuse(material->m_diffuse);
-	//		const glVector4 specular(material->m_specular);
-	//		const glVector4 reflection(material->m_reflection);
-	//
-	//		glUniform3fv(m_diffuseColor, 1, &diffuse[0]);
-	//		glUniform3fv(m_specularColor, 1, &specular[0]);
-	//		glUniform3fv(m_reflectionColor, 1, &reflection[0]);
-	//		glUniform1fv(m_specularAlpha, 1, &material->m_specularPower);
-	//
-	//		glBindTexture(GL_TEXTURE_2D, image->m_texture);
-	//		glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
-	//	}
-	//}
-	//
-	////glBindBuffer(GL_ARRAY_BUFFER, 0);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	//glBindVertexArray(0);
-	//glUseProgram(0);
+	
+	glBindVertexArray(self->m_vertextArrayBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
+	
+	glActiveTexture(GL_TEXTURE0);
+	for (ndList<ndRenderPrimitiveSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
+	{
+		ndRenderPrimitiveSegment& segment = node->GetInfo();
+		if (segment.m_material.m_opacity > ndFloat32(0.99f))
+		{
+			const ndRenderPrimitiveMaterial* const material = &segment.m_material;
+			const ndRenderTextureImageCommon* const image = (ndRenderTextureImageCommon*)*material->m_texture;
+			ndAssert(image);
+	
+			const glVector4 diffuse(material->m_diffuse);
+			const glVector4 specular(material->m_specular);
+			const glVector4 reflection(material->m_reflection);
+	
+			glUniform3fv(m_diffuseColor, 1, &diffuse[0]);
+			glUniform3fv(m_specularColor, 1, &specular[0]);
+			glUniform3fv(m_reflectionColor, 1, &reflection[0]);
+			glUniform1fv(m_specularAlpha, 1, &material->m_specularPower);
+	
+			glBindTexture(GL_TEXTURE_2D, image->m_texture);
+			glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
+		}
+	}
+	
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	glUseProgram(0);
 }
 

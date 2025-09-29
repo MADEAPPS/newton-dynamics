@@ -63,11 +63,13 @@ class ndRenderPrimitiveImplement : public ndContainersFreeListAlloc<ndRenderPrim
 	ndRenderSceneNode* m_skinSceneNode;
 	ndArray<ndRenderSceneNode*> m_skeleton;
 	ndArray<glMatrix> m_instanceMatrixArray;		// this is a vertex buffer array
-	ndArray<glMatrix> m_bindingSkinMatrixArray;		// this is a uniform array
+	ndArray<ndMatrix> m_bindingSkinMatrixArray;		// this is a uniform array
+	ndArray<glMatrix> m_skinPaletteMatrixArray;		// this is a uniform array
 
+	GLint m_vertexSize;
 	GLint m_indexCount;
 	GLint m_vertexCount;
-	GLint m_vertexSize;
+	GLint m_instanceCount;
 
 	GLuint m_indexBuffer;
 	GLuint m_vertexBuffer;

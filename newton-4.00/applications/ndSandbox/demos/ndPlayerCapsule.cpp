@@ -181,6 +181,7 @@ class ndPlayerCapsuleController : public ndModelNotify
 		ndFloat32 radio = 0.15f;
 		ndFloat32 mass = 100.0f;
 		ndSharedPtr<ndRenderSceneNode> entityDuplicate(loader.m_renderMesh->Clone());
+		//ndSharedPtr<ndRenderSceneNode> entityDuplicate(loader.m_renderMesh);
 		ndSharedPtr<ndBody> playerBody(new ndBasicPlayerCapsule(scene, loader, entityDuplicate, localAxis, location, mass, radio, height, height / 4.0f, true));
 
 		ndSharedPtr<ndModel> model(new ndModel());
@@ -273,16 +274,22 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 	 
 	// load the visual mesh, and animations.
 	ndMeshLoader loader;
-	//loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("whiteMan.fbx"));
-	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("humanoidRobot.fbx"));
+	////loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("whiteMan.fbx"));
+	//loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("humanoidRobot.fbx"));
+	//
+	//// create one player capsule, the mesh will be duplicated
+	//ndMatrix location(ndGetIdentityMatrix());
+	//
+	//ndSharedPtr<ndModelNotify> modelNotity0(ndPlayerCapsuleController::CreatePlayer(scene, loader, location));
+	//ndPlayerCapsuleController* const playerController0 = (ndPlayerCapsuleController*)*modelNotity0;
+	//playerController0->SetCamera();
 
-	// create one player capsule, the mesh will be duplicated
-	ndMatrix location(ndGetIdentityMatrix());
-
-	ndSharedPtr<ndModelNotify> modelNotity0(ndPlayerCapsuleController::CreatePlayer(scene, loader, location));
-	ndPlayerCapsuleController* const playerController0 = (ndPlayerCapsuleController*)*modelNotity0;
-	playerController0->SetCamera();
-
+	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("skinningTest.fbx"));
+	//loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("tpot.fbx"));
+	//ndSharedPtr<ndRenderSceneNode> entityDuplicate(loader.m_renderMesh->Clone());
+	ndSharedPtr<ndRenderSceneNode> entityDuplicate(loader.m_renderMesh);
+	//ndSharedPtr<ndRenderSceneNode> entityDuplicate(loader1.m_renderMesh);
+	scene->AddEntity(entityDuplicate);
 #if 0		
 	//ndSharedPtr<ndBody> player1(new ndBasicPlayerCapsule(scene, loader, *entity, localAxis, location, mass, radio, height, height/4.0f));
 	//world->AddBody(player1);

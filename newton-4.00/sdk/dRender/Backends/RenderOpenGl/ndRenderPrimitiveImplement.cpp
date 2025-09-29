@@ -29,9 +29,10 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(ndRenderPrimitive* const 
 	,m_owner(owner)
 	,m_context(*descriptor.m_render->m_context)
 	,m_skinSceneNode(nullptr)
+	,m_vertexSize(0)
 	,m_indexCount(0)
 	,m_vertexCount(0)
-	,m_vertexSize(0)
+	,m_instanceCount(0)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vertextArrayBuffer(0)
@@ -55,9 +56,10 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
 	,m_owner(nullptr)
 	,m_context(src.m_context)
 	,m_skinSceneNode(nullptr)
+	,m_vertexSize(0)
 	,m_indexCount(0)
 	,m_vertexCount(0)
-	,m_vertexSize(0)
+	,m_instanceCount(0)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vertextArrayBuffer(0)
@@ -72,9 +74,10 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
 	,m_owner(nullptr)
 	,m_context(src.m_context)
 	,m_skinSceneNode(nullptr)
+	,m_vertexSize(src.m_vertexSize)
 	,m_indexCount(src.m_indexCount)
 	,m_vertexCount(src.m_vertexCount)
-	,m_vertexSize(src.m_vertexSize)
+	,m_instanceCount(src.m_instanceCount)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vertextArrayBuffer(0)
@@ -87,11 +90,12 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
 	
 	if (src.m_instanceMatrixBuffer)
 	{
-		ndAssert(src.m_skeleton.GetCount());
+		m_instanceMatrixArray.SetCount(m_instanceCount);
 		glGenBuffers(1, &m_instanceMatrixBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, m_instanceMatrixBuffer);
-		glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(src.m_bindingSkinMatrixArray.GetCount() * sizeof(glMatrix)), &src.m_bindingSkinMatrixArray[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(m_instanceCount * sizeof(glMatrix)), &src.m_instanceMatrixArray[0], GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		m_instanceMatrixArray.SetCount(0);
 	}
 
 	if (src.m_indexBuffer)
@@ -163,7 +167,7 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
 		glBindVertexArray(0);
 	}
 
-	// bind the matric palette 
+	// bind the matrix palette 
 	if (skinSceneNode)
 	{
 		const ndRenderSceneNode* const root = skinSceneNode->GetRoot();
@@ -226,15 +230,14 @@ void ndRenderPrimitiveImplement::UpdateSkinPaletteMatrix()
 		return;
 	}
 
-	ndAssert(0);
-	//m_instanceMatricArray.SetCount(0);
-	//ndMatrix shapeBindMatrix((m_skinSceneNode->m_primitiveMatrix * m_skinSceneNode->m_globalMatrix).OrthoInverse());
-	//for (ndInt32 i = 0; i < ndInt32(m_skeleton.GetCount()); ++i)
-	//{
-	//	const ndRenderSceneNode* const bone = m_skeleton[i];
-	//	const ndMatrix paletteMatrix(m_bindingSkinMatrixArray[i] * bone->m_globalMatrix * shapeBindMatrix);
-	//	m_instanceMatricArray.PushBack(glMatrix(paletteMatrix));
-	//}
+	m_skinPaletteMatrixArray.SetCount(0);
+	const ndMatrix shapeBindMatrix((m_skinSceneNode->m_primitiveMatrix * m_skinSceneNode->m_globalMatrix).OrthoInverse());
+	for (ndInt32 i = 0; i < ndInt32(m_skeleton.GetCount()); ++i)
+	{
+		const ndRenderSceneNode* const bone = m_skeleton[i];
+		const ndMatrix paletteMatrix(m_bindingSkinMatrixArray[i] * bone->m_globalMatrix * shapeBindMatrix);
+		m_skinPaletteMatrixArray.PushBack(glMatrix(paletteMatrix));
+	}
 }
 
 ndRenderPrimitiveImplement* ndRenderPrimitiveImplement::Clone(
@@ -616,9 +619,10 @@ void ndRenderPrimitiveImplement::BuildRenderSkinnedMeshFromMeshEffect(const ndRe
 	m_indexCount = indexCount;
 	m_vertexCount = ndInt32(points.GetCount());
 
-	glGenBuffers(1, &m_instanceMatrixBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, m_instanceMatrixBuffer);
-	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(m_bindingSkinMatrixArray.GetCount() * sizeof(glMatrix)), &m_bindingSkinMatrixArray[0], GL_STATIC_DRAW);
+	//ndAssert(0);
+	//glGenBuffers(1, &m_instanceMatrixBuffer);
+	//glBindBuffer(GL_ARRAY_BUFFER, m_instanceMatrixBuffer);
+	//glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(m_bindingSkinMatrixArray.GetCount() * sizeof(glMatrix)), &m_bindingSkinMatrixArray[0], GL_STATIC_DRAW);
 	
 	glGenBuffers(1, &m_indexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
@@ -1035,11 +1039,13 @@ void ndRenderPrimitiveImplement::BuildRenderInstanceMesh(const ndRenderPrimitive
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(glPositionNormalUV), (void*)OFFSETOF(glPositionNormalUV, m_uv));
 
 	// set vertex buffer for matrix instances
-	m_instanceMatrixArray.SetCount(descriptor.m_numberOfInstances);
+	m_instanceCount = descriptor.m_numberOfInstances;
+	m_instanceMatrixArray.SetCount(m_instanceCount);
 
 	glGenBuffers(1, &m_instanceMatrixBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_instanceMatrixBuffer);
 	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(descriptor.m_numberOfInstances * sizeof(glMatrix)), &m_instanceMatrixArray[0], GL_STATIC_DRAW);
+	m_instanceMatrixArray.SetCount(0);
 	
 	glEnableVertexAttribArray(3);
 	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glMatrix), (void*)(0 * sizeof(glVector4)));
