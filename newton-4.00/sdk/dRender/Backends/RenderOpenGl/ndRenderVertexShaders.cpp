@@ -71,7 +71,7 @@ R""""(
 	uniform mat4 viewModelProjectionMatrix;
 	//uniform mat4 viewModelMatrix;
 	//uniform mat4 projectionMatrix;
-	uniform mat4 matrixPallete[128];
+	uniform mat4 matrixPalette[128];
 
 	void main()
 	{
@@ -80,7 +80,7 @@ R""""(
 		for (int i = 0; i < 4; i++) 
 		{
 			int matrixIndex = in_boneIndices[i];
-			weightedVertex += matrixPallete[matrixIndex] * pointVertex * in_boneWeights[i];
+			weightedVertex += matrixPalette[matrixIndex] * pointVertex * in_boneWeights[i];
 		}
 		weightedVertex.w = 1.0;
 
@@ -231,7 +231,7 @@ R""""(
 	uniform mat4 viewModelMatrix;
 	uniform mat4 projectionMatrix;
 	uniform mat4 modelWorldMatrix;
-	uniform mat4 matrixPallete[128];
+	uniform mat4 matrixPalette[128];
 
 	out vec4 worldPosit;
 	out vec3 posit;
@@ -248,8 +248,8 @@ R""""(
 		for (int i = 0; i < 4; i++) 
 		{
 			int matrixIndex = in_boneIndices[i];
-			weightedVertex += matrixPallete[matrixIndex] * pointVertex * in_boneWeights[i];
-			weightedNormal += matrixPallete[matrixIndex] * pointNormal * in_boneWeights[i];
+			weightedVertex += matrixPalette[matrixIndex] * pointVertex * in_boneWeights[i];
+			weightedNormal += matrixPalette[matrixIndex] * pointNormal * in_boneWeights[i];
 		}
 		weightedVertex.w = 1.0;
 		weightedNormal = normalize (weightedNormal);

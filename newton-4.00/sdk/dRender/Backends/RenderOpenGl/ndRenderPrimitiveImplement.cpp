@@ -35,7 +35,7 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(ndRenderPrimitive* const 
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vertextArrayBuffer(0)
-	,m_instanceRenderMatrixPalleteBuffer(0)
+	,m_matrixPaletteBuffer(0)
 {
 	if (*descriptor.m_collision)
 	{
@@ -61,7 +61,7 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vertextArrayBuffer(0)
-	,m_instanceRenderMatrixPalleteBuffer(0)
+	,m_matrixPaletteBuffer(0)
 {
 	ndAssert(0);
 }
@@ -78,19 +78,20 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vertextArrayBuffer(0)
-	,m_instanceRenderMatrixPalleteBuffer(0)
+	,m_matrixPaletteBuffer(0)
 {
 	if (src.m_skinSceneNode)
 	{
 		m_skinSceneNode = (ndRenderSceneNode*)skinSceneNode;
 	}
 	
-	if (src.m_instanceRenderMatrixPalleteBuffer)
+	if (src.m_matrixPaletteBuffer)
 	{
 		ndAssert(src.m_skeleton.GetCount());
-		glGenBuffers(1, &m_instanceRenderMatrixPalleteBuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, m_instanceRenderMatrixPalleteBuffer);
+		glGenBuffers(1, &m_matrixPaletteBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, m_matrixPaletteBuffer);
 		glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(src.m_bindingSkinMatrixArray.GetCount() * sizeof(glMatrix)), &src.m_bindingSkinMatrixArray[0], GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
 	if (src.m_indexBuffer)
@@ -115,7 +116,7 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
 		glBindBuffer(GL_ARRAY_BUFFER, src.m_vertexBuffer);
 		const ndReal* const srcData = (ndReal*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
 		ndMemCpy(&vertexBuffer[0], srcData, sizeInReals);
-		glSkinVertex* xxx = (glSkinVertex*)srcData;
+		//glSkinVertex* xxx = (glSkinVertex*)srcData;
 		
 		glGenBuffers(1, &m_vertexBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
@@ -158,14 +159,17 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
 		glBindVertexArray(0);
 	}
 
-	// bind the matric pallete 
-	const ndRenderSceneNode* const root = skinSceneNode->GetRoot();
-	for (ndInt32 i = 0; i < src.m_skeleton.GetCount(); ++i)
+	// bind the matric palette 
+	if (skinSceneNode)
 	{
-		ndRenderSceneNode* const bone = root->FindByName(src.m_skeleton[i]->m_name);
-		ndAssert(bone);
-		m_skeleton.PushBack(bone);
-		m_bindingSkinMatrixArray.PushBack(src.m_bindingSkinMatrixArray[i]);
+		const ndRenderSceneNode* const root = skinSceneNode->GetRoot();
+		for (ndInt32 i = 0; i < src.m_skeleton.GetCount(); ++i)
+		{
+			ndRenderSceneNode* const bone = root->FindByName(src.m_skeleton[i]->m_name);
+			ndAssert(bone);
+			m_skeleton.PushBack(bone);
+			m_bindingSkinMatrixArray.PushBack(src.m_bindingSkinMatrixArray[i]);
+		}
 	}
 
 	InitShaderBlocks();
@@ -173,9 +177,9 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
 
 ndRenderPrimitiveImplement::~ndRenderPrimitiveImplement()
 {
-	if (m_instanceRenderMatrixPalleteBuffer)
+	if (m_matrixPaletteBuffer)
 	{
-		glDeleteBuffers(1, &m_instanceRenderMatrixPalleteBuffer);
+		glDeleteBuffers(1, &m_matrixPaletteBuffer);
 	}
 
 	if (m_indexBuffer)
@@ -211,7 +215,7 @@ bool ndRenderPrimitiveImplement::IsSKinnedMesh() const
 	return m_skinSceneNode ? true : false;
 }
 
-void ndRenderPrimitiveImplement::UpdateSkinPalleteMatrix()
+void ndRenderPrimitiveImplement::UpdateSkinPaletteMatrix()
 {
 	if (!IsSKinnedMesh())
 	{
@@ -223,8 +227,8 @@ void ndRenderPrimitiveImplement::UpdateSkinPalleteMatrix()
 	for (ndInt32 i = 0; i < ndInt32(m_skeleton.GetCount()); ++i)
 	{
 		const ndRenderSceneNode* const bone = m_skeleton[i];
-		const ndMatrix palleteMatrix(m_bindingSkinMatrixArray[i] * bone->m_globalMatrix * shapeBindMatrix);
-		m_genericMatricArray.PushBack(glMatrix(palleteMatrix));
+		const ndMatrix paletteMatrix(m_bindingSkinMatrixArray[i] * bone->m_globalMatrix * shapeBindMatrix);
+		m_genericMatricArray.PushBack(glMatrix(paletteMatrix));
 	}
 }
 
@@ -561,8 +565,8 @@ void ndRenderPrimitiveImplement::BuildRenderSkinnedMeshFromMeshEffect(const ndRe
 					m_skeleton.PushBack(entity);
 					//const ndMatrix boneMatrix(entity->GetTransform().GetMatrix() * parentMatrix.Pop());
 					const ndMatrix boneMatrix(entity->CalculateGlobalTransform());
-					const ndMatrix palleteMatrix(shapeBindMatrix * boneMatrix.OrthoInverse());
-					m_bindingSkinMatrixArray.PushBack(palleteMatrix);
+					const ndMatrix paletteMatrix(shapeBindMatrix * boneMatrix.OrthoInverse());
+					m_bindingSkinMatrixArray.PushBack(paletteMatrix);
 				}
 				points[i].m_boneIndex[j] = vertexMapNode->GetInfo();
 			}
@@ -607,10 +611,10 @@ void ndRenderPrimitiveImplement::BuildRenderSkinnedMeshFromMeshEffect(const ndRe
 	m_indexCount = indexCount;
 	m_vertexCount = ndInt32(points.GetCount());
 
-	glGenBuffers(1, &m_instanceRenderMatrixPalleteBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, m_instanceRenderMatrixPalleteBuffer);
+	glGenBuffers(1, &m_matrixPaletteBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_matrixPaletteBuffer);
 	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(m_bindingSkinMatrixArray.GetCount() * sizeof(glMatrix)), &m_bindingSkinMatrixArray[0], GL_STATIC_DRAW);
-
+	
 	glGenBuffers(1, &m_indexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, GLsizeiptr(indexCount * sizeof(GLuint)), &indices[0], GL_STATIC_DRAW);
@@ -1007,7 +1011,6 @@ void ndRenderPrimitiveImplement::BuildRenderInstanceMesh(const ndRenderPrimitive
 	glGenBuffers(1, &m_indexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, GLsizeiptr(indexCount * sizeof(GLuint)), &indices[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	glGenVertexArrays(1, &m_vertextArrayBuffer);
 	glBindVertexArray(m_vertextArrayBuffer);
@@ -1029,10 +1032,10 @@ void ndRenderPrimitiveImplement::BuildRenderInstanceMesh(const ndRenderPrimitive
 	// set vertex buffer for matrix instances
 	m_genericMatricArray.SetCount(descriptor.m_numberOfInstances);
 
-	glGenBuffers(1, &m_instanceRenderMatrixPalleteBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, m_instanceRenderMatrixPalleteBuffer);
+	glGenBuffers(1, &m_matrixPaletteBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_matrixPaletteBuffer);
 	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(descriptor.m_numberOfInstances * sizeof(glMatrix)), &m_genericMatricArray[0], GL_STATIC_DRAW);
-
+	
 	glEnableVertexAttribArray(3);
 	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glMatrix), (void*)(0 * sizeof(glVector4)));
 	glVertexAttribDivisor(3, 1);

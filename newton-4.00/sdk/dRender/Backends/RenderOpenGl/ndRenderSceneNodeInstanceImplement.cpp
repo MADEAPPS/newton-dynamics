@@ -46,15 +46,15 @@ void ndRenderSceneNodeInstanceImplement::Render(const ndRender* const owner, con
 		ndRenderPrimitive* const mesh = (ndRenderPrimitive*)*m_owner->m_primitive;
 		ndRenderPrimitiveImplement* const meshImplement = *mesh->m_implement;
 		
-		ndArray<glMatrix>& matrixPallete = meshImplement->m_genericMatricArray;
+		ndArray<glMatrix>& matrixPalette = meshImplement->m_genericMatricArray;
 
-		matrixPallete.SetCount(0);
+		matrixPalette.SetCount(0);
 		const ndList<ndSharedPtr<ndRenderSceneNode>>& children = m_owner->GetChildren();
 		for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = children.GetFirst(); node; node = node->GetNext())
 		{
 			ndRenderSceneNode* const child = *node->GetInfo();
-			//matrixPallete.PushBack(glMatrix(primitiveMatrix * child->GetMatrix()));
-			matrixPallete.PushBack(glMatrix(primitiveMatrix * child->m_globalMatrix));
+			//matrixPalette.PushBack(glMatrix(primitiveMatrix * child->GetMatrix()));
+			matrixPalette.PushBack(glMatrix(primitiveMatrix * child->m_globalMatrix));
 		}
 
 		ndRenderPassMode overrideRenderMode = (renderMode == m_directionalDiffusseShadow) ? m_directionalDiffusseInstanceShadow : renderMode;

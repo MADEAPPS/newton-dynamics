@@ -35,7 +35,7 @@ class ndRenderPrimitiveImplement : public ndContainersFreeListAlloc<ndRenderPrim
 	void BuildFromCollisionShape(const ndRenderPrimitive::ndDescriptor& descriptor);
 
 	bool IsSKinnedMesh() const;
-	void UpdateSkinPalleteMatrix();
+	void UpdateSkinPaletteMatrix();
 	void Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderMode) const;
 	
 	private:
@@ -72,7 +72,7 @@ class ndRenderPrimitiveImplement : public ndContainersFreeListAlloc<ndRenderPrim
 	GLuint m_indexBuffer;
 	GLuint m_vertexBuffer;
 	GLuint m_vertextArrayBuffer;
-	GLuint m_instanceRenderMatrixPalleteBuffer;
+	GLuint m_matrixPaletteBuffer;
 	
 	ndRenderShaderOpaqueDiffusedColorBlock m_opaqueDifusedColorNoShadowBlock;
 	ndRenderShaderOpaqueDiffusedShadowColorBlock m_opaqueDiffusedColorShadowBlock;

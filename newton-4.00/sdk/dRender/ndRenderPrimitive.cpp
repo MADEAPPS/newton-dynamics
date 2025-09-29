@@ -105,10 +105,16 @@ ndRenderPrimitive::ndRenderPrimitive(const ndDescriptor& descriptor)
 	m_implement = ndSharedPtr<ndRenderPrimitiveImplement>(new ndRenderPrimitiveImplement(this, descriptor));
 }
 
-ndRenderPrimitive::ndRenderPrimitive(const ndRenderPrimitive&)
+ndRenderPrimitive::ndRenderPrimitive(const ndRenderPrimitive& src)
 	:m_implement(nullptr)
 {
-	ndAssert(0);
+	m_implement = ndSharedPtr<ndRenderPrimitiveImplement>(src.m_implement->Clone(this, nullptr));
+
+	for (ndList<ndRenderPrimitiveSegment>::ndNode* node = src.m_segments.GetFirst(); node; node = node->GetNext())
+	{
+		ndRenderPrimitiveSegment& srcSegment = node->GetInfo();
+		m_segments.Append(ndRenderPrimitiveSegment(srcSegment));
+	}
 }
 
 ndRenderPrimitive::ndRenderPrimitive(const ndRenderPrimitive& src, const ndRenderSceneNode* const skeleton)
@@ -133,9 +139,9 @@ bool ndRenderPrimitive::IsSKinnedMesh() const
 	return m_implement->IsSKinnedMesh();
 }
 
-void ndRenderPrimitive::UpdateSkinPalleteMatrix()
+void ndRenderPrimitive::UpdateSkinPaletteMatrix()
 {
-	m_implement->UpdateSkinPalleteMatrix();
+	m_implement->UpdateSkinPaletteMatrix();
 }
 
 void ndRenderPrimitive::Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderPassMode) const

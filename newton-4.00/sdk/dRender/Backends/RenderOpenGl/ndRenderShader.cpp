@@ -138,7 +138,7 @@ void ndRenderShaderGenerateSkinShadowMapBlock::GetShaderParameters(const ndRende
 void ndRenderShaderGenerateSkinShadowMapBlock::SetParameters(GLuint shader)
 {
 	ndRenderShaderGenerateShadowMapBlock::SetParameters(shader);
-	m_matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
+	m_matrixPalette = glGetUniformLocation(m_shader, "matrixPalette");
 }
 
 void ndRenderShaderGenerateSkinShadowMapBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const, const ndMatrix& modelMatrix) const
@@ -614,14 +614,6 @@ void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::SetParameters(GLuint shad
 
 void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	// upload matrix pallete to the gpu vertex buffer
-	glBindBuffer(GL_ARRAY_BUFFER, self->m_instanceRenderMatrixPalleteBuffer);
-	glMatrix* const matrixBuffer = (glMatrix*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-	ndMemCpy(matrixBuffer, &self->m_genericMatricArray[0], self->m_genericMatricArray.GetCount());
-	glUnmapBuffer(GL_ARRAY_BUFFER);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	//const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
 	const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
 
 	const ndMatrix viewMatrix(camera->m_invViewMatrix);
@@ -636,6 +628,13 @@ void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::Render(const ndRenderPrim
 	const glVector4 glSunlightDir(viewMatrix.RotateVector(render->m_sunLightDir));
 
 	glUseProgram(m_shader);
+
+	// upload matrix palette to the gpu vertex buffer
+	glBindBuffer(GL_ARRAY_BUFFER, self->m_matrixPaletteBuffer);
+	glMatrix* const matrixBuffer = (glMatrix*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+	ndMemCpy(matrixBuffer, &self->m_genericMatricArray[0], self->m_genericMatricArray.GetCount());
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glUniform3fv(m_directionalLightDirection, 1, &glSunlightDir[0]);
 	glUniform3fv(m_directionalLightAmbient, 1, &glSunlightAmbient[0]);
@@ -715,7 +714,7 @@ void ndRenderShaderOpaqueDiffusedShadowSkinColorBlock::GetShaderParameters(const
 void ndRenderShaderOpaqueDiffusedShadowSkinColorBlock::SetParameters(GLuint shader)
 {
 	ndRenderShaderOpaqueDiffusedShadowColorBlock::SetParameters(shader);
-	m_matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
+	m_matrixPalette = glGetUniformLocation(m_shader, "matrixPalette");
 }
 
 void ndRenderShaderOpaqueDiffusedShadowSkinColorBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
@@ -733,16 +732,13 @@ void ndRenderShaderOpaqueDiffusedShadowSkinColorBlock::Render(const ndRenderPrim
 	const glVector4 glSunlightIntensity(render->m_sunLightIntesity);
 	const glVector4 glSunlightDir(viewMatrix.RotateVector(render->m_sunLightDir));
 
-	const glMatrix* const glMatrixPallete = &self->m_genericMatricArray[0];
-
-	ndInt32 count = ndInt32 (self->m_genericMatricArray.GetCount());
+	//ndInt32 count = ndInt32 (self->m_genericMatricArray.GetCount());
 	glUseProgram(m_shader);
 
 	glUniform3fv(m_directionalLightDirection, 1, &glSunlightDir[0]);
 	glUniform3fv(m_directionalLightAmbient, 1, &glSunlightAmbient[0]);
 	glUniform3fv(m_directionalLightIntesity, 1, &glSunlightIntensity[0]);
 
-	glUniformMatrix4fv(m_matrixPalette, count, GL_FALSE, &glMatrixPallete[0][0][0]);
 	glUniformMatrix4fv(m_projectMatrixLocation, 1, GL_FALSE, &glProjectionMatrix[0][0]);
 	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, GL_FALSE, &glViewModelMatrix[0][0]);
 
@@ -769,6 +765,14 @@ void ndRenderShaderOpaqueDiffusedShadowSkinColorBlock::Render(const ndRenderPrim
 
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, shadowPass->m_shadowMapTexture);
+
+	const glMatrix* const glMatrixPalette = &self->m_genericMatricArray[0];
+	glUniformMatrix4fv(m_matrixPalette, ndInt32(self->m_genericMatricArray.GetCount()), GL_FALSE, &glMatrixPalette[0][0][0]);
+
+	//glBindBuffer(GL_ARRAY_BUFFER, self->m_matrixPaletteBuffer);
+	//glMatrix* const matrixBuffer = (glMatrix*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+	//ndMemCpy(matrixBuffer, &self->m_genericMatricArray[0], self->m_genericMatricArray.GetCount());
+	//glUnmapBuffer(GL_ARRAY_BUFFER);
 
 	glBindVertexArray(self->m_vertextArrayBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
@@ -797,6 +801,7 @@ void ndRenderShaderOpaqueDiffusedShadowSkinColorBlock::Render(const ndRenderPrim
 		}
 	}
 
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 	glUseProgram(0);
