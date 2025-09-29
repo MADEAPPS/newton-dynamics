@@ -286,8 +286,8 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 
 	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("skinningTest.fbx"));
 	//loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("tpot.fbx"));
-	//ndSharedPtr<ndRenderSceneNode> entityDuplicate(loader.m_renderMesh->Clone());
-	ndSharedPtr<ndRenderSceneNode> entityDuplicate(loader.m_renderMesh);
+	ndSharedPtr<ndRenderSceneNode> entityDuplicate(loader.m_renderMesh->Clone());
+	//ndSharedPtr<ndRenderSceneNode> entityDuplicate(loader.m_renderMesh);
 	//ndSharedPtr<ndRenderSceneNode> entityDuplicate(loader1.m_renderMesh);
 	scene->AddEntity(entityDuplicate);
 #if 0		

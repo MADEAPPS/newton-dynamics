@@ -98,6 +98,7 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
 		m_instanceMatrixArray.SetCount(0);
 	}
 
+	ndAssert(src.m_indexBuffer);
 	if (src.m_indexBuffer)
 	{
 		ndArray<ndInt32> indices;
@@ -114,8 +115,10 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
-	if (src.m_vertexBuffer)
+	ndAssert(src.m_vertextArrayBuffer);
+	if (src.m_vertextArrayBuffer)
 	{
+		ndAssert(src.m_vertexBuffer);
 		ndArray<ndReal> vertexBuffer;
 		ndInt32 sizeInReals = ndInt32 (m_vertexSize * m_vertexCount / sizeof(ndReal));
 		vertexBuffer.SetCount(sizeInReals);
@@ -124,17 +127,14 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
 		ndAssert(srcData);
 		ndMemCpy(&vertexBuffer[0], srcData, sizeInReals);
 		glUnmapBuffer(GL_ARRAY_BUFFER);
-		
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glGenVertexArrays(1, &m_vertextArrayBuffer);
+		glBindVertexArray(m_vertextArrayBuffer);
+
 		glGenBuffers(1, &m_vertexBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 		glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(sizeInReals * sizeof(ndReal)), &vertexBuffer[0], GL_STATIC_DRAW);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	}
-
-	if (src.m_vertextArrayBuffer)
-	{
-		glGenVertexArrays(1, &m_vertextArrayBuffer);
-		glBindVertexArray(m_vertextArrayBuffer);
 
 		size_t offset = 0;
 		glEnableVertexAttribArray(0);
@@ -163,9 +163,10 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
 				}
 			}
 		}
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 	}
-
+	
 	// bind the matrix palette 
 	if (skinSceneNode)
 	{
