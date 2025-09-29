@@ -123,9 +123,9 @@ ndRenderPrimitive::ndRenderPrimitive(const ndRenderPrimitive& src, const ndRende
 {
 	m_implement = ndSharedPtr<ndRenderPrimitiveImplement>(src.m_implement->Clone(this, skeleton));
 
-	for (ndList<ndRenderPrimitiveSegment>::ndNode* node = src.m_segments.GetFirst(); node; node = node->GetNext())
+	for (ndList<ndRenderPrimitiveSegment>::ndNode* srcNode = src.m_segments.GetFirst(); srcNode; srcNode = srcNode->GetNext())
 	{
-		ndRenderPrimitiveSegment& srcSegment = node->GetInfo();
+		ndRenderPrimitiveSegment& srcSegment = srcNode->GetInfo();
 		m_segments.Append(ndRenderPrimitiveSegment(srcSegment));
 	}
 }
