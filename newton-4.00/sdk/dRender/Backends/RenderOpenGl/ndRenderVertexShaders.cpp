@@ -69,8 +69,6 @@ R""""(
 	layout(location = 4) in ivec4 in_boneIndices;
 
 	uniform mat4 viewModelProjectionMatrix;
-	//uniform mat4 viewModelMatrix;
-	//uniform mat4 projectionMatrix;
 	uniform mat4 matrixPalette[128];
 
 	void main()
@@ -84,8 +82,6 @@ R""""(
 		}
 		weightedVertex.w = 1.0;
 
-		//posit = vec3 (viewModelMatrix * weightedVertex);
-		//gl_Position = projectionMatrix * vec4(posit, 1.0);
 		gl_Position = viewModelProjectionMatrix * weightedVertex;
 	}
 )"""";
@@ -131,7 +127,6 @@ R""""(
 	void main()
 	{
 		posit = vec3(viewModelMatrix * vec4(in_position, 1.0));
-		//normal = vec3(normalize(normalMatrix * vec4(in_normal, 0.0)));
 		normal = vec3(normalize(viewModelMatrix * vec4(in_normal, 0.0)));
 		uv = in_uv;
 		gl_Position = projectionMatrix * vec4(posit, 1.0);
