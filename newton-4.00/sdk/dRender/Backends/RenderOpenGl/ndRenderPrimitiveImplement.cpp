@@ -67,7 +67,7 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
 }
 
 ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
-	const ndRenderPrimitiveImplement& src, const ndRenderSceneNode* const skeleton)
+	const ndRenderPrimitiveImplement& src, const ndRenderSceneNode* const skinSceneNode)
 	:ndContainersFreeListAlloc<ndRenderPrimitiveImplement>()
 	,m_owner(nullptr)
 	,m_context(src.m_context)
@@ -80,9 +80,9 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
 	,m_vertextArrayBuffer(0)
 	,m_instanceRenderMatrixPalleteBuffer(0)
 {
-	if (src.m_skeleton.GetCount())
+	if (src.m_skinSceneNode)
 	{
-		m_skinSceneNode = (ndRenderSceneNode*) skeleton;
+		m_skinSceneNode = (ndRenderSceneNode*)skinSceneNode;
 	}
 	
 	if (src.m_instanceRenderMatrixPalleteBuffer)
@@ -115,6 +115,7 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
 		glBindBuffer(GL_ARRAY_BUFFER, src.m_vertexBuffer);
 		const ndReal* const srcData = (ndReal*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
 		ndMemCpy(&vertexBuffer[0], srcData, sizeInReals);
+		glSkinVertex* xxx = (glSkinVertex*)srcData;
 		
 		glGenBuffers(1, &m_vertexBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
@@ -149,7 +150,7 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
 					 offset += 4 * sizeof(ndReal);
 
 					 glEnableVertexAttribArray(4);
-					 glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(m_vertexSize), (void*)offset);
+					 glVertexAttribPointer(4, 4, GL_INT, GL_FALSE, sizeof(m_vertexSize), (void*)offset);
 					 offset += 4 * sizeof(ndReal);
 				}
 			}
@@ -158,7 +159,7 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
 	}
 
 	// bind the matric pallete 
-	const ndRenderSceneNode* const root = skeleton->GetRoot();
+	const ndRenderSceneNode* const root = skinSceneNode->GetRoot();
 	for (ndInt32 i = 0; i < src.m_skeleton.GetCount(); ++i)
 	{
 		ndRenderSceneNode* const bone = root->FindByName(src.m_skeleton[i]->m_name);
