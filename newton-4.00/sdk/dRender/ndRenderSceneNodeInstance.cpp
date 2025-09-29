@@ -15,6 +15,7 @@
 #include "ndRenderTexture.h"
 #include "ndRenderSceneNode.h"
 #include "ndRenderSceneNodeInstance.h"
+#include "ndRenderPrimitiveImplement.h"
 #include "ndRenderSceneNodeInstanceImplement.h"
 
 ndRenderSceneNodeInstance::ndRenderSceneNodeInstance(const ndMatrix& matrix, const ndRenderPrimitive::ndDescriptor& descriptor)
@@ -42,6 +43,26 @@ void ndRenderSceneNodeInstance::Finalize()
 	m_isInitialized = true;
 	m_descriptor.m_numberOfInstances = ndInt32 (m_children.GetCount());
 	m_implement->Finalize();
+}
+
+void ndRenderSceneNodeInstance::ApplyPrimitiveTransforms()
+{
+	ndRenderSceneNode::ApplyPrimitiveTransforms();
+
+	ndAssert(m_isInitialized);
+	ndRenderPrimitive* const mesh = *m_primitive;
+	ndRenderPrimitiveImplement* const meshImplement = *mesh->m_implement;
+
+	ndArray<glMatrix>& matrixPalette = meshImplement->m_instanceMatrixArray;
+
+	matrixPalette.SetCount(0);
+	const ndMatrix primitiveMatrix(m_primitiveMatrix);
+	const ndList<ndSharedPtr<ndRenderSceneNode>>& children = GetChildren();
+	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = children.GetFirst(); node; node = node->GetNext())
+	{
+		ndRenderSceneNode* const child = *node->GetInfo();
+		matrixPalette.PushBack(glMatrix(primitiveMatrix * child->m_globalMatrix));
+	}
 }
 
 void ndRenderSceneNodeInstance::Render(const ndRender* const owner, const ndMatrix& modelViewMatrix, ndRenderPassMode renderMode) const

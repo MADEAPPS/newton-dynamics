@@ -91,6 +91,7 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 	ndString m_name;
 
 	protected:
+	virtual void ApplyPrimitiveTransforms();
 	virtual ndRenderSceneNode* CloneSkeleton() const;
 	void ClonePrimitives(const ndRenderSceneNode& src);
 	

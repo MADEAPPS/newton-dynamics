@@ -100,6 +100,15 @@ void ndRenderSceneNode::ClonePrimitives(const ndRenderSceneNode& src)
 	}
 }
 
+void ndRenderSceneNode::ApplyPrimitiveTransforms()
+{
+	ndAssert(*m_primitive);
+	if (m_primitive->IsSKinnedMesh())
+	{
+		m_primitive->UpdateSkinPaletteMatrix();
+	}
+}
+
 ndRenderSceneNode* ndRenderSceneNode::Clone() const
 {
 	ndRenderSceneNode* const rootNode = new ndRenderSceneNode(*this);

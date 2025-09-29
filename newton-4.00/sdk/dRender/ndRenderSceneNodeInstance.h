@@ -25,6 +25,8 @@ class ndRenderSceneNodeInstance : public ndRenderSceneNode
 	virtual const ndRenderSceneNodeInstance* GetAsInstance() const override;
 
 	void Finalize();
+	virtual void ApplyPrimitiveTransforms() override;
+
 	virtual void Render(const ndRender* const owner, const ndMatrix& parentMatrix, ndRenderPassMode renderMode) const override;
 
 	ndRenderPrimitive::ndDescriptor m_descriptor;

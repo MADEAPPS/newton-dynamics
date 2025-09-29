@@ -200,7 +200,7 @@ void ndRenderShaderGenerateInstanceShadowMapBlock::Render(const ndRenderPrimitiv
 		ndRenderPrimitiveSegment& segment = node->GetInfo();
 		if (segment.m_material.m_castShadows)
 		{
-			glDrawElementsInstanced(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)), GLsizei(self->m_genericMatricArray.GetCount()));
+			glDrawElementsInstanced(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)), GLsizei(self->m_instanceMatrixArray.GetCount()));
 		}
 	}
 	
@@ -630,9 +630,9 @@ void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::Render(const ndRenderPrim
 	glUseProgram(m_shader);
 
 	// upload matrix palette to the gpu vertex buffer
-	glBindBuffer(GL_ARRAY_BUFFER, self->m_matrixPaletteBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, self->m_instanceMatrixBuffer);
 	glMatrix* const matrixBuffer = (glMatrix*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-	ndMemCpy(matrixBuffer, &self->m_genericMatricArray[0], self->m_genericMatricArray.GetCount());
+	ndMemCpy(matrixBuffer, &self->m_instanceMatrixArray[0], self->m_instanceMatrixArray.GetCount());
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -692,7 +692,7 @@ void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::Render(const ndRenderPrim
 
 			glBindTexture(GL_TEXTURE_2D, image->m_texture);
 			//glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
-			glDrawElementsInstanced(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)), GLsizei(self->m_genericMatricArray.GetCount()));
+			glDrawElementsInstanced(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)), GLsizei(self->m_instanceMatrixArray.GetCount()));
 		}
 	}
 
@@ -732,7 +732,7 @@ void ndRenderShaderOpaqueDiffusedShadowSkinColorBlock::Render(const ndRenderPrim
 	const glVector4 glSunlightIntensity(render->m_sunLightIntesity);
 	const glVector4 glSunlightDir(viewMatrix.RotateVector(render->m_sunLightDir));
 
-	//ndInt32 count = ndInt32 (self->m_genericMatricArray.GetCount());
+	//ndInt32 count = ndInt32 (self->m_instanceMatricArray.GetCount());
 	glUseProgram(m_shader);
 
 	glUniform3fv(m_directionalLightDirection, 1, &glSunlightDir[0]);
@@ -766,44 +766,45 @@ void ndRenderShaderOpaqueDiffusedShadowSkinColorBlock::Render(const ndRenderPrim
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, shadowPass->m_shadowMapTexture);
 
-	const glMatrix* const glMatrixPalette = &self->m_genericMatricArray[0];
-	glUniformMatrix4fv(m_matrixPalette, ndInt32(self->m_genericMatricArray.GetCount()), GL_FALSE, &glMatrixPalette[0][0][0]);
-
-	//glBindBuffer(GL_ARRAY_BUFFER, self->m_matrixPaletteBuffer);
-	//glMatrix* const matrixBuffer = (glMatrix*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-	//ndMemCpy(matrixBuffer, &self->m_genericMatricArray[0], self->m_genericMatricArray.GetCount());
-	//glUnmapBuffer(GL_ARRAY_BUFFER);
-
-	glBindVertexArray(self->m_vertextArrayBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
-
-	glActiveTexture(GL_TEXTURE0);
-	for (ndList<ndRenderPrimitiveSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
-	{
-		ndRenderPrimitiveSegment& segment = node->GetInfo();
-		if (segment.m_material.m_opacity > ndFloat32(0.99f))
-		{
-			const ndRenderPrimitiveMaterial* const material = &segment.m_material;
-			const ndRenderTextureImageCommon* const image = (ndRenderTextureImageCommon*)*material->m_texture;
-			ndAssert(image);
-
-			const glVector4 diffuse(material->m_diffuse);
-			const glVector4 specular(material->m_specular);
-			const glVector4 reflection(material->m_reflection);
-
-			glUniform3fv(m_diffuseColor, 1, &diffuse[0]);
-			glUniform3fv(m_specularColor, 1, &specular[0]);
-			glUniform3fv(m_reflectionColor, 1, &reflection[0]);
-			glUniform1fv(m_specularAlpha, 1, &material->m_specularPower);
-
-			glBindTexture(GL_TEXTURE_2D, image->m_texture);
-			glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
-		}
-	}
-
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-	glUseProgram(0);
+	ndAssert(0);
+	//const glMatrix* const glMatrixPalette = &self->m_instanceMatrixArray[0];
+	//glUniformMatrix4fv(m_matrixPalette, ndInt32(self->m_instanceMatrixArray.GetCount()), GL_FALSE, &glMatrixPalette[0][0][0]);
+	//
+	////glBindBuffer(GL_ARRAY_BUFFER, self->m_instanceMatrixBuffer);
+	////glMatrix* const matrixBuffer = (glMatrix*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+	////ndMemCpy(matrixBuffer, &self->m_instanceMatricArray[0], self->m_instanceMatricArray.GetCount());
+	////glUnmapBuffer(GL_ARRAY_BUFFER);
+	//
+	//glBindVertexArray(self->m_vertextArrayBuffer);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
+	//
+	//glActiveTexture(GL_TEXTURE0);
+	//for (ndList<ndRenderPrimitiveSegment>::ndNode* node = self->m_owner->m_segments.GetFirst(); node; node = node->GetNext())
+	//{
+	//	ndRenderPrimitiveSegment& segment = node->GetInfo();
+	//	if (segment.m_material.m_opacity > ndFloat32(0.99f))
+	//	{
+	//		const ndRenderPrimitiveMaterial* const material = &segment.m_material;
+	//		const ndRenderTextureImageCommon* const image = (ndRenderTextureImageCommon*)*material->m_texture;
+	//		ndAssert(image);
+	//
+	//		const glVector4 diffuse(material->m_diffuse);
+	//		const glVector4 specular(material->m_specular);
+	//		const glVector4 reflection(material->m_reflection);
+	//
+	//		glUniform3fv(m_diffuseColor, 1, &diffuse[0]);
+	//		glUniform3fv(m_specularColor, 1, &specular[0]);
+	//		glUniform3fv(m_reflectionColor, 1, &reflection[0]);
+	//		glUniform1fv(m_specularAlpha, 1, &material->m_specularPower);
+	//
+	//		glBindTexture(GL_TEXTURE_2D, image->m_texture);
+	//		glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
+	//	}
+	//}
+	//
+	////glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	//glBindVertexArray(0);
+	//glUseProgram(0);
 }
 

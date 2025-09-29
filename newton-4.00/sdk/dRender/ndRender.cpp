@@ -190,7 +190,19 @@ void ndRender::InterpolateTransforms(ndFloat32 param)
 void ndRender::UpdateGlobalMatrices() const
 {
 	ndList<ndRenderSceneNode*, ndContainersFreeListAlloc<ndRenderSceneNode*>> stackList;
-	ndList<ndRenderSceneNode*, ndContainersFreeListAlloc<ndRenderSceneNode*>> skinnedNodes;
+	ndList<ndRenderSceneNode*, ndContainersFreeListAlloc<ndRenderSceneNode*>> transformNodes;
+
+	auto AddNode = [&transformNodes](ndRenderSceneNode* const sceneNode)
+	{
+		if (*sceneNode->m_primitive)
+		{
+			if (sceneNode->GetAsInstance() || sceneNode->m_primitive->IsSKinnedMesh())
+			{
+				transformNodes.Append(sceneNode);
+			}
+		}
+	};
+
 	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* rootSceneNode = m_scene.GetFirst(); rootSceneNode; rootSceneNode = rootSceneNode->GetNext())
 	{
 		stackList.RemoveAll();
@@ -203,22 +215,15 @@ void ndRender::UpdateGlobalMatrices() const
 			stackList.Append(child);
 		}
 
-		// add root primitive to the skinning list
-		if (*rootNode->m_primitive && rootNode->m_primitive->IsSKinnedMesh())
-		{
-			skinnedNodes.Append(rootNode);
-		}
+		// add root primitive to the transfrom list
+		AddNode(rootNode);
 
 		// add all children primitive the skinning list
 		while (stackList.GetCount())
 		{
 			ndRenderSceneNode* const sceneNode = stackList.GetLast()->GetInfo();
 
-			if (*sceneNode->m_primitive && sceneNode->m_primitive->IsSKinnedMesh())
-			{
-				skinnedNodes.Append(sceneNode);
-			}
-
+			AddNode(sceneNode);
 			stackList.Remove(stackList.GetLast());
 			sceneNode->m_globalMatrix = sceneNode->m_matrix * sceneNode->m_parent->m_globalMatrix;
 			for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* childSceneNode = sceneNode->m_children.GetFirst(); childSceneNode; childSceneNode = childSceneNode->GetNext())
@@ -228,10 +233,10 @@ void ndRender::UpdateGlobalMatrices() const
 			}
 		}
 
-		for (ndList<ndRenderSceneNode*, ndContainersFreeListAlloc<ndRenderSceneNode*>>::ndNode* node = skinnedNodes.GetFirst();	node; node = node->GetNext())
+		for (ndList<ndRenderSceneNode*, ndContainersFreeListAlloc<ndRenderSceneNode*>>::ndNode* node = transformNodes.GetFirst();	node; node = node->GetNext())
 		{
-			ndRenderSceneNode* const skinnedNode = node->GetInfo();
-			skinnedNode->GetPrimitive()->UpdateSkinPaletteMatrix();
+			ndRenderSceneNode* const meshNode = node->GetInfo();
+			meshNode->ApplyPrimitiveTransforms();
 		}
 	}
 }

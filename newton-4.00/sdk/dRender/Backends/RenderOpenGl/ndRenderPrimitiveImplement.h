@@ -62,8 +62,8 @@ class ndRenderPrimitiveImplement : public ndContainersFreeListAlloc<ndRenderPrim
 	const ndRenderContext* m_context;
 	ndRenderSceneNode* m_skinSceneNode;
 	ndArray<ndRenderSceneNode*> m_skeleton;
-	ndArray<glMatrix> m_genericMatricArray;
-	ndArray<ndMatrix> m_bindingSkinMatrixArray;
+	ndArray<glMatrix> m_instanceMatrixArray;		// this is a vertex buffer array
+	ndArray<glMatrix> m_bindingSkinMatrixArray;		// this is a uniform array
 
 	GLint m_indexCount;
 	GLint m_vertexCount;
@@ -72,7 +72,7 @@ class ndRenderPrimitiveImplement : public ndContainersFreeListAlloc<ndRenderPrim
 	GLuint m_indexBuffer;
 	GLuint m_vertexBuffer;
 	GLuint m_vertextArrayBuffer;
-	GLuint m_matrixPaletteBuffer;
+	GLuint m_instanceMatrixBuffer;
 	
 	ndRenderShaderOpaqueDiffusedColorBlock m_opaqueDifusedColorNoShadowBlock;
 	ndRenderShaderOpaqueDiffusedShadowColorBlock m_opaqueDiffusedColorShadowBlock;
@@ -88,6 +88,7 @@ class ndRenderPrimitiveImplement : public ndContainersFreeListAlloc<ndRenderPrim
 	ndRenderShaderDebugWireframeDiffuseBlock m_debugWireframeColorBlock;
 	ndRenderShaderDebugFlatShadedDiffusedBlock m_debugFlatShadedColorBlock;
 
+	friend class ndRenderSceneNodeInstance;
 	friend class ndRenderSceneNodeInstanceImplement;
 	friend class ndRenderShaderSetZbufferCleanBlock;
 	friend class ndRenderShaderGenerateShadowMapBlock;
