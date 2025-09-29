@@ -119,8 +119,8 @@ ndRenderPrimitive::ndRenderPrimitive(const ndRenderPrimitive& src, const ndRende
 
 	for (ndList<ndRenderPrimitiveSegment>::ndNode* node = src.m_segments.GetFirst(); node; node = node->GetNext())
 	{
-		ndRenderPrimitiveSegment& segment = node->GetInfo();
-		m_segments.Append(ndRenderPrimitiveSegment(segment));
+		ndRenderPrimitiveSegment& srcSegment = node->GetInfo();
+		m_segments.Append(ndRenderPrimitiveSegment(srcSegment));
 	}
 }
 
