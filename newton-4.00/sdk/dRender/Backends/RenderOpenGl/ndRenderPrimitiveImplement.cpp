@@ -100,7 +100,9 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
 		indices.SetCount(m_indexCount);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, src.m_indexBuffer);
 		ndInt32* const srcData = (ndInt32*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY);
+		ndAssert(srcData);
 		ndMemCpy(&indices[0], srcData, m_indexCount);
+		glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
 
 		glGenBuffers(1, &m_indexBuffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
@@ -115,7 +117,9 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
 		vertexBuffer.SetCount(sizeInReals);
 		glBindBuffer(GL_ARRAY_BUFFER, src.m_vertexBuffer);
 		const ndReal* const srcData = (ndReal*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
+		ndAssert(srcData);
 		ndMemCpy(&vertexBuffer[0], srcData, sizeInReals);
+		glUnmapBuffer(GL_ARRAY_BUFFER);
 		//glSkinVertex* xxx = (glSkinVertex*)srcData;
 		
 		glGenBuffers(1, &m_vertexBuffer);
