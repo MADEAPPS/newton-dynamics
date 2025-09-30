@@ -14,11 +14,6 @@
 
 #include "ndSandboxStdafx.h"
 
-class ndPhysicsWorld;
-class ndDemoEntityManager;
-class ndAnimationBlendTreeNode;
-class ndAnimationSequencePlayer;
-
 class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 {
 	public:
@@ -41,20 +36,15 @@ class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 
 	ndBasicPlayerCapsule();
 	ndBasicPlayerCapsule(
-		ndDemoEntityManager* const scene, ndMeshLoader& loader,
+		ndDemoEntityManager* const scene,
 		ndSharedPtr<ndRenderSceneNode>& modelEntity, const ndMatrix& localAxis, const ndMatrix& location,
-		ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight, bool isPlayer = false);
+		ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight);
 	~ndBasicPlayerCapsule();
 
 	void ApplyInputs(ndFloat32 timestep) override;
 	ndFloat32 ContactFrictionCallback(const ndVector& position, const ndVector& normal, ndInt32 contactId, const ndBodyKinematic* const otherbody) const override;
 
 	PlayerInputs m_playerInput;
-	bool m_isPlayer;
-
-	ndAnimationPose m_output;
-	ndAnimationTwoWayBlend* m_idleWalkBlend;
-	ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
 };
 
 #endif

@@ -17,96 +17,28 @@
 #include "ndDemoEntityManager.h"
 #include "ndBasicPlayerCapsule.h"
 
-#define PLAYER_WALK_SPEED				8.0f
+//#define PLAYER_WALK_SPEED				8.0f
 #define PLAYER_JUMP_SPEED				5.0f
-
-//#define PLAYER_FIRST_PERSON	
-
-#ifdef PLAYER_FIRST_PERSON	
-	#define PLAYER_THIRD_PERSON_VIEW_DIST	0.0f
-#else
-	//#define PLAYER_THIRD_PERSON_VIEW_DIST	6.0f
-	#define PLAYER_THIRD_PERSON_VIEW_DIST	5.0f
-#endif
-
-class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
-{
-	public:
-	ndBasicPlayerCapsuleNotify(
-		ndDemoEntityManager* const manager, 
-		const ndSharedPtr<ndRenderSceneNode>& entity)
-		:ndDemoEntityNotify(manager, entity)
-		//,m_meshOrigin(entity->GetRenderMatrix().m_posit)
-		//,m_localRotation(entity->GetRenderMatrix())
-		//,m_veloc(ndVector::m_zero)
-	{
-		ndAssert(0);
-	}
-
-	void OnTransform(ndInt32, const ndMatrix& matrix)
-	{
-		ndAssert(0);
-		//const ndBody* const body = GetBody();
-		//const ndQuaternion rot(body->GetRotation());
-		//ndWorld* const word = m_manager->GetWorld();
-		//
-		//m_entity->SetMatrix(m_localRotation * rot, matrix.TransformVector(m_meshOrigin));
-		//ndBasicPlayerCapsule* const player = (ndBasicPlayerCapsule*)GetBody();
-		//
-		//ndFloat32 timestep = word->GetScene()->GetTimestep();
-		//player->m_animBlendTree->Update(timestep);
-		//player->m_animBlendTree->Evaluate(player->m_output, m_veloc);
-		
-		//for (ndInt32 i = 0; i < player->m_output.GetCount(); ++i)
-		//{
-		//	const ndAnimKeyframe& keyFrame = player->m_output[i];
-		//	ndDemoEntity* const entity = (ndDemoEntity*)keyFrame.m_userData;
-		//	if (entity)
-		//	{
-		//		entity->SetMatrix(keyFrame.m_rotation, keyFrame.m_posit);
-		//	}
-		//}
-	}
-	
-	ndQuaternion m_meshOrigin;
-	ndQuaternion m_localRotation;
-	ndVector m_veloc;
-};
+//
+////#define PLAYER_FIRST_PERSON	
+//#ifdef PLAYER_FIRST_PERSON	
+//	#define PLAYER_THIRD_PERSON_VIEW_DIST	0.0f
+//#else
+//	//#define PLAYER_THIRD_PERSON_VIEW_DIST	6.0f
+//	#define PLAYER_THIRD_PERSON_VIEW_DIST	5.0f
+//#endif
 
 ndBasicPlayerCapsule::ndBasicPlayerCapsule()
 	:ndBodyPlayerCapsule()
-	,m_isPlayer(false)
 {
 }
 
-class ndAnimationBlendTansition: public ndAnimationTwoWayBlend
-{
-	public:
-	ndAnimationBlendTansition(ndAnimationBlendTreeNode* const node0, ndAnimationBlendTreeNode* const node1)
-		:ndAnimationTwoWayBlend(node0, node1)
-		,m_paramMemory(0.0f)
-	{
-	}
-
-	void SetTransition(ndFloat32 param)
-	{
-		m_paramMemory = m_paramMemory + 0.15f * (param - m_paramMemory);
-		SetParam(m_paramMemory);
-	}
-
-	ndFloat32 m_paramMemory;
-};
-
 ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	ndDemoEntityManager* const scene, 
-	ndMeshLoader& loader, ndSharedPtr<ndRenderSceneNode>& entity, 
+	ndSharedPtr<ndRenderSceneNode>& entity, 
 	const ndMatrix& localAxis, const ndMatrix& location,
-	ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight, bool isPlayer)
+	ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight)
 	:ndBodyPlayerCapsule(localAxis, mass, radius, height, stepHeight)
-	,m_isPlayer(isPlayer)
-	,m_output()
-	,m_idleWalkBlend(nullptr)
-	,m_animBlendTree(nullptr)
 {
 	ndMatrix matrix(location);
 	ndPhysicsWorld* const world = scene->GetWorld();

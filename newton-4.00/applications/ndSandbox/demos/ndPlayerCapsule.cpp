@@ -23,138 +23,27 @@
 
 #define ND_THIRD_PERSON_CAMERA_DIST ndFloat32(-5.0f)
 
-#if 0
-class ndMopcapRetargetMeshLoader : public ndMeshLoader
-{
-	public:
-	ndMopcapRetargetMeshLoader(ndFloat32 scale)
-		:ndMeshLoader()
-		,m_scale(scale)
-	{
-	}
-
-	virtual ~ndMopcapRetargetMeshLoader()
-	{
-	}
-
-	//ndMesh* LoadMesh(const char* const fbxMeshName, bool loadAnimation)
-	ndSharedPtr<ndRenderSceneNode> LoadEntity(ndRender* const renderer, const ndString& fbxPathMeshName) override
-	{
-		ndSharedPtr<ndRenderSceneNode> mesh (ndMeshLoader::LoadEntity(renderer, fbxPathMeshName));
-
-		//ndMesh* mesh = ndMeshLoader::LoadMesh(fbxMeshName, loadAnimation);
-
-		//// re target animation names
-		//ndList<ndSharedPtr<ndMeshEffect>> meshes;
-		//for (ndMesh* node = mesh->GetFirstIterator(); node; node = node->GetNextIterator())
-		//{
-		//	ndSharedPtr<ndMeshEffect> meshEffect(node->GetMesh());
-		//	if (*meshEffect && meshEffect->GetVertexWeights().GetCount())
-		//	{
-		//		meshes.Append(meshEffect);
-		//	}
-		//}
-		//if (meshes.GetCount())
-		//{
-		//	for (ndMesh* node = mesh->GetFirstIterator(); node; node = node->GetNextIterator())
-		//	{
-		//		const char* const ptr = strchr(node->GetName().GetStr(), ':');
-		//		if (ptr)
-		//		{
-		//			ndInt32 newHashId = ndInt32(ndCRC64(ptr + 1) & 0xffffffff);
-		//			ndInt32 oldHashId = ndInt32(ndCRC64(node->GetName().GetStr()) & 0xffffffff);
-		//			for (ndList<ndSharedPtr<ndMeshEffect>>::ndNode* meshNode = meshes.GetFirst(); meshNode; meshNode = meshNode->GetNext())
-		//			{
-		//				ndArray<ndMeshEffect::ndVertexWeight>& weights = meshNode->GetInfo()->GetVertexWeights();
-		//				for (ndInt32 i = 0; i < weights.GetCount(); ++i)
-		//				{
-		//					ndMeshEffect::ndVertexWeight& w = weights[i];
-		//					for (ndInt32 j = ND_VERTEX_WEIGHT_SIZE - 1; j >= 0; --j)
-		//					{
-		//						if (w.m_boneId[j] == oldHashId)
-		//						{
-		//							w.m_boneId[j] = newHashId;
-		//						}
-		//					}
-		//				}
-		//			}
-		//		}
-		//	}
-		//}
-		//
-		//// re target bone names
-		//for (ndMesh* node = mesh->GetFirstIterator(); node; node = node->GetNextIterator())
-		//{
-		//	const char* const ptr = strchr(node->GetName().GetStr(), ':');
-		//	if (ptr)
-		//	{
-		//		node->SetName(ptr + 1);
-		//	}
-		//}
-		//
-		//if (m_scale != ndFloat32(1.0f))
-		//{
-		//	ndMatrix scaleMatrix(ndGetIdentityMatrix());
-		//	scaleMatrix[0][0] = m_scale;
-		//	scaleMatrix[1][1] = m_scale;
-		//	scaleMatrix[2][2] = m_scale;
-		//	mesh->ApplyTransform(scaleMatrix);
-		//}
-		//
-		//static int xxxxx;
-		//if (loadAnimation)
-		//{
-		//	if (xxxxx==0)
-		//	{
-		//		//ndMesh::Save(mesh, "xxx.ndm");
-		//		//delete mesh;
-		//		//mesh = ndMesh::Load("xxx.ndm");
-		//	}
-		//	xxxxx++;
-		//}
-
-		return mesh;
-	}
-
-	virtual ndAnimationSequence* LoadAnimation(const char* const clipName)
-	{
-		ndAnimationSequence* const sequence = ndMeshLoader::LoadAnimation(clipName);
-		ndAssert(sequence);
-
-		// extract translation for hip node.
-		if (!strcmp(clipName, "mocap_walk.fbx"))
-		{
-			for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = sequence->GetTracks().GetFirst(); node; node = node->GetNext())
-			{
-				ndAnimationKeyFramesTrack& track = node->GetInfo();
-				if (track.GetName() == "Hips")
-				{
-					ndAnimationKeyFramesTrack& translationTrack = sequence->GetTranslationTrack();
-					ndVector translation(ndVector::m_zero);
-					ndReal offset = ndReal(track.m_position[0].m_x);
-					for (ndInt32 i = 0; i < track.m_position.GetCount(); ++i)
-					{
-						translation.m_x = track.m_position[i].m_x - offset;
-						translationTrack.m_position.PushBack(translation);
-						translationTrack.m_position.m_time.PushBack(track.m_position.m_time[i]);
-						track.m_position[i].m_x = offset;
-					}
-					break;
-				}
-			}
-		}
-
-		return sequence;
-	}
-
-	ndFloat32 m_scale;
-};
-#endif
-
-
 class ndPlayerCapsuleController : public ndModelNotify
 {
 	public:
+	class ndAnimationBlendTransition : public ndAnimationTwoWayBlend
+	{
+		public:
+		ndAnimationBlendTransition(const ndSharedPtr<ndAnimationBlendTreeNode>& node0, const ndSharedPtr<ndAnimationBlendTreeNode>& node1)
+			:ndAnimationTwoWayBlend(node0, node1)
+			,m_paramMemory(0.0f)
+		{
+		}
+
+		void SetTransition(ndFloat32 param)
+		{
+			m_paramMemory = m_paramMemory + 0.15f * (param - m_paramMemory);
+			SetParam(m_paramMemory);
+		}
+
+		ndFloat32 m_paramMemory;
+	};
+
 	ndPlayerCapsuleController(ndDemoEntityManager* const scene, const ndSharedPtr<ndBody>& body)
 		:ndModelNotify()
 		,m_scene(scene)
@@ -181,7 +70,7 @@ class ndPlayerCapsuleController : public ndModelNotify
 		ndFloat32 radio = 0.15f;
 		ndFloat32 mass = 100.0f;
 		ndSharedPtr<ndRenderSceneNode> entityDuplicate(loader.m_renderMesh->Clone());
-		ndSharedPtr<ndBody> playerBody(new ndBasicPlayerCapsule(scene, loader, entityDuplicate, localAxis, location, mass, radio, height, height / 4.0f, true));
+		ndSharedPtr<ndBody> playerBody(new ndBasicPlayerCapsule(scene, entityDuplicate, localAxis, location, mass, radio, height, height / 4.0f));
 		ndSharedPtr<ndModel> model(new ndModel());
 		ndSharedPtr<ndModelNotify> controller(new ndPlayerCapsuleController(scene, playerBody));
 		model->SetNotifyCallback(controller);
@@ -213,35 +102,21 @@ class ndPlayerCapsuleController : public ndModelNotify
 		{
 			ndAnimationKeyFramesTrack& track = node->GetInfo();
 			const ndString& name = track.GetName();
-			ndSharedPtr<ndRenderSceneNode> ent(playerMesh->FindByName(name.GetStr()));
+			ndRenderSceneNode* const ent = playerMesh->FindByName(name.GetStr());
+			ndAssert(ent);
+
 			ndAnimKeyframe keyFrame;
-			keyFrame.m_userData = *ent;
+			keyFrame.m_userData = ent;
 			m_keyFrameOutput.PushBack(keyFrame);
 		}
 
 		// create an animation blend tree
-		//ndSharedPtr<ndAnimationSequence> idleSequence__(scene->GetAnimationSequence(loader, "box.fbx"));
-		//ndSharedPtr<ndAnimationSequence> idleSequence(scene->GetAnimationSequence(loader, "mocap_ide0.fbx"));
-		//ndSharedPtr<ndAnimationSequence> idleSequence(scene->GetAnimationSequence(loader, "mocap_ide1.fbx"));
+		ndSharedPtr<ndAnimationBlendTreeNode> idle (new ndAnimationSequencePlayer(idleSequence));
+		ndSharedPtr<ndAnimationBlendTreeNode> walk (new ndAnimationSequencePlayer(walkSequence));
+		//ndAnimationSequencePlayer* const run = new ndAnimationSequencePlayer(runSequence);
 		
-		//// create bind pose to animation sequences.
-		//const ndList<ndAnimationKeyFramesTrack>& tracks = idleSequence->GetTracks();
-		//for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = tracks.GetFirst(); node; node = node->GetNext())
-		//{
-		//	ndAnimationKeyFramesTrack& track = node->GetInfo();
-		//	const ndString& name = track.GetName();
-		//	ndSharedPtr<ndRenderSceneNode> ent (entity->Find(entity, name.GetStr()));
-		//	ndAnimKeyframe keyFrame;
-		//	keyFrame.m_userData = *ent;
-		//	m_output.PushBack(keyFrame);
-		//}
-		//
-		//ndAnimationSequencePlayer* const idle = new ndAnimationSequencePlayer(idleSequence);
-		//ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);
-		////ndAnimationSequencePlayer* const run = new ndAnimationSequencePlayer(runSequence);
-		//
-		//m_idleWalkBlend = new ndAnimationBlendTansition(idle, walk);
-		//m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(m_idleWalkBlend);
+		m_idleWalkBlend = ndSharedPtr<ndAnimationBlendTreeNode>(new ndAnimationBlendTransition(idle, walk));
+		m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(m_idleWalkBlend);
 	}
 
 	void SetCamera()
@@ -264,24 +139,69 @@ class ndPlayerCapsuleController : public ndModelNotify
 	void Update(ndFloat32 timestep) override
 	{
 		ndModelNotify::Update(timestep);
+	}
+
+	virtual void PostTransformUpdate(ndFloat32 timestep) override
+	{
+		ndModelNotify::PostTransformUpdate(timestep);
 
 		ndBasicPlayerCapsule* const player = (ndBasicPlayerCapsule*)m_playerBody->GetAsBodyPlayerCapsule();
 		ndAssert(player);
-		player->m_playerInput.m_forwardSpeed = ndFloat32 (0.0f);
+
+		const ndQuaternion rot(player->GetRotation());
+		//ndWorld* const word = m_manager->GetWorld();
+
+		//m_entity->SetMatrix(m_localRotation * rot, matrix.TransformVector(m_meshOrigin));
+		//ndBasicPlayerCapsule* const player = (ndBasicPlayerCapsule*)GetBody();
+		//ndFloat32 timestep = word->GetScene()->GetTimestep();
+
+		ndVector xxxx;
+		m_animBlendTree->Update(timestep);
+		m_animBlendTree->Evaluate(m_keyFrameOutput, xxxx);
+
+		for (ndInt32 i = 0; i < m_keyFrameOutput.GetCount(); ++i)
+		{
+			const ndAnimKeyframe& keyFrame = m_keyFrameOutput[i];
+			ndRenderSceneNode* const entity = (ndRenderSceneNode*)keyFrame.m_userData;
+			if (entity)
+			{
+				entity->SetTransform(keyFrame.m_rotation, keyFrame.m_posit);
+			}
+		}
+
+		ndAnimationBlendTransition* const blender = (ndAnimationBlendTransition*)*m_idleWalkBlend;
+		blender->SetTransition(1.0f);
+
+
+		//
+		//player->m_playerInput.m_forwardSpeed = ndFloat32(0.0f);
 		if (m_scene->GetKeyState(ImGuiKey_W))
 		{
+		//	ndAnimationBlendTransition* const blender = (ndAnimationBlendTransition*)*m_idleWalkBlend;
+		//	blender->SetTransition(m_playerInput.m_forwardSpeed ? 1.0f : 0.0f);
+		//
+		//	if (m_playerInput.m_forwardSpeed || m_playerInput.m_strafeSpeed)
+		//	{
+		//		ndFloat32 speed = notify->m_veloc.m_x;
+		//		ndFloat32 invMag = speed / ndSqrt(m_playerInput.m_forwardSpeed * m_playerInput.m_forwardSpeed + m_playerInput.m_strafeSpeed * m_playerInput.m_strafeSpeed);
+		//		m_playerInput.m_forwardSpeed *= invMag;
+		//		m_playerInput.m_strafeSpeed *= invMag;
+		//	}
+		
+			//ndAnimationBlendTransition* const blender = (ndAnimationBlendTransition*)*m_idleWalkBlend;
+			//blender->SetTransition(1.0f);
 			player->m_playerInput.m_forwardSpeed = ndFloat32(2.0f);
 		}
 		else if (m_scene->GetKeyState(ImGuiKey_S))
 		{
 			player->m_playerInput.m_forwardSpeed = ndFloat32(-1.0f);
 		}
-
+		
 		const ndFloat32 headingSpeed = ndFloat32(0.25f);
 		m_cameraAngle = ndAnglesAdd(m_cameraAngle, m_camera->m_yaw);
 		m_headingAngle = ndAnglesAdd(m_headingAngle, headingSpeed * ndAnglesSub(m_cameraAngle, m_headingAngle));
 		player->m_playerInput.m_heading = m_headingAngle;
-
+		
 		m_camera->m_yaw = ndFloat32(0.0f);
 	}
 
@@ -289,6 +209,8 @@ class ndPlayerCapsuleController : public ndModelNotify
 	ndDemoEntityManager* m_scene;
 	ndSharedPtr<ndBody> m_playerBody;
 	ndDemoCameraNodeFollow* m_camera;
+	ndSharedPtr<ndAnimationBlendTreeNode> m_idleWalkBlend;
+	ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
 	ndFloat32 m_cameraAngle;
 	ndFloat32 m_headingAngle;
 };

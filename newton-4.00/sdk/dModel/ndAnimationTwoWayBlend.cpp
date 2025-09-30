@@ -13,7 +13,7 @@
 #include "ndAnimationPose.h"
 #include "ndAnimationTwoWayBlend.h"
 
-ndAnimationTwoWayBlend::ndAnimationTwoWayBlend(ndAnimationBlendTreeNode* const node0, ndAnimationBlendTreeNode* const node1)
+ndAnimationTwoWayBlend::ndAnimationTwoWayBlend(const ndSharedPtr<ndAnimationBlendTreeNode>& node0, const ndSharedPtr<ndAnimationBlendTreeNode>& node1)
 	:ndAnimationBlendTreeNode(nullptr)
 	,m_node0(node0)
 	,m_node1(node1)
@@ -23,8 +23,6 @@ ndAnimationTwoWayBlend::ndAnimationTwoWayBlend(ndAnimationBlendTreeNode* const n
 
 ndAnimationTwoWayBlend::~ndAnimationTwoWayBlend()
 {
-	delete m_node0;
-	delete m_node1;
 }
 
 void ndAnimationTwoWayBlend::Update(ndFloat32 timestep)

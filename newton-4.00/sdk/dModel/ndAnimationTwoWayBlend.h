@@ -17,7 +17,7 @@
 class ndAnimationTwoWayBlend: public ndAnimationBlendTreeNode
 {
 	public:
-	ndAnimationTwoWayBlend(ndAnimationBlendTreeNode* const node0, ndAnimationBlendTreeNode* const node1);
+	ndAnimationTwoWayBlend(const ndSharedPtr<ndAnimationBlendTreeNode>& node0, const ndSharedPtr<ndAnimationBlendTreeNode>& node1);
 	virtual ~ndAnimationTwoWayBlend();
 
 	ndFloat32 GetParam() const;
@@ -27,8 +27,8 @@ class ndAnimationTwoWayBlend: public ndAnimationBlendTreeNode
 	void Evaluate(ndAnimationPose& output, ndVector& veloc);
 
 	protected:
-	ndAnimationBlendTreeNode* m_node0;
-	ndAnimationBlendTreeNode* m_node1;
+	ndSharedPtr<ndAnimationBlendTreeNode> m_node0;
+	ndSharedPtr<ndAnimationBlendTreeNode> m_node1;
 	ndFloat32 m_param;
 };
 
