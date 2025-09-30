@@ -400,7 +400,6 @@ ndDemoEntityManager::ndDemoEntityManager()
 	,m_transparentRenderPass(nullptr)
 	,m_debugDisplayRenderPass(nullptr)
 	,m_environmentTexture(nullptr)
-	,m_animationCache()
 	,m_demoHelper(nullptr)
 	,m_currentScene(DEFAULT_SCENE)
 	,m_lastCurrentScene(DEFAULT_SCENE)
@@ -637,22 +636,6 @@ void ndDemoEntityManager::KeyCallback(ndInt32 key, ndInt32)
 	}
 }
 
-//ndSharedPtr<ndAnimationSequence> ndDemoEntityManager::GetAnimationSequence(ndMeshLoader& loader, const char* const fileName)
-ndSharedPtr<ndAnimationSequence> ndDemoEntityManager::GetAnimationSequence(ndMeshLoader&, const char* const)
-{
-	ndAssert(0);
-	return ndSharedPtr<ndAnimationSequence>();
-	//ndTree<ndSharedPtr<ndAnimationSequence>, ndString>::ndNode* node = m_animationCache.Find(fileName);
-	//if (!node)
-	//{
-	//	ndAnimationSequence* const sequence = loader.LoadAnimation(fileName);
-	//	if (sequence)
-	//	{
-	//		node = m_animationCache.Insert(sequence, fileName);
-	//	}
-	//}
-	//return node ? node->GetInfo() : nullptr;
-}
 
 bool ndDemoEntityManager::IsShiftKeyDown () const
 {
@@ -787,9 +770,6 @@ void ndDemoEntityManager::Cleanup ()
 		m_world->Sync();
 	}
 
-	//RegisterPostUpdate(nullptr);
-	m_animationCache.RemoveAll();
-	
 	m_renderer->ResetScene();
 	
 	// destroy the Newton world

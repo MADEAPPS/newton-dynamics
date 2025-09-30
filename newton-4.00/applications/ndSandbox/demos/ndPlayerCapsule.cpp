@@ -274,8 +274,12 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 	 
 	// load the visual mesh, and animations.
 	ndMeshLoader loader;
-	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("whiteMan.fbx"));
-	//loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("humanoidRobot.fbx"));
+	// load mesh model and skeleton
+	//loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("whiteMan.fbx"));
+	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("humanoidRobot.fbx"));
+
+	// load animation clips
+	//loader.GetAnimationSequence(ndGetWorkingFileName("mocap_walk.fbx"));
 	
 	// create one player capsule, the mesh will be duplicated
 	ndMatrix location(ndGetIdentityMatrix());

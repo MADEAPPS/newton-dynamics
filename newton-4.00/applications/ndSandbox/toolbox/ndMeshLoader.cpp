@@ -148,3 +148,22 @@ bool ndMeshLoader::LoadEntity(ndRender* const renderer, const ndString& fbxPathM
 
 	return *m_mesh && *m_renderMesh;
 }
+
+
+//ndSharedPtr<ndAnimationSequence> ndDemoEntityManager::GetAnimationSequence(ndMeshLoader& loader, const char* const fileName)
+ndSharedPtr<ndAnimationSequence> ndMeshLoader::GetAnimationSequence(const ndString& fbxPathAnimName)
+{
+	ndTree<ndSharedPtr<ndAnimationSequence>, ndString>::ndNode* node = m_animationCache.Find(fbxPathAnimName);
+	if (!node)
+	{
+		ndAssert(0);
+	//	ndAnimationSequence* const sequence = loader.LoadAnimation(fileName);
+	//	if (sequence)
+	//	{
+	//		node = m_animationCache.Insert(sequence, fileName);
+	//	}
+	}
+	//return node ? node->GetInfo() : nullptr;
+
+	return ndSharedPtr<ndAnimationSequence>();
+}

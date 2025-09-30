@@ -1929,8 +1929,6 @@ class dAdvancedPlayerControllerManager: public dVehicleManager
 	DemoEntityManager::ButtonKey m_crowchKey;
 };
 
-
-
 void AdvancedPlayerController(DemoEntityManager* const scene)
 {
 	// load the sky box

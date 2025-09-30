@@ -12,9 +12,7 @@
 #define __DEMO_MAIN_FRAME_H__
 
 class ndUIEntity;
-class ndMeshLoader;
 class ndPhysicsWorld;
-class ndAnimationSequence;
 
 class ndDemoEntityManager : public ndClassAlloc
 {
@@ -166,8 +164,6 @@ class ndDemoEntityManager : public ndClassAlloc
 	bool GetCaptured () const;
 	bool GetMouseKeyState (ndInt32 button ) const;
 	ndInt32 Print (const ndVector& color, const char *fmt, ... ) const;
-	
-	ndSharedPtr<ndAnimationSequence> GetAnimationSequence(ndMeshLoader& loader, const char* const meshName);
 
 	void RenderStats();
 	void SetAcceleratedUpdate();
@@ -201,8 +197,6 @@ class ndDemoEntityManager : public ndClassAlloc
 	ndSharedPtr<ndRenderPass> m_transparentRenderPass;
 	ndSharedPtr<ndRenderPass> m_debugDisplayRenderPass;
 	ndSharedPtr<ndRenderTexture> m_environmentTexture;
-	
-	ndTree<ndSharedPtr<ndAnimationSequence>, ndString> m_animationCache;
 
 	ndSharedPtr<ndDemoHelper> m_demoHelper;
 
