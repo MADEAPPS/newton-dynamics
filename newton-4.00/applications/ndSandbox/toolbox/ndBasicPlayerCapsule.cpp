@@ -115,31 +115,6 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 
 	SetMatrix(matrix);
 	SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-	
-	//// create an animation blend tree
-	////ndSharedPtr<ndAnimationSequence> idleSequence__(scene->GetAnimationSequence(loader, "box.fbx"));
-	////ndSharedPtr<ndAnimationSequence> idleSequence(scene->GetAnimationSequence(loader, "mocap_ide0.fbx"));
-	//ndSharedPtr<ndAnimationSequence> idleSequence(scene->GetAnimationSequence(loader, "mocap_ide1.fbx"));
-	//ndSharedPtr<ndAnimationSequence> walkSequence(scene->GetAnimationSequence(loader, "mocap_walk.fbx"));
-	//
-	//// create bind pose to animation sequences.
-	//const ndList<ndAnimationKeyFramesTrack>& tracks = idleSequence->GetTracks();
-	//for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = tracks.GetFirst(); node; node = node->GetNext())
-	//{
-	//	ndAnimationKeyFramesTrack& track = node->GetInfo();
-	//	const ndString& name = track.GetName();
-	//	ndSharedPtr<ndRenderSceneNode> ent (entity->Find(entity, name.GetStr()));
-	//	ndAnimKeyframe keyFrame;
-	//	keyFrame.m_userData = *ent;
-	//	m_output.PushBack(keyFrame);
-	//}
-	//
-	//ndAnimationSequencePlayer* const idle = new ndAnimationSequencePlayer(idleSequence);
-	//ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);
-	////ndAnimationSequencePlayer* const run = new ndAnimationSequencePlayer(runSequence);
-	//
-	//m_idleWalkBlend = new ndAnimationBlendTansition(idle, walk);
-	//m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(m_idleWalkBlend);
 }
 
 ndBasicPlayerCapsule::~ndBasicPlayerCapsule()

@@ -27,9 +27,9 @@ class ndFbxMeshLoader : public ndClassAlloc
 
 	public:
 	ndFbxMeshLoader();
+	ndFbxMeshLoader(const ndFbxMeshLoader& src);
 	virtual ~ndFbxMeshLoader();
 
-	//virtual ndAnimationSequence* LoadAnimation(const char* const fullPathName);
 	virtual ndSharedPtr<ndAnimationSequence> LoadAnimation(const char* const fullPathName);
 	virtual ndSharedPtr<ndMesh> LoadMesh(const char* const fullPathName, bool loadAnimation);
 
@@ -53,7 +53,6 @@ class ndFbxMeshLoader : public ndClassAlloc
 	ndMatrix GetKeyframe(ndMesh::ndCurveValue& scale, ndMesh::ndCurveValue& position, ndMesh::ndCurveValue& rotation);
 	void LoadAnimationLayer(ndTree <ndFbxAnimationTrack, ndString>& tracks, const ofbx::IScene* const fbxScene, const ofbx::AnimationLayer* const animLayer);
 	void LoadAnimationCurve(ndTree <ndFbxAnimationTrack, ndString>& tracks, const ofbx::IScene* const, const ofbx::Object* const bone, const ofbx::AnimationLayer* const animLayer, ndFloat32 duration, ndInt32 framesCount);
-	
 };
 
 #endif

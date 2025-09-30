@@ -71,7 +71,6 @@ void ndAnimationSequence::CalculatePose(ndAnimationPose& output, ndFloat32 param
 		ndInt32 index = 0;
 		ndAnimKeyframe* const keyFrames = &output[0];
 
-		//m_translationTrack.InterpolatePosition(param, translationOut);
 		for (ndList<ndAnimationKeyFramesTrack>::ndNode* srcNode = m_tracks.GetFirst(); srcNode; srcNode = srcNode->GetNext())
 		{
 			const ndAnimationKeyFramesTrack& track = srcNode->GetInfo();

@@ -181,9 +181,7 @@ class ndPlayerCapsuleController : public ndModelNotify
 		ndFloat32 radio = 0.15f;
 		ndFloat32 mass = 100.0f;
 		ndSharedPtr<ndRenderSceneNode> entityDuplicate(loader.m_renderMesh->Clone());
-		//ndSharedPtr<ndRenderSceneNode> entityDuplicate(loader.m_renderMesh);
 		ndSharedPtr<ndBody> playerBody(new ndBasicPlayerCapsule(scene, loader, entityDuplicate, localAxis, location, mass, radio, height, height / 4.0f, true));
-
 		ndSharedPtr<ndModel> model(new ndModel());
 		ndSharedPtr<ndModelNotify> controller(new ndPlayerCapsuleController(scene, playerBody));
 		model->SetNotifyCallback(controller);
@@ -193,7 +191,57 @@ class ndPlayerCapsuleController : public ndModelNotify
 		scene->AddEntity(entityDuplicate);
 		world->AddBody(playerBody);
 		world->AddModel(model);
+
+		ndPlayerCapsuleController* const playerCapsule = (ndPlayerCapsuleController*)*controller;
+		playerCapsule->BindAnimations(loader);
 		return controller;
+	}
+
+	void BindAnimations(ndMeshLoader& loader)
+	{
+		ndDemoEntityNotify* const playerNotify = (ndDemoEntityNotify*)(m_playerBody->GetAsBodyKinematic()->GetNotifyCallback());
+		ndSharedPtr<ndRenderSceneNode> playerMesh(playerNotify->GetUserData());
+
+		ndSharedPtr<ndAnimationSequence> idleSequence(loader.FindSequence(ndGetWorkingFileName("mocap_idle.fbx")));
+		ndSharedPtr<ndAnimationSequence> walkSequence(loader.FindSequence(ndGetWorkingFileName("mocap_walk.fbx")));
+		ndAssert(*idleSequence);
+		ndAssert(*walkSequence);
+
+		// create bind pose to animation sequences.
+		const ndList<ndAnimationKeyFramesTrack>& tracks = walkSequence->GetTracks();
+		for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = tracks.GetFirst(); node; node = node->GetNext())
+		{
+			ndAnimationKeyFramesTrack& track = node->GetInfo();
+			const ndString& name = track.GetName();
+			ndSharedPtr<ndRenderSceneNode> ent(playerMesh->FindByName(name.GetStr()));
+			ndAnimKeyframe keyFrame;
+			keyFrame.m_userData = *ent;
+			m_keyFrameOutput.PushBack(keyFrame);
+		}
+
+		// create an animation blend tree
+		//ndSharedPtr<ndAnimationSequence> idleSequence__(scene->GetAnimationSequence(loader, "box.fbx"));
+		//ndSharedPtr<ndAnimationSequence> idleSequence(scene->GetAnimationSequence(loader, "mocap_ide0.fbx"));
+		//ndSharedPtr<ndAnimationSequence> idleSequence(scene->GetAnimationSequence(loader, "mocap_ide1.fbx"));
+		
+		//// create bind pose to animation sequences.
+		//const ndList<ndAnimationKeyFramesTrack>& tracks = idleSequence->GetTracks();
+		//for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = tracks.GetFirst(); node; node = node->GetNext())
+		//{
+		//	ndAnimationKeyFramesTrack& track = node->GetInfo();
+		//	const ndString& name = track.GetName();
+		//	ndSharedPtr<ndRenderSceneNode> ent (entity->Find(entity, name.GetStr()));
+		//	ndAnimKeyframe keyFrame;
+		//	keyFrame.m_userData = *ent;
+		//	m_output.PushBack(keyFrame);
+		//}
+		//
+		//ndAnimationSequencePlayer* const idle = new ndAnimationSequencePlayer(idleSequence);
+		//ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);
+		////ndAnimationSequencePlayer* const run = new ndAnimationSequencePlayer(runSequence);
+		//
+		//m_idleWalkBlend = new ndAnimationBlendTansition(idle, walk);
+		//m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(m_idleWalkBlend);
 	}
 
 	void SetCamera()
@@ -237,6 +285,7 @@ class ndPlayerCapsuleController : public ndModelNotify
 		m_camera->m_yaw = ndFloat32(0.0f);
 	}
 
+	ndAnimationPose m_keyFrameOutput;
 	ndDemoEntityManager* m_scene;
 	ndSharedPtr<ndBody> m_playerBody;
 	ndDemoCameraNodeFollow* m_camera;
@@ -264,6 +313,35 @@ static void AddSomeProps(ndDemoEntityManager* const)
 	//AddBox(scene, PlaceMatrix(10.0f, 1.0f, 1.250f), 30.0f, 2.0f, 0.25f, 2.5f);
 }
 
+static void LoadAnimations(ndMeshLoader& loader)
+{
+	// load animation clips
+	loader.GetAnimationSequence(ndGetWorkingFileName("mocap_idle.fbx"));
+	ndSharedPtr<ndAnimationSequence> walkCycle (loader.GetAnimationSequence(ndGetWorkingFileName("mocap_walk.fbx")));
+
+	// add the translation track
+	for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = walkCycle->GetTracks().GetFirst(); node; node = node->GetNext())
+	{
+		ndAnimationKeyFramesTrack& track = node->GetInfo();
+		ndString name(track.GetName());
+		name.ToLower();
+		if (name.Find("hips") != -1)
+		{
+			ndAnimationKeyFramesTrack& translationTrack = walkCycle->GetTranslationTrack();
+			ndVector translation(ndVector::m_zero);
+			ndReal offset = ndReal(track.m_position[0].m_x);
+			for (ndInt32 i = 0; i < track.m_position.GetCount(); ++i)
+			{
+				translation.m_x = track.m_position[i].m_x - offset;
+				translationTrack.m_position.PushBack(translation);
+				translationTrack.m_position.m_time.PushBack(track.m_position.m_time[i]);
+				track.m_position[i].m_x = offset;
+			}
+			break;
+		}
+	}
+}
+
 void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 {
 	// build a floor
@@ -278,9 +356,8 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 	//loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("whiteMan.fbx"));
 	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("humanoidRobot.fbx"));
 
-	// load animation clips
-	loader.GetAnimationSequence(ndGetWorkingFileName("mocap_idle.fbx"));
-	loader.GetAnimationSequence(ndGetWorkingFileName("mocap_walk.fbx"));
+	// load play animations stack
+	LoadAnimations(loader);
 	
 	// create one player capsule, the mesh will be duplicated
 	ndMatrix location(ndGetIdentityMatrix());

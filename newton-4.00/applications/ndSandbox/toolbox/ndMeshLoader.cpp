@@ -19,6 +19,14 @@ ndMeshLoader::ndMeshLoader()
 {
 }
 
+ndMeshLoader::ndMeshLoader(const ndMeshLoader& src)
+	:ndFbxMeshLoader(src)
+	,m_mesh(nullptr)
+	,m_renderMesh(nullptr)
+{
+	ndAssert(0);
+}
+
 ndMeshLoader::~ndMeshLoader()
 {
 }
@@ -149,8 +157,16 @@ bool ndMeshLoader::LoadEntity(ndRender* const renderer, const ndString& fbxPathM
 	return *m_mesh && *m_renderMesh;
 }
 
+const ndSharedPtr<ndAnimationSequence> ndMeshLoader::FindSequence(const ndString& fbxPathAnimName) const
+{
+	ndTree<ndSharedPtr<ndAnimationSequence>, ndString>::ndNode* const node = m_animationCache.Find(fbxPathAnimName);
+	if (node)
+	{
+		return node->GetInfo();
+	}
+	return ndSharedPtr<ndAnimationSequence>(nullptr);
+}
 
-//ndSharedPtr<ndAnimationSequence> ndDemoEntityManager::GetAnimationSequence(ndMeshLoader& loader, const char* const fileName)
 ndSharedPtr<ndAnimationSequence> ndMeshLoader::GetAnimationSequence(const ndString& fbxPathAnimName)
 {
 	ndTree<ndSharedPtr<ndAnimationSequence>, ndString>::ndNode* node = m_animationCache.Find(fbxPathAnimName);

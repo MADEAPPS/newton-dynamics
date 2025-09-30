@@ -114,6 +114,12 @@ ndFbxMeshLoader::ndFbxMeshLoader()
 {
 }
 
+ndFbxMeshLoader::ndFbxMeshLoader(const ndFbxMeshLoader&)
+	:ndClassAlloc()
+{
+	ndAssert(0);
+}
+
 ndFbxMeshLoader::~ndFbxMeshLoader()
 {
 }
