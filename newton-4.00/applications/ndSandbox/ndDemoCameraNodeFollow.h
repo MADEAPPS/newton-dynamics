@@ -22,6 +22,7 @@ class ndDemoCameraNodeFollow: public ndDemoCameraNode
 	ndDemoCameraNodeFollow(ndRender* const owner, const ndVector& pivot, ndFloat32 distance);
 
 	void TickUpdate(ndFloat32 timestep);
+	virtual ndMatrix CalculateLocalTransform() const;
 	virtual void SetTransform(const ndQuaternion& rotation, const ndVector& position) override;
 
 	ndVector m_pivot;
