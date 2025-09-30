@@ -127,8 +127,6 @@ class ndBackGroundVehicleController : public ndModelNotify
 
 	void SetCamera()
 	{
-		//ndSharedPtr<ndBody> vehicleBody = vehicleController->m_vehicleBody;
-
 		// attach a follow camera to the vehicle prop
 		const ndVector cameraPivot(0.0f, 2.0f, 0.0f, 0.0f);
 		ndRender* const renderer = *m_scene->GetRenderer();
@@ -159,13 +157,13 @@ class ndBackGroundVehicleController : public ndModelNotify
 		ndModelNotify::PostTransformUpdate(timestep);
 
 		// apply vehicle control 
-		ApplyImpulControls();
+		ApplyImpulseControls();
 
 		// apply tire animation and othe stuff if nessesary
 		AnimateTires(timestep);
 	}
 
-	void ApplyImpulControls()
+	void ApplyImpulseControls()
 	{
 		// apply forward controls
 		m_desiredSpeed = ndFloat32(0.0f);
