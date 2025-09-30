@@ -38,7 +38,22 @@ class ndPlayerCapsuleController : public ndModelNotify
 
 		virtual ndMatrix CalculateLocalTransform() const override
 		{
-			return ndDemoCameraNodeFollow::CalculateLocalTransform();
+			//ndAssert(m_parent);
+			ndMatrix globalMatrix(m_parent->CalculateGlobalTransform());
+			//ndMatrix uprightMatrix(ndGetIdentityMatrix());
+			//uprightMatrix.m_right = globalMatrix.m_front.CrossProduct(uprightMatrix.m_up).Normalize();
+			//uprightMatrix.m_front = uprightMatrix.m_up.CrossProduct(uprightMatrix.m_right).Normalize();
+			//uprightMatrix.m_posit = globalMatrix.m_posit;
+			//ndAssert(uprightMatrix.TestOrthogonal());
+			//const ndMatrix localUpMatrix(uprightMatrix * globalMatrix.OrthoInverse());
+			//ndMatrix camMatrix(ndRollMatrix(m_pitch) * ndYawMatrix(m_yaw) * localUpMatrix);
+			//camMatrix.m_posit = m_pivot;
+
+			ndMatrix camMatrix(globalMatrix.OrthoInverse());
+			ndMatrix xxxx(ndGetIdentityMatrix());
+			xxxx.m_posit.m_y = 2.0f;
+			//camMatrix.m_posit.m_y += 2.0f;
+			return xxxx * camMatrix;
 		}
 
 		ndFloat32 CameraHeadingAngle()
@@ -77,7 +92,6 @@ class ndPlayerCapsuleController : public ndModelNotify
 		,m_scene(scene)
 		,m_playerBody(body)
 		,m_camera(nullptr)
-
 	{
 	}
 
