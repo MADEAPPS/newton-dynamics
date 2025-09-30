@@ -57,35 +57,6 @@ R""""(
 	}
 )"""";
 
-const char* ndRenderShaderCache::m_generateShadowMapSkinVertex =
-R""""(
-	#version 450 core
-
-	// using the same vertex buffer
-	layout(location = 0) in vec3 in_position;
-	layout(location = 1) in vec3 in_normal;
-	layout(location = 2) in vec2 in_uv;
-	layout(location = 3) in vec4 in_boneWeights;
-	layout(location = 4) in ivec4 in_boneIndices;
-
-	uniform mat4 viewModelProjectionMatrix;
-	uniform mat4 matrixPalette[128];
-
-	void main()
-	{
-		vec4 weightedVertex = vec4 (0.0f, 0.0f, 0.0f, 1.0f);	
-		vec4 pointVertex = vec4(in_position, 1.0f);
-		for (int i = 0; i < 4; i++) 
-		{
-			int matrixIndex = in_boneIndices[i];
-			weightedVertex += matrixPalette[matrixIndex] * pointVertex * in_boneWeights[i];
-		}
-		weightedVertex.w = 1.0;
-
-		gl_Position = viewModelProjectionMatrix * weightedVertex;
-	}
-)"""";
-
 const char* ndRenderShaderCache::m_debugFlatShadedDiffuseVertex =
 R""""(
 	#version 450 core
@@ -257,5 +228,35 @@ R""""(
 		uv = in_uv;
 		gl_Position = projectionMatrix * vec4(posit, 1.0);
 	}
-
 )"""";
+
+const char* ndRenderShaderCache::m_generateShadowMapSkinVertex =
+R""""(
+	#version 450 core
+
+	// using the same vertex buffer
+	layout(location = 0) in vec3 in_position;
+	layout(location = 1) in vec3 in_normal;
+	layout(location = 2) in vec2 in_uv;
+	layout(location = 3) in vec4 in_boneWeights;
+	layout(location = 4) in ivec4 in_boneIndices;
+
+	uniform mat4 viewModelProjectionMatrix;
+	uniform mat4 matrixPalette[128];
+
+	void main()
+	{
+		vec4 pointVertex = vec4(in_position, 1.0f);
+		vec4 weightedVertex = vec4 (0.0f, 0.0f, 0.0f, 1.0f);	
+		for (int i = 0; i < 4; i++) 
+		{
+			float weigh = in_boneWeights[i];
+			int matrixIndex = in_boneIndices[i];
+			weightedVertex += matrixPalette[matrixIndex] * pointVertex * weigh;
+		}
+		weightedVertex.w = 1.0;
+
+		gl_Position = viewModelProjectionMatrix * weightedVertex;
+	}
+)"""";
+

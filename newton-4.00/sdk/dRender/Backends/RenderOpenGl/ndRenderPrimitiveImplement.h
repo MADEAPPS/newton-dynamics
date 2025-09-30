@@ -96,6 +96,7 @@ class ndRenderPrimitiveImplement : public ndContainersFreeListAlloc<ndRenderPrim
 	friend class ndRenderShaderGenerateShadowMapBlock;
 	friend class ndRenderShaderOpaqueDiffusedColorBlock;
 	friend class ndRenderShaderDebugWireframeDiffuseBlock;
+	friend class ndRenderShaderGenerateSkinShadowMapBlock;
 	friend class ndRenderShaderDebugFlatShadedDiffusedBlock;
 	friend class ndRenderShaderOpaqueDiffusedShadowColorBlock;
 	friend class ndRenderShaderGenerateInstanceShadowMapBlock;
