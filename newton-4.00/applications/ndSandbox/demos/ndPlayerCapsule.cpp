@@ -279,6 +279,7 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("humanoidRobot.fbx"));
 
 	// load animation clips
+	loader.GetAnimationSequence(ndGetWorkingFileName("mocap_idle.fbx"));
 	loader.GetAnimationSequence(ndGetWorkingFileName("mocap_walk.fbx"));
 	
 	// create one player capsule, the mesh will be duplicated
