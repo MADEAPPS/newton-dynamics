@@ -723,34 +723,6 @@ void ndRenderShaderOpaqueDiffusedShadowSkinColorBlock::Render(const ndRenderPrim
 
 	const ndMatrix viewMatrix(camera->m_invViewMatrix);
 	const ndMatrix modelViewMatrix(modelMatrix * viewMatrix);
-	{
-		//glBindBuffer(GL_ARRAY_BUFFER, self->m_vertexBuffer);
-		//const glSkinVertex* points = (glSkinVertex*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
-		//const ndMatrix* matrixPalette = (ndMatrix*)&self->m_skinPaletteMatrixArray[0];
-		//for (ndInt32 i = 0; i < self->m_vertexCount; ++i)
-		//{
-		//	ndVector pointVertex(points[i].m_posit.m_x, points[i].m_posit.m_y, points[i].m_posit.m_z, 1.0f);
-		//	ndVector weightedVertex (ndVector::m_zero);
-		//	for (int j = 0; j < 4; j++)
-		//	{
-		//		int matrixIndex = points[i].m_boneIndex[j];
-		//		weightedVertex += matrixPalette[matrixIndex].TransformVector(pointVertex).Scale(points[i].m_weighs[j]);
-		//	}
-		//	weightedVertex.m_w = 1.0f;
-		//	ndVector posit(modelViewMatrix.TransformVector(weightedVertex));
-		//	ndTrace(("%f %f %f\n", posit.m_x, posit.m_y, posit.m_z));
-		//}
-		//glUnmapBuffer(GL_ARRAY_BUFFER);
-
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self->m_indexBuffer);
-		//ndInt32* const srcData = (ndInt32*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY);
-		//for (ndInt32 i = 0; i < self->m_indexCount; i += 3)
-		//{
-		//	ndTrace(("%d %d %d\n", srcData[i], srcData[i + 1], srcData[i + 2]));
-		//}
-		//glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
-	}
-
 
 	const glMatrix worldMatrix(modelMatrix);
 	const glMatrix glViewModelMatrix(modelViewMatrix);

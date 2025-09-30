@@ -154,11 +154,11 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
 				{
 					// clone a skinned mesh weights and matrix index
 					 glEnableVertexAttribArray(3);
-					 glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(m_vertexSize), (void*)offset);
+					 glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, GLsizei(m_vertexSize), (void*)offset);
 					 offset += 4 * sizeof(ndReal);
-
+					 
 					 glEnableVertexAttribArray(4);
-					 glVertexAttribPointer(4, 4, GL_INT, GL_FALSE, sizeof(m_vertexSize), (void*)offset);
+					 glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, GLsizei(m_vertexSize), (void*)offset);
 					 offset += 4 * sizeof(ndReal);
 				}
 			}

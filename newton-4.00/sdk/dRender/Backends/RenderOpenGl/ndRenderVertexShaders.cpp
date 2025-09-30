@@ -242,9 +242,10 @@ R""""(
 		vec4 weightedVertex = vec4 (0.0f, 0.0f, 0.0f, 1.0f);	
 		for (int i = 0; i < 4; i++) 
 		{
+			float weigh = in_boneWeights[i];
 			int matrixIndex = in_boneIndices[i];
-			weightedVertex += matrixPalette[matrixIndex] * pointVertex * in_boneWeights[i];
-			weightedNormal += matrixPalette[matrixIndex] * pointNormal * in_boneWeights[i];
+			weightedVertex += matrixPalette[matrixIndex] * pointVertex * weigh;
+			weightedNormal += matrixPalette[matrixIndex] * pointNormal * weigh;
 		}
 		weightedVertex.w = 1.0;
 		weightedNormal = normalize (weightedNormal);
