@@ -108,7 +108,6 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		if (m_showIcon)
 		{
 			const ndMatrix modelMatrix(m_primitiveOffsetMatrix * m_placementMatrix);
-			//m_meshPrimitive->Render(owner, modelMatrix, m_directionalDiffusseShadow);
 			m_ghostPrimitive->Render(owner, modelMatrix, m_transparencyBackface);
 			m_ghostPrimitive->Render(owner, modelMatrix, m_transparencyFrontface);
 		}
