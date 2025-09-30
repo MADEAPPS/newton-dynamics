@@ -102,8 +102,8 @@ class ndMesh : public ndClassAlloc
 	ndCurve m_posit;
 	ndCurve m_rotation;
 	ndMesh* m_parent;
-	ndList<ndSharedPtr<ndMesh>>::ndNode* m_childNode;
 	ndList<ndSharedPtr<ndMesh>> m_children;
+	ndList<ndSharedPtr<ndMesh>>::ndNode* m_childNode;
 
 	friend class ndMeshFile;
 };

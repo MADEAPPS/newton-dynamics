@@ -29,7 +29,8 @@ class ndFbxMeshLoader : public ndClassAlloc
 	ndFbxMeshLoader();
 	virtual ~ndFbxMeshLoader();
 
-	virtual ndAnimationSequence* LoadAnimation(const char* const fullPathName);
+	//virtual ndAnimationSequence* LoadAnimation(const char* const fullPathName);
+	virtual ndSharedPtr<ndAnimationSequence> LoadAnimation(const char* const fullPathName);
 	virtual ndSharedPtr<ndMesh> LoadMesh(const char* const fullPathName, bool loadAnimation);
 
 	private:
