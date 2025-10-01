@@ -172,6 +172,20 @@ inline T ndAnglesSub(T angleInRadiand1, T angleInRadiand0)
 }
 
 template <class T>
+inline T ndModAdd(T value1, T value0, T modulo)
+{
+	T scale = T(2.0f * ndPi) / modulo;
+	return ndAnglesAdd(scale * value1, scale * value0) / scale;
+}
+
+template <class T>
+inline T ndModDiff(T value1, T value0, T modulo)
+{
+	T scale = T(2.0f * ndPi) / modulo;
+	return ndAnglesSub(scale * value1, scale * value0) / scale;
+}
+
+template <class T>
 inline void ndMemSet(T* const dst, const T& val, ndInt64 elements)
 {
 	T value(val);
