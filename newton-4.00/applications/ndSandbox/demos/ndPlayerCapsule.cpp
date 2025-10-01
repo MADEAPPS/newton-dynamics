@@ -191,15 +191,12 @@ class ndPlayerCapsuleController : public ndModelNotify
 		ndAssert(player);
 
 		const ndQuaternion rot(player->GetRotation());
-		//ndWorld* const word = m_manager->GetWorld();
 
-		//m_entity->SetMatrix(m_localRotation * rot, matrix.TransformVector(m_meshOrigin));
-		//ndBasicPlayerCapsule* const player = (ndBasicPlayerCapsule*)GetBody();
-		//ndFloat32 timestep = word->GetScene()->GetTimestep();
-
-		ndVector xxxx;
+		ndVector velocity;
 		m_animBlendTree->Update(timestep);
-		m_animBlendTree->Evaluate(m_keyFrameOutput, xxxx);
+		m_animBlendTree->Evaluate(m_keyFrameOutput, velocity);
+
+		player->m_playerInput.m_forwardSpeed = velocity.m_x;
 
 		for (ndInt32 i = 0; i < m_keyFrameOutput.GetCount(); ++i)
 		{
@@ -212,31 +209,17 @@ class ndPlayerCapsuleController : public ndModelNotify
 		}
 
 		ndAnimationBlendTransition* const blender = (ndAnimationBlendTransition*)*m_idleWalkBlend;
-		blender->SetTransition(1.0f);
-
-
-		//
-		//player->m_playerInput.m_forwardSpeed = ndFloat32(0.0f);
 		if (m_scene->GetKeyState(ImGuiKey_W))
 		{
-		//	ndAnimationBlendTransition* const blender = (ndAnimationBlendTransition*)*m_idleWalkBlend;
-		//	blender->SetTransition(m_playerInput.m_forwardSpeed ? 1.0f : 0.0f);
-		//
-		//	if (m_playerInput.m_forwardSpeed || m_playerInput.m_strafeSpeed)
-		//	{
-		//		ndFloat32 speed = notify->m_veloc.m_x;
-		//		ndFloat32 invMag = speed / ndSqrt(m_playerInput.m_forwardSpeed * m_playerInput.m_forwardSpeed + m_playerInput.m_strafeSpeed * m_playerInput.m_strafeSpeed);
-		//		m_playerInput.m_forwardSpeed *= invMag;
-		//		m_playerInput.m_strafeSpeed *= invMag;
-		//	}
-		
-			//ndAnimationBlendTransition* const blender = (ndAnimationBlendTransition*)*m_idleWalkBlend;
-			//blender->SetTransition(1.0f);
-			player->m_playerInput.m_forwardSpeed = ndFloat32(2.0f);
+			blender->SetTransition(1.0f);
 		}
 		else if (m_scene->GetKeyState(ImGuiKey_S))
 		{
-			player->m_playerInput.m_forwardSpeed = ndFloat32(-1.0f);
+			blender->SetTransition(1.0f);
+		}
+		else
+		{
+			blender->SetTransition(0.0f);
 		}
 		
 		if (m_camera)
@@ -330,11 +313,6 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 	ndPlayerCapsuleController* const playerController0 = (ndPlayerCapsuleController*)*modelNotity0;
 	playerController0->SetCamera();
 
-	////loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("tpot.fbx"));
-	//ndSharedPtr<ndRenderSceneNode> entityDuplicate(loader.m_renderMesh->Clone());
-	////ndSharedPtr<ndRenderSceneNode> entityDuplicate(loader.m_renderMesh);
-	////ndSharedPtr<ndRenderSceneNode> entityDuplicate(loader1.m_renderMesh);
-	//scene->AddEntity(entityDuplicate);
 #if 0		
 	//ndSharedPtr<ndBody> player1(new ndBasicPlayerCapsule(scene, loader, *entity, localAxis, location, mass, radio, height, height/4.0f));
 	//world->AddBody(player1);
