@@ -3780,7 +3780,7 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsContinue()
 	ndInt32 contactCount = 0;
 	ndFloat32 minTimeStep = m_timestep;
 	stackPool.PushBack(compoundShape->m_root);
-	impactTime.PushBack(ray.BoxIntersect(rootMinBox, rootMaxBox));
+	impactTime.PushBack(ndMin (ray.BoxIntersect(rootMinBox, rootMaxBox), ndFloat32 (1.0f)));
 
 	auto InsertNode = [&impactTime, &stackPool](const ndShapeCompound::ndNodeBase* const node, ndFloat32 dist)
 	{
@@ -3873,7 +3873,7 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsContinue()
 				ndAssert(left);
 				const ndVector minBox(left->m_p0 - boxP1);
 				const ndVector maxBox(left->m_p1 - boxP0);
-				ndFloat32 dist1 = ray.BoxIntersect(minBox, maxBox);
+				ndFloat32 dist1 = ndMin(ray.BoxIntersect(minBox, maxBox), ndFloat32(1.0f));
 				if (dist1 <= ndFloat32 (1.0f))
 				{
 					InsertNode(left, dist1);
@@ -3885,7 +3885,8 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsContinue()
 				ndAssert(right);
 				const ndVector minBox(right->m_p0 - boxP1);
 				const ndVector maxBox = right->m_p1 - boxP0;
-				ndFloat32 dist1 = ray.BoxIntersect(minBox, maxBox);
+				//ndFloat32 dist1 = ray.BoxIntersect(minBox, maxBox);
+				ndFloat32 dist1 = ndMin(ray.BoxIntersect(minBox, maxBox), ndFloat32(1.0f));
 				if (dist1 <= ndFloat32(1.0f))
 				{
 					InsertNode(right, dist1);
