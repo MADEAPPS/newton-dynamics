@@ -351,7 +351,7 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 
 #if 1
 	{
-		// populate the world with props and othe players
+		// populate the world with props and other players
 		AddSomeProps(scene);
 
 		// load the write man model and resuse the animations
