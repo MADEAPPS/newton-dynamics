@@ -38,21 +38,21 @@ class ndBodyPlayerCapsule : public ndBodyKinematicBase
 	D_COLLISION_API ndBodyPlayerCapsule(const ndMatrix& localAxis, ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight);
 	D_COLLISION_API virtual ~ndBodyPlayerCapsule();
 
-	ndBodyPlayerCapsule* GetAsBodyPlayerCapsule() override;
+	D_COLLISION_API ndBodyPlayerCapsule* GetAsBodyPlayerCapsule() override;
 
-	ndFloat32 GetForwardSpeed() const;
-	void SetForwardSpeed(ndFloat32 speed);
+	D_COLLISION_API ndFloat32 GetForwardSpeed() const;
+	D_COLLISION_API void SetForwardSpeed(ndFloat32 speed);
 
-	ndFloat32 GetLateralSpeed() const;
-	void SetLateralSpeed(ndFloat32 speed);
+	D_COLLISION_API ndFloat32 GetLateralSpeed() const;
+	D_COLLISION_API void SetLateralSpeed(ndFloat32 speed);
 
-	ndFloat32 GetHeadingAngle() const;
-	void SetHeadingAngle(ndFloat32 angle);
+	D_COLLISION_API ndFloat32 GetHeadingAngle() const;
+	D_COLLISION_API void SetHeadingAngle(ndFloat32 angle);
 
-	bool IsOnFloor() const;
+	D_COLLISION_API bool IsOnFloor() const;
 
-	virtual void ApplyInputs(ndFloat32 timestep);
-	virtual ndFloat32 ContactFrictionCallback(const ndVector& position, const ndVector& normal, ndInt32 contactId, const ndBodyKinematic* const otherbody) const;
+	D_COLLISION_API virtual void ApplyInputs(ndFloat32 timestep);
+	D_COLLISION_API virtual ndFloat32 ContactFrictionCallback(const ndVector& position, const ndVector& normal, ndInt32 contactId, const ndBodyKinematic* const otherbody) const;
 
 	private:
 	enum dCollisionState
@@ -62,18 +62,18 @@ class ndBodyPlayerCapsule : public ndBodyKinematicBase
 		m_deepPenetration,
 	};
 
-	virtual void IntegrateExternalForce(ndFloat32 timestep) override;
-	virtual void SetCollisionShape(const ndShapeInstance& shapeInstance) override;
+	D_COLLISION_API virtual void SpecialUpdate(ndFloat32 timestep) override;
+	D_COLLISION_API virtual void IntegrateExternalForce(ndFloat32 timestep) override;
+	D_COLLISION_API void IntegrateVelocity(ndFloat32 timestep) override;
+	D_COLLISION_API virtual void SetCollisionShape(const ndShapeInstance& shapeInstance) override;
+	D_COLLISION_API void Init(const ndMatrix& localAxis, ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight);
+
 	void UpdatePlayerStatus(ndBodyPlayerCapsuleContactSolver& contactSolver);
 	void ResolveStep(ndBodyPlayerCapsuleContactSolver& contactSolver, ndFloat32 timestep);
 	void ResolveCollision(ndBodyPlayerCapsuleContactSolver& contactSolver, ndFloat32 timestep);
 	ndFloat32 PredictTimestep(ndBodyPlayerCapsuleContactSolver& contactSolver, ndFloat32 timestep);
 	dCollisionState TestPredictCollision(const ndBodyPlayerCapsuleContactSolver& contactSolver, const ndVector& veloc) const;
 	void ResolveInterpenetrations(ndBodyPlayerCapsuleContactSolver& contactSolver, ndBodyPlayerCapsuleImpulseSolver& impulseSolver);
-	void IntegrateVelocity(ndFloat32 timestep) override;
-
-	D_COLLISION_API virtual void SpecialUpdate(ndFloat32 timestep) override;
-	D_COLLISION_API void Init(const ndMatrix& localAxis, ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight);
 
 	protected: 
 	ndMatrix m_localFrame;
@@ -94,75 +94,5 @@ class ndBodyPlayerCapsule : public ndBodyKinematicBase
 	bool m_isCrouched;
 	
 } D_GCC_NEWTON_CLASS_ALIGN_32;
-
-inline ndBodyPlayerCapsule* ndBodyPlayerCapsule::GetAsBodyPlayerCapsule()
-{ 
-	return this; 
-}
-
-inline void ndBodyPlayerCapsule::SetCollisionShape(const ndShapeInstance&)
-{
-	// ignore the changing collision shape;
-}
-
-inline void ndBodyPlayerCapsule::ApplyInputs(ndFloat32)
-{
-}
-
-inline ndFloat32 ndBodyPlayerCapsule::ContactFrictionCallback(const ndVector&, const ndVector&, ndInt32, const ndBodyKinematic* const) const
-{
-	return ndFloat32 (2.0f);
-}
-
-inline ndFloat32 ndBodyPlayerCapsule::GetForwardSpeed() const 
-{ 
-	return -m_forwardSpeed; 
-}
-
-inline void ndBodyPlayerCapsule::SetForwardSpeed(ndFloat32 speed) 
-{ 
-	m_forwardSpeed = -speed; 
-}
-
-inline ndFloat32 ndBodyPlayerCapsule::GetLateralSpeed() const 
-{ 
-	return -m_lateralSpeed; 
-}
-
-inline void ndBodyPlayerCapsule::SetLateralSpeed(ndFloat32 speed) 
-{ 
-	m_lateralSpeed = -speed; 
-}
-
-inline ndFloat32 ndBodyPlayerCapsule::GetHeadingAngle() const
-{
-	return m_headingAngle;
-}
-
-inline void ndBodyPlayerCapsule::SetHeadingAngle(ndFloat32 angle)
-{ 
-	//m_headingAngle = dClamp(angle, ndFloat32(-dPi), ndFloat32(dPi)); 
-	const ndFloat32 interpolation = ndFloat32(0.3f);
-	ndFloat32 deltaAngle = ndAnglesAdd(angle, -m_headingAngle) * interpolation;
-	ndFloat32 headingAngle = ndAnglesAdd(m_headingAngle, deltaAngle);
-	//dTrace(("%f %f %f\n", angle * dRadToDegree, m_headingAngle * dRadToDegree, headingAngle * dRadToDegree));
-	m_headingAngle = headingAngle;
-}
-
-inline void ndBodyPlayerCapsule::IntegrateVelocity(ndFloat32)
-{
-	m_accel = ndVector::m_zero;
-	m_alpha = ndVector::m_zero;
-}
-
-inline bool ndBodyPlayerCapsule::IsOnFloor() const 
-{ 
-	return m_isOnFloor; 
-}
-
-inline void ndBodyPlayerCapsule::IntegrateExternalForce(ndFloat32)
-{
-	// do nothing
-}
 
 #endif

@@ -130,6 +130,80 @@ void ndBodyPlayerCapsule::Init(const ndMatrix& localAxis, ndFloat32 mass, ndFloa
 	m_stepHeight = ndMax(stepHeight, m_contactPatch * ndFloat32(2.0f));
 }
 
+ndBodyPlayerCapsule* ndBodyPlayerCapsule::GetAsBodyPlayerCapsule()
+{
+	return this;
+}
+
+void ndBodyPlayerCapsule::SetCollisionShape(const ndShapeInstance&)
+{
+	// ignore the changing collision shape;
+}
+
+void ndBodyPlayerCapsule::ApplyInputs(ndFloat32)
+{
+}
+
+ndFloat32 ndBodyPlayerCapsule::ContactFrictionCallback(const ndVector&, const ndVector&, ndInt32, const ndBodyKinematic* const) const
+{
+	return ndFloat32(2.0f);
+}
+
+ndFloat32 ndBodyPlayerCapsule::GetForwardSpeed() const
+{
+	return -m_forwardSpeed;
+}
+
+void ndBodyPlayerCapsule::SetForwardSpeed(ndFloat32 speed)
+{
+	m_forwardSpeed = -speed;
+}
+
+ndFloat32 ndBodyPlayerCapsule::GetLateralSpeed() const
+{
+	return -m_lateralSpeed;
+}
+
+void ndBodyPlayerCapsule::SetLateralSpeed(ndFloat32 speed)
+{
+	m_lateralSpeed = -speed;
+}
+
+ndFloat32 ndBodyPlayerCapsule::GetHeadingAngle() const
+{
+	return m_headingAngle;
+}
+
+void ndBodyPlayerCapsule::SetHeadingAngle(ndFloat32 angle)
+{
+	//m_headingAngle = dClamp(angle, ndFloat32(-dPi), ndFloat32(dPi)); 
+	const ndFloat32 interpolation = ndFloat32(0.3f);
+	ndFloat32 deltaAngle = ndAnglesAdd(angle, -m_headingAngle) * interpolation;
+	ndFloat32 headingAngle = ndAnglesAdd(m_headingAngle, deltaAngle);
+	//dTrace(("%f %f %f\n", angle * dRadToDegree, m_headingAngle * dRadToDegree, headingAngle * dRadToDegree));
+	m_headingAngle = headingAngle;
+}
+
+void ndBodyPlayerCapsule::IntegrateVelocity(ndFloat32)
+{
+	m_accel = ndVector::m_zero;
+	m_alpha = ndVector::m_zero;
+}
+
+bool ndBodyPlayerCapsule::IsOnFloor() const
+{
+	return m_isOnFloor;
+}
+
+void ndBodyPlayerCapsule::IntegrateExternalForce(ndFloat32)
+{
+	// do nothing
+}
+
+
+
+
+
 void ndBodyPlayerCapsule::ResolveStep(ndBodyPlayerCapsuleContactSolver& contactSolver, ndFloat32 timestep)
 {
 	ndMatrix matrix(m_matrix);
