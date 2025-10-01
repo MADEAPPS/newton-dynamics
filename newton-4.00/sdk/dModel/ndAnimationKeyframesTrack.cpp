@@ -65,6 +65,10 @@ void ndAnimationKeyFramesTrack::InterpolatePosition(ndFloat32 param, ndVector& p
 	{
 		posit = m_position[0];
 	}
+	else
+	{
+		posit = ndVector::m_zero;
+	}
 }
 
 void ndAnimationKeyFramesTrack::InterpolateRotation(ndFloat32 param, ndQuaternion& rotation) const
