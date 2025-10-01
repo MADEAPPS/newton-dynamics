@@ -182,8 +182,8 @@ ndSharedPtr<ndBody> AddCapsule(ndDemoEntityManager* const scene, const ndMatrix&
 
 ndSharedPtr<ndBody> AddCylinder(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, const char* const textName)
 {
-	//ndSharedPtr<ndBody> body (CreateCylinder(scene, location, mass, radius0, radius1, high, textName));
-	ndSharedPtr<ndBody> body(CreateCapsule(scene, location, mass, radius0, radius1, high, textName));
+	ndSharedPtr<ndBody> body (CreateCylinder(scene, location, mass, radius0, radius1, high, textName));
+	//ndSharedPtr<ndBody> body(CreateCapsule(scene, location, mass, radius0, radius1, high, textName));
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 	world->AddBody(body);
