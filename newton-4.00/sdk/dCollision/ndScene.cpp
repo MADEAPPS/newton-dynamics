@@ -1121,16 +1121,6 @@ bool ndScene::ConvexCast(
 					ndFloat32 dist1 = ray.BoxIntersect(minBox, maxBox);
 					if (dist1 < callback.m_param)
 					{
-						//ndInt32 j = ndInt32 (stackPool.GetCount());
-						//for (; j && (dist1 > stackDistance[j - 1]); j--)
-						//{
-						//	stackPool[j] = stackPool[j - 1];
-						//	stackDistance[j] = stackDistance[j - 1];
-						//}
-						//stackPool[j] = left;
-						//stackDistance[j] = dist1;
-						//stack++;
-						//ndAssert(stack < D_SCENE_MAX_STACK_DEPTH);
 						InsertNode(left, dist1);
 					}
 				}
@@ -1143,16 +1133,6 @@ bool ndScene::ConvexCast(
 					ndFloat32 dist1 = ray.BoxIntersect(minBox, maxBox);
 					if (dist1 < callback.m_param)
 					{
-						//ndInt32 j = stack;
-						//for (; j && (dist1 > stackDistance[j - 1]); j--) 
-						//{
-						//	stackPool[j] = stackPool[j - 1];
-						//	stackDistance[j] = stackDistance[j - 1];
-						//}
-						//stackPool[j] = right;
-						//stackDistance[j] = dist1;
-						//stack++;
-						//ndAssert(stack < D_SCENE_MAX_STACK_DEPTH);
 						InsertNode(right, dist1);
 					}
 				}
