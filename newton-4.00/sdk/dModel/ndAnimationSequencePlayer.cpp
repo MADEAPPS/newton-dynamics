@@ -35,52 +35,63 @@ void ndAnimationSequencePlayer::SetTime(ndFloat32 time)
 {
 	ndFloat32 duration = m_sequence->GetDuration();
 	m_time = ndFmod(time, duration);
+	if (m_time < ndFloat32(0.0f))
+	{
+		m_time += duration;
+	}
 }
 
 void ndAnimationSequencePlayer::Update(ndFloat32 timestep)
 {
-	//SetTime (m_time + timestep);
-
 	ndFloat32 duration = m_sequence->GetDuration();
-	ndFloat32 scale = ndFloat32(2.0f) * ndPi / duration;
-
-	ndFloat32 angle1 = timestep * scale;
-	ndFloat32 angle0 = m_time * scale;
-	ndFloat32 deltaAngle = ndAnglesSub(angle1, angle0);
+	ndAssert(m_time >= ndFloat32 (0.0f));
+	ndAssert(m_time <= duration);
 
 	ndFloat32 t0 = m_time;
-	ndFloat32 angle = angle0 + deltaAngle;
-	if (angle < 0.0f)
+	ndFloat32 t1 = t0 + timestep;
+	if (timestep > ndFloat32(0.0f))
 	{
-		angle += ndFloat32(2.0f) * ndPi;
-	}
-	ndFloat32 t1 = ndMod(angle, ndFloat32(2.0f) * ndPi) / scale;
-	if (deltaAngle > ndFloat32(0.0f))
-	{
-		if (t1 > t0)
+		const ndVector p0(m_sequence->GetTranslation(t0));
+		if (t1 < duration)
 		{
-			ndVector p0(m_sequence->GetTranslation(t0));
-			ndVector p1(m_sequence->GetTranslation(t1));
-			m_veloc = (p1 - p0).Scale(ndFloat32(1.0f) / (t1 - t0));
+			const ndVector p1(m_sequence->GetTranslation(t1));
+			m_veloc = (p1 - p0).Scale(ndFloat32(1.0f) / timestep);
 		}
 		else
 		{
-			//ndAssert(0);
+			//t1 = ndModAdd(t0, timestep, duration);
+			t1 -= duration;
+			ndAssert(t1 <= duration);
+			ndAssert(t1 >= ndFloat32(0.0f));
+			const ndVector q(m_sequence->GetTranslation(duration));
+			const ndVector p1(m_sequence->GetTranslation(t1) + q);
+			m_veloc = (p1 - p0).Scale(ndFloat32(1.0f) / timestep);
 		}
 	}
-	else if (deltaAngle < ndFloat32(0.0f))
+	else if (timestep < ndFloat32(0.0f))
 	{
-		if (t1 < t0)
+		const ndVector p0(m_sequence->GetTranslation(t0));
+		if (t1 >= ndFloat32(0.0f))
 		{
-			ndVector p0(m_sequence->GetTranslation(t0));
-			ndVector p1(m_sequence->GetTranslation(t1));
-			m_veloc = (p1 - p0).Scale(ndFloat32(1.0f) / (t0 - t1));
+			const ndVector p1(m_sequence->GetTranslation(t1));
+			m_veloc = (p1 - p0).Scale(ndFloat32(1.0f) / timestep);
 		}
 		else
 		{
-			//ndAssert(0);
+			//t1 = ndModAdd(t0, timestep, duration);
+			t1 += duration;
+			ndAssert(t1 <= duration);
+			ndAssert(t1 >= ndFloat32(0.0f));
+			const ndVector q(m_sequence->GetTranslation(duration));
+			const ndVector p1(m_sequence->GetTranslation(t1) - q);
+			m_veloc = (p1 - p0).Scale(ndFloat32(1.0f) / timestep);
 		}
 	}
+	else
+	{
+		m_veloc = ndVector::m_zero;
+	}
+
 	SetTime(m_time + timestep);
 }
 
@@ -97,7 +108,5 @@ void ndAnimationSequencePlayer::Evaluate(ndAnimationPose& output, ndVector& velo
 
 	ndAssert(m_time <= period);
 	ndAssert(m_time >= ndFloat32(0.0f));
-	m_sequence->CalculatePose(output, m_time / period);
+	m_sequence->CalculatePose(output, m_time);
 }
-
-
