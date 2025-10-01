@@ -215,11 +215,11 @@ class ndPlayerCapsuleController : public ndModelNotify
 			blender->SetTransition(0.0f);
 		}
 		
-		ndVector velocity;
+		ndVector veloc;
 		m_animBlendTree->Update(timestep * timestepSign);
-		m_animBlendTree->Evaluate(m_keyFrameOutput, velocity);
+		m_animBlendTree->Evaluate(m_keyFrameOutput, veloc);
 
-		player->m_playerInput.m_forwardSpeed = velocity.m_x;
+		player->m_playerInput.m_forwardSpeed = veloc.m_x;
 		
 		if (m_camera)
 		{
