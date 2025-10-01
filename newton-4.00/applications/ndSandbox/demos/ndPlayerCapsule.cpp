@@ -90,9 +90,9 @@ class ndPlayerCapsuleController : public ndModelNotify
 	public:
 	ndPlayerCapsuleController(ndDemoEntityManager* const scene, const ndSharedPtr<ndBody>& body)
 		:ndModelNotify()
-		,m_scene(scene)
 		,m_playerBody(body)
 		,m_camera(nullptr)
+		,m_scene(scene)
 	{
 	}
 
@@ -232,31 +232,46 @@ class ndPlayerCapsuleController : public ndModelNotify
 	}
 
 	ndAnimationPose m_keyFrameOutput;
-	ndDemoEntityManager* m_scene;
 	ndSharedPtr<ndBody> m_playerBody;
-	ndPlayerCamera* m_camera;
 	ndSharedPtr<ndAnimationBlendTreeNode> m_idleWalkBlend;
 	ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
+	ndPlayerCamera* m_camera;
+	ndDemoEntityManager* m_scene;
 };
 
-//static void AddSomeProps(ndDemoEntityManager* const scene)
-static void AddSomeProps(ndDemoEntityManager* const)
+static void AddSomeProps(ndDemoEntityManager* const scene)
 {
-	//class PlaceMatrix : public ndMatrix
-	//{
-	//	public:
-	//	PlaceMatrix(ndFloat32 x, ndFloat32 y, ndFloat32 z)
-	//		:ndMatrix(ndGetIdentityMatrix())
-	//	{
-	//		m_posit.m_x = x;
-	//		m_posit.m_y = y;
-	//		m_posit.m_z = z;
-	//	}
-	//};
+	auto AddMerryGoRound = [scene](const ndMatrix& location)
+	{
+		ndMatrix matrix(ndRollMatrix(ndFloat32(90.0f) * ndDegreeToRad) * location);
+		ndSharedPtr<ndBody> pole(AddCylinder(scene, matrix, ndFloat32(0.0f), ndFloat32(0.1f), ndFloat32(0.1f), ndFloat32(3.0f)));
+		ndSharedPtr<ndBody> platform(AddCylinder(scene, matrix, ndFloat32(200.0f), ndFloat32(5.0f), ndFloat32(5.0f), ndFloat32(0.2f)));
+		
+		matrix.m_posit.m_y += 0.3f;
+		platform->SetMatrix(matrix);
+		platform->SetOmega(ndVector(0.0f, 2.5f, 0.0f, 0.0f));
+		
+		ndSharedPtr<ndJointBilateralConstraint> hinge (new ndJointHinge(matrix, platform->GetAsBodyDynamic(), pole->GetAsBodyDynamic()));
+		scene->GetWorld()->AddJoint(hinge);
+	};
+
+	class PlaceMatrix : public ndMatrix
+	{
+		public:
+		PlaceMatrix(ndFloat32 x, ndFloat32 y, ndFloat32 z)
+			:ndMatrix(ndGetIdentityMatrix())
+		{
+			m_posit.m_x = x;
+			m_posit.m_y = y;
+			m_posit.m_z = z;
+		}
+	};
 	//AddCapsulesStacks___(scene, PlaceMatrix(32.0f, 0.0f, 0.0f), 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
 	//AddBox(scene, PlaceMatrix(10.0f, 0.0f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
 	//AddBox(scene, PlaceMatrix(10.0f, 0.5f, 1.125f), 30.0f, 2.0f, 0.25f, 2.5f);
 	//AddBox(scene, PlaceMatrix(10.0f, 1.0f, 1.250f), 30.0f, 2.0f, 0.25f, 2.5f);
+	
+	AddMerryGoRound(PlaceMatrix(32.0f, 0.0f, 10.0f));
 }
 
 static void LoadAnimations(ndMeshLoader& loader)
@@ -291,8 +306,9 @@ static void LoadAnimations(ndMeshLoader& loader)
 void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 {
 	// build a floor
+	//ndSharedPtr<ndBody> bodyFloor(BuildPlayground(scene));
 	//ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "marblecheckboard.png", 0.1f, true));
-	ndSharedPtr<ndBody> compoundScene(BuildCompoundScene(scene, ndGetIdentityMatrix()));
+	ndSharedPtr<ndBody> bodyFloor(BuildCompoundScene(scene, ndGetIdentityMatrix()));
 
 	AddSomeProps(scene);
 	 
