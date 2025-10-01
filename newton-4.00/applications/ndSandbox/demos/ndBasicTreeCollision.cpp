@@ -20,28 +20,6 @@
 void ndBasicStaticMeshCollision (ndDemoEntityManager* const scene)
 {
 	ndSharedPtr<ndBody> background(BuildPlayground(scene));
-
-	//ndMatrix location(ndGetIdentityMatrix());
-	//location.m_posit.m_y += 2.0f;
-	//ndMatrix localAxis(ndGetIdentityMatrix());
-	//localAxis[0] = ndVector(0.0f, 1.0f, 0.0f, 0.0f);
-	//localAxis[1] = ndVector(1.0f, 0.0f, 0.0f, 0.0f);
-	//localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
-	//
-	//ndMeshLoader loader;
-	//ndSharedPtr<ndDemoEntity> man(loader.LoadEntity("walker.fbx", scene));
-	//
-	////ndFloat32 height = 1.9f;
-	////ndFloat32 radio = 0.5f;
-	////ndFloat32 mass = 100.0f;
-	////new ndBasicPlayerCapsule(scene, man, localAxis, location, mass, radio, height, height/4.0f, true);
-	//
-	//location.m_posit.m_x += 8.0f;
-	//location.m_posit.m_z -= 2.0f;
-	////new ndBasicPlayerCapsule(scene, man, localAxis, location, mass, radio, height, height / 4.0f);
-	//
-	//location.m_posit.m_z += 4.0f;
-	////new ndBasicPlayerCapsule(scene, man, localAxis, location, mass, radio, height, height / 4.0f);
 	
 	class PlaceMatrix : public ndMatrix
 	{
@@ -73,7 +51,7 @@ void ndBasicStaticMeshCollision (ndDemoEntityManager* const scene)
 
 void ndBasicSceneCompoundCollision(ndDemoEntityManager* const scene)
 {
-	ndSharedPtr<ndBody> BuildCompoundScene(BuildCompoundScene(scene, ndGetIdentityMatrix()));
+	ndSharedPtr<ndBody> compoundScene(BuildCompoundScene(scene, ndGetIdentityMatrix()));
 
 	class PlaceMatrix : public ndMatrix
 	{
