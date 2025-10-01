@@ -17,16 +17,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndBasicPlayerCapsule.h"
 
-//#define PLAYER_WALK_SPEED				8.0f
 #define PLAYER_JUMP_SPEED				5.0f
-//
-////#define PLAYER_FIRST_PERSON	
-//#ifdef PLAYER_FIRST_PERSON	
-//	#define PLAYER_THIRD_PERSON_VIEW_DIST	0.0f
-//#else
-//	//#define PLAYER_THIRD_PERSON_VIEW_DIST	6.0f
-//	#define PLAYER_THIRD_PERSON_VIEW_DIST	5.0f
-//#endif
 
 ndBasicPlayerCapsule::ndBasicPlayerCapsule()
 	:ndBodyPlayerCapsule()
