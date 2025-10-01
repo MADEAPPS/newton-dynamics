@@ -180,15 +180,8 @@ class ndPlayerCapsuleController : public ndModelNotify
 	}
 
 	private:
-	virtual void PostTransformUpdate(ndFloat32 timestep) override
+	void UpdateSkeleton()
 	{
-		ndModelNotify::PostTransformUpdate(timestep);
-
-		ndBasicPlayerCapsule* const player = (ndBasicPlayerCapsule*)m_playerBody->GetAsBodyPlayerCapsule();
-		ndAssert(player);
-
-		const ndQuaternion rot(player->GetRotation());
-
 		for (ndInt32 i = 0; i < m_keyFrameOutput.GetCount(); ++i)
 		{
 			const ndAnimKeyframe& keyFrame = m_keyFrameOutput[i];
@@ -198,6 +191,23 @@ class ndPlayerCapsuleController : public ndModelNotify
 				entity->SetTransform(keyFrame.m_rotation, keyFrame.m_posit);
 			}
 		}
+	}
+
+	void PlayerUpdate(ndFloat32 timestep)
+	{
+		ndBasicPlayerCapsule* const player = (ndBasicPlayerCapsule*)m_playerBody->GetAsBodyPlayerCapsule();
+		//const ndQuaternion rot(player->GetRotation());
+
+		//for (ndInt32 i = 0; i < m_keyFrameOutput.GetCount(); ++i)
+		//{
+		//	const ndAnimKeyframe& keyFrame = m_keyFrameOutput[i];
+		//	ndRenderSceneNode* const entity = (ndRenderSceneNode*)keyFrame.m_userData;
+		//	if (entity)
+		//	{
+		//		entity->SetTransform(keyFrame.m_rotation, keyFrame.m_posit);
+		//	}
+		//}
+		UpdateSkeleton();
 
 		ndFloat32 timestepSign = ndFloat32(1.0f);
 		ndAnimationBlendTransition* const blender = (ndAnimationBlendTransition*)*m_idleWalkBlend;
@@ -214,20 +224,36 @@ class ndPlayerCapsuleController : public ndModelNotify
 		{
 			blender->SetTransition(0.0f);
 		}
-		
+
 		ndVector veloc;
 		m_animBlendTree->Update(timestep * timestepSign);
 		m_animBlendTree->Evaluate(m_keyFrameOutput, veloc);
 
 		player->m_playerInput.m_forwardSpeed = veloc.m_x;
-		
+
+		player->m_playerInput.m_heading = m_camera->CameraHeadingAngle();
+	}
+
+	// player to be update to a game script, for now only update the animation
+	void NonPlayerUpdate(ndFloat32 timestep)
+	{
+		ndVector veloc;
+		m_animBlendTree->Update(timestep);
+		m_animBlendTree->Evaluate(m_keyFrameOutput, veloc);
+		UpdateSkeleton();
+	}
+
+	virtual void PostTransformUpdate(ndFloat32 timestep) override
+	{
+		ndModelNotify::PostTransformUpdate(timestep);
+
 		if (m_camera)
 		{
-			player->m_playerInput.m_heading = m_camera->CameraHeadingAngle();
+			PlayerUpdate(timestep);
 		}
 		else
 		{
-			ndAssert(0);
+			NonPlayerUpdate(timestep);
 		}
 	}
 
@@ -266,10 +292,9 @@ static void AddSomeProps(ndDemoEntityManager* const scene)
 			m_posit.m_z = z;
 		}
 	};
-	//AddCapsulesStacks___(scene, PlaceMatrix(32.0f, 0.0f, 0.0f), 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
-	//AddBox(scene, PlaceMatrix(10.0f, 0.0f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
-	//AddBox(scene, PlaceMatrix(10.0f, 0.5f, 1.125f), 30.0f, 2.0f, 0.25f, 2.5f);
-	//AddBox(scene, PlaceMatrix(10.0f, 1.0f, 1.250f), 30.0f, 2.0f, 0.25f, 2.5f);
+	AddBox(scene, PlaceMatrix(20.0f, 0.0f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
+	AddBox(scene, PlaceMatrix(25.0f, 0.5f, 2.0f), 30.0f, 2.0f, 0.25f, 2.5f);
+	AddBox(scene, PlaceMatrix(15.0f, 1.0f, 4.0f), 30.0f, 2.0f, 0.25f, 2.5f);
 	
 	AddMerryGoRound(PlaceMatrix(32.0f, 0.0f, 10.0f));
 }
@@ -309,13 +334,9 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 	//ndSharedPtr<ndBody> bodyFloor(BuildPlayground(scene));
 	//ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "marblecheckboard.png", 0.1f, true));
 	ndSharedPtr<ndBody> bodyFloor(BuildCompoundScene(scene, ndGetIdentityMatrix()));
-
-	AddSomeProps(scene);
 	 
 	// load the visual mesh, and animations.
 	ndMeshLoader loader;
-	// load mesh model and skeleton
-	//loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("whiteMan.fbx"));
 	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("humanoidRobot.fbx"));
 
 	// load play animations stack
@@ -328,17 +349,30 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 	ndPlayerCapsuleController* const playerController0 = (ndPlayerCapsuleController*)*modelNotity0;
 	playerController0->SetCamera();
 
-#if 0		
-	//ndSharedPtr<ndBody> player1(new ndBasicPlayerCapsule(scene, loader, *entity, localAxis, location, mass, radio, height, height/4.0f));
-	//world->AddBody(player1);
+#if 1
+	{
+		// populate the world with props and othe players
+		AddSomeProps(scene);
 
-	location.m_posit.m_z += 2.0f;
-	ndSharedPtr<ndBody> player2(new ndBasicPlayerCapsule(scene, loader, *entity, localAxis, location, mass, radio, height, height / 4.0f));
-	//world->AddBody(player2);
-	
-	location.m_posit.m_z += 2.0f;
-	ndSharedPtr<ndBody> player3(new ndBasicPlayerCapsule(scene, loader, *entity, localAxis, location, mass, radio, height, height / 4.0f));
-	//world->AddBody(player3);
+		// load the write man model and resuse the animations
+		loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("whiteMan.fbx"));
+
+		location.m_posit.m_x = 25.0f;
+		location.m_posit.m_z = -5.0f;
+		ndPlayerCapsuleController::CreatePlayer(scene, loader, location);
+
+		location.m_posit.m_x = 25.0f;
+		location.m_posit.m_z = 5.0f;
+		ndPlayerCapsuleController::CreatePlayer(scene, loader, location);
+
+		location.m_posit.m_x = 30.0f;
+		location.m_posit.m_z = 10.0f;
+		ndPlayerCapsuleController::CreatePlayer(scene, loader, location);
+
+		location.m_posit.m_x = 30.0f;
+		location.m_posit.m_z = 15.0f;
+		ndPlayerCapsuleController::CreatePlayer(scene, loader, location);
+	}
 #endif
 
 }
