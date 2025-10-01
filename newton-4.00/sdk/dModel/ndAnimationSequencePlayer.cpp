@@ -49,6 +49,8 @@ void ndAnimationSequencePlayer::Update(ndFloat32 timestep)
 
 	ndFloat32 t0 = m_time;
 	ndFloat32 t1 = t0 + timestep;
+
+	m_veloc = ndVector::m_zero;
 	if (timestep > ndFloat32(0.0f))
 	{
 		const ndVector p0(m_sequence->GetTranslation(t0));
@@ -91,11 +93,7 @@ void ndAnimationSequencePlayer::Update(ndFloat32 timestep)
 			m_veloc = step.Scale(ndFloat32(-1.0f) / timestep);
 		}
 	}
-	else
-	{
-		m_veloc = ndVector::m_zero;
-	}
-
+	m_veloc.m_w = ndFloat32(0.0f);
 	SetTime(m_time + timestep);
 }
 
@@ -107,10 +105,7 @@ ndSharedPtr<ndAnimationSequence>& ndAnimationSequencePlayer::GetSequence()
 void ndAnimationSequencePlayer::Evaluate(ndAnimationPose& output, ndVector& veloc)
 {
 	veloc = m_veloc;
-
-	const ndFloat32 period = m_sequence->GetDuration();
-
-	ndAssert(m_time <= period);
 	ndAssert(m_time >= ndFloat32(0.0f));
+	ndAssert(m_time <= m_sequence->GetDuration());
 	m_sequence->CalculatePose(output, m_time);
 }
