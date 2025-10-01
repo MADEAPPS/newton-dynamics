@@ -25,56 +25,12 @@
 
 class ndPlayerCapsuleController : public ndModelNotify
 {
-	public:
-	class ndPlayerCamera : public ndDemoCameraNodeFollow
-	{
-		public:
-		ndPlayerCamera(ndRender* const owner, const ndVector& pivot, ndFloat32 distance)
-			:ndDemoCameraNodeFollow(owner, pivot, distance)
-			,m_cameraAngle(0.0f)
-			,m_headingAngle(0.0f)
-		{
-		}
-
-		virtual ndMatrix CalculateLocalTransform() const override
-		{
-			//ndAssert(m_parent);
-			ndMatrix globalMatrix(m_parent->CalculateGlobalTransform());
-			//ndMatrix uprightMatrix(ndGetIdentityMatrix());
-			//uprightMatrix.m_right = globalMatrix.m_front.CrossProduct(uprightMatrix.m_up).Normalize();
-			//uprightMatrix.m_front = uprightMatrix.m_up.CrossProduct(uprightMatrix.m_right).Normalize();
-			//uprightMatrix.m_posit = globalMatrix.m_posit;
-			//ndAssert(uprightMatrix.TestOrthogonal());
-			//const ndMatrix localUpMatrix(uprightMatrix * globalMatrix.OrthoInverse());
-			//ndMatrix camMatrix(ndRollMatrix(m_pitch) * ndYawMatrix(m_yaw) * localUpMatrix);
-			//camMatrix.m_posit = m_pivot;
-
-			ndMatrix camMatrix(globalMatrix.OrthoInverse());
-			ndMatrix xxxx(ndGetIdentityMatrix());
-			xxxx.m_posit.m_y = 2.0f;
-			//camMatrix.m_posit.m_y += 2.0f;
-			return xxxx * camMatrix;
-		}
-
-		ndFloat32 CameraHeadingAngle()
-		{
-			const ndFloat32 headingSpeed = ndFloat32(0.25f);
-			m_cameraAngle = ndAnglesAdd(m_cameraAngle, m_yaw);
-			m_headingAngle = ndAnglesAdd(m_headingAngle, headingSpeed * ndAnglesSub(m_cameraAngle, m_headingAngle));
-			m_yaw = ndFloat32(0.0f);
-			return m_headingAngle;
-		}
-
-		ndFloat32 m_cameraAngle;
-		ndFloat32 m_headingAngle;
-	};
-
 	class ndAnimationBlendTransition : public ndAnimationTwoWayBlend
 	{
 		public:
 		ndAnimationBlendTransition(const ndSharedPtr<ndAnimationBlendTreeNode>& node0, const ndSharedPtr<ndAnimationBlendTreeNode>& node1)
 			:ndAnimationTwoWayBlend(node0, node1)
-			,m_paramMemory(0.0f)
+			, m_paramMemory(0.0f)
 		{
 		}
 
@@ -87,6 +43,42 @@ class ndPlayerCapsuleController : public ndModelNotify
 		ndFloat32 m_paramMemory;
 	};
 
+	class ndPlayerCamera : public ndDemoCameraNodeFollow
+	{
+		public:
+		ndPlayerCamera(ndBodyPlayerCapsule* const playerBody, ndRender* const owner, const ndVector& pivot, ndFloat32 distance)
+			:ndDemoCameraNodeFollow(owner, pivot, distance)
+			,m_playerBody(playerBody)
+			,m_cameraAngle(0.0f)
+			,m_headingAngle(0.0f)
+		{
+		}
+
+		virtual ndMatrix CalculateLocalTransform() const override
+		{
+			ndMatrix camMatrix(m_parent->CalculateGlobalTransform().OrthoInverse());
+
+			ndMatrix playerMatrix(m_playerBody->GetMatrix());
+			playerMatrix.m_posit.m_y += ndFloat32 (2.5f);
+
+			return playerMatrix * camMatrix;
+		}
+
+		ndFloat32 CameraHeadingAngle()
+		{
+			const ndFloat32 headingSpeed = ndFloat32(0.25f);
+			m_cameraAngle = ndAnglesAdd(m_cameraAngle, m_yaw);
+			m_headingAngle = ndAnglesAdd(m_headingAngle, headingSpeed * ndAnglesSub(m_cameraAngle, m_headingAngle));
+			m_yaw = ndFloat32(0.0f);
+			return m_headingAngle;
+		}
+
+		ndBodyPlayerCapsule* m_playerBody;
+		ndFloat32 m_cameraAngle;
+		ndFloat32 m_headingAngle;
+	};
+
+	public:
 	ndPlayerCapsuleController(ndDemoEntityManager* const scene, const ndSharedPtr<ndBody>& body)
 		:ndModelNotify()
 		,m_scene(scene)
@@ -166,7 +158,7 @@ class ndPlayerCapsuleController : public ndModelNotify
 		// create a follow camera and set as teh active camera
 		const ndVector cameraPivot(0.0f, 0.5f, 0.0f, 0.0f);
 		ndRender* const renderer = *m_scene->GetRenderer();
-		ndSharedPtr<ndRenderSceneNode> camera(new ndPlayerCamera(renderer, cameraPivot, ND_THIRD_PERSON_CAMERA_DIST));
+		ndSharedPtr<ndRenderSceneNode> camera(new ndPlayerCamera(m_playerBody->GetAsBodyPlayerCapsule(), renderer, cameraPivot, ND_THIRD_PERSON_CAMERA_DIST));
 		renderer->SetCamera(camera);
 		m_camera = (ndPlayerCamera*)*camera;
 
@@ -177,12 +169,8 @@ class ndPlayerCapsuleController : public ndModelNotify
 		ndAssert(cameraNodePivot);
 		cameraNodePivot->AddChild(camera);
 	}
-	private:
-	void Update(ndFloat32 timestep) override
-	{
-		ndModelNotify::Update(timestep);
-	}
 
+	private:
 	virtual void PostTransformUpdate(ndFloat32 timestep) override
 	{
 		ndModelNotify::PostTransformUpdate(timestep);
