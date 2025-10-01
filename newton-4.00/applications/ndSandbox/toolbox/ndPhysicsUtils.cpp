@@ -134,6 +134,13 @@ ndSharedPtr<ndBody> CreateCapsule(ndDemoEntityManager* const scene, const ndMatr
 	return body;
 }
 
+ndSharedPtr<ndBody> CreateCylinder(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, const char* const textName)
+{
+	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeCylinder(radius0, radius1, high)));
+	ndSharedPtr<ndBody> body(CreateBody(scene, shape, location, mass, textName, ndRenderPrimitive::m_cylindrical));
+	return body;
+}
+
 //******************************************************************************
 // Create simple primitive and add to the scene
 //******************************************************************************
@@ -163,7 +170,20 @@ ndSharedPtr<ndBody> AddBox(ndDemoEntityManager* const scene, const ndMatrix& loc
 
 ndSharedPtr<ndBody> AddCapsule(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, const char* const textName)
 {
-	ndSharedPtr<ndBody> body = CreateCapsule(scene, location, mass, radius0, radius1, high, textName);
+	ndSharedPtr<ndBody> body (CreateCapsule(scene, location, mass, radius0, radius1, high, textName));
+
+	ndPhysicsWorld* const world = scene->GetWorld();
+	world->AddBody(body);
+
+	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)body->GetNotifyCallback();
+	scene->AddEntity(notify->m_entity);
+	return body;
+}
+
+ndSharedPtr<ndBody> AddCylinder(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, const char* const textName)
+{
+	//ndSharedPtr<ndBody> body (CreateCylinder(scene, location, mass, radius0, radius1, high, textName));
+	ndSharedPtr<ndBody> body(CreateCapsule(scene, location, mass, radius0, radius1, high, textName));
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 	world->AddBody(body);
