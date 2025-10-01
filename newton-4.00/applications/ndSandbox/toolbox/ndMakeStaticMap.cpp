@@ -461,7 +461,6 @@ class ndSceneMesh : public ndRenderSceneNode
 	ndSceneMesh(
 		ndDemoEntityManager* const scene, 
 		ndMeshLoader& loader,
-		const ndSharedPtr<ndRenderSceneNode>& playground, 
 		const ndMatrix& matrix)
 		:ndRenderSceneNode(matrix)
 		,m_compoundScene(new ndShapeInstance(new ndShapeCompound()))
@@ -472,22 +471,22 @@ class ndSceneMesh : public ndRenderSceneNode
 			ndMatrix subShapeLocation(ndGetIdentityMatrix());
 
 			// add the collision tree map
-			playground->SetTransform(subShapeLocation);
-			playground->SetTransform(subShapeLocation);
-			AddChild(playground);
+			loader.m_renderMesh->SetTransform(subShapeLocation);
+			loader.m_renderMesh->SetTransform(subShapeLocation);
+			AddChild(loader.m_renderMesh);
 			AddPlayground(subShapeLocation, loader);
-
+			
 			// add an array of cylinders
 			subShapeLocation.m_posit.m_x += 10.0f;
 			AddSpeedBumpsSubShape(scene, subShapeLocation, 14);
-		
+			
 			// we can add a lot more stuff
 			subShapeLocation.m_posit.m_z -= 15.0f;
 			AddBoxSubShape(scene, subShapeLocation);
-		
+			
 			subShapeLocation.m_posit.m_z += 30.0f;
 			AddBoxSubShape(scene, subShapeLocation);
-		
+			
 			subShapeLocation.m_posit.m_z += 5.0f;
 			AddBoxSubShape(scene, subShapeLocation);
 
@@ -587,7 +586,7 @@ ndSharedPtr<ndBody> BuildCompoundScene(ndDemoEntityManager* const scene, const n
 	// load the player arena map
 	ndMeshLoader loader;
 	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("playground.fbx"));
-	ndSharedPtr<ndRenderSceneNode> rootScene(new ndSceneMesh(scene, loader, loader.m_renderMesh, location));
+	ndSharedPtr<ndRenderSceneNode> rootScene(new ndSceneMesh(scene, loader, location));
 
 	ndSceneMesh* const sceneMesh = (ndSceneMesh*)*rootScene;
 	ndPhysicsWorld* const world = scene->GetWorld();
