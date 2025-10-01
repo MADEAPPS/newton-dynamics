@@ -56,12 +56,21 @@ class ndPlayerCapsuleController : public ndModelNotify
 
 		virtual ndMatrix CalculateLocalTransform() const override
 		{
-			ndMatrix camMatrix(m_parent->CalculateGlobalTransform().OrthoInverse());
+			const ndMatrix camMatrix(m_parent->CalculateGlobalTransform().OrthoInverse());
 
 			ndMatrix playerMatrix(m_playerBody->GetMatrix());
 			playerMatrix.m_posit.m_y += ndFloat32 (2.5f);
 
-			return playerMatrix * camMatrix;
+			// for debugging
+			#if 0
+				playerMatrix = ndGetIdentityMatrix();
+				playerMatrix.m_posit = m_playerBody->GetMatrix().m_posit;
+				playerMatrix.m_posit.m_y += ndFloat32(2.5f);
+			#endif
+
+			ndMatrix const pithcAngle(ndRollMatrix(m_pitch));
+
+			return pithcAngle * playerMatrix * camMatrix;
 		}
 
 		ndFloat32 CameraHeadingAngle()
@@ -180,12 +189,6 @@ class ndPlayerCapsuleController : public ndModelNotify
 
 		const ndQuaternion rot(player->GetRotation());
 
-		ndVector velocity;
-		m_animBlendTree->Update(timestep);
-		m_animBlendTree->Evaluate(m_keyFrameOutput, velocity);
-
-		player->m_playerInput.m_forwardSpeed = velocity.m_x;
-
 		for (ndInt32 i = 0; i < m_keyFrameOutput.GetCount(); ++i)
 		{
 			const ndAnimKeyframe& keyFrame = m_keyFrameOutput[i];
@@ -196,6 +199,7 @@ class ndPlayerCapsuleController : public ndModelNotify
 			}
 		}
 
+		ndFloat32 timestepSign = ndFloat32(1.0f);
 		ndAnimationBlendTransition* const blender = (ndAnimationBlendTransition*)*m_idleWalkBlend;
 		if (m_scene->GetKeyState(ImGuiKey_W))
 		{
@@ -203,12 +207,19 @@ class ndPlayerCapsuleController : public ndModelNotify
 		}
 		else if (m_scene->GetKeyState(ImGuiKey_S))
 		{
+			timestepSign = ndFloat32(-1.0f);
 			blender->SetTransition(1.0f);
 		}
 		else
 		{
 			blender->SetTransition(0.0f);
 		}
+		
+		ndVector velocity;
+		m_animBlendTree->Update(timestep * timestepSign);
+		m_animBlendTree->Evaluate(m_keyFrameOutput, velocity);
+
+		player->m_playerInput.m_forwardSpeed = velocity.m_x;
 		
 		if (m_camera)
 		{
@@ -280,8 +291,8 @@ static void LoadAnimations(ndMeshLoader& loader)
 void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	//ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
-	ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "marblecheckboard.png", 0.1f, true));
+	//ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "marblecheckboard.png", 0.1f, true));
+	ndSharedPtr<ndBody> compoundScene(BuildCompoundScene(scene, ndGetIdentityMatrix()));
 
 	AddSomeProps(scene);
 	 
