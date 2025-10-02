@@ -400,17 +400,20 @@ ndRenderSceneNode* ndRenderSceneNode::FindByName(const ndString& name) const
 
 ndRenderSceneNode* ndRenderSceneNode::FindByClosestMatch(const ndString& name) const
 {
-	ndInt32 bestScore = 10000;
-	ndRenderSceneNode* closestMatch = nullptr;
-	ndRenderSceneNode* const self = (ndRenderSceneNode*)this;
-	for (ndRenderSceneNode* node = self->IteratorFirst(); node && bestScore; node = node->IteratorNext())
+	ndRenderSceneNode* closestMatch = FindByName(name);
+	if (!closestMatch)
 	{
-		ndInt32 distance = node->m_name.Distance(name);
-		ndAssert(distance >= 0);
-		if (distance < bestScore)
+		ndInt32 bestScore = 10000;
+		ndRenderSceneNode* const self = (ndRenderSceneNode*)this;
+		for (ndRenderSceneNode* node = self->IteratorFirst(); node && bestScore; node = node->IteratorNext())
 		{
-			bestScore = distance;
-			closestMatch = node;
+			ndInt32 distance = node->m_name.Distance(name);
+			ndAssert(distance >= 0);
+			if (distance < bestScore)
+			{
+				bestScore = distance;
+				closestMatch = node;
+			}
 		}
 	}
 	return closestMatch;
