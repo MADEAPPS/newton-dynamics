@@ -96,6 +96,11 @@ ndSharedPtr<ndRenderTextureCache>& ndRender::GetTextureCache()
 	return m_textureCache;
 }
 
+ndList<ndSharedPtr<ndRenderSceneNode>>& ndRender::GetScene()
+{
+	return  m_scene;
+}
+
 ndInt32 ndRender::GetWidth() const
 {
 	return m_context->GetWidth();
