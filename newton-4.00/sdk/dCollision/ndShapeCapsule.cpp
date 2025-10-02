@@ -272,7 +272,7 @@ void ndShapeCapsule::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debu
 
 		ndVector face[4];
 		ndShapeDebugNotify::ndEdgeType edgeType[4];
-		memset(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType));
+		ndMemSet(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType)/sizeof (edgeType[0]));
 
 		for (ndInt32 i = 0; i < count; i += 3) 
 		{
