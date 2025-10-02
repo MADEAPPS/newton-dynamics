@@ -420,6 +420,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	,m_showUI(true)
 	,m_showAABB(false)
 	,m_showStats(true)
+	,m_helperLegend(false)
 	,m_autoSleepMode(true)
 	,m_showScene(false)
 	,m_showConcaveEdge(false)
@@ -867,6 +868,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("auto sleep mode", &m_autoSleepMode);
 			ImGui::Checkbox("show UI", &m_showUI);
 			ImGui::Checkbox("show stats", &m_showStats);
+			ImGui::Checkbox("show helper legend", &m_helperLegend);
 			ImGui::Checkbox("synchronous physics update", &m_synchronousPhysicsUpdate);
 			ImGui::Checkbox("synchronous particle update", &m_synchronousParticlesUpdate);
 			ImGui::Separator();
@@ -888,7 +890,8 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Text("worker threads");
 			ImGui::SliderInt("##worker", &m_workerThreads, 1, ndThreadPool::GetMaxThreads());
 			ImGui::Separator();
-	
+
+			//ImGui::RadioButton("show UI", &m_showUI);
 			ImGui::RadioButton("hide collision Mesh", &m_collisionDisplayMode, 0);
 			ImGui::RadioButton("show solid collision", &m_collisionDisplayMode, 1);
 			ImGui::RadioButton("show wire frame collision", &m_collisionDisplayMode, 2);
@@ -1089,16 +1092,31 @@ void ndDemoEntityManager::RenderStats()
 	
 	if (*m_demoHelper)
 	{
-		if (ImGui::Begin("User Interface", &m_showUI))
-		{
-			m_demoHelper->PresentHelp(this);
-			ImGui::End();
+		if (m_helperLegend)
+		{	
+			m_helperLegend = false;
+			m_demoHelper->ResetTime();
 		}
 
-		if (m_demoHelper->ExpirationTime())
+		if (!m_demoHelper->ExpirationTime())
 		{
-			m_demoHelper = ndSharedPtr<ndDemoHelper>(nullptr);
+			bool dummy = true;
+			if (ImGui::Begin("User Interface", &dummy))
+			{
+				m_demoHelper->PresentHelp(this);
+				ImGui::End();
+			}
 		}
+
+		//m_demoHelper->ExpirationTime();
+		//{
+		//	m_demoHelper = ndSharedPtr<ndDemoHelper>(nullptr);
+		//}
+		//if (!m_demoHelper->ExpirationTime())
+		//{
+		//	m_demoHelper->PresentHelp(this);
+		//	ImGui::End();
+		//}
 	}
 	
 	ShowMainMenuBar();
@@ -1107,6 +1125,54 @@ void ndDemoEntityManager::RenderStats()
 void ndDemoEntityManager::SetDemoHelp(ndSharedPtr<ndDemoHelper>& helper)
 {
 	m_demoHelper = helper;
+}
+
+void ndDemoEntityManager::SetNextActiveCamera()
+{
+	ndList<ndSharedPtr<ndRenderSceneNode>>& scene = m_renderer->GetScene();
+
+	const ndRenderSceneCamera* const currentCamera = m_renderer->GetCamera()->FindCameraNode();
+	ndAssert(currentCamera);
+	ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* currentNode = nullptr;
+	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* sceneNode = scene.GetFirst(); sceneNode; sceneNode = sceneNode->GetNext())
+	{
+		ndSharedPtr<ndRenderSceneNode>& node = sceneNode->GetInfo();
+		const ndRenderSceneCamera* cameraNode = node->FindCameraNode();
+		if (cameraNode && (cameraNode == currentCamera))
+		{
+			currentNode = sceneNode;
+			break;
+		}
+	}
+
+	// if it find a node, see if It can mode to teh next
+	if (currentNode)
+	{
+		ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* nextNode = nullptr;
+		for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* nextSceneNode = currentNode->GetNext(); nextSceneNode; nextSceneNode = nextSceneNode->GetNext())
+		{
+			ndSharedPtr<ndRenderSceneNode>& node = nextSceneNode->GetInfo();
+			const ndRenderSceneCamera* cameraNode = node->FindCameraNode();
+			if (cameraNode)
+			{
+				nextNode = nextSceneNode;
+				break;
+			}
+		}
+
+		if (!nextNode)
+		{
+			ndAssert(0);
+		}
+
+		// found a a diffrent playe with a camera
+		if (nextNode != currentNode)
+		{
+			ndRenderSceneNode* xxxx = nextNode->GetInfo()->FindByName("__PlayerCamera__");
+			ndRenderSceneNode* xxxx1 = nextNode->GetInfo()->FindByName("__PlayerCamera__");
+			
+		}
+	}
 }
 
 void ndDemoEntityManager::CalculateFPS(ndFloat32 timestep)

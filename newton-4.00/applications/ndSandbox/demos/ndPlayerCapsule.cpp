@@ -23,20 +23,36 @@
 
 #define ND_THIRD_PERSON_CAMERA_DIST ndFloat32(-5.0f)
 
+
 class ndPlayerCapsuleController : public ndModelNotify
 {
+	public:
+	class ndHelpLegend : public ndDemoEntityManager::ndDemoHelper
+	{
+		virtual void PresentHelp(ndDemoEntityManager* const scene) override
+		{
+			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
+			scene->Print(color, "implements a basic player capsule mechanic");
+			scene->Print(color, "w key for moving walking forward");
+			scene->Print(color, "s key for going walking backward");
+			scene->Print(color, "shift w key for running forwad");
+			scene->Print(color, "left click on the scene for turning and look up and down");
+			scene->Print(color, "left click on dynamics body for pickin the body");
+		}
+	};
+
 	class ndAnimationBlendTransition : public ndAnimationTwoWayBlend
 	{
 		public:
 		ndAnimationBlendTransition(const ndSharedPtr<ndAnimationBlendTreeNode>& node0, const ndSharedPtr<ndAnimationBlendTreeNode>& node1)
 			:ndAnimationTwoWayBlend(node0, node1)
-			, m_paramMemory(0.0f)
+			,m_paramMemory(0.0f)
 		{
 		}
 
 		void SetTransition(ndFloat32 param)
 		{
-			m_paramMemory = m_paramMemory + 0.15f * (param - m_paramMemory);
+			m_paramMemory = m_paramMemory + 0.05f * (param - m_paramMemory);
 			SetParam(m_paramMemory);
 		}
 
@@ -91,9 +107,25 @@ class ndPlayerCapsuleController : public ndModelNotify
 	ndPlayerCapsuleController(ndDemoEntityManager* const scene, const ndSharedPtr<ndBody>& body)
 		:ndModelNotify()
 		,m_playerBody(body)
-		,m_camera(nullptr)
+		,m_cameraNode(nullptr)
 		,m_scene(scene)
 	{
+		// add a camera 
+		const ndVector cameraPivot(0.0f, 0.5f, 0.0f, 0.0f);
+		ndRender* const renderer = *m_scene->GetRenderer();
+		m_cameraNode = ndSharedPtr<ndRenderSceneNode>(new ndPlayerCamera(m_playerBody->GetAsBodyPlayerCapsule(), renderer, cameraPivot, ND_THIRD_PERSON_CAMERA_DIST));
+
+		// attach the camera to the pivot node
+		ndDemoEntityNotify* const playerNotify = (ndDemoEntityNotify*)(m_playerBody->GetAsBodyKinematic()->GetNotifyCallback());
+		ndSharedPtr<ndRenderSceneNode> playerMesh(playerNotify->GetUserData());
+		ndRenderSceneNode* const cameraNodePivot = playerMesh->FindByName("cameraPivot");
+		ndAssert(cameraNodePivot);
+		cameraNodePivot->AddChild(m_cameraNode);
+	}
+
+	ndSharedPtr<ndRenderSceneNode> GetCamera()
+	{
+		return m_cameraNode;
 	}
 
 	static ndSharedPtr<ndModelNotify> CreatePlayer(
@@ -134,8 +166,10 @@ class ndPlayerCapsuleController : public ndModelNotify
 		ndDemoEntityNotify* const playerNotify = (ndDemoEntityNotify*)(m_playerBody->GetAsBodyKinematic()->GetNotifyCallback());
 		ndSharedPtr<ndRenderSceneNode> playerMesh(playerNotify->GetUserData());
 
+		ndSharedPtr<ndAnimationSequence> runSequence(loader.FindSequence(ndGetWorkingFileName("mocap_run.fbx")));
 		ndSharedPtr<ndAnimationSequence> idleSequence(loader.FindSequence(ndGetWorkingFileName("mocap_idle.fbx")));
 		ndSharedPtr<ndAnimationSequence> walkSequence(loader.FindSequence(ndGetWorkingFileName("mocap_walk.fbx")));
+		ndAssert(*runSequence);
 		ndAssert(*idleSequence);
 		ndAssert(*walkSequence);
 
@@ -154,30 +188,31 @@ class ndPlayerCapsuleController : public ndModelNotify
 		}
 
 		// create an animation blend tree
+		ndSharedPtr<ndAnimationBlendTreeNode> run(new ndAnimationSequencePlayer(runSequence));
 		ndSharedPtr<ndAnimationBlendTreeNode> idle (new ndAnimationSequencePlayer(idleSequence));
 		ndSharedPtr<ndAnimationBlendTreeNode> walk (new ndAnimationSequencePlayer(walkSequence));
-		//ndAnimationSequencePlayer* const run = new ndAnimationSequencePlayer(runSequence);
 		
-		m_idleWalkBlend = ndSharedPtr<ndAnimationBlendTreeNode>(new ndAnimationBlendTransition(idle, walk));
+		m_walkRunBlend = ndSharedPtr<ndAnimationBlendTreeNode>(new ndAnimationBlendTransition(walk, run));
+		m_idleWalkBlend = ndSharedPtr<ndAnimationBlendTreeNode>(new ndAnimationBlendTransition(idle, m_walkRunBlend));
 		m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(m_idleWalkBlend);
 	}
 
-	void SetCamera()
-	{
-		// create a follow camera and set as teh active camera
-		const ndVector cameraPivot(0.0f, 0.5f, 0.0f, 0.0f);
-		ndRender* const renderer = *m_scene->GetRenderer();
-		ndSharedPtr<ndRenderSceneNode> camera(new ndPlayerCamera(m_playerBody->GetAsBodyPlayerCapsule(), renderer, cameraPivot, ND_THIRD_PERSON_CAMERA_DIST));
-		renderer->SetCamera(camera);
-		m_camera = (ndPlayerCamera*)*camera;
-
-		// attach the camera to the pivot node
-		ndDemoEntityNotify* const playerNotify = (ndDemoEntityNotify*)(m_playerBody->GetAsBodyKinematic()->GetNotifyCallback());
-		ndSharedPtr<ndRenderSceneNode> playerMesh(playerNotify->GetUserData());
-		ndRenderSceneNode* const cameraNodePivot = playerMesh->FindByName("cameraPivot");
-		ndAssert(cameraNodePivot);
-		cameraNodePivot->AddChild(camera);
-	}
+	//void SetCamera()
+	//{
+	//	// create a follow camera and set as teh active camera
+	//	const ndVector cameraPivot(0.0f, 0.5f, 0.0f, 0.0f);
+	//	ndRender* const renderer = *m_scene->GetRenderer();
+	//	ndSharedPtr<ndRenderSceneNode> camera(new ndPlayerCamera(m_playerBody->GetAsBodyPlayerCapsule(), renderer, cameraPivot, ND_THIRD_PERSON_CAMERA_DIST));
+	//	renderer->SetCamera(camera);
+	//	m_camera = (ndPlayerCamera*)*camera;
+	//
+	//	// attach the camera to the pivot node
+	//	ndDemoEntityNotify* const playerNotify = (ndDemoEntityNotify*)(m_playerBody->GetAsBodyKinematic()->GetNotifyCallback());
+	//	ndSharedPtr<ndRenderSceneNode> playerMesh(playerNotify->GetUserData());
+	//	ndRenderSceneNode* const cameraNodePivot = playerMesh->FindByName("cameraPivot");
+	//	ndAssert(cameraNodePivot);
+	//	cameraNodePivot->AddChild(camera);
+	//}
 
 	private:
 	void UpdateSkeleton()
@@ -196,33 +231,37 @@ class ndPlayerCapsuleController : public ndModelNotify
 	void PlayerUpdate(ndFloat32 timestep)
 	{
 		ndBasicPlayerCapsule* const player = (ndBasicPlayerCapsule*)m_playerBody->GetAsBodyPlayerCapsule();
-		//const ndQuaternion rot(player->GetRotation());
 
-		//for (ndInt32 i = 0; i < m_keyFrameOutput.GetCount(); ++i)
-		//{
-		//	const ndAnimKeyframe& keyFrame = m_keyFrameOutput[i];
-		//	ndRenderSceneNode* const entity = (ndRenderSceneNode*)keyFrame.m_userData;
-		//	if (entity)
-		//	{
-		//		entity->SetTransform(keyFrame.m_rotation, keyFrame.m_posit);
-		//	}
-		//}
 		UpdateSkeleton();
 
 		ndFloat32 timestepSign = ndFloat32(1.0f);
-		ndAnimationBlendTransition* const blender = (ndAnimationBlendTransition*)*m_idleWalkBlend;
+
+		ndAnimationBlendTransition* const walkRunBlender = (ndAnimationBlendTransition*)*m_walkRunBlend;
+		ndAnimationBlendTransition* const idleWalkBlender = (ndAnimationBlendTransition*)*m_idleWalkBlend;
+
+		// run the input mibni state machine
 		if (m_scene->GetKeyState(ImGuiKey_W))
 		{
-			blender->SetTransition(1.0f);
+			idleWalkBlender->SetTransition(1.0f);
+			if (m_scene->GetKeyState(ImGuiKey_LeftShift))
+			{
+				walkRunBlender->SetTransition(1.0f);
+			}
+			else
+			{
+				walkRunBlender->SetTransition(0.0f);
+			}
 		}
 		else if (m_scene->GetKeyState(ImGuiKey_S))
 		{
 			timestepSign = ndFloat32(-1.0f);
-			blender->SetTransition(1.0f);
+			walkRunBlender->SetTransition(0.0f);
+			idleWalkBlender->SetTransition(1.0f);
 		}
 		else
 		{
-			blender->SetTransition(0.0f);
+			walkRunBlender->SetTransition(0.0f);
+			idleWalkBlender->SetTransition(0.0f);
 		}
 
 		ndVector veloc;
@@ -231,7 +270,8 @@ class ndPlayerCapsuleController : public ndModelNotify
 
 		player->m_playerInput.m_forwardSpeed = veloc.m_x;
 
-		player->m_playerInput.m_heading = m_camera->CameraHeadingAngle();
+		ndPlayerCamera* const cameraNode = (ndPlayerCamera*)*m_cameraNode;
+		player->m_playerInput.m_heading = cameraNode->CameraHeadingAngle();
 	}
 
 	// player to be update to a game script, for now only update the animation
@@ -247,7 +287,9 @@ class ndPlayerCapsuleController : public ndModelNotify
 	{
 		ndModelNotify::PostTransformUpdate(timestep);
 
-		if (m_camera)
+		ndRenderSceneCamera* const playerCamera = m_cameraNode->FindCameraNode();
+		ndRenderSceneCamera* const sceneCamera = m_scene->GetRenderer()->GetCamera()->FindCameraNode();
+		if (playerCamera == sceneCamera)
 		{
 			PlayerUpdate(timestep);
 		}
@@ -259,9 +301,10 @@ class ndPlayerCapsuleController : public ndModelNotify
 
 	ndAnimationPose m_keyFrameOutput;
 	ndSharedPtr<ndBody> m_playerBody;
+	ndSharedPtr<ndAnimationBlendTreeNode> m_walkRunBlend;
 	ndSharedPtr<ndAnimationBlendTreeNode> m_idleWalkBlend;
 	ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
-	ndPlayerCamera* m_camera;
+	ndSharedPtr<ndRenderSceneNode> m_cameraNode;
 	ndDemoEntityManager* m_scene;
 };
 
@@ -302,30 +345,12 @@ static void AddSomeProps(ndDemoEntityManager* const scene)
 static void LoadAnimations(ndMeshLoader& loader)
 {
 	// load animation clips
+	loader.GetAnimationSequence(ndGetWorkingFileName("mocap_run.fbx"));
+	loader.GetAnimationSequence(ndGetWorkingFileName("mocap_walk.fbx"));
 	loader.GetAnimationSequence(ndGetWorkingFileName("mocap_idle.fbx"));
-	ndSharedPtr<ndAnimationSequence> walkCycle (loader.GetAnimationSequence(ndGetWorkingFileName("mocap_walk.fbx")));
 
-	// add the translation track
-	for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = walkCycle->GetTracks().GetFirst(); node; node = node->GetNext())
-	{
-		ndAnimationKeyFramesTrack& track = node->GetInfo();
-		ndString name(track.GetName());
-		name.ToLower();
-		if (name.Find("hips") != -1)
-		{
-			ndAnimationKeyFramesTrack& translationTrack = walkCycle->GetTranslationTrack();
-			ndVector translation(ndVector::m_zero);
-			ndReal offset = ndReal(track.m_position[0].m_x);
-			for (ndInt32 i = 0; i < track.m_position.GetCount(); ++i)
-			{
-				translation.m_x = track.m_position[i].m_x - offset;
-				translationTrack.m_position.PushBack(translation);
-				translationTrack.m_position.m_time.PushBack(track.m_position.m_time[i]);
-				track.m_position[i].m_x = offset;
-			}
-			break;
-		}
-	}
+	// add the translation track, that tanslation is contained in the hip bone 
+	loader.SetTranslationTracks(ndString("hips"));
 }
 
 void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
@@ -334,7 +359,11 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 	//ndSharedPtr<ndBody> bodyFloor(BuildPlayground(scene));
 	//ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "marblecheckboard.png", 0.1f, true));
 	ndSharedPtr<ndBody> bodyFloor(BuildCompoundScene(scene, ndGetIdentityMatrix()));
-	 
+
+	// add a help menu
+	ndSharedPtr<ndDemoEntityManager::ndDemoHelper> demoHelper(new ndPlayerCapsuleController::ndHelpLegend());
+	scene->SetDemoHelp(demoHelper);
+
 	// load the visual mesh, and animations.
 	ndMeshLoader loader;
 	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("humanoidRobot.fbx"));
@@ -345,9 +374,12 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 	// create one player capsule, the mesh will be duplicated
 	ndMatrix location(ndGetIdentityMatrix());
 	
-	ndSharedPtr<ndModelNotify> modelNotity0(ndPlayerCapsuleController::CreatePlayer(scene, loader, location));
-	ndPlayerCapsuleController* const playerController0 = (ndPlayerCapsuleController*)*modelNotity0;
-	playerController0->SetCamera();
+	ndSharedPtr<ndModelNotify> modelNotity(ndPlayerCapsuleController::CreatePlayer(scene, loader, location));
+
+	// set this player as teh active camera
+	ndPlayerCapsuleController* const playerController = (ndPlayerCapsuleController*)*modelNotity;
+	ndRender* const renderer = *scene->GetRenderer();
+	renderer->SetCamera(playerController->GetCamera());
 
 #if 1
 	{
@@ -374,5 +406,4 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 		ndPlayerCapsuleController::CreatePlayer(scene, loader, location);
 	}
 #endif
-
 }

@@ -180,3 +180,32 @@ ndSharedPtr<ndAnimationSequence> ndMeshLoader::GetAnimationSequence(const ndStri
 	}
 	return node ? node->GetInfo() : ndSharedPtr<ndAnimationSequence>(nullptr);
 }
+
+void ndMeshLoader::SetTranslationTracks(const ndString& boneName)
+{
+	ndTree<ndSharedPtr<ndAnimationSequence>, ndString>::Iterator it(m_animationCache);
+	for (it.Begin(); it; it++)
+	{
+		const ndSharedPtr<ndAnimationSequence>& cycle = it.GetNode()->GetInfo();
+		for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = cycle->GetTracks().GetFirst(); node; node = node->GetNext())
+		{
+			ndAnimationKeyFramesTrack& track = node->GetInfo();
+			ndString name(track.GetName());
+			name.ToLower();
+			if (name.Find(boneName) != -1)
+			{
+				ndAnimationKeyFramesTrack& translationTrack = cycle->GetTranslationTrack();
+				ndVector translation(ndVector::m_zero);
+				ndReal offset = ndReal(track.m_position[0].m_x);
+				for (ndInt32 i = 0; i < track.m_position.GetCount(); ++i)
+				{
+					translation.m_x = track.m_position[i].m_x - offset;
+					translationTrack.m_position.PushBack(translation);
+					translationTrack.m_position.m_time.PushBack(track.m_position.m_time[i]);
+					track.m_position[i].m_x = offset;
+				}
+				break;
+			}
+		}
+	}
+}

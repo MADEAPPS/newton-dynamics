@@ -25,6 +25,16 @@ ndAnimationTwoWayBlend::~ndAnimationTwoWayBlend()
 {
 }
 
+ndFloat32 ndAnimationTwoWayBlend::GetParam() const
+{
+	return m_param;
+}
+
+void ndAnimationTwoWayBlend::SetParam(ndFloat32 param)
+{
+	m_param = param;
+}
+
 void ndAnimationTwoWayBlend::Update(ndFloat32 timestep)
 {
 	if (m_param < ndFloat32(0.001f))

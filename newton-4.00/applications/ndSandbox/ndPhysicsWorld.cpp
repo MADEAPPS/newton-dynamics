@@ -136,6 +136,9 @@ void ndPhysicsWorld::PostUpdate(ndFloat32 timestep)
 	ndWorld::PostUpdate(timestep);
 
 	ndScopeSpinLock Lock(m_lock);
+
+	m_manager->SetNextActiveCamera();
+
 	const ndBodyListView& bodyArray = GetBodyList();
 	const ndArray<ndBodyKinematic*>& view = bodyArray.GetView();
 	for (ndInt32 i = ndInt32(view.GetCount()) - 2; i >= 0; --i)

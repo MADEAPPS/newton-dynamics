@@ -97,12 +97,19 @@ class ndDemoEntityManager : public ndClassAlloc
 			:ndClassAlloc()
 			,m_currentTime(ndGetTimeInMicroseconds())
 		{
+			ResetTime();
+		}
+
+		void ResetTime()
+		{
+			m_currentTime = ndGetTimeInMicroseconds();
 		}
 
 		bool ExpirationTime() const
 		{
+			// stops diplay the legend afte 5 secunds
 			ndUnsigned64 timestep = ndGetTimeInMicroseconds() - m_currentTime;
-			return timestep > 10 * 1024 * 1024;
+			return timestep > 5 * 1024 * 1024;
 		}
 
 		virtual ~ndDemoHelper() {}
@@ -169,6 +176,8 @@ class ndDemoEntityManager : public ndClassAlloc
 	void SetAcceleratedUpdate();
 	void SetDemoHelp(ndSharedPtr<ndDemoHelper>& helper);
 
+	void SetNextActiveCamera();
+
 	private:
 	void Cleanup();
 
@@ -219,6 +228,7 @@ class ndDemoEntityManager : public ndClassAlloc
 	bool m_showUI;
 	bool m_showAABB;
 	bool m_showStats;
+	bool m_helperLegend;
 	bool m_autoSleepMode;
 	bool m_showScene;
 	bool m_showConcaveEdge;
