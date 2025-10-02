@@ -109,9 +109,9 @@ class ndPlayerCapsuleController : public ndModelNotify
 		localAxis[1] = ndVector(1.0f, 0.0f, 0.0f, 0.0f);
 		localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
 		
-		ndFloat32 height = 1.9f;
-		ndFloat32 radio = 0.15f;
-		ndFloat32 mass = 100.0f;
+		ndFloat32 height = ndFloat32(1.9f);
+		ndFloat32 radio = ndFloat32(0.4f);
+		ndFloat32 mass = ndFloat32(100.0f);
 		ndSharedPtr<ndRenderSceneNode> entityDuplicate(loader.m_renderMesh->Clone());
 		ndSharedPtr<ndBody> playerBody(new ndBasicPlayerCapsule(scene, entityDuplicate, localAxis, location, mass, radio, height, height / 4.0f));
 		ndSharedPtr<ndModel> model(new ndModel());
