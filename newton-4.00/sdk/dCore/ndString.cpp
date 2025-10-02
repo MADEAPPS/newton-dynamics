@@ -679,8 +679,6 @@ ndInt32 ndString::Distance(const ndString& other) const
 	ndInt32 m = m_size;
 	ndInt32 n = other.m_size;
 
-	//ndArray<ndInt32> prevRow;
-	//ndArray<ndInt32> currRow;
 	ndFixSizeArray<ndInt32, 1024> prevRow;
 	ndFixSizeArray<ndInt32, 1024> currRow;
 
