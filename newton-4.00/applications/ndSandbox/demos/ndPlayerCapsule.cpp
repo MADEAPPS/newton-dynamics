@@ -33,6 +33,7 @@ class ndPlayerCapsuleController : public ndModelNotify
 		{
 			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			scene->Print(color, "implements a basic player capsule mechanic");
+			scene->Print(color, "c key to chanage player");
 			scene->Print(color, "w key for moving walking forward");
 			scene->Print(color, "s key for going walking backward");
 			scene->Print(color, "shift w key for running forwad");
@@ -179,15 +180,11 @@ class ndPlayerCapsuleController : public ndModelNotify
 		{
 			ndAnimationKeyFramesTrack& track = node->GetInfo();
 			const ndString& name = track.GetName();
-			ndRenderSceneNode* ent = playerMesh->FindByName(name);
-			if (!ent)
-			{
-				ent = playerMesh->FindByClosestMatch(name);
-			}
-			ndAssert(ent);
+			ndRenderSceneNode* const bone = playerMesh->FindByClosestMatch(name);
+			ndAssert(bone);
 
 			ndAnimKeyframe keyFrame;
-			keyFrame.m_userData = ent;
+			keyFrame.m_userData = bone;
 			m_keyFrameOutput.PushBack(keyFrame);
 		}
 
