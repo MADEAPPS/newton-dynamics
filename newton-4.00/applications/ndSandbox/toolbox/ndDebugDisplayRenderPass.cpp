@@ -92,7 +92,8 @@ void ndDebugDisplayRenderPass::RenderScene()
 			node = m_meshCache.Insert(debugMesh, key);
 		}
 
-		const ndMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
+		//const ndMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
+		const ndMatrix matrix(shapeInstance.GetLocalMatrix() * body->GetMatrix());
 		ndSharedPtr<ndDebugMesh>& debugMesh = node->GetInfo();
 		const ndVector color((body->GetSleepState() == 1) ? m_sleepColor : m_awakeColor);
 
@@ -142,7 +143,8 @@ void ndDebugDisplayRenderPass::RenderScene()
 			}
 			ndTree<ndSharedPtr<ndDebugMesh>, ndShape*>::ndNode* const node = m_meshCache.Find(key);
 			ndAssert(node);
-			const ndMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
+			//const ndMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
+			const ndMatrix matrix(shapeInstance.GetLocalMatrix() * body->GetMatrix());
 			ndSharedPtr<ndDebugMesh>& debugMesh = node->GetInfo();
 			const ndVector color((body->GetSleepState() == 1) ? m_sleepColor : m_awakeColor);
 		
