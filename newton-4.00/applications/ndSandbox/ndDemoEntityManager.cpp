@@ -1127,6 +1127,54 @@ void ndDemoEntityManager::SetDemoHelp(ndSharedPtr<ndDemoHelper>& helper)
 	m_demoHelper = helper;
 }
 
+void ndDemoEntityManager::SetNextActiveCamera()
+{
+	ndList<ndSharedPtr<ndRenderSceneNode>>& scene = m_renderer->GetScene();
+
+	const ndRenderSceneCamera* const currentCamera = m_renderer->GetCamera()->FindCameraNode();
+	ndAssert(currentCamera);
+	ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* currentNode = nullptr;
+	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* sceneNode = scene.GetFirst(); sceneNode; sceneNode = sceneNode->GetNext())
+	{
+		ndSharedPtr<ndRenderSceneNode>& node = sceneNode->GetInfo();
+		const ndRenderSceneCamera* cameraNode = node->FindCameraNode();
+		if (cameraNode && (cameraNode == currentCamera))
+		{
+			currentNode = sceneNode;
+			break;
+		}
+	}
+
+	// if it find a node, see if It can mode to teh next
+	if (currentNode)
+	{
+		ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* nextNode = nullptr;
+		for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* nextSceneNode = currentNode->GetNext(); nextSceneNode; nextSceneNode = nextSceneNode->GetNext())
+		{
+			ndSharedPtr<ndRenderSceneNode>& node = nextSceneNode->GetInfo();
+			const ndRenderSceneCamera* cameraNode = node->FindCameraNode();
+			if (cameraNode)
+			{
+				nextNode = nextSceneNode;
+				break;
+			}
+		}
+
+		if (!nextNode)
+		{
+			ndAssert(0);
+		}
+
+		// found a a diffrent playe with a camera
+		if (nextNode != currentNode)
+		{
+			ndRenderSceneNode* xxxx = nextNode->GetInfo()->FindByName("__PlayerCamera__");
+			ndRenderSceneNode* xxxx1 = nextNode->GetInfo()->FindByName("__PlayerCamera__");
+			
+		}
+	}
+}
+
 void ndDemoEntityManager::CalculateFPS(ndFloat32 timestep)
 {
 	m_framesCount ++;

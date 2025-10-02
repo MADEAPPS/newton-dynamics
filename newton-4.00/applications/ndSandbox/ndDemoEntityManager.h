@@ -176,6 +176,8 @@ class ndDemoEntityManager : public ndClassAlloc
 	void SetAcceleratedUpdate();
 	void SetDemoHelp(ndSharedPtr<ndDemoHelper>& helper);
 
+	void SetNextActiveCamera();
+
 	private:
 	void Cleanup();
 
