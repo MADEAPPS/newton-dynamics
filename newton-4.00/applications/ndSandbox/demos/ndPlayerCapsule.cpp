@@ -135,7 +135,8 @@ class ndPlayerCapsuleController : public ndModelNotify
 		ndSharedPtr<ndRenderSceneNode> playerMesh(playerNotify->GetUserData());
 
 		ndSharedPtr<ndAnimationSequence> idleSequence(loader.FindSequence(ndGetWorkingFileName("mocap_idle.fbx")));
-		ndSharedPtr<ndAnimationSequence> walkSequence(loader.FindSequence(ndGetWorkingFileName("mocap_walk.fbx")));
+		//ndSharedPtr<ndAnimationSequence> walkSequence(loader.FindSequence(ndGetWorkingFileName("mocap_walk.fbx")));
+		ndSharedPtr<ndAnimationSequence> walkSequence(loader.FindSequence(ndGetWorkingFileName("mocap_run.fbx")));
 		ndAssert(*idleSequence);
 		ndAssert(*walkSequence);
 
@@ -196,17 +197,7 @@ class ndPlayerCapsuleController : public ndModelNotify
 	void PlayerUpdate(ndFloat32 timestep)
 	{
 		ndBasicPlayerCapsule* const player = (ndBasicPlayerCapsule*)m_playerBody->GetAsBodyPlayerCapsule();
-		//const ndQuaternion rot(player->GetRotation());
 
-		//for (ndInt32 i = 0; i < m_keyFrameOutput.GetCount(); ++i)
-		//{
-		//	const ndAnimKeyframe& keyFrame = m_keyFrameOutput[i];
-		//	ndRenderSceneNode* const entity = (ndRenderSceneNode*)keyFrame.m_userData;
-		//	if (entity)
-		//	{
-		//		entity->SetTransform(keyFrame.m_rotation, keyFrame.m_posit);
-		//	}
-		//}
 		UpdateSkeleton();
 
 		ndFloat32 timestepSign = ndFloat32(1.0f);
@@ -302,30 +293,12 @@ static void AddSomeProps(ndDemoEntityManager* const scene)
 static void LoadAnimations(ndMeshLoader& loader)
 {
 	// load animation clips
+	loader.GetAnimationSequence(ndGetWorkingFileName("mocap_run.fbx"));
+	loader.GetAnimationSequence(ndGetWorkingFileName("mocap_walk.fbx"));
 	loader.GetAnimationSequence(ndGetWorkingFileName("mocap_idle.fbx"));
-	ndSharedPtr<ndAnimationSequence> walkCycle (loader.GetAnimationSequence(ndGetWorkingFileName("mocap_walk.fbx")));
 
-	// add the translation track
-	for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = walkCycle->GetTracks().GetFirst(); node; node = node->GetNext())
-	{
-		ndAnimationKeyFramesTrack& track = node->GetInfo();
-		ndString name(track.GetName());
-		name.ToLower();
-		if (name.Find("hips") != -1)
-		{
-			ndAnimationKeyFramesTrack& translationTrack = walkCycle->GetTranslationTrack();
-			ndVector translation(ndVector::m_zero);
-			ndReal offset = ndReal(track.m_position[0].m_x);
-			for (ndInt32 i = 0; i < track.m_position.GetCount(); ++i)
-			{
-				translation.m_x = track.m_position[i].m_x - offset;
-				translationTrack.m_position.PushBack(translation);
-				translationTrack.m_position.m_time.PushBack(track.m_position.m_time[i]);
-				track.m_position[i].m_x = offset;
-			}
-			break;
-		}
-	}
+	// add the translation track, that tanslation is contained in the hip bone 
+	loader.SetTranslationTracks(ndString("hips"));
 }
 
 void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
