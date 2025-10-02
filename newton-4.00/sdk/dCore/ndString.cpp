@@ -12,6 +12,7 @@
 #include "ndCoreStdafx.h"
 #include "ndTypes.h"
 #include "ndUtils.h"
+#include "ndArray.h"
 #include "ndString.h"
 #include "ndMemory.h"
 
@@ -640,4 +641,80 @@ void ndString::FreeMem (char* const ptr)
 	{
 		GetAllocator().Free(ptr);
 	}
+}
+
+ndInt32 ndString::Distance(const ndString& other) const
+{
+	// recursive version is just too slow
+	//auto LevenshteinDistance = [str0, str1](auto self, ndInt32 size0, ndInt32 size1) -> ndInt32
+	//{
+	//	// str1 is empty
+	//	if (size0 == 0)
+	//	{
+	//		return size1;
+	//	}
+	//	// str2 is empty
+	//	if (size1 == 0)
+	//	{
+	//		return size0;
+	//	}
+	//
+	//	if (str0[size0 - 1] == str1[size1 - 1])
+	//	{
+	//		return self(self, size0 - 1, size1 - 1);
+	//	}
+	//	ndInt32 insert = self(self, size0, size1 - 1);
+	//	ndInt32 remove = self(self, size0 - 1, size1);
+	//	ndInt32 replace = self(self, size0 - 1, size1 - 1);
+	//	return 1 + ndMin(insert, ndMin(remove, replace));
+	//};
+	//ndInt32 dist = LevenshteinDistance(LevenshteinDistance, m_size, other.m_size);
+	//return dist;
+
+
+	// instead use th enon recureve version of the Levenshtein Distance from wikipedia
+	const char* const str1 = GetStr();
+	const char* const str2 = other.GetStr();
+
+	ndInt32 m = m_size;
+	ndInt32 n = other.m_size;
+
+	//ndArray<ndInt32> prevRow;
+	//ndArray<ndInt32> currRow;
+	ndFixSizeArray<ndInt32, 1024> prevRow;
+	ndFixSizeArray<ndInt32, 1024> currRow;
+
+	for (ndInt32 j = 0; j <= n; j++)
+	{
+		prevRow.PushBack(j);
+		currRow.PushBack(j);
+	}
+
+	for (ndInt32 i = 1; i <= m; i++) 
+	{
+		currRow[0] = i;
+	
+		for (ndInt32 j = 1; j <= n; j++)
+		{
+			if (str1[i - 1] == str2[j - 1]) 
+			{
+				currRow[j] = prevRow[j - 1];
+			}
+			else 
+			{
+				ndInt32 insert = currRow[j - 1];
+				ndInt32 remove = prevRow[j];
+				ndInt32 replace = prevRow[j - 1];
+				currRow[j] = 1 + ndMin(insert, ndMin(remove, replace));
+			}
+		}
+
+		prevRow.SetCount(0);
+		for (ndInt32 j = 0; j < currRow.GetCount(); ++j)
+		{
+			prevRow.PushBack(currRow[j]);
+		}
+	}
+	
+	return currRow[n];
 }

@@ -43,8 +43,8 @@ class ndString: public ndClassAlloc
 	D_CORE_API void operator+= (const char* const src);
 	void operator+= (const ndString& src);
 
-	ndString operator+ (const char* const src) const;
 	ndString operator+ (const ndString& src) const;
+	ndString operator+ (const char* const src) const;
 
 	D_CORE_API ndInt32 Find (char ch, ndInt32 from = 0) const;
 	ndInt32 Find (const ndString& subString, ndInt32 from = 0) const;
@@ -52,6 +52,8 @@ class ndString: public ndClassAlloc
 
 	D_CORE_API void Replace (ndInt32 start, ndInt32 size, const char* const str, ndInt32 strSize);
 	void Replace (ndInt32 start, ndInt32 size, const ndString& str);
+
+	D_CORE_API ndInt32 Distance(const ndString& other) const;
 
 	void Clear();
 	void Empty();
