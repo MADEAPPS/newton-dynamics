@@ -245,19 +245,6 @@ const ndRenderSceneCamera* ndRenderSceneNode::FindCameraNode() const
 	return nullptr;
 }
 
-ndRenderSceneNode* ndRenderSceneNode::FindByName(const ndString& name) const
-{
-	ndRenderSceneNode* const self = (ndRenderSceneNode*)this;
-	for (ndRenderSceneNode* node = self->IteratorFirst(); node; node = node->IteratorNext())
-	{
-		if (name == node->m_name)
-		{
-			return node;
-		}
-	}
-	return nullptr;
-}
-
 void ndRenderSceneNode::AddChild(const ndSharedPtr<ndRenderSceneNode>& child)
 {
 	ndAssert(child->m_parent == nullptr);
@@ -396,4 +383,35 @@ void ndRenderSceneNode::Render(const ndRender* const owner, const ndMatrix& mode
 		ndRenderSceneNode* const childNode = *node->GetInfo();
 		childNode->Render(owner, modelViewMatrix, renderMode);
 	}
+}
+
+ndRenderSceneNode* ndRenderSceneNode::FindByName(const ndString& name) const
+{
+	ndRenderSceneNode* const self = (ndRenderSceneNode*)this;
+	for (ndRenderSceneNode* node = self->IteratorFirst(); node; node = node->IteratorNext())
+	{
+		if (name == node->m_name)
+		{
+			return node;
+		}
+	}
+	return nullptr;
+}
+
+ndRenderSceneNode* ndRenderSceneNode::FindByClosestMatch(const ndString& name) const
+{
+	ndInt32 bestScore = 10000;
+	ndRenderSceneNode* closestMatch = nullptr;
+	ndRenderSceneNode* const self = (ndRenderSceneNode*)this;
+	for (ndRenderSceneNode* node = self->IteratorFirst(); node && bestScore; node = node->IteratorNext())
+	{
+		ndInt32 distance = node->m_name.Distance(name);
+		ndAssert(distance >= 0);
+		if (distance < bestScore)
+		{
+			bestScore = distance;
+			closestMatch = node;
+		}
+	}
+	return closestMatch;
 }

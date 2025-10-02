@@ -59,6 +59,7 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 	const ndRenderSceneCamera* FindCameraNode() const;
 
 	ndRenderSceneNode* FindByName(const ndString& name) const;
+	ndRenderSceneNode* FindByClosestMatch(const ndString& name) const;
 
 	void SetPrimitiveMatrix(const ndMatrix& matrix);
 	ndSharedPtr<ndRenderPrimitive>GetPrimitive() const;
