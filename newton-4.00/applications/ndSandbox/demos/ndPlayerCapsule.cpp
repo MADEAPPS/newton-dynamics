@@ -179,7 +179,11 @@ class ndPlayerCapsuleController : public ndModelNotify
 		{
 			ndAnimationKeyFramesTrack& track = node->GetInfo();
 			const ndString& name = track.GetName();
-			ndRenderSceneNode* const ent = playerMesh->FindByName(name.GetStr());
+			ndRenderSceneNode* ent = playerMesh->FindByName(name);
+			if (!ent)
+			{
+				ent = playerMesh->FindByClosestMatch(name);
+			}
 			ndAssert(ent);
 
 			ndAnimKeyframe keyFrame;
@@ -196,23 +200,6 @@ class ndPlayerCapsuleController : public ndModelNotify
 		m_idleWalkBlend = ndSharedPtr<ndAnimationBlendTreeNode>(new ndAnimationBlendTransition(idle, m_walkRunBlend));
 		m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(m_idleWalkBlend);
 	}
-
-	//void SetCamera()
-	//{
-	//	// create a follow camera and set as teh active camera
-	//	const ndVector cameraPivot(0.0f, 0.5f, 0.0f, 0.0f);
-	//	ndRender* const renderer = *m_scene->GetRenderer();
-	//	ndSharedPtr<ndRenderSceneNode> camera(new ndPlayerCamera(m_playerBody->GetAsBodyPlayerCapsule(), renderer, cameraPivot, ND_THIRD_PERSON_CAMERA_DIST));
-	//	renderer->SetCamera(camera);
-	//	m_camera = (ndPlayerCamera*)*camera;
-	//
-	//	// attach the camera to the pivot node
-	//	ndDemoEntityNotify* const playerNotify = (ndDemoEntityNotify*)(m_playerBody->GetAsBodyKinematic()->GetNotifyCallback());
-	//	ndSharedPtr<ndRenderSceneNode> playerMesh(playerNotify->GetUserData());
-	//	ndRenderSceneNode* const cameraNodePivot = playerMesh->FindByName("cameraPivot");
-	//	ndAssert(cameraNodePivot);
-	//	cameraNodePivot->AddChild(camera);
-	//}
 
 	private:
 	void UpdateSkeleton()
@@ -349,7 +336,7 @@ static void LoadAnimations(ndMeshLoader& loader)
 	loader.GetAnimationSequence(ndGetWorkingFileName("mocap_walk.fbx"));
 	loader.GetAnimationSequence(ndGetWorkingFileName("mocap_idle.fbx"));
 
-	// add the translation track, that tanslation is contained in the hip bone 
+	// add the translation track, that translation is contained in the hip bone 
 	loader.SetTranslationTracks(ndString("hips"));
 }
 
@@ -399,6 +386,7 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 
 		location.m_posit.m_x = 30.0f;
 		location.m_posit.m_z = 10.0f;
+		loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("testDummy.fbx"));
 		ndPlayerCapsuleController::CreatePlayer(scene, loader, location);
 
 		location.m_posit.m_x = 30.0f;
