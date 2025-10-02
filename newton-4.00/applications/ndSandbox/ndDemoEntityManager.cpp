@@ -1166,12 +1166,12 @@ void ndDemoEntityManager::SetNextActiveCamera()
 		}
 
 		// found a a diffrent playe with a camera
-		if (nextNode != currentNode)
-		{
-			ndRenderSceneNode* xxxx = nextNode->GetInfo()->FindByName("__PlayerCamera__");
-			ndRenderSceneNode* xxxx1 = nextNode->GetInfo()->FindByName("__PlayerCamera__");
-			
-		}
+		//if (nextNode != currentNode)
+		//{
+		//	ndRenderSceneNode* xxxx = nextNode->GetInfo()->FindByName("__PlayerCamera__");
+		//	ndRenderSceneNode* xxxx1 = nextNode->GetInfo()->FindByName("__PlayerCamera__");
+		//	
+		//}
 	}
 }
 
