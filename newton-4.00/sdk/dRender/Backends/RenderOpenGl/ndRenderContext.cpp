@@ -217,15 +217,14 @@ void ndRenderContext::InitImGui(const char* const fontPathName)
 	io.KeyMap[ImGuiKey_Backspace] = GLFW_KEY_BACKSPACE;
 	io.KeyMap[ImGuiKey_Enter] = GLFW_KEY_ENTER;
 	io.KeyMap[ImGuiKey_Escape] = GLFW_KEY_ESCAPE;
+
+	io.KeyMap[ImGuiKey_LeftShift] = GLFW_KEY_LEFT_SHIFT;
+	io.KeyMap[ImGuiKey_RightShift] = GLFW_KEY_RIGHT_SHIFT;
+
 	for (int i = 0; i < (GLFW_KEY_Z - GLFW_KEY_A + 1); ++i)
 	{
 		io.KeyMap[ImGuiKey_A + i] = GLFW_KEY_A + i;
 	}
-	//io.KeyMap[ImGuiKey_D] = GLFW_KEY_D;
-	//io.KeyMap[ImGuiKey_W] = GLFW_KEY_W;
-	//io.KeyMap[ImGuiKey_S] = GLFW_KEY_S;
-	//io.KeyMap[ImGuiKey_Q] = GLFW_KEY_Q;
-	//io.KeyMap[ImGuiKey_E] = GLFW_KEY_E;
 
 #ifdef _MSC_VER 
 	io.ImeWindowHandle = glfwGetWin32Window(m_mainFrame);

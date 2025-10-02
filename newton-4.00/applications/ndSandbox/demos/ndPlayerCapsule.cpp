@@ -23,8 +23,24 @@
 
 #define ND_THIRD_PERSON_CAMERA_DIST ndFloat32(-5.0f)
 
+
 class ndPlayerCapsuleController : public ndModelNotify
 {
+	public:
+	class ndHelpLegend : public ndDemoEntityManager::ndDemoHelper
+	{
+		virtual void PresentHelp(ndDemoEntityManager* const scene) override
+		{
+			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
+			scene->Print(color, "implements a basic player capsule mechanic");
+			scene->Print(color, "w key for moving walking forward");
+			scene->Print(color, "s key for going walking backward");
+			scene->Print(color, "shift w key for running forwad");
+			scene->Print(color, "left click on the scene for turning and look up and down");
+			scene->Print(color, "left click on dynamics body for pickin the body");
+		}
+	};
+
 	class ndAnimationBlendTransition : public ndAnimationTwoWayBlend
 	{
 		public:
@@ -36,7 +52,7 @@ class ndPlayerCapsuleController : public ndModelNotify
 
 		void SetTransition(ndFloat32 param)
 		{
-			m_paramMemory = m_paramMemory + 0.15f * (param - m_paramMemory);
+			m_paramMemory = m_paramMemory + 0.05f * (param - m_paramMemory);
 			SetParam(m_paramMemory);
 		}
 
@@ -134,9 +150,10 @@ class ndPlayerCapsuleController : public ndModelNotify
 		ndDemoEntityNotify* const playerNotify = (ndDemoEntityNotify*)(m_playerBody->GetAsBodyKinematic()->GetNotifyCallback());
 		ndSharedPtr<ndRenderSceneNode> playerMesh(playerNotify->GetUserData());
 
+		ndSharedPtr<ndAnimationSequence> runSequence(loader.FindSequence(ndGetWorkingFileName("mocap_run.fbx")));
 		ndSharedPtr<ndAnimationSequence> idleSequence(loader.FindSequence(ndGetWorkingFileName("mocap_idle.fbx")));
-		//ndSharedPtr<ndAnimationSequence> walkSequence(loader.FindSequence(ndGetWorkingFileName("mocap_walk.fbx")));
-		ndSharedPtr<ndAnimationSequence> walkSequence(loader.FindSequence(ndGetWorkingFileName("mocap_run.fbx")));
+		ndSharedPtr<ndAnimationSequence> walkSequence(loader.FindSequence(ndGetWorkingFileName("mocap_walk.fbx")));
+		ndAssert(*runSequence);
 		ndAssert(*idleSequence);
 		ndAssert(*walkSequence);
 
@@ -155,11 +172,12 @@ class ndPlayerCapsuleController : public ndModelNotify
 		}
 
 		// create an animation blend tree
+		ndSharedPtr<ndAnimationBlendTreeNode> run(new ndAnimationSequencePlayer(runSequence));
 		ndSharedPtr<ndAnimationBlendTreeNode> idle (new ndAnimationSequencePlayer(idleSequence));
 		ndSharedPtr<ndAnimationBlendTreeNode> walk (new ndAnimationSequencePlayer(walkSequence));
-		//ndAnimationSequencePlayer* const run = new ndAnimationSequencePlayer(runSequence);
 		
-		m_idleWalkBlend = ndSharedPtr<ndAnimationBlendTreeNode>(new ndAnimationBlendTransition(idle, walk));
+		m_walkRunBlend = ndSharedPtr<ndAnimationBlendTreeNode>(new ndAnimationBlendTransition(walk, run));
+		m_idleWalkBlend = ndSharedPtr<ndAnimationBlendTreeNode>(new ndAnimationBlendTransition(idle, m_walkRunBlend));
 		m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(m_idleWalkBlend);
 	}
 
@@ -201,19 +219,33 @@ class ndPlayerCapsuleController : public ndModelNotify
 		UpdateSkeleton();
 
 		ndFloat32 timestepSign = ndFloat32(1.0f);
-		ndAnimationBlendTransition* const blender = (ndAnimationBlendTransition*)*m_idleWalkBlend;
+
+		ndAnimationBlendTransition* const walkRunBlender = (ndAnimationBlendTransition*)*m_walkRunBlend;
+		ndAnimationBlendTransition* const idleWalkBlender = (ndAnimationBlendTransition*)*m_idleWalkBlend;
+
+		// run the input mibni state machine
 		if (m_scene->GetKeyState(ImGuiKey_W))
 		{
-			blender->SetTransition(1.0f);
+			idleWalkBlender->SetTransition(1.0f);
+			if (m_scene->GetKeyState(ImGuiKey_LeftShift))
+			{
+				walkRunBlender->SetTransition(1.0f);
+			}
+			else
+			{
+				walkRunBlender->SetTransition(0.0f);
+			}
 		}
 		else if (m_scene->GetKeyState(ImGuiKey_S))
 		{
 			timestepSign = ndFloat32(-1.0f);
-			blender->SetTransition(1.0f);
+			walkRunBlender->SetTransition(0.0f);
+			idleWalkBlender->SetTransition(1.0f);
 		}
 		else
 		{
-			blender->SetTransition(0.0f);
+			walkRunBlender->SetTransition(0.0f);
+			idleWalkBlender->SetTransition(0.0f);
 		}
 
 		ndVector veloc;
@@ -250,6 +282,7 @@ class ndPlayerCapsuleController : public ndModelNotify
 
 	ndAnimationPose m_keyFrameOutput;
 	ndSharedPtr<ndBody> m_playerBody;
+	ndSharedPtr<ndAnimationBlendTreeNode> m_walkRunBlend;
 	ndSharedPtr<ndAnimationBlendTreeNode> m_idleWalkBlend;
 	ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
 	ndPlayerCamera* m_camera;
@@ -307,7 +340,12 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 	//ndSharedPtr<ndBody> bodyFloor(BuildPlayground(scene));
 	//ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "marblecheckboard.png", 0.1f, true));
 	ndSharedPtr<ndBody> bodyFloor(BuildCompoundScene(scene, ndGetIdentityMatrix()));
-	 
+
+	// add a help menu
+	ndSharedPtr<ndDemoEntityManager::ndDemoHelper> demoHelper(new ndPlayerCapsuleController::ndHelpLegend());
+	scene->SetDemoHelp(demoHelper);
+
+
 	// load the visual mesh, and animations.
 	ndMeshLoader loader;
 	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("humanoidRobot.fbx"));

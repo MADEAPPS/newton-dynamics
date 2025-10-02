@@ -32,14 +32,4 @@ class ndAnimationTwoWayBlend: public ndAnimationBlendTreeNode
 	ndFloat32 m_param;
 };
 
-inline ndFloat32 ndAnimationTwoWayBlend::GetParam() const
-{
-	return m_param; 
-}
-
-inline void ndAnimationTwoWayBlend::SetParam(ndFloat32 param) 
-{ 
-	m_param = param; 
-}
-
 #endif

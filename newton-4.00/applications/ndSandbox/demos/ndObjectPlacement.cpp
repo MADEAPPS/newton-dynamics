@@ -19,23 +19,23 @@
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 
-class ndObjectPlacementHelp : public ndDemoEntityManager::ndDemoHelper
-{
-	virtual void PresentHelp(ndDemoEntityManager* const scene) override
-	{
-		ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
-		scene->Print(color, "Basic object placement");
-		scene->Print(color, "Right click and drag the location where");
-		scene->Print(color, "where you want to place a dynamic body.");
-		scene->Print(color, "Left click while keeping right click down");
-		scene->Print(color, "to place a dynamics body at the location.");
-		scene->Print(color, "An object will spawn only if the location is stable.");
-	}
-};
-
 class ndObjectPlacementCamera : public ndDemoCameraNode
 {
 	public:
+	class ndHelpLegend : public ndDemoEntityManager::ndDemoHelper
+	{
+		virtual void PresentHelp(ndDemoEntityManager* const scene) override
+		{
+			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
+			scene->Print(color, "Basic object placement");
+			scene->Print(color, "Right click and drag the location where");
+			scene->Print(color, "where you want to place a dynamic body.");
+			scene->Print(color, "Left click while keeping right click down");
+			scene->Print(color, "to place a dynamics body at the location.");
+			scene->Print(color, "An object will spawn only if the location is stable.");
+		}
+	};
+
 	enum ndPlacementState
 	{
 		m_none,
@@ -377,7 +377,8 @@ void ndObjectPlacement(ndDemoEntityManager* const scene)
 	AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f,  5.0f), 10.0f, 1.0f, 1.5f, 15);
 	AddConvexHull(scene, PlaceMatrix( 2.0f, 5.0f,  3.0f), 30.0f, 1.0f, 1.5f, 20);
 
-	ndSharedPtr<ndDemoEntityManager::ndDemoHelper> demoHelper(new ndObjectPlacementHelp());
+	// add a help legend
+	ndSharedPtr<ndDemoEntityManager::ndDemoHelper> demoHelper(new ndObjectPlacementCamera::ndHelpLegend());
 	scene->SetDemoHelp(demoHelper);
 
 	// set a special object placemnet Camera;
