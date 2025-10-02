@@ -22,8 +22,9 @@ class ndMeshLoader: public ndFbxMeshLoader
 	virtual ~ndMeshLoader();
 	bool LoadEntity(ndRender* const renderer, const ndString& fbxPathMeshName);
 	ndSharedPtr<ndAnimationSequence> GetAnimationSequence(const ndString& fbxPathAnimName);
-
 	const ndSharedPtr<ndAnimationSequence> FindSequence(const ndString& fbxPathAnimName) const;
+
+	void SetTranslationTracks(const ndString& boneName);
 
 	ndSharedPtr<ndMesh> m_mesh;
 	ndSharedPtr<ndRenderSceneNode> m_renderMesh;
