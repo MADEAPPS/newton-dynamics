@@ -80,11 +80,11 @@ void ndDemoCameraNodeFollow::TickUpdate(ndFloat32)
 		{
 			if (mouseSpeedX > 0.0f)
 			{
-				m_yaw = ndAnglesAdd(m_yaw, m_yawRate);
+				m_yaw = ndAnglesAdd(m_yaw, -m_yawRate);
 			}
 			else if (mouseSpeedX < 0.0f)
 			{
-				m_yaw = ndAnglesAdd(m_yaw, -m_yawRate);
+				m_yaw = ndAnglesAdd(m_yaw, m_yawRate);
 			}
 	
 			if (mouseSpeedY > 0.0f)
