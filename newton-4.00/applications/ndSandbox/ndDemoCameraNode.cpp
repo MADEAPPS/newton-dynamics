@@ -24,6 +24,7 @@ ndDemoCameraNode::ndDemoCameraNode(ndRender* const owner)
 	,m_prevMouseState(false)
 {
 	m_owner = owner;
+	m_name = ndString("__PlayerCamera__");
 	ndSharedPtr<ndRenderSceneNode> camera(new ndRenderSceneCamera(owner));
 	AddChild(camera);
 }
