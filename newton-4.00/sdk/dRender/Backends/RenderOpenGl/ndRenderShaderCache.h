@@ -32,7 +32,6 @@ class ndRenderShaderCache
 		{
 			GLuint m_skyBoxEffect;
 			GLuint m_diffuseEffect;
-			GLuint m_wireFrameEffect;
 			GLuint m_setZbufferEffect;
 			GLuint m_diffuseShadowEffect;
 			GLuint m_diffuseShadowSkinEffect;
@@ -48,7 +47,6 @@ class ndRenderShaderCache
 
 	// vertex shaders
 	static const char* m_skyBoxVertex;
-	static const char* m_wireFrameVertex;
 	static const char* m_setZbufferVertex;
 	static const char* m_generateShadowMapVertex;
 	static const char* m_directionalDiffuseVertex;
@@ -62,7 +60,6 @@ class ndRenderShaderCache
 	// pixel shaders
 	static const char* m_skyBoxPixel;
 	static const char* m_doNothingPixel;
-	static const char* m_wireFramePixel;
 	static const char* m_directionalDiffusePixel;
 	static const char* m_debugFlatShadedDiffusePixel;
 	static const char* m_directionalDiffuseShadowPixel;
