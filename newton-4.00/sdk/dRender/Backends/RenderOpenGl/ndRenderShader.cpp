@@ -796,3 +796,25 @@ void ndRenderShaderGenerateSkinShadowMapBlock::Render(const ndRenderPrimitiveImp
 	ndAssert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 	glUseProgram(0);
 }
+
+// *********************************************************************
+// 
+// *********************************************************************
+void ndRenderShaderLineArrayBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
+{
+	SetParameters(shaderCache->m_wireFrameEffect);
+	EndParameters();
+}
+
+void ndRenderShaderLineArrayBlock::SetParameters(GLuint shader)
+{
+	ndRenderShaderBlock::SetParameters(shader);
+	m_viewModelProjectionMatrix = glGetUniformLocation(m_shader, "viewModelProjectionMatrix");
+}
+
+void ndRenderShaderLineArrayBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
+{
+	//ndAssert(0);
+}
+
+
