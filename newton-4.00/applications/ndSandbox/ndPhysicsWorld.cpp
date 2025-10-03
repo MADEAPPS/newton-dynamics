@@ -145,8 +145,10 @@ void ndPhysicsWorld::PostUpdate(ndFloat32 timestep)
 	{
 		ndBodyKinematic* const body = view[i];
 		ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)body->GetNotifyCallback();
-		ndAssert(notify);
-		notify->m_entity->SetTransform(notify->m_transform.m_rotation, notify->m_transform.m_position);
+		if (notify)
+		{
+			notify->m_entity->SetTransform(notify->m_transform.m_rotation, notify->m_transform.m_position);
+		}
 	}
 
 	ndDemoCameraNode* const camera = (ndDemoCameraNode*)*m_manager->m_renderer->GetCamera();
