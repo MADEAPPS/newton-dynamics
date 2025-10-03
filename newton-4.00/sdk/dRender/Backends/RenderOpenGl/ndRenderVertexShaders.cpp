@@ -27,14 +27,32 @@ R""""(
 	}
 )"""";
 
+const char* ndRenderShaderCache::m_wireFrameVertex =
+R""""(
+	#version 450 core
+
+	layout(location = 0) in vec3 in_position;
+
+	out vec4 color;
+	uniform mat4 invViewModelProjectionTextureMatrix;
+	uniform vec4 shadeColor;
+ 
+	void main() 
+	{	
+		color = shadeColor;
+		gl_Position = vec4(in_position, 1.0);
+	}
+)"""";
+
+
 const char* ndRenderShaderCache::m_setZbufferVertex =
 R""""(
 	#version 450 core
 
-	// using the same vertex buffer
 	layout(location = 0) in vec3 in_position;
 
 	uniform mat4 viewModelProjectionMatrix;
+
 	void main()
 	{
 		gl_Position = viewModelProjectionMatrix * vec4(in_position, 1.0);
