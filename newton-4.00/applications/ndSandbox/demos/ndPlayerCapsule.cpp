@@ -360,7 +360,7 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 	
 	ndSharedPtr<ndModelNotify> modelNotity(ndPlayerCapsuleController::CreatePlayer(scene, loader, location));
 
-	// set this player as teh active camera
+	// set this player as the active camera
 	ndPlayerCapsuleController* const playerController = (ndPlayerCapsuleController*)*modelNotity;
 	ndRender* const renderer = *scene->GetRenderer();
 	renderer->SetCamera(playerController->GetCamera());
