@@ -32,10 +32,10 @@ R""""(
 	#version 450 core
 
 	layout(location = 0) in vec3 in_position;
-	layout(location = 0) in vec3 in_vertexColor;
+	layout(location = 1) in vec3 in_vertexColor;
 
-	uniform mat4 viewModelProjectionMatrix;
 	out vec4 color;
+	uniform mat4 viewModelProjectionMatrix;
  
 	void main() 
 	{	

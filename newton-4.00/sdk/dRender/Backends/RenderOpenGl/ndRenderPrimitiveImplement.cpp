@@ -1101,9 +1101,10 @@ void ndRenderPrimitiveImplement::BuildFromSimpleMesh(const ndRenderPrimitive::nd
 		p.m_normal = glVector3(color.m_x, color.m_y, color.m_z);
 		buffer.PushBack(p);
 	}
-	
-	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(buffer.GetCount() * sizeof(glPositionNormal)), &buffer[0].m_posit.m_x, GL_STATIC_DRAW);
+
 	m_vertexSize = sizeof(glPositionNormal);
+	m_vertexCount = ndInt32(buffer.GetCount());
+	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(buffer.GetCount() * sizeof(glPositionNormal)), &buffer[0].m_posit.m_x, GL_STATIC_DRAW);
 	
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormal), (void*)OFFSETOF(glPositionNormal, m_posit));

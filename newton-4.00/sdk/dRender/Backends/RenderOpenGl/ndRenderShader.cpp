@@ -59,10 +59,8 @@ void ndRenderShaderSetZbufferCleanBlock::SetParameters(GLuint shader)
 
 void ndRenderShaderSetZbufferCleanBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	//const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
 	const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
 
-	//const ndMatrix modelViewProjectionMatrixMatrix(modelMatrix * camera->m_invViewMatrix * camera->m_projectionMatrix);
 	const ndMatrix modelViewProjectionMatrixMatrix(modelMatrix * camera->m_invViewRrojectionMatrix);
 	const glMatrix glViewModelProjectionMatrix(modelViewProjectionMatrixMatrix);
 
@@ -592,7 +590,6 @@ void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::Render(const ndRenderPrim
 	glMatrix* const matrixBuffer = (glMatrix*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
 	ndMemCpy(matrixBuffer, &self->m_instanceMatrixArray[0], self->m_instanceMatrixArray.GetCount());
 	glUnmapBuffer(GL_ARRAY_BUFFER);
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glUniform3fv(m_directionalLightDirection, 1, &glSunlightDir[0]);
 	glUniform3fv(m_directionalLightAmbient, 1, &glSunlightAmbient[0]);
@@ -814,7 +811,17 @@ void ndRenderShaderLineArrayBlock::SetParameters(GLuint shader)
 
 void ndRenderShaderLineArrayBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	//ndAssert(0);
+	const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
+
+	glUseProgram(m_shader);
+	const ndMatrix modelViewProjectionMatrixMatrix(modelMatrix * camera->m_invViewMatrix * camera->m_projectionMatrix);
+	const glMatrix glViewModelProjectionMatrix(modelViewProjectionMatrixMatrix);
+	glUniformMatrix4fv(m_viewModelProjectionMatrix, 1, false, &glViewModelProjectionMatrix[0][0]);
+
+	glBindVertexArray(self->m_vertextArrayBuffer);
+	glDrawArrays(GL_LINES, 0, self->m_vertexCount);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	glUseProgram(0);
 }
-
-
