@@ -385,6 +385,15 @@ void ndRenderSceneNode::Render(const ndRender* const owner, const ndMatrix& mode
 	}
 }
 
+ndSharedPtr<ndRenderSceneNode> ndRenderSceneNode::GetSharedPtr() const
+{
+	if (m_childNode)
+	{
+		return m_childNode->GetInfo();
+	}
+	return ndSharedPtr<ndRenderSceneNode>(nullptr);
+}
+
 ndRenderSceneNode* ndRenderSceneNode::FindByName(const ndString& name) const
 {
 	ndRenderSceneNode* const self = (ndRenderSceneNode*)this;

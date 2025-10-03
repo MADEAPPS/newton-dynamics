@@ -248,6 +248,7 @@ class ndDemoEntityManager : public ndClassAlloc
 	bool m_synchronousParticlesUpdate;
 	bool m_showRaycastHit;
 	bool m_profilerMode;
+	ndKeyTrigger m_nextActiveCamera;
 	
 	ndWorld::ndSolverModes m_solverMode;
 	static ndDemos m_demosSelection[];

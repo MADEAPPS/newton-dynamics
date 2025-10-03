@@ -58,6 +58,7 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 	ndRenderSceneCamera* FindCameraNode();
 	const ndRenderSceneCamera* FindCameraNode() const;
 
+	ndSharedPtr<ndRenderSceneNode> GetSharedPtr() const;
 	ndRenderSceneNode* FindByName(const ndString& name) const;
 	ndRenderSceneNode* FindByClosestMatch(const ndString& name) const;
 

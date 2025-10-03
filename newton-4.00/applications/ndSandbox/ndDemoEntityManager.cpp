@@ -411,8 +411,6 @@ ndDemoEntityManager::ndDemoEntityManager()
 	,m_workerThreads(1)
 	,m_debugDisplayMode(0)
 	,m_collisionDisplayMode(0)
-	//,m_selectedModel(nullptr)
-	//,m_onPostUpdate(nullptr)
 	,m_fps(0.0f)
 	,m_timestepAcc(0.0f)
 	,m_currentListenerTimestep(0.0f)
@@ -440,6 +438,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	,m_synchronousParticlesUpdate(false)
 	,m_showRaycastHit(false)
 	,m_profilerMode(false)
+	,m_nextActiveCamera()
 	,m_solverMode(ndWorld::ndSimdSoaSolver)
 {
 	// Setup window
@@ -1129,8 +1128,12 @@ void ndDemoEntityManager::SetDemoHelp(ndSharedPtr<ndDemoHelper>& helper)
 
 void ndDemoEntityManager::SetNextActiveCamera()
 {
-	ndList<ndSharedPtr<ndRenderSceneNode>>& scene = m_renderer->GetScene();
+	if (!m_nextActiveCamera.Update(GetKeyState(ImGuiKey_C) ? true : false))
+	{
+		return;
+	}
 
+	ndList<ndSharedPtr<ndRenderSceneNode>>& scene = m_renderer->GetScene();
 	const ndRenderSceneCamera* const currentCamera = m_renderer->GetCamera()->FindCameraNode();
 	ndAssert(currentCamera);
 	ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* currentNode = nullptr;
@@ -1145,9 +1148,9 @@ void ndDemoEntityManager::SetNextActiveCamera()
 		}
 	}
 
-	// if it find a node, see if It can mode to teh next
 	if (currentNode)
 	{
+		// if it find a node, see if it can find the next camera.
 		ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* nextNode = nullptr;
 		for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* nextSceneNode = currentNode->GetNext(); nextSceneNode; nextSceneNode = nextSceneNode->GetNext())
 		{
@@ -1162,16 +1165,25 @@ void ndDemoEntityManager::SetNextActiveCamera()
 
 		if (!nextNode)
 		{
-			ndAssert(0);
+			for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* sceneNode = scene.GetFirst(); sceneNode; sceneNode = sceneNode->GetNext())
+			{
+				ndSharedPtr<ndRenderSceneNode>& node = sceneNode->GetInfo();
+				const ndRenderSceneCamera* cameraNode = node->FindCameraNode();
+				if (cameraNode)
+				{
+					nextNode = sceneNode;
+					break;
+				}
+			}
 		}
 
-		// found a a diffrent playe with a camera
-		//if (nextNode != currentNode)
-		//{
-		//	ndRenderSceneNode* xxxx = nextNode->GetInfo()->FindByName("__PlayerCamera__");
-		//	ndRenderSceneNode* xxxx1 = nextNode->GetInfo()->FindByName("__PlayerCamera__");
-		//	
-		//}
+		// found a different player with a camera
+		if (nextNode != currentNode)
+		{
+			ndRenderSceneNode* const camera = nextNode->GetInfo()->FindByName("__PlayerCamera__");
+			ndSharedPtr<ndRenderSceneNode> cameraNode(camera->GetSharedPtr());
+			m_renderer->SetCamera(cameraNode);
+		}
 	}
 }
 
