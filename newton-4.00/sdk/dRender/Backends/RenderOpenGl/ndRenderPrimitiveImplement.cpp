@@ -37,15 +37,20 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(ndRenderPrimitive* const 
 	,m_vertexBuffer(0)
 	,m_vertextArrayBuffer(0)
 	,m_instanceMatrixBuffer(0)
+	,m_isSimpleMesh(false)
 {
 	if (*descriptor.m_collision)
 	{
 		BuildFromCollisionShape(descriptor);
 	}
+	else if (*descriptor.m_meshNode)
+	{
+		BuildFromNewtonMeshEffect(descriptor);
+	}
 	else
 	{
-		ndAssert(*descriptor.m_meshNode);
-		BuildFromMesh(descriptor);
+		ndAssert(*descriptor.m_simpleMesh);
+		BuildFromSimpleMesh(descriptor);
 	}
 	InitShaderBlocks();
 }
@@ -64,6 +69,7 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
 	,m_vertexBuffer(0)
 	,m_vertextArrayBuffer(0)
 	,m_instanceMatrixBuffer(0)
+	,m_isSimpleMesh(src.m_isSimpleMesh)
 {
 	ndAssert(0);
 }
@@ -82,6 +88,7 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
 	,m_vertexBuffer(0)
 	,m_vertextArrayBuffer(0)
 	,m_instanceMatrixBuffer(0)
+	,m_isSimpleMesh(false)
 {
 	if (src.m_skinSceneNode)
 	{
@@ -218,6 +225,11 @@ void ndRenderPrimitiveImplement::InitShaderBlocks()
 	m_opaqueDifusedColorNoShadowInstanceBlock.GetShaderParameters(*m_context->m_shaderCache);
 }
 
+bool ndRenderPrimitiveImplement::IsSimpleMesh() const
+{
+	return m_isSimpleMesh;
+}
+
 bool ndRenderPrimitiveImplement::IsSKinnedMesh() const
 {
 	return m_skinSceneNode ? true : false;
@@ -289,7 +301,7 @@ void ndRenderPrimitiveImplement::BuildFromCollisionShape(const ndRenderPrimitive
 	}
 }
 
-void ndRenderPrimitiveImplement::BuildFromMesh(const ndRenderPrimitive::ndDescriptor& descriptor)
+void ndRenderPrimitiveImplement::BuildFromNewtonMeshEffect(const ndRenderPrimitive::ndDescriptor& descriptor)
 {
 	switch (descriptor.m_meshBuildMode)
 	{
@@ -1067,6 +1079,97 @@ void ndRenderPrimitiveImplement::BuildRenderInstanceMesh(const ndRenderPrimitive
 	glBindVertexArray(0);
 }
 
+void ndRenderPrimitiveImplement::BuildFromSimpleMesh(const ndRenderPrimitive::ndDescriptor& descriptor)
+{
+	m_isSimpleMesh = true;
+	//class ndDrawShape : public ndShapeDebugNotify
+	//{
+	//public:
+	//	ndDrawShape()
+	//		:ndShapeDebugNotify()
+	//		, m_lines(1024)
+	//	{
+	//	}
+	//
+	//	virtual void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceVertex, const ndEdgeType* const)
+	//	{
+	//		ndVector p0(faceVertex[0]);
+	//		ndVector p1(faceVertex[1]);
+	//		ndVector p2(faceVertex[2]);
+	//
+	//		ndVector normal((p1 - p0).CrossProduct(p2 - p0));
+	//		normal = normal.Normalize();
+	//		ndInt32 i0 = vertexCount - 1;
+	//		for (ndInt32 i = 0; i < vertexCount; ++i)
+	//		{
+	//			glPositionNormal point;
+	//			point.m_posit.m_x = GLfloat(faceVertex[i].m_x);
+	//			point.m_posit.m_y = GLfloat(faceVertex[i].m_y);
+	//			point.m_posit.m_z = GLfloat(faceVertex[i].m_z);
+	//			point.m_normal.m_x = GLfloat(normal.m_x);
+	//			point.m_normal.m_y = GLfloat(normal.m_y);
+	//			point.m_normal.m_z = GLfloat(normal.m_z);
+	//			m_lines.PushBack(point);
+	//
+	//			point.m_posit.m_x = GLfloat(faceVertex[i0].m_x);
+	//			point.m_posit.m_y = GLfloat(faceVertex[i0].m_y);
+	//			point.m_posit.m_z = GLfloat(faceVertex[i0].m_z);
+	//			point.m_normal.m_x = GLfloat(normal.m_x);
+	//			point.m_normal.m_y = GLfloat(normal.m_y);
+	//			point.m_normal.m_z = GLfloat(normal.m_z);
+	//			m_lines.PushBack(point);
+	//			i0 = i;
+	//		}
+	//	}
+	//
+	//	ndArray<glPositionNormal> m_lines;
+	//};
+	//
+	//ndDrawShape drawShapes;
+	//descriptor.m_collision->DebugShape(ndGetIdentityMatrix(), drawShapes);
+	//if (drawShapes.m_lines.GetCount())
+	//{
+	//	ndArray<ndInt32> m_lines(drawShapes.m_lines.GetCount());
+	//	m_lines.SetCount(drawShapes.m_lines.GetCount());
+	//
+	//	m_indexCount = ndInt32(m_lines.GetCount());
+	//	ndInt32 vertexCount = ndVertexListToIndexList(&drawShapes.m_lines[0].m_posit.m_x, sizeof(glPositionNormal), 6, ndInt32(drawShapes.m_lines.GetCount()), &m_lines[0], GLfloat(1.0e-6f));
+	//
+	//	glGenVertexArrays(1, &m_vertextArrayBuffer);
+	//	glBindVertexArray(m_vertextArrayBuffer);
+	//
+	//	glGenBuffers(1, &m_vertexBuffer);
+	//	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+	//
+	//	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(vertexCount * sizeof(glPositionNormal)), &drawShapes.m_lines[0].m_posit.m_x, GL_STATIC_DRAW);
+	//	m_vertexSize = sizeof(glPositionNormal);
+	//
+	//	glEnableVertexAttribArray(0);
+	//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormal), (void*)OFFSETOF(glPositionNormal, m_posit));
+	//
+	//	glEnableVertexAttribArray(1);
+	//	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormal), (void*)OFFSETOF(glPositionNormal, m_normal));
+	//
+	//	glGenBuffers(1, &m_indexBuffer);
+	//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+	//	glBufferData(GL_ELEMENT_ARRAY_BUFFER, GLsizeiptr(m_indexCount * sizeof(GLuint)), &m_lines[0], GL_STATIC_DRAW);
+	//
+	//	glBindVertexArray(0);
+	//
+	//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	//	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//
+	//	ndRenderPrimitiveSegment& segment = m_owner->m_segments.Append()->GetInfo();
+	//
+	//	segment.m_material.m_specular = ndVector::m_zero;
+	//	segment.m_material.m_reflection = ndVector::m_zero;
+	//
+	//	segment.m_segmentStart = 0;
+	//	segment.m_indexCount = m_indexCount;
+	//
+	//	m_debugWireframeColorBlock.GetShaderParameters(*m_context->m_shaderCache);
+	//}
+}
 void ndRenderPrimitiveImplement::Render(const ndRender* const render, const ndMatrix& modelMatrix, ndRenderPassMode renderMode) const
 {
 	switch (renderMode)
@@ -1133,6 +1236,11 @@ void ndRenderPrimitiveImplement::RenderDebugShapeWireFrame(const ndRender* const
 
 void ndRenderPrimitiveImplement::RenderGenerateShadowMaps(const ndRender* const render, const ndMatrix& lightMatrix) const
 {
+	if (IsSimpleMesh())
+	{
+		return;
+	}
+
 	bool castShadow = true;
 	for (ndList<ndRenderPrimitiveSegment>::ndNode* node = m_owner->m_segments.GetFirst(); node && castShadow; node = node->GetNext())
 	{
@@ -1170,23 +1278,34 @@ void ndRenderPrimitiveImplement::RenderGenerateInstancedShadowMaps(const ndRende
 
 void ndRenderPrimitiveImplement::RenderDirectionalDiffuseColorNoShadow(const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	bool castShadow = true;
-	for (ndList<ndRenderPrimitiveSegment>::ndNode* node = m_owner->m_segments.GetFirst(); node && castShadow; node = node->GetNext())
+	if (IsSimpleMesh())
 	{
-		ndRenderPrimitiveSegment& segment = node->GetInfo();
-		castShadow = castShadow && segment.m_material.m_castShadows;
+		ndTrace(("xxxxx\n"));
 	}
-
-	if (castShadow)
+	else
 	{
-		return;
-	}
+		bool castShadow = true;
+		for (ndList<ndRenderPrimitiveSegment>::ndNode* node = m_owner->m_segments.GetFirst(); node && castShadow; node = node->GetNext())
+		{
+			ndRenderPrimitiveSegment& segment = node->GetInfo();
+			castShadow = castShadow && segment.m_material.m_castShadows;
+		}
 
-	m_opaqueDifusedColorNoShadowBlock.Render(this, render, modelMatrix);
+		if (castShadow)
+		{
+			return;
+		}
+
+		m_opaqueDifusedColorNoShadowBlock.Render(this, render, modelMatrix);
+	}
 }
 
 void ndRenderPrimitiveImplement::RenderDirectionalDiffuseColorShadow(const ndRender* const render, const ndMatrix& modelMatrix) const
 {
+	if (IsSimpleMesh())
+	{
+		return;
+	}
 	if (IsSKinnedMesh())
 	{
 		m_opaqueDiffusedColorShadowSkinBlock.Render(this, render, modelMatrix);
@@ -1199,6 +1318,11 @@ void ndRenderPrimitiveImplement::RenderDirectionalDiffuseColorShadow(const ndRen
 
 void ndRenderPrimitiveImplement::RenderTransparency(const ndRender* const render, const ndMatrix& modelMatrix, bool backface) const
 {
+	if (IsSimpleMesh())
+	{
+		return;
+	}
+
 	bool isOpaque = true;
 	for (ndList<ndRenderPrimitiveSegment>::ndNode* node = m_owner->m_segments.GetFirst(); node && isOpaque; node = node->GetNext())
 	{

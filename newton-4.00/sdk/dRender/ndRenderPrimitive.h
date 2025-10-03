@@ -60,6 +60,20 @@ class ndRenderPrimitiveSegment
 	bool m_hasTranparency;
 };
 
+class ndRenderPrimitiveSimpleMesh : public ndClassAlloc
+{
+	public:
+	enum MeshType
+	{
+		m_lines,
+		m_points,
+		m_triangles,
+	};
+	ndArray<ndVector> m_vertex;
+	ndArray<ndVector> m_color;
+	MeshType m_type;
+};
+
 class ndRenderPrimitive : public ndContainersFreeListAlloc<ndRenderPrimitive>
 {
 	public:
@@ -90,6 +104,7 @@ class ndRenderPrimitive : public ndContainersFreeListAlloc<ndRenderPrimitive>
 	
 		ndRender* m_render;
 		ndSharedPtr<ndMeshEffect> m_meshNode;
+		ndSharedPtr<ndRenderPrimitiveSimpleMesh> m_simpleMesh;
 		ndSharedPtr<ndShapeInstance> m_collision;
 		ndSharedPtr<ndRenderSceneNode> m_skeleton;
 		ndList<ndRenderPrimitiveMaterial> m_materials;

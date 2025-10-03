@@ -721,14 +721,15 @@ static void BuildRollingFriction(ndDemoEntityManager* const scene, const ndVecto
 class ndRollerCoasterModelNotify: public ndModelNotify
 {
 	public:
-	ndRollerCoasterModelNotify(ndDemoEntityManager* const scene)
+	ndRollerCoasterModelNotify(ndDemoEntityManager* const scene, const ndVector& origin)
 		:ndModelNotify()
+		,m_spline(nullptr)
 	{
-		CreateSpline();
+		CreateSpline(scene, origin);
 
 	}
 	
-	void CreateSpline()
+	void CreateSpline(ndDemoEntityManager* const scene, const ndVector& origin)
 	{
 		// create the splane path
 		ndFloat64 knots[] = { 0.0f, 1.0f / 5.0f, 2.0f / 5.0f, 3.0f / 5.0f, 4.0f / 5.0f, 1.0f };
@@ -744,27 +745,57 @@ class ndRollerCoasterModelNotify: public ndModelNotify
 			ndBigVector(100.0f - 100.0f, 20.0f, 200.0f - 250.0f, 1.0f),
 		};
 
-		ndBezierSpline spline;
-		spline.CreateFromKnotVectorAndControlPoints(3, sizeof(knots) / sizeof(knots[0]), knots, control);
+		m_spline = ndSharedPtr<ndBezierSpline>(new ndBezierSpline);
+		m_spline->CreateFromKnotVectorAndControlPoints(3, sizeof(knots) / sizeof(knots[0]), knots, control);
 
+		ndSharedPtr<ndRenderPrimitiveSimpleMesh> wireFrame(new ndRenderPrimitiveSimpleMesh);
+
+		// build the mesh wire frame line list
 		ndFloat64 resolution = 500;
 		ndFloat64 scale = 1.0f / resolution;
-		ndArray<ndVector> points;
-		for (ndInt32 i = 0; i < resolution; ++i)
+		wireFrame->m_type = ndRenderPrimitiveSimpleMesh::m_lines;
+
+		ndVector color(ndFloat32(1.0f));
+		ndBigVector p0(m_spline->CurvePoint(0));
+		for (ndInt32 i = 1; i < resolution; ++i)
 		{
-			ndBigVector p(spline.CurvePoint(i * scale));
-			points.PushBack(ndVector(p));
+			ndBigVector p1(m_spline->CurvePoint(i * scale));
+			wireFrame->m_vertex.PushBack(ndVector(p0));
+			wireFrame->m_color.PushBack(color);
+
+			wireFrame->m_vertex.PushBack(ndVector(p1));
+			wireFrame->m_color.PushBack(color);
+			p0 = p1;
 		}
-		points.PushBack(points[0]);
+		wireFrame->m_vertex.PushBack(ndVector(p0));
+		wireFrame->m_color.PushBack(color);
+
+		wireFrame->m_vertex.PushBack(wireFrame->m_vertex[0]);
+		wireFrame->m_color.PushBack(color);
+
+		ndRender* const render = *scene->GetRenderer();
+		ndRenderPrimitive::ndDescriptor descriptor(render);
+		descriptor.m_simpleMesh = wireFrame;
+
+		ndSharedPtr<ndRenderPrimitive>mesh(new ndRenderPrimitive(descriptor));
+
+		ndMatrix matrix(ndGetIdentityMatrix());
+		matrix.m_posit = origin;
+		matrix.m_posit.m_w = ndFloat32 (1.0f);
+		ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(matrix));
+		entity->SetPrimitive(mesh);
+
+		scene->AddEntity(entity);
 	}
 
+	ndSharedPtr<ndBezierSpline> m_spline;
 };
 
 static void BuildPathFollow(ndDemoEntityManager* const scene, const ndVector& origin)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndSharedPtr<ndModel> model(new ndModel());
-	ndSharedPtr<ndModelNotify> rollerCoster(new ndRollerCoasterModelNotify(scene));
+	ndSharedPtr<ndModelNotify> rollerCoster(new ndRollerCoasterModelNotify(scene, origin));
 	model->SetNotifyCallback(rollerCoster);
 	world->AddModel(model);
 
@@ -868,15 +899,15 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	// build a floor
 	ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
 
-	BuildBallSocket(scene, ndVector(0.0f, 0.0f, -7.0f, 1.0f));
-	BuildHinge(scene, ndVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
-	BuildSlider(scene, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 100.0f, 0.75f);
-	BuildGear(scene, ndVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
-	BuildDoubleHinge(scene, ndVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
-	BuildRoller(scene, ndVector(0.0f, 0.0f, 9.0f, 1.0f), 10.0f, 0.75f);
-	BuildCylindrical(scene, ndVector(0.0f, 0.0f, 12.0f, 1.0f), 10.0f, 0.75f);
-	BuildFixDistanceJoints(scene, ndVector( -4.0f, 0.0f, -5.0f, 1.0f));
-	BuildRollingFriction(scene, ndVector(-4.0f, 0.0f, 5.0f, 1.0f), 10.0f, 0.5f);
+	//BuildBallSocket(scene, ndVector(0.0f, 0.0f, -7.0f, 1.0f));
+	//BuildHinge(scene, ndVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
+	//BuildSlider(scene, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 100.0f, 0.75f);
+	//BuildGear(scene, ndVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
+	//BuildDoubleHinge(scene, ndVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
+	//BuildRoller(scene, ndVector(0.0f, 0.0f, 9.0f, 1.0f), 10.0f, 0.75f);
+	//BuildCylindrical(scene, ndVector(0.0f, 0.0f, 12.0f, 1.0f), 10.0f, 0.75f);
+	//BuildFixDistanceJoints(scene, ndVector( -4.0f, 0.0f, -5.0f, 1.0f));
+	//BuildRollingFriction(scene, ndVector(-4.0f, 0.0f, 5.0f, 1.0f), 10.0f, 0.5f);
 	BuildPathFollow(scene, ndVector(40.0f, 0.0f, 0.0f, 1.0f));
 	
 	ndQuaternion rot;

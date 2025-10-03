@@ -31,9 +31,11 @@ class ndRenderPrimitiveImplement : public ndContainersFreeListAlloc<ndRenderPrim
 
 	ndRenderPrimitiveImplement* Clone(ndRenderPrimitive* const owner, const ndRenderSceneNode* const skeletonOwner) const;
 
-	void BuildFromMesh(const ndRenderPrimitive::ndDescriptor& descriptor);
+	void BuildFromSimpleMesh(const ndRenderPrimitive::ndDescriptor& descriptor);
 	void BuildFromCollisionShape(const ndRenderPrimitive::ndDescriptor& descriptor);
+	void BuildFromNewtonMeshEffect(const ndRenderPrimitive::ndDescriptor& descriptor);
 
+	bool IsSimpleMesh() const;
 	bool IsSKinnedMesh() const;
 	void UpdateSkinPaletteMatrix();
 	void Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderMode) const;
@@ -75,6 +77,8 @@ class ndRenderPrimitiveImplement : public ndContainersFreeListAlloc<ndRenderPrim
 	GLuint m_vertexBuffer;
 	GLuint m_vertextArrayBuffer;
 	GLuint m_instanceMatrixBuffer;
+
+	bool m_isSimpleMesh;
 	
 	ndRenderShaderOpaqueDiffusedColorBlock m_opaqueDifusedColorNoShadowBlock;
 	ndRenderShaderOpaqueDiffusedShadowColorBlock m_opaqueDiffusedColorShadowBlock;
