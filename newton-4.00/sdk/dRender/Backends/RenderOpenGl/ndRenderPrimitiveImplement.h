@@ -31,9 +31,11 @@ class ndRenderPrimitiveImplement : public ndContainersFreeListAlloc<ndRenderPrim
 
 	ndRenderPrimitiveImplement* Clone(ndRenderPrimitive* const owner, const ndRenderSceneNode* const skeletonOwner) const;
 
-	void BuildFromMesh(const ndRenderPrimitive::ndDescriptor& descriptor);
+	void BuildFromSimpleMesh(const ndRenderPrimitive::ndDescriptor& descriptor);
 	void BuildFromCollisionShape(const ndRenderPrimitive::ndDescriptor& descriptor);
+	void BuildFromNewtonMeshEffect(const ndRenderPrimitive::ndDescriptor& descriptor);
 
+	bool IsSimpleMesh() const;
 	bool IsSKinnedMesh() const;
 	void UpdateSkinPaletteMatrix();
 	void Render(const ndRender* const render, const ndMatrix& modelViewMatrix, ndRenderPassMode renderMode) const;
@@ -50,6 +52,7 @@ class ndRenderPrimitiveImplement : public ndContainersFreeListAlloc<ndRenderPrim
 
 	void RenderDebugSetZbuffer(const ndRender* const render, const ndMatrix& modelMatrix) const;
 	void RenderGenerateShadowMaps(const ndRender* const render, const ndMatrix& lightMatrix) const;
+	void RenderSimplePrimitive(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
 	void RenderDebugShapeSolid(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
 	void RenderDebugShapeWireFrame(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
 	void RenderGenerateInstancedShadowMaps(const ndRender* const render, const ndMatrix& lightMatrix) const;
@@ -75,6 +78,8 @@ class ndRenderPrimitiveImplement : public ndContainersFreeListAlloc<ndRenderPrim
 	GLuint m_vertexBuffer;
 	GLuint m_vertextArrayBuffer;
 	GLuint m_instanceMatrixBuffer;
+
+	bool m_isSimpleMesh;
 	
 	ndRenderShaderOpaqueDiffusedColorBlock m_opaqueDifusedColorNoShadowBlock;
 	ndRenderShaderOpaqueDiffusedShadowColorBlock m_opaqueDiffusedColorShadowBlock;
@@ -86,11 +91,13 @@ class ndRenderPrimitiveImplement : public ndContainersFreeListAlloc<ndRenderPrim
 	ndRenderShaderGenerateSkinShadowMapBlock m_generateSkinShadowMapsBlock;
 	ndRenderShaderGenerateInstanceShadowMapBlock m_generateIntanceShadowMapsBlock;
 
+	ndRenderShaderLineArrayBlock m_lineArrayBlock;
 	ndRenderShaderSetZbufferCleanBlock m_setZbufferBlock;
 	ndRenderShaderDebugWireframeDiffuseBlock m_debugWireframeColorBlock;
 	ndRenderShaderDebugFlatShadedDiffusedBlock m_debugFlatShadedColorBlock;
 
 	friend class ndRenderSceneNodeInstance;
+	friend class ndRenderShaderLineArrayBlock;
 	friend class ndRenderSceneNodeInstanceImplement;
 	friend class ndRenderShaderSetZbufferCleanBlock;
 	friend class ndRenderShaderGenerateShadowMapBlock;

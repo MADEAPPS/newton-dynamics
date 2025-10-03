@@ -37,16 +37,22 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(ndRenderPrimitive* const 
 	,m_vertexBuffer(0)
 	,m_vertextArrayBuffer(0)
 	,m_instanceMatrixBuffer(0)
+	,m_isSimpleMesh(false)
 {
 	if (*descriptor.m_collision)
 	{
 		BuildFromCollisionShape(descriptor);
 	}
+	else if (*descriptor.m_meshNode)
+	{
+		BuildFromNewtonMeshEffect(descriptor);
+	}
 	else
 	{
-		ndAssert(*descriptor.m_meshNode);
-		BuildFromMesh(descriptor);
+		ndAssert(*descriptor.m_simpleMesh);
+		BuildFromSimpleMesh(descriptor);
 	}
+
 	InitShaderBlocks();
 }
 
@@ -64,6 +70,7 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
 	,m_vertexBuffer(0)
 	,m_vertextArrayBuffer(0)
 	,m_instanceMatrixBuffer(0)
+	,m_isSimpleMesh(src.m_isSimpleMesh)
 {
 	ndAssert(0);
 }
@@ -82,6 +89,7 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(
 	,m_vertexBuffer(0)
 	,m_vertextArrayBuffer(0)
 	,m_instanceMatrixBuffer(0)
+	,m_isSimpleMesh(false)
 {
 	if (src.m_skinSceneNode)
 	{
@@ -208,6 +216,7 @@ ndRenderPrimitiveImplement::~ndRenderPrimitiveImplement()
 
 void ndRenderPrimitiveImplement::InitShaderBlocks()
 {
+	m_lineArrayBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_generateShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_transparencyDiffusedBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_generateSkinShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
@@ -216,6 +225,11 @@ void ndRenderPrimitiveImplement::InitShaderBlocks()
 	m_opaqueDifusedColorNoShadowBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_opaqueDiffusedColorShadowSkinBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_opaqueDifusedColorNoShadowInstanceBlock.GetShaderParameters(*m_context->m_shaderCache);
+}
+
+bool ndRenderPrimitiveImplement::IsSimpleMesh() const
+{
+	return m_isSimpleMesh;
 }
 
 bool ndRenderPrimitiveImplement::IsSKinnedMesh() const
@@ -289,7 +303,7 @@ void ndRenderPrimitiveImplement::BuildFromCollisionShape(const ndRenderPrimitive
 	}
 }
 
-void ndRenderPrimitiveImplement::BuildFromMesh(const ndRenderPrimitive::ndDescriptor& descriptor)
+void ndRenderPrimitiveImplement::BuildFromNewtonMeshEffect(const ndRenderPrimitive::ndDescriptor& descriptor)
 {
 	switch (descriptor.m_meshBuildMode)
 	{
@@ -1067,6 +1081,41 @@ void ndRenderPrimitiveImplement::BuildRenderInstanceMesh(const ndRenderPrimitive
 	glBindVertexArray(0);
 }
 
+void ndRenderPrimitiveImplement::BuildFromSimpleMesh(const ndRenderPrimitive::ndDescriptor& descriptor)
+{
+	m_isSimpleMesh = true;
+
+	glGenVertexArrays(1, &m_vertextArrayBuffer);
+	glBindVertexArray(m_vertextArrayBuffer);
+	
+	glGenBuffers(1, &m_vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+
+	ndArray<glPositionNormal> buffer;
+	for (ndInt32 i = 0; i < descriptor.m_simpleMesh->m_vertex.GetCount(); ++i)
+	{
+		glPositionNormal p;
+		ndVector point(descriptor.m_simpleMesh->m_vertex[i]);
+		ndVector color(descriptor.m_simpleMesh->m_color[i]);
+		p.m_posit = glVector3(point.m_x, point.m_y, point.m_z);
+		p.m_normal = glVector3(color.m_x, color.m_y, color.m_z);
+		buffer.PushBack(p);
+	}
+	
+	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(buffer.GetCount() * sizeof(glPositionNormal)), &buffer[0].m_posit.m_x, GL_STATIC_DRAW);
+	m_vertexSize = sizeof(glPositionNormal);
+	
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormal), (void*)OFFSETOF(glPositionNormal, m_posit));
+	
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormal), (void*)OFFSETOF(glPositionNormal, m_normal));
+	
+	glBindVertexArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 void ndRenderPrimitiveImplement::Render(const ndRender* const render, const ndMatrix& modelMatrix, ndRenderPassMode renderMode) const
 {
 	switch (renderMode)
@@ -1131,8 +1180,18 @@ void ndRenderPrimitiveImplement::RenderDebugShapeWireFrame(const ndRender* const
 	m_debugWireframeColorBlock.Render(this, render, modelMatrix);
 }
 
+void ndRenderPrimitiveImplement::RenderSimplePrimitive(const ndRender* const render, const ndMatrix& modelMatrix) const
+{
+	m_lineArrayBlock.Render(this, render, modelMatrix);
+}
+
 void ndRenderPrimitiveImplement::RenderGenerateShadowMaps(const ndRender* const render, const ndMatrix& lightMatrix) const
 {
+	if (IsSimpleMesh())
+	{
+		return;
+	}
+
 	bool castShadow = true;
 	for (ndList<ndRenderPrimitiveSegment>::ndNode* node = m_owner->m_segments.GetFirst(); node && castShadow; node = node->GetNext())
 	{
@@ -1170,23 +1229,34 @@ void ndRenderPrimitiveImplement::RenderGenerateInstancedShadowMaps(const ndRende
 
 void ndRenderPrimitiveImplement::RenderDirectionalDiffuseColorNoShadow(const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	bool castShadow = true;
-	for (ndList<ndRenderPrimitiveSegment>::ndNode* node = m_owner->m_segments.GetFirst(); node && castShadow; node = node->GetNext())
+	if (IsSimpleMesh())
 	{
-		ndRenderPrimitiveSegment& segment = node->GetInfo();
-		castShadow = castShadow && segment.m_material.m_castShadows;
+		RenderSimplePrimitive(render, modelMatrix);
 	}
-
-	if (castShadow)
+	else
 	{
-		return;
-	}
+		bool castShadow = true;
+		for (ndList<ndRenderPrimitiveSegment>::ndNode* node = m_owner->m_segments.GetFirst(); node && castShadow; node = node->GetNext())
+		{
+			ndRenderPrimitiveSegment& segment = node->GetInfo();
+			castShadow = castShadow && segment.m_material.m_castShadows;
+		}
 
-	m_opaqueDifusedColorNoShadowBlock.Render(this, render, modelMatrix);
+		if (castShadow)
+		{
+			return;
+		}
+
+		m_opaqueDifusedColorNoShadowBlock.Render(this, render, modelMatrix);
+	}
 }
 
 void ndRenderPrimitiveImplement::RenderDirectionalDiffuseColorShadow(const ndRender* const render, const ndMatrix& modelMatrix) const
 {
+	if (IsSimpleMesh())
+	{
+		return;
+	}
 	if (IsSKinnedMesh())
 	{
 		m_opaqueDiffusedColorShadowSkinBlock.Render(this, render, modelMatrix);
@@ -1199,6 +1269,11 @@ void ndRenderPrimitiveImplement::RenderDirectionalDiffuseColorShadow(const ndRen
 
 void ndRenderPrimitiveImplement::RenderTransparency(const ndRender* const render, const ndMatrix& modelMatrix, bool backface) const
 {
+	if (IsSimpleMesh())
+	{
+		return;
+	}
+
 	bool isOpaque = true;
 	for (ndList<ndRenderPrimitiveSegment>::ndNode* node = m_owner->m_segments.GetFirst(); node && isOpaque; node = node->GetNext())
 	{
