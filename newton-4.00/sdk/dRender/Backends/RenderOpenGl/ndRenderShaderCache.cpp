@@ -51,6 +51,9 @@ bool ndRenderShaderCache::CreateAllEffects()
 	m_diffuseShadowIntanceEffect = CreateShaderEffect(m_directionalDiffuseInstanceVertex, m_directionalDiffuseShadowPixel);
 	m_diffuseShadowSkinEffect = CreateShaderEffect(m_directionalDiffuseShadowSkinVertex, m_directionalDiffuseShadowPixel);
 
+	// some special effects
+	m_wireFrameEffect = CreateShaderEffect(m_wireFrameVertex, m_wireFramePixel);
+
 	return true;
 }
 

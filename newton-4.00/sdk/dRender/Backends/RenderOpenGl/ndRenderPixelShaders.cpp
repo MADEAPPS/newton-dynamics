@@ -12,6 +12,28 @@
 #include "ndRenderStdafx.h"
 #include "ndRenderShaderCache.h"
 
+const char* ndRenderShaderCache::m_doNothingPixel =
+R""""(
+	#version 450 core
+
+	void main()
+	{	
+	}
+)"""";
+
+const char* ndRenderShaderCache::m_wireFramePixel =
+R""""(
+	#version 450 core
+
+	in vec4 color;
+	out vec4 pixelColor;
+
+	void main()
+	{	
+		pixelColor = color;
+	}
+)"""";
+
 const char* ndRenderShaderCache::m_skyBoxPixel =
 R""""(
 	#version 450 core
@@ -23,17 +45,6 @@ R""""(
 	void main (void) 
 	{	
 		pixelColor = texture(cubemap, texCoord);
-	}
-)"""";
-
-const char* ndRenderShaderCache::m_doNothingPixel =
-R""""(
-	#version 450 core
-                        
-	//out vec4 pixelColor;
-	void main()
-	{	
-		//pixelColor = vec4(0.5, 0.5, 0.5, 1.0);
 	}
 )"""";
 
