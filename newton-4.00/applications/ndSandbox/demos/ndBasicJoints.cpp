@@ -726,7 +726,104 @@ class ndRollerCoasterModelNotify: public ndModelNotify
 		,m_spline(nullptr)
 	{
 		CreateSpline(scene, origin);
+		BuildCoaster(scene, origin);
+	}
 
+	void BuildCoaster(ndDemoEntityManager* const scene, const ndVector& origin)
+	{
+		ndPhysicsWorld* const world = scene->GetWorld();
+		ndMatrix matrix(ndGetIdentityMatrix());
+		matrix.m_posit = origin;
+
+		//ndSharedPtr<ndBody> pathBody(new ndSplinePathBody(scene, matrix));
+		//world->AddBody(pathBody);
+		//ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)pathBody->GetNotifyCallback();
+		//ndDemoEntity* const rollerCosterPath = *notify->m_entity;
+		//
+		//ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoSplinePathMesh(((ndSplinePathBody*)*pathBody)->m_spline, scene->GetShaderCache(), 500));
+		//rollerCosterPath->SetMesh(mesh);
+		//mesh->SetVisible(true);
+		//
+		//ndDemoSplinePathMesh* const splineMesh = (ndDemoSplinePathMesh*)*mesh;
+		//const ndBezierSpline& spline = splineMesh->m_curve;
+		//const ndInt32 count = 32;
+		//ndBigVector point0;
+		//ndVector positions[count + 1];
+		//ndFloat64 knot = spline.FindClosestKnot(point0, ndBigVector(ndVector(100.0f - 100.0f, 20.0f, 200.0f - 250.0f, 1.0f)), 4);
+		//positions[0] = point0;
+		//for (ndInt32 i = 0; i < count; ++i)
+		//{
+		//	ndBigVector point1;
+		//	ndBigVector tangent(spline.CurveDerivative(knot));
+		//	tangent = tangent.Scale(1.0 / ndSqrt(tangent.DotProduct(tangent).GetScalar()));
+		//	knot = spline.FindClosestKnot(point1, ndBigVector(point0 + tangent.Scale(2.0f)), 4);
+		//	point0 = point1;
+		//	positions[i + 1] = point1;
+		//}
+		//
+		//ndMatrix pathBodyMatrix(pathBody->GetMatrix());
+		//ndFloat32 attachmentOffset = 0.8f;
+		//
+		//ndShapeInstance shape(new ndShapeChamferCylinder(0.5f, 0.5f));
+		//ndSharedPtr<ndDemoMeshIntance> instanceMesh(new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
+		//ndSharedPtr<ndDemoEntity> rootEntity(new ndDemoInstanceEntity(instanceMesh));
+		//scene->AddEntity(rootEntity);
+		//
+		//ndBodyDynamic* bodies[count];
+		//for (ndInt32 i = 0; i < count; ++i)
+		//{
+		//	ndVector location0(positions[i + 0].m_x, positions[i + 0].m_y, positions[i + 0].m_z, ndFloat32(0.0f));
+		//	ndVector location1(positions[i + 1].m_x, positions[i + 1].m_y, positions[i + 1].m_z, ndFloat32(0.0f));
+		//
+		//	location0 = pathBodyMatrix.TransformVector(location0);
+		//	location1 = pathBodyMatrix.TransformVector(location1);
+		//
+		//	ndVector dir(location1 - location0);
+		//	dir.m_w = 0.0f;
+		//	matrix.m_front = dir.Scale(1.0f / ndSqrt(dir.DotProduct(dir).GetScalar()));
+		//	matrix.m_right = matrix.m_front.CrossProduct(matrix.m_up);
+		//	matrix.m_right = matrix.m_right.Scale(1.0f / ndSqrt(matrix.m_right.DotProduct(matrix.m_right).GetScalar()));
+		//	matrix.m_up = matrix.m_right.CrossProduct(matrix.m_front);
+		//	matrix.m_posit = pathBodyMatrix.TransformVector(ndVector(positions[i].m_x, positions[i].m_y - attachmentOffset, positions[i].m_z, ndFloat32(1.0f)));
+		//	ndMatrix matrix1(ndYawMatrix(0.5f * ndPi) * matrix);
+		//
+		//	ndSharedPtr<ndBody> body(new ndBodyDynamic());
+		//	ndSharedPtr<ndDemoEntity> entity(new ndDemoEntity(matrix1));
+		//	rootEntity->AddChild(entity);
+		//
+		//	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+		//	body->SetMatrix(matrix1);
+		//	body->GetAsBodyDynamic()->SetCollisionShape(shape);
+		//	body->GetAsBodyDynamic()->SetMassMatrix(1.0f, shape);
+		//
+		//	world->AddBody(body);
+		//
+		//	bodies[i] = body->GetAsBodyDynamic();
+		//	matrix.m_posit = pathBodyMatrix.TransformVector(ndVector(positions[i].m_x, positions[i].m_y, positions[i].m_z, ndFloat32(1.0f)));
+		//
+		//	ndJointFollowSplinePath* const joint = new ndJointFollowSplinePath(matrix, body->GetAsBodyDynamic(), pathBody->GetAsBodyDynamic());
+		//	ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
+		//	world->AddJoint(jointPtr);
+		//
+		//	ndVector veloc(dir.Scale(20.0f));
+		//	body->SetVelocity(veloc);
+		//}
+		//
+		//for (ndInt32 i = 1; i < count; ++i)
+		//{
+		//	ndBodyDynamic* const box0 = bodies[i - 1];
+		//	ndBodyDynamic* const box1 = bodies[i - 0];
+		//
+		//	ndMatrix matrix0(box0->GetMatrix());
+		//	ndMatrix matrix1(box1->GetMatrix());
+		//
+		//	matrix0.m_posit.m_y += attachmentOffset;
+		//	matrix1.m_posit.m_y += attachmentOffset;
+		//
+		//	ndJointFixDistance* const joint = new ndJointFixDistance(matrix1.m_posit, matrix0.m_posit, box1, box0);
+		//	ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
+		//	world->AddJoint(jointPtr);
+		//}
 	}
 	
 	void CreateSpline(ndDemoEntityManager* const scene, const ndVector& origin)
@@ -798,100 +895,6 @@ static void BuildPathFollow(ndDemoEntityManager* const scene, const ndVector& or
 	ndSharedPtr<ndModelNotify> rollerCoster(new ndRollerCoasterModelNotify(scene, origin));
 	model->SetNotifyCallback(rollerCoster);
 	world->AddModel(model);
-
-	//ndMatrix matrix(ndGetIdentityMatrix());
-	//matrix.m_posit = origin;
-	//ndPhysicsWorld* const world = scene->GetWorld();
-	
-	//ndSharedPtr<ndBody> pathBody(new ndSplinePathBody(scene, matrix));
-	//world->AddBody(pathBody);
-	//ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)pathBody->GetNotifyCallback();
-	//ndDemoEntity* const rollerCosterPath = *notify->m_entity;
-	//
-	//ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoSplinePathMesh(((ndSplinePathBody*)*pathBody)->m_spline, scene->GetShaderCache(), 500));
-	//rollerCosterPath->SetMesh(mesh);
-	//mesh->SetVisible(true);
-	//
-	//ndDemoSplinePathMesh* const splineMesh = (ndDemoSplinePathMesh*)*mesh;
-	//const ndBezierSpline& spline = splineMesh->m_curve;
-	//const ndInt32 count = 32;
-	//ndBigVector point0;
-	//ndVector positions[count + 1];
-	//ndFloat64 knot = spline.FindClosestKnot(point0, ndBigVector(ndVector(100.0f - 100.0f, 20.0f, 200.0f - 250.0f, 1.0f)), 4);
-	//positions[0] = point0;
-	//for (ndInt32 i = 0; i < count; ++i)
-	//{
-	//	ndBigVector point1;
-	//	ndBigVector tangent(spline.CurveDerivative(knot));
-	//	tangent = tangent.Scale(1.0 / ndSqrt(tangent.DotProduct(tangent).GetScalar()));
-	//	knot = spline.FindClosestKnot(point1, ndBigVector(point0 + tangent.Scale(2.0f)), 4);
-	//	point0 = point1;
-	//	positions[i + 1] = point1;
-	//}
-	//
-	//ndMatrix pathBodyMatrix(pathBody->GetMatrix());
-	//ndFloat32 attachmentOffset = 0.8f;
-	//
-	//ndShapeInstance shape(new ndShapeChamferCylinder(0.5f, 0.5f));
-	//ndSharedPtr<ndDemoMeshIntance> instanceMesh(new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
-	//ndSharedPtr<ndDemoEntity> rootEntity(new ndDemoInstanceEntity(instanceMesh));
-	//scene->AddEntity(rootEntity);
-	//
-	//ndBodyDynamic* bodies[count];
-	//for (ndInt32 i = 0; i < count; ++i)
-	//{
-	//	ndVector location0(positions[i + 0].m_x, positions[i + 0].m_y, positions[i + 0].m_z, ndFloat32(0.0f));
-	//	ndVector location1(positions[i + 1].m_x, positions[i + 1].m_y, positions[i + 1].m_z, ndFloat32(0.0f));
-	//
-	//	location0 = pathBodyMatrix.TransformVector(location0);
-	//	location1 = pathBodyMatrix.TransformVector(location1);
-	//
-	//	ndVector dir(location1 - location0);
-	//	dir.m_w = 0.0f;
-	//	matrix.m_front = dir.Scale(1.0f / ndSqrt(dir.DotProduct(dir).GetScalar()));
-	//	matrix.m_right = matrix.m_front.CrossProduct(matrix.m_up);
-	//	matrix.m_right = matrix.m_right.Scale(1.0f / ndSqrt(matrix.m_right.DotProduct(matrix.m_right).GetScalar()));
-	//	matrix.m_up = matrix.m_right.CrossProduct(matrix.m_front);
-	//	matrix.m_posit = pathBodyMatrix.TransformVector(ndVector(positions[i].m_x, positions[i].m_y - attachmentOffset, positions[i].m_z, ndFloat32(1.0f)));
-	//	ndMatrix matrix1(ndYawMatrix(0.5f * ndPi) * matrix);
-	//
-	//	ndSharedPtr<ndBody> body(new ndBodyDynamic());
-	//	ndSharedPtr<ndDemoEntity> entity(new ndDemoEntity(matrix1));
-	//	rootEntity->AddChild(entity);
-	//
-	//	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-	//	body->SetMatrix(matrix1);
-	//	body->GetAsBodyDynamic()->SetCollisionShape(shape);
-	//	body->GetAsBodyDynamic()->SetMassMatrix(1.0f, shape);
-	//
-	//	world->AddBody(body);
-	//
-	//	bodies[i] = body->GetAsBodyDynamic();
-	//	matrix.m_posit = pathBodyMatrix.TransformVector(ndVector(positions[i].m_x, positions[i].m_y, positions[i].m_z, ndFloat32(1.0f)));
-	//
-	//	ndJointFollowSplinePath* const joint = new ndJointFollowSplinePath(matrix, body->GetAsBodyDynamic(), pathBody->GetAsBodyDynamic());
-	//	ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
-	//	world->AddJoint(jointPtr);
-	//
-	//	ndVector veloc(dir.Scale(20.0f));
-	//	body->SetVelocity(veloc);
-	//}
-	//
-	//for (ndInt32 i = 1; i < count; ++i)
-	//{
-	//	ndBodyDynamic* const box0 = bodies[i - 1];
-	//	ndBodyDynamic* const box1 = bodies[i - 0];
-	//
-	//	ndMatrix matrix0(box0->GetMatrix());
-	//	ndMatrix matrix1(box1->GetMatrix());
-	//
-	//	matrix0.m_posit.m_y += attachmentOffset;
-	//	matrix1.m_posit.m_y += attachmentOffset;
-	//
-	//	ndJointFixDistance* const joint = new ndJointFixDistance(matrix1.m_posit, matrix0.m_posit, box1, box0);
-	//	ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
-	//	world->AddJoint(jointPtr);
-	//}
 }
 
 void ndBasicJoints (ndDemoEntityManager* const scene)
