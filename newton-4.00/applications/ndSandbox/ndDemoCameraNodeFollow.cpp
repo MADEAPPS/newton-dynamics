@@ -89,11 +89,11 @@ void ndDemoCameraNodeFollow::TickUpdate(ndFloat32)
 	
 			if (mouseSpeedY > 0.0f)
 			{
-				m_pitch += m_pitchRate;
+				m_pitch -= m_pitchRate;
 			}
 			else if (mouseSpeedY < 0.0f)
 			{
-				m_pitch -= m_pitchRate;
+				m_pitch += m_pitchRate;
 			}
 			m_pitch = ndClamp(m_pitch, ndFloat32(-80.0f * ndDegreeToRad), ndFloat32(80.0f * ndDegreeToRad));
 		}
