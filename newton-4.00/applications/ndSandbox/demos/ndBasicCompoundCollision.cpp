@@ -89,19 +89,17 @@ static void CreateBoxCompoundShape(ndShapeInstance& parentInstance)
 
 	ndShapeCompound* const compoundShape = parentInstance.GetShape()->GetAsShapeCompound();
 	compoundShape->BeginAddRemove();
-	{
 		auto AddToCompoundShape = [](const ndMatrix& localMatrix, ndShapeInstance& parentShape, ndShapeInstance& childInstance)
-			{
-				ndShapeCompound* const compoundShape = parentShape.GetShape()->GetAsShapeCompound();
-				childInstance.SetLocalMatrix(localMatrix);
-				compoundShape->AddCollision(&childInstance);
-			};
+		{
+			ndShapeCompound* const compoundShape = parentShape.GetShape()->GetAsShapeCompound();
+			childInstance.SetLocalMatrix(localMatrix);
+			compoundShape->AddCollision(&childInstance);
+		};
 		AddToCompoundShape(wall1_local, parentInstance, wall1);
 		AddToCompoundShape(wall2_local, parentInstance, wall2);
 		AddToCompoundShape(wall3_local, parentInstance, wall3);
 		AddToCompoundShape(wall4_local, parentInstance, wall4);
 		AddToCompoundShape(floor_local, parentInstance, floor);
-	}
 	compoundShape->EndAddRemove();
 }
 
@@ -151,8 +149,8 @@ void ndBasicCompoundCollision(ndDemoEntityManager* const scene)
 
 	ndMatrix location(ndGetIdentityMatrix());
 
-	AddSphere(scene);
-	AddEmptyBox(scene);
+	//AddSphere(scene);
+	//AddEmptyBox(scene);
 
 	location.m_posit.m_y = 0.5f;
 	location.m_posit.m_z = -3.0f;
