@@ -244,14 +244,33 @@ namespace ndRagdoll
 	}
 #endif
 
+	class ndRagDollController : public ndModelNotify
+	{ 
+		public:
+		ndRagDollController(ndDemoEntityManager* const scene, ndSharedPtr<ndRenderSceneNode>& mesh)
+			:ndModelNotify()
+			//, m_playerBody(body)
+			//, m_cameraNode(nullptr)
+			//, m_scene(scene)
+		{
+
+		}
+	};
+
+
 	ndSharedPtr<ndModelNotify> CreateRagdoll(ndDemoEntityManager* const scene, const ndMeshLoader& loader, const ndMatrix& location)
 	{
+		ndWorld* const world = scene->GetWorld();
 		ndSharedPtr<ndRenderSceneNode> entityDuplicate(loader.m_renderMesh->Clone());
 		entityDuplicate->SetTransform(location);
 		entityDuplicate->SetTransform(location);
-
 		scene->AddEntity(entityDuplicate);
 
+		ndSharedPtr<ndModel> model(new ndModelArticulation());
+		ndSharedPtr<ndModelNotify> controller(new ndRagDollController(scene, entityDuplicate));
+		model->SetNotifyCallback(controller);
+		
+		world->AddModel(model);
 		return ndSharedPtr<ndModelNotify>();
 	}
 }
