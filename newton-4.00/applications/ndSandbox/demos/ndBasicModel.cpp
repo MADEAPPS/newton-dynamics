@@ -298,8 +298,8 @@ class ndBackGroundVehicleController : public ndModelNotify
 
 void ndBasicModel(ndDemoEntityManager* const scene)
 {
-	ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
-	//ndSharedPtr<ndBody> mapBody(BuildHeightFieldTerrain(scene, "grass.png", ndGetIdentityMatrix()));
+	//ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
+	ndSharedPtr<ndBody> mapBody(BuildHeightFieldTerrain(scene, "grass.png", ndGetIdentityMatrix()));
 
 	ndMeshLoader vmwLoaderRedPaint;
 	vmwLoaderRedPaint.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("vmwRed.fbx"));
