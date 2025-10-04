@@ -235,8 +235,8 @@ ndSharedPtr<ndBody> BuildStaticMesh(ndDemoEntityManager* const scene, const char
 static void BuildPlaygroundHangingBridge(ndDemoEntityManager* const scene, const ndSharedPtr<ndMesh>& mesh, const ndSharedPtr<ndBody>& playgroundBody)
 {
 	// add a hanging bridge as a feature.
-	const ndMesh* const end(mesh->FindChild("rampEnd"));
-	const ndMesh* const start(mesh->FindChild("rampStart"));
+	const ndMesh* const end(mesh->FindByName("rampEnd"));
+	const ndMesh* const start(mesh->FindByName("rampStart"));
 
 	ndMatrix endMatrix(end->CalculateGlobalMatrix());
 	ndMatrix startMatrix(start->CalculateGlobalMatrix());

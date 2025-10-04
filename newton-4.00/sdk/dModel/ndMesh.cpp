@@ -177,18 +177,38 @@ void ndMesh::SetMesh(const ndSharedPtr<ndMeshEffect>& mesh)
 	m_mesh = mesh;
 }
 
-ndMesh* ndMesh::FindChild(const char* const name) const
+ndMesh* ndMesh::FindByName(const ndString& name) const
 {
-	const ndString testName(name);
 	ndMesh* const self = (ndMesh*)this;
 	for (ndMesh* node = self->IteratorFirst(); node; node = node->IteratorNext())
 	{
-		if (testName == node->m_name)
+		if (name == node->m_name)
 		{
 			return node;
 		}
 	}
 	return nullptr;
+}
+
+ndMesh* ndMesh::FindByClosestMatch(const ndString& name) const
+{
+	ndMesh* closestMatch = FindByName(name);
+	if (!closestMatch)
+	{
+		ndInt32 bestScore = 10000;
+		ndMesh* const self = (ndMesh*)this;
+		for (ndMesh* node = self->IteratorFirst(); node && bestScore; node = node->IteratorNext())
+		{
+			ndInt32 distance = node->m_name.Distance(name);
+			ndAssert(distance >= 0);
+			if (distance < bestScore)
+			{
+				bestScore = distance;
+				closestMatch = node;
+			}
+		}
+	}
+	return closestMatch;
 }
 
 ndMesh* ndMesh::IteratorFirst()
@@ -497,5 +517,12 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollision()
 	}
 
 	shape->SetLocalMatrix(shape->GetLocalMatrix() * m_meshMatrix);
+	return shape;
+}
+
+ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionFromChildren()
+{
+	//ndSharedPtr<ndShapeInstance> shape(new ndShapeInstance(new ndShapeNull()));
+	ndSharedPtr<ndShapeInstance> shape(new ndShapeInstance(new ndShapeSphere(0.1f)));
 	return shape;
 }

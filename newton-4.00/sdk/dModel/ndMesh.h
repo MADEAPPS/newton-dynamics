@@ -64,7 +64,9 @@ class ndMesh : public ndClassAlloc
 
 	ndMesh* IteratorNext();
 	ndMesh* IteratorFirst();
-	ndMesh* FindChild(const char* const name) const;
+
+	ndMesh* FindByName(const ndString& name) const;
+	ndMesh* FindByClosestMatch(const ndString& name) const;
 
 	ndSharedPtr<ndMeshEffect>& GetMesh();
 	const ndSharedPtr<ndMeshEffect>& GetMesh() const;
@@ -85,6 +87,7 @@ class ndMesh : public ndClassAlloc
 	ndMatrix CalculateGlobalMatrix(ndMesh* const parent = nullptr) const;
 
 	ndSharedPtr<ndShapeInstance> CreateCollision();
+	ndSharedPtr<ndShapeInstance> CreateCollisionFromChildren();
 
 	ndMatrix m_matrix;
 	ndMatrix m_meshMatrix;
