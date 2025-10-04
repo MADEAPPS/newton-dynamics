@@ -834,23 +834,26 @@ ndVector ndShapeConvexHull::SupportVertexhierarchical(const ndVector& dir, ndInt
 	const ndFloat32 leftDist = leftP.DotProduct(dir).GetScalar();
 	const ndFloat32 rightDist = rightP.DotProduct(dir).GetScalar();
 
-	ndFloat32 distPool[32];
-	const ndConvexBox* stackPool[32];
+	//ndFloat32 distPool[32];
+	//const ndConvexBox* stackPool[32];
+	ndFixSizeArray<ndFloat32, 64> distPool;
+	ndFixSizeArray<const ndConvexBox*, 64> stackPool;
+
 	if (rightDist >= leftDist)
 	{
-		distPool[0] = leftDist;
-		stackPool[0] = &leftBox;
+		distPool.PushBack(leftDist);
+		stackPool.PushBack(&leftBox);
 
-		distPool[1] = rightDist;
-		stackPool[1] = &rightBox;
+		distPool.PushBack(rightDist);
+		stackPool.PushBack(&rightBox);
 	}
 	else
 	{
-		distPool[0] = rightDist;
-		stackPool[0] = &rightBox;
+		distPool.PushBack(rightDist);
+		stackPool.PushBack(&rightBox);
 
-		distPool[1] = leftDist;
-		stackPool[1] = &leftBox;
+		distPool.PushBack(leftDist);
+		stackPool.PushBack(&leftBox);
 	}
 
 	const ndVector dirX(dir.m_x);
@@ -860,14 +863,13 @@ ndVector ndShapeConvexHull::SupportVertexhierarchical(const ndVector& dir, ndInt
 	ndVector maxProj(ndFloat32(-1.0e20f));
 	ndVector maxVertexProjection(maxProj);
 
-	ndInt32 stack = 2;
-	while (stack)
+	while (distPool.GetCount())
 	{
-		stack--;
-		const ndFloat32 dist = distPool[stack];
+		const ndFloat32 dist = distPool.Pop();
+		const ndConvexBox& box = *stackPool.Pop();
 		if (dist > maxProj.GetScalar())
 		{
-			const ndConvexBox& box = *stackPool[stack];
+			//const ndConvexBox& box = *stackPool[stack];
 			if (box.m_leftBox > 0)
 			{
 				ndAssert(box.m_rightBox > 0);
@@ -881,32 +883,24 @@ ndVector ndShapeConvexHull::SupportVertexhierarchical(const ndVector& dir, ndInt
 				const ndFloat32 rightBoxDist = rightBoxP.DotProduct(dir).GetScalar();
 				if (rightBoxDist >= leftBoxDist)
 				{
-					distPool[stack] = leftBoxDist;
-					stackPool[stack] = &leftBox1;
-					stack++;
-					ndAssert(stack < ndInt32 (sizeof(distPool) / sizeof(distPool[0])));
+					distPool.PushBack(leftBoxDist);
+					stackPool.PushBack(&leftBox1);
 
-					distPool[stack] = rightBoxDist;
-					stackPool[stack] = &rightBox1;
-					stack++;
-					ndAssert(stack < ndInt32 (sizeof(distPool) / sizeof(distPool[0])));
+					distPool.PushBack(rightBoxDist);
+					stackPool.PushBack(&rightBox1);
 				}
 				else
 				{
-					distPool[stack] = rightBoxDist;
-					stackPool[stack] = &rightBox1;
-					stack++;
-					ndAssert(stack < ndInt32 (sizeof(distPool) / sizeof(distPool[0])));
+					distPool.PushBack(rightBoxDist);
+					stackPool.PushBack(&rightBox1);
 
-					distPool[stack] = leftBoxDist;
-					stackPool[stack] = &leftBox1;
-					stack++;
-					ndAssert(stack < ndInt32 (sizeof(distPool) / sizeof(distPool[0])));
+					distPool.PushBack(leftBoxDist);
+					stackPool.PushBack(&leftBox1);
 				}
 			}
 			else
 			{
-				for (ndInt32 j = 0; j < box.m_soaVertexCount; ++j)
+				for (ndInt32 j = box.m_soaVertexCount - 1; j >= 0; --j)
 				{
 					ndInt32 i = box.m_soaVertexStart + j;
 					ndVector dot(m_soa_x[i] * dirX + m_soa_y[i] * dirY + m_soa_z[i] * dirZ);
