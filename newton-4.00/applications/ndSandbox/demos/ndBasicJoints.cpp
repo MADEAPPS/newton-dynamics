@@ -16,43 +16,6 @@
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 
-#if 0
-class ndJointFollowSplinePath : public ndJointFollowPath
-{
-	public:
-	D_CLASS_REFLECTION(ndJointFollowSplinePath, ndJointFollowPath)
-
-	ndJointFollowSplinePath()
-		:ndJointFollowPath()
-	{
-	}
-
-	ndJointFollowSplinePath(const ndMatrix& pinAndPivotFrame, ndBodyDynamic* const child, ndBodyDynamic* const pathBody)
-		:ndJointFollowPath(pinAndPivotFrame, child, pathBody)
-	{
-		//static ndJointFollowSplinePathSaveLoad loadSave;
-	}
-
-	void GetPointAndTangentAtLocation(const ndVector& location, ndVector& positOut, ndVector& tangentOut) const override
-	{
-		const ndSplinePathBody* const splineBody = (ndSplinePathBody*)GetBody1();
-		const ndBezierSpline& spline = splineBody->m_spline;
-		
-		ndMatrix matrix(splineBody->GetMatrix());
-		
-		ndVector p(matrix.UntransformVector(location));
-		ndBigVector point;
-		ndFloat64 knot = spline.FindClosestKnot(point, p, 4);
-		ndBigVector tangent(spline.CurveDerivative(knot));
-		tangent = tangent.Scale(1.0 / ndSqrt(tangent.DotProduct(tangent).GetScalar()));
-		positOut = matrix.TransformVector(point);
-		tangentOut = tangent;
-	}
-};
-
-
-#endif
-
 static ndSharedPtr<ndBody> MakePrimitive(ndDemoEntityManager* const scene, const ndMatrix& matrix, const ndShapeInstance& shape, ndSharedPtr<ndRenderPrimitive> mesh, ndFloat32 mass)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
@@ -671,6 +634,45 @@ static void BuildRollingFriction(ndDemoEntityManager* const scene, const ndVecto
 
 class ndRollerCoasterModelNotify: public ndModelNotify
 {
+	class ndJointFollowSplinePath : public ndJointFollowPath
+	{
+		public:
+		D_CLASS_REFLECTION(ndJointFollowSplinePath, ndJointFollowPath)
+
+		ndJointFollowSplinePath()
+			:ndJointFollowPath()
+		{
+		}
+
+		ndJointFollowSplinePath(
+			const ndMatrix& pinAndPivotFrame, 
+			ndBodyDynamic* const child, 
+			ndBodyDynamic* const pathBody,
+			const ndSharedPtr<ndBezierSpline>& spline)
+			:ndJointFollowPath(pinAndPivotFrame, child, pathBody)
+			,m_spline(spline)
+		{
+		}
+
+		void GetPointAndTangentAtLocation(const ndVector& location, ndVector& positOut, ndVector& tangentOut) const override
+		{
+			const ndBodyKinematic* const splineBody = GetBody1();
+			//const ndBezierSpline& spline = splineBody->m_spline;
+
+			ndMatrix matrix(splineBody->GetMatrix());
+
+			ndVector p(matrix.UntransformVector(location));
+			ndBigVector point;
+			ndFloat64 knot = m_spline->FindClosestKnot(point, p, 4);
+			ndBigVector tangent(m_spline->CurveDerivative(knot));
+			tangent = tangent.Scale(1.0 / ndSqrt(tangent.DotProduct(tangent).GetScalar()));
+			positOut = matrix.TransformVector(point);
+			tangentOut = tangent;
+		}
+
+		ndSharedPtr<ndBezierSpline> m_spline;
+	};
+
 	public:
 	ndRollerCoasterModelNotify(ndDemoEntityManager* const scene, const ndVector& origin)
 		:ndModelNotify()
@@ -694,49 +696,19 @@ class ndRollerCoasterModelNotify: public ndModelNotify
 		pathBody->GetAsBodyKinematic()->SetCollisionShape(box);
 		world->AddBody(pathBody);
 
-		//ndSharedPtr<ndBody> pathBody(new ndSplinePathBody(scene, matrix));
-		//world->AddBody(pathBody);
-		//ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)pathBody->GetNotifyCallback();
-		//ndDemoEntity* const rollerCosterPath = *notify->m_entity;
-		//ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoSplinePathMesh(((ndSplinePathBody*)*pathBody)->m_spline, scene->GetShaderCache(), 500));
-		//rollerCosterPath->SetMesh(mesh);
-		//mesh->SetVisible(true);
-		//ndDemoSplinePathMesh* const splineMesh = (ndDemoSplinePathMesh*)*mesh;
-		//const ndBezierSpline& spline = splineMesh->m_curve;
-		//const ndInt32 count = 32;
-		//ndBigVector point0;
-		//ndVector positions[count + 1];
-		//ndFloat64 knot = spline.FindClosestKnot(point0, ndBigVector(ndVector(100.0f - 100.0f, 20.0f, 200.0f - 250.0f, 1.0f)), 4);
-		//positions[0] = point0;
-		//for (ndInt32 i = 0; i < count; ++i)
-		//{
-		//	ndBigVector point1;
-		//	ndBigVector tangent(spline.CurveDerivative(knot));
-		//	tangent = tangent.Scale(1.0 / ndSqrt(tangent.DotProduct(tangent).GetScalar()));
-		//	knot = spline.FindClosestKnot(point1, ndBigVector(point0 + tangent.Scale(2.0f)), 4);
-		//	point0 = point1;
-		//	positions[i + 1] = point1;
-		//}
-
 		// create all the roller coater carts
 		ndRender* const render = *scene->GetRenderer();
 		ndMatrix pathBodyMatrix(pathBody->GetMatrix());
-		ndFloat32 attachmentOffset = 0.8f;
-		ndSharedPtr<ndShapeInstance> shape(new ndShapeInstance(new ndShapeChamferCylinder(0.5f, 0.5f)));
 
-		//ndFloat32 mass = 1.0f;
-		//ndFloat32 diameter = 0.5f;
-		//ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeCapsule(diameter * 0.25f, diameter * 0.25f, diameter * 1.0f)));
+		ndFloat32 attachmentOffset = ndFloat32 (0.8f);
+		ndSharedPtr<ndShapeInstance> shape(new ndShapeInstance(new ndShapeChamferCylinder(ndFloat32(0.5f), ndFloat32(0.5f))));
+
 		ndRenderPrimitive::ndDescriptor descriptor(render);
 		descriptor.m_collision = shape;
-		descriptor.m_mapping = ndRenderPrimitive::m_capsule;
-		descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png")));
-		//descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("smilli.png")));
-		ndSharedPtr<ndRenderPrimitive> mesh(new ndRenderPrimitive(descriptor));
-
-		//ndSharedPtr<ndDemoMeshIntance> instanceMesh(new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "wood_0.png", "wood_0.png", "wood_0.png"));
-		//ndSharedPtr<ndDemoEntity> rootEntity(new ndDemoInstanceEntity(instanceMesh));
-		//scene->AddEntity(rootEntity);
+		descriptor.m_mapping = ndRenderPrimitive::m_cylindrical;
+		//descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png")));
+		descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("smilli.png")));
+		ndSharedPtr<ndRenderPrimitive> coasterCarPrimitive(new ndRenderPrimitive(descriptor));
 
 		ndBigVector point0;
 		ndFixSizeArray<ndVector, 64> positions;
@@ -752,7 +724,6 @@ class ndRollerCoasterModelNotify: public ndModelNotify
 			positions.PushBack(point1);
 		}
 
-		//ndBodyDynamic* bodies[count];
 		ndFixSizeArray<ndBodyDynamic*, 64> bodies;
 		for (ndInt32 i = 0; i < positions.GetCount() - 1; ++i)
 		{
@@ -772,10 +743,11 @@ class ndRollerCoasterModelNotify: public ndModelNotify
 			ndMatrix matrix1(ndYawMatrix(0.5f * ndPi) * matrix);
 		
 			ndSharedPtr<ndBody> body(new ndBodyDynamic());
-		//	ndSharedPtr<ndDemoEntity> entity(new ndDemoEntity(matrix1));
-		//	rootEntity->AddChild(entity);
+			ndSharedPtr<ndRenderSceneNode>coasterCar(new ndRenderSceneNode(matrix1));
+			visualPath->AddChild(coasterCar);
+			coasterCar->SetPrimitive(coasterCarPrimitive);
 		
-		//	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+			body->SetNotifyCallback(new ndDemoEntityNotify(scene, coasterCar));
 			body->SetMatrix(matrix1);
 			body->GetAsBodyDynamic()->SetCollisionShape(**shape);
 			body->GetAsBodyDynamic()->SetMassMatrix(ndFloat32 (1.0f), **shape);
@@ -785,12 +757,11 @@ class ndRollerCoasterModelNotify: public ndModelNotify
 			bodies.PushBack(body->GetAsBodyDynamic());
 			matrix.m_posit = pathBodyMatrix.TransformVector(ndVector(positions[i].m_x, positions[i].m_y, positions[i].m_z, ndFloat32(1.0f)));
 		
-		//	ndJointFollowSplinePath* const joint = new ndJointFollowSplinePath(matrix, body->GetAsBodyDynamic(), pathBody->GetAsBodyDynamic());
-		//	ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
-		//	world->AddJoint(jointPtr);
-		//
-		//	ndVector veloc(dir.Scale(20.0f));
-		//	body->SetVelocity(veloc);
+			ndSharedPtr<ndJointBilateralConstraint> joint(new ndJointFollowSplinePath(matrix, body->GetAsBodyDynamic(), pathBody->GetAsBodyDynamic(), m_spline));
+			world->AddJoint(joint);
+		
+			ndVector veloc(dir.Scale(20.0f));
+			body->SetVelocity(veloc);
 		}
 		
 		for (ndInt32 i = 1; i < bodies.GetCount(); ++i)
@@ -887,15 +858,15 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	// build a floor
 	ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
 
-	//BuildBallSocket(scene, ndVector(0.0f, 0.0f, -7.0f, 1.0f));
-	//BuildHinge(scene, ndVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
-	//BuildSlider(scene, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 100.0f, 0.75f);
-	//BuildGear(scene, ndVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
-	//BuildDoubleHinge(scene, ndVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
-	//BuildRoller(scene, ndVector(0.0f, 0.0f, 9.0f, 1.0f), 10.0f, 0.75f);
-	//BuildCylindrical(scene, ndVector(0.0f, 0.0f, 12.0f, 1.0f), 10.0f, 0.75f);
-	//BuildFixDistanceJoints(scene, ndVector( -4.0f, 0.0f, -5.0f, 1.0f));
-	//BuildRollingFriction(scene, ndVector(-4.0f, 0.0f, 5.0f, 1.0f), 10.0f, 0.5f);
+	BuildBallSocket(scene, ndVector(0.0f, 0.0f, -7.0f, 1.0f));
+	BuildHinge(scene, ndVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
+	BuildSlider(scene, ndVector(0.0f, 0.0f, 1.0f, 1.0f), 100.0f, 0.75f);
+	BuildGear(scene, ndVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
+	BuildDoubleHinge(scene, ndVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
+	BuildRoller(scene, ndVector(0.0f, 0.0f, 9.0f, 1.0f), 10.0f, 0.75f);
+	BuildCylindrical(scene, ndVector(0.0f, 0.0f, 12.0f, 1.0f), 10.0f, 0.75f);
+	BuildFixDistanceJoints(scene, ndVector( -4.0f, 0.0f, -5.0f, 1.0f));
+	BuildRollingFriction(scene, ndVector(-4.0f, 0.0f, 5.0f, 1.0f), 10.0f, 0.5f);
 	BuildPathFollow(scene, ndVector(40.0f, 0.0f, 0.0f, 1.0f));
 	
 	ndQuaternion rot;
