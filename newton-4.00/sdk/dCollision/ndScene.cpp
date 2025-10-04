@@ -1685,7 +1685,8 @@ void ndScene::CalculateContacts()
 			}
 		});
 		const ndInt32 jointCount = ndInt32(m_contactArray.GetCount());
-		ParallelExecute(CalculateContactPoints, jointCount, OptimalGroupBatch(jointCount));
+		//ParallelExecute(CalculateContactPoints, jointCount, OptimalGroupBatch(jointCount));
+		ParallelExecute(CalculateContactPoints, jointCount, 8);
 	}
 }
 
