@@ -44,6 +44,7 @@ class ndDemoCameraNode: public ndRenderSceneNode
 	ndDemoCameraNode(ndRender* const owner);
 
 	virtual void TickUpdate(ndFloat32 timestep) = 0;
+	virtual ndRenderSceneNode* Clone() const;
 	
 	protected:
 	void ResetPickBody();

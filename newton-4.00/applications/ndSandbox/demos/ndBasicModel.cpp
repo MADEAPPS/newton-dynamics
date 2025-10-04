@@ -35,10 +35,12 @@ class ndBackGroundVehicleController : public ndModelNotify
 		ndFloat32 m_invRadius;
 	};
 
-	ndBackGroundVehicleController(ndDemoEntityManager* const scene, const ndSharedPtr<ndBody>& body)
+	ndBackGroundVehicleController(
+		ndDemoEntityManager* const scene, const ndSharedPtr<ndBody>& body)
 		:ndModelNotify()
 		,m_scene(scene)
 		,m_vehicleBody(body)
+		,m_cameraNode(nullptr)
 		,m_desiredSpeed(ndFloat32(0.0f))
 		,m_desiredAngularSpeedFactor(ndFloat32(0.0f))
 	{
@@ -65,18 +67,27 @@ class ndBackGroundVehicleController : public ndModelNotify
 				m_wheelAnimation.PushBack(wheel);
 			}
 		}
+
+		// attach a follow camera to the vehicle prop
+		const ndVector cameraPivot(0.0f, 2.0f, 0.0f, 0.0f);
+		ndRender* const renderer = *m_scene->GetRenderer();
+		m_cameraNode = ndSharedPtr<ndRenderSceneNode>(new ndDemoCameraNodeFollow(renderer, cameraPivot, ND_PROP_VEHICLE_CAMERA_DISTANCE));
+		vehicleMesh->AddChild(m_cameraNode);
 	}
 
-	static ndSharedPtr<ndModelNotify> CreateAiVehicleProp(ndDemoEntityManager* const scene)
+	ndSharedPtr<ndRenderSceneNode> GetCamera()
 	{
-		ndMeshLoader loader;
-		loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("vmw.fbx"));
+		return m_cameraNode;
+	}
 
-		ndSharedPtr<ndRenderSceneNode> vehicleMesh(loader.m_renderMesh);
+	static ndSharedPtr<ndModelNotify> CreateAiVehicleProp(ndDemoEntityManager* const scene, const ndVector& location,  const ndMeshLoader& loader)
+	{
+		ndSharedPtr<ndRenderSceneNode> vehicleMesh(loader.m_renderMesh->Clone());
 		ndMatrix matrix(ndGetIdentityMatrix());
-		ndVector floor(FindFloor(*scene->GetWorld(), ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-		floor.m_y += ndFloat32(1.0f);
-		matrix.m_posit = floor;
+		matrix.m_posit = location;
+		matrix.m_posit.m_y += ndFloat32(1.0f);
+		matrix.m_posit.m_w = ndFloat32 (1.0f);
+		matrix.m_posit = FindFloor(*scene->GetWorld(), matrix.m_posit, 200.0f);
 
 		ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* renderChildren = vehicleMesh->GetChildren().GetFirst();
 
@@ -123,18 +134,6 @@ class ndBackGroundVehicleController : public ndModelNotify
 		scene->AddEntity(vehicleMesh);
 		world->AddModel(model);
 		return controller;
-	}
-
-	void SetCamera()
-	{
-		// attach a follow camera to the vehicle prop
-		const ndVector cameraPivot(0.0f, 2.0f, 0.0f, 0.0f);
-		ndRender* const renderer = *m_scene->GetRenderer();
-		ndDemoEntityNotify* const bodyNotify = (ndDemoEntityNotify*)(m_vehicleBody->GetAsBodyKinematic()->GetNotifyCallback());
-		ndSharedPtr<ndRenderSceneNode> vehicleMesh(bodyNotify->GetUserData());
-		ndSharedPtr<ndRenderSceneNode> camera(new ndDemoCameraNodeFollow(renderer, cameraPivot, ND_PROP_VEHICLE_CAMERA_DISTANCE));
-		renderer->SetCamera(camera);
-		vehicleMesh->AddChild(camera);
 	}
 
 	private:
@@ -291,6 +290,7 @@ class ndBackGroundVehicleController : public ndModelNotify
 	public:
 	ndDemoEntityManager* m_scene;
 	ndSharedPtr<ndBody> m_vehicleBody;
+	ndSharedPtr<ndRenderSceneNode> m_cameraNode;
 	ndFloat32 m_desiredSpeed;
 	ndFloat32 m_desiredAngularSpeedFactor;
 	ndFixSizeArray<ndWheelSpin, 8> m_wheelAnimation;
@@ -298,10 +298,50 @@ class ndBackGroundVehicleController : public ndModelNotify
 
 void ndBasicModel(ndDemoEntityManager* const scene)
 {
-	//ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
-	ndSharedPtr<ndBody> mapBody(BuildHeightFieldTerrain(scene, "grass.png", ndGetIdentityMatrix()));
+	ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
+	//ndSharedPtr<ndBody> mapBody(BuildHeightFieldTerrain(scene, "grass.png", ndGetIdentityMatrix()));
 
-	ndSharedPtr<ndModelNotify> modelController(ndBackGroundVehicleController::CreateAiVehicleProp(scene));
-	ndBackGroundVehicleController* const vehicleController = (ndBackGroundVehicleController*)*modelController;
-	vehicleController->SetCamera();
+	ndMeshLoader vmwLoaderRedPaint;
+	vmwLoaderRedPaint.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("vmwRed.fbx"));
+	ndSharedPtr<ndModelNotify> controller(ndBackGroundVehicleController::CreateAiVehicleProp(scene, ndVector::m_wOne, vmwLoaderRedPaint));
+
+	// set this player as the active camera
+	ndBackGroundVehicleController* const playerController = (ndBackGroundVehicleController*)*controller;
+	ndRender* const renderer = *scene->GetRenderer();
+	renderer->SetCamera(playerController->GetCamera());
+
+#if 1
+	{
+		// add an array of vehicles 
+		ndMeshLoader vmwLoaderGreenPaint;
+		vmwLoaderGreenPaint.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("vmwGreen.fbx"));
+
+		const ndInt32 count = 5;
+		ndFloat32 spacing = ndFloat32(10.0f);
+
+		ndFloat32 x0 = spacing;
+		ndFloat32 z0 = -spacing * ndFloat32(count / 2);
+		for (ndInt32 i = 0; i < count; ++i)
+		{
+			for (ndInt32 j = 0; j < count; ++j)
+			{
+				ndFloat32 z = z0 + ndFloat32(i) * spacing;
+				ndFloat32 x = x0 + ndFloat32(j) * spacing;
+				x += (ndRand() - ndFloat32(0.5f)) * spacing * ndFloat32(0.25f);
+				z += (ndRand() - ndFloat32(0.5f)) * spacing * ndFloat32(0.25f);
+
+				ndVector position(x, ndFloat32(0.0f), z, ndFloat32(1.0f));
+
+				if (ndRandInt() & 1)
+				{
+					ndBackGroundVehicleController::CreateAiVehicleProp(scene, position, vmwLoaderRedPaint);
+				}
+				else
+				{
+					ndBackGroundVehicleController::CreateAiVehicleProp(scene, position, vmwLoaderGreenPaint);
+				}
+			}
+		}
+	}
+#endif
 }

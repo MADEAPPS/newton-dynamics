@@ -29,6 +29,12 @@ ndDemoCameraNode::ndDemoCameraNode(ndRender* const owner)
 	AddChild(camera);
 }
 
+ndRenderSceneNode* ndDemoCameraNode::Clone() const
+{
+	ndAssert(0);
+	return nullptr;
+}
+
 bool ndDemoCameraNode::UpdatePickBody()
 {
 	// handle pick body from the screen

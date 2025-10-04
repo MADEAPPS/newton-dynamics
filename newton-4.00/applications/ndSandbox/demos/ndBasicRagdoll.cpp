@@ -10,20 +10,18 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndSkyBox.h"
-#include "ndDemoMesh.h"
 #include "ndMeshLoader.h"
-#include "ndDemoCamera.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
-#include "ndDemoInstanceEntity.h"
-#include "ndBasicPlayerCapsule.h"
+#include "ndDemoCameraNodeFollow.h"
+#include "ndHeightFieldPrimitive.h"
 
 namespace ndRagdoll
 {
+#if 0
 	class ndDefinition
 	{
 		public:
@@ -244,39 +242,42 @@ namespace ndRagdoll
 		model->NormalizeMassDistribution(100.0f);
 		return model;
 	}
+#endif
 }
 
 using namespace ndRagdoll;
-void ndRagdollTest (ndDemoEntityManager* const scene)
+void ndBasicRagdoll (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene, ndGetIdentityMatrix());
+	//ndSharedPtr<ndBody> bodyFloor(BuildPlayground(scene));
+	ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "marblecheckboard.png", 0.1f, true));
+	//ndSharedPtr<ndBody> bodyFloor(BuildCompoundScene(scene, ndGetIdentityMatrix()));
 	
-	ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
-	ndMeshLoader loader;
-	ndSharedPtr<ndDemoEntity> modelMesh (loader.LoadEntity("walker.fbx", scene));
+	//ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
+	//ndMeshLoader loader;
+	//ndSharedPtr<ndDemoEntity> modelMesh (loader.LoadEntity("walker.fbx", scene));
 	
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.5f;
 	ndMatrix playerMatrix(matrix);
-
-	ndSharedPtr<ndModel> model(BuildModel(scene, *modelMesh, matrix));
-	scene->GetWorld()->AddModel(model);
-	model->AddBodiesAndJointsToWorld();
 	
-	//matrix.m_posit.m_x += 1.4f;
-	//TestPlayerCapsuleInteraction(scene, matrix);
-	//matrix.m_posit.m_x += 2.0f;
-	//matrix.m_posit.m_y += 2.0f;
-	//ndBodyKinematic* const reckingBall = AddSphere(scene, matrix.m_posit, 25.0f, 0.25f);
-	//reckingBall->SetVelocity(ndVector(-5.0f, 0.0f, 0.0f, 0.0f));
-	//matrix.m_posit.m_x += 2.0f;
-	//matrix.m_posit.m_z -= 2.0f;
-	//scene->GetWorld()->AddModel(new ndHumanoidModel(scene, modelMesh, matrix));
-	//matrix.m_posit.m_z = 2.0f;
-	//scene->GetWorld()->AddModel(new ndHumanoidModel(scene, modelMesh, matrix));
-	//origin1.m_x += 20.0f;
-	//AddCapsulesStacks(scene, origin1, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
+	//ndSharedPtr<ndModel> model(BuildModel(scene, *modelMesh, matrix));
+	//scene->GetWorld()->AddModel(model);
+	//model->AddBodiesAndJointsToWorld();
+	//
+	////matrix.m_posit.m_x += 1.4f;
+	////TestPlayerCapsuleInteraction(scene, matrix);
+	////matrix.m_posit.m_x += 2.0f;
+	////matrix.m_posit.m_y += 2.0f;
+	////ndBodyKinematic* const reckingBall = AddSphere(scene, matrix.m_posit, 25.0f, 0.25f);
+	////reckingBall->SetVelocity(ndVector(-5.0f, 0.0f, 0.0f, 0.0f));
+	////matrix.m_posit.m_x += 2.0f;
+	////matrix.m_posit.m_z -= 2.0f;
+	////scene->GetWorld()->AddModel(new ndHumanoidModel(scene, modelMesh, matrix));
+	////matrix.m_posit.m_z = 2.0f;
+	////scene->GetWorld()->AddModel(new ndHumanoidModel(scene, modelMesh, matrix));
+	////origin1.m_x += 20.0f;
+	////AddCapsulesStacks(scene, origin1, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
 	
 	ndFloat32 angle = ndFloat32(90.0f * ndDegreeToRad);
 	playerMatrix = ndYawMatrix(angle) * playerMatrix;
