@@ -243,6 +243,11 @@ namespace ndRagdoll
 		return model;
 	}
 #endif
+
+	ndSharedPtr<ndModelNotify> CreateRagdoll(ndDemoEntityManager* const scene, const ndMeshLoader& loader, const ndMatrix& location)
+	{
+		return ndSharedPtr<ndModelNotify>();
+	}
 }
 
 using namespace ndRagdoll;
@@ -256,6 +261,9 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 	//ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
 	//ndMeshLoader loader;
 	//ndSharedPtr<ndDemoEntity> modelMesh (loader.LoadEntity("walker.fbx", scene));
+
+	ndMeshLoader loader;
+	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("ragdoll.fbx"));
 	
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.5f;
@@ -264,7 +272,8 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 	//ndSharedPtr<ndModel> model(BuildModel(scene, *modelMesh, matrix));
 	//scene->GetWorld()->AddModel(model);
 	//model->AddBodiesAndJointsToWorld();
-	//
+	ndSharedPtr<ndModelNotify> modelNotity(CreateRagdoll(scene, loader, matrix));
+	
 	////matrix.m_posit.m_x += 1.4f;
 	////TestPlayerCapsuleInteraction(scene, matrix);
 	////matrix.m_posit.m_x += 2.0f;

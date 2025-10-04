@@ -32,8 +32,8 @@
 //#define DEFAULT_SCENE	8		// static mesh collision
 //#define DEFAULT_SCENE	9		// static compound scene collision
 //#define DEFAULT_SCENE	10		// basic compound shapes
-#define DEFAULT_SCENE	11		// basic model
-//#define DEFAULT_SCENE	12		// basic ragdoll
+//#define DEFAULT_SCENE	11		// basic model, a npd vehicle prop
+#define DEFAULT_SCENE	12		// basic ragdoll
 //#define DEFAULT_SCENE	13		// object Placement
 //#define DEFAULT_SCENE	14		// third person player cpasule
  
