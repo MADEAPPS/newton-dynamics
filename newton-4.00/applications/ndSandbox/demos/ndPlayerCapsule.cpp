@@ -33,12 +33,12 @@ class ndPlayerCapsuleController : public ndModelNotify
 		{
 			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			scene->Print(color, "implements a basic player capsule mechanic");
-			scene->Print(color, "c key to chanage player");
+			scene->Print(color, "c key to change player");
 			scene->Print(color, "w key for moving walking forward");
 			scene->Print(color, "s key for going walking backward");
 			scene->Print(color, "shift w key for running forwad");
+			scene->Print(color, "left click on dynamics body for picking the body");
 			scene->Print(color, "left click on the scene for turning and look up and down");
-			scene->Print(color, "left click on dynamics body for pickin the body");
 		}
 	};
 
