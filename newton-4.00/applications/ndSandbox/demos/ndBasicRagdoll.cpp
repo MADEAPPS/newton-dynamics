@@ -246,6 +246,12 @@ namespace ndRagdoll
 
 	ndSharedPtr<ndModelNotify> CreateRagdoll(ndDemoEntityManager* const scene, const ndMeshLoader& loader, const ndMatrix& location)
 	{
+		ndSharedPtr<ndRenderSceneNode> entityDuplicate(loader.m_renderMesh->Clone());
+		entityDuplicate->SetTransform(location);
+		entityDuplicate->SetTransform(location);
+
+		scene->AddEntity(entityDuplicate);
+
 		return ndSharedPtr<ndModelNotify>();
 	}
 }
@@ -266,7 +272,7 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("ragdoll.fbx"));
 	
 	ndMatrix matrix(ndGetIdentityMatrix());
-	matrix.m_posit.m_y = 0.5f;
+	matrix.m_posit.m_y = 1.0f;
 	ndMatrix playerMatrix(matrix);
 	
 	//ndSharedPtr<ndModel> model(BuildModel(scene, *modelMesh, matrix));
