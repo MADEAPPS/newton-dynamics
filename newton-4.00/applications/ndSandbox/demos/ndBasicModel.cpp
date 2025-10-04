@@ -26,6 +26,22 @@
 class ndBackGroundVehicleController : public ndModelNotify
 {
 	public:
+
+	class ndHelpLegend : public ndDemoEntityManager::ndDemoHelper
+	{
+		virtual void PresentHelp(ndDemoEntityManager* const scene) override
+		{
+			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
+			scene->Print(color, "implements a basic simple background prp");
+			scene->Print(color, "c key to change player");
+			scene->Print(color, "a key for turning left");
+			scene->Print(color, "d key for turning right");
+			scene->Print(color, "w key for moving walking forward");
+			scene->Print(color, "s key for going walking backward");
+			scene->Print(color, "left click on dynamics body for picking the body");
+		}
+	};
+
 	class ndWheelSpin
 	{
 		public:
@@ -300,6 +316,10 @@ void ndBasicModel(ndDemoEntityManager* const scene)
 {
 	//ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
 	ndSharedPtr<ndBody> mapBody(BuildHeightFieldTerrain(scene, "grass.png", ndGetIdentityMatrix()));
+
+	// add a help menu
+	ndSharedPtr<ndDemoEntityManager::ndDemoHelper> demoHelper(new ndBackGroundVehicleController::ndHelpLegend());
+	scene->SetDemoHelp(demoHelper);
 
 	ndMeshLoader vmwLoaderRedPaint;
 	vmwLoaderRedPaint.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("vmwRed.fbx"));
