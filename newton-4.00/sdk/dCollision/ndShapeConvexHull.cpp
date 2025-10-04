@@ -869,7 +869,6 @@ ndVector ndShapeConvexHull::SupportVertexhierarchical(const ndVector& dir, ndInt
 		const ndConvexBox& box = *stackPool.Pop();
 		if (dist > maxProj.GetScalar())
 		{
-			//const ndConvexBox& box = *stackPool[stack];
 			if (box.m_leftBox > 0)
 			{
 				ndAssert(box.m_rightBox > 0);
