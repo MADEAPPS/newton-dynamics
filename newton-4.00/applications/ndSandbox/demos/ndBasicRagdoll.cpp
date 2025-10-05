@@ -177,8 +177,7 @@ namespace ndRagdoll
 			return nullptr;
 		}
 
-
-		void Build(ndDemoEntityManager* const scene, const ndMeshLoader& loader, const ndMatrix& location)
+		void RagdollBuildScript(ndDemoEntityManager* const scene, const ndMeshLoader& loader, const ndMatrix& location)
 		{
 			ndSharedPtr<ndRenderSceneNode> entityDuplicate(loader.m_renderMesh->Clone());
 			entityDuplicate->SetTransform(location);
@@ -187,6 +186,10 @@ namespace ndRagdoll
 
 			ndSharedPtr<ndBody> rootBody(CreateBodyPart(scene, entityDuplicate, loader, ragdollDefinition[0]));
 
+			ndModelArticulation* const model = (ndModelArticulation*)GetModel();
+			ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(rootBody);
+			ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)modelRootNode->m_body->GetAsBodyKinematic()->GetNotifyCallback();
+
 			struct StackData
 			{
 				ndModelArticulation::ndNode* parentBone;
@@ -194,10 +197,6 @@ namespace ndRagdoll
 			};
 			ndList<StackData> stack;
 
-			ndModelArticulation* const model = (ndModelArticulation*)GetModel();
-			ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(rootBody);
-
-			ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)modelRootNode->m_body->GetAsBodyKinematic()->GetNotifyCallback();
 			for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = notify->GetUserData()->GetChildren().GetFirst(); node; node = node->GetNext())
 			{
 				ndList<StackData>::ndNode* const stackNode = stack.Append();
@@ -251,7 +250,7 @@ namespace ndRagdoll
 		model->SetNotifyCallback(controller);
 		
 		ndRagDollController* const ragdollController = (ndRagDollController*)*controller;
-		ragdollController->Build(scene, loader, location);
+		ragdollController->RagdollBuildScript(scene, loader, location);
 		
 		ndWorld* const world = scene->GetWorld();
 		world->AddModel(model);
