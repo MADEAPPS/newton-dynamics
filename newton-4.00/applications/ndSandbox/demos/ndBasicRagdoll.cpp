@@ -115,7 +115,9 @@ namespace ndRagdoll
 		ndSharedPtr<ndBody> CreateBodyPart(
 			ndDemoEntityManager* const scene,
 			const ndSharedPtr<ndRenderSceneNode>& rootMesh,
-			const ndMeshLoader& loader, const ndDefinition& definition)
+			const ndMeshLoader& loader, 
+			const ndDefinition& definition,
+			ndBodyDynamic* const parentBone)
 		{
 			ndMesh* const mesh(loader.m_mesh->FindByName(definition.m_boneName));
 			ndSharedPtr<ndShapeInstance> shape(mesh->CreateCollisionFromChildren());
@@ -184,7 +186,7 @@ namespace ndRagdoll
 			entityDuplicate->SetTransform(location);
 			scene->AddEntity(entityDuplicate);
 
-			ndSharedPtr<ndBody> rootBody(CreateBodyPart(scene, entityDuplicate, loader, ragdollDefinition[0]));
+			ndSharedPtr<ndBody> rootBody(CreateBodyPart(scene, entityDuplicate, loader, ragdollDefinition[0], nullptr));
 
 			ndModelArticulation* const model = (ndModelArticulation*)GetModel();
 			ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(rootBody);
@@ -195,23 +197,21 @@ namespace ndRagdoll
 				ndModelArticulation::ndNode* parentBone;
 				ndSharedPtr<ndRenderSceneNode> childEntity;
 			};
-			ndList<StackData> stack;
+			ndFixSizeArray<StackData, 256> stack;
 
 			for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = notify->GetUserData()->GetChildren().GetFirst(); node; node = node->GetNext())
 			{
-				ndList<StackData>::ndNode* const stackNode = stack.Append();
-				stackNode->GetInfo().parentBone = modelRootNode;
-				stackNode->GetInfo().childEntity = node->GetInfo();
+				StackData data;
+				data.parentBone = modelRootNode;
+				data.childEntity = node->GetInfo();
+				stack.PushBack(data);
 			}
 
 			while (stack.GetCount())
 			{
-				ndList<StackData>::ndNode* const stackNode = stack.GetLast();
-				ndSharedPtr<ndRenderSceneNode> childEntity = stackNode->GetInfo().childEntity;
-				ndModelArticulation::ndNode* parentBone = stackNode->GetInfo().parentBone;
-				stack.Remove(stackNode);
+				StackData data(stack.Pop());
 
-				const char* const name = childEntity->m_name.GetStr();
+				const char* const name = data.childEntity->m_name.GetStr();
 				//ndTrace(("name: %s\n", name));
 				for (ndInt32 i = 0; ragdollDefinition[i].m_boneName[0]; ++i)
 				{
@@ -219,22 +219,24 @@ namespace ndRagdoll
 
 					if (!strcmp(definition.m_boneName, name))
 					{
-						ndSharedPtr<ndBody> childBody(CreateBodyPart(scene, entityDuplicate, loader, definition));
+						ndBodyDynamic* const parentBody = data.parentBone->m_body->GetAsBodyDynamic();
+						ndSharedPtr<ndBody> childBody(CreateBodyPart(scene, entityDuplicate, loader, definition, nullptr));
 
 						//connect this body part to its parentBody with a rag doll joint
-						ndSharedPtr<ndJointBilateralConstraint> joint(ConnectBodyParts(childBody->GetAsBodyDynamic(), parentBone->m_body->GetAsBodyDynamic(), definition));
+						ndSharedPtr<ndJointBilateralConstraint> joint(ConnectBodyParts(childBody->GetAsBodyDynamic(), parentBody, definition));
 
 						// add this child body to the rad doll model.
-						parentBone = model->AddLimb(parentBone, childBody, joint);
+						data.parentBone = model->AddLimb(data.parentBone, childBody, joint);
 						break;
 					}
 				}
-
-				for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = childEntity->GetChildren().GetFirst(); node; node = node->GetNext())
+			
+				for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = data.childEntity->GetChildren().GetFirst(); node; node = node->GetNext())
 				{
-					ndList<StackData>::ndNode* const stackChildNode = stack.Append();
-					stackChildNode->GetInfo().parentBone = parentBone;
-					stackChildNode->GetInfo().childEntity = node->GetInfo();
+					StackData childData;
+					childData.parentBone = data.parentBone;
+					childData.childEntity = node->GetInfo();
+					stack.PushBack(childData);
 				}
 			}
 		}
