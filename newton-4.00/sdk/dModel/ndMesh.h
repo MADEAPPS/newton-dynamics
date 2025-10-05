@@ -94,8 +94,11 @@ class ndMesh : public ndClassAlloc
 
 	protected:
 
+	ndSharedPtr<ndShapeInstance> CreateCollisionBox();
 	ndSharedPtr<ndShapeInstance> CreateCollisionTire();
+	ndSharedPtr<ndShapeInstance> CreateCollisionSphere();
 	ndSharedPtr<ndShapeInstance> CreateCollisionConvex();
+	ndSharedPtr<ndShapeInstance> CreateCollisionCapsule();
 	ndSharedPtr<ndShapeInstance> CreateCollisionTree(bool optimize = true);
 	ndSharedPtr<ndShapeInstance> CreateCollisionCompound(bool lowDetail = false);
 

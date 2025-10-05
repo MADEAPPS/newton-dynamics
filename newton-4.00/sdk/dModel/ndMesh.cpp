@@ -316,10 +316,145 @@ void ndMesh::ApplyTransform(const ndMatrix& transform)
 	}
 }
 
+ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionBox()
+{
+	ndSharedPtr<ndMeshEffect> meshEffect = GetMesh();
+	ndAssert(*meshEffect);
+
+	const ndInt32 pointsCount = meshEffect->GetVertexCount();
+	const ndInt32 pointsStride = ndInt32(meshEffect->GetVertexStrideInByte() / sizeof(ndFloat64));
+	const ndFloat64* const pointsBuffer = meshEffect->GetVertexPool();
+
+	ndVector minP(ndFloat32(1.0e10f));
+	ndVector maxP(ndFloat32(-1.0e10f));
+	for (ndInt32 i = 0; i < pointsCount; ++i)
+	{
+		ndFloat32 x = ndFloat32(pointsBuffer[i * pointsStride + 0]);
+		ndFloat32 y = ndFloat32(pointsBuffer[i * pointsStride + 1]);
+		ndFloat32 z = ndFloat32(pointsBuffer[i * pointsStride + 2]);
+		ndVector p(x, y, z, ndFloat32(0.0f));
+		minP = minP.GetMin(p);
+		maxP = maxP.GetMax(p);
+	}
+	 
+	ndVector size(maxP - minP);
+	ndSharedPtr<ndShapeInstance> box(new ndShapeInstance(new ndShapeBox(size.m_x, size.m_y, size.m_z)));
+	
+	const ndVector origin((maxP + minP).Scale(ndFloat32(0.5f)));
+	ndMatrix alighMatrix(ndGetIdentityMatrix());
+	alighMatrix.m_posit = ndVector::m_half * (maxP + minP);
+	alighMatrix.m_posit.m_w = ndFloat32(1.0f);
+	
+	const ndMatrix matrix(alighMatrix * m_meshMatrix);
+	box->SetLocalMatrix(matrix);
+	return box;
+}
+
+ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionSphere()
+{
+	ndSharedPtr<ndMeshEffect> meshEffect = GetMesh();
+	ndAssert(*meshEffect);
+
+	const ndInt32 pointsCount = meshEffect->GetVertexCount();
+	const ndInt32 pointsStride = ndInt32(meshEffect->GetVertexStrideInByte() / sizeof(ndFloat64));
+	const ndFloat64* const pointsBuffer = meshEffect->GetVertexPool();
+
+	ndVector minP(ndFloat32(1.0e10f));
+	ndVector maxP(ndFloat32(-1.0e10f));
+	for (ndInt32 i = 0; i < pointsCount; ++i)
+	{
+		ndFloat32 x = ndFloat32(pointsBuffer[i * pointsStride + 0]);
+		ndFloat32 y = ndFloat32(pointsBuffer[i * pointsStride + 1]);
+		ndFloat32 z = ndFloat32(pointsBuffer[i * pointsStride + 2]);
+		ndVector p(x, y, z, ndFloat32(0.0f));
+		minP = minP.GetMin(p);
+		maxP = maxP.GetMax(p);
+	}
+	 
+	ndVector size(ndVector::m_half * (maxP - minP));
+	ndMatrix alighMatrix(ndGetIdentityMatrix());
+	alighMatrix.m_posit = ndVector::m_half * (maxP + minP);
+	alighMatrix.m_posit.m_w = ndFloat32(1.0f);
+	
+	ndSharedPtr<ndShapeInstance> sphere (new ndShapeInstance(new ndShapeSphere(size.m_x)));
+	const ndMatrix matrix(alighMatrix * m_meshMatrix);
+	sphere->SetLocalMatrix(matrix);
+	return sphere;
+}
+
+ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionCapsule()
+{
+	ndSharedPtr<ndMeshEffect> meshEffect = GetMesh();
+	ndAssert(*meshEffect);
+
+	const ndInt32 pointsCount = meshEffect->GetVertexCount();
+	const ndInt32 pointsStride = ndInt32(meshEffect->GetVertexStrideInByte() / sizeof(ndFloat64));
+	const ndFloat64* const pointsBuffer = meshEffect->GetVertexPool();
+
+	ndVector minP(ndFloat32(1.0e10f));
+	ndVector maxP(ndFloat32(-1.0e10f));
+	for (ndInt32 i = 0; i < pointsCount; ++i)
+	{
+		ndFloat32 x = ndFloat32(pointsBuffer[i * pointsStride + 0]);
+		ndFloat32 y = ndFloat32(pointsBuffer[i * pointsStride + 1]);
+		ndFloat32 z = ndFloat32(pointsBuffer[i * pointsStride + 2]);
+		ndVector p(x, y, z, ndFloat32(0.0f));
+		minP = minP.GetMin(p);
+		maxP = maxP.GetMax(p);
+	}
+
+	ndVector size(ndVector::m_half * (maxP - minP));
+	ndVector origin(ndVector::m_half * (maxP + minP));
+	ndFloat32 high = 2.0f * ndMax(size.m_y - size.m_x, ndFloat32(0.05f));
+	ndMatrix alighMatrix(ndRollMatrix(90.0f * ndDegreeToRad));
+	alighMatrix.m_posit = origin;
+	alighMatrix.m_posit.m_w = ndFloat32(1.0f);
+
+	ndSharedPtr<ndShapeInstance> capsule(new ndShapeInstance(new ndShapeCapsule(size.m_x, size.m_x, high)));
+
+	const ndMatrix matrix(alighMatrix * m_meshMatrix);
+	capsule->SetLocalMatrix(matrix);
+	return capsule;
+}
+
+ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionTire()
+{
+	ndSharedPtr<ndMeshEffect> meshEffect = GetMesh();
+	ndAssert(*meshEffect);
+
+	const ndInt32 pointsCount = meshEffect->GetVertexCount();
+	const ndInt32 pointsStride = ndInt32(meshEffect->GetVertexStrideInByte() / sizeof(ndFloat64));
+	const ndFloat64* const pointsBuffer = meshEffect->GetVertexPool();
+
+	ndVector minBox(ndFloat32(1.0e10f));
+	ndVector maxBox(ndFloat32(-1.0e10f));
+	const ndMatrix localMatrix(m_meshMatrix);
+	for (ndInt32 i = 0; i < pointsCount; ++i)
+	{
+		ndFloat32 x = ndFloat32(pointsBuffer[i * pointsStride + 0]);
+		ndFloat32 y = ndFloat32(pointsBuffer[i * pointsStride + 1]);
+		ndFloat32 z = ndFloat32(pointsBuffer[i * pointsStride + 2]);
+		const ndVector p(localMatrix.TransformVector(ndVector(x, y, z, ndFloat32(1.0f))));
+		minBox = minBox.GetMin(p);
+		maxBox = maxBox.GetMax(p);
+	}
+	ndFloat32 width = ndMax(maxBox.m_x, ndAbs(minBox.m_x));
+	ndFloat32 radius = ndMax(ndMax(maxBox.m_y, ndAbs(minBox.m_y)), ndMax(maxBox.m_z, ndAbs(minBox.m_z)));
+
+	ndSharedPtr<ndShapeInstance> tireShape(new ndShapeInstance(new ndShapeChamferCylinder(ndFloat32(0.75f), ndFloat32(0.5f))));
+
+	ndVector scale(ndFloat32(4.0f) * width, radius, radius, 0.0f);
+	tireShape->SetScale(scale);
+	tireShape->SetLocalMatrix(localMatrix.OrthoInverse() * m_meshMatrix);
+	return tireShape;
+}
+
 ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionConvex()
 {
 	ndAssert(*m_mesh);
 	ndSharedPtr<ndShapeInstance>shape(m_mesh->CreateConvexCollision(1.0e-3f));
+	const ndMatrix matrix(shape->GetLocalMatrix() * m_meshMatrix);
+	shape->SetLocalMatrix(matrix);
 	return shape;
 }
 
@@ -388,10 +523,12 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionCompound(bool lowDetail)
 		compoundShape->AddCollision(&hullShape);
 	}
 	compoundShape->EndAddRemove();
-	//compoundShapeInstance->SetLocalMatrix(m_meshMatrix);
 
 	interfaceVHACD->Clean();
 	interfaceVHACD->Release();
+
+	const ndMatrix matrix(m_meshMatrix);
+	compoundShapeInstance->SetLocalMatrix(matrix);
 
 	return compoundShapeInstance;
 }
@@ -456,38 +593,6 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionTree(bool optimize)
 	return shape;
 }
 
-ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionTire()
-{
-	ndSharedPtr<ndMeshEffect> meshEffect = GetMesh();
-	ndAssert(*meshEffect);
-
-	const ndInt32 pointsCount = meshEffect->GetVertexCount();
-	const ndInt32 pointsStride = ndInt32(meshEffect->GetVertexStrideInByte() / sizeof(ndFloat64));
-	const ndFloat64* const pointsBuffer = meshEffect->GetVertexPool();
-
-	ndVector minBox(ndFloat32(1.0e10f));
-	ndVector maxBox(ndFloat32(-1.0e10f));
-	const ndMatrix localMatrix(m_meshMatrix);
-	for (ndInt32 i = 0; i < pointsCount; ++i)
-	{
-		ndFloat32 x = ndFloat32(pointsBuffer[i * pointsStride + 0]);
-		ndFloat32 y = ndFloat32(pointsBuffer[i * pointsStride + 1]);
-		ndFloat32 z = ndFloat32(pointsBuffer[i * pointsStride + 2]);
-		const ndVector p(localMatrix.TransformVector(ndVector(x, y, z, ndFloat32(1.0f))));
-		minBox = minBox.GetMin(p);
-		maxBox = maxBox.GetMax(p);
-	}
-	ndFloat32 width = ndMax(maxBox.m_x, ndAbs(minBox.m_x));
-	ndFloat32 radius = ndMax(ndMax(maxBox.m_y, ndAbs(minBox.m_y)), ndMax(maxBox.m_z, ndAbs(minBox.m_z)));
-
-	ndSharedPtr<ndShapeInstance> tireShape(new ndShapeInstance(new ndShapeChamferCylinder(ndFloat32(0.75f), ndFloat32(0.5f))));
-
-	ndVector scale(ndFloat32(4.0f) * width, radius, radius, 0.0f);
-	tireShape->SetScale(scale);
-	tireShape->SetLocalMatrix(localMatrix.OrthoInverse());
-	return tireShape;
-}
-
 ndSharedPtr<ndShapeInstance> ndMesh::CreateCollision()
 {
 	ndString tmpName(GetName());
@@ -495,7 +600,27 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollision()
 	const char* const name = tmpName.GetStr();
 
 	ndSharedPtr<ndShapeInstance> shape(new ndShapeInstance(new ndShapeNull()));
-	if (strstr(name, "collisiontree"))
+	if (strstr(name, "box"))
+	{
+		shape = CreateCollisionBox();
+	}
+	else if (strstr(name, "sphere"))
+	{
+		shape = CreateCollisionSphere();
+	}
+	else if (strstr(name, "capsule"))
+	{
+		shape = CreateCollisionCapsule();
+	}
+	else if (strstr(name, "tire"))
+	{
+		shape = CreateCollisionTire();
+	}
+	else if (strstr(name, "convexhull"))
+	{
+		shape = CreateCollisionConvex();
+	}
+	else if (strstr(name, "collisiontree"))
 	{
 		shape = CreateCollisionTree();
 	}
@@ -503,26 +628,111 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollision()
 	{
 		shape = CreateCollisionCompound();
 	}
-	else if(strstr(name, "convexhull"))
-	{
-		shape = ndSharedPtr<ndShapeInstance>(m_mesh->CreateConvexCollision(1.0e-3f));
-	}
-	else if (strstr(name, "tire"))
-	{
-		shape = CreateCollisionTire();
-	}
 	else
 	{
 		ndAssert(0);
 	}
 
-	shape->SetLocalMatrix(shape->GetLocalMatrix() * m_meshMatrix);
+	//shape->SetLocalMatrix(shape->GetLocalMatrix() * m_meshMatrix);
 	return shape;
 }
 
 ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionFromChildren()
 {
-	//ndSharedPtr<ndShapeInstance> shape(new ndShapeInstance(new ndShapeNull()));
-	ndSharedPtr<ndShapeInstance> shape(new ndShapeInstance(new ndShapeSphere(0.1f)));
-	return shape;
+	ndArray<ndVector> points;
+	ndFixSizeArray<ndSharedPtr<ndShapeInstance>, 256> shapeArray;
+
+	for (ndList<ndSharedPtr<ndMesh>>::ndNode* node = GetChildren().GetFirst(); node; node = node->GetNext())
+	{
+		ndString tmpName(node->GetInfo()->GetName());
+		tmpName.ToLower();
+		const char* const name = tmpName.GetStr();
+	
+		if (strstr(name, "sphere"))
+		{
+			ndAssert(0);
+
+			ndSharedPtr<ndShapeInstance> subShape(node->GetInfo()->CreateCollision());
+			shapeArray.PushBack(subShape);
+		}
+		else if (strstr(name, "box"))
+		{
+			ndSharedPtr<ndShapeInstance> subShape(node->GetInfo()->CreateCollision());
+			shapeArray.PushBack(subShape);
+		}
+		else if (strstr(name, "capsule"))
+		{
+			ndSharedPtr<ndShapeInstance> subShape(node->GetInfo()->CreateCollision());
+			shapeArray.PushBack(subShape);
+		}
+		else if (strstr(name, "convexhull"))
+		{
+			ndSharedPtr<ndShapeInstance> subShape(node->GetInfo()->CreateCollision());
+			shapeArray.PushBack(subShape);
+		}
+		else if (strstr(name, "vhacd"))
+		{
+			ndAssert(0);
+			//ndArray<ndInt32> indices;
+			//ndDemoMesh* const mesh = (ndDemoMesh*)*node->GetInfo()->GetMesh();
+			//ndAssert(mesh);
+			//mesh->GetVertexArray(points);
+			//mesh->GetIndexArray(indices);
+			//
+			//ndArray<ndTriplex> meshPoints;
+			//for (ndInt32 i = 0; i < points.GetCount(); ++i)
+			//{
+			//	ndTriplex p;
+			//	p.m_x = points[i].m_x;
+			//	p.m_y = points[i].m_y;
+			//	p.m_z = points[i].m_z;
+			//	meshPoints.PushBack(p);
+			//}
+			//nd_::VHACD::IVHACD* const interfaceVHACD = nd_::VHACD::CreateVHACD();
+			//
+			//nd_::VHACD::IVHACD::Parameters paramsVHACD;
+			////paramsVHACD.m_concavityToVolumeWeigh = 1.0;
+			//paramsVHACD.m_concavityToVolumeWeigh = 0.5f;
+			//interfaceVHACD->Compute(&meshPoints[0].m_x, uint32_t(points.GetCount()),
+			//	(uint32_t*)&indices[0], uint32_t(indices.GetCount()) / 3, paramsVHACD);
+			//
+			//ndInt32 hullCount = ndInt32(interfaceVHACD->GetNConvexHulls());
+			//ndArray<ndVector> convexMeshPoints;
+			//for (ndInt32 i = 0; i < hullCount; ++i)
+			//{
+			//	nd_::VHACD::IVHACD::ConvexHull ch;
+			//	interfaceVHACD->GetConvexHull(uint32_t(i), ch);
+			//	convexMeshPoints.SetCount(ndInt32(ch.m_nPoints));
+			//	for (ndInt32 j = 0; j < ndInt32(ch.m_nPoints); ++j)
+			//	{
+			//		ndVector p(ndFloat32(ch.m_points[j * 3 + 0]), ndFloat32(ch.m_points[j * 3 + 1]), ndFloat32(ch.m_points[j * 3 + 2]), ndFloat32(0.0f));
+			//		convexMeshPoints[j] = p;
+			//	}
+			//	shapeArray.PushBack(new ndShapeInstance(new ndShapeConvexHull(ndInt32(convexMeshPoints.GetCount()), sizeof(ndVector), 0.01f, &convexMeshPoints[0].m_x)));
+			//	const ndMatrix matrix(node->GetInfo()->GetMeshMatrix() * node->GetInfo()->GetCurrentMatrix());
+			//	shapeArray[shapeArray.GetCount() - 1]->SetLocalMatrix(matrix);
+			//}
+			//
+			//interfaceVHACD->Clean();
+			//interfaceVHACD->Release();
+		}
+	}
+	
+	ndAssert(shapeArray.GetCount());
+	if (shapeArray.GetCount() > 1)
+	{
+		ndAssert(0);
+		//ndShapeInstance* const compoundInstance = new ndShapeInstance(new ndShapeCompound());
+		//ndShapeCompound* const compound = compoundInstance->GetShape()->GetAsShapeCompound();
+		//
+		//compound->BeginAddRemove();
+		//for (ndInt32 i = 1; i < shapeArray.GetCount(); ++i)
+		//{
+		//	compound->AddCollision(shapeArray[i]);
+		//	delete shapeArray[i];
+		//}
+		//compound->EndAddRemove();
+		//shapeArray[0] = compoundInstance;
+	}
+	return shapeArray[0];
 }
