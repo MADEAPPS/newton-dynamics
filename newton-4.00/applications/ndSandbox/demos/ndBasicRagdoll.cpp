@@ -306,17 +306,17 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	//ndSharedPtr<ndBody> bodyFloor(BuildPlayground(scene));
-	ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "marblecheckboard.png", 0.1f, true));
-	//ndSharedPtr<ndBody> bodyFloor(BuildCompoundScene(scene, ndGetIdentityMatrix()));
+	//ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "marblecheckboard.png", 0.1f, true));
+	ndSharedPtr<ndBody> bodyFloor(BuildCompoundScene(scene, ndGetIdentityMatrix()));
 	
 	ndMeshLoader loader;
 	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("ragdoll.fbx"));
 	
-	ndMatrix matrix(ndGetIdentityMatrix());
-	matrix.m_posit.m_y = 1.0f;
-	ndMatrix playerMatrix(matrix);
+	ndMatrix playerMatrix(ndGetIdentityMatrix());
+	playerMatrix.m_posit = FindFloor(*scene->GetWorld(), playerMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f);
+	playerMatrix.m_posit.m_y += ndFloat32 (1.0f);
 	
-	ndSharedPtr<ndModelNotify> modelNotity(CreateRagdoll(scene, loader, matrix));
+	ndSharedPtr<ndModelNotify> modelNotity(CreateRagdoll(scene, loader, playerMatrix));
 	
 	////matrix.m_posit.m_x += 1.4f;
 	////TestPlayerCapsuleInteraction(scene, matrix);
@@ -334,8 +334,6 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 	
 	ndFloat32 angle = ndFloat32(90.0f * ndDegreeToRad);
 	playerMatrix = ndYawMatrix(angle) * playerMatrix;
-	ndVector origin(playerMatrix.m_posit + playerMatrix.m_front.Scale (-5.0f));
-	origin.m_y += 1.0f;
-	origin.m_z += -0.0f;
+	ndVector origin(playerMatrix.m_posit + playerMatrix.m_front.Scale (-15.0f));
 	scene->SetCameraMatrix(playerMatrix, origin);
 }
