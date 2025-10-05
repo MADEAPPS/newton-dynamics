@@ -1576,7 +1576,8 @@ void ndDynamicsUpdateAvx2::InitSkeletons()
 			}
 		}
 		const ndInt32 count = ndInt32(activeSkeletons.GetCount());
-		scene->ParallelExecute(InitSkeletons, count, scene->OptimalGroupBatch(count));
+		//scene->ParallelExecute(InitSkeletons, count, scene->OptimalGroupBatch(count));
+		scene->ParallelExecute(InitSkeletons, count, 2);
 	}
 }
 
