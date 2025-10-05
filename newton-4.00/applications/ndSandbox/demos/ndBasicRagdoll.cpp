@@ -315,23 +315,12 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 	ndMatrix playerMatrix(ndGetIdentityMatrix());
 	playerMatrix.m_posit = FindFloor(*scene->GetWorld(), playerMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f);
 	playerMatrix.m_posit.m_y += ndFloat32 (1.0f);
-	
 	ndSharedPtr<ndModelNotify> modelNotity(CreateRagdoll(scene, loader, playerMatrix));
+
+#if 0
+	// add few more rag dolls
 	
-	////matrix.m_posit.m_x += 1.4f;
-	////TestPlayerCapsuleInteraction(scene, matrix);
-	////matrix.m_posit.m_x += 2.0f;
-	////matrix.m_posit.m_y += 2.0f;
-	////ndBodyKinematic* const reckingBall = AddSphere(scene, matrix.m_posit, 25.0f, 0.25f);
-	////reckingBall->SetVelocity(ndVector(-5.0f, 0.0f, 0.0f, 0.0f));
-	////matrix.m_posit.m_x += 2.0f;
-	////matrix.m_posit.m_z -= 2.0f;
-	////scene->GetWorld()->AddModel(new ndHumanoidModel(scene, modelMesh, matrix));
-	////matrix.m_posit.m_z = 2.0f;
-	////scene->GetWorld()->AddModel(new ndHumanoidModel(scene, modelMesh, matrix));
-	////origin1.m_x += 20.0f;
-	////AddCapsulesStacks(scene, origin1, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
-	
+#endif
 	ndFloat32 angle = ndFloat32(90.0f * ndDegreeToRad);
 	playerMatrix = ndYawMatrix(angle) * playerMatrix;
 	ndVector origin(playerMatrix.m_posit + playerMatrix.m_front.Scale (-15.0f));
