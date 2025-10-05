@@ -138,7 +138,7 @@ static void AddSimpleConcaveMesh(ndDemoEntityManager* const scene, const ndMatri
 	for (ndInt32 i = 0; i < count; ++i)
 	{
 		ndSharedPtr<ndRenderSceneNode> cloneEntity(loader.m_renderMesh->Clone());
-		originMatrix.m_posit.m_z += 2.0f;
+		originMatrix.m_posit.m_z += ndFloat32 (2.0f);
 		ndVector floor(FindFloor(*scene->GetWorld(), originMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		originMatrix.m_posit.m_y = floor.m_y + 2.0f;
 		AddRigidBody(scene, originMatrix, *(*compoundShapeInstance), cloneEntity, 5.0f);
@@ -157,7 +157,7 @@ void ndBasicCompoundCollision(ndDemoEntityManager* const scene)
 	location.m_posit.m_y = 0.5f;
 	location.m_posit.m_z = -3.0f;
 	AddSimpleConcaveMesh(scene, location, "testConcave.fbx", 1);
-
+	
 	location.m_posit.m_z = -5.0f;
 	AddSimpleConcaveMesh(scene, location, "bowl.fbx", 1);	
 	
