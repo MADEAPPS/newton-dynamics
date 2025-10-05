@@ -164,29 +164,32 @@ inline void ndString::CopyBuffer (char* const dst, const char* const src, ndInt3
 
 inline ndInt32 ndString::Compare (const char* const str0, const char* const str1) const
 {
-	//ndAssert (str0);
-	//ndAssert (str1);
 	if (str0 && str1)
 	{
 		return strcmp(str0, str1);
 	}
-	else if (str0 || str1)
+	else if (str0)
 	{
 		return 1;
+	} 
+	else if (str1)
+	{
+		return -1;
 	}
 	return 0;
 }
 
 inline bool ndString::operator== (const ndString& src) const
 {
-	return Compare (m_string, src.m_string) == 0;
+	ndInt32 test = Compare(m_string, src.m_string);
+	return test == 0;
 }
 
 inline bool ndString::operator!= (const ndString& src) const
 {
-	return Compare (m_string, src.m_string) != 0;
+	ndInt32 test = Compare(m_string, src.m_string);
+	return test != 0;
 }
-
 
 inline bool ndString::operator< (const ndString& src) const
 {
