@@ -306,8 +306,9 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	//ndSharedPtr<ndBody> bodyFloor(BuildPlayground(scene));
-	//ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "marblecheckboard.png", 0.1f, true));
 	ndSharedPtr<ndBody> bodyFloor(BuildCompoundScene(scene, ndGetIdentityMatrix()));
+	//ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "marblecheckboard.png", 0.1f, true));
+	
 	
 	ndMeshLoader loader;
 	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("ragdoll.fbx"));

@@ -33,9 +33,11 @@
 //#define DEFAULT_SCENE	9		// static compound scene collision
 //#define DEFAULT_SCENE	10		// basic compound shapes
 //#define DEFAULT_SCENE	11		// basic model, a npd vehicle prop
-#define DEFAULT_SCENE	12		// basic ragdoll
-//#define DEFAULT_SCENE	13		// object Placement
-//#define DEFAULT_SCENE	14		// third person player cpasule
+#define DEFAULT_SCENE	12		// basics mutibody vehicle
+//#define DEFAULT_SCENE	13		// basic ragdoll
+//#define DEFAULT_SCENE	14		// object Placement
+//#define DEFAULT_SCENE	15		// third person player capsule
+
  
 //#define DEFAULT_SCENE	8		// particle fluid
 //#define DEFAULT_SCENE	10		// static user mesh collision 
@@ -65,6 +67,7 @@ void ndBasicJoints(ndDemoEntityManager* const scene);
 void ndBasicStacks(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
 void ndBasicRagdoll(ndDemoEntityManager* const scene);
+void ndBasicVehicle(ndDemoEntityManager* const scene);
 void ndBasicFriction(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
 void ndObjectPlacement(ndDemoEntityManager* const scene);
@@ -91,9 +94,11 @@ ndDemoEntityManager::ndDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic static compound scene collision", ndBasicSceneCompoundCollision},
 	{ "basic compound collision", ndBasicCompoundCollision},
 	{ "basic model", ndBasicModel},
+	{ "basic vehicle", ndBasicVehicle},
 	{ "basic ragdoll", ndBasicRagdoll},
 	{ "object placement", ndObjectPlacement},
 	{ "basic player", ndPlayerCapsule_ThirdPerson},
+	
 	
 
 #if 0

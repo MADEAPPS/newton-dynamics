@@ -10,23 +10,16 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndSkyBox.h"
-#include "ndDemoMesh.h"
-#include "ndVehicleUI.h"
 #include "ndMeshLoader.h"
-#include "ndDemoCamera.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
-#include "ndCompoundScene.h"
-#include "ndVehicleCommon.h"
 #include "ndMakeStaticMap.h"
-#include "ndContactCallback.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
-#include "ndDemoInstanceEntity.h"
-#include "ndBasicPlayerCapsule.h"
+#include "ndDemoCameraNodeFollow.h"
 #include "ndHeightFieldPrimitive.h"
 
+#if 0
 class ndVehicleDectriptorViper : public ndVehicleDectriptor
 {
 	public:
@@ -401,90 +394,88 @@ static void TestPlayerCapsuleInteraction(ndDemoEntityManager* const, const ndMat
 	//delete entity;
 }
 
-class ndPlacementMatrix : public ndMatrix
-{
-	public:
-	ndPlacementMatrix(const ndMatrix base, const ndVector& offset)
-		:ndMatrix (base)
-	{
-		m_posit += offset;
-	}
-};
+
+#endif
 
 void ndBasicVehicle (ndDemoEntityManager* const scene)
 {
-	ndMatrix sceneLocation(ndGetIdentityMatrix());
-	sceneLocation.m_posit.m_x = -200.0f;
-	sceneLocation.m_posit.m_z = -200.0f;
+	ndSharedPtr<ndBody> bodyFloor(BuildPlayground(scene));
+	//ndSharedPtr<ndBody> bodyFloor(BuildCompoundScene(scene, ndGetIdentityMatrix()));
+	//ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "marblecheckboard.png", 0.1f, true));
 
-	//BuildFloorBox(scene, sceneLocation);
-	BuildFlatPlane(scene, true);
-	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
-	//BuildStaticMesh(scene, "track.fbx", true);
-	//BuildCompoundScene(scene, ndGetIdentityMatrix());
-	//BuildStaticMesh(scene, "playerarena.fbx", true);
-	//BuildSplineTrack(scene, "playerarena.fbx", true);
-	//BuildHeightFieldTerrain(scene, sceneLocation);
+	class ndPlacementMatrix : public ndMatrix
+	{
+		public:
+		ndPlacementMatrix(const ndMatrix base, const ndVector& offset)
+			:ndMatrix(base)
+		{
+			m_posit += offset;
+		}
+	};
 
-	ndPhysicsWorld* const world = scene->GetWorld();
-	ndVector location(0.0f, 2.0f, 0.0f, 1.0f);
-	
-	ndMatrix matrix(ndGetIdentityMatrix());
-	ndVector floor(FindFloor(*world, location + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit = floor;
-	matrix.m_posit.m_y += 0.5f;
-
-	ndVehicleMaterial material;
-	material.m_restitution = 0.1f;
-	material.m_staticFriction0 = 0.8f;
-	material.m_staticFriction1 = 0.8f;
-	material.m_dynamicFriction0 = 0.8f;
-	material.m_dynamicFriction1 = 0.8f;
-
-	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
-	callback->RegisterMaterial(material, ndDemoContactCallback::m_modelPart, ndDemoContactCallback::m_default);
-	callback->RegisterMaterial(material, ndDemoContactCallback::m_modelPart, ndDemoContactCallback::m_modelPart);
-	callback->RegisterMaterial(material, ndDemoContactCallback::m_vehicleTirePart, ndDemoContactCallback::m_modelPart);
-	callback->RegisterMaterial(material, ndDemoContactCallback::m_vehicleTirePart, ndDemoContactCallback::m_vehicleTirePart);
-	callback->RegisterMaterial(material, ndDemoContactCallback::m_vehicleTirePart, ndDemoContactCallback::m_default);
-
-	// add a model for general controls
-	ndSharedPtr<ndModel> controls(new ndVehicleSelector());
-	world->AddModel(controls);
-
-	ndSharedPtr<ndUIEntity> vehicleUI(new ndVehicleUI(scene));
-	scene->Set2DDisplayRenderFunction(vehicleUI);
-	
-	ndSharedPtr<ndModel> vehicle0 (CreateBasicVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
-	ndSharedPtr<ndModel> vehicle1 (CreateBasicVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f,  -6.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
-	ndSharedPtr<ndModel> vehicle2 (CreateBasicVehicle(scene, monterTruckDesc0, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 0.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
-	ndSharedPtr<ndModel> vehicle3 (CreateBasicVehicle(scene, monterTruckDesc1, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 6.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
-
-	world->AddModel(vehicle0);
-	vehicle0->AddBodiesAndJointsToWorld();
-
-	world->AddModel(vehicle1);
-	vehicle1->AddBodiesAndJointsToWorld();
-	
-	world->AddModel(vehicle2);
-	vehicle2->AddBodiesAndJointsToWorld();
-	
-	world->AddModel(vehicle3);
-	vehicle3->AddBodiesAndJointsToWorld();
-
-	//test removing model from world
-	//vehicle1->RemoveBodiesAndJointsFromWorld();
-	//world->RemoveModel(*vehicle1);
-
-	ndSharedPtr<ndModel> vehicle(vehicle0);
-	ndVehicleCommonNotify* const notifyCallback = (ndVehicleCommonNotify*)*vehicle->GetNotifyCallback();
-	notifyCallback->SetAsPlayer(scene);
-	matrix.m_posit.m_x += 5.0f;
-	//TestPlayerCapsuleInteraction(scene, matrix);
-	
-	matrix.m_posit.m_x += 40.0f;
-	matrix.m_posit.m_z += 5.0f;
-	AddPlanks(scene, matrix, 60.0f, 5);
+	//ndMatrix sceneLocation(ndGetIdentityMatrix());
+	//sceneLocation.m_posit.m_x = -200.0f;
+	//sceneLocation.m_posit.m_z = -200.0f;
+	//
+	//ndPhysicsWorld* const world = scene->GetWorld();
+	//ndVector location(0.0f, 2.0f, 0.0f, 1.0f);
+	//
+	//ndMatrix matrix(ndGetIdentityMatrix());
+	//ndVector floor(FindFloor(*world, location + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	//matrix.m_posit = floor;
+	//matrix.m_posit.m_y += 0.5f;
+	//
+	//ndVehicleMaterial material;
+	//material.m_restitution = 0.1f;
+	//material.m_staticFriction0 = 0.8f;
+	//material.m_staticFriction1 = 0.8f;
+	//material.m_dynamicFriction0 = 0.8f;
+	//material.m_dynamicFriction1 = 0.8f;
+	//
+	//ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
+	//callback->RegisterMaterial(material, ndDemoContactCallback::m_modelPart, ndDemoContactCallback::m_default);
+	//callback->RegisterMaterial(material, ndDemoContactCallback::m_modelPart, ndDemoContactCallback::m_modelPart);
+	//callback->RegisterMaterial(material, ndDemoContactCallback::m_vehicleTirePart, ndDemoContactCallback::m_modelPart);
+	//callback->RegisterMaterial(material, ndDemoContactCallback::m_vehicleTirePart, ndDemoContactCallback::m_vehicleTirePart);
+	//callback->RegisterMaterial(material, ndDemoContactCallback::m_vehicleTirePart, ndDemoContactCallback::m_default);
+	//
+	//// add a model for general controls
+	//ndSharedPtr<ndModel> controls(new ndVehicleSelector());
+	//world->AddModel(controls);
+	//
+	//ndSharedPtr<ndUIEntity> vehicleUI(new ndVehicleUI(scene));
+	//scene->Set2DDisplayRenderFunction(vehicleUI);
+	//
+	//ndSharedPtr<ndModel> vehicle0 (CreateBasicVehicle(scene, viperDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, -12.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
+	//ndSharedPtr<ndModel> vehicle1 (CreateBasicVehicle(scene, jeepDesc, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f,  -6.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
+	//ndSharedPtr<ndModel> vehicle2 (CreateBasicVehicle(scene, monterTruckDesc0, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 0.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
+	//ndSharedPtr<ndModel> vehicle3 (CreateBasicVehicle(scene, monterTruckDesc1, ndPlacementMatrix(matrix, ndVector(0.0f, 0.0f, 6.0f, 0.0f)), (ndVehicleUI*)*vehicleUI));
+	//
+	//world->AddModel(vehicle0);
+	//vehicle0->AddBodiesAndJointsToWorld();
+	//
+	//world->AddModel(vehicle1);
+	//vehicle1->AddBodiesAndJointsToWorld();
+	//
+	//world->AddModel(vehicle2);
+	//vehicle2->AddBodiesAndJointsToWorld();
+	//
+	//world->AddModel(vehicle3);
+	//vehicle3->AddBodiesAndJointsToWorld();
+	//
+	////test removing model from world
+	////vehicle1->RemoveBodiesAndJointsFromWorld();
+	////world->RemoveModel(*vehicle1);
+	//
+	//ndSharedPtr<ndModel> vehicle(vehicle0);
+	//ndVehicleCommonNotify* const notifyCallback = (ndVehicleCommonNotify*)*vehicle->GetNotifyCallback();
+	//notifyCallback->SetAsPlayer(scene);
+	//matrix.m_posit.m_x += 5.0f;
+	////TestPlayerCapsuleInteraction(scene, matrix);
+	//
+	//matrix.m_posit.m_x += 40.0f;
+	//matrix.m_posit.m_z += 5.0f;
+	//AddPlanks(scene, matrix, 60.0f, 5);
 
 	ndQuaternion rot;
 	ndVector origin(-10.0f, 2.0f, -10.0f, 1.0f);
