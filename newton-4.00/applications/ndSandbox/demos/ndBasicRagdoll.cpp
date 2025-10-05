@@ -80,26 +80,27 @@ namespace ndRagdoll
 	static ndDefinition ragdollDefinition[] =
 	{
 		{ "root", ndDefinition::m_root, 1.0f, {}, {} },
-		//{ "lowerback", ndDefinition::m_spherical, 1.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
-		//{ "upperback", ndDefinition::m_spherical, 1.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-		//{ "lowerneck", ndDefinition::m_spherical, 1.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-		//{ "upperneck", ndDefinition::m_spherical, 1.0f,{ -60.0f, 60.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
-		//
-		//{ "lclavicle", ndDefinition::m_spherical, 1.0f, { -60.0f, 60.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
-		//{ "lhumerus", ndDefinition::m_hinge, 1.0f, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		//{ "lradius", ndDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
-		//
-		//{ "rclavicle", ndDefinition::m_spherical, 1.0f, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
-		//{ "rhumerus", ndDefinition::m_hinge, 1.0f, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		//{ "rradius", ndDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
-		//
-		//{ "rhipjoint", ndDefinition::m_spherical, 1.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
-		//{ "rfemur", ndDefinition::m_hinge, 1.0f, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		//{ "rtibia", ndDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+
+		{ "lowerback", ndDefinition::m_spherical, 1.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
+		{ "upperback", ndDefinition::m_spherical, 1.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+		{ "lowerneck", ndDefinition::m_spherical, 1.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+		{ "upperneck", ndDefinition::m_spherical, 1.0f,{ -60.0f, 60.0f, 30.0f },{ 0.0f, 0.0f, 0.0f } },
+		
+		{ "lclavicle", ndDefinition::m_spherical, 1.0f, { -60.0f, 60.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
+		{ "lhumerus", ndDefinition::m_hinge, 1.0f, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		{ "lradius", ndDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		
+		{ "rclavicle", ndDefinition::m_spherical, 1.0f, { -60.0f, 60.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
+		{ "rhumerus", ndDefinition::m_hinge, 1.0f, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		{ "rradius", ndDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		
+		{ "rhipjoint", ndDefinition::m_spherical, 1.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, -60.0f, 0.0f } },
+		{ "rfemur", ndDefinition::m_hinge, 1.0f, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		{ "rtibia", ndDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 		
 		{ "lhipjoint", ndDefinition::m_spherical, 1.0f,{ -45.0f, 45.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
-		//{ "lfemur", ndDefinition::m_hinge, 1.0f, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
-		//{ "ltibia", ndDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
+		{ "lfemur", ndDefinition::m_hinge, 1.0f, { 0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
+		{ "ltibia", ndDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
 		{ "", ndDefinition::m_root,{},{} },
 	};
@@ -179,6 +180,43 @@ namespace ndRagdoll
 			return nullptr;
 		}
 
+		void CalculateMassDistribution(ndModelArticulation* const ragdoll, ndFloat32 totalMass)
+		{
+			ndFixSizeArray<ndBodyDynamic*, 256> bodyArray;
+			ndFixSizeArray<ndModelArticulation::ndNode*, 256> stack;
+			if (ragdoll->GetRoot())
+			{
+				stack.PushBack(ragdoll->GetRoot());
+				while (stack.GetCount())
+				{
+					ndInt32 index = stack.GetCount() - 1;
+					ndModelArticulation::ndNode* const node = stack[index];
+					stack.SetCount(index);
+
+					bodyArray.PushBack(node->m_body->GetAsBodyDynamic());
+					for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
+					{
+						stack.PushBack(child);
+					}
+				}
+			}
+
+			ndFloat32 volume = 0.0f;
+			for (ndInt32 i = 0; i < bodyArray.GetCount(); ++i)
+			{
+				volume += bodyArray[i]->GetCollisionShape().GetVolume();
+			}
+			ndFloat32 density = totalMass / volume;
+
+			for (ndInt32 i = 0; i < bodyArray.GetCount(); ++i)
+			{
+				ndBodyDynamic* const body = bodyArray[i];
+				ndFloat32 mass = density * body->GetCollisionShape().GetVolume();
+				ndVector inertia(body->GetMassMatrix().Scale(mass));
+				body->SetMassMatrix(inertia);
+			}
+		}
+
 		void RagdollBuildScript(ndDemoEntityManager* const scene, const ndMeshLoader& loader, const ndMatrix& location)
 		{
 			ndSharedPtr<ndRenderSceneNode> entityDuplicate(loader.m_renderMesh->Clone());
@@ -188,8 +226,8 @@ namespace ndRagdoll
 
 			ndSharedPtr<ndBody> rootBody(CreateBodyPart(scene, entityDuplicate, loader, ragdollDefinition[0], nullptr));
 
-			ndModelArticulation* const model = (ndModelArticulation*)GetModel();
-			ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(rootBody);
+			ndModelArticulation* const ragdoll = (ndModelArticulation*)GetModel();
+			ndModelArticulation::ndNode* const modelRootNode = ragdoll->AddRootBody(rootBody);
 			ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)modelRootNode->m_body->GetAsBodyKinematic()->GetNotifyCallback();
 
 			struct StackData
@@ -220,14 +258,13 @@ namespace ndRagdoll
 					if (!strcmp(definition.m_boneName, name))
 					{
 						ndBodyDynamic* const parentBody = data.parentBone->m_body->GetAsBodyDynamic();
-						//ndSharedPtr<ndBody> childBody(CreateBodyPart(scene, entityDuplicate, loader, definition, nullptr));
 						ndSharedPtr<ndBody> childBody(CreateBodyPart(scene, entityDuplicate, loader, definition, parentBody));
 
 						//connect this body part to its parentBody with a rag doll joint
 						ndSharedPtr<ndJointBilateralConstraint> joint(ConnectBodyParts(childBody->GetAsBodyDynamic(), parentBody, definition));
 
 						// add this child body to the rad doll model.
-						data.parentBone = model->AddLimb(data.parentBone, childBody, joint);
+						data.parentBone = ragdoll->AddLimb(data.parentBone, childBody, joint);
 						break;
 					}
 				}
@@ -240,6 +277,8 @@ namespace ndRagdoll
 					stack.PushBack(childData);
 				}
 			}
+
+			CalculateMassDistribution(ragdoll, ndFloat32(100.0f));
 		}
 	};
 
