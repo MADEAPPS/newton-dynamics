@@ -312,17 +312,43 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 	ndMeshLoader loader;
 	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("ragdoll.fbx"));
 	
-	ndMatrix playerMatrix(ndGetIdentityMatrix());
-	playerMatrix.m_posit = FindFloor(*scene->GetWorld(), playerMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f);
-	playerMatrix.m_posit.m_y += ndFloat32 (1.0f);
+	class PlaceMatrix : public ndMatrix
+	{
+		public:
+		PlaceMatrix(ndDemoEntityManager* const scene, ndFloat32 x, ndFloat32 y, ndFloat32 z)
+			:ndMatrix(ndGetIdentityMatrix())
+		{
+			m_posit.m_x = x;
+			m_posit.m_y = y;
+			m_posit.m_z = z;
+			m_posit = FindFloor(*scene->GetWorld(), m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f);
+			m_posit.m_y += ndFloat32(10.0f);
+		}
+	};
+
+	ndMatrix playerMatrix(PlaceMatrix(scene, 0.0f, 0.0f, 0.0f));
 	ndSharedPtr<ndModelNotify> modelNotity(CreateRagdoll(scene, loader, playerMatrix));
 
-#if 0
-	// add few more rag dolls
-	
+	{
+#if 1
+		// add few more rag dolls
+		CreateRagdoll(scene, loader, PlaceMatrix(scene, 0.0f, 0.0f, 0.0f));
+		CreateRagdoll(scene, loader, PlaceMatrix(scene, 3.0f, 0.0f, 0.0f));
+		CreateRagdoll(scene, loader, PlaceMatrix(scene, 5.0f, 0.0f, 0.0f));
+
+		CreateRagdoll(scene, loader, PlaceMatrix(scene, 0.0f, 0.0f, 10.0f));
+		CreateRagdoll(scene, loader, PlaceMatrix(scene, 3.0f, 0.0f, 10.0f));
+		CreateRagdoll(scene, loader, PlaceMatrix(scene, 5.0f, 0.0f, 10.0f));
+
+		CreateRagdoll(scene, loader, PlaceMatrix(scene, 0.0f, 0.0f, -10.0f));
+		CreateRagdoll(scene, loader, PlaceMatrix(scene, 3.0f, 0.0f, -10.0f));
+		CreateRagdoll(scene, loader, PlaceMatrix(scene, 5.0f, 0.0f, -10.0f));
 #endif
+	}
+
 	ndFloat32 angle = ndFloat32(90.0f * ndDegreeToRad);
 	playerMatrix = ndYawMatrix(angle) * playerMatrix;
-	ndVector origin(playerMatrix.m_posit + playerMatrix.m_front.Scale (-15.0f));
-	scene->SetCameraMatrix(playerMatrix, origin);
+	playerMatrix.m_posit += playerMatrix.m_front.Scale (-15.0f);
+	playerMatrix.m_posit = FindFloor(*scene->GetWorld(), playerMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f);
+	scene->SetCameraMatrix(playerMatrix, playerMatrix.m_posit);
 }
