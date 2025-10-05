@@ -144,10 +144,13 @@ void ndPhysicsWorld::PostUpdate(ndFloat32 timestep)
 	for (ndInt32 i = ndInt32(view.GetCount()) - 2; i >= 0; --i)
 	{
 		ndBodyKinematic* const body = view[i];
-		ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)body->GetNotifyCallback();
-		if (notify)
+		if (!body->GetSleepState())
 		{
-			notify->m_entity->SetTransform(notify->m_transform.m_rotation, notify->m_transform.m_position);
+			ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)body->GetNotifyCallback();
+			if (notify)
+			{
+				notify->m_entity->SetTransform(notify->m_transform.m_rotation, notify->m_transform.m_position);
+			}
 		}
 	}
 

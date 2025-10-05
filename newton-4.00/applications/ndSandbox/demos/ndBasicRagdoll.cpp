@@ -112,7 +112,6 @@ namespace ndRagdoll
 		{
 		}
 
-		//ndSharedPtr<ndBody> CreateBodyPart(ndDemoEntityManager* const scene, const ndSharedPtr<ndRenderSceneNode>& entityPart, ndBodyDynamic* const parentBone)
 		ndSharedPtr<ndBody> CreateBodyPart(
 			ndDemoEntityManager* const scene,
 			const ndSharedPtr<ndRenderSceneNode>& rootMesh,
@@ -130,7 +129,6 @@ namespace ndRagdoll
 			body->SetMatrix(matrix);
 			body->GetAsBodyDynamic()->SetCollisionShape(**shape);
 			body->GetAsBodyDynamic()->SetMassMatrix(1.0f, **shape);
-			//body->SetNotifyCallback(new ndBindingRagdollEntityNotify(scene, entityPart, parentBone, 100.0f));
 			body->SetNotifyCallback(new ndDemoEntityNotify(scene, bonePart));
 			return body;
 		}
@@ -270,10 +268,6 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 	ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "marblecheckboard.png", 0.1f, true));
 	//ndSharedPtr<ndBody> bodyFloor(BuildCompoundScene(scene, ndGetIdentityMatrix()));
 	
-	//ndVector origin1(0.0f, 0.0f, 0.0f, 1.0f);
-	//ndMeshLoader loader;
-	//ndSharedPtr<ndDemoEntity> modelMesh (loader.LoadEntity("walker.fbx", scene));
-
 	ndMeshLoader loader;
 	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("ragdoll.fbx"));
 	
@@ -281,9 +275,6 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 	matrix.m_posit.m_y = 1.0f;
 	ndMatrix playerMatrix(matrix);
 	
-	//ndSharedPtr<ndModel> model(BuildModel(scene, *modelMesh, matrix));
-	//scene->GetWorld()->AddModel(model);
-	//model->AddBodiesAndJointsToWorld();
 	ndSharedPtr<ndModelNotify> modelNotity(CreateRagdoll(scene, loader, matrix));
 	
 	////matrix.m_posit.m_x += 1.4f;

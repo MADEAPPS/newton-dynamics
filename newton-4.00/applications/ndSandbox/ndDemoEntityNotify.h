@@ -38,7 +38,6 @@ class ndDemoEntityNotify : public ndModelBodyNotify
 	}
 
 	void RemoveBody();
-	//virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix) override;
 	virtual void OnTransform(ndFloat32 timestep, const ndMatrix& matrix) override;
 
 	ndDemoEntityManager* m_manager;

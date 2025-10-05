@@ -98,7 +98,7 @@ ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, const
 	,m_manager(manager)
 	,m_entity(entity)
 	,m_transform()
-	,m_capSpeed(100.0f)
+	,m_capSpeed(ndFloat32 (100.0f))
 {
 	ndRenderSceneNode* const parent = entity->GetParent();
 	const ndMatrix parentMatrix(parent ? parent->CalculateGlobalTransform() : ndGetIdentityMatrix());
@@ -126,7 +126,6 @@ ndDemoEntityNotify::~ndDemoEntityNotify()
 {
 }
 
-//void ndDemoEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
 void ndDemoEntityNotify::OnTransform(ndFloat32, const ndMatrix& matrix)
 {
 	// apply this transformation matrix to the application user data.
