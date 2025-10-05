@@ -131,7 +131,8 @@ namespace ndRagdoll
 			body->SetMatrix(matrix);
 			body->GetAsBodyDynamic()->SetCollisionShape(**shape);
 			body->GetAsBodyDynamic()->SetMassMatrix(1.0f, **shape);
-			body->SetNotifyCallback(new ndDemoEntityNotify(scene, bonePart, parentBody));
+			//body->SetNotifyCallback(new ndDemoEntityNotify(scene, bonePart, parentBody));
+			body->SetNotifyCallback(new ndDemoEntityNotify(scene, bonePart, nullptr));
 			return body;
 		}
 
@@ -220,7 +221,8 @@ namespace ndRagdoll
 					if (!strcmp(definition.m_boneName, name))
 					{
 						ndBodyDynamic* const parentBody = data.parentBone->m_body->GetAsBodyDynamic();
-						ndSharedPtr<ndBody> childBody(CreateBodyPart(scene, entityDuplicate, loader, definition, nullptr));
+						//ndSharedPtr<ndBody> childBody(CreateBodyPart(scene, entityDuplicate, loader, definition, nullptr));
+						ndSharedPtr<ndBody> childBody(CreateBodyPart(scene, entityDuplicate, loader, definition, parentBody));
 
 						//connect this body part to its parentBody with a rag doll joint
 						ndSharedPtr<ndJointBilateralConstraint> joint(ConnectBodyParts(childBody->GetAsBodyDynamic(), parentBody, definition));
