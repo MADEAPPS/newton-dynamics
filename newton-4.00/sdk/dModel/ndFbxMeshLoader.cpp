@@ -623,7 +623,7 @@ ndMesh* ndFbxMeshLoader::CreateMeshHierarchy(ofbx::IScene* const fbxScene, ndFbx
 	
 	// putting all node under a dummy root, makes Max and Blender fbx compatible
 	ndMesh* const mesh = new ndMesh();
-	mesh->SetName("dommyRoot");
+	mesh->SetName("dummyRoot");
 
 	const ofbx::GlobalSettings& globalSettings = *fbxScene->getGlobalSettings();
 	if (globalSettings.UpAxis == UpVector_AxisY)
