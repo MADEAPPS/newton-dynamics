@@ -166,7 +166,15 @@ inline ndInt32 ndString::Compare (const char* const str0, const char* const str1
 {
 	//ndAssert (str0);
 	//ndAssert (str1);
-	return (str0 && str1) ? strcmp(str0, str1) : 1;
+	if (str0 && str1)
+	{
+		return strcmp(str0, str1);
+	}
+	else if (str0 || str1)
+	{
+		return 1;
+	}
+	return 0;
 }
 
 inline bool ndString::operator== (const ndString& src) const
