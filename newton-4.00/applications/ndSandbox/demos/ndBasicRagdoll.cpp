@@ -131,8 +131,7 @@ namespace ndRagdoll
 			body->SetMatrix(matrix);
 			body->GetAsBodyDynamic()->SetCollisionShape(**shape);
 			body->GetAsBodyDynamic()->SetMassMatrix(1.0f, **shape);
-			//body->SetNotifyCallback(new ndDemoEntityNotify(scene, bonePart, parentBody));
-			body->SetNotifyCallback(new ndDemoEntityNotify(scene, bonePart, nullptr));
+			body->SetNotifyCallback(new ndDemoEntityNotify(scene, bonePart, parentBody));
 			return body;
 		}
 
