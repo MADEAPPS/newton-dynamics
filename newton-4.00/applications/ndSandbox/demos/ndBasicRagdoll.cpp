@@ -117,7 +117,7 @@ namespace ndRagdoll
 			const ndSharedPtr<ndRenderSceneNode>& rootMesh,
 			const ndMeshLoader& loader, 
 			const ndDefinition& definition,
-			ndBodyDynamic* const parentBone)
+			ndBodyDynamic* const parentBody)
 		{
 			ndMesh* const mesh(loader.m_mesh->FindByName(definition.m_boneName));
 			ndSharedPtr<ndShapeInstance> shape(mesh->CreateCollisionFromChildren());
@@ -131,7 +131,7 @@ namespace ndRagdoll
 			body->SetMatrix(matrix);
 			body->GetAsBodyDynamic()->SetCollisionShape(**shape);
 			body->GetAsBodyDynamic()->SetMassMatrix(1.0f, **shape);
-			body->SetNotifyCallback(new ndDemoEntityNotify(scene, bonePart));
+			body->SetNotifyCallback(new ndDemoEntityNotify(scene, bonePart, parentBody));
 			return body;
 		}
 
