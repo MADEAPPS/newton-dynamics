@@ -100,9 +100,27 @@ ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, const
 	,m_transform()
 	,m_capSpeed(ndFloat32 (100.0f))
 {
-	ndRenderSceneNode* const parent = entity->GetParent();
-	const ndMatrix parentMatrix(parent ? parent->CalculateGlobalTransform() : ndGetIdentityMatrix());
-	m_bindMatrix = parentMatrix.OrthoInverse();
+	if (!parentBody)
+	{
+		// handle root level and intances single bodies
+		ndRenderSceneNode* const parent = entity->GetParent();
+		const ndMatrix parentMatrix(parent ? parent->CalculateGlobalTransform() : ndGetIdentityMatrix());
+		m_bindMatrix = parentMatrix.OrthoInverse();
+	}
+	else
+	{
+		// handle hierarchies of rigid nodies 
+		ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)parentBody->GetNotifyCallback();
+		ndSharedPtr<ndRenderSceneNode> parentEntity = *notify->m_entity;
+
+		ndMatrix matrix(ndGetIdentityMatrix());
+		for (const ndRenderSceneNode* parent = entity->GetParent(); parent != *parentEntity; parent = parent->GetParent())
+		{
+			const ndMatrix parentMatrix(parent->GetTransform().GetMatrix());
+			matrix = matrix * parentMatrix;
+		}
+		m_bindMatrix = matrix;
+	}
 }
 
 ndDemoEntityNotify::ndDemoEntityNotify(const ndDemoEntityNotify& notify)
@@ -133,8 +151,12 @@ void ndDemoEntityNotify::OnTransform(ndFloat32, const ndMatrix& matrix)
 	{
 		if (m_parentBody)
 		{
-			//ndBody* const body = GetBody();
-			ndAssert(0);
+			const ndMatrix parentMatrix(m_bindMatrix * m_parentBody->GetMatrix());
+			const ndMatrix localMatrix(matrix * parentMatrix.OrthoInverse());
+
+			const ndQuaternion rot(localMatrix);
+			//m_entity->SetMatrix(rot, localMatrix.m_posit);
+			m_transform = ndTransform(rot, localMatrix.m_posit);
 		}
 		else
 		{
