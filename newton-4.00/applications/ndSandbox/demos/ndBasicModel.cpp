@@ -117,16 +117,17 @@ class ndBackGroundVehicleController : public ndModelNotify
 		compoundShape->AddCollision(*chassisShape);
 
 		// add all tires
-		ndString tirename("tire");
+		const ndString tirename("tire");
 		const ndList<ndSharedPtr<ndMesh>>& children = loader.m_mesh->GetChildren();
 		for (ndList<ndSharedPtr<ndMesh>>::ndNode* node = children.GetFirst(); node; node = node->GetNext())
 		{
 			ndMesh* const child = *node->GetInfo();
 			if (child->GetName().Find(tirename) >= 0)
 			{
-				// we can use a convex hull for simplicity, 
-				// but a tire capsule is much better choice because it generates 
-				// only one contact
+				// we can use a convex hull for simplicity. 
+				// however a tire champhered cylinder is much better choice because 
+				// it only generates one contact at the contact patch.
+				// this is faster and generate much beterr behavior.
 				ndSharedPtr<ndShapeInstance> tireShape(child->CreateCollision());
 				tireShape->SetLocalMatrix(tireShape->GetLocalMatrix() * child->m_matrix);
 				compoundShape->AddCollision(*tireShape);
