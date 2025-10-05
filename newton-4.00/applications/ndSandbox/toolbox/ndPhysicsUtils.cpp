@@ -55,28 +55,6 @@ ndMatrix FindFloor(const ndWorld& world, const ndMatrix& origin, const ndShapeIn
 	return matrix;
 }
 
-#if 0
-void SetModelVisualMesh(ndDemoEntityManager* const scene, ndModelArticulation* const model)
-{
-	for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
-	{
-		ndSharedPtr<ndBody> body(node->m_body);
-
-		ndUrdfBodyNotify* const urdfNotify = body->GetNotifyCallback()->GetAsUrdfBodyNotify();
-		if (urdfNotify)
-		{
-			ndSharedPtr<ndDemoMeshInterface> mesh(new ndDemoMesh("urdfMesh", *urdfNotify->m_mesh, scene->GetShaderCache()));
-			ndSharedPtr<ndDemoEntity> entity (new ndDemoEntity(body->GetMatrix()));
-			entity->SetMesh(mesh);
-			entity->SetMeshMatrix(urdfNotify->m_offset);
-
-			scene->AddEntity(entity);
-			body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-		}
-	}
-}
-#endif
-
 //******************************************************************************
 // Create simple rigi body with a collsion shspe and render primitev but is not added to the scene
 //******************************************************************************
