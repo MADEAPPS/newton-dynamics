@@ -195,13 +195,13 @@ namespace ndRagdoll
 			ndList<StackData> stack;
 
 			ndModelArticulation* const model = (ndModelArticulation*)GetModel();
-			ndModelArticulation::ndNode* const modelNode = model->AddRootBody(rootBody);
+			ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(rootBody);
 
-			ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)modelNode->m_body->GetAsBodyKinematic()->GetNotifyCallback();
+			ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)modelRootNode->m_body->GetAsBodyKinematic()->GetNotifyCallback();
 			for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = notify->GetUserData()->GetChildren().GetFirst(); node; node = node->GetNext())
 			{
 				ndList<StackData>::ndNode* const stackNode = stack.Append();
-				stackNode->GetInfo().parentBone = modelNode;
+				stackNode->GetInfo().parentBone = modelRootNode;
 				stackNode->GetInfo().childEntity = node->GetInfo();
 			}
 
@@ -220,11 +220,11 @@ namespace ndRagdoll
 
 					if (!strcmp(definition.m_boneName, name))
 					{
-						//ndSharedPtr<ndBody> childBody(CreateBodyPart(scene, childEntity, parentBone->m_body->GetAsBodyDynamic()));
 						ndSharedPtr<ndBody> childBody(CreateBodyPart(scene, entityDuplicate, loader, definition));
 
 						//connect this body part to its parentBody with a rag doll joint
 						ndSharedPtr<ndJointBilateralConstraint> joint(ConnectBodyParts(childBody->GetAsBodyDynamic(), parentBone->m_body->GetAsBodyDynamic(), definition));
+
 						// add this child body to the rad doll model.
 						parentBone = model->AddLimb(parentBone, childBody, joint);
 						break;
