@@ -632,8 +632,6 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollision()
 	{
 		ndAssert(0);
 	}
-
-	//shape->SetLocalMatrix(shape->GetLocalMatrix() * m_meshMatrix);
 	return shape;
 }
 
@@ -642,32 +640,39 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionFromChildren()
 	ndArray<ndVector> points;
 	ndFixSizeArray<ndSharedPtr<ndShapeInstance>, 256> shapeArray;
 
-	for (ndList<ndSharedPtr<ndMesh>>::ndNode* node = GetChildren().GetFirst(); node; node = node->GetNext())
+	for (ndList<ndSharedPtr<ndMesh>>::ndNode* ptr = GetChildren().GetFirst(); ptr; ptr = ptr->GetNext())
 	{
-		ndString tmpName(node->GetInfo()->GetName());
+		ndMesh* const meshNode = *ptr->GetInfo();
+		ndString tmpName(meshNode->GetName());
 		tmpName.ToLower();
 		const char* const name = tmpName.GetStr();
 	
 		if (strstr(name, "sphere"))
 		{
-			ndAssert(0);
-
-			ndSharedPtr<ndShapeInstance> subShape(node->GetInfo()->CreateCollision());
+			ndSharedPtr<ndShapeInstance> subShape(meshNode->CreateCollision());
+			const ndMatrix matrix(subShape->GetLocalMatrix() * meshNode->m_matrix);
+			subShape->SetLocalMatrix(matrix);
 			shapeArray.PushBack(subShape);
 		}
 		else if (strstr(name, "box"))
 		{
-			ndSharedPtr<ndShapeInstance> subShape(node->GetInfo()->CreateCollision());
+			ndSharedPtr<ndShapeInstance> subShape(meshNode->CreateCollision());
+			const ndMatrix matrix(subShape->GetLocalMatrix() * meshNode->m_matrix);
+			subShape->SetLocalMatrix(matrix);
 			shapeArray.PushBack(subShape);
 		}
 		else if (strstr(name, "capsule"))
 		{
-			ndSharedPtr<ndShapeInstance> subShape(node->GetInfo()->CreateCollision());
+			ndSharedPtr<ndShapeInstance> subShape(meshNode->CreateCollision());
+			const ndMatrix matrix(subShape->GetLocalMatrix() * meshNode->m_matrix);
+			subShape->SetLocalMatrix(matrix);
 			shapeArray.PushBack(subShape);
 		}
 		else if (strstr(name, "convexhull"))
 		{
-			ndSharedPtr<ndShapeInstance> subShape(node->GetInfo()->CreateCollision());
+			ndSharedPtr<ndShapeInstance> subShape(meshNode->CreateCollision());
+			const ndMatrix matrix(subShape->GetLocalMatrix() * meshNode->m_matrix);
+			subShape->SetLocalMatrix(matrix);
 			shapeArray.PushBack(subShape);
 		}
 		else if (strstr(name, "vhacd"))
