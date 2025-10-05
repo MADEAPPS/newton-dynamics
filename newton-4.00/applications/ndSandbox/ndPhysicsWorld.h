@@ -15,8 +15,6 @@
 
 #define MAX_PHYSICS_FPS			60.0f
 
-class ndDemoEntity;
-class ndSoundManager;
 class ndDemoEntityManager;
 
 class ndDemoContactCallback : public ndContactCallback
