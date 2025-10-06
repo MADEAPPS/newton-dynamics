@@ -33,12 +33,12 @@ class ndMeshFile : public ndClassAlloc
 	ndMeshFile();
 	virtual ~ndMeshFile();
 
-	ndMesh* Import(const char* const fullPathName);
-	void Export(const ndMesh* const mesh, const char* const fullPathName);
+	ndMesh* Import(const ndString& fullPathName);
+	void Export(const ndMesh* const mesh, const ndString& fullPathName);
 
 	private:
-	//void Load(FILE* const file, const ndTree<ndSharedPtr<ndMeshEffect>, ndInt32>& meshEffects);
-	//void Save(FILE* const file, const ndTree<ndInt32, const ndMeshEffect*>& meshEffects, ndInt32 level = 0) const;
+	void ExportMeshes(const ndTree<ndInt32, const ndMeshEffect*>& meshEffects, nd::TiXmlElement* const rootNode);
+	void ExportMaterials(const ndTree<ndInt32, const ndMeshEffect*>& meshEffects, nd::TiXmlElement* const rootNode);
 };
 #endif
 

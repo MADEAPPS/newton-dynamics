@@ -9,8 +9,10 @@
 * freely
 */
 
-#include "ndSandboxStdafx.h"
+#include "ndModelStdafx.h"
 #include "ndMeshLoader.h"
+#include "ndAnimationSequence.h"
+#include "ndAnimationKeyframesTrack.h"
 
 ndMeshLoader::ndMeshLoader()
 	:ndFbxMeshLoader()
@@ -132,7 +134,7 @@ bool ndMeshLoader::LoadEntity(ndRender* const renderer, const ndString& fbxPathM
 				ndRenderPrimitiveMaterial& material = descriptor.AddMaterial(renderer->GetTextureCache()->GetTexture(texturePathName));
 				material.m_diffuse = materials[j].m_diffuse;
 				material.m_specular = materials[j].m_specular;
-				material.m_reflection = materials[j].m_specular;
+				material.m_reflection = materials[j].m_reflection;
 				material.m_specularPower = ndReal(materials[j].m_shiness);
 				material.m_opacity = ndReal(materials[j].m_opacity);
 				material.m_castShadows = true;

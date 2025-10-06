@@ -17,9 +17,12 @@ include_directories(.)
 include_directories(../dCore)
 include_directories(../dBrain)
 include_directories(../dNewton)
+include_directories(../dRender)
 include_directories(../dProfiler)
 include_directories(../dCollision)
 
+include_directories(../../thirdParty/png)
+include_directories(../../thirdParty/imgui/)
 include_directories(../../thirdParty/openFBX/src)
 include_directories(../../thirdParty/hacd/src/VHACD_Lib/public/)
 

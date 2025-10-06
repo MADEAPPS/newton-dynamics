@@ -214,7 +214,8 @@ void ndFbxMeshLoader::ImportMaterials(const ofbx::Mesh* const fbxMesh, ndMeshEff
 		Color color(geom->getRgbDisplayColor());
 		material.m_diffuse = ndVector(color.r, color.g, color.b, 1.0f);
 		material.m_ambient = ndVector(color.r, color.g, color.b, 1.0f);
-		material.m_specular = ndVector(color.r, color.g, color.b, 1.0f);
+		material.m_specular = ndVector(ndFloat32 (1.0f));
+		material.m_reflection = ndVector(ndFloat32(1.0f));
 
 		materialArray.PushBack(material);
 	}
@@ -234,9 +235,11 @@ void ndFbxMeshLoader::ImportMaterials(const ofbx::Mesh* const fbxMesh, ndMeshEff
 			
 			color = fbxMaterial->getSpecularColor();
 			material.m_specular = ndVector(color.r, color.g, color.b, 1.0f);
-			
+
+			color = fbxMaterial->getReflectionColor();
+			material.m_reflection = ndVector(color.r, color.g, color.b, 1.0f);
+
 			material.m_opacity = ndFloat32(fbxMaterial->getOpacityFactor());
-			//material.m_shiness = ndFloat32(fbxMaterial->getShininess());
 			material.m_shiness = ndFloat32(fbxMaterial->getShininessExponent());
 			
 			const ofbx::Texture* const texture = fbxMaterial->getTexture(ofbx::Texture::DIFFUSE);

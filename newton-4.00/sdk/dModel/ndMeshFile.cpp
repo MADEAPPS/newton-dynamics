@@ -32,296 +32,6 @@ ndMeshFile::~ndMeshFile()
 {
 }
 
-//void ndMeshFile::Export(const ndMesh* const mesh, const char* const fullPathName)
-void ndMeshFile::Export(const ndMesh* const, const char* const)
-{
-	ndAssert(0);
-	//FILE* const file = fopen(fullPathName, "wb");
-	//if (file)
-	//{
-	//	fprintf(file, "# Newton Dynamics Mesh file format.\n\n");
-	//	ndTree<ndInt32, const ndMeshEffect*> meshEffects;
-	//	for (ndMesh* node = mesh->GetFirstIterator(); node; node = node->GetNextIterator())
-	//	{
-	//		if (node->m_mesh)
-	//		{
-	//			meshEffects.Insert(meshEffects.GetCount(), *node->m_mesh);
-	//		}
-	//	}
-	//
-	//	if (meshEffects.GetCount())
-	//	{
-	//		auto PrintVertexChannel = [file](const ndMeshEffect::ndMeshVertexFormat::ndData<ndFloat64>& channel, ndInt32 vertexCount)
-	//		{
-	//			fprintf(file, "\t\tvertex:\n");
-	//			fprintf(file, "\t\t{\n");
-	//
-	//			ndInt32 positCount = 0;
-	//			for (ndInt32 i = 0; i < vertexCount; ++i)
-	//			{
-	//				positCount = ndMax(positCount, channel.m_indexList[i] + 1);
-	//			}
-	//
-	//			fprintf(file, "\t\t\tposition: %d\n", positCount);
-	//			fprintf(file, "\t\t\t{\n");
-	//			ndInt32 stride = channel.m_strideInBytes / ndInt32(sizeof(ndFloat64));
-	//			for (ndInt32 i = 0; i < positCount; ++i)
-	//			{
-	//				ndFloat64 x;
-	//				ndFloat64 y;
-	//				ndFloat64 z;
-	//				x = channel.m_data[i * stride + 0];
-	//				y = channel.m_data[i * stride + 1];
-	//				z = channel.m_data[i * stride + 2];
-	//				fprintf(file, "\t\t\t\t%lg %lg %lg\n", x, y, z);
-	//			}
-	//			fprintf(file, "\t\t\t}\n");
-	//
-	//			fprintf(file, "\t\t\tindices: %d\n", vertexCount);
-	//			fprintf(file, "\t\t\t{\n");
-	//			fprintf(file, "\t\t\t\t");
-	//			for (ndInt32 i = 0; i < vertexCount; ++i)
-	//			{
-	//				fprintf(file, "%d ", channel.m_indexList[i]);
-	//			}
-	//			fprintf(file, "\n");
-	//			fprintf(file, "\t\t\t}\n");
-	//
-	//			fprintf(file, "\t\t}\n");
-	//		};
-	//
-	//		auto PrintNormalChannel = [file](const ndMeshEffect::ndMeshVertexFormat::ndData<ndReal>& channel, ndInt32 vertexCount)
-	//		{
-	//			fprintf(file, "\t\tnormal:\n");
-	//			fprintf(file, "\t\t{\n");
-	//
-	//			ndInt32 positCount = 0;
-	//			for (ndInt32 i = 0; i < vertexCount; ++i)
-	//			{
-	//				positCount = ndMax(positCount, channel.m_indexList[i] + 1);
-	//			}
-	//
-	//			fprintf(file, "\t\t\tposition: %d\n", positCount);
-	//			fprintf(file, "\t\t\t{\n");
-	//			ndInt32 stride = channel.m_strideInBytes / ndInt32(sizeof(ndReal));
-	//			for (ndInt32 i = 0; i < positCount; ++i)
-	//			{
-	//				ndReal x;
-	//				ndReal y;
-	//				ndReal z;
-	//				x = channel.m_data[i * stride + 0];
-	//				y = channel.m_data[i * stride + 1];
-	//				z = channel.m_data[i * stride + 2];
-	//				fprintf(file, "\t\t\t\t%g %g %g\n", x, y, z);
-	//			}
-	//			fprintf(file, "\t\t\t}\n");
-	//
-	//			fprintf(file, "\t\t\tindices: %d\n", vertexCount);
-	//			fprintf(file, "\t\t\t{\n");
-	//			fprintf(file, "\t\t\t\t");
-	//			for (ndInt32 i = 0; i < vertexCount; ++i)
-	//			{
-	//				fprintf(file, "%d ", channel.m_indexList[i]);
-	//			}
-	//			fprintf(file, "\n");
-	//			fprintf(file, "\t\t\t}\n");
-	//
-	//			fprintf(file, "\t\t}\n");
-	//		};
-	//
-	//		auto PrintUVChannel = [file](const ndMeshEffect::ndMeshVertexFormat::ndData<ndReal>& channel, ndInt32 vertexCount)
-	//		{
-	//			fprintf(file, "\t\tuv:\n");
-	//			fprintf(file, "\t\t{\n");
-	//
-	//			ndInt32 positCount = 0;
-	//			for (ndInt32 i = 0; i < vertexCount; ++i)
-	//			{
-	//				positCount = ndMax(positCount, channel.m_indexList[i] + 1);
-	//			}
-	//
-	//			fprintf(file, "\t\t\tposition: %d\n", positCount);
-	//			fprintf(file, "\t\t\t{\n");
-	//			ndInt32 stride = channel.m_strideInBytes / ndInt32(sizeof(ndReal));
-	//			for (ndInt32 i = 0; i < positCount; ++i)
-	//			{
-	//				ndReal x;
-	//				ndReal y;
-	//				x = channel.m_data[i * stride + 0];
-	//				y = channel.m_data[i * stride + 1];
-	//				fprintf(file, "\t\t\t\t%g %g\n", x, y);
-	//			}
-	//			fprintf(file, "\t\t\t}\n");
-	//
-	//			fprintf(file, "\t\t\tindices: %d\n", vertexCount);
-	//			fprintf(file, "\t\t\t{\n");
-	//			fprintf(file, "\t\t\t\t");
-	//			for (ndInt32 i = 0; i < vertexCount; ++i)
-	//			{
-	//				fprintf(file, "%d ", channel.m_indexList[i]);
-	//			}
-	//			fprintf(file, "\n");
-	//			fprintf(file, "\t\t\t}\n");
-	//
-	//			fprintf(file, "\t\t}\n");
-	//		};
-	//
-	//		fprintf(file, "geometries: %d\n", meshEffects.GetCount());
-	//		fprintf(file, "{\n");
-	//
-	//		ndTree<ndInt32, const ndMeshEffect*>::Iterator it(meshEffects);
-	//		for (it.Begin(); it; it++)
-	//		{
-	//			fprintf(file, "\tgeometry: %d\n", it.GetNode()->GetInfo());
-	//			fprintf(file, "\t{\n");
-	//
-	//			ndMeshEffect* effectMesh = (ndMeshEffect*)it.GetKey();
-	//
-	//			ndArray<ndUnsigned8> tmpBuffer;
-	//			ndMeshEffect::ndMeshVertexFormat format;
-	//			ndInt32 vertexCount = effectMesh->GenerateVertexFormat(format, tmpBuffer);
-	//			PrintVertexChannel(format.m_vertex, vertexCount);
-	//			if (format.m_normal.m_data)
-	//			{
-	//				PrintNormalChannel(format.m_normal, vertexCount);
-	//			}
-	//			if (format.m_uv0.m_data)
-	//			{
-	//				PrintUVChannel(format.m_uv0, vertexCount);
-	//			}
-	//
-	//			const ndArray<ndMeshEffect::ndMaterial>& materialArray = effectMesh->GetMaterials();
-	//			for (ndInt32 i = 0; i < materialArray.GetCount(); ++i)
-	//			{
-	//				fprintf(file, "\t\tmaterial:\n");
-	//				fprintf(file, "\t\t{\n");
-	//			
-	//				const ndMeshEffect::ndMaterial& material = materialArray[i];
-	//			
-	//				fprintf(file, "\t\t\tambience: %g %g %g %g\n", material.m_ambient.m_x, material.m_ambient.m_y, material.m_ambient.m_z, material.m_ambient.m_w);
-	//				fprintf(file, "\t\t\tdiffuse: %g %g %g %g\n", material.m_diffuse.m_x, material.m_diffuse.m_y, material.m_diffuse.m_z, material.m_diffuse.m_w);
-	//				fprintf(file, "\t\t\tm_specular: %g %g %g %g\n", material.m_specular.m_x, material.m_specular.m_y, material.m_specular.m_z, material.m_specular.m_w);
-	//				fprintf(file, "\t\t\topacity: %g\n", material.m_opacity);
-	//				fprintf(file, "\t\t\tshiness: %g\n", material.m_shiness);
-	//				fprintf(file, "\t\t\ttexture: %s\n", material.m_textureName);
-	//
-	//				ndInt32 faceCount = 0;
-	//				for (ndInt32 j = 0; j < format.m_faceCount; ++j)
-	//				{
-	//					if (format.m_faceMaterial[j] == i)
-	//					{
-	//						faceCount++;
-	//					}
-	//				}
-	//			
-	//				ndInt32 indexAcc = 0;
-	//				fprintf(file, "\t\t\tfacesVertexCount: %d\n", faceCount);
-	//				fprintf(file, "\t\t\t{\n");
-	//				fprintf(file, "\t\t\t\t");
-	//				for (ndInt32 j = 0; j < format.m_faceCount; ++j)
-	//				{
-	//					if (format.m_faceMaterial[j] == i)
-	//					{
-	//						fprintf(file, "%d ", format.m_faceIndexCount[j]);
-	//						indexAcc += format.m_faceIndexCount[j];
-	//					}
-	//				}
-	//				fprintf(file, "\n");
-	//				fprintf(file, "\t\t\t}\n");
-	//
-	//				fprintf(file, "\t\t\tfacesIndexList: %d\n", indexAcc);
-	//				fprintf(file, "\t\t\t{\n");
-	//				fprintf(file, "\t\t\t\t");
-	//				indexAcc = 0;
-	//				for (ndInt32 j = 0; j < format.m_faceCount; ++j)
-	//				{
-	//					if (format.m_faceMaterial[j] == i)
-	//					{
-	//						for (ndInt32 k = 0; k < format.m_faceIndexCount[j]; ++k)
-	//						{
-	//							fprintf(file, "%d ", indexAcc + k);
-	//						}
-	//					}
-	//					indexAcc += format.m_faceIndexCount[j];
-	//				}
-	//				fprintf(file, "\n");
-	//				fprintf(file, "\t\t\t}\n");
-	//
-	//
-	//				fprintf(file, "\t\t}\n");
-	//			}
-	//
-	//			if (format.m_vertexWeight.m_data)
-	//			{
-	//				ndInt32 weightsCount = 0;
-	//				for (ndInt32 i = 0; i < vertexCount; ++i)
-	//				{
-	//					weightsCount = ndMax(weightsCount, format.m_vertexWeight.m_indexList[i] + 1);
-	//				}
-	//
-	//				for (ndMesh* node = mesh->GetFirstIterator(); node; node = node->GetNextIterator())
-	//				{
-	//					ndInt32 count = 0;
-	//					ndInt32 hash = ndInt32(ndCRC64(node->m_name.GetStr()) & 0xffffffff);
-	//					ndAssert(hash);
-	//					for (ndInt32 j = 0; j < weightsCount; ++j)
-	//					{
-	//						for (ndInt32 k = 0; k < ND_VERTEX_WEIGHT_SIZE; ++k)
-	//						{
-	//							count += (format.m_vertexWeight.m_data[j].m_boneId[k] == hash) ? 1 : 0;
-	//						}
-	//					}
-	//					if (count)
-	//					{
-	//						fprintf(file, "\t\tvertexWeightsCluster: %s\n", node->m_name.GetStr());
-	//						fprintf(file, "\t\t{\n");
-	//						
-	//						fprintf(file, "\t\t\tindexCount: %d\n", count);
-	//						
-	//						fprintf(file, "\t\t\tvertexIndex: ");
-	//						for (ndInt32 j = 0; j < weightsCount; ++j)
-	//						{
-	//							for (ndInt32 k = 0; k < ND_VERTEX_WEIGHT_SIZE; ++k)
-	//							{
-	//								if (format.m_vertexWeight.m_data[j].m_boneId[k] == hash)
-	//								{
-	//									fprintf(file, "%d ", j);
-	//								}
-	//							}
-	//						}
-	//						fprintf(file, "\t\t\t\n");
-	//
-	//						fprintf(file, "\t\t\tvertexWeight: ");
-	//						for (ndInt32 j = 0; j < weightsCount; ++j)
-	//						{
-	//							for (ndInt32 k = 0; k < ND_VERTEX_WEIGHT_SIZE; ++k)
-	//							{
-	//								if (format.m_vertexWeight.m_data[j].m_boneId[k] == hash)
-	//								{
-	//									fprintf(file, "%g ", format.m_vertexWeight.m_data[j].m_weight[k]);
-	//								}
-	//							}
-	//						}
-	//						fprintf(file, "\t\t\t\n");
-	//						
-	//						fprintf(file, "\t\t}\n");
-	//
-	//					}
-	//				}
-	//			}
-	//			
-	//			fprintf(file, "\t}\n");
-	//		}
-	//
-	//		fprintf(file, "}\n");
-	//		fprintf(file, "\n");
-	//	}
-	//
-	//	mesh->Save(file, meshEffects);
-	//	fclose(file);
-	//}
-}
-
 //void ndMeshFile::Save(FILE* const file, const ndTree<ndInt32, const ndMeshEffect*>& meshEffects, ndInt32 level) const
 //{
 //	auto PrintTabs = [file](ndInt32 level)
@@ -413,7 +123,8 @@ void ndMeshFile::Export(const ndMesh* const, const char* const)
 //}
 
 //ndMesh* ndMeshFile::Import(const char* const fullPathName)
-ndMesh* ndMeshFile::Import(const char* const)
+//ndMesh* ndMeshFile::Import(const ndString& fullPathName)
+ndMesh* ndMeshFile::Import(const ndString&)
 {
 	ndAssert(0);
 	return nullptr;
@@ -801,3 +512,365 @@ ndMesh* ndMeshFile::Import(const char* const)
 //		ReadToken();
 //	}
 //}
+
+void ndMeshFile::ExportMaterials(const ndTree<ndInt32, const ndMeshEffect*>& meshEffects, nd::TiXmlElement* const rootNode)
+{
+	nd::TiXmlElement* const materialNode = new nd::TiXmlElement("ndMeshMaterials");
+	rootNode->LinkEndChild(materialNode);
+
+	ndTree<ndInt32, const ndMeshEffect*>::Iterator it(meshEffects);
+	for (it.Begin(); it; it++)
+	{
+		 ndMeshEffect* const mesh = (ndMeshEffect*)it.GetKey();
+		//ndString name(node->GetName() + "_");
+		ndString name("xxxx_");
+		const ndArray<ndMeshEffect::ndMaterial>& materialArray = mesh->GetMaterials();
+		for (ndInt32 i = 0; i < materialArray.GetCount(); ++i)
+		{
+			nd::TiXmlElement* const materialLink = new nd::TiXmlElement("ndMeshMaterial");
+			materialNode->LinkEndChild(materialLink);
+			const ndMeshEffect::ndMaterial& material = materialArray[i];
+
+			ndString materialName(name + i);
+			xmlSaveParam(materialLink, "name", materialName.GetStr());
+			xmlSaveParam(materialLink, "texture", material.m_textureName);
+			xmlSaveParam(materialLink, "ambient", material.m_ambient);
+			xmlSaveParam(materialLink, "diffuse", material.m_diffuse);
+			xmlSaveParam(materialLink, "specular", material.m_specular);
+			xmlSaveParam(materialLink, "reflection", material.m_reflection);
+			xmlSaveParam(materialLink, "opacity", material.m_opacity);
+			xmlSaveParam(materialLink, "shiness", material.m_shiness);
+		}
+	}
+}
+
+void ndMeshFile::ExportMeshes(const ndTree<ndInt32, const ndMeshEffect*>& meshEffects, nd::TiXmlElement* const rootNode)
+{
+	nd::TiXmlElement* const materialNode = new nd::TiXmlElement("ndMeshes");
+	rootNode->LinkEndChild(materialNode);
+
+	ndTree<ndInt32, const ndMeshEffect*>::Iterator it(meshEffects);
+	for (it.Begin(); it; it++)
+	{
+		//ndMeshEffect* const mesh = (ndMeshEffect*)it.GetKey();
+		//ndString name(node->GetName() + "_");
+		ndString name("meshxxxx_");
+
+		nd::TiXmlElement* const meshLink = new nd::TiXmlElement("mesh");
+		materialNode->LinkEndChild(meshLink);
+		xmlSaveParam(meshLink, "name", name.GetStr());
+	}
+}
+
+//void ndMeshFile::Export(const ndMesh* const mesh, const char* const fullPathName)
+void ndMeshFile::Export(const ndMesh* const mesh, const ndString& fullPathName)
+{
+	ndSharedPtr<nd::TiXmlDocument> doc(new nd::TiXmlDocument(""));
+	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
+	doc->LinkEndChild(decl);
+	ndString oldloc(setlocale(LC_ALL, 0));
+
+	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndMesh");
+	doc->LinkEndChild(rootNode);
+
+	// find all meshes
+	ndTree<ndInt32, const ndMeshEffect*> meshEffects;
+	for (ndMesh* node = ((ndMesh*)mesh)->IteratorFirst(); node; node = node->IteratorNext())
+	{
+		if (*node->m_mesh)
+		{
+			meshEffects.Insert(meshEffects.GetCount(), *node->m_mesh);
+		}
+	}
+
+	ExportMaterials(meshEffects, rootNode);
+	ExportMeshes(meshEffects, rootNode);
+
+	//FILE* const file = fopen(fullPathName, "wb");
+	//if (file)
+	//{
+	//	fprintf(file, "# Newton Dynamics Mesh file format.\n\n");
+	//	ndTree<ndInt32, const ndMeshEffect*> meshEffects;
+	//	for (ndMesh* node = mesh->GetFirstIterator(); node; node = node->GetNextIterator())
+	//	{
+	//		if (node->m_mesh)
+	//		{
+	//			meshEffects.Insert(meshEffects.GetCount(), *node->m_mesh);
+	//		}
+	//	}
+	//
+	//	if (meshEffects.GetCount())
+	//	{
+	//		auto PrintVertexChannel = [file](const ndMeshEffect::ndMeshVertexFormat::ndData<ndFloat64>& channel, ndInt32 vertexCount)
+	//		{
+	//			fprintf(file, "\t\tvertex:\n");
+	//			fprintf(file, "\t\t{\n");
+	//
+	//			ndInt32 positCount = 0;
+	//			for (ndInt32 i = 0; i < vertexCount; ++i)
+	//			{
+	//				positCount = ndMax(positCount, channel.m_indexList[i] + 1);
+	//			}
+	//
+	//			fprintf(file, "\t\t\tposition: %d\n", positCount);
+	//			fprintf(file, "\t\t\t{\n");
+	//			ndInt32 stride = channel.m_strideInBytes / ndInt32(sizeof(ndFloat64));
+	//			for (ndInt32 i = 0; i < positCount; ++i)
+	//			{
+	//				ndFloat64 x;
+	//				ndFloat64 y;
+	//				ndFloat64 z;
+	//				x = channel.m_data[i * stride + 0];
+	//				y = channel.m_data[i * stride + 1];
+	//				z = channel.m_data[i * stride + 2];
+	//				fprintf(file, "\t\t\t\t%lg %lg %lg\n", x, y, z);
+	//			}
+	//			fprintf(file, "\t\t\t}\n");
+	//
+	//			fprintf(file, "\t\t\tindices: %d\n", vertexCount);
+	//			fprintf(file, "\t\t\t{\n");
+	//			fprintf(file, "\t\t\t\t");
+	//			for (ndInt32 i = 0; i < vertexCount; ++i)
+	//			{
+	//				fprintf(file, "%d ", channel.m_indexList[i]);
+	//			}
+	//			fprintf(file, "\n");
+	//			fprintf(file, "\t\t\t}\n");
+	//
+	//			fprintf(file, "\t\t}\n");
+	//		};
+	//
+	//		auto PrintNormalChannel = [file](const ndMeshEffect::ndMeshVertexFormat::ndData<ndReal>& channel, ndInt32 vertexCount)
+	//		{
+	//			fprintf(file, "\t\tnormal:\n");
+	//			fprintf(file, "\t\t{\n");
+	//
+	//			ndInt32 positCount = 0;
+	//			for (ndInt32 i = 0; i < vertexCount; ++i)
+	//			{
+	//				positCount = ndMax(positCount, channel.m_indexList[i] + 1);
+	//			}
+	//
+	//			fprintf(file, "\t\t\tposition: %d\n", positCount);
+	//			fprintf(file, "\t\t\t{\n");
+	//			ndInt32 stride = channel.m_strideInBytes / ndInt32(sizeof(ndReal));
+	//			for (ndInt32 i = 0; i < positCount; ++i)
+	//			{
+	//				ndReal x;
+	//				ndReal y;
+	//				ndReal z;
+	//				x = channel.m_data[i * stride + 0];
+	//				y = channel.m_data[i * stride + 1];
+	//				z = channel.m_data[i * stride + 2];
+	//				fprintf(file, "\t\t\t\t%g %g %g\n", x, y, z);
+	//			}
+	//			fprintf(file, "\t\t\t}\n");
+	//
+	//			fprintf(file, "\t\t\tindices: %d\n", vertexCount);
+	//			fprintf(file, "\t\t\t{\n");
+	//			fprintf(file, "\t\t\t\t");
+	//			for (ndInt32 i = 0; i < vertexCount; ++i)
+	//			{
+	//				fprintf(file, "%d ", channel.m_indexList[i]);
+	//			}
+	//			fprintf(file, "\n");
+	//			fprintf(file, "\t\t\t}\n");
+	//
+	//			fprintf(file, "\t\t}\n");
+	//		};
+	//
+	//		auto PrintUVChannel = [file](const ndMeshEffect::ndMeshVertexFormat::ndData<ndReal>& channel, ndInt32 vertexCount)
+	//		{
+	//			fprintf(file, "\t\tuv:\n");
+	//			fprintf(file, "\t\t{\n");
+	//
+	//			ndInt32 positCount = 0;
+	//			for (ndInt32 i = 0; i < vertexCount; ++i)
+	//			{
+	//				positCount = ndMax(positCount, channel.m_indexList[i] + 1);
+	//			}
+	//
+	//			fprintf(file, "\t\t\tposition: %d\n", positCount);
+	//			fprintf(file, "\t\t\t{\n");
+	//			ndInt32 stride = channel.m_strideInBytes / ndInt32(sizeof(ndReal));
+	//			for (ndInt32 i = 0; i < positCount; ++i)
+	//			{
+	//				ndReal x;
+	//				ndReal y;
+	//				x = channel.m_data[i * stride + 0];
+	//				y = channel.m_data[i * stride + 1];
+	//				fprintf(file, "\t\t\t\t%g %g\n", x, y);
+	//			}
+	//			fprintf(file, "\t\t\t}\n");
+	//
+	//			fprintf(file, "\t\t\tindices: %d\n", vertexCount);
+	//			fprintf(file, "\t\t\t{\n");
+	//			fprintf(file, "\t\t\t\t");
+	//			for (ndInt32 i = 0; i < vertexCount; ++i)
+	//			{
+	//				fprintf(file, "%d ", channel.m_indexList[i]);
+	//			}
+	//			fprintf(file, "\n");
+	//			fprintf(file, "\t\t\t}\n");
+	//
+	//			fprintf(file, "\t\t}\n");
+	//		};
+	//
+	//		fprintf(file, "geometries: %d\n", meshEffects.GetCount());
+	//		fprintf(file, "{\n");
+	//
+	//		ndTree<ndInt32, const ndMeshEffect*>::Iterator it(meshEffects);
+	//		for (it.Begin(); it; it++)
+	//		{
+	//			fprintf(file, "\tgeometry: %d\n", it.GetNode()->GetInfo());
+	//			fprintf(file, "\t{\n");
+	//
+	//			ndMeshEffect* effectMesh = (ndMeshEffect*)it.GetKey();
+	//
+	//			ndArray<ndUnsigned8> tmpBuffer;
+	//			ndMeshEffect::ndMeshVertexFormat format;
+	//			ndInt32 vertexCount = effectMesh->GenerateVertexFormat(format, tmpBuffer);
+	//			PrintVertexChannel(format.m_vertex, vertexCount);
+	//			if (format.m_normal.m_data)
+	//			{
+	//				PrintNormalChannel(format.m_normal, vertexCount);
+	//			}
+	//			if (format.m_uv0.m_data)
+	//			{
+	//				PrintUVChannel(format.m_uv0, vertexCount);
+	//			}
+	//
+	//			const ndArray<ndMeshEffect::ndMaterial>& materialArray = effectMesh->GetMaterials();
+	//			for (ndInt32 i = 0; i < materialArray.GetCount(); ++i)
+	//			{
+	//				fprintf(file, "\t\tmaterial:\n");
+	//				fprintf(file, "\t\t{\n");
+	//			
+	//				const ndMeshEffect::ndMaterial& material = materialArray[i];
+	//			
+	//				fprintf(file, "\t\t\tambience: %g %g %g %g\n", material.m_ambient.m_x, material.m_ambient.m_y, material.m_ambient.m_z, material.m_ambient.m_w);
+	//				fprintf(file, "\t\t\tdiffuse: %g %g %g %g\n", material.m_diffuse.m_x, material.m_diffuse.m_y, material.m_diffuse.m_z, material.m_diffuse.m_w);
+	//				fprintf(file, "\t\t\tm_specular: %g %g %g %g\n", material.m_specular.m_x, material.m_specular.m_y, material.m_specular.m_z, material.m_specular.m_w);
+	//				fprintf(file, "\t\t\topacity: %g\n", material.m_opacity);
+	//				fprintf(file, "\t\t\tshiness: %g\n", material.m_shiness);
+	//				fprintf(file, "\t\t\ttexture: %s\n", material.m_textureName);
+	//
+	//				ndInt32 faceCount = 0;
+	//				for (ndInt32 j = 0; j < format.m_faceCount; ++j)
+	//				{
+	//					if (format.m_faceMaterial[j] == i)
+	//					{
+	//						faceCount++;
+	//					}
+	//				}
+	//			
+	//				ndInt32 indexAcc = 0;
+	//				fprintf(file, "\t\t\tfacesVertexCount: %d\n", faceCount);
+	//				fprintf(file, "\t\t\t{\n");
+	//				fprintf(file, "\t\t\t\t");
+	//				for (ndInt32 j = 0; j < format.m_faceCount; ++j)
+	//				{
+	//					if (format.m_faceMaterial[j] == i)
+	//					{
+	//						fprintf(file, "%d ", format.m_faceIndexCount[j]);
+	//						indexAcc += format.m_faceIndexCount[j];
+	//					}
+	//				}
+	//				fprintf(file, "\n");
+	//				fprintf(file, "\t\t\t}\n");
+	//
+	//				fprintf(file, "\t\t\tfacesIndexList: %d\n", indexAcc);
+	//				fprintf(file, "\t\t\t{\n");
+	//				fprintf(file, "\t\t\t\t");
+	//				indexAcc = 0;
+	//				for (ndInt32 j = 0; j < format.m_faceCount; ++j)
+	//				{
+	//					if (format.m_faceMaterial[j] == i)
+	//					{
+	//						for (ndInt32 k = 0; k < format.m_faceIndexCount[j]; ++k)
+	//						{
+	//							fprintf(file, "%d ", indexAcc + k);
+	//						}
+	//					}
+	//					indexAcc += format.m_faceIndexCount[j];
+	//				}
+	//				fprintf(file, "\n");
+	//				fprintf(file, "\t\t\t}\n");
+	//
+	//
+	//				fprintf(file, "\t\t}\n");
+	//			}
+	//
+	//			if (format.m_vertexWeight.m_data)
+	//			{
+	//				ndInt32 weightsCount = 0;
+	//				for (ndInt32 i = 0; i < vertexCount; ++i)
+	//				{
+	//					weightsCount = ndMax(weightsCount, format.m_vertexWeight.m_indexList[i] + 1);
+	//				}
+	//
+	//				for (ndMesh* node = mesh->GetFirstIterator(); node; node = node->GetNextIterator())
+	//				{
+	//					ndInt32 count = 0;
+	//					ndInt32 hash = ndInt32(ndCRC64(node->m_name.GetStr()) & 0xffffffff);
+	//					ndAssert(hash);
+	//					for (ndInt32 j = 0; j < weightsCount; ++j)
+	//					{
+	//						for (ndInt32 k = 0; k < ND_VERTEX_WEIGHT_SIZE; ++k)
+	//						{
+	//							count += (format.m_vertexWeight.m_data[j].m_boneId[k] == hash) ? 1 : 0;
+	//						}
+	//					}
+	//					if (count)
+	//					{
+	//						fprintf(file, "\t\tvertexWeightsCluster: %s\n", node->m_name.GetStr());
+	//						fprintf(file, "\t\t{\n");
+	//						
+	//						fprintf(file, "\t\t\tindexCount: %d\n", count);
+	//						
+	//						fprintf(file, "\t\t\tvertexIndex: ");
+	//						for (ndInt32 j = 0; j < weightsCount; ++j)
+	//						{
+	//							for (ndInt32 k = 0; k < ND_VERTEX_WEIGHT_SIZE; ++k)
+	//							{
+	//								if (format.m_vertexWeight.m_data[j].m_boneId[k] == hash)
+	//								{
+	//									fprintf(file, "%d ", j);
+	//								}
+	//							}
+	//						}
+	//						fprintf(file, "\t\t\t\n");
+	//
+	//						fprintf(file, "\t\t\tvertexWeight: ");
+	//						for (ndInt32 j = 0; j < weightsCount; ++j)
+	//						{
+	//							for (ndInt32 k = 0; k < ND_VERTEX_WEIGHT_SIZE; ++k)
+	//							{
+	//								if (format.m_vertexWeight.m_data[j].m_boneId[k] == hash)
+	//								{
+	//									fprintf(file, "%g ", format.m_vertexWeight.m_data[j].m_weight[k]);
+	//								}
+	//							}
+	//						}
+	//						fprintf(file, "\t\t\t\n");
+	//						
+	//						fprintf(file, "\t\t}\n");
+	//
+	//					}
+	//				}
+	//			}
+	//			
+	//			fprintf(file, "\t}\n");
+	//		}
+	//
+	//		fprintf(file, "}\n");
+	//		fprintf(file, "\n");
+	//	}
+	//
+	//	mesh->Save(file, meshEffects);
+	//	fclose(file);
+	//}
+
+	doc->SaveFile(fullPathName.GetStr());
+	setlocale(LC_ALL, oldloc.GetStr());
+}

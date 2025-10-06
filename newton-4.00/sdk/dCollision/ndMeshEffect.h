@@ -414,6 +414,7 @@ class ndMeshEffect: public ndPolyhedra
 			:m_ambient(ndFloat32(0.8f), ndFloat32(0.8f), ndFloat32(0.8f), ndFloat32(1.0f))
 			,m_diffuse(ndFloat32(0.8f), ndFloat32(0.8f), ndFloat32(0.8f), ndFloat32(1.0f))
 			,m_specular(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(1.0f))
+			,m_reflection(ndFloat32(0.5f), ndFloat32(0.5f), ndFloat32(0.5f), ndFloat32(1.0f))
 			,m_opacity(ndFloat32(1.0f))
 			,m_shiness(ndFloat32 (250.0f))
 		{
@@ -423,6 +424,7 @@ class ndMeshEffect: public ndPolyhedra
 		ndVector m_ambient;
 		ndVector m_diffuse;
 		ndVector m_specular;
+		ndVector m_reflection;
 		ndFloat32 m_opacity;
 		ndFloat32 m_shiness;
 		char m_textureName[32];

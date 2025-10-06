@@ -12,7 +12,8 @@
 #ifndef _ND_MESH_LOADER_H_
 #define _ND_MESH_LOADER_H_
 
-class ndDemoEntityManager;
+//class ndDemoEntityManager;
+#include "ndFbxMeshLoader.h"
 
 class ndMeshLoader: public ndFbxMeshLoader
 {

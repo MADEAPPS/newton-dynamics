@@ -26,6 +26,7 @@
 #include <ofbx.h>
 #include <VHACD.h>
 #include <ndNewton.h>
+#include <ndRenderInc.h>
 
 #endif 
 

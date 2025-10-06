@@ -10,7 +10,6 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndMeshLoader.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"

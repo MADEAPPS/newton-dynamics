@@ -10,7 +10,6 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndMeshLoader.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
@@ -309,9 +308,11 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 	ndSharedPtr<ndBody> bodyFloor(BuildCompoundScene(scene, ndGetIdentityMatrix()));
 	//ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "marblecheckboard.png", 0.1f, true));
 	
-	
 	ndMeshLoader loader;
 	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("ragdoll.fbx"));
+
+	ndMeshFile exportFile;
+	exportFile.Export(*loader.m_mesh, ndGetWorkingFileName("xxx.nd"));
 	
 	class PlaceMatrix : public ndMatrix
 	{

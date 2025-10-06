@@ -99,8 +99,8 @@ class ndBodyKinematic : public ndBody
 	D_COLLISION_API ndVector GetGyroTorque() const;
 
 	D_COLLISION_API bool GetSleepState() const;
-	D_COLLISION_API void RestoreSleepState(bool state);
 	D_COLLISION_API void SetSleepState(bool state);
+	D_COLLISION_API void RestoreSleepState(bool state);
 
 	D_COLLISION_API bool GetAutoSleep() const;
 	D_COLLISION_API void SetAutoSleep(bool state);
