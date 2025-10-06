@@ -404,6 +404,7 @@ void ndRenderPrimitiveImplement::BuildRenderMeshFromCollisionShape(const ndRende
 		segment.m_material.m_diffuse = material.m_diffuse;
 		segment.m_material.m_opacity = material.m_opacity;
 		segment.m_material.m_specular = material.m_specular;
+		segment.m_material.m_reflection = material.m_reflection;
 		segment.m_material.m_castShadows = material.m_castShadows;
 		segment.m_material.m_specularPower = material.m_specularPower;
 
@@ -1016,6 +1017,7 @@ void ndRenderPrimitiveImplement::BuildRenderInstanceMesh(const ndRenderPrimitive
 		segment.m_material.m_diffuse = material.m_diffuse;
 		segment.m_material.m_opacity = material.m_opacity;
 		segment.m_material.m_specular = material.m_specular;
+		segment.m_material.m_reflection = material.m_reflection;
 		segment.m_material.m_castShadows = material.m_castShadows;
 		segment.m_material.m_specularPower = material.m_specularPower;
 
