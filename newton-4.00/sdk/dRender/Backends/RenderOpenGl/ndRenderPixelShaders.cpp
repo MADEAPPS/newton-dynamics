@@ -210,7 +210,13 @@ R""""(
 		{
 			vec4 pointInDepthMapSpace = directionaLightViewProjectionMatrix[index] * worldPosit;
 
-			pointInDepthMapSpace.z = clamp (pointInDepthMapSpace.z, 0.0, 1.0);
+			// this chek will never work for all cacade maps because 
+			// each mapp represent a diffrent resoltions. 
+			// To fix this the code need to pass an array of zbiaz for each shadowmap
+			pointInDepthMapSpace.z = pointInDepthMapSpace.z - 0.004f;
+
+			//pointInDepthMapSpace.z = clamp (pointInDepthMapSpace.z, 0.0, 1.0);
+
 			float textDepth = texture(shadowMapTexture, vec2(pointInDepthMapSpace)).x;
 			if (textDepth < pointInDepthMapSpace.z)
 			{
