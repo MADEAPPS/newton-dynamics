@@ -646,7 +646,6 @@ void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::Render(const ndRenderPrim
 			glUniform1fv(m_specularAlpha, 1, &material->m_specularPower);
 
 			glBindTexture(GL_TEXTURE_2D, image->m_texture);
-			//glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
 			glDrawElementsInstanced(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)), GLsizei(self->m_instanceMatrixArray.GetCount()));
 		}
 	}
