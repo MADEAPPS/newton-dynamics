@@ -135,6 +135,7 @@ class ndRenderShaderOpaqueDiffusedShadowColorBlock : public ndRenderShaderOpaque
 
 	GLint m_worldMatrix;
 	GLint m_shadowSlices;
+	GLint m_cameraToWorld;
 	GLint m_depthMapTexture;
 	GLint m_directionLightViewProjectionMatrixShadow;
 };

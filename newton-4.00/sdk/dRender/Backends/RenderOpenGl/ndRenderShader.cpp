@@ -190,7 +190,6 @@ void ndRenderShaderDebugFlatShadedDiffusedBlock::SetParameters(GLuint shader)
 
 void ndRenderShaderDebugFlatShadedDiffusedBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	//const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
 	const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
 	
 	const ndMatrix viewMatrix(camera->m_invViewMatrix);
@@ -238,7 +237,6 @@ void ndRenderShaderDebugFlatShadedDiffusedBlock::Render(const ndRenderPrimitiveI
 // *********************************************************************
 void ndRenderShaderDebugWireframeDiffuseBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	//const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
 	const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
 	
 	const ndMatrix viewMatrix(camera->m_invViewMatrix);
@@ -302,7 +300,6 @@ void ndRenderShaderOpaqueDiffusedColorBlock::SetParameters(GLuint shader)
 
 void ndRenderShaderOpaqueDiffusedColorBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	//const ndSharedPtr<ndRenderSceneCamera>& camera = render->GetCamera();
 	const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
 
 	glUseProgram(m_shader);
@@ -377,6 +374,7 @@ void ndRenderShaderOpaqueDiffusedShadowColorBlock::SetParameters(GLuint shader)
 {
 	ndRenderShaderOpaqueDiffusedColorBlock::SetParameters(shader);
 	m_shadowSlices = glGetUniformLocation(m_shader, "shadowSlices");
+	m_cameraToWorld = glGetUniformLocation(m_shader, "cameraToWorld");
 	m_worldMatrix = glGetUniformLocation(m_shader, "modelWorldMatrix");
 	m_depthMapTexture = glGetUniformLocation(m_shader, "shadowMapTexture");
 	m_directionLightViewProjectionMatrixShadow = glGetUniformLocation(m_shader, "directionaLightViewProjectionMatrix");
@@ -391,6 +389,7 @@ void ndRenderShaderOpaqueDiffusedShadowColorBlock::Render(const ndRenderPrimitiv
 	
 	const glMatrix worldMatrix(modelMatrix);
 	const glMatrix glViewModelMatrix(modelViewMatrix);
+	const glMatrix glCameraToWorld(viewMatrix.OrthoInverse());
 	const glMatrix glProjectionMatrix(camera->m_projectionMatrix);
 	
 	const glVector4 glSunlightAmbient(render->m_sunLightAmbient);
@@ -417,6 +416,7 @@ void ndRenderShaderOpaqueDiffusedShadowColorBlock::Render(const ndRenderPrimitiv
 	}
 	glUniform1i(m_depthMapTexture, 1);
 	glUniformMatrix4fv(m_worldMatrix, 1, GL_FALSE, &worldMatrix[0][0]);
+	glUniformMatrix4fv(m_cameraToWorld, 1, false, &glCameraToWorld[0][0]);
 	glUniformMatrix4fv(m_directionLightViewProjectionMatrixShadow, 4, GL_FALSE, &lightViewProjectMatrix[0][0][0]);
 	glUniform4fv(m_shadowSlices, 1, &cameraSpaceSplits[0]);
 	
