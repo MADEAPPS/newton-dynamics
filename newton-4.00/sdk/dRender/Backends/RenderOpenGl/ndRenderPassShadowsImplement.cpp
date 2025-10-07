@@ -20,8 +20,8 @@
 
 #define ND_SHADOW_MAP_RESOLUTION	(1024 * 4)
 #define ND_MAX_FAR_PLANE			ndFloat32 (50.0f)
+//#define ND_MAX_FAR_PLANE			ndFloat32 (200.0f)
 #define ND_MIN_NEAR_PLANE			ndFloat32 (0.1f)
-
 
 ndRenderPassShadowsImplement::ndRenderPassShadowsImplement(ndRenderContext* const context)
 	:ndClassAlloc()
@@ -37,7 +37,7 @@ ndRenderPassShadowsImplement::ndRenderPassShadowsImplement(ndRenderContext* cons
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
 	
-	// Create the depth buffer textures, onle one 4 x 4 tile
+	// Create the depth buffer textures, only one 4 x 4 tile
 	glGenTextures(1, &m_shadowMapTexture);
 	glBindTexture(GL_TEXTURE_2D, m_shadowMapTexture);
 	
@@ -190,11 +190,11 @@ void ndRenderPassShadowsImplement::RenderScene(const ndRenderSceneCamera* const 
 	glDepthFunc(GL_LEQUAL);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	////glPolygonOffset(GLfloat(1.0f), GLfloat(1024.0f * 8.0f));
-	//glPolygonOffset(GLfloat(1.0f), GLfloat(1024.0f * 32.0f));
-	////glPolygonOffset(GLfloat(100.0f), GLfloat(128.0f));
-	//glEnable(GL_POLYGON_OFFSET_FILL);
-
+	//glFrontFace(GL_CW);
+	glEnable(GL_POLYGON_OFFSET_FILL);
+	//glPolygonOffset(GLfloat(1.0f), GLfloat(1024.0f * 8.0f));
+	glPolygonOffset(GLfloat(1.0f), GLfloat(1024.0f * 32.0f));
+	
 	UpdateCascadeSplits(camera);
 	
 	ndMatrix tileMatrix(ndGetIdentityMatrix());
@@ -239,7 +239,8 @@ void ndRenderPassShadowsImplement::RenderScene(const ndRenderSceneCamera* const 
 	// render instance primitives, fucking big mistake
 	RenderPrimitive(m_m_generateInstanceShadowMaps);
 
-	//glDisable(GL_POLYGON_OFFSET_FILL);
+	//glFrontFace(GL_CCW);
+	glDisable(GL_POLYGON_OFFSET_FILL);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	m_context->SetViewport(m_context->GetWidth(), m_context->GetHeight());
 }
