@@ -1395,7 +1395,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 	for (ndInt32 i = 0; i < ndInt32(passes); ++i)
 	{
 		const ndInt32 jointCount = ndInt32(jointArray.GetCount());
-		scene->ParallelExecute(CalculateJointsForce, jointCount, scene->OptimalGroupBatch(jointCount));
+		scene->ParallelExecute(CalculateJointsForce, jointCount, scene->OptimalGroupBatch(jointCount) / 2);
 
 		const ndInt32 bodyCount = ndInt32(bodyArray.GetCount());
 		scene->ParallelExecute(ApplyJacobianAccumulatePartialForces, bodyCount, scene->OptimalGroupBatch(bodyCount));

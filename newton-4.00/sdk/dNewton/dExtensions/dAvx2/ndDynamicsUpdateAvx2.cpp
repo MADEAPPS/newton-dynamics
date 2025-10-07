@@ -2148,7 +2148,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 		const ndInt32 mask = -ndInt32(D_AVX_WORK_GROUP);
 		const ndInt32 jointCount = ndInt32(jointArray.GetCount());
 		const ndInt32 soaJointCount = ((jointCount + D_AVX_WORK_GROUP - 1) & mask) / D_AVX_WORK_GROUP;
-		scene->ParallelExecute(CalculateJointsForce, soaJointCount, scene->OptimalGroupBatch(soaJointCount) / 4);
+		scene->ParallelExecute(CalculateJointsForce, soaJointCount, scene->OptimalGroupBatch(soaJointCount) / 8);
 
 		const ndInt32 bodyCount = ndInt32(bodyArray.GetCount());
 		scene->ParallelExecute(ApplyJacobianAccumulatePartialForces, bodyCount, scene->OptimalGroupBatch(bodyCount));
