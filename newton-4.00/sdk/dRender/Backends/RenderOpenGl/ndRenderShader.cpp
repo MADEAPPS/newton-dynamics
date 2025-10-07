@@ -292,10 +292,11 @@ void ndRenderShaderOpaqueDiffusedColorBlock::SetParameters(GLuint shader)
 {
 	ndRenderShaderDebugFlatShadedDiffusedBlock::SetParameters(shader);
 	m_texture = glGetUniformLocation(m_shader, "texture0");
-	m_environmentMap = glGetUniformLocation(m_shader, "environmentMap");
 	m_specularColor = glGetUniformLocation(m_shader, "specularColor");
-	m_reflectionColor = glGetUniformLocation(m_shader, "reflectionColor");
+	m_cameraToWorld = glGetUniformLocation(m_shader, "cameraToWorld");
 	m_specularAlpha = glGetUniformLocation(m_shader, "specularAlpha");
+	m_environmentMap = glGetUniformLocation(m_shader, "environmentMap");
+	m_reflectionColor = glGetUniformLocation(m_shader, "reflectionColor");
 }
 
 void ndRenderShaderOpaqueDiffusedColorBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
@@ -308,6 +309,7 @@ void ndRenderShaderOpaqueDiffusedColorBlock::Render(const ndRenderPrimitiveImple
 	const ndMatrix modelViewMatrix(modelMatrix * viewMatrix);
 
 	const glMatrix glViewModelMatrix(modelViewMatrix);
+	const glMatrix glCameraToWorld(viewMatrix.OrthoInverse());
 	const glMatrix glProjectionMatrix(camera->m_projectionMatrix);
 
 	const glVector4 glSunlightAmbient(render->m_sunLightAmbient);
@@ -319,6 +321,7 @@ void ndRenderShaderOpaqueDiffusedColorBlock::Render(const ndRenderPrimitiveImple
 	glUniform3fv(m_directionalLightIntesity, 1, &glSunlightIntensity[0]);
 
 	//glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &glViewModelMatrix[0][0]);
+	glUniformMatrix4fv(m_cameraToWorld, 1, false, &glCameraToWorld[0][0]);
 	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &glProjectionMatrix[0][0]);
 	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &glViewModelMatrix[0][0]);
 
@@ -374,7 +377,6 @@ void ndRenderShaderOpaqueDiffusedShadowColorBlock::SetParameters(GLuint shader)
 {
 	ndRenderShaderOpaqueDiffusedColorBlock::SetParameters(shader);
 	m_shadowSlices = glGetUniformLocation(m_shader, "shadowSlices");
-	m_cameraToWorld = glGetUniformLocation(m_shader, "cameraToWorld");
 	m_worldMatrix = glGetUniformLocation(m_shader, "modelWorldMatrix");
 	m_depthMapTexture = glGetUniformLocation(m_shader, "shadowMapTexture");
 	m_directionLightViewProjectionMatrixShadow = glGetUniformLocation(m_shader, "directionaLightViewProjectionMatrix");

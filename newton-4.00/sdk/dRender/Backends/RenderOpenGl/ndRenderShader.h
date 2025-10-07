@@ -115,9 +115,10 @@ class ndRenderShaderOpaqueDiffusedColorBlock : public ndRenderShaderDebugFlatSha
 	virtual void SetParameters(GLuint shader) override;
 
 	GLint m_texture;
-	GLint m_environmentMap;
+	GLint m_cameraToWorld;
 	GLint m_specularColor;
 	GLint m_specularAlpha;
+	GLint m_environmentMap;
 	GLint m_reflectionColor;
 };
 
@@ -135,7 +136,6 @@ class ndRenderShaderOpaqueDiffusedShadowColorBlock : public ndRenderShaderOpaque
 
 	GLint m_worldMatrix;
 	GLint m_shadowSlices;
-	GLint m_cameraToWorld;
 	GLint m_depthMapTexture;
 	GLint m_directionLightViewProjectionMatrixShadow;
 };

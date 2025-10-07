@@ -128,7 +128,6 @@ R""""(
 		vec4 reflectionDir = vec4(normalDir * (2.0 * dot(cameraDir, normalDir)) - cameraDir, 0.0f);
 		vec3 worldSpaceReflectionDir = vec3(cameraToWorld * reflectionDir);
 		vec3 reflection = directionalLightAmbient * reflectionColor * vec3(texture(environmentMap, worldSpaceReflectionDir));
-//reflection = vec3 (0, 0, 0);
 
 		// add all contributions
 		//vec3 color = vec3(1.0, 0.0, 0.0);
@@ -256,6 +255,7 @@ R""""(
 	layout(binding = 0) uniform sampler2D texture0;
 	layout(binding = 1) uniform samplerCube environmentMap;
 
+	uniform mat4 cameraToWorld;
 	uniform vec3 diffuseColor;
 	uniform vec3 specularColor;
 	uniform vec3 reflectionColor;
@@ -293,9 +293,11 @@ R""""(
 		vec3 specular = specularColor * directionalLightIntesity * specularReflection;
 
 		// calculate reflection	
-		vec3 reflectionDir = normalDir * (2.0 * dot(cameraDir, normalDir)) - cameraDir;
-		vec3 reflection = reflectionColor * vec3(texture(environmentMap, reflectionDir));
-reflection = vec3 (0, 0, 0);
+		//vec3 reflectionDir = normalDir * (2.0 * dot(cameraDir, normalDir)) - cameraDir;
+		//vec3 reflection = reflectionColor * vec3(texture(environmentMap, reflectionDir));
+		vec4 reflectionDir = vec4(normalDir * (2.0 * dot(cameraDir, normalDir)) - cameraDir, 0.0f);
+		vec3 worldSpaceReflectionDir = vec3(cameraToWorld * reflectionDir);
+		vec3 reflection = directionalLightAmbient * reflectionColor * vec3(texture(environmentMap, worldSpaceReflectionDir));
 
 		// add all contributions
 		vec3 color = reflection + (emissive + diffuse + specular) * vec3 (texture(texture0, uv));
