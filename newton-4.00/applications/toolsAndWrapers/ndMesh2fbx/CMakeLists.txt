@@ -5,7 +5,7 @@ set (projectName "ndMesh2fbx")
 
 #C:\Program Files\Autodesk\FBX\FBX SDK\2020.2.1\lib\vs2019\x64\debug
 #set (libraryPath "$ENV{FBX_SDK}/Lib/vs2017/$(Platform)/$(Configuration)/")
-set (libraryPath "$ENV{FBX_SDK}/Lib/vs2019/$(Platform)/$(Configuration)/")
+set (libraryPath "$ENV{FBX_SDK}/Lib/$(Platform)/$(Configuration)/")
 
 message ("fbx lib path: ${libraryPath}")
 
