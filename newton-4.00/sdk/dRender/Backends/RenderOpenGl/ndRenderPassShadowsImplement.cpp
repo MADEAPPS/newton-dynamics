@@ -189,12 +189,8 @@ void ndRenderPassShadowsImplement::RenderScene(const ndRenderSceneCamera* const 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 	glClear(GL_DEPTH_BUFFER_BIT);
-
-	//glFrontFace(GL_CW);
 	glEnable(GL_POLYGON_OFFSET_FILL);
-	//glPolygonOffset(GLfloat(1.0f), GLfloat(1024.0f * 8.0f));
-	glPolygonOffset(GLfloat(1.0f), GLfloat(1024.0f * 32.0f));
-	
+
 	UpdateCascadeSplits(camera);
 	
 	ndMatrix tileMatrix(ndGetIdentityMatrix());
@@ -205,9 +201,10 @@ void ndRenderPassShadowsImplement::RenderScene(const ndRenderSceneCamera* const 
 	const ndMatrix& cameraProjection = camera->m_projectionMatrix;
 	
 	ndRender* const owner = m_context->m_owner;
-
+	
 	auto RenderPrimitive = [this, &owner, camera, &cameraTestPoint, &cameraProjection, &tileMatrix](ndRenderPassMode modepass)
 	{
+		ndReal zbias = ndReal(1024.0f * 1.0f);
 		const ndList<ndSharedPtr<ndRenderSceneNode>>& scene = owner->m_scene;
 		for (ndInt32 i = 0; i < 4; i++)
 		{
@@ -225,11 +222,13 @@ void ndRenderPassShadowsImplement::RenderScene(const ndRenderSceneCamera* const 
 			m_lighProjectionMatrix[i] = lightSpaceMatrix * m_lightProjectToTextureSpace * tileMatrix;
 
 			glViewport(vp_x, vp_y, m_width, m_height);
+			glPolygonOffset(GLfloat(1.0f), GLfloat(zbias));
 			for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = scene.GetFirst(); node; node = node->GetNext())
 			{
 				ndRenderSceneNode* const sceneNode = *node->GetInfo();
 				sceneNode->Render(owner, lightSpaceMatrix, modepass);
 			}
+			zbias *= ndReal(2.0f);
 		}
 	};
 
@@ -239,7 +238,6 @@ void ndRenderPassShadowsImplement::RenderScene(const ndRenderSceneCamera* const 
 	// render instance primitives, fucking big mistake
 	RenderPrimitive(m_m_generateInstanceShadowMaps);
 
-	//glFrontFace(GL_CCW);
 	glDisable(GL_POLYGON_OFFSET_FILL);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	m_context->SetViewport(m_context->GetWidth(), m_context->GetHeight());

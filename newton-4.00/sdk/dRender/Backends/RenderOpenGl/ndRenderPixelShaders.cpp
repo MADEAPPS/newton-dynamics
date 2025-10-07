@@ -214,16 +214,18 @@ R""""(
 			if (textDepth < pointInDepthMapSpace.z)
 			{
 				color = vec3(0.0f, 0.0f, 0.0f);
-				// uncomment this to see the shadows sections
-				//if (index < 3)
-				//{
-				//	color[index] = 1.0f;
-				//}
-				//else
-				//{
-				//	color[0] = 1.0f;
-				//	color[1] = 1.0f;
-				//}
+				// enable this to show the shadows sections
+				#if 0
+					if (index < 3)
+					{
+						color[index] = 1.0f;
+					}
+					else
+					{
+						color[0] = 1.0f;
+						color[1] = 1.0f;
+					}
+				#endif
 			}
 		}
 		// calculate reflection	

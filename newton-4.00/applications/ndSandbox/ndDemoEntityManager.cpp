@@ -21,7 +21,7 @@
 #include "ndDemoCameraNodeFlyby.h"
 #include "ndDebugDisplayRenderPass.h"
 
-//#define DEFAULT_SCENE	0		// basic rigidbody
+#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// basic Stacks 
 //#define DEFAULT_SCENE	2		// basic friction
 //#define DEFAULT_SCENE	3		// basic sliding platform
@@ -34,7 +34,7 @@
 //#define DEFAULT_SCENE	10		// basic compound shapes
 //#define DEFAULT_SCENE	11		// basic model, a npd vehicle prop
 //#define DEFAULT_SCENE	12		// basics mutibody vehicle
-#define DEFAULT_SCENE	13		// basic ragdoll
+//#define DEFAULT_SCENE	13		// basic ragdoll
 //#define DEFAULT_SCENE	14		// object Placement
 //#define DEFAULT_SCENE	15		// third person player capsule
 
