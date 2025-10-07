@@ -204,7 +204,7 @@ void ndRenderPassShadowsImplement::RenderScene(const ndRenderSceneCamera* const 
 	
 	auto RenderPrimitive = [this, &owner, camera, &cameraTestPoint, &cameraProjection, &tileMatrix](ndRenderPassMode modepass)
 	{
-		ndReal zbias = ndReal(1024.0f * 1.0f);
+		ndVector zBiasUnits(ndFloat32(1024.0f * 64.0f), ndFloat32(1024.0f * 64.0f), ndFloat32(1024.0f * 40.0f), ndFloat32(1024.0f * 16.0f));
 		const ndList<ndSharedPtr<ndRenderSceneNode>>& scene = owner->m_scene;
 		for (ndInt32 i = 0; i < 4; i++)
 		{
@@ -222,13 +222,13 @@ void ndRenderPassShadowsImplement::RenderScene(const ndRenderSceneCamera* const 
 			m_lighProjectionMatrix[i] = lightSpaceMatrix * m_lightProjectToTextureSpace * tileMatrix;
 
 			glViewport(vp_x, vp_y, m_width, m_height);
-			glPolygonOffset(GLfloat(1.0f), GLfloat(zbias));
+			glPolygonOffset(GLfloat(1.0f), GLfloat(zBiasUnits[i]));
 			for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = scene.GetFirst(); node; node = node->GetNext())
 			{
 				ndRenderSceneNode* const sceneNode = *node->GetInfo();
+				//if (i == 1)
 				sceneNode->Render(owner, lightSpaceMatrix, modepass);
 			}
-			zbias *= ndReal(2.0f);
 		}
 	};
 
