@@ -579,6 +579,7 @@ void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::Render(const ndRenderPrim
 
 	const glMatrix worldMatrix(modelMatrix);
 	const glMatrix glViewModelMatrix(modelViewMatrix);
+	const glMatrix glCameraToWorld(viewMatrix.OrthoInverse());
 	const glMatrix glProjectionMatrix(camera->m_projectionMatrix);
 
 	const glVector4 glSunlightAmbient(render->m_sunLightAmbient);
@@ -598,6 +599,7 @@ void ndRenderShaderInstancedOpaqueDiffusedShadowBlock::Render(const ndRenderPrim
 	glUniform3fv(m_directionalLightIntesity, 1, &glSunlightIntensity[0]);
 
 	//glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &glViewModelMatrix[0][0]);
+	glUniformMatrix4fv(m_cameraToWorld, 1, false, &glCameraToWorld[0][0]);
 	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &glProjectionMatrix[0][0]);
 	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &glViewModelMatrix[0][0]);
 

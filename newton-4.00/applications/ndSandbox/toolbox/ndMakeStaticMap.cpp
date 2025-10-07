@@ -257,9 +257,10 @@ static void BuildPlaygroundHangingBridge(ndDemoEntityManager* const scene, const
 	ndRenderPrimitive::ndDescriptor descriptor(render);
 	descriptor.m_collision = shape;
 	descriptor.m_mapping = ndRenderPrimitive::m_box;
-	ndRenderPrimitiveMaterial& material = descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_1.png")));
-	material.m_specular = ndVector::m_zero;
-	material.m_reflection = ndVector::m_zero;
+	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_1.png")));
+	//ndRenderPrimitiveMaterial& material = descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_1.png")));
+	//material.m_specular = ndVector::m_zero;
+	//material.m_reflection = ndVector::m_zero;
 
 	ndSharedPtr<ndRenderSceneNode> bridgeMesh(new ndRenderSceneNodeInstance(startMatrix, descriptor));
 	scene->AddEntity(bridgeMesh);

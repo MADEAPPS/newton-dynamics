@@ -231,9 +231,8 @@ R""""(
 				#endif
 			}
 		}
+
 		// calculate reflection	
-		//vec3 reflectionDir = normalDir * (2.0 * dot(cameraDir, normalDir)) - cameraDir;
-		//vec3 reflection = directionalLightAmbient * reflectionColor * vec3(texture(environmentMap, reflectionDir));
 		vec4 reflectionDir = vec4(normalDir * (2.0 * dot(cameraDir, normalDir)) - cameraDir, 0.0f);
 		vec3 worldSpaceReflectionDir = vec3(cameraToWorld * reflectionDir);
 		vec3 reflection = directionalLightAmbient * reflectionColor * vec3(texture(environmentMap, worldSpaceReflectionDir));
@@ -293,8 +292,6 @@ R""""(
 		vec3 specular = specularColor * directionalLightIntesity * specularReflection;
 
 		// calculate reflection	
-		//vec3 reflectionDir = normalDir * (2.0 * dot(cameraDir, normalDir)) - cameraDir;
-		//vec3 reflection = reflectionColor * vec3(texture(environmentMap, reflectionDir));
 		vec4 reflectionDir = vec4(normalDir * (2.0 * dot(cameraDir, normalDir)) - cameraDir, 0.0f);
 		vec3 worldSpaceReflectionDir = vec3(cameraToWorld * reflectionDir);
 		vec3 reflection = directionalLightAmbient * reflectionColor * vec3(texture(environmentMap, worldSpaceReflectionDir));
