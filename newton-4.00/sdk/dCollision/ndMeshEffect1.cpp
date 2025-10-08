@@ -4892,3 +4892,248 @@ void ndMeshEffect::FlipWinding()
 	}
 	ndPolyhedra::EndFace();
 }
+
+
+void ndMeshEffect::SerializeToXml(nd::TiXmlElement* const xmlNode) const
+{
+
+//
+//	if (format.m_vertexWeight.m_data)
+//	{
+//		ndInt32 weightsCount = 0;
+//		for (ndInt32 i = 0; i < vertexCount; ++i)
+//		{
+//			weightsCount = ndMax(weightsCount, format.m_vertexWeight.m_indexList[i] + 1);
+//		}
+//
+//		for (ndMesh* node = mesh->GetFirstIterator(); node; node = node->GetNextIterator())
+//		{
+//			ndInt32 count = 0;
+//			ndInt32 hash = ndInt32(ndCRC64(node->m_name.GetStr()) & 0xffffffff);
+//			ndAssert(hash);
+//			for (ndInt32 j = 0; j < weightsCount; ++j)
+//			{
+//				for (ndInt32 k = 0; k < ND_VERTEX_WEIGHT_SIZE; ++k)
+//				{
+//					count += (format.m_vertexWeight.m_data[j].m_boneId[k] == hash) ? 1 : 0;
+//				}
+//			}
+//			if (count)
+//			{
+//				fprintf(file, "\t\tvertexWeightsCluster: %s\n", node->m_name.GetStr());
+//				fprintf(file, "\t\t{\n");
+//				
+//				fprintf(file, "\t\t\tindexCount: %d\n", count);
+//				
+//				fprintf(file, "\t\t\tvertexIndex: ");
+//				for (ndInt32 j = 0; j < weightsCount; ++j)
+//				{
+//					for (ndInt32 k = 0; k < ND_VERTEX_WEIGHT_SIZE; ++k)
+//					{
+//						if (format.m_vertexWeight.m_data[j].m_boneId[k] == hash)
+//						{
+//							fprintf(file, "%d ", j);
+//						}
+//					}
+//				}
+//				fprintf(file, "\t\t\t\n");
+//
+//				fprintf(file, "\t\t\tvertexWeight: ");
+//				for (ndInt32 j = 0; j < weightsCount; ++j)
+//				{
+//					for (ndInt32 k = 0; k < ND_VERTEX_WEIGHT_SIZE; ++k)
+//					{
+//						if (format.m_vertexWeight.m_data[j].m_boneId[k] == hash)
+//						{
+//							fprintf(file, "%g ", format.m_vertexWeight.m_data[j].m_weight[k]);
+//						}
+//					}
+//				}
+//				fprintf(file, "\t\t\t\n");
+//				
+//				fprintf(file, "\t\t}\n");
+//
+//			}
+//		}
+//	}
+
+	auto PrintVertexChannel = [xmlNode](const ndMeshVertexFormat::ndData<ndFloat64>& channel, ndInt32 vertexCount)
+	{
+		nd::TiXmlElement* const node = new nd::TiXmlElement("vertices");
+		xmlNode->LinkEndChild(node);
+	
+		ndInt32 positCount = 0;
+		for (ndInt32 i = 0; i < vertexCount; ++i)
+		{
+			positCount = ndMax(positCount, channel.m_indexList[i] + 1);
+		}
+	
+		ndInt32 stride = channel.m_strideInBytes / ndInt32(sizeof(ndFloat64));
+
+		ndArray<ndVector> positions;
+		for (ndInt32 i = 0; i < positCount; ++i)
+		{
+			ndFloat64 x;
+			ndFloat64 y;
+			ndFloat64 z;
+			x = channel.m_data[i * stride + 0];
+			y = channel.m_data[i * stride + 1];
+			z = channel.m_data[i * stride + 2];
+			positions.PushBack(ndVector(x, y, z, ndFloat64(1.0f)));
+		}
+		xmlSaveParam(node, "positions", positions);
+
+		ndArray<ndInt32> indices;
+		for (ndInt32 i = 0; i < vertexCount; ++i)
+		{
+			indices.PushBack(ndInt32(channel.m_indexList[i]));
+		}
+		xmlSaveParam(node, "indices", indices);
+	};
+	
+	auto PrintNormalChannel = [xmlNode](const ndMeshVertexFormat::ndData<ndReal>& channel, ndInt32 vertexCount)
+	{
+		nd::TiXmlElement* const node = new nd::TiXmlElement("normal");
+		xmlNode->LinkEndChild(node);
+
+		ndInt32 positCount = 0;
+		for (ndInt32 i = 0; i < vertexCount; ++i)
+		{
+			positCount = ndMax(positCount, channel.m_indexList[i] + 1);
+		}
+	
+		ndArray<ndVector> positions;
+		ndInt32 stride = channel.m_strideInBytes / ndInt32(sizeof(ndReal));
+		for (ndInt32 i = 0; i < positCount; ++i)
+		{
+			ndReal x;
+			ndReal y;
+			ndReal z;
+			x = channel.m_data[i * stride + 0];
+			y = channel.m_data[i * stride + 1];
+			z = channel.m_data[i * stride + 2];
+			positions.PushBack(ndVector(x, y, z, ndReal(0.0f)));
+		}
+		xmlSaveParam(node, "normal", positions);
+	
+		ndArray<ndInt32> indices;
+		for (ndInt32 i = 0; i < vertexCount; ++i)
+		{
+			indices.PushBack(ndInt32(channel.m_indexList[i]));
+		}
+		xmlSaveParam(node, "indices", indices);
+	};
+
+	auto PrintUVChannel = [xmlNode](const ndMeshVertexFormat::ndData<ndReal>& channel, ndInt32 vertexCount)
+	{
+		nd::TiXmlElement* const node = new nd::TiXmlElement("uvs");
+		xmlNode->LinkEndChild(node);
+
+		ndInt32 positCount = 0;
+		for (ndInt32 i = 0; i < vertexCount; ++i)
+		{
+			positCount = ndMax(positCount, channel.m_indexList[i] + 1);
+		}
+	
+		ndInt32 stride = channel.m_strideInBytes / ndInt32(sizeof(ndReal));
+		ndArray<ndVector> positions;
+		for (ndInt32 i = 0; i < positCount; ++i)
+		{
+			ndReal x;
+			ndReal y;
+			x = channel.m_data[i * stride + 0];
+			y = channel.m_data[i * stride + 1];
+			positions.PushBack(ndVector(x, y, ndReal(0.0f), ndReal(0.0f)));
+		}
+		xmlSaveParam(node, "uv", positions);
+
+		ndArray<ndInt32> indices;
+		for (ndInt32 i = 0; i < vertexCount; ++i)
+		{
+			indices.PushBack(ndInt32(channel.m_indexList[i]));
+		}
+		xmlSaveParam(node, "indices", indices);
+	};
+
+	ndMeshVertexFormat format;
+	ndArray<ndUnsigned8> tmpBuffer;
+	ndInt32 vertexCount = GenerateVertexFormat(format, tmpBuffer);
+
+	PrintVertexChannel(format.m_vertex, vertexCount);
+	if (format.m_normal.m_data)
+	{
+		PrintNormalChannel(format.m_normal, vertexCount);
+	}
+	if (format.m_uv0.m_data)
+	{
+		PrintUVChannel(format.m_uv0, vertexCount);
+	}
+	if (format.m_vertexWeight.m_data)
+	{
+		ndAssert(0);
+	}
+
+	const ndArray<ndMeshEffect::ndMaterial>& materialArray = GetMaterials();
+	ndArray<ndInt32> faceIndexCount;
+	for (ndInt32 i = 0; i < materialArray.GetCount(); ++i)
+	{
+		nd::TiXmlElement* const materialNode = new nd::TiXmlElement("material");
+		xmlNode->LinkEndChild(materialNode);
+
+		const ndMeshEffect::ndMaterial& material = materialArray[i];
+		xmlSaveParam(materialNode, "texture", material.m_textureName);
+		xmlSaveParam(materialNode, "ambient", material.m_ambient);
+		xmlSaveParam(materialNode, "diffuse", material.m_diffuse);
+		xmlSaveParam(materialNode, "specular", material.m_specular);
+		xmlSaveParam(materialNode, "reflection", material.m_reflection);
+		xmlSaveParam(materialNode, "opacity", material.m_opacity);
+		xmlSaveParam(materialNode, "shiness", material.m_shiness);
+
+		ndInt32 faceCount = 0;
+		for (ndInt32 j = 0; j < format.m_faceCount; ++j)
+		{
+			if (format.m_faceMaterial[j] == i)
+			{
+				faceCount++;
+			}
+		}
+	
+		ndInt32 indexAcc = 0;
+//		fprintf(file, "\t\t\tfacesVertexCount: %d\n", faceCount);
+//		fprintf(file, "\t\t\t{\n");
+//		fprintf(file, "\t\t\t\t");
+		faceIndexCount.SetCount(0);
+		for (ndInt32 j = 0; j < format.m_faceCount; ++j)
+		{
+			if (format.m_faceMaterial[j] == i)
+			{
+//				fprintf(file, "%d ", format.m_faceIndexCount[j]);
+				faceIndexCount.PushBack(format.m_faceIndexCount[j]);
+				indexAcc += format.m_faceIndexCount[j];
+			}
+		}
+		indexAcc *= 1;
+//		fprintf(file, "\n");
+//		fprintf(file, "\t\t\t}\n");
+//
+//		fprintf(file, "\t\t\tfacesIndexList: %d\n", indexAcc);
+//		fprintf(file, "\t\t\t{\n");
+//		fprintf(file, "\t\t\t\t");
+//		indexAcc = 0;
+//		for (ndInt32 j = 0; j < format.m_faceCount; ++j)
+//		{
+//			if (format.m_faceMaterial[j] == i)
+//			{
+//				for (ndInt32 k = 0; k < format.m_faceIndexCount[j]; ++k)
+//				{
+//					fprintf(file, "%d ", indexAcc + k);
+//				}
+//			}
+//			indexAcc += format.m_faceIndexCount[j];
+//		}
+//		fprintf(file, "\n");
+//		fprintf(file, "\t\t\t}\n");
+//		fprintf(file, "\t\t}\n");
+	}
+
+}

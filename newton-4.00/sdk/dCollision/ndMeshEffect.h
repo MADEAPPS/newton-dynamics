@@ -500,6 +500,7 @@ class ndMeshEffect: public ndPolyhedra
 	D_COLLISION_API const ndString& GetName() const;
 
 	D_COLLISION_API ndArray<ndMaterial>& GetMaterials();
+	D_COLLISION_API const ndArray<ndMaterial>& GetMaterials() const;
 	D_COLLISION_API ndInt32 GetPropertiesCount() const;
 
 	D_COLLISION_API ndInt32 GetVertexCount() const;
@@ -572,6 +573,8 @@ class ndMeshEffect: public ndPolyhedra
 	D_COLLISION_API ndMeshEffect* ConvexMeshIntersection(const ndMeshEffect* const convexMesh) const;
 	D_COLLISION_API ndMeshEffect* InverseConvexMeshIntersection(const ndMeshEffect* const convexMesh) const;
 	D_COLLISION_API ndMeshEffect* CreateVoronoiConvexDecomposition(const ndArray<ndVector>& pointCloud, ndInt32 interiorMaterialIndex, const ndMatrix& textureProjectionMatrix);
+
+	D_COLLISION_API void SerializeToXml(nd::TiXmlElement* const xmlNode) const;
 
 	protected:
 	D_COLLISION_API void Init();
@@ -828,6 +831,11 @@ inline const ndString& ndMeshEffect::GetName() const
 }
 
 inline ndArray<ndMeshEffect::ndMaterial>& ndMeshEffect::GetMaterials()
+{
+	return m_materials;
+}
+
+inline const ndArray<ndMeshEffect::ndMaterial>& ndMeshEffect::GetMaterials() const
 {
 	return m_materials;
 }
