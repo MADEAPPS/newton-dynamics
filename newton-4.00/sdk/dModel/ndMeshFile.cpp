@@ -513,53 +513,58 @@ ndMesh* ndMeshFile::Import(const ndString&)
 //	}
 //}
 
-void ndMeshFile::ExportMaterials(const ndTree<ndInt32, const ndMeshEffect*>& meshEffects, nd::TiXmlElement* const rootNode)
+//void ndMeshFile::ExportMaterial(nd::TiXmlElement* const parent, )
+//{
+//	nd::TiXmlElement* const materialNode = new nd::TiXmlElement("ndMeshMaterials");
+//	rootNode->LinkEndChild(materialNode);
+//
+//	ndTree<ndInt32, const ndMeshEffect*>::Iterator it(meshEffects);
+//	for (it.Begin(); it; it++)
+//	{
+//		 ndMeshEffect* const mesh = (ndMeshEffect*)it.GetKey();
+//		//ndString name(node->GetName() + "_");
+//		ndString name("xxxx_");
+//		const ndArray<ndMeshEffect::ndMaterial>& materialArray = mesh->GetMaterials();
+//		for (ndInt32 i = 0; i < materialArray.GetCount(); ++i)
+//		{
+//			nd::TiXmlElement* const materialLink = new nd::TiXmlElement("ndMeshMaterial");
+//			materialNode->LinkEndChild(materialLink);
+//			const ndMeshEffect::ndMaterial& material = materialArray[i];
+//
+//			ndString materialName(name + i);
+//			xmlSaveParam(materialLink, "name", materialName.GetStr());
+//			xmlSaveParam(materialLink, "texture", material.m_textureName);
+//			xmlSaveParam(materialLink, "ambient", material.m_ambient);
+//			xmlSaveParam(materialLink, "diffuse", material.m_diffuse);
+//			xmlSaveParam(materialLink, "specular", material.m_specular);
+//			xmlSaveParam(materialLink, "reflection", material.m_reflection);
+//			xmlSaveParam(materialLink, "opacity", material.m_opacity);
+//			xmlSaveParam(materialLink, "shiness", material.m_shiness);
+//		}
+//	}
+//}
+
+//void ndMeshFile::ExportMeshes(const ndTree<ndInt32, const ndMeshEffect*>& meshEffects, nd::TiXmlElement* const rootNode)
+//{
+//	nd::TiXmlElement* const materialNode = new nd::TiXmlElement("ndMeshes");
+//	rootNode->LinkEndChild(materialNode);
+//
+//	ndTree<ndInt32, const ndMeshEffect*>::Iterator it(meshEffects);
+//	for (it.Begin(); it; it++)
+//	{
+//		//ndMeshEffect* const mesh = (ndMeshEffect*)it.GetKey();
+//		//ndString name(node->GetName() + "_");
+//		ndString name("meshxxxx_");
+//
+//		nd::TiXmlElement* const meshLink = new nd::TiXmlElement("mesh");
+//		materialNode->LinkEndChild(meshLink);
+//		xmlSaveParam(meshLink, "name", name.GetStr());
+//	}
+//}
+
+void ndMeshFile::SameGeomtry(const ndMesh* const mesh, nd::TiXmlElement* const rootNode)
 {
-	nd::TiXmlElement* const materialNode = new nd::TiXmlElement("ndMeshMaterials");
-	rootNode->LinkEndChild(materialNode);
-
-	ndTree<ndInt32, const ndMeshEffect*>::Iterator it(meshEffects);
-	for (it.Begin(); it; it++)
-	{
-		 ndMeshEffect* const mesh = (ndMeshEffect*)it.GetKey();
-		//ndString name(node->GetName() + "_");
-		ndString name("xxxx_");
-		const ndArray<ndMeshEffect::ndMaterial>& materialArray = mesh->GetMaterials();
-		for (ndInt32 i = 0; i < materialArray.GetCount(); ++i)
-		{
-			nd::TiXmlElement* const materialLink = new nd::TiXmlElement("ndMeshMaterial");
-			materialNode->LinkEndChild(materialLink);
-			const ndMeshEffect::ndMaterial& material = materialArray[i];
-
-			ndString materialName(name + i);
-			xmlSaveParam(materialLink, "name", materialName.GetStr());
-			xmlSaveParam(materialLink, "texture", material.m_textureName);
-			xmlSaveParam(materialLink, "ambient", material.m_ambient);
-			xmlSaveParam(materialLink, "diffuse", material.m_diffuse);
-			xmlSaveParam(materialLink, "specular", material.m_specular);
-			xmlSaveParam(materialLink, "reflection", material.m_reflection);
-			xmlSaveParam(materialLink, "opacity", material.m_opacity);
-			xmlSaveParam(materialLink, "shiness", material.m_shiness);
-		}
-	}
-}
-
-void ndMeshFile::ExportMeshes(const ndTree<ndInt32, const ndMeshEffect*>& meshEffects, nd::TiXmlElement* const rootNode)
-{
-	nd::TiXmlElement* const materialNode = new nd::TiXmlElement("ndMeshes");
-	rootNode->LinkEndChild(materialNode);
-
-	ndTree<ndInt32, const ndMeshEffect*>::Iterator it(meshEffects);
-	for (it.Begin(); it; it++)
-	{
-		//ndMeshEffect* const mesh = (ndMeshEffect*)it.GetKey();
-		//ndString name(node->GetName() + "_");
-		ndString name("meshxxxx_");
-
-		nd::TiXmlElement* const meshLink = new nd::TiXmlElement("mesh");
-		materialNode->LinkEndChild(meshLink);
-		xmlSaveParam(meshLink, "name", name.GetStr());
-	}
+	//ndAssert(0);
 }
 
 //void ndMeshFile::Export(const ndMesh* const mesh, const char* const fullPathName)
@@ -570,21 +575,18 @@ void ndMeshFile::Export(const ndMesh* const mesh, const ndString& fullPathName)
 	doc->LinkEndChild(decl);
 	ndString oldloc(setlocale(LC_ALL, 0));
 
-	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndMesh");
-	doc->LinkEndChild(rootNode);
-
 	// find all meshes
-	ndTree<ndInt32, const ndMeshEffect*> meshEffects;
-	for (ndMesh* node = ((ndMesh*)mesh)->IteratorFirst(); node; node = node->IteratorNext())
-	{
-		if (*node->m_mesh)
-		{
-			meshEffects.Insert(meshEffects.GetCount(), *node->m_mesh);
-		}
-	}
+	//ndTree<ndInt32, const ndMeshEffect*> meshEffects;
+	//for (ndMesh* node = ((ndMesh*)mesh)->IteratorFirst(); node; node = node->IteratorNext())
+	//{
+	//	if (*node->m_mesh)
+	//	{
+	//		meshEffects.Insert(meshEffects.GetCount(), *node->m_mesh);
+	//	}
+	//}
 
-	ExportMaterials(meshEffects, rootNode);
-	ExportMeshes(meshEffects, rootNode);
+	//ExportMaterials(meshEffects, rootNode);
+	//ExportMeshes(meshEffects, rootNode);
 
 	//FILE* const file = fopen(fullPathName, "wb");
 	//if (file)
@@ -870,6 +872,44 @@ void ndMeshFile::Export(const ndMesh* const mesh, const ndString& fullPathName)
 	//	mesh->Save(file, meshEffects);
 	//	fclose(file);
 	//}
+
+	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndMesh");
+	doc->LinkEndChild(rootNode);
+
+	struct MeshXmlNodePair
+	{
+		const ndMesh* m_meshNode;
+		nd::TiXmlElement* m_parentXml;
+	};
+
+	ndFixSizeArray<MeshXmlNodePair, 1024> stack;
+	MeshXmlNodePair pair;
+	pair.m_meshNode = mesh;
+	pair.m_parentXml = rootNode;
+	stack.PushBack(pair);
+
+	while (stack.GetCount())
+	{
+		MeshXmlNodePair entry(stack.Pop());
+		xmlSaveParam(entry.m_parentXml, "name", entry.m_meshNode->m_name.GetStr());
+		xmlSaveParam(entry.m_parentXml, "matrix", entry.m_meshNode->m_matrix);
+		xmlSaveParam(entry.m_parentXml, "mashMatrix", entry.m_meshNode->m_meshMatrix);
+
+		if (*entry.m_meshNode->GetMesh())
+		{
+			SameGeomtry(entry.m_meshNode, entry.m_parentXml);
+		}
+
+		for (ndList<ndSharedPtr<ndMesh>>::ndNode* node = entry.m_meshNode->m_children.GetFirst(); node; node = node->GetNext())
+		{
+			MeshXmlNodePair childPair;
+			childPair.m_meshNode = *node->GetInfo();
+			nd::TiXmlElement* const child = new nd::TiXmlElement("ndMesh");
+			entry.m_parentXml->LinkEndChild(child);
+			childPair.m_parentXml = child;
+			stack.PushBack(childPair);
+		}
+	};
 
 	doc->SaveFile(fullPathName.GetStr());
 	setlocale(LC_ALL, oldloc.GetStr());
