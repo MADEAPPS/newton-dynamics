@@ -5074,21 +5074,10 @@ void ndMeshEffect::SerializeToXml(nd::TiXmlElement* const xmlNode) const
 	}
 
 	const ndArray<ndMeshEffect::ndMaterial>& materialArray = GetMaterials();
+	ndArray<ndInt32> faceIndex;
 	ndArray<ndInt32> faceIndexCount;
 	for (ndInt32 i = 0; i < materialArray.GetCount(); ++i)
 	{
-		nd::TiXmlElement* const materialNode = new nd::TiXmlElement("material");
-		xmlNode->LinkEndChild(materialNode);
-
-		const ndMeshEffect::ndMaterial& material = materialArray[i];
-		xmlSaveParam(materialNode, "texture", material.m_textureName);
-		xmlSaveParam(materialNode, "ambient", material.m_ambient);
-		xmlSaveParam(materialNode, "diffuse", material.m_diffuse);
-		xmlSaveParam(materialNode, "specular", material.m_specular);
-		xmlSaveParam(materialNode, "reflection", material.m_reflection);
-		xmlSaveParam(materialNode, "opacity", material.m_opacity);
-		xmlSaveParam(materialNode, "shiness", material.m_shiness);
-
 		ndInt32 faceCount = 0;
 		for (ndInt32 j = 0; j < format.m_faceCount; ++j)
 		{
@@ -5097,43 +5086,38 @@ void ndMeshEffect::SerializeToXml(nd::TiXmlElement* const xmlNode) const
 				faceCount++;
 			}
 		}
-	
-		ndInt32 indexAcc = 0;
-//		fprintf(file, "\t\t\tfacesVertexCount: %d\n", faceCount);
-//		fprintf(file, "\t\t\t{\n");
-//		fprintf(file, "\t\t\t\t");
-		faceIndexCount.SetCount(0);
-		for (ndInt32 j = 0; j < format.m_faceCount; ++j)
+
+		if (faceCount)
 		{
-			if (format.m_faceMaterial[j] == i)
+			nd::TiXmlElement* const materialNode = new nd::TiXmlElement("material");
+			xmlNode->LinkEndChild(materialNode);
+
+			const ndMeshEffect::ndMaterial& material = materialArray[i];
+			xmlSaveParam(materialNode, "texture", material.m_textureName);
+			xmlSaveParam(materialNode, "ambient", material.m_ambient);
+			xmlSaveParam(materialNode, "diffuse", material.m_diffuse);
+			xmlSaveParam(materialNode, "specular", material.m_specular);
+			xmlSaveParam(materialNode, "reflection", material.m_reflection);
+			xmlSaveParam(materialNode, "opacity", material.m_opacity);
+			xmlSaveParam(materialNode, "shiness", material.m_shiness);
+
+			ndInt32 indexAcc = 0;
+			faceIndex.SetCount(0);
+			faceIndexCount.SetCount(0);
+			for (ndInt32 j = 0; j < format.m_faceCount; ++j)
 			{
-//				fprintf(file, "%d ", format.m_faceIndexCount[j]);
-				faceIndexCount.PushBack(format.m_faceIndexCount[j]);
+				if (format.m_faceMaterial[j] == i)
+				{
+					faceIndexCount.PushBack(format.m_faceIndexCount[j]);
+					for (ndInt32 k = 0; k < format.m_faceIndexCount[j]; ++k)
+					{
+						faceIndex.PushBack(indexAcc + k);
+					}
+				}
 				indexAcc += format.m_faceIndexCount[j];
 			}
+			xmlSaveParam(materialNode, "faceIndexCount", faceIndexCount);
+			xmlSaveParam(materialNode, "faceIndices", faceIndex);
 		}
-		indexAcc *= 1;
-//		fprintf(file, "\n");
-//		fprintf(file, "\t\t\t}\n");
-//
-//		fprintf(file, "\t\t\tfacesIndexList: %d\n", indexAcc);
-//		fprintf(file, "\t\t\t{\n");
-//		fprintf(file, "\t\t\t\t");
-//		indexAcc = 0;
-//		for (ndInt32 j = 0; j < format.m_faceCount; ++j)
-//		{
-//			if (format.m_faceMaterial[j] == i)
-//			{
-//				for (ndInt32 k = 0; k < format.m_faceIndexCount[j]; ++k)
-//				{
-//					fprintf(file, "%d ", indexAcc + k);
-//				}
-//			}
-//			indexAcc += format.m_faceIndexCount[j];
-//		}
-//		fprintf(file, "\n");
-//		fprintf(file, "\t\t\t}\n");
-//		fprintf(file, "\t\t}\n");
 	}
-
 }
