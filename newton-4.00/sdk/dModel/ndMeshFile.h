@@ -37,7 +37,6 @@ class ndMeshFile : public ndClassAlloc
 	void Export(const ndMesh* const mesh, const ndString& fullPathName);
 
 	private:
-	void SameGeomtry(const ndMesh* const mesh, nd::TiXmlElement* const rootNode);
 	//void ExportMaterial(nd::TiXmlElement* const rootNode, const ndMesh* const mesh);
 	//void ExportMeshes(const ndTree<ndInt32, const ndMeshEffect*>& meshEffects, nd::TiXmlElement* const rootNode);
 };
