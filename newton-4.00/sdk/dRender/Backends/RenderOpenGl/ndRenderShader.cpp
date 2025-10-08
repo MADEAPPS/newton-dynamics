@@ -495,6 +495,7 @@ void ndRenderShaderTransparentDiffusedShadowColorBlock::Render(const ndRenderPri
 	const ndMatrix modelViewMatrix(modelMatrix * viewMatrix);
 
 	const glMatrix glViewModelMatrix(modelViewMatrix);
+	const glMatrix glCameraToWorld(viewMatrix.OrthoInverse());
 	const glMatrix glProjectionMatrix(camera->m_projectionMatrix);
 
 	const glVector4 glSunlightAmbient(render->m_sunLightAmbient);
@@ -506,6 +507,7 @@ void ndRenderShaderTransparentDiffusedShadowColorBlock::Render(const ndRenderPri
 	glUniform3fv(m_directionalLightIntesity, 1, &glSunlightIntensity[0]);
 
 	//glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &glViewModelMatrix[0][0]);
+	glUniformMatrix4fv(m_cameraToWorld, 1, false, &glCameraToWorld[0][0]);
 	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &glProjectionMatrix[0][0]);
 	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &glViewModelMatrix[0][0]);
 
@@ -684,6 +686,7 @@ void ndRenderShaderOpaqueDiffusedShadowSkinColorBlock::Render(const ndRenderPrim
 
 	const glMatrix worldMatrix(modelMatrix);
 	const glMatrix glViewModelMatrix(modelViewMatrix);
+	const glMatrix glCameraToWorld(viewMatrix.OrthoInverse());
 	const glMatrix glProjectionMatrix(camera->m_projectionMatrix);
 
 	const glVector4 glSunlightAmbient(render->m_sunLightAmbient);
@@ -710,6 +713,7 @@ void ndRenderShaderOpaqueDiffusedShadowSkinColorBlock::Render(const ndRenderPrim
 	}
 	glUniform1i(m_depthMapTexture, 1);
 	glUniformMatrix4fv(m_worldMatrix, 1, GL_FALSE, &worldMatrix[0][0]);
+	glUniformMatrix4fv(m_cameraToWorld, 1, false, &glCameraToWorld[0][0]);
 	glUniformMatrix4fv(m_directionLightViewProjectionMatrixShadow, 4, GL_FALSE, &lightViewProjectMatrix[0][0][0]);
 	glUniform4fv(m_shadowSlices, 1, &cameraSpaceSplits[0]);
 	glUniformMatrix4fv(m_matrixPalette, ndInt32(self->m_skinPaletteMatrixArray.GetCount()), GL_FALSE, &self->m_skinPaletteMatrixArray[0][0][0]);
