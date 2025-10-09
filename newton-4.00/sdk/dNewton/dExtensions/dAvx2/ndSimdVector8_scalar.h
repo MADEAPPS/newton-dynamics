@@ -22,7 +22,7 @@
 #ifndef __ND_SIMD_VECTOR8_SCALAR_H__
 #define __ND_SIMD_VECTOR8_SCALAR_H__
 
-#include "ndCollision.h"
+#include "ndCore.h"
 
 #ifdef D_NEWTON_USE_DOUBLE
 D_MSV_NEWTON_CLASS_ALIGN_32
@@ -529,7 +529,12 @@ class ndVector8
 	{
 		ndFloat32 m_float[ND_SIMD8_WORK_GROUP_SIZE];
 		ndInt32 m_int[ND_SIMD8_WORK_GROUP_SIZE];
-		ndJacobian m_vector8;
+		//ndJacobian m_vector8;
+		struct
+		{
+			ndVector m_linear;
+			ndVector m_angular;
+		} m_vector8;
 	};
 
 	static ndVector8 m_one;
