@@ -19,7 +19,7 @@
 static ndSharedPtr<ndBody> MakePrimitive(ndDemoEntityManager* const scene, const ndMatrix& matrix, const ndShapeInstance& shape, ndSharedPtr<ndRenderPrimitive> mesh, ndFloat32 mass)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
-	ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(ndGetIdentityMatrix()));
+	ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(matrix));
 	entity->SetPrimitive(mesh);
 
 	ndSharedPtr<ndBody> body(new ndBodyDynamic());
@@ -614,7 +614,7 @@ static void BuildRollingFriction(ndDemoEntityManager* const scene, const ndVecto
 	ndRenderPrimitive::ndDescriptor descriptor(render);
 	descriptor.m_collision = shape;
 	descriptor.m_mapping = ndRenderPrimitive::m_spherical;
-	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("earthmap.png")));
+	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_1.png")));
 
 	ndSharedPtr<ndRenderPrimitive> mesh(new ndRenderPrimitive(descriptor));
 
