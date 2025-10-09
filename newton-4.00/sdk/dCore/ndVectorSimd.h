@@ -431,7 +431,8 @@ class ndBigVector
 		return ndBigVector(_mm256_and_pd(tmp7, ndBigVector::m_triplexMask.m_type));
 	}
 
-	inline static void Transpose4x4(ndBigVector& dst0, ndBigVector& dst1, ndBigVector& dst2, ndBigVector& dst3,
+	inline static void Transpose4x4(
+		ndBigVector& dst0, ndBigVector& dst1, ndBigVector& dst2, ndBigVector& dst3,
 		const ndBigVector& src0, const ndBigVector& src1, const ndBigVector& src2, const ndBigVector& src3)
 	{
 		__m256d tmp[4];
