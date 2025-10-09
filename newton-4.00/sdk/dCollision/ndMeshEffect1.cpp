@@ -3751,7 +3751,7 @@ void ndMeshEffect::GetVertexChannel64(ndInt32 strideInByte, ndFloat64* const buf
 
 void ndMeshEffect::GetVertexChannel(ndInt32 strideInByte, ndReal* const bufferOut) const
 {
-	ndInt32 stride = strideInByte / ndInt32(sizeof(ndFloat32));
+	ndInt32 stride = strideInByte / ndInt32(sizeof(ndReal));
 	for (ndInt32 i = 0; i < m_attrib.m_pointChannel.GetCount(); ++i)
 	{
 		const ndInt32 j = i * stride;
@@ -3765,7 +3765,6 @@ void ndMeshEffect::GetVertexChannel(ndInt32 strideInByte, ndReal* const bufferOu
 
 void ndMeshEffect::GetVertexWeightChannel(ndInt32 strideInByte, ndVertexWeight* const bufferOut) const
 {
-	//ndInt32 offset = 0;
 	char* ptr = (char*)bufferOut;
 	for (ndInt32 i = 0; i < m_attrib.m_pointChannel.GetCount(); ++i)
 	{
@@ -3779,7 +3778,7 @@ void ndMeshEffect::GetVertexWeightChannel(ndInt32 strideInByte, ndVertexWeight* 
 
 void ndMeshEffect::GetNormalChannel(ndInt32 strideInByte, ndReal* const bufferOut) const
 {
-	ndInt32 stride = strideInByte / ndInt32(sizeof(ndFloat32));
+	ndInt32 stride = strideInByte / ndInt32(sizeof(ndReal));
 	for (ndInt32 i = 0; i < m_attrib.m_normalChannel.GetCount(); ++i)
 	{
 		const ndInt32 j = i * stride;
@@ -3791,7 +3790,7 @@ void ndMeshEffect::GetNormalChannel(ndInt32 strideInByte, ndReal* const bufferOu
 
 void ndMeshEffect::GetBinormalChannel(ndInt32 strideInByte, ndReal* const bufferOut) const
 {
-	ndInt32 stride = strideInByte / ndInt32(sizeof(ndFloat32));
+	ndInt32 stride = strideInByte / ndInt32(sizeof(ndReal));
 	for (ndInt32 i = 0; i < m_attrib.m_binormalChannel.GetCount(); ++i)
 	{
 		const ndInt32 j = i * stride;
@@ -3803,7 +3802,7 @@ void ndMeshEffect::GetBinormalChannel(ndInt32 strideInByte, ndReal* const buffer
 
 void ndMeshEffect::GetUV0Channel(ndInt32 strideInByte, ndReal* const bufferOut) const
 {
-	ndInt32 stride = strideInByte / ndInt32(sizeof(ndFloat32));
+	ndInt32 stride = strideInByte / ndInt32(sizeof(ndReal));
 	for (ndInt32 i = 0; i < m_attrib.m_uv0Channel.GetCount(); ++i)
 	{
 		const ndInt32 j = i * stride;
@@ -3814,7 +3813,7 @@ void ndMeshEffect::GetUV0Channel(ndInt32 strideInByte, ndReal* const bufferOut) 
 
 void ndMeshEffect::GetUV1Channel(ndInt32 strideInByte, ndReal* const bufferOut) const
 {
-	ndInt32 stride = strideInByte / ndInt32(sizeof(ndFloat32));
+	ndInt32 stride = strideInByte / ndInt32(sizeof(ndReal));
 	for (ndInt32 i = 0; i < m_attrib.m_uv1Channel.GetCount(); ++i)
 	{
 		const ndInt32 j = i * stride;
@@ -3825,7 +3824,7 @@ void ndMeshEffect::GetUV1Channel(ndInt32 strideInByte, ndReal* const bufferOut) 
 
 void ndMeshEffect::GetVertexColorChannel(ndInt32 strideInByte, ndReal* const bufferOut) const
 {
-	ndInt32 stride = strideInByte / ndInt32(sizeof(ndFloat32));
+	ndInt32 stride = strideInByte / ndInt32(sizeof(ndReal));
 	for (ndInt32 i = 0; i < m_attrib.m_colorChannel.GetCount(); ++i)
 	{
 		const ndInt32 j = i * stride;
