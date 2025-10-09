@@ -58,21 +58,11 @@
 		{
 		}
 
-		#ifdef D_SCALAR_VECTOR_CLASS
-			inline ndVector8(const ndVector& low, const ndVector& high)
-				//:m_low(low.m_type)
-				//,m_high(high.m_type)
-			{
-				m_vector8.m_linear = low;
-				m_vector8.m_angular = high;
-			}
-		#else
-			inline ndVector8(const ndVector& low, const ndVector& high)
-				:m_low(_mm256_set_m128d(low.m_typeHigh, low.m_typeLow))
-				,m_high(_mm256_set_m128d(high.m_typeHigh, high.m_typeLow))
-			{
-			}
-		#endif
+		inline ndVector8(const ndVector& low, const ndVector& high)
+			:m_low(_mm256_set_m128d(low.m_typeHigh, low.m_typeLow))
+			,m_high(_mm256_set_m128d(high.m_typeHigh, high.m_typeLow))
+		{
+		}
 
 		inline ndVector8(const ndVector8* const baseAddr, const ndVector8& index)
 			:m_low(_mm256_i64gather_pd(&(*baseAddr)[0], index.m_lowInt, 8))
@@ -83,7 +73,7 @@
 		inline ndFloat32& operator[] (ndInt32 i)
 		{
 			ndAssert(i >= 0);
-			ndAssert(i < D_SIMD8_WORK_GROUP_SIZE);
+			ndAssert(i < ND_SIMD8_WORK_GROUP_SIZE);
 			ndFloat32* const ptr = (ndFloat32*)&m_low;
 			return ptr[i];
 		}
@@ -91,7 +81,7 @@
 		inline const ndFloat32& operator[] (ndInt32 i) const
 		{
 			ndAssert(i >= 0);
-			ndAssert(i < D_SIMD8_WORK_GROUP_SIZE);
+			ndAssert(i < ND_SIMD8_WORK_GROUP_SIZE);
 			const ndFloat32* const ptr = (ndFloat32*)&m_low;
 			return ptr[i];
 		}
@@ -240,6 +230,14 @@
 
 		union
 		{
+			ndFloat64 m_float[ND_SIMD8_WORK_GROUP_SIZE];
+			ndInt64 m_int[ND_SIMD8_WORK_GROUP_SIZE];
+			struct
+			{
+				ndBigVector m_linear;
+				ndBigVector m_angular;
+			} m_vector8;
+
 			struct
 			{
 				__m256d m_low;
@@ -250,8 +248,6 @@
 				__m256i m_lowInt;
 				__m256i m_highInt;
 			};
-			ndJacobian m_vector8;
-			ndInt64 m_int[D_SIMD8_WORK_GROUP_SIZE];
 		};
 
 		static ndVector8 m_one;
@@ -284,21 +280,17 @@
 		}
 
 		inline ndVector8(const __m256 type)
-			: m_type(type)
+			:m_type(type)
 		{
 		}
 
 		inline ndVector8(const ndVector8& copy)
-			: m_type(copy.m_type)
+			:m_type(copy.m_type)
 		{
 		}
 
 		inline ndVector8(const ndVector& low, const ndVector& high)
-			#ifdef D_SCALAR_VECTOR_CLASS
-			:m_type(_mm256_set_m128(_mm_set_ps(high.m_w, high.m_z, high.m_y, high.m_x), _mm_set_ps(low.m_w, low.m_z, low.m_y, low.m_x)))
-			#else
 			:m_type(_mm256_set_m128(high.m_type, low.m_type))
-			#endif
 		{
 		}
 
@@ -463,7 +455,6 @@
 		{
 			ndFloat32 m_float[ND_SIMD8_WORK_GROUP_SIZE];
 			ndInt32 m_int[ND_SIMD8_WORK_GROUP_SIZE];
-			//ndJacobian m_vector8;
 			struct
 			{
 				ndVector m_linear;
