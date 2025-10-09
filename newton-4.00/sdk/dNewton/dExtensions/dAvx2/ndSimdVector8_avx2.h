@@ -309,7 +309,7 @@
 		inline ndFloat32& operator[] (ndInt32 i)
 		{
 			ndAssert(i >= 0);
-			ndAssert(i < D_SIMD8_WORK_GROUP_SIZE);
+			ndAssert(i < ND_SIMD8_WORK_GROUP_SIZE);
 			ndFloat32* const ptr = (ndFloat32*)&m_type;
 			return ptr[i];
 		}
@@ -317,7 +317,7 @@
 		inline const ndFloat32& operator[] (ndInt32 i) const
 		{
 			ndAssert(i >= 0);
-			ndAssert(i < D_SIMD8_WORK_GROUP_SIZE);
+			ndAssert(i < ND_SIMD8_WORK_GROUP_SIZE);
 			const ndFloat32* const ptr = (ndFloat32*)&m_type;
 			return ptr[i];
 		}
