@@ -24,6 +24,7 @@
 
 #define ND_SIMD8_WORK_GROUP_SIZE	8 
 
+
 #ifdef D_SCALAR_VECTOR_CLASS
 	#include "ndSimdVector8_scalar.h"
 #elif (defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64))
