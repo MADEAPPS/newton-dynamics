@@ -571,7 +571,7 @@ ndMesh* ndMeshFile::Import(const ndString& fullPathName)
 
 	struct MeshXmlNodePair
 	{
-		//const ndMesh* m_meshNode;
+		ndMesh* m_mesh;
 		const nd::TiXmlElement* m_xmlNode;
 	};
 
@@ -581,7 +581,8 @@ ndMesh* ndMeshFile::Import(const ndString& fullPathName)
 	const nd::TiXmlElement* const rootNode = doc.RootElement();
 	ndAssert(strcmp(rootNode->Value(), "ndMesh") == 0);
 
-	//pair.m_meshNode = mesh;
+	ndMesh* const root = new ndMesh();
+	pair.m_mesh = root;
 	pair.m_xmlNode = rootNode;
 	stack.PushBack(pair);
 
@@ -589,13 +590,18 @@ ndMesh* ndMeshFile::Import(const ndString& fullPathName)
 	{
 		MeshXmlNodePair entry(stack.Pop());
 
+		ndMesh* const mesh = pair.m_mesh;
+
+		mesh->m_name = ndString(xmlGetString(entry.m_xmlNode, "name"));
+		mesh->m_matrix = xmlGetMatrix(entry.m_xmlNode, "matrix");
+		mesh->m_meshMatrix = xmlGetMatrix(entry.m_xmlNode, "meshMatrix");
+
 		const nd::TiXmlElement* const xmlGeometry = (nd::TiXmlElement*)entry.m_xmlNode->FirstChild("ndGeometry");
 		if (xmlGeometry)
 		{
 			ndSharedPtr<ndMeshEffect> geometry(new ndMeshEffect());
 			geometry->DeserializeFromXml(xmlGeometry);
 		}
-
 
 		for (const nd::TiXmlNode* node = entry.m_xmlNode->FirstChild("ndMesh"); node; node = node->NextSibling("ndMesh"))
 		{
@@ -610,5 +616,5 @@ ndMesh* ndMeshFile::Import(const ndString& fullPathName)
 	}
 
 	setlocale(LC_ALL, oldloc.GetStr());
-	return nullptr;
+	return root;
 }

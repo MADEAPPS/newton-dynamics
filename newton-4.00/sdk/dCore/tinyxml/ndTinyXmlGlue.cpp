@@ -362,14 +362,40 @@ ndMatrix xmlGetMatrix(const nd::TiXmlNode* const rootNode, const char* const nam
 	return matrix;
 }
 
+void xmlGetInt32(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndInt32>& array)
+{
+	const nd::TiXmlElement* const element = (nd::TiXmlElement*)rootNode->FirstChild(name);
+	ndAssert(element);
+	ndInt32 count;
+	element->Attribute("count", &count);
+	//array.Resize(count);
+	//array.SetCount(count);
+	const char* const data = element->Attribute("int64Array");
+
+	size_t start = 0;
+	ndVector point(ndVector::m_zero);
+	for (ndInt32 i = 0; i < count; ++i)
+	{
+		char x[128];
+		x[127] = 0;
+		ndInt32 xx = sscanf(&data[start], "%[^ ]", x);
+		start += strlen(x) + 1;
+
+		long long int fx;
+		xx = sscanf(x, "%lld", &fx);
+		//array[i] = ndInt64(fx);
+		array.PushBack(ndInt32(fx));
+	}
+}
+
 void xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndInt64>& array)
 {
 	const nd::TiXmlElement* const element = (nd::TiXmlElement*)rootNode->FirstChild(name);
 	ndAssert(element);
 	ndInt32 count;
 	element->Attribute("count", &count);
-	array.Resize(count);
-	array.SetCount(count);
+	//array.Resize(count);
+	//array.SetCount(count);
 
 	const char* const data = element->Attribute("int64Array");
 
@@ -377,13 +403,14 @@ void xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name, nd
 	ndVector point(ndVector::m_zero);
 	for (ndInt32 i = 0; i < count; ++i)
 	{
-		char x[64];
-		sscanf(&data[start], "%[^ ]", x);
+		char x[128];
+		x[127] = 0;
+		ndInt32 xx = sscanf(&data[start], "%[^ ]", x);
 		start += strlen(x) + 1;
 
 		long long int fx;
-		sscanf(x, "%lld", &fx);
-		array[i] = ndInt64 (fx);
+		xx = sscanf(x, "%lld", &fx);
+		array.PushBack(ndInt64 (fx));
 	}
 }
 
@@ -393,42 +420,33 @@ void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const na
 	ndAssert(element);
 	ndInt32 count;
 	element->Attribute("count", &count);
-	array.Resize(count);
-	array.SetCount(count);
-
+	//array.Resize(count);
+	//array.SetCount(count);
 	//const char* const data = element->Attribute("float4Array");
+
 	const char* const data = element->Attribute("float3Array");
 
 	size_t start = 0;
-	ndVector point(ndVector::m_zero);
 	for (ndInt32 i = 0; i < count; ++i)
 	{
-		char x[64];
-		char y[64];
-		char z[64];
-		//char w[64];
-		//sscanf(&data[start], "%[^ ] %[^ ] %[^ ] %[^ ]", x, y, z, w);
-		//start += strlen(x) + strlen(y) + strlen(z) + strlen(w) + 4;
+		char x[128];
+		char y[128];
+		char z[128];
 
-		sscanf(&data[start], "%[^ ] %[^ ] %[^ ]", x, y, z);
+		x[127] = 0;
+		y[127] = 0;
+		z[127] = 0;
+
+		ndInt32 xx = sscanf(&data[start], "%[^ ] %[^ ] %[^ ]", x, y, z);
 		start += strlen(x) + strlen(y) + strlen(z) + 3;
 
 		ndFloat64 fx;
 		ndFloat64 fy;
 		ndFloat64 fz;
-		//ndFloat64 fw;
 
-		sscanf(x, "%lf", &fx);
-		sscanf(y, "%lf", &fy);
-		sscanf(z, "%lf", &fz);
-		//sscanf(w, "%lf", &fw);
-
-		point.m_x = ndFloat32(fx);
-		point.m_y = ndFloat32(fy);
-		point.m_z = ndFloat32(fz);
-		//point.m_w = ndFloat32(fw);
-		point.m_w = ndFloat32(0.0f);
-
-		array[i] = point;
+		xx = sscanf(x, "%lf", &fx);
+		xx = sscanf(y, "%lf", &fy);
+		xx = sscanf(z, "%lf", &fz);
+		array.PushBack (ndVector(ndFloat32(fx), ndFloat32(fx), ndFloat32(fz), ndFloat32(0.0f)));
 	}
 }

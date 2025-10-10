@@ -4892,7 +4892,6 @@ void ndMeshEffect::FlipWinding()
 	ndPolyhedra::EndFace();
 }
 
-
 void ndMeshEffect::SerializeToXml(nd::TiXmlElement* const xmlNode) const
 {
 
@@ -5058,6 +5057,30 @@ void ndMeshEffect::SerializeToXml(nd::TiXmlElement* const xmlNode) const
 	ndArray<ndUnsigned8> tmpBuffer;
 	ndInt32 vertexCount = GenerateVertexFormat(format, tmpBuffer);
 
+	auto PrintFaces = [xmlNode, format]()
+	{
+		nd::TiXmlElement* const node = new nd::TiXmlElement("faces");
+		xmlNode->LinkEndChild(node);
+
+		ndInt32 indexCount = 0;
+		ndArray<ndInt32> faceMaterial;
+		ndArray<ndInt32> faceIndexCount;
+		for (ndInt32 i = 0; i < format.m_faceCount; ++i)
+		{
+			faceMaterial.PushBack(format.m_faceMaterial[i]);
+			faceIndexCount.PushBack(format.m_faceIndexCount[i]);
+			indexCount += format.m_faceIndexCount[i];
+		}
+		xmlSaveParam(node, "faceMaterial", faceMaterial);
+		xmlSaveParam(node, "faceIndexCount", faceIndexCount);
+
+		//faceIndexCount.SetCount(0);
+		//for (ndInt32 i = 0; i < indexCount; ++i)
+		//{
+		//	faceIndexCount.PushBack(format.);
+		//}
+	};
+
 	PrintVertexChannel(format.m_vertex, vertexCount);
 	if (format.m_normal.m_data)
 	{
@@ -5072,56 +5095,171 @@ void ndMeshEffect::SerializeToXml(nd::TiXmlElement* const xmlNode) const
 		ndAssert(0);
 	}
 
-	const ndArray<ndMeshEffect::ndMaterial>& materialArray = GetMaterials();
-	ndArray<ndInt32> faceIndex;
-	ndArray<ndInt32> faceIndexCount;
-	for (ndInt32 i = 0; i < materialArray.GetCount(); ++i)
+	ndInt32 materialCount = 0;
+	for (ndInt32 i = 0; i < format.m_faceCount; ++i)
 	{
-		ndInt32 faceCount = 0;
-		for (ndInt32 j = 0; j < format.m_faceCount; ++j)
-		{
-			if (format.m_faceMaterial[j] == i)
-			{
-				faceCount++;
-			}
-		}
-
-		if (faceCount)
-		{
-			nd::TiXmlElement* const materialNode = new nd::TiXmlElement("material");
-			xmlNode->LinkEndChild(materialNode);
-
-			const ndMeshEffect::ndMaterial& material = materialArray[i];
-			xmlSaveParam(materialNode, "texture", material.m_textureName);
-			xmlSaveParam(materialNode, "ambient", material.m_ambient);
-			xmlSaveParam(materialNode, "diffuse", material.m_diffuse);
-			xmlSaveParam(materialNode, "specular", material.m_specular);
-			xmlSaveParam(materialNode, "reflection", material.m_reflection);
-			xmlSaveParam(materialNode, "opacity", material.m_opacity);
-			xmlSaveParam(materialNode, "shiness", material.m_shiness);
-
-			ndInt32 indexAcc = 0;
-			faceIndex.SetCount(0);
-			faceIndexCount.SetCount(0);
-			for (ndInt32 j = 0; j < format.m_faceCount; ++j)
-			{
-				if (format.m_faceMaterial[j] == i)
-				{
-					faceIndexCount.PushBack(format.m_faceIndexCount[j]);
-					for (ndInt32 k = 0; k < format.m_faceIndexCount[j]; ++k)
-					{
-						faceIndex.PushBack(indexAcc + k);
-					}
-				}
-				indexAcc += format.m_faceIndexCount[j];
-			}
-			xmlSaveParam(materialNode, "faceIndexCount", faceIndexCount);
-			xmlSaveParam(materialNode, "faceIndices", faceIndex);
-		}
+		materialCount = ndMax(materialCount, format.m_faceMaterial[i] + 1);
 	}
+	const ndArray<ndMeshEffect::ndMaterial>& materialArray = GetMaterials();
+	for (ndInt32 i = 0; i < materialCount; ++i)
+	{
+		nd::TiXmlElement* const materialNode = new nd::TiXmlElement("material");
+		xmlNode->LinkEndChild(materialNode);
+
+		const ndMeshEffect::ndMaterial& material = materialArray[i];
+		xmlSaveParam(materialNode, "ambient", material.m_ambient);
+		xmlSaveParam(materialNode, "diffuse", material.m_diffuse);
+		xmlSaveParam(materialNode, "specular", material.m_specular);
+		xmlSaveParam(materialNode, "reflection", material.m_reflection);
+		xmlSaveParam(materialNode, "opacity", material.m_opacity);
+		xmlSaveParam(materialNode, "shiness", material.m_shiness);
+		xmlSaveParam(materialNode, "texture", material.m_textureName);
+	}
+	PrintFaces();
 }
 
-void ndMeshEffect::DeserializeFromXml(const nd::TiXmlElement* const xmlNode) const
+void ndMeshEffect::DeserializeFromXml(const nd::TiXmlElement* const xmlNode)
 {
+	ndArray<ndMeshEffect::ndUV> uvArray;
+	ndArray<ndMeshEffect::ndNormal> normalArray;
+	ndArray<ndMeshEffect::ndVertexWeight> vertexWeights;
 
+	ndArray<ndInt32> indexArray;
+	ndArray<ndInt32> faceIndexArray;
+	ndArray<ndInt32> faceMaterialArray;
+	ndArray<ndInt32> vertexWeightsIndexArray;
+	ndMeshEffect::ndMeshVertexFormat format;
+	
+	//indexArray.SetCount(indexCount);
+	//ndMemCpy(&indexArray[0], geom->getFaceIndices(), indexCount);
+	//
+	//ndInt32 faceCount = 0;
+	//for (ndInt32 i = 0; i < indexCount; ++i)
+	//{
+	//	if (indexArray[i] < 0)
+	//	{
+	//		faceCount++;
+	//	}
+	//}
+	//
+	//ndInt32 count = 0;
+	//ndInt32 faceIndex = 0;
+	//
+	//faceIndexArray.SetCount(faceCount);
+	//faceMaterialArray.SetCount(faceCount);
+	//ImportMaterials(fbxMesh, *meshEffect);
+	//ndInt32 defaultMaterialId = (materialArray.GetCount() <= 1) ? 0 : -1;
+	//for (ndInt32 i = 0; i < indexCount; ++i)
+	//{
+	//	count++;
+	//	if (indexArray[i] < 0)
+	//	{
+	//		indexArray[i] = -indexArray[i] - 1;
+	//		faceIndexArray[faceIndex] = count;
+	//		if (defaultMaterialId == 0)
+	//		{
+	//			faceMaterialArray[faceIndex] = defaultMaterialId;
+	//		}
+	//		else
+	//		{
+	//			ndInt32 fbxMatIndex = geom->getMaterials()[faceIndex];
+	//			faceMaterialArray[faceIndex] = fbxMatIndex;
+	//		}
+	//		count = 0;
+	//		faceIndex++;
+	//	}
+	//}
+	 
+	 
+	// populate material array
+	ndArray<ndMaterial>& materialArray = GetMaterials();
+	for (const nd::TiXmlNode* node = xmlNode->FirstChild("material"); node; node = node->NextSibling("material"))
+	{
+		ndMaterial material;
+		material.m_ambient = xmlGetVector3(node, "ambient");
+		material.m_diffuse = xmlGetVector3(node, "diffuse");
+		material.m_specular = xmlGetVector3(node, "specular");
+		material.m_reflection = xmlGetVector3(node, "reflection");
+		material.m_shiness = xmlGetFloat(node, "shiness");
+		material.m_opacity = xmlGetFloat(node, "opacity");
+		snprintf(material.m_textureName, sizeof(material.m_textureName), xmlGetString(node, "texture"));
+
+		materialArray.PushBack(material);
+	}
+
+
+	
+	//const ofbx::Vec3* const vertices = geom->getVertices();
+	//format.m_vertex.m_data = (ndFloat64*)&vertices[0].x;
+	//format.m_vertex.m_indexList = &indexArray[0];
+	//format.m_vertex.m_strideInBytes = sizeof(ofbx::Vec3);
+	//
+	//format.m_faceCount = faceCount;
+	//format.m_faceIndexCount = &faceIndexArray[0];
+	//format.m_faceMaterial = &faceMaterialArray[0];
+	//
+	//if (geom->getNormals())
+	//{
+	//	normalArray.SetCount(indexCount);
+	//	const ofbx::Vec3* const normals = geom->getNormals();
+	//	for (ndInt32 i = 0; i < indexCount; ++i)
+	//	{
+	//		ofbx::Vec3 n = normals[i];
+	//		normalArray[i] = ndMeshEffect::ndNormal(ndFloat32(n.x), ndFloat32(n.y), ndFloat32(n.z));
+	//	}
+	//
+	//	format.m_normal.m_data = &normalArray[0].m_x;
+	//	format.m_normal.m_indexList = &indexArray[0];
+	//	format.m_normal.m_strideInBytes = sizeof(ndMeshEffect::ndNormal);
+	//}
+	//
+	//if (geom->getUVs())
+	//{
+	//	uvArray.SetCount(indexCount);
+	//	const ofbx::Vec2* const uv = geom->getUVs();
+	//	for (ndInt32 i = 0; i < indexCount; ++i)
+	//	{
+	//		ofbx::Vec2 n = uv[i];
+	//		uvArray[i] = ndMeshEffect::ndUV(ndFloat32(n.x), ndFloat32(n.y));
+	//	}
+	//	format.m_uv0.m_data = &uvArray[0].m_u;
+	//	format.m_uv0.m_indexList = &indexArray[0];
+	//	format.m_uv0.m_strideInBytes = sizeof(ndMeshEffect::ndUV);
+	//}
+	//
+	//// import skin if there is any
+	//if (geom->getSkin())
+	//{
+	//	const ofbx::Skin* const skin = geom->getSkin();
+	//	ndInt32 clusterCount = skin->getClusterCount();
+	//
+	//	vertexWeights.SetCount(geom->getVertexCount());
+	//	for (ndInt32 i = 0; i < vertexWeights.GetCount(); ++i)
+	//	{
+	//		vertexWeights[i].Clear();
+	//		vertexWeightsIndexArray.PushBack(i);
+	//	}
+	//	for (ndInt32 i = 0; i < clusterCount; ++i)
+	//	{
+	//		const ofbx::Cluster* const fbxCluster = skin->getCluster(i);
+	//		ndInt32 clusterIndexCount = fbxCluster->getIndicesCount();
+	//		if (clusterIndexCount)
+	//		{
+	//			const ofbx::Object* const fbxBone = fbxCluster->getLink();
+	//			ndInt32 hashId = ndInt32(ndCRC64(fbxBone->name) & 0xffffffff);
+	//			const ndInt32* const indices = fbxCluster->getIndices();
+	//			const ndFloat64* const weights = fbxCluster->getWeights();
+	//			for (ndInt32 j = 0; j < clusterIndexCount; ++j)
+	//			{
+	//				ndInt32 index = indices[j];
+	//				vertexWeights[index].SetWeight(hashId, ndReal(weights[j]));
+	//			}
+	//		}
+	//	}
+	//	format.m_vertexWeight.m_data = &vertexWeights[0];
+	//	format.m_vertexWeight.m_indexList = &vertexWeightsIndexArray[0];
+	//	format.m_vertexWeight.m_strideInBytes = sizeof(ndMeshEffect::ndVertexWeight);
+	//}
+	//
+	//meshEffect->BuildFromIndexList(&format);
 }
