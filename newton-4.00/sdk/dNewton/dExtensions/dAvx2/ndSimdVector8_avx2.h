@@ -22,8 +22,9 @@
 #ifndef __ND_SIMD_VECTOR8_AVX2_H__
 #define __ND_SIMD_VECTOR8_AVX2_H__
 
-//#include "ndCollision.h"
 #include "ndCore.h"
+
+#define ND_SIMD8_WORK_GROUP_SIZE	8 
 
 #ifdef D_NEWTON_USE_DOUBLE
 	D_MSV_NEWTON_CLASS_ALIGN_32
