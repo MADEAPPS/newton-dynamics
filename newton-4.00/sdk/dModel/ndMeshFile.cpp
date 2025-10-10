@@ -121,13 +121,164 @@ ndMeshFile::~ndMeshFile()
 //	PrintTabs(level);
 //	fprintf(file, "}\n");
 //}
+//
+//void ndMeshFile::Load(FILE* const file, const ndTree<ndSharedPtr<ndMeshEffect>, ndInt32>& meshEffects)
+//{
+//	char token[256];
+//	ndInt32 error = 0;
+//
+//	auto ReadToken = [file, &token]()
+//	{
+//		ndInt32 error = 0;
+//		error = fscanf(file, "%s", token);
+//	};
+//
+//	ReadToken();
+//	ReadToken();
+//	while (strcmp(token, "}"))
+//	{
+//		if (!strcmp(token, "name:"))
+//		{
+//			ReadToken();
+//			SetName(token);
+//		}
+//		else if (!strcmp(token, "eulers:"))
+//		{
+//			ndBigVector eulers;
+//			error = fscanf(file, "%lf %lf %lf", &eulers.m_x, &eulers.m_y, &eulers.m_z);
+//			ndMatrix matrix(ndPitchMatrix(ndFloat32(eulers.m_x) * ndDegreeToRad) * ndYawMatrix(ndFloat32(eulers.m_y) * ndDegreeToRad) * ndRollMatrix(ndFloat32(eulers.m_z) * ndDegreeToRad));
+//			matrix.m_posit = m_matrix.m_posit;
+//			m_matrix = matrix;
+//		}
+//		else if (!strcmp(token, "position:"))
+//		{
+//			ndBigVector posit;
+//			error = fscanf(file, "%lf %lf %lf", &posit.m_x, &posit.m_y, &posit.m_z);
+//			posit.m_w = ndFloat32(1.0f);
+//			m_matrix.m_posit = ndVector(posit);
+//		}
+//		else if (!strcmp(token, "geometryEulers:"))
+//		{
+//			ndBigVector eulers;
+//			error = fscanf(file, "%lf %lf %lf", &eulers.m_x, &eulers.m_y, &eulers.m_z);
+//			ndMatrix matrix(ndPitchMatrix(ndFloat32(eulers.m_x) * ndDegreeToRad) * ndYawMatrix(ndFloat32(eulers.m_y) * ndDegreeToRad) * ndRollMatrix(ndFloat32(eulers.m_z) * ndDegreeToRad));
+//			matrix.m_posit = m_meshMatrix.m_posit;
+//			m_meshMatrix = matrix;
+//		}
+//		else if (!strcmp(token, "geometryPosition:"))
+//		{
+//			ndBigVector posit;
+//			error = fscanf(file, "%lf %lf %lf", &posit.m_x, &posit.m_y, &posit.m_z);
+//			posit.m_w = ndFloat32(1.0f);
+//			m_meshMatrix.m_posit = ndVector(posit);
+//		}
+//		else if (!strcmp(token, "node:"))
+//		{
+//			ndMesh* const child = new ndMesh(this);
+//			child->Load(file, meshEffects);
+//		}
+//		else if (!strcmp(token, "geometry:"))
+//		{
+//			ndInt32 nodeId;
+//			error = fscanf(file, "%d", &nodeId);
+//			ndAssert(meshEffects.Find(nodeId));
+//			m_mesh = meshEffects.Find(nodeId)->GetInfo();
+//		}
+//		else if (!strcmp(token, "keyFramePosits:"))
+//		{
+//			ndInt32 keyFramesCount;
+//			error = fscanf(file, "%d\n", &keyFramesCount);
+//			
+//			ReadToken();
+//			ndMesh::ndCurve& curve = GetPositCurve();
+//			for (ndInt32 i = 0; i < keyFramesCount; ++i)
+//			{
+//				ndCurveValue keyframe;
+//				error = fscanf(file, "%f %f %f %f\n", &keyframe.m_x, &keyframe.m_y, &keyframe.m_z, &keyframe.m_time);
+//				curve.Append(keyframe);
+//			}
+//			ReadToken();
+//		}
+//		else if (!strcmp(token, "keyFrameRotations:"))
+//		{
+//			ndInt32 keyFramesCount;
+//			error = fscanf(file, "%d\n", &keyFramesCount);
+//
+//			ReadToken();
+//			ndMesh::ndCurve& curve = GetRotationCurve();
+//			for (ndInt32 i = 0; i < keyFramesCount; ++i)
+//			{
+//				ndCurveValue keyframe;
+//				error = fscanf(file, "%f %f %f %f\n", &keyframe.m_x, &keyframe.m_y, &keyframe.m_z, &keyframe.m_time);
+//				keyframe.m_x = ndReal(keyframe.m_x * ndDegreeToRad);
+//				keyframe.m_y = ndReal(keyframe.m_y * ndDegreeToRad);
+//				keyframe.m_z = ndReal(keyframe.m_z * ndDegreeToRad);
+//				curve.Append(keyframe);
+//			}
+//			ReadToken();
+//		}
+//		else
+//		{
+//			break;
+//		}
+//		ReadToken();
+//	}
+//}
 
-//ndMesh* ndMeshFile::Import(const char* const fullPathName)
-//ndMesh* ndMeshFile::Import(const ndString& fullPathName)
-ndMesh* ndMeshFile::Import(const ndString&)
+
+void ndMeshFile::Export(const ndMesh* const mesh, const ndString& fullPathName)
 {
-	ndAssert(0);
-	return nullptr;
+	ndString oldloc(setlocale(LC_ALL, 0));
+	ndSharedPtr<nd::TiXmlDocument> doc(new nd::TiXmlDocument(""));
+	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
+	doc->LinkEndChild(decl);
+
+	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndMesh");
+	doc->LinkEndChild(rootNode);
+
+	struct MeshXmlNodePair
+	{
+		const ndMesh* m_meshNode;
+		nd::TiXmlElement* m_parentXml;
+	};
+
+	ndFixSizeArray<MeshXmlNodePair, 1024> stack;
+	MeshXmlNodePair pair;
+	pair.m_meshNode = mesh;
+	pair.m_parentXml = rootNode;
+	stack.PushBack(pair);
+
+	while (stack.GetCount())
+	{
+		MeshXmlNodePair entry(stack.Pop());
+		xmlSaveParam(entry.m_parentXml, "name", entry.m_meshNode->m_name.GetStr());
+		xmlSaveParam(entry.m_parentXml, "matrix", entry.m_meshNode->m_matrix);
+		xmlSaveParam(entry.m_parentXml, "meshMatrix", entry.m_meshNode->m_meshMatrix);
+
+		if (*entry.m_meshNode->GetMesh())
+		{
+			nd::TiXmlElement* const geometry = new nd::TiXmlElement("ndGeometry");
+			entry.m_parentXml->LinkEndChild(geometry);
+			entry.m_meshNode->GetMesh()->SerializeToXml(geometry);
+		}
+
+		for (ndList<ndSharedPtr<ndMesh>>::ndNode* node = entry.m_meshNode->m_children.GetFirst(); node; node = node->GetNext())
+		{
+			MeshXmlNodePair childPair;
+			childPair.m_meshNode = *node->GetInfo();
+			nd::TiXmlElement* const child = new nd::TiXmlElement("ndMesh");
+			entry.m_parentXml->LinkEndChild(child);
+			childPair.m_parentXml = child;
+			stack.PushBack(childPair);
+		}
+	};
+
+	doc->SaveFile(fullPathName.GetStr());
+	setlocale(LC_ALL, oldloc.GetStr());
+}
+
+ndMesh* ndMeshFile::Import(const ndString& fullPathName)
+{
 	//ndMesh* root = nullptr;
 	//FILE* const file = fopen(fullPathName, "rb");
 	//if (file)
@@ -408,189 +559,56 @@ ndMesh* ndMeshFile::Import(const ndString&)
 	//	fclose(file);
 	//}
 	//return root;
-}
 
-//void ndMeshFile::Load(FILE* const file, const ndTree<ndSharedPtr<ndMeshEffect>, ndInt32>& meshEffects)
-//{
-//	char token[256];
-//	ndInt32 error = 0;
-//
-//	auto ReadToken = [file, &token]()
-//	{
-//		ndInt32 error = 0;
-//		error = fscanf(file, "%s", token);
-//	};
-//
-//	ReadToken();
-//	ReadToken();
-//	while (strcmp(token, "}"))
-//	{
-//		if (!strcmp(token, "name:"))
-//		{
-//			ReadToken();
-//			SetName(token);
-//		}
-//		else if (!strcmp(token, "eulers:"))
-//		{
-//			ndBigVector eulers;
-//			error = fscanf(file, "%lf %lf %lf", &eulers.m_x, &eulers.m_y, &eulers.m_z);
-//			ndMatrix matrix(ndPitchMatrix(ndFloat32(eulers.m_x) * ndDegreeToRad) * ndYawMatrix(ndFloat32(eulers.m_y) * ndDegreeToRad) * ndRollMatrix(ndFloat32(eulers.m_z) * ndDegreeToRad));
-//			matrix.m_posit = m_matrix.m_posit;
-//			m_matrix = matrix;
-//		}
-//		else if (!strcmp(token, "position:"))
-//		{
-//			ndBigVector posit;
-//			error = fscanf(file, "%lf %lf %lf", &posit.m_x, &posit.m_y, &posit.m_z);
-//			posit.m_w = ndFloat32(1.0f);
-//			m_matrix.m_posit = ndVector(posit);
-//		}
-//		else if (!strcmp(token, "geometryEulers:"))
-//		{
-//			ndBigVector eulers;
-//			error = fscanf(file, "%lf %lf %lf", &eulers.m_x, &eulers.m_y, &eulers.m_z);
-//			ndMatrix matrix(ndPitchMatrix(ndFloat32(eulers.m_x) * ndDegreeToRad) * ndYawMatrix(ndFloat32(eulers.m_y) * ndDegreeToRad) * ndRollMatrix(ndFloat32(eulers.m_z) * ndDegreeToRad));
-//			matrix.m_posit = m_meshMatrix.m_posit;
-//			m_meshMatrix = matrix;
-//		}
-//		else if (!strcmp(token, "geometryPosition:"))
-//		{
-//			ndBigVector posit;
-//			error = fscanf(file, "%lf %lf %lf", &posit.m_x, &posit.m_y, &posit.m_z);
-//			posit.m_w = ndFloat32(1.0f);
-//			m_meshMatrix.m_posit = ndVector(posit);
-//		}
-//		else if (!strcmp(token, "node:"))
-//		{
-//			ndMesh* const child = new ndMesh(this);
-//			child->Load(file, meshEffects);
-//		}
-//		else if (!strcmp(token, "geometry:"))
-//		{
-//			ndInt32 nodeId;
-//			error = fscanf(file, "%d", &nodeId);
-//			ndAssert(meshEffects.Find(nodeId));
-//			m_mesh = meshEffects.Find(nodeId)->GetInfo();
-//		}
-//		else if (!strcmp(token, "keyFramePosits:"))
-//		{
-//			ndInt32 keyFramesCount;
-//			error = fscanf(file, "%d\n", &keyFramesCount);
-//			
-//			ReadToken();
-//			ndMesh::ndCurve& curve = GetPositCurve();
-//			for (ndInt32 i = 0; i < keyFramesCount; ++i)
-//			{
-//				ndCurveValue keyframe;
-//				error = fscanf(file, "%f %f %f %f\n", &keyframe.m_x, &keyframe.m_y, &keyframe.m_z, &keyframe.m_time);
-//				curve.Append(keyframe);
-//			}
-//			ReadToken();
-//		}
-//		else if (!strcmp(token, "keyFrameRotations:"))
-//		{
-//			ndInt32 keyFramesCount;
-//			error = fscanf(file, "%d\n", &keyFramesCount);
-//
-//			ReadToken();
-//			ndMesh::ndCurve& curve = GetRotationCurve();
-//			for (ndInt32 i = 0; i < keyFramesCount; ++i)
-//			{
-//				ndCurveValue keyframe;
-//				error = fscanf(file, "%f %f %f %f\n", &keyframe.m_x, &keyframe.m_y, &keyframe.m_z, &keyframe.m_time);
-//				keyframe.m_x = ndReal(keyframe.m_x * ndDegreeToRad);
-//				keyframe.m_y = ndReal(keyframe.m_y * ndDegreeToRad);
-//				keyframe.m_z = ndReal(keyframe.m_z * ndDegreeToRad);
-//				curve.Append(keyframe);
-//			}
-//			ReadToken();
-//		}
-//		else
-//		{
-//			break;
-//		}
-//		ReadToken();
-//	}
-//}
-
-//void ndMeshFile::ExportMaterial(nd::TiXmlElement* const parent, )
-//{
-//	nd::TiXmlElement* const materialNode = new nd::TiXmlElement("ndMeshMaterials");
-//	rootNode->LinkEndChild(materialNode);
-//
-//	ndTree<ndInt32, const ndMeshEffect*>::Iterator it(meshEffects);
-//	for (it.Begin(); it; it++)
-//	{
-//		 ndMeshEffect* const mesh = (ndMeshEffect*)it.GetKey();
-//		//ndString name(node->GetName() + "_");
-//		ndString name("xxxx_");
-//		const ndArray<ndMeshEffect::ndMaterial>& materialArray = mesh->GetMaterials();
-//		for (ndInt32 i = 0; i < materialArray.GetCount(); ++i)
-//		{
-//			nd::TiXmlElement* const materialLink = new nd::TiXmlElement("ndMeshMaterial");
-//			materialNode->LinkEndChild(materialLink);
-//			const ndMeshEffect::ndMaterial& material = materialArray[i];
-//
-//			ndString materialName(name + i);
-//			xmlSaveParam(materialLink, "name", materialName.GetStr());
-//			xmlSaveParam(materialLink, "texture", material.m_textureName);
-//			xmlSaveParam(materialLink, "ambient", material.m_ambient);
-//			xmlSaveParam(materialLink, "diffuse", material.m_diffuse);
-//			xmlSaveParam(materialLink, "specular", material.m_specular);
-//			xmlSaveParam(materialLink, "reflection", material.m_reflection);
-//			xmlSaveParam(materialLink, "opacity", material.m_opacity);
-//			xmlSaveParam(materialLink, "shiness", material.m_shiness);
-//		}
-//	}
-//}
-
-void ndMeshFile::Export(const ndMesh* const mesh, const ndString& fullPathName)
-{
-	ndSharedPtr<nd::TiXmlDocument> doc(new nd::TiXmlDocument(""));
-	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
-	doc->LinkEndChild(decl);
 	ndString oldloc(setlocale(LC_ALL, 0));
-
-	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndMesh");
-	doc->LinkEndChild(rootNode);
+	nd::TiXmlDocument doc(fullPathName.GetStr());
+	doc.LoadFile();
+	if (doc.Error())
+	{
+		setlocale(LC_ALL, oldloc.GetStr());
+		return nullptr;
+	}
 
 	struct MeshXmlNodePair
 	{
-		const ndMesh* m_meshNode;
-		nd::TiXmlElement* m_parentXml;
+		//const ndMesh* m_meshNode;
+		const nd::TiXmlElement* m_xmlNode;
 	};
 
 	ndFixSizeArray<MeshXmlNodePair, 1024> stack;
 	MeshXmlNodePair pair;
-	pair.m_meshNode = mesh;
-	pair.m_parentXml = rootNode;
+
+	const nd::TiXmlElement* const rootNode = doc.RootElement();
+	ndAssert(strcmp(rootNode->Value(), "ndMesh") == 0);
+
+	//pair.m_meshNode = mesh;
+	pair.m_xmlNode = rootNode;
 	stack.PushBack(pair);
 
 	while (stack.GetCount())
 	{
 		MeshXmlNodePair entry(stack.Pop());
-		xmlSaveParam(entry.m_parentXml, "name", entry.m_meshNode->m_name.GetStr());
-		xmlSaveParam(entry.m_parentXml, "matrix", entry.m_meshNode->m_matrix);
-		xmlSaveParam(entry.m_parentXml, "meshMatrix", entry.m_meshNode->m_meshMatrix);
 
-		if (*entry.m_meshNode->GetMesh())
+		const nd::TiXmlElement* const xmlGeometry = (nd::TiXmlElement*)entry.m_xmlNode->FirstChild("ndGeometry");
+		if (xmlGeometry)
 		{
-			nd::TiXmlElement* const geometry = new nd::TiXmlElement("ndGeometry");
-			entry.m_parentXml->LinkEndChild(geometry);
-			entry.m_meshNode->GetMesh()->SerializeToXml(geometry);
+			ndSharedPtr<ndMeshEffect> geometry(new ndMeshEffect());
+			geometry->DeserializeFromXml(xmlGeometry);
 		}
 
-		for (ndList<ndSharedPtr<ndMesh>>::ndNode* node = entry.m_meshNode->m_children.GetFirst(); node; node = node->GetNext())
+
+		for (const nd::TiXmlNode* node = entry.m_xmlNode->FirstChild("ndMesh"); node; node = node->NextSibling("ndMesh"))
 		{
+			ndAssert(0);
 			MeshXmlNodePair childPair;
-			childPair.m_meshNode = *node->GetInfo();
-			nd::TiXmlElement* const child = new nd::TiXmlElement("ndMesh");
-			entry.m_parentXml->LinkEndChild(child);
-			childPair.m_parentXml = child;
+			const nd::TiXmlElement* const linkNode = (nd::TiXmlElement*)node;
+
+			ndAssert(strcmp(linkNode->Value(), "ndMesh") == 0);
+			childPair.m_xmlNode = linkNode;
 			stack.PushBack(childPair);
 		}
-	};
+	}
 
-	doc->SaveFile(fullPathName.GetStr());
 	setlocale(LC_ALL, oldloc.GetStr());
+	return nullptr;
 }

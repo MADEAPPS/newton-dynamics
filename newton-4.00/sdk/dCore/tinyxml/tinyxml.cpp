@@ -1114,21 +1114,10 @@ namespace nd
 		// Generally, you expect fgets to translate from the convention of the OS to the c/unix
 		// convention, and not work generally.
 
-		/*
-		while( fgets( buf, sizeof(buf), file ) )
-		{
-			data += buf;
-		}
-		*/
-
-		//char* buf = new char[ length+1 ];
-		//char* buf = (char*)dMemory::Malloc((length + 1) * sizeof (char));
 		char* buf = (char*)__alloc__((length + 1) * sizeof(char));
 		buf[0] = 0;
 
 		if ( fread( buf, size_t(length), 1, file ) != 1 ) {
-			//delete [] buf;
-			//dMemory::Free(buf);
 			__free__(buf);
 			SetError( TIXML_ERROR_OPENING_FILE, 0, 0, TIXML_ENCODING_UNKNOWN );
 			return false;
@@ -1177,8 +1166,6 @@ namespace nd
 		if ( p-lastPos ) {
 			data.append( lastPos, size_t(p-lastPos) );
 		}		
-		//delete [] buf;
-		//dMemory::Free(buf);
 		__free__(buf);
 		buf = 0;
 
@@ -1189,7 +1176,6 @@ namespace nd
 		else
 			return true;
 	}
-
 
 	bool TiXmlDocument::SaveFile( const char * filename ) const
 	{

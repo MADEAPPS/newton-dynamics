@@ -312,7 +312,7 @@ ndMeshLoader loader__;
 loader__.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("unitBox.fbx"));
 ndMeshFile exportFile;
 exportFile.Export(*loader__.m_mesh, ndGetWorkingFileName("xxx.nd"));
-
+ndSharedPtr<ndMesh> xxxx(exportFile.Import(ndGetWorkingFileName("xxx.nd")));
 	
 	ndMeshLoader loader;
 	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("ragdoll.fbx"));

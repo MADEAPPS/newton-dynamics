@@ -5120,3 +5120,8 @@ void ndMeshEffect::SerializeToXml(nd::TiXmlElement* const xmlNode) const
 		}
 	}
 }
+
+void ndMeshEffect::DeserializeFromXml(const nd::TiXmlElement* const xmlNode) const
+{
+
+}
