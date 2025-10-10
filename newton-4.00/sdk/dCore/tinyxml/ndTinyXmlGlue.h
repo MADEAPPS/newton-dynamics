@@ -50,9 +50,11 @@ D_TINY_API ndFloat32 xmlGetFloat(const nd::TiXmlNode* const rootNode, const char
 D_TINY_API ndVector xmlGetVector3(const nd::TiXmlNode* const rootNode, const char* const name);
 D_TINY_API const char* xmlGetString(const nd::TiXmlNode* const rootNode, const char* const name);
 
-D_TINY_API void xmlGetInt32(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndInt32>& array);
-D_TINY_API void xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndInt64>& array);
+D_TINY_API void xmlGetInt(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndInt32>& array);
 D_TINY_API void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndVector>& array);
+
+D_TINY_API void xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndInt64>& array);
+D_TINY_API void xmlGetFloat64Array3(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndBigVector>& array);
 
 #endif
 
