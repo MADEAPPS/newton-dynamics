@@ -15,6 +15,7 @@ xcuserdata
 *.moved-aside
 DerivedData
 
+
 #
 # ignore settings for VisualStudio
 #
@@ -38,10 +39,6 @@ bld/
 *.suo
 *.obj
 *.sdf
-#*.bin
-#*.pdb
-#*.dll
-#*.lib
 *.exe
 *.spv
 *.dat
@@ -59,6 +56,7 @@ bld/
 *.sbr
 *.res
 *.ipa
+*.pyc
 *.libs
 *.user
 *.tlog
