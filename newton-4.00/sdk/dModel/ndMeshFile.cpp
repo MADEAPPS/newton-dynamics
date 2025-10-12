@@ -605,7 +605,6 @@ ndMesh* ndMeshFile::Import(const ndString& fullPathName)
 
 		for (const nd::TiXmlNode* node = entry.m_xmlNode->FirstChild("ndMesh"); node; node = node->NextSibling("ndMesh"))
 		{
-			ndAssert(0);
 			MeshXmlNodePair childPair;
 			const nd::TiXmlElement* const linkNode = (nd::TiXmlElement*)node;
 

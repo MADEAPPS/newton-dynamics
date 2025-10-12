@@ -40,7 +40,7 @@ class ImportMesh(Operator, ImportHelper):
     def execute(self, context):
         #print(self.filepath)
         #return read_some_data(context, self.filepath, self.use_setting)
-        return ndMeshImport.read_some_data(context, self.filepath, self.use_setting)
+        return ndMeshImport.LoadMesh(context, self.filepath, self.use_setting)
 
 
 # Only needed if you want to add into a dynamic menu.
