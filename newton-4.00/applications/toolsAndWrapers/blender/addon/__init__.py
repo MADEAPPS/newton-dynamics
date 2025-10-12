@@ -5,6 +5,20 @@ from bpy.types import Operator
 
 from.import ndMeshImport
 
+# blend installation info
+bl_info = {
+    "name": "Newton Dynamics file format",
+    "author": "Julio Jerez",
+    "version": (1, 0, 0),
+    "blender": (5, 0, 0),
+    "location": "File > Import-Export",
+    "description": "Import-Export nd",
+    "warning": "",
+    "wiki_url": "http://newtondynamics.com",
+    "support": 'COMMUNITY',
+    "category": "Import-Export"}
+
+# import mesh class  hook
 class ImportMesh(Operator, ImportHelper):
     """This appears in the tooltip of the operator and in the generated docs"""
     bl_idname = "import_test.some_data"  # important since its how bpy.ops.import_test.some_data is constructed
@@ -46,7 +60,6 @@ class ImportMesh(Operator, ImportHelper):
 # Only needed if you want to add into a dynamic menu.
 def menu_func_import(self, context):
     self.layout.operator(ImportMesh.bl_idname, text="ndMesh (.nd)")
-
 
 # register classes.
 def register():
