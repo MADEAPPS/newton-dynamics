@@ -4,43 +4,58 @@ import bmesh
 import mathutils
 import xml.etree.ElementTree as ET
 
+#from mathutils import Vector
+
 def LoadMesh(context, filepath, use_some_setting):
     tree = ET.parse(filepath)
     root = tree.getroot()
     mesh = ParseNode(context, root, None)
     return {'FINISHED'}
 
-
-def TestShit(xmlNode):
-    name = xmlNode.find('name')
-    print(name.get('string'))
-    
-    matrix = xmlNode.find('matrix')
-    posit = [float(x) for x in matrix.find('posit').get('float3').split()]
-    angles = [float(x) for x in matrix.find('angles').get('float3').split()]
-    print(posit, angles)
-    
 def CalculateTransform(xmlMatrix):
     posit = [float(x) for x in xmlMatrix.find('posit').get('float3').split()]
     angles = [float(x) for x in xmlMatrix.find('angles').get('float3').split()]
-
     scale = mathutils.Vector((1.0, 1.0, 1.0))
     location = mathutils.Vector((posit[0], posit[1], posit[2]))
     rotation = mathutils.Euler((math.radians(angles[0]), math.radians(angles[1]), math.radians(angles[2])), 'XYZ')
+    #meshNode.matrix_basis = mathutils.Matrix.LocRotScale(location, rotation, scale)
     return mathutils.Matrix.LocRotScale(location, rotation, scale)
 
-def ParseVertices(meshObj, xmlVertices):
-    #positions = xmlVertices.find('vertices')
-    #indices = xmlVertices.find('indices')
+#def CalculateGeomtryTransform(meshNode, xmlMatrix):
+#    posit = [float(x) for x in xmlMatrix.find('posit').get('float3').split()]
+#    angles = [float(x) for x in xmlMatrix.find('angles').get('float3').split()]
+#    meshNode.delta_scale = mathutils.Vector((1.0, 1.0, 1.0))
+#    meshNode.delta_location = mathutils.Vector((posit[0], posit[1], posit[2]))
+#    meshNode.delta_rotation_euler = mathutils.Euler((math.radians(angles[0]), math.radians(angles[1]), math.radians(angles[2])), 'XYZ')
+
+def ParseVertices(meshObj, xmlVertices, xmlFaces):
     indices = [int(x) for x in xmlVertices.find('indices').get('intArray').split()]
+    faces = [int(x) for x in xmlFaces.find('faceIndexCount').get('intArray').split()]
     posit = [float(x) for x in xmlVertices.find('positions').get('float3Array').split()]
-    print(posit)
-    print(indices)
+    
+    for i in range(0, len(posit), 3):
+        x = posit[i + 0]
+        y = posit[i + 1]
+        z = posit[i + 2]
+        meshObj.verts.new ((x, y, z))
+        
+    # Ensure the lookup table is updated for vertex indexing
+    meshObj.verts.ensure_lookup_table()        
+
+    indexCount = 0
+    for i in range(0, len(faces), 1):
+        meshFace = []        
+        count = faces[i]
+        for j in range(0, count, 1):
+            index = indices[indexCount + j]
+            meshFace.append(meshObj.verts[index])
+        meshObj.faces.new(meshFace)                    
+        indexCount = indexCount + count;        
 
 
 def ParseGeomentry(nodeData, xmlNode):
     mesh = bmesh.new()
-    ParseVertices(mesh, xmlNode.find('vertices'))
+    ParseVertices(mesh, xmlNode.find('vertices'), xmlNode.find('faces'))
     
     
     mesh.to_mesh(nodeData)
@@ -62,6 +77,9 @@ def ParseNode(context, xmlNode, blenderParentNode):
     
     #set the transform
     node.matrix_basis = CalculateTransform(xmlNode.find('matrix'))
+    
+    #set the geometry Transform
+    #CalculateGeomtryTransform(node, xmlNode.find('meshMatrix'))
     
     xmlGeometry = xmlNode.find('ndGeometry')
     if (xmlGeometry != None):
