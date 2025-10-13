@@ -12,6 +12,9 @@
 #ifndef _ND_SHARED_PTR_H_
 #define _ND_SHARED_PTR_H_
 
+#include "ndCoreStdafx.h"
+#include "ndContainersAlloc.h"
+
 template <typename T>
 class ndSharedPtr
 {
