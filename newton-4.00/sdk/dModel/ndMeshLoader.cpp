@@ -139,13 +139,11 @@ bool ndMeshLoader::LoadEntity(ndRender* const renderer, const ndString& fbxPathM
 				material.m_opacity = ndReal(materials[j].m_opacity);
 				material.m_castShadows = true;
 			}
-			//ndSharedPtr<ndRenderPrimitive> geometry(ndRenderPrimitive::CreateMeshPrimitive(descriptor));
-			ndSharedPtr<ndRenderPrimitive> geometry(new ndRenderPrimitive(descriptor));
 
 			//pair.m_entity->m_name = effectNode->GetName();
+			//ndSharedPtr<ndRenderPrimitive> geometry(ndRenderPrimitive::CreateMeshPrimitive(descriptor));
+			ndSharedPtr<ndRenderPrimitive> geometry(new ndRenderPrimitive(descriptor));
 			pair.m_entity->SetPrimitive(geometry);
-			//pair.m_entity->SetPrimitiveMatrix(pair.m_mesh->m_meshMatrix);
-			pair.m_entity->SetPrimitiveMatrix(ndGetIdentityMatrix());
 
 			//if ((effectNode->GetName().Find("hidden") >= 0) || (effectNode->GetName().Find("Hidden") >= 0))
 			//{

@@ -594,8 +594,6 @@ ndMesh* ndMeshFile::Import(const ndString& fullPathName)
 
 		mesh->m_name = ndString(xmlGetString(entry.m_xmlNode, "name"));
 		mesh->m_matrix = xmlGetMatrix(entry.m_xmlNode, "matrix");
-		ndAssert(0);
-		//mesh->m_meshMatrix = xmlGetMatrix(entry.m_xmlNode, "meshMatrix");
 
 		const nd::TiXmlElement* const xmlGeometry = (nd::TiXmlElement*)entry.m_xmlNode->FirstChild("ndGeometry");
 		if (xmlGeometry)

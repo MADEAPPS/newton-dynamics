@@ -62,7 +62,6 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 	ndRenderSceneNode* FindByName(const ndString& name) const;
 	ndRenderSceneNode* FindByClosestMatch(const ndString& name) const;
 
-	void SetPrimitiveMatrix(const ndMatrix& matrix);
 	ndSharedPtr<ndRenderPrimitive>GetPrimitive() const;
 	void SetPrimitive(const ndSharedPtr<ndRenderPrimitive>& primitive);
 
@@ -87,7 +86,6 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 
 	ndMatrix m_matrix;			// interpolated local matrix
 	ndMatrix m_globalMatrix;	// world space matrix calculated each frame for rendering
-	ndMatrix m_primitiveMatrix;
 	ndTransform m_transform0;
 	ndTransform m_transform1;
 	ndString m_name;

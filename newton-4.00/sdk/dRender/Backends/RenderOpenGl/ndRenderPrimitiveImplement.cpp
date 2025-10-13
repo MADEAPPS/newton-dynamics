@@ -245,7 +245,7 @@ void ndRenderPrimitiveImplement::UpdateSkinPaletteMatrix()
 	}
 
 	m_skinPaletteMatrixArray.SetCount(0);
-	const ndMatrix shapeBindMatrix((m_skinSceneNode->m_primitiveMatrix * m_skinSceneNode->m_globalMatrix).OrthoInverse());
+	const ndMatrix shapeBindMatrix(m_skinSceneNode->m_globalMatrix.OrthoInverse());
 	for (ndInt32 i = 0; i < ndInt32(m_skeleton.GetCount()); ++i)
 	{
 		const ndRenderSceneNode* const bone = m_skeleton[i];
@@ -570,7 +570,7 @@ void ndRenderPrimitiveImplement::BuildRenderSkinnedMeshFromMeshEffect(const ndRe
 	}
 	// build a mapping for bone to index for all bone active in the vertex weigh
 	ndTree<ndInt32, ndInt32> boneToIndexMap;
-	ndMatrix shapeBindMatrix(descriptor.m_skeleton->m_primitiveMatrix * descriptor.m_skeleton->CalculateGlobalTransform());
+	const ndMatrix shapeBindMatrix(descriptor.m_skeleton->CalculateGlobalTransform());
 	for (ndInt32 i = 0; i < vertexCount; ++i)
 	{
 		for (ndInt32 j = 0; j < ND_VERTEX_WEIGHT_SIZE; ++j)

@@ -319,6 +319,7 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 
 ndMeshFile exportFile;
 exportFile.Export(*loader.m_mesh, ndGetWorkingFileName("xxx.nd"));
+ndSharedPtr<ndMesh> xxxx (exportFile.Import(ndGetWorkingFileName("xxx.nd")));
 
 
 	class PlaceMatrix : public ndMatrix

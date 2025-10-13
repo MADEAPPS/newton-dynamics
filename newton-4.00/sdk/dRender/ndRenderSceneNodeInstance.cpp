@@ -56,12 +56,11 @@ void ndRenderSceneNodeInstance::ApplyPrimitiveTransforms()
 	ndArray<glMatrix>& matrixPalette = meshImplement->m_instanceMatrixArray;
 
 	matrixPalette.SetCount(0);
-	const ndMatrix primitiveMatrix(m_primitiveMatrix);
 	const ndList<ndSharedPtr<ndRenderSceneNode>>& children = GetChildren();
 	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* node = children.GetFirst(); node; node = node->GetNext())
 	{
 		ndRenderSceneNode* const child = *node->GetInfo();
-		matrixPalette.PushBack(glMatrix(primitiveMatrix * child->m_globalMatrix));
+		matrixPalette.PushBack(glMatrix(child->m_globalMatrix));
 	}
 	ndAssert(matrixPalette.GetCount() <= meshImplement->m_instanceCount);
 }

@@ -45,7 +45,6 @@ ndRenderSceneNode::ndRenderSceneNode(const ndMatrix& matrix)
 	:ndContainersFreeListAlloc<ndRenderSceneNode>()
 	,m_matrix(matrix)
 	,m_globalMatrix(matrix)
-	,m_primitiveMatrix(ndGetIdentityMatrix())
 	,m_transform0(matrix)
 	,m_transform1(m_transform0)
 	,m_name()
@@ -63,7 +62,6 @@ ndRenderSceneNode::ndRenderSceneNode(const ndRenderSceneNode& src)
 	:ndContainersFreeListAlloc<ndRenderSceneNode>()
 	,m_matrix(src.m_matrix)
 	,m_globalMatrix(src.m_globalMatrix)
-	,m_primitiveMatrix(src.m_primitiveMatrix)
 	,m_transform0(src.m_transform0)
 	,m_transform1(src.m_transform1)
 	,m_name(src.m_name)
@@ -277,11 +275,6 @@ void ndRenderSceneNode::RemoveChild(const ndSharedPtr<ndRenderSceneNode> child)
 	m_children.Remove(node);
 }
 
-void ndRenderSceneNode::SetPrimitiveMatrix(const ndMatrix& matrix)
-{
-	m_primitiveMatrix = matrix;
-}
-
 void ndRenderSceneNode::SetPrimitive(const ndSharedPtr<ndRenderPrimitive>& primitive)
 {
 	m_primitive = primitive;
@@ -374,7 +367,7 @@ void ndRenderSceneNode::Render(const ndRender* const owner, const ndMatrix& mode
 	if (m_isVisible && *m_primitive)
 	{
 		const ndRenderPrimitive* const mesh = *m_primitive;
-		const ndMatrix modelMatrix(m_primitiveMatrix * m_globalMatrix * modelViewMatrix);
+		const ndMatrix modelMatrix(m_globalMatrix * modelViewMatrix);
 		mesh->Render(owner, modelMatrix, renderMode);
 	}
 
