@@ -26,10 +26,9 @@
 #include "ndMemory.h"
 #include "ndVector.h"
 #include "ndMatrix.h"
-#include "ndSharedPtr.h"
-#include "ndContainersAlloc.h"
 
-#define D_VERTEXLIST_INDEX_LIST_BATCH (1024 * 64)
+//#define ND_EXPERIMETAL_SWEEP_METHOD
+#define ND_VERTEXLIST_INDEX_LIST_BATCH (1024 * 32)
 
 #pragma optimize( "", off )
 ndFloat32 ndExp_VS__Fix(ndReal x)
@@ -103,20 +102,7 @@ static ndInt32 SortVertices(
 	ndSortKey* const remapIndex,
 	const ndSortCluster& cluster, ndInt32 baseCount, ndInt32 firstSortAxis)
 {
-	firstSortAxis = 0;
-	const ndBigVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count));
-	const ndBigVector variance(ndBigVector::m_zero.GetMax(cluster.m_sum2.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count) - origin * origin).Sqrt());
-
-	if ((variance.m_y >= variance.m_x) && (variance.m_y >= variance.m_z))
-	{
-		firstSortAxis = 1;
-	}
-	else if ((variance.m_z >= variance.m_x) && (variance.m_z >= variance.m_y))
-	{
-		firstSortAxis = 2;
-	}
-
-	class dVertexSortData
+	class ndVertexSortData
 	{
 		public:
 		ndInt32 m_stride;
@@ -124,7 +110,7 @@ static ndInt32 SortVertices(
 		const ndFloat64* m_vertex;
 	};
 
-	dVertexSortData sortContext;
+	ndVertexSortData sortContext;
 	sortContext.m_vertex = vertexList;
 	sortContext.m_stride = stride;
 	sortContext.m_vertexSortIndex = firstSortAxis;
@@ -132,7 +118,7 @@ static ndInt32 SortVertices(
 	{
 		public:
 		ndCompareKey(void* const context)
-			:m_sortContext((dVertexSortData*)context)
+			:m_sortContext((ndVertexSortData*)context)
 		{
 		}
 
@@ -152,13 +138,20 @@ static ndInt32 SortVertices(
 			return 0;
 		}
 
-		dVertexSortData* m_sortContext;
+		ndVertexSortData* m_sortContext;
 	};
 	ndSort<ndSortKey, ndCompareKey>(remapIndex, cluster.m_count, &sortContext);
 
+#ifdef ND_EXPERIMETAL_SWEEP_METHOD
+	const ndFloat64 tolerance = ndMax(ndFloat64(tol), ndFloat64(1.0e-8f));
+	const ndFloat64 sweptWindow = ndFloat64(2.0f) * tolerance;
+#else
+	const ndBigVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count));
+	const ndBigVector variance(ndBigVector::m_zero.GetMax(cluster.m_sum2.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count) - origin * origin).Sqrt());
 	const ndFloat64 minDist = ndMin(ndMin(variance.m_x, variance.m_y), variance.m_z);
 	const ndFloat64 tolerance = ndMax(ndMin(minDist, ndFloat64(tol)), ndFloat64(1.0e-8f));
 	const ndFloat64 sweptWindow = ndFloat64(2.0f) * tolerance;
+#endif
 	
 	ndInt32 newCount = 0;
 	for (ndInt32 i = 0; i < cluster.m_count; ++i)
@@ -220,7 +213,7 @@ static ndInt32 SortVertices(
 
 static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, ndFloat64 tolerance)
 {
-#if 1
+#ifndef ND_EXPERIMETAL_SWEEP_METHOD
 	ndSortCluster cluster;
 	cluster.m_start = 0;
 	cluster.m_count = vertexCount;
@@ -246,7 +239,7 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 	}
 
 	ndInt32 baseCount = 0;
-	if (cluster.m_count > D_VERTEXLIST_INDEX_LIST_BATCH)
+	if (cluster.m_count > ND_VERTEXLIST_INDEX_LIST_BATCH)
 	{
 		ndFixSizeArray<ndSortCluster, 128> spliteStack;
 		spliteStack.PushBack(cluster);
@@ -260,7 +253,7 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 			ndSortKey* const remapIndex = &indirectList[cluster.m_start];
 
 			ndFloat64 maxVariance2 = ndMax(ndMax(variance2.m_x, variance2.m_y), variance2.m_z);
-			bool doSort = (cluster.m_count <= D_VERTEXLIST_INDEX_LIST_BATCH) || (spliteStack.GetCount() > (spliteStack.GetCapacity() - 4)) || (maxVariance2 < ndFloat32(4.0f));
+			bool doSort = (cluster.m_count <= ND_VERTEXLIST_INDEX_LIST_BATCH) || (spliteStack.GetCount() > (spliteStack.GetCapacity() - 4)) || (maxVariance2 < ndFloat32(4.0f));
 			if (doSort)
 			{
 				ndInt32 sortIndex = cluster.GetSortIndex();
@@ -269,15 +262,6 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 			}
 			else
 			{
-				//ndInt32 firstSortAxis = 0;
-				//if ((variance2.m_y >= variance2.m_x) && (variance2.m_y >= variance2.m_z))
-				//{
-				//	firstSortAxis = 1;
-				//}
-				//else if ((variance2.m_z >= variance2.m_x) && (variance2.m_z >= variance2.m_y))
-				//{
-				//	firstSortAxis = 2;
-				//}
 				ndInt32 firstSortAxis = cluster.GetSortIndex();
 				ndFloat64 axisVal = origin[firstSortAxis];
 	
@@ -364,23 +348,22 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 #else
 
 	ndSortCluster cluster;
-	ndArray<ndFloat64> vertList;
-	ndArray<ndSortKey> indirectList;
-
 	cluster.m_start = 0;
 	cluster.m_count = vertexCount;
 	cluster.m_sum = ndBigVector::m_zero;
 	cluster.m_sum2 = ndBigVector::m_zero;
 
+	ndArray<ndFloat64> vertList;
+	ndArray<ndSortKey> indirectList;
 	for (ndInt32 i = 0; i < cluster.m_count * stride; ++i)
 	{
 		vertList.PushBack(vertListOut[i]);
 	}
-	
+
 	for (ndInt32 i = 0; i < cluster.m_count; ++i)
 	{
 		ndSortKey key;
-		key.m_mask = ndInt32(-1);
+		key.m_mask = -1;
 		key.m_ordinal = i;
 		key.m_vertexIndex = i;
 		indirectList.PushBack(key);
@@ -390,135 +373,113 @@ static ndInt32 QuickSortVertices(ndFloat64* const vertListOut, ndInt32 stride, n
 		cluster.m_sum2 += x * x;
 	}
 
-	class ndPartitionTree : public ndContainersFreeListAlloc<ndPartitionTree>
+	const ndBigVector origin(cluster.m_sum.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count));
+	ndBigVector variance2(cluster.m_sum2.Scale(ndFloat32(1.0f) / (ndFloat32)cluster.m_count) - origin * origin);
+
+	auto CalculateSorIndex = [&variance2]()
 	{
-		public:
-		ndPartitionTree(
-			ndFloat64* const vertListOut,
-			ndInt32* const indexListOut,
-			const ndSortCluster& cluster, 
-			ndArray<ndFloat64>& vertexArray, 
-			ndArray<ndSortKey>& indirectList, 
-			ndInt32 stride, 
-			ndInt32& baseCount)
-			:ndContainersFreeListAlloc<ndPartitionTree>()
-			,m_cluster(cluster)
-			,m_stride(stride)
+		ndInt32 index = 0;
+		ndFloat64 maxVariance = ndFloat64(-1.0e10f);
+		for (ndInt32 i = 0; i < 3; ++i)
 		{
-			if (cluster.m_count > D_VERTEXLIST_INDEX_LIST_BATCH)
+			if (variance2[i] >= maxVariance)
 			{
-				SpliteTree(vertListOut, indexListOut, vertexArray, indirectList, baseCount);
+				index = i;
+				maxVariance = variance2[i];
 			}
-			ndAssert(0);
-			//ndInt32 newCount = SortVertices(vertListOut, indexListOut, &vertexArray[0], m_stride, compareCount, tolerance, remapIndex, cluster, baseCount, sortIndex);
-			//baseCount += newCount;
 		}
-
-		void SpliteTree(ndFloat64* const vertListOut, ndInt32* const indexListOut,
-			ndArray<ndFloat64>& vertexArray, ndArray<ndSortKey>& indirectList, ndInt32& baseCount)
-		{
-			const ndBigVector origin(m_cluster.m_sum.Scale(ndFloat32(1.0f) / (ndFloat32)m_cluster.m_count));
-			const ndBigVector variance2(m_cluster.m_sum2.Scale(ndFloat32(1.0f) / (ndFloat32)m_cluster.m_count) - origin * origin);
-			ndSortKey* const remapIndex = &indirectList[m_cluster.m_start];
-
-			ndInt32 firstSortAxis = 0;
-			if ((variance2.m_y >= variance2.m_x) && (variance2.m_y >= variance2.m_z))
-			{
-				firstSortAxis = 1;
-			}
-			else if ((variance2.m_z >= variance2.m_x) && (variance2.m_z >= variance2.m_y))
-			{
-				firstSortAxis = 2;
-			}
-			ndFloat64 axisVal = origin[firstSortAxis];
-
-			ndInt32 i0 = 0;
-			ndInt32 i1 = m_cluster.m_count - 1;
-			while (i0 < i1)
-			{
-				ndInt32 index0 = remapIndex[i0].m_vertexIndex;
-				while ((vertexArray[index0 * m_stride + firstSortAxis] <= axisVal) && (i0 < i1))
-				{
-					++i0;
-					index0 = remapIndex[i0].m_vertexIndex;
-				};
-
-				ndInt32 index1 = remapIndex[i1].m_vertexIndex;
-				while ((vertexArray[index1 * m_stride + firstSortAxis] > axisVal) && (i0 < i1))
-				{
-					--i1;
-					index1 = remapIndex[i1].m_vertexIndex;
-				}
-
-				ndAssert(i0 <= i1);
-				if (i0 < i1)
-				{
-					ndSwap(remapIndex[i0], remapIndex[i1]);
-					++i0;
-					--i1;
-				}
-			}
-
-			ndInt32 index0 = remapIndex[i0].m_vertexIndex;
-			while ((vertexArray[index0 * m_stride + firstSortAxis] <= axisVal) && (i0 < m_cluster.m_count))
-			{
-				++i0;
-				index0 = remapIndex[i0].m_vertexIndex;
-			};
-
-#ifdef _DEBUG
-			for (ndInt32 i = 0; i < i0; ++i)
-			{
-				index0 = remapIndex[i].m_vertexIndex;
-				ndAssert(vertexArray[index0 * m_stride + firstSortAxis] <= axisVal);
-			}
-
-			for (ndInt32 i = i0; i < m_cluster.m_count; ++i)
-			{
-				index0 = remapIndex[i].m_vertexIndex;
-				ndAssert(vertexArray[index0 * m_stride + firstSortAxis] > axisVal);
-			}
-#endif
-
-			ndBigVector xc(ndBigVector::m_zero);
-			ndBigVector x2c(ndBigVector::m_zero);
-			for (ndInt32 i = 0; i < i0; ++i)
-			{
-				ndInt32 j = remapIndex[i].m_vertexIndex;
-				const ndBigVector x(vertexArray[j * m_stride + 0], vertexArray[j * m_stride + 1], vertexArray[j * m_stride + 2], ndFloat64(0.0f));
-				xc += x;
-				x2c += x * x;
-			}
-
-			ndSortCluster cluster_i1(m_cluster);
-			cluster_i1.m_start = m_cluster.m_start + i0;
-			cluster_i1.m_count = m_cluster.m_count - i0;
-			cluster_i1.m_sum -= xc;
-			cluster_i1.m_sum2 -= x2c;
-			ndSharedPtr<ndPartitionTree> leftBranch(
-				new ndPartitionTree(vertListOut, indexListOut,
-					cluster_i1, vertexArray, indirectList, m_stride, baseCount));
-
-			ndSortCluster cluster_i0(m_cluster);
-			cluster_i0.m_start = m_cluster.m_start;
-			cluster_i0.m_count = i0;
-			cluster_i0.m_sum = xc;
-			cluster_i0.m_sum2 = x2c;
-			ndSharedPtr<ndPartitionTree> rightBranch(
-				new ndPartitionTree(vertListOut, indexListOut,
-					cluster_i0, vertexArray, indirectList, m_stride, baseCount));
-
-			// merge sliver
-		}
-
-		ndSortCluster m_cluster;
-		ndInt32 m_stride;
+		return index;
 	};
 
-	ndInt32 baseCount = 0;
-	ndSharedPtr<ndPartitionTree> root(new ndPartitionTree(vertListOut, indexListOut, cluster, vertList, indirectList, stride, baseCount));
+	ndInt32 sortIndex = CalculateSorIndex();
+	if (cluster.m_count < ND_VERTEXLIST_INDEX_LIST_BATCH)
+	//if (1)
+	{
+		ndInt32 baseCount = SortVertices(vertListOut, indexListOut, &vertList[0], stride, compareCount, tolerance, &indirectList[0], cluster, 0, sortIndex);
+		return baseCount;
+	}
 
-	return 0;
+	variance2[sortIndex] = ndFloat64(-1.0e10f);
+	ndInt32 sweepIndex = CalculateSorIndex();
+	ndAssert(sweepIndex != sortIndex);
+
+	class ndVertexSortData
+	{
+		public:
+		ndInt32 m_stride;
+		ndInt32 m_vertexSortIndex;
+		const ndFloat64* m_vertex;
+	};
+
+	ndVertexSortData sortContext;
+	sortContext.m_vertex = &vertList[0];
+	sortContext.m_stride = stride;
+	sortContext.m_vertexSortIndex = sweepIndex;
+	class ndCompareKey
+	{
+		public:
+		ndCompareKey(void* const context)
+			:m_sortContext((ndVertexSortData*)context)
+		{
+		}
+
+		ndInt32 Compare(const ndSortKey& elementA, const ndSortKey& elementB) const
+		{
+			ndInt32 index0 = elementA.m_vertexIndex * m_sortContext->m_stride + m_sortContext->m_vertexSortIndex;
+			ndInt32 index1 = elementB.m_vertexIndex * m_sortContext->m_stride + m_sortContext->m_vertexSortIndex;
+
+			ndFloat64 val0 = m_sortContext->m_vertex[index0];
+			ndFloat64 val1 = m_sortContext->m_vertex[index1];
+			if (val0 < val1)
+			{
+				return -1;
+			}
+			if (val0 > val1)
+			{
+				return 1;
+			}
+			return 0;
+		}
+
+		ndVertexSortData* m_sortContext;
+	};
+	ndSort<ndSortKey, ndCompareKey>(&indirectList[0], cluster.m_count, &sortContext);
+
+	int xxxx = 0;
+	ndInt32 baseCount = 0;
+	ndInt32 startIndex = 0;
+	while (startIndex < cluster.m_count)
+	{
+		ndInt32 start = startIndex;
+		const ndInt32 count = ((start + ND_VERTEXLIST_INDEX_LIST_BATCH) < cluster.m_count) ? ND_VERTEXLIST_INDEX_LIST_BATCH : cluster.m_count - start;
+
+		ndFloat64 sweepWindow = ndMax(ndFloat64(tolerance * 10.0f), ndFloat64(0.5f));
+		ndFloat64 startPoint = sweepWindow + sortContext.m_vertex[indirectList[start].m_vertexIndex * stride + sweepIndex];
+		for (ndInt32 i = 0; i < count; ++i)
+		{
+			ndInt32 j = indirectList[start + i].m_vertexIndex;
+			ndInt32 index = j * stride + sweepIndex;
+			ndFloat64 val = sortContext.m_vertex[index];
+			if (val > startPoint)
+			{
+				break;
+			}
+			startIndex++;
+		}
+
+		ndSortKey* const remapIndex = &indirectList[start];
+		ndSortCluster clusterBash(cluster);
+		clusterBash.m_start = 0;
+		clusterBash.m_count = startIndex - start;
+		clusterBash.m_sum = ndBigVector::m_zero;
+		clusterBash.m_sum2 = ndBigVector::m_zero;
+		ndInt32 newCount = SortVertices(vertListOut, indexListOut, &vertList[0], stride, compareCount, tolerance, remapIndex, clusterBash, baseCount, sortIndex);
+		baseCount += newCount;
+		
+		xxxx++;
+	}
+	return baseCount;
+
 #endif
 	
 }
