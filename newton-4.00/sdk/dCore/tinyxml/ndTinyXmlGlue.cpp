@@ -308,8 +308,9 @@ ndInt64 xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name)
 	ndAssert(element);
 	const char* const data = element->Attribute("int64");
 
+	ndInt32 ret = 0;
 	long long int value;
-	sscanf(data, "%lld", &value);
+	ret = sscanf(data, "%lld", &value);
 	return ndInt64(value);
 }
 
@@ -339,7 +340,8 @@ ndVector xmlGetVector3(const nd::TiXmlNode* const rootNode, const char* const na
 	ndFloat64 fx;
 	ndFloat64 fy;
 	ndFloat64 fz;
-	sscanf(positData, "%lf %lf %lf", &fx, &fy, &fz);
+	ndInt32 ret = 0;
+	ret = sscanf(positData, "%lf %lf %lf", &fx, &fy, &fz);
 
 	ndVector posit(ndVector::m_zero);
 	posit.m_x = ndFloat32(fx);
@@ -377,11 +379,11 @@ void xmlGetInt(const nd::TiXmlNode* const rootNode, const char* const name, ndAr
 	{
 		char x[128];
 		x[127] = 0;
-		ndInt32 xx = sscanf(&data[start], "%[^ ]", x);
+		ndInt32 ret = sscanf(&data[start], "%[^ ]", x);
 		start += strlen(x) + 1;
 
 		long long int fx;
-		xx = sscanf(x, "%lld", &fx);
+		ret = sscanf(x, "%lld", &fx);
 		array.PushBack(ndInt32(fx));
 	}
 }
@@ -401,12 +403,37 @@ void xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name, nd
 	{
 		char x[128];
 		x[127] = 0;
-		ndInt32 xx = sscanf(&data[start], "%[^ ]", x);
+		ndInt32 ret = sscanf(&data[start], "%[^ ]", x);
 		start += strlen(x) + 1;
 
 		long long int fx;
-		xx = sscanf(x, "%lld", &fx);
+		ret = sscanf(x, "%lld", &fx);
 		array.PushBack(ndInt64 (fx));
+	}
+}
+
+void xmlGetRealArray(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndReal>& array)
+{
+	const nd::TiXmlElement* const element = (nd::TiXmlElement*)rootNode->FirstChild(name);
+	ndAssert(element);
+	ndInt32 count;
+	element->Attribute("count", &count);
+
+	const char* const data = element->Attribute("float3Array");
+	ndAssert(data);
+
+	size_t start = 0;
+	for (ndInt32 i = 0; i < count * 3; ++i)
+	{
+		char x[128];
+		x[127] = 0;
+
+		ndInt32 ret = sscanf(&data[start], "%[^ ]", x);
+		start += strlen(x) + 1;
+
+		ndFloat64 fx;
+		ret = sscanf(x, "%lf", &fx);
+		array.PushBack(ndReal(fx));
 	}
 }
 
@@ -431,16 +458,16 @@ void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const na
 		y[127] = 0;
 		z[127] = 0;
 
-		ndInt32 xx = sscanf(&data[start], "%[^ ] %[^ ] %[^ ]", x, y, z);
+		ndInt32 ret = sscanf(&data[start], "%[^ ] %[^ ] %[^ ]", x, y, z);
 		start += strlen(x) + strlen(y) + strlen(z) + 3;
 
 		ndFloat64 fx;
 		ndFloat64 fy;
 		ndFloat64 fz;
 
-		xx = sscanf(x, "%lf", &fx);
-		xx = sscanf(y, "%lf", &fy);
-		xx = sscanf(z, "%lf", &fz);
+		ret = sscanf(x, "%lf", &fx);
+		ret = sscanf(y, "%lf", &fy);
+		ret = sscanf(z, "%lf", &fz);
 		array.PushBack (ndVector(ndFloat32(fx), ndFloat32(fx), ndFloat32(fz), ndFloat32(0.0f)));
 	}
 }
@@ -466,16 +493,16 @@ void xmlGetFloat64Array3(const nd::TiXmlNode* const rootNode, const char* const 
 		y[127] = 0;
 		z[127] = 0;
 
-		ndInt32 xx = sscanf(&data[start], "%[^ ] %[^ ] %[^ ]", x, y, z);
+		ndInt32 ret = sscanf(&data[start], "%[^ ] %[^ ] %[^ ]", x, y, z);
 		start += strlen(x) + strlen(y) + strlen(z) + 3;
 
 		ndFloat64 fx;
 		ndFloat64 fy;
 		ndFloat64 fz;
 
-		xx = sscanf(x, "%lf", &fx);
-		xx = sscanf(y, "%lf", &fy);
-		xx = sscanf(z, "%lf", &fz);
+		ret = sscanf(x, "%lf", &fx);
+		ret = sscanf(y, "%lf", &fy);
+		ret = sscanf(z, "%lf", &fz);
 		array.PushBack(ndBigVector(fx, fx, fz, ndFloat64(0.0f)));
 	}
 }

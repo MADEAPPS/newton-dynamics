@@ -4894,8 +4894,6 @@ void ndMeshEffect::FlipWinding()
 
 void ndMeshEffect::SerializeToXml(nd::TiXmlElement* const xmlNode) const
 {
-
-//
 //	if (format.m_vertexWeight.m_data)
 //	{
 //		ndInt32 weightsCount = 0;
@@ -5136,9 +5134,7 @@ void ndMeshEffect::DeserializeFromXml(const nd::TiXmlElement* const xmlNode)
 		materialArray.PushBack(material);
 	}
 
-
 	//ndArray<ndMeshEffect::ndVertexWeight> vertexWeights;
-	
 	//ndArray<ndInt32> faceIndexArray;
 	//ndArray<ndInt32> faceMaterialArray;
 	//ndArray<ndInt32> vertexWeightsIndexArray;
@@ -5158,32 +5154,33 @@ void ndMeshEffect::DeserializeFromXml(const nd::TiXmlElement* const xmlNode)
 		format.m_vertex.m_strideInBytes = sizeof(ndBigVector);
 	}
 
-	ndArray<ndVector> normalArray;
+	ndArray<ndReal> normalArray;
 	ndArray<ndInt32> normalIndexArray;
 	if (xmlNode->FirstChild("normal"))
 	{
 		const nd::TiXmlElement* const node = (nd::TiXmlElement*)xmlNode->FirstChild("normal");
 		ndAssert(node);
 		xmlGetInt(node, "indices", normalIndexArray);
-		xmlGetFloatArray3(node, "normal", normalArray);
+		xmlGetRealArray(node, "normal", normalArray);
 
-		format.m_normal.m_data = &normalArray[0].m_x;
+		format.m_normal.m_data = &normalArray[0];
 		format.m_normal.m_indexList = &normalIndexArray[0];
-		format.m_normal.m_strideInBytes = sizeof(ndVector);
+		format.m_normal.m_strideInBytes = sizeof(ndNormal);
 	}
 
-	ndArray<ndVector> uvArray;
+	ndArray<ndReal> uvArray;
 	ndArray<ndInt32> uvIndexArray;
 	if (xmlNode->FirstChild("uvs"))
 	{
 		const nd::TiXmlElement* const node = (nd::TiXmlElement*)xmlNode->FirstChild("uvs");
 		ndAssert(node);
 		xmlGetInt(node, "indices", uvIndexArray);
-		xmlGetFloatArray3(node, "uv", uvArray);
+		xmlGetRealArray(node, "uv", uvArray);
 
-		format.m_uv0.m_data = &uvArray[0].m_x;
+		format.m_uv0.m_data = &uvArray[0];
 		format.m_uv0.m_indexList = &uvIndexArray[0];
-		format.m_uv0.m_strideInBytes = sizeof(ndVector);
+		//format.m_uv0.m_strideInBytes = sizeof(ndUV);
+		format.m_uv0.m_strideInBytes = 3 * sizeof(ndReal);
 	}
 
 	// import skin if there is any
