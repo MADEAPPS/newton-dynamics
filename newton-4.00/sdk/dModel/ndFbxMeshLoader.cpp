@@ -308,11 +308,12 @@ void ndFbxMeshLoader::FreezeScale(ndMesh* const mesh)
 		ndSharedPtr<ndMeshEffect> effectMesh (meshNode->GetMesh());
 		if (*effectMesh)
 		{
-			matrix = meshNode->m_meshMatrix * scaleMatrix;
-			matrix.PolarDecomposition(transformMatrix, scale, stretchAxis);
-			meshNode->m_meshMatrix = transformMatrix;
-			ndMatrix meshMatrix(ndGetIdentityMatrix(), scale, stretchAxis);
-			effectMesh->ApplyTransform(meshMatrix);
+			//matrix = meshNode->m_meshMatrix * scaleMatrix;
+			//matrix.PolarDecomposition(transformMatrix, scale, stretchAxis);
+			//meshNode->m_meshMatrix = transformMatrix;
+			//ndMatrix meshMatrix(ndGetIdentityMatrix(), scale, stretchAxis);
+			//effectMesh->ApplyTransform(meshMatrix);
+			effectMesh->ApplyTransform(scaleMatrix);
 		}
 
 		ndMesh::ndCurve& scaleCurve = meshNode->GetScaleCurve();
@@ -411,8 +412,9 @@ void ndFbxMeshLoader::AlignToWorld(ndMesh* const mesh)
 		ndSharedPtr<ndMeshEffect> effectMesh (meshNode->GetMesh());
 		if (*effectMesh)
 		{
-			ndMatrix meshMatrix(invRotation * meshNode->m_meshMatrix * rotation);
-			meshNode->m_meshMatrix = meshMatrix;
+			//ndMatrix meshMatrix(invRotation * meshNode->m_meshMatrix * rotation);
+			//meshNode->m_meshMatrix = meshMatrix;
+			//effectMesh->ApplyTransform(rotation);
 			effectMesh->ApplyTransform(rotation);
 		}
 
@@ -481,9 +483,6 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 	ndAssert(nodeMap.Find(fbxNode));
 	ndMesh* const entity = nodeMap.Find(fbxNode)->GetInfo();
 	ndSharedPtr<ndMeshEffect> meshEffect(new ndMeshEffect());
-	
-	ndMatrix pivotMatrix(ofbxMatrix2dMatrix(fbxMesh->getGeometricMatrix()));
-	entity->m_meshMatrix = pivotMatrix;
 	
 	const ofbx::Geometry* const geom = fbxMesh->getGeometry();
 	ndInt32 indexCount = geom->getIndexCount();
@@ -612,6 +611,10 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 	}
 	
 	meshEffect->BuildFromIndexList(&format);
+
+	ndMatrix pivotMatrix(ofbxMatrix2dMatrix(fbxMesh->getGeometricMatrix()));
+	//entity->m_meshMatrix = pivotMatrix;
+	meshEffect->ApplyTransform(pivotMatrix);
 	entity->SetMesh(meshEffect);
 	//mesh->RepairTJoints();
 }

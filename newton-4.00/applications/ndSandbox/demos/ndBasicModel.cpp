@@ -126,7 +126,7 @@ class ndBackGroundVehicleController : public ndModelNotify
 				// we can use a convex hull for simplicity. 
 				// however a tire champhered cylinder is much better choice because 
 				// it only generates one contact at the contact patch.
-				// this is faster and generate much beterr behavior.
+				// this is faster and generates beter behavior.
 				ndSharedPtr<ndShapeInstance> tireShape(child->CreateCollision());
 				tireShape->SetLocalMatrix(tireShape->GetLocalMatrix() * child->m_matrix);
 				compoundShape->AddCollision(*tireShape);

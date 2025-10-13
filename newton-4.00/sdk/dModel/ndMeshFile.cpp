@@ -253,7 +253,7 @@ void ndMeshFile::Export(const ndMesh* const mesh, const ndString& fullPathName)
 		MeshXmlNodePair entry(stack.Pop());
 		xmlSaveParam(entry.m_parentXml, "name", entry.m_meshNode->m_name.GetStr());
 		xmlSaveParam(entry.m_parentXml, "matrix", entry.m_meshNode->m_matrix);
-		xmlSaveParam(entry.m_parentXml, "meshMatrix", entry.m_meshNode->m_meshMatrix);
+		//xmlSaveParam(entry.m_parentXml, "meshMatrix", entry.m_meshNode->m_meshMatrix);
 
 		if (*entry.m_meshNode->GetMesh())
 		{
@@ -594,7 +594,8 @@ ndMesh* ndMeshFile::Import(const ndString& fullPathName)
 
 		mesh->m_name = ndString(xmlGetString(entry.m_xmlNode, "name"));
 		mesh->m_matrix = xmlGetMatrix(entry.m_xmlNode, "matrix");
-		mesh->m_meshMatrix = xmlGetMatrix(entry.m_xmlNode, "meshMatrix");
+		ndAssert(0);
+		//mesh->m_meshMatrix = xmlGetMatrix(entry.m_xmlNode, "meshMatrix");
 
 		const nd::TiXmlElement* const xmlGeometry = (nd::TiXmlElement*)entry.m_xmlNode->FirstChild("ndGeometry");
 		if (xmlGeometry)

@@ -308,15 +308,19 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 	ndSharedPtr<ndBody> bodyFloor(BuildCompoundScene(scene, ndGetIdentityMatrix()));
 	//ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "marblecheckboard.png", 0.1f, true));
 
-ndMeshLoader loader__;
-loader__.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("unitBox.fbx"));
-ndMeshFile exportFile;
-exportFile.Export(*loader__.m_mesh, ndGetWorkingFileName("xxx.nd"));
-ndSharedPtr<ndMesh> xxxx(exportFile.Import(ndGetWorkingFileName("xxx.nd")));
+//ndMeshLoader loader__;
+//loader__.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("unitBox.fbx"));
+//ndMeshFile exportFile;
+//exportFile.Export(*loader__.m_mesh, ndGetWorkingFileName("xxx.nd"));
+//ndSharedPtr<ndMesh> xxxx(exportFile.Import(ndGetWorkingFileName("xxx.nd")));
 	
 	ndMeshLoader loader;
 	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("ragdoll.fbx"));
-	
+
+ndMeshFile exportFile;
+exportFile.Export(*loader.m_mesh, ndGetWorkingFileName("xxx.nd"));
+
+
 	class PlaceMatrix : public ndMatrix
 	{
 		public:

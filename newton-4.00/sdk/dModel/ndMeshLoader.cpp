@@ -144,7 +144,8 @@ bool ndMeshLoader::LoadEntity(ndRender* const renderer, const ndString& fbxPathM
 
 			//pair.m_entity->m_name = effectNode->GetName();
 			pair.m_entity->SetPrimitive(geometry);
-			pair.m_entity->SetPrimitiveMatrix(pair.m_mesh->m_meshMatrix);
+			//pair.m_entity->SetPrimitiveMatrix(pair.m_mesh->m_meshMatrix);
+			pair.m_entity->SetPrimitiveMatrix(ndGetIdentityMatrix());
 
 			//if ((effectNode->GetName().Find("hidden") >= 0) || (effectNode->GetName().Find("Hidden") >= 0))
 			//{

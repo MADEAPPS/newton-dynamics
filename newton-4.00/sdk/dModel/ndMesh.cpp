@@ -27,7 +27,7 @@
 ndMesh::ndMesh()
 	:ndClassAlloc()
 	,m_matrix(ndGetIdentityMatrix())
-	,m_meshMatrix(ndGetIdentityMatrix())
+	//,m_meshMatrix(ndGetIdentityMatrix())
 	,m_name()
 	,m_mesh()
 	,m_scale()
@@ -41,7 +41,7 @@ ndMesh::ndMesh()
 ndMesh::ndMesh(const ndMesh& src)
 	:ndClassAlloc()
 	,m_matrix(src.m_matrix)
-	,m_meshMatrix(src.m_meshMatrix)
+	//,m_meshMatrix(src.m_meshMatrix)
 	,m_name(src.m_name)
 	,m_mesh(src.m_mesh)
 	,m_scale()
@@ -71,7 +71,7 @@ ndMesh::ndMesh(const ndMesh& src)
 ndMesh::ndMesh(const ndShapeInstance&)
 	:ndClassAlloc()
 	,m_matrix(ndGetIdentityMatrix())
-	,m_meshMatrix(ndGetIdentityMatrix())
+	//,m_meshMatrix(ndGetIdentityMatrix())
 	,m_name()
 	,m_mesh()
 	,m_scale()
@@ -271,8 +271,9 @@ void ndMesh::ApplyTransform(const ndMatrix& transform)
 		ndSharedPtr<ndMeshEffect> mesh (node->GetMesh());
 		if (mesh)
 		{
-			const ndMatrix meshMatrix(invTransform * node->m_meshMatrix * transform);
-			node->m_meshMatrix = meshMatrix;
+			//const ndMatrix meshMatrix(invTransform * node->m_meshMatrix * transform);
+			//node->m_meshMatrix = meshMatrix;
+			//mesh->ApplyTransform(transform);
 			mesh->ApplyTransform(transform);
 		}
 
@@ -345,7 +346,8 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionBox()
 	alighMatrix.m_posit = ndVector::m_half * (maxP + minP);
 	alighMatrix.m_posit.m_w = ndFloat32(1.0f);
 	
-	const ndMatrix matrix(alighMatrix * m_meshMatrix);
+	//const ndMatrix matrix(alighMatrix * m_meshMatrix);
+	const ndMatrix matrix(alighMatrix);
 	box->SetLocalMatrix(matrix);
 	return box;
 }
@@ -377,7 +379,9 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionSphere()
 	alighMatrix.m_posit.m_w = ndFloat32(1.0f);
 	
 	ndSharedPtr<ndShapeInstance> sphere (new ndShapeInstance(new ndShapeSphere(size.m_x)));
-	const ndMatrix matrix(alighMatrix * m_meshMatrix);
+	
+	//const ndMatrix matrix(alighMatrix * m_meshMatrix);
+	const ndMatrix matrix(alighMatrix);
 	sphere->SetLocalMatrix(matrix);
 	return sphere;
 }
@@ -411,8 +415,9 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionCapsule()
 	alighMatrix.m_posit.m_w = ndFloat32(1.0f);
 
 	ndSharedPtr<ndShapeInstance> capsule(new ndShapeInstance(new ndShapeCapsule(size.m_x, size.m_x, high)));
-
-	const ndMatrix matrix(alighMatrix * m_meshMatrix);
+	
+	//const ndMatrix matrix(alighMatrix * m_meshMatrix);
+	const ndMatrix matrix(alighMatrix);
 	capsule->SetLocalMatrix(matrix);
 	return capsule;
 }
@@ -428,7 +433,8 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionTire()
 
 	ndVector minBox(ndFloat32(1.0e10f));
 	ndVector maxBox(ndFloat32(-1.0e10f));
-	const ndMatrix localMatrix(m_meshMatrix);
+	//const ndMatrix localMatrix(m_meshMatrix);
+	const ndMatrix localMatrix(ndGetIdentityMatrix());
 	for (ndInt32 i = 0; i < pointsCount; ++i)
 	{
 		ndFloat32 x = ndFloat32(pointsBuffer[i * pointsStride + 0]);
@@ -445,7 +451,8 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionTire()
 
 	ndVector scale(ndFloat32(4.0f) * width, radius, radius, 0.0f);
 	tireShape->SetScale(scale);
-	tireShape->SetLocalMatrix(localMatrix.OrthoInverse() * m_meshMatrix);
+	//tireShape->SetLocalMatrix(localMatrix.OrthoInverse() * m_meshMatrix);
+	tireShape->SetLocalMatrix(localMatrix.OrthoInverse());
 	return tireShape;
 }
 
@@ -453,7 +460,9 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionConvex()
 {
 	ndAssert(*m_mesh);
 	ndSharedPtr<ndShapeInstance>shape(m_mesh->CreateConvexCollision(1.0e-3f));
-	const ndMatrix matrix(shape->GetLocalMatrix() * m_meshMatrix);
+	
+	//const ndMatrix matrix(shape->GetLocalMatrix() * m_meshMatrix);
+	const ndMatrix matrix(shape->GetLocalMatrix());
 	shape->SetLocalMatrix(matrix);
 	return shape;
 }
@@ -527,8 +536,9 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionCompound(bool lowDetail)
 	interfaceVHACD->Clean();
 	interfaceVHACD->Release();
 
-	const ndMatrix matrix(m_meshMatrix);
-	compoundShapeInstance->SetLocalMatrix(matrix);
+	//const ndMatrix matrix(m_meshMatrix);
+	//compoundShapeInstance->SetLocalMatrix(matrix);
+	compoundShapeInstance->SetLocalMatrix(ndGetIdentityMatrix());
 
 	return compoundShapeInstance;
 }
@@ -558,7 +568,8 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionTree(bool optimize)
 			ndInt32 mark = meshEffect->IncLRU();
 			ndPolyhedra::Iterator iter(*(*meshEffect));
 		
-			ndMatrix worldMatrix(node->m_meshMatrix * matrix);
+			//ndMatrix worldMatrix(node->m_meshMatrix * matrix);
+			const ndMatrix worldMatrix(matrix);
 			for (iter.Begin(); iter; iter++)
 			{
 				ndEdge* const edge = &(*iter);

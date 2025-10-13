@@ -90,10 +90,9 @@ class ndMesh : public ndClassAlloc
 	ndSharedPtr<ndShapeInstance> CreateCollisionFromChildren();
 
 	ndMatrix m_matrix;
-	ndMatrix m_meshMatrix;
+	//ndMatrix m_meshMatrix;
 
 	protected:
-
 	ndSharedPtr<ndShapeInstance> CreateCollisionBox();
 	ndSharedPtr<ndShapeInstance> CreateCollisionTire();
 	ndSharedPtr<ndShapeInstance> CreateCollisionSphere();
