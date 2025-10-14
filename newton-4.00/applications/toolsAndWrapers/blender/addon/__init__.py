@@ -89,8 +89,10 @@ class ExportMesh(Operator, ExportHelper):
     ) # type: ignore
 
     def execute(self, context):
-        return ndMeshExport.SaveMesh(context, self.filepath)
-
+        object = context.object
+        if (object != None):
+            ndMeshExport.SaveMesh(context, self.filepath)
+        return {'FINISHED'}
 
 # import a mesh browser 
 def menu_func_import(self, context):
