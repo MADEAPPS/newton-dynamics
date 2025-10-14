@@ -18,7 +18,7 @@ def SaveMesh(context, filepath):
     #parse blender selected node and all it children
     object = context.object
     xmlRoot = ET.Element("ndMesh")
-    ParseDataRecurse(context, xmlRoot, object, matrix)
+    SaveNodeDataRecurse(context, xmlRoot, object, matrix)
     
     # 4. Create an ElementTree object from the root element
     tree = ET.ElementTree(xmlRoot)
@@ -32,13 +32,24 @@ def SaveMesh(context, filepath):
     
     return {'FINISHED'}
 
+def SaveNodeDataGeopmentry(context, xmlNode, blenderNode, matrix):
+    xmlGeomtry = ET.SubElement(xmlNode, "geometry")
 
-def ParseDataRecurse(context, xmlNode, blenderNode, matrix):
+def SaveNodeData(context, xmlNode, blenderNode, matrix):
     objectData = blenderNode.data
     if (objectData != None):
         xmlName = ET.SubElement(xmlNode, "name")
         xmlName.set('string', objectData.name)
+        
+        xmlMatrix = ET.SubElement(xmlNode, "matrix")
+        
+        vertices = objectData.vertices
+        if (vertices != None):
+            SaveNodeDataGeopmentry(context, xmlNode, blenderNode, matrix)
+
+def SaveNodeDataRecurse(context, xmlNode, blenderNode, matrix):
+    SaveNodeData(context, xmlNode, blenderNode, matrix)
     
     for blenderChild in blenderNode.children:
         xmlChild = ET.SubElement(xmlNode, "ndMesh")
-        ParseDataRecurse(context, xmlChild, blenderChild, matrix)
+        SaveNodeDataRecurse(context, xmlChild, blenderChild, matrix)

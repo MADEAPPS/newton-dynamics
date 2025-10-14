@@ -79,7 +79,7 @@ def ParseNode(context, xmlNode, blenderParentNode):
     #set the transform
     node.matrix_basis = CalculateTransform(xmlNode.find('matrix'))
     
-    xmlGeometry = xmlNode.find('ndGeometry')
+    xmlGeometry = xmlNode.find('geometry')
     if (xmlGeometry != None):
         ParseGeomentry(data, xmlGeometry)
     
