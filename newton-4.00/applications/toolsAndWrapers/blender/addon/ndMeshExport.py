@@ -1,6 +1,6 @@
 import bpy
 import math
-import bmesh
+#import bmesh
 import mathutils
 import xml.etree.ElementTree as ET
 
@@ -34,14 +34,32 @@ def SaveMesh(context, filepath):
 
 def SaveNodeDataGeopmentry(context, xmlNode, blenderNode, matrix):
     xmlGeomtry = ET.SubElement(xmlNode, "geometry")
+    
+def SaveNodeDataTransfrom(context, xmlNode, blenderNode, rotation):
+    xmlMatrix = ET.SubElement(xmlNode, "matrix")
+    
+    transposeRotation = rotation.copy()
+    transposeRotation.invert()
+    matrix = rotation @ blenderNode.matrix_basis @ transposeRotation
+    
+    location, quaternion, scale = matrix.decompose()
+    eulers = quaternion.to_euler('XYZ')
+    degrees = mathutils.Vector((math.degrees(eulers.x), math.degrees(eulers.y), math.degrees(eulers.z)))
+    
+    xmlPosit = ET.SubElement(xmlMatrix, "posit")
+    xmlPosit.set('float3', ' '.join(map(str, location)))
 
+    xmlAngles = ET.SubElement(xmlMatrix, "angles")
+    xmlAngles.set('float3', ' '.join(map(str, degrees)))
+   
+        
 def SaveNodeData(context, xmlNode, blenderNode, matrix):
     objectData = blenderNode.data
     if (objectData != None):
         xmlName = ET.SubElement(xmlNode, "name")
         xmlName.set('string', objectData.name)
         
-        xmlMatrix = ET.SubElement(xmlNode, "matrix")
+        SaveNodeDataTransfrom(context, xmlNode, blenderNode, matrix)
         
         vertices = objectData.vertices
         if (vertices != None):

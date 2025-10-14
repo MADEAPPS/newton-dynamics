@@ -11,8 +11,8 @@ def LoadMesh(context, filepath, use_some_setting):
 
     scale = mathutils.Vector((1.0, 1.0, 1.0))
     location = mathutils.Vector((0.0, 0.0, 0.0))
-    eulers = mathutils.Euler((math.radians(90.0), math.radians(0.0), math.radians(-90.0)), 'XYZ')
-    matrix = mathutils.Matrix.LocRotScale(location, eulers, scale)
+    quaternion = mathutils.Euler((math.radians(90.0), math.radians(0.0), math.radians(-90.0)), 'XYZ')
+    matrix = mathutils.Matrix.LocRotScale(location, quaternion, scale)
     TransformModel(mesh, matrix)
     return {'FINISHED'}
 
@@ -32,8 +32,8 @@ def CalculateTransform(xmlMatrix):
     angles = [float(x) for x in xmlMatrix.find('angles').get('float3').split()]
     scale = mathutils.Vector((1.0, 1.0, 1.0))
     location = mathutils.Vector((posit[0], posit[1], posit[2]))
-    rotation = mathutils.Euler((math.radians(angles[0]), math.radians(angles[1]), math.radians(angles[2])), 'XYZ')
-    return mathutils.Matrix.LocRotScale(location, rotation, scale)
+    quaternion = mathutils.Euler((math.radians(angles[0]), math.radians(angles[1]), math.radians(angles[2])), 'XYZ')
+    return mathutils.Matrix.LocRotScale(location, quaternion, scale)
 
 def ParseVertices(meshObj, xmlVertices, xmlFaces):
     indices = [int(x) for x in xmlVertices.find('indices').get('intArray').split()]
