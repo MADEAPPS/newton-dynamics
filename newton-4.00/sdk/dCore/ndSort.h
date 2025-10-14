@@ -26,6 +26,7 @@
 #include "ndArray.h"
 #include "ndProfiler.h"
 #include "ndThreadPool.h"
+#include "ndFixSizeArray.h"
 
 template <class T, class dCompareKey>
 void ndSort(T* const array, ndInt32 elements, void* const context);
@@ -57,17 +58,31 @@ void ndSort(T* const array, ndInt32 elements, void* const context)
 {
 	//D_TRACKTIME();
 	const ndInt32 batchSize = 8;
-	ndInt32 stack[128][2];
 
-	stack[0][0] = 0;
-	stack[0][1] = elements - 1;
-	ndInt32 stackIndex = 1;
-	const dCompareKey comparator(context);
-	while (stackIndex)
+	class ndIntervale
 	{
-		stackIndex--;
-		ndInt32 lo = stack[stackIndex][0];
-		ndInt32 hi = stack[stackIndex][1];
+		public:
+		ndIntervale() {}
+		ndIntervale(ndInt32 start, ndInt32 end)
+			:m_start(start)
+			,m_end(end)
+		{
+		}
+
+		ndInt32 m_start;
+		ndInt32 m_end;
+	};
+
+	ndFixSizeArray<ndIntervale, 256> stack;
+	
+	stack.PushBack(ndIntervale(0, elements - 1));
+
+	const dCompareKey comparator(context);
+	while (stack.GetCount())
+	{
+		ndIntervale span(stack.Pop());
+		ndInt32 lo = span.m_start;
+		ndInt32 hi = span.m_end;
 		if ((hi - lo) > batchSize)
 		{
 			ndInt32 mid = (lo + hi) >> 1;
@@ -107,17 +122,12 @@ void ndSort(T* const array, ndInt32 elements, void* const context)
 
 			if (i < hi)
 			{
-				stack[stackIndex][0] = i;
-				stack[stackIndex][1] = hi;
-				stackIndex++;
+				stack.PushBack(ndIntervale(i, hi));
 			}
 			if (lo < j)
 			{
-				stack[stackIndex][0] = lo;
-				stack[stackIndex][1] = j;
-				stackIndex++;
+				stack.PushBack(ndIntervale(lo, j));
 			}
-			ndAssert(stackIndex < ndInt32(sizeof(stack) / (2 * sizeof(stack[0][0]))));
 		}
 	}
 
