@@ -24,10 +24,11 @@ def SaveMesh(context, filepath):
     tree = ET.ElementTree(xmlRoot)
     
     # 5. Write the tree to an XML file
+    ET.indent(xmlRoot)
     tree.write(filepath, encoding="utf-8", xml_declaration=True)
     
     # 6. (debug) Print the XML to the console
-    print(ET.tostring(xmlRoot, encoding="utf-8").decode())
+    #print(ET.tostring(xmlRoot, encoding="utf-8").decode())
     
     return {'FINISHED'}
 
@@ -35,7 +36,9 @@ def SaveMesh(context, filepath):
 def ParseDataRecurse(context, xmlNode, blenderNode, matrix):
     objectData = blenderNode.data
     if (objectData != None):
-        print(objectData.name)
+        xmlName = ET.SubElement(xmlNode, "name")
+        xmlName.set('string', objectData.name)
     
-    for child in blenderNode.children:    
-        ParseDataRecurse(context, xmlNode, child, matrix)
+    for blenderChild in blenderNode.children:
+        xmlChild = ET.SubElement(xmlNode, "ndMesh")
+        ParseDataRecurse(context, xmlChild, blenderChild, matrix)
