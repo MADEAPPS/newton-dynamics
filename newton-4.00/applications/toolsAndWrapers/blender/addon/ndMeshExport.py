@@ -32,8 +32,26 @@ def SaveMesh(context, filepath):
     
     return {'FINISHED'}
 
-def SaveNodeDataGeopmentry(context, xmlNode, blenderNode, matrix):
+def SaveNodeDataGeometry(context, xmlNode, blenderNode, matrix):
     xmlGeomtry = ET.SubElement(xmlNode, "geometry")
+    
+    objectData = blenderNode.data
+    
+    #add veretex list roated to nd mesh system
+    vertexList = []
+    for vert in objectData.vertices:
+        #print(vert.co)
+        p = vert.co @ matrix
+        vertexList.append(p.x)
+        vertexList.append(p.y)
+        vertexList.append(p.z)
+        
+    xmlPositions = ET.SubElement(xmlGeomtry, "positions")
+    pointString = ' '.join(map(str, vertexList))
+    numberOfPoints = str(len(objectData.vertices))
+    xmlPositions.set('count', numberOfPoints)
+    xmlPositions.set('float3Array', pointString)
+
     
 def SaveNodeDataTransfrom(context, xmlNode, blenderNode, rotation):
     xmlMatrix = ET.SubElement(xmlNode, "matrix")
@@ -51,7 +69,6 @@ def SaveNodeDataTransfrom(context, xmlNode, blenderNode, rotation):
 
     xmlAngles = ET.SubElement(xmlMatrix, "angles")
     xmlAngles.set('float3', ' '.join(map(str, degrees)))
-   
         
 def SaveNodeData(context, xmlNode, blenderNode, matrix):
     objectData = blenderNode.data
@@ -63,7 +80,7 @@ def SaveNodeData(context, xmlNode, blenderNode, matrix):
         
         vertices = objectData.vertices
         if (vertices != None):
-            SaveNodeDataGeopmentry(context, xmlNode, blenderNode, matrix)
+            SaveNodeDataGeometry(context, xmlNode, blenderNode, matrix)
 
 def SaveNodeDataRecurse(context, xmlNode, blenderNode, matrix):
     SaveNodeData(context, xmlNode, blenderNode, matrix)
