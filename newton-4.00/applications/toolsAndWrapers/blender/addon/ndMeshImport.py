@@ -11,8 +11,9 @@ def LoadMesh(context, filepath, use_some_setting):
 
     scale = mathutils.Vector((1.0, 1.0, 1.0))
     location = mathutils.Vector((0.0, 0.0, 0.0))
-    rotation = mathutils.Euler((math.radians(90.0), math.radians(0.0), math.radians(-90.0)), 'XYZ')
-    TransformModel(mesh, mathutils.Matrix.LocRotScale(location, rotation, scale))
+    eulers = mathutils.Euler((math.radians(90.0), math.radians(0.0), math.radians(-90.0)), 'XYZ')
+    matrix = mathutils.Matrix.LocRotScale(location, eulers, scale)
+    TransformModel(mesh, matrix)
     return {'FINISHED'}
 
 def TransformModel(node, rotation):
