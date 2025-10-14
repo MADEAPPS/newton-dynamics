@@ -124,14 +124,15 @@ static ndInt32 SortVertices(
 
 		ndInt32 Compare(const ndSortKey& elementA, const ndSortKey& elementB) const
 		{
-			ndInt32 index0 = elementA.m_vertexIndex * m_sortContext->m_stride + m_sortContext->m_vertexSortIndex;
-			ndInt32 index1 = elementB.m_vertexIndex * m_sortContext->m_stride + m_sortContext->m_vertexSortIndex;
-
-			if (m_sortContext->m_vertex[index0] < m_sortContext->m_vertex[index1])
+			const ndInt32 index0 = elementA.m_vertexIndex * m_sortContext->m_stride + m_sortContext->m_vertexSortIndex;
+			const ndInt32 index1 = elementB.m_vertexIndex * m_sortContext->m_stride + m_sortContext->m_vertexSortIndex;
+			const ndFloat64 val0 = m_sortContext->m_vertex[index0];
+			const ndFloat64 val1 = m_sortContext->m_vertex[index1];
+			if (val0 < val1)
 			{
 				return -1;
 			}
-			if (m_sortContext->m_vertex[index0] > m_sortContext->m_vertex[index1])
+			if (val0 > val1)
 			{
 				return 1;
 			}
