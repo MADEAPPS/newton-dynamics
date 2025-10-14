@@ -4,8 +4,6 @@ import bmesh
 import mathutils
 import xml.etree.ElementTree as ET
 
-#from mathutils import Vector
-
 def LoadMesh(context, filepath, use_some_setting):
     tree = ET.parse(filepath)
     root = tree.getroot()
@@ -13,7 +11,7 @@ def LoadMesh(context, filepath, use_some_setting):
 
     scale = mathutils.Vector((1.0, 1.0, 1.0))
     location = mathutils.Vector((0.0, 0.0, 0.0))
-    rotation = mathutils.Euler((math.radians(90.0), math.radians(0.0), math.radians(0.0)), 'XYZ')
+    rotation = mathutils.Euler((math.radians(90.0), math.radians(0.0), math.radians(-90.0)), 'XYZ')
     TransformModel(mesh, mathutils.Matrix.LocRotScale(location, rotation, scale))
     return {'FINISHED'}
 
@@ -21,8 +19,9 @@ def TransformModel(node, rotation):
     transposeRotation = rotation.copy()
     transposeRotation.invert()
     node.matrix_basis = rotation @ node.matrix_basis @ transposeRotation
-
-
+    
+    for vert in node.data.vertices:
+        vert.co = rotation @ vert.co
     
     for child in node.children:
         TransformModel(child, rotation)
