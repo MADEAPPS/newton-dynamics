@@ -10,23 +10,30 @@ def LoadMesh(context, filepath, use_some_setting):
     tree = ET.parse(filepath)
     root = tree.getroot()
     mesh = ParseNode(context, root, None)
+
+    scale = mathutils.Vector((1.0, 1.0, 1.0))
+    location = mathutils.Vector((0.0, 0.0, 0.0))
+    rotation = mathutils.Euler((math.radians(90.0), math.radians(0.0), math.radians(0.0)), 'XYZ')
+    TransformModel(mesh, mathutils.Matrix.LocRotScale(location, rotation, scale))
     return {'FINISHED'}
 
+def TransformModel(node, rotation):
+    transposeRotation = rotation.copy()
+    transposeRotation.invert()
+    node.matrix_basis = rotation @ node.matrix_basis @ transposeRotation
+
+
+    
+    for child in node.children:
+        TransformModel(child, rotation)
+        
 def CalculateTransform(xmlMatrix):
     posit = [float(x) for x in xmlMatrix.find('posit').get('float3').split()]
     angles = [float(x) for x in xmlMatrix.find('angles').get('float3').split()]
     scale = mathutils.Vector((1.0, 1.0, 1.0))
     location = mathutils.Vector((posit[0], posit[1], posit[2]))
     rotation = mathutils.Euler((math.radians(angles[0]), math.radians(angles[1]), math.radians(angles[2])), 'XYZ')
-    #meshNode.matrix_basis = mathutils.Matrix.LocRotScale(location, rotation, scale)
     return mathutils.Matrix.LocRotScale(location, rotation, scale)
-
-#def CalculateGeomtryTransform(meshNode, xmlMatrix):
-#    posit = [float(x) for x in xmlMatrix.find('posit').get('float3').split()]
-#    angles = [float(x) for x in xmlMatrix.find('angles').get('float3').split()]
-#    meshNode.delta_scale = mathutils.Vector((1.0, 1.0, 1.0))
-#    meshNode.delta_location = mathutils.Vector((posit[0], posit[1], posit[2]))
-#    meshNode.delta_rotation_euler = mathutils.Euler((math.radians(angles[0]), math.radians(angles[1]), math.radians(angles[2])), 'XYZ')
 
 def ParseVertices(meshObj, xmlVertices, xmlFaces):
     indices = [int(x) for x in xmlVertices.find('indices').get('intArray').split()]
@@ -52,21 +59,15 @@ def ParseVertices(meshObj, xmlVertices, xmlFaces):
         meshObj.faces.new(meshFace)                    
         indexCount = indexCount + count;        
 
-
 def ParseGeomentry(nodeData, xmlNode):
     mesh = bmesh.new()
     ParseVertices(mesh, xmlNode.find('vertices'), xmlNode.find('faces'))
     
-    
     mesh.to_mesh(nodeData)
     nodeData.update()
     mesh.free()
-   
-    
         
 def ParseNode(context, xmlNode, blenderParentNode):
-    #TestShit(meshNode)
-    
     #create a geometry and a mesh node and link it to the scene and parent
     data = bpy.data.meshes.new(xmlNode.find('name').get('string'))
     node = bpy.data.objects.new(xmlNode.find('name').get('string'), data);
@@ -77,9 +78,6 @@ def ParseNode(context, xmlNode, blenderParentNode):
     
     #set the transform
     node.matrix_basis = CalculateTransform(xmlNode.find('matrix'))
-    
-    #set the geometry Transform
-    #CalculateGeomtryTransform(node, xmlNode.find('meshMatrix'))
     
     xmlGeometry = xmlNode.find('ndGeometry')
     if (xmlGeometry != None):
