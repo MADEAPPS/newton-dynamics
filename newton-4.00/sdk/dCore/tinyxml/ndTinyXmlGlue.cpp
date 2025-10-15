@@ -468,7 +468,7 @@ void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const na
 		ret = sscanf(x, "%lf", &fx);
 		ret = sscanf(y, "%lf", &fy);
 		ret = sscanf(z, "%lf", &fz);
-		array.PushBack (ndVector(ndFloat32(fx), ndFloat32(fx), ndFloat32(fz), ndFloat32(0.0f)));
+		array.PushBack (ndVector(ndFloat32(fx), ndFloat32(fy), ndFloat32(fz), ndFloat32(0.0f)));
 	}
 }
 
@@ -503,7 +503,7 @@ void xmlGetFloat64Array3(const nd::TiXmlNode* const rootNode, const char* const 
 		ret = sscanf(x, "%lf", &fx);
 		ret = sscanf(y, "%lf", &fy);
 		ret = sscanf(z, "%lf", &fz);
-		array.PushBack(ndBigVector(fx, fx, fz, ndFloat64(0.0f)));
+		array.PushBack(ndBigVector(fx, fy, fz, ndFloat64(0.0f)));
 	}
 }
 
