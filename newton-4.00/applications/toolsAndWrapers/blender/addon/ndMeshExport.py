@@ -1,6 +1,6 @@
 import bpy
 import math
-#import bmesh
+import bmesh
 import mathutils
 import xml.etree.ElementTree as ET
 
@@ -36,22 +36,54 @@ def SaveNodeDataGeometry(context, xmlNode, blenderNode, matrix):
     xmlGeomtry = ET.SubElement(xmlNode, "geometry")
     
     objectData = blenderNode.data
+
+    mesh = bmesh.new()
+    mesh.from_mesh(objectData)
     
-    #add veretex list roated to nd mesh system
+    #rotate and save vertex list
+    indexList = []
     vertexList = []
-    for vert in objectData.vertices:
-        #print(vert.co)
-        p = vert.co @ matrix
+    faceIndexList = []
+    for face in mesh.faces:
+        faceIndexList.append(len(face.verts))
+        for vert in face.verts:
+            indexList.append(vert.index)
+    
+    #for vert in objectData.vertices:
+    for vert in mesh.verts:
+        #p = vert.co @ matrix
+        p = matrix @ vert.co
         vertexList.append(p.x)
         vertexList.append(p.y)
         vertexList.append(p.z)
-        
-    xmlPositions = ET.SubElement(xmlGeomtry, "positions")
-    pointString = ' '.join(map(str, vertexList))
-    numberOfPoints = str(len(objectData.vertices))
-    xmlPositions.set('count', numberOfPoints)
-    xmlPositions.set('float3Array', pointString)
 
+    xmlPosition = ET.SubElement(xmlGeomtry, "vertices")
+    xmlPositions = ET.SubElement(xmlPosition, "positions")
+    xmlPositIndices = ET.SubElement(xmlPosition, "indices")
+
+    xmlFaces = ET.SubElement(xmlGeomtry, "faces")
+    mlFaceMaterial = ET.SubElement(xmlFaces, "faceMaterial")
+    xmlFaceIndexCount = ET.SubElement(xmlFaces, "faceIndexCount")
+        
+    #save the vertex array
+    pointString = ' '.join(map(str, vertexList))
+    xmlPositions.set('count', str(len(mesh.verts)))
+    xmlPositions.set('float3Array', pointString)
+    
+    # save the vertex Index array 
+    indexString = ' '.join(map(str, indexList))
+    xmlPositIndices.set('count', str(len(indexList)))
+    xmlPositIndices.set('intArray', indexString)
+
+    # save face index
+    faceIndexString = ' '.join(map(str, faceIndexList))
+    xmlFaceIndexCount.set('count', str(len(faceIndexList)))
+    xmlFaceIndexCount.set('intArray', faceIndexString)
+    
+    # save material ....
+    
+    # Free the BMesh data when done
+    mesh.free()
     
 def SaveNodeDataTransfrom(context, xmlNode, blenderNode, rotation):
     xmlMatrix = ET.SubElement(xmlNode, "matrix")
