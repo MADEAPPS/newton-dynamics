@@ -18,6 +18,7 @@ include_directories(../../../dCore)
 include_directories(../../../dNewton)
 include_directories(../../../dProfiler)
 include_directories(../../../dCollision)
+include_directories(../../../dCore/tinyxml)
 
 file(GLOB CPP_SOURCE *.c *.cpp *.h)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})

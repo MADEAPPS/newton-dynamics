@@ -20,6 +20,7 @@ include_directories(../dNewton)
 include_directories(../dRender)
 include_directories(../dProfiler)
 include_directories(../dCollision)
+include_directories(../dCore/tinyxml)
 
 include_directories(../../thirdParty/png)
 include_directories(../../thirdParty/imgui/)

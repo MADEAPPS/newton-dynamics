@@ -28,6 +28,7 @@
 #include <ndTree.h>
 #include <ndHeap.h>
 #include <ndSort.h>
+#include <tinyxml.h>
 #include <ndTypes.h>
 #include <ndUtils.h>
 #include <ndArray.h>
@@ -53,12 +54,12 @@
 #include <ndQuaternion.h>
 #include <ndProbability.h>
 #include <ndPerlinNoise.h>
+#include <ndTinyXmlGlue.h>
 #include <ndFixSizeArray.h>
 #include <ndConvexHull2d.h>
 #include <ndConvexHull3d.h>
 #include <ndConvexHull4d.h>
 #include <ndBezierSpline.h>
-#include <tinyxml/tinyxml.h>
 #include <ndNodeHierarchy.h>
 #include <ndIntersections.h>
 #include <ndSpatialVector.h>
@@ -75,7 +76,6 @@
 #include <ndPolygonSoupBuilder.h>
 #include <ndSharedNodeHierarchy.h>
 #include <ndPolygonSoupDatabase.h>
-#include <tinyxml/ndTinyXmlGlue.h>
 #include <ndThreadBackgroundWorker.h>
 #include <ndPolyhedraMassProperties.h>
 #include <ndDelaunayTetrahedralization.h>

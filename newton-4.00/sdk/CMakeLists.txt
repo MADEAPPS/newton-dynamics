@@ -33,6 +33,7 @@ else()
 	include_directories(dCore)
 	include_directories(dNewton)
 	include_directories(dCollision)
+	include_directories(dCore/tinyxml)
 
 	add_subdirectory(dNewton/dExtensions)
 

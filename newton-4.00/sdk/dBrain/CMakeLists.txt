@@ -15,6 +15,7 @@ message (${projectName})
 
 include_directories(.)
 include_directories(../dCore)
+include_directories(../dCore/tinyxml)
 include_directories(../../thirdParty/png)
 
 if(NEWTON_ENABLE_OPENCL_SDK)

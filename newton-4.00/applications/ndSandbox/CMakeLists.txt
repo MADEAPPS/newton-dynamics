@@ -45,6 +45,7 @@ include_directories(../../sdk/dCore)
 include_directories(../../sdk/dModel)
 include_directories(../../sdk/dNewton)
 include_directories(../../sdk/dCollision)
+include_directories(../../sdk/dCore/tinyxml)
 
 include_directories(../../sdk/dBrain)
 include_directories(../../sdk/dRender)
