@@ -162,8 +162,8 @@ if (MSVC)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 	add_definitions(-D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR)
 	
-	set(binarySdkPath ${CMAKE_CURRENT_SOURCE_DIR}/../newton-4.00-Binaries)
-	#message(${binarySdkPath})
+	set(binarySdkPath "$ENV{NewtonSDKBinaries}/newtonSDK-4.00_Binaries")
+	message(${binarySdkPath})
 	if (PTR_SIZE EQUAL 8)
 		
 		if (NEWTON_BUILD_SHARED_LIBS)
