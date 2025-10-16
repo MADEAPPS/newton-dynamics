@@ -13,7 +13,7 @@
 #define __ND_IK_JOINT_SPHERICAL_H__
 
 #include "ndNewtonStdafx.h"
-#include "dJoints/ndJointSpherical.h"
+#include "ndJointSpherical.h"
 
 D_MSV_NEWTON_CLASS_ALIGN_32
 class ndIkJointSpherical: public ndJointSpherical, public ndJointBilateralConstraint::ndIkInterface

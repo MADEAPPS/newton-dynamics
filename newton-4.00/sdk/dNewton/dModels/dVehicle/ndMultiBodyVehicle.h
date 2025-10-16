@@ -23,9 +23,9 @@
 #define __ND_MULTIBODY_VEHICLE_H__
 
 #include "ndNewtonStdafx.h"
-#include "dModels/ndModel.h"
-#include "dIkSolver/ndIkSolver.h"
-#include "dModels/ndModelArticulation.h"
+#include "ndModel.h"
+#include "ndIkSolver.h"
+#include "ndModelArticulation.h"
 
 class ndWorld;
 class ndBodyDynamic;

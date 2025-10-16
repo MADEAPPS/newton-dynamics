@@ -12,12 +12,12 @@
 #include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndUrdfFile.h"
+#include "ndJointHinge.h"
+#include "ndJointSlider.h"
 #include "ndBodyDynamic.h"
-#include "dJoints/ndJointHinge.h"
-#include "dJoints/ndJointSlider.h"
-#include "dJoints/ndJointFix6dof.h"
-#include "dIkSolver/ndIkJointHinge.h"
-#include "dIkSolver/ndIkJointSpherical.h"
+#include "ndJointFix6dof.h"
+#include "ndIkJointHinge.h"
+#include "ndIkJointSpherical.h"
 
 ndUrdfFile::ndUrdfFile()
 	:ndClassAlloc()

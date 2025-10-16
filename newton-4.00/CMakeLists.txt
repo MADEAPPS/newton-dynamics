@@ -162,7 +162,7 @@ if (MSVC)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 	add_definitions(-D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR)
 	
-	set(binarySdkPath "$ENV{NewtonSDKBinaries}/newtonSDK-4.00_Binaries")
+	set(binarySdkPath "$ENV{NewtonDynamics}/newton-4.00/binaries")
 	message(${binarySdkPath})
 	if (PTR_SIZE EQUAL 8)
 		

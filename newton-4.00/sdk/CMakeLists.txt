@@ -34,6 +34,10 @@ else()
 	include_directories(dNewton)
 	include_directories(dCollision)
 	include_directories(dCore/tinyxml)
+	include_directories(dNewton/dJoints)
+	include_directories(dNewton/dModels)
+	include_directories(dNewton/dIkSolver)
+	include_directories(dNewton/dModels/dVehicle)
 
 	add_subdirectory(dNewton/dExtensions)
 
@@ -153,7 +157,7 @@ else()
 			RUNTIME DESTINATION bin)
 
 	#install(FILES ${HEADERS} DESTINATION include/${projectName})
-	install(FILES ${HEADERS} DESTINATION include/)
+	install(FILES ${HEADERS} DESTINATION source/)
 	#install(DIRECTORY ../sdk DESTINATION "include")
 
 	if (MSVC)

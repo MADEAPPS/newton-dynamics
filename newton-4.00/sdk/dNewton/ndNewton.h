@@ -43,42 +43,42 @@
 #include <ndSkeletonContainer.h>
 #include <ndDynamicsUpdateSoa.h>
 
-#include <dJoints/ndJointGear.h>
-#include <dJoints/ndJointHinge.h>
-#include <dJoints/ndJointPlane.h>
-#include <dJoints/ndJointWheel.h>
-#include <dJoints/ndJointRoller.h>
-#include <dJoints/ndJointSlider.h>
-#include <dJoints/ndJointPulley.h>
-#include <dJoints/ndJointFix6dof.h>
-#include <dJoints/ndJointCylinder.h>
-#include <dJoints/ndJointUpVector.h>
-#include <dJoints/ndJointSpherical.h>
-#include <dJoints/ndJointFollowPath.h>
-#include <dJoints/ndJointDoubleHinge.h>
-#include <dJoints/ndJointFixDistance.h>
-#include <dJoints/ndJointDryRollingFriction.h>
-#include <dJoints/ndJointKinematicController.h>
+#include <ndJointGear.h>
+#include <ndJointHinge.h>
+#include <ndJointPlane.h>
+#include <ndJointWheel.h>
+#include <ndJointRoller.h>
+#include <ndJointSlider.h>
+#include <ndJointPulley.h>
+#include <ndJointFix6dof.h>
+#include <ndJointCylinder.h>
+#include <ndJointUpVector.h>
+#include <ndJointSpherical.h>
+#include <ndJointFollowPath.h>
+#include <ndJointDoubleHinge.h>
+#include <ndJointFixDistance.h>
+#include <ndJointDryRollingFriction.h>
+#include <ndJointKinematicController.h>
 
-#include <dIkSolver/ndIkSolver.h>
-#include <dIkSolver/ndIkJointHinge.h>
-#include <dIkSolver/ndIk6DofEffector.h>
-#include <dIkSolver/ndIkJointSpherical.h>
-#include <dIkSolver/ndIkJointDoubleHinge.h>
-#include <dIkSolver/ndIkSwivelPositionEffector.h>
+#include <ndIkSolver.h>
+#include <ndIkJointHinge.h>
+#include <ndIk6DofEffector.h>
+#include <ndIkJointSpherical.h>
+#include <ndIkJointDoubleHinge.h>
+#include <ndIkSwivelPositionEffector.h>
 
-#include <dModels/ndModel.h>
-#include <dModels/ndUrdfFile.h>
-#include <dModels/ndModelList.h>
-#include <dModels/ndModelNotify.h>
-#include <dModels/ndModelArticulation.h>
-#include <dModels/dVehicle/ndMultiBodyVehicle.h>
-#include <dModels/dVehicle/ndMultiBodyVehicleMotor.h>
-#include <dModels/dVehicle/ndMultiBodyVehicleGearBox.h>
-#include <dModels/dVehicle/ndMultiBodyVehicleTireJoint.h>
-#include <dModels/dVehicle/ndMultiBodyVehicleTorsionBar.h>
-#include <dModels/dVehicle/ndMultiBodyVehicleDifferential.h>
-#include <dModels/dVehicle/ndMultiBodyVehicleDifferentialAxle.h>
+#include <ndModel.h>
+#include <ndUrdfFile.h>
+#include <ndModelList.h>
+#include <ndModelNotify.h>
+#include <ndModelArticulation.h>
+#include <ndMultiBodyVehicle.h>
+#include <ndMultiBodyVehicleMotor.h>
+#include <ndMultiBodyVehicleGearBox.h>
+#include <ndMultiBodyVehicleTireJoint.h>
+#include <ndMultiBodyVehicleTorsionBar.h>
+#include <ndMultiBodyVehicleDifferential.h>
+#include <ndMultiBodyVehicleDifferentialAxle.h>
 
 #endif 
 

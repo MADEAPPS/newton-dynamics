@@ -25,7 +25,7 @@
 #include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndModel.h"
-#include "dIkSolver/ndIkSolver.h"
+#include "ndIkSolver.h"
 
 class ndIkSolver;
 class ndMultiBodyVehicle;

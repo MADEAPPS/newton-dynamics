@@ -19,7 +19,6 @@ DerivedData
 #
 # ignore settings for VisualStudio
 #
-
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
@@ -76,6 +75,9 @@ bld/
 *.sln.docstates
 *.lastbuildstate
 *.unsuccessfulbuild
+
+# ignore intall folder
+binaries
 
 # Ignore auxiliary output from Doxygen and Sphinx
 doc/xml

@@ -12,6 +12,22 @@
 #include "stdafx.h"
 #include <ndNewton.h>
 
+ndString ndGetWorkingFileName(const char* const name)
+{
+	char outPathName[2048];
+	//ndGetWorkingFileName(name, outPathName);
+
+	char appPath[256];
+	GetModuleFileNameA(nullptr, appPath, sizeof(appPath));
+	strtolwr(appPath);
+
+	char* const end = strstr(appPath, "applications");
+	end[0] = 0;
+	snprintf(outPathName, sizeof(appPath), "%sapplications/media/%s", appPath, name);
+
+	return ndString(outPathName);
+}
+
 int main(int argc, char** argv)
 {
 	const char* ndmName = nullptr;
@@ -23,10 +39,10 @@ int main(int argc, char** argv)
 	{
 		printf("usage fbx2ndMesh [fbx_file_name]\n");
 		//printf("nd_file_name = nd file name\n");
-		return 0;
+		//return 0;
 	}
 
-	ndGetWorkingFileName("playground.fbx")
+	ndString fullPath(ndGetWorkingFileName("playground.fbx"));
 
 	//exportMeshNode* const mesh = exportMeshNode::ImportNdm(ndmName);
 	//

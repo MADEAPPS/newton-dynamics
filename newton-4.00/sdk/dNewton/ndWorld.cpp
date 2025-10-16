@@ -22,13 +22,13 @@
 #include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
+#include "ndModel.h"
 #include "ndWorldScene.h"
 #include "ndBodyDynamic.h"
+#include "ndModelNotify.h"
 #include "ndSkeletonList.h"
-#include "dModels/ndModel.h"
 #include "ndDynamicsUpdate.h"
 #include "ndDynamicsUpdateSoa.h"
-#include "dModels/ndModelNotify.h"
 #include "ndJointBilateralConstraint.h"
 
 #ifdef _D_USE_AVX2_SOLVER

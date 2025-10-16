@@ -13,7 +13,7 @@
 #define __ND_IK_JOINT_HINGE_H__
 
 #include "ndNewtonStdafx.h"
-#include "dJoints/ndJointHinge.h"
+#include "ndJointHinge.h"
 
 // setting to a value larger that D_IK_HINGE_MAX_TORQUE, disable torque limit
 #define D_IK_HINGE_MAX_TORQUE ndFloat32 (1.0e10f)
