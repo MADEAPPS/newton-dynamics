@@ -151,16 +151,10 @@ else()
 		target_link_libraries (${projectName} dProfiler)
 	endif()
 
-	install(TARGETS ${projectName} 
-			LIBRARY DESTINATION lib
-			ARCHIVE DESTINATION lib
-			RUNTIME DESTINATION bin)
-
-	#install(FILES ${HEADERS} DESTINATION include/${projectName})
-	install(FILES ${HEADERS} DESTINATION source/)
-	#install(DIRECTORY ../sdk DESTINATION "include")
-
 	if (MSVC)
+		install(FILES ${HEADERS} DESTINATION source/)
+		install(TARGETS ${projectName} LIBRARY DESTINATION lib ARCHIVE DESTINATION lib RUNTIME DESTINATION bin)
+
 		set_target_properties(${projectName} PROPERTIES FOLDER "newtonSdk")
 	endif()
 endif()

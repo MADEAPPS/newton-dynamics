@@ -25,7 +25,7 @@
 
 #include <imgui.h>
 #include <lodepng.h>
-//#include <ndNewton.h>
+#include <ndModelInc.h>
 #include <ndCollision.h>
 
 #endif 

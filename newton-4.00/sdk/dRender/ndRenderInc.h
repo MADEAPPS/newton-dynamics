@@ -30,6 +30,7 @@
 #include <ndRenderPrimitive.h>
 #include <ndRenderPassColor.h>
 #include <ndRenderSceneNode.h>
+#include <ndRenderMeshLoader.h>
 #include <ndRenderSceneCamera.h>
 #include <ndRenderPassShadows.h>
 #include <ndRenderTextureCache.h>

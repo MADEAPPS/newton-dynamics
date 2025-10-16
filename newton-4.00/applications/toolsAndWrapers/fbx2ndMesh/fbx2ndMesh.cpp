@@ -11,21 +11,22 @@
 
 #include "stdafx.h"
 #include <ndNewton.h>
+#include <ndModelInc.h>
 
 ndString ndGetWorkingFileName(const char* const name)
 {
-	char outPathName[2048];
-	//ndGetWorkingFileName(name, outPathName);
+	ndString path(std::getenv("NewtonDynamics"));
+	path += "/newton-4.00/applications/media/";
+	path += name;
 
-	char appPath[256];
-	GetModuleFileNameA(nullptr, appPath, sizeof(appPath));
-	strtolwr(appPath);
-
-	char* const end = strstr(appPath, "applications");
-	end[0] = 0;
-	snprintf(outPathName, sizeof(appPath), "%sapplications/media/%s", appPath, name);
-
-	return ndString(outPathName);
+	//char appPath[256];
+	//GetModuleFileNameA(nullptr, appPath, sizeof(appPath));
+	//strtolwr(appPath);
+	//char* const end = strstr(appPath, "applications");
+	//end[0] = 0;
+	//snprintf(outPathName, sizeof(appPath), "%sapplications/media/%s", appPath, name);
+	//return ndString(outPathName);
+	return path;
 }
 
 int main(int argc, char** argv)
@@ -42,7 +43,11 @@ int main(int argc, char** argv)
 		//return 0;
 	}
 
+	ndMeshLoader loader;
 	ndString fullPath(ndGetWorkingFileName("playground.fbx"));
+	
+	loader.ImportFbx(fullPath);
+
 
 	//exportMeshNode* const mesh = exportMeshNode::ImportNdm(ndmName);
 	//

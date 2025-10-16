@@ -40,23 +40,4 @@ class ndMeshLoader : public ndClassAlloc
 	ndTree<ndSharedPtr<ndAnimationSequence>, ndString> m_animationCache;
 };
 
-class ndRenderMeshLoader : public ndMeshLoader
-{
-	public:
-	ndRenderMeshLoader(ndRender* const renderer): m_owner(renderer) {}
-	//ndRenderMeshLoader(const ndRenderMeshLoader& src) {};
-	virtual ~ndRenderMeshLoader() {}
-
-	virtual bool LoadMesh(const ndString& fullPathMeshName) override;
-	virtual bool ImportFbx(const ndString& fbxPathMeshName) override;
-
-	private:
-	bool MeshToRenderSceneNode(const ndString& materialBasePath);
-	
-
-	public:
-	ndRender* m_owner;
-	ndSharedPtr<ndRenderSceneNode> m_renderMesh;
-};
-
 #endif
