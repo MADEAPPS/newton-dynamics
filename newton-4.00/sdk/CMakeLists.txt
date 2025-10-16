@@ -42,15 +42,15 @@ else()
 	add_subdirectory(dNewton/dExtensions)
 
 	# source and header files
-	file(GLOB HEADERS 
-		dCore/*.h 
-		dNewton/*.h 
-		dCollision/*.h 
-		dCore/tinyxml/*.h 
-		dNewton/dJoints/*.h 
-		dNewton/dModels/*.h 
-		dNewton/dIkSolver/*.h
-		dNewton/dModels/dVehicle/*.h)
+	#file(GLOB HEADERS 
+	#	dCore/*.h 
+	#	dNewton/*.h 
+	#	dCollision/*.h 
+	#	dCore/tinyxml/*.h 
+	#	dNewton/dJoints/*.h 
+	#	dNewton/dModels/*.h 
+	#	dNewton/dIkSolver/*.h
+	#	dNewton/dModels/dVehicle/*.h)
 
 	file(GLOB CPP_SOURCE 
 		dCore/*.h 
@@ -152,7 +152,7 @@ else()
 	endif()
 
 	if (MSVC)
-		install(FILES ${HEADERS} DESTINATION source/)
+		install(FILES ${CPP_SOURCE} DESTINATION source/)
 		install(TARGETS ${projectName} LIBRARY DESTINATION lib ARCHIVE DESTINATION lib RUNTIME DESTINATION bin)
 
 		set_target_properties(${projectName} PROPERTIES FOLDER "newtonSdk")

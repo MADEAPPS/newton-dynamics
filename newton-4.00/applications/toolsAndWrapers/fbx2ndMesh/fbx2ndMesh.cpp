@@ -10,22 +10,13 @@
 */
 
 #include "stdafx.h"
-#include <ndNewton.h>
-#include <ndModelInc.h>
+#include <ndNewtonInc.h>
 
 ndString ndGetWorkingFileName(const char* const name)
 {
 	ndString path(std::getenv("NewtonDynamics"));
 	path += "/newton-4.00/applications/media/";
 	path += name;
-
-	//char appPath[256];
-	//GetModuleFileNameA(nullptr, appPath, sizeof(appPath));
-	//strtolwr(appPath);
-	//char* const end = strstr(appPath, "applications");
-	//end[0] = 0;
-	//snprintf(outPathName, sizeof(appPath), "%sapplications/media/%s", appPath, name);
-	//return ndString(outPathName);
 	return path;
 }
 
@@ -39,7 +30,6 @@ int main(int argc, char** argv)
 	if (!ndmName)
 	{
 		printf("usage fbx2ndMesh [fbx_file_name]\n");
-		//printf("nd_file_name = nd file name\n");
 		//return 0;
 	}
 
@@ -47,23 +37,6 @@ int main(int argc, char** argv)
 	ndString fullPath(ndGetWorkingFileName("playground.fbx"));
 	
 	loader.ImportFbx(fullPath);
-
-
-	//exportMeshNode* const mesh = exportMeshNode::ImportNdm(ndmName);
-	//
-	//if (!mesh)
-	//{
-	//	printf("failed to load %s\n", ndmName);
-	//	return 0;
-	//}
-	//
-	////const char* const exportName = acmName ? acmName : asfName;
-	//if (!ExportFbx(mesh, ndmName))
-	//{
-	//	printf("failed to export %s\n", ndmName);
-	//}
-	//
-	//delete mesh;
 	return 0;
 }
 
