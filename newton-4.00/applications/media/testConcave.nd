@@ -1,0 +1,35 @@
+<?xml version="1.0" ?>
+<ndMesh>
+    <name string="convexApproximation" />
+    <matrix>
+        <posit float3="-0.149798 0 0.184616" />
+        <angles float3="0 -0 0" />
+    </matrix>
+    <ndGeometry>
+        <vertices>
+            <positions count="12" float3Array="-0.508 0.381 -0.127 -0.508 -0.381 -0.381 -0.508 0.381 -0.381 -0.508 -0.381 -0.127 0.254 0.381 -0.127 0.254 0.381 0.381 0.254 -0.381 0.381 0.254 -0.381 -0.127 0.508 0.381 -0.381 0.508 -0.381 0.381 0.508 -0.381 -0.381 0.508 0.381 0.381" />
+            <indices count="60" intArray="5 11 8 5 8 4 4 8 2 4 2 0 11 9 10 11 10 8 8 10 1 8 1 2 2 1 3 2 3 0 0 3 7 0 7 4 4 7 6 4 6 5 5 6 9 5 9 11 9 6 7 9 7 10 10 7 3 10 3 1" />
+        </vertices>
+        <normal>
+            <normal count="6" float3Array="0 -1 0 0 0 1 -1 0 0 1 0 0 0 0 -1 0 1 0" />
+            <indices count="60" intArray="5 5 5 5 5 5 5 5 5 5 5 5 3 3 3 3 3 3 4 4 4 4 4 4 2 2 2 2 2 2 1 1 1 1 1 1 2 2 2 2 2 2 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0" />
+        </normal>
+        <uvs>
+            <uv count="20" float3Array="1 0 0 0.5 0 0 0.571429 0 0 0.214286 0 0 0.785714 0 0 0 0 0 0.928571 0 0 0.666667 0 0 0 0.25 0 0.666667 0.25 0 0.666667 0.75 0 0 0.75 0 0.5 1 0 1 1 0 0 1 0 0.666667 1 0 0.928571 1 0 0.214286 1 0 0.785714 1 0 0.571429 1 0" />
+            <indices count="60" intArray="8 5 0 8 0 9 9 0 13 9 13 15 14 5 3 14 3 17 17 3 1 17 1 12 12 1 2 12 2 19 19 2 4 19 4 18 18 4 6 18 6 16 16 6 0 16 0 13 14 11 10 14 10 13 13 10 7 13 7 0" />
+        </uvs>
+        <material>
+            <ambient float3="0.105882 0.694118 0.580392" />
+            <diffuse float3="0.105882 0.694118 0.580392" />
+            <specular float3="1 1 1" />
+            <reflection float3="1 1 1" />
+            <opacity float="1" />
+            <shiness float="250" />
+            <texture string="default.png" />
+        </material>
+        <faces>
+            <faceMaterial count="20" intArray="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" />
+            <faceIndexCount count="20" intArray="3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3" />
+        </faces>
+    </ndGeometry>
+</ndMesh>

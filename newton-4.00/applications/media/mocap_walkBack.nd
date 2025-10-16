@@ -1,0 +1,456 @@
+<?xml version="1.0" ?>
+<ndMesh>
+    <name string="mixamorig:Hips" />
+    <matrix>
+        <posit float3="-0.00532956 0.910607 -0.0131392" />
+        <angles float3="68.0404 7.65488 -96.0638" />
+    </matrix>
+    <ndMesh>
+        <name string="mixamorig:Spine" />
+        <matrix>
+            <posit float3="-0.0992349 -0.012273 -9.00269e-06" />
+            <angles float3="-0.207203 -4.6506 -8.10749" />
+        </matrix>
+        <ndMesh>
+            <name string="mixamorig:Spine1" />
+            <matrix>
+                <posit float3="-0.11732 -3.8147e-08 9.53674e-09" />
+                <angles float3="-0.910952 -2.67069 -5.79169" />
+            </matrix>
+            <ndMesh>
+                <name string="mixamorig:Spine2" />
+                <matrix>
+                    <posit float3="-0.134588 3.8147e-08 1.90735e-08" />
+                    <angles float3="-0.676142 -2.81141 -12.3837" />
+                </matrix>
+                <ndMesh>
+                    <name string="mixamorig:Neck" />
+                    <matrix>
+                        <posit float3="-0.150278 0.00877899 0" />
+                        <angles float3="-1.48062 3.53102 3.27586" />
+                    </matrix>
+                    <ndMesh>
+                        <name string="mixamorig:Head" />
+                        <matrix>
+                            <posit float3="-0.103218 0.031424 0" />
+                            <angles float3="-54.8587 1.38511 18.0324" />
+                        </matrix>
+                        <ndMesh>
+                            <name string="mixamorig:HeadTop_End" />
+                            <matrix>
+                                <posit float3="-0.184747 0.066364 -1.98364e-06" />
+                                <angles float3="6.4033e-07 1.90833e-14 -1.70755e-06" />
+                            </matrix>
+                        </ndMesh>
+                    </ndMesh>
+                </ndMesh>
+                <ndMesh>
+                    <name string="mixamorig:LeftShoulder" />
+                    <matrix>
+                        <posit float3="-0.0910629 0.00757103 -0.061058" />
+                        <angles float3="121.179 -74.2113 144.92" />
+                    </matrix>
+                    <ndMesh>
+                        <name string="mixamorig:LeftArm" />
+                        <matrix>
+                            <posit float3="-0.129223 0 0" />
+                            <angles float3="37.7791 12.8427 -42.6576" />
+                        </matrix>
+                        <ndMesh>
+                            <name string="mixamorig:LeftForeArm" />
+                            <matrix>
+                                <posit float3="-0.274047 -7.62939e-08 -2.86102e-08" />
+                                <angles float3="-0.18872 47.4759 0.141955" />
+                            </matrix>
+                            <ndMesh>
+                                <name string="mixamorig:LeftHand" />
+                                <matrix>
+                                    <posit float3="-0.276145 -1.52588e-07 1.52588e-07" />
+                                    <angles float3="10.6259 -0.26339 0.417036" />
+                                </matrix>
+                                <ndMesh>
+                                    <name string="mixamorig:LeftHandThumb1" />
+                                    <matrix>
+                                        <posit float3="-0.0378881 0.021671 0.0300301" />
+                                        <angles float3="-42.1199 11.2088 -50.311" />
+                                    </matrix>
+                                    <ndMesh>
+                                        <name string="mixamorig:LeftHandThumb2" />
+                                        <matrix>
+                                            <posit float3="-0.04745 -1.52588e-07 -3.8147e-08" />
+                                            <angles float3="-3.49205 -27.6411 15.2374" />
+                                        </matrix>
+                                        <ndMesh>
+                                            <name string="mixamorig:LeftHandThumb3" />
+                                            <matrix>
+                                                <posit float3="-0.0438209 7.62939e-08 0" />
+                                                <angles float3="-9.34883 -38.0591 29.5041" />
+                                            </matrix>
+                                            <ndMesh>
+                                                <name string="mixamorig:LeftHandThumb4" />
+                                                <matrix>
+                                                    <posit float3="-0.034591 0 -9.53674e-09" />
+                                                    <angles float3="-14.6214 8.06641 -2.0959" />
+                                                </matrix>
+                                            </ndMesh>
+                                        </ndMesh>
+                                    </ndMesh>
+                                </ndMesh>
+                                <ndMesh>
+                                    <name string="mixamorig:LeftHandIndex1" />
+                                    <matrix>
+                                        <posit float3="-0.122666 0.00231796 0.02822" />
+                                        <angles float3="-0.852591 -7.39389 -60.9145" />
+                                    </matrix>
+                                    <ndMesh>
+                                        <name string="mixamorig:LeftHandIndex2" />
+                                        <matrix>
+                                            <posit float3="-0.03892 -1.90735e-08 0" />
+                                            <angles float3="7.62539 -8.26153 -89.8978" />
+                                        </matrix>
+                                        <ndMesh>
+                                            <name string="mixamorig:LeftHandIndex3" />
+                                            <matrix>
+                                                <posit float3="-0.034152 -7.62939e-08 0" />
+                                                <angles float3="3.86591 -7.51803 -41.9285" />
+                                            </matrix>
+                                            <ndMesh>
+                                                <name string="mixamorig:LeftHandIndex4" />
+                                                <matrix>
+                                                    <posit float3="-0.03078 0 0" />
+                                                    <angles float3="-0.458602 0.00260158 -0.000100745" />
+                                                </matrix>
+                                            </ndMesh>
+                                        </ndMesh>
+                                    </ndMesh>
+                                </ndMesh>
+                                <ndMesh>
+                                    <name string="mixamorig:LeftHandMiddle1" />
+                                    <matrix>
+                                        <posit float3="-0.127755 0 0" />
+                                        <angles float3="5.24121 -0.0666978 -62.7543" />
+                                    </matrix>
+                                    <ndMesh>
+                                        <name string="mixamorig:LeftHandMiddle2" />
+                                        <matrix>
+                                            <posit float3="-0.0361401 -3.8147e-08 0" />
+                                            <angles float3="9.43661 -9.24942 -87.0569" />
+                                        </matrix>
+                                        <ndMesh>
+                                            <name string="mixamorig:LeftHandMiddle3" />
+                                            <matrix>
+                                                <posit float3="-0.034598 -1.52588e-07 0" />
+                                                <angles float3="1.41688 -5.12517 -37.461" />
+                                            </matrix>
+                                            <ndMesh>
+                                                <name string="mixamorig:LeftHandMiddle4" />
+                                                <matrix>
+                                                    <posit float3="-0.036802 7.62939e-08 -7.62939e-08" />
+                                                    <angles float3="-0.524799 -0.0749975 0.000500312" />
+                                                </matrix>
+                                            </ndMesh>
+                                        </ndMesh>
+                                    </ndMesh>
+                                </ndMesh>
+                                <ndMesh>
+                                    <name string="mixamorig:LeftHandRing1" />
+                                    <matrix>
+                                        <posit float3="-0.12147 -9.99451e-05 -0.022166" />
+                                        <angles float3="13.1441 3.03921 -61.2124" />
+                                    </matrix>
+                                    <ndMesh>
+                                        <name string="mixamorig:LeftHandRing2" />
+                                        <matrix>
+                                            <posit float3="-0.036012 7.62939e-08 0" />
+                                            <angles float3="5.39408 -11.5633 -66.7293" />
+                                        </matrix>
+                                        <ndMesh>
+                                            <name string="mixamorig:LeftHandRing3" />
+                                            <matrix>
+                                                <posit float3="-0.0330729 -7.62939e-08 3.8147e-08" />
+                                                <angles float3="7.1283 -9.50893 -70.4088" />
+                                            </matrix>
+                                            <ndMesh>
+                                                <name string="mixamorig:LeftHandRing4" />
+                                                <matrix>
+                                                    <posit float3="-0.036601 0 0" />
+                                                    <angles float3="-0.847601 0.0882747 -0.00160168" />
+                                                </matrix>
+                                            </ndMesh>
+                                        </ndMesh>
+                                    </ndMesh>
+                                </ndMesh>
+                                <ndMesh>
+                                    <name string="mixamorig:LeftHandPinky1" />
+                                    <matrix>
+                                        <posit float3="-0.109082 0.00226105 -0.047258" />
+                                        <angles float3="22.5212 5.1765 -52.7971" />
+                                    </matrix>
+                                    <ndMesh>
+                                        <name string="mixamorig:LeftHandPinky2" />
+                                        <matrix>
+                                            <posit float3="-0.041367 0 0" />
+                                            <angles float3="7.83113 -9.61328 -84.7982" />
+                                        </matrix>
+                                        <ndMesh>
+                                            <name string="mixamorig:LeftHandPinky3" />
+                                            <matrix>
+                                                <posit float3="-0.025948 0 0" />
+                                                <angles float3="5.28521 -8.43136 -59.1912" />
+                                            </matrix>
+                                            <ndMesh>
+                                                <name string="mixamorig:LeftHandPinky4" />
+                                                <matrix>
+                                                    <posit float3="-0.029239 -3.8147e-08 -3.8147e-08" />
+                                                    <angles float3="-0.469799 -0.0659 0.00040042" />
+                                                </matrix>
+                                            </ndMesh>
+                                        </ndMesh>
+                                    </ndMesh>
+                                </ndMesh>
+                            </ndMesh>
+                        </ndMesh>
+                    </ndMesh>
+                </ndMesh>
+                <ndMesh>
+                    <name string="mixamorig:RightShoulder" />
+                    <matrix>
+                        <posit float3="-0.0910638 0.00757111 0.061057" />
+                        <angles float3="-113.155 79.3091 154.261" />
+                    </matrix>
+                    <ndMesh>
+                        <name string="mixamorig:RightArm" />
+                        <matrix>
+                            <posit float3="-0.129223 0 0" />
+                            <angles float3="6.48795 5.69031 -49.9871" />
+                        </matrix>
+                        <ndMesh>
+                            <name string="mixamorig:RightForeArm" />
+                            <matrix>
+                                <posit float3="-0.274047 7.6294e-08 7.62939e-08" />
+                                <angles float3="-15.186 -40.867 -5.17469" />
+                            </matrix>
+                            <ndMesh>
+                                <name string="mixamorig:RightHand" />
+                                <matrix>
+                                    <posit float3="-0.276145 0 0" />
+                                    <angles float3="-29.3159 0.5971 21.1906" />
+                                </matrix>
+                                <ndMesh>
+                                    <name string="mixamorig:RightHandThumb1" />
+                                    <matrix>
+                                        <posit float3="-0.0378881 0.021671 -0.0300299" />
+                                        <angles float3="-6.27214 -23.3428 -38.2071" />
+                                    </matrix>
+                                    <ndMesh>
+                                        <name string="mixamorig:RightHandThumb2" />
+                                        <matrix>
+                                            <posit float3="-0.0474501 3.8147e-08 -1.52588e-07" />
+                                            <angles float3="-0.927051 22.6693 11.8079" />
+                                        </matrix>
+                                        <ndMesh>
+                                            <name string="mixamorig:RightHandThumb3" />
+                                            <matrix>
+                                                <posit float3="-0.043821 0 -7.62939e-08" />
+                                                <angles float3="1.53425 -14.3776 -6.41902" />
+                                            </matrix>
+                                            <ndMesh>
+                                                <name string="mixamorig:RightHandThumb4" />
+                                                <matrix>
+                                                    <posit float3="-0.034591 3.8147e-08 0" />
+                                                    <angles float3="14.7968 -8.09097 -2.1218" />
+                                                </matrix>
+                                            </ndMesh>
+                                        </ndMesh>
+                                    </ndMesh>
+                                </ndMesh>
+                                <ndMesh>
+                                    <name string="mixamorig:RightHandIndex1" />
+                                    <matrix>
+                                        <posit float3="-0.122666 0.00231796 -0.0282199" />
+                                        <angles float3="-0.0479379 -0.532725 -0.738249" />
+                                    </matrix>
+                                    <ndMesh>
+                                        <name string="mixamorig:RightHandIndex2" />
+                                        <matrix>
+                                            <posit float3="-0.0389201 -7.62939e-08 -3.8147e-08" />
+                                            <angles float3="0.0160907 0.089123 -5.07853" />
+                                        </matrix>
+                                        <ndMesh>
+                                            <name string="mixamorig:RightHandIndex3" />
+                                            <matrix>
+                                                <posit float3="-0.0341519 -7.62939e-08 0" />
+                                                <angles float3="0.0951401 2.00213 2.83561" />
+                                            </matrix>
+                                            <ndMesh>
+                                                <name string="mixamorig:RightHandIndex4" />
+                                                <matrix>
+                                                    <posit float3="-0.03078 0 3.8147e-08" />
+                                                    <angles float3="0.768826 0.157474 0.0094035" />
+                                                </matrix>
+                                            </ndMesh>
+                                        </ndMesh>
+                                    </ndMesh>
+                                </ndMesh>
+                                <ndMesh>
+                                    <name string="mixamorig:RightHandMiddle1" />
+                                    <matrix>
+                                        <posit float3="-0.127755 0 3.8147e-08" />
+                                        <angles float3="0.0862662 5.92835 -2.56157" />
+                                    </matrix>
+                                    <ndMesh>
+                                        <name string="mixamorig:RightHandMiddle2" />
+                                        <matrix>
+                                            <posit float3="-0.0361401 0 0" />
+                                            <angles float3="-0.404537 4.42274 -24.0151" />
+                                        </matrix>
+                                        <ndMesh>
+                                            <name string="mixamorig:RightHandMiddle3" />
+                                            <matrix>
+                                                <posit float3="-0.0345979 -1.52588e-07 1.90735e-08" />
+                                                <angles float3="-0.041803 -1.75108 5.75163" />
+                                            </matrix>
+                                            <ndMesh>
+                                                <name string="mixamorig:RightHandMiddle4" />
+                                                <matrix>
+                                                    <posit float3="-0.0368019 0 0" />
+                                                    <angles float3="0.767184 -0.195763 0.00459845" />
+                                                </matrix>
+                                            </ndMesh>
+                                        </ndMesh>
+                                    </ndMesh>
+                                </ndMesh>
+                                <ndMesh>
+                                    <name string="mixamorig:RightHandRing1" />
+                                    <matrix>
+                                        <posit float3="-0.12147 -0.000100021 0.0221661" />
+                                        <angles float3="0.364824 11.809 -3.99288" />
+                                    </matrix>
+                                    <ndMesh>
+                                        <name string="mixamorig:RightHandRing2" />
+                                        <matrix>
+                                            <posit float3="-0.036012 -1.52588e-07 0" />
+                                            <angles float3="-0.101872 4.17534 -26.81" />
+                                        </matrix>
+                                        <ndMesh>
+                                            <name string="mixamorig:RightHandRing3" />
+                                            <matrix>
+                                                <posit float3="-0.0330728 0 0" />
+                                                <angles float3="-0.0875458 4.20645 -19.444" />
+                                            </matrix>
+                                            <ndMesh>
+                                                <name string="mixamorig:RightHandRing4" />
+                                                <matrix>
+                                                    <posit float3="-0.036601 7.62939e-08 3.8147e-08" />
+                                                    <angles float3="0.872396 -0.0345036 0.00679903" />
+                                                </matrix>
+                                            </ndMesh>
+                                        </ndMesh>
+                                    </ndMesh>
+                                </ndMesh>
+                                <ndMesh>
+                                    <name string="mixamorig:RightHandPinky1" />
+                                    <matrix>
+                                        <posit float3="-0.109082 0.00226105 0.047258" />
+                                        <angles float3="-1.70044 19.2077 -11.2487" />
+                                    </matrix>
+                                    <ndMesh>
+                                        <name string="mixamorig:RightHandPinky2" />
+                                        <matrix>
+                                            <posit float3="-0.041367 0 0" />
+                                            <angles float3="2.49565 3.08882 -18.6991" />
+                                        </matrix>
+                                        <ndMesh>
+                                            <name string="mixamorig:RightHandPinky3" />
+                                            <matrix>
+                                                <posit float3="-0.025948 0 0" />
+                                                <angles float3="3.17986 7.44785 -28.4627" />
+                                            </matrix>
+                                            <ndMesh>
+                                                <name string="mixamorig:RightHandPinky4" />
+                                                <matrix>
+                                                    <posit float3="-0.029239 7.62939e-08 -9.53674e-09" />
+                                                    <angles float3="0.973951 0.252703 0.0115961" />
+                                                </matrix>
+                                            </ndMesh>
+                                        </ndMesh>
+                                    </ndMesh>
+                                </ndMesh>
+                            </ndMesh>
+                        </ndMesh>
+                    </ndMesh>
+                </ndMesh>
+            </ndMesh>
+        </ndMesh>
+    </ndMesh>
+    <ndMesh>
+        <name string="mixamorig:LeftUpLeg" />
+        <matrix>
+            <posit float3="0.0665719 -0.000554028 -0.091239" />
+            <angles float3="-169.79 -13.1832 -130.103" />
+        </matrix>
+        <ndMesh>
+            <name string="mixamorig:LeftLeg" />
+            <matrix>
+                <posit float3="-0.405994 0 4.76837e-08" />
+                <angles float3="-2.05545 -3.43251 88.5166" />
+            </matrix>
+            <ndMesh>
+                <name string="mixamorig:LeftFoot" />
+                <matrix>
+                    <posit float3="-0.42099 0 -4.76837e-09" />
+                    <angles float3="-4.37825 2.22447 -64.0048" />
+                </matrix>
+                <ndMesh>
+                    <name string="mixamorig:LeftToeBase" />
+                    <matrix>
+                        <posit float3="-0.157216 0 0" />
+                        <angles float3="4.029 -0.934002 -25.0355" />
+                    </matrix>
+                    <ndMesh>
+                        <name string="mixamorig:LeftToe_End" />
+                        <matrix>
+                            <posit float3="-0.1 -9.53674e-09 -4.76837e-09" />
+                            <angles float3="-1.70755e-06 -2.13443e-06 1.70755e-06" />
+                        </matrix>
+                    </ndMesh>
+                </ndMesh>
+            </ndMesh>
+        </ndMesh>
+    </ndMesh>
+    <ndMesh>
+        <name string="mixamorig:RightUpLeg" />
+        <matrix>
+            <posit float3="0.066556 -0.000553989 0.09125" />
+            <angles float3="178.304 -9.65416 -136.526" />
+        </matrix>
+        <ndMesh>
+            <name string="mixamorig:RightLeg" />
+            <matrix>
+                <posit float3="-0.405994 -3.8147e-08 -9.53674e-09" />
+                <angles float3="-1.62281 -0.717665 47.986" />
+            </matrix>
+            <ndMesh>
+                <name string="mixamorig:RightFoot" />
+                <matrix>
+                    <posit float3="-0.42099 -4.76837e-08 8.34465e-09" />
+                    <angles float3="8.85563 -2.83319 -76.8108" />
+                </matrix>
+                <ndMesh>
+                    <name string="mixamorig:RightToeBase" />
+                    <matrix>
+                        <posit float3="-0.157216 0 -2.38419e-09" />
+                        <angles float3="-3.98358 0.853941 -26.3689" />
+                    </matrix>
+                    <ndMesh>
+                        <name string="mixamorig:RightToe_End" />
+                        <matrix>
+                            <posit float3="-0.1 0 -4.76837e-09" />
+                            <angles float3="-3.21064e-15 -1.7237e-06 1.06722e-07" />
+                        </matrix>
+                    </ndMesh>
+                </ndMesh>
+            </ndMesh>
+        </ndMesh>
+    </ndMesh>
+</ndMesh>

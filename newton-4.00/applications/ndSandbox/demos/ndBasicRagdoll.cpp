@@ -317,9 +317,10 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 	ndRenderMeshLoader loader(*scene->GetRenderer());
 	loader.ImportFbx(ndGetWorkingFileName("ragdoll.fbx"));
 
-ndMeshFile exportFile;
-exportFile.Export(*loader.m_mesh, ndGetWorkingFileName("xxx.nd"));
-ndSharedPtr<ndMesh> xxxx (exportFile.Import(ndGetWorkingFileName("xxx.nd")));
+//ndMeshLoader exportFile;
+//exportFile.Export(*loader.m_mesh, ndGetWorkingFileName("xxx.nd"));
+//ndSharedPtr<ndMesh> xxxx (exportFile.Import(ndGetWorkingFileName("xxx.nd")));
+loader.SaveMesh(ndGetWorkingFileName("xxx.nd"));
 
 
 	class PlaceMatrix : public ndMatrix

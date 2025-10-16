@@ -12,31 +12,27 @@
 #include "stdafx.h"
 #include <ndNewtonInc.h>
 
-ndString ndGetWorkingFileName(const char* const name)
-{
-	ndString path(std::getenv("NewtonDynamics"));
-	path += "/newton-4.00/applications/media/";
-	path += name;
-	return path;
-}
-
 int main(int argc, char** argv)
 {
-	const char* ndmName = nullptr;
+	const char* name = nullptr;
 	if ((argc > 1) && strstr(argv[1], ".fbx"))
 	{
-		ndmName = argv[1];
+		name = argv[1];
 	}
-	if (!ndmName)
+	if (!name)
 	{
 		printf("usage fbx2ndMesh [fbx_file_name]\n");
-		//return 0;
+		return 0;
 	}
 
+	ndString fbxPath(name);
+	ndString path(fbxPath);
+	path.ToLower();
+	ndString ndPath(fbxPath.SubString(0, path.Find(".fbx")) + ".nd");
+
 	ndMeshLoader loader;
-	ndString fullPath(ndGetWorkingFileName("playground.fbx"));
-	
-	loader.ImportFbx(fullPath);
+	loader.ImportFbx(fbxPath);
+	loader.SaveMesh(ndPath);
 	return 0;
 }
 
