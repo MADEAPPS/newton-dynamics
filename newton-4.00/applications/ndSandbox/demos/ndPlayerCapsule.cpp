@@ -130,7 +130,7 @@ class ndPlayerCapsuleController : public ndModelNotify
 
 	static ndSharedPtr<ndModelNotify> CreatePlayer(
 		ndDemoEntityManager* const scene,
-		ndMeshLoader& loader,
+		ndRenderMeshLoader& loader,
 		const ndMatrix& matrix)
 	{
 		ndMatrix location(matrix);
@@ -161,7 +161,7 @@ class ndPlayerCapsuleController : public ndModelNotify
 		return controller;
 	}
 
-	void BindAnimations(ndMeshLoader& loader)
+	void BindAnimations(ndRenderMeshLoader& loader)
 	{
 		ndDemoEntityNotify* const playerNotify = (ndDemoEntityNotify*)(m_playerBody->GetAsBodyKinematic()->GetNotifyCallback());
 		ndSharedPtr<ndRenderSceneNode> playerMesh(playerNotify->GetUserData());
@@ -325,7 +325,7 @@ static void AddSomeProps(ndDemoEntityManager* const scene)
 	AddMerryGoRound(PlaceMatrix(32.0f, 0.0f, 10.0f));
 }
 
-static void LoadAnimations(ndMeshLoader& loader)
+static void LoadAnimations(ndRenderMeshLoader& loader)
 {
 	// load animation clips
 	loader.GetAnimationSequence(ndGetWorkingFileName("mocap_run.fbx"));
@@ -348,8 +348,8 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 	scene->SetDemoHelp(demoHelper);
 
 	// load the visual mesh, and animations.
-	ndMeshLoader loader;
-	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("humanoidRobot.fbx"));
+	ndRenderMeshLoader loader(*scene->GetRenderer());
+	loader.ImportFbx(ndGetWorkingFileName("humanoidRobot.fbx"));
 
 	// load play animations stack
 	LoadAnimations(loader);
@@ -370,7 +370,7 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 		AddSomeProps(scene);
 
 		// load the write man model and resuse the animations
-		loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("whiteMan.fbx"));
+		loader.ImportFbx(ndGetWorkingFileName("whiteMan.fbx"));
 
 		location.m_posit.m_x = 25.0f;
 		location.m_posit.m_z = -5.0f;
@@ -382,7 +382,7 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 
 		location.m_posit.m_x = 30.0f;
 		location.m_posit.m_z = 10.0f;
-		loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("testDummy.fbx"));
+		loader.ImportFbx(ndGetWorkingFileName("testDummy.fbx"));
 		ndPlayerCapsuleController::CreatePlayer(scene, loader, location);
 
 		location.m_posit.m_x = 30.0f;

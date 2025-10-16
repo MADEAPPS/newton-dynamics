@@ -95,7 +95,7 @@ class ndBackGroundVehicleController : public ndModelNotify
 		return m_cameraNode;
 	}
 
-	static ndSharedPtr<ndModelNotify> CreateAiVehicleProp(ndDemoEntityManager* const scene, const ndVector& location,  const ndMeshLoader& loader)
+	static ndSharedPtr<ndModelNotify> CreateAiVehicleProp(ndDemoEntityManager* const scene, const ndVector& location,  const ndRenderMeshLoader& loader)
 	{
 		ndSharedPtr<ndRenderSceneNode> vehicleMesh(loader.m_renderMesh->Clone());
 		ndMatrix matrix(ndGetIdentityMatrix());
@@ -321,8 +321,8 @@ void ndBasicModel(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndDemoEntityManager::ndDemoHelper> demoHelper(new ndBackGroundVehicleController::ndHelpLegend());
 	scene->SetDemoHelp(demoHelper);
 
-	ndMeshLoader vmwLoaderRedPaint;
-	vmwLoaderRedPaint.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("vmwRed.fbx"));
+	ndRenderMeshLoader vmwLoaderRedPaint(*scene->GetRenderer());
+	vmwLoaderRedPaint.ImportFbx(ndGetWorkingFileName("vmwRed.fbx"));
 	ndSharedPtr<ndModelNotify> controller(ndBackGroundVehicleController::CreateAiVehicleProp(scene, ndVector::m_wOne, vmwLoaderRedPaint));
 
 	// set this player as the active camera
@@ -333,8 +333,8 @@ void ndBasicModel(ndDemoEntityManager* const scene)
 #if 1
 	{
 		// add an array of vehicles 
-		ndMeshLoader vmwLoaderGreenPaint;
-		vmwLoaderGreenPaint.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("vmwGreen.fbx"));
+		ndRenderMeshLoader vmwLoaderGreenPaint(*scene->GetRenderer());
+		vmwLoaderGreenPaint.ImportFbx(ndGetWorkingFileName("vmwGreen.fbx"));
 
 		const ndInt32 count = 5;
 		ndFloat32 spacing = ndFloat32(10.0f);

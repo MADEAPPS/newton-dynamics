@@ -245,8 +245,8 @@ static void TippeTop(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat32
 	matrix.m_posit.m_w = 1.0f;
 	matrix.m_posit.m_y += 1.0f;
 
-	ndMeshLoader loader;
-	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("tippeTop.fbx", scene));
+	ndRenderMeshLoader loader;
+	ndSharedPtr<ndDemoEntity> modelMesh(loader.ImportFbx("tippeTop.fbx", scene));
 	//ndSharedPtr<ndDemoMeshInterface> mesh (modelMesh->GetFirstChild()->GetMesh());
 	ndSharedPtr<ndDemoMeshInterface> mesh(modelMesh->GetChildren().GetFirst()->GetInfo()->GetMesh());
 

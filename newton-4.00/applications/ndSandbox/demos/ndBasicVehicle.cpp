@@ -247,8 +247,8 @@ static ndVehicleDectriptorMonsterTruck1 monterTruckDesc1;
 
 static ndDemoEntity* LoadVehicleMeshModel(ndDemoEntityManager* const scene, const char* const filename)
 {
-	ndMeshLoader loader;
-	ndDemoEntity* const vehicleEntity = loader.LoadEntity(filename, scene);
+	ndRenderMeshLoader loader;
+	ndDemoEntity* const vehicleEntity = loader.ImportFbx(filename, scene);
 	return vehicleEntity;
 }
 

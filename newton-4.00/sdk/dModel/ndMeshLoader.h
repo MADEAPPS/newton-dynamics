@@ -12,24 +12,51 @@
 #ifndef _ND_MESH_LOADER_H_
 #define _ND_MESH_LOADER_H_
 
-//class ndDemoEntityManager;
 #include "ndFbxMeshLoader.h"
 
-class ndMeshLoader: public ndFbxMeshLoader
+//class ndMeshLoader: public ndFbxMeshLoader
+class ndMeshLoader : public ndClassAlloc
 {
 	public:
 	ndMeshLoader();
 	ndMeshLoader(const ndMeshLoader& src);
 	virtual ~ndMeshLoader();
-	bool LoadEntity(ndRender* const renderer, const ndString& fbxPathMeshName);
+
+	virtual bool LoadMesh(const ndString& pathMeshName);
+	virtual void SaveMesh(const ndString& pathMeshName);
+	virtual bool ImportFbx(const ndString& fbxPathMeshName);
+
 	ndSharedPtr<ndAnimationSequence> GetAnimationSequence(const ndString& fbxPathAnimName);
 	const ndSharedPtr<ndAnimationSequence> FindSequence(const ndString& fbxPathAnimName) const;
-
 	void SetTranslationTracks(const ndString& boneName);
 
+
+	protected:
+	ndString GetPath(const ndString& fullPathName) const;
+	ndString GetName(const ndString& fullPathName) const;
+
+	public:
 	ndSharedPtr<ndMesh> m_mesh;
-	ndSharedPtr<ndRenderSceneNode> m_renderMesh;
 	ndTree<ndSharedPtr<ndAnimationSequence>, ndString> m_animationCache;
+};
+
+class ndRenderMeshLoader : public ndMeshLoader
+{
+	public:
+	ndRenderMeshLoader(ndRender* const renderer): m_owner(renderer) {}
+	//ndRenderMeshLoader(const ndRenderMeshLoader& src) {};
+	virtual ~ndRenderMeshLoader() {}
+
+	virtual bool LoadMesh(const ndString& fullPathMeshName) override;
+	virtual bool ImportFbx(const ndString& fbxPathMeshName) override;
+
+	private:
+	bool MeshToRenderSceneNode(const ndString& materialBasePath);
+	
+
+	public:
+	ndRender* m_owner;
+	ndSharedPtr<ndRenderSceneNode> m_renderMesh;
 };
 
 #endif

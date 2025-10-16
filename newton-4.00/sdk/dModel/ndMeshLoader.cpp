@@ -15,147 +15,20 @@
 #include "ndAnimationKeyframesTrack.h"
 
 ndMeshLoader::ndMeshLoader()
-	:ndFbxMeshLoader()
+	:ndClassAlloc()
 	,m_mesh(nullptr)
-	,m_renderMesh(nullptr)
 {
 }
 
 ndMeshLoader::ndMeshLoader(const ndMeshLoader& src)
-	:ndFbxMeshLoader(src)
+	:ndClassAlloc(src)
 	,m_mesh(nullptr)
-	,m_renderMesh(nullptr)
 {
 	ndAssert(0);
 }
 
 ndMeshLoader::~ndMeshLoader()
 {
-}
-
-bool ndMeshLoader::LoadEntity(ndRender* const renderer, const ndString& fbxPathMeshName)
-{
-	m_renderMesh = ndSharedPtr<ndRenderSceneNode>(nullptr);
-	m_mesh = ndSharedPtr<ndMesh>(ndFbxMeshLoader::LoadMesh(fbxPathMeshName.GetStr(), false));
-
-	if (*m_mesh)
-	{	
-		class EntityMeshPair
-		{
-			public:
-			EntityMeshPair()
-				:m_mesh(nullptr)
-				,m_entity(nullptr)
-			{
-			}
-
-			EntityMeshPair(const EntityMeshPair& src)
-				:m_mesh(src.m_mesh)
-				,m_entity(src.m_entity)
-			{
-			}
-
-			EntityMeshPair(const ndSharedPtr<ndRenderSceneNode>& entity, const ndSharedPtr<ndMesh>& mesh)
-				:m_mesh(mesh)
-				,m_entity(entity)
-			{
-			}
-
-			ndSharedPtr<ndMesh> m_mesh;
-			ndSharedPtr<ndRenderSceneNode> m_entity;
-		};
-
-		ndList<EntityMeshPair> meshList;
-		ndList<ndSharedPtr<ndMesh>> effectNodeList;
-		ndList<ndSharedPtr<ndRenderSceneNode>> parentEntityList;
-
-		effectNodeList.Append(m_mesh);
-		parentEntityList.Append(ndSharedPtr<ndRenderSceneNode>(nullptr));
-
-		while (effectNodeList.GetCount())
-		{
-			ndSharedPtr<ndMesh> mesh (effectNodeList.GetLast()->GetInfo());
-			ndSharedPtr<ndRenderSceneNode> parentNode (parentEntityList.GetLast()->GetInfo());
-
-			effectNodeList.Remove(effectNodeList.GetLast());
-			parentEntityList.Remove(parentEntityList.GetLast());
-
-			ndSharedPtr<ndRenderSceneNode> entity(nullptr);
-			if (!(*parentNode))
-			{
-				m_renderMesh = ndSharedPtr<ndRenderSceneNode>(new ndRenderSceneNode(mesh->m_matrix));
-				entity = m_renderMesh;
-			}
-			else
-			{
-				ndSharedPtr<ndRenderSceneNode> childNode(new ndRenderSceneNode(mesh->m_matrix));
-				parentNode->AddChild(childNode);
-				entity = childNode;
-			}
-			entity->m_name = mesh->GetName();
-
-			ndSharedPtr<ndMeshEffect> meshEffect(mesh->GetMesh());
-			if (*meshEffect)
-			{
-				meshList.Append(EntityMeshPair(entity, mesh));
-			}
-
-			for (ndList<ndSharedPtr<ndMesh>>::ndNode* childNode = mesh->GetChildren().GetFirst(); childNode; childNode = childNode->GetNext())
-			{
-				parentEntityList.Append(entity);
-				effectNodeList.Append(childNode->GetInfo());
-			}
-		}
-
-		const char* ptr = strrchr(fbxPathMeshName.GetStr(), '/');
-		if (!ptr)
-		{
-			ptr = strrchr(fbxPathMeshName.GetStr(), '\\');
-		}
-		const ndString path(fbxPathMeshName.GetStr(), ndInt32 (fbxPathMeshName.Size() - strlen(ptr + 1)));
-
-		for (ndList<EntityMeshPair>::ndNode* node = meshList.GetFirst(); node; node = node->GetNext())
-		{
-			EntityMeshPair& pair = node->GetInfo();
-
-			ndAssert(*pair.m_mesh);
-			ndAssert(*pair.m_entity);
-			
-			ndSharedPtr<ndMeshEffect> meshEffect(pair.m_mesh->GetMesh());
-			ndArray<ndMeshEffect::ndMaterial>& materials = meshEffect->GetMaterials();
-
-			ndRenderPrimitive::ndDescriptor descriptor(renderer);
-			descriptor.m_meshNode = meshEffect;
-			descriptor.m_skeleton = pair.m_entity;
-
-			for (ndInt32 j = 0; j < materials.GetCount(); ++j)
-			{
-				const ndString texturePathName(path + materials[j].m_textureName);
-				ndRenderPrimitiveMaterial& material = descriptor.AddMaterial(renderer->GetTextureCache()->GetTexture(texturePathName));
-				material.m_diffuse = materials[j].m_diffuse;
-				material.m_specular = materials[j].m_specular;
-				material.m_reflection = materials[j].m_reflection;
-				material.m_specularPower = ndReal(materials[j].m_shiness);
-				material.m_opacity = ndReal(materials[j].m_opacity);
-				material.m_castShadows = true;
-			}
-
-			//pair.m_entity->m_name = effectNode->GetName();
-			//ndSharedPtr<ndRenderPrimitive> geometry(ndRenderPrimitive::CreateMeshPrimitive(descriptor));
-			ndSharedPtr<ndRenderPrimitive> geometry(new ndRenderPrimitive(descriptor));
-			pair.m_entity->SetPrimitive(geometry);
-
-			//if ((effectNode->GetName().Find("hidden") >= 0) || (effectNode->GetName().Find("Hidden") >= 0))
-			//{
-			//	ndAssert(0);
-			//	//mesh->m_isVisible = false;
-			//	//entity->m_isVisible = false;
-			//	//entity->m_castShadow = false;
-			//}
-		}
-	}
-
-	return *m_mesh && *m_renderMesh;
 }
 
 const ndSharedPtr<ndAnimationSequence> ndMeshLoader::FindSequence(const ndString& fbxPathAnimName) const
@@ -170,16 +43,18 @@ const ndSharedPtr<ndAnimationSequence> ndMeshLoader::FindSequence(const ndString
 
 ndSharedPtr<ndAnimationSequence> ndMeshLoader::GetAnimationSequence(const ndString& fbxPathAnimName)
 {
-	ndTree<ndSharedPtr<ndAnimationSequence>, ndString>::ndNode* node = m_animationCache.Find(fbxPathAnimName);
-	if (!node)
-	{
-		ndSharedPtr<ndAnimationSequence> sequence (LoadAnimation(fbxPathAnimName.GetStr()));
-		if (sequence)
-		{
-			node = m_animationCache.Insert(sequence, fbxPathAnimName);
-		}
-	}
-	return node ? node->GetInfo() : ndSharedPtr<ndAnimationSequence>(nullptr);
+	ndAssert(0);
+	return ndSharedPtr<ndAnimationSequence>(nullptr);
+	//ndTree<ndSharedPtr<ndAnimationSequence>, ndString>::ndNode* node = m_animationCache.Find(fbxPathAnimName);
+	//if (!node)
+	//{
+	//	ndSharedPtr<ndAnimationSequence> sequence (LoadAnimation(fbxPathAnimName.GetStr()));
+	//	if (sequence)
+	//	{
+	//		node = m_animationCache.Insert(sequence, fbxPathAnimName);
+	//	}
+	//}
+	//return node ? node->GetInfo() : ndSharedPtr<ndAnimationSequence>(nullptr);
 }
 
 void ndMeshLoader::SetTranslationTracks(const ndString& boneName)
@@ -210,3 +85,286 @@ void ndMeshLoader::SetTranslationTracks(const ndString& boneName)
 		}
 	}
 }
+
+ndString ndMeshLoader::GetPath(const ndString& fullPathName) const
+{
+	const char* ptr = strrchr(fullPathName.GetStr(), '/');
+	if (!ptr)
+	{
+		ptr = strrchr(fullPathName.GetStr(), '\\');
+	}
+	return ndString (fullPathName.GetStr(), ndInt32(fullPathName.Size() - strlen(ptr + 1)));
+}
+
+ndString ndMeshLoader::GetName(const ndString& fullPathName) const
+{
+	const char* ptr1 = strrchr(fullPathName.GetStr(), '.');
+	const char* ptr0 = strrchr(fullPathName.GetStr(), '/');
+	if (!ptr0)
+	{
+		ptr0 = strrchr(fullPathName.GetStr(), '\\');
+	}
+	ndAssert(ptr0);
+	ndAssert(ptr1);
+	ndInt32 start = ndInt32(fullPathName.Size() - strlen(ptr0 + 1));
+	ndInt32 end = ndInt32(fullPathName.Size() - strlen(ptr1));
+	return fullPathName.SubString(start, end - start);
+}
+
+bool ndMeshLoader::ImportFbx(const ndString& fbxPathMeshName)
+{
+	ndFbxMeshLoader loader;
+	m_mesh = ndSharedPtr<ndMesh>(loader.LoadMesh(fbxPathMeshName.GetStr(), false));
+
+	ndTrace(("export mesh %s this mode as .nd mesh\n", fbxPathMeshName.GetStr()));
+	const ndString exportName(GetPath(fbxPathMeshName) + GetName(fbxPathMeshName) + ".nd");
+	//SaveMesh(exportName);
+	//ndAssert(0);
+	return m_mesh;
+}
+
+bool ndMeshLoader::LoadMesh(const ndString& fullPathMeshName)
+{
+	ndString oldloc(setlocale(LC_ALL, 0));
+	nd::TiXmlDocument doc(fullPathMeshName.GetStr());
+	doc.LoadFile();
+	if (doc.Error())
+	{
+		m_mesh = ndSharedPtr<ndMesh>(nullptr);
+		setlocale(LC_ALL, oldloc.GetStr());
+		return false;
+	}
+
+	struct MeshXmlNodePair
+	{
+		MeshXmlNodePair() {}
+		MeshXmlNodePair(ndMesh* const mesh, const nd::TiXmlElement* const xmlNode)
+			:m_mesh(mesh)
+			,m_xmlNode(xmlNode)
+		{
+		}
+		ndMesh* m_mesh;
+		const nd::TiXmlElement* m_xmlNode;
+	};
+
+	ndFixSizeArray<MeshXmlNodePair, 1024> stack;
+
+	const nd::TiXmlElement* const rootNode = doc.RootElement();
+	ndAssert(strcmp(rootNode->Value(), "ndMesh") == 0);
+
+	m_mesh = ndSharedPtr<ndMesh>(new ndMesh());
+	stack.PushBack(MeshXmlNodePair(*m_mesh, rootNode));
+
+	while (stack.GetCount())
+	{
+		MeshXmlNodePair entry(stack.Pop());
+
+		ndMesh* const mesh = entry.m_mesh;
+
+		mesh->m_name = ndString(xmlGetString(entry.m_xmlNode, "name"));
+		mesh->m_matrix = xmlGetMatrix(entry.m_xmlNode, "matrix");
+
+		const nd::TiXmlElement* const xmlGeometry = (nd::TiXmlElement*)entry.m_xmlNode->FirstChild("ndGeometry");
+		if (xmlGeometry)
+		{
+			ndSharedPtr<ndMeshEffect> geometry(new ndMeshEffect());
+			geometry->DeserializeFromXml(xmlGeometry);
+			mesh->SetMesh(geometry);
+		}
+
+		for (const nd::TiXmlNode* node = entry.m_xmlNode->FirstChild("ndMesh"); node; node = node->NextSibling("ndMesh"))
+		{
+			const nd::TiXmlElement* const linkNode = (nd::TiXmlElement*)node;
+			ndAssert(strcmp(linkNode->Value(), "ndMesh") == 0);
+
+			ndSharedPtr<ndMesh> child (new ndMesh());
+			entry.m_mesh->AddChild(child);
+			stack.PushBack(MeshXmlNodePair(*child, linkNode));
+		}
+	}
+
+	setlocale(LC_ALL, oldloc.GetStr());
+	return true;
+}
+
+void ndMeshLoader::SaveMesh(const ndString& fullPathName)
+{
+	ndString oldloc(setlocale(LC_ALL, 0));
+	ndSharedPtr<nd::TiXmlDocument> doc(new nd::TiXmlDocument(""));
+	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
+	doc->LinkEndChild(decl);
+
+	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndMesh");
+	doc->LinkEndChild(rootNode);
+
+	struct MeshXmlNodePair
+	{
+		const ndMesh* m_meshNode;
+		nd::TiXmlElement* m_parentXml;
+	};
+
+	ndFixSizeArray<MeshXmlNodePair, 1024> stack;
+	MeshXmlNodePair pair;
+	pair.m_meshNode = *m_mesh;
+	pair.m_parentXml = rootNode;
+	stack.PushBack(pair);
+
+	while (stack.GetCount())
+	{
+		MeshXmlNodePair entry(stack.Pop());
+		xmlSaveParam(entry.m_parentXml, "name", entry.m_meshNode->m_name.GetStr());
+		xmlSaveParam(entry.m_parentXml, "matrix", entry.m_meshNode->m_matrix);
+		//xmlSaveParam(entry.m_parentXml, "meshMatrix", entry.m_meshNode->m_meshMatrix);
+
+		if (*entry.m_meshNode->GetMesh())
+		{
+			nd::TiXmlElement* const geometry = new nd::TiXmlElement("ndGeometry");
+			entry.m_parentXml->LinkEndChild(geometry);
+			entry.m_meshNode->GetMesh()->SerializeToXml(geometry);
+		}
+
+		for (ndList<ndSharedPtr<ndMesh>>::ndNode* node = entry.m_meshNode->m_children.GetFirst(); node; node = node->GetNext())
+		{
+			MeshXmlNodePair childPair;
+			childPair.m_meshNode = *node->GetInfo();
+			nd::TiXmlElement* const child = new nd::TiXmlElement("ndMesh");
+			entry.m_parentXml->LinkEndChild(child);
+			childPair.m_parentXml = child;
+			stack.PushBack(childPair);
+		}
+	};
+
+	doc->SaveFile(fullPathName.GetStr());
+	setlocale(LC_ALL, oldloc.GetStr());
+}
+
+bool ndRenderMeshLoader::MeshToRenderSceneNode(const ndString& materialBasePath)
+{
+	class EntityMeshPair
+	{
+		public:
+		EntityMeshPair()
+			:m_mesh(nullptr)
+			,m_entity(nullptr)
+		{
+		}
+
+		EntityMeshPair(const EntityMeshPair& src)
+			:m_mesh(src.m_mesh)
+			,m_entity(src.m_entity)
+		{
+		}
+
+		EntityMeshPair(const ndSharedPtr<ndRenderSceneNode>& entity, const ndSharedPtr<ndMesh>& mesh)
+			:m_mesh(mesh)
+			, m_entity(entity)
+		{
+		}
+
+		ndSharedPtr<ndMesh> m_mesh;
+		ndSharedPtr<ndRenderSceneNode> m_entity;
+	};
+
+	ndList<EntityMeshPair> meshList;
+	ndList<ndSharedPtr<ndMesh>> effectNodeList;
+	ndList<ndSharedPtr<ndRenderSceneNode>> parentEntityList;
+
+	effectNodeList.Append(m_mesh);
+	parentEntityList.Append(ndSharedPtr<ndRenderSceneNode>(nullptr));
+
+	m_renderMesh = ndSharedPtr<ndRenderSceneNode>(nullptr);
+	while (effectNodeList.GetCount())
+	{
+		ndSharedPtr<ndMesh> mesh(effectNodeList.GetLast()->GetInfo());
+		ndSharedPtr<ndRenderSceneNode> parentNode(parentEntityList.GetLast()->GetInfo());
+
+		effectNodeList.Remove(effectNodeList.GetLast());
+		parentEntityList.Remove(parentEntityList.GetLast());
+
+		ndSharedPtr<ndRenderSceneNode> entity(nullptr);
+		if (!(*parentNode))
+		{
+			m_renderMesh = ndSharedPtr<ndRenderSceneNode>(new ndRenderSceneNode(mesh->m_matrix));
+			entity = m_renderMesh;
+		}
+		else
+		{
+			ndSharedPtr<ndRenderSceneNode> childNode(new ndRenderSceneNode(mesh->m_matrix));
+			parentNode->AddChild(childNode);
+			entity = childNode;
+		}
+		entity->m_name = mesh->GetName();
+
+		ndSharedPtr<ndMeshEffect> meshEffect(mesh->GetMesh());
+		if (*meshEffect)
+		{
+			meshList.Append(EntityMeshPair(entity, mesh));
+		}
+
+		for (ndList<ndSharedPtr<ndMesh>>::ndNode* childNode = mesh->GetChildren().GetFirst(); childNode; childNode = childNode->GetNext())
+		{
+			parentEntityList.Append(entity);
+			effectNodeList.Append(childNode->GetInfo());
+		}
+	}
+
+	for (ndList<EntityMeshPair>::ndNode* node = meshList.GetFirst(); node; node = node->GetNext())
+	{
+		EntityMeshPair& pair = node->GetInfo();
+	
+		ndAssert(*pair.m_mesh);
+		ndAssert(*pair.m_entity);
+	
+		ndSharedPtr<ndMeshEffect> meshEffect(pair.m_mesh->GetMesh());
+		ndArray<ndMeshEffect::ndMaterial>& materials = meshEffect->GetMaterials();
+	
+		ndRenderPrimitive::ndDescriptor descriptor(m_owner);
+		descriptor.m_meshNode = meshEffect;
+		descriptor.m_skeleton = pair.m_entity;
+	
+		for (ndInt32 j = 0; j < materials.GetCount(); ++j)
+		{
+			const ndString texturePathName(materialBasePath + materials[j].m_textureName);
+			ndRenderPrimitiveMaterial& material = descriptor.AddMaterial(m_owner->GetTextureCache()->GetTexture(texturePathName));
+			material.m_diffuse = materials[j].m_diffuse;
+			material.m_specular = materials[j].m_specular;
+			material.m_reflection = materials[j].m_reflection;
+			material.m_specularPower = ndReal(materials[j].m_shiness);
+			material.m_opacity = ndReal(materials[j].m_opacity);
+			material.m_castShadows = true;
+		}
+	
+		//pair.m_entity->m_name = effectNode->GetName();
+		//ndSharedPtr<ndRenderPrimitive> geometry(ndRenderPrimitive::CreateMeshPrimitive(descriptor));
+		ndSharedPtr<ndRenderPrimitive> geometry(new ndRenderPrimitive(descriptor));
+		pair.m_entity->SetPrimitive(geometry);
+	
+		//if ((effectNode->GetName().Find("hidden") >= 0) || (effectNode->GetName().Find("Hidden") >= 0))
+		//{
+		//	ndAssert(0);
+		//	//mesh->m_isVisible = false;
+		//	//entity->m_isVisible = false;
+		//	//entity->m_castShadow = false;
+		//}
+	}
+	return m_renderMesh;
+}
+
+bool ndRenderMeshLoader::LoadMesh(const ndString& fullPathMeshName)
+{
+	if (ndMeshLoader::LoadMesh(fullPathMeshName))
+	{
+		return MeshToRenderSceneNode(GetPath(fullPathMeshName));
+	}
+	return false;
+}
+
+bool ndRenderMeshLoader::ImportFbx(const ndString& fbxPathMeshName)
+{
+	if (ndMeshLoader::ImportFbx(fbxPathMeshName))
+	{
+		return MeshToRenderSceneNode(GetPath(fbxPathMeshName));
+	}
+	return false;
+}
+

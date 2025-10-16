@@ -151,10 +151,11 @@ else()
 			ARCHIVE DESTINATION lib
 			RUNTIME DESTINATION bin)
 
-	install(FILES ${HEADERS} DESTINATION include/${projectName})
+	#install(FILES ${HEADERS} DESTINATION include/${projectName})
+	install(FILES ${HEADERS} DESTINATION include/)
+	#install(DIRECTORY ../sdk DESTINATION "include")
 
 	if (MSVC)
-		#set_target_properties(${projectName} PROPERTIES FOLDER "physics")
 		set_target_properties(${projectName} PROPERTIES FOLDER "newtonSdk")
 	endif()
 endif()

@@ -110,6 +110,7 @@ class ndMesh : public ndClassAlloc
 	ndList<ndSharedPtr<ndMesh>>::ndNode* m_childNode;
 
 	friend class ndMeshFile;
+	friend class ndMeshLoader;
 };
 #endif
 

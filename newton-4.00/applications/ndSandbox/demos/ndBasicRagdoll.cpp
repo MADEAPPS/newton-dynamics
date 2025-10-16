@@ -115,7 +115,7 @@ namespace ndRagdoll
 		ndSharedPtr<ndBody> CreateBodyPart(
 			ndDemoEntityManager* const scene,
 			const ndSharedPtr<ndRenderSceneNode>& rootMesh,
-			const ndMeshLoader& loader, 
+			const ndRenderMeshLoader& loader, 
 			const ndDefinition& definition,
 			ndBodyDynamic* const parentBody)
 		{
@@ -216,7 +216,7 @@ namespace ndRagdoll
 			}
 		}
 
-		void RagdollBuildScript(ndDemoEntityManager* const scene, const ndMeshLoader& loader, const ndMatrix& location)
+		void RagdollBuildScript(ndDemoEntityManager* const scene, const ndRenderMeshLoader& loader, const ndMatrix& location)
 		{
 			ndSharedPtr<ndRenderSceneNode> entityDuplicate(loader.m_renderMesh->Clone());
 			entityDuplicate->SetTransform(location);
@@ -281,7 +281,7 @@ namespace ndRagdoll
 		}
 	};
 
-	ndSharedPtr<ndModelNotify> CreateRagdoll(ndDemoEntityManager* const scene, const ndMeshLoader& loader, const ndMatrix& location)
+	ndSharedPtr<ndModelNotify> CreateRagdoll(ndDemoEntityManager* const scene, const ndRenderMeshLoader& loader, const ndMatrix& location)
 	{
 		// make a hierchical atriculate model
 		ndSharedPtr<ndModel> model(new ndModelArticulation());
@@ -308,14 +308,14 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 	ndSharedPtr<ndBody> bodyFloor(BuildCompoundScene(scene, ndGetIdentityMatrix()));
 	//ndSharedPtr<ndBody> bodyFloor(BuildFloorBox(scene, ndGetIdentityMatrix(), "marblecheckboard.png", 0.1f, true));
 
-//ndMeshLoader loader__;
-//loader__.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("unitBox.fbx"));
+//ndRenderMeshLoader loader__;
+//loader__.ImportFbx(*scene->GetRenderer(), ndGetWorkingFileName("unitBox.fbx"));
 //ndMeshFile exportFile;
 //exportFile.Export(*loader__.m_mesh, ndGetWorkingFileName("xxx.nd"));
 //ndSharedPtr<ndMesh> xxxx(exportFile.Import(ndGetWorkingFileName("xxx.nd")));
 	
-	ndMeshLoader loader;
-	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("ragdoll.fbx"));
+	ndRenderMeshLoader loader(*scene->GetRenderer());
+	loader.ImportFbx(ndGetWorkingFileName("ragdoll.fbx"));
 
 ndMeshFile exportFile;
 exportFile.Export(*loader.m_mesh, ndGetWorkingFileName("xxx.nd"));

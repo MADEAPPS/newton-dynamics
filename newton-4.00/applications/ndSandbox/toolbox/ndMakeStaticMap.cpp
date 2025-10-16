@@ -149,7 +149,7 @@ ndSharedPtr<ndBody> BuildGridPlane(ndDemoEntityManager* const scene, ndInt32 gri
 
 ndSharedPtr<ndBody> BuildStaticMesh(ndDemoEntityManager* const scene, const char* const meshName, bool optimized, bool kinematic)
 {
-	ndMeshLoader loader;
+	ndRenderMeshLoader loader;
 	ndSharedPtr<ndMesh> meshEffectNode(loader.LoadMesh(meshName));
 	ndAssert(*meshEffectNode);
 
@@ -436,8 +436,12 @@ ndSharedPtr<ndBody> BuildFlatPlane(ndDemoEntityManager* const scene, const ndMat
 
 ndSharedPtr<ndBody> BuildPlayground(ndDemoEntityManager* const scene, bool kinematic)
 {
-	ndMeshLoader loader;
-	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("playground.fbx"));
+	ndRenderMeshLoader loader(*scene->GetRenderer());
+	//loader.ImportFbx(ndGetWorkingFileName("flatfloor.fbx"));
+	//loader.LoadMesh(ndGetWorkingFileName("flatfloor.nd"));
+
+	loader.ImportFbx(ndGetWorkingFileName("playground.fbx"));
+	//loader.LoadMesh(ndGetWorkingFileName("playground.nd"));
 	ndSharedPtr<ndShapeInstance>collision(loader.m_mesh->CreateCollision());
 
 	kinematic = false;
@@ -462,7 +466,7 @@ class ndSceneMesh : public ndRenderSceneNode
 	public:
 	ndSceneMesh(
 		ndDemoEntityManager* const scene, 
-		ndMeshLoader& loader,
+		ndRenderMeshLoader& loader,
 		const ndMatrix& matrix)
 		:ndRenderSceneNode(matrix)
 		,m_compoundScene(new ndShapeInstance(new ndShapeCompound()))
@@ -498,7 +502,7 @@ class ndSceneMesh : public ndRenderSceneNode
 	}
 
 	private:
-	void AddPlayground(const ndMatrix& location, const ndMeshLoader& loader)
+	void AddPlayground(const ndMatrix& location, const ndRenderMeshLoader& loader)
 	{
 		ndSharedPtr<ndShapeInstance>collision(loader.m_mesh->CreateCollision());
 		collision->SetLocalMatrix(location);
@@ -586,8 +590,8 @@ class ndSceneMesh : public ndRenderSceneNode
 ndSharedPtr<ndBody> BuildCompoundScene(ndDemoEntityManager* const scene, const ndMatrix& location)
 {
 	// load the player arena map
-	ndMeshLoader loader;
-	loader.LoadEntity(*scene->GetRenderer(), ndGetWorkingFileName("playground.fbx"));
+	ndRenderMeshLoader loader(*scene->GetRenderer());
+	loader.ImportFbx(ndGetWorkingFileName("playground.fbx"));
 	ndSharedPtr<ndRenderSceneNode> rootScene(new ndSceneMesh(scene, loader, location));
 
 	ndSceneMesh* const sceneMesh = (ndSceneMesh*)*rootScene;
