@@ -46,7 +46,7 @@ bool ndRenderMeshLoader::MeshToRenderSceneNode(const ndString& materialBasePath)
 
 		EntityMeshPair(const ndSharedPtr<ndRenderSceneNode>& entity, const ndSharedPtr<ndMesh>& mesh)
 			:m_mesh(mesh)
-			, m_entity(entity)
+			,m_entity(entity)
 		{
 		}
 
