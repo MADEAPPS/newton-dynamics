@@ -99,6 +99,7 @@ class ndMesh : public ndClassAlloc
 	ndSharedPtr<ndShapeInstance> CreateCollisionCapsule();
 	ndSharedPtr<ndShapeInstance> CreateCollisionTree(bool optimize = true);
 	ndSharedPtr<ndShapeInstance> CreateCollisionCompound(bool lowDetail = false);
+	ndMatrix CalculateLocalMatrix(ndVector& size) const;
 
 	ndString m_name;
 	ndSharedPtr<ndMeshEffect> m_mesh;

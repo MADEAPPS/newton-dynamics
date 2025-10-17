@@ -1292,8 +1292,6 @@ ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, 
 				cluster_i1.m_count = cluster.m_count - i0;
 				cluster_i1.m_sum -= xc;
 				cluster_i1.m_sum2 -= x2c;
-				//spliteStack[stack] = cluster_i1;
-				//stack++;
 				spliteStack.PushBack(cluster_i1);
 
 				ndCluster cluster_i0(cluster);
@@ -1301,8 +1299,6 @@ ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, 
 				cluster_i0.m_count = i0;
 				cluster_i0.m_sum = xc;
 				cluster_i0.m_sum2 = x2c;
-				//spliteStack[stack] = cluster_i0;
-				//stack++;
 				spliteStack.PushBack(cluster_i0);
 			}
 		}
@@ -1366,7 +1362,6 @@ ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, 
 			const ndFloat32 window2 = window * window;
 
 			ndUnsigned8 mask[D_MAX_CONTATCS];
-			//memset(mask, 0, count * sizeof(ndUnsigned8));
 			ndMemSet(mask, ndUnsigned8(0), count);
 			for (ndInt32 i = 0; i < count; ++i)
 			{

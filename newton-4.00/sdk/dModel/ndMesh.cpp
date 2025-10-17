@@ -314,10 +314,9 @@ void ndMesh::ApplyTransform(const ndMatrix& transform)
 	}
 }
 
-ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionBox()
+ndMatrix ndMesh::CalculateLocalMatrix(ndVector& sizeOut) const
 {
 	ndSharedPtr<ndMeshEffect> meshEffect = GetMesh();
-	ndAssert(*meshEffect);
 
 	const ndInt32 pointsCount = meshEffect->GetVertexCount();
 	const ndInt32 pointsStride = ndInt32(meshEffect->GetVertexStrideInByte() / sizeof(ndFloat64));
@@ -330,22 +329,46 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionBox()
 		ndFloat32 x = ndFloat32(pointsBuffer[i * pointsStride + 0]);
 		ndFloat32 y = ndFloat32(pointsBuffer[i * pointsStride + 1]);
 		ndFloat32 z = ndFloat32(pointsBuffer[i * pointsStride + 2]);
-		ndVector p(x, y, z, ndFloat32(0.0f));
+		const ndVector p(x, y, z, ndFloat32(0.0f));
 		minP = minP.GetMin(p);
 		maxP = maxP.GetMax(p);
 	}
-	 
-	ndVector size(maxP - minP);
+
+	ndVector size(ndVector::m_half * (maxP - minP));
+	ndVector origin(ndVector::m_half * (maxP + minP));
+	ndMatrix covariance(ndGetZeroMatrix());
+	for (ndInt32 i = 0; i < pointsCount; ++i)
+	{
+		ndFloat32 x = ndFloat32(pointsBuffer[i * pointsStride + 0]);
+		ndFloat32 y = ndFloat32(pointsBuffer[i * pointsStride + 1]);
+		ndFloat32 z = ndFloat32(pointsBuffer[i * pointsStride + 2]);
+		const ndVector q(x, y, z, ndFloat32(0.0f));
+		const ndVector p((q - origin) & ndVector::m_triplexMask);
+		ndAssert(p.m_w == ndFloat32(0.0f));
+		const ndMatrix matrix(ndCovarianceMatrix(p, p));
+		covariance.m_front += matrix.m_front;
+		covariance.m_up += matrix.m_up;
+		covariance.m_right += matrix.m_right;
+	}
+	const ndVector eigen(covariance.EigenVectors() & ndVector::m_triplexMask);
+	covariance.m_posit = origin;
+	covariance.m_posit.m_w = ndFloat32(1.0f);
+
+	sizeOut = size;
+	sizeOut.m_w = ndFloat32(0.0f);
+	return covariance;
+}
+
+ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionBox()
+{
+	ndSharedPtr<ndMeshEffect> meshEffect = GetMesh();
+	ndAssert(*meshEffect);
+	
+	ndVector size;
+	ndMatrix localMatrix(CalculateLocalMatrix(size));
+	size = size.Scale(ndFloat32(2.0f));
 	ndSharedPtr<ndShapeInstance> box(new ndShapeInstance(new ndShapeBox(size.m_x, size.m_y, size.m_z)));
-	
-	const ndVector origin((maxP + minP).Scale(ndFloat32(0.5f)));
-	ndMatrix alighMatrix(ndGetIdentityMatrix());
-	alighMatrix.m_posit = ndVector::m_half * (maxP + minP);
-	alighMatrix.m_posit.m_w = ndFloat32(1.0f);
-	
-	//const ndMatrix matrix(alighMatrix * m_meshMatrix);
-	const ndMatrix matrix(alighMatrix);
-	box->SetLocalMatrix(matrix);
+	box->SetLocalMatrix(localMatrix);
 	return box;
 }
 
@@ -354,32 +377,11 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionSphere()
 	ndSharedPtr<ndMeshEffect> meshEffect = GetMesh();
 	ndAssert(*meshEffect);
 
-	const ndInt32 pointsCount = meshEffect->GetVertexCount();
-	const ndInt32 pointsStride = ndInt32(meshEffect->GetVertexStrideInByte() / sizeof(ndFloat64));
-	const ndFloat64* const pointsBuffer = meshEffect->GetVertexPool();
-
-	ndVector minP(ndFloat32(1.0e10f));
-	ndVector maxP(ndFloat32(-1.0e10f));
-	for (ndInt32 i = 0; i < pointsCount; ++i)
-	{
-		ndFloat32 x = ndFloat32(pointsBuffer[i * pointsStride + 0]);
-		ndFloat32 y = ndFloat32(pointsBuffer[i * pointsStride + 1]);
-		ndFloat32 z = ndFloat32(pointsBuffer[i * pointsStride + 2]);
-		ndVector p(x, y, z, ndFloat32(0.0f));
-		minP = minP.GetMin(p);
-		maxP = maxP.GetMax(p);
-	}
-	 
-	ndVector size(ndVector::m_half * (maxP - minP));
-	ndMatrix alighMatrix(ndGetIdentityMatrix());
-	alighMatrix.m_posit = ndVector::m_half * (maxP + minP);
-	alighMatrix.m_posit.m_w = ndFloat32(1.0f);
-	
+	ndVector size;
+	ndMatrix localMatrix(CalculateLocalMatrix(size));
 	ndSharedPtr<ndShapeInstance> sphere (new ndShapeInstance(new ndShapeSphere(size.m_x)));
 	
-	//const ndMatrix matrix(alighMatrix * m_meshMatrix);
-	const ndMatrix matrix(alighMatrix);
-	sphere->SetLocalMatrix(matrix);
+	sphere->SetLocalMatrix(localMatrix);
 	return sphere;
 }
 
@@ -388,34 +390,25 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionCapsule()
 	ndSharedPtr<ndMeshEffect> meshEffect = GetMesh();
 	ndAssert(*meshEffect);
 
-	const ndInt32 pointsCount = meshEffect->GetVertexCount();
-	const ndInt32 pointsStride = ndInt32(meshEffect->GetVertexStrideInByte() / sizeof(ndFloat64));
-	const ndFloat64* const pointsBuffer = meshEffect->GetVertexPool();
-
-	ndVector minP(ndFloat32(1.0e10f));
-	ndVector maxP(ndFloat32(-1.0e10f));
-	for (ndInt32 i = 0; i < pointsCount; ++i)
+	ndVector size;
+	ndMatrix localMatrix(CalculateLocalMatrix(size));
+	if ((size.m_y >= size.m_x) && (size.m_y >= size.m_z))
 	{
-		ndFloat32 x = ndFloat32(pointsBuffer[i * pointsStride + 0]);
-		ndFloat32 y = ndFloat32(pointsBuffer[i * pointsStride + 1]);
-		ndFloat32 z = ndFloat32(pointsBuffer[i * pointsStride + 2]);
-		ndVector p(x, y, z, ndFloat32(0.0f));
-		minP = minP.GetMin(p);
-		maxP = maxP.GetMax(p);
+		ndSwap(size.m_x, size.m_y);
+		localMatrix = ndRollMatrix(ndFloat32(90.0f) * ndDegreeToRad) * localMatrix;
+	}
+	else if ((size.m_z >= size.m_x) && (size.m_z >= size.m_y))
+	{
+		ndSwap(size.m_x, size.m_z);
+		localMatrix = ndYawMatrix(ndFloat32(90.0f) * ndDegreeToRad) * localMatrix;
 	}
 
-	ndVector size(ndVector::m_half * (maxP - minP));
-	ndVector origin(ndVector::m_half * (maxP + minP));
-	ndFloat32 high = 2.0f * ndMax(size.m_y - size.m_x, ndFloat32(0.05f));
-	ndMatrix alighMatrix(ndRollMatrix(90.0f * ndDegreeToRad));
-	alighMatrix.m_posit = origin;
-	alighMatrix.m_posit.m_w = ndFloat32(1.0f);
+	ndFloat32 radios = size.m_y;
+	ndFloat32 high = ndFloat32(2.0f) * ndMax(size.m_x - size.m_y, ndFloat32(0.025f));
 
-	ndSharedPtr<ndShapeInstance> capsule(new ndShapeInstance(new ndShapeCapsule(size.m_x, size.m_x, high)));
-	
-	//const ndMatrix matrix(alighMatrix * m_meshMatrix);
-	const ndMatrix matrix(alighMatrix);
-	capsule->SetLocalMatrix(matrix);
+	ndSharedPtr<ndShapeInstance> capsule(new ndShapeInstance(new ndShapeCapsule(radios, radios, high)));
+
+	capsule->SetLocalMatrix(localMatrix);
 	return capsule;
 }
 
@@ -428,6 +421,7 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionTire()
 	const ndInt32 pointsStride = ndInt32(meshEffect->GetVertexStrideInByte() / sizeof(ndFloat64));
 	const ndFloat64* const pointsBuffer = meshEffect->GetVertexPool();
 
+	ndAssert(0);
 	ndVector minBox(ndFloat32(1.0e10f));
 	ndVector maxBox(ndFloat32(-1.0e10f));
 	//const ndMatrix localMatrix(m_meshMatrix);

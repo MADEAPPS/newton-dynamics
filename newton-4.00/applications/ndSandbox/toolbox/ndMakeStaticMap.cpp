@@ -439,9 +439,9 @@ ndSharedPtr<ndBody> BuildPlayground(ndDemoEntityManager* const scene, bool kinem
 	ndRenderMeshLoader loader(*scene->GetRenderer());
 	//loader.ImportFbx(ndGetWorkingFileName("flatfloor.fbx"));
 	//loader.LoadMesh(ndGetWorkingFileName("flatfloor.nd"));
+	//loader.ImportFbx(ndGetWorkingFileName("playground.fbx"));
 
-	loader.ImportFbx(ndGetWorkingFileName("playground.fbx"));
-	//loader.LoadMesh(ndGetWorkingFileName("playground.nd"));
+	loader.LoadMesh(ndGetWorkingFileName("playground.nd"));
 	ndSharedPtr<ndShapeInstance>collision(loader.m_mesh->CreateCollision());
 
 	kinematic = false;
@@ -591,7 +591,8 @@ ndSharedPtr<ndBody> BuildCompoundScene(ndDemoEntityManager* const scene, const n
 {
 	// load the player arena map
 	ndRenderMeshLoader loader(*scene->GetRenderer());
-	loader.ImportFbx(ndGetWorkingFileName("playground.fbx"));
+	//loader.ImportFbx(ndGetWorkingFileName("playground.fbx"));
+	loader.LoadMesh(ndGetWorkingFileName("playground.nd"));
 	ndSharedPtr<ndRenderSceneNode> rootScene(new ndSceneMesh(scene, loader, location));
 
 	ndSceneMesh* const sceneMesh = (ndSceneMesh*)*rootScene;
