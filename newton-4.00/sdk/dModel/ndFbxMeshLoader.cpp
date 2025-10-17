@@ -515,7 +515,7 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 	faceIndexArray.SetCount(faceCount);
 	faceMaterialArray.SetCount(faceCount);
 	ImportMaterials(fbxMesh, *meshEffect);
-	const ndArray<ndMeshEffect::ndMaterial>& materialArray = meshEffect->GetMaterials();
+	ndArray<ndMeshEffect::ndMaterial>& materialArray = meshEffect->GetMaterials();
 	ndInt32 defaultMaterialId = (materialArray.GetCount() <= 1) ? 0 : -1;
 	for (ndInt32 i = 0; i < indexCount; ++i)
 	{
@@ -536,6 +536,27 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 			count = 0;
 			faceIndex++;
 		}
+	}
+
+	// remove unuse materials
+	ndArray<ndInt32> remapMaterial;
+	ndArray<ndMeshEffect::ndMaterial> dirtyMaterial;
+	for (ndInt32 i = 0; i < materialArray.GetCount(); ++i)
+	{
+		remapMaterial.PushBack(-1);
+		dirtyMaterial.PushBack(materialArray[i]);
+	}
+
+	materialArray.SetCount(0);
+	for (ndInt32 i = 0; i < faceCount; ++i)
+	{
+		ndInt32 index = faceMaterialArray[i];
+		if (remapMaterial[index] == -1)
+		{
+			remapMaterial[index] = ndInt32(materialArray.GetCount());
+			materialArray.PushBack(dirtyMaterial[index]);
+		}
+		faceMaterialArray[i] = remapMaterial[index];
 	}
 
 	const ofbx::Vec3* const vertices = geom->getVertices();
@@ -613,9 +634,9 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 	meshEffect->BuildFromIndexList(&format);
 
 	ndMatrix pivotMatrix(ofbxMatrix2dMatrix(fbxMesh->getGeometricMatrix()));
-	//entity->m_meshMatrix = pivotMatrix;
 	meshEffect->ApplyTransform(pivotMatrix);
 	entity->SetMesh(meshEffect);
+
 	//mesh->RepairTJoints();
 }
 
