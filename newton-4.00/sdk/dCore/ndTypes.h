@@ -311,6 +311,14 @@ class ndTriplex
 	ndFloat32 m_z;
 };
 
+class ndTriplexReal
+{
+	public:
+	ndReal m_x;
+	ndReal m_y;
+	ndReal m_z;
+};
+
 #define D_BASE_CLASS_REFLECTION(Class)			\
 	virtual const char* ClassName() const		\
 	{											\
