@@ -30,10 +30,10 @@
 //#define DEFAULT_SCENE	5		// conservation of momentum 
 //#define DEFAULT_SCENE	6		// basic joints
 //#define DEFAULT_SCENE	7		// heighfield collision
-#define DEFAULT_SCENE	8		// static mesh collision
+//#define DEFAULT_SCENE	8		// static mesh collision
 //#define DEFAULT_SCENE	9		// static compound scene collision
 //#define DEFAULT_SCENE	10		// basic compound shapes
-//#define DEFAULT_SCENE	11		// basic model, a npd vehicle prop
+#define DEFAULT_SCENE	11		// basic model, a npd vehicle prop
 //#define DEFAULT_SCENE	12		// basics mutibody vehicle
 //#define DEFAULT_SCENE	13		// basic ragdoll
 //#define DEFAULT_SCENE	14		// object Placement

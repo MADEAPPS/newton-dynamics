@@ -314,15 +314,16 @@ class ndBackGroundVehicleController : public ndModelNotify
 
 void ndBasicModel(ndDemoEntityManager* const scene)
 {
-	//ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
-	ndSharedPtr<ndBody> mapBody(BuildHeightFieldTerrain(scene, "grass.png", ndGetIdentityMatrix()));
+	ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
+	//ndSharedPtr<ndBody> mapBody(BuildHeightFieldTerrain(scene, "grass.png", ndGetIdentityMatrix()));
 
 	// add a help menu
 	ndSharedPtr<ndDemoEntityManager::ndDemoHelper> demoHelper(new ndBackGroundVehicleController::ndHelpLegend());
 	scene->SetDemoHelp(demoHelper);
 
 	ndRenderMeshLoader vmwLoaderRedPaint(*scene->GetRenderer());
-	vmwLoaderRedPaint.ImportFbx(ndGetWorkingFileName("vmwRed.fbx"));
+	//vmwLoaderRedPaint.ImportFbx(ndGetWorkingFileName("vmwRed.fbx"));
+	vmwLoaderRedPaint.LoadMesh(ndGetWorkingFileName("vmwRed.nd"));
 	ndSharedPtr<ndModelNotify> controller(ndBackGroundVehicleController::CreateAiVehicleProp(scene, ndVector::m_wOne, vmwLoaderRedPaint));
 
 	// set this player as the active camera
@@ -330,11 +331,12 @@ void ndBasicModel(ndDemoEntityManager* const scene)
 	ndRender* const renderer = *scene->GetRenderer();
 	renderer->SetCamera(playerController->GetCamera());
 
-#if 1
+#if 0
 	{
 		// add an array of vehicles 
 		ndRenderMeshLoader vmwLoaderGreenPaint(*scene->GetRenderer());
-		vmwLoaderGreenPaint.ImportFbx(ndGetWorkingFileName("vmwGreen.fbx"));
+		//vmwLoaderGreenPaint.ImportFbx(ndGetWorkingFileName("vmwGreen.fbx"));
+		vmwLoaderGreenPaint.LoadMesh(ndGetWorkingFileName("vmwGreen.nd"));
 
 		const ndInt32 count = 5;
 		ndFloat32 spacing = ndFloat32(10.0f);

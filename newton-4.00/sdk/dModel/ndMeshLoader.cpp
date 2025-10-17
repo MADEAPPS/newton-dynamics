@@ -118,6 +118,7 @@ bool ndMeshLoader::ImportFbx(const ndString& fbxPathMeshName)
 	//const ndString exportName(GetPath(fbxPathMeshName) + GetName(fbxPathMeshName) + ".nd");
 	//ndTrace(("exporting mesh %s\n", exportName.GetStr()));
 	//SaveMesh(exportName);
+	ndAssert(0);
 	return m_mesh;
 }
 

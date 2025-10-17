@@ -417,33 +417,49 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionTire()
 	ndSharedPtr<ndMeshEffect> meshEffect = GetMesh();
 	ndAssert(*meshEffect);
 
-	const ndInt32 pointsCount = meshEffect->GetVertexCount();
-	const ndInt32 pointsStride = ndInt32(meshEffect->GetVertexStrideInByte() / sizeof(ndFloat64));
-	const ndFloat64* const pointsBuffer = meshEffect->GetVertexPool();
+	//const ndInt32 pointsCount = meshEffect->GetVertexCount();
+	//const ndInt32 pointsStride = ndInt32(meshEffect->GetVertexStrideInByte() / sizeof(ndFloat64));
+	//const ndFloat64* const pointsBuffer = meshEffect->GetVertexPool();
+	//
+	//ndVector minBox(ndFloat32(1.0e10f));
+	//ndVector maxBox(ndFloat32(-1.0e10f));
+	//const ndMatrix localMatrix(ndGetIdentityMatrix());
+	//for (ndInt32 i = 0; i < pointsCount; ++i)
+	//{
+	//	ndFloat32 x = ndFloat32(pointsBuffer[i * pointsStride + 0]);
+	//	ndFloat32 y = ndFloat32(pointsBuffer[i * pointsStride + 1]);
+	//	ndFloat32 z = ndFloat32(pointsBuffer[i * pointsStride + 2]);
+	//	const ndVector p(localMatrix.TransformVector(ndVector(x, y, z, ndFloat32(1.0f))));
+	//	minBox = minBox.GetMin(p);
+	//	maxBox = maxBox.GetMax(p);
+	//}
+	//ndFloat32 width = ndMax(maxBox.m_x, ndAbs(minBox.m_x));
+	//ndFloat32 radius = ndMax(ndMax(maxBox.m_y, ndAbs(minBox.m_y)), ndMax(maxBox.m_z, ndAbs(minBox.m_z)));
+	//ndSharedPtr<ndShapeInstance> tireShape(new ndShapeInstance(new ndShapeChamferCylinder(ndFloat32(0.75f), ndFloat32(0.5f))));
+	//ndVector scale(ndFloat32(4.0f) * width, radius, radius, 0.0f);
+	//tireShape->SetScale(scale);
+	//tireShape->SetLocalMatrix(localMatrix.OrthoInverse());
 
-	ndAssert(0);
-	ndVector minBox(ndFloat32(1.0e10f));
-	ndVector maxBox(ndFloat32(-1.0e10f));
-	//const ndMatrix localMatrix(m_meshMatrix);
-	const ndMatrix localMatrix(ndGetIdentityMatrix());
-	for (ndInt32 i = 0; i < pointsCount; ++i)
-	{
-		ndFloat32 x = ndFloat32(pointsBuffer[i * pointsStride + 0]);
-		ndFloat32 y = ndFloat32(pointsBuffer[i * pointsStride + 1]);
-		ndFloat32 z = ndFloat32(pointsBuffer[i * pointsStride + 2]);
-		const ndVector p(localMatrix.TransformVector(ndVector(x, y, z, ndFloat32(1.0f))));
-		minBox = minBox.GetMin(p);
-		maxBox = maxBox.GetMax(p);
-	}
-	ndFloat32 width = ndMax(maxBox.m_x, ndAbs(minBox.m_x));
-	ndFloat32 radius = ndMax(ndMax(maxBox.m_y, ndAbs(minBox.m_y)), ndMax(maxBox.m_z, ndAbs(minBox.m_z)));
+	ndVector size;
+	ndMatrix localMatrix(CalculateLocalMatrix(size));
+	//if ((size.m_y >= size.m_x) && (size.m_y >= size.m_z))
+	//{
+	//	ndSwap(size.m_x, size.m_y);
+	//	localMatrix = ndRollMatrix(ndFloat32(90.0f) * ndDegreeToRad) * localMatrix;
+	//}
+	//else if ((size.m_z >= size.m_x) && (size.m_z >= size.m_y))
+	//{
+	//	ndSwap(size.m_x, size.m_z);
+	//	localMatrix = ndYawMatrix(ndFloat32(90.0f) * ndDegreeToRad) * localMatrix;
+	//}
 
+	ndFloat32 width = size.m_x;
+	ndFloat32 radius = size.m_y;
 	ndSharedPtr<ndShapeInstance> tireShape(new ndShapeInstance(new ndShapeChamferCylinder(ndFloat32(0.75f), ndFloat32(0.5f))));
-
 	ndVector scale(ndFloat32(4.0f) * width, radius, radius, 0.0f);
 	tireShape->SetScale(scale);
-	//tireShape->SetLocalMatrix(localMatrix.OrthoInverse() * m_meshMatrix);
-	tireShape->SetLocalMatrix(localMatrix.OrthoInverse());
+	tireShape->SetLocalMatrix(localMatrix);
+
 	return tireShape;
 }
 
@@ -451,8 +467,7 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionConvex()
 {
 	ndAssert(*m_mesh);
 	ndSharedPtr<ndShapeInstance>shape(m_mesh->CreateConvexCollision(1.0e-3f));
-	
-	//const ndMatrix matrix(shape->GetLocalMatrix() * m_meshMatrix);
+
 	const ndMatrix matrix(shape->GetLocalMatrix());
 	shape->SetLocalMatrix(matrix);
 	return shape;
