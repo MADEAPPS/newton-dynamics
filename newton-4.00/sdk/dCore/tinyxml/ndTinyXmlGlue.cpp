@@ -117,7 +117,6 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndArray<ndInt32>& array)
 {
-	//char* const buffer = ndAlloca(char, array.GetCount() * 24 + 256);
 	ndStack<char> buffer(ndInt32 (array.GetCount() * 24 + 256));
 	char* ptr = &buffer[0];
 	for (ndInt32 i = 0; i < array.GetCount(); ++i)
@@ -136,7 +135,6 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndArray<ndInt64>& array)
 {
-	//char* const buffer = ndAlloca(char, array.GetCount() * 24 + 256);
 	ndStack<char> buffer(ndInt32(array.GetCount() * 24 + 256));
 	char* ptr = &buffer[0];
 	for (ndInt32 i = 0; i < array.GetCount(); ++i)
@@ -156,7 +154,6 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndArray<ndVector>& array)
 {
-	//char* const buffer = ndAlloca(char, array.GetCount() * 4 * 12 + 256);
 	ndStack<char> buffer(ndInt32(array.GetCount() * 4 * 12 + 256));
 	char* ptr = &buffer[0];
 	for (ndInt32 i = 0; i < array.GetCount(); ++i)
@@ -165,6 +162,25 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 		{
 			ptr = FloatToString(ptr, 256, array[i][j]);
 		}
+	}
+	CleanWhiteSpace(&buffer[0]);
+
+	nd::TiXmlElement* const node = new nd::TiXmlElement(name);
+	rootNode->LinkEndChild(node);
+
+	node->SetAttribute("count", ndInt32(array.GetCount()));
+	node->SetAttribute("float3Array", &buffer[0]);
+}
+
+void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndArray<ndTriplexReal>& array)
+{
+	ndStack<char> buffer(ndInt32(array.GetCount() * 4 * 12 + 256));
+	char* ptr = &buffer[0];
+	for (ndInt32 i = 0; i < array.GetCount(); ++i)
+	{
+		ptr = FloatToString(ptr, 256, array[i].m_x);
+		ptr = FloatToString(ptr, 256, array[i].m_y);
+		ptr = FloatToString(ptr, 256, array[i].m_z);
 	}
 	CleanWhiteSpace(&buffer[0]);
 

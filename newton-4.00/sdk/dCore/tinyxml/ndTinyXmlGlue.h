@@ -36,11 +36,11 @@ D_TINY_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const
 D_TINY_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndFloat32 value);
 D_TINY_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndVector& value);
 D_TINY_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndMatrix& value);
+D_TINY_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const value);
 D_TINY_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndArray<ndInt32>& array);
 D_TINY_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndArray<ndInt64>& array);
 D_TINY_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndArray<ndVector>& array);
-//D_TINY_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const type, const char* const value);
-D_TINY_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const value);
+D_TINY_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndArray<ndTriplexReal>& array);
 
 D_TINY_API ndInt32 xmlGetNodeId(const nd::TiXmlNode* const rootNode);
 D_TINY_API ndInt32 xmlGetInt(const nd::TiXmlNode* const rootNode, const char* const name);
