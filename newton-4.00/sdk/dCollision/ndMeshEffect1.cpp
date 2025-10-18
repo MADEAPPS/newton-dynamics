@@ -5070,16 +5070,33 @@ void ndMeshEffect::SerializeToXml(nd::TiXmlElement* const xmlNode) const
 	{
 		// save mesh normal data
 		ndArray<ndTriplexReal> points;
-		for (ndInt32 i = 0; i < ndInt32(m_attrib.m_normalChannel.GetCount()); ++i)
+		if (m_attrib.m_normalChannel.GetCount())
+		{
+			for (ndInt32 i = 0; i < ndInt32(m_attrib.m_normalChannel.GetCount()); ++i)
+			{
+				ndTriplexReal p;
+				ndReal x = ndReal(m_attrib.m_normalChannel[i].m_x);
+				ndReal y = ndReal(m_attrib.m_normalChannel[i].m_y);
+				ndReal z = ndReal(m_attrib.m_normalChannel[i].m_z);
+				p.m_x = x;
+				p.m_y = y;
+				p.m_z = z;
+				points.PushBack(p);
+			}
+		}
+		else
 		{
 			ndTriplexReal p;
-			ndReal x = ndReal(m_attrib.m_normalChannel[i].m_x);
-			ndReal y = ndReal(m_attrib.m_normalChannel[i].m_y);
-			ndReal z = ndReal(m_attrib.m_normalChannel[i].m_z);
+			ndReal x = ndReal(0.0f);
+			ndReal y = ndReal(1.0f);
+			ndReal z = ndReal(0.0f);
 			p.m_x = x;
 			p.m_y = y;
 			p.m_z = z;
-			points.PushBack(p);
+			for (ndInt32 i = 0; i < m_attrib.GetCount(); ++i)
+			{
+				points.PushBack(p);
+			}
 		}
 
 		nd::TiXmlElement* const node = new nd::TiXmlElement("normal");
@@ -5105,16 +5122,33 @@ void ndMeshEffect::SerializeToXml(nd::TiXmlElement* const xmlNode) const
 	{
 		// save mesh uv0 data
 		ndArray<ndTriplexReal> points;
-		for (ndInt32 i = 0; i < ndInt32(m_attrib.m_uv0Channel.GetCount()); ++i)
+		if (m_attrib.m_uv0Channel.GetCount())
+		{
+			for (ndInt32 i = 0; i < ndInt32(m_attrib.m_uv0Channel.GetCount()); ++i)
+			{
+				ndTriplexReal p;
+				ndReal x = ndReal(m_attrib.m_uv0Channel[i].m_u);
+				ndReal y = ndReal(m_attrib.m_uv0Channel[i].m_v);
+				ndReal z = ndReal(0.0f);
+				p.m_x = x;
+				p.m_y = y;
+				p.m_z = z;
+				points.PushBack(p);
+			}
+		}
+		else
 		{
 			ndTriplexReal p;
-			ndReal x = ndReal(m_attrib.m_uv0Channel[i].m_u);
-			ndReal y = ndReal(m_attrib.m_uv0Channel[i].m_v);
+			ndReal x = ndReal(0.0f);
+			ndReal y = ndReal(0.0f);
 			ndReal z = ndReal(0.0f);
 			p.m_x = x;
 			p.m_y = y;
 			p.m_z = z;
-			points.PushBack(p);
+			for (ndInt32 i = 0; i < m_attrib.GetCount(); ++i)
+			{
+				points.PushBack(p);
+			}
 		}
 
 		nd::TiXmlElement* const node = new nd::TiXmlElement("uvs");
