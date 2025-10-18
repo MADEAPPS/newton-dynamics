@@ -39,24 +39,42 @@ def ParseVertices(meshObj, xmlVertices, xmlFaces):
     indices = [int(x) for x in xmlVertices.find('indices').get('intArray').split()]
     faces = [int(x) for x in xmlFaces.find('faceIndexCount').get('intArray').split()]
     posit = [float(x) for x in xmlVertices.find('positions').get('float3Array').split()]
-    
-    for i in range(0, len(posit), 3):
-        x = posit[i + 0]
-        y = posit[i + 1]
-        z = posit[i + 2]
-        meshObj.verts.new ((x, y, z))
+
+    layersCount = 1
+    xmlLayers = xmlFaces.find('faceLayers')
+    if (xmlLayers != None):
+        layers = [int(x) for x in xmlLayers.get('intArray').split()]
+        for x in range(0, len(layers), 1):
+            layersCount = max(layers[x] + 1, layersCount) 
+    else:
+        layers = []
+        for i in range(0, len(faces), 1):
+            layers.append(int(0))
+
+    for j  in layersCount, 1: 
+        for i in range(0, len(posit), 3):
+            x = posit[i + 0]
+            y = posit[i + 1]
+            z = posit[i + 2]
+            meshObj.verts.new ((x, y, z))
         
     # Ensure the lookup table is updated for vertex indexing
-    meshObj.verts.ensure_lookup_table()        
+    meshObj.verts.ensure_lookup_table()    
 
     indexCount = 0
+    baseSize = len(posit) / 3
     for i in range(0, len(faces), 1):
+        #if (i == 3947): print(index)
         meshFace = []        
         count = faces[i]
+        baseIndex = int (layers[i] * baseSize)
         for j in range(0, count, 1):
-            index = indices[indexCount + j]
+            index0 = indices[indexCount + j] 
+            index = int(index0 + baseIndex)
             meshFace.append(meshObj.verts[index])
-        meshObj.faces.new(meshFace)                    
+        
+        if (baseIndex == 0):
+            meshObj.faces.new(meshFace)
         indexCount = indexCount + count;        
 
 def ParseGeomentry(nodeData, xmlNode):
