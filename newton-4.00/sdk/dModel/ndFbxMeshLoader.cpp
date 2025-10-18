@@ -538,7 +538,7 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 		}
 	}
 
-	// remove unuse materials
+	// remove unused materials
 	ndArray<ndInt32> remapMaterial;
 	ndArray<ndMeshEffect::ndMaterial> dirtyMaterial;
 	for (ndInt32 i = 0; i < materialArray.GetCount(); ++i)

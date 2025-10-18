@@ -1543,7 +1543,7 @@ void ndMeshEffect::CylindricalMapping (ndInt32 cylinderMaterial, ndInt32 capMate
     ndPolyhedra::Iterator iter (*this);	
     for(iter.Begin(); iter; iter ++){
         ndEdge* const edge = &(*iter);
-		ndAttibutFormat::ndUV uv;
+		ndAttibuteFormat::ndUV uv;
 		uv.m_u = ndFloat32(cylinder[edge->m_incidentVertex].m_x);
 		uv.m_v = ndFloat32(cylinder[edge->m_incidentVertex].m_y);
 		m_attrib.m_uv0Channel[ndInt32(edge->m_userData)] = uv;
@@ -1554,13 +1554,13 @@ void ndMeshEffect::CylindricalMapping (ndInt32 cylinderMaterial, ndInt32 capMate
     for(iter.Begin(); iter; iter ++){
         ndEdge* const edge = &(*iter);
         if ((edge->m_incidentFace > 0) && (edge->m_mark != mark)) {
-			ndAttibutFormat::ndUV uvRef(m_attrib.m_uv0Channel[ndInt32(edge->m_userData)]);
+			ndAttibuteFormat::ndUV uvRef(m_attrib.m_uv0Channel[ndInt32(edge->m_userData)]);
 			ndFloat32 UVrefSin = ndSin(uvRef.m_v);
 			ndFloat32 UVrefCos = ndCos(uvRef.m_v);
 			ndEdge* ptr = edge;
             do {
 				ptr->m_mark = mark;
-				ndAttibutFormat::ndUV uv(m_attrib.m_uv0Channel[ndInt32(ptr->m_userData)]);
+				ndAttibuteFormat::ndUV uv(m_attrib.m_uv0Channel[ndInt32(ptr->m_userData)]);
 				ndFloat32 sinAngle = UVrefCos * ndSin(uv.m_v) - UVrefSin * ndCos(uv.m_v);
 				ndFloat32 cosAngle = UVrefCos * ndCos(uv.m_v) + UVrefSin * ndSin(uv.m_v);
 				ndFloat32 deltaAngle = ndAtan2(sinAngle, cosAngle);
@@ -1591,7 +1591,7 @@ void ndMeshEffect::CylindricalMapping (ndInt32 cylinderMaterial, ndInt32 capMate
 			if (ndAbs(normal.m_x) > ndFloat32 (0.99f)) {
 				ndEdge* ptr = edge;
 				do {
-					ndAttibutFormat::ndUV uv;
+					ndAttibuteFormat::ndUV uv;
 					ndVector p(buffer[ptr->m_incidentVertex]);
 					uv.m_u = ndFloat32((p.m_y - pMin.m_y) * scale.m_y);
 					uv.m_v = ndFloat32((p.m_z - pMin.m_z) * scale.m_z);

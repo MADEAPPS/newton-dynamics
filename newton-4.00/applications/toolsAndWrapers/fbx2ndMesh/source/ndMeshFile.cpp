@@ -20,6 +20,7 @@
 */
 
 #include "ndModelStdafx.h"
+#if 0
 #include "ndMesh.h"
 #include "ndMeshFile.h"
 
@@ -616,3 +617,4 @@ ndMesh* ndMeshFile::Import(const ndString& fullPathName)
 	setlocale(LC_ALL, oldloc.GetStr());
 	return root;
 }
+#endif

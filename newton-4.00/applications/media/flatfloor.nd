@@ -11,7 +11,7 @@
             <indices count="6" intArray="2 0 1 1 3 2" />
         </vertices>
         <normal>
-            <normal count="1" float3Array="0 1 0" />
+            <normals count="1" float3Array="0 1 0" />
             <indices count="6" intArray="0 0 0 0 0 0" />
         </normal>
         <uvs>

@@ -1,17 +1,17 @@
 <?xml version="1.0" ?>
 <ndMesh>
-    <name string="Model::Box001" />
+    <name string="Box001" />
     <matrix>
         <posit float3="0 0 0" />
         <angles float3="0 -0 0" />
     </matrix>
     <ndGeometry>
         <vertices>
-            <positions count="8" float3Array="0.4953 -0.4953 0.4953 0.4953 -0.4953 -0.4953 -0.4953 -0.4953 -0.4953 -0.4953 -0.4953 0.4953 -0.4953 0.4953 0.4953 0.4953 0.4953 0.4953 -0.4953 0.4953 -0.4953 0.4953 0.4953 -0.4953" />
-            <indices count="36" intArray="0 3 2 0 2 1 5 7 6 5 6 4 0 1 7 0 7 5 1 2 6 1 6 7 2 3 4 2 4 6 3 0 5 3 5 4" />
+            <positions count="8" float3Array="-0.4953 0.4953 -0.4953 0.4953 0.4953 -0.4953 0.4953 -0.4953 -0.4953 -0.4953 -0.4953 -0.4953 -0.4953 0.4953 0.4953 0.4953 -0.4953 0.4953 -0.4953 -0.4953 0.4953 0.4953 0.4953 0.4953" />
+            <indices count="36" intArray="5 6 3 5 3 2 7 1 0 7 0 4 5 2 1 5 1 7 2 3 0 2 0 1 3 6 4 3 4 0 6 5 7 6 7 4" />
         </vertices>
         <normal>
-            <normal count="6" float3Array="0 0 -1 0 -1 0 -1 0 0 1 0 0 0 1 0 0 0 1" />
+            <normals count="6" float3Array="0 0 -1 0 -1 0 -1 0 0 1 0 0 0 1 0 0 0 1" />
             <indices count="36" intArray="1 1 1 1 1 1 4 4 4 4 4 4 3 3 3 3 3 3 0 0 0 0 0 0 2 2 2 2 2 2 5 5 5 5 5 5" />
         </normal>
         <uvs>
@@ -41,133 +41,4 @@
             <faceIndexCount count="12" intArray="3 3 3 3 3 3 3 3 3 3 3 3" />
         </faces>
     </ndGeometry>
-    <ndMesh>
-        <name string="Model::Box002" />
-        <matrix>
-            <posit float3="1.43698 -6.28124e-08 6.28124e-08" />
-            <angles float3="0 -0 -90" />
-        </matrix>
-        <ndGeometry>
-            <vertices>
-                <positions count="8" float3Array="0.4953 -0.4953 0.4953 0.4953 -0.4953 -0.4953 -0.4953 -0.4953 -0.4953 -0.4953 -0.4953 0.4953 -0.4953 0.4953 0.4953 0.4953 0.4953 0.4953 -0.4953 0.4953 -0.4953 0.4953 0.4953 -0.4953" />
-                <indices count="36" intArray="0 3 2 0 2 1 5 7 6 5 6 4 0 1 7 0 7 5 1 2 6 1 6 7 2 3 4 2 4 6 3 0 5 3 5 4" />
-            </vertices>
-            <normal>
-                <normal count="6" float3Array="0 0 -1 0 -1 0 -1 0 0 1 0 0 0 1 0 0 0 1" />
-                <indices count="36" intArray="1 1 1 1 1 1 4 4 4 4 4 4 3 3 3 3 3 3 0 0 0 0 0 0 2 2 2 2 2 2 5 5 5 5 5 5" />
-            </normal>
-            <uvs>
-                <uv count="4" float3Array="1 0 0 0 0 0 1 1 0 0 1 0" />
-                <indices count="36" intArray="0 2 3 0 3 1 1 0 2 1 2 3 1 0 2 1 2 3 1 0 2 1 2 3 1 0 2 1 2 3 1 0 2 1 2 3" />
-            </uvs>
-            <material>
-                <ambient float3="0 0.588235 0.0705882" />
-                <diffuse float3="0 0.588235 0.0705882" />
-                <specular float3="0.9 0.9 0.9" />
-                <reflection float3="1 1 1" />
-                <opacity float="1" />
-                <shiness float="2" />
-                <texture string="default.png" />
-            </material>
-            <material>
-                <ambient float3="0.121569 0.0588235 0.984314" />
-                <diffuse float3="0.121569 0.0588235 0.984314" />
-                <specular float3="0.9 0.9 0.9" />
-                <reflection float3="1 1 1" />
-                <opacity float="1" />
-                <shiness float="2" />
-                <texture string="default.png" />
-            </material>
-            <faces>
-                <faceMaterial count="12" intArray="0 0 1 1 0 0 1 1 0 0 0 0" />
-                <faceIndexCount count="12" intArray="3 3 3 3 3 3 3 3 3 3 3 3" />
-            </faces>
-        </ndGeometry>
-        <ndMesh>
-            <name string="Model::Box003" />
-            <matrix>
-                <posit float3="1.40615 -1.52588e-07 6.14648e-08" />
-                <angles float3="0 -0 0" />
-            </matrix>
-            <ndGeometry>
-                <vertices>
-                    <positions count="8" float3Array="0.4953 -0.4953 0.4953 0.4953 -0.4953 -0.4953 -0.4953 -0.4953 -0.4953 -0.4953 -0.4953 0.4953 -0.4953 0.4953 0.4953 0.4953 0.4953 0.4953 -0.4953 0.4953 -0.4953 0.4953 0.4953 -0.4953" />
-                    <indices count="36" intArray="0 3 2 0 2 1 5 7 6 5 6 4 0 1 7 0 7 5 1 2 6 1 6 7 2 3 4 2 4 6 3 0 5 3 5 4" />
-                </vertices>
-                <normal>
-                    <normal count="6" float3Array="0 0 -1 0 -1 0 -1 0 0 1 0 0 0 1 0 0 0 1" />
-                    <indices count="36" intArray="1 1 1 1 1 1 4 4 4 4 4 4 3 3 3 3 3 3 0 0 0 0 0 0 2 2 2 2 2 2 5 5 5 5 5 5" />
-                </normal>
-                <uvs>
-                    <uv count="4" float3Array="1 0 0 0 0 0 1 1 0 0 1 0" />
-                    <indices count="36" intArray="0 2 3 0 3 1 1 0 2 1 2 3 1 0 2 1 2 3 1 0 2 1 2 3 1 0 2 1 2 3 1 0 2 1 2 3" />
-                </uvs>
-                <material>
-                    <ambient float3="0 0.588235 0.0705882" />
-                    <diffuse float3="0 0.588235 0.0705882" />
-                    <specular float3="0.9 0.9 0.9" />
-                    <reflection float3="1 1 1" />
-                    <opacity float="1" />
-                    <shiness float="2" />
-                    <texture string="default.png" />
-                </material>
-                <material>
-                    <ambient float3="0.121569 0.0588235 0.984314" />
-                    <diffuse float3="0.121569 0.0588235 0.984314" />
-                    <specular float3="0.9 0.9 0.9" />
-                    <reflection float3="1 1 1" />
-                    <opacity float="1" />
-                    <shiness float="2" />
-                    <texture string="default.png" />
-                </material>
-                <faces>
-                    <faceMaterial count="12" intArray="0 0 1 1 0 0 1 1 0 0 0 0" />
-                    <faceIndexCount count="12" intArray="3 3 3 3 3 3 3 3 3 3 3 3" />
-                </faces>
-            </ndGeometry>
-        </ndMesh>
-    </ndMesh>
-    <ndMesh>
-        <name string="Model::Box004" />
-        <matrix>
-            <posit float3="1.43698 1.56319 6.28124e-08" />
-            <angles float3="0 -0 0" />
-        </matrix>
-        <ndGeometry>
-            <vertices>
-                <positions count="8" float3Array="0.4953 -0.4953 0.4953 0.4953 -0.4953 -0.4953 -0.4953 -0.4953 -0.4953 -0.4953 -0.4953 0.4953 -0.4953 0.4953 0.4953 0.4953 0.4953 0.4953 -0.4953 0.4953 -0.4953 0.4953 0.4953 -0.4953" />
-                <indices count="36" intArray="0 3 2 0 2 1 5 7 6 5 6 4 0 1 7 0 7 5 1 2 6 1 6 7 2 3 4 2 4 6 3 0 5 3 5 4" />
-            </vertices>
-            <normal>
-                <normal count="6" float3Array="0 0 -1 0 -1 0 -1 0 0 1 0 0 0 1 0 0 0 1" />
-                <indices count="36" intArray="1 1 1 1 1 1 4 4 4 4 4 4 3 3 3 3 3 3 0 0 0 0 0 0 2 2 2 2 2 2 5 5 5 5 5 5" />
-            </normal>
-            <uvs>
-                <uv count="4" float3Array="1 0 0 0 0 0 1 1 0 0 1 0" />
-                <indices count="36" intArray="0 2 3 0 3 1 1 0 2 1 2 3 1 0 2 1 2 3 1 0 2 1 2 3 1 0 2 1 2 3 1 0 2 1 2 3" />
-            </uvs>
-            <material>
-                <ambient float3="0 0.588235 0.0705882" />
-                <diffuse float3="0 0.588235 0.0705882" />
-                <specular float3="0.9 0.9 0.9" />
-                <reflection float3="1 1 1" />
-                <opacity float="1" />
-                <shiness float="2" />
-                <texture string="default.png" />
-            </material>
-            <material>
-                <ambient float3="0.121569 0.0588235 0.984314" />
-                <diffuse float3="0.121569 0.0588235 0.984314" />
-                <specular float3="0.9 0.9 0.9" />
-                <reflection float3="1 1 1" />
-                <opacity float="1" />
-                <shiness float="2" />
-                <texture string="default.png" />
-            </material>
-            <faces>
-                <faceMaterial count="12" intArray="0 0 1 1 0 0 1 1 0 0 0 0" />
-                <faceIndexCount count="12" intArray="3 3 3 3 3 3 3 3 3 3 3 3" />
-            </faces>
-        </ndGeometry>
-    </ndMesh>
 </ndMesh>

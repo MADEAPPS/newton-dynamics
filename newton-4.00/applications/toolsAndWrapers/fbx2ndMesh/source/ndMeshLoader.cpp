@@ -115,10 +115,13 @@ bool ndMeshLoader::ImportFbx(const ndString& fbxPathMeshName)
 {
 	ndFbxMeshLoader loader;
 	m_mesh = ndSharedPtr<ndMesh>(loader.LoadMesh(fbxPathMeshName.GetStr(), false));
-
-	//const ndString exportName(GetPath(fbxPathMeshName) + GetName(fbxPathMeshName) + ".nd");
-	//ndTrace(("exporting mesh %s\n", exportName.GetStr()));
-	//SaveMesh(exportName);
+#if 0
+	ndTrace(("exporting mesh %s\n", fbxPathMeshName.GetStr()));
+	ndString tmpName(fbxPathMeshName);
+	tmpName.ToLower();
+	ndString exportName(tmpName.SubString(0, tmpName.Find(".fbx")) + ".nd");
+	SaveMesh(exportName);
+#endif
 	return m_mesh;
 }
 

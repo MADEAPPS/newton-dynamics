@@ -379,23 +379,20 @@ class ndMeshEffect: public ndPolyhedra
 		ndChannel<ndVertexWeight, m_weight> m_skinWeights;
 	};
 
-	class ndAttibutFormat: public ndFormat
+	class ndAttibuteFormat: public ndFormat
 	{
 		public:
-		ndAttibutFormat();
-		ndAttibutFormat(const ndAttibutFormat& source);
-		~ndAttibutFormat();
+		ndAttibuteFormat();
+		ndAttibuteFormat(const ndAttibuteFormat& source);
+		~ndAttibuteFormat();
 
 		void Clear();
 		ndInt32 GetCount() const;
 		void SetCount(ndInt32 count);
-		
-		//void CopyFrom(const ndAttibutFormat& source);
-		//void CopyEntryFrom(ndInt32 index, const ndAttibutFormat& source, ndInt32 sourceIndex);
 		void CompactVertexData(const ndPointFormat& points, ndInt32* const indexList, ndFloat32 tol);
 
 		private:
-		void CompressData(ndAttibutFormat& output, const ndPointFormat& points, ndInt32* const indexList, ndSortKey* const remapIndex, const ndSortCluster& batch, ndFloat32 tol);
+		void CompressData(ndAttibuteFormat& output, const ndPointFormat& points, ndInt32* const indexList, ndSortKey* const remapIndex, const ndSortCluster& batch, ndFloat32 tol);
 
 		public:
 		ndChannel<ndInt32, m_vertex> m_pointChannel;
@@ -596,7 +593,7 @@ class ndMeshEffect: public ndPolyhedra
 
 	ndString m_name;
 	ndPointFormat m_points;
-	ndAttibutFormat m_attrib;
+	ndAttibuteFormat m_attrib;
 	ndArray<ndMaterial> m_materials;
 	ndInt32 m_vertexBaseCount;
 	ndInt32 m_constructionIndex;
@@ -729,7 +726,7 @@ inline void ndMeshEffect::ndPointFormat::SetCount(ndInt32 count)
 	}
 }
 
-inline ndMeshEffect::ndAttibutFormat::ndAttibutFormat()
+inline ndMeshEffect::ndAttibuteFormat::ndAttibuteFormat()
 	:m_pointChannel()
 	,m_materialChannel()
 	,m_normalChannel()
@@ -740,7 +737,7 @@ inline ndMeshEffect::ndAttibutFormat::ndAttibutFormat()
 {
 }
 
-inline ndMeshEffect::ndAttibutFormat::ndAttibutFormat(const ndAttibutFormat& source)
+inline ndMeshEffect::ndAttibuteFormat::ndAttibuteFormat(const ndAttibuteFormat& source)
 	:m_pointChannel(source.m_pointChannel)
 	,m_materialChannel(source.m_materialChannel)
 	,m_normalChannel(source.m_normalChannel)
@@ -751,11 +748,11 @@ inline ndMeshEffect::ndAttibutFormat::ndAttibutFormat(const ndAttibutFormat& sou
 {
 }
 
-inline ndMeshEffect::ndAttibutFormat::~ndAttibutFormat()
+inline ndMeshEffect::ndAttibuteFormat::~ndAttibuteFormat()
 {
 }
 
-inline void ndMeshEffect::ndAttibutFormat::Clear()
+inline void ndMeshEffect::ndAttibuteFormat::Clear()
 {
 	m_pointChannel.Clear();
 	m_materialChannel.Clear();
@@ -766,7 +763,7 @@ inline void ndMeshEffect::ndAttibutFormat::Clear()
 	m_uv1Channel.Clear();
 }
 
-inline void ndMeshEffect::ndAttibutFormat::SetCount(ndInt32 count)
+inline void ndMeshEffect::ndAttibuteFormat::SetCount(ndInt32 count)
 {
 	if (m_pointChannel.GetCount())
 	{
@@ -811,7 +808,7 @@ inline void ndMeshEffect::ndAttibutFormat::SetCount(ndInt32 count)
 	}
 }
 
-inline ndInt32 ndMeshEffect::ndAttibutFormat::GetCount() const
+inline ndInt32 ndMeshEffect::ndAttibuteFormat::GetCount() const
 {
 	return ndInt32(m_pointChannel.GetCount());
 }

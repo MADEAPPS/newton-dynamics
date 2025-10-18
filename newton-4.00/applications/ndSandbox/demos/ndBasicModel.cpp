@@ -314,8 +314,8 @@ class ndBackGroundVehicleController : public ndModelNotify
 
 void ndBasicModel(ndDemoEntityManager* const scene)
 {
-	ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
-	//ndSharedPtr<ndBody> mapBody(BuildHeightFieldTerrain(scene, "grass.png", ndGetIdentityMatrix()));
+	//ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
+	ndSharedPtr<ndBody> mapBody(BuildHeightFieldTerrain(scene, "grass.png", ndGetIdentityMatrix()));
 
 	// add a help menu
 	ndSharedPtr<ndDemoEntityManager::ndDemoHelper> demoHelper(new ndBackGroundVehicleController::ndHelpLegend());
@@ -331,7 +331,7 @@ void ndBasicModel(ndDemoEntityManager* const scene)
 	ndRender* const renderer = *scene->GetRenderer();
 	renderer->SetCamera(playerController->GetCamera());
 
-#if 0
+#if 1
 	{
 		// add an array of vehicles 
 		ndRenderMeshLoader vmwLoaderGreenPaint(*scene->GetRenderer());

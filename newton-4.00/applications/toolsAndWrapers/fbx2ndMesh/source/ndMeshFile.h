@@ -22,6 +22,7 @@
 #ifndef __ND_MESH_FILE_H__
 #define __ND_MESH_FILE_H__
 
+#if 0
 #include "ndCollisionStdafx.h"
 #include "ndMeshEffect.h"
 
@@ -39,3 +40,4 @@ class ndMeshFile : public ndClassAlloc
 };
 #endif
 
+#endif

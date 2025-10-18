@@ -24,7 +24,6 @@
 
 #include <ndModelStdafx.h>
 #include <ndMesh.h>
-#include <ndMeshFile.h>
 #include <ndMeshLoader.h>
 #include <ndFbxMeshLoader.h>
 #include <ndAnimationPose.h>
