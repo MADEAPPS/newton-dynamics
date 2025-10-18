@@ -166,7 +166,7 @@ bool ndMeshLoader::LoadMesh(const ndString& fullPathMeshName)
 		mesh->m_name = ndString(xmlGetString(entry.m_xmlNode, "name"));
 		mesh->m_matrix = xmlGetMatrix(entry.m_xmlNode, "matrix");
 
-		const nd::TiXmlElement* const xmlGeometry = (nd::TiXmlElement*)entry.m_xmlNode->FirstChild("ndGeometry");
+		const nd::TiXmlElement* const xmlGeometry = (nd::TiXmlElement*)entry.m_xmlNode->FirstChild("geometry");
 		if (xmlGeometry)
 		{
 			ndSharedPtr<ndMeshEffect> geometry(new ndMeshEffect());
@@ -220,7 +220,7 @@ void ndMeshLoader::SaveMesh(const ndString& fullPathName)
 
 		if (*entry.m_meshNode->GetMesh())
 		{
-			nd::TiXmlElement* const geometry = new nd::TiXmlElement("ndGeometry");
+			nd::TiXmlElement* const geometry = new nd::TiXmlElement("geometry");
 			entry.m_parentXml->LinkEndChild(geometry);
 			entry.m_meshNode->GetMesh()->SerializeToXml(geometry);
 		}
