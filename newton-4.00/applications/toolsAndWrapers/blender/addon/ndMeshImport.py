@@ -33,6 +33,12 @@ def TransformModel(node, rotation):
     
     for vert in node.data.vertices:
         vert.co = rotation @ vert.co
+
+    for poly in node.data.polygons:
+        print(f"Polygon {poly.index}:")
+        for loop_index in poly.loop_indices:
+            loop = node.data.loops[loop_index]
+            print(f"  Loop {loop.index} (Vertex {loop.vertex_index}): Normal = {loop.normal}")
     
     for child in node.children:
         TransformModel(child, rotation)
@@ -104,7 +110,7 @@ def ParseNormals(meshObj, xmlNormals, layers, faces):
             for j in range(0, count, 1):
                 index0 = indices[indexCount + j] 
                 index = int(index0)
-                k = int(indices[index] * 3)
+                k = int(index * 3)
                 x = posit[k + 0]
                 y = posit[k + 1]
                 z = posit[k + 2]
