@@ -349,7 +349,8 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 
 	// load the visual mesh, and animations.
 	ndRenderMeshLoader loader(*scene->GetRenderer());
-	loader.ImportFbx(ndGetWorkingFileName("humanoidRobot.fbx"));
+	//loader.ImportFbx(ndGetWorkingFileName("humanoidRobot.fbx"));
+	loader.LoadMesh(ndGetWorkingFileName("humanoidRobot.nd"));
 
 	// load play animations stack
 	LoadAnimations(loader);
@@ -370,7 +371,8 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 		AddSomeProps(scene);
 
 		// load the write man model and resuse the animations
-		loader.ImportFbx(ndGetWorkingFileName("whiteMan.fbx"));
+		//loader.ImportFbx(ndGetWorkingFileName("whiteMan.fbx"));
+		loader.LoadMesh(ndGetWorkingFileName("whiteMan.nd"));
 
 		location.m_posit.m_x = 25.0f;
 		location.m_posit.m_z = -5.0f;
@@ -382,7 +384,8 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 
 		location.m_posit.m_x = 30.0f;
 		location.m_posit.m_z = 10.0f;
-		loader.ImportFbx(ndGetWorkingFileName("testDummy.fbx"));
+		//loader.ImportFbx(ndGetWorkingFileName("testDummy.fbx"));
+		loader.LoadMesh(ndGetWorkingFileName("testDummy.fbx"));
 		ndPlayerCapsuleController::CreatePlayer(scene, loader, location);
 
 		location.m_posit.m_x = 30.0f;

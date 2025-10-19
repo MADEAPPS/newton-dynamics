@@ -311,12 +311,12 @@ void xmlGetInt(const nd::TiXmlNode* const rootNode, const char* const name, ndAr
 	const char* const data = element->Attribute("intArray");
 	ndAssert(data);
 
+	char x[128];
+	x[127] = 0;
 	size_t start = 0;
 	ndVector point(ndVector::m_zero);
 	for (ndInt32 i = 0; i < count; ++i)
 	{
-		char x[128];
-		x[127] = 0;
 		ndInt32 ret = sscanf(&data[start], "%[^ ]", x);
 		start += strlen(x) + 1;
 
@@ -335,12 +335,12 @@ void xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name, nd
 	const char* const data = element->Attribute("intArray");
 	ndAssert(data);
 
+	char x[128];
+	x[127] = 0;
 	size_t start = 0;
 	ndVector point(ndVector::m_zero);
 	for (ndInt32 i = 0; i < count; ++i)
 	{
-		char x[128];
-		x[127] = 0;
 		ndInt32 ret = sscanf(&data[start], "%[^ ]", x);
 		start += strlen(x) + 1;
 
@@ -350,7 +350,6 @@ void xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name, nd
 	}
 }
 
-//void xmlGetRealArray(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndReal>& array)
 void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndTriplexReal>& array)
 {
 	const nd::TiXmlElement* const element = (nd::TiXmlElement*)rootNode->FirstChild(name);

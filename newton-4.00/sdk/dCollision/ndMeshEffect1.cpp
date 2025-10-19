@@ -4953,10 +4953,6 @@ void ndMeshEffect::DeserializeFromXml(const nd::TiXmlElement* const xmlNode)
 		materialArray.PushBack(material);
 	}
 
-	//ndArray<ndMeshEffect::ndVertexWeight> vertexWeights;
-	//ndArray<ndInt32> faceIndexArray;
-	//ndArray<ndInt32> faceMaterialArray;
-	//ndArray<ndInt32> vertexWeightsIndexArray;
 	ndMeshEffect::ndMeshVertexFormat format;
 
 	ndArray<ndInt32> faceMaterialArray;
@@ -4977,15 +4973,51 @@ void ndMeshEffect::DeserializeFromXml(const nd::TiXmlElement* const xmlNode)
 	ndArray<ndInt32> vertexIndexArray;
 	{
 		// get the vertexData
-		const nd::TiXmlElement* const node = (nd::TiXmlElement*)xmlNode->FirstChild("vertices");
-		ndAssert(node);
+		const nd::TiXmlElement* const xmlVertexNode = (nd::TiXmlElement*)xmlNode->FirstChild("vertices");
+		ndAssert(xmlVertexNode);
 	
-		xmlGetInt(node, "indices", vertexIndexArray);
-		xmlGetFloat64Array3(node, "positions", vertices);
+		xmlGetInt(xmlVertexNode, "indices", vertexIndexArray);
+		xmlGetFloat64Array3(xmlVertexNode, "positions", vertices);
 	
 		format.m_vertex.m_data = &vertices[0].m_x;
 		format.m_vertex.m_indexList = &vertexIndexArray[0];
 		format.m_vertex.m_strideInBytes = sizeof(ndBigVector);
+
+		// import skin if there is any
+		if (xmlVertexNode->FirstChild("vertexWeights"))
+		{
+			//ndAssert(0);
+			//	//const ofbx::Skin* const skin = geom->getSkin();
+			//	//ndInt32 clusterCount = skin->getClusterCount();
+			//	//
+			//	//vertexWeights.SetCount(geom->getVertexCount());
+			//	//for (ndInt32 i = 0; i < vertexWeights.GetCount(); ++i)
+			//	//{
+			//	//	vertexWeights[i].Clear();
+			//	//	vertexWeightsIndexArray.PushBack(i);
+			//	//}
+			//	//for (ndInt32 i = 0; i < clusterCount; ++i)
+			//	//{
+			//	//	const ofbx::Cluster* const fbxCluster = skin->getCluster(i);
+			//	//	ndInt32 clusterIndexCount = fbxCluster->getIndicesCount();
+			//	//	if (clusterIndexCount)
+			//	//	{
+			//	//		const ofbx::Object* const fbxBone = fbxCluster->getLink();
+			//	//		ndInt32 hashId = ndInt32(ndCRC64(fbxBone->name) & 0xffffffff);
+			//	//		const ndInt32* const indices = fbxCluster->getIndices();
+			//	//		const ndFloat64* const weights = fbxCluster->getWeights();
+			//	//		for (ndInt32 j = 0; j < clusterIndexCount; ++j)
+			//	//		{
+			//	//			ndInt32 index = indices[j];
+			//	//			vertexWeights[index].SetWeight(hashId, ndReal(weights[j]));
+			//	//		}
+			//	//	}
+			//	//}
+			//	//format.m_vertexWeight.m_data = &vertexWeights[0];
+			//	//format.m_vertexWeight.m_indexList = &vertexWeightsIndexArray[0];
+			//	//format.m_vertexWeight.m_strideInBytes = sizeof(ndMeshEffect::ndVertexWeight);
+		}
+
 	}
 	
 	ndArray<ndTriplexReal> normalArray;
@@ -5015,42 +5047,6 @@ void ndMeshEffect::DeserializeFromXml(const nd::TiXmlElement* const xmlNode)
 		format.m_uv0.m_indexList = &uvIndexArray[0];
 		format.m_uv0.m_strideInBytes = sizeof(ndTriplexReal);
 	}
-	
-	// import skin if there is any
-	if (xmlNode->FirstChild("skinWeights"))
-	{
-		ndAssert(0);
-	//	//const ofbx::Skin* const skin = geom->getSkin();
-	//	//ndInt32 clusterCount = skin->getClusterCount();
-	//	//
-	//	//vertexWeights.SetCount(geom->getVertexCount());
-	//	//for (ndInt32 i = 0; i < vertexWeights.GetCount(); ++i)
-	//	//{
-	//	//	vertexWeights[i].Clear();
-	//	//	vertexWeightsIndexArray.PushBack(i);
-	//	//}
-	//	//for (ndInt32 i = 0; i < clusterCount; ++i)
-	//	//{
-	//	//	const ofbx::Cluster* const fbxCluster = skin->getCluster(i);
-	//	//	ndInt32 clusterIndexCount = fbxCluster->getIndicesCount();
-	//	//	if (clusterIndexCount)
-	//	//	{
-	//	//		const ofbx::Object* const fbxBone = fbxCluster->getLink();
-	//	//		ndInt32 hashId = ndInt32(ndCRC64(fbxBone->name) & 0xffffffff);
-	//	//		const ndInt32* const indices = fbxCluster->getIndices();
-	//	//		const ndFloat64* const weights = fbxCluster->getWeights();
-	//	//		for (ndInt32 j = 0; j < clusterIndexCount; ++j)
-	//	//		{
-	//	//			ndInt32 index = indices[j];
-	//	//			vertexWeights[index].SetWeight(hashId, ndReal(weights[j]));
-	//	//		}
-	//	//	}
-	//	//}
-	//	//format.m_vertexWeight.m_data = &vertexWeights[0];
-	//	//format.m_vertexWeight.m_indexList = &vertexWeightsIndexArray[0];
-	//	//format.m_vertexWeight.m_strideInBytes = sizeof(ndMeshEffect::ndVertexWeight);
-	}
-
 	BuildFromIndexList(&format);
 }
 
