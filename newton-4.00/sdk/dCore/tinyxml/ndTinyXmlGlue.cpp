@@ -58,6 +58,21 @@ nd::TiXmlElement* xmlCreateClassNode(nd::TiXmlElement* const parent, const char*
 	return node;
 }
 
+void xmlSaveAtribute(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 value)
+{
+	rootNode->SetAttribute(name, value);
+}
+
+void xmlSaveAtribute(nd::TiXmlElement* const rootNode, const char* const name, ndReal value)
+{
+	rootNode->SetDoubleAttribute(name, value);
+}
+
+void xmlSaveAtribute(nd::TiXmlElement* const rootNode, const char* const name, const char* const value)
+{
+	rootNode->SetAttribute(name, value);
+}
+
 static void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const type, const char* const value)
 {
 	nd::TiXmlElement* const node = new nd::TiXmlElement(name);
@@ -113,6 +128,23 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 	char* ptr1 = FloatToString(ptr0, sizeof (buffer) - 256, value.m_y);
 	FloatToString(ptr1, sizeof(buffer) - 256, value.m_z);
 	xmlSaveParam(rootNode, name, "float3", buffer);
+}
+
+void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndArray<ndReal>& array)
+{
+	ndStack<char> buffer(ndInt32(array.GetCount() * 4 * 12 + 256));
+	char* ptr = &buffer[0];
+	for (ndInt32 i = 0; i < array.GetCount(); ++i)
+	{
+		ptr = FloatToString(ptr, 256, array[i]);
+	}
+	CleanWhiteSpace(&buffer[0]);
+
+	nd::TiXmlElement* const node = new nd::TiXmlElement(name);
+	rootNode->LinkEndChild(node);
+
+	node->SetAttribute("count", ndInt32(array.GetCount()));
+	node->SetAttribute("floatArray", &buffer[0]);
 }
 
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndArray<ndInt32>& array)
@@ -345,16 +377,16 @@ void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const na
 		ndFloat64 fx;
 		ndFloat64 fy;
 		ndFloat64 fz;
-		ndTriplexReal data;
+		ndTriplexReal tuple;
 
 		ret = sscanf(x, "%lf", &fx);
 		ret = sscanf(y, "%lf", &fy);
 		ret = sscanf(z, "%lf", &fz);
 		
-		data.m_x = ndFloat32(fx);
-		data.m_y = ndFloat32(fy);
-		data.m_z = ndFloat32(fz);
-		array.PushBack(data);
+		tuple.m_x = ndFloat32(fx);
+		tuple.m_y = ndFloat32(fy);
+		tuple.m_z = ndFloat32(fz);
+		array.PushBack(tuple);
 	}
 }
 
