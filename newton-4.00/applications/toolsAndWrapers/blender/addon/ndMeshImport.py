@@ -35,10 +35,10 @@ def TransformModel(node, rotation):
         vert.co = rotation @ vert.co
 
     for poly in node.data.polygons:
-        print(f"Polygon {poly.index}:")
+        #print(f"Polygon {poly.index}:")
         for loop_index in poly.loop_indices:
             loop = node.data.loops[loop_index]
-            print(f"  Loop {loop.index} (Vertex {loop.vertex_index}): Normal = {loop.normal}")
+            #print(f"  Loop {loop.index} (Vertex {loop.vertex_index}): Normal = {loop.normal}")
     
     for child in node.children:
         TransformModel(child, rotation)
