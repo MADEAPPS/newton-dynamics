@@ -34,11 +34,14 @@ def TransformModel(node, rotation):
     for vert in node.data.vertices:
         vert.co = rotation @ vert.co
 
-    for poly in node.data.polygons:
-        #print(f"Polygon {poly.index}:")
-        for loop_index in poly.loop_indices:
-            loop = node.data.loops[loop_index]
-            #print(f"  Loop {loop.index} (Vertex {loop.vertex_index}): Normal = {loop.normal}")
+    # I do not understand it but it seems blender rotaion the normal automatically
+    #custom_normals = []
+    #for poly in node.data.polygons:
+    #    for loop_index in poly.loop_indices:
+    #        loop = node.data.loops[loop_index]
+    #        #loop.normal = rotation @ loop.normal
+    #        custom_normals.append(rotation @ loop.normal)
+    #node.data.normals_split_custom_set(custom_normals)
     
     for child in node.children:
         TransformModel(child, rotation)
@@ -99,11 +102,11 @@ def ParseVertices(meshObj, xmlVertices, layersCount, layers, faces):
 def ParseNormals(meshObj, xmlNormals, layers, faces):
     indices = [int(x) for x in xmlNormals.find('indices').get('intArray').split()]
     posit = [float(x) for x in xmlNormals.find('normals').get('float3Array').split()]
-    print (len(indices), len(posit), len(meshObj.loops))
+    #print (len(indices), len(posit), len(meshObj.loops))
 
     #meshObj.use_auto_smooth = True
     indexCount = 0
-    custom_normals = []    
+    custom_normals = []
     for i in range(0, len(faces), 1):
         count = faces[i]
         if (layers[i] == 0):
