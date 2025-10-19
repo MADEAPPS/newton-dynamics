@@ -207,6 +207,17 @@ void ndMeshLoader::SaveMesh(const ndString& fullPathName)
 	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndMesh");
 	doc->LinkEndChild(rootNode);
 
+	// make the bone list for sikn and othe dependencies
+	ndTree<ndString, ndUnsigned32> bonesMap;
+	for (ndMesh* node = m_mesh->IteratorFirst(); node; node = node->IteratorNext())
+	{
+		if (node->m_name.GetStr())
+		{
+			ndUnsigned32 hash = ndUnsigned32(ndCRC64(node->m_name.GetStr()) & 0xffffffff);
+			bonesMap.Insert(node->m_name, hash);
+		}
+	}
+
 	struct MeshXmlNodePair
 	{
 		const ndMesh* m_meshNode;
@@ -224,13 +235,12 @@ void ndMeshLoader::SaveMesh(const ndString& fullPathName)
 		MeshXmlNodePair entry(stack.Pop());
 		xmlSaveParam(entry.m_parentXml, "name", entry.m_meshNode->m_name.GetStr());
 		xmlSaveParam(entry.m_parentXml, "matrix", entry.m_meshNode->m_matrix);
-		//xmlSaveParam(entry.m_parentXml, "meshMatrix", entry.m_meshNode->m_meshMatrix);
 
 		if (*entry.m_meshNode->GetMesh())
 		{
 			nd::TiXmlElement* const geometry = new nd::TiXmlElement("geometry");
 			entry.m_parentXml->LinkEndChild(geometry);
-			entry.m_meshNode->GetMesh()->SerializeToXml(geometry);
+			entry.m_meshNode->GetMesh()->SerializeToXml(geometry, bonesMap);
 		}
 
 		for (ndList<ndSharedPtr<ndMesh>>::ndNode* node = entry.m_meshNode->m_children.GetFirst(); node; node = node->GetNext())

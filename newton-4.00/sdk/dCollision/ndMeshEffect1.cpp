@@ -5016,10 +5016,10 @@ void ndMeshEffect::DeserializeFromXml(const nd::TiXmlElement* const xmlNode)
 		format.m_uv0.m_strideInBytes = sizeof(ndTriplexReal);
 	}
 	
-	//// import skin if there is any
-	//if (xmlNode->FirstChild("skinWeights"))
-	//{
-	//	ndAssert(0);
+	// import skin if there is any
+	if (xmlNode->FirstChild("skinWeights"))
+	{
+		ndAssert(0);
 	//	//const ofbx::Skin* const skin = geom->getSkin();
 	//	//ndInt32 clusterCount = skin->getClusterCount();
 	//	//
@@ -5049,79 +5049,19 @@ void ndMeshEffect::DeserializeFromXml(const nd::TiXmlElement* const xmlNode)
 	//	//format.m_vertexWeight.m_data = &vertexWeights[0];
 	//	//format.m_vertexWeight.m_indexList = &vertexWeightsIndexArray[0];
 	//	//format.m_vertexWeight.m_strideInBytes = sizeof(ndMeshEffect::ndVertexWeight);
-	//}
+	}
 
 	BuildFromIndexList(&format);
 }
 
-void ndMeshEffect::SerializeToXml(nd::TiXmlElement* const xmlNode) const
+void ndMeshEffect::SerializeToXml(nd::TiXmlElement* const xmlNode, const ndTree<ndString, ndUnsigned32>& boneMap) const
 {
-	//	if (format.m_vertexWeight.m_data)
-	//	{
-	//		ndInt32 weightsCount = 0;
-	//		for (ndInt32 i = 0; i < vertexCount; ++i)
-	//		{
-	//			weightsCount = ndMax(weightsCount, format.m_vertexWeight.m_indexList[i] + 1);
-	//		}
-	//
-	//		for (ndMesh* node = mesh->GetFirstIterator(); node; node = node->GetNextIterator())
-	//		{
-	//			ndInt32 count = 0;
-	//			ndInt32 hash = ndInt32(ndCRC64(node->m_name.GetStr()) & 0xffffffff);
-	//			ndAssert(hash);
-	//			for (ndInt32 j = 0; j < weightsCount; ++j)
-	//			{
-	//				for (ndInt32 k = 0; k < ND_VERTEX_WEIGHT_SIZE; ++k)
-	//				{
-	//					count += (format.m_vertexWeight.m_data[j].m_boneId[k] == hash) ? 1 : 0;
-	//				}
-	//			}
-	//			if (count)
-	//			{
-	//				fprintf(file, "\t\tvertexWeightsCluster: %s\n", node->m_name.GetStr());
-	//				fprintf(file, "\t\t{\n");
-	//				
-	//				fprintf(file, "\t\t\tindexCount: %d\n", count);
-	//				
-	//				fprintf(file, "\t\t\tvertexIndex: ");
-	//				for (ndInt32 j = 0; j < weightsCount; ++j)
-	//				{
-	//					for (ndInt32 k = 0; k < ND_VERTEX_WEIGHT_SIZE; ++k)
-	//					{
-	//						if (format.m_vertexWeight.m_data[j].m_boneId[k] == hash)
-	//						{
-	//							fprintf(file, "%d ", j);
-	//						}
-	//					}
-	//				}
-	//				fprintf(file, "\t\t\t\n");
-	//
-	//				fprintf(file, "\t\t\tvertexWeight: ");
-	//				for (ndInt32 j = 0; j < weightsCount; ++j)
-	//				{
-	//					for (ndInt32 k = 0; k < ND_VERTEX_WEIGHT_SIZE; ++k)
-	//					{
-	//						if (format.m_vertexWeight.m_data[j].m_boneId[k] == hash)
-	//						{
-	//							fprintf(file, "%g ", format.m_vertexWeight.m_data[j].m_weight[k]);
-	//						}
-	//					}
-	//				}
-	//				fprintf(file, "\t\t\t\n");
-	//				
-	//				fprintf(file, "\t\t}\n");
-	//
-	//			}
-	//		}
-	//	}
-
 	ndArray<ndInt32> faceIndexArray;
 	ndArray<ndInt32> faceMaterialArray;
 
 	ndArray<ndInt32> pointsIndexList;
 	ndArray<ndInt32> normalsIndexList;
 	ndArray<ndInt32> uvIndexList;
-	//ndArray<ndInt32> vertexWeightsIndexArray;
 
 	ndInt32 mark = IncLRU();
 	ndPolyhedra::Iterator iter(*this);
@@ -5167,8 +5107,8 @@ void ndMeshEffect::SerializeToXml(nd::TiXmlElement* const xmlNode) const
 			points.PushBack(p);
 		}
 
-		nd::TiXmlElement* const node = new nd::TiXmlElement("vertices");
-		xmlNode->LinkEndChild(node);
+		nd::TiXmlElement* const xmlVertexNode = new nd::TiXmlElement("vertices");
+		xmlNode->LinkEndChild(xmlVertexNode);
 
 		ndArray<ndInt32> indexArray;
 		ndArray<ndInt32> remapIndexList;
@@ -5183,8 +5123,46 @@ void ndMeshEffect::SerializeToXml(nd::TiXmlElement* const xmlNode) const
 		{
 			pointsIndexList[i] = indexArray[remapIndexList[i]];
 		}
-		xmlSaveParam(node, "positions", points);
-		xmlSaveParam(node, "indices", pointsIndexList);
+		xmlSaveParam(xmlVertexNode, "positions", points);
+		xmlSaveParam(xmlVertexNode, "indices", pointsIndexList);
+
+		if (m_points.m_skinWeights.GetCount())
+		{
+			ndArray<ndVertexWeight> weightArray;
+			weightArray.SetCount(pointCount);
+			for (ndInt32 i = 0; i < ndInt32(m_points.m_skinWeights.GetCount()); ++i)
+			{
+				ndInt32 index = indexArray[i];
+				weightArray[index] = m_points.m_skinWeights[i];
+			}
+
+			nd::TiXmlElement* const xmlVertexWeights = new nd::TiXmlElement("vertexWeights");
+			xmlVertexNode->LinkEndChild(xmlVertexWeights);
+
+			char* const boneNames[] = { "bone0", "bone1", "bone2", "bone3" };
+			char* const weightNames[] = { "weight0", "weight1", "weight2", "weight3" };
+
+			for (ndInt32 i = 0; i < pointCount; ++i)
+			{
+				const ndVertexWeight& weight = weightArray[i];
+				ndAssert(weight.m_boneId[0] != -1);
+
+				nd::TiXmlElement* const xmlVertexWeight = new nd::TiXmlElement("vert");
+				xmlVertexWeights->LinkEndChild(xmlVertexWeight);
+				xmlSaveAtribute(xmlVertexWeight, "vertID", i);
+
+				for (ndInt32 j = 0; j < ND_VERTEX_WEIGHT_SIZE; ++j)
+				{
+					if (weight.m_boneId[j] != -1)
+					{
+						const ndTree<ndString, ndUnsigned32>::ndNode* const nameNode = boneMap.Find(ndUnsigned32(weight.m_boneId[j]));
+						ndAssert(nameNode);
+						xmlSaveAtribute(xmlVertexWeight, boneNames[j], nameNode->GetInfo().GetStr());
+						xmlSaveAtribute(xmlVertexWeight, weightNames[j], weight.m_weight[j]);
+					}
+				}
+			}
+		}
 	}
 
 	{
