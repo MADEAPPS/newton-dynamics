@@ -364,7 +364,7 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 	ndRender* const renderer = *scene->GetRenderer();
 	renderer->SetCamera(playerController->GetCamera());
 
-#if 1
+#if 0
 	{
 		// populate the world with props and other players
 		AddSomeProps(scene);

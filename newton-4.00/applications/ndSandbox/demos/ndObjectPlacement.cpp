@@ -82,11 +82,11 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		ndDemoEntityManager* const scene = renderCallback->m_owner;
 
 		ndRenderMeshLoader loader(*scene->GetRenderer());
-		loader.ImportFbx(ndGetWorkingFileName("tpot.fbx"));
+		//loader.ImportFbx(ndGetWorkingFileName("tpot.fbx"));
+		loader.LoadMesh(ndGetWorkingFileName("tpot.nd"));
 		m_castingShape = loader.m_mesh->CreateCollision();
 
 		m_meshPrimitive = loader.m_renderMesh->GetPrimitive();
-		//m_primitiveOffsetMatrix = loader.m_renderMesh->m_primitiveMatrix;
 
 		m_ghostPrimitive = ndSharedPtr<ndRenderPrimitive>(new ndRenderPrimitive (**m_meshPrimitive));
 		ndRenderPrimitive* const ghoshMesh = *m_ghostPrimitive;
@@ -106,7 +106,7 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 
 		if (m_showIcon)
 		{
-			const ndMatrix modelMatrix(m_primitiveOffsetMatrix * m_placementMatrix);
+			const ndMatrix modelMatrix(m_placementMatrix);
 			m_ghostPrimitive->Render(owner, modelMatrix, m_transparencyBackface);
 			m_ghostPrimitive->Render(owner, modelMatrix, m_transparencyFrontface);
 		}
@@ -270,12 +270,6 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		ndMatrix matrixStart;
 		if (CastRay(scene, matrixStart))
 		{
-			//ndWorld* const world = scene->GetWorld();
-			//ndMatrix xxx (FindFloor(*world, matrixStart, **m_castingShape, ndFloat32(1.0f)));
-			//ndTrace(("(%f %f %f) (%f %f %f)\n", 
-			//	xxx.m_posit.m_x, xxx.m_posit.m_y, xxx.m_posit.m_z, 
-			//	matrixStart.m_posit.m_x, matrixStart.m_posit.m_y, matrixStart.m_posit.m_z));
-
 			m_showIcon = true;
 			m_placementMatrix = matrixStart;
 			if (CalculatePlacementMatrix(matrixStart))
@@ -337,7 +331,6 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 
 	// for now just sone mesh
 	ndMatrix m_placementMatrix;
-	ndMatrix m_primitiveOffsetMatrix;
 	ndSharedPtr<ndShapeInstance> m_castingShape;
 	ndSharedPtr<ndRenderPrimitive> m_meshPrimitive;
 	ndSharedPtr<ndRenderPrimitive> m_ghostPrimitive;

@@ -41,20 +41,27 @@ const ndSharedPtr<ndAnimationSequence> ndMeshLoader::FindSequence(const ndString
 	return ndSharedPtr<ndAnimationSequence>(nullptr);
 }
 
-ndSharedPtr<ndAnimationSequence> ndMeshLoader::GetAnimationSequence(const ndString& fbxPathAnimName)
+ndSharedPtr<ndAnimationSequence> ndMeshLoader::ImportFbxAnimation(const ndString& fbxPathAnimName)
 {
-	ndAssert(0);
-	return ndSharedPtr<ndAnimationSequence>(nullptr);
-	//ndTree<ndSharedPtr<ndAnimationSequence>, ndString>::ndNode* node = m_animationCache.Find(fbxPathAnimName);
-	//if (!node)
-	//{
-	//	ndSharedPtr<ndAnimationSequence> sequence (LoadAnimation(fbxPathAnimName.GetStr()));
-	//	if (sequence)
-	//	{
-	//		node = m_animationCache.Insert(sequence, fbxPathAnimName);
-	//	}
-	//}
-	//return node ? node->GetInfo() : ndSharedPtr<ndAnimationSequence>(nullptr);
+	//return ndSharedPtr<ndAnimationSequence>(nullptr);
+	ndTree<ndSharedPtr<ndAnimationSequence>, ndString>::ndNode* node = m_animationCache.Find(fbxPathAnimName);
+	if (!node)
+	{
+		ndFbxMeshLoader animLoader;
+		ndSharedPtr<ndAnimationSequence> sequence (animLoader.LoadAnimation(fbxPathAnimName.GetStr()));
+		if (sequence)
+		{
+			node = m_animationCache.Insert(sequence, fbxPathAnimName);
+		}
+	}
+	return node ? node->GetInfo() : ndSharedPtr<ndAnimationSequence>(nullptr);
+}
+
+ndSharedPtr<ndAnimationSequence> ndMeshLoader::GetAnimationSequence(const ndString& pathAnimName)
+{
+	//ndAssert(0);
+	//return ndSharedPtr<ndAnimationSequence>(nullptr);
+	return ImportFbxAnimation(pathAnimName);
 }
 
 void ndMeshLoader::SetTranslationTracks(const ndString& boneName)
@@ -116,6 +123,7 @@ bool ndMeshLoader::ImportFbx(const ndString& fbxPathMeshName)
 	ndFbxMeshLoader loader;
 	m_mesh = ndSharedPtr<ndMesh>(loader.LoadMesh(fbxPathMeshName.GetStr(), false));
 #if 1
+	//ndAssert(0);
 	ndTrace(("exporting mesh %s\n", fbxPathMeshName.GetStr()));
 	ndString tmpName(fbxPathMeshName);
 	tmpName.ToLower();
