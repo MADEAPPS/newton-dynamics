@@ -1681,28 +1681,31 @@
 			:m_low(&baseAddr->m_low, index.m_low)
 			,m_high(&baseAddr->m_low, index.m_high)
 		{
-	#ifdef _DEBUG
-			const ndFloat32* const base = (ndFloat32*)baseAddr;
-			for (ndInt32 i = 0; i < D_AVX_WORK_GROUP; ++i)
-			{
-				ndFloat32 val = base[index.m_int[i]];
-				ndAssert(val == m_float[i]);
-			}
-	#endif
+			//#ifdef _DEBUG
+			//const ndFloat32* const base = (ndFloat32*)baseAddr;
+			//for (ndInt32 i = 0; i < D_AVX_WORK_GROUP; ++i)
+			//{
+			//	ndFloat32 val = base[index.m_int[i]];
+			//	ndAssert(val == m_float[i]);
+			//}
+			//#endif
 		}
 
 		inline ndFloat32& operator[] (ndInt32 i)
 		{
 			ndAssert(i >= 0);
 			ndAssert(i < D_AVX_WORK_GROUP);
-			return m_float[i];
+			ndFloat32* const data = &m_low[0];
+			return data[i];
 		}
 
 		inline const ndFloat32& operator[] (ndInt32 i) const
 		{
 			ndAssert(i >= 0);
 			ndAssert(i < D_AVX_WORK_GROUP);
-			return m_float[i];
+			//return m_float[i];
+			const ndFloat32* const data = &m_low[0];
+			return data[i];
 		}
 
 		inline ndVectorAvx& operator= (const ndVectorAvx& A)
@@ -1796,42 +1799,19 @@
 		{
 		}
 
-		//static inline void Transpose(
-		//	ndVectorAvx& dst0, ndVectorAvx& dst1, ndVectorAvx& dst2, ndVectorAvx& dst3,
-		//	ndVectorAvx& dst4, ndVectorAvx& dst5, ndVectorAvx& dst6, ndVectorAvx& dst7,
-		//	const ndVectorAvx& src0, const ndVectorAvx& src1, const ndVectorAvx& src2, const ndVectorAvx& src3,
-		//	const ndVectorAvx& src4, const ndVectorAvx& src5, const ndVectorAvx& src6, const ndVectorAvx& src7)
+		//union
 		//{
-		//	const ndMatrix off01(src0.m_angular, src1.m_angular, src2.m_angular, src3.m_angular);
-		//	const ndMatrix off10(src4.m_linear, src5.m_linear, src6.m_linear, src7.m_linear);
-		//	
-		//	ndVector::Transpose4x4(
-		//		dst0.m_linear, dst1.m_linear, dst2.m_linear, dst3.m_linear,
-		//		src0.m_linear, src1.m_linear, src2.m_linear, src3.m_linear);
-		//	
-		//	ndVector::Transpose4x4(
-		//		dst0.m_angular, dst1.m_angular, dst2.m_angular, dst3.m_angular,
-		//		off10[0], off10[1], off10[2], off10[3]);
-		//	
-		//	ndVector::Transpose4x4(
-		//		dst4.m_linear, dst5.m_linear, dst6.m_linear, dst7.m_linear,
-		//		off01[0], off01[1], off01[2], off01[3]);
-		//	
-		//	ndVector::Transpose4x4(
-		//		dst4.m_angular, dst5.m_angular, dst6.m_angular, dst7.m_angular,
-		//		src4.m_angular, src5.m_angular, src6.m_angular, src7.m_angular);
-		//}
+		//	ndFloat32 m_float[D_AVX_WORK_GROUP];
+		//	ndInt32 m_int[D_AVX_WORK_GROUP];
+		//	struct data
+		//	{
+		//		ndVector8 m_low;
+		//		ndVector8 m_high;
+		//	};
+		//};
 
-		union
-		{
-			ndFloat32 m_float[D_AVX_WORK_GROUP];
-			ndInt32 m_int[D_AVX_WORK_GROUP];
-			struct
-			{
-				ndVector8 m_low;
-				ndVector8 m_high;
-			};
-		};
+		ndVector8 m_low;
+		ndVector8 m_high;
 
 		D_CORE_API static ndVectorAvx m_one;
 		D_CORE_API static ndVectorAvx m_zero;
