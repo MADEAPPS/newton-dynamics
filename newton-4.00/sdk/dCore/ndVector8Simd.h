@@ -39,37 +39,37 @@
 
 		inline ndVector8(const ndFloat32 val)
 			:m_low(_mm256_set1_pd(val))
-			, m_high(_mm256_set1_pd(val))
+			,m_high(_mm256_set1_pd(val))
 		{
 		}
 
 		inline ndVector8(const ndInt32 val)
-			: m_low(_mm256_castsi256_pd(_mm256_set1_epi64x(ndInt64(val))))
-			, m_high(_mm256_castsi256_pd(_mm256_set1_epi64x(ndInt64(val))))
+			:m_low(_mm256_castsi256_pd(_mm256_set1_epi64x(ndInt64(val))))
+			,m_high(_mm256_castsi256_pd(_mm256_set1_epi64x(ndInt64(val))))
 		{
 		}
 
 		inline ndVector8(const __m256d low, const __m256d high)
-			: m_low(low)
-			, m_high(high)
+			:m_low(low)
+			,m_high(high)
 		{
 		}
 
 		inline ndVector8(const ndVector8& copy)
-			: m_low(copy.m_low)
-			, m_high(copy.m_high)
+			:m_low(copy.m_low)
+			,m_high(copy.m_high)
 		{
 		}
 
 		inline ndVector8(const ndVector& low, const ndVector& high)
-			: m_low(_mm256_set_m128d(low.m_typeHigh, low.m_typeLow))
-			, m_high(_mm256_set_m128d(high.m_typeHigh, high.m_typeLow))
+			:m_low(_mm256_set_m128d(low.m_typeHigh, low.m_typeLow))
+			,m_high(_mm256_set_m128d(high.m_typeHigh, high.m_typeLow))
 		{
 		}
 
 		inline ndVector8(const ndVector8* const baseAddr, const ndVector8& index)
-			: m_low(_mm256_i64gather_pd(&(*baseAddr)[0], index.m_lowInt, 8))
-			, m_high(_mm256_i64gather_pd(&(*baseAddr)[0], index.m_highInt, 8))
+			:m_low(_mm256_i64gather_pd(&(*baseAddr)[0], index.m_lowInt, 8))
+			,m_high(_mm256_i64gather_pd(&(*baseAddr)[0], index.m_highInt, 8))
 		{
 		}
 
@@ -163,12 +163,12 @@
 
 		inline ndVector GetLow() const
 		{
-			return m_vector8.m_linear;
+			return m_linear;
 		}
 
 		inline ndVector GetHigh() const
 		{
-			return m_vector8.m_angular;
+			return m_angular;
 		}
 
 		inline ndFloat32 GetMax() const
@@ -239,8 +239,7 @@
 			{
 				ndBigVector m_linear;
 				ndBigVector m_angular;
-			} m_vector8;
-
+			};
 			struct
 			{
 				__m256d m_low;
@@ -515,32 +514,36 @@
 		{
 		}
 
+#ifdef D_NEWTON_USE_DOUBLE
+		inline ndVector8(const ndVector8* const baseAddr, const ndVector8& index)
+			:m_linear(&baseAddr->m_linear[0], (ndInt64*)&index.m_linear[0])
+			,m_angular(&baseAddr->m_linear[0], (ndInt64*)&index.m_angular[0])
+		{
+		}
+#else
 		inline ndVector8(const ndVector8* const baseAddr, const ndVector8& index)
 			:m_linear(&baseAddr->m_linear[0], (ndInt32*)&index.m_linear[0])
 			,m_angular(&baseAddr->m_linear[0], (ndInt32*)&index.m_angular[0])
 		{
-#ifdef _DEBUG		
-			const ndFloat32* const base = (ndFloat32*)baseAddr;
-			for (ndInt32 i = 0; i < ND_SIMD8_WORK_GROUP_SIZE; ++i)
-			{
-				ndFloat32 val = base[index.m_int[i]];
-				ndAssert(val == m_float[i]);
-			}
-#endif
 		}
+#endif
 
 		inline ndFloat32& operator[] (ndInt32 i)
 		{
 			ndAssert(i >= 0);
 			ndAssert(i < ND_SIMD8_WORK_GROUP_SIZE);
-			return m_float[i];
+			//return m_float[i];
+			ndFloat32* const ptr = (ndFloat32*)&m_linear;
+			return ptr[i];
 		}
 
 		inline const ndFloat32& operator[] (ndInt32 i) const
 		{
 			ndAssert(i >= 0);
 			ndAssert(i < ND_SIMD8_WORK_GROUP_SIZE);
-			return m_float[i];
+			//return m_float[i];
+			const ndFloat32* const ptr = (ndFloat32*)&m_linear;
+			return ptr[i];
 		}
 
 		inline ndVector8& operator= (const ndVector8& A)
@@ -660,16 +663,18 @@
 				src4.m_angular, src5.m_angular, src6.m_angular, src7.m_angular);
 		}
 
-		union
-		{
-			ndFloat32 m_float[ND_SIMD8_WORK_GROUP_SIZE];
-			ndInt32 m_int[ND_SIMD8_WORK_GROUP_SIZE];
-			struct
-			{
-				ndVector m_linear;
-				ndVector m_angular;
-			};
-		};
+		//union
+		//{
+		//	ndFloat32 m_float[ND_SIMD8_WORK_GROUP_SIZE];
+		//	ndInt32 m_int[ND_SIMD8_WORK_GROUP_SIZE];
+		//	struct
+		//	{
+		//		ndVector m_linear;
+		//		ndVector m_angular;
+		//	};
+		//};
+		ndVector m_linear;
+		ndVector m_angular;
 
 		D_CORE_API static ndVector8 m_one;
 		D_CORE_API static ndVector8 m_zero;

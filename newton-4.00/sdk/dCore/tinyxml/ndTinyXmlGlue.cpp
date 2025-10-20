@@ -382,9 +382,9 @@ void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const na
 		ret = sscanf(y, "%lf", &fy);
 		ret = sscanf(z, "%lf", &fz);
 		
-		tuple.m_x = ndFloat32(fx);
-		tuple.m_y = ndFloat32(fy);
-		tuple.m_z = ndFloat32(fz);
+		tuple.m_x = ndReal(fx);
+		tuple.m_y = ndReal(fy);
+		tuple.m_z = ndReal(fz);
 		array.PushBack(tuple);
 	}
 }

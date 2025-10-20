@@ -29,8 +29,6 @@
 
 #define D_SOA_DEFAULT_BUFFER_SIZE	1024
 
-//#define D_USING_SINGLE_SOA_REGISTER
-
 #ifdef D_USING_SINGLE_SOA_REGISTER
 
 	#define D_SSE_WORK_GROUP 4 
@@ -1684,16 +1682,19 @@
 		{
 		}
 
+#ifdef D_NEWTON_USE_DOUBLE
+		inline ndVectorSoa(const ndVectorSoa* const baseAddr, const ndVectorSoa& index)
+			:m_linear((ndFloat32*)baseAddr, (ndInt64*)&index.m_linear)
+			,m_angular((ndFloat32*)baseAddr, (ndInt64*)&index.m_angular)
+		{
+		}
+#else
 		inline ndVectorSoa(const ndVectorSoa* const baseAddr, const ndVectorSoa& index)
 			:m_linear((ndFloat32*)baseAddr, (ndInt32*)&index.m_linear)
 			,m_angular((ndFloat32*)baseAddr, (ndInt32*)&index.m_angular)
 		{
-			//const ndFloat32* const base = (ndFloat32*)baseAddr;
-			//for (ndInt32 i = 0; i < ND_SIMD8_WORK_GROUP_SIZE; ++i)
-			//{
-			//	m_float[i] = base[index.m_int[i]];
-			//}
 		}
+#endif
 
 		inline ndFloat32& operator[] (ndInt32 i)
 		{
@@ -1830,16 +1831,6 @@
 				src4.m_angular, src5.m_angular, src6.m_angular, src7.m_angular);
 		}
 
-		//union
-		//{
-		//	ndFloat32 m_float[ND_SIMD8_WORK_GROUP_SIZE];
-		//	ndInt32 m_int[ND_SIMD8_WORK_GROUP_SIZE];
-		//	struct
-		//	{
-		//		ndVector m_linear;
-		//		ndVector m_angular;
-		//	};
-		//};
 		ndVector m_linear;
 		ndVector m_angular;
 
