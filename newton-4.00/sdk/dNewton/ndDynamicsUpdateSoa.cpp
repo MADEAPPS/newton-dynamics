@@ -1685,26 +1685,32 @@
 		}
 
 		inline ndVectorSoa(const ndVectorSoa* const baseAddr, const ndVectorSoa& index)
+			:m_linear((ndFloat32*)baseAddr, (ndInt32*)&index.m_linear)
+			,m_angular((ndFloat32*)baseAddr, (ndInt32*)&index.m_angular)
 		{
-			const ndFloat32* const base = (ndFloat32*)baseAddr;
-			for (ndInt32 i = 0; i < ND_SIMD8_WORK_GROUP_SIZE; ++i)
-			{
-				m_float[i] = base[index.m_int[i]];
-			}
+			//const ndFloat32* const base = (ndFloat32*)baseAddr;
+			//for (ndInt32 i = 0; i < ND_SIMD8_WORK_GROUP_SIZE; ++i)
+			//{
+			//	m_float[i] = base[index.m_int[i]];
+			//}
 		}
 
 		inline ndFloat32& operator[] (ndInt32 i)
 		{
 			ndAssert(i >= 0);
 			ndAssert(i < ND_SIMD8_WORK_GROUP_SIZE);
-			return m_float[i];
+			//return m_float[i];
+			ndFloat32* const data = &m_linear[0];
+			return data[i];
 		}
 
 		inline const ndFloat32& operator[] (ndInt32 i) const
 		{
 			ndAssert(i >= 0);
 			ndAssert(i < ND_SIMD8_WORK_GROUP_SIZE);
-			return m_float[i];
+			//return m_float[i];
+			const ndFloat32* const data = &m_linear[0];
+			return data[i];
 		}
 
 		inline ndVectorSoa& operator= (const ndVectorSoa& A)
@@ -1824,16 +1830,18 @@
 				src4.m_angular, src5.m_angular, src6.m_angular, src7.m_angular);
 		}
 
-		union
-		{
-			ndFloat32 m_float[ND_SIMD8_WORK_GROUP_SIZE];
-			ndInt32 m_int[ND_SIMD8_WORK_GROUP_SIZE];
-			struct
-			{
-				ndVector m_linear;
-				ndVector m_angular;
-			};
-		};
+		//union
+		//{
+		//	ndFloat32 m_float[ND_SIMD8_WORK_GROUP_SIZE];
+		//	ndInt32 m_int[ND_SIMD8_WORK_GROUP_SIZE];
+		//	struct
+		//	{
+		//		ndVector m_linear;
+		//		ndVector m_angular;
+		//	};
+		//};
+		ndVector m_linear;
+		ndVector m_angular;
 
 		D_CORE_API static ndVectorSoa m_one;
 		D_CORE_API static ndVectorSoa m_zero;
