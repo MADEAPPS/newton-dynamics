@@ -41,20 +41,27 @@ const ndSharedPtr<ndAnimationSequence> ndMeshLoader::FindSequence(const ndString
 	return ndSharedPtr<ndAnimationSequence>(nullptr);
 }
 
-ndSharedPtr<ndAnimationSequence> ndMeshLoader::GetAnimationSequence(const ndString& fbxPathAnimName)
+ndSharedPtr<ndAnimationSequence> ndMeshLoader::ImportFbxAnimation(const ndString& fbxPathAnimName)
 {
-	ndAssert(0);
-	return ndSharedPtr<ndAnimationSequence>(nullptr);
-	//ndTree<ndSharedPtr<ndAnimationSequence>, ndString>::ndNode* node = m_animationCache.Find(fbxPathAnimName);
-	//if (!node)
-	//{
-	//	ndSharedPtr<ndAnimationSequence> sequence (LoadAnimation(fbxPathAnimName.GetStr()));
-	//	if (sequence)
-	//	{
-	//		node = m_animationCache.Insert(sequence, fbxPathAnimName);
-	//	}
-	//}
-	//return node ? node->GetInfo() : ndSharedPtr<ndAnimationSequence>(nullptr);
+	//return ndSharedPtr<ndAnimationSequence>(nullptr);
+	ndTree<ndSharedPtr<ndAnimationSequence>, ndString>::ndNode* node = m_animationCache.Find(fbxPathAnimName);
+	if (!node)
+	{
+		ndFbxMeshLoader animLoader;
+		ndSharedPtr<ndAnimationSequence> sequence (animLoader.LoadAnimation(fbxPathAnimName.GetStr()));
+		if (sequence)
+		{
+			node = m_animationCache.Insert(sequence, fbxPathAnimName);
+		}
+	}
+	return node ? node->GetInfo() : ndSharedPtr<ndAnimationSequence>(nullptr);
+}
+
+ndSharedPtr<ndAnimationSequence> ndMeshLoader::GetAnimationSequence(const ndString& pathAnimName)
+{
+	//ndAssert(0);
+	//return ndSharedPtr<ndAnimationSequence>(nullptr);
+	return ImportFbxAnimation(pathAnimName);
 }
 
 void ndMeshLoader::SetTranslationTracks(const ndString& boneName)
@@ -116,6 +123,7 @@ bool ndMeshLoader::ImportFbx(const ndString& fbxPathMeshName)
 	ndFbxMeshLoader loader;
 	m_mesh = ndSharedPtr<ndMesh>(loader.LoadMesh(fbxPathMeshName.GetStr(), false));
 #if 1
+	//ndAssert(0);
 	ndTrace(("exporting mesh %s\n", fbxPathMeshName.GetStr()));
 	ndString tmpName(fbxPathMeshName);
 	tmpName.ToLower();
@@ -199,6 +207,17 @@ void ndMeshLoader::SaveMesh(const ndString& fullPathName)
 	nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndMesh");
 	doc->LinkEndChild(rootNode);
 
+	// make the bone list for sikn and othe dependencies
+	ndTree<ndString, ndUnsigned32> bonesMap;
+	for (ndMesh* node = m_mesh->IteratorFirst(); node; node = node->IteratorNext())
+	{
+		if (node->m_name.GetStr())
+		{
+			ndUnsigned32 hash = ndUnsigned32(ndCRC64(node->m_name.GetStr()) & 0xffffffff);
+			bonesMap.Insert(node->m_name, hash);
+		}
+	}
+
 	struct MeshXmlNodePair
 	{
 		const ndMesh* m_meshNode;
@@ -216,13 +235,12 @@ void ndMeshLoader::SaveMesh(const ndString& fullPathName)
 		MeshXmlNodePair entry(stack.Pop());
 		xmlSaveParam(entry.m_parentXml, "name", entry.m_meshNode->m_name.GetStr());
 		xmlSaveParam(entry.m_parentXml, "matrix", entry.m_meshNode->m_matrix);
-		//xmlSaveParam(entry.m_parentXml, "meshMatrix", entry.m_meshNode->m_meshMatrix);
 
 		if (*entry.m_meshNode->GetMesh())
 		{
 			nd::TiXmlElement* const geometry = new nd::TiXmlElement("geometry");
 			entry.m_parentXml->LinkEndChild(geometry);
-			entry.m_meshNode->GetMesh()->SerializeToXml(geometry);
+			entry.m_meshNode->GetMesh()->SerializeToXml(geometry, bonesMap);
 		}
 
 		for (ndList<ndSharedPtr<ndMesh>>::ndNode* node = entry.m_meshNode->m_children.GetFirst(); node; node = node->GetNext())

@@ -636,6 +636,7 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 	ndMatrix pivotMatrix(ofbxMatrix2dMatrix(fbxMesh->getGeometricMatrix()));
 	meshEffect->ApplyTransform(pivotMatrix);
 	entity->SetMesh(meshEffect);
+
 	//mesh->RepairTJoints();
 }
 

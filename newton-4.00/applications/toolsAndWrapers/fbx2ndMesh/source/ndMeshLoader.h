@@ -24,12 +24,13 @@ class ndMeshLoader : public ndClassAlloc
 
 	virtual bool LoadMesh(const ndString& pathMeshName);
 	virtual void SaveMesh(const ndString& pathMeshName);
-	virtual bool ImportFbx(const ndString& fbxPathMeshName);
 
-	ndSharedPtr<ndAnimationSequence> GetAnimationSequence(const ndString& fbxPathAnimName);
-	const ndSharedPtr<ndAnimationSequence> FindSequence(const ndString& fbxPathAnimName) const;
+	ndSharedPtr<ndAnimationSequence> GetAnimationSequence(const ndString& pathAnimName);
+	const ndSharedPtr<ndAnimationSequence> FindSequence(const ndString& pathAnimName) const;
 	void SetTranslationTracks(const ndString& boneName);
 
+	virtual bool ImportFbx(const ndString& fbxPathMeshName);
+	ndSharedPtr<ndAnimationSequence> ImportFbxAnimation(const ndString& fbxPathAnimName);
 
 	protected:
 	ndString GetPath(const ndString& fullPathName) const;
