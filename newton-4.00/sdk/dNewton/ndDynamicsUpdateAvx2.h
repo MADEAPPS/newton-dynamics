@@ -25,6 +25,7 @@
 #include <ndNewton.h>
 
 class ndAvxMatrixArray;
+class ndAvxJointMaskArray;
 
 D_MSV_NEWTON_CLASS_ALIGN_32
 class ndDynamicsUpdateAvx2: public ndDynamicsUpdate
@@ -59,8 +60,8 @@ class ndDynamicsUpdateAvx2: public ndDynamicsUpdate
 	void GetJacobianDerivatives(ndConstraint* const joint);
 
 	ndArray<ndInt8> m_groupType;
-	ndArray<ndJacobian> m_jointMask;
 	ndArray<ndInt32> m_avxJointRows;
+	ndAvxJointMaskArray* m_jointMask;
 	ndAvxMatrixArray* m_avxMassMatrixArray;
 } D_GCC_NEWTON_CLASS_ALIGN_32;
 

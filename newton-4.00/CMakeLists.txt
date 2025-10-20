@@ -23,7 +23,6 @@ option("NEWTON_USE_DEFAULT_NEW_AND_DELETE" "overload new and delete when buildin
 
 if (NOT APPLE)
 	option("NEWTON_ENABLE_AVX2" "enable AVX2" ON)
-	option("NEWTON_ENABLE_AVX2_SOLVER" "enable AVX2 solver" ON)
 endif()
 
 #option("NEWTON_ENABLE_CUDA_SOLVER" "enable cuda solver" OFF)

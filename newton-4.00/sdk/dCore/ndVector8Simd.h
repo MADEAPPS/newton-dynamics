@@ -19,14 +19,16 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_SIMD_VECTOR8_AVX2_H__
-#define __ND_SIMD_VECTOR8_AVX2_H__
+#ifndef __ND_VECTOR8_SIMD_H__
+#define __ND_VECTOR8_SIMD_H__
 
 #include "ndCore.h"
 
 #define ND_SIMD8_WORK_GROUP_SIZE	8 
 
-#ifdef D_NEWTON_USE_DOUBLE
+#ifdef D_NEWTON_USE_AVX2_OPTION
+
+	#ifdef D_NEWTON_USE_DOUBLE
 	D_MSV_NEWTON_CLASS_ALIGN_32
 	class ndVector8
 	{
@@ -37,37 +39,37 @@
 
 		inline ndVector8(const ndFloat32 val)
 			:m_low(_mm256_set1_pd(val))
-			,m_high(_mm256_set1_pd(val))
+			, m_high(_mm256_set1_pd(val))
 		{
 		}
 
 		inline ndVector8(const ndInt32 val)
-			:m_low(_mm256_castsi256_pd(_mm256_set1_epi64x(ndInt64(val))))
-			,m_high(_mm256_castsi256_pd(_mm256_set1_epi64x(ndInt64(val))))
+			: m_low(_mm256_castsi256_pd(_mm256_set1_epi64x(ndInt64(val))))
+			, m_high(_mm256_castsi256_pd(_mm256_set1_epi64x(ndInt64(val))))
 		{
 		}
-				
+
 		inline ndVector8(const __m256d low, const __m256d high)
-			:m_low(low)
-			,m_high(high)
+			: m_low(low)
+			, m_high(high)
 		{
 		}
 
 		inline ndVector8(const ndVector8& copy)
-			:m_low(copy.m_low)
-			,m_high(copy.m_high)
+			: m_low(copy.m_low)
+			, m_high(copy.m_high)
 		{
 		}
 
 		inline ndVector8(const ndVector& low, const ndVector& high)
-			:m_low(_mm256_set_m128d(low.m_typeHigh, low.m_typeLow))
-			,m_high(_mm256_set_m128d(high.m_typeHigh, high.m_typeLow))
+			: m_low(_mm256_set_m128d(low.m_typeHigh, low.m_typeLow))
+			, m_high(_mm256_set_m128d(high.m_typeHigh, high.m_typeLow))
 		{
 		}
 
 		inline ndVector8(const ndVector8* const baseAddr, const ndVector8& index)
-			:m_low(_mm256_i64gather_pd(&(*baseAddr)[0], index.m_lowInt, 8))
-			,m_high(_mm256_i64gather_pd(&(*baseAddr)[0], index.m_highInt, 8))
+			: m_low(_mm256_i64gather_pd(&(*baseAddr)[0], index.m_lowInt, 8))
+			, m_high(_mm256_i64gather_pd(&(*baseAddr)[0], index.m_highInt, 8))
 		{
 		}
 
@@ -154,7 +156,7 @@
 			// (((b ^ a) & mask)^a)
 			//return  _mm_or_ps (_mm_and_ps (mask.m_type, data.m_type), _mm_andnot_ps(mask.m_type, m_type));
 			//return  _mm256_xor_ps(m_type, _mm256_and_ps(mask.m_type, _mm256_xor_ps(m_type, data.m_type)));
-			__m256d low (_mm256_xor_pd(m_low, _mm256_and_pd(mask.m_low, _mm256_xor_pd(m_low, data.m_low))));
+			__m256d low(_mm256_xor_pd(m_low, _mm256_and_pd(mask.m_low, _mm256_xor_pd(m_low, data.m_low))));
 			__m256d high(_mm256_xor_pd(m_high, _mm256_and_pd(mask.m_high, _mm256_xor_pd(m_high, data.m_high))));
 			return ndVector8(low, high);
 		}
@@ -251,20 +253,20 @@
 			};
 		};
 
-		static ndVector8 m_one;
-		static ndVector8 m_zero;
-		static ndVector8 m_mask;
-		static ndVector8 m_ordinals;
+		D_CORE_API static ndVector8 m_one;
+		D_CORE_API static ndVector8 m_zero;
+		D_CORE_API static ndVector8 m_mask;
+		D_CORE_API static ndVector8 m_ordinals;
 	} D_GCC_NEWTON_CLASS_ALIGN_32;
 
-#else
+	#else
 	D_MSV_NEWTON_CLASS_ALIGN_32
 	class ndVector8
 	{
-		public:
-		#ifndef PERMUTE_MASK
-		#define PERMUTE_MASK(w, z, y, x) _MM_SHUFFLE (w, z, y, x)
-		#endif
+	public:
+	#ifndef PERMUTE_MASK
+	#define PERMUTE_MASK(w, z, y, x) _MM_SHUFFLE (w, z, y, x)
+	#endif
 
 		inline ndVector8()
 		{
@@ -276,22 +278,22 @@
 		}
 
 		inline ndVector8(const ndInt32 val)
-			:m_type(_mm256_castsi256_ps(_mm256_set1_epi32(val)))
+			: m_type(_mm256_castsi256_ps(_mm256_set1_epi32(val)))
 		{
 		}
 
 		inline ndVector8(const __m256 type)
-			:m_type(type)
+			: m_type(type)
 		{
 		}
 
 		inline ndVector8(const ndVector8& copy)
-			:m_type(copy.m_type)
+			: m_type(copy.m_type)
 		{
 		}
 
 		inline ndVector8(const ndVector& low, const ndVector& high)
-			:m_type(_mm256_set_m128(high.m_type, low.m_type))
+			: m_type(_mm256_set_m128(high.m_type, low.m_type))
 		{
 		}
 
@@ -325,6 +327,7 @@
 		inline ndVector8 operator+ (const ndVector8& A) const
 		{
 			return _mm256_add_ps(m_type, A.m_type);
+			//return ndVector8(_mm_add_ps(m_typeLow, A.m_typeLow), _mm_add_ps(m_typeHigh, A.m_typeHigh));
 		}
 
 		inline ndVector8 operator- (const ndVector8& A) const
@@ -335,6 +338,7 @@
 		inline ndVector8 operator* (const ndVector8& A) const
 		{
 			return _mm256_mul_ps(m_type, A.m_type);
+			//return ndVector8(_mm_mul_ps(m_typeLow, A.m_typeLow), _mm_mul_ps(m_typeHigh, A.m_typeHigh));
 		}
 
 		inline ndVector8 MulAdd(const ndVector8& A, const ndVector8& B) const
@@ -416,7 +420,7 @@
 		}
 
 		static inline void Transpose(
-			ndVector8& dst0, ndVector8& dst1, ndVector8& dst2, ndVector8& dst3, 
+			ndVector8& dst0, ndVector8& dst1, ndVector8& dst2, ndVector8& dst3,
 			ndVector8& dst4, ndVector8& dst5, ndVector8& dst6, ndVector8& dst7,
 			const ndVector8& src0, const ndVector8& src1, const ndVector8& src2, const ndVector8& src3,
 			const ndVector8& src4, const ndVector8& src5, const ndVector8& src6, const ndVector8& src7)
@@ -441,7 +445,7 @@
 			blocks2x2[5].m_type = _mm256_unpackhi_ps(blocks4x4[2].m_type, blocks4x4[6].m_type);
 			blocks2x2[6].m_type = _mm256_unpacklo_ps(blocks4x4[3].m_type, blocks4x4[7].m_type);
 			blocks2x2[7].m_type = _mm256_unpackhi_ps(blocks4x4[3].m_type, blocks4x4[7].m_type);
-			
+
 			dst0.m_type = _mm256_unpacklo_ps(blocks2x2[0].m_type, blocks2x2[4].m_type);
 			dst1.m_type = _mm256_unpackhi_ps(blocks2x2[0].m_type, blocks2x2[4].m_type);
 			dst2.m_type = _mm256_unpacklo_ps(blocks2x2[1].m_type, blocks2x2[5].m_type);
@@ -471,10 +475,206 @@
 			};
 		};
 
-		static ndVector8 m_one;
-		static ndVector8 m_zero;
-		static ndVector8 m_mask;
-		static ndVector8 m_ordinals;
+		D_CORE_API static ndVector8 m_one;
+		D_CORE_API static ndVector8 m_zero;
+		D_CORE_API static ndVector8 m_mask;
+		D_CORE_API static ndVector8 m_ordinals;
+	} D_GCC_NEWTON_CLASS_ALIGN_32;
+	#endif
+
+#else
+	D_MSV_NEWTON_CLASS_ALIGN_32
+	class ndVector8
+	{
+		public:
+		inline ndVector8()
+		{
+		}
+
+		inline ndVector8(const ndFloat32 val)
+			:m_linear(val)
+			,m_angular(val)
+		{
+		}
+
+		inline ndVector8(const ndInt32 val)
+			:m_linear(val, val, val, val)
+			,m_angular(val, val, val, val)
+		{
+		}
+
+		inline ndVector8(const ndVector8& copy)
+			:m_linear(copy.m_linear)
+			,m_angular(copy.m_angular)
+		{
+		}
+
+		inline ndVector8(const ndVector& low, const ndVector& high)
+			:m_linear(low)
+			,m_angular(high)
+		{
+		}
+
+		inline ndVector8(const ndVector8* const baseAddr, const ndVector8& index)
+			:m_linear(&baseAddr->m_linear[0], (ndInt32*)&index.m_linear[0])
+			,m_angular(&baseAddr->m_linear[0], (ndInt32*)&index.m_angular[0])
+		{
+#ifdef _DEBUG		
+			const ndFloat32* const base = (ndFloat32*)baseAddr;
+			for (ndInt32 i = 0; i < ND_SIMD8_WORK_GROUP_SIZE; ++i)
+			{
+				ndFloat32 val = base[index.m_int[i]];
+				ndAssert(val == m_float[i]);
+			}
+#endif
+		}
+
+		inline ndFloat32& operator[] (ndInt32 i)
+		{
+			ndAssert(i >= 0);
+			ndAssert(i < ND_SIMD8_WORK_GROUP_SIZE);
+			return m_float[i];
+		}
+
+		inline const ndFloat32& operator[] (ndInt32 i) const
+		{
+			ndAssert(i >= 0);
+			ndAssert(i < ND_SIMD8_WORK_GROUP_SIZE);
+			return m_float[i];
+		}
+
+		inline ndVector8& operator= (const ndVector8& A)
+		{
+			m_linear = A.m_linear;
+			m_angular = A.m_angular;
+			return *this;
+		}
+
+		inline ndVector8 operator+ (const ndVector8& A) const
+		{
+			return ndVector8(m_linear + A.m_linear, m_angular + A.m_angular);
+		}
+
+		inline ndVector8 operator- (const ndVector8& A) const
+		{
+			return ndVector8(m_linear - A.m_linear, m_angular - A.m_angular);
+		}
+
+		inline ndVector8 operator* (const ndVector8& A) const
+		{
+			return ndVector8(m_linear * A.m_linear, m_angular * A.m_angular);
+		}
+
+		inline ndVector8 MulAdd(const ndVector8& A, const ndVector8& B) const
+		{
+			return ndVector8(m_linear.MulAdd(A.m_linear, B.m_linear), m_angular.MulAdd(A.m_angular, B.m_angular));
+		}
+
+		inline ndVector8 MulSub(const ndVector8& A, const ndVector8& B) const
+		{
+			return ndVector8(m_linear.MulSub(A.m_linear, B.m_linear), m_angular.MulSub(A.m_angular, B.m_angular));
+		}
+
+		inline ndVector8 operator> (const ndVector8& A) const
+		{
+			return ndVector8(m_linear > A.m_linear, m_angular > A.m_angular);
+		}
+
+		inline ndVector8 operator< (const ndVector8& A) const
+		{
+			return ndVector8(m_linear < A.m_linear, m_angular < A.m_angular);
+		}
+
+		inline ndVector8 operator| (const ndVector8& A) const
+		{
+			return ndVector8(m_linear | A.m_linear, m_angular | A.m_angular);
+		}
+
+		inline ndVector8 operator& (const ndVector8& A) const
+		{
+			return ndVector8(m_linear & A.m_linear, m_angular & A.m_angular);
+		}
+
+		inline ndVector8 GetMin(const ndVector8& A) const
+		{
+			return ndVector8(m_linear.GetMin(A.m_linear), m_angular.GetMin(A.m_angular));
+		}
+
+		inline ndVector8 GetMax(const ndVector8& A) const
+		{
+			return ndVector8(m_linear.GetMax(A.m_linear), m_angular.GetMax(A.m_angular));
+		}
+
+		inline ndVector8 Select(const ndVector8& data, const ndVector8& mask) const
+		{
+			return ndVector8(m_linear.Select(data.m_linear, mask.m_linear), m_angular.Select(data.m_angular, mask.m_angular));
+		}
+
+		inline ndVector GetLow() const
+		{
+			return m_linear;
+		}
+
+		inline ndVector GetHigh() const
+		{
+			return m_angular;
+		}
+
+		inline ndFloat32 GetMax() const
+		{
+			return m_linear.GetMax(m_angular).GetScalar();
+		}
+
+		inline ndFloat32 AddHorizontal() const
+		{
+			return (m_linear + m_angular).AddHorizontal().GetScalar();
+		}
+
+		static inline void FlushRegisters()
+		{
+		}
+
+		static inline void Transpose(
+			ndVector8& dst0, ndVector8& dst1, ndVector8& dst2, ndVector8& dst3,
+			ndVector8& dst4, ndVector8& dst5, ndVector8& dst6, ndVector8& dst7,
+			const ndVector8& src0, const ndVector8& src1, const ndVector8& src2, const ndVector8& src3,
+			const ndVector8& src4, const ndVector8& src5, const ndVector8& src6, const ndVector8& src7)
+		{
+			const ndMatrix off01(src0.m_angular, src1.m_angular, src2.m_angular, src3.m_angular);
+			const ndMatrix off10(src4.m_linear, src5.m_linear, src6.m_linear, src7.m_linear);
+
+			ndVector::Transpose4x4(
+				dst0.m_linear, dst1.m_linear, dst2.m_linear, dst3.m_linear,
+				src0.m_linear, src1.m_linear, src2.m_linear, src3.m_linear);
+
+			ndVector::Transpose4x4(
+				dst0.m_angular, dst1.m_angular, dst2.m_angular, dst3.m_angular,
+				off10[0], off10[1], off10[2], off10[3]);
+
+			ndVector::Transpose4x4(
+				dst4.m_linear, dst5.m_linear, dst6.m_linear, dst7.m_linear,
+				off01[0], off01[1], off01[2], off01[3]);
+
+			ndVector::Transpose4x4(
+				dst4.m_angular, dst5.m_angular, dst6.m_angular, dst7.m_angular,
+				src4.m_angular, src5.m_angular, src6.m_angular, src7.m_angular);
+		}
+
+		union
+		{
+			ndFloat32 m_float[ND_SIMD8_WORK_GROUP_SIZE];
+			ndInt32 m_int[ND_SIMD8_WORK_GROUP_SIZE];
+			struct
+			{
+				ndVector m_linear;
+				ndVector m_angular;
+			};
+		};
+
+		D_CORE_API static ndVector8 m_one;
+		D_CORE_API static ndVector8 m_zero;
+		D_CORE_API static ndVector8 m_mask;
+		D_CORE_API static ndVector8 m_ordinals;
 	} D_GCC_NEWTON_CLASS_ALIGN_32;
 #endif
 

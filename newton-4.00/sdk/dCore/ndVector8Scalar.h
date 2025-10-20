@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_SIMD_VECTOR8_SCALAR_H__
-#define __ND_SIMD_VECTOR8_SCALAR_H__
+#ifndef __ND_VECTOR8_SCALAR_H__
+#define __ND_VECTOR8_SCALAR_H__
 
 #include "ndCore.h"
 
@@ -291,10 +291,10 @@ class ndVector8
 		} m_vector8;
 	};
 
-	static ndVector8 m_one;
-	static ndVector8 m_zero;
-	static ndVector8 m_mask;
-	static ndVector8 m_ordinals;
+	D_CORE_API static ndVector8 m_one;
+	D_CORE_API static ndVector8 m_zero;
+	D_CORE_API static ndVector8 m_mask;
+	D_CORE_API static ndVector8 m_ordinals;
 } D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #else
@@ -562,10 +562,10 @@ class ndVector8
 		} m_vector8;
 	};
 
-	static ndVector8 m_one;
-	static ndVector8 m_zero;
-	static ndVector8 m_mask;
-	static ndVector8 m_ordinals;
+	D_CORE_API static ndVector8 m_one;
+	D_CORE_API static ndVector8 m_zero;
+	D_CORE_API static ndVector8 m_mask;
+	D_CORE_API static ndVector8 m_ordinals;
 } D_GCC_NEWTON_CLASS_ALIGN_32;
 #endif
 

@@ -23,6 +23,7 @@
 #include "ndTypes.h"
 #include "ndVector.h"
 #include "ndMatrix.h"
+#include "ndVector8.h"
 #include "ndSpatialVector.h"
 
 #ifndef D_NEWTON_USE_DOUBLE
@@ -64,14 +65,9 @@ ndBigVector ndBigVector::m_xyzwMask (ndInt32(-1), ndInt32(-1), ndInt32(-1), ndIn
 
 ndSpatialVector ndSpatialVector::m_zero (ndFloat32 (0.0f));
 
-//dMatrix dMatrix::m_zeroMatrix(
-//	ndVector(ndFloat32(0.0f)),
-//	ndVector(ndFloat32(0.0f)),
-//	ndVector(ndFloat32(0.0f)),
-//	ndVector(ndFloat32(0.0f)));
-//
-//dMatrix dMatrix::m_identityMatrix(
-//	ndVector(ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f)),
-//	ndVector(ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f)),
-//	ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f)),
-//	ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f)));
+ndVector8 ndVector8::m_mask(-1);
+ndVector8 ndVector8::m_one(ndFloat32(1.0f));
+ndVector8 ndVector8::m_zero(ndFloat32(0.0f));
+ndVector8 ndVector8::m_ordinals(ndVector(0, 1, 2, 3), ndVector(4, 5, 6, 7));
+
+

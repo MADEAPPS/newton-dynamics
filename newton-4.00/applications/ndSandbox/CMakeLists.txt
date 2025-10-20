@@ -150,12 +150,6 @@ if(MSVC OR MINGW)
 		target_link_libraries (${projectName} PUBLIC ${openclSDKPath}/lib/OpenCL.lib)
 	endif()
 
-	if(NEWTON_ENABLE_AVX2_SOLVER)
-		if (NOT NEWTON_BUILD_SHARED_LIBS)
-			target_link_libraries (${projectName} PUBLIC ndSolverAvx2)
-		endif()
-	endif(NEWTON_ENABLE_AVX2_SOLVER)
-
 	if (NEWTON_ENABLE_CUDA_SOLVER)
 		if (NOT NEWTON_BUILD_SHARED_LIBS)
 			target_link_libraries (${projectName} PUBLIC ndSolverCuda)
@@ -173,10 +167,6 @@ if(MSVC OR MINGW)
 endif()
 
 if(UNIX)
-	if(NEWTON_ENABLE_AVX2_SOLVER)
-		target_link_libraries (${projectName} PUBLIC ndSolverAvx2)
-	endif(NEWTON_ENABLE_AVX2_SOLVER)
-
 	if (NEWTON_ENABLE_CUDA_SOLVER)
 		target_link_libraries (${projectName} PUBLIC ndSolverCuda)
 	endif(NEWTON_ENABLE_CUDA_SOLVER)

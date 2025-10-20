@@ -4984,38 +4984,45 @@ void ndMeshEffect::DeserializeFromXml(const nd::TiXmlElement* const xmlNode)
 		format.m_vertex.m_strideInBytes = sizeof(ndBigVector);
 
 		// import skin if there is any
-		if (xmlVertexNode->FirstChild("vertexWeights"))
+		const nd::TiXmlElement* const xmlVertexWeightsNode = (nd::TiXmlElement*)xmlVertexNode->FirstChild("vertexWeights");
+		if (xmlVertexWeightsNode)
 		{
-			//ndAssert(0);
-			//	//const ofbx::Skin* const skin = geom->getSkin();
-			//	//ndInt32 clusterCount = skin->getClusterCount();
-			//	//
-			//	//vertexWeights.SetCount(geom->getVertexCount());
-			//	//for (ndInt32 i = 0; i < vertexWeights.GetCount(); ++i)
-			//	//{
-			//	//	vertexWeights[i].Clear();
-			//	//	vertexWeightsIndexArray.PushBack(i);
-			//	//}
-			//	//for (ndInt32 i = 0; i < clusterCount; ++i)
-			//	//{
-			//	//	const ofbx::Cluster* const fbxCluster = skin->getCluster(i);
-			//	//	ndInt32 clusterIndexCount = fbxCluster->getIndicesCount();
-			//	//	if (clusterIndexCount)
-			//	//	{
-			//	//		const ofbx::Object* const fbxBone = fbxCluster->getLink();
-			//	//		ndInt32 hashId = ndInt32(ndCRC64(fbxBone->name) & 0xffffffff);
-			//	//		const ndInt32* const indices = fbxCluster->getIndices();
-			//	//		const ndFloat64* const weights = fbxCluster->getWeights();
-			//	//		for (ndInt32 j = 0; j < clusterIndexCount; ++j)
-			//	//		{
-			//	//			ndInt32 index = indices[j];
-			//	//			vertexWeights[index].SetWeight(hashId, ndReal(weights[j]));
-			//	//		}
-			//	//	}
-			//	//}
-			//	//format.m_vertexWeight.m_data = &vertexWeights[0];
-			//	//format.m_vertexWeight.m_indexList = &vertexWeightsIndexArray[0];
-			//	//format.m_vertexWeight.m_strideInBytes = sizeof(ndMeshEffect::ndVertexWeight);
+			////const ofbx::Skin* const skin = geom->getSkin();
+			////ndInt32 clusterCount = skin->getClusterCount();
+			////
+			////vertexWeights.SetCount(geom->getVertexCount());
+			////for (ndInt32 i = 0; i < vertexWeights.GetCount(); ++i)
+			////{
+			////	vertexWeights[i].Clear();
+			////	vertexWeightsIndexArray.PushBack(i);
+			////}
+			////for (ndInt32 i = 0; i < clusterCount; ++i)
+			////{
+			////	const ofbx::Cluster* const fbxCluster = skin->getCluster(i);
+			////	ndInt32 clusterIndexCount = fbxCluster->getIndicesCount();
+			////	if (clusterIndexCount)
+			////	{
+			////		const ofbx::Object* const fbxBone = fbxCluster->getLink();
+			////		ndInt32 hashId = ndInt32(ndCRC64(fbxBone->name) & 0xffffffff);
+			////		const ndInt32* const indices = fbxCluster->getIndices();
+			////		const ndFloat64* const weights = fbxCluster->getWeights();
+			////		for (ndInt32 j = 0; j < clusterIndexCount; ++j)
+			////		{
+			////			ndInt32 index = indices[j];
+			////			vertexWeights[index].SetWeight(hashId, ndReal(weights[j]));
+			////		}
+			////	}
+			////}
+			////format.m_vertexWeight.m_data = &vertexWeights[0];
+			////format.m_vertexWeight.m_indexList = &vertexWeightsIndexArray[0];
+			////format.m_vertexWeight.m_strideInBytes = sizeof(ndMeshEffect::ndVertexWeight);
+
+			for (const nd::TiXmlNode* node = xmlVertexWeightsNode->FirstChild("vert"); node; node = node->NextSibling("vert"))
+			{
+				//const nd::TiXmlElement* const linkNode = (nd::TiXmlElement*)node;
+				//ndAssert(strcmp(linkNode->Value(), "vert") == 0);
+			}
+
 		}
 
 	}

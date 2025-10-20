@@ -37,10 +37,6 @@ file(GLOB HEADERS *.h dParticles/*.h)
 file(GLOB HEADERS *.h dModels/dVehicle/*.h)
 file(GLOB HEADERS *.h dModels/dCharacter/*.h)
 
-if(NEWTON_ENABLE_AVX2_SOLVER)
-	add_definitions(-D_D_USE_AVX2_SOLVER)
-endif()
-
 include_directories(.)
 include_directories(../dCore)
 include_directories(../dTinyxml)
@@ -56,10 +52,6 @@ include_directories(dModels/dCharacter/)
 
 add_subdirectory(dExtensions)
 
-if(NEWTON_ENABLE_AVX2_SOLVER)
-	include_directories(dExtensions/dAvx2)
-endif()
-
 if (NEWTON_ENABLE_CUDA_SOLVER)
 	add_definitions(-D_D_NEWTON_CUDA)
 	include_directories(dExtensions/dCuda)
@@ -70,17 +62,6 @@ if (NEWTON_ENABLE_CUDA_SOLVER)
 		dExtensions/dCuda/*.h
 		dExtensions/dCuda/*.cpp
 		dExtensions/dCuda/dContext/*.h) 
-endif()
-
-if (NEWTON_ENABLE_SYCL_SOLVER)
-	add_definitions(-D_D_NEWTON_SYCL)
-	include_directories(dNewton/dExtensions/dSycl)
-	include_directories(dNewton/dExtensions/dSycl/ndScene)
-
-	file(GLOB CPP_SOURCE 
-		${CPP_SOURCE} 
-		dNewton/dExtensions/dSycl/ndScene/*.h
-		dNewton/dExtensions/dSycl/ndScene/*.cpp) 
 endif()
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
@@ -120,19 +101,9 @@ endif(MSVC)
 
 target_link_libraries(${projectName} ndTinyxml ndCore ndCollision)
 
-if(NEWTON_ENABLE_AVX2_SOLVER)
-	target_link_libraries(${projectName} ndSolverAvx2)
-endif()
-
 if (NEWTON_ENABLE_CUDA_SOLVER)
 	if(NEWTON_BUILD_SHARED_LIBS)
 		target_link_libraries (${projectName} ndSolverCuda)
-	endif()
-endif()
-
-if (NEWTON_ENABLE_SYCL_SOLVER)
-	if(NEWTON_BUILD_SHARED_LIBS)
-		target_link_libraries (${projectName} ndSolverSycl)
 	endif()
 endif()
 

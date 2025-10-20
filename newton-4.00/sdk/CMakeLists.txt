@@ -70,11 +70,6 @@ else()
 		dNewton/dModels/dVehicle/*.h 
 		dNewton/dModels/dVehicle/*.cpp)
 
-	if(NEWTON_ENABLE_AVX2_SOLVER)
-		add_definitions(-D_D_USE_AVX2_SOLVER)
-		include_directories(dNewton/dExtensions/dAvx2)
-	endif()
-
 	if (NEWTON_ENABLE_CUDA_SOLVER)
 		add_definitions(-D_D_NEWTON_CUDA)
 		include_directories(dNewton/dExtensions/dCuda)
@@ -102,16 +97,8 @@ else()
 		add_definitions(-D_D_COLLISION_EXPORT_DLL)
 		add_library(${projectName} SHARED ${CPP_SOURCE})
 
-		if(NEWTON_ENABLE_AVX2_SOLVER)
-			target_link_libraries (${projectName} ndSolverAvx2)
-		endif()
-
 		if (NEWTON_ENABLE_CUDA_SOLVER)
 			target_link_libraries (${projectName} ndSolverCuda)
-		endif()
-
-		if (NEWTON_ENABLE_SYCL_SOLVER)
-			target_link_libraries (${projectName} ndSolverSycl)
 		endif()
 
 		if(MSVC OR MINGW)

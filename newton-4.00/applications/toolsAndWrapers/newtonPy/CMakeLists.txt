@@ -68,16 +68,8 @@ else()
 	target_link_libraries (${projectName} ndNewton)
 endif()
 
-if(NEWTON_ENABLE_AVX2_SOLVER)
-	target_link_libraries (${projectName} ndSolverAvx2)
-endif()
-
 if (NEWTON_ENABLE_CUDA_SOLVER)
 	target_link_libraries (${projectName} ndSolverCuda)
-endif()
-
-if (NEWTON_ENABLE_SYCL_SOLVER)
-	target_link_libraries (${projectName} ndSolverSycl)
 endif()
 
 if(MSVC OR MINGW)

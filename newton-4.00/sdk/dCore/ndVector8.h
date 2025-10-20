@@ -23,15 +23,15 @@
 #define __ND_SIMD_VECTOR8_H__
 
 #ifdef D_SCALAR_VECTOR_CLASS
-	#include "ndSimdVector8_scalar.h"
+	#include "ndVector8Scalar.h"
 #elif (defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64))
-	#include "ndSimdVector8_avx2.h"
+	#include "ndVector8Simd.h"
 #elif (defined(__arm__) || defined(__aarch64__) || defined(__ARM_ARCH_ISA_A64) || defined(__ARM_ARCH_7S__) || defined(__ARM_ARCH_7A__))
 	//#include "ndVectorArmNeon.h"
-	#include "ndSimdVector8_scalar.h"
+	#include "ndVector8Scalar.h"
 #else
 	// unknown cpu assume scaler instruction set until otherwise
-	#include "ndSimdVector8_scalar.h"
+	#include "ndVector8Scalar.h"
 #endif
 
 

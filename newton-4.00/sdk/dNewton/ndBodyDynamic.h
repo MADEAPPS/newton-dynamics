@@ -37,6 +37,8 @@
 #define D_ERR_TOLERANCE		ndFloat32(1.0e-2f)
 #define D_ERR_TOLERANCE2	(D_ERR_TOLERANCE * D_ERR_TOLERANCE)
 
+//#define D_USING_SINGLE_SOA_REGISTER
+
 D_MSV_NEWTON_CLASS_ALIGN_32
 class ndBodyDynamic: public ndBodyKinematic
 {
