@@ -97,33 +97,38 @@ endif(NOT CMAKE_BUILD_TYPE)
 
 #check for UNIX
 if(UNIX)
-	  # ----------------------------------------------------------------------
-	  # Ensure the RPATH for libndNewton is set correctly both inside the build
-	  # tree as well as in the installed location (ie after `make install`).
-	  #
-	  # The following settings were adapted from here
-	  # https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
+	# ----------------------------------------------------------------------
+	# Ensure the RPATH for libndNewton is set correctly both inside the build
+	# tree as well as in the installed location (ie after `make install`).
+	#
+	# The following settings were adapted from here
+	# https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling
 
-	  # Use the full RPATH for the build tree.
-	  set(CMAKE_SKIP_BUILD_RPATH FALSE)
+	set(DEFAULT_INSTALL_PREFIX "/usr/local/${PROJECT_NAME}")
+	if (${CMAKE_INSTALL_PREFIX} STREQUAL ${DEFAULT_INSTALL_PREFIX})
+		set(CMAKE_INSTALL_PREFIX "../newton-4.00/binaries" CACHE PATH "..." FORCE)
+	endif()
 
-	  # Do not use the install RPATH during building but use later on when we install the library.
-	  set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+	# Use the full RPATH for the build tree.
+	set(CMAKE_SKIP_BUILD_RPATH FALSE)
 
-	  # Set this RPATH in the installed library.
-	  # NOTE: specify CMAKE_INSTALL_PREFIX as an absolute path or it will almost certainly not work.
-	  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+	# Do not use the install RPATH during building but use later on when we install the library.
+	set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
-	  # Add the automatically determined parts of the RPATH which point to directories
-	  # outside the build tree to the install RPATH.
-	  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+	# Set this RPATH in the installed library.
+	# NOTE: specify CMAKE_INSTALL_PREFIX as an absolute path or it will almost certainly not work.
+	set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
-	  # Only use the RPATH if the target is not a system directory.
-	  list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
-	  if("${isSystemDir}" STREQUAL "-1")
-		set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-	  endif("${isSystemDir}" STREQUAL "-1")
-	  # ----------------------------------------------------------------------
+	# Add the automatically determined parts of the RPATH which point to directories
+	# outside the build tree to the install RPATH.
+	set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+	# Only use the RPATH if the target is not a system directory.
+	#list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
+	#if("${isSystemDir}" STREQUAL "-1")
+	#	set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+	#endif("${isSystemDir}" STREQUAL "-1")
+	# ----------------------------------------------------------------------
 
 	set(CMAKE_POLICY_DEFAULT_CMP0072 NEW)
 	if(NOT NEWTON_BUILD_SHARED_LIBS)
@@ -137,7 +142,7 @@ if(UNIX)
 	endif()
 
 	if (X86)
-	add_compile_options(-msse3)
+		add_compile_options(-msse3)
 	endif()
 
 	include("GNUInstallDirs")
@@ -156,9 +161,6 @@ if(UNIX)
 	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 endif ()
-
-
-#set(CMAKE_INSTALL_PREFIX "../newton-4.00/binaries" CACHE PATH "..." FORCE)
 
 if (MSVC)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
