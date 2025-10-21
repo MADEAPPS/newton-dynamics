@@ -38,6 +38,8 @@ bld/
 *.suo
 *.obj
 *.sdf
+*.lib
+*.dll
 *.exe
 *.spv
 *.dat
