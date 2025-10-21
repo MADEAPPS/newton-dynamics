@@ -157,27 +157,17 @@ if(UNIX)
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
 endif ()
 
+
+#set(CMAKE_INSTALL_PREFIX "../newton-4.00/binaries" CACHE PATH "..." FORCE)
+
 if (MSVC)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 	add_definitions(-D_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR)
-	
-	#set(binarySdkPath "$ENV{NewtonDynamics}/newton-4.00/binaries")
-	#message(${binarySdkPath})
-	#if (PTR_SIZE EQUAL 8)
-	#	
-	#	if (NEWTON_BUILD_SHARED_LIBS)
-	#		set(CMAKE_INSTALL_PREFIX ${binarySdkPath}/sharedLib CACHE PATH "..." FORCE)
-	#	else()
-	#		if (NEWTON_STATIC_RUNTIME_LIBRARIES)
-	#			set(CMAKE_INSTALL_PREFIX ${binarySdkPath}/static_mt CACHE PATH "..." FORCE)
-	#		else()
-	#			set(CMAKE_INSTALL_PREFIX ${binarySdkPath}/static_md CACHE PATH "..." FORCE)
-	#		endif()
-	#	endif()
-	#else()
-	#	set(CMAKE_INSTALL_PREFIX "win32sdk" CACHE PATH "..." FORCE)
-	#endif ()
-	message(${CMAKE_INSTALL_PREFIX})
+
+	set(DEFAULT_INSTALL_PREFIX "C:/Program Files (x86)/${PROJECT_NAME}")
+	if (${CMAKE_INSTALL_PREFIX} STREQUAL ${DEFAULT_INSTALL_PREFIX})
+		set(CMAKE_INSTALL_PREFIX "../newton-4.00/binaries" CACHE PATH "..." FORCE)
+	endif()
 
 	if(NEWTON_STATIC_RUNTIME_LIBRARIES)
 		message ("link to static runtime libraries")

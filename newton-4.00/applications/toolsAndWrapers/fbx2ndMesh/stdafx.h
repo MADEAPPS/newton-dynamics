@@ -20,11 +20,6 @@
 
 #include <stdio.h>
 #include <tchar.h>
-//#include <map>
-//#include <list>
-//#include <vector>
-//#include <string>
-//#include <iostream>
 
 
 
