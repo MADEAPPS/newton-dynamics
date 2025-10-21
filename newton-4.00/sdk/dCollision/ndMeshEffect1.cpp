@@ -4935,128 +4935,6 @@ void ndMeshEffect::FlipWinding()
 	ndPolyhedra::EndFace();
 }
 
-void ndMeshEffect::DeserializeFromXml(const nd::TiXmlElement* const xmlNode)
-{
-	// populate material array
-	ndArray<ndMaterial>& materialArray = GetMaterials();
-	for (const nd::TiXmlNode* node = xmlNode->FirstChild("material"); node; node = node->NextSibling("material"))
-	{
-		ndMaterial material;
-		material.m_ambient = xmlGetVector3(node, "ambient");
-		material.m_diffuse = xmlGetVector3(node, "diffuse");
-		material.m_specular = xmlGetVector3(node, "specular");
-		material.m_reflection = xmlGetVector3(node, "reflection");
-		material.m_shiness = xmlGetFloat(node, "shiness");
-		material.m_opacity = xmlGetFloat(node, "opacity");
-		snprintf(material.m_textureName, sizeof(material.m_textureName), xmlGetString(node, "texture"));
-
-		materialArray.PushBack(material);
-	}
-
-	ndMeshEffect::ndMeshVertexFormat format;
-
-	ndArray<ndInt32> faceMaterialArray;
-	ndArray<ndInt32> faceIndexCountArray;
-	if (xmlNode->FirstChild("faces"))
-	{
-		const nd::TiXmlElement* const node = (nd::TiXmlElement*)xmlNode->FirstChild("faces");
-		ndAssert(node);
-		xmlGetInt(node, "faceMaterial", faceMaterialArray);
-		xmlGetInt(node, "faceIndexCount", faceIndexCountArray);
-
-		format.m_faceCount = ndInt32(faceMaterialArray.GetCount());
-		format.m_faceMaterial = &faceMaterialArray[0];
-		format.m_faceIndexCount = &faceIndexCountArray[0];
-	}
-
-	ndArray<ndBigVector> vertices;
-	ndArray<ndInt32> vertexIndexArray;
-	{
-		// get the vertexData
-		const nd::TiXmlElement* const xmlVertexNode = (nd::TiXmlElement*)xmlNode->FirstChild("vertices");
-		ndAssert(xmlVertexNode);
-	
-		xmlGetInt(xmlVertexNode, "indices", vertexIndexArray);
-		xmlGetFloat64Array3(xmlVertexNode, "positions", vertices);
-	
-		format.m_vertex.m_data = &vertices[0].m_x;
-		format.m_vertex.m_indexList = &vertexIndexArray[0];
-		format.m_vertex.m_strideInBytes = sizeof(ndBigVector);
-
-		// import skin if there is any
-		const nd::TiXmlElement* const xmlVertexWeightsNode = (nd::TiXmlElement*)xmlVertexNode->FirstChild("vertexWeights");
-		if (xmlVertexWeightsNode)
-		{
-			////const ofbx::Skin* const skin = geom->getSkin();
-			////ndInt32 clusterCount = skin->getClusterCount();
-			////
-			////vertexWeights.SetCount(geom->getVertexCount());
-			////for (ndInt32 i = 0; i < vertexWeights.GetCount(); ++i)
-			////{
-			////	vertexWeights[i].Clear();
-			////	vertexWeightsIndexArray.PushBack(i);
-			////}
-			////for (ndInt32 i = 0; i < clusterCount; ++i)
-			////{
-			////	const ofbx::Cluster* const fbxCluster = skin->getCluster(i);
-			////	ndInt32 clusterIndexCount = fbxCluster->getIndicesCount();
-			////	if (clusterIndexCount)
-			////	{
-			////		const ofbx::Object* const fbxBone = fbxCluster->getLink();
-			////		ndInt32 hashId = ndInt32(ndCRC64(fbxBone->name) & 0xffffffff);
-			////		const ndInt32* const indices = fbxCluster->getIndices();
-			////		const ndFloat64* const weights = fbxCluster->getWeights();
-			////		for (ndInt32 j = 0; j < clusterIndexCount; ++j)
-			////		{
-			////			ndInt32 index = indices[j];
-			////			vertexWeights[index].SetWeight(hashId, ndReal(weights[j]));
-			////		}
-			////	}
-			////}
-			////format.m_vertexWeight.m_data = &vertexWeights[0];
-			////format.m_vertexWeight.m_indexList = &vertexWeightsIndexArray[0];
-			////format.m_vertexWeight.m_strideInBytes = sizeof(ndMeshEffect::ndVertexWeight);
-
-			for (const nd::TiXmlNode* node = xmlVertexWeightsNode->FirstChild("vert"); node; node = node->NextSibling("vert"))
-			{
-				//const nd::TiXmlElement* const linkNode = (nd::TiXmlElement*)node;
-				//ndAssert(strcmp(linkNode->Value(), "vert") == 0);
-			}
-
-		}
-
-	}
-	
-	ndArray<ndTriplexReal> normalArray;
-	ndArray<ndInt32> normalIndexArray;
-	if (xmlNode->FirstChild("normal"))
-	{
-		const nd::TiXmlElement* const node = (nd::TiXmlElement*)xmlNode->FirstChild("normal");
-		ndAssert(node);
-		xmlGetInt(node, "indices", normalIndexArray);
-		xmlGetFloatArray3(node, "normals", normalArray);
-	
-		format.m_normal.m_data = &normalArray[0].m_x;
-		format.m_normal.m_indexList = &normalIndexArray[0];
-		format.m_normal.m_strideInBytes = sizeof(ndNormal);
-	}
-	
-	ndArray<ndTriplexReal> uvArray;
-	ndArray<ndInt32> uvIndexArray;
-	if (xmlNode->FirstChild("uvs"))
-	{
-		const nd::TiXmlElement* const node = (nd::TiXmlElement*)xmlNode->FirstChild("uvs");
-		ndAssert(node);
-		xmlGetInt(node, "indices", uvIndexArray);
-		xmlGetFloatArray3(node, "uv", uvArray);
-	
-		format.m_uv0.m_data = &uvArray[0].m_x;
-		format.m_uv0.m_indexList = &uvIndexArray[0];
-		format.m_uv0.m_strideInBytes = sizeof(ndTriplexReal);
-	}
-	BuildFromIndexList(&format);
-}
-
 void ndMeshEffect::SerializeToXml(nd::TiXmlElement* const xmlNode, const ndTree<ndString, ndUnsigned32>& boneMap) const
 {
 	ndArray<ndInt32> faceIndexArray;
@@ -5152,7 +5030,7 @@ void ndMeshEffect::SerializeToXml(nd::TiXmlElement* const xmlNode, const ndTree<
 
 				nd::TiXmlElement* const xmlVertexWeight = new nd::TiXmlElement("vert");
 				xmlVertexWeights->LinkEndChild(xmlVertexWeight);
-				xmlSaveAtribute(xmlVertexWeight, "vertID", i);
+				xmlSaveAttribute(xmlVertexWeight, "vertID", i);
 
 				for (ndInt32 j = 0; j < ND_VERTEX_WEIGHT_SIZE; ++j)
 				{
@@ -5160,8 +5038,8 @@ void ndMeshEffect::SerializeToXml(nd::TiXmlElement* const xmlNode, const ndTree<
 					{
 						const ndTree<ndString, ndUnsigned32>::ndNode* const nameNode = boneMap.Find(ndUnsigned32(weight.m_boneId[j]));
 						ndAssert(nameNode);
-						xmlSaveAtribute(xmlVertexWeight, boneNames[j], nameNode->GetInfo().GetStr());
-						xmlSaveAtribute(xmlVertexWeight, weightNames[j], weight.m_weight[j]);
+						xmlSaveAttribute(xmlVertexWeight, boneNames[j], nameNode->GetInfo().GetStr());
+						xmlSaveAttribute(xmlVertexWeight, weightNames[j], weight.m_weight[j]);
 					}
 				}
 			}
@@ -5349,4 +5227,118 @@ void ndMeshEffect::SerializeToXml(nd::TiXmlElement* const xmlNode, const ndTree<
 		xmlSaveParam(node, "faceMaterial", faceMaterialArray);
 		xmlSaveParam(node, "faceIndexCount", faceIndexArray);
 	}
+}
+
+
+void ndMeshEffect::DeserializeFromXml(const nd::TiXmlElement* const xmlNode)
+{
+	// populate material array
+	ndArray<ndMaterial>& materialArray = GetMaterials();
+	for (const nd::TiXmlNode* node = xmlNode->FirstChild("material"); node; node = node->NextSibling("material"))
+	{
+		ndMaterial material;
+		material.m_ambient = xmlGetVector3(node, "ambient");
+		material.m_diffuse = xmlGetVector3(node, "diffuse");
+		material.m_specular = xmlGetVector3(node, "specular");
+		material.m_reflection = xmlGetVector3(node, "reflection");
+		material.m_shiness = xmlGetFloat(node, "shiness");
+		material.m_opacity = xmlGetFloat(node, "opacity");
+		snprintf(material.m_textureName, sizeof(material.m_textureName), xmlGetString(node, "texture"));
+
+		materialArray.PushBack(material);
+	}
+
+	ndMeshEffect::ndMeshVertexFormat format;
+
+	ndArray<ndInt32> faceMaterialArray;
+	ndArray<ndInt32> faceIndexCountArray;
+	if (xmlNode->FirstChild("faces"))
+	{
+		const nd::TiXmlElement* const node = (nd::TiXmlElement*)xmlNode->FirstChild("faces");
+		ndAssert(node);
+		xmlGetInt(node, "faceMaterial", faceMaterialArray);
+		xmlGetInt(node, "faceIndexCount", faceIndexCountArray);
+
+		format.m_faceCount = ndInt32(faceMaterialArray.GetCount());
+		format.m_faceMaterial = &faceMaterialArray[0];
+		format.m_faceIndexCount = &faceIndexCountArray[0];
+	}
+
+	ndArray<ndBigVector> vertices;
+	ndArray<ndVertexWeight> vertexWeights;
+	ndArray<ndInt32> vertexIndexArray;
+	{
+		// get the vertexData
+		const nd::TiXmlElement* const xmlVertexNode = (nd::TiXmlElement*)xmlNode->FirstChild("vertices");
+		ndAssert(xmlVertexNode);
+
+		xmlGetInt(xmlVertexNode, "indices", vertexIndexArray);
+		xmlGetFloat64Array3(xmlVertexNode, "positions", vertices);
+
+		format.m_vertex.m_data = &vertices[0].m_x;
+		format.m_vertex.m_indexList = &vertexIndexArray[0];
+		format.m_vertex.m_strideInBytes = sizeof(ndBigVector);
+
+		// import skin if there is any
+		const nd::TiXmlElement* const xmlVertexWeightsNode = (nd::TiXmlElement*)xmlVertexNode->FirstChild("vertexWeights");
+		if (xmlVertexWeightsNode)
+		{
+			char* const boneNames[] = { "bone0", "bone1", "bone2", "bone3" };
+			char* const weightNames[] = { "weight0", "weight1", "weight2", "weight3" };
+
+			vertexWeights.SetCount(vertices.GetCount());
+			for (const nd::TiXmlNode* node = xmlVertexWeightsNode->FirstChild("vert"); node; node = node->NextSibling("vert"))
+			{
+				const nd::TiXmlElement* const linkNode = (nd::TiXmlElement*)node;
+				ndAssert(strcmp(linkNode->Value(), "vert") == 0);
+
+				ndVertexWeight weight;
+				for (ndInt32 i = 0; i < 4; ++i)
+				{
+					const char* const boneName = xmlGetNameAttribute(linkNode, boneNames[i]);
+					if (boneName)
+					{
+						ndReal w = xmlGetRealAttribute(linkNode, weightNames[i]);
+						ndUnsigned32 hash = ndUnsigned32(ndCRC64(boneName) & 0xffffffff);
+						weight.m_weight[i] = w;
+						weight.m_boneId[i] = hash;
+					}
+				}
+				ndInt32 vertIndex = xmlGetIntAttribute(linkNode, "vertID");
+				vertexWeights[vertIndex] = weight;
+			}
+			format.m_vertexWeight.m_data = &vertexWeights[0];
+			format.m_vertexWeight.m_indexList = &vertexIndexArray[0];
+			format.m_vertexWeight.m_strideInBytes = sizeof(ndMeshEffect::ndVertexWeight);
+		}
+	}
+
+	ndArray<ndTriplexReal> normalArray;
+	ndArray<ndInt32> normalIndexArray;
+	if (xmlNode->FirstChild("normal"))
+	{
+		const nd::TiXmlElement* const node = (nd::TiXmlElement*)xmlNode->FirstChild("normal");
+		ndAssert(node);
+		xmlGetInt(node, "indices", normalIndexArray);
+		xmlGetFloatArray3(node, "normals", normalArray);
+
+		format.m_normal.m_data = &normalArray[0].m_x;
+		format.m_normal.m_indexList = &normalIndexArray[0];
+		format.m_normal.m_strideInBytes = sizeof(ndNormal);
+	}
+
+	ndArray<ndTriplexReal> uvArray;
+	ndArray<ndInt32> uvIndexArray;
+	if (xmlNode->FirstChild("uvs"))
+	{
+		const nd::TiXmlElement* const node = (nd::TiXmlElement*)xmlNode->FirstChild("uvs");
+		ndAssert(node);
+		xmlGetInt(node, "indices", uvIndexArray);
+		xmlGetFloatArray3(node, "uv", uvArray);
+
+		format.m_uv0.m_data = &uvArray[0].m_x;
+		format.m_uv0.m_indexList = &uvIndexArray[0];
+		format.m_uv0.m_strideInBytes = sizeof(ndTriplexReal);
+	}
+	BuildFromIndexList(&format);
 }

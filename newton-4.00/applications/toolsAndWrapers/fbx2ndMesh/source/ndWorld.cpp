@@ -29,12 +29,8 @@
 #include "ndSkeletonList.h"
 #include "ndDynamicsUpdate.h"
 #include "ndDynamicsUpdateSoa.h"
+#include "ndDynamicsUpdateAvx2.h"
 #include "ndJointBilateralConstraint.h"
-
-#ifdef _D_USE_AVX2_SOLVER
-	#include "ndWorldSceneAvx2.h"
-	#include "ndDynamicsUpdateAvx2.h"
-#endif
 
 #ifdef _D_NEWTON_CUDA
 	#include "ndCudaUtils.h"
@@ -830,21 +826,12 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 
 			case ndSimdAvx2Solver:
 			{
-				#ifdef _D_USE_AVX2_SOLVER
-					ndWorldScene* const newScene = new ndWorldSceneAvx2(*((ndWorldScene*)m_scene));
-					delete m_scene;
-					m_scene = newScene;
+				ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
+				delete m_scene;
+				m_scene = newScene;
 
-					m_solverMode = solverMode;
-					m_solver = new ndDynamicsUpdateAvx2(this);
-				#else
-					ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
-					delete m_scene;
-					m_scene = newScene;
-
-					m_solverMode = ndSimdSoaSolver;
-					m_solver = new ndDynamicsUpdateSoa(this);
-				#endif
+				m_solverMode = solverMode;
+				m_solver = new ndDynamicsUpdateAvx2(this);
 				break;
 			}
 

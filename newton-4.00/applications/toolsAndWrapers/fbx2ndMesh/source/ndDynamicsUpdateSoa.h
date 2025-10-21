@@ -25,46 +25,8 @@
 #include "ndNewtonStdafx.h"
 #include "ndDynamicsUpdate.h"
 
-namespace ndSoa
-{
-	class ndSoaVector3
-	{
-		public:
-		ndVector m_x;
-		ndVector m_y;
-		ndVector m_z;
-	};
-
-	class ndSoaVector6
-	{
-		public:
-		ndSoaVector3 m_linear;
-		ndSoaVector3 m_angular;
-	};
-
-	class ndSoaJacobianPair
-	{
-		public:
-		ndSoaVector6 m_jacobianM0;
-		ndSoaVector6 m_jacobianM1;
-	};
-
-	class ndSoaMatrixElement
-	{
-		public:
-		ndSoaJacobianPair m_Jt;
-		ndSoaJacobianPair m_JMinv;
-
-		ndVector m_force;
-		ndVector m_diagDamp;
-		ndVector m_JinvMJt;
-		ndVector m_invJinvMJt;
-		ndVector m_coordenateAccel;
-		ndVector m_normalForceIndex;
-		ndVector m_lowerBoundFrictionCoefficent;
-		ndVector m_upperBoundFrictionCoefficent;
-	};
-}
+class ndSoaMatrixArray;
+class ndSoaJointMaskArray;
 
 D_MSV_NEWTON_CLASS_ALIGN_32
 class ndDynamicsUpdateSoa: public ndDynamicsUpdate
@@ -100,9 +62,10 @@ class ndDynamicsUpdateSoa: public ndDynamicsUpdate
 
 	ndVector m_ordinals;
 	ndArray<ndInt8> m_groupType;
-	ndArray<ndVector> m_jointMask;
 	ndArray<ndInt32> m_soaJointRows;
-	ndArray<ndSoa::ndSoaMatrixElement> m_soaMassMatrix;
+
+	ndSoaJointMaskArray* m_jointMask;
+	ndSoaMatrixArray* m_soaMassMatrixArray;
 
 } D_GCC_NEWTON_CLASS_ALIGN_32;
 

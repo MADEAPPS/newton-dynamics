@@ -58,17 +58,38 @@ nd::TiXmlElement* xmlCreateClassNode(nd::TiXmlElement* const parent, const char*
 	return node;
 }
 
-void xmlSaveAtribute(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 value)
+ndInt32 xmlGetIntAttribute(const nd::TiXmlElement* const rootNode, const char* const name)
+{
+	ndInt32 i;
+	rootNode->Attribute(name, &i);
+	return i;
+}
+
+ndReal xmlGetRealAttribute(const nd::TiXmlElement* const rootNode, const char* const name)
+{
+	ndFloat64 i;
+	rootNode->Attribute(name, &i);
+	return ndReal (i);
+}
+
+const char* xmlGetNameAttribute(const nd::TiXmlElement* const rootNode, const char* const name)
+{
+	return rootNode->Attribute(name);
+}
+
+void xmlSaveAttribute(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 value)
 {
 	rootNode->SetAttribute(name, value);
 }
 
-void xmlSaveAtribute(nd::TiXmlElement* const rootNode, const char* const name, ndReal value)
+void xmlSaveAttribute(nd::TiXmlElement* const rootNode, const char* const name, ndReal value)
 {
 	rootNode->SetDoubleAttribute(name, value);
 }
 
-void xmlSaveAtribute(nd::TiXmlElement* const rootNode, const char* const name, const char* const value)
+
+
+void xmlSaveAttribute(nd::TiXmlElement* const rootNode, const char* const name, const char* const value)
 {
 	rootNode->SetAttribute(name, value);
 }
@@ -350,6 +371,30 @@ void xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name, nd
 	}
 }
 
+void xmlGetRealArray(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndReal>& array)
+{
+	const nd::TiXmlElement* const element = (nd::TiXmlElement*)rootNode->FirstChild(name);
+	ndAssert(element);
+	ndInt32 count;
+	element->Attribute("count", &count);
+
+	const char* const data = element->Attribute("float3Array");
+	ndAssert(data);
+
+	size_t start = 0;
+	char x[128];
+	x[127] = 0;
+	for (ndInt32 i = 0; i < count; ++i)
+	{
+		ndInt32 ret = sscanf(&data[start], "%[^ ]", x);
+		start += strlen(x) + 1;
+
+		ndFloat64 fx;
+		ret = sscanf(x, "%lf", &fx);
+		array.PushBack(ndReal(fx));
+	}
+}
+
 void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndTriplexReal>& array)
 {
 	const nd::TiXmlElement* const element = (nd::TiXmlElement*)rootNode->FirstChild(name);
@@ -382,9 +427,9 @@ void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const na
 		ret = sscanf(y, "%lf", &fy);
 		ret = sscanf(z, "%lf", &fz);
 		
-		tuple.m_x = ndFloat32(fx);
-		tuple.m_y = ndFloat32(fy);
-		tuple.m_z = ndFloat32(fz);
+		tuple.m_x = ndReal(fx);
+		tuple.m_y = ndReal(fy);
+		tuple.m_z = ndReal(fz);
 		array.PushBack(tuple);
 	}
 }

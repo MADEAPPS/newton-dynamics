@@ -539,7 +539,6 @@ class ndBigVector
 //
 // *****************************************************************************************
 #ifdef D_NEWTON_USE_DOUBLE
-	//typedef ndBigVector ndVector;
 	#define ndVector ndBigVector
 #else
 
