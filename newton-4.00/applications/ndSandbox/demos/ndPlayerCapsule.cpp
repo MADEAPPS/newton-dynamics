@@ -365,7 +365,7 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 	ndRender* const renderer = *scene->GetRenderer();
 	renderer->SetCamera(playerController->GetCamera());
 
-#if 0
+#if 1
 	{
 		// populate the world with props and other players
 		AddSomeProps(scene);
@@ -385,7 +385,7 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 		location.m_posit.m_x = 30.0f;
 		location.m_posit.m_z = 10.0f;
 		//loader.ImportFbx(ndGetWorkingFileName("testDummy.fbx"));
-		loader.LoadMesh(ndGetWorkingFileName("testDummy.fbx"));
+		loader.LoadMesh(ndGetWorkingFileName("testDummy.nd"));
 		ndPlayerCapsuleController::CreatePlayer(scene, loader, location);
 
 		location.m_posit.m_x = 30.0f;
