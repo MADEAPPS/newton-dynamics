@@ -154,8 +154,20 @@ def ParseUvs(meshObj, xmlUVs, layers, faces):
 def ParseMaterials(meshObj, xmlMaterials, layers, faces):
     for xmlMaterial in xmlMaterials.findall('material'): 
         materialName = xmlMaterial.find('name').get('string')
-        textureName = xmlMaterial.find('texture').get('string')
-        print(materialName, textureName)
+        material = bpy.data.materials.new(name=materialName)
+        
+        material.use_nodes = True
+        nodes = material.node_tree.nodes
+        # I do not really understand how to map the Blinn Paramaters to a blender matrial
+        principled_bsdf = nodes.get("Principled BSDF")
+        principled_bsdf.inputs["Base Color"].default_value = (0.0, 0.8, 0.2, 1.0)
+        principled_bsdf.inputs["Metallic"].default_value = 0.1
+        principled_bsdf.inputs["Roughness"].default_value = 0.7
+        
+        meshObj.materials.append(material)
+        
+        #textureName = xmlMaterial.find('texture').get('string')
+        #print(materialName, textureName)
 
 def ParseGeomentry(nodeData, xmlNode):
     
