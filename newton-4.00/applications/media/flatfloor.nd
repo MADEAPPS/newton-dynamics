@@ -19,6 +19,7 @@
             <indices count="6" intArray="1 0 2 2 3 1" />
         </uvs>
         <material>
+            <name string="02 - Default" />
             <ambient float3="1 1 1" />
             <diffuse float3="1 1 1" />
             <specular float3="0.219608 0.219608 0.219608" />

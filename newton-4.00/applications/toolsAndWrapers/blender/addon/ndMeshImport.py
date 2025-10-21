@@ -124,20 +124,54 @@ def ParseNormals(meshObj, xmlNormals, layers, faces):
     # asign the face vertex normals        
     meshObj.normals_split_custom_set(custom_normals)
 
+def ParseUvs(meshObj, xmlUVs, layers, faces):
+    indices = [int(x) for x in xmlUVs.find('indices').get('intArray').split()]
+    posit = [float(x) for x in xmlUVs.find('uv').get('float3Array').split()]
+    print (len(indices), len(posit), len(meshObj.loops))
+
+    indexCount = 0
+    custom_uv = []
+    for i in range(0, len(faces), 1):
+        count = faces[i]
+        if (layers[i] == 0):
+            for j in range(0, count, 1):
+                index0 = indices[indexCount + j] 
+                index = int(index0)
+                k = int(index * 3)
+                x = posit[k + 0]
+                y = posit[k + 1]
+                z = posit[k + 2]
+                uv = mathutils.Vector((x, y, z))
+                custom_uv.append(uv)
+        indexCount = indexCount + count;        
+        
+    meshObj.uv_layers.new(name="UVMap")
+    uv_layer = meshObj.uv_layers.active
+    
+    for index, loop in enumerate(meshObj.loops):
+        uv_layer.data[index].uv = (custom_uv[index].x, custom_uv[index].y)
+        
+def ParseMaterials(meshObj, xmlMaterials, layers, faces):
+    for xmlMaterial in xmlMaterials.findall('material'): 
+        materialName = xmlMaterial.find('name').get('string')
+        textureName = xmlMaterial.find('texture').get('string')
+        print(materialName, textureName)
+
 def ParseGeomentry(nodeData, xmlNode):
     
     layersCount, layers, faces = ParseFaces(xmlNode.find('faces'))
             
     #create a mesh and add the facse and vertices
     mesh = bmesh.new()
-    #ParseVertices(mesh, xmlNode.find('vertices'), xmlNode.find('faces'))
     ParseVertices(mesh, xmlNode.find('vertices'), layersCount, layers, faces)
     mesh.to_mesh(nodeData)
     nodeData.update()
     mesh.free()
     
-    # add the atibutes, normal, uv, weight, ets.
+    # add the attributes: material, normal, uv, weight, ets.
+    ParseMaterials(nodeData, xmlNode, layers, faces)
     ParseNormals(nodeData, xmlNode.find('normal'), layers, faces)
+    ParseUvs(nodeData, xmlNode.find('uvs'), layers, faces)
         
 def ParseNode(context, xmlNode, blenderParentNode):
     #create a geometry and a mesh node and link it to the scene and parent

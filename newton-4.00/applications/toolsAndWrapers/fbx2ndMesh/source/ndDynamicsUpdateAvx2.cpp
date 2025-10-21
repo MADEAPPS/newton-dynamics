@@ -1681,14 +1681,6 @@
 			:m_low(&baseAddr->m_low, index.m_low)
 			,m_high(&baseAddr->m_low, index.m_high)
 		{
-			//#ifdef _DEBUG
-			//const ndFloat32* const base = (ndFloat32*)baseAddr;
-			//for (ndInt32 i = 0; i < D_AVX_WORK_GROUP; ++i)
-			//{
-			//	ndFloat32 val = base[index.m_int[i]];
-			//	ndAssert(val == m_float[i]);
-			//}
-			//#endif
 		}
 
 		inline ndFloat32& operator[] (ndInt32 i)

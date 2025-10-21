@@ -48,7 +48,6 @@ class ndMesh : public ndClassAlloc
 		ndReal m_lenght;
 	};
 
-	
 	ndMesh();
 	ndMesh(const ndMesh& src);
 	ndMesh(const ndShapeInstance& src);

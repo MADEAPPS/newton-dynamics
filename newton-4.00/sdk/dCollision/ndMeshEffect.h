@@ -415,6 +415,7 @@ class ndMeshEffect: public ndPolyhedra
 			,m_opacity(ndFloat32(1.0f))
 			,m_shiness(ndFloat32 (250.0f))
 		{
+			m_name[0] = 0;
 			strcpy_s(m_textureName, sizeof(m_textureName), "default.png");
 		}
 
@@ -424,6 +425,7 @@ class ndMeshEffect: public ndPolyhedra
 		ndVector m_reflection;
 		ndFloat32 m_opacity;
 		ndFloat32 m_shiness;
+		char m_name[32];
 		char m_textureName[32];
 	};
 

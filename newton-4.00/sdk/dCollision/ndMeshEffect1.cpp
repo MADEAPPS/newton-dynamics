@@ -5157,6 +5157,7 @@ void ndMeshEffect::SerializeToXml(nd::TiXmlElement* const xmlNode, const ndTree<
 		xmlNode->LinkEndChild(materialNode);
 
 		const ndMeshEffect::ndMaterial& material = materials[i];
+		xmlSaveParam(materialNode, "name", material.m_name);
 		xmlSaveParam(materialNode, "ambient", material.m_ambient);
 		xmlSaveParam(materialNode, "diffuse", material.m_diffuse);
 		xmlSaveParam(materialNode, "specular", material.m_specular);
@@ -5229,7 +5230,6 @@ void ndMeshEffect::SerializeToXml(nd::TiXmlElement* const xmlNode, const ndTree<
 	}
 }
 
-
 void ndMeshEffect::DeserializeFromXml(const nd::TiXmlElement* const xmlNode)
 {
 	// populate material array
@@ -5243,6 +5243,7 @@ void ndMeshEffect::DeserializeFromXml(const nd::TiXmlElement* const xmlNode)
 		material.m_reflection = xmlGetVector3(node, "reflection");
 		material.m_shiness = xmlGetFloat(node, "shiness");
 		material.m_opacity = xmlGetFloat(node, "opacity");
+		snprintf(material.m_name, sizeof(material.m_name), xmlGetString(node, "name"));
 		snprintf(material.m_textureName, sizeof(material.m_textureName), xmlGetString(node, "texture"));
 
 		materialArray.PushBack(material);
@@ -5301,7 +5302,7 @@ void ndMeshEffect::DeserializeFromXml(const nd::TiXmlElement* const xmlNode)
 						ndReal w = xmlGetRealAttribute(linkNode, weightNames[i]);
 						ndUnsigned32 hash = ndUnsigned32(ndCRC64(boneName) & 0xffffffff);
 						weight.m_weight[i] = w;
-						weight.m_boneId[i] = hash;
+						weight.m_boneId[i] = ndInt32 (hash);
 					}
 				}
 				ndInt32 vertIndex = xmlGetIntAttribute(linkNode, "vertID");

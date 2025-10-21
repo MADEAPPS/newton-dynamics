@@ -217,6 +217,7 @@ void ndFbxMeshLoader::ImportMaterials(const ofbx::Mesh* const fbxMesh, ndMeshEff
 		material.m_specular = ndVector(ndFloat32 (1.0f));
 		material.m_reflection = ndVector(ndFloat32(1.0f));
 
+		strcpy(material.m_name, "defualt");
 		materialArray.PushBack(material);
 	}
 	else
@@ -246,6 +247,7 @@ void ndFbxMeshLoader::ImportMaterials(const ofbx::Mesh* const fbxMesh, ndMeshEff
 			if (texture)
 			{
 				char textName[1024];
+				textName[1023] = 0;
 				ofbx::DataView dataView = texture->getRelativeFileName();
 				dataView.toString(textName);
 				char* namePtr = strrchr(textName, '\\');
@@ -267,6 +269,7 @@ void ndFbxMeshLoader::ImportMaterials(const ofbx::Mesh* const fbxMesh, ndMeshEff
 			{
 				strcpy(material.m_textureName, "default.png");
 			}
+			strcpy(material.m_name, fbxMaterial->name);
 			materialArray.PushBack(material);
 		}
 	}

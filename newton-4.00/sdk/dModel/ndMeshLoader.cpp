@@ -122,7 +122,7 @@ bool ndMeshLoader::ImportFbx(const ndString& fbxPathMeshName)
 {
 	ndFbxMeshLoader loader;
 	m_mesh = ndSharedPtr<ndMesh>(loader.LoadMesh(fbxPathMeshName.GetStr(), false));
-#if 1
+#if 0
 	//ndAssert(0);
 	ndTrace(("exporting mesh %s\n", fbxPathMeshName.GetStr()));
 	ndString tmpName(fbxPathMeshName);

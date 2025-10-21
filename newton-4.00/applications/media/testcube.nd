@@ -19,25 +19,27 @@
             <indices count="36" intArray="0 2 3 0 3 1 1 0 2 1 2 3 1 0 2 1 2 3 1 0 2 1 2 3 1 0 2 1 2 3 1 0 2 1 2 3" />
         </uvs>
         <material>
-            <ambient float3="0 0.588235 0.0705882" />
-            <diffuse float3="0 0.588235 0.0705882" />
+            <name string="01 - Default" />
+            <ambient float3="0.588235 0.588235 0.588235" />
+            <diffuse float3="0.588235 0.588235 0.588235" />
             <specular float3="0.9 0.9 0.9" />
             <reflection float3="1 1 1" />
             <opacity float="1" />
             <shiness float="2" />
-            <texture string="default.png" />
+            <texture string="wood_0.png" />
         </material>
         <material>
-            <ambient float3="0.121569 0.0588235 0.984314" />
-            <diffuse float3="0.121569 0.0588235 0.984314" />
+            <name string="02 - Default" />
+            <ambient float3="0.588235 0.588235 0.588235" />
+            <diffuse float3="0.588235 0.588235 0.588235" />
             <specular float3="0.9 0.9 0.9" />
             <reflection float3="1 1 1" />
             <opacity float="1" />
             <shiness float="2" />
-            <texture string="default.png" />
+            <texture string="wood_1.png" />
         </material>
         <faces>
-            <faceMaterial count="12" intArray="0 0 1 1 0 0 1 1 0 0 0 0" />
+            <faceMaterial count="12" intArray="0 0 0 0 1 1 0 0 1 1 0 0" />
             <faceIndexCount count="12" intArray="3 3 3 3 3 3 3 3 3 3 3 3" />
         </faces>
     </geometry>
