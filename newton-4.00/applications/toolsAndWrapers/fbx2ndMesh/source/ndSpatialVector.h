@@ -27,10 +27,10 @@
 #include "ndVector.h"
 
 D_MSV_NEWTON_CLASS_ALIGN_32
-class ndSpatialVector
+class ndSpatialVector : public ndClassAlloc
 {
 	public:
-	D_OPERATOR_NEW_AND_DELETE
+	//D_OPERATOR_NEW_AND_DELETE
 
 	inline ndSpatialVector()
 	{

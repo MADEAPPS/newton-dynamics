@@ -32,12 +32,12 @@ class ndVector;
 // *****************************************************************************************
 #ifdef D_NEWTON_USE_AVX2_OPTION
 D_MSV_NEWTON_CLASS_ALIGN_32
-class ndBigVector
+class ndBigVector: public ndClassAlloc
 {
 	#define PERMUT_MASK_DOUBLE(y, x) _MM_SHUFFLE2 (y, x)
 
 	public:
-	D_OPERATOR_NEW_AND_DELETE
+	//D_OPERATOR_NEW_AND_DELETE
 
 	inline ndBigVector()
 	{
@@ -550,12 +550,12 @@ class ndBigVector
 #else
 
 D_MSV_NEWTON_CLASS_ALIGN_32
-class ndBigVector
+class ndBigVector : public ndClassAlloc
 {
 	#define PERMUT_MASK_DOUBLE(y, x) _MM_SHUFFLE2 (y, x)
 
 	public:
-	D_OPERATOR_NEW_AND_DELETE
+	//D_OPERATOR_NEW_AND_DELETE
 
 	inline ndBigVector()
 	{
@@ -1099,11 +1099,11 @@ class ndBigVector
 //
 // *****************************************************************************************
 D_MSV_NEWTON_CLASS_ALIGN_16
-class ndVector
+class ndVector : public ndClassAlloc
 {
 	#define PERMUTE_MASK(w, z, y, x) _MM_SHUFFLE (w, z, y, x)
 	public:
-	D_OPERATOR_NEW_AND_DELETE
+	//D_OPERATOR_NEW_AND_DELETE
 
 	inline ndVector()
 	{

@@ -32,10 +32,10 @@ class ndVector;
 //
 // *****************************************************************************************
 D_MSV_NEWTON_CLASS_ALIGN_32
-class ndBigVector
+class ndBigVector : public ndClassAlloc
 {
 	public:
-	D_OPERATOR_NEW_AND_DELETE
+	//D_OPERATOR_NEW_AND_DELETE
 
 	inline ndBigVector()
 	{
@@ -548,10 +548,10 @@ class ndBigVector
 //
 // *****************************************************************************************
 D_MSV_NEWTON_CLASS_ALIGN_16
-class ndVector
+class ndVector : public ndClassAlloc
 {
 	public:
-	D_OPERATOR_NEW_AND_DELETE
+	//D_OPERATOR_NEW_AND_DELETE
 
 	inline ndVector()
 	{

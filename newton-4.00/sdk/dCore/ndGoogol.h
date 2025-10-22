@@ -34,10 +34,10 @@
 //#define ND_GOOGOL_SIZE	16
 #define ND_GOOGOL_SIZE		4
 
-class ndGoogol
+class ndGoogol: public ndClassAlloc
 {
 	public:
-	D_OPERATOR_NEW_AND_DELETE
+	//D_OPERATOR_NEW_AND_DELETE
 
 	ndGoogol(void);
 	ndGoogol(ndFloat64 value);

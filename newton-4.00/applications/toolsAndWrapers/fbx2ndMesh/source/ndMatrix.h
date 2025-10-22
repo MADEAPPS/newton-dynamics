@@ -41,10 +41,10 @@ D_CORE_API ndMatrix ndCovarianceMatrix(const ndVector& p, const ndVector& q);
 D_CORE_API ndMatrix ndCalculateMatrix(const ndQuaternion& rotation, const ndVector& position = ndVector::m_wOne);
 
 D_MSV_NEWTON_CLASS_ALIGN_32
-class ndMatrix
+class ndMatrix : public ndClassAlloc
 {
 	public:
-	D_OPERATOR_NEW_AND_DELETE
+	//D_OPERATOR_NEW_AND_DELETE
 
 	ndMatrix ();
 	ndMatrix (const ndFloat32* const array);

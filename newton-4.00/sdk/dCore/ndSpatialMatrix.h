@@ -27,10 +27,10 @@
 #include "ndVector.h"
 #include "ndSpatialVector.h"
 
-class ndSpatialMatrix
+class ndSpatialMatrix : public ndClassAlloc
 {
 	public:
-	D_OPERATOR_NEW_AND_DELETE
+	//D_OPERATOR_NEW_AND_DELETE
 
 	inline ndSpatialMatrix()
 	{

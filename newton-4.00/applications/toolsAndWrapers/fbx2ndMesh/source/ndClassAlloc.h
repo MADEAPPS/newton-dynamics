@@ -34,7 +34,25 @@ class ndClassAlloc
 	{
 	}
 
-	D_OPERATOR_NEW_AND_DELETE
+	void *operator new (size_t size)	
+	{									
+		return ndMemory::Malloc(size);	
+	}									
+										
+	void *operator new[](size_t size) 	
+	{									
+		return ndMemory::Malloc(size);	
+	}									
+										
+	void operator delete (void* ptr)	
+	{									
+		ndMemory::Free(ptr);			
+	}									
+										
+	void operator delete[](void* ptr)	
+	{									
+		ndMemory::Free(ptr);			
+	}
 
 	/// Generic allocation for any function subclass from ndClassAlloc
 	D_CORE_API static void* Malloc(size_t size);
