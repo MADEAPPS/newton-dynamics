@@ -22,6 +22,33 @@
 #include "ndCoreStdafx.h"
 #include "ndTinyXmlGlue.h"
 
+class ndParseXmlData
+{
+	public:
+	ndParseXmlData(const char* const data)
+		:m_data(data)
+		,m_start(0)
+		,m_end(0)
+	{
+	}
+
+	void GetData(char* const output)
+	{
+		m_end = m_start;
+		for (; m_data[m_end] && (m_data[m_end] != ' '); ++m_end);
+		ndInt32 bytes = m_end - m_start;
+		strncpy(output, &m_data[m_start], size_t(bytes));
+		output[bytes] = 0;
+		m_start += bytes;
+		while (m_data[m_start] == ' ')
+			m_start++;
+	}
+
+	const char* m_data;
+	ndInt32 m_start;
+	ndInt32 m_end;
+};
+
 static char* FloatToString(char* const buffer, ndInt32 size, ndFloat32 value)
 {
 	snprintf(buffer, size_t(size), "%g", value);
@@ -333,17 +360,14 @@ void xmlGetInt(const nd::TiXmlNode* const rootNode, const char* const name, ndAr
 	ndAssert(data);
 
 	char x[128];
-	x[127] = 0;
-	size_t start = 0;
 	ndVector point(ndVector::m_zero);
+
+	ndParseXmlData parseData(data);
 	for (ndInt32 i = 0; i < count; ++i)
 	{
-		ndInt32 ret = sscanf(&data[start], "%[^ ]", x);
-		start += strlen(x) + 1;
-
-		long long int fx;
-		ret = sscanf(x, "%lld", &fx);
-		array.PushBack(ndInt32(fx));
+		parseData.GetData(x);
+		ndInt32 fx = atoi(x);
+		array.PushBack(fx);
 	}
 }
 
@@ -357,16 +381,12 @@ void xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name, nd
 	ndAssert(data);
 
 	char x[128];
-	x[127] = 0;
-	size_t start = 0;
+	ndParseXmlData parseData(data);
 	ndVector point(ndVector::m_zero);
 	for (ndInt32 i = 0; i < count; ++i)
 	{
-		ndInt32 ret = sscanf(&data[start], "%[^ ]", x);
-		start += strlen(x) + 1;
-
-		long long int fx;
-		ret = sscanf(x, "%lld", &fx);
+		parseData.GetData(x);
+		long long int fx = atoll(x);
 		array.PushBack(ndInt64 (fx));
 	}
 }
@@ -381,14 +401,12 @@ void xmlGetRealArray(const nd::TiXmlNode* const rootNode, const char* const name
 	const char* const data = element->Attribute("float3Array");
 	ndAssert(data);
 
-	size_t start = 0;
 	char x[128];
-	x[127] = 0;
+	ndInt32 ret = 0;
+	ndParseXmlData parseData(data);
 	for (ndInt32 i = 0; i < count; ++i)
 	{
-		ndInt32 ret = sscanf(&data[start], "%[^ ]", x);
-		start += strlen(x) + 1;
-
+		parseData.GetData(x);
 		ndFloat64 fx;
 		ret = sscanf(x, "%lf", &fx);
 		array.PushBack(ndReal(fx));
@@ -405,18 +423,17 @@ void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const na
 	const char* const data = element->Attribute("float3Array");
 	ndAssert(data);
 
-	size_t start = 0;
 	char x[128];
 	char y[128];
 	char z[128];
 
-	x[127] = 0;
-	y[127] = 0;
-	z[127] = 0;
+	ndInt32 ret = 0;
+	ndParseXmlData parseData(data);
 	for (ndInt32 i = 0; i < count; ++i)
 	{
-		ndInt32 ret = sscanf(&data[start], "%[^ ] %[^ ] %[^ ]", x, y, z);
-		start += strlen(x) + strlen(y) + strlen(z) + 3;
+		parseData.GetData(x);
+		parseData.GetData(y);
+		parseData.GetData(z);
 
 		ndFloat64 fx;
 		ndFloat64 fy;
@@ -444,23 +461,21 @@ void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const na
 	const char* const data = element->Attribute("float3Array");
 	ndAssert(data);
 
-	size_t start = 0;
+	char x[128];
+	char y[128];
+	char z[128];
+
+	ndInt32 ret = 0;
+	ndParseXmlData parseData(data);
 	for (ndInt32 i = 0; i < count; ++i)
 	{
-		char x[128];
-		char y[128];
-		char z[128];
-
-		x[127] = 0;
-		y[127] = 0;
-		z[127] = 0;
-
-		ndInt32 ret = sscanf(&data[start], "%[^ ] %[^ ] %[^ ]", x, y, z);
-		start += strlen(x) + strlen(y) + strlen(z) + 3;
-
 		ndFloat64 fx;
 		ndFloat64 fy;
 		ndFloat64 fz;
+
+		parseData.GetData(x);
+		parseData.GetData(y);
+		parseData.GetData(z);
 
 		ret = sscanf(x, "%lf", &fx);
 		ret = sscanf(y, "%lf", &fy);
@@ -479,19 +494,17 @@ void xmlGetFloat64Array3(const nd::TiXmlNode* const rootNode, const char* const 
 	const char* const data = element->Attribute("float3Array");
 	ndAssert(data);
 
-	size_t start = 0;
+	char x[128];
+	char y[128];
+	char z[128];
+
+	ndInt32 ret = 0;
+	ndParseXmlData parseData(data);
 	for (ndInt32 i = 0; i < count; ++i)
 	{
-		char x[128];
-		char y[128];
-		char z[128];
-
-		x[127] = 0;
-		y[127] = 0;
-		z[127] = 0;
-
-		ndInt32 ret = sscanf(&data[start], "%[^ ] %[^ ] %[^ ]", x, y, z);
-		start += strlen(x) + strlen(y) + strlen(z) + 3;
+		parseData.GetData(x);
+		parseData.GetData(y);
+		parseData.GetData(z);
 
 		ndFloat64 fx;
 		ndFloat64 fy;
