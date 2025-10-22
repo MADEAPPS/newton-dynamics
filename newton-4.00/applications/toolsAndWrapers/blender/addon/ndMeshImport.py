@@ -58,10 +58,11 @@ def CalculateTransform(xmlMatrix):
     return mathutils.Matrix.LocRotScale(location, quaternion, scale)
 
 def ParseFaces(xmlFaces):
-    xmlLayers = xmlFaces.find('faceLayers')
     faces = [int(x) for x in xmlFaces.find('faceIndexCount').get('intArray').split()]
-
+    faceMaterials = [int(x) for x in xmlFaces.find('faceMaterial').get('intArray').split()]
+    
     layersCount = 1
+    xmlLayers = xmlFaces.find('faceLayers')
     if (xmlLayers != None):
         layers = [int(x) for x in xmlLayers.get('intArray').split()]
         for x in range(0, len(layers), 1):
@@ -70,7 +71,7 @@ def ParseFaces(xmlFaces):
         layers = []
         for i in range(0, len(faces), 1):
             layers.append(int(0))
-    return layersCount, layers, faces
+    return layersCount, layers, faces, faceMaterials
 
 def ParseVertices(meshObj, xmlVertices, layersCount, layers, faces):
     indices = [int(x) for x in xmlVertices.find('indices').get('intArray').split()]
@@ -151,11 +152,10 @@ def ParseUvs(meshObj, xmlUVs, layers, faces):
     meshObj.uv_layers.new(name="UVMap")
     uv_layer = meshObj.uv_layers.active
     
-    for index, loop in enumerate(meshObj.loops):
-        uv_layer.data[index].uv = (custom_uv[index].x, custom_uv[index].y)
+    for face, loop in enumerate(meshObj.loops):
+        uv_layer.data[face].uv = (custom_uv[face].x, custom_uv[face].y)
         
-def ParseMaterials(meshObj, path, xmlMaterials, layers, faces):
-   
+def ParseMaterials(meshObj, path, xmlMaterials, layers, faceMaterials):
     for xmlMaterial in xmlMaterials.findall('material'): 
         materialName = xmlMaterial.find('name').get('string')
         material = bpy.data.materials.new(name=materialName)
@@ -177,13 +177,16 @@ def ParseMaterials(meshObj, path, xmlMaterials, layers, faces):
         texture_node.image = image
         #material.node_tree.links.new(texture_node.outputs['Color'], principled_bsdf.inputs['Base Color'])
         material.node_tree.links.new(texture_node.outputs['Color'], materialOutput.inputs['Surface'])
-        
+       
         meshObj.materials.append(material)
 
+    # assign this material to the faces.
+    for faceIndex in range(0, len(faceMaterials), 1):
+        meshObj.polygons[faceIndex].material_index = faceMaterials[faceIndex]
 
 def ParseGeomentry(nodeData, path, xmlNode):
     
-    layersCount, layers, faces = ParseFaces(xmlNode.find('faces'))
+    layersCount, layers, faces, faceMaterials = ParseFaces(xmlNode.find('faces'))
             
     #create a mesh and add the facse and vertices
     mesh = bmesh.new()
@@ -193,7 +196,7 @@ def ParseGeomentry(nodeData, path, xmlNode):
     mesh.free()
     
     # add the attributes: material, normal, uv, weight, ets.
-    ParseMaterials(nodeData, path, xmlNode, layers, faces)
+    ParseMaterials(nodeData, path, xmlNode, layers, faceMaterials)
     ParseNormals(nodeData, xmlNode.find('normal'), layers, faces)
     ParseUvs(nodeData, xmlNode.find('uvs'), layers, faces)
         
@@ -214,7 +217,7 @@ def ParseNode(context, path, xmlNode, blenderParentNode):
         ParseGeomentry(data, path, xmlGeometry)
     
     # add all the children nodes
-    for book in xmlNode.findall('ndMesh'):
-        ParseNode(context, book, node)
+    for child in xmlNode.findall('ndMesh'):
+        ParseNode(context, path, child, node)
         
     return node
