@@ -35,12 +35,14 @@ class ndClassAlloc
 	}
 
 	void *operator new (size_t size)	
-	{									
+	{								
+		// these function returns aligned memory
 		return ndMemory::Malloc(size);	
 	}									
 										
 	void *operator new[](size_t size) 	
 	{									
+		// these function returns aligned memory
 		return ndMemory::Malloc(size);	
 	}									
 										
@@ -52,6 +54,27 @@ class ndClassAlloc
 	void operator delete[](void* ptr)	
 	{									
 		ndMemory::Free(ptr);			
+	}
+
+	/// <summary> the placemnet operators new and delete are only use by 
+	/// language like rush that use manage memory
+	/// <param name=""></param>
+	/// <param name="ptr"></param>
+	/// <returns></returns>
+	void* operator new(std::size_t, void* ptr)
+	{
+		return ptr;
+	}
+
+	/// <summary> the placemnet operators new and delete are only use by 
+	/// language like rush that use manage memory
+	/// <param name=""></param>
+	/// <param name="ptr"></param>
+	/// <returns></returns>
+	void operator delete (void*, void*)
+	{
+		// this call should never happens, but is needed for the compiler warnings
+		ndAssert(0);
 	}
 
 	/// Generic allocation for any function subclass from ndClassAlloc
