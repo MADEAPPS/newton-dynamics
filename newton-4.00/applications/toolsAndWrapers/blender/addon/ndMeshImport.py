@@ -155,33 +155,29 @@ def ParseUvs(meshObj, xmlUVs, layers, faces):
         uv_layer.data[index].uv = (custom_uv[index].x, custom_uv[index].y)
         
 def ParseMaterials(meshObj, path, xmlMaterials, layers, faces):
-    
-    #xxx = int(0)
-    
+   
     for xmlMaterial in xmlMaterials.findall('material'): 
         materialName = xmlMaterial.find('name').get('string')
         material = bpy.data.materials.new(name=materialName)
         
-        textureName = xmlMaterial.find('texture').get('string')
         material.use_nodes = True
         nodes = material.node_tree.nodes
         
-        # I do not really understand how to map the Blinn Paramaters to a blender matrial
-        principled_bsdf = nodes.get("Principled BSDF")
-        #principled_bsdf.inputs["Base Color"].default_value = (0.0, 0.0, 0.0, 1.0)
-        #principled_bsdf.inputs["Base Color"].default_value[xxx] = 1.0
-        #xxx = xxx + int(1)
-        principled_bsdf.inputs["Metallic"].default_value = 0.1
-        principled_bsdf.inputs["Roughness"].default_value = 0.7
+        # I do not really understand how to map the Blinn Paramaters to a blender Principled BSDF material
+        #principled_bsdf = nodes.get("Principled BSDF")
+        #principled_bsdf.inputs["Metallic"].default_value = 0.1
+        #principled_bsdf.inputs["Roughness"].default_value = 0.7
+        materialOutput = nodes.get("Material Output")
 
-        #create  texture node
+        #create the diffuse texture node
+        textureName = xmlMaterial.find('texture').get('string')
         texturePath = path + "\\" + textureName
         image = bpy.data.images.load(texturePath)
         texture_node = nodes.new(type='ShaderNodeTexImage')
         texture_node.image = image
-        material.node_tree.links.new(texture_node.outputs['Color'], principled_bsdf.inputs['Base Color'])
+        #material.node_tree.links.new(texture_node.outputs['Color'], principled_bsdf.inputs['Base Color'])
+        material.node_tree.links.new(texture_node.outputs['Color'], materialOutput.inputs['Surface'])
         
-        #link the texture to the color input of the principled_bsdf shader
         meshObj.materials.append(material)
 
 
