@@ -14,10 +14,13 @@ import bmesh
 import mathutils
 import xml.etree.ElementTree as ET
 
-def LoadMesh(context, filepath, use_some_setting):
+def LoadMesh(context, filepath):
     tree = ET.parse(filepath)
     root = tree.getroot()
-    mesh = ParseNode(context, root, None)
+    
+    index = filepath.rfind("\\")
+    path = filepath[:index]
+    mesh = ParseNode(context, path, root, None)
 
     scale = mathutils.Vector((1.0, 1.0, 1.0))
     location = mathutils.Vector((0.0, 0.0, 0.0))
@@ -151,29 +154,38 @@ def ParseUvs(meshObj, xmlUVs, layers, faces):
     for index, loop in enumerate(meshObj.loops):
         uv_layer.data[index].uv = (custom_uv[index].x, custom_uv[index].y)
         
-def ParseMaterials(meshObj, xmlMaterials, layers, faces):
+def ParseMaterials(meshObj, path, xmlMaterials, layers, faces):
     
-    xxx = int(0)
+    #xxx = int(0)
+    
     for xmlMaterial in xmlMaterials.findall('material'): 
         materialName = xmlMaterial.find('name').get('string')
         material = bpy.data.materials.new(name=materialName)
         
+        textureName = xmlMaterial.find('texture').get('string')
         material.use_nodes = True
         nodes = material.node_tree.nodes
+        
         # I do not really understand how to map the Blinn Paramaters to a blender matrial
         principled_bsdf = nodes.get("Principled BSDF")
-        principled_bsdf.inputs["Base Color"].default_value = (0.0, 0.0, 0.0, 1.0)
-        principled_bsdf.inputs["Base Color"].default_value[xxx] = 1.0
-        xxx = xxx + int(1)
+        #principled_bsdf.inputs["Base Color"].default_value = (0.0, 0.0, 0.0, 1.0)
+        #principled_bsdf.inputs["Base Color"].default_value[xxx] = 1.0
+        #xxx = xxx + int(1)
         principled_bsdf.inputs["Metallic"].default_value = 0.1
         principled_bsdf.inputs["Roughness"].default_value = 0.7
-        
-        meshObj.materials.append(material)
-        
-        #textureName = xmlMaterial.find('texture').get('string')
-        #print(materialName, textureName)
 
-def ParseGeomentry(nodeData, xmlNode):
+        #create  texture node
+        texturePath = path + "\\" + textureName
+        image = bpy.data.images.load(texturePath)
+        texture_node = nodes.new(type='ShaderNodeTexImage')
+        texture_node.image = image
+        material.node_tree.links.new(texture_node.outputs['Color'], principled_bsdf.inputs['Base Color'])
+        
+        #link the texture to the color input of the principled_bsdf shader
+        meshObj.materials.append(material)
+
+
+def ParseGeomentry(nodeData, path, xmlNode):
     
     layersCount, layers, faces = ParseFaces(xmlNode.find('faces'))
             
@@ -185,11 +197,11 @@ def ParseGeomentry(nodeData, xmlNode):
     mesh.free()
     
     # add the attributes: material, normal, uv, weight, ets.
-    ParseMaterials(nodeData, xmlNode, layers, faces)
+    ParseMaterials(nodeData, path, xmlNode, layers, faces)
     ParseNormals(nodeData, xmlNode.find('normal'), layers, faces)
     ParseUvs(nodeData, xmlNode.find('uvs'), layers, faces)
         
-def ParseNode(context, xmlNode, blenderParentNode):
+def ParseNode(context, path, xmlNode, blenderParentNode):
     #create a geometry and a mesh node and link it to the scene and parent
     data = bpy.data.meshes.new(xmlNode.find('name').get('string'))
     node = bpy.data.objects.new(xmlNode.find('name').get('string'), data);
@@ -203,7 +215,7 @@ def ParseNode(context, xmlNode, blenderParentNode):
     
     xmlGeometry = xmlNode.find('geometry')
     if (xmlGeometry != None):
-        ParseGeomentry(data, xmlGeometry)
+        ParseGeomentry(data, path, xmlGeometry)
     
     # add all the children nodes
     for book in xmlNode.findall('ndMesh'):

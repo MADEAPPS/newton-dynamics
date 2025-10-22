@@ -64,7 +64,7 @@ class ImportMesh(Operator, ImportHelper):
     ) # type: ignore
 
     def execute(self, context):
-        return ndMeshImport.LoadMesh(context, self.filepath, self.use_setting)
+        return ndMeshImport.LoadMesh(context, self.filepath)
 
 class ExportMesh(Operator, ExportHelper):
     """This appears in the tooltip of the operator and in the generated docs"""
