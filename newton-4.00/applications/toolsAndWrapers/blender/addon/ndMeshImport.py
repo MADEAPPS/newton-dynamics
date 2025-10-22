@@ -106,9 +106,7 @@ def ParseVertices(meshObj, xmlVertices, layersCount, layers, faces):
 def ParseNormals(meshObj, xmlNormals, layers, faces):
     indices = [int(x) for x in xmlNormals.find('indices').get('intArray').split()]
     posit = [float(x) for x in xmlNormals.find('normals').get('float3Array').split()]
-    #print (len(indices), len(posit), len(meshObj.loops))
 
-    #meshObj.use_auto_smooth = True
     indexCount = 0
     custom_normals = []
     for i in range(0, len(faces), 1):
@@ -131,7 +129,6 @@ def ParseNormals(meshObj, xmlNormals, layers, faces):
 def ParseUvs(meshObj, xmlUVs, layers, faces):
     indices = [int(x) for x in xmlUVs.find('indices').get('intArray').split()]
     posit = [float(x) for x in xmlUVs.find('uv').get('float3Array').split()]
-    print (len(indices), len(posit), len(meshObj.loops))
 
     indexCount = 0
     custom_uv = []
@@ -182,7 +179,8 @@ def ParseMaterials(meshObj, path, xmlMaterials, layers, faceMaterials):
 
     # assign this material to the faces.
     for faceIndex in range(0, len(faceMaterials), 1):
-        meshObj.polygons[faceIndex].material_index = faceMaterials[faceIndex]
+        materialIndex = int(faceMaterials[faceIndex])
+        meshObj.polygons[faceIndex].material_index = materialIndex
 
 def ParseGeomentry(nodeData, path, xmlNode):
     
@@ -202,8 +200,9 @@ def ParseGeomentry(nodeData, path, xmlNode):
         
 def ParseNode(context, path, xmlNode, blenderParentNode):
     #create a geometry and a mesh node and link it to the scene and parent
-    data = bpy.data.meshes.new(xmlNode.find('name').get('string'))
-    node = bpy.data.objects.new(xmlNode.find('name').get('string'), data);
+    nodeName = xmlNode.find('name').get('string')
+    data = bpy.data.meshes.new(nodeName)
+    node = bpy.data.objects.new(nodeName, data)
     
     node.parent_type = 'OBJECT'
     node.parent = blenderParentNode
@@ -212,6 +211,7 @@ def ParseNode(context, path, xmlNode, blenderParentNode):
     #set the transform
     node.matrix_basis = CalculateTransform(xmlNode.find('matrix'))
     
+    print (nodeName)
     xmlGeometry = xmlNode.find('geometry')
     if (xmlGeometry != None):
         ParseGeomentry(data, path, xmlGeometry)
