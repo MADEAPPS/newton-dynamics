@@ -178,7 +178,9 @@ def ParseMaterials(meshObj, path, xmlMaterials, layers, faceMaterials):
         meshObj.materials.append(material)
 
     # assign this material to the faces.
-    for faceIndex in range(0, len(faceMaterials), 1):
+    #print (len(meshObj.polygons), len(faceMaterials))
+    #for faceIndex in range(0, len(faceMaterials), 1):
+    for faceIndex in range(0, len(meshObj.polygons), 1):
         materialIndex = int(faceMaterials[faceIndex])
         meshObj.polygons[faceIndex].material_index = materialIndex
 
@@ -211,7 +213,7 @@ def ParseNode(context, path, xmlNode, blenderParentNode):
     #set the transform
     node.matrix_basis = CalculateTransform(xmlNode.find('matrix'))
     
-    print (nodeName)
+    #print (nodeName)
     xmlGeometry = xmlNode.find('geometry')
     if (xmlGeometry != None):
         ParseGeomentry(data, path, xmlGeometry)
