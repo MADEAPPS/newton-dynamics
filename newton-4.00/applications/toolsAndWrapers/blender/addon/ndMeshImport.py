@@ -261,8 +261,14 @@ def ParseAmatures(xmlNode, meshNode):
         # create an amature for all the bones
         armature_data = bpy.data.armatures.new(meshNode.data.name)
         armature_object = bpy.data.objects.new(meshNode.data.name, armature_data)
-        bpy.context.collection.objects.link(armature_object)
+        #bpy.context.collection.objects.link(armature_object)
         
+        # Add an Armature modifier to the mesh
+        armature_modifier = meshNode.modifiers.new(name='Armature', type='ARMATURE')
+        
+        # Assign the armature object to the modifier
+        armature_modifier.object = armature_object
+
         # set the per vertex skinning weights
         #boneNames = ["bone0", "bone1", "bone2", "bone3"]
         #boneWeights = ["weight0", "weight1", "weight2", "weight3"]
