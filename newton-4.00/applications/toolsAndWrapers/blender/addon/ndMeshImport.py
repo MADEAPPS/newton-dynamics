@@ -86,21 +86,6 @@ def ParseVertices(meshObj, xmlVertices, layersCount, layers, faces):
         
     # Ensure the lookup table is updated for vertex indexing
     meshObj.verts.ensure_lookup_table()   
-    
-    xmlVertexGroupSet = xmlVertices.find('vertexWeights')
-    if (xmlVertexGroupSet != None):
-        # set the per vertex skinning weights
-        boneNames = ["bone0", "bone1", "bone2", "bone3"]
-        boneWeights = ["weight0", "weight1", "weight2", "weight3"]
-        for vertexGroup in xmlVertexGroupSet.findall('vert'):
-            vertexIndex = vertexGroup.get('vertID')
-            print (vertexIndex)
-            for i in range(0, len(boneNames), 1):
-                groupName = vertexGroup.get(boneNames[i])
-                if (groupName != None):
-                    weight = vertexGroup.get(boneWeights[i])
-                    print (groupName, weight)
-                
 
     indexCount = 0
     baseSize = 0
@@ -116,6 +101,25 @@ def ParseVertices(meshObj, xmlVertices, layersCount, layers, faces):
                 meshFace.append(meshObj.verts[index])
             meshObj.faces.new(meshFace)
         indexCount = indexCount + count;        
+        
+def ParseVerticesWeights(meshNode, xmlVertices, layersCount):
+    xmlVertexGroupSet = xmlVertices.find('vertexWeights')
+    if (xmlVertexGroupSet != None):
+        # set the per vertex skinning weights
+        boneNames = ["bone0", "bone1", "bone2", "bone3"]
+        boneWeights = ["weight0", "weight1", "weight2", "weight3"]
+        
+        #add all the vertex groups
+        for xmlVertexGroup in xmlVertexGroupSet.findall('vert'):
+            vertexIndex = int(xmlVertexGroup.get('vertID'))
+            for i in range(0, len(boneNames), 1):
+                groupName = xmlVertexGroup.get(boneNames[i])
+                if (groupName != None):
+                    if groupName not in meshNode.vertex_groups:
+                        meshNode.vertex_groups.new(name=groupName)
+                    vertexGroup = meshNode.vertex_groups[groupName]
+                    weightValue = float(xmlVertexGroup.get(boneWeights[i]))
+                    vertexGroup.add([vertexIndex], weightValue, 'REPLACE')
 
 def ParseNormals(meshObj, xmlNormals, layers, faces):
     indices = [int(x) for x in xmlNormals.find('indices').get('intArray').split()]
@@ -196,18 +200,20 @@ def ParseMaterials(meshObj, path, xmlMaterials, layers, faceMaterials):
         materialIndex = int(faceMaterials[faceIndex])
         meshObj.polygons[faceIndex].material_index = materialIndex
 
-def ParseGeomentry(nodeData, path, xmlNode):
+def ParseGeomentry(node, nodeData, path, xmlNode):
     
     layersCount, layers, faces, faceMaterials = ParseFaces(xmlNode.find('faces'))
             
     #create a mesh and add the facse and vertices
     mesh = bmesh.new()
-    ParseVertices(mesh, xmlNode.find('vertices'), layersCount, layers, faces)
+    xmlVerticesNode = xmlNode.find('vertices')
+    ParseVertices(mesh, xmlVerticesNode, layersCount, layers, faces)
     mesh.to_mesh(nodeData)
     nodeData.update()
     mesh.free()
     
     # add the attributes: material, normal, uv, weight, ets.
+    ParseVerticesWeights(node, xmlVerticesNode, layersCount)
     ParseMaterials(nodeData, path, xmlNode, layers, faceMaterials)
     ParseNormals(nodeData, xmlNode.find('normal'), layers, faces)
     ParseUvs(nodeData, xmlNode.find('uvs'), layers, faces)
@@ -228,7 +234,7 @@ def ParseNode(context, path, xmlNode, blenderParentNode):
     #print (nodeName)
     xmlGeometry = xmlNode.find('geometry')
     if (xmlGeometry != None):
-        ParseGeomentry(data, path, xmlGeometry)
+        ParseGeomentry(node, data, path, xmlGeometry)
     
     # add all the children nodes
     for child in xmlNode.findall('ndMesh'):
