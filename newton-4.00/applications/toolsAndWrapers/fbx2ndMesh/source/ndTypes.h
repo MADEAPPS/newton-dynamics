@@ -347,26 +347,5 @@ class ndTriplexReal
 		return #SuperClass;								\
 	}
 
-//#define D_OPERATOR_NEW_AND_DELETE				\
-//	inline void *operator new (size_t size)		\
-//	{											\
-//		return ndMemory::Malloc(size);			\
-//	}											\
-//												\
-//	inline void *operator new[](size_t size) 	\
-//	{											\
-//		return ndMemory::Malloc(size);			\
-//	}											\
-//												\
-//	inline void operator delete (void* ptr)		\
-//	{											\
-//		ndMemory::Free(ptr);					\
-//	}											\
-//												\
-//	inline void operator delete[](void* ptr)	\
-//	{											\
-//		ndMemory::Free(ptr);					\
-//	}
-
 #endif
 

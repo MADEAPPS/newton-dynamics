@@ -26,13 +26,12 @@ int main(int argc, char** argv)
 	}
 
 	ndString fbxPath(name);
-	ndString path(fbxPath);
-	path.ToLower();
-	ndString ndMeshPath(fbxPath.SubString(0, path.Find(".fbx")) + ".nd");
+	ndString ndPath(fbxPath.SubString(0, fbxPath.Find(".fbx")) + ".nd");
+	ndPath.ToLower();
 
 	ndMeshLoader loader;
 	loader.ImportFbx(fbxPath);
-	loader.SaveMesh(ndMeshPath);
+	loader.SaveMesh(ndPath);
 	return 0;
 }
 

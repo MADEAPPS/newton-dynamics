@@ -86,9 +86,23 @@ def ParseVertices(meshObj, xmlVertices, layersCount, layers, faces):
         
     # Ensure the lookup table is updated for vertex indexing
     meshObj.verts.ensure_lookup_table()   
+    
+    xmlVertexGroupSet = xmlVertices.find('vertexWeights')
+    if (xmlVertexGroupSet != None):
+        # set the per vertex skinning weights
+        boneNames = ["bone0", "bone1", "bone2", "bone3"]
+        boneWeights = ["weight0", "weight1", "weight2", "weight3"]
+        for vertexGroup in xmlVertexGroupSet.findall('vert'):
+            vertexIndex = vertexGroup.get('vertID')
+            print (vertexIndex)
+            for i in range(0, len(boneNames), 1):
+                groupName = vertexGroup.get(boneNames[i])
+                if (groupName != None):
+                    weight = vertexGroup.get(boneWeights[i])
+                    print (groupName, weight)
+                
 
     indexCount = 0
-    #baseSize = len(posit) / 3
     baseSize = 0
     for i in range(0, len(faces), 1):
         count = faces[i]
@@ -178,8 +192,6 @@ def ParseMaterials(meshObj, path, xmlMaterials, layers, faceMaterials):
         meshObj.materials.append(material)
 
     # assign this material to the faces.
-    #print (len(meshObj.polygons), len(faceMaterials))
-    #for faceIndex in range(0, len(faceMaterials), 1):
     for faceIndex in range(0, len(meshObj.polygons), 1):
         materialIndex = int(faceMaterials[faceIndex])
         meshObj.polygons[faceIndex].material_index = materialIndex
