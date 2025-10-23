@@ -16,11 +16,16 @@ import xml.etree.ElementTree as ET
 
 def LoadMesh(context, filepath):
     tree = ET.parse(filepath)
-    root = tree.getroot()
+    xmlRoot = tree.getroot()
     
     index = filepath.rfind("\\")
     path = filepath[:index]
-    mesh = ParseNode(context, path, root, None)
+    
+    #create the hierchical mesh and static geometries
+    mesh = ParseNode(context, path, xmlRoot, None)
+    
+    # add gemometry modieres
+    ParseGeometryModifiers (xmlRoot)
 
     scale = mathutils.Vector((1.0, 1.0, 1.0))
     location = mathutils.Vector((0.0, 0.0, 0.0))
@@ -102,25 +107,6 @@ def ParseVertices(meshObj, xmlVertices, layersCount, layers, faces):
             meshObj.faces.new(meshFace)
         indexCount = indexCount + count;        
         
-def ParseVerticesWeights(meshNode, xmlVertices, layersCount):
-    xmlVertexGroupSet = xmlVertices.find('vertexWeights')
-    if (xmlVertexGroupSet != None):
-        # set the per vertex skinning weights
-        boneNames = ["bone0", "bone1", "bone2", "bone3"]
-        boneWeights = ["weight0", "weight1", "weight2", "weight3"]
-        
-        #add all the vertex groups
-        for xmlVertexGroup in xmlVertexGroupSet.findall('vert'):
-            vertexIndex = int(xmlVertexGroup.get('vertID'))
-            for i in range(0, len(boneNames), 1):
-                groupName = xmlVertexGroup.get(boneNames[i])
-                if (groupName != None):
-                    if groupName not in meshNode.vertex_groups:
-                        meshNode.vertex_groups.new(name=groupName)
-                    vertexGroup = meshNode.vertex_groups[groupName]
-                    weightValue = float(xmlVertexGroup.get(boneWeights[i]))
-                    vertexGroup.add([vertexIndex], weightValue, 'REPLACE')
-
 def ParseNormals(meshObj, xmlNormals, layers, faces):
     indices = [int(x) for x in xmlNormals.find('indices').get('intArray').split()]
     posit = [float(x) for x in xmlNormals.find('normals').get('float3Array').split()]
@@ -212,8 +198,7 @@ def ParseGeomentry(node, nodeData, path, xmlNode):
     nodeData.update()
     mesh.free()
     
-    # add the attributes: material, normal, uv, weight, ets.
-    ParseVerticesWeights(node, xmlVerticesNode, layersCount)
+    # add the attributes: material, normal, uv, ets.
     ParseMaterials(nodeData, path, xmlNode, layers, faceMaterials)
     ParseNormals(nodeData, xmlNode.find('normal'), layers, faces)
     ParseUvs(nodeData, xmlNode.find('uvs'), layers, faces)
@@ -241,3 +226,68 @@ def ParseNode(context, path, xmlNode, blenderParentNode):
         ParseNode(context, path, child, node)
         
     return node
+
+
+def ParseVerticesWeights(meshNode, xmlVertices, layersCount):
+    xmlVertexGroupSet = xmlVertices.find('vertexWeights')
+    if (xmlVertexGroupSet != None):
+        
+        # create an amature for all the bones
+        armature_data = bpy.data.armatures.new(meshNode.data.name)
+        armature_object = bpy.data.objects.new(meshNode.data.name, armature_data)
+        bpy.context.collection.objects.link(armature_object)
+        
+        # set the per vertex skinning weights
+        boneNames = ["bone0", "bone1", "bone2", "bone3"]
+        boneWeights = ["weight0", "weight1", "weight2", "weight3"]
+        
+        #add all the vertex groups
+        for xmlVertexGroup in xmlVertexGroupSet.findall('vert'):
+            vertexIndex = int(xmlVertexGroup.get('vertID'))
+            for i in range(0, len(boneNames), 1):
+                groupName = xmlVertexGroup.get(boneNames[i])
+                if (groupName != None):
+                    if groupName not in meshNode.vertex_groups:
+                        meshNode.vertex_groups.new(name=groupName)
+                    vertexGroup = meshNode.vertex_groups[groupName]
+                    weightValue = float(xmlVertexGroup.get(boneWeights[i]))
+                    vertexGroup.add([vertexIndex], weightValue, 'REPLACE')
+
+def ParseAmatures(xmlNode, meshNode):
+    xmlVertices = xmlNode.find('vertices')
+    xmlVertexGroupSet = xmlVertices.find('vertexWeights')
+    if (xmlVertexGroupSet != None):
+        
+        # create an amature for all the bones
+        armature_data = bpy.data.armatures.new(meshNode.data.name)
+        armature_object = bpy.data.objects.new(meshNode.data.name, armature_data)
+        bpy.context.collection.objects.link(armature_object)
+        
+        # set the per vertex skinning weights
+        #boneNames = ["bone0", "bone1", "bone2", "bone3"]
+        #boneWeights = ["weight0", "weight1", "weight2", "weight3"]
+        
+        #add all the vertex groups
+        #for xmlVertexGroup in xmlVertexGroupSet.findall('vert'):
+        #    vertexIndex = int(xmlVertexGroup.get('vertID'))
+        #    for i in range(0, len(boneNames), 1):
+        #        groupName = xmlVertexGroup.get(boneNames[i])
+        #        if (groupName != None):
+        #            if groupName not in meshNode.vertex_groups:
+        #                meshNode.vertex_groups.new(name=groupName)
+        #            vertexGroup = meshNode.vertex_groups[groupName]
+        #            weightValue = float(xmlVertexGroup.get(boneWeights[i]))
+        #            vertexGroup.add([vertexIndex], weightValue, 'REPLACE')
+
+
+def ParseGeometryModifiers (xmlNode):
+    xmlGeometry = xmlNode.find('geometry')
+    if (xmlGeometry != None):
+        nodeName = xmlNode.find('name').get('string')
+        meshNode = bpy.data.objects.get(nodeName)
+        ParseAmatures(xmlGeometry, meshNode)
+    
+    # add all the children nodes
+    for child in xmlNode.findall('ndMesh'):
+        ParseGeometryModifiers(child)
+        
