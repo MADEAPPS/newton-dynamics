@@ -249,7 +249,7 @@ void ndMeshLoader::SaveMesh(const ndString& fullPathName)
 				xmlSaveAttribute(xmlNodeType, "nodeType", "endBone");
 				break;
 		}
-		xmlSaveAttribute(xmlNodeType, "nodeLength", entry.m_meshNode->GetBoneLength());
+		xmlSaveAttribute(xmlNodeType, "nodeLength", ndReal(entry.m_meshNode->GetBoneLength()));
 
 		if (*entry.m_meshNode->GetMesh())
 		{
