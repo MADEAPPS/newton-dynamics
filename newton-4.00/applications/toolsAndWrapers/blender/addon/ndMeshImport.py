@@ -22,16 +22,16 @@ def LoadMesh(context, filepath):
     path = filepath[:index]
     
     #create the hierchical mesh and static geometries
-    mesh = ParseNode(context, path, xmlRoot, None)
+    rootMesh = ParseNode(context, path, xmlRoot, None)
     
     # add gemometry modieres
-    ParseGeometryModifiers (xmlRoot)
+    ParseGeometryModifiers (xmlRoot, rootMesh)
 
     scale = mathutils.Vector((1.0, 1.0, 1.0))
     location = mathutils.Vector((0.0, 0.0, 0.0))
     quaternion = mathutils.Euler((math.radians(90.0), math.radians(0.0), math.radians(-90.0)), 'XYZ')
     matrix = mathutils.Matrix.LocRotScale(location, quaternion, scale)
-    TransformModel(mesh, matrix)
+    TransformModel(rootMesh, matrix)
     return {'FINISHED'}
 
 def TransformModel(node, rotation):
@@ -253,26 +253,60 @@ def ParseVerticesWeights(meshNode, xmlVertices, layersCount):
                     weightValue = float(xmlVertexGroup.get(boneWeights[i]))
                     vertexGroup.add([vertexIndex], weightValue, 'REPLACE')
 
-def ParseAmatures(xmlNode, meshNode):
+
+def BuildAmatureSkeleton(armatureObject, rootMesh, boneNameList, parentBone):
+    try:
+        index = boneNameList.index(rootMesh.data.name)
+        ebs = armatureObject.edit_bones
+        newBone = ebs.new(boneNameList[index])
+        if parentBone != None:
+            newBone.parent = parentBone
+            
+        #newBone.head = (0, 0, 0) # Example head position
+        #newBone.tail = (0, 0, 1) # Example tail position            
+        newBone.head = (0, 0, float(index)) # Example head position
+        newBone.tail = (0, 0, float(index + 1)) # Example tail position            
+            
+    except ValueError:
+        newBone = parentBone
+    
+    for child in rootMesh.children:
+        BuildAmatureSkeleton(armatureObject, child, boneNameList, newBone)
+
+def ParseAmatures(xmlNode, meshNode, rootNode):
     xmlVertices = xmlNode.find('vertices')
     xmlVertexGroupSet = xmlVertices.find('vertexWeights')
     if (xmlVertexGroupSet != None):
-        
+        boneNames = ["bone0", "bone1", "bone2", "bone3"]
+        boneWeights = ["weight0", "weight1", "weight2", "weight3"]
+
         # create an amature for all the bones
-        armature_data = bpy.data.armatures.new(meshNode.data.name)
-        armature_object = bpy.data.objects.new(meshNode.data.name, armature_data)
-        #bpy.context.collection.objects.link(armature_object)
+        armatureData = bpy.data.armatures.new(meshNode.data.name)
+        armatureObject = bpy.data.objects.new(meshNode.data.name, armatureData)
+        bpy.context.collection.objects.link(armatureObject)
         
-        # Add an Armature modifier to the mesh
-        armature_modifier = meshNode.modifiers.new(name='Armature', type='ARMATURE')
+        # Add an Armature modifier to the mesh, this is making too hard to add bone
+        #armature_modifier = meshNode.modifiers.new(name='Armature', type='ARMATURE')
+        #armature_modifier.object = armature_object
         
-        # Assign the armature object to the modifier
-        armature_modifier.object = armature_object
+        # generate the bone list
+        boneNameList = []
+        for xmlVertexGroup in xmlVertexGroupSet.findall('vert'):
+            for i in range(0, len(boneNames), 1):
+                groupName = xmlVertexGroup.get(boneNames[i])
+                if (groupName != None):
+                   if groupName not in meshNode.vertex_groups:
+                       meshNode.vertex_groups.new(name=groupName)
+                       boneNameList.append(groupName)    
+                       
+        bpy.ops.object.select_all(action='DESELECT')
+        bpy.context.view_layer.objects.active = armatureObject
+        armatureObject.select_set(True)
+        bpy.ops.object.mode_set(mode='EDIT')
+        BuildAmatureSkeleton(armatureData, rootNode, boneNameList, None)
+        #bpy.ops.object.mode_set(mode='OBJECT')                           
 
         # set the per vertex skinning weights
-        #boneNames = ["bone0", "bone1", "bone2", "bone3"]
-        #boneWeights = ["weight0", "weight1", "weight2", "weight3"]
-        
         #add all the vertex groups
         #for xmlVertexGroup in xmlVertexGroupSet.findall('vert'):
         #    vertexIndex = int(xmlVertexGroup.get('vertID'))
@@ -286,14 +320,14 @@ def ParseAmatures(xmlNode, meshNode):
         #            vertexGroup.add([vertexIndex], weightValue, 'REPLACE')
 
 
-def ParseGeometryModifiers (xmlNode):
+def ParseGeometryModifiers (xmlNode, rootMeshNode):
     xmlGeometry = xmlNode.find('geometry')
     if (xmlGeometry != None):
         nodeName = xmlNode.find('name').get('string')
         meshNode = bpy.data.objects.get(nodeName)
-        ParseAmatures(xmlGeometry, meshNode)
+        ParseAmatures(xmlGeometry, meshNode, rootMeshNode)
     
     # add all the children nodes
-    for child in xmlNode.findall('ndMesh'):
-        ParseGeometryModifiers(child)
+    for xmlChild in xmlNode.findall('ndMesh'):
+        ParseGeometryModifiers(xmlChild, rootMeshNode)
         
