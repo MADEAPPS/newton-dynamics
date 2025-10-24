@@ -28,6 +28,13 @@
 class ndMesh : public ndClassAlloc
 {
 	public:
+	enum ndNodeType
+	{
+		m_node,
+		m_bone,
+		m_boneEnd
+	};
+	
 	class ndCurveValue
 	{
 		public:
@@ -58,6 +65,9 @@ class ndMesh : public ndClassAlloc
 	void AddChild(const ndSharedPtr<ndMesh>& child);
 	void RemoveChild(const ndSharedPtr<ndMesh>& child);
 
+	ndMesh* GetParent();
+	const ndMesh* GetParent() const;
+
 	ndList<ndSharedPtr<ndMesh>>& GetChildren();
 	const ndList<ndSharedPtr<ndMesh>>& GetChildren() const;
 
@@ -73,6 +83,12 @@ class ndMesh : public ndClassAlloc
 
 	const ndString& GetName() const;
 	void SetName(const ndString& name);
+
+	ndNodeType GetNodeType() const;
+	void SetNodeType(ndNodeType type);
+
+	ndFloat32 GetBoneLength() const;
+	void SetBoneLength(ndFloat32 lenghth);
 
 	ndCurve& GetScaleCurve();
 	ndCurve& GetPositCurve();
@@ -108,6 +124,8 @@ class ndMesh : public ndClassAlloc
 	ndMesh* m_parent;
 	ndList<ndSharedPtr<ndMesh>> m_children;
 	ndList<ndSharedPtr<ndMesh>>::ndNode* m_childNode;
+	ndFloat32 m_boneLenght;
+	ndNodeType m_type;
 
 	friend class ndMeshFile;
 	friend class ndMeshLoader;

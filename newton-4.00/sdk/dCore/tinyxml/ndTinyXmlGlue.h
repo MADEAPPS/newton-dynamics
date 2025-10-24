@@ -39,8 +39,6 @@ D_TINY_API void xmlSaveAttribute(nd::TiXmlElement* const rootNode, const char* c
 D_TINY_API void xmlSaveAttribute(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 value);
 D_TINY_API void xmlSaveAttribute(nd::TiXmlElement* const rootNode, const char* const name, const char* const value);
 
-
-
 D_TINY_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 value);
 D_TINY_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt64 value);
 D_TINY_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndFloat32 value);

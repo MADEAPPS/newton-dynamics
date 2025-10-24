@@ -34,6 +34,8 @@ ndMesh::ndMesh()
 	,m_rotation()
 	,m_parent(nullptr)
 	,m_childNode(nullptr)
+	,m_boneLenght(0.0f)
+	,m_type(m_node)
 {
 }
 
@@ -47,6 +49,8 @@ ndMesh::ndMesh(const ndMesh& src)
 	,m_rotation()
 	,m_parent(nullptr)
 	,m_childNode(nullptr)
+	,m_boneLenght(src.m_boneLenght)
+	,m_type(src.m_type)
 {
 	ndAssert(0);
 	//for (ndCurve::ndNode* node = src.m_scale.GetFirst(); node; node = node->GetNext())
@@ -65,7 +69,6 @@ ndMesh::ndMesh(const ndMesh& src)
 	//}
 }
 
-//ndMesh::ndMesh(const ndShapeInstance& src)
 ndMesh::ndMesh(const ndShapeInstance&)
 	:ndClassAlloc()
 	,m_matrix(ndGetIdentityMatrix())
@@ -76,6 +79,8 @@ ndMesh::ndMesh(const ndShapeInstance&)
 	,m_rotation()
 	,m_parent(nullptr)
 	,m_childNode(nullptr)
+	,m_boneLenght(0.5f)
+	,m_type(m_node)
 {
 	ndAssert(0);
 	// TO DO: build the mesh form the collision shape;
@@ -104,6 +109,16 @@ void ndMesh::RemoveChild(const ndSharedPtr<ndMesh>& child)
 	m_children.Remove(node);
 }
 
+ndMesh* ndMesh::GetParent()
+{
+	return m_parent;
+}
+
+const ndMesh* ndMesh::GetParent() const
+{
+	return m_parent;
+}
+
 ndList<ndSharedPtr<ndMesh>>& ndMesh::GetChildren()
 {
 	return m_children;
@@ -112,6 +127,26 @@ ndList<ndSharedPtr<ndMesh>>& ndMesh::GetChildren()
 const ndList<ndSharedPtr<ndMesh>>& ndMesh::GetChildren() const
 {
 	return m_children;
+}
+
+ndMesh::ndNodeType ndMesh::GetNodeType() const
+{
+	return m_type;
+}
+
+void ndMesh::SetNodeType(ndNodeType type)
+{
+	m_type = type;
+}
+
+ndFloat32 ndMesh::GetBoneLength() const
+{
+	return m_boneLenght;
+}
+
+void ndMesh::SetBoneLength(ndFloat32 lenghth)
+{
+	m_boneLenght = ndAbs(lenghth);
 }
 
 const ndString& ndMesh::GetName() const
