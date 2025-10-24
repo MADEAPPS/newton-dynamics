@@ -43,7 +43,6 @@ const ndSharedPtr<ndAnimationSequence> ndMeshLoader::FindSequence(const ndString
 
 ndSharedPtr<ndAnimationSequence> ndMeshLoader::ImportFbxAnimation(const ndString& fbxPathAnimName)
 {
-	//return ndSharedPtr<ndAnimationSequence>(nullptr);
 	ndTree<ndSharedPtr<ndAnimationSequence>, ndString>::ndNode* node = m_animationCache.Find(fbxPathAnimName);
 	if (!node)
 	{
@@ -122,7 +121,7 @@ bool ndMeshLoader::ImportFbx(const ndString& fbxPathMeshName)
 {
 	ndFbxMeshLoader loader;
 	m_mesh = ndSharedPtr<ndMesh>(loader.LoadMesh(fbxPathMeshName.GetStr(), false));
-#if 0
+#if 1
 	//ndAssert(0);
 	ndTrace(("exporting mesh %s\n", fbxPathMeshName.GetStr()));
 	ndString tmpName(fbxPathMeshName);
