@@ -49,6 +49,20 @@ class ndFreeListAlloc
 	D_CORE_API static void Flush(ndInt32 size);
 	D_CORE_API void *operator new (size_t size);
 	D_CORE_API void operator delete (void* ptr);
+
+	/// <summary> the placemnet operators new and delete are only use by 
+	/// language like rush that use manage memory
+	/// <param name=""></param>
+	/// <param name="ptr"></param>
+	/// <returns></returns>
+	D_CORE_API void* operator new(std::size_t, void* ptr);
+
+	/// <summary> the placemnet operators new and delete are only use by 
+	/// language like rush that use manage memory
+	/// <param name=""></param>
+	/// <param name="ptr"></param>
+	/// <returns></returns>
+	D_CORE_API void operator delete (void*, void*);
 };
 
 inline ndFreeListAlloc::ndFreeListAlloc() 

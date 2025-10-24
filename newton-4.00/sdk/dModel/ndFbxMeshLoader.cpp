@@ -415,9 +415,6 @@ void ndFbxMeshLoader::AlignToWorld(ndMesh* const mesh)
 		ndSharedPtr<ndMeshEffect> effectMesh (meshNode->GetMesh());
 		if (*effectMesh)
 		{
-			//ndMatrix meshMatrix(invRotation * meshNode->m_meshMatrix * rotation);
-			//meshNode->m_meshMatrix = meshMatrix;
-			//effectMesh->ApplyTransform(rotation);
 			effectMesh->ApplyTransform(rotation);
 		}
 
@@ -472,11 +469,87 @@ void ndFbxMeshLoader::AlignToWorld(ndMesh* const mesh)
 	}
 }
 
+void ndFbxMeshLoader::CalculateBoneProperties(ndMesh* const entity)
+{
+	ndFixSizeArray<ndMesh*, ND_FBX_MAX_CHILDREN> entBuffer(0);
+	entBuffer.PushBack(entity);
+	while (entBuffer.GetCount())
+	{
+		ndMesh* const meshNode = entBuffer.Pop();
+		if (meshNode->GetNodeType() == ndMesh::m_bone)
+		{
+			ndMesh* boneChild = nullptr;
+			ndFloat32 closestDist2 = ndFloat32(1.0e10f); 
+			for (ndList<ndSharedPtr<ndMesh>>::ndNode* node = meshNode->GetChildren().GetFirst(); node; node = node->GetNext())
+			{
+				ndMesh* const child = *node->GetInfo();
+				ndMesh::ndNodeType type = child->GetNodeType();
+				if ((type == ndMesh::m_bone) || (type == ndMesh::m_boneEnd))
+				{
+					ndVector posit(child->m_matrix.m_posit);
+					if (posit.m_x < ndFloat32(1.0e-4f))
+					{
+						ndFloat32 dist2 = posit.m_y * posit.m_y + posit.m_z * posit.m_z;
+						if (dist2 < closestDist2)
+						{
+							boneChild = child;
+							closestDist2 = dist2;
+						}
+					}
+				}
+			}
+
+			if (boneChild)
+			{
+				ndVector posit(boneChild->m_matrix.m_posit);
+				meshNode->SetBoneLength(ndAbs(posit.m_x));
+			}
+			else if (meshNode->GetChildren().GetCount())
+			{
+				closestDist2 = ndFloat32(1.0e10f);
+				for (ndList<ndSharedPtr<ndMesh>>::ndNode* node = meshNode->GetChildren().GetFirst(); node; node = node->GetNext())
+				{
+					ndMesh* const child = *node->GetInfo();
+					ndVector posit(child->m_matrix.m_posit);
+					if (posit.m_x < ndFloat32(0.0f))
+					{
+						ndFloat32 dist2 = posit.m_y * posit.m_y + posit.m_z * posit.m_z;
+						if (dist2 < closestDist2)
+						{
+							boneChild = child;
+							closestDist2 = dist2;
+						}
+					}
+				}
+				ndAssert(boneChild);
+				ndVector posit(boneChild->m_matrix.m_posit);
+				meshNode->SetBoneLength(ndAbs(posit.m_x));
+				boneChild->SetNodeType(ndMesh::m_boneEnd);
+			}
+			else
+			{
+				meshNode->SetNodeType(ndMesh::m_boneEnd);
+			}
+		}
+		else if (meshNode->GetNodeType() == ndMesh::m_boneEnd)
+		{
+			meshNode->SetBoneLength(ndFloat32(0.0f));
+		}
+
+		for (ndList<ndSharedPtr<ndMesh>>::ndNode* node = meshNode->GetChildren().GetFirst(); node; node = node->GetNext())
+		{
+			ndMesh* const child = *node->GetInfo();
+			entBuffer.PushBack(child);
+		}
+	}
+}
+
 void ndFbxMeshLoader::ApplyAllTransforms(ndMesh* const mesh, const ndMatrix& coordinateSystem)
 {
 	FreezeScale(mesh);
 	ApplyTransform(mesh, coordinateSystem);
 	AlignToWorld(mesh);
+	CalculateBoneProperties(mesh);
 }
 
 void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNodeMap& nodeMap)
@@ -705,6 +778,7 @@ ndMesh* ndFbxMeshLoader::Fbx2ndMesh(ofbx::IScene* const fbxScene)
 	{
 		ofbx::Object* const fbxNode = (ofbx::Object*)iter.GetKey();
 		ofbx::Object::Type type = fbxNode->getType();
+
 		switch (type)
 		{
 			case ofbx::Object::Type::MESH:
@@ -720,6 +794,29 @@ ndMesh* ndFbxMeshLoader::Fbx2ndMesh(ofbx::IScene* const fbxScene)
 	
 			case ofbx::Object::Type::LIMB_NODE:
 			{
+				ndMesh* const entity = iter.GetNode()->GetInfo();
+				entity->SetNodeType(ndMesh::m_bone);
+
+				// there doesn't seems to be any bone information saved in the properies elements.
+				// 
+				//ndFixSizeArray<const IElement*, 128> stack;
+				//stack.PushBack(&fbxNode->element);
+				//while (stack.GetCount())
+				//{
+				//	const IElement* elem = stack.Pop();
+				//
+				//	for (const IElementProperty* prop = elem->getFirstProperty(); prop; prop = prop->getNext())
+				//	{
+				//		DataView aaaa(prop->getValue());
+				//		DataView aaaaa(prop->getValue());
+				//	}
+				//
+				//	for (const IElement* child = elem->getFirstChild(); child; child = child->getSibling())
+				//	{
+				//		stack.PushBack(child);
+				//	}
+				//}
+
 				break;
 			}
 	
@@ -1095,7 +1192,7 @@ ndSharedPtr<ndMesh> ndFbxMeshLoader::LoadMesh(const char* const fullPathName, bo
 	if (!file)
 	{
 		ndAssert(0);
-		return nullptr;
+		return ndSharedPtr<ndMesh>(nullptr);
 	}
 
 	size_t readBytes = 0;

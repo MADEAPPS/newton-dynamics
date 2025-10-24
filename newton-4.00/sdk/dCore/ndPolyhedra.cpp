@@ -475,7 +475,7 @@ bool ndPolyhedra::EndFace ()
 		{
 			bool state;
 			ndPolyhedra::ndPairKey code (edge->m_next->m_incidentVertex, edge->m_incidentVertex);
-			ndEdge tmpEdge (edge->m_next->m_incidentVertex, -1);
+			ndEdge tmpEdge (edge->m_next->m_incidentVertex, -1, 0);
 			tmpEdge.m_incidentFace = -1; 
 			ndPolyhedra::ndNode* const node = Insert (tmpEdge, code.GetVal(), state); 
 			ndAssert (!state);
@@ -567,7 +567,7 @@ ndEdge* ndPolyhedra::AddHalfEdge (ndInt32 v0, ndInt32 v1)
 	if (v0 != v1) 
 	{
 		ndPairKey pairKey (v0, v1);
-		ndEdge tmpEdge (v0, -1);
+		ndEdge tmpEdge (v0, -1, 0);
 
 		ndNode* node = Insert (tmpEdge, pairKey.GetVal()); 
 		return node ? &node->GetInfo() : nullptr;

@@ -212,6 +212,17 @@ void ndFreeListAlloc::operator delete (void* ptr)
 	dictionary.Free(ptr);
 }
 
+void* ndFreeListAlloc::operator new (std::size_t, void* ptr)
+{
+	return ptr;
+}
+
+void ndFreeListAlloc::operator delete (void*, void*)
+{
+	// do nothing
+}
+
+
 void ndFreeListAlloc::Flush(ndInt32 size)
 {
 	ndFreeListDictionary& dictionary = ndFreeListDictionary::GetHeader();

@@ -235,6 +235,22 @@ void ndMeshLoader::SaveMesh(const ndString& fullPathName)
 		xmlSaveParam(entry.m_parentXml, "name", entry.m_meshNode->m_name.GetStr());
 		xmlSaveParam(entry.m_parentXml, "matrix", entry.m_meshNode->m_matrix);
 
+		nd::TiXmlElement* const xmlNodeType = new nd::TiXmlElement("type");
+		entry.m_parentXml->LinkEndChild(xmlNodeType);
+		switch (entry.m_meshNode->m_type)
+		{
+			case ndMesh::m_node:
+				xmlSaveAttribute(xmlNodeType, "nodeType", "node");
+				break;
+			case ndMesh::m_bone:
+				xmlSaveAttribute(xmlNodeType, "nodeType", "bone");
+				break;
+			case ndMesh::m_boneEnd:
+				xmlSaveAttribute(xmlNodeType, "nodeType", "endBone");
+				break;
+		}
+		xmlSaveAttribute(xmlNodeType, "nodeLength", entry.m_meshNode->GetBoneLength());
+
 		if (*entry.m_meshNode->GetMesh())
 		{
 			nd::TiXmlElement* const geometry = new nd::TiXmlElement("geometry");

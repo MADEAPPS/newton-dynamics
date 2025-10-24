@@ -44,7 +44,7 @@ class ndEdge
 {
 	public:
 	ndEdge ();
-	ndEdge (ndInt32 vertex, ndInt32 face, ndUnsigned64 userdata = 0);
+	ndEdge (ndInt32 vertex, ndInt32 face, ndUnsigned64 userdata);
 	//~ndEdge ();
 
 	ndInt32 m_incidentVertex;
