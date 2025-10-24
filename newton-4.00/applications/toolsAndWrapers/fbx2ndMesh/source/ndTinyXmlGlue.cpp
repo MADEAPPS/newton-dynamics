@@ -135,8 +135,6 @@ void xmlSaveAttribute(nd::TiXmlElement* const rootNode, const char* const name, 
 	rootNode->SetDoubleAttribute(name, value);
 }
 
-
-
 void xmlSaveAttribute(nd::TiXmlElement* const rootNode, const char* const name, const char* const value)
 {
 	rootNode->SetAttribute(name, value);
