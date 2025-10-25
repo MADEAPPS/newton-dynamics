@@ -61,7 +61,11 @@ def TransformModel(node, rotation):
         TransformModel(child, rotation)
         
 def TransformArmature(rotation, armature):
+    bpy.ops.object.select_all(action='DESELECT')
+    bpy.context.view_layer.objects.active = armature
+    armature.select_set(True)
     bpy.ops.object.mode_set(mode='EDIT')
+    
     for bone in armature.data.edit_bones:
         head = rotation @ bone.head
         tail = rotation @ bone.tail
