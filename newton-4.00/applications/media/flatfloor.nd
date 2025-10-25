@@ -5,7 +5,7 @@
         <posit float3="0 0 0" />
         <angles float3="0 -0 0" />
     </matrix>
-    <type nodeType="node" nodeLength="0.000000" />
+    <type nodeType="node" target="0 0 0 " />
     <geometry>
         <vertices>
             <positions count="4" float3Array="50.8 0 -50.8 -50.8 0 -50.8 50.8 0 50.8 -50.8 0 50.8" />

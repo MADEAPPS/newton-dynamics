@@ -224,9 +224,7 @@ def ParseNode(context, path, xmlNode, blenderParentNode):
     # add all the children nodes
     for child in xmlNode.findall('ndMesh'):
         ParseNode(context, path, child, node)
-        
     return node
-
 
 def ParseVerticesWeights(meshNode, xmlVertices, layersCount):
     xmlVertexGroupSet = xmlVertices.find('vertexWeights')
@@ -254,24 +252,34 @@ def ParseVerticesWeights(meshNode, xmlVertices, layersCount):
                     vertexGroup.add([vertexIndex], weightValue, 'REPLACE')
 
 
-def BuildAmatureSkeleton(armatureObject, rootMesh, boneNameList, parentBone):
+def BuildAmatureSkeleton(armatureObject, meshNode, boneNameList, parentBone, parentMatrix):
+    
+    globalMatrix = parentMatrix @ meshNode.matrix_basis
     try:
-        index = boneNameList.index(rootMesh.data.name)
+        index = boneNameList.index(meshNode.data.name)
         ebs = armatureObject.edit_bones
         newBone = ebs.new(boneNameList[index])
         if parentBone != None:
             newBone.parent = parentBone
+
+        newBone.matrix = globalMatrix
+        #boneCount = len(armatureObject.edit_bones)
+        #if (boneCount == int(1)):
+        #     #globalMatrix = meshNode.matrix_basis
+        #     newBone.matrix_local = globalMatrix
+        #else:
+        #    newBone.matrix_local = meshNode.matrix_basis
             
-        #newBone.head = (0, 0, 0) # Example head position
-        #newBone.tail = (0, 0, 1) # Example tail position            
-        newBone.head = (0, 0, float(index)) # Example head position
-        newBone.tail = (0, 0, float(index + 1)) # Example tail position            
+        newBone.head = (0, 0, 0) # Example head position
+        newBone.tail = (0, 0, 1) # Example tail position            
+        #newBone.head = (0, 0, float(index)) # Example head position
+        #newBone.tail = (0, 0, float(index + 1)) # Example tail position            
             
     except ValueError:
         newBone = parentBone
     
-    for child in rootMesh.children:
-        BuildAmatureSkeleton(armatureObject, child, boneNameList, newBone)
+    for child in meshNode.children:
+        BuildAmatureSkeleton(armatureObject, child, boneNameList, newBone, globalMatrix)
 
 def ParseAmatures(xmlNode, meshNode, rootNode):
     xmlVertices = xmlNode.find('vertices')
@@ -303,7 +311,9 @@ def ParseAmatures(xmlNode, meshNode, rootNode):
         bpy.context.view_layer.objects.active = armatureObject
         armatureObject.select_set(True)
         bpy.ops.object.mode_set(mode='EDIT')
-        BuildAmatureSkeleton(armatureData, rootNode, boneNameList, None)
+        
+        matrix = mathutils.Matrix.Identity(4)
+        BuildAmatureSkeleton(armatureData, rootNode, boneNameList, None, matrix)
         #bpy.ops.object.mode_set(mode='OBJECT')                           
 
         # set the per vertex skinning weights

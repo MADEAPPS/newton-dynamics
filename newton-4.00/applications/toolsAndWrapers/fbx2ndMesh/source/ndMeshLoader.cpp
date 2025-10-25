@@ -173,6 +173,20 @@ bool ndMeshLoader::LoadMesh(const ndString& fullPathMeshName)
 		mesh->m_name = ndString(xmlGetString(entry.m_xmlNode, "name"));
 		mesh->m_matrix = xmlGetMatrix(entry.m_xmlNode, "matrix");
 
+		nd::TiXmlElement* const xmlNodeType = (nd::TiXmlElement*)entry.m_xmlNode->FirstChild("type");
+		ndAssert(xmlNodeType);
+		const char* const nodeType = xmlGetNameAttribute(xmlNodeType, "nodeType");
+		mesh->SetNodeType(ndMesh::m_node);
+		if (!strcmp(nodeType, "bone"))
+		{
+			mesh->SetNodeType(ndMesh::m_bone);
+		}
+		else if (!strcmp(nodeType, "endBone"))
+		{
+			mesh->SetNodeType(ndMesh::m_boneEnd);
+		}
+		ndTriplexReal target(xmlGetTriplexRealAttribute(xmlNodeType, "target"));
+
 		const nd::TiXmlElement* const xmlGeometry = (nd::TiXmlElement*)entry.m_xmlNode->FirstChild("geometry");
 		if (xmlGeometry)
 		{
@@ -249,7 +263,8 @@ void ndMeshLoader::SaveMesh(const ndString& fullPathName)
 				xmlSaveAttribute(xmlNodeType, "nodeType", "endBone");
 				break;
 		}
-		xmlSaveAttribute(xmlNodeType, "nodeLength", ndReal(entry.m_meshNode->GetBoneLength()));
+		ndVector boneTarget(entry.m_meshNode->GetBoneTarget());
+		xmlSaveAttribute(xmlNodeType, "target", ndTriplexReal(ndReal(boneTarget.m_x), ndReal(boneTarget.m_y), ndReal(boneTarget.m_z)));
 
 		if (*entry.m_meshNode->GetMesh())
 		{

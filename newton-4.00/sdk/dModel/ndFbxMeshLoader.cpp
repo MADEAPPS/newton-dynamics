@@ -502,7 +502,7 @@ void ndFbxMeshLoader::CalculateBoneProperties(ndMesh* const entity)
 			if (boneChild)
 			{
 				ndVector posit(boneChild->m_matrix.m_posit);
-				meshNode->SetBoneLength(ndAbs(posit.m_x));
+				meshNode->SetBoneTarget(posit);
 			}
 			else if (meshNode->GetChildren().GetCount())
 			{
@@ -523,7 +523,7 @@ void ndFbxMeshLoader::CalculateBoneProperties(ndMesh* const entity)
 				}
 				ndAssert(boneChild);
 				ndVector posit(boneChild->m_matrix.m_posit);
-				meshNode->SetBoneLength(ndAbs(posit.m_x));
+				meshNode->SetBoneTarget(posit);
 				boneChild->SetNodeType(ndMesh::m_boneEnd);
 			}
 			else
@@ -533,7 +533,7 @@ void ndFbxMeshLoader::CalculateBoneProperties(ndMesh* const entity)
 		}
 		else if (meshNode->GetNodeType() == ndMesh::m_boneEnd)
 		{
-			meshNode->SetBoneLength(ndFloat32(0.0f));
+			meshNode->SetBoneTarget(ndVector::m_wOne);
 		}
 
 		for (ndList<ndSharedPtr<ndMesh>>::ndNode* node = meshNode->GetChildren().GetFirst(); node; node = node->GetNext())

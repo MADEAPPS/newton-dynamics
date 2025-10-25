@@ -125,6 +125,17 @@ const char* xmlGetNameAttribute(const nd::TiXmlElement* const rootNode, const ch
 	return rootNode->Attribute(name);
 }
 
+ndTriplexReal xmlGetTriplexRealAttribute(const nd::TiXmlElement* const rootNode, const char* const name)
+{
+	const char* const data = xmlGetNameAttribute(rootNode, name);
+	ndAssert(data);
+	ndParseXmlData parseData(data);
+	ndFloat64 fx = parseData.GetFloat();
+	ndFloat64 fy = parseData.GetFloat();
+	ndFloat64 fz = parseData.GetFloat();
+	return ndTriplexReal(ndReal (fx), ndReal(fy), ndReal(fz));
+}
+
 void xmlSaveAttribute(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 value)
 {
 	rootNode->SetAttribute(name, value);
@@ -133,6 +144,17 @@ void xmlSaveAttribute(nd::TiXmlElement* const rootNode, const char* const name, 
 void xmlSaveAttribute(nd::TiXmlElement* const rootNode, const char* const name, ndReal value)
 {
 	rootNode->SetDoubleAttribute(name, value);
+}
+
+void xmlSaveAttribute(nd::TiXmlElement* const rootNode, const char* const name, ndTriplexReal value)
+{
+	char data[256];
+	ndInt32 size = sizeof(data) - 64;
+	char* ptr = data;
+	ptr = FloatToString(ptr, size, value.m_x);
+	ptr = FloatToString(ptr, size, value.m_y);
+	ptr = FloatToString(ptr, size, value.m_z);
+	xmlSaveAttribute(rootNode, name, data);
 }
 
 void xmlSaveAttribute(nd::TiXmlElement* const rootNode, const char* const name, const char* const value)

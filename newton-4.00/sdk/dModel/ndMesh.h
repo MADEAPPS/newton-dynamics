@@ -87,8 +87,8 @@ class ndMesh : public ndClassAlloc
 	ndNodeType GetNodeType() const;
 	void SetNodeType(ndNodeType type);
 
-	ndFloat32 GetBoneLength() const;
-	void SetBoneLength(ndFloat32 lenghth);
+	ndVector GetBoneTarget() const;
+	void SetBoneTarget(const ndVector& target);
 
 	ndCurve& GetScaleCurve();
 	ndCurve& GetPositCurve();
@@ -124,7 +124,7 @@ class ndMesh : public ndClassAlloc
 	ndMesh* m_parent;
 	ndList<ndSharedPtr<ndMesh>> m_children;
 	ndList<ndSharedPtr<ndMesh>>::ndNode* m_childNode;
-	ndFloat32 m_boneLenght;
+	ndVector m_boneTarget;
 	ndNodeType m_type;
 
 	friend class ndMeshFile;

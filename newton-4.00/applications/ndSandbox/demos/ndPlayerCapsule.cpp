@@ -349,7 +349,7 @@ void ndPlayerCapsule_ThirdPerson (ndDemoEntityManager* const scene)
 
 	// load the visual mesh, and animations.
 	ndRenderMeshLoader loader(*scene->GetRenderer());
-	loader.ImportFbx(ndGetWorkingFileName("skinningtest.fbx"));
+	//loader.ImportFbx(ndGetWorkingFileName("skinningtest.fbx"));
 	//loader.ImportFbx(ndGetWorkingFileName("humanoidRobot.fbx"));
 	loader.LoadMesh(ndGetWorkingFileName("humanoidRobot.nd"));
 

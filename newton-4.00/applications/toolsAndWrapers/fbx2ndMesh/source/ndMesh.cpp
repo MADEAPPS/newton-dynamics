@@ -34,7 +34,7 @@ ndMesh::ndMesh()
 	,m_rotation()
 	,m_parent(nullptr)
 	,m_childNode(nullptr)
-	,m_boneLenght(0.0f)
+	,m_boneTarget(ndVector::m_wOne)
 	,m_type(m_node)
 {
 }
@@ -49,7 +49,7 @@ ndMesh::ndMesh(const ndMesh& src)
 	,m_rotation()
 	,m_parent(nullptr)
 	,m_childNode(nullptr)
-	,m_boneLenght(src.m_boneLenght)
+	,m_boneTarget(src.m_boneTarget)
 	,m_type(src.m_type)
 {
 	ndAssert(0);
@@ -79,7 +79,7 @@ ndMesh::ndMesh(const ndShapeInstance&)
 	,m_rotation()
 	,m_parent(nullptr)
 	,m_childNode(nullptr)
-	,m_boneLenght(0.5f)
+	,m_boneTarget(ndVector::m_wOne)
 	,m_type(m_node)
 {
 	ndAssert(0);
@@ -139,14 +139,15 @@ void ndMesh::SetNodeType(ndNodeType type)
 	m_type = type;
 }
 
-ndFloat32 ndMesh::GetBoneLength() const
+ndVector ndMesh::GetBoneTarget() const
 {
-	return m_boneLenght;
+	return m_boneTarget;
 }
 
-void ndMesh::SetBoneLength(ndFloat32 lenghth)
+void ndMesh::SetBoneTarget(const ndVector& target)
 {
-	m_boneLenght = ndAbs(lenghth);
+	m_boneTarget = target;
+	m_boneTarget.m_w = ndFloat32(1.0f);
 }
 
 const ndString& ndMesh::GetName() const

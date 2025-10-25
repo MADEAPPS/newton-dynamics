@@ -314,6 +314,12 @@ class ndTriplex
 class ndTriplexReal
 {
 	public:
+	ndTriplexReal() {}
+	ndTriplexReal(ndReal x, ndReal y, ndReal z)
+		:m_x(x), m_y(y), m_z(z)
+	{
+
+	}
 	ndReal m_x;
 	ndReal m_y;
 	ndReal m_z;
