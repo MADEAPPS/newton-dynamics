@@ -310,11 +310,12 @@ def ParseAmatures(xmlNode, meshNode, rootNode, boneTargetDictionary, armatureLis
         armatureObject = bpy.data.objects.new(meshNode.data.name, armatureData)
         bpy.context.collection.objects.link(armatureObject)
         
-        armatureList.append(armatureObject)
-        
         # Add an Armature modifier to the mesh, this is making too hard to add bone
-        #armature_modifier = meshNode.modifiers.new(name='Armature', type='ARMATURE')
-        #armature_modifier.object = armature_object
+        armature_modifier = meshNode.modifiers.new(name='Armature', type='ARMATURE')
+        armature_modifier.object = armatureObject
+        
+        #save amature for post processing 
+        armatureList.append(armatureObject)
         
         # generate the bone list
         boneNameList = []
@@ -331,22 +332,18 @@ def ParseAmatures(xmlNode, meshNode, rootNode, boneTargetDictionary, armatureLis
         armatureObject.select_set(True)
         bpy.ops.object.mode_set(mode='EDIT')
         
-        #matrix = mathutils.Matrix.Identity(4)
         BuildAmatureSkeleton(armatureData, rootNode, boneNameList, None, boneTargetDictionary, mathutils.Matrix.Identity(4))
         bpy.ops.object.mode_set(mode='OBJECT')                           
 
         # set the per vertex skinning weights
-        #add all the vertex groups
-        #for xmlVertexGroup in xmlVertexGroupSet.findall('vert'):
-        #    vertexIndex = int(xmlVertexGroup.get('vertID'))
-        #    for i in range(0, len(boneNames), 1):
-        #        groupName = xmlVertexGroup.get(boneNames[i])
-        #        if (groupName != None):
-        #            if groupName not in meshNode.vertex_groups:
-        #                meshNode.vertex_groups.new(name=groupName)
-        #            vertexGroup = meshNode.vertex_groups[groupName]
-        #            weightValue = float(xmlVertexGroup.get(boneWeights[i]))
-        #            vertexGroup.add([vertexIndex], weightValue, 'REPLACE')
+        for xmlVertexGroup in xmlVertexGroupSet.findall('vert'):
+            vertexIndex = int(xmlVertexGroup.get('vertID'))
+            for i in range(0, len(boneNames), 1):
+                groupName = xmlVertexGroup.get(boneNames[i])
+                if (groupName != None):
+                    vertexGroup = meshNode.vertex_groups[groupName]
+                    weightValue = float(xmlVertexGroup.get(boneWeights[i]))
+                    vertexGroup.add([vertexIndex], weightValue, 'REPLACE')
 
 
 def ParseGeometryModifiers (xmlNode, rootMeshNode, boneTargetDictionary, armatureList):

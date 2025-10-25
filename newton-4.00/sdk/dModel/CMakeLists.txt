@@ -40,14 +40,19 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 add_library(${projectName} STATIC ${CPP_SOURCE})
 
-if (MSVC)
-	install(FILES ${CPP_SOURCE} DESTINATION source/)
-	install(TARGETS ${projectName} LIBRARY DESTINATION lib ARCHIVE DESTINATION lib RUNTIME DESTINATION bin)
+install(FILES ${CPP_SOURCE} DESTINATION "install/source")
+install(TARGETS ${projectName} 
+		LIBRARY DESTINATION "install/lib" 
+		ARCHIVE DESTINATION "install/lib" 
+		RUNTIME DESTINATION "install/bin")
+set_target_properties(${projectName} PROPERTIES FOLDER "utils")
 
+if (MSVC)
+	#install(FILES ${CPP_SOURCE} DESTINATION source/)
+	#install(TARGETS ${projectName} LIBRARY DESTINATION lib ARCHIVE DESTINATION lib RUNTIME DESTINATION bin)
 	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YundModelStdafx.h")
 	set_source_files_properties(ndModelStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcndModelStdafx.h")
-	set_target_properties(${projectName} PROPERTIES FOLDER "utils")
-
+	#set_target_properties(${projectName} PROPERTIES FOLDER "utils")
 endif()
 
 

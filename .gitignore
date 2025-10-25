@@ -79,7 +79,7 @@ bld/
 *.unsuccessfulbuild
 
 # ignore intall folder
-binaries
+install
 
 # Ignore auxiliary output from Doxygen and Sphinx
 doc/xml

@@ -95,6 +95,7 @@ if(NOT CMAKE_BUILD_TYPE)
           FORCE)
 endif(NOT CMAKE_BUILD_TYPE)
 
+
 #check for UNIX
 if(UNIX)
 	# ----------------------------------------------------------------------
@@ -106,7 +107,7 @@ if(UNIX)
 
 	set(DEFAULT_INSTALL_PREFIX "/usr/local/${PROJECT_NAME}")
 	if (${CMAKE_INSTALL_PREFIX} STREQUAL ${DEFAULT_INSTALL_PREFIX})
-		set(CMAKE_INSTALL_PREFIX "../newton-4.00/binaries" CACHE PATH "..." FORCE)
+		set(CMAKE_INSTALL_PREFIX "../newton-4.00/" CACHE PATH "..." FORCE)
 	endif()
 
 	# Use the full RPATH for the build tree.
@@ -116,19 +117,11 @@ if(UNIX)
 	set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
 	# Set this RPATH in the installed library.
-	# NOTE: specify CMAKE_INSTALL_PREFIX as an absolute path or it will almost certainly not work.
 	set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 	# Add the automatically determined parts of the RPATH which point to directories
 	# outside the build tree to the install RPATH.
 	set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-
-	# Only use the RPATH if the target is not a system directory.
-	#list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
-	#if("${isSystemDir}" STREQUAL "-1")
-	#	set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-	#endif("${isSystemDir}" STREQUAL "-1")
-	# ----------------------------------------------------------------------
 
 	set(CMAKE_POLICY_DEFAULT_CMP0072 NEW)
 	if(NOT NEWTON_BUILD_SHARED_LIBS)
@@ -168,7 +161,9 @@ if (MSVC)
 
 	set(DEFAULT_INSTALL_PREFIX "C:/Program Files (x86)/${PROJECT_NAME}")
 	if (${CMAKE_INSTALL_PREFIX} STREQUAL ${DEFAULT_INSTALL_PREFIX})
-		set(CMAKE_INSTALL_PREFIX "../newton-4.00/binaries" CACHE PATH "..." FORCE)
+		message ("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz")
+		set(CMAKE_INSTALL_PREFIX "../newton-4.00/" CACHE PATH "..." FORCE)
+		message ("installPrefixPath = ${CMAKE_INSTALL_PREFIX}")
 	endif()
 
 	if(NEWTON_STATIC_RUNTIME_LIBRARIES)
