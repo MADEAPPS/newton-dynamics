@@ -108,6 +108,7 @@ if(UNIX)
 	set(DEFAULT_INSTALL_PREFIX "/usr/local/${PROJECT_NAME}")
 	if (${CMAKE_INSTALL_PREFIX} STREQUAL ${DEFAULT_INSTALL_PREFIX})
 		set(CMAKE_INSTALL_PREFIX "../newton-4.00/" CACHE PATH "..." FORCE)
+		message ("installPrefixPath = ${CMAKE_INSTALL_PREFIX}")
 	endif()
 
 	# Use the full RPATH for the build tree.
@@ -161,7 +162,6 @@ if (MSVC)
 
 	set(DEFAULT_INSTALL_PREFIX "C:/Program Files (x86)/${PROJECT_NAME}")
 	if (${CMAKE_INSTALL_PREFIX} STREQUAL ${DEFAULT_INSTALL_PREFIX})
-		message ("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz")
 		set(CMAKE_INSTALL_PREFIX "../newton-4.00/" CACHE PATH "..." FORCE)
 		message ("installPrefixPath = ${CMAKE_INSTALL_PREFIX}")
 	endif()
@@ -227,11 +227,4 @@ endif()
 add_subdirectory(sdk)
 add_subdirectory(thirdParty)
 add_subdirectory(applications)
-
-#if (NOT NEWTON_EXCLUDE_UNIX_TEST AND (PTR_SIZE EQUAL 8))
-#	message("building unit tests")
-#	file(REMOVE_RECURSE ${PROJECT_BINARY_DIR}/_deps)
-#	add_subdirectory(tests)
-#endif()
-
 

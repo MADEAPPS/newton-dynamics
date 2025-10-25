@@ -48,11 +48,8 @@ install(TARGETS ${projectName}
 set_target_properties(${projectName} PROPERTIES FOLDER "utils")
 
 if (MSVC)
-	#install(FILES ${CPP_SOURCE} DESTINATION source/)
-	#install(TARGETS ${projectName} LIBRARY DESTINATION lib ARCHIVE DESTINATION lib RUNTIME DESTINATION bin)
 	set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YundModelStdafx.h")
 	set_source_files_properties(ndModelStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcndModelStdafx.h")
-	#set_target_properties(${projectName} PROPERTIES FOLDER "utils")
 endif()
 
 

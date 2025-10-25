@@ -35,9 +35,3 @@ install(TARGETS ${projectName}
 		ARCHIVE DESTINATION "install/lib" 
 		RUNTIME DESTINATION "install/bin")
 set_target_properties(${projectName} PROPERTIES FOLDER "thirdParty")
-
-if (MSVC)
-	#install(FILES ${CPP_SOURCE} DESTINATION source/)
-	#install(TARGETS ${projectName} LIBRARY DESTINATION lib ARCHIVE DESTINATION lib RUNTIME DESTINATION bin)
-	#set_target_properties(${projectName} PROPERTIES FOLDER "thirdParty")
-endif()

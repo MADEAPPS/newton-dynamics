@@ -117,7 +117,7 @@ else()
 		endif ()
 
 		if(NEWTON_BUILD_SHARED_LIBS)
-			install(FILES $<TARGET_PDB_FILE:${projectName}> DESTINATION bin OPTIONAL)
+			install(FILES $<TARGET_PDB_FILE:${projectName}> DESTINATION "install/lib" OPTIONAL)
 		endif(NEWTON_BUILD_SHARED_LIBS)
 
 	endif(MSVC)
@@ -129,14 +129,9 @@ else()
 
 	install(FILES ${CPP_SOURCE} DESTINATION "install/source")
 	install(TARGETS ${projectName} 
-			LIBRARY DESTINATION "install/lib" 
-			ARCHIVE DESTINATION "install/lib" 
+			LIBRARY DESTINATION "install/lib"
+			ARCHIVE DESTINATION "install/lib"
 			RUNTIME DESTINATION "install/bin")
 	set_target_properties(${projectName} PROPERTIES FOLDER "newtonSdk")
 
-	if (MSVC)
-		#install(FILES ${CPP_SOURCE} DESTINATION source/)
-		#install(TARGETS ${projectName} LIBRARY DESTINATION lib ARCHIVE DESTINATION lib RUNTIME DESTINATION bin)
-		#set_target_properties(${projectName} PROPERTIES FOLDER "newtonSdk")
-	endif()
 endif()

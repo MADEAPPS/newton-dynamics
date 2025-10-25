@@ -11,7 +11,10 @@
 cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR)
 
 set (projectName "newtonPy")
+project(${projectName})
+
 message (${projectName})
+
 if(MSVC OR MINGW)
 	set (swig "${CMAKE_SOURCE_DIR}/thirdParty/swigwin/swigwin-4.0.2/swig.exe")
 else()
@@ -30,55 +33,19 @@ file(GLOB CPP_SOURCE
 	*.cxx
 	*.i
 	*.py
+	install/source/*.h
+	install/source/*.c
+	install/source/*.cpp
 )
 
-#source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" PREFIX source/ FILES ${CPP_SOURCE})
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
+add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+
 include_directories(.)
-include_directories(../../../sdk/dCore)
-include_directories(../../../sdk/dNewton)
-include_directories(../../../sdk/dTinyxml)
-include_directories(../../../sdk/dCollision)
-include_directories(../../../sdk/dNewton/dJoints)
-include_directories(../../../sdk/dNewton/dModels)
-include_directories(../../../sdk/dNewton/dIkSolver)
-include_directories(../../../sdk/dNewton/dParticles)
-include_directories(../../../sdk/dNewton/dModels/dVehicle)
-include_directories(../../../sdk/dNewton/dModels/dCharacter)
+include_directories(install/source)
 
 add_library(${projectName} SHARED ${CPP_SOURCE})
-
-if(DEFINED ENV{Python})
-	#message ($ENV{PythonInclude})
-	target_include_directories(${projectName} BEFORE PRIVATE "$ENV{Python}/Include")
-
-	#message ("$ENV{Python}")
-	target_link_directories(${projectName} BEFORE PRIVATE "$ENV{Python}/Libs")
-else()
-	find_package (Python COMPONENTS Development REQUIRED)
-	#message ("${Python_LIBRARIES}")
-	target_include_directories(${projectName} PUBLIC ${Python_INCLUDE_DIRS})
-	target_link_libraries(${projectName} ${Python_LIBRARIES})
-endif()
-
-if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
-	target_link_libraries (${projectName} ndNewton ndCollision ndCore)
-else()
-	target_link_libraries (${projectName} ndNewton)
-endif()
-
-if (NEWTON_ENABLE_CUDA_SOLVER)
-	target_link_libraries (${projectName} ndSolverCuda)
-endif()
-
-if(MSVC OR MINGW)
-    if(CMAKE_VS_MSBUILD_COMMAND OR CMAKE_VS_DEVENV_COMMAND)
-		set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YunewtonStdafx.h")
-		set_source_files_properties(newtonStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcnewtonStdafx.h")
-		set_source_files_properties(newton_wrap.cxx PROPERTIES COMPILE_FLAGS "/Y-")
-    endif()
-endif()
 
 set (pySrc "${CMAKE_CURRENT_SOURCE_DIR}")
 list(APPEND PY_SOURCE 
@@ -102,13 +69,3 @@ add_custom_command(
 	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
 	ARGS -E copy $<TARGET_FILE:${projectName}> ${wrapper}/${projectName}/${projectName}${CMAKE_DEBUG_POSTFIX}${pySuffix})
 
-#if(DEFINED ENV{Blender})
-#  foreach(file IN LISTS PY_SOURCE)
-#	add_custom_command(
-#	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-#	ARGS -E copy ${pySrc}/${file} $ENV{Blender}/scripts/addons/${projectName}/${file})
-#    endforeach()
-#    add_custom_command(
-#	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-#	ARGS -E copy $<TARGET_FILE:${projectName}> $ENV{Blender}/scripts/addons/${projectName}/_newton${pySuffix})
-#endif()
