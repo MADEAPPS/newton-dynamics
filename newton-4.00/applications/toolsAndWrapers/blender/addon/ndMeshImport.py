@@ -26,13 +26,18 @@ def LoadMesh(context, filepath):
     rootMesh = ParseNode(context, path, xmlRoot, None, bonesTarget)
     
     # add gemometry modieres
-    ParseGeometryModifiers (xmlRoot, rootMesh, bonesTarget)
+    armatureList = []
+    ParseGeometryModifiers (xmlRoot, rootMesh, bonesTarget, armatureList)
 
     scale = mathutils.Vector((1.0, 1.0, 1.0))
     location = mathutils.Vector((0.0, 0.0, 0.0))
     quaternion = mathutils.Euler((math.radians(90.0), math.radians(0.0), math.radians(-90.0)), 'XYZ')
     matrix = mathutils.Matrix.LocRotScale(location, quaternion, scale)
+    
     TransformModel(rootMesh, matrix)
+    for skin in armatureList:
+        TransformArmature(matrix, skin)
+    
     return {'FINISHED'}
 
 def TransformModel(node, rotation):
@@ -54,6 +59,17 @@ def TransformModel(node, rotation):
     
     for child in node.children:
         TransformModel(child, rotation)
+        
+def TransformArmature(rotation, armature):
+    bpy.ops.object.mode_set(mode='EDIT')
+    for bone in armature.data.edit_bones:
+        head = rotation @ bone.head
+        tail = rotation @ bone.tail
+        bone.head = head
+        bone.tail = tail
+    
+    bpy.ops.object.mode_set(mode='OBJECT')                           
+
         
 def CalculateTransform(xmlMatrix):
     posit = [float(x) for x in xmlMatrix.find('posit').get('float3').split()]
@@ -256,13 +272,12 @@ def ParseVerticesWeights(meshNode, xmlVertices, layersCount):
                     weightValue = float(xmlVertexGroup.get(boneWeights[i]))
                     vertexGroup.add([vertexIndex], weightValue, 'REPLACE')
 
-
 def BuildAmatureSkeleton(armatureObject, meshNode, boneNameList, parentBone, boneTargetDictionary, parentMatrix):
     armatureMatrix = parentMatrix @ meshNode.matrix_basis
     try:
         index = boneNameList.index(meshNode.data.name)
-        ebs = armatureObject.edit_bones
-        newBone = ebs.new(boneNameList[index])
+        amatureBoneList = armatureObject.edit_bones
+        newBone = amatureBoneList.new(boneNameList[index])
         if parentBone != None:
             newBone.parent = parentBone
 
@@ -279,7 +294,7 @@ def BuildAmatureSkeleton(armatureObject, meshNode, boneNameList, parentBone, bon
     for child in meshNode.children:
         BuildAmatureSkeleton(armatureObject, child, boneNameList, newBone, boneTargetDictionary, armatureMatrix)
 
-def ParseAmatures(xmlNode, meshNode, rootNode, boneTargetDictionary):
+def ParseAmatures(xmlNode, meshNode, rootNode, boneTargetDictionary, armatureList):
     xmlVertices = xmlNode.find('vertices')
     xmlVertexGroupSet = xmlVertices.find('vertexWeights')
     if (xmlVertexGroupSet != None):
@@ -290,6 +305,8 @@ def ParseAmatures(xmlNode, meshNode, rootNode, boneTargetDictionary):
         armatureData = bpy.data.armatures.new(meshNode.data.name)
         armatureObject = bpy.data.objects.new(meshNode.data.name, armatureData)
         bpy.context.collection.objects.link(armatureObject)
+        
+        armatureList.append(armatureObject)
         
         # Add an Armature modifier to the mesh, this is making too hard to add bone
         #armature_modifier = meshNode.modifiers.new(name='Armature', type='ARMATURE')
@@ -328,14 +345,14 @@ def ParseAmatures(xmlNode, meshNode, rootNode, boneTargetDictionary):
         #            vertexGroup.add([vertexIndex], weightValue, 'REPLACE')
 
 
-def ParseGeometryModifiers (xmlNode, rootMeshNode, boneTargetDictionary):
+def ParseGeometryModifiers (xmlNode, rootMeshNode, boneTargetDictionary, armatureList):
     xmlGeometry = xmlNode.find('geometry')
     if (xmlGeometry != None):
         nodeName = xmlNode.find('name').get('string')
         meshNode = bpy.data.objects.get(nodeName)
-        ParseAmatures(xmlGeometry, meshNode, rootMeshNode, boneTargetDictionary)
+        ParseAmatures(xmlGeometry, meshNode, rootMeshNode, boneTargetDictionary, armatureList)
     
     # add all the children nodes
     for xmlChild in xmlNode.findall('ndMesh'):
-        ParseGeometryModifiers(xmlChild, rootMeshNode, boneTargetDictionary)
+        ParseGeometryModifiers(xmlChild, rootMeshNode, boneTargetDictionary, armatureList)
         
