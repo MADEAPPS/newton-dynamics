@@ -33,13 +33,12 @@
 %}
 
 %{
-	#include <ndNewton.h>
+	%include <ndNewtonInc.h>
 	#include <newtonWorld.h>
 	#include "newtonConfig.h"
 %}
 
-%include "newtonConfig.h"
-
+//%include "newtonConfig.h"
 //%rename(GetElement) ndVector::operator[](ndInt32 i);
 //%rename(GetElement) ndVector::operator[](ndInt32 i) const;
 //%rename(Add) ndVector::operator+(const ndVector& src) const;
@@ -92,36 +91,47 @@
 //%array_class(int, intArray);
 //%array_class(double, doubleArray);
 
-%include "../../../sdk/dCore/ndVector.h"
-%include "../../../sdk/dCore/ndMatrix.h"
-%include "../../../sdk/dCore/ndQuaternion.h"
+%rename(Create) ndClassAlloc::operator new;  
+%rename(Destroy) ndClassAlloc::operator delete;  
+%rename(CreateArray) ndClassAlloc::operator new[];
+%rename(DestroyArray) ndClassAlloc::operator delete[];
 
-%include "../../../sdk/dCollision/ndShape.h"
-%include "../../../sdk/dCollision/ndShapeBox.h"
-%include "../../../sdk/dCollision/ndShapeCone.h"
-%include "../../../sdk/dCollision/ndShapeConvex.h"
-%include "../../../sdk/dCollision/ndShapeSphere.h"
-%include "../../../sdk/dCollision/ndShapeCapsule.h"
-%include "../../../sdk/dCollision/ndShapeCompound.h"
-%include "../../../sdk/dCollision/ndShapeCylinder.h"
-%include "../../../sdk/dCollision/ndShapeStatic_bvh.h"
-%include "../../../sdk/dCollision/ndShapeStaticMesh.h"
-%include "../../../sdk/dCollision/ndShapeConvexHull.h"
-%include "../../../sdk/dCollision/ndShapeHeightfield.h"
-%include "../../../sdk/dCollision/ndShapeChamferCylinder.h"
 
-%include "../../../sdk/dCollision/ndShapeInstance.h"
+%include "install/source/ndNewtonInc.h"
+%include "install/source/ndTypes.h"
+%include "install/source/ndCollisionStdafx.h"
 
-%include "../../../sdk/dCollision/ndBody.h"
-%include "../../../sdk/dCollision/ndBodyKinematic.h"
-%include "../../../sdk/dCollision/ndBodyTriggerVolume.h"
-%include "../../../sdk/dCollision/ndBodyPlayerCapsule.h"
-%include "../../../sdk/dCollision/ndBodyKinematicBase.h"
+%include "install/source/ndClassAlloc.h"
+%include "install/source/ndVector.h"
+%include "install/source/ndMatrix.h"
+%include "install/source/ndQuaternion.h"
 
-%include "../../../sdk/dCollision/ndBodyNotify.h"
-%include "../../../sdk/dCollision/ndContactNotify.h"
-%include "../../../sdk/dCollision/ndRayCastNotify.h"
-%include "../../../sdk/dCollision/ndBodiesInAabbNotify.h"
+%include "install/source/ndShape.h"
+%include "install/source/ndShapeBox.h"
+%include "install/source/ndShapeCone.h"
+%include "install/source/ndShapeConvex.h"
+%include "install/source/ndShapeSphere.h"
+//%include "install/source/ndShapeCapsule.h"
+//%include "install/source/ndShapeCompound.h"
+//%include "install/source/ndShapeCylinder.h"
+//%include "install/source/ndShapeStatic_bvh.h"
+//%include "install/source/ndShapeStaticMesh.h"
+//%include "install/source/ndShapeConvexHull.h"
+//%include "install/source/ndShapeHeightfield.h"
+//%include "install/source/ndShapeChamferCylinder.h"
+//
+//%include "install/source/ndShapeInstance.h"
+//
+//%include "install/source/ndBody.h"
+//%include "install/source/ndBodyKinematic.h"
+//%include "install/source/ndBodyTriggerVolume.h"
+//%include "install/source/ndBodyPlayerCapsule.h"
+//%include "install/source/ndBodyKinematicBase.h"
+//
+//%include "install/source/ndBodyNotify.h"
+//%include "install/source/ndContactNotify.h"
+//%include "install/source/ndRayCastNotify.h"
+//%include "install/source/ndBodiesInAabbNotify.h"
 
 %include "newtonWorld.h"
 

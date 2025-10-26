@@ -61,9 +61,115 @@ class _SwigNonDynamicMeta(type):
     __setattr__ = _swig_setattr_nondynamic_class_variable(type.__setattr__)
 
 
+ND_NEWTON_VERSION = _newton.ND_NEWTON_VERSION
 
-def dGetWorkingFileName(name, outPathName):
-    return _newton.dGetWorkingFileName(name, outPathName)
+def ndExp_VS__Fix(x):
+    return _newton.ndExp_VS__Fix(x)
+class ndFloatSign(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+    m_iVal = property(_newton.ndFloatSign_m_iVal_get, _newton.ndFloatSign_m_iVal_set)
+    m_fVal = property(_newton.ndFloatSign_m_fVal_get, _newton.ndFloatSign_m_fVal_set)
+
+    def __init__(self):
+        _newton.ndFloatSign_swiginit(self, _newton.new_ndFloatSign())
+    __swig_destroy__ = _newton.delete_ndFloatSign
+
+# Register ndFloatSign in _newton:
+_newton.ndFloatSign_swigregister(ndFloatSign)
+
+class ndIntPtr(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+
+    def __init__(self):
+        _newton.ndIntPtr_swiginit(self, _newton.new_ndIntPtr())
+    m_ptr = property(_newton.ndIntPtr_m_ptr_get, _newton.ndIntPtr_m_ptr_set)
+    m_int = property(_newton.ndIntPtr_m_int_get, _newton.ndIntPtr_m_int_set)
+    __swig_destroy__ = _newton.delete_ndIntPtr
+
+# Register ndIntPtr in _newton:
+_newton.ndIntPtr_swigregister(ndIntPtr)
+
+class ndDoubleInt(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+    m_ptr = property(_newton.ndDoubleInt_m_ptr_get, _newton.ndDoubleInt_m_ptr_set)
+    m_int = property(_newton.ndDoubleInt_m_int_get, _newton.ndDoubleInt_m_int_set)
+    m_float = property(_newton.ndDoubleInt_m_float_get, _newton.ndDoubleInt_m_float_set)
+
+    def __init__(self):
+        _newton.ndDoubleInt_swiginit(self, _newton.new_ndDoubleInt())
+    __swig_destroy__ = _newton.delete_ndDoubleInt
+
+# Register ndDoubleInt in _newton:
+_newton.ndDoubleInt_swigregister(ndDoubleInt)
+
+class ndTriplex(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+    m_x = property(_newton.ndTriplex_m_x_get, _newton.ndTriplex_m_x_set)
+    m_y = property(_newton.ndTriplex_m_y_get, _newton.ndTriplex_m_y_set)
+    m_z = property(_newton.ndTriplex_m_z_get, _newton.ndTriplex_m_z_set)
+
+    def __init__(self):
+        _newton.ndTriplex_swiginit(self, _newton.new_ndTriplex())
+    __swig_destroy__ = _newton.delete_ndTriplex
+
+# Register ndTriplex in _newton:
+_newton.ndTriplex_swigregister(ndTriplex)
+
+class ndTriplexReal(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+
+    def __init__(self, *args):
+        _newton.ndTriplexReal_swiginit(self, _newton.new_ndTriplexReal(*args))
+    m_x = property(_newton.ndTriplexReal_m_x_get, _newton.ndTriplexReal_m_x_set)
+    m_y = property(_newton.ndTriplexReal_m_y_get, _newton.ndTriplexReal_m_y_set)
+    m_z = property(_newton.ndTriplexReal_m_z_get, _newton.ndTriplexReal_m_z_set)
+    __swig_destroy__ = _newton.delete_ndTriplexReal
+
+# Register ndTriplexReal in _newton:
+_newton.ndTriplexReal_swigregister(ndTriplexReal)
+
+class ndClassAlloc(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+
+    def __init__(self):
+        _newton.ndClassAlloc_swiginit(self, _newton.new_ndClassAlloc())
+
+    def CreateArray(self, size):
+        return _newton.ndClassAlloc_CreateArray(self, size)
+
+    def DestroyArray(self, ptr):
+        return _newton.ndClassAlloc_DestroyArray(self, ptr)
+
+    def Create(self, *args):
+        return _newton.ndClassAlloc_Create(self, *args)
+
+    def Destroy(self, *args):
+        return _newton.ndClassAlloc_Destroy(self, *args)
+
+    @staticmethod
+    def Malloc(size):
+        return _newton.ndClassAlloc_Malloc(size)
+
+    @staticmethod
+    def Free(ptr):
+        return _newton.ndClassAlloc_Free(ptr)
+    __swig_destroy__ = _newton.delete_ndClassAlloc
+
+# Register ndClassAlloc in _newton:
+_newton.ndClassAlloc_swigregister(ndClassAlloc)
+
+def ndClassAlloc_Malloc(size):
+    return _newton.ndClassAlloc_Malloc(size)
+
+def ndClassAlloc_Free(ptr):
+    return _newton.ndClassAlloc_Free(ptr)
+
 
 def ndGetZeroMatrix():
     return _newton.ndGetZeroMatrix()
@@ -86,12 +192,11 @@ def ndGramSchmidtMatrix(dir):
 def ndCovarianceMatrix(p, q):
     return _newton.ndCovarianceMatrix(p, q)
 
-def ndCalculateMatrix(rotation, position):
-    return _newton.ndCalculateMatrix(rotation, position)
-class ndMatrix(object):
+def ndCalculateMatrix(*args):
+    return _newton.ndCalculateMatrix(*args)
+class ndMatrix(ndClassAlloc):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
-    __swig_destroy__ = _newton.delete_ndMatrix
 
     def Inverse(self):
         return _newton.ndMatrix_Inverse(self)
@@ -141,6 +246,9 @@ class ndMatrix(object):
     def TransformTriplex(self, *args):
         return _newton.ndMatrix_TransformTriplex(self, *args)
 
+    def SanityCheck(self):
+        return _newton.ndMatrix_SanityCheck(self)
+
     def TestIdentity(self):
         return _newton.ndMatrix_TestIdentity(self)
 
@@ -168,6 +276,7 @@ class ndMatrix(object):
     m_up = property(_newton.ndMatrix_m_up_get, _newton.ndMatrix_m_up_set)
     m_right = property(_newton.ndMatrix_m_right_get, _newton.ndMatrix_m_right_set)
     m_posit = property(_newton.ndMatrix_m_posit_get, _newton.ndMatrix_m_posit_set)
+    __swig_destroy__ = _newton.delete_ndMatrix
 
 # Register ndMatrix in _newton:
 _newton.ndMatrix_swigregister(ndMatrix)
@@ -197,11 +306,23 @@ class ndQuaternion(object):
     def __mul__(self, B):
         return _newton.ndQuaternion___mul__(self, B)
 
+    def GetEulerAngles(self, euler):
+        return _newton.ndQuaternion_GetEulerAngles(self, euler)
+
+    def RotateVector(self, point):
+        return _newton.ndQuaternion_RotateVector(self, point)
+
+    def UnrotateVector(self, point):
+        return _newton.ndQuaternion_UnrotateVector(self, point)
+
     def Slerp(self, q1, t):
         return _newton.ndQuaternion_Slerp(self, q1, t)
 
     def CalcAverageOmega(self, q1, invdt):
         return _newton.ndQuaternion_CalcAverageOmega(self, q1, invdt)
+
+    def IntegrateOmega(self, omega, timestep):
+        return _newton.ndQuaternion_IntegrateOmega(self, omega, timestep)
     __swig_destroy__ = _newton.delete_ndQuaternion
 
 # Register ndQuaternion in _newton:
@@ -213,6 +334,7 @@ m_sphere = _newton.m_sphere
 m_capsule = _newton.m_capsule
 m_cylinder = _newton.m_cylinder
 m_chamferCylinder = _newton.m_chamferCylinder
+m_userDefinedImplicit = _newton.m_userDefinedImplicit
 m_convexHull = _newton.m_convexHull
 m_compound = _newton.m_compound
 m_staticMesh = _newton.m_staticMesh
@@ -386,7 +508,6 @@ class ndHeighfieldInfo(object):
     m_width = property(_newton.ndHeighfieldInfo_m_width_get, _newton.ndHeighfieldInfo_m_width_set)
     m_height = property(_newton.ndHeighfieldInfo_m_height_get, _newton.ndHeighfieldInfo_m_height_set)
     m_gridsDiagonals = property(_newton.ndHeighfieldInfo_m_gridsDiagonals_get, _newton.ndHeighfieldInfo_m_gridsDiagonals_set)
-    m_verticalScale = property(_newton.ndHeighfieldInfo_m_verticalScale_get, _newton.ndHeighfieldInfo_m_verticalScale_set)
     m_horizonalScale_x = property(_newton.ndHeighfieldInfo_m_horizonalScale_x_get, _newton.ndHeighfieldInfo_m_horizonalScale_x_set)
     m_horizonalScale_z = property(_newton.ndHeighfieldInfo_m_horizonalScale_z_get, _newton.ndHeighfieldInfo_m_horizonalScale_z_set)
     m_elevation = property(_newton.ndHeighfieldInfo_m_elevation_get, _newton.ndHeighfieldInfo_m_elevation_set)
@@ -423,6 +544,16 @@ class ndShape(object):
     def __init__(self, *args, **kwargs):
         raise AttributeError("No constructor defined - class is abstract")
     __repr__ = _swig_repr
+
+    def ClassName(self):
+        return _newton.ndShape_ClassName(self)
+
+    @staticmethod
+    def StaticClassName():
+        return _newton.ndShape_StaticClassName()
+
+    def SuperClassName(self):
+        return _newton.ndShape_SuperClassName(self)
     __swig_destroy__ = _newton.delete_ndShape
 
     def GetRefCount(self):
@@ -467,6 +598,9 @@ class ndShape(object):
     def GetAsShapeStaticMesh(self):
         return _newton.ndShape_GetAsShapeStaticMesh(self)
 
+    def GetAsShapeConvexHull(self):
+        return _newton.ndShape_GetAsShapeConvexHull(self)
+
     def GetAsShapeHeightfield(self):
         return _newton.ndShape_GetAsShapeHeightfield(self)
 
@@ -475,6 +609,9 @@ class ndShape(object):
 
     def GetAsShapeChamferCylinder(self):
         return _newton.ndShape_GetAsShapeChamferCylinder(self)
+
+    def GetAsShapeUserDefinedImplicit(self):
+        return _newton.ndShape_GetAsShapeUserDefinedImplicit(self)
 
     def GetAsShapeStaticProceduralMesh(self):
         return _newton.ndShape_GetAsShapeStaticProceduralMesh(self)
@@ -494,11 +631,14 @@ class ndShape(object):
     def MassProperties(self):
         return _newton.ndShape_MassProperties(self)
 
-    def DebugShape(self, matrix, debugCallback):
-        return _newton.ndShape_DebugShape(self, matrix, debugCallback)
-
     def GetShapeInfo(self):
         return _newton.ndShape_GetShapeInfo(self)
+
+    def CalculateInertiaAndCenterOfMass(self, alignMatrix, localScale, matrix):
+        return _newton.ndShape_CalculateInertiaAndCenterOfMass(self, alignMatrix, localScale, matrix)
+
+    def CalculateMassProperties(self, offset, inertia, crossInertia, centerOfMass):
+        return _newton.ndShape_CalculateMassProperties(self, offset, inertia, crossInertia, centerOfMass)
 
     def GetVolume(self):
         return _newton.ndShape_GetVolume(self)
@@ -512,17 +652,17 @@ class ndShape(object):
     def GetHash(self, hash=0):
         return _newton.ndShape_GetHash(self, hash)
 
+    def SupportVertex(self, dir):
+        return _newton.ndShape_SupportVertex(self, dir)
+
+    def SupportVertexSpecial(self, dir, skinMargin):
+        return _newton.ndShape_SupportVertexSpecial(self, dir, skinMargin)
+
     def CalculateAabb(self, matrix, p0, p1):
         return _newton.ndShape_CalculateAabb(self, matrix, p0, p1)
 
-    def SupportVertex(self, dir, vertexIndex):
-        return _newton.ndShape_SupportVertex(self, dir, vertexIndex)
-
     def SupportVertexSpecialProjectPoint(self, point, dir):
         return _newton.ndShape_SupportVertexSpecialProjectPoint(self, point, dir)
-
-    def SupportVertexSpecial(self, dir, skinMargin, vertexIndex):
-        return _newton.ndShape_SupportVertexSpecial(self, dir, skinMargin, vertexIndex)
 
     def CalculatePlaneIntersection(self, normal, point, contactsOut):
         return _newton.ndShape_CalculatePlaneIntersection(self, normal, point, contactsOut)
@@ -533,18 +673,28 @@ class ndShape(object):
     def RayCast(self, callback, localP0, localP1, maxT, body, contactOut):
         return _newton.ndShape_RayCast(self, callback, localP0, localP1, maxT, body, contactOut)
 
-    def CalculateInertiaAndCenterOfMass(self, alignMatrix, localScale, matrix):
-        return _newton.ndShape_CalculateInertiaAndCenterOfMass(self, alignMatrix, localScale, matrix)
-
-    def CalculateMassProperties(self, offset, inertia, crossInertia, centerOfMass):
-        return _newton.ndShape_CalculateMassProperties(self, offset, inertia, crossInertia, centerOfMass)
+    def DebugShape(self, matrix, debugCallback):
+        return _newton.ndShape_DebugShape(self, matrix, debugCallback)
 
 # Register ndShape in _newton:
 _newton.ndShape_swigregister(ndShape)
 
+def ndShape_StaticClassName():
+    return _newton.ndShape_StaticClassName()
+
 class ndShapeBox(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
+
+    def ClassName(self):
+        return _newton.ndShapeBox_ClassName(self)
+
+    @staticmethod
+    def StaticClassName():
+        return _newton.ndShapeBox_StaticClassName()
+
+    def SuperClassName(self):
+        return _newton.ndShapeBox_SuperClassName(self)
 
     def __init__(self, size_x, size_y, size_z):
         _newton.ndShapeBox_swiginit(self, _newton.new_ndShapeBox(size_x, size_y, size_z))
@@ -556,10 +706,23 @@ class ndShapeBox(object):
 # Register ndShapeBox in _newton:
 _newton.ndShapeBox_swigregister(ndShapeBox)
 
+def ndShapeBox_StaticClassName():
+    return _newton.ndShapeBox_StaticClassName()
+
 D_CONE_SEGMENTS = _newton.D_CONE_SEGMENTS
 class ndShapeCone(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
+
+    def ClassName(self):
+        return _newton.ndShapeCone_ClassName(self)
+
+    @staticmethod
+    def StaticClassName():
+        return _newton.ndShapeCone_StaticClassName()
+
+    def SuperClassName(self):
+        return _newton.ndShapeCone_SuperClassName(self)
 
     def __init__(self, radio, height):
         _newton.ndShapeCone_swiginit(self, _newton.new_ndShapeCone(radio, height))
@@ -571,6 +734,9 @@ class ndShapeCone(object):
 # Register ndShapeCone in _newton:
 _newton.ndShapeCone_swigregister(ndShapeCone)
 
+def ndShapeCone_StaticClassName():
+    return _newton.ndShapeCone_StaticClassName()
+
 D_CLIP_MAX_COUNT = _newton.D_CLIP_MAX_COUNT
 D_CLIP_MAX_POINT_COUNT = _newton.D_CLIP_MAX_POINT_COUNT
 class ndShapeConvex(ndShape):
@@ -580,13 +746,36 @@ class ndShapeConvex(ndShape):
         raise AttributeError("No constructor defined")
     __repr__ = _swig_repr
 
+    def ClassName(self):
+        return _newton.ndShapeConvex_ClassName(self)
+
+    @staticmethod
+    def StaticClassName():
+        return _newton.ndShapeConvex_StaticClassName()
+
+    def SuperClassName(self):
+        return _newton.ndShapeConvex_SuperClassName(self)
+
 # Register ndShapeConvex in _newton:
 _newton.ndShapeConvex_swigregister(ndShapeConvex)
+
+def ndShapeConvex_StaticClassName():
+    return _newton.ndShapeConvex_StaticClassName()
 
 D_SPHERE_VERTEX_COUNT = _newton.D_SPHERE_VERTEX_COUNT
 class ndShapeSphere(ndShapeConvex):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
+
+    def ClassName(self):
+        return _newton.ndShapeSphere_ClassName(self)
+
+    @staticmethod
+    def StaticClassName():
+        return _newton.ndShapeSphere_StaticClassName()
+
+    def SuperClassName(self):
+        return _newton.ndShapeSphere_SuperClassName(self)
 
     def __init__(self, radius):
         _newton.ndShapeSphere_swiginit(self, _newton.new_ndShapeSphere(radius))
@@ -598,816 +787,8 @@ class ndShapeSphere(ndShapeConvex):
 # Register ndShapeSphere in _newton:
 _newton.ndShapeSphere_swigregister(ndShapeSphere)
 
-class ndShapeCapsule(ndShapeConvex):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-
-    def __init__(self, radio0, radio1, height):
-        _newton.ndShapeCapsule_swiginit(self, _newton.new_ndShapeCapsule(radio0, radio1, height))
-
-    def GetAsShapeCapsule(self):
-        return _newton.ndShapeCapsule_GetAsShapeCapsule(self)
-    __swig_destroy__ = _newton.delete_ndShapeCapsule
-
-# Register ndShapeCapsule in _newton:
-_newton.ndShapeCapsule_swigregister(ndShapeCapsule)
-
-D_COMPOUND_STACK_DEPTH = _newton.D_COMPOUND_STACK_DEPTH
-class ndShapeCompound(ndShape):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-    m_leaf = _newton.ndShapeCompound_m_leaf
-    m_node = _newton.ndShapeCompound_m_node
-
-    def __init__(self):
-        _newton.ndShapeCompound_swiginit(self, _newton.new_ndShapeCompound())
-    __swig_destroy__ = _newton.delete_ndShapeCompound
-
-    def SetOwner(self, myInstance):
-        return _newton.ndShapeCompound_SetOwner(self, myInstance)
-
-    def GetTree(self):
-        return _newton.ndShapeCompound_GetTree(self)
-
-    def GetHash(self, hash):
-        return _newton.ndShapeCompound_GetHash(self, hash)
-
-    def BeginAddRemove(self):
-        return _newton.ndShapeCompound_BeginAddRemove(self)
-
-    def RemoveNode(self, node):
-        return _newton.ndShapeCompound_RemoveNode(self, node)
-
-    def AddCollision(self, part):
-        return _newton.ndShapeCompound_AddCollision(self, part)
-
-    def GetShapeInstance(self, node):
-        return _newton.ndShapeCompound_GetShapeInstance(self, node)
-
-    def EndAddRemove(self):
-        return _newton.ndShapeCompound_EndAddRemove(self)
-
-# Register ndShapeCompound in _newton:
-_newton.ndShapeCompound_swigregister(ndShapeCompound)
-
-D_TAPED_CYLINDER_SEGMENTS = _newton.D_TAPED_CYLINDER_SEGMENTS
-class ndShapeCylinder(ndShapeConvex):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-
-    def __init__(self, radio0, radio1, height):
-        _newton.ndShapeCylinder_swiginit(self, _newton.new_ndShapeCylinder(radio0, radio1, height))
-    __swig_destroy__ = _newton.delete_ndShapeCylinder
-
-    def GetAsShapeCylinder(self):
-        return _newton.ndShapeCylinder_GetAsShapeCylinder(self)
-
-# Register ndShapeCylinder in _newton:
-_newton.ndShapeCylinder_swigregister(ndShapeCylinder)
-
-class ndShapeStatic_bvh(object):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-
-    def __init__(self, *args):
-        _newton.ndShapeStatic_bvh_swiginit(self, _newton.new_ndShapeStatic_bvh(*args))
-    __swig_destroy__ = _newton.delete_ndShapeStatic_bvh
-
-    def Create(self, size):
-        return _newton.ndShapeStatic_bvh_Create(self, size)
-
-    def Destroy(self, ptr):
-        return _newton.ndShapeStatic_bvh_Destroy(self, ptr)
-
-# Register ndShapeStatic_bvh in _newton:
-_newton.ndShapeStatic_bvh_swigregister(ndShapeStatic_bvh)
-
-class ndShapeStaticMesh(ndShape):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-
-    def __init__(self, id):
-        _newton.ndShapeStaticMesh_swiginit(self, _newton.new_ndShapeStaticMesh(id))
-    __swig_destroy__ = _newton.delete_ndShapeStaticMesh
-
-    def DebugShape(self, matrix, debugCallback):
-        return _newton.ndShapeStaticMesh_DebugShape(self, matrix, debugCallback)
-
-    def RayCast(self, callback, localP0, localP1, maxT, body, contactOut):
-        return _newton.ndShapeStaticMesh_RayCast(self, callback, localP0, localP1, maxT, body, contactOut)
-
-    def GetCollidingFaces(self, data):
-        return _newton.ndShapeStaticMesh_GetCollidingFaces(self, data)
-
-# Register ndShapeStaticMesh in _newton:
-_newton.ndShapeStaticMesh_swigregister(ndShapeStaticMesh)
-
-class ndShapeConvexHull(ndShapeConvex):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-
-    def __init__(self, count, strideInBytes, tolerance, vertexArray, maxPointsOut=0x7fffffff):
-        _newton.ndShapeConvexHull_swiginit(self, _newton.new_ndShapeConvexHull(count, strideInBytes, tolerance, vertexArray, maxPointsOut))
-    __swig_destroy__ = _newton.delete_ndShapeConvexHull
-
-# Register ndShapeConvexHull in _newton:
-_newton.ndShapeConvexHull_swigregister(ndShapeConvexHull)
-
-class ndShapeHeightfield(ndShapeStaticMesh):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-    m_normalDiagonals = _newton.ndShapeHeightfield_m_normalDiagonals
-    m_invertedDiagonals = _newton.ndShapeHeightfield_m_invertedDiagonals
-
-    def __init__(self, width, height, constructionMode, horizontalScale_x, horizontalScale_z):
-        _newton.ndShapeHeightfield_swiginit(self, _newton.new_ndShapeHeightfield(width, height, constructionMode, horizontalScale_x, horizontalScale_z))
-    __swig_destroy__ = _newton.delete_ndShapeHeightfield
-
-    def GetElevationMap(self, *args):
-        return _newton.ndShapeHeightfield_GetElevationMap(self, *args)
-
-    def UpdateElevationMapAabb(self):
-        return _newton.ndShapeHeightfield_UpdateElevationMapAabb(self)
-
-    def GetLocalAabb(self, p0, p1, boxP0, boxP1):
-        return _newton.ndShapeHeightfield_GetLocalAabb(self, p0, p1, boxP0, boxP1)
-
-# Register ndShapeHeightfield in _newton:
-_newton.ndShapeHeightfield_swigregister(ndShapeHeightfield)
-
-DG_CHAMFERCYLINDER_SLICES = _newton.DG_CHAMFERCYLINDER_SLICES
-DG_CHAMFERCYLINDER_BRAKES = _newton.DG_CHAMFERCYLINDER_BRAKES
-DG_MAX_CHAMFERCYLINDER_DIR_COUNT = _newton.DG_MAX_CHAMFERCYLINDER_DIR_COUNT
-class ndShapeChamferCylinder(ndShapeConvex):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-
-    def __init__(self, radius, height):
-        _newton.ndShapeChamferCylinder_swiginit(self, _newton.new_ndShapeChamferCylinder(radius, height))
-    __swig_destroy__ = _newton.delete_ndShapeChamferCylinder
-
-    def GetAsShapeChamferCylinder(self):
-        return _newton.ndShapeChamferCylinder_GetAsShapeChamferCylinder(self)
-
-# Register ndShapeChamferCylinder in _newton:
-_newton.ndShapeChamferCylinder_swigregister(ndShapeChamferCylinder)
-
-class ndShapeDebugNotify(object):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-
-    def __init__(self, *args, **kwargs):
-        raise AttributeError("No constructor defined - class is abstract")
-    __repr__ = _swig_repr
-    m_shared = _newton.ndShapeDebugNotify_m_shared
-    m_open = _newton.ndShapeDebugNotify_m_open
-    __swig_destroy__ = _newton.delete_ndShapeDebugNotify
-
-    def DrawPolygon(self, vertexCount, faceArray, edgeType):
-        return _newton.ndShapeDebugNotify_DrawPolygon(self, vertexCount, faceArray, edgeType)
-    m_instance = property(_newton.ndShapeDebugNotify_m_instance_get, _newton.ndShapeDebugNotify_m_instance_set)
-
-# Register ndShapeDebugNotify in _newton:
-_newton.ndShapeDebugNotify_swigregister(ndShapeDebugNotify)
-
-class ndShapeInstance(object):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-    m_unit = _newton.ndShapeInstance_m_unit
-    m_uniform = _newton.ndShapeInstance_m_uniform
-    m_nonUniform = _newton.ndShapeInstance_m_nonUniform
-    m_global = _newton.ndShapeInstance_m_global
-
-    def __init__(self, *args):
-        _newton.ndShapeInstance_swiginit(self, _newton.new_ndShapeInstance(*args))
-    __swig_destroy__ = _newton.delete_ndShapeInstance
-
-    def Assigment(self, src):
-        return _newton.ndShapeInstance_Assigment(self, src)
-
-    def CalculateInertia(self):
-        return _newton.ndShapeInstance_CalculateInertia(self)
-
-    def CalculateObb(self, origin, size):
-        return _newton.ndShapeInstance_CalculateObb(self, origin, size)
-
-    def CalculateAabb(self, matrix, minP, maxP):
-        return _newton.ndShapeInstance_CalculateAabb(self, matrix, minP, maxP)
-
-    def DebugShape(self, matrix, debugCallback):
-        return _newton.ndShapeInstance_DebugShape(self, matrix, debugCallback)
-
-    def RayCast(self, callback, localP0, localP1, body, contactOut):
-        return _newton.ndShapeInstance_RayCast(self, callback, localP0, localP1, body, contactOut)
-
-    def GetShapeInfo(self):
-        return _newton.ndShapeInstance_GetShapeInfo(self)
-
-    def CalculateBuoyancyCenterOfPresure(self, com, matrix, fluidPlane):
-        return _newton.ndShapeInstance_CalculateBuoyancyCenterOfPresure(self, com, matrix, fluidPlane)
-
-    @staticmethod
-    def GetBoxPadding():
-        return _newton.ndShapeInstance_GetBoxPadding()
-
-    def SavePLY(self, fileName):
-        return _newton.ndShapeInstance_SavePLY(self, fileName)
-
-    def ClassName(self):
-        return _newton.ndShapeInstance_ClassName(self)
-
-    @staticmethod
-    def StaticClassName():
-        return _newton.ndShapeInstance_StaticClassName()
-
-    def SuperClassName(self):
-        return _newton.ndShapeInstance_SuperClassName(self)
-
-    def GetShape(self, *args):
-        return _newton.ndShapeInstance_GetShape(self, *args)
-
-    def SetShape(self, shape):
-        return _newton.ndShapeInstance_SetShape(self, shape)
-
-    def SupportVertex(self, dir):
-        return _newton.ndShapeInstance_SupportVertex(self, dir)
-
-    def GetScaledTransform(self, matrix):
-        return _newton.ndShapeInstance_GetScaledTransform(self, matrix)
-
-    def SupportVertexSpecial(self, dir, vertexIndex):
-        return _newton.ndShapeInstance_SupportVertexSpecial(self, dir, vertexIndex)
-
-    def SupportVertexSpecialProjectPoint(self, point, dir):
-        return _newton.ndShapeInstance_SupportVertexSpecialProjectPoint(self, point, dir)
-
-    def GetLocalMatrix(self):
-        return _newton.ndShapeInstance_GetLocalMatrix(self)
-
-    def SetLocalMatrix(self, matrix):
-        return _newton.ndShapeInstance_SetLocalMatrix(self, matrix)
-
-    def GetGlobalMatrix(self):
-        return _newton.ndShapeInstance_GetGlobalMatrix(self)
-
-    def SetGlobalMatrix(self, scale):
-        return _newton.ndShapeInstance_SetGlobalMatrix(self, scale)
-
-    def GetCollisionMode(self):
-        return _newton.ndShapeInstance_GetCollisionMode(self)
-
-    def SetCollisionMode(self, mode):
-        return _newton.ndShapeInstance_SetCollisionMode(self, mode)
-
-    def GetConvexVertexCount(self):
-        return _newton.ndShapeInstance_GetConvexVertexCount(self)
-
-    def GetMaterial(self):
-        return _newton.ndShapeInstance_GetMaterial(self)
-
-    def SetMaterial(self, material):
-        return _newton.ndShapeInstance_SetMaterial(self, material)
-
-    def GetScale(self):
-        return _newton.ndShapeInstance_GetScale(self)
-
-    def GetInvScale(self):
-        return _newton.ndShapeInstance_GetInvScale(self)
-
-    def GetAlignmentMatrix(self):
-        return _newton.ndShapeInstance_GetAlignmentMatrix(self)
-
-    def SetScale(self, scale):
-        return _newton.ndShapeInstance_SetScale(self, scale)
-
-    def SetGlobalScale(self, *args):
-        return _newton.ndShapeInstance_SetGlobalScale(self, *args)
-
-    def CalculatePlaneIntersection(self, normal, point, contactsOut):
-        return _newton.ndShapeInstance_CalculatePlaneIntersection(self, normal, point, contactsOut)
-
-    def GetVolume(self):
-        return _newton.ndShapeInstance_GetVolume(self)
-
-    def GetBoxMinRadius(self):
-        return _newton.ndShapeInstance_GetBoxMinRadius(self)
-
-    def GetBoxMaxRadius(self):
-        return _newton.ndShapeInstance_GetBoxMaxRadius(self)
-
-    def GetScaleType(self):
-        return _newton.ndShapeInstance_GetScaleType(self)
-
-    def GetUmbraClipSize(self):
-        return _newton.ndShapeInstance_GetUmbraClipSize(self)
-
-    def GetUserDataID(self):
-        return _newton.ndShapeInstance_GetUserDataID(self)
-    m_globalMatrix = property(_newton.ndShapeInstance_m_globalMatrix_get, _newton.ndShapeInstance_m_globalMatrix_set)
-    m_localMatrix = property(_newton.ndShapeInstance_m_localMatrix_get, _newton.ndShapeInstance_m_localMatrix_set)
-    m_alignmentMatrix = property(_newton.ndShapeInstance_m_alignmentMatrix_get, _newton.ndShapeInstance_m_alignmentMatrix_set)
-    m_scale = property(_newton.ndShapeInstance_m_scale_get, _newton.ndShapeInstance_m_scale_set)
-    m_invScale = property(_newton.ndShapeInstance_m_invScale_get, _newton.ndShapeInstance_m_invScale_set)
-    m_maxScale = property(_newton.ndShapeInstance_m_maxScale_get, _newton.ndShapeInstance_m_maxScale_set)
-    m_shapeMaterial = property(_newton.ndShapeInstance_m_shapeMaterial_get, _newton.ndShapeInstance_m_shapeMaterial_set)
-    m_shape = property(_newton.ndShapeInstance_m_shape_get, _newton.ndShapeInstance_m_shape_set)
-    m_ownerBody = property(_newton.ndShapeInstance_m_ownerBody_get, _newton.ndShapeInstance_m_ownerBody_set)
-    m_subCollisionHandle = property(_newton.ndShapeInstance_m_subCollisionHandle_get, _newton.ndShapeInstance_m_subCollisionHandle_set)
-    m_parent = property(_newton.ndShapeInstance_m_parent_get, _newton.ndShapeInstance_m_parent_set)
-    m_skinMargin = property(_newton.ndShapeInstance_m_skinMargin_get, _newton.ndShapeInstance_m_skinMargin_set)
-    m_scaleType = property(_newton.ndShapeInstance_m_scaleType_get, _newton.ndShapeInstance_m_scaleType_set)
-    m_collisionMode = property(_newton.ndShapeInstance_m_collisionMode_get, _newton.ndShapeInstance_m_collisionMode_set)
-
-# Register ndShapeInstance in _newton:
-_newton.ndShapeInstance_swigregister(ndShapeInstance)
-
-def ndShapeInstance_GetBoxPadding():
-    return _newton.ndShapeInstance_GetBoxPadding()
-
-def ndShapeInstance_StaticClassName():
-    return _newton.ndShapeInstance_StaticClassName()
-
-class ndBody(object):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-
-    def __init__(self, *args, **kwargs):
-        raise AttributeError("No constructor defined - class is abstract")
-    __repr__ = _swig_repr
-    __swig_destroy__ = _newton.delete_ndBody
-
-    def GetAsBody(self):
-        return _newton.ndBody_GetAsBody(self)
-
-    def GetAsBodyDynamic(self):
-        return _newton.ndBody_GetAsBodyDynamic(self)
-
-    def GetAsBodySentinel(self):
-        return _newton.ndBody_GetAsBodySentinel(self)
-
-    def GetAsBodySphFluid(self):
-        return _newton.ndBody_GetAsBodySphFluid(self)
-
-    def GetAsBodyKinematic(self):
-        return _newton.ndBody_GetAsBodyKinematic(self)
-
-    def GetAsBodyParticleSet(self):
-        return _newton.ndBody_GetAsBodyParticleSet(self)
-
-    def GetAsBodyPlayerCapsule(self):
-        return _newton.ndBody_GetAsBodyPlayerCapsule(self)
-
-    def GetAsBodyTriggerVolume(self):
-        return _newton.ndBody_GetAsBodyTriggerVolume(self)
-
-    def GetAsBodyKinematicSpecial(self):
-        return _newton.ndBody_GetAsBodyKinematicSpecial(self)
-
-    def GetId(self):
-        return _newton.ndBody_GetId(self)
-
-    def GetAABB(self, p0, p1):
-        return _newton.ndBody_GetAABB(self, p0, p1)
-
-    def GetInvMass(self):
-        return _newton.ndBody_GetInvMass(self)
-
-    def RayCast(self, callback, ray, maxT):
-        return _newton.ndBody_RayCast(self, callback, ray, maxT)
-
-    def GetCentreOfMass(self):
-        return _newton.ndBody_GetCentreOfMass(self)
-
-    def SetCentreOfMass(self, com):
-        return _newton.ndBody_SetCentreOfMass(self, com)
-
-    def GetNotifyCallback(self):
-        return _newton.ndBody_GetNotifyCallback(self)
-
-    def GetOmega(self):
-        return _newton.ndBody_GetOmega(self)
-
-    def GetMatrix(self):
-        return _newton.ndBody_GetMatrix(self)
-
-    def GetVelocity(self):
-        return _newton.ndBody_GetVelocity(self)
-
-    def GetPosition(self):
-        return _newton.ndBody_GetPosition(self)
-
-    def GetRotation(self):
-        return _newton.ndBody_GetRotation(self)
-
-    def GetGlobalGetCentreOfMass(self):
-        return _newton.ndBody_GetGlobalGetCentreOfMass(self)
-
-    def SetNotifyCallback(self, notify):
-        return _newton.ndBody_SetNotifyCallback(self, notify)
-
-    def SetOmega(self, veloc):
-        return _newton.ndBody_SetOmega(self, veloc)
-
-    def SetVelocity(self, veloc):
-        return _newton.ndBody_SetVelocity(self, veloc)
-
-    def SetMatrix(self, matrix):
-        return _newton.ndBody_SetMatrix(self, matrix)
-
-    def GetVelocityAtPoint(self, point):
-        return _newton.ndBody_GetVelocityAtPoint(self, point)
-
-    def SetOmegaNoSleep(self, veloc):
-        return _newton.ndBody_SetOmegaNoSleep(self, veloc)
-
-    def SetVelocityNoSleep(self, veloc):
-        return _newton.ndBody_SetVelocityNoSleep(self, veloc)
-
-    def SetMatrixNoSleep(self, matrix):
-        return _newton.ndBody_SetMatrixNoSleep(self, matrix)
-
-    def SetMatrixAndCentreOfMass(self, rotation, globalcom):
-        return _newton.ndBody_SetMatrixAndCentreOfMass(self, rotation, globalcom)
-
-# Register ndBody in _newton:
-_newton.ndBody_swigregister(ndBody)
-
-class ndBodyKinematic(ndBody):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-
-    def __init__(self):
-        _newton.ndBodyKinematic_swiginit(self, _newton.new_ndBodyKinematic())
-    __swig_destroy__ = _newton.delete_ndBodyKinematic
-
-    def GetScene(self):
-        return _newton.ndBodyKinematic_GetScene(self)
-
-    def GetIndex(self):
-        return _newton.ndBodyKinematic_GetIndex(self)
-
-    def GetInvMass(self):
-        return _newton.ndBodyKinematic_GetInvMass(self)
-
-    def GetInvInertia(self):
-        return _newton.ndBodyKinematic_GetInvInertia(self)
-
-    def GetInvInertiaMatrix(self):
-        return _newton.ndBodyKinematic_GetInvInertiaMatrix(self)
-
-    def GetGyroAlpha(self):
-        return _newton.ndBodyKinematic_GetGyroAlpha(self)
-
-    def GetGyroTorque(self):
-        return _newton.ndBodyKinematic_GetGyroTorque(self)
-
-    def GetSleepState(self):
-        return _newton.ndBodyKinematic_GetSleepState(self)
-
-    def RestoreSleepState(self, state):
-        return _newton.ndBodyKinematic_RestoreSleepState(self, state)
-
-    def SetSleepState(self, state):
-        return _newton.ndBodyKinematic_SetSleepState(self, state)
-
-    def GetAutoSleep(self):
-        return _newton.ndBodyKinematic_GetAutoSleep(self)
-
-    def SetAutoSleep(self, state):
-        return _newton.ndBodyKinematic_SetAutoSleep(self, state)
-
-    def GetMaxLinearStep(self):
-        return _newton.ndBodyKinematic_GetMaxLinearStep(self)
-
-    def GetMaxAngularStep(self):
-        return _newton.ndBodyKinematic_GetMaxAngularStep(self)
-
-    def SetDebugMaxLinearAndAngularIntegrationStep(self, angleInRadian, stepInUnitPerSeconds):
-        return _newton.ndBodyKinematic_SetDebugMaxLinearAndAngularIntegrationStep(self, angleInRadian, stepInUnitPerSeconds)
-
-    def GetLinearDamping(self):
-        return _newton.ndBodyKinematic_GetLinearDamping(self)
-
-    def SetLinearDamping(self, linearDamp):
-        return _newton.ndBodyKinematic_SetLinearDamping(self, linearDamp)
-
-    def GetCachedDamping(self):
-        return _newton.ndBodyKinematic_GetCachedDamping(self)
-
-    def GetAngularDamping(self):
-        return _newton.ndBodyKinematic_GetAngularDamping(self)
-
-    def SetAngularDamping(self, angularDamp):
-        return _newton.ndBodyKinematic_SetAngularDamping(self, angularDamp)
-
-    def GetCollisionShape(self, *args):
-        return _newton.ndBodyKinematic_GetCollisionShape(self, *args)
-
-    def SetCollisionShape(self, shapeInstance):
-        return _newton.ndBodyKinematic_SetCollisionShape(self, shapeInstance)
-
-    def RayCast(self, callback, ray, maxT):
-        return _newton.ndBodyKinematic_RayCast(self, callback, ray, maxT)
-
-    def CalculateLinearMomentum(self):
-        return _newton.ndBodyKinematic_CalculateLinearMomentum(self)
-
-    def CalculateAngularMomentum(self):
-        return _newton.ndBodyKinematic_CalculateAngularMomentum(self)
-
-    def TotalEnergy(self):
-        return _newton.ndBodyKinematic_TotalEnergy(self)
-
-    def IntegrateVelocity(self, timestep):
-        return _newton.ndBodyKinematic_IntegrateVelocity(self, timestep)
-
-    def SetMatrixUpdateScene(self, matrix):
-        return _newton.ndBodyKinematic_SetMatrixUpdateScene(self, matrix)
-
-    def FindContact(self, otherBody):
-        return _newton.ndBodyKinematic_FindContact(self, otherBody)
-
-    def CalculateInertiaMatrix(self):
-        return _newton.ndBodyKinematic_CalculateInertiaMatrix(self)
-
-    def CalculateInvInertiaMatrix(self):
-        return _newton.ndBodyKinematic_CalculateInvInertiaMatrix(self)
-
-    def UpdateInvInertiaMatrix(self):
-        return _newton.ndBodyKinematic_UpdateInvInertiaMatrix(self)
-
-    def SetMassMatrix(self, *args):
-        return _newton.ndBodyKinematic_SetMassMatrix(self, *args)
-
-    def GetPrincipalAxis(self):
-        return _newton.ndBodyKinematic_GetPrincipalAxis(self)
-
-    def GetMassMatrix(self, *args):
-        return _newton.ndBodyKinematic_GetMassMatrix(self, *args)
-
-    def GetAsBodyKinematic(self):
-        return _newton.ndBodyKinematic_GetAsBodyKinematic(self)
-
-    def GetSkeleton(self):
-        return _newton.ndBodyKinematic_GetSkeleton(self)
-
-    def SetSkeleton(self, skeleton):
-        return _newton.ndBodyKinematic_SetSkeleton(self, skeleton)
-
-    def GetForce(self):
-        return _newton.ndBodyKinematic_GetForce(self)
-
-    def GetTorque(self):
-        return _newton.ndBodyKinematic_GetTorque(self)
-
-    def SetForce(self, force):
-        return _newton.ndBodyKinematic_SetForce(self, force)
-
-    def SetTorque(self, torque):
-        return _newton.ndBodyKinematic_SetTorque(self, torque)
-
-    def AddImpulse(self, pointVeloc, pointPosit, timestep):
-        return _newton.ndBodyKinematic_AddImpulse(self, pointVeloc, pointPosit, timestep)
-
-    def ApplyImpulsePair(self, linearImpulse, angularImpulse, timestep):
-        return _newton.ndBodyKinematic_ApplyImpulsePair(self, linearImpulse, angularImpulse, timestep)
-
-    def ApplyImpulsesAtPoint(self, count, impulseArray, pointArray, timestep):
-        return _newton.ndBodyKinematic_ApplyImpulsesAtPoint(self, count, impulseArray, pointArray, timestep)
-
-    def GetAccel(self):
-        return _newton.ndBodyKinematic_GetAccel(self)
-
-    def GetAlpha(self):
-        return _newton.ndBodyKinematic_GetAlpha(self)
-
-    def SetAccel(self, accel):
-        return _newton.ndBodyKinematic_SetAccel(self, accel)
-
-    def SetAlpha(self, alpha):
-        return _newton.ndBodyKinematic_SetAlpha(self, alpha)
-
-    def GetContactMap(self, *args):
-        return _newton.ndBodyKinematic_GetContactMap(self, *args)
-
-    def GetJointList(self):
-        return _newton.ndBodyKinematic_GetJointList(self)
-
-# Register ndBodyKinematic in _newton:
-_newton.ndBodyKinematic_swigregister(ndBodyKinematic)
-
-class ndBodySentinel(ndBodyKinematic):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-
-    def __init__(self):
-        _newton.ndBodySentinel_swiginit(self, _newton.new_ndBodySentinel())
-    __swig_destroy__ = _newton.delete_ndBodySentinel
-
-# Register ndBodySentinel in _newton:
-_newton.ndBodySentinel_swigregister(ndBodySentinel)
-
-class ndBodyTriggerVolume(object):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-
-    def __init__(self):
-        _newton.ndBodyTriggerVolume_swiginit(self, _newton.new_ndBodyTriggerVolume())
-    __swig_destroy__ = _newton.delete_ndBodyTriggerVolume
-
-    def GetAsBodyTriggerVolume(self):
-        return _newton.ndBodyTriggerVolume_GetAsBodyTriggerVolume(self)
-
-    def OnTrigger(self, body, timestep):
-        return _newton.ndBodyTriggerVolume_OnTrigger(self, body, timestep)
-
-    def OnTriggerEnter(self, body, timestep):
-        return _newton.ndBodyTriggerVolume_OnTriggerEnter(self, body, timestep)
-
-    def OnTriggerExit(self, body, timestep):
-        return _newton.ndBodyTriggerVolume_OnTriggerExit(self, body, timestep)
-
-    def SpecialUpdate(self, timestep):
-        return _newton.ndBodyTriggerVolume_SpecialUpdate(self, timestep)
-
-# Register ndBodyTriggerVolume in _newton:
-_newton.ndBodyTriggerVolume_swigregister(ndBodyTriggerVolume)
-
-class ndBodyPlayerCapsule(object):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-
-    def __init__(self, *args):
-        _newton.ndBodyPlayerCapsule_swiginit(self, _newton.new_ndBodyPlayerCapsule(*args))
-    __swig_destroy__ = _newton.delete_ndBodyPlayerCapsule
-
-    def GetAsBodyPlayerCapsule(self):
-        return _newton.ndBodyPlayerCapsule_GetAsBodyPlayerCapsule(self)
-
-    def GetForwardSpeed(self):
-        return _newton.ndBodyPlayerCapsule_GetForwardSpeed(self)
-
-    def SetForwardSpeed(self, speed):
-        return _newton.ndBodyPlayerCapsule_SetForwardSpeed(self, speed)
-
-    def GetLateralSpeed(self):
-        return _newton.ndBodyPlayerCapsule_GetLateralSpeed(self)
-
-    def SetLateralSpeed(self, speed):
-        return _newton.ndBodyPlayerCapsule_SetLateralSpeed(self, speed)
-
-    def GetHeadingAngle(self):
-        return _newton.ndBodyPlayerCapsule_GetHeadingAngle(self)
-
-    def SetHeadingAngle(self, angle):
-        return _newton.ndBodyPlayerCapsule_SetHeadingAngle(self, angle)
-
-    def IsOnFloor(self):
-        return _newton.ndBodyPlayerCapsule_IsOnFloor(self)
-
-    def ApplyInputs(self, timestep):
-        return _newton.ndBodyPlayerCapsule_ApplyInputs(self, timestep)
-
-    def ContactFrictionCallback(self, position, normal, contactId, otherbody):
-        return _newton.ndBodyPlayerCapsule_ContactFrictionCallback(self, position, normal, contactId, otherbody)
-
-# Register ndBodyPlayerCapsule in _newton:
-_newton.ndBodyPlayerCapsule_swigregister(ndBodyPlayerCapsule)
-
-class ndBodyKinematicBase(ndBodyKinematic):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-
-    def __init__(self):
-        _newton.ndBodyKinematicBase_swiginit(self, _newton.new_ndBodyKinematicBase())
-    __swig_destroy__ = _newton.delete_ndBodyKinematicBase
-
-    def SpecialUpdate(self, timestep):
-        return _newton.ndBodyKinematicBase_SpecialUpdate(self, timestep)
-
-    def GetAsBodyKinematicSpecial(self):
-        return _newton.ndBodyKinematicBase_GetAsBodyKinematicSpecial(self)
-
-# Register ndBodyKinematicBase in _newton:
-_newton.ndBodyKinematicBase_swigregister(ndBodyKinematicBase)
-
-class ndBodyNotify(object):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-
-    def __init__(self, defaultGravity):
-        _newton.ndBodyNotify_swiginit(self, _newton.new_ndBodyNotify(defaultGravity))
-    __swig_destroy__ = _newton.delete_ndBodyNotify
-
-    def GetBody(self, *args):
-        return _newton.ndBodyNotify_GetBody(self, *args)
-
-    def GetUserData(self):
-        return _newton.ndBodyNotify_GetUserData(self)
-
-    def GetGravity(self):
-        return _newton.ndBodyNotify_GetGravity(self)
-
-    def SetGravity(self, defaultGravity):
-        return _newton.ndBodyNotify_SetGravity(self, defaultGravity)
-
-    def OnTransform(self, threadIndex, matrix):
-        return _newton.ndBodyNotify_OnTransform(self, threadIndex, matrix)
-
-    def OnApplyExternalForce(self, threadIndex, timestep):
-        return _newton.ndBodyNotify_OnApplyExternalForce(self, threadIndex, timestep)
-
-# Register ndBodyNotify in _newton:
-_newton.ndBodyNotify_swigregister(ndBodyNotify)
-
-class ndMaterial(object):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-
-    def __init__(self):
-        _newton.ndMaterial_swiginit(self, _newton.new_ndMaterial())
-    m_restitution = property(_newton.ndMaterial_m_restitution_get, _newton.ndMaterial_m_restitution_set)
-    m_staticFriction0 = property(_newton.ndMaterial_m_staticFriction0_get, _newton.ndMaterial_m_staticFriction0_set)
-    m_staticFriction1 = property(_newton.ndMaterial_m_staticFriction1_get, _newton.ndMaterial_m_staticFriction1_set)
-    m_dynamicFriction0 = property(_newton.ndMaterial_m_dynamicFriction0_get, _newton.ndMaterial_m_dynamicFriction0_set)
-    m_dynamicFriction1 = property(_newton.ndMaterial_m_dynamicFriction1_get, _newton.ndMaterial_m_dynamicFriction1_set)
-    m_skinMargin = property(_newton.ndMaterial_m_skinMargin_get, _newton.ndMaterial_m_skinMargin_set)
-    m_softness = property(_newton.ndMaterial_m_softness_get, _newton.ndMaterial_m_softness_set)
-    m_flags = property(_newton.ndMaterial_m_flags_get, _newton.ndMaterial_m_flags_set)
-    m_userFlags = property(_newton.ndMaterial_m_userFlags_get, _newton.ndMaterial_m_userFlags_set)
-    __swig_destroy__ = _newton.delete_ndMaterial
-
-# Register ndMaterial in _newton:
-_newton.ndMaterial_swigregister(ndMaterial)
-
-class ndContactNotify(object):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-
-    def __init__(self, scene):
-        _newton.ndContactNotify_swiginit(self, _newton.new_ndContactNotify(scene))
-    __swig_destroy__ = _newton.delete_ndContactNotify
-
-    def GetMaterial(self, arg2, arg3, arg4):
-        return _newton.ndContactNotify_GetMaterial(self, arg2, arg3, arg4)
-
-# Register ndContactNotify in _newton:
-_newton.ndContactNotify_swigregister(ndContactNotify)
-
-class ndRayCastNotify(object):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-
-    def __init__(self, *args, **kwargs):
-        raise AttributeError("No constructor defined - class is abstract")
-    __repr__ = _swig_repr
-    __swig_destroy__ = _newton.delete_ndRayCastNotify
-
-    def TraceShape(self, globalOrigin, globalDestination, shapeInstance, shapeGlobal):
-        return _newton.ndRayCastNotify_TraceShape(self, globalOrigin, globalDestination, shapeInstance, shapeGlobal)
-
-    def OnRayPrecastAction(self, arg2, arg3):
-        return _newton.ndRayCastNotify_OnRayPrecastAction(self, arg2, arg3)
-
-    def OnRayCastAction(self, contact, intersetParam):
-        return _newton.ndRayCastNotify_OnRayCastAction(self, contact, intersetParam)
-    m_contact = property(_newton.ndRayCastNotify_m_contact_get, _newton.ndRayCastNotify_m_contact_set)
-    m_param = property(_newton.ndRayCastNotify_m_param_get, _newton.ndRayCastNotify_m_param_set)
-
-# Register ndRayCastNotify in _newton:
-_newton.ndRayCastNotify_swigregister(ndRayCastNotify)
-
-class ndRayCastClosestHitCallback(ndRayCastNotify):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-
-    def __init__(self):
-        _newton.ndRayCastClosestHitCallback_swiginit(self, _newton.new_ndRayCastClosestHitCallback())
-
-    def OnRayPrecastAction(self, body, arg3):
-        return _newton.ndRayCastClosestHitCallback_OnRayPrecastAction(self, body, arg3)
-
-    def OnRayCastAction(self, contact, intersetParam):
-        return _newton.ndRayCastClosestHitCallback_OnRayCastAction(self, contact, intersetParam)
-    __swig_destroy__ = _newton.delete_ndRayCastClosestHitCallback
-
-# Register ndRayCastClosestHitCallback in _newton:
-_newton.ndRayCastClosestHitCallback_swigregister(ndRayCastClosestHitCallback)
-
-class ndBodiesInAabbNotify(object):
-    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
-    __repr__ = _swig_repr
-
-    def __init__(self):
-        _newton.ndBodiesInAabbNotify_swiginit(self, _newton.new_ndBodiesInAabbNotify())
-    __swig_destroy__ = _newton.delete_ndBodiesInAabbNotify
-
-    def Reset(self):
-        return _newton.ndBodiesInAabbNotify_Reset(self)
-
-    def OnOverlap(self, body):
-        return _newton.ndBodiesInAabbNotify_OnOverlap(self, body)
-    m_bodyArray = property(_newton.ndBodiesInAabbNotify_m_bodyArray_get, _newton.ndBodiesInAabbNotify_m_bodyArray_set)
-
-# Register ndBodiesInAabbNotify in _newton:
-_newton.ndBodiesInAabbNotify_swigregister(ndBodiesInAabbNotify)
+def ndShapeSphere_StaticClassName():
+    return _newton.ndShapeSphere_StaticClassName()
 
 NOMINAL_FPS = _newton.NOMINAL_FPS
 class NewtonWorld(object):

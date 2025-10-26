@@ -16,13 +16,13 @@ project(${projectName})
 message (${projectName})
 
 if(MSVC OR MINGW)
-	set (swig "${CMAKE_SOURCE_DIR}/thirdParty/swigwin/swigwin-4.0.2/swig.exe")
+	set (swig "${CMAKE_SOURCE_DIR}/../../../thirdParty/swigwin/swigwin-4.0.2/swig.exe")
 else()
 	set (swig "/usr/bin/swig")
 endif()
 
-set (wrapper "${PROJECT_BINARY_DIR}/applications/toolsAndWrapers/${projectName}")
-set (swigScript "${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/${projectName}")
+set (wrapper "${PROJECT_BINARY_DIR}")
+set (swigScript "${CMAKE_SOURCE_DIR}")
 
 execute_process(COMMAND ${swig} -c++ -python ${swigScript}/newton.i)
 
