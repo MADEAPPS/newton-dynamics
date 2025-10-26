@@ -33,7 +33,7 @@
 %}
 
 %{
-	%include <ndNewtonInc.h>
+	#include <ndNewtonInc.h>
 	#include <newtonWorld.h>
 	#include "newtonConfig.h"
 %}

@@ -45,6 +45,10 @@ add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 include_directories(.)
 include_directories(install/source)
 
+message ("$ENV{Python}/Include")
+link_directories("$ENV{Python}/Libs")
+include_directories("$ENV{Python}/Include")
+
 add_library(${projectName} SHARED ${CPP_SOURCE})
 
 set (pySrc "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -60,6 +64,7 @@ else()
 endif()
 
 foreach(file IN LISTS PY_SOURCE)
+	message ("copy ${pySrc}/${file} to ${wrapper}/${projectName}/${file}")
 	add_custom_command(
 	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
 	ARGS -E copy ${pySrc}/${file} ${wrapper}/${projectName}/${file})
