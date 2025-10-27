@@ -190,20 +190,35 @@ def ParseMaterials(meshObj, path, xmlMaterials, layers, faceMaterials):
         #principled_bsdf.inputs["Metallic"].default_value = 0.1
         #principled_bsdf.inputs["Roughness"].default_value = 0.7
         materialOutput = nodes.get("Material Output")
-
-        shaderSpecularNode = nodes.new(type='ShaderNodeEeveeSpecular')
-        shaderSpecularNode.location = (-50, 70)
-        
+       
         #create the diffuse texture node
         textureName = xmlMaterial.find('texture').get('string')
         texturePath = path + "\\" + textureName
         image = bpy.data.images.load(texturePath)
         textureNode = nodes.new(type='ShaderNodeTexImage')
         textureNode.image = image
-        textureNode.location = (-350, 50)
+        textureNode.location = (-600, 50)
+        
+        # Create a new Vector Math node and set the operation
+        # Set the operation of the Vector Math node (e.g., ADD, SUBTRACT, MULTIPLY, DOT_PRODUCT, CROSS_PRODUCT, NORMALIZE, etc.)
+        diffuseColor = [float(x) for x in xmlMaterial.find('diffuse').get('float3').split()]
+        vectorMathNode = nodes.new(type='ShaderNodeVectorMath')
+        vectorMathNode.operation = 'MULTIPLY'   
+        vectorMathNode.name = "diffuseColor"
+        vectorMathNode.inputs[0].default_value = (1.0, 1.0, 1.0) # Vector A
+        vectorMathNode.inputs[1].default_value = (diffuseColor[0], diffuseColor[1], diffuseColor[2]) # Vector B
+        vectorMathNode.location = (-300, 50) 
+        #print (vectorMathNode.name)
+        
+        # create the specular shader
+        opacity = float(xmlMaterial.find('opacity').get('float'))
+        shaderSpecularNode = nodes.new(type='ShaderNodeEeveeSpecular')
+        #shaderSpecularNode.transparency  = 1.0 - opacity
+        shaderSpecularNode.inputs["Transparency"].default_value = 1.0 - opacity
+        shaderSpecularNode.location = (-50, 70)
 
-        #material.node_tree.links.new(textureNode.outputs['Color'], materialOutput.inputs['Surface'])
-        material.node_tree.links.new(textureNode.outputs['Color'], shaderSpecularNode.inputs['Base Color'])
+        material.node_tree.links.new(textureNode.outputs['Color'], vectorMathNode.inputs[0])
+        material.node_tree.links.new(vectorMathNode.outputs['Vector'], shaderSpecularNode.inputs['Base Color'])
         material.node_tree.links.new(shaderSpecularNode.outputs['BSDF'], materialOutput.inputs['Surface'])
        
         for node in nodes:
