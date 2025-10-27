@@ -191,15 +191,26 @@ def ParseMaterials(meshObj, path, xmlMaterials, layers, faceMaterials):
         #principled_bsdf.inputs["Roughness"].default_value = 0.7
         materialOutput = nodes.get("Material Output")
 
+        shaderSpecularNode = nodes.new(type='ShaderNodeEeveeSpecular')
+        shaderSpecularNode.location = (-50, 70)
+        
         #create the diffuse texture node
         textureName = xmlMaterial.find('texture').get('string')
         texturePath = path + "\\" + textureName
         image = bpy.data.images.load(texturePath)
-        texture_node = nodes.new(type='ShaderNodeTexImage')
-        texture_node.image = image
-        #material.node_tree.links.new(texture_node.outputs['Color'], principled_bsdf.inputs['Base Color'])
-        material.node_tree.links.new(texture_node.outputs['Color'], materialOutput.inputs['Surface'])
+        textureNode = nodes.new(type='ShaderNodeTexImage')
+        textureNode.image = image
+        textureNode.location = (-350, 50)
+
+        #material.node_tree.links.new(textureNode.outputs['Color'], materialOutput.inputs['Surface'])
+        material.node_tree.links.new(textureNode.outputs['Color'], shaderSpecularNode.inputs['Base Color'])
+        material.node_tree.links.new(shaderSpecularNode.outputs['BSDF'], materialOutput.inputs['Surface'])
        
+        for node in nodes:
+            if node.type == 'BSDF_PRINCIPLED':
+                nodes.remove(node)        
+                break
+
         meshObj.materials.append(material)
 
     # assign this material to the faces.
