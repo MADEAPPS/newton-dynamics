@@ -88,9 +88,7 @@ def SaveMesh(context, filepath):
     object = context.object
     
     if object.type != 'MESH':
-        print("please select a Mesh Type of node")
-        return {'FINISHED'}
-    
+        return {'CANCELLED'}
     
     xmlRoot = ET.Element("ndMesh")
     rawMesh = ndMesh(context, object)
