@@ -101,7 +101,9 @@ class ExportMesh(Operator, ExportHelper):
     def execute(self, context):
         object = context.object
         if (object != None):
-            ndMeshExport.SaveMesh(context, self.filepath)
+            if ndMeshExport.SaveMesh(context, self.filepath) != 'FINISHED':
+                self.report({'INFO'}, "please select a Mesh Node")
+                return {'CANCELLED'}
         return {'FINISHED'}
 
 # import a mesh browser 
