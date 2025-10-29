@@ -229,6 +229,7 @@ class ndBodyKinematic : public ndBody
 	friend class ndContact;
 	friend class ndIkSolver;
 	friend class ndBvhLeafNode;
+	friend class ndContactSolver;
 	friend class ndDynamicsUpdate;
 	friend class ndWorldSceneSycl;
 	friend class ndWorldSceneCuda;
