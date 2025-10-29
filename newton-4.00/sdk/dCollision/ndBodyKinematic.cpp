@@ -689,7 +689,9 @@ bool ndBodyKinematic::RayCast(ndRayCastNotify& callback, const ndFastRay& ray, n
 				contactOut.m_shapeInstance0 = &m_shapeInstance;
 				contactOut.m_shapeInstance1 = &m_shapeInstance;
 
-				ndFloat32 t = m_shapeInstance.RayCast(callback, localP0, localP1, this, contactOut, maxT);
+				// big mistake passing max t here
+				//ndFloat32 t = m_shapeInstance.RayCast(callback, localP0, localP1, this, contactOut, maxT);
+				ndFloat32 t = m_shapeInstance.RayCast(callback, localP0, localP1, this, contactOut, ndFloat32 (1.2f));
 				if (t < ndFloat32(1.0f))
 				{
 					ndAssert(localP0.m_w == localP1.m_w);
