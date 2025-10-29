@@ -530,12 +530,12 @@ ndFloat32 ndShapeCompound::RayCast(ndRayCastNotify& callback, const ndVector& lo
 	ndFloat32 distance[D_COMPOUND_STACK_DEPTH];
 	const ndNodeBase* stackPool[D_COMPOUND_STACK_DEPTH];
 
-//	ndFloat32 maxParam = maxT;
 	ndFastRay ray (localP0, localP1);
 
 	ndInt32 stack = 1;
 	stackPool[0] = m_root;
 	distance[0] = ray.BoxIntersect(m_root->m_p0, m_root->m_p1);
+
 	while (stack) 
 	{
 		stack --;
@@ -552,19 +552,21 @@ ndFloat32 ndShapeCompound::RayCast(ndRayCastNotify& callback, const ndVector& lo
 			if (me->m_type == m_leaf) 
 			{
 				ndContactPoint tmpContactOut;
-				ndShapeInstance* const shape = me->GetShape();
-				const ndVector p0 (shape->GetLocalMatrix().UntransformVector (localP0) & ndVector::m_triplexMask);
-				const ndVector p1 (shape->GetLocalMatrix().UntransformVector (localP1) & ndVector::m_triplexMask);
-				//ndFloat32 param = shape->RayCast (p0, p1, maxT, tmpContactOut, preFilter, body, userData);
-				ndFloat32 param = shape->RayCast(callback, p0, p1, body, tmpContactOut);
+				tmpContactOut.Init();
+				ndShapeInstance* const shapeInstance = me->GetShape();
+				const ndVector p0 (shapeInstance->GetLocalMatrix().UntransformVector (localP0) & ndVector::m_triplexMask);
+				const ndVector p1 (shapeInstance->GetLocalMatrix().UntransformVector (localP1) & ndVector::m_triplexMask);
+				ndFloat32 param = shapeInstance->RayCast(callback, p0, p1, body, tmpContactOut, maxT);
 				if (param < maxT) 
 				{
 					maxT = param;
-					contactOut.m_normal = shape->GetLocalMatrix().RotateVector (tmpContactOut.m_normal);
+					contactOut.m_normal = shapeInstance->GetLocalMatrix().RotateVector (tmpContactOut.m_normal);
 					contactOut.m_shapeId0 = tmpContactOut.m_shapeId0;
 					contactOut.m_shapeId1 = tmpContactOut.m_shapeId0;
-					contactOut.m_shapeInstance0 = tmpContactOut.m_shapeInstance0;
-					contactOut.m_shapeInstance1 = tmpContactOut.m_shapeInstance1;
+					//contactOut.m_shapeInstance0 = tmpContactOut.m_shapeInstance0;
+					//contactOut.m_shapeInstance1 = tmpContactOut.m_shapeInstance1;
+					contactOut.m_shapeInstance0 = shapeInstance;
+					contactOut.m_shapeInstance1 = shapeInstance;
 				}
 			} 
 			else 

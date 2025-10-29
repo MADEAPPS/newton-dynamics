@@ -37,6 +37,22 @@ D_MSV_NEWTON_CLASS_ALIGN_32
 class ndContactPoint
 {
 	public:
+	void Init()
+	{
+		m_point = ndVector::m_wOne;
+		m_normal = ndVector::m_zero;
+		m_normal.m_y = ndFloat32(1.0f);
+		m_body0 = nullptr;
+		m_body1 = nullptr;
+		m_shapeInstance0 = nullptr;
+		m_shapeInstance1 = nullptr;
+		m_shapeId0 = 0;
+		m_shapeId1 = 0;
+		m_penetration = ndFloat32 (0.0f);
+
+	}
+		
+
 	ndVector m_point;
 	ndVector m_normal;
 	const ndBodyKinematic* m_body0;
@@ -46,7 +62,6 @@ class ndContactPoint
 	ndInt64 m_shapeId0;
 	ndInt64 m_shapeId1;
 	ndFloat32 m_penetration;
-
 } D_GCC_NEWTON_CLASS_ALIGN_32;
 
 D_MSV_NEWTON_CLASS_ALIGN_32

@@ -684,7 +684,12 @@ bool ndBodyKinematic::RayCast(ndRayCastNotify& callback, const ndFastRay& ray, n
 			if (m_shapeInstance.GetCollisionMode())
 			{
 				ndContactPoint contactOut;
-				ndFloat32 t = m_shapeInstance.RayCast(callback, localP0, localP1, this, contactOut);
+
+				contactOut.Init();
+				contactOut.m_shapeInstance0 = &m_shapeInstance;
+				contactOut.m_shapeInstance1 = &m_shapeInstance;
+
+				ndFloat32 t = m_shapeInstance.RayCast(callback, localP0, localP1, this, contactOut, maxT);
 				if (t < ndFloat32(1.0f))
 				{
 					ndAssert(localP0.m_w == localP1.m_w);

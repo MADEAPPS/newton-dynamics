@@ -1206,16 +1206,6 @@ bool ndScene::RayCast(
 					ndFloat32 dist1 = ray.BoxIntersect(left->m_minBox, left->m_maxBox);
 					if (dist1 < callback.m_param)
 					{
-						//ndInt32 j = stack;
-						//for (; j && (dist1 > stackDistance[j - 1]); j--)
-						//{
-						//	stackPool[j] = stackPool[j - 1];
-						//	stackDistance[j] = stackDistance[j - 1];
-						//}
-						//stackPool[j] = left;
-						//stackDistance[j] = dist1;
-						//stack++;
-						//ndAssert(stack < D_SCENE_MAX_STACK_DEPTH);
 						InsertNode(left, dist1);
 					}
 				}
@@ -1226,16 +1216,6 @@ bool ndScene::RayCast(
 					ndFloat32 dist1 = ray.BoxIntersect(right->m_minBox, right->m_maxBox);
 					if (dist1 < callback.m_param)
 					{
-						//ndInt32 j = stack;
-						//for (; j && (dist1 > stackDistance[j - 1]); j--)
-						//{
-						//	stackPool[j] = stackPool[j - 1];
-						//	stackDistance[j] = stackDistance[j - 1];
-						//}
-						//stackPool[j] = right;
-						//stackDistance[j] = dist1;
-						//stack++;
-						//ndAssert(stack < D_SCENE_MAX_STACK_DEPTH);
 						InsertNode(right, dist1);
 					}
 				}

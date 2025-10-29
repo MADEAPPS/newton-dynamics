@@ -33,6 +33,7 @@ class ndRayCastNotify : public ndClassAlloc
 	ndRayCastNotify()
 		:m_param(ndFloat32 (1.0f))
 	{
+		m_contact.Init();
 	}
 
 	virtual ~ndRayCastNotify()

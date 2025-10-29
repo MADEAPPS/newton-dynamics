@@ -477,21 +477,17 @@ void ndShapeInstance::CalculateObb(ndVector& origin, ndVector& size) const
 	ndAssert(origin.m_w == ndFloat32(0.0f));
 }
 
-ndFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const
+ndFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, const ndBody* const body, ndContactPoint& contactOut, ndFloat32 maxT) const
 {
-	ndFloat32 t = ndFloat32(1.2f);
+	//ndFloat32 t = ndFloat32(1.2f);
+	ndFloat32 t = maxT;
 	if (callback.OnRayPrecastAction(body, this))
 	{
 		switch (m_scaleType)
 		{
 			case m_unit:
 			{
-				t = m_shape->RayCast(callback, localP0, localP1, ndFloat32(1.0f), body, contactOut);
-				if (t < ndFloat32 (1.0f)) 
-				{
-					contactOut.m_shapeInstance0 = this;
-					contactOut.m_shapeInstance1 = this;
-				}
+				t = m_shape->RayCast(callback, localP0, localP1, maxT, body, contactOut);
 				break;
 			}
 
@@ -499,13 +495,13 @@ ndFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const ndVector& lo
 			{
 				ndVector p0(localP0 * m_invScale);
 				ndVector p1(localP1 * m_invScale);
-				t = m_shape->RayCast(callback, p0, p1, ndFloat32(1.0f), body, contactOut);
-				if (t < ndFloat32(1.0f))
-				{
-					ndAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
-					contactOut.m_shapeInstance0 = this;
-					contactOut.m_shapeInstance1 = this;
-				}
+				t = m_shape->RayCast(callback, p0, p1, maxT, body, contactOut);
+				//if (t < maxT)
+				//{
+				//	ndAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
+				//	contactOut.m_shapeInstance0 = this;
+				//	contactOut.m_shapeInstance1 = this;
+				//}
 				break;
 			}
 
@@ -513,14 +509,14 @@ ndFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const ndVector& lo
 			{
 				ndVector p0(localP0 * m_invScale);
 				ndVector p1(localP1 * m_invScale);
-				t = m_shape->RayCast(callback, p0, p1, ndFloat32(1.0f), body, contactOut);
-				if (t < ndFloat32(1.0f))
+				t = m_shape->RayCast(callback, p0, p1, maxT, body, contactOut);
+				if (t < maxT)
 				{
 					ndAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
 					ndVector normal(m_invScale * contactOut.m_normal);
 					contactOut.m_normal = normal.Normalize();
-					contactOut.m_shapeInstance0 = this;
-					contactOut.m_shapeInstance1 = this;
+					//contactOut.m_shapeInstance0 = this;
+					//contactOut.m_shapeInstance1 = this;
 				}
 				break;
 			}
@@ -530,14 +526,14 @@ ndFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const ndVector& lo
 			{
 				ndVector p0(m_alignmentMatrix.UntransformVector(localP0 * m_invScale));
 				ndVector p1(m_alignmentMatrix.UntransformVector(localP1 * m_invScale));
-				t = m_shape->RayCast(callback, p0, p1, ndFloat32(1.0f), body, contactOut);
-				if (t < ndFloat32(1.0f))
+				t = m_shape->RayCast(callback, p0, p1, maxT, body, contactOut);
+				if (t < maxT)
 				{
 					ndAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
 					ndVector normal(m_alignmentMatrix.RotateVector(m_invScale * contactOut.m_normal));
 					contactOut.m_normal = normal.Normalize();
-					contactOut.m_shapeInstance0 = this;
-					contactOut.m_shapeInstance1 = this;
+					//contactOut.m_shapeInstance0 = this;
+					//contactOut.m_shapeInstance1 = this;
 				}
 				break;
 			}

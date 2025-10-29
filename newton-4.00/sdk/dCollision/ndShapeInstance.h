@@ -111,24 +111,20 @@ class ndShapeInstance: public ndContainersFreeListAlloc<ndShapeInstance>
 
 	D_COLLISION_API ndShapeInstance& operator=(const ndShapeInstance& src);
 
+	D_COLLISION_API static ndFloat32 GetBoxPadding();
+	D_COLLISION_API ndShapeInfo GetShapeInfo() const;
 	D_COLLISION_API ndMatrix CalculateInertia() const;
 	D_COLLISION_API void CalculateObb(ndVector& origin, ndVector& size) const;
 	D_COLLISION_API void CalculateAabb(const ndMatrix& matrix, ndVector& minP, ndVector& maxP) const;
 	D_COLLISION_API void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
-	D_COLLISION_API ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const;
-
-	//D_COLLISION_API ndInt32 ClosestPoint(const ndMatrix& matrix, const ndVector& point, ndVector& contactPoint) const;
-
-	D_COLLISION_API ndShapeInfo GetShapeInfo() const;
 	D_COLLISION_API ndFloat32 CalculateBuoyancyCenterOfPresure(ndVector& com, const ndMatrix& matrix, const ndVector& fluidPlane) const;
-
-	D_COLLISION_API static ndFloat32 GetBoxPadding();
+	D_COLLISION_API ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, const ndBody* const body, ndContactPoint& contactOut, ndFloat32 maxT) const;
 
 	D_COLLISION_API void SavePLY(const char* const fileName) const;
 
 	const char* ClassName() const;
-	static const char* StaticClassName();
 	const char* SuperClassName() const;
+	static const char* StaticClassName();
 	
 	D_COLLISION_API ndShape* GetShape();
 	D_COLLISION_API const ndShape* GetShape() const;

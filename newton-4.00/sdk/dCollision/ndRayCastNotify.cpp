@@ -33,9 +33,10 @@ bool ndRayCastNotify::TraceShape(const ndVector& globalOrigin, const ndVector& g
 	tmpBody.SetCollisionShape(shapeInstance);
 	tmpBody.SetMassMatrix(ndVector::m_one);
 
+	ndFloat32 maxT = ndFloat32(1.2f);
 	const ndVector& localOrigin(shapeGlobal.UntransformVector(globalOrigin) & ndVector::m_triplexMask);
 	const ndVector& localDestination(shapeGlobal.UntransformVector(globalDestination) & ndVector::m_triplexMask);
-	ndFloat32 t = shapeInstance.RayCast(*this, localOrigin, localDestination, &tmpBody, contactOut);
+	ndFloat32 t = shapeInstance.RayCast(*this, localOrigin, localDestination, &tmpBody, contactOut, maxT);
 	bool state = false;
 	if (t <= ndFloat32 (1.0f))
 	{
