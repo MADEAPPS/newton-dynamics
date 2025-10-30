@@ -495,7 +495,7 @@ ndBigVector ndContactSolver::ReduceTriangle(ndInt32& indexOut)
 	else
 	{
 		ndInt32 count = 3;
-		for (ndInt32 i = 2; i > 0; i--)
+		for (ndInt32 i = 2; i > 0; --i)
 		{
 			for (ndInt32 j = i - 1; j >= 0; --j)
 			{
@@ -1133,7 +1133,7 @@ ndInt32 ndContactSolver::PruneSupport(ndInt32 count, const ndVector& dir, const 
 
 ndInt32 ndContactSolver::PruneBruteForceSmallContacts(ndInt32 count, ndContactPoint* const contactArray) const
 {
-	for (ndInt32 i = count - 1; i > 0; i--)
+	for (ndInt32 i = count - 1; i > 0; --i)
 	{
 		for (ndInt32 j = i - 1; j >= 0; j--)
 		{
@@ -2511,7 +2511,7 @@ ndInt32 ndContactSolver::ConvexContactsDiscrete()
 	if (!m_intersectionTestOnly)
 	{
 		ndContactPoint* const contactOut = m_contactBuffer;
-		for (ndInt32 i = count - 1; i >= 0; i--)
+		for (ndInt32 i = count - 1; i >= 0; --i)
 		{
 			contactOut[i].m_point += offset;
 		}
@@ -3638,7 +3638,7 @@ ndInt32 ndContactSolver::ConvexContactsContinue()
 	if (!m_intersectionTestOnly)
 	{
 		ndContactPoint* const contactOut = m_contactBuffer;
-		for (ndInt32 i = count - 1; i >= 0; i--)
+		for (ndInt32 i = count - 1; i >= 0; --i)
 		{
 			contactOut[i].m_point += offset;
 		}
@@ -4072,7 +4072,7 @@ ndInt32 ndContactSolver::ConvexToStaticMeshContactsContinue()
 	if (!m_intersectionTestOnly)
 	{
 		ndContactPoint* const contactOut = m_contactBuffer;
-		for (ndInt32 i = count - 1; i >= 0; i--)
+		for (ndInt32 i = count - 1; i >= 0; --i)
 		{
 			contactOut[i].m_body0 = body0;
 			contactOut[i].m_body1 = body1;
@@ -4280,7 +4280,7 @@ ndInt32 ndContactSolver::ConvexToStaticMeshContactsDiscrete()
 	if (!m_intersectionTestOnly)
 	{
 		ndContactPoint* const contactOut = m_contactBuffer;
-		for (ndInt32 i = count - 1; i >= 0; i--)
+		for (ndInt32 i = count - 1; i >= 0; --i)
 		{
 			contactOut[i].m_body0 = body0;
 			contactOut[i].m_body1 = body1;
@@ -4390,7 +4390,7 @@ ndInt32 ndContactSolver::ConvexToSaticStaticBvhContactsNodeDescrete(const ndAabb
 	if (!m_intersectionTestOnly)
 	{
 		ndContactPoint* const contactOut = m_contactBuffer;
-		for (ndInt32 i = count - 1; i >= 0; i--)
+		for (ndInt32 i = count - 1; i >= 0; --i)
 		{
 			contactOut[i].m_point += offset;
 			contactOut[i].m_body0 = body0;
