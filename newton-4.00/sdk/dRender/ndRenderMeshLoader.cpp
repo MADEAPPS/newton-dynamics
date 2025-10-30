@@ -84,10 +84,13 @@ bool ndRenderMeshLoader::MeshToRenderSceneNode(const ndString& materialBasePath)
 		}
 		entity->m_name = mesh->GetName();
 
-		ndSharedPtr<ndMeshEffect> meshEffect(mesh->GetMesh());
-		if (*meshEffect)
+		if (entity->m_name.Find("hidden") == -1)
 		{
-			meshList.Append(EntityMeshPair(entity, mesh));
+			ndSharedPtr<ndMeshEffect> meshEffect(mesh->GetMesh());
+			if (*meshEffect)
+			{
+				meshList.Append(EntityMeshPair(entity, mesh));
+			}
 		}
 
 		for (ndList<ndSharedPtr<ndMesh>>::ndNode* childNode = mesh->GetChildren().GetFirst(); childNode; childNode = childNode->GetNext())
