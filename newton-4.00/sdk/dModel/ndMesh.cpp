@@ -779,18 +779,16 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionFromChildren()
 	ndAssert(shapeArray.GetCount());
 	if (shapeArray.GetCount() > 1)
 	{
-		ndAssert(0);
-		//ndShapeInstance* const compoundInstance = new ndShapeInstance(new ndShapeCompound());
-		//ndShapeCompound* const compound = compoundInstance->GetShape()->GetAsShapeCompound();
-		//
-		//compound->BeginAddRemove();
-		//for (ndInt32 i = 1; i < shapeArray.GetCount(); ++i)
-		//{
-		//	compound->AddCollision(shapeArray[i]);
-		//	delete shapeArray[i];
-		//}
-		//compound->EndAddRemove();
-		//shapeArray[0] = compoundInstance;
+		ndSharedPtr<ndShapeInstance> compoundInstance (new ndShapeInstance(new ndShapeCompound()));
+		ndShapeCompound* const compound = compoundInstance->GetShape()->GetAsShapeCompound();
+		
+		compound->BeginAddRemove();
+		for (ndInt32 i = 0; i < shapeArray.GetCount(); ++i)
+		{
+			compound->AddCollision(*shapeArray[i]);
+		}
+		compound->EndAddRemove();
+		shapeArray[0] = compoundInstance;
 	}
 	return shapeArray[0];
 }

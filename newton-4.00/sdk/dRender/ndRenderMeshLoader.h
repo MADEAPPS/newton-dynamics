@@ -26,7 +26,6 @@ class ndRenderMeshLoader : public ndMeshLoader
 
 	private:
 	bool MeshToRenderSceneNode(const ndString& materialBasePath);
-	
 
 	public:
 	ndRender* m_owner;

@@ -22,16 +22,69 @@
 class ndExcavatorController : public ndModelNotify
 {
 	public:
+	ndExcavatorController(
+		ndDemoEntityManager* const scene, 
+		const ndMatrix& location, ndSharedPtr<ndMesh>& mesh, 
+		ndSharedPtr<ndModel>& model, ndSharedPtr<ndRenderSceneNode>& visualMesh)
+		:ndModelNotify()
+		,m_scene(scene)
+	{
+		ndModelArticulation* const articulation = model->GetAsModelArticulation();
+		ndAssert(articulation);
 
-	static void CreateExcavator(ndDemoEntityManager* const scene, const ndMatrix& location, ndRenderMeshLoader& mesh)
+		MakeChassis(articulation, location, mesh, visualMesh);
+
+	}
+
+	static ndSharedPtr<ndModelNotify> CreateExcavator(ndDemoEntityManager* const scene, const ndMatrix& location, ndRenderMeshLoader& mesh)
 	{
 		ndSharedPtr<ndRenderSceneNode> vehicleMesh(mesh.m_renderMesh->Clone());
 		ndMatrix matrix(location);
 		matrix.m_posit = FindFloor(*scene->GetWorld(), matrix.m_posit, 200.0f);
 
+		// using a model articulation for this vehicle
+		ndSharedPtr<ndModel> vehicleModel(new ndModelArticulation());
+		ndSharedPtr<ndModelNotify> controller(new ndExcavatorController(scene, matrix, mesh.m_mesh, vehicleModel, vehicleMesh));
 
+		ndWorld* const world = scene->GetWorld();
 		scene->AddEntity(vehicleMesh);
+		world->AddModel(vehicleModel);
+		vehicleModel->AddBodiesAndJointsToWorld();
+
+		return controller;
 	}
+
+	private:
+	//void MakeChassis(NewtonWorld* const world, const char* const modelName, const dMatrix& location)
+	void MakeChassis(
+		ndModelArticulation* const articulation, 
+		const ndMatrix& location, 
+		ndSharedPtr<ndMesh>& mesh, ndSharedPtr<ndRenderSceneNode>& visualMeshRoot)
+	{
+		ndMesh* const chassisMesh = mesh->FindByName("base");
+		ndAssert(chassisMesh);
+
+		// create the collision and the world matrix
+		ndMatrix matrix(chassisMesh->CalculateGlobalMatrix() * location);
+		ndSharedPtr<ndShapeInstance> collision (chassisMesh->CreateCollisionFromChildren());
+
+		// find the visual mesh for thsi body
+		ndRenderSceneNode* const visualMeshNode = visualMeshRoot->FindByName(chassisMesh->GetName());
+		ndSharedPtr<ndRenderSceneNode> visualMesh((visualMeshNode == *visualMeshRoot) ? visualMeshRoot : visualMeshRoot->GetSharedPtr());
+
+		ndFloat32 chassisMass = ndFloat32(4000.0f);
+
+		// create the rigid that represent the chassis
+		ndSharedPtr<ndBody> chassisBody(new ndBodyDynamic());
+		chassisBody->SetNotifyCallback(new ndDemoEntityNotify(m_scene, visualMesh));
+		chassisBody->SetMatrix(matrix);
+		chassisBody->GetAsBodyDynamic()->SetCollisionShape(**collision);
+		chassisBody->GetAsBodyDynamic()->SetMassMatrix(chassisMass, **collision);
+		
+		articulation->AddRootBody(chassisBody);
+	}
+
+	ndDemoEntityManager* m_scene;
 };
 
 
@@ -50,7 +103,7 @@ void ndComplexModel(ndDemoEntityManager* const scene)
 	excavatorLoaded.LoadMesh(ndGetWorkingFileName("excavator.nd"));
 	//ndSharedPtr<ndModelNotify> controller(ndBackGroundVehicleController::CreateAiVehicleProp(scene, ndVector::m_wOne, vmwLoaderRedPaint));
 
-	ndExcavatorController::CreateExcavator(scene, matrix, excavatorLoaded);
+	ndSharedPtr<ndModelNotify> controller(ndExcavatorController::CreateExcavator(scene, matrix, excavatorLoaded));
 
 	//// set this player as the active camera
 	//ndBackGroundVehicleController* const playerController = (ndBackGroundVehicleController*)*controller;
@@ -58,7 +111,7 @@ void ndComplexModel(ndDemoEntityManager* const scene)
 	//renderer->SetCamera(playerController->GetCamera());
 
 	matrix.m_posit.m_x -= 10.0f;
-	matrix.m_posit.m_y += 2.0f;
+	matrix.m_posit.m_y += 4.0f;
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
