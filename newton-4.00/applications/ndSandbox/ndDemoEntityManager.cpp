@@ -34,9 +34,9 @@
 //#define DEFAULT_SCENE	9		// static compound scene collision
 //#define DEFAULT_SCENE	10		// basic compound shapes
 //#define DEFAULT_SCENE	11		// basic model, a npd vehicle prop
-#define DEFAULT_SCENE	12		// complex model, impmnet an complex model with joints
-//#define DEFAULT_SCENE	13		// basics mutibody vehicle
-//#define DEFAULT_SCENE	14		// basic ragdoll
+//#define DEFAULT_SCENE	12		// basic ragdoll
+#define DEFAULT_SCENE	13		// complex model, impmnet an complex model with joints
+//#define DEFAULT_SCENE	14		// basics mutibody vehicle
 //#define DEFAULT_SCENE	15		// object Placement
 //#define DEFAULT_SCENE	16		// third person player capsule
 
@@ -97,9 +97,9 @@ ndDemoEntityManager::ndDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic static compound scene collision", ndBasicSceneCompoundCollision},
 	{ "basic compound collision", ndBasicCompoundCollision},
 	{ "basic model", ndBasicModel},
+	{ "basic ragdoll", ndBasicRagdoll},
 	{ "complex model", ndComplexModel},
 	{ "basic vehicle", ndBasicVehicle},
-	{ "basic ragdoll", ndBasicRagdoll},
 	{ "object placement", ndObjectPlacement},
 	{ "basic player", ndPlayerCapsule_ThirdPerson},
 	

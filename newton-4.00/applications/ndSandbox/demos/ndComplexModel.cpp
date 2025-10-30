@@ -23,8 +23,7 @@ class ndExcavatorController : public ndModelNotify
 {
 	public:
 	ndExcavatorController(
-		ndDemoEntityManager* const scene, 
-		const ndMatrix& location, ndSharedPtr<ndMesh>& mesh, 
+		ndDemoEntityManager* const scene, ndSharedPtr<ndMesh>& mesh, 
 		ndSharedPtr<ndModel>& model, ndSharedPtr<ndRenderSceneNode>& visualMesh)
 		:ndModelNotify()
 		,m_scene(scene)
@@ -32,19 +31,26 @@ class ndExcavatorController : public ndModelNotify
 		ndModelArticulation* const articulation = model->GetAsModelArticulation();
 		ndAssert(articulation);
 
-		MakeChassis(articulation, location, mesh, visualMesh);
-		MakeCabinAndUpperBody(articulation, location, mesh, visualMesh);
+		// build the major vehicle components, each major component build its sub parts
+		MakeChassis(articulation, mesh, visualMesh);
+		MakeCabinAndUpperBody(articulation, mesh, visualMesh);
+
+		MakeLeftTrack(articulation, mesh, visualMesh);
+		MakeRightTrack(articulation, mesh, visualMesh);
 	}
 
 	static ndSharedPtr<ndModelNotify> CreateExcavator(ndDemoEntityManager* const scene, const ndMatrix& location, ndRenderMeshLoader& mesh)
 	{
+		// crate a model and set the root transform
 		ndSharedPtr<ndRenderSceneNode> vehicleMesh(mesh.m_renderMesh->Clone());
 		ndMatrix matrix(location);
 		matrix.m_posit = FindFloor(*scene->GetWorld(), matrix.m_posit, 200.0f);
+		vehicleMesh->SetTransform(vehicleMesh->GetMatrix() * location);
+		vehicleMesh->SetTransform(vehicleMesh->GetMatrix() * location);
 
 		// using a model articulation for this vehicle
 		ndSharedPtr<ndModel> vehicleModel(new ndModelArticulation());
-		ndSharedPtr<ndModelNotify> controller(new ndExcavatorController(scene, matrix, mesh.m_mesh, vehicleModel, vehicleMesh));
+		ndSharedPtr<ndModelNotify> controller(new ndExcavatorController(scene, mesh.m_mesh, vehicleModel, vehicleMesh));
 
 		ndWorld* const world = scene->GetWorld();
 		scene->AddEntity(vehicleMesh);
@@ -57,7 +63,6 @@ class ndExcavatorController : public ndModelNotify
 	private:
 	void MakeChassis(
 		ndModelArticulation* const articulation, 
-		const ndMatrix& location, 
 		ndSharedPtr<ndMesh>& mesh, 
 		ndSharedPtr<ndRenderSceneNode>& visualMeshRoot)
 	{
@@ -65,7 +70,7 @@ class ndExcavatorController : public ndModelNotify
 		ndAssert(chassisMesh);
 
 		// create the collision and the world matrix
-		ndMatrix matrix(chassisMesh->CalculateGlobalMatrix() * location);
+		ndMatrix matrix(chassisMesh->CalculateGlobalMatrix());
 		ndSharedPtr<ndShapeInstance> collision (chassisMesh->CreateCollisionFromChildren());
 
 		// find the visual mesh for thsi body
@@ -73,10 +78,11 @@ class ndExcavatorController : public ndModelNotify
 		ndSharedPtr<ndRenderSceneNode> visualMesh((visualMeshNode == *visualMeshRoot) ? visualMeshRoot : visualMeshRoot->GetSharedPtr());
 
 		ndFloat32 chassisMass = ndFloat32(4000.0f);
+		//ndFloat32 chassisMass = ndFloat32(0.0f);
 
 		// create the rigid that represent the chassis
 		ndSharedPtr<ndBody> chassisBody(new ndBodyDynamic());
-		chassisBody->SetNotifyCallback(new ndDemoEntityNotify(m_scene, visualMesh));
+		chassisBody->SetNotifyCallback(new ndDemoEntityNotify(m_scene, visualMesh, nullptr));
 		chassisBody->SetMatrix(matrix);
 		chassisBody->GetAsBodyDynamic()->SetCollisionShape(**collision);
 		chassisBody->GetAsBodyDynamic()->SetMassMatrix(chassisMass, **collision);
@@ -85,41 +91,49 @@ class ndExcavatorController : public ndModelNotify
 	}
 
 	ndSharedPtr<ndBody> MakeBodyPart(
-		const ndMatrix& location,
-		ndSharedPtr<ndMesh>& mesh, ndSharedPtr<ndRenderSceneNode>& visualMeshRoot,
-		const char* const name, ndFloat32 mass)
+		ndMesh* const childMesh, 
+		ndSharedPtr<ndRenderSceneNode>& visualMeshRoot,
+		ndSharedPtr<ndShapeInstance> collision,
+		ndBodyKinematic* const parentBody,
+		ndFloat32 mass)
 	{
-		ndMesh* const meshNode = mesh->FindByName(name);
-		ndAssert(meshNode);
-
 		// calculate matrix
-		ndMatrix matrix(meshNode->CalculateGlobalMatrix() * location);
-
-		// build collision mesh
-		ndSharedPtr<ndShapeInstance> collision(meshNode->CreateCollisionFromChildren());
+		const ndMatrix matrix(childMesh->CalculateGlobalMatrix());
 
 		// find the visual mesh
-		ndRenderSceneNode* const visualMeshNode = visualMeshRoot->FindByName(meshNode->GetName());
+		ndRenderSceneNode* const visualMeshNode = visualMeshRoot->FindByName(childMesh->GetName());
 		ndSharedPtr<ndRenderSceneNode> visualMesh(visualMeshNode->GetSharedPtr());
 
 		ndSharedPtr<ndBody> body(new ndBodyDynamic());
-		body->SetNotifyCallback(new ndDemoEntityNotify(m_scene, visualMesh));
+		body->SetNotifyCallback(new ndDemoEntityNotify(m_scene, visualMesh, parentBody));
 		body->SetMatrix(matrix);
 		body->GetAsBodyDynamic()->SetCollisionShape(**collision);
 		body->GetAsBodyDynamic()->SetMassMatrix(mass, **collision);
 		return body;
 	}
 
+	ndSharedPtr<ndBody> MakeBodyPart(
+		ndSharedPtr<ndMesh>& mesh, ndSharedPtr<ndRenderSceneNode>& visualMeshRoot,
+		ndBodyKinematic* const parentbody,
+		const char* const name, ndFloat32 mass)
+	{
+		ndMesh* const meshNode = mesh->FindByName(name);
+		ndAssert(meshNode);
+
+		// build collision mesh
+		ndSharedPtr<ndShapeInstance> collision(meshNode->CreateCollisionFromChildren());
+		return MakeBodyPart(meshNode, visualMeshRoot, collision, parentbody, mass);
+	}
+
 	void MakeCabinAndUpperBody(
 		ndModelArticulation* const articulation,
-		const ndMatrix& location,
 		ndSharedPtr<ndMesh>& mesh, ndSharedPtr<ndRenderSceneNode>& visualMeshRoot)
 	{
-		ndSharedPtr<ndBody> cabinBody (MakeBodyPart(location, mesh, visualMeshRoot, "EngineBody", 400.0f));
-
-		ndMatrix hingeFrame(cabinBody->GetMatrix());
 		ndModelArticulation::ndNode* const rootNode = articulation->GetRoot();
 
+		ndSharedPtr<ndBody> cabinBody (MakeBodyPart(mesh, visualMeshRoot, rootNode->m_body->GetAsBodyKinematic(), "EngineBody", 400.0f));
+
+		ndMatrix hingeFrame(cabinBody->GetMatrix());
 		ndSharedPtr<ndJointBilateralConstraint> cabinPivot(new ndJointHinge(hingeFrame, cabinBody->GetAsBodyDynamic(), rootNode->m_body->GetAsBodyDynamic()));
 		
 		//// set the center of mass of engine
@@ -127,6 +141,100 @@ class ndExcavatorController : public ndModelNotify
 		//NewtonBodySetCentreOfMass(cabinBody, &com[0]);
 		ndModelArticulation::ndNode* const cabinNode = articulation->AddLimb(rootNode, cabinBody, cabinPivot);
 	}
+
+	void LinkTires(ndMesh* const master, ndMesh* const slave)
+	{
+		//NewtonCollisionInfoRecord slaveTire;
+		//NewtonCollisionInfoRecord masterTire;
+		//
+		//NewtonCollisionGetInfo(NewtonBodyGetCollision(slave->GetBody()), &slaveTire);
+		//NewtonCollisionGetInfo(NewtonBodyGetCollision(master->GetBody()), &masterTire);
+		//
+		//dAssert(masterTire.m_collisionType == SERIALIZE_ID_CHAMFERCYLINDER);
+		//dAssert(slaveTire.m_collisionType == SERIALIZE_ID_CHAMFERCYLINDER);
+		//dAssert(masterTire.m_collisionMaterial.m_userId == ARTICULATED_VEHICLE_DEFINITION::m_tirePart);
+		//dAssert(slaveTire.m_collisionMaterial.m_userId == ARTICULATED_VEHICLE_DEFINITION::m_tirePart);
+		//
+		//dFloat masterRadio = masterTire.m_chamferCylinder.m_height * 0.5f + masterTire.m_chamferCylinder.m_radio;
+		//dFloat slaveRadio = slaveTire.m_chamferCylinder.m_height * 0.5f + slaveTire.m_chamferCylinder.m_radio;
+		//
+		//dMatrix pinMatrix0;
+		//dMatrix pinMatrix1;
+		//const dCustomJoint* const joint = master->GetJoint();
+		//joint->CalculateGlobalMatrix(pinMatrix0, pinMatrix1);
+		//return new dCustomGear(slaveRadio / masterRadio, pinMatrix0[0], pinMatrix0[0].Scale(-1.0f), slave->GetBody(), master->GetBody());
+	}
+
+	ndModelArticulation::ndNode* MakeRollerTire(
+		ndModelArticulation* const articulation,
+		ndSharedPtr<ndMesh>& mesh, 
+		ndSharedPtr<ndRenderSceneNode>& visualMeshRoot,
+		const char* const name)
+	{
+		ndMesh* const node = mesh->FindByName(name);
+		ndAssert(node);
+		ndSharedPtr<ndShapeInstance> tireCollision(node->CreateCollisionTire());
+		tireCollision->SetLocalMatrix(ndYawMatrix(90.0f * ndDegreeToRad) * tireCollision->GetLocalMatrix());
+
+		ndModelArticulation::ndNode* const rootNode = articulation->GetRoot();
+		ndSharedPtr<ndBody> tireBody(MakeBodyPart(node, visualMeshRoot, tireCollision,
+			rootNode->m_body->GetAsBodyKinematic(),	ndFloat32(30.0f)));
+
+		const ndMatrix rollerMatrix(ndYawMatrix(90.0f * ndDegreeToRad) * tireBody->GetMatrix());
+		ndSharedPtr<ndJointBilateralConstraint> rollerPivot(new ndJointRoller(rollerMatrix, tireBody->GetAsBodyDynamic(), rootNode->m_body->GetAsBodyDynamic()));
+		ndJointRoller* const rollerJoint = (ndJointRoller*)*rollerPivot;
+		rollerJoint->SetAsSpringDamperPosit(ndFloat32(0.01f), ndFloat32 (2000.0f), ndFloat32 (50.0f));
+
+		ndModelArticulation::ndNode* const rollerLimb = articulation->AddLimb(rootNode, tireBody, rollerPivot);
+		return rollerLimb;
+	}
+
+	void MakeLeftTrack(
+		ndModelArticulation* const articulation,
+		ndSharedPtr<ndMesh>& mesh, 
+		ndSharedPtr<ndRenderSceneNode>& visualMeshRoot)
+	{
+		//dModelNode* const leftTire_0 = MakeRollerTire("leftGear");
+		//dModelNode* const leftTire_7 = MakeRollerTire("leftFrontRoller");
+		//LinkTires(leftTire_0, leftTire_7);
+		//MakeRollerTire("leftSupportRoller");
+		//
+		//for (int i = 0; i < 3; i++) {
+		//	char name[64];
+		//	sprintf(name, "leftRoller%d", i);
+		//	dModelNode* const rollerTire = MakeRollerTire(name);
+		//	LinkTires(leftTire_0, rollerTire);
+		//}
+		//
+		//// link traction tire to the engine using a differential gear
+		//dMatrix engineMatrix;
+		//dMatrix chassisMatrix;
+		//
+		//NewtonBody* const tire = leftTire_0->GetBody();
+		//NewtonBody* const engine = m_engineJoint->GetBody0();
+		//m_engineJoint->CalculateGlobalMatrix(engineMatrix, chassisMatrix);
+		//
+		//dMatrix tireMatrix;
+		//NewtonBodyGetMatrix(tire, &tireMatrix[0][0]);
+		//new dCustomDifferentialGear___(EXCAVATOR_GEAR_GAIN, engineMatrix.m_front.Scale(-1.0f), engineMatrix.m_up, tireMatrix.m_right.Scale(1.0f), engine, tire);
+
+		ndModelArticulation::ndNode* const leftTire_0 = MakeRollerTire(articulation, mesh, visualMeshRoot, "leftGear");
+		ndModelArticulation::ndNode* const leftTire_7 = MakeRollerTire(articulation, mesh, visualMeshRoot, "leftFrontRoller");
+		//ndAssert(leftTire_0);
+		//ndAssert(leftTire_7);
+	}
+
+	void MakeRightTrack(
+		ndModelArticulation* const articulation,
+		ndSharedPtr<ndMesh>& mesh,
+		ndSharedPtr<ndRenderSceneNode>& visualMeshRoot)
+	{
+		ndModelArticulation::ndNode* const rightTire_0 = MakeRollerTire(articulation, mesh, visualMeshRoot, "rightGear");
+		ndModelArticulation::ndNode* const rightTire_7 = MakeRollerTire(articulation, mesh, visualMeshRoot, "rightFrontRoller");
+		//ndAssert(leftTire_0);
+		//ndAssert(leftTire_7);
+	}
+
 
 	ndDemoEntityManager* m_scene;
 };
