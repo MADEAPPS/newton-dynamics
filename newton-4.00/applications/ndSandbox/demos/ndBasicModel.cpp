@@ -323,12 +323,7 @@ void ndBasicModel(ndDemoEntityManager* const scene)
 	vmwLoaderRedPaint.LoadMesh(ndGetWorkingFileName("vmwRed.nd"));
 	ndSharedPtr<ndModelNotify> controller(ndBackGroundVehicleController::CreateAiVehicleProp(scene, ndVector::m_wOne, vmwLoaderRedPaint));
 
-	// set this player as the active camera
-	ndBackGroundVehicleController* const playerController = (ndBackGroundVehicleController*)*controller;
-	ndRender* const renderer = *scene->GetRenderer();
-	renderer->SetCamera(playerController->GetCamera());
-
-#if 1
+	if (1)
 	{
 		// add an array of vehicles 
 		ndRenderMeshLoader vmwLoaderGreenPaint(*scene->GetRenderer());
@@ -362,5 +357,9 @@ void ndBasicModel(ndDemoEntityManager* const scene)
 			}
 		}
 	}
-#endif
+
+	// set this player as the active camera
+	ndBackGroundVehicleController* const playerController = (ndBackGroundVehicleController*)*controller;
+	ndRender* const renderer = *scene->GetRenderer();
+	renderer->SetCamera(playerController->GetCamera());
 }

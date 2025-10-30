@@ -18,7 +18,7 @@ import xml.etree.ElementTree as ET
 # first convert the blend mesh to a ndMesh so that it can be post processed
 #
 class ndMesh:
-    def __init__ (self, context, blenderMesh):
+    def __init__ (self, context, localMatrix, blenderMesh):
         self.name = "unnamed"
         objectData = blenderMesh.data
         if (objectData != None):
@@ -29,23 +29,78 @@ class ndMesh:
         self.type = self.nodeTypes[0]
         
         # save some blender node data info 
-        self.blederArmature = None
+        self.blenderArmature = None
         self.blenderNode = blenderMesh
         for modifier in self.blenderNode.modifiers:
             if modifier.type == 'ARMATURE':
-                self.blederArmature = modifier
+                self.blenderArmature = modifier.object
                 break
 
         self.children = []
         for child in blenderMesh.children:
            self.children.append(ndMesh(context, child))
            
-    def MapArmature(self, rootNode):
-        print(self.name)
+    def FindNode(self, name):
+        stack = []
+        stack.append(self)
+        while (len(stack) != 0):
+            node = stack.pop()
+            if (node.name == name):
+                return node 
+
+            for child in node.children:
+                self.FindNode(child, name)
+        return None
+           
+    def MapArmature(self, rootNode, bone):
+        #print(self.name, rootNode.name)
+        #armatureData = self.blenderArmature.data
+        #print (self.blenderArmature.name)
+        
+        node = rootNode.FindNode(bone.name)
+            
+        if bone.parent is None:
+            if (node != None):
+                print (bone.name)
+            else:
+               self.children.append(ndMesh(rootNode.context, rootNode))
+               
+        else:
+            print (bone.name)
+
+
+        #head = bone.head
+        #tail = bone.tail
+        #print (bone.name, head, tail)
+        #for bone in armatureData.edit_bones:
+        #    head = bone.head
+        #    tail = bone.tail
+        #    print (head, tail)
+        for childBone in bone.children:
+            self.MapArmature(rootNode, childBone)
+
            
     def MapArmatures(self, rootNode):
-        if (self.blederArmature != None):
-            self.MapArmature(rootNode)
+        if (self.blenderArmature != None):
+            #save selected node and selected the armature
+            saveSelection = bpy.context.view_layer.objects.active
+            bpy.ops.object.select_all(action='DESELECT')
+            bpy.context.view_layer.objects.active = self.blenderArmature
+            self.blenderArmature.select_set(True)
+            bpy.ops.object.mode_set(mode='EDIT')
+
+            rootBone = None
+            armatureData = self.blenderArmature.data
+            for bone in armatureData.edit_bones:
+                if bone.parent is None:
+                    rootBone = bone
+                    break
+           
+            self.MapArmature(rootNode, rootBone)
+            
+            #select root node back
+            bpy.context.view_layer.objects.active = saveSelection
+            bpy.ops.object.mode_set(mode='OBJECT')
 
         for child in self.children:
             child.MapArmatures(rootNode)
@@ -84,8 +139,9 @@ def SaveMesh(context, filepath):
     if bpy.ops.object.mode_set.poll():
         bpy.ops.object.mode_set(mode='OBJECT')
 
-    #parse blender selected node and all it children
-    object = context.object
+    #parse blender selected node and all its children
+    object = bpy.context.selected_objects[0]
+    #object = context.object
     
     if object.type != 'MESH':
         return {'CANCELLED'}

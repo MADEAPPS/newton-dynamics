@@ -71,8 +71,10 @@ def TransformArmature(rotation, armature):
         tail = rotation @ bone.tail
         bone.head = head
         bone.tail = tail
+        #bone.roll = 45.0 * 3.1416 / 180.0
+        bone.roll = 0.0
     
-    bpy.ops.object.mode_set(mode='OBJECT')                           
+    bpy.ops.object.mode_set(mode='OBJECT')
 
         
 def CalculateTransform(xmlMatrix):

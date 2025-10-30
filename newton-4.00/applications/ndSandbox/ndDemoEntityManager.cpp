@@ -22,7 +22,7 @@
 #include "ndDemoCameraNodeFlyby.h"
 #include "ndDebugDisplayRenderPass.h"
 
-#define DEFAULT_SCENE	0		// basic rigidbody
+//#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// basic Stacks 
 //#define DEFAULT_SCENE	2		// basic friction
 //#define DEFAULT_SCENE	3		// basic sliding platform
@@ -34,12 +34,13 @@
 //#define DEFAULT_SCENE	9		// static compound scene collision
 //#define DEFAULT_SCENE	10		// basic compound shapes
 //#define DEFAULT_SCENE	11		// basic model, a npd vehicle prop
-//#define DEFAULT_SCENE	12		// basics mutibody vehicle
-//#define DEFAULT_SCENE	13		// basic ragdoll
-//#define DEFAULT_SCENE	14		// object Placement
-//#define DEFAULT_SCENE	15		// third person player capsule
+#define DEFAULT_SCENE	12		// complex model, impmnet an complex model with joints
+//#define DEFAULT_SCENE	13		// basics mutibody vehicle
+//#define DEFAULT_SCENE	14		// basic ragdoll
+//#define DEFAULT_SCENE	15		// object Placement
+//#define DEFAULT_SCENE	16		// third person player capsule
 
- 
+// legacy demos 
 //#define DEFAULT_SCENE	8		// particle fluid
 //#define DEFAULT_SCENE	10		// static user mesh collision 
 //#define DEFAULT_SCENE	12		// basic vehicle
@@ -66,6 +67,7 @@
 void ndBasicModel(ndDemoEntityManager* const scene);
 void ndBasicJoints(ndDemoEntityManager* const scene);
 void ndBasicStacks(ndDemoEntityManager* const scene);
+void ndComplexModel(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
 void ndBasicRagdoll(ndDemoEntityManager* const scene);
 void ndBasicVehicle(ndDemoEntityManager* const scene);
@@ -95,6 +97,7 @@ ndDemoEntityManager::ndDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic static compound scene collision", ndBasicSceneCompoundCollision},
 	{ "basic compound collision", ndBasicCompoundCollision},
 	{ "basic model", ndBasicModel},
+	{ "complex model", ndComplexModel},
 	{ "basic vehicle", ndBasicVehicle},
 	{ "basic ragdoll", ndBasicRagdoll},
 	{ "object placement", ndObjectPlacement},
