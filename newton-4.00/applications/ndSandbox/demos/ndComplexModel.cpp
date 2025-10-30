@@ -220,8 +220,17 @@ class ndExcavatorController : public ndModelNotify
 
 		ndModelArticulation::ndNode* const leftTire_0 = MakeRollerTire(articulation, mesh, visualMeshRoot, "leftGear");
 		ndModelArticulation::ndNode* const leftTire_7 = MakeRollerTire(articulation, mesh, visualMeshRoot, "leftFrontRoller");
-		//ndAssert(leftTire_0);
-		//ndAssert(leftTire_7);
+		ndAssert(leftTire_0);
+		ndAssert(leftTire_7);
+
+		for (int i = 0; i < 3; ++i) 
+		{
+			char name[64];
+			snprintf(name, 63, "leftRoller%d", i);
+			ndModelArticulation::ndNode* const rollerTire = MakeRollerTire(articulation, mesh, visualMeshRoot, name);
+			ndAssert(rollerTire);
+			//LinkTires(leftTire_0, rollerTire);
+		}
 	}
 
 	void MakeRightTrack(
@@ -231,10 +240,18 @@ class ndExcavatorController : public ndModelNotify
 	{
 		ndModelArticulation::ndNode* const rightTire_0 = MakeRollerTire(articulation, mesh, visualMeshRoot, "rightGear");
 		ndModelArticulation::ndNode* const rightTire_7 = MakeRollerTire(articulation, mesh, visualMeshRoot, "rightFrontRoller");
-		//ndAssert(leftTire_0);
-		//ndAssert(leftTire_7);
-	}
+		ndAssert(rightTire_0);
+		ndAssert(rightTire_7);
 
+		for (int i = 0; i < 3; ++i)
+		{
+			char name[64];
+			snprintf(name, 63, "rightRoller%d", i);
+			ndModelArticulation::ndNode* const rollerTire = MakeRollerTire(articulation, mesh, visualMeshRoot, name);
+			ndAssert(rollerTire);
+			//LinkTires(leftTire_0, rollerTire);
+		}
+	}
 
 	ndDemoEntityManager* m_scene;
 };
