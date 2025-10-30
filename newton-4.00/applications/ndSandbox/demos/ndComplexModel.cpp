@@ -194,34 +194,12 @@ class ndExcavatorController : public ndModelNotify
 		ndSharedPtr<ndMesh>& mesh, 
 		ndSharedPtr<ndRenderSceneNode>& visualMeshRoot)
 	{
-		//dModelNode* const leftTire_0 = MakeRollerTire("leftGear");
-		//dModelNode* const leftTire_7 = MakeRollerTire("leftFrontRoller");
-		//LinkTires(leftTire_0, leftTire_7);
-		//MakeRollerTire("leftSupportRoller");
-		//
-		//for (int i = 0; i < 3; i++) {
-		//	char name[64];
-		//	sprintf(name, "leftRoller%d", i);
-		//	dModelNode* const rollerTire = MakeRollerTire(name);
-		//	LinkTires(leftTire_0, rollerTire);
-		//}
-		//
-		//// link traction tire to the engine using a differential gear
-		//dMatrix engineMatrix;
-		//dMatrix chassisMatrix;
-		//
-		//NewtonBody* const tire = leftTire_0->GetBody();
-		//NewtonBody* const engine = m_engineJoint->GetBody0();
-		//m_engineJoint->CalculateGlobalMatrix(engineMatrix, chassisMatrix);
-		//
-		//dMatrix tireMatrix;
-		//NewtonBodyGetMatrix(tire, &tireMatrix[0][0]);
-		//new dCustomDifferentialGear___(EXCAVATOR_GEAR_GAIN, engineMatrix.m_front.Scale(-1.0f), engineMatrix.m_up, tireMatrix.m_right.Scale(1.0f), engine, tire);
-
+		MakeRollerTire(articulation, mesh, visualMeshRoot, "leftSupportRoller");
 		ndModelArticulation::ndNode* const leftTire_0 = MakeRollerTire(articulation, mesh, visualMeshRoot, "leftGear");
 		ndModelArticulation::ndNode* const leftTire_7 = MakeRollerTire(articulation, mesh, visualMeshRoot, "leftFrontRoller");
 		ndAssert(leftTire_0);
 		ndAssert(leftTire_7);
+		//LinkTires(leftTire_0, leftTire_7);
 
 		for (int i = 0; i < 3; ++i) 
 		{
@@ -231,6 +209,17 @@ class ndExcavatorController : public ndModelNotify
 			ndAssert(rollerTire);
 			//LinkTires(leftTire_0, rollerTire);
 		}
+
+		//// link traction tire to the engine using a differential gear
+		//dMatrix engineMatrix;
+		//dMatrix chassisMatrix;
+		//
+		//NewtonBody* const tire = leftTire_0->GetBody();
+		//NewtonBody* const engine = m_engineJoint->GetBody0();
+		//m_engineJoint->CalculateGlobalMatrix(engineMatrix, chassisMatrix);
+		//dMatrix tireMatrix;
+		//NewtonBodyGetMatrix(tire, &tireMatrix[0][0]);
+		//new dCustomDifferentialGear___(EXCAVATOR_GEAR_GAIN, engineMatrix.m_front.Scale(-1.0f), engineMatrix.m_up, tireMatrix.m_right.Scale(1.0f), engine, tire);
 	}
 
 	void MakeRightTrack(
@@ -238,10 +227,12 @@ class ndExcavatorController : public ndModelNotify
 		ndSharedPtr<ndMesh>& mesh,
 		ndSharedPtr<ndRenderSceneNode>& visualMeshRoot)
 	{
+		MakeRollerTire(articulation, mesh, visualMeshRoot, "rightSupportRoller");
 		ndModelArticulation::ndNode* const rightTire_0 = MakeRollerTire(articulation, mesh, visualMeshRoot, "rightGear");
 		ndModelArticulation::ndNode* const rightTire_7 = MakeRollerTire(articulation, mesh, visualMeshRoot, "rightFrontRoller");
 		ndAssert(rightTire_0);
 		ndAssert(rightTire_7);
+		//LinkTires(rightTire_0, rightTire_7);
 
 		for (int i = 0; i < 3; ++i)
 		{
@@ -249,7 +240,7 @@ class ndExcavatorController : public ndModelNotify
 			snprintf(name, 63, "rightRoller%d", i);
 			ndModelArticulation::ndNode* const rollerTire = MakeRollerTire(articulation, mesh, visualMeshRoot, name);
 			ndAssert(rollerTire);
-			//LinkTires(leftTire_0, rollerTire);
+			//LinkTires(rightTire_0, rollerTire);
 		}
 	}
 
