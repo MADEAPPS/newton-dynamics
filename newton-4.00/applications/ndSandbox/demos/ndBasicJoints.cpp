@@ -82,13 +82,11 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 
 	ndSharedPtr<ndRenderPrimitive> mesh(new ndRenderPrimitive(descriptor));
 
-	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	ndMatrix refMatrix(ndRollMatrix(90.0f * ndDegreeToRad));
+	refMatrix.m_posit = FindFloor(*world, origin, 200.0f);
 	{
 		// add a spherical motor.
-		matrix.m_posit.m_y = floor.m_y;
+		ndMatrix matrix(refMatrix);
 		matrix.m_posit.m_y += diameter;
 		ndSharedPtr<ndBody> body (MakePrimitive(scene, matrix, **shape, mesh, mass));
 		ndMatrix pinAlign(ndRollMatrix(180.0f * ndDegreeToRad));
@@ -101,10 +99,11 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 
 	if (1)
 	{
-		const ndInt32 count = 6;
 		// add flexible chain with spring damper.
+		ndMatrix matrix(refMatrix);
 		matrix.m_posit.m_z -= 2.0f;
-		matrix.m_posit.m_y = floor.m_y;
+
+		const ndInt32 count = 6;
 		ndBodyDynamic* array[count];
 		for (ndInt32 i = 0; i < count; ++i)
 		{
@@ -112,11 +111,11 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 			ndSharedPtr<ndBody> body (MakePrimitive(scene, matrix, **shape, mesh, mass));
 			array[i] = body->GetAsBodyDynamic();
 		}
-
+		
 		ndFloat32 friction = 10.0f;
 		ndFloat32 spring = 1500.0f;
 		ndFloat32 regularizer = 0.01f;
-
+		
 		ndMatrix pinAlign(ndRollMatrix(180.0f * ndDegreeToRad));
 		for (ndInt32 i = 1; i < count; ++i)
 		{
@@ -129,7 +128,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 			ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
 			world->AddJoint(jointPtr);
 		}
-
+		
 		ndMatrix bodyMatrix0(pinAlign * array[count - 1]->GetMatrix());
 		bodyMatrix0.m_posit.m_y += diameter * 0.5f + diameter * 0.25f;
 		ndBodyKinematic* const fixBody = world->GetSentinelBody();
@@ -141,10 +140,14 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 
 	if (1)
 	{
-		// add a chain with viscous friction.
+		// add a chain with limits and viscous friction.
+		// this is trick extact moementon form the articalation 
+		// and it is a practical way to make long change of connected bodies stable.
+
+		ndMatrix matrix(refMatrix);
+		matrix.m_posit.m_z -= 4.0f;
+
 		const ndInt32 count = 6;
-		matrix.m_posit.m_z -= 2.0f;
-		matrix.m_posit.m_y = floor.m_y;
 		ndBodyDynamic* array[count];
 		for (ndInt32 i = 0; i < count; ++i)
 		{
@@ -158,11 +161,12 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 			//body->SetMassMatrix(inertia);
 			array[i] = body->GetAsBodyDynamic();
 		}
-
+		
 		ndFloat32 friction = 10.0f;
 		ndFloat32 regularizer = 0.1f;
-
+		
 		ndMatrix pinAlign(ndRollMatrix(180.0f * ndDegreeToRad));
+		// connect all links
 		for (ndInt32 i = 1; i < count; ++i)
 		{
 			ndMatrix bodyMatrix0(array[i - 1]->GetMatrix());
@@ -176,7 +180,8 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 			ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
 			world->AddJoint(jointPtr);
 		}
-
+		
+		// connect root link to the world
 		ndMatrix bodyMatrix0(pinAlign * array[count - 1]->GetMatrix());
 		bodyMatrix0.m_posit.m_y += diameter * 0.5f + diameter * 0.25f;
 		ndBodyKinematic* const fixBody = world->GetSentinelBody();
@@ -240,17 +245,14 @@ static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin,
 
 	ndSharedPtr<ndRenderPrimitive> mesh(new ndRenderPrimitive(descriptor));
 
-	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-
-	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y = floor.m_y;
+	ndMatrix refMatrix(ndRollMatrix(90.0f * ndDegreeToRad));
+	refMatrix.m_posit = FindFloor(*world, origin, 200.0f);
+	refMatrix.m_posit.m_y += 2.0f;
 
 	ndBodyKinematic* const fixBody = world->GetSentinelBody();
 	{
 		// spring damper and limits
-		matrix.m_posit.m_y += 2.0f;
+		ndMatrix matrix(refMatrix);
 		ndSharedPtr<ndBody> body (MakePrimitive(scene, matrix, **shape, mesh, mass));
 		ndJointHinge* const joint = new ndJointHinge(matrix, body->GetAsBodyDynamic(), fixBody);
 		joint->SetAsSpringDamper(0.1f, 20.0f, 1.0f);
@@ -262,6 +264,7 @@ static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin,
 
 	{
 		// viscous friction and limits
+		ndMatrix matrix(refMatrix);
 		matrix.m_posit.m_y += 1.2f;
 		ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, **shape, mesh, mass));
 		ndJointHinge* const joint = new ndJointHinge(matrix, body->GetAsBodyDynamic(), fixBody);
@@ -274,7 +277,8 @@ static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin,
 
 	{
 		// proportional derivative hinge oscillator with limits
-		matrix.m_posit.m_y += 1.2f;
+		ndMatrix matrix(refMatrix);
+		matrix.m_posit.m_y += 2.4f;
 		ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, **shape, mesh, mass));
 		ndJointHinge* const joint = new ndJointHingeOscillator(matrix, body->GetAsBodyDynamic(), fixBody);
 		joint->SetAsSpringDamper(0.1f, 1500.0f, 10.0f);
@@ -284,7 +288,8 @@ static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin,
 
 	{
 		// proportional derivative hinge motor with limits
-		matrix.m_posit.m_y += 1.2f;
+		ndMatrix matrix(refMatrix);
+		matrix.m_posit.m_y += 3.6f;
 		ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, **shape, mesh, mass));
 		ndJointHinge* const joint = new ndJointHingeMotor(matrix, body->GetAsBodyDynamic(), fixBody);
 		joint->SetAsSpringDamper(0.1f, 1500.0f, 10.0f);
@@ -326,17 +331,14 @@ static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin
 
 	ndSharedPtr<ndRenderPrimitive> mesh(new ndRenderPrimitive(descriptor));
 
-	ndMatrix matrix(ndGetIdentityMatrix());
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-
-	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y = floor.m_y;
+	ndMatrix refMatrix(ndGetIdentityMatrix());
+	refMatrix.m_posit = FindFloor(*world, origin, 200.0f);
+	refMatrix.m_posit.m_y += 2.0f;
 
 	ndBodyKinematic* const fixBody = world->GetSentinelBody();
 	{
 		// spring damper slider with limits
-		matrix.m_posit.m_y += 2.0f;
+		ndMatrix matrix(refMatrix);
 		ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, **shape, mesh, mass));
 		ndJointSlider* const joint = new ndJointSlider(ndYawMatrix(90.0f * ndDegreeToRad) * matrix, body->GetAsBodyDynamic(), fixBody);
 		joint->SetAsSpringDamper(0.1f, 100.0f, 5.0f);
@@ -348,6 +350,7 @@ static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin
 
 	{
 		// viscous damper slider with limits
+		ndMatrix matrix(refMatrix);
 		matrix.m_posit.m_y += 1.2f;
 		ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, **shape, mesh, mass));
 		ndJointSlider* const joint = new ndJointSlider(ndYawMatrix(90.0f * ndDegreeToRad) * matrix, body->GetAsBodyDynamic(), fixBody);
@@ -360,7 +363,8 @@ static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin
 
 	{
 		// proportional derivative slider oscillator with limits
-		matrix.m_posit.m_y += 1.2f;
+		ndMatrix matrix(refMatrix);
+		matrix.m_posit.m_y += 2.4f;
 		ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, **shape, mesh, mass));
 		ndJointSlider* const joint = new ndJointSliderOscillator(ndYawMatrix(90.0f * ndDegreeToRad) * matrix, body->GetAsBodyDynamic(), fixBody);
 		joint->SetAsSpringDamper(0.1f, 500.0f, 10.0f);
@@ -385,12 +389,7 @@ static void BuildGear(ndDemoEntityManager* const scene, const ndVector& origin, 
 	ndSharedPtr<ndRenderPrimitive> mesh(new ndRenderPrimitive(descriptor));
 
 	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-
-	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y = floor.m_y;
-
+	matrix.m_posit = FindFloor(*world, origin, 200.0f);
 	matrix.m_posit.m_y += 2.0f;
 
 	ndBodyKinematic* const fixBody = world->GetSentinelBody();
@@ -448,17 +447,14 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& o
 
 	ndSharedPtr<ndRenderPrimitive> mesh(new ndRenderPrimitive(descriptor));
 
-	ndMatrix matrix(ndYawMatrix(90.0f * ndDegreeToRad));
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-
-	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y = floor.m_y;
-
-	matrix.m_posit.m_y += 2.0f;
+	ndMatrix refMatrix(ndGetIdentityMatrix());
+	refMatrix.m_posit = FindFloor(*world, origin, 200.0f);
+	refMatrix.m_posit.m_y += 2.0f;
 
 	ndBodyKinematic* const fixBody = world->GetSentinelBody();
 	{
+		// free rollong dopuble hinge
+		ndMatrix matrix(refMatrix);
 		ndSharedPtr<ndBody> body (MakePrimitive(scene, matrix, **shape, mesh, mass));
 		body->SetOmega(ndVector(0.0f, 10.0f, 20.0f, 0.0f));
 
@@ -469,6 +465,7 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& o
 
 	{
 		// proportional derivative double hinge motor
+		ndMatrix matrix(refMatrix);
 		matrix.m_posit.m_z += 1.8f;
 		ndSharedPtr<ndBody> body (MakePrimitive(scene, matrix, **shape, mesh, mass));
 		ndJointDoubleHinge* const joint = new ndJointDoubleHingeMotor(matrix, body->GetAsBodyDynamic(), fixBody);
@@ -492,17 +489,14 @@ static void BuildRoller(ndDemoEntityManager* const scene, const ndVector& origin
 
 	ndSharedPtr<ndRenderPrimitive> mesh(new ndRenderPrimitive(descriptor));
 
-	ndMatrix matrix(ndGetIdentityMatrix());
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-
-	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y = floor.m_y;
+	ndMatrix refMatrix(ndGetIdentityMatrix());
+	refMatrix.m_posit = FindFloor(*world, origin, 200.0f);
+	refMatrix.m_posit.m_y += 2.0f;
 
 	ndBodyKinematic* const fixBody = world->GetSentinelBody();
 	{
-		// spring damper slider with limits
-		matrix.m_posit.m_y += 2.0f;
+		// spring damper slider with limits, this coudl be use for a roller wheels
+		ndMatrix matrix(refMatrix);
 		ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, **shape, mesh, mass));
 		ndJointRoller* const joint = new ndJointRoller(ndPitchMatrix(90.0f * ndDegreeToRad) * matrix, body->GetAsBodyDynamic(), fixBody);
 		joint->SetAsSpringDamperPosit(0.1f, 100.0f, 5.0f);
@@ -526,17 +520,14 @@ static void BuildCylindrical(ndDemoEntityManager* const scene, const ndVector& o
 
 	ndSharedPtr<ndRenderPrimitive> mesh(new ndRenderPrimitive(descriptor));
 
-	ndMatrix matrix(ndYawMatrix(90.0f * ndDegreeToRad));
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-
-	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y = floor.m_y;
+	ndMatrix refMatrix(ndGetIdentityMatrix());
+	refMatrix.m_posit = FindFloor(*world, origin, 200.0f);
+	refMatrix.m_posit.m_y += 2.0f;
 
 	ndBodyKinematic* const fixBody = world->GetSentinelBody();
 	{
 		// spring damper slider with limits
-		matrix.m_posit.m_y += 2.0f;
+		ndMatrix matrix(refMatrix);
 		ndSharedPtr<ndBody> body(MakePrimitive(scene, matrix, **shape, mesh, mass));
 		ndJointCylinder* const joint = new ndJointCylinder(matrix, body->GetAsBodyDynamic(), fixBody);
 		joint->SetAsSpringDamperPosit(0.1f, 100.0f, 5.0f);
@@ -547,7 +538,7 @@ static void BuildCylindrical(ndDemoEntityManager* const scene, const ndVector& o
 	}
 }
 
-void BuildFixDistanceJoints(ndDemoEntityManager* const scene, const ndVector& origin)
+void BuildFixDistanceJoints(ndDemoEntityManager* const scene, const ndVector& posit)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndRender* const render = *scene->GetRenderer();
@@ -561,6 +552,7 @@ void BuildFixDistanceJoints(ndDemoEntityManager* const scene, const ndVector& or
 	ndSharedPtr<ndRenderPrimitive> mesh(new ndRenderPrimitive(descriptor));
 
 	ndMatrix matrix(ndGetIdentityMatrix());
+	const ndVector origin(FindFloor(*world, posit, 200.0f));
 
 	ndBodyDynamic* bodies[8];
 
@@ -607,8 +599,8 @@ static void BuildRollingFriction(ndDemoEntityManager* const scene, const ndVecto
 	ndRender* const render = *scene->GetRenderer();
 
 	ndMatrix matrix(ndRollMatrix(90.0f * ndDegreeToRad));
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
+	matrix.m_posit = FindFloor(*world, origin, 200.0f);
+	matrix.m_posit.m_y += 5.0f;
 
 	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeSphere(diameter * 0.5f)));
 	ndRenderPrimitive::ndDescriptor descriptor(render);
@@ -618,7 +610,6 @@ static void BuildRollingFriction(ndDemoEntityManager* const scene, const ndVecto
 
 	ndSharedPtr<ndRenderPrimitive> mesh(new ndRenderPrimitive(descriptor));
 
-	matrix.m_posit.m_y += 5.0f;
 	ndVector posit(matrix.m_posit);
 	for (ndInt32 i = 0; i < 8; ++i)
 	{
@@ -630,7 +621,6 @@ static void BuildRollingFriction(ndDemoEntityManager* const scene, const ndVecto
 		matrix.m_posit = posit + ndVector(ndGaussianRandom(0.0f, 0.01f), 0.0f, ndGaussianRandom(0.0f, 0.01f), 0.0f);
 	}
 }
-
 
 class ndRollerCoasterModelNotify: public ndModelNotify
 {

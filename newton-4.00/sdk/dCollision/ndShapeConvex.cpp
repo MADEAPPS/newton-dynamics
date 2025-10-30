@@ -96,7 +96,6 @@ void ndShapeConvex::SetVolumeAndCG()
 {
 	ndVector faceVertex[D_MAX_EDGE_COUNT];
 	ndInt8* const edgeMarks = ndAlloca(ndInt8, m_edgeCount + 32);
-	//memset(&edgeMarks[0], 0, sizeof(ndInt8) * m_edgeCount);
 	ndMemSet(edgeMarks, ndInt8(0), m_edgeCount);
 
 	ndPolyhedraMassProperties localData;

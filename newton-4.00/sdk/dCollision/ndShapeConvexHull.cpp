@@ -60,11 +60,6 @@ ndShapeConvexHull::ndShapeConvexHull (ndInt32 count, ndInt32 strideInBytes, ndFl
 	m_simplex = nullptr;
 	Create(count, strideInBytes, vertexArray, tolerance, maxPointsOut);
 	ndAssert(m_faceCount > 0);
-	//if (m_faceCount == 0)
-	//{
-	//	ndAssert(m_faceCount > 0);
-	//	Create(count, strideInBytes, vertexArray, tolerance);
-	//}
 	ndAssert(ndMemory::CheckMemory(this));
 }
 

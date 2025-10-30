@@ -1052,6 +1052,7 @@ bool ndScene::ConvexCast(
 					ndConvexCastNotify savedNotification(callback);
 					ndBodyKinematic* const kinBody = body->GetAsBodyKinematic();
 					callback.m_contacts.SetCount(0);
+
 					if (callback.CastShape(convexShape, globalOrigin, globalDest, kinBody))
 					{
 						// found new contacts, see how the are managed
@@ -1100,7 +1101,6 @@ bool ndScene::ConvexCast(
 						callback.m_param = savedNotification.m_param;
 						for (ndInt32 i = 0; i < savedNotification.m_contacts.GetCount(); ++i)
 						{
-							//callback.m_contacts[i] = savedNotification.m_contacts[i];
 							callback.m_contacts.PushBack(savedNotification.m_contacts[i]);
 						}
 					}

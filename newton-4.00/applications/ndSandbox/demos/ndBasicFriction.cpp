@@ -83,13 +83,13 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 	ndVector boxSize(1.0f, 0.5f, 1.5f, 0.0f);
 	matrix.m_posit.m_z -= 10.0f;
 	matrix.m_posit.m_x -= 12.0f;
-	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+
+	ndVector floor(FindFloor(*world, matrix.m_posit, 200.0f));
 	matrix.m_posit.m_y = floor.m_y + boxSize.m_y;
-	
 	for (ndInt32 i = 0; i < 10; ++i)
 	{
 		ndSharedPtr<ndBody> boxBody(AddBox(scene, matrix, ndFloat32(5.0f), boxSize.m_x, boxSize.m_y, boxSize.m_z, "wood_0.png"));
-
+	
 		matrix.m_posit.m_x += 2.5f;
 	
 		// assign material id to the collision shape.

@@ -303,8 +303,7 @@ ndFloat32 ndShapeHeightfield::RayCastCell(const ndFastRay& ray, ndInt32 xIndex0,
 	{
 		return ndFloat32(1.2f);
 	}
-
-	ndAssert(maxT <= 1.0);
+	maxT = ndMin(maxT, ndFloat32(1.0f));
 
 	ndInt32 base = zIndex0 * m_width + xIndex0;
 

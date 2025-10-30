@@ -30,11 +30,11 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight)
 	:ndBodyPlayerCapsule(localAxis, mass, radius, height, stepHeight)
 {
-	ndMatrix matrix(location);
 	ndPhysicsWorld* const world = scene->GetWorld();
-	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y = floor.m_y;
 
+	ndMatrix matrix(location);
+	matrix.m_posit = FindFloor(*world, matrix.m_posit, 200.0f);
+	
 	SetMatrix(matrix);
 	SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 }

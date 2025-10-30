@@ -49,6 +49,7 @@ class ndParamMapper
 
 ndVector FindFloor(const ndWorld& world, const ndVector& origin, ndFloat32 dist);
 ndMatrix FindFloor(const ndWorld& world, const ndMatrix& origin, const ndShapeInstance& shape, ndFloat32 dist);
+ndVector FindFloor(const ndWorld& world, const ndVector& origin, const ndShapeInstance& shape, ndFloat32 dist);
 
 void SetModelVisualMesh(ndDemoEntityManager* const scene, ndModelArticulation* const model);
 

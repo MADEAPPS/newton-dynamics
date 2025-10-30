@@ -50,12 +50,13 @@ static void AddSphere(ndDemoEntityManager* const scene)
 
 	ndMatrix originMatrix = ndGetIdentityMatrix();
 	originMatrix.m_posit.m_x = 2.0f;
+
+	//ndFloat32 spacing = shape->GetBoxMinRadius();
 	for (ndInt32 i = 0; i < 4; ++i)
 	{
 		ndSharedPtr<ndRenderSceneNode> entity(origEntity->Clone());
-		ndVector floor(FindFloor(*scene->GetWorld(), originMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-		originMatrix.m_posit.m_y = floor.m_y + 1.0f;
-
+		originMatrix.m_posit = FindFloor(*scene->GetWorld(), originMatrix.m_posit, **shape, 100.0f);
+		
 		// make sure the visual is initialized properlly
 		entity->SetTransform(originMatrix, originMatrix.m_posit);
 		entity->SetTransform(originMatrix, originMatrix.m_posit);
@@ -109,21 +110,21 @@ static void AddEmptyBox(ndDemoEntityManager* const scene)
 	ndRender* const render = *scene->GetRenderer();
 	ndSharedPtr<ndShapeInstance>compoundShapeInstance(new ndShapeInstance(new ndShapeCompound()));
 	CreateBoxCompoundShape(**compoundShapeInstance);
-
+	
 	ndRenderPrimitive::ndDescriptor descriptor(render);
 	descriptor.m_collision = compoundShapeInstance;
 	descriptor.m_mapping = ndRenderPrimitive::m_box;
 	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName("wood_0.png")));
-
+	
 	ndSharedPtr<ndRenderPrimitive> mesh(new ndRenderPrimitive(descriptor));
 	ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(ndGetIdentityMatrix()));
 	entity->SetPrimitive(mesh);
-
+	
 	ndMatrix mBodyMatrix = ndGetIdentityMatrix();
 	mBodyMatrix.m_posit = ndVector(-2.0f, 5.0f, -5.0f, 1.0f);
-	ndVector floor(FindFloor(*scene->GetWorld(), mBodyMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	mBodyMatrix.m_posit.m_y = floor.m_y + 1.5f;
-
+	ndVector floor(FindFloor(*scene->GetWorld(), mBodyMatrix.m_posit, **compoundShapeInstance, 100.0f));
+	mBodyMatrix.m_posit.m_y = floor.m_y;
+	
 	AddRigidBody(scene, mBodyMatrix, **compoundShapeInstance, entity, 10.0f);
 }
 
@@ -138,9 +139,8 @@ static void AddSimpleConcaveMesh(ndDemoEntityManager* const scene, const ndMatri
 	for (ndInt32 i = 0; i < count; ++i)
 	{
 		ndSharedPtr<ndRenderSceneNode> cloneEntity(loader.m_renderMesh->Clone());
-		originMatrix.m_posit.m_z += ndFloat32 (2.0f);
-		ndVector floor(FindFloor(*scene->GetWorld(), originMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-		originMatrix.m_posit.m_y = floor.m_y + 2.0f;
+		originMatrix.m_posit.m_z += ndFloat32 (3.0f);
+		originMatrix.m_posit = FindFloor(*scene->GetWorld(), originMatrix.m_posit, **compoundShapeInstance, 100.0f);
 		AddRigidBody(scene, originMatrix, *(*compoundShapeInstance), cloneEntity, 5.0f);
 	}
 }
@@ -157,18 +157,23 @@ void ndBasicCompoundCollision(ndDemoEntityManager* const scene)
 	location.m_posit.m_y = 0.5f;
 	location.m_posit.m_z = -3.0f;
 	AddSimpleConcaveMesh(scene, location, "testConcave.nd", 1);
+
+	// test placement
+	AddSimpleConcaveMesh(scene, location, "testConcave.nd", 1);
 	
 	location.m_posit.m_z = -5.0f;
-	//AddSimpleConcaveMesh(scene, location, "bowl.nd", 1);	
+	AddSimpleConcaveMesh(scene, location, "bowl.nd", 1);	
 	
 	location.m_posit.m_x = 5.0f;
 	location.m_posit.m_z = -2.0f;
 	location.m_posit.m_y = 1.7f;
-	//AddSimpleConcaveMesh(scene, location, "camel.nd", 4);
+	//AddSimpleConcaveMesh(scene, location, "camel.nd", 1);
+	AddSimpleConcaveMesh(scene, location, "camel.nd", 4);
 	
 	location.m_posit.m_x = 10.0f;
 	location.m_posit.m_z = 5.0f;
 	location.m_posit.m_y = 2.0f;
+	//AddSimpleConcaveMesh(scene, location, "dino.nd", 1);
 	AddSimpleConcaveMesh(scene, location, "dino.nd", 4);
 
 	ndVector origin(ndVector::m_zero);

@@ -314,10 +314,7 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 		PlaceMatrix(ndDemoEntityManager* const scene, ndFloat32 x, ndFloat32 y, ndFloat32 z)
 			:ndMatrix(ndGetIdentityMatrix())
 		{
-			m_posit.m_x = x;
-			m_posit.m_y = y;
-			m_posit.m_z = z;
-			m_posit = FindFloor(*scene->GetWorld(), m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f);
+			m_posit = FindFloor(*scene->GetWorld(), ndVector(x, y, z, ndFloat32 (1.0f)), 200.0f);
 			m_posit.m_y += ndFloat32(10.0f);
 		}
 	};
@@ -349,6 +346,6 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 	ndFloat32 angle = ndFloat32(90.0f * ndDegreeToRad);
 	playerMatrix = ndYawMatrix(angle) * playerMatrix;
 	playerMatrix.m_posit += playerMatrix.m_front.Scale (-15.0f);
-	playerMatrix.m_posit = FindFloor(*scene->GetWorld(), playerMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f);
+	playerMatrix.m_posit = FindFloor(*scene->GetWorld(), playerMatrix.m_posit, 200.0f);
 	scene->SetCameraMatrix(playerMatrix, playerMatrix.m_posit);
 }

@@ -18,15 +18,19 @@
 
 ndVector FindFloor(const ndWorld& world, const ndVector& origin, ndFloat32 dist)
 {
-	ndVector p0(origin);
-	ndVector p1(origin - ndVector(0.0f, ndAbs(dist), 0.0f, 0.0f));
+	ndVector dir(ndVector::m_zero);
+	dir.m_y = dist;
 
+	ndVector p0(origin + dir.Scale (ndFloat32 (0.5f)));
+	ndVector p1(p0 - dir);
 	ndRayCastClosestHitCallback rayCaster;
 	if (world.RayCast(rayCaster, p0, p1))
 	{
+		rayCaster.m_contact.m_point.m_w = ndFloat32(1.0f);
 		return rayCaster.m_contact.m_point;
 	}
-	return p1;
+	p0.m_w = ndFloat32(1.0f);
+	return p0;
 }
 
 ndMatrix FindFloor(const ndWorld& world, const ndMatrix& origin, const ndShapeInstance& shape, ndFloat32 dist)
@@ -39,20 +43,66 @@ ndMatrix FindFloor(const ndWorld& world, const ndMatrix& origin, const ndShapeIn
 		{
 			ndVector dst(origin.m_posit);
 			dst.m_y -= dist;
-			world.ConvexCast(*this, shape, origin, dst);
+			dst.m_w = ndFloat32(1.0f);
+			m_floor = origin.m_posit;
+			if (((ndShape*)shape.GetShape())->GetAsShapeCompound())
+			{
+				//ndVector size;
+				//ndVector obbOrigin;
+				//shape.CalculateObb(obbOrigin, size);
+				//size = size.Scale(ndFloat32 (2.0f));
+				//ndShapeInstance sorrugate(new ndShapeBox(size.m_x, size.m_y, size.m_z));
+				//ndMatrix surrugateMatrix(ndGetIdentityMatrix());
+				//
+				////ndMatrix xxxxx(shape.CalculateInertia());
+				////ndVector xxxxxx(xxxxx.EigenVectors());
+				//
+				//surrugateMatrix.m_posit = obbOrigin;
+				//surrugateMatrix.m_posit.m_w = ndFloat32(1.0f);
+				//sorrugate.SetLocalMatrix(surrugateMatrix);
+
+				ndFloat32 radios = shape.GetBoxMinRadius();
+				ndShapeInstance sorrugate(new ndShapeSphere(radios));
+				world.ConvexCast(*this, sorrugate, origin, dst);
+				if (m_param < ndFloat32(1.0f))
+				{
+					ndVector size;
+					ndVector obbOrigin;
+					shape.CalculateObb(obbOrigin, size);
+					m_floor.m_y -= dist * m_param;
+					m_floor.m_y += (size.m_y - radios);
+				}
+			}
+			else
+			{
+				world.ConvexCast(*this, shape, origin, dst);
+				if (m_param < ndFloat32(1.0f))
+				{
+					m_floor.m_y -= dist * m_param;
+				}
+			}
 		}
 
 		virtual ndUnsigned32 OnRayPrecastAction(const ndBody* const, const ndShapeInstance* const)
 		{
 			return 1;
 		}
+		ndVector m_floor;
 	};
 
 	ndMatrix matrix(origin);
-	matrix.m_posit.m_y += dist * 0.5f;
+	matrix.m_posit.m_y += dist * ndFloat32 (0.5f);
 	ndFindFloorConvexCast castShape(world, matrix, shape, dist);
-	matrix.m_posit.m_y -= dist * castShape.m_param;
+	matrix.m_posit = castShape.m_floor;
 	return matrix;
+}
+
+ndVector FindFloor(const ndWorld& world, const ndVector& origin, const ndShapeInstance& shape, ndFloat32 dist)
+{
+	ndMatrix matrix(ndGetIdentityMatrix());
+	matrix.m_posit = origin;
+	const ndMatrix castMatrix(FindFloor(world, matrix, shape, dist));
+	return castMatrix.m_posit;
 }
 
 //******************************************************************************
@@ -208,7 +258,7 @@ void AddPlanks(ndDemoEntityManager* const scene, const ndMatrix& location, ndFlo
 	{
 		for (ndInt32 j = 0; j < count; ++j)
 		{
-			matrix.m_posit = location.m_posit + ndVector(((ndFloat32)i - 2) * 5.0f, 0.0f, ((ndFloat32)j - 2) * 5.0f, 0.0f);
+			//matrix.m_posit = location.m_posit + ndVector(((ndFloat32)i - 2) * 5.0f, 0.0f, ((ndFloat32)j - 2) * 5.0f, 0.0f);
 			ndSharedPtr<ndBody> body (AddBox(scene, matrix, mass, 4.0f, 0.25f, 3.0f));
 		}
 	}
@@ -239,14 +289,14 @@ void AddCapsuleStacks(ndDemoEntityManager* const scene, const ndMatrix& location
 			ndMatrix matrix(startMatrix);
 			matrix.m_posit = location.m_posit + ndVector((ndFloat32)(x - rows_x / 2) * spacing, 0.0f, (ndFloat32)(z - rows_z / 2) * spacing, ndFloat32(0.0f));
 
-			ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+			ndVector floor(FindFloor(*world, matrix.m_posit, **shape, 200.0f));
 			matrix.m_posit.m_y = floor.m_y + high + 7.0f;
 			for (ndInt32 i = 0; i < columHigh; ++i)
 			{
 				const ndMatrix localMatrix(matrix * bindMatrix);
 				ndSharedPtr<ndRenderSceneNode>instance(new ndRenderSceneNode(localMatrix));
 				root->AddChild(instance);
-
+			
 				ndSharedPtr<ndBody> body(new ndBodyDynamic());
 				body->SetNotifyCallback(new ndDemoEntityNotify(scene, instance));
 				body->SetMatrix(matrix);

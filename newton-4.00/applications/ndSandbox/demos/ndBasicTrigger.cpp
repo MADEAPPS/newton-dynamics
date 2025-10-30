@@ -24,26 +24,24 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 	ndPhysicsWorld* const world = scene->GetWorld();
 	
 	// make the matrix for this body
-	ndVector floor(FindFloor(*world, ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	ndMatrix matrix(ndYawMatrix (ndFloat32(30.0f) * ndDegreeToRad));
-	matrix.m_posit = floor;
-	matrix.m_posit.m_w = 1.0f;
-	matrix.m_posit.m_y += 2.0f;
-
+	matrix.m_posit = FindFloor(*world, ndVector::m_zero, 200.0f);
+	matrix.m_posit.m_y += ndFloat32 (2.0f);
+	
 	// make a triger volume
 	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeBox(20.0f, 10.0f, 20.0f)));
-
+	
 	// make a tranparent visual mesh
 	ndRenderPrimitive::ndDescriptor descriptor(*scene->GetRenderer());
 	descriptor.m_collision = shape;
 	descriptor.m_mapping = ndRenderPrimitive::m_box;
 	ndRenderPrimitiveMaterial& material = descriptor.AddMaterial(scene->GetRenderer()->GetTextureCache()->GetTexture(ndGetWorkingFileName("metal_30.png")));
 	material.m_opacity = ndFloat32(0.3f);
-
+	
 	ndSharedPtr<ndRenderPrimitive> mesh(new ndRenderPrimitive(descriptor));
 	ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(matrix));
 	entity->SetPrimitive(mesh);
-
+	
 	// make a trigger rigid body and asign mesh and collision
 	ndSharedPtr<ndBody> body(new ndArchimedesBuoyancyVolume());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));

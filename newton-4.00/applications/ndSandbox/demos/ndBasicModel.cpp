@@ -99,22 +99,19 @@ class ndBackGroundVehicleController : public ndModelNotify
 	{
 		ndSharedPtr<ndRenderSceneNode> vehicleMesh(loader.m_renderMesh->Clone());
 		ndMatrix matrix(ndGetIdentityMatrix());
-		matrix.m_posit = location;
-		matrix.m_posit.m_y += ndFloat32(1.0f);
-		matrix.m_posit.m_w = ndFloat32 (1.0f);
-		matrix.m_posit = FindFloor(*scene->GetWorld(), matrix.m_posit, 200.0f);
-
+		matrix.m_posit = FindFloor(*scene->GetWorld(), location, 200.0f);
+		
 		ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* renderChildren = vehicleMesh->GetChildren().GetFirst();
-
+		
 		// build a compound collision shape with chassis and tires
 		ndSharedPtr<ndShapeInstance> compoundShapeInstance(new ndShapeInstance(new ndShapeCompound()));
 		ndShapeCompound* const compoundShape = compoundShapeInstance->GetShape()->GetAsShapeCompound();
 		compoundShape->BeginAddRemove();
-
+		
 		//add chassis shape
 		ndSharedPtr<ndShapeInstance> chassisShape(loader.m_mesh->CreateCollision());
 		compoundShape->AddCollision(*chassisShape);
-
+		
 		// add all tires
 		const ndString tirename("tire");
 		const ndList<ndSharedPtr<ndMesh>>& children = loader.m_mesh->GetChildren();
@@ -134,18 +131,18 @@ class ndBackGroundVehicleController : public ndModelNotify
 			renderChildren = renderChildren->GetNext();
 		}
 		compoundShape->EndAddRemove();
-
+		
 		ndWorld* const world = scene->GetWorld();
 		ndSharedPtr<ndBody> vehicleBody(new ndBodyDynamic());
 		vehicleBody->SetNotifyCallback(new ndDemoEntityNotify(scene, vehicleMesh));
 		vehicleBody->SetMatrix(matrix);
 		vehicleBody->GetAsBodyDynamic()->SetCollisionShape(**compoundShapeInstance);
 		vehicleBody->GetAsBodyDynamic()->SetMassMatrix(1000.0f, **chassisShape);
-
+		
 		ndSharedPtr<ndModel> model(new ndModel());
 		ndSharedPtr<ndModelNotify> controller(new ndBackGroundVehicleController(scene, vehicleBody));
 		model->SetNotifyCallback(controller);
-
+		
 		world->AddBody(vehicleBody);
 		scene->AddEntity(vehicleMesh);
 		world->AddModel(model);
