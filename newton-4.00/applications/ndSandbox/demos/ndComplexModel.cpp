@@ -33,7 +33,7 @@ class ndExcavatorController : public ndModelNotify
 		ndAssert(articulation);
 
 		MakeChassis(articulation, location, mesh, visualMesh);
-
+		MakeCabinAndUpperBody(articulation, location, mesh, visualMesh);
 	}
 
 	static ndSharedPtr<ndModelNotify> CreateExcavator(ndDemoEntityManager* const scene, const ndMatrix& location, ndRenderMeshLoader& mesh)
@@ -55,11 +55,11 @@ class ndExcavatorController : public ndModelNotify
 	}
 
 	private:
-	//void MakeChassis(NewtonWorld* const world, const char* const modelName, const dMatrix& location)
 	void MakeChassis(
 		ndModelArticulation* const articulation, 
 		const ndMatrix& location, 
-		ndSharedPtr<ndMesh>& mesh, ndSharedPtr<ndRenderSceneNode>& visualMeshRoot)
+		ndSharedPtr<ndMesh>& mesh, 
+		ndSharedPtr<ndRenderSceneNode>& visualMeshRoot)
 	{
 		ndMesh* const chassisMesh = mesh->FindByName("base");
 		ndAssert(chassisMesh);
@@ -82,6 +82,50 @@ class ndExcavatorController : public ndModelNotify
 		chassisBody->GetAsBodyDynamic()->SetMassMatrix(chassisMass, **collision);
 		
 		articulation->AddRootBody(chassisBody);
+	}
+
+	ndSharedPtr<ndBody> MakeBodyPart(
+		const ndMatrix& location,
+		ndSharedPtr<ndMesh>& mesh, ndSharedPtr<ndRenderSceneNode>& visualMeshRoot,
+		const char* const name, ndFloat32 mass)
+	{
+		ndMesh* const meshNode = mesh->FindByName(name);
+		ndAssert(meshNode);
+
+		// calculate matrix
+		ndMatrix matrix(meshNode->CalculateGlobalMatrix() * location);
+
+		// build collision mesh
+		ndSharedPtr<ndShapeInstance> collision(meshNode->CreateCollisionFromChildren());
+
+		// find the visual mesh
+		ndRenderSceneNode* const visualMeshNode = visualMeshRoot->FindByName(meshNode->GetName());
+		ndSharedPtr<ndRenderSceneNode> visualMesh(visualMeshNode->GetSharedPtr());
+
+		ndSharedPtr<ndBody> body(new ndBodyDynamic());
+		body->SetNotifyCallback(new ndDemoEntityNotify(m_scene, visualMesh));
+		body->SetMatrix(matrix);
+		body->GetAsBodyDynamic()->SetCollisionShape(**collision);
+		body->GetAsBodyDynamic()->SetMassMatrix(mass, **collision);
+		return body;
+	}
+
+	void MakeCabinAndUpperBody(
+		ndModelArticulation* const articulation,
+		const ndMatrix& location,
+		ndSharedPtr<ndMesh>& mesh, ndSharedPtr<ndRenderSceneNode>& visualMeshRoot)
+	{
+		ndSharedPtr<ndBody> cabinBody (MakeBodyPart(location, mesh, visualMeshRoot, "EngineBody", 400.0f));
+
+		ndMatrix hingeFrame(cabinBody->GetMatrix());
+		ndModelArticulation::ndNode* const rootNode = articulation->GetRoot();
+
+		ndSharedPtr<ndJointBilateralConstraint> cabinPivot(new ndJointHinge(hingeFrame, cabinBody->GetAsBodyDynamic(), rootNode->m_body->GetAsBodyDynamic()));
+		
+		//// set the center of mass of engine
+		//dVector com(hingeFrame.UnrotateVector(dVector(-2.0f, 0.0f, 0.0f, 0.0f)));
+		//NewtonBodySetCentreOfMass(cabinBody, &com[0]);
+		ndModelArticulation::ndNode* const cabinNode = articulation->AddLimb(rootNode, cabinBody, cabinPivot);
 	}
 
 	ndDemoEntityManager* m_scene;
