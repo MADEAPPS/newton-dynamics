@@ -49,10 +49,8 @@ class ndContactPoint
 		m_shapeId0 = 0;
 		m_shapeId1 = 0;
 		m_penetration = ndFloat32 (0.0f);
-
 	}
 		
-
 	ndVector m_point;
 	ndVector m_normal;
 	const ndBodyKinematic* m_body0;
@@ -89,6 +87,8 @@ class ndContactMaterial: public ndContactPoint
 		m_dir1_Force.m_force = accel;
 		m_material.m_flags = m_material.m_flags | m_override1Accel;
 	}
+
+	D_COLLISION_API void RotateTangentDirections(const ndVector& dir);
 
 	ndVector m_dir0;
 	ndVector m_dir1;

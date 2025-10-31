@@ -33,6 +33,20 @@ ndVector ndContact::m_initialSeparatingVector(ndFloat32(0.0f), ndFloat32(1.0f), 
 #define D_MAX_PENETRATION_STIFFNESS		ndFloat32 (50.0f)
 #define D_DIAGONAL_REGULARIZER			ndFloat32 (1.0e-3f)
 
+
+void ndContactMaterial::RotateTangentDirections(const ndVector& dir)
+{
+	const ndVector dir0(dir);
+	ndVector dir1(m_normal.CrossProduct(dir0));
+	ndAssert(dir1.m_w == ndFloat32(0.0f));
+	ndFloat32 mag2 = dir1.DotProduct(dir1).GetScalar();
+	if (mag2 > ndFloat32(1.0e-6f)) 
+	{
+		m_dir1 = dir1.Normalize();
+		m_dir0 = m_dir1.CrossProduct(m_normal);
+	}
+}
+
 ndContact::ndContact()
 	:ndConstraint()
 	,m_positAcc(ndFloat32(10.0f))
