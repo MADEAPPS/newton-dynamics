@@ -22,6 +22,13 @@
 class ndExcavatorController : public ndModelNotify
 {
 	public:
+	enum ndBodyPartType
+	{
+		m_chassis,
+		m_roller,
+		m_thread,
+	};
+
 	ndExcavatorController(
 		ndDemoEntityManager* const scene, ndSharedPtr<ndMesh>& mesh, 
 		ndSharedPtr<ndModel>& model, ndSharedPtr<ndRenderSceneNode>& visualMesh)
@@ -42,13 +49,19 @@ class ndExcavatorController : public ndModelNotify
 		MakeThread(articulation, "rightThread", mesh, visualMesh);
 	}
 
-	bool OnContactGeneration(const ndBodyKinematic* const, const ndBodyKinematic* const) override
+	bool OnContactGeneration(const ndBodyKinematic* const body0, const ndBodyKinematic* const body1) override
 	{
 		// here the application can use filter to determine what body parts should collide.
 		// this greatly improves performance because since articulated models in general 
 		// do not self collide, but occationaly some parts do collide. 
-		// for now we just return false (no collision)
-		return false;
+		const ndShapeInstance& shape0 = body0->GetCollisionShape();
+		const ndShapeInstance& shape1 = body1->GetCollisionShape();
+
+		ndBodyPartType type0 = ndBodyPartType(shape0.m_shapeMaterial.m_userParam[1].m_intData);
+		ndBodyPartType type1 = ndBodyPartType(shape1.m_shapeMaterial.m_userParam[1].m_intData);
+		
+		bool collide = ((type0 == m_roller) && (type1 == m_thread)) || ((type0 == m_thread) && (type1 == m_roller));
+		return collide;
 	}
 
 	static ndSharedPtr<ndModelNotify> CreateExcavator(ndDemoEntityManager* const scene, const ndMatrix& location, ndRenderMeshLoader& mesh)
@@ -74,6 +87,14 @@ class ndExcavatorController : public ndModelNotify
 	}
 
 	private:
+	// set a body pat type later usage in the concact filter generatior
+	void SetBodyType(ndShapeInstance* const collision, ndBodyPartType type)
+	{
+		ndShapeMaterial materailProperties(collision->GetMaterial());
+		materailProperties.m_userParam[1].m_intData = type;
+		collision->SetMaterial(materailProperties);
+	}
+
 	void MakeChassis(
 		ndModelArticulation* const articulation, 
 		ndSharedPtr<ndMesh>& mesh, 
@@ -85,6 +106,9 @@ class ndExcavatorController : public ndModelNotify
 		// create the collision and the world matrix
 		ndMatrix matrix(chassisMesh->CalculateGlobalMatrix());
 		ndSharedPtr<ndShapeInstance> collision (chassisMesh->CreateCollisionFromChildren());
+
+		// set a body pat type later usage in the concact filter generatior
+		SetBodyType(*collision, m_chassis);
 
 		// find the visual mesh for thsi body
 		ndRenderSceneNode* const visualMeshNode = visualMeshRoot->FindByName(chassisMesh->GetName());
@@ -145,6 +169,7 @@ class ndExcavatorController : public ndModelNotify
 		ndModelArticulation::ndNode* const rootNode = articulation->GetRoot();
 
 		ndSharedPtr<ndBody> cabinBody (MakeBodyPart(mesh, visualMeshRoot, rootNode->m_body->GetAsBodyKinematic(), "EngineBody", 400.0f));
+		SetBodyType(&cabinBody->GetAsBodyDynamic()->GetCollisionShape(), m_chassis);
 
 		ndMatrix hingeFrame(cabinBody->GetMatrix());
 		ndSharedPtr<ndJointBilateralConstraint> cabinPivot(new ndJointHinge(hingeFrame, cabinBody->GetAsBodyDynamic(), rootNode->m_body->GetAsBodyDynamic()));
@@ -186,7 +211,11 @@ class ndExcavatorController : public ndModelNotify
 		ndMesh* const node = mesh->FindByName(name);
 		ndAssert(node);
 		ndSharedPtr<ndShapeInstance> tireCollision(node->CreateCollisionTire());
-		ndFloat32 threadThickness = ndFloat32(0.18f);
+		SetBodyType(*tireCollision, m_roller);
+		//SetBodyType(*tireCollision, m_chassis);
+
+		//ndFloat32 threadThickness = ndFloat32(0.18f);
+		ndFloat32 threadThickness = ndFloat32(0.0f);
 		ndVector padd(ndVector::m_zero);
 		padd.m_y = threadThickness;
 		padd.m_z = threadThickness;
@@ -213,6 +242,7 @@ class ndExcavatorController : public ndModelNotify
 		ndSharedPtr<ndRenderSceneNode>& visualMeshRoot)
 	{
 		MakeRollerTire(articulation, mesh, visualMeshRoot, "leftSupportRoller");
+
 		ndModelArticulation::ndNode* const leftTire_0 = MakeRollerTire(articulation, mesh, visualMeshRoot, "leftGear");
 		ndModelArticulation::ndNode* const leftTire_7 = MakeRollerTire(articulation, mesh, visualMeshRoot, "leftFrontRoller");
 		ndAssert(leftTire_0);
@@ -292,11 +322,12 @@ class ndExcavatorController : public ndModelNotify
 		}
 
 		// make the collision shape. 
-		ndSharedPtr<ndShapeInstance> tireCollision(linkArray[0]->CreateCollisionFromChildren());
+		ndSharedPtr<ndShapeInstance> threadCollision(linkArray[0]->CreateCollisionFromChildren());
+		SetBodyType(*threadCollision, m_thread);
 
 		ndFloat32 threadLinkMass = ndFloat32(8.0f);
 		ndModelArticulation::ndNode* const rootNode = articulation->GetRoot();
-		ndSharedPtr<ndBody> linkBody (MakeBodyPart(linkArray[0], visualMeshRoot, tireCollision,	rootNode->m_body->GetAsBodyKinematic(), threadLinkMass));
+		ndSharedPtr<ndBody> linkBody (MakeBodyPart(linkArray[0], visualMeshRoot, threadCollision, rootNode->m_body->GetAsBodyKinematic(), threadLinkMass));
 
 		ndMatrix planeMatrix(linkBody->GetMatrix());
 		ndVector planePivot(planeMatrix.m_posit);
@@ -311,7 +342,7 @@ class ndExcavatorController : public ndModelNotify
 		ndModelArticulation::ndNode* linkNode0 = firstLink;
 		for (ndInt32 i = 1; i < linkArray.GetCount(); ++i)
 		{
-			ndSharedPtr<ndBody> body(MakeBodyPart(linkArray[i], visualMeshRoot, tireCollision, linkNode0->m_body->GetAsBodyKinematic(), threadLinkMass));
+			ndSharedPtr<ndBody> body(MakeBodyPart(linkArray[i], visualMeshRoot, threadCollision, linkNode0->m_body->GetAsBodyKinematic(), threadLinkMass));
 			ndMatrix hingeMatrix (ndRollMatrix(90.0f * ndDegreeToRad) * body->GetMatrix());
 			ndSharedPtr<ndJointBilateralConstraint> joint (new ndJointHinge(hingeMatrix, body->GetAsBodyKinematic(), linkNode0->m_body->GetAsBodyKinematic()));
 			((ndJointHinge*)*joint)->SetAsSpringDamper(ndFloat32(0.25f), ndFloat32(0.0f), ndFloat32(5.0f));
@@ -319,7 +350,7 @@ class ndExcavatorController : public ndModelNotify
 			linkNode0 = firstLink1;
 		}
 
-		ndMatrix hingeMatrix(ndRollMatrix(90.0f * ndDegreeToRad) * linkNode0->m_body->GetMatrix());
+		ndMatrix hingeMatrix(ndRollMatrix(90.0f * ndDegreeToRad) * firstLink->m_body->GetMatrix());
 		ndSharedPtr<ndJointBilateralConstraint> joint(new ndJointHinge(hingeMatrix, linkNode0->m_body->GetAsBodyKinematic(), firstLink->m_body->GetAsBodyKinematic()));
 		((ndJointHinge*)*joint)->SetAsSpringDamper(ndFloat32(0.25f), ndFloat32(0.0f), ndFloat32(5.0f));
 		articulation->AddCloseLoop(joint);

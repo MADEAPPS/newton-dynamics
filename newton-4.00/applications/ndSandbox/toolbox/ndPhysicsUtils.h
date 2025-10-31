@@ -12,9 +12,9 @@
 #ifndef __PHYSICS_UTIL__
 #define __PHYSICS_UTIL__
 
-//#define DEMO_GRAVITY  ndFloat32(-10.0f)
+#define DEMO_GRAVITY  ndFloat32(-10.0f)
 //#define DEMO_GRAVITY  ndFloat32(-1.0f)
-#define DEMO_GRAVITY  ndFloat32(0.0f)
+//#define DEMO_GRAVITY  ndFloat32(0.0f)
 
 class ndDemoEntityManager;
 
@@ -29,7 +29,7 @@ class ndParamMapper
 
 	ndParamMapper(ndFloat32 x0, ndFloat32 x1)
 		:m_x0(x0 + (x1 - x0) * 0.5f)
-		, m_scale((x1 - x0) * 0.5f)
+		,m_scale((x1 - x0) * 0.5f)
 	{
 	}
 
