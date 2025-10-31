@@ -37,6 +37,9 @@ class ndExcavatorController : public ndModelNotify
 
 		MakeLeftTrack(articulation, mesh, visualMesh);
 		MakeRightTrack(articulation, mesh, visualMesh);
+
+		MakeThread(articulation, "leftThread", mesh, visualMesh);
+		MakeThread(articulation, "rightThread", mesh, visualMesh);
 	}
 
 	static ndSharedPtr<ndModelNotify> CreateExcavator(ndDemoEntityManager* const scene, const ndMatrix& location, ndRenderMeshLoader& mesh)
@@ -252,6 +255,77 @@ class ndExcavatorController : public ndModelNotify
 			ndAssert(rollerTire);
 			LinkTires(articulation, rightTire_0, rollerTire);
 		}
+	}
+
+	void MakeThread(ndModelArticulation* const articulation,
+		const char* const baseName,
+		ndSharedPtr<ndMesh>& mesh,
+		ndSharedPtr<ndRenderSceneNode>& visualMeshRoot)
+	{
+		//NewtonBody* const parentBody = GetBody();
+		//NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
+		//DemoEntity* const parentModel = (DemoEntity*)NewtonBodyGetUserData(parentBody);
+		//
+		//DemoEntity* linkArray[256];
+		//DemoEntity* stackPool[256];
+		//char name[256];
+		//
+		//int stack = 1;
+		//int linksCount = 0;
+		//sprintf(name, "%s_00", baseName);
+		//stackPool[0] = parentModel->Find(name);
+		//
+		//while (stack) {
+		//	stack--;
+		//	DemoEntity* link = stackPool[stack];
+		//	linkArray[linksCount] = link;
+		//	linksCount++;
+		//
+		//	for (DemoEntity* child = link->GetChild(); child; child = child->GetSibling()) {
+		//		if (strstr(child->GetName().GetStr(), baseName)) {
+		//			stackPool[stack] = child;
+		//			stack++;
+		//		}
+		//	}
+		//}
+		//
+		//NewtonCollision* const linkCollision = linkArray[0]->CreateCollisionFromchildren(world);
+		//NewtonBody* const firstLinkBody = MakeThreadLinkBody(linkArray[0], linkCollision, linkMaterilID);
+		//
+		////dMatrix bindMatrix(linkArray[count]->GetParent()->CalculateGlobalMatrix(parentModel).Inverse());
+		//dMatrix bindMatrix(dGetIdentityMatrix());
+		//dModelNode* const linkNode = new dModelNode(firstLinkBody, bindMatrix, this);
+		//
+		//dMatrix planeMatrix;
+		//NewtonBodyGetMatrix(firstLinkBody, &planeMatrix[0][0]);
+		//dVector planePivot(planeMatrix.m_posit);
+		//dVector planeNornal(planeMatrix.m_up);
+		//new dCustomPlane(planePivot, planeNornal, firstLinkBody, GetBody());
+		//
+		//dModelNode* linkNode0 = linkNode;
+		//for (int i = 1; i < linksCount; i++) {
+		//	dMatrix hingeMatrix;
+		//	NewtonBody* const linkBody = MakeThreadLinkBody(linkArray[i], linkCollision, linkMaterilID);
+		//	NewtonBodyGetMatrix(linkBody, &hingeMatrix[0][0]);
+		//	hingeMatrix = dRollMatrix(90.0f * dDegreeToRad) * hingeMatrix;
+		//	dCustomHinge* const hinge = new dCustomHinge(hingeMatrix, linkBody, linkNode0->GetBody());
+		//	hinge->SetMassIndependentSpringDamper(true, 0.9f, 0.0f, 5.0f);
+		//	dModelNode* const linkNode1 = new dModelNode(linkBody, bindMatrix, linkNode0);
+		//	linkNode0 = linkNode1;
+		//}
+		//
+		//dMatrix hingeMatrix;
+		//NewtonBodyGetMatrix(firstLinkBody, &hingeMatrix[0][0]);
+		//hingeMatrix = dRollMatrix(90.0f * dDegreeToRad) * hingeMatrix;
+		//dCustomHinge* const hinge = new dCustomHinge(hingeMatrix, firstLinkBody, linkNode0->GetBody());
+		//hinge->SetMassIndependentSpringDamper(true, 0.9f, 0.0f, 5.0f);
+		//NewtonDestroyCollision(linkCollision);
+
+		char name[256];
+		snprintf(name, 255, "%s_00", baseName);
+		ndMesh* const node = mesh->FindByName(name);
+		ndAssert(node);
+
 	}
 
 	ndDemoEntityManager* m_scene;
