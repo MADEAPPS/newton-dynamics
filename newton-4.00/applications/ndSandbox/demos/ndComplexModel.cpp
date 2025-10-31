@@ -321,11 +321,32 @@ class ndExcavatorController : public ndModelNotify
 		//hinge->SetMassIndependentSpringDamper(true, 0.9f, 0.0f, 5.0f);
 		//NewtonDestroyCollision(linkCollision);
 
+		// find the first link of the thread.
 		char name[256];
 		snprintf(name, 255, "%s_00", baseName);
-		ndMesh* const node = mesh->FindByName(name);
-		ndAssert(node);
+		ndFixSizeArray<ndMesh*, 256> stack;
+		ndFixSizeArray<ndMesh*, 256> linkArray;
+		stack.PushBack(mesh->FindByName(name));
+		ndAssert(stack[0]);
 
+		// get all the thread links in order.
+		while (stack.GetCount())
+		{
+			ndMesh* const node = stack.Pop();
+			linkArray.PushBack(node);
+
+			for (ndList<ndSharedPtr<ndMesh>>::ndNode* child = node->GetChildren().GetFirst(); child; child = child->GetNext())
+			{
+				ndMesh* const childMesh = *child->GetInfo();
+				if (childMesh->GetName().Find(baseName) != -1)
+				{
+					stack.PushBack(*child->GetInfo());
+				}
+			}
+		}
+
+		// make the collision shape. 
+		ndSharedPtr<ndShapeInstance> tireCollision(linkArray[0]->CreateCollisionFromChildren());
 	}
 
 	ndDemoEntityManager* m_scene;
