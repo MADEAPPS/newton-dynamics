@@ -109,6 +109,7 @@ class ndMesh : public ndClassAlloc
 	ndSharedPtr<ndShapeInstance> CreateCollisionSphere();
 	ndSharedPtr<ndShapeInstance> CreateCollisionConvex();
 	ndSharedPtr<ndShapeInstance> CreateCollisionCapsule();
+	ndSharedPtr<ndShapeInstance> CreateCollisionChamferCylinder();
 	ndSharedPtr<ndShapeInstance> CreateCollisionTree(bool optimize = true);
 	ndSharedPtr<ndShapeInstance> CreateCollisionCompound(bool lowDetail = false);
 

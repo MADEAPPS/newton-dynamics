@@ -15,7 +15,6 @@
 #include "ndMakeStaticMap.h"
 #include "ndDemoCameraNode.h"
 #include "ndContactCallback.h"
-//#include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 
 class FrictionMaterial : public ndApplicationMaterial
