@@ -178,6 +178,12 @@ class ndExcavatorController : public ndModelNotify
 		ndMesh* const node = mesh->FindByName(name);
 		ndAssert(node);
 		ndSharedPtr<ndShapeInstance> tireCollision(node->CreateCollisionTire());
+		ndFloat32 threadThickness = ndFloat32(0.18f);
+		ndVector padd(ndVector::m_zero);
+		padd.m_y = threadThickness;
+		padd.m_z = threadThickness;
+		tireCollision->SetScale (tireCollision->GetScale() + padd);
+
 		tireCollision->SetLocalMatrix(ndYawMatrix(90.0f * ndDegreeToRad) * tireCollision->GetLocalMatrix());
 
 		ndModelArticulation::ndNode* const rootNode = articulation->GetRoot();
