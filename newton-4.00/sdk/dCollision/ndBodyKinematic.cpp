@@ -106,6 +106,7 @@ ndBodyKinematic::ndBodyKinematic()
 	,m_contactList()
 	,m_lock()
 	,m_scene(nullptr)
+	,m_model(nullptr)
 	,m_islandParent(nullptr)
 	,m_sceneNode(nullptr)
 	,m_skeletonContainer(nullptr)
@@ -141,6 +142,7 @@ ndBodyKinematic::ndBodyKinematic(const ndBodyKinematic& src)
 	,m_contactList()
 	,m_lock()
 	,m_scene(nullptr)
+	,m_model(nullptr)
 	,m_islandParent(nullptr)
 	,m_sceneNode(nullptr)
 	,m_skeletonContainer(nullptr)
@@ -353,6 +355,16 @@ void ndBodyKinematic::SetAutoSleep(bool state)
 {
 	m_autoSleep = ndUnsigned8(state ? 1 : 0);
 	SetSleepState(false);
+}
+
+ndModel* ndBodyKinematic::GetModel() const
+{
+	return m_model;
+}
+
+void ndBodyKinematic::SetModel(ndModel* const model)
+{
+	m_model = model;
 }
 
 ndSkeletonContainer* ndBodyKinematic::GetSkeleton() const

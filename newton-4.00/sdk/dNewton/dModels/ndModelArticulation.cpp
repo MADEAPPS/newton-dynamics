@@ -174,7 +174,7 @@ ndModelArticulation::ndNode* ndModelArticulation::AddRootBody(const ndSharedPtr<
 	ndSharedPtr <ndJointBilateralConstraint> dummyJoint;
 	m_rootNode = new ndNode(rootBody, dummyJoint, nullptr);
 
-	ndBodyDynamic* const dynBody = m_rootNode->m_body->GetAsBodyDynamic();
+	ndBodyKinematic* const dynBody = rootBody->GetAsBodyDynamic();
 	ndAssert(dynBody);
 	if (dynBody)
 	{
@@ -189,7 +189,7 @@ ndModelArticulation::ndNode* ndModelArticulation::AddLimb(ndNode* const parent, 
 	ndAssert(joint->GetBody0() == body->GetAsBodyKinematic());
 	ndAssert(joint->GetBody1() == parent->m_body->GetAsBodyKinematic());
 
-	ndBodyDynamic* const dynBody = body->GetAsBodyDynamic();
+	ndBodyKinematic* const dynBody = body->GetAsBodyDynamic();
 	ndAssert(dynBody);
 	if (dynBody)
 	{

@@ -20,7 +20,7 @@
 */
 
 #include "ndCoreStdafx.h"
-#include "ndNewtonStdafx.h"
+#include "ndCollisionStdafx.h"
 #include "ndModel.h"
 
 ndModelList::ndModelList()

@@ -22,7 +22,7 @@
 #ifndef __ND_MODEL_H__
 #define __ND_MODEL_H__
 
-#include "ndNewtonStdafx.h"
+#include "ndCoreStdafx.h"
 #include "ndModelList.h"
 
 class ndModelBase;
@@ -37,22 +37,22 @@ class ndModel: public ndContainersFreeListAlloc<ndModel>
 	public:
 	D_BASE_CLASS_REFLECTION(ndModel)
 
-	D_NEWTON_API ndModel();
-	D_NEWTON_API ndModel(const ndModel& src);
+	D_COLLISION_API ndModel();
+	D_COLLISION_API ndModel(const ndModel& src);
 
-	D_NEWTON_API virtual ~ndModel ();
-	D_NEWTON_API virtual ndModel* Clone() const;
-	D_NEWTON_API virtual ndWorld* GetWorld() const;
+	D_COLLISION_API virtual ~ndModel ();
+	D_COLLISION_API virtual ndModel* Clone() const;
+	D_COLLISION_API virtual ndWorld* GetWorld() const;
 
-	D_NEWTON_API virtual ndModel* GetAsModel();
-	D_NEWTON_API virtual ndMultiBodyVehicle* GetAsMultiBodyVehicle();
-	D_NEWTON_API virtual ndModelArticulation* GetAsModelArticulation();
+	D_COLLISION_API virtual ndModel* GetAsModel();
+	D_COLLISION_API virtual ndMultiBodyVehicle* GetAsMultiBodyVehicle();
+	D_COLLISION_API virtual ndModelArticulation* GetAsModelArticulation();
 
-	D_NEWTON_API ndSharedPtr<ndModelNotify>& GetNotifyCallback();
-	D_NEWTON_API void SetNotifyCallback(const ndSharedPtr<ndModelNotify>& notifyCallback);
+	D_COLLISION_API ndSharedPtr<ndModelNotify>& GetNotifyCallback();
+	D_COLLISION_API void SetNotifyCallback(const ndSharedPtr<ndModelNotify>& notifyCallback);
 
-	D_NEWTON_API virtual void AddBodiesAndJointsToWorld() {}
-	D_NEWTON_API virtual void RemoveBodiesAndJointsFromWorld() {}
+	D_COLLISION_API virtual void AddBodiesAndJointsToWorld() {}
+	D_COLLISION_API virtual void RemoveBodiesAndJointsFromWorld() {}
 
 	protected:
 	virtual void OnAddToWorld() {}

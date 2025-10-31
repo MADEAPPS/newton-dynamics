@@ -22,9 +22,10 @@
 #ifndef __ND_MODEL_LIST_H__
 #define __ND_MODEL_LIST_H__
 
-#include "ndNewtonStdafx.h"
+#include "ndCollisionStdafx.h"
 
 class ndModel;
+class ndWorld;
 
 class ndModelList : public ndList<ndSharedPtr<ndModel>, ndContainersFreeListAlloc<ndSharedPtr<ndModel>*>>
 {

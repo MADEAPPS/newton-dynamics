@@ -73,9 +73,6 @@ class ndBodyDynamic: public ndBodyKinematic
 
 	D_NEWTON_API ndVector GetForce() const override;
 	D_NEWTON_API ndVector GetTorque() const override;
-
-	D_NEWTON_API ndModel* GetModel() const;
-	D_NEWTON_API void SetModel(ndModel* const model);
 	
 	private:
 	void SaveExternalForces();
@@ -93,7 +90,6 @@ class ndBodyDynamic: public ndBodyKinematic
 	ndVector m_dampCoef;
 	ndVector m_cachedDampCoef;
 	ndVector m_sleepAccelTest2;
-	ndModel* m_model;
 	ndFloat32 m_cachedTimeStep;
 
 	static ndVector m_sleepAccelTestScale2;

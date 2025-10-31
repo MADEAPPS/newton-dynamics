@@ -37,7 +37,6 @@ ndBodyDynamic::ndBodyDynamic()
 	,m_dampCoef(ndVector::m_zero)
 	,m_cachedDampCoef(ndVector::m_one)
 	,m_sleepAccelTest2(D_SOLVER_MAX_ACCEL_ERROR * D_SOLVER_MAX_ACCEL_ERROR)
-	,m_model(nullptr)
 	,m_cachedTimeStep(ndFloat32(0.0f))
 {
 	m_isDynamics = 1;
@@ -54,7 +53,6 @@ ndBodyDynamic::ndBodyDynamic(const ndBodyDynamic& src)
 	,m_dampCoef(ndVector::m_zero)
 	,m_cachedDampCoef(ndVector::m_one)
 	,m_sleepAccelTest2(D_SOLVER_MAX_ACCEL_ERROR* D_SOLVER_MAX_ACCEL_ERROR)
-	,m_model(nullptr)
 	,m_cachedTimeStep(ndFloat32(0.0f))
 {
 	m_isDynamics = 1;
@@ -123,16 +121,6 @@ void ndBodyDynamic::SetTorque(const ndVector& torque)
 		ndFloat32 deltaAlpha2 = deltaAlpha.DotProduct(deltaAlpha).GetScalar();
 		m_equilibrium = ndUnsigned8(deltaAlpha2 < D_ERR_TOLERANCE2);
 	}
-}
-
-ndModel* ndBodyDynamic::GetModel() const
-{
-	return m_model;
-}
-
-void ndBodyDynamic::SetModel(ndModel* const model)
-{
-	m_model = model;
 }
 
 void ndBodyDynamic::ApplyExternalForces(ndInt32 threadIndex, ndFloat32 timestep)

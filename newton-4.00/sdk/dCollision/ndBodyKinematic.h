@@ -28,6 +28,7 @@
 #include "ndBodyListView.h"
 
 class ndScene;
+class ndModel;
 class ndSkeletonContainer;
 class ndJointBilateralConstraint;
 
@@ -150,6 +151,9 @@ class ndBodyKinematic : public ndBody
 	D_COLLISION_API ndSkeletonContainer* GetSkeleton() const;
 	D_COLLISION_API void SetSkeleton(ndSkeletonContainer* const skeleton);
 
+	D_COLLISION_API ndModel* GetModel() const;
+	D_COLLISION_API void SetModel(ndModel* const model);
+
 	D_COLLISION_API virtual ndVector GetForce() const;
 	D_COLLISION_API virtual ndVector GetTorque() const;
 
@@ -208,6 +212,7 @@ class ndBodyKinematic : public ndBody
 	ndContactMap m_contactList;
 	mutable ndSpinLock m_lock;
 	ndScene* m_scene;
+	ndModel* m_model;
 	ndBodyKinematic* m_islandParent;
 	ndBodyListView::ndNode* m_sceneNode;
 	ndSkeletonContainer* m_skeletonContainer;
