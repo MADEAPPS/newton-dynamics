@@ -20,7 +20,7 @@
 */
 
 #include "ndCoreStdafx.h"
-#include "ndNewtonStdafx.h"
+#include "ndCollisionStdafx.h"
 #include "ndModelNotify.h"
 
 ndModelNotify::ndModelNotify(const ndModelNotify& src)
@@ -69,4 +69,9 @@ void ndModelNotify::PostUpdate(ndFloat32)
 
 void ndModelNotify::PostTransformUpdate(ndFloat32)
 {
+}
+
+bool ndModelNotify::OnContactGeneration(const ndBodyKinematic* const, const ndBodyKinematic* const)
+{
+	return false;
 }

@@ -112,6 +112,16 @@ namespace ndRagdoll
 		{
 		}
 
+		bool OnContactGeneration(const ndBodyKinematic* const, const ndBodyKinematic* const) override
+		{
+			// here the application can use filter to determine what body parts should collide.
+			// this greatly improves performance because since articulated models in general 
+			// do not self collide, but occationaly some parts do collide. 
+			// for now we just return false (no collision)
+			return false;
+		}
+
+
 		ndSharedPtr<ndBody> CreateBodyPart(
 			ndDemoEntityManager* const scene,
 			const ndSharedPtr<ndRenderSceneNode>& rootMesh,

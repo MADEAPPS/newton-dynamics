@@ -22,9 +22,11 @@
 #ifndef __ND_MODEL_NOTIFY_H__
 #define __ND_MODEL_NOTIFY_H__
 
-#include "ndNewtonStdafx.h"
+#include "ndCollisionStdafx.h"
 
 class ndModel;
+class ndBodyKinematic;
+class ndConstraintDebugCallback;
 
 D_MSV_NEWTON_CLASS_ALIGN_32
 class ndModelNotify : public ndContainersFreeListAlloc<ndModelNotify>
@@ -32,20 +34,21 @@ class ndModelNotify : public ndContainersFreeListAlloc<ndModelNotify>
 	public:  
 	D_BASE_CLASS_REFLECTION(ndModelNotify)
 
-	D_NEWTON_API ndModelNotify();
-	D_NEWTON_API ndModelNotify(const ndModelNotify& src);
+	D_COLLISION_API ndModelNotify();
+	D_COLLISION_API ndModelNotify(const ndModelNotify& src);
 
-	D_NEWTON_API virtual ~ndModelNotify();
+	D_COLLISION_API virtual ~ndModelNotify();
 
-	D_NEWTON_API ndModel* GetModel() const;
-	D_NEWTON_API void SetModel(ndModel* const model);
+	D_COLLISION_API ndModel* GetModel() const;
+	D_COLLISION_API void SetModel(ndModel* const model);
 
-	D_NEWTON_API virtual ndModelNotify* Clone() const;
-	D_NEWTON_API virtual void Update(ndFloat32 timestep);
-	D_NEWTON_API virtual void PostUpdate(ndFloat32 timestep);
-	D_NEWTON_API virtual void PostTransformUpdate(ndFloat32 timestep);
+	D_COLLISION_API virtual ndModelNotify* Clone() const;
+	D_COLLISION_API virtual void Update(ndFloat32 timestep);
+	D_COLLISION_API virtual void PostUpdate(ndFloat32 timestep);
+	D_COLLISION_API virtual void PostTransformUpdate(ndFloat32 timestep);
+	D_COLLISION_API virtual bool OnContactGeneration(const ndBodyKinematic* const body0, const ndBodyKinematic* const body1);
 
-	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;
+	D_COLLISION_API virtual void Debug(ndConstraintDebugCallback& context) const;
 
 	private:
 	ndModel* m_model;

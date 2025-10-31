@@ -42,6 +42,15 @@ class ndExcavatorController : public ndModelNotify
 		MakeThread(articulation, "rightThread", mesh, visualMesh);
 	}
 
+	bool OnContactGeneration(const ndBodyKinematic* const, const ndBodyKinematic* const) override
+	{
+		// here the application can use filter to determine what body parts should collide.
+		// this greatly improves performance because since articulated models in general 
+		// do not self collide, but occationaly some parts do collide. 
+		// for now we just return false (no collision)
+		return false;
+	}
+
 	static ndSharedPtr<ndModelNotify> CreateExcavator(ndDemoEntityManager* const scene, const ndMatrix& location, ndRenderMeshLoader& mesh)
 	{
 		// crate a model and set the root transform
@@ -54,6 +63,7 @@ class ndExcavatorController : public ndModelNotify
 		// using a model articulation for this vehicle
 		ndSharedPtr<ndModel> vehicleModel(new ndModelArticulation());
 		ndSharedPtr<ndModelNotify> controller(new ndExcavatorController(scene, mesh.m_mesh, vehicleModel, vehicleMesh));
+		vehicleModel->SetNotifyCallback(controller);
 
 		ndWorld* const world = scene->GetWorld();
 		scene->AddEntity(vehicleMesh);
