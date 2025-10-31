@@ -27,7 +27,6 @@
 #include "ndBodyDynamic.h"
 #include "ndModelArticulation.h"
 
-
 ndModelArticulation::ndCenterOfMassDynamics::ndCenterOfMassDynamics()
 	:m_omega(ndVector::m_zero)
 	,m_veloc(ndVector::m_zero)
@@ -174,6 +173,13 @@ ndModelArticulation::ndNode* ndModelArticulation::AddRootBody(const ndSharedPtr<
 	ndAssert(!m_rootNode);
 	ndSharedPtr <ndJointBilateralConstraint> dummyJoint;
 	m_rootNode = new ndNode(rootBody, dummyJoint, nullptr);
+
+	ndBodyDynamic* const dynBody = m_rootNode->m_body->GetAsBodyDynamic();
+	ndAssert(dynBody);
+	if (dynBody)
+	{
+		dynBody->SetModel(this);
+	}
 	return m_rootNode;
 }
 
@@ -182,6 +188,13 @@ ndModelArticulation::ndNode* ndModelArticulation::AddLimb(ndNode* const parent, 
 	ndAssert(m_rootNode);
 	ndAssert(joint->GetBody0() == body->GetAsBodyKinematic());
 	ndAssert(joint->GetBody1() == parent->m_body->GetAsBodyKinematic());
+
+	ndBodyDynamic* const dynBody = body->GetAsBodyDynamic();
+	ndAssert(dynBody);
+	if (dynBody)
+	{
+		dynBody->SetModel(this);
+	}
 	return new ndNode(body, joint, parent);
 }
 

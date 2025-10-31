@@ -37,6 +37,7 @@ ndBodyDynamic::ndBodyDynamic()
 	,m_dampCoef(ndVector::m_zero)
 	,m_cachedDampCoef(ndVector::m_one)
 	,m_sleepAccelTest2(D_SOLVER_MAX_ACCEL_ERROR * D_SOLVER_MAX_ACCEL_ERROR)
+	,m_model(nullptr)
 	,m_cachedTimeStep(ndFloat32(0.0f))
 {
 	m_isDynamics = 1;
@@ -44,12 +45,50 @@ ndBodyDynamic::ndBodyDynamic()
 
 ndBodyDynamic::ndBodyDynamic(const ndBodyDynamic& src)
 	:ndBodyKinematic(src)
+	,m_externalForce(ndVector::m_zero)
+	,m_externalTorque(ndVector::m_zero)
+	,m_impulseForce(ndVector::m_zero)
+	,m_impulseTorque(ndVector::m_zero)
+	,m_savedExternalForce(ndVector::m_zero)
+	,m_savedExternalTorque(ndVector::m_zero)
+	,m_dampCoef(ndVector::m_zero)
+	,m_cachedDampCoef(ndVector::m_one)
+	,m_sleepAccelTest2(D_SOLVER_MAX_ACCEL_ERROR* D_SOLVER_MAX_ACCEL_ERROR)
+	,m_model(nullptr)
+	,m_cachedTimeStep(ndFloat32(0.0f))
 {
 	m_isDynamics = 1;
 }
 
 ndBodyDynamic::~ndBodyDynamic()
 {
+}
+
+ndVector ndBodyDynamic::GetForce() const
+{
+	return m_externalForce;
+}
+
+ndVector ndBodyDynamic::GetTorque() const
+{
+	return m_externalTorque;
+}
+
+void ndBodyDynamic::SaveExternalForces()
+{
+	m_savedExternalForce = m_externalForce;
+	m_savedExternalTorque = m_externalTorque;
+}
+
+ndVector ndBodyDynamic::GetCachedDamping() const
+{
+	return m_cachedDampCoef;
+}
+
+void ndBodyDynamic::SetAcceleration(const ndVector& accel, const ndVector& alpha)
+{
+	m_accel = accel;
+	m_alpha = alpha;
 }
 
 void ndBodyDynamic::SetForce(const ndVector& force)
@@ -84,6 +123,16 @@ void ndBodyDynamic::SetTorque(const ndVector& torque)
 		ndFloat32 deltaAlpha2 = deltaAlpha.DotProduct(deltaAlpha).GetScalar();
 		m_equilibrium = ndUnsigned8(deltaAlpha2 < D_ERR_TOLERANCE2);
 	}
+}
+
+ndModel* ndBodyDynamic::GetModel() const
+{
+	return m_model;
+}
+
+void ndBodyDynamic::SetModel(ndModel* const model)
+{
+	m_model = model;
 }
 
 void ndBodyDynamic::ApplyExternalForces(ndInt32 threadIndex, ndFloat32 timestep)

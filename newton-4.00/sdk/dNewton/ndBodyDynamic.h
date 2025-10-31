@@ -37,7 +37,7 @@
 #define D_ERR_TOLERANCE		ndFloat32(1.0e-2f)
 #define D_ERR_TOLERANCE2	(D_ERR_TOLERANCE * D_ERR_TOLERANCE)
 
-//#define D_USING_SINGLE_SOA_REGISTER
+class ndModel;
 
 D_MSV_NEWTON_CLASS_ALIGN_32
 class ndBodyDynamic: public ndBodyKinematic
@@ -71,8 +71,11 @@ class ndBodyDynamic: public ndBodyKinematic
 	D_NEWTON_API ndFloat32 GetSleepAccel() const;
 	D_NEWTON_API void SetSleepAccel(ndFloat32 accelMag2);
 
-	virtual ndVector GetForce() const override;
-	virtual ndVector GetTorque() const override;
+	D_NEWTON_API ndVector GetForce() const override;
+	D_NEWTON_API ndVector GetTorque() const override;
+
+	D_NEWTON_API ndModel* GetModel() const;
+	D_NEWTON_API void SetModel(ndModel* const model);
 	
 	private:
 	void SaveExternalForces();
@@ -90,6 +93,7 @@ class ndBodyDynamic: public ndBodyKinematic
 	ndVector m_dampCoef;
 	ndVector m_cachedDampCoef;
 	ndVector m_sleepAccelTest2;
+	ndModel* m_model;
 	ndFloat32 m_cachedTimeStep;
 
 	static ndVector m_sleepAccelTestScale2;
@@ -101,32 +105,6 @@ class ndBodyDynamic: public ndBodyKinematic
 	friend class ndDynamicsUpdateCuda;
 } D_GCC_NEWTON_CLASS_ALIGN_32 ;
 
-inline ndVector ndBodyDynamic::GetForce() const
-{
-	return m_externalForce;
-}
-
-inline ndVector ndBodyDynamic::GetTorque() const
-{
-	return m_externalTorque;
-}
-
-inline void ndBodyDynamic::SaveExternalForces()
-{
-	m_savedExternalForce = m_externalForce;
-	m_savedExternalTorque = m_externalTorque;
-}
-
-inline ndVector ndBodyDynamic::GetCachedDamping() const
-{
-	return m_cachedDampCoef;
-}
-
-inline void ndBodyDynamic::SetAcceleration(const ndVector& accel, const ndVector& alpha)
-{
-	m_accel = accel;
-	m_alpha = alpha;
-}
 
 #endif 
 
