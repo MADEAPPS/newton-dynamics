@@ -145,7 +145,7 @@ struct ndConeInfo
 
 struct ndChamferCylinderInfo
 {
-	ndFloat32 m_r;
+	ndFloat32 m_radius;
 	ndFloat32 m_height;
 };
 

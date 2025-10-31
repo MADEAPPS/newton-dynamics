@@ -149,7 +149,7 @@ ndShapeInfo ndShapeChamferCylinder::GetShapeInfo() const
 {
 	ndShapeInfo info(ndShapeConvex::GetShapeInfo());
 
-	info.m_chamferCylinder.m_r = m_radius;
+	info.m_chamferCylinder.m_radius = m_radius;
 	info.m_chamferCylinder.m_height = m_height * ndFloat32(2.0f);
 	return info;
 }

@@ -142,27 +142,31 @@ class ndExcavatorController : public ndModelNotify
 		ndModelArticulation::ndNode* const cabinNode = articulation->AddLimb(rootNode, cabinBody, cabinPivot);
 	}
 
-	void LinkTires(ndMesh* const master, ndMesh* const slave)
+	void LinkTires(ndModelArticulation* const articulation,
+		ndModelArticulation::ndNode* const master, ndModelArticulation::ndNode* const slave)
 	{
-		//NewtonCollisionInfoRecord slaveTire;
-		//NewtonCollisionInfoRecord masterTire;
-		//
-		//NewtonCollisionGetInfo(NewtonBodyGetCollision(slave->GetBody()), &slaveTire);
-		//NewtonCollisionGetInfo(NewtonBodyGetCollision(master->GetBody()), &masterTire);
-		//
-		//dAssert(masterTire.m_collisionType == SERIALIZE_ID_CHAMFERCYLINDER);
-		//dAssert(slaveTire.m_collisionType == SERIALIZE_ID_CHAMFERCYLINDER);
-		//dAssert(masterTire.m_collisionMaterial.m_userId == ARTICULATED_VEHICLE_DEFINITION::m_tirePart);
-		//dAssert(slaveTire.m_collisionMaterial.m_userId == ARTICULATED_VEHICLE_DEFINITION::m_tirePart);
-		//
-		//dFloat masterRadio = masterTire.m_chamferCylinder.m_height * 0.5f + masterTire.m_chamferCylinder.m_radio;
-		//dFloat slaveRadio = slaveTire.m_chamferCylinder.m_height * 0.5f + slaveTire.m_chamferCylinder.m_radio;
-		//
-		//dMatrix pinMatrix0;
-		//dMatrix pinMatrix1;
-		//const dCustomJoint* const joint = master->GetJoint();
-		//joint->CalculateGlobalMatrix(pinMatrix0, pinMatrix1);
-		//return new dCustomGear(slaveRadio / masterRadio, pinMatrix0[0], pinMatrix0[0].Scale(-1.0f), slave->GetBody(), master->GetBody());
+		//ndShapeInfo slaveTire(slave->m_body->GetAsBodyKinematic()->GetCollisionShape().GetShapeInfo());
+		//ndShapeInfo masterTire(master->m_body->GetAsBodyKinematic()->GetCollisionShape().GetShapeInfo());
+		//ndFloat32 slaveRadio = slaveTire.m_chamferCylinder.m_height * 0.5f + slaveTire.m_chamferCylinder.m_radius;
+		//ndFloat32 masterRadio = masterTire.m_chamferCylinder.m_height * 0.5f + masterTire.m_chamferCylinder.m_radius;
+
+		const ndShapeInstance& slaveShape = slave->m_body->GetAsBodyKinematic()->GetCollisionShape();
+		const ndShapeInstance& masterShape = master->m_body->GetAsBodyKinematic()->GetCollisionShape();
+
+		ndFloat32 slaveRadio = slaveShape.GetScale().m_y;
+		ndFloat32 masterRadio = masterShape.GetScale().m_y;
+
+		ndMatrix pinMatrix0;
+		ndMatrix pinMatrix1;
+		const ndJointBilateralConstraint* const joint = *master->m_joint;
+		joint->CalculateGlobalMatrix(pinMatrix0, pinMatrix1);
+
+		ndFloat32 ratio = slaveRadio / masterRadio;
+		ndSharedPtr<ndJointBilateralConstraint> link(new ndJointGear(
+			ratio, pinMatrix0[0], slave->m_body->GetAsBodyDynamic(),
+			pinMatrix1[0].Scale(ndFloat32(-1.0f)), master->m_body->GetAsBodyDynamic()));
+
+		articulation->AddCloseLoop(link);
 	}
 
 	ndModelArticulation::ndNode* MakeRollerTire(
@@ -199,7 +203,7 @@ class ndExcavatorController : public ndModelNotify
 		ndModelArticulation::ndNode* const leftTire_7 = MakeRollerTire(articulation, mesh, visualMeshRoot, "leftFrontRoller");
 		ndAssert(leftTire_0);
 		ndAssert(leftTire_7);
-		//LinkTires(leftTire_0, leftTire_7);
+		LinkTires(articulation, leftTire_0, leftTire_7);
 
 		for (int i = 0; i < 3; ++i) 
 		{
@@ -207,7 +211,7 @@ class ndExcavatorController : public ndModelNotify
 			snprintf(name, 63, "leftRoller%d", i);
 			ndModelArticulation::ndNode* const rollerTire = MakeRollerTire(articulation, mesh, visualMeshRoot, name);
 			ndAssert(rollerTire);
-			//LinkTires(leftTire_0, rollerTire);
+			LinkTires(articulation, leftTire_0, rollerTire);
 		}
 
 		//// link traction tire to the engine using a differential gear
@@ -232,7 +236,7 @@ class ndExcavatorController : public ndModelNotify
 		ndModelArticulation::ndNode* const rightTire_7 = MakeRollerTire(articulation, mesh, visualMeshRoot, "rightFrontRoller");
 		ndAssert(rightTire_0);
 		ndAssert(rightTire_7);
-		//LinkTires(rightTire_0, rightTire_7);
+		LinkTires(articulation, rightTire_0, rightTire_7);
 
 		for (int i = 0; i < 3; ++i)
 		{
@@ -240,7 +244,7 @@ class ndExcavatorController : public ndModelNotify
 			snprintf(name, 63, "rightRoller%d", i);
 			ndModelArticulation::ndNode* const rollerTire = MakeRollerTire(articulation, mesh, visualMeshRoot, name);
 			ndAssert(rollerTire);
-			//LinkTires(rightTire_0, rollerTire);
+			LinkTires(articulation, rightTire_0, rollerTire);
 		}
 	}
 
