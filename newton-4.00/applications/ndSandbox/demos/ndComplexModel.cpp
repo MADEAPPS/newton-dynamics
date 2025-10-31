@@ -148,11 +148,6 @@ class ndExcavatorController : public ndModelNotify
 	void LinkTires(ndModelArticulation* const articulation,
 		ndModelArticulation::ndNode* const master, ndModelArticulation::ndNode* const slave)
 	{
-		//ndShapeInfo slaveTire(slave->m_body->GetAsBodyKinematic()->GetCollisionShape().GetShapeInfo());
-		//ndShapeInfo masterTire(master->m_body->GetAsBodyKinematic()->GetCollisionShape().GetShapeInfo());
-		//ndFloat32 slaveRadio = slaveTire.m_chamferCylinder.m_height * 0.5f + slaveTire.m_chamferCylinder.m_radius;
-		//ndFloat32 masterRadio = masterTire.m_chamferCylinder.m_height * 0.5f + masterTire.m_chamferCylinder.m_radius;
-
 		const ndShapeInstance& slaveShape = slave->m_body->GetAsBodyKinematic()->GetCollisionShape();
 		const ndShapeInstance& masterShape = master->m_body->GetAsBodyKinematic()->GetCollisionShape();
 
@@ -262,65 +257,6 @@ class ndExcavatorController : public ndModelNotify
 		ndSharedPtr<ndMesh>& mesh,
 		ndSharedPtr<ndRenderSceneNode>& visualMeshRoot)
 	{
-		//NewtonBody* const parentBody = GetBody();
-		//NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
-		//DemoEntity* const parentModel = (DemoEntity*)NewtonBodyGetUserData(parentBody);
-		//
-		//DemoEntity* linkArray[256];
-		//DemoEntity* stackPool[256];
-		//char name[256];
-		//
-		//int stack = 1;
-		//int linksCount = 0;
-		//sprintf(name, "%s_00", baseName);
-		//stackPool[0] = parentModel->Find(name);
-		//
-		//while (stack) {
-		//	stack--;
-		//	DemoEntity* link = stackPool[stack];
-		//	linkArray[linksCount] = link;
-		//	linksCount++;
-		//
-		//	for (DemoEntity* child = link->GetChild(); child; child = child->GetSibling()) {
-		//		if (strstr(child->GetName().GetStr(), baseName)) {
-		//			stackPool[stack] = child;
-		//			stack++;
-		//		}
-		//	}
-		//}
-		//
-		//NewtonCollision* const linkCollision = linkArray[0]->CreateCollisionFromchildren(world);
-		//NewtonBody* const firstLinkBody = MakeThreadLinkBody(linkArray[0], linkCollision, linkMaterilID);
-		//
-		////dMatrix bindMatrix(linkArray[count]->GetParent()->CalculateGlobalMatrix(parentModel).Inverse());
-		//dMatrix bindMatrix(dGetIdentityMatrix());
-		//dModelNode* const linkNode = new dModelNode(firstLinkBody, bindMatrix, this);
-		//
-		//dMatrix planeMatrix;
-		//NewtonBodyGetMatrix(firstLinkBody, &planeMatrix[0][0]);
-		//dVector planePivot(planeMatrix.m_posit);
-		//dVector planeNornal(planeMatrix.m_up);
-		//new dCustomPlane(planePivot, planeNornal, firstLinkBody, GetBody());
-		//
-		//dModelNode* linkNode0 = linkNode;
-		//for (int i = 1; i < linksCount; i++) {
-		//	dMatrix hingeMatrix;
-		//	NewtonBody* const linkBody = MakeThreadLinkBody(linkArray[i], linkCollision, linkMaterilID);
-		//	NewtonBodyGetMatrix(linkBody, &hingeMatrix[0][0]);
-		//	hingeMatrix = dRollMatrix(90.0f * dDegreeToRad) * hingeMatrix;
-		//	dCustomHinge* const hinge = new dCustomHinge(hingeMatrix, linkBody, linkNode0->GetBody());
-		//	hinge->SetMassIndependentSpringDamper(true, 0.9f, 0.0f, 5.0f);
-		//	dModelNode* const linkNode1 = new dModelNode(linkBody, bindMatrix, linkNode0);
-		//	linkNode0 = linkNode1;
-		//}
-		//
-		//dMatrix hingeMatrix;
-		//NewtonBodyGetMatrix(firstLinkBody, &hingeMatrix[0][0]);
-		//hingeMatrix = dRollMatrix(90.0f * dDegreeToRad) * hingeMatrix;
-		//dCustomHinge* const hinge = new dCustomHinge(hingeMatrix, firstLinkBody, linkNode0->GetBody());
-		//hinge->SetMassIndependentSpringDamper(true, 0.9f, 0.0f, 5.0f);
-		//NewtonDestroyCollision(linkCollision);
-
 		// find the first link of the thread.
 		char name[256];
 		snprintf(name, 255, "%s_00", baseName);
@@ -347,6 +283,36 @@ class ndExcavatorController : public ndModelNotify
 
 		// make the collision shape. 
 		ndSharedPtr<ndShapeInstance> tireCollision(linkArray[0]->CreateCollisionFromChildren());
+
+		ndFloat32 threadLinkMass = ndFloat32(8.0f);
+		ndModelArticulation::ndNode* const rootNode = articulation->GetRoot();
+		ndSharedPtr<ndBody> linkBody (MakeBodyPart(linkArray[0], visualMeshRoot, tireCollision,	rootNode->m_body->GetAsBodyKinematic(), threadLinkMass));
+
+		ndMatrix planeMatrix(linkBody->GetMatrix());
+		ndVector planePivot(planeMatrix.m_posit);
+		ndVector planeNornal(planeMatrix.m_up);
+		ndSharedPtr<ndJointBilateralConstraint> linkJoint(new ndJointPlane(
+			planePivot, planeNornal, linkBody->GetAsBodyDynamic(),
+			rootNode->m_body->GetAsBodyDynamic()));
+
+		ndModelArticulation::ndNode* const firstLink = articulation->AddLimb(rootNode, linkBody, linkJoint);
+
+		// connent all threads planks with hinge joint
+		ndModelArticulation::ndNode* linkNode0 = firstLink;
+		for (ndInt32 i = 1; i < linkArray.GetCount(); ++i)
+		{
+			ndSharedPtr<ndBody> body(MakeBodyPart(linkArray[i], visualMeshRoot, tireCollision, linkNode0->m_body->GetAsBodyKinematic(), threadLinkMass));
+			ndMatrix hingeMatrix (ndRollMatrix(90.0f * ndDegreeToRad) * body->GetMatrix());
+			ndSharedPtr<ndJointBilateralConstraint> joint (new ndJointHinge(hingeMatrix, body->GetAsBodyKinematic(), linkNode0->m_body->GetAsBodyKinematic()));
+			((ndJointHinge*)*joint)->SetAsSpringDamper(ndFloat32(0.25f), ndFloat32(0.0f), ndFloat32(5.0f));
+			ndModelArticulation::ndNode* const firstLink1 = articulation->AddLimb(linkNode0, body, joint);
+			linkNode0 = firstLink1;
+		}
+
+		ndMatrix hingeMatrix(ndRollMatrix(90.0f * ndDegreeToRad) * linkNode0->m_body->GetMatrix());
+		ndSharedPtr<ndJointBilateralConstraint> joint(new ndJointHinge(hingeMatrix, linkNode0->m_body->GetAsBodyKinematic(), firstLink->m_body->GetAsBodyKinematic()));
+		((ndJointHinge*)*joint)->SetAsSpringDamper(ndFloat32(0.25f), ndFloat32(0.0f), ndFloat32(5.0f));
+		articulation->AddCloseLoop(joint);
 	}
 
 	ndDemoEntityManager* m_scene;
