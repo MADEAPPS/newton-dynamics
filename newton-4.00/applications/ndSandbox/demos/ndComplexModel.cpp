@@ -349,14 +349,14 @@ class ndExcavatorController : public ndModelNotify
 			ndSharedPtr<ndBody> body(MakeBodyPart(linkArray[i], visualMeshRoot, threadCollision, linkNode0->m_body->GetAsBodyKinematic(), threadLinkMass));
 			ndMatrix hingeMatrix (ndRollMatrix(90.0f * ndDegreeToRad) * body->GetMatrix());
 			ndSharedPtr<ndJointBilateralConstraint> joint (new ndJointHinge(hingeMatrix, body->GetAsBodyKinematic(), linkNode0->m_body->GetAsBodyKinematic()));
-			((ndJointHinge*)*joint)->SetAsSpringDamper(ndFloat32(0.25f), ndFloat32(0.0f), ndFloat32(5.0f));
+			((ndJointHinge*)*joint)->SetAsSpringDamper(ndFloat32(0.1f), ndFloat32(0.0f), ndFloat32(5.0f));
 			ndModelArticulation::ndNode* const firstLink1 = articulation->AddLimb(linkNode0, body, joint);
 			linkNode0 = firstLink1;
 		}
 
 		ndMatrix hingeMatrix(ndRollMatrix(90.0f * ndDegreeToRad) * firstLink->m_body->GetMatrix());
 		ndSharedPtr<ndJointBilateralConstraint> joint(new ndJointHinge(hingeMatrix, linkNode0->m_body->GetAsBodyKinematic(), firstLink->m_body->GetAsBodyKinematic()));
-		((ndJointHinge*)*joint)->SetAsSpringDamper(ndFloat32(0.25f), ndFloat32(0.0f), ndFloat32(5.0f));
+		((ndJointHinge*)*joint)->SetAsSpringDamper(ndFloat32(0.1f), ndFloat32(0.0f), ndFloat32(5.0f));
 		articulation->AddCloseLoop(joint);
 	}
 
