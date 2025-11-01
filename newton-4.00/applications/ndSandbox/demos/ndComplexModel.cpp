@@ -301,27 +301,36 @@ class ndExcavatorController : public ndModelNotify
 		ndSharedPtr<ndMesh>& mesh,
 		ndSharedPtr<ndRenderSceneNode>& visualMeshRoot)
 	{
-		// find the first link of the thread.
-		char name[256];
-		snprintf(name, 255, "%s_00", baseName);
 		ndFixSizeArray<ndMesh*, 256> stack;
 		ndFixSizeArray<ndMesh*, 256> linkArray;
-		stack.PushBack(mesh->FindByName(name));
-		ndAssert(stack[0]);
+		stack.PushBack(*mesh);
 
 		// get all the thread links in order.
 		while (stack.GetCount())
 		{
 			ndMesh* const node = stack.Pop();
-			linkArray.PushBack(node);
+			if (node->GetName().Find(baseName) != -1)
+			{
+				linkArray.PushBack(node);
+				ndInt32 index = 0;
+				for (ndInt32 i = linkArray.GetCount() - 2; i >= 0; --i)
+				{
+					if (linkArray[i]->GetName() > node->GetName())
+					{
+						linkArray[i + 1] = linkArray[i];
+						index = i;
+					}
+					else
+					{
+						break;
+					}
+				}
+				linkArray[index] = node;
+			}
 
 			for (ndList<ndSharedPtr<ndMesh>>::ndNode* child = node->GetChildren().GetFirst(); child; child = child->GetNext())
 			{
-				ndMesh* const childMesh = *child->GetInfo();
-				if (childMesh->GetName().Find(baseName) != -1)
-				{
-					stack.PushBack(*child->GetInfo());
-				}
+				stack.PushBack(*child->GetInfo());
 			}
 		}
 
@@ -346,7 +355,7 @@ class ndExcavatorController : public ndModelNotify
 		ndModelArticulation::ndNode* linkNode0 = firstLink;
 		for (ndInt32 i = 1; i < linkArray.GetCount(); ++i)
 		{
-			ndSharedPtr<ndBody> body(MakeBodyPart(linkArray[i], visualMeshRoot, threadCollision, linkNode0->m_body->GetAsBodyKinematic(), threadLinkMass));
+			ndSharedPtr<ndBody> body(MakeBodyPart(linkArray[i], visualMeshRoot, threadCollision, rootNode->m_body->GetAsBodyDynamic(), threadLinkMass));
 			ndMatrix hingeMatrix (ndRollMatrix(90.0f * ndDegreeToRad) * body->GetMatrix());
 			ndSharedPtr<ndJointBilateralConstraint> joint (new ndJointHinge(hingeMatrix, body->GetAsBodyKinematic(), linkNode0->m_body->GetAsBodyKinematic()));
 			((ndJointHinge*)*joint)->SetAsSpringDamper(ndFloat32(0.1f), ndFloat32(0.0f), ndFloat32(5.0f));
