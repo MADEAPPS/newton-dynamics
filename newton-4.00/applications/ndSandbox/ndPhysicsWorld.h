@@ -78,6 +78,7 @@ class ndPhysicsWorld: public ndWorld
 	void DefferedRemoveBody(ndBody* const body);
 
 	private:
+	void UpdateTransforms() override;
 	void PreUpdate(ndFloat32 timestep) override;
 	void PostUpdate(ndFloat32 timestep) override;
 	void OnSubStepPostUpdate(ndFloat32 timestep) override;
