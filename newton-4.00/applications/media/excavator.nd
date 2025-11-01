@@ -705,7 +705,7 @@
                 <name string="cameraPivot" />
                 <matrix>
                     <posit float3="-1.76893 1.02119 1.34967" />
-                    <angles float3="-2.50448e-06 -1.09474e-13 -2.50448e-06" />
+                    <angles float3="90 -90 0" />
                 </matrix>
                 <type nodeType="node" target="0 0 0 " />
             </ndMesh>
