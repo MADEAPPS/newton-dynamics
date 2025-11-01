@@ -453,7 +453,7 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& o
 
 	ndBodyKinematic* const fixBody = world->GetSentinelBody();
 	{
-		// free rollong dopuble hinge
+		// free rolling double hinge
 		ndMatrix matrix(refMatrix);
 		ndSharedPtr<ndBody> body (MakePrimitive(scene, matrix, **shape, mesh, mass));
 		body->SetOmega(ndVector(0.0f, 10.0f, 20.0f, 0.0f));
