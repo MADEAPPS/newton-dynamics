@@ -885,7 +885,6 @@ void ndScene::UpdateTransform()
 		const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
 
 		ndBodyKinematic* const body = bodyArray[groupId];
-		//UpdateTransformNotify(threadIndex, body);
 		UpdateTransformNotify(timestep, body);
 	});
 	const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
