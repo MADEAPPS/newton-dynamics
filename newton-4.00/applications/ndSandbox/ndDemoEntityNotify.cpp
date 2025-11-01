@@ -102,7 +102,6 @@ void ndDemoEntityNotify::OnTransform(ndFloat32, const ndMatrix& matrix)
 			const ndMatrix localMatrix(matrix * parentMatrix.OrthoInverse());
 
 			const ndQuaternion rot(localMatrix);
-			//m_entity->SetMatrix(rot, localMatrix.m_posit);
 			m_transform = ndTransform(rot, localMatrix.m_posit);
 		}
 		else
