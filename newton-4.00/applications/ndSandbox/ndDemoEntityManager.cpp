@@ -933,12 +933,6 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("show models debug info", &m_showModelsDebugInfo);
 			ImGui::Checkbox("show colliding faces", &m_showCollidingFaces);
 
-			//m_colorRenderPass->MakeActive(!m_hideVisualMeshes);
-			//m_shadowRenderPass->MakeActive(!m_hideVisualMeshes);
-			//m_transparentRenderPass->MakeActive(!m_hideVisualMeshes);
-			//
-			//ndDebugDisplayRenderPass* const debugDisplay = (ndDebugDisplayRenderPass*)*m_debugDisplayRenderPass;
-			//debugDisplay->SetDisplayMode(m_collisionDisplayMode);
 			ApplyOptions();
 	
 			ImGui::EndMenu();

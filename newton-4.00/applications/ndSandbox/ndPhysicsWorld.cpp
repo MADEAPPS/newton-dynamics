@@ -133,15 +133,17 @@ void ndPhysicsWorld::AccelerateUpdates()
 
 void ndPhysicsWorld::UpdateTransforms()
 {
-	ndScopeSpinLock Lock(m_lock);
+	// for some reason this cause a dead lock. I need to investigate.
+	//ndScopeSpinLock Lock(m_lock); 
 	ndWorld::UpdateTransforms();
 }
 
 void ndPhysicsWorld::PostUpdate(ndFloat32 timestep)
 {
+	ndWorld::PostUpdate(timestep);
+
 	ndScopeSpinLock Lock(m_lock);
 
-	ndWorld::PostUpdate(timestep);
 	m_manager->SetNextActiveCamera();
 
 	const ndBodyListView& bodyArray = GetBodyList();
