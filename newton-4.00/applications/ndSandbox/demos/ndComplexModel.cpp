@@ -38,6 +38,7 @@ class ndExcavatorController : public ndModelNotify
 		,m_engineNode(nullptr)
 		,m_cameraNode(nullptr)
 		,m_targetOmega(ndFloat32 (0.0f))
+		,m_turnRateOmega(ndFloat32(0.0f))
 	{
 		ndModelArticulation* const articulation = model->GetAsModelArticulation();
 		ndAssert(articulation);
@@ -434,21 +435,24 @@ class ndExcavatorController : public ndModelNotify
 
 		ndJointDoubleHinge* const engine = (ndJointDoubleHinge*)*m_engineNode->m_joint;
 
-		// reset the tranfoprm every tick
-		//dMatrix matrix0(GetMatrix0().Inverse() * GetMatrix1() * matrix1);
-		//NewtonBodySetMatrixNoSleep(m_body0, &matrix0[0][0]);
+		// reset the engine carcase transform
+		const ndMatrix matrix(engine->GetLocalMatrix0().OrthoInverse() * engine->GetLocalMatrix1() * engine->GetBody1()->GetMatrix());
+		//engine->GetBody0()->SetMatrixNoSleep(matrix);
 
-		// integrate the joints angles;
+		// integrate tyurn rate angle
+		ndFloat32 turnAngle = engine->GetAngle0();
+		engine->SetOffsetAngle0(turnAngle + m_turnRateOmega * timestep);
+
+		// integrate the joints angle;
 		ndFloat32 fowardAngle = engine->GetAngle1();
 		engine->SetOffsetAngle1(fowardAngle + m_targetOmega * timestep);
-
-		ndTrace(("%f %f\n", fowardAngle, m_targetOmega));
 	}
 
 	void PostTransformUpdate(ndFloat32)
 	{
-		m_targetOmega = 0.0f;
 		ndBodyDynamic* const engine = m_engineNode->m_body->GetAsBodyDynamic();
+
+		m_targetOmega = ndFloat32(0.0f);
 		if (m_scene->GetKeyState(ImGuiKey_W))
 		{
 			m_targetOmega = ndFloat32(-20.0f);
@@ -459,12 +463,26 @@ class ndExcavatorController : public ndModelNotify
 			m_targetOmega = ndFloat32 (20.0f);
 			engine->SetSleepState(false);
 		}
+
+		m_turnRateOmega = ndFloat32(0.0f);
+		if (m_scene->GetKeyState(ImGuiKey_A))
+		{
+			m_turnRateOmega = ndFloat32(-10.0f);
+			engine->SetSleepState(false);
+		}
+		else if (m_scene->GetKeyState(ImGuiKey_D))
+		{
+			m_turnRateOmega = ndFloat32(10.0f);
+			engine->SetSleepState(false);
+		}
+
 	}
 
 	ndDemoEntityManager* m_scene;
 	ndModelArticulation::ndNode* m_engineNode;
 	ndSharedPtr<ndRenderSceneNode> m_cameraNode;
 	ndFloat32 m_targetOmega;
+	ndFloat32 m_turnRateOmega;
 };
 
 class ExcavatorThreadFloorMaterial : public ndApplicationMaterial
