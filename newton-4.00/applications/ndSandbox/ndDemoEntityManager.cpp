@@ -503,7 +503,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//m_showMeshSkeleton = true;
 	//m_autoSleepMode = false;
 	m_hidePostUpdate = true;
-	//m_hideVisualMeshes = true;
+	m_hideVisualMeshes = true;
 	m_solverMode = ndWorld::ndStandardSolver;
 	//m_solverMode = ndWorld::ndSimdSoaSolver;
 	//m_solverMode = ndWorld::ndSimdAvx2Solver;
@@ -516,7 +516,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
 	//m_showModelsDebugInfo = true;
-	//m_collisionDisplayMode = 1;
+	m_collisionDisplayMode = 1;
 	//m_collisionDisplayMode = 2;	
 	//m_collisionDisplayMode = 3;		// solid wire frame
 	m_synchronousPhysicsUpdate = true;
@@ -524,6 +524,8 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	Cleanup();
 	ndResetTimer();
+	ApplyOptions();
+
 #if 0
 	//Test0__();
 	//Test1__();
@@ -818,6 +820,16 @@ void ndDemoEntityManager::ApplyMenuOptions()
 	m_solverMode = m_world->GetSelectedSolver();
 }
 
+void ndDemoEntityManager::ApplyOptions()
+{
+	m_colorRenderPass->MakeActive(!m_hideVisualMeshes);
+	m_shadowRenderPass->MakeActive(!m_hideVisualMeshes);
+	m_transparentRenderPass->MakeActive(!m_hideVisualMeshes);
+
+	ndDebugDisplayRenderPass* const debugDisplay = (ndDebugDisplayRenderPass*)*m_debugDisplayRenderPass;
+	debugDisplay->SetDisplayMode(m_collisionDisplayMode);
+}
+
 void ndDemoEntityManager::ShowMainMenuBar()
 {
 	ndMenuSelection menuSelection = m_none;
@@ -921,12 +933,13 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("show models debug info", &m_showModelsDebugInfo);
 			ImGui::Checkbox("show colliding faces", &m_showCollidingFaces);
 
-			m_colorRenderPass->MakeActive(!m_hideVisualMeshes);
-			m_shadowRenderPass->MakeActive(!m_hideVisualMeshes);
-			m_transparentRenderPass->MakeActive(!m_hideVisualMeshes);
-
-			ndDebugDisplayRenderPass* const debugDisplay = (ndDebugDisplayRenderPass*)*m_debugDisplayRenderPass;
-			debugDisplay->SetDisplayMode(m_collisionDisplayMode);
+			//m_colorRenderPass->MakeActive(!m_hideVisualMeshes);
+			//m_shadowRenderPass->MakeActive(!m_hideVisualMeshes);
+			//m_transparentRenderPass->MakeActive(!m_hideVisualMeshes);
+			//
+			//ndDebugDisplayRenderPass* const debugDisplay = (ndDebugDisplayRenderPass*)*m_debugDisplayRenderPass;
+			//debugDisplay->SetDisplayMode(m_collisionDisplayMode);
+			ApplyOptions();
 	
 			ImGui::EndMenu();
 	

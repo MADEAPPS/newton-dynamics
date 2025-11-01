@@ -190,6 +190,7 @@ class ndDemoEntityManager : public ndClassAlloc
 	
 	void ShowMainMenuBar();
 	void ToggleProfiler();
+	void ApplyOptions();
 
 	void ApplyMenuOptions();
 	void LoadDemo(ndInt32 menu);
