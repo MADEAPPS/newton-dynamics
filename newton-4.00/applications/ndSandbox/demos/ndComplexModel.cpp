@@ -34,19 +34,21 @@ class ndExcavatorController : public ndModelNotify
 		ndSharedPtr<ndModel>& model, ndSharedPtr<ndRenderSceneNode>& visualMesh)
 		:ndModelNotify()
 		,m_scene(scene)
+		,m_engineNode(nullptr)
 	{
 		ndModelArticulation* const articulation = model->GetAsModelArticulation();
 		ndAssert(articulation);
 
 		// build the major vehicle components, each major component build its sub parts
 		MakeChassis(articulation, mesh, visualMesh);
-		MakeCabinAndUpperBody(articulation, mesh, visualMesh);
+
+		//MakeCabinAndUpperBody(articulation, mesh, visualMesh);
 
 		MakeLeftTrack(articulation, mesh, visualMesh);
 		MakeRightTrack(articulation, mesh, visualMesh);
-
-		MakeThread(articulation, "leftThread", mesh, visualMesh);
-		MakeThread(articulation, "rightThread", mesh, visualMesh);
+		
+		//MakeThread(articulation, "leftThread", mesh, visualMesh);
+		//MakeThread(articulation, "rightThread", mesh, visualMesh);
 	}
 
 	bool OnContactGeneration(const ndBodyKinematic* const body0, const ndBodyKinematic* const body1) override
@@ -130,6 +132,9 @@ class ndExcavatorController : public ndModelNotify
 		chassisBody->GetAsBodyDynamic()->SetMassMatrix(chassisMass, **collision);
 		
 		articulation->AddRootBody(chassisBody);
+
+		// add the motor
+		AddLocomotion(articulation);
 	}
 
 	ndSharedPtr<ndBody> MakeBodyPart(
@@ -215,7 +220,6 @@ class ndExcavatorController : public ndModelNotify
 	{
 		ndMesh* const node = mesh->FindByName(name);
 		ndAssert(node);
-		//ndSharedPtr<ndShapeInstance> tireCollision(node->CreateCollisionTire());
 		ndSharedPtr<ndShapeInstance> tireCollision(node->CreateCollisionChamferCylinder());
 		SetBodyType(*tireCollision, m_roller);
 
@@ -369,7 +373,42 @@ class ndExcavatorController : public ndModelNotify
 		articulation->AddCloseLoop(joint);
 	}
 
+	void AddLocomotion(ndModelArticulation* const articulation)
+	{
+		ndModelArticulation::ndNode* const rootNode = articulation->GetRoot();
+
+		ndSharedPtr<ndShapeInstance> motorCollision(new ndShapeInstance(new ndShapeCylinder(ndFloat32 (0.25f), ndFloat32(0.25f), ndFloat32(0.75f))));
+		SetBodyType(*motorCollision, m_chassis);
+
+		ndMatrix engineMatrix (rootNode->m_body->GetMatrix());
+		engineMatrix = ndRollMatrix(ndFloat32 (90.0f) * ndDegreeToRad) * engineMatrix;
+		engineMatrix.m_posit.m_y += 1.0f;
+
+		// make engine body
+		ndFloat32 mass = ndFloat32(50.0f);
+		ndFloat32 radius = ndFloat32(1.0f);
+		ndFloat32 inertia = ndFloat32(2.0f / 5.0f) * mass * radius * radius;
+
+		ndSharedPtr<ndBody> motorBody(new ndBodyDynamic());
+		//chassisBody->SetNotifyCallback(new ndDemoEntityNotify(m_scene, visualMesh, nullptr));
+		motorBody->SetMatrix(engineMatrix);
+		motorBody->GetAsBodyDynamic()->SetCollisionShape(**motorCollision);
+		motorBody->GetAsBodyDynamic()->SetMassMatrix(inertia, inertia, inertia, mass);
+
+		ndMatrix engineAxis;
+		engineAxis.m_front = engineMatrix.m_front;
+		engineAxis.m_up = engineMatrix.m_right;
+		engineAxis.m_right = engineAxis.m_front.CrossProduct(engineAxis.m_up);
+		engineAxis.m_posit = engineMatrix.m_posit;
+
+		ndSharedPtr<ndJointBilateralConstraint> joint(new ndJointDoubleHinge(engineAxis, motorBody->GetAsBodyKinematic(), rootNode->m_body->GetAsBodyKinematic()));
+		m_engineNode = articulation->AddLimb(rootNode, motorBody, joint);
+
+		motorBody->SetOmega(ndVector (2.0f, 2.0f, 2.0f, 0.0f));
+	}
+
 	ndDemoEntityManager* m_scene;
+	ndModelArticulation::ndNode* m_engineNode;
 };
 
 class ExcavatorThreadFloorMaterial : public ndApplicationMaterial
@@ -467,6 +506,11 @@ void ndComplexModel(ndDemoEntityManager* const scene)
 	//ndBackGroundVehicleController* const playerController = (ndBackGroundVehicleController*)*controller;
 	//ndRender* const renderer = *scene->GetRenderer();
 	//renderer->SetCamera(playerController->GetCamera());
+
+	ndMatrix matrix1(ndGetIdentityMatrix());
+	matrix1.m_posit.m_x += 10.0f;
+	matrix1.m_posit.m_z += 10.0f;
+	//AddPlanks(scene, matrix1, 1.0f, 4);
 
 	matrix.m_posit.m_x -= 10.0f;
 	matrix.m_posit.m_y += 4.0f;
