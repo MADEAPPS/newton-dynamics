@@ -18,6 +18,7 @@
 #include "ndDemoCameraNodeFollow.h"
 #include "ndHeightFieldPrimitive.h"
 
+#define ND_EXCAVATOR_CAMERA_DISTANCE ndFloat32 (-12.0f)
 
 class ndExcavatorController : public ndModelNotify
 {
@@ -35,6 +36,9 @@ class ndExcavatorController : public ndModelNotify
 		:ndModelNotify()
 		,m_scene(scene)
 		,m_engineNode(nullptr)
+		,m_cameraNode(nullptr)
+		,m_targetOmega(ndFloat32 (0.0f))
+		,m_turnRateOmega(ndFloat32(0.0f))
 	{
 		ndModelArticulation* const articulation = model->GetAsModelArticulation();
 		ndAssert(articulation);
@@ -51,19 +55,9 @@ class ndExcavatorController : public ndModelNotify
 		//MakeThread(articulation, "rightThread", mesh, visualMesh);
 	}
 
-	bool OnContactGeneration(const ndBodyKinematic* const body0, const ndBodyKinematic* const body1) override
+	ndSharedPtr<ndRenderSceneNode> GetCamera()
 	{
-		// here the application can use filter to determine what body parts should collide.
-		// this greatly improves performance because since articulated models in general 
-		// do not self collide, but occationaly some parts do collide. 
-		const ndShapeInstance& shape0 = body0->GetCollisionShape();
-		const ndShapeInstance& shape1 = body1->GetCollisionShape();
-
-		ndBodyPartType type0 = ndBodyPartType(shape0.m_shapeMaterial.m_userId);
-		ndBodyPartType type1 = ndBodyPartType(shape1.m_shapeMaterial.m_userId);
-		
-		bool collide = ((type0 == m_roller) && (type1 == m_thread)) || ((type0 == m_thread) && (type1 == m_roller));
-		return collide;
+		return m_cameraNode;
 	}
 
 	static ndSharedPtr<ndModelNotify> CreateExcavator(ndDemoEntityManager* const scene, const ndMatrix& location, ndRenderMeshLoader& mesh)
@@ -102,6 +96,21 @@ class ndExcavatorController : public ndModelNotify
 		collision->m_shapeMaterial.m_userId = type;
 	}
 
+	bool OnContactGeneration(const ndBodyKinematic* const body0, const ndBodyKinematic* const body1) override
+	{
+		// here the application can use filter to determine what body parts should collide.
+		// this greatly improves performance because since articulated models in general 
+		// do not self collide, but occationaly some parts do collide. 
+		const ndShapeInstance& shape0 = body0->GetCollisionShape();
+		const ndShapeInstance& shape1 = body1->GetCollisionShape();
+
+		ndBodyPartType type0 = ndBodyPartType(shape0.m_shapeMaterial.m_userId);
+		ndBodyPartType type1 = ndBodyPartType(shape1.m_shapeMaterial.m_userId);
+
+		bool collide = ((type0 == m_roller) && (type1 == m_thread)) || ((type0 == m_thread) && (type1 == m_roller));
+		return collide;
+	}
+
 	void MakeChassis(
 		ndModelArticulation* const articulation, 
 		ndSharedPtr<ndMesh>& mesh, 
@@ -135,6 +144,16 @@ class ndExcavatorController : public ndModelNotify
 
 		// add the motor
 		AddLocomotion(articulation);
+
+		//add a camera 
+		ndAssert(visualMeshRoot->FindByName("cameraPivot"));
+		ndSharedPtr<ndRenderSceneNode> cameraPivotNode(visualMeshRoot->FindByName("cameraPivot")->GetSharedPtr());
+
+		// note this is fucked up. I have to fix it, but for now just hack it
+		const ndVector cameraPivot(-1.0f, 0.0f, 0.0f, 0.0f);
+		ndRender* const renderer = *m_scene->GetRenderer();
+		m_cameraNode = ndSharedPtr<ndRenderSceneNode>(new ndDemoCameraNodeFollow(renderer, cameraPivot, ND_EXCAVATOR_CAMERA_DISTANCE));
+		cameraPivotNode->AddChild(m_cameraNode);
 	}
 
 	ndSharedPtr<ndBody> MakeBodyPart(
@@ -402,13 +421,68 @@ class ndExcavatorController : public ndModelNotify
 		engineAxis.m_posit = engineMatrix.m_posit;
 
 		ndSharedPtr<ndJointBilateralConstraint> joint(new ndJointDoubleHinge(engineAxis, motorBody->GetAsBodyKinematic(), rootNode->m_body->GetAsBodyKinematic()));
+		((ndJointDoubleHinge*)*joint)->SetAsSpringDamper0(0.1f, 1500.0f, 10.0f);
+		((ndJointDoubleHinge*)*joint)->SetAsSpringDamper1(0.1f, 1500.0f, 10.0f);
+
 		m_engineNode = articulation->AddLimb(rootNode, motorBody, joint);
 
-		motorBody->SetOmega(ndVector (2.0f, 2.0f, 2.0f, 0.0f));
+		//motorBody->SetOmega(ndVector (2.0f, 2.0f, 2.0f, 0.0f));
+	}
+
+	void Update(ndFloat32 timestep) override
+	{
+		ndModelNotify::Update(timestep);
+
+		ndJointDoubleHinge* const engine = (ndJointDoubleHinge*)*m_engineNode->m_joint;
+
+		// reset the engine carcase transform
+		const ndMatrix matrix(engine->GetLocalMatrix0().OrthoInverse() * engine->GetLocalMatrix1() * engine->GetBody1()->GetMatrix());
+		//engine->GetBody0()->SetMatrixNoSleep(matrix);
+
+		// integrate tyurn rate angle
+		ndFloat32 turnAngle = engine->GetAngle0();
+		engine->SetOffsetAngle0(turnAngle + m_turnRateOmega * timestep);
+
+		// integrate the joints angle;
+		ndFloat32 fowardAngle = engine->GetAngle1();
+		engine->SetOffsetAngle1(fowardAngle + m_targetOmega * timestep);
+	}
+
+	void PostTransformUpdate(ndFloat32)
+	{
+		ndBodyDynamic* const engine = m_engineNode->m_body->GetAsBodyDynamic();
+
+		m_targetOmega = ndFloat32(0.0f);
+		if (m_scene->GetKeyState(ImGuiKey_W))
+		{
+			m_targetOmega = ndFloat32(-20.0f);
+			engine->SetSleepState(false);
+		}
+		else if (m_scene->GetKeyState(ImGuiKey_S))
+		{
+			m_targetOmega = ndFloat32 (20.0f);
+			engine->SetSleepState(false);
+		}
+
+		m_turnRateOmega = ndFloat32(0.0f);
+		if (m_scene->GetKeyState(ImGuiKey_A))
+		{
+			m_turnRateOmega = ndFloat32(-10.0f);
+			engine->SetSleepState(false);
+		}
+		else if (m_scene->GetKeyState(ImGuiKey_D))
+		{
+			m_turnRateOmega = ndFloat32(10.0f);
+			engine->SetSleepState(false);
+		}
+
 	}
 
 	ndDemoEntityManager* m_scene;
 	ndModelArticulation::ndNode* m_engineNode;
+	ndSharedPtr<ndRenderSceneNode> m_cameraNode;
+	ndFloat32 m_targetOmega;
+	ndFloat32 m_turnRateOmega;
 };
 
 class ExcavatorThreadFloorMaterial : public ndApplicationMaterial
@@ -512,8 +586,13 @@ void ndComplexModel(ndDemoEntityManager* const scene)
 	matrix1.m_posit.m_z += 10.0f;
 	//AddPlanks(scene, matrix1, 1.0f, 4);
 
-	matrix.m_posit.m_x -= 10.0f;
-	matrix.m_posit.m_y += 4.0f;
-	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
-	scene->SetCameraMatrix(rotation, matrix.m_posit);
+	//matrix.m_posit.m_x -= 10.0f;
+	//matrix.m_posit.m_y += 4.0f;
+	//ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
+	//scene->SetCameraMatrix(rotation, matrix.m_posit);
+
+	ndExcavatorController* const playerController = (ndExcavatorController*)*controller;
+	ndRender* const renderer = *scene->GetRenderer();
+	renderer->SetCamera(playerController->GetCamera());
+
 }
