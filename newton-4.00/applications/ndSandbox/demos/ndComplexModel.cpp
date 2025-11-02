@@ -57,8 +57,8 @@ class ndExcavatorController : public ndModelNotify
 		MakeRightTrack(articulation, mesh, visualMesh);
 		
 		// add the tracks
-		//MakeThread(articulation, "leftThread", mesh, visualMesh);
-		//MakeThread(articulation, "rightThread", mesh, visualMesh);
+		MakeThread(articulation, "leftThread", mesh, visualMesh);
+		MakeThread(articulation, "rightThread", mesh, visualMesh);
 	}
 
 	ndSharedPtr<ndRenderSceneNode> GetCamera()
@@ -207,7 +207,11 @@ class ndExcavatorController : public ndModelNotify
 		ndSharedPtr<ndBody> cabinBody (MakeBodyPart(mesh, visualMeshRoot, rootNode->m_body->GetAsBodyDynamic(), "EngineBody", 400.0f));
 		SetBodyType(&cabinBody->GetAsBodyDynamic()->GetCollisionShape(), m_chassis);
 
+		// set the center of mass of engine
 		const ndMatrix hingeFrame(cabinBody->GetMatrix());
+		ndVector com(hingeFrame.m_front.Scale (ndFloat32 (5.0f)));
+		cabinBody->SetCentreOfMass(com);
+
 		ndSharedPtr<ndJointBilateralConstraint> cabinPivot(new ndJointHinge(hingeFrame, cabinBody->GetAsBodyDynamic(), rootNode->m_body->GetAsBodyDynamic()));
 		ndModelArticulation::ndNode* const cabinNode = articulation->AddLimb(rootNode, cabinBody, cabinPivot);
 
@@ -648,7 +652,7 @@ void ndComplexModel(ndDemoEntityManager* const scene)
 	ndMatrix matrix1(ndGetIdentityMatrix());
 	matrix1.m_posit.m_x += 10.0f;
 	matrix1.m_posit.m_z += 10.0f;
-	//AddPlanks(scene, matrix1, 10.0f, 4);
+	AddPlanks(scene, matrix1, 10.0f, 4);
 
 	ndExcavatorController* const playerController = (ndExcavatorController*)*controller;
 	ndRender* const renderer = *scene->GetRenderer();
