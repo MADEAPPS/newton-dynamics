@@ -677,6 +677,7 @@ void ndSkeletonContainer::CalculateLoopMassMatrixCoefficients(ndFloat32* const d
 	D_TRACKTIME();
 	const ndInt32 primaryCount = m_rowCount - m_auxiliaryRowCount;
 
+#if 0
 	ndJacobian tempArray[3];
 	tempArray[0].m_linear = ndVector::m_zero;
 	tempArray[0].m_angular = ndVector::m_zero;
@@ -718,6 +719,8 @@ void ndSkeletonContainer::CalculateLoopMassMatrixCoefficients(ndFloat32* const d
 
 			const ndInt32 index_m0_j = (index_m0_j_m0_i_mask & 1) | (index_m0_j_m1_i_mask & 2);
 			const ndInt32 index_m1_j = (index_m1_j_m0_i_mask & 1) | (index_m1_j_m1_i_mask & 2);
+			ndAssert(index_m0_j < 3);
+			ndAssert(index_m1_j < 3);
 
 			ndVector acc(row_j->m_Jt.m_jacobianM0.m_linear * tempArray[index_m0_j].m_linear);
 			acc = acc.MulAdd(row_j->m_Jt.m_jacobianM0.m_angular, tempArray[index_m0_j].m_angular);
@@ -746,6 +749,8 @@ void ndSkeletonContainer::CalculateLoopMassMatrixCoefficients(ndFloat32* const d
 
 			const ndInt32 index_m0_j = (index_m0_j_m0_i_mask & 1) | (index_m0_j_m1_i_mask & 2);
 			const ndInt32 index_m1_j = (index_m1_j_m0_i_mask & 1) | (index_m1_j_m1_i_mask & 2);
+			ndAssert(index_m0_j < 3);
+			ndAssert(index_m1_j < 3);
 
 			ndVector acc(row_j->m_Jt.m_jacobianM0.m_linear * tempArray[index_m0_j].m_linear);
 			acc = acc.MulAdd(row_j->m_Jt.m_jacobianM0.m_angular, tempArray[index_m0_j].m_angular);
@@ -755,6 +760,129 @@ void ndSkeletonContainer::CalculateLoopMassMatrixCoefficients(ndFloat32* const d
 			matrixRow10[j] = acc.GetScalar();
 		}
 	}
+
+#else
+	//#ifdef _DEBUG
+	//for (ndInt32 index = 0; index < m_auxiliaryRowCount; ++index)
+	//{
+	//	ndFloat32* const matrixRow11 = &m_massMatrix11[m_auxiliaryRowCount * index];
+	//	for (ndInt32 j = 0; j < m_auxiliaryRowCount; ++j)
+	//	{
+	////		ndAssert (matrixRow11[j] == ndFloat32 (0.0f));
+	//	}
+	//}
+	//#endif // DEBUG
+
+	const ndVector8 zero(ndVector8::m_zero);
+	for (ndInt32 index = 0; index < m_auxiliaryRowCount; ++index)
+	{
+		const ndInt32 ii = m_matrixRowsIndex[primaryCount + index];
+		const ndLeftHandSide* const row_i = &m_leftHandSide[ii];
+		const ndRightHandSide* const rhs_i = &m_rightHandSide[ii];
+		//const ndJacobian JMinvM0(row_i->m_JMinv.m_jacobianM0);
+		//const ndJacobian JMinvM1(row_i->m_JMinv.m_jacobianM1);
+		//const ndVector element(
+		//	JMinvM0.m_linear * row_i->m_Jt.m_jacobianM0.m_linear + JMinvM0.m_angular * row_i->m_Jt.m_jacobianM0.m_angular +
+		//	JMinvM1.m_linear * row_i->m_Jt.m_jacobianM1.m_linear + JMinvM1.m_angular * row_i->m_Jt.m_jacobianM1.m_angular);
+
+		const ndVector8 JMinvM0(row_i->m_JMinv.m_jacobianM0.m_linear, row_i->m_JMinv.m_jacobianM0.m_angular);
+		const ndVector8 JMinvM1(row_i->m_JMinv.m_jacobianM1.m_linear, row_i->m_JMinv.m_jacobianM1.m_angular);
+		const ndVector8 element(JMinvM0 * (ndVector8&)row_i->m_Jt.m_jacobianM0 + 
+								JMinvM1 * (ndVector8&)row_i->m_Jt.m_jacobianM1);
+
+		// I know I am doubling the matrix regularizer, but this makes the solution more robust.
+		ndFloat32* const matrixRow11 = &m_massMatrix11[m_auxiliaryRowCount * index];
+		ndFloat32 diagonal = element.AddHorizontal() + rhs_i->m_diagDamp;
+		matrixRow11[index] = diagonal + rhs_i->m_diagDamp;
+		diagDamp[index] = matrixRow11[index] * ndFloat32(4.0e-3f);
+
+		const ndInt32 m0_i = m_pairs[primaryCount + index].m_m0;
+		const ndInt32 m1_i = m_pairs[primaryCount + index].m_m1;
+		for (ndInt32 j = index + 1; j < m_auxiliaryRowCount; ++j)
+		{
+			const ndInt32 jj = m_matrixRowsIndex[primaryCount + j];
+			const ndLeftHandSide* const row_j = &m_leftHandSide[jj];
+
+			const ndInt32 k = primaryCount + j;
+			const ndInt32 m0_j = m_pairs[k].m_m0;
+			const ndInt32 m1_j = m_pairs[k].m_m1;
+
+			bool hasEffect = false;
+			ndVector8 acc(zero);
+			if (m0_i == m0_j)
+			{
+				hasEffect = true;
+				acc = acc.MulAdd(JMinvM0, (ndVector8&)row_j->m_Jt.m_jacobianM0);
+			}
+			else if (m0_i == m1_j)
+			{
+				hasEffect = true;
+				acc = acc.MulAdd(JMinvM0, (ndVector8&)row_j->m_Jt.m_jacobianM1);
+			}
+
+			if (m1_i == m1_j)
+			{
+				hasEffect = true;
+				acc = acc.MulAdd(JMinvM1, (ndVector8&)row_j->m_Jt.m_jacobianM1);
+			}
+			else if (m1_i == m0_j)
+			{
+				hasEffect = true;
+				acc = acc.MulAdd(JMinvM1, (ndVector8&)row_j->m_Jt.m_jacobianM0);
+			}
+
+			if (hasEffect)
+			{
+				ndFloat32 offDiagValue = acc.AddHorizontal();
+				ndAssert(matrixRow11[j] == ndFloat32 (0.0f));
+				matrixRow11[j] = offDiagValue;
+				m_massMatrix11[j * m_auxiliaryRowCount + index] = offDiagValue;
+			}
+		}
+
+		ndFloat32* const matrixRow10 = &m_massMatrix10[primaryCount * index];
+		for (ndInt32 j = 0; j < primaryCount; ++j)
+		{
+			const ndInt32 jj = m_matrixRowsIndex[j];
+			const ndLeftHandSide* const row_j = &m_leftHandSide[jj];
+
+			const ndInt32 m0_j = m_pairs[j].m_m0;
+			const ndInt32 m1_j = m_pairs[j].m_m1;
+
+			bool hasEffect = false;
+
+			ndVector8 acc(zero);
+			if (m0_i == m0_j)
+			{
+				hasEffect = true;
+				acc = acc.MulAdd(JMinvM0, (ndVector8&)row_j->m_Jt.m_jacobianM0);
+			}
+			else if (m0_i == m1_j)
+			{
+				hasEffect = true;
+				acc = acc.MulAdd(JMinvM0, (ndVector8&)row_j->m_Jt.m_jacobianM1);
+			}
+
+			if (m1_i == m1_j)
+			{
+				hasEffect = true;
+				acc = acc.MulAdd(JMinvM1, (ndVector8&)row_j->m_Jt.m_jacobianM1);
+			}
+			else if (m1_i == m0_j)
+			{
+				hasEffect = true;
+				acc = acc.MulAdd(JMinvM1, (ndVector8&)row_j->m_Jt.m_jacobianM0);
+			}
+
+			if (hasEffect)
+			{
+				ndFloat32 val = acc.AddHorizontal();
+				ndAssert(matrixRow10[j]== ndFloat32 (0.0f));
+				matrixRow10[j] = val;
+			}
+		}
+	}
+#endif
 }
 
 void ndSkeletonContainer::SolveForward(ndForcePair* const force, const ndForcePair* const accel, ndInt32 startNode) const
