@@ -38,6 +38,7 @@ class ndExcavatorController : public ndModelNotify
 		:ndModelNotify()
 		,m_scene(scene)
 		,m_engineNode(nullptr)
+		,m_armEffector(nullptr)
 		,m_cameraNode(nullptr)
 		,m_targetOmega(ndFloat32 (0.0f))
 		,m_turnRateOmega(ndFloat32(0.0f))
@@ -56,8 +57,8 @@ class ndExcavatorController : public ndModelNotify
 		MakeRightTrack(articulation, mesh, visualMesh);
 		
 		// add the tracks
-		MakeThread(articulation, "leftThread", mesh, visualMesh);
-		MakeThread(articulation, "rightThread", mesh, visualMesh);
+		//MakeThread(articulation, "leftThread", mesh, visualMesh);
+		//MakeThread(articulation, "rightThread", mesh, visualMesh);
 	}
 
 	ndSharedPtr<ndRenderSceneNode> GetCamera()
@@ -184,7 +185,8 @@ class ndExcavatorController : public ndModelNotify
 	}
 
 	ndSharedPtr<ndBody> MakeBodyPart(
-		ndSharedPtr<ndMesh>& mesh, ndSharedPtr<ndRenderSceneNode>& visualMeshRoot,
+		ndSharedPtr<ndMesh>& mesh, 
+		ndSharedPtr<ndRenderSceneNode>& visualMeshRoot,
 		ndBodyKinematic* const parentbody,
 		const char* const name, ndFloat32 mass)
 	{
@@ -202,18 +204,41 @@ class ndExcavatorController : public ndModelNotify
 	{
 		ndModelArticulation::ndNode* const rootNode = articulation->GetRoot();
 
-		ndSharedPtr<ndBody> cabinBody (MakeBodyPart(mesh, visualMeshRoot, rootNode->m_body->GetAsBodyKinematic(), "EngineBody", 400.0f));
+		ndSharedPtr<ndBody> cabinBody (MakeBodyPart(mesh, visualMeshRoot, rootNode->m_body->GetAsBodyDynamic(), "EngineBody", 400.0f));
 		SetBodyType(&cabinBody->GetAsBodyDynamic()->GetCollisionShape(), m_chassis);
 
-		ndMatrix hingeFrame(cabinBody->GetMatrix());
+		const ndMatrix hingeFrame(cabinBody->GetMatrix());
 		ndSharedPtr<ndJointBilateralConstraint> cabinPivot(new ndJointHinge(hingeFrame, cabinBody->GetAsBodyDynamic(), rootNode->m_body->GetAsBodyDynamic()));
-		// temporary
-		((ndJointHinge*)*cabinPivot)->SetAsSpringDamper(1.0e-2f, 1000.0f, 50.0f);
-		
-		//// set the center of mass of engine
-		//dVector com(hingeFrame.UnrotateVector(dVector(-2.0f, 0.0f, 0.0f, 0.0f)));
-		//NewtonBodySetCentreOfMass(cabinBody, &com[0]);
 		ndModelArticulation::ndNode* const cabinNode = articulation->AddLimb(rootNode, cabinBody, cabinPivot);
+
+		// add arm0.
+		ndSharedPtr<ndBody> bodyArm0(MakeBodyPart(mesh, visualMeshRoot, cabinBody->GetAsBodyKinematic(), "Boom", 50.0f));
+		SetBodyType(&bodyArm0->GetAsBodyDynamic()->GetCollisionShape(), m_chassis);
+		const ndMatrix matrixArm0(ndYawMatrix(ndFloat32 (90.0f) * ndDegreeToRad) * bodyArm0->GetMatrix());
+		ndSharedPtr<ndJointBilateralConstraint> jointArm0(new ndJointHinge(matrixArm0, bodyArm0->GetAsBodyDynamic(), cabinBody->GetAsBodyDynamic()));
+		ndModelArticulation::ndNode* const armNode0 = articulation->AddLimb(cabinNode, bodyArm0, jointArm0);
+		
+		// add arm1.
+		ndSharedPtr<ndBody> bodyArm1(MakeBodyPart(mesh, visualMeshRoot, bodyArm0->GetAsBodyKinematic(), "arm02", 50.0f));
+		SetBodyType(&bodyArm1->GetAsBodyDynamic()->GetCollisionShape(), m_chassis);
+		const ndMatrix matrixArm1(ndRollMatrix(ndFloat32(90.0f) * ndDegreeToRad) * bodyArm1->GetMatrix());
+		ndSharedPtr<ndJointBilateralConstraint> jointArm1(new ndJointHinge(matrixArm1, bodyArm1->GetAsBodyDynamic(), bodyArm0->GetAsBodyDynamic()));
+		ndModelArticulation::ndNode* const armNode1 = articulation->AddLimb(armNode0, bodyArm1, jointArm1);
+
+		// add bucket
+		ndSharedPtr<ndBody> bodyBucket(MakeBodyPart(mesh, visualMeshRoot, bodyArm1->GetAsBodyKinematic(), "bucket", 40.0f));
+		SetBodyType(&bodyBucket->GetAsBodyDynamic()->GetCollisionShape(), m_chassis);
+		const ndMatrix matrixBucket(ndRollMatrix(ndFloat32(90.0f) * ndDegreeToRad) * bodyBucket->GetMatrix());
+		ndSharedPtr<ndJointBilateralConstraint> jointBucket(new ndJointHinge(matrixBucket, bodyBucket->GetAsBodyDynamic(), bodyArm1->GetAsBodyDynamic()));
+		ndModelArticulation::ndNode* const buckectNode = articulation->AddLimb(armNode1, bodyBucket, jointBucket);
+
+		// add an effector to move the arme joint
+		m_armEffector = new ndIkSwivelPositionEffector(
+			hingeFrame, rootNode->m_body->GetAsBodyDynamic(),
+			matrixBucket.m_posit, bodyArm1->GetAsBodyDynamic());
+		m_armEffector->SetSwivelMode(false);
+		ndSharedPtr<ndJointBilateralConstraint> effector(m_armEffector);
+		articulation->AddCloseLoop(effector);
 	}
 
 	void LinkTires(ndModelArticulation* const articulation,
@@ -508,6 +533,7 @@ class ndExcavatorController : public ndModelNotify
 
 	ndDemoEntityManager* m_scene;
 	ndModelArticulation::ndNode* m_engineNode;
+	ndIkSwivelPositionEffector* m_armEffector;
 	ndSharedPtr<ndRenderSceneNode> m_cameraNode;
 	ndFloat32 m_targetOmega;
 	ndFloat32 m_turnRateOmega;
@@ -622,15 +648,15 @@ void ndComplexModel(ndDemoEntityManager* const scene)
 	ndMatrix matrix1(ndGetIdentityMatrix());
 	matrix1.m_posit.m_x += 10.0f;
 	matrix1.m_posit.m_z += 10.0f;
-	AddPlanks(scene, matrix1, 10.0f, 4);
-
-	//matrix.m_posit.m_x -= 10.0f;
-	//matrix.m_posit.m_y += 4.0f;
-	//ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
-	//scene->SetCameraMatrix(rotation, matrix.m_posit);
+	//AddPlanks(scene, matrix1, 10.0f, 4);
 
 	ndExcavatorController* const playerController = (ndExcavatorController*)*controller;
 	ndRender* const renderer = *scene->GetRenderer();
 	renderer->SetCamera(playerController->GetCamera());
+
+//matrix.m_posit.m_x -= 10.0f;
+//matrix.m_posit.m_y += 4.0f;
+//ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
+//scene->SetCameraMatrix(rotation, matrix.m_posit);
 
 }
