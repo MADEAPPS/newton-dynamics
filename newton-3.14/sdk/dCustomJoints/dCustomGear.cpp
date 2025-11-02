@@ -16,7 +16,7 @@
 
 IMPLEMENT_CUSTOM_JOINT(dCustomGear);
 IMPLEMENT_CUSTOM_JOINT(dCustomGearAndSlide);
-IMPLEMENT_CUSTOM_JOINT(dCustomDifferentialGear___);
+IMPLEMENT_CUSTOM_JOINT(dCustomDifferentialGearAxel);
 IMPLEMENT_CUSTOM_JOINT(dCustomDifferentialGear);
 
 //////////////////////////////////////////////////////////////////////
@@ -219,7 +219,7 @@ void dCustomGearAndSlide::SubmitConstraints (dFloat timestep, int threadIndex)
 }
 
 
-dCustomDifferentialGear___::dCustomDifferentialGear___(dFloat gearRatio, const dVector& diffPin, const dVector& inputPin, const dVector& axleOutPin, NewtonBody* const diffBody, NewtonBody* const axleOutBody)
+dCustomDifferentialGearAxel::dCustomDifferentialGearAxel(dFloat gearRatio, const dVector& diffPin, const dVector& inputPin, const dVector& axleOutPin, NewtonBody* const diffBody, NewtonBody* const axleOutBody)
 	:dCustomGear(1, diffBody, axleOutBody)
 {
 	dAssert(diffPin.DotProduct3(inputPin) < 1.0e-5f);
@@ -239,7 +239,7 @@ dCustomDifferentialGear___::dCustomDifferentialGear___(dFloat gearRatio, const d
 	CalculateLocalMatrix(pinAndPivot1, dommyMatrix, m_localMatrix1);
 }
 
-void dCustomDifferentialGear___::SubmitConstraints(dFloat timestep, int threadIndex)
+void dCustomDifferentialGearAxel::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;

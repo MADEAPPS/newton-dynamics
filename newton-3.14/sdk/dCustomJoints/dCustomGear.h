@@ -59,15 +59,15 @@ class dCustomGearAndSlide: public dCustomGear
 };
 
 
-class dCustomDifferentialGear___: public dCustomGear
+class dCustomDifferentialGearAxel: public dCustomGear
 {
 	public:
-	CUSTOM_JOINTS_API dCustomDifferentialGear___(dFloat gearRatio, const dVector& diffPin, const dVector& parentPin, const dVector& childPin, NewtonBody* const diffBody, NewtonBody* const axleOutBody);
+	CUSTOM_JOINTS_API dCustomDifferentialGearAxel(dFloat gearRatio, const dVector& diffPin, const dVector& parentPin, const dVector& childPin, NewtonBody* const diffBody, NewtonBody* const axleOutBody);
 
 	protected:
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
 
-	DECLARE_CUSTOM_JOINT(dCustomDifferentialGear___, dCustomGear)
+	DECLARE_CUSTOM_JOINT(dCustomDifferentialGearAxel, dCustomGear)
 };
 
 
