@@ -18,7 +18,9 @@
 #include "ndDemoCameraNodeFollow.h"
 #include "ndHeightFieldPrimitive.h"
 
-#define ND_EXCAVATOR_CAMERA_DISTANCE ndFloat32 (-15.0f)
+#define ND_EXCAVATOR_GEAR_GAIN			ndFloat32 (5.0f)
+#define ND_EXCAVATOR_ENGINE_OMEGA		ndFloat32 (100.0f)
+#define ND_EXCAVATOR_CAMERA_DISTANCE	ndFloat32 (-15.0f)
 
 class ndExcavatorController : public ndModelNotify
 {
@@ -54,8 +56,8 @@ class ndExcavatorController : public ndModelNotify
 		MakeRightTrack(articulation, mesh, visualMesh);
 		
 		// add the tracks
-		//MakeThread(articulation, "leftThread", mesh, visualMesh);
-		//MakeThread(articulation, "rightThread", mesh, visualMesh);
+		MakeThread(articulation, "leftThread", mesh, visualMesh);
+		MakeThread(articulation, "rightThread", mesh, visualMesh);
 	}
 
 	ndSharedPtr<ndRenderSceneNode> GetCamera()
@@ -152,8 +154,8 @@ class ndExcavatorController : public ndModelNotify
 		ndAssert(visualMeshRoot->FindByName("cameraPivot"));
 		ndSharedPtr<ndRenderSceneNode> cameraPivotNode(visualMeshRoot->FindByName("cameraPivot")->GetSharedPtr());
 
-		// note this is fucked up. I have to fix it, but for now just hack it
-		const ndVector cameraPivot(0.0f, 2.0f, 0.0f, 0.0f);
+		ndVector cameraPivot (ndVector::m_zero);
+		cameraPivot.m_y = ndFloat32 (2.5f);
 		ndRender* const renderer = *m_scene->GetRenderer();
 		m_cameraNode = ndSharedPtr<ndRenderSceneNode>(new ndDemoCameraNodeFollow(renderer, cameraPivot, ND_EXCAVATOR_CAMERA_DISTANCE));
 		cameraPivotNode->AddChild(m_cameraNode);
@@ -301,7 +303,7 @@ class ndExcavatorController : public ndModelNotify
 		ndSharedPtr<ndJointBilateralConstraint> axel (
 			new ndMultiBodyVehicleDifferentialAxle(
 				engineMatrix.m_front.Scale(ndFloat32(-1.0f)), engineMatrix.m_up, engine,
-				tireMatrix.m_right.Scale (ndFloat32 (1.0f)), tire));
+				tireMatrix.m_right.Scale (ND_EXCAVATOR_GEAR_GAIN), tire));
 
 		articulation->AddCloseLoop(axel);
 	}
@@ -338,7 +340,7 @@ class ndExcavatorController : public ndModelNotify
 		ndSharedPtr<ndJointBilateralConstraint> axel(
 			new ndMultiBodyVehicleDifferentialAxle(
 				engineMatrix.m_front.Scale(ndFloat32(1.0f)), engineMatrix.m_up, engine,
-				tireMatrix.m_right.Scale (-1.0f), tire));
+				tireMatrix.m_right.Scale (-ND_EXCAVATOR_GEAR_GAIN), tire));
 
 		articulation->AddCloseLoop(axel);
 	}
@@ -476,32 +478,32 @@ class ndExcavatorController : public ndModelNotify
 	{
 		ndBodyDynamic* const engine = m_engineNode->m_body->GetAsBodyDynamic();
 
+		ndFloat32 turnSign = ndFloat32(1.0f);
 		m_targetOmega = ndFloat32(0.0f);
-		ndFloat32 omegaMag = ndFloat32(-20.0f);
 		if (m_scene->GetKeyState(ImGuiKey_W))
 		{
-			m_targetOmega = omegaMag;
+			turnSign = ndFloat32(0.75f);
+			m_targetOmega = -ND_EXCAVATOR_ENGINE_OMEGA;
 			engine->SetSleepState(false);
 		}
 		else if (m_scene->GetKeyState(ImGuiKey_S))
 		{
-			m_targetOmega = -omegaMag;
+			turnSign = ndFloat32(-0.75f);
+			m_targetOmega = ND_EXCAVATOR_ENGINE_OMEGA;
 			engine->SetSleepState(false);
 		}
 
 		m_turnRateOmega = ndFloat32(0.0f);
-		ndFloat32 omegaTurnMag = omegaMag * ndFloat32 (0.7f);
 		if (m_scene->GetKeyState(ImGuiKey_A))
 		{
-			m_turnRateOmega = omegaTurnMag;
+			m_turnRateOmega = -ND_EXCAVATOR_ENGINE_OMEGA * turnSign;
 			engine->SetSleepState(false);
 		}
 		else if (m_scene->GetKeyState(ImGuiKey_D))
 		{
-			m_turnRateOmega = -omegaTurnMag;
+			m_turnRateOmega = ND_EXCAVATOR_ENGINE_OMEGA * turnSign;
 			engine->SetSleepState(false);
 		}
-
 	}
 
 	ndDemoEntityManager* m_scene;
@@ -522,6 +524,11 @@ class ExcavatorThreadFloorMaterial : public ndApplicationMaterial
 	ExcavatorThreadFloorMaterial(const ExcavatorThreadFloorMaterial& src)
 		:ndApplicationMaterial(src)
 	{
+		m_restitution = ndFloat32(0.1f);
+		m_staticFriction0 = ndFloat32(0.8f);
+		m_staticFriction1 = ndFloat32(0.8f);
+		m_dynamicFriction0 = ndFloat32(0.8f);
+		m_dynamicFriction1 = ndFloat32(0.8f);
 	}
 
 	ndApplicationMaterial* Clone() const
@@ -548,6 +555,12 @@ class ExcavatorThreadRollerMaterial : public ndApplicationMaterial
 	ExcavatorThreadRollerMaterial()
 		:ndApplicationMaterial()
 	{
+		m_flags = m_flags & ~m_friction0Enable;
+		m_restitution = ndFloat32(0.1f);
+		m_staticFriction0 = ndFloat32(1.0f);
+		m_staticFriction1 = ndFloat32(1.0f);
+		m_dynamicFriction0 = ndFloat32(1.0f);
+		m_dynamicFriction1 = ndFloat32(1.0f);
 	}
 
 	ExcavatorThreadRollerMaterial(const ExcavatorThreadFloorMaterial& src)
@@ -569,9 +582,7 @@ class ExcavatorThreadRollerMaterial : public ndApplicationMaterial
 		ndBodyKinematic* const roller = joint->GetBody0()->GetCollisionShape().GetShape()->GetAsShapeChamferCylinder() ? joint->GetBody0() : joint->GetBody1();
 		ndAssert(roller->GetCollisionShape().GetShape()->GetAsShapeChamferCylinder());
 		const ndMatrix& matrix = roller->GetMatrix();
-
 		contact.RotateTangentDirections(matrix.m_right);
-		contact.m_material.m_flags = contact.m_material.m_flags & ~m_friction0Enable;
 	}
 };
 
