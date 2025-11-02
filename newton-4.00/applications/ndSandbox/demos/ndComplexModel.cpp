@@ -588,8 +588,8 @@ class ExcavatorThreadRollerMaterial : public ndApplicationMaterial
 
 void ndComplexModel(ndDemoEntityManager* const scene)
 {
-	ndSharedPtr<ndBody> mapBody(BuildPlayground(scene));
-	//ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "marbleCheckBoard.png", 0.1f, true));
+	//ndSharedPtr<ndBody> mapBody(BuildPlayground(scene));
+	ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "marbleCheckBoard.png", 0.1f, true));
 	//ndSharedPtr<ndBody> mapBody(BuildHeightFieldTerrain(scene, "grass.png", ndGetIdentityMatrix()));
 
 	ndMatrix matrix(ndGetIdentityMatrix());
@@ -622,7 +622,7 @@ void ndComplexModel(ndDemoEntityManager* const scene)
 	ndMatrix matrix1(ndGetIdentityMatrix());
 	matrix1.m_posit.m_x += 10.0f;
 	matrix1.m_posit.m_z += 10.0f;
-	AddPlanks(scene, matrix1, 1.0f, 4);
+	AddPlanks(scene, matrix1, 10.0f, 4);
 
 	//matrix.m_posit.m_x -= 10.0f;
 	//matrix.m_posit.m_y += 4.0f;
