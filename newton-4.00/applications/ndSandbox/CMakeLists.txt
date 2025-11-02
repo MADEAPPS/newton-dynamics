@@ -150,13 +150,6 @@ if(MSVC OR MINGW)
 		target_link_libraries (${projectName} PUBLIC ${openclSDKPath}/lib/OpenCL.lib)
 	endif()
 
-	if (NEWTON_ENABLE_CUDA_SOLVER)
-		if (NOT NEWTON_BUILD_SHARED_LIBS)
-			target_link_libraries (${projectName} PUBLIC ndSolverCuda)
-		endif()
-	endif(NEWTON_ENABLE_CUDA_SOLVER)
-	    
-
 	target_link_options(${projectName} PUBLIC "/DEBUG") 
 
     if(CMAKE_VS_MSBUILD_COMMAND OR CMAKE_VS_DEVENV_COMMAND)
@@ -167,10 +160,6 @@ if(MSVC OR MINGW)
 endif()
 
 if(UNIX)
-	if (NEWTON_ENABLE_CUDA_SOLVER)
-		target_link_libraries (${projectName} PUBLIC ndSolverCuda)
-	endif(NEWTON_ENABLE_CUDA_SOLVER)
-
     set (source "${CMAKE_SOURCE_DIR}/applications/media")
     set (destination "${PROJECT_BINARY_DIR}/applications/media")
 

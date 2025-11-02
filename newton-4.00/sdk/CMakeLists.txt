@@ -59,18 +59,6 @@ else()
 		dNewton/dModels/dVehicle/*.h 
 		dNewton/dModels/dVehicle/*.cpp)
 
-	if (NEWTON_ENABLE_CUDA_SOLVER)
-		add_definitions(-D_D_NEWTON_CUDA)
-		include_directories(dNewton/dExtensions/dCuda)
-		include_directories(dNewton/dExtensions/dCuda/dContext)
-
-		file(GLOB CPP_SOURCE 
-			${CPP_SOURCE} 
-			dNewton/dExtensions/dCuda/*.h
-			dNewton/dExtensions/dCuda/*.cpp
-			dNewton/dExtensions/dCuda/dContext/*.h) 
-	endif()
-
 	if(MSVC)
 		file(GLOB CPP_SOURCE ${CPP_SOURCE} dCore/ndTypes.natvis)
 	endif()
@@ -85,10 +73,6 @@ else()
 		add_definitions(-D_D_TINYXML_EXPORT_DLL)
 		add_definitions(-D_D_COLLISION_EXPORT_DLL)
 		add_library(${projectName} SHARED ${CPP_SOURCE})
-
-		if (NEWTON_ENABLE_CUDA_SOLVER)
-			target_link_libraries (${projectName} ndSolverCuda)
-		endif()
 
 		if(MSVC OR MINGW)
 			target_link_options(${projectName} PUBLIC "/DEBUG") 

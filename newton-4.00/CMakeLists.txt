@@ -25,8 +25,6 @@ if (NOT APPLE)
 	option("NEWTON_ENABLE_AVX2" "enable AVX2" ON)
 endif()
 
-#option("NEWTON_ENABLE_CUDA_SOLVER" "enable cuda solver" OFF)
-#option("NEWTON_EXCLUDE_UNIX_TEST" "generate unit test projects" OFF)
 #option("NEWTON_BUILD_NEWTON_JAVA" "build a sharp wrapper" OFF)
 #option("NEWTON_BUILD_NEWTON_PYTHON" "build python wrapper" OFF)
 #option("NEWTON_BUILD_NEWTON_C_SHARP" "build a sharp wrapper" OFF)
