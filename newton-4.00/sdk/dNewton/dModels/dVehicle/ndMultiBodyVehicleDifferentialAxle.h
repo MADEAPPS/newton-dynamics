@@ -40,6 +40,8 @@ class ndMultiBodyVehicleDifferentialAxle : public ndJointBilateralConstraint
 	void JacobianDerivative(ndConstraintDescritor& desc) override;
 	void DebugJoint(ndConstraintDebugCallback&) const override {}
 
+	ndFloat32 m_gearRatio;
+
 } D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif

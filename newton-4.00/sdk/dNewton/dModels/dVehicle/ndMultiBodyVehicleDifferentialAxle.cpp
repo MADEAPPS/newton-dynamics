@@ -25,6 +25,7 @@
 
 ndMultiBodyVehicleDifferentialAxle::ndMultiBodyVehicleDifferentialAxle()
 	:ndJointBilateralConstraint()
+	,m_gearRatio(ndFloat32(1.0f))
 {
 	m_maxDof = 1;
 }
@@ -35,8 +36,13 @@ ndMultiBodyVehicleDifferentialAxle::ndMultiBodyVehicleDifferentialAxle(
 	:ndJointBilateralConstraint(1, differentialBody, body1, ndGetIdentityMatrix())
 {
 	ndMatrix temp;
-	ndMatrix matrix0(pin0, upPin, pin0.CrossProduct(upPin), ndVector::m_wOne);
+	ndAssert(pin0.DotProduct(pin0 & ndVector::m_triplexMask).GetScalar() - ndFloat32());
+	ndAssert(upPin.DotProduct(upPin & ndVector::m_triplexMask).GetScalar() - ndFloat32());
+
+	m_gearRatio = ndSqrt (pin1.DotProduct(pin1 & ndVector::m_triplexMask).GetScalar());
+
 	ndMatrix matrix1(ndGramSchmidtMatrix(pin1));
+	ndMatrix matrix0(pin0, upPin, pin0.CrossProduct(upPin), ndVector::m_wOne);
 	matrix0.m_posit = differentialBody->GetMatrix().m_posit;
 	matrix1.m_posit = body1->GetMatrix().m_posit;
 
@@ -57,7 +63,7 @@ void ndMultiBodyVehicleDifferentialAxle::JacobianDerivative(ndConstraintDescrito
 	ndJacobian& jacobian1 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
 
 	jacobian0.m_angular = matrix0.m_front + matrix0.m_up;
-	jacobian1.m_angular = matrix1.m_front;
+	jacobian1.m_angular = matrix1.m_front.Scale(m_gearRatio);
 
 	const ndVector& omega0 = m_body0->GetOmega();
 	const ndVector& omega1 = m_body1->GetOmega();
