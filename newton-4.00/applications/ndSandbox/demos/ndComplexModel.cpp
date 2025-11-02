@@ -18,7 +18,7 @@
 #include "ndDemoCameraNodeFollow.h"
 #include "ndHeightFieldPrimitive.h"
 
-#define ND_EXCAVATOR_CAMERA_DISTANCE ndFloat32 (-12.0f)
+#define ND_EXCAVATOR_CAMERA_DISTANCE ndFloat32 (-15.0f)
 
 class ndExcavatorController : public ndModelNotify
 {
@@ -46,11 +46,14 @@ class ndExcavatorController : public ndModelNotify
 		// build the major vehicle components, each major component build its sub parts
 		MakeChassis(articulation, mesh, visualMesh);
 
-		//MakeCabinAndUpperBody(articulation, mesh, visualMesh);
+		// add the cabin and boom mechanism
+		MakeCabinAndUpperBody(articulation, mesh, visualMesh);
 
+		// add the roller and diffrenticl gear system
 		MakeLeftTrack(articulation, mesh, visualMesh);
 		MakeRightTrack(articulation, mesh, visualMesh);
 		
+		// add the tracks
 		//MakeThread(articulation, "leftThread", mesh, visualMesh);
 		//MakeThread(articulation, "rightThread", mesh, visualMesh);
 	}
@@ -150,7 +153,7 @@ class ndExcavatorController : public ndModelNotify
 		ndSharedPtr<ndRenderSceneNode> cameraPivotNode(visualMeshRoot->FindByName("cameraPivot")->GetSharedPtr());
 
 		// note this is fucked up. I have to fix it, but for now just hack it
-		const ndVector cameraPivot(-1.0f, 0.0f, 0.0f, 0.0f);
+		const ndVector cameraPivot(0.0f, 2.0f, 0.0f, 0.0f);
 		ndRender* const renderer = *m_scene->GetRenderer();
 		m_cameraNode = ndSharedPtr<ndRenderSceneNode>(new ndDemoCameraNodeFollow(renderer, cameraPivot, ND_EXCAVATOR_CAMERA_DISTANCE));
 		cameraPivotNode->AddChild(m_cameraNode);
@@ -202,6 +205,8 @@ class ndExcavatorController : public ndModelNotify
 
 		ndMatrix hingeFrame(cabinBody->GetMatrix());
 		ndSharedPtr<ndJointBilateralConstraint> cabinPivot(new ndJointHinge(hingeFrame, cabinBody->GetAsBodyDynamic(), rootNode->m_body->GetAsBodyDynamic()));
+		// temporary
+		((ndJointHinge*)*cabinPivot)->SetAsSpringDamper(1.0e-2f, 1000.0f, 50.0f);
 		
 		//// set the center of mass of engine
 		//dVector com(hingeFrame.UnrotateVector(dVector(-2.0f, 0.0f, 0.0f, 0.0f)));
@@ -285,16 +290,20 @@ class ndExcavatorController : public ndModelNotify
 			LinkTires(articulation, leftTire_0, rollerTire);
 		}
 
-		//// link traction tire to the engine using a differential gear
-		//dMatrix engineMatrix;
-		//dMatrix chassisMatrix;
-		//
-		//NewtonBody* const tire = leftTire_0->GetBody();
-		//NewtonBody* const engine = m_engineJoint->GetBody0();
-		//m_engineJoint->CalculateGlobalMatrix(engineMatrix, chassisMatrix);
-		//dMatrix tireMatrix;
-		//NewtonBodyGetMatrix(tire, &tireMatrix[0][0]);
-		//new dCustomDifferentialGear___(EXCAVATOR_GEAR_GAIN, engineMatrix.m_front.Scale(-1.0f), engineMatrix.m_up, tireMatrix.m_right.Scale(1.0f), engine, tire);
+		// link traction tire to the engine using a differential gear
+		ndMatrix engineMatrix;
+		ndMatrix chassisMatrix;
+		ndBodyDynamic* const tire = leftTire_0->m_body->GetAsBodyDynamic();
+		ndBodyDynamic* const engine = m_engineNode->m_body->GetAsBodyDynamic();
+		m_engineNode->m_joint->CalculateGlobalMatrix(engineMatrix, chassisMatrix);
+		const ndMatrix tireMatrix(tire->GetMatrix());
+
+		ndSharedPtr<ndJointBilateralConstraint> axel (
+			new ndMultiBodyVehicleDifferentialAxle(
+				engineMatrix.m_front.Scale(ndFloat32(-1.0f)), engineMatrix.m_up, engine,
+				tireMatrix.m_right.Scale (ndFloat32 (1.0f)), tire));
+
+		articulation->AddCloseLoop(axel);
 	}
 
 	void MakeRightTrack(
@@ -317,6 +326,21 @@ class ndExcavatorController : public ndModelNotify
 			ndAssert(rollerTire);
 			LinkTires(articulation, rightTire_0, rollerTire);
 		}
+
+		// link traction tire to the engine using a differential gear
+		ndMatrix engineMatrix;
+		ndMatrix chassisMatrix;
+		ndBodyDynamic* const tire = rightTire_0->m_body->GetAsBodyDynamic();
+		ndBodyDynamic* const engine = m_engineNode->m_body->GetAsBodyDynamic();
+		m_engineNode->m_joint->CalculateGlobalMatrix(engineMatrix, chassisMatrix);
+		const ndMatrix tireMatrix(tire->GetMatrix());
+
+		ndSharedPtr<ndJointBilateralConstraint> axel(
+			new ndMultiBodyVehicleDifferentialAxle(
+				engineMatrix.m_front.Scale(ndFloat32(1.0f)), engineMatrix.m_up, engine,
+				tireMatrix.m_right.Scale (-1.0f), tire));
+
+		articulation->AddCloseLoop(axel);
 	}
 
 	void MakeThread(ndModelArticulation* const articulation,
@@ -437,7 +461,7 @@ class ndExcavatorController : public ndModelNotify
 
 		// reset the engine carcase transform
 		const ndMatrix matrix(engine->GetLocalMatrix0().OrthoInverse() * engine->GetLocalMatrix1() * engine->GetBody1()->GetMatrix());
-		//engine->GetBody0()->SetMatrixNoSleep(matrix);
+		engine->GetBody0()->SetMatrixNoSleep(matrix);
 
 		// integrate tyurn rate angle
 		ndFloat32 turnAngle = engine->GetAngle0();
@@ -453,26 +477,28 @@ class ndExcavatorController : public ndModelNotify
 		ndBodyDynamic* const engine = m_engineNode->m_body->GetAsBodyDynamic();
 
 		m_targetOmega = ndFloat32(0.0f);
+		ndFloat32 omegaMag = ndFloat32(-20.0f);
 		if (m_scene->GetKeyState(ImGuiKey_W))
 		{
-			m_targetOmega = ndFloat32(-20.0f);
+			m_targetOmega = omegaMag;
 			engine->SetSleepState(false);
 		}
 		else if (m_scene->GetKeyState(ImGuiKey_S))
 		{
-			m_targetOmega = ndFloat32 (20.0f);
+			m_targetOmega = -omegaMag;
 			engine->SetSleepState(false);
 		}
 
 		m_turnRateOmega = ndFloat32(0.0f);
+		ndFloat32 omegaTurnMag = omegaMag * ndFloat32 (0.7f);
 		if (m_scene->GetKeyState(ImGuiKey_A))
 		{
-			m_turnRateOmega = ndFloat32(-10.0f);
+			m_turnRateOmega = omegaTurnMag;
 			engine->SetSleepState(false);
 		}
 		else if (m_scene->GetKeyState(ImGuiKey_D))
 		{
-			m_turnRateOmega = ndFloat32(10.0f);
+			m_turnRateOmega = -omegaTurnMag;
 			engine->SetSleepState(false);
 		}
 
