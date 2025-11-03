@@ -37,10 +37,10 @@ class ndExcavatorController : public ndModelNotify
 			scene->Print(color, "d key for turning right");
 			scene->Print(color, "w key for moving walking forward");
 			scene->Print(color, "s key for going walking backward");
+			scene->Print(color, "mouse right click for moving arm");
 			//scene->Print(color, "left click on dynamics body for picking the body");
 		}
 	};
-
 
 	enum ndBodyPartType
 	{
@@ -57,11 +57,15 @@ class ndExcavatorController : public ndModelNotify
 		,m_engineNode(nullptr)
 		,m_armEffector(nullptr)
 		,m_cameraNode(nullptr)
-		,m_targetOmega(ndFloat32 (0.0f))
-		,m_turnRateOmega(ndFloat32(0.0f))
-		,m_cabinAngle(ndFloat32(0.0f))
 		,m_mouseX(ndFloat32(0.0f))
 		,m_mouseY(ndFloat32(0.0f))
+		,m_targetOmega(ndFloat32 (0.0f))
+		,m_turnRateOmega(ndFloat32(0.0f))
+		,m_armAngle(ndFloat32(0.0f))
+		,m_armAngle0(ndFloat32(0.0f))
+		,m_armPosit_x(ndFloat32(0.0f))
+		,m_armPosit_y(ndFloat32(0.0f))
+		,m_backTrackingArm(8)
 	{
 		ndModelArticulation* const articulation = model->GetAsModelArticulation();
 		ndAssert(articulation);
@@ -77,8 +81,8 @@ class ndExcavatorController : public ndModelNotify
 		MakeRightTrack(articulation, mesh, visualMesh);
 		
 		// add the tracks
-		//MakeThread(articulation, "leftThread", mesh, visualMesh);
-		//MakeThread(articulation, "rightThread", mesh, visualMesh);
+		MakeThread(articulation, "leftThread", mesh, visualMesh);
+		MakeThread(articulation, "rightThread", mesh, visualMesh);
 	}
 
 	ndSharedPtr<ndRenderSceneNode> GetCamera()
@@ -259,13 +263,30 @@ class ndExcavatorController : public ndModelNotify
 		// add an effector to move the arm
 		ndMatrix baseFrame(ndGetIdentityMatrix());
 		baseFrame.m_posit = hingeFrame.m_posit;
-		const ndMatrix childMatrix(matrixBucket * baseFrame.OrthoInverse());
+
 		m_armEffector = new ndIkSwivelPositionEffector(
 			baseFrame, rootNode->m_body->GetAsBodyDynamic(),
-			childMatrix.m_posit, bodyArm1->GetAsBodyDynamic());
+			matrixBucket.m_posit, bodyArm1->GetAsBodyDynamic());
 		m_armEffector->SetSwivelMode(false);
 		ndSharedPtr<ndJointBilateralConstraint> effector(m_armEffector);
 		articulation->AddCloseLoop(effector);
+
+		// calculate the work space.
+		ndVector arm1Len(jointBucket->CalculateGlobalMatrix0().m_posit - jointArm1->CalculateGlobalMatrix0().m_posit);
+		ndVector arm0Len(jointArm1->CalculateGlobalMatrix0().m_posit - jointArm0->CalculateGlobalMatrix0().m_posit);
+		ndVector cabinLen(jointArm0->CalculateGlobalMatrix0().m_posit - cabinPivot->CalculateGlobalMatrix0().m_posit);
+		ndFloat32 l1 = ndSqrt(arm1Len.DotProduct(arm1Len).GetScalar());
+		ndFloat32 l0 = ndSqrt(arm0Len.DotProduct(arm0Len).GetScalar()) + ndSqrt(cabinLen.DotProduct(cabinLen).GetScalar());
+		ndFloat32 minRadios = (l0 - l1) * ndFloat32(1.1f);
+		ndFloat32 maxRadios = (l0 + l1) * ndFloat32(0.9f);
+		m_armEffector->SetWorkSpaceConstraints(minRadios, maxRadios);
+
+		// calculate arm parameters		
+		ndVector localPosit(m_armEffector->GetLocalTargetPosition());
+		m_armAngle = ndFloat32(0.0f);
+		m_armPosit_y = localPosit.m_y;
+		m_armAngle0 = ndAtan2(localPosit.m_z, localPosit.m_x);
+		m_armPosit_x = ndSqrt(localPosit.m_x * localPosit.m_x + localPosit.m_z * localPosit.m_z);
 	}
 
 	void LinkTires(ndModelArticulation* const articulation,
@@ -561,6 +582,8 @@ class ndExcavatorController : public ndModelNotify
 		ndFloat32 mouseX;
 		ndFloat32 mouseY;
 		m_scene->GetMousePosition(mouseX, mouseY);
+//mouseY = 0;
+//mouseX = 0;
 
 		// control cabine rotation angle
 		if (m_scene->GetMouseKeyState(1))
@@ -570,62 +593,74 @@ class ndExcavatorController : public ndModelNotify
 
 			if ((mouseX - m_mouseX) > ndFloat32(0.001f))
 			{
-				step_x = 0.02f;
-				//m_cabinAngle = ndAnglesAdd(m_cabinAngle, 0.01f);
-				//ndVector target(m_armEffector->GetLocalTargetPosition());
-				//target.m_x += 0.02;
-				//m_armEffector->SetLocalTargetPosition(target);
+				step_x = 0.05f;
 			}
 			else if ((mouseX - m_mouseX) < ndFloat32(-0.001f))
 			{
-				step_x = -0.02f;
-				//m_cabinAngle = ndAnglesAdd(m_cabinAngle, -0.01f);
-				//ndTrace(("%f\n", m_cabinAngle));
-				//ndVector target(m_armEffector->GetLocalTargetPosition());
-				//target.m_x += -0.02;
-				//m_armEffector->SetLocalTargetPosition(target);
+				step_x = -0.05f;
 			}
 
 			if ((mouseY - m_mouseY) > ndFloat32(0.001f))
 			{
-				step_y = 0.02f;
-				//m_cabinAngle = ndAnglesAdd(m_cabinAngle, 0.01f);
-				//ndVector target(m_armEffector->GetLocalTargetPosition());
-				//target.m_x += 0.02;
-				//m_armEffector->SetLocalTargetPosition(target);
+				step_y = -0.05f;
 			}
 			else if ((mouseY - m_mouseY) < ndFloat32(-0.001f))
 			{
-				step_y = -0.02f;
-				//m_cabinAngle = ndAnglesAdd(m_cabinAngle, -0.01f);
-				//ndTrace(("%f\n", m_cabinAngle));
-				//ndVector target(m_armEffector->GetLocalTargetPosition());
-				//target.m_x += -0.02;
-				//m_armEffector->SetLocalTargetPosition(target);
-
+				step_y = 0.05f;
 			}
+			m_armPosit_x += step_x;
+			m_armPosit_y += step_y;
 
-			ndVector target(m_armEffector->GetLocalTargetPosition());
-			//target.m_x += step_x;
-			target.m_z += step_y;
-			m_armEffector->SetLocalTargetPosition(target);
+			ndFloat32 angle = m_armAngle0 + m_armAngle;
+			ndFloat32 x = m_armPosit_x * ndCos(angle);
+			ndFloat32 z = m_armPosit_x * ndSin(angle);
+
+			ndVector posit(x, m_armPosit_y, z, ndFloat32(1.0f));
+			if (m_armEffector->TestWorkSpaceViolation(posit))
+			{
+				// prevent arm from get stucked in a violation by back tracking
+				for (ndInt32 i = 0; i < m_backTrackingArm.GetCount(); ++i)
+				{
+					ndVector posit(m_backTrackingArm[i]);
+					if (!m_armEffector->TestWorkSpaceViolation(posit))
+					{
+						x = posit.m_x;
+						z = posit.m_z;
+						m_armPosit_y = posit.m_y;
+						m_armPosit_x = ndSqrt(x * x + z * z);
+						break;
+					}
+				}
+			}
+			engine->SetSleepState(false);
+			m_armEffector->SetLocalTargetPosition(ndVector (x, m_armPosit_y, z, ndFloat32(1.0f)));
+			
+			// save position for backtracking if get stuck
+			for (ndInt32 i = m_backTrackingArm.GetCount() - 1; i > 0; --i)
+			{
+				m_backTrackingArm[i] = m_backTrackingArm[i - 1];
+			}
+			m_backTrackingArm[0] = ndVector(x, m_armPosit_y, z, ndFloat32 (1.0f));
 		}
 
 		m_mouseX = mouseX;
 		m_mouseY = mouseY;
-
 	}
 
 	ndDemoEntityManager* m_scene;
 	ndModelArticulation::ndNode* m_engineNode;
 	ndIkSwivelPositionEffector* m_armEffector;
 	ndSharedPtr<ndRenderSceneNode> m_cameraNode;
-	ndFloat32 m_targetOmega;
-	ndFloat32 m_turnRateOmega;
-	ndFloat32 m_cabinAngle;
 	ndFloat32 m_mouseX;
 	ndFloat32 m_mouseY;
+	ndFloat32 m_targetOmega;
+	ndFloat32 m_turnRateOmega;
 
+	ndFloat32 m_armAngle;
+	ndFloat32 m_armAngle0;
+	ndFloat32 m_armPosit_x;
+	ndFloat32 m_armPosit_y;
+	ndFixSizeArray<ndVector, 8> m_backTrackingArm;
 };
 
 class ExcavatorThreadFloorMaterial : public ndApplicationMaterial
