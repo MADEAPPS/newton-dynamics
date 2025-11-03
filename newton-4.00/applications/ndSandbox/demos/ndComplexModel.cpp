@@ -37,8 +37,9 @@ class ndExcavatorController : public ndModelNotify
 			scene->Print(color, "d key for turning right");
 			scene->Print(color, "w key for moving walking forward");
 			scene->Print(color, "s key for going walking backward");
-			scene->Print(color, "mouse right click for moving arm");
-			//scene->Print(color, "left click on dynamics body for picking the body");
+			scene->Print(color, "right mouse click for moving arm");
+			scene->Print(color, "middle mouse click for rotate bucket");
+			scene->Print(color, "right and middle mouse click for rotate cabin");
 		}
 	};
 
@@ -56,6 +57,7 @@ class ndExcavatorController : public ndModelNotify
 		,m_scene(scene)
 		,m_engineNode(nullptr)
 		,m_armEffector(nullptr)
+		,m_bucketJoint(nullptr)
 		,m_cameraNode(nullptr)
 		,m_mouseX(ndFloat32(0.0f))
 		,m_mouseY(ndFloat32(0.0f))
@@ -259,6 +261,8 @@ class ndExcavatorController : public ndModelNotify
 		const ndMatrix matrixBucket(ndRollMatrix(ndFloat32(90.0f) * ndDegreeToRad) * bodyBucket->GetMatrix());
 		ndSharedPtr<ndJointBilateralConstraint> jointBucket(new ndJointHinge(matrixBucket, bodyBucket->GetAsBodyDynamic(), bodyArm1->GetAsBodyDynamic()));
 		ndModelArticulation::ndNode* const buckectNode = articulation->AddLimb(armNode1, bodyBucket, jointBucket);
+		m_bucketJoint = (ndJointHinge*)*jointBucket;
+		m_bucketJoint->SetAsSpringDamper(ndFloat32(0.1f), ndFloat32(2000.0f), ndFloat32(50.0f));
 
 		// add an effector to move the arm
 		ndMatrix baseFrame(ndGetIdentityMatrix());
@@ -582,32 +586,63 @@ class ndExcavatorController : public ndModelNotify
 		ndFloat32 mouseX;
 		ndFloat32 mouseY;
 		m_scene->GetMousePosition(mouseX, mouseY);
-//mouseY = 0;
-//mouseX = 0;
 
 		// control cabine rotation angle
-		if (m_scene->GetMouseKeyState(1))
+		if (m_scene->GetMouseKeyState(1) || m_scene->GetMouseKeyState(2))
 		{
 			ndFloat32 step_x = 0;
 			ndFloat32 step_y = 0;
 
-			if ((mouseX - m_mouseX) > ndFloat32(0.001f))
+			// moving arm in the plane of the IK chain
+			if (m_scene->GetMouseKeyState(1) && !m_scene->GetMouseKeyState(2))
 			{
-				step_x = 0.05f;
-			}
-			else if ((mouseX - m_mouseX) < ndFloat32(-0.001f))
-			{
-				step_x = -0.05f;
+				if ((mouseX - m_mouseX) > ndFloat32(0.001f))
+				{
+					step_x = 0.05f;
+				}
+				else if ((mouseX - m_mouseX) < ndFloat32(-0.001f))
+				{
+					step_x = -0.05f;
+				}
+
+				if ((mouseY - m_mouseY) > ndFloat32(0.001f))
+				{
+					step_y = -0.05f;
+				}
+				else if ((mouseY - m_mouseY) < ndFloat32(-0.001f))
+				{
+					step_y = 0.05f;
+				}
 			}
 
-			if ((mouseY - m_mouseY) > ndFloat32(0.001f))
+			// rotate the cabine
+			if (m_scene->GetMouseKeyState(1) && m_scene->GetMouseKeyState(2))
 			{
-				step_y = -0.05f;
+				ndFloat32 cabinOmega = ndFloat32(0.5f) * ndDegreeToRad;
+				if ((mouseX - m_mouseX) > ndFloat32(0.001f))
+				{
+					m_armAngle = ndAnglesAdd(m_armAngle, cabinOmega);
+				}
+				else if ((mouseX - m_mouseX) < ndFloat32(-0.001f))
+				{
+					m_armAngle = ndAnglesAdd(m_armAngle, -cabinOmega);
+				}
 			}
-			else if ((mouseY - m_mouseY) < ndFloat32(-0.001f))
+
+			// rotate the bucket
+			if (m_scene->GetMouseKeyState(2) && !m_scene->GetMouseKeyState(1))
 			{
-				step_y = 0.05f;
+				ndFloat32 bucketAngleStep = ndFloat32(2.0f) * ndDegreeToRad;
+				if ((mouseY - m_mouseY) > ndFloat32(0.001f))
+				{
+					m_bucketJoint->SetTargetAngle(m_bucketJoint->GetTargetAngle() + bucketAngleStep);
+				}
+				else if ((mouseY - m_mouseY) < ndFloat32(-0.001f))
+				{
+					m_bucketJoint->SetTargetAngle(m_bucketJoint->GetTargetAngle() - bucketAngleStep);
+				}
 			}
+
 			m_armPosit_x += step_x;
 			m_armPosit_y += step_y;
 
@@ -650,6 +685,7 @@ class ndExcavatorController : public ndModelNotify
 	ndDemoEntityManager* m_scene;
 	ndModelArticulation::ndNode* m_engineNode;
 	ndIkSwivelPositionEffector* m_armEffector;
+	ndJointHinge* m_bucketJoint;
 	ndSharedPtr<ndRenderSceneNode> m_cameraNode;
 	ndFloat32 m_mouseX;
 	ndFloat32 m_mouseY;
