@@ -209,6 +209,7 @@ class ndDemoEntityManager : public ndClassAlloc
 	ndSharedPtr<ndRenderTexture> m_environmentTexture;
 
 	ndSharedPtr<ndDemoHelper> m_demoHelper;
+	ndSharedPtr<ndRenderSceneNode> m_defaultCamera;
 
 	ndInt32 m_currentScene;
 	ndInt32 m_lastCurrentScene;

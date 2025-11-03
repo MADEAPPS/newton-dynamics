@@ -994,7 +994,8 @@ void ndDemoEntityManager::LoadDemo(ndInt32 menu)
 
 	// add a demo camera per demo
 	m_demoHelper = ndSharedPtr<ndDemoHelper>(nullptr);
-	m_renderer->SetCamera(ndSharedPtr<ndRenderSceneNode>(new ndDemoCameraNodeFlyby(*m_renderer)));
+	m_defaultCamera = ndSharedPtr<ndRenderSceneNode>(new ndDemoCameraNodeFlyby(*m_renderer));
+	m_renderer->SetCamera(m_defaultCamera);
 	m_demosSelection[menu].m_demoLauncher(this);
 	
 	snprintf(newTitle, sizeof(newTitle), "Newton Dynamics %d.%.2i demo: %s", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION, m_demosSelection[menu].m_name);
@@ -1149,56 +1150,37 @@ void ndDemoEntityManager::SetNextActiveCamera()
 		return;
 	}
 
+	ndFixSizeArray<const ndRenderSceneCamera*, 256> cameraPallete;
+	cameraPallete.PushBack(m_defaultCamera->FindCameraNode());
+
 	ndList<ndSharedPtr<ndRenderSceneNode>>& scene = m_renderer->GetScene();
-	const ndRenderSceneCamera* const currentCamera = m_renderer->GetCamera()->FindCameraNode();
-	ndAssert(currentCamera);
-	ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* currentNode = nullptr;
 	for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* sceneNode = scene.GetFirst(); sceneNode; sceneNode = sceneNode->GetNext())
 	{
 		ndSharedPtr<ndRenderSceneNode>& node = sceneNode->GetInfo();
 		const ndRenderSceneCamera* cameraNode = node->FindCameraNode();
-		if (cameraNode && (cameraNode == currentCamera))
+		if (cameraNode)
 		{
-			currentNode = sceneNode;
-			break;
+			cameraPallete.PushBack(cameraNode);
 		}
 	}
 
-	if (currentNode)
+	const ndRenderSceneCamera* const currentCamera = m_renderer->GetCamera()->FindCameraNode();
+	for (ndInt32 i = 0; i < cameraPallete.GetCount(); ++i)
 	{
-		// if it find a node, see if it can find the next camera.
-		ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* nextNode = nullptr;
-		for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* nextSceneNode = currentNode->GetNext(); nextSceneNode; nextSceneNode = nextSceneNode->GetNext())
+		if (cameraPallete[i] == currentCamera)
 		{
-			ndSharedPtr<ndRenderSceneNode>& node = nextSceneNode->GetInfo();
-			const ndRenderSceneCamera* cameraNode = node->FindCameraNode();
-			if (cameraNode)
+			ndInt32 j = (i + 1) % cameraPallete.GetCount();
+			if (j == 0)
 			{
-				nextNode = nextSceneNode;
-				break;
+				m_renderer->SetCamera(m_defaultCamera);
 			}
-		}
-
-		if (!nextNode)
-		{
-			for (ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* sceneNode = scene.GetFirst(); sceneNode; sceneNode = sceneNode->GetNext())
+			else
 			{
-				ndSharedPtr<ndRenderSceneNode>& node = sceneNode->GetInfo();
-				const ndRenderSceneCamera* cameraNode = node->FindCameraNode();
-				if (cameraNode)
-				{
-					nextNode = sceneNode;
-					break;
-				}
+				ndRenderSceneNode* const camera = cameraPallete[j]->FindByName("__PlayerCamera__");
+				ndSharedPtr<ndRenderSceneNode> cameraNode(camera->GetSharedPtr());
+				m_renderer->SetCamera(cameraNode);
 			}
-		}
-
-		// found a different player with a camera
-		if (nextNode != currentNode)
-		{
-			ndRenderSceneNode* const camera = nextNode->GetInfo()->FindByName("__PlayerCamera__");
-			ndSharedPtr<ndRenderSceneNode> cameraNode(camera->GetSharedPtr());
-			m_renderer->SetCamera(cameraNode);
+			break;
 		}
 	}
 }

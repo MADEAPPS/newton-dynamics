@@ -32,7 +32,7 @@ class ndExcavatorController : public ndModelNotify
 		{
 			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			scene->Print(color, "implements a midium complexity articulated model");
-			//scene->Print(color, "c key to change player");
+			scene->Print(color, "c key to player camera");
 			scene->Print(color, "a key for turning left");
 			scene->Print(color, "d key for turning right");
 			scene->Print(color, "w key for moving walking forward");
@@ -98,10 +98,6 @@ class ndExcavatorController : public ndModelNotify
 		ndSharedPtr<ndRenderSceneNode> vehicleMesh(mesh.m_renderMesh->Clone());
 		ndMatrix matrix(location);
 		matrix.m_posit = FindFloor(*scene->GetWorld(), matrix.m_posit, 200.0f);
-
-		//this was a mistake, the model souel be crated form teh ndMesh no the visual mesh
-		//vehicleMesh->SetTransform(vehicleMesh->GetMatrix() * matrix);
-		//vehicleMesh->SetTransform(vehicleMesh->GetMatrix() * matrix);
 
 		ndMatrix saveMatrix(mesh.m_mesh->m_matrix);
 		mesh.m_mesh->m_matrix = saveMatrix * matrix;
@@ -512,7 +508,6 @@ class ndExcavatorController : public ndModelNotify
 		ndFloat32 inertia = ndFloat32(2.0f / 5.0f) * mass * radius * radius;
 
 		ndSharedPtr<ndBody> motorBody(new ndBodyDynamic());
-		//chassisBody->SetNotifyCallback(new ndDemoEntityNotify(m_scene, visualMesh, nullptr));
 		motorBody->SetMatrix(engineMatrix);
 		motorBody->GetAsBodyDynamic()->SetCollisionShape(**motorCollision);
 		motorBody->GetAsBodyDynamic()->SetMassMatrix(inertia, inertia, inertia, mass);
@@ -555,31 +550,36 @@ class ndExcavatorController : public ndModelNotify
 	{
 		ndBodyDynamic* const engine = m_engineNode->m_body->GetAsBodyDynamic();
 
-		ndFloat32 turnSign = ndFloat32(1.0f);
-		m_targetOmega = ndFloat32(0.0f);
-		if (m_scene->GetKeyState(ImGuiKey_W))
+		ndRender* const renderer = *m_scene->GetRenderer();
+		ndSharedPtr<ndRenderSceneNode> camera (renderer->GetCamera());
+		if (camera == m_cameraNode)
 		{
-			turnSign = ndFloat32(0.75f);
-			m_targetOmega = -ND_EXCAVATOR_ENGINE_OMEGA;
-			engine->SetSleepState(false);
-		}
-		else if (m_scene->GetKeyState(ImGuiKey_S))
-		{
-			turnSign = ndFloat32(-0.75f);
-			m_targetOmega = ND_EXCAVATOR_ENGINE_OMEGA;
-			engine->SetSleepState(false);
-		}
+			ndFloat32 turnSign = ndFloat32(1.0f);
+			m_targetOmega = ndFloat32(0.0f);
+			if (m_scene->GetKeyState(ImGuiKey_W))
+			{
+				turnSign = ndFloat32(0.75f);
+				m_targetOmega = -ND_EXCAVATOR_ENGINE_OMEGA;
+				engine->SetSleepState(false);
+			}
+			else if (m_scene->GetKeyState(ImGuiKey_S))
+			{
+				turnSign = ndFloat32(-0.75f);
+				m_targetOmega = ND_EXCAVATOR_ENGINE_OMEGA;
+				engine->SetSleepState(false);
+			}
 
-		m_turnRateOmega = ndFloat32(0.0f);
-		if (m_scene->GetKeyState(ImGuiKey_A))
-		{
-			m_turnRateOmega = -ND_EXCAVATOR_ENGINE_OMEGA * turnSign;
-			engine->SetSleepState(false);
-		}
-		else if (m_scene->GetKeyState(ImGuiKey_D))
-		{
-			m_turnRateOmega = ND_EXCAVATOR_ENGINE_OMEGA * turnSign;
-			engine->SetSleepState(false);
+			m_turnRateOmega = ndFloat32(0.0f);
+			if (m_scene->GetKeyState(ImGuiKey_A))
+			{
+				m_turnRateOmega = -ND_EXCAVATOR_ENGINE_OMEGA * turnSign;
+				engine->SetSleepState(false);
+			}
+			else if (m_scene->GetKeyState(ImGuiKey_D))
+			{
+				m_turnRateOmega = ND_EXCAVATOR_ENGINE_OMEGA * turnSign;
+				engine->SetSleepState(false);
+			}
 		}
 
 
@@ -618,7 +618,7 @@ class ndExcavatorController : public ndModelNotify
 			// rotate the cabine
 			if (m_scene->GetMouseKeyState(1) && m_scene->GetMouseKeyState(2))
 			{
-				ndFloat32 cabinOmega = ndFloat32(0.5f) * ndDegreeToRad;
+				ndFloat32 cabinOmega = ndFloat32(1.0f) * ndDegreeToRad;
 				if ((mouseX - m_mouseX) > ndFloat32(0.001f))
 				{
 					m_armAngle = ndAnglesAdd(m_armAngle, cabinOmega);
@@ -793,20 +793,11 @@ void ndComplexModel(ndDemoEntityManager* const scene)
 	ExcavatorThreadRollerMaterial material1;
 	callback->RegisterMaterial(material1, ndExcavatorController::m_thread, ndExcavatorController::m_roller);
 
-	//// add a help menu
-	//ndSharedPtr<ndDemoEntityManager::ndDemoHelper> demoHelper(new ndBackGroundVehicleController::ndHelpLegend());
-	//scene->SetDemoHelp(demoHelper);
-
 	ndRenderMeshLoader excavatorLoaded(*scene->GetRenderer());
 	excavatorLoaded.LoadMesh(ndGetWorkingFileName("excavator.nd"));
 	//ndSharedPtr<ndModelNotify> controller(ndBackGroundVehicleController::CreateAiVehicleProp(scene, ndVector::m_wOne, vmwLoaderRedPaint));
 
 	ndSharedPtr<ndModelNotify> controller(ndExcavatorController::CreateExcavator(scene, matrix, excavatorLoaded));
-
-	//// set this player as the active camera
-	//ndBackGroundVehicleController* const playerController = (ndBackGroundVehicleController*)*controller;
-	//ndRender* const renderer = *scene->GetRenderer();
-	//renderer->SetCamera(playerController->GetCamera());
 
 	ndMatrix matrix1(ndGetIdentityMatrix());
 	matrix1.m_posit.m_x += 10.0f;
@@ -821,5 +812,4 @@ void ndComplexModel(ndDemoEntityManager* const scene)
 //matrix.m_posit.m_y += 4.0f;
 //ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
 //scene->SetCameraMatrix(rotation, matrix.m_posit);
-
 }
