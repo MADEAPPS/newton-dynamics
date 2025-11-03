@@ -25,6 +25,23 @@
 class ndExcavatorController : public ndModelNotify
 {
 	public:
+
+	class ndHelpLegend : public ndDemoEntityManager::ndDemoHelper
+	{
+		virtual void PresentHelp(ndDemoEntityManager* const scene) override
+		{
+			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
+			scene->Print(color, "implements a midium complexity articulated model");
+			//scene->Print(color, "c key to change player");
+			scene->Print(color, "a key for turning left");
+			scene->Print(color, "d key for turning right");
+			scene->Print(color, "w key for moving walking forward");
+			scene->Print(color, "s key for going walking backward");
+			//scene->Print(color, "left click on dynamics body for picking the body");
+		}
+	};
+
+
 	enum ndBodyPartType
 	{
 		m_chassis = 1,
@@ -42,6 +59,9 @@ class ndExcavatorController : public ndModelNotify
 		,m_cameraNode(nullptr)
 		,m_targetOmega(ndFloat32 (0.0f))
 		,m_turnRateOmega(ndFloat32(0.0f))
+		,m_cabinAngle(ndFloat32(0.0f))
+		,m_mouseX(ndFloat32(0.0f))
+		,m_mouseY(ndFloat32(0.0f))
 	{
 		ndModelArticulation* const articulation = model->GetAsModelArticulation();
 		ndAssert(articulation);
@@ -57,8 +77,8 @@ class ndExcavatorController : public ndModelNotify
 		MakeRightTrack(articulation, mesh, visualMesh);
 		
 		// add the tracks
-		MakeThread(articulation, "leftThread", mesh, visualMesh);
-		MakeThread(articulation, "rightThread", mesh, visualMesh);
+		//MakeThread(articulation, "leftThread", mesh, visualMesh);
+		//MakeThread(articulation, "rightThread", mesh, visualMesh);
 	}
 
 	ndSharedPtr<ndRenderSceneNode> GetCamera()
@@ -236,10 +256,13 @@ class ndExcavatorController : public ndModelNotify
 		ndSharedPtr<ndJointBilateralConstraint> jointBucket(new ndJointHinge(matrixBucket, bodyBucket->GetAsBodyDynamic(), bodyArm1->GetAsBodyDynamic()));
 		ndModelArticulation::ndNode* const buckectNode = articulation->AddLimb(armNode1, bodyBucket, jointBucket);
 
-		// add an effector to move the arme joint
+		// add an effector to move the arm
+		ndMatrix baseFrame(ndGetIdentityMatrix());
+		baseFrame.m_posit = hingeFrame.m_posit;
+		const ndMatrix childMatrix(matrixBucket * baseFrame.OrthoInverse());
 		m_armEffector = new ndIkSwivelPositionEffector(
-			hingeFrame, rootNode->m_body->GetAsBodyDynamic(),
-			matrixBucket.m_posit, bodyArm1->GetAsBodyDynamic());
+			baseFrame, rootNode->m_body->GetAsBodyDynamic(),
+			childMatrix.m_posit, bodyArm1->GetAsBodyDynamic());
 		m_armEffector->SetSwivelMode(false);
 		ndSharedPtr<ndJointBilateralConstraint> effector(m_armEffector);
 		articulation->AddCloseLoop(effector);
@@ -503,7 +526,7 @@ class ndExcavatorController : public ndModelNotify
 		engine->SetOffsetAngle1(fowardAngle + m_targetOmega * timestep);
 	}
 
-	void PostTransformUpdate(ndFloat32)
+	void PostTransformUpdate(ndFloat32 timestep)
 	{
 		ndBodyDynamic* const engine = m_engineNode->m_body->GetAsBodyDynamic();
 
@@ -533,6 +556,64 @@ class ndExcavatorController : public ndModelNotify
 			m_turnRateOmega = ND_EXCAVATOR_ENGINE_OMEGA * turnSign;
 			engine->SetSleepState(false);
 		}
+
+
+		ndFloat32 mouseX;
+		ndFloat32 mouseY;
+		m_scene->GetMousePosition(mouseX, mouseY);
+
+		// control cabine rotation angle
+		if (m_scene->GetMouseKeyState(1))
+		{
+			ndFloat32 step_x = 0;
+			ndFloat32 step_y = 0;
+
+			if ((mouseX - m_mouseX) > ndFloat32(0.001f))
+			{
+				step_x = 0.02f;
+				//m_cabinAngle = ndAnglesAdd(m_cabinAngle, 0.01f);
+				//ndVector target(m_armEffector->GetLocalTargetPosition());
+				//target.m_x += 0.02;
+				//m_armEffector->SetLocalTargetPosition(target);
+			}
+			else if ((mouseX - m_mouseX) < ndFloat32(-0.001f))
+			{
+				step_x = -0.02f;
+				//m_cabinAngle = ndAnglesAdd(m_cabinAngle, -0.01f);
+				//ndTrace(("%f\n", m_cabinAngle));
+				//ndVector target(m_armEffector->GetLocalTargetPosition());
+				//target.m_x += -0.02;
+				//m_armEffector->SetLocalTargetPosition(target);
+			}
+
+			if ((mouseY - m_mouseY) > ndFloat32(0.001f))
+			{
+				step_y = 0.02f;
+				//m_cabinAngle = ndAnglesAdd(m_cabinAngle, 0.01f);
+				//ndVector target(m_armEffector->GetLocalTargetPosition());
+				//target.m_x += 0.02;
+				//m_armEffector->SetLocalTargetPosition(target);
+			}
+			else if ((mouseY - m_mouseY) < ndFloat32(-0.001f))
+			{
+				step_y = -0.02f;
+				//m_cabinAngle = ndAnglesAdd(m_cabinAngle, -0.01f);
+				//ndTrace(("%f\n", m_cabinAngle));
+				//ndVector target(m_armEffector->GetLocalTargetPosition());
+				//target.m_x += -0.02;
+				//m_armEffector->SetLocalTargetPosition(target);
+
+			}
+
+			ndVector target(m_armEffector->GetLocalTargetPosition());
+			//target.m_x += step_x;
+			target.m_z += step_y;
+			m_armEffector->SetLocalTargetPosition(target);
+		}
+
+		m_mouseX = mouseX;
+		m_mouseY = mouseY;
+
 	}
 
 	ndDemoEntityManager* m_scene;
@@ -541,6 +622,10 @@ class ndExcavatorController : public ndModelNotify
 	ndSharedPtr<ndRenderSceneNode> m_cameraNode;
 	ndFloat32 m_targetOmega;
 	ndFloat32 m_turnRateOmega;
+	ndFloat32 m_cabinAngle;
+	ndFloat32 m_mouseX;
+	ndFloat32 m_mouseY;
+
 };
 
 class ExcavatorThreadFloorMaterial : public ndApplicationMaterial
@@ -622,8 +707,11 @@ void ndComplexModel(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "marbleCheckBoard.png", 0.1f, true));
 	//ndSharedPtr<ndBody> mapBody(BuildHeightFieldTerrain(scene, "grass.png", ndGetIdentityMatrix()));
 
-	ndMatrix matrix(ndGetIdentityMatrix());
+	// add a help menu
+	ndSharedPtr<ndDemoEntityManager::ndDemoHelper> demoHelper(new ndExcavatorController::ndHelpLegend());
+	scene->SetDemoHelp(demoHelper);
 
+	ndMatrix matrix(ndGetIdentityMatrix());
 	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
 
 	// this material prune extra contact from the thread links and ground 
