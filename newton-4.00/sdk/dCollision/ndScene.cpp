@@ -1062,8 +1062,8 @@ bool ndScene::ConvexCast(
 							// merge contact
 							for (ndInt32 i = 0; i < savedNotification.m_contacts.GetCount(); ++i)
 							{
-								const ndContactPoint& contact = savedNotification.m_contacts[i];
 								bool newPoint = true;
+								const ndContactPoint& contact = savedNotification.m_contacts[i];
 								for (ndInt32 j = callback.m_contacts.GetCount() - 1; j >= 0; --j)
 								{
 									const ndVector diff(callback.m_contacts[j].m_point - contact.m_point);
