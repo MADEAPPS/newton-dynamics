@@ -1064,7 +1064,7 @@ bool ndScene::ConvexCast(
 							{
 								const ndContactPoint& contact = savedNotification.m_contacts[i];
 								bool newPoint = true;
-								for (ndInt32 j = callback.m_contacts.GetCount() - 1; j >= 0; ++j)
+								for (ndInt32 j = callback.m_contacts.GetCount() - 1; j >= 0; --j)
 								{
 									const ndVector diff(callback.m_contacts[j].m_point - contact.m_point);
 									ndFloat32 mag2 = diff.DotProduct(diff & ndVector::m_triplexMask).GetScalar();
