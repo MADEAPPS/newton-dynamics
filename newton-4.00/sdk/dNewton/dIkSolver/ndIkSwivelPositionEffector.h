@@ -34,6 +34,7 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	D_NEWTON_API virtual ~ndIkSwivelPositionEffector();
 
 	D_NEWTON_API ndVector GetLocalTargetPosition() const;
+	D_NEWTON_API bool TestWorkSpaceViolation(ndVector& posit) const;
 	D_NEWTON_API void SetLocalTargetPosition(const ndVector& posit);
 
 	D_NEWTON_API ndRotationOrder GetRotationOrder() const;

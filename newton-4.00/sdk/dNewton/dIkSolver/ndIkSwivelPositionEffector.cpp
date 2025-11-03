@@ -129,9 +129,9 @@ ndVector ndIkSwivelPositionEffector::GetLocalTargetPosition() const
 	return m_localTargetPosit;
 }
 
-void ndIkSwivelPositionEffector::SetLocalTargetPosition(const ndVector& posit)
+bool ndIkSwivelPositionEffector::TestWorkSpaceViolation(ndVector& posit) const
 {
-	ndVector target (posit & ndVector::m_triplexMask);
+	ndVector target(posit & ndVector::m_triplexMask);
 	ndFloat32 dist2 = target.DotProduct(target).GetScalar();
 	if (dist2 < ndFloat32(1.0e-4f))
 	{
@@ -141,12 +141,23 @@ void ndIkSwivelPositionEffector::SetLocalTargetPosition(const ndVector& posit)
 	if (dist2 > m_maxWorkSpaceRadio * m_maxWorkSpaceRadio)
 	{
 		target = target.Normalize().Scale(m_maxWorkSpaceRadio);
+		posit = target | ndVector::m_wOne;
+		return true;
 	}
 	else if (dist2 < m_minWorkSpaceRadio * m_minWorkSpaceRadio)
 	{
 		target = target.Normalize().Scale(m_minWorkSpaceRadio);
+		posit = target | ndVector::m_wOne;
+		return true;
 	}
-	m_localTargetPosit = target | ndVector::m_wOne;
+	return false;
+}
+
+void ndIkSwivelPositionEffector::SetLocalTargetPosition(const ndVector& posit)
+{
+	ndVector target (posit);
+	TestWorkSpaceViolation(target);
+	m_localTargetPosit = target;
 }
 
 void ndIkSwivelPositionEffector::SetWorkSpaceConstraints(ndFloat32 minRadio, ndFloat32 maxRadio)
