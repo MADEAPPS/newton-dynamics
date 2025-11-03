@@ -787,8 +787,7 @@ void ndSkeletonContainer::CalculateLoopMassMatrixCoefficients(ndFloat32* const d
 
 		const ndVector8 JMinvM0(row_i->m_JMinv.m_jacobianM0.m_linear, row_i->m_JMinv.m_jacobianM0.m_angular);
 		const ndVector8 JMinvM1(row_i->m_JMinv.m_jacobianM1.m_linear, row_i->m_JMinv.m_jacobianM1.m_angular);
-		const ndVector8 element(JMinvM0 * (ndVector8&)row_i->m_Jt.m_jacobianM0 + 
-								JMinvM1 * (ndVector8&)row_i->m_Jt.m_jacobianM1);
+		const ndVector8 element(JMinvM0 * (ndVector8&)row_i->m_Jt.m_jacobianM0 + JMinvM1 * (ndVector8&)row_i->m_Jt.m_jacobianM1);
 
 		// I know I am doubling the matrix regularizer, but this makes the solution more robust.
 		ndFloat32* const matrixRow11 = &m_massMatrix11[m_auxiliaryRowCount * index];
