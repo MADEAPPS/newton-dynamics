@@ -30,8 +30,6 @@
 class ndSpatialMatrix : public ndClassAlloc
 {
 	public:
-	//D_OPERATOR_NEW_AND_DELETE
-
 	inline ndSpatialMatrix()
 	{
 	}
@@ -44,10 +42,6 @@ class ndSpatialMatrix : public ndClassAlloc
 			m_rows[i] = row;
 		}
 	}
-
-	//inline ~ndSpatialMatrix()
-	//{
-	//}
 	
 	inline ndSpatialVector& operator[] (ndInt32 i)
 	{
@@ -88,6 +82,7 @@ class ndSpatialMatrix : public ndClassAlloc
 	}
 
 	ndSpatialVector m_rows[6];
+	D_CORE_API static ndSpatialMatrix m_zero;
 };
 
 #endif
