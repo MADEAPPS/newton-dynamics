@@ -541,8 +541,6 @@ class ndExcavatorController : public ndModelNotify
 		((ndJointDoubleHinge*)*joint)->SetAsSpringDamper1(0.1f, 1500.0f, 10.0f);
 
 		m_engineNode = articulation->AddLimb(rootNode, motorBody, joint);
-
-		//motorBody->SetOmega(ndVector (2.0f, 2.0f, 2.0f, 0.0f));
 	}
 
 	void Update(ndFloat32 timestep) override
