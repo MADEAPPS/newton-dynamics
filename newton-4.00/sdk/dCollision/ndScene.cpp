@@ -1373,34 +1373,6 @@ void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1
 			// can't use skeleton as filter, since skelton are procedurally generated
 			// by the engine and the app has not control over them.
 			 
-			//bool selfSkelCollidable = body0->GetSkeletonSelfCollision() && body1->GetSkeletonSelfCollision();
-			//if (!selfSkelCollidable)
-			//{
-			//	const ndSkeletonContainer* skel0 = body0->GetSkeleton();
-			//	const ndSkeletonContainer* skel1 = body1->GetSkeleton();
-			//	auto FindMissingSkeletorm = [](const ndSkeletonContainer* const skeleton, const ndBodyKinematic* const body)
-			//	{
-			//		bool test = (body->GetInvMass() == ndFloat32(0.0f)) && (skeleton->FindBoneIndex(body) != -1);
-			//		return test ? skeleton : nullptr;
-			//	};
-			//
-			//	if (skel0 && !skel1)
-			//	{
-			//		skel1 = FindMissingSkeletorm(skel0, body1);
-			//	}
-			//	else if (!skel0 && skel1)
-			//	{
-			//		skel0 = FindMissingSkeletorm(skel1, body0);
-			//	}
-			//	selfSkelCollidable = !(skel0 && skel1 && (skel0 == skel1));
-			//}
-			//if (selfSkelCollidable)
-			//{
-			//	ndArray<ndContactPairs>& particalPairs = m_partialNewPairs[threadId];
-			//	ndContactPairs pair(ndUnsigned32(body0->m_index), ndUnsigned32(body1->m_index));
-			//	particalPairs.PushBack(pair);
-			//}
-
 			//instead use the model as filter
 			ndModel* const model0 = body0->GetModel();
 			ndModel* const model1 = body1->GetModel();
