@@ -2822,7 +2822,7 @@ ndInt32 ndContactSolver::CompoundToConvexContactsDiscrete()
 	ndInt32 contactCount = 0;
 	stackPool.PushBack(compoundShape->m_root);
 	stackDistance.PushBack(data.CalculateDistance2(compoundShape->m_root->m_origin, compoundShape->m_root->m_size, origin, size));
-	ndFloat32 closestDist2 = (stackDistance[0] > ndFloat32(0.0f)) ? stackDistance[0] : ndFloat32(1.0e10f);
+	ndFloat32 closestDist2 = (stackDistance[0] > ndFloat32(0.0f)) ? stackDistance[0] : ND_MIN_DIST2;
 
 	auto InsertNode = [&stackDistance, &stackPool](const ndShapeCompound::ndNodeBase* const node, ndFloat32 dist)
 	{
@@ -2894,16 +2894,6 @@ ndInt32 ndContactSolver::CompoundToConvexContactsDiscrete()
 				const ndShapeCompound::ndNodeBase* const left = node->m_left;
 				ndAssert(left);
 				ndFloat32 subDist2 = data.CalculateDistance2(left->m_origin, left->m_size, origin, size);
-				//ndInt32 j = stack;
-				//for (; j && (subDist2 > stackDistance[j - 1]); --j)
-				//{
-				//	stackPool[j] = stackPool[j - 1];
-				//	stackDistance[j] = stackDistance[j - 1];
-				//}
-				//stackPool[j] = left;
-				//stackDistance[j] = subDist2;
-				//stack++;
-				//ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0])));
 				InsertNode(left, subDist2);
 			}
 
@@ -2911,16 +2901,6 @@ ndInt32 ndContactSolver::CompoundToConvexContactsDiscrete()
 				const ndShapeCompound::ndNodeBase* const right = node->m_right;
 				ndAssert(right);
 				ndFloat32 subDist2 = data.CalculateDistance2(right->m_origin, right->m_size, origin, size);
-				//ndInt32 j = stack;
-				//for (; j && (subDist2 > stackDistance[j - 1]); --j)
-				//{
-				//	stackPool[j] = stackPool[j - 1];
-				//	stackDistance[j] = stackDistance[j - 1];
-				//}
-				//stackPool[j] = right;
-				//stackDistance[j] = subDist2;
-				//stack++;
-				//ndAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0])));
 				InsertNode(right, subDist2);
 			}
 		}
@@ -2936,7 +2916,6 @@ ndInt32 ndContactSolver::CompoundToConvexContactsDiscrete()
 	return contactCount;
 }
 
-#pragma optimize( "", off )
 ndInt32 ndContactSolver::CompoundToCompoundContactsDiscrete()
 {
 	ndContact* const contactJoint = m_contact;
