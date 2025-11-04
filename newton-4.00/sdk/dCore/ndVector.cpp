@@ -63,11 +63,11 @@ ndBigVector ndBigVector::m_zMask (ndInt32 ( 0), ndInt32 ( 0),	ndInt32 (-1), ndIn
 ndBigVector ndBigVector::m_wMask (ndInt32 ( 0), ndInt32 ( 0),	ndInt32 ( 0), ndInt32 (-1));
 ndBigVector ndBigVector::m_xyzwMask (ndInt32(-1), ndInt32(-1), ndInt32(-1), ndInt32(-1));
 
-ndSpatialVector ndSpatialVector::m_zero (ndFloat32 (0.0f));
-
 ndVector8 ndVector8::m_mask(-1);
 ndVector8 ndVector8::m_one(ndFloat32(1.0f));
 ndVector8 ndVector8::m_zero(ndFloat32(0.0f));
 ndVector8 ndVector8::m_ordinals(ndVector(0, 1, 2, 3), ndVector(4, 5, 6, 7));
 
+ndSpatialVector ndSpatialVector::m_zero(ndFloat32(0.0f));
+ndSpatialMatrix ndSpatialMatrix::m_zero(ndFloat32(0.0f));
 
