@@ -155,62 +155,6 @@ namespace ndMakeObject
 	}
 }
 
-//template <typename Function>
-//class ndTaskImplement_old : public ndTask
-//{
-//	public:
-//	ndTaskImplement_old(ndInt32 threadIndex, ndThreadPool* const threadPool, const Function& function)
-//		:ndTask(threadIndex)
-//		,m_function(function)
-//		,m_threadPool(threadPool)
-//		,m_threadCount(threadPool->GetThreadCount())
-//	{
-//	}
-//
-//	private:
-//	void Execute() const
-//	{
-//		m_function(m_threadIndex, m_threadCount);
-//	}
-//
-//	Function m_function;
-//	ndThreadPool* m_threadPool;
-//	const ndInt32 m_threadCount;
-//	friend class ndThreadPool;
-//};
-//
-//template <typename Function>
-//void ndThreadPool::ParallelExecute_old(const Function& callback)
-//{
-//	const ndInt32 workerCount = GetThreadCount() - 1;
-//	if (workerCount > 0)
-//	{
-//		#ifdef	D_USE_THREAD_EMULATION
-//			for (ndInt32 i = 0; i < (workerCount + 1); ++i)
-//			{
-//				callback(i, workerCount + 1);
-//			}
-//		#else	
-//			ndTaskImplement_old<Function>* const jobsArray = ndAlloca(ndTaskImplement_old<Function>, workerCount);
-//			ndFixSizeArray<ndTask*, D_MAX_THREADS_COUNT> taskArray;
-//			for (ndInt32 i = 0; i < workerCount; ++i)
-//			{
-//				ndTaskImplement_old<Function>* const job = &jobsArray[i];
-//				taskArray.PushBack(new (job) ndTaskImplement<Function>(i + 1, this, callback));
-//				m_taskInProgress.fetch_add(1);
-//				m_workers[i].ExecuteTask(job);
-//			}
-//
-//			callback(0, workerCount + 1);
-//			WaitForWorkers();
-//		#endif
-//	}
-//	else
-//	{
-//		callback(0, 1);
-//	}
-//}
-
 template <typename Function>
 class ndTaskImplement : public ndTask
 {
