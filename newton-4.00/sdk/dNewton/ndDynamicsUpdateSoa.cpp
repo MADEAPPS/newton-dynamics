@@ -2931,7 +2931,7 @@
 			const ndArray<ndLeftHandSide>& leftHandSide = m_leftHandSide;
 
 			ndSkeletonContainer* const skeleton = activeSkeletons[groupId];
-			skeleton->InitMassMatrix(&leftHandSide[0], &rightHandSide[0]);
+			skeleton->InitMassMatrix(nullptr, &leftHandSide[0], &rightHandSide[0]);
 		});
 
 		if (activeSkeletons.GetCount())

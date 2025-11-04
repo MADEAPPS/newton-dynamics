@@ -92,7 +92,8 @@ class ndSkeletonContainer
 		public:
 		ndNode();
 		~ndNode();
-		ndInt32 Factorize(const ndLeftHandSide* const leftHandSide, const ndRightHandSide* const rightHandSide, ndSpatialMatrix* const bodyMassArray, ndSpatialMatrix* const jointMassArray);
+		ndInt32 FactorizeRoot(ndSpatialMatrix* const bodyMassArray, ndSpatialMatrix* const jointMassArray);
+		ndInt32 FactorizeChild(const ndLeftHandSide* const leftHandSide, const ndRightHandSide* const rightHandSide, ndSpatialMatrix* const bodyMassArray, ndSpatialMatrix* const jointMassArray);
 
 		inline void CalculateJacobianBlock();
 		inline void CalculateInertiaMatrix(ndSpatialMatrix* const bodyMassArray) const;
@@ -115,6 +116,7 @@ class ndSkeletonContainer
 		ndNode* m_child;
 		ndNode* m_sibling;
 		ndInt32 m_index;
+		ndInt32 m_factorizeLayer;
 		ndOrdinal m_ordinal;
 		ndInt8 m_dof;
 		ndInt8 m_swapJacobianBodiesIndex;
@@ -204,17 +206,19 @@ class ndSkeletonContainer
 	void Finalize(ndInt32 loopJoints, ndJointBilateralConstraint** const loopJointArray);
 
 	void AddExtraContacts();
-	void InitLoopMassMatrix();
 	void RegularizeLcp() const;
 	void ClearCloseLoopJoints();
+	void CalculateBufferSizeInBytes();
 	void AddCloseLoopJoint(ndConstraint* const joint);
 	void CalculateReactionForces(ndJacobian* const internalForces);
-	void InitMassMatrix(const ndLeftHandSide* const matrixRow, ndRightHandSide* const rightHandSide);
-	void CalculateBufferSizeInBytes();
-	void ConditionMassMatrix() const;
+
+	void InitLoopMassMatrix(ndThreadPool* const threadPool);
+	void ConditionMassMatrix(ndThreadPool* const threadPool) const;
+	void RebuildMassMatrix(ndThreadPool* const threadPool, const ndFloat32* const diagDamp) const;
+	void InitMassMatrix(ndThreadPool* const threadPool, const ndLeftHandSide* const matrixRow, ndRightHandSide* const rightHandSide);
+
 	void SortGraph(ndNode* const root, ndInt32& index);
-	void RebuildMassMatrix(const ndFloat32* const diagDamp) const;
-	void CalculateLoopMassMatrixCoefficients(ndFloat32* const diagDamp);
+	void CalculateLoopMassMatrixCoefficients(ndThreadPool* const threadPool, ndFloat32* const diagDamp);
 	void FactorizeMatrix(ndInt32 size, ndInt32 stride, ndFloat32* const matrix, ndFloat32* const diagDamp) const;
 	void SolveAuxiliary(ndJacobian* const internalForces, const ndForcePair* const accel, ndForcePair* const force) const;
 	void SolveBlockLcp(ndInt32 size, ndInt32 blockSize, ndFloat32* const x, ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex, ndFloat32 accelTol) const;
@@ -233,6 +237,7 @@ class ndSkeletonContainer
 		
 	ndNode* m_skeleton;
 	ndNode** m_nodesOrder;
+	ndNode** m_nodesFactorizationOrder;
 	ndRightHandSide* m_rightHandSide;
 	const ndLeftHandSide* m_leftHandSide;
 	ndNodePair* m_pairs;
@@ -245,6 +250,7 @@ class ndSkeletonContainer
 	ndFloat32* m_precondinonedMassMatrix11;
 
 	ndNodeList m_nodeList;
+	ndArray<ndUnsigned32> m_factorizeSpans;
 	ndArray<ndContact*> m_transientLoopingContacts;
 	ndArray<ndJointBilateralConstraint*> m_transientLoopingJoints;
 	ndArray<ndJointBilateralConstraint*> m_permanentLoopingJoints;

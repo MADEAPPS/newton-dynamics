@@ -1171,16 +1171,6 @@ void ndDynamicsUpdate::InitSkeletons()
 	ndScene* const scene = m_world->GetScene();
 	const ndArray<ndSkeletonContainer*>& activeSkeletons = m_world->m_activeSkeletons;
 
-	auto InitSkeletons = ndMakeObject::ndFunction([this, &activeSkeletons](ndInt32 groupId, ndInt32)
-	{
-		D_TRACKTIME_NAMED(InitSkeletons);
-		ndArray<ndRightHandSide>& rightHandSide = m_rightHandSide;
-		const ndArray<ndLeftHandSide>& leftHandSide = m_leftHandSide;
-
-		ndSkeletonContainer* const skeleton = activeSkeletons[groupId];
-		skeleton->InitMassMatrix(&leftHandSide[0], &rightHandSide[0]);
-	});
-
 	if (activeSkeletons.GetCount())
 	{
 		for (ndInt32 i = ndInt32(activeSkeletons.GetCount()) - 1; i >= 0; --i)
@@ -1191,9 +1181,35 @@ void ndDynamicsUpdate::InitSkeletons()
 				skeleton->AddExtraContacts();
 			}
 		}
-		const ndInt32 count = ndInt32(activeSkeletons.GetCount());
-		//scene->ParallelExecute(InitSkeletons, count, scene->OptimalGroupBatch(count));
-		scene->ParallelExecute(InitSkeletons, count, 2);
+
+		ndInt32 base = 0;
+		if (scene->GetThreadCount() > 1)
+		{
+			for (ndInt32 i = 0; i < activeSkeletons.GetCount(); ++i)
+			{
+				if (activeSkeletons[i]->GetNodeList().GetCount() > 4)
+				{
+					activeSkeletons[i]->InitMassMatrix(scene, &m_leftHandSide[0], &m_rightHandSide[0]);
+					base ++;
+				}
+			}
+		}
+
+		auto InitSkeletons = ndMakeObject::ndFunction([this, &activeSkeletons, base](ndInt32 groupId, ndInt32)
+		{
+			D_TRACKTIME_NAMED(InitSkeletons);
+			ndArray<ndRightHandSide>& rightHandSide = m_rightHandSide;
+			const ndArray<ndLeftHandSide>& leftHandSide = m_leftHandSide;
+
+			ndSkeletonContainer* const skeleton = activeSkeletons[base + groupId];
+			skeleton->InitMassMatrix(nullptr, &leftHandSide[0], &rightHandSide[0]);
+		});
+
+		const ndInt32 count = ndInt32(activeSkeletons.GetCount()) - base;
+		if (count)
+		{
+			scene->ParallelExecute(InitSkeletons, count, 1);
+		}
 	}
 }
 

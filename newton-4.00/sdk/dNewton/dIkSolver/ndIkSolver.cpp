@@ -502,7 +502,7 @@ void ndIkSolver::BuildMassMatrix()
 		BuildJacobianMatrix(contact);
 	}
 
-	m_skeleton->InitMassMatrix(&m_leftHandSide[0], &m_rightHandSide[0]);
+	m_skeleton->InitMassMatrix(nullptr, &m_leftHandSide[0], &m_rightHandSide[0]);
 }
 
 void ndIkSolver::SolverBegin(ndSkeletonContainer* const skeleton, ndJointBilateralConstraint* const* joints, ndInt32 jointCount, ndWorld* const world, ndFloat32 timestep)

@@ -788,6 +788,30 @@ void ndWorld::UpdateSkeletons()
 		ndSkeletonContainer* const skeleton = m_activeSkeletons[i];
 		skeleton->ClearCloseLoopJoints();
 	}
+
+	class CompareVertex
+	{
+		public:
+		CompareVertex(void*)
+		{
+		}
+
+		ndInt32 Compare(const ndSkeletonContainer* const skeletonA, const ndSkeletonContainer* const skeletonB) const
+		{
+			ndInt32 countA = (ndInt32)skeletonA->GetNodeList().GetCount();
+			ndInt32 countB = (ndInt32)skeletonB->GetNodeList().GetCount();
+			if (countA > countB)
+			{
+				return -1;
+			}
+			else if (countA < countB)
+			{
+				return 1;
+			}
+			return 0;
+		}
+	};
+	ndSort<ndSkeletonContainer*, CompareVertex>(&m_activeSkeletons[0], ndInt32 (m_activeSkeletons.GetCount()), nullptr);
 }
 
 bool ndWorld::RayCast(ndRayCastNotify& callback, const ndVector& globalOrigin, const ndVector& globalDest) const
