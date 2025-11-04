@@ -25,6 +25,12 @@
 class ndExcavatorController : public ndModelNotify
 {
 	public:
+	enum ndBodyPartType
+	{
+		m_chassis = 1,
+		m_thread,
+		m_roller,
+	};
 
 	class ndHelpLegend : public ndDemoEntityManager::ndDemoHelper
 	{
@@ -41,13 +47,6 @@ class ndExcavatorController : public ndModelNotify
 			scene->Print(color, "middle mouse click for rotate bucket");
 			scene->Print(color, "right and middle mouse click for rotate cabin");
 		}
-	};
-
-	enum ndBodyPartType
-	{
-		m_chassis = 1,
-		m_roller,
-		m_thread,
 	};
 
 	ndExcavatorController(
@@ -159,7 +158,6 @@ class ndExcavatorController : public ndModelNotify
 		ndSharedPtr<ndRenderSceneNode> visualMesh((visualMeshNode == *visualMeshRoot) ? visualMeshRoot : visualMeshRoot->GetSharedPtr());
 
 		ndFloat32 chassisMass = ndFloat32(4000.0f);
-		//ndFloat32 chassisMass = ndFloat32(0.0f);
 
 		// create the rigid that represent the chassis
 		ndSharedPtr<ndBody> chassisBody(new ndBodyDynamic());
@@ -256,7 +254,7 @@ class ndExcavatorController : public ndModelNotify
 		SetBodyType(&bodyBucket->GetAsBodyDynamic()->GetCollisionShape(), m_chassis);
 		const ndMatrix matrixBucket(ndRollMatrix(ndFloat32(90.0f) * ndDegreeToRad) * bodyBucket->GetMatrix());
 		ndSharedPtr<ndJointBilateralConstraint> jointBucket(new ndJointHinge(matrixBucket, bodyBucket->GetAsBodyDynamic(), bodyArm1->GetAsBodyDynamic()));
-		ndModelArticulation::ndNode* const buckectNode = articulation->AddLimb(armNode1, bodyBucket, jointBucket);
+		articulation->AddLimb(armNode1, bodyBucket, jointBucket);
 		m_bucketJoint = (ndJointHinge*)*jointBucket;
 		m_bucketJoint->SetAsSpringDamper(ndFloat32(0.1f), ndFloat32(2000.0f), ndFloat32(50.0f));
 
@@ -295,8 +293,26 @@ class ndExcavatorController : public ndModelNotify
 		const ndShapeInstance& slaveShape = slave->m_body->GetAsBodyKinematic()->GetCollisionShape();
 		const ndShapeInstance& masterShape = master->m_body->GetAsBodyKinematic()->GetCollisionShape();
 
-		ndFloat32 slaveRadio = slaveShape.GetScale().m_y;
-		ndFloat32 masterRadio = masterShape.GetScale().m_y;
+		auto GetRadios = [](const ndShapeInstance& shape)
+		{
+			//ndShapeCompound* const compoundTire = ((ndShape*)shape.GetShape())->GetAsShapeCompound();
+			//const ndShapeCompound::ndTreeArray& array = compoundTire->GetTree();
+			//ndShapeCompound::ndTreeArray::Iterator it(compoundTire->GetTree());
+			//
+			//ndFloat32 radios = ndFloat32(0.0f);
+			//for (it.Begin(); it; it++)
+			//{
+			//	ndShapeInstance* const subShape = compoundTire->GetShapeInstance(it.GetNode());
+			//	ndAssert (subShape->GetShape()->GetAsShapeChamferCylinder());
+			//	const ndShapeInfo info(subShape->GetShapeInfo());
+			//	radios = ndMax(radios, info.m_chamferCylinder.m_radius);
+			//}
+			const ndShapeInfo info(shape.GetShapeInfo());
+			//return info.m_chamferCylinder.m_radius;
+			return 1.0f;
+		};
+		ndFloat32 slaveRadio = GetRadios(slaveShape);
+		ndFloat32 masterRadio = GetRadios(masterShape);
 
 		ndMatrix pinMatrix0;
 		ndMatrix pinMatrix1;
@@ -474,20 +490,22 @@ class ndExcavatorController : public ndModelNotify
 		ndModelArticulation::ndNode* const firstLink = articulation->AddLimb(rootNode, linkBody, linkJoint);
 
 		// connent all threads planks with hinge joint
+		ndFloat32 linkDamper = ndFloat32 (5.0f);
+		ndFloat32 linkRegularizer = ndFloat32(0.15f);
 		ndModelArticulation::ndNode* linkNode0 = firstLink;
 		for (ndInt32 i = 1; i < linkArray.GetCount(); ++i)
 		{
 			ndSharedPtr<ndBody> body(MakeBodyPart(linkArray[i], visualMeshRoot, threadCollision, rootNode->m_body->GetAsBodyDynamic(), threadLinkMass));
 			ndMatrix hingeMatrix (ndRollMatrix(90.0f * ndDegreeToRad) * body->GetMatrix());
 			ndSharedPtr<ndJointBilateralConstraint> joint (new ndJointHinge(hingeMatrix, body->GetAsBodyKinematic(), linkNode0->m_body->GetAsBodyKinematic()));
-			((ndJointHinge*)*joint)->SetAsSpringDamper(ndFloat32(0.1f), ndFloat32(0.0f), ndFloat32(5.0f));
+			((ndJointHinge*)*joint)->SetAsSpringDamper(linkRegularizer, ndFloat32(0.0f), linkDamper);
 			ndModelArticulation::ndNode* const firstLink1 = articulation->AddLimb(linkNode0, body, joint);
 			linkNode0 = firstLink1;
 		}
 
 		ndMatrix hingeMatrix(ndRollMatrix(90.0f * ndDegreeToRad) * firstLink->m_body->GetMatrix());
 		ndSharedPtr<ndJointBilateralConstraint> joint(new ndJointHinge(hingeMatrix, linkNode0->m_body->GetAsBodyKinematic(), firstLink->m_body->GetAsBodyKinematic()));
-		((ndJointHinge*)*joint)->SetAsSpringDamper(ndFloat32(0.1f), ndFloat32(0.0f), ndFloat32(5.0f));
+		((ndJointHinge*)*joint)->SetAsSpringDamper(linkRegularizer, ndFloat32(0.0f), linkDamper);
 		articulation->AddCloseLoop(joint);
 	}
 
@@ -546,7 +564,7 @@ class ndExcavatorController : public ndModelNotify
 		engine->SetOffsetAngle1(fowardAngle + m_targetOmega * timestep);
 	}
 
-	void PostTransformUpdate(ndFloat32 timestep)
+	void PostTransformUpdate(ndFloat32)
 	{
 		ndBodyDynamic* const engine = m_engineNode->m_body->GetAsBodyDynamic();
 
@@ -656,7 +674,7 @@ class ndExcavatorController : public ndModelNotify
 				// prevent arm from get stucked in a violation by back tracking
 				for (ndInt32 i = 0; i < m_backTrackingArm.GetCount(); ++i)
 				{
-					ndVector posit(m_backTrackingArm[i]);
+					posit = ndVector(m_backTrackingArm[i]);
 					if (!m_armEffector->TestWorkSpaceViolation(posit))
 					{
 						x = posit.m_x;
