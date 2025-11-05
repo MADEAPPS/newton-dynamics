@@ -2083,26 +2083,38 @@ void ndSkeletonContainer::InitMassMatrix(ndThreadPool* const threadPool,
 		InitLoopMassMatrix(threadPool);
 
 #ifdef D_USING_PRECONDITIONER
-		ndInt32 stride = m_auxiliaryRowCount;
-		ndInt32 size = m_auxiliaryRowCount - m_blockSize;
+		const ndInt32 stride = m_auxiliaryRowCount;
+		const ndInt32 size = m_auxiliaryRowCount - m_blockSize;
 		const ndFloat32* const matrix = &m_massMatrix11[m_blockSize * stride + m_blockSize];
+
 		for (ndInt32 i = 0; i < size; ++i)
 		{
 			ndFloat32 diagSqrt = ndSqrt(matrix[i * stride + i]);
 			m_diagonalPreconditioner[i] = ndFloat32(1.0f) / diagSqrt;
 		}
 
-		ndInt32 rowBase = 0;
 		ndFloat32* const preconditionMatrix = &m_precondinonedMassMatrix11[0];
-		for (ndInt32 i = 0; i < size; ++i)
+		auto Precondition = ndMakeObject::ndFunction([this, stride, size, matrix, preconditionMatrix](ndInt32 groupId, ndInt32)
 		{
-			const ndFloat32* const srcRow = &matrix[rowBase];
-			ndFloat32* const dstRow = &preconditionMatrix[rowBase];
+			const ndFloat32* const srcRow = &matrix[groupId * stride];
+			ndFloat32* const dstRow = &preconditionMatrix[groupId * stride];
+			ndFloat32 diagonal = m_diagonalPreconditioner[groupId];
 			for (ndInt32 j = 0; j < size; ++j)
 			{
-				dstRow[j] = srcRow[j] * m_diagonalPreconditioner[i] * m_diagonalPreconditioner[j];
+				dstRow[j] = diagonal * srcRow[j] * m_diagonalPreconditioner[j];
 			}
-			rowBase += stride;
+		});
+
+		if (threadPool)
+		{
+			threadPool->ParallelExecute(Precondition, size, 2);
+		}
+		else
+		{
+			for (ndInt32 i = 0; i < size; ++i)
+			{
+				Precondition(i, 0);
+			}
 		}
 #endif	
 	}
