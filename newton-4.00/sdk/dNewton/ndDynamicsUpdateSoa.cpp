@@ -2924,18 +2924,29 @@
 		ndScene* const scene = m_world->GetScene();
 		const ndArray<ndSkeletonContainer*>& activeSkeletons = m_world->m_activeSkeletons;
 
-		auto InitSkeletons = ndMakeObject::ndFunction([this, &activeSkeletons](ndInt32 groupId, ndInt32)
-		{
-			D_TRACKTIME_NAMED(InitSkeletons);
-			ndArray<ndRightHandSide>& rightHandSide = m_rightHandSide;
-			const ndArray<ndLeftHandSide>& leftHandSide = m_leftHandSide;
-
-			ndSkeletonContainer* const skeleton = activeSkeletons[groupId];
-			skeleton->InitMassMatrix(nullptr, &leftHandSide[0], &rightHandSide[0]);
-		});
+		//auto InitSkeletons = ndMakeObject::ndFunction([this, &activeSkeletons](ndInt32 groupId, ndInt32)
+		//{
+		//	D_TRACKTIME_NAMED(InitSkeletons);
+		//	ndArray<ndRightHandSide>& rightHandSide = m_rightHandSide;
+		//	const ndArray<ndLeftHandSide>& leftHandSide = m_leftHandSide;
+		//
+		//	ndSkeletonContainer* const skeleton = activeSkeletons[groupId];
+		//	skeleton->InitMassMatrix(nullptr, &leftHandSide[0], &rightHandSide[0]);
+		//});
 
 		if (activeSkeletons.GetCount())
 		{
+			//for (ndInt32 i = ndInt32(activeSkeletons.GetCount()) - 1; i >= 0; --i)
+			//{
+			//	ndSkeletonContainer* const skeleton = activeSkeletons[i];
+			//	if (skeleton->m_transientLoopingContacts.GetCount())
+			//	{
+			//		skeleton->AddExtraContacts();
+			//	}
+			//}
+			//const ndInt32 count = ndInt32(activeSkeletons.GetCount());
+			//scene->ParallelExecute(InitSkeletons, count, 1);
+
 			for (ndInt32 i = ndInt32(activeSkeletons.GetCount()) - 1; i >= 0; --i)
 			{
 				ndSkeletonContainer* const skeleton = activeSkeletons[i];
@@ -2944,9 +2955,35 @@
 					skeleton->AddExtraContacts();
 				}
 			}
-			const ndInt32 count = ndInt32(activeSkeletons.GetCount());
-			//scene->ParallelExecute(InitSkeletons, count, scene->OptimalGroupBatch(count));
-			scene->ParallelExecute(InitSkeletons, count, 2);
+
+			m_parallelSkeletons = 0;
+			if (scene->GetThreadCount() > 1)
+			{
+				for (ndInt32 i = 0; i < activeSkeletons.GetCount(); ++i)
+				{
+					if (activeSkeletons[i]->GetNodeList().GetCount() > 4)
+					{
+						activeSkeletons[i]->InitMassMatrix(scene, &m_leftHandSide[0], &m_rightHandSide[0]);
+						m_parallelSkeletons++;
+					}
+				}
+			}
+
+			auto InitSkeletons = ndMakeObject::ndFunction([this, &activeSkeletons](ndInt32 groupId, ndInt32)
+			{
+				D_TRACKTIME_NAMED(InitSkeletons);
+				ndArray<ndRightHandSide>& rightHandSide = m_rightHandSide;
+				const ndArray<ndLeftHandSide>& leftHandSide = m_leftHandSide;
+
+				ndSkeletonContainer* const skeleton = activeSkeletons[m_parallelSkeletons + groupId];
+				skeleton->InitMassMatrix(nullptr, &leftHandSide[0], &rightHandSide[0]);
+			});
+
+			const ndInt32 count = ndInt32(activeSkeletons.GetCount()) - m_parallelSkeletons;
+			if (count)
+			{
+				scene->ParallelExecute(InitSkeletons, count, 1);
+			}
 		}
 	}
 
@@ -2965,9 +3002,20 @@
 			skeleton->CalculateReactionForces(nullptr, internalForces);
 		});
 
-		if (activeSkeletons.GetCount())
+		if (scene->GetThreadCount() > 1)
 		{
-			const ndInt32 count = ndInt32(activeSkeletons.GetCount());
+			ndAssert(m_parallelSkeletons <= activeSkeletons.GetCount());
+			ndJacobian* const internalForces = &GetInternalForces()[0];
+			for (ndInt32 i = 0; i < m_parallelSkeletons; ++i)
+			{
+				activeSkeletons[i]->CalculateReactionForces(scene, internalForces);
+			}
+		}
+
+		//if (activeSkeletons.GetCount())
+		const ndInt32 count = ndInt32(activeSkeletons.GetCount()) - m_parallelSkeletons;
+		if (count)
+		{
 			scene->ParallelExecute(UpdateSkeletons, count, 2);
 		}
 	}
