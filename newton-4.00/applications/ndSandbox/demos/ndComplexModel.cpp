@@ -562,8 +562,17 @@ class ndExcavatorController : public ndModelNotify
 		engine->SetOffsetAngle1(fowardAngle + m_targetOmega * timestep);
 	}
 
+	// here we chek of the body is almost sleepping, 
+	// and if se we just forse a sleep state. 
+	void CheckSleep() const
+	{
+		// for now do nothing.
+	}
+
 	void PostTransformUpdate(ndFloat32)
 	{
+		CheckSleep();
+
 		ndBodyDynamic* const engine = m_engineNode->m_body->GetAsBodyDynamic();
 
 		ndRender* const renderer = *m_scene->GetRenderer();
@@ -597,7 +606,6 @@ class ndExcavatorController : public ndModelNotify
 				engine->SetSleepState(false);
 			}
 		}
-
 
 		ndFloat32 mouseX;
 		ndFloat32 mouseY;
