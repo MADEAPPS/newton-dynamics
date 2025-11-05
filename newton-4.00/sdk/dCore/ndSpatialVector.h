@@ -86,6 +86,11 @@ class ndSpatialVector : public ndClassAlloc
 		return ndSpatialVector(m_data.m_low * A.m_data.m_low, m_data.m_high * A.m_data.m_high);
 	}
 
+	inline ndSpatialVector MulAdd(const ndSpatialVector& A, const ndSpatialVector& B) const
+	{
+		return ndSpatialVector(m_data.m_low.MulAdd(A.m_data.m_low, B.m_data.m_low), m_data.m_high.MulAdd(A.m_data.m_high, B.m_data.m_high));
+	}
+
 	inline ndFloat64 DotProduct(const ndSpatialVector& v) const
 	{
 		ndAssert(m_f[6] == ndFloat32(0.0f));
