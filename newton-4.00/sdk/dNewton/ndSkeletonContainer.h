@@ -210,11 +210,11 @@ class ndSkeletonContainer
 	void ClearCloseLoopJoints();
 	void CalculateBufferSizeInBytes();
 	void AddCloseLoopJoint(ndConstraint* const joint);
-	void CalculateReactionForces(ndJacobian* const internalForces);
 
 	void InitLoopMassMatrix(ndThreadPool* const threadPool);
 	void ConditionMassMatrix(ndThreadPool* const threadPool) const;
 	void RebuildMassMatrix(ndThreadPool* const threadPool, const ndFloat32* const diagDamp) const;
+	void CalculateReactionForces(ndThreadPool* const threadPool, ndJacobian* const internalForces);
 	void InitMassMatrix(ndThreadPool* const threadPool, const ndLeftHandSide* const matrixRow, ndRightHandSide* const rightHandSide);
 
 	void SortGraph(ndNode* const root, ndInt32& index);

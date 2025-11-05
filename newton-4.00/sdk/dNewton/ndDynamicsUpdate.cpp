@@ -1225,7 +1225,7 @@ void ndDynamicsUpdate::UpdateSkeletons()
 		ndJacobian* const internalForces = &GetInternalForces()[0];
 	
 		ndSkeletonContainer* const skeleton = activeSkeletons[groupId];
-		skeleton->CalculateReactionForces(internalForces);
+		skeleton->CalculateReactionForces(nullptr, internalForces);
 	});
 
 	if (activeSkeletons.GetCount())
