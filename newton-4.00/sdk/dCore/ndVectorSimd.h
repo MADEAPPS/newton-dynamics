@@ -1237,22 +1237,26 @@ class ndVector : public ndClassAlloc
 
 	inline ndVector BroadcastX() const
 	{
-		return _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(0, 0, 0, 0));
+		//return _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(0, 0, 0, 0));
+		return ndVector(m_x);
 	}
 
 	inline ndVector BroadcastY() const
 	{
-		return _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(1, 1, 1, 1));
+		//return _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(1, 1, 1, 1));
+		return ndVector(m_y);
 	}
 
 	inline ndVector BroadcastZ() const
 	{
-		return _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(2, 2, 2, 2));
+		//return _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(2, 2, 2, 2));
+		return ndVector(m_z);
 	}
 
 	inline ndVector BroadcastW() const
 	{
-		return _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(3, 3, 3, 3));
+		//return _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(3, 3, 3, 3));
+		return ndVector(m_w);
 	}
 
 	inline ndVector Scale(ndFloat32 s) const
