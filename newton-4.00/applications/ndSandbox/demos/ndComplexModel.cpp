@@ -37,15 +37,15 @@ class ndExcavatorController : public ndModelNotify
 		virtual void PresentHelp(ndDemoEntityManager* const scene) override
 		{
 			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			scene->Print(color, "implements a midium complexity articulated model");
-			scene->Print(color, "c key to player camera");
-			scene->Print(color, "a key for turning left");
-			scene->Print(color, "d key for turning right");
-			scene->Print(color, "w key for moving walking forward");
-			scene->Print(color, "s key for going walking backward");
-			scene->Print(color, "right mouse click for moving arm");
-			scene->Print(color, "middle mouse click for rotate bucket");
-			scene->Print(color, "right and middle mouse click for rotate cabin");
+			scene->Print(color, "implements a medium complexity articulated model");
+			scene->Print(color, "'c' change player camera");
+			scene->Print(color, "'a' turn left");
+			scene->Print(color, "'d' turn right");
+			scene->Print(color, "'w' moves forward");
+			scene->Print(color, "'s' moves backward");
+			scene->Print(color, "'right mouse click' move arm");
+			scene->Print(color, "'middle mouse click' rotate bucket");
+			scene->Print(color, "'right and middle mouse click' rotate cabin");
 		}
 	};
 
