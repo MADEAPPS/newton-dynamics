@@ -63,20 +63,20 @@ class ndSpatialMatrix : public ndClassAlloc
 
 	inline ndSpatialVector VectorTimeMatrix(const ndSpatialVector& jacobian) const
 	{
-		ndSpatialVector tmp(m_rows[0].Scale (jacobian[0]));
-		for (ndInt32 i = 1; i < 6; ++i) 
+		ndSpatialVector tmp(m_rows[0] * ndSpatialVector(jacobian[0]));
+		for (ndInt32 i = 1; i < 6; ++i)
 		{
-			tmp = tmp + m_rows[i].Scale(jacobian[i]);
+			tmp = tmp.MulAdd(m_rows[i], ndSpatialVector(jacobian[i]));
 		}
 		return tmp;
 	}
 
-	inline ndSpatialVector VectorTimeMatrix(const ndSpatialVector& jacobian, ndInt32 dof) const
+	inline ndSpatialVector VectorTimeMatrix(const ndSpatialVector& jacobian, const ndInt32 dof) const
 	{
-		ndSpatialVector tmp(ndFloat32 (0.0f));
-		for (ndInt32 i = 0; i < dof; ++i) 
+		ndSpatialVector tmp(m_rows[0] * ndSpatialVector(jacobian[0]));
+		for (ndInt32 i = 1; i < dof; ++i)
 		{
-			tmp = tmp + m_rows[i].Scale(jacobian[i]);
+			tmp = tmp.MulAdd(m_rows[i], ndSpatialVector(jacobian[i]));
 		}
 		return tmp;
 	}
