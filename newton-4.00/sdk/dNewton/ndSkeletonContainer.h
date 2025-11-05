@@ -211,29 +211,32 @@ class ndSkeletonContainer
 	void CalculateBufferSizeInBytes();
 	void AddCloseLoopJoint(ndConstraint* const joint);
 
-	void InitLoopMassMatrix(ndThreadPool* const threadPool);
-	void ConditionMassMatrix(ndThreadPool* const threadPool) const;
-	void RebuildMassMatrix(ndThreadPool* const threadPool, const ndFloat32* const diagDamp) const;
-	void CalculateReactionForces(ndThreadPool* const threadPool, ndJacobian* const internalForces);
-	void InitMassMatrix(ndThreadPool* const threadPool, const ndLeftHandSide* const matrixRow, ndRightHandSide* const rightHandSide);
-
 	void SortGraph(ndNode* const root, ndInt32& index);
 	void CalculateLoopMassMatrixCoefficients(ndThreadPool* const threadPool, ndFloat32* const diagDamp);
 	void FactorizeMatrix(ndInt32 size, ndInt32 stride, ndFloat32* const matrix, ndFloat32* const diagDamp) const;
-	void SolveAuxiliary(ndJacobian* const internalForces, const ndForcePair* const accel, ndForcePair* const force) const;
 	void SolveBlockLcp(ndInt32 size, ndInt32 blockSize, ndFloat32* const x, ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex, ndFloat32 accelTol) const;
 	void SolveLcp(ndInt32 stride, ndInt32 size, ndFloat32* const x, const ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex, ndFloat32 accelTol) const;
 
-	inline void SolveBackward(ndForcePair* const force) const;
-	inline void CalculateForce(ndForcePair* const force, const ndForcePair* const accel) const;
-	inline void UpdateForces(ndJacobian* const internalForces, const ndForcePair* const force) const;
-	inline void CalculateJointAccel(const ndJacobian* const internalForces, ndForcePair* const accel) const;
-	inline void SolveForward(ndForcePair* const force, const ndForcePair* const accel, ndInt32 startNode) const;
+	void SolveBackward(ndForcePair* const force) const;
+	void CalculateForce(ndForcePair* const force, const ndForcePair* const accel) const;
+	void UpdateForces(ndJacobian* const internalForces, const ndForcePair* const force) const;
+	
+	void SolveForward(ndForcePair* const force, const ndForcePair* const accel, ndInt32 startNode) const;
 
 	void SolveImmediate(ndIkSolver& solverInfo);
 	void UpdateForcesImmediate(const ndForcePair* const force) const;
 	void CalculateJointAccelImmediate(ndForcePair* const accel) const;
 	void SolveAuxiliaryImmediate(ndArray<ndBodyKinematic*>& bodyArray, ndForcePair* const force) const;
+
+	// parallezation
+	void InitLoopMassMatrix(ndThreadPool* const threadPool);
+	void ConditionMassMatrix(ndThreadPool* const threadPool) const;
+	void RebuildMassMatrix(ndThreadPool* const threadPool, const ndFloat32* const diagDamp) const;
+	void CalculateReactionForces(ndThreadPool* const threadPool, ndJacobian* const internalForces);
+	void CalculateJointAccel(ndThreadPool* const threadPool, const ndJacobian* const internalForces, ndForcePair* const accel) const;
+	void InitMassMatrix(ndThreadPool* const threadPool, const ndLeftHandSide* const matrixRow, ndRightHandSide* const rightHandSide);
+	void SolveAuxiliary(ndThreadPool* const threadPool, ndJacobian* const internalForces, const ndForcePair* const accel, ndForcePair* const force) const;
+
 		
 	ndNode* m_skeleton;
 	ndNode** m_nodesOrder;
