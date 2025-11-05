@@ -102,9 +102,6 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 	D_CORE_API void End();
 	D_CORE_API void TaskUpdate(ndInt32 threadIndex);
 
-	//template <typename Function>
-	//void ParallelExecute_old(const Function& function);
-
 	template <typename Function>
 	void ParallelExecute(const Function& function, ndInt32 workGroupCount, ndInt32 groupsPerThreads = D_WORKER_BATCH_SIZE);
 
