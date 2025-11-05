@@ -566,7 +566,50 @@ class ndExcavatorController : public ndModelNotify
 	// and if se we just forse a sleep state. 
 	void CheckSleep() const
 	{
-		// for now do nothing.
+		// here the application can be more aggressive with the sleep state
+		ndModelArticulation::ndNode* const root = GetModel()->GetAsModelArticulation()->GetRoot();
+		ndAssert(root);
+		
+		bool isSleeping = true;
+		for (ndModelArticulation::ndNode* node = root->GetFirstIterator(); node; node = node->GetNextIterator())
+		{
+			const ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+			if (!body->GetSleepState())
+			{
+				const ndVector accel(body->GetAccel());
+				if (accel.DotProduct(accel).GetScalar() > ndFloat32 (2.0f))
+				{
+					isSleeping = false;
+					break;
+				}
+				const ndVector alpha(body->GetAlpha());
+				if (alpha.DotProduct(alpha).GetScalar() > ndFloat32(5.0f))
+				{
+					isSleeping = false;
+					break;
+				}
+				const ndVector veloc(body->GetOmega());
+				if (veloc.DotProduct(veloc).GetScalar() > ndFloat32(0.5f))
+				{
+					isSleeping = false;
+					break;
+				}
+				const ndVector omega(body->GetVelocity());
+				if (omega.DotProduct(omega).GetScalar() > ndFloat32(0.5f))
+				{
+					isSleeping = false;
+					break;
+				}
+			}
+		}
+		if (isSleeping)
+		{
+			for (ndModelArticulation::ndNode* node = root->GetFirstIterator(); node; node = node->GetNextIterator())
+			{
+				ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
+				body->RestoreSleepState(true);
+			}
+		}
 	}
 
 	void PostTransformUpdate(ndFloat32)
