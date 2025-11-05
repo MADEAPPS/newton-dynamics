@@ -45,10 +45,34 @@ ndMatrix ndMatrix::Multiply3X3 (const ndMatrix &B) const
 
 ndMatrix ndMatrix::operator* (const ndMatrix &B) const
 {
-	return ndMatrix (B.m_front * m_front.BroadcastX() + B.m_up * m_front.BroadcastY() + B.m_right * m_front.BroadcastZ() + B.m_posit * m_front.BroadcastW(), 
-					 B.m_front * m_up.BroadcastX()    + B.m_up * m_up.BroadcastY()    + B.m_right * m_up.BroadcastZ()    + B.m_posit * m_up.BroadcastW(), 
-					 B.m_front * m_right.BroadcastX() + B.m_up * m_right.BroadcastY() + B.m_right * m_right.BroadcastZ() + B.m_posit * m_right.BroadcastW(), 
-					 B.m_front * m_posit.BroadcastX() + B.m_up * m_posit.BroadcastY() + B.m_right * m_posit.BroadcastZ() + B.m_posit * m_posit.BroadcastW()); 
+	//return Multiply(B);
+	//return ndMatrix (
+	//	B.m_front * m_front.BroadcastX() + B.m_up * m_front.BroadcastY() + B.m_right * m_front.BroadcastZ() + B.m_posit * m_front.BroadcastW(), 
+	//	B.m_front * m_up.BroadcastX()    + B.m_up * m_up.BroadcastY()    + B.m_right * m_up.BroadcastZ()    + B.m_posit * m_up.BroadcastW(), 
+	//	B.m_front * m_right.BroadcastX() + B.m_up * m_right.BroadcastY() + B.m_right * m_right.BroadcastZ() + B.m_posit * m_right.BroadcastW(), 
+	//	B.m_front * m_posit.BroadcastX() + B.m_up * m_posit.BroadcastY() + B.m_right * m_posit.BroadcastZ() + B.m_posit * m_posit.BroadcastW()); 
+
+	ndVector front(B.m_front * m_front.BroadcastX());
+	front = front.MulAdd(B.m_up, m_front.BroadcastY());
+	front = front.MulAdd(B.m_right, m_front.BroadcastZ());
+	front = front.MulAdd(B.m_posit, m_front.BroadcastW());
+
+	ndVector up(B.m_front * m_up.BroadcastX());
+	up = up.MulAdd(B.m_up, m_up.BroadcastY());
+	up = up.MulAdd(B.m_right, m_up.BroadcastZ());
+	up = up.MulAdd(B.m_posit, m_up.BroadcastW());
+
+	ndVector right(B.m_front * m_right.BroadcastX());
+	right = right.MulAdd(B.m_up, m_right.BroadcastY());
+	right = right.MulAdd(B.m_right, m_right.BroadcastZ());
+	right = right.MulAdd(B.m_posit, m_right.BroadcastW());
+
+	ndVector posit(B.m_front * m_posit.BroadcastX());
+	posit = posit.MulAdd(B.m_up, m_posit.BroadcastY());
+	posit = posit.MulAdd(B.m_right, m_posit.BroadcastZ());
+	posit = posit.MulAdd(B.m_posit, m_posit.BroadcastW());
+
+	return ndMatrix(front, up, right, posit);
 }
 
 void ndMatrix::TransformTriplex (ndFloat32* const dst, ndInt32 dstStrideInBytes, const ndFloat32* const src, ndInt32 srcStrideInBytes, ndInt32 count) const
