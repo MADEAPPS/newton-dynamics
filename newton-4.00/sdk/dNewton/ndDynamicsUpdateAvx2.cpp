@@ -2998,15 +2998,21 @@
 			}
 
 			m_parallelSkeletons = 0;
-			if (scene->GetThreadCount() > 1)
+			ndInt32 threadCount = scene->GetThreadCount();
+			if (threadCount > 1)
 			{
 				for (ndInt32 i = 0; i < activeSkeletons.GetCount(); ++i)
 				{
-					if (activeSkeletons[i]->GetNodeList().GetCount() > 4)
+					ndInt32 jointCount = activeSkeletons[i]->GetNodeList().GetCount();
+					if (jointCount > D_NUMBER_OF_PARALLER_SKELETON_JOINTS)
 					{
 						activeSkeletons[i]->InitMassMatrix(scene, &m_leftHandSide[0], &m_rightHandSide[0]);
 						m_parallelSkeletons++;
 					}
+				}
+				if (m_parallelSkeletons > threadCount)
+				{
+					m_parallelSkeletons = 0;
 				}
 			}
 

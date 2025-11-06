@@ -41,6 +41,7 @@
 class ndWorld;
 
 //#define D_USING_SINGLE_SOA_REGISTER
+#define D_NUMBER_OF_PARALLER_SKELETON_JOINTS	8
 
 D_MSV_NEWTON_CLASS_ALIGN_32
 class ndDynamicsUpdate : public ndClassAlloc
