@@ -22,6 +22,8 @@
 #include "ndDemoCameraNodeFlyby.h"
 #include "ndDebugDisplayRenderPass.h"
 
+#define MACHINE_LEARNING_BASE	100
+
 //#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// basic Stacks 
 //#define DEFAULT_SCENE	2		// basic friction
@@ -35,10 +37,13 @@
 //#define DEFAULT_SCENE	10		// basic compound shapes
 //#define DEFAULT_SCENE	11		// basic model, a npd vehicle prop
 //#define DEFAULT_SCENE	12		// basic ragdoll
-#define DEFAULT_SCENE	13		// complex model, impmnet an complex model with joints
+//#define DEFAULT_SCENE	13		// complex model, impmnet an complex model with joints
 //#define DEFAULT_SCENE	14		// basics mutibody vehicle
 //#define DEFAULT_SCENE	15		// object Placement
 //#define DEFAULT_SCENE	16		// third person player capsule
+
+
+#define DEFAULT_SCENE			(MACHINE_LEARNING_BASE + 0)	// train cart pole using SAC agent
 
 // legacy demos 
 //#define DEFAULT_SCENE	8		// particle fluid
@@ -82,6 +87,8 @@ void ndBasicStaticMeshCollision(ndDemoEntityManager* const scene);
 void ndPlayerCapsule_ThirdPerson(ndDemoEntityManager* const scene);
 void ndBasicSceneCompoundCollision(ndDemoEntityManager* const scene);
 
+void ndCartpoleTrainerContinue(ndDemoEntityManager* const scene);
+
 
 ndDemoEntityManager::ndDemos ndDemoEntityManager::m_demosSelection[] =
 {
@@ -112,7 +119,6 @@ ndDemoEntityManager::ndDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "heavy vehicle", ndHeavyVehicle},
 
 	{ "cartpole discrete controller", ndCartpoleDiscrete},
-	{ "cartpole continue controller", ndCartpoleContinue},
 	{ "unicycle controller", ndUnicycleController},
 	{ "quadruped animated", ndQuadruped_animation_test},
 	{ "quadruped sac", ndQuadruped_sac_test},
@@ -130,6 +136,13 @@ ndDemoEntityManager::ndDemos ndDemoEntityManager::m_demosSelection[] =
 	//{ "linked convex fracture", ndBasicFracture_2},
 	//{ "simple skin peeling fracture", ndBasicFracture_4},
 #endif
+
+
+};
+
+ndDemoEntityManager::ndDemos ndDemoEntityManager::m_machineLearning[]
+{
+	{ "carpole SAC", ndCartpoleTrainerContinue},
 };
 
 ndDemoEntityManager::ButtonKey::ButtonKey (bool state)
@@ -795,9 +808,6 @@ void ndDemoEntityManager::Cleanup ()
 	// create the newton world
 	m_world = new ndPhysicsWorld(this);
 	ApplyMenuOptions();
-	
-	// we start without 2d render
-	//m_renderDemoGUI = ndSharedPtr<ndUIEntity>();
 }
 
 void ndDemoEntityManager::ApplyMenuOptions()
@@ -879,7 +889,20 @@ void ndDemoEntityManager::ShowMainMenuBar()
 	
 			ImGui::EndMenu();
 		}
-	
+
+		if (ImGui::BeginMenu("MachineLearning"))
+		{
+			ndInt32 demosCount = ndInt32(sizeof(m_machineLearning) / sizeof m_machineLearning[0]);
+			for (ndInt32 i = 0; i < demosCount; ++i)
+			{
+				if (ImGui::MenuItem(m_machineLearning[i].m_name, ""))
+				{
+					m_currentScene = i + MACHINE_LEARNING_BASE;
+				}
+			}
+			ImGui::EndMenu();
+		}
+		
 		bool optionsOn = ImGui::BeginMenu("Options");
 		if (optionsOn) 
 		{
@@ -986,7 +1009,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 	}
 }
 
-void ndDemoEntityManager::LoadDemo(ndInt32 menu)
+void ndDemoEntityManager::LoadDemo(ndInt32 menuIndex)
 {
 	Cleanup();
 	
@@ -996,9 +1019,19 @@ void ndDemoEntityManager::LoadDemo(ndInt32 menu)
 	m_demoHelper = ndSharedPtr<ndDemoHelper>(nullptr);
 	m_defaultCamera = ndSharedPtr<ndRenderSceneNode>(new ndDemoCameraNodeFlyby(*m_renderer));
 	m_renderer->SetCamera(m_defaultCamera);
-	m_demosSelection[menu].m_demoLauncher(this);
-	
-	snprintf(newTitle, sizeof(newTitle), "Newton Dynamics %d.%.2i demo: %s", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION, m_demosSelection[menu].m_name);
+
+	if (menuIndex < MACHINE_LEARNING_BASE)
+	{
+		m_demosSelection[menuIndex].m_demoLauncher(this);
+		snprintf(newTitle, sizeof(newTitle), "Newton Dynamics %d.%.2i demo: %s", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION, m_demosSelection[menuIndex].m_name);
+	}
+	else
+	{
+		menuIndex -= MACHINE_LEARNING_BASE;
+		m_machineLearning[menuIndex].m_demoLauncher(this);
+		snprintf(newTitle, sizeof(newTitle), "Newton Dynamics %d.%.2i demo: %s", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION, m_machineLearning[menuIndex].m_name);
+	}
+
 	m_renderer->SetTitle(newTitle);
 	ApplyMenuOptions();
 	ndResetTimer();

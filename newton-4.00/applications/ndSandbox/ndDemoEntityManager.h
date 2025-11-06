@@ -254,6 +254,7 @@ class ndDemoEntityManager : public ndClassAlloc
 	
 	ndWorld::ndSolverModes m_solverMode;
 	static ndDemos m_demosSelection[];
+	static ndDemos m_machineLearning[];
 
 	friend class ndPhysicsWorld;
 };

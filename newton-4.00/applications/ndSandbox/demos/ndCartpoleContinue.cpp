@@ -10,19 +10,14 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndSkyBox.h"
-#include "ndUIEntity.h"
-#include "ndDemoMesh.h"
 #include "ndMeshLoader.h"
-#include "ndDemoCamera.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
-#include "ndDemoInstanceEntity.h"
 
-
+#if 0
 namespace ndContinueCarpole
 {
 	#define ND_TRAIN_AGENT
@@ -647,38 +642,38 @@ namespace ndContinueCarpole
 }
 
 using namespace ndContinueCarpole;
+#endif
 
-
-void ndCartpoleContinue(ndDemoEntityManager* const scene)
+void ndCartpoleTrainerContinue(ndDemoEntityManager* const scene)
 {
-	BuildFlatPlane(scene, true);
+	ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "marbleCheckBoard.png", 0.1f, true));
 
 	ndMatrix matrix(ndGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.11f;
-
-	ndMeshLoader loader;
-	ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("cartpole.fbx", scene));
-
-#ifdef ND_TRAIN_AGENT
-	ndSetRandSeed(42);
-	TrainingUpdata* const trainer = new TrainingUpdata(scene, matrix, modelMesh);
-	scene->RegisterPostUpdate(trainer);
-#else
-	ndWorld* const world = scene->GetWorld();
-	ndModelArticulation* const model = CreateModel(scene, matrix, modelMesh);
-	world->AddModel(model);
-	model->AddBodiesAndJointsToWorld();
-
-	// add the deep learning controller
-	char name[256];
-	char fileName[256];
-	snprintf(name, sizeof(name), "%s.dnn", CONTROLLER_NAME);
-	ndGetWorkingFileName(name, fileName);
-
-	ndSharedPtr<ndBrain> policy(ndBrainLoad::Load(fileName));
-	model->SetNotifyCallback(new RobotModelNotify(policy, model));
-#endif
-
+	
+	//ndMeshLoader loader;
+	//ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("cartpole.fbx", scene));
+	//
+	//#ifdef ND_TRAIN_AGENT
+	//ndSetRandSeed(42);
+	//TrainingUpdata* const trainer = new TrainingUpdata(scene, matrix, modelMesh);
+	//scene->RegisterPostUpdate(trainer);
+	//#else
+	//ndWorld* const world = scene->GetWorld();
+	//ndModelArticulation* const model = CreateModel(scene, matrix, modelMesh);
+	//world->AddModel(model);
+	//model->AddBodiesAndJointsToWorld();
+	//
+	//// add the deep learning controller
+	//char name[256];
+	//char fileName[256];
+	//snprintf(name, sizeof(name), "%s.dnn", CONTROLLER_NAME);
+	//ndGetWorkingFileName(name, fileName);
+	//
+	//ndSharedPtr<ndBrain> policy(ndBrainLoad::Load(fileName));
+	//model->SetNotifyCallback(new RobotModelNotify(policy, model));
+	//#endif
+	
 	matrix.m_posit.m_x -= 0.0f;
 	matrix.m_posit.m_y += 0.5f;
 	matrix.m_posit.m_z += 2.0f;
