@@ -23,7 +23,7 @@ namespace ndContinueCarpole
 
 	#define ND_TRAJECTORY_STEPS		(1024 * 4)
 	//#define D_PUSH_ACCEL			ndBrainFloat (-3.0f * DEMO_GRAVITY)
-	//#define D_REWARD_MIN_ANGLE		ndBrainFloat (20.0f * ndDegreeToRad)
+	#define D_REWARD_MIN_ANGLE		ndBrainFloat (20.0f * ndDegreeToRad)
 
 	enum ndActionSpace
 	{
@@ -42,180 +42,6 @@ namespace ndContinueCarpole
 #if 0
 	class RobotModelNotify : public ndModelNotify
 	{
-		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Agent
-		{
-			public:
-			ndControllerTrainer(const ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master)
-				:ndBrainAgentContinuePolicyGradient_Agent(master)
-				,m_solver()
-				,m_robot(nullptr)
-			{
-			}
-
-			ndControllerTrainer(const ndControllerTrainer& src)
-				:ndBrainAgentContinuePolicyGradient_Agent(src.m_owner)
-				,m_robot(nullptr)
-			{
-			}
-
-			ndBrainFloat CalculateReward()
-			{
-				return m_robot->GetReward();
-			}
-
-			bool IsTerminal() const
-			{
-				return m_robot->IsTerminal();
-			}
-
-			void GetObservation(ndBrainFloat* const observation)
-			{
-				m_robot->GetObservation(observation);
-			}
-
-			virtual void ApplyActions(ndBrainFloat* const actions)
-			{
-				m_robot->ApplyActions(actions);
-			}
-
-			void ResetModel()
-			{
-				m_robot->ResetModel();
-			}
-
-			ndIkSolver m_solver;
-			RobotModelNotify* m_robot;
-		};
-
-		public:
-		RobotModelNotify(ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>& master, ndModelArticulation* const robot)
-			:ndModelNotify()
-			,m_controller(nullptr)
-			,m_controllerTrainer(nullptr)
-		{
-			m_controllerTrainer = new ndControllerTrainer(master);
-			m_controllerTrainer->m_robot = this;
-			Init(robot);
-		}
-
-		RobotModelNotify(const ndSharedPtr<ndBrain>& policy, ndModelArticulation* const robot)
-			:ndModelNotify()
-			,m_controller(nullptr)
-			,m_controllerTrainer(nullptr)
-		{
-			m_controller = new ndController(policy);
-			m_controller->m_robot = this;
-			Init(robot);
-		}
-
-		RobotModelNotify(const RobotModelNotify& src)
-			:ndModelNotify(src)
-			,m_controller(src.m_controller)
-		{
-			//Init(robot);
-			ndAssert(0);
-		}
-
-		~RobotModelNotify()
-		{
-			if (m_controller)
-			{
-				delete m_controller;
-			}
-
-			if (m_controllerTrainer)
-			{
-				delete m_controllerTrainer;
-			}
-		}
-
-		ndModelNotify* Clone() const
-		{
-			return new RobotModelNotify(*this);
-		}
-
-		void Init(ndModelArticulation* const robot)
-		{
-			m_cart = robot->GetRoot()->m_body->GetAsBodyDynamic();
-			m_pole = robot->GetRoot()->GetLastChild()->m_body->GetAsBodyDynamic();
-			m_poleJoint = (ndJointHinge*)*robot->GetRoot()->GetLastChild()->m_joint;
-
-			m_cartMatrix = m_cart->GetMatrix();
-			m_poleMatrix = m_pole->GetMatrix();
-		}
-
-		//#pragma optimize( "", off )
-		ndFloat32 GetPoleAngle() const
-		{
-			const ndMatrix matrix(m_poleJoint->CalculateGlobalMatrix0());
-			ndFloat32 sinAngle = ndClamp (matrix.m_up.m_x, ndFloat32 (-0.99f), ndFloat32(0.99f));
-			ndFloat32 angle = ndAsin(sinAngle);
-			return angle;
-		}
-
-		//#pragma optimize( "", off )
-		bool IsTerminal() const
-		{
-			ndFloat32 angle = GetPoleAngle();
-			bool fail = ndAbs(angle) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
-			return fail;
-		}
-
-		//#pragma optimize( "", off )
-		ndReal GetReward() const
-		{
-			if (IsTerminal())
-			{
-				return ndReal(0.0f);
-			}
-
-			ndIkSolver& solver = m_controllerTrainer->m_solver;
-			ndSkeletonContainer* const skeleton = m_cart->GetSkeleton();
-			ndAssert(skeleton);
-
-			const ndVector savedForce(m_cart->GetForce());
-			ndVector testForce(savedForce);
-			testForce.m_x = ndFloat32(0.0f);
-			m_cart->SetForce(testForce);
-			m_poleJoint->SetAsSpringDamper(ndFloat32(1.0e-3f), ndFloat32(10000.0f), ndFloat32(100.0f));
-
-			ndFloat32 targetAngle = m_poleJoint->GetAngle() * ndFloat32(0.25f);
-			m_poleJoint->SetTargetAngle(targetAngle);
-
-			solver.SolverBegin(skeleton, nullptr, 0, GetModel()->GetWorld(), m_timestep);
-			solver.Solve();
-			ndVector boxAccel(m_cart->GetAccel());
-			solver.SolverEnd();
-
-			m_cart->SetForce(savedForce);
-			m_poleJoint->SetAsSpringDamper(ndFloat32(0.0), ndFloat32(0.0f), ndFloat32(0.0f));
-			ndFloat32 accelError = m_cart->GetInvMass() * savedForce.m_x - boxAccel.m_x;
-			ndFloat32 accelReward = ndReal(ndExp(-ndFloat32(0.5f) * accelError * accelError));
-
-			ndFloat32 angle = GetPoleAngle();
-			const ndVector veloc(m_cart->GetVelocity());
-			ndFloat32 angularReward = ndReal(ndExp(-ndFloat32(1000.0f) * angle * angle));
-			ndFloat32 speedReward = ndReal(ndExp(-ndFloat32(200.0f) * veloc.m_x * veloc.m_x));
-			//ndFloat32 timeLineReward = ndFloat32(m_controllerTrainer->m_trajectory.GetCount()) / ndFloat32(ND_TRAJECTORY_STEPS);
-			
-			//ndFloat32 reward = (angularReward + speedReward + timeLineReward) / ndFloat32(3.0f);
-			ndFloat32 reward = 0.25f * angularReward + 0.25f * speedReward + 0.5f * accelReward;
-			return ndReal(reward);
-		}
-
-		//#pragma optimize( "", off )
-		void GetObservation(ndBrainFloat* const observation)
-		{
-			ndVector omega(m_pole->GetOmega());
-			ndFloat32 angle = GetPoleAngle();
-			observation[m_poleAngle] = ndReal(angle);
-			observation[m_poleOmega] = ndReal(omega.m_z);
-
-			const ndVector cartVeloc(m_cart->GetVelocity());
-			ndFloat32 cartSpeed = cartVeloc.m_x;
-			observation[m_cartSpeed] = ndBrainFloat(cartSpeed);
-		}
-
 		void ApplyActions(ndBrainFloat* const actions)
 		{
 			ndVector force(m_cart->GetForce());
@@ -244,36 +70,6 @@ namespace ndContinueCarpole
 		{
 			return ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(20.0f);
 		}
-
-		void Update(ndFloat32 timestep)
-		{
-			m_timestep = timestep;
-			if (m_controllerTrainer)
-			{
-				m_controllerTrainer->Step();
-			}
-			else
-			{
-				m_controller->Step();
-			}
-		}
-
-		void PostUpdate(ndFloat32)
-		{
-		}
-
-		void PostTransformUpdate(ndFloat32)
-		{
-		}
-
-		ndMatrix m_cartMatrix;
-		ndMatrix m_poleMatrix;
-		ndController* m_controller;
-		ndControllerTrainer* m_controllerTrainer;
-		ndBodyDynamic* m_cart;
-		ndBodyDynamic* m_pole;
-		ndJointHinge* m_poleJoint;
-		ndFloat32 m_timestep;
 	};
 #endif
 
@@ -282,7 +78,6 @@ namespace ndContinueCarpole
 		class ndAgent : public ndBrainAgentOffPolicyGradient_Agent
 		{
 			public:
-			//ndControllerAgent(ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master, RobotModelNotify* const robot)
 			ndAgent(ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master, ndTrainerController* const owner)
 				:ndBrainAgentOffPolicyGradient_Agent(*master)
 				,m_owner (owner)
@@ -291,14 +86,12 @@ namespace ndContinueCarpole
 
 			ndBrainFloat CalculateReward()
 			{
-				//return m_robot->CalculateReward();
-				return 0;
+				return m_owner->CalculateReward();
 			}
 
 			bool IsTerminal() const
 			{
-				//return m_robot->IsTerminal();
-				return false;
+				return m_owner->IsTerminal();
 			}
 
 			void GetObservation(ndBrainFloat* const observation)
@@ -381,6 +174,13 @@ namespace ndContinueCarpole
 			return angle;
 		}
 
+		bool IsTerminal() const
+		{
+			ndFloat32 angle = GetPoleAngle();
+			bool fail = ndAbs(angle) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
+			return fail;
+		}
+
 		void GetObservation(ndBrainFloat* const observation)
 		{
 			ndVector omega(m_pole->GetOmega());
@@ -391,6 +191,46 @@ namespace ndContinueCarpole
 			const ndVector cartVeloc(m_cart->GetVelocity());
 			ndFloat32 cartSpeed = cartVeloc.m_x;
 			observation[m_cartSpeed] = ndBrainFloat(cartSpeed);
+		}
+
+		ndBrainFloat CalculateReward()
+		{
+			if (IsTerminal())
+			{
+				return ndReal(0.0f);
+			}
+
+			//ndIkSolver& solver = m_controllerTrainer->m_solver;
+			//ndSkeletonContainer* const skeleton = m_cart->GetSkeleton();
+			//ndAssert(skeleton);
+			//
+			//const ndVector savedForce(m_cart->GetForce());
+			//ndVector testForce(savedForce);
+			//testForce.m_x = ndFloat32(0.0f);
+			//m_cart->SetForce(testForce);
+			//m_poleJoint->SetAsSpringDamper(ndFloat32(1.0e-3f), ndFloat32(10000.0f), ndFloat32(100.0f));
+			//
+			//ndFloat32 targetAngle = m_poleJoint->GetAngle() * ndFloat32(0.25f);
+			//m_poleJoint->SetTargetAngle(targetAngle);
+			//
+			//solver.SolverBegin(skeleton, nullptr, 0, GetModel()->GetWorld(), m_timestep);
+			//solver.Solve();
+			//ndVector boxAccel(m_cart->GetAccel());
+			//solver.SolverEnd();
+			//m_cart->SetForce(savedForce);
+			//m_poleJoint->SetAsSpringDamper(ndFloat32(0.0), ndFloat32(0.0f), ndFloat32(0.0f));
+			//ndFloat32 accelError = m_cart->GetInvMass() * savedForce.m_x - boxAccel.m_x;
+			//ndFloat32 accelReward = ndReal(ndExp(-ndFloat32(0.5f) * accelError * accelError));
+
+			ndFloat32 accelReward = 0.0f;
+			
+			ndFloat32 angle = GetPoleAngle();
+			const ndVector veloc(m_cart->GetVelocity());
+			ndFloat32 angularReward = ndReal(ndExp(-ndFloat32(1000.0f) * angle * angle));
+			ndFloat32 speedReward = ndReal(ndExp(-ndFloat32(200.0f) * veloc.m_x * veloc.m_x));
+
+			ndFloat32 reward = 0.25f * angularReward + 0.25f * speedReward + 0.5f * accelReward;
+			return ndReal(reward);
 		}
 
 		ndSharedPtr<ndBody> m_cart;
