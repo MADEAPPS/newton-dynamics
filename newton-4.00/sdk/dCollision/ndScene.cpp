@@ -1424,23 +1424,23 @@ void ndScene::FindCollidingPairs()
 	ParallelExecute(FindPairsForward, numOfgroups, 1);
 	ParallelExecute(FindPairsBackward, numOfgroups, 1);
 
-	ndInt32 sum = 0;
+	ndInt32 sum0 = 0;
 	const ndInt32 threadCount = GetThreadCount();
 	for (ndInt32 i = 0; i < threadCount; ++i)
 	{
-		sum += ndInt32(m_partialNewPairs[i].GetCount());
+		sum0 += ndInt32(m_partialNewPairs[i].GetCount());
 	}
-	m_newPairs.SetCount(sum);
+	m_newPairs.SetCount(sum0);
 
-	sum = 0;
+	ndInt32 sum1 = 0;
 	for (ndInt32 i = 0; i < threadCount; ++i)
 	{
 		const ndArray<ndContactPairs>& newPairs = m_partialNewPairs[i];
 		const ndInt32 count = ndInt32(newPairs.GetCount());
 		if (count)
 		{
-			ndMemCpy(&m_newPairs[sum], &newPairs[0], count);
-			sum += count;
+			ndMemCpy(&m_newPairs[sum1], &newPairs[0], count);
+			sum1 += count;
 		}
 	}
 }
