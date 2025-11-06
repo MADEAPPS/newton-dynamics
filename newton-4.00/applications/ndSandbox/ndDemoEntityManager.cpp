@@ -889,19 +889,6 @@ void ndDemoEntityManager::ShowMainMenuBar()
 	
 			ImGui::EndMenu();
 		}
-
-		if (ImGui::BeginMenu("MachineLearning"))
-		{
-			ndInt32 demosCount = ndInt32(sizeof(m_machineLearning) / sizeof m_machineLearning[0]);
-			for (ndInt32 i = 0; i < demosCount; ++i)
-			{
-				if (ImGui::MenuItem(m_machineLearning[i].m_name, ""))
-				{
-					m_currentScene = i + MACHINE_LEARNING_BASE;
-				}
-			}
-			ImGui::EndMenu();
-		}
 		
 		bool optionsOn = ImGui::BeginMenu("Options");
 		if (optionsOn) 
@@ -962,7 +949,20 @@ void ndDemoEntityManager::ShowMainMenuBar()
 	
 			SetParticleUpdateMode();
 		}
-	
+
+		if (ImGui::BeginMenu("MachineLearning"))
+		{
+			ndInt32 demosCount = ndInt32(sizeof(m_machineLearning) / sizeof m_machineLearning[0]);
+			for (ndInt32 i = 0; i < demosCount; ++i)
+			{
+				if (ImGui::MenuItem(m_machineLearning[i].m_name, ""))
+				{
+					m_currentScene = i + MACHINE_LEARNING_BASE;
+				}
+			}
+			ImGui::EndMenu();
+		}
+
 		if (ImGui::BeginMenu("Help")) 
 		{
 			m_suspendPhysicsUpdate = true;
