@@ -194,7 +194,7 @@ class ndDemoEntityManager : public ndClassAlloc
 
 	void SetNextActiveCamera();
 
-	void RegisterPostUpdate(ndSharedPtr<OnPostUpdate>& postUpdate);
+	void RegisterPostUpdate(const ndSharedPtr<OnPostUpdate>& postUpdate);
 
 	private:
 	void Cleanup();
