@@ -811,7 +811,10 @@ void ndWorld::UpdateSkeletons()
 			return 0;
 		}
 	};
-	ndSort<ndSkeletonContainer*, CompareVertex>(&m_activeSkeletons[0], ndInt32 (m_activeSkeletons.GetCount()), nullptr);
+	if (m_activeSkeletons.GetCount())
+	{
+		ndSort<ndSkeletonContainer*, CompareVertex>(&m_activeSkeletons[0], ndInt32(m_activeSkeletons.GetCount()), nullptr);
+	}
 }
 
 bool ndWorld::RayCast(ndRayCastNotify& callback, const ndVector& globalOrigin, const ndVector& globalDest) const
