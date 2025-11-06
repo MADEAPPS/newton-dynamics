@@ -303,7 +303,7 @@ namespace ndContinueCarpole
 
 			void GetObservation(ndBrainFloat* const observation)
 			{
-				//m_robot->GetObservation(observation);
+				m_owner->GetObservation(observation);
 			}
 
 			virtual void ApplyActions(ndBrainFloat* const actions)
@@ -324,10 +324,47 @@ namespace ndContinueCarpole
 		{
 		}
 
-		void SetControllerTrainer(ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master)
+		void SetControllerTrainer(ndDemoEntityManager* const scene,
+			ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master,
+			ndSharedPtr<ndMesh> mesh, ndSharedPtr<ndRenderSceneNode> visualMesh)
 		{
 			m_controllerTrainer = ndSharedPtr<ndBrainAgentOffPolicyGradient_Agent>(new ndAgent(master, this));
 			master->SetAgent(m_controllerTrainer);
+
+			auto CreateRigidBody = [scene](ndSharedPtr<ndMesh>& mesh, ndSharedPtr<ndRenderSceneNode>& visualMesh, ndFloat32 mass, ndBodyDynamic* const parentBody)
+			{
+				ndSharedPtr<ndShapeInstance> shape(mesh->CreateCollision());
+
+				ndBodyKinematic* const body = new ndBodyDynamic();
+				body->SetNotifyCallback(new ndDemoEntityNotify(scene, visualMesh, parentBody));
+				body->SetMatrix(mesh->CalculateGlobalMatrix());
+				body->SetCollisionShape(*(*shape));
+				body->GetAsBodyDynamic()->SetMassMatrix(mass, *(*shape));
+				return body;
+			};
+
+			ndFloat32 cartMass = ndFloat32(5.0f);
+			ndFloat32 poleMass = ndFloat32(10.0f);
+
+			ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
+
+			// add the cart mesh and body
+			m_cart = ndSharedPtr<ndBody>(CreateRigidBody(mesh, visualMesh, cartMass, nullptr));
+			ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(m_cart);
+
+			// add the pole mesh and body
+			ndSharedPtr<ndMesh> poleMesh(mesh->GetChildren().GetFirst()->GetInfo());
+			ndSharedPtr<ndRenderSceneNode> poleEntity(visualMesh->GetChildren().GetFirst()->GetInfo());
+			m_pole = ndSharedPtr<ndBody> (CreateRigidBody(poleMesh, poleEntity, poleMass, m_cart->GetAsBodyDynamic()));
+			const ndMatrix poleMatrix(m_cart->GetMatrix());
+
+			m_poleHinge = ndSharedPtr<ndJointBilateralConstraint>(new ndJointHinge(poleMatrix, m_pole->GetAsBodyKinematic(), m_cart->GetAsBodyKinematic()));
+			model->AddLimb(modelRootNode, m_pole, m_poleHinge);
+
+			ndWorld* const world = scene->GetWorld();
+			const ndMatrix sliderMatrix(m_cart->GetMatrix());
+			ndSharedPtr<ndJointBilateralConstraint> xDirSlider(new ndJointSlider(sliderMatrix, m_cart->GetAsBodyKinematic(), world->GetSentinelBody()));
+			world->AddJoint(xDirSlider);
 		}
 
 		void Update(ndFloat32 timestep)
@@ -336,7 +373,29 @@ namespace ndContinueCarpole
 			m_controllerTrainer->Step();
 		}
 
+		ndFloat32 GetPoleAngle() const
+		{
+			const ndMatrix matrix(m_poleHinge->CalculateGlobalMatrix0());
+			ndFloat32 sinAngle = ndClamp(matrix.m_up.m_x, ndFloat32(-0.99f), ndFloat32(0.99f));
+			ndFloat32 angle = ndAsin(sinAngle);
+			return angle;
+		}
 
+		void GetObservation(ndBrainFloat* const observation)
+		{
+			ndVector omega(m_pole->GetOmega());
+			ndFloat32 angle = GetPoleAngle();
+			observation[m_poleAngle] = ndReal(angle);
+			observation[m_poleOmega] = ndReal(omega.m_z);
+			
+			const ndVector cartVeloc(m_cart->GetVelocity());
+			ndFloat32 cartSpeed = cartVeloc.m_x;
+			observation[m_cartSpeed] = ndBrainFloat(cartSpeed);
+		}
+
+		ndSharedPtr<ndBody> m_cart;
+		ndSharedPtr<ndBody> m_pole;
+		ndSharedPtr<ndJointBilateralConstraint> m_poleHinge;
 		ndSharedPtr<ndBrainAgentOffPolicyGradient_Agent> m_controllerTrainer;
 	};
 
@@ -406,48 +465,10 @@ namespace ndContinueCarpole
 			ndSharedPtr<ndMesh> mesh,
 			ndSharedPtr<ndRenderSceneNode> visualMesh)
 		{
-			auto CreateRigidBody = [scene](ndSharedPtr<ndMesh>& mesh, ndSharedPtr<ndRenderSceneNode>& visualMesh, ndFloat32 mass, ndBodyDynamic* const parentBody)
-			{
-				ndSharedPtr<ndShapeInstance> shape(mesh->CreateCollision());
-			
-				ndBodyKinematic* const body = new ndBodyDynamic();
-				body->SetNotifyCallback(new ndDemoEntityNotify(scene, visualMesh, parentBody));
-				body->SetMatrix(mesh->CalculateGlobalMatrix());
-				body->SetCollisionShape(*(*shape));
-				body->GetAsBodyDynamic()->SetMassMatrix(mass, *(*shape));
-				return body;
-			};
-			
-			ndFloat32 cartMass = ndFloat32(5.0f);
-			ndFloat32 poleMass = ndFloat32(10.0f);
-			
 			ndModelArticulation* const model = new ndModelArticulation();
-
-			// add the cart mesh and body
-			ndSharedPtr<ndBody> rootBody(CreateRigidBody(mesh, visualMesh, cartMass, nullptr));
-			ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(rootBody);
-
-			// add the pole mesh and body
-			ndSharedPtr<ndMesh> poleMesh(mesh->GetChildren().GetFirst()->GetInfo());
-			ndSharedPtr<ndRenderSceneNode> poleEntity(visualMesh->GetChildren().GetFirst()->GetInfo());
-			ndSharedPtr<ndBody> pole(CreateRigidBody(poleMesh, poleEntity, poleMass, rootBody->GetAsBodyDynamic()));
-			const ndMatrix poleMatrix(pole->GetMatrix());
-			ndSharedPtr<ndJointBilateralConstraint> poleHinge(new ndJointHinge(poleMatrix, pole->GetAsBodyKinematic(), rootBody->GetAsBodyKinematic()));
-			model->AddLimb(modelRootNode, pole, poleHinge);
-			
-			ndWorld* const world = scene->GetWorld();
-			const ndMatrix sliderMatrix(rootBody->GetMatrix());
-			ndSharedPtr<ndJointBilateralConstraint> xDirSlider(new ndJointSlider(sliderMatrix, rootBody->GetAsBodyKinematic(), world->GetSentinelBody()));
-			world->AddJoint(xDirSlider);
-			
-			////ndUrdfFile urdf;
-			////char fileName[256];
-			////ndGetWorkingFileName("cartpole.urdf", fileName);
-			////urdf.Export(fileName, model->GetAsModelArticulation());
-
 			ndSharedPtr<ndModelNotify> controller(new ndTrainerController());
 			model->SetNotifyCallback(controller);
-			((ndTrainerController*)(*controller))->SetControllerTrainer(m_master);
+			((ndTrainerController*)(*controller))->SetControllerTrainer(scene, m_master, mesh, visualMesh);
 
 			return model;
 		}
