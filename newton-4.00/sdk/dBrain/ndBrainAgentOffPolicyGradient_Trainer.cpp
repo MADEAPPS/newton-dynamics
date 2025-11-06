@@ -296,9 +296,7 @@ void ndBrainAgentOffPolicyGradient_Agent::Step()
 	GetObservation(&observation[0]);
 
 	bool isdead = IsTerminal();
-	//ndBrainFloat rewardScale = ndFloat32(1.0f) - owner->m_parameters.m_discountRewardFactor;
-	ndBrainFloat rewardScale = ndFloat32(1.0f);
-	ndBrainFloat reward = CalculateReward() * rewardScale;
+	ndBrainFloat reward = CalculateReward();
 
 	m_trajectory.SetReward(entryIndex, reward);
 	m_trajectory.SetTerminalState(entryIndex, isdead);
