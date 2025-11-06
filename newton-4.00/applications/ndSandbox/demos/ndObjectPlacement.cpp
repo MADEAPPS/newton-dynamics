@@ -69,7 +69,7 @@ class ndObjectPlacementCamera : public ndDemoCameraNode
 		,m_ghostPrimitive(nullptr)
 		,m_yaw(ndFloat32(0.0f))
 		,m_pitch(ndFloat32(0.0f))
-		,m_yawRate(ndFloat32(0.04f))
+		,m_yawRate(ndFloat32(0.02f))
 		,m_pitchRate(ndFloat32(0.02f))
 		,m_mousePosX(ndFloat32(0.0f))
 		,m_mousePosY(ndFloat32(0.0f))
