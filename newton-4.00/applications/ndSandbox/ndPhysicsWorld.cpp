@@ -142,6 +142,12 @@ void ndPhysicsWorld::PostUpdate(ndFloat32 timestep)
 {
 	ndWorld::PostUpdate(timestep);
 
+	if (m_manager->m_onPostUpdate)
+	{
+		m_manager->m_onPostUpdate->Update(m_manager, timestep);
+		m_manager->m_onPostUpdate->OnDebug(m_manager, m_manager->m_hidePostUpdate);
+	}
+
 	ndScopeSpinLock Lock(m_lock);
 
 	m_manager->SetNextActiveCamera();

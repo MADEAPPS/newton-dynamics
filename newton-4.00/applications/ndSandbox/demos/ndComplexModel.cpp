@@ -860,11 +860,9 @@ void ndComplexModel(ndDemoEntityManager* const scene)
 	ExcavatorThreadRollerMaterial material1;
 	callback->RegisterMaterial(material1, ndExcavatorController::m_thread, ndExcavatorController::m_roller);
 
-	ndRenderMeshLoader excavatorLoaded(*scene->GetRenderer());
-	excavatorLoaded.LoadMesh(ndGetWorkingFileName("excavator.nd"));
-	//ndSharedPtr<ndModelNotify> controller(ndBackGroundVehicleController::CreateAiVehicleProp(scene, ndVector::m_wOne, vmwLoaderRedPaint));
-
-	ndSharedPtr<ndModelNotify> controller(ndExcavatorController::CreateExcavator(scene, matrix, excavatorLoaded));
+	ndRenderMeshLoader loader(*scene->GetRenderer());
+	loader.LoadMesh(ndGetWorkingFileName("excavator.nd"));
+	ndSharedPtr<ndModelNotify> controller(ndExcavatorController::CreateExcavator(scene, matrix, loader));
 
 	ndMatrix matrix1(ndGetIdentityMatrix());
 	matrix1.m_posit.m_x += 10.0f;
@@ -874,9 +872,4 @@ void ndComplexModel(ndDemoEntityManager* const scene)
 	ndExcavatorController* const playerController = (ndExcavatorController*)*controller;
 	ndRender* const renderer = *scene->GetRenderer();
 	renderer->SetCamera(playerController->GetCamera());
-
-//matrix.m_posit.m_x -= 10.0f;
-//matrix.m_posit.m_y += 4.0f;
-//ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
-//scene->SetCameraMatrix(rotation, matrix.m_posit);
 }

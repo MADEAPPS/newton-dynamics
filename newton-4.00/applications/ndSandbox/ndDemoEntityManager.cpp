@@ -616,7 +616,6 @@ void ndDemoEntityManager::CursorposCallback(ndReal x, ndReal y)
 	io.MousePos = ImVec2(x, y);
 }
 
-//void ndDemoEntityManager::MouseScrollCallback(ndReal x, ndReal y)
 void ndDemoEntityManager::MouseScrollCallback(ndReal, ndReal y)
 {
 	//ndTrace(("%f %f\n", x, y));
@@ -643,7 +642,6 @@ void ndDemoEntityManager::MouseButtonCallback(ndInt32 button, ndInt32 action)
 	}
 }
 
-//void ndDemoEntityManager::KeyCallback(ndInt32 key, ndInt32 action)
 void ndDemoEntityManager::KeyCallback(ndInt32 key, ndInt32)
 {
 	if (key == ImGuiKey_F1)
@@ -660,7 +658,6 @@ void ndDemoEntityManager::KeyCallback(ndInt32 key, ndInt32)
 		//ndAssert(0);
 	}
 }
-
 
 bool ndDemoEntityManager::IsShiftKeyDown () const
 {
@@ -692,12 +689,6 @@ bool ndDemoEntityManager::GetMouseKeyState (ndInt32 button) const
 	return io.MouseDown[button];
 }
 
-////void ndDemoEntityManager::Set2DDisplayRenderFunction(ndSharedPtr<ndUIEntity>& demoGui)
-//void ndDemoEntityManager::Set2DDisplayRenderFunction(ndSharedPtr<ndUIEntity>&)
-//{
-//	//m_renderDemoGUI = demoGui;
-//}
-
 bool ndDemoEntityManager::JoystickDetected() const
 {
 	ndAssert(0);
@@ -705,7 +696,6 @@ bool ndDemoEntityManager::JoystickDetected() const
 	//return glfwJoystickPresent(0) ? true : false;
 }
 
-//void ndDemoEntityManager::GetJoystickAxis (ndFixSizeArray<ndFloat32, 8>& axisValues)
 void ndDemoEntityManager::GetJoystickAxis(ndFixSizeArray<ndFloat32, 8>&)
 {
 	ndAssert(0);
@@ -757,7 +747,6 @@ void ndDemoEntityManager::GetJoystickAxis(ndFixSizeArray<ndFloat32, 8>&)
 	//}
 }
 
-//void ndDemoEntityManager::GetJoystickButtons(ndFixSizeArray<char, 32>& axisbuttons)
 void ndDemoEntityManager::GetJoystickButtons(ndFixSizeArray<char, 32>&)
 {
 	ndAssert(0);
@@ -773,6 +762,11 @@ void ndDemoEntityManager::GetJoystickButtons(ndFixSizeArray<char, 32>&)
 	//		axisbuttons.PushBack(char(buttons[i]));
 	//	}
 	//}
+}
+
+void ndDemoEntityManager::RegisterPostUpdate(ndSharedPtr<OnPostUpdate>& postUpdate)
+{
+	m_onPostUpdate = postUpdate;
 }
 
 void ndDemoEntityManager::AddEntity(const ndSharedPtr<ndRenderSceneNode>& entity)
@@ -796,6 +790,7 @@ void ndDemoEntityManager::Cleanup ()
 	}
 
 	m_renderer->ResetScene();
+	RegisterPostUpdate(ndSharedPtr<OnPostUpdate>(nullptr));
 	
 	// destroy the Newton world
 	if (m_world) 

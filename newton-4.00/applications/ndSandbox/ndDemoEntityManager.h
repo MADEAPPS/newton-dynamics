@@ -118,6 +118,22 @@ class ndDemoEntityManager : public ndClassAlloc
 		ndUnsigned64 m_currentTime;
 	};
 
+	class OnPostUpdate : public ndClassAlloc
+	{
+		public:
+		OnPostUpdate()
+			:ndClassAlloc()
+		{
+		}
+
+		virtual ~OnPostUpdate()
+		{
+		}
+
+		virtual void OnDebug(ndDemoEntityManager* const, bool) {}
+		virtual void Update(ndDemoEntityManager* const scene, ndFloat32 timestep) = 0;
+	};
+
 	class ButtonKey
 	{
 		public:
@@ -178,6 +194,8 @@ class ndDemoEntityManager : public ndClassAlloc
 
 	void SetNextActiveCamera();
 
+	void RegisterPostUpdate(ndSharedPtr<OnPostUpdate>& postUpdate);
+
 	private:
 	void Cleanup();
 
@@ -210,6 +228,8 @@ class ndDemoEntityManager : public ndClassAlloc
 
 	ndSharedPtr<ndDemoHelper> m_demoHelper;
 	ndSharedPtr<ndRenderSceneNode> m_defaultCamera;
+
+	ndSharedPtr<OnPostUpdate> m_onPostUpdate;
 
 	ndInt32 m_currentScene;
 	ndInt32 m_lastCurrentScene;
