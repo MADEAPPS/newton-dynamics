@@ -305,6 +305,16 @@ namespace ndContinueCarpole
 	};
 #endif
 
+	class ndTrainerController : public ndModelNotify
+	{
+		public:
+		ndTrainerController()
+			:ndModelNotify()
+		{
+
+		}
+	};
+
 	class TrainingUpdata : public ndDemoEntityManager::OnPostUpdate
 	{
 		public:
@@ -348,34 +358,14 @@ namespace ndContinueCarpole
 			ndSharedPtr<ndRenderSceneNode> visualMesh(loader.m_renderMesh->Clone());
 			visualMesh->SetTransform(loader.m_mesh->m_matrix);
 			visualMesh->SetTransform(loader.m_mesh->m_matrix);
-			scene->AddEntity(visualMesh);
 
-			// create an articulated model, and add it to the world
+			// create an articulated model
 			ndSharedPtr<ndModel>model(CreateModel(scene, loader.m_mesh, visualMesh));
 
+			// add model a visual mesh to the scene and world
 			world->AddModel(model);
+			scene->AddEntity(visualMesh);
 			model->AddBodiesAndJointsToWorld();
-#if 0
-			visualModel->SetNotifyCallback(new RobotModelNotify(m_master, visualModel->GetAsModelArticulation()));
-			SetMaterial(visualModel->GetAsModelArticulation());
-
-			// add a hidden battery of model to generate trajectories in parallel
-			const ndInt32 countX = 100;
-			//const ndInt32 countX = 0;
-			for (ndInt32 i = 0; i < countX; ++i)
-			{
-				ndMatrix location(matrix);
-				location.m_posit.m_x += 10.0f * (ndRand() - 0.5f);
-				ndSharedPtr<ndModel>model(CreateModel(scene, location, modelMesh));
-				world->AddModel(model);
-				model->AddBodiesAndJointsToWorld();
-				model->SetNotifyCallback(new RobotModelNotify(m_master, model->GetAsModelArticulation()));
-				SetMaterial(model->GetAsModelArticulation());
-
-				m_models.Append(model->GetAsModelArticulation());
-			}
-			scene->SetAcceleratedUpdate();
-#endif
 		}
 
 		~TrainingUpdata()
@@ -386,51 +376,54 @@ namespace ndContinueCarpole
 			}
 		}
 
-
 		ndModelArticulation* CreateModel(
 			ndDemoEntityManager* const scene, 
 			ndSharedPtr<ndMesh> mesh,
 			ndSharedPtr<ndRenderSceneNode> visualMesh)
 		{
 			ndModelArticulation* const model = new ndModelArticulation();
-			//ndSharedPtr<ndDemoEntity> entity(modelMesh->GetChildren().GetFirst()->GetInfo()->CreateClone());
-			//scene->AddEntity(entity);
-			//
-			//auto CreateRigidBody = [scene](ndSharedPtr<ndDemoEntity>& entity, const ndMatrix& matrix, ndFloat32 mass, ndBodyDynamic* const parentBody)
-			//{
-			//	ndSharedPtr<ndShapeInstance> shape(entity->CreateCollision());
-			//
-			//	ndBodyKinematic* const body = new ndBodyDynamic();
-			//	body->SetNotifyCallback(new ndBindingRagdollEntityNotify(scene, entity, parentBody, 100.0f));
-			//	body->SetMatrix(matrix);
-			//	body->SetCollisionShape(*(*shape));
-			//	body->GetAsBodyDynamic()->SetMassMatrix(mass, *(*shape));
-			//	return body;
-			//};
-			//
-			//ndFloat32 cartMass = 5.0f;
-			//ndFloat32 poleMass = 10.0f;
-			//
-			//ndMatrix matrix(entity->GetCurrentMatrix() * location);
-			//matrix.m_posit = location.m_posit;
-			//ndSharedPtr<ndBody> rootBody(CreateRigidBody(entity, matrix, cartMass, nullptr));
-			//ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(rootBody);
-			//
-			//ndSharedPtr<ndDemoEntity> poleEntity(entity->GetChildren().GetFirst()->GetInfo());
-			//const ndMatrix poleMatrix(poleEntity->GetCurrentMatrix() * matrix);
-			//ndSharedPtr<ndBody> pole(CreateRigidBody(poleEntity, poleMatrix, poleMass, rootBody->GetAsBodyDynamic()));
-			//ndSharedPtr<ndJointBilateralConstraint> poleHinge(new ndJointHinge(poleMatrix, pole->GetAsBodyKinematic(), rootBody->GetAsBodyKinematic()));
-			//model->AddLimb(modelRootNode, pole, poleHinge);
-			//
-			//ndWorld* const world = scene->GetWorld();
-			//const ndMatrix sliderMatrix(rootBody->GetMatrix());
-			//ndSharedPtr<ndJointBilateralConstraint> xDirSlider(new ndJointSlider(sliderMatrix, rootBody->GetAsBodyKinematic(), world->GetSentinelBody()));
-			//world->AddJoint(xDirSlider);
-			//
+			
+			auto CreateRigidBody = [scene](ndSharedPtr<ndMesh>& mesh, ndSharedPtr<ndRenderSceneNode>& visualMesh, ndFloat32 mass, ndBodyDynamic* const parentBody)
+			{
+				ndSharedPtr<ndShapeInstance> shape(mesh->CreateCollision());
+			
+				ndBodyKinematic* const body = new ndBodyDynamic();
+				body->SetNotifyCallback(new ndDemoEntityNotify(scene, visualMesh, parentBody));
+				body->SetMatrix(mesh->CalculateGlobalMatrix());
+				body->SetCollisionShape(*(*shape));
+				body->GetAsBodyDynamic()->SetMassMatrix(mass, *(*shape));
+				return body;
+			};
+			
+			ndFloat32 cartMass = ndFloat32(5.0f);
+			ndFloat32 poleMass = ndFloat32(10.0f);
+			
+			// add the cart mesh and body
+			ndSharedPtr<ndBody> rootBody(CreateRigidBody(mesh, visualMesh, cartMass, nullptr));
+			ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(rootBody);
+
+			// add the pole mesh and body
+			ndSharedPtr<ndMesh> poleMesh(mesh->GetChildren().GetFirst()->GetInfo());
+			ndSharedPtr<ndRenderSceneNode> poleEntity(visualMesh->GetChildren().GetFirst()->GetInfo());
+			ndSharedPtr<ndBody> pole(CreateRigidBody(poleMesh, poleEntity, poleMass, rootBody->GetAsBodyDynamic()));
+			const ndMatrix poleMatrix(pole->GetMatrix());
+			ndSharedPtr<ndJointBilateralConstraint> poleHinge(new ndJointHinge(poleMatrix, pole->GetAsBodyKinematic(), rootBody->GetAsBodyKinematic()));
+			model->AddLimb(modelRootNode, pole, poleHinge);
+			
+			ndWorld* const world = scene->GetWorld();
+			const ndMatrix sliderMatrix(rootBody->GetMatrix());
+			ndSharedPtr<ndJointBilateralConstraint> xDirSlider(new ndJointSlider(sliderMatrix, rootBody->GetAsBodyKinematic(), world->GetSentinelBody()));
+			world->AddJoint(xDirSlider);
+			
 			////ndUrdfFile urdf;
 			////char fileName[256];
 			////ndGetWorkingFileName("cartpole.urdf", fileName);
 			////urdf.Export(fileName, model->GetAsModelArticulation());
+
+			ndSharedPtr<ndModel> vehicleModel(new ndModelArticulation());
+			ndSharedPtr<ndModelNotify> controller(new ndTrainerController());
+			vehicleModel->SetNotifyCallback(controller);
+
 			return model;
 		}
 
@@ -666,6 +659,9 @@ void ndCartpoleContinueTraining(ndDemoEntityManager* const scene)
 	ndSetRandSeed(42);
 	ndSharedPtr<ndDemoEntityManager::OnPostUpdate>trainer (new TrainingUpdata(scene, matrix, loader));
 	scene->RegisterPostUpdate(trainer);
+
+	// supress v sync refress rate
+	//scene->SetAcceleratedUpdate();
 	
 	matrix.m_posit.m_x -= 0.0f;
 	matrix.m_posit.m_y += 0.5f;
