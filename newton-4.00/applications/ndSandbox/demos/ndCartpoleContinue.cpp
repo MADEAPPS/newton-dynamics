@@ -19,13 +19,11 @@
 
 namespace ndContinueCarpole
 {
-#if 0
-	#define ND_TRAIN_AGENT
 	#define CONTROLLER_NAME			"cartpoleContinue"
 
 	#define ND_TRAJECTORY_STEPS		(1024 * 4)
-	#define D_PUSH_ACCEL			ndBrainFloat (-3.0f * DEMO_GRAVITY)
-	#define D_REWARD_MIN_ANGLE		ndBrainFloat (20.0f * ndDegreeToRad)
+	//#define D_PUSH_ACCEL			ndBrainFloat (-3.0f * DEMO_GRAVITY)
+	//#define D_REWARD_MIN_ANGLE		ndBrainFloat (20.0f * ndDegreeToRad)
 
 	enum ndActionSpace
 	{
@@ -41,6 +39,7 @@ namespace ndContinueCarpole
 		m_observationsSize
 	};
 
+#if 0
 	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndSharedPtr<ndDemoEntity>& modelMesh)
 	{
 #if 0
@@ -360,7 +359,7 @@ namespace ndContinueCarpole
 	{
 		public:
 		//TrainingUpdata(ndDemoEntityManager* const scene, const ndMatrix& matrix, const ndSharedPtr<ndDemoEntity>& modelMesh)
-			TrainingUpdata(ndDemoEntityManager* const scene, const ndMatrix& matrix, ndRenderMeshLoader loader)
+		TrainingUpdata(ndDemoEntityManager* const scene, const ndMatrix& location, const ndRenderMeshLoader& loader)
 			:OnPostUpdate()
 			,m_master()
 			,m_bestActor()
@@ -374,27 +373,35 @@ namespace ndContinueCarpole
 			,m_stopTraining(100 * 1000000)
 			,m_modelIsTrained(false)
 		{
-			ndAssert(0);
-#if 0
 			char name[256];
 			snprintf(name, sizeof(name), "%s-vpg.csv", CONTROLLER_NAME);
 			m_outFile = fopen(name, "wb");
 			fprintf(m_outFile, "vpg\n");
 
-			ndBrainAgentContinuePolicyGradient_TrainerMaster::HyperParameters hyperParameters;
-
+			// create a Soft Actor Critic traniing agent
+			ndBrainAgentOffPolicyGradient_Trainer::HyperParameters hyperParameters;
 			hyperParameters.m_numberOfActions = m_actionsSize;
 			hyperParameters.m_numberOfObservations = m_observationsSize;
-			hyperParameters.m_maxTrajectorySteps = ND_TRAJECTORY_STEPS;
-			hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
-
-			m_master = ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster>(new ndBrainAgentContinuePolicyGradient_TrainerMaster(hyperParameters));
+			m_master = ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>(new ndBrainAgentOffPolicyGradient_Trainer(hyperParameters));
+			
 			m_bestActor = ndSharedPtr< ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
 
 			snprintf(name, sizeof(name), "%s.dnn", CONTROLLER_NAME);
 			m_master->SetName(name);
 
+			// create a visual mesh and add to the scene.
 			ndWorld* const world = scene->GetWorld();
+			ndMatrix matrix(location);
+			matrix.m_posit = FindFloor(*scene->GetWorld(), matrix.m_posit, 200.0f);
+			matrix.m_posit.m_y += ndFloat32 (0.1f);
+			loader.m_mesh->m_matrix = loader.m_mesh->m_matrix * matrix;
+
+			ndSharedPtr<ndRenderSceneNode> visualMesh(loader.m_renderMesh->Clone());
+			visualMesh->SetTransform(loader.m_mesh->m_matrix);
+			visualMesh->SetTransform(loader.m_mesh->m_matrix);
+			scene->AddEntity(visualMesh);
+
+#if 0
 			ndSharedPtr<ndModel>visualModel(CreateModel(scene, matrix, modelMesh));
 			world->AddModel(visualModel);
 			visualModel->AddBodiesAndJointsToWorld();
@@ -526,7 +533,7 @@ namespace ndContinueCarpole
 
 		virtual void Update(ndDemoEntityManager* const manager, ndFloat32)
 		{
-			ndAssert(0);
+			//ndAssert(0);
 #if 0
 			ndUnsigned32 stopTraining = m_master->GetFramesCount();
 			if (stopTraining <= m_stopTraining)
@@ -594,7 +601,7 @@ namespace ndContinueCarpole
 #endif
 		}
 
-		ndSharedPtr<ndBrainAgentContinuePolicyGradient_TrainerMaster> m_master;
+		ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer> m_master;
 		ndSharedPtr<ndBrain> m_bestActor;
 		ndList<ndModelArticulation*> m_models;
 		FILE* m_outFile;
@@ -650,13 +657,11 @@ void ndCartpolePlayerContinue(ndDemoEntityManager* const scene)
 	//scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
 
-void ndCartpoleTrainerContinue(ndDemoEntityManager* const scene)
+void ndCartpoleContinueTraining(ndDemoEntityManager* const scene)
 {
 	ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "marbleCheckBoard.png", 0.1f, true));
 
 	ndMatrix matrix(ndGetIdentityMatrix());
-	matrix.m_posit.m_y = 0.11f;
-	
 	ndRenderMeshLoader loader(*scene->GetRenderer());
 	loader.LoadMesh(ndGetWorkingFileName("cartpole.nd"));
 

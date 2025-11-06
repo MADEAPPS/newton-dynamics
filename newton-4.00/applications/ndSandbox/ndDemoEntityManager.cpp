@@ -37,12 +37,13 @@
 //#define DEFAULT_SCENE	10		// basic compound shapes
 //#define DEFAULT_SCENE	11		// basic model, a npd vehicle prop
 //#define DEFAULT_SCENE	12		// basic ragdoll
-#define DEFAULT_SCENE	13		// complex model, implement a complex model with joints
+//#define DEFAULT_SCENE	13		// complex model, implement a complex model with joints
 //#define DEFAULT_SCENE	14		// basics mutibody vehicle
 //#define DEFAULT_SCENE	15		// object Placement
 //#define DEFAULT_SCENE	16		// third person player capsule
 
-//#define DEFAULT_SCENE			(MACHINE_LEARNING_BASE + 0)	// train cart pole using SAC agent
+// These are the machine learning training demos
+#define DEFAULT_SCENE			(MACHINE_LEARNING_BASE + 0)	// train cart pole using SAC agent
 
 
 // legacy demos 
@@ -87,7 +88,7 @@ void ndBasicStaticMeshCollision(ndDemoEntityManager* const scene);
 void ndPlayerCapsule_ThirdPerson(ndDemoEntityManager* const scene);
 void ndBasicSceneCompoundCollision(ndDemoEntityManager* const scene);
 
-void ndCartpoleTrainerContinue(ndDemoEntityManager* const scene);
+void ndCartpoleContinueTraining(ndDemoEntityManager* const scene);
 
 
 ndDemoEntityManager::ndDemos ndDemoEntityManager::m_demosSelection[] =
@@ -142,7 +143,7 @@ ndDemoEntityManager::ndDemos ndDemoEntityManager::m_demosSelection[] =
 
 ndDemoEntityManager::ndDemos ndDemoEntityManager::m_machineLearning[]
 {
-	{ "carpole SAC", ndCartpoleTrainerContinue},
+	{ "carpole SAC", ndCartpoleContinueTraining},
 };
 
 ndDemoEntityManager::ButtonKey::ButtonKey (bool state)
