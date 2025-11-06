@@ -96,7 +96,7 @@ ndDemoEntityManager::ndDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic stacking", ndBasicStacks},
 	{ "basic friction", ndBasicFriction},
 	{ "basic sliding ground", ndBasicSlidingPlatform},
-	{ "basic triger", ndBasicTrigger},
+	{ "basic trigger", ndBasicTrigger},
 	{ "basic momentum conservation", ndBasicAngularMomentum},
 	{ "basic joints", ndBasicJoints},
 	{ "basic static mesh collision", ndBasicStaticMeshCollision},
@@ -764,7 +764,7 @@ void ndDemoEntityManager::GetJoystickButtons(ndFixSizeArray<char, 32>&)
 	//}
 }
 
-void ndDemoEntityManager::RegisterPostUpdate(ndSharedPtr<OnPostUpdate>& postUpdate)
+void ndDemoEntityManager::RegisterPostUpdate(const ndSharedPtr<OnPostUpdate>& postUpdate)
 {
 	m_onPostUpdate = postUpdate;
 }
