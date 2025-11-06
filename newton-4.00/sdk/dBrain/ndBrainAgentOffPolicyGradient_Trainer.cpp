@@ -350,7 +350,6 @@ ndBrainAgentOffPolicyGradient_Trainer::ndBrainAgentOffPolicyGradient_Trainer(con
 	m_randomGenerator.seed(ndRandInt());
 	
 	m_parameters.m_numberOfUpdates = ndMax(m_parameters.m_numberOfUpdates, 2);
-	m_parameters.m_numberOfUpdates = ndMax(m_parameters.m_numberOfUpdates, 2);
 	m_parameters.m_discountRewardFactor = ndClamp(m_parameters.m_discountRewardFactor, ndBrainFloat(0.1f), ndBrainFloat(0.999f));
 
 	if (m_parameters.m_useGpuBackend)
@@ -1146,7 +1145,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::Optimize()
 	}
 }
 
-#pragma optimize( "", off )
+//#pragma optimize( "", off )
 void ndBrainAgentOffPolicyGradient_Trainer::OptimizeStep()
 {
 	SaveTrajectory();

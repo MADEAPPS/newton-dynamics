@@ -42,34 +42,6 @@ namespace ndContinueCarpole
 #if 0
 	class RobotModelNotify : public ndModelNotify
 	{
-		class ndController : public ndBrainAgentContinuePolicyGradient
-		{
-			public:
-			ndController(const ndSharedPtr<ndBrain>& brain)
-				:ndBrainAgentContinuePolicyGradient(brain)
-				,m_robot(nullptr)
-			{
-			}
-
-			ndController(const ndController& src)
-				:ndBrainAgentContinuePolicyGradient(src.m_policy)
-				,m_robot(nullptr)
-			{
-			}
-
-			void GetObservation(ndBrainFloat* const observation)
-			{
-				m_robot->GetObservation(observation);
-			}
-
-			virtual void ApplyActions(ndBrainFloat* const actions)
-			{
-				m_robot->ApplyActions(actions);
-			}
-
-			RobotModelNotify* m_robot;
-		};
-
 		class ndControllerTrainer : public ndBrainAgentContinuePolicyGradient_Agent
 		{
 			public:
@@ -307,12 +279,65 @@ namespace ndContinueCarpole
 
 	class ndTrainerController : public ndModelNotify
 	{
+		class ndAgent : public ndBrainAgentOffPolicyGradient_Agent
+		{
+			public:
+			//ndControllerAgent(ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master, RobotModelNotify* const robot)
+			ndAgent(ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master, ndTrainerController* const owner)
+				:ndBrainAgentOffPolicyGradient_Agent(*master)
+				,m_owner (owner)
+			{
+			}
+
+			ndBrainFloat CalculateReward()
+			{
+				//return m_robot->CalculateReward();
+				return 0;
+			}
+
+			bool IsTerminal() const
+			{
+				//return m_robot->IsTerminal();
+				return false;
+			}
+
+			void GetObservation(ndBrainFloat* const observation)
+			{
+				//m_robot->GetObservation(observation);
+			}
+
+			virtual void ApplyActions(ndBrainFloat* const actions)
+			{
+				//m_robot->ApplyActions(actions);
+			}
+
+			void ResetModel()
+			{
+			}
+
+			ndTrainerController* m_owner;
+		};
+
 		public:
 		ndTrainerController()
 			:ndModelNotify()
 		{
-
 		}
+
+		void SetControllerTrainer(ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master)
+		{
+			m_controllerTrainer = ndSharedPtr<ndBrainAgentOffPolicyGradient_Agent>(new ndAgent(master, this));
+			master->SetAgent(m_controllerTrainer);
+		}
+
+		void Update(ndFloat32 timestep)
+		{
+			//m_timestep = timestep;
+			m_controllerTrainer->Step();
+		}
+
+
+		ndSharedPtr<ndBrainAgentOffPolicyGradient_Agent> m_controllerTrainer;
 	};
 
 	class TrainingUpdata : public ndDemoEntityManager::OnPostUpdate
@@ -381,8 +406,6 @@ namespace ndContinueCarpole
 			ndSharedPtr<ndMesh> mesh,
 			ndSharedPtr<ndRenderSceneNode> visualMesh)
 		{
-			ndModelArticulation* const model = new ndModelArticulation();
-			
 			auto CreateRigidBody = [scene](ndSharedPtr<ndMesh>& mesh, ndSharedPtr<ndRenderSceneNode>& visualMesh, ndFloat32 mass, ndBodyDynamic* const parentBody)
 			{
 				ndSharedPtr<ndShapeInstance> shape(mesh->CreateCollision());
@@ -398,6 +421,8 @@ namespace ndContinueCarpole
 			ndFloat32 cartMass = ndFloat32(5.0f);
 			ndFloat32 poleMass = ndFloat32(10.0f);
 			
+			ndModelArticulation* const model = new ndModelArticulation();
+
 			// add the cart mesh and body
 			ndSharedPtr<ndBody> rootBody(CreateRigidBody(mesh, visualMesh, cartMass, nullptr));
 			ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(rootBody);
@@ -420,112 +445,19 @@ namespace ndContinueCarpole
 			////ndGetWorkingFileName("cartpole.urdf", fileName);
 			////urdf.Export(fileName, model->GetAsModelArticulation());
 
-			ndSharedPtr<ndModel> vehicleModel(new ndModelArticulation());
 			ndSharedPtr<ndModelNotify> controller(new ndTrainerController());
-			vehicleModel->SetNotifyCallback(controller);
+			model->SetNotifyCallback(controller);
+			((ndTrainerController*)(*controller))->SetControllerTrainer(m_master);
 
 			return model;
 		}
 
-		void HideModel(ndModelArticulation* const model, bool mode) const
+		void OnDebug(ndDemoEntityManager* const, bool)
 		{
-			ndAssert(0);
-#if 0
-			ndModelArticulation::ndNode* stackMem[128];
-			ndInt32 stack = 1;
-			stackMem[0] = model->GetRoot();
-			while (stack)
-			{
-				stack--;
-				ndModelArticulation::ndNode* const node = stackMem[stack];
-				ndBody* const body = *node->m_body;
-				ndDemoEntityNotify* const userData = (ndDemoEntityNotify*)body->GetNotifyCallback();
-				ndDemoEntity* const ent = *userData->m_entity;
-				//ent->Hide();
-				mode ? ent->Hide() : ent->UnHide();
-
-				for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
-				{
-					stackMem[stack] = child;
-					stack++;
-				}
-			}
-#endif
-		}
-
-		void OnDebug(ndDemoEntityManager* const, bool mode)
-		{
-			for (ndList<ndModelArticulation*>::ndNode* node = m_models.GetFirst(); node; node = node->GetNext())
-			{
-				HideModel(node->GetInfo(), mode);
-			}
-		}
-
-		class InvisibleBodyNotify : public ndDemoEntityNotify
-		{
-			public:
-			InvisibleBodyNotify(const ndDemoEntityNotify* const src)
-				:ndDemoEntityNotify(*src)
-			{
-			}
-
-			InvisibleBodyNotify(const InvisibleBodyNotify& src)
-				:ndDemoEntityNotify(src)
-			{
-			}
-
-			ndBodyNotify* Clone() const
-			{
-				return new InvisibleBodyNotify(*this);
-			}
-
-			virtual bool OnSceneAabbOverlap(const ndBody* const otherBody) const
-			{
-				const ndBodyKinematic* const body0 = ((ndBody*)GetBody())->GetAsBodyKinematic();
-				const ndBodyKinematic* const body1 = ((ndBody*)otherBody)->GetAsBodyKinematic();
-				const ndShapeInstance& instanceShape0 = body0->GetCollisionShape();
-				const ndShapeInstance& instanceShape1 = body1->GetCollisionShape();
-				return instanceShape0.m_shapeMaterial.m_userId != instanceShape1.m_shapeMaterial.m_userId;
-			}
-		};
-
-		void SetMaterial(ndModelArticulation* const model) const
-		{
-			ndAssert(0);
-#if 0
-			ndModelArticulation::ndNode* stackMem[128];
-			ndInt32 stack = 1;
-			stackMem[0] = model->GetRoot();
-			while (stack)
-			{
-				stack--;
-				ndModelArticulation::ndNode* const node = stackMem[stack];
-				ndBodyKinematic* const body = node->m_body->GetAsBodyKinematic();
-				body->GetAsBodyDynamic()->SetSleepAccel(body->GetAsBodyDynamic()->GetSleepAccel() * ndFloat32(0.1f));
-
-				ndShapeInstance& instanceShape = body->GetCollisionShape();
-				instanceShape.m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
-
-				ndDemoEntityNotify* const originalNotify = (ndDemoEntityNotify*)body->GetNotifyCallback();
-				ndSharedPtr<ndDemoEntity> userData(originalNotify->m_entity);
-				originalNotify->m_entity = ndSharedPtr<ndDemoEntity>();
-				InvisibleBodyNotify* const notify = new InvisibleBodyNotify((InvisibleBodyNotify*)body->GetNotifyCallback());
-				body->SetNotifyCallback(notify);
-				notify->m_entity = userData;
-
-				for (ndModelArticulation::ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
-				{
-					stackMem[stack] = child;
-					stack++;
-				}
-			}
-#endif
 		}
 
 		virtual void Update(ndDemoEntityManager* const manager, ndFloat32)
 		{
-			//ndAssert(0);
-#if 0
 			ndUnsigned32 stopTraining = m_master->GetFramesCount();
 			if (stopTraining <= m_stopTraining)
 			{
@@ -548,20 +480,18 @@ namespace ndContinueCarpole
 
 				if (rewardTrajectory > m_saveScore)
 				{
-					char fileName[256];
+					char name[256];
 					m_saveScore = ndFloor(rewardTrajectory) + 2.0f;
 
 					// save partial controller in case of crash 
 					ndBrain* const actor = m_master->GetPolicyNetwork();
-					char name[256];
 					snprintf(name, sizeof(name), "%s_actor.dnn", CONTROLLER_NAME);
-					ndGetWorkingFileName(name, fileName);
-					actor->SaveToFile(fileName);
-
-					ndBrain* const critic = m_master->GetValueNetwork();
-					snprintf(name, sizeof(name), "%s_critic.dnn", CONTROLLER_NAME);
-					ndGetWorkingFileName(name, fileName);
-					critic->SaveToFile(fileName);
+					ndString fileName (ndGetWorkingFileName(name));
+					actor->SaveToFile(fileName.GetStr());
+					//ndBrain* const critic = m_master->GetValueNetwork();
+					//snprintf(name, sizeof(name), "%s_critic.dnn", CONTROLLER_NAME);
+					//ndGetWorkingFileName(name, fileName);
+					//critic->SaveToFile(fileName);
 				}
 
 				if (episodeCount && !m_master->IsSampling())
@@ -577,19 +507,17 @@ namespace ndContinueCarpole
 
 			if ((stopTraining >= m_stopTraining) || (100.0f * m_master->GetAverageScore() / m_horizon > 95.0f))
 			{
-				char fileName[1024];
 				m_modelIsTrained = true;
 				m_master->GetPolicyNetwork()->CopyFrom(*(*m_bestActor));
-				ndGetWorkingFileName(m_master->GetName().GetStr(), fileName);
-				m_master->GetPolicyNetwork()->SaveToFile(fileName);
-				ndExpandTraceMessage("saving to file: %s\n", fileName);
+				ndString fileName (ndGetWorkingFileName(m_master->GetName().GetStr()));
+				m_master->GetPolicyNetwork()->SaveToFile(fileName.GetStr());
+				ndExpandTraceMessage("saving to file: %s\n", fileName.GetStr());
 				ndExpandTraceMessage("training complete\n");
 				ndUnsigned64 timer = ndGetTimeInMicroseconds() - m_timer;
 				ndExpandTraceMessage("training time: %g seconds\n", ndFloat32(ndFloat64(timer) * ndFloat32(1.0e-6f)));
 
 				manager->Terminate();
 			}
-#endif
 		}
 
 		ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer> m_master;
@@ -609,7 +537,8 @@ namespace ndContinueCarpole
 
 using namespace ndContinueCarpole;
 
-void ndCartpolePlayerContinue(ndDemoEntityManager* const scene)
+//void ndCartpolePlayerContinue(ndDemoEntityManager* const scene)
+void ndCartpolePlayerContinue(ndDemoEntityManager* const)
 {
 	ndAssert(0);
 	//ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "marbleCheckBoard.png", 0.1f, true));

@@ -885,7 +885,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 	
 			ImGui::EndMenu();
 		}
-		
+	
 		bool optionsOn = ImGui::BeginMenu("Options");
 		if (optionsOn) 
 		{
