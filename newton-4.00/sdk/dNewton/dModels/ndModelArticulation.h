@@ -86,6 +86,8 @@ class ndModelArticulation: public ndModel
 	D_NEWTON_API virtual void AddBodiesAndJointsToWorld() override;
 	D_NEWTON_API virtual void RemoveBodiesAndJointsFromWorld() override;
 
+	D_NEWTON_API virtual void SetSleep(ndFloat32 speed, ndFloat32 angularSpeed, ndFloat32 accel, ndFloat32 alpha) const override;
+
 	D_NEWTON_API const ndString& GetName() const;
 	D_NEWTON_API void SetName(const ndString& name);
 	D_NEWTON_API ndNode* FindByName(const char* const name) const;

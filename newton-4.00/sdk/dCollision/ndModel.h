@@ -54,6 +54,8 @@ class ndModel: public ndContainersFreeListAlloc<ndModel>
 	D_COLLISION_API virtual void AddBodiesAndJointsToWorld() {}
 	D_COLLISION_API virtual void RemoveBodiesAndJointsFromWorld() {}
 
+	D_COLLISION_API virtual void SetSleep(ndFloat32, ndFloat32, ndFloat32, ndFloat32) const {}
+
 	protected:
 	virtual void OnAddToWorld() {}
 	virtual void OnRemoveFromToWorld() {}
