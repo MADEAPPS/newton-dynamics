@@ -539,7 +539,6 @@ namespace ndUnicycle
 			ndSharedPtr<ndJointBilateralConstraint> visualPlaneJoint(new ndJointPlane(rootBody->GetMatrix().m_posit, ndVector(0.0f, 0.0f, 1.0f, 0.0f), rootBody, world->GetSentinelBody()));
 			world->AddJoint(visualPlaneJoint);
 			
-			//RobotModelNotify* const notify = new RobotModelNotify(m_master, visualModel->GetAsModelArticulation());
 			RobotModelNotify* const notify = new RobotModelNotify();
 			visualModel->SetNotifyCallback(notify);
 			notify->SetControllerTrainer(m_master, visualModel->GetAsModelArticulation());
