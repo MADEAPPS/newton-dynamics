@@ -21,6 +21,8 @@ ndArchimedesBuoyancyVolume::ndArchimedesBuoyancyVolume()
 	,m_density(1.0f)
 	,m_hasPlane(0)
 {
+	// gives the trigger some mass to make it acc as a dynamics body
+	SetMassMatrix(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 void ndArchimedesBuoyancyVolume::CalculatePlane(ndBodyKinematic* const body)
@@ -60,6 +62,15 @@ void ndArchimedesBuoyancyVolume::OnTriggerEnter(ndBodyKinematic* const body, ndF
 {
 	ndTrace(("enter trigger body %d\n", body->GetId()));
 	CalculatePlane(body);
+}
+
+void ndArchimedesBuoyancyVolume::SpecialUpdate(ndFloat32 timestep)
+{
+	ndBodyTriggerVolume::SpecialUpdate(timestep);
+
+	// here the app can do manipulate the body ex: setting velocity
+	// in this examnple we do nothing
+	//SetVelocity(ndVector(1.0f, 0.0f, 0.0f, 0.0f));
 }
 	
 void ndArchimedesBuoyancyVolume::OnTrigger(ndBodyKinematic* const kinBody, ndFloat32)
