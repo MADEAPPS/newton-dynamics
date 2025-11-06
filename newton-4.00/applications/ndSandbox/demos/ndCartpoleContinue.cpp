@@ -40,56 +40,6 @@ namespace ndContinueCarpole
 	};
 
 #if 0
-	ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndSharedPtr<ndDemoEntity>& modelMesh)
-	{
-#if 0
-		ndModelArticulation* const model = BuildModelOldModel(scene, location);
-#else
-		
-		ndModelArticulation* const model = new ndModelArticulation();
-		ndSharedPtr<ndDemoEntity> entity(modelMesh->GetChildren().GetFirst()->GetInfo()->CreateClone());
-		scene->AddEntity(entity);
-
-		auto CreateRigidBody = [scene](ndSharedPtr<ndDemoEntity>& entity, const ndMatrix& matrix, ndFloat32 mass, ndBodyDynamic* const parentBody)
-		{
-			ndSharedPtr<ndShapeInstance> shape(entity->CreateCollision());
-
-			ndBodyKinematic* const body = new ndBodyDynamic();
-			body->SetNotifyCallback(new ndBindingRagdollEntityNotify(scene, entity, parentBody, 100.0f));
-			body->SetMatrix(matrix);
-			body->SetCollisionShape(*(*shape));
-			body->GetAsBodyDynamic()->SetMassMatrix(mass, *(*shape));
-			return body;
-		};
-
-		ndFloat32 cartMass = 5.0f;
-		ndFloat32 poleMass = 10.0f;
-
-		ndMatrix matrix(entity->GetCurrentMatrix() * location);
-		matrix.m_posit = location.m_posit;
-		ndSharedPtr<ndBody> rootBody(CreateRigidBody(entity, matrix, cartMass, nullptr));
-		ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(rootBody);
-
-		ndSharedPtr<ndDemoEntity> poleEntity(entity->GetChildren().GetFirst()->GetInfo());
-		const ndMatrix poleMatrix(poleEntity->GetCurrentMatrix() * matrix);
-		ndSharedPtr<ndBody> pole(CreateRigidBody(poleEntity, poleMatrix, poleMass, rootBody->GetAsBodyDynamic()));
-		ndSharedPtr<ndJointBilateralConstraint> poleHinge(new ndJointHinge(poleMatrix, pole->GetAsBodyKinematic(), rootBody->GetAsBodyKinematic()));
-		model->AddLimb(modelRootNode, pole, poleHinge);
-
-		ndWorld* const world = scene->GetWorld();
-		const ndMatrix sliderMatrix(rootBody->GetMatrix());
-		ndSharedPtr<ndJointBilateralConstraint> xDirSlider(new ndJointSlider(sliderMatrix, rootBody->GetAsBodyKinematic(), world->GetSentinelBody()));
-		world->AddJoint(xDirSlider);
-
-		//ndUrdfFile urdf;
-		//char fileName[256];
-		//ndGetWorkingFileName("cartpole.urdf", fileName);
-		//urdf.Export(fileName, model->GetAsModelArticulation());
-#endif
-
-		return model;
-	}
-
 	class RobotModelNotify : public ndModelNotify
 	{
 		class ndController : public ndBrainAgentContinuePolicyGradient
@@ -358,7 +308,6 @@ namespace ndContinueCarpole
 	class TrainingUpdata : public ndDemoEntityManager::OnPostUpdate
 	{
 		public:
-		//TrainingUpdata(ndDemoEntityManager* const scene, const ndMatrix& matrix, const ndSharedPtr<ndDemoEntity>& modelMesh)
 		TrainingUpdata(ndDemoEntityManager* const scene, const ndMatrix& location, const ndRenderMeshLoader& loader)
 			:OnPostUpdate()
 			,m_master()
@@ -401,11 +350,12 @@ namespace ndContinueCarpole
 			visualMesh->SetTransform(loader.m_mesh->m_matrix);
 			scene->AddEntity(visualMesh);
 
-#if 0
-			ndSharedPtr<ndModel>visualModel(CreateModel(scene, matrix, modelMesh));
-			world->AddModel(visualModel);
-			visualModel->AddBodiesAndJointsToWorld();
+			// create an articulated model, and add it to the world
+			ndSharedPtr<ndModel>model(CreateModel(scene, loader.m_mesh, visualMesh));
 
+			world->AddModel(model);
+			model->AddBodiesAndJointsToWorld();
+#if 0
 			visualModel->SetNotifyCallback(new RobotModelNotify(m_master, visualModel->GetAsModelArticulation()));
 			SetMaterial(visualModel->GetAsModelArticulation());
 
@@ -434,6 +384,54 @@ namespace ndContinueCarpole
 			{
 				fclose(m_outFile);
 			}
+		}
+
+
+		ndModelArticulation* CreateModel(
+			ndDemoEntityManager* const scene, 
+			ndSharedPtr<ndMesh> mesh,
+			ndSharedPtr<ndRenderSceneNode> visualMesh)
+		{
+			ndModelArticulation* const model = new ndModelArticulation();
+			//ndSharedPtr<ndDemoEntity> entity(modelMesh->GetChildren().GetFirst()->GetInfo()->CreateClone());
+			//scene->AddEntity(entity);
+			//
+			//auto CreateRigidBody = [scene](ndSharedPtr<ndDemoEntity>& entity, const ndMatrix& matrix, ndFloat32 mass, ndBodyDynamic* const parentBody)
+			//{
+			//	ndSharedPtr<ndShapeInstance> shape(entity->CreateCollision());
+			//
+			//	ndBodyKinematic* const body = new ndBodyDynamic();
+			//	body->SetNotifyCallback(new ndBindingRagdollEntityNotify(scene, entity, parentBody, 100.0f));
+			//	body->SetMatrix(matrix);
+			//	body->SetCollisionShape(*(*shape));
+			//	body->GetAsBodyDynamic()->SetMassMatrix(mass, *(*shape));
+			//	return body;
+			//};
+			//
+			//ndFloat32 cartMass = 5.0f;
+			//ndFloat32 poleMass = 10.0f;
+			//
+			//ndMatrix matrix(entity->GetCurrentMatrix() * location);
+			//matrix.m_posit = location.m_posit;
+			//ndSharedPtr<ndBody> rootBody(CreateRigidBody(entity, matrix, cartMass, nullptr));
+			//ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(rootBody);
+			//
+			//ndSharedPtr<ndDemoEntity> poleEntity(entity->GetChildren().GetFirst()->GetInfo());
+			//const ndMatrix poleMatrix(poleEntity->GetCurrentMatrix() * matrix);
+			//ndSharedPtr<ndBody> pole(CreateRigidBody(poleEntity, poleMatrix, poleMass, rootBody->GetAsBodyDynamic()));
+			//ndSharedPtr<ndJointBilateralConstraint> poleHinge(new ndJointHinge(poleMatrix, pole->GetAsBodyKinematic(), rootBody->GetAsBodyKinematic()));
+			//model->AddLimb(modelRootNode, pole, poleHinge);
+			//
+			//ndWorld* const world = scene->GetWorld();
+			//const ndMatrix sliderMatrix(rootBody->GetMatrix());
+			//ndSharedPtr<ndJointBilateralConstraint> xDirSlider(new ndJointSlider(sliderMatrix, rootBody->GetAsBodyKinematic(), world->GetSentinelBody()));
+			//world->AddJoint(xDirSlider);
+			//
+			////ndUrdfFile urdf;
+			////char fileName[256];
+			////ndGetWorkingFileName("cartpole.urdf", fileName);
+			////urdf.Export(fileName, model->GetAsModelArticulation());
+			return model;
 		}
 
 		void HideModel(ndModelArticulation* const model, bool mode) const
