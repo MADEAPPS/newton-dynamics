@@ -21,7 +21,7 @@
 #include "ndBrainUniformBuffer.h"
 #include "ndBrainIntegerBuffer.h"
 #include "ndBrainBufferCommand.h"
-#include "ndBrainTrainerInference.h"
+//#include "ndBrainTrainerInference.h"
 
 #define ND_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_ALL
 //#define ND_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_CPU
@@ -650,7 +650,7 @@ void ndBrainGpuContext::ApplyLeanRateCommands(ndBrainBufferCommand* const comman
 	ndAssert(error == CL_SUCCESS);
 }
 
-void ndBrainGpuContext::SetLeanRateCommandBuffers(ndBrainOptimizerAdam& optimizer, ndInt32 minibatchSize, ndBrainFloatBuffer& weightsAndBiasBuffer, ndBrainFloatBuffer& weightsAndBiasGradientBuffer)
+void ndBrainGpuContext::SetLearnRateCommandBuffers(ndBrainOptimizerAdam& optimizer, ndInt32 minibatchSize, ndBrainFloatBuffer& weightsAndBiasBuffer, ndBrainFloatBuffer& weightsAndBiasGradientBuffer)
 {
 	ndBrainOptimizerAdam::ndCommandSharedInfo optimizerData(optimizer.m_parameters);
 	ndSharedPtr<ndBrainUniformBuffer> adamUniformbuffer(new ndBrainUniformBuffer(this, sizeof(ndBrainOptimizerAdam::ndCommandSharedInfo), &optimizerData));
@@ -661,7 +661,7 @@ void ndBrainGpuContext::SetLeanRateCommandBuffers(ndBrainOptimizerAdam& optimize
 		ndBrainBufferCommandDesc descriptor(ndInt32(sizeInFloats) / ND_DEFAULT_WORKGROUP_SIZE);
 		descriptor.m_context = this;
 		descriptor.m_owner = nullptr;
-		descriptor.m_id = ndBrainTrainerInference::m_adamOptimizerUpdate;
+		descriptor.m_id = m_adamOptimizerUpdate;
 		descriptor.m_uniformBuffer = adamUniformbuffer;
 		descriptor.m_workGroupSize = ND_DEFAULT_WORKGROUP_SIZE;
 
@@ -687,7 +687,7 @@ void ndBrainGpuContext::SetLeanRateCommandBuffers(ndBrainOptimizerAdam& optimize
 		ndBrainBufferCommandDesc descriptor(1);
 		descriptor.m_context = this;
 		descriptor.m_owner = nullptr;
-		descriptor.m_id = ndBrainTrainerInference::m_adamOptimizerMomentum;
+		descriptor.m_id = m_adamOptimizerMomentum;
 		descriptor.m_uniformBuffer = adamUniformbuffer;
 		descriptor.PushBack(*adamUniformbuffer);
 

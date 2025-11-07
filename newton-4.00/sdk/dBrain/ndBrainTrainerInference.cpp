@@ -234,7 +234,7 @@ void ndBrainTrainerInference::AddCopyInputCommand(const ndCommandSharedInfo& uni
 	ndBrainBufferCommandDesc descriptor(m_descriptor.m_minibatchSize);
 	descriptor.m_context = *m_descriptor.m_context;
 	descriptor.m_owner = this;
-	descriptor.m_id = m_inputId;
+	descriptor.m_id = ndBrainContext::m_inputId;
 	descriptor.m_info = uniformParam;
 	descriptor.m_uniformBuffer = uniformbuffer;
 	descriptor.PushBack(*uniformbuffer);
@@ -298,7 +298,7 @@ void ndBrainTrainerInference::AddCopyOutputCommand()
 	ndBrainBufferCommandDesc descriptor(m_descriptor.m_minibatchSize);
 	descriptor.m_context = *m_descriptor.m_context;
 	descriptor.m_owner = this;
-	descriptor.m_id = m_outpuId;
+	descriptor.m_id = ndBrainContext::m_outpuId;
 	descriptor.m_info = uniformParam;
 	descriptor.m_uniformBuffer = uniformbuffer;
 	descriptor.PushBack(*uniformbuffer);

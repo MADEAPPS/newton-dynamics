@@ -41,12 +41,10 @@ class ndTrainerDescriptor
 {
 	public:
 	ndTrainerDescriptor();
-	//ndTrainerDescriptor(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndInt32 minibatchSize, ndBrainFloat learnRate);
 	ndTrainerDescriptor(const ndSharedPtr<ndBrain>& brain, const ndSharedPtr<ndBrainContext>& context, ndInt32 minibatchSize);
 
 	ndSharedPtr<ndBrain> m_brain;
 	ndSharedPtr<ndBrainContext> m_context;
-	//ndBrainFloat m_learnRate;
 	ndBrainFloat m_regularizer;
 	ndInt32 m_minibatchSize;
 	ndRegularizerType m_regularizerType;
@@ -75,15 +73,6 @@ class ndBrainTrainerInference : public ndClassAlloc
 	ndInt32 RoundOffOffset(ndInt32 value) const;
 
 	protected:
-	enum ndInputOutputCommandId
-	{
-		m_inputId = 7,
-		m_outpuId,
-		m_adamOptimizerSum,
-		m_adamOptimizerUpdate,
-		m_adamOptimizerMomentum,
-	};
-
 	void AddCopyOutputCommand();
 	void InitInputOutputBuffer();
 	void InitWeightAndBiasBuffer();

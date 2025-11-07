@@ -127,7 +127,7 @@ void ndBrainTrainer::Initialize()
 
 void ndBrainTrainer::AddCopyOutputGradientCommand()
 {
-	ndBrainBufferCommand* const lastLayerCommand = FindCommand(m_outpuId);
+	ndBrainBufferCommand* const lastLayerCommand = FindCommand(ndBrainContext::m_outpuId);
 	ndAssert(lastLayerCommand);
 
 	ndBrainBufferCommandDesc& desc = lastLayerCommand->GetDescriptor();
@@ -145,7 +145,7 @@ void ndBrainTrainer::AddCopyOutputGradientCommand()
 	ndBrainBufferCommandDesc descriptor(m_descriptor.m_minibatchSize);
 	descriptor.m_context = *m_descriptor.m_context;
 	descriptor.m_owner = this;
-	descriptor.m_id = m_outpuId;
+	descriptor.m_id = ndBrainContext::m_outpuId;
 	descriptor.m_info = data;
 	descriptor.m_uniformBuffer = uniformbuffer;
 	descriptor.PushBack(*uniformbuffer);
@@ -190,7 +190,7 @@ void ndBrainTrainer::AddCopyOutputGradientCommand()
 
 void ndBrainTrainer::AddCopyInputGradientCommand()
 {
-	ndBrainBufferCommand* const firstCommand = FindCommand(m_inputId);
+	ndBrainBufferCommand* const firstCommand = FindCommand(ndBrainContext::m_inputId);
 	ndAssert(firstCommand);
 
 	ndBrainBufferCommandDesc& desc = firstCommand->GetDescriptor();
@@ -208,7 +208,7 @@ void ndBrainTrainer::AddCopyInputGradientCommand()
 	ndBrainBufferCommandDesc descriptor(m_descriptor.m_minibatchSize);
 	descriptor.m_context = *m_descriptor.m_context;
 	descriptor.m_owner = this;
-	descriptor.m_id = m_inputId;
+	descriptor.m_id = ndBrainContext::m_inputId;
 	descriptor.m_info = data;
 	descriptor.m_uniformBuffer = uniformbuffer;
 	descriptor.PushBack(*uniformbuffer);

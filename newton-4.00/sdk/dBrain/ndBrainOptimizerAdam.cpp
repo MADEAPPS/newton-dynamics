@@ -46,7 +46,7 @@ void ndBrainOptimizerAdam::Init(ndInt32 minibatchSize, ndBrainFloatBuffer& weigh
 	
 	m_vdw = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, buffer));
 	m_vdw2 = ndSharedPtr<ndBrainFloatBuffer>(new ndBrainFloatBuffer(*m_context, buffer));
-	m_context->SetLeanRateCommandBuffers(*this, minibatchSize, weightsAndBiasBuffer, weightsAndBiasGradientBuffer);
+	m_context->SetLearnRateCommandBuffers(*this, minibatchSize, weightsAndBiasBuffer, weightsAndBiasGradientBuffer);
 }
 
 void ndBrainOptimizerAdam::ApplyLearnRate(ndBrainFloat learnRate)

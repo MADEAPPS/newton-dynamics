@@ -452,7 +452,7 @@ void ndBrainCpuContext::CalculateEntropyRegularizationGradient(ndBrainFloatBuffe
 	}
 }
 
-void ndBrainCpuContext::SetLeanRateCommandBuffers(
+void ndBrainCpuContext::SetLearnRateCommandBuffers(
 	ndBrainOptimizerAdam& optimizer, ndInt32 minibatchSize, 
 	ndBrainFloatBuffer& weightsAndBiasBuffer, ndBrainFloatBuffer& weightsAndBiasGradientBuffer)
 {
@@ -466,7 +466,7 @@ void ndBrainCpuContext::SetLeanRateCommandBuffers(
 		ndBrainBufferCommandDesc descriptor(ndInt32(sizeInFloats) / ND_DEFAULT_WORKGROUP_SIZE);
 		descriptor.m_context = this;
 		descriptor.m_owner = nullptr;
-		descriptor.m_id = ndBrainTrainerInference::m_adamOptimizerUpdate;
+		descriptor.m_id = m_adamOptimizerUpdate;
 		descriptor.m_uniformBuffer = adamUniformbuffer;
 		descriptor.m_workGroupSize = ND_DEFAULT_WORKGROUP_SIZE;
 		
@@ -494,7 +494,7 @@ void ndBrainCpuContext::SetLeanRateCommandBuffers(
 		ndBrainBufferCommandDesc descriptor(1);
 		descriptor.m_context = this;
 		descriptor.m_owner = nullptr;
-		descriptor.m_id = ndBrainTrainerInference::m_adamOptimizerMomentum;
+		descriptor.m_id = m_adamOptimizerMomentum;
 		descriptor.m_uniformBuffer = adamUniformbuffer;
 		descriptor.PushBack(*adamUniformbuffer);
 		optimizer.m_commands.Append(ndSharedPtr<ndBrainBufferCommand>(new ndBrainAdamMomentumUpdate(descriptor)));
@@ -504,7 +504,7 @@ void ndBrainCpuContext::SetLeanRateCommandBuffers(
 void ndBrainCpuContext::ApplyLeanRateCommands(ndBrainBufferCommand* const command, ndBrainFloat learnRate)
 {
 	ndBrainAdamUpdateParametersRidge* const gradientUpdateCommand = (ndBrainAdamUpdateParametersRidge*)command;
-	ndAssert(gradientUpdateCommand->GetDescriptor().m_id == ndBrainTrainerInference::m_adamOptimizerUpdate);
+	ndAssert(gradientUpdateCommand->GetDescriptor().m_id == m_adamOptimizerUpdate);
 	gradientUpdateCommand->m_learnRate = learnRate;
 	SubmitBufferCommand(command);
 }

@@ -31,6 +31,15 @@ class ndCopyBufferCommandInfo;
 class ndBrainContext : public ndClassAlloc
 {
 	public:
+	enum ndInputOutputCommandId
+	{
+		m_inputId = 7,
+		m_outpuId,
+		m_adamOptimizerSum,
+		m_adamOptimizerUpdate,
+		m_adamOptimizerMomentum,
+	};
+
 	ndBrainContext();
 	virtual ~ndBrainContext();
 
@@ -85,7 +94,7 @@ class ndBrainContext : public ndClassAlloc
 
 	// learnRate commands
 	virtual void ApplyLeanRateCommands(ndBrainBufferCommand*, ndBrainFloat) = 0;
-	virtual void SetLeanRateCommandBuffers(ndBrainOptimizerAdam&, ndInt32, ndBrainFloatBuffer&, ndBrainFloatBuffer&) = 0;
+	virtual void SetLearnRateCommandBuffers(ndBrainOptimizerAdam&, ndInt32, ndBrainFloatBuffer&, ndBrainFloatBuffer&) = 0;
 };
 
 #endif
