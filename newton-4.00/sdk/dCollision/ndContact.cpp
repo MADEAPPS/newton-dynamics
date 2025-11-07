@@ -143,6 +143,13 @@ void ndContact::ClearMemory()
 	}
 }
 
+void ndContact::GetSeparatingSurface(ndVector& normal, ndVector& point0, ndVector& point1) const
+{
+	normal = m_separatingVector;
+	point0 = m_closestPointOnBodyA;
+	point1 = m_closestPointOnBodyB;
+}
+
 void ndContact::InitSurrogateContact(ndContact* const surrogate, ndBodyKinematic* const body0, ndBodyKinematic* const body1) const
 {
 	ndAssert(m_body0->GetInvMass() > ndFloat32(0.0f));

@@ -26,7 +26,7 @@ class ndArchimedesBuoyancyVolume: public ndBodyTriggerVolume
 	void CalculatePlane(ndBodyKinematic* const body);
 	void SpecialUpdate(ndFloat32 timestep) override;
 	void OnTriggerEnter(ndBodyKinematic* const body, ndFloat32 timestep) override;
-	void OnTrigger(ndBodyKinematic* const kinBody, ndFloat32 timestep) override;
+	void OnTrigger(const ndContact* const contact, ndFloat32 timestep) override;
 	void OnTriggerExit(ndBodyKinematic* const body, ndFloat32 timestep) override;
 
 	ndPlane m_plane;

@@ -33,41 +33,17 @@ class ndBodyTriggerVolume : public ndBodyKinematicBase
 	D_COLLISION_API ndBodyTriggerVolume();
 	D_COLLISION_API virtual ~ndBodyTriggerVolume();
 
-	ndBodyTriggerVolume* GetAsBodyTriggerVolume() override;
-
-	virtual void OnTrigger(ndBodyKinematic* const body, ndFloat32 timestep);
-	virtual void OnTriggerEnter(ndBodyKinematic* const body, ndFloat32 timestep);
-	virtual void OnTriggerExit(ndBodyKinematic* const body, ndFloat32 timestep);
+	D_COLLISION_API ndBodyTriggerVolume* GetAsBodyTriggerVolume() override;
 
 	D_COLLISION_API virtual void SpecialUpdate(ndFloat32 timestep) override;
+	D_COLLISION_API virtual void OnTrigger(const ndContact* const contact, ndFloat32 timestep);
+	D_COLLISION_API virtual void OnTriggerEnter(ndBodyKinematic* const body, ndFloat32 timestep);
+	D_COLLISION_API virtual void OnTriggerExit(ndBodyKinematic* const body, ndFloat32 timestep);
 
 	private:
-	virtual void IntegrateExternalForce(ndFloat32 timestep) override;
+	D_COLLISION_API virtual void IntegrateExternalForce(ndFloat32 timestep) override;
 
 } D_GCC_NEWTON_CLASS_ALIGN_32;
 
-inline ndBodyTriggerVolume* ndBodyTriggerVolume::GetAsBodyTriggerVolume()
-{ 
-	return this; 
-}
-
-inline void ndBodyTriggerVolume::OnTriggerEnter(ndBodyKinematic* const, ndFloat32)
-{
-	//dAssert(0);
-}
-
-inline void ndBodyTriggerVolume::OnTrigger(ndBodyKinematic* const, ndFloat32)
-{
-	//dAssert(0);
-}
-
-inline void ndBodyTriggerVolume::OnTriggerExit(ndBodyKinematic* const, ndFloat32)
-{
-	//dAssert(0);
-}
-
-inline void ndBodyTriggerVolume::IntegrateExternalForce(ndFloat32) 
-{
-}
 
 #endif

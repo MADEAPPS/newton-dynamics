@@ -33,6 +33,30 @@ ndBodyTriggerVolume::~ndBodyTriggerVolume()
 {
 }
 
+ndBodyTriggerVolume* ndBodyTriggerVolume::GetAsBodyTriggerVolume()
+{
+	return this;
+}
+
+void ndBodyTriggerVolume::OnTriggerEnter(ndBodyKinematic* const, ndFloat32)
+{
+	//dAssert(0);
+}
+
+void ndBodyTriggerVolume::OnTrigger(const ndContact* const, ndFloat32)
+{
+	//dAssert(0);
+}
+
+void ndBodyTriggerVolume::OnTriggerExit(ndBodyKinematic* const, ndFloat32)
+{
+	//dAssert(0);
+}
+
+void ndBodyTriggerVolume::IntegrateExternalForce(ndFloat32)
+{
+}
+
 void ndBodyTriggerVolume::SpecialUpdate(ndFloat32 timestep)
 {
 	const ndContactMap& contactMap = GetContactMap();
@@ -43,9 +67,10 @@ void ndBodyTriggerVolume::SpecialUpdate(ndFloat32 timestep)
 		const ndContact* const contact = *it;
 		if (contact->IsActive() && contact->IsInTrigger())
 		{
-			ndBodyKinematic* const body0 = contact->GetBody0();
-			ndBodyKinematic* const body1 = contact->GetBody1();
-			OnTrigger((body1 == this) ? body0 : body1, timestep);
+			OnTrigger(contact, timestep);
+			//ndBodyKinematic* const body0 = contact->GetBody0();
+			//ndBodyKinematic* const body1 = contact->GetBody1();
+			//OnTrigger((body1 == this) ? body0 : body1, timestep);
 		}
 	}
 }

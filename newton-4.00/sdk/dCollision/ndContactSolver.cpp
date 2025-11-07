@@ -2455,6 +2455,8 @@ ndInt32 ndContactSolver::CalculateContactsDiscrete()
 	m_contact->m_separatingVector = m_separatingVector;
 	ndAssert(!count || (m_separationDistance < ndFloat32(1.0e6)));
 	m_contact->m_separationDistance = m_separationDistance;
+	m_contact->m_closestPointOnBodyA = m_closestPoint0;
+	m_contact->m_closestPointOnBodyB = m_closestPoint1;
 	return count;
 }
 

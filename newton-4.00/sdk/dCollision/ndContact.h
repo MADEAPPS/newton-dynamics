@@ -127,6 +127,8 @@ class ndContact: public ndConstraint
 	D_COLLISION_API virtual void JacobianDerivative(ndConstraintDescritor& desc);
 	D_COLLISION_API virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc);
 	D_COLLISION_API void InitSurrogateContact(ndContact* const surrogate, ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
+
+	D_COLLISION_API void GetSeparatingSurface(ndVector& normal, ndVector& point0, ndVector& point1) const;
 	
 	private:
 	virtual void ClearMemory();
@@ -138,6 +140,8 @@ class ndContact: public ndConstraint
 	ndVector m_positAcc;
 	ndQuaternion m_rotationAcc;
 	ndVector m_separatingVector;
+	ndVector m_closestPointOnBodyA;
+	ndVector m_closestPointOnBodyB;
 	ndContactPointList m_contacPointsList;
 	ndMaterial* m_material;
 	ndFloat32 m_timeOfImpact;

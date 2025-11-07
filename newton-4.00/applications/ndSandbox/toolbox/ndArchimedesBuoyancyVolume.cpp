@@ -73,9 +73,21 @@ void ndArchimedesBuoyancyVolume::SpecialUpdate(ndFloat32 timestep)
 	//SetVelocity(ndVector(1.0f, 0.0f, 0.0f, 0.0f));
 }
 	
-void ndArchimedesBuoyancyVolume::OnTrigger(ndBodyKinematic* const kinBody, ndFloat32)
+void ndArchimedesBuoyancyVolume::OnTrigger(const ndContact* const contact, ndFloat32)
 {
-	ndBodyDynamic* const body = kinBody->GetAsBodyDynamic();
+	ndBodyKinematic* const body = (contact->GetBody0() != this) ? contact->GetBody0()->GetAsBodyDynamic() : contact->GetBody1()->GetAsBodyDynamic();
+
+	// you can check here to get the contact surfaces
+	ndVector normal;
+	ndVector point0;
+	ndVector point1;
+	contact->GetSeparatingSurface(normal, point0, point1);
+	if (body == contact->GetBody0())
+	{
+		// if the trigger is the first body, them swap the points
+		ndSwap(point0, point1);
+	}
+
 	if (!m_hasPlane)
 	{
 		CalculatePlane(body);
