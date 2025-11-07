@@ -372,7 +372,7 @@ namespace ndContinueCarpole
 				}
 			}
 
-			if ((stopTraining >= m_stopTraining) || (100.0f * m_master->GetAverageScore() / m_horizon > 95.0f))
+			if ((stopTraining >= m_stopTraining) || (m_master->GetAverageScore() > ndBrainFloat(0.97f)))
 			{
 				m_modelIsTrained = true;
 				m_master->GetPolicyNetwork()->CopyFrom(*(*m_bestActor));
