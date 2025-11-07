@@ -18,7 +18,8 @@ include_directories(../dCore)
 include_directories(../dCore/tinyxml)
 include_directories(../../thirdParty/png)
 
-if(NEWTON_ENABLE_OPENCL_SDK)
+# for now opencl only for windows, I need to figure out the path for linux systems
+if(NEWTON_ENABLE_OPENCL_SDK AND MSVC)
 	include_directories(dOpencl)
 	include_directories(../../thirdParty/opencl/OpenCL-SDK-v2024.10.24-Win-x64/include)
 	file(GLOB CPP_SOURCE *.cpp dOpenCl/*.cpp *.h dOpenCl/*.h)
