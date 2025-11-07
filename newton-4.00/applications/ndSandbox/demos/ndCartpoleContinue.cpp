@@ -137,6 +137,32 @@ namespace ndContinueCarpole
 			m_controllerTrainer->Step();
 		}
 
+		void PostUpdate(ndFloat32)
+		{
+			if (IsOutOfBounds())
+			{
+				TelePort();
+			}
+		}
+
+		void TelePort() const
+		{
+			//ndModelArticulation* const model = (ndModelArticulation*)GetModel();
+			//ndBodyKinematic* const body = model->GetRoot()->m_body->GetAsBodyKinematic();
+			//
+			//ndVector posit(body->GetMatrix().m_posit);
+			//posit.m_y = 0.0f;
+			//posit.m_z = 0.0f;
+			//posit.m_w = 0.0f;
+			//for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
+			//{
+			//	ndBodyKinematic* const modelBody = m_bodies[i];
+			//	ndMatrix matrix(modelBody->GetMatrix());
+			//	matrix.m_posit -= posit;
+			//	modelBody->SetMatrix(matrix);
+			//}
+		}
+
 		void ResetModel()
 		{
 			m_cart->SetMatrix(m_cartMatrix);
@@ -158,9 +184,8 @@ namespace ndContinueCarpole
 
 		ndFloat32 GetPoleAngle() const
 		{
-			const ndMatrix matrix(m_poleHinge->CalculateGlobalMatrix0());
-			ndFloat32 sinAngle = ndClamp(matrix.m_up.m_x, ndFloat32(-0.99f), ndFloat32(0.99f));
-			ndFloat32 angle = ndAsin(sinAngle);
+			ndJointHinge* const hinge = (ndJointHinge*)*m_poleHinge;
+			ndFloat32 angle = hinge->GetAngle();
 			return angle;
 		}
 
@@ -194,14 +219,19 @@ namespace ndContinueCarpole
 			//ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 			//ndModelArticulation::ndCenterOfMassDynamics dynamics (model->CalculateCentreOfMassDynamics(m_solver, ndGetIdentityMatrix(), extraJoints, m_timestep));
 			//ndFloat32 accelReward = 0.0f;
-			
-			ndFloat32 angle = GetPoleAngle();
-			const ndVector veloc(m_cart->GetVelocity());
-			ndFloat32 angularReward = ndReal(ndExp(-ndFloat32(1000.0f) * angle * angle));
-			ndFloat32 speedReward = ndReal(ndExp(-ndFloat32(200.0f) * veloc.m_x * veloc.m_x));
-
+			//const ndVector veloc(m_cart->GetVelocity());
+			//ndFloat32 speedReward = ndReal(ndExp(-ndFloat32(200.0f) * veloc.m_x * veloc.m_x));
 			//ndFloat32 reward = 0.25f * angularReward + 0.25f * speedReward + 0.5f * accelReward;
-			ndFloat32 reward = 0.5f * angularReward + 0.5f * speedReward;
+
+
+			ndJointHinge* const hinge = (ndJointHinge*)*m_poleHinge;
+			ndFloat32 angle = hinge->GetAngle();
+			ndFloat32 omega = hinge->GetOmega();
+			ndFloat32 angleReward = ndReal(ndExp(-ndFloat32(1000.0f) * angle * angle));
+			ndFloat32 omegaReward = ndReal(ndExp(-ndFloat32(1000.0f) * omega * omega));
+			//ndTrace(("a=%f w=%f ra=%f rw=%f\n", angle, omega, angleReward, omegaReward));
+
+			ndFloat32 reward = 0.6f * angleReward + 0.4f * omegaReward;
 			return ndReal(reward);
 		}
 
