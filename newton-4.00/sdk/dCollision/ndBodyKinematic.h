@@ -236,15 +236,11 @@ class ndBodyKinematic : public ndBody
 	friend class ndBvhLeafNode;
 	friend class ndContactSolver;
 	friend class ndDynamicsUpdate;
-	friend class ndWorldSceneSycl;
-	friend class ndWorldSceneCuda;
 	friend class ndBvhSceneManager;
 	friend class ndSkeletonContainer;
 	friend class ndModelArticulation;
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
-	friend class ndDynamicsUpdateSycl;
-	friend class ndDynamicsUpdateCuda;
 	friend class ndJointBilateralConstraint;
 } D_GCC_NEWTON_CLASS_ALIGN_32;
 

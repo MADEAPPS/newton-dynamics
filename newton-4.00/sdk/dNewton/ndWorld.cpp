@@ -32,12 +32,6 @@
 #include "ndDynamicsUpdateAvx2.h"
 #include "ndJointBilateralConstraint.h"
 
-#ifdef _D_NEWTON_CUDA
-	#include "ndCudaUtils.h"
-	#include "ndWorldSceneCuda.h"
-	#include "ndDynamicsUpdateCuda.h"
-#endif
-
 ndWorld::ndWorld()
 	:ndClassAlloc()
 	,m_scene(nullptr)
@@ -859,38 +853,6 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 
 				m_solverMode = solverMode;
 				m_solver = new ndDynamicsUpdateAvx2(this);
-				break;
-			}
-
-			case ndCudaSolver:
-			{
-				#ifdef _D_NEWTON_CUDA
-					ndMemFreeCallback freeMemory;
-					ndMemAllocCallback allocMemory;
-					ndMemory::GetMemoryAllocators(allocMemory, freeMemory);
-					ndCudaContext::SetMemoryAllocators(allocMemory, freeMemory);
-					ndWorldScene* const newScene = new ndWorldSceneCuda(*((ndWorldScene*)m_scene));
-					delete m_scene;
-					m_scene = newScene;
-					m_solverMode = solverMode;
-					m_solver = new ndDynamicsUpdateCuda(this);
-					if (!newScene->IsValid())
-					{
-						delete m_solver;
-						ndWorldScene* const defaultScene = new ndWorldScene(*((ndWorldScene*)m_scene));
-						delete m_scene;
-						m_scene = defaultScene;
-
-						m_solverMode = ndSimdSoaSolver;
-						m_solver = new ndDynamicsUpdateSoa(this);
-					}
-				#else
-					ndWorldScene* const newScene = new ndWorldScene(*((ndWorldScene*)m_scene));
-					delete m_scene;
-					m_scene = newScene;
-					m_solverMode = ndSimdSoaSolver;
-					m_solver = new ndDynamicsUpdateSoa(this);
-				#endif
 				break;
 			}
 
