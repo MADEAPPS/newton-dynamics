@@ -5020,8 +5020,8 @@ void ndMeshEffect::SerializeToXml(nd::TiXmlElement* const xmlNode, const ndTree<
 			nd::TiXmlElement* const xmlVertexWeights = new nd::TiXmlElement("vertexWeights");
 			xmlVertexNode->LinkEndChild(xmlVertexWeights);
 
-			char* const boneNames[] = { "bone0", "bone1", "bone2", "bone3" };
-			char* const weightNames[] = { "weight0", "weight1", "weight2", "weight3" };
+			const char* const boneNames[] = { "bone0", "bone1", "bone2", "bone3" };
+			const char* const weightNames[] = { "weight0", "weight1", "weight2", "weight3" };
 
 			for (ndInt32 i = 0; i < pointCount; ++i)
 			{
@@ -5284,8 +5284,8 @@ void ndMeshEffect::DeserializeFromXml(const nd::TiXmlElement* const xmlNode)
 		const nd::TiXmlElement* const xmlVertexWeightsNode = (nd::TiXmlElement*)xmlVertexNode->FirstChild("vertexWeights");
 		if (xmlVertexWeightsNode)
 		{
-			char* const boneNames[] = { "bone0", "bone1", "bone2", "bone3" };
-			char* const weightNames[] = { "weight0", "weight1", "weight2", "weight3" };
+			const char* const boneNames[] = { "bone0", "bone1", "bone2", "bone3" };
+			const char* const weightNames[] = { "weight0", "weight1", "weight2", "weight3" };
 
 			vertexWeights.SetCount(vertices.GetCount());
 			for (const nd::TiXmlNode* node = xmlVertexWeightsNode->FirstChild("vert"); node; node = node->NextSibling("vert"))
