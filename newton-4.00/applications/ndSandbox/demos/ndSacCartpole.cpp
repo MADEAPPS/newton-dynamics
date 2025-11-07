@@ -148,9 +148,10 @@ namespace ndContinueCarpole
 			ndMatrix poleMatrix(m_pole->GetMatrix());
 
 			ndFloat32 deltax = cartMatrix.m_posit.m_x;
+			ndFloat32 deltay = cartMatrix.m_posit.m_x;
 
 			cartMatrix.m_posit.m_x -= deltax;
-			poleMatrix.m_posit.m_x -= deltax;
+			poleMatrix.m_posit.m_y = deltay;
 
 			m_cart->SetMatrix(cartMatrix);
 			m_pole->SetMatrix(poleMatrix);
