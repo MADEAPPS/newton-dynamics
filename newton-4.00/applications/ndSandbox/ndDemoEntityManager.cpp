@@ -80,6 +80,7 @@ void ndBasicVehicle(ndDemoEntityManager* const scene);
 void ndBasicFriction(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
 void ndObjectPlacement(ndDemoEntityManager* const scene);
+void ndCartpoleSacPlayer(ndDemoEntityManager* const scene);
 void ndBasicAngularMomentum(ndDemoEntityManager* const scene);
 void ndBasicSlidingPlatform(ndDemoEntityManager* const scene);
 void ndBasicCompoundCollision(ndDemoEntityManager* const scene);
@@ -88,7 +89,8 @@ void ndBasicStaticMeshCollision(ndDemoEntityManager* const scene);
 void ndPlayerCapsule_ThirdPerson(ndDemoEntityManager* const scene);
 void ndBasicSceneCompoundCollision(ndDemoEntityManager* const scene);
 
-void ndCartpoleContinueTraining(ndDemoEntityManager* const scene);
+
+void ndCartpoleSacTraining(ndDemoEntityManager* const scene);
 
 
 ndDemoEntityManager::ndDemos ndDemoEntityManager::m_demosSelection[] =
@@ -110,6 +112,7 @@ ndDemoEntityManager::ndDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic vehicle", ndBasicVehicle},
 	{ "object placement", ndObjectPlacement},
 	{ "basic player", ndPlayerCapsule_ThirdPerson},
+	{ "carpole SAC player", ndCartpoleSacPlayer},
 	
 	
 
@@ -143,7 +146,7 @@ ndDemoEntityManager::ndDemos ndDemoEntityManager::m_demosSelection[] =
 
 ndDemoEntityManager::ndDemos ndDemoEntityManager::m_machineLearning[]
 {
-	{ "carpole SAC", ndCartpoleContinueTraining},
+	{ "carpole SAC training", ndCartpoleSacTraining},
 };
 
 ndDemoEntityManager::ButtonKey::ButtonKey (bool state)

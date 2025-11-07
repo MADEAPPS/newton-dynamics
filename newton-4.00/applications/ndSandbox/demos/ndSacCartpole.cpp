@@ -215,15 +215,6 @@ namespace ndContinueCarpole
 				return ndReal(0.0f);
 			}
 
-			//ndFixSizeArray<ndJointBilateralConstraint*, 64> extraJoints(0);
-			//ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
-			//ndModelArticulation::ndCenterOfMassDynamics dynamics (model->CalculateCentreOfMassDynamics(m_solver, ndGetIdentityMatrix(), extraJoints, m_timestep));
-			//ndFloat32 accelReward = 0.0f;
-			//const ndVector veloc(m_cart->GetVelocity());
-			//ndFloat32 speedReward = ndReal(ndExp(-ndFloat32(200.0f) * veloc.m_x * veloc.m_x));
-			//ndFloat32 reward = 0.25f * angularReward + 0.25f * speedReward + 0.5f * accelReward;
-
-
 			ndJointHinge* const hinge = (ndJointHinge*)*m_poleHinge;
 			ndFloat32 angle = hinge->GetAngle();
 			ndFloat32 omega = hinge->GetOmega();
@@ -268,7 +259,7 @@ namespace ndContinueCarpole
 			,m_discountRewardFactor(0.99f)
 			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountRewardFactor))
 			,m_lastEpisode(0xfffffff)
-			,m_stopTraining(100 * 1000000)
+			,m_stopTraining(500000)
 			,m_modelIsTrained(false)
 		{
 			char name[256];
@@ -410,24 +401,16 @@ namespace ndContinueCarpole
 		bool m_modelIsTrained;
 	};
 }
-
 using namespace ndContinueCarpole;
 
-//void ndCartpolePlayerContinue(ndDemoEntityManager* const scene)
-void ndCartpolePlayerContinue(ndDemoEntityManager* const)
+void ndCartpoleSacPlayer(ndDemoEntityManager* const scene)
 {
-	ndAssert(0);
-	//ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "marbleCheckBoard.png", 0.1f, true));
-	//
-	//ndMatrix matrix(ndGetIdentityMatrix());
-	//matrix.m_posit.m_y = 0.11f;
-	//
+	ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "marbleCheckBoard.png", 0.1f, true));
+
 	////ndMeshLoader loader;
 	////ndSharedPtr<ndDemoEntity> modelMesh(loader.LoadEntity("cartpole.fbx", scene));
 	//ndRenderMeshLoader loader(*scene->GetRenderer());
 	//loader.LoadMesh(ndGetWorkingFileName("cartpole.nd"));
-	//
-	//ndSetRandSeed(42);
 	//ndSharedPtr<ndDemoEntityManager::OnPostUpdate>trainer(new TrainingUpdata(scene, matrix, loader));
 	//scene->RegisterPostUpdate(trainer);
 	////#else
@@ -445,15 +428,23 @@ void ndCartpolePlayerContinue(ndDemoEntityManager* const)
 	////ndSharedPtr<ndBrain> policy(ndBrainLoad::Load(fileName));
 	////model->SetNotifyCallback(new RobotModelNotify(policy, model));
 	////#endif
-	//
-	//matrix.m_posit.m_x -= 0.0f;
-	//matrix.m_posit.m_y += 0.5f;
-	//matrix.m_posit.m_z += 2.0f;
-	//ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
-	//scene->SetCameraMatrix(rotation, matrix.m_posit);
+
+	ndMatrix matrix(ndGetIdentityMatrix());
+	ndRenderMeshLoader loader(*scene->GetRenderer());
+	loader.LoadMesh(ndGetWorkingFileName("cartpole.nd"));
+	
+	//ndSetRandSeed(42);
+	//ndSharedPtr<ndDemoEntityManager::OnPostUpdate>trainer(new TrainingUpdata(scene, matrix, loader));
+	//scene->RegisterPostUpdate(trainer);
+
+	matrix.m_posit.m_x -= 0.0f;
+	matrix.m_posit.m_y += 0.5f;
+	matrix.m_posit.m_z += 2.0f;
+	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
+	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
 
-void ndCartpoleContinueTraining(ndDemoEntityManager* const scene)
+void ndCartpoleSacTraining(ndDemoEntityManager* const scene)
 {
 	ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "marbleCheckBoard.png", 0.1f, true));
 
