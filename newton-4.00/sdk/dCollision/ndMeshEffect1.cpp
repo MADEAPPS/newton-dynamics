@@ -5243,8 +5243,8 @@ void ndMeshEffect::DeserializeFromXml(const nd::TiXmlElement* const xmlNode)
 		material.m_reflection = xmlGetVector3(node, "reflection");
 		material.m_shiness = xmlGetFloat(node, "shiness");
 		material.m_opacity = xmlGetFloat(node, "opacity");
-		snprintf(material.m_name, sizeof(material.m_name), xmlGetString(node, "name"));
-		snprintf(material.m_textureName, sizeof(material.m_textureName), xmlGetString(node, "texture"));
+		snprintf(material.m_name, sizeof(material.m_name), "%s", xmlGetString(node, "name"));
+		snprintf(material.m_textureName, sizeof(material.m_textureName), "%s", xmlGetString(node, "texture"));
 
 		materialArray.PushBack(material);
 	}
