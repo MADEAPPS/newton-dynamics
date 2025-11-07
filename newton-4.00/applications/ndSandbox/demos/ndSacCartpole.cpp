@@ -19,7 +19,7 @@
 
 namespace ndContinueCarpole
 {
-	#define CONTROLLER_NAME			"cartpoleContinue"
+	#define CONTROLLER_NAME			"cartpoleSac"
 
 	#define ND_TRAJECTORY_STEPS		(1024 * 4)
 	#define D_PUSH_ACCEL			ndBrainFloat (-10.0f * DEMO_GRAVITY)
@@ -127,8 +127,8 @@ namespace ndContinueCarpole
 			ndSharedPtr<ndJointBilateralConstraint> xDirSlider(new ndJointSlider(sliderMatrix, m_cart->GetAsBodyKinematic(), world->GetSentinelBody()));
 			world->AddJoint(xDirSlider);
 
-			m_cartMatrix = m_cart->GetMatrix();
-			m_poleMatrix = m_pole->GetMatrix();
+			//m_cartMatrix = m_cart->GetMatrix();
+			//m_poleMatrix = m_pole->GetMatrix();
 		}
 
 		void Update(ndFloat32 timestep)
@@ -165,8 +165,16 @@ namespace ndContinueCarpole
 
 		void ResetModel()
 		{
-			m_cart->SetMatrix(m_cartMatrix);
-			m_pole->SetMatrix(m_poleMatrix);
+			//m_cart->SetMatrix(m_cartMatrix);
+			//m_pole->SetMatrix(m_poleMatrix);
+
+			ndMatrix cartMatrix(ndGetIdentityMatrix());
+			cartMatrix.m_posit = m_cart->GetMatrix().m_posit;
+			cartMatrix.m_posit.m_x = ndFloat32(0.0f);
+			m_cart->SetMatrix(cartMatrix);
+
+			const ndMatrix poleMatrix(m_poleHinge->CalculateGlobalMatrix1());
+			m_pole->SetMatrix(poleMatrix);
 
 			m_pole->SetOmega(ndVector::m_zero);
 			m_pole->SetVelocity(ndVector::m_zero);
@@ -235,8 +243,8 @@ namespace ndContinueCarpole
 			m_cart->GetAsBodyDynamic()->SetForce(force);
 		}
 
-		ndMatrix m_cartMatrix;
-		ndMatrix m_poleMatrix;
+		//ndMatrix m_cartMatrix;
+		//ndMatrix m_poleMatrix;
 		ndIkSolver m_solver;
 		ndSharedPtr<ndBody> m_cart;
 		ndSharedPtr<ndBody> m_pole;
@@ -352,13 +360,9 @@ namespace ndContinueCarpole
 
 					// save partial controller in case of crash 
 					ndBrain* const actor = m_master->GetPolicyNetwork();
-					snprintf(name, sizeof(name), "%s_actor.dnn", CONTROLLER_NAME);
-					ndString fileName (ndGetWorkingFileName(name));
+					ndString fileName(ndGetWorkingFileName(m_master->GetName().GetStr()));
+					m_master->GetPolicyNetwork()->SaveToFile(fileName.GetStr());
 					actor->SaveToFile(fileName.GetStr());
-					//ndBrain* const critic = m_master->GetValueNetwork();
-					//snprintf(name, sizeof(name), "%s_critic.dnn", CONTROLLER_NAME);
-					//ndGetWorkingFileName(name, fileName);
-					//critic->SaveToFile(fileName);
 				}
 
 				if (episodeCount && !m_master->IsSampling())
