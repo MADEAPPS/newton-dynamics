@@ -70,7 +70,8 @@ endif()
 
 set (openclSDKPath ${CMAKE_SOURCE_DIR}/thirdParty/opencl/OpenCL-SDK-v2024.10.24-Win-x64)
 
-if(NEWTON_ENABLE_OPENCL_SDK)
+# for now opencl only for windows, I need to figure out the path for linux systems
+if(NEWTON_ENABLE_OPENCL_SDK AND MSVC)
 	include_directories(${openclSDKPath}/include)
 	include_directories(../../sdk/dBrain/dOpencl)
 else()
