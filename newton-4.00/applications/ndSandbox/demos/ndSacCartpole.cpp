@@ -20,14 +20,12 @@
 namespace ndContinueCarpole
 {
 	#define CONTROLLER_NAME			"cartpoleSac"
+	#define CART_MASS				ndFloat32(10.0f)
+	#define POLE_MASS				ndFloat32(5.0f)
 
 	#define ND_TRAJECTORY_STEPS		(1024 * 4)
 	#define D_PUSH_ACCEL			ndBrainFloat (-10.0f * DEMO_GRAVITY)
 	#define D_REWARD_MIN_ANGLE		ndBrainFloat (20.0f * ndDegreeToRad)
-
-	#define CART_MASS				ndFloat32(10.0f)
-	#define POLE_MASS				ndFloat32(5.0f)
-
 
 	enum ndActionSpace
 	{
@@ -91,30 +89,15 @@ namespace ndContinueCarpole
 			{
 			}
 		
-			//ndBrainFloat CalculateReward()
-			//{
-			//	return m_owner->CalculateReward();
-			//}
-			//
-			//bool IsTerminal() const
-			//{
-			//	return m_owner->IsTerminal();
-			//}
-		
 			void GetObservation(ndBrainFloat* const observation)
 			{
-				//m_owner->GetObservation(observation);
+				m_owner->GetObservation(observation);
 			}
 		
 			virtual void ApplyActions(ndBrainFloat* const actions)
 			{
-				//m_owner->ApplyActions(actions);
+				m_owner->ApplyActions(actions);
 			}
-		
-			//void ResetModel()
-			//{
-			//	m_owner->ResetModel();
-			//}
 		
 			ndPlaybackController* m_owner;
 		};
@@ -131,6 +114,10 @@ namespace ndContinueCarpole
 		{
 			// create the model 
 			CreateArticulatedModel(scene, GetModel()->GetAsModelArticulation(), mesh, visualMesh);
+			ndModelArticulation::ndNode* const rootNode = GetModel()->GetAsModelArticulation()->GetRoot();
+			m_cart = rootNode->m_body;
+			m_pole = rootNode->GetFirstChild()->m_body;
+			m_poleHinge = rootNode->GetFirstChild()->m_joint;
 
 			// load the agent contaller
 			char name[256];
@@ -143,61 +130,7 @@ namespace ndContinueCarpole
 		void Update(ndFloat32 timestep)
 		{
 			m_timestep = timestep;
-			//m_controller->Step();
-		}
-
-#if 0
-		void PostUpdate(ndFloat32)
-		{
-			//if (IsOutOfBounds())
-			//{
-			//	TelePort();
-			//}
-		}
-
-		void TelePort() const
-		{
-			//ndModelArticulation* const model = (ndModelArticulation*)GetModel();
-			//ndBodyKinematic* const body = model->GetRoot()->m_body->GetAsBodyKinematic();
-			//
-			//ndVector posit(body->GetMatrix().m_posit);
-			//posit.m_y = 0.0f;
-			//posit.m_z = 0.0f;
-			//posit.m_w = 0.0f;
-			//for (ndInt32 i = 0; i < m_bodies.GetCount(); ++i)
-			//{
-			//	ndBodyKinematic* const modelBody = m_bodies[i];
-			//	ndMatrix matrix(modelBody->GetMatrix());
-			//	matrix.m_posit -= posit;
-			//	modelBody->SetMatrix(matrix);
-			//}
-		}
-
-		void ResetModel()
-		{
-			//m_cart->SetMatrix(m_cartMatrix);
-			//m_pole->SetMatrix(m_poleMatrix);
-
-			ndMatrix cartMatrix(ndGetIdentityMatrix());
-			cartMatrix.m_posit = m_cart->GetMatrix().m_posit;
-			cartMatrix.m_posit.m_x = ndFloat32(0.0f);
-			m_cart->SetMatrix(cartMatrix);
-
-			const ndMatrix poleMatrix(m_poleHinge->CalculateGlobalMatrix1());
-			m_pole->SetMatrix(poleMatrix);
-
-			m_pole->SetOmega(ndVector::m_zero);
-			m_pole->SetVelocity(ndVector::m_zero);
-
-			m_cart->SetOmega(ndVector::m_zero);
-			m_cart->SetVelocity(ndVector::m_zero);
-
-			GetModel()->GetAsModelArticulation()->ClearMemory();
-		}
-
-		bool IsOutOfBounds() const
-		{
-			return ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(20.0f);
+			m_controller->Step();
 		}
 
 		ndFloat32 GetPoleAngle() const
@@ -205,13 +138,6 @@ namespace ndContinueCarpole
 			ndJointHinge* const hinge = (ndJointHinge*)*m_poleHinge;
 			ndFloat32 angle = hinge->GetAngle();
 			return angle;
-		}
-
-		bool IsTerminal() const
-		{
-			ndFloat32 angle = GetPoleAngle();
-			bool fail = ndAbs(angle) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
-			return fail;
 		}
 
 		void GetObservation(ndBrainFloat* const observation)
@@ -226,24 +152,6 @@ namespace ndContinueCarpole
 			observation[m_cartSpeed] = ndBrainFloat(cartSpeed);
 		}
 
-		ndBrainFloat CalculateReward()
-		{
-			if (IsTerminal())
-			{
-				return ndReal(0.0f);
-			}
-
-			ndJointHinge* const hinge = (ndJointHinge*)*m_poleHinge;
-			ndFloat32 angle = hinge->GetAngle();
-			ndFloat32 omega = hinge->GetOmega();
-			ndFloat32 angleReward = ndReal(ndExp(-ndFloat32(1000.0f) * angle * angle));
-			ndFloat32 omegaReward = ndReal(ndExp(-ndFloat32(1000.0f) * omega * omega));
-			//ndTrace(("a=%f w=%f ra=%f rw=%f\n", angle, omega, angleReward, omegaReward));
-
-			ndFloat32 reward = 0.6f * angleReward + 0.4f * omegaReward;
-			return ndReal(reward);
-		}
-
 		void ApplyActions(ndBrainFloat* const actions)
 		{
 			ndVector force(m_cart->GetAsBodyDynamic()->GetForce());
@@ -253,14 +161,9 @@ namespace ndContinueCarpole
 			m_cart->GetAsBodyDynamic()->SetForce(force);
 		}
 
-		//ndMatrix m_cartMatrix;
-		//ndMatrix m_poleMatrix;
 		ndSharedPtr<ndBody> m_cart;
 		ndSharedPtr<ndBody> m_pole;
 		ndSharedPtr<ndJointBilateralConstraint> m_poleHinge;
-		ndSharedPtr<ndBrainAgentOffPolicyGradient_Agent> m_controllerTrainer;
-		
-#endif
 		ndSharedPtr<ndBrainAgentContinuePolicyGradient> m_controller;
 		ndFloat32 m_timestep;
 	};
