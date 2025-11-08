@@ -210,8 +210,6 @@ class ndSkeletonContainer
 	void ClearCloseLoopJoints();
 	void CalculateBufferSizeInBytes();
 	void AddCloseLoopJoint(ndConstraint* const joint);
-
-	void SortGraph(ndNode* const root, ndInt32& index);
 	void CalculateLoopMassMatrixCoefficients(ndThreadPool* const threadPool, ndFloat32* const diagDamp);
 	void FactorizeMatrix(ndInt32 size, ndInt32 stride, ndFloat32* const matrix, ndFloat32* const diagDamp) const;
 	void SolveBlockLcp(ndInt32 size, ndInt32 blockSize, ndFloat32* const x, ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex, ndFloat32 accelTol) const;
@@ -237,6 +235,20 @@ class ndSkeletonContainer
 	void InitMassMatrix(ndThreadPool* const threadPool, const ndLeftHandSide* const matrixRow, ndRightHandSide* const rightHandSide);
 	void SolveAuxiliary(ndThreadPool* const threadPool, ndJacobian* const internalForces, const ndForcePair* const accel, ndForcePair* const force) const;
 
+	class ndBodyForceIndexPair
+	{
+		public:
+		ndInt32 m_bodyIndex;
+		ndInt32 m_forceIndex;
+	};
+
+	class ndBodyForcePtr
+	{
+		public:
+		ndInt32* m_indexSpan;
+		ndBodyForceIndexPair* m_index;
+		ndInt32 m_spansCount;
+	};
 		
 	ndNode* m_skeleton;
 	ndNode** m_nodesOrder;
@@ -244,6 +256,8 @@ class ndSkeletonContainer
 	ndRightHandSide* m_rightHandSide;
 	const ndLeftHandSide* m_leftHandSide;
 	ndNodePair* m_pairs;
+	ndBodyForcePtr m_bodyForceRemap0;
+	ndBodyForcePtr m_bodyForceRemap1;
 	ndInt32* m_frictionIndex;
 	ndInt32* m_matrixRowsIndex;
 	ndFloat32* m_massMatrix11;
