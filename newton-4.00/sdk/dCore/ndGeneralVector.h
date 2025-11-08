@@ -26,7 +26,7 @@
 #include "ndTypes.h"
 
 template <class T>
-T ndSQRH(const T num, const T den)
+inline T ndSQRH(const T num, const T den)
 {
 	T r(num / den);
 	return T(sqrt(T(1.0f) + r * r));
@@ -41,14 +41,14 @@ T ndPythag(const T a, const T b)
 }
 
 template <class T>
-T ndSign(const T a, const T b)
+inline T ndSign(const T a, const T b)
 {
 	return (b >= T(0.0f)) ? (a >= T(0.0f) ? a : -a) : (a >= T(0.0f) ? -a : a);
 }
 
 // return dot product
 template<class T>
-T ndDotProduct(ndInt32 size, const T* const A, const T* const B)
+inline T ndDotProduct(ndInt32 size, const T* const A, const T* const B)
 {
 	T val(0.0f);
 	for (ndInt32 i = 0; i < size; ++i) 
@@ -60,7 +60,7 @@ T ndDotProduct(ndInt32 size, const T* const A, const T* const B)
 }
 
 template<class T>
-void ndScale(ndInt32 size, T* const X, T scale)
+inline void ndScale(ndInt32 size, T* const X, T scale)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
@@ -70,7 +70,7 @@ void ndScale(ndInt32 size, T* const X, T scale)
 }
 
 template<class T>
-void ndScaleSet(ndInt32 size, T* const X, const T* const A, T scale)
+inline void ndScaleSet(ndInt32 size, T* const X, const T* const A, T scale)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
@@ -80,7 +80,7 @@ void ndScaleSet(ndInt32 size, T* const X, const T* const A, T scale)
 }
 
 template<class T>
-void ndScaleAdd(ndInt32 size, T* const X, const T* const B, T C)
+inline void ndScaleAdd(ndInt32 size, T* const X, const T* const B, T C)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
@@ -90,7 +90,7 @@ void ndScaleAdd(ndInt32 size, T* const X, const T* const B, T C)
 }
 
 template<class T>
-void ndScaleAdd(ndInt32 size, T* const X, const T* const A, const T* const B, T C)
+inline void ndScaleAdd(ndInt32 size, T* const X, const T* const A, const T* const B, T C)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
@@ -100,7 +100,7 @@ void ndScaleAdd(ndInt32 size, T* const X, const T* const A, const T* const B, T 
 }
 
 template<class T>
-void ndMin(ndInt32 size, T* const X, T A)
+inline void ndMin(ndInt32 size, T* const X, T A)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
@@ -110,7 +110,7 @@ void ndMin(ndInt32 size, T* const X, T A)
 }
 
 template<class T>
-void ndMin(ndInt32 size, T* const X, const T* const A)
+inline void ndMin(ndInt32 size, T* const X, const T* const A)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
@@ -120,7 +120,7 @@ void ndMin(ndInt32 size, T* const X, const T* const A)
 }
 
 template<class T>
-void ndMax(ndInt32 size, T* const X, T A)
+inline void ndMax(ndInt32 size, T* const X, T A)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
@@ -130,7 +130,7 @@ void ndMax(ndInt32 size, T* const X, T A)
 }
 
 template<class T>
-void ndMax(ndInt32 size, T* const X, const T* const A)
+inline void ndMax(ndInt32 size, T* const X, const T* const A)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
@@ -140,7 +140,7 @@ void ndMax(ndInt32 size, T* const X, const T* const A)
 }
 
 template<class T>
-void ndLessMask(ndInt32 size, T* const X, T A)
+inline void ndLessMask(ndInt32 size, T* const X, T A)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
@@ -150,7 +150,7 @@ void ndLessMask(ndInt32 size, T* const X, T A)
 }
 
 template<class T>
-void ndLessEqualMask(ndInt32 size, T* const X, T A)
+inline void ndLessEqualMask(ndInt32 size, T* const X, T A)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
@@ -160,7 +160,7 @@ void ndLessEqualMask(ndInt32 size, T* const X, T A)
 }
 
 template<class T>
-void ndLessEqualMask(ndInt32 size, T* const X, const T* const A)
+inline void ndLessEqualMask(ndInt32 size, T* const X, const T* const A)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
@@ -170,7 +170,7 @@ void ndLessEqualMask(ndInt32 size, T* const X, const T* const A)
 }
 
 template<class T>
-void ndGreaterMask(ndInt32 size, T* const X, T A)
+inline void ndGreaterMask(ndInt32 size, T* const X, T A)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
@@ -180,7 +180,7 @@ void ndGreaterMask(ndInt32 size, T* const X, T A)
 }
 
 template<class T>
-void ndGreaterEqualMask(ndInt32 size, T* const X, T A)
+inline void ndGreaterEqualMask(ndInt32 size, T* const X, T A)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
@@ -190,7 +190,7 @@ void ndGreaterEqualMask(ndInt32 size, T* const X, T A)
 }
 
 template<class T>
-void ndGreaterEqualMask(ndInt32 size, T* const X, const T* const A)
+inline void ndGreaterEqualMask(ndInt32 size, T* const X, const T* const A)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
@@ -200,7 +200,7 @@ void ndGreaterEqualMask(ndInt32 size, T* const X, const T* const A)
 }
 
 template<class T>
-void ndBlend(ndInt32 size, T* const X, const T* const mask, T a, T b)
+inline void ndBlend(ndInt32 size, T* const X, const T* const mask, T a, T b)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
@@ -211,7 +211,7 @@ void ndBlend(ndInt32 size, T* const X, const T* const mask, T a, T b)
 }
 
 template<class T>
-void ndAdd(ndInt32 size, T* const X, const T* const A)
+inline void ndAdd(ndInt32 size, T* const X, const T* const A)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
@@ -221,7 +221,7 @@ void ndAdd(ndInt32 size, T* const X, const T* const A)
 }
 
 template<class T>
-void ndAdd(ndInt32 size, T* const X, const T* const A, const T* const B)
+inline void ndAdd(ndInt32 size, T* const X, const T* const A, const T* const B)
 {
 	for (ndInt32 i = 0; i < size; ++i) 
 	{
@@ -231,7 +231,7 @@ void ndAdd(ndInt32 size, T* const X, const T* const A, const T* const B)
 }
 
 template<class T>
-void ndSub(ndInt32 size, T* const X, const T* const A)
+inline void ndSub(ndInt32 size, T* const X, const T* const A)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
@@ -241,7 +241,7 @@ void ndSub(ndInt32 size, T* const X, const T* const A)
 }
 
 template<class T>
-void ndSub(ndInt32 size, T* const X, const T* const A, const T* const B)
+inline void ndSub(ndInt32 size, T* const X, const T* const A, const T* const B)
 {
 	for (ndInt32 i = 0; i < size; ++i) 
 	{
@@ -251,7 +251,7 @@ void ndSub(ndInt32 size, T* const X, const T* const A, const T* const B)
 }
 
 template<class T>
-void ndMul(ndInt32 size, T* const X, const T* const A)
+inline void ndMul(ndInt32 size, T* const X, const T* const A)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
@@ -261,7 +261,7 @@ void ndMul(ndInt32 size, T* const X, const T* const A)
 }
 
 template<class T>
-void ndMul(ndInt32 size, T* const X, const T* const A, const T* const B)
+inline void ndMul(ndInt32 size, T* const X, const T* const A, const T* const B)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
@@ -271,7 +271,7 @@ void ndMul(ndInt32 size, T* const X, const T* const A, const T* const B)
 }
 
 template<class T>
-void ndDiv(ndInt32 size, T* const X, const T* const A, const T* const B)
+inline void ndDiv(ndInt32 size, T* const X, const T* const A, const T* const B)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
@@ -281,7 +281,7 @@ void ndDiv(ndInt32 size, T* const X, const T* const A, const T* const B)
 }
 
 template<class T>
-void ndMulAdd(ndInt32 size, T* const X, const T* const B, const T* const C)
+inline void ndMulAdd(ndInt32 size, T* const X, const T* const B, const T* const C)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
@@ -291,7 +291,7 @@ void ndMulAdd(ndInt32 size, T* const X, const T* const B, const T* const C)
 }
 
 template<class T>
-void ndMulAdd(ndInt32 size, T* const X, const T* const A, const T* const B, const T* const C)
+inline void ndMulAdd(ndInt32 size, T* const X, const T* const A, const T* const B, const T* const C)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
@@ -301,7 +301,7 @@ void ndMulAdd(ndInt32 size, T* const X, const T* const A, const T* const B, cons
 }
 
 template<class T>
-void ndMulSub(ndInt32 size, T* const X, const T* const B, const T* const C)
+inline void ndMulSub(ndInt32 size, T* const X, const T* const B, const T* const C)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
@@ -311,7 +311,7 @@ void ndMulSub(ndInt32 size, T* const X, const T* const B, const T* const C)
 }
 
 template<class T>
-void ndMulSub(ndInt32 size, T* const X, const T* const A, const T* const B, const T* const C)
+inline void ndMulSub(ndInt32 size, T* const X, const T* const A, const T* const B, const T* const C)
 {
 	for (ndInt32 i = 0; i < size; ++i)
 	{
