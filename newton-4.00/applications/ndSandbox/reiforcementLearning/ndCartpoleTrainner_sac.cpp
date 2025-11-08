@@ -17,7 +17,7 @@
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 
-namespace ndContinueCarpole
+namespace ndCartpoleTrainer_sac
 {
 	#define CONTROLLER_NAME			"cartpoleSac"
 	#define CART_MASS				ndFloat32(10.0f)
@@ -77,96 +77,6 @@ namespace ndContinueCarpole
 		ndSharedPtr<ndJointBilateralConstraint> xDirSlider(new ndJointSlider(sliderMatrix, cart->GetAsBodyKinematic(), world->GetSentinelBody()));
 		world->AddJoint(xDirSlider);
 	}
-
-	class ndPlaybackController : public ndModelNotify
-	{
-		class ndAgent : public ndBrainAgentContinuePolicyGradient
-		{
-			public:
-			ndAgent(ndSharedPtr<ndBrain>& brain, ndPlaybackController* const owner)
-				:ndBrainAgentContinuePolicyGradient(brain)
-				,m_owner(owner)
-			{
-			}
-		
-			void GetObservation(ndBrainFloat* const observation)
-			{
-				m_owner->GetObservation(observation);
-			}
-		
-			virtual void ApplyActions(ndBrainFloat* const actions)
-			{
-				m_owner->ApplyActions(actions);
-			}
-		
-			ndPlaybackController* m_owner;
-		};
-
-		public:
-		ndPlaybackController()
-			:ndModelNotify()
-			,m_timestep(0.0f)
-		{
-		}
-
-		void SetController(ndDemoEntityManager* const scene,
-			ndSharedPtr<ndMesh> mesh, ndSharedPtr<ndRenderSceneNode> visualMesh)
-		{
-			// create the model 
-			CreateArticulatedModel(scene, GetModel()->GetAsModelArticulation(), mesh, visualMesh);
-			ndModelArticulation::ndNode* const rootNode = GetModel()->GetAsModelArticulation()->GetRoot();
-			m_cart = rootNode->m_body;
-			m_pole = rootNode->GetFirstChild()->m_body;
-			m_poleHinge = rootNode->GetFirstChild()->m_joint;
-
-			// load the agent contaller
-			char name[256];
-			snprintf(name, sizeof(name) - 1, "%s.dnn", CONTROLLER_NAME);
-			ndString fileName(ndGetWorkingFileName(name));
-			ndSharedPtr<ndBrain> policy(ndBrainLoad::Load(fileName.GetStr()));
-			m_controller = ndSharedPtr<ndBrainAgentContinuePolicyGradient> (new ndAgent(policy, this));
-		}
-
-		void Update(ndFloat32 timestep)
-		{
-			m_timestep = timestep;
-			m_controller->Step();
-		}
-
-		ndFloat32 GetPoleAngle() const
-		{
-			ndJointHinge* const hinge = (ndJointHinge*)*m_poleHinge;
-			ndFloat32 angle = hinge->GetAngle();
-			return angle;
-		}
-
-		void GetObservation(ndBrainFloat* const observation)
-		{
-			ndVector omega(m_pole->GetOmega());
-			ndFloat32 angle = GetPoleAngle();
-			observation[m_poleAngle] = ndReal(angle);
-			observation[m_poleOmega] = ndReal(omega.m_z);
-
-			const ndVector cartVeloc(m_cart->GetVelocity());
-			ndFloat32 cartSpeed = cartVeloc.m_x;
-			observation[m_cartSpeed] = ndBrainFloat(cartSpeed);
-		}
-
-		void ApplyActions(ndBrainFloat* const actions)
-		{
-			ndVector force(m_cart->GetAsBodyDynamic()->GetForce());
-			ndBrainFloat action = actions[0];
-			ndBrainFloat accel = D_PUSH_ACCEL * action;
-			force.m_x = ndFloat32(accel * (m_cart->GetAsBodyDynamic()->GetMassMatrix().m_w));
-			m_cart->GetAsBodyDynamic()->SetForce(force);
-		}
-
-		ndSharedPtr<ndBody> m_cart;
-		ndSharedPtr<ndBody> m_pole;
-		ndSharedPtr<ndJointBilateralConstraint> m_poleHinge;
-		ndSharedPtr<ndBrainAgentContinuePolicyGradient> m_controller;
-		ndFloat32 m_timestep;
-	};
 
 	class ndTrainerController : public ndModelNotify
 	{
@@ -502,31 +412,8 @@ namespace ndContinueCarpole
 		ndUnsigned32 m_stopTraining;
 		bool m_modelIsTrained;
 	};
-
-	static void CreatePlaybackModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndRenderMeshLoader& loader)
-	{
-		ndWorld* const world = scene->GetWorld();
-		ndMatrix matrix(location);
-		matrix.m_posit = FindFloor(*scene->GetWorld(), matrix.m_posit, 200.0f);
-		matrix.m_posit.m_y += ndFloat32(0.1f);
-		loader.m_mesh->m_matrix = loader.m_mesh->m_matrix * matrix;
-
-		ndSharedPtr<ndRenderSceneNode> visualMesh(loader.m_renderMesh->Clone());
-		visualMesh->SetTransform(loader.m_mesh->m_matrix);
-		visualMesh->SetTransform(loader.m_mesh->m_matrix);
-
-		ndModelArticulation* const model = new ndModelArticulation();
-		ndSharedPtr<ndModelNotify> controller(new ndPlaybackController());
-		model->SetNotifyCallback(controller);
-		((ndPlaybackController*)(*controller))->SetController(scene, loader.m_mesh, visualMesh);
-
-		// add model a visual mesh to the scene and world
-		world->AddModel(model);
-		scene->AddEntity(visualMesh);
-		model->AddBodiesAndJointsToWorld();
-	}
 }
-using namespace ndContinueCarpole;
+using namespace ndCartpoleTrainer_sac;
 
 void ndCartpoleSacTraining(ndDemoEntityManager* const scene)
 {
@@ -550,18 +437,3 @@ void ndCartpoleSacTraining(ndDemoEntityManager* const scene)
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
 
-void ndCartpoleSacPlayer(ndDemoEntityManager* const scene)
-{
-	ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "marbleCheckBoard.png", 0.1f, true));
-
-	ndMatrix matrix(ndGetIdentityMatrix());
-	ndRenderMeshLoader loader(*scene->GetRenderer());
-	loader.LoadMesh(ndGetWorkingFileName("cartpole.nd"));
-	CreatePlaybackModel(scene, matrix, loader);
-
-	matrix.m_posit.m_x -= 0.0f;
-	matrix.m_posit.m_y += 0.5f;
-	matrix.m_posit.m_z += 2.0f;
-	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
-	scene->SetCameraMatrix(rotation, matrix.m_posit);
-}

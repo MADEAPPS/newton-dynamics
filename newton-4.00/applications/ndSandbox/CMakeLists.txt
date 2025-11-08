@@ -22,7 +22,7 @@ if (APPLE)
 		demos/*.cpp
 		toolbox/*.h
 		toolbox/*.cpp 
-		plaforms/macos/*.mm 	
+		#plaforms/macos/*.mm 	
 	)
 else()
 	file(GLOB CPP_SOURCE 
@@ -33,6 +33,7 @@ else()
 		toolbox/*.h
 		toolbox/*.cpp 
 		plaforms/opengl/*.cpp 
+		reiforcementLearning/*.cpp
 	)
 endif()
 
