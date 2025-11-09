@@ -1917,8 +1917,16 @@ void ndSkeletonContainer::InitLoopMassMatrix(ndThreadPool* const threadPool)
 		m_bodyForceRemap1.m_index[i].m_bodyIndex = m1;
 		m_bodyForceRemap1.m_index[i].m_forceIndex = i;
 	}
-	SortIndexArray(0, 0);
-	SortIndexArray(1, 0);
+
+	if (threadPool)
+	{
+		threadPool->ParallelExecute(SortIndexArray, 2, 1);
+	}
+	else
+	{
+		SortIndexArray(0, 0);
+		SortIndexArray(1, 0);
+	}
 }
 
 void ndSkeletonContainer::SolveAuxiliary(ndThreadPool* const threadPool, ndJacobian* const internalForces, const ndForcePair* const, ndForcePair* const force) const
@@ -2033,15 +2041,14 @@ void ndSkeletonContainer::SolveAuxiliary(ndThreadPool* const threadPool, ndJacob
 	//	internalForcesArray[m1] = internalForcesArray[m1].MulAdd((ndVector8&)row->m_Jt.m_jacobianM1, jointForce);
 	//}
 
-	auto AddForces = ndMakeObject::ndFunction([this, f, internalForcesArray](ndInt32 groupId, ndInt32)
+	if (threadPool)
 	{
-		const ndBodyForcePtr bodyForceRemap (groupId ? m_bodyForceRemap1 : m_bodyForceRemap0);
-		const ndLeftHandSide* const leftHandSide = groupId ? (ndLeftHandSide*)&m_leftHandSide->m_Jt.m_jacobianM1 : m_leftHandSide;
-
-		for (ndInt32 k = 0; k < bodyForceRemap.m_spansCount; ++k)
+		ndLeftHandSide* leftHandSide;
+		ndBodyForcePtr bodyForceRemap;
+		auto AddForces = ndMakeObject::ndFunction([this, f, internalForcesArray, &leftHandSide, &bodyForceRemap](ndInt32 groupId, ndInt32)
 		{
-			const ndInt32 start = bodyForceRemap.m_indexSpan[k];
-			const ndInt32 count = bodyForceRemap.m_indexSpan[k + 1] - start;
+			const ndInt32 start = bodyForceRemap.m_indexSpan[groupId];
+			const ndInt32 count = bodyForceRemap.m_indexSpan[groupId + 1] - start;
 
 			const ndInt32 m = bodyForceRemap.m_index[start].m_bodyIndex;
 			ndVector8 force(internalForcesArray[m]);
@@ -2053,12 +2060,46 @@ void ndSkeletonContainer::SolveAuxiliary(ndThreadPool* const threadPool, ndJacob
 				const ndLeftHandSide* const row = &leftHandSide[index];
 				force = force.MulAdd((ndVector8&)row->m_Jt.m_jacobianM0, jointForce);
 			}
-			internalForcesArray[m] = force;	
-		}
-	});
+			internalForcesArray[m] = force;
+		});
 
-	AddForces(0, 0);
-	AddForces(1, 0);
+		bodyForceRemap = m_bodyForceRemap0;
+		leftHandSide = (ndLeftHandSide*)m_leftHandSide;
+		threadPool->ParallelExecute(AddForces, bodyForceRemap.m_spansCount, 4);
+
+		bodyForceRemap = m_bodyForceRemap1;
+		leftHandSide = (ndLeftHandSide*)(((ndJacobian*)m_leftHandSide) + 1);
+		threadPool->ParallelExecute(AddForces, bodyForceRemap.m_spansCount, 4);
+	}
+	else
+	{
+		auto AddForces = ndMakeObject::ndFunction([this, f, internalForcesArray](ndInt32 groupId, ndInt32)
+		{
+			const ndBodyForcePtr bodyForceRemap(groupId ? m_bodyForceRemap1 : m_bodyForceRemap0);
+			//const ndLeftHandSide* const leftHandSide = groupId ? (ndLeftHandSide*)&m_leftHandSide->m_Jt.m_jacobianM1 : m_leftHandSide;
+			const ndLeftHandSide* const leftHandSide = groupId ? (ndLeftHandSide*) (((ndJacobian*)m_leftHandSide)+1): m_leftHandSide;
+
+			for (ndInt32 k = 0; k < bodyForceRemap.m_spansCount; ++k)
+			{
+				const ndInt32 start = bodyForceRemap.m_indexSpan[k];
+				const ndInt32 count = bodyForceRemap.m_indexSpan[k + 1] - start;
+
+				const ndInt32 m = bodyForceRemap.m_index[start].m_bodyIndex;
+				ndVector8 force(internalForcesArray[m]);
+				for (ndInt32 j = 0; j < count; ++j)
+				{
+					const ndInt32 i = bodyForceRemap.m_index[j + start].m_forceIndex;
+					const ndVector8 jointForce(f[i]);
+					const ndInt32 index = m_matrixRowsIndex[i];
+					const ndLeftHandSide* const row = &leftHandSide[index];
+					force = force.MulAdd((ndVector8&)row->m_Jt.m_jacobianM0, jointForce);
+				}
+				internalForcesArray[m] = force;
+			}
+		});
+		AddForces(0, 0);
+		AddForces(1, 0);
+	}
 }
 
 void ndSkeletonContainer::InitMassMatrix(ndThreadPool* const threadPool,
