@@ -17,9 +17,9 @@
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 
-namespace ndCartpoleTrainer_sac
+namespace ndCartpoleTrainer_ppo
 {
-	#define CONTROLLER_NAME			"cartpoleSac"
+	#define CONTROLLER_NAME			"cartpolePpo"
 	#define CART_MASS				ndFloat32(10.0f)
 	#define POLE_MASS				ndFloat32(5.0f)
 
@@ -288,7 +288,6 @@ namespace ndCartpoleTrainer_sac
 
 			// create a Soft Actor Critic traniing agent
 			ndBrainAgentOffPolicyGradient_Trainer::HyperParameters hyperParameters;
-
 			//hyperParameters.m_useGpuBackend = false;
 			hyperParameters.m_numberOfActions = m_actionsSize;
 			hyperParameters.m_numberOfObservations = m_observationsSize;
@@ -417,9 +416,9 @@ namespace ndCartpoleTrainer_sac
 		bool m_modelIsTrained;
 	};
 }
-using namespace ndCartpoleTrainer_sac;
+using namespace ndCartpoleTrainer_ppo;
 
-void ndCartpoleSacTraining(ndDemoEntityManager* const scene)
+void ndCartpolePpoTraining(ndDemoEntityManager* const scene)
 {
 	ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "marbleCheckBoard.png", 0.1f, true));
 
