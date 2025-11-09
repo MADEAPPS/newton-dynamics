@@ -119,7 +119,7 @@ namespace ndCarpolePlayer_sac
 			ndWorld* const world = scene->GetWorld();
 			const ndMatrix sliderMatrix(cart->GetMatrix());
 			ndSharedPtr<ndJointBilateralConstraint> xDirSlider(new ndJointSlider(sliderMatrix, cart->GetAsBodyKinematic(), world->GetSentinelBody()));
-			world->AddJoint(xDirSlider);
+			model->AddCloseLoop(xDirSlider);
 		}
 
 		void SetController(ndDemoEntityManager* const scene,

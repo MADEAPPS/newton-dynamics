@@ -23,13 +23,12 @@
 #define _ND_MODEL_INC_H__
 
 #include <ndModelStdafx.h>
-#include <ndMesh.h>
-#include <ndMeshLoader.h>
 #include <ndFbxMeshLoader.h>
 #include <ndAnimationPose.h>
 #include <ndContactCallback.h>
 #include <ndModelBodyNotify.h>
 #include <ndAnimationSequence.h>
+#include <ndAnimationMeshLoader.h>
 #include <ndAnimationTwoWayBlend.h>
 #include <ndAnimationBlendTreeNode.h>
 #include <ndAnimationKeyframesTrack.h>

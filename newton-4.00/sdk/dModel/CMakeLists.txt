@@ -23,9 +23,9 @@ include_directories(../dCollision)
 include_directories(../dCore/tinyxml)
 include_directories(../dNewton/dJoints)
 include_directories(../dNewton/dModels)
+include_directories(../dCollision/dMesh)
 include_directories(../dNewton/dIkSolver)
 include_directories(../dNewton/dModels/dVehicle)
-
 
 include_directories(../../thirdParty/png)
 #include_directories(../../thirdParty/imgui/)

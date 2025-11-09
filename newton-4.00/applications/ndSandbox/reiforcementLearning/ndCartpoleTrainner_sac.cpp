@@ -75,7 +75,7 @@ namespace ndCartpoleTrainer_sac
 		ndWorld* const world = scene->GetWorld();
 		const ndMatrix sliderMatrix(cart->GetMatrix());
 		ndSharedPtr<ndJointBilateralConstraint> xDirSlider(new ndJointSlider(sliderMatrix, cart->GetAsBodyKinematic(), world->GetSentinelBody()));
-		world->AddJoint(xDirSlider);
+		model->AddCloseLoop(xDirSlider);
 	}
 
 	class ndTrainerController : public ndModelNotify
@@ -131,15 +131,14 @@ namespace ndCartpoleTrainer_sac
 			m_controllerTrainer = ndSharedPtr<ndBrainAgentOffPolicyGradient_Agent>(new ndAgent(master, this));
 			master->SetAgent(m_controllerTrainer);
 
-			CreateArticulatedModel(scene, GetModel()->GetAsModelArticulation(), mesh, visualMesh);
-			ndModelArticulation::ndNode* const rootNode = GetModel()->GetAsModelArticulation()->GetRoot();
+			ndModelArticulation* const articulation = GetModel()->GetAsModelArticulation();
+			CreateArticulatedModel(scene, articulation, mesh, visualMesh);
+			ndModelArticulation::ndNode* const rootNode = articulation->GetRoot();
 
 			m_cart = rootNode->m_body;
 			m_pole = rootNode->GetFirstChild()->m_body;
 			m_poleHinge = rootNode->GetFirstChild()->m_joint;
-
-			//m_cartMatrix = m_cart->GetMatrix();
-			//m_poleMatrix = m_pole->GetMatrix();
+			m_slider = articulation->GetCloseLoops().GetFirst()->GetInfo().m_joint;
 		}
 
 		void Update(ndFloat32 timestep)
@@ -176,9 +175,6 @@ namespace ndCartpoleTrainer_sac
 
 		void ResetModel()
 		{
-			//m_cart->SetMatrix(m_cartMatrix);
-			//m_pole->SetMatrix(m_poleMatrix);
-
 			ndMatrix cartMatrix(ndGetIdentityMatrix());
 			cartMatrix.m_posit = m_cart->GetMatrix().m_posit;
 			cartMatrix.m_posit.m_x = ndFloat32(0.0f);
@@ -235,13 +231,19 @@ namespace ndCartpoleTrainer_sac
 			}
 
 			ndJointHinge* const hinge = (ndJointHinge*)*m_poleHinge;
+			ndJointSlider* const slider = (ndJointSlider*)*m_slider;
+
 			ndFloat32 angle = hinge->GetAngle();
 			ndFloat32 omega = hinge->GetOmega();
+			ndFloat32 speed = slider->GetSpeed();
+
+			ndFloat32 speedReward = ndReal(ndExp(-ndFloat32(100.0f) * speed * speed));
 			ndFloat32 angleReward = ndReal(ndExp(-ndFloat32(1000.0f) * angle * angle));
 			ndFloat32 omegaReward = ndReal(ndExp(-ndFloat32(1000.0f) * omega * omega));
-			//ndTrace(("a=%f w=%f ra=%f rw=%f\n", angle, omega, angleReward, omegaReward));
 
-			ndFloat32 reward = 0.6f * angleReward + 0.4f * omegaReward;
+			// add penalize high velocity, 
+			// this is the equivalent of adding drag to the slider joint 
+			ndFloat32 reward = 0.6f * angleReward + 0.4f * omegaReward - 0.2f * speedReward;
 			return ndReal(reward);
 		}
 
@@ -256,6 +258,7 @@ namespace ndCartpoleTrainer_sac
 
 		ndSharedPtr<ndBody> m_cart;
 		ndSharedPtr<ndBody> m_pole;
+		ndSharedPtr<ndJointBilateralConstraint> m_slider;
 		ndSharedPtr<ndJointBilateralConstraint> m_poleHinge;
 		ndSharedPtr<ndBrainAgentOffPolicyGradient_Agent> m_controllerTrainer;
 		ndFloat32 m_timestep;

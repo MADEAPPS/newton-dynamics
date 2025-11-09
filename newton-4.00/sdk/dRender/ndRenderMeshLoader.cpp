@@ -18,7 +18,8 @@
 #include "ndRenderTextureCache.h"
 
 ndRenderMeshLoader::ndRenderMeshLoader(ndRender* const renderer)
-	:m_owner(renderer) 
+	:ndAnimationMeshLoader()
+	,m_owner(renderer) 
 {
 }
 
@@ -144,7 +145,7 @@ bool ndRenderMeshLoader::MeshToRenderSceneNode(const ndString& materialBasePath)
 
 bool ndRenderMeshLoader::LoadMesh(const ndString& fullPathMeshName)
 {
-	if (ndMeshLoader::LoadMesh(fullPathMeshName))
+	if (ndAnimationMeshLoader::LoadMesh(fullPathMeshName))
 	{
 		return MeshToRenderSceneNode(GetPath(fullPathMeshName));
 	}
@@ -153,7 +154,7 @@ bool ndRenderMeshLoader::LoadMesh(const ndString& fullPathMeshName)
 
 bool ndRenderMeshLoader::ImportFbx(const ndString& fbxPathMeshName)
 {
-	if (ndMeshLoader::ImportFbx(fbxPathMeshName))
+	if (ndAnimationMeshLoader::ImportFbx(fbxPathMeshName))
 	{
 		return MeshToRenderSceneNode(GetPath(fbxPathMeshName));
 	}

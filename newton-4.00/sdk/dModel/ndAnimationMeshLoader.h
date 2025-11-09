@@ -9,21 +9,16 @@
 * freely
 */
 
-#ifndef _ND_MESH_LOADER_H_
-#define _ND_MESH_LOADER_H_
+#ifndef _ND_ANIMATION_MESH_LOADER_H_
+#define _ND_ANIMATION_MESH_LOADER_H_
 
 #include "ndFbxMeshLoader.h"
 
-//class ndMeshLoader: public ndFbxMeshLoader
-class ndMeshLoader : public ndClassAlloc
+class ndAnimationMeshLoader : public ndMeshLoader
 {
 	public:
-	ndMeshLoader();
-	ndMeshLoader(const ndMeshLoader& src);
-	virtual ~ndMeshLoader();
-
-	virtual bool LoadMesh(const ndString& pathMeshName);
-	virtual void SaveMesh(const ndString& pathMeshName);
+	ndAnimationMeshLoader();
+	virtual ~ndAnimationMeshLoader();
 
 	ndSharedPtr<ndAnimationSequence> GetAnimationSequence(const ndString& pathAnimName);
 	const ndSharedPtr<ndAnimationSequence> FindSequence(const ndString& pathAnimName) const;
@@ -37,7 +32,6 @@ class ndMeshLoader : public ndClassAlloc
 	ndString GetName(const ndString& fullPathName) const;
 
 	public:
-	ndSharedPtr<ndMesh> m_mesh;
 	ndTree<ndSharedPtr<ndAnimationSequence>, ndString> m_animationCache;
 };
 

@@ -14,11 +14,10 @@
 
 
 class ndRender;
-class ndRenderMeshLoader : public ndMeshLoader
+class ndRenderMeshLoader : public ndAnimationMeshLoader
 {
 	public:
 	ndRenderMeshLoader(ndRender* const renderer);
-	//ndRenderMeshLoader(const ndRenderMeshLoader& src) {};
 	virtual ~ndRenderMeshLoader();
 
 	virtual bool LoadMesh(const ndString& fullPathMeshName) override;
