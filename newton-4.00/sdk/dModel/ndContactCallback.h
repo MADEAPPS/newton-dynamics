@@ -24,6 +24,7 @@ class ndApplicationMaterial : public ndMaterial
 	}
 
 	virtual void OnContactCallback(const ndContact* const joint, ndFloat32 timestep) const;
+	virtual bool OnAabbOverlap(const ndBodyKinematic* const body0, const ndBodyKinematic* const body1) const;
 	virtual bool OnAabbOverlap(const ndContact* const joint, ndFloat32 timestep, const ndShapeInstance& instanceShape0, const ndShapeInstance& instanceShape1) const;
 };
 
@@ -83,9 +84,10 @@ class ndContactCallback: public ndContactNotify
 	virtual ndMaterial* GetMaterial(const ndContact* const contactJoint, const ndShapeInstance& instance0, const ndShapeInstance& instance1) const;
 
 	private:
-	virtual bool OnAabbOverlap(const ndContact* const contactJoint, ndFloat32 timestep) const;
-	virtual void OnContactCallback(const ndContact* const contactJoint, ndFloat32 timestep) const;
-	virtual bool OnCompoundSubShapeOverlap(const ndContact* const contactJoint, ndFloat32 timestep, const ndShapeInstance* const instance0, const ndShapeInstance* const instance1) const;
+	virtual bool OnAabbOverlap(const ndContact* const contactJoint, ndFloat32 timestep) const override;
+	virtual void OnContactCallback(const ndContact* const contactJoint, ndFloat32 timestep) const override;
+	virtual bool OnAabbOverlap(const ndBodyKinematic* const body0, const ndBodyKinematic* const body1) const override;
+	virtual bool OnCompoundSubShapeOverlap(const ndContact* const contactJoint, ndFloat32 timestep, const ndShapeInstance* const instance0, const ndShapeInstance* const instance1) const override;
 	
 	ndMaterialGraph m_materialGraph;
 	ndApplicationMaterial m_defaultMaterial;
@@ -103,6 +105,11 @@ inline ndApplicationMaterial::ndApplicationMaterial(const ndApplicationMaterial&
 
 inline ndApplicationMaterial::~ndApplicationMaterial()
 {
+}
+
+inline bool ndApplicationMaterial::OnAabbOverlap(const ndBodyKinematic* const body0, const ndBodyKinematic* const body1) const
+{
+	return true;
 }
 
 inline bool ndApplicationMaterial::OnAabbOverlap(const ndContact* const, ndFloat32, const ndShapeInstance&, const ndShapeInstance&) const

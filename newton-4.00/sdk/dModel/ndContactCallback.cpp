@@ -34,6 +34,20 @@ ndApplicationMaterial& ndContactCallback::RegisterMaterial(const ndApplicationMa
 	return *node->GetInfo();
 }
 
+bool ndContactCallback::OnAabbOverlap(const ndBodyKinematic* const body0, const ndBodyKinematic* const body1) const
+{
+	const ndShapeInstance& instanceShape0 = body0->GetCollisionShape();
+	const ndShapeInstance& instanceShape1 = body1->GetCollisionShape();
+	ndMaterialHash key(instanceShape0.m_shapeMaterial.m_userId, instanceShape1.m_shapeMaterial.m_userId);
+	ndMaterialGraph::ndNode* const node = m_materialGraph.Find(key);
+	if (node)
+	{
+		return node->GetInfo()->OnAabbOverlap(body0, body1);
+	}
+
+	return true;
+}
+
 bool ndContactCallback::OnAabbOverlap(const ndContact* const contactJoint, ndFloat32 timestep) const
 {
 	const ndApplicationMaterial* const material = (ndApplicationMaterial*)contactJoint->GetMaterial();

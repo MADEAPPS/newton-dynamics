@@ -1370,26 +1370,27 @@ void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1
 		bool isCollidable = bilateral ? bilateral->IsCollidable() : true;
 		if (isCollidable)
 		{	
-			// can't use skeleton as filter, since skelton are procedurally generated
-			// by the engine and the app has not control over them.
-			 
-			//instead use the model as filter
-			ndModel* const model0 = body0->GetModel();
-			ndModel* const model1 = body1->GetModel();
-			if (model0 && model1 && (model0 == model1))
+			bool generateContact = m_contactNotifyCallback->OnAabbOverlap(body0, body1);
+			if (generateContact)
 			{
-				const ndSharedPtr<ndModelNotify>& notification = model0->GetNotifyCallback();
-				if (*notification)
+				//instead use the model as filter
+				ndModel* const model0 = body0->GetModel();
+				ndModel* const model1 = body1->GetModel();
+				if (model0 && model1 && (model0 == model1))
 				{
-					isCollidable = notification->OnContactGeneration(body0, body1);
+					const ndSharedPtr<ndModelNotify>& notification = model0->GetNotifyCallback();
+					if (*notification)
+					{
+						isCollidable = notification->OnContactGeneration(body0, body1);
+					}
 				}
-			}
 
-			if (isCollidable)
-			{
-				ndArray<ndContactPairs>& particalPairs = m_partialNewPairs[threadId];
-				ndContactPairs pair(ndUnsigned32(body0->m_index), ndUnsigned32(body1->m_index));
-				particalPairs.PushBack(pair);
+				if (isCollidable)
+				{
+					ndArray<ndContactPairs>& particalPairs = m_partialNewPairs[threadId];
+					ndContactPairs pair(ndUnsigned32(body0->m_index), ndUnsigned32(body1->m_index));
+					particalPairs.PushBack(pair);
+				}
 			}
 		}
 	}

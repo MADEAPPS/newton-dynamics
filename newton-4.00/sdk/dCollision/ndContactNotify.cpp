@@ -72,6 +72,11 @@ bool ndContactNotify::OnAabbOverlap(const ndContact* const, ndFloat32) const
 	return true;
 }
 
+bool ndContactNotify::OnAabbOverlap(const ndBodyKinematic* const, const ndBodyKinematic* const) const
+{
+	return true;
+}
+
 void ndContactNotify::OnContactCallback(const ndContact* const, ndFloat32) const
 {
 }
