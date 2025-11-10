@@ -104,9 +104,7 @@ static void AddCompound(ndDemoEntityManager* const scene, const ndMatrix& origin
 	}
 	compound->EndAddRemove();
 
-	//ndSharedPtr<ndBody> body = AddSphere(scene, origin, mass, ndFloat32(0.5f));
-	ndSharedPtr<ndBody> body (CreateRigidbody(scene, shape, origin, mass, 
-		"wood_0.png", ndRenderPrimitive::m_box));
+	ndSharedPtr<ndBody> body (CreateRigidbody(scene, shape, origin, mass, "wood_0.png", ndRenderPrimitive::m_box));
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 	world->AddBody(body);
