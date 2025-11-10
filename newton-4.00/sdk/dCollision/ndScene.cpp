@@ -1370,8 +1370,8 @@ void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1
 		bool isCollidable = bilateral ? bilateral->IsCollidable() : true;
 		if (isCollidable)
 		{	
-			bool generateContact = m_contactNotifyCallback->OnAabbOverlap(body0, body1);
-			if (generateContact)
+			isCollidable = m_contactNotifyCallback->OnAabbOverlap(body0, body1);
+			if (isCollidable)
 			{
 				//instead use the model as filter
 				ndModel* const model0 = body0->GetModel();
