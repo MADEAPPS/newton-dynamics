@@ -76,7 +76,8 @@ void ndArchimedesBuoyancyVolume::OnTriggerEnter(ndBodyKinematic* const body, ndF
 void ndArchimedesBuoyancyVolume::OnTrigger(const ndContact* const contact, ndFloat32)
 {
 	// get the nody from the joint
-	ndBodyKinematic* const body = (contact->GetBody0() != this) ? contact->GetBody0()->GetAsBodyDynamic() : contact->GetBody1()->GetAsBodyDynamic();
+	ndBodyKinematic* const body = (contact->GetBody0() != this) ? contact->GetBody0()->GetAsBodyKinematic() : contact->GetBody1()->GetAsBodyKinematic();
+	ndAssert(body);
 
 	{
 		// you can check here to get the contact surfaces
@@ -101,7 +102,7 @@ void ndArchimedesBuoyancyVolume::OnTrigger(const ndContact* const contact, ndFlo
 		ndVector mass (body->GetMassMatrix());
 		ndVector centerOfPreasure(ndVector::m_zero);
 		ndMatrix matrix (body->GetMatrix());
-		ndShapeInstance& collision = body->GetCollisionShape();
+		const ndShapeInstance& collision = body->GetCollisionShape();
 
 		ndFloat32 volume = collision.CalculateBuoyancyCenterOfPresure (centerOfPreasure, matrix, m_plane);
 		if (volume > 0.0f)
