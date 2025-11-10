@@ -129,7 +129,7 @@ namespace ndCartpoleTrainer_sac
 			ndSharedPtr<ndMesh> mesh, ndSharedPtr<ndRenderSceneNode> visualMesh)
 		{
 			m_controllerTrainer = ndSharedPtr<ndBrainAgentOffPolicyGradient_Agent>(new ndAgent(master, this));
-			master->SetAgent(m_controllerTrainer);
+			master->AddAgent(m_controllerTrainer);
 
 			ndModelArticulation* const articulation = GetModel()->GetAsModelArticulation();
 			CreateArticulatedModel(scene, articulation, mesh, visualMesh);

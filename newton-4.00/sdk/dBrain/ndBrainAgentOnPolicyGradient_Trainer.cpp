@@ -29,6 +29,7 @@
 #include "ndBrainLayerLinear.h"
 #include "ndBrainFloatBuffer.h"
 #include "ndBrainIntegerBuffer.h"
+#include "ndBrainOptimizerAdam.h"
 #include "ndBrainLayerActivationRelu.h"
 #include "ndBrainLayerActivationTanh.h"
 #include "ndBrainLossLeastSquaredError.h"
@@ -37,16 +38,6 @@
 #include "ndBrainAgentPolicyGradientActivation.h"
 #include "ndBrainAgentOnPolicyGradient_Trainer.h"
 
-
-// this activation suffers a lot form exploding gradients, when many neuron die, 
-#define ND_HIDEN_LAYERS_ACTIVATION				ndBrainLayerActivationRelu
- 
-// trying leaky linear rectifier to see if is better at dealing with banishing and exploding gradients
-//#define ND_HIDEN_LAYERS_ACTIVATION			ndBrainLayerActivationLeakyRelu
-
-// not exploding gradients but too slow to convergence
-//#define ND_HIDEN_LAYERS_ACTIVATION			ndBrainLayerActivationTanh
- 
 #define ND_POLICY_TRAINING_EXPLORATION_NOISE	ndBrainFloat(0.2f)
 #define ND_POLICY_DEFAULT_POLYAK_BLEND			ndBrainFloat(0.005f)
 #define ND_POLICY_CONSTANT_SIGMA				ndBrainFloat(0.5f)
@@ -462,14 +453,19 @@ void ndBrainAgentOnPolicyGradient_Trainer::BuildPolicyClass()
 	ndFixSizeArray<ndBrainLayer*, 32> layers;
 	
 	layers.SetCount(0);
+
 	layers.PushBack(new ndBrainLayerLinear(m_parameters.m_numberOfObservations, m_parameters.m_hiddenLayersNumberOfNeurons));
 	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
-	for (ndInt32 i = 0; i < m_parameters.m_numberOfHiddenLayers; ++i)
+	for (ndInt32 i = 0; i < m_parameters.m_numberOfHiddenLayers - 1; ++i)
 	{
 		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == m_parameters.m_hiddenLayersNumberOfNeurons);
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
-		layers.PushBack(new ND_HIDEN_LAYERS_ACTIVATION(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
 	}
+	// prevent exploding gradients. 
+	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
+	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
+
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_numberOfActions * 2));
 	layers.PushBack(new ndBrainAgentPolicyGradientActivation(layers[layers.GetCount() - 1]->GetOutputSize(), ndBrainFloat(ndLog(ND_POLICY_MIN_SIGMA)), ndBrainFloat(ndLog(ND_POLICY_MAX_SIGMA))));
 
@@ -480,12 +476,12 @@ void ndBrainAgentOnPolicyGradient_Trainer::BuildPolicyClass()
 	}
 	policy->InitWeights();
 
-	ndTrainerDescriptor descriptor(policy, m_context, m_parameters.m_miniBatchSize);
-	descriptor.m_regularizer = m_parameters.m_policyRegularizer;
-	descriptor.m_regularizerType = m_parameters.m_policyRegularizerType;
+	ndSharedPtr<ndBrainOptimizer> optimizer(new ndBrainOptimizerAdam(m_context));
+	optimizer->SetRegularizer(m_parameters.m_policyRegularizer);
+	optimizer->SetRegularizerType(m_parameters.m_policyRegularizerType);
 
-	ndAssert(0);
-	//m_policyTrainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor));
+	ndTrainerDescriptor descriptor(policy, m_context, m_parameters.m_miniBatchSize);
+	m_policyTrainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor, optimizer));
 }
 
 void ndBrainAgentOnPolicyGradient_Trainer::BuildCriticClass()
@@ -494,16 +490,17 @@ void ndBrainAgentOnPolicyGradient_Trainer::BuildCriticClass()
 	const ndBrain& policy = **m_policyTrainer->GetBrain();
 
 	layers.SetCount(0);
+
 	layers.PushBack(new ndBrainLayerLinear(policy.GetInputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
 	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
-	
-	for (ndInt32 i = 0; i < m_parameters.m_numberOfHiddenLayers; ++i)
+	for (ndInt32 i = 0; i < m_parameters.m_numberOfHiddenLayers - 1; ++i)
 	{
 		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == m_parameters.m_hiddenLayersNumberOfNeurons);
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
-		layers.PushBack(new ND_HIDEN_LAYERS_ACTIVATION(layers[layers.GetCount() - 1]->GetOutputSize()));
+		layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
 	}
 	
+	// prevent exploding gradients.
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
 	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 	
@@ -517,11 +514,12 @@ void ndBrainAgentOnPolicyGradient_Trainer::BuildCriticClass()
 	}
 	critic->InitWeights();
 	
+	ndSharedPtr<ndBrainOptimizer> optimizer(new ndBrainOptimizerAdam(m_context));
+	optimizer->SetRegularizer(m_parameters.m_criticRegularizer);
+	optimizer->SetRegularizerType(m_parameters.m_criticRegularizerType);
+
 	ndTrainerDescriptor descriptor(critic, m_context, m_parameters.m_miniBatchSize);
-	descriptor.m_regularizer = m_parameters.m_criticRegularizer;
-	descriptor.m_regularizerType = m_parameters.m_criticRegularizerType;
-	ndAssert(0);
-	//m_criticTrainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor));
+	m_criticTrainer = ndSharedPtr<ndBrainTrainer>(new ndBrainTrainer(descriptor, optimizer));
 }
 
 bool ndBrainAgentOnPolicyGradient_Trainer::IsValid() const

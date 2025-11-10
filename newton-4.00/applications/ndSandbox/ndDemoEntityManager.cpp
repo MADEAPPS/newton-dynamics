@@ -41,11 +41,11 @@
 //#define DEFAULT_SCENE	14		// basics mutibody vehicle
 //#define DEFAULT_SCENE	15		// object Placement
 //#define DEFAULT_SCENE	16		// third person player capsule
-//#define DEFAULT_SCENE	17		// cart pole Sace trained controller
+#define DEFAULT_SCENE	17		// cart pole SAC trained controller
 
 // These are the machine learning training demos
 //#define DEFAULT_SCENE			(MACHINE_LEARNING_BASE + 0)	// train cart pole using SAC agent
-#define DEFAULT_SCENE			(MACHINE_LEARNING_BASE + 1)	// train cart pole using PPO agent
+//#define DEFAULT_SCENE			(MACHINE_LEARNING_BASE + 1)	// train cart pole using PPO agent
 
 
 // legacy demos 

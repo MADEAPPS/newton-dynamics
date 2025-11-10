@@ -80,11 +80,11 @@ namespace ndCartpoleTrainer_ppo
 
 	class ndTrainerController : public ndModelNotify
 	{
-		class ndAgent : public ndBrainAgentOffPolicyGradient_Agent
+		class ndAgent : public ndBrainAgentOnPolicyGradient_Agent
 		{
 			public:
-			ndAgent(ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master, ndTrainerController* const owner)
-				:ndBrainAgentOffPolicyGradient_Agent(*master)
+			ndAgent(ndSharedPtr<ndBrainAgentOnPolicyGradient_Trainer>& master, ndTrainerController* const owner)
+				:ndBrainAgentOnPolicyGradient_Agent(*master)
 				,m_owner (owner)
 			{
 			}
@@ -125,11 +125,12 @@ namespace ndCartpoleTrainer_ppo
 		}
 
 		void SetController(ndDemoEntityManager* const scene,
-			ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>& master,
+			ndSharedPtr<ndBrainAgentOnPolicyGradient_Trainer>& master,
 			ndSharedPtr<ndMesh> mesh, ndSharedPtr<ndRenderSceneNode> visualMesh)
 		{
-			m_controllerTrainer = ndSharedPtr<ndBrainAgentOffPolicyGradient_Agent>(new ndAgent(master, this));
-			master->SetAgent(m_controllerTrainer);
+			m_controllerTrainer = ndSharedPtr<ndBrainAgentOnPolicyGradient_Agent>(new ndAgent(master, this));
+			//master->SetAgent(m_controllerTrainer);
+			master->AddAgent(m_controllerTrainer);
 
 			ndModelArticulation* const articulation = GetModel()->GetAsModelArticulation();
 			CreateArticulatedModel(scene, articulation, mesh, visualMesh);
@@ -260,7 +261,7 @@ namespace ndCartpoleTrainer_ppo
 		ndSharedPtr<ndBody> m_pole;
 		ndSharedPtr<ndJointBilateralConstraint> m_slider;
 		ndSharedPtr<ndJointBilateralConstraint> m_poleHinge;
-		ndSharedPtr<ndBrainAgentOffPolicyGradient_Agent> m_controllerTrainer;
+		ndSharedPtr<ndBrainAgentOnPolicyGradient_Agent> m_controllerTrainer;
 		ndFloat32 m_timestep;
 	};
 
@@ -287,11 +288,12 @@ namespace ndCartpoleTrainer_ppo
 			fprintf(m_outFile, "vpg\n");
 
 			// create a Soft Actor Critic traniing agent
-			ndBrainAgentOffPolicyGradient_Trainer::HyperParameters hyperParameters;
+			//ndBrainAgentOffPolicyGradient_Trainer::HyperParameters hyperParameters;
+			ndBrainAgentOnPolicyGradient_Trainer::HyperParameters hyperParameters;
 			//hyperParameters.m_useGpuBackend = false;
 			hyperParameters.m_numberOfActions = m_actionsSize;
 			hyperParameters.m_numberOfObservations = m_observationsSize;
-			m_master = ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer>(new ndBrainAgentOffPolicyGradient_Trainer(hyperParameters));
+			m_master = ndSharedPtr<ndBrainAgentOnPolicyGradient_Trainer>(new ndBrainAgentOnPolicyGradient_Trainer(hyperParameters));
 			
 			m_bestActor = ndSharedPtr< ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
 
@@ -402,7 +404,7 @@ namespace ndCartpoleTrainer_ppo
 			}
 		}
 
-		ndSharedPtr<ndBrainAgentOffPolicyGradient_Trainer> m_master;
+		ndSharedPtr<ndBrainAgentOnPolicyGradient_Trainer> m_master;
 		ndSharedPtr<ndBrain> m_bestActor;
 		ndList<ndModelArticulation*> m_models;
 		FILE* m_outFile;
