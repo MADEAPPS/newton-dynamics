@@ -41,6 +41,30 @@ namespace ndCartpoleTrainer_ppo
 		m_observationsSize
 	};
 
+	class CartPoleMaterial : public ndApplicationMaterial
+	{
+		public:
+		CartPoleMaterial()
+			:ndApplicationMaterial()
+		{
+		}
+
+		CartPoleMaterial(const CartPoleMaterial& src)
+			:ndApplicationMaterial(src)
+		{
+		}
+
+		ndApplicationMaterial* Clone() const
+		{
+			return new CartPoleMaterial(*this);
+		}
+
+		virtual bool OnAabbOverlap(const ndBodyKinematic* const, const ndBodyKinematic* const) const override
+		{
+			return false;
+		}
+	};
+
 	static void CreateArticulatedModel(
 		ndDemoEntityManager* const scene,
 		ndModelArticulation* const model,
@@ -50,6 +74,7 @@ namespace ndCartpoleTrainer_ppo
 		auto CreateRigidBody = [scene](ndSharedPtr<ndMesh>& mesh, ndSharedPtr<ndRenderSceneNode>& visualMesh, ndFloat32 mass, ndBodyDynamic* const parentBody)
 		{
 			ndSharedPtr<ndShapeInstance> shape(mesh->CreateCollision());
+			shape->m_shapeMaterial.m_userId = ndDemoContactCallback::m_modelPart;
 
 			ndBodyKinematic* const body = new ndBodyDynamic();
 			body->SetNotifyCallback(new ndDemoEntityNotify(scene, visualMesh, parentBody));
@@ -145,7 +170,7 @@ namespace ndCartpoleTrainer_ppo
 		void Update(ndFloat32 timestep)
 		{
 			m_timestep = timestep;
-			m_controllerTrainer->Step();
+			//m_controllerTrainer->Step();
 		}
 
 		void PostUpdate(ndFloat32)
@@ -307,17 +332,22 @@ namespace ndCartpoleTrainer_ppo
 			matrix.m_posit.m_y += ndFloat32 (0.1f);
 			loader.m_mesh->m_matrix = loader.m_mesh->m_matrix * matrix;
 
-			ndSharedPtr<ndRenderSceneNode> visualMesh(loader.m_renderMesh->Clone());
-			visualMesh->SetTransform(loader.m_mesh->m_matrix);
-			visualMesh->SetTransform(loader.m_mesh->m_matrix);
-
 			// create an articulated model
-			ndSharedPtr<ndModel>model(CreateModel(scene, loader.m_mesh, visualMesh));
+			const ndInt32 numberOfAgents = 10;
+			for (ndInt32 i = 0; i < numberOfAgents; ++i)
+			{
+				loader.m_mesh->m_matrix.m_posit.m_x = ndFloat32(10.0f) * (ndRand() - ndFloat32(0.5f));
+				ndSharedPtr<ndRenderSceneNode> visualMesh(loader.m_renderMesh->Clone());
+				visualMesh->SetTransform(loader.m_mesh->m_matrix);
+				visualMesh->SetTransform(loader.m_mesh->m_matrix);
 
-			// add model a visual mesh to the scene and world
-			world->AddModel(model);
-			scene->AddEntity(visualMesh);
-			model->AddBodiesAndJointsToWorld();
+				ndSharedPtr<ndModel>model(CreateModel(scene, loader.m_mesh, visualMesh));
+
+				// add model a visual mesh to the scene and world
+				world->AddModel(model);
+				scene->AddEntity(visualMesh);
+				model->AddBodiesAndJointsToWorld();
+			}
 		}
 
 		~TrainingUpdata()
@@ -347,6 +377,7 @@ namespace ndCartpoleTrainer_ppo
 
 		virtual void Update(ndDemoEntityManager* const manager, ndFloat32)
 		{
+			return;
 			ndUnsigned32 stopTraining = m_master->GetFramesCount();
 			if (stopTraining <= m_stopTraining)
 			{
@@ -420,6 +451,7 @@ namespace ndCartpoleTrainer_ppo
 }
 using namespace ndCartpoleTrainer_ppo;
 
+
 void ndCartpolePpoTraining(ndDemoEntityManager* const scene)
 {
 	ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "marbleCheckBoard.png", 0.1f, true));
@@ -428,12 +460,18 @@ void ndCartpolePpoTraining(ndDemoEntityManager* const scene)
 	ndRenderMeshLoader loader(*scene->GetRenderer());
 	loader.LoadMesh(ndGetWorkingFileName("cartpole.nd"));
 
+	// create a material that make the objects in training not collsionnle
+	CartPoleMaterial material;
+	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
+	callback->RegisterMaterial(material, ndDemoContactCallback::m_modelPart, ndDemoContactCallback::m_modelPart);
+
+
 	ndSetRandSeed(42);
 	ndSharedPtr<ndDemoEntityManager::OnPostUpdate>trainer (new TrainingUpdata(scene, matrix, loader));
 	scene->RegisterPostUpdate(trainer);
 
 	// supress v sync refress rate
-	scene->SetAcceleratedUpdate();
+	//scene->SetAcceleratedUpdate();
 	
 	matrix.m_posit.m_x -= 0.0f;
 	matrix.m_posit.m_y += 0.5f;
