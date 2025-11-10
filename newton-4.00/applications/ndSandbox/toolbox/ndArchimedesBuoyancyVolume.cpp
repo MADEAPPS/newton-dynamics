@@ -58,34 +58,37 @@ void ndArchimedesBuoyancyVolume::CalculatePlane(ndBodyKinematic* const body)
 	}
 }
 
+void ndArchimedesBuoyancyVolume::SpecialUpdate(ndFloat32 timestep)
+{
+	ndBodyTriggerVolume::SpecialUpdate(timestep);
+
+	// here the app can do things to manipulate the body ex: setting velocity
+	// in this examnple we do nothing
+	//SetVelocity(ndVector(1.0f, 0.0f, 0.0f, 0.0f));
+}
+
 void ndArchimedesBuoyancyVolume::OnTriggerEnter(ndBodyKinematic* const body, ndFloat32)
 {
 	ndTrace(("enter trigger body %d\n", body->GetId()));
 	CalculatePlane(body);
 }
-
-void ndArchimedesBuoyancyVolume::SpecialUpdate(ndFloat32 timestep)
-{
-	ndBodyTriggerVolume::SpecialUpdate(timestep);
-
-	// here the app can do manipulate the body ex: setting velocity
-	// in this examnple we do nothing
-	//SetVelocity(ndVector(1.0f, 0.0f, 0.0f, 0.0f));
-}
 	
 void ndArchimedesBuoyancyVolume::OnTrigger(const ndContact* const contact, ndFloat32)
 {
+	// get the nody from the joint
 	ndBodyKinematic* const body = (contact->GetBody0() != this) ? contact->GetBody0()->GetAsBodyDynamic() : contact->GetBody1()->GetAsBodyDynamic();
 
-	// you can check here to get the contact surfaces
-	ndVector normal;
-	ndVector point0;
-	ndVector point1;
-	contact->GetSeparatingSurface(normal, point0, point1);
-	if (body == contact->GetBody0())
 	{
-		// if the trigger is the first body, them swap the points
-		ndSwap(point0, point1);
+		// you can check here to get the contact surfaces
+		ndVector normal;
+		ndVector point0;
+		ndVector point1;
+		contact->GetSeparatingSurface(normal, point0, point1);
+		if (body == contact->GetBody0())
+		{
+			// if the trigger is the first body, them swap the points
+			ndSwap(point0, point1);
+		}
 	}
 
 	if (!m_hasPlane)

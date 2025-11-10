@@ -31,7 +31,7 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 	// make a triger volume
 	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeBox(20.0f, 10.0f, 20.0f)));
 	
-	// make a tranparent visual mesh
+	// make a transparent visual mesh
 	ndRenderPrimitive::ndDescriptor descriptor(*scene->GetRenderer());
 	descriptor.m_collision = shape;
 	descriptor.m_mapping = ndRenderPrimitive::m_box;
@@ -53,15 +53,15 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 
 static void AddBox(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 density, ndFloat32 mass)
 {
-	ndSharedPtr<ndBody> body = AddBox(scene, origin, mass, 1.0f, 1.0f, 1.0f);
+	ndSharedPtr<ndBody> body = AddBox(scene, origin, mass, ndFloat32(0.5f), ndFloat32(1.5f), ndFloat32(0.75f));
 	ndShapeMaterial material;
 	material.m_userParam[ndDemoContactCallback::m_density].m_floatData = density;
 	body->GetAsBodyKinematic()->GetCollisionShape().SetMaterial(material);
 }
 
-static void AddSphere1(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 density, ndFloat32 mass)
+static void AddSph(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 density, ndFloat32 mass)
 {
-	ndSharedPtr<ndBody> body = AddSphere(scene, origin, mass, 0.5f);
+	ndSharedPtr<ndBody> body = AddSphere(scene, origin, mass, ndFloat32(0.5f));
 	ndShapeMaterial material;
 	material.m_userParam[ndDemoContactCallback::m_density].m_floatData = density;
 	body->GetAsBodyKinematic()->GetCollisionShape().SetMaterial(material);
@@ -78,6 +78,42 @@ static void AddCapsule(ndDemoEntityManager* const scene, const ndMatrix& origin,
 static void AddConvexHull(ndDemoEntityManager* const scene, const ndMatrix& origin, const ndInt32 segments, ndFloat32 radius, ndFloat32 high, ndFloat32 density, ndFloat32 mass)
 {
 	ndSharedPtr<ndBody> body = AddConvexHull(scene, origin, mass, radius, high, segments);
+	ndShapeMaterial material;
+	material.m_userParam[ndDemoContactCallback::m_density].m_floatData = density;
+	body->GetAsBodyKinematic()->GetCollisionShape().SetMaterial(material);
+}
+
+static void AddCompound(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 density, ndFloat32 mass)
+{
+	ndSharedPtr<ndShapeInstance> shape(new ndShapeInstance(new ndShapeCompound()));
+	ndShapeCompound* const compound = shape->GetShape()->GetAsShapeCompound();
+	compound->BeginAddRemove();
+	{
+		// add a sphere
+		ndMatrix localMatrix(ndGetIdentityMatrix());
+		ndSharedPtr<ndShapeInstance>sphere(new ndShapeInstance(new ndShapeSphere(ndFloat32(0.5f))));
+		localMatrix.m_posit.m_x = ndFloat32(0.5f);
+		shape->SetLocalMatrix(localMatrix);
+		compound->AddCollision(*sphere);
+
+		// add a box
+		ndSharedPtr<ndShapeInstance>box(new ndShapeInstance(new ndShapeBox(ndFloat32(0.5f), ndFloat32(0.75f), ndFloat32(1.5f))));
+		localMatrix.m_posit.m_x = ndFloat32(-0.5f);
+		box->SetLocalMatrix(localMatrix);
+		compound->AddCollision(*box);
+	}
+	compound->EndAddRemove();
+
+	//ndSharedPtr<ndBody> body = AddSphere(scene, origin, mass, ndFloat32(0.5f));
+	ndSharedPtr<ndBody> body (CreateRigidbody(scene, shape, origin, mass, 
+		"wood_0.png", ndRenderPrimitive::m_box));
+
+	ndPhysicsWorld* const world = scene->GetWorld();
+	world->AddBody(body);
+
+	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)body->GetNotifyCallback();
+	scene->AddEntity(notify->m_entity);
+
 	ndShapeMaterial material;
 	material.m_userParam[ndDemoContactCallback::m_density].m_floatData = density;
 	body->GetAsBodyKinematic()->GetCollisionShape().SetMaterial(material);
@@ -103,12 +139,13 @@ void ndBasicTrigger (ndDemoEntityManager* const scene)
 		}
 	};
 	
-	AddBox(scene, PlaceMatrix(0.0f, 20.0f, -3.0f), 0.6f, 10.0f);
-	AddSphere1(scene, PlaceMatrix(0.0f, 5.0f, 0.0f), 0.5f, 10.0f);
-	AddCapsule(scene, PlaceMatrix(0.0f, 5.0f, 3.0f), 0.7f, 10.0f);
-	AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f, -2.0f), 7, 1.0f, 1.5f, 0.8f, 10.0f);
-	AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f,  2.0f), 21, 1.0f, 1.5f, 0.7f, 10.0f);
-	AddConvexHull(scene, PlaceMatrix( 2.0f, 5.0f,  3.0f), 210, 1.0f, 1.5f, 0.9f, 10.0f);
+	//AddBox(scene, PlaceMatrix(0.0f, 20.0f, -3.0f), 0.6f, 10.0f);
+	//AddSph(scene, PlaceMatrix(0.0f, 5.0f, 0.0f), 0.5f, 10.0f);
+	//AddCapsule(scene, PlaceMatrix(0.0f, 5.0f, 3.0f), 0.7f, 10.0f);
+	AddCompound(scene, PlaceMatrix(3.0f, 5.0f, 3.0f), 0.9f, 10.0f);
+	//AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f, -2.0f), 7, 1.0f, 1.5f, 0.8f, 10.0f);
+	//AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f,  2.0f), 21, 1.0f, 1.5f, 0.7f, 10.0f);
+	//AddConvexHull(scene, PlaceMatrix( 2.0f, 5.0f,  3.0f), 210, 1.0f, 1.5f, 0.9f, 10.0f);
 
 	ndQuaternion rot;
 	ndVector origin(-30.0f, 10.0f, 0.0f, 1.0f);

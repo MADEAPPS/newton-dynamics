@@ -514,10 +514,34 @@ ndInt32 ndShapeCompound::CalculatePlaneIntersection(const ndVector&, const ndVec
 	return 0;
 }
 
-ndVector ndShapeCompound::CalculateVolumeIntegral(const ndMatrix&, const ndVector&, const ndShapeInstance&) const
+ndVector ndShapeCompound::CalculateVolumeIntegral(const ndMatrix& globalMatrix, const ndVector& globalPlane, const ndShapeInstance& parentScale) const
 {
-	ndAssert(0);
-	return ndVector::m_zero;
+	ndFloat32 volume = ndFloat32(0.0f);
+	ndVector volumePosit(ndVector::m_zero);
+	ndTreeArray::Iterator iter(m_array);
+	for (iter.Begin(); iter; iter++)
+	{
+		ndNodeBase* const node = iter.GetNode()->GetInfo();
+		const ndShapeInstance* const collision = node->GetShape();
+
+		const ndMatrix matrix(collision->GetLocalMatrix() * globalMatrix);
+		const ndVector partialVolume(collision->GetShape()->CalculateVolumeIntegral(matrix, globalPlane, parentScale));
+
+		volume += partialVolume.m_w;
+		volumePosit += partialVolume.Scale(partialVolume.m_w);
+	}
+
+	if (volume > ndFloat32(1.0e-5f))
+	{
+		volumePosit = volumePosit.Scale(ndFloat32(1.0f) / volume);
+		volumePosit.m_w = volume;
+	}
+	else
+	{
+		volumePosit = ndVector::m_zero;
+	}
+
+	return volumePosit;
 }
 
 ndFloat32 ndShapeCompound::RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
@@ -563,8 +587,6 @@ ndFloat32 ndShapeCompound::RayCast(ndRayCastNotify& callback, const ndVector& lo
 					contactOut.m_normal = shapeInstance->GetLocalMatrix().RotateVector (tmpContactOut.m_normal);
 					contactOut.m_shapeId0 = tmpContactOut.m_shapeId0;
 					contactOut.m_shapeId1 = tmpContactOut.m_shapeId0;
-					//contactOut.m_shapeInstance0 = tmpContactOut.m_shapeInstance0;
-					//contactOut.m_shapeInstance1 = tmpContactOut.m_shapeInstance1;
 					contactOut.m_shapeInstance0 = shapeInstance;
 					contactOut.m_shapeInstance1 = shapeInstance;
 				}
@@ -802,7 +824,6 @@ ndFloat64 ndShapeCompound::CalculateEntropy(ndInt32 count, ndNodeBase** array)
 	ndFloat64 cost1 = cost0;
 	do {
 		cost1 = cost0;
-		//for (dgList<ndNodeBase*>::dgListNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) {
 		for (ndInt32 i = 0; i < count; ++i) 
 		{
 			ndNodeBase* const node = array[i];
@@ -810,10 +831,8 @@ ndFloat64 ndShapeCompound::CalculateEntropy(ndInt32 count, ndNodeBase** array)
 		}
 
 		cost0 = ndFloat32(0.0f);
-		//for (dgList<ndNodeBase*>::dgListNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) {
 		for (ndInt32 i = 0; i < count; ++i)
 		{
-			//ndNodeBase* const node = listNode->GetInfo();
 			ndNodeBase* const node = array[i];
 			cost0 += node->m_area;
 		}
@@ -902,8 +921,6 @@ void ndShapeCompound::EndAddRemove()
 {
 	if (m_root) 
 	{
-		//dgScopeSpinLock lock(&m_criticalSectionLock);
-
 		ndTreeArray::Iterator iter(m_array);
 		for (iter.Begin(); iter; iter++) 
 		{
@@ -989,8 +1006,6 @@ void ndShapeCompound::EndAddRemove()
 			{
 				m_root = m_root->m_parent;
 			}
-
-			//m_root->Sanity();
 		}
 		else 
 		{
@@ -1020,7 +1035,6 @@ ndShapeInstance* ndShapeCompound::GetShapeInstance(ndTreeArray::ndNode* const no
 
 ndShapeCompound::ndTreeArray::ndNode* ndShapeCompound::AddCollision(ndShapeInstance* const subInstance)
 {
-	//ndAssert(m_ownerInstance);
 	ndNodeBase* const newNode = new ndNodeBase(subInstance);
 	m_array.AddNode(newNode, m_idIndex);
 

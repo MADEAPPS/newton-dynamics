@@ -51,14 +51,13 @@ ndVector FindFloor(const ndWorld& world, const ndVector& origin, ndFloat32 dist)
 ndMatrix FindFloor(const ndWorld& world, const ndMatrix& origin, const ndShapeInstance& shape, ndFloat32 dist);
 ndVector FindFloor(const ndWorld& world, const ndVector& origin, const ndShapeInstance& shape, ndFloat32 dist);
 
-void SetModelVisualMesh(ndDemoEntityManager* const scene, ndModelArticulation* const model);
 
-//ndSharedPtr<ndBody> CreateRigidbody(ndDemoEntityManager* const scene,
-//	const ndShapeInstance& shape,
-//	const ndMatrix& location,
-//	ndFloat32 mass,
-//	const char* const textName,
-//	ndRenderPrimitive::ndUvMapingMode mappingMode);
+ndSharedPtr<ndBody> CreateRigidbody(ndDemoEntityManager* const scene,
+	ndSharedPtr<ndShapeInstance>& shape,
+	const ndMatrix& location,
+	ndFloat32 mass,
+	const char* const textName,
+	ndRenderPrimitive::ndUvMapingMode mappingMode);
 
 ndSharedPtr<ndBody> CreateBox(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez, const char* const textName = "wood_0.png");
 ndSharedPtr<ndBody> CreateSphere(ndDemoEntityManager* const scene, const ndMatrix& origin, ndFloat32 mass, ndFloat32 radius, const char* const textName = "wood_0.png");

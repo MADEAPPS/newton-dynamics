@@ -106,9 +106,10 @@ ndVector FindFloor(const ndWorld& world, const ndVector& origin, const ndShapeIn
 }
 
 //******************************************************************************
-// Create simple rigi body with a collsion shspe and render primitev but is not added to the scene
+// Create simple rigid body with a collsion shspe and render primitev but 
+// is not added to the scene
 //******************************************************************************
-static ndSharedPtr<ndBody> CreateBody(
+ndSharedPtr<ndBody> CreateRigidbody(
 	ndDemoEntityManager* const scene, 
 	ndSharedPtr<ndShapeInstance>& shape,
 	const ndMatrix& location, 
@@ -119,15 +120,14 @@ static ndSharedPtr<ndBody> CreateBody(
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndRender* const render = *scene->GetRenderer();
 
-	const ndMatrix matrix(FindFloor(*world, location, **shape, 200.0f));
-	ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(matrix));
-
 	ndRenderPrimitive::ndDescriptor descriptor(render);
 	descriptor.m_collision = shape;
 	descriptor.m_mapping = mappingMode;
-	descriptor.AddMaterial (render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textName)));
-
+	descriptor.AddMaterial(render->GetTextureCache()->GetTexture(ndGetWorkingFileName(textName)));
 	ndSharedPtr<ndRenderPrimitive> mesh(new ndRenderPrimitive(descriptor));
+
+	const ndMatrix matrix(FindFloor(*world, location, **shape, 200.0f));
+	ndSharedPtr<ndRenderSceneNode>entity(new ndRenderSceneNode(matrix));
 	entity->SetPrimitive(mesh);
 
 	ndSharedPtr<ndBody> body (new ndBodyDynamic());
@@ -144,28 +144,28 @@ static ndSharedPtr<ndBody> CreateBody(
 ndSharedPtr<ndBody> CreateBox(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez, const char* const textName)
 {
 	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeBox(sizex, sizey, sizez)));
-	ndSharedPtr<ndBody> body(CreateBody(scene, shape, location, mass, textName, ndRenderPrimitive::m_box));
+	ndSharedPtr<ndBody> body(CreateRigidbody(scene, shape, location, mass, textName, ndRenderPrimitive::m_box));
 	return body;
 }
 
 ndSharedPtr<ndBody> CreateSphere(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius, const char* const textName)
 {
 	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeSphere(radius)));
-	ndSharedPtr<ndBody> body(CreateBody(scene, shape, location, mass, textName, ndRenderPrimitive::m_spherical));
+	ndSharedPtr<ndBody> body(CreateRigidbody(scene, shape, location, mass, textName, ndRenderPrimitive::m_spherical));
 	return body;
 }
 
 ndSharedPtr<ndBody> CreateCapsule(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, const char* const textName)
 {
 	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeCapsule(radius0, radius1, high)));
-	ndSharedPtr<ndBody> body(CreateBody(scene, shape, location, mass, textName, ndRenderPrimitive::m_capsule));
+	ndSharedPtr<ndBody> body(CreateRigidbody(scene, shape, location, mass, textName, ndRenderPrimitive::m_capsule));
 	return body;
 }
 
 ndSharedPtr<ndBody> CreateCylinder(ndDemoEntityManager* const scene, const ndMatrix& location, ndFloat32 mass, ndFloat32 radius0, ndFloat32 radius1, ndFloat32 high, const char* const textName)
 {
 	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeCylinder(radius0, radius1, high)));
-	ndSharedPtr<ndBody> body(CreateBody(scene, shape, location, mass, textName, ndRenderPrimitive::m_cylindrical));
+	ndSharedPtr<ndBody> body(CreateRigidbody(scene, shape, location, mass, textName, ndRenderPrimitive::m_cylindrical));
 	return body;
 }
 
@@ -237,7 +237,7 @@ ndSharedPtr<ndBody> AddConvexHull(ndDemoEntityManager* const scene, const ndMatr
 	}
 
 	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(new ndShapeConvexHull(ndInt32(points.GetCount()), sizeof(ndVector), 0.0f, &points[0].m_x)));
-	ndSharedPtr<ndBody> body(CreateBody(scene, shape, location, mass, textName, ndRenderPrimitive::m_box));
+	ndSharedPtr<ndBody> body(CreateRigidbody(scene, shape, location, mass, textName, ndRenderPrimitive::m_box));
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 	world->AddBody(body);

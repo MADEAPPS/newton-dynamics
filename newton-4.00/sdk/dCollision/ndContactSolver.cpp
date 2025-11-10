@@ -2684,7 +2684,7 @@ ndInt32 ndContactSolver::CompoundContactsDiscrete()
 ndInt32 ndContactSolver::ConvexToCompoundContactsDiscrete()
 {
 	ndContact* const contactJoint = m_contact;
-	ndContactPoint* const contacts = m_contactBuffer;
+	ndContactPoint* const contactOut = m_contactBuffer;
 	ndBodyKinematic* const convexBody = contactJoint->GetBody0();
 	ndBodyKinematic* const compoundBody = contactJoint->GetBody1();
 	ndShapeInstance* const convexInstance = &convexBody->GetCollisionShape();
@@ -2755,11 +2755,15 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsDiscrete()
 					ndInt32 count = contactSolver.ConvexContactsDiscrete();
 					ndFloat32 dist = ndMax(contactSolver.m_separationDistance, ndFloat32(0.0f));
 					closestDist2 = ndMin(closestDist2, dist * dist);
-					if (!m_intersectionTestOnly)
+					if (m_intersectionTestOnly)
+					{
+						contactCount += count;
+					}
+					else
 					{
 						for (ndInt32 i = 0; i < count; ++i)
 						{
-							contacts[contactCount + i].m_shapeInstance0 = subShape;
+							contactOut[contactCount + i].m_shapeInstance0 = subShape;
 						}
 						contactCount += count;
 						if (contactCount > (D_MAX_CONTATCS - 2 * (D_CONSTRAINT_MAX_ROWS / 3)))
@@ -2789,7 +2793,7 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsDiscrete()
 		}
 	}
 
-	if (m_pruneContacts && (contactCount > 1))
+	if (m_pruneContacts && !m_intersectionTestOnly && (contactCount > 1))
 	{
 		contactCount = PruneContacts(contactCount, 16);
 	}
