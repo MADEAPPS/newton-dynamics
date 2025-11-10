@@ -27,6 +27,15 @@ namespace ndCartpoleTrainer_ppo
 	#define D_PUSH_ACCEL			ndBrainFloat (-10.0f * DEMO_GRAVITY)
 	#define D_REWARD_MIN_ANGLE		ndBrainFloat (20.0f * ndDegreeToRad)
 
+	class ndHelpLegend : public ndDemoEntityManager::ndDemoHelper
+	{
+		virtual void PresentHelp(ndDemoEntityManager* const scene) override
+		{
+			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
+			scene->Print(color, "training a cart pole using Proximal Policy Gradient method");
+		}
+	};
+
 	enum ndActionSpace
 	{
 		m_softPush,
@@ -455,6 +464,10 @@ using namespace ndCartpoleTrainer_ppo;
 void ndCartpolePpoTraining(ndDemoEntityManager* const scene)
 {
 	ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "marbleCheckBoard.png", 0.1f, true));
+
+	// add a help message
+	ndSharedPtr<ndDemoEntityManager::ndDemoHelper> demoHelper(new ndHelpLegend());
+	scene->SetDemoHelp(demoHelper);
 
 	ndMatrix matrix(ndGetIdentityMatrix());
 	ndRenderMeshLoader loader(*scene->GetRenderer());
