@@ -107,7 +107,7 @@ inline ndApplicationMaterial::~ndApplicationMaterial()
 {
 }
 
-inline bool ndApplicationMaterial::OnAabbOverlap(const ndBodyKinematic* const body0, const ndBodyKinematic* const body1) const
+inline bool ndApplicationMaterial::OnAabbOverlap(const ndBodyKinematic* const, const ndBodyKinematic* const) const
 {
 	return true;
 }
