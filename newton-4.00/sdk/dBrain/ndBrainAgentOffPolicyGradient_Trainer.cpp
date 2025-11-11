@@ -77,7 +77,7 @@ ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 	
 //m_useGpuBackend = false;
 //m_numberOfUpdates = 1;
-//m_replayBufferStartOptimizeSize = 1024 * 2;
+m_replayBufferStartOptimizeSize = 1024 * 2;
 }
 
 ndBrainAgentOffPolicyGradient_Agent::ndTrajectory::ndTrajectory()
@@ -582,7 +582,6 @@ ndFloat32 ndBrainAgentOffPolicyGradient_Trainer::GetAverageFrames() const
 	return m_averageFramesPerEpisodes.GetAverage();
 }
 
-//#pragma optimize( "", off )
 void ndBrainAgentOffPolicyGradient_Trainer::CalculateScore()
 {
 	ndBrainAgentOffPolicyGradient_Agent::ndTrajectory& trajectory = m_agent->m_trajectory;
@@ -750,7 +749,6 @@ void ndBrainAgentOffPolicyGradient_Trainer::SaveTrajectory()
 	m_startOptimization = m_startOptimization || (ndInt32 (m_replayBufferIndex) > m_parameters.m_replayBufferStartOptimizeSize);
 }
 
-//#pragma optimize( "", off )
 void ndBrainAgentOffPolicyGradient_Trainer::CalculateExpectedRewards()
 {
 	// Get the rewards for this mini batch
@@ -865,7 +863,6 @@ void ndBrainAgentOffPolicyGradient_Trainer::CalculateExpectedRewards()
 	m_minibatchExpectedRewards->Add(qValue);
 }
 
-//#pragma optimize( "", off )
 void ndBrainAgentOffPolicyGradient_Trainer::TrainCritics(ndInt32 criticIndex)
 {
 	ndInt32 criticInputSize = m_policyTrainer->GetBrain()->GetInputSize() + m_policyTrainer->GetBrain()->GetOutputSize();
@@ -1032,7 +1029,6 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainPolicy()
 	m_policyTrainer->ApplyLearnRate(m_learnRate);
 }
 
-//#pragma optimize( "", off )
 void ndBrainAgentOffPolicyGradient_Trainer::Optimize()
 {
 	// get the number of indirect transitions 
@@ -1132,7 +1128,6 @@ void ndBrainAgentOffPolicyGradient_Trainer::Optimize()
 	}
 }
 
-//#pragma optimize( "", off )
 void ndBrainAgentOffPolicyGradient_Trainer::OptimizeStep()
 {
 	SaveTrajectory();
