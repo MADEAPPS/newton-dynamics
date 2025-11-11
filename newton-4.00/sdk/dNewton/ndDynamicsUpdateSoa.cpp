@@ -1088,6 +1088,7 @@
 			joint->m_torqueBody0 = torque0;
 			joint->m_forceBody1 = force1;
 			joint->m_torqueBody1 = torque1;
+			joint->UpdateParameters();
 		});
 		const ndInt32 count = ndInt32(jointArray.GetCount());
 		scene->ParallelExecute(UpdateForceFeedback, count, scene->OptimalGroupBatch(count));
@@ -1629,8 +1630,6 @@
 				UpdateSkeletons();
 				IntegrateBodiesVelocity();
 			}
-		
-			UpdateForceFeedback();
 		}
 	}
 
@@ -1646,6 +1645,7 @@
 		InitJacobianMatrix();
 		CalculateForces();
 		IntegrateBodies();
+		UpdateForceFeedback();
 		DetermineSleepStates();
 	}
 #else
@@ -2913,6 +2913,7 @@
 			joint->m_torqueBody0 = force0.GetHigh();
 			joint->m_forceBody1 = force1.GetLow();
 			joint->m_torqueBody1 = force1.GetHigh();
+			joint->UpdateParameters();
 		});
 		const ndInt32 count = ndInt32(jointArray.GetCount());
 		scene->ParallelExecute(UpdateForceFeedback, count, scene->OptimalGroupBatch(count));
@@ -3475,8 +3476,6 @@
 				UpdateSkeletons();
 				IntegrateBodiesVelocity();
 			}
-
-			UpdateForceFeedback();
 		}
 	}
 
@@ -3492,6 +3491,7 @@
 		InitJacobianMatrix();
 		CalculateForces();
 		IntegrateBodies();
+		UpdateForceFeedback();
 		DetermineSleepStates();
 	}
 

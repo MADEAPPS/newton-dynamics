@@ -1076,6 +1076,7 @@ void ndDynamicsUpdate::UpdateForceFeedback()
 		joint->m_torqueBody0 = torque0;
 		joint->m_forceBody1 = force1;
 		joint->m_torqueBody1 = torque1;
+		joint->UpdateParameters();
 	});
 
 	const ndInt32 count = ndInt32(jointArray.GetCount());
@@ -1448,7 +1449,6 @@ void ndDynamicsUpdate::CalculateForces()
 			UpdateSkeletons();
 			IntegrateBodiesVelocity();
 		}
-		UpdateForceFeedback();
 	}
 }
 
@@ -1464,5 +1464,6 @@ void ndDynamicsUpdate::Update()
 	InitJacobianMatrix();
 	CalculateForces();
 	IntegrateBodies();
+	UpdateForceFeedback();
 	DetermineSleepStates();
 }

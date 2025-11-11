@@ -179,7 +179,6 @@ void ndJointSlider::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 
 	debugCallback.DrawFrame(matrix0);
 	debugCallback.DrawFrame(matrix1, 0.5f);
-
 }
 
 ndFloat32 ndJointSlider::PenetrationSpeed(ndFloat32 penetration) const
@@ -198,23 +197,28 @@ ndInt32 ndJointSlider::GetKinematicState(ndKinematicState* const state) const
 
 void ndJointSlider::ClearMemory()
 {
+	ndJointBilateralConstraint::ClearMemory();
+
+	UpdateParameters();
+	m_positOffset = m_posit;
+}
+
+void ndJointSlider::UpdateParameters()
+{
 	ndMatrix matrix0;
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
-	ndJointBilateralConstraint::ClearMemory();
-
-	const ndVector& p0 = matrix0.m_posit;
-	const ndVector& p1 = matrix1.m_posit;
 	const ndVector veloc0(m_body0->GetVelocityAtPoint(matrix0.m_posit));
 	const ndVector veloc1(m_body1->GetVelocityAtPoint(matrix1.m_posit));
 
+	const ndVector& p0 = matrix0.m_posit;
+	const ndVector& p1 = matrix1.m_posit;
 	const ndVector prel(p0 - p1);
 	const ndVector vrel(veloc0 - veloc1);
 
 	m_speed = vrel.DotProduct(matrix1.m_front).GetScalar();
 	m_posit = prel.DotProduct(matrix1.m_front).GetScalar();
-	m_positOffset = m_posit;
 }
 
 void ndJointSlider::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
@@ -275,8 +279,8 @@ void ndJointSlider::ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& m
 	const ndVector prel(p0 - p1);
 	const ndVector vrel(veloc0 - veloc1);
 
-	m_speed = vrel.DotProduct(matrix1.m_front).GetScalar();
-	m_posit = prel.DotProduct(matrix1.m_front).GetScalar();
+	//m_speed = vrel.DotProduct(matrix1.m_front).GetScalar();
+	//m_posit = prel.DotProduct(matrix1.m_front).GetScalar();
 	const ndVector projectedPoint = p1 + pin.Scale(pin.DotProduct(prel).GetScalar());
 
 	AddLinearRowJacobian(desc, p0, projectedPoint, matrix1[1]);

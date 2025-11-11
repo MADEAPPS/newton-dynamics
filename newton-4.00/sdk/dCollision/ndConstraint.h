@@ -275,6 +275,8 @@ class ndConstraint: public ndContainersFreeListAlloc<ndConstraint>
 	virtual void JacobianDerivative(ndConstraintDescritor& desc) = 0;
 	virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc) = 0;
 
+	virtual void UpdateParameters();
+
 	ndVector GetForceBody0() const;
 	ndVector GetTorqueBody0() const;
 	ndVector GetForceBody1() const;
@@ -401,6 +403,10 @@ inline ndVector ndConstraint::GetForceBody1() const
 inline ndVector ndConstraint::GetTorqueBody1() const
 {
 	return m_torqueBody1;
+}
+
+inline void ndConstraint::UpdateParameters()
+{
 }
 
 #endif 
