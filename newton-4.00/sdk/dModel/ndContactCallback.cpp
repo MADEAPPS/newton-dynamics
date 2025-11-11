@@ -38,7 +38,7 @@ bool ndContactCallback::OnAabbOverlap(const ndBodyKinematic* const body0, const 
 {
 	const ndShapeInstance& instanceShape0 = body0->GetCollisionShape();
 	const ndShapeInstance& instanceShape1 = body1->GetCollisionShape();
-	ndMaterialHash key(instanceShape0.m_shapeMaterial.m_userId, instanceShape1.m_shapeMaterial.m_userId);
+	ndMaterialHash key(ndUnsigned32(instanceShape0.m_shapeMaterial.m_userId), ndUnsigned32(instanceShape1.m_shapeMaterial.m_userId));
 	ndMaterialGraph::ndNode* const node = m_materialGraph.Find(key);
 	if (node)
 	{
