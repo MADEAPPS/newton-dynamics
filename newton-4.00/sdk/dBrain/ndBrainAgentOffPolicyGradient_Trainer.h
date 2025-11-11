@@ -27,11 +27,11 @@
 #include "ndBrain.h"
 #include "ndBrainAgent.h"
 
-// this is an implementation of the different versions of deep deterministic 
-// policy gradient for continue control re enforcement learning.  
-// the core algorithm is DDPG as described in: https://arxiv.org/pdf/1509.02971.pdf
-// pseudo code samples of variance of the same algorithm can be found at:
-// https://spinningup.openai.com/en/latest/algorithms/td3.html
+// This is an implementation the Soft Actor Critic algorithm as decrived in.
+// https://arxiv.org/pdf/1801.01290
+// The algorithm is stochastic, and uses entropy regularization to scale the loss 
+// of both actor and critic networks. 
+// pseudo code implementation is found here
 // https://spinningup.openai.com/en/latest/algorithms/sac.html
 
 #define ND_OFF_POLICY_MOVING_AVERAGE_SCORE	8
