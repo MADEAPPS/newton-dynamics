@@ -33,6 +33,7 @@ class ndJointFollowPath: public ndJointBilateralConstraint
 	}
 
 	protected:
+	D_NEWTON_API void UpdateParameters() override;
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc) override;
 } D_GCC_NEWTON_CLASS_ALIGN_32;
 

@@ -30,6 +30,11 @@ ndJointFollowPath::~ndJointFollowPath()
 {
 }
 
+void ndJointFollowPath::UpdateParameters()
+{
+	// do nothing for now
+}
+
 void ndJointFollowPath::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;
