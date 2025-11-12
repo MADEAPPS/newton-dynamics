@@ -17,9 +17,10 @@
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 
-namespace ndCarpolePlayer_sac
+namespace ndCarpolePlayer
 {
-	#define CONTROLLER_NAME			"cartpoleSac"
+	#define CONTROLLER_NAME_SAC		"cartpoleSac"
+	#define CONTROLLER_NAME_PPO		"cartpolePpo"
 	#define CART_MASS				ndFloat32(10.0f)
 	#define POLE_MASS				ndFloat32(5.0f)
 	#define D_PUSH_ACCEL			ndBrainFloat (-10.0f * DEMO_GRAVITY)
@@ -38,17 +39,33 @@ namespace ndCarpolePlayer_sac
 		m_observationsSize
 	};
 
-	class ndHelpLegend : public ndDemoEntityManager::ndDemoHelper
+	class ndHelpLegend_Sac : public ndDemoEntityManager::ndDemoHelper
 	{
 		virtual void PresentHelp(ndDemoEntityManager* const scene) override
 		{
 			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			scene->Print(color, "This setup is a pole mounted on a cart");
+			scene->Print(color, "The model is trained using Soft Actor Critic(SAC) algorithm.");
 			scene->Print(color, "a classic “hello world” example in reinforcement learning.");
 			scene->Print(color, "It consists of a pole attached by a hinge to a sliding cart.");
 			scene->Print(color, "The objective goal was to train a neural network to keep");
 			scene->Print(color, "the pole balanced in an upright position.");
-			scene->Print(color, "The model is trained using Soft Actor Critic(SAC) algorithm.");
+			scene->Print(color, "You can interact with the simulation and try.");
+			scene->Print(color, "to knock the pole over using the mouse.");
+		}
+	};
+
+	class ndHelpLegend_Ppo : public ndDemoEntityManager::ndDemoHelper
+	{
+		virtual void PresentHelp(ndDemoEntityManager* const scene) override
+		{
+			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
+			scene->Print(color, "This setup is a pole mounted on a cart");
+			scene->Print(color, "The model is trained using Proximal Policy Gradinet (PPO) algorithm.");
+			scene->Print(color, "a classic “hello world” example in reinforcement learning.");
+			scene->Print(color, "It consists of a pole attached by a hinge to a sliding cart.");
+			scene->Print(color, "The objective goal was to train a neural network to keep");
+			scene->Print(color, "the pole balanced in an upright position.");
 			scene->Print(color, "You can interact with the simulation and try.");
 			scene->Print(color, "to knock the pole over using the mouse.");
 		}
@@ -123,7 +140,9 @@ namespace ndCarpolePlayer_sac
 		}
 
 		void SetController(ndDemoEntityManager* const scene,
-			ndSharedPtr<ndMesh> mesh, ndSharedPtr<ndRenderSceneNode> visualMesh)
+			ndSharedPtr<ndMesh> mesh, 
+			ndSharedPtr<ndRenderSceneNode> visualMesh, 
+			const char* const name)
 		{
 			// create the model 
 			ndModelArticulation* const articulation = GetModel()->GetAsModelArticulation();
@@ -135,9 +154,9 @@ namespace ndCarpolePlayer_sac
 			m_slider = articulation->GetCloseLoops().GetFirst()->GetInfo().m_joint;
 
 			// load the agent contaller
-			char name[256];
-			snprintf(name, sizeof(name) - 1, "%s.dnn", CONTROLLER_NAME);
-			ndString fileName(ndGetWorkingFileName(name));
+			char nameExt[256];
+			snprintf(nameExt, sizeof(nameExt) - 1, "%s.dnn", name);
+			ndString fileName(ndGetWorkingFileName(nameExt));
 			ndSharedPtr<ndBrain> policy(ndBrainLoad::Load(fileName.GetStr()));
 			m_controller = ndSharedPtr<ndBrainAgentContinuePolicyGradient> (new ndAgent(policy, this));
 		}
@@ -183,8 +202,7 @@ namespace ndCarpolePlayer_sac
 		ndFloat32 m_timestep;
 	};
 
-
-	static void CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndRenderMeshLoader& loader)
+	static void CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndRenderMeshLoader& loader, const char* const name)
 	{
 		ndWorld* const world = scene->GetWorld();
 		ndMatrix matrix(location);
@@ -199,7 +217,7 @@ namespace ndCarpolePlayer_sac
 		ndModelArticulation* const model = new ndModelArticulation();
 		ndSharedPtr<ndModelNotify> controller(new ndPlaybackController());
 		model->SetNotifyCallback(controller);
-		((ndPlaybackController*)(*controller))->SetController(scene, loader.m_mesh, visualMesh);
+		((ndPlaybackController*)(*controller))->SetController(scene, loader.m_mesh, visualMesh, name);
 
 		// add model a visual mesh to the scene and world
 		world->AddModel(model);
@@ -207,21 +225,40 @@ namespace ndCarpolePlayer_sac
 		model->AddBodiesAndJointsToWorld();
 	}
 }
-using namespace ndCarpolePlayer_sac;
+using namespace ndCarpolePlayer;
 
-
-void ndCartpoleSacPlayer(ndDemoEntityManager* const scene)
+void ndCartpolePlayer_SAC(ndDemoEntityManager* const scene)
 {
 	ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "marbleCheckBoard.png", 0.1f, true));
 
 	// add a help message
-	ndSharedPtr<ndDemoEntityManager::ndDemoHelper> demoHelper(new ndHelpLegend());
+	ndSharedPtr<ndDemoEntityManager::ndDemoHelper> demoHelper(new ndHelpLegend_Sac());
 	scene->SetDemoHelp(demoHelper);
 
 	ndMatrix matrix(ndGetIdentityMatrix());
 	ndRenderMeshLoader loader(*scene->GetRenderer());
 	loader.LoadMesh(ndGetWorkingFileName("cartpole.nd"));
-	CreateModel(scene, matrix, loader);
+	CreateModel(scene, matrix, loader, CONTROLLER_NAME_SAC);
+
+	matrix.m_posit.m_x -= 0.0f;
+	matrix.m_posit.m_y += 0.5f;
+	matrix.m_posit.m_z += 2.0f;
+	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
+	scene->SetCameraMatrix(rotation, matrix.m_posit);
+}
+
+void ndCartpolePlayer_PPO(ndDemoEntityManager* const scene)
+{
+	ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "marbleCheckBoard.png", 0.1f, true));
+
+	// add a help message
+	ndSharedPtr<ndDemoEntityManager::ndDemoHelper> demoHelper(new ndHelpLegend_Ppo());
+	scene->SetDemoHelp(demoHelper);
+
+	ndMatrix matrix(ndGetIdentityMatrix());
+	ndRenderMeshLoader loader(*scene->GetRenderer());
+	loader.LoadMesh(ndGetWorkingFileName("cartpole.nd"));
+	CreateModel(scene, matrix, loader, CONTROLLER_NAME_PPO);
 
 	matrix.m_posit.m_x -= 0.0f;
 	matrix.m_posit.m_y += 0.5f;

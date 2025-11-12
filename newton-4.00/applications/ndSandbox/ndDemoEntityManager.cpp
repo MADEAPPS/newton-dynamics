@@ -41,7 +41,8 @@
 //#define DEFAULT_SCENE	14		// basics mutibody vehicle
 //#define DEFAULT_SCENE	15		// object Placement
 //#define DEFAULT_SCENE	16		// third person player capsule
-#define DEFAULT_SCENE	17		// cart pole SAC trained controller
+//#define DEFAULT_SCENE	17		// cart pole SAC trained controller
+#define DEFAULT_SCENE	18		// cart pole PPO trained controller
 
 // These are the machine learning training demos
 //#define DEFAULT_SCENE			(MACHINE_LEARNING_BASE + 0)	// train cart pole using SAC agent
@@ -80,7 +81,8 @@ void ndBasicVehicle(ndDemoEntityManager* const scene);
 void ndBasicFriction(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
 void ndObjectPlacement(ndDemoEntityManager* const scene);
-void ndCartpoleSacPlayer(ndDemoEntityManager* const scene);
+void ndCartpolePlayer_SAC(ndDemoEntityManager* const scene);
+void ndCartpolePlayer_PPO(ndDemoEntityManager* const scene);
 void ndBasicAngularMomentum(ndDemoEntityManager* const scene);
 void ndBasicSlidingPlatform(ndDemoEntityManager* const scene);
 void ndBasicCompoundCollision(ndDemoEntityManager* const scene);
@@ -111,7 +113,8 @@ ndDemoEntityManager::ndDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic vehicle", ndBasicVehicle},
 	{ "object placement", ndObjectPlacement},
 	{ "basic player", ndPlayerCapsule_ThirdPerson},
-	{ "cart pole SAC player controller", ndCartpoleSacPlayer},
+	{ "cart pole SAC player controller", ndCartpolePlayer_SAC},
+	{ "cart pole PPO player controller", ndCartpolePlayer_PPO},
 	
 
 #if 0
