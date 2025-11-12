@@ -46,7 +46,7 @@
 
 ndBrainAgentOnPolicyGradient_Trainer::HyperParameters::HyperParameters()
 {
-	m_learnRate = ndBrainFloat(1.0e-4f);
+	m_learnRate = ndBrainFloat(1.0e-5f);
 	m_policyRegularizer = ndBrainFloat(1.0e-4f);
 	m_criticRegularizer = ndBrainFloat(1.0e-4f);
 	m_discountRewardFactor = ndBrainFloat(0.995f);
@@ -1324,13 +1324,13 @@ void ndBrainAgentOnPolicyGradient_Trainer::OptimizeStep()
 
 	if (ndInt32 (m_trajectiesCount) >= m_parameters.m_batchTrajectoryCount)
 	{
-		// calculate aneling paremater
-		ndFloat64 num = ndFloat64(m_frameCount);
-		ndFloat64 den = ndFloat64(m_parameters.m_maxNumberOfTrainingSteps - m_parameters.m_replayBufferStartOptimizeSize);
-		ndBrainFloat param = ndBrainFloat((ndFloat64(1.0f) - ndClamp(num / den, ndFloat64(0.0f), ndFloat64(1.0f))));
-
-		// linearly anneal lear rate;
-		m_learnRate = m_parameters.m_learnRate * param;
+		//// calculate aneling paremater
+		//ndFloat64 num = ndFloat64(m_frameCount);
+		//ndFloat64 den = ndFloat64(m_parameters.m_maxNumberOfTrainingSteps - m_parameters.m_replayBufferStartOptimizeSize);
+		//ndBrainFloat param = ndBrainFloat((ndFloat64(1.0f) - ndClamp(num / den, ndFloat64(0.0f), ndFloat64(1.0f))));
+		//
+		//// linearly anneal lear rate;
+		//m_learnRate = m_parameters.m_learnRate * param;
 
 		Optimize();
 		for (ndList<ndSharedPtr<ndBrainAgentOnPolicyGradient_Agent>>::ndNode* node = m_agents.GetFirst(); node; node = node->GetNext())
