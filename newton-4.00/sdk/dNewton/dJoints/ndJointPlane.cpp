@@ -15,6 +15,12 @@
 
 ndJointPlane::ndJointPlane()
 	:ndJointBilateralConstraint()
+	,m_angle(ndFloat32(0.0f))
+	,m_omega(ndFloat32(0.0f))
+	,m_posit_y(ndFloat32(0.0f))
+	,m_posit_z(ndFloat32(0.0f))
+	,m_speed_y(ndFloat32(0.0f))
+	,m_speed_z(ndFloat32(0.0f))
 	,m_enableControlRotation(true)
 {
 	m_maxDof = 5;
@@ -22,6 +28,12 @@ ndJointPlane::ndJointPlane()
 
 ndJointPlane::ndJointPlane (const ndVector& pivot, const ndVector& normal, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(5, child, parent, ndGetIdentityMatrix())
+	,m_angle(ndFloat32(0.0f))
+	,m_omega(ndFloat32(0.0f))
+	,m_posit_y(ndFloat32(0.0f))
+	,m_posit_z(ndFloat32(0.0f))
+	,m_speed_y(ndFloat32(0.0f))
+	,m_speed_z(ndFloat32(0.0f))
 	,m_enableControlRotation(true)
 {
 	ndMatrix pinAndPivotFrame(ndGramSchmidtMatrix(normal));
@@ -33,6 +45,35 @@ ndJointPlane::ndJointPlane (const ndVector& pivot, const ndVector& normal, ndBod
 
 ndJointPlane::~ndJointPlane()
 {
+}
+
+void ndJointPlane::UpdateParameters()
+{
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+
+	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	// Restrict the movement on the pivot point along all two orthonormal axis direction perpendicular to the motion
+	const ndVector veloc0(m_body0->GetVelocityAtPoint(matrix0.m_posit));
+	const ndVector veloc1(m_body1->GetVelocityAtPoint(matrix1.m_posit));
+	const ndVector veloc(veloc0 - veloc1);
+	const ndVector step(matrix0.m_posit - matrix1.m_posit);
+
+	m_posit_y = step.DotProduct(matrix1.m_up).GetScalar();
+	m_posit_z = step.DotProduct(matrix1.m_right).GetScalar();
+	m_speed_y = veloc.DotProduct(matrix1.m_up).GetScalar();
+	m_speed_z = veloc.DotProduct(matrix1.m_right).GetScalar();
+
+	if (m_enableControlRotation)
+	{
+		const ndVector omega0(m_body0->GetOmega());
+		const ndVector omega1(m_body1->GetOmega());
+		const ndFloat32 deltaAngle = ndAnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front), -m_angle);
+		m_angle += deltaAngle;
+		m_omega = matrix1.m_front.DotProduct(omega0 - omega1).GetScalar();
+	}
 }
 
 void ndJointPlane::JacobianDerivative(ndConstraintDescritor& desc)
@@ -47,28 +88,18 @@ void ndJointPlane::JacobianDerivative(ndConstraintDescritor& desc)
 	const ndVector& dir = matrix1[0];
 	const ndVector& p0 = matrix0.m_posit;
 	const ndVector& p1 = matrix1.m_posit;
-	//NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &dir[0]);
 	AddLinearRowJacobian(desc, p0, p1, dir);
 	
-	//const ndFloat32 invTimeStep = 1.0f / timestep;
-	const ndFloat32 dist = 0.25f * dir.DotProduct((p1 - p0) & ndVector::m_triplexMask).GetScalar();
-	//const ndFloat32 accel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dist * invTimeStep * invTimeStep;
+	const ndFloat32 dist = ndFloat32 (0.25f) * dir.DotProduct((p1 - p0) & ndVector::m_triplexMask).GetScalar();
 	const ndFloat32 accel = GetMotorZeroAcceleration(desc) + dist * desc.m_invTimestep * desc.m_invTimestep;
 
-	//NewtonUserJointSetRowAcceleration(m_joint, accel);
 	SetMotorAcceleration(desc, accel);
-	//NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 
 	// construct an orthogonal coordinate system with these two vectors
 	if (m_enableControlRotation) 
 	{
-		//NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up), &matrix1.m_up[0]);
 		AddAngularRowJacobian(desc, matrix1.m_up, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up));
-		//NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-
-		//NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right), &matrix1.m_right[0]);
 		AddAngularRowJacobian(desc, matrix1.m_right, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right));
-		//NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 	}
 }
 

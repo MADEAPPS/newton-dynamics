@@ -29,7 +29,15 @@ class ndJointPlane: public ndJointBilateralConstraint
 	bool GetEnableControlRotation() const;
 
 	protected:
+	D_NEWTON_API void UpdateParameters() override;
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc) override;
+
+	ndFloat32 m_angle;
+	ndFloat32 m_omega;
+	ndFloat32 m_posit_y;
+	ndFloat32 m_posit_z;
+	ndFloat32 m_speed_y;
+	ndFloat32 m_speed_z;
 	
 	bool m_enableControlRotation;
 } D_GCC_NEWTON_CLASS_ALIGN_32;
