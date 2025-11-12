@@ -38,6 +38,7 @@ class ndJointDryRollingFriction: public ndJointBilateralConstraint
 	D_NEWTON_API ndFloat32 GetFrictionCoefficient() const;
 
 	protected:
+	D_NEWTON_API void UpdateParameters() override;
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc) override;
 
 	ndFloat32 m_coefficient;

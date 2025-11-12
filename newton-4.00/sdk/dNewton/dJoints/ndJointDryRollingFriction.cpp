@@ -56,6 +56,9 @@ ndFloat32 ndJointDryRollingFriction::GetFrictionCoefficient() const
 	return m_coefficient;
 }
 
+void ndJointDryRollingFriction::UpdateParameters()
+{
+}
 
 // rolling friction works as follow: the idealization of the contact of a spherical object 
 // with a another surface is a point that pass by the center of the sphere.

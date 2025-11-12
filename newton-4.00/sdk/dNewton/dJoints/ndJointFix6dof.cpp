@@ -68,6 +68,10 @@ ndFloat32 ndJointFix6dof::GetMaxTorque() const
 	return m_maxTorque;
 }
 
+void ndJointFix6dof::UpdateParameters()
+{
+}
+
 void ndJointFix6dof::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;

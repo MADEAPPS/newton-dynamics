@@ -35,6 +35,7 @@ class ndJointFix6dof: public ndJointBilateralConstraint
 	D_NEWTON_API ndFloat32 GetMaxTorque() const;
 
 	private:
+	D_NEWTON_API void UpdateParameters() override;
 	void JacobianDerivative(ndConstraintDescritor& desc) override;
 	void SubmitAngularAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	void SubmitAngularAxisCartisianApproximation(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);

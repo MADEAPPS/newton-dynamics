@@ -29,6 +29,7 @@ class ndJointFixDistance: public ndJointBilateralConstraint
 	D_NEWTON_API void SetDistance(ndFloat32 dist);
 
 	protected:
+	D_NEWTON_API void UpdateParameters() override;
 	void JacobianDerivative(ndConstraintDescritor& desc) override;
 
 	ndFloat32 m_distance;

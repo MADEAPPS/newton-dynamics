@@ -45,6 +45,10 @@ void ndJointFixDistance::SetDistance(ndFloat32 dist)
 	m_distance = dist;
 }
 
+void ndJointFixDistance::UpdateParameters()
+{
+}
+
 void ndJointFixDistance::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;
