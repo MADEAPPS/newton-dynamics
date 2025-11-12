@@ -330,23 +330,20 @@ void ndJointRoller::ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& m
 	AddLinearRowJacobian(desc, p0, projectedPoint, matrix1[0]);
 	AddLinearRowJacobian(desc, p0, projectedPoint, matrix1[2]);
 
-	//const ndFloat32 angle0 = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
-	//AddAngularRowJacobian(desc, matrix1.m_front, angle0);
-
 	const ndFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 	AddAngularRowJacobian(desc, matrix1.m_up, angle1);
 
 	const ndFloat32 angle2 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 	AddAngularRowJacobian(desc, matrix1.m_right, angle2);
 	
-	// save the current joint Omega
-	const ndVector omega0(m_body0->GetOmega());
-	const ndVector omega1(m_body1->GetOmega());
-	
-	// the joint angle can be determined by getting the angle between any two non parallel vectors
-	const ndFloat32 deltaAngle = ndAnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front), -m_angle);
-	m_angle += deltaAngle;
-	m_omega = matrix1.m_front.DotProduct(omega0 - omega1).GetScalar();
+	//// save the current joint Omega
+	//const ndVector omega0(m_body0->GetOmega());
+	//const ndVector omega1(m_body1->GetOmega());
+	//
+	//// the joint angle can be determined by getting the angle between any two non parallel vectors
+	//const ndFloat32 deltaAngle = ndAnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front), -m_angle);
+	//m_angle += deltaAngle;
+	//m_omega = matrix1.m_front.DotProduct(omega0 - omega1).GetScalar();
 }
 
 ndFloat32 ndJointRoller::PenetrationOmega(ndFloat32 penetration) const
@@ -354,6 +351,42 @@ ndFloat32 ndJointRoller::PenetrationOmega(ndFloat32 penetration) const
 	ndFloat32 param = ndClamp(penetration, ndFloat32(0.0f), D_MAX_HINGE_PENETRATION) / D_MAX_HINGE_PENETRATION;
 	ndFloat32 omega = D_MAX_HINGE_RECOVERY_SPEED * param;
 	return omega;
+}
+
+void ndJointRoller::ClearMemory()
+{
+	ndJointBilateralConstraint::ClearMemory();
+
+	UpdateParameters();
+	m_offsetPosit = m_posit;
+	m_offsetAngle = m_angle;
+}
+
+void ndJointRoller::UpdateParameters()
+{
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	const ndVector veloc0(m_body0->GetVelocityAtPoint(matrix0.m_posit));
+	const ndVector veloc1(m_body1->GetVelocityAtPoint(matrix1.m_posit));
+
+	const ndVector& p0 = matrix0.m_posit;
+	const ndVector& p1 = matrix1.m_posit;
+	const ndVector prel(p0 - p1);
+	const ndVector vrel(veloc0 - veloc1);
+
+	m_speed = vrel.DotProduct(matrix1.m_up).GetScalar();
+	m_posit = prel.DotProduct(matrix1.m_up).GetScalar();
+
+	// save the current joint Omega
+	const ndVector omega0(m_body0->GetOmega());
+	const ndVector omega1(m_body1->GetOmega());
+
+	// the joint angle can be determined by getting the angle between any two non parallel vectors
+	const ndFloat32 deltaAngle = ndAnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front), -m_angle);
+	m_angle += deltaAngle;
+	m_omega = matrix1.m_front.DotProduct(omega0 - omega1).GetScalar();
 }
 
 void ndJointRoller::SubmitLimitsAngle(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
@@ -453,5 +486,3 @@ void ndJointRoller::JacobianDerivative(ndConstraintDescritor& desc)
 	SubmitLimitsPosit(desc, matrix0, matrix1);
 	SubmitLimitsAngle(desc, matrix0, matrix1);
 }
-
-

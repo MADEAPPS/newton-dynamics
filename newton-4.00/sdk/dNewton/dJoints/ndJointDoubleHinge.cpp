@@ -233,18 +233,18 @@ void ndJointDoubleHinge::ApplyBaseRows(ndConstraintDescritor& desc, const ndMatr
 	const ndFloat32 alphaRollError = GetMotorZeroAcceleration(desc) + ndFloat32 (0.5f) * angle * desc.m_invTimestep * desc.m_invTimestep;
 	SetMotorAcceleration(desc, alphaRollError);
 
-	// save the current joint Omega
-	const ndVector omega0(m_body0->GetOmega());
-	const ndVector omega1(m_body1->GetOmega());
-	
-	// calculate joint parameters, angles and omega
-	const ndFloat32 deltaAngle0 = ndAnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, frontDir), -m_axis0.m_angle);
-	m_axis0.m_angle += deltaAngle0;
-	m_axis0.m_omega = frontDir.DotProduct(omega0 - omega1).GetScalar();
-	
-	const ndFloat32 deltaAngle1 = ndAnglesAdd(-CalculateAngle(frontDir, matrix1.m_front, matrix1.m_up), -m_axis1.m_angle);
-	m_axis1.m_angle += deltaAngle1;
-	m_axis1.m_omega = matrix1.m_up.DotProduct(omega0 - omega1).GetScalar();
+	//// save the current joint Omega
+	//const ndVector omega0(m_body0->GetOmega());
+	//const ndVector omega1(m_body1->GetOmega());
+	//
+	//// calculate joint parameters, angles and omega
+	//const ndFloat32 deltaAngle0 = ndAnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, frontDir), -m_axis0.m_angle);
+	//m_axis0.m_angle += deltaAngle0;
+	//m_axis0.m_omega = frontDir.DotProduct(omega0 - omega1).GetScalar();
+	//
+	//const ndFloat32 deltaAngle1 = ndAnglesAdd(-CalculateAngle(frontDir, matrix1.m_front, matrix1.m_up), -m_axis1.m_angle);
+	//m_axis1.m_angle += deltaAngle1;
+	//m_axis1.m_omega = matrix1.m_up.DotProduct(omega0 - omega1).GetScalar();
 }
 
 ndFloat32 ndJointDoubleHinge::PenetrationOmega(ndFloat32 penetration) const
@@ -256,27 +256,32 @@ ndFloat32 ndJointDoubleHinge::PenetrationOmega(ndFloat32 penetration) const
 
 void ndJointDoubleHinge::ClearMemory()
 {
+	ndJointBilateralConstraint::ClearMemory();
+
+	UpdateParameters();
+
+	// calculate joint parameters, angles and omega
+	m_axis0.m_offsetAngle = m_axis0.m_angle;
+	m_axis1.m_offsetAngle = m_axis1.m_angle;
+}
+
+void ndJointDoubleHinge::UpdateParameters()
+{
 	ndMatrix matrix0;
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
-	ndJointBilateralConstraint::ClearMemory();
-
-	// save the current joint Omega
 	const ndVector omega0(m_body0->GetOmega());
 	const ndVector omega1(m_body1->GetOmega());
-
 	const ndVector frontDir((matrix0.m_front - matrix1.m_up.Scale(matrix0.m_front.DotProduct(matrix1.m_up).GetScalar())).Normalize());
 
 	// calculate joint parameters, angles and omega
 	const ndFloat32 deltaAngle0 = CalculateAngle(matrix0.m_up, matrix1.m_up, frontDir);
 	m_axis0.m_angle = deltaAngle0;
-	m_axis0.m_offsetAngle = deltaAngle0;
 	m_axis0.m_omega = frontDir.DotProduct(omega0 - omega1).GetScalar();
 
 	const ndFloat32 deltaAngle1 = CalculateAngle(frontDir, matrix1.m_front, matrix1.m_up);
 	m_axis1.m_angle += deltaAngle1;
-	m_axis1.m_offsetAngle = deltaAngle1;
 	m_axis1.m_omega = matrix1.m_up.DotProduct(omega0 - omega1).GetScalar();
 }
 

@@ -62,6 +62,7 @@ class ndJointDoubleHinge: public ndJointBilateralConstraint
 	D_NEWTON_API void ClearMemory() override;
 
 	protected:
+	D_NEWTON_API void UpdateParameters() override;
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc) override;
 	D_NEWTON_API ndFloat32 PenetrationOmega(ndFloat32 penetartion) const;
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const override;
