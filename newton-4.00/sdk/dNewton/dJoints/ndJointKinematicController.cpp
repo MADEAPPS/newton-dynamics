@@ -61,6 +61,10 @@ void ndJointKinematicController::Init(const ndMatrix& globalMatrix)
 	SetSolverModel(m_jointkinematicAttachment);
 }
 
+void ndJointKinematicController::UpdateParameters()
+{
+}
+
 void ndJointKinematicController::CheckSleep() const
 {
 	GetBody0()->SetSleepState(false);

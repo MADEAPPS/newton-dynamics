@@ -132,6 +132,7 @@ class ndJointBilateralConstraint : public ndConstraint
 	D_COLLISION_API ndFloat32 GetMotorZeroAcceleration(ndConstraintDescritor& desc) const;
 	D_COLLISION_API ndFloat32 GetDiagonalRegularizer(const ndConstraintDescritor& desc) const;
 
+	D_COLLISION_API void UpdateParameters() override;
 	D_COLLISION_API void ReplaceSentinel(ndBodyKinematic* const sentinel);
 
 	// inverse dynamics interface
@@ -150,7 +151,6 @@ class ndJointBilateralConstraint : public ndConstraint
 	ndJointList::ndNode* m_worldNode;
 	ndBodyKinematic::ndJointList::ndNode* m_body0Node;
 	ndBodyKinematic::ndJointList::ndNode* m_body1Node;
-	//ndSpecialList<ndJointBilateralConstraint>::ndNode* m_deletedNode;
 
 	ndFloat32 m_defualtDiagonalRegularizer;
 	ndUnsigned32 m_mark0			: 1;

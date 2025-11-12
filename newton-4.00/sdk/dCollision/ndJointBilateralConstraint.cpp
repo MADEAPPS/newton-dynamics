@@ -602,3 +602,8 @@ ndInt32 ndJointBilateralConstraint::GetKinematicState(ndKinematicState* const) c
 	ndAssert(0);
 	return 0;
 }
+
+void ndJointBilateralConstraint::UpdateParameters()
+{
+	ndTrace(("Fix this joint paremeters\n"));
+}

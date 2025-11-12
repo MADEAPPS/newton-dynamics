@@ -56,6 +56,7 @@ class ndJointKinematicController: public ndJointBilateralConstraint
 
 	protected:
 	D_NEWTON_API void CheckSleep() const;
+	D_NEWTON_API void UpdateParameters() override;
 	D_NEWTON_API void Init(const ndMatrix& matrix);
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc) override;
 

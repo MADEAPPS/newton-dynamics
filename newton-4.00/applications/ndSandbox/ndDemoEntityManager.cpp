@@ -28,7 +28,7 @@
 //#define DEFAULT_SCENE	1		// basic Stacks 
 //#define DEFAULT_SCENE	2		// basic friction
 //#define DEFAULT_SCENE	3		// basic sliding platform
-#define DEFAULT_SCENE	4		// basic Trigger
+//#define DEFAULT_SCENE	4		// basic Trigger
 //#define DEFAULT_SCENE	5		// conservation of momentum 
 //#define DEFAULT_SCENE	6		// basic joints
 //#define DEFAULT_SCENE	7		// static mesh collision
@@ -41,7 +41,7 @@
 //#define DEFAULT_SCENE	14		// basics mutibody vehicle
 //#define DEFAULT_SCENE	15		// object Placement
 //#define DEFAULT_SCENE	16		// third person player capsule
-//#define DEFAULT_SCENE	17		// cart pole SAC trained controller
+#define DEFAULT_SCENE	17		// cart pole SAC trained controller
 
 // These are the machine learning training demos
 //#define DEFAULT_SCENE			(MACHINE_LEARNING_BASE + 0)	// train cart pole using SAC agent

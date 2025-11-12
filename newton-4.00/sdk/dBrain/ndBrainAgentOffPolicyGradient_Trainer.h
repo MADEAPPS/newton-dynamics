@@ -216,7 +216,7 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchOfTransitions;
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchExpectedRewards;
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchCriticInputTest;
-	ndSharedPtr<ndBrainFloatBuffer> m_minibatchUniformRandomDistribution;
+	ndSharedPtr<ndBrainFloatBuffer> m_minibatchGaussianDistribution;
 
 	ndSharedPtr<ndBrainIntegerBuffer> m_randomShuffleBuffer;
 	ndSharedPtr<ndBrainIntegerBuffer> m_minibatchIndexBuffer;

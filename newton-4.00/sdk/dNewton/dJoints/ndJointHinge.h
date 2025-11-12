@@ -41,7 +41,7 @@ class ndJointHinge: public ndJointBilateralConstraint
 	D_NEWTON_API void ClearMemory() override;
 
 	protected:
-	D_NEWTON_API void UpdateParameters();
+	D_NEWTON_API void UpdateParameters() override;
 	D_NEWTON_API ndFloat32 PenetrationOmega(ndFloat32 penetartion) const;
 	D_NEWTON_API void SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	D_NEWTON_API void SubmitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);

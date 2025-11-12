@@ -31,11 +31,12 @@ namespace ndCartpoleTrainer_sac
 	{
 		virtual void PresentHelp(ndDemoEntityManager* const scene) override
 		{
-			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
+			const ndVector color(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f));
 			scene->Print(color, "training a cart pole using Soft Actor Critic method");
+			scene->Print(color, "training goes for 100k steps.");
+			scene->Print(color, "therfore it takes from 30 to 60 miniute using GPU");
 		}
 	};
-
 
 	enum ndActionSpace
 	{
@@ -207,37 +208,19 @@ namespace ndCartpoleTrainer_sac
 			return ndAbs(m_cart->GetMatrix().m_posit.m_x) > ndFloat32(20.0f);
 		}
 
-		ndFloat32 GetPoleAngle() const
-		{
-			ndJointHinge* const hinge = (ndJointHinge*)*m_poleHinge;
-			ndFloat32 angle = hinge->GetAngle();
-			return angle;
-		}
-
 		bool IsTerminal() const
 		{
-			ndFloat32 angle = GetPoleAngle();
+			const ndJointHinge* const hinge = (ndJointHinge*)*m_poleHinge;
+			ndFloat32 angle = hinge->GetAngle();
 			bool fail = ndAbs(angle) > (D_REWARD_MIN_ANGLE * ndFloat32(2.0f));
 			return fail;
-		}
-
-		void GetObservation(ndBrainFloat* const observation)
-		{
-			ndVector omega(m_pole->GetOmega());
-			ndFloat32 angle = GetPoleAngle();
-			observation[m_poleAngle] = ndReal(angle);
-			observation[m_poleOmega] = ndReal(omega.m_z);
-			
-			const ndVector cartVeloc(m_cart->GetVelocity());
-			ndFloat32 cartSpeed = cartVeloc.m_x;
-			observation[m_cartSpeed] = ndBrainFloat(cartSpeed);
 		}
 
 		ndBrainFloat CalculateReward()
 		{
 			if (IsTerminal())
 			{
-				return ndReal(0.0f);
+				return ndBrainFloat(0.0f);
 			}
 
 			ndJointHinge* const hinge = (ndJointHinge*)*m_poleHinge;
@@ -259,11 +242,34 @@ namespace ndCartpoleTrainer_sac
 
 		void ApplyActions(ndBrainFloat* const actions)
 		{
-			ndVector force(m_cart->GetAsBodyDynamic()->GetForce());
+			//ndVector force(m_cart->GetAsBodyDynamic()->GetForce());
+			//ndBrainFloat action = actions[0];
+			//ndBrainFloat accel = D_PUSH_ACCEL * action;
+			//force.m_x = ndFloat32(accel * (m_cart->GetAsBodyDynamic()->GetMassMatrix().m_w));
+			//m_cart->GetAsBodyDynamic()->SetForce(force);
+
 			ndBrainFloat action = actions[0];
-			ndBrainFloat accel = D_PUSH_ACCEL * action;
-			force.m_x = ndFloat32(accel * (m_cart->GetAsBodyDynamic()->GetMassMatrix().m_w));
+			ndFloat32 pushForce = ndFloat32(D_PUSH_ACCEL * action * m_cart->GetAsBodyDynamic()->GetMassMatrix().m_w);
+
+			ndJointSlider* const slider = (ndJointSlider*)*m_slider;
+			const ndMatrix matrix(slider->CalculateGlobalMatrix0());
+
+			ndVector force(m_cart->GetAsBodyDynamic()->GetForce() + matrix.m_front.Scale(pushForce));
 			m_cart->GetAsBodyDynamic()->SetForce(force);
+		}
+
+		void GetObservation(ndBrainFloat* const observation)
+		{
+			const ndJointHinge* const hinge = (ndJointHinge*)*m_poleHinge;
+			const ndJointSlider* const slider = (ndJointSlider*)*m_slider;
+
+			ndFloat32 omega = hinge->GetOmega();
+			ndFloat32 angle = hinge->GetAngle();
+			ndFloat32 speed = slider->GetSpeed();
+
+			observation[m_poleAngle] = ndBrainFloat(angle);
+			observation[m_poleOmega] = ndBrainFloat(omega);
+			observation[m_cartSpeed] = ndBrainFloat(speed);
 		}
 
 		ndSharedPtr<ndBody> m_cart;
@@ -288,7 +294,7 @@ namespace ndCartpoleTrainer_sac
 			,m_discountRewardFactor(0.99f)
 			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountRewardFactor))
 			,m_lastEpisode(0xfffffff)
-			,m_stopTraining(250000)
+			,m_stopTraining(100000)
 			,m_modelIsTrained(false)
 		{
 			char name[256];

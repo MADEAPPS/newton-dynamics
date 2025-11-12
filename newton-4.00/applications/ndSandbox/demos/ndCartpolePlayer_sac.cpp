@@ -126,11 +126,13 @@ namespace ndCarpolePlayer_sac
 			ndSharedPtr<ndMesh> mesh, ndSharedPtr<ndRenderSceneNode> visualMesh)
 		{
 			// create the model 
-			CreateArticulatedModel(scene, GetModel()->GetAsModelArticulation(), mesh, visualMesh);
+			ndModelArticulation* const articulation = GetModel()->GetAsModelArticulation();
+			CreateArticulatedModel(scene, articulation, mesh, visualMesh);
 			ndModelArticulation::ndNode* const rootNode = GetModel()->GetAsModelArticulation()->GetRoot();
 			m_cart = rootNode->m_body;
 			m_pole = rootNode->GetFirstChild()->m_body;
 			m_poleHinge = rootNode->GetFirstChild()->m_joint;
+			m_slider = articulation->GetCloseLoops().GetFirst()->GetInfo().m_joint;
 
 			// load the agent contaller
 			char name[256];
@@ -146,36 +148,36 @@ namespace ndCarpolePlayer_sac
 			m_controller->Step();
 		}
 
-		ndFloat32 GetPoleAngle() const
+		void ApplyActions(ndBrainFloat* const actions)
 		{
-			ndJointHinge* const hinge = (ndJointHinge*)*m_poleHinge;
-			ndFloat32 angle = hinge->GetAngle();
-			return angle;
+			ndBrainFloat action = actions[0];
+			ndBrainFloat accel = D_PUSH_ACCEL * action;
+			ndFloat32 pushForce = accel * (m_cart->GetAsBodyDynamic()->GetMassMatrix().m_w);
+
+			ndJointSlider* const slider = (ndJointSlider*)*m_slider;
+			const ndMatrix matrix(slider->CalculateGlobalMatrix0());
+
+			ndVector force(m_cart->GetAsBodyDynamic()->GetForce() + matrix.m_front.Scale(pushForce));
+			m_cart->GetAsBodyDynamic()->SetForce(force);
 		}
 
 		void GetObservation(ndBrainFloat* const observation)
 		{
-			ndVector omega(m_pole->GetOmega());
-			ndFloat32 angle = GetPoleAngle();
-			observation[m_poleAngle] = ndReal(angle);
-			observation[m_poleOmega] = ndReal(omega.m_z);
+			const ndJointHinge* const hinge = (ndJointHinge*)*m_poleHinge;
+			const ndJointSlider* const slider = (ndJointSlider*)*m_slider;
 
-			const ndVector cartVeloc(m_cart->GetVelocity());
-			ndFloat32 cartSpeed = cartVeloc.m_x;
-			observation[m_cartSpeed] = ndBrainFloat(cartSpeed);
-		}
+			ndFloat32 omega = hinge->GetOmega();
+			ndFloat32 angle = hinge->GetAngle();
+			ndFloat32 speed = slider->GetSpeed();
 
-		void ApplyActions(ndBrainFloat* const actions)
-		{
-			ndVector force(m_cart->GetAsBodyDynamic()->GetForce());
-			ndBrainFloat action = actions[0];
-			ndBrainFloat accel = D_PUSH_ACCEL * action;
-			force.m_x = ndFloat32(accel * (m_cart->GetAsBodyDynamic()->GetMassMatrix().m_w));
-			m_cart->GetAsBodyDynamic()->SetForce(force);
+			observation[m_poleAngle] = ndBrainFloat(angle);
+			observation[m_poleOmega] = ndBrainFloat(omega);
+			observation[m_cartSpeed] = ndBrainFloat(speed);
 		}
 
 		ndSharedPtr<ndBody> m_cart;
 		ndSharedPtr<ndBody> m_pole;
+		ndSharedPtr<ndJointBilateralConstraint> m_slider;
 		ndSharedPtr<ndJointBilateralConstraint> m_poleHinge;
 		ndSharedPtr<ndBrainAgentContinuePolicyGradient> m_controller;
 		ndFloat32 m_timestep;
