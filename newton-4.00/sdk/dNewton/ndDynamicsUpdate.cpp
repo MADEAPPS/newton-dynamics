@@ -1230,7 +1230,7 @@ void ndDynamicsUpdate::UpdateSkeletons()
 		D_TRACKTIME_NAMED(UpdateSkeletons);
 		ndJacobian* const internalForces = &GetInternalForces()[0];
 	
-		ndSkeletonContainer* const skeleton = activeSkeletons[groupId];
+		ndSkeletonContainer* const skeleton = activeSkeletons[m_parallelSkeletons + groupId];
 		skeleton->CalculateReactionForces(nullptr, internalForces);
 	});
 

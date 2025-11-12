@@ -1106,7 +1106,7 @@
 			ndArray<ndRightHandSide>& rightHandSide = m_rightHandSide;
 			const ndArray<ndLeftHandSide>& leftHandSide = m_leftHandSide;
 
-			ndSkeletonContainer* const skeleton = activeSkeletons[groupId];
+			ndSkeletonContainer* const skeleton = activeSkeletons[m_parallelSkeletons + groupId];
 			skeleton->InitMassMatrix(&leftHandSide[0], &rightHandSide[0]);
 		});
 
@@ -1137,7 +1137,7 @@
 			D_TRACKTIME_NAMED(UpdateSkeletons);
 			ndJacobian* const internalForces = &GetInternalForces()[0];
 
-			ndSkeletonContainer* const skeleton = activeSkeletons[groupId];
+			ndSkeletonContainer* const skeleton = activeSkeletons[m_parallelSkeletons + groupId];
 			skeleton->CalculateReactionForces(internalForces);
 		});
 
@@ -2925,29 +2925,8 @@
 		ndScene* const scene = m_world->GetScene();
 		const ndArray<ndSkeletonContainer*>& activeSkeletons = m_world->m_activeSkeletons;
 
-		//auto InitSkeletons = ndMakeObject::ndFunction([this, &activeSkeletons](ndInt32 groupId, ndInt32)
-		//{
-		//	D_TRACKTIME_NAMED(InitSkeletons);
-		//	ndArray<ndRightHandSide>& rightHandSide = m_rightHandSide;
-		//	const ndArray<ndLeftHandSide>& leftHandSide = m_leftHandSide;
-		//
-		//	ndSkeletonContainer* const skeleton = activeSkeletons[groupId];
-		//	skeleton->InitMassMatrix(nullptr, &leftHandSide[0], &rightHandSide[0]);
-		//});
-
 		if (activeSkeletons.GetCount())
 		{
-			//for (ndInt32 i = ndInt32(activeSkeletons.GetCount()) - 1; i >= 0; --i)
-			//{
-			//	ndSkeletonContainer* const skeleton = activeSkeletons[i];
-			//	if (skeleton->m_transientLoopingContacts.GetCount())
-			//	{
-			//		skeleton->AddExtraContacts();
-			//	}
-			//}
-			//const ndInt32 count = ndInt32(activeSkeletons.GetCount());
-			//scene->ParallelExecute(InitSkeletons, count, 1);
-
 			for (ndInt32 i = ndInt32(activeSkeletons.GetCount()) - 1; i >= 0; --i)
 			{
 				ndSkeletonContainer* const skeleton = activeSkeletons[i];
@@ -3005,7 +2984,7 @@
 			D_TRACKTIME_NAMED(UpdateSkeletons);
 			ndJacobian* const internalForces = &GetInternalForces()[0];
 
-			ndSkeletonContainer* const skeleton = activeSkeletons[groupId];
+			ndSkeletonContainer* const skeleton = activeSkeletons[m_parallelSkeletons + groupId];
 			skeleton->CalculateReactionForces(nullptr, internalForces);
 		});
 
