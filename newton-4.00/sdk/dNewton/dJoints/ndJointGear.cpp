@@ -15,6 +15,9 @@
 
 ndJointGear::ndJointGear()
 	:ndJointBilateralConstraint()
+	,m_angle(ndFloat32(0.0f))
+	,m_omega(ndFloat32(0.0f))
+	,m_gearRatio(ndFloat32(1.0f))
 {
 	m_maxDof = 1;
 }
@@ -23,6 +26,8 @@ ndJointGear::ndJointGear(ndFloat32 gearRatio,
 	const ndVector& body0Pin, ndBodyKinematic* const body0,
 	const ndVector& body1Pin, ndBodyKinematic* const body1)
 	:ndJointBilateralConstraint(1, body0, body1, ndGetIdentityMatrix())
+	,m_angle(ndFloat32(0.0f))
+	,m_omega(ndFloat32(0.0f))
 	,m_gearRatio(gearRatio)
 {
 	// calculate the two local matrix of the pivot point
@@ -55,6 +60,27 @@ ndFloat32 ndJointGear::GetRatio() const
 void ndJointGear::SetRatio(ndFloat32 ratio)
 {
 	m_gearRatio = ratio;
+}
+
+void ndJointGear::UpdateParameters()
+{
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+
+	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	const ndVector jacobian0(matrix0.m_front.Scale(m_gearRatio));
+	const ndVector jacobian1(matrix1.m_front);
+
+	const ndVector& omega0 = m_body0->GetOmega();
+	const ndVector& omega1 = m_body1->GetOmega();
+
+	const ndVector relOmega(omega0 * jacobian0 + omega1 * jacobian1);
+	m_omega = relOmega.AddHorizontal().GetScalar();
+
+	const ndFloat32 deltaAngle = ndAnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front), -m_angle);
+	m_angle += deltaAngle;
 }
 
 void ndJointGear::JacobianDerivative(ndConstraintDescritor& desc)

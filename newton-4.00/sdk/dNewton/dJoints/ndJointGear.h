@@ -31,8 +31,11 @@ class ndJointGear: public ndJointBilateralConstraint
 	D_NEWTON_API void SetRatio(ndFloat32 ratio);
 
 	protected:
+	D_NEWTON_API void UpdateParameters() override;
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc) override;
 
+	ndFloat32 m_angle;
+	ndFloat32 m_omega;
 	ndFloat32 m_gearRatio;
 } D_GCC_NEWTON_CLASS_ALIGN_32;
 
