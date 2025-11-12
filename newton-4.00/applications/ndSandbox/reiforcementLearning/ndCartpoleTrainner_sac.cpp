@@ -232,11 +232,11 @@ namespace ndCartpoleTrainer_sac
 
 			ndFloat32 angleReward = ndExp(-ndFloat32(1000.0f) * angle * angle);
 			ndFloat32 omegaReward = ndExp(-ndFloat32(1000.0f) * omega * omega);
-			ndFloat32 speedPenalty = ndFloat32(1.0f) - ndExp(-ndFloat32(100.0f) * speed * speed);
+			ndFloat32 speedPenalty = ndFloat32(1.0f) - ndExp(-ndFloat32(400.0f) * speed * speed);
 
 			// add a penalty for high speed. 
 			// this is the equivalent of adding drag to the slider joint 
-			ndFloat32 reward = ndFloat32(0.6f) * angleReward + ndFloat32(0.4f) * omegaReward - ndFloat32(0.2f) * speedPenalty;
+			ndFloat32 reward = ndFloat32(0.6f) * angleReward + ndFloat32(0.4f) * omegaReward - ndFloat32(0.25f) * speedPenalty;
 			return ndBrainFloat(reward);
 		}
 
