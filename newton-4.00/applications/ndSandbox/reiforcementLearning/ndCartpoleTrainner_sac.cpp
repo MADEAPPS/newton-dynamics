@@ -242,12 +242,6 @@ namespace ndCartpoleTrainer_sac
 
 		void ApplyActions(ndBrainFloat* const actions)
 		{
-			//ndVector force(m_cart->GetAsBodyDynamic()->GetForce());
-			//ndBrainFloat action = actions[0];
-			//ndBrainFloat accel = D_PUSH_ACCEL * action;
-			//force.m_x = ndFloat32(accel * (m_cart->GetAsBodyDynamic()->GetMassMatrix().m_w));
-			//m_cart->GetAsBodyDynamic()->SetForce(force);
-
 			ndBrainFloat action = actions[0];
 			ndFloat32 pushForce = ndFloat32(D_PUSH_ACCEL * action * m_cart->GetAsBodyDynamic()->GetMassMatrix().m_w);
 
@@ -294,7 +288,7 @@ namespace ndCartpoleTrainer_sac
 			,m_discountRewardFactor(0.99f)
 			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountRewardFactor))
 			,m_lastEpisode(0xfffffff)
-			,m_stopTraining(100000)
+			,m_stopTraining(150000)
 			,m_modelIsTrained(false)
 		{
 			char name[256];
