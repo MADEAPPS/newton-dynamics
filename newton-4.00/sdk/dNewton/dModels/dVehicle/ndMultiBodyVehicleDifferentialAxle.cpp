@@ -25,6 +25,8 @@
 
 ndMultiBodyVehicleDifferentialAxle::ndMultiBodyVehicleDifferentialAxle()
 	:ndJointBilateralConstraint()
+	,m_angle(ndFloat32(0.0f))
+	,m_omega(ndFloat32(0.0f))
 	,m_gearRatio(ndFloat32(1.0f))
 {
 	m_maxDof = 1;
@@ -34,6 +36,8 @@ ndMultiBodyVehicleDifferentialAxle::ndMultiBodyVehicleDifferentialAxle(
 	const ndVector& pin0, const ndVector& upPin, ndBodyKinematic* const differentialBody,
 	const ndVector& pin1, ndBodyKinematic* const body1)
 	:ndJointBilateralConstraint(1, differentialBody, body1, ndGetIdentityMatrix())
+	,m_angle(ndFloat32(0.0f))
+	,m_omega(ndFloat32(0.0f))
 {
 	ndMatrix temp;
 	ndAssert(pin0.DotProduct(pin0 & ndVector::m_triplexMask).GetScalar() - ndFloat32());
@@ -49,6 +53,26 @@ ndMultiBodyVehicleDifferentialAxle::ndMultiBodyVehicleDifferentialAxle(
 	CalculateLocalMatrix(matrix0, m_localMatrix0, temp);
 	CalculateLocalMatrix(matrix1, temp, m_localMatrix1);
 	SetSolverModel(m_jointkinematicCloseLoop);
+}
+
+void ndMultiBodyVehicleDifferentialAxle::UpdateParameters()
+{
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	const ndVector jacobian0 (matrix0.m_front + matrix0.m_up);
+	const ndVector jacobian1 (matrix1.m_front.Scale(m_gearRatio));
+
+	const ndVector& omega0 = m_body0->GetOmega();
+	const ndVector& omega1 = m_body1->GetOmega();
+
+	const ndVector relOmega(omega0 * jacobian0 + omega1 * jacobian1);
+	m_omega = relOmega.m_x + relOmega.m_y + relOmega.m_z;
+
+	//this may be wrong, need to debugit.
+	//const ndFloat32 deltaAngle = ndAnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front), -m_angle);
+	//m_angle += deltaAngle;
 }
 
 void ndMultiBodyVehicleDifferentialAxle::JacobianDerivative(ndConstraintDescritor& desc)
