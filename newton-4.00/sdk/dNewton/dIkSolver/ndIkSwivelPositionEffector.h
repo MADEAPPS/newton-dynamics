@@ -74,17 +74,23 @@ class ndIkSwivelPositionEffector: public ndJointBilateralConstraint
 	D_NEWTON_API void ClearMemory() override;
 
 	protected:
+	D_NEWTON_API void UpdateParameters() override;
 	ndMatrix CalculateSwivelFrame(const ndMatrix& matrix1) const;
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc) override;
 
 	void SubmitLinearAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	void SubmitAngularAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	void SubmitReducedLinearAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
-	
+
 	ndVector m_restPosition;
 	ndVector m_localTargetPosit;
-	ndFloat32 m_swivelAngle;
 
+	ndVector m_positParam;
+	ndVector m_velocParam;
+	ndFloat32 m_swivelAngleParam;
+	ndFloat32 m_swivelOmegaParam;
+
+	ndFloat32 m_swivelAngle;
 	ndFloat32 m_angularSpring;
 	ndFloat32 m_angularDamper;
 	ndFloat32 m_angularMaxTorque;

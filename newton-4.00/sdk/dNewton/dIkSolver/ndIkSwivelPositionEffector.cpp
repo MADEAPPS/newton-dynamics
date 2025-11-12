@@ -18,6 +18,10 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector()
 	:ndJointBilateralConstraint()
 	,m_restPosition(ndVector::m_wOne)
 	,m_localTargetPosit(ndVector::m_wOne)
+	,m_positParam(ndVector::m_wOne)
+	,m_velocParam(ndVector::m_zero)
+	,m_swivelAngleParam(ndFloat32(0.0f))
+	,m_swivelOmegaParam(ndFloat32(0.0f))
 	,m_swivelAngle(ndFloat32(0.0f))
 	,m_angularSpring(ndFloat32(1000.0f))
 	,m_angularDamper(ndFloat32(50.0f))
@@ -42,6 +46,10 @@ ndIkSwivelPositionEffector::ndIkSwivelPositionEffector(
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotParentInGlobalSpace)
 	,m_restPosition(ndVector::m_wOne)
 	,m_localTargetPosit(ndVector::m_wOne)
+	,m_positParam(ndVector::m_wOne)
+	,m_velocParam(ndVector::m_zero)
+	,m_swivelAngleParam(ndFloat32(0.0f))
+	,m_swivelOmegaParam(ndFloat32(0.0f))
 	,m_swivelAngle(ndFloat32(0.0f))
 	,m_angularSpring(ndFloat32(1000.0f))
 	,m_angularDamper(ndFloat32(50.0f))
@@ -265,6 +273,52 @@ void ndIkSwivelPositionEffector::ClearMemory()
 
 ndInt32 ndIkSwivelPositionEffector::GetKinematicState(ndKinematicState* const state) const
 {
+	//ndVector posit;
+	//ndVector veloc;
+	//ndMatrix matrix0;
+	//ndMatrix matrix1;
+	//
+	//CalculateGlobalMatrix(matrix0, matrix1);
+	//
+	//const ndMatrix& axisDir = matrix1;
+	//const ndVector omega0(m_body0->GetOmega());
+	//const ndVector omega1(m_body1->GetOmega());
+	//const ndVector veloc0(m_body0->GetVelocity());
+	//const ndVector veloc1(m_body1->GetVelocity());
+	//
+	//ndPointParam param;
+	//InitPointParam(param, matrix0.m_posit, matrix1.m_posit);
+	//for (ndInt32 i = 0; i < 3; ++i)
+	//{
+	//	const ndVector& pin = axisDir[i];
+	//	const ndVector r0CrossDir(param.m_r0.CrossProduct(pin));
+	//	const ndVector r1CrossDir(param.m_r1.CrossProduct(pin));
+	//	posit[i] = (pin * param.m_posit0 - pin * param.m_posit1).AddHorizontal().GetScalar();
+	//	veloc[i] = (pin * veloc0 + r0CrossDir * omega0 - pin * veloc1 - r1CrossDir * omega1).AddHorizontal().GetScalar();
+	//}
+	//
+	//const ndMatrix swivelMatrix(ndPitchMatrix(-m_swivelAngle) * CalculateSwivelFrame(matrix1));
+	//posit.m_w = CalculateAngle(matrix0[1], swivelMatrix[1], swivelMatrix[0]);
+	//veloc.m_w = (omega0 * swivelMatrix.m_front - omega1 * swivelMatrix.m_front).AddHorizontal().GetScalar();
+	//
+	//for (ndInt32 i = 0; i < 4; i++)
+	//{
+	//	state[i].m_posit = posit[i];
+	//	state[i].m_velocity = veloc[i];
+	//}
+
+	for (ndInt32 i = 0; i < 3; i++)
+	{
+		state[i].m_posit = m_positParam[i];
+		state[i].m_velocity = m_velocParam[i];
+	}
+	state[3].m_posit = m_swivelAngleParam;
+	state[4].m_velocity = m_swivelOmegaParam;
+	return 4;
+}
+
+void ndIkSwivelPositionEffector::UpdateParameters()
+{
 	ndVector posit;
 	ndVector veloc;
 	ndMatrix matrix0;
@@ -285,20 +339,13 @@ ndInt32 ndIkSwivelPositionEffector::GetKinematicState(ndKinematicState* const st
 		const ndVector& pin = axisDir[i];
 		const ndVector r0CrossDir(param.m_r0.CrossProduct(pin));
 		const ndVector r1CrossDir(param.m_r1.CrossProduct(pin));
-		posit[i] = (pin * param.m_posit0 - pin * param.m_posit1).AddHorizontal().GetScalar();
-		veloc[i] = (pin * veloc0 + r0CrossDir * omega0 - pin * veloc1 - r1CrossDir * omega1).AddHorizontal().GetScalar();
+		m_positParam[i] = (pin * param.m_posit0 - pin * param.m_posit1).AddHorizontal().GetScalar();
+		m_velocParam[i] = (pin * veloc0 + r0CrossDir * omega0 - pin * veloc1 - r1CrossDir * omega1).AddHorizontal().GetScalar();
 	}
 
 	const ndMatrix swivelMatrix(ndPitchMatrix(-m_swivelAngle) * CalculateSwivelFrame(matrix1));
-	posit.m_w = CalculateAngle(matrix0[1], swivelMatrix[1], swivelMatrix[0]);
-	veloc.m_w = (omega0 * swivelMatrix.m_front - omega1 * swivelMatrix.m_front).AddHorizontal().GetScalar();
-
-	for (ndInt32 i = 0; i < 4; i++)
-	{
-		state[i].m_posit = posit[i];
-		state[i].m_velocity = veloc[i];
-	}
-	return 4;
+	m_swivelAngleParam = CalculateAngle(matrix0[1], swivelMatrix[1], swivelMatrix[0]);
+	m_swivelOmegaParam = (omega0 * swivelMatrix.m_front - omega1 * swivelMatrix.m_front).AddHorizontal().GetScalar();
 }
 
 ndFloat32 ndIkSwivelPositionEffector::CalculateLookAtSwivelAngle(const ndVector& upDir) const
@@ -392,7 +439,6 @@ void ndIkSwivelPositionEffector::JacobianDerivative(ndConstraintDescritor& desc)
 	ndMatrix matrix0;
 	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
-
 
 	if (m_enableSwivelControl)
 	{
