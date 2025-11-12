@@ -16,6 +16,8 @@
 ndJointSpherical::ndJointSpherical()
 	:ndJointBilateralConstraint()
 	,m_rotation(ndGetIdentityMatrix())
+	,m_omegaParam(ndVector::m_zero)
+	,m_rotationParam()
 	,m_springK(ndFloat32(0.0f))
 	,m_damperC(ndFloat32(0.0f))
 	,m_maxConeAngle(ndFloat32(1.0e10f))
@@ -29,6 +31,8 @@ ndJointSpherical::ndJointSpherical()
 ndJointSpherical::ndJointSpherical(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(9, child, parent, pinAndPivotFrame)
 	,m_rotation(ndGetIdentityMatrix())
+	,m_omegaParam(ndVector::m_zero)
+	,m_rotationParam()
 	,m_springK(ndFloat32(0.0f))
 	,m_damperC(ndFloat32(0.0f))
 	,m_maxConeAngle(ndFloat32(1.0e10f))
@@ -182,6 +186,32 @@ void ndJointSpherical::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 			debugCallback.DrawLine(arch[i], arch[i + 1], color);
 		}
 	}
+}
+
+void ndJointSpherical::ClearMemory()
+{
+	ndJointBilateralConstraint::ClearMemory();
+	UpdateParameters();
+}
+
+void ndJointSpherical::UpdateParameters()
+{
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	const ndMatrix matrix11(m_rotation * matrix1);
+	ndQuaternion rotation(matrix0.OrthoInverse() * matrix11);
+	if (rotation.DotProduct(m_rotationParam).GetScalar() < 0.0f)
+	{
+		rotation = rotation.Scale(ndFloat32 (-1.0f));
+	}
+	m_rotationParam = rotation;
+
+	const ndVector omega0(m_body0->GetOmega());
+	const ndVector omega1(m_body1->GetOmega());
+	const ndVector omega(omega0 - omega1);
+	m_omegaParam = matrix1.UnrotateVector(omega);
 }
 
 void ndJointSpherical::SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc)
