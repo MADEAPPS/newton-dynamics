@@ -1136,10 +1136,10 @@ void ndBrainAgentOffPolicyGradient_Trainer::OptimizeStep()
 		// linearly anneal entropy
 		m_entropyTemperature = m_parameters.m_entropyMinTemperature + param * (m_parameters.m_entropyMaxTemperature - m_parameters.m_entropyMinTemperature);
 
-		// linearly anneal lear rate;
-		ndBrainFloat maxRate = m_parameters.m_learnRate;
-		ndBrainFloat minRate = ndMax(maxRate * ndBrainFloat(0.1f), ndBrainFloat(1.0e-5f));
-		m_learnRate = minRate + param * (maxRate - minRate);
+		//// linearly anneal lear rate;
+		//ndBrainFloat maxRate = m_parameters.m_learnRate;
+		//ndBrainFloat minRate = ndMax(maxRate * ndBrainFloat(0.1f), ndBrainFloat(1.0e-5f));
+		//m_learnRate = minRate + param * (maxRate - minRate);
 
 		Optimize();
 		m_frameCount++;
