@@ -2878,7 +2878,12 @@ ndInt32 ndContactSolver::CompoundToConvexContactsDiscrete()
 					ndInt32 count = contactSolver.ConvexContactsDiscrete();
 					ndFloat32 dist = ndMax(contactSolver.m_separationDistance, ndFloat32(0.0f));
 					closestDist2 = ndMin(closestDist2, dist * dist);
-					if (!m_intersectionTestOnly)
+					if (m_intersectionTestOnly)
+					{
+						contactCount += count;
+					}
+					else
+					//if (!m_intersectionTestOnly)
 					{
 						for (ndInt32 i = 0; i < count; ++i)
 						{
@@ -2912,7 +2917,8 @@ ndInt32 ndContactSolver::CompoundToConvexContactsDiscrete()
 		}
 	}
 
-	if (m_pruneContacts && (contactCount > 1))
+	//if (m_pruneContacts && (contactCount > 1))
+	if (m_pruneContacts && !m_intersectionTestOnly && (contactCount > 1))
 	{
 		contactCount = PruneContacts(contactCount, 16);
 	}
