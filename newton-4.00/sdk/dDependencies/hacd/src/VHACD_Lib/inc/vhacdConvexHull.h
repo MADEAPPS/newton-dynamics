@@ -23,14 +23,15 @@
 #define __ND_VHACD_CONVEXHULL_3D__
 
 #include "vhacdDefines.h"
+#include "ndConvexHull3d.h"
 #include "vhacdConvexHullUtils.h"
 
 namespace nd
 {
 	namespace VHACD
 	{
+#if 0
 		#define VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE 16
-
 		class ConvexHullVertex : public hullVector
 		{
 			public:
@@ -42,15 +43,15 @@ namespace nd
 			public:
 			ConvexHullAABBTreeNode()
 				:m_left(nullptr)
-				,m_right(nullptr)
-				,m_parent(nullptr)
+				, m_right(nullptr)
+				, m_parent(nullptr)
 			{
 			}
 
 			ConvexHullAABBTreeNode(ConvexHullAABBTreeNode* const parent)
 				:m_left(nullptr)
-				,m_right(nullptr)
-				,m_parent(parent)
+				, m_right(nullptr)
+				, m_parent(parent)
 			{
 			}
 
@@ -77,7 +78,7 @@ namespace nd
 			int m_indices[VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE];
 		};
 
-		class ConvexHull3dPointSet: public std::vector<ConvexHullVertex>
+		class ConvexHull3dPointSet : public std::vector<ConvexHullVertex>
 		{
 			public:
 			ConvexHull3dPointSet();
@@ -87,7 +88,6 @@ namespace nd
 			private:
 			ConvexHullAABBTreeNode* BuildRecurse(ConvexHullAABBTreeNode* const parent, ConvexHullVertex* const points, int count, int baseIndex, size_t& memoryPool);
 			std::vector<ConvexHull3dPointCluster> m_treeBuffer;
-			//ConvexHullAABBTreeNode* m_tree;
 		};
 
 		class ConvexHullFace
@@ -134,6 +134,15 @@ namespace nd
 			double m_diag;
 			std::vector<hullVector> m_points;
 		};
+#else
+		class ConvexHull : public ndConvexHull3d
+		{
+			public:
+			//ConvexHull(ConvexHull3dPointSet& accelerator, double distTol, int maxVertexCount = 0x7fffffff);
+			ConvexHull(const double* const vertexCloud, int strideInBytes, int count, double distTol, int maxVertexCount = 0x7fffffff);
+			~ConvexHull();
+		};
+#endif
 	}
 }
 #endif

@@ -25,10 +25,11 @@
 
 namespace nd
 {
+
 	namespace VHACD
 	{
+#if 0
 		#define DG_STACK_DEPTH_3D 64
-
 		ConvexHullFace::ConvexHullFace()
 		{
 			m_mark = 0;
@@ -284,49 +285,6 @@ namespace nd
 			tree->m_box[1] = maxP + hullVector(double(1.0e-3f));
 			return tree;
 		}
-
-		//void ConvexHull3dSupportAccelerator::Split(VHACD::Vec3<double>& dir, double dist, ConvexHull3dSupportAccelerator& back, ConvexHull3dSupportAccelerator& front) const
-		//{
-		//	back.m_points = m_points;
-		//	front.m_points = m_points;
-		//	back.m_treeBuffer = m_treeBuffer;
-		//	front.m_treeBuffer = m_treeBuffer;
-		//
-		//	_ASSERT(m_tree == &m_treeBuffer[0]);
-		//	back.m_tree = &back.m_treeBuffer[0];
-		//	front.m_tree = &front.m_treeBuffer[0];
-		//
-		//	for (int i = 0; i < m_treeBuffer.size(); ++i)
-		//	{
-		//		const ConvexHullAABBTreeNode* const node = &m_treeBuffer[i];
-		//		ConvexHullAABBTreeNode* const backNode = &back.m_treeBuffer[i];
-		//		ConvexHullAABBTreeNode* const frontNode = &front.m_treeBuffer[i];
-		//		if (node->m_parent)
-		//		{
-		//			int index = node->m_parent - m_tree;
-		//			backNode->m_parent = &back.m_treeBuffer[index];
-		//			frontNode->m_parent = &front.m_treeBuffer[index];
-		//		}
-		//
-		//		if (node->m_left)
-		//		{
-		//			int index = node->m_left - m_tree;
-		//			backNode->m_left = &back.m_treeBuffer[index];
-		//			frontNode->m_right = &front.m_treeBuffer[index];
-		//		}
-		//
-		//		if (node->m_right)
-		//		{
-		//			int index = node->m_right - m_tree;
-		//			backNode->m_right = &back.m_treeBuffer[index];
-		//			frontNode->m_right = &front.m_treeBuffer[index];
-		//		}
-		//	}
-		//	
-		//	VHACD::Vec3<double> backDir(dir.X() * -1.0, dir.Y() * -1.0, dir.Z() * -1.0);
-		//	front.Prune(dir, dist);
-		//	back.Prune(backDir, dist * -1.0);
-		//}
 
 		class ConvexHull::ndNormalMap
 		{
@@ -929,5 +887,17 @@ namespace nd
 			}
 			m_points.resize(currentIndex);
 		}
+#else
+
+	//ConvexHull(const double* const vertexCloud, int strideInBytes, int count, double distTol, int maxVertexCount)
+	ConvexHull::ConvexHull(const double* const vertexCloud, int strideInBytes, int count, double distTol, int maxVertexCount)
+		:ndConvexHull3d(vertexCloud, strideInBytes, count, distTol, maxVertexCount)
+	{
+	}
+
+	ConvexHull::~ConvexHull()
+	{
+	}
+#endif
 	}
 }

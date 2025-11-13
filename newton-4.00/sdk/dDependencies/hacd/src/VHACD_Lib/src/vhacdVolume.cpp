@@ -460,27 +460,32 @@ namespace nd
 					}
 					++p;
 				}
-
+				
 				ConvexHull ch(&points[0][0], 3 * sizeof(double), int32_t(points.size()), 1.0e-5f);
-				const std::vector<hullVector>& convexPoints = ch.GetVertexPool();
-				for (size_t v = 0; v < convexPoints.size(); v++)
+				const ndArray<ndBigVector>& convexPoints = ch.GetVertexPool();
+				for (ndInt32 v = 0; v < ndInt32(convexPoints.GetCount()); v++)
 				{
-					cpoints.push_back(convexPoints[v]);
+					const Vec3<double> hullPoint(convexPoints[v].m_x, convexPoints[v].m_y, convexPoints[v].m_z);
+					cpoints.push_back(hullPoint);
 				}
 			}
 			ConvexHull ch(&cpoints[0][0], 3 * sizeof(double), int32_t(cpoints.size()), 1.0e-5f);
 			meshCH.ResizePoints(0);
 			meshCH.ResizeTriangles(0);
 
-			const std::vector<hullVector>& convexPoints = ch.GetVertexPool();
-			for (size_t v = 0; v < convexPoints.size(); v++)
+			//const std::vector<hullVector>& convexPoints = ch.GetVertexPool();
+			const ndArray<ndBigVector>& convexPoints = ch.GetVertexPool();
+			//for (size_t v = 0; v < convexPoints.size(); v++)
+			for (ndInt32 v = 0; v < ndInt32(convexPoints.GetCount()); v++)
 			{
-				meshCH.AddPoint(convexPoints[v]);
+				const Vec3<double> hullPoint(convexPoints[v].m_x, convexPoints[v].m_y, convexPoints[v].m_z);
+				meshCH.AddPoint(hullPoint);
 			}
-
+			
 			for (ConvexHull::ndNode* node = ch.GetFirst(); node; node = node->GetNext())
 			{
-				ConvexHullFace* const face = &node->GetInfo();
+				//ConvexHullFace* const face = &node->GetInfo();
+				const ndConvexHull3dFace* const face = &node->GetInfo();
 				meshCH.AddTriangle(Vec3<int32_t>(face->m_index[0], face->m_index[1], face->m_index[2]));
 			}
 		}

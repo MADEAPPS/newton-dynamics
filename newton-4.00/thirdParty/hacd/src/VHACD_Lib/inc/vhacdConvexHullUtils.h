@@ -666,7 +666,8 @@ namespace nd
 			friend class ndNode;
 		};
 
-		class hullVector : public VHACD::Vec3<double>
+		//class hullVector : public VHACD::Vec3<double>
+		class hullVector : public Vec3<double>
 		{
 			public:
 			hullVector()
