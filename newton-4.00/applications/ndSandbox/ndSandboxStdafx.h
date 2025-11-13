@@ -53,7 +53,6 @@
 #endif
 
 // some third party libraries includes here
-#include <VHACD.h>
 #include <imgui.h>
 #include <lodepng.h>
 

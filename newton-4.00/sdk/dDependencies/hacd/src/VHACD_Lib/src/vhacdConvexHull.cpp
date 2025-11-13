@@ -19,6 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#include "ndCoreStdafx.h"
+#include "ndCollisionStdafx.h"
 #include "vhacdConvexHull.h"
 
 namespace nd
@@ -929,5 +931,3 @@ namespace nd
 		}
 	}
 }
-
-

@@ -24,7 +24,6 @@
 #define _ND_MODEL_STDAFX_H__
 
 #include <ofbx.h>
-#include <VHACD.h>
 #include <ndNewton.h>
 
 #endif 

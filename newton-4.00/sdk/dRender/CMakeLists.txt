@@ -28,7 +28,6 @@ include_directories(../../sdk/dNewton/dModels/dVehicle)
 include_directories(../../thirdParty/png)
 include_directories(../../thirdParty/imgui/)
 include_directories(../../thirdParty/openFBX/src)
-include_directories(../../thirdParty/hacd/src/VHACD_Lib/public/)
 
 if (APPLE) 
 	message ("render library with metal backend")

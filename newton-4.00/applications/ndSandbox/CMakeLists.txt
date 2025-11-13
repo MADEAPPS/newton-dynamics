@@ -60,7 +60,6 @@ include_directories(../../thirdParty/png/)
 include_directories(../../thirdParty/imgui/)
 include_directories(../../thirdParty/openFBX/src/)
 include_directories(../../thirdParty/imgui/backends)
-include_directories(../../thirdParty/hacd/src/VHACD_Lib/public/)
 
 if (APPLE) 
 	message ("apple headers here")	
@@ -83,7 +82,7 @@ endif()
 add_executable(${projectName} ${CPP_SOURCE})
 
 message ("adding project libraries")
-target_link_libraries (${projectName} PUBLIC ndRender ndNewton ndBrain ndModel vhacd openfbx lodepng imgui)
+target_link_libraries (${projectName} PUBLIC ndRender ndNewton ndBrain ndModel openfbx lodepng imgui)
 
 if (MSVC OR MINGW)
 	message ("adding required third party opengl libraries")

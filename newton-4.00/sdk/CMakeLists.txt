@@ -39,8 +39,10 @@ else()
 	include_directories(dCollision/dMesh)
 	include_directories(dNewton/dIkSolver)
 	include_directories(dNewton/dModels/dVehicle)
+	include_directories(dDependencies/hacd/src/VHACD_Lib/inc/)
+	include_directories(dDependencies/hacd/src/VHACD_Lib/public/)
 
-	add_subdirectory(dNewton/dExtensions)
+	#add_subdirectory(dNewton/dExtensions)
 
 	file(GLOB CPP_SOURCE 
 		dCore/*.h 
@@ -60,7 +62,11 @@ else()
 		dNewton/dIkSolver/*.h
 		dNewton/dIkSolver/*.cpp
 		dNewton/dModels/dVehicle/*.h 
-		dNewton/dModels/dVehicle/*.cpp)
+		dNewton/dModels/dVehicle/*.cpp
+		dDependencies/hacd/src/VHACD_Lib/inc/*.h
+		dDependencies/hacd/src/VHACD_Lib/src/*.cpp
+		dDependencies/hacd/src/VHACD_Lib/public/*.h
+	)
 
 	if(MSVC)
 		file(GLOB CPP_SOURCE ${CPP_SOURCE} dCore/ndTypes.natvis)
