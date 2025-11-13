@@ -256,7 +256,9 @@ ndBrainAgentOnPolicyGradient_Agent::ndBrainAgentOnPolicyGradient_Agent(ndBrainAg
 {
 	const ndBrain* const brain = *master->m_policyTrainer->GetBrain();
 	m_trajectory.Init(brain->GetOutputSize(), master->m_parameters.m_numberOfObservations);
-	m_randomeGenerator.m_gen.seed(master->m_parameters.m_randomSeed);
+
+	ndUnsigned32 agentSeed = m_owner->m_randomGenerator();
+	m_randomeGenerator.m_gen.seed(agentSeed);
 }
 
 ndInt32 ndBrainAgentOnPolicyGradient_Agent::GetEpisodeFrames() const
@@ -554,7 +556,6 @@ ndFloat32 ndBrainAgentOnPolicyGradient_Trainer::GetAverageFrames() const
 	return m_averageFramesPerEpisodes.GetAverage();
 }
 
-//#pragma optimize( "", off )
 //void ndBrainAgentOnPolicyGradient_Trainer::CalculateScore()
 //{
 //	ndAssert(0);
@@ -697,7 +698,8 @@ void ndBrainAgentOnPolicyGradient_Trainer::SaveTrajectory(ndBrainAgentOnPolicyGr
 
 	if (agent->m_isDead)
 	{
-		for (ndInt32 i = 0; i < trajectory.GetCount(); ++i)
+		ndInt32 start = ndMax(0, ndInt32(trajectory.GetCount() - 64));
+		for (ndInt32 i = start; i < trajectory.GetCount(); ++i)
 		{
 			if (trajectory.GetTerminalState(i))
 			{
@@ -738,10 +740,8 @@ void ndBrainAgentOnPolicyGradient_Trainer::SaveTrajectory(ndBrainAgentOnPolicyGr
 		m_trajectoryAccumulator.SetCount(m_trajectoryAccumulator.GetCount() + 1);
 		m_trajectoryAccumulator.CopyFrom(m_trajectoryAccumulator.GetCount() - 1, trajectory, i);
 	}
-
 }
 
-//#pragma optimize( "", off )
 //void ndBrainAgentOnPolicyGradient_Trainer::TrainCritics(ndInt32 criticIndex)
 //{
 //	ndAssert(0);
@@ -806,7 +806,7 @@ void ndBrainAgentOnPolicyGradient_Trainer::SaveTrajectory(ndBrainAgentOnPolicyGr
 //	critic.ApplyLearnRate();
 //}
 
-//#pragma optimize( "", off )
+
 //void ndBrainAgentOnPolicyGradient_Trainer::CalculateExpectedRewards()
 //{
 //	// Get the rewards for this mini batch
@@ -1055,7 +1055,7 @@ void ndBrainAgentOnPolicyGradient_Trainer::SaveTrajectory(ndBrainAgentOnPolicyGr
 //	m_policyTrainer->ApplyLearnRate();
 //}
 
-#pragma optimize( "", off )
+
 void ndBrainAgentOnPolicyGradient_Trainer::UpdateScore()
 {
 	ndBrainFloat averageSum = ndBrainFloat(0.0f);
@@ -1068,7 +1068,6 @@ void ndBrainAgentOnPolicyGradient_Trainer::UpdateScore()
 	m_averageFramesPerEpisodes.Update(ndBrainFloat(stepNumber) / ndBrainFloat(m_parameters.m_batchTrajectoryCount));
 }
 
-#pragma optimize( "", off )
 void ndBrainAgentOnPolicyGradient_Trainer::TrajectoryToGpuBuffers()
 {
 	ndInt32 stride = m_trajectoryAccumulator.GetStride();
@@ -1089,7 +1088,7 @@ void ndBrainAgentOnPolicyGradient_Trainer::TrajectoryToGpuBuffers()
 	m_numberOfMinibatches = ndUnsigned32(m_trajectoryAccumulator.GetCount() - m_trajectoryAccumulator.GetCount() % m_parameters.m_miniBatchSize);
 }
 
-#pragma optimize( "", off )
+
 void ndBrainAgentOnPolicyGradient_Trainer::CalculateAdvantage()
 {
 	ndBrainFloatBuffer* const inputBuffer = m_criticTrainer->GetInputBuffer();
@@ -1135,7 +1134,6 @@ void ndBrainAgentOnPolicyGradient_Trainer::CalculateAdvantage()
 	}
 }
 
-#pragma optimize( "", off )
 void ndBrainAgentOnPolicyGradient_Trainer::OptimizeCritic()
 {
 	ndCopyBufferCommandInfo shuffleBufferInfo;
@@ -1180,7 +1178,7 @@ void ndBrainAgentOnPolicyGradient_Trainer::OptimizeCritic()
 	}
 }
 
-#pragma optimize( "", off )
+
 void ndBrainAgentOnPolicyGradient_Trainer::OptimizePolicy()
 {
 //	ndAtomic<ndInt32> iterator(0);
@@ -1291,7 +1289,6 @@ void ndBrainAgentOnPolicyGradient_Trainer::OptimizePolicy()
 	m_policyTrainer->ApplyLearnRate(m_learnRate);
 }
 
-#pragma optimize( "", off )
 void ndBrainAgentOnPolicyGradient_Trainer::Optimize()
 {
 	UpdateScore();
@@ -1301,7 +1298,6 @@ void ndBrainAgentOnPolicyGradient_Trainer::Optimize()
 	OptimizeCritic();
 }
 
-#pragma optimize( "", off )
 void ndBrainAgentOnPolicyGradient_Trainer::OptimizeStep()
 {
 	for (ndList<ndSharedPtr<ndBrainAgentOnPolicyGradient_Agent>>::ndNode* node = m_agents.GetFirst(); node; node = node->GetNext())

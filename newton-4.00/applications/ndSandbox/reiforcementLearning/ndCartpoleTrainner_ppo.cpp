@@ -211,8 +211,10 @@ namespace ndCartpoleTrainer_ppo
 		void ResetModel()
 		{
 			ndMatrix cartMatrix(ndGetIdentityMatrix());
+
 			cartMatrix.m_posit = m_cart->GetMatrix().m_posit;
-			cartMatrix.m_posit.m_x = ndFloat32(0.0f);
+			cartMatrix.m_posit.m_x = ndFloat32(10.0f) * (ndRand() - ndFloat32(0.5f));
+			cartMatrix.m_posit.m_y = ndFloat32(0.1f);
 			m_cart->SetMatrix(cartMatrix);
 
 			const ndMatrix poleMatrix(m_poleHinge->CalculateGlobalMatrix1());
@@ -244,7 +246,7 @@ namespace ndCartpoleTrainer_ppo
 		{
 			if (IsTerminal())
 			{
-				return ndBrainFloat(0.0f);
+				return ndBrainFloat(-1.0f);
 			}
 
 			ndJointHinge* const hinge = (ndJointHinge*)*m_poleHinge;
@@ -267,8 +269,7 @@ namespace ndCartpoleTrainer_ppo
 		void ApplyActions(ndBrainFloat* const actions)
 		{
 			ndBrainFloat action = actions[0];
-			ndBrainFloat accel = D_PUSH_ACCEL * action;
-			ndFloat32 pushForce = accel * (m_cart->GetAsBodyDynamic()->GetMassMatrix().m_w);
+			ndFloat32 pushForce = ndBrainFloat(D_PUSH_ACCEL * action * (m_cart->GetAsBodyDynamic()->GetMassMatrix().m_w));
 
 			ndJointSlider* const slider = (ndJointSlider*)*m_slider;
 			const ndMatrix matrix(slider->CalculateGlobalMatrix0());
@@ -322,9 +323,7 @@ namespace ndCartpoleTrainer_ppo
 			fprintf(m_outFile, "vpg\n");
 
 			// create a Soft Actor Critic traniing agent
-			//ndBrainAgentOffPolicyGradient_Trainer::HyperParameters hyperParameters;
 			ndBrainAgentOnPolicyGradient_Trainer::HyperParameters hyperParameters;
-			//hyperParameters.m_useGpuBackend = false;
 			hyperParameters.m_numberOfActions = m_actionsSize;
 			hyperParameters.m_numberOfObservations = m_observationsSize;
 			m_master = ndSharedPtr<ndBrainAgentOnPolicyGradient_Trainer>(new ndBrainAgentOnPolicyGradient_Trainer(hyperParameters));
@@ -337,8 +336,8 @@ namespace ndCartpoleTrainer_ppo
 			// create a visual mesh and add to the scene.
 			ndWorld* const world = scene->GetWorld();
 			ndMatrix matrix(location);
-			matrix.m_posit = FindFloor(*scene->GetWorld(), matrix.m_posit, 200.0f);
-			matrix.m_posit.m_y += ndFloat32 (0.1f);
+			//matrix.m_posit = FindFloor(*scene->GetWorld(), matrix.m_posit, 200.0f);
+			matrix.m_posit.m_y = ndFloat32 (0.1f);
 			loader.m_mesh->m_matrix = loader.m_mesh->m_matrix * matrix;
 
 			// create an articulated model
@@ -386,7 +385,6 @@ namespace ndCartpoleTrainer_ppo
 
 		virtual void Update(ndDemoEntityManager* const manager, ndFloat32)
 		{
-			return;
 			ndUnsigned32 stopTraining = m_master->GetFramesCount();
 			if (stopTraining <= m_stopTraining)
 			{

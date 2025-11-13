@@ -41,8 +41,8 @@
 //#define DEFAULT_SCENE	14		// basics mutibody vehicle
 //#define DEFAULT_SCENE	15		// object Placement
 //#define DEFAULT_SCENE	16		// third person player capsule
-//#define DEFAULT_SCENE	17		// cart pole SAC trained controller
-#define DEFAULT_SCENE	18		// cart pole PPO trained controller
+#define DEFAULT_SCENE	17		// cart pole SAC trained controller
+//#define DEFAULT_SCENE	18		// cart pole PPO trained controller
 
 // These are the machine learning training demos
 //#define DEFAULT_SCENE			(MACHINE_LEARNING_BASE + 0)	// train cart pole using SAC agent
@@ -51,10 +51,8 @@
 
 // legacy demos 
 //#define DEFAULT_SCENE	8		// particle fluid
-//#define DEFAULT_SCENE	10		// static user mesh collision 
 //#define DEFAULT_SCENE	12		// basic vehicle
 //#define DEFAULT_SCENE	13		// heavy vehicle
-//#define DEFAULT_SCENE	16		// rag doll
 //#define DEFAULT_SCENE	19		// unit cycle controller
 //#define DEFAULT_SCENE	20		// quadruped animated 1
 //#define DEFAULT_SCENE	21		// quadruped sac trained

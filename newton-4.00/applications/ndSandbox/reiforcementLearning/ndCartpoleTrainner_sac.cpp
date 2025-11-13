@@ -220,7 +220,7 @@ namespace ndCartpoleTrainer_sac
 		{
 			if (IsTerminal())
 			{
-				return ndBrainFloat(0.0f);
+				return ndBrainFloat(-1.0f);
 			}
 
 			ndJointHinge* const hinge = (ndJointHinge*)*m_poleHinge;
