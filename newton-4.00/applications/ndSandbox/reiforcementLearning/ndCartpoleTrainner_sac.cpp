@@ -27,14 +27,15 @@ namespace ndCartpoleTrainer_sac
 	#define D_PUSH_ACCEL			ndBrainFloat (-10.0f * DEMO_GRAVITY)
 	#define D_REWARD_MIN_ANGLE		ndBrainFloat (20.0f * ndDegreeToRad)
 
+
 	class ndHelpLegend : public ndDemoEntityManager::ndDemoHelper
 	{
 		virtual void PresentHelp(ndDemoEntityManager* const scene) override
 		{
 			const ndVector color(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f));
 			scene->Print(color, "training a cart pole using Soft Actor Critic method");
-			scene->Print(color, "training goes for 100k steps.");
-			scene->Print(color, "therfore it takes from 30 to 60 miniute using GPU");
+			scene->Print(color, "training goes for 200k steps. Therefore the training");
+			scene->Print(color, "seccion takes from one two twp hours with GPU backend");
 		}
 	};
 
@@ -288,7 +289,7 @@ namespace ndCartpoleTrainer_sac
 			,m_discountRewardFactor(0.99f)
 			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountRewardFactor))
 			,m_lastEpisode(0xfffffff)
-			,m_stopTraining(150000)
+			,m_stopTraining(200000)
 			,m_modelIsTrained(false)
 		{
 			char name[256];
