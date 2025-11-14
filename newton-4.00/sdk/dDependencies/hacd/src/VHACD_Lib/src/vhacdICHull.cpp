@@ -26,6 +26,7 @@ namespace nd
 	{
 		const double ICHull::sc_eps = 1.0e-15;
 		const int32_t ICHull::sc_dummyIndex = 0x7fffffff;
+
 		ICHull::ICHull()
 		{
 			m_isFlat = false;

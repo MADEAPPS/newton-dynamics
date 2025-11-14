@@ -17,7 +17,6 @@
 
 
 #include <stdlib.h>
-#include <vector>
 #include <atomic>
 #include <thread>
 #include <condition_variable>

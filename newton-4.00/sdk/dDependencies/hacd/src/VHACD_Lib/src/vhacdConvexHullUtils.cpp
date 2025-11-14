@@ -29,47 +29,6 @@ namespace nd
 {
 	namespace VHACD
 	{
-		//#define Absolute(a)  ((a) >= 0.0 ? (a) : -(a))
-		//double Determinant2x2(const double matrix[2][2], double* const error)
-		//{
-		//	double a00xa11 = matrix[0][0] * matrix[1][1];
-		//	double a01xa10 = matrix[0][1] * matrix[1][0];
-		//	*error = Absolute(a00xa11) + Absolute(a01xa10);
-		//	return a00xa11 - a01xa10;
-		//}
-		//
-		//double Determinant3x3(const double matrix[3][3], double* const error)
-		//{
-		//	double sign = double(-1.0f);
-		//	double det = double(0.0f);
-		//	double accError = double(0.0f);
-		//	for (int i = 0; i < 3; ++i)
-		//	{
-		//		double cofactor[2][2];
-		//		for (int j = 0; j < 2; ++j)
-		//		{
-		//			int k0 = 0;
-		//			for (int k = 0; k < 3; ++k)
-		//			{
-		//				if (k != i)
-		//				{
-		//					cofactor[j][k0] = matrix[j][k];
-		//					k0++;
-		//				}
-		//			}
-		//		}
-		//
-		//		double parcialError;
-		//		double minorDet = Determinant2x2(cofactor, &parcialError);
-		//		accError += parcialError * Absolute(matrix[2][i]);
-		//		det += sign * minorDet * matrix[2][i];
-		//		sign *= double(-1.0f);
-		//	}
-		//
-		//	*error = accError;
-		//	return det;
-		//}
-
 		Semaphore::Semaphore()
 			:m_count(0)
 			,m_mutex()

@@ -424,13 +424,15 @@ namespace nd
 					double volume = pset->ComputeVolume();
 					pset->ComputeBB();
 					pset->ComputePrincipalAxes();
-					if (params.m_pca) {
+					if (params.m_pca) 
+					{
 						pset->AlignToPrincipalAxes();
 					}
 
 					pset->ComputeConvexHull(pset->GetConvexHull());
 					double volumeCH = fabs(pset->GetConvexHull().ComputeVolume());
-					if (firstIteration) {
+					if (firstIteration) 
+					{
 						m_volumeCH0 = volumeCH;
 					}
 
@@ -439,11 +441,13 @@ namespace nd
 					// make the value smaller, later put it the parameters.
 					error *= params.m_concavityToVolumeWeigh;
 
-					if (firstIteration) {
+					if (firstIteration) 
+					{
 						firstIteration = false;
 					}
 			
-					if (concavity > params.m_concavity && concavity > error) {
+					if (concavity > params.m_concavity && concavity > error) 
+					{
 						Vec3<double> preferredCuttingDirection;
 						double w = ComputePreferredCuttingDirection(pset, preferredCuttingDirection);
 						planes.Resize(0);
@@ -465,7 +469,8 @@ namespace nd
 							bestPlane,
 							minConcavity,
 							params);
-						if ((params.m_planeDownsampling > 1 || params.m_convexhullDownsampling > 1)) {
+						if ((params.m_planeDownsampling > 1 || params.m_convexhullDownsampling > 1)) 
+						{
 							planesRef.Resize(0);
 
 							//VoxelSet* vset = (VoxelSet*)pset;
@@ -488,7 +493,7 @@ namespace nd
 
 						{
 							if (maxConcavity < minConcavity) 
-{
+							{
 								maxConcavity = minConcavity;
 							}
 							PrimitiveSet* bestLeft = pset->Create();
@@ -496,15 +501,18 @@ namespace nd
 							temp.PushBack(bestLeft);
 							temp.PushBack(bestRight);
 							pset->Clip(bestPlane, bestRight, bestLeft);
-							if (params.m_pca) {
+							if (params.m_pca) 
+							{
 								bestRight->RevertAlignToPrincipalAxes();
 								bestLeft->RevertAlignToPrincipalAxes();
 							}
 							delete pset;
 						}
 					}
-					else {
-						if (params.m_pca) {
+					else 
+					{
+						if (params.m_pca) 
+						{
 							pset->RevertAlignToPrincipalAxes();
 						}
 						parts.PushBack(pset);
@@ -517,7 +525,8 @@ namespace nd
 				}
 			}
 			const size_t nInputParts = inputParts.Size();
-			for (size_t p = 0; p < nInputParts; ++p) {
+			for (size_t p = 0; p < nInputParts; ++p) 
+			{
 				parts.PushBack(inputParts[p]);
 			}
 
@@ -530,7 +539,8 @@ namespace nd
 				parts[p]->ComputeConvexHull(*m_convexHulls[p]);
 				size_t nv = m_convexHulls[p]->GetNPoints();
 				double x, y, z;
-				for (size_t i = 0; i < nv; ++i) {
+				for (size_t i = 0; i < nv; ++i) 
+				{
 					Vec3<double>& pt = m_convexHulls[p]->GetPoint(i);
 					x = pt[0];
 					y = pt[1];
@@ -551,7 +561,8 @@ namespace nd
 		void AddPoints(const Mesh* const mesh, SArray<Vec3<double> >& pts)
 		{
 			const size_t n = mesh->GetNPoints();
-			for (size_t i = 0; i < n; ++i) {
+			for (size_t i = 0; i < n; ++i) 
+			{
 				pts.PushBack(mesh->GetPoint(i));
 			}
 		}
@@ -567,12 +578,9 @@ namespace nd
 			combinedCH->ResizeTriangles(0);
 
 			const std::vector<ndBigVector>& convexPoints = ch.GetVertexPool();
-			//const ndArray<ndBigVector>& convexPoints = ch.GetVertexPool();
 			for (size_t v = 0; v < convexPoints.size(); v++) 
-			//for (ndInt32 v = 0; v < ndInt32(convexPoints.GetCount()); v++)
 			{
 				const Vec3<double> hullPoint(convexPoints[v].m_x, convexPoints[v].m_y, convexPoints[v].m_z);
-				//combinedCH->AddPoint(convexPoints[v]);
 				combinedCH->AddPoint(hullPoint);
 			}
 		
@@ -642,7 +650,6 @@ namespace nd
 				float m_cost;
 			};
 		
-			//std::set<ConvexKey> hullGraph;
 			ndTree<ndInt32, ConvexKey> hullGraph;
 			std::vector<ConvexPair> convexPairArray;
 			std::vector<ConvexProxy> convexProxyArray;

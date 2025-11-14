@@ -59,7 +59,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <vector>
 #include <atomic>
 #include <thread>
 #include <condition_variable>
