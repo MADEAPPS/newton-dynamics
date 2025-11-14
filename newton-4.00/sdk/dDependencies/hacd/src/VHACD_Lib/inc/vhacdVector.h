@@ -322,31 +322,6 @@ namespace nd
 			return m_data;
 		}
 		
-		inline bool Vec3::operator<(const Vec3& rhs) const
-		{
-			if (X() == rhs[0])
-			{
-				if (Y() == rhs[1])
-				{
-					return (Z() < rhs[2]);
-				}
-				return (Y() < rhs[1]);
-			}
-			return (X() < rhs[0]);
-		}
-		
-		inline bool Vec3::operator>(const Vec3& rhs) const
-		{
-			if (X() == rhs[0])
-			{
-				if (Y() == rhs[1])
-				{
-					return (Z() > rhs[2]);
-				}
-				return (Y() > rhs[1]);
-			}
-			return (X() > rhs[0]);
-		}
 #else
 
 		class Vec3 : public ndBigVector
@@ -662,32 +637,6 @@ namespace nd
 		{
 			ndAssert(0);
 			return &(*this)[0];
-		}
-
-		inline bool Vec3::operator<(const Vec3& rhs) const
-		{
-			if (X() == rhs[0])
-			{
-				if (Y() == rhs[1])
-				{
-					return (Z() < rhs[2]);
-				}
-				return (Y() < rhs[1]);
-			}
-			return (X() < rhs[0]);
-		}
-
-		inline bool Vec3::operator>(const Vec3& rhs) const
-		{
-			if (X() == rhs[0])
-			{
-				if (Y() == rhs[1])
-				{
-					return (Z() > rhs[2]);
-				}
-				return (Y() > rhs[1]);
-			}
-			return (X() > rhs[0]);
 		}
 #endif
 
