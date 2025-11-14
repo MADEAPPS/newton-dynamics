@@ -20,6 +20,7 @@ namespace nd
 {
 	namespace VHACD 
 	{
+#if 1
 		//!    Vector dim 3.
 		template <typename T>
 		class Vec3 
@@ -325,12 +326,9 @@ namespace nd
 			}
 			return (X() > rhs[0]);
 		}
-
-
-		template <typename T>
-		bool Colinear(const Vec3<T>& a, const Vec3<T>& b, const Vec3<T>& c);
-		template <typename T>
-		const T ComputeVolume4(const Vec3<T>& a, const Vec3<T>& b, const Vec3<T>& c, const Vec3<T>& d);
+#else
+		typedef ndBigVector Vec3;
+#endif
 	}
 }
 #endif
