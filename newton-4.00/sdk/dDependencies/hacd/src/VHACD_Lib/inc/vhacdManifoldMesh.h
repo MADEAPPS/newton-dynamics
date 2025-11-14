@@ -37,7 +37,7 @@ namespace nd
 			TMMVertex(void);
 
 			private:
-			Vec3<double> m_pos;
+			Vec3 m_pos;
 			int32_t m_name;
 			size_t m_id;
 			CircularListElement<TMMEdge>* m_duplicate; // pointer to incident cone edge (or NULL)
@@ -116,7 +116,7 @@ namespace nd
 			//! Print mesh information
 			void Print();
 			//!
-			void GetIFS(Vec3<double>* const points, Triangle* const triangles);
+			void GetIFS(Vec3* const points, Triangle* const triangles);
 			//!
 			void Clear();
 			//!

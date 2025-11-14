@@ -89,7 +89,7 @@ namespace nd
 			void ComputeBestClippingPlane(const PrimitiveSet* inputPSet,
 				const double volume,
 				const SArray<Plane>& planes,
-				const Vec3<double>& preferredCuttingDirection,
+				const Vec3& preferredCuttingDirection,
 				const double w,
 				const double alpha,
 				const double beta,
@@ -183,7 +183,7 @@ namespace nd
 			SArray<Mesh*> m_convexHulls;
 			double m_rot[3][3];
 			double m_volumeCH0;
-			Vec3<double> m_barycenter;
+			Vec3 m_barycenter;
 			size_t m_dim;
 			Volume* m_volume;
 			PrimitiveSet* m_pset;

@@ -49,52 +49,51 @@ namespace nd
 
 #if 1
 		//!    Vector dim 3.
-		template <typename T>
 		class Vec3 
 		{
 			public:
-			T& operator[](size_t i) { return m_data[i]; }
-			const T& operator[](size_t i) const { return m_data[i]; }
-			T& X();
-			T& Y();
-			T& Z();
-			const T& X() const;
-			const T& Y() const;
-			const T& Z() const;
+			double& operator[](size_t i) { return m_data[i]; }
+			const double& operator[](size_t i) const { return m_data[i]; }
+			double& X();
+			double& Y();
+			double& Z();
+			const double& X() const;
+			const double& Y() const;
+			const double& Z() const;
 			void Normalize();
-			T GetNorm() const;
+			double GetNorm() const;
 			void operator=(const Vec3& rhs);
 			void operator+=(const Vec3& rhs);
 			void operator-=(const Vec3& rhs);
-			void operator-=(T a);
-			void operator+=(T a);
-			void operator/=(T a);
-			void operator*=(T a);
+			void operator-=(double a);
+			void operator+=(double a);
+			void operator/=(double a);
+			void operator*=(double a);
 			Vec3 operator^(const Vec3& rhs) const;
-			T operator*(const Vec3& rhs) const;
+			double operator*(const Vec3& rhs) const;
 			Vec3 operator+(const Vec3& rhs) const;
 			Vec3 operator-(const Vec3& rhs) const;
 			Vec3 operator-() const;
-			Vec3 operator*(T rhs) const;
-			Vec3 operator/(T rhs) const;
+			Vec3 operator*(double rhs) const;
+			Vec3 operator/(double rhs) const;
 			bool operator<(const Vec3& rhs) const;
 			bool operator>(const Vec3& rhs) const;
 			Vec3();
-			Vec3(T a);
-			Vec3(T x, T y, T z);
+			Vec3(double a);
+			Vec3(double x, double y, double z);
 			Vec3(const Vec3& rhs);
 			/*virtual*/ ~Vec3(void);
 
 			// Compute the center of this bounding box and return the diagonal length
-			T GetCenter(const Vec3 &bmin, const Vec3 &bmax)
+			double GetCenter(const Vec3 &bmin, const Vec3 &bmax)
 			{
 				X() = (bmin.X() + bmax.X())*0.5;
 				Y() = (bmin.Y() + bmax.Y())*0.5;
 				Z() = (bmin.Z() + bmax.Z())*0.5;
-				T dx = bmax.X() - bmin.X();
-				T dy = bmax.Y() - bmin.Y();
-				T dz = bmax.Z() - bmin.Z();
-				T diagonal = T(sqrt(dx*dx + dy*dy + dz*dz));
+				double dx = bmax.X() - bmin.X();
+				double dy = bmax.Y() - bmin.Y();
+				double dz = bmax.Z() - bmin.Z();
+				double diagonal = double(sqrt(dx*dx + dy*dy + dz*dz));
 				return diagonal;
 			}
 
@@ -132,203 +131,195 @@ namespace nd
 			}
 
 			// Returns the squared distance between these two points
-			T GetDistanceSquared(const Vec3 &p) const
+			double GetDistanceSquared(const Vec3 &p) const
 			{
-				T dx = X() - p.X();
-				T dy = Y() - p.Y();
-				T dz = Z() - p.Z();
+				double dx = X() - p.X();
+				double dy = Y() - p.Y();
+				double dz = Z() - p.Z();
 				return dx*dx + dy*dy + dz*dz;
 			}
 
-			T GetDistance(const Vec3 &p) const
+			double GetDistance(const Vec3 &p) const
 			{
 				return sqrt(GetDistanceSquared(p));
 			}
 
 			// Returns the raw vector data as a pointer
-			T* GetData(void)
+			double* GetData(void)
 			{
 				return m_data;
 			}
 		private:
-			T m_data[3];
+			double m_data[3];
 		};
-
-
-		template <typename T>
-		inline Vec3<T> operator*(T lhs, const Vec3<T>& rhs)
+		
+		inline Vec3 operator*(double lhs, const Vec3& rhs)
 		{
-			return Vec3<T>(lhs * rhs.X(), lhs * rhs.Y(), lhs * rhs.Z());
+			return Vec3(lhs * rhs.X(), lhs * rhs.Y(), lhs * rhs.Z());
 		}
-		template <typename T>
-		inline T& Vec3<T>::X()
+
+		inline double& Vec3::X()
 		{
 			return m_data[0];
 		}
-		template <typename T>
-		inline  T& Vec3<T>::Y()
+		
+		inline  double& Vec3::Y()
 		{
 			return m_data[1];
 		}
-		template <typename T>
-		inline  T& Vec3<T>::Z()
+		
+		inline  double& Vec3::Z()
 		{
 			return m_data[2];
 		}
-		template <typename T>
-		inline  const T& Vec3<T>::X() const
+		
+		inline  const double& Vec3::X() const
 		{
 			return m_data[0];
 		}
-		template <typename T>
-		inline  const T& Vec3<T>::Y() const
+		
+		inline  const double& Vec3::Y() const
 		{
 			return m_data[1];
 		}
-		template <typename T>
-		inline  const T& Vec3<T>::Z() const
+		
+		inline  const double& Vec3::Z() const
 		{
 			return m_data[2];
 		}
-		template <typename T>
-		inline  void Vec3<T>::Normalize()
+		
+		inline  void Vec3::Normalize()
 		{
-			T n = sqrt(m_data[0] * m_data[0] + m_data[1] * m_data[1] + m_data[2] * m_data[2]);
+			double n = sqrt(m_data[0] * m_data[0] + m_data[1] * m_data[1] + m_data[2] * m_data[2]);
 			if (n != 0.0) (*this) /= n;
 		}
-		template <typename T>
-		inline  T Vec3<T>::GetNorm() const
+		
+		inline  double Vec3::GetNorm() const
 		{
 			return sqrt(m_data[0] * m_data[0] + m_data[1] * m_data[1] + m_data[2] * m_data[2]);
 		}
-		template <typename T>
-		inline  void Vec3<T>::operator= (const Vec3& rhs)
+		
+		inline  void Vec3::operator= (const Vec3& rhs)
 		{
 			this->m_data[0] = rhs.m_data[0];
 			this->m_data[1] = rhs.m_data[1];
 			this->m_data[2] = rhs.m_data[2];
 		}
-		template <typename T>
-		inline  void Vec3<T>::operator+=(const Vec3& rhs)
+		
+		inline  void Vec3::operator+=(const Vec3& rhs)
 		{
 			this->m_data[0] += rhs.m_data[0];
 			this->m_data[1] += rhs.m_data[1];
 			this->m_data[2] += rhs.m_data[2];
 		}
-		template <typename T>
-		inline void Vec3<T>::operator-=(const Vec3& rhs)
+		
+		inline void Vec3::operator-=(const Vec3& rhs)
 		{
 			this->m_data[0] -= rhs.m_data[0];
 			this->m_data[1] -= rhs.m_data[1];
 			this->m_data[2] -= rhs.m_data[2];
 		}
-		template <typename T>
-		inline void Vec3<T>::operator-=(T a)
+		
+		inline void Vec3::operator-=(double a)
 		{
 			this->m_data[0] -= a;
 			this->m_data[1] -= a;
 			this->m_data[2] -= a;
 		}
-		template <typename T>
-		inline void Vec3<T>::operator+=(T a)
+		
+		inline void Vec3::operator+=(double a)
 		{
 			this->m_data[0] += a;
 			this->m_data[1] += a;
 			this->m_data[2] += a;
 		}
-		template <typename T>
-		inline void Vec3<T>::operator/=(T a)
+		
+		inline void Vec3::operator/=(double a)
 		{
 			this->m_data[0] /= a;
 			this->m_data[1] /= a;
 			this->m_data[2] /= a;
 		}
-		template <typename T>
-		inline void Vec3<T>::operator*=(T a)
+		
+		inline void Vec3::operator*=(double a)
 		{
 			this->m_data[0] *= a;
 			this->m_data[1] *= a;
 			this->m_data[2] *= a;
 		}
-		template <typename T>
-		inline Vec3<T> Vec3<T>::operator^ (const Vec3<T>& rhs) const
+		
+		inline Vec3 Vec3::operator^ (const Vec3& rhs) const
 		{
-			return Vec3<T>(m_data[1] * rhs.m_data[2] - m_data[2] * rhs.m_data[1],
+			return Vec3(m_data[1] * rhs.m_data[2] - m_data[2] * rhs.m_data[1],
 				m_data[2] * rhs.m_data[0] - m_data[0] * rhs.m_data[2],
 				m_data[0] * rhs.m_data[1] - m_data[1] * rhs.m_data[0]);
 		}
-		template <typename T>
-		inline T Vec3<T>::operator*(const Vec3<T>& rhs) const
+		
+		inline double Vec3::operator*(const Vec3& rhs) const
 		{
 			return (m_data[0] * rhs.m_data[0] + m_data[1] * rhs.m_data[1] + m_data[2] * rhs.m_data[2]);
 		}
-		template <typename T>
-		inline Vec3<T> Vec3<T>::operator+(const Vec3<T>& rhs) const
+		
+		inline Vec3 Vec3::operator+(const Vec3& rhs) const
 		{
-			return Vec3<T>(m_data[0] + rhs.m_data[0], m_data[1] + rhs.m_data[1], m_data[2] + rhs.m_data[2]);
+			return Vec3(m_data[0] + rhs.m_data[0], m_data[1] + rhs.m_data[1], m_data[2] + rhs.m_data[2]);
 		}
-		template <typename T>
-		inline  Vec3<T> Vec3<T>::operator-(const Vec3<T>& rhs) const
+		
+		inline  Vec3 Vec3::operator-(const Vec3& rhs) const
 		{
-			return Vec3<T>(m_data[0] - rhs.m_data[0], m_data[1] - rhs.m_data[1], m_data[2] - rhs.m_data[2]);
+			return Vec3(m_data[0] - rhs.m_data[0], m_data[1] - rhs.m_data[1], m_data[2] - rhs.m_data[2]);
 		}
-		template <typename T>
-		inline  Vec3<T> Vec3<T>::operator-() const
+		
+		inline  Vec3 Vec3::operator-() const
 		{
-			return Vec3<T>(-m_data[0], -m_data[1], -m_data[2]);
+			return Vec3(-m_data[0], -m_data[1], -m_data[2]);
 		}
 
-		template <typename T>
-		inline Vec3<T> Vec3<T>::operator*(T rhs) const
+		
+		inline Vec3 Vec3::operator*(double rhs) const
 		{
-			return Vec3<T>(rhs * this->m_data[0], rhs * this->m_data[1], rhs * this->m_data[2]);
+			return Vec3(rhs * this->m_data[0], rhs * this->m_data[1], rhs * this->m_data[2]);
 		}
-		template <typename T>
-		inline Vec3<T> Vec3<T>::operator/ (T rhs) const
+		
+		inline Vec3 Vec3::operator/ (double rhs) const
 		{
-			return Vec3<T>(m_data[0] / rhs, m_data[1] / rhs, m_data[2] / rhs);
+			return Vec3(m_data[0] / rhs, m_data[1] / rhs, m_data[2] / rhs);
 		}
-		template <typename T>
-		inline Vec3<T>::Vec3(T a)
+		
+		inline Vec3::Vec3(double a)
 		{
 			m_data[0] = m_data[1] = m_data[2] = a;
 		}
-		template <typename T>
-		inline Vec3<T>::Vec3(T x, T y, T z)
+		
+		inline Vec3::Vec3(double x, double y, double z)
 		{
 			m_data[0] = x;
 			m_data[1] = y;
 			m_data[2] = z;
 		}
-		template <typename T>
-		inline Vec3<T>::Vec3(const Vec3& rhs)
+		
+		inline Vec3::Vec3(const Vec3& rhs)
 		{
 			m_data[0] = rhs.m_data[0];
 			m_data[1] = rhs.m_data[1];
 			m_data[2] = rhs.m_data[2];
 		}
-		template <typename T>
-		inline Vec3<T>::~Vec3(void) {}
 
-		template <typename T>
-		inline Vec3<T>::Vec3() {}
+		inline Vec3::Vec3() {}
+		inline Vec3::~Vec3(void) {}
 
-		template<typename T>
-		inline bool Colinear(const Vec3<T>& a, const Vec3<T>& b, const Vec3<T>& c)
+		inline bool Colinear(const Vec3& a, const Vec3& b, const Vec3& c)
 		{
 			return  ((c.Z() - a.Z()) * (b.Y() - a.Y()) - (b.Z() - a.Z()) * (c.Y() - a.Y()) == 0.0 /*EPS*/) &&
 				((b.Z() - a.Z()) * (c.X() - a.X()) - (b.X() - a.X()) * (c.Z() - a.Z()) == 0.0 /*EPS*/) &&
 				((b.X() - a.X()) * (c.Y() - a.Y()) - (b.Y() - a.Y()) * (c.X() - a.X()) == 0.0 /*EPS*/);
 		}
-
-		template<typename T>
-		inline const T ComputeVolume4(const Vec3<T>& a, const Vec3<T>& b, const Vec3<T>& c, const Vec3<T>& d)
+		inline double ComputeVolume4(const Vec3& a, const Vec3& b, const Vec3& c, const Vec3& d)
 		{
 			return (a - d) * ((b - d) ^ (c - d));
 		}
-
-		template <typename T>
-		inline bool Vec3<T>::operator<(const Vec3& rhs) const
+		
+		inline bool Vec3::operator<(const Vec3& rhs) const
 		{
 			if (X() == rhs[0])
 			{
@@ -340,8 +331,8 @@ namespace nd
 			}
 			return (X() < rhs[0]);
 		}
-		template <typename T>
-		inline  bool Vec3<T>::operator>(const Vec3& rhs) const
+		
+		inline  bool Vec3::operator>(const Vec3& rhs) const
 		{
 			if (X() == rhs[0])
 			{

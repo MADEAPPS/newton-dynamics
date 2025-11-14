@@ -58,15 +58,17 @@ namespace nd
 				return 0.0;
 			}
 
-			Vec3<double> bary(0.0, 0.0, 0.0);
-			for (size_t v = 0; v < nV; v++) {
+			Vec3 bary(0.0, 0.0, 0.0);
+			for (size_t v = 0; v < nV; v++) 
+			{
 				bary += GetPoint(v);
 			}
 			bary /= static_cast<double>(nV);
 
-			Vec3<double> ver0, ver1, ver2;
+			Vec3 ver0, ver1, ver2;
 			double totalVolume = 0.0;
-			for (size_t t = 0; t < nT; t++) {
+			for (size_t t = 0; t < nT; t++) 
+			{
 				const Triangle& tri = GetTriangle(t);
 				ver0 = GetPoint(size_t(tri[0]));
 				ver1 = GetPoint(size_t(tri[1]));
@@ -85,7 +87,7 @@ namespace nd
 			const std::vector<ndBigVector>& convexPoints = ch.GetVertexPool();
 			for (size_t v = 0; v < size_t(convexPoints.size()); v++)
 			{
-				const Vec3<double> hullPoint(convexPoints[v].m_x, convexPoints[v].m_y, convexPoints[v].m_z);
+				const Vec3 hullPoint(convexPoints[v].m_x, convexPoints[v].m_y, convexPoints[v].m_z);
 				AddPoint(hullPoint);
 			}
 			
@@ -97,8 +99,8 @@ namespace nd
 		}
 
 		void Mesh::Clip(const Plane& plane,
-			SArray<Vec3<double> >& positivePart,
-			SArray<Vec3<double> >& negativePart) const
+			SArray<Vec3 >& positivePart,
+			SArray<Vec3 >& negativePart) const
 		{
 			const size_t nV = GetNPoints();
 			if (nV == 0) {
@@ -106,7 +108,7 @@ namespace nd
 			}
 			double d;
 			for (size_t v = 0; v < nV; v++) {
-				const Vec3<double>& pt = GetPoint(v);
+				const Vec3& pt = GetPoint(v);
 				d = plane.m_a * pt[0] + plane.m_b * pt[1] + plane.m_c * pt[2] + plane.m_d;
 				if (d > 0.0) {
 					positivePart.PushBack(pt);
@@ -120,14 +122,14 @@ namespace nd
 				}
 			}
 		}
-		bool Mesh::IsInside(const Vec3<double>& pt) const
+		bool Mesh::IsInside(const Vec3& pt) const
 		{
 			const size_t nV = GetNPoints();
 			const size_t nT = GetNTriangles();
 			if (nV == 0 || nT == 0) {
 				return false;
 			}
-			Vec3<double> ver0, ver1, ver2;
+			Vec3 ver0, ver1, ver2;
 			double volume;
 			for (size_t t = 0; t < nT; t++) {
 				const Triangle& tri = GetTriangle(t);
@@ -142,13 +144,13 @@ namespace nd
 			return true;
 		}
 
-		void Mesh::CalculateBoundingBox(Vec3<double>& p0, Vec3<double>& p1) const
+		void Mesh::CalculateBoundingBox(Vec3& p0, Vec3& p1) const
 		{
-			Vec3<double> bmin(m_points[0]);
-			Vec3<double> bmax(m_points[1]);
+			Vec3 bmin(m_points[0]);
+			Vec3 bmax(m_points[1]);
 			for (uint32_t i = 1; i < m_points.Size(); i++)
 			{
-				const Vec3<double>& p = m_points[i];
+				const Vec3& p = m_points[i];
 				p.UpdateMinMax(bmin, bmax);
 			}
 			p0 = bmin;

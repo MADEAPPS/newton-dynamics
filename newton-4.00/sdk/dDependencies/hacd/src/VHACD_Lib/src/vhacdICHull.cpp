@@ -28,9 +28,10 @@ namespace nd
 		{
 			m_isFlat = false;
 		}
-		bool ICHull::AddPoints(const Vec3<double>* points, size_t nPoints)
+		bool ICHull::AddPoints(const Vec3* points, size_t nPoints)
 		{
-			if (!points) {
+			if (!points) 
+			{
 				return false;
 			}
 			CircularListElement<TMMVertex>* vertex = NULL;
@@ -43,7 +44,7 @@ namespace nd
 			}
 			return true;
 		}
-		bool ICHull::AddPoint(const Vec3<double>& point, int32_t id)
+		bool ICHull::AddPoint(const Vec3& point, int32_t id)
 		{
 			if (AddPoints(&point, 1)) {
 				m_mesh.m_vertices.GetData().m_name = id;
@@ -66,9 +67,9 @@ namespace nd
 				CircularListElement<TMMVertex>* v1 = v0->GetNext();
 				CircularListElement<TMMVertex>* v2 = v1->GetNext();
 				// Compute the normal to the plane
-				Vec3<double> p0 = v0->GetData().m_pos;
-				Vec3<double> p1 = v1->GetData().m_pos;
-				Vec3<double> p2 = v2->GetData().m_pos;
+				Vec3 p0 = v0->GetData().m_pos;
+				Vec3 p1 = v1->GetData().m_pos;
+				Vec3 p2 = v2->GetData().m_pos;
 				m_normal = (p1 - p0) ^ (p2 - p0);
 				m_normal.Normalize();
 				t1->GetData().m_vertices[0] = v0;
@@ -187,9 +188,9 @@ namespace nd
 				CircularListElement<TMMVertex>* v1 = v0->GetNext();
 				CircularListElement<TMMVertex>* v2 = v1->GetNext();
 				// Compute the normal to the plane
-				Vec3<double> p0 = v0->GetData().m_pos;
-				Vec3<double> p1 = v1->GetData().m_pos;
-				Vec3<double> p2 = v2->GetData().m_pos;
+				Vec3 p0 = v0->GetData().m_pos;
+				Vec3 p1 = v1->GetData().m_pos;
+				Vec3 p2 = v2->GetData().m_pos;
 				m_normal = (p1 - p0) ^ (p2 - p0);
 				m_normal.Normalize();
 				t1->GetData().m_vertices[0] = v0;
@@ -322,7 +323,7 @@ namespace nd
 				return false;
 			}
 			if (vMaxVolume != vHead) {
-				Vec3<double> pos = vHead->GetData().m_pos;
+				Vec3 pos = vHead->GetData().m_pos;
 				int32_t id = vHead->GetData().m_name;
 				vHead->GetData().m_pos = vMaxVolume->GetData().m_pos;
 				vHead->GetData().m_name = vMaxVolume->GetData().m_name;
@@ -364,7 +365,7 @@ namespace nd
 			}
 			if (fabs(vol) < sc_eps) {
 				// compute the barycenter
-				Vec3<double> bary(0.0, 0.0, 0.0);
+				Vec3 bary(0.0, 0.0, 0.0);
 				CircularListElement<TMMVertex>* vBary = v0;
 				do {
 					bary += vBary->GetData().m_pos;
@@ -372,14 +373,14 @@ namespace nd
 				bary /= static_cast<double>(vertices.GetSize());
 
 				// Compute the normal to the plane
-				Vec3<double> p0 = v0->GetData().m_pos;
-				Vec3<double> p1 = v1->GetData().m_pos;
-				Vec3<double> p2 = v2->GetData().m_pos;
+				Vec3 p0 = v0->GetData().m_pos;
+				Vec3 p1 = v1->GetData().m_pos;
+				Vec3 p2 = v2->GetData().m_pos;
 				m_normal = (p1 - p0) ^ (p2 - p0);
 				m_normal.Normalize();
 				// add dummy vertex placed at (bary + normal)
 				vertices.GetHead() = v2;
-				Vec3<double> newPt = bary + m_normal;
+				Vec3 newPt = bary + m_normal;
 				AddPoint(newPt, sc_dummyIndex);
 				m_isFlat = true;
 				return ICHullErrorOK;
@@ -472,12 +473,12 @@ namespace nd
 			CircularList<TMMVertex>& vertices = m_mesh.GetVertices();
 			CircularListElement<TMMVertex>* vertex0 = vertices.GetHead();
 			bool visible = false;
-			Vec3<double> pos0 = Vec3<double>(vertex0->GetData().m_pos.X(),
+			Vec3 pos0 = Vec3(vertex0->GetData().m_pos.X(),
 				vertex0->GetData().m_pos.Y(),
 				vertex0->GetData().m_pos.Z());
 			double vol = 0.0;
 			totalVolume = 0.0;
-			Vec3<double> ver0, ver1, ver2;
+			Vec3 ver0, ver1, ver2;
 			do {
 				ver0.X() = f->GetData().m_vertices[0]->GetData().m_pos.X();
 				ver0.Y() = f->GetData().m_vertices[0]->GetData().m_pos.Y();
@@ -678,12 +679,12 @@ namespace nd
 			}
 			return (*this);
 		}
-		bool ICHull::IsInside(const Vec3<double>& pt0, const double eps)
+		bool ICHull::IsInside(const Vec3& pt0, const double eps)
 		{
-			const Vec3<double> pt(pt0.X(), pt0.Y(), pt0.Z());
+			const Vec3 pt(pt0.X(), pt0.Y(), pt0.Z());
 			if (m_isFlat) {
 				size_t nT = m_mesh.m_triangles.GetSize();
-				Vec3<double> ver0, ver1, ver2, a, b, c;
+				Vec3 ver0, ver1, ver2, a, b, c;
 				double u, v;
 				for (size_t t = 0; t < nT; t++) {
 					ver0.X() = m_mesh.m_triangles.GetHead()->GetData().m_vertices[0]->GetData().m_pos.X();
@@ -709,7 +710,7 @@ namespace nd
 			}
 			else {
 				size_t nT = m_mesh.m_triangles.GetSize();
-				Vec3<double> ver0, ver1, ver2;
+				Vec3 ver0, ver1, ver2;
 				double vol;
 				for (size_t t = 0; t < nT; t++) {
 					ver0.X() = m_mesh.m_triangles.GetHead()->GetData().m_vertices[0]->GetData().m_pos.X();

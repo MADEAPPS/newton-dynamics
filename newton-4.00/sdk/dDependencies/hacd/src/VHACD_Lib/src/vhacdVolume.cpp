@@ -161,20 +161,23 @@ namespace nd
 			if (min > rad || max < -rad)                     \
 				return 0;
 
-		int32_t PlaneBoxOverlap(const Vec3<double>& normal,
-			const Vec3<double>& vert,
-			const Vec3<double>& maxbox)
+		int32_t PlaneBoxOverlap(const Vec3& normal,
+			const Vec3& vert,
+			const Vec3& maxbox)
 		{
 			size_t q;
-			Vec3<double> vmin, vmax;
+			Vec3 vmin, vmax;
 			double v;
-			for (q = X; q <= Z; q++) {
+			for (q = X; q <= Z; q++) 
+			{
 				v = vert[q];
-				if (normal[q] > 0.0) {
+				if (normal[q] > 0.0) 
+				{
 					vmin[q] = -maxbox[q] - v;
 					vmax[q] = maxbox[q] - v;
 				}
-				else {
+				else 
+				{
 					vmin[q] = maxbox[q] - v;
 					vmax[q] = -maxbox[q] - v;
 				}
@@ -186,11 +189,11 @@ namespace nd
 			return 0;
 		}
 
-		int32_t TriBoxOverlap(const Vec3<double>& boxcenter,
-			const Vec3<double>& boxhalfsize,
-			const Vec3<double>& triver0,
-			const Vec3<double>& triver1,
-			const Vec3<double>& triver2)
+		int32_t TriBoxOverlap(const Vec3& boxcenter,
+			const Vec3& boxhalfsize,
+			const Vec3& triver0,
+			const Vec3& triver1,
+			const Vec3& triver2)
 		{
 			/*    use separating axis theorem to test overlap between triangle and box */
 			/*    need to test for overlap in these directions: */
@@ -200,9 +203,9 @@ namespace nd
 			/*    3) crossproduct(edge from tri, {x,y,z}-directin) */
 			/*       this gives 3x3=9 more tests */
 
-			Vec3<double> v0, v1, v2;
+			Vec3 v0, v1, v2;
 			double min, max, p0, p1, p2, rad, fex, fey, fez; // -NJMP- "d" local variable removed
-			Vec3<double> normal, e0, e1, e2;
+			Vec3 normal, e0, e1, e2;
 
 			/* This is the fastest branch on Sun */
 			/* move everything so that the boxcenter is in (0,0,0) */
@@ -399,7 +402,7 @@ namespace nd
 				m_minBBVoxels[h] = m_voxels[0].m_coord[h];
 				m_maxBBVoxels[h] = m_voxels[0].m_coord[h];
 			}
-			Vec3<double> bary(0.0);
+			Vec3 bary(0.0);
 			for (size_t p = 0; p < nVoxels; ++p) {
 				for (size_t h = 0; h < 3; ++h) {
 					bary[h] += m_voxels[p].m_coord[h];
@@ -422,8 +425,8 @@ namespace nd
 			if (nVoxels == 0)
 				return;
 	
-			std::vector<Vec3<double>> points;
-			std::vector<Vec3<double>> cpoints;
+			std::vector<Vec3> points;
+			std::vector<Vec3> cpoints;
 			size_t p = 0;
 			size_t s = 0;
 			short i, j, k;
@@ -439,14 +442,14 @@ namespace nd
 							i = m_voxels[p].m_coord[0];
 							j = m_voxels[p].m_coord[1];
 							k = m_voxels[p].m_coord[2];
-							Vec3<double> p0((i - 0.5) * m_scale, (j - 0.5) * m_scale, (k - 0.5) * m_scale);
-							Vec3<double> p1((i + 0.5) * m_scale, (j - 0.5) * m_scale, (k - 0.5) * m_scale);
-							Vec3<double> p2((i + 0.5) * m_scale, (j + 0.5) * m_scale, (k - 0.5) * m_scale);
-							Vec3<double> p3((i - 0.5) * m_scale, (j + 0.5) * m_scale, (k - 0.5) * m_scale);
-							Vec3<double> p4((i - 0.5) * m_scale, (j - 0.5) * m_scale, (k + 0.5) * m_scale);
-							Vec3<double> p5((i + 0.5) * m_scale, (j - 0.5) * m_scale, (k + 0.5) * m_scale);
-							Vec3<double> p6((i + 0.5) * m_scale, (j + 0.5) * m_scale, (k + 0.5) * m_scale);
-							Vec3<double> p7((i - 0.5) * m_scale, (j + 0.5) * m_scale, (k + 0.5) * m_scale);
+							Vec3 p0((i - 0.5) * m_scale, (j - 0.5) * m_scale, (k - 0.5) * m_scale);
+							Vec3 p1((i + 0.5) * m_scale, (j - 0.5) * m_scale, (k - 0.5) * m_scale);
+							Vec3 p2((i + 0.5) * m_scale, (j + 0.5) * m_scale, (k - 0.5) * m_scale);
+							Vec3 p3((i - 0.5) * m_scale, (j + 0.5) * m_scale, (k - 0.5) * m_scale);
+							Vec3 p4((i - 0.5) * m_scale, (j - 0.5) * m_scale, (k + 0.5) * m_scale);
+							Vec3 p5((i + 0.5) * m_scale, (j - 0.5) * m_scale, (k + 0.5) * m_scale);
+							Vec3 p6((i + 0.5) * m_scale, (j + 0.5) * m_scale, (k + 0.5) * m_scale);
+							Vec3 p7((i - 0.5) * m_scale, (j + 0.5) * m_scale, (k + 0.5) * m_scale);
 
      						points.push_back(p0 + m_minBB);
 							points.push_back(p1 + m_minBB);
@@ -465,7 +468,7 @@ namespace nd
 				const std::vector<ndBigVector>& convexPoints = ch.GetVertexPool();
 				for (size_t v = 0; v < size_t(convexPoints.size()); v++)
 				{
-					const Vec3<double> hullPoint(convexPoints[v].m_x, convexPoints[v].m_y, convexPoints[v].m_z);
+					const Vec3 hullPoint(convexPoints[v].m_x, convexPoints[v].m_y, convexPoints[v].m_z);
 					cpoints.push_back(hullPoint);
 				}
 			}
@@ -476,7 +479,7 @@ namespace nd
 			const std::vector<ndBigVector>& convexPoints = ch.GetVertexPool();
 			for (size_t v = 0; v < convexPoints.size(); v++)
 			{
-				const Vec3<double> hullPoint(convexPoints[v].m_x, convexPoints[v].m_y, convexPoints[v].m_z);
+				const Vec3 hullPoint(convexPoints[v].m_x, convexPoints[v].m_y, convexPoints[v].m_z);
 				meshCH.AddPoint(hullPoint);
 			}
 			
@@ -488,7 +491,7 @@ namespace nd
 		}
 
 		void VoxelSet::GetPoints(const Voxel& voxel,
-			Vec3<double>* const pts) const
+			Vec3* const pts) const
 		{
 			short i = voxel.m_coord[0];
 			short j = voxel.m_coord[1];
@@ -520,8 +523,8 @@ namespace nd
 		}
 
 		void VoxelSet::Intersect(const Plane& plane,
-			SArray<Vec3<double> >* const positivePts,
-			SArray<Vec3<double> >* const negativePts,
+			SArray<Vec3 >* const positivePts,
+			SArray<Vec3 >* const negativePts,
 			const size_t sampling) const
 		{
 			const size_t nVoxels = m_voxels.Size();
@@ -529,8 +532,8 @@ namespace nd
 				return;
 			const double d0 = m_scale;
 			double d;
-			Vec3<double> pts[8];
-			Vec3<double> pt;
+			Vec3 pts[8];
+			Vec3 pt;
 			Voxel voxel;
 			size_t sp = 0;
 			size_t sn = 0;
@@ -591,11 +594,11 @@ namespace nd
 			_ASSERT(negativePts->Size() <= nVoxels * 8);
 		}
 
-		void VoxelSet::GetPointArray(std::vector<Vec3<double>>& points) const
+		void VoxelSet::GetPointArray(std::vector<Vec3>& points) const
 		{
 			const size_t nVoxels = m_voxels.Size();
 
-			Vec3<double> pts[8];
+			Vec3 pts[8];
 			for (size_t i = 0; i < nVoxels; ++i)
 			{
 				Voxel voxel (m_voxels[i]);
@@ -609,14 +612,14 @@ namespace nd
 
 		void VoxelSet::ComputeExteriorPoints(const Plane& plane,
 			const Mesh& mesh,
-			SArray<Vec3<double> >* const exteriorPts) const
+			SArray<Vec3 >* const exteriorPts) const
 		{
 			const size_t nVoxels = m_voxels.Size();
 			if (nVoxels == 0)
 				return;
 			double d;
-			Vec3<double> pt;
-			Vec3<double> pts[8];
+			Vec3 pt;
+			Vec3 pts[8];
 			Voxel voxel;
 			for (size_t v = 0; v < nVoxels; ++v) {
 				voxel = m_voxels[v];
@@ -642,7 +645,7 @@ namespace nd
 			if (nVoxels == 0)
 				return;
 			double d;
-			Vec3<double> pt;
+			Vec3 pt;
 			size_t nPositiveVoxels = 0;
 			for (size_t v = 0; v < nVoxels; ++v) {
 				pt = GetPoint(m_voxels[v]);
@@ -700,7 +703,7 @@ namespace nd
 			negativePart->m_numVoxelsInsideSurface = positivePart->m_numVoxelsInsideSurface = 0;
 
 			double d;
-			Vec3<double> pt;
+			Vec3 pt;
 			Voxel voxel;
 			const double d0 = m_scale;
 			for (size_t v = 0; v < nVoxels; ++v) {
@@ -737,7 +740,7 @@ namespace nd
 			if (nVoxels == 0)
 				return;
 			Voxel voxel;
-			Vec3<double> pts[8];
+			Vec3 pts[8];
 			for (size_t v = 0; v < nVoxels; ++v) {
 				voxel = m_voxels[v];
 				if (voxel.m_data == value) {
@@ -836,20 +839,24 @@ namespace nd
 			const size_t j1,
 			const size_t k1)
 		{
-			const short neighbours[6][3] = { { 1, 0, 0 },
+			const short neighbours[6][3] = { 
+				{ 1, 0, 0 },
 				{ 0, 1, 0 },
 				{ 0, 0, 1 },
 				{ -1, 0, 0 },
 				{ 0, -1, 0 },
 				{ 0, 0, -1 } };
-			std::queue<Vec3<short> > fifo;
-			Vec3<short> current;
-			short a, b, c;
-			for (size_t i = i0; i < i1; ++i) {
-				for (size_t j = j0; j < j1; ++j) {
-					for (size_t k = k0; k < k1; ++k) {
-
-						if (GetVoxel(i, j, k) == PRIMITIVE_UNDEFINED) {
+			std::queue<Triangle> fifo;
+			Triangle current;
+			//short a, b, c;
+			for (size_t i = i0; i < i1; ++i) 
+			{
+				for (size_t j = j0; j < j1; ++j) 
+				{
+					for (size_t k = k0; k < k1; ++k) 
+					{
+						if (GetVoxel(i, j, k) == PRIMITIVE_UNDEFINED) 
+						{
 							current[0] = (short)i;
 							current[1] = (short)j;
 							current[2] = (short)k;
@@ -859,18 +866,21 @@ namespace nd
 							while (fifo.size() > 0) {
 								current = fifo.front();
 								fifo.pop();
-								for (int32_t h = 0; h < 6; ++h) {
-									a = current[0] + neighbours[h][0];
-									b = current[1] + neighbours[h][1];
-									c = current[2] + neighbours[h][2];
-									if (a < 0 || a >= (int32_t)m_dim[0] || b < 0 || b >= (int32_t)m_dim[1] || c < 0 || c >= (int32_t)m_dim[2]) {
+								for (int32_t h = 0; h < 6; ++h) 
+								{
+									short a = short(current[0] + neighbours[h][0]);
+									short b = short(current[1] + neighbours[h][1]);
+									short c = short(current[2] + neighbours[h][2]);
+									if (a < 0 || a >= (int32_t)m_dim[0] || b < 0 || b >= (int32_t)m_dim[1] || c < 0 || c >= (int32_t)m_dim[2]) 
+									{
 										continue;
 									}
 									unsigned char& v = GetVoxel(size_t(a), size_t(b), size_t(c));
-									if (v == PRIMITIVE_UNDEFINED) {
+									if (v == PRIMITIVE_UNDEFINED) 
+									{
 										v = PRIMITIVE_OUTSIDE_SURFACE;
 										++m_numVoxelsOutsideSurface;
-										fifo.push(Vec3<short>(a, b, c));
+										fifo.push(Triangle(a, b, c));
 									}
 								}
 							}
@@ -879,6 +889,7 @@ namespace nd
 				}
 			}
 		}
+
 		void Volume::FillInsideSurface()
 		{
 			const size_t i0 = m_dim[0];
@@ -910,14 +921,14 @@ namespace nd
 					for (size_t k = 0; k < k0; ++k) {
 						const unsigned char& voxel = GetVoxel(i, j, k);
 						if (voxel == value) {
-							Vec3<double> p0(((double)i - 0.5) * m_scale, ((double)j - 0.5) * m_scale, ((double)k - 0.5) * m_scale);
-							Vec3<double> p1(((double)i + 0.5) * m_scale, ((double)j - 0.5) * m_scale, ((double)k - 0.5) * m_scale);
-							Vec3<double> p2(((double)i + 0.5) * m_scale, ((double)j + 0.5) * m_scale, ((double)k - 0.5) * m_scale);
-							Vec3<double> p3(((double)i - 0.5) * m_scale, ((double)j + 0.5) * m_scale, ((double)k - 0.5) * m_scale);
-							Vec3<double> p4(((double)i - 0.5) * m_scale, ((double)j - 0.5) * m_scale, ((double)k + 0.5) * m_scale);
-							Vec3<double> p5(((double)i + 0.5) * m_scale, ((double)j - 0.5) * m_scale, ((double)k + 0.5) * m_scale);
-							Vec3<double> p6(((double)i + 0.5) * m_scale, ((double)j + 0.5) * m_scale, ((double)k + 0.5) * m_scale);
-							Vec3<double> p7(((double)i - 0.5) * m_scale, ((double)j + 0.5) * m_scale, ((double)k + 0.5) * m_scale);
+							Vec3 p0(((double)i - 0.5) * m_scale, ((double)j - 0.5) * m_scale, ((double)k - 0.5) * m_scale);
+							Vec3 p1(((double)i + 0.5) * m_scale, ((double)j - 0.5) * m_scale, ((double)k - 0.5) * m_scale);
+							Vec3 p2(((double)i + 0.5) * m_scale, ((double)j + 0.5) * m_scale, ((double)k - 0.5) * m_scale);
+							Vec3 p3(((double)i - 0.5) * m_scale, ((double)j + 0.5) * m_scale, ((double)k - 0.5) * m_scale);
+							Vec3 p4(((double)i - 0.5) * m_scale, ((double)j - 0.5) * m_scale, ((double)k + 0.5) * m_scale);
+							Vec3 p5(((double)i + 0.5) * m_scale, ((double)j - 0.5) * m_scale, ((double)k + 0.5) * m_scale);
+							Vec3 p6(((double)i + 0.5) * m_scale, ((double)j + 0.5) * m_scale, ((double)k + 0.5) * m_scale);
+							Vec3 p7(((double)i - 0.5) * m_scale, ((double)j + 0.5) * m_scale, ((double)k + 0.5) * m_scale);
 							int32_t s = (int32_t)mesh.GetNPoints();
 							mesh.AddPoint(p0 + m_minBB);
 							mesh.AddPoint(p1 + m_minBB);
@@ -994,7 +1005,7 @@ namespace nd
 			const short i0 = (short)m_dim[0];
 			const short j0 = (short)m_dim[1];
 			const short k0 = (short)m_dim[2];
-			Vec3<double> barycenter(0.0);
+			Vec3 barycenter(0.0);
 			size_t nVoxels = 0;
 			for (short i = 0; i < i0; ++i) {
 				for (short j = 0; j < j0; ++j) {

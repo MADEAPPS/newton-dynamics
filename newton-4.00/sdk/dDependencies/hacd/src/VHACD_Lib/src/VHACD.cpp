@@ -52,7 +52,7 @@ namespace nd
 			return ComputeACD(points, nPoints, triangles, nTriangles, params);
 		}
 
-		double ComputePreferredCuttingDirection(const PrimitiveSet* const tset, Vec3<double>& dir)
+		double ComputePreferredCuttingDirection(const PrimitiveSet* const tset, Vec3& dir)
 		{
 			double ex = tset->GetEigenValue(AXIS_X);
 			double ey = tset->GetEigenValue(AXIS_Y);
@@ -88,44 +88,45 @@ namespace nd
 
 		void ComputeAxesAlignedClippingPlanes(const VoxelSet& vset, const short downsampling, SArray<Plane>& planes)
 		{
-			const Vec3<short> minV = vset.GetMinBBVoxels();
-			const Vec3<short> maxV = vset.GetMaxBBVoxels();
-			Vec3<double> pt;
+			const Triangle minV = vset.GetMinBBVoxels();
+			const Triangle maxV = vset.GetMaxBBVoxels();
+			Vec3 pt;
 			Plane plane;
-			const short i0 = minV[0];
-			const short i1 = maxV[0];
+			const short i0 = short(minV[0]);
+			const short i1 = short(maxV[0]);
 			plane.m_a = 1.0;
 			plane.m_b = 0.0;
 			plane.m_c = 0.0;
 			plane.m_axis = AXIS_X;
 			for (short i = i0; i <= i1; i += downsampling) 
 			{
-				pt = vset.GetPoint(Vec3<double>(i + 0.5, 0.0, 0.0));
+				pt = vset.GetPoint(Vec3(i + 0.5, 0.0, 0.0));
 				plane.m_d = -pt[0];
 				plane.m_index = i;
 				planes.PushBack(plane);
 			}
-			const short j0 = minV[1];
-			const short j1 = maxV[1];
+			const short j0 = short(minV[1]);
+			const short j1 = short(maxV[1]);
 			plane.m_a = 0.0;
 			plane.m_b = 1.0;
 			plane.m_c = 0.0;
 			plane.m_axis = AXIS_Y;
 			for (short j = j0; j <= j1; j += downsampling) 
 			{
-				pt = vset.GetPoint(Vec3<double>(0.0, j + 0.5, 0.0));
+				pt = vset.GetPoint(Vec3(0.0, j + 0.5, 0.0));
 				plane.m_d = -pt[1];
 				plane.m_index = j;
 				planes.PushBack(plane);
 			}
-			const short k0 = minV[2];
-			const short k1 = maxV[2];
+			const short k0 = short(minV[2]);
+			const short k1 = short(maxV[2]);
 			plane.m_a = 0.0;
 			plane.m_b = 0.0;
 			plane.m_c = 1.0;
 			plane.m_axis = AXIS_Z;
-			for (short k = k0; k <= k1; k += downsampling) {
-				pt = vset.GetPoint(Vec3<double>(0.0, 0.0, k + 0.5));
+			for (short k = k0; k <= k1; k += downsampling) 
+			{
+				pt = vset.GetPoint(Vec3(0.0, 0.0, k + 0.5));
 				plane.m_d = -pt[2];
 				plane.m_index = k;
 				planes.PushBack(plane);
@@ -135,9 +136,9 @@ namespace nd
 		void RefineAxesAlignedClippingPlanes(const VoxelSet& vset, const Plane& bestPlane, const short downsampling,
 			SArray<Plane>& planes)
 		{
-			const Vec3<short> minV = vset.GetMinBBVoxels();
-			const Vec3<short> maxV = vset.GetMaxBBVoxels();
-			Vec3<double> pt;
+			const Triangle minV = vset.GetMinBBVoxels();
+			const Triangle maxV = vset.GetMaxBBVoxels();
+			Vec3 pt;
 			Plane plane;
 
 			if (bestPlane.m_axis == AXIS_X) 
@@ -150,7 +151,7 @@ namespace nd
 				plane.m_axis = AXIS_X;
 				for (short i = i0; i <= i1; ++i) 
 				{
-					pt = vset.GetPoint(Vec3<double>(i + 0.5, 0.0, 0.0));
+					pt = vset.GetPoint(Vec3(i + 0.5, 0.0, 0.0));
 					plane.m_d = -pt[0];
 					plane.m_index = i;
 					planes.PushBack(plane);
@@ -166,7 +167,7 @@ namespace nd
 				plane.m_axis = AXIS_Y;
 				for (short j = j0; j <= j1; ++j) 
 				{
-					pt = vset.GetPoint(Vec3<double>(0.0, j + 0.5, 0.0));
+					pt = vset.GetPoint(Vec3(0.0, j + 0.5, 0.0));
 					plane.m_d = -pt[1];
 					plane.m_index = j;
 					planes.PushBack(plane);
@@ -181,7 +182,7 @@ namespace nd
 				plane.m_c = 1.0;
 				plane.m_axis = AXIS_Z;
 				for (short k = k0; k <= k1; ++k) {
-					pt = vset.GetPoint(Vec3<double>(0.0, 0.0, k + 0.5));
+					pt = vset.GetPoint(Vec3(0.0, 0.0, k + 0.5));
 					plane.m_d = -pt[2];
 					plane.m_index = k;
 					planes.PushBack(plane);
@@ -199,7 +200,7 @@ namespace nd
 		}
 
 		void VHACD::ComputeBestClippingPlane(const PrimitiveSet* inputPSet, const double, const SArray<Plane>& planes,
-			const Vec3<double>& preferredCuttingDirection, const double w, const double alpha, const double beta,
+			const Vec3& preferredCuttingDirection, const double w, const double alpha, const double beta,
 			const int32_t convexhullDownsampling, const double, const double, Plane& bestPlane,
 			double& minConcavity, const Parameters& params)
 		{
@@ -246,9 +247,9 @@ namespace nd
 				const PrimitiveSet* m_inputPSet;
 				int32_t m_convexhullDownsampling;
 				Mesh chs[VHACD_WORKERS_THREADS][2];
-				SArray<Vec3<double>> chPts[VHACD_WORKERS_THREADS][2];
+				SArray<Vec3> chPts[VHACD_WORKERS_THREADS][2];
 
-				Vec3<double> m_preferredCuttingDirection;
+				Vec3 m_preferredCuttingDirection;
 				PrimitiveSet** m_psets;
 			};
 
@@ -271,8 +272,8 @@ namespace nd
 			
 					if (m_commonData->m_params.m_convexhullApproximation)
 					{
-						SArray<Vec3<double> >& leftCHPts = m_commonData->chPts[threadId][0];
-						SArray<Vec3<double> >& rightCHPts = m_commonData->chPts[threadId][1];;
+						SArray<Vec3 >& leftCHPts = m_commonData->chPts[threadId][0];
+						SArray<Vec3 >& rightCHPts = m_commonData->chPts[threadId][1];;
 						rightCHPts.Resize(0);
 						leftCHPts.Resize(0);
 						m_commonData->m_onSurfacePSet->Intersect(m_plane, &rightCHPts, &leftCHPts, size_t (m_commonData->m_convexhullDownsampling * 32));
@@ -448,7 +449,7 @@ namespace nd
 			
 					if (concavity > params.m_concavity && concavity > error) 
 					{
-						Vec3<double> preferredCuttingDirection;
+						Vec3 preferredCuttingDirection;
 						double w = ComputePreferredCuttingDirection(pset, preferredCuttingDirection);
 						planes.Resize(0);
 
@@ -541,7 +542,7 @@ namespace nd
 				double x, y, z;
 				for (size_t i = 0; i < nv; ++i) 
 				{
-					Vec3<double>& pt = m_convexHulls[p]->GetPoint(i);
+					Vec3& pt = m_convexHulls[p]->GetPoint(i);
 					x = pt[0];
 					y = pt[1];
 					z = pt[2];
@@ -558,7 +559,7 @@ namespace nd
 			}
 			parts.Resize(0);
 		}
-		void AddPoints(const Mesh* const mesh, SArray<Vec3<double> >& pts)
+		void AddPoints(const Mesh* const mesh, SArray<Vec3 >& pts)
 		{
 			const size_t n = mesh->GetNPoints();
 			for (size_t i = 0; i < n; ++i) 
@@ -566,7 +567,7 @@ namespace nd
 				pts.PushBack(mesh->GetPoint(i));
 			}
 		}
-		void ComputeConvexHull(const Mesh* const ch1, const Mesh* const ch2, SArray<Vec3<double> >& pts, Mesh* const combinedCH)
+		void ComputeConvexHull(const Mesh* const ch1, const Mesh* const ch2, SArray<Vec3 >& pts, Mesh* const combinedCH)
 		{
 			pts.Resize(0);
 			AddPoints(ch1, pts);
@@ -580,7 +581,7 @@ namespace nd
 			const std::vector<ndBigVector>& convexPoints = ch.GetVertexPool();
 			for (size_t v = 0; v < convexPoints.size(); v++) 
 			{
-				const Vec3<double> hullPoint(convexPoints[v].m_x, convexPoints[v].m_y, convexPoints[v].m_z);
+				const Vec3 hullPoint(convexPoints[v].m_x, convexPoints[v].m_y, convexPoints[v].m_z);
 				combinedCH->AddPoint(hullPoint);
 			}
 		
@@ -600,8 +601,8 @@ namespace nd
 
 			struct ConvexProxy
 			{
-				Vec3<double> m_bmin;
-				Vec3<double> m_bmax;
+				Vec3 m_bmin;
+				Vec3 m_bmax;
 				Mesh* m_hull;
 				int m_id;
 			};
@@ -666,7 +667,7 @@ namespace nd
 				void Execute(int)
 				{
 					Mesh combinedCH;
-					SArray<Vec3<double> > pts;
+					SArray<Vec3 > pts;
 					for (int i = 0; i < m_pairsCount; i++)
 					{
 						ConvexPair& pair = m_pairs[i];
@@ -698,15 +699,15 @@ namespace nd
 
 			for (size_t i = 1; i < convexProxyArray.size(); ++i)
 			{
-				Vec3<double> bmin1(convexProxyArray[i].m_bmin);
-				Vec3<double> bmax1(convexProxyArray[i].m_bmax);
+				Vec3 bmin1(convexProxyArray[i].m_bmin);
+				Vec3 bmax1(convexProxyArray[i].m_bmax);
 				for (size_t j = 0; j < i; ++j)
 				{
-					Vec3<double> bmin0(convexProxyArray[j].m_bmin);
-					Vec3<double> bmax0(convexProxyArray[j].m_bmax);
-					Vec3<double> box1(bmax1 - bmin0);
-					Vec3<double> box0(bmin1 - bmax0);
-					Vec3<double> size(box0.X() * box1.X(), box0.Y()* box1.Y(), box0.Z()* box1.Z());
+					Vec3 bmin0(convexProxyArray[j].m_bmin);
+					Vec3 bmax0(convexProxyArray[j].m_bmax);
+					Vec3 box1(bmax1 - bmin0);
+					Vec3 box0(bmin1 - bmax0);
+					Vec3 size(box0.X() * box1.X(), box0.Y()* box1.Y(), box0.Z()* box1.Z());
 
 					if ((size[0] <= 0.0) && (size[1] <= 0.0) && (size[2] <= 0.0))
 					{
@@ -760,7 +761,7 @@ namespace nd
 				}
 
 				Mesh combinedCH;
-				SArray<Vec3<double> > pts;
+				SArray<Vec3 > pts;
 				while (((nConvexHulls > params.m_maxConvexHulls) || (priority.Value() <= params.m_minMergeToleranace)) && priority.GetCount())
 				{
 					ConvexKey key(priority[0]);
@@ -795,18 +796,18 @@ namespace nd
 
 						const float volume0 = float(newHull->ComputeVolume());
 
-						const Vec3<double> bmin(convexProxyArray[index].m_bmin);
-						const Vec3<double> bmax(convexProxyArray[index].m_bmax);
+						const Vec3 bmin(convexProxyArray[index].m_bmin);
+						const Vec3 bmax(convexProxyArray[index].m_bmax);
 
 						for (size_t i = 0; i < convexProxyArray.size() - 1; i++)
 						{
 							if (convexProxyArray[i].m_hull)
 							{
-								Vec3<double> bmin0(convexProxyArray[i].m_bmin);
-								Vec3<double> bmax0(convexProxyArray[i].m_bmax);
-								Vec3<double> box1(bmax - bmin0);
-								Vec3<double> box0(bmin - bmax0);
-								Vec3<double> size(box0.X() * box1.X(), box0.Y() * box1.Y(), box0.Z() * box1.Z());
+								Vec3 bmin0(convexProxyArray[i].m_bmin);
+								Vec3 bmax0(convexProxyArray[i].m_bmax);
+								Vec3 box1(bmax - bmin0);
+								Vec3 box0(bmin - bmax0);
+								Vec3 size(box0.X() * box1.X(), box0.Y() * box1.Y(), box0.Z() * box1.Z());
 
 								if ((size[0] <= 0.0) && (size[1] <= 0.0) && (size[2] <= 0.0))
 								{
@@ -855,15 +856,15 @@ namespace nd
 				// The first step is we need to compute the bounding box of the mesh we are trying to build a convex hull for.
 				// From this bounding box, we compute the length of the diagonal to get a relative size and center for point projection
 				uint32_t nPoints = uint32_t(ch->GetNPoints());
-				Vec3<double> *inputPoints = ch->GetPointsBuffer();
-				Vec3<double> bmin(inputPoints[0]);
-				Vec3<double> bmax(inputPoints[1]);
+				Vec3 *inputPoints = ch->GetPointsBuffer();
+				Vec3 bmin(inputPoints[0]);
+				Vec3 bmax(inputPoints[1]);
 				for (uint32_t i = 1; i < nPoints; i++)
 				{
-					const Vec3<double> &p = inputPoints[i];
+					const Vec3 &p = inputPoints[i];
 					p.UpdateMinMax(bmin, bmax);
 				}
-				Vec3<double> center;
+				Vec3 center;
 				double diagonalLength = center.GetCenter(bmin, bmax);   // Get the center of the bounding box
 				// This is the error threshold for determining if we should use the raycast result data point vs. the voxelized result.
 				double pointDistanceThreshold = diagonalLength * 0.05;
@@ -873,14 +874,14 @@ namespace nd
 				double snapDistanceThresholdSquared = snapDistanceThreshold*snapDistanceThreshold;
 
 				// Allocate buffer for projected vertices
-				Vec3<double> *outputPoints = new Vec3<double>[nPoints];
+				Vec3 *outputPoints = new Vec3[nPoints];
 				uint32_t outCount = 0;
 				for (uint32_t i = 0; i < nPoints; i++)
 				{
-					Vec3<double> &inputPoint = inputPoints[i];
-					Vec3<double> &outputPoint = outputPoints[outCount];
+					Vec3 &inputPoint = inputPoints[i];
+					Vec3 &outputPoint = outputPoints[outCount];
 					// Compute the direction vector from the center of this mesh to the vertex
-					Vec3<double> dir = inputPoint - center;
+					Vec3 dir = inputPoint - center;
 					// Normalize the direction vector.
 					dir.Normalize();
 					// Multiply times the diagonal length of the mesh

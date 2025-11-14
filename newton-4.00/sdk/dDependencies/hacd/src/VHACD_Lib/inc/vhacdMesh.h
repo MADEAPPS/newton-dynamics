@@ -44,15 +44,15 @@ namespace nd
 		class Mesh 
 		{
 			public:
-			void AddPoint(const Vec3<double>& pt) { m_points.PushBack(pt); }
-			void SetPoint(size_t index, const Vec3<double>& pt) { m_points[index] = pt; }
-			const Vec3<double>& GetPoint(size_t index) const { return m_points[index]; }
-			Vec3<double>& GetPoint(size_t index) { return m_points[index]; }
+			void AddPoint(const Vec3& pt) { m_points.PushBack(pt); }
+			void SetPoint(size_t index, const Vec3& pt) { m_points[index] = pt; }
+			const Vec3& GetPoint(size_t index) const { return m_points[index]; }
+			Vec3& GetPoint(size_t index) { return m_points[index]; }
 			size_t GetNPoints() const { return m_points.Size(); }
 			double* GetPoints() { return (double*)m_points.Data(); } // ugly
 			const double* GetPoints() const { return (double*)m_points.Data(); } // ugly
-			const Vec3<double>* GetPointsBuffer() const { return m_points.Data(); } //
-			Vec3<double>* GetPointsBuffer() { return m_points.Data(); } //
+			const Vec3* GetPointsBuffer() const { return m_points.Data(); } //
+			Vec3* GetPointsBuffer() { return m_points.Data(); } //
 			void AddTriangle(const Triangle& tri) { m_triangles.PushBack(tri); }
 			void SetTriangle(size_t index, const Triangle& tri) { m_triangles[index] = tri; }
 			const Triangle& GetTriangle(size_t index) const { return m_triangles[index]; }
@@ -71,14 +71,14 @@ namespace nd
 			}
 			void ResizePoints(size_t nPts) { m_points.Resize(nPts); }
 			void ResizeTriangles(size_t nTri) { m_triangles.Resize(nTri); }
-			void CopyPoints(SArray<Vec3<double> >& points) const { points = m_points; }
+			void CopyPoints(SArray<Vec3>& points) const { points = m_points; }
 			double ComputeVolume() const;
 			void ComputeConvexHull(const double* const pts,	const size_t nPts);
 			void Clip(const Plane& plane,
-				SArray<Vec3<double> >& positivePart,
-				SArray<Vec3<double> >& negativePart) const;
-			bool IsInside(const Vec3<double>& pt) const;
-			void CalculateBoundingBox(Vec3<double>& p0, Vec3<double>& p1) const;
+				SArray<Vec3>& positivePart,
+				SArray<Vec3>& negativePart) const;
+			bool IsInside(const Vec3& pt) const;
+			void CalculateBoundingBox(Vec3& p0, Vec3& p1) const;
 
 			//! Constructor.
 			Mesh();
@@ -88,7 +88,7 @@ namespace nd
 			Mesh(const Mesh& src);
 
 			private:
-			SArray<Vec3<double> > m_points;
+			SArray<Vec3> m_points;
 			SArray<Triangle> m_triangles;
 		};
 	}

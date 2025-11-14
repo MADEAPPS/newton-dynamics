@@ -64,7 +64,7 @@ namespace nd
 		TMMesh::~TMMesh(void)
 		{
 		}
-		void TMMesh::GetIFS(Vec3<double>* const points, Triangle* const triangles)
+		void TMMesh::GetIFS(Vec3* const points, Triangle* const triangles)
 		{
 			size_t nV = m_vertices.GetSize();
 			size_t nT = m_triangles.GetSize();

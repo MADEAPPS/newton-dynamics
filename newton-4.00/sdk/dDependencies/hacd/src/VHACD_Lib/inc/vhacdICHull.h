@@ -42,17 +42,17 @@ namespace nd
 			//! Returns the computed mesh
 			TMMesh& GetMesh() { return m_mesh; }
 			//!    Add one point to the convex-hull
-			bool AddPoint(const Vec3<double>& point) { return AddPoints(&point, 1); }
+			bool AddPoint(const Vec3& point) { return AddPoints(&point, 1); }
 			//!    Add one point to the convex-hull
-			bool AddPoint(const Vec3<double>& point, int32_t id);
+			bool AddPoint(const Vec3& point, int32_t id);
 			//!    Add points to the convex-hull
-			bool AddPoints(const Vec3<double>* points, size_t nPoints);
+			bool AddPoints(const Vec3* points, size_t nPoints);
 			//!
 			ICHullError Process();
 			//!
 			ICHullError Process(const uint32_t nPointsCH, const double minVolume = 0.0);
 			//!
-			bool IsInside(const Vec3<double>& pt0, const double eps = 0.0);
+			bool IsInside(const Vec3& pt0, const double eps = 0.0);
 			//!
 			const ICHull& operator=(ICHull& rhs);
 
@@ -97,7 +97,7 @@ namespace nd
 			SArray<CircularListElement<TMMEdge>*> m_edgesToDelete;
 			SArray<CircularListElement<TMMEdge>*> m_edgesToUpdate;
 			SArray<CircularListElement<TMMTriangle>*> m_trianglesToDelete;
-			Vec3<double> m_normal;
+			Vec3 m_normal;
 			bool m_isFlat;
 			ICHull(const ICHull& rhs);
 		};
