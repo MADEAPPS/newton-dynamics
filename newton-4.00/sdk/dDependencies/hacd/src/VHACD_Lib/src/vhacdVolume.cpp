@@ -475,7 +475,6 @@ namespace nd
 
 			const std::vector<ndBigVector>& convexPoints = ch.GetVertexPool();
 			for (size_t v = 0; v < convexPoints.size(); v++)
-			//for (ndInt32 v = 0; v < ndInt32(convexPoints.GetCount()); v++)
 			{
 				const Vec3<double> hullPoint(convexPoints[v].m_x, convexPoints[v].m_y, convexPoints[v].m_z);
 				meshCH.AddPoint(hullPoint);

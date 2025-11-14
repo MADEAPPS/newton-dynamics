@@ -773,8 +773,8 @@ namespace nd
 				}
 
 				ConvexKey(int i0, int i1)
-					:m_p0(Min(i0, i1))
-					,m_p1(Max(i0, i1))
+					:m_p0(ndMin(i0, i1))
+					,m_p1(ndMax(i0, i1))
 				{
 				}
 

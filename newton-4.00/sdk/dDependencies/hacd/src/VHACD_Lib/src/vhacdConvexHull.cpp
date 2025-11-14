@@ -116,6 +116,9 @@ namespace nd
 			class CompareVertex
 			{
 				public:
+				CompareVertex() {}
+				CompareVertex(void*) {}
+
 				int Compare(const ConvexHullVertex& elementA, const ConvexHullVertex& elementB) const
 				{
 					for (ndInt32 i = 0; i < 3; i++)
@@ -134,7 +137,7 @@ namespace nd
 			};
 			
 			count = int(size());
-			Sort<ConvexHullVertex, CompareVertex>(&array[0], count);
+			ndSort<ConvexHullVertex, CompareVertex>(&array[0], count, nullptr);
 			
 			size_t indexCount = 0;
 			CompareVertex compareVetex;
@@ -253,7 +256,7 @@ namespace nd
 		
 					if (i0 < i1)
 					{
-						Swap(points[i0], points[i1]);
+						ndSwap(points[i0], points[i1]);
 						i0++;
 						i1--;
 					}
@@ -358,7 +361,7 @@ namespace nd
 		};
 
 		ConvexHull::ConvexHull(const double* const vertexCloud, int strideInBytes, int count, double distTol, int maxVertexCount)
-			:List<ndConvexHull3dFace>()
+			:ndList<ndConvexHull3dFace>()
 			,m_aabbP0(ndBigVector::m_zero)
 			,m_aabbP1(ndBigVector::m_zero)
 			,m_diag()
@@ -370,7 +373,7 @@ namespace nd
 		}
 
 		ConvexHull::ConvexHull(ConvexHull3dPointSet& accelerator, double distTol, int maxVertexCount)
-			:List<ndConvexHull3dFace>()
+			:ndList<ndConvexHull3dFace>()
 			,m_aabbP0(ndBigVector::m_zero)
 			,m_aabbP1(ndBigVector::m_zero)
 			,m_diag()
@@ -658,7 +661,7 @@ namespace nd
 				double volume = TetrahedrumVolume(m_points[0], m_points[1], m_points[2], m_points[3]);
 				if (volume > double(0.0f))
 				{
-					Swap(m_points[2], m_points[3]);
+					ndSwap(m_points[2], m_points[3]);
 				}
 				_ASSERT(TetrahedrumVolume(m_points[0], m_points[1], m_points[2], m_points[3]) < double(0.0f));
 			}
@@ -705,7 +708,7 @@ namespace nd
 			f3->m_twin[1] = f1Node;
 			f3->m_twin[2] = f2Node;
 	
-			List<ndNode*> boundaryFaces;
+			ndList<ndNode*> boundaryFaces;
 			boundaryFaces.Append(f0Node);
 			boundaryFaces.Append(f1Node);
 			boundaryFaces.Append(f2Node);

@@ -110,7 +110,7 @@ namespace nd
 		}
 
 		Queue::Queue()
-			:List<Job*>()
+			:ndList<Job*>()
 			,m_mutex()
 			,m_jobs(0)
 		{

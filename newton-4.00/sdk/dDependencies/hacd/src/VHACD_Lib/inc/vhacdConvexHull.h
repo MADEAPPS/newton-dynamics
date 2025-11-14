@@ -102,12 +102,12 @@ namespace nd
 
 			private:
 			int m_mark;
-			List<ndConvexHull3dFace>::ndNode* m_twin[3];
+			ndList<ndConvexHull3dFace>::ndNode* m_twin[3];
 
 			friend class ConvexHull;
 		};
 
-		class ConvexHull : public List<ndConvexHull3dFace>
+		class ConvexHull : public ndList<ndConvexHull3dFace>
 		{
 			class ndNormalMap;
 
