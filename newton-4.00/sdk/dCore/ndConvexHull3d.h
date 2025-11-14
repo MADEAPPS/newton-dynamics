@@ -30,8 +30,6 @@
 #include "ndMatrix.h"
 #include "ndQuaternion.h"
 
-#define D_OLD_CONVEXHULL_3D
-
 class ndConvexHull3dVertex;
 class ndConvexHull3dAABBTreeNode;
 
@@ -59,9 +57,7 @@ class ndConvexHull3dFace
 D_MSV_NEWTON_CLASS_ALIGN_32
 class ndConvexHull3d: public ndList<ndConvexHull3dFace>
 {
-#ifdef	D_OLD_CONVEXHULL_3D
 	class ndNormalMap;
-#endif
 
 	public:
 	D_CORE_API ndConvexHull3d(const ndConvexHull3d& source);

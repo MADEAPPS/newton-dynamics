@@ -29,7 +29,7 @@
 
 #define DG_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE		8
 
-#ifdef	D_OLD_CONVEXHULL_3D
+
 class ndConvexHull3d::ndNormalMap
 {
 	public:
@@ -100,7 +100,6 @@ class ndConvexHull3d::ndNormalMap
 	ndBigVector m_normal[128];
 	ndInt32 m_count;
 };
-#endif
 
 class ndConvexHull3dVertex: public ndBigVector
 {
@@ -300,26 +299,10 @@ void ndConvexHull3d::BuildHull (const ndFloat64* const vertexCloud, ndInt32 stri
 	}
 
 	count = InitVertexArray(&points[0], count, &treePool[0], treePool.GetSizeInBytes());
-
-#ifdef	D_OLD_CONVEXHULL_3D
 	if (m_points.GetCount() >= 4)
 	{
 		CalculateConvexHull3d (&treePool[0], &points[0], count, distTol, maxVertexCount);
 	}
-#else
-	if (m_count >= 3) 
-	{
-		if (CheckFlatSurface(&treePool[0], &points[0], count, distTol, maxVertexCount))
-		{
-			CalculateConvexHull2d(&treePool[0], &points[0], count, distTol, maxVertexCount);
-		} 
-		else 
-		{
-			ndAssert(m_count == 4);
-			CalculateConvexHull3d(&treePool[0], &points[0], count, distTol, maxVertexCount);
-		}
-	}
-#endif
 }
 
 ndConvexHull3dAABBTreeNode* ndConvexHull3d::BuildTree (ndConvexHull3dAABBTreeNode* const parent, ndConvexHull3dVertex* const points, ndInt32 count, ndInt32 baseIndex, ndInt8** memoryPool, ndInt32& maxMemSize) const
@@ -503,7 +486,6 @@ ndInt32 ndConvexHull3d::InitVertexArray(ndConvexHull3dVertex* const points, ndIn
 	ndAssert (boxSize.m_w == ndFloat32 (0.0f));
 	m_diag = ndFloat32 (sqrt (boxSize.DotProduct(boxSize).GetScalar()));
 
-#ifdef D_OLD_CONVEXHULL_3D
 	const ndNormalMap& normalMap = ndNormalMap::GetNormaMap();
 
 	ndInt32 index0 = SupportVertex (&tree, points, normalMap.m_normal[0]);
@@ -633,50 +615,6 @@ ndInt32 ndConvexHull3d::InitVertexArray(ndConvexHull3dVertex* const points, ndIn
 	ndAssert (TetrahedrumVolume(m_points[0], m_points[1], m_points[2], m_points[3]) < ndFloat64(0.0f));
 
 	return count;
-#else
-	
-	ndBigVector origin((m_aabbP1 + m_aabbP0).Scale (0.5f));
-
-	ndBigVector dir(m_aabbP1 - m_aabbP0);
-	ndAssert(dir.DotProduct3(dir) > ndFloat32(1.0e-4f));
-	dir = dir.Normalize();
-	ndInt32 index0 = SupportVertex(&tree, points, dir);
-	m_points[0] = points[index0];
-	points[index0].m_mark = 1;
-
-	dir = origin - m_points[0];
-	ndAssert(dir.DotProduct3(dir) > ndFloat32(1.0e-4f));
-	dir = dir.Normalize();
-	ndInt32 index1 = SupportVertex(&tree, points, dir);
-	m_points[1] = points[index1];
-	points[index1].m_mark = 1;
-
-	ndBigVector e0(m_points[1] - m_points[0]);
-	ndAssert(e0.DotProduct3(e0) > ndFloat32(1.0e-4f));
-	ndFloat64 t = -e0.DotProduct3(origin - m_points[0]) / e0.DotProduct3(e0);
-	dir = m_points[0] + e0.Scale(t) - origin;
-
-	ndAssert(dir.DotProduct3(dir) > ndFloat32(1.0e-4f));
-	dir = dir.Normalize();
-	ndInt32 index2 = SupportVertex(&tree, points, dir);
-	m_points[2] = points[index2];
-	points[index2].m_mark = 1;
-
-	ndBigVector e1 (m_points[2] - m_points[0]);
-	ndBigVector normal (e1.CrossProduct(e0));
-	ndFloat64 error2 = sqrt(normal.DotProduct3(normal));
-	if (error2 < (ndFloat32(1.0e-4f) * m_diag * m_diag)) 
-	{
-		ndAssert(0);
-//		m_points[2] = points[index];
-//		points[index].m_mark = 1;
-//		validTetrahedrum = true;
-//		break;
-	}
-
-	m_count = 3;
-	return count;
-#endif
 }
 
 ndFloat64 ndConvexHull3d::TetrahedrumVolume (const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2, const ndBigVector& p3) const
