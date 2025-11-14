@@ -101,13 +101,13 @@ namespace nd
 
 		ConvexHull3dPointSet::ConvexHull3dPointSet(const double* const vertexCloud, int strideInBytes, int count)
 		{
-			resize(size_t(count));
+			SetCount(count);
 
-			std::vector<ConvexHullVertex>& array = *this;
-			const int stride = int(strideInBytes / sizeof(double));
-			for (size_t i = 0; i < size_t(count); ++i)
+			ndArray<ConvexHullVertex>& array = *this;
+			const ndInt32 stride = int(strideInBytes / sizeof(double));
+			for (ndInt32 i = 0; i < count; ++i)
 			{
-				size_t index = i * stride;
+				ndInt32 index = i * stride;
 				ndBigVector& vertex = array[i];
 				vertex = ndBigVector(vertexCloud[index], vertexCloud[index + 1], vertexCloud[index + 2], double(0.0f));
 				array[i].m_mark = 0;
@@ -136,14 +136,14 @@ namespace nd
 				}
 			};
 			
-			count = int(size());
+			count = ndInt32(GetCount());
 			ndSort<ConvexHullVertex, CompareVertex>(&array[0], count, nullptr);
 			
-			size_t indexCount = 0;
+			ndInt32 indexCount = 0;
 			CompareVertex compareVetex;
-			for (size_t i = 1; i < size_t(count); ++i)
+			for (ndInt32 i = 1; i < count; ++i)
 			{
-				for (; i < size_t(count); ++i)
+				for (; i < count; ++i)
 				{
 					if (compareVetex.Compare(array[indexCount], array[i]))
 					{
@@ -153,30 +153,30 @@ namespace nd
 					}
 				}
 			}
-			count = int (indexCount + 1);
-			array.resize(size_t (count));
+			count = indexCount + 1;
+			array.SetCount(count);
 		}
 
 		ConvexHullAABBTreeNode* ConvexHull3dPointSet::BuildAccelerator()
 		{
-			size_t treeCount = size() / (VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE >> 1);
+			ndInt32 treeCount = ndInt32(GetCount() / (VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE >> 1));
 			if (treeCount < 4)
 			{
 				treeCount = 4;
 			}
 			treeCount *= 2;
-			m_treeBuffer.resize(treeCount + 256);
+			m_treeBuffer.SetCount(treeCount + 256);
 
-			if (size() > 4)
+			if (GetCount() > 4)
 			{
-				size_t memoryIndex = 0;
-				std::vector<ConvexHullVertex>& array = *this;
-				return BuildRecurse(nullptr, &array[0], int (size()), 0, memoryIndex);
+				ndInt32 memoryIndex = 0;
+				ndArray<ConvexHullVertex>& array = *this;
+				return BuildRecurse(nullptr, &array[0], ndInt32 (GetCount()), 0, memoryIndex);
 			}
 			return nullptr;
 		}
 
-		ConvexHullAABBTreeNode* ConvexHull3dPointSet::BuildRecurse(ConvexHullAABBTreeNode* const parent, ConvexHullVertex* const points, int count, int baseIndex, size_t& memoryIndex)
+		ConvexHullAABBTreeNode* ConvexHull3dPointSet::BuildRecurse(ConvexHullAABBTreeNode* const parent, ConvexHullVertex* const points, int count, int baseIndex, ndInt32& memoryIndex)
 		{
 			ConvexHullAABBTreeNode* tree = nullptr;
 		
@@ -364,10 +364,10 @@ namespace nd
 			:ndList<ndConvexHull3dFace>()
 			,m_aabbP0(ndBigVector::m_zero)
 			,m_aabbP1(ndBigVector::m_zero)
-			,m_diag()
 			,m_points()
+			,m_diag(0.0)
 		{
-			m_points.resize(0);
+			m_points.SetCount(0);
 			ConvexHull3dPointSet accelerator(vertexCloud, strideInBytes, count);
 			BuildHull(accelerator, distTol, maxVertexCount);
 		}
@@ -376,10 +376,10 @@ namespace nd
 			:ndList<ndConvexHull3dFace>()
 			,m_aabbP0(ndBigVector::m_zero)
 			,m_aabbP1(ndBigVector::m_zero)
-			,m_diag()
 			,m_points()
+			,m_diag(0.0)
 		{
-			m_points.resize(0);
+			m_points.SetCount(0);
 			#ifdef _DEBUG
 			for (size_t i = 0; i < int (accelerator.size()); i++)
 			{
@@ -393,7 +393,7 @@ namespace nd
 		{
 		}
 
-		const std::vector<ndBigVector>& ConvexHull::GetVertexPool() const
+		const ndArray<ndBigVector>& ConvexHull::GetVertexPool() const
 		{
 			return m_points;
 		}
@@ -403,33 +403,33 @@ namespace nd
 			ConvexHullAABBTreeNode* const tree = InitVertexArray(accelerator);
 			if (tree)
 			{
-				CalculateConvexHull3d(tree, accelerator, int (accelerator.size()), distTol, maxVertexCount);
+				CalculateConvexHull3d(tree, accelerator, ndInt32 (accelerator.GetCount()), distTol, maxVertexCount);
 			}
 		}
 
-		size_t ConvexHull::SupportVertex(ConvexHullAABBTreeNode** const treePointer, const std::vector<ConvexHullVertex>& points, const ndBigVector& dirPlane, const bool removeEntry) const
+		ndInt32 ConvexHull::SupportVertex(ConvexHullAABBTreeNode** const treePointer, const ndArray<ConvexHullVertex>& points, const ndBigVector& dirPlane, const bool removeEntry) const
 		{
-			double aabbProjection[DG_STACK_DEPTH_3D];
-			const ConvexHullAABBTreeNode *stackPool[DG_STACK_DEPTH_3D];
+			//double aabbProjection[DG_STACK_DEPTH_3D];
+			//const ConvexHullAABBTreeNode *stackPool[DG_STACK_DEPTH_3D];
 
-			ndBigVector dir(dirPlane);
+			ndFixSizeArray<double, DG_STACK_DEPTH_3D> aabbProjection;
+			ndFixSizeArray<const ConvexHullAABBTreeNode*, DG_STACK_DEPTH_3D> stackPool;
+			
+			const ndBigVector dir(dirPlane);
 
 			int index = -1;
-			int stack = 1;
-			stackPool[0] = *treePointer;
-			aabbProjection[0] = double(1.0e20f);
+			stackPool.PushBack(*treePointer);
+			aabbProjection.PushBack (double(1.0e20f));
 			double maxProj = double(-1.0e20f);
 			int ix = (dir[0] > double(0.0f)) ? 1 : 0;
 			int iy = (dir[1] > double(0.0f)) ? 1 : 0;
 			int iz = (dir[2] > double(0.0f)) ? 1 : 0;
-			while (stack)
+			while (stackPool.GetCount())
 			{
-				stack--;
-				double boxSupportValue = aabbProjection[stack];
+				double boxSupportValue = aabbProjection.Pop();
+				const ConvexHullAABBTreeNode* const me = stackPool.Pop();
 				if (boxSupportValue > maxProj)
 				{
-					const ConvexHullAABBTreeNode* const me = stackPool[stack];
-
 					if (me->m_left && me->m_right)
 					{
 						const ndBigVector leftSupportPoint(me->m_left->m_box[ix].m_x, me->m_left->m_box[iy].m_y, me->m_left->m_box[iz].m_z, 0.0);
@@ -440,25 +440,17 @@ namespace nd
 
 						if (rightSupportDist >= leftSupportDist)
 						{
-							aabbProjection[stack] = leftSupportDist;
-							stackPool[stack] = me->m_left;
-							stack++;
-							_ASSERT(stack < DG_STACK_DEPTH_3D);
-							aabbProjection[stack] = rightSupportDist;
-							stackPool[stack] = me->m_right;
-							stack++;
-							_ASSERT(stack < DG_STACK_DEPTH_3D);
+							aabbProjection.PushBack(leftSupportDist);
+							stackPool.PushBack(me->m_left);
+							aabbProjection.PushBack(rightSupportDist);
+							stackPool.PushBack(me->m_right);
 						}
 						else
 						{
-							aabbProjection[stack] = rightSupportDist;
-							stackPool[stack] = me->m_right;
-							stack++;
-							_ASSERT(stack < DG_STACK_DEPTH_3D);
-							aabbProjection[stack] = leftSupportDist;
-							stackPool[stack] = me->m_left;
-							stack++;
-							_ASSERT(stack < DG_STACK_DEPTH_3D);
+							aabbProjection.PushBack(rightSupportDist);
+							stackPool.PushBack(me->m_right);
+							aabbProjection.PushBack(leftSupportDist);
+							stackPool.PushBack(me->m_left);
 						}
 					}
 					else
@@ -466,7 +458,7 @@ namespace nd
 						ConvexHull3dPointCluster* const cluster = (ConvexHull3dPointCluster*)me;
 						for (int i = 0; i < cluster->m_count; ++i)
 						{
-							const ConvexHullVertex& p = points[size_t(cluster->m_indices[i])];
+							const ConvexHullVertex& p = points[cluster->m_indices[i]];
 							_ASSERT(p.m_x >= cluster->m_box[0].m_x);
 							_ASSERT(p.m_x <= cluster->m_box[1].m_x);
 							_ASSERT(p.m_y >= cluster->m_box[0].m_y);
@@ -523,7 +515,7 @@ namespace nd
 			}
 
 			_ASSERT(index != -1);
-			return size_t(index);
+			return index;
 		}
 
 		double ConvexHull::TetrahedrumVolume(const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2, const ndBigVector& p3) const
@@ -539,13 +531,13 @@ namespace nd
 			ConvexHullAABBTreeNode* tree = accelerator.BuildAccelerator();
 			if (tree)
 			{
-				int count = int(accelerator.size());
+				ndInt32 count = ndInt32(accelerator.GetCount());
 				if (count < 4)
 				{
-					m_points.resize(0);
+					m_points.SetCount(0);
 					return nullptr;
 				}
-				m_points.resize(4);
+				m_points.SetCount(4);
 
 				m_aabbP0 = tree->m_box[0];
 				m_aabbP1 = tree->m_box[1];
@@ -554,15 +546,15 @@ namespace nd
 				m_diag = double(sqrt(boxSize.DotProduct(boxSize).GetScalar()));
 				const ndNormalMap& normalMap = ndNormalMap::GetNormaMap();
 
-				size_t index0 = SupportVertex(&tree, accelerator, normalMap.m_normal[0]);
+				ndInt32 index0 = SupportVertex(&tree, accelerator, normalMap.m_normal[0]);
 				m_points[0] = accelerator[index0];
 				accelerator[index0].m_mark = 1;
 
 				bool validTetrahedrum = false;
 				ndBigVector e1(0.0);
-				for (int i = 1; i < normalMap.m_count; ++i)
+				for (ndInt32 i = 1; i < normalMap.m_count; ++i)
 				{
-					size_t index = SupportVertex(&tree, accelerator, normalMap.m_normal[i]);
+					ndInt32 index = SupportVertex(&tree, accelerator, normalMap.m_normal[i]);
 
 					e1 = accelerator[index] - m_points[0];
 					double error2 = e1.DotProduct(e1).GetScalar();
@@ -576,16 +568,16 @@ namespace nd
 				}
 				if (!validTetrahedrum)
 				{
-					m_points.resize(0);
+					m_points.SetCount(0);
 					return nullptr;
 				}
 
 				validTetrahedrum = false;
 				ndBigVector e2(0.0);
 				ndBigVector normal(0.0);
-				for (int i = 2; i < normalMap.m_count; ++i)
+				for (ndInt32 i = 2; i < normalMap.m_count; ++i)
 				{
-					size_t index = SupportVertex(&tree, accelerator, normalMap.m_normal[i]);
+					ndInt32 index = SupportVertex(&tree, accelerator, normalMap.m_normal[i]);
 					e2 = accelerator[index] - m_points[0];
 					normal = e1.CrossProduct(e2);
 					double error2 = sqrt(normal.DotProduct(normal).GetScalar());
@@ -600,7 +592,7 @@ namespace nd
 
 				if (!validTetrahedrum)
 				{
-					m_points.resize(0);
+					m_points.SetCount(0);
 					return nullptr;
 				}
 
@@ -621,7 +613,7 @@ namespace nd
 				if (!validTetrahedrum)
 				{
 					ndBigVector n(normal.Scale(double(-1.0f)));
-					size_t index = SupportVertex(&tree, accelerator, n);
+					ndInt32 index = SupportVertex(&tree, accelerator, n);
 					e3 = accelerator[index] - m_points[0];
 					double error2 = normal.DotProduct(e3).GetScalar();
 					if (fabs(error2) > (double(1.0e-6f) * m_diag * m_diag))
@@ -636,7 +628,7 @@ namespace nd
 				{
 					for (int i = 3; i < normalMap.m_count; ++i)
 					{
-						size_t index = SupportVertex(&tree, accelerator, normalMap.m_normal[i]);
+						ndInt32 index = SupportVertex(&tree, accelerator, normalMap.m_normal[i]);
 
 						//make sure the volume of the fist tetrahedral is no negative
 						e3 = accelerator[index] - m_points[0];
@@ -654,7 +646,7 @@ namespace nd
 				if (!validTetrahedrum)
 				{
 					// the points do not form a convex hull
-					m_points.resize(0);
+					m_points.SetCount(0);
 					return nullptr;
 				}
 
@@ -679,7 +671,7 @@ namespace nd
 			return node;
 		}
 
-		void ConvexHull::CalculateConvexHull3d(ConvexHullAABBTreeNode* vertexTree, std::vector<ConvexHullVertex>& points, int count, double distTol, int maxVertexCount)
+		void ConvexHull::CalculateConvexHull3d(ConvexHullAABBTreeNode* vertexTree, ndArray<ConvexHullVertex>& points, int count, double distTol, int maxVertexCount)
 		{
 			distTol = fabs(distTol) * m_diag;
 			ndNode* const f0Node = AddFace(0, 1, 2);
@@ -714,19 +706,19 @@ namespace nd
 			boundaryFaces.Append(f2Node);
 			boundaryFaces.Append(f3Node);
 
-			m_points.resize(size_t(count));
+			m_points.SetCount(count);
 
 			count -= 4;
 			maxVertexCount -= 4;
 			size_t currentIndex = 4;
 
-			std::vector<ndNode*> stackPool;
-			std::vector<ndNode*> coneListPool;
-			std::vector<ndNode*> deleteListPool;
+			ndArray<ndNode*> stackPool;
+			ndArray<ndNode*> coneListPool;
+			ndArray<ndNode*> deleteListPool;
 
-			stackPool.resize(size_t(1024 + count));
-			coneListPool.resize(size_t(1024 + count));
-			deleteListPool.resize(size_t(1024 + count));
+			stackPool.SetCount(1024 + count);
+			coneListPool.SetCount(1024 + count);
+			deleteListPool.SetCount(1024 + count);
 
 			ndNode** const stack = &stackPool[0];
 			ndNode** const coneList = &stackPool[0];
@@ -754,7 +746,7 @@ namespace nd
 				ndConvexHull3dFace* const face = &faceNode->GetInfo();
 				ndBigPlane planeEquation(face->GetPlaneEquation(&m_points[0], isvalid));
 
-				size_t index = 0;
+				ndInt32 index = 0;
 				double dist = 0;
 				ndBigVector p;
 				if (isvalid)
@@ -768,8 +760,8 @@ namespace nd
 				{
 					stack[0] = faceNode;
 
-					int stackIndex = 1;
-					int deletedCount = 0;
+					ndInt32 stackIndex = 1;
+					ndInt32 deletedCount = 0;
 
 					while (stackIndex)
 					{
@@ -805,7 +797,7 @@ namespace nd
 						}
 					}
 			
-					m_points[currentIndex] = points[index];
+					m_points[ndInt32(currentIndex)] = points[index];
 					points[index].m_mark = 1;
 			
 					int newCount = 0;
@@ -888,7 +880,7 @@ namespace nd
 					boundaryFaces.Remove(faceNode);
 				}
 			}
-			m_points.resize(currentIndex);
+			m_points.SetCount(ndInt32 (currentIndex));
 		}
 #else
 

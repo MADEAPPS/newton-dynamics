@@ -77,7 +77,7 @@ namespace nd
 			int m_indices[VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE];
 		};
 
-		class ConvexHull3dPointSet : public std::vector<ConvexHullVertex>
+		class ConvexHull3dPointSet : public ndArray<ConvexHullVertex>
 		{
 			public:
 			ConvexHull3dPointSet();
@@ -85,8 +85,8 @@ namespace nd
 			ConvexHullAABBTreeNode* BuildAccelerator();
 
 			private:
-			ConvexHullAABBTreeNode* BuildRecurse(ConvexHullAABBTreeNode* const parent, ConvexHullVertex* const points, int count, int baseIndex, size_t& memoryPool);
-			std::vector<ConvexHull3dPointCluster> m_treeBuffer;
+			ConvexHullAABBTreeNode* BuildRecurse(ConvexHullAABBTreeNode* const parent, ConvexHullVertex* const points, int count, int baseIndex, ndInt32& memoryPool);
+			ndArray<ConvexHull3dPointCluster> m_treeBuffer;
 		};
 
 		class ndConvexHull3dFace
@@ -115,7 +115,7 @@ namespace nd
 			ConvexHull(const double* const vertexCloud, int strideInBytes, int count, double distTol, int maxVertexCount = 0x7fffffff);
 			~ConvexHull();
 
-			const std::vector<ndBigVector>& GetVertexPool() const;
+			const ndArray<ndBigVector>& GetVertexPool() const;
 
 			private:
 			ConvexHullAABBTreeNode* InitVertexArray(ConvexHull3dPointSet& accelerator);
@@ -123,15 +123,15 @@ namespace nd
 
 			ndNode* AddFace(int i0, int i1, int i2);
 
-			void CalculateConvexHull3d(ConvexHullAABBTreeNode* vertexTree, std::vector<ConvexHullVertex>& points, int count, double distTol, int maxVertexCount);
+			void CalculateConvexHull3d(ConvexHullAABBTreeNode* vertexTree, ndArray<ConvexHullVertex>& points, int count, double distTol, int maxVertexCount);
 
-			size_t SupportVertex(ConvexHullAABBTreeNode** const tree, const std::vector<ConvexHullVertex>& points, const ndBigVector& dir, const bool removeEntry = true) const;
+			ndInt32 SupportVertex(ConvexHullAABBTreeNode** const tree, const ndArray<ConvexHullVertex>& points, const ndBigVector& dir, const bool removeEntry = true) const;
 			double TetrahedrumVolume(const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2, const ndBigVector& p3) const;
 
 			ndBigVector m_aabbP0;
 			ndBigVector m_aabbP1;
+			ndArray<ndBigVector> m_points;
 			double m_diag;
-			std::vector<ndBigVector> m_points;
 		};
 #else
 		class ConvexHull : public ndConvexHull3d

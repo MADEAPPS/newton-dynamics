@@ -579,8 +579,8 @@ namespace nd
 			combinedCH->ResizePoints(0);
 			combinedCH->ResizeTriangles(0);
 
-			const std::vector<ndBigVector>& convexPoints = ch.GetVertexPool();
-			for (size_t v = 0; v < convexPoints.size(); v++) 
+			const ndArray<ndBigVector>& convexPoints = ch.GetVertexPool();
+			for (ndInt32 v = 0; v < ndInt32(convexPoints.GetCount()); v++)
 			{
 				const Vec3 hullPoint(convexPoints[v].m_x, convexPoints[v].m_y, convexPoints[v].m_z);
 				combinedCH->AddPoint(hullPoint);

@@ -84,8 +84,8 @@ namespace nd
 			ResizeTriangles(0);
 			ConvexHull ch(&pts[0][0], sizeof(Vec3), (int32_t)nPts, 1.0e-5f);
 		
-			const std::vector<ndBigVector>& convexPoints = ch.GetVertexPool();
-			for (size_t v = 0; v < size_t(convexPoints.size()); v++)
+			const ndArray<ndBigVector>& convexPoints = ch.GetVertexPool();
+			for (ndInt32 v = 0; v < ndInt32(convexPoints.GetCount()); v++)
 			{
 				const Vec3 hullPoint(convexPoints[v].m_x, convexPoints[v].m_y, convexPoints[v].m_z);
 				AddPoint(hullPoint);

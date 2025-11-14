@@ -32,11 +32,7 @@
 #include "ndCollisionStdafx.h"
 
 #include "vhacdVolume.h"
-#include <algorithm>
-#include <float.h>
-#include <math.h>
 #include <queue>
-#include <string.h>
 #include "vhacdConvexHull.h"
 
 namespace nd
@@ -424,9 +420,8 @@ namespace nd
 			const size_t nVoxels = m_voxels.Size();
 			if (nVoxels == 0)
 				return;
-	
-			std::vector<Vec3> points;
-			std::vector<Vec3> cpoints;
+
+			ndArray<Vec3> points;
 			size_t p = 0;
 			size_t s = 0;
 			short i, j, k;
@@ -437,7 +432,8 @@ namespace nd
 					if (m_voxels[p].m_data == PRIMITIVE_ON_SURFACE) 
 					{
 						++s;
-						if (s == sampling) {
+						if (s == sampling) 
+						{
 							s = 0;
 							i = m_voxels[p].m_coord[0];
 							j = m_voxels[p].m_coord[1];
@@ -451,33 +447,34 @@ namespace nd
 							Vec3 p6((i + 0.5) * m_scale, (j + 0.5) * m_scale, (k + 0.5) * m_scale);
 							Vec3 p7((i - 0.5) * m_scale, (j + 0.5) * m_scale, (k + 0.5) * m_scale);
 
-     						points.push_back(p0 + m_minBB);
-							points.push_back(p1 + m_minBB);
-							points.push_back(p2 + m_minBB);
-							points.push_back(p3 + m_minBB);
-							points.push_back(p4 + m_minBB);
-							points.push_back(p5 + m_minBB);
-							points.push_back(p6 + m_minBB);
-							points.push_back(p7 + m_minBB);
+     						points.PushBack(p0 + m_minBB);
+							points.PushBack(p1 + m_minBB);
+							points.PushBack(p2 + m_minBB);
+							points.PushBack(p3 + m_minBB);
+							points.PushBack(p4 + m_minBB);
+							points.PushBack(p5 + m_minBB);
+							points.PushBack(p6 + m_minBB);
+							points.PushBack(p7 + m_minBB);
 						}
 					}
 					++p;
 				}
 				
-				ConvexHull ch(&points[0][0], sizeof(Vec3), int32_t(points.size()), 1.0e-5f);
-				const std::vector<ndBigVector>& convexPoints = ch.GetVertexPool();
-				for (size_t v = 0; v < size_t(convexPoints.size()); v++)
+				ConvexHull ch(&points[0][0], sizeof(Vec3), int32_t(points.GetCount()), 1.0e-5f);
+				const ndArray<ndBigVector>& convexPoints = ch.GetVertexPool();
+				points.SetCount(0);
+				for (ndInt32 v = 0; v < ndInt32(convexPoints.GetCount()); v++)
 				{
 					const Vec3 hullPoint(convexPoints[v].m_x, convexPoints[v].m_y, convexPoints[v].m_z);
-					cpoints.push_back(hullPoint);
+					points.PushBack(hullPoint);
 				}
 			}
-			ConvexHull ch(&cpoints[0][0], sizeof(Vec3), int32_t(cpoints.size()), 1.0e-5f);
+			ConvexHull ch(&points[0][0], sizeof(Vec3), int32_t(points.GetCount()), 1.0e-5f);
 			meshCH.ResizePoints(0);
 			meshCH.ResizeTriangles(0);
 
-			const std::vector<ndBigVector>& convexPoints = ch.GetVertexPool();
-			for (size_t v = 0; v < convexPoints.size(); v++)
+			const ndArray<ndBigVector>& convexPoints = ch.GetVertexPool();
+			for (ndInt32 v = 0; v < ndInt32(convexPoints.GetCount()); v++)
 			{
 				const Vec3 hullPoint(convexPoints[v].m_x, convexPoints[v].m_y, convexPoints[v].m_z);
 				meshCH.AddPoint(hullPoint);
@@ -1028,11 +1025,15 @@ namespace nd
 				{ 0.0, 0.0, 0.0 },
 				{ 0.0, 0.0, 0.0 } };
 			double x, y, z;
-			for (short i = 0; i < i0; ++i) {
-				for (short j = 0; j < j0; ++j) {
-					for (short k = 0; k < k0; ++k) {
+			for (short i = 0; i < i0; ++i) 
+			{
+				for (short j = 0; j < j0; ++j) 
+				{
+					for (short k = 0; k < k0; ++k) 
+					{
 						const unsigned char& value = GetVoxel(size_t(i), size_t(j), size_t(k));
-						if (value == PRIMITIVE_INSIDE_SURFACE || value == PRIMITIVE_ON_SURFACE) {
+						if (value == PRIMITIVE_INSIDE_SURFACE || value == PRIMITIVE_ON_SURFACE) 
+						{
 							x = i - barycenter[0];
 							y = j - barycenter[1];
 							z = k - barycenter[2];
