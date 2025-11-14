@@ -123,7 +123,6 @@
 
 ndInt32 ndConvexHull2d(ndVector* const vertexCloud2d, ndInt32 count)
 {
-
 	auto Cross = [](const ndVector& O, const ndVector& A, const ndVector& B)
 	{
 		const ndVector A0(A - O);
