@@ -714,15 +714,14 @@ namespace nd
 
 			ndArray<ndNode*> stackPool;
 			ndArray<ndNode*> coneListPool;
-			ndArray<ndNode*> deleteListPool;
+			
 
 			stackPool.SetCount(1024 + count);
 			coneListPool.SetCount(1024 + count);
-			deleteListPool.SetCount(1024 + count);
-
 			ndNode** const stack = &stackPool[0];
 			ndNode** const coneList = &stackPool[0];
-			ndNode** const deleteList = &deleteListPool[0];
+			
+			ndFixSizeArray<ndNode*, 1024 * 4> deleteList;
 
 			while (boundaryFaces.GetCount() && count && (maxVertexCount > 0))
 			{
@@ -761,7 +760,7 @@ namespace nd
 					stack[0] = faceNode;
 
 					ndInt32 stackIndex = 1;
-					ndInt32 deletedCount = 0;
+					ndAssert(deleteList.GetCount() == 0);
 
 					while (stackIndex)
 					{
@@ -772,17 +771,15 @@ namespace nd
 						if (!face1->m_mark && (face1->Evalue(&m_points[0], p) > double(0.0f)))
 						{
 							#ifdef _DEBUG
-							for (int i = 0; i < deletedCount; ++i)
+							for (ndInt32 i = 0; i < deleteList.GetCount(); ++i)
 							{
 								ndAssert(deleteList[i] != node1);
 							}
 							#endif
 			
-							deleteList[deletedCount] = node1;
-							deletedCount++;
-							ndAssert(deletedCount < int(deleteListPool.GetCount()));
+							deleteList.PushBack(node1);
 							face1->m_mark = 1;
-							for (int i = 0; i < 3; ++i)
+							for (ndInt32 i = 0; i < 3; ++i)
 							{
 								ndNode* const twinNode = face1->m_twin[i];
 								ndAssert(twinNode);
@@ -801,7 +798,7 @@ namespace nd
 					points[index].m_mark = 1;
 			
 					int newCount = 0;
-					for (ndInt32 i = 0; i < deletedCount; ++i)
+					for (ndInt32 i = 0; i < deleteList.GetCount(); ++i)
 					{
 						ndNode* const node1 = deleteList[i];
 						ndConvexHull3dFace* const face1 = &node1->GetInfo();
@@ -837,7 +834,7 @@ namespace nd
 						ndNode* const nodeA = coneList[i];
 						ndConvexHull3dFace* const faceA = &nodeA->GetInfo();
 						ndAssert(faceA->m_mark == 0);
-						for (int j = i + 1; j < newCount; ++j) 
+						for (ndInt32 j = i + 1; j < newCount; ++j) 
 						{
 							ndNode* const nodeB = coneList[j];
 							ndConvexHull3dFace* const faceB = &nodeB->GetInfo();
@@ -864,9 +861,9 @@ namespace nd
 						}
 					}
 			
-					for (ndInt32 i = 0; i < deletedCount; ++i)
+					for (ndInt32 i = deleteList.GetCount() - 1; i >= 0; --i)
 					{
-						ndNode* const node = deleteList[i];
+						ndNode* const node = deleteList.Pop();
 						boundaryFaces.Remove(node);
 						Remove(node);
 					}
