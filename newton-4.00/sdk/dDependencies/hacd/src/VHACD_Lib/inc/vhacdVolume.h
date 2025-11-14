@@ -50,10 +50,10 @@ namespace nd
 			virtual double ComputeVolume() const = 0;
 			virtual void Clip(const Plane& plane, PrimitiveSet* const positivePart,
 				PrimitiveSet* const negativePart) const = 0;
-			virtual void Intersect(const Plane& plane, SArray<Vec3 >* const positivePts,
-				SArray<Vec3 >* const negativePts, const size_t sampling) const = 0;
+			virtual void Intersect(const Plane& plane, SArray<Vec3>* const positivePts,
+				SArray<Vec3>* const negativePts, const size_t sampling) const = 0;
 			virtual void ComputeExteriorPoints(const Plane& plane, const Mesh& mesh,
-				SArray<Vec3 >* const exteriorPts) const = 0;
+				SArray<Vec3>* const exteriorPts) const = 0;
 			virtual void ComputeClippedVolumes(const Plane& plane, double& positiveVolume,
 				double& negativeVolume) const = 0;
 			virtual void SelectOnSurface(PrimitiveSet* const onSurfP) const = 0;
@@ -63,7 +63,7 @@ namespace nd
 			virtual void AlignToPrincipalAxes() = 0;
 			virtual void RevertAlignToPrincipalAxes() = 0;
 			virtual void Convert(Mesh& mesh, const VOXEL_VALUE value) const = 0;
-			virtual void GetPointArray(std::vector<Vec3 >& points) const = 0;
+			virtual void GetPointArray(ndArray<Vec3>& points) const = 0;
 			const Mesh& GetConvexHull() const { return m_convexHull; }
 			Mesh& GetConvexHull() { return m_convexHull; }
 			private:
@@ -112,15 +112,15 @@ namespace nd
 					voxel[2] * m_scale + m_minBB[2]);
 			}
 
-			void GetPointArray(std::vector<Vec3>& points) const ;
+			void GetPointArray(ndArray<Vec3>& points) const ;
 
 			void GetPoints(const Voxel& voxel, Vec3* const pts) const;
 			void ComputeConvexHull(Mesh& meshCH, const size_t sampling = 1) const;
 			void Clip(const Plane& plane, PrimitiveSet* const positivePart, PrimitiveSet* const negativePart) const;
 			void Intersect(const Plane& plane, SArray<Vec3>* const positivePts,
-				SArray<Vec3 >* const negativePts, const size_t sampling) const;
+				SArray<Vec3>* const negativePts, const size_t sampling) const;
 			void ComputeExteriorPoints(const Plane& plane, const Mesh& mesh,
-				SArray<Vec3 >* const exteriorPts) const;
+				SArray<Vec3>* const exteriorPts) const;
 			void ComputeClippedVolumes(const Plane& plane, double& positiveVolume, double& negativeVolume) const;
 			void SelectOnSurface(PrimitiveSet* const onSurfP) const;
 			void ComputeBB();
