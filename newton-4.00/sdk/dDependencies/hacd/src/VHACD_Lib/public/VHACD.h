@@ -44,11 +44,8 @@
 	#endif
 	#include <windows.h>
 #elif __MACH__
-	#include <mach/clock.h>
 	#include <mach/mach.h>
 #else
-	#include <sys/time.h>
-	#include <time.h>
 	#include <unistd.h>
 #endif
 

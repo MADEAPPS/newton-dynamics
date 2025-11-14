@@ -78,12 +78,12 @@ namespace nd
 			return totalVolume / 6.0;
 		}
 
-		void Mesh::ComputeConvexHull(const double* const pts, const size_t nPts)
+		void Mesh::ComputeConvexHull(const Vec3* const pts, const size_t nPts)
 		{
 			ResizePoints(0);
 			ResizeTriangles(0);
-			ConvexHull ch(pts, 3 * sizeof(double), (int32_t)nPts, 1.0e-5f);
-
+			ConvexHull ch(&pts[0][0], sizeof(Vec3), (int32_t)nPts, 1.0e-5f);
+		
 			const std::vector<ndBigVector>& convexPoints = ch.GetVertexPool();
 			for (size_t v = 0; v < size_t(convexPoints.size()); v++)
 			{
@@ -99,29 +99,35 @@ namespace nd
 		}
 
 		void Mesh::Clip(const Plane& plane,
-			SArray<Vec3 >& positivePart,
-			SArray<Vec3 >& negativePart) const
+			SArray<Vec3>& positivePart,
+			SArray<Vec3>& negativePart) const
 		{
 			const size_t nV = GetNPoints();
-			if (nV == 0) {
+			if (nV == 0) 
+			{
 				return;
 			}
 			double d;
-			for (size_t v = 0; v < nV; v++) {
+			for (size_t v = 0; v < nV; v++) 
+			{
 				const Vec3& pt = GetPoint(v);
 				d = plane.m_a * pt[0] + plane.m_b * pt[1] + plane.m_c * pt[2] + plane.m_d;
-				if (d > 0.0) {
+				if (d > 0.0) 
+				{
 					positivePart.PushBack(pt);
 				}
-				else if (d < 0.0) {
+				else if (d < 0.0) 
+				{
 					negativePart.PushBack(pt);
 				}
-				else {
+				else 
+				{
 					positivePart.PushBack(pt);
 					negativePart.PushBack(pt);
 				}
 			}
 		}
+
 		bool Mesh::IsInside(const Vec3& pt) const
 		{
 			const size_t nV = GetNPoints();

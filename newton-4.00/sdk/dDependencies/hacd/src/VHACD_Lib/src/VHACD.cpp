@@ -269,17 +269,18 @@ namespace nd
 					leftCH.ResizePoints(0);
 					rightCH.ResizeTriangles(0);
 					leftCH.ResizeTriangles(0);
-			
+
 					if (m_commonData->m_params.m_convexhullApproximation)
 					{
-						SArray<Vec3 >& leftCHPts = m_commonData->chPts[threadId][0];
-						SArray<Vec3 >& rightCHPts = m_commonData->chPts[threadId][1];;
-						rightCHPts.Resize(0);
+						SArray<Vec3>& leftCHPts = m_commonData->chPts[threadId][0];
+						SArray<Vec3>& rightCHPts = m_commonData->chPts[threadId][1];
+
 						leftCHPts.Resize(0);
+						rightCHPts.Resize(0);
 						m_commonData->m_onSurfacePSet->Intersect(m_plane, &rightCHPts, &leftCHPts, size_t (m_commonData->m_convexhullDownsampling * 32));
 						m_commonData->m_inputPSet->GetConvexHull().Clip(m_plane, rightCHPts, leftCHPts);
-						rightCH.ComputeConvexHull((double*)rightCHPts.Data(), rightCHPts.Size());
-						leftCH.ComputeConvexHull((double*)leftCHPts.Data(), leftCHPts.Size());
+						rightCH.ComputeConvexHull(rightCHPts.Data(), rightCHPts.Size());
+						leftCH.ComputeConvexHull(leftCHPts.Data(), leftCHPts.Size());
 					}
 					else 
 					{
@@ -559,7 +560,7 @@ namespace nd
 			}
 			parts.Resize(0);
 		}
-		void AddPoints(const Mesh* const mesh, SArray<Vec3 >& pts)
+		void AddPoints(const Mesh* const mesh, SArray<Vec3>& pts)
 		{
 			const size_t n = mesh->GetNPoints();
 			for (size_t i = 0; i < n; ++i) 
@@ -567,13 +568,13 @@ namespace nd
 				pts.PushBack(mesh->GetPoint(i));
 			}
 		}
-		void ComputeConvexHull(const Mesh* const ch1, const Mesh* const ch2, SArray<Vec3 >& pts, Mesh* const combinedCH)
+		void ComputeConvexHull(const Mesh* const ch1, const Mesh* const ch2, SArray<Vec3>& pts, Mesh* const combinedCH)
 		{
 			pts.Resize(0);
 			AddPoints(ch1, pts);
 			AddPoints(ch2, pts);
 	
-			ConvexHull ch((double*)pts.Data(), 3 * sizeof(double), (int32_t)pts.Size(), 1.0e-5f);
+			ConvexHull ch((double*)pts.Data(), sizeof(Vec3), (int32_t)pts.Size(), 1.0e-5f);
 
 			combinedCH->ResizePoints(0);
 			combinedCH->ResizeTriangles(0);
@@ -667,7 +668,7 @@ namespace nd
 				void Execute(int)
 				{
 					Mesh combinedCH;
-					SArray<Vec3 > pts;
+					SArray<Vec3> pts;
 					for (int i = 0; i < m_pairsCount; i++)
 					{
 						ConvexPair& pair = m_pairs[i];
@@ -761,7 +762,7 @@ namespace nd
 				}
 
 				Mesh combinedCH;
-				SArray<Vec3 > pts;
+				SArray<Vec3> pts;
 				while (((nConvexHulls > params.m_maxConvexHulls) || (priority.Value() <= params.m_minMergeToleranace)) && priority.GetCount())
 				{
 					ConvexKey key(priority[0]);

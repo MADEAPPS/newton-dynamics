@@ -118,7 +118,6 @@ namespace nd
 				volume.Voxelize(points, stridePoints, nPoints,
 					triangles, strideTriangles, nTriangles,
 					m_dim, m_barycenter, m_rot);
-				//size_t n = volume.GetNPrimitivesOnSurf() + volume.GetNPrimitivesInsideSurf();
 
 				volume.AlignToPrincipalAxes(m_rot);
 			}

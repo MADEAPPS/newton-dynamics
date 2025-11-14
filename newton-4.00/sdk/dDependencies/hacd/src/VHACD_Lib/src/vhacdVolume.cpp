@@ -464,7 +464,7 @@ namespace nd
 					++p;
 				}
 				
-				ConvexHull ch(&points[0][0], 3 * sizeof(double), int32_t(points.size()), 1.0e-5f);
+				ConvexHull ch(&points[0][0], sizeof(Vec3), int32_t(points.size()), 1.0e-5f);
 				const std::vector<ndBigVector>& convexPoints = ch.GetVertexPool();
 				for (size_t v = 0; v < size_t(convexPoints.size()); v++)
 				{
@@ -472,7 +472,7 @@ namespace nd
 					cpoints.push_back(hullPoint);
 				}
 			}
-			ConvexHull ch(&cpoints[0][0], 3 * sizeof(double), int32_t(cpoints.size()), 1.0e-5f);
+			ConvexHull ch(&cpoints[0][0], sizeof(Vec3), int32_t(cpoints.size()), 1.0e-5f);
 			meshCH.ResizePoints(0);
 			meshCH.ResizeTriangles(0);
 
@@ -529,7 +529,9 @@ namespace nd
 		{
 			const size_t nVoxels = m_voxels.Size();
 			if (nVoxels == 0)
+			{
 				return;
+			}
 			const double d0 = m_scale;
 			double d;
 			Vec3 pts[8];
