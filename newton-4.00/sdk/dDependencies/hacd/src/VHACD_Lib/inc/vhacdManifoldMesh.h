@@ -16,9 +16,9 @@ All rights reserved.
 #ifndef ND_VHACD_MANIFOLD_MESH_H
 #define ND_VHACD_MANIFOLD_MESH_H
 
+#include "vhacdCircularList.h"
 #include "vhacdSArray.h"
 #include "vhacdVector.h"
-#include "vhacdCircularList.h"
 
 namespace nd
 {

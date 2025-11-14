@@ -17,7 +17,6 @@
 #include "ndCollisionStdafx.h"
 #include "vhacdICHull.h"
 
-#if 0
 namespace nd
 {
 	namespace VHACD 
@@ -734,4 +733,3 @@ namespace nd
 		}
 	}
 }
-#endif

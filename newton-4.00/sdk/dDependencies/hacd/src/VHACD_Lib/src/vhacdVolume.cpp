@@ -30,7 +30,9 @@
 
 #include "ndCoreStdafx.h"
 #include "ndCollisionStdafx.h"
+
 #include "vhacdVolume.h"
+#include <queue>
 #include "vhacdConvexHull.h"
 
 namespace nd
@@ -591,10 +593,10 @@ namespace nd
 			_ASSERT(negativePts->Size() <= nVoxels * 8);
 		}
 
-		void VoxelSet::GetPointArray(ndArray<Vec3>& points) const
+		void VoxelSet::GetPointArray(std::vector<Vec3>& points) const
 		{
 			const size_t nVoxels = m_voxels.Size();
-		
+
 			Vec3 pts[8];
 			for (size_t i = 0; i < nVoxels; ++i)
 			{
@@ -602,7 +604,7 @@ namespace nd
 				GetPoints(voxel, pts);
 				for (int32_t k = 0; k < 8; ++k) 
 				{
-					points.PushBack(pts[k]);
+					points.push_back(pts[k]);
 				}
 			}
 		}
@@ -618,8 +620,7 @@ namespace nd
 			Vec3 pt;
 			Vec3 pts[8];
 			Voxel voxel;
-			for (size_t v = 0; v < nVoxels; ++v) 
-			{
+			for (size_t v = 0; v < nVoxels; ++v) {
 				voxel = m_voxels[v];
 				pt = GetPoint(voxel);
 				d = plane.m_a * pt[0] + plane.m_b * pt[1] + plane.m_c * pt[2] + plane.m_d;
@@ -633,7 +634,6 @@ namespace nd
 				}
 			}
 		}
-
 		void VoxelSet::ComputeClippedVolumes(const Plane& plane,
 			double& positiveVolume,
 			double& negativeVolume) const
@@ -655,7 +655,6 @@ namespace nd
 			positiveVolume = m_unitVolume * (double)nPositiveVoxels;
 			negativeVolume = m_unitVolume * (double)nNegativeVoxels;
 		}
-
 		void VoxelSet::SelectOnSurface(PrimitiveSet* const onSurfP) const
 		{
 			VoxelSet* const onSurf = (VoxelSet*)onSurfP;
@@ -832,7 +831,6 @@ namespace nd
 			delete[] m_data;
 			m_data = 0;
 		}
-
 		void Volume::FillOutsideSurface(const size_t i0,
 			const size_t j0,
 			const size_t k0,
@@ -847,10 +845,9 @@ namespace nd
 				{ -1, 0, 0 },
 				{ 0, -1, 0 },
 				{ 0, 0, -1 } };
-
+			std::queue<Triangle> fifo;
 			Triangle current;
-			ndFixSizeArray<Triangle, 1024 * 32> fifo;
-
+			//short a, b, c;
 			for (size_t i = i0; i < i1; ++i) 
 			{
 				for (size_t j = j0; j < j1; ++j) 
@@ -862,13 +859,12 @@ namespace nd
 							current[0] = (short)i;
 							current[1] = (short)j;
 							current[2] = (short)k;
-
-							fifo.PushBack(current);
+							fifo.push(current);
 							GetVoxel(size_t(current[0]), size_t(current[1]), size_t(current[2])) = PRIMITIVE_OUTSIDE_SURFACE;
 							++m_numVoxelsOutsideSurface;
-							while (fifo.GetCount() > 0)
-							{
-								current = fifo.Pop();
+							while (fifo.size() > 0) {
+								current = fifo.front();
+								fifo.pop();
 								for (int32_t h = 0; h < 6; ++h) 
 								{
 									short a = short(current[0] + neighbours[h][0]);
@@ -883,7 +879,7 @@ namespace nd
 									{
 										v = PRIMITIVE_OUTSIDE_SURFACE;
 										++m_numVoxelsOutsideSurface;
-										fifo.PushBack(Triangle(a, b, c));
+										fifo.push(Triangle(a, b, c));
 									}
 								}
 							}
@@ -919,15 +915,11 @@ namespace nd
 			const size_t i0 = m_dim[0];
 			const size_t j0 = m_dim[1];
 			const size_t k0 = m_dim[2];
-			for (size_t i = 0; i < i0; ++i) 
-			{
-				for (size_t j = 0; j < j0; ++j) 
-				{
-					for (size_t k = 0; k < k0; ++k) 
-					{
+			for (size_t i = 0; i < i0; ++i) {
+				for (size_t j = 0; j < j0; ++j) {
+					for (size_t k = 0; k < k0; ++k) {
 						const unsigned char& voxel = GetVoxel(i, j, k);
-						if (voxel == value) 
-						{
+						if (voxel == value) {
 							Vec3 p0(((double)i - 0.5) * m_scale, ((double)j - 0.5) * m_scale, ((double)k - 0.5) * m_scale);
 							Vec3 p1(((double)i + 0.5) * m_scale, ((double)j - 0.5) * m_scale, ((double)k - 0.5) * m_scale);
 							Vec3 p2(((double)i + 0.5) * m_scale, ((double)j + 0.5) * m_scale, ((double)k - 0.5) * m_scale);

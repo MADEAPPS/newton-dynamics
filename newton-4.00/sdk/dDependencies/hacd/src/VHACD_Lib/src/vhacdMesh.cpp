@@ -16,7 +16,12 @@
 #include "ndCoreStdafx.h"
 #include "ndCollisionStdafx.h"
 
+#include <fstream>
+#include <iosfwd>
+#include <iostream>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string>
 #include "vhacdMesh.h"
 #include "vhacdConvexHull.h"
 
