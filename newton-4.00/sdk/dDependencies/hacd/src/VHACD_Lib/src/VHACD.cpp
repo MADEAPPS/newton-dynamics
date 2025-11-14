@@ -45,16 +45,13 @@ namespace nd
 			delete m_volume;
 			m_volume = 0;
 		}
-		bool VHACD::Compute(const double* const points, const uint32_t nPoints,
-			const uint32_t* const triangles,const uint32_t nTriangles, const Parameters& params)
-		{
-			return ComputeACD(points, nPoints, triangles, nTriangles, params);
-		}
+
 		bool VHACD::Compute(const float* const points,const uint32_t nPoints,
 			const uint32_t* const triangles,const uint32_t nTriangles, const Parameters& params)
 		{
 			return ComputeACD(points, nPoints, triangles, nTriangles, params);
 		}
+
 		double ComputePreferredCuttingDirection(const PrimitiveSet* const tset, Vec3<double>& dir)
 		{
 			double ex = tset->GetEigenValue(AXIS_X);
@@ -63,21 +60,24 @@ namespace nd
 			double vx = (ey - ez) * (ey - ez);
 			double vy = (ex - ez) * (ex - ez);
 			double vz = (ex - ey) * (ex - ey);
-			if (vx < vy && vx < vz) {
+			if (vx < vy && vx < vz) 
+			{
 				double e = ey * ey + ez * ez;
 				dir[0] = 1.0;
 				dir[1] = 0.0;
 				dir[2] = 0.0;
 				return (e == 0.0) ? 0.0 : 1.0 - vx / e;
 			}
-			else if (vy < vx && vy < vz) {
+			else if (vy < vx && vy < vz) 
+			{
 				double e = ex * ex + ez * ez;
 				dir[0] = 0.0;
 				dir[1] = 1.0;
 				dir[2] = 0.0;
 				return (e == 0.0) ? 0.0 : 1.0 - vy / e;
 			}
-			else {
+			else 
+			{
 				double e = ex * ex + ey * ey;
 				dir[0] = 0.0;
 				dir[1] = 0.0;

@@ -70,9 +70,13 @@ namespace nd
 				uint32_t m_nTriangles;
 			};
 
-			class Parameters {
+			class Parameters 
+			{
 				public:
-				Parameters(void) { Init(); }
+				Parameters(void) 
+				{ 
+					Init(); 
+				}
 				void Init(void)
 				{
 					m_resolution = 1000000;
@@ -110,12 +114,6 @@ namespace nd
 			};
 
 			virtual bool Compute(const float* const points,
-				const uint32_t countPoints,
-				const uint32_t* const triangles,
-				const uint32_t countTriangles,
-				const Parameters& params)
-				= 0;
-			virtual bool Compute(const double* const points,
 				const uint32_t countPoints,
 				const uint32_t* const triangles,
 				const uint32_t countTriangles,

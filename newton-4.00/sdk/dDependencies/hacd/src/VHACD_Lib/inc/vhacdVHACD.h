@@ -68,11 +68,6 @@ namespace nd
 				const uint32_t* const triangles,
 				const uint32_t nTriangles,
 				const Parameters& params);
-			bool Compute(const double* const points,
-				const uint32_t nPoints,
-				const uint32_t* const triangles,
-				const uint32_t nTriangles,
-				const Parameters& params);
 
 			private:
 			void Init()
