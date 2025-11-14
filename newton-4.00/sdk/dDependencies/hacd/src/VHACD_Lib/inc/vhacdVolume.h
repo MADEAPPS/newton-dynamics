@@ -239,9 +239,11 @@ namespace nd
 			ComputeAlignedPoint(points, 0, barycenter, rot, pt);
 			m_maxBB = pt;
 			m_minBB = pt;
-			for (uint32_t v = 1; v < nPoints; ++v) {
+			for (uint32_t v = 1; v < nPoints; ++v) 
+			{
 				ComputeAlignedPoint(points, v * stridePoints, barycenter, rot, pt);
-				for (size_t i = 0; i < 3; ++i) {
+				for (size_t i = 0; i < 3; ++i) 
+				{
 					if (pt[i] < m_minBB[i])
 						m_minBB[i] = pt[i];
 					else if (pt[i] > m_maxBB[i])

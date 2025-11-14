@@ -49,9 +49,14 @@ namespace nd
 
 #if 1
 		//!    Vector dim 3.
-		class Vec3 
+		class Vec3
 		{
 			public:
+			Vec3();
+			Vec3(double a);
+			Vec3(double x, double y, double z);
+			Vec3(const Vec3& rhs);
+
 			double& operator[](size_t i) { return m_data[i]; }
 			const double& operator[](size_t i) const { return m_data[i]; }
 			double& X();
@@ -78,81 +83,48 @@ namespace nd
 			Vec3 operator/(double rhs) const;
 			bool operator<(const Vec3& rhs) const;
 			bool operator>(const Vec3& rhs) const;
-			Vec3();
-			Vec3(double a);
-			Vec3(double x, double y, double z);
-			Vec3(const Vec3& rhs);
-			/*virtual*/ ~Vec3(void);
 
 			// Compute the center of this bounding box and return the diagonal length
-			double GetCenter(const Vec3 &bmin, const Vec3 &bmax)
-			{
-				X() = (bmin.X() + bmax.X())*0.5;
-				Y() = (bmin.Y() + bmax.Y())*0.5;
-				Z() = (bmin.Z() + bmax.Z())*0.5;
-				double dx = bmax.X() - bmin.X();
-				double dy = bmax.Y() - bmin.Y();
-				double dz = bmax.Z() - bmin.Z();
-				double diagonal = double(sqrt(dx*dx + dy*dy + dz*dz));
-				return diagonal;
-			}
+			double GetCenter(const Vec3& bmin, const Vec3& bmax);
 
 			// Update the min/max values relative to this point
-			void UpdateMinMax(Vec3 &bmin, Vec3 &bmax) const
-			{
-				if (X() < bmin.X())
-				{
-					bmin.X() = X();
-				}
-				if (Y() < bmin.Y())
-				{
-					bmin.Y() = Y();
-				}
-				if (Z() < bmin.Z())
-				{
-					bmin.Z() = Z();
-				}
-				if (X() > bmax.X())
-				{
-					bmax.X() = X();
-				}
-				if (X() > bmax.X())
-				{
-					bmax.X() = X();
-				}
-				if (Y() > bmax.Y())
-				{
-					bmax.Y() = Y();
-				}
-				if (Z() > bmax.Z())
-				{
-					bmax.Z() = Z();
-				}
-			}
+			void UpdateMinMax(Vec3& bmin, Vec3& bmax) const;
 
 			// Returns the squared distance between these two points
-			double GetDistanceSquared(const Vec3 &p) const
-			{
-				double dx = X() - p.X();
-				double dy = Y() - p.Y();
-				double dz = Z() - p.Z();
-				return dx*dx + dy*dy + dz*dz;
-			}
+			double GetDistanceSquared(const Vec3& p) const;
 
-			double GetDistance(const Vec3 &p) const
-			{
-				return sqrt(GetDistanceSquared(p));
-			}
+			double GetDistance(const Vec3& p) const;
 
 			// Returns the raw vector data as a pointer
-			double* GetData(void)
-			{
-				return m_data;
-			}
-		private:
+			double* GetData(void);
+
+			private:
 			double m_data[3];
 		};
-		
+	
+		inline Vec3::Vec3() 
+		{
+		}
+
+		inline Vec3::Vec3(double a)
+		{
+			m_data[0] = m_data[1] = m_data[2] = a;
+		}
+
+		inline Vec3::Vec3(double x, double y, double z)
+		{
+			m_data[0] = x;
+			m_data[1] = y;
+			m_data[2] = z;
+		}
+
+		inline Vec3::Vec3(const Vec3& rhs)
+		{
+			m_data[0] = rhs.m_data[0];
+			m_data[1] = rhs.m_data[1];
+			m_data[2] = rhs.m_data[2];
+		}
+
 		inline Vec3 operator*(double lhs, const Vec3& rhs)
 		{
 			return Vec3(lhs * rhs.X(), lhs * rhs.Y(), lhs * rhs.Z());
@@ -163,50 +135,50 @@ namespace nd
 			return m_data[0];
 		}
 		
-		inline  double& Vec3::Y()
+		inline double& Vec3::Y()
 		{
 			return m_data[1];
 		}
 		
-		inline  double& Vec3::Z()
+		inline double& Vec3::Z()
 		{
 			return m_data[2];
 		}
 		
-		inline  const double& Vec3::X() const
+		inline const double& Vec3::X() const
 		{
 			return m_data[0];
 		}
 		
-		inline  const double& Vec3::Y() const
+		inline const double& Vec3::Y() const
 		{
 			return m_data[1];
 		}
 		
-		inline  const double& Vec3::Z() const
+		inline const double& Vec3::Z() const
 		{
 			return m_data[2];
 		}
 		
-		inline  void Vec3::Normalize()
+		inline void Vec3::Normalize()
 		{
 			double n = sqrt(m_data[0] * m_data[0] + m_data[1] * m_data[1] + m_data[2] * m_data[2]);
 			if (n != 0.0) (*this) /= n;
 		}
 		
-		inline  double Vec3::GetNorm() const
+		inline double Vec3::GetNorm() const
 		{
 			return sqrt(m_data[0] * m_data[0] + m_data[1] * m_data[1] + m_data[2] * m_data[2]);
 		}
 		
-		inline  void Vec3::operator= (const Vec3& rhs)
+		inline void Vec3::operator= (const Vec3& rhs)
 		{
 			this->m_data[0] = rhs.m_data[0];
 			this->m_data[1] = rhs.m_data[1];
 			this->m_data[2] = rhs.m_data[2];
 		}
 		
-		inline  void Vec3::operator+=(const Vec3& rhs)
+		inline void Vec3::operator+=(const Vec3& rhs)
 		{
 			this->m_data[0] += rhs.m_data[0];
 			this->m_data[1] += rhs.m_data[1];
@@ -265,16 +237,15 @@ namespace nd
 			return Vec3(m_data[0] + rhs.m_data[0], m_data[1] + rhs.m_data[1], m_data[2] + rhs.m_data[2]);
 		}
 		
-		inline  Vec3 Vec3::operator-(const Vec3& rhs) const
+		inline Vec3 Vec3::operator-(const Vec3& rhs) const
 		{
 			return Vec3(m_data[0] - rhs.m_data[0], m_data[1] - rhs.m_data[1], m_data[2] - rhs.m_data[2]);
 		}
 		
-		inline  Vec3 Vec3::operator-() const
+		inline Vec3 Vec3::operator-() const
 		{
 			return Vec3(-m_data[0], -m_data[1], -m_data[2]);
 		}
-
 		
 		inline Vec3 Vec3::operator*(double rhs) const
 		{
@@ -286,37 +257,69 @@ namespace nd
 			return Vec3(m_data[0] / rhs, m_data[1] / rhs, m_data[2] / rhs);
 		}
 		
-		inline Vec3::Vec3(double a)
+
+		// Compute the center of this bounding box and return the diagonal length
+		inline double Vec3::GetCenter(const Vec3& bmin, const Vec3& bmax)
 		{
-			m_data[0] = m_data[1] = m_data[2] = a;
-		}
-		
-		inline Vec3::Vec3(double x, double y, double z)
-		{
-			m_data[0] = x;
-			m_data[1] = y;
-			m_data[2] = z;
-		}
-		
-		inline Vec3::Vec3(const Vec3& rhs)
-		{
-			m_data[0] = rhs.m_data[0];
-			m_data[1] = rhs.m_data[1];
-			m_data[2] = rhs.m_data[2];
+			X() = (bmin.X() + bmax.X()) * 0.5;
+			Y() = (bmin.Y() + bmax.Y()) * 0.5;
+			Z() = (bmin.Z() + bmax.Z()) * 0.5;
+			double dx = bmax.X() - bmin.X();
+			double dy = bmax.Y() - bmin.Y();
+			double dz = bmax.Z() - bmin.Z();
+			double diagonal = double(sqrt(dx * dx + dy * dy + dz * dz));
+			return diagonal;
 		}
 
-		inline Vec3::Vec3() {}
-		inline Vec3::~Vec3(void) {}
-
-		inline bool Colinear(const Vec3& a, const Vec3& b, const Vec3& c)
+		inline void Vec3::UpdateMinMax(Vec3& bmin, Vec3& bmax) const
 		{
-			return  ((c.Z() - a.Z()) * (b.Y() - a.Y()) - (b.Z() - a.Z()) * (c.Y() - a.Y()) == 0.0 /*EPS*/) &&
-				((b.Z() - a.Z()) * (c.X() - a.X()) - (b.X() - a.X()) * (c.Z() - a.Z()) == 0.0 /*EPS*/) &&
-				((b.X() - a.X()) * (c.Y() - a.Y()) - (b.Y() - a.Y()) * (c.X() - a.X()) == 0.0 /*EPS*/);
+			if (X() < bmin.X())
+			{
+				bmin.X() = X();
+			}
+			if (Y() < bmin.Y())
+			{
+				bmin.Y() = Y();
+			}
+			if (Z() < bmin.Z())
+			{
+				bmin.Z() = Z();
+			}
+			if (X() > bmax.X())
+			{
+				bmax.X() = X();
+			}
+			if (X() > bmax.X())
+			{
+				bmax.X() = X();
+			}
+			if (Y() > bmax.Y())
+			{
+				bmax.Y() = Y();
+			}
+			if (Z() > bmax.Z())
+			{
+				bmax.Z() = Z();
+			}
 		}
-		inline double ComputeVolume4(const Vec3& a, const Vec3& b, const Vec3& c, const Vec3& d)
+
+		inline double Vec3::GetDistanceSquared(const Vec3& p) const
 		{
-			return (a - d) * ((b - d) ^ (c - d));
+			double dx = X() - p.X();
+			double dy = Y() - p.Y();
+			double dz = Z() - p.Z();
+			return dx * dx + dy * dy + dz * dz;
+		}
+
+		inline double Vec3::GetDistance(const Vec3& p) const
+		{
+			return sqrt(GetDistanceSquared(p));
+		}
+
+		// Returns the raw vector data as a pointer
+		inline double* Vec3::GetData(void)
+		{
+			return m_data;
 		}
 		
 		inline bool Vec3::operator<(const Vec3& rhs) const
@@ -332,7 +335,7 @@ namespace nd
 			return (X() < rhs[0]);
 		}
 		
-		inline  bool Vec3::operator>(const Vec3& rhs) const
+		inline bool Vec3::operator>(const Vec3& rhs) const
 		{
 			if (X() == rhs[0])
 			{
@@ -345,8 +348,359 @@ namespace nd
 			return (X() > rhs[0]);
 		}
 #else
-		typedef ndBigVector Vec3;
+
+		class Vec3 : public ndBigVector
+		{
+			public:
+			Vec3();
+			Vec3(double a);
+			Vec3(double x, double y, double z);
+			Vec3(const Vec3& rhs);
+			Vec3(const ndBigVector& a);
+
+			double& operator[](size_t i);
+			const double& operator[](size_t i) const;
+			double& X();
+			double& Y();
+			double& Z();
+			const double& X() const;
+			const double& Y() const;
+			const double& Z() const;
+			void Normalize();
+			double GetNorm() const;
+			void operator=(const Vec3& rhs);
+			void operator+=(const Vec3& rhs);
+			void operator-=(const Vec3& rhs);
+			void operator-=(double a);
+			void operator+=(double a);
+			void operator/=(double a);
+			void operator*=(double a);
+			Vec3 operator^(const Vec3& rhs) const;
+			double operator*(const Vec3& rhs) const;
+			Vec3 operator+(const Vec3& rhs) const;
+			Vec3 operator-(const Vec3& rhs) const;
+			Vec3 operator-() const;
+			Vec3 operator*(double rhs) const;
+			Vec3 operator/(double rhs) const;
+			bool operator<(const Vec3& rhs) const;
+			bool operator>(const Vec3& rhs) const;
+
+			// Compute the center of this bounding box and return the diagonal length
+			double GetCenter(const Vec3& bmin, const Vec3& bmax);
+
+			// Update the min/max values relative to this point
+			void UpdateMinMax(Vec3& bmin, Vec3& bmax) const;
+
+			// Returns the squared distance between these two points
+			double GetDistanceSquared(const Vec3& p) const;
+
+			double GetDistance(const Vec3& p) const;
+
+			// Returns the raw vector data as a pointer
+			double* GetData(void);
+		};
+
+		inline Vec3::Vec3()
+			:ndBigVector(0.0)
+		{
+		}
+
+		inline Vec3::Vec3(double a)
+			:ndBigVector(a)
+		{
+		}
+
+		inline Vec3::Vec3(double x, double y, double z)
+			:ndBigVector(x, y, z, 0.0)
+		{
+		}
+
+		inline Vec3::Vec3(const Vec3& rhs)
+			:ndBigVector(rhs)
+		{
+		}
+
+		inline Vec3::Vec3(const ndBigVector& rhs)
+			:ndBigVector(rhs)
+		{
+		}
+
+		inline double& Vec3::operator[](size_t i)
+		{ 
+			return (&m_x)[i];
+		}
+
+		inline const double& Vec3::operator[](size_t i) const
+		{ 
+			return (&m_x)[i];
+		}
+
+		inline Vec3 operator*(double lhs, const Vec3& rhs)
+		{
+			ndAssert(0);
+			return Vec3(lhs * rhs.X(), lhs * rhs.Y(), lhs * rhs.Z());
+		}
+
+		inline double& Vec3::X()
+		{
+			ndAssert(0);
+			//return m_data[0];
+			return m_x;
+		}
+
+		inline double& Vec3::Y()
+		{
+			ndAssert(0);
+			//return m_data[1];
+			return m_y;
+		}
+
+		inline double& Vec3::Z()
+		{
+			ndAssert(0);
+			//return m_data[2];
+			return m_z;
+		}
+
+		inline const double& Vec3::X() const
+		{
+			ndAssert(0);
+			//return m_data[0];
+			return m_x;
+		}
+
+		inline const double& Vec3::Y() const
+		{
+			ndAssert(0);
+			//return m_data[1];
+			return m_y;
+		}
+
+		inline const double& Vec3::Z() const
+		{
+			ndAssert(0);
+			//return m_data[2];
+			return m_z;
+		}
+
+		inline void Vec3::Normalize()
+		{
+			ndAssert(0);
+			m_w = 0.0;
+			//double n = sqrt(m_data[0] * m_data[0] + m_data[1] * m_data[1] + m_data[2] * m_data[2]);
+			(*this) = ndBigVector::Normalize();
+		}
+
+		inline double Vec3::GetNorm() const
+		{
+			ndAssert(0);
+			//return sqrt(m_data[0] * m_data[0] + m_data[1] * m_data[1] + m_data[2] * m_data[2]);
+			const Vec3 tmp(*this & ndBigVector::m_triplexMask);
+			return tmp.DotProduct(tmp).GetScalar();
+		}
+
+		inline void Vec3::operator= (const Vec3& rhs)
+		{
+			ndBigVector::operator=(rhs);
+		}
+
+		inline void Vec3::operator+=(const Vec3& rhs)
+		{
+			//this->m_data[0] += rhs.m_data[0];
+			//this->m_data[1] += rhs.m_data[1];
+			//this->m_data[2] += rhs.m_data[2];
+			ndBigVector::operator+=(rhs);
+		}
+
+		inline void Vec3::operator-=(const Vec3& rhs)
+		{
+			//this->m_data[0] -= rhs.m_data[0];
+			//this->m_data[1] -= rhs.m_data[1];
+			//this->m_data[2] -= rhs.m_data[2];
+			ndBigVector::operator-=(rhs);
+		}
+
+		inline void Vec3::operator-=(double a)
+		{
+			//this->m_data[0] -= a;
+			//this->m_data[1] -= a;
+			//this->m_data[2] -= a;
+			ndBigVector::operator-=(Vec3(a));
+		}
+
+		inline void Vec3::operator+=(double a)
+		{
+			//this->m_data[0] += a;
+			//this->m_data[1] += a;
+			//this->m_data[2] += a;
+			ndBigVector::operator+=(Vec3(a));
+		}
+
+		inline void Vec3::operator/=(double a)
+		{
+			ndBigVector::operator*=(Vec3(1.0 / a));
+		}
+
+		inline void Vec3::operator*=(double a)
+		{
+			ndBigVector::operator*=(Vec3(a));
+		}
+
+		inline Vec3 Vec3::operator^ (const Vec3& rhs) const
+		{
+			//return Vec3(m_data[1] * rhs.m_data[2] - m_data[2] * rhs.m_data[1],
+			//	m_data[2] * rhs.m_data[0] - m_data[0] * rhs.m_data[2],
+			//	m_data[0] * rhs.m_data[1] - m_data[1] * rhs.m_data[0]);
+			//this looks like a cros prodoc
+			return CrossProduct(rhs);
+		}
+
+		inline double Vec3::operator*(const Vec3& rhs) const
+		{
+			//return (m_data[0] * rhs.m_data[0] + m_data[1] * rhs.m_data[1] + m_data[2] * rhs.m_data[2]);
+			return DotProduct(rhs & ndBigVector::m_triplexMask).GetScalar();
+		}
+
+		inline Vec3 Vec3::operator+(const Vec3& rhs) const
+		{
+			//return Vec3(m_data[0] + rhs.m_data[0], m_data[1] + rhs.m_data[1], m_data[2] + rhs.m_data[2]);
+			return ndBigVector::operator+(rhs);
+		}
+
+		inline Vec3 Vec3::operator-(const Vec3& rhs) const
+		{
+			//return Vec3(m_data[0] - rhs.m_data[0], m_data[1] - rhs.m_data[1], m_data[2] - rhs.m_data[2]);
+			return ndBigVector::operator-(rhs);
+		}
+
+		inline Vec3 Vec3::operator-() const
+		{
+			ndAssert(0);
+			//return Vec3(-m_data[0], -m_data[1], -m_data[2]);
+			return Scale(-1.0);
+		}
+
+		inline Vec3 Vec3::operator*(double rhs) const
+		{
+			ndAssert(0);
+			//return Vec3(rhs * this->m_data[0], rhs * this->m_data[1], rhs * this->m_data[2]);
+			return *this * Vec3(rhs);
+		}
+
+		inline Vec3 Vec3::operator/ (double rhs) const
+		{
+			ndAssert(0);
+			//return Vec3(m_data[0] / rhs, m_data[1] / rhs, m_data[2] / rhs);
+			return *this * Vec3(1.0/rhs);
+		}
+
+
+		// Compute the center of this bounding box and return the diagonal length
+		inline double Vec3::GetCenter(const Vec3& bmin, const Vec3& bmax)
+		{
+			ndAssert(0);
+			X() = (bmin.X() + bmax.X()) * 0.5;
+			Y() = (bmin.Y() + bmax.Y()) * 0.5;
+			Z() = (bmin.Z() + bmax.Z()) * 0.5;
+			double dx = bmax.X() - bmin.X();
+			double dy = bmax.Y() - bmin.Y();
+			double dz = bmax.Z() - bmin.Z();
+			double diagonal = double(sqrt(dx * dx + dy * dy + dz * dz));
+			return diagonal;
+		}
+
+		inline void Vec3::UpdateMinMax(Vec3& bmin, Vec3& bmax) const
+		{
+			ndAssert(0);
+			if (X() < bmin.X())
+			{
+				bmin.X() = X();
+			}
+			if (Y() < bmin.Y())
+			{
+				bmin.Y() = Y();
+			}
+			if (Z() < bmin.Z())
+			{
+				bmin.Z() = Z();
+			}
+			if (X() > bmax.X())
+			{
+				bmax.X() = X();
+			}
+			if (X() > bmax.X())
+			{
+				bmax.X() = X();
+			}
+			if (Y() > bmax.Y())
+			{
+				bmax.Y() = Y();
+			}
+			if (Z() > bmax.Z())
+			{
+				bmax.Z() = Z();
+			}
+		}
+
+		inline double Vec3::GetDistanceSquared(const Vec3& p) const
+		{
+			ndAssert(0);
+			double dx = X() - p.X();
+			double dy = Y() - p.Y();
+			double dz = Z() - p.Z();
+			return dx * dx + dy * dy + dz * dz;
+		}
+
+		inline double Vec3::GetDistance(const Vec3& p) const
+		{
+			ndAssert(0);
+			return sqrt(GetDistanceSquared(p));
+		}
+
+		// Returns the raw vector data as a pointer
+		inline double* Vec3::GetData(void)
+		{
+			ndAssert(0);
+			return &(*this)[0];
+		}
+
+		inline bool Vec3::operator<(const Vec3& rhs) const
+		{
+			if (X() == rhs[0])
+			{
+				if (Y() == rhs[1])
+				{
+					return (Z() < rhs[2]);
+				}
+				return (Y() < rhs[1]);
+			}
+			return (X() < rhs[0]);
+		}
+
+		inline bool Vec3::operator>(const Vec3& rhs) const
+		{
+			if (X() == rhs[0])
+			{
+				if (Y() == rhs[1])
+				{
+					return (Z() > rhs[2]);
+				}
+				return (Y() > rhs[1]);
+			}
+			return (X() > rhs[0]);
+		}
 #endif
+
+		inline bool Colinear(const Vec3& a, const Vec3& b, const Vec3& c)
+		{
+			return  ((c.Z() - a.Z()) * (b.Y() - a.Y()) - (b.Z() - a.Z()) * (c.Y() - a.Y()) == 0.0 /*EPS*/) &&
+				((b.Z() - a.Z()) * (c.X() - a.X()) - (b.X() - a.X()) * (c.Z() - a.Z()) == 0.0 /*EPS*/) &&
+				((b.X() - a.X()) * (c.Y() - a.Y()) - (b.Y() - a.Y()) * (c.X() - a.X()) == 0.0 /*EPS*/);
+		}
+		inline double ComputeVolume4(const Vec3& a, const Vec3& b, const Vec3& c, const Vec3& d)
+		{
+			return (a - d) * ((b - d) ^ (c - d));
+		}
 	}
 }
 #endif

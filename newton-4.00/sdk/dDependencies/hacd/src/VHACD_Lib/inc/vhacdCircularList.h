@@ -42,6 +42,7 @@ namespace nd
 
 			CircularListElement(const CircularListElement& rhs);
 		};
+
 		//!    CircularList class.
 		template <typename T>
 		class CircularList 

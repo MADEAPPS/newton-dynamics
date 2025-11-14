@@ -99,8 +99,8 @@ namespace nd
 				Plane& bestPlane,
 				double& minConcavity,
 				const Parameters& params);
-			template <class T>
-			void AlignMesh(const T* const points,
+
+			void AlignMesh(const ndReal* const points,
 				const uint32_t stridePoints,
 				const uint32_t nPoints,
 				const int32_t* const triangles,
@@ -108,7 +108,8 @@ namespace nd
 				const uint32_t nTriangles,
 				const Parameters& params)
 			{
-				if (!params.m_pca) {
+				if (!params.m_pca) 
+				{
 					return;
 				}
 
@@ -121,8 +122,8 @@ namespace nd
 
 				volume.AlignToPrincipalAxes(m_rot);
 			}
-			template <class T>
-			void VoxelizeMesh(const T* const points,
+
+			void VoxelizeMesh(const ndReal* const points,
 				const uint32_t stridePoints,
 				const uint32_t nPoints,
 				const int32_t* const triangles,
@@ -155,8 +156,9 @@ namespace nd
 					}
 				}
 			}
-			template <class T>
-			bool ComputeACD(const T* const points,
+
+			
+			bool ComputeACD(const ndReal* const points,
 				const uint32_t nPoints,
 				const uint32_t* const triangles,
 				const uint32_t nTriangles,
