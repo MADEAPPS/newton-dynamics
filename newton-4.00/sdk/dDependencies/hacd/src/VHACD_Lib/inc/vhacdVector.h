@@ -171,14 +171,12 @@ namespace nd
 			double n = GetNorm();
 			if (n != 0.0)
 			{
-				//(*this) /= n;
 				operator*(1.0 / n);
 			}
 		}
 		
 		inline double Vec3::GetNorm() const
 		{
-			//return sqrt(m_data[0] * m_data[0] + m_data[1] * m_data[1] + m_data[2] * m_data[2]);
 			return sqrt(operator*(*this));
 		}
 		
@@ -219,9 +217,10 @@ namespace nd
 		
 		inline void Vec3::operator/=(double a)
 		{
-			m_data[0] /= a;
-			m_data[1] /= a;
-			m_data[2] /= a;
+			double reciproc = 1.0 / a;
+			m_data[0] *= reciproc;
+			m_data[1] *= reciproc;
+			m_data[2] *= reciproc;
 		}
 		
 		inline void Vec3::operator*=(double a)
@@ -233,7 +232,8 @@ namespace nd
 		
 		inline Vec3 Vec3::operator^ (const Vec3& rhs) const
 		{
-			return Vec3(m_data[1] * rhs.m_data[2] - m_data[2] * rhs.m_data[1],
+			return Vec3(
+				m_data[1] * rhs.m_data[2] - m_data[2] * rhs.m_data[1],
 				m_data[2] * rhs.m_data[0] - m_data[0] * rhs.m_data[2],
 				m_data[0] * rhs.m_data[1] - m_data[1] * rhs.m_data[0]);
 		}
@@ -270,7 +270,8 @@ namespace nd
 		
 		inline Vec3 Vec3::operator/ (double rhs) const
 		{
-			return Vec3(m_data[0] / rhs, m_data[1] / rhs, m_data[2] / rhs);
+			double reciproc = 1.0 / rhs;
+			return Vec3(m_data[0] * reciproc, m_data[1] * reciproc, m_data[2] * reciproc);
 		}
 
 		// Compute the center of this bounding box and return the diagonal length
