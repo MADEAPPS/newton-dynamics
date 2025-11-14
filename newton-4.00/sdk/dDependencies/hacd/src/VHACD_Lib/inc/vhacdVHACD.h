@@ -43,10 +43,6 @@ namespace nd
 			{
 				return (uint32_t)m_convexHulls.Size();
 			}
-			void Cancel()
-			{
-				SetCancel(true);
-			}
 			void GetConvexHull(const uint32_t index, ConvexHull& ch) const
 			{
 				Mesh* mesh = m_convexHulls[index];
@@ -82,16 +78,6 @@ namespace nd
 				const Parameters& params);
 
 			private:
-			void SetCancel(bool cancel)
-			{
-				m_cancel = cancel;
-			}
-			bool GetCancel()
-			{
-				bool cancel = m_cancel;
-				return cancel;
-			}
-
 			void Init()
 			{
 				m_raycastMesh = nullptr;
@@ -100,12 +86,8 @@ namespace nd
 				m_volume = 0;
 				m_volumeCH0 = 0.0;
 				m_pset = 0;
-				m_overallProgress = 0.0;
-				m_stageProgress = 0.0;
-				m_operationProgress = 0.0;
 				m_barycenter[0] = m_barycenter[1] = m_barycenter[2] = 0.0;
 				m_rot[0][0] = m_rot[1][1] = m_rot[2][2] = 1.0;
-				SetCancel(false);
 			}
 			void ComputePrimitiveSet(const Parameters& params);
 			void ComputeACD(const Parameters& params);
@@ -134,13 +116,10 @@ namespace nd
 				const uint32_t nTriangles,
 				const Parameters& params)
 			{
-				if (GetCancel() || !params.m_pca) {
+				if (!params.m_pca) {
 					return;
 				}
 
-				if (GetCancel()) {
-					return;
-				}
 				m_dim = (size_t)(pow((double)params.m_resolution, 1.0 / 3.0) + 0.5);
 				Volume volume;
 				volume.Voxelize(points, stridePoints, nPoints,
@@ -148,12 +127,7 @@ namespace nd
 					m_dim, m_barycenter, m_rot);
 				//size_t n = volume.GetNPrimitivesOnSurf() + volume.GetNPrimitivesInsideSurf();
 
-				if (GetCancel()) {
-					return;
-				}
-
 				volume.AlignToPrincipalAxes(m_rot);
-				m_overallProgress = 1.0;
 			}
 			template <class T>
 			void VoxelizeMesh(const T* const points,
@@ -164,19 +138,12 @@ namespace nd
 				const uint32_t nTriangles,
 				const Parameters& params)
 			{
-				if (GetCancel()) {
-					return;
-				}
-
 				delete m_volume;
 				m_volume = nullptr;
 				int32_t iteration = 0;
 				const int32_t maxIteration = 5;
-				double progress = 0.0;
-				while (iteration++ < maxIteration && !m_cancel) 
+				while (iteration++ < maxIteration) 
 				{
-					progress = iteration * 100.0 / maxIteration;
-
 					m_volume = new Volume;
 					m_volume->Voxelize(points, stridePoints, nPoints,
 						triangles, strideTriangles, nTriangles,
@@ -195,7 +162,6 @@ namespace nd
 						break;
 					}
 				}
-				m_overallProgress = 10.0;
 			}
 			template <class T>
 			bool ComputeACD(const T* const points,
@@ -217,26 +183,18 @@ namespace nd
 					m_raycastMesh->release();
 					m_raycastMesh = nullptr;
 				}
-				if (GetCancel()) {
-					Clean();
-					return false;
-				}
 				return true;
 			}
 
 		private:
 			RaycastMesh* m_raycastMesh;
 			SArray<Mesh*> m_convexHulls;
-			double m_overallProgress;
-			double m_stageProgress;
-			double m_operationProgress;
 			double m_rot[3][3];
 			double m_volumeCH0;
 			Vec3<double> m_barycenter;
 			size_t m_dim;
 			Volume* m_volume;
 			PrimitiveSet* m_pset;
-			bool m_cancel;
 			Queue m_parallelQueue;
 		};
 	}

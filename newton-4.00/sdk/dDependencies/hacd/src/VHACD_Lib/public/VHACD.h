@@ -59,8 +59,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <string.h>
-#include <iostream>
 #include <vector>
 #include <atomic>
 #include <thread>
@@ -121,7 +119,6 @@ namespace nd
 				bool m_projectHullVertices;
 			};
 
-			virtual void Cancel() = 0;
 			virtual bool Compute(const float* const points,
 				const uint32_t countPoints,
 				const uint32_t* const triangles,

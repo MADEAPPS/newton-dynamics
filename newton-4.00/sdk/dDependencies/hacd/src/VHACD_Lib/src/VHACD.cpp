@@ -63,18 +63,12 @@ namespace nd
 
 		void VHACD::ComputePrimitiveSet(const Parameters&)
 		{
-			if (GetCancel()) {
-				return;
-			}
-
 			VoxelSet* vset = new VoxelSet;
 			m_volume->Convert(*vset);
 			m_pset = vset;
 
 			delete m_volume;
 			m_volume = 0;
-
-			m_overallProgress = 15.0;
 		}
 		bool VHACD::Compute(const double* const points, const uint32_t nPoints,
 			const uint32_t* const triangles,const uint32_t nTriangles, const Parameters& params)
@@ -229,11 +223,6 @@ namespace nd
 			const int32_t convexhullDownsampling, const double, const double, Plane& bestPlane,
 			double& minConcavity, const Parameters& params)
 		{
-			if (GetCancel()) 
-			{
-				return;
-			}
-
 			int32_t iBest = -1;
 			int32_t nPlanes = static_cast<int32_t>(planes.Size());
 			double minTotal = MAX_DOUBLE;
@@ -406,10 +395,6 @@ namespace nd
 
 		void VHACD::ComputeACD(const Parameters& params)
 		{
-			if (GetCancel()) {
-				return;
-			}
-
 			SArray<PrimitiveSet*> parts;
 			SArray<PrimitiveSet*> inputParts;
 			SArray<PrimitiveSet*> temp;
@@ -443,12 +428,12 @@ namespace nd
 			// from that.
 			depth++;
 
-			while (sub++ < depth && inputParts.Size() > 0 && !m_cancel) 
+			while (sub++ < depth && inputParts.Size() > 0) 
 			{
 				double maxConcavity = 0.0;
 				const size_t nInputParts = inputParts.Size();
 
-				for (size_t p = 0; p < nInputParts && !m_cancel; ++p) 
+				for (size_t p = 0; p < nInputParts; ++p) 
 				{
 					const double progress0 = double(p) * 100.0 / (double)nInputParts;
 					const double progress1 = (double(p) + 0.75) * 100.0 / (double)nInputParts;
@@ -500,7 +485,7 @@ namespace nd
 							bestPlane,
 							minConcavity,
 							params);
-						if (!m_cancel && (params.m_planeDownsampling > 1 || params.m_convexhullDownsampling > 1)) {
+						if ((params.m_planeDownsampling > 1 || params.m_convexhullDownsampling > 1)) {
 							planesRef.Resize(0);
 
 							//VoxelSet* vset = (VoxelSet*)pset;
@@ -520,12 +505,10 @@ namespace nd
 								minConcavity,
 								params);
 						}
-						if (GetCancel()) {
-							delete pset; // clean up
-							break;
-						}
-						else {
-							if (maxConcavity < minConcavity) {
+
+						{
+							if (maxConcavity < minConcavity) 
+{
 								maxConcavity = minConcavity;
 							}
 							PrimitiveSet* bestLeft = pset->Create();
@@ -548,14 +531,7 @@ namespace nd
 					}
 				}
 
-				if (GetCancel()) {
-					const size_t nTempParts = temp.Size();
-					for (size_t p = 0; p < nTempParts; ++p) {
-						delete temp[p];
-					}
-					temp.Resize(0);
-				}
-				else {
+				{
 					inputParts = temp;
 					temp.Resize(0);
 				}
@@ -565,20 +541,10 @@ namespace nd
 				parts.PushBack(inputParts[p]);
 			}
 
-			if (GetCancel()) {
-				const size_t nParts = parts.Size();
-				for (size_t p = 0; p < nParts; ++p) {
-					delete parts[p];
-				}
-				return;
-			}
-
-			m_overallProgress = 90.0;
-
 			size_t nConvexHulls = parts.Size();
 
 			m_convexHulls.Resize(0);
-			for (size_t p = 0; p < nConvexHulls && !m_cancel; ++p) 
+			for (size_t p = 0; p < nConvexHulls; ++p) 
 			{
 				m_convexHulls.PushBack(new Mesh);
 				parts[p]->ComputeConvexHull(*m_convexHulls[p]);
@@ -601,16 +567,6 @@ namespace nd
 				parts[p] = 0;
 			}
 			parts.Resize(0);
-
-			if (GetCancel()) {
-				for (size_t p = 0; p < m_convexHulls.Size(); ++p) {
-					delete m_convexHulls[p];
-				}
-				m_convexHulls.Clear();
-				return;
-			}
-
-			m_overallProgress = 95.0;
 		}
 		void AddPoints(const Mesh* const mesh, SArray<Vec3<double> >& pts)
 		{
@@ -649,7 +605,7 @@ namespace nd
 
 		void VHACD::MergeConvexHulls(const Parameters& params)
 		{
-			if (GetCancel() || (m_convexHulls.Size() <= 1)) 
+			if (m_convexHulls.Size() <= 1) 
 			{
 				return;
 			}
@@ -770,7 +726,7 @@ namespace nd
 			}
 
 			size_t nConvexHulls = m_convexHulls.Size();
-			if (nConvexHulls > 1 && !m_cancel)
+			if (nConvexHulls > 1)
 			{
 				size_t start = 0;
 				size_t batchSize = pairsCount / (VHACD_WORKERS_THREADS * 4);
@@ -888,8 +844,6 @@ namespace nd
 					}
 				}
 			}
-
-			m_overallProgress = 99.0;
 		}
 
 		void VHACD::SimplifyConvexHull(Mesh* const ch, const size_t nvertices, const double minVolume)
@@ -985,16 +939,15 @@ namespace nd
 		}
 		void VHACD::SimplifyConvexHulls(const Parameters& params)
 		{
-			if (m_cancel || params.m_maxNumVerticesPerCH < 4) {
+			if (params.m_maxNumVerticesPerCH < 4) {
 				return;
 			}
 			const size_t nConvexHulls = m_convexHulls.Size();
 
-			for (size_t i = 0; i < nConvexHulls && !m_cancel; ++i) {
+			for (size_t i = 0; i < nConvexHulls; ++i) 
+			{
 				SimplifyConvexHull(m_convexHulls[i], params.m_maxNumVerticesPerCH, m_volumeCH0 * params.m_minVolumePerCH);
 			}
-
-			m_overallProgress = 100.0;
 		}
 	} // end of VHACD namespace
 }

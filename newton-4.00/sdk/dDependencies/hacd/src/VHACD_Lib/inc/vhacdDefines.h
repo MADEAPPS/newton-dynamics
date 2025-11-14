@@ -37,8 +37,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <string.h>
-#include <iostream>
 #include <vector>
 #include <atomic>
 #include <thread>
