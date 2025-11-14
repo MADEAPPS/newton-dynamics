@@ -24,7 +24,6 @@
 #include "vhacdICHull.h"
 #include "vhacdMesh.h"
 #include "vhacdSArray.h"
-#include "vhacdTimer.h"
 #include "vhacdVHACD.h"
 #include "vhacdVector.h"
 #include "vhacdVolume.h"
@@ -65,8 +64,6 @@ namespace nd
 		if (GetCancel()) {
 			return;
 		}
-		m_timer.Tic();
-
 		m_stage = "Compute primitive set";
 		m_operation = "Convert volume to pset";
 
@@ -94,10 +91,9 @@ namespace nd
 
 		m_overallProgress = 15.0;
 		Update(100.0, 100.0, params);
-		m_timer.Toc();
+		
 		if (params.m_logger) {
 			msg.str("");
-			msg << "\t time " << m_timer.GetElapsedTime() / 1000.0 << "s" << std::endl;
 			params.m_logger->Log(msg.str().c_str());
 		}
 	}
@@ -437,7 +433,6 @@ namespace nd
 		if (GetCancel()) {
 			return;
 		}
-		m_timer.Tic();
 
 		m_stage = "Approximate Convex Decomposition";
 		m_stageProgress = 0.0;
@@ -694,10 +689,10 @@ namespace nd
 
 		m_overallProgress = 95.0;
 		Update(100.0, 100.0, params);
-		m_timer.Toc();
+
 		if (params.m_logger) {
 			msg.str("");
-			msg << "\t time " << m_timer.GetElapsedTime() / 1000.0 << "s" << std::endl;
+
 			params.m_logger->Log(msg.str().c_str());
 		}
 	}
@@ -736,8 +731,6 @@ namespace nd
 		{
 			return;
 		}
-		m_timer.Tic();
-
 		m_stage = "Merge Convex Hulls";
 
 		std::ostringstream msg;
@@ -983,10 +976,8 @@ namespace nd
 
 		m_overallProgress = 99.0;
 		Update(100.0, 100.0, params);
-		m_timer.Toc();
 		if (params.m_logger) {
 			msg.str("");
-			msg << "\t time " << m_timer.GetElapsedTime() / 1000.0 << "s" << std::endl;
 			params.m_logger->Log(msg.str().c_str());
 		}
 	}
@@ -1088,8 +1079,7 @@ namespace nd
 		if (m_cancel || params.m_maxNumVerticesPerCH < 4) {
 			return;
 		}
-		m_timer.Tic();
-
+		
 		m_stage = "Simplify convex-hulls";
 		m_operation = "Simplify convex-hulls";
 
@@ -1112,10 +1102,9 @@ namespace nd
 
 		m_overallProgress = 100.0;
 		Update(100.0, 100.0, params);
-		m_timer.Toc();
+
 		if (params.m_logger) {
 			msg.str("");
-			msg << "\t time " << m_timer.GetElapsedTime() / 1000.0 << "s" << std::endl;
 			params.m_logger->Log(msg.str().c_str());
 		}
 	}

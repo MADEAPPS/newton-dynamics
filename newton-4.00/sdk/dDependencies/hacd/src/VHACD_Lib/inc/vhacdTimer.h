@@ -52,63 +52,6 @@ namespace nd
 			LARGE_INTEGER m_stop;
 			LARGE_INTEGER m_freq;
 		};
-
-		#elif __MACH__
-		class Timer {
-		public:
-			Timer(void)
-			{
-				memset(this, 0, sizeof(Timer));
-				host_get_clock_service(mach_host_self(), CALENDAR_CLOCK, &m_cclock);
-			};
-			~Timer(void)
-			{
-				mach_port_deallocate(mach_task_self(), m_cclock);
-			};
-			void Tic()
-			{
-				clock_get_time(m_cclock, &m_start);
-			}
-			void Toc()
-			{
-				clock_get_time(m_cclock, &m_stop);
-			}
-			double GetElapsedTime() // in ms
-			{
-				return 1000.0 * (m_stop.tv_sec - m_start.tv_sec + (1.0E-9) * (m_stop.tv_nsec - m_start.tv_nsec));
-			}
-
-		private:
-			clock_serv_t m_cclock;
-			mach_timespec_t m_start;
-			mach_timespec_t m_stop;
-		};
-		#else
-		class Timer {
-		public:
-			Timer(void)
-			{
-				memset(this, 0, sizeof(Timer));
-			};
-			~Timer(void) {};
-			void Tic()
-			{
-				clock_gettime(CLOCK_REALTIME, &m_start);
-			}
-			void Toc()
-			{
-				clock_gettime(CLOCK_REALTIME, &m_stop);
-			}
-			double GetElapsedTime() // in ms
-			{
-				return 1000.0 * (m_stop.tv_sec - m_start.tv_sec + (1.0E-9) * (m_stop.tv_nsec - m_start.tv_nsec));
-			}
-
-			private:
-			struct timespec m_start;
-			struct timespec m_stop;
-		};
-		#endif
 	}
 }
 #endif // VHACD_TIMER_H

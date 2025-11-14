@@ -149,7 +149,6 @@ namespace nd
 				if (GetCancel() || !params.m_pca) {
 					return;
 				}
-				m_timer.Tic();
 
 				m_stage = "Align mesh";
 				m_operation = "Voxelization";
@@ -186,10 +185,8 @@ namespace nd
 				m_overallProgress = 1.0;
 				Update(100.0, 100.0, params);
 
-				m_timer.Toc();
 				if (params.m_logger) {
 					msg.str("");
-					msg << "\t time " << m_timer.GetElapsedTime() / 1000.0 << "s" << std::endl;
 					params.m_logger->Log(msg.str().c_str());
 				}
 			}
@@ -206,7 +203,6 @@ namespace nd
 					return;
 				}
 
-				m_timer.Tic();
 				m_stage = "Voxelization";
 
 				std::ostringstream msg;
@@ -256,10 +252,8 @@ namespace nd
 				m_overallProgress = 10.0;
 				Update(100.0, 100.0, params);
 
-				m_timer.Toc();
 				if (params.m_logger) {
 					msg.str("");
-					msg << "\t time " << m_timer.GetElapsedTime() / 1000.0 << "s" << std::endl;
 					params.m_logger->Log(msg.str().c_str());
 				}
 			}
@@ -301,7 +295,6 @@ namespace nd
 			double m_rot[3][3];
 			double m_volumeCH0;
 			Vec3<double> m_barycenter;
-			Timer m_timer;
 			size_t m_dim;
 			Volume* m_volume;
 			PrimitiveSet* m_pset;
