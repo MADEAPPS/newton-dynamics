@@ -16,27 +16,10 @@
 #define ND_VHACD_DWEFINES_H
 
 
-#ifdef _WIN32
-	#ifndef WIN32_LEAN_AND_MEAN
-		#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
-	#endif
-	#include <windows.h>
-#elif __MACH__
-	#include <mach/clock.h>
-	#include <mach/mach.h>
-#else
-	#include <sys/time.h>
-	#include <time.h>
-	#include <unistd.h>
-#endif
-
 #include <math.h>
-#include <cstdint>
-#include <float.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <assert.h>
 #include <vector>
 #include <atomic>
 #include <thread>

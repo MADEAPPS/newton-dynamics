@@ -16,8 +16,6 @@
 #include "ndCoreStdafx.h"
 #include "ndCollisionStdafx.h"
 
-#include <iomanip>
-#include <limits>
 #include <set>
 #include "VHACD.h"
 #include "vhacdMesh.h"
