@@ -25,7 +25,6 @@ namespace nd
 	namespace VHACD 
 	{
 		const double ICHull::sc_eps = 1.0e-15;
-		//const int32_t ICHull::sc_dummyIndex = std::numeric_limits<int32_t>::max();
 		const int32_t ICHull::sc_dummyIndex = 0x7fffffff;
 		ICHull::ICHull()
 		{

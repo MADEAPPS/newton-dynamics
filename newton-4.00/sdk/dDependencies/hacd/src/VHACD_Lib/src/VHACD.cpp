@@ -16,7 +16,6 @@
 #include "ndCoreStdafx.h"
 #include "ndCollisionStdafx.h"
 
-#include <set>
 #include "VHACD.h"
 #include "vhacdMesh.h"
 #include "vhacdVHACD.h"
@@ -29,31 +28,9 @@
 
 namespace nd
 {
-	#define MAX(a, b) (((a) > (b)) ? (a) : (b))
-	#define MIN(a, b) (((a) < (b)) ? (a) : (b))
-	#define ABS(a) (((a) < 0) ? -(a) : (a))
-	#define ZSGN(a) (((a) < 0) ? -1 : (a) > 0 ? 1 : 0)
-	#define MAX_DOUBLE (1.79769e+308)
-
-	#define USE_CPP_11_THREADS
-
-	inline int32_t FindMinimumElement(const float* const d, float* const m, const int32_t begin, const int32_t end)
-	{
-		int32_t idx = -1;
-		float min = (std::numeric_limits<float>::max)();
-		for (size_t i = size_t(begin); i < size_t(end); ++i) {
-			if (d[i] < min) {
-				idx = int32_t(i);
-				min = d[i];
-			}
-		}
-
-		*m = min;
-		return idx;
-	}
-
 	namespace VHACD 
 	{
+		#define MAX_DOUBLE (1.79769e+30)
 		IVHACD* CreateVHACD(void)
 		{
 			return new VHACD();
@@ -163,37 +140,42 @@ namespace nd
 			Vec3<double> pt;
 			Plane plane;
 
-			if (bestPlane.m_axis == AXIS_X) {
-				const short i0 = MAX(minV[0], bestPlane.m_index - downsampling);
-				const short i1 = MIN(maxV[0], bestPlane.m_index + downsampling);
+			if (bestPlane.m_axis == AXIS_X) 
+			{
+				const short i0 = ndMax(short(minV[0]), short(bestPlane.m_index - downsampling));
+				const short i1 = ndMin(short(maxV[0]), short(bestPlane.m_index + downsampling));
 				plane.m_a = 1.0;
 				plane.m_b = 0.0;
 				plane.m_c = 0.0;
 				plane.m_axis = AXIS_X;
-				for (short i = i0; i <= i1; ++i) {
+				for (short i = i0; i <= i1; ++i) 
+				{
 					pt = vset.GetPoint(Vec3<double>(i + 0.5, 0.0, 0.0));
 					plane.m_d = -pt[0];
 					plane.m_index = i;
 					planes.PushBack(plane);
 				}
 			}
-			else if (bestPlane.m_axis == AXIS_Y) {
-				const short j0 = MAX(minV[1], bestPlane.m_index - downsampling);
-				const short j1 = MIN(maxV[1], bestPlane.m_index + downsampling);
+			else if (bestPlane.m_axis == AXIS_Y) 
+			{
+				const short j0 = ndMax(short(minV[1]), short(bestPlane.m_index - downsampling));
+				const short j1 = ndMin(short(maxV[1]), short(bestPlane.m_index + downsampling));
 				plane.m_a = 0.0;
 				plane.m_b = 1.0;
 				plane.m_c = 0.0;
 				plane.m_axis = AXIS_Y;
-				for (short j = j0; j <= j1; ++j) {
+				for (short j = j0; j <= j1; ++j) 
+				{
 					pt = vset.GetPoint(Vec3<double>(0.0, j + 0.5, 0.0));
 					plane.m_d = -pt[1];
 					plane.m_index = j;
 					planes.PushBack(plane);
 				}
 			}
-			else {
-				const short k0 = MAX(minV[2], bestPlane.m_index - downsampling);
-				const short k1 = MIN(maxV[2], bestPlane.m_index + downsampling);
+			else 
+			{
+				const short k0 = ndMax(short(minV[2]), short(bestPlane.m_index - downsampling));
+				const short k1 = ndMin(short(maxV[2]), short(bestPlane.m_index + downsampling));
 				plane.m_a = 0.0;
 				plane.m_b = 0.0;
 				plane.m_c = 1.0;
@@ -622,7 +604,7 @@ namespace nd
 				{
 				}
 
-				ConvexKey(int i0, int i1)
+				ConvexKey(ndInt32 i0, ndInt32 i1)
 					:m_p0(ndMin(i0, i1))
 					,m_p1(ndMax(i0, i1))
 				{
@@ -630,13 +612,20 @@ namespace nd
 
 				bool operator< (const ConvexKey& key) const
 				{
-					int key0 = (m_p1 << 16) + m_p0;
-					int key1 = (key.m_p1 << 16) + key.m_p0;
+					ndInt32  key0 = (m_p1 << 16) + m_p0;
+					ndInt32  key1 = (key.m_p1 << 16) + key.m_p0;
 					return key0 < key1;
 				}
 
-				int m_p0;
-				int m_p1;
+				bool operator> (const ConvexKey& key) const
+				{
+					ndInt32  key0 = (m_p1 << 16) + m_p0;
+					ndInt32  key1 = (key.m_p1 << 16) + key.m_p0;
+					return key0 > key1;
+				}
+
+				ndInt32 m_p0;
+				ndInt32 m_p1;
 			};
 
 			struct ConvexPair: public ConvexKey
@@ -653,7 +642,8 @@ namespace nd
 				float m_cost;
 			};
 		
-			std::set<ConvexKey> hullGraph;
+			//std::set<ConvexKey> hullGraph;
+			ndTree<ndInt32, ConvexKey> hullGraph;
 			std::vector<ConvexPair> convexPairArray;
 			std::vector<ConvexProxy> convexProxyArray;
 			ndUpHeap<ConvexKey, float> priority(int(8 * m_convexHulls.Size() * m_convexHulls.Size()));
@@ -661,7 +651,7 @@ namespace nd
 			class MergeConvexJob : public Job
 			{
 				public:
-					MergeConvexJob()
+				MergeConvexJob()
 					:Job()
 				{
 				}
@@ -713,10 +703,10 @@ namespace nd
 
 					if ((size[0] <= 0.0) && (size[1] <= 0.0) && (size[2] <= 0.0))
 					{
-						int i0 = int(i);
-						int j0 = int(j);
+						ndInt32 i0 = ndInt32(i);
+						ndInt32 j0 = ndInt32(j);
 						ConvexKey key(i0, j0);
-						hullGraph.insert(key);
+						hullGraph.Insert(0, key);
 						convexPairArray[pairsCount] = ConvexPair(i0, j0);
 						pairsCount++;
 					}
@@ -767,19 +757,19 @@ namespace nd
 				while (((nConvexHulls > params.m_maxConvexHulls) || (priority.Value() <= params.m_minMergeToleranace)) && priority.GetCount())
 				{
 					ConvexKey key(priority[0]);
-					std::set<ConvexKey>::iterator it = hullGraph.find(key);
-					if (it != hullGraph.end())
+					ndTree<ndInt32, ConvexKey>::ndNode* const it = hullGraph.Find(key);
+					if (it)
 					{
-						hullGraph.erase(it);
+						hullGraph.Remove(it);
 						for (size_t i = 0; i < convexProxyArray.size(); i++)
 						{
 							if (convexProxyArray[i].m_hull)
 							{
 								ConvexKey key0(key.m_p0, int(i));
-								hullGraph.erase(key0);
+								hullGraph.Remove(key0);
 
 								ConvexKey key1(key.m_p1, int(i));
-								hullGraph.erase(key1);
+								hullGraph.Remove(key1);
 							}
 						}
 

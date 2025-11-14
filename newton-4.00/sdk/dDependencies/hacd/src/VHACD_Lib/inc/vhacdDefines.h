@@ -16,9 +16,6 @@
 #define ND_VHACD_DWEFINES_H
 
 
-#include <math.h>
-#include <stdio.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <vector>
 #include <atomic>
