@@ -103,8 +103,6 @@ namespace nd
 				m_overallProgress = 0.0;
 				m_stageProgress = 0.0;
 				m_operationProgress = 0.0;
-				m_stage = "";
-				m_operation = "";
 				m_barycenter[0] = m_barycenter[1] = m_barycenter[2] = 0.0;
 				m_rot[0][0] = m_rot[1][1] = m_rot[2][2] = 1.0;
 				SetCancel(false);
@@ -140,9 +138,6 @@ namespace nd
 					return;
 				}
 
-				m_stage = "Align mesh";
-				m_operation = "Voxelization";
-
 				if (GetCancel()) {
 					return;
 				}
@@ -156,7 +151,7 @@ namespace nd
 				if (GetCancel()) {
 					return;
 				}
-				m_operation = "PCA";
+
 				volume.AlignToPrincipalAxes(m_rot);
 				m_overallProgress = 1.0;
 			}
@@ -173,10 +168,8 @@ namespace nd
 					return;
 				}
 
-				m_stage = "Voxelization";
-
 				delete m_volume;
-				m_volume = 0;
+				m_volume = nullptr;
 				int32_t iteration = 0;
 				const int32_t maxIteration = 5;
 				double progress = 0.0;
@@ -234,8 +227,6 @@ namespace nd
 		private:
 			RaycastMesh* m_raycastMesh;
 			SArray<Mesh*> m_convexHulls;
-			std::string m_stage;
-			std::string m_operation;
 			double m_overallProgress;
 			double m_stageProgress;
 			double m_operationProgress;

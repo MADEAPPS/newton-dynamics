@@ -16,11 +16,9 @@
 #include "ndCoreStdafx.h"
 #include "ndCollisionStdafx.h"
 
-#include <fstream>
 #include <iomanip>
 #include <limits>
 #include <set>
-#include <sstream>
 #include "VHACD.h"
 #include "vhacdMesh.h"
 #include "vhacdVHACD.h"
@@ -68,9 +66,6 @@ namespace nd
 			if (GetCancel()) {
 				return;
 			}
-
-			m_stage = "Compute primitive set";
-			m_operation = "Convert volume to pset";
 
 			VoxelSet* vset = new VoxelSet;
 			m_volume->Convert(*vset);
@@ -415,10 +410,6 @@ namespace nd
 				return;
 			}
 
-			m_stage = "Approximate Convex Decomposition";
-			m_stageProgress = 0.0;
-			std::ostringstream msg;
-
 			SArray<PrimitiveSet*> parts;
 			SArray<PrimitiveSet*> inputParts;
 			SArray<PrimitiveSet*> temp;
@@ -452,12 +443,8 @@ namespace nd
 			// from that.
 			depth++;
 
-
-			while (sub++ < depth && inputParts.Size() > 0 && !m_cancel) {
-				msg.str("");
-				msg << "Subdivision level " << sub;
-				m_operation = msg.str();
-
+			while (sub++ < depth && inputParts.Size() > 0 && !m_cancel) 
+			{
 				double maxConcavity = 0.0;
 				const size_t nInputParts = inputParts.Size();
 
@@ -588,11 +575,7 @@ namespace nd
 
 			m_overallProgress = 90.0;
 
-			msg.str("");
-			msg << "Generate convex-hulls";
-			m_operation = msg.str();
 			size_t nConvexHulls = parts.Size();
-
 
 			m_convexHulls.Resize(0);
 			for (size_t p = 0; p < nConvexHulls && !m_cancel; ++p) 
@@ -670,8 +653,6 @@ namespace nd
 			{
 				return;
 			}
-
-			m_stage = "Merge Convex Hulls";
 
 			struct ConvexProxy
 			{
@@ -1007,9 +988,6 @@ namespace nd
 			if (m_cancel || params.m_maxNumVerticesPerCH < 4) {
 				return;
 			}
-			m_stage = "Simplify convex-hulls";
-			m_operation = "Simplify convex-hulls";
-
 			const size_t nConvexHulls = m_convexHulls.Size();
 
 			for (size_t i = 0; i < nConvexHulls && !m_cancel; ++i) {
