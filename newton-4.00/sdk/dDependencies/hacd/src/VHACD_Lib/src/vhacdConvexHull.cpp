@@ -180,16 +180,16 @@ namespace nd
 		{
 			ConvexHullAABBTreeNode* tree = nullptr;
 		
-			_ASSERT(count);
+			ndAssert(count);
 			ndBigVector minP(double(1.0e15f));
 			ndBigVector maxP(-double(1.0e15f));
 			if (count <= VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE)
 			{
 				ConvexHull3dPointCluster* const clump = new (&m_treeBuffer[memoryIndex]) ConvexHull3dPointCluster();
 				memoryIndex++;
-				_ASSERT(memoryIndex <= int (m_treeBuffer.size()));
+				ndAssert(memoryIndex <= int (m_treeBuffer.GetCount()));
 		
-				_ASSERT(clump);
+				ndAssert(clump);
 				clump->m_count = count;
 				for (int i = 0; i < count; ++i)
 				{
@@ -273,16 +273,16 @@ namespace nd
 		
 				tree = new (&m_treeBuffer[memoryIndex]) ConvexHullAABBTreeNode();
 				memoryIndex++;
-				_ASSERT(memoryIndex <= m_treeBuffer.size());
+				ndAssert(memoryIndex <= m_treeBuffer.GetCount());
 		
-				_ASSERT(i0);
-				_ASSERT(count - i0);
+				ndAssert(i0);
+				ndAssert(count - i0);
 		
 				tree->m_left = BuildRecurse(tree, points, i0, baseIndex, memoryIndex);
 				tree->m_right = BuildRecurse(tree, &points[i0], count - i0, i0 + baseIndex, memoryIndex);
 			}
 		
-			_ASSERT(tree);
+			ndAssert(tree);
 			tree->m_parent = parent;
 			tree->m_box[0] = minP - ndBigVector(double(1.0e-3f));
 			tree->m_box[1] = maxP + ndBigVector(double(1.0e-3f));
@@ -324,9 +324,9 @@ namespace nd
 			{
 				if (level) 
 				{
-					_ASSERT(fabs(p0.DotProduct(p0).GetScalar() - double(1.0f)) < double(1.0e-4f));
-					_ASSERT(fabs(p1.DotProduct(p1).GetScalar() - double(1.0f)) < double(1.0e-4f));
-					_ASSERT(fabs(p2.DotProduct(p2).GetScalar() - double(1.0f)) < double(1.0e-4f));
+					ndAssert(fabs(p0.DotProduct(p0).GetScalar() - double(1.0f)) < double(1.0e-4f));
+					ndAssert(fabs(p1.DotProduct(p1).GetScalar() - double(1.0f)) < double(1.0e-4f));
+					ndAssert(fabs(p2.DotProduct(p2).GetScalar() - double(1.0f)) < double(1.0e-4f));
 					ndBigVector p01(p0 + p1);
 					ndBigVector p12(p1 + p2);
 					ndBigVector p20(p2 + p0);
@@ -335,9 +335,9 @@ namespace nd
 					p12 = p12.Scale(1.0 / sqrt(p12.DotProduct(p12).GetScalar()));
 					p20 = p20.Scale(1.0 / sqrt(p20.DotProduct(p20).GetScalar()));
 
-					_ASSERT(fabs(p01.DotProduct(p01).GetScalar() - double(1.0f)) < double(1.0e-4f));
-					_ASSERT(fabs(p12.DotProduct(p12).GetScalar() - double(1.0f)) < double(1.0e-4f));
-					_ASSERT(fabs(p20.DotProduct(p20).GetScalar() - double(1.0f)) < double(1.0e-4f));
+					ndAssert(fabs(p01.DotProduct(p01).GetScalar() - double(1.0f)) < double(1.0e-4f));
+					ndAssert(fabs(p12.DotProduct(p12).GetScalar() - double(1.0f)) < double(1.0e-4f));
+					ndAssert(fabs(p20.DotProduct(p20).GetScalar() - double(1.0f)) < double(1.0e-4f));
 
 					TessellateTriangle(level - 1, p0, p01, p20, count);
 					TessellateTriangle(level - 1, p1, p12, p01, count);
@@ -352,7 +352,7 @@ namespace nd
 					int index = dBitReversal(count, sizeof(m_normal) / sizeof(m_normal[0]));
 					m_normal[index] = n;
 					count++;
-					_ASSERT(count <= int(sizeof(m_normal) / sizeof(m_normal[0])));
+					ndAssert(count <= int(sizeof(m_normal) / sizeof(m_normal[0])));
 				}
 			}
 
@@ -381,9 +381,9 @@ namespace nd
 		{
 			m_points.SetCount(0);
 			#ifdef _DEBUG
-			for (size_t i = 0; i < int (accelerator.size()); i++)
+			for (ndInt32 i = 0; i < ndInt32 (accelerator.GetCount()); i++)
 			{
-				_ASSERT(accelerator[i].m_mark == 0);
+				ndAssert (accelerator[i].m_mark == 0);
 			}
 			#endif
 			BuildHull(accelerator, distTol, maxVertexCount);
@@ -459,15 +459,15 @@ namespace nd
 						for (int i = 0; i < cluster->m_count; ++i)
 						{
 							const ConvexHullVertex& p = points[cluster->m_indices[i]];
-							_ASSERT(p.m_x >= cluster->m_box[0].m_x);
-							_ASSERT(p.m_x <= cluster->m_box[1].m_x);
-							_ASSERT(p.m_y >= cluster->m_box[0].m_y);
-							_ASSERT(p.m_y <= cluster->m_box[1].m_y);
-							_ASSERT(p.m_z >= cluster->m_box[0].m_z);
-							_ASSERT(p.m_z <= cluster->m_box[1].m_z);
+							ndAssert(p.m_x >= cluster->m_box[0].m_x);
+							ndAssert(p.m_x <= cluster->m_box[1].m_x);
+							ndAssert(p.m_y >= cluster->m_box[0].m_y);
+							ndAssert(p.m_y <= cluster->m_box[1].m_y);
+							ndAssert(p.m_z >= cluster->m_box[0].m_z);
+							ndAssert(p.m_z <= cluster->m_box[1].m_z);
 							if (!p.m_mark)
 							{
-								//_ASSERT(p.m_w == double(0.0f));
+								//ndAssert(p.m_w == double(0.0f));
 								double dist = p.DotProduct(dir).GetScalar();
 								if (dist > maxProj)
 								{
@@ -489,7 +489,7 @@ namespace nd
 							if (parent)
 							{
 								ConvexHullAABBTreeNode* const sibling = (parent->m_left != cluster) ? parent->m_left : parent->m_right;
-								_ASSERT(sibling != cluster);
+								ndAssert(sibling != cluster);
 								ConvexHullAABBTreeNode* const grandParent = parent->m_parent;
 								if (grandParent)
 								{
@@ -514,7 +514,7 @@ namespace nd
 				}
 			}
 
-			_ASSERT(index != -1);
+			ndAssert(index != -1);
 			return index;
 		}
 
@@ -655,7 +655,7 @@ namespace nd
 				{
 					ndSwap(m_points[2], m_points[3]);
 				}
-				_ASSERT(TetrahedrumVolume(m_points[0], m_points[1], m_points[2], m_points[3]) < double(0.0f));
+				ndAssert(TetrahedrumVolume(m_points[0], m_points[1], m_points[2], m_points[3]) < double(0.0f));
 			}
 			return tree;
 		}
@@ -774,24 +774,24 @@ namespace nd
 							#ifdef _DEBUG
 							for (int i = 0; i < deletedCount; ++i)
 							{
-								_ASSERT(deleteList[i] != node1);
+								ndAssert(deleteList[i] != node1);
 							}
 							#endif
 			
 							deleteList[deletedCount] = node1;
 							deletedCount++;
-							_ASSERT(deletedCount < int(deleteListPool.size()));
+							ndAssert(deletedCount < int(deleteListPool.GetCount()));
 							face1->m_mark = 1;
 							for (int i = 0; i < 3; ++i)
 							{
 								ndNode* const twinNode = face1->m_twin[i];
-								_ASSERT(twinNode);
+								ndAssert(twinNode);
 								ndConvexHull3dFace* const twinFace = &twinNode->GetInfo();
 								if (!twinFace->m_mark)
 								{
 									stack[stackIndex] = twinNode;
 									stackIndex++;
-									_ASSERT(stackIndex < int(stackPool.size()));
+									ndAssert(stackIndex < int(stackPool.GetCount()));
 								}
 							}
 						}
@@ -805,7 +805,7 @@ namespace nd
 					{
 						ndNode* const node1 = deleteList[i];
 						ndConvexHull3dFace* const face1 = &node1->GetInfo();
-						_ASSERT(face1->m_mark == 1);
+						ndAssert(face1->m_mark == 1);
 						for (int j0 = 0; j0 < 3; j0++)
 						{
 							ndNode* const twinNode = face1->m_twin[j0];
@@ -827,7 +827,7 @@ namespace nd
 								}
 								coneList[newCount] = newNode;
 								newCount++;
-								_ASSERT(newCount < int(coneListPool.size()));
+								ndAssert(newCount < int(coneListPool.GetCount()));
 							}
 						}
 					}
@@ -836,12 +836,12 @@ namespace nd
 					{
 						ndNode* const nodeA = coneList[i];
 						ndConvexHull3dFace* const faceA = &nodeA->GetInfo();
-						_ASSERT(faceA->m_mark == 0);
+						ndAssert(faceA->m_mark == 0);
 						for (int j = i + 1; j < newCount; ++j) 
 						{
 							ndNode* const nodeB = coneList[j];
 							ndConvexHull3dFace* const faceB = &nodeB->GetInfo();
-							_ASSERT(faceB->m_mark == 0);
+							ndAssert(faceB->m_mark == 0);
 							if (faceA->m_index[2] == faceB->m_index[1])
 							{
 								faceA->m_twin[2] = nodeB;
@@ -854,7 +854,7 @@ namespace nd
 						{
 							ndNode* const nodeB = coneList[j];
 							ndConvexHull3dFace* const faceB = &nodeB->GetInfo();
-							_ASSERT(faceB->m_mark == 0);
+							ndAssert(faceB->m_mark == 0);
 							if (faceA->m_index[1] == faceB->m_index[2])
 							{
 								faceA->m_twin[0] = nodeB;

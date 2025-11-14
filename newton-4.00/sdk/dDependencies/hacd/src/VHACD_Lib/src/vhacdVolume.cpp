@@ -31,7 +31,6 @@
 #include "ndCoreStdafx.h"
 #include "ndCollisionStdafx.h"
 #include "vhacdVolume.h"
-#include <queue>
 #include "vhacdConvexHull.h"
 
 namespace nd
@@ -849,8 +848,8 @@ namespace nd
 				{ 0, -1, 0 },
 				{ 0, 0, -1 } };
 
-			std::queue<Triangle> fifo;
 			Triangle current;
+			ndList<Triangle> fifo;
 
 			for (size_t i = i0; i < i1; ++i) 
 			{
@@ -864,13 +863,14 @@ namespace nd
 							current[1] = (short)j;
 							current[2] = (short)k;
 
-							fifo.push(current);
+							fifo.Append(current);
 							GetVoxel(size_t(current[0]), size_t(current[1]), size_t(current[2])) = PRIMITIVE_OUTSIDE_SURFACE;
 							++m_numVoxelsOutsideSurface;
-							while (fifo.size() > 0) 
+							while (fifo.GetCount() > 0)
 							{
-								current = fifo.front();
-								fifo.pop();
+								ndList<Triangle>::ndNode* const node = fifo.GetFirst();
+								current = node->GetInfo();
+								fifo.Remove(node);
 								for (int32_t h = 0; h < 6; ++h) 
 								{
 									short a = short(current[0] + neighbours[h][0]);
@@ -885,7 +885,7 @@ namespace nd
 									{
 										v = PRIMITIVE_OUTSIDE_SURFACE;
 										++m_numVoxelsOutsideSurface;
-										fifo.push(Triangle(a, b, c));
+										fifo.Append(Triangle(a, b, c));
 									}
 								}
 							}
