@@ -16,7 +16,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 #define ND_VHACD_VHACD_H
 
 #include "vhacdVolume.h"
-#include "vhacdRaycastMesh.h"
 #include "vhacdConvexHullUtils.h"
 
 namespace nd
@@ -72,7 +71,6 @@ namespace nd
 			private:
 			void Init()
 			{
-				m_raycastMesh = nullptr;
 				memset(m_rot, 0, sizeof(double) * 9);
 				m_dim = 64;
 				m_volume = 0;
@@ -153,7 +151,6 @@ namespace nd
 					}
 				}
 			}
-
 			
 			bool ComputeACD(const ndReal* const points,
 				const uint32_t nPoints,
@@ -171,7 +168,6 @@ namespace nd
 			}
 
 		private:
-			RaycastMesh* m_raycastMesh;
 			SArray<Mesh*> m_convexHulls;
 			double m_rot[3][3];
 			double m_volumeCH0;

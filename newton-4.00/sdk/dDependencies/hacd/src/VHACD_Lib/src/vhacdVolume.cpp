@@ -30,7 +30,6 @@
 
 #include "ndCoreStdafx.h"
 #include "ndCollisionStdafx.h"
-
 #include "vhacdVolume.h"
 #include <queue>
 #include "vhacdConvexHull.h"
