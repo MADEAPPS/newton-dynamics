@@ -84,12 +84,6 @@ namespace nd
 					= 0;
 			};
 
-			class IUserLogger {
-				public:
-				virtual ~IUserLogger() {}
-				virtual void Log(const char* const msg) = 0;
-			};
-
 			class ConvexHull {
 				public:
 				double* m_points;
@@ -115,7 +109,6 @@ namespace nd
 					m_maxNumVerticesPerCH = 64;
 					m_minVolumePerCH = 0.0001;
 					m_callback = 0;
-					m_logger = 0;
 					m_convexhullApproximation = true;
 					//m_maxConvexHulls = 1024;
 					m_maxConvexHulls = 128;
@@ -130,7 +123,6 @@ namespace nd
 				double m_minVolumePerCH;
 				double m_minMergeToleranace;
 				IUserCallback* m_callback;
-				IUserLogger* m_logger;
 				uint32_t m_resolution;
 				uint32_t m_maxNumVerticesPerCH;
 				uint32_t m_planeDownsampling;

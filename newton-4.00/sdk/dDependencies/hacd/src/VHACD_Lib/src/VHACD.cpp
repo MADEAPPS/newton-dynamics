@@ -72,12 +72,6 @@ namespace nd
 			m_stage = "Compute primitive set";
 			m_operation = "Convert volume to pset";
 
-			std::ostringstream msg;
-			if (params.m_logger) {
-				msg << "+ " << m_stage << std::endl;
-				params.m_logger->Log(msg.str().c_str());
-			}
-
 			Update(0.0, 0.0, params);
 			VoxelSet* vset = new VoxelSet;
 			m_volume->Convert(*vset);
@@ -86,20 +80,8 @@ namespace nd
 			delete m_volume;
 			m_volume = 0;
 
-			if (params.m_logger) {
-				msg.str("");
-				msg << "\t # primitives               " << m_pset->GetNPrimitives() << std::endl;
-				msg << "\t # inside surface           " << m_pset->GetNPrimitivesInsideSurf() << std::endl;
-				msg << "\t # on surface               " << m_pset->GetNPrimitivesOnSurf() << std::endl;
-				params.m_logger->Log(msg.str().c_str());
-			}
-
 			m_overallProgress = 15.0;
 			Update(100.0, 100.0, params);
-			if (params.m_logger) {
-				msg.str("");
-				params.m_logger->Log(msg.str().c_str());
-			}
 		}
 		bool VHACD::Compute(const double* const points, const uint32_t nPoints,
 			const uint32_t* const triangles,const uint32_t nTriangles, const Parameters& params)
@@ -258,7 +240,7 @@ namespace nd
 			{
 				return;
 			}
-			char msg[256];
+
 			int32_t iBest = -1;
 			int32_t nPlanes = static_cast<int32_t>(planes.Size());
 			double minTotal = MAX_DOUBLE;
@@ -427,11 +409,6 @@ namespace nd
 				delete[] psets;
 			}
 			delete onSurfacePSet;
-			if (params.m_logger) 
-			{
-				snprintf(msg, sizeof (msg), "\n\t\t\t Best  %04i T=%2.6f C=%2.6f B=%2.6f S=%2.6f (%1.1f, %1.1f, %1.1f, %3.3f)\n\n", int (iBest), minTotal, minConcavity, minBalance, minSymmetry, bestPlane.m_a, bestPlane.m_b, bestPlane.m_c, bestPlane.m_d);
-				params.m_logger->Log(msg);
-			}
 		}
 
 		void VHACD::ComputeACD(const Parameters& params)
@@ -443,10 +420,6 @@ namespace nd
 			m_stage = "Approximate Convex Decomposition";
 			m_stageProgress = 0.0;
 			std::ostringstream msg;
-			if (params.m_logger) {
-				msg << "+ " << m_stage << std::endl;
-				params.m_logger->Log(msg.str().c_str());
-			}
 
 			SArray<PrimitiveSet*> parts;
 			SArray<PrimitiveSet*> inputParts;
@@ -487,12 +460,6 @@ namespace nd
 				msg << "Subdivision level " << sub;
 				m_operation = msg.str();
 
-				if (params.m_logger) {
-					msg.str("");
-					msg << "\t Subdivision level " << sub << std::endl;
-					params.m_logger->Log(msg.str().c_str());
-				}
-
 				double maxConcavity = 0.0;
 				const size_t nInputParts = inputParts.Size();
 				Update(m_stageProgress, 0.0, params);
@@ -526,17 +493,6 @@ namespace nd
 					if (firstIteration) {
 						firstIteration = false;
 					}
-
-					if (params.m_logger) {
-						msg.str("");
-						msg << "\t -> Part[" << p
-							<< "] C  = " << concavity
-							<< ", E  = " << error
-							<< ", VS = " << pset->GetNPrimitivesOnSurf()
-							<< ", VI = " << pset->GetNPrimitivesInsideSurf()
-							<< std::endl;
-						params.m_logger->Log(msg.str().c_str());
-					}
 			
 					if (concavity > params.m_concavity && concavity > error) {
 						Vec3<double> preferredCuttingDirection;
@@ -544,12 +500,6 @@ namespace nd
 						planes.Resize(0);
 
 						ComputeAxesAlignedClippingPlanes(*((VoxelSet*)pset), short(params.m_planeDownsampling), planes);
-
-						if (params.m_logger) {
-							msg.str("");
-							msg << "\t\t [Regular sampling] Number of clipping planes " << planes.Size() << std::endl;
-							params.m_logger->Log(msg.str().c_str());
-						}
 
 						Plane bestPlane;
 						double minConcavity = MAX_DOUBLE;
@@ -572,11 +522,6 @@ namespace nd
 							//VoxelSet* vset = (VoxelSet*)pset;
 							RefineAxesAlignedClippingPlanes(*((VoxelSet*)pset), bestPlane, short(params.m_planeDownsampling), planesRef);
 
-							if (params.m_logger) {
-								msg.str("");
-								msg << "\t\t [Refining] Number of clipping planes " << planesRef.Size() << std::endl;
-								params.m_logger->Log(msg.str().c_str());
-							}
 							ComputeBestClippingPlane(pset,
 								volume,
 								planesRef,
@@ -652,11 +597,6 @@ namespace nd
 			msg << "Generate convex-hulls";
 			m_operation = msg.str();
 			size_t nConvexHulls = parts.Size();
-			if (params.m_logger) {
-				msg.str("");
-				msg << "+ Generate " << nConvexHulls << " convex-hulls " << std::endl;
-				params.m_logger->Log(msg.str().c_str());
-			}
 
 			Update(m_stageProgress, 0.0, params);
 			m_convexHulls.Resize(0);
@@ -694,10 +634,6 @@ namespace nd
 
 			m_overallProgress = 95.0;
 			Update(100.0, 100.0, params);
-			if (params.m_logger) {
-				msg.str("");
-				params.m_logger->Log(msg.str().c_str());
-			}
 		}
 		void AddPoints(const Mesh* const mesh, SArray<Vec3<double> >& pts)
 		{
@@ -742,12 +678,6 @@ namespace nd
 			}
 
 			m_stage = "Merge Convex Hulls";
-
-			std::ostringstream msg;
-			if (params.m_logger) {
-				msg << "+ " << m_stage << std::endl;
-				params.m_logger->Log(msg.str().c_str());
-			}
 
 			struct ConvexProxy
 			{
@@ -986,11 +916,6 @@ namespace nd
 
 			m_overallProgress = 99.0;
 			Update(100.0, 100.0, params);
-
-			if (params.m_logger) {
-				msg.str("");
-				params.m_logger->Log(msg.str().c_str());
-			}
 		}
 
 		void VHACD::SimplifyConvexHull(Mesh* const ch, const size_t nvertices, const double minVolume)
@@ -1092,30 +1017,15 @@ namespace nd
 			m_stage = "Simplify convex-hulls";
 			m_operation = "Simplify convex-hulls";
 
-			std::ostringstream msg;
 			const size_t nConvexHulls = m_convexHulls.Size();
-			if (params.m_logger) {
-				msg << "+ Simplify " << nConvexHulls << " convex-hulls " << std::endl;
-				params.m_logger->Log(msg.str().c_str());
-			}
 
 			Update(0.0, 0.0, params);
 			for (size_t i = 0; i < nConvexHulls && !m_cancel; ++i) {
-				if (params.m_logger) {
-					msg.str("");
-					msg << "\t\t Simplify CH[" << std::setfill('0') << std::setw(5) << i << "] " << m_convexHulls[i]->GetNPoints() << " V, " << m_convexHulls[i]->GetNTriangles() << " T" << std::endl;
-					params.m_logger->Log(msg.str().c_str());
-				}
 				SimplifyConvexHull(m_convexHulls[i], params.m_maxNumVerticesPerCH, m_volumeCH0 * params.m_minVolumePerCH);
 			}
 
 			m_overallProgress = 100.0;
 			Update(100.0, 100.0, params);
-			if (params.m_logger) {
-				msg.str("");
-
-				params.m_logger->Log(msg.str().c_str());
-			}
 		}
 	} // end of VHACD namespace
 }

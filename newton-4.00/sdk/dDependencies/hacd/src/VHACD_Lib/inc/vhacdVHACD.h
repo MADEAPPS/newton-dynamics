@@ -156,12 +156,6 @@ namespace nd
 				m_stage = "Align mesh";
 				m_operation = "Voxelization";
 
-				std::ostringstream msg;
-				if (params.m_logger) {
-					msg << "+ " << m_stage << std::endl;
-					params.m_logger->Log(msg.str().c_str());
-				}
-
 				Update(0.0, 0.0, params);
 				if (GetCancel()) {
 					return;
@@ -171,14 +165,9 @@ namespace nd
 				volume.Voxelize(points, stridePoints, nPoints,
 					triangles, strideTriangles, nTriangles,
 					m_dim, m_barycenter, m_rot);
-				size_t n = volume.GetNPrimitivesOnSurf() + volume.GetNPrimitivesInsideSurf();
+				//size_t n = volume.GetNPrimitivesOnSurf() + volume.GetNPrimitivesInsideSurf();
 				Update(50.0, 100.0, params);
 
-				if (params.m_logger) {
-					msg.str("");
-					msg << "\t dim = " << m_dim << "\t-> " << n << " voxels" << std::endl;
-					params.m_logger->Log(msg.str().c_str());
-				}
 				if (GetCancel()) {
 					return;
 				}
@@ -187,11 +176,6 @@ namespace nd
 				volume.AlignToPrincipalAxes(m_rot);
 				m_overallProgress = 1.0;
 				Update(100.0, 100.0, params);
-
-				if (params.m_logger) {
-					msg.str("");
-					params.m_logger->Log(msg.str().c_str());
-				}
 			}
 			template <class T>
 			void VoxelizeMesh(const T* const points,
@@ -208,22 +192,13 @@ namespace nd
 
 				m_stage = "Voxelization";
 
-				std::ostringstream msg;
-				if (params.m_logger) {
-					msg << "+ " << m_stage << std::endl;
-					params.m_logger->Log(msg.str().c_str());
-				}
-
 				delete m_volume;
 				m_volume = 0;
 				int32_t iteration = 0;
 				const int32_t maxIteration = 5;
 				double progress = 0.0;
-				while (iteration++ < maxIteration && !m_cancel) {
-					msg.str("");
-					msg << "Iteration " << iteration;
-					m_operation = msg.str();
-
+				while (iteration++ < maxIteration && !m_cancel) 
+				{
 					progress = iteration * 100.0 / maxIteration;
 					Update(progress, 0.0, params);
 
@@ -235,11 +210,6 @@ namespace nd
 					Update(progress, 100.0, params);
 
 					size_t n = m_volume->GetNPrimitivesOnSurf() + m_volume->GetNPrimitivesInsideSurf();
-					if (params.m_logger) {
-						msg.str("");
-						msg << "\t dim = " << m_dim << "\t-> " << n << " voxels" << std::endl;
-						params.m_logger->Log(msg.str().c_str());
-					}
 
 					double a = pow(double(params.m_resolution) / double(n), 0.33);
 					size_t dim_next = (size_t)(double(m_dim) * a + 0.5);
@@ -254,11 +224,6 @@ namespace nd
 				}
 				m_overallProgress = 10.0;
 				Update(100.0, 100.0, params);
-
-				if (params.m_logger) {
-					msg.str("");
-					params.m_logger->Log(msg.str().c_str());
-				}
 			}
 			template <class T>
 			bool ComputeACD(const T* const points,
