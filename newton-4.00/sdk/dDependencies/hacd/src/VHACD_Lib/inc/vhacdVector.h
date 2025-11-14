@@ -173,51 +173,51 @@ namespace nd
 		
 		inline void Vec3::operator= (const Vec3& rhs)
 		{
-			this->m_data[0] = rhs.m_data[0];
-			this->m_data[1] = rhs.m_data[1];
-			this->m_data[2] = rhs.m_data[2];
+			m_data[0] = rhs.m_data[0];
+			m_data[1] = rhs.m_data[1];
+			m_data[2] = rhs.m_data[2];
 		}
 		
 		inline void Vec3::operator+=(const Vec3& rhs)
 		{
-			this->m_data[0] += rhs.m_data[0];
-			this->m_data[1] += rhs.m_data[1];
-			this->m_data[2] += rhs.m_data[2];
+			m_data[0] += rhs.m_data[0];
+			m_data[1] += rhs.m_data[1];
+			m_data[2] += rhs.m_data[2];
 		}
 		
 		inline void Vec3::operator-=(const Vec3& rhs)
 		{
-			this->m_data[0] -= rhs.m_data[0];
-			this->m_data[1] -= rhs.m_data[1];
-			this->m_data[2] -= rhs.m_data[2];
+			m_data[0] -= rhs.m_data[0];
+			m_data[1] -= rhs.m_data[1];
+			m_data[2] -= rhs.m_data[2];
 		}
 		
 		inline void Vec3::operator-=(double a)
 		{
-			this->m_data[0] -= a;
-			this->m_data[1] -= a;
-			this->m_data[2] -= a;
+			m_data[0] -= a;
+			m_data[1] -= a;
+			m_data[2] -= a;
 		}
 		
 		inline void Vec3::operator+=(double a)
 		{
-			this->m_data[0] += a;
-			this->m_data[1] += a;
-			this->m_data[2] += a;
+			m_data[0] += a;
+			m_data[1] += a;
+			m_data[2] += a;
 		}
 		
 		inline void Vec3::operator/=(double a)
 		{
-			this->m_data[0] /= a;
-			this->m_data[1] /= a;
-			this->m_data[2] /= a;
+			m_data[0] /= a;
+			m_data[1] /= a;
+			m_data[2] /= a;
 		}
 		
 		inline void Vec3::operator*=(double a)
 		{
-			this->m_data[0] *= a;
-			this->m_data[1] *= a;
-			this->m_data[2] *= a;
+			m_data[0] *= a;
+			m_data[1] *= a;
+			m_data[2] *= a;
 		}
 		
 		inline Vec3 Vec3::operator^ (const Vec3& rhs) const
@@ -249,7 +249,7 @@ namespace nd
 		
 		inline Vec3 Vec3::operator*(double rhs) const
 		{
-			return Vec3(rhs * this->m_data[0], rhs * this->m_data[1], rhs * this->m_data[2]);
+			return Vec3(rhs * m_data[0], rhs * m_data[1], rhs * m_data[2]);
 		}
 		
 		inline Vec3 Vec3::operator/ (double rhs) const
@@ -506,33 +506,33 @@ namespace nd
 
 		inline void Vec3::operator+=(const Vec3& rhs)
 		{
-			//this->m_data[0] += rhs.m_data[0];
-			//this->m_data[1] += rhs.m_data[1];
-			//this->m_data[2] += rhs.m_data[2];
+			//m_data[0] += rhs.m_data[0];
+			//m_data[1] += rhs.m_data[1];
+			//m_data[2] += rhs.m_data[2];
 			ndBigVector::operator+=(rhs);
 		}
 
 		inline void Vec3::operator-=(const Vec3& rhs)
 		{
-			//this->m_data[0] -= rhs.m_data[0];
-			//this->m_data[1] -= rhs.m_data[1];
-			//this->m_data[2] -= rhs.m_data[2];
+			//m_data[0] -= rhs.m_data[0];
+			//m_data[1] -= rhs.m_data[1];
+			//m_data[2] -= rhs.m_data[2];
 			ndBigVector::operator-=(rhs);
 		}
 
 		inline void Vec3::operator-=(double a)
 		{
-			//this->m_data[0] -= a;
-			//this->m_data[1] -= a;
-			//this->m_data[2] -= a;
+			//m_data[0] -= a;
+			//m_data[1] -= a;
+			//m_data[2] -= a;
 			ndBigVector::operator-=(Vec3(a));
 		}
 
 		inline void Vec3::operator+=(double a)
 		{
-			//this->m_data[0] += a;
-			//this->m_data[1] += a;
-			//this->m_data[2] += a;
+			//m_data[0] += a;
+			//m_data[1] += a;
+			//m_data[2] += a;
 			ndBigVector::operator+=(Vec3(a));
 		}
 
@@ -583,7 +583,7 @@ namespace nd
 		inline Vec3 Vec3::operator*(double rhs) const
 		{
 			ndAssert(0);
-			//return Vec3(rhs * this->m_data[0], rhs * this->m_data[1], rhs * this->m_data[2]);
+			//return Vec3(rhs * m_data[0], rhs * m_data[1], rhs * m_data[2]);
 			return *this * Vec3(rhs);
 		}
 
