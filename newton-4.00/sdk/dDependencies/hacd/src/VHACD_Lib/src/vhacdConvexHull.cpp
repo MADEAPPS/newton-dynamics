@@ -713,15 +713,13 @@ namespace nd
 			size_t currentIndex = 4;
 
 			ndArray<ndNode*> stackPool;
-			ndArray<ndNode*> coneListPool;
 			
-
 			stackPool.SetCount(1024 + count);
-			coneListPool.SetCount(1024 + count);
 			ndNode** const stack = &stackPool[0];
-			ndNode** const coneList = &stackPool[0];
+			//ndNode** const coneList = &stackPool[0];
 			
 			ndFixSizeArray<ndNode*, 1024 * 4> deleteList;
+			ndFixSizeArray<ndNode*, 1024 * 4> coneList;
 
 			while (boundaryFaces.GetCount() && count && (maxVertexCount > 0))
 			{
@@ -797,7 +795,8 @@ namespace nd
 					m_points[ndInt32(currentIndex)] = points[index];
 					points[index].m_mark = 1;
 			
-					int newCount = 0;
+					//int newCount = 0;
+					coneList.SetCount(0);
 					for (ndInt32 i = 0; i < deleteList.GetCount(); ++i)
 					{
 						ndNode* const node1 = deleteList[i];
@@ -822,19 +821,18 @@ namespace nd
 										twinFace->m_twin[k] = newNode;
 									}
 								}
-								coneList[newCount] = newNode;
-								newCount++;
-								ndAssert(newCount < int(coneListPool.GetCount()));
+								coneList.PushBack(newNode);
 							}
 						}
 					}
 			
-					for (ndInt32 i = 0; i < newCount - 1; ++i)
+					//for (ndInt32 i = 0; i < newCount - 1; ++i)
+					for (ndInt32 i = 0; i < (coneList.GetCount() - 1); ++i)
 					{
 						ndNode* const nodeA = coneList[i];
 						ndConvexHull3dFace* const faceA = &nodeA->GetInfo();
 						ndAssert(faceA->m_mark == 0);
-						for (ndInt32 j = i + 1; j < newCount; ++j) 
+						for (ndInt32 j = i + 1; j < coneList.GetCount(); ++j)
 						{
 							ndNode* const nodeB = coneList[j];
 							ndConvexHull3dFace* const faceB = &nodeB->GetInfo();
@@ -847,7 +845,7 @@ namespace nd
 							}
 						}
 			
-						for (ndInt32 j = i + 1; j < newCount; ++j)
+						for (ndInt32 j = i + 1; j < coneList.GetCount(); ++j)
 						{
 							ndNode* const nodeB = coneList[j];
 							ndConvexHull3dFace* const faceB = &nodeB->GetInfo();
