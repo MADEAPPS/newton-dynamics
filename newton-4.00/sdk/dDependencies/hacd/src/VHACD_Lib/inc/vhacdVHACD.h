@@ -155,7 +155,6 @@ namespace nd
 					}
 				}
 			}
-
 			
 			bool ComputeACD(const ndReal* const points,
 				const uint32_t nPoints,

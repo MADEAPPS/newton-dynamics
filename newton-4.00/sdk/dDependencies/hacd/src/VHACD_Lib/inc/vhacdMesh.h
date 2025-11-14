@@ -19,7 +19,6 @@
 #include "vhacdSArray.h"
 #include "vhacdVector.h"
 
-
 namespace nd
 {
 	namespace VHACD 

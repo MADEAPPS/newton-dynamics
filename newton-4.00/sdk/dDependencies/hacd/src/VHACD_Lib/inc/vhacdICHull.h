@@ -22,6 +22,7 @@
 	#include <unistd.h>
 #endif
 
+#if 0
 namespace nd
 {
 	namespace VHACD 
@@ -34,7 +35,8 @@ namespace nd
 			ICHullErrorInconsistent,
 			ICHullErrorNotEnoughPoints
 		};
-		class ICHull {
+		class ICHull 
+		{
 			public:
 			static const double sc_eps;
 			//!
@@ -103,4 +105,5 @@ namespace nd
 		};
 	}
 }
+#endif
 #endif // VHACD_ICHULL_H

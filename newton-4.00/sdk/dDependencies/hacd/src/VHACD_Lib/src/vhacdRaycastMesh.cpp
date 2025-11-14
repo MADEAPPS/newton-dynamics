@@ -15,10 +15,7 @@
 
 #include "ndCoreStdafx.h"
 #include "ndCollisionStdafx.h"
-
 #include "vhacdRaycastMesh.h"
-#include <math.h>
-#include <assert.h>
 
 namespace nd
 {
