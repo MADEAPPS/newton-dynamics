@@ -22,16 +22,16 @@
 
 namespace nd
 {
-	//#define VHACD_DEBUG_MESH
-
 	namespace VHACD 
 	{
-		enum AXIS {
+		enum AXIS 
+		{
 			AXIS_X = 0,
 			AXIS_Y = 1,
 			AXIS_Z = 2
 		};
-		struct Plane {
+		struct Plane 
+		{
 			double m_a;
 			double m_b;
 			double m_c;
@@ -39,35 +39,10 @@ namespace nd
 			AXIS m_axis;
 			short m_index;
 		};
-		#ifdef VHACD_DEBUG_MESH
-		struct Material {
-
-			Vec3<double> m_diffuseColor;
-			double m_ambientIntensity;
-			Vec3<double> m_specularColor;
-			Vec3<double> m_emissiveColor;
-			double m_shininess;
-			double m_transparency;
-			Material(void)
-			{
-				m_diffuseColor.X() = 0.5;
-				m_diffuseColor.Y() = 0.5;
-				m_diffuseColor.Z() = 0.5;
-				m_specularColor.X() = 0.5;
-				m_specularColor.Y() = 0.5;
-				m_specularColor.Z() = 0.5;
-				m_ambientIntensity = 0.4;
-				m_emissiveColor.X() = 0.0;
-				m_emissiveColor.Y() = 0.0;
-				m_emissiveColor.Z() = 0.0;
-				m_shininess = 0.4;
-				m_transparency = 0.0;
-			};
-		};
-		#endif // VHACD_DEBUG_MESH
 
 		//! Triangular mesh data structure
-		class Mesh {
+		class Mesh 
+		{
 			public:
 			void AddPoint(const Vec3<double>& pt) { m_points.PushBack(pt); }
 			void SetPoint(size_t index, const Vec3<double>& pt) { m_points[index] = pt; }
@@ -104,13 +79,6 @@ namespace nd
 				SArray<Vec3<double> >& negativePart) const;
 			bool IsInside(const Vec3<double>& pt) const;
 			void CalculateBoundingBox(Vec3<double>& p0, Vec3<double>& p1) const;
-
-			#ifdef VHACD_DEBUG_MESH
-			bool LoadOFF(const std::string& fileName, bool invert);
-			bool SaveVRML2(const std::string& fileName) const;
-			bool SaveVRML2(std::ofstream& fout, const Material& material) const;
-			bool SaveOFF(const std::string& fileName) const;
-			#endif // VHACD_DEBUG_MESH
 
 			//! Constructor.
 			Mesh();
