@@ -116,7 +116,7 @@ namespace nd
 			//! Print mesh information
 			void Print();
 			//!
-			void GetIFS(Vec3<double>* const points, Vec3<int32_t>* const triangles);
+			void GetIFS(Vec3<double>* const points, Triangle* const triangles);
 			//!
 			void Clear();
 			//!

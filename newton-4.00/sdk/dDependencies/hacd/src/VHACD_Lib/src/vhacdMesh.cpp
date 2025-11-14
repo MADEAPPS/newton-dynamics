@@ -67,7 +67,7 @@ namespace nd
 			Vec3<double> ver0, ver1, ver2;
 			double totalVolume = 0.0;
 			for (size_t t = 0; t < nT; t++) {
-				const Vec3<int32_t>& tri = GetTriangle(t);
+				const Triangle& tri = GetTriangle(t);
 				ver0 = GetPoint(size_t(tri[0]));
 				ver1 = GetPoint(size_t(tri[1]));
 				ver2 = GetPoint(size_t(tri[2]));
@@ -92,7 +92,7 @@ namespace nd
 			for (ConvexHull::ndNode* node = ch.GetFirst(); node; node = node->GetNext())
 			{
 				const ndConvexHull3dFace* const face = &node->GetInfo();
-				AddTriangle(Vec3<int32_t>(face->m_index[0], face->m_index[1], face->m_index[2]));
+				AddTriangle(Triangle(face->m_index[0], face->m_index[1], face->m_index[2]));
 			}
 		}
 
@@ -130,7 +130,7 @@ namespace nd
 			Vec3<double> ver0, ver1, ver2;
 			double volume;
 			for (size_t t = 0; t < nT; t++) {
-				const Vec3<int32_t>& tri = GetTriangle(t);
+				const Triangle& tri = GetTriangle(t);
 				ver0 = GetPoint(size_t(tri[0]));
 				ver1 = GetPoint(size_t(tri[1]));
 				ver2 = GetPoint(size_t(tri[2]));

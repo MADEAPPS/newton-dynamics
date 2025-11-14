@@ -483,7 +483,7 @@ namespace nd
 			for (ConvexHull::ndNode* node = ch.GetFirst(); node; node = node->GetNext())
 			{
 				const ndConvexHull3dFace* const face = &node->GetInfo();
-				meshCH.AddTriangle(Vec3<int32_t>(face->m_index[0], face->m_index[1], face->m_index[2]));
+				meshCH.AddTriangle(Triangle(face->m_index[0], face->m_index[1], face->m_index[2]));
 			}
 		}
 
@@ -746,18 +746,18 @@ namespace nd
 					for (int32_t k = 0; k < 8; ++k) {
 						mesh.AddPoint(pts[k]);
 					}
-					mesh.AddTriangle(Vec3<int32_t>(s + 0, s + 2, s + 1));
-					mesh.AddTriangle(Vec3<int32_t>(s + 0, s + 3, s + 2));
-					mesh.AddTriangle(Vec3<int32_t>(s + 4, s + 5, s + 6));
-					mesh.AddTriangle(Vec3<int32_t>(s + 4, s + 6, s + 7));
-					mesh.AddTriangle(Vec3<int32_t>(s + 7, s + 6, s + 2));
-					mesh.AddTriangle(Vec3<int32_t>(s + 7, s + 2, s + 3));
-					mesh.AddTriangle(Vec3<int32_t>(s + 4, s + 1, s + 5));
-					mesh.AddTriangle(Vec3<int32_t>(s + 4, s + 0, s + 1));
-					mesh.AddTriangle(Vec3<int32_t>(s + 6, s + 5, s + 1));
-					mesh.AddTriangle(Vec3<int32_t>(s + 6, s + 1, s + 2));
-					mesh.AddTriangle(Vec3<int32_t>(s + 7, s + 0, s + 4));
-					mesh.AddTriangle(Vec3<int32_t>(s + 7, s + 3, s + 0));
+					mesh.AddTriangle(Triangle(s + 0, s + 2, s + 1));
+					mesh.AddTriangle(Triangle(s + 0, s + 3, s + 2));
+					mesh.AddTriangle(Triangle(s + 4, s + 5, s + 6));
+					mesh.AddTriangle(Triangle(s + 4, s + 6, s + 7));
+					mesh.AddTriangle(Triangle(s + 7, s + 6, s + 2));
+					mesh.AddTriangle(Triangle(s + 7, s + 2, s + 3));
+					mesh.AddTriangle(Triangle(s + 4, s + 1, s + 5));
+					mesh.AddTriangle(Triangle(s + 4, s + 0, s + 1));
+					mesh.AddTriangle(Triangle(s + 6, s + 5, s + 1));
+					mesh.AddTriangle(Triangle(s + 6, s + 1, s + 2));
+					mesh.AddTriangle(Triangle(s + 7, s + 0, s + 4));
+					mesh.AddTriangle(Triangle(s + 7, s + 3, s + 0));
 				}
 			}
 		}
@@ -927,18 +927,18 @@ namespace nd
 							mesh.AddPoint(p5 + m_minBB);
 							mesh.AddPoint(p6 + m_minBB);
 							mesh.AddPoint(p7 + m_minBB);
-							mesh.AddTriangle(Vec3<int32_t>(s + 0, s + 2, s + 1));
-							mesh.AddTriangle(Vec3<int32_t>(s + 0, s + 3, s + 2));
-							mesh.AddTriangle(Vec3<int32_t>(s + 4, s + 5, s + 6));
-							mesh.AddTriangle(Vec3<int32_t>(s + 4, s + 6, s + 7));
-							mesh.AddTriangle(Vec3<int32_t>(s + 7, s + 6, s + 2));
-							mesh.AddTriangle(Vec3<int32_t>(s + 7, s + 2, s + 3));
-							mesh.AddTriangle(Vec3<int32_t>(s + 4, s + 1, s + 5));
-							mesh.AddTriangle(Vec3<int32_t>(s + 4, s + 0, s + 1));
-							mesh.AddTriangle(Vec3<int32_t>(s + 6, s + 5, s + 1));
-							mesh.AddTriangle(Vec3<int32_t>(s + 6, s + 1, s + 2));
-							mesh.AddTriangle(Vec3<int32_t>(s + 7, s + 0, s + 4));
-							mesh.AddTriangle(Vec3<int32_t>(s + 7, s + 3, s + 0));
+							mesh.AddTriangle(Triangle(s + 0, s + 2, s + 1));
+							mesh.AddTriangle(Triangle(s + 0, s + 3, s + 2));
+							mesh.AddTriangle(Triangle(s + 4, s + 5, s + 6));
+							mesh.AddTriangle(Triangle(s + 4, s + 6, s + 7));
+							mesh.AddTriangle(Triangle(s + 7, s + 6, s + 2));
+							mesh.AddTriangle(Triangle(s + 7, s + 2, s + 3));
+							mesh.AddTriangle(Triangle(s + 4, s + 1, s + 5));
+							mesh.AddTriangle(Triangle(s + 4, s + 0, s + 1));
+							mesh.AddTriangle(Triangle(s + 6, s + 5, s + 1));
+							mesh.AddTriangle(Triangle(s + 6, s + 1, s + 2));
+							mesh.AddTriangle(Triangle(s + 7, s + 0, s + 4));
+							mesh.AddTriangle(Triangle(s + 7, s + 3, s + 0));
 						}
 					}
 				}

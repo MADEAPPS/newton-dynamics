@@ -20,6 +20,33 @@ namespace nd
 {
 	namespace VHACD 
 	{
+		class Triangle
+		{
+			public:
+			Triangle()
+			{
+			}
+
+			Triangle(ndInt32 x, ndInt32 y, ndInt32 z)
+			{
+				m_data[0] = x;
+				m_data[1] = y;
+				m_data[2] = z;
+			}
+
+			ndInt32& operator[](size_t i) 
+			{ 
+				return m_data[i]; 
+			}
+
+			const ndInt32& operator[](size_t i) const 
+			{ 
+				return m_data[i]; 
+			}
+
+			ndInt32 m_data[3];
+		};
+
 #if 1
 		//!    Vector dim 3.
 		template <typename T>

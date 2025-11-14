@@ -53,15 +53,15 @@ namespace nd
 			const double* GetPoints() const { return (double*)m_points.Data(); } // ugly
 			const Vec3<double>* GetPointsBuffer() const { return m_points.Data(); } //
 			Vec3<double>* GetPointsBuffer() { return m_points.Data(); } //
-			void AddTriangle(const Vec3<int32_t>& tri) { m_triangles.PushBack(tri); }
-			void SetTriangle(size_t index, const Vec3<int32_t>& tri) { m_triangles[index] = tri; }
-			const Vec3<int32_t>& GetTriangle(size_t index) const { return m_triangles[index]; }
-			Vec3<int32_t>& GetTriangle(size_t index) { return m_triangles[index]; }
+			void AddTriangle(const Triangle& tri) { m_triangles.PushBack(tri); }
+			void SetTriangle(size_t index, const Triangle& tri) { m_triangles[index] = tri; }
+			const Triangle& GetTriangle(size_t index) const { return m_triangles[index]; }
+			Triangle& GetTriangle(size_t index) { return m_triangles[index]; }
 			size_t GetNTriangles() const { return m_triangles.Size(); }
 			int32_t* GetTriangles() { return (int32_t*)m_triangles.Data(); } // ugly
 			const int32_t* GetTriangles() const { return (int32_t*)m_triangles.Data(); } // ugly
-			const Vec3<int32_t>* GetTrianglesBuffer() const { return m_triangles.Data(); }
-			Vec3<int32_t>* GetTrianglesBuffer() { return m_triangles.Data(); }
+			const Triangle* GetTrianglesBuffer() const { return m_triangles.Data(); }
+			Triangle* GetTrianglesBuffer() { return m_triangles.Data(); }
 			void ClearPoints() { m_points.Clear(); }
 			void ClearTriangles() { m_triangles.Clear(); }
 			void Clear()
@@ -89,7 +89,7 @@ namespace nd
 
 			private:
 			SArray<Vec3<double> > m_points;
-			SArray<Vec3<int32_t> > m_triangles;
+			SArray<Triangle> m_triangles;
 		};
 	}
 }

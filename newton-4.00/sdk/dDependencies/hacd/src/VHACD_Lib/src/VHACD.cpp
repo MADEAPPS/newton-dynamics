@@ -587,7 +587,7 @@ namespace nd
 			for (ConvexHull::ndNode* node = ch.GetFirst(); node; node = node->GetNext())
 			{
 				const ndConvexHull3dFace* const face = &node->GetInfo();
-				combinedCH->AddTriangle(Vec3<int32_t>(face->m_index[0], face->m_index[1], face->m_index[2]));
+				combinedCH->AddTriangle(Triangle(face->m_index[0], face->m_index[1], face->m_index[2]));
 			}
 		}	
 

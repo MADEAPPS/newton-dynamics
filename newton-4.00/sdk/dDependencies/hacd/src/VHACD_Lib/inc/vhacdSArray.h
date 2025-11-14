@@ -24,7 +24,8 @@ namespace nd
 	{
 		//!    SArray.
 		template <typename T, size_t N = 64>
-		class SArray {
+		class SArray 
+		{
 			public:
 			T& operator[](size_t i)
 			{
@@ -61,7 +62,8 @@ namespace nd
 			}
 			void Allocate(size_t size)
 			{
-				if (size > m_maxSize) {
+				if (size > m_maxSize) 
+				{
 					T* temp = new T[size];
 					memcpy(temp, Data(), m_size * sizeof(T));
 					delete[] m_data;
@@ -77,7 +79,8 @@ namespace nd
 
 			void PushBack(const T& value)
 			{
-				if (m_size == m_maxSize) {
+				if (m_size == m_maxSize) 
+				{
 					size_t maxSize = (m_maxSize << 1);
 					T* temp = new T[maxSize];
 					memcpy(temp, Data(), m_maxSize * sizeof(T));
@@ -108,7 +111,8 @@ namespace nd
 			{
 				size_t pos;
 				T* const data = Data();
-				if (Find(value, pos)) {
+				if (Find(value, pos)) 
+				{
 					for (size_t j = pos + 1; j < m_size; ++j)
 						data[j - 1] = data[j];
 					--m_size;
@@ -118,7 +122,8 @@ namespace nd
 			}
 			void operator=(const SArray& rhs)
 			{
-				if (m_maxSize < rhs.m_size) {
+				if (m_maxSize < rhs.m_size) 
+				{
 					delete[] m_data;
 					m_maxSize = rhs.m_maxSize;
 					m_data = new T[m_maxSize];
