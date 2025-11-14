@@ -712,14 +712,9 @@ namespace nd
 			maxVertexCount -= 4;
 			size_t currentIndex = 4;
 
-			ndArray<ndNode*> stackPool;
-			
-			stackPool.SetCount(1024 + count);
-			ndNode** const stack = &stackPool[0];
-			//ndNode** const coneList = &stackPool[0];
-			
-			ndFixSizeArray<ndNode*, 1024 * 4> deleteList;
+			ndFixSizeArray<ndNode*, 1024 * 4> stack;
 			ndFixSizeArray<ndNode*, 1024 * 4> coneList;
+			ndFixSizeArray<ndNode*, 1024 * 4> deleteList;
 
 			while (boundaryFaces.GetCount() && count && (maxVertexCount > 0))
 			{
@@ -755,15 +750,13 @@ namespace nd
 
 				if (isvalid && (dist >= distTol) && (face->Evalue(&m_points[0], p) > double(0.0f)))
 				{
-					stack[0] = faceNode;
-
-					ndInt32 stackIndex = 1;
+					ndAssert(stack.GetCount() == 0);
 					ndAssert(deleteList.GetCount() == 0);
 
-					while (stackIndex)
+					stack.PushBack(faceNode);
+					while (stack.GetCount())
 					{
-						stackIndex--;
-						ndNode* const node1 = stack[stackIndex];
+						ndNode* const node1 = stack.Pop();
 						ndConvexHull3dFace* const face1 = &node1->GetInfo();
 			
 						if (!face1->m_mark && (face1->Evalue(&m_points[0], p) > double(0.0f)))
@@ -784,9 +777,7 @@ namespace nd
 								ndConvexHull3dFace* const twinFace = &twinNode->GetInfo();
 								if (!twinFace->m_mark)
 								{
-									stack[stackIndex] = twinNode;
-									stackIndex++;
-									ndAssert(stackIndex < int(stackPool.GetCount()));
+									stack.PushBack(twinNode);
 								}
 							}
 						}
@@ -795,7 +786,6 @@ namespace nd
 					m_points[ndInt32(currentIndex)] = points[index];
 					points[index].m_mark = 1;
 			
-					//int newCount = 0;
 					coneList.SetCount(0);
 					for (ndInt32 i = 0; i < deleteList.GetCount(); ++i)
 					{
@@ -808,7 +798,7 @@ namespace nd
 							ndConvexHull3dFace* const twinFace = &twinNode->GetInfo();
 							if (!twinFace->m_mark)
 							{
-								int j1 = (j0 == 2) ? 0 : j0 + 1;
+								ndInt32 j1 = (j0 == 2) ? 0 : j0 + 1;
 								ndNode* const newNode = AddFace(int(currentIndex), face1->m_index[j0], face1->m_index[j1]);
 								boundaryFaces.Addtop(newNode);
 			
@@ -826,7 +816,6 @@ namespace nd
 						}
 					}
 			
-					//for (ndInt32 i = 0; i < newCount - 1; ++i)
 					for (ndInt32 i = 0; i < (coneList.GetCount() - 1); ++i)
 					{
 						ndNode* const nodeA = coneList[i];
