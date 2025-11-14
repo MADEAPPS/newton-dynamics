@@ -57,8 +57,8 @@ namespace nd
 			Vec3(double x, double y, double z);
 			Vec3(const Vec3& rhs);
 
-			double& operator[](size_t i) { return m_data[i]; }
-			const double& operator[](size_t i) const { return m_data[i]; }
+			double& operator[](size_t i);
+			const double& operator[](size_t i) const;
 			double& X();
 			double& Y();
 			double& Z();
@@ -104,6 +104,7 @@ namespace nd
 	
 		inline Vec3::Vec3() 
 		{
+			m_data[0] = m_data[1] = m_data[2] = 0.0;
 		}
 
 		inline Vec3::Vec3(double a)
@@ -125,9 +126,14 @@ namespace nd
 			m_data[2] = rhs.m_data[2];
 		}
 
-		inline Vec3 operator*(double lhs, const Vec3& rhs)
-		{
-			return Vec3(lhs * rhs.X(), lhs * rhs.Y(), lhs * rhs.Z());
+		inline double& Vec3::operator[](size_t i)
+		{ 
+			return m_data[i];
+		}
+
+		inline const double& Vec3::operator[](size_t i) const
+		{ 
+			return m_data[i];
 		}
 
 		inline double& Vec3::X()
@@ -144,7 +150,7 @@ namespace nd
 		{
 			return m_data[2];
 		}
-		
+
 		inline const double& Vec3::X() const
 		{
 			return m_data[0];
@@ -159,16 +165,21 @@ namespace nd
 		{
 			return m_data[2];
 		}
-		
+
 		inline void Vec3::Normalize()
 		{
-			double n = sqrt(m_data[0] * m_data[0] + m_data[1] * m_data[1] + m_data[2] * m_data[2]);
-			if (n != 0.0) (*this) /= n;
+			double n = GetNorm();
+			if (n != 0.0)
+			{
+				//(*this) /= n;
+				operator*(1.0 / n);
+			}
 		}
 		
 		inline double Vec3::GetNorm() const
 		{
-			return sqrt(m_data[0] * m_data[0] + m_data[1] * m_data[1] + m_data[2] * m_data[2]);
+			//return sqrt(m_data[0] * m_data[0] + m_data[1] * m_data[1] + m_data[2] * m_data[2]);
+			return sqrt(operator*(*this));
 		}
 		
 		inline void Vec3::operator= (const Vec3& rhs)
@@ -231,7 +242,12 @@ namespace nd
 		{
 			return (m_data[0] * rhs.m_data[0] + m_data[1] * rhs.m_data[1] + m_data[2] * rhs.m_data[2]);
 		}
-		
+
+		inline Vec3 operator*(double lhs, const Vec3& rhs)
+		{
+			return Vec3(lhs * rhs.X(), lhs * rhs.Y(), lhs * rhs.Z());
+		}
+
 		inline Vec3 Vec3::operator+(const Vec3& rhs) const
 		{
 			return Vec3(m_data[0] + rhs.m_data[0], m_data[1] + rhs.m_data[1], m_data[2] + rhs.m_data[2]);
@@ -256,7 +272,6 @@ namespace nd
 		{
 			return Vec3(m_data[0] / rhs, m_data[1] / rhs, m_data[2] / rhs);
 		}
-		
 
 		// Compute the center of this bounding box and return the diagonal length
 		inline double Vec3::GetCenter(const Vec3& bmin, const Vec3& bmax)
