@@ -128,7 +128,7 @@ namespace nd
 
 		Thread::Thread()
 			:Semaphore()
-			,std::thread(&Thread::ThreadFunctionCallback, this)
+			,std::thread(&Thread::ThreadFunction, this)
 			,m_queue(nullptr)
 		{
 		}
@@ -141,7 +141,7 @@ namespace nd
 		{
 		}
 
-		void Thread::ThreadFunctionCallback()
+		void Thread::ThreadFunction()
 		{
 			while (!Wait())
 			{

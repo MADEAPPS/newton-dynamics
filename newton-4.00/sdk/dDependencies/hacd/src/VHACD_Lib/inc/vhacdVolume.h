@@ -12,31 +12,33 @@
  
  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#pragma once
 #ifndef ND_VHACD_VOLUME_H
 #define ND_VHACD_VOLUME_H
-#include "vhacdDefines.h"
+
 #include "vhacdMesh.h"
 #include "vhacdVector.h"
 
 namespace nd
 {
-	namespace VHACD {
-
-		enum VOXEL_VALUE {
+	namespace VHACD 
+	{
+		enum VOXEL_VALUE 
+		{
 			PRIMITIVE_UNDEFINED = 0,
 			PRIMITIVE_OUTSIDE_SURFACE = 1,
 			PRIMITIVE_INSIDE_SURFACE = 2,
 			PRIMITIVE_ON_SURFACE = 3
 		};
 
-		struct Voxel {
+		struct Voxel 
+		{
 			public:
 			short m_coord[3];
 			short m_data;
 		};
 
-		class PrimitiveSet {
+		class PrimitiveSet 
+		{
 			public:
 			virtual ~PrimitiveSet() {}
 			virtual PrimitiveSet* Create() const = 0;
@@ -69,7 +71,8 @@ namespace nd
 		};
 
 		//!
-		class VoxelSet : public PrimitiveSet {
+		class VoxelSet : public PrimitiveSet 
+		{
 			friend class Volume;
 
 			public:
@@ -149,7 +152,8 @@ namespace nd
 		};
 
 		//!
-		class Volume {
+		class Volume 
+		{
 			public:
 			//! Destructor.
 			~Volume(void);

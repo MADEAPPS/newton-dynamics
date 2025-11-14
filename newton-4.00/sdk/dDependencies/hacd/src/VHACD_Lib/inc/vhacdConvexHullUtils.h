@@ -22,12 +22,7 @@
 #ifndef __ND_CONVEXHULL_3D_UTILS__
 #define __ND_CONVEXHULL_3D_UTILS__
 
-#include "vhacdDefines.h"
 #include "vhacdVector.h"
-
-#ifndef _ASSERT
-#define _ASSERT(x)
-#endif
 
 namespace nd
 {
@@ -88,7 +83,7 @@ namespace nd
 			public:
 			Thread();
 			~Thread();
-			void ThreadFunctionCallback();
+			void ThreadFunction();
 
 			int m_threadID;
 			Queue* m_queue;
@@ -105,7 +100,7 @@ namespace nd
 			void PushTask(Job* const job);
 
 			std::mutex m_mutex;
-			std::atomic<int> m_jobs;
+			ndAtomic<ndInt32> m_jobs;
 			Thread m_threads[VHACD_WORKERS_THREADS];
 		};
 	}

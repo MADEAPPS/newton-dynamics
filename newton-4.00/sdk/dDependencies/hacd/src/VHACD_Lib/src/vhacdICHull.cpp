@@ -15,10 +15,7 @@
 
 #include "ndCoreStdafx.h"
 #include "ndCollisionStdafx.h"
-
-#include "vhacdDefines.h"
 #include "vhacdICHull.h"
-
 
 namespace nd
 {

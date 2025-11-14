@@ -52,16 +52,7 @@
 	#include <unistd.h>
 #endif
 
-#include <math.h>
-#include <cstdint>
-#include <float.h>
-#include <stdio.h>
-#include <stdint.h>
 #include <stdlib.h>
-#include <assert.h>
-#include <atomic>
-#include <thread>
-#include <condition_variable>
 
 namespace nd
 {

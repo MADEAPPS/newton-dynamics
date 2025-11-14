@@ -16,8 +16,6 @@
 #ifndef ND_VHACD_SARRAY_H
 #define ND_VHACD_SARRAY_H
 
-#include "vhacdDefines.h"
-
 namespace nd
 {
 	#define SARRAY_DEFAULT_MIN_SIZE 16

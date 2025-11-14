@@ -22,7 +22,6 @@
 #ifndef __ND_VHACD_CONVEXHULL_3D__
 #define __ND_VHACD_CONVEXHULL_3D__
 
-#include "vhacdDefines.h"
 #include "ndConvexHull3d.h"
 #include "vhacdConvexHullUtils.h"
 

@@ -16,7 +16,6 @@
 #ifndef ND_VHACD_MESH_H
 #define ND_VHACD_MESH_H
 
-#include "vhacdDefines.h"
 #include "vhacdSArray.h"
 #include "vhacdVector.h"
 
