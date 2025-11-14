@@ -91,20 +91,7 @@ namespace nd
 				bool cancel = m_cancel;
 				return cancel;
 			}
-			void Update(const double stageProgress,
-				const double operationProgress,
-				const Parameters& params)
-			{
-				m_stageProgress = stageProgress;
-				m_operationProgress = operationProgress;
-				if (params.m_callback) {
-					params.m_callback->Update(m_overallProgress,
-						m_stageProgress,
-						m_operationProgress,
-						m_stage.c_str(),
-						m_operation.c_str());
-				}
-			}
+
 			void Init()
 			{
 				m_raycastMesh = nullptr;
@@ -156,7 +143,6 @@ namespace nd
 				m_stage = "Align mesh";
 				m_operation = "Voxelization";
 
-				Update(0.0, 0.0, params);
 				if (GetCancel()) {
 					return;
 				}
@@ -166,16 +152,13 @@ namespace nd
 					triangles, strideTriangles, nTriangles,
 					m_dim, m_barycenter, m_rot);
 				//size_t n = volume.GetNPrimitivesOnSurf() + volume.GetNPrimitivesInsideSurf();
-				Update(50.0, 100.0, params);
 
 				if (GetCancel()) {
 					return;
 				}
 				m_operation = "PCA";
-				Update(50.0, 0.0, params);
 				volume.AlignToPrincipalAxes(m_rot);
 				m_overallProgress = 1.0;
-				Update(100.0, 100.0, params);
 			}
 			template <class T>
 			void VoxelizeMesh(const T* const points,
@@ -200,14 +183,11 @@ namespace nd
 				while (iteration++ < maxIteration && !m_cancel) 
 				{
 					progress = iteration * 100.0 / maxIteration;
-					Update(progress, 0.0, params);
 
 					m_volume = new Volume;
 					m_volume->Voxelize(points, stridePoints, nPoints,
 						triangles, strideTriangles, nTriangles,
 						m_dim, m_barycenter, m_rot);
-
-					Update(progress, 100.0, params);
 
 					size_t n = m_volume->GetNPrimitivesOnSurf() + m_volume->GetNPrimitivesInsideSurf();
 
@@ -223,7 +203,6 @@ namespace nd
 					}
 				}
 				m_overallProgress = 10.0;
-				Update(100.0, 100.0, params);
 			}
 			template <class T>
 			bool ComputeACD(const T* const points,

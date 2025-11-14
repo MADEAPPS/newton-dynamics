@@ -73,18 +73,8 @@ namespace nd
 		class IVHACD 
 		{
 			public:
-			class IUserCallback {
-				public:
-				virtual ~IUserCallback() {}
-				virtual void Update(const double overallProgress,
-					const double stageProgress,
-					const double operationProgress,
-					const char* const stage,
-					const char* const operation)
-					= 0;
-			};
-
-			class ConvexHull {
+			class ConvexHull 
+			{
 				public:
 				double* m_points;
 				uint32_t* m_triangles;
@@ -108,7 +98,6 @@ namespace nd
 					m_pca = 0;
 					m_maxNumVerticesPerCH = 64;
 					m_minVolumePerCH = 0.0001;
-					m_callback = 0;
 					m_convexhullApproximation = true;
 					//m_maxConvexHulls = 1024;
 					m_maxConvexHulls = 128;
@@ -122,7 +111,6 @@ namespace nd
 				double m_beta;
 				double m_minVolumePerCH;
 				double m_minMergeToleranace;
-				IUserCallback* m_callback;
 				uint32_t m_resolution;
 				uint32_t m_maxNumVerticesPerCH;
 				uint32_t m_planeDownsampling;
