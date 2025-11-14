@@ -90,9 +90,6 @@ namespace nd
 					m_convexhullApproximation = true;
 					//m_maxConvexHulls = 1024;
 					m_maxConvexHulls = 128;
-					// This will project the output convex hull vertices onto the original source mesh to increase the floating point accuracy of the results
-					//m_projectHullVertices = true; 
-					m_projectHullVertices = false;
 				}
 				double m_concavity;
 				double m_concavityToVolumeWeigh;
@@ -107,7 +104,6 @@ namespace nd
 				uint32_t m_pca;
 				uint32_t m_convexhullApproximation;
 				uint32_t m_maxConvexHulls;
-				bool m_projectHullVertices;
 			};
 
 			virtual bool Compute(const float* const points,

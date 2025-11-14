@@ -84,8 +84,6 @@ namespace nd
 			void ComputePrimitiveSet(const Parameters& params);
 			void ComputeACD(const Parameters& params);
 			void MergeConvexHulls(const Parameters& params);
-			void SimplifyConvexHull(Mesh* const ch, const size_t nvertices, const double minVolume);
-			void SimplifyConvexHulls(const Parameters& params);
 			void ComputeBestClippingPlane(const PrimitiveSet* inputPSet,
 				const double volume,
 				const SArray<Plane>& planes,
@@ -169,13 +167,6 @@ namespace nd
 				ComputePrimitiveSet(params);
 				ComputeACD(params);
 				MergeConvexHulls(params);
-				if (params.m_projectHullVertices)
-				{
-					m_raycastMesh = RaycastMesh::createRaycastMesh(nPoints, points, nTriangles, (const uint32_t *)triangles);
-					SimplifyConvexHulls(params);
-					m_raycastMesh->release();
-					m_raycastMesh = nullptr;
-				}
 				return true;
 			}
 

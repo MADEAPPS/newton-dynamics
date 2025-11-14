@@ -16,9 +16,9 @@ All rights reserved.
 #ifndef ND_VHACD_MANIFOLD_MESH_H
 #define ND_VHACD_MANIFOLD_MESH_H
 
-#include "vhacdCircularList.h"
 #include "vhacdSArray.h"
 #include "vhacdVector.h"
+#include "vhacdCircularList.h"
 
 namespace nd
 {
@@ -27,7 +27,6 @@ namespace nd
 		class TMMTriangle;
 		class TMMEdge;
 		class TMMesh;
-		class ICHull;
 
 		//!    Vertex data structure used in a triangular manifold mesh (TMM).
 		class TMMVertex 
@@ -44,7 +43,6 @@ namespace nd
 			bool m_onHull;
 			bool m_tag;
 			
-			friend class ICHull;
 			friend class TMMesh;
 			friend class TMMTriangle;
 			friend class TMMEdge;
@@ -62,7 +60,6 @@ namespace nd
 			CircularListElement<TMMVertex>* m_vertices[2];
 			CircularListElement<TMMTriangle>* m_newFace;
 
-			friend class ICHull;
 			friend class TMMTriangle;
 			friend class TMMVertex;
 			friend class TMMesh;
@@ -80,7 +77,6 @@ namespace nd
 			CircularListElement<TMMVertex>* m_vertices[3];
 			bool m_visible;
 
-			friend class ICHull;
 			friend class TMMesh;
 			friend class TMMVertex;
 			friend class TMMEdge;
@@ -139,7 +135,6 @@ namespace nd
 
 			// not defined
 			TMMesh(const TMMesh& rhs);
-			friend class ICHull;
 		};
 	}
 }
