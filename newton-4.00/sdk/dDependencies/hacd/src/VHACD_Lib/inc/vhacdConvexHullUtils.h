@@ -33,15 +33,8 @@ namespace nd
 {
 	namespace VHACD 
 	{
-		#define VHACD_GOOGOL_SIZE		4
 		#define VHACD_WORKERS_THREADS	4
 		//#define VHACD_WORKERS_THREADS	1
-
-		class Googol;
-		Googol Determinant2x2(const Googol matrix[2][2]);
-		Googol Determinant3x3(const Googol matrix[3][3]);
-		double Determinant2x2(const double matrix[2][2], double* const error);
-		double Determinant3x3(const double matrix[3][3], double* const error);
 
 		inline int dExp2(int x)
 		{
@@ -85,7 +78,6 @@ namespace nd
 			A = B;
 			B = tmp;
 		}
-
 
 		template <class dItem, class dKey>
 		class ndHeap
@@ -666,194 +658,139 @@ namespace nd
 			friend class ndNode;
 		};
 
-		class hullVector : public VHACD::Vec3<double>
-		{
-			public:
-			hullVector()
-				:Vec3<double>(0, 0, 0)
-			{
-			}
-
-			hullVector(double x)
-				:Vec3<double>(x, x, x)
-			{
-			}
-
-			hullVector(const hullVector& x)
-				:Vec3<double>(x.X(), x.Y(), x.Z())
-			{
-			}
-
-			hullVector(double x, double y, double z, double)
-				:Vec3<double>(x, y, z)
-			{
-			}
-
-			hullVector GetMin(const hullVector& p) const
-			{
-				return hullVector(
-					X() < p.X() ? X() : p.X(),
-					Y() < p.Y() ? Y() : p.Y(),
-					Z() < p.Z() ? Z() : p.Z(), 0.0);
-			}
-
-			hullVector GetMax(const hullVector& p) const
-			{
-				return hullVector(
-					X() > p.X() ? X() : p.X(),
-					Y() > p.Y() ? Y() : p.Y(),
-					Z() > p.Z() ? Z() : p.Z(), 0.0);
-			}
-
-			hullVector Scale(double s) const
-			{
-				return hullVector(X() * s, Y() * s, Z() * s, 0.0);
-			}
-
-			inline hullVector operator+(const hullVector & rhs) const
-			{
-				return hullVector(X() + rhs.X(), Y() + rhs.Y(), Z() + rhs.Z(), 0.0f);
-			}
-
-			inline hullVector operator-(const hullVector & rhs) const
-			{
-				return hullVector(X() - rhs.X(), Y() - rhs.Y(), Z() - rhs.Z(), 0.0f);
-			}
-
-			inline hullVector operator*(const hullVector & rhs) const
-			{
-				return hullVector(X() * rhs.X(), Y() * rhs.Y(), Z() * rhs.Z(), 0.0f);
-			}
-
-			inline double DotProduct(const hullVector & rhs) const
-			{
-				return X() * rhs.X() + Y() * rhs.Y() + Z() * rhs.Z();
-			}
-
-			inline hullVector CrossProduct(const hullVector & rhs) const
-			{
-				return hullVector(Y() * rhs.Z() - Z() * rhs.Y(), Z() * rhs.X() - X() * rhs.Z(), X() * rhs.Y() - Y() * rhs.X(), 0.0);
-			}
-
-			inline hullVector operator= (const Vec3 & rhs)
-			{
-				X() = rhs.X();
-				Y() = rhs.Y();
-				Z() = rhs.Z();
-				return *this;
-			}
-
-			inline hullVector& operator= (const hullVector& rhs)
-			{
-				X() = rhs.X();
-				Y() = rhs.Y();
-				Z() = rhs.Z();
-				return *this;
-			}
-
-		};
-
-		class hullPlane : public hullVector
-		{
-			public:
-			hullPlane(const hullPlane& src)
-				:hullVector(src)
-				,m_w(src.m_w)
-			{
-			}
-
-			hullPlane(double x, double y, double z, double w)
-				:hullVector(x, y, z, 0.0)
-				, m_w(w)
-			{
-			}
-
-			hullPlane(const hullVector &P0, const hullVector &P1, const hullVector &P2)
-				:hullVector((P1 - P0).CrossProduct(P2 - P0))
-			{
-				m_w = -DotProduct(P0);
-			}
-
-			hullPlane Scale(double s) const
-			{
-				return hullPlane(X() * s, Y() * s, Z() * s, m_w * s);
-			}
-
-			inline hullPlane operator= (const hullPlane &rhs)
-			{
-				X() = rhs.X();
-				Y() = rhs.Y();
-				Z() = rhs.Z();
-				m_w = rhs.m_w;
-				return *this;
-			}
-
-			inline hullVector operator*(const hullVector & rhs) const
-			{
-				return hullVector(X() * rhs.X(), Y() * rhs.Y(), Z() * rhs.Z(), 0.0f);
-			}
-
-			double Evalue(const hullVector &point) const
-			{
-				return DotProduct(point) + m_w;
-			}
-
-			double m_w;
-		};
-
-		class Googol
-		{
-			public:
-			Googol(void);
-			Googol(double value);
-
-			operator double() const;
-			Googol operator+ (const Googol &A) const;
-			Googol operator- (const Googol &A) const;
-			Googol operator* (const Googol &A) const;
-			Googol operator/ (const Googol &A) const;
-
-			Googol operator+= (const Googol &A);
-			Googol operator-= (const Googol &A);
-
-			bool operator> (const Googol &A) const;
-			bool operator>= (const Googol &A) const;
-			bool operator< (const Googol &A) const;
-			bool operator<= (const Googol &A) const;
-			bool operator== (const Googol &A) const;
-			bool operator!= (const Googol &A) const;
-
-			Googol Abs() const;
-			Googol Sqrt() const;
-			Googol InvSqrt() const;
-			Googol Floor() const;
-
-			void Trace() const;
-			void ToString(char* const string) const;
-
-			private:
-			void InitFloatFloat(double value);
-			void NegateMantissa(uint64_t* const mantissa) const;
-			void CopySignedMantissa(uint64_t* const mantissa) const;
-			int NormalizeMantissa(uint64_t* const mantissa) const;
-			uint64_t CheckCarrier(uint64_t a, uint64_t b) const;
-			void ShiftRightMantissa(uint64_t* const mantissa, int bits) const;
-
-			int LeadingZeros(uint64_t a) const;
-			void ExtendeMultiply(uint64_t a, uint64_t b, uint64_t& high, uint64_t& low) const;
-			void ScaleMantissa(uint64_t* const out, uint64_t scale) const;
-
-			int m_sign;
-			int m_exponent;
-			uint64_t m_mantissa[VHACD_GOOGOL_SIZE];
-
-			public:
-			static Googol m_zero;
-			static Googol m_one;
-			static Googol m_two;
-			static Googol m_three;
-			static Googol m_half;
-		};
+		//class hullVector : public VHACD::Vec3<double>
+		//{
+		//	public:
+		//	hullVector()
+		//		:Vec3<double>(0, 0, 0)
+		//	{
+		//	}
+		//
+		//	hullVector(double x)
+		//		:Vec3<double>(x, x, x)
+		//	{
+		//	}
+		//
+		//	hullVector(const hullVector& x)
+		//		:Vec3<double>(x.X(), x.Y(), x.Z())
+		//	{
+		//	}
+		//
+		//	hullVector(double x, double y, double z, double)
+		//		:Vec3<double>(x, y, z)
+		//	{
+		//	}
+		//
+		//	hullVector GetMin(const hullVector& p) const
+		//	{
+		//		return hullVector(
+		//			X() < p.X() ? X() : p.X(),
+		//			Y() < p.Y() ? Y() : p.Y(),
+		//			Z() < p.Z() ? Z() : p.Z(), 0.0);
+		//	}
+		//
+		//	hullVector GetMax(const hullVector& p) const
+		//	{
+		//		return hullVector(
+		//			X() > p.X() ? X() : p.X(),
+		//			Y() > p.Y() ? Y() : p.Y(),
+		//			Z() > p.Z() ? Z() : p.Z(), 0.0);
+		//	}
+		//
+		//	hullVector Scale(double s) const
+		//	{
+		//		return hullVector(X() * s, Y() * s, Z() * s, 0.0);
+		//	}
+		//
+		//	inline hullVector operator+(const hullVector & rhs) const
+		//	{
+		//		return hullVector(X() + rhs.X(), Y() + rhs.Y(), Z() + rhs.Z(), 0.0f);
+		//	}
+		//
+		//	inline hullVector operator-(const hullVector & rhs) const
+		//	{
+		//		return hullVector(X() - rhs.X(), Y() - rhs.Y(), Z() - rhs.Z(), 0.0f);
+		//	}
+		//
+		//	inline hullVector operator*(const hullVector & rhs) const
+		//	{
+		//		return hullVector(X() * rhs.X(), Y() * rhs.Y(), Z() * rhs.Z(), 0.0f);
+		//	}
+		//
+		//	inline double DotProduct(const hullVector & rhs) const
+		//	{
+		//		return X() * rhs.X() + Y() * rhs.Y() + Z() * rhs.Z();
+		//	}
+		//
+		//	inline hullVector CrossProduct(const hullVector & rhs) const
+		//	{
+		//		return hullVector(Y() * rhs.Z() - Z() * rhs.Y(), Z() * rhs.X() - X() * rhs.Z(), X() * rhs.Y() - Y() * rhs.X(), 0.0);
+		//	}
+		//
+		//	inline hullVector operator= (const Vec3 & rhs)
+		//	{
+		//		X() = rhs.X();
+		//		Y() = rhs.Y();
+		//		Z() = rhs.Z();
+		//		return *this;
+		//	}
+		//
+		//	inline hullVector& operator= (const hullVector& rhs)
+		//	{
+		//		X() = rhs.X();
+		//		Y() = rhs.Y();
+		//		Z() = rhs.Z();
+		//		return *this;
+		//	}
+		//};
+		//
+		//class hullPlane : public hullVector
+		//{
+		//	public:
+		//	hullPlane(const hullPlane& src)
+		//		:hullVector(src)
+		//		,m_w(src.m_w)
+		//	{
+		//	}
+		//
+		//	hullPlane(double x, double y, double z, double w)
+		//		:hullVector(x, y, z, 0.0)
+		//		, m_w(w)
+		//	{
+		//	}
+		//
+		//	hullPlane(const hullVector &P0, const hullVector &P1, const hullVector &P2)
+		//		:hullVector((P1 - P0).CrossProduct(P2 - P0))
+		//	{
+		//		m_w = -DotProduct(P0);
+		//	}
+		//
+		//	hullPlane Scale(double s) const
+		//	{
+		//		return hullPlane(X() * s, Y() * s, Z() * s, m_w * s);
+		//	}
+		//
+		//	inline hullPlane operator= (const hullPlane &rhs)
+		//	{
+		//		X() = rhs.X();
+		//		Y() = rhs.Y();
+		//		Z() = rhs.Z();
+		//		m_w = rhs.m_w;
+		//		return *this;
+		//	}
+		//
+		//	inline hullVector operator*(const hullVector & rhs) const
+		//	{
+		//		return hullVector(X() * rhs.X(), Y() * rhs.Y(), Z() * rhs.Z(), 0.0f);
+		//	}
+		//
+		//	double Evalue(const hullVector &point) const
+		//	{
+		//		return DotProduct(point) + m_w;
+		//	}
+		//
+		//	double m_w;
+		//};
 
 		template <class T, class dCompareKey>
 		void Sort(T* const array, int elements)

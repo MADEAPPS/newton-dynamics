@@ -30,9 +30,9 @@ namespace nd
 {
 	namespace VHACD
 	{
-#if 0
+#if 1
 		#define VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE 16
-		class ConvexHullVertex : public hullVector
+		class ConvexHullVertex : public ndBigVector
 		{
 			public:
 			int m_mark;
@@ -55,7 +55,7 @@ namespace nd
 			{
 			}
 
-			hullVector m_box[2];
+			ndBigVector m_box[2];
 			ConvexHullAABBTreeNode* m_left;
 			ConvexHullAABBTreeNode* m_right;
 			ConvexHullAABBTreeNode* m_parent;
@@ -90,24 +90,24 @@ namespace nd
 			std::vector<ConvexHull3dPointCluster> m_treeBuffer;
 		};
 
-		class ConvexHullFace
+		class ndConvexHull3dFace
 		{
 			public:
-			ConvexHullFace();
-			double Evalue(const hullVector* const pointArray, const hullVector& point) const;
-			hullPlane GetPlaneEquation(const hullVector* const pointArray, bool& isValid) const;
+			ndConvexHull3dFace();
+			double Evalue(const ndBigVector* const pointArray, const ndBigVector& point) const;
+			ndBigPlane GetPlaneEquation(const ndBigVector* const pointArray, bool& isValid) const;
 
 			public:
 			int m_index[3];
 
 			private:
 			int m_mark;
-			List<ConvexHullFace>::ndNode* m_twin[3];
+			List<ndConvexHull3dFace>::ndNode* m_twin[3];
 
 			friend class ConvexHull;
 		};
 
-		class ConvexHull : public List<ConvexHullFace>
+		class ConvexHull : public List<ndConvexHull3dFace>
 		{
 			class ndNormalMap;
 
@@ -116,7 +116,7 @@ namespace nd
 			ConvexHull(const double* const vertexCloud, int strideInBytes, int count, double distTol, int maxVertexCount = 0x7fffffff);
 			~ConvexHull();
 
-			const std::vector<hullVector>& GetVertexPool() const;
+			const std::vector<ndBigVector>& GetVertexPool() const;
 
 			private:
 			ConvexHullAABBTreeNode* InitVertexArray(ConvexHull3dPointSet& accelerator);
@@ -126,13 +126,13 @@ namespace nd
 
 			void CalculateConvexHull3d(ConvexHullAABBTreeNode* vertexTree, std::vector<ConvexHullVertex>& points, int count, double distTol, int maxVertexCount);
 
-			size_t SupportVertex(ConvexHullAABBTreeNode** const tree, const std::vector<ConvexHullVertex>& points, const hullVector& dir, const bool removeEntry = true) const;
-			double TetrahedrumVolume(const hullVector& p0, const hullVector& p1, const hullVector& p2, const hullVector& p3) const;
+			size_t SupportVertex(ConvexHullAABBTreeNode** const tree, const std::vector<ConvexHullVertex>& points, const ndBigVector& dir, const bool removeEntry = true) const;
+			double TetrahedrumVolume(const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2, const ndBigVector& p3) const;
 
-			hullVector m_aabbP0;
-			hullVector m_aabbP1;
+			ndBigVector m_aabbP0;
+			ndBigVector m_aabbP1;
 			double m_diag;
-			std::vector<hullVector> m_points;
+			std::vector<ndBigVector> m_points;
 		};
 #else
 		class ConvexHull : public ndConvexHull3d

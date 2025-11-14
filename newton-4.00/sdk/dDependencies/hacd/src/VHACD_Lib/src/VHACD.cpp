@@ -725,10 +725,10 @@ namespace nd
 			combinedCH->ResizePoints(0);
 			combinedCH->ResizeTriangles(0);
 
-			//const std::vector<hullVector>& convexPoints = ch.GetVertexPool();
-			const ndArray<ndBigVector>& convexPoints = ch.GetVertexPool();
-			//for (size_t v = 0; v < convexPoints.size(); v++) 
-			for (ndInt32 v = 0; v < ndInt32(convexPoints.GetCount()); v++)
+			const std::vector<ndBigVector>& convexPoints = ch.GetVertexPool();
+			//const ndArray<ndBigVector>& convexPoints = ch.GetVertexPool();
+			for (size_t v = 0; v < convexPoints.size(); v++) 
+			//for (ndInt32 v = 0; v < ndInt32(convexPoints.GetCount()); v++)
 			{
 				const Vec3<double> hullPoint(convexPoints[v].m_x, convexPoints[v].m_y, convexPoints[v].m_z);
 				//combinedCH->AddPoint(convexPoints[v]);
@@ -737,7 +737,6 @@ namespace nd
 		
 			for (ConvexHull::ndNode* node = ch.GetFirst(); node; node = node->GetNext())
 			{
-				//ConvexHullFace* const face = &node->GetInfo();
 				const ndConvexHull3dFace* const face = &node->GetInfo();
 				combinedCH->AddTriangle(Vec3<int32_t>(face->m_index[0], face->m_index[1], face->m_index[2]));
 			}
