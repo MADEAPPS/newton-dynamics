@@ -234,6 +234,7 @@ void ndArray<T>::Resize(ndInt64 newSize)
 	}
 	else if (newSize < m_capacity)
 	{
+		ndInt64 oldSize = newSize;
 		newSize = ndMax(newSize, ndInt64(16));
 		T* const newArray = (T*)ndMemory::Malloc(sizeof(T) * size_t(newSize));
 		if (m_array) 
@@ -241,7 +242,7 @@ void ndArray<T>::Resize(ndInt64 newSize)
 			CopyBuffer(newArray, m_array, newSize);
 			ndMemory::Free(m_array);
 		}
-		m_size = newSize;
+		m_size = oldSize;
 		m_array = newArray;
 		m_capacity = newSize;
 	}
