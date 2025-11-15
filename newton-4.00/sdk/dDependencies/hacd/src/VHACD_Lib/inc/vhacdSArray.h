@@ -21,11 +21,20 @@ namespace nd
 	namespace VHACD 
 	{
 		//!    SArray.
-#if 0 
+#if 1
 		template <typename T>
 		class SArray : public ndArray<T>
 		{
 			public:
+
+			void operator=(const SArray& rhs)
+			{
+				SetCount(0);
+				for (ndInt32 i = 0; i < ndInt32 (rhs.GetCount()); ++i)
+				{
+					PushBack(rhs[i]);
+				}
+			}
 
 			T& operator[](ndInt32 i)
 			{
@@ -71,10 +80,10 @@ namespace nd
 
 			void Allocate(size_t size)
 			{
-				SetCount(ndInt32 (size));
+				Resize(size);
+				SetCount(0);
 			}
 		};
-	}
 
 #else
 
