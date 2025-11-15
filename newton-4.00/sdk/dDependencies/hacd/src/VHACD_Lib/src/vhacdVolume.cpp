@@ -397,8 +397,10 @@ namespace nd
 				m_maxBBVoxels[h] = m_voxels[0].m_coord[h];
 			}
 			Vec3 bary(0.0);
-			for (size_t p = 0; p < nVoxels; ++p) {
-				for (size_t h = 0; h < 3; ++h) {
+			for (size_t p = 0; p < nVoxels; ++p) 
+			{
+				for (size_t h = 0; h < 3; ++h) 
+				{
 					bary[h] += m_voxels[p].m_coord[h];
 					if (m_minBBVoxels[h] > m_voxels[p].m_coord[h])
 						m_minBBVoxels[h] = m_voxels[p].m_coord[h];
@@ -407,7 +409,8 @@ namespace nd
 				}
 			}
 			bary /= (double)nVoxels;
-			for (size_t h = 0; h < 3; ++h) {
+			for (size_t h = 0; h < 3; ++h) 
+			{
 				m_minBBPts[h] = m_minBBVoxels[h] * m_scale + m_minBB[h];
 				m_maxBBPts[h] = m_maxBBVoxels[h] * m_scale + m_minBB[h];
 				m_barycenter[h] = (short)(bary[h] + 0.5);
@@ -508,8 +511,8 @@ namespace nd
 		}
 
 		void VoxelSet::Intersect(const Plane& plane,
-			SArray<Vec3 >* const positivePts,
-			SArray<Vec3 >* const negativePts,
+			SArray<Vec3>* const positivePts,
+			SArray<Vec3>* const negativePts,
 			const size_t sampling) const
 		{
 			const size_t nVoxels = m_voxels.Size();
@@ -518,17 +521,15 @@ namespace nd
 				return;
 			}
 			const double d0 = m_scale;
-			double d;
+
 			Vec3 pts[8];
-			Vec3 pt;
-			Voxel voxel;
 			size_t sp = 0;
 			size_t sn = 0;
 			for (size_t v = 0; v < nVoxels; ++v) 
 			{
-				voxel = m_voxels[v];
-				pt = GetPoint(voxel);
-				d = plane.m_a * pt[0] + plane.m_b * pt[1] + plane.m_c * pt[2] + plane.m_d;
+				Voxel voxel (m_voxels[v]);
+				Vec3 pt (GetPoint(voxel));
+				double d = plane.m_a * pt[0] + plane.m_b * pt[1] + plane.m_c * pt[2] + plane.m_d;
 				if (d >= 0.0) 
 				{
 					if (d <= d0) 
@@ -599,7 +600,7 @@ namespace nd
 
 		void VoxelSet::ComputeExteriorPoints(const Plane& plane,
 			const Mesh& mesh,
-			SArray<Vec3 >* const exteriorPts) const
+			SArray<Vec3>* const exteriorPts) const
 		{
 			const size_t nVoxels = m_voxels.Size();
 			if (nVoxels == 0)
@@ -967,33 +968,35 @@ namespace nd
 			vset.m_voxels.Allocate(m_numVoxelsInsideSurface + m_numVoxelsOnSurface);
 			vset.m_scale = m_scale;
 			vset.m_unitVolume = m_scale * m_scale * m_scale;
-			const short i0 = (short)m_dim[0];
-			const short j0 = (short)m_dim[1];
-			const short k0 = (short)m_dim[2];
-			Voxel voxel;
 			vset.m_numVoxelsOnSurface = 0;
 			vset.m_numVoxelsInsideSurface = 0;
-			for (short i = 0; i < i0; ++i) 
+
+			const ndInt32 i0 = (ndInt32)m_dim[0];
+			const ndInt32 j0 = (ndInt32)m_dim[1];
+			const ndInt32 k0 = (ndInt32)m_dim[2];
+			for (ndInt32 i = 0; i < i0; ++i)
 			{
-				for (short j = 0; j < j0; ++j) 
+				for (ndInt32 j = 0; j < j0; ++j)
 				{
-					for (short k = 0; k < k0; ++k) 
+					for (ndInt32 k = 0; k < k0; ++k)
 					{
 						const unsigned char& value = GetVoxel(size_t(i), size_t(j), size_t(k));
 						if (value == PRIMITIVE_INSIDE_SURFACE) 
 						{
-							voxel.m_coord[0] = i;
-							voxel.m_coord[1] = j;
-							voxel.m_coord[2] = k;
+							Voxel voxel;
+							voxel.m_coord[0] = ndInt16(i);
+							voxel.m_coord[1] = ndInt16(j);
+							voxel.m_coord[2] = ndInt16(k);
 							voxel.m_data = PRIMITIVE_INSIDE_SURFACE;
 							vset.m_voxels.PushBack(voxel);
 							++vset.m_numVoxelsInsideSurface;
 						}
 						else if (value == PRIMITIVE_ON_SURFACE) 
 						{
-							voxel.m_coord[0] = i;
-							voxel.m_coord[1] = j;
-							voxel.m_coord[2] = k;
+							Voxel voxel;
+							voxel.m_coord[0] = ndInt16(i);
+							voxel.m_coord[1] = ndInt16(j);
+							voxel.m_coord[2] = ndInt16(k);
 							voxel.m_data = PRIMITIVE_ON_SURFACE;
 							vset.m_voxels.PushBack(voxel);
 							++vset.m_numVoxelsOnSurface;
