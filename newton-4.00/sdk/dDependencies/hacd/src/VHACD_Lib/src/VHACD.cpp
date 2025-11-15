@@ -203,8 +203,8 @@ namespace nd
 			const int32_t convexhullDownsampling, const double, const double, Plane& bestPlane,
 			double& minConcavity, const Parameters& params)
 		{
-			int32_t iBest = -1;
-			int32_t nPlanes = static_cast<int32_t>(planes.Size());
+			ndInt32 iBest = -1;
+			ndInt32 nPlanes = ndInt32(planes.Size());
 			double minTotal = MAX_DOUBLE;
 			double minBalance = MAX_DOUBLE;
 			double minSymmetry = MAX_DOUBLE;
@@ -273,17 +273,17 @@ namespace nd
 						rightCHPts.Resize(0);
 						m_commonData->m_onSurfacePSet->Intersect(m_plane, &rightCHPts, &leftCHPts, size_t (m_commonData->m_convexhullDownsampling * 32));
 						m_commonData->m_inputPSet->GetConvexHull().Clip(m_plane, rightCHPts, leftCHPts);
-						rightCH.ComputeConvexHull(rightCHPts.Data(), rightCHPts.Size());
 						leftCH.ComputeConvexHull(leftCHPts.Data(), leftCHPts.Size());
+						rightCH.ComputeConvexHull(rightCHPts.Data(), rightCHPts.Size());
 					}
 					else 
 					{
-						_ASSERT(0);
+						ndAssert(0);
 						PrimitiveSet* const right = m_commonData->m_psets[threadId * 2 + 0];
 						PrimitiveSet* const left = m_commonData->m_psets[threadId * 2 + 1];
 						m_commonData->m_onSurfacePSet->Clip(m_plane, right, left);
-						right->ComputeConvexHull(rightCH, size_t(m_commonData->m_convexhullDownsampling));
 						left->ComputeConvexHull(leftCH, size_t(m_commonData->m_convexhullDownsampling));
+						right->ComputeConvexHull(rightCH, size_t(m_commonData->m_convexhullDownsampling));
 					}
 
 					double volumeLeftCH = leftCH.ComputeVolume();
@@ -419,8 +419,8 @@ namespace nd
 					const double progress1 = (double(p) + 0.75) * 100.0 / (double)nInputParts;
 					const double progress2 = (double(p) + 1.00) * 100.0 / (double)nInputParts;
 
-					PrimitiveSet* pset = inputParts[p];
-					inputParts[p] = 0;
+					PrimitiveSet* const pset = inputParts[p];
+					inputParts[p] = nullptr;
 					double volume = pset->ComputeVolume();
 					pset->ComputeBB();
 					pset->ComputePrincipalAxes();
@@ -519,11 +519,10 @@ namespace nd
 					}
 				}
 
-				{
-					inputParts = temp;
-					temp.Resize(0);
-				}
+				inputParts = temp;
+				temp.Resize(0);
 			}
+
 			const size_t nInputParts = inputParts.Size();
 			for (size_t p = 0; p < nInputParts; ++p) 
 			{
