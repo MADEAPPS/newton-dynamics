@@ -632,11 +632,14 @@ namespace nd
 			positiveVolume = 0.0;
 			const size_t nVoxels = m_voxels.Size();
 			if (nVoxels == 0)
+			{
 				return;
+			}
 			double d;
 			Vec3 pt;
 			size_t nPositiveVoxels = 0;
-			for (size_t v = 0; v < nVoxels; ++v) {
+			for (size_t v = 0; v < nVoxels; ++v) 
+			{
 				pt = GetPoint(m_voxels[v]);
 				d = plane.m_a * pt[0] + plane.m_b * pt[1] + plane.m_c * pt[2] + plane.m_d;
 				nPositiveVoxels += (d >= 0.0);
