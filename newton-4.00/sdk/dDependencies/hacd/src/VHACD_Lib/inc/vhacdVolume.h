@@ -30,6 +30,9 @@ namespace nd
 			PRIMITIVE_ON_SURFACE = 3
 		};
 
+		class ConvexHull3dPointSet;
+		class ConvexHullAABBTreeNode;
+
 		struct Voxel 
 		{
 			public:
@@ -56,6 +59,13 @@ namespace nd
 				SArray<Vec3>* const exteriorPts) const = 0;
 			virtual void ComputeClippedVolumes(const Plane& plane, double& positiveVolume,
 				double& negativeVolume) const = 0;
+
+			virtual void CalculateVoxelSpace(ConvexHull3dPointSet& space) const = 0;
+			virtual void ComputeClippedVolumes(
+				const ConvexHullAABBTreeNode* const voxelSpace,
+				const Plane& plane, double& positiveVolume,
+				double& negativeVolume) const = 0;
+
 			virtual void SelectOnSurface(PrimitiveSet* const onSurfP) const = 0;
 			virtual void ComputeConvexHull(Mesh& meshCH, const size_t sampling = 1) const = 0;
 			virtual void ComputeBB() = 0;
@@ -64,7 +74,9 @@ namespace nd
 			virtual void RevertAlignToPrincipalAxes() = 0;
 			virtual void Convert(Mesh& mesh, const VOXEL_VALUE value) const = 0;
 			virtual void GetPointArray(ndArray<Vec3>& points) const = 0;
+
 			const Mesh& GetConvexHull() const { return m_convexHull; }
+			
 			Mesh& GetConvexHull() { return m_convexHull; }
 			private:
 			Mesh m_convexHull;
@@ -122,6 +134,12 @@ namespace nd
 			void ComputeExteriorPoints(const Plane& plane, const Mesh& mesh,
 				SArray<Vec3>* const exteriorPts) const;
 			void ComputeClippedVolumes(const Plane& plane, double& positiveVolume, double& negativeVolume) const;
+
+			virtual void CalculateVoxelSpace(ConvexHull3dPointSet& space) const;
+			void ComputeClippedVolumes(
+				const ConvexHullAABBTreeNode* const voxelSpace, const Plane& plane, 
+				double& positiveVolume,	double& negativeVolume) const;
+
 			void SelectOnSurface(PrimitiveSet* const onSurfP) const;
 			void ComputeBB();
 			void Convert(Mesh& mesh, const VOXEL_VALUE value) const;

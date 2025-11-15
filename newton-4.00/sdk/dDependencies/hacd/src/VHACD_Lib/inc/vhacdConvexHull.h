@@ -33,7 +33,7 @@ namespace nd
 		class ConvexHullVertex : public ndBigVector
 		{
 			public:
-			int m_mark;
+			ndInt32 m_mark;
 		};
 
 		class ConvexHullAABBTreeNode
@@ -43,6 +43,7 @@ namespace nd
 				:m_left(nullptr)
 				,m_right(nullptr)
 				,m_parent(nullptr)
+				,m_count(0)
 			{
 			}
 
@@ -50,6 +51,7 @@ namespace nd
 				:m_left(nullptr)
 				,m_right(nullptr)
 				,m_parent(parent)
+				,m_count(0)
 			{
 			}
 
@@ -57,6 +59,7 @@ namespace nd
 			ConvexHullAABBTreeNode* m_left;
 			ConvexHullAABBTreeNode* m_right;
 			ConvexHullAABBTreeNode* m_parent;
+			ndInt32 m_count;
 		};
 
 		class ConvexHull3dPointCluster : public ConvexHullAABBTreeNode
@@ -72,8 +75,8 @@ namespace nd
 			{
 			}
 
-			int m_count;
-			int m_indices[VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE];
+			//ndInt32 m_count;
+			ndInt32 m_indices[VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE];
 		};
 
 		class ConvexHull3dPointSet : public ndArray<ConvexHullVertex>
@@ -83,8 +86,10 @@ namespace nd
 			ConvexHull3dPointSet(const double* const vertexCloud, ndInt32 strideInBytes, ndInt32 count);
 			ConvexHullAABBTreeNode* BuildAccelerator();
 
+			const ConvexHullAABBTreeNode* GetTree() const;
+
 			private:
-			ConvexHullAABBTreeNode* BuildRecurse(ConvexHullAABBTreeNode* const parent, ConvexHullVertex* const points, int count, int baseIndex, ndInt32& memoryPool);
+			ConvexHullAABBTreeNode* BuildRecurse(ConvexHullAABBTreeNode* const parent, ConvexHullVertex* const points, ndInt32 count, ndInt32 baseIndex, ndInt32& memoryPool);
 			ndArray<ConvexHull3dPointCluster> m_treeBuffer;
 		};
 
@@ -96,10 +101,10 @@ namespace nd
 			ndBigPlane GetPlaneEquation(const ndBigVector* const pointArray, bool& isValid) const;
 
 			public:
-			int m_index[3];
+			ndInt32 m_index[3];
 
 			private:
-			int m_mark;
+			ndInt32 m_mark;
 			ndList<ndConvexHull3dFace, ndContainersFreeListAlloc<ndConvexHull3dFace>>::ndNode* m_twin[3];
 
 			friend class ConvexHull;
@@ -110,19 +115,19 @@ namespace nd
 			class ndNormalMap;
 
 			public:
-			ConvexHull(ConvexHull3dPointSet& accelerator, double distTol, int maxVertexCount = 0x7fffffff);
-			ConvexHull(const double* const vertexCloud, int strideInBytes, int count, double distTol, int maxVertexCount = 0x7fffffff);
+			ConvexHull(ConvexHull3dPointSet& accelerator, double distTol, ndInt32 maxVertexCount = 0x7fffffff);
+			ConvexHull(const double* const vertexCloud, ndInt32 strideInBytes, ndInt32 count, double distTol, ndInt32 maxVertexCount = 0x7fffffff);
 			~ConvexHull();
 
 			const ndArray<ndBigVector>& GetVertexPool() const;
 
 			private:
 			ConvexHullAABBTreeNode* InitVertexArray(ConvexHull3dPointSet& accelerator);
-			void BuildHull(ConvexHull3dPointSet& accelerator, double distTol, int maxVertexCount);
+			void BuildHull(ConvexHull3dPointSet& accelerator, double distTol, ndInt32 maxVertexCount);
 
 			ndNode* AddFace(ndInt32 i0, ndInt32 i1, ndInt32 i2);
 
-			void CalculateConvexHull3d(ConvexHullAABBTreeNode* vertexTree, ndArray<ConvexHullVertex>& points, int count, double distTol, int maxVertexCount);
+			void CalculateConvexHull3d(ConvexHullAABBTreeNode* vertexTree, ndArray<ConvexHullVertex>& points, ndInt32 count, double distTol, ndInt32 maxVertexCount);
 
 			ndInt32 SupportVertex(ConvexHullAABBTreeNode** const tree, const ndArray<ConvexHullVertex>& points, const ndBigVector& dir, const bool removeEntry = true) const;
 			double TetrahedrumVolume(const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2, const ndBigVector& p3) const;

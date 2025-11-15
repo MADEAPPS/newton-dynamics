@@ -210,17 +210,13 @@ namespace nd
 			double minSymmetry = MAX_DOUBLE;
 			minConcavity = MAX_DOUBLE;
 
-			PrimitiveSet* onSurfacePSet = inputPSet->Create();
+			PrimitiveSet* const onSurfacePSet = inputPSet->Create();
 			inputPSet->SelectOnSurface(onSurfacePSet);
 
-			PrimitiveSet** psets = 0;
-			if (!params.m_convexhullApproximation) 
+			PrimitiveSet** psets = new PrimitiveSet*[2];
+			for (int32_t i = 0; i < 2; ++i) 
 			{
-				psets = new PrimitiveSet*[2];
-				for (int32_t i = 0; i < 2; ++i) 
-				{
-					psets[i] = inputPSet->Create();
-				}
+				psets[i] = inputPSet->Create();
 			}
 
 			class CommonData
@@ -239,6 +235,7 @@ namespace nd
 				const Parameters& m_params;
 				PrimitiveSet* m_onSurfacePSet;
 				const PrimitiveSet* m_inputPSet;
+				const ConvexHullAABBTreeNode* m_voxelSpace;
 				ndInt32 m_convexhullDownsampling;
 				Mesh chs[VHACD_WORKERS_THREADS][2];
 				SArray<Vec3> chPts[VHACD_WORKERS_THREADS][2];
@@ -264,36 +261,29 @@ namespace nd
 					rightCH.ResizeTriangles(0);
 					leftCH.ResizeTriangles(0);
 
-					if (m_commonData->m_params.m_convexhullApproximation)
-					{
-						SArray<Vec3>& leftCHPts = m_commonData->chPts[threadId][0];
-						SArray<Vec3>& rightCHPts = m_commonData->chPts[threadId][1];
+					SArray<Vec3>& leftCHPts = m_commonData->chPts[threadId][0];
+					SArray<Vec3>& rightCHPts = m_commonData->chPts[threadId][1];
 
-						leftCHPts.Resize(0);
-						rightCHPts.Resize(0);
-						m_commonData->m_onSurfacePSet->Intersect(m_plane, &rightCHPts, &leftCHPts, size_t (m_commonData->m_convexhullDownsampling * 32));
-						m_commonData->m_inputPSet->GetConvexHull().Clip(m_plane, rightCHPts, leftCHPts);
-						leftCH.ComputeConvexHull(leftCHPts.Data(), leftCHPts.Size());
-						rightCH.ComputeConvexHull(rightCHPts.Data(), rightCHPts.Size());
-					}
-					else 
-					{
-						ndAssert(0);
-						PrimitiveSet* const right = m_commonData->m_psets[threadId * 2 + 0];
-						PrimitiveSet* const left = m_commonData->m_psets[threadId * 2 + 1];
-						m_commonData->m_onSurfacePSet->Clip(m_plane, right, left);
-						left->ComputeConvexHull(leftCH, size_t(m_commonData->m_convexhullDownsampling));
-						right->ComputeConvexHull(rightCH, size_t(m_commonData->m_convexhullDownsampling));
-					}
+					leftCHPts.Resize(0);
+					rightCHPts.Resize(0);
+					m_commonData->m_onSurfacePSet->Intersect(m_plane, &rightCHPts, &leftCHPts, size_t (m_commonData->m_convexhullDownsampling * 32));
+					m_commonData->m_inputPSet->GetConvexHull().Clip(m_plane, rightCHPts, leftCHPts);
+					leftCH.ComputeConvexHull(leftCHPts.Data(), leftCHPts.Size());
+					rightCH.ComputeConvexHull(rightCHPts.Data(), rightCHPts.Size());
 
 					double volumeLeftCH = leftCH.ComputeVolume();
 					double volumeRightCH = rightCH.ComputeVolume();
 			
 					// compute clipped volumes
-					double volumeLeft = 0.0;
-					double volumeRight = 0.0;
-			
-					m_commonData->m_inputPSet->ComputeClippedVolumes(m_plane, volumeRight, volumeLeft);
+					//double volumeLeft;
+					//double volumeRight;
+					//m_commonData->m_inputPSet->ComputeClippedVolumes(m_plane, volumeRight, volumeLeft);
+
+					double volumeLeft;
+					double volumeRight;
+					m_commonData->m_inputPSet->ComputeClippedVolumes(m_commonData->m_voxelSpace, m_plane, volumeRight, volumeLeft);
+					//ndAssert(ndAreEqual(volumeLeft__, volumeLeft, 1.0e-5));
+					//ndAssert(ndAreEqual(volumeRight__, volumeRight, 1.0e-5));
 			
 					double concavityLeft = float(ComputeConcavity(volumeLeft, volumeLeftCH, m_commonData->m_me->m_volumeCH0));
 					double concavityRight = float(ComputeConcavity(volumeRight, volumeRightCH, m_commonData->m_me->m_volumeCH0));
@@ -314,15 +304,19 @@ namespace nd
 			};
 			ndFixSizeArray<BestClippingPlaneJob, 1024> jobs;
 
+			ConvexHull3dPointSet space;
+			inputPSet->CalculateVoxelSpace(space);
+
 			CommonData data(this, params);
 			data.m_w = w;
 			data.m_beta = beta;
 			data.m_alpha = alpha;
 			data.m_psets = psets;
 			data.m_inputPSet = inputPSet;
+			data.m_voxelSpace = space.GetTree();
 			data.m_onSurfacePSet = onSurfacePSet;
-			data.m_preferredCuttingDirection = preferredCuttingDirection;
 			data.m_convexhullDownsampling = convexhullDownsampling;
+			data.m_preferredCuttingDirection = preferredCuttingDirection;
 #if 1
 			for (ndInt32 i = 0; i < nPlanes; ++i)
 			{
@@ -333,11 +327,17 @@ namespace nd
 			}
 			m_parallelQueue.Sync();
 #else
+			//static int xxxx = 0;
 			for (ndInt32 i = 0; i < nPlanes; ++i)
 			{
 				jobs.PushBack(BestClippingPlaneJob());
 				jobs[i].m_plane = planes[i];
 				jobs[i].m_commonData = &data;
+				//xxxx++;
+				//if (xxxx == 76)
+				//{
+				//	xxxx *= 1;
+				//}
 				jobs[i].Execute(0);
 			}
 #endif
