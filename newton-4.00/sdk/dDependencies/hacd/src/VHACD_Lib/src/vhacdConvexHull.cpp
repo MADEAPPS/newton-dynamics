@@ -347,7 +347,7 @@ namespace nd
 					ndBigPlane n(p0, p1, p2);
 					n = n.Scale(double(1.0f) / sqrt(n.DotProduct(n).GetScalar()));
 					n.m_w = double(0.0f);
-					int index = dBitReversal(count, sizeof(m_normal) / sizeof(m_normal[0]));
+					int index = ndBitReversal(count, sizeof(m_normal) / sizeof(m_normal[0]));
 					m_normal[index] = n;
 					count++;
 					ndAssert(count <= int(sizeof(m_normal) / sizeof(m_normal[0])));
