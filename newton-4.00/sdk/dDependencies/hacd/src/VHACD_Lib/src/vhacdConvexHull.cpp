@@ -359,7 +359,7 @@ namespace nd
 		};
 
 		ConvexHull::ConvexHull(const double* const vertexCloud, int strideInBytes, int count, double distTol, int maxVertexCount)
-			:ndList<ndConvexHull3dFace>()
+			:ndList<ndConvexHull3dFace, ndContainersFreeListAlloc<ndConvexHull3dFace>>()
 			,m_aabbP0(ndBigVector::m_zero)
 			,m_aabbP1(ndBigVector::m_zero)
 			,m_points()
@@ -371,7 +371,7 @@ namespace nd
 		}
 
 		ConvexHull::ConvexHull(ConvexHull3dPointSet& accelerator, double distTol, int maxVertexCount)
-			:ndList<ndConvexHull3dFace>()
+			:ndList<ndConvexHull3dFace, ndContainersFreeListAlloc<ndConvexHull3dFace>>()
 			,m_aabbP0(ndBigVector::m_zero)
 			,m_aabbP1(ndBigVector::m_zero)
 			,m_points()
@@ -695,7 +695,7 @@ namespace nd
 			f3->m_twin[1] = f1Node;
 			f3->m_twin[2] = f2Node;
 	
-			ndList<ndNode*> boundaryFaces;
+			ndList<ndNode*, ndContainersFreeListAlloc<ndNode*>> boundaryFaces;
 			boundaryFaces.Append(f0Node);
 			boundaryFaces.Append(f1Node);
 			boundaryFaces.Append(f2Node);

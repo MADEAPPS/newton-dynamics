@@ -842,7 +842,7 @@ namespace nd
 				{ 0, 0, -1 } };
 
 			Triangle current;
-			ndList<Triangle> fifo;
+			ndList<Triangle, ndContainersFreeListAlloc<Triangle>> fifo;
 
 			for (size_t i = i0; i < i1; ++i) 
 			{
@@ -861,7 +861,7 @@ namespace nd
 							++m_numVoxelsOutsideSurface;
 							while (fifo.GetCount() > 0)
 							{
-								ndList<Triangle>::ndNode* const node = fifo.GetFirst();
+								ndList<Triangle, ndContainersFreeListAlloc<Triangle>>::ndNode* const node = fifo.GetFirst();
 								current = node->GetInfo();
 								fifo.Remove(node);
 								for (int32_t h = 0; h < 6; ++h) 

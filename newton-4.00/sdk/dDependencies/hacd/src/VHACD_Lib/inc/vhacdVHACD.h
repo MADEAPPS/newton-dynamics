@@ -49,10 +49,11 @@ namespace nd
 			}
 			void Clean(void)
 			{
-				delete m_volume;
 				delete m_pset;
+				delete m_volume;
 				size_t nCH = m_convexHulls.Size();
-				for (size_t p = 0; p < nCH; ++p) {
+				for (size_t p = 0; p < nCH; ++p) 
+				{
 					delete m_convexHulls[p];
 				}
 				m_convexHulls.Clear();

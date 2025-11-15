@@ -48,8 +48,8 @@ namespace nd
 
 			ConvexHullAABBTreeNode(ConvexHullAABBTreeNode* const parent)
 				:m_left(nullptr)
-				, m_right(nullptr)
-				, m_parent(parent)
+				,m_right(nullptr)
+				,m_parent(parent)
 			{
 			}
 
@@ -100,12 +100,12 @@ namespace nd
 
 			private:
 			int m_mark;
-			ndList<ndConvexHull3dFace>::ndNode* m_twin[3];
+			ndList<ndConvexHull3dFace, ndContainersFreeListAlloc<ndConvexHull3dFace>>::ndNode* m_twin[3];
 
 			friend class ConvexHull;
 		};
 
-		class ConvexHull : public ndList<ndConvexHull3dFace>
+		class ConvexHull : public ndList<ndConvexHull3dFace, ndContainersFreeListAlloc<ndConvexHull3dFace>>
 		{
 			class ndNormalMap;
 
