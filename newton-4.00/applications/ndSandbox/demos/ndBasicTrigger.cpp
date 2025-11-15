@@ -137,13 +137,13 @@ void ndBasicTrigger (ndDemoEntityManager* const scene)
 		}
 	};
 	
-	//AddBox(scene, PlaceMatrix(0.0f, 20.0f, -3.0f), 0.6f, 10.0f);
-	//AddSph(scene, PlaceMatrix(0.0f, 5.0f, 0.0f), 0.5f, 10.0f);
-	//AddCapsule(scene, PlaceMatrix(0.0f, 5.0f, 3.0f), 0.7f, 10.0f);
+	AddBox(scene, PlaceMatrix(0.0f, 20.0f, -3.0f), 0.6f, 10.0f);
+	AddSph(scene, PlaceMatrix(0.0f, 5.0f, 0.0f), 0.5f, 10.0f);
+	AddCapsule(scene, PlaceMatrix(0.0f, 5.0f, 3.0f), 0.7f, 10.0f);
 	AddCompound(scene, PlaceMatrix(3.0f, 5.0f, 3.0f), 0.9f, 10.0f);
-	//AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f, -2.0f), 7, 1.0f, 1.5f, 0.8f, 10.0f);
-	//AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f,  2.0f), 21, 1.0f, 1.5f, 0.7f, 10.0f);
-	//AddConvexHull(scene, PlaceMatrix( 2.0f, 5.0f,  3.0f), 210, 1.0f, 1.5f, 0.9f, 10.0f);
+	AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f, -2.0f), 7, 1.0f, 1.5f, 0.8f, 10.0f);
+	AddConvexHull(scene, PlaceMatrix(-2.0f, 5.0f,  2.0f), 21, 1.0f, 1.5f, 0.7f, 10.0f);
+	AddConvexHull(scene, PlaceMatrix( 2.0f, 5.0f,  3.0f), 210, 1.0f, 1.5f, 0.9f, 10.0f);
 
 	ndQuaternion rot;
 	ndVector origin(-30.0f, 10.0f, 0.0f, 1.0f);

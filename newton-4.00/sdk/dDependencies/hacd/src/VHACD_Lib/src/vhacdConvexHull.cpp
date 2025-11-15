@@ -712,9 +712,9 @@ namespace nd
 			maxVertexCount -= 4;
 			size_t currentIndex = 4;
 
-			ndFixSizeArray<ndNode*, 1024 * 4> stack;
-			ndFixSizeArray<ndNode*, 1024 * 4> coneList;
-			ndFixSizeArray<ndNode*, 1024 * 4> deleteList;
+			ndFixSizeArray<ndNode*, 1024 * 2> stack;
+			ndFixSizeArray<ndNode*, 1024 * 2> coneList;
+			ndFixSizeArray<ndNode*, 1024 * 2> deleteList;
 
 			while (boundaryFaces.GetCount() && count && (maxVertexCount > 0))
 			{
@@ -750,6 +750,7 @@ namespace nd
 
 				if (isvalid && (dist >= distTol) && (face->Evalue(&m_points[0], p) > double(0.0f)))
 				{
+					ndAssert(faceNode);
 					ndAssert(stack.GetCount() == 0);
 					ndAssert(deleteList.GetCount() == 0);
 
@@ -767,9 +768,9 @@ namespace nd
 								ndAssert(deleteList[i] != node1);
 							}
 							#endif
-			
-							deleteList.PushBack(node1);
+
 							face1->m_mark = 1;
+							deleteList.PushBack(node1);
 							for (ndInt32 i = 0; i < 3; ++i)
 							{
 								ndNode* const twinNode = face1->m_twin[i];

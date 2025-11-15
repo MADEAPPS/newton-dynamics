@@ -23,16 +23,15 @@
 #include "ndSort.h"
 #include "ndConvexHull2d.h"
 
-
 //ndInt32 ndConvexHull2d_new(ndVector* const vertexCloud2d, ndInt32 count)
 //{
 //	auto Cross = [](const ndVector& O, const ndVector& A, const ndVector& B)
-//		{
-//			const ndVector a0(A - O);
-//			const ndVector b0(B - O);
-//			const ndFloat32 sign = a0.m_y * b0.m_x - a0.m_x * b0.m_y;
-//			return sign;
-//		};
+//	{
+//		const ndVector a0(A - O);
+//		const ndVector b0(B - O);
+//		const ndFloat32 sign = a0.m_y * b0.m_x - a0.m_x * b0.m_y;
+//		return sign;
+//	};
 //
 //	if (count <= 3)
 //	{
@@ -178,7 +177,6 @@ ndInt32 ndConvexHull2d(ndVector* const vertexCloud2d, ndInt32 count)
 	};
 	ndSort<ndVector, CompareVertex>(vertexCloud2d, count, nullptr);
 
-	//ndVector* const hull = ndAlloca(ndVector, 2 * count);
 	ndFixSizeArray<ndVector, 256> hull(2 * count);
 
 	// Build lower hull
