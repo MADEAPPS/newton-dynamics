@@ -30,19 +30,6 @@ namespace nd
 	{
 		#define VHACD_WORKERS_THREADS	8
 
-		inline int dBitReversal(int v, int base)
-		{
-			int x = 0;
-			int power = ndExp2(base) - 1;
-			do
-			{
-				x += (v & 1) << power;
-				v >>= 1;
-				power--;
-			} while (v);
-			return x;
-		}
-
 		class Job
 		{
 			public:
