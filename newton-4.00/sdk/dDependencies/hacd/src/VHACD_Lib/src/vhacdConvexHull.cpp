@@ -25,10 +25,8 @@
 
 namespace nd
 {
-
 	namespace VHACD
 	{
-#if 1
 		#define DG_STACK_DEPTH_3D 64
 		ndConvexHull3dFace::ndConvexHull3dFace()
 		{
@@ -99,12 +97,12 @@ namespace nd
 		{
 		}
 
-		ConvexHull3dPointSet::ConvexHull3dPointSet(const double* const vertexCloud, int strideInBytes, int count)
+		ConvexHull3dPointSet::ConvexHull3dPointSet(const double* const vertexCloud, ndInt32 strideInBytes, ndInt32 count)
 		{
 			SetCount(count);
 
 			ndArray<ConvexHullVertex>& array = *this;
-			const ndInt32 stride = int(strideInBytes / sizeof(double));
+			const ndInt32 stride = ndInt32(strideInBytes / sizeof(double));
 			for (ndInt32 i = 0; i < count; ++i)
 			{
 				ndInt32 index = i * stride;
@@ -409,9 +407,6 @@ namespace nd
 
 		ndInt32 ConvexHull::SupportVertex(ConvexHullAABBTreeNode** const treePointer, const ndArray<ConvexHullVertex>& points, const ndBigVector& dirPlane, const bool removeEntry) const
 		{
-			//double aabbProjection[DG_STACK_DEPTH_3D];
-			//const ConvexHullAABBTreeNode *stackPool[DG_STACK_DEPTH_3D];
-
 			ndFixSizeArray<double, DG_STACK_DEPTH_3D> aabbProjection;
 			ndFixSizeArray<const ConvexHullAABBTreeNode*, DG_STACK_DEPTH_3D> stackPool;
 			
@@ -660,7 +655,7 @@ namespace nd
 			return tree;
 		}
 
-		ConvexHull::ndNode* ConvexHull::AddFace(int i0, int i1, int i2)
+		ConvexHull::ndNode* ConvexHull::AddFace(ndInt32 i0, ndInt32 i1, ndInt32 i2)
 		{
 			ndNode* const node = Append();
 			ndConvexHull3dFace& face = node->GetInfo();
@@ -867,17 +862,5 @@ namespace nd
 			}
 			m_points.SetCount(ndInt32 (currentIndex));
 		}
-#else
-
-	//ConvexHull(const double* const vertexCloud, int strideInBytes, int count, double distTol, int maxVertexCount)
-	ConvexHull::ConvexHull(const double* const vertexCloud, int strideInBytes, int count, double distTol, int maxVertexCount)
-		:ndConvexHull3d(vertexCloud, strideInBytes, count, distTol, maxVertexCount)
-	{
-	}
-
-	ConvexHull::~ConvexHull()
-	{
-	}
-#endif
 	}
 }

@@ -29,7 +29,6 @@ namespace nd
 {
 	namespace VHACD
 	{
-#if 1
 		#define VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE 16
 		class ConvexHullVertex : public ndBigVector
 		{
@@ -42,8 +41,8 @@ namespace nd
 			public:
 			ConvexHullAABBTreeNode()
 				:m_left(nullptr)
-				, m_right(nullptr)
-				, m_parent(nullptr)
+				,m_right(nullptr)
+				,m_parent(nullptr)
 			{
 			}
 
@@ -81,7 +80,7 @@ namespace nd
 		{
 			public:
 			ConvexHull3dPointSet();
-			ConvexHull3dPointSet(const double* const vertexCloud, int strideInBytes, int count);
+			ConvexHull3dPointSet(const double* const vertexCloud, ndInt32 strideInBytes, ndInt32 count);
 			ConvexHullAABBTreeNode* BuildAccelerator();
 
 			private:
@@ -121,7 +120,7 @@ namespace nd
 			ConvexHullAABBTreeNode* InitVertexArray(ConvexHull3dPointSet& accelerator);
 			void BuildHull(ConvexHull3dPointSet& accelerator, double distTol, int maxVertexCount);
 
-			ndNode* AddFace(int i0, int i1, int i2);
+			ndNode* AddFace(ndInt32 i0, ndInt32 i1, ndInt32 i2);
 
 			void CalculateConvexHull3d(ConvexHullAABBTreeNode* vertexTree, ndArray<ConvexHullVertex>& points, int count, double distTol, int maxVertexCount);
 
@@ -133,15 +132,6 @@ namespace nd
 			ndArray<ndBigVector> m_points;
 			double m_diag;
 		};
-#else
-		class ConvexHull : public ndConvexHull3d
-		{
-			public:
-			//ConvexHull(ConvexHull3dPointSet& accelerator, double distTol, int maxVertexCount = 0x7fffffff);
-			ConvexHull(const double* const vertexCloud, int strideInBytes, int count, double distTol, int maxVertexCount = 0x7fffffff);
-			~ConvexHull();
-		};
-#endif
 	}
 }
 #endif
