@@ -425,49 +425,39 @@ namespace nd
 			short i, j, k;
 			while (p < nVoxels) 
 			{
-				while (p < nVoxels) 
+				if (m_voxels[p].m_data == PRIMITIVE_ON_SURFACE) 
 				{
-					if (m_voxels[p].m_data == PRIMITIVE_ON_SURFACE) 
+					++s;
+					if (s == sampling) 
 					{
-						++s;
-						if (s == sampling) 
-						{
-							s = 0;
-							i = m_voxels[p].m_coord[0];
-							j = m_voxels[p].m_coord[1];
-							k = m_voxels[p].m_coord[2];
-							Vec3 p0((i - 0.5) * m_scale, (j - 0.5) * m_scale, (k - 0.5) * m_scale);
-							Vec3 p1((i + 0.5) * m_scale, (j - 0.5) * m_scale, (k - 0.5) * m_scale);
-							Vec3 p2((i + 0.5) * m_scale, (j + 0.5) * m_scale, (k - 0.5) * m_scale);
-							Vec3 p3((i - 0.5) * m_scale, (j + 0.5) * m_scale, (k - 0.5) * m_scale);
-							Vec3 p4((i - 0.5) * m_scale, (j - 0.5) * m_scale, (k + 0.5) * m_scale);
-							Vec3 p5((i + 0.5) * m_scale, (j - 0.5) * m_scale, (k + 0.5) * m_scale);
-							Vec3 p6((i + 0.5) * m_scale, (j + 0.5) * m_scale, (k + 0.5) * m_scale);
-							Vec3 p7((i - 0.5) * m_scale, (j + 0.5) * m_scale, (k + 0.5) * m_scale);
+						s = 0;
+						i = m_voxels[p].m_coord[0];
+						j = m_voxels[p].m_coord[1];
+						k = m_voxels[p].m_coord[2];
+						Vec3 p0((i - 0.5) * m_scale, (j - 0.5) * m_scale, (k - 0.5) * m_scale);
+						Vec3 p1((i + 0.5) * m_scale, (j - 0.5) * m_scale, (k - 0.5) * m_scale);
+						Vec3 p2((i + 0.5) * m_scale, (j + 0.5) * m_scale, (k - 0.5) * m_scale);
+						Vec3 p3((i - 0.5) * m_scale, (j + 0.5) * m_scale, (k - 0.5) * m_scale);
+						Vec3 p4((i - 0.5) * m_scale, (j - 0.5) * m_scale, (k + 0.5) * m_scale);
+						Vec3 p5((i + 0.5) * m_scale, (j - 0.5) * m_scale, (k + 0.5) * m_scale);
+						Vec3 p6((i + 0.5) * m_scale, (j + 0.5) * m_scale, (k + 0.5) * m_scale);
+						Vec3 p7((i - 0.5) * m_scale, (j + 0.5) * m_scale, (k + 0.5) * m_scale);
 
-     						points.PushBack(p0 + m_minBB);
-							points.PushBack(p1 + m_minBB);
-							points.PushBack(p2 + m_minBB);
-							points.PushBack(p3 + m_minBB);
-							points.PushBack(p4 + m_minBB);
-							points.PushBack(p5 + m_minBB);
-							points.PushBack(p6 + m_minBB);
-							points.PushBack(p7 + m_minBB);
-						}
+     					points.PushBack(p0 + m_minBB);
+						points.PushBack(p1 + m_minBB);
+						points.PushBack(p2 + m_minBB);
+						points.PushBack(p3 + m_minBB);
+						points.PushBack(p4 + m_minBB);
+						points.PushBack(p5 + m_minBB);
+						points.PushBack(p6 + m_minBB);
+						points.PushBack(p7 + m_minBB);
 					}
-					++p;
 				}
-				
-				ConvexHull ch(&points[0][0], sizeof(Vec3), int32_t(points.GetCount()), 1.0e-5f);
-				const ndArray<ndBigVector>& convexPoints = ch.GetVertexPool();
-				points.SetCount(0);
-				for (ndInt32 v = 0; v < ndInt32(convexPoints.GetCount()); v++)
-				{
-					const Vec3 hullPoint(convexPoints[v].m_x, convexPoints[v].m_y, convexPoints[v].m_z);
-					points.PushBack(hullPoint);
-				}
+				++p;
 			}
-			ConvexHull ch(&points[0][0], sizeof(Vec3), int32_t(points.GetCount()), 1.0e-5f);
+
+			ConvexHull3dPointSet accelerator(&points[0][0], sizeof(Vec3), int32_t(points.GetCount()));
+			ConvexHull ch(accelerator, 1.0e-5);
 			meshCH.ResizePoints(0);
 			meshCH.ResizeTriangles(0);
 
