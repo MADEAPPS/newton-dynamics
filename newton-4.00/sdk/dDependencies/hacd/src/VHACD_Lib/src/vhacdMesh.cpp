@@ -149,7 +149,7 @@ namespace nd
 		{
 			Vec3 bmin(m_points[0]);
 			Vec3 bmax(m_points[1]);
-			for (uint32_t i = 1; i < m_points.Size(); i++)
+			for (ndInt32 i = 1; i < ndInt32(m_points.Size()); i++)
 			{
 				const Vec3& p = m_points[i];
 				p.UpdateMinMax(bmin, bmax);

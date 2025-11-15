@@ -140,7 +140,7 @@ namespace nd
 			size_t m_numVoxelsInsideSurface;
 			Vec3 m_minBB;
 			double m_scale;
-			SArray<Voxel, 8> m_voxels;
+			SArray<Voxel> m_voxels;
 			double m_unitVolume;
 			Vec3 m_minBBPts;
 			Vec3 m_maxBBPts;

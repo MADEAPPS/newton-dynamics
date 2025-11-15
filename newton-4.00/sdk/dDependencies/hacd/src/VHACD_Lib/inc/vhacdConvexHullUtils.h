@@ -28,8 +28,7 @@ namespace nd
 {
 	namespace VHACD 
 	{
-		#define VHACD_WORKERS_THREADS	4
-		//#define VHACD_WORKERS_THREADS	1
+		#define VHACD_WORKERS_THREADS	8
 
 		inline int dBitReversal(int v, int base)
 		{
@@ -54,6 +53,8 @@ namespace nd
 			Job(const Job&)
 			{
 			}
+
+			Job& operator=(const Job& other) = default;
 
 			virtual ~Job()
 			{

@@ -41,11 +41,11 @@ namespace nd
 			}
 			void GetConvexHull(const uint32_t index, ConvexHull& ch) const
 			{
-				Mesh* mesh = m_convexHulls[index];
-				ch.m_nPoints = (uint32_t)mesh->GetNPoints();
-				ch.m_nTriangles = (uint32_t)mesh->GetNTriangles();
+				Mesh* mesh = m_convexHulls[ndInt32(index)];
+				ch.m_nPoints = ndInt32(mesh->GetNPoints());
+				ch.m_nTriangles = ndInt32(mesh->GetNTriangles());
 				ch.m_points = mesh->GetPoints();
-				ch.m_triangles = (uint32_t *)mesh->GetTriangles();
+				ch.m_triangles = (ndInt32*)mesh->GetTriangles();
 			}
 			void Clean(void)
 			{
@@ -138,16 +138,18 @@ namespace nd
 						triangles, strideTriangles, nTriangles,
 						m_dim, m_barycenter, m_rot);
 
-					size_t n = m_volume->GetNPrimitivesOnSurf() + m_volume->GetNPrimitivesInsideSurf();
+					ndInt32 n = ndInt32(m_volume->GetNPrimitivesOnSurf() + m_volume->GetNPrimitivesInsideSurf());
 
 					double a = pow(double(params.m_resolution) / double(n), 0.33);
-					size_t dim_next = (size_t)(double(m_dim) * a + 0.5);
-					if (n < params.m_resolution && iteration < maxIteration && m_volume->GetNPrimitivesOnSurf() < params.m_resolution / 8 && m_dim != dim_next) {
+					size_t dim_next = size_t(double(m_dim) * a + 0.5);
+					if ((n < params.m_resolution) && iteration < maxIteration && (ndInt32(m_volume->GetNPrimitivesOnSurf()) < params.m_resolution / 8) && (m_dim != dim_next)) 
+					{
 						delete m_volume;
 						m_volume = 0;
 						m_dim = dim_next;
 					}
-					else {
+					else 
+					{
 						break;
 					}
 				}

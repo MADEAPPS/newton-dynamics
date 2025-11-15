@@ -775,7 +775,8 @@ namespace nd
 				{ 0.0, 0.0, 0.0 },
 				{ 0.0, 0.0, 0.0 } };
 			double x, y, z;
-			for (size_t v = 0; v < nVoxels; ++v) {
+			for (size_t v = 0; v < nVoxels; ++v) 
+			{
 				Voxel& voxel = m_voxels[v];
 				x = voxel.m_coord[0] - m_barycenter[0];
 				y = voxel.m_coord[1] - m_barycenter[1];

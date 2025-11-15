@@ -12,21 +12,88 @@
  
  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#pragma once
+
 #ifndef ND_VHACD_SARRAY_H
 #define ND_VHACD_SARRAY_H
 
 namespace nd
 {
-	#define SARRAY_DEFAULT_MIN_SIZE 16
-
 	namespace VHACD 
 	{
 		//!    SArray.
+#if 0 
+		template <typename T>
+		class SArray : public ndArray<T>
+		{
+			public:
+
+			T& operator[](ndInt32 i)
+			{
+				return ndArray<T>::operator[](i);
+			}
+			const T& operator[](ndInt32 i) const
+			{
+				return ndArray<T>::operator[](ndInt32(i));
+			}
+
+			T& operator[](size_t i)
+			{
+				return ndArray<T>::operator[](ndInt32(i));
+			}
+			const T& operator[](size_t i) const
+			{
+				return ndArray<T>::operator[](ndInt32(i));
+			}
+
+			size_t Size() const
+			{
+				return (size_t)GetCount();
+			}
+
+			T* Data()
+			{
+				return &ndArray<T>::operator[](0);
+			}
+			const T* Data() const
+			{
+				return &ndArray<T>::operator[](0);
+			}
+
+			void Clear()
+			{
+				SetCount(0);
+			}
+
+			void Resize(size_t size)
+			{
+				ndArray<T>::Resize(ndInt64(size));
+			}
+
+			void Allocate(size_t size)
+			{
+				SetCount(ndInt32 (size));
+			}
+		};
+	}
+
+#else
+
+	#define SARRAY_DEFAULT_MIN_SIZE 16
 		template <typename T, size_t N = 64>
 		class SArray 
 		{
 			public:
+			T& operator[](ndInt32 i)
+			{
+				T* const data = Data();
+				return data[i];
+			}
+			const T& operator[](ndInt32 i) const
+			{
+				const T* const data = Data();
+				return data[i];
+			}
+
 			T& operator[](size_t i)
 			{
 				T* const data = Data();
@@ -75,6 +142,10 @@ namespace nd
 			{
 				Allocate(size);
 				m_size = size;
+			}
+			void SetCount(size_t size)
+			{
+				Resize(size);
 			}
 
 			void PushBack(const T& value)
@@ -159,6 +230,7 @@ namespace nd
 			size_t m_size;
 			size_t m_maxSize;
 		};
+#endif
 	}
 }
 #endif

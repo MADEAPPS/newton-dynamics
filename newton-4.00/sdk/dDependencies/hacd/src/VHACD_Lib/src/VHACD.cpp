@@ -223,11 +223,6 @@ namespace nd
 				}
 			}
 
-		#ifdef DEBUG_TEMP
-			Timer timerComputeCost;
-			timerComputeCost.Tic();
-		#endif // DEBUG_TEMP
-
 			class CommonData
 			{
 				public:
@@ -244,7 +239,7 @@ namespace nd
 				const Parameters& m_params;
 				PrimitiveSet* m_onSurfacePSet;
 				const PrimitiveSet* m_inputPSet;
-				int32_t m_convexhullDownsampling;
+				ndInt32 m_convexhullDownsampling;
 				Mesh chs[VHACD_WORKERS_THREADS][2];
 				SArray<Vec3> chPts[VHACD_WORKERS_THREADS][2];
 
@@ -317,9 +312,7 @@ namespace nd
 				Plane m_plane;
 				CommonData* m_commonData;
 			};
-
-			std::vector<BestClippingPlaneJob> jobs;
-			jobs.resize(size_t(nPlanes));
+			ndFixSizeArray<BestClippingPlaneJob, 1024> jobs;
 
 			CommonData data(this, params);
 			data.m_w = w;
@@ -330,13 +323,24 @@ namespace nd
 			data.m_onSurfacePSet = onSurfacePSet;
 			data.m_preferredCuttingDirection = preferredCuttingDirection;
 			data.m_convexhullDownsampling = convexhullDownsampling;
-			for (size_t i = 0; i < size_t(nPlanes); ++i)
+#if 1
+			for (ndInt32 i = 0; i < nPlanes; ++i)
 			{
+				jobs.PushBack(BestClippingPlaneJob());
 				jobs[i].m_plane = planes[i];
 				jobs[i].m_commonData = &data;
 				m_parallelQueue.PushTask(&jobs[i]);
 			}
 			m_parallelQueue.Sync();
+#else
+			for (ndInt32 i = 0; i < nPlanes; ++i)
+			{
+				jobs.PushBack(BestClippingPlaneJob());
+				jobs[i].m_plane = planes[i];
+				jobs[i].m_commonData = &data;
+				jobs[i].Execute(0);
+			}
+#endif
 
 			iBest = 0;
 			minConcavity = jobs[0].m_concavity;
@@ -344,7 +348,7 @@ namespace nd
 			minSymmetry = jobs[0].m_symmetry;
 			bestPlane = jobs[0].m_plane;
 			minTotal = jobs[0].m_concavity + jobs[0].m_balance + jobs[0].m_symmetry;
-			for (size_t i = 1; i < size_t(nPlanes); ++i)
+			for (ndInt32 i = 1; i < nPlanes; ++i)
 			{
 				double total = jobs[i].m_concavity + jobs[i].m_balance + jobs[i].m_symmetry;
 				if ((total < minTotal && int32_t(i) < iBest) || total < minTotal)
@@ -354,14 +358,9 @@ namespace nd
 					minSymmetry = jobs[i].m_symmetry;
 					bestPlane = jobs[i].m_plane;
 					minTotal = total;
-					iBest = int32_t(i);
+					iBest = i;
 				}
 			}
-
-			#ifdef DEBUG_TEMP
-				timerComputeCost.Toc();
-				printf_s("Cost[%i] = %f\n", nPlanes, timerComputeCost.GetElapsedTime());
-			#endif // DEBUG_TEMP
 
 			if (psets) 
 			{
@@ -383,13 +382,13 @@ namespace nd
 			m_pset = 0;
 			SArray<Plane> planes;
 			SArray<Plane> planesRef;
-			uint32_t sub = 0;
+			ndInt32 sub = 0;
 			bool firstIteration = true;
 			m_volumeCH0 = 1.0;
 
 			// Compute the decomposition depth based on the number of convex hulls being requested..
-			uint32_t hullCount = 2;
-			uint32_t depth = 1;
+			ndInt32 depth = 1;
+			ndInt32 hullCount = 2;
 			while (params.m_maxConvexHulls > hullCount)
 			{
 				depth++;
@@ -409,7 +408,7 @@ namespace nd
 			// from that.
 			depth++;
 
-			while (sub++ < depth && inputParts.Size() > 0) 
+			while ((sub++ < depth) && (inputParts.Size() > 0)) 
 			{
 				double maxConcavity = 0.0;
 				const size_t nInputParts = inputParts.Size();
@@ -604,7 +603,7 @@ namespace nd
 				Vec3 m_bmin;
 				Vec3 m_bmax;
 				Mesh* m_hull;
-				int m_id;
+				ndInt32 m_id;
 			};
 
 			struct ConvexKey
@@ -651,9 +650,12 @@ namespace nd
 				float m_cost;
 			};
 		
-			ndTree<ndInt32, ConvexKey> hullGraph;
-			std::vector<ConvexPair> convexPairArray;
-			std::vector<ConvexProxy> convexProxyArray;
+			ndTree<ndInt32, ConvexKey, ndContainersFreeListAlloc<ndInt32>> hullGraph;
+			//std::vector<ConvexPair> convexPairArray;
+			//std::vector<ConvexProxy> convexProxyArray;
+			ndFixSizeArray<ConvexPair, 1024 * 2> convexPairArray;
+			ndFixSizeArray<ConvexProxy, 1024 * 2> convexProxyArray;
+
 			ndUpHeap<ConvexKey, float> priority(int(8 * m_convexHulls.Size() * m_convexHulls.Size()));
 
 			class MergeConvexJob : public Job
@@ -686,22 +688,22 @@ namespace nd
 
 			MergeConvexJob jobBatches[VHACD_WORKERS_THREADS * 4 + 1];
 
-			size_t pairsCount = 0;
-			convexPairArray.resize(((m_convexHulls.Size()* m_convexHulls.Size()) - m_convexHulls.Size()) >> 1);
+			//ndInt32 pairsCount = 0;
+			//convexPairArray.resize(((m_convexHulls.Size()* m_convexHulls.Size()) - m_convexHulls.Size()) >> 1);
 
-			for (size_t i = 0; i < m_convexHulls.Size(); ++i)
+			for (ndInt32 i = 0; i < ndInt32(m_convexHulls.Size()); ++i)
 			{
-				convexProxyArray.push_back(ConvexProxy());
+				convexProxyArray.PushBack(ConvexProxy());
 				convexProxyArray[i].m_hull = new Mesh (*m_convexHulls[i]);
-				convexProxyArray[i].m_id = int (i);
+				convexProxyArray[i].m_id = i;
 				convexProxyArray[i].m_hull->CalculateBoundingBox(convexProxyArray[i].m_bmin, convexProxyArray[i].m_bmax);
 			}
 
-			for (size_t i = 1; i < convexProxyArray.size(); ++i)
+			for (ndInt32 i = 1; i < convexProxyArray.GetCount(); ++i)
 			{
 				Vec3 bmin1(convexProxyArray[i].m_bmin);
 				Vec3 bmax1(convexProxyArray[i].m_bmax);
-				for (size_t j = 0; j < i; ++j)
+				for (ndInt32 j = 0; j < i; ++j)
 				{
 					Vec3 bmin0(convexProxyArray[j].m_bmin);
 					Vec3 bmax0(convexProxyArray[j].m_bmax);
@@ -715,20 +717,19 @@ namespace nd
 						ndInt32 j0 = ndInt32(j);
 						ConvexKey key(i0, j0);
 						hullGraph.Insert(0, key);
-						convexPairArray[pairsCount] = ConvexPair(i0, j0);
-						pairsCount++;
+						convexPairArray.PushBack(ConvexPair(i0, j0));
 					}
 				}
 			}
 
-			size_t nConvexHulls = m_convexHulls.Size();
+			ndInt32 nConvexHulls = ndInt32(m_convexHulls.Size());
 			if (nConvexHulls > 1)
 			{
-				size_t start = 0;
-				size_t batchSize = pairsCount / (VHACD_WORKERS_THREADS * 4);
-				for (size_t j = 0; j < VHACD_WORKERS_THREADS * 4; ++j)
+				ndInt32 start = 0;
+				ndInt32 batchSize = convexPairArray.GetCount() / (VHACD_WORKERS_THREADS * 4);
+				for (ndInt32 j = 0; j < VHACD_WORKERS_THREADS * 4; ++j)
 				{
-					size_t count = (j + 1) * batchSize - start;
+					ndInt32 count = (j + 1) * batchSize - start;
 					if (count > 0)
 					{
 						jobBatches[j].m_pairs = &convexPairArray[start];
@@ -739,7 +740,7 @@ namespace nd
 					}
 					start += batchSize;
 				}
-				size_t count = pairsCount - start;
+				ndInt32 count = convexPairArray.GetCount() - start;
 				if (count > 0)
 				{
 					jobBatches[VHACD_WORKERS_THREADS * 4].m_pairs = &convexPairArray[start];
@@ -751,7 +752,7 @@ namespace nd
 
 				m_parallelQueue.Sync();
 
-				for (size_t i = 0; i < pairsCount; i++)
+				for (ndInt32 i = 0; i < convexPairArray.GetCount(); i++)
 				{
 					ConvexPair& pair = convexPairArray[i];
 					if (pair.m_cost < (2.0f * params.m_minMergeToleranace))
@@ -765,11 +766,11 @@ namespace nd
 				while (((nConvexHulls > params.m_maxConvexHulls) || (priority.Value() <= params.m_minMergeToleranace)) && priority.GetCount())
 				{
 					ConvexKey key(priority[0]);
-					ndTree<ndInt32, ConvexKey>::ndNode* const it = hullGraph.Find(key);
+					ndTree<ndInt32, ConvexKey, ndContainersFreeListAlloc<ndInt32>>::ndNode* const it = hullGraph.Find(key);
 					if (it)
 					{
 						hullGraph.Remove(it);
-						for (size_t i = 0; i < convexProxyArray.size(); i++)
+						for (ndInt32 i = 0; i < convexProxyArray.GetCount(); i++)
 						{
 							if (convexProxyArray[i].m_hull)
 							{
@@ -782,24 +783,24 @@ namespace nd
 						}
 
 						Mesh* const newHull = new Mesh();
-						size_t index = convexProxyArray.size();
-						ComputeConvexHull(convexProxyArray[size_t(key.m_p0)].m_hull, convexProxyArray[size_t(key.m_p1)].m_hull, pts, newHull);
-						convexProxyArray.push_back(ConvexProxy());
+						ndInt32 index = convexProxyArray.GetCount();
+						ComputeConvexHull(convexProxyArray[key.m_p0].m_hull, convexProxyArray[key.m_p1].m_hull, pts, newHull);
+						convexProxyArray.PushBack(ConvexProxy());
 						convexProxyArray[index].m_hull = newHull;
 						convexProxyArray[index].m_id = int(index);
 						convexProxyArray[index].m_hull->CalculateBoundingBox(convexProxyArray[index].m_bmin, convexProxyArray[index].m_bmax);
 
-						delete convexProxyArray[size_t(key.m_p0)].m_hull;
-						delete convexProxyArray[size_t(key.m_p1)].m_hull;
-						convexProxyArray[size_t(key.m_p0)].m_hull = nullptr;
-						convexProxyArray[size_t(key.m_p1)].m_hull = nullptr;
+						delete convexProxyArray[key.m_p0].m_hull;
+						delete convexProxyArray[key.m_p1].m_hull;
+						convexProxyArray[key.m_p0].m_hull = nullptr;
+						convexProxyArray[key.m_p1].m_hull = nullptr;
 
 						const float volume0 = float(newHull->ComputeVolume());
 
 						const Vec3 bmin(convexProxyArray[index].m_bmin);
 						const Vec3 bmax(convexProxyArray[index].m_bmax);
 
-						for (size_t i = 0; i < convexProxyArray.size() - 1; i++)
+						for (ndInt32 i = 0; i < convexProxyArray.GetCount() - 1; i++)
 						{
 							if (convexProxyArray[i].m_hull)
 							{
@@ -826,13 +827,13 @@ namespace nd
 					priority.Pop();
 				}
 	
-				for (int i = int (m_convexHulls.Size()-1); i >= 0; --i)
+				for (ndInt32 i = ndInt32(m_convexHulls.Size())-1; i >= 0; --i)
 				{
-					delete m_convexHulls[size_t(i)];
-					m_convexHulls.PopBack();
+					delete m_convexHulls[i];
 				}
+				m_convexHulls.SetCount(0);
 
-				for (size_t i = 0; i < convexProxyArray.size(); i++)
+				for (ndInt32 i = 0; i < convexProxyArray.GetCount(); i++)
 				{
 					if (convexProxyArray[i].m_hull)
 					{

@@ -12,7 +12,7 @@
  
  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#pragma once
+
 #ifndef ND_VHACD_H
 #define ND_VHACD_H
 
@@ -62,9 +62,9 @@ namespace nd
 			{
 				public:
 				double* m_points;
-				uint32_t* m_triangles;
-				uint32_t m_nPoints;
-				uint32_t m_nTriangles;
+				ndInt32* m_triangles;
+				ndInt32 m_nPoints;
+				ndInt32 m_nTriangles;
 			};
 
 			class Parameters 
@@ -97,13 +97,13 @@ namespace nd
 				double m_beta;
 				double m_minVolumePerCH;
 				double m_minMergeToleranace;
-				uint32_t m_resolution;
-				uint32_t m_maxNumVerticesPerCH;
-				uint32_t m_planeDownsampling;
-				uint32_t m_convexhullDownsampling;
-				uint32_t m_pca;
-				uint32_t m_convexhullApproximation;
-				uint32_t m_maxConvexHulls;
+				ndInt32 m_resolution;
+				ndInt32 m_maxNumVerticesPerCH;
+				ndInt32 m_planeDownsampling;
+				ndInt32 m_convexhullDownsampling;
+				ndInt32 m_pca;
+				ndInt32 m_convexhullApproximation;
+				ndInt32 m_maxConvexHulls;
 			};
 
 			virtual bool Compute(const float* const points,

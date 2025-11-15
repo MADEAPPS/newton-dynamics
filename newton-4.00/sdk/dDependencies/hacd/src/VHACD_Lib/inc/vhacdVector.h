@@ -34,6 +34,16 @@ namespace nd
 				m_data[2] = z;
 			}
 
+			ndInt32& operator[](ndInt32 i)
+			{
+				return m_data[i];
+			}
+
+			const ndInt32& operator[](ndInt32 i) const
+			{
+				return m_data[i];
+			}
+
 			ndInt32& operator[](size_t i) 
 			{ 
 				return m_data[i]; 
@@ -56,6 +66,8 @@ namespace nd
 			Vec3(double x, double y, double z);
 			Vec3(const Vec3& rhs);
 
+			double& operator[](ndInt32 i);
+			const double& operator[](ndInt32 i) const;
 			double& operator[](size_t i);
 			const double& operator[](size_t i) const;
 			double& X();
@@ -123,6 +135,16 @@ namespace nd
 			m_data[0] = rhs.m_data[0];
 			m_data[1] = rhs.m_data[1];
 			m_data[2] = rhs.m_data[2];
+		}
+
+		inline double& Vec3::operator[](ndInt32 i)
+		{
+			return m_data[i];
+		}
+
+		inline const double& Vec3::operator[](ndInt32 i) const
+		{
+			return m_data[i];
 		}
 
 		inline double& Vec3::operator[](size_t i)
