@@ -414,10 +414,6 @@ namespace nd
 					double volume = pset->ComputeVolume();
 					pset->ComputeBB();
 					pset->ComputePrincipalAxes();
-					//if (params.m_pca) 
-					//{
-					//	pset->AlignToPrincipalAxes();
-					//}
 
 					pset->ComputeConvexHull(pset->GetConvexHull());
 					double volumeCH = fabs(pset->GetConvexHull().ComputeVolume());
@@ -487,20 +483,11 @@ namespace nd
 							temp.PushBack(bestLeft);
 							temp.PushBack(bestRight);
 							pset->Clip(bestPlane, bestRight, bestLeft);
-							//if (params.m_pca) 
-							//{
-							//	bestRight->RevertAlignToPrincipalAxes();
-							//	bestLeft->RevertAlignToPrincipalAxes();
-							//}
 							delete pset;
 						}
 					}
 					else 
 					{
-						//if (params.m_pca) 
-						//{
-						//	pset->RevertAlignToPrincipalAxes();
-						//}
 						parts.PushBack(pset);
 					}
 				}
