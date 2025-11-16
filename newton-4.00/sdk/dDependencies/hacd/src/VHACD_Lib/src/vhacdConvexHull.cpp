@@ -552,7 +552,7 @@ namespace nd
 				accelerator[index0].m_mark = 1;
 
 				bool validTetrahedrum = false;
-				ndBigVector e1(0.0);
+				ndBigVector e1(ndBigVector::m_zero);
 				for (ndInt32 i = 1; i < normalMap.m_count; ++i)
 				{
 					ndInt32 index = SupportVertex(&tree, accelerator, normalMap.m_normal[i]);
@@ -574,8 +574,8 @@ namespace nd
 				}
 
 				validTetrahedrum = false;
-				ndBigVector e2(0.0);
-				ndBigVector normal(0.0);
+				ndBigVector e2(ndBigVector::m_zero);
+				ndBigVector normal(ndBigVector::m_zero);
 				for (ndInt32 i = 2; i < normalMap.m_count; ++i)
 				{
 					ndInt32 index = SupportVertex(&tree, accelerator, normalMap.m_normal[i]);
@@ -599,7 +599,7 @@ namespace nd
 
 				// find the largest possible tetrahedron
 				validTetrahedrum = false;
-				ndBigVector e3(0.0);
+				ndBigVector e3(ndBigVector::m_zero);
 
 				index0 = SupportVertex(&tree, accelerator, normal);
 				e3 = accelerator[index0] - m_points[0];
