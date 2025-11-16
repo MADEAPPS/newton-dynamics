@@ -636,8 +636,6 @@ namespace nd
 			};
 		
 			ndTree<ndInt32, ConvexKey, ndContainersFreeListAlloc<ndInt32>> hullGraph;
-			//std::vector<ConvexPair> convexPairArray;
-			//std::vector<ConvexProxy> convexProxyArray;
 			ndFixSizeArray<ConvexPair, 1024 * 2> convexPairArray;
 			ndFixSizeArray<ConvexProxy, 1024 * 2> convexProxyArray;
 
@@ -672,9 +670,6 @@ namespace nd
 			};
 
 			MergeConvexJob jobBatches[VHACD_WORKERS_THREADS * 4 + 1];
-
-			//ndInt32 pairsCount = 0;
-			//convexPairArray.resize(((m_convexHulls.Size()* m_convexHulls.Size()) - m_convexHulls.Size()) >> 1);
 
 			for (ndInt32 i = 0; i < ndInt32(m_convexHulls.Size()); ++i)
 			{
@@ -734,7 +729,6 @@ namespace nd
 					jobBatches[VHACD_WORKERS_THREADS * 4].m_convexHulls = &m_convexHulls[0];
 					m_parallelQueue.PushTask(&jobBatches[VHACD_WORKERS_THREADS * 4]);
 				}
-
 				m_parallelQueue.Sync();
 
 				for (ndInt32 i = 0; i < convexPairArray.GetCount(); i++)
@@ -827,5 +821,57 @@ namespace nd
 				}
 			}
 		}
+
+		void VHACD::VoxelizeMesh(
+			const ndReal* const points, 
+			const uint32_t stridePoints,
+			const uint32_t nPoints,
+			const int32_t* const triangles,
+			const uint32_t strideTriangles,
+			const uint32_t nTriangles,
+			const Parameters& params)
+		{
+			delete m_volume;
+			m_volume = nullptr;
+			int32_t iteration = 0;
+			const int32_t maxIteration = 5;
+			while (iteration++ < maxIteration)
+			{
+				m_volume = new Volume;
+				m_volume->Voxelize(points, stridePoints, nPoints,
+					triangles, strideTriangles, nTriangles,
+					m_dim, m_barycenter, m_rot);
+
+				ndInt32 n = ndInt32(m_volume->GetNPrimitivesOnSurf() + m_volume->GetNPrimitivesInsideSurf());
+
+				double a = pow(double(params.m_resolution) / double(n), 0.33);
+				size_t dim_next = size_t(double(m_dim) * a + 0.5);
+				if ((n < params.m_resolution) && iteration < maxIteration && (ndInt32(m_volume->GetNPrimitivesOnSurf()) < params.m_resolution / 8) && (m_dim != dim_next))
+				{
+					delete m_volume;
+					m_volume = 0;
+					m_dim = dim_next;
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+
+		bool VHACD::ComputeACD(const ndReal* const points,
+			const uint32_t nPoints,
+			const uint32_t* const triangles,
+			const uint32_t nTriangles,
+			const Parameters& params)
+		{
+			Init();
+			VoxelizeMesh(points, 3, nPoints, (int32_t*)triangles, 3, nTriangles, params);
+			ComputePrimitiveSet(params);
+			ComputeACD(params);
+			MergeConvexHulls(params);
+			return true;
+		}
+
 	} // end of VHACD namespace
 }
