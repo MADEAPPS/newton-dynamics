@@ -27,8 +27,7 @@
 #include "ndConvexHull3d.h"
 #include "ndSmallDeterminant.h"
 
-#define DG_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE		8
-
+#define DG_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE	8
 
 class ndConvexHull3d::ndNormalMap
 {
@@ -173,7 +172,7 @@ ndFloat64 ndConvexHull3dFace::Evalue (const ndBigVector* const pointArray, const
 	return ret;
 }
 
-ndConvexHull3d::ndList<ndConvexHull3dFace>::ndNode* ndConvexHull3dFace::GetTwin(ndInt32 index) const
+ndConvexHull3d::ndList<ndConvexHull3dFace, ndContainersFreeListAlloc<ndConvexHull3dFace>>::ndNode* ndConvexHull3dFace::GetTwin(ndInt32 index) const
 {
 	return m_twin[index];
 }
@@ -196,7 +195,7 @@ ndBigPlane ndConvexHull3dFace::GetPlaneEquation (const ndBigVector* const pointA
 }
 
 ndConvexHull3d::ndConvexHull3d ()
-	:ndList<ndConvexHull3dFace>()
+	:ndList<ndConvexHull3dFace, ndContainersFreeListAlloc<ndConvexHull3dFace>>()
 	,m_aabbP0(ndBigVector (ndFloat64 (0.0f)))
 	,m_aabbP1(ndBigVector (ndFloat64 (0.0f)))
 	,m_diag()
@@ -205,7 +204,7 @@ ndConvexHull3d::ndConvexHull3d ()
 }
 
 ndConvexHull3d::ndConvexHull3d(const ndConvexHull3d& source)
-	:ndList<ndConvexHull3dFace>()
+	:ndList<ndConvexHull3dFace, ndContainersFreeListAlloc<ndConvexHull3dFace>>()
 	,m_aabbP0 (source.m_aabbP0)
 	,m_aabbP1 (source.m_aabbP1)
 	,m_diag(source.m_diag)
@@ -218,21 +217,23 @@ ndConvexHull3d::ndConvexHull3d(const ndConvexHull3d& source)
 		m_points[i] = source.m_points[i];
 	}
 
-	ndTree<ndNode*, ndNode*> map;
+	ndTree<ndNode*, ndNode*, ndContainersFreeListAlloc<ndNode*>> map;
 	for(ndNode* sourceNode = source.GetFirst(); sourceNode; sourceNode = sourceNode->GetNext() ) 
 	{
 		ndNode* const node = Append();
 		map.Insert(node, sourceNode);
 	}
 
-	for(ndNode* sourceNode = source.GetFirst(); sourceNode; sourceNode = sourceNode->GetNext() ) {
+	for(ndNode* sourceNode = source.GetFirst(); sourceNode; sourceNode = sourceNode->GetNext() ) 
+	{
 		ndNode* const node = map.Find(sourceNode)->GetInfo();
 
 		ndConvexHull3dFace& face = node->GetInfo();
 		ndConvexHull3dFace& srcFace = sourceNode->GetInfo();
 
 		face.m_mark = 0;
-		for (ndInt32 i = 0; i < 3; ++i) {
+		for (ndInt32 i = 0; i < 3; ++i) 
+		{
 			face.m_index[i] = srcFace.m_index[i];
 			face.m_twin[i] = map.Find (srcFace.m_twin[i])->GetInfo();
 		}
@@ -240,7 +241,7 @@ ndConvexHull3d::ndConvexHull3d(const ndConvexHull3d& source)
 }
 
 ndConvexHull3d::ndConvexHull3d(const ndFloat64* const vertexCloud, ndInt32 strideInBytes, ndInt32 count, ndFloat64 distTol, ndInt32 maxVertexCount)
-	:ndList<ndConvexHull3dFace>()
+	:ndList<ndConvexHull3dFace, ndContainersFreeListAlloc<ndConvexHull3dFace>>()
 	,m_aabbP0(ndBigVector::m_zero)
 	,m_aabbP1(ndBigVector::m_zero)
 	,m_diag()
@@ -251,6 +252,22 @@ ndConvexHull3d::ndConvexHull3d(const ndFloat64* const vertexCloud, ndInt32 strid
 
 ndConvexHull3d::~ndConvexHull3d(void)
 {
+}
+
+const ndArray<ndBigVector>& ndConvexHull3d::GetVertexPool() const
+{
+	return m_points;
+}
+
+ndFloat64 ndConvexHull3d::GetDiagonal() const
+{
+	return m_diag;
+}
+
+void ndConvexHull3d::GetAABB(ndBigVector& boxP0, ndBigVector& boxP1) const
+{
+	boxP0 = m_aabbP0;
+	boxP1 = m_aabbP1;
 }
 
 void ndConvexHull3d::Save(const char* const filename) const
@@ -601,11 +618,9 @@ ndInt32 ndConvexHull3d::InitVertexArray(ndConvexHull3dVertex* const points, ndIn
 	{
 		// the points do not form a convex hull
 		m_points.SetCount(0);
-		//ndAssert (0);
 		return count;
 	}
 
-	//m_count = 4;
 	m_points.SetCount(4);
 	ndFloat64 volume = TetrahedrumVolume (m_points[0], m_points[1], m_points[2], m_points[3]);
 	if (volume > ndFloat64 (0.0f)) 
@@ -628,31 +643,29 @@ ndFloat64 ndConvexHull3d::TetrahedrumVolume (const ndBigVector& p0, const ndBigV
 	return p3p0.DotProduct(p1p0.CrossProduct(p2p0)).GetScalar();
 }
 
-ndInt32 ndConvexHull3d::SupportVertex (ndConvexHull3dAABBTreeNode** const treePointer, const ndConvexHull3dVertex* const points, const ndBigVector& dirPlane, const bool removeEntry) const
+ndInt32 ndConvexHull3d::SupportVertex (ndConvexHull3dAABBTreeNode** const treePointer, const ndConvexHull3dVertex* const points, const ndBigVector& dirPlane) const
 {
 	#define DG_STACK_DEPTH_3D 64
-	ndFloat64 aabbProjection[DG_STACK_DEPTH_3D];
-	const ndConvexHull3dAABBTreeNode *stackPool[DG_STACK_DEPTH_3D];
+	ndFixSizeArray<ndFloat64, DG_STACK_DEPTH_3D> aabbProjection;
+	ndFixSizeArray<const ndConvexHull3dAABBTreeNode*, DG_STACK_DEPTH_3D> stackPool;
 
-	ndBigVector dir(dirPlane & ndBigPlane::m_triplexMask);
-	ndAssert (dir.m_w == ndFloat32 (0.0f));
+	const ndBigVector dir(dirPlane & ndBigPlane::m_triplexMask);
 
 	ndInt32 index = -1;
-	ndInt32 stack = 1;
-	stackPool[0] = *treePointer;
-	aabbProjection[0] = ndFloat32 (1.0e20f);
+	stackPool.PushBack(*treePointer);
+	aabbProjection.PushBack(ndFloat32(1.0e20f));
 	ndFloat64 maxProj = ndFloat64 (-1.0e20f);
 	ndInt32 ix = (dir[0] > ndFloat64 (0.0f)) ? 1 : 0;
 	ndInt32 iy = (dir[1] > ndFloat64 (0.0f)) ? 1 : 0;
 	ndInt32 iz = (dir[2] > ndFloat64 (0.0f)) ? 1 : 0;
-	while (stack) 
+
+	while (stackPool.GetCount())
 	{
-		stack--;
-		ndFloat64 boxSupportValue = aabbProjection[stack];
+		ndFloat64 boxSupportValue = aabbProjection.Pop();
+		const ndConvexHull3dAABBTreeNode* const me = stackPool.Pop();
+
 		if (boxSupportValue > maxProj) 
 		{
-			const ndConvexHull3dAABBTreeNode* const me = stackPool[stack];
-
 			if (me->m_left && me->m_right) 
 			{
 				const ndBigVector leftSupportPoint (me->m_left->m_box[ix].m_x, me->m_left->m_box[iy].m_y, me->m_left->m_box[iz].m_z, ndFloat32 (0.0f));
@@ -663,54 +676,58 @@ ndInt32 ndConvexHull3d::SupportVertex (ndConvexHull3dAABBTreeNode** const treePo
 
 				if (rightSupportDist >= leftSupportDist) 
 				{
-					aabbProjection[stack] = leftSupportDist;
-					stackPool[stack] = me->m_left;
-					stack++;
-					ndAssert (stack < DG_STACK_DEPTH_3D);
-					aabbProjection[stack] = rightSupportDist;
-					stackPool[stack] = me->m_right;
-					stack++;
-					ndAssert (stack < DG_STACK_DEPTH_3D);
+					aabbProjection.PushBack(leftSupportDist);
+					stackPool.PushBack(me->m_left);
+					aabbProjection.PushBack(rightSupportDist);
+					stackPool.PushBack(me->m_right);
 				} 
 				else 
 				{
-					aabbProjection[stack] = rightSupportDist;
-					stackPool[stack] = me->m_right;
-					stack++;
-					ndAssert (stack < DG_STACK_DEPTH_3D);
-					aabbProjection[stack] = leftSupportDist;
-					stackPool[stack] = me->m_left;
-					stack++;
-					ndAssert (stack < DG_STACK_DEPTH_3D);
+					aabbProjection.PushBack(rightSupportDist);
+					stackPool.PushBack(me->m_right);
+					aabbProjection.PushBack(leftSupportDist);
+					stackPool.PushBack(me->m_left);
 				}
 			} 
 			else 
 			{
 				ndConvexHull3dPointCluster* const cluster = (ndConvexHull3dPointCluster*) me;
-				for (ndInt32 i = 0; i < cluster->m_count; ++i) 
+				ndInt32* const indices = cluster->m_indices;
+
+				const ndInt32 count = cluster->m_count;
+				for (ndInt32 i = 0; i < count; ++i)
 				{
-					const ndConvexHull3dVertex& p = points[cluster->m_indices[i]];
+					const ndInt32 i0 = indices[i];
+					const ndConvexHull3dVertex& p0 = points[i0];
+					if (p0.m_mark)
+					{
+						for (ndInt32 j = i + 1; j < count; ++j)
+						{
+							indices[j - 1] = indices[j];
+						}
+						cluster->m_count--;
+						break;
+					}
+				}
+
+				for (ndInt32 i = cluster->m_count - 1; i >= 0; --i)
+				{
+					const ndInt32 j = indices[i];
+					const ndConvexHull3dVertex& p = points[j];
+					ndAssert(!p.m_mark);
 					ndAssert (p.m_x >= cluster->m_box[0].m_x);
 					ndAssert (p.m_x <= cluster->m_box[1].m_x);
 					ndAssert (p.m_y >= cluster->m_box[0].m_y);
 					ndAssert (p.m_y <= cluster->m_box[1].m_y);
 					ndAssert (p.m_z >= cluster->m_box[0].m_z);
 					ndAssert (p.m_z <= cluster->m_box[1].m_z);
-					if (!p.m_mark) 
+					
+					ndAssert (p.m_w == ndFloat32 (0.0f));
+					ndFloat64 dist = p.DotProduct(dir).GetScalar();
+					if (dist > maxProj) 
 					{
-						ndAssert (p.m_w == ndFloat32 (0.0f));
-						ndFloat64 dist = p.DotProduct(dir).GetScalar();
-						if (dist > maxProj) 
-						{
-							maxProj = dist;
-							index = cluster->m_indices[i];
-						}
-					} 
-					else if (removeEntry) 
-					{
-						cluster->m_indices[i] = cluster->m_indices[cluster->m_count - 1];
-						cluster->m_count = cluster->m_count - 1;
-						i --;
+						maxProj = dist;
+						index = cluster->m_indices[i];
 					}
 				}
 
@@ -829,7 +846,7 @@ bool ndConvexHull3d::CheckFlatSurface(ndConvexHull3dAABBTreeNode* tree, ndConvex
 		ndSwap(m_points[2], m_points[3]);
 	}
 	ndAssert(TetrahedrumVolume(m_points[0], m_points[1], m_points[2], m_points[3]) < ndFloat64(0.0f));
-	//m_count = 4;
+
 	m_points.SetCount(4);
 	return false;
 }
@@ -1039,7 +1056,6 @@ void ndConvexHull3d::CalculateConvexHull3d (ndConvexHull3dAABBTreeNode* vertexTr
 			boundaryFaces.Remove (faceNode);
 		}
 	}
-	//m_count = currentIndex;
 	m_points.SetCount(currentIndex);
 }
 
@@ -1096,12 +1112,11 @@ ndFloat64 ndConvexHull3d::RayCast (const ndBigVector& localP0, const ndBigVector
 		ndAssert(normal.m_w == ndFloat32(0.0f));
 		ndAssert(localP0.m_w == ndFloat32(0.0f));
 
-		//ndFloat64 N = -((localP0 - p0) % normal);
 		ndFloat64 D =  normal.DotProduct(dS).GetScalar();
 		ndFloat64 N = -normal.DotProduct(localP0 - p0).GetScalar();
 
 		if (fabs(D) < ndFloat64 (1.0e-12f)) 
-		{ //
+		{ 
 			if (N < ndFloat64 (0.0f)) 
 			{
 				return ndFloat64 (1.2f);
