@@ -84,10 +84,8 @@ namespace nd
 					m_convexhullDownsampling = 4;
 					m_alpha = 0.05;
 					m_beta = 0.05;
-					m_pca = 0;
 					m_maxNumVerticesPerCH = 64;
 					m_minVolumePerCH = 0.0001;
-					//m_convexhullApproximation = true;
 					//m_maxConvexHulls = 1024;
 					m_maxConvexHulls = 128;
 				}
@@ -101,8 +99,6 @@ namespace nd
 				ndInt32 m_maxNumVerticesPerCH;
 				ndInt32 m_planeDownsampling;
 				ndInt32 m_convexhullDownsampling;
-				ndInt32 m_pca;
-				//ndInt32 m_convexhullApproximation;
 				ndInt32 m_maxConvexHulls;
 			};
 

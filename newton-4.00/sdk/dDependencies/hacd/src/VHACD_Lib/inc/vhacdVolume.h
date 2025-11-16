@@ -74,9 +74,7 @@ namespace nd
 			virtual void RevertAlignToPrincipalAxes() = 0;
 			virtual void Convert(Mesh& mesh, const VOXEL_VALUE value) const = 0;
 			virtual void GetPointArray(ndArray<Vec3>& points) const = 0;
-
 			const Mesh& GetConvexHull() const { return m_convexHull; }
-			
 			Mesh& GetConvexHull() { return m_convexHull; }
 			private:
 			Mesh m_convexHull;
@@ -227,39 +225,37 @@ namespace nd
 		int32_t TriBoxOverlap(const Vec3& boxcenter, const Vec3& boxhalfsize, const Vec3& triver0,
 			const Vec3& triver1, const Vec3& triver2);
 		template <class T>
-		inline void ComputeAlignedPoint(const T* const points, const uint32_t idx, const Vec3& barycenter,
-			const double(&rot)[3][3], Vec3& pt) {}
-		template <>
-		inline void ComputeAlignedPoint<float>(const float* const points, const uint32_t idx, const Vec3& barycenter, const double(&rot)[3][3], Vec3& pt)
+		inline Vec3 ComputeAlignedPoint(const T* const points, const uint32_t idx, const Vec3& barycenter, const double(&rot)[3][3]) {}
+		inline Vec3 ComputeAlignedPoint(const float* const points, const uint32_t idx, const Vec3& barycenter, const double(&rot)[3][3])
 		{
 			double x = points[idx + 0] - barycenter[0];
 			double y = points[idx + 1] - barycenter[1];
 			double z = points[idx + 2] - barycenter[2];
-			pt[0] = rot[0][0] * x + rot[1][0] * y + rot[2][0] * z;
-			pt[1] = rot[0][1] * x + rot[1][1] * y + rot[2][1] * z;
-			pt[2] = rot[0][2] * x + rot[1][2] * y + rot[2][2] * z;
+			return Vec3(
+				rot[0][0] * x + rot[1][0] * y + rot[2][0] * z,
+				rot[0][1] * x + rot[1][1] * y + rot[2][1] * z,
+				rot[0][2] * x + rot[1][2] * y + rot[2][2] * z);
 		}
-		template <>
-		inline void ComputeAlignedPoint<double>(const double* const points, const uint32_t idx, const Vec3& barycenter, const double(&rot)[3][3], Vec3& pt)
+		inline Vec3 ComputeAlignedPoint(const double* const points, const uint32_t idx, const Vec3& barycenter, const double(&rot)[3][3])
 		{
 			double x = points[idx + 0] - barycenter[0];
 			double y = points[idx + 1] - barycenter[1];
 			double z = points[idx + 2] - barycenter[2];
-			pt[0] = rot[0][0] * x + rot[1][0] * y + rot[2][0] * z;
-			pt[1] = rot[0][1] * x + rot[1][1] * y + rot[2][1] * z;
-			pt[2] = rot[0][2] * x + rot[1][2] * y + rot[2][2] * z;
+			return Vec3(
+				rot[0][0] * x + rot[1][0] * y + rot[2][0] * z,
+				rot[0][1] * x + rot[1][1] * y + rot[2][1] * z,
+				rot[0][2] * x + rot[1][2] * y + rot[2][2] * z);
 		}
 		template <class T>
 		void Volume::ComputeBB(const T* const points, const uint32_t stridePoints, const uint32_t nPoints,
 			const Vec3& barycenter, const double(&rot)[3][3])
 		{
-			Vec3 pt;
-			ComputeAlignedPoint(points, 0, barycenter, rot, pt);
+			Vec3 pt(ComputeAlignedPoint(points, 0, barycenter, rot));
 			m_maxBB = pt;
 			m_minBB = pt;
 			for (uint32_t v = 1; v < nPoints; ++v) 
 			{
-				ComputeAlignedPoint(points, v * stridePoints, barycenter, rot, pt);
+				pt = ComputeAlignedPoint(points, v * stridePoints, barycenter, rot);
 				for (size_t i = 0; i < 3; ++i) 
 				{
 					if (pt[i] < m_minBB[i])
@@ -274,26 +270,30 @@ namespace nd
 			const int32_t* const triangles, const uint32_t strideTriangles, const uint32_t nTriangles,
 			const size_t dim, const Vec3& barycenter, const double(&rot)[3][3])
 		{
-			if (nPoints == 0) {
+			if (nPoints == 0) 
+			{
 				return;
 			}
 			ComputeBB(points, stridePoints, nPoints, barycenter, rot);
 
 			double d[3] = { m_maxBB[0] - m_minBB[0], m_maxBB[1] - m_minBB[1], m_maxBB[2] - m_minBB[2] };
 			double r;
-			if (d[0] >= d[1] && d[0] >= d[2]) {
+			if (d[0] >= d[1] && d[0] >= d[2]) 
+			{
 				r = d[0];
 				m_dim[0] = dim;
 				m_dim[1] = 2 + static_cast<size_t>(double(dim) * d[1] / d[0]);
 				m_dim[2] = 2 + static_cast<size_t>(double(dim) * d[2] / d[0]);
 			}
-			else if (d[1] >= d[0] && d[1] >= d[2]) {
+			else if (d[1] >= d[0] && d[1] >= d[2]) 
+			{
 				r = d[1];
 				m_dim[1] = dim;
 				m_dim[0] = 2 + static_cast<size_t>(double(dim) * d[0] / d[1]);
 				m_dim[2] = 2 + static_cast<size_t>(double(dim) * d[2] / d[1]);
 			}
-			else {
+			else 
+			{
 				r = d[2];
 				m_dim[2] = dim;
 				m_dim[0] = 2 + static_cast<size_t>((double)dim * d[0] / d[2]);
@@ -308,25 +308,24 @@ namespace nd
 			m_numVoxelsInsideSurface = 0;
 			m_numVoxelsOutsideSurface = 0;
 
-			Vec3 p[3];
 			size_t i_= 0, j_ = 0, k_ = 0;
 			size_t i0 = 0, j0 = 0, k0 = 0;
 			size_t i1 = 0, j1 = 0, k1 = 0;
-			Vec3 boxcenter;
-			Vec3 pt;
+
 			const Vec3 boxhalfsize(0.5, 0.5, 0.5);
 			for (size_t t = 0, ti = 0; t < nTriangles; ++t, ti += strideTriangles) 
 			{
+				Vec3 p[3];
 				Triangle tri(triangles[ti + 0], triangles[ti + 1], triangles[ti + 2]);
 				for (size_t c = 0; c < 3; ++c) 
 				{
-					ComputeAlignedPoint(points, tri[c] * stridePoints, barycenter, rot, pt);
+					Vec3 pt(ComputeAlignedPoint(points, tri[c] * stridePoints, barycenter, rot));
 					p[c][0] = (pt[0] - m_minBB[0]) * invScale;
 					p[c][1] = (pt[1] - m_minBB[1]) * invScale;
 					p[c][2] = (pt[2] - m_minBB[2]) * invScale;
-					i_ = static_cast<size_t>(p[c][0] + 0.5);
-					j_ = static_cast<size_t>(p[c][1] + 0.5);
-					k_ = static_cast<size_t>(p[c][2] + 0.5);
+					i_ = size_t(p[c][0] + 0.5);
+					j_ = size_t(p[c][1] + 0.5);
+					k_ = size_t(p[c][2] + 0.5);
 					assert(i_ < m_dim[0] && i_ >= 0 && j_ < m_dim[1] && j_ >= 0 && k_ < m_dim[2] && k_ >= 0);
 
 					if (c == 0) 
@@ -363,8 +362,10 @@ namespace nd
 					++j1;
 				if (k1 < m_dim[2])
 					++k1;
+
 				for (size_t i = i0; i < i1; ++i) 
 				{
+					Vec3 boxcenter;
 					boxcenter[0] = (double)i;
 					for (size_t j = j0; j < j1; ++j) 
 					{
@@ -372,7 +373,7 @@ namespace nd
 						for (size_t k = k0; k < k1; ++k) 
 						{
 							boxcenter[2] = (double)k;
-							int32_t res = TriBoxOverlap(boxcenter, boxhalfsize, p[0], p[1], p[2]);
+							ndInt32 res = TriBoxOverlap(boxcenter, boxhalfsize, p[0], p[1], p[2]);
 							unsigned char& value = GetVoxel(i, j, k);
 							if (res == 1 && value == PRIMITIVE_UNDEFINED) 
 							{

@@ -37,12 +37,12 @@ namespace nd
 
 		void VHACD::ComputePrimitiveSet(const Parameters&)
 		{
-			VoxelSet* vset = new VoxelSet;
+			VoxelSet* const vset = new VoxelSet;
 			m_volume->Convert(*vset);
 			m_pset = vset;
 
 			delete m_volume;
-			m_volume = 0;
+			m_volume = nullptr;
 		}
 
 		bool VHACD::Compute(const float* const points,const uint32_t nPoints,
@@ -200,8 +200,7 @@ namespace nd
 
 		void VHACD::ComputeBestClippingPlane(const PrimitiveSet* inputPSet, const double, const SArray<Plane>& planes,
 			const Vec3& preferredCuttingDirection, const double w, const double alpha, const double beta,
-			const int32_t convexhullDownsampling, const double, const double, Plane& bestPlane,
-			double& minConcavity, const Parameters& params)
+			const int32_t convexhullDownsampling, Plane& bestPlane, double& minConcavity, const Parameters& params)
 		{
 			ndInt32 iBest = -1;
 			ndInt32 nPlanes = ndInt32(planes.Size());
@@ -327,17 +326,11 @@ namespace nd
 			}
 			m_parallelQueue.Sync();
 #else
-			//static int xxxx = 0;
 			for (ndInt32 i = 0; i < nPlanes; ++i)
 			{
 				jobs.PushBack(BestClippingPlaneJob());
 				jobs[i].m_plane = planes[i];
 				jobs[i].m_commonData = &data;
-				//xxxx++;
-				//if (xxxx == 76)
-				//{
-				//	xxxx *= 1;
-				//}
 				jobs[i].Execute(0);
 			}
 #endif
@@ -375,11 +368,12 @@ namespace nd
 
 		void VHACD::ComputeACD(const Parameters& params)
 		{
+			SArray<PrimitiveSet*> temp;
 			SArray<PrimitiveSet*> parts;
 			SArray<PrimitiveSet*> inputParts;
-			SArray<PrimitiveSet*> temp;
+
 			inputParts.PushBack(m_pset);
-			m_pset = 0;
+			m_pset = nullptr;
 			SArray<Plane> planes;
 			SArray<Plane> planesRef;
 			ndInt32 sub = 0;
@@ -415,19 +409,15 @@ namespace nd
 
 				for (size_t p = 0; p < nInputParts; ++p) 
 				{
-					const double progress0 = double(p) * 100.0 / (double)nInputParts;
-					const double progress1 = (double(p) + 0.75) * 100.0 / (double)nInputParts;
-					const double progress2 = (double(p) + 1.00) * 100.0 / (double)nInputParts;
-
 					PrimitiveSet* const pset = inputParts[p];
 					inputParts[p] = nullptr;
 					double volume = pset->ComputeVolume();
 					pset->ComputeBB();
 					pset->ComputePrincipalAxes();
-					if (params.m_pca) 
-					{
-						pset->AlignToPrincipalAxes();
-					}
+					//if (params.m_pca) 
+					//{
+					//	pset->AlignToPrincipalAxes();
+					//}
 
 					pset->ComputeConvexHull(pset->GetConvexHull());
 					double volumeCH = fabs(pset->GetConvexHull().ComputeVolume());
@@ -464,8 +454,6 @@ namespace nd
 							concavity * params.m_alpha,
 							concavity * params.m_beta,
 							int32_t(params.m_convexhullDownsampling),
-							progress0,
-							progress1,
 							bestPlane,
 							minConcavity,
 							params);
@@ -484,8 +472,6 @@ namespace nd
 								concavity * params.m_alpha,
 								concavity * params.m_beta,
 								1, // convexhullDownsampling = 1
-								progress1,
-								progress2,
 								bestPlane,
 								minConcavity,
 								params);
@@ -501,20 +487,20 @@ namespace nd
 							temp.PushBack(bestLeft);
 							temp.PushBack(bestRight);
 							pset->Clip(bestPlane, bestRight, bestLeft);
-							if (params.m_pca) 
-							{
-								bestRight->RevertAlignToPrincipalAxes();
-								bestLeft->RevertAlignToPrincipalAxes();
-							}
+							//if (params.m_pca) 
+							//{
+							//	bestRight->RevertAlignToPrincipalAxes();
+							//	bestLeft->RevertAlignToPrincipalAxes();
+							//}
 							delete pset;
 						}
 					}
 					else 
 					{
-						if (params.m_pca) 
-						{
-							pset->RevertAlignToPrincipalAxes();
-						}
+						//if (params.m_pca) 
+						//{
+						//	pset->RevertAlignToPrincipalAxes();
+						//}
 						parts.PushBack(pset);
 					}
 				}

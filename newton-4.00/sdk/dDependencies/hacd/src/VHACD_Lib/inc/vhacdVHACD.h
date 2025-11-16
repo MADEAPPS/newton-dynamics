@@ -74,9 +74,9 @@ namespace nd
 			{
 				memset(m_rot, 0, sizeof(double) * 9);
 				m_dim = 64;
-				m_volume = 0;
 				m_volumeCH0 = 0.0;
-				m_pset = 0;
+				m_pset = nullptr;
+				m_volume = nullptr;
 				m_barycenter[0] = m_barycenter[1] = m_barycenter[2] = 0.0;
 				m_rot[0][0] = m_rot[1][1] = m_rot[2][2] = 1.0;
 			}
@@ -91,33 +91,9 @@ namespace nd
 				const double alpha,
 				const double beta,
 				const int32_t convexhullDownsampling,
-				const double progress0,
-				const double progress1,
 				Plane& bestPlane,
 				double& minConcavity,
 				const Parameters& params);
-
-			void AlignMesh(const ndReal* const points,
-				const uint32_t stridePoints,
-				const uint32_t nPoints,
-				const int32_t* const triangles,
-				const uint32_t strideTriangles,
-				const uint32_t nTriangles,
-				const Parameters& params)
-			{
-				if (!params.m_pca) 
-				{
-					return;
-				}
-
-				m_dim = (size_t)(pow((double)params.m_resolution, 1.0 / 3.0) + 0.5);
-				Volume volume;
-				volume.Voxelize(points, stridePoints, nPoints,
-					triangles, strideTriangles, nTriangles,
-					m_dim, m_barycenter, m_rot);
-
-				volume.AlignToPrincipalAxes(m_rot);
-			}
 
 			void VoxelizeMesh(const ndReal* const points,
 				const uint32_t stridePoints,
@@ -162,7 +138,6 @@ namespace nd
 				const Parameters& params)
 			{
 				Init();
-				AlignMesh(points, 3, nPoints, (int32_t *)triangles, 3, nTriangles, params);
 				VoxelizeMesh(points, 3, nPoints, (int32_t *)triangles, 3, nTriangles, params);
 				ComputePrimitiveSet(params);
 				ComputeACD(params);
