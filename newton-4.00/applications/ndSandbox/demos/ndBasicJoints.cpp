@@ -456,7 +456,7 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& o
 		// free rolling double hinge
 		ndMatrix matrix(refMatrix);
 		ndSharedPtr<ndBody> body (MakePrimitive(scene, matrix, **shape, mesh, mass));
-		body->SetOmega(ndVector(0.0f, 10.0f, 20.0f, 0.0f));
+		body->SetOmega(ndVector(20.0f, 10.0f, 0.0f, 0.0f));
 
 		ndJointDoubleHinge* const joint = new ndJointDoubleHinge(matrix, body->GetAsBodyDynamic(), fixBody);
 		ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint);
