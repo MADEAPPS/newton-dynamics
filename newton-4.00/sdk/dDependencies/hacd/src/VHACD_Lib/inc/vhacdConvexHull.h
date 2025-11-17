@@ -30,12 +30,6 @@ namespace nd
 	namespace VHACD
 	{
 		#define VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE 16
-		class ConvexHullVertex : public ndBigVector
-		{
-			public:
-			ndInt32 m_mark;
-		};
-
 		class ConvexHullAABBTreeNode
 		{
 			public:
@@ -75,11 +69,10 @@ namespace nd
 			{
 			}
 
-			//ndInt32 m_count;
 			ndInt32 m_indices[VHACD_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE];
 		};
 
-		class ConvexHull3dPointSet : public ndArray<ConvexHullVertex>
+		class ConvexHull3dPointSet : public ndArray<ndBigVector>
 		{
 			public:
 			ConvexHull3dPointSet();
@@ -89,7 +82,7 @@ namespace nd
 			const ConvexHullAABBTreeNode* GetTree() const;
 
 			private:
-			ConvexHullAABBTreeNode* BuildRecurse(ConvexHullAABBTreeNode* const parent, ConvexHullVertex* const points, ndInt32 count, ndInt32 baseIndex, ndInt32& memoryPool);
+			ConvexHullAABBTreeNode* BuildRecurse(ConvexHullAABBTreeNode* const parent, ndBigVector* const points, ndInt32 count, ndInt32 baseIndex, ndInt32& memoryPool);
 			ndArray<ConvexHull3dPointCluster> m_treeBuffer;
 		};
 
@@ -122,14 +115,30 @@ namespace nd
 			const ndArray<ndBigVector>& GetVertexPool() const;
 
 			private:
+			class ndSupportPoint
+			{
+				public:
+				ndSupportPoint()
+					:m_cluster(nullptr)
+					,m_positIndex(-1)
+					,m_vertexIndex(-1)
+				{
+				}
+
+				ConvexHull3dPointCluster* m_cluster;
+				ndInt32 m_positIndex;
+				ndInt32 m_vertexIndex;
+			};
+
 			ConvexHullAABBTreeNode* InitVertexArray(ConvexHull3dPointSet& accelerator);
 			void BuildHull(ConvexHull3dPointSet& accelerator, double distTol, ndInt32 maxVertexCount);
 
 			ndNode* AddFace(ndInt32 i0, ndInt32 i1, ndInt32 i2);
 
-			void CalculateConvexHull3d(ConvexHullAABBTreeNode* vertexTree, ndArray<ConvexHullVertex>& points, ndInt32 count, double distTol, ndInt32 maxVertexCount);
+			void CalculateConvexHull3d(ConvexHullAABBTreeNode* vertexTree, ndArray<ndBigVector>& points, ndInt32 count, double distTol, ndInt32 maxVertexCount);
 
-			ndInt32 SupportVertex(ConvexHullAABBTreeNode** const tree, const ndArray<ConvexHullVertex>& points, const ndBigVector& dir, const bool removeEntry = true) const;
+			void RemoveSupportPoint(ConvexHullAABBTreeNode** const tree, const ndSupportPoint& point) const;
+			ndSupportPoint SupportVertex(ConvexHullAABBTreeNode** const tree, const ndArray<ndBigVector>& points, const ndBigVector& dir) const;
 			double TetrahedrumVolume(const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2, const ndBigVector& p3) const;
 
 			ndBigVector m_aabbP0;

@@ -732,12 +732,7 @@ namespace nd
 			for (ndInt32 v = 0; v < nVoxels; ++v)
 			{
 				Vec3 pt(GetPoint(m_voxels[v]));
-				ConvexHullVertex p;
-				p.m_x = pt[0];
-				p.m_y = pt[1];
-				p.m_z = pt[2];
-				p.m_w = 0.0;
-				p.m_mark = 0;
+				const ndBigVector p (pt[0], pt[1], pt[2], 0.0);
 				space.PushBack(p);
 			}
 			space.BuildAccelerator();
