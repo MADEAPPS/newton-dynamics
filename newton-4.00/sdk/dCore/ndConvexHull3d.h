@@ -31,6 +31,7 @@
 #include "ndQuaternion.h"
 
 class ndConvexHull3dVertex;
+class ndConvexHull3dPointCluster;
 class ndConvexHull3dAABBTreeNode;
 
 class ndConvexHull3dFace
@@ -72,6 +73,20 @@ class ndConvexHull3d: public ndList<ndConvexHull3dFace, ndContainersFreeListAllo
 	D_CORE_API void CalculateVolumeAndSurfaceArea (ndFloat64& volume, ndFloat64& surcafeArea) const;
 
 	protected:
+	class ndSupportPoint
+	{
+		public:
+		ndSupportPoint()
+			:m_cluster(nullptr)
+			,m_positIndex(-1)
+			,m_vertexIndex(-1)
+		{
+		}
+
+		ndConvexHull3dPointCluster* m_cluster;
+		ndInt32 m_positIndex;
+		ndInt32 m_vertexIndex;
+	};
 	D_CORE_API ndConvexHull3d();
 	D_CORE_API void BuildHull (const ndFloat64* const vertexCloud, ndInt32 strideInBytes, ndInt32 count, ndFloat64 distTol, ndInt32 maxVertexCount);
 
@@ -84,8 +99,9 @@ class ndConvexHull3d: public ndList<ndConvexHull3dFace, ndContainersFreeListAllo
 	void CalculateConvexHull2d (ndConvexHull3dAABBTreeNode* vertexTree, ndConvexHull3dVertex* const points, ndInt32 count, ndFloat64 distTol, ndInt32 maxVertexCount);
 	void CalculateConvexHull3d (ndConvexHull3dAABBTreeNode* vertexTree, ndConvexHull3dVertex* const points, ndInt32 count, ndFloat64 distTol, ndInt32 maxVertexCount);
 
+	void RemovendSupportPoint(ndConvexHull3dAABBTreeNode** const tree, const ndSupportPoint& point) const;
 	ndFloat64 TetrahedrumVolume(const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2, const ndBigVector& p3) const;
-	ndInt32 SupportVertex (ndConvexHull3dAABBTreeNode** const tree, const ndConvexHull3dVertex* const points, const ndBigVector& dir) const;
+	ndSupportPoint SupportVertex (ndConvexHull3dAABBTreeNode** const tree, const ndConvexHull3dVertex* const points, const ndBigVector& dir) const;
 
 	ndInt32 GetUniquePoints(ndConvexHull3dVertex* const points, ndInt32 count);
 	ndConvexHull3dAABBTreeNode* BuildTree (ndConvexHull3dAABBTreeNode* const parent, ndConvexHull3dVertex* const points, ndInt32 count, ndInt32 baseIndex, ndInt8** const memoryPool, ndInt32& maxMemSize) const;

@@ -167,13 +167,11 @@ void ndBasicCompoundCollision(ndDemoEntityManager* const scene)
 	location.m_posit.m_x = 5.0f;
 	location.m_posit.m_z = -2.0f;
 	location.m_posit.m_y = 1.7f;
-	//AddSimpleConcaveMesh(scene, location, "camel.nd", 1);
 	AddSimpleConcaveMesh(scene, location, "camel.nd", 4);
 	
 	location.m_posit.m_x = 10.0f;
 	location.m_posit.m_z = 5.0f;
 	location.m_posit.m_y = 2.0f;
-	//AddSimpleConcaveMesh(scene, location, "dino.nd", 1);
 	AddSimpleConcaveMesh(scene, location, "dino.nd", 4);
 
 	ndVector origin(ndVector::m_zero);
