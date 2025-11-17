@@ -225,7 +225,7 @@ namespace nd
 		int32_t TriBoxOverlap(const Vec3& boxcenter, const Vec3& boxhalfsize, const Vec3& triver0,
 			const Vec3& triver1, const Vec3& triver2);
 		template <class T>
-		inline Vec3 ComputeAlignedPoint(const T* const points, const uint32_t idx, const Vec3& barycenter, const double(&rot)[3][3]) {}
+		inline Vec3 ComputeAlignedPoint(const T* const points, const uint32_t idx, const Vec3& barycenter, const double(&rot)[3][3]) { return Vec3;}
 		inline Vec3 ComputeAlignedPoint(const float* const points, const uint32_t idx, const Vec3& barycenter, const double(&rot)[3][3])
 		{
 			double x = points[idx + 0] - barycenter[0];
