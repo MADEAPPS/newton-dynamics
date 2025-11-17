@@ -29,10 +29,10 @@ namespace nd
 
 			void operator=(const SArray& rhs)
 			{
-				SetCount(0);
+				ndArray<T>::SetCount(0);
 				for (ndInt32 i = 0; i < ndInt32 (rhs.GetCount()); ++i)
 				{
-					PushBack(rhs[i]);
+					ndArray<T>::PushBack(rhs[i]);
 				}
 			}
 
@@ -56,13 +56,14 @@ namespace nd
 
 			size_t Size() const
 			{
-				return (size_t)GetCount();
+				return (size_t)ndArray<T>::GetCount();
 			}
 
 			T* Data()
 			{
 				return &ndArray<T>::operator[](0);
 			}
+
 			const T* Data() const
 			{
 				return &ndArray<T>::operator[](0);
@@ -70,7 +71,7 @@ namespace nd
 
 			void Clear()
 			{
-				SetCount(0);
+				ndArray<T>::SetCount(0);
 			}
 
 			void Resize(size_t size)
@@ -81,7 +82,7 @@ namespace nd
 			void Allocate(size_t size)
 			{
 				Resize(size);
-				SetCount(0);
+				ndArray<T>::SetCount(0);
 			}
 		};
 
