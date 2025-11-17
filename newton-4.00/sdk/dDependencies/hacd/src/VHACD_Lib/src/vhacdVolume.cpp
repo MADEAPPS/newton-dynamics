@@ -578,8 +578,8 @@ namespace nd
 				}
 			}
 
-			_ASSERT(positivePts->Size() <= nVoxels * 8);
-			_ASSERT(negativePts->Size() <= nVoxels * 8);
+			ndAssert(positivePts->Size() <= nVoxels * 8);
+			ndAssert(negativePts->Size() <= nVoxels * 8);
 		}
 
 		void VoxelSet::GetPointArray(ndArray<Vec3>& points) const
