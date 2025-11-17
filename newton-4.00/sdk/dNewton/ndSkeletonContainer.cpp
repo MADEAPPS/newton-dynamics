@@ -236,11 +236,12 @@ ndInt32 ndSkeletonContainer::ndNode::FactorizeChild(const ndLeftHandSide* const 
 {
 	CalculateInertiaMatrix(bodyMassArray);
 
-	ndInt32 boundedDof = 0;
-	m_ordinal = ndOrdinal();
-	ndAssert(m_joint);
 	m_dof = 0;
+	ndAssert(m_joint);
 	ndAssert(m_parent);
+
+	m_ordinal = ndOrdinal();
+	//ndInt32 boundedDof = 0;
 	ndInt32 count = m_joint->m_rowCount;
 	const ndInt32 first = m_joint->m_rowStart;
 	for (ndInt32 i = 0; i < count; ++i) 
@@ -260,9 +261,11 @@ ndInt32 ndSkeletonContainer::ndNode::FactorizeChild(const ndLeftHandSide* const 
 			count--;
 		}
 	}
+	m_dof = ndMin(m_dof, ndInt8(6));
 	ndAssert(m_dof >= 0);
 	ndAssert(m_dof <= 6);
-	boundedDof += m_joint->m_rowCount - count;
+	//boundedDof += m_joint->m_rowCount - count;
+	ndInt32 boundedDof = m_joint->m_rowCount - m_dof;
 	GetJacobians(leftHandSide, rightHandSide, jointMassArray);
 	
 	ndSpatialMatrix& bodyInvMass = m_data.m_body.m_invMass;
