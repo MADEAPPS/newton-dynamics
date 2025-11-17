@@ -99,7 +99,7 @@ class ndConvexHull3d: public ndList<ndConvexHull3dFace, ndContainersFreeListAllo
 	void CalculateConvexHull2d (ndConvexHull3dAABBTreeNode* vertexTree, ndConvexHull3dVertex* const points, ndInt32 count, ndFloat64 distTol, ndInt32 maxVertexCount);
 	void CalculateConvexHull3d (ndConvexHull3dAABBTreeNode* vertexTree, ndConvexHull3dVertex* const points, ndInt32 count, ndFloat64 distTol, ndInt32 maxVertexCount);
 
-	void RemovendSupportPoint(ndConvexHull3dAABBTreeNode** const tree, const ndSupportPoint& point) const;
+	void RemoveSupportPoint(ndConvexHull3dAABBTreeNode** const tree, const ndSupportPoint& point) const;
 	ndFloat64 TetrahedrumVolume(const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2, const ndBigVector& p3) const;
 	ndSupportPoint SupportVertex (ndConvexHull3dAABBTreeNode** const tree, const ndConvexHull3dVertex* const points, const ndBigVector& dir) const;
 

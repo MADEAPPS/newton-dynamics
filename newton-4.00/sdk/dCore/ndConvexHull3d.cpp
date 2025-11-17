@@ -504,7 +504,7 @@ ndInt32 ndConvexHull3d::InitVertexArray(ndConvexHull3dVertex* const points, ndIn
 
 	const ndSupportPoint index0(SupportVertex(&tree, points, normalMap.m_normal[0]));
 	m_points[0] = points[index0.m_vertexIndex];
-	RemovendSupportPoint(&tree, index0);
+	RemoveSupportPoint(&tree, index0);
 
 	bool validTetrahedrum = false;
 	ndBigVector e1 (ndBigVector::m_zero);
@@ -520,7 +520,7 @@ ndInt32 ndConvexHull3d::InitVertexArray(ndConvexHull3dVertex* const points, ndIn
 		{
 			validTetrahedrum = true;
 			m_points[1] = points[index.m_vertexIndex];
-			RemovendSupportPoint(&tree, index);
+			RemoveSupportPoint(&tree, index);
 			break;
 		}
 	}
@@ -547,7 +547,7 @@ ndInt32 ndConvexHull3d::InitVertexArray(ndConvexHull3dVertex* const points, ndIn
 		{
 			validTetrahedrum = true;
 			m_points[2] = points[index.m_vertexIndex];
-			RemovendSupportPoint(&tree, index);
+			RemoveSupportPoint(&tree, index);
 			break;
 		}
 	}
@@ -573,7 +573,7 @@ ndInt32 ndConvexHull3d::InitVertexArray(ndConvexHull3dVertex* const points, ndIn
 		// we found a valid tetrahedral, about and start build the hull by adding the rest of the points
 		validTetrahedrum = true;
 		m_points[3] = points[index1.m_vertexIndex];
-		RemovendSupportPoint(&tree, index1);
+		RemoveSupportPoint(&tree, index1);
 	}
 	if (!validTetrahedrum) 
 	{
@@ -587,7 +587,7 @@ ndInt32 ndConvexHull3d::InitVertexArray(ndConvexHull3dVertex* const points, ndIn
 			// we found a valid tetrahedral, about and start build the hull by adding the rest of the points
 			validTetrahedrum = true;
 			m_points[3] = points[index.m_vertexIndex];
-			RemovendSupportPoint(&tree, index);
+			RemoveSupportPoint(&tree, index);
 		}
 	}
 	if (!validTetrahedrum) 
@@ -606,7 +606,7 @@ ndInt32 ndConvexHull3d::InitVertexArray(ndConvexHull3dVertex* const points, ndIn
 				// we found a valid tetrahedral, about and start build the hull by adding the rest of the points
 				validTetrahedrum = true;
 				m_points[3] = points[index.m_vertexIndex];
-				RemovendSupportPoint(&tree, index);
+				RemoveSupportPoint(&tree, index);
 				break;
 			}
 		}
@@ -640,7 +640,7 @@ ndFloat64 ndConvexHull3d::TetrahedrumVolume (const ndBigVector& p0, const ndBigV
 	return p3p0.DotProduct(p1p0.CrossProduct(p2p0)).GetScalar();
 }
 
-void ndConvexHull3d::RemovendSupportPoint(ndConvexHull3dAABBTreeNode** const tree, const ndSupportPoint& point) const
+void ndConvexHull3d::RemoveSupportPoint(ndConvexHull3dAABBTreeNode** const tree, const ndSupportPoint& point) const
 {
 	ndInt32* const indices = point.m_cluster->m_indices;
 	for (ndInt32 i = point.m_positIndex + 1; i < point.m_cluster->m_count; ++i)
@@ -687,6 +687,7 @@ ndConvexHull3d::ndSupportPoint ndConvexHull3d::SupportVertex (ndConvexHull3dAABB
 
 	stackPool.PushBack(*treePointer);
 	aabbProjection.PushBack(ndFloat32(1.0e20f));
+
 	ndFloat64 maxProj = ndFloat64 (-1.0e20f);
 	ndInt32 ix = (dir[0] > ndFloat64 (0.0f)) ? 1 : 0;
 	ndInt32 iy = (dir[1] > ndFloat64 (0.0f)) ? 1 : 0;
@@ -725,7 +726,7 @@ ndConvexHull3d::ndSupportPoint ndConvexHull3d::SupportVertex (ndConvexHull3dAABB
 			} 
 			else 
 			{
-				const ndConvexHull3dPointCluster* const cluster = (ndConvexHull3dPointCluster*) me;
+				ndConvexHull3dPointCluster* const cluster = (ndConvexHull3dPointCluster*) me;
 				const ndInt32* const indices = cluster->m_indices;
 
 				for (ndInt32 i = cluster->m_count - 1; i >= 0; --i)
@@ -746,7 +747,7 @@ ndConvexHull3d::ndSupportPoint ndConvexHull3d::SupportVertex (ndConvexHull3dAABB
 						maxProj = dist;
 						supportPoint.m_positIndex = i;
 						supportPoint.m_vertexIndex = j;
-						supportPoint.m_cluster = (ndConvexHull3dPointCluster*)cluster;
+						supportPoint.m_cluster = cluster;
 					}
 				}
 			}
@@ -836,7 +837,7 @@ bool ndConvexHull3d::CheckFlatSurface(ndConvexHull3dAABBTreeNode* tree, ndConvex
 		}
 	}
 
-	RemovendSupportPoint(&tree, index);
+	RemoveSupportPoint(&tree, index);
 	if (volume > ndFloat64(0.0f)) 
 	{
 		ndSwap(m_points[2], m_points[3]);
@@ -924,9 +925,9 @@ void ndConvexHull3d::CalculateConvexHull3d (ndConvexHull3dAABBTreeNode* vertexTr
 		ndBigPlane planeEquation (face->GetPlaneEquation (&m_points[0], isvalid));
 
 		ndBigVector p;
-		ndFloat64 dist = 0;
-
 		ndSupportPoint supportPoint;
+
+		ndFloat64 dist = 0;
 		if (isvalid)
 		{
 			supportPoint = SupportVertex(&vertexTree, points, planeEquation);
@@ -972,7 +973,7 @@ void ndConvexHull3d::CalculateConvexHull3d (ndConvexHull3dAABBTreeNode* vertexTr
 			}
 
 			m_points[currentIndex] = points[supportPoint.m_vertexIndex];
-			RemovendSupportPoint(&vertexTree, supportPoint);
+			RemoveSupportPoint(&vertexTree, supportPoint);
 
 			coneList.SetCount(0);
 			for (ndInt32 i = 0; i < deleteList.GetCount(); ++i)
