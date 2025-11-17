@@ -37,7 +37,7 @@ namespace ndRagdoll
 			ndDampData()
 				:m_spring(0.0f)
 				,m_damper(0.25f)
-				,m_regularizer(0.1f)
+				,m_regularizer(0.025f)
 			{
 			}
 
@@ -97,7 +97,7 @@ namespace ndRagdoll
 		{ "rfemur", ndDefinition::m_hinge, 1.0f, { -0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
 		{ "rtibia", ndDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 		
-		{ "lhipjoint", ndDefinition::m_spherical, 1.0f,{ -45.0f, 45.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
+		{ "lhipjoint", ndDefinition::m_spherical, 1.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 60.0f, 0.0f } },
 		{ "lfemur", ndDefinition::m_hinge, 1.0f, { -0.5f, 120.0f, 0.0f }, { 0.0f, 90.0f, 0.0f } },
 		{ "ltibia", ndDefinition::m_doubleHinge, 1.0f, { 0.0f, 0.0f, 60.0f }, { 90.0f, 0.0f, 90.0f } },
 
@@ -176,6 +176,8 @@ namespace ndRagdoll
 				case ndDefinition::m_doubleHinge:
 				{
 					ndJointDoubleHinge* const joint = new ndJointDoubleHinge(pinAndPivotInGlobalSpace, childBody, parentBody);
+					joint->SetLimitState0(true);
+					joint->SetLimitState1(true);
 					joint->SetLimits0(-30.0f * ndDegreeToRad, 30.0f * ndDegreeToRad);
 					joint->SetLimits1(-45.0f * ndDegreeToRad, 45.0f * ndDegreeToRad);
 					joint->SetAsSpringDamper0(definition.m_coneSpringData.m_regularizer, definition.m_coneSpringData.m_spring, definition.m_coneSpringData.m_damper);
