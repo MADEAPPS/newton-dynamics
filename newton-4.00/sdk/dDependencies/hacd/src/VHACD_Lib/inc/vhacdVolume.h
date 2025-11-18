@@ -17,6 +17,7 @@
 
 #include "vhacdMesh.h"
 #include "vhacdVector.h"
+#include "vhacdConvexHull.h"
 
 namespace nd
 {
@@ -60,14 +61,14 @@ namespace nd
 			virtual void ComputeClippedVolumes(const Plane& plane, double& positiveVolume,
 				double& negativeVolume) const = 0;
 
-			virtual void CalculateVoxelSpace(ConvexHull3dPointSet& space) const = 0;
+			virtual void BuildHullPoints(size_t sampling = 1) = 0;
 			virtual void ComputeClippedVolumes(
 				const ConvexHullAABBTreeNode* const voxelSpace,
 				const Plane& plane, double& positiveVolume,
 				double& negativeVolume) const = 0;
 
 			virtual void SelectOnSurface(PrimitiveSet* const onSurfP) const = 0;
-			virtual void ComputeConvexHull(Mesh& meshCH, const size_t sampling = 1) const = 0;
+			virtual void ComputeConvexHull(Mesh& meshCH, const size_t sampling = 1) = 0;
 			virtual void ComputeBB() = 0;
 			virtual void ComputePrincipalAxes() = 0;
 			virtual void AlignToPrincipalAxes() = 0;
@@ -125,7 +126,7 @@ namespace nd
 			void GetPointArray(ndArray<Vec3>& points) const ;
 
 			void GetPoints(const Voxel& voxel, Vec3* const pts) const;
-			void ComputeConvexHull(Mesh& meshCH, const size_t sampling = 1) const;
+			void ComputeConvexHull(Mesh& meshCH, const size_t sampling = 1);
 			void Clip(const Plane& plane, PrimitiveSet* const positivePart, PrimitiveSet* const negativePart) const;
 			void Intersect(const Plane& plane, SArray<Vec3>* const positivePts,
 				SArray<Vec3>* const negativePts, const size_t sampling) const;
@@ -133,7 +134,7 @@ namespace nd
 				SArray<Vec3>* const exteriorPts) const;
 			void ComputeClippedVolumes(const Plane& plane, double& positiveVolume, double& negativeVolume) const;
 
-			virtual void CalculateVoxelSpace(ConvexHull3dPointSet& space) const;
+			virtual void BuildHullPoints(size_t sampling = 1);
 			void ComputeClippedVolumes(
 				const ConvexHullAABBTreeNode* const voxelSpace, const Plane& plane, 
 				double& positiveVolume,	double& negativeVolume) const;
@@ -157,6 +158,7 @@ namespace nd
 			Vec3 m_minBB;
 			double m_scale;
 			SArray<Voxel> m_voxels;
+			ConvexHull3dPointSet m_surfaceHullPoints;
 			double m_unitVolume;
 			Vec3 m_minBBPts;
 			Vec3 m_maxBBPts;

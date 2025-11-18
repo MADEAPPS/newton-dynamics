@@ -58,6 +58,8 @@ namespace nd
 		class IVHACD 
 		{
 			public:
+			virtual ~IVHACD();
+
 			class ConvexHull 
 			{
 				public:
@@ -102,19 +104,15 @@ namespace nd
 				ndInt32 m_maxConvexHulls;
 			};
 
-			virtual bool Compute(const float* const points,
-				const uint32_t countPoints,
-				const uint32_t* const triangles,
-				const uint32_t countTriangles,
-				const Parameters& params)
-				= 0;
+			virtual void Compute(
+				const float* const points, const uint32_t countPoints,
+				const uint32_t* const triangles, const uint32_t countTriangles,
+				const Parameters& params)= 0;
 			virtual uint32_t GetNConvexHulls() const = 0;
 			virtual void GetConvexHull(const uint32_t index, ConvexHull& ch) const = 0;
-			virtual void Clean(void) = 0; // release internally allocated memory
-			virtual void Release(void) = 0; // release IVHACD
 
 			protected:
-			virtual ~IVHACD(void) {}
+			IVHACD();
 		};
 		IVHACD* CreateVHACD(void);
 	}

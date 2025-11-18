@@ -81,6 +81,9 @@ namespace nd
 
 			const ConvexHullAABBTreeNode* GetTree() const;
 
+			void GetUniquePoints();
+			void BuildPoints(const double* const vertexCloud, ndInt32 strideInBytes, ndInt32 count);
+
 			private:
 			ConvexHullAABBTreeNode* BuildRecurse(ConvexHullAABBTreeNode* const parent, ndBigVector* const points, ndInt32 count, ndInt32 baseIndex, ndInt32& memoryPool);
 			ndArray<ConvexHull3dPointCluster> m_treeBuffer;
@@ -135,7 +138,7 @@ namespace nd
 
 			ndNode* AddFace(ndInt32 i0, ndInt32 i1, ndInt32 i2);
 
-			void CalculateConvexHull3d(ConvexHullAABBTreeNode* vertexTree, ndArray<ndBigVector>& points, ndInt32 count, double distTol, ndInt32 maxVertexCount);
+			void CalculateConvexHull3d(ConvexHullAABBTreeNode* vertexTree, ConvexHull3dPointSet& points, ndInt32 count, double distTol, ndInt32 maxVertexCount);
 
 			void RemoveSupportPoint(ConvexHullAABBTreeNode** const tree, const ndSupportPoint& point) const;
 			ndSupportPoint SupportVertex(ConvexHullAABBTreeNode** const tree, const ndArray<ndBigVector>& points, const ndBigVector& dir) const;

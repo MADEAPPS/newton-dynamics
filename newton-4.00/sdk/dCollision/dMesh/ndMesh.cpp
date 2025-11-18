@@ -511,7 +511,7 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionCompound(bool lowDetail)
 		}
 	}
 	
-	nd::VHACD::IVHACD* const interfaceVHACD = nd::VHACD::CreateVHACD();
+	ndSharedPtr<nd::VHACD::IVHACD> interfaceVHACD (nd::VHACD::CreateVHACD());
 	nd::VHACD::IVHACD::Parameters paramsVHACD;
 	paramsVHACD.m_concavityToVolumeWeigh = lowDetail ? 1.0f : 0.5f;
 	interfaceVHACD->Compute(&meshPoints[0], uint32_t(meshPoints.GetCount() / 3), (uint32_t*)&indices[0], uint32_t(indices.GetCount() / 3), paramsVHACD);
@@ -536,11 +536,6 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionCompound(bool lowDetail)
 	}
 	compoundShape->EndAddRemove();
 	
-	interfaceVHACD->Clean();
-	interfaceVHACD->Release();
-	
-	//const ndMatrix matrix(m_meshMatrix);
-	//compoundShapeInstance->SetLocalMatrix(matrix);
 	compoundShapeInstance->SetLocalMatrix(ndGetIdentityMatrix());
 	
 	return compoundShapeInstance;

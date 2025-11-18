@@ -20,66 +20,22 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 namespace nd
 {
-	#define CH_APP_MIN_NUM_PRIMITIVES 64000
 	namespace VHACD 
 	{
 		class VHACD : public IVHACD 
 		{
 			public:
-			//! Constructor.
-			VHACD()
-			{
-				Init();
-			}
-			//! Destructor.
-			~VHACD(void)
-			{
-			}
-			uint32_t GetNConvexHulls() const
-			{
-				return (uint32_t)m_convexHulls.Size();
-			}
-			void GetConvexHull(const uint32_t index, ConvexHull& ch) const
-			{
-				Mesh* mesh = m_convexHulls[ndInt32(index)];
-				ch.m_nPoints = ndInt32(mesh->GetNPoints());
-				ch.m_nTriangles = ndInt32(mesh->GetNTriangles());
-				ch.m_points = mesh->GetPoints();
-				ch.m_triangles = (ndInt32*)mesh->GetTriangles();
-			}
-			void Clean(void)
-			{
-				delete m_pset;
-				delete m_volume;
-				size_t nCH = m_convexHulls.Size();
-				for (size_t p = 0; p < nCH; ++p) 
-				{
-					delete m_convexHulls[p];
-				}
-				m_convexHulls.Clear();
-				Init();
-			}
-			void Release(void)
-			{
-				delete this;
-			}
-			bool Compute(const float* const points,
-				const uint32_t nPoints,
-				const uint32_t* const triangles,
-				const uint32_t nTriangles,
+			VHACD();
+			~VHACD(void);
+
+			uint32_t GetNConvexHulls() const;
+			void GetConvexHull(const uint32_t index, ConvexHull& ch) const;
+			void Compute(
+				const float* const points, const uint32_t nPoints,
+				const uint32_t* const triangles, const uint32_t nTriangles,
 				const Parameters& params);
 
 			private:
-			void Init()
-			{
-				memset(m_rot, 0, sizeof(double) * 9);
-				m_dim = 64;
-				m_volumeCH0 = 0.0;
-				m_pset = nullptr;
-				m_volume = nullptr;
-				m_barycenter[0] = m_barycenter[1] = m_barycenter[2] = 0.0;
-				m_rot[0][0] = m_rot[1][1] = m_rot[2][2] = 1.0;
-			}
 			void ComputePrimitiveSet(const Parameters& params);
 			void ComputeACD(const Parameters& params);
 			void MergeConvexHulls(const Parameters& params);
@@ -95,18 +51,15 @@ namespace nd
 				double& minConcavity,
 				const Parameters& params);
 
-			void VoxelizeMesh(const ndReal* const points,
-				const uint32_t stridePoints,
-				const uint32_t nPoints,
-				const int32_t* const triangles,
-				const uint32_t strideTriangles,
-				const uint32_t nTriangles,
+			void VoxelizeMesh(
+				const ndReal* const points, const uint32_t stridePoints,
+				const uint32_t nPoints,	const int32_t* const triangles,
+				const uint32_t strideTriangles,	const uint32_t nTriangles,
 				const Parameters& params);
 			
-			bool ComputeACD(const ndReal* const points,
-				const uint32_t nPoints,
-				const uint32_t* const triangles,
-				const uint32_t nTriangles,
+			void ComputeACD(
+				const ndReal* const points,	const uint32_t nPoints,		
+				const uint32_t* const triangles, const uint32_t nTriangles,
 				const Parameters& params);
 
 		private:
@@ -121,4 +74,4 @@ namespace nd
 		};
 	}
 }
-#endif // VHACD_VHACD_H
+#endif

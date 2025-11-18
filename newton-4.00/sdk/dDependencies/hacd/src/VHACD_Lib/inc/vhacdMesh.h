@@ -35,8 +35,8 @@ namespace nd
 			double m_b;
 			double m_c;
 			double m_d;
+			ndInt32 m_index;
 			AXIS m_axis;
-			short m_index;
 		};
 
 		//! Triangular mesh data structure

@@ -30,9 +30,55 @@ namespace nd
 	namespace VHACD 
 	{
 		#define MAX_DOUBLE (1.79769e+30)
+		IVHACD::IVHACD()
+		{
+		}
+
+		IVHACD::~IVHACD(void)
+		{
+		}
+
 		IVHACD* CreateVHACD(void)
 		{
 			return new VHACD();
+		}
+
+		VHACD::VHACD()
+		{
+			m_dim = 64;
+			m_volumeCH0 = 0.0;
+			m_pset = nullptr;
+			m_volume = nullptr;
+			m_barycenter[0] = m_barycenter[1] = m_barycenter[2] = 0.0;
+
+			memset(m_rot, 0, sizeof(double) * 9);
+			m_rot[0][0] = m_rot[1][1] = m_rot[2][2] = 1.0;
+		}
+
+		VHACD::~VHACD(void)
+		{
+			delete m_pset;
+			delete m_volume;
+			size_t nCH = m_convexHulls.Size();
+			for (size_t p = 0; p < nCH; ++p)
+			{
+				delete m_convexHulls[p];
+			}
+			m_convexHulls.Clear();
+		}
+
+		uint32_t VHACD::GetNConvexHulls() const
+		{
+			return (uint32_t)m_convexHulls.Size();
+		}
+
+		void VHACD::GetConvexHull(const uint32_t index, ConvexHull& ch) const
+		{
+			Mesh* mesh = m_convexHulls[ndInt32(index)];
+			ch.m_nPoints = ndInt32(mesh->GetNPoints());
+			ch.m_nTriangles = ndInt32(mesh->GetNTriangles());
+			ch.m_points = mesh->GetPoints();
+			ch.m_triangles = (ndInt32*)mesh->GetTriangles();
 		}
 
 		void VHACD::ComputePrimitiveSet(const Parameters&)
@@ -45,10 +91,10 @@ namespace nd
 			m_volume = nullptr;
 		}
 
-		bool VHACD::Compute(const float* const points,const uint32_t nPoints,
+		void VHACD::Compute(const float* const points,const uint32_t nPoints,
 			const uint32_t* const triangles,const uint32_t nTriangles, const Parameters& params)
 		{
-			return ComputeACD(points, nPoints, triangles, nTriangles, params);
+			ComputeACD(points, nPoints, triangles, nTriangles, params);
 		}
 
 		double ComputePreferredCuttingDirection(const PrimitiveSet* const tset, Vec3& dir)
@@ -87,45 +133,45 @@ namespace nd
 
 		void ComputeAxesAlignedClippingPlanes(const VoxelSet& vset, const short downsampling, SArray<Plane>& planes)
 		{
-			const Triangle minV = vset.GetMinBBVoxels();
-			const Triangle maxV = vset.GetMaxBBVoxels();
-			Vec3 pt;
+			const Triangle minV (vset.GetMinBBVoxels());
+			const Triangle maxV (vset.GetMaxBBVoxels());
 			Plane plane;
-			const short i0 = short(minV[0]);
-			const short i1 = short(maxV[0]);
 			plane.m_a = 1.0;
 			plane.m_b = 0.0;
 			plane.m_c = 0.0;
 			plane.m_axis = AXIS_X;
-			for (short i = i0; i <= i1; i += downsampling) 
+			const ndInt32 i0 = minV[0];
+			const ndInt32 i1 = maxV[0];
+			for (ndInt32 i = i0; i <= i1; i += downsampling) 
 			{
-				pt = vset.GetPoint(Vec3(i + 0.5, 0.0, 0.0));
+				Vec3 pt (vset.GetPoint(Vec3(i + 0.5, 0.0, 0.0)));
 				plane.m_d = -pt[0];
 				plane.m_index = i;
 				planes.PushBack(plane);
 			}
-			const short j0 = short(minV[1]);
-			const short j1 = short(maxV[1]);
+
 			plane.m_a = 0.0;
 			plane.m_b = 1.0;
 			plane.m_c = 0.0;
 			plane.m_axis = AXIS_Y;
-			for (short j = j0; j <= j1; j += downsampling) 
+			const ndInt32 j0 = minV[1];
+			const ndInt32 j1 = maxV[1];
+			for (ndInt32 j = j0; j <= j1; j += downsampling) 
 			{
-				pt = vset.GetPoint(Vec3(0.0, j + 0.5, 0.0));
+				Vec3 pt (vset.GetPoint(Vec3(0.0, j + 0.5, 0.0)));
 				plane.m_d = -pt[1];
 				plane.m_index = j;
 				planes.PushBack(plane);
 			}
-			const short k0 = short(minV[2]);
-			const short k1 = short(maxV[2]);
 			plane.m_a = 0.0;
 			plane.m_b = 0.0;
 			plane.m_c = 1.0;
 			plane.m_axis = AXIS_Z;
-			for (short k = k0; k <= k1; k += downsampling) 
+			const ndInt32 k0 = minV[2];
+			const ndInt32 k1 = maxV[2];
+			for (ndInt32 k = k0; k <= k1; k += downsampling) 
 			{
-				pt = vset.GetPoint(Vec3(0.0, 0.0, k + 0.5));
+				Vec3 pt (vset.GetPoint(Vec3(0.0, 0.0, k + 0.5)));
 				plane.m_d = -pt[2];
 				plane.m_index = k;
 				planes.PushBack(plane);
@@ -142,13 +188,13 @@ namespace nd
 
 			if (bestPlane.m_axis == AXIS_X) 
 			{
-				const short i0 = ndMax(short(minV[0]), short(bestPlane.m_index - downsampling));
-				const short i1 = ndMin(short(maxV[0]), short(bestPlane.m_index + downsampling));
+				const ndInt32 i0 = ndMax(minV[0], bestPlane.m_index - downsampling);
+				const ndInt32 i1 = ndMin(maxV[0], bestPlane.m_index + downsampling);
 				plane.m_a = 1.0;
 				plane.m_b = 0.0;
 				plane.m_c = 0.0;
 				plane.m_axis = AXIS_X;
-				for (short i = i0; i <= i1; ++i) 
+				for (ndInt32 i = i0; i <= i1; ++i) 
 				{
 					pt = vset.GetPoint(Vec3(i + 0.5, 0.0, 0.0));
 					plane.m_d = -pt[0];
@@ -158,13 +204,13 @@ namespace nd
 			}
 			else if (bestPlane.m_axis == AXIS_Y) 
 			{
-				const short j0 = ndMax(short(minV[1]), short(bestPlane.m_index - downsampling));
-				const short j1 = ndMin(short(maxV[1]), short(bestPlane.m_index + downsampling));
+				const ndInt32 j0 = ndMax(minV[1], bestPlane.m_index - downsampling);
+				const ndInt32 j1 = ndMin(maxV[1], bestPlane.m_index + downsampling);
 				plane.m_a = 0.0;
 				plane.m_b = 1.0;
 				plane.m_c = 0.0;
 				plane.m_axis = AXIS_Y;
-				for (short j = j0; j <= j1; ++j) 
+				for (ndInt32 j = j0; j <= j1; ++j) 
 				{
 					pt = vset.GetPoint(Vec3(0.0, j + 0.5, 0.0));
 					plane.m_d = -pt[1];
@@ -174,13 +220,14 @@ namespace nd
 			}
 			else 
 			{
-				const short k0 = ndMax(short(minV[2]), short(bestPlane.m_index - downsampling));
-				const short k1 = ndMin(short(maxV[2]), short(bestPlane.m_index + downsampling));
+				const ndInt32 k0 = ndMax(minV[2], bestPlane.m_index - downsampling);
+				const ndInt32 k1 = ndMin(maxV[2], bestPlane.m_index + downsampling);
 				plane.m_a = 0.0;
 				plane.m_b = 0.0;
 				plane.m_c = 1.0;
 				plane.m_axis = AXIS_Z;
-				for (short k = k0; k <= k1; ++k) {
+				for (ndInt32 k = k0; k <= k1; ++k) 
+				{
 					pt = vset.GetPoint(Vec3(0.0, 0.0, k + 0.5));
 					plane.m_d = -pt[2];
 					plane.m_index = k;
@@ -212,12 +259,6 @@ namespace nd
 			PrimitiveSet* const onSurfacePSet = inputPSet->Create();
 			inputPSet->SelectOnSurface(onSurfacePSet);
 
-			PrimitiveSet** psets = new PrimitiveSet*[2];
-			for (int32_t i = 0; i < 2; ++i) 
-			{
-				psets[i] = inputPSet->Create();
-			}
-
 			class CommonData
 			{
 				public:
@@ -234,13 +275,11 @@ namespace nd
 				const Parameters& m_params;
 				PrimitiveSet* m_onSurfacePSet;
 				const PrimitiveSet* m_inputPSet;
-				const ConvexHullAABBTreeNode* m_voxelSpace;
 				ndInt32 m_convexhullDownsampling;
 				Mesh chs[VHACD_WORKERS_THREADS][2];
 				SArray<Vec3> chPts[VHACD_WORKERS_THREADS][2];
 
 				Vec3 m_preferredCuttingDirection;
-				PrimitiveSet** m_psets;
 			};
 
 			class BestClippingPlaneJob : public Job
@@ -274,15 +313,9 @@ namespace nd
 					double volumeRightCH = rightCH.ComputeVolume();
 			
 					// compute clipped volumes
-					//double volumeLeft;
-					//double volumeRight;
-					//m_commonData->m_inputPSet->ComputeClippedVolumes(m_plane, volumeRight, volumeLeft);
-
 					double volumeLeft;
 					double volumeRight;
-					m_commonData->m_inputPSet->ComputeClippedVolumes(m_commonData->m_voxelSpace, m_plane, volumeRight, volumeLeft);
-					//ndAssert(ndAreEqual(volumeLeft__, volumeLeft, 1.0e-5));
-					//ndAssert(ndAreEqual(volumeRight__, volumeRight, 1.0e-5));
+					m_commonData->m_inputPSet->ComputeClippedVolumes(m_plane, volumeRight, volumeLeft);
 			
 					double concavityLeft = float(ComputeConcavity(volumeLeft, volumeLeftCH, m_commonData->m_me->m_volumeCH0));
 					double concavityRight = float(ComputeConcavity(volumeRight, volumeRightCH, m_commonData->m_me->m_volumeCH0));
@@ -303,16 +336,11 @@ namespace nd
 			};
 			ndFixSizeArray<BestClippingPlaneJob, 1024> jobs;
 
-			ConvexHull3dPointSet space;
-			inputPSet->CalculateVoxelSpace(space);
-
 			CommonData data(this, params);
 			data.m_w = w;
 			data.m_beta = beta;
 			data.m_alpha = alpha;
-			data.m_psets = psets;
 			data.m_inputPSet = inputPSet;
-			data.m_voxelSpace = space.GetTree();
 			data.m_onSurfacePSet = onSurfacePSet;
 			data.m_convexhullDownsampling = convexhullDownsampling;
 			data.m_preferredCuttingDirection = preferredCuttingDirection;
@@ -355,24 +383,17 @@ namespace nd
 				}
 			}
 
-			if (psets) 
-			{
-				for (int32_t i = 0; i < 2; ++i) 
-				{
-					delete psets[i];
-				}
-				delete[] psets;
-			}
 			delete onSurfacePSet;
 		}
 
 		void VHACD::ComputeACD(const Parameters& params)
 		{
-			SArray<PrimitiveSet*> temp;
-			SArray<PrimitiveSet*> parts;
-			SArray<PrimitiveSet*> inputParts;
+			ndFixSizeArray<PrimitiveSet*, 1024> parts;
+			ndFixSizeArray<PrimitiveSet*, 1024> inputParts;
 
 			inputParts.PushBack(m_pset);
+			m_pset->BuildHullPoints(1);
+
 			m_pset = nullptr;
 			SArray<Plane> planes;
 			SArray<Plane> planesRef;
@@ -400,17 +421,15 @@ namespace nd
 			// We could just allow the artist to directly control the decomposition depth directly, but this would be a bit
 			// too complex and the preference is simply to let them specify how many hulls they want and derive the solution
 			// from that.
-			depth++;
 
-			while ((sub++ < depth) && (inputParts.Size() > 0)) 
+			depth++;
+			while (inputParts.GetCount() && (sub++ < depth))
 			{
 				double maxConcavity = 0.0;
-				const size_t nInputParts = inputParts.Size();
-
-				for (size_t p = 0; p < nInputParts; ++p) 
+				ndFixSizeArray<PrimitiveSet*, 1024> temp;
+				for (ndInt32 p = 0; p < inputParts.GetCount(); ++p)
 				{
 					PrimitiveSet* const pset = inputParts[p];
-					inputParts[p] = nullptr;
 					double volume = pset->ComputeVolume();
 					pset->ComputeBB();
 					pset->ComputePrincipalAxes();
@@ -456,8 +475,6 @@ namespace nd
 						if ((params.m_planeDownsampling > 1 || params.m_convexhullDownsampling > 1)) 
 						{
 							planesRef.Resize(0);
-
-							//VoxelSet* vset = (VoxelSet*)pset;
 							RefineAxesAlignedClippingPlanes(*((VoxelSet*)pset), bestPlane, short(params.m_planeDownsampling), planesRef);
 
 							ComputeBestClippingPlane(pset,
@@ -473,62 +490,57 @@ namespace nd
 								params);
 						}
 
+						if (maxConcavity < minConcavity) 
 						{
-							if (maxConcavity < minConcavity) 
-							{
-								maxConcavity = minConcavity;
-							}
-							PrimitiveSet* bestLeft = pset->Create();
-							PrimitiveSet* bestRight = pset->Create();
-							temp.PushBack(bestLeft);
-							temp.PushBack(bestRight);
-							pset->Clip(bestPlane, bestRight, bestLeft);
-							delete pset;
+							maxConcavity = minConcavity;
 						}
+						PrimitiveSet* const bestLeft = pset->Create();
+						PrimitiveSet* const bestRight = pset->Create();
+						pset->Clip(bestPlane, bestRight, bestLeft);
+
+						temp.PushBack(bestLeft);
+						temp.PushBack(bestRight);
+						delete pset;
 					}
 					else 
 					{
 						parts.PushBack(pset);
 					}
 				}
-
-				inputParts = temp;
-				temp.Resize(0);
+				inputParts.SetCount(0);
+				for (ndInt32 p = 0; p < temp.GetCount(); ++p)
+				{
+					inputParts.PushBack(temp[p]);
+				}
 			}
 
-			const size_t nInputParts = inputParts.Size();
-			for (size_t p = 0; p < nInputParts; ++p) 
+			for (ndInt32 p = 0; p < inputParts.GetCount(); ++p)
 			{
 				parts.PushBack(inputParts[p]);
 			}
 
-			size_t nConvexHulls = parts.Size();
-
 			m_convexHulls.Resize(0);
-			for (size_t p = 0; p < nConvexHulls; ++p) 
+			for (ndInt32 p = 0; p < parts.GetCount(); ++p)
 			{
 				m_convexHulls.PushBack(new Mesh);
 				parts[p]->ComputeConvexHull(*m_convexHulls[p]);
 				size_t nv = m_convexHulls[p]->GetNPoints();
-				double x, y, z;
 				for (size_t i = 0; i < nv; ++i) 
 				{
 					Vec3& pt = m_convexHulls[p]->GetPoint(i);
-					x = pt[0];
-					y = pt[1];
-					z = pt[2];
+					double x = pt[0];
+					double y = pt[1];
+					double z = pt[2];
 					pt[0] = m_rot[0][0] * x + m_rot[0][1] * y + m_rot[0][2] * z + m_barycenter[0];
 					pt[1] = m_rot[1][0] * x + m_rot[1][1] * y + m_rot[1][2] * z + m_barycenter[1];
 					pt[2] = m_rot[2][0] * x + m_rot[2][1] * y + m_rot[2][2] * z + m_barycenter[2];
 				}
 			}
 
-			const size_t nParts = parts.Size();
-			for (size_t p = 0; p < nParts; ++p) {
+			for (ndInt32 p = 0; p < parts.GetCount(); ++p)
+			{
 				delete parts[p];
-				parts[p] = 0;
 			}
-			parts.Resize(0);
 		}
 		void AddPoints(const Mesh* const mesh, SArray<Vec3>& pts)
 		{
@@ -846,19 +858,15 @@ namespace nd
 			}
 		}
 
-		bool VHACD::ComputeACD(const ndReal* const points,
-			const uint32_t nPoints,
-			const uint32_t* const triangles,
-			const uint32_t nTriangles,
+		void VHACD::ComputeACD(
+			const ndReal* const points, const uint32_t nPoints,
+			const uint32_t* const triangles, const uint32_t nTriangles,
 			const Parameters& params)
 		{
-			Init();
 			VoxelizeMesh(points, 3, nPoints, (int32_t*)triangles, 3, nTriangles, params);
 			ComputePrimitiveSet(params);
 			ComputeACD(params);
 			MergeConvexHulls(params);
-			return true;
 		}
-
-	} // end of VHACD namespace
+	}
 }

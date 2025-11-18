@@ -99,16 +99,11 @@ namespace nd
 
 		ConvexHull3dPointSet::ConvexHull3dPointSet(const double* const vertexCloud, ndInt32 strideInBytes, ndInt32 count)
 		{
-			SetCount(count);
+			BuildPoints(vertexCloud, strideInBytes, count);
+		}
 
-			ndArray<ndBigVector>& array = *this;
-			const ndInt32 stride = ndInt32(strideInBytes / sizeof(double));
-			for (ndInt32 i = 0; i < count; ++i)
-			{
-				ndInt32 index = i * stride;
-				array[i] = ndBigVector(vertexCloud[index], vertexCloud[index + 1], vertexCloud[index + 2], double(0.0f));
-			}
-			
+		void ConvexHull3dPointSet::GetUniquePoints()
+		{
 			class CompareVertex
 			{
 				public:
@@ -131,26 +126,44 @@ namespace nd
 					return 0;
 				}
 			};
-			
-			count = ndInt32(GetCount());
-			ndSort<ndBigVector, CompareVertex>(&array[0], count, nullptr);
-			
-			ndInt32 indexCount = 0;
-			CompareVertex compareVetex;
-			for (ndInt32 i = 1; i < count; ++i)
+
+			ndInt32 count = ndInt32(GetCount());
+			if (count)
 			{
-				for (; i < count; ++i)
+				ndArray<ndBigVector>& array = *this;
+				ndSort<ndBigVector, CompareVertex>(&array[0], count, nullptr);
+
+				ndInt32 indexCount = 0;
+				CompareVertex compareVetex;
+				for (ndInt32 i = 1; i < count; ++i)
 				{
-					if (compareVetex.Compare(array[indexCount], array[i]))
+					for (; i < count; ++i)
 					{
-						indexCount++;
-						array[indexCount] = array[i];
-						break;
+						if (compareVetex.Compare(array[indexCount], array[i]))
+						{
+							indexCount++;
+							array[indexCount] = array[i];
+							break;
+						}
 					}
 				}
+				count = indexCount + 1;
+				array.SetCount(count);
 			}
-			count = indexCount + 1;
-			array.SetCount(count);
+		}
+
+		void ConvexHull3dPointSet::BuildPoints(const double* const vertexCloud, ndInt32 strideInBytes, ndInt32 count)
+		{
+			SetCount(count);
+
+			ndArray<ndBigVector>& array = *this;
+			const ndInt32 stride = ndInt32(strideInBytes / sizeof(double));
+			for (ndInt32 i = 0; i < count; ++i)
+			{
+				ndInt32 index = i * stride;
+				array[i] = ndBigVector(vertexCloud[index], vertexCloud[index + 1], vertexCloud[index + 2], double(0.0f));
+			}
+			GetUniquePoints();
 		}
 
 		const ConvexHullAABBTreeNode* ConvexHull3dPointSet::GetTree() const
@@ -678,7 +691,7 @@ namespace nd
 			return node;
 		}
 
-		void ConvexHull::CalculateConvexHull3d(ConvexHullAABBTreeNode* vertexTree, ndArray<ndBigVector>& points, ndInt32 count, double distTol, ndInt32 maxVertexCount)
+		void ConvexHull::CalculateConvexHull3d(ConvexHullAABBTreeNode* vertexTree, ConvexHull3dPointSet& points, ndInt32 count, double distTol, ndInt32 maxVertexCount)
 		{
 			distTol = fabs(distTol) * m_diag;
 			ndNode* const f0Node = AddFace(0, 1, 2);
@@ -792,8 +805,6 @@ namespace nd
 						}
 					}
 			
-					//m_points[ndInt32(currentIndex)] = points[index];
-					//points[index].m_mark = 1;
 					m_points[currentIndex] = points[supportPoint.m_vertexIndex];
 					RemoveSupportPoint(&vertexTree, supportPoint);
 			
@@ -866,9 +877,9 @@ namespace nd
 						Remove(node);
 					}
 
-					maxVertexCount--;
-					currentIndex++;
 					count--;
+					currentIndex++;
+					maxVertexCount--;
 				}
 				else
 				{

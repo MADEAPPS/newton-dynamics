@@ -416,54 +416,61 @@ namespace nd
 				m_barycenter[h] = (short)(bary[h] + 0.5);
 			}
 		}
-		void VoxelSet::ComputeConvexHull(Mesh& meshCH, const size_t sampling) const
+
+		void VoxelSet::BuildHullPoints(size_t sampling)
 		{
 			const size_t nVoxels = m_voxels.Size();
 			if (nVoxels == 0)
+			{
 				return;
+			}
 
-			ndArray<Vec3> points;
 			size_t p = 0;
 			size_t s = 0;
-			short i, j, k;
-			while (p < nVoxels) 
+			m_surfaceHullPoints.SetCount(0);
+			const ndBigVector minBB(m_minBB[0], m_minBB[1], m_minBB[2], 0.0);
+			while (p < nVoxels)
 			{
-				if (m_voxels[p].m_data == PRIMITIVE_ON_SURFACE) 
+				if (m_voxels[p].m_data == PRIMITIVE_ON_SURFACE)
 				{
 					++s;
-					if (s == sampling) 
+					if (s == sampling)
 					{
 						s = 0;
-						i = m_voxels[p].m_coord[0];
-						j = m_voxels[p].m_coord[1];
-						k = m_voxels[p].m_coord[2];
-						Vec3 p0((i - 0.5) * m_scale, (j - 0.5) * m_scale, (k - 0.5) * m_scale);
-						Vec3 p1((i + 0.5) * m_scale, (j - 0.5) * m_scale, (k - 0.5) * m_scale);
-						Vec3 p2((i + 0.5) * m_scale, (j + 0.5) * m_scale, (k - 0.5) * m_scale);
-						Vec3 p3((i - 0.5) * m_scale, (j + 0.5) * m_scale, (k - 0.5) * m_scale);
-						Vec3 p4((i - 0.5) * m_scale, (j - 0.5) * m_scale, (k + 0.5) * m_scale);
-						Vec3 p5((i + 0.5) * m_scale, (j - 0.5) * m_scale, (k + 0.5) * m_scale);
-						Vec3 p6((i + 0.5) * m_scale, (j + 0.5) * m_scale, (k + 0.5) * m_scale);
-						Vec3 p7((i - 0.5) * m_scale, (j + 0.5) * m_scale, (k + 0.5) * m_scale);
+						ndInt32 i = m_voxels[p].m_coord[0];
+						ndInt32 j = m_voxels[p].m_coord[1];
+						ndInt32 k = m_voxels[p].m_coord[2];
+						ndBigVector p0((i - 0.5) * m_scale, (j - 0.5) * m_scale, (k - 0.5) * m_scale, 0.0);
+						ndBigVector p1((i + 0.5) * m_scale, (j - 0.5) * m_scale, (k - 0.5) * m_scale, 0.0);
+						ndBigVector p2((i + 0.5) * m_scale, (j + 0.5) * m_scale, (k - 0.5) * m_scale, 0.0);
+						ndBigVector p3((i - 0.5) * m_scale, (j + 0.5) * m_scale, (k - 0.5) * m_scale, 0.0);
+						ndBigVector p4((i - 0.5) * m_scale, (j - 0.5) * m_scale, (k + 0.5) * m_scale, 0.0);
+						ndBigVector p5((i + 0.5) * m_scale, (j - 0.5) * m_scale, (k + 0.5) * m_scale, 0.0);
+						ndBigVector p6((i + 0.5) * m_scale, (j + 0.5) * m_scale, (k + 0.5) * m_scale, 0.0);
+						ndBigVector p7((i - 0.5) * m_scale, (j + 0.5) * m_scale, (k + 0.5) * m_scale, 0.0);
 
-     					points.PushBack(p0 + m_minBB);
-						points.PushBack(p1 + m_minBB);
-						points.PushBack(p2 + m_minBB);
-						points.PushBack(p3 + m_minBB);
-						points.PushBack(p4 + m_minBB);
-						points.PushBack(p5 + m_minBB);
-						points.PushBack(p6 + m_minBB);
-						points.PushBack(p7 + m_minBB);
+						m_surfaceHullPoints.PushBack(p0 + minBB);
+						m_surfaceHullPoints.PushBack(p1 + minBB);
+						m_surfaceHullPoints.PushBack(p2 + minBB);
+						m_surfaceHullPoints.PushBack(p3 + minBB);
+						m_surfaceHullPoints.PushBack(p4 + minBB);
+						m_surfaceHullPoints.PushBack(p5 + minBB);
+						m_surfaceHullPoints.PushBack(p6 + minBB);
+						m_surfaceHullPoints.PushBack(p7 + minBB);
 					}
 				}
 				++p;
 			}
+			m_surfaceHullPoints.GetUniquePoints();
+		}
 
-			ConvexHull3dPointSet accelerator(&points[0][0], sizeof(Vec3), ndInt32(points.GetCount()));
-			ConvexHull ch(accelerator, 1.0e-5);
+		//void VoxelSet::ComputeConvexHull(Mesh& meshCH, const size_t sampling)
+		void VoxelSet::ComputeConvexHull(Mesh& meshCH, const size_t)
+		{
+			ConvexHull ch(m_surfaceHullPoints, 1.0e-5);
+
 			meshCH.ResizePoints(0);
 			meshCH.ResizeTriangles(0);
-
 			const ndArray<ndBigVector>& convexPoints = ch.GetVertexPool();
 			for (ndInt32 v = 0; v < ndInt32(convexPoints.GetCount()); v++)
 			{
@@ -719,25 +726,6 @@ namespace nd
 			negativeVolume = m_unitVolume * (double)nNegativeVoxels;
 		}
 
-		void VoxelSet::CalculateVoxelSpace(ConvexHull3dPointSet& space) const
-		{
-			const ndInt32 nVoxels = ndInt32(m_voxels.Size());
-			if (nVoxels == 0)
-			{
-				return;
-			}
-			
-			space.Resize(nVoxels);
-			space.SetCount(0);
-			for (ndInt32 v = 0; v < nVoxels; ++v)
-			{
-				Vec3 pt(GetPoint(m_voxels[v]));
-				const ndBigVector p (pt[0], pt[1], pt[2], 0.0);
-				space.PushBack(p);
-			}
-			space.BuildAccelerator();
-		}
-
 		void VoxelSet::SelectOnSurface(PrimitiveSet* const onSurfP) const
 		{
 			VoxelSet* const onSurf = (VoxelSet*)onSurfP;
@@ -767,6 +755,7 @@ namespace nd
 				}
 			}
 		}
+
 		void VoxelSet::Clip(const Plane& plane,
 			PrimitiveSet* const positivePartP,
 			PrimitiveSet* const negativePartP) const
@@ -779,28 +768,55 @@ namespace nd
 				return;
 			}
 
-			for (size_t h = 0; h < 3; ++h) 
-			{
-				negativePart->m_minBB[h] = positivePart->m_minBB[h] = m_minBB[h];
-			}
-			positivePart->m_voxels.Resize(0);
-			negativePart->m_voxels.Resize(0);
-			positivePart->m_voxels.Allocate(nVoxels);
-			negativePart->m_voxels.Allocate(nVoxels);
+			negativePart->m_minBB = m_minBB;
+			positivePart->m_minBB = m_minBB;
+
+			positivePart->m_voxels.SetCount(0);
+			negativePart->m_voxels.SetCount(0);
 			negativePart->m_scale = positivePart->m_scale = m_scale;
 			negativePart->m_unitVolume = positivePart->m_unitVolume = m_unitVolume;
 			negativePart->m_numVoxelsOnSurface = positivePart->m_numVoxelsOnSurface = 0;
 			negativePart->m_numVoxelsInsideSurface = positivePart->m_numVoxelsInsideSurface = 0;
 
-			double d;
-			Vec3 pt;
-			Voxel voxel;
+			ConvexHull3dPointSet posTemp;
+			ConvexHull3dPointSet negTemp;
+
+			double thickPlane = m_scale * 2.0;
+			for (ndInt32 i = ndInt32(m_surfaceHullPoints.GetCount()) - 1; i >= 0; --i)
+			{
+				const ndBigVector& p = m_surfaceHullPoints[i];
+				double d = plane.m_a * p[0] + plane.m_b * p[1] + plane.m_c * p[2] + plane.m_d;
+				if (d >= 0.0)
+				{
+					if (d >= thickPlane)
+					{
+						positivePart->m_surfaceHullPoints.PushBack(p);
+					}
+					else
+					{
+						posTemp.PushBack(p);
+					}
+				}
+				else
+				{
+					if (d <= -thickPlane)
+					{
+						negativePart->m_surfaceHullPoints.PushBack(p);
+					}
+					else
+					{
+						negTemp.PushBack(p);
+					}
+				}
+			}
+
 			const double d0 = m_scale;
+			const ndBigVector minBB(m_minBB[0], m_minBB[1], m_minBB[2], 0.0);
 			for (size_t v = 0; v < nVoxels; ++v) 
 			{
-				voxel = m_voxels[v];
-				pt = GetPoint(voxel);
-				d = plane.m_a * pt[0] + plane.m_b * pt[1] + plane.m_c * pt[2] + plane.m_d;
+				Voxel voxel (m_voxels[v]);
+				const Vec3 pt (GetPoint(voxel));
+				double d = plane.m_a * pt[0] + plane.m_b * pt[1] + plane.m_c * pt[2] + plane.m_d;
 				if (d >= 0.0) 
 				{
 					if (voxel.m_data == PRIMITIVE_ON_SURFACE || d <= d0) 
@@ -813,6 +829,30 @@ namespace nd
 					{
 						positivePart->m_voxels.PushBack(voxel);
 						++positivePart->m_numVoxelsInsideSurface;
+					}
+
+					if (d < thickPlane)
+					{
+						ndInt32 i = voxel.m_coord[0];
+						ndInt32 j = voxel.m_coord[1];
+						ndInt32 k = voxel.m_coord[2];
+						ndBigVector p0((i - 0.5) * m_scale, (j - 0.5) * m_scale, (k - 0.5) * m_scale, 0.0);
+						ndBigVector p1((i + 0.5) * m_scale, (j - 0.5) * m_scale, (k - 0.5) * m_scale, 0.0);
+						ndBigVector p2((i + 0.5) * m_scale, (j + 0.5) * m_scale, (k - 0.5) * m_scale, 0.0);
+						ndBigVector p3((i - 0.5) * m_scale, (j + 0.5) * m_scale, (k - 0.5) * m_scale, 0.0);
+						ndBigVector p4((i - 0.5) * m_scale, (j - 0.5) * m_scale, (k + 0.5) * m_scale, 0.0);
+						ndBigVector p5((i + 0.5) * m_scale, (j - 0.5) * m_scale, (k + 0.5) * m_scale, 0.0);
+						ndBigVector p6((i + 0.5) * m_scale, (j + 0.5) * m_scale, (k + 0.5) * m_scale, 0.0);
+						ndBigVector p7((i - 0.5) * m_scale, (j + 0.5) * m_scale, (k + 0.5) * m_scale, 0.0);
+
+						posTemp.PushBack(p0 + minBB);
+						posTemp.PushBack(p1 + minBB);
+						posTemp.PushBack(p2 + minBB);
+						posTemp.PushBack(p3 + minBB);
+						posTemp.PushBack(p4 + minBB);
+						posTemp.PushBack(p5 + minBB);
+						posTemp.PushBack(p6 + minBB);
+						posTemp.PushBack(p7 + minBB);
 					}
 				}
 				else 
@@ -828,9 +868,46 @@ namespace nd
 						negativePart->m_voxels.PushBack(voxel);
 						++negativePart->m_numVoxelsInsideSurface;
 					}
+
+					if (d > -thickPlane)
+					{
+						ndInt32 i = voxel.m_coord[0];
+						ndInt32 j = voxel.m_coord[1];
+						ndInt32 k = voxel.m_coord[2];
+						ndBigVector p0((i - 0.5) * m_scale, (j - 0.5) * m_scale, (k - 0.5) * m_scale, 0.0);
+						ndBigVector p1((i + 0.5) * m_scale, (j - 0.5) * m_scale, (k - 0.5) * m_scale, 0.0);
+						ndBigVector p2((i + 0.5) * m_scale, (j + 0.5) * m_scale, (k - 0.5) * m_scale, 0.0);
+						ndBigVector p3((i - 0.5) * m_scale, (j + 0.5) * m_scale, (k - 0.5) * m_scale, 0.0);
+						ndBigVector p4((i - 0.5) * m_scale, (j - 0.5) * m_scale, (k + 0.5) * m_scale, 0.0);
+						ndBigVector p5((i + 0.5) * m_scale, (j - 0.5) * m_scale, (k + 0.5) * m_scale, 0.0);
+						ndBigVector p6((i + 0.5) * m_scale, (j + 0.5) * m_scale, (k + 0.5) * m_scale, 0.0);
+						ndBigVector p7((i - 0.5) * m_scale, (j + 0.5) * m_scale, (k + 0.5) * m_scale, 0.0);
+
+						negTemp.PushBack(p0 + minBB);
+						negTemp.PushBack(p1 + minBB);
+						negTemp.PushBack(p2 + minBB);
+						negTemp.PushBack(p3 + minBB);
+						negTemp.PushBack(p4 + minBB);
+						negTemp.PushBack(p5 + minBB);
+						negTemp.PushBack(p6 + minBB);
+						negTemp.PushBack(p7 + minBB);
+					}
 				}
 			}
+
+			negTemp.GetUniquePoints();
+			for (ndInt32 i = ndInt32(negTemp.GetCount()) - 1; i >= 0; --i)
+			{
+				negativePart->m_surfaceHullPoints.PushBack(negTemp[i]);
+			}
+
+			posTemp.GetUniquePoints();
+			for (ndInt32 i = ndInt32(posTemp.GetCount()) - 1; i >= 0; --i)
+			{
+				positivePart->m_surfaceHullPoints.PushBack(posTemp[i]);
+			}
 		}
+
 		void VoxelSet::Convert(Mesh& mesh, const VOXEL_VALUE value) const
 		{
 			const size_t nVoxels = m_voxels.Size();
@@ -838,9 +915,11 @@ namespace nd
 				return;
 			Voxel voxel;
 			Vec3 pts[8];
-			for (size_t v = 0; v < nVoxels; ++v) {
+			for (size_t v = 0; v < nVoxels; ++v) 
+			{
 				voxel = m_voxels[v];
-				if (voxel.m_data == value) {
+				if (voxel.m_data == value) 
+				{
 					GetPoints(voxel, pts);
 					int32_t s = (int32_t)mesh.GetNPoints();
 					for (int32_t k = 0; k < 8; ++k) {
@@ -861,13 +940,15 @@ namespace nd
 				}
 			}
 		}
+
 		void VoxelSet::ComputePrincipalAxes()
 		{
 			const size_t nVoxels = m_voxels.Size();
 			if (nVoxels == 0)
 				return;
 			m_barycenterPCA[0] = m_barycenterPCA[1] = m_barycenterPCA[2] = 0.0;
-			for (size_t v = 0; v < nVoxels; ++v) {
+			for (size_t v = 0; v < nVoxels; ++v) 
+			{
 				Voxel& voxel = m_voxels[v];
 				m_barycenterPCA[0] += voxel.m_coord[0];
 				m_barycenterPCA[1] += voxel.m_coord[1];
@@ -875,16 +956,17 @@ namespace nd
 			}
 			m_barycenterPCA /= (double)nVoxels;
 
-			double covMat[3][3] = { { 0.0, 0.0, 0.0 },
+			double covMat[3][3] = { 
+				{ 0.0, 0.0, 0.0 },
 				{ 0.0, 0.0, 0.0 },
 				{ 0.0, 0.0, 0.0 } };
-			double x, y, z;
+
 			for (size_t v = 0; v < nVoxels; ++v) 
 			{
 				Voxel& voxel = m_voxels[v];
-				x = voxel.m_coord[0] - m_barycenter[0];
-				y = voxel.m_coord[1] - m_barycenter[1];
-				z = voxel.m_coord[2] - m_barycenter[2];
+				double x = voxel.m_coord[0] - m_barycenter[0];
+				double y = voxel.m_coord[1] - m_barycenter[1];
+				double z = voxel.m_coord[2] - m_barycenter[2];
 				covMat[0][0] += x * x;
 				covMat[1][1] += y * y;
 				covMat[2][2] += z * z;
@@ -903,6 +985,7 @@ namespace nd
 			covMat[2][1] = covMat[1][2];
 			Diagonalize(covMat, m_Q, m_D);
 		}
+
 		Volume::Volume()
 		{
 			m_dim[0] = m_dim[1] = m_dim[2] = 0;
@@ -914,6 +997,7 @@ namespace nd
 			m_scale = 1.0;
 			m_data = 0;
 		}
+
 		Volume::~Volume(void)
 		{
 			delete[] m_data;
