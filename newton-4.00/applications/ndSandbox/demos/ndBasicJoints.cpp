@@ -415,19 +415,21 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& o
 		public:
 		ndJointDoubleHingeMotor(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 			:ndJointDoubleHinge(pinAndPivotFrame, child, parent)
-			,m_angle(0.0f)
-			,m_speed(10.0f)
+			,m_angle(150.0f * ndDegreeToRad)
+			,m_speed(2.5f)
 		{
 		}
 
 		void JacobianDerivative(ndConstraintDescritor& desc)
 		{
-			m_angle += ndFmod(5.0f * desc.m_timestep, 2.0f * ndPi);
-			ndFloat32 dist = 150.0f * ndDegreeToRad * ndSin(m_angle);
-			SetOffsetAngle0(dist);
+			// first axis is a angle motor, by setting target angle;
+			ndFloat32 angle0 = GetAngle0();
+			ndFloat32 deltaAngle = ndClamp (m_angle - angle0, -90.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
+			SetOffsetAngle0(angle0 + deltaAngle * desc.m_timestep);
 
-			ndFloat32 angle = GetAngle1();
-			SetOffsetAngle1(angle + m_speed * desc.m_timestep);
+			// second axis an angular motor by integrating the angle 
+			ndFloat32 angle1 = GetAngle1();
+			SetOffsetAngle1(angle1 + m_speed * desc.m_timestep);
 
 			ndJointDoubleHinge::JacobianDerivative(desc);
 		}
