@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR)
 
-project("fbx2ndMesh")
-set (projectName "fbx2ndMesh")
+project("fbxToMesh")
+set (projectName "fbxToMesh")
 
 file(GLOB CPP_SOURCE 
 	*.h 

@@ -6,7 +6,7 @@ set "target_dir=."
 
 for /R "%target_dir%" %%f in (*.fbx) do (
     rem echo "processing %%f"
-    fbx2ndMesh.exe %%f
+    fbxToMesh.exe %%f
     echo "processing %%f"
 )
 
