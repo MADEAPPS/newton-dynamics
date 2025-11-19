@@ -6,9 +6,6 @@ set (projectName "fbxToMesh")
 file(GLOB CPP_SOURCE 
 	*.h 
 	*.cpp
-	openFBX/src/*.h
-	openFBX/src/*.c
-	openFBX/src/*.cpp
 	install/source/*.h
 	install/source/*.c
 	install/source/*.cpp)
