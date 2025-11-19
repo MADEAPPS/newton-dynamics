@@ -73,6 +73,27 @@ namespace nd
 			return totalVolume / 6.0;
 		}
 
+		void Mesh::ComputeConvexHull(ConvexHull3dPointSet& points)
+		{
+			ResizePoints(0);
+			ResizeTriangles(0);
+			ConvexHull ch(points, 1.0e-5f);
+
+			const ndArray<ndBigVector>& convexPoints = ch.GetVertexPool();
+			for (ndInt32 v = 0; v < ndInt32(convexPoints.GetCount()); v++)
+			{
+				const Vec3 hullPoint(convexPoints[v].m_x, convexPoints[v].m_y, convexPoints[v].m_z);
+				AddPoint(hullPoint);
+			}
+
+			for (ConvexHull::ndNode* node = ch.GetFirst(); node; node = node->GetNext())
+			{
+				const ndConvexHull3dFace* const face = &node->GetInfo();
+				AddTriangle(Triangle(face->m_index[0], face->m_index[1], face->m_index[2]));
+			}
+
+		}
+
 		void Mesh::ComputeConvexHull(const Vec3* const pts, const size_t nPts)
 		{
 			ResizePoints(0);

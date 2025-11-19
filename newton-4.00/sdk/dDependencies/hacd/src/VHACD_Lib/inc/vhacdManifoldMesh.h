@@ -66,7 +66,8 @@ namespace nd
 		};
 
 		//!    Triangle data structure used in a triangular manifold mesh (TMM).
-		class TMMTriangle {
+		class TMMTriangle 
+		{
 			public:
 			void Initialize();
 			TMMTriangle(void);

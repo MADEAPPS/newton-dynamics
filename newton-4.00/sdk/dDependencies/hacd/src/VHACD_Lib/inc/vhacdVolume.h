@@ -52,8 +52,11 @@ namespace nd
 			virtual double GetEigenValue(AXIS axis) const = 0;
 			virtual double ComputeMaxVolumeError() const = 0;
 			virtual double ComputeVolume() const = 0;
-			virtual void Clip(const Plane& plane, PrimitiveSet* const positivePart,
-				PrimitiveSet* const negativePart) const = 0;
+			virtual void Clip(const Plane& plane, ConvexHull3dPointSet& posTemp, ConvexHull3dPointSet& negTemp, ndInt32 sampe) const = 0;
+
+			virtual void Clip(const Plane& plane, 
+				PrimitiveSet* const positivePart, ConvexHull3dPointSet& posTemp,
+				PrimitiveSet* const negativePart, ConvexHull3dPointSet& negTemp) const = 0;
 			virtual void Intersect(const Plane& plane, SArray<Vec3>* const positivePts,
 				SArray<Vec3>* const negativePts, const size_t sampling) const = 0;
 			virtual void ComputeExteriorPoints(const Plane& plane, const Mesh& mesh,
@@ -127,7 +130,11 @@ namespace nd
 
 			void GetPoints(const Voxel& voxel, Vec3* const pts) const;
 			void ComputeConvexHull(Mesh& meshCH, const size_t sampling = 1);
-			void Clip(const Plane& plane, PrimitiveSet* const positivePart, PrimitiveSet* const negativePart) const;
+
+			void Clip(const Plane& plane, ConvexHull3dPointSet& posTemp, ConvexHull3dPointSet& negTemp, ndInt32 sampe) const;
+			void Clip(const Plane& plane, 
+				PrimitiveSet* const positivePart, ConvexHull3dPointSet& posTemp,
+				PrimitiveSet* const negativePart, ConvexHull3dPointSet& negTemp) const;
 			void Intersect(const Plane& plane, SArray<Vec3>* const positivePts,
 				SArray<Vec3>* const negativePts, const size_t sampling) const;
 			void ComputeExteriorPoints(const Plane& plane, const Mesh& mesh,

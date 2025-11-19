@@ -22,6 +22,15 @@ namespace nd
 {
 	namespace VHACD 
 	{
+		class ndWorkingBuffers
+		{
+			public:
+			Mesh m_leftMesh;
+			Mesh m_rightMesh;
+			ConvexHull3dPointSet m_leftBuffer;
+			ConvexHull3dPointSet m_rightBuffer;
+		};
+
 		class VHACD : public IVHACD 
 		{
 			public:
@@ -49,6 +58,9 @@ namespace nd
 				const int32_t convexhullDownsampling,
 				Plane& bestPlane,
 				double& minConcavity,
+				ndWorkingBuffers* const workBuffers,
+				//ConvexHull3dPointSet& posBuffer,
+				//ConvexHull3dPointSet& negBuffer,
 				const Parameters& params);
 
 			void VoxelizeMesh(

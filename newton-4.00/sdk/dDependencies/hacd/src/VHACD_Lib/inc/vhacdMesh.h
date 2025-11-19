@@ -23,6 +23,7 @@ namespace nd
 {
 	namespace VHACD 
 	{
+		class ConvexHull3dPointSet;
 		enum AXIS 
 		{
 			AXIS_X = 0,
@@ -72,6 +73,7 @@ namespace nd
 			void ResizeTriangles(size_t nTri) { m_triangles.Resize(nTri); }
 			void CopyPoints(SArray<Vec3>& points) const { points = m_points; }
 			double ComputeVolume() const;
+			void ComputeConvexHull(ConvexHull3dPointSet& points);
 			void ComputeConvexHull(const Vec3* const pts, const size_t nPts);
 			void Clip(const Plane& plane,
 				SArray<Vec3>& positivePart,

@@ -464,7 +464,6 @@ namespace nd
 			m_surfaceHullPoints.GetUniquePoints();
 		}
 
-		//void VoxelSet::ComputeConvexHull(Mesh& meshCH, const size_t sampling)
 		void VoxelSet::ComputeConvexHull(Mesh& meshCH, const size_t)
 		{
 			ConvexHull ch(m_surfaceHullPoints, 1.0e-5);
@@ -488,9 +487,9 @@ namespace nd
 		void VoxelSet::GetPoints(const Voxel& voxel,
 			Vec3* const pts) const
 		{
-			short i = voxel.m_coord[0];
-			short j = voxel.m_coord[1];
-			short k = voxel.m_coord[2];
+			ndInt32 i = voxel.m_coord[0];
+			ndInt32 j = voxel.m_coord[1];
+			ndInt32 k = voxel.m_coord[2];
 			pts[0][0] = (i - 0.5) * m_scale + m_minBB[0];
 			pts[1][0] = (i + 0.5) * m_scale + m_minBB[0];
 			pts[2][0] = (i + 0.5) * m_scale + m_minBB[0];
@@ -522,7 +521,7 @@ namespace nd
 			SArray<Vec3>* const negativePts,
 			const size_t sampling) const
 		{
-			const size_t nVoxels = m_voxels.Size();
+			const ndInt32 nVoxels = ndInt32(m_voxels.Size());
 			if (nVoxels == 0)
 			{
 				return;
@@ -532,7 +531,7 @@ namespace nd
 			Vec3 pts[8];
 			size_t sp = 0;
 			size_t sn = 0;
-			for (size_t v = 0; v < nVoxels; ++v) 
+			for (ndInt32 v = 0; v < nVoxels; ++v) 
 			{
 				Voxel voxel (m_voxels[v]);
 				Vec3 pt (GetPoint(voxel));
@@ -585,8 +584,8 @@ namespace nd
 				}
 			}
 
-			ndAssert(positivePts->Size() <= nVoxels * 8);
-			ndAssert(negativePts->Size() <= nVoxels * 8);
+			ndAssert(ndInt32(positivePts->Size()) <= nVoxels * 8);
+			ndAssert(ndInt32(negativePts->Size()) <= nVoxels * 8);
 		}
 
 		void VoxelSet::GetPointArray(ndArray<Vec3>& points) const
@@ -757,8 +756,61 @@ namespace nd
 		}
 
 		void VoxelSet::Clip(const Plane& plane,
-			PrimitiveSet* const positivePartP,
-			PrimitiveSet* const negativePartP) const
+			ConvexHull3dPointSet& posTemp,
+			ConvexHull3dPointSet& negTemp, ndInt32 sampling) const
+		{
+			ndInt32 sp = 0;
+			ndInt32 sn = 0;
+			posTemp.SetCount(0);
+			negTemp.SetCount(0);
+			const double d0 = m_scale * 2.0;
+			for (ndInt32 i = ndInt32(m_surfaceHullPoints.GetCount()) - 1; i >= 0; --i)
+			{
+				const ndBigVector& p = m_surfaceHullPoints[i];
+				double d = plane.m_a * p[0] + plane.m_b * p[1] + plane.m_c * p[2] + plane.m_d;
+				if (d > 0.0)
+				{
+					if (d <= d0)
+					{
+						posTemp.PushBack(p);
+					}
+					else
+					{
+						sp++;
+						if (sp == sampling)
+						{
+							posTemp.PushBack(p);
+							sp = 0;
+						}
+					}
+				}
+				else if (d < 0.0)
+				{
+					if (d >= -d0)
+					{
+						negTemp.PushBack(p);
+					}
+					else
+					{
+						sn++;
+						if (sn == sampling)
+						{
+							negTemp.PushBack(p);
+							sn = 0;
+						}
+					}
+				}
+				else
+				{
+					posTemp.PushBack(p);
+					negTemp.PushBack(p);
+				}
+			}
+		}
+
+		void VoxelSet::Clip(const Plane& plane,
+			PrimitiveSet* const positivePartP, ConvexHull3dPointSet& posTemp,
+			PrimitiveSet* const negativePartP, ConvexHull3dPointSet& negTemp) const
 		{
 			VoxelSet* const positivePart = (VoxelSet*)positivePartP;
 			VoxelSet* const negativePart = (VoxelSet*)negativePartP;
@@ -778,9 +830,8 @@ namespace nd
 			negativePart->m_numVoxelsOnSurface = positivePart->m_numVoxelsOnSurface = 0;
 			negativePart->m_numVoxelsInsideSurface = positivePart->m_numVoxelsInsideSurface = 0;
 
-			ConvexHull3dPointSet posTemp;
-			ConvexHull3dPointSet negTemp;
-
+			posTemp.SetCount(0);
+			negTemp.SetCount(0);
 			double thickPlane = m_scale * 2.0;
 			for (ndInt32 i = ndInt32(m_surfaceHullPoints.GetCount()) - 1; i >= 0; --i)
 			{

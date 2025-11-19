@@ -247,7 +247,8 @@ namespace nd
 
 		void VHACD::ComputeBestClippingPlane(const PrimitiveSet* inputPSet, const double, const SArray<Plane>& planes,
 			const Vec3& preferredCuttingDirection, const double w, const double alpha, const double beta,
-			const int32_t convexhullDownsampling, Plane& bestPlane, double& minConcavity, const Parameters& params)
+			const int32_t convexhullDownsampling, Plane& bestPlane, double& minConcavity, 
+			ndWorkingBuffers* const workBuffers, const Parameters& params)
 		{
 			ndInt32 iBest = -1;
 			ndInt32 nPlanes = ndInt32(planes.Size());
@@ -256,15 +257,13 @@ namespace nd
 			double minSymmetry = MAX_DOUBLE;
 			minConcavity = MAX_DOUBLE;
 
-			PrimitiveSet* const onSurfacePSet = inputPSet->Create();
-			inputPSet->SelectOnSurface(onSurfacePSet);
-
 			class CommonData
 			{
 				public:
-				CommonData(VHACD* me, const Parameters& params)
+				CommonData(VHACD* me, const Parameters& params, ndWorkingBuffers* const workBuffers)
 					:m_me(me)
 					,m_params(params)
+					,m_workBuffers(workBuffers)
 				{
 				}
 
@@ -273,12 +272,9 @@ namespace nd
 				double m_beta;
 				double m_alpha;
 				const Parameters& m_params;
-				PrimitiveSet* m_onSurfacePSet;
 				const PrimitiveSet* m_inputPSet;
 				ndInt32 m_convexhullDownsampling;
-				Mesh chs[VHACD_WORKERS_THREADS][2];
-				SArray<Vec3> chPts[VHACD_WORKERS_THREADS][2];
-
+				ndWorkingBuffers* const m_workBuffers;
 				Vec3 m_preferredCuttingDirection;
 			};
 
@@ -292,26 +288,18 @@ namespace nd
 
 				void Execute(int threadId)
 				{
-					Mesh& leftCH = m_commonData->chs[threadId][0];
-					Mesh& rightCH = m_commonData->chs[threadId][1];
-					rightCH.ResizePoints(0);
-					leftCH.ResizePoints(0);
-					rightCH.ResizeTriangles(0);
-					leftCH.ResizeTriangles(0);
+					Mesh& leftCH = m_commonData->m_workBuffers[threadId].m_leftMesh;
+					Mesh& rightCH = m_commonData->m_workBuffers[threadId].m_rightMesh;
+					ConvexHull3dPointSet& leftBuffer = m_commonData->m_workBuffers[threadId].m_rightBuffer;
+					ConvexHull3dPointSet& rightBuffer = m_commonData->m_workBuffers[threadId].m_leftBuffer;
 
-					SArray<Vec3>& leftCHPts = m_commonData->chPts[threadId][0];
-					SArray<Vec3>& rightCHPts = m_commonData->chPts[threadId][1];
-
-					leftCHPts.Resize(0);
-					rightCHPts.Resize(0);
-					m_commonData->m_onSurfacePSet->Intersect(m_plane, &rightCHPts, &leftCHPts, size_t (m_commonData->m_convexhullDownsampling * 32));
-					m_commonData->m_inputPSet->GetConvexHull().Clip(m_plane, rightCHPts, leftCHPts);
-					leftCH.ComputeConvexHull(leftCHPts.Data(), leftCHPts.Size());
-					rightCH.ComputeConvexHull(rightCHPts.Data(), rightCHPts.Size());
+					m_commonData->m_inputPSet->Clip(m_plane, rightBuffer, leftBuffer, m_commonData->m_convexhullDownsampling);
+					leftCH.ComputeConvexHull(leftBuffer);
+					rightCH.ComputeConvexHull(rightBuffer);
 
 					double volumeLeftCH = leftCH.ComputeVolume();
 					double volumeRightCH = rightCH.ComputeVolume();
-			
+
 					// compute clipped volumes
 					double volumeLeft;
 					double volumeRight;
@@ -336,12 +324,11 @@ namespace nd
 			};
 			ndFixSizeArray<BestClippingPlaneJob, 1024> jobs;
 
-			CommonData data(this, params);
+			CommonData data(this, params, workBuffers);
 			data.m_w = w;
 			data.m_beta = beta;
 			data.m_alpha = alpha;
 			data.m_inputPSet = inputPSet;
-			data.m_onSurfacePSet = onSurfacePSet;
 			data.m_convexhullDownsampling = convexhullDownsampling;
 			data.m_preferredCuttingDirection = preferredCuttingDirection;
 #if 1
@@ -382,8 +369,6 @@ namespace nd
 					iBest = i;
 				}
 			}
-
-			delete onSurfacePSet;
 		}
 
 		void VHACD::ComputeACD(const Parameters& params)
@@ -423,6 +408,8 @@ namespace nd
 			// from that.
 
 			depth++;
+
+			ndWorkingBuffers workBuffers[VHACD_WORKERS_THREADS];
 			while (inputParts.GetCount() && (sub++ < depth))
 			{
 				double maxConcavity = 0.0;
@@ -471,6 +458,7 @@ namespace nd
 							int32_t(params.m_convexhullDownsampling),
 							bestPlane,
 							minConcavity,
+							workBuffers,
 							params);
 						if ((params.m_planeDownsampling > 1 || params.m_convexhullDownsampling > 1)) 
 						{
@@ -487,6 +475,7 @@ namespace nd
 								1, // convexhullDownsampling = 1
 								bestPlane,
 								minConcavity,
+								workBuffers,
 								params);
 						}
 
@@ -496,7 +485,7 @@ namespace nd
 						}
 						PrimitiveSet* const bestLeft = pset->Create();
 						PrimitiveSet* const bestRight = pset->Create();
-						pset->Clip(bestPlane, bestRight, bestLeft);
+						pset->Clip(bestPlane, bestRight, workBuffers[0].m_rightBuffer, bestLeft, workBuffers[0].m_leftBuffer);
 
 						temp.PushBack(bestLeft);
 						temp.PushBack(bestRight);
@@ -638,7 +627,7 @@ namespace nd
 			ndFixSizeArray<ConvexPair, 1024 * 2> convexPairArray;
 			ndFixSizeArray<ConvexProxy, 1024 * 2> convexProxyArray;
 
-			ndUpHeap<ConvexKey, float> priority(int(8 * m_convexHulls.Size() * m_convexHulls.Size()));
+			ndUpHeap<ConvexKey, float> priority(ndInt32(8 * m_convexHulls.Size() * m_convexHulls.Size()));
 
 			class MergeConvexJob : public Job
 			{
@@ -652,7 +641,7 @@ namespace nd
 				{
 					Mesh combinedCH;
 					SArray<Vec3> pts;
-					for (int i = 0; i < m_pairsCount; i++)
+					for (ndInt32 i = 0; i < m_pairsCount; i++)
 					{
 						ConvexPair& pair = m_pairs[i];
 						const float volume0 = float(m_convexHulls[pair.m_p0]->ComputeVolume());
@@ -665,7 +654,7 @@ namespace nd
 				ConvexPair* m_pairs;
 				Mesh** m_convexHulls;
 				double m_volumeCH0;
-				int m_pairsCount;
+				ndInt32 m_pairsCount;
 			};
 
 			MergeConvexJob jobBatches[VHACD_WORKERS_THREADS * 4 + 1];
