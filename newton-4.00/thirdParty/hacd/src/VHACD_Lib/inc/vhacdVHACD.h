@@ -15,6 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 #pragma once
 #ifndef ND_VHACD_VHACD_H
 #define ND_VHACD_VHACD_H
+
 #include "vhacdDefines.h"
 #include "vhacdVolume.h"
 #include "vhacdRaycastMesh.h"
