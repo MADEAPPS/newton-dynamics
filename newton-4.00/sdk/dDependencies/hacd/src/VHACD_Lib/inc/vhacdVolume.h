@@ -192,19 +192,24 @@ namespace nd
 			void Voxelize(const T* const points, const uint32_t stridePoints, const uint32_t nPoints,
 				const int32_t* const triangles, const uint32_t strideTriangles, const uint32_t nTriangles,
 				const size_t dim, const Vec3& barycenter, const double(&rot)[3][3]);
+
+			unsigned char& GetVoxel(const ndInt32 i, const ndInt32 j, const ndInt32 k)
+			{
+				return m_data[i + j * m_dim[0] + k * m_dim[0] * m_dim[1]];
+			}
+
+			const unsigned char& GetVoxel(const ndInt32 i, const ndInt32 j, const ndInt32 k) const
+			{
+				return m_data[i + j * m_dim[0] + k * m_dim[0] * m_dim[1]];
+			}
+
 			unsigned char& GetVoxel(const size_t i, const size_t j, const size_t k)
 			{
-				//assert(i < m_dim[0] || i >= 0);
-				//assert(j < m_dim[0] || j >= 0);
-				//assert(k < m_dim[0] || k >= 0);
-				return m_data[i + j * m_dim[0] + k * m_dim[0] * m_dim[1]];
+				return m_data[ndInt32(i + j * m_dim[0] + k * m_dim[0] * m_dim[1])];
 			}
 			const unsigned char& GetVoxel(const size_t i, const size_t j, const size_t k) const
 			{
-				//assert(i < m_dim[0] || i >= 0);
-				//assert(j < m_dim[0] || j >= 0);
-				//assert(k < m_dim[0] || k >= 0);
-				return m_data[i + j * m_dim[0] + k * m_dim[0] * m_dim[1]];
+				return m_data[ndInt32(i + j * m_dim[0] + k * m_dim[0] * m_dim[1])];
 			}
 			size_t GetNPrimitivesOnSurf() const { return m_numVoxelsOnSurface; }
 			size_t GetNPrimitivesInsideSurf() const { return m_numVoxelsInsideSurface; }
@@ -213,8 +218,9 @@ namespace nd
 			void AlignToPrincipalAxes(double(&rot)[3][3]) const;
 
 			private:
-			void FillOutsideSurface(const size_t i0, const size_t j0, const size_t k0, const size_t i1,
-				const size_t j1, const size_t k1);
+			void FillOutsideSurface(
+				const ndInt32 i0, const ndInt32 j0, const ndInt32 k0, 
+				const ndInt32 i1, const ndInt32 j1, const ndInt32 k1);
 			void FillInsideSurface();
 			template <class T>
 			void ComputeBB(const T* const points, const uint32_t stridePoints, const uint32_t nPoints,
@@ -225,11 +231,11 @@ namespace nd
 			Vec3 m_minBB;
 			Vec3 m_maxBB;
 			double m_scale;
-			size_t m_dim[3]; //>! dim
+			ndInt32 m_dim[3]; //>! dim
 			size_t m_numVoxelsOnSurface;
 			size_t m_numVoxelsInsideSurface;
 			size_t m_numVoxelsOutsideSurface;
-			unsigned char* m_data;
+			ndArray<unsigned char> m_data;
 		};
 		int32_t TriBoxOverlap(const Vec3& boxcenter, const Vec3& boxhalfsize, const Vec3& triver0,
 			const Vec3& triver1, const Vec3& triver2);
@@ -293,23 +299,23 @@ namespace nd
 			if (d[0] >= d[1] && d[0] >= d[2]) 
 			{
 				r = d[0];
-				m_dim[0] = dim;
-				m_dim[1] = 2 + static_cast<size_t>(double(dim) * d[1] / d[0]);
-				m_dim[2] = 2 + static_cast<size_t>(double(dim) * d[2] / d[0]);
+				m_dim[0] = ndInt32(dim);
+				m_dim[1] = 2 + ndInt32(double(dim) * d[1] / d[0]);
+				m_dim[2] = 2 + ndInt32(double(dim) * d[2] / d[0]);
 			}
 			else if (d[1] >= d[0] && d[1] >= d[2]) 
 			{
 				r = d[1];
-				m_dim[1] = dim;
-				m_dim[0] = 2 + static_cast<size_t>(double(dim) * d[0] / d[1]);
-				m_dim[2] = 2 + static_cast<size_t>(double(dim) * d[2] / d[1]);
+				m_dim[1] = ndInt32(dim);
+				m_dim[0] = 2 + ndInt32(double(dim) * d[0] / d[1]);
+				m_dim[2] = 2 + ndInt32(double(dim) * d[2] / d[1]);
 			}
 			else 
 			{
 				r = d[2];
-				m_dim[2] = dim;
-				m_dim[0] = 2 + static_cast<size_t>((double)dim * d[0] / d[2]);
-				m_dim[1] = 2 + static_cast<size_t>((double)dim * d[1] / d[2]);
+				m_dim[2] = ndInt32(dim);
+				m_dim[0] = 2 + ndInt32(double(dim) * d[0] / d[2]);
+				m_dim[1] = 2 + ndInt32(double(dim) * d[1] / d[2]);
 			}
 
 			m_scale = r / (double(dim) - 1);
@@ -320,9 +326,8 @@ namespace nd
 			m_numVoxelsInsideSurface = 0;
 			m_numVoxelsOutsideSurface = 0;
 
-			size_t i_= 0, j_ = 0, k_ = 0;
-			size_t i0 = 0, j0 = 0, k0 = 0;
-			size_t i1 = 0, j1 = 0, k1 = 0;
+			ndInt32 i0 = 0, j0 = 0, k0 = 0;
+			ndInt32 i1 = 0, j1 = 0, k1 = 0;
 
 			const Vec3 boxhalfsize(0.5, 0.5, 0.5);
 			for (size_t t = 0, ti = 0; t < nTriangles; ++t, ti += strideTriangles) 
@@ -335,10 +340,10 @@ namespace nd
 					p[c][0] = (pt[0] - m_minBB[0]) * invScale;
 					p[c][1] = (pt[1] - m_minBB[1]) * invScale;
 					p[c][2] = (pt[2] - m_minBB[2]) * invScale;
-					i_ = size_t(p[c][0] + 0.5);
-					j_ = size_t(p[c][1] + 0.5);
-					k_ = size_t(p[c][2] + 0.5);
-					assert(i_ < m_dim[0] && i_ >= 0 && j_ < m_dim[1] && j_ >= 0 && k_ < m_dim[2] && k_ >= 0);
+					ndInt32 i_ = ndInt32(p[c][0] + 0.5);
+					ndInt32 j_ = ndInt32(p[c][1] + 0.5);
+					ndInt32 k_ = ndInt32(p[c][2] + 0.5);
+					ndAssert(i_ < m_dim[0] && i_ >= 0 && j_ < m_dim[1] && j_ >= 0 && k_ < m_dim[2] && k_ >= 0);
 
 					if (c == 0) 
 					{
@@ -375,19 +380,19 @@ namespace nd
 				if (k1 < m_dim[2])
 					++k1;
 
-				for (size_t i = i0; i < i1; ++i) 
+				for (ndInt32 i = i0; i < i1; ++i) 
 				{
 					Vec3 boxcenter;
 					boxcenter[0] = (double)i;
-					for (size_t j = j0; j < j1; ++j) 
+					for (ndInt32 j = j0; j < j1; ++j)
 					{
 						boxcenter[1] = (double)j;
-						for (size_t k = k0; k < k1; ++k) 
+						for (ndInt32 k = k0; k < k1; ++k)
 						{
 							boxcenter[2] = (double)k;
 							ndInt32 res = TriBoxOverlap(boxcenter, boxhalfsize, p[0], p[1], p[2]);
 							unsigned char& value = GetVoxel(i, j, k);
-							if (res == 1 && value == PRIMITIVE_UNDEFINED) 
+							if ((res == 1) && (value == PRIMITIVE_UNDEFINED)) 
 							{
 								value = PRIMITIVE_ON_SURFACE;
 								++m_numVoxelsOnSurface;

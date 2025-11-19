@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 	ndString ndPath(fbxPath.SubString(0, fbxPath.Find(".fbx")) + ".nd");
 	ndPath.ToLower();
 
-	ndMeshLoader loader;
+	ndAnimationMeshLoader loader;
 	loader.ImportFbx(fbxPath);
 	loader.SaveMesh(ndPath);
 	return 0;

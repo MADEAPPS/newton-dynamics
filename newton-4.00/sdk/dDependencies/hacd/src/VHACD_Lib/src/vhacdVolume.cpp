@@ -1046,49 +1046,44 @@ namespace nd
 			m_numVoxelsInsideSurface = 0;
 			m_numVoxelsOutsideSurface = 0;
 			m_scale = 1.0;
-			m_data = 0;
 		}
 
 		Volume::~Volume(void)
 		{
-			delete[] m_data;
 		}
 		void Volume::Allocate()
 		{
-			delete[] m_data;
-			size_t size = m_dim[0] * m_dim[1] * m_dim[2];
-			m_data = new unsigned char[size];
-			memset(m_data, PRIMITIVE_UNDEFINED, sizeof(unsigned char) * size);
+			ndInt32 size = ndInt32(m_dim[0] * m_dim[1] * m_dim[2]);
+			m_data.Resize(size);
+			m_data.SetCount(size);
+			memset(&m_data[0], PRIMITIVE_UNDEFINED, sizeof(unsigned char) * size);
 		}
 		void Volume::Free()
 		{
-			delete[] m_data;
-			m_data = 0;
 		}
 
-		void Volume::FillOutsideSurface(const size_t i0,
-			const size_t j0,
-			const size_t k0,
-			const size_t i1,
-			const size_t j1,
-			const size_t k1)
+		void Volume::FillOutsideSurface(
+			const ndInt32 i0, const ndInt32 j0, const ndInt32 k0,
+			const ndInt32 i1, const ndInt32 j1, const ndInt32 k1)
 		{
-			const short neighbours[6][3] = { 
+			const short neighbours[6][3] = 
+			{ 
 				{ 1, 0, 0 },
 				{ 0, 1, 0 },
 				{ 0, 0, 1 },
 				{ -1, 0, 0 },
 				{ 0, -1, 0 },
-				{ 0, 0, -1 } };
+				{ 0, 0, -1 } 
+			};
 
 			Triangle current;
 			ndList<Triangle, ndContainersFreeListAlloc<Triangle>> fifo;
 
-			for (size_t i = i0; i < i1; ++i) 
+			for (ndInt32 i = i0; i < i1; ++i)
 			{
-				for (size_t j = j0; j < j1; ++j) 
+				for (ndInt32 j = j0; j < j1; ++j)
 				{
-					for (size_t k = k0; k < k1; ++k) 
+					for (ndInt32 k = k0; k < k1; ++k)
 					{
 						if (GetVoxel(i, j, k) == PRIMITIVE_UNDEFINED) 
 						{
@@ -1106,9 +1101,9 @@ namespace nd
 								fifo.Remove(node);
 								for (int32_t h = 0; h < 6; ++h) 
 								{
-									short a = short(current[0] + neighbours[h][0]);
-									short b = short(current[1] + neighbours[h][1]);
-									short c = short(current[2] + neighbours[h][2]);
+									ndInt32 a = current[0] + neighbours[h][0];
+									ndInt32 b = current[1] + neighbours[h][1];
+									ndInt32 c = current[2] + neighbours[h][2];
 									if (a < 0 || a >= (int32_t)m_dim[0] || b < 0 || b >= (int32_t)m_dim[1] || c < 0 || c >= (int32_t)m_dim[2]) 
 									{
 										continue;
@@ -1130,14 +1125,14 @@ namespace nd
 
 		void Volume::FillInsideSurface()
 		{
-			const size_t i0 = m_dim[0];
-			const size_t j0 = m_dim[1];
-			const size_t k0 = m_dim[2];
-			for (size_t k = 0; k < k0; ++k) 
+			const ndInt32 i0 = m_dim[0];
+			const ndInt32 j0 = m_dim[1];
+			const ndInt32 k0 = m_dim[2];
+			for (ndInt32 k = 0; k < k0; ++k)
 			{
-				for (size_t j = 0; j < j0; ++j) 
+				for (ndInt32 j = 0; j < j0; ++j)
 				{
-					for (size_t i = 0; i < i0; ++i) 
+					for (ndInt32 i = 0; i < i0; ++i)
 					{
 						unsigned char& v = GetVoxel(i, j, k);
 						if (v == PRIMITIVE_UNDEFINED) 
@@ -1151,14 +1146,14 @@ namespace nd
 		}
 		void Volume::Convert(Mesh& mesh, const VOXEL_VALUE value) const
 		{
-			const size_t i0 = m_dim[0];
-			const size_t j0 = m_dim[1];
-			const size_t k0 = m_dim[2];
-			for (size_t i = 0; i < i0; ++i) 
+			const ndInt32 i0 = m_dim[0];
+			const ndInt32 j0 = m_dim[1];
+			const ndInt32 k0 = m_dim[2];
+			for (ndInt32 i = 0; i < i0; ++i)
 			{
-				for (size_t j = 0; j < j0; ++j) 
+				for (ndInt32 j = 0; j < j0; ++j)
 				{
-					for (size_t k = 0; k < k0; ++k) 
+					for (ndInt32 k = 0; k < k0; ++k)
 					{
 						const unsigned char& voxel = GetVoxel(i, j, k);
 						if (voxel == value) 
@@ -1197,6 +1192,7 @@ namespace nd
 				}
 			}
 		}
+
 		void Volume::Convert(VoxelSet& vset) const
 		{
 			for (size_t h = 0; h < 3; ++h)

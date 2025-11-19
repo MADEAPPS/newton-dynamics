@@ -49,7 +49,8 @@
 	#include <unistd.h>
 #endif
 
-#include <stdlib.h>
+#include "ndCoreStdafx.h"
+#include "ndCollisionStdafx.h"
 
 namespace nd
 {
