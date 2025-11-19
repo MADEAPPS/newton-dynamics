@@ -63,8 +63,8 @@ namespace nd
 			class ConvexHull 
 			{
 				public:
-				double* m_points;
-				ndInt32* m_triangles;
+				const double* m_points;
+				const ndInt32* m_triangles;
 				ndInt32 m_nPoints;
 				ndInt32 m_nTriangles;
 			};

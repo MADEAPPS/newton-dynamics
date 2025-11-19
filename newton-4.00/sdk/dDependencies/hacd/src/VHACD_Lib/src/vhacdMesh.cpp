@@ -49,7 +49,8 @@ namespace nd
 		{
 			const size_t nV = GetNPoints();
 			const size_t nT = GetNTriangles();
-			if (nV == 0 || nT == 0) {
+			if (nV == 0 || nT == 0) 
+			{
 				return 0.0;
 			}
 

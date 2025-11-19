@@ -59,8 +59,6 @@ namespace nd
 				Plane& bestPlane,
 				double& minConcavity,
 				ndWorkingBuffers* const workBuffers,
-				//ConvexHull3dPointSet& posBuffer,
-				//ConvexHull3dPointSet& negBuffer,
 				const Parameters& params);
 
 			void VoxelizeMesh(
@@ -75,14 +73,14 @@ namespace nd
 				const Parameters& params);
 
 		private:
-			SArray<Mesh*> m_convexHulls;
+			ndSharedPtr<Volume> m_volume;
+			ndSharedPtr<PrimitiveSet> m_pset;
+			ndFixSizeArray<ndSharedPtr<Mesh>, 256> m_convexHulls;
+			Queue m_parallelQueue;
 			double m_rot[3][3];
 			double m_volumeCH0;
 			Vec3 m_barycenter;
 			size_t m_dim;
-			Volume* m_volume;
-			PrimitiveSet* m_pset;
-			Queue m_parallelQueue;
 		};
 	}
 }
