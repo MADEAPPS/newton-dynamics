@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <ndMesh>
-    <name string="tpot_convexHull" />
+    <name string="tpot-convexHull" />
     <matrix>
         <posit float3="0 0 0" />
         <angles float3="0 -0 0" />
