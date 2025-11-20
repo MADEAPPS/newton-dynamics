@@ -85,7 +85,7 @@ bool ndRenderMeshLoader::MeshToRenderSceneNode(const ndString& materialBasePath)
 		}
 		entity->m_name = mesh->GetName();
 
-		if (entity->m_name.Find("hidden") == -1)
+		if (entity->m_name.Find("-hidden") == -1)
 		{
 			ndSharedPtr<ndMeshEffect> meshEffect(mesh->GetMesh());
 			if (*meshEffect)
@@ -131,18 +131,8 @@ bool ndRenderMeshLoader::MeshToRenderSceneNode(const ndString& materialBasePath)
 			material.m_castShadows = true;
 		}
 	
-		//pair.m_entity->m_name = effectNode->GetName();
-		//ndSharedPtr<ndRenderPrimitive> geometry(ndRenderPrimitive::CreateMeshPrimitive(descriptor));
 		ndSharedPtr<ndRenderPrimitive> geometry(new ndRenderPrimitive(descriptor));
 		pair.m_entity->SetPrimitive(geometry);
-	
-		//if ((effectNode->GetName().Find("hidden") >= 0) || (effectNode->GetName().Find("Hidden") >= 0))
-		//{
-		//	ndAssert(0);
-		//	//mesh->m_isVisible = false;
-		//	//entity->m_isVisible = false;
-		//	//entity->m_castShadow = false;
-		//}
 	}
 	return m_renderMesh;
 }
