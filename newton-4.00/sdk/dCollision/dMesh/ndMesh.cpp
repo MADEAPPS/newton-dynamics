@@ -661,21 +661,21 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionFromChildren()
 		tmpName.ToLower();
 		const char* const name = tmpName.GetStr();
 	
-		if (strstr(name, "sphere"))
+		if (strstr(name, "-sphere"))
 		{
 			ndSharedPtr<ndShapeInstance> subShape(meshNode->CreateCollision());
 			const ndMatrix matrix(subShape->GetLocalMatrix() * meshNode->m_matrix);
 			subShape->SetLocalMatrix(matrix);
 			shapeArray.PushBack(subShape);
 		}
-		else if (strstr(name, "box"))
+		else if (strstr(name, "-box"))
 		{
 			ndSharedPtr<ndShapeInstance> subShape(meshNode->CreateCollision());
 			const ndMatrix matrix(subShape->GetLocalMatrix() * meshNode->m_matrix);
 			subShape->SetLocalMatrix(matrix);
 			shapeArray.PushBack(subShape);
 		}
-		else if (strstr(name, "capsule"))
+		else if (strstr(name, "-capsule"))
 		{
 			ndSharedPtr<ndShapeInstance> subShape(meshNode->CreateCollision());
 			const ndMatrix matrix(subShape->GetLocalMatrix() * meshNode->m_matrix);
@@ -690,7 +690,6 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionFromChildren()
 			shapeArray.PushBack(subShape);
 		}
 		else if (strstr(name, "-vhacd"))
-		//else if (strstr(name, "-compound"))
 		{
 			ndAssert(0);
 			//ndArray<ndInt32> indices;
