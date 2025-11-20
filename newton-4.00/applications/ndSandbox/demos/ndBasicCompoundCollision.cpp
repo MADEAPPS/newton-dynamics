@@ -131,7 +131,6 @@ static void AddEmptyBox(ndDemoEntityManager* const scene)
 static void AddSimpleConcaveMesh(ndDemoEntityManager* const scene, const ndMatrix& matrix, const char* const meshName, int count = 1)
 {
 	ndRenderMeshLoader loader(*scene->GetRenderer());
-	//loader.ImportFbx(ndGetWorkingFileName(meshName));
 	loader.LoadMesh(ndGetWorkingFileName(meshName));
 	ndSharedPtr<ndShapeInstance>compoundShapeInstance(loader.m_mesh->CreateCollision());
 	

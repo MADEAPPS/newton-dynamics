@@ -311,11 +311,6 @@ void ndFbxMeshLoader::FreezeScale(ndMesh* const mesh)
 		ndSharedPtr<ndMeshEffect> effectMesh (meshNode->GetMesh());
 		if (*effectMesh)
 		{
-			//matrix = meshNode->m_meshMatrix * scaleMatrix;
-			//matrix.PolarDecomposition(transformMatrix, scale, stretchAxis);
-			//meshNode->m_meshMatrix = transformMatrix;
-			//ndMatrix meshMatrix(ndGetIdentityMatrix(), scale, stretchAxis);
-			//effectMesh->ApplyTransform(meshMatrix);
 			effectMesh->ApplyTransform(scaleMatrix);
 		}
 
@@ -712,8 +707,6 @@ void ndFbxMeshLoader::ImportMeshNode(ofbx::Object* const fbxNode, ndFbx2ndMeshNo
 	ndMatrix pivotMatrix(ofbxMatrix2dMatrix(fbxMesh->getGeometricMatrix()));
 	meshEffect->ApplyTransform(pivotMatrix);
 	entity->SetMesh(meshEffect);
-
-	//mesh->RepairTJoints();
 }
 
 ndMesh* ndFbxMeshLoader::CreateMeshHierarchy(ofbx::IScene* const fbxScene, ndFbx2ndMeshNodeMap& nodeMap)
@@ -1186,6 +1179,13 @@ void ndFbxMeshLoader::OptimizeAnimation(ndMesh* const model)
 	}
 }
 
+ndSharedPtr<ndAnimationSequence> ndFbxMeshLoader::LoadAnimation(const char* const fullPathName)
+{
+	ndSharedPtr<ndMesh> mesh(LoadMesh(fullPathName, true));
+	ndSharedPtr<ndAnimationSequence> sequence(CreateSequence(*mesh, fullPathName));
+	return sequence;
+}
+
 ndSharedPtr<ndMesh> ndFbxMeshLoader::LoadMesh(const char* const fullPathName, bool loadAnimation)
 {
 	FILE* const file = fopen(fullPathName, "rb");
@@ -1227,11 +1227,4 @@ ndSharedPtr<ndMesh> ndFbxMeshLoader::LoadMesh(const char* const fullPathName, bo
 		mesh = child;
 	}
 	return mesh;
-}
-
-ndSharedPtr<ndAnimationSequence> ndFbxMeshLoader::LoadAnimation(const char* const fullPathName)
-{
-	ndSharedPtr<ndMesh> mesh(LoadMesh(fullPathName, true));
-	ndSharedPtr<ndAnimationSequence> sequence (CreateSequence(*mesh, fullPathName));
-	return sequence;
 }

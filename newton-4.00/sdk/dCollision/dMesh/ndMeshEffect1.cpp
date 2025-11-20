@@ -4494,6 +4494,9 @@ ndMeshEffect::ndMeshEffect(const ndShapeInstance& shapeInstance)
 	,m_vertexBaseCount(0)
 	,m_constructionIndex(0)
 {
+	ndMeshEffect::ndMaterial material;
+	m_materials.PushBack(material);
+
 	class dgMeshEffectBuilder : public ndShapeDebugNotify
 	{
 		public:
@@ -4546,11 +4549,17 @@ ndMeshEffect::ndMeshEffect(const ndShapeInstance& shapeInstance)
 	ndInt32* const indexList = &indexListBuffer[0];
 	ndVertexListToIndexList(&builder.m_vertex[0].m_x, sizeof(ndBigVector), 4, ndInt32(builder.m_vertex.GetCount()), &indexList[0], DG_VERTEXLIST_INDEXLIST_TOL);
 
+	ndArray<ndInt32> faceMaterialArray;
 	ndMeshEffect::ndMeshVertexFormat vertexFormat;
+
+	for (ndInt32 i = 0; i < builder.m_faceIndexCount.GetCount(); ++i)
+	{
+		faceMaterialArray.PushBack(0);
+	}
 
 	vertexFormat.m_faceCount = ndInt32(builder.m_faceIndexCount.GetCount());
 	vertexFormat.m_faceIndexCount = &builder.m_faceIndexCount[0];
-	//vertexFormat.m_faceMaterial = materialIndex;
+	vertexFormat.m_faceMaterial = &faceMaterialArray[0];
 
 	vertexFormat.m_vertex.m_data = &builder.m_vertex[0].m_x;
 	vertexFormat.m_vertex.m_strideInBytes = sizeof(ndBigVector);
@@ -4947,28 +4956,31 @@ void ndMeshEffect::SerializeToXml(nd::TiXmlElement* const xmlNode, const ndTree<
 	ndInt32 mark = IncLRU();
 	ndPolyhedra::Iterator iter(*this);
 	const ndChannel<ndInt32, m_material>& materialChannel = m_attrib.m_materialChannel;
-	for (iter.Begin(); iter; iter++)
+	if (materialChannel.GetCount())
 	{
-		ndEdge* const edge = &(*iter);
-		if ((edge->m_mark < mark) && (edge->m_incidentFace > 0))
+		for (iter.Begin(); iter; iter++)
 		{
-			ndInt32 indexCount = 0;
-			ndInt32 materialIndex = materialChannel[ndInt32(edge->m_userData)];
-			ndEdge* ptr = edge;
-			do
+			ndEdge* const edge = &(*iter);
+			if ((edge->m_mark < mark) && (edge->m_incidentFace > 0))
 			{
-				ndAssert(materialIndex == materialChannel[ndInt32(ptr->m_userData)]);
-				pointsIndexList.PushBack(ptr->m_incidentVertex);
-				normalsIndexList.PushBack(ndInt32(ptr->m_userData));
-				uvIndexList.PushBack(ndInt32(ptr->m_userData));
+				ndInt32 indexCount = 0;
+				ndInt32 materialIndex = materialChannel[ndInt32(edge->m_userData)];
+				ndEdge* ptr = edge;
+				do
+				{
+					ndAssert(materialIndex == materialChannel[ndInt32(ptr->m_userData)]);
+					pointsIndexList.PushBack(ptr->m_incidentVertex);
+					normalsIndexList.PushBack(ndInt32(ptr->m_userData));
+					uvIndexList.PushBack(ndInt32(ptr->m_userData));
 
-				indexCount++;
-				ptr->m_mark = mark;
-				ptr = ptr->m_next;
-			} while (ptr != edge);
+					indexCount++;
+					ptr->m_mark = mark;
+					ptr = ptr->m_next;
+				} while (ptr != edge);
 
-			faceIndexArray.PushBack(indexCount);
-			faceMaterialArray.PushBack(materialIndex);
+				faceIndexArray.PushBack(indexCount);
+				faceMaterialArray.PushBack(materialIndex);
+			}
 		}
 	}
 
@@ -5167,17 +5179,18 @@ void ndMeshEffect::SerializeToXml(nd::TiXmlElement* const xmlNode, const ndTree<
 		xmlSaveParam(materialNode, "texture", material.m_textureName);
 	}
 
+	if (faceIndexArray.GetCount())
 	{
 		// generate layer;
-		ndInt32 duplicateCount = 1;
-		ndInt32 layerIndex = 0;
 		ndInt32 base = 0;
+		ndInt32 layerIndex = 0;
+		ndInt32 duplicateCount = 1;
 
 		ndPolyhedra simplex;
-		simplex.BeginFace();
 		ndArray<ndInt32> layers;
 		ndArray<ndInt8> faceMask;
 
+		simplex.BeginFace();
 		layers.SetCount(ndInt32(faceIndexArray.GetCount()));
 		faceMask.SetCount(ndInt32(faceIndexArray.GetCount()));
 		ndMemSet(&faceMask[0], ndInt8(0), faceIndexArray.GetCount());

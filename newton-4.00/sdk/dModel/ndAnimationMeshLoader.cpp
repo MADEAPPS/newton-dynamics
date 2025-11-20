@@ -113,8 +113,41 @@ bool ndAnimationMeshLoader::ImportFbx(const ndString& fbxPathMeshName)
 {
 	ndFbxMeshLoader loader;
 	m_mesh = ndSharedPtr<ndMesh>(loader.LoadMesh(fbxPathMeshName.GetStr(), false));
+
+	ndInt32 index = 0;
+	ndArray<ndVector> hullPoints;
+	for (ndMesh* childMesh = m_mesh->IteratorFirst(); childMesh; childMesh = childMesh->IteratorNext())
+	{
+		ndString name (childMesh->GetName());
+		ndInt32 vhacd = name.Find("-vhacd");
+		if (vhacd != -1)
+		{
+			// remove the -vhacd from name
+			name.Replace (vhacd, 6, "-compound", 9);
+			childMesh->SetName(name);
+			ndSharedPtr<ndShapeInstance>compoundShapeInstance(childMesh->CreateCollisionConvexApproximation());
+			ndShapeCompound* const compoundShape = compoundShapeInstance->GetShape()->GetAsShapeCompound();
+			ndShapeCompound::ndTreeArray::Iterator it(compoundShape->GetTree());
+			for (it.Begin(); it; it++)
+			{
+				ndShapeInstance* const subShape = compoundShape->GetShapeInstance(it.GetNode());
+				ndAssert(subShape);
+
+				ndSharedPtr<ndMesh> convexMesh(new ndMesh);
+				char collisionshapeName[256];
+				snprintf(collisionshapeName, 255, "collision%d-convexhull", index++);
+				ndSharedPtr<ndMeshEffect> hullMesh(new ndMeshEffect(*subShape));
+
+				convexMesh->SetMesh(hullMesh);
+				convexMesh->m_matrix = subShape->GetLocalMatrix();
+				convexMesh->SetNodeType(ndMesh::m_collisionShape);
+				convexMesh->SetName(collisionshapeName);
+				childMesh->AddChild(convexMesh);
+			}
+		}
+	}
+
 #if 0
-	//ndAssert(0);
 	ndTrace(("exporting mesh %s\n", fbxPathMeshName.GetStr()));
 	ndString tmpName(fbxPathMeshName);
 	tmpName.ToLower();

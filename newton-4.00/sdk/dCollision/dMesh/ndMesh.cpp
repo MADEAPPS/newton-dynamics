@@ -470,7 +470,7 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionConvex()
 	return shape;
 }
 
-ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionCompound(bool lowDetail)
+ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionConvexApproximation(bool lowDetail)
 {
 	const ndInt32 pointsCount = m_mesh->GetVertexCount();
 	const ndInt32 pointsStride = ndInt32(m_mesh->GetVertexStrideInByte() / sizeof(ndFloat64));
@@ -633,9 +633,14 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollision()
 	{
 		shape = CreateCollisionTree();
 	}
-	else if(strstr(name, "convexapproximation"))
+	else if (strstr(name, "-compound"))
 	{
-		shape = CreateCollisionCompound();
+		//shape = CreateCollisionCompound();
+		shape = CreateCollisionFromChildren();
+	}
+	else if (strstr(name, "-vhacd"))
+	{
+		shape = CreateCollisionConvexApproximation();
 	}
 	else
 	{
@@ -677,14 +682,15 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollisionFromChildren()
 			subShape->SetLocalMatrix(matrix);
 			shapeArray.PushBack(subShape);
 		}
-		else if (strstr(name, "convexhull"))
+		else if (strstr(name, "-convexhull"))
 		{
 			ndSharedPtr<ndShapeInstance> subShape(meshNode->CreateCollision());
 			const ndMatrix matrix(subShape->GetLocalMatrix() * meshNode->m_matrix);
 			subShape->SetLocalMatrix(matrix);
 			shapeArray.PushBack(subShape);
 		}
-		else if (strstr(name, "vhacd"))
+		else if (strstr(name, "-vhacd"))
+		//else if (strstr(name, "-compound"))
 		{
 			ndAssert(0);
 			//ndArray<ndInt32> indices;

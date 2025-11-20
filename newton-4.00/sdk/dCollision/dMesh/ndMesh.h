@@ -23,10 +23,6 @@
 #define __ND_MESH_H__
 
 #include "ndCore.h"
-//#include "ndCollisionStdafx.h"
-//#include "ndMatrix.h"
-//#include "ndClassAlloc.h"
-//#include "ndSharedPtr.h"
 
 class ndMeshEffect;
 class ndShapeInstance;
@@ -38,7 +34,8 @@ class ndMesh : public ndClassAlloc
 	{
 		m_node,
 		m_bone,
-		m_boneEnd
+		m_boneEnd,
+		m_collisionShape,
 	};
 	
 	class ndCurveValue
@@ -117,7 +114,7 @@ class ndMesh : public ndClassAlloc
 	D_COLLISION_API ndSharedPtr<ndShapeInstance> CreateCollisionCapsule();
 	D_COLLISION_API ndSharedPtr<ndShapeInstance> CreateCollisionChamferCylinder();
 	D_COLLISION_API ndSharedPtr<ndShapeInstance> CreateCollisionTree(bool optimize = true);
-	D_COLLISION_API ndSharedPtr<ndShapeInstance> CreateCollisionCompound(bool lowDetail = false);
+	D_COLLISION_API ndSharedPtr<ndShapeInstance> CreateCollisionConvexApproximation(bool lowDetail = false);
 
 	ndMatrix m_matrix;
 

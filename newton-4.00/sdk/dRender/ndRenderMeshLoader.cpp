@@ -96,8 +96,12 @@ bool ndRenderMeshLoader::MeshToRenderSceneNode(const ndString& materialBasePath)
 
 		for (ndList<ndSharedPtr<ndMesh>>::ndNode* childNode = mesh->GetChildren().GetFirst(); childNode; childNode = childNode->GetNext())
 		{
-			parentEntityList.Append(entity);
-			effectNodeList.Append(childNode->GetInfo());
+			ndMesh::ndNodeType type = childNode->GetInfo()->GetNodeType();
+			if (type != ndMesh::m_collisionShape)
+			{
+				parentEntityList.Append(entity);
+				effectNodeList.Append(childNode->GetInfo());
+			}
 		}
 	}
 

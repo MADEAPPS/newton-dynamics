@@ -69,14 +69,25 @@ bool ndMeshLoader::LoadMesh(const ndString& fullPathMeshName)
 		nd::TiXmlElement* const xmlNodeType = (nd::TiXmlElement*)entry.m_xmlNode->FirstChild("type");
 		ndAssert(xmlNodeType);
 		const char* const nodeType = xmlGetNameAttribute(xmlNodeType, "nodeType");
-		mesh->SetNodeType(ndMesh::m_node);
-		if (!strcmp(nodeType, "bone"))
+		if (!strcmp(nodeType, "node"))
+		{
+			mesh->SetNodeType(ndMesh::m_node);
+		}
+		else if (!strcmp(nodeType, "bone"))
 		{
 			mesh->SetNodeType(ndMesh::m_bone);
 		}
 		else if (!strcmp(nodeType, "endBone"))
 		{
 			mesh->SetNodeType(ndMesh::m_boneEnd);
+		}
+		else if (!strcmp(nodeType, "collisionShape"))
+		{
+			mesh->SetNodeType(ndMesh::m_collisionShape);
+		}
+		else
+		{
+			ndAssert(0);
 		}
 		ndTriplexReal target(xmlGetTriplexRealAttribute(xmlNodeType, "target"));
 
@@ -154,6 +165,10 @@ void ndMeshLoader::SaveMesh(const ndString& fullPathName)
 				break;
 			case ndMesh::m_boneEnd:
 				xmlSaveAttribute(xmlNodeType, "nodeType", "endBone");
+				break;
+
+			case ndMesh::m_collisionShape:
+				xmlSaveAttribute(xmlNodeType, "nodeType", "collisionShape");
 				break;
 		}
 		ndVector boneTarget(entry.m_meshNode->GetBoneTarget());

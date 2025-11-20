@@ -40,7 +40,7 @@ bld/
 *.sdf
 *.lib
 *.dll
-*.exe
+#*.exe
 *.spv
 *.dat
 *.log
