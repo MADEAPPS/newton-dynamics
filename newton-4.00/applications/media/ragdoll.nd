@@ -88,7 +88,7 @@
                                     </ndMesh>
                                 </ndMesh>
                                 <ndMesh>
-                                    <name string="Box004" />
+                                    <name string="-Box004" />
                                     <matrix>
                                         <posit float3="0.0668832 -0.0122576 -0.0029287" />
                                         <angles float3="90 30 90" />
@@ -125,7 +125,7 @@
                                 </ndMesh>
                             </ndMesh>
                             <ndMesh>
-                                <name string="Capsule009" />
+                                <name string="-Capsule009" />
                                 <matrix>
                                     <posit float3="-0.00555275 -0.0122578 -0.00292877" />
                                     <angles float3="1.99158e-05 6.72269e-07 180" />
@@ -162,7 +162,7 @@
                             </ndMesh>
                         </ndMesh>
                         <ndMesh>
-                            <name string="Capsule010" />
+                            <name string="-Capsule010" />
                             <matrix>
                                 <posit float3="-0.00866539 0.00915108 0.0560728" />
                                 <angles float3="-30 90 0" />
@@ -252,7 +252,7 @@
                                     </ndMesh>
                                 </ndMesh>
                                 <ndMesh>
-                                    <name string="Box003" />
+                                    <name string="-Box003" />
                                     <matrix>
                                         <posit float3="0.0706828 0 -7.6294e-08" />
                                         <angles float3="90 30 -90" />
@@ -289,7 +289,7 @@
                                 </ndMesh>
                             </ndMesh>
                             <ndMesh>
-                                <name string="Capsule008" />
+                                <name string="-Capsule008" />
                                 <matrix>
                                     <posit float3="-0.00226105 -7.62939e-08 7.62939e-08" />
                                     <angles float3="-7.56296e-07 -1.33106e-13 -1.00839e-05" />
@@ -326,7 +326,7 @@
                             </ndMesh>
                         </ndMesh>
                         <ndMesh>
-                            <name string="Capsule007" />
+                            <name string="-Capsule007" />
                             <matrix>
                                 <posit float3="-7.62939e-08 3.09944e-08 -0.0581108" />
                                 <angles float3="150 90 0" />
@@ -385,7 +385,7 @@
                                 <type nodeType="node" target="0 0 0 " />
                             </ndMesh>
                             <ndMesh>
-                                <name string="Sphere001" />
+                                <name string="-Sphere001" />
                                 <matrix>
                                     <posit float3="-0.0678944 -2.28286e-07 -4.08292e-08" />
                                     <angles float3="0 -0 90" />
@@ -530,7 +530,7 @@
                             </ndMesh>
                         </ndMesh>
                         <ndMesh>
-                            <name string="Capsule006" />
+                            <name string="-Capsule006" />
                             <matrix>
                                 <posit float3="-0.06026 -0.00424642 3.57628e-09" />
                                 <angles float3="0 -0 90" />
@@ -568,7 +568,7 @@
                     </ndMesh>
                 </ndMesh>
                 <ndMesh>
-                    <name string="convexhull_002" />
+                    <name string="-convexhull_002" />
                     <matrix>
                         <posit float3="-0.172922 -0.00835318 0.00178935" />
                         <angles float3="0 -0 89.1" />
@@ -605,7 +605,7 @@
                 </ndMesh>
             </ndMesh>
             <ndMesh>
-                <name string="convexhull_001" />
+                <name string="-convexhull_001" />
                 <matrix>
                     <posit float3="-0.10001 0.00347656 0.00117672" />
                     <angles float3="0 -0 91.1" />
@@ -679,7 +679,7 @@
                         </ndMesh>
                     </ndMesh>
                     <ndMesh>
-                        <name string="Box001" />
+                        <name string="-Box001" />
                         <matrix>
                             <posit float3="0.0516451 0.0496536 -0.0104244" />
                             <angles float3="-3.36131e-06 6.87856e-13 90" />
@@ -716,7 +716,7 @@
                     </ndMesh>
                 </ndMesh>
                 <ndMesh>
-                    <name string="Capsule003" />
+                    <name string="-Capsule003" />
                     <matrix>
                         <posit float3="0.180766 1.12057e-07 -0.00992145" />
                         <angles float3="-7.57244e-13 6.05037e-06 -6.98123e-06" />
@@ -761,7 +761,7 @@
                 </ndMesh>
             </ndMesh>
             <ndMesh>
-                <name string="Capsule002" />
+                <name string="-Capsule002" />
                 <matrix>
                     <posit float3="0.21818 1.54972e-07 0.0688529" />
                     <angles float3="2.54096e-06 -20 -7.42927e-06" />
@@ -843,7 +843,7 @@
                         </ndMesh>
                     </ndMesh>
                     <ndMesh>
-                        <name string="Box002" />
+                        <name string="-Box002" />
                         <matrix>
                             <posit float3="0.0460096 0.0496536 0.00335209" />
                             <angles float3="-4.70584e-06 2.95199e-13 -90" />
@@ -880,7 +880,7 @@
                     </ndMesh>
                 </ndMesh>
                 <ndMesh>
-                    <name string="Capsule004" />
+                    <name string="-Capsule004" />
                     <matrix>
                         <posit float3="0.17944 2.14577e-08 0.0125122" />
                         <angles float3="8.56582e-07 2.79118e-13 180" />
@@ -925,7 +925,7 @@
                 </ndMesh>
             </ndMesh>
             <ndMesh>
-                <name string="Capsule005" />
+                <name string="-Capsule005" />
                 <matrix>
                     <posit float3="0.21818 5.72205e-08 -0.0661022" />
                     <angles float3="7.65187e-06 -20 180" />
@@ -970,7 +970,7 @@
             </ndMesh>
         </ndMesh>
         <ndMesh>
-            <name string="convexhull_0" />
+            <name string="-convexhull_0" />
             <matrix>
                 <posit float3="-0.00519897 0.0108213 4.73014e-10" />
                 <angles float3="0 -0 95.8" />

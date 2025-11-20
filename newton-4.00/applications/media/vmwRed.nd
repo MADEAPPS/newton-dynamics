@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <ndMesh>
-    <name string="bmw7_convexHull" />
+    <name string="bmw7-convexHull" />
     <matrix>
         <posit float3="0 0 -8.7204e-07" />
         <angles float3="0 -0 0" />
@@ -136,7 +136,7 @@
         </faces>
     </geometry>
     <ndMesh>
-        <name string="fr_tire" />
+        <name string="fr-tire" />
         <matrix>
             <posit float3="1.61584 0.360766 0.783183" />
             <angles float3="-0 90 0" />
@@ -228,7 +228,7 @@
         </geometry>
     </ndMesh>
     <ndMesh>
-        <name string="rr_tire" />
+        <name string="rr-tire" />
         <matrix>
             <posit float3="-1.41061 0.360766 0.783183" />
             <angles float3="-0 90 0" />
@@ -274,7 +274,7 @@
         </geometry>
     </ndMesh>
     <ndMesh>
-        <name string="fl_tire" />
+        <name string="fl-tire" />
         <matrix>
             <posit float3="1.60511 0.360766 -0.781477" />
             <angles float3="-0 -90 0" />
@@ -320,7 +320,7 @@
         </geometry>
     </ndMesh>
     <ndMesh>
-        <name string="rl_tire" />
+        <name string="rl-tire" />
         <matrix>
             <posit float3="-1.41061 0.360766 -0.782782" />
             <angles float3="-0 -90 0" />

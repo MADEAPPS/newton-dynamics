@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <ndMesh>
-    <name string="cart_box" />
+    <name string="cart-box" />
     <matrix>
         <posit float3="-2.07845e-09 -1.10003e-08 0" />
         <angles float3="0 3.41509e-06 0" />
@@ -35,7 +35,7 @@
         </faces>
     </geometry>
     <ndMesh>
-        <name string="pole_capsule" />
+        <name string="pole-capsule" />
         <matrix>
             <posit float3="-9.49463e-10 0.0231397 0" />
             <angles float3="-0 90 0" />

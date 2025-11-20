@@ -609,27 +609,27 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollision()
 	const char* const name = tmpName.GetStr();
 
 	ndSharedPtr<ndShapeInstance> shape(new ndShapeInstance(new ndShapeNull()));
-	if (strstr(name, "box"))
+	if (strstr(name, "-box"))
 	{
 		shape = CreateCollisionBox();
 	}
-	else if (strstr(name, "sphere"))
+	else if (strstr(name, "-sphere"))
 	{
 		shape = CreateCollisionSphere();
 	}
-	else if (strstr(name, "capsule"))
+	else if (strstr(name, "-capsule"))
 	{
 		shape = CreateCollisionCapsule();
 	}
-	else if (strstr(name, "tire"))
+	else if (strstr(name, "-tire"))
 	{
 		shape = CreateCollisionTire();
 	}
-	else if (strstr(name, "convexhull"))
+	else if (strstr(name, "-convexhull"))
 	{
 		shape = CreateCollisionConvex();
 	}
-	else if (strstr(name, "collisiontree"))
+	else if (strstr(name, "-collisiontree"))
 	{
 		shape = CreateCollisionTree();
 	}
