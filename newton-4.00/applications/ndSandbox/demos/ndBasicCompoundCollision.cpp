@@ -174,10 +174,10 @@ void ndBasicCompoundCollision(ndDemoEntityManager* const scene)
 	AddSimpleConcaveMesh(scene, location, "dino.nd", 4);
 
 	ndVector origin(ndVector::m_zero);
-	origin.m_x -= 10.0f;
+	origin.m_x -= 15.0f;
 	origin.m_y += 2.0f;
 	origin.m_z += 10.0f;
 	origin.m_w = 1.0f;
-	ndQuaternion rot(ndYawMatrix(45.0f * ndDegreeToRad));
+	ndQuaternion rot(ndYawMatrix(20.0f * ndDegreeToRad));
 	scene->SetCameraMatrix(rot, origin);
 }
