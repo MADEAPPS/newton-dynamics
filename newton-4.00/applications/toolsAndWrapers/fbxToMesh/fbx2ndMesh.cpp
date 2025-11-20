@@ -29,9 +29,22 @@ int main(int argc, char** argv)
 	ndString ndPath(fbxPath.SubString(0, fbxPath.Find(".fbx")) + ".nd");
 	ndPath.ToLower();
 
-	ndAnimationMeshLoader loader;
-	loader.ImportFbx(fbxPath);
-	loader.SaveMesh(ndPath);
+	WIN32_FILE_ATTRIBUTE_DATA ndFileInfo;
+	WIN32_FILE_ATTRIBUTE_DATA fbxFileInfo;
+	memset(&ndFileInfo, 0, sizeof(WIN32_FILE_ATTRIBUTE_DATA));
+
+	GetFileAttributesEx(ndPath.GetStr(), GetFileExInfoStandard, &ndFileInfo);
+	GetFileAttributesEx(fbxPath.GetStr(), GetFileExInfoStandard, &fbxFileInfo);
+
+	ndUnsigned64 ndDate = (ndUnsigned64(ndFileInfo.ftLastWriteTime.dwHighDateTime) << 32) + ndFileInfo.ftLastWriteTime.dwLowDateTime;
+	ndUnsigned64 fbxDate = (ndUnsigned64(fbxFileInfo.ftLastWriteTime.dwHighDateTime) << 32) + fbxFileInfo.ftLastWriteTime.dwLowDateTime;
+
+	if (fbxDate >= ndDate)
+	{
+		ndAnimationMeshLoader loader;
+		loader.ImportFbx(fbxPath);
+		loader.SaveMesh(ndPath);
+	}
 	return 0;
 }
 

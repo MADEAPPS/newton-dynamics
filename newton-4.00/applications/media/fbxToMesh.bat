@@ -9,5 +9,5 @@ for /R "%target_dir%" %%f in (*.fbx) do (
     fbxToMesh.exe %%f
     echo "processing %%f"
 )
-
+pause
 endlocal
