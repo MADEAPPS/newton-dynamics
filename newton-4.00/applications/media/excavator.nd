@@ -574,7 +574,7 @@
             </faces>
         </geometry>
         <ndMesh>
-            <name string="hidden_box04" />
+            <name string="box-hidden-box04" />
             <matrix>
                 <posit float3="0.0236583 0.000192624 -0.150227" />
                 <angles float3="6.66967e-12 -2.04147e-07 -4.29162e-07" />
@@ -836,7 +836,7 @@
                         </faces>
                     </geometry>
                     <ndMesh>
-                        <name string="hidden_convexhull_ b04" />
+                        <name string="bucket-hidden-convexhull_ b04" />
                         <matrix>
                             <posit float3="4.12529e-07 4.11487e-07 4.12529e-07" />
                             <angles float3="2.44886e-12 9.70629e-20 2.70722e-13" />
@@ -872,7 +872,7 @@
                         </geometry>
                     </ndMesh>
                     <ndMesh>
-                        <name string="hidden_convexhull_ b03" />
+                        <name string="bucket-hidden-convexhull_ b03" />
                         <matrix>
                             <posit float3="4.12529e-07 4.11487e-07 4.12529e-07" />
                             <angles float3="2.44886e-12 9.70629e-20 2.70722e-13" />
@@ -908,7 +908,7 @@
                         </geometry>
                     </ndMesh>
                     <ndMesh>
-                        <name string="hidden_convexhull_ b01" />
+                        <name string="buckect-hidden-convexhull_ b01" />
                         <matrix>
                             <posit float3="4.12529e-07 4.11487e-07 4.12529e-07" />
                             <angles float3="2.44886e-12 9.70629e-20 2.70722e-13" />
@@ -944,7 +944,7 @@
                         </geometry>
                     </ndMesh>
                     <ndMesh>
-                        <name string="hidden_convexhull_ b02" />
+                        <name string="buckect-hidden-convexhull_ b02" />
                         <matrix>
                             <posit float3="4.12529e-07 4.11487e-07 4.12529e-07" />
                             <angles float3="2.44886e-12 9.70629e-20 2.70722e-13" />
@@ -980,7 +980,7 @@
                         </geometry>
                     </ndMesh>
                     <ndMesh>
-                        <name string="hidden_convexhull_ b00" />
+                        <name string="bucket1-hidden-convexhull_ b00" />
                         <matrix>
                             <posit float3="0.641896 0.698228 0.773734" />
                             <angles float3="-4.59679e-06 3.2085e-06 -4.03951e-07" />
@@ -1016,7 +1016,7 @@
                         </geometry>
                     </ndMesh>
                     <ndMesh>
-                        <name string="hidden_convexhull_ b05" />
+                        <name string="bucket-hidden-convexhull_ b05" />
                         <matrix>
                             <posit float3="0.641896 -0.831059 0.773733" />
                             <angles float3="-4.11493e-06 -2.00532e-07 -3.61606e-07" />
@@ -1052,7 +1052,7 @@
                         </geometry>
                     </ndMesh>
                     <ndMesh>
-                        <name string="hidden_convexhull_ b06" />
+                        <name string="bucket-hidden-convexhull_ b06" />
                         <matrix>
                             <posit float3="0.630131 -0.01533 0.0378698" />
                             <angles float3="-90 59.2275 3.13319e-10" />
@@ -1125,7 +1125,7 @@
                     </ndMesh>
                 </ndMesh>
                 <ndMesh>
-                    <name string="hidden_convexhull001" />
+                    <name string="arm2-hidden-convexhull001" />
                     <matrix>
                         <posit float3="0.816715 -0.0296556 -0.0706725" />
                         <angles float3="-90 90 0" />
@@ -1251,7 +1251,7 @@
                             </faces>
                         </geometry>
                         <ndMesh>
-                            <name string="hidden_convexhull_barLinkage003" />
+                            <name string="bucket-hidden-convexhull_barLinkage003" />
                             <matrix>
                                 <posit float3="0 -2.42233e-08 0" />
                                 <angles float3="-5.76634e-13 4.07111e-13 -8.14222e-13" />
@@ -1298,7 +1298,7 @@
                         </ndMesh>
                     </ndMesh>
                     <ndMesh>
-                        <name string="hidden_convexhull_barLinkage003" />
+                        <name string="bucket-hidden-convexhull_barLinkage003" />
                         <matrix>
                             <posit float3="0 2.42233e-08 0" />
                             <angles float3="-1.56052e-12 50.3902 -1.2771e-12" />
@@ -1346,7 +1346,7 @@
                 </ndMesh>
             </ndMesh>
             <ndMesh>
-                <name string="hidden_convexhull002" />
+                <name string="arm1-hidden-convexhull002" />
                 <matrix>
                     <posit float3="2.71603 2.21489 -0.0128438" />
                     <angles float3="-180 2.20619e-06 -78.405" />
@@ -1382,7 +1382,7 @@
                 </geometry>
             </ndMesh>
             <ndMesh>
-                <name string="hidden_convexhull001" />
+                <name string="arm1-hidden-convexhull001" />
                 <matrix>
                     <posit float3="0.79286 0.960605 -0.0128439" />
                     <angles float3="-9.12635e-14 1.27273e-13 -35.6432" />
@@ -1419,7 +1419,7 @@
             </ndMesh>
         </ndMesh>
         <ndMesh>
-            <name string="hidden_Box001" />
+            <name string="box-hidden-Box001" />
             <matrix>
                 <posit float3="-0.342205 -1.52781 -0.00357383" />
                 <angles float3="-6.83019e-06 2.98524e-13 90" />
@@ -1455,7 +1455,7 @@
             </geometry>
         </ndMesh>
         <ndMesh>
-            <name string="hidden_Box002" />
+            <name string="cneter-hidden-Box002" />
             <matrix>
                 <posit float3="-1.03648 -1.52781 0.251658" />
                 <angles float3="-6.83019e-06 2.98524e-13 90" />
@@ -1491,7 +1491,7 @@
             </geometry>
         </ndMesh>
         <ndMesh>
-            <name string="hidden_Box003" />
+            <name string="box-hidden-Box003" />
             <matrix>
                 <posit float3="-0.0617827 1.00615 0.714656" />
                 <angles float3="-6.83019e-06 2.98524e-13 90" />
@@ -1527,7 +1527,7 @@
             </geometry>
         </ndMesh>
         <ndMesh>
-            <name string="hidden_convexhull" />
+            <name string="cabiin-hidden-convexhull" />
             <matrix>
                 <posit float3="-1.10749 1.63122 -0.957813" />
                 <angles float3="-6.83019e-06 2.98524e-13 90" />
@@ -1564,7 +1564,7 @@
         </ndMesh>
     </ndMesh>
     <ndMesh>
-        <name string="hidden_box00" />
+        <name string="box-hidden-box00" />
         <matrix>
             <posit float3="0.0384858 0.031019 -0.026994" />
             <angles float3="0 -0 0" />
@@ -1600,7 +1600,7 @@
         </geometry>
     </ndMesh>
     <ndMesh>
-        <name string="hidden_box002" />
+        <name string="box-hidden-box002" />
         <matrix>
             <posit float3="0.602049 -0.224517 1.973" />
             <angles float3="0 -0 0" />
@@ -1636,7 +1636,7 @@
         </geometry>
     </ndMesh>
     <ndMesh>
-        <name string="hidden_box001" />
+        <name string="box-hidden-box001" />
         <matrix>
             <posit float3="0.602049 -0.224517 -1.97778" />
             <angles float3="0 -0 0" />
@@ -1707,7 +1707,7 @@
             </faces>
         </geometry>
         <ndMesh>
-            <name string="hidden_box005" />
+            <name string="link-hidden-box005" />
             <matrix>
                 <posit float3="0.0246608 0.000192624 -0.129195" />
                 <angles float3="6.66967e-12 -2.04147e-07 -4.29162e-07" />

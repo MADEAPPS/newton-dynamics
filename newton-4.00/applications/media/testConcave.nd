@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <ndMesh>
-    <name string="convexApproximation" />
+    <name string="lshape-compound" />
     <matrix>
         <posit float3="-0.149798 0 0.184616" />
         <angles float3="0 -0 0" />
@@ -34,4 +34,76 @@
             <faceIndexCount count="20" intArray="3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3" />
         </faces>
     </geometry>
+    <ndMesh>
+        <name string="collision0-convexhull" />
+        <matrix>
+            <posit float3="0 0 0" />
+            <angles float3="0 -0 0" />
+        </matrix>
+        <type nodeType="collisionShape" target="0 0 0 " />
+        <geometry>
+            <vertices>
+                <positions count="8" float3Array="-0.511364 0.382682 -0.121954 -0.511364 -0.384364 -0.121954 -0.511364 -0.384364 -0.384364 -0.511364 0.382682 -0.384364 0.511364 0.382682 -0.384364 0.511364 -0.384364 -0.115225 0.511364 -0.384364 -0.384364 0.511364 0.382682 -0.115225" />
+                <indices count="24" intArray="0 1 5 7 0 3 2 1 0 7 4 3 1 2 6 5 2 3 4 6 4 7 5 6" />
+            </vertices>
+            <normal>
+                <normals count="6" float3Array="-1 0 0 -0.0065788 0 0.999978 0 -1 0 0 0 -1 0 1 0 1 0 0" />
+                <indices count="24" intArray="1 1 1 1 0 0 0 0 4 4 4 4 2 2 2 2 3 3 3 3 5 5 5 5" />
+            </normal>
+            <uvs>
+                <uv count="1" float3Array="0 0 0" />
+                <indices count="24" intArray="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" />
+            </uvs>
+            <material>
+                <name string="" />
+                <ambient float3="0.8 0.8 0.8" />
+                <diffuse float3="0.8 0.8 0.8" />
+                <specular float3="1 1 1" />
+                <reflection float3="0.5 0.5 0.5" />
+                <opacity float="1" />
+                <shiness float="250" />
+                <texture string="default.png" />
+            </material>
+            <faces>
+                <faceMaterial count="6" intArray="0 0 0 0 0 0" />
+                <faceIndexCount count="6" intArray="4 4 4 4 4 4" />
+            </faces>
+        </geometry>
+    </ndMesh>
+    <ndMesh>
+        <name string="collision1-convexhull" />
+        <matrix>
+            <posit float3="0 0 0" />
+            <angles float3="0 -0 0" />
+        </matrix>
+        <type nodeType="collisionShape" target="0 0 0 " />
+        <geometry>
+            <vertices>
+                <positions count="8" float3Array="0.511364 -0.384364 -0.115225 0.511364 -0.384364 0.382682 0.248954 -0.384364 0.382682 0.248954 -0.384364 -0.115225 0.248954 0.375954 0.382682 0.511364 0.382682 -0.115225 0.248954 0.382682 -0.115225 0.511364 0.382682 0.382682" />
+                <indices count="26" intArray="0 1 2 3 0 3 6 5 0 5 7 1 1 7 4 2 2 4 6 3 4 7 6 5 6 7" />
+            </vertices>
+            <normal>
+                <normals count="8" float3Array="-1 0 0 -0.0256304 0.99958 0.0135079 -0.0128165 0.999895 0.00675465 0 0 -1 0 1 0 0 0 1 0 -1 0 1 0 0" />
+                <indices count="26" intArray="6 6 6 6 3 3 3 3 7 7 7 7 5 5 5 5 0 0 0 0 1 2 2 4 2 2" />
+            </normal>
+            <uvs>
+                <uv count="1" float3Array="0 0 0" />
+                <indices count="26" intArray="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" />
+            </uvs>
+            <material>
+                <name string="" />
+                <ambient float3="0.8 0.8 0.8" />
+                <diffuse float3="0.8 0.8 0.8" />
+                <specular float3="1 1 1" />
+                <reflection float3="0.5 0.5 0.5" />
+                <opacity float="1" />
+                <shiness float="250" />
+                <texture string="default.png" />
+            </material>
+            <faces>
+                <faceMaterial count="7" intArray="0 0 0 0 0 0 0" />
+                <faceIndexCount count="7" intArray="4 4 4 4 4 3 3" />
+            </faces>
+        </geometry>
+    </ndMesh>
 </ndMesh>
