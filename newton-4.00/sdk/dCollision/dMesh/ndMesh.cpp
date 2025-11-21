@@ -629,7 +629,7 @@ ndSharedPtr<ndShapeInstance> ndMesh::CreateCollision()
 	{
 		shape = CreateCollisionConvex();
 	}
-	else if (strstr(name, "-collisiontree"))
+	else if (strstr(name, "-mesh"))
 	{
 		shape = CreateCollisionTree();
 	}

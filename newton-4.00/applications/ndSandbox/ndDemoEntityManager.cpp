@@ -434,7 +434,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	,m_currentPlugin(0)
 	,m_solverPasses(6)
 	,m_solverSubSteps(2)
-	,m_workerThreads(1)
+	,m_workerThreads(4)
 	,m_debugDisplayMode(0)
 	,m_collisionDisplayMode(0)
 	,m_fps(0.0f)
@@ -519,7 +519,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//m_autoSleepMode = false;
 	///m_hidePostUpdate = true;
 	//m_hideVisualMeshes = true;
-	m_solverMode = ndWorld::ndStandardSolver;
+	//m_solverMode = ndWorld::ndStandardSolver;
 	//m_solverMode = ndWorld::ndSimdSoaSolver;
 	//m_solverMode = ndWorld::ndSimdAvx2Solver;
 	//m_solverPasses = 4;

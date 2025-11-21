@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <ndMesh>
-    <name string="levelGeometry_collisionTree" />
+    <name string="levelGeometry-mesh" />
     <matrix>
         <posit float3="0 0 0" />
         <angles float3="0 -0 0" />
