@@ -753,8 +753,6 @@ ndModelArticulation::ndCenterOfMassDynamics ndModelArticulation::CalculateCentre
 		for (ndInt32 i = bodyArray.GetCount() - 1; i >= 0; --i)
 		{
 			const ndBodyKinematic* const body = bodyArray[i];
-			//const ndMatrix bodyMatrix(body->GetMatrix());
-
 			ndFloat32 mass = body->GetMassMatrix().m_w;
 
 			ndMatrix bodyInertia(body->CalculateInertiaMatrix());
