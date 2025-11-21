@@ -102,7 +102,7 @@ class ndUrdfFile : public ndClassAlloc
 
 	void ExportMakeNamesUnique(ndModelArticulation* const model);
 	Surrogate* ExportMakeSurrogate(ndModelArticulation* const model);
-	void ExportCollectTransforms(Surrogate* const surrogateRoot);
+	//void ExportCollectTransforms(Surrogate* const surrogateRoot);
 	void ExportOrigin(nd::TiXmlElement* const linkNode, const ndMatrix& pose);
 	void ExportLink(nd::TiXmlElement* const rootNode, const Surrogate* const link);
 	void ExportJoint(nd::TiXmlElement* const rootNode, const Surrogate* const link);
