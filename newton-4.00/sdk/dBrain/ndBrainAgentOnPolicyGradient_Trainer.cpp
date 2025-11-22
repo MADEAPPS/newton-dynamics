@@ -1360,6 +1360,8 @@ void ndBrainAgentOnPolicyGradient_Trainer::OptimizePolicy()
 		m_meanGradiendBuffer->BroadcastScaler(**m_advantageMinibatchBuffer);
 		m_sigmaGradiendBuffer->BroadcastScaler(**m_advantageMinibatchBuffer);
 
+m_sigmaGradiendBuffer->Scale(0.0);
+
 		ndCopyBufferCommandInfo policyGradient;
 		policyGradient.m_srcStrideInByte = ndInt32(m_parameters.m_numberOfActions * sizeof(ndReal));
 		policyGradient.m_srcOffsetInByte = 0;
