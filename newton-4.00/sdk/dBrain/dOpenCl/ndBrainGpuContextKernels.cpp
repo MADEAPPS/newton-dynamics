@@ -1560,11 +1560,11 @@ R""""(
         float value = inputData[groupId];    
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
-            outputData[dstOffset + i + itemId] = value;
+            outputData[dstOffset + i + itemId] *= value;
         }
         if (itemId < workGroupSizeReminder)
         {
-           outputData[dstOffset + modWorkGroupSize + itemId] = value;
+           outputData[dstOffset + modWorkGroupSize + itemId] *= value;
         }
     }
 
@@ -1591,6 +1591,18 @@ R""""(
         {
             float a = outputData[global_id];
             outputData[global_id] = (a >= scalar) ? a : scalar;
+        }
+    }
+
+    __kernel void brainReciprocal(
+        int numberOfElements,
+        __global float* outputData,
+        __global float* inputData)
+    {
+        int global_id = get_global_id(0);
+        if (global_id < numberOfElements)
+        {
+            outputData[global_id] = 1.0 / inputData[global_id];
         }
     }
 
@@ -1818,6 +1830,7 @@ void ndBrainGpuContext::CreateKerners()
     m_brainLessEqual = CreateKerner(program, "brainLessEqual");
     m_brainBlendScale = CreateKerner(program, "brainBlendScale");
     m_brainLessScalar = CreateKerner(program, "brainLessScalar");
+    m_brainReciprocal = CreateKerner(program, "brainReciprocal");
     m_brainBlendVector = CreateKerner(program, "brainBlendVector");
     m_brainGreaterEqual = CreateKerner(program, "brainGreaterEqual");
     m_brainAssigment = CreateKerner(program, "brainBufferAssigment");

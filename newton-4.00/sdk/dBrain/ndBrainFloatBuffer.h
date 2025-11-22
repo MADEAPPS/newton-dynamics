@@ -60,7 +60,6 @@ class ndBrainFloatBuffer : public ndBrainBuffer
 	void GreaterEqual(const ndBrainFloatBuffer& buffer);
 	void Blend(const ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& blendFactor);
 
-	
 	void SetOrdinal();
 	void ReductionSum();
 	void StandardNormalDistribution();

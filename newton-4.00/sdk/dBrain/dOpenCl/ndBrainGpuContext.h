@@ -170,6 +170,7 @@ class ndBrainGpuContext : public ndBrainContext
 	ndSharedPtr<ndBrainKernel> m_brainLessEqual;
 	ndSharedPtr<ndBrainKernel> m_brainMinScalar;
 	ndSharedPtr<ndBrainKernel> m_brainMaxScalar;
+	ndSharedPtr<ndBrainKernel> m_brainReciprocal;
 	ndSharedPtr<ndBrainKernel> m_brainBlendScale;
 	ndSharedPtr<ndBrainKernel> m_brainLessScalar;
 	ndSharedPtr<ndBrainKernel> m_brainBlendVector;

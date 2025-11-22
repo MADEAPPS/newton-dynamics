@@ -314,13 +314,13 @@ namespace ndCartpoleTrainer_ppo
 			,m_discountRewardFactor(0.99f)
 			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountRewardFactor))
 			,m_lastEpisode(0xfffffff)
-			,m_stopTraining(250000)
+			,m_stopTraining(1000000)
 			,m_modelIsTrained(false)
 		{
 			char name[256];
-			snprintf(name, sizeof(name), "%s-vpg.csv", CONTROLLER_NAME);
+			snprintf(name, sizeof(name), "%s-ppo.csv", CONTROLLER_NAME);
 			m_outFile = fopen(name, "wb");
-			fprintf(m_outFile, "vpg\n");
+			fprintf(m_outFile, "ppo\n");
 
 			// create a Soft Actor Critic traniing agent
 			ndBrainAgentOnPolicyGradient_Trainer::HyperParameters hyperParameters;
@@ -336,7 +336,6 @@ namespace ndCartpoleTrainer_ppo
 			// create a visual mesh and add to the scene.
 			ndWorld* const world = scene->GetWorld();
 			ndMatrix matrix(location);
-			//matrix.m_posit = FindFloor(*scene->GetWorld(), matrix.m_posit, 200.0f);
 			matrix.m_posit.m_y = ndFloat32 (0.1f);
 			loader.m_mesh->m_matrix = loader.m_mesh->m_matrix * matrix;
 

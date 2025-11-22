@@ -58,7 +58,7 @@ class ndBrainCpuContext : public ndBrainContext, public ndBrainThreadPool
 	virtual void Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat blend) override;
 	virtual void Select(ndBrainFloatBuffer& buffer, ndBrainFloatBuffer& mask, ndBrainFloat a, ndBrainFloat b) override;
 	virtual void ScaleAdd(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat scale) override;
-	
+
 	virtual void SetOrdinal(ndBrainFloatBuffer& buffer) override;
 	virtual void ReductionSum(ndBrainFloatBuffer& buffer) override;
 	virtual void StandardNormalDistribution(ndBrainFloatBuffer& uniformRandomVariable) override;

@@ -408,7 +408,7 @@ void ndBrainCpuContext::BroadcastScaler(ndBrainFloatBuffer& buffer, ndInt32 buff
 	for (ndInt32 i = 0; i < src.GetCount(); ++i)
 	{
 		ndBrainMemVector subVector(&dst[i * bufferStrideInFloats], bufferStrideInFloats);
-		subVector.Set(src[i]);
+		subVector.Scale(src[i]);
 	}
 }
 
