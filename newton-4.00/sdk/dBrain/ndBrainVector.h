@@ -41,6 +41,7 @@ class ndBrainVector: public ndArray<ndBrainFloat>
 	void Mul(const ndBrainVector& a);
 	void Min(const ndBrainVector& a);
 	void Max(const ndBrainVector& a);
+	void Reciprocal(const ndBrainVector& a);
 
 	void Less(ndBrainFloat test);
 	void Greater(ndBrainFloat test);

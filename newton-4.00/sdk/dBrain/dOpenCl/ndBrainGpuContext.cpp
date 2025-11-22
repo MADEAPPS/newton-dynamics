@@ -706,6 +706,11 @@ void ndBrainGpuContext::Set(ndBrainFloatBuffer& dstData, const ndBrainFloatBuffe
 	SubmitMathOperation(m_brainAssigment, &dstData, &srcData);
 }
 
+void ndBrainGpuContext::Reciprocal(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
+{
+	ndAssert(0);
+}
+
 void ndBrainGpuContext::CopyBuffer(ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
 {
 	SubmitMathOperation(m_brainAssigment, &dstData, &srcData);

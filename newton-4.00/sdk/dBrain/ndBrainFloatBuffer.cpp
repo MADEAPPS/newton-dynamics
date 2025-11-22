@@ -141,6 +141,11 @@ void ndBrainFloatBuffer::Set(const ndBrainFloatBuffer& buffer)
 	m_context->Set(*this, buffer);
 }
 
+void ndBrainFloatBuffer::Reciprocal(const ndBrainFloatBuffer& buffer)
+{
+	m_context->Reciprocal(*this, buffer);
+}
+
 void ndBrainFloatBuffer::SetOrdinal()
 {
 	m_context->SetOrdinal(*this);

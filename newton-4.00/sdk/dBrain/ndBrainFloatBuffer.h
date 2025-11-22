@@ -55,10 +55,12 @@ class ndBrainFloatBuffer : public ndBrainBuffer
 	void Mul(const ndBrainFloatBuffer& buffer);
 	void Min(const ndBrainFloatBuffer& buffer);
 	void Max(const ndBrainFloatBuffer& buffer);
+	void Reciprocal(const ndBrainFloatBuffer& buffer);
 	void LessEqual(const ndBrainFloatBuffer& buffer);
 	void GreaterEqual(const ndBrainFloatBuffer& buffer);
 	void Blend(const ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& blendFactor);
 
+	
 	void SetOrdinal();
 	void ReductionSum();
 	void StandardNormalDistribution();

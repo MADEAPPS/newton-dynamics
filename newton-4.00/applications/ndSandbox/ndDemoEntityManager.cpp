@@ -34,7 +34,7 @@
 //#define DEFAULT_SCENE	7		// static mesh collision
 //#define DEFAULT_SCENE	8		// heighfield collision
 //#define DEFAULT_SCENE	9		// static compound scene collision
-#define DEFAULT_SCENE	10		// basic convex approximate compound shapes
+//#define DEFAULT_SCENE	10		// basic convex approximate compound shapes
 //#define DEFAULT_SCENE	11		// basic model, a npd vehicle prop
 //#define DEFAULT_SCENE	12		// basic ragdoll
 //#define DEFAULT_SCENE	13		// complex model, implement a complex model with joints
@@ -46,7 +46,7 @@
 
 // These are the machine learning training demos
 //#define DEFAULT_SCENE			(MACHINE_LEARNING_BASE + 0)	// train cart pole using SAC agent
-//#define DEFAULT_SCENE			(MACHINE_LEARNING_BASE + 1)	// train cart pole using PPO agent
+#define DEFAULT_SCENE			(MACHINE_LEARNING_BASE + 1)	// train cart pole using PPO agent
 
 
 // legacy demos 

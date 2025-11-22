@@ -233,6 +233,18 @@ ndBrainFloat ndBrainVector::Dot(const ndBrainVector& a) const
 	return ndDotProduct(ndInt32(GetCount()), &(*this)[0], &a[0]);
 }
 
+void ndBrainVector::Reciprocal(const ndBrainVector& data)
+{
+	ndAssert(GetCount() < (1ll << 32));
+	ndAssert(GetCount() == data.GetCount());
+
+	for (ndInt64 i = GetCount() - 1; i >= 0; --i)
+	{
+		ndAssert(ndAbs((*this)[i]) > ndBrainFloat(1.e-6f));
+		(*this)[i] = ndBrainFloat(1.0f) / data[i];
+	}
+}
+
 void ndBrainVector::Blend(const ndBrainVector& target, ndBrainFloat blend)
 {
 	ndAssert(GetCount() < (1ll << 32));

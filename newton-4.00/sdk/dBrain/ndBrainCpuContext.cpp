@@ -262,6 +262,12 @@ void ndBrainCpuContext::Set(ndBrainFloatBuffer& dstData, const ndBrainFloatBuffe
 	dst.Set(src);
 }
 
+void ndBrainCpuContext::Reciprocal(ndBrainFloatBuffer& dstData, const ndBrainFloatBuffer& srcData)
+{
+	ndBrainVector& dst = **dstData.m_buffer;
+	dst.Reciprocal(**srcData.m_buffer);
+}
+
 void ndBrainCpuContext::SetOrdinal(ndBrainFloatBuffer& dstData)
 {
 	ndBrainVector& dst = **dstData.m_buffer;

@@ -1014,7 +1014,6 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainPolicy()
 	policyCopyGradients.m_strideInByte = ndInt32(m_policyTrainer->GetBrain()->GetOutputSize() * sizeof(ndReal));
 	policyMinibatchOutputBuffer->CopyBuffer(policyCopyGradients, m_parameters.m_miniBatchSize, *criticMinibatchInputGradientBuffer);
 	ndBrainFloatBuffer* const policyMinibatchOutputGradientBuffer = m_policyTrainer->GetOuputGradientBuffer();
-	//policyMinibatchOutputGradientBuffer->CalculateEntropyRegularizationGradient(**m_minibatchUniformRandomDistribution, **m_minibatchSigma, m_entropyTemperature, ndInt32(meanOutputSizeInBytes / sizeof(ndReal)));
 	policyMinibatchOutputGradientBuffer->CalculateEntropyRegularizationGradient(**m_minibatchGaussianDistribution, **m_minibatchSigma, m_entropyTemperature, ndInt32(meanOutputSizeInBytes / sizeof(ndReal)));
 
 	// subtract the qValue gradient from the entropy gradient.
@@ -1135,11 +1134,6 @@ void ndBrainAgentOffPolicyGradient_Trainer::OptimizeStep()
 
 		// linearly anneal entropy
 		m_entropyTemperature = m_parameters.m_entropyMinTemperature + param * (m_parameters.m_entropyMaxTemperature - m_parameters.m_entropyMinTemperature);
-
-		//// linearly anneal lear rate;
-		//ndBrainFloat maxRate = m_parameters.m_learnRate;
-		//ndBrainFloat minRate = ndMax(maxRate * ndBrainFloat(0.1f), ndBrainFloat(1.0e-5f));
-		//m_learnRate = minRate + param * (maxRate - minRate);
 
 		Optimize();
 		m_frameCount++;

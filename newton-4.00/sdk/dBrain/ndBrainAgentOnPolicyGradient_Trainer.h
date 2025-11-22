@@ -27,12 +27,13 @@
 #include "ndBrain.h"
 #include "ndBrainAgent.h"
 
-// this is an implementation of the different versions of the  
-// on policy gradient for continue control re enforcement learning.  
-// pseudo code samples of variance of the same algorithm can be found at:
-// https://spinningup.openai.com/en/latest/algorithms/vpg.html
+// This is an implementation the Proximal Policy optimization as decrived in.
+// https://arxiv.org/abs/1707.06347
+// The algorithm is stochastic, and use the generalized advantage statimation.
+// it optinally supports entropy regularization to scale the loss 
+// of both actor and critic networks. 
+// pseudo code implementation is found here
 // https://spinningup.openai.com/en/latest/algorithms/ppo.html
-
 
 #define ND_ON_POLICY_MOVING_AVERAGE_SCORE	8
 
@@ -207,6 +208,14 @@ class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 	std::uniform_real_distribution<ndFloat32> m_uniformDistribution;
 	ndList<ndSharedPtr<ndBrainAgentOnPolicyGradient_Agent>> m_agents;
 
+	ndSharedPtr<ndBrainFloatBuffer> m_meanBuffer;
+	ndSharedPtr<ndBrainFloatBuffer> m_sigmaBuffer;
+	ndSharedPtr<ndBrainFloatBuffer> m_invSigmaBuffer;
+	ndSharedPtr<ndBrainFloatBuffer> m_invSigma2Buffer;
+	ndSharedPtr<ndBrainFloatBuffer> m_actionMeanBuffer;
+	ndSharedPtr<ndBrainFloatBuffer> m_meanGradiendBuffer;
+	ndSharedPtr<ndBrainFloatBuffer> m_sigmaGradiendBuffer;
+
 	ndSharedPtr<ndBrainFloatBuffer> m_trainingBuffer;
 	ndSharedPtr<ndBrainFloatBuffer> m_advantageBuffer;
 	ndSharedPtr<ndBrainIntegerBuffer> m_randomShuffleBuffer;
@@ -218,7 +227,6 @@ class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 	ndBrainVector m_lastPolicy;
 	ndBrainVector m_scratchBuffer;
 	ndArray<ndInt32> m_shuffleBuffer;
-	//ndArray<ndInt32> m_miniBatchIndices;
 	ndBrainAgentOnPolicyGradient_Agent::ndTrajectory m_trajectoryAccumulator;
 	ndMovingAverage<ND_ON_POLICY_MOVING_AVERAGE_SCORE> m_averageExpectedRewards;
 	ndMovingAverage<ND_ON_POLICY_MOVING_AVERAGE_SCORE> m_averageFramesPerEpisodes;
