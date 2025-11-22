@@ -213,9 +213,10 @@ class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 	ndSharedPtr<ndBrainFloatBuffer> m_invSigmaBuffer;
 	ndSharedPtr<ndBrainFloatBuffer> m_invSigma2Buffer;
 	ndSharedPtr<ndBrainFloatBuffer> m_meanDeviationBuffer;
-
 	ndSharedPtr<ndBrainFloatBuffer> m_meanGradiendBuffer;
 	ndSharedPtr<ndBrainFloatBuffer> m_sigmaGradiendBuffer;
+
+	ndSharedPtr<ndBrainFloatBuffer> m_criticStateValue;
 
 	ndSharedPtr<ndBrainFloatBuffer> m_trainingBuffer;
 	ndSharedPtr<ndBrainFloatBuffer> m_advantageBuffer;
