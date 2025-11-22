@@ -301,6 +301,15 @@ void ndBrainGpuContext::Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuff
 	dst.Blend(src, blend);
 }
 
+void ndBrainGpuContext::Reciprocal(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
+{
+	ndAssert(buffer.SizeInBytes() == srcBuffer.SizeInBytes());
+	ndInt32 elements = ndInt32(buffer.SizeInBytes() / sizeof(ndBrainFloat));
+	ndBrainMemVector dst((ndBrainFloat*)buffer.GetCpuPtr(), elements);
+	const ndBrainMemVector src((ndBrainFloat*)srcBuffer.GetCpuPtr(), elements);
+	dst.Reciprocal(src);
+}
+
 void ndBrainGpuContext::Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, const ndBrainFloatBuffer& blendBuffer)
 {
 	ndAssert(buffer.SizeInBytes() == srcBuffer.SizeInBytes());

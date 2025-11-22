@@ -61,6 +61,8 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 	virtual void Greater(ndBrainFloatBuffer& buffer, ndBrainFloat test) override;
 	virtual void LessEqual(ndBrainFloatBuffer& buffer, ndBrainFloat test) override;
 	virtual void GreaterEqual(ndBrainFloatBuffer& buffer, ndBrainFloat test) override;
+
+	virtual void Reciprocal(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
 	virtual void Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat blend) override;
 	virtual void Select(ndBrainFloatBuffer& buffer, ndBrainFloatBuffer& mask, ndBrainFloat a, ndBrainFloat b) override;
 	virtual void ScaleAdd(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat scale) override;
