@@ -72,10 +72,7 @@ ndBrainAgentOnPolicyGradient_Trainer::HyperParameters::HyperParameters()
 	m_replayBufferStartOptimizeSize = 1024 * 64;
 	m_maxNumberOfTrainingSteps = 1000000;
 
-//m_useGpuBackend = false;
-//m_numberOfUpdates = 1;
-//m_batchTrajectoryCount = 10;
-//m_replayBufferStartOptimizeSize = 1024 * 2;
+m_useGpuBackend = false;
 }
 
 ndBrainAgentOnPolicyGradient_Agent::ndTrajectory::ndTrajectory()
@@ -256,8 +253,6 @@ ndBrainAgentOnPolicyGradient_Agent::ndBrainAgentOnPolicyGradient_Agent(ndBrainAg
 	,m_owner(master)
 	,m_isDead(false)
 {
-	//const ndBrain* const brain = *master->m_policyTrainer->GetBrain();
-	//m_trajectory.Init(brain->GetOutputSize(), master->m_parameters.m_numberOfObservations);
 	m_trajectory.Init(master->m_parameters.m_numberOfActions, master->m_parameters.m_numberOfObservations);
 
 	ndUnsigned32 agentSeed = m_owner->m_randomGenerator();
@@ -1156,19 +1151,19 @@ void ndBrainAgentOnPolicyGradient_Trainer::OptimizeCritic()
 	shuffleBufferInfo.m_dstStrideInByte = shuffleBufferInfo.m_srcStrideInByte;
 	shuffleBufferInfo.m_strideInByte = shuffleBufferInfo.m_srcStrideInByte;
 
+	ndCopyBufferCommandInfo rewardInfo;
+	rewardInfo.m_srcOffsetInByte = ndInt32(m_trajectoryAccumulator.GetRewardOffset() * sizeof(ndReal));
+	rewardInfo.m_srcStrideInByte = ndInt32(m_trajectoryAccumulator.GetStride() * sizeof(ndReal));
+	rewardInfo.m_dstOffsetInByte = 0;
+	rewardInfo.m_dstStrideInByte = ndInt32(sizeof(ndReal));
+	rewardInfo.m_strideInByte = rewardInfo.m_dstStrideInByte;
+
 	ndCopyBufferCommandInfo terminalInfo;
 	terminalInfo.m_srcOffsetInByte = ndInt32(m_trajectoryAccumulator.GetTerminalOffset() * sizeof(ndReal));
 	terminalInfo.m_srcStrideInByte = ndInt32(m_trajectoryAccumulator.GetStride() * sizeof(ndReal));
 	terminalInfo.m_dstOffsetInByte = 0;
 	terminalInfo.m_dstStrideInByte = ndInt32(sizeof(ndReal));
 	terminalInfo.m_strideInByte = terminalInfo.m_dstStrideInByte;
-
-	ndCopyBufferCommandInfo rewardInfo;
-	rewardInfo.m_srcOffsetInByte = ndInt32(m_trajectoryAccumulator.GetRewardOffset() * sizeof(ndReal));
-	terminalInfo.m_srcStrideInByte = ndInt32(m_trajectoryAccumulator.GetStride() * sizeof(ndReal));
-	rewardInfo.m_dstOffsetInByte = 0;
-	rewardInfo.m_dstStrideInByte = ndInt32(sizeof(ndReal));
-	rewardInfo.m_strideInByte = rewardInfo.m_dstStrideInByte;
 
 	ndCopyBufferCommandInfo observationInfo;
 	observationInfo.m_srcOffsetInByte = ndInt32(m_trajectoryAccumulator.GetObsevationOffset() * sizeof(ndReal)); 
