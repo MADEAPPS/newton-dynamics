@@ -40,6 +40,7 @@ endif()
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 include_directories(.)
+include_directories(demos)
 include_directories(toolbox)
 
 include_directories(../../sdk/dCore)

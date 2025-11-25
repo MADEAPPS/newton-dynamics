@@ -77,7 +77,7 @@ namespace ndCartpoleTrainer_ppo
 	static void CreateArticulatedModel(
 		ndDemoEntityManager* const scene,
 		ndModelArticulation* const model,
-		ndSharedPtr<ndMesh> mesh, 
+		ndSharedPtr<ndMesh> mesh,
 		ndSharedPtr<ndRenderSceneNode> visualMesh)
 	{
 		auto CreateRigidBody = [scene](ndSharedPtr<ndMesh>& mesh, ndSharedPtr<ndRenderSceneNode>& visualMesh, ndFloat32 mass, ndBodyDynamic* const parentBody)
@@ -103,7 +103,7 @@ namespace ndCartpoleTrainer_ppo
 		ndSharedPtr<ndBody> pole(CreateRigidBody(poleMesh, poleEntity, POLE_MASS, cart->GetAsBodyDynamic()));
 
 		const ndMatrix poleMatrix(ndYawMatrix(ndFloat32(90.0f) * ndDegreeToRad) * cart->GetMatrix());
-		ndSharedPtr<ndJointBilateralConstraint> poleHinge (new ndJointHinge(poleMatrix, pole->GetAsBodyKinematic(), cart->GetAsBodyKinematic()));
+		ndSharedPtr<ndJointBilateralConstraint> poleHinge(new ndJointHinge(poleMatrix, pole->GetAsBodyKinematic(), cart->GetAsBodyKinematic()));
 		model->AddLimb(modelRootNode, pole, poleHinge);
 
 		ndWorld* const world = scene->GetWorld();
@@ -163,7 +163,6 @@ namespace ndCartpoleTrainer_ppo
 			ndSharedPtr<ndMesh> mesh, ndSharedPtr<ndRenderSceneNode> visualMesh)
 		{
 			m_controllerTrainer = ndSharedPtr<ndBrainAgentOnPolicyGradient_Agent>(new ndAgent(master, this));
-			//master->SetAgent(m_controllerTrainer);
 			master->AddAgent(m_controllerTrainer);
 
 			ndModelArticulation* const articulation = GetModel()->GetAsModelArticulation();
@@ -242,6 +241,7 @@ namespace ndCartpoleTrainer_ppo
 			return fail;
 		}
 
+		#pragma optimize( "", off )
 		ndBrainFloat CalculateReward()
 		{
 			if (IsTerminal())
@@ -262,7 +262,7 @@ namespace ndCartpoleTrainer_ppo
 
 			// add a penalty for high speed. 
 			// this is the equivalent of adding drag to the slider joint 
-			ndFloat32 reward = ndFloat32(0.6f) * angleReward + ndFloat32(0.4f) * omegaReward - ndFloat32(0.2f) * speedPenalty;
+			ndFloat32 reward = ndFloat32(0.6f) * angleReward + ndFloat32(0.4f) * omegaReward - ndFloat32(0.25f) * speedPenalty;
 			return ndBrainFloat(reward);
 		}
 
@@ -274,7 +274,7 @@ namespace ndCartpoleTrainer_ppo
 			ndJointSlider* const slider = (ndJointSlider*)*m_slider;
 			const ndMatrix matrix(slider->CalculateGlobalMatrix0());
 
-			ndVector force(m_cart->GetAsBodyDynamic()->GetForce() + matrix.m_front.Scale (pushForce));
+			ndVector force(m_cart->GetAsBodyDynamic()->GetForce() + matrix.m_front.Scale(pushForce));
 			m_cart->GetAsBodyDynamic()->SetForce(force);
 		}
 
@@ -314,7 +314,7 @@ namespace ndCartpoleTrainer_ppo
 			,m_discountRewardFactor(0.99f)
 			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountRewardFactor))
 			,m_lastEpisode(0xfffffff)
-			,m_stopTraining(1000000)
+			,m_stopTraining(100 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			char name[256];
@@ -324,10 +324,14 @@ namespace ndCartpoleTrainer_ppo
 
 			// create a Soft Actor Critic traniing agent
 			ndBrainAgentOnPolicyGradient_Trainer::HyperParameters hyperParameters;
+
+			hyperParameters.m_batchTrajectoryCount = 100;
 			hyperParameters.m_numberOfActions = m_actionsSize;
 			hyperParameters.m_numberOfObservations = m_observationsSize;
+			hyperParameters.m_maxTrajectorySteps = ND_TRAJECTORY_STEPS;
+			hyperParameters.m_discountRewardFactor = ndReal(m_discountRewardFactor);
+
 			m_master = ndSharedPtr<ndBrainAgentOnPolicyGradient_Trainer>(new ndBrainAgentOnPolicyGradient_Trainer(hyperParameters));
-			
 			m_bestActor = ndSharedPtr< ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
 
 			snprintf(name, sizeof(name), "%s.dnn", CONTROLLER_NAME);
@@ -336,7 +340,7 @@ namespace ndCartpoleTrainer_ppo
 			// create a visual mesh and add to the scene.
 			ndWorld* const world = scene->GetWorld();
 			ndMatrix matrix(location);
-			matrix.m_posit.m_y = ndFloat32 (0.1f);
+			matrix.m_posit.m_y = ndFloat32(0.1f);
 			loader.m_mesh->m_matrix = loader.m_mesh->m_matrix * matrix;
 
 			// create an articulated model
@@ -455,6 +459,7 @@ namespace ndCartpoleTrainer_ppo
 		bool m_modelIsTrained;
 	};
 }
+
 using namespace ndCartpoleTrainer_ppo;
 
 
@@ -475,13 +480,12 @@ void ndCartpolePpoTraining(ndDemoEntityManager* const scene)
 	ndContactCallback* const callback = (ndContactCallback*)scene->GetWorld()->GetContactNotify();
 	callback->RegisterMaterial(material, ndDemoContactCallback::m_modelPart, ndDemoContactCallback::m_modelPart);
 
-
 	ndSetRandSeed(42);
-	ndSharedPtr<ndDemoEntityManager::OnPostUpdate>trainer (new TrainingUpdata(scene, matrix, loader));
+	ndSharedPtr<ndDemoEntityManager::OnPostUpdate>trainer(new TrainingUpdata(scene, matrix, loader));
 	scene->RegisterPostUpdate(trainer);
 
-	// supress v sync refress rate
-	//scene->SetAcceleratedUpdate();
+	// supress v sync refresh rate
+	scene->SetAcceleratedUpdate();
 	
 	matrix.m_posit.m_x -= 0.0f;
 	matrix.m_posit.m_y += 0.5f;
@@ -489,4 +493,3 @@ void ndCartpolePpoTraining(ndDemoEntityManager* const scene)
 	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
-
