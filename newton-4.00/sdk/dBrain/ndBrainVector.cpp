@@ -34,6 +34,14 @@ void ndBrainVector::Set(const ndBrainVector& data)
 	ndMemCpy(&(*this)[0], &data[0], GetCount());
 }
 
+void ndBrainVector::Exp(const ndBrainVector& data)
+{
+	for (ndInt64 i = GetCount() - 1; i >= 0; --i)
+	{
+		(*this)[i] = ndExp(data[i]);
+	}
+}
+
 void ndBrainVector::SetOrdinal()
 {
 	for (ndInt64 i = 0; i < GetCount(); ++i)
@@ -113,6 +121,14 @@ void ndBrainVector::FlushToZero()
 		ndBrainFloat val = data[i];
 		data[i] = (val > max.m_f[0]) ? val : ((val < min.m_f[0]) ? val : ndBrainFloat(0.0f));
 	}
+
+#ifdef _DEBUG
+	for (ndInt32 i = ndInt32(GetCount() - 1); i >= 0; --i)
+	{
+		ndBrainFloat val = (*this)[i];
+		ndAssert(ndAbs(val) < 1.0e3f);
+	}
+#endif
 }
 
 void ndBrainVector::Min(const ndBrainVector& a)
@@ -167,7 +183,6 @@ void ndBrainVector::GreaterEqual(const ndBrainVector& a)
 	ndGreaterEqualMask(ndInt32(GetCount()), &(*this)[0], &a[0]);
 }
 
-//void ndBrainVector::Select(const ndBrainVector& mask, ndFloat32 a, ndFloat32 b)
 void ndBrainVector::Blend(const ndBrainVector& blendMask, ndBrainFloat a, ndBrainFloat b)
 {
 	ndAssert(GetCount() < (1ll << 32));
@@ -402,7 +417,6 @@ ndBrainFloat ndBrainVector::CalculateEntropyRegularization(const ndBrainVector& 
 {
 	ndAssert(GetCount() == varianceBuffer.GetCount());
 	ndBrainFloat entropy = -ndBrainFloat(0.5f) * ndBrainFloat (GetCount()) * ndBrainFloat(ndLog(ndBrainFloat(2.0f) * ndPi));
-
 	for (ndInt32 i = 0; i < GetCount(); ++i)
 	{
 		ndBrainFloat sample = (*this)[i];

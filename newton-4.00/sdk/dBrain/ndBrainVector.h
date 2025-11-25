@@ -35,6 +35,7 @@ class ndBrainVector: public ndArray<ndBrainFloat>
 
 	void Set(ndBrainFloat value);
 	void Set(const ndBrainVector& data);
+	void Exp(const ndBrainVector& data);
 
 	void Add(const ndBrainVector& a);
 	void Sub(const ndBrainVector& a);
