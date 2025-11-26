@@ -416,14 +416,16 @@ void ndBrainVector::SoftMaxNormalize()
 ndBrainFloat ndBrainVector::CalculateEntropyRegularization(const ndBrainVector& varianceBuffer, ndBrainFloat regularization) const
 {
 	ndAssert(GetCount() == varianceBuffer.GetCount());
-	ndBrainFloat entropy = -ndBrainFloat(0.5f) * ndBrainFloat (GetCount()) * ndBrainFloat(ndLog(ndBrainFloat(2.0f) * ndPi));
+	ndBrainFloat entropy = ndBrainFloat(0.5f) * ndBrainFloat (GetCount()) * ndBrainFloat(ndLog(ndBrainFloat(2.0f) * ndPi));
 	for (ndInt32 i = 0; i < GetCount(); ++i)
 	{
 		ndBrainFloat sample = (*this)[i];
 		ndBrainFloat sigma = varianceBuffer[i];
-		entropy -= (ndBrainFloat(0.5f) * sample * sample / (sigma * sigma) + ndBrainFloat(ndLog(sigma)));
+		ndBrainFloat z = sample / sigma;
+		entropy += (ndBrainFloat(0.5f) * z * z + ndBrainFloat(ndLog(sigma)));
 	}
-	return entropy * regularization;
+	//ndAssert(entropy >= ndBrainFloat(0.0f));
+	return -entropy * regularization;
 }
 
 void ndBrainVector::CalculateEntropyRegularizationGradient(const ndBrainVector& meanSampleBuffer, const ndBrainVector& varianceBuffer, ndBrainFloat regularization)
