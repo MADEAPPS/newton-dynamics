@@ -34,12 +34,18 @@
 #include "ndBrainUniformBuffer.h"
 #include "ndBrainAgentPolicyGradientActivation.h"
 
-ndBrainAgentPolicyGradientActivation::ndBrainAgentPolicyGradientActivation(ndInt32 neurons, ndBrainFloat minLogVariance, ndBrainFloat maxLogVariance)
+ndBrainAgentPolicyGradientActivation::ndBrainAgentPolicyGradientActivation(ndInt32 neurons, ndBrainFloat minVariance, ndBrainFloat maxVariance)
 	:ndBrainLayerActivation(neurons)
 	,m_logVarianceBuffer(nullptr)
 {
+	ndBrainFloat minLogVariance = ndLog(minVariance);
+	ndBrainFloat maxLogVariance = ndLog(maxVariance);
 	m_logVarianceBias = (maxLogVariance + minLogVariance) * ndBrainFloat(0.5f);
 	m_logVarianceSlope = (maxLogVariance - minLogVariance) * ndBrainFloat(0.5f);
+
+	//ndBrainFloat xxx0 = ndExp(m_logVarianceBias + m_logVarianceSlope * -1.0f);
+	//ndBrainFloat xxx1 = ndExp(m_logVarianceBias + m_logVarianceSlope * 1.0f);
+	//xxx1 *= 1;
 }
 
 ndBrainAgentPolicyGradientActivation::ndBrainAgentPolicyGradientActivation(const ndBrainAgentPolicyGradientActivation& src)
@@ -106,9 +112,9 @@ void ndBrainAgentPolicyGradientActivation::MakePrediction(const ndBrainVector& i
 	{
 		ndBrainFloat value = ndClamp(input[i], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
 		ndBrainFloat out0 = ndBrainFloat(ndTanh(value));
-		ndBrainFloat out1 = m_logVarianceBias + out0 * m_logVarianceSlope;
-		ndBrainFloat out2 = ndBrainFloat(ndExp(out1));
-		output[i] = (i < size / 2) ? out0 : out2;
+		ndBrainFloat x = m_logVarianceBias + m_logVarianceSlope * out0;
+		ndBrainFloat out1 = ndBrainFloat(ndExp(x));
+		output[i] = (i < size / 2) ? out0 : out1;
 	}
 }
 
@@ -157,9 +163,9 @@ void ndBrainAgentPolicyGradientActivation::FeedForward(const ndBrainLayerFeedFor
 	{
 		ndBrainFloat value = ndClamp(input[i], ndBrainFloat(-30.0f), ndBrainFloat(30.0f));
 		ndBrainFloat out0 = ndBrainFloat(ndTanh(value));
-		ndBrainFloat out1 = m_logVarianceBias + out0 * m_logVarianceSlope;
-		ndBrainFloat out2 = ndBrainFloat(ndExp(out1));
-		output[i] = (i < size / 2) ? out0 : out2;
+		ndBrainFloat x = m_logVarianceBias + m_logVarianceSlope * out0;
+		ndBrainFloat out1 = ndBrainFloat(ndExp(x));
+		output[i] = (i < size / 2) ? out0 : out1;
 	}
 }
 

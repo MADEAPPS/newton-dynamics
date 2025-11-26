@@ -37,7 +37,7 @@
 class ndBrainAgentPolicyGradientActivation : public ndBrainLayerActivation
 {
 	public:
-	ndBrainAgentPolicyGradientActivation(ndInt32 neurons, ndBrainFloat minLogVariance, ndBrainFloat maxLogVariance);
+	ndBrainAgentPolicyGradientActivation(ndInt32 neurons, ndBrainFloat minVariance, ndBrainFloat maxVariance);
 	ndBrainAgentPolicyGradientActivation(const ndBrainAgentPolicyGradientActivation& src);
 
 	virtual bool HasGpuSupport() const override;
