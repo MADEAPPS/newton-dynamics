@@ -38,6 +38,9 @@ ndBrainAgentPolicyGradientActivation::ndBrainAgentPolicyGradientActivation(ndInt
 	:ndBrainLayerActivation(neurons)
 	,m_logVarianceBuffer(nullptr)
 {
+	ndAssert(minVariance > 0.0f);
+	ndAssert(maxVariance > minVariance);
+
 	ndBrainFloat minLogVariance = ndLog(minVariance);
 	ndBrainFloat maxLogVariance = ndLog(maxVariance);
 	m_logVarianceBias = (maxLogVariance + minLogVariance) * ndBrainFloat(0.5f);
