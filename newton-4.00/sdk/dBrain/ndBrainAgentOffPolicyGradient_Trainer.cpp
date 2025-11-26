@@ -797,10 +797,15 @@ void ndBrainAgentOffPolicyGradient_Trainer::CalculateExpectedRewards()
 	m_minibatchMean->Min(ndBrainFloat(1.0f));
 	m_minibatchMean->Max(ndBrainFloat(-1.0f));
 
-//ndBrainVector xxx0;
-//ndBrainVector xxx1;
-//m_minibatchSigma->VectorFromDevice(xxx0);
-//policyMinibatchOutputBuffer->VectorFromDevice(xxx1);
+static int xxxxx = 1;
+if (xxxxx)
+{
+	ndBrainVector xxx0;
+	ndBrainVector xxx1;
+	m_minibatchSigma->VectorFromDevice(xxx0);
+	policyMinibatchOutputBuffer->VectorFromDevice(xxx1);
+	policyMinibatchOutputBuffer->VectorFromDevice(xxx1);
+}
 
 	const ndInt32 criticInputSize = policy->GetBrain()->GetInputSize() + policy->GetBrain()->GetOutputSize();
 	for (ndInt32 i = 0; i < ndInt32(sizeof(m_criticTrainer) / sizeof(m_criticTrainer[0])); ++i)
