@@ -137,24 +137,6 @@ void ndBrainGpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
 		shader.m_parameters.PushBack(desc[i]);
 	}
 
-#if 0
-	ndAtomic<ndInt32> iterator(0);
-	auto ExecuteCommand = ndMakeObject::ndFunction([this, &iterator, &command](ndInt32, ndInt32)
-	{
-		ndBrainBufferCommandDesc& desc = command->GetDescriptor();
-
-		ndBrainKernel& shader = **desc.m_kernel;
-		ndInt32 workGroupdSize = ndInt32(desc.m_workGroupSize);
-		ndInt32 numberOfWorkGrouds = ndInt32(desc.m_miniBatchSize);
-
-		for (ndInt32 i = iterator++; i < numberOfWorkGrouds; i = iterator++)
-		{
-			shader.Execute(i, workGroupdSize);
-		}
-	});
-	ParallelExecute(ExecuteCommand);
-#else
-
 	auto ExecuteCommand = ndMakeObject::ndFunction([this, &command](ndInt32 groupId, ndInt32)
 	{
 		ndBrainBufferCommandDesc& desc = command->GetDescriptor();
@@ -162,8 +144,7 @@ void ndBrainGpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
 		ndInt32 workGroupdSize = ndInt32(desc.m_workGroupSize);
 		shader.Execute(groupId, workGroupdSize);
 	});
-	ParallelExecuteNew(ExecuteCommand, desc.m_miniBatchSize);
-#endif
+	ParallelExecute(ExecuteCommand, desc.m_miniBatchSize);
 }
 
 void ndBrainGpuContext::BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector)
@@ -199,6 +180,15 @@ void ndBrainGpuContext::Set(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer
 	ndBrainMemVector dst((ndBrainFloat*)buffer.GetCpuPtr(), elements);
 	const ndBrainMemVector src((ndBrainFloat*)srcBuffer.GetCpuPtr(), elements);
 	dst.Set(src);
+}
+
+void ndBrainGpuContext::Exp(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
+{
+	ndAssert(buffer.SizeInBytes() == srcBuffer.SizeInBytes());
+	ndInt32 elements = ndInt32(buffer.SizeInBytes() / sizeof(ndBrainFloat));
+	ndBrainMemVector dst((ndBrainFloat*)buffer.GetCpuPtr(), elements);
+	const ndBrainMemVector src((ndBrainFloat*)srcBuffer.GetCpuPtr(), elements);
+	dst.Exp(src);
 }
 
 void ndBrainGpuContext::Min(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
@@ -370,7 +360,7 @@ void ndBrainGpuContext::BroadcastScaler(ndBrainFloatBuffer& buffer, ndInt32 buff
 	for (ndInt32 i = 0; i < src.GetCount(); ++i)
 	{
 		ndBrainMemVector subVector(&dst[i * bufferStrideInFloats], bufferStrideInFloats);
-		subVector.Scale(src[i]);
+		subVector.Set(src[i]);
 	}
 }
 
