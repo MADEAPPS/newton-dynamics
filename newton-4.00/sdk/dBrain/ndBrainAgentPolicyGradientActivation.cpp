@@ -78,12 +78,12 @@ ndBrainLayer* ndBrainAgentPolicyGradientActivation::Load(const ndBrainLoad* cons
 	ndInt32 inputs = loadSave->ReadInt();
 
 	loadSave->ReadString(buffer);
-	ndBrainFloat minLogVariance = ndBrainFloat(loadSave->ReadFloat());
+	ndBrainFloat minSigma2 = ndBrainFloat(loadSave->ReadFloat());
 
 	loadSave->ReadString(buffer);
-	ndBrainFloat maxLogVariance = ndBrainFloat(loadSave->ReadFloat());
+	ndBrainFloat maxSigma2 = ndBrainFloat(loadSave->ReadFloat());
 
-	ndBrainAgentPolicyGradientActivation* const layer = new ndBrainAgentPolicyGradientActivation(inputs, minLogVariance, maxLogVariance);
+	ndBrainAgentPolicyGradientActivation* const layer = new ndBrainAgentPolicyGradientActivation(inputs, ndSqrt(minSigma2), ndSqrt(maxSigma2));
 	loadSave->ReadString(buffer);
 	return layer;
 }
@@ -92,14 +92,14 @@ void ndBrainAgentPolicyGradientActivation::Save(const ndBrainSave* const loadSav
 {
 	ndBrainLayerActivation::Save(loadSave);
 
-	ndBrainFloat maxLogVariance = m_logVarianceSlope + m_logVarianceBias;
-	ndBrainFloat minLogVariance = m_logVarianceBias - m_logVarianceSlope;
+	ndBrainFloat minSigma = ndExp(m_logVarianceBias - m_logVarianceSlope);
+	ndBrainFloat maxSigma = ndExp(m_logVarianceSlope + m_logVarianceBias);
 
 	char buffer[1024];
-	snprintf(buffer, sizeof(buffer), "\tminLogVariance %f\n", minLogVariance);
+	snprintf(buffer, sizeof(buffer), "\tminSigma2 %f\n", minSigma * minSigma);
 	loadSave->WriteData(buffer);
 
-	snprintf(buffer, sizeof(buffer), "\tmaxLogVariance %f\n", maxLogVariance);
+	snprintf(buffer, sizeof(buffer), "\tmaxSigma2 %f\n", maxSigma * maxSigma);
 	loadSave->WriteData(buffer);
 }
 
