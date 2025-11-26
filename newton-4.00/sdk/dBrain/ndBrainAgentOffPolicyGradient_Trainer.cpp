@@ -797,7 +797,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::CalculateExpectedRewards()
 	m_minibatchMean->Min(ndBrainFloat(1.0f));
 	m_minibatchMean->Max(ndBrainFloat(-1.0f));
 
-static int xxxxx = 1;
+static int xxxxx = 0;
 if (xxxxx)
 {
 	ndBrainVector xxx0;
