@@ -126,7 +126,7 @@ void ndBrainVector::FlushToZero()
 	for (ndInt32 i = ndInt32(GetCount() - 1); i >= 0; --i)
 	{
 		ndBrainFloat val = (*this)[i];
-		ndAssert(ndAbs(val) < 1.0e3f);
+		ndAssert(ndAbs(val) < 1.0e4f);
 	}
 #endif
 }

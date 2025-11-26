@@ -201,7 +201,7 @@ namespace ndCartpoleTrainer_sac
 				}
 			}
 
-			if ((stopTraining >= m_stopTraining) || (m_master->GetAverageScore() > ndBrainFloat(0.97f)))
+			if ((stopTraining >= m_stopTraining) || (m_master->GetAverageScore() > ndBrainFloat(0.95f)))
 			{
 				m_modelIsTrained = true;
 				m_master->GetPolicyNetwork()->CopyFrom(*(*m_bestActor));

@@ -61,6 +61,7 @@ class ndBrainGpuContext : public ndBrainContext
 	virtual void CopyBuffer(const ndCopyBufferCommandInfo& descriptor, ndInt32 numberOfWorkGrups, ndBrainBuffer& dstData, const ndBrainBuffer& srcData) override;
 	virtual void CopyBufferIndirect(const ndCopyBufferCommandInfo& descriptor, const ndBrainIntegerBuffer& indexBuffer, ndBrainBuffer& dstData, const ndBrainBuffer& srcData) override;
 
+	virtual void Exp(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
 	virtual void Set(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
 	virtual void Min(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
 	virtual void Max(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) override;
@@ -84,6 +85,8 @@ class ndBrainGpuContext : public ndBrainContext
 	virtual void Select(ndBrainFloatBuffer& buffer, ndBrainFloatBuffer& mask, ndBrainFloat a, ndBrainFloat b) override;
 	virtual void ScaleAdd(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat scale) override;
 
+	virtual void SetOrdinal(ndBrainFloatBuffer& buffer) override;
+	virtual void ReductionSum(ndBrainFloatBuffer& buffer) override;
 	virtual void StandardNormalDistribution(ndBrainFloatBuffer& uniformRandomVariable) override;
 	virtual void BroadcastScaler(ndBrainFloatBuffer& buffer, ndInt32 bufferStrideInFloats, const ndBrainFloatBuffer& srcScalar) override;
 	virtual void CalculateEntropyRegularization(ndBrainFloatBuffer&, const ndBrainFloatBuffer&, const ndBrainFloatBuffer&, ndBrainFloat) override;

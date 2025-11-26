@@ -38,46 +38,45 @@
 #include "ndBrainAgentPolicyGradientActivation.h"
 #include "ndBrainAgentOffPolicyGradient_Trainer.h"
 
+#define ND_POLICY_DEFAULT_POLYAK_BLEND			ndBrainFloat(0.005f)
 #define ND_POLICY_MAX_ENTROPY_TEMPERATURE		ndBrainFloat(0.1f)
 #define ND_POLICY_MIN_ENTROPY_TEMPERATURE		ndBrainFloat(0.01f)
-
-#define ND_POLICY_TRAINING_EXPLORATION_NOISE	ndBrainFloat(0.2f)
-#define ND_POLICY_DEFAULT_POLYAK_BLEND			ndBrainFloat(0.005f)
-#define ND_POLICY_MIN_SIGMA						(ndBrainFloat(0.01f))
-#define ND_POLICY_MAX_SIGMA						(ndBrainFloat(0.10f))
+#define ND_POLICY_MIN_SIGMA_SQUARE				(ndBrainFloat(0.2f))
+#define ND_POLICY_MAX_SIGMA_SQUARE				(ndBrainFloat(2.0f))
 
 ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 {
-	m_learnRate = ndBrainFloat(1.0e-5f);
-	m_policyRegularizer = ndBrainFloat(1.0e-4f);
-	m_criticRegularizer = ndBrainFloat(1.0e-4f);
-	m_discountRewardFactor = ndBrainFloat(0.995f);
+	m_randomSeed = 47;
+	m_numberOfHiddenLayers = 2;
+	m_maxTrajectorySteps = 4096;
+	m_hiddenLayersNumberOfNeurons = 128;
+	//m_hiddenLayersNumberOfNeurons = 256;
 
-	m_polyakBlendFactor = ND_POLICY_DEFAULT_POLYAK_BLEND;
 	m_useGpuBackend = true;
-
-	m_policyRegularizerType = m_ridge;
-	m_criticRegularizerType = m_ridge;
-
 	m_miniBatchSize = 256;
 	m_numberOfActions = 0;
 	m_numberOfObservations = 0;
 
-	m_randomSeed = 1001;
+	m_learnRate = ndBrainFloat(1.0e-4f);
+	m_policyRegularizer = ndBrainFloat(1.0e-4f);
+	m_criticRegularizer = ndBrainFloat(1.0e-4f);
+	m_discountRewardFactor = ndBrainFloat(0.99f);
+
+	m_policyRegularizerType = m_ridge;
+	m_criticRegularizerType = m_ridge;
+
+	m_polyakBlendFactor = ND_POLICY_DEFAULT_POLYAK_BLEND;
+
 	m_numberOfUpdates = 8;
-	m_numberOfHiddenLayers = 2;
-	m_maxTrajectorySteps = 1024 * 4;
+
 	m_replayBufferSize = 1024 * 1024;
-	m_hiddenLayersNumberOfNeurons = 256;
 	m_replayBufferStartOptimizeSize = 1024 * 64;
 
 	m_maxNumberOfTrainingSteps = 1024 * 256;
 	m_entropyMinTemperature = ND_POLICY_MIN_ENTROPY_TEMPERATURE;
 	m_entropyMaxTemperature = ND_POLICY_MAX_ENTROPY_TEMPERATURE;
 
-//m_numberOfUpdates = 1;
-//m_useGpuBackend = false;
-//m_replayBufferStartOptimizeSize = 1024 * 2;
+m_useGpuBackend = false;
 }
 
 ndBrainAgentOffPolicyGradient_Agent::ndTrajectory::ndTrajectory()
@@ -469,18 +468,19 @@ void ndBrainAgentOffPolicyGradient_Trainer::BuildPolicyClass()
 
 	layers.PushBack(new ndBrainLayerLinear(m_parameters.m_numberOfObservations, m_parameters.m_hiddenLayersNumberOfNeurons));
 	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
-	for (ndInt32 i = 0; i < m_parameters.m_numberOfHiddenLayers - 1; ++i)
+	//for (ndInt32 i = 0; i < m_parameters.m_numberOfHiddenLayers - 1; ++i)
+	for (ndInt32 i = 0; i < m_parameters.m_numberOfHiddenLayers; ++i)
 	{
 		ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == m_parameters.m_hiddenLayersNumberOfNeurons);
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
 		layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
 	}
 	// prevent exploding gradients. 
-	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
-	layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
+	//layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
+	//layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_numberOfActions * 2));
-	layers.PushBack(new ndBrainAgentPolicyGradientActivation(layers[layers.GetCount() - 1]->GetOutputSize(), ndBrainFloat(ndLog(ND_POLICY_MIN_SIGMA)), ndBrainFloat(ndLog(ND_POLICY_MAX_SIGMA))));
+	layers.PushBack(new ndBrainAgentPolicyGradientActivation(layers[layers.GetCount() - 1]->GetOutputSize(), ndSqrt(ND_POLICY_MIN_SIGMA_SQUARE), ndSqrt(ND_POLICY_MAX_SIGMA_SQUARE)));
 
 	ndSharedPtr<ndBrain> policy (new ndBrain);
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
@@ -507,16 +507,16 @@ void ndBrainAgentOffPolicyGradient_Trainer::BuildCriticClass()
 		layers.PushBack(new ndBrainLayerLinear(policy.GetOutputSize() + policy.GetInputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
 		layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 
-		for (ndInt32 i = 0; i < m_parameters.m_numberOfHiddenLayers - 1; ++i)
+		//for (ndInt32 i = 0; i < m_parameters.m_numberOfHiddenLayers - 1; ++i)
+		for (ndInt32 i = 0; i < m_parameters.m_numberOfHiddenLayers; ++i)
 		{
 			ndAssert(layers[layers.GetCount() - 1]->GetOutputSize() == m_parameters.m_hiddenLayersNumberOfNeurons);
 			layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
 			layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
 		}
-		
-		// prevent exploding gradients.
-		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
-		layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
+		//// prevent exploding gradients.
+		//layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_hiddenLayersNumberOfNeurons));
+		//layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 		layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), 1));
 		layers.PushBack(new ndBrainLayerActivationLeakyRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
@@ -1017,7 +1017,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainPolicy()
 	policyMinibatchOutputGradientBuffer->CalculateEntropyRegularizationGradient(**m_minibatchGaussianDistribution, **m_minibatchSigma, m_entropyTemperature, ndInt32(meanOutputSizeInBytes / sizeof(ndReal)));
 
 	// subtract the qValue gradient from the entropy gradient.
-	// The subtraction order is in reverse order, to get the gradient ascend.
+	// The subtraction in reverse order, to get the gradient ascend.
 	policyMinibatchOutputGradientBuffer->Sub(*policyMinibatchOutputBuffer);
 
 	m_policyTrainer->BackPropagate();

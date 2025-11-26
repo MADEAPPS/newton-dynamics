@@ -49,6 +49,7 @@ class ndBrainFloatBuffer : public ndBrainBuffer
 	void GreaterEqual(ndBrainFloat value);
 	void Blend(const ndBrainFloatBuffer& buffer, ndBrainFloat blendFactor);
 
+	void Exp(const ndBrainFloatBuffer& buffer);
 	void Set(const ndBrainFloatBuffer& buffer);
 	void Add(const ndBrainFloatBuffer& buffer);
 	void Sub(const ndBrainFloatBuffer& buffer);

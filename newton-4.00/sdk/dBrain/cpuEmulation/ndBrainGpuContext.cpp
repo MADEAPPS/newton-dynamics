@@ -374,6 +374,20 @@ void ndBrainGpuContext::BroadcastScaler(ndBrainFloatBuffer& buffer, ndInt32 buff
 	}
 }
 
+void ndBrainGpuContext::SetOrdinal(ndBrainFloatBuffer& dstData)
+{
+	ndAssert(0);
+	//ndBrainVector& dst = **dstData.m_buffer;
+	//dst.SetOrdinal();
+}
+
+void ndBrainGpuContext::ReductionSum(ndBrainFloatBuffer& dstData)
+{
+	ndAssert(0);
+	//ndBrainVector& dst = **dstData.m_buffer;
+	//dst.ReductionSum();
+}
+
 void ndBrainGpuContext::CalculateEntropyRegularization(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& sampleBuffer, const ndBrainFloatBuffer& sigmaBuffer, ndBrainFloat regularization)
 { 
 	const ndInt32 stride = ndInt32(sigmaBuffer.SizeInBytes() / buffer.SizeInBytes());

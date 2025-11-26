@@ -39,10 +39,7 @@ class ndBrainThreadPool: public ndClassAlloc, public ndSyncMutex
 	void SetThreadCount(ndInt32 count);
 
 	template <typename Function>
-	void ParallelExecute(const Function& function);
-
-	template <typename Function>
-	void ParallelExecuteNew(const Function& function, ndInt32 numberOfJobs, ndInt32 numberOfJobsBatch = D_WORKER_BATCH_SIZE);
+	void ParallelExecute(const Function& function, ndInt32 numberOfJobs, ndInt32 numberOfJobsBatch = D_WORKER_BATCH_SIZE);
 
 	private:
 	void SubmmitTask(ndTask* const task, ndInt32 index);
@@ -53,73 +50,7 @@ template <typename Function>
 class ndBrainTaskImplement: public ndTask
 {
 	public:
-	ndBrainTaskImplement(ndInt32 threadIndex, ndBrainThreadPool* const threadPool, const Function& function)
-		:ndTask(threadIndex)
-		,m_function(function)
-		,m_threadPool(threadPool)
-		,m_threadCount(threadPool->GetThreadCount())
-	{
-	}
-
-	~ndBrainTaskImplement()
-	{
-	}
-
-	private:
-	void Execute() const
-	{
-		m_function(m_threadIndex, m_threadCount);
-	}
-
-	Function m_function;
-	ndBrainThreadPool* m_threadPool;
-	const ndInt32 m_threadCount;
-	friend class ndBrainThreadPool;
-};
-
-template <typename Function>
-void ndBrainThreadPool::ParallelExecute(const Function& callback)
-{
-	const ndInt32 threadCount = GetThreadCount();
-	ndBrainTaskImplement<Function>* const jobsArray = ndAlloca(ndBrainTaskImplement<Function>, threadCount);
-
-	for (ndInt32 i = 0; i < threadCount; ++i)
-	{
-		ndBrainTaskImplement<Function>* const job = &jobsArray[i];
-		new (job) ndBrainTaskImplement<Function>(i, this, callback);
-	}
-
-	if (m_workers.GetCount() > 0)
-	{
-		#ifdef D_USE_BRAIN_THREAD_EMULATION
-		for (ndInt32 i = 0; i < threadCount; ++i)
-		{
-			ndBrainTaskImplement<Function>* const job = &jobsArray[i];
-			callback(job->m_threadIndex, job->m_threadCount);
-		}
-		#else
-		for (ndInt32 i = threadCount - 1; i > 0; --i)
-		{
-			ndBrainTaskImplement<Function>* const job = &jobsArray[i];
-			SubmmitTask(job, i - 1);
-		}
-		ndBrainTaskImplement<Function>* const job = &jobsArray[0];
-		callback(job->m_threadIndex, job->m_threadCount);
-		Sync();
-		#endif
-	}
-	else
-	{
-		ndBrainTaskImplement<Function>* const job = &jobsArray[0];
-		callback(job->m_threadIndex, job->m_threadCount);
-	}
-}
-
-template <typename Function>
-class ndBrainTaskImplementNew : public ndTask
-{
-	public:
-	ndBrainTaskImplementNew(
+	ndBrainTaskImplement(
 		ndBrainThreadPool* const threadPool,
 		const Function& function,
 		ndAtomic<ndInt32>& threadIterator,
@@ -132,7 +63,6 @@ class ndBrainTaskImplementNew : public ndTask
 		,m_threadIterator(threadIterator)
 		,m_jobsCount(jobsCount)
 		,m_jobsStride(jobsStride)
-		//,m_threadIndex(threadIndex)
 	{
 	}
 
@@ -160,7 +90,7 @@ class ndBrainTaskImplementNew : public ndTask
 };
 
 template <typename Function>
-void ndBrainThreadPool::ParallelExecuteNew(const Function& function, ndInt32 numberOfJobs, ndInt32 numberOfJobsBatch)
+void ndBrainThreadPool::ParallelExecute(const Function& function, ndInt32 numberOfJobs, ndInt32 numberOfJobsBatch)
 {
 	const ndInt32 threadCount = GetThreadCount();
 	if (threadCount <= 1)
@@ -189,18 +119,18 @@ void ndBrainThreadPool::ParallelExecuteNew(const Function& function, ndInt32 num
 			// enough work to use more than one core. get number of cores needed using batch size
 			ndAtomic<ndInt32> threadIterator(0);
 			const ndInt32 numberOfThreads = ndMin(virtualThreadCount, threadCount);
-			ndBrainTaskImplementNew<Function>* const jobsArray = ndAlloca(ndBrainTaskImplementNew<Function>, numberOfThreads);
+			ndBrainTaskImplement<Function>* const jobsArray = ndAlloca(ndBrainTaskImplement<Function>, numberOfThreads);
 			for (ndInt32 i = 0; i < numberOfThreads; ++i)
 			{
-				ndBrainTaskImplementNew<Function>* const job = &jobsArray[i];
-				new (job) ndBrainTaskImplementNew<Function>(this, function, threadIterator, numberOfJobs, numberOfJobsBatch, i);
+				ndBrainTaskImplement<Function>* const job = &jobsArray[i];
+				new (job) ndBrainTaskImplement<Function>(this, function, threadIterator, numberOfJobs, numberOfJobsBatch, i);
 			}
 
 			//ndTrace(("start batches\n"));
 			for (ndInt32 i = numberOfThreads - 1; i > 0; --i)
 			{
 				ndInt32 threadSlot = i - 1;
-				ndBrainTaskImplementNew<Function>* const job = &jobsArray[i];
+				ndBrainTaskImplement<Function>* const job = &jobsArray[i];
 				SubmmitTask(job, threadSlot);
 			}
 

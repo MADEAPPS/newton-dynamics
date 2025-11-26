@@ -1557,14 +1557,14 @@ R""""(
         uint workGroupSizeReminder = numberOfElements % workGroupSize;
         uint modWorkGroupSize = numberOfElements - workGroupSizeReminder;
 
-        float value = inputData[groupId];    
+        float value = inputData[groupId];
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
-            outputData[dstOffset + i + itemId] *= value;
+            outputData[dstOffset + i + itemId] = value;
         }
         if (itemId < workGroupSizeReminder)
         {
-           outputData[dstOffset + modWorkGroupSize + itemId] *= value;
+           outputData[dstOffset + modWorkGroupSize + itemId] = value;
         }
     }
 

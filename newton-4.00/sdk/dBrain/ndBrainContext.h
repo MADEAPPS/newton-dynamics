@@ -62,6 +62,7 @@ class ndBrainContext : public ndClassAlloc
 	virtual void BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVector& dstVector) = 0;
 	virtual void BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector) = 0;
 
+	virtual void Exp(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) = 0;
 	virtual void Set(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) = 0;
 	virtual void Min(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) = 0;
 	virtual void Max(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) = 0;
@@ -84,11 +85,10 @@ class ndBrainContext : public ndClassAlloc
 	virtual void Blend(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat blend) = 0;
 	virtual void Select(ndBrainFloatBuffer& buffer, ndBrainFloatBuffer& mask, ndBrainFloat a, ndBrainFloat b) = 0;
 	virtual void ScaleAdd(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat scale) = 0;
-
 	virtual void BroadcastScaler(ndBrainFloatBuffer& buffer, ndInt32 bufferStrideInFloats, const ndBrainFloatBuffer& srcScalar) = 0;
 
-	virtual void SetOrdinal(ndBrainFloatBuffer&) { ndAssert(0); }
-	virtual void ReductionSum(ndBrainFloatBuffer&) { ndAssert(0); }
+	virtual void SetOrdinal(ndBrainFloatBuffer&) = 0;
+	virtual void ReductionSum(ndBrainFloatBuffer&) = 0;
 	virtual void StandardNormalDistribution(ndBrainFloatBuffer& uniformRandomVariable) = 0;
 	virtual void CalculateEntropyRegularization(ndBrainFloatBuffer&, const ndBrainFloatBuffer&, const ndBrainFloatBuffer&, ndBrainFloat) = 0;
 	virtual void CalculateEntropyRegularizationGradient(ndBrainFloatBuffer&, const ndBrainFloatBuffer&, const ndBrainFloatBuffer&, ndBrainFloat, ndInt32) = 0;

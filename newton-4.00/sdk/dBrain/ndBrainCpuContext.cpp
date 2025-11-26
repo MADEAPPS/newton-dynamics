@@ -112,7 +112,7 @@ ndBrainCpuContext::ndBrainCpuContext()
 {
 	ndInt32 numOfThreads = ndBrainThreadPool::GetMaxThreads();
 #ifdef _DEBUG
-numOfThreads = 1;
+//numOfThreads = 1;
 #endif
 
 	SetThreadCount(numOfThreads);
@@ -208,22 +208,6 @@ void ndBrainCpuContext::MemoryToDevice(ndBrainBuffer& deviceBuffer, size_t offse
 
 void ndBrainCpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
 {
-#if 0
-	// brute force launches all thread, 
-	ndAtomic<ndInt32> iterator(0);
-	auto ExecuteCommand = ndMakeObject::ndFunction([this, &iterator, command](ndInt32, ndInt32)
-	{
-		const ndBrainBufferCommandDesc& descriptor = command->GetDescriptor();
-		ndBrainBufferCommandCpu* const cpuCommand = (ndBrainBufferCommandCpu*)command;
-	
-		for (ndInt32 i = iterator++; i < descriptor.m_miniBatchSize; i = iterator++)
-		{
-			cpuCommand->Execute(i);
-		}
-	});
-	ParallelExecute(ExecuteCommand);
-
-#else
 	// adaptive thread dispacher, in general 50% faster
 	auto ExecuteCommand = ndMakeObject::ndFunction([this, command](ndInt32 groupId, ndInt32)
 	{
@@ -232,8 +216,7 @@ void ndBrainCpuContext::SubmitBufferCommand(ndBrainBufferCommand* const command)
 	});
 
 	const ndBrainBufferCommandDesc& descriptor = command->GetDescriptor();
-	ParallelExecuteNew(ExecuteCommand, descriptor.m_miniBatchSize);
-#endif
+	ParallelExecute(ExecuteCommand, descriptor.m_miniBatchSize);
 }
 
 void ndBrainCpuContext::BrainVectorToDevice(ndBrainFloatBuffer& buffer, const ndBrainVector& srcVector)
@@ -260,6 +243,13 @@ void ndBrainCpuContext::Set(ndBrainFloatBuffer& dstData, const ndBrainFloatBuffe
 	ndBrainVector& dst = **dstData.m_buffer;
 	const ndBrainVector& src = **srcData.m_buffer;
 	dst.Set(src);
+}
+
+void ndBrainCpuContext::Exp(ndBrainFloatBuffer& dstData, const ndBrainFloatBuffer& srcData)
+{
+	ndBrainVector& dst = **dstData.m_buffer;
+	const ndBrainVector& src = **srcData.m_buffer;
+	dst.Exp(src);
 }
 
 void ndBrainCpuContext::Reciprocal(ndBrainFloatBuffer& dstData, const ndBrainFloatBuffer& srcData)
@@ -408,7 +398,7 @@ void ndBrainCpuContext::BroadcastScaler(ndBrainFloatBuffer& buffer, ndInt32 buff
 	for (ndInt32 i = 0; i < src.GetCount(); ++i)
 	{
 		ndBrainMemVector subVector(&dst[i * bufferStrideInFloats], bufferStrideInFloats);
-		subVector.Scale(src[i]);
+		subVector.Set(src[i]);
 	}
 }
 
@@ -462,7 +452,6 @@ void ndBrainCpuContext::SetLearnRateCommandBuffers(
 	ndBrainOptimizerAdam& optimizer, ndInt32 minibatchSize, 
 	ndBrainFloatBuffer& weightsAndBiasBuffer, ndBrainFloatBuffer& weightsAndBiasGradientBuffer)
 {
-
 	ndBrainOptimizerAdam::ndCommandSharedInfo optimizerData(optimizer.m_parameters);
 	optimizerData.m_minibathScale = ndBrainFloat(1.0f) / ndBrainFloat(minibatchSize);
 	ndSharedPtr<ndBrainUniformBuffer> adamUniformbuffer(new ndBrainUniformBuffer(this, sizeof(ndBrainOptimizerAdam::ndCommandSharedInfo), &optimizerData));

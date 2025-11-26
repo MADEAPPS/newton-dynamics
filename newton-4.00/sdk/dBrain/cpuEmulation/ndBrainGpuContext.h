@@ -67,6 +67,8 @@ class ndBrainGpuContext : public ndBrainContext, public ndBrainThreadPool
 	virtual void Select(ndBrainFloatBuffer& buffer, ndBrainFloatBuffer& mask, ndBrainFloat a, ndBrainFloat b) override;
 	virtual void ScaleAdd(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer, ndBrainFloat scale) override;
 
+	virtual void SetOrdinal(ndBrainFloatBuffer& buffer) override;
+	virtual void ReductionSum(ndBrainFloatBuffer& buffer) override;
 	virtual void StandardNormalDistribution(ndBrainFloatBuffer& uniformRandomVariable) override;
 	virtual void BroadcastScaler(ndBrainFloatBuffer& buffer, ndInt32 bufferStrideInFloats, const ndBrainFloatBuffer& srcScalar) override;
 	virtual void CalculateEntropyRegularization(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& sampleBuffer, const ndBrainFloatBuffer& sigmaBuffer, ndBrainFloat regularization) override;

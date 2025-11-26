@@ -45,9 +45,8 @@
 //#define DEFAULT_SCENE	18		// cart pole PPO trained controller
 
 // These are the machine learning training demos
-//#define DEFAULT_SCENE			(MACHINE_LEARNING_BASE + 0)	// train cart pole using SAC agent
-#define DEFAULT_SCENE			(MACHINE_LEARNING_BASE + 1)	// train cart pole using PPO agent
-
+#define DEFAULT_SCENE			(MACHINE_LEARNING_BASE + 0)	// train cart pole using SAC agent
+//#define DEFAULT_SCENE			(MACHINE_LEARNING_BASE + 1)	// train cart pole using PPO agent
 
 // legacy demos 
 //#define DEFAULT_SCENE	8		// particle fluid

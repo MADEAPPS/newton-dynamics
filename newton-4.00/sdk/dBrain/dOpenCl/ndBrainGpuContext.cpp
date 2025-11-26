@@ -21,7 +21,6 @@
 #include "ndBrainUniformBuffer.h"
 #include "ndBrainIntegerBuffer.h"
 #include "ndBrainBufferCommand.h"
-//#include "ndBrainTrainerInference.h"
 
 #define ND_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_ALL
 //#define ND_OPENCL_SELECTION_TYPE	CL_DEVICE_TYPE_CPU
@@ -505,7 +504,7 @@ void ndBrainGpuContext::BroadcastScaler(ndBrainFloatBuffer& buffer, ndInt32 buff
 	
 	cl::NDRange offset(0);
 	cl::NDRange local(ND_DEFAULT_WORKGROUP_SIZE);
-	cl::NDRange global(size_t(numberOfParameters * ND_DEFAULT_WORKGROUP_SIZE));
+	cl::NDRange global(size_t(ND_DEFAULT_WORKGROUP_SIZE * ND_DEFAULT_WORKGROUP_SIZE));
 	error = m_queue->enqueueNDRangeKernel(*shader, offset, global, local);
 	ndAssert(error == CL_SUCCESS);
 }
@@ -547,6 +546,7 @@ void ndBrainGpuContext::Select(ndBrainFloatBuffer& buffer, ndBrainFloatBuffer& m
 
 void ndBrainGpuContext::CalculateEntropyRegularization(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& sampleBuffer, const ndBrainFloatBuffer& varianceBuffer, ndBrainFloat regularization)
 {
+	ndAssert(0);
 	cl_int error = 0;
 
 	OpenclKernel* const oclKernel = (OpenclKernel*)*m_brainEntropyRegularization;
@@ -583,6 +583,7 @@ void ndBrainGpuContext::CalculateEntropyRegularization(ndBrainFloatBuffer& buffe
 
 void ndBrainGpuContext::CalculateEntropyRegularizationGradient(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& sampleBuffer, const ndBrainFloatBuffer& varianceBuffer, ndBrainFloat regularization, ndInt32 inputSize)
 {
+	ndAssert(0);
 	cl_int error = 0;
 
 	ndAssert(sampleBuffer.SizeInBytes() == varianceBuffer.SizeInBytes());
@@ -706,9 +707,24 @@ void ndBrainGpuContext::Set(ndBrainFloatBuffer& dstData, const ndBrainFloatBuffe
 	SubmitMathOperation(m_brainAssigment, &dstData, &srcData);
 }
 
+void ndBrainGpuContext::Exp(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
+{
+	ndAssert(0);
+}
+
 void ndBrainGpuContext::Reciprocal(ndBrainFloatBuffer& dstData, const ndBrainFloatBuffer& srcData)
 {
 	SubmitMathOperation(m_brainReciprocal, &dstData, &srcData);
+}
+
+void ndBrainGpuContext::SetOrdinal(ndBrainFloatBuffer& dstData)
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuContext::ReductionSum(ndBrainFloatBuffer& dstData)
+{
+	ndAssert(0);
 }
 
 void ndBrainGpuContext::CopyBuffer(ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
