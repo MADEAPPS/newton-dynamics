@@ -16,7 +16,6 @@
 #include "ndMakeStaticMap.h"
 #include "ndCartpolePlayer.h"
 #include "ndDemoEntityNotify.h"
-
 #include "ndDemoEntityManager.h"
 
 using namespace ndCarpolePlayer;
@@ -42,32 +41,32 @@ namespace ndCartpoleTrainer_sac
 			,m_owner(owner)
 		{
 		}
-
+	
 		ndBrainFloat CalculateReward()
 		{
 			return m_owner->CalculateReward();
 		}
-
+	
 		bool IsTerminal() const
 		{
 			return m_owner->IsTerminal();
 		}
-
+	
 		void GetObservation(ndBrainFloat* const observation)
 		{
 			m_owner->GetObservation(observation);
 		}
-
+	
 		virtual void ApplyActions(ndBrainFloat* const actions)
 		{
 			m_owner->ApplyActions(actions);
 		}
-
+	
 		void ResetModel()
 		{
 			m_owner->ResetModel();
 		}
-
+	
 		ndController* m_owner;
 	};
 

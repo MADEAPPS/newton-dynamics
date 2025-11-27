@@ -104,6 +104,7 @@ namespace ndCarpolePlayer
 		GetModel()->GetAsModelArticulation()->ClearMemory();
 	}
 
+	#pragma optimize( "", off )
 	ndBrainFloat ndController::CalculateReward() const
 	{
 		if (IsTerminal())
@@ -120,11 +121,12 @@ namespace ndCarpolePlayer
 
 		ndFloat32 angleReward = ndExp(-ndFloat32(1000.0f) * angle * angle);
 		ndFloat32 omegaReward = ndExp(-ndFloat32(1000.0f) * omega * omega);
-		ndFloat32 speedPenalty = ndFloat32(1.0f) - ndExp(-ndFloat32(400.0f) * speed * speed);
+		//ndFloat32 speedPenalty = ndFloat32(1.0f) - ndExp(-ndFloat32(400.0f) * speed * speed);
+		ndFloat32 speedReward = ndExp(-ndFloat32(400.0f) * speed * speed);
 
 		// add a penalty for high speed. 
 		// this is the equivalent of adding drag to the slider joint 
-		ndFloat32 reward = ndFloat32(0.5f) * angleReward + ndFloat32(0.5f) * omegaReward - ndFloat32(0.25f) * speedPenalty;
+		ndFloat32 reward = ndFloat32(1.0f/3.0f) * angleReward + ndFloat32(1.0f / 3.0f) * omegaReward + ndFloat32(1.0f / 3.0f) * speedReward;
 		return ndBrainFloat(reward);
 	}
 
