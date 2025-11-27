@@ -38,19 +38,23 @@
 #include "ndBrainAgentPolicyGradientActivation.h"
 #include "ndBrainAgentOffPolicyGradient_Trainer.h"
 
-#define ND_POLICY_DEFAULT_POLYAK_BLEND			ndBrainFloat(0.005f)
-#define ND_POLICY_MAX_ENTROPY_TEMPERATURE		ndBrainFloat(0.1f)
-#define ND_POLICY_MIN_ENTROPY_TEMPERATURE		ndBrainFloat(0.01f)
+
 #define ND_POLICY_MIN_SIGMA_SQUARE				ndBrainFloat(0.01f)
 #define ND_POLICY_MAX_SIGMA_SQUARE				ndBrainFloat(1.0f)
+#define ND_POLICY_MAX_ENTROPY_TEMPERATURE		ndBrainFloat(0.1f)
+#define ND_POLICY_MIN_ENTROPY_TEMPERATURE		ndBrainFloat(0.01f)
+#define ND_POLICY_DEFAULT_POLYAK_BLEND			ndBrainFloat(0.005f)
+
+//#define D_USING_REPLAY_BUFFER_SIGMA_FOR_ENTROPY
 
 ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 {
 	m_randomSeed = 47;
 	m_numberOfHiddenLayers = 2;
 	m_maxTrajectorySteps = 4096;
-	m_hiddenLayersNumberOfNeurons = 128;
-	//m_hiddenLayersNumberOfNeurons = 256;
+	//m_hiddenLayersNumberOfNeurons = 64;
+	//m_hiddenLayersNumberOfNeurons = 128;
+	m_hiddenLayersNumberOfNeurons = 256;
 
 	m_useGpuBackend = true;
 	m_miniBatchSize = 256;
@@ -61,6 +65,8 @@ ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 	m_policyRegularizer = ndBrainFloat(1.0e-4f);
 	m_criticRegularizer = ndBrainFloat(1.0e-4f);
 	m_discountRewardFactor = ndBrainFloat(0.995f);
+	m_minSigmaSquared = ND_POLICY_MIN_SIGMA_SQUARE;
+	m_maxSigmaSquared = ND_POLICY_MAX_SIGMA_SQUARE;
 
 	m_policyRegularizerType = m_ridge;
 	m_criticRegularizerType = m_ridge;
@@ -75,8 +81,6 @@ ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 	m_maxNumberOfTrainingSteps = 1024 * 256;
 	m_entropyMinTemperature = ND_POLICY_MIN_ENTROPY_TEMPERATURE;
 	m_entropyMaxTemperature = ND_POLICY_MAX_ENTROPY_TEMPERATURE;
-
-m_useGpuBackend = false;
 }
 
 ndBrainAgentOffPolicyGradient_Agent::ndTrajectory::ndTrajectory()
@@ -480,7 +484,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::BuildPolicyClass()
 	//layers.PushBack(new ndBrainLayerActivationTanh(layers[layers.GetCount() - 1]->GetOutputSize()));
 
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_numberOfActions * 2));
-	layers.PushBack(new ndBrainAgentPolicyGradientActivation(layers[layers.GetCount() - 1]->GetOutputSize(), ndSqrt(ND_POLICY_MIN_SIGMA_SQUARE), ndSqrt(ND_POLICY_MAX_SIGMA_SQUARE)));
+	layers.PushBack(new ndBrainAgentPolicyGradientActivation(layers[layers.GetCount() - 1]->GetOutputSize(), ndSqrt(m_parameters.m_minSigmaSquared), ndSqrt(m_parameters.m_maxSigmaSquared)));
 
 	ndSharedPtr<ndBrain> policy (new ndBrain);
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
@@ -797,15 +801,15 @@ void ndBrainAgentOffPolicyGradient_Trainer::CalculateExpectedRewards()
 	m_minibatchMean->Min(ndBrainFloat(1.0f));
 	m_minibatchMean->Max(ndBrainFloat(-1.0f));
 
-static int xxxxx = 0;
-if (xxxxx)
-{
-	ndBrainVector xxx0;
-	ndBrainVector xxx1;
-	m_minibatchSigma->VectorFromDevice(xxx0);
-	policyMinibatchOutputBuffer->VectorFromDevice(xxx1);
-	policyMinibatchOutputBuffer->VectorFromDevice(xxx1);
-}
+//static int xxxxx = 0;
+//if (xxxxx)
+//{
+//	ndBrainVector xxx0;
+//	ndBrainVector xxx1;
+//	m_minibatchSigma->VectorFromDevice(xxx0);
+//	policyMinibatchOutputBuffer->VectorFromDevice(xxx1);
+//	policyMinibatchOutputBuffer->VectorFromDevice(xxx1);
+//}
 
 	const ndInt32 criticInputSize = policy->GetBrain()->GetInputSize() + policy->GetBrain()->GetOutputSize();
 	for (ndInt32 i = 0; i < ndInt32(sizeof(m_criticTrainer) / sizeof(m_criticTrainer[0])); ++i)
@@ -855,9 +859,28 @@ if (xxxxx)
 	criticOutputTerminal.m_strideInByte = ndInt32(sizeof(ndReal));
 	m_minibatchNoTerminal->CopyBuffer(criticOutputTerminal, m_parameters.m_miniBatchSize, **m_minibatchOfTransitions);
 
+#ifdef D_USING_REPLAY_BUFFER_SIGMA_FOR_ENTROPY
+	// In my opinion, the entropy should be calculated from the 
+	// ditribution of actions saved in the replay buffer, 
+	// not the changing policy generated, 
+	// but the paper and pseudo code says otherwise.
+	ndCopyBufferCommandInfo minibatchSigmaEntropy;
+	minibatchSigmaEntropy.m_srcStrideInByte = transitionStrideInBytes;
+	minibatchSigmaEntropy.m_srcOffsetInByte = ndInt32((trajectory.GetActionOffset() + policyActionSize) * sizeof(ndReal));
+	minibatchSigmaEntropy.m_dstOffsetInByte = 0;
+	minibatchSigmaEntropy.m_dstStrideInByte = policyActionSize * ndInt32(sizeof(ndReal));
+	minibatchSigmaEntropy.m_strideInByte = policyActionSize * ndInt32(sizeof(ndReal));
+
+//ndBrainVector xxx0;
+//m_minibatchSigma->VectorFromDevice(xxx0);
+
+	m_minibatchSigma->CopyBuffer(minibatchSigmaEntropy, m_parameters.m_miniBatchSize, **m_minibatchOfTransitions);
+//ndBrainVector xxx1;
+//m_minibatchSigma->VectorFromDevice(xxx1);
+#endif
+
 	// calculate and add entropy regularization to the q value
 	m_minibatchEntropy->CalculateEntropyRegularization(**m_minibatchGaussianDistribution, **m_minibatchSigma, m_entropyTemperature);
-
 	qValue.Sub(**m_minibatchEntropy);
 	qValue.Mul(**m_minibatchNoTerminal);
 	qValue.Scale(m_parameters.m_discountRewardFactor);
@@ -1012,15 +1035,34 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainPolicy()
 	}
 
 	// calculate entropy Regularization
-	ndCopyBufferCommandInfo policyCopyGradients;
-	policyCopyGradients.m_srcOffsetInByte = 0;
-	policyCopyGradients.m_srcStrideInByte = ndInt32(criticInputSize * sizeof(ndReal));
-	policyCopyGradients.m_dstOffsetInByte = 0;
-	policyCopyGradients.m_dstStrideInByte = ndInt32(m_policyTrainer->GetBrain()->GetOutputSize() * sizeof(ndReal));;
-	policyCopyGradients.m_strideInByte = ndInt32(m_policyTrainer->GetBrain()->GetOutputSize() * sizeof(ndReal));
-	policyMinibatchOutputBuffer->CopyBuffer(policyCopyGradients, m_parameters.m_miniBatchSize, *criticMinibatchInputGradientBuffer);
+#ifdef D_USING_REPLAY_BUFFER_SIGMA_FOR_ENTROPY
+	// In my opinion, the entropy should be calculated from the 
+	// ditribution of actions saved in the replay buffer, 
+	// not the changing policy generated, 
+	// but the paper and pseudo code says otherwise.
+	ndInt32 outputSize = policy->GetBrain()->GetOutputSize() / 2;
+	ndCopyBufferCommandInfo minibatchSigmaEntropy;
+	minibatchSigmaEntropy.m_srcStrideInByte = ndInt32(trajectory.GetStride() * sizeof(ndReal));
+	minibatchSigmaEntropy.m_srcOffsetInByte = ndInt32((trajectory.GetActionOffset() + outputSize) * sizeof(ndReal));
+	minibatchSigmaEntropy.m_dstOffsetInByte = 0;
+	minibatchSigmaEntropy.m_dstStrideInByte = outputSize * ndInt32(sizeof(ndReal));
+	minibatchSigmaEntropy.m_strideInByte = outputSize * ndInt32(sizeof(ndReal));
+#else
+	ndAssert(0);
+	ndCopyBufferCommandInfo policyEntropyGradients;
+	policyEntropyGradients.m_srcOffsetInByte = 0;
+	policyEntropyGradients.m_srcStrideInByte = ndInt32(criticInputSize * sizeof(ndReal));
+	policyEntropyGradients.m_dstOffsetInByte = 0;
+	policyEntropyGradients.m_dstStrideInByte = ndInt32(m_policyTrainer->GetBrain()->GetOutputSize() * sizeof(ndReal));
+	policyEntropyGradients.m_strideInByte = ndInt32(m_policyTrainer->GetBrain()->GetOutputSize() * sizeof(ndReal));
+	policyMinibatchOutputBuffer->CopyBuffer(policyEntropyGradients, m_parameters.m_miniBatchSize, *criticMinibatchInputGradientBuffer);
+#endif
+
 	ndBrainFloatBuffer* const policyMinibatchOutputGradientBuffer = m_policyTrainer->GetOuputGradientBuffer();
 	policyMinibatchOutputGradientBuffer->CalculateEntropyRegularizationGradient(**m_minibatchGaussianDistribution, **m_minibatchSigma, m_entropyTemperature, ndInt32(meanOutputSizeInBytes / sizeof(ndReal)));
+
+//ndBrainVector xxx0;
+//policyMinibatchOutputGradientBuffer->VectorFromDevice(xxx0);
 
 	// subtract the qValue gradient from the entropy gradient.
 	// The subtraction in reverse order, to get the gradient ascend.
