@@ -40,7 +40,7 @@
 
 
 #define ND_POLICY_MIN_SIGMA_SQUARE				ndBrainFloat(0.01f)
-#define ND_POLICY_MAX_SIGMA_SQUARE				ndBrainFloat(1.0f)
+#define ND_POLICY_MAX_SIGMA_SQUARE				ndBrainFloat(0.5f)
 #define ND_POLICY_MAX_ENTROPY_TEMPERATURE		ndBrainFloat(0.1f)
 #define ND_POLICY_MIN_ENTROPY_TEMPERATURE		ndBrainFloat(0.01f)
 #define ND_POLICY_DEFAULT_POLYAK_BLEND			ndBrainFloat(0.005f)
