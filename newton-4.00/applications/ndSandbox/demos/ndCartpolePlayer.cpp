@@ -109,7 +109,7 @@ namespace ndCarpolePlayer
 	{
 		if (IsTerminal())
 		{
-			// a terminal reward of zero sould make for smoother MDPs. 
+			// a terminal reward of zero should make for smoother MDPs. 
 			// traing small networks could be much harder with negative terminal rewrads..
 			// return ndBrainFloat(-1.0f);
 			return ndBrainFloat(0.0f);
@@ -124,11 +124,10 @@ namespace ndCarpolePlayer
 
 		ndFloat32 angleReward = ndExp(-ndFloat32(1000.0f) * angle * angle);
 		ndFloat32 omegaReward = ndExp(-ndFloat32(400.0f) * omega * omega);
-		//ndFloat32 speedPenalty = ndFloat32(1.0f) - ndExp(-ndFloat32(400.0f) * speed * speed);
 		ndFloat32 speedReward = ndExp(-ndFloat32(400.0f) * speed * speed);
 
-		// add a penalty for high speed. 
-		// this is the equivalent of adding drag to the slider joint 
+		// make sure the reward is never negative, to avoid the possibility of  
+		// MDP states with negative values.
 		ndFloat32 reward = ndFloat32(0.3f) * angleReward + ndFloat32(0.3f) * omegaReward + ndFloat32(0.4f) * speedReward;
 		return ndBrainFloat(reward);
 	}
