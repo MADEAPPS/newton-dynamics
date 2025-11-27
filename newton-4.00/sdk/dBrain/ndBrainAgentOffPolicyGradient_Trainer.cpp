@@ -40,7 +40,7 @@
 
 
 #define ND_POLICY_MIN_SIGMA_SQUARE				ndBrainFloat(0.01f)
-#define ND_POLICY_MAX_SIGMA_SQUARE				ndBrainFloat(0.25f)
+#define ND_POLICY_MAX_SIGMA_SQUARE				ndBrainFloat(1.0f)
 #define ND_POLICY_MAX_ENTROPY_TEMPERATURE		ndBrainFloat(0.2f)
 #define ND_POLICY_MIN_ENTROPY_TEMPERATURE		ndBrainFloat(0.1f)
 #define ND_POLICY_DEFAULT_POLYAK_BLEND			ndBrainFloat(0.005f)
@@ -50,7 +50,7 @@
 ndBrainAgentOffPolicyGradient_Trainer::HyperParameters::HyperParameters()
 {
 	m_randomSeed = 47;
-	m_numberOfHiddenLayers = 2;
+	m_numberOfHiddenLayers = 3;
 	m_maxTrajectorySteps = 4096;
 	//m_hiddenLayersNumberOfNeurons = 64;
 	//m_hiddenLayersNumberOfNeurons = 128;
@@ -242,14 +242,15 @@ void ndBrainAgentOffPolicyGradient_Agent::ndTrajectory::GetFlatArray(ndInt32 ind
 
 ndBrainAgentOffPolicyGradient_Agent::ndBrainAgentOffPolicyGradient_Agent(ndBrainAgentOffPolicyGradient_Trainer* const master)
 	:ndBrainAgent()
-	,m_owner(nullptr)
+	,m_owner(master)
 	,m_trajectory()
 	,m_randomeGenerator()
 	,m_trajectoryBaseIndex(0)
 {
 	const ndBrain* const brain = *master->m_policyTrainer->GetBrain();
 	m_trajectory.Init(brain->GetOutputSize(), master->m_parameters.m_numberOfObservations);
-	m_randomeGenerator.m_gen.seed(master->m_parameters.m_randomSeed);
+	ndUnsigned32 agentSeed = m_owner->m_randomGenerator();
+	m_randomeGenerator.m_gen.seed(agentSeed);
 }
 
 ndInt32 ndBrainAgentOffPolicyGradient_Agent::GetEpisodeFrames() const
