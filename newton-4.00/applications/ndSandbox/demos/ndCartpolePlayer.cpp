@@ -124,7 +124,7 @@ namespace ndCarpolePlayer
 
 		ndFloat32 angleReward = ndExp(-ndFloat32(1000.0f) * angle * angle);
 		ndFloat32 omegaReward = ndExp(-ndFloat32(400.0f) * omega * omega);
-		ndFloat32 speedReward = ndExp(-ndFloat32(400.0f) * speed * speed);
+		ndFloat32 speedReward = ndExp(-ndFloat32(1000.0f) * speed * speed);
 
 		// make sure the reward is never negative, to avoid the possibility of  
 		// MDP states with negative values.
