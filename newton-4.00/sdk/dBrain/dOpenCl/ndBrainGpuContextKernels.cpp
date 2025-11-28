@@ -764,7 +764,7 @@ R""""(
             
             float blend = ((i + itemId) < halfSize) ? 1.0 : 0.0;
             float gradiend = meanGrad * blend + sigmaGrad * (1.0 - blend);
-            
+          
             float inputGradient = inputOutputGradients[dstBase + i + itemId];
             inputOutputGradients[srcBase + i + itemId] = gradiend * inputGradient;
         }
@@ -780,7 +780,7 @@ R""""(
             
             float blend = ((modWorkGroupSize + itemId) < halfSize) ? 1.0 : 0.0;
             float gradiend = meanGrad * blend + sigmaGrad * (1.0 - blend);
-            
+          
             float inputGradient = inputOutputGradients[dstBase + modWorkGroupSize + itemId];
             inputOutputGradients[srcBase + modWorkGroupSize + itemId] = gradiend * inputGradient;
         }
