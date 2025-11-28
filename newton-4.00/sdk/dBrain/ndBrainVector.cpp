@@ -438,7 +438,6 @@ void ndBrainVector::CalculateEntropyRegularizationGradient(const ndBrainVector& 
 	{
 		ndBrainFloat sigma = varianceBuffer[i];
 		ndBrainFloat sample = meanSampleBuffer[i];
-
 		ndBrainFloat invSigma = ndBrainFloat(1.0f) / sigma;
 
 		//ndBrainFloat invSigma2 = invSigma * invSigma;
