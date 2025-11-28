@@ -447,5 +447,6 @@ void ndBrainVector::CalculateEntropyRegularizationGradient(const ndBrainVector& 
 
 		ndBrainFloat z = sample * invSigma;
 		(*this)[i] = regularization * z * invSigma;
+		(*this)[i + base] = regularization * invSigma * (z * z - ndBrainFloat(1.0f));
 	}
 }
