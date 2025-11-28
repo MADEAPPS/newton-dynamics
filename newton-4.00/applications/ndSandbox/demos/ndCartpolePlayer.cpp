@@ -104,7 +104,7 @@ namespace ndCarpolePlayer
 		ndFloat32 angle = hinge->GetAngle();
 		ndFloat32 speed = slider->GetSpeed();
 		bool alife = ndAbs(angle) < (REWARD_MIN_ANGLE * ndFloat32(2.0f));
-		alife = alife && (ndAbs(speed) < ndFloat32(4.0f));
+		alife = alife && (ndAbs(speed) < ndFloat32(5.0f));
 		return !alife;
 	}
 
@@ -116,7 +116,7 @@ namespace ndCarpolePlayer
 			// a terminal reward of zero should make for smoother MDPs. 
 			// traing small networks could be much harder with negative terminal rewrads..
 			// return ndBrainFloat(-1.0f);
-			return ndBrainFloat(0.0f);
+			return ndBrainFloat(-1.0f);
 		}
 
 		ndJointHinge* const hinge = (ndJointHinge*)*m_poleHinge;
