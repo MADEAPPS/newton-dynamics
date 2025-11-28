@@ -220,23 +220,42 @@ ndVector ndMatrix::SolveByGaussianElimination(const ndVector &v) const
 {
 	ndMatrix tmp(*this);
 	ndVector ret(v);
-	for (ndInt32 i = 0; i < 4; ++i) 
+	for (ndInt32 i = 0; i < 4; ++i)
 	{
 		ndFloat32 pivot = ndAbs(tmp[i][i]);
-		if (pivot < ndFloat32(0.01f)) 
+		if (pivot < ndFloat32(0.01f))
 		{
 			ndInt32 permute = i;
-			for (ndInt32 j = i + 1; j < 4; ++j) 
+			for (ndInt32 j = i + 1; j < 4; ++j)
 			{
 				ndFloat32 pivot1 = ndAbs(tmp[j][i]);
-				if (pivot1 > pivot) 
+				if (pivot1 > pivot)
 				{
 					permute = j;
 					pivot = pivot1;
 				}
 			}
-			
-			if (permute != i) 
+
+			// Lax inside: 
+			// if the matrix become singular, 
+			// we can just set the row soliioon to zero and use ran redcution.
+			//ndFloat32 diag = tmp[i][i];
+			if (!ndCheckFloat(pivot) || ndAbs(pivot) < ndFloat32(1.0e-6f))
+			{
+				// Matrix is effectively singular for this system.
+				// Fallback: zero-out remainder of solution (no angular accel contribution).
+				//for (ndInt32 k = i; k < 4; ++k)
+				//{
+				//	ret[k] = ndFloat32(0.0f);
+				//}
+				//return ret;
+				permute = i;
+				ret[i] = ndFloat32(0.0f);
+				tmp[i][i] = ndFloat32(1.0f);
+			}
+			// *** END NEW ***
+
+			if (permute != i)
 			{
 				ndAssert(pivot > ndFloat32(1.0e-6f));
 				ndSwap(ret[i], ret[permute]);
@@ -244,7 +263,7 @@ ndVector ndMatrix::SolveByGaussianElimination(const ndVector &v) const
 			}
 		}
 
-		for (ndInt32 j = i + 1; j < 4; ++j) 
+		for (ndInt32 j = i + 1; j < 4; ++j)
 		{
 			const ndVector scale(tmp[j][i] / tmp[i][i]);
 			tmp[j] -= tmp[i] * scale;
@@ -253,9 +272,10 @@ ndVector ndMatrix::SolveByGaussianElimination(const ndVector &v) const
 		}
 	}
 
-	for (ndInt32 i = 3; i >= 0; --i) 
+	for (ndInt32 i = 3; i >= 0; --i)
 	{
 		const ndVector pivot(tmp[i] * ret);
+		// We know tmp[i][i] is valid and non-zero here due to the guard above
 		ret[i] = (ret[i] - pivot.AddHorizontal().GetScalar() + tmp[i][i] * ret[i]) / tmp[i][i];
 	}
 
