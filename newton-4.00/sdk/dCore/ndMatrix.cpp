@@ -237,18 +237,13 @@ ndVector ndMatrix::SolveByGaussianElimination(const ndVector &v) const
 			}
 
 			// Lax inside: 
-			// if the matrix become singular, 
-			// we can just set the row soliioon to zero and use ran redcution.
-			//ndFloat32 diag = tmp[i][i];
+			// if the matrix becomes singular, 
+			// we can just set the row solusion to zero and use rank reduction.
 			if (!ndCheckFloat(pivot) || ndAbs(pivot) < ndFloat32(1.0e-6f))
 			{
 				// Matrix is effectively singular for this system.
 				// Fallback: zero-out remainder of solution (no angular accel contribution).
-				//for (ndInt32 k = i; k < 4; ++k)
-				//{
-				//	ret[k] = ndFloat32(0.0f);
-				//}
-				//return ret;
+				ndTrace(("the matrix is singular, solving by rank reduction\nsomething may not be right\n\n"));
 				permute = i;
 				ret[i] = ndFloat32(0.0f);
 				tmp[i][i] = ndFloat32(1.0f);
