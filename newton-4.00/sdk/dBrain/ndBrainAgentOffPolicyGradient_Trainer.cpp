@@ -1049,7 +1049,6 @@ void ndBrainAgentOffPolicyGradient_Trainer::TrainPolicy()
 	minibatchSigmaEntropy.m_dstStrideInByte = outputSize * ndInt32(sizeof(ndReal));
 	minibatchSigmaEntropy.m_strideInByte = outputSize * ndInt32(sizeof(ndReal));
 #else
-	ndAssert(0);
 	ndCopyBufferCommandInfo policyEntropyGradients;
 	policyEntropyGradients.m_srcOffsetInByte = 0;
 	policyEntropyGradients.m_srcStrideInByte = ndInt32(criticInputSize * sizeof(ndReal));

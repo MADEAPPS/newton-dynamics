@@ -77,14 +77,6 @@ namespace ndCarpolePlayer
 		m_agent->Step();
 	}
 
-	bool ndController::IsTerminal() const
-	{
-		const ndJointHinge* const hinge = (ndJointHinge*)*m_poleHinge;
-		ndFloat32 angle = hinge->GetAngle();
-		bool fail = ndAbs(angle) > (REWARD_MIN_ANGLE * ndFloat32(2.0f));
-		return fail;
-	}
-
 	void ndController::ResetModel()
 	{
 		ndMatrix cartMatrix(ndGetIdentityMatrix());
@@ -105,6 +97,18 @@ namespace ndCarpolePlayer
 	}
 
 	#pragma optimize( "", off )
+	bool ndController::IsTerminal() const
+	{
+		const ndJointHinge* const hinge = (ndJointHinge*)*m_poleHinge;
+		const ndJointSlider* const slider = (ndJointSlider*)*m_slider;
+		ndFloat32 angle = hinge->GetAngle();
+		ndFloat32 speed = slider->GetSpeed();
+		bool alife = ndAbs(angle) < (REWARD_MIN_ANGLE * ndFloat32(2.0f));
+		alife = alife && (ndAbs(speed) < ndFloat32(4.0f));
+		return !alife;
+	}
+
+	#pragma optimize( "", off )
 	ndBrainFloat ndController::CalculateReward() const
 	{
 		if (IsTerminal())
@@ -122,9 +126,9 @@ namespace ndCarpolePlayer
 		ndFloat32 omega = hinge->GetOmega();
 		ndFloat32 speed = slider->GetSpeed();
 
-		ndFloat32 angleReward = ndExp(-ndFloat32(1000.0f) * angle * angle);
-		ndFloat32 omegaReward = ndExp(-ndFloat32(400.0f) * omega * omega);
-		ndFloat32 speedReward = ndExp(-ndFloat32(1000.0f) * speed * speed);
+		ndFloat32 speedReward = ndExp(-ndFloat32(10.0f) * speed * speed);
+		ndFloat32 omegaReward = ndExp(-ndFloat32(10.0f) * omega * omega);
+		ndFloat32 angleReward = ndExp(-ndFloat32(10.0f) * angle * angle);
 
 		// make sure the reward is never negative, to avoid the possibility of  
 		// MDP states with negative values.
