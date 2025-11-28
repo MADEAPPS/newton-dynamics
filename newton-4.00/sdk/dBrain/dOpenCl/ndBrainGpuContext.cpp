@@ -546,7 +546,6 @@ void ndBrainGpuContext::Select(ndBrainFloatBuffer& buffer, ndBrainFloatBuffer& m
 
 void ndBrainGpuContext::CalculateEntropyRegularization(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& sampleBuffer, const ndBrainFloatBuffer& varianceBuffer, ndBrainFloat regularization)
 {
-	ndAssert(0);
 	cl_int error = 0;
 
 	OpenclKernel* const oclKernel = (OpenclKernel*)*m_brainEntropyRegularization;
@@ -583,7 +582,6 @@ void ndBrainGpuContext::CalculateEntropyRegularization(ndBrainFloatBuffer& buffe
 
 void ndBrainGpuContext::CalculateEntropyRegularizationGradient(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& sampleBuffer, const ndBrainFloatBuffer& varianceBuffer, ndBrainFloat regularization, ndInt32 inputSize)
 {
-	ndAssert(0);
 	cl_int error = 0;
 
 	ndAssert(sampleBuffer.SizeInBytes() == varianceBuffer.SizeInBytes());

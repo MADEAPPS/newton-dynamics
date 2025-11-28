@@ -41,32 +41,32 @@ namespace ndCartpoleTrainer_sac
 			,m_owner(owner)
 		{
 		}
-	
+
 		ndBrainFloat CalculateReward()
 		{
 			return m_owner->CalculateReward();
 		}
-	
+
 		bool IsTerminal() const
 		{
 			return m_owner->IsTerminal();
 		}
-	
+
 		void GetObservation(ndBrainFloat* const observation)
 		{
 			m_owner->GetObservation(observation);
 		}
-	
+
 		virtual void ApplyActions(ndBrainFloat* const actions)
 		{
 			m_owner->ApplyActions(actions);
 		}
-	
+
 		void ResetModel()
 		{
 			m_owner->ResetModel();
 		}
-	
+
 		ndController* m_owner;
 	};
 
@@ -95,7 +95,7 @@ namespace ndCartpoleTrainer_sac
 			// create a Soft Actor Critic traniing agent
 			ndBrainAgentOffPolicyGradient_Trainer::HyperParameters hyperParameters;
 
-			hyperParameters.m_useGpuBackend = false;
+			//hyperParameters.m_useGpuBackend = false;
 			hyperParameters.m_hiddenLayersNumberOfNeurons = 64;
 			hyperParameters.m_numberOfActions = m_actionsSize;
 			hyperParameters.m_numberOfObservations = m_observationsSize;

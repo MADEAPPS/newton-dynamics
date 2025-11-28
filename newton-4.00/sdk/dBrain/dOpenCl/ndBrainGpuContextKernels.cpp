@@ -298,7 +298,7 @@ R""""(
         __global const UniformBufferLayerArguments* parameters, 
         __global float* inputOutputData, 
         __global float* notUsed,
-        __global float* logVariance)
+        __global float* sigmaBuffer)
     {
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
@@ -311,8 +311,8 @@ R""""(
         long inputOffset = groupId * (long)inputOutputSize + inputOutputStartOffset;
         long outputOffset = inputOffset + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
 
-        float logVarianceBias = logVariance[0];
-        float logVarianceSlope = logVariance[1];
+        float varianceBias = sigmaBuffer[0];
+        float varianceSlope = sigmaBuffer[1];
 
         uint halfSize = inputSize / 2;
         uint workGroupSizeReminder = inputSize % workGroupSize;
@@ -322,18 +322,18 @@ R""""(
             float x = inputOutputData[inputOffset + i + itemId];
             float value = (x < -30.0) ? -30.0 : ((x > 30.0) ? 30.0 : x);
             float out0 = tanh(value);
-            float out1 = logVarianceBias + out0 * logVarianceSlope;
-            float out2 = exp(out1);
-            inputOutputData[outputOffset + i + itemId] = ((i + itemId) < halfSize) ? out0 : out2;
+            float out1 = varianceBias + varianceSlope * out0;
+            bool test = (i + itemId) < halfSize;
+            inputOutputData[outputOffset + i + itemId] = test ? out0 : out1;
         }
         if (itemId < workGroupSizeReminder)
         {
             float x = inputOutputData[inputOffset + modWorkGroupSize + itemId];
             float value = (x < -30.0) ? -30.0 : ((x > 30.0) ? 30.0 : x);
             float out0 = tanh(value);
-            float out1 = logVarianceBias + out0 * logVarianceSlope;
-            float out2 = exp(out1);
-            inputOutputData[outputOffset + modWorkGroupSize + itemId] = ((modWorkGroupSize + itemId) < halfSize) ? out0 : out2;
+            float out1 = varianceBias + varianceSlope * out0;
+            bool test = (modWorkGroupSize + itemId) < halfSize;
+            inputOutputData[outputOffset + modWorkGroupSize + itemId] = test ? out0 : out1;
         }
     }
 
@@ -733,7 +733,7 @@ R""""(
             __global float* weightsAndBias, 
             __global float* inputOutputGradients,
             __global float* weightsAndBiasGradients,
-            __global float* logVariance) 
+            __global float* variance) 
     {
         uint itemId = get_local_id(0);
         uint groupId = get_group_id(0);
@@ -746,43 +746,41 @@ R""""(
         long srcBase = groupId * (long)inputOutputSize + inputOutputStartOffset;        
         long dstBase = srcBase + CalculateWorkGroupRoundoff(inputSize, workGroupSize);
         
-        float logVarianceBias = logVariance[0];
-        float logVarianceSlope = logVariance[1];
+        float sigmaBias = variance[0];
+        float sigmaSlope = variance[1];
+        float invSigmaSlope = 1.0 / sigmaSlope;
 
         uint halfSize = inputSize / 2;
         uint workGroupSizeReminder = inputSize % workGroupSize;
         uint modWorkGroupSize = inputSize - workGroupSizeReminder;
         for (uint i = 0; i < modWorkGroupSize; i += workGroupSize)
         {
-            float in = inputOutputData[srcBase + i + itemId];
             float out = inputOutputData[dstBase + i + itemId];
 
-            float x1 = tanh(in);
-            float x2 = logVarianceBias + logVarianceSlope * x1;
-
             float meanGrad = 1.0 - out * out;
-            float sigmaGrad = logVarianceSlope * exp(x2) * (1.0 - x1 * x1);
-
+            
+            float x1 = (out - sigmaBias) * invSigmaSlope;
+            float sigmaGrad = sigmaSlope * (1.0 - x1 * x1);
+            
             float blend = ((i + itemId) < halfSize) ? 1.0 : 0.0;
             float gradiend = meanGrad * blend + sigmaGrad * (1.0 - blend);
-          
+            
             float inputGradient = inputOutputGradients[dstBase + i + itemId];
             inputOutputGradients[srcBase + i + itemId] = gradiend * inputGradient;
         }
+
         if (itemId < workGroupSizeReminder)
         {
-            float in = inputOutputData[srcBase + modWorkGroupSize + itemId];
             float out = inputOutputData[dstBase + modWorkGroupSize + itemId];
 
-            float x1 = tanh(in);
-            float x2 = logVarianceBias + logVarianceSlope * x1;
-
             float meanGrad = 1.0 - out * out;
-            float sigmaGrad = logVarianceSlope * exp(x2) * (1.0 - x1 * x1);
 
+            float x1 = (out - sigmaBias) * invSigmaSlope;
+            float sigmaGrad = sigmaSlope * (1.0 - x1 * x1);
+            
             float blend = ((modWorkGroupSize + itemId) < halfSize) ? 1.0 : 0.0;
             float gradiend = meanGrad * blend + sigmaGrad * (1.0 - blend);
-          
+            
             float inputGradient = inputOutputGradients[dstBase + modWorkGroupSize + itemId];
             inputOutputGradients[srcBase + modWorkGroupSize + itemId] = gradiend * inputGradient;
         }
@@ -1663,7 +1661,8 @@ R""""(
         
 		float sample = meanBuffer[srcOffset + itemId];
 		float sigma = varianceBuffer[srcOffset + itemId];
-        float entropy = 0.5 * sample * sample / (sigma * sigma) + log(sigma);
+        float z = sample / sigma;
+        float entropy = 0.5 * z * z + log(sigma);
         reductionBuffer[itemId] = entropy;
         barrier(CLK_LOCAL_MEM_FENCE); 
         
@@ -1694,12 +1693,11 @@ R""""(
         
 		float sample = meanBuffer[srcOffset + itemId];
 		float sigma = varianceBuffer[srcOffset + itemId];
-
         float invSigma = 1.0 / sigma;
-        float invSigma2 = invSigma * invSigma;
-        
-        float meanGradient = regularizationTemperature * sample * invSigma2;
-        float sigmaGradient = regularizationTemperature * invSigma * (sample * sample * invSigma2 - 1.0);
+
+        float z = sample * invSigma;
+        float meanGradient = regularizationTemperature * invSigma * z;
+        float sigmaGradient = regularizationTemperature * invSigma * (z * z - 1.0);
 
         outputBuffer[dstOffset + itemId] = meanGradient;
         outputBuffer[dstOffset + numberOfElements + itemId] = sigmaGradient;

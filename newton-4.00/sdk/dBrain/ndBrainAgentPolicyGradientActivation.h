@@ -25,10 +25,7 @@
 #include "ndBrainStdafx.h"
 #include "ndBrainLayerActivation.h"
 
-#define D_USE_LINEAR_SCALE_SIGMA
 #define ND_POLICY_GRADIENT_ACTIVATION_NAME	"ndBrainAgentPolicyGradientActivation"
-
-#ifdef D_USE_LINEAR_SCALE_SIGMA
 
 // this is an implementation if the last activation layer of a continue action neural nework
 // it takes the mean and pass alone, but it takes the log of deviation as inoput and produce exp(deviacion)
@@ -69,45 +66,4 @@ class ndBrainAgentPolicyGradientActivation : public ndBrainLayerActivation
 	mutable ndSharedPtr<ndBrainUniformBuffer> m_varianceBuffer;
 };
 
-#else
-
-// this is an implementation if the last activation layer of a continue action neural nework
-// it takes the mean and pass alone, but it takes the log of deviation as inoput and produce exp(deviacion)
-// as out put: this is
-// y = tanh(x); for the mean
-// y = exp(a + b(tanh(x)) for the deviation.
-// where a and b are the constant that map x to minimun and maximun sigma 
-
-class ndBrainAgentPolicyGradientActivation : public ndBrainLayerActivation
-{
-	public:
-	ndBrainAgentPolicyGradientActivation(ndInt32 neurons, ndBrainFloat minVariance, ndBrainFloat maxVariance);
-	ndBrainAgentPolicyGradientActivation(const ndBrainAgentPolicyGradientActivation& src);
-
-	virtual bool HasGpuSupport() const override;
-	virtual ndBrainLayer* Clone() const override;
-	virtual const char* GetLabelId() const override;
-	static ndBrainLayer* Load(const ndBrainLoad* const loadSave);
-	virtual void Save(const ndBrainSave* const loadSave) const override;
-
-	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const override;
-	virtual void InputDerivative(const ndBrainVector&, const ndBrainVector& output, const ndBrainVector& outputDerivative, ndBrainVector& inputDerivative) const override;
-	virtual void FeedForward(const ndBrainLayerFeedForwardCpuCommand* const command, ndInt32 miniBatchIndex) const override;
-	virtual void BackPropagate(const ndBrainLayerBackPropagateCpuCommand* const command, ndInt32 miniBatchIndex) const override;
-
-	virtual ndCommandArray CreateGpuFeedForwardCommand(
-		ndBrainTrainerInference* const owner, ndBrainContext* const context,
-		const ndCommandSharedInfo& info, ndInt32 miniBatchSize,
-		ndBrainFloatBuffer* const inputOutputData, ndBrainFloatBuffer* const weightsAndBias) const override;
-
-	virtual ndCommandArray CreateGpuBackPropagateCommand(
-		ndBrainTrainerInference* const owner, ndBrainContext* const context, const ndCommandSharedInfo& info,
-		ndInt32 miniBatchSize, ndBrainFloatBuffer* const inputOutputData, ndBrainFloatBuffer* const weightsAndBias,
-		ndBrainFloatBuffer* const inputOutputGradients, ndBrainFloatBuffer* const weightsAndBiasGradients) const override;
-
-	ndBrainFloat m_logVarianceBias;
-	ndBrainFloat m_logVarianceSlope;
-	mutable ndSharedPtr<ndBrainUniformBuffer> m_logVarianceBuffer;
-};
-#endif
 #endif 
