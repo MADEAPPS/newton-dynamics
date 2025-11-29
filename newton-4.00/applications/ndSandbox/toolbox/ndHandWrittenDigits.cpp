@@ -13,7 +13,7 @@
 #include "ndTestDeepBrain.h"
 
 #define MINIST_USE_CPU_TRAINING
- 
+
 //#define MNIST_USE_MINIST_CONVOLUTIONAL_LAYERS
 //#define MNIST_CONVOLUTIONAL_FEATURE_MAPS		32
 
