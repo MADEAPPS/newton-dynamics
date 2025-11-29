@@ -424,7 +424,6 @@ ndBrainFloat ndBrainVector::CalculateEntropyRegularization(const ndBrainVector& 
 		ndBrainFloat z = sample / sigma;
 		entropy += (ndBrainFloat(0.5f) * z * z + ndBrainFloat(ndLog(sigma)));
 	}
-	//ndAssert(entropy >= ndBrainFloat(0.0f));
 	return -entropy * regularization;
 }
 
@@ -439,10 +438,6 @@ void ndBrainVector::CalculateEntropyRegularizationGradient(const ndBrainVector& 
 		ndBrainFloat sigma = varianceBuffer[i];
 		ndBrainFloat sample = meanSampleBuffer[i];
 		ndBrainFloat invSigma = ndBrainFloat(1.0f) / sigma;
-
-		//ndBrainFloat invSigma2 = invSigma * invSigma;
-		//(*this)[i] = regularization * sample * invSigma2;
-		//(*this)[i + base] = regularization * invSigma * (sample * sample * invSigma2 - ndBrainFloat(1.0f));
 
 		ndBrainFloat z = sample * invSigma;
 		(*this)[i] = regularization * z * invSigma;
