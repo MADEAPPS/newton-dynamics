@@ -35,7 +35,6 @@
 #include "ndBrainAgentPolicyGradientActivation.h"
 
 
-
 ndBrainAgentPolicyGradientActivation::ndBrainAgentPolicyGradientActivation(ndInt32 neurons, ndBrainFloat minVariance, ndBrainFloat maxVariance)
 	:ndBrainLayerActivation(neurons)
 	,m_varianceBuffer(nullptr)

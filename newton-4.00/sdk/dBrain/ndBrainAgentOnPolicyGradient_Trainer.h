@@ -143,6 +143,8 @@ class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 		ndBrainFloat m_policyRegularizer;
 		ndBrainFloat m_criticRegularizer;
 		ndBrainFloat m_discountRewardFactor;
+		ndBrainFloat m_minSigmaSquared;
+		ndBrainFloat m_maxSigmaSquared;
 
 		ndUnsigned32 m_randomSeed;
 		ndInt32 m_miniBatchSize;

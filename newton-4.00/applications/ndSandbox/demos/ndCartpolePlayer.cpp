@@ -81,7 +81,9 @@ namespace ndCarpolePlayer
 	{
 		ndMatrix cartMatrix(ndGetIdentityMatrix());
 		cartMatrix.m_posit = m_cart->GetMatrix().m_posit;
-		cartMatrix.m_posit.m_x = ndFloat32(0.0f);
+		//cartMatrix.m_posit.m_x = ndFloat32(0.0f);
+		cartMatrix.m_posit.m_x = ndFloat32(10.0f) * (ndRand() - ndFloat32(0.5f));
+		cartMatrix.m_posit.m_y = ndFloat32(0.1f);
 		m_cart->SetMatrix(cartMatrix);
 
 		const ndMatrix poleMatrix(m_poleHinge->CalculateGlobalMatrix1());
