@@ -378,6 +378,21 @@ void ndBrainGpuContext::ReductionSum(ndBrainFloatBuffer& dstData)
 	//dst.ReductionSum();
 }
 
+void ndBrainGpuContext::Sqrt(ndBrainFloatBuffer&, ndInt32)
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuContext::InvSqrt(ndBrainFloatBuffer&, ndInt32 clipSize)
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuContext::ReductionSum(ndBrainFloatBuffer& buffer, ndInt32 clipSize)
+{
+	ndAssert(0);
+}
+
 void ndBrainGpuContext::CalculateEntropyRegularization(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& sampleBuffer, const ndBrainFloatBuffer& sigmaBuffer, ndBrainFloat regularization)
 { 
 	const ndInt32 stride = ndInt32(sigmaBuffer.SizeInBytes() / buffer.SizeInBytes());

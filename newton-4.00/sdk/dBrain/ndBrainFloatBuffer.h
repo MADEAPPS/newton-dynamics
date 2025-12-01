@@ -68,6 +68,10 @@ class ndBrainFloatBuffer : public ndBrainBuffer
 	void CalculateEntropyRegularization(const ndBrainFloatBuffer& sample, const ndBrainFloatBuffer& sigma, ndBrainFloat regularization);
 	void CalculateEntropyRegularizationGradient(const ndBrainFloatBuffer& sample, const ndBrainFloatBuffer& sigma, ndBrainFloat regularization, ndInt32 inputSize);
 
+	void Sqrt(ndInt32 clipSize);
+	void InvSqrt(ndInt32 clipSize);
+	void ReductionSum(ndInt32 clipSize);
+
 	protected:
 	ndSharedPtr<ndBrainVector> m_buffer;
 

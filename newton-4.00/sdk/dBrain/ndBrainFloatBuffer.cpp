@@ -26,6 +26,7 @@ ndBrainFloatBuffer::ndBrainFloatBuffer(ndBrainContext* const context, ndInt64 si
 	{
 		m_buffer = ndSharedPtr<ndBrainVector>(new ndBrainVector());
 		m_buffer->SetCount(sizeInFloat);
+		m_buffer->Set(ndBrainFloat(0.0f));
 	}
 }
 
@@ -36,6 +37,7 @@ ndBrainFloatBuffer::ndBrainFloatBuffer(ndBrainContext* const context, const ndBr
 	{
 		m_buffer = ndSharedPtr<ndBrainVector>(new ndBrainVector());
 		m_buffer->SetCount(input.GetCount());
+		m_buffer->Set(ndBrainFloat(0.0f));
 	}
 	m_context->BrainVectorToDevice(*this, input);
 }
@@ -56,6 +58,7 @@ ndBrainFloatBuffer::ndBrainFloatBuffer(ndBrainContext* const context, const ndBr
 	{
 		m_buffer = ndSharedPtr<ndBrainVector>(new ndBrainVector());
 		m_buffer->SetCount(matrix.GetColumns() * matrix.GetRows());
+		m_buffer->Set(ndBrainFloat(0.0f));
 	}
 	m_context->BrainVectorToDevice(*this, flatArray);
 }
@@ -67,6 +70,7 @@ ndBrainFloatBuffer::ndBrainFloatBuffer(const ndBrainFloatBuffer& src)
 	{
 		m_buffer = ndSharedPtr<ndBrainVector>(new ndBrainVector());
 		m_buffer->SetCount(ndInt64(src.m_sizeInBytes / sizeof(ndReal)));
+		m_buffer->Set(ndBrainFloat(0.0f));
 	}
 	m_context->CopyBuffer(*this, src);
 }
@@ -159,6 +163,21 @@ void ndBrainFloatBuffer::SetOrdinal()
 void ndBrainFloatBuffer::ReductionSum()
 {
 	m_context->ReductionSum(*this);
+}
+
+void ndBrainFloatBuffer::ReductionSum(ndInt32 clipSize)
+{
+	m_context->ReductionSum(*this, clipSize);
+}
+
+void ndBrainFloatBuffer::Sqrt(ndInt32 clipSize)
+{
+	m_context->Sqrt(*this, clipSize);
+}
+
+void ndBrainFloatBuffer::InvSqrt(ndInt32 clipSize)
+{
+	m_context->InvSqrt(*this, clipSize);
 }
 
 void ndBrainFloatBuffer::Add(const ndBrainFloatBuffer& buffer)

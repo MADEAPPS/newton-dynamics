@@ -120,7 +120,7 @@ class ndBrainAgentOffPolicyGradient_Agent: public ndBrainAgent
 
 	ndBrainAgentOffPolicyGradient_Trainer* m_owner;
 	ndTrajectory m_trajectory;
-	ndRandomGenerator m_randomeGenerator;
+	ndRandomGenerator m_randomGenerator;
 	ndUnsigned32 m_trajectoryBaseIndex;
 	friend class ndBrainAgentOffPolicyGradient_Trainer;
 };

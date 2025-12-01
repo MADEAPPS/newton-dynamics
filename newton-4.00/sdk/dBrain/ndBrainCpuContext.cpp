@@ -270,6 +270,30 @@ void ndBrainCpuContext::ReductionSum(ndBrainFloatBuffer& dstData)
 	dst.ReductionSum();
 }
 
+void ndBrainCpuContext::Sqrt(ndBrainFloatBuffer& dstData, ndInt32 clipSize)
+{
+	ndBrainVector& dst = **dstData.m_buffer;
+	ndAssert(clipSize <= dst.GetCount());
+	ndBrainMemVector clipDst(&dst[0], clipSize);
+	clipDst.Sqrt();
+}
+
+void ndBrainCpuContext::InvSqrt(ndBrainFloatBuffer& dstData, ndInt32 clipSize)
+{
+	ndBrainVector& dst = **dstData.m_buffer;
+	ndAssert(clipSize <= dst.GetCount());
+	ndBrainMemVector clipDst(&dst[0], clipSize);
+	clipDst.InvSqrt();
+}
+
+void ndBrainCpuContext::ReductionSum(ndBrainFloatBuffer& dstData, ndInt32 clipSize)
+{
+	ndBrainVector& dst = **dstData.m_buffer;
+	ndAssert(clipSize <= dst.GetCount());
+	ndBrainMemVector clipDst(&dst[0], clipSize);
+	clipDst.ReductionSum();
+}
+
 void ndBrainCpuContext::Scale(ndBrainFloatBuffer& buffer, ndBrainFloat scale)
 {
 	ndBrainVector& dst = **buffer.m_buffer;

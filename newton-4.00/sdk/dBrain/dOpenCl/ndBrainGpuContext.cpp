@@ -725,6 +725,21 @@ void ndBrainGpuContext::ReductionSum(ndBrainFloatBuffer& dstData)
 	ndAssert(0);
 }
 
+void ndBrainGpuContext::ReductionSum(ndBrainFloatBuffer& buffer, ndInt32)
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuContext::Sqrt(ndBrainFloatBuffer&, ndInt32)
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuContext::InvSqrt(ndBrainFloatBuffer&, ndInt32 clipSize)
+{
+	ndAssert(0);
+}
+
 void ndBrainGpuContext::CopyBuffer(ndBrainBuffer& dstData, const ndBrainBuffer& srcData)
 {
 	SubmitMathOperation(m_brainAssigment, &dstData, &srcData);

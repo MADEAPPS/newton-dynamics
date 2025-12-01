@@ -38,7 +38,6 @@
 #include "ndBrainAgentPolicyGradientActivation.h"
 #include "ndBrainAgentOnPolicyGradient_Trainer.h"
 
-
 #define ND_POLICY_MIN_SIGMA_SQUARE				ndBrainFloat(0.01f)
 #define ND_POLICY_MAX_SIGMA_SQUARE				ndBrainFloat(1.0f)
 
@@ -56,8 +55,9 @@ ndBrainAgentOnPolicyGradient_Trainer::HyperParameters::HyperParameters()
 	m_miniBatchSize = 256;
 	m_numberOfActions = 0;
 	m_numberOfObservations = 0;
+	m_criticValueIterations = 5;
 
-	m_learnRate = ndBrainFloat(1.0e-5f);
+	m_learnRate = ndBrainFloat(1.0e-4f);
 	m_policyRegularizer = ndBrainFloat(1.0e-4f);
 	m_criticRegularizer = ndBrainFloat(1.0e-4f);
 	m_discountRewardFactor = ndBrainFloat(0.99f);
@@ -245,14 +245,14 @@ void ndBrainAgentOnPolicyGradient_Agent::ndTrajectory::GetFlatArray(ndInt32 inde
 ndBrainAgentOnPolicyGradient_Agent::ndBrainAgentOnPolicyGradient_Agent(ndBrainAgentOnPolicyGradient_Trainer* const master)
 	:ndBrainAgent()
 	,m_trajectory()
-	,m_randomeGenerator()
+	,m_randomGenerator()
 	,m_owner(master)
 	,m_isDead(false)
 {
 	m_trajectory.Init(master->m_parameters.m_numberOfActions, master->m_parameters.m_numberOfObservations);
 
 	ndUnsigned32 agentSeed = m_owner->m_randomGenerator();
-	m_randomeGenerator.m_gen.seed(agentSeed);
+	m_randomGenerator.m_gen.seed(agentSeed);
 }
 
 ndInt32 ndBrainAgentOnPolicyGradient_Agent::GetEpisodeFrames() const
@@ -267,7 +267,7 @@ void ndBrainAgentOnPolicyGradient_Agent::SampleActions(ndBrainVector& actions)
 	for (ndInt32 i = size - 1; i >= 0; --i)
 	{
 		ndBrainFloat sigma = actions[size + i];
-		ndBrainFloat unitVarianceSample = m_randomeGenerator.m_d(m_randomeGenerator.m_gen);
+		ndBrainFloat unitVarianceSample = m_randomGenerator.m_d(m_randomGenerator.m_gen);
 		ndBrainFloat sample = ndBrainFloat(actions[i]) + unitVarianceSample * sigma;
 		ndBrainFloat clippedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
 		actions[i] = clippedAction;
@@ -290,7 +290,6 @@ void ndBrainAgentOnPolicyGradient_Agent::Step()
 
 	bool isdead = IsTerminal();
 	ndBrainFloat reward = CalculateReward();
-
 	m_trajectory.SetReward(entryIndex, reward);
 	m_trajectory.SetTerminalState(entryIndex, isdead);
 	policy->MakePrediction(observation, actions);
@@ -567,6 +566,11 @@ void ndBrainAgentOnPolicyGradient_Trainer::SaveTrajectory(ndBrainAgentOnPolicyGr
 		}
 	}
 
+	for (ndInt32 i = trajectory.GetCount() - 2; i >= 0; --i)
+	{
+		ndMemCpy(trajectory.GetNextObservations(i), trajectory.GetObservations(i + 1), m_parameters.m_numberOfObservations);
+	}
+
 	// using the Bellman equation to calculate trajectory rewards. (Monte Carlo method)
 	ndBrainFloat gamma = m_parameters.m_discountRewardFactor;
 	ndBrainFloat expectedRewrad = trajectory.GetReward(trajectory.GetCount() - 1);
@@ -578,19 +582,11 @@ void ndBrainAgentOnPolicyGradient_Trainer::SaveTrajectory(ndBrainAgentOnPolicyGr
 		trajectory.SetExpectedReward(i, expectedRewrad);
 	}
 
-	for (ndInt32 i = trajectory.GetCount() - 2; i >= 0; --i)
-	{
-		ndMemCpy(trajectory.GetNextObservations(i), trajectory.GetObservations(i + 1), m_parameters.m_numberOfObservations);
-	}
-
-	if (trajectory.GetTerminalState(trajectory.GetCount() - 1))
-	{
-		ndMemCpy(trajectory.GetNextObservations(trajectory.GetCount() - 1), trajectory.GetObservations(trajectory.GetCount() - 1), m_parameters.m_numberOfObservations);
-	}
-
 	if (trajectory.GetCount() >= m_parameters.m_maxTrajectorySteps)
 	{
 		ndAssert(0);
+		trajectory.SetCount(m_parameters.m_maxTrajectorySteps);
+		trajectory.SetTerminalState(m_parameters.m_maxTrajectorySteps - 1, true);
 	}
 
 	ndInt32 base = m_trajectoryAccumulator.GetCount();

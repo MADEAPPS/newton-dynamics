@@ -93,6 +93,10 @@ class ndBrainContext : public ndClassAlloc
 	virtual void CalculateEntropyRegularization(ndBrainFloatBuffer&, const ndBrainFloatBuffer&, const ndBrainFloatBuffer&, ndBrainFloat) = 0;
 	virtual void CalculateEntropyRegularizationGradient(ndBrainFloatBuffer&, const ndBrainFloatBuffer&, const ndBrainFloatBuffer&, ndBrainFloat, ndInt32) = 0;
 
+	virtual void Sqrt(ndBrainFloatBuffer&, ndInt32) = 0;
+	virtual void InvSqrt(ndBrainFloatBuffer&, ndInt32) = 0;
+	virtual void ReductionSum(ndBrainFloatBuffer&, ndInt32) = 0;
+
 	// learnRate commands
 	virtual void ApplyLeanRateCommands(ndBrainBufferCommand*, ndBrainFloat) = 0;
 	virtual void SetLearnRateCommandBuffers(ndBrainOptimizerAdam&, ndInt32, ndBrainFloatBuffer&, ndBrainFloatBuffer&) = 0;

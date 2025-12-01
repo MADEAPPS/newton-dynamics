@@ -124,7 +124,7 @@ class ndBrainAgentOnPolicyGradient_Agent: public ndBrainAgent
 	virtual void SampleActions(ndBrainVector& action);
 	
 	ndTrajectory m_trajectory;
-	ndRandomGenerator m_randomeGenerator;
+	ndRandomGenerator m_randomGenerator;
 	ndBrainAgentOnPolicyGradient_Trainer* m_owner;
 
 	bool m_isDead;
@@ -151,6 +151,7 @@ class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 		ndInt32 m_numberOfActions;
 		ndInt32 m_numberOfObservations;
 
+		ndInt32 m_criticValueIterations;
 		ndInt32 m_numberOfHiddenLayers;
 		ndInt32 m_hiddenLayersNumberOfNeurons;
 

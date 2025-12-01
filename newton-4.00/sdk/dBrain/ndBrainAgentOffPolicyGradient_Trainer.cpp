@@ -244,13 +244,13 @@ ndBrainAgentOffPolicyGradient_Agent::ndBrainAgentOffPolicyGradient_Agent(ndBrain
 	:ndBrainAgent()
 	,m_owner(master)
 	,m_trajectory()
-	,m_randomeGenerator()
+	,m_randomGenerator()
 	,m_trajectoryBaseIndex(0)
 {
 	const ndBrain* const brain = *master->m_policyTrainer->GetBrain();
 	m_trajectory.Init(brain->GetOutputSize(), master->m_parameters.m_numberOfObservations);
 	ndUnsigned32 agentSeed = m_owner->m_randomGenerator();
-	m_randomeGenerator.m_gen.seed(agentSeed);
+	m_randomGenerator.m_gen.seed(agentSeed);
 }
 
 ndInt32 ndBrainAgentOffPolicyGradient_Agent::GetEpisodeFrames() const
@@ -265,7 +265,7 @@ void ndBrainAgentOffPolicyGradient_Agent::SampleActions(ndBrainVector& actions)
 	for (ndInt32 i = size - 1; i >= 0; --i)
 	{
 		ndBrainFloat sigma = actions[size + i];
-		ndBrainFloat unitVarianceSample = m_randomeGenerator.m_d(m_randomeGenerator.m_gen);
+		ndBrainFloat unitVarianceSample = m_randomGenerator.m_d(m_randomGenerator.m_gen);
 		ndBrainFloat sample = ndBrainFloat(actions[i]) + unitVarianceSample * sigma;
 		ndBrainFloat clippedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
 		actions[i] = clippedAction;
