@@ -699,7 +699,7 @@ void ndBrainAgentOnPolicyGradient_Trainer::CalculateAdvantage()
 
 void ndBrainAgentOnPolicyGradient_Trainer::OptimizeCritic()
 {
-	// claulte value function by booth strapping
+	// calculate value function by bootstrapping the trajectory transtions.
 	ndCopyBufferCommandInfo shuffleBufferInfo;
 	shuffleBufferInfo.m_srcStrideInByte = ndInt32(m_parameters.m_miniBatchSize * sizeof(ndReal));
 	shuffleBufferInfo.m_srcOffsetInByte = 0;
@@ -708,56 +708,53 @@ void ndBrainAgentOnPolicyGradient_Trainer::OptimizeCritic()
 	shuffleBufferInfo.m_strideInByte = shuffleBufferInfo.m_srcStrideInByte;
 
 	ndCopyBufferCommandInfo rewardInfo;
-	rewardInfo.m_srcOffsetInByte = ndInt32(m_trajectoryAccumulator.GetRewardOffset() * sizeof(ndReal));
 	rewardInfo.m_srcStrideInByte = ndInt32(m_trajectoryAccumulator.GetStride() * sizeof(ndReal));
+	rewardInfo.m_srcOffsetInByte = ndInt32(m_trajectoryAccumulator.GetRewardOffset() * sizeof(ndReal));
 	rewardInfo.m_dstOffsetInByte = 0;
 	rewardInfo.m_dstStrideInByte = ndInt32(sizeof(ndReal));
 	rewardInfo.m_strideInByte = rewardInfo.m_dstStrideInByte;
 
-	ndCopyBufferCommandInfo terminalInfo;
+	ndCopyBufferCommandInfo terminalInfo(rewardInfo);
 	terminalInfo.m_srcOffsetInByte = ndInt32(m_trajectoryAccumulator.GetTerminalOffset() * sizeof(ndReal));
-	terminalInfo.m_srcStrideInByte = ndInt32(m_trajectoryAccumulator.GetStride() * sizeof(ndReal));
-	terminalInfo.m_dstOffsetInByte = 0;
-	terminalInfo.m_dstStrideInByte = ndInt32(sizeof(ndReal));
-	terminalInfo.m_strideInByte = terminalInfo.m_dstStrideInByte;
 
-	ndCopyBufferCommandInfo observationInfo;
+	ndCopyBufferCommandInfo observationInfo(rewardInfo);
 	observationInfo.m_srcOffsetInByte = ndInt32(m_trajectoryAccumulator.GetObsevationOffset() * sizeof(ndReal)); 
-	observationInfo.m_srcStrideInByte = ndInt32(m_trajectoryAccumulator.GetStride() * sizeof(ndReal));
-	observationInfo.m_dstOffsetInByte = 0;
-	observationInfo.m_dstStrideInByte = ndInt32(m_parameters.m_numberOfObservations * sizeof(ndReal));
-	observationInfo.m_strideInByte = observationInfo.m_dstStrideInByte;
 
-	ndCopyBufferCommandInfo nextObservationInfo(observationInfo);
+	ndCopyBufferCommandInfo nextObservationInfo(rewardInfo);
 	nextObservationInfo.m_srcOffsetInByte = ndInt32(m_trajectoryAccumulator.GetNextObsevationOffset() * sizeof(ndReal));
 
 	ndBrainFloatBuffer* const inputBuffer = m_criticTrainer->GetInputBuffer();
 	ndBrainFloatBuffer* const outputBuffer = m_criticTrainer->GetOuputBuffer();
 	ndBrainFloatBuffer* const outputGradientBuffer = m_criticTrainer->GetOuputGradientBuffer();
 
-static int xxxxx;
-	const ndInt32 numberOfUpdates = m_parameters.m_criticValueIterations * m_numberOfGpuTransitions / m_parameters.m_miniBatchSize;
+	const ndInt32 numberOfUpdates = ndInt32 (m_parameters.m_criticValueIterations * m_numberOfGpuTransitions / m_parameters.m_miniBatchSize);
+
+	// calculate GAE(l, 1) // very noisy, the policy colapse most of the time.
+	// calculate GAE(l, 0) // too smooth, and doesn't seem to work either
+	// just using bellman equation to calculate state state value.
+	// gradValue(i) = 0.5 * (value(i) - reward(i) + alive(i) * gamma * Value(i + 1))^2
 	for (ndInt32 i = numberOfUpdates - 1; i >= 0; --i)
 	{
 		m_randomShuffleMinibatchBuffer->CopyBuffer(shuffleBufferInfo, 1, **m_randomShuffleBuffer);
+
 		inputBuffer->CopyBufferIndirect(nextObservationInfo, **m_randomShuffleMinibatchBuffer, **m_trainingBuffer);
 		m_criticTrainer->MakePrediction();
+		outputBuffer->Scale(m_parameters.m_discountRewardFactor);
+
+		outputGradientBuffer->CopyBufferIndirect(terminalInfo, **m_randomShuffleMinibatchBuffer, **m_trainingBuffer);
+		outputBuffer->Mul(*outputGradientBuffer);
 		
-		//outputGradientBuffer->CopyBufferIndirect(terminalInfo, **m_randomShuffleMinibatchBuffer, **m_trainingBuffer);
-		//outputBuffer->Scale(m_parameters.m_discountRewardFactor);
-		//outputBuffer->Mul(*outputGradientBuffer);
-		//
-		//m_criticStateValue->CopyBufferIndirect(rewardInfo, **m_randomShuffleMinibatchBuffer, **m_trainingBuffer);
-		//m_criticStateValue->Add(*outputBuffer);
-		//
-		//inputBuffer->CopyBufferIndirect(observationInfo, **m_randomShuffleMinibatchBuffer, **m_trainingBuffer);
-		//m_criticTrainer->MakePrediction();
-		//
-		//outputGradientBuffer->Set(*outputBuffer);
-		//outputGradientBuffer->Sub(**m_criticStateValue);
-		//
-		//m_criticTrainer->BackPropagate();
-		//m_criticTrainer->ApplyLearnRate(m_learnRate);
+		m_criticStateValue->CopyBufferIndirect(rewardInfo, **m_randomShuffleMinibatchBuffer, **m_trainingBuffer);
+		m_criticStateValue->Add(*outputBuffer);
+		
+		inputBuffer->CopyBufferIndirect(observationInfo, **m_randomShuffleMinibatchBuffer, **m_trainingBuffer);
+		m_criticTrainer->MakePrediction();
+
+		outputGradientBuffer->Set(*outputBuffer);
+		outputGradientBuffer->Sub(**m_criticStateValue);
+		
+		m_criticTrainer->BackPropagate();
+		m_criticTrainer->ApplyLearnRate(m_learnRate);
 		
 		shuffleBufferInfo.m_srcOffsetInByte += ndInt32(m_parameters.m_miniBatchSize * sizeof(ndReal));
 	}
