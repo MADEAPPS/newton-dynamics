@@ -50,14 +50,32 @@ void ndBrainVector::SetOrdinal()
 	}
 }
 
+void ndBrainVector::Sqrt()
+{
+	for (ndInt64 i = GetCount() - 1; i >= 0; --i)
+	{
+		ndBrainFloat x = (*this)[i];
+		(*this)[i] = ndBrainFloat (ndSqrt(x));
+	}
+}
+
+void ndBrainVector::InvSqrt()
+{
+	for (ndInt64 i = GetCount() - 1; i >= 0; --i)
+	{
+		ndBrainFloat x = (*this)[i];
+		(*this)[i] = ndBrainFloat(1.0f) / ndBrainFloat(ndSqrt(x));
+	}
+}
+
 void ndBrainVector::ReductionSum()
 {
 	ndBrainFloat sum = ndBrainFloat(0.0f);
-	for (ndInt64 i = 0; i < GetCount(); ++i)
+	for (ndInt64 i = GetCount() - 1; i >= 0; --i)
 	{
 		sum += (*this)[i];
 	}
-	for (ndInt64 i = 0; i < GetCount(); ++i)
+	for (ndInt64 i = GetCount() - 1; i >= 0; --i)
 	{
 		(*this)[i] = sum;
 	}

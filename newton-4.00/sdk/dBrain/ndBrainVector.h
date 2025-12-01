@@ -68,6 +68,8 @@ class ndBrainVector: public ndArray<ndBrainFloat>
 	void MulAdd(const ndBrainVector& a, const ndBrainVector& b);
 	void MulSub(const ndBrainVector& a, const ndBrainVector& b);
 
+	void Sqrt();
+	void InvSqrt();
 	void SetOrdinal();
 	void ReductionSum();
 	void StandardNormalDistribution();

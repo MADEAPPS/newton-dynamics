@@ -116,7 +116,6 @@ void ndBrainLayerLinear::InitWeights_xavier()
 	}
 }
 
-
 void ndBrainLayerLinear::Clear()
 {
 	m_bias.Set(ndBrainFloat(0.0f));

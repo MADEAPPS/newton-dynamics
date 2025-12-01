@@ -177,6 +177,12 @@ namespace ndCartpoleTrainer_ppo
 			ndSharedPtr<ndBrainAgentOnPolicyGradient_Agent> agent(new ndAgent(m_master, playerController));
 			playerController->m_agent = *agent;
 
+			for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
+			{
+				ndShapeMaterial& material = node->m_body->GetAsBodyDynamic()->GetCollisionShape().m_shapeMaterial;
+				material.m_userId = ndDemoContactCallback::m_modelPart;
+			}
+
 			m_master->AddAgent(agent);
 			return model;
 		}
