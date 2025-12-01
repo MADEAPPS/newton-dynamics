@@ -1148,8 +1148,8 @@ void ndBrainAgentOffPolicyGradient_Trainer::Optimize()
 
 		// load the same uniform random array
 		m_minibatchGaussianDistribution->CopyBuffer(minibatchReparametization, 1, **m_uniformRandom);
-		TrainPolicy();
 
+		TrainPolicy();
 		for (ndInt32 j = 0; j < ndInt32(sizeof(m_referenceCriticTrainer) / sizeof(m_referenceCriticTrainer[0])); ++j)
 		{
 			ndBrainTrainer* const criticTrainer = *m_criticTrainer[j];
