@@ -679,22 +679,53 @@ void ndBrainAgentOnPolicyGradient_Trainer::CalculateAdvantage()
 	observationInfo.m_dstStrideInByte = ndInt32(m_criticTrainer->GetBrain()->GetInputSize() * sizeof(ndReal));
 	observationInfo.m_strideInByte = observationInfo.m_dstStrideInByte;
 
-	const ndInt32 dstStride = ndInt32(m_parameters.m_miniBatchSize * sizeof(ndReal));
-	const ndInt32 srcStride = ndInt32(m_parameters.m_miniBatchSize * m_trajectoryAccumulator.GetStride() * sizeof(ndReal));
-	for (ndInt32 i = ndInt32 (m_numberOfGpuTransitions / m_parameters.m_miniBatchSize) - 1; i >= 0; --i)
+	ndCopyBufferCommandInfo nextObservationInfo(observationInfo);
+	nextObservationInfo.m_srcOffsetInByte = ndInt32(m_trajectoryAccumulator.GetNextObsevationOffset() * sizeof(ndReal));
+
+	ndCopyBufferCommandInfo stateRewardInfo(observationInfo);
+	stateRewardInfo.m_srcOffsetInByte = ndInt32(m_trajectoryAccumulator.GetRewardOffset() * sizeof(ndReal));
+	stateRewardInfo.m_dstStrideInByte = ndInt32(sizeof(ndReal));
+	stateRewardInfo.m_strideInByte = stateRewardInfo.m_dstStrideInByte;
+	
+	ndCopyBufferCommandInfo stateTerminalInfo(stateRewardInfo);
+	stateTerminalInfo.m_srcOffsetInByte = ndInt32(m_trajectoryAccumulator.GetTerminalOffset() * sizeof(ndReal));
+
+	const ndInt32 advantageStrideInBytes = ndInt32(m_parameters.m_miniBatchSize * sizeof(ndReal));
+	const ndInt32 numberOfGpuTransitions = ndInt32(m_numberOfGpuTransitions / m_parameters.m_miniBatchSize);
+	const ndInt32 transitionStrideInBytes = ndInt32(m_parameters.m_miniBatchSize * m_trajectoryAccumulator.GetStride() * sizeof(ndReal));
+
+	// calculate GAE(l, 1) // very noisy, the policy colapse most of the time.
+	// calculate GAE(l, 0) // too smooth, and doesn't seem to work either
+	// just using bellman equation to calculate state expected reward.
+	// advantage(i) = reward(i) + alive(i) * (gamma * Value(i + 1) - value(i))
+	for (ndInt32 i = numberOfGpuTransitions - 1; i >= 0; --i)
 	{
-		m_advantageMinibatchBuffer->CopyBuffer(expectedRewardInfo, m_parameters.m_miniBatchSize, **m_trainingBuffer);
-		//inputBuffer->CopyBuffer(observationInfo, m_parameters.m_miniBatchSize, **m_trainingBuffer);
-		//m_criticTrainer->MakePrediction();
-		//m_advantageMinibatchBuffer->Sub(*outputBuffer);
+		// get next state value
+		inputBuffer->CopyBuffer(nextObservationInfo, m_parameters.m_miniBatchSize, **m_trainingBuffer);
+		m_criticTrainer->MakePrediction();
+		
+		outputBuffer->Scale(m_parameters.m_discountRewardFactor);
+		m_advantageMinibatchBuffer->Set(*outputBuffer);
+		
+		inputBuffer->CopyBuffer(observationInfo, m_parameters.m_miniBatchSize, **m_trainingBuffer);
+		m_criticTrainer->MakePrediction();
+		m_advantageMinibatchBuffer->Sub(*outputBuffer);
+
+		outputBuffer->CopyBuffer(stateTerminalInfo, m_parameters.m_miniBatchSize, **m_trainingBuffer);
+		m_advantageMinibatchBuffer->Mul(*outputBuffer);
+		
+		outputBuffer->CopyBuffer(stateRewardInfo, m_parameters.m_miniBatchSize, **m_trainingBuffer);
+		m_advantageMinibatchBuffer->Add(*outputBuffer);
+		
+		// save advantage
 		m_advantageBuffer->CopyBuffer(advantageInfo, 1, **m_advantageMinibatchBuffer);
 
-		advantageInfo.m_dstOffsetInByte += dstStride;
-		observationInfo.m_srcOffsetInByte += srcStride;
-		expectedRewardInfo.m_srcOffsetInByte += srcStride;
+		advantageInfo.m_dstOffsetInByte += advantageStrideInBytes;
+		stateRewardInfo.m_srcOffsetInByte += transitionStrideInBytes;
+		observationInfo.m_srcOffsetInByte += transitionStrideInBytes;
+		stateTerminalInfo.m_srcOffsetInByte += transitionStrideInBytes;
+		nextObservationInfo.m_srcOffsetInByte += transitionStrideInBytes;
 	}
-	//ndAssert(0);
-	//m_advantageBuffer->GaussianNormalize(ndInt32 (m_numberOfMinibatches));
 }
 
 void ndBrainAgentOnPolicyGradient_Trainer::OptimizeCritic()
@@ -886,7 +917,7 @@ void ndBrainAgentOnPolicyGradient_Trainer::Optimize()
 	UpdateScore();
 	TrajectoryToGpuBuffers();
 
-	//CalculateAdvantage();
+	CalculateAdvantage();
 	//OptimizePolicy();
 
 	//ndBrainFloat divergence = CalculateKLdivergence();
