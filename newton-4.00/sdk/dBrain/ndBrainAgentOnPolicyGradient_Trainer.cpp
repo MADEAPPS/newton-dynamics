@@ -673,7 +673,7 @@ void ndBrainAgentOnPolicyGradient_Trainer::CalculateAdvantage()
 
 	ndCopyBufferCommandInfo observationInfo;
 	observationInfo.m_srcStrideInByte = ndInt32 (m_trajectoryAccumulator.GetStride() * sizeof(ndReal));
-	observationInfo.m_srcOffsetInByte = ndInt32(m_trajectoryAccumulator.GetNextObsevationOffset() * sizeof(ndReal));
+	observationInfo.m_srcOffsetInByte = ndInt32(m_trajectoryAccumulator.GetObsevationOffset() * sizeof(ndReal));
 	observationInfo.m_dstOffsetInByte = 0;
 	observationInfo.m_dstStrideInByte = ndInt32(m_criticTrainer->GetBrain()->GetInputSize() * sizeof(ndReal));
 	observationInfo.m_strideInByte = observationInfo.m_dstStrideInByte;
