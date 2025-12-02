@@ -108,7 +108,7 @@ namespace ndCartpoleTrainer_ppo
 			,m_discountRewardFactor(0.99f)
 			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountRewardFactor))
 			,m_lastEpisode(0xfffffff)
-			,m_stopTraining(50 * 1000000)
+			,m_stopTraining(100 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			char name[256];
@@ -119,7 +119,7 @@ namespace ndCartpoleTrainer_ppo
 			// create a Soft Actor Critic traniing agent
 			ndBrainAgentOnPolicyGradient_Trainer::HyperParameters hyperParameters;
 			
-			hyperParameters.m_useGpuBackend = false;
+			//hyperParameters.m_useGpuBackend = false;
 			hyperParameters.m_batchTrajectoryCount = 100;
 			hyperParameters.m_hiddenLayersNumberOfNeurons = 64;
 			hyperParameters.m_numberOfActions = m_actionsSize;
