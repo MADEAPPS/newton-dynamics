@@ -108,7 +108,7 @@ namespace ndCartpoleTrainer_ppo
 			,m_discountRewardFactor(0.99f)
 			,m_horizon(ndFloat32(1.0f) / (ndFloat32(1.0f) - m_discountRewardFactor))
 			,m_lastEpisode(0xfffffff)
-			,m_stopTraining(2 * 1000000)
+			,m_stopTraining(20 * 1000000)
 			,m_modelIsTrained(false)
 		{
 			char name[256];
@@ -138,7 +138,7 @@ namespace ndCartpoleTrainer_ppo
 			loader.m_mesh->m_matrix = loader.m_mesh->m_matrix * matrix;
 			
 			// create an articulated model
-			const ndInt32 numberOfAgents = 1;
+			const ndInt32 numberOfAgents = 10;
 			for (ndInt32 i = 0; i < numberOfAgents; ++i)
 			{
 				ndFloat32 x = ndFloat32(10.0f) * (ndRand() - ndFloat32(0.5f));
