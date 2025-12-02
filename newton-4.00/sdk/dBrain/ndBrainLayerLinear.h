@@ -50,6 +50,7 @@ class ndBrainLayerLinear : public ndBrainLayer
 	virtual ndBrainVector* GetBias();
 	virtual ndBrainMatrix* GetWeights();
 	
+	virtual void InitWeights() override;
 	virtual void InitWeights_he() override;
 	virtual void InitWeights_xavier() override;
 	virtual void MakePrediction(const ndBrainVector& input, ndBrainVector& output) const override;

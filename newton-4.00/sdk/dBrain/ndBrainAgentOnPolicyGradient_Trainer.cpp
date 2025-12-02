@@ -291,8 +291,8 @@ void ndBrainAgentOnPolicyGradient_Agent::Step()
 	ndBrainFloat reward = CalculateReward();
 	m_trajectory.SetReward(entryIndex, reward);
 	m_trajectory.SetTerminalState(entryIndex, isdead);
+
 	policy->MakePrediction(observation, actions);
-	
 	SampleActions(actions);
 	ApplyActions(&actions[0]);
 	m_isDead = m_isDead || isdead;
@@ -875,7 +875,7 @@ void ndBrainAgentOnPolicyGradient_Trainer::Optimize()
 	TrajectoryToGpuBuffers();
 
 	CalculateAdvantage();
-	OptimizePolicy();
+	//OptimizePolicy();
 
 	//ndBrainFloat divergence = CalculateKLdivergence();
 	for (ndInt32 i = ND_CONTINUE_PROXIMA_POLICY_ITERATIONS - 1; i >= 0; --i)

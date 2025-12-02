@@ -146,6 +146,13 @@ void ndBrain::InitWeights()
 	for (ndInt32 i = ndInt32(layers.GetCount() - 1); i >= 0; --i)
 	{
 		ndBrainLayer* const layer = layers[i];
+#if 1
+		// unless I misundertood the paper, 
+		// the Xavier of He inialization are not 
+		// better than a just plan gaussian ditrubitrion
+		// in fact, the guassian initalization seem a lot better
+		layer->InitWeights();
+#else
 		if (strcmp(layer->GetLabelId(), ND_BRAIN_LAYER_LINEAR_NAME) == 0)
 		{
 			if ((i + 1) < layers.GetCount())
@@ -166,9 +173,8 @@ void ndBrain::InitWeights()
 			{
 				layer->InitWeights_xavier();
 			}
-
-			//layer->InitWeights();
 		}
+#endif
 	}
 }
 

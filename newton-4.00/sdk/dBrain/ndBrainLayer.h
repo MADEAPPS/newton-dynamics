@@ -99,6 +99,7 @@ class ndBrainLayer : public ndClassAlloc
 	virtual void AddReqularizerL1(const ndBrainLayer& weights, ndBrainFloat regularizer);
 	virtual void AddReqularizerL2(const ndBrainLayer& weights, ndBrainFloat regularizer);
 
+	virtual void InitWeights();
 	virtual void InitWeights_he();
 	virtual void InitWeights_xavier();
 
