@@ -588,7 +588,6 @@ void ndBrainAgentOnPolicyGradient_Trainer::SaveTrajectory(ndBrainAgentOnPolicyGr
 
 	if (trajectory.GetCount() >= m_parameters.m_maxTrajectorySteps)
 	{
-		ndAssert(0);
 		trajectory.SetCount(m_parameters.m_maxTrajectorySteps);
 		trajectory.SetTerminalState(m_parameters.m_maxTrajectorySteps - 1, true);
 	}
