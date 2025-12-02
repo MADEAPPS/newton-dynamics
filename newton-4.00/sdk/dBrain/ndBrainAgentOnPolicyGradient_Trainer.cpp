@@ -753,9 +753,11 @@ void ndBrainAgentOnPolicyGradient_Trainer::OptimizeCritic()
 	terminalInfo.m_srcOffsetInByte = ndInt32(m_trajectoryAccumulator.GetTerminalOffset() * sizeof(ndReal));
 
 	ndCopyBufferCommandInfo observationInfo(rewardInfo);
-	observationInfo.m_srcOffsetInByte = ndInt32(m_trajectoryAccumulator.GetObsevationOffset() * sizeof(ndReal)); 
+	observationInfo.m_srcOffsetInByte = ndInt32(m_trajectoryAccumulator.GetObsevationOffset() * sizeof(ndReal));
+	observationInfo.m_dstStrideInByte = ndInt32(m_criticTrainer->GetBrain()->GetInputSize() * sizeof(ndReal));
+	observationInfo.m_strideInByte = observationInfo.m_dstStrideInByte;
 
-	ndCopyBufferCommandInfo nextObservationInfo(rewardInfo);
+	ndCopyBufferCommandInfo nextObservationInfo(observationInfo);
 	nextObservationInfo.m_srcOffsetInByte = ndInt32(m_trajectoryAccumulator.GetNextObsevationOffset() * sizeof(ndReal));
 
 	ndBrainFloatBuffer* const inputBuffer = m_criticTrainer->GetInputBuffer();
@@ -865,7 +867,7 @@ void ndBrainAgentOnPolicyGradient_Trainer::OptimizePolicy()
 		policyObservation.m_srcOffsetInByte += transitionStrideInBytes;
 	}
 	m_policyGradientAccumulator->Scale(ndBrainFloat(1.0f) / ndBrainFloat(numberOfBatches));
-	weightAndBiasGradientBuffer->Set(m_policyGradientAccumulator);
+	weightAndBiasGradientBuffer->Set(**m_policyGradientAccumulator);
 	m_policyTrainer->ApplyLearnRate(m_learnRate);
 }
 
@@ -875,7 +877,7 @@ void ndBrainAgentOnPolicyGradient_Trainer::Optimize()
 	TrajectoryToGpuBuffers();
 
 	CalculateAdvantage();
-	//OptimizePolicy();
+	OptimizePolicy();
 
 	//ndBrainFloat divergence = CalculateKLdivergence();
 	for (ndInt32 i = ND_CONTINUE_PROXIMA_POLICY_ITERATIONS - 1; i >= 0; --i)
