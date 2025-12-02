@@ -636,22 +636,50 @@ void ndBrainAgentOnPolicyGradient_Trainer::TrajectoryToGpuBuffers()
 		m_trajectoryAccumulator.GetFlatArray(i, dst);
 	}
 
-	m_shuffleBuffer.SetCount(0);
 	m_numberOfGpuTransitions = ndUnsigned32 (m_trajectoryAccumulator.GetCount() - m_trajectoryAccumulator.GetCount() % m_parameters.m_miniBatchSize);
-	for (ndInt32 j = m_parameters.m_criticValueIterations; j >= 0; --j)
+	 
+	//m_shuffleBuffer.SetCount(0);
+	//for (ndInt32 j = m_parameters.m_criticValueIterations; j >= 0; --j)
+	//{
+	//	m_tmpShuffleBuffer.SetCount(0);
+	//	for (ndInt32 i = 0; i < count; ++i)
+	//	{
+	//		m_tmpShuffleBuffer.PushBack(i);
+	//	}
+	//	m_tmpShuffleBuffer.RandomShuffle(count);
+	//	for (ndInt32 i = 0; i < ndInt32 (m_numberOfGpuTransitions); ++i)
+	//	{
+	//		m_shuffleBuffer.PushBack(m_tmpShuffleBuffer[i]);
+	//	}
+	//}
+
+	m_tmpShuffleBuffer.SetCount(0);
+	for (ndInt32 i = 0; i < ndInt32(m_trajectoryAccumulator.GetCount()); ++i)
 	{
-		m_tmpShuffleBuffer.SetCount(0);
-		for (ndInt32 i = 0; i < count; ++i)
+		m_tmpShuffleBuffer.PushBack(i);
+	}
+	if (m_tmpShuffleBuffer.GetCount() < ndInt32(m_parameters.m_criticValueIterations * m_parameters.m_miniBatchSize))
+	{
+		ndInt32 duplicate = 0;
+		for (ndInt32 i = ndInt32(m_tmpShuffleBuffer.GetCount()); i < ndInt32(m_parameters.m_criticValueIterations * m_parameters.m_miniBatchSize); ++i)
 		{
-			m_tmpShuffleBuffer.PushBack(i);
-		}
-		m_tmpShuffleBuffer.RandomShuffle(count);
-		for (ndInt32 i = 0; i < ndInt32 (m_numberOfGpuTransitions); ++i)
-		{
-			m_shuffleBuffer.PushBack(m_tmpShuffleBuffer[i]);
+			m_tmpShuffleBuffer.PushBack(m_tmpShuffleBuffer[duplicate]);
+			duplicate++;
 		}
 	}
+	m_tmpShuffleBuffer.RandomShuffle(m_tmpShuffleBuffer.GetCount());
+	m_tmpShuffleBuffer.SetCount(m_parameters.m_criticValueIterations * m_parameters.m_miniBatchSize);
 
+	m_shuffleBuffer.SetCount(0);
+	for (ndInt32 i = 0; i < m_parameters.m_criticValueIterations; ++i)
+	{
+		for (ndInt32 j = 0; j < ndInt32(m_parameters.m_criticValueIterations * m_parameters.m_miniBatchSize); ++j)
+		{
+			m_shuffleBuffer.PushBack(m_tmpShuffleBuffer[j]);
+		}
+		m_tmpShuffleBuffer.RandomShuffle(m_tmpShuffleBuffer.GetCount());
+	}
+	
 	m_trainingBuffer->VectorToDevice(m_scratchBuffer);
 	m_randomShuffleBuffer->MemoryToDevice(0, m_shuffleBuffer.GetCount() * sizeof(ndInt32), &m_shuffleBuffer[0]);
 }
@@ -763,7 +791,8 @@ void ndBrainAgentOnPolicyGradient_Trainer::OptimizeCritic()
 	ndBrainFloatBuffer* const outputBuffer = m_criticTrainer->GetOuputBuffer();
 	ndBrainFloatBuffer* const outputGradientBuffer = m_criticTrainer->GetOuputGradientBuffer();
 
-	const ndInt32 numberOfUpdates = ndInt32 (m_parameters.m_criticValueIterations * m_numberOfGpuTransitions / m_parameters.m_miniBatchSize);
+	//const ndInt32 numberOfUpdates = ndInt32 (m_parameters.m_criticValueIterations * m_numberOfGpuTransitions / m_parameters.m_miniBatchSize);
+	const ndInt32 numberOfUpdates = ndInt32(m_shuffleBuffer.GetCount() / m_parameters.m_miniBatchSize);
 
 	// calculate GAE(l, 1) // very noisy, the policy colapse most of the time.
 	// calculate GAE(l, 0) // too smooth, and doesn't seem to work either
