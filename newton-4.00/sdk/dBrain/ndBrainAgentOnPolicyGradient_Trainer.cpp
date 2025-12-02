@@ -66,8 +66,6 @@ ndBrainAgentOnPolicyGradient_Trainer::HyperParameters::HyperParameters()
 
 	m_policyRegularizerType = m_ridge;
 	m_criticRegularizerType = m_ridge;
-
-m_useGpuBackend = false;
 }
 
 ndBrainAgentOnPolicyGradient_Agent::ndTrajectory::ndTrajectory()
