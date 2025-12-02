@@ -141,7 +141,8 @@ namespace ndCartpoleTrainer_ppo
 			const ndInt32 numberOfAgents = 1;
 			for (ndInt32 i = 0; i < numberOfAgents; ++i)
 			{
-				loader.m_mesh->m_matrix.m_posit.m_x = ndFloat32(10.0f) * (ndRand() - ndFloat32(0.5f));
+				ndFloat32 x = ndFloat32(10.0f) * (ndRand() - ndFloat32(0.5f));
+				loader.m_mesh->m_matrix.m_posit.m_x = x;
 				ndSharedPtr<ndRenderSceneNode> visualMesh(loader.m_renderMesh->Clone());
 				visualMesh->SetTransform(loader.m_mesh->m_matrix);
 				visualMesh->SetTransform(loader.m_mesh->m_matrix);
