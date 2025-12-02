@@ -330,6 +330,8 @@ ndBrainAgentOnPolicyGradient_Trainer::ndBrainAgentOnPolicyGradient_Trainer(const
 	ndAssert(m_parameters.m_numberOfObservations);
 
 	m_randomGenerator.seed(m_parameters.m_randomSeed);
+	ndSetRandSeed(m_randomGenerator());
+
 	m_trajectoryAccumulator.Init(m_parameters.m_numberOfActions, m_parameters.m_numberOfObservations);
 	m_parameters.m_discountRewardFactor = ndClamp(m_parameters.m_discountRewardFactor, ndBrainFloat(0.1f), ndBrainFloat(0.999f));
 
