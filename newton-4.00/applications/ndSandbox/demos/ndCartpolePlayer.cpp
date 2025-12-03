@@ -25,9 +25,9 @@ namespace ndCarpolePlayer
 		virtual void PresentHelp(ndDemoEntityManager* const scene) override
 		{
 			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			scene->Print(color, "This setup is a pole mounted on a cart");
-			scene->Print(color, "The model is trained using Soft Actor Critic(SAC) algorithm.");
-			scene->Print(color, "a classic “hello world” example in reinforcement learning.");
+			scene->Print(color, "Cart Pole is the classic hello world of reinforcement learning");
+			scene->Print(color, "it is use to test the correctness of an algorithm implementation.");
+			scene->Print(color, "The model is trained using Soft Actor Critic(SAC).");
 			scene->Print(color, "It consists of a pole attached by a hinge to a sliding cart.");
 			scene->Print(color, "The objective goal was to train a neural network to keep");
 			scene->Print(color, "the pole balanced in an upright position.");
@@ -41,9 +41,9 @@ namespace ndCarpolePlayer
 		virtual void PresentHelp(ndDemoEntityManager* const scene) override
 		{
 			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			scene->Print(color, "This setup is a pole mounted on a cart");
-			scene->Print(color, "The model is trained using Proximal Policy Gradinet (PPO) algorithm.");
-			scene->Print(color, "a classic “hello world” example in reinforcement learning.");
+			scene->Print(color, "Cart Pole is the classic hello world of reinforcement learning");
+			scene->Print(color, "It is used to test the correctness of an algorithm implementation.");
+			scene->Print(color, "The model is trained using Proximal Policy Gradient (PPO).");
 			scene->Print(color, "It consists of a pole attached by a hinge to a sliding cart.");
 			scene->Print(color, "The objective goal was to train a neural network to keep");
 			scene->Print(color, "the pole balanced in an upright position.");
