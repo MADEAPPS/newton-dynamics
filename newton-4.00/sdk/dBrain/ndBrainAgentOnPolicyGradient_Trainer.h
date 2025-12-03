@@ -140,6 +140,7 @@ class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 		ndBrainFloat m_policyRegularizer;
 		ndBrainFloat m_criticRegularizer;
 		ndBrainFloat m_discountRewardFactor;
+		ndBrainFloat m_entropyRegularizerCoef;
 
 		ndUnsigned32 m_randomSeed;
 		ndInt32 m_miniBatchSize;
@@ -213,6 +214,7 @@ class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 
 	ndSharedPtr<ndBrainFloatBuffer> m_trainingBuffer;
 	ndSharedPtr<ndBrainFloatBuffer> m_advantageBuffer;
+	ndSharedPtr<ndBrainFloatBuffer> m_probabilityBuffer;
 	ndSharedPtr<ndBrainIntegerBuffer> m_randomShuffleBuffer;
 	ndSharedPtr<ndBrainFloatBuffer> m_policyGradientAccumulator;
 
