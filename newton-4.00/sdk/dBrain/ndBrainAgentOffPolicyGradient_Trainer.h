@@ -178,9 +178,6 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 
 	ndFloat32 GetAverageScore() const;
 	ndFloat32 GetAverageFrames() const;
-
-	void SaveState(const char* baseName);
-	void RecoverState(const char* baseName);
 	void AddAgent(ndSharedPtr<ndBrainAgentOffPolicyGradient_Agent>& agent);
 
 	private:
