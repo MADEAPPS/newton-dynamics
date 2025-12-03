@@ -77,8 +77,8 @@ class ndBrainAgentOnPolicyGradient_Agent: public ndBrainAgent
 		ndBrainFloat GetReward(ndInt32 entry) const;
 		void SetReward(ndInt32 entry, ndBrainFloat reward);
 
-		ndBrainFloat GetExpectedReward(ndInt32 entry) const;
-		void SetExpectedReward(ndInt32 entry, ndBrainFloat reward);
+		//ndBrainFloat GetExpectedReward(ndInt32 entry) const;
+		//void SetExpectedReward(ndInt32 entry, ndBrainFloat reward);
 
 		bool GetTerminalState(ndInt32 entry) const;
 		void SetTerminalState(ndInt32 entry, bool isTermimal);
@@ -104,7 +104,7 @@ class ndBrainAgentOnPolicyGradient_Agent: public ndBrainAgent
 
 		ndBrainVector m_reward;
 		ndBrainVector m_terminal;
-		ndBrainVector m_expectedReward;
+		//ndBrainVector m_expectedReward;
 		ndBrainVector m_actions;
 		ndBrainVector m_observations;
 		ndBrainVector m_nextObservations;
@@ -181,8 +181,6 @@ class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 	ndFloat32 GetAverageScore() const;
 	ndFloat32 GetAverageFrames() const;
 
-	void SaveState(const char* baseName);
-	void RecoverState(const char* baseName);
 	void AddAgent(ndSharedPtr<ndBrainAgentOnPolicyGradient_Agent>& agent);
 
 	private:
