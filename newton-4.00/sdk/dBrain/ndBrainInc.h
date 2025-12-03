@@ -70,7 +70,6 @@
 #include <ndBrainAgentOffPolicyGradient_Trainer.h>
 #include <ndBrainLayerConvolutionalWithDropOut_2d.h>
 #include <ndBrainLayerActivationCategoricalSoftmax.h>
-#include <ndBrainAgentContinuePolicyGradient_Trainer.h>
 
 #endif 
 
