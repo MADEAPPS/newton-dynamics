@@ -433,6 +433,26 @@ void ndBrainCpuContext::StandardNormalDistribution(ndBrainFloatBuffer& uniformRa
 	dst.StandardNormalDistribution();
 }
 
+void ndBrainCpuContext::CalculateLikelihood(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& sampleBuffer, const ndBrainFloatBuffer& sigmaBuffer)
+{
+	const ndInt32 stride = ndInt32(sigmaBuffer.SizeInBytes() / buffer.SizeInBytes());
+	ndAssert(sampleBuffer.SizeInBytes() == sigmaBuffer.SizeInBytes());
+	ndAssert(stride * buffer.SizeInBytes() == sampleBuffer.SizeInBytes());
+
+	const ndInt32 numberOfGroups = ndInt32(buffer.SizeInBytes() / sizeof(ndBrainFloat));
+
+	ndBrainMemVector dst((ndBrainFloat*)buffer.GetCpuPtr(), numberOfGroups);
+	const ndBrainMemVector sample((ndBrainFloat*)sampleBuffer.GetCpuPtr(), stride * numberOfGroups);
+	const ndBrainMemVector sigmas((ndBrainFloat*)sigmaBuffer.GetCpuPtr(), stride * numberOfGroups);
+
+	for (ndInt32 i = 0; i < numberOfGroups; ++i)
+	{
+		const ndBrainMemVector meanSample(&sample[i * stride], stride);
+		const ndBrainMemVector variance(&sigmas[i * stride], stride);
+		dst[i] = meanSample.CalculateLikelihood(variance);
+	}
+}
+
 void ndBrainCpuContext::CalculateEntropyRegularization(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& sampleBuffer, const ndBrainFloatBuffer& sigmaBuffer, ndBrainFloat regularization)
 {
 	const ndInt32 stride = ndInt32(sigmaBuffer.SizeInBytes() / buffer.SizeInBytes());

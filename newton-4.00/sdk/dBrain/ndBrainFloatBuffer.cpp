@@ -277,6 +277,11 @@ void ndBrainFloatBuffer::BroadcastScaler(const ndBrainFloatBuffer& srcScalars)
 	m_context->BroadcastScaler(*this, stride, srcScalars);
 }
 
+void ndBrainFloatBuffer::CalculateLikelihood(const ndBrainFloatBuffer& sample, const ndBrainFloatBuffer& sigma)
+{
+	m_context->CalculateLikelihood(*this, sample, sigma);
+}
+
 void ndBrainFloatBuffer::CalculateEntropyRegularization(const ndBrainFloatBuffer& sample, const ndBrainFloatBuffer& sigma, ndBrainFloat regularization)
 {
 	m_context->CalculateEntropyRegularization(*this, sample, sigma, regularization);

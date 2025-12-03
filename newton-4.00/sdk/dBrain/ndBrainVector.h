@@ -76,6 +76,8 @@ class ndBrainVector: public ndArray<ndBrainFloat>
 	ndBrainFloat Dot(const ndBrainVector& a) const;
 	void CalculateMeanAndVariance(ndBrainFloat& mean, ndBrainFloat& variance) const;
 	void CategoricalSample(const ndBrainVector& probability, ndBrainFloat beta = ndBrainFloat(0.5f));
+
+	ndBrainFloat CalculateLikelihood(const ndBrainVector& variance) const;
 	ndBrainFloat CalculateEntropyRegularization(const ndBrainVector& variance, ndBrainFloat regularization) const;
 	void CalculateEntropyRegularizationGradient(const ndBrainVector& mean, const ndBrainVector& variance, ndBrainFloat regularization);
 };

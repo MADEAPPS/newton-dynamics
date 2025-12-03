@@ -214,7 +214,7 @@ class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 
 	ndSharedPtr<ndBrainFloatBuffer> m_trainingBuffer;
 	ndSharedPtr<ndBrainFloatBuffer> m_advantageBuffer;
-	ndSharedPtr<ndBrainFloatBuffer> m_probabilityBuffer;
+	ndSharedPtr<ndBrainFloatBuffer> m_likelihoodBuffer;
 	ndSharedPtr<ndBrainIntegerBuffer> m_randomShuffleBuffer;
 	ndSharedPtr<ndBrainFloatBuffer> m_policyGradientAccumulator;
 

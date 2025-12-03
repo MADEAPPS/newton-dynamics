@@ -431,6 +431,26 @@ void ndBrainVector::SoftMaxNormalize()
 	Scale(ndBrainFloat(1.0f) / acc);
 }
 
+ndBrainFloat ndBrainVector::CalculateLikelihood(const ndBrainVector& varianceBuffer) const
+{
+	ndAssert(GetCount() == varianceBuffer.GetCount());
+
+	ndBrainFloat z2 = ndBrainFloat(0.0f);
+	ndBrainFloat invSigma2Det = ndBrainFloat(1.0f);
+	const ndFloat32 invSqrtPi = ndSqrt(1.0f / (2.0f * ndPi));
+	for (ndInt32 i = ndInt32 (GetCount()) - 1; i >= 0; --i)
+	{
+		ndBrainFloat sigma = varianceBuffer[i];
+		ndBrainFloat invSigma = ndBrainFloat(1.0f) / sigma;
+		ndBrainFloat z = invSigma * (*this)[i];
+		z2 += z * z;
+		invSigma2Det *= (invSqrtPi * invSigma);
+	}
+	ndBrainFloat exponent = ndBrainFloat(0.5f) * z2;
+	ndBrainFloat likelihood = invSigma2Det * ndExp(-exponent);
+	return ndMax(likelihood, ndBrainFloat(1.0e-4f));
+}
+
 ndBrainFloat ndBrainVector::CalculateEntropyRegularization(const ndBrainVector& varianceBuffer, ndBrainFloat regularization) const
 {
 	ndAssert(GetCount() == varianceBuffer.GetCount());

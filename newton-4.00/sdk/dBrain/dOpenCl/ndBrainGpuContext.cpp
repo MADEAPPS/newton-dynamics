@@ -544,6 +544,11 @@ void ndBrainGpuContext::Select(ndBrainFloatBuffer& buffer, ndBrainFloatBuffer& m
 	ndAssert(error == CL_SUCCESS);
 }
 
+void ndBrainGpuContext::CalculateLikelihood(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& sampleBuffer, const ndBrainFloatBuffer& sigmaBuffer)
+{
+	ndAssert(0);
+}
+
 void ndBrainGpuContext::CalculateEntropyRegularization(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& sampleBuffer, const ndBrainFloatBuffer& varianceBuffer, ndBrainFloat regularization)
 {
 	cl_int error = 0;
