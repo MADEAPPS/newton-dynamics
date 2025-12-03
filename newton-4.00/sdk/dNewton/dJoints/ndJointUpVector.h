@@ -29,7 +29,11 @@ class ndJointUpVector: public ndJointBilateralConstraint
 	D_NEWTON_API void SetPinDir (const ndVector& pin);
 
 	protected:
+	D_NEWTON_API void UpdateParameters() override;
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc) override;
+
+	ndFloat32 m_angle;
+	ndFloat32 m_omega;
 } D_GCC_NEWTON_CLASS_ALIGN_32;
 
 

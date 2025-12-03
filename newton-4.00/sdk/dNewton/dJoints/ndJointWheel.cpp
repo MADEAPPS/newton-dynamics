@@ -152,6 +152,11 @@ void ndJointWheel::DebugJoint(ndConstraintDebugCallback& context) const
 	context.DrawFrame(upperBumberMatrix);
 }
 
+void ndJointWheel::UpdateParameters()
+{
+	// for now do nothing
+}
+
 void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;

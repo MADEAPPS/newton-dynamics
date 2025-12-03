@@ -15,12 +15,16 @@
 
 ndJointUpVector::ndJointUpVector()
 	:ndJointBilateralConstraint()
+	,m_angle(ndFloat32(0.0f))
+	,m_omega(ndFloat32(0.0f))
 {
 	m_maxDof = 2;
 }
 
 ndJointUpVector::ndJointUpVector(const ndVector& normal, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(2, child, parent, ndGetIdentityMatrix())
+	,m_angle(ndFloat32(0.0f))
+	,m_omega(ndFloat32(0.0f))
 {
 	ndMatrix matrix(ndGramSchmidtMatrix(normal));
 	matrix.m_posit = child->GetMatrix().m_posit;
@@ -36,6 +40,30 @@ ndJointUpVector::~ndJointUpVector()
 void ndJointUpVector::SetPinDir (const ndVector& pin)
 {
 	m_localMatrix1 = ndGramSchmidtMatrix(pin);
+}
+
+void ndJointUpVector::UpdateParameters()
+{
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	// save the current joint Omega
+	const ndVector omega0(m_body0->GetOmega());
+	const ndVector omega1(m_body1->GetOmega());
+
+	// the joint angle can be determined by getting the angle between any two non parallel vectors
+	const ndFloat32 deltaAngle = ndAnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front), -m_angle);
+	m_angle += deltaAngle;
+	if (m_angle > (ndPi * ndFloat32(2.0f)))
+	{
+		m_angle = ndMod(m_angle, ndPi * ndFloat32(2.0f));
+	}
+	else if (m_angle < -(ndPi * ndFloat32(2.0f)))
+	{
+		m_angle = ndMod(m_angle, ndPi * ndFloat32(2.0f));
+	}
+	m_omega = matrix1.m_front.DotProduct(omega0 - omega1).GetScalar();
 }
 
 void ndJointUpVector::JacobianDerivative(ndConstraintDescritor& desc)
@@ -64,15 +92,12 @@ void ndJointUpVector::JacobianDerivative(ndConstraintDescritor& desc)
 		// in theory only one correction is needed, but this produces instability as the body may move sideway.
 		// a lateral correction prevent this from happening.
 		ndVector frontDir (lateralDir.CrossProduct(matrix1.m_front));
-		//NewtonUserJointAddAngularRow (m_joint, 0.0f, &frontDir[0]);
 		AddAngularRowJacobian(desc, frontDir, ndFloat32 (0.0f));
  	} 
 	else 
 	{
 		// if the angle error is very small then two angular correction along the plane axis do the trick
-		//NewtonUserJointAddAngularRow (m_joint, 0.0f, &matrix0.m_up[0]);
 		AddAngularRowJacobian(desc, matrix0.m_up, ndFloat32(0.0f));
-		//NewtonUserJointAddAngularRow (m_joint, 0.0f, &matrix0.m_right[0]);
 		AddAngularRowJacobian(desc, matrix0.m_right, ndFloat32(0.0f));
 	}
 }
