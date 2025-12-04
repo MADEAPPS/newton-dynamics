@@ -116,7 +116,7 @@ namespace ndCarpolePlayer
 		if (IsTerminal())
 		{
 			// a terminal reward of zero should make for smoother MDPs. 
-			// traing small networks could be much harder with negative terminal rewrads..
+			// training small networks could be much harder with negative terminal rewards..
 			// return ndBrainFloat(-1.0f);
 			return ndBrainFloat(-1.0f);
 		}
