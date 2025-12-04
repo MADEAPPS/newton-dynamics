@@ -220,14 +220,14 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
 		const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 		SetMotorAcceleration(desc, stopAccel);
-		SetLowerFriction(desc, ndFloat32(0.0f));
+		SetHighFriction(desc, ndFloat32(0.0f));
 	}
 	else if (x <= m_info.m_lowerStop)
 	{
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
 		const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 		SetMotorAcceleration(desc, stopAccel);
-		SetHighFriction(desc, ndFloat32(0.0f));
+		SetLowerFriction(desc, ndFloat32(0.0f));
 	}
 }
 
