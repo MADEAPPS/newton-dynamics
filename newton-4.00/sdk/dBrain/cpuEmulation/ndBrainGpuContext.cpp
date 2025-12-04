@@ -275,7 +275,7 @@ void ndBrainGpuContext::ScaleAdd(ndBrainFloatBuffer& buffer, const ndBrainFloatB
 	dst.ScaleAdd(src, scale);
 }
 
-void ndBrainGpuContext::CalculatePartialKlDivergence(const ndBrainFloatBuffer& baseGaussianLikelihood, const ndBrainFloatBuffer& gaussianLikelihood)
+void ndBrainGpuContext::CalculatePartialKlDivergence(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& baseGaussianLikelihood, const ndBrainFloatBuffer& gaussianLikelihood)
 {
 	ndAssert(0);
 }
