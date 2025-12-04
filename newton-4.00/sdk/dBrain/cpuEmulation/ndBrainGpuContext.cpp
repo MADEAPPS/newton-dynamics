@@ -182,6 +182,12 @@ void ndBrainGpuContext::Set(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer
 	dst.Set(src);
 }
 
+ndBrainFloat ndBrainGpuContext::Element(const ndBrainFloatBuffer& buffer, ndInt32 index) const
+{
+	ndAssert(0);
+	return 0;
+}
+
 void ndBrainGpuContext::Exp(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
 {
 	ndAssert(buffer.SizeInBytes() == srcBuffer.SizeInBytes());

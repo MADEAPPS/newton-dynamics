@@ -710,6 +710,12 @@ void ndBrainGpuContext::Set(ndBrainFloatBuffer& dstData, const ndBrainFloatBuffe
 	SubmitMathOperation(m_brainAssigment, &dstData, &srcData);
 }
 
+ndBrainFloat ndBrainGpuContext::Element(const ndBrainFloatBuffer& buffer, ndInt32 index) const
+{
+	ndAssert(0);
+	return 0;
+}
+
 void ndBrainGpuContext::Exp(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer)
 {
 	ndAssert(0);

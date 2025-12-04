@@ -245,6 +245,12 @@ void ndBrainCpuContext::Set(ndBrainFloatBuffer& dstData, const ndBrainFloatBuffe
 	dst.Set(src);
 }
 
+ndBrainFloat ndBrainCpuContext::Element(const ndBrainFloatBuffer& buffer, ndInt32 index) const
+{
+	const ndBrainVector& src = **buffer.m_buffer;
+	return src[index];
+}
+
 void ndBrainCpuContext::Exp(ndBrainFloatBuffer& dstData, const ndBrainFloatBuffer& srcData)
 {
 	ndBrainVector& dst = **dstData.m_buffer;

@@ -47,7 +47,11 @@ class ndBrainContext : public ndClassAlloc
 	virtual ndBrainGpuContext* GetAsGpuContext();
 	virtual ndBrainCpuContext* GetAsCpuContext();
 
-	static bool HasGpuSupport() { ndAssert(0); return true;}
+	static bool HasGpuSupport() 
+	{ 
+		ndAssert(0); 
+		return true;
+	}
 
 	virtual void SyncBufferCommandQueue() = 0;
 	virtual void SubmitBufferCommand(ndBrainBufferCommand* const command) = 0;
@@ -62,6 +66,7 @@ class ndBrainContext : public ndClassAlloc
 	virtual void BrainVectorFromDevice(ndBrainFloatBuffer& src, ndBrainVector& dstVector) = 0;
 	virtual void BrainVectorToDevice(ndBrainFloatBuffer& dst, const ndBrainVector& srcVector) = 0;
 
+	virtual ndBrainFloat Element(const ndBrainFloatBuffer& buffer, ndInt32 index) const = 0;
 	virtual void Exp(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) = 0;
 	virtual void Set(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) = 0;
 	virtual void Min(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& srcBuffer) = 0;

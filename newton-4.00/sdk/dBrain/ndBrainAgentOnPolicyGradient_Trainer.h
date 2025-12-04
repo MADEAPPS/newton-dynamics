@@ -188,6 +188,8 @@ class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 	void BuildCriticClass();
 	void CalculateAdvantage();
 	void TrajectoryToGpuBuffers();
+	void OptimizedSurrogatePolicy();
+
 	ndBrainFloat CalculateKLdivergence();
 	void SaveTrajectory(ndBrainAgentOnPolicyGradient_Agent* const agent);
 
