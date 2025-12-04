@@ -279,7 +279,7 @@ void ndBrainFloatBuffer::BroadcastScaler(const ndBrainFloatBuffer& srcScalars)
 
 void ndBrainFloatBuffer::CalculatePartialKlDivergence(const ndBrainFloatBuffer& baseGaussianLikelihood, const ndBrainFloatBuffer& gaussianLikelihood)
 {
-
+	m_context->CalculatePartialKlDivergence(*this, baseGaussianLikelihood, gaussianLikelihood);
 }
 
 void ndBrainFloatBuffer::CalculateLikelihood(const ndBrainFloatBuffer& sample, const ndBrainFloatBuffer& sigma)

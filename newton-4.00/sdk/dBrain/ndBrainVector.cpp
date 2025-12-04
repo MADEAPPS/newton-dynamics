@@ -451,6 +451,31 @@ ndBrainFloat ndBrainVector::CalculateLikelihood(const ndBrainVector& varianceBuf
 	return ndMax(likelihood, ndBrainFloat(1.0e-4f));
 }
 
+ndBrainFloat ndBrainVector::CalculatePartialKlDivergence(const ndBrainVector& gaussianLikelihood) const
+{
+	ndFloat32 t0 = 0.0f;
+	ndFloat32 t2 = 0.0f;
+	ndFloat32 log_det_p = 0.0f;
+	ndFloat32 log_det_q = 0.0f;
+	const ndInt32 size = ndInt32 (GetCount()) / 2;
+	for (ndInt32 i = 0; i < size; ++i)
+	{
+		ndBrainFloat sigma_p = (*this)[size + i];
+		ndBrainFloat sigma_q = gaussianLikelihood[size + i];
+		ndBrainFloat invSigma_q = 1.0f / sigma_q;
+
+		log_det_p += ndLog(sigma_p);
+		log_det_q += ndLog(sigma_q);
+		t0 += sigma_p * invSigma_q;
+		ndBrainFloat meanError(gaussianLikelihood[i] - (*this)[i]);
+		t2 += meanError * invSigma_q * meanError;
+	}
+	ndFloat64 t3 = log_det_q - log_det_p;
+	ndFloat64 t1 = ndBrainFloat(size);
+	ndFloat64 divergence = t0 - t1 + t2 + t3;
+	return ndFloat32 (divergence);
+}
+
 ndBrainFloat ndBrainVector::CalculateEntropyRegularization(const ndBrainVector& varianceBuffer, ndBrainFloat regularization) const
 {
 	ndAssert(GetCount() == varianceBuffer.GetCount());

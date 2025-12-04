@@ -839,3 +839,8 @@ void ndBrainGpuContext::StandardNormalDistribution(ndBrainFloatBuffer& uniformRa
 {
 	SubmitMathOperation(m_brainNormalDistribution, &uniformRandomVariable);
 }
+
+void ndBrainGpuContext::CalculatePartialKlDivergence(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& baseGaussianLikelihood, const ndBrainFloatBuffer& gaussianLikelihood)
+{
+	ndAssert(0);
+}

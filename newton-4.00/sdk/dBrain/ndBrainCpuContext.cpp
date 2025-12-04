@@ -433,6 +433,26 @@ void ndBrainCpuContext::StandardNormalDistribution(ndBrainFloatBuffer& uniformRa
 	dst.StandardNormalDistribution();
 }
 
+void ndBrainCpuContext::CalculatePartialKlDivergence(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& baseGaussianLikelihood, const ndBrainFloatBuffer& gaussianLikelihood)
+{
+	const ndInt32 stride = ndInt32(baseGaussianLikelihood.SizeInBytes() / buffer.SizeInBytes());
+	ndAssert(gaussianLikelihood.SizeInBytes() == baseGaussianLikelihood.SizeInBytes());
+	ndAssert((2 * buffer.SizeInBytes()) == baseGaussianLikelihood.SizeInBytes());
+	
+	const ndInt32 numberOfGroups = ndInt32(buffer.SizeInBytes() / sizeof(ndBrainFloat));
+	
+	ndBrainMemVector dst((ndBrainFloat*)buffer.GetCpuPtr(), numberOfGroups);
+	const ndBrainMemVector baseLikeliHood((ndBrainFloat*)baseGaussianLikelihood.GetCpuPtr(), stride * numberOfGroups);
+	const ndBrainMemVector likeliHood((ndBrainFloat*)gaussianLikelihood.GetCpuPtr(), stride * numberOfGroups);
+	
+	for (ndInt32 i = 0; i < numberOfGroups; ++i)
+	{
+		const ndBrainMemVector base(&baseLikeliHood[i * stride], stride);
+		const ndBrainMemVector newLikeliHood(&likeliHood[i * stride], stride);
+		dst[i] = base.CalculatePartialKlDivergence(newLikeliHood);
+	}
+}
+
 void ndBrainCpuContext::CalculateLikelihood(ndBrainFloatBuffer& buffer, const ndBrainFloatBuffer& sampleBuffer, const ndBrainFloatBuffer& sigmaBuffer)
 {
 	const ndInt32 stride = ndInt32(sigmaBuffer.SizeInBytes() / buffer.SizeInBytes());
