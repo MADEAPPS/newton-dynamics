@@ -453,27 +453,31 @@ ndBrainFloat ndBrainVector::CalculateLikelihood(const ndBrainVector& varianceBuf
 
 ndBrainFloat ndBrainVector::CalculatePartialKlDivergence(const ndBrainVector& gaussianLikelihood) const
 {
-	ndFloat32 t0 = 0.0f;
-	ndFloat32 t2 = 0.0f;
-	ndFloat32 log_det_p = 0.0f;
-	ndFloat32 log_det_q = 0.0f;
+	// https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
+	// since I am using a diagonal sigma, I do not have to use Cholesky 
+
+	ndFloat32 t0 = ndFloat32(0.0f);
+	ndFloat32 t2 = ndFloat32(0.0f);
+	ndFloat32 log_det_0 = ndFloat32(0.0f);
+	ndFloat32 log_det_1 = ndFloat32(0.0f);
 	const ndInt32 size = ndInt32 (GetCount()) / 2;
 	for (ndInt32 i = 0; i < size; ++i)
 	{
-		ndBrainFloat sigma_p = (*this)[size + i];
-		ndBrainFloat sigma_q = gaussianLikelihood[size + i];
-		ndBrainFloat invSigma_q = 1.0f / sigma_q;
+		ndBrainFloat sigma_0 = (*this)[size + i];
+		ndBrainFloat sigma_1 = gaussianLikelihood[size + i];
+		ndBrainFloat invSigma_1 = 1.0f / sigma_1;
+		ndBrainFloat meanError = gaussianLikelihood[i] - (*this)[i];
 
-		log_det_p += ndLog(sigma_p);
-		log_det_q += ndLog(sigma_q);
-		t0 += sigma_p * invSigma_q;
-		ndBrainFloat meanError(gaussianLikelihood[i] - (*this)[i]);
-		t2 += meanError * invSigma_q * meanError;
+		t0 += sigma_0 * invSigma_1;
+		t2 += meanError * invSigma_1 * meanError;
+
+		log_det_1 += ndLog(sigma_1);
+		log_det_0 += ndLog(sigma_0);
 	}
-	ndFloat64 t3 = log_det_q - log_det_p;
-	ndFloat64 t1 = ndBrainFloat(size);
-	ndFloat64 divergence = t0 - t1 + t2 + t3;
-	return ndFloat32 (divergence);
+	ndFloat32 t3 = log_det_1 - log_det_0;
+	ndFloat32 t1 = ndBrainFloat(size);
+	ndFloat32 divergence = t0 - t1 + t2 + t3;
+	return ndFloat32 (0.5f) * divergence;
 }
 
 ndBrainFloat ndBrainVector::CalculateEntropyRegularization(const ndBrainVector& varianceBuffer, ndBrainFloat regularization) const
