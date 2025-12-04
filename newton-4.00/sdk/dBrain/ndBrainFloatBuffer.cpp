@@ -170,6 +170,11 @@ void ndBrainFloatBuffer::ReductionSum(ndInt32 clipSize)
 	m_context->ReductionSum(*this, clipSize);
 }
 
+ndBrainFloat ndBrainFloatBuffer::GetElement(ndInt32 index) const
+{
+	return 0.0f;
+}
+
 void ndBrainFloatBuffer::Sqrt(ndInt32 clipSize)
 {
 	m_context->Sqrt(*this, clipSize);

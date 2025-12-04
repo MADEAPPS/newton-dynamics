@@ -75,6 +75,8 @@ class ndBrainFloatBuffer : public ndBrainBuffer
 	void InvSqrt(ndInt32 clipSize);
 	void ReductionSum(ndInt32 clipSize);
 
+	ndBrainFloat GetElement(ndInt32 index) const;
+
 	protected:
 	ndSharedPtr<ndBrainVector> m_buffer;
 
