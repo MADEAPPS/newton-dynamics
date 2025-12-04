@@ -67,6 +67,7 @@ class ndBrainFloatBuffer : public ndBrainBuffer
 	void BroadcastScaler(const ndBrainFloatBuffer& srcScalars);
 
 	void CalculateLikelihood(const ndBrainFloatBuffer& sample, const ndBrainFloatBuffer& sigma);
+	void CalculatePartialKlDivergence(const ndBrainFloatBuffer& baseGaussianLikelihood, const ndBrainFloatBuffer& gaussianLikelihood);
 	void CalculateEntropyRegularization(const ndBrainFloatBuffer& sample, const ndBrainFloatBuffer& sigma, ndBrainFloat regularization);
 	void CalculateEntropyRegularizationGradient(const ndBrainFloatBuffer& sample, const ndBrainFloatBuffer& sigma, ndBrainFloat regularization, ndInt32 inputSize);
 
