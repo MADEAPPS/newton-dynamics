@@ -147,6 +147,7 @@ class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 		ndInt32 m_numberOfActions;
 		ndInt32 m_numberOfObservations;
 
+		ndInt32 m_policyIterations;
 		ndInt32 m_criticValueIterations;
 		ndInt32 m_numberOfHiddenLayers;
 		ndInt32 m_hiddenLayersNumberOfNeurons;
