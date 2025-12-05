@@ -27,6 +27,8 @@ class ndBrainIntegerBuffer : public ndBrainBuffer
 
 	void CopyBuffer(const ndCopyBufferCommandInfo& descriptor, ndInt32 workGroupCount, const ndBrainIntegerBuffer& srcBuffer);
 
+	//void GetRand(const ndCopyBufferCommandInfo& descriptor, ndInt32 workGroupCount, const ndBrainIntegerBuffer& srcBuffer);
+
 	private:
 	ndSharedPtr<ndArray<ndUnsigned32>> m_indexArray;
 

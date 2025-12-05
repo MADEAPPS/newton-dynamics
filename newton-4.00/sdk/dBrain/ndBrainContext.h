@@ -105,6 +105,9 @@ class ndBrainContext : public ndClassAlloc
 	virtual void InvSqrt(ndBrainFloatBuffer&, ndInt32) = 0;
 	virtual void ReductionSum(ndBrainFloatBuffer&, ndInt32) = 0;
 
+	virtual void Rand(ndBrainIntegerBuffer& randBuffer) = 0;
+	virtual void SetRandSeeds(const ndFixSizeArray<ndUnsigned32, 256>& seed) = 0;
+
 	// learnRate commands
 	virtual void ApplyLeanRateCommands(ndBrainBufferCommand*, ndBrainFloat) = 0;
 	virtual void SetLearnRateCommandBuffers(ndBrainOptimizerAdam&, ndInt32, ndBrainFloatBuffer&, ndBrainFloatBuffer&) = 0;

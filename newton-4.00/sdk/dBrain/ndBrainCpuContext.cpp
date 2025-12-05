@@ -573,3 +573,13 @@ void ndBrainCpuContext::ApplyLeanRateCommands(ndBrainBufferCommand* const comman
 	gradientUpdateCommand->m_learnRate = learnRate;
 	SubmitBufferCommand(command);
 }
+
+void ndBrainCpuContext::Rand(ndBrainIntegerBuffer& randBuffer)
+{
+	ndAssert(0);
+}
+
+void ndBrainCpuContext::SetRandSeeds(const ndFixSizeArray<ndUnsigned32, 256>& seed)
+{
+	ndAssert(0);
+}

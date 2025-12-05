@@ -34,7 +34,7 @@
   * @param random tinymt state vector.
   * @param seed a 32-bit unsigned integer used as a seed.
   */
-void TINYMT32_T::tinymt32_init( uint32_t seed)
+void TINYMT32_T::Init( uint32_t seed)
 {
     status[0] = seed;
     status[1] = mat1;
@@ -46,10 +46,10 @@ void TINYMT32_T::tinymt32_init( uint32_t seed)
             * (status[(i - 1) & 3] ^ (status[(i - 1) & 3] >> 30));
     }
 
-    period_certification();
+    PeriodCertification();
     for (unsigned int i = 0; i < PRE_LOOP; i++) 
     {
-        tinymt32_next_state();
+        NextState();
     }
 }
 
@@ -57,7 +57,7 @@ void TINYMT32_T::tinymt32_init( uint32_t seed)
  * This function certificate the period of 2^127-1.
  * @param random tinymt state vector.
  */
-void TINYMT32_T::period_certification()
+void TINYMT32_T::PeriodCertification()
 {
     if ((status[0] & TINYMT32_MASK) == 0 &&
         status[1] == 0 && status[2] == 0 && status[3] == 0) 
@@ -74,7 +74,7 @@ void TINYMT32_T::period_certification()
  * Users should not call this function directly.
  * @param random tinymt internal status
  */
-void TINYMT32_T::tinymt32_next_state()
+void TINYMT32_T::NextState()
 {
     uint32_t x;
     uint32_t y;
@@ -191,10 +191,10 @@ void tinymt32_init_by_array(tinymt32_t * random, uint32_t init_key[],
         st[i % size] = r;
         i = (i + 1) % size;
     }
-    period_certification(random);
+    PeriodCertification(random);
     for (i = 0; i < PRE_LOOP; i++) 
     {
-        tinymt32_next_state(random);
+        NextState(random);
     }
 }
 
@@ -272,7 +272,7 @@ inline static float tinymt32_temper_conv_open(tinymt32_t* random) {
  * @param random tinymt internal status
  * @return 32-bit unsigned pseudorandom number
  */
-uint32_t TINYMT32_T::tinymt32_temper()
+uint32_t TINYMT32_T::Temper()
 {
     uint32_t t0, t1;
     t0 = status[3];
@@ -285,8 +285,8 @@ uint32_t TINYMT32_T::tinymt32_temper()
     return t0;
 }
 
-uint32_t TINYMT32_T::tinymt32_generate_uint32()
+uint32_t TINYMT32_T::Generate()
 {
-    tinymt32_next_state();
-    return tinymt32_temper();
+    NextState();
+    return Temper();
 }

@@ -850,3 +850,13 @@ void ndBrainGpuContext::CalculatePartialKlDivergence(ndBrainFloatBuffer& buffer,
 {
 	ndAssert(0);
 }
+
+void ndBrainGpuContext::Rand(ndBrainIntegerBuffer& randBuffer)
+{
+	ndAssert(0);
+}
+
+void ndBrainGpuContext::SetRandSeeds(const ndFixSizeArray<ndUnsigned32, 256>& seed)
+{
+	ndAssert(0);
+}
