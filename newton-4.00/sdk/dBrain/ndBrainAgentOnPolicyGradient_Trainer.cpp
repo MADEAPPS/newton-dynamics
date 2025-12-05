@@ -40,7 +40,7 @@
 
 #define ND_POLICY_MIN_SIGMA_SQUARE					ndBrainFloat(0.01f)
 #define ND_POLICY_MAX_SIGMA_SQUARE					ndBrainFloat(1.0f)
-#define ND_CONTINUE_PROXIMA_POLICY_KL_DIVERGENCE	ndBrainFloat(0.05f)
+#define ND_CONTINUE_PROXIMA_POLICY_KL_DIVERGENCE	ndBrainFloat(1.0e-4f)
 #define ND_CONTINUE_PROXIMA_POLICY_ITERATIONS		8
 
 ndBrainAgentOnPolicyGradient_Trainer::HyperParameters::HyperParameters()
@@ -930,6 +930,7 @@ void ndBrainAgentOnPolicyGradient_Trainer::OptimizedSurrogatePolicy()
 	m_policyTrainer->ApplyLearnRate(m_learnRate);
 }
 
+#pragma optimize( "", off )
 ndBrainFloat ndBrainAgentOnPolicyGradient_Trainer::CalculateKLdivergence()
 {
 	// https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
@@ -982,8 +983,7 @@ ndBrainFloat ndBrainAgentOnPolicyGradient_Trainer::CalculateKLdivergence()
 
 	minbatchDivergenceAcc->ReductionSum();
 	ndBrainFloat divergence = minbatchDivergenceAcc->GetElement(0);
-	//return divergence / ndFloat32(m_parameters.m_miniBatchSize * m_numberOfGpuTransitions);
-	return divergence;
+	return divergence / ndFloat32(m_numberOfGpuTransitions);
 }
 
 #pragma optimize( "", off )
