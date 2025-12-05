@@ -1121,7 +1121,7 @@ bool ndMultiBodyVehicle::CoulombTireModel(ndMultiBodyVehicleTireJoint* const joi
 	const ndFloat32 frictionCoefficient = contactPoint.m_material.m_staticFriction0;
 
 	// handling dynamics friction manually
-	ndFloat32 dynamicFrictionCoef = joint->m_IsApplyingBreaks ? ndFloat32(0.75f) : ndFloat32(1.0f);
+	ndFloat32 dynamicFrictionCoef = joint->m_isApplyingBrakes ? ndFloat32(0.75f) : ndFloat32(1.0f);
 
 	contactPoint.m_material.m_staticFriction0 = frictionCoefficient;
 	contactPoint.m_material.m_staticFriction1 = frictionCoefficient;
