@@ -112,7 +112,7 @@ namespace ndCartpoleTrainer_ppo
 			,m_modelIsTrained(false)
 		{
 			char name[256];
-			snprintf(name, sizeof(name), "%s-vpg.csv", CONTROLLER_NAME_PPO);
+			snprintf(name, sizeof(name), "%s.csv", CONTROLLER_NAME_PPO);
 			m_outFile = fopen(name, "wb");
 			fprintf(m_outFile, "vpg\n");
 

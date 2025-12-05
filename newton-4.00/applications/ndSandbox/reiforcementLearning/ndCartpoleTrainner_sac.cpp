@@ -88,7 +88,7 @@ namespace ndCartpoleTrainer_sac
 			,m_modelIsTrained(false)
 		{
 			char name[256];
-			snprintf(name, sizeof(name), "%s-vpg.csv", CONTROLLER_NAME_SAC);
+			snprintf(name, sizeof(name), "%s.csv", CONTROLLER_NAME_SAC);
 			m_outFile = fopen(name, "wb");
 			fprintf(m_outFile, "vpg\n");
 
