@@ -41,7 +41,7 @@
 #define ND_POLICY_MIN_SIGMA_SQUARE					ndBrainFloat(0.01f)
 #define ND_POLICY_MAX_SIGMA_SQUARE					ndBrainFloat(1.0f)
 #define ND_CONTINUE_PROXIMA_POLICY_CLIP_EPSILON		ndBrainFloat(0.2f)
-#define ND_CONTINUE_PROXIMA_POLICY_KL_DIVERGENCE	ndBrainFloat(5.0e-4f)
+#define ND_CONTINUE_PROXIMA_POLICY_KL_DIVERGENCE	ndBrainFloat(1.0e-3f)
 #define ND_CONTINUE_PROXIMA_POLICY_ITERATIONS		10
 
 ndBrainAgentOnPolicyGradient_Trainer::HyperParameters::HyperParameters()
@@ -227,15 +227,12 @@ void ndBrainAgentOnPolicyGradient_Agent::ndTrajectory::GetFlatArray(ndInt32 inde
 ndBrainAgentOnPolicyGradient_Agent::ndBrainAgentOnPolicyGradient_Agent(ndBrainAgentOnPolicyGradient_Trainer* const master)
 	:ndBrainAgent()
 	,m_trajectory()
-	//,m_randomGenerator()
 	,m_normalDistribution()
 	,m_owner(master)
 	,m_isDead(false)
 {
 	m_trajectory.Init(master->m_parameters.m_numberOfActions, master->m_parameters.m_numberOfObservations);
 
-	//ndUnsigned32 seed = master->m_randomGenerator();
-	//m_randomGenerator.m_gen.seed(seed);
 	ndUnsigned32 seed = master->m_uniformDistribution.Generate();
 	m_normalDistribution.Init(seed);
 }
@@ -252,8 +249,8 @@ void ndBrainAgentOnPolicyGradient_Agent::SampleActions(ndBrainVector& actions)
 	for (ndInt32 i = size - 1; i >= 0; --i)
 	{
 		ndBrainFloat sigma = actions[size + i];
-		ndBrainFloat unitVarianceSample = m_normalDistribution();
-		ndBrainFloat sample = ndBrainFloat(actions[i]) + unitVarianceSample * sigma;
+		ndBrainFloat normalSample = m_normalDistribution();
+		ndBrainFloat sample = ndBrainFloat(actions[i]) + normalSample * sigma;
 		ndBrainFloat clippedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
 		actions[i] = clippedAction;
 	}
@@ -291,8 +288,6 @@ ndBrainAgentOnPolicyGradient_Trainer::ndBrainAgentOnPolicyGradient_Trainer(const
 	,m_context()
 	,m_policyTrainer(nullptr)
 	,m_criticTrainer(nullptr)
-	//,m_randomGenerator(std::random_device{}())
-	//,m_uniformDistribution(ndFloat32(0.0f), ndFloat32(1.0f))
 	,m_uniformDistribution()
 	,m_agents()
 	,m_trainingBuffer(nullptr)
@@ -322,7 +317,8 @@ ndBrainAgentOnPolicyGradient_Trainer::ndBrainAgentOnPolicyGradient_Trainer(const
 	ndAssert(m_parameters.m_numberOfActions);
 	ndAssert(m_parameters.m_numberOfObservations);
 
-	m_uniformDistribution.Init(m_parameters.m_randomSeed);
+	ndSetRandSeed(m_parameters.m_randomSeed);
+	m_uniformDistribution.Init(ndRandInt());
 
 	m_trajectoryAccumulator.Init(m_parameters.m_numberOfActions, m_parameters.m_numberOfObservations);
 	m_parameters.m_discountRewardFactor = ndClamp(m_parameters.m_discountRewardFactor, ndBrainFloat(0.1f), ndBrainFloat(0.999f));

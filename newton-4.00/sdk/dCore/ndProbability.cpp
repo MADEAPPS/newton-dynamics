@@ -25,27 +25,6 @@
 #include "ndProbability.h"
 #include "ndThreadSyncUtils.h"
 
-//static std::mt19937& GetRandomGenerator()
-//{
-//	class ndRandom : public std::mt19937
-//	{
-//		public: 
-//		ndRandom()
-//			:std::mt19937(std::random_device{}())
-//		{
-//			seed(42);
-//		}
-//	};
-//	// using hardware non deterministic random generator if found
-//	static ndRandom generator;
-//	return generator;
-//}
-//static ndSpinLock& GetLock()
-//{
-//	static ndSpinLock lock;
-//	return lock;
-//}
-
 static ndRand127& GetRandomGenerator()
 {
 	static ndRand127 generator;
