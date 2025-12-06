@@ -212,36 +212,39 @@ namespace ndQuadSpiderPlayer
 			ndSharedPtr<ndJointBilateralConstraint> ballJoint(new ndJointSpherical(thighMatrix, thighBody->GetAsBodyKinematic(), rootBody->GetAsBodyKinematic()));
 			ndModelArticulation::ndNode* const thighNode = model->AddLimb(modelRootNode, thighBody, ballJoint);
 		
-			//// build calf
-			//ndSharedPtr<ndDemoEntity> calfEntity(thighEntity->GetChildren().GetFirst()->GetInfo());
-			//const ndMatrix calfMatrix(calfEntity->GetCurrentMatrix() * thighMatrix);
-			//ndSharedPtr<ndBody> calf(CreateRigidBody(calfEntity, calfMatrix, limbMass, thigh->GetAsBodyDynamic()));
-			//
-			//ndSharedPtr<ndJointBilateralConstraint> calfHinge(new ndJointHinge(calfMatrix, calf->GetAsBodyKinematic(), thigh->GetAsBodyKinematic()));
-			//ndModelArticulation::ndNode* const calfNode = model->AddLimb(thighNode, calf, calfHinge);
-			//
-			//((ndIkJointHinge*)*calfHinge)->SetLimitState(true);
-			//((ndIkJointHinge*)*calfHinge)->SetLimits(-60.0f * ndDegreeToRad, 50.0f * ndDegreeToRad);
-			//
-			//// build heel
-			//ndSharedPtr<ndDemoEntity> heelEntity(calfEntity->GetChildren().GetFirst()->GetInfo());
-			//const ndMatrix heelMatrix(heelEntity->GetCurrentMatrix() * calfMatrix);
-			//ndSharedPtr<ndBody> heel(CreateRigidBody(heelEntity, heelMatrix, limbMass * 0.5f, calf->GetAsBodyDynamic()));
-			//
-			//ndSharedPtr<ndJointBilateralConstraint> heelHinge(new ndJointHinge(heelMatrix, heel->GetAsBodyKinematic(), calf->GetAsBodyKinematic()));
-			//ndModelArticulation::ndNode* const heelNode = model->AddLimb(calfNode, heel, heelHinge);
-			//((ndJointHinge*)*heelHinge)->SetAsSpringDamper(0.001f, 2000.0f, 50.0f);
-			//
-			//// build soft contact heel
-			//ndSharedPtr<ndDemoEntity> contactEntity(heelEntity->GetChildren().GetFirst()->GetInfo());
-			//const ndMatrix contactMatrix(contactEntity->GetCurrentMatrix() * heelMatrix);
-			//ndSharedPtr<ndBody> contact(CreateRigidBody(contactEntity, contactMatrix, limbMass * 0.5f, heel->GetAsBodyDynamic()));
-			//
-			//const ndMatrix contactAxis(ndRollMatrix(ndFloat32(90.0f) * ndDegreeToRad) * contactMatrix);
-			//ndSharedPtr<ndJointBilateralConstraint> softContact(new ndJointSlider(contactAxis, contact->GetAsBodyKinematic(), heel->GetAsBodyKinematic()));
-			//model->AddLimb(heelNode, contact, softContact);
-			//((ndJointSlider*)*softContact)->SetAsSpringDamper(0.01f, 2000.0f, 10.0f);
-			//
+			// build calf
+			ndSharedPtr<ndMesh> calfMesh(thighMesh->GetChildren().GetFirst()->GetInfo());
+			ndSharedPtr<ndRenderSceneNode> calfEntity(thighEntity->FindByName(calfMesh->GetName())->GetSharedPtr());
+			ndSharedPtr<ndBody> calf(CreateRigidBody(calfMesh, calfEntity, limbMass, thighBody->GetAsBodyDynamic()));
+			
+			const ndMatrix calfMatrix(calfMesh->CalculateGlobalMatrix());
+			ndSharedPtr<ndJointBilateralConstraint> calfHinge(new ndJointHinge(calfMatrix, calf->GetAsBodyKinematic(), thighBody->GetAsBodyKinematic()));
+			ndModelArticulation::ndNode* const calfNode = model->AddLimb(thighNode, calf, calfHinge);
+			
+			((ndIkJointHinge*)*calfHinge)->SetLimitState(true);
+			((ndIkJointHinge*)*calfHinge)->SetLimits(-60.0f * ndDegreeToRad, 50.0f * ndDegreeToRad);
+			
+			// build heel
+			ndSharedPtr<ndMesh> heelMesh(calfMesh->GetChildren().GetFirst()->GetInfo());
+			ndSharedPtr<ndRenderSceneNode> heelEntity(calfEntity->FindByName(heelMesh->GetName())->GetSharedPtr());
+			ndSharedPtr<ndBody> heel(CreateRigidBody(heelMesh, heelEntity, limbMass * 0.5f, calf->GetAsBodyDynamic()));
+
+			const ndMatrix heelMatrix(heelMesh->CalculateGlobalMatrix());
+			ndSharedPtr<ndJointBilateralConstraint> heelHinge(new ndJointHinge(heelMatrix, heel->GetAsBodyKinematic(), calf->GetAsBodyKinematic()));
+			ndModelArticulation::ndNode* const heelNode = model->AddLimb(calfNode, heel, heelHinge);
+			((ndJointHinge*)*heelHinge)->SetAsSpringDamper(0.001f, 2000.0f, 50.0f);
+			
+			// build soft contact heel
+			ndSharedPtr<ndMesh> contactMesh(heelMesh->GetChildren().GetFirst()->GetInfo());
+			ndSharedPtr<ndRenderSceneNode> contactEntity(heelEntity->FindByName(contactMesh->GetName())->GetSharedPtr());
+			ndSharedPtr<ndBody> contact(CreateRigidBody(contactMesh, contactEntity, limbMass * 0.5f, heel->GetAsBodyDynamic()));
+
+			const ndMatrix contactMatrix(contactMesh->CalculateGlobalMatrix());
+			const ndMatrix contactAxis(ndRollMatrix(ndFloat32(90.0f) * ndDegreeToRad) * contactMatrix);
+			ndSharedPtr<ndJointBilateralConstraint> softContact(new ndJointSlider(contactAxis, contact->GetAsBodyKinematic(), heel->GetAsBodyKinematic()));
+			model->AddLimb(heelNode, contact, softContact);
+			((ndJointSlider*)*softContact)->SetAsSpringDamper(0.01f, 2000.0f, 10.0f);
+			
 			//// create effector
 			//ndSharedPtr<ndDemoEntity> footEntity(contactEntity->GetChildren().GetFirst()->GetInfo());
 			//ndMatrix footMatrix(matrix);
@@ -279,7 +282,7 @@ namespace ndQuadSpiderPlayer
 		//notify->InitAnimation();
 	}
 
-	ndSharedPtr<ndModel> ndController::CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndRenderMeshLoader& loader, const char* const name)
+	ndSharedPtr<ndModel> ndController::CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndRenderMeshLoader& loader, const char* const)
 	{
 		ndMatrix matrix(location);
 		matrix.m_posit = FindFloor(*scene->GetWorld(), matrix.m_posit, 200.0f);
