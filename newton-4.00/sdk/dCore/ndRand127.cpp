@@ -32,6 +32,23 @@ ndRand127::ndRand127()
     Init(uint32_t(47));
 }
 
+#ifdef ND_USE_STD_RAND
+
+void ndRand127::Init(uint32_t seed)
+{
+    m_gen.seed(seed);
+    ndUnsigned32 rand = m_gen();
+}
+
+uint32_t ndRand127::Generate()
+{
+    ndScopeSpinLock lock(m_lock);
+    ndUnsigned32 rand = m_gen();
+    return rand;
+}
+
+#else
+
  /**
   * This function initializes the internal state array with a 32-bit
   * unsigned integer seed.
@@ -119,3 +136,4 @@ uint32_t ndRand127::Generate()
     NextState();
     return Temper();
 }
+#endif

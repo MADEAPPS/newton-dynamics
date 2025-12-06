@@ -23,6 +23,8 @@
  /**
   * tinymt32 internal state vector and parameters
   */
+
+#define ND_USE_STD_RAND
 class ndRand127
 {
     public:
@@ -37,11 +39,14 @@ class ndRand127
     D_CORE_API uint32_t Generate();
 
     private:
+#ifdef ND_USE_STD_RAND
+    std::mt19937 m_gen;
+#else
     uint32_t Temper();
     void NextState();
     void PeriodCertification();
-
     uint32_t status[4];
+#endif
     ndSpinLock m_lock;
 };
 
