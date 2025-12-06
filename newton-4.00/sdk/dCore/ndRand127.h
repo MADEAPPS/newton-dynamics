@@ -18,20 +18,23 @@
 
 #include <stdint.h>
 #include <inttypes.h>
+#include "ndThreadSyncUtils.h"
 
  /**
   * tinymt32 internal state vector and parameters
   */
-class TINYMT32_T
+class ndRand127
 {
-    void Init(uint32_t seed);
+    public:
+    D_CORE_API ndRand127();
+    D_CORE_API void Init(uint32_t seed);
 
     /**
      * This function outputs 32-bit unsigned integer from internal state.
      * @param random tinymt internal status
      * @return 32-bit unsigned integer r (0 <= r < 2^32)
      */
-    uint32_t Generate();
+    D_CORE_API uint32_t Generate();
 
     private:
     uint32_t Temper();
@@ -39,8 +42,8 @@ class TINYMT32_T
     void PeriodCertification();
 
     uint32_t status[4];
-    uint32_t mat1;
-    uint32_t mat2;
-    uint32_t tmat;
+    ndSpinLock m_lock;
 };
+
+
 #endif

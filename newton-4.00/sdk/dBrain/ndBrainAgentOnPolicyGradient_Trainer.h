@@ -44,20 +44,20 @@ class ndBrainAgentOnPolicyGradient_Trainer;
 
 class ndBrainAgentOnPolicyGradient_Agent: public ndBrainAgent
 {
-	class ndRandomGenerator
-	{
-		public:
-		ndRandomGenerator()
-			:m_gen()
-			,m_rd()
-			,m_d(ndFloat32(0.0f), ndFloat32(1.0f))
-		{
-		}
-	
-		std::mt19937 m_gen;
-		std::random_device m_rd;
-		std::normal_distribution<ndReal> m_d;
-	};
+	//class ndRandomGenerator
+	//{
+	//	public:
+	//	ndRandomGenerator()
+	//		:m_gen()
+	//		,m_rd()
+	//		,m_d(ndFloat32(0.0f), ndFloat32(1.0f))
+	//	{
+	//	}
+	//
+	//	std::mt19937 m_gen;
+	//	std::random_device m_rd;
+	//	std::normal_distribution<ndReal> m_d;
+	//};
 
 	public:
 	class ndTrajectory
@@ -119,7 +119,9 @@ class ndBrainAgentOnPolicyGradient_Agent: public ndBrainAgent
 	virtual void SampleActions(ndBrainVector& action);
 	
 	ndTrajectory m_trajectory;
-	ndRandomGenerator m_randomGenerator;
+	//ndRandomGenerator m_randomGenerator;
+	ndNomalDistribution m_normalDistribution;
+	
 	ndBrainAgentOnPolicyGradient_Trainer* m_owner;
 
 	bool m_isDead;
@@ -201,8 +203,7 @@ class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 	ndSharedPtr<ndBrainTrainer> m_policyTrainer;
 	ndSharedPtr<ndBrainTrainer> m_criticTrainer;
 
-	std::mt19937 m_randomGenerator;
-	std::uniform_real_distribution<ndFloat32> m_uniformDistribution;
+	ndUniformDistribution m_uniformDistribution;
 	ndList<ndSharedPtr<ndBrainAgentOnPolicyGradient_Agent>> m_agents;
 
 	ndSharedPtr<ndBrainFloatBuffer> m_meanBuffer;

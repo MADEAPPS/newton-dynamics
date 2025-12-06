@@ -42,6 +42,7 @@
 #include <ndGoogol.h>
 #include <ndString.h>
 #include <ndVector8.h>
+#include <ndRand127.h>
 #include <ndFastRay.h>
 #include <ndFastAabb.h>
 #include <ndProfiler.h>
