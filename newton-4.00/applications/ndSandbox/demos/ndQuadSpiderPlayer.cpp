@@ -245,24 +245,25 @@ namespace ndQuadSpiderPlayer
 			model->AddLimb(heelNode, contact, softContact);
 			((ndJointSlider*)*softContact)->SetAsSpringDamper(0.01f, 2000.0f, 10.0f);
 			
-			//// create effector
-			//ndSharedPtr<ndDemoEntity> footEntity(contactEntity->GetChildren().GetFirst()->GetInfo());
+			// create effector
+			ndSharedPtr<ndMesh> footEntity(contactMesh->GetChildren().GetFirst()->GetInfo());
 			//ndMatrix footMatrix(matrix);
 			//footMatrix.m_posit = (footEntity->GetCurrentMatrix() * contactMatrix).m_posit;
-			//
-			//ndMatrix effectorRefFrame(footMatrix);
-			//effectorRefFrame.m_posit = thighMatrix.m_posit;
-			//
-			//ndFloat32 regularizer = 0.001f;
-			//ndFloat32 effectorStrength = 20.0f * 10.0f * 500.0f;
-			//ndSharedPtr<ndJointBilateralConstraint> effector(new ndIkSwivelPositionEffector(effectorRefFrame, rootBody->GetAsBodyKinematic(), footMatrix.m_posit, contact->GetAsBodyKinematic()));
-			//((ndIkSwivelPositionEffector*)*effector)->SetLinearSpringDamper(regularizer, 4000.0f, 50.0f);
-			//((ndIkSwivelPositionEffector*)*effector)->SetAngularSpringDamper(regularizer, 4000.0f, 50.0f);
-			//((ndIkSwivelPositionEffector*)*effector)->SetWorkSpaceConstraints(0.0f, 0.75f * 0.9f);
-			//((ndIkSwivelPositionEffector*)*effector)->SetMaxForce(effectorStrength);
-			//((ndIkSwivelPositionEffector*)*effector)->SetMaxTorque(effectorStrength);
-			//model->AddCloseLoop(effector);
-			//
+			ndMatrix footMatrix(footEntity->CalculateGlobalMatrix());
+			
+			ndMatrix effectorRefFrame(footMatrix);
+			effectorRefFrame.m_posit = thighMatrix.m_posit;
+			
+			ndFloat32 regularizer = 0.001f;
+			ndFloat32 effectorStrength = 20.0f * 10.0f * 500.0f;
+			ndSharedPtr<ndJointBilateralConstraint> effector(new ndIkSwivelPositionEffector(effectorRefFrame, rootBody->GetAsBodyKinematic(), footMatrix.m_posit, contact->GetAsBodyKinematic()));
+			((ndIkSwivelPositionEffector*)*effector)->SetLinearSpringDamper(regularizer, 4000.0f, 50.0f);
+			((ndIkSwivelPositionEffector*)*effector)->SetAngularSpringDamper(regularizer, 4000.0f, 50.0f);
+			((ndIkSwivelPositionEffector*)*effector)->SetWorkSpaceConstraints(0.0f, 0.75f * 0.9f);
+			((ndIkSwivelPositionEffector*)*effector)->SetMaxForce(effectorStrength);
+			((ndIkSwivelPositionEffector*)*effector)->SetMaxTorque(effectorStrength);
+			model->AddCloseLoop(effector);
+			
 			//RobotModelNotify::ndEffectorInfo leg;
 			//leg.m_calf = (ndJointHinge*)*calfHinge;
 			//leg.m_heel = (ndJointHinge*)*heelHinge;
