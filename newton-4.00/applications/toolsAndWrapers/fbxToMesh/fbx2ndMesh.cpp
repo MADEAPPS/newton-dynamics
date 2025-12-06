@@ -32,6 +32,7 @@ int main(int argc, char** argv)
 	WIN32_FILE_ATTRIBUTE_DATA ndFileInfo;
 	WIN32_FILE_ATTRIBUTE_DATA fbxFileInfo;
 	memset(&ndFileInfo, 0, sizeof(WIN32_FILE_ATTRIBUTE_DATA));
+	memset(&fbxFileInfo, 0, sizeof(WIN32_FILE_ATTRIBUTE_DATA));
 
 	GetFileAttributesEx(ndPath.GetStr(), GetFileExInfoStandard, &ndFileInfo);
 	GetFileAttributesEx(fbxPath.GetStr(), GetFileExInfoStandard, &fbxFileInfo);
