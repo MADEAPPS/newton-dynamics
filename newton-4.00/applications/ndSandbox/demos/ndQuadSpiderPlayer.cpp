@@ -208,7 +208,7 @@ namespace ndQuadSpiderPlayer
 			ndSharedPtr<ndRenderSceneNode> thighEntity(visualMesh->FindByName(thighMesh->GetName())->GetSharedPtr());
 			ndSharedPtr<ndBody> thighBody(CreateRigidBody(thighMesh, thighEntity, limbMass, rootBody->GetAsBodyDynamic()));
 			
-			const ndMatrix thighMatrix(thighEntity->m_matrix * thighBody->GetMatrix());
+			const ndMatrix thighMatrix(thighMesh->CalculateGlobalMatrix());
 			ndSharedPtr<ndJointBilateralConstraint> ballJoint(new ndJointSpherical(thighMatrix, thighBody->GetAsBodyKinematic(), rootBody->GetAsBodyKinematic()));
 			ndModelArticulation::ndNode* const thighNode = model->AddLimb(modelRootNode, thighBody, ballJoint);
 		
