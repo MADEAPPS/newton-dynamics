@@ -90,13 +90,13 @@ namespace ndQuadSpiderPlayer
 			ndSharedPtr<ndMesh> mesh,
 			ndSharedPtr<ndRenderSceneNode> visualMesh);
 
-		static ndModelArticulation* CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndRenderMeshLoader& loader, const char* const name);
+		static ndSharedPtr<ndModel> CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndRenderMeshLoader& loader, const char* const name);
 
-		ndSharedPtr<ndBody> m_cart;
-		ndSharedPtr<ndBody> m_pole;
-		ndSharedPtr<ndJointBilateralConstraint> m_slider;
-		ndSharedPtr<ndJointBilateralConstraint> m_poleHinge;
-		ndBrainAgent* m_agent;
+		//ndSharedPtr<ndBody> m_cart;
+		//ndSharedPtr<ndBody> m_pole;
+		//ndSharedPtr<ndJointBilateralConstraint> m_slider;
+		//ndSharedPtr<ndJointBilateralConstraint> m_poleHinge;
+		//ndBrainAgent* m_agent;
 		ndFloat32 m_timestep;
 	};
 };
