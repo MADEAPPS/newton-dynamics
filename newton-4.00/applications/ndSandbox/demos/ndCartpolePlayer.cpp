@@ -105,9 +105,9 @@ namespace ndCarpolePlayer
 		const ndJointSlider* const slider = (ndJointSlider*)*m_slider;
 		ndFloat32 angle = hinge->GetAngle();
 		ndFloat32 speed = slider->GetSpeed();
-		bool alife = ndAbs(angle) < (REWARD_MIN_ANGLE * ndFloat32(2.0f));
-		alife = alife && (ndAbs(speed) < ndFloat32(5.0f));
-		return !alife;
+		bool isdead = ndAbs(angle) > (REWARD_MIN_ANGLE * ndFloat32(2.0f));
+		isdead = isdead || (ndAbs(speed) > ndFloat32(3.0f));
+		return isdead;
 	}
 
 	#pragma optimize( "", off )
