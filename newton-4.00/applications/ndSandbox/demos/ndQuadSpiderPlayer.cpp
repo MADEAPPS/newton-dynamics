@@ -272,7 +272,7 @@ namespace ndQuadSpiderPlayer
 			//leg.m_effector = (ndIkSwivelPositionEffector*)*effector;
 			//notify->m_legs.PushBack(leg);
 
-			break;
+			//break;
 		}
 
 		ndWorld* const world = scene->GetWorld();
