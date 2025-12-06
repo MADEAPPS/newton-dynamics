@@ -14,11 +14,11 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
-#include "ndCartpolePlayer.h"
+#include "ndQuadSpiderPlayer.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 
-namespace ndCarpolePlayer
+namespace ndQuadSpiderPlayer
 {
 	class ndHelpLegend_Sac : public ndDemoEntityManager::ndDemoHelper
 	{
@@ -74,7 +74,10 @@ namespace ndCarpolePlayer
 	void ndController::Update(ndFloat32 timestep)
 	{
 		m_timestep = timestep;
-		m_agent->Step();
+		if (m_agent)
+		{
+			m_agent->Step();
+		}
 	}
 
 	void ndController::ResetModel()
@@ -207,7 +210,7 @@ namespace ndCarpolePlayer
 	{
 		ndMatrix matrix(location);
 		matrix.m_posit = FindFloor(*scene->GetWorld(), matrix.m_posit, 200.0f);
-		matrix.m_posit.m_y += ndFloat32(0.1f);
+		matrix.m_posit.m_y += ndFloat32(0.5f);
 		loader.m_mesh->m_matrix = loader.m_mesh->m_matrix * matrix;
 		
 		ndSharedPtr<ndRenderSceneNode> visualMesh(loader.m_renderMesh->Clone());
@@ -220,12 +223,12 @@ namespace ndCarpolePlayer
 		ndPlaybackController* const playerController = (ndPlaybackController*)(*controller);
 		playerController->CreateArticulatedModel(scene, model, loader.m_mesh, visualMesh);
 
-		char nameExt[256];
-		snprintf(nameExt, sizeof(nameExt) - 1, "%s.dnn", name);
-		ndString fileName(ndGetWorkingFileName(nameExt));
-		ndSharedPtr<ndBrain> policy(ndBrainLoad::Load(fileName.GetStr()));
-		playerController->m_saveAgent = ndSharedPtr<ndBrainAgent>(new ndController::ndAgent(policy, playerController));
-		playerController->m_agent = *playerController->m_saveAgent;
+		//char nameExt[256];
+		//snprintf(nameExt, sizeof(nameExt) - 1, "%s.dnn", name);
+		//ndString fileName(ndGetWorkingFileName(nameExt));
+		//ndSharedPtr<ndBrain> policy(ndBrainLoad::Load(fileName.GetStr()));
+		//playerController->m_saveAgent = ndSharedPtr<ndBrainAgent>(new ndController::ndAgent(policy, playerController));
+		//playerController->m_agent = *playerController->m_saveAgent;
 
 		// add model a visual mesh to the scene and world
 		ndWorld* const world = scene->GetWorld();
@@ -237,41 +240,62 @@ namespace ndCarpolePlayer
 	}
 }
 
-using namespace ndCarpolePlayer;
+using namespace ndQuadSpiderPlayer;
 
-void ndCartpolePlayer_PPO(ndDemoEntityManager* const scene)
+//void ndCartpolePlayer_PPO(ndDemoEntityManager* const scene)
+//{
+//	ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "marbleCheckBoard.png", 0.1f, true));
+//
+//	// add a help message
+//	ndSharedPtr<ndDemoEntityManager::ndDemoHelper> demoHelper(new ndHelpLegend_Ppo());
+//	scene->SetDemoHelp(demoHelper);
+//
+//	ndMatrix matrix(ndGetIdentityMatrix());
+//	ndRenderMeshLoader loader(*scene->GetRenderer());
+//	loader.LoadMesh(ndGetWorkingFileName("cartpole.nd"));
+//	ndController::CreateModel(scene, matrix, loader, CONTROLLER_NAME_PPO);
+//
+//	matrix.m_posit.m_x -= 0.0f;
+//	matrix.m_posit.m_y += 0.5f;
+//	matrix.m_posit.m_z += 2.0f;
+//	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
+//	scene->SetCameraMatrix(rotation, matrix.m_posit);
+//}
+//
+//void ndCartpolePlayer_SAC(ndDemoEntityManager* const scene)
+//{
+//	ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "marbleCheckBoard.png", 0.1f, true));
+//
+//	// add a help message
+//	ndSharedPtr<ndDemoEntityManager::ndDemoHelper> demoHelper(new ndHelpLegend_Sac());
+//	scene->SetDemoHelp(demoHelper);
+//
+//	ndMatrix matrix(ndGetIdentityMatrix());
+//	ndRenderMeshLoader loader(*scene->GetRenderer());
+//	loader.LoadMesh(ndGetWorkingFileName("cartpole.nd"));
+//	ndController::CreateModel(scene, matrix, loader, CONTROLLER_NAME_SAC);
+//
+//	matrix.m_posit.m_x -= 0.0f;
+//	matrix.m_posit.m_y += 0.5f;
+//	matrix.m_posit.m_z += 2.0f;
+//	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
+//	scene->SetCameraMatrix(rotation, matrix.m_posit);
+//}
+
+
+void ndQuadSpiderAnimated(ndDemoEntityManager* const scene)
 {
 	ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "marbleCheckBoard.png", 0.1f, true));
-
-	// add a help message
-	ndSharedPtr<ndDemoEntityManager::ndDemoHelper> demoHelper(new ndHelpLegend_Ppo());
-	scene->SetDemoHelp(demoHelper);
-
+	
+	//// add a help message
+	//ndSharedPtr<ndDemoEntityManager::ndDemoHelper> demoHelper(new ndHelpLegend_Sac());
+	//scene->SetDemoHelp(demoHelper);
+	
 	ndMatrix matrix(ndGetIdentityMatrix());
 	ndRenderMeshLoader loader(*scene->GetRenderer());
-	loader.LoadMesh(ndGetWorkingFileName("cartpole.nd"));
-	ndController::CreateModel(scene, matrix, loader, CONTROLLER_NAME_PPO);
-
-	matrix.m_posit.m_x -= 0.0f;
-	matrix.m_posit.m_y += 0.5f;
-	matrix.m_posit.m_z += 2.0f;
-	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
-	scene->SetCameraMatrix(rotation, matrix.m_posit);
-}
-
-void ndCartpolePlayer_SAC(ndDemoEntityManager* const scene)
-{
-	ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "marbleCheckBoard.png", 0.1f, true));
-
-	// add a help message
-	ndSharedPtr<ndDemoEntityManager::ndDemoHelper> demoHelper(new ndHelpLegend_Sac());
-	scene->SetDemoHelp(demoHelper);
-
-	ndMatrix matrix(ndGetIdentityMatrix());
-	ndRenderMeshLoader loader(*scene->GetRenderer());
-	loader.LoadMesh(ndGetWorkingFileName("cartpole.nd"));
+	loader.LoadMesh(ndGetWorkingFileName("spider.nd"));
 	ndController::CreateModel(scene, matrix, loader, CONTROLLER_NAME_SAC);
-
+	
 	matrix.m_posit.m_x -= 0.0f;
 	matrix.m_posit.m_y += 0.5f;
 	matrix.m_posit.m_z += 2.0f;
