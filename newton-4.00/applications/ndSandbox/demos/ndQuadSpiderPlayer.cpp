@@ -29,16 +29,17 @@ namespace ndQuadSpiderPlayer
 		}
 	};
 
-	ndProdeduralGaitGenerator::ndProdeduralGaitGenerator()
+	ndProdeduralGaitGenerator::ndProdeduralGaitGenerator(ndController* const controller)
 		:ndAnimationSequence()
-		//,m_amp(D_CYCLE_AMPLITUDE)
-		//,m_stride_x(D_CYCLE_STRIDE_X)
-		//,m_stride_z(D_CYCLE_STRIDE_Z)
+		,m_owner(controller)
 		,m_omega(0.1f)
 	{
 		m_duration = ndFloat32(4.0f);
 		for (ndInt32 i = 0; i < 4; ++i)
 		{
+			ndEffectorInfo& leg = controller->m_legs[i];
+			m_pose[i] = leg.m_effector->GetEffectorPosit();
+			m_basePose[i] = m_pose[i];
 			AddTrack();
 		}
 	}
@@ -110,7 +111,7 @@ namespace ndQuadSpiderPlayer
 	//}
 
 	ndGeneratorWalkGait::ndGeneratorWalkGait(ndController* const controller)
-		:ndProdeduralGaitGenerator()
+		:ndProdeduralGaitGenerator(controller)
 	{
 		for (ndInt32 i = 0; i < 4; ++i)
 		{
@@ -119,12 +120,12 @@ namespace ndQuadSpiderPlayer
 		}
 	}
 
-	void ndGeneratorWalkGait::CalculatePose(ndAnimationPose& output, ndFloat32 param)
+	void ndGeneratorWalkGait::CalculatePose(ndAnimationPose& output, ndFloat32)
 	{
 		for (ndInt32 i = 0; i < output.GetCount(); i++)
 		{
 			output[i].m_userParamFloat = 0.0f;
-			output[i].m_posit = m_basePose[i];
+			output[i].m_posit = m_pose[i];
 		}
 	}
 
@@ -203,10 +204,6 @@ namespace ndQuadSpiderPlayer
 
 		ndSharedPtr<ndAnimationBlendTreeNode> proceduralPoseGenerator (new ndAnimationSequencePlayer(walkSequence));
 		m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(proceduralPoseGenerator);
-		
-		////ndFloat32 duration = ((ndAnimationSequencePlayer*)*m_poseGenerator)->GetSequence()->GetDuration();
-		////m_animBlendTree->SetTime(duration * ndRand());
-		//m_animBlendTree->SetTime(0.0f);
 		
 		for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 		{
@@ -342,19 +339,6 @@ namespace ndQuadSpiderPlayer
 		model->AddBodiesAndJointsToWorld();
 		return model;
 	}
-
-	//class ndPlaybackController : public ndController
-	//{
-	//	public:
-	//	ndPlaybackController()
-	//		:ndController()
-	//	{
-	//	}
-	//
-	//	//ndSharedPtr<ndBrainAgent> m_saveAgent;
-	//	ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
-	//};
-
 }
 
 using namespace ndQuadSpiderPlayer;

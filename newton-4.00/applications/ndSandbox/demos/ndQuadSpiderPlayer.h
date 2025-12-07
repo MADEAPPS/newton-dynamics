@@ -40,8 +40,10 @@ namespace ndQuadSpiderPlayer
 	class ndProdeduralGaitGenerator : public ndAnimationSequence
 	{
 		public:
-		ndProdeduralGaitGenerator();
+		ndProdeduralGaitGenerator(ndController* const controller);
+		ndVector m_pose[4];
 		ndVector m_basePose[4];
+		ndController* m_owner;
 		ndFloat32 m_omega;
 	};
 
