@@ -29,93 +29,104 @@ namespace ndQuadSpiderPlayer
 		}
 	};
 
-	class ndProdeduralGaitGenerator : public ndAnimationSequence
+	ndProdeduralGaitGenerator::ndProdeduralGaitGenerator()
+		:ndAnimationSequence()
+		//,m_amp(D_CYCLE_AMPLITUDE)
+		//,m_stride_x(D_CYCLE_STRIDE_X)
+		//,m_stride_z(D_CYCLE_STRIDE_Z)
+		,m_omega(0.1f)
 	{
-		public:
-		ndProdeduralGaitGenerator()
-			:ndAnimationSequence()
-			//,m_amp(D_CYCLE_AMPLITUDE)
-			//,m_stride_x(D_CYCLE_STRIDE_X)
-			//,m_stride_z(D_CYCLE_STRIDE_Z)
+		m_duration = ndFloat32(4.0f);
+		for (ndInt32 i = 0; i < 4; ++i)
 		{
-			m_duration = ndFloat32(4.0f);
+			AddTrack();
 		}
+	}
 
-		ndVector GetTranslation(ndFloat32) const override
+	//void CalculatePose(ndAnimationPose& output, ndFloat32 param) override
+	//{
+	//	// generate a procedural in place march gait
+	//	ndAssert(param >= ndFloat32(0.0f));
+	//	ndAssert(param <= ndFloat32(1.0f));
+	//	
+	//	ndFloat32 gaitFraction = 0.25f;
+	//	ndFloat32 gaitGuard = gaitFraction * 0.25f;
+	//	ndFloat32 omega = ndPi / (gaitFraction - gaitGuard);
+	//	
+	//	for (ndInt32 i = 0; i < output.GetCount(); i++)
+	//	{
+	//		const ndEffectorInfo& leg = *(ndEffectorInfo*)output[i].m_userData;;
+	//		output[i].m_userParamFloat = 0.0f;
+	//		output[i].m_posit = leg.m_effector->GetRestPosit();
+	//	}
+	//	
+	//	for (ndInt32 i = 0; i < output.GetCount(); i++)
+	//	{
+	//		const ndEffectorInfo& leg = *(ndEffectorInfo*)output[i].m_userData;;
+	//		const ndVector localPosit(leg.m_effector->GetRestPosit());
+	//		ndFloat32 stride_x = m_stride_x;
+	//		//ndFloat32 stride_z = m_stride_z;
+	//		ndFloat32 phase = 0.0f;
+	//		if (localPosit.m_x > 0.0f)
+	//		{
+	//			phase = (localPosit.m_z > 0.0f) ? 0.0f : 0.50f;
+	//		}
+	//		else
+	//		{
+	//			phase = (localPosit.m_z > 0.0f) ? 0.75f : 0.25f;
+	//		}
+	//	
+	//		stride_x = 0.0f;
+	//		//stride_z = 0.0f;
+	//	
+	//		ndFloat32 t = ndMod(param - phase + ndFloat32(1.0f), ndFloat32(1.0f));
+	//		if ((t >= gaitGuard) && (t <= gaitFraction))
+	//		{
+	//			output[i].m_posit.m_y += m_amp * ndSin(omega * (t - gaitGuard));
+	//			output[i].m_userParamFloat = 1.0f;
+	//	
+	//			ndFloat32 num = t - gaitGuard;
+	//			ndFloat32 den = gaitFraction - gaitGuard;
+	//	
+	//			ndFloat32 t0 = num / den;
+	//			output[i].m_posit.m_x += stride_x * t0 - stride_x * 0.5f;
+	//			//output[i].m_posit.m_z += -(stride_z * t0 - stride_z * 0.5f);
+	//		}
+	//		else
+	//		{
+	//			if (t <= gaitGuard)
+	//			{
+	//				t += 1.0f;
+	//				output[i].m_userParamFloat = 0.5f;
+	//			}
+	//	
+	//			ndFloat32 num = t - gaitFraction;
+	//			ndFloat32 den = 1.0f - (gaitFraction - gaitGuard);
+	//			ndFloat32 t0 = num / den;
+	//			output[i].m_posit.m_x += -(stride_x * t0 - stride_x * 0.5f);
+	//			//output[i].m_posit.m_z += (stride_z * t0 - stride_z * 0.5f);
+	//		}
+	//	}
+	//}
+
+	ndGeneratorWalkGait::ndGeneratorWalkGait(ndController* const controller)
+		:ndProdeduralGaitGenerator()
+	{
+		for (ndInt32 i = 0; i < 4; ++i)
 		{
-			return ndVector::m_zero;
+			ndEffectorInfo& leg = controller->m_legs[i];
+			m_basePose[i] = leg.m_effector->GetEffectorPosit();
 		}
+	}
 
-		void CalculatePose(ndAnimationPose& output, ndFloat32 param) override
+	void ndGeneratorWalkGait::CalculatePose(ndAnimationPose& output, ndFloat32 param)
+	{
+		for (ndInt32 i = 0; i < output.GetCount(); i++)
 		{
-			//// generate a procedural in place march gait
-			//ndAssert(param >= ndFloat32(0.0f));
-			//ndAssert(param <= ndFloat32(1.0f));
-			//
-			//ndFloat32 gaitFraction = 0.25f;
-			//ndFloat32 gaitGuard = gaitFraction * 0.25f;
-			//ndFloat32 omega = ndPi / (gaitFraction - gaitGuard);
-			//
-			//for (ndInt32 i = 0; i < output.GetCount(); i++)
-			//{
-			//	const ndEffectorInfo& leg = *(ndEffectorInfo*)output[i].m_userData;;
-			//	output[i].m_userParamFloat = 0.0f;
-			//	output[i].m_posit = leg.m_effector->GetRestPosit();
-			//}
-			//
-			//for (ndInt32 i = 0; i < output.GetCount(); i++)
-			//{
-			//	const ndEffectorInfo& leg = *(ndEffectorInfo*)output[i].m_userData;;
-			//	const ndVector localPosit(leg.m_effector->GetRestPosit());
-			//	ndFloat32 stride_x = m_stride_x;
-			//	//ndFloat32 stride_z = m_stride_z;
-			//	ndFloat32 phase = 0.0f;
-			//	if (localPosit.m_x > 0.0f)
-			//	{
-			//		phase = (localPosit.m_z > 0.0f) ? 0.0f : 0.50f;
-			//	}
-			//	else
-			//	{
-			//		phase = (localPosit.m_z > 0.0f) ? 0.75f : 0.25f;
-			//	}
-			//
-			//	stride_x = 0.0f;
-			//	//stride_z = 0.0f;
-			//
-			//	ndFloat32 t = ndMod(param - phase + ndFloat32(1.0f), ndFloat32(1.0f));
-			//	if ((t >= gaitGuard) && (t <= gaitFraction))
-			//	{
-			//		output[i].m_posit.m_y += m_amp * ndSin(omega * (t - gaitGuard));
-			//		output[i].m_userParamFloat = 1.0f;
-			//
-			//		ndFloat32 num = t - gaitGuard;
-			//		ndFloat32 den = gaitFraction - gaitGuard;
-			//
-			//		ndFloat32 t0 = num / den;
-			//		output[i].m_posit.m_x += stride_x * t0 - stride_x * 0.5f;
-			//		//output[i].m_posit.m_z += -(stride_z * t0 - stride_z * 0.5f);
-			//	}
-			//	else
-			//	{
-			//		if (t <= gaitGuard)
-			//		{
-			//			t += 1.0f;
-			//			output[i].m_userParamFloat = 0.5f;
-			//		}
-			//
-			//		ndFloat32 num = t - gaitFraction;
-			//		ndFloat32 den = 1.0f - (gaitFraction - gaitGuard);
-			//		ndFloat32 t0 = num / den;
-			//		output[i].m_posit.m_x += -(stride_x * t0 - stride_x * 0.5f);
-			//		//output[i].m_posit.m_z += (stride_z * t0 - stride_z * 0.5f);
-			//	}
-			//}
+			output[i].m_userParamFloat = 0.0f;
+			output[i].m_posit = m_basePose[i];
 		}
-
-		ndFloat32 m_amp;
-		ndFloat32 m_stride_x;
-		ndFloat32 m_stride_z;
-	};
+	}
 
 	ndController::ndController()
 		:ndModelNotify()
@@ -131,11 +142,6 @@ namespace ndQuadSpiderPlayer
 		ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
 		rootBody->SetSleepState(false);
 
-		//const ndModelArticulation::ndCenterOfMassDynamics comDynamics(CalculateDynamics(timestep));
-		//const ndVector comOmega(comDynamics.m_omega);
-		//const ndVector comAlpha(comDynamics.m_alpha);
-
-		//ndFloat32 animSpeed = 2.0f * m_control->m_animSpeed;
 		ndFloat32 animSpeed = 0.5f;
 		m_animBlendTree->Update(timestep * animSpeed);
 
@@ -193,25 +199,21 @@ namespace ndQuadSpiderPlayer
 
 	void ndController::CreateAnimationBlendTree()
 	{
-		ndSharedPtr<ndAnimationSequence> sequence(new ndProdeduralGaitGenerator());
+		ndSharedPtr<ndAnimationSequence> walkSequence(new ndGeneratorWalkGait(this));
 
-		//m_poseGenerator = ndSharedPtr<ndAnimationBlendTreeNode>(new ndAnimationSequencePlayer(sequence));
-		//m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(m_poseGenerator);
-		ndSharedPtr<ndAnimationBlendTreeNode> proceduralPoseGenerator (new ndAnimationSequencePlayer(sequence));
+		ndSharedPtr<ndAnimationBlendTreeNode> proceduralPoseGenerator (new ndAnimationSequencePlayer(walkSequence));
 		m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(proceduralPoseGenerator);
 		
 		////ndFloat32 duration = ((ndAnimationSequencePlayer*)*m_poseGenerator)->GetSequence()->GetDuration();
 		////m_animBlendTree->SetTime(duration * ndRand());
 		//m_animBlendTree->SetTime(0.0f);
 		
-		ndProdeduralGaitGenerator* const poseGenerator = (ndProdeduralGaitGenerator*)*sequence;
 		for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 		{
 			ndEffectorInfo& leg = m_legs[i];
 			ndAnimKeyframe keyFrame;
 			keyFrame.m_userData = &leg;
 			m_pose.PushBack(keyFrame);
-			poseGenerator->AddTrack();
 		}
 	}
 

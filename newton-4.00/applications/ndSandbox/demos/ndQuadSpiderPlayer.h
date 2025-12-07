@@ -22,21 +22,39 @@ namespace ndQuadSpiderPlayer
 	#define D_BODY_MASS	ndFloat32(20.0f)
 	#define D_LIMB_MASS ndFloat32(0.25f)
 
+	class ndController;
+
+	class ndEffectorInfo
+	{
+		public:
+		ndEffectorInfo()
+			:m_calf(nullptr)
+			,m_effector(nullptr)
+		{
+		}
+
+		ndJointHinge* m_calf;
+		ndIkSwivelPositionEffector* m_effector;
+	};
+
+	class ndProdeduralGaitGenerator : public ndAnimationSequence
+	{
+		public:
+		ndProdeduralGaitGenerator();
+		ndVector m_basePose[4];
+		ndFloat32 m_omega;
+	};
+
+	class ndGeneratorWalkGait : public ndProdeduralGaitGenerator
+	{
+		public:
+		ndGeneratorWalkGait(ndController* const controller);
+		void CalculatePose(ndAnimationPose& output, ndFloat32 param) override;
+	};
+
 	class ndController : public ndModelNotify
 	{
 		public:
-		class ndEffectorInfo
-		{
-			public:
-			ndEffectorInfo()
-				:m_calf(nullptr)
-				,m_effector(nullptr)
-			{
-			}
-
-			ndJointHinge* m_calf;
-			ndIkSwivelPositionEffector* m_effector;
-		};
 
 		ndController();
 
