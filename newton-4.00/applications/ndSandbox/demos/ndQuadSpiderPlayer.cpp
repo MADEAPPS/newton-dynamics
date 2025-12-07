@@ -33,8 +33,13 @@ namespace ndQuadSpiderPlayer
 		:ndAnimationSequence()
 		,m_owner(controller)
 		,m_omega(0.1f)
+		,m_timeAcc(0.0f)
 	{
-		m_duration = ndFloat32(4.0f);
+		m_duration = ndFloat32(1.0f);
+		m_timeLine[0] = ndFloat32(0.0f);
+		m_timeLine[1] = ndFloat32(0.0f);
+		m_timeLine[2] = ndFloat32(m_duration);
+
 		for (ndInt32 i = 0; i < 4; ++i)
 		{
 			ndEffectorInfo& leg = controller->m_legs[i];
@@ -110,23 +115,42 @@ namespace ndQuadSpiderPlayer
 	//	}
 	//}
 
-	ndGeneratorWalkGait::ndGeneratorWalkGait(ndController* const controller)
-		:ndProdeduralGaitGenerator(controller)
+	ndFloat32 ndProdeduralGaitGenerator::CalculateTime() const
 	{
-		for (ndInt32 i = 0; i < 4; ++i)
+		ndFloat32 angle0 = m_timeAcc * ndFloat32(2.0f) * ndPi / m_duration;
+		ndFloat32 deltaAngle = m_owner->m_timestep * ndFloat32(2.0f) * ndPi / m_duration;
+		ndFloat32 angle1 = ndAnglesAdd(angle0, deltaAngle);
+		if (angle1 < -0.0f)
 		{
-			ndEffectorInfo& leg = controller->m_legs[i];
-			m_basePose[i] = leg.m_effector->GetEffectorPosit();
+			angle1 += ndFloat32(2.0f) * ndPi;
 		}
+		ndFloat32 time = angle1 * m_duration / (ndFloat32(2.0f) * ndPi);
+		return time;
 	}
 
-	void ndGeneratorWalkGait::CalculatePose(ndAnimationPose& output, ndFloat32)
+	void ndProdeduralGaitGenerator::CalculatePose(ndAnimationPose& output, ndFloat32)
 	{
-		for (ndInt32 i = 0; i < output.GetCount(); i++)
+		ndFloat32 nextTime = CalculateTime();
+		ndAssert(nextTime < m_duration);
+		ndAssert(nextTime >= ndFloat32(0.0f));
+
+		//for (ndInt32 i = 0; i < output.GetCount(); i++)
+		for (ndInt32 i = 0; i < 1; i++)
 		{
 			output[i].m_userParamFloat = 0.0f;
 			output[i].m_posit = m_pose[i];
 		}
+
+		m_timeAcc = nextTime;
+	}
+
+	ndGeneratorWalkGait::ndGeneratorWalkGait(ndController* const controller)
+		:ndProdeduralGaitGenerator(controller)
+	{
+		m_duration = ndFloat32(4.0f);
+		m_timeLine[0] = ndFloat32(0.00f) * m_duration;
+		m_timeLine[1] = ndFloat32(0.25f) * m_duration;
+		m_timeLine[2] = ndFloat32(1.00f) * m_duration;
 	}
 
 	ndController::ndController()

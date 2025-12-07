@@ -41,17 +41,22 @@ namespace ndQuadSpiderPlayer
 	{
 		public:
 		ndProdeduralGaitGenerator(ndController* const controller);
+		void CalculatePose(ndAnimationPose& output, ndFloat32 param) override;
+
+		ndFloat32 CalculateTime() const;
+
 		ndVector m_pose[4];
 		ndVector m_basePose[4];
+		ndFloat32 m_timeLine[3];
 		ndController* m_owner;
 		ndFloat32 m_omega;
+		ndFloat32 m_timeAcc;
 	};
 
 	class ndGeneratorWalkGait : public ndProdeduralGaitGenerator
 	{
 		public:
 		ndGeneratorWalkGait(ndController* const controller);
-		void CalculatePose(ndAnimationPose& output, ndFloat32 param) override;
 	};
 
 	class ndController : public ndModelNotify
