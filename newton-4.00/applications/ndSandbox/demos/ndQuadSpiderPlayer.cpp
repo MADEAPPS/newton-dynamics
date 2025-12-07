@@ -93,12 +93,12 @@ namespace ndQuadSpiderPlayer
 		m_timeLine[1] = ndFloat32(0.25f) * m_duration;
 		m_timeLine[2] = ndFloat32(1.00f) * m_duration;
 
-		ndFloat32 walkStride = ndFloat32(0.4f);
 		for (ndInt32 i = 0; i < 4; ++i)
 		{
 if (i == 0)
 {
-	m_pose[i].m_base.m_x += walkStride * ndFloat32(0.5f);
+	m_stride = ndFloat32(0.4f);
+	m_pose[i].m_base.m_x += m_stride * ndFloat32(0.5f);
 	m_pose[i].m_start = m_pose[i].m_base;
 	m_pose[i].m_end = m_pose[i].m_base;
 	m_pose[i].m_posit = m_pose[i].m_base;
