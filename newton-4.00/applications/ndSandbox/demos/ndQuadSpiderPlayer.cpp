@@ -44,8 +44,10 @@ namespace ndQuadSpiderPlayer
 		for (ndInt32 i = 0; i < 4; ++i)
 		{
 			ndEffectorInfo& leg = controller->m_legs[i];
-			m_pose[i] = leg.m_effector->GetEffectorPosit();
-			m_basePose[i] = m_pose[i];
+			m_pose[i].m_base = leg.m_effector->GetEffectorPosit();
+			m_pose[i].m_end = m_pose[i].m_base;
+			m_pose[i].m_posit = m_pose[i].m_base;
+			m_pose[i].m_start = m_pose[i].m_base;
 			AddTrack();
 		}
 	}
@@ -66,7 +68,7 @@ namespace ndQuadSpiderPlayer
 	void ndProdeduralGaitGenerator::IntegrateLeg(ndAnimationPose& output, ndInt32 legIndex)
 	{
 		output[legIndex].m_userParamFloat = ndFloat32(0.0f);
-		output[legIndex].m_posit = m_pose[legIndex];
+		output[legIndex].m_posit = m_pose[legIndex].m_posit;
 	}
 
 	void ndProdeduralGaitGenerator::CalculatePose(ndAnimationPose& output, ndFloat32)
@@ -95,8 +97,13 @@ namespace ndQuadSpiderPlayer
 		for (ndInt32 i = 0; i < 4; ++i)
 		{
 if (i == 0)
-m_pose[i].m_x += walkStride * ndFloat32(0.5f);
-			m_basePose[i] = m_pose[i];
+{
+	m_pose[i].m_base.m_x += walkStride * ndFloat32(0.5f);
+	m_pose[i].m_start = m_pose[i].m_base;
+	m_pose[i].m_end = m_pose[i].m_base;
+	m_pose[i].m_posit = m_pose[i].m_base;
+}
+
 		}
 	}
 
