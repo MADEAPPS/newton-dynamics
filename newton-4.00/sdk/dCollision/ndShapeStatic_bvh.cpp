@@ -184,7 +184,8 @@ ndFloat32 ndShapeStatic_bvh::RayCast(ndRayCastNotify& callback, const ndVector& 
 	if (ray.m_t < maxT)
 	{
 		t = ray.m_t;
-		ndAssert(ray.m_normal.m_w == ndFloat32(0.0f));
+		ray.m_normal = ray.m_normal & ndVector::m_triplexMask;
+		//ndAssert(ray.m_normal.m_w == ndFloat32(0.0f));
 		ndAssert(ray.m_normal.DotProduct(ray.m_normal).GetScalar() > ndFloat32(0.0f));
 		contactOut.m_normal = ray.m_normal.Normalize();
 		contactOut.m_shapeId0 = ray.m_id;
