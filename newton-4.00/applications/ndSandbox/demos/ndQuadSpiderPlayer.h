@@ -43,6 +43,7 @@ namespace ndQuadSpiderPlayer
 		ndProdeduralGaitGenerator(ndController* const controller);
 		void CalculatePose(ndAnimationPose& output, ndFloat32 param) override;
 
+		void IntegrateLeg(ndAnimationPose& output, ndInt32 legIndex);
 		ndFloat32 CalculateTime() const;
 
 		ndVector m_pose[4];
@@ -50,6 +51,7 @@ namespace ndQuadSpiderPlayer
 		ndFloat32 m_timeLine[3];
 		ndController* m_owner;
 		ndFloat32 m_omega;
+		ndFloat32 m_stride;
 		ndFloat32 m_timeAcc;
 	};
 
