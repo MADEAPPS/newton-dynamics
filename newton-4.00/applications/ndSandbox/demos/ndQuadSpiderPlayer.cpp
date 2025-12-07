@@ -32,7 +32,7 @@ namespace ndQuadSpiderPlayer
 	ndProdeduralGaitGenerator::ndProdeduralGaitGenerator(ndController* const controller)
 		:ndAnimationSequence()
 		,m_owner(controller)
-		,m_omega(ndFloat32(0.1f))
+		,m_omega(ndFloat32(0.2f))
 		,m_stride(ndFloat32(0.0f))
 		,m_timeAcc(ndFloat32(0.0f))
 	{
@@ -65,10 +65,101 @@ namespace ndQuadSpiderPlayer
 		return time;
 	}
 
+	ndProdeduralGaitGenerator::State ndProdeduralGaitGenerator::GetState() const
+	{
+		ndFloat32 t0 = m_timeAcc;
+		ndFloat32 t1 = m_timeAcc + m_owner->m_timestep;
+		if (t0 <= m_timeLine[1])
+		{
+			if (t1 > m_timeLine[1])
+			{
+				return airToGround;
+			}
+			return onAir;
+		}
+		if (t0 <= m_timeLine[2])
+		{
+			if (t1 > m_timeLine[2])
+			{
+				return groundToAir;
+			}
+			return onGround;
+		}
+		ndAssert(0);
+		return onGround;
+	}
+
 	void ndProdeduralGaitGenerator::IntegrateLeg(ndAnimationPose& output, ndInt32 legIndex)
 	{
 		output[legIndex].m_userParamFloat = ndFloat32(0.0f);
-		output[legIndex].m_posit = m_pose[legIndex].m_posit;
+
+		if (legIndex != 0)
+		{
+			output[legIndex].m_posit = m_pose[legIndex].m_posit;
+			return;
+		}
+
+		State state = ndProdeduralGaitGenerator::GetState();
+		switch (state)
+		{
+			case groundToAir:
+			{
+				ndFloat32 time = m_timeLine[1] - m_timeLine[0];
+				//ndFloat32 angle = m_omega * time;
+				//ndMatrix matrix(ndYawMatrix(angle));
+				//ndVector target(matrix.RotateVector(m_pose[legIndex].m_base));
+				m_pose[legIndex].m_start = m_pose[legIndex].m_posit;
+				m_pose[legIndex].m_end = m_pose[legIndex].m_base;
+
+				m_pose[legIndex].m_maxTime = time;
+				m_pose[legIndex].m_time = ndFloat32(0.0f);
+
+				output[legIndex].m_posit = m_pose[legIndex].m_posit;
+
+				break;
+			}
+
+			case airToGround:
+			{
+				ndFloat32 time = m_timeLine[2] - m_timeLine[1];
+				ndFloat32 angle = m_omega * time;
+				ndMatrix matrix(ndYawMatrix (angle));
+				ndVector target(matrix.RotateVector(m_pose[legIndex].m_base));
+				m_pose[legIndex].m_start = m_pose[legIndex].m_posit;
+				m_pose[legIndex].m_end = target;
+
+				m_pose[legIndex].m_maxTime = time;
+				m_pose[legIndex].m_time = ndFloat32(0.0f);
+
+				output[legIndex].m_posit = m_pose[legIndex].m_posit;
+				break;
+			}
+
+			case onAir:
+			{
+				m_pose[legIndex].m_time += m_owner->m_timestep;
+				ndFloat32 param = m_pose[legIndex].m_time / m_pose[legIndex].m_maxTime;
+				ndVector step(m_pose[legIndex].m_end - m_pose[legIndex].m_start);
+				m_pose[legIndex].m_posit = m_pose[legIndex].m_start + step.Scale(param);
+
+				output[legIndex].m_posit = m_pose[legIndex].m_posit;
+				break;
+			}
+
+			case onGround:
+			default:
+			{
+				m_pose[legIndex].m_time += m_owner->m_timestep;
+				ndFloat32 param = m_pose[legIndex].m_time / m_pose[legIndex].m_maxTime;
+				ndVector step(m_pose[legIndex].m_end - m_pose[legIndex].m_start);
+				m_pose[legIndex].m_posit = m_pose[legIndex].m_start + step.Scale(param);
+
+				output[legIndex].m_posit = m_pose[legIndex].m_posit;
+				break;
+			}
+		}
+		
+		
 	}
 
 	void ndProdeduralGaitGenerator::CalculatePose(ndAnimationPose& output, ndFloat32)
@@ -286,7 +377,8 @@ if (i == 0)
 
 		ndWorld* const world = scene->GetWorld();
 		const ndMatrix upMatrix(rootBody->GetMatrix());
-		ndSharedPtr<ndJointBilateralConstraint> upVector(new ndJointUpVector(upMatrix.m_up, rootBody->GetAsBodyKinematic(), world->GetSentinelBody()));
+		//ndSharedPtr<ndJointBilateralConstraint> upVector(new ndJointUpVector(upMatrix.m_up, rootBody->GetAsBodyKinematic(), world->GetSentinelBody()));
+		ndSharedPtr<ndJointBilateralConstraint> upVector(new ndJointFix6dof(upMatrix, rootBody->GetAsBodyKinematic(), world->GetSentinelBody()));
 		model->AddCloseLoop(upVector);
 	}
 
