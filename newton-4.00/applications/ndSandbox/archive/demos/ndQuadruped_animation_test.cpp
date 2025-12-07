@@ -67,10 +67,10 @@ namespace ndQuadruped_animation
 			ndIkSwivelPositionEffector* m_effector;
 		};
 
-		class ndPoseGenerator : public ndAnimationSequence
+		class ndProdeduralGaitGenerator : public ndAnimationSequence
 		{
 			public:
-			ndPoseGenerator()
+			ndProdeduralGaitGenerator()
 				:ndAnimationSequence()
 				,m_amp(D_CYCLE_AMPLITUDE)
 				,m_stride_x(D_CYCLE_STRIDE_X)
@@ -157,7 +157,7 @@ namespace ndQuadruped_animation
 
 		void InitAnimation()
 		{
-			ndSharedPtr<ndAnimationSequence> sequence(new ndPoseGenerator());
+			ndSharedPtr<ndAnimationSequence> sequence(new ndProdeduralGaitGenerator());
 			
 			m_poseGenerator = ndSharedPtr<ndAnimationBlendTreeNode>(new ndAnimationSequencePlayer(sequence));
 			m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(m_poseGenerator);
@@ -166,7 +166,7 @@ namespace ndQuadruped_animation
 			//m_animBlendTree->SetTime(duration * ndRand());
 			m_animBlendTree->SetTime(0.0f);
 			
-			ndPoseGenerator* const poseGenerator = (ndPoseGenerator*)*sequence;
+			ndProdeduralGaitGenerator* const poseGenerator = (ndProdeduralGaitGenerator*)*sequence;
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
 				ndEffectorInfo& leg = m_legs[i];

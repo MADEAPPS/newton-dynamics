@@ -29,10 +29,10 @@ namespace ndQuadSpiderPlayer
 		}
 	};
 
-	class ndPoseGenerator : public ndAnimationSequence
+	class ndProdeduralGaitGenerator : public ndAnimationSequence
 	{
 		public:
-		ndPoseGenerator()
+		ndProdeduralGaitGenerator()
 			:ndAnimationSequence()
 			//,m_amp(D_CYCLE_AMPLITUDE)
 			//,m_stride_x(D_CYCLE_STRIDE_X)
@@ -48,14 +48,14 @@ namespace ndQuadSpiderPlayer
 
 		void CalculatePose(ndAnimationPose& output, ndFloat32 param) override
 		{
-			// generate a procedural in place march gait
-			ndAssert(param >= ndFloat32(0.0f));
-			ndAssert(param <= ndFloat32(1.0f));
-
-			ndFloat32 gaitFraction = 0.25f;
-			ndFloat32 gaitGuard = gaitFraction * 0.25f;
-			ndFloat32 omega = ndPi / (gaitFraction - gaitGuard);
-
+			//// generate a procedural in place march gait
+			//ndAssert(param >= ndFloat32(0.0f));
+			//ndAssert(param <= ndFloat32(1.0f));
+			//
+			//ndFloat32 gaitFraction = 0.25f;
+			//ndFloat32 gaitGuard = gaitFraction * 0.25f;
+			//ndFloat32 omega = ndPi / (gaitFraction - gaitGuard);
+			//
 			//for (ndInt32 i = 0; i < output.GetCount(); i++)
 			//{
 			//	const ndEffectorInfo& leg = *(ndEffectorInfo*)output[i].m_userData;;
@@ -126,6 +126,64 @@ namespace ndQuadSpiderPlayer
 	void ndController::Update(ndFloat32 timestep)
 	{
 		m_timestep = timestep;
+
+		ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
+		ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
+		rootBody->SetSleepState(false);
+
+		//const ndModelArticulation::ndCenterOfMassDynamics comDynamics(CalculateDynamics(timestep));
+		//const ndVector comOmega(comDynamics.m_omega);
+		//const ndVector comAlpha(comDynamics.m_alpha);
+
+		//ndFloat32 animSpeed = 2.0f * m_control->m_animSpeed;
+		ndFloat32 animSpeed = 0.5f;
+		m_animBlendTree->Update(timestep * animSpeed);
+
+		ndVector veloc;
+		m_animBlendTree->Evaluate(m_pose, veloc);
+
+		const ndVector upVector(rootBody->GetMatrix().m_up);
+		for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
+		{
+			ndEffectorInfo& leg = m_legs[i];
+			ndIkSwivelPositionEffector* const effector = leg.m_effector;
+
+			ndVector posit(m_pose[i].m_posit);
+			ndFloat32 swivelAngle = effector->CalculateLookAtSwivelAngle(upVector);
+
+			ndFloat32 minAngle;
+			ndFloat32 maxAngle;
+			ndFloat32 kneeAngle = leg.m_calf->GetAngle();
+			leg.m_calf->GetLimits(minAngle, maxAngle);
+			ndFloat32 safeGuardAngle = ndFloat32(3.0f * ndDegreeToRad);
+			maxAngle = ndMax(ndFloat32(0.0f), maxAngle - safeGuardAngle);
+			minAngle = ndMin(ndFloat32(0.0f), minAngle + safeGuardAngle);
+
+			if ((kneeAngle > maxAngle) || (kneeAngle < minAngle))
+			{
+				ndAssert(0);
+				// project that target to the sphere of the corrent position
+				leg.m_effector->SetAsReducedDof();
+			}
+
+			effector->SetSwivelAngle(swivelAngle);
+			effector->SetLocalTargetPosition(posit);
+
+			//// calculate lookAt angle
+			//ndMatrix lookAtMatrix0;
+			//ndMatrix lookAtMatrix1;
+			//ndJointHinge* const heelHinge = leg.m_heel;
+			//heelHinge->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
+			//
+			//ndMatrix upMatrix(ndGetIdentityMatrix());
+			//upMatrix.m_front = lookAtMatrix0.m_front;
+			//upMatrix.m_right = (upVector.CrossProduct(upMatrix.m_front) & ndVector::m_triplexMask).Normalize();
+			//upMatrix.m_up = upMatrix.m_right.CrossProduct(upMatrix.m_front);
+			//upMatrix = upMatrix * lookAtMatrix0.OrthoInverse();
+			//const ndFloat32 angle = ndAtan2(upMatrix.m_up.m_z, upMatrix.m_up.m_y);
+			//heelHinge->SetTargetAngle(angle);
+		}
+
 	}
 
 	void ndController::ResetModel()
@@ -135,7 +193,7 @@ namespace ndQuadSpiderPlayer
 
 	void ndController::CreateAnimationBlendTree()
 	{
-		ndSharedPtr<ndAnimationSequence> sequence(new ndPoseGenerator());
+		ndSharedPtr<ndAnimationSequence> sequence(new ndProdeduralGaitGenerator());
 
 		//m_poseGenerator = ndSharedPtr<ndAnimationBlendTreeNode>(new ndAnimationSequencePlayer(sequence));
 		//m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(m_poseGenerator);
@@ -146,7 +204,7 @@ namespace ndQuadSpiderPlayer
 		////m_animBlendTree->SetTime(duration * ndRand());
 		//m_animBlendTree->SetTime(0.0f);
 		
-		ndPoseGenerator* const poseGenerator = (ndPoseGenerator*)*sequence;
+		ndProdeduralGaitGenerator* const poseGenerator = (ndProdeduralGaitGenerator*)*sequence;
 		for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 		{
 			ndEffectorInfo& leg = m_legs[i];
@@ -241,7 +299,7 @@ namespace ndQuadSpiderPlayer
 			model->AddCloseLoop(effector);
 			
 			ndEffectorInfo leg;
-			//leg.m_calf = (ndJointHinge*)*calfHinge;
+			leg.m_calf = (ndJointHinge*)*calfHinge;
 			//leg.m_heel = (ndJointHinge*)*heelHinge;
 			//leg.m_thigh = (ndJointSpherical*)*ballJoint;
 			//leg.m_softContact = (ndJointSlider*)*softContact;
