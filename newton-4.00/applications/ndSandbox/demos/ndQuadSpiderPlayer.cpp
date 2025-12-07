@@ -20,52 +20,105 @@
 
 namespace ndQuadSpiderPlayer
 {
-	class ndHelpLegend_Sac : public ndDemoEntityManager::ndDemoHelper
+	class ndAnimatedHelper : public ndDemoEntityManager::ndDemoHelper
 	{
 		virtual void PresentHelp(ndDemoEntityManager* const scene) override
 		{
 			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			scene->Print(color, "Cart Pole is the classic hello world of reinforcement learning");
-			scene->Print(color, "it is use to test the correctness of an algorithm implementation.");
-			scene->Print(color, "The model is trained using Soft Actor Critic(SAC).");
-			scene->Print(color, "It consists of a pole attached by a hinge to a sliding cart.");
-			scene->Print(color, "The objective goal was to train a neural network to keep");
-			scene->Print(color, "the pole balanced in an upright position.");
-			scene->Print(color, "You can interact with the simulation and try.");
-			scene->Print(color, "to knock the pole over using the mouse.");
-		}
-	};
-	
-	class ndHelpLegend_Ppo : public ndDemoEntityManager::ndDemoHelper
-	{
-		virtual void PresentHelp(ndDemoEntityManager* const scene) override
-		{
-			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			scene->Print(color, "Cart Pole is the classic hello world of reinforcement learning");
-			scene->Print(color, "It is used to test the correctness of an algorithm implementation.");
-			scene->Print(color, "The model is trained using Proximal Policy Gradient (PPO).");
-			scene->Print(color, "It consists of a pole attached by a hinge to a sliding cart.");
-			scene->Print(color, "The objective goal was to train a neural network to keep");
-			scene->Print(color, "the pole balanced in an upright position.");
-			scene->Print(color, "You can interact with the simulation and try.");
-			scene->Print(color, "to knock the pole over using the mouse.");
+			scene->Print(color, "");
 		}
 	};
 
-	class ndPlaybackController : public ndController
+	class ndPoseGenerator : public ndAnimationSequence
 	{
 		public:
-		ndPlaybackController()
-			:ndController()
+		ndPoseGenerator()
+			:ndAnimationSequence()
+			//,m_amp(D_CYCLE_AMPLITUDE)
+			//,m_stride_x(D_CYCLE_STRIDE_X)
+			//,m_stride_z(D_CYCLE_STRIDE_Z)
 		{
+			m_duration = ndFloat32(4.0f);
 		}
 
-		ndSharedPtr<ndBrainAgent> m_saveAgent;
+		ndVector GetTranslation(ndFloat32) const override
+		{
+			return ndVector::m_zero;
+		}
+
+		void CalculatePose(ndAnimationPose& output, ndFloat32 param) override
+		{
+			// generate a procedural in place march gait
+			ndAssert(param >= ndFloat32(0.0f));
+			ndAssert(param <= ndFloat32(1.0f));
+
+			ndFloat32 gaitFraction = 0.25f;
+			ndFloat32 gaitGuard = gaitFraction * 0.25f;
+			ndFloat32 omega = ndPi / (gaitFraction - gaitGuard);
+
+			//for (ndInt32 i = 0; i < output.GetCount(); i++)
+			//{
+			//	const ndEffectorInfo& leg = *(ndEffectorInfo*)output[i].m_userData;;
+			//	output[i].m_userParamFloat = 0.0f;
+			//	output[i].m_posit = leg.m_effector->GetRestPosit();
+			//}
+			//
+			//for (ndInt32 i = 0; i < output.GetCount(); i++)
+			//{
+			//	const ndEffectorInfo& leg = *(ndEffectorInfo*)output[i].m_userData;;
+			//	const ndVector localPosit(leg.m_effector->GetRestPosit());
+			//	ndFloat32 stride_x = m_stride_x;
+			//	//ndFloat32 stride_z = m_stride_z;
+			//	ndFloat32 phase = 0.0f;
+			//	if (localPosit.m_x > 0.0f)
+			//	{
+			//		phase = (localPosit.m_z > 0.0f) ? 0.0f : 0.50f;
+			//	}
+			//	else
+			//	{
+			//		phase = (localPosit.m_z > 0.0f) ? 0.75f : 0.25f;
+			//	}
+			//
+			//	stride_x = 0.0f;
+			//	//stride_z = 0.0f;
+			//
+			//	ndFloat32 t = ndMod(param - phase + ndFloat32(1.0f), ndFloat32(1.0f));
+			//	if ((t >= gaitGuard) && (t <= gaitFraction))
+			//	{
+			//		output[i].m_posit.m_y += m_amp * ndSin(omega * (t - gaitGuard));
+			//		output[i].m_userParamFloat = 1.0f;
+			//
+			//		ndFloat32 num = t - gaitGuard;
+			//		ndFloat32 den = gaitFraction - gaitGuard;
+			//
+			//		ndFloat32 t0 = num / den;
+			//		output[i].m_posit.m_x += stride_x * t0 - stride_x * 0.5f;
+			//		//output[i].m_posit.m_z += -(stride_z * t0 - stride_z * 0.5f);
+			//	}
+			//	else
+			//	{
+			//		if (t <= gaitGuard)
+			//		{
+			//			t += 1.0f;
+			//			output[i].m_userParamFloat = 0.5f;
+			//		}
+			//
+			//		ndFloat32 num = t - gaitFraction;
+			//		ndFloat32 den = 1.0f - (gaitFraction - gaitGuard);
+			//		ndFloat32 t0 = num / den;
+			//		output[i].m_posit.m_x += -(stride_x * t0 - stride_x * 0.5f);
+			//		//output[i].m_posit.m_z += (stride_z * t0 - stride_z * 0.5f);
+			//	}
+			//}
+		}
+
+		ndFloat32 m_amp;
+		ndFloat32 m_stride_x;
+		ndFloat32 m_stride_z;
 	};
 
 	ndController::ndController()
 		:ndModelNotify()
-		//,m_agent(nullptr)
 		,m_timestep(0.0f)
 	{
 	}
@@ -73,107 +126,35 @@ namespace ndQuadSpiderPlayer
 	void ndController::Update(ndFloat32 timestep)
 	{
 		m_timestep = timestep;
-		//if (m_agent)
-		//{
-		//	m_agent->Step();
-		//}
 	}
 
 	void ndController::ResetModel()
 	{
 		ndAssert(0);
-		//ndMatrix cartMatrix(ndGetIdentityMatrix());
-		//cartMatrix.m_posit = m_cart->GetMatrix().m_posit;
-		//cartMatrix.m_posit.m_x = ndFloat32(0.0f);
-		////cartMatrix.m_posit.m_x = ndFloat32(10.0f) * (ndRand() - ndFloat32(0.5f));
-		//cartMatrix.m_posit.m_y = ndFloat32(0.1f);
-		//m_cart->SetMatrix(cartMatrix);
-		//
-		//const ndMatrix poleMatrix(m_poleHinge->CalculateGlobalMatrix1());
-		//m_pole->SetMatrix(poleMatrix);
-		//
-		//m_pole->SetOmega(ndVector::m_zero);
-		//m_pole->SetVelocity(ndVector::m_zero);
-		//
-		//m_cart->SetOmega(ndVector::m_zero);
-		//m_cart->SetVelocity(ndVector::m_zero);
-		//
-		//GetModel()->GetAsModelArticulation()->ClearMemory();
 	}
 
-	#pragma optimize( "", off )
-	bool ndController::IsTerminal() const
+	void ndController::CreateAnimationBlendTree()
 	{
-		ndAssert(0);
-		return true;
-		//const ndJointHinge* const hinge = (ndJointHinge*)*m_poleHinge;
-		//const ndJointSlider* const slider = (ndJointSlider*)*m_slider;
-		//ndFloat32 angle = hinge->GetAngle();
-		//ndFloat32 speed = slider->GetSpeed();
-		//bool isdead = ndAbs(angle) > (REWARD_MIN_ANGLE * ndFloat32(2.0f));
-		//isdead = isdead || (ndAbs(speed) > ndFloat32(3.0f));
-		//return isdead;
-	}
+		ndSharedPtr<ndAnimationSequence> sequence(new ndPoseGenerator());
 
-	#pragma optimize( "", off )
-	ndBrainFloat ndController::CalculateReward() const
-	{
-		ndAssert(0);
-		return true;
-
-		//if (IsTerminal())
-		//{
-		//	// a terminal reward of zero should make for smoother MDPs. 
-		//	// training small networks could be much harder with negative terminal rewards..
-		//	// return ndBrainFloat(-1.0f);
-		//	return ndBrainFloat(-1.0f);
-		//}
-		//
-		//ndJointHinge* const hinge = (ndJointHinge*)*m_poleHinge;
-		//ndJointSlider* const slider = (ndJointSlider*)*m_slider;
-		//
-		//ndFloat32 angle = hinge->GetAngle();
-		//ndFloat32 omega = hinge->GetOmega();
-		//ndFloat32 speed = slider->GetSpeed();
-		//
-		//ndFloat32 invSigma2 = ndFloat32(50.0f);
-		//ndFloat32 speedReward = ndExp(-invSigma2 * speed * speed);
-		//ndFloat32 omegaReward = ndExp(-invSigma2 * omega * omega);
-		//ndFloat32 angleReward = ndExp(-invSigma2 * angle * angle);
-		//
-		//// make sure the reward is never negative, to avoid the possibility of  
-		//// MDP states with negative values.
-		//ndFloat32 reward = ndFloat32(0.3f) * angleReward + ndFloat32(0.3f) * omegaReward + ndFloat32(0.4f) * speedReward;
-		//return ndBrainFloat(reward);
-	}
-
-	void ndController::ApplyActions(ndBrainFloat* const actions)
-	{
-		ndAssert(0);
-		//ndBrainFloat action = actions[0];
-		//ndBrainFloat accel = PUSH_ACCEL * action;
-		//ndFloat32 pushForce = accel * (m_cart->GetAsBodyDynamic()->GetMassMatrix().m_w);
-		//
-		//ndJointSlider* const slider = (ndJointSlider*)*m_slider;
-		//const ndMatrix matrix(slider->CalculateGlobalMatrix0());
-		//
-		//ndVector force(m_cart->GetAsBodyDynamic()->GetForce() + matrix.m_front.Scale(pushForce));
-		//m_cart->GetAsBodyDynamic()->SetForce(force);
-	}
-
-	void ndController::GetObservation(ndBrainFloat* const observation)
-	{
-		ndAssert(0);
-		//const ndJointHinge* const hinge = (ndJointHinge*)*m_poleHinge;
-		//const ndJointSlider* const slider = (ndJointSlider*)*m_slider;
-		//
-		//ndFloat32 omega = hinge->GetOmega();
-		//ndFloat32 angle = hinge->GetAngle();
-		//ndFloat32 speed = slider->GetSpeed();
-		//
-		//observation[m_poleAngle] = ndBrainFloat(angle);
-		//observation[m_poleOmega] = ndBrainFloat(omega);
-		//observation[m_cartSpeed] = ndBrainFloat(speed);
+		//m_poseGenerator = ndSharedPtr<ndAnimationBlendTreeNode>(new ndAnimationSequencePlayer(sequence));
+		//m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(m_poseGenerator);
+		ndSharedPtr<ndAnimationBlendTreeNode> proceduralPoseGenerator (new ndAnimationSequencePlayer(sequence));
+		m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(proceduralPoseGenerator);
+		
+		////ndFloat32 duration = ((ndAnimationSequencePlayer*)*m_poseGenerator)->GetSequence()->GetDuration();
+		////m_animBlendTree->SetTime(duration * ndRand());
+		//m_animBlendTree->SetTime(0.0f);
+		
+		ndPoseGenerator* const poseGenerator = (ndPoseGenerator*)*sequence;
+		for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
+		{
+			ndEffectorInfo& leg = m_legs[i];
+			ndAnimKeyframe keyFrame;
+			keyFrame.m_userData = &leg;
+			m_pose.PushBack(keyFrame);
+			poseGenerator->AddTrack();
+		}
 	}
 
 	void ndController::CreateArticulatedModel(
@@ -194,10 +175,8 @@ namespace ndQuadSpiderPlayer
 			return body;
 		};
 
-		// add the cart mesh and body
-		ndFloat32 mass = 20.0f;
-		ndFloat32 limbMass = 0.25f;
-		ndSharedPtr<ndBody> rootBody(CreateRigidBody(mesh, visualMesh, mass, nullptr));
+		// add the main upper body
+		ndSharedPtr<ndBody> rootBody(CreateRigidBody(mesh, visualMesh, D_BODY_MASS, nullptr));
 		ndModelArticulation::ndNode* const modelRootNode = model->AddRootBody(rootBody);
 		
 		// build all four legs
@@ -206,7 +185,7 @@ namespace ndQuadSpiderPlayer
 			// build thigh
 			ndSharedPtr<ndMesh> thighMesh(node->GetInfo());
 			ndSharedPtr<ndRenderSceneNode> thighEntity(visualMesh->FindByName(thighMesh->GetName())->GetSharedPtr());
-			ndSharedPtr<ndBody> thighBody(CreateRigidBody(thighMesh, thighEntity, limbMass, rootBody->GetAsBodyDynamic()));
+			ndSharedPtr<ndBody> thighBody(CreateRigidBody(thighMesh, thighEntity, D_LIMB_MASS, rootBody->GetAsBodyDynamic()));
 			
 			const ndMatrix thighMatrix(thighMesh->CalculateGlobalMatrix());
 			ndSharedPtr<ndJointBilateralConstraint> ballJoint(new ndJointSpherical(thighMatrix, thighBody->GetAsBodyKinematic(), rootBody->GetAsBodyKinematic()));
@@ -215,7 +194,7 @@ namespace ndQuadSpiderPlayer
 			// build calf
 			ndSharedPtr<ndMesh> calfMesh(thighMesh->GetChildren().GetFirst()->GetInfo());
 			ndSharedPtr<ndRenderSceneNode> calfEntity(thighEntity->FindByName(calfMesh->GetName())->GetSharedPtr());
-			ndSharedPtr<ndBody> calf(CreateRigidBody(calfMesh, calfEntity, limbMass, thighBody->GetAsBodyDynamic()));
+			ndSharedPtr<ndBody> calf(CreateRigidBody(calfMesh, calfEntity, D_LIMB_MASS, thighBody->GetAsBodyDynamic()));
 			
 			const ndMatrix calfMatrix(calfMesh->CalculateGlobalMatrix());
 			ndSharedPtr<ndJointBilateralConstraint> calfHinge(new ndJointHinge(calfMatrix, calf->GetAsBodyKinematic(), thighBody->GetAsBodyKinematic()));
@@ -227,7 +206,7 @@ namespace ndQuadSpiderPlayer
 			// build heel
 			ndSharedPtr<ndMesh> heelMesh(calfMesh->GetChildren().GetFirst()->GetInfo());
 			ndSharedPtr<ndRenderSceneNode> heelEntity(calfEntity->FindByName(heelMesh->GetName())->GetSharedPtr());
-			ndSharedPtr<ndBody> heel(CreateRigidBody(heelMesh, heelEntity, limbMass * 0.5f, calf->GetAsBodyDynamic()));
+			ndSharedPtr<ndBody> heel(CreateRigidBody(heelMesh, heelEntity, D_LIMB_MASS * 0.5f, calf->GetAsBodyDynamic()));
 
 			const ndMatrix heelMatrix(heelMesh->CalculateGlobalMatrix());
 			ndSharedPtr<ndJointBilateralConstraint> heelHinge(new ndJointHinge(heelMatrix, heel->GetAsBodyKinematic(), calf->GetAsBodyKinematic()));
@@ -237,7 +216,7 @@ namespace ndQuadSpiderPlayer
 			// build soft contact heel
 			ndSharedPtr<ndMesh> contactMesh(heelMesh->GetChildren().GetFirst()->GetInfo());
 			ndSharedPtr<ndRenderSceneNode> contactEntity(heelEntity->FindByName(contactMesh->GetName())->GetSharedPtr());
-			ndSharedPtr<ndBody> contact(CreateRigidBody(contactMesh, contactEntity, limbMass * 0.5f, heel->GetAsBodyDynamic()));
+			ndSharedPtr<ndBody> contact(CreateRigidBody(contactMesh, contactEntity, D_LIMB_MASS * 0.5f, heel->GetAsBodyDynamic()));
 
 			const ndMatrix contactMatrix(contactMesh->CalculateGlobalMatrix());
 			const ndMatrix contactAxis(ndRollMatrix(ndFloat32(90.0f) * ndDegreeToRad) * contactMatrix);
@@ -247,15 +226,12 @@ namespace ndQuadSpiderPlayer
 			
 			// create effector
 			ndSharedPtr<ndMesh> footEntity(contactMesh->GetChildren().GetFirst()->GetInfo());
-			//ndMatrix footMatrix(matrix);
-			//footMatrix.m_posit = (footEntity->GetCurrentMatrix() * contactMatrix).m_posit;
 			ndMatrix footMatrix(footEntity->CalculateGlobalMatrix());
-			
 			ndMatrix effectorRefFrame(footMatrix);
 			effectorRefFrame.m_posit = thighMatrix.m_posit;
 			
-			ndFloat32 regularizer = 0.001f;
-			ndFloat32 effectorStrength = 20.0f * 10.0f * 500.0f;
+			ndFloat32 regularizer = ndFloat32(0.001f);
+			ndFloat32 effectorStrength = ndFloat32(20.0f * 10.0f * 500.0f);
 			ndSharedPtr<ndJointBilateralConstraint> effector(new ndIkSwivelPositionEffector(effectorRefFrame, rootBody->GetAsBodyKinematic(), footMatrix.m_posit, contact->GetAsBodyKinematic()));
 			((ndIkSwivelPositionEffector*)*effector)->SetLinearSpringDamper(regularizer, 4000.0f, 50.0f);
 			((ndIkSwivelPositionEffector*)*effector)->SetAngularSpringDamper(regularizer, 4000.0f, 50.0f);
@@ -264,26 +240,22 @@ namespace ndQuadSpiderPlayer
 			((ndIkSwivelPositionEffector*)*effector)->SetMaxTorque(effectorStrength);
 			model->AddCloseLoop(effector);
 			
-			//RobotModelNotify::ndEffectorInfo leg;
+			ndEffectorInfo leg;
 			//leg.m_calf = (ndJointHinge*)*calfHinge;
 			//leg.m_heel = (ndJointHinge*)*heelHinge;
 			//leg.m_thigh = (ndJointSpherical*)*ballJoint;
 			//leg.m_softContact = (ndJointSlider*)*softContact;
-			//leg.m_effector = (ndIkSwivelPositionEffector*)*effector;
-			//notify->m_legs.PushBack(leg);
-
-			//break;
+			leg.m_effector = (ndIkSwivelPositionEffector*)*effector;
+			m_legs.PushBack(leg);
 		}
 
 		ndWorld* const world = scene->GetWorld();
 		const ndMatrix upMatrix(rootBody->GetMatrix());
 		ndSharedPtr<ndJointBilateralConstraint> upVector(new ndJointUpVector(upMatrix.m_up, rootBody->GetAsBodyKinematic(), world->GetSentinelBody()));
 		model->AddCloseLoop(upVector);
-
-		//notify->InitAnimation();
 	}
 
-	ndSharedPtr<ndModel> ndController::CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndRenderMeshLoader& loader, const char* const)
+	ndSharedPtr<ndModel> ndController::CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndRenderMeshLoader& loader)
 	{
 		ndMatrix matrix(location);
 		matrix.m_posit = FindFloor(*scene->GetWorld(), matrix.m_posit, 200.0f);
@@ -294,12 +266,14 @@ namespace ndQuadSpiderPlayer
 		visualMesh->SetTransform(loader.m_mesh->m_matrix);
 		visualMesh->SetTransform(loader.m_mesh->m_matrix);
 		
-		//ndModelArticulation* const model = new ndModelArticulation();
 		ndSharedPtr<ndModel> model (new ndModelArticulation());
-		ndSharedPtr<ndModelNotify> controller(new ndPlaybackController());
+		ndSharedPtr<ndModelNotify> controller(new ndController());
 		model->SetNotifyCallback(controller);
-		ndPlaybackController* const playerController = (ndPlaybackController*)(*controller);
+		ndController* const playerController = (ndController*)(*controller);
 		playerController->CreateArticulatedModel(scene, model->GetAsModelArticulation(), loader.m_mesh, visualMesh);
+
+		// create animation blend tree
+		playerController->CreateAnimationBlendTree();
 		
 		// add model a visual mesh to the scene and world
 		ndWorld* const world = scene->GetWorld();
@@ -308,67 +282,40 @@ namespace ndQuadSpiderPlayer
 		model->AddBodiesAndJointsToWorld();
 		return model;
 	}
+
+	//class ndPlaybackController : public ndController
+	//{
+	//	public:
+	//	ndPlaybackController()
+	//		:ndController()
+	//	{
+	//	}
+	//
+	//	//ndSharedPtr<ndBrainAgent> m_saveAgent;
+	//	ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
+	//};
+
 }
 
 using namespace ndQuadSpiderPlayer;
-
-//void ndCartpolePlayer_PPO(ndDemoEntityManager* const scene)
-//{
-//	ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "marbleCheckBoard.png", 0.1f, true));
-//
-//	// add a help message
-//	ndSharedPtr<ndDemoEntityManager::ndDemoHelper> demoHelper(new ndHelpLegend_Ppo());
-//	scene->SetDemoHelp(demoHelper);
-//
-//	ndMatrix matrix(ndGetIdentityMatrix());
-//	ndRenderMeshLoader loader(*scene->GetRenderer());
-//	loader.LoadMesh(ndGetWorkingFileName("cartpole.nd"));
-//	ndController::CreateModel(scene, matrix, loader, CONTROLLER_NAME_PPO);
-//
-//	matrix.m_posit.m_x -= 0.0f;
-//	matrix.m_posit.m_y += 0.5f;
-//	matrix.m_posit.m_z += 2.0f;
-//	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
-//	scene->SetCameraMatrix(rotation, matrix.m_posit);
-//}
-//
-//void ndCartpolePlayer_SAC(ndDemoEntityManager* const scene)
-//{
-//	ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "marbleCheckBoard.png", 0.1f, true));
-//
-//	// add a help message
-//	ndSharedPtr<ndDemoEntityManager::ndDemoHelper> demoHelper(new ndHelpLegend_Sac());
-//	scene->SetDemoHelp(demoHelper);
-//
-//	ndMatrix matrix(ndGetIdentityMatrix());
-//	ndRenderMeshLoader loader(*scene->GetRenderer());
-//	loader.LoadMesh(ndGetWorkingFileName("cartpole.nd"));
-//	ndController::CreateModel(scene, matrix, loader, CONTROLLER_NAME_SAC);
-//
-//	matrix.m_posit.m_x -= 0.0f;
-//	matrix.m_posit.m_y += 0.5f;
-//	matrix.m_posit.m_z += 2.0f;
-//	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
-//	scene->SetCameraMatrix(rotation, matrix.m_posit);
-//}
 
 
 void ndQuadSpiderAnimated(ndDemoEntityManager* const scene)
 {
 	ndSharedPtr<ndBody> mapBody(BuildFloorBox(scene, ndGetIdentityMatrix(), "marbleCheckBoard.png", 0.1f, true));
 	
-	//// add a help message
-	//ndSharedPtr<ndDemoEntityManager::ndDemoHelper> demoHelper(new ndHelpLegend_Sac());
-	//scene->SetDemoHelp(demoHelper);
+	// add a help message
+	ndSharedPtr<ndDemoEntityManager::ndDemoHelper> demoHelper(new ndAnimatedHelper());
+	scene->SetDemoHelp(demoHelper);
 	
 	ndMatrix matrix(ndGetIdentityMatrix());
 	ndRenderMeshLoader loader(*scene->GetRenderer());
 	loader.LoadMesh(ndGetWorkingFileName("spider.nd"));
-	ndController::CreateModel(scene, matrix, loader, CONTROLLER_NAME_SAC);
+	ndController::CreateModel(scene, matrix, loader);
 	
-	matrix.m_posit.m_x -= 0.0f;
+	matrix.m_posit.m_x -= 2.0f;
 	matrix.m_posit.m_y += 0.5f;
-	matrix.m_posit.m_z += 2.0f;
-	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 90.0f * ndDegreeToRad);
+	matrix.m_posit.m_z += 0.0f;
+	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }

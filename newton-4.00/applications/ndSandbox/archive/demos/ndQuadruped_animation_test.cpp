@@ -166,10 +166,6 @@ namespace ndQuadruped_animation
 			//m_animBlendTree->SetTime(duration * ndRand());
 			m_animBlendTree->SetTime(0.0f);
 			
-			ndFloat32 offset_x[] = { 0.2f, 0.2f, 0.2f, 0.2f };
-			ndFloat32 offset_z[] = { -0.3f, 0.3f, -0.3f, 0.3f };
-			ndFloat32 offset_y[] = { D_POSE_REST_POSITION_Y, D_POSE_REST_POSITION_Y, D_POSE_REST_POSITION_Y, D_POSE_REST_POSITION_Y };
-			
 			ndPoseGenerator* const poseGenerator = (ndPoseGenerator*)*sequence;
 			for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 			{
@@ -406,15 +402,6 @@ namespace ndQuadruped_animation
 			scaledSurrogateLocalZmpPoint.m_w = ndFloat32(1.0f);
 			const ndVector surrogateZmpPoint(centerOfPresure.TransformVector(scaledSurrogateLocalZmpPoint));
 			context.DrawPoint(surrogateZmpPoint, ndVector(1.0f, 1.0f, 0.0f, 1.0f), 4);
-
-//ndAssert((surrogateLocalZmpPoint.m_x * scaledLocalZmp.m_x >= 0.0f) && (surrogateLocalZmpPoint.m_z * scaledLocalZmp.m_z >= 0.0f));
-//static int xxxxx;
-//ndTrace(("%d suppostpoints(%d) alpha(%f %f) zmp(%f %f)\n", xxxxx, supportPolygon.GetCount(), dynamics.m_alpha.m_x, dynamics.m_alpha.m_z, localZmp.m_x * 10.0f, localZmp.m_z * 10.0f));
-////if (xxxxx >= 1127)
-//if (xxxxx >= 100)
-//	xxxxx *= 1;
-//xxxxx++;
-
 		}
 
 		mutable ndIkSolver m_solver;

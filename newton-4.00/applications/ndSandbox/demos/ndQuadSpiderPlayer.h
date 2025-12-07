@@ -19,59 +19,26 @@
 
 namespace ndQuadSpiderPlayer
 {
-	#define CONTROLLER_NAME_SAC		"quadSpiderSac"
-	#define CONTROLLER_NAME_PPO		"quadSpiderPpo"
-
-	#define CART_MASS				ndFloat32(10.0f)
-	#define POLE_MASS				ndFloat32(5.0f)
-
-	#define TRAJECTORY_STEPS		(1024 * 4)
-
-	#define PUSH_ACCEL				ndBrainFloat (-10.0f * DEMO_GRAVITY)
-	#define REWARD_MIN_ANGLE		ndBrainFloat (20.0f * ndDegreeToRad)
-
-	enum ndActionSpace
-	{
-		m_softPush,
-		m_actionsSize
-	};
-
-	enum ndStateSpace
-	{
-		m_poleAngle,
-		m_poleOmega,
-		m_cartSpeed,
-		m_observationsSize
-	};
+	#define D_BODY_MASS	ndFloat32(20.0f)
+	#define D_LIMB_MASS ndFloat32(0.25f)
 
 	class ndController : public ndModelNotify
 	{
 		public:
-		class ndAgent : public ndBrainAgentContinuePolicyGradient
+		class ndEffectorInfo
 		{
 			public:
-			ndAgent(ndSharedPtr<ndBrain>& brain, ndController* const owner)
-				:ndBrainAgentContinuePolicyGradient(brain)
-				,m_owner(owner)
+			ndEffectorInfo()
+				:m_effector(nullptr)
 			{
 			}
 
-			void GetObservation(ndBrainFloat* const observation)
+			ndEffectorInfo(ndIkSwivelPositionEffector* const effector)
+				:m_effector(effector)
 			{
-				m_owner->GetObservation(observation);
 			}
 
-			virtual void ApplyActions(ndBrainFloat* const actions)
-			{
-				m_owner->ApplyActions(actions);
-			}
-
-			bool IsTerminal() const
-			{
-				return m_owner->IsTerminal();
-			}
-
-			ndController* m_owner;
+			ndIkSwivelPositionEffector* m_effector;
 		};
 
 		ndController();
@@ -80,23 +47,19 @@ namespace ndQuadSpiderPlayer
 
 		void ResetModel();
 		bool IsTerminal() const;
-		ndBrainFloat CalculateReward() const;
-		void ApplyActions(ndBrainFloat* const actions);
-		void GetObservation(ndBrainFloat* const observation);
 
 		void CreateArticulatedModel(
 			ndDemoEntityManager* const scene,
 			ndModelArticulation* const model,
 			ndSharedPtr<ndMesh> mesh,
 			ndSharedPtr<ndRenderSceneNode> visualMesh);
+		void CreateAnimationBlendTree();
 
-		static ndSharedPtr<ndModel> CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndRenderMeshLoader& loader, const char* const name);
+		static ndSharedPtr<ndModel> CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndRenderMeshLoader& loader);
 
-		//ndSharedPtr<ndBody> m_cart;
-		//ndSharedPtr<ndBody> m_pole;
-		//ndSharedPtr<ndJointBilateralConstraint> m_slider;
-		//ndSharedPtr<ndJointBilateralConstraint> m_poleHinge;
-		//ndBrainAgent* m_agent;
+		ndAnimationPose m_pose;
+		ndFixSizeArray<ndEffectorInfo, 4> m_legs;
+		ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
 		ndFloat32 m_timestep;
 	};
 };
