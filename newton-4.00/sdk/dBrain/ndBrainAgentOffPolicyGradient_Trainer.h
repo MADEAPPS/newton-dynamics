@@ -43,21 +43,6 @@ class ndBrainAgentOffPolicyGradient_Trainer;
 
 class ndBrainAgentOffPolicyGradient_Agent: public ndBrainAgent
 {
-	class ndRandomGenerator
-	{
-		public:
-		ndRandomGenerator()
-			:m_gen()
-			,m_rd()
-			,m_d(ndFloat32(0.0f), ndFloat32(1.0f))
-		{
-		}
-	
-		std::mt19937 m_gen;
-		std::random_device m_rd;
-		std::normal_distribution<ndReal> m_d;
-	};
-
 	public:
 	class ndTrajectory
 	{
@@ -120,7 +105,7 @@ class ndBrainAgentOffPolicyGradient_Agent: public ndBrainAgent
 
 	ndBrainAgentOffPolicyGradient_Trainer* m_owner;
 	ndTrajectory m_trajectory;
-	ndRandomGenerator m_randomGenerator;
+	ndNomalDistribution m_randomGenerator;
 	ndUnsigned32 m_trajectoryBaseIndex;
 	friend class ndBrainAgentOffPolicyGradient_Trainer;
 };
@@ -202,9 +187,8 @@ class ndBrainAgentOffPolicyGradient_Trainer : public ndClassAlloc
 	ndSharedPtr<ndBrainTrainer> m_criticTrainer[2];
 	ndSharedPtr<ndBrainTrainerInference> m_referenceCriticTrainer[2];
 
+	ndUniformDistribution m_uniformDistribution;
 	ndSharedPtr<ndBrainAgentOffPolicyGradient_Agent> m_agent;
-	std::mt19937 m_randomGenerator;
-	std::uniform_real_distribution<ndReal> m_uniformDistribution;
 
 	ndSharedPtr<ndBrainFloatBuffer> m_uniformRandom;
 	ndSharedPtr<ndBrainFloatBuffer> m_minibatchMean;

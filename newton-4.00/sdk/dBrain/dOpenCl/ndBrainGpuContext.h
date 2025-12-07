@@ -100,6 +100,9 @@ class ndBrainGpuContext : public ndBrainContext
 	virtual void InvSqrt(ndBrainFloatBuffer&, ndInt32 clipSize) override;
 	virtual void ReductionSum(ndBrainFloatBuffer& buffer, ndInt32 clipSize) override;
 
+	virtual void Rand(ndBrainIntegerBuffer& randBuffer) override;
+	virtual void SetRandSeeds(const ndFixSizeArray<ndUnsigned32, 256>& seed) override;
+
 	// learnRate commands
 	virtual void ApplyLeanRateCommands(ndBrainBufferCommand* const command, ndBrainFloat learnRate) override;
 	virtual void SetLearnRateCommandBuffers(ndBrainOptimizerAdam& optimizer, ndInt32 minibatchSize, ndBrainFloatBuffer& weightsAndBiasBuffer, ndBrainFloatBuffer& weightsAndBiasGradientBuffer) override;

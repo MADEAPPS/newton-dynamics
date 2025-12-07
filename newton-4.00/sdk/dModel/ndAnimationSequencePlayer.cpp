@@ -62,7 +62,6 @@ void ndAnimationSequencePlayer::Update(ndFloat32 timestep)
 		}
 		else
 		{
-			//t1 = ndModAdd(t0, timestep, duration);
 			t1 -= duration;
 			ndAssert(t1 <= duration);
 			ndAssert(t1 >= ndFloat32(0.0f));

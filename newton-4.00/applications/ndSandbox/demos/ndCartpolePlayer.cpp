@@ -61,7 +61,7 @@ namespace ndCarpolePlayer
 		{
 		}
 
-		ndSharedPtr<ndBrainAgent> m_saveAgent;
+		//ndSharedPtr<ndBrainAgent> m_myAgent;
 	};
 
 	ndController::ndController()
@@ -81,8 +81,8 @@ namespace ndCarpolePlayer
 	{
 		ndMatrix cartMatrix(ndGetIdentityMatrix());
 		cartMatrix.m_posit = m_cart->GetMatrix().m_posit;
-		//cartMatrix.m_posit.m_x = ndFloat32(0.0f);
-		cartMatrix.m_posit.m_x = ndFloat32(10.0f) * (ndRand() - ndFloat32(0.5f));
+		cartMatrix.m_posit.m_x = ndFloat32(0.0f);
+		//cartMatrix.m_posit.m_x = ndFloat32(10.0f) * (ndRand() - ndFloat32(0.5f));
 		cartMatrix.m_posit.m_y = ndFloat32(0.1f);
 		m_cart->SetMatrix(cartMatrix);
 
@@ -105,9 +105,9 @@ namespace ndCarpolePlayer
 		const ndJointSlider* const slider = (ndJointSlider*)*m_slider;
 		ndFloat32 angle = hinge->GetAngle();
 		ndFloat32 speed = slider->GetSpeed();
-		bool alife = ndAbs(angle) < (REWARD_MIN_ANGLE * ndFloat32(2.0f));
-		alife = alife && (ndAbs(speed) < ndFloat32(5.0f));
-		return !alife;
+		bool isdead = ndAbs(angle) > (REWARD_MIN_ANGLE * ndFloat32(2.0f));
+		isdead = isdead || (ndAbs(speed) > ndFloat32(3.0f));
+		return isdead;
 	}
 
 	#pragma optimize( "", off )
@@ -128,9 +128,10 @@ namespace ndCarpolePlayer
 		ndFloat32 omega = hinge->GetOmega();
 		ndFloat32 speed = slider->GetSpeed();
 
-		ndFloat32 speedReward = ndExp(-ndFloat32(10.0f) * speed * speed);
-		ndFloat32 omegaReward = ndExp(-ndFloat32(10.0f) * omega * omega);
-		ndFloat32 angleReward = ndExp(-ndFloat32(10.0f) * angle * angle);
+		ndFloat32 invSigma2 = ndFloat32(50.0f);
+		ndFloat32 speedReward = ndExp(-invSigma2 * speed * speed);
+		ndFloat32 omegaReward = ndExp(-invSigma2 * omega * omega);
+		ndFloat32 angleReward = ndExp(-invSigma2 * angle * angle);
 
 		// make sure the reward is never negative, to avoid the possibility of  
 		// MDP states with negative values.
@@ -223,8 +224,8 @@ namespace ndCarpolePlayer
 		snprintf(nameExt, sizeof(nameExt) - 1, "%s.dnn", name);
 		ndString fileName(ndGetWorkingFileName(nameExt));
 		ndSharedPtr<ndBrain> policy(ndBrainLoad::Load(fileName.GetStr()));
-		playerController->m_saveAgent = ndSharedPtr<ndBrainAgent>(new ndController::ndAgent(policy, playerController));
-		playerController->m_agent = *playerController->m_saveAgent;
+		playerController->m_agent = ndSharedPtr<ndBrainAgent>(new ndController::ndAgent(policy, playerController));
+		//playerController->m_agent = *playerController->m_myAgent;
 
 		// add model a visual mesh to the scene and world
 		ndWorld* const world = scene->GetWorld();

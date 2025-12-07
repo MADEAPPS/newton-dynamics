@@ -249,8 +249,8 @@ ndBrainAgentOffPolicyGradient_Agent::ndBrainAgentOffPolicyGradient_Agent(ndBrain
 {
 	const ndBrain* const brain = *master->m_policyTrainer->GetBrain();
 	m_trajectory.Init(brain->GetOutputSize(), master->m_parameters.m_numberOfObservations);
-	ndUnsigned32 agentSeed = m_owner->m_randomGenerator();
-	m_randomGenerator.m_gen.seed(agentSeed);
+	ndUnsigned32 agentSeed = m_owner->m_uniformDistribution.Generate();
+	m_randomGenerator.Init(agentSeed);
 }
 
 ndInt32 ndBrainAgentOffPolicyGradient_Agent::GetEpisodeFrames() const
@@ -265,8 +265,8 @@ void ndBrainAgentOffPolicyGradient_Agent::SampleActions(ndBrainVector& actions)
 	for (ndInt32 i = size - 1; i >= 0; --i)
 	{
 		ndBrainFloat sigma = actions[size + i];
-		ndBrainFloat unitVarianceSample = m_randomGenerator.m_d(m_randomGenerator.m_gen);
-		ndBrainFloat sample = ndBrainFloat(actions[i]) + unitVarianceSample * sigma;
+		ndBrainFloat normalSample = m_randomGenerator();
+		ndBrainFloat sample = ndBrainFloat(actions[i]) + normalSample * sigma;
 		ndBrainFloat clippedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
 		actions[i] = clippedAction;
 	}
@@ -303,9 +303,8 @@ ndBrainAgentOffPolicyGradient_Trainer::ndBrainAgentOffPolicyGradient_Trainer(con
 	,m_name()
 	,m_parameters(parameters)
 	,m_context()
+	,m_uniformDistribution()
 	,m_agent(nullptr)
-	,m_randomGenerator(std::random_device{}())
-	,m_uniformDistribution(ndFloat32(0.0f), ndFloat32(1.0f))
 	,m_uniformRandom(nullptr)
 	,m_minibatchMean(nullptr)
 	,m_minibatchSigma(nullptr)
@@ -337,7 +336,7 @@ ndBrainAgentOffPolicyGradient_Trainer::ndBrainAgentOffPolicyGradient_Trainer(con
 	ndAssert(m_parameters.m_numberOfObservations);
 
 	ndSetRandSeed(m_parameters.m_randomSeed);
-	m_randomGenerator.seed(ndRandInt());
+	m_uniformDistribution.Init(ndRandInt());
 	
 	m_parameters.m_numberOfUpdates = ndMax(m_parameters.m_numberOfUpdates, 2);
 	m_parameters.m_discountRewardFactor = ndClamp(m_parameters.m_discountRewardFactor, ndBrainFloat(0.1f), ndBrainFloat(0.999f));
@@ -1041,7 +1040,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::Optimize()
 	{
 		for (ndInt32 j = 0; j < numberOfActions; ++j)
 		{
-			m_scratchBuffer.PushBack(m_uniformDistribution(m_randomGenerator));
+			m_scratchBuffer.PushBack(m_uniformDistribution());
 		}
 	}
 	m_uniformRandom->VectorToDevice(m_scratchBuffer);

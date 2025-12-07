@@ -175,8 +175,6 @@ namespace ndCartpoleTrainer_ppo
 
 			ndController* const playerController = (ndController*)(*controller);
 			playerController->CreateArticulatedModel(scene, model, mesh, visualMesh);
-			ndSharedPtr<ndBrainAgentOnPolicyGradient_Agent> agent(new ndAgent(m_master, playerController));
-			playerController->m_agent = *agent;
 
 			for (ndModelArticulation::ndNode* node = model->GetRoot()->GetFirstIterator(); node; node = node->GetNextIterator())
 			{
@@ -184,7 +182,10 @@ namespace ndCartpoleTrainer_ppo
 				material.m_userId = ndDemoContactCallback::m_modelPart;
 			}
 
+			ndSharedPtr<ndBrainAgentOnPolicyGradient_Agent> agent(new ndAgent(m_master, playerController));
+			playerController->m_agent = (ndSharedPtr<ndBrainAgent>&) agent;
 			m_master->AddAgent(agent);
+
 			return model;
 		}
 

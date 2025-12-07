@@ -96,7 +96,7 @@ namespace ndCarpolePlayer
 		ndSharedPtr<ndBody> m_pole;
 		ndSharedPtr<ndJointBilateralConstraint> m_slider;
 		ndSharedPtr<ndJointBilateralConstraint> m_poleHinge;
-		ndBrainAgent* m_agent;
+		ndSharedPtr<ndBrainAgent> m_agent;
 		ndFloat32 m_timestep;
 	};
 };

@@ -145,9 +145,9 @@ namespace ndCartpoleTrainer_sac
 
 			ndController* const playerController = (ndController*)(*controller);
 			playerController->CreateArticulatedModel(scene, model, mesh, visualMesh);
-			ndSharedPtr<ndBrainAgentOffPolicyGradient_Agent> agent(new ndAgent(m_master, playerController));
-			playerController->m_agent = *agent;
 
+			ndSharedPtr<ndBrainAgentOffPolicyGradient_Agent> agent(new ndAgent(m_master, playerController));
+			playerController->m_agent = (ndSharedPtr<ndBrainAgent>&) agent;
 			m_master->AddAgent(agent);
 
 			return model;
