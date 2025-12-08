@@ -59,6 +59,9 @@ namespace ndQuadSpiderPlayer
 			ndVector m_posit;
 			ndFloat32 m_time;
 			ndFloat32 m_maxTime;
+			ndFloat32 m_a0;
+			ndFloat32 m_a1;
+			ndFloat32 m_a2;
 		};
 
 		ndProdeduralGaitGenerator(ndController* const controller);

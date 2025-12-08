@@ -48,6 +48,14 @@ namespace ndQuadSpiderPlayer
 			m_pose[i].m_end = m_pose[i].m_base;
 			m_pose[i].m_posit = m_pose[i].m_base;
 			m_pose[i].m_start = m_pose[i].m_base;
+
+			m_pose[i].m_a0 = m_pose[i].m_base.m_y;
+			m_pose[i].m_a1 = ndFloat32 (0.0f);
+			m_pose[i].m_a2 = ndFloat32(0.0f);
+
+			m_pose[i].m_time = ndFloat32(0.0f);
+			m_pose[i].m_maxTime = ndFloat32(1.0f);
+
 			AddTrack();
 		}
 	}
@@ -105,17 +113,22 @@ namespace ndQuadSpiderPlayer
 			case groundToAir:
 			{
 				ndFloat32 time = m_timeLine[1] - m_timeLine[0];
-				//ndFloat32 angle = m_omega * time;
-				//ndMatrix matrix(ndYawMatrix(angle));
-				//ndVector target(matrix.RotateVector(m_pose[legIndex].m_base));
-				m_pose[legIndex].m_start = m_pose[legIndex].m_posit;
 				m_pose[legIndex].m_end = m_pose[legIndex].m_base;
+				m_pose[legIndex].m_start = m_pose[legIndex].m_posit;
 
 				m_pose[legIndex].m_maxTime = time;
 				m_pose[legIndex].m_time = ndFloat32(0.0f);
 
-				output[legIndex].m_posit = m_pose[legIndex].m_posit;
+				// create a parabolic arch for the effector to follow
+				ndFloat32 y0 = m_pose[legIndex].m_start.m_y;
+				ndFloat32 y1 = m_pose[legIndex].m_end.m_y;
 
+				ndFloat32 h = m_stride * ndFloat32(0.25f);
+				m_pose[legIndex].m_a0 = y0;
+				m_pose[legIndex].m_a1 = ndFloat32(4.0f) * (h - y0) + ndFloat32(0.5f) * (y1 + y0);
+				m_pose[legIndex].m_a2 = -m_pose[legIndex].m_a1;
+
+				output[legIndex].m_posit = m_pose[legIndex].m_posit;
 				break;
 			}
 
@@ -141,6 +154,11 @@ namespace ndQuadSpiderPlayer
 				ndFloat32 param = m_pose[legIndex].m_time / m_pose[legIndex].m_maxTime;
 				ndVector step(m_pose[legIndex].m_end - m_pose[legIndex].m_start);
 				m_pose[legIndex].m_posit = m_pose[legIndex].m_start + step.Scale(param);
+
+				ndFloat32 a0 = m_pose[legIndex].m_a0;
+				ndFloat32 a1 = m_pose[legIndex].m_a1;
+				ndFloat32 a2 = m_pose[legIndex].m_a2;
+				m_pose[legIndex].m_posit.m_y = a0 + a1 * param + a2 * param * param;
 
 				output[legIndex].m_posit = m_pose[legIndex].m_posit;
 				break;
