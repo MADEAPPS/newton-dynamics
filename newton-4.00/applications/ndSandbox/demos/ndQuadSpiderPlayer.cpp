@@ -372,7 +372,7 @@ if (i == 0)
 			const ndMatrix contactAxis(ndRollMatrix(ndFloat32(90.0f) * ndDegreeToRad) * contactMatrix);
 			ndSharedPtr<ndJointBilateralConstraint> softContact(new ndJointSlider(contactAxis, contact->GetAsBodyKinematic(), heelBody->GetAsBodyKinematic()));
 			model->AddLimb(heelNode, contact, softContact);
-			((ndJointSlider*)*softContact)->SetAsSpringDamper(0.01f, 2000.0f, 10.0f);
+			((ndJointSlider*)*softContact)->SetAsSpringDamper(0.01f, 2000.0f, 100.0f);
 			
 			// save leg info
 			ndEffectorInfo leg;
