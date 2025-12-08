@@ -32,8 +32,9 @@ namespace ndQuadSpiderPlayer
 	ndProdeduralGaitGenerator::ndProdeduralGaitGenerator(ndController* const controller)
 		:ndAnimationSequence()
 		,m_owner(controller)
-		,m_omega(0.1f)
-		,m_timeAcc(0.0f)
+		,m_omega(ndFloat32(0.2f))
+		,m_stride(ndFloat32(0.0f))
+		,m_timeAcc(ndFloat32(0.0f))
 	{
 		m_duration = ndFloat32(1.0f);
 		m_timeLine[0] = ndFloat32(0.0f);
@@ -43,77 +44,13 @@ namespace ndQuadSpiderPlayer
 		for (ndInt32 i = 0; i < 4; ++i)
 		{
 			ndEffectorInfo& leg = controller->m_legs[i];
-			m_pose[i] = leg.m_effector->GetEffectorPosit();
-			m_basePose[i] = m_pose[i];
+			m_pose[i].m_base = leg.m_effector->GetEffectorPosit();
+			m_pose[i].m_end = m_pose[i].m_base;
+			m_pose[i].m_posit = m_pose[i].m_base;
+			m_pose[i].m_start = m_pose[i].m_base;
 			AddTrack();
 		}
 	}
-
-	//void CalculatePose(ndAnimationPose& output, ndFloat32 param) override
-	//{
-	//	// generate a procedural in place march gait
-	//	ndAssert(param >= ndFloat32(0.0f));
-	//	ndAssert(param <= ndFloat32(1.0f));
-	//	
-	//	ndFloat32 gaitFraction = 0.25f;
-	//	ndFloat32 gaitGuard = gaitFraction * 0.25f;
-	//	ndFloat32 omega = ndPi / (gaitFraction - gaitGuard);
-	//	
-	//	for (ndInt32 i = 0; i < output.GetCount(); i++)
-	//	{
-	//		const ndEffectorInfo& leg = *(ndEffectorInfo*)output[i].m_userData;;
-	//		output[i].m_userParamFloat = 0.0f;
-	//		output[i].m_posit = leg.m_effector->GetRestPosit();
-	//	}
-	//	
-	//	for (ndInt32 i = 0; i < output.GetCount(); i++)
-	//	{
-	//		const ndEffectorInfo& leg = *(ndEffectorInfo*)output[i].m_userData;;
-	//		const ndVector localPosit(leg.m_effector->GetRestPosit());
-	//		ndFloat32 stride_x = m_stride_x;
-	//		//ndFloat32 stride_z = m_stride_z;
-	//		ndFloat32 phase = 0.0f;
-	//		if (localPosit.m_x > 0.0f)
-	//		{
-	//			phase = (localPosit.m_z > 0.0f) ? 0.0f : 0.50f;
-	//		}
-	//		else
-	//		{
-	//			phase = (localPosit.m_z > 0.0f) ? 0.75f : 0.25f;
-	//		}
-	//	
-	//		stride_x = 0.0f;
-	//		//stride_z = 0.0f;
-	//	
-	//		ndFloat32 t = ndMod(param - phase + ndFloat32(1.0f), ndFloat32(1.0f));
-	//		if ((t >= gaitGuard) && (t <= gaitFraction))
-	//		{
-	//			output[i].m_posit.m_y += m_amp * ndSin(omega * (t - gaitGuard));
-	//			output[i].m_userParamFloat = 1.0f;
-	//	
-	//			ndFloat32 num = t - gaitGuard;
-	//			ndFloat32 den = gaitFraction - gaitGuard;
-	//	
-	//			ndFloat32 t0 = num / den;
-	//			output[i].m_posit.m_x += stride_x * t0 - stride_x * 0.5f;
-	//			//output[i].m_posit.m_z += -(stride_z * t0 - stride_z * 0.5f);
-	//		}
-	//		else
-	//		{
-	//			if (t <= gaitGuard)
-	//			{
-	//				t += 1.0f;
-	//				output[i].m_userParamFloat = 0.5f;
-	//			}
-	//	
-	//			ndFloat32 num = t - gaitFraction;
-	//			ndFloat32 den = 1.0f - (gaitFraction - gaitGuard);
-	//			ndFloat32 t0 = num / den;
-	//			output[i].m_posit.m_x += -(stride_x * t0 - stride_x * 0.5f);
-	//			//output[i].m_posit.m_z += (stride_z * t0 - stride_z * 0.5f);
-	//		}
-	//	}
-	//}
 
 	ndFloat32 ndProdeduralGaitGenerator::CalculateTime() const
 	{
@@ -128,17 +65,112 @@ namespace ndQuadSpiderPlayer
 		return time;
 	}
 
+	ndProdeduralGaitGenerator::State ndProdeduralGaitGenerator::GetState() const
+	{
+		ndFloat32 t0 = m_timeAcc;
+		ndFloat32 t1 = m_timeAcc + m_owner->m_timestep;
+		if (t0 <= m_timeLine[1])
+		{
+			if (t1 > m_timeLine[1])
+			{
+				return airToGround;
+			}
+			return onAir;
+		}
+		if (t0 <= m_timeLine[2])
+		{
+			if (t1 > m_timeLine[2])
+			{
+				return groundToAir;
+			}
+			return onGround;
+		}
+		ndAssert(0);
+		return onGround;
+	}
+
+	void ndProdeduralGaitGenerator::IntegrateLeg(ndAnimationPose& output, ndInt32 legIndex)
+	{
+		output[legIndex].m_userParamFloat = ndFloat32(0.0f);
+
+		if (legIndex != 0)
+		{
+			output[legIndex].m_posit = m_pose[legIndex].m_posit;
+			return;
+		}
+
+		State state = ndProdeduralGaitGenerator::GetState();
+		switch (state)
+		{
+			case groundToAir:
+			{
+				ndFloat32 time = m_timeLine[1] - m_timeLine[0];
+				//ndFloat32 angle = m_omega * time;
+				//ndMatrix matrix(ndYawMatrix(angle));
+				//ndVector target(matrix.RotateVector(m_pose[legIndex].m_base));
+				m_pose[legIndex].m_start = m_pose[legIndex].m_posit;
+				m_pose[legIndex].m_end = m_pose[legIndex].m_base;
+
+				m_pose[legIndex].m_maxTime = time;
+				m_pose[legIndex].m_time = ndFloat32(0.0f);
+
+				output[legIndex].m_posit = m_pose[legIndex].m_posit;
+
+				break;
+			}
+
+			case airToGround:
+			{
+				ndFloat32 time = m_timeLine[2] - m_timeLine[1];
+				ndFloat32 angle = m_omega * time;
+				ndMatrix matrix(ndYawMatrix (angle));
+				ndVector target(matrix.RotateVector(m_pose[legIndex].m_base));
+				m_pose[legIndex].m_start = m_pose[legIndex].m_posit;
+				m_pose[legIndex].m_end = target;
+
+				m_pose[legIndex].m_maxTime = time;
+				m_pose[legIndex].m_time = ndFloat32(0.0f);
+
+				output[legIndex].m_posit = m_pose[legIndex].m_posit;
+				break;
+			}
+
+			case onAir:
+			{
+				m_pose[legIndex].m_time += m_owner->m_timestep;
+				ndFloat32 param = m_pose[legIndex].m_time / m_pose[legIndex].m_maxTime;
+				ndVector step(m_pose[legIndex].m_end - m_pose[legIndex].m_start);
+				m_pose[legIndex].m_posit = m_pose[legIndex].m_start + step.Scale(param);
+
+				output[legIndex].m_posit = m_pose[legIndex].m_posit;
+				break;
+			}
+
+			case onGround:
+			default:
+			{
+				m_pose[legIndex].m_time += m_owner->m_timestep;
+				ndFloat32 param = m_pose[legIndex].m_time / m_pose[legIndex].m_maxTime;
+				ndVector step(m_pose[legIndex].m_end - m_pose[legIndex].m_start);
+				m_pose[legIndex].m_posit = m_pose[legIndex].m_start + step.Scale(param);
+
+				output[legIndex].m_posit = m_pose[legIndex].m_posit;
+				break;
+			}
+		}
+		
+		
+	}
+
 	void ndProdeduralGaitGenerator::CalculatePose(ndAnimationPose& output, ndFloat32)
 	{
 		ndFloat32 nextTime = CalculateTime();
 		ndAssert(nextTime < m_duration);
 		ndAssert(nextTime >= ndFloat32(0.0f));
 
-		//for (ndInt32 i = 0; i < output.GetCount(); i++)
-		for (ndInt32 i = 0; i < 1; i++)
+		for (ndInt32 i = 0; i < output.GetCount(); i++)
 		{
-			output[i].m_userParamFloat = 0.0f;
-			output[i].m_posit = m_pose[i];
+			IntegrateLeg(output, i);
 		}
 
 		m_timeAcc = nextTime;
@@ -151,6 +183,19 @@ namespace ndQuadSpiderPlayer
 		m_timeLine[0] = ndFloat32(0.00f) * m_duration;
 		m_timeLine[1] = ndFloat32(0.25f) * m_duration;
 		m_timeLine[2] = ndFloat32(1.00f) * m_duration;
+
+		for (ndInt32 i = 0; i < 4; ++i)
+		{
+if (i == 0)
+{
+	m_stride = ndFloat32(0.4f);
+	m_pose[i].m_base.m_x += m_stride * ndFloat32(0.5f);
+	m_pose[i].m_start = m_pose[i].m_base;
+	m_pose[i].m_end = m_pose[i].m_base;
+	m_pose[i].m_posit = m_pose[i].m_base;
+}
+
+		}
 	}
 
 	ndController::ndController()
@@ -306,8 +351,8 @@ namespace ndQuadSpiderPlayer
 			((ndJointSlider*)*softContact)->SetAsSpringDamper(0.01f, 2000.0f, 10.0f);
 			
 			// create effector
-			ndSharedPtr<ndMesh> footEntity(contactMesh->GetChildren().GetFirst()->GetInfo());
-			ndMatrix footMatrix(footEntity->CalculateGlobalMatrix());
+			ndSharedPtr<ndMesh>footMesh(contactMesh->GetChildren().GetFirst()->GetInfo());
+			ndMatrix footMatrix(footMesh->CalculateGlobalMatrix());
 			ndMatrix effectorRefFrame(footMatrix);
 			effectorRefFrame.m_posit = thighMatrix.m_posit;
 			
@@ -332,7 +377,8 @@ namespace ndQuadSpiderPlayer
 
 		ndWorld* const world = scene->GetWorld();
 		const ndMatrix upMatrix(rootBody->GetMatrix());
-		ndSharedPtr<ndJointBilateralConstraint> upVector(new ndJointUpVector(upMatrix.m_up, rootBody->GetAsBodyKinematic(), world->GetSentinelBody()));
+		//ndSharedPtr<ndJointBilateralConstraint> upVector(new ndJointUpVector(upMatrix.m_up, rootBody->GetAsBodyKinematic(), world->GetSentinelBody()));
+		ndSharedPtr<ndJointBilateralConstraint> upVector(new ndJointFix6dof(upMatrix, rootBody->GetAsBodyKinematic(), world->GetSentinelBody()));
 		model->AddCloseLoop(upVector);
 	}
 

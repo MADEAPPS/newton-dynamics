@@ -40,16 +40,37 @@ namespace ndQuadSpiderPlayer
 	class ndProdeduralGaitGenerator : public ndAnimationSequence
 	{
 		public:
+		enum State
+		{
+			onAir,
+			onGround, 
+			groundToAir,
+			airToGround,
+		};
+
+		class ndPose
+		{
+			public:
+			ndVector m_base;
+			ndVector m_end;
+			ndVector m_start;
+			ndVector m_posit;
+			ndFloat32 m_time;
+			ndFloat32 m_maxTime;
+		};
+
 		ndProdeduralGaitGenerator(ndController* const controller);
 		void CalculatePose(ndAnimationPose& output, ndFloat32 param) override;
 
+		State GetState() const;
+		void IntegrateLeg(ndAnimationPose& output, ndInt32 legIndex);
 		ndFloat32 CalculateTime() const;
 
-		ndVector m_pose[4];
-		ndVector m_basePose[4];
+		ndPose m_pose[4];
 		ndFloat32 m_timeLine[3];
 		ndController* m_owner;
 		ndFloat32 m_omega;
+		ndFloat32 m_stride;
 		ndFloat32 m_timeAcc;
 	};
 
