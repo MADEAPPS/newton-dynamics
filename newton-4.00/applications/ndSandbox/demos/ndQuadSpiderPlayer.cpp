@@ -158,8 +158,6 @@ namespace ndQuadSpiderPlayer
 				break;
 			}
 		}
-		
-		
 	}
 
 	void ndProdeduralGaitGenerator::CalculatePose(ndAnimationPose& output, ndFloat32)
@@ -190,6 +188,8 @@ if (i == 0)
 {
 	m_stride = ndFloat32(0.4f);
 	m_pose[i].m_base.m_x += m_stride * ndFloat32(0.5f);
+	//m_pose[i].m_base.m_x += 0.1;
+	//m_pose[i].m_base.m_z += 0.2;
 	m_pose[i].m_start = m_pose[i].m_base;
 	m_pose[i].m_end = m_pose[i].m_base;
 	m_pose[i].m_posit = m_pose[i].m_base;
@@ -219,7 +219,8 @@ if (i == 0)
 		m_animBlendTree->Evaluate(m_pose, veloc);
 
 		const ndVector upVector(rootBody->GetMatrix().m_up);
-		for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
+		//for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
+		for (ndInt32 i = 0; i < 1; ++i)
 		{
 			ndEffectorInfo& leg = m_legs[i];
 			ndIkSwivelPositionEffector* const effector = leg.m_effector;
@@ -239,7 +240,7 @@ if (i == 0)
 			{
 				ndAssert(0);
 				// project that target to the sphere of the corrent position
-				leg.m_effector->SetAsReducedDof();
+				//leg.m_effector->SetAsReducedDof();
 			}
 
 			effector->SetSwivelAngle(swivelAngle);
@@ -248,18 +249,23 @@ if (i == 0)
 			//// calculate lookAt angle
 			//ndMatrix lookAtMatrix0;
 			//ndMatrix lookAtMatrix1;
-			//ndJointHinge* const heelHinge = leg.m_heel;
+			ndJointHinge* const heelHinge = leg.m_heel;
+			ndJointHinge* const calfHinge = leg.m_calf;
 			//heelHinge->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
+			//
+			//
 			//
 			//ndMatrix upMatrix(ndGetIdentityMatrix());
 			//upMatrix.m_front = lookAtMatrix0.m_front;
 			//upMatrix.m_right = (upVector.CrossProduct(upMatrix.m_front) & ndVector::m_triplexMask).Normalize();
 			//upMatrix.m_up = upMatrix.m_right.CrossProduct(upMatrix.m_front);
+			//
 			//upMatrix = upMatrix * lookAtMatrix0.OrthoInverse();
 			//const ndFloat32 angle = ndAtan2(upMatrix.m_up.m_z, upMatrix.m_up.m_y);
 			//heelHinge->SetTargetAngle(angle);
+			//ndFloat32 xxx = calfHinge->GetAngle();
+			//heelHinge->SetTargetAngle(-xxx);
 		}
-
 	}
 
 	void ndController::ResetModel()
@@ -320,65 +326,66 @@ if (i == 0)
 			// build calf
 			ndSharedPtr<ndMesh> calfMesh(thighMesh->GetChildren().GetFirst()->GetInfo());
 			ndSharedPtr<ndRenderSceneNode> calfEntity(thighEntity->FindByName(calfMesh->GetName())->GetSharedPtr());
-			ndSharedPtr<ndBody> calf(CreateRigidBody(calfMesh, calfEntity, D_LIMB_MASS, thighBody->GetAsBodyDynamic()));
+			ndSharedPtr<ndBody> calfBody(CreateRigidBody(calfMesh, calfEntity, D_LIMB_MASS, thighBody->GetAsBodyDynamic()));
 			
 			const ndMatrix calfMatrix(calfMesh->CalculateGlobalMatrix());
-			ndSharedPtr<ndJointBilateralConstraint> calfHinge(new ndJointHinge(calfMatrix, calf->GetAsBodyKinematic(), thighBody->GetAsBodyKinematic()));
-			ndModelArticulation::ndNode* const calfNode = model->AddLimb(thighNode, calf, calfHinge);
+			ndSharedPtr<ndJointBilateralConstraint> calfHinge(new ndJointHinge(calfMatrix, calfBody->GetAsBodyKinematic(), thighBody->GetAsBodyKinematic()));
+			ndModelArticulation::ndNode* const calfNode = model->AddLimb(thighNode, calfBody, calfHinge);
 			
 			((ndIkJointHinge*)*calfHinge)->SetLimitState(true);
-			((ndIkJointHinge*)*calfHinge)->SetLimits(-60.0f * ndDegreeToRad, 50.0f * ndDegreeToRad);
+			((ndIkJointHinge*)*calfHinge)->SetLimits(-60.0f * ndDegreeToRad, 80.0f * ndDegreeToRad);
 			
 			// build heel
 			ndSharedPtr<ndMesh> heelMesh(calfMesh->GetChildren().GetFirst()->GetInfo());
 			ndSharedPtr<ndRenderSceneNode> heelEntity(calfEntity->FindByName(heelMesh->GetName())->GetSharedPtr());
-			ndSharedPtr<ndBody> heel(CreateRigidBody(heelMesh, heelEntity, D_LIMB_MASS * 0.5f, calf->GetAsBodyDynamic()));
+			ndSharedPtr<ndBody> heelBody(CreateRigidBody(heelMesh, heelEntity, D_LIMB_MASS * 0.5f, calfBody->GetAsBodyDynamic()));
 
 			const ndMatrix heelMatrix(heelMesh->CalculateGlobalMatrix());
-			ndSharedPtr<ndJointBilateralConstraint> heelHinge(new ndJointHinge(heelMatrix, heel->GetAsBodyKinematic(), calf->GetAsBodyKinematic()));
-			ndModelArticulation::ndNode* const heelNode = model->AddLimb(calfNode, heel, heelHinge);
+			ndSharedPtr<ndJointBilateralConstraint> heelHinge(new ndJointHinge(heelMatrix, heelBody->GetAsBodyKinematic(), calfBody->GetAsBodyKinematic()));
+			ndModelArticulation::ndNode* const heelNode = model->AddLimb(calfNode, heelBody, heelHinge);
 			((ndJointHinge*)*heelHinge)->SetAsSpringDamper(0.001f, 2000.0f, 50.0f);
-			
-			// build soft contact heel
-			ndSharedPtr<ndMesh> contactMesh(heelMesh->GetChildren().GetFirst()->GetInfo());
-			ndSharedPtr<ndRenderSceneNode> contactEntity(heelEntity->FindByName(contactMesh->GetName())->GetSharedPtr());
-			ndSharedPtr<ndBody> contact(CreateRigidBody(contactMesh, contactEntity, D_LIMB_MASS * 0.5f, heel->GetAsBodyDynamic()));
 
-			const ndMatrix contactMatrix(contactMesh->CalculateGlobalMatrix());
-			const ndMatrix contactAxis(ndRollMatrix(ndFloat32(90.0f) * ndDegreeToRad) * contactMatrix);
-			ndSharedPtr<ndJointBilateralConstraint> softContact(new ndJointSlider(contactAxis, contact->GetAsBodyKinematic(), heel->GetAsBodyKinematic()));
-			model->AddLimb(heelNode, contact, softContact);
-			((ndJointSlider*)*softContact)->SetAsSpringDamper(0.01f, 2000.0f, 10.0f);
-			
 			// create effector
-			ndSharedPtr<ndMesh>footMesh(contactMesh->GetChildren().GetFirst()->GetInfo());
-			ndMatrix footMatrix(footMesh->CalculateGlobalMatrix());
-			ndMatrix effectorRefFrame(footMatrix);
-			effectorRefFrame.m_posit = thighMatrix.m_posit;
+			ndAssert(heelMesh->FindByClosestMatch("-effector"));
+			ndSharedPtr<ndMesh>footMesh(heelMesh->FindByClosestMatch("-effector")->GetSharedPtr());
+			ndMatrix effectPivot(footMesh->CalculateGlobalMatrix());
+			ndVector effectOffset(effectPivot.m_posit);
+			effectPivot.m_posit = thighMatrix.m_posit;
 			
 			ndFloat32 regularizer = ndFloat32(0.001f);
-			ndFloat32 effectorStrength = ndFloat32(20.0f * 10.0f * 500.0f);
-			ndSharedPtr<ndJointBilateralConstraint> effector(new ndIkSwivelPositionEffector(effectorRefFrame, rootBody->GetAsBodyKinematic(), footMatrix.m_posit, contact->GetAsBodyKinematic()));
-			((ndIkSwivelPositionEffector*)*effector)->SetLinearSpringDamper(regularizer, 4000.0f, 50.0f);
-			((ndIkSwivelPositionEffector*)*effector)->SetAngularSpringDamper(regularizer, 4000.0f, 50.0f);
-			((ndIkSwivelPositionEffector*)*effector)->SetWorkSpaceConstraints(0.0f, 0.75f * 0.9f);
+			ndFloat32 effectorStrength = ndAbs(ndFloat32(500.0f * D_LIMB_MASS * DEMO_GRAVITY));
+			ndSharedPtr<ndJointBilateralConstraint> effector(new ndIkSwivelPositionEffector(effectPivot, rootBody->GetAsBodyKinematic(), effectOffset, heelBody->GetAsBodyKinematic()));
+			((ndIkSwivelPositionEffector*)*effector)->SetLinearSpringDamper(regularizer, ndFloat32(4000.0f), ndFloat32(50.0f));
+			((ndIkSwivelPositionEffector*)*effector)->SetAngularSpringDamper(regularizer, ndFloat32(4000.0f), ndFloat32(50.0f));
+			((ndIkSwivelPositionEffector*)*effector)->SetWorkSpaceConstraints(ndFloat32(0.0f), ndFloat32(0.75f * 0.9f));
 			((ndIkSwivelPositionEffector*)*effector)->SetMaxForce(effectorStrength);
 			((ndIkSwivelPositionEffector*)*effector)->SetMaxTorque(effectorStrength);
 			model->AddCloseLoop(effector);
+
+			// build soft contact heel
+			ndAssert(heelMesh->FindByClosestMatch("-capsule"));
+			ndSharedPtr<ndMesh> contactMesh(heelMesh->FindByClosestMatch("-capsule")->GetSharedPtr());
+			ndSharedPtr<ndRenderSceneNode> contactEntity(heelEntity->FindByName(contactMesh->GetName())->GetSharedPtr());
+			ndSharedPtr<ndBody> contact(CreateRigidBody(contactMesh, contactEntity, D_LIMB_MASS * 0.5f, heelBody->GetAsBodyDynamic()));
 			
+			const ndMatrix contactMatrix(contactMesh->CalculateGlobalMatrix());
+			const ndMatrix contactAxis(ndRollMatrix(ndFloat32(90.0f) * ndDegreeToRad) * contactMatrix);
+			ndSharedPtr<ndJointBilateralConstraint> softContact(new ndJointSlider(contactAxis, contact->GetAsBodyKinematic(), heelBody->GetAsBodyKinematic()));
+			model->AddLimb(heelNode, contact, softContact);
+			((ndJointSlider*)*softContact)->SetAsSpringDamper(0.01f, 2000.0f, 10.0f);
+			
+			// save leg info
 			ndEffectorInfo leg;
 			leg.m_calf = (ndJointHinge*)*calfHinge;
-			//leg.m_heel = (ndJointHinge*)*heelHinge;
-			//leg.m_thigh = (ndJointSpherical*)*ballJoint;
-			//leg.m_softContact = (ndJointSlider*)*softContact;
+			leg.m_heel = (ndJointHinge*)*heelHinge;
 			leg.m_effector = (ndIkSwivelPositionEffector*)*effector;
 			m_legs.PushBack(leg);
 		}
 
 		ndWorld* const world = scene->GetWorld();
 		const ndMatrix upMatrix(rootBody->GetMatrix());
-		//ndSharedPtr<ndJointBilateralConstraint> upVector(new ndJointUpVector(upMatrix.m_up, rootBody->GetAsBodyKinematic(), world->GetSentinelBody()));
-		ndSharedPtr<ndJointBilateralConstraint> upVector(new ndJointFix6dof(upMatrix, rootBody->GetAsBodyKinematic(), world->GetSentinelBody()));
+		ndSharedPtr<ndJointBilateralConstraint> upVector(new ndJointUpVector(upMatrix.m_up, rootBody->GetAsBodyKinematic(), world->GetSentinelBody()));
+		//ndSharedPtr<ndJointBilateralConstraint> upVector(new ndJointFix6dof(upMatrix, rootBody->GetAsBodyKinematic(), world->GetSentinelBody()));
 		model->AddCloseLoop(upVector);
 	}
 
@@ -427,9 +434,9 @@ void ndQuadSpiderAnimated(ndDemoEntityManager* const scene)
 	loader.LoadMesh(ndGetWorkingFileName("spider.nd"));
 	ndController::CreateModel(scene, matrix, loader);
 	
-	matrix.m_posit.m_x -= 2.0f;
+	matrix.m_posit.m_x -= 0.0f;
 	matrix.m_posit.m_y += 0.5f;
-	matrix.m_posit.m_z += 0.0f;
-	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), 0.0f * ndDegreeToRad);
+	matrix.m_posit.m_z += -2.0f;
+	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), -90.0f * ndDegreeToRad);
 	scene->SetCameraMatrix(rotation, matrix.m_posit);
 }

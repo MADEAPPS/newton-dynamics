@@ -29,11 +29,13 @@ namespace ndQuadSpiderPlayer
 		public:
 		ndEffectorInfo()
 			:m_calf(nullptr)
+			,m_heel(nullptr)
 			,m_effector(nullptr)
 		{
 		}
 
 		ndJointHinge* m_calf;
+		ndJointHinge* m_heel;
 		ndIkSwivelPositionEffector* m_effector;
 	};
 

@@ -116,7 +116,7 @@ bool ndAnimationMeshLoader::ImportFbx(const ndString& fbxPathMeshName)
 
 	ndInt32 index = 0;
 	ndArray<ndVector> hullPoints;
-	for (ndMesh* childMesh = m_mesh->IteratorFirst(); childMesh; childMesh = childMesh->IteratorNext())
+	for (ndMesh* childMesh = m_mesh->IteratorFirst(); childMesh; childMesh = childMesh->IteratorNext(*m_mesh))
 	{
 		ndString name (childMesh->GetName());
 		ndInt32 vhacd = name.Find("-vhacd");

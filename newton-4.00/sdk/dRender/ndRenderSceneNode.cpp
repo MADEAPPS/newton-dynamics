@@ -52,7 +52,7 @@ ndRenderSceneNode::ndRenderSceneNode(const ndMatrix& matrix)
 	,m_parent(nullptr)
 	,m_primitive(nullptr)
 	,m_children()
-	,m_childNode(nullptr)
+	,m_selfChildNode(nullptr)
 	,m_sceneHandle(nullptr)
 	,m_isVisible(true)
 {
@@ -69,7 +69,7 @@ ndRenderSceneNode::ndRenderSceneNode(const ndRenderSceneNode& src)
 	,m_parent(nullptr)
 	,m_primitive(nullptr)
 	,m_children()
-	,m_childNode(nullptr)
+	,m_selfChildNode(nullptr)
 	,m_sceneHandle(nullptr)
 	,m_isVisible(true)
 {
@@ -181,9 +181,9 @@ const ndRenderSceneNode* ndRenderSceneNode::IteratorFirst() const
 
 ndRenderSceneNode* ndRenderSceneNode::IteratorNext()
 {
-	if (m_childNode)
+	if (m_selfChildNode)
 	{
-		ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* next = m_childNode->GetNext();
+		ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* next = m_selfChildNode->GetNext();
 		if (next)
 		{
 			if (next->GetInfo()->m_children.GetCount())
@@ -199,9 +199,9 @@ ndRenderSceneNode* ndRenderSceneNode::IteratorNext()
 
 const ndRenderSceneNode* ndRenderSceneNode::IteratorNext() const
 {
-	if (m_childNode)
+	if (m_selfChildNode)
 	{
-		ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* next = m_childNode->GetNext();
+		ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* next = m_selfChildNode->GetNext();
 		if (next)
 		{
 			if (next->GetInfo()->m_children.GetCount())
@@ -249,7 +249,7 @@ void ndRenderSceneNode::AddChild(const ndSharedPtr<ndRenderSceneNode>& child)
 
 	ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* const childNode = m_children.Append(child);
 	child->m_parent = this;
-	child->m_childNode = childNode;
+	child->m_selfChildNode = childNode;
 }
 
 void ndRenderSceneNode::RemoveChild(const ndSharedPtr<ndRenderSceneNode> child)
@@ -265,12 +265,12 @@ void ndRenderSceneNode::RemoveChild(const ndSharedPtr<ndRenderSceneNode> child)
 	//		break;
 	//	}
 	//}
-	ndAssert(child->m_childNode);
+	ndAssert(child->m_selfChildNode);
 	ndAssert(child->m_parent && (child->m_parent == this));
 
-	ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* const node = child->m_childNode;
+	ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* const node = child->m_selfChildNode;
 	child->m_parent = nullptr;
-	child->m_childNode = nullptr;
+	child->m_selfChildNode = nullptr;
 
 	m_children.Remove(node);
 }
@@ -380,9 +380,9 @@ void ndRenderSceneNode::Render(const ndRender* const owner, const ndMatrix& mode
 
 ndSharedPtr<ndRenderSceneNode> ndRenderSceneNode::GetSharedPtr() const
 {
-	if (m_childNode)
+	if (m_selfChildNode)
 	{
-		return m_childNode->GetInfo();
+		return m_selfChildNode->GetInfo();
 	}
 	return ndSharedPtr<ndRenderSceneNode>(nullptr);
 }

@@ -36,7 +36,7 @@ ndMesh::ndMesh()
 	,m_posit()
 	,m_rotation()
 	,m_parent(nullptr)
-	,m_childNode(nullptr)
+	,m_selfChildNode(nullptr)
 	,m_boneTarget(ndVector::m_wOne)
 	,m_type(m_node)
 {
@@ -57,7 +57,7 @@ ndMesh::ndMesh(const ndShapeInstance&)
 	,m_posit()
 	,m_rotation()
 	,m_parent(nullptr)
-	,m_childNode(nullptr)
+	,m_selfChildNode(nullptr)
 	,m_boneTarget(ndVector::m_wOne)
 	,m_type(m_node)
 {
@@ -73,17 +73,17 @@ void ndMesh::AddChild(const ndSharedPtr<ndMesh>& child)
 {
 	ndAssert(!child->m_parent);
 	child->m_parent = this;
-	child->m_childNode = m_children.Append(child);
+	child->m_selfChildNode = m_children.Append(child);
 }
 
 void ndMesh::RemoveChild(const ndSharedPtr<ndMesh>& child)
 {
-	ndAssert(child->m_childNode);
+	ndAssert(child->m_selfChildNode);
 	ndAssert(child->m_parent && (child->m_parent == this));
 
-	ndList<ndSharedPtr<ndMesh>>::ndNode* const node = child->m_childNode;
+	ndList<ndSharedPtr<ndMesh>>::ndNode* const node = child->m_selfChildNode;
 	child->m_parent = nullptr;
-	child->m_childNode = nullptr;
+	child->m_selfChildNode = nullptr;
 
 	m_children.Remove(node);
 }
@@ -189,10 +189,19 @@ void ndMesh::SetMesh(const ndSharedPtr<ndMeshEffect>& mesh)
 	m_mesh = mesh;
 }
 
+ndSharedPtr<ndMesh> ndMesh::GetSharedPtr() const
+{
+	if (m_selfChildNode)
+	{
+		return m_selfChildNode->GetInfo();
+	}
+	return ndSharedPtr<ndMesh>(nullptr);
+}
+
 ndMesh* ndMesh::FindByName(const ndString& name) const
 {
 	ndMesh* const self = (ndMesh*)this;
-	for (ndMesh* node = self->IteratorFirst(); node; node = node->IteratorNext())
+	for (ndMesh* node = self->IteratorFirst(); node; node = node->IteratorNext(self))
 	{
 		if (name == node->m_name)
 		{
@@ -209,7 +218,7 @@ ndMesh* ndMesh::FindByClosestMatch(const ndString& name) const
 	{
 		ndInt32 bestScore = 10000;
 		ndMesh* const self = (ndMesh*)this;
-		for (ndMesh* node = self->IteratorFirst(); node && bestScore; node = node->IteratorNext())
+		for (ndMesh* node = self->IteratorFirst(); node && bestScore; node = node->IteratorNext(self))
 		{
 			ndInt32 distance = node->m_name.Distance(name);
 			ndAssert(distance >= 0);
@@ -233,11 +242,15 @@ ndMesh* ndMesh::IteratorFirst()
 	return ptr;
 }
 
-ndMesh* ndMesh::IteratorNext()
+ndMesh* ndMesh::IteratorNext(const ndMesh* const root)
 {
-	if (m_childNode)
+	if (this == root)
 	{
-		ndList<ndSharedPtr<ndMesh>>::ndNode* next = m_childNode->GetNext();
+		return nullptr;
+	}
+	if (m_selfChildNode)
+	{
+		ndList<ndSharedPtr<ndMesh>>::ndNode* next = m_selfChildNode->GetNext();
 		if (next)
 		{
 			if (next->GetInfo()->m_children.GetCount())
@@ -248,6 +261,7 @@ ndMesh* ndMesh::IteratorNext()
 		}
 		return m_parent;
 	}
+
 	return nullptr;
 }
 
@@ -275,7 +289,7 @@ void ndMesh::ApplyTransform(const ndMatrix& transform)
 	};
 
 	const ndMatrix invTransform(transform.Inverse4x4());
-	for (ndMesh* node = IteratorFirst(); node; node = node->IteratorNext())
+	for (ndMesh* node = IteratorFirst(); node; node = node->IteratorNext(this))
 	{
 		const ndMatrix entMatrix(invTransform * node->m_matrix * transform);
 		node->m_matrix = entMatrix;

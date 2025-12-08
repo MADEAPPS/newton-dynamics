@@ -74,11 +74,13 @@ class ndMesh : public ndClassAlloc
 	D_COLLISION_API ndList<ndSharedPtr<ndMesh>>& GetChildren();
 	D_COLLISION_API const ndList<ndSharedPtr<ndMesh>>& GetChildren() const;
 
-	D_COLLISION_API ndMesh* IteratorNext();
 	D_COLLISION_API ndMesh* IteratorFirst();
+	D_COLLISION_API ndMesh* IteratorNext(const ndMesh* const root);
 
 	D_COLLISION_API ndMesh* FindByName(const ndString& name) const;
 	D_COLLISION_API ndMesh* FindByClosestMatch(const ndString& name) const;
+
+	D_COLLISION_API ndSharedPtr<ndMesh> GetSharedPtr() const;
 
 	D_COLLISION_API ndSharedPtr<ndMeshEffect>& GetMesh();
 	D_COLLISION_API const ndSharedPtr<ndMeshEffect>& GetMesh() const;
@@ -128,7 +130,7 @@ class ndMesh : public ndClassAlloc
 	ndCurve m_rotation;
 	ndMesh* m_parent;
 	ndList<ndSharedPtr<ndMesh>> m_children;
-	ndList<ndSharedPtr<ndMesh>>::ndNode* m_childNode;
+	ndList<ndSharedPtr<ndMesh>>::ndNode* m_selfChildNode;
 	ndVector m_boneTarget;
 	ndNodeType m_type;
 

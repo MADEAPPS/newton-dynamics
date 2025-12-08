@@ -126,7 +126,7 @@ void ndMeshLoader::SaveMesh(const ndString& fullPathName)
 
 	// make the bone list for sikn and othe dependencies
 	ndTree<ndString, ndUnsigned32> bonesMap;
-	for (ndMesh* node = m_mesh->IteratorFirst(); node; node = node->IteratorNext())
+	for (ndMesh* node = m_mesh->IteratorFirst(); node; node = node->IteratorNext(*m_mesh))
 	{
 		if (node->m_name.GetStr())
 		{

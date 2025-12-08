@@ -99,7 +99,7 @@ class ndRenderSceneNode : public ndContainersFreeListAlloc<ndRenderSceneNode>
 	ndRenderSceneNode* m_parent;
 	ndSharedPtr<ndRenderPrimitive> m_primitive;
 	ndList<ndSharedPtr<ndRenderSceneNode>> m_children;
-	ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* m_childNode;
+	ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* m_selfChildNode;
 	ndList<ndSharedPtr<ndRenderSceneNode>>::ndNode* m_sceneHandle;
 
 	public:

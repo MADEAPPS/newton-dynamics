@@ -174,14 +174,14 @@
                             <faceIndexCount count="288" intArray="3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3" />
                         </faces>
                     </geometry>
-                    <ndMesh>
-                        <name string="-effector1" />
-                        <matrix>
-                            <posit float3="-4.54187e-08 0.0780387 4.84466e-08" />
-                            <angles float3="180 -60 0.000573738" />
-                        </matrix>
-                        <type nodeType="node" target="0 0 0 " />
-                    </ndMesh>
+                </ndMesh>
+                <ndMesh>
+                    <name string="-effector1" />
+                    <matrix>
+                        <posit float3="-6.35862e-08 0.200905 4.84466e-08" />
+                        <angles float3="180 -60 0.000601058" />
+                    </matrix>
+                    <type nodeType="node" target="0 0 0 " />
                 </ndMesh>
             </ndMesh>
         </ndMesh>
@@ -326,14 +326,14 @@
                             <faceIndexCount count="288" intArray="3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3" />
                         </faces>
                     </geometry>
-                    <ndMesh>
-                        <name string="-effector2" />
-                        <matrix>
-                            <posit float3="-4.84466e-08 0.0780387 9.68933e-08" />
-                            <angles float3="-180 60 0.000638396" />
-                        </matrix>
-                        <type nodeType="node" target="0 0 0 " />
-                    </ndMesh>
+                </ndMesh>
+                <ndMesh>
+                    <name string="-effector2" />
+                    <matrix>
+                        <posit float3="-7.72119e-08 0.200906 9.68933e-08" />
+                        <angles float3="-180 60 0.000665717" />
+                    </matrix>
+                    <type nodeType="node" target="0 0 0 " />
                 </ndMesh>
             </ndMesh>
         </ndMesh>
@@ -478,14 +478,14 @@
                             <faceIndexCount count="288" intArray="3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3" />
                         </faces>
                     </geometry>
-                    <ndMesh>
-                        <name string="-effector3" />
-                        <matrix>
-                            <posit float3="-2.27094e-08 0.0780387 0" />
-                            <angles float3="-5.45592e-05 60 -179.999" />
-                        </matrix>
-                        <type nodeType="node" target="0 0 0 " />
-                    </ndMesh>
+                </ndMesh>
+                <ndMesh>
+                    <name string="-effector3" />
+                    <matrix>
+                        <posit float3="-6.96421e-08 0.200905 4.84466e-08" />
+                        <angles float3="-4.71337e-05 60 -179.999" />
+                    </matrix>
+                    <type nodeType="node" target="0 0 0 " />
                 </ndMesh>
             </ndMesh>
         </ndMesh>
@@ -630,14 +630,14 @@
                             <faceIndexCount count="288" intArray="3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3" />
                         </faces>
                     </geometry>
-                    <ndMesh>
-                        <name string="-effector0" />
-                        <matrix>
-                            <posit float3="-4.39048e-08 0.0780387 9.68933e-08" />
-                            <angles float3="-5.10693e-05 -60 -179.999" />
-                        </matrix>
-                        <type nodeType="node" target="0 0 0 " />
-                    </ndMesh>
+                </ndMesh>
+                <ndMesh>
+                    <name string="-effector0" />
+                    <matrix>
+                        <posit float3="-2.27094e-08 0.200905 0" />
+                        <angles float3="-4.17489e-05 -60 -179.999" />
+                    </matrix>
+                    <type nodeType="node" target="0 0 0 " />
                 </ndMesh>
             </ndMesh>
         </ndMesh>
