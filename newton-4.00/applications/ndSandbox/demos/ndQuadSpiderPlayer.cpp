@@ -32,7 +32,8 @@ namespace ndQuadSpiderPlayer
 	ndProdeduralGaitGenerator::ndProdeduralGaitGenerator(ndController* const controller)
 		:ndAnimationSequence()
 		,m_owner(controller)
-		,m_omega(ndFloat32(0.2f))
+		,m_omega(ndFloat32(0.3f))
+		//,m_omega(ndFloat32(0.0f))
 		,m_stride(ndFloat32(0.0f))
 		,m_timeAcc(ndFloat32(0.0f))
 	{
@@ -201,6 +202,7 @@ namespace ndQuadSpiderPlayer
 		m_timeLine[2] = ndFloat32(1.00f) * m_duration;
 
 		m_stride = ndFloat32(0.4f);
+		m_stride = ndFloat32(0.0f);
 		//ndFloat32 gait[] = { 0.5f, 0.25f, -0.25f, -0.5f };
 		for (ndInt32 i = 0; i < 4; ++i)
 		{
@@ -383,7 +385,7 @@ namespace ndQuadSpiderPlayer
 			const ndMatrix contactAxis(ndRollMatrix(ndFloat32(90.0f) * ndDegreeToRad) * contactMatrix);
 			ndSharedPtr<ndJointBilateralConstraint> softContact(new ndJointSlider(contactAxis, contact->GetAsBodyKinematic(), heelBody->GetAsBodyKinematic()));
 			model->AddLimb(heelNode, contact, softContact);
-			((ndJointSlider*)*softContact)->SetAsSpringDamper(0.01f, 2000.0f, 100.0f);
+			((ndJointSlider*)*softContact)->SetAsSpringDamper(0.002f, 2000.0f, 100.0f);
 			
 			// save leg info
 			ndEffectorInfo leg;
