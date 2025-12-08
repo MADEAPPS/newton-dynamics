@@ -73,10 +73,10 @@ namespace ndQuadSpiderPlayer
 		return time;
 	}
 
-	ndProdeduralGaitGenerator::State ndProdeduralGaitGenerator::GetState() const
+	ndProdeduralGaitGenerator::State ndProdeduralGaitGenerator::GetState(ndInt32 legIndex) const
 	{
-		ndFloat32 t0 = m_timeAcc;
-		ndFloat32 t1 = m_timeAcc + m_owner->m_timestep;
+		ndFloat32 t0 = ndMod(m_timeAcc + ndFloat32(legIndex) * m_duration * ndFloat32(0.25f), m_duration);
+		ndFloat32 t1 = t0 + m_owner->m_timestep;
 		if (t0 <= m_timeLine[1])
 		{
 			if (t1 > m_timeLine[1])
@@ -101,13 +101,13 @@ namespace ndQuadSpiderPlayer
 	{
 		output[legIndex].m_userParamFloat = ndFloat32(0.0f);
 
-		if (legIndex != 0)
+		//if (legIndex > 1)
 		{
-			output[legIndex].m_posit = m_pose[legIndex].m_posit;
-			return;
+			//output[legIndex].m_posit = m_pose[legIndex].m_posit;
+			//return;
 		}
 
-		State state = ndProdeduralGaitGenerator::GetState();
+		State state = ndProdeduralGaitGenerator::GetState(legIndex);
 		switch (state)
 		{
 			case groundToAir:
@@ -200,19 +200,14 @@ namespace ndQuadSpiderPlayer
 		m_timeLine[1] = ndFloat32(0.25f) * m_duration;
 		m_timeLine[2] = ndFloat32(1.00f) * m_duration;
 
+		m_stride = ndFloat32(0.4f);
+		//ndFloat32 gait[] = { 0.5f, 0.25f, -0.25f, -0.5f };
 		for (ndInt32 i = 0; i < 4; ++i)
 		{
-if (i == 0)
-{
-	m_stride = ndFloat32(0.4f);
-	m_pose[i].m_base.m_x += m_stride * ndFloat32(0.5f);
-	//m_pose[i].m_base.m_x += 0.1;
-	//m_pose[i].m_base.m_z += 0.2;
-	m_pose[i].m_start = m_pose[i].m_base;
-	m_pose[i].m_end = m_pose[i].m_base;
-	m_pose[i].m_posit = m_pose[i].m_base;
-}
-
+			m_pose[i].m_base.m_x += m_stride * ndFloat32 (0.5f);
+			m_pose[i].m_start = m_pose[i].m_base;
+			m_pose[i].m_end = m_pose[i].m_base;
+			m_pose[i].m_posit = m_pose[i].m_base;
 		}
 	}
 
@@ -237,8 +232,8 @@ if (i == 0)
 		m_animBlendTree->Evaluate(m_pose, veloc);
 
 		const ndVector upVector(rootBody->GetMatrix().m_up);
-		//for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
-		for (ndInt32 i = 0; i < 1; ++i)
+		for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
+		//for (ndInt32 i = 0; i < 2; ++i)
 		{
 			ndEffectorInfo& leg = m_legs[i];
 			ndIkSwivelPositionEffector* const effector = leg.m_effector;
@@ -270,9 +265,7 @@ if (i == 0)
 			ndJointHinge* const heelHinge = leg.m_heel;
 			ndJointHinge* const calfHinge = leg.m_calf;
 			//heelHinge->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
-			//
-			//
-			//
+
 			//ndMatrix upMatrix(ndGetIdentityMatrix());
 			//upMatrix.m_front = lookAtMatrix0.m_front;
 			//upMatrix.m_right = (upVector.CrossProduct(upMatrix.m_front) & ndVector::m_triplexMask).Normalize();

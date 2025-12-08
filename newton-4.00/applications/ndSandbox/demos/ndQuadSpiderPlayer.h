@@ -67,7 +67,7 @@ namespace ndQuadSpiderPlayer
 		ndProdeduralGaitGenerator(ndController* const controller);
 		void CalculatePose(ndAnimationPose& output, ndFloat32 param) override;
 
-		State GetState() const;
+		State GetState(ndInt32 legIndex) const;
 		void IntegrateLeg(ndAnimationPose& output, ndInt32 legIndex);
 		ndFloat32 CalculateTime() const;
 
