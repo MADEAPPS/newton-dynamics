@@ -77,6 +77,7 @@ namespace ndQuadSpiderPlayer
 		ndFloat32 m_omega;
 		ndFloat32 m_stride;
 		ndFloat32 m_timeAcc;
+		ndInt32 m_gaitSequence[4];
 	};
 
 	class ndGeneratorWalkGait : public ndProdeduralGaitGenerator

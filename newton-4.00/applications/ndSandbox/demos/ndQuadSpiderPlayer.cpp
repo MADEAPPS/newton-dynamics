@@ -57,6 +57,8 @@ namespace ndQuadSpiderPlayer
 			m_pose[i].m_time = ndFloat32(0.0f);
 			m_pose[i].m_maxTime = ndFloat32(1.0f);
 
+			m_gaitSequence[i] = i;
+
 			AddTrack();
 		}
 	}
@@ -74,10 +76,11 @@ namespace ndQuadSpiderPlayer
 		return time;
 	}
 
-	ndProdeduralGaitGenerator::State ndProdeduralGaitGenerator::GetState(ndInt32 legIndex) const
+	ndProdeduralGaitGenerator::State ndProdeduralGaitGenerator::GetState(ndInt32 legIndex____) const
 	{
 		// get the quadrant for this leg
-		ndFloat32 t0 = ndMod(m_timeAcc + ndFloat32(legIndex) * m_duration * ndFloat32(0.25f), m_duration);
+		ndFloat32 sequenceOffset = ndFloat32(0.25f) * ndFloat32(m_gaitSequence[legIndex____]);
+		ndFloat32 t0 = ndMod(m_timeAcc + sequenceOffset * m_duration, m_duration);
 		// get the next time
 		ndFloat32 t1 = t0 + m_owner->m_timestep;
 
@@ -209,12 +212,27 @@ namespace ndQuadSpiderPlayer
 		:ndProdeduralGaitGenerator(controller)
 	{
 		m_duration = ndFloat32(2.0f);
+		//m_duration = ndFloat32(5.0f);
+
 		m_timeLine[0] = ndFloat32(0.00f) * m_duration;
 		m_timeLine[1] = ndFloat32(0.25f) * m_duration;
 		m_timeLine[2] = ndFloat32(1.00f) * m_duration;
 
 		m_stride = ndFloat32(0.4f);
 		//m_stride = ndFloat32(0.0f);
+		m_omega = ndFloat32(0.0f);
+
+		// gait one
+		m_gaitSequence[0] = 3;
+		m_gaitSequence[1] = 1;
+		m_gaitSequence[2] = 2;
+		m_gaitSequence[3] = 0;
+
+		// gait tow
+		//m_gaitSequence[0] = 0;
+		//m_gaitSequence[1] = 2;
+		//m_gaitSequence[2] = 1;
+		//m_gaitSequence[3] = 3;
 	}
 
 	ndController::ndController()
