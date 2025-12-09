@@ -24,7 +24,7 @@
   * tinymt32 internal state vector and parameters
   */
 
-#define ND_USE_STD_RAND
+//#define ND_USE_STD_RAND
 class ndRand127
 {
     public:
