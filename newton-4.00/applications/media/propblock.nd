@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<ndMesh>
+    <name string="-convexhull" />
+    <matrix>
+        <posit float3="0 0 0" />
+        <angles float3="0 -0 0" />
+    </matrix>
+    <type nodeType="node" target="0 0 0 " />
+    <geometry>
+        <vertices>
+            <positions count="8" float3Array="-1.27 0.381 0.635 -1.27 0.381 -0.635 -1.27 0 -0.635 -1.27 0 0.635 1.27 0.381 0.635 1.27 0.381 -0.635 1.27 0 0.635 1.27 0 -0.635" />
+            <indices count="36" intArray="6 3 2 6 2 7 4 5 1 4 1 0 6 7 5 6 5 4 7 2 1 7 1 5 2 3 0 2 0 1 3 6 4 3 4 0" />
+        </vertices>
+        <normal>
+            <normals count="6" float3Array="0 0 -1 0 -1 0 -1 0 0 1 0 0 0 1 0 0 0 1" />
+            <indices count="36" intArray="1 1 1 1 1 1 4 4 4 4 4 4 3 3 3 3 3 3 0 0 0 0 0 0 2 2 2 2 2 2 5 5 5 5 5 5" />
+        </normal>
+        <uvs>
+            <uv count="4" float3Array="1 0 0 0 0 0 1 1 0 0 1 0" />
+            <indices count="36" intArray="0 2 3 0 3 1 1 0 2 1 2 3 1 0 2 1 2 3 1 0 2 1 2 3 1 0 2 1 2 3 1 0 2 1 2 3" />
+        </uvs>
+        <material>
+            <name string="01 - Default" />
+            <ambient float3="0.588235 0.588235 0.588235" />
+            <diffuse float3="0.588235 0.588235 0.588235" />
+            <specular float3="0.9 0.9 0.9" />
+            <reflection float3="1 1 1" />
+            <opacity float="1" />
+            <shiness float="2" />
+            <texture string="wood_4.png" />
+        </material>
+        <faces>
+            <faceMaterial count="12" intArray="0 0 0 0 0 0 0 0 0 0 0 0" />
+            <faceIndexCount count="12" intArray="3 3 3 3 3 3 3 3 3 3 3 3" />
+        </faces>
+    </geometry>
+</ndMesh>

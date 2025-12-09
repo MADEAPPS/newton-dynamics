@@ -32,18 +32,18 @@
 //#define DEFAULT_SCENE	5		// conservation of momentum 
 //#define DEFAULT_SCENE	6		// basic joints
 //#define DEFAULT_SCENE	7		// static mesh collision
-//#define DEFAULT_SCENE	8		// heighfield collision
+//#define DEFAULT_SCENE	8		// Highfield collision
 //#define DEFAULT_SCENE	9		// static compound scene collision
 //#define DEFAULT_SCENE	10		// basic convex approximate compound shapes
 //#define DEFAULT_SCENE	11		// basic model, a npd vehicle prop
-//#define DEFAULT_SCENE	12		// basic ragdoll
+//#define DEFAULT_SCENE	12		// basic rag doll
 //#define DEFAULT_SCENE	13		// complex model, implement a complex model with joints
-//#define DEFAULT_SCENE	14		// basics mutibody vehicle
+//#define DEFAULT_SCENE	14		// basics muti body vehicle
 //#define DEFAULT_SCENE	15		// object Placement
 //#define DEFAULT_SCENE	16		// third person player capsule
 //#define DEFAULT_SCENE	17		// cart pole SAC trained controller
 //#define DEFAULT_SCENE	18		// cart pole PPO trained controller
-#define DEFAULT_SCENE	19		// procedurally animated quadrup spider
+#define DEFAULT_SCENE	19		// procedurally animated quadruped spider
 
 // These are the machine learning training demos
 //#define DEFAULT_SCENE			(MACHINE_LEARNING_BASE + 0)	// train cart pole using SAC agent
