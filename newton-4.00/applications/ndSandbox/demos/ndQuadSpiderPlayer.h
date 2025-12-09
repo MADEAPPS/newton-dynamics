@@ -108,6 +108,7 @@ namespace ndQuadSpiderPlayer
 
 		ndAnimationPose m_pose;
 		ndFixSizeArray<ndEffectorInfo, 4> m_legs;
+		ndSharedPtr<ndRenderSceneNode> m_cameraNode;
 		ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
 		ndFloat32 m_timestep;
 	};
