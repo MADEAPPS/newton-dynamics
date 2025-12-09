@@ -1327,13 +1327,9 @@ class ndVector : public ndClassAlloc
 	// return 3d cross product
 	inline ndVector CrossProduct(const ndVector& B) const
 	{
-		//const ndVector t0(m_y, m_z, m_x, m_w);
-		//const ndVector t1(B.m_z, B.m_x, B.m_y, B.m_w);
-		//const ndVector t2(t0 * B);
-		//const ndVector t3(t0 * t1);
-		//const ndVector t4(t3 - ndVector(t2.m_y, t2.m_z, t2.m_x, t2.m_w));
-		//return t4;
-
+#if 1
+		// actually this is better because the compulier replace 
+		// shffle with permutes.
 		__m128 tmp0 = _mm_shuffle_ps(m_type, m_type, _MM_SHUFFLE(3, 0, 2, 1));
 		__m128 tmp1 = _mm_shuffle_ps(B.m_type, B.m_type, _MM_SHUFFLE(3, 1, 0, 2));
 		__m128 tmp2 = _mm_mul_ps(tmp0, B.m_type);
@@ -1341,6 +1337,16 @@ class ndVector : public ndClassAlloc
 		__m128 tmp4 = _mm_shuffle_ps(tmp2, tmp2, _MM_SHUFFLE(3, 0, 2, 1));
 		__m128 tmp5 = _mm_sub_ps(tmp3, tmp4);
 		return tmp5;
+#else
+		// let the compiler figure out the shuffle
+		// actually a worse code sequence.
+		const ndVector t0(m_y, m_z, m_x, m_w);
+		const ndVector t1(B.m_z, B.m_x, B.m_y, B.m_w);
+		const ndVector t2(t0 * B);
+		const ndVector t3(t0 * t1);
+		const ndVector t4(t3 - ndVector(t2.m_y, t2.m_z, t2.m_x, t2.m_w));
+		return t4;
+#endif
 	}
 
 	// return 4d cross product
