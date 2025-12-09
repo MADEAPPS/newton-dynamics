@@ -32,8 +32,8 @@ namespace ndQuadSpiderPlayer
 	ndProdeduralGaitGenerator::ndProdeduralGaitGenerator(ndController* const controller)
 		:ndAnimationSequence()
 		,m_owner(controller)
-		,m_omega(ndFloat32(0.3f))
-		//,m_omega(ndFloat32(0.0f))
+		//,m_omega(ndFloat32(0.3f))
+		,m_omega(ndFloat32(0.0f))
 		,m_stride(ndFloat32(0.0f))
 		,m_timeAcc(ndFloat32(0.0f))
 	{
@@ -204,13 +204,13 @@ namespace ndQuadSpiderPlayer
 		m_stride = ndFloat32(0.4f);
 		m_stride = ndFloat32(0.0f);
 		//ndFloat32 gait[] = { 0.5f, 0.25f, -0.25f, -0.5f };
-		for (ndInt32 i = 0; i < 4; ++i)
-		{
-			m_pose[i].m_base.m_x += m_stride * ndFloat32 (0.5f);
-			m_pose[i].m_start = m_pose[i].m_base;
-			m_pose[i].m_end = m_pose[i].m_base;
-			m_pose[i].m_posit = m_pose[i].m_base;
-		}
+		//for (ndInt32 i = 0; i < 4; ++i)
+		//{
+		//	//m_pose[i].m_base.m_x += m_stride * ndFloat32 (0.5f);
+		//	m_pose[i].m_start = m_pose[i].m_base;
+		//	m_pose[i].m_end = m_pose[i].m_base;
+		//	m_pose[i].m_posit = m_pose[i].m_base;
+		//}
 	}
 
 	ndController::ndController()
