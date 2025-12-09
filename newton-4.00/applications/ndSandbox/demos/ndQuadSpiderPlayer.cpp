@@ -76,8 +76,12 @@ namespace ndQuadSpiderPlayer
 
 	ndProdeduralGaitGenerator::State ndProdeduralGaitGenerator::GetState(ndInt32 legIndex) const
 	{
+		// get the quadrant for this leg
 		ndFloat32 t0 = ndMod(m_timeAcc + ndFloat32(legIndex) * m_duration * ndFloat32(0.25f), m_duration);
+		// get the next time
 		ndFloat32 t1 = t0 + m_owner->m_timestep;
+
+		// see if the step crosses a quadrant
 		if (t0 <= m_timeLine[1])
 		{
 			if (t1 > m_timeLine[1])
@@ -102,19 +106,23 @@ namespace ndQuadSpiderPlayer
 	{
 		output[legIndex].m_userParamFloat = ndFloat32(0.0f);
 
-		//if (legIndex > 1)
-		{
-			//output[legIndex].m_posit = m_pose[legIndex].m_posit;
-			//return;
-		}
+		//if (legIndex > 0)
+		//{
+		//	output[legIndex].m_posit = m_pose[legIndex].m_posit;
+		//	return;
+		//}
 
+		//ndFloat32 gait[] = { 0.5f, 0.25f, -0.25f, -0.5f };
 		State state = ndProdeduralGaitGenerator::GetState(legIndex);
 		switch (state)
 		{
 			case groundToAir:
 			{
+				ndVector target(m_pose[legIndex].m_base);
+				target.m_x += m_stride * ndFloat32(0.5f);
+
 				ndFloat32 time = m_timeLine[1] - m_timeLine[0];
-				m_pose[legIndex].m_end = m_pose[legIndex].m_base;
+				m_pose[legIndex].m_end = target;
 				m_pose[legIndex].m_start = m_pose[legIndex].m_posit;
 
 				m_pose[legIndex].m_maxTime = time;
@@ -135,13 +143,17 @@ namespace ndQuadSpiderPlayer
 
 			case airToGround:
 			{
+				ndVector target(m_pose[legIndex].m_base);
+				target.m_x -= m_stride * ndFloat32 (0.5f);
+
 				ndFloat32 time = m_timeLine[2] - m_timeLine[1];
 				ndFloat32 angle = m_omega * time;
-				ndMatrix matrix(ndYawMatrix (angle));
-				ndVector target(matrix.RotateVector(m_pose[legIndex].m_base));
+				ndMatrix matrix(ndYawMatrix(angle));
+				target = matrix.RotateVector(target);
+
 				m_pose[legIndex].m_start = m_pose[legIndex].m_posit;
 				m_pose[legIndex].m_end = target;
-
+				
 				m_pose[legIndex].m_maxTime = time;
 				m_pose[legIndex].m_time = ndFloat32(0.0f);
 
@@ -202,15 +214,7 @@ namespace ndQuadSpiderPlayer
 		m_timeLine[2] = ndFloat32(1.00f) * m_duration;
 
 		m_stride = ndFloat32(0.4f);
-		m_stride = ndFloat32(0.0f);
-		//ndFloat32 gait[] = { 0.5f, 0.25f, -0.25f, -0.5f };
-		//for (ndInt32 i = 0; i < 4; ++i)
-		//{
-		//	//m_pose[i].m_base.m_x += m_stride * ndFloat32 (0.5f);
-		//	m_pose[i].m_start = m_pose[i].m_base;
-		//	m_pose[i].m_end = m_pose[i].m_base;
-		//	m_pose[i].m_posit = m_pose[i].m_base;
-		//}
+		//m_stride = ndFloat32(0.0f);
 	}
 
 	ndController::ndController()
@@ -264,8 +268,8 @@ namespace ndQuadSpiderPlayer
 			//// calculate lookAt angle
 			//ndMatrix lookAtMatrix0;
 			//ndMatrix lookAtMatrix1;
-			ndJointHinge* const heelHinge = leg.m_heel;
-			ndJointHinge* const calfHinge = leg.m_calf;
+			//ndJointHinge* const heelHinge = leg.m_heel;
+			//ndJointHinge* const calfHinge = leg.m_calf;
 			//heelHinge->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
 
 			//ndMatrix upMatrix(ndGetIdentityMatrix());
