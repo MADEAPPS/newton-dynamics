@@ -17,6 +17,7 @@
 #include "ndQuadSpiderPlayer.h"
 #include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
+#include "ndDemoCameraNodeFollow.h"
 
 namespace ndQuadSpiderPlayer
 {
@@ -228,7 +229,7 @@ namespace ndQuadSpiderPlayer
 		m_gaitSequence[2] = 2;
 		m_gaitSequence[3] = 0;
 
-		// gait tow
+		// gait two
 		//m_gaitSequence[0] = 0;
 		//m_gaitSequence[1] = 2;
 		//m_gaitSequence[2] = 1;
@@ -405,6 +406,12 @@ namespace ndQuadSpiderPlayer
 			m_legs.PushBack(leg);
 		}
 
+		// add a camera node.
+		const ndVector cameraPivot(0.0f, 0.5f, 0.0f, 0.0f);
+		ndRender* const renderer = *scene->GetRenderer();
+		m_cameraNode = ndSharedPtr<ndRenderSceneNode>(new ndDemoCameraNodeFollow(renderer, cameraPivot, -3.0f));
+		visualMesh->AddChild(m_cameraNode);
+
 		ndWorld* const world = scene->GetWorld();
 		const ndMatrix upMatrix(rootBody->GetMatrix());
 		ndSharedPtr<ndJointBilateralConstraint> upVector(new ndJointUpVector(upMatrix.m_up, rootBody->GetAsBodyKinematic(), world->GetSentinelBody()));
@@ -455,11 +462,15 @@ void ndQuadSpiderAnimated(ndDemoEntityManager* const scene)
 	ndMatrix matrix(ndGetIdentityMatrix());
 	ndRenderMeshLoader loader(*scene->GetRenderer());
 	loader.LoadMesh(ndGetWorkingFileName("spider.nd"));
-	ndController::CreateModel(scene, matrix, loader);
-	
-	matrix.m_posit.m_x -= 0.0f;
-	matrix.m_posit.m_y += 0.5f;
-	matrix.m_posit.m_z += -2.0f;
-	ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), -90.0f * ndDegreeToRad);
-	scene->SetCameraMatrix(rotation, matrix.m_posit);
+	ndSharedPtr<ndModel> model (ndController::CreateModel(scene, matrix, loader));
+
+	ndController* const controller = (ndController*)*model->GetNotifyCallback();
+	ndRender* const renderer = *scene->GetRenderer();
+	renderer->SetCamera(controller->m_cameraNode);
+
+	//matrix.m_posit.m_x -= 0.0f;
+	//matrix.m_posit.m_y += 0.5f;
+	//matrix.m_posit.m_z += -2.0f;
+	//ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), -90.0f * ndDegreeToRad);
+	//scene->SetCameraMatrix(rotation, matrix.m_posit);
 }
