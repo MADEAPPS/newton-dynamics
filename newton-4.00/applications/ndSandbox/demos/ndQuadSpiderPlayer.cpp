@@ -208,7 +208,7 @@ namespace ndQuadSpiderPlayer
 	ndGeneratorWalkGait::ndGeneratorWalkGait(ndController* const controller)
 		:ndProdeduralGaitGenerator(controller)
 	{
-		m_duration = ndFloat32(4.0f);
+		m_duration = ndFloat32(2.0f);
 		m_timeLine[0] = ndFloat32(0.00f) * m_duration;
 		m_timeLine[1] = ndFloat32(0.25f) * m_duration;
 		m_timeLine[2] = ndFloat32(1.00f) * m_duration;
@@ -239,7 +239,6 @@ namespace ndQuadSpiderPlayer
 
 		const ndVector upVector(rootBody->GetMatrix().m_up);
 		for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
-		//for (ndInt32 i = 0; i < 2; ++i)
 		{
 			ndEffectorInfo& leg = m_legs[i];
 			ndIkSwivelPositionEffector* const effector = leg.m_effector;
@@ -265,23 +264,12 @@ namespace ndQuadSpiderPlayer
 			effector->SetSwivelAngle(swivelAngle);
 			effector->SetLocalTargetPosition(posit);
 
-			//// calculate lookAt angle
-			//ndMatrix lookAtMatrix0;
-			//ndMatrix lookAtMatrix1;
-			//ndJointHinge* const heelHinge = leg.m_heel;
-			//ndJointHinge* const calfHinge = leg.m_calf;
-			//heelHinge->CalculateGlobalMatrix(lookAtMatrix0, lookAtMatrix1);
-
-			//ndMatrix upMatrix(ndGetIdentityMatrix());
-			//upMatrix.m_front = lookAtMatrix0.m_front;
-			//upMatrix.m_right = (upVector.CrossProduct(upMatrix.m_front) & ndVector::m_triplexMask).Normalize();
-			//upMatrix.m_up = upMatrix.m_right.CrossProduct(upMatrix.m_front);
-			//
-			//upMatrix = upMatrix * lookAtMatrix0.OrthoInverse();
-			//const ndFloat32 angle = ndAtan2(upMatrix.m_up.m_z, upMatrix.m_up.m_y);
-			//heelHinge->SetTargetAngle(angle);
-			//ndFloat32 xxx = calfHinge->GetAngle();
-			//heelHinge->SetTargetAngle(-xxx);
+			// the heel joint angle depen on teh knee angle
+			// I in theory no clip is need sine the knee angle 
+			// is aleady with in limits, 
+			// by I don'tt know until joing debug is enabled.
+			ndJointHinge* const heelHinge = leg.m_heel;
+			heelHinge->SetTargetAngle(-kneeAngle * ndFloat32(0.5f));
 		}
 	}
 
