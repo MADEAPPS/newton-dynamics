@@ -275,17 +275,17 @@ namespace ndQuadSpiderPlayer
 			if ((kneeAngle > maxAngle) || (kneeAngle < minAngle))
 			{
 				ndAssert(0);
-				// project that target to the sphere of the corrent position
+				// project that target to the sphere of the correct position
 				//leg.m_effector->SetAsReducedDof();
 			}
 
 			effector->SetSwivelAngle(swivelAngle);
 			effector->SetLocalTargetPosition(posit);
 
-			// the heel joint angle depen on teh knee angle
+			// the heel joint angle depend on the knee angle
 			// I in theory no clip is need sine the knee angle 
-			// is aleady with in limits, 
-			// by I don'tt know until joing debug is enabled.
+			// is already with in limits, 
+			// by I don't know until joint debug is enabled.
 			ndJointHinge* const heelHinge = leg.m_heel;
 			heelHinge->SetTargetAngle(-kneeAngle * ndFloat32(0.5f));
 		}
