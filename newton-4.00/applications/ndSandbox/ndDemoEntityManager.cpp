@@ -43,7 +43,7 @@
 //#define DEFAULT_SCENE	16		// third person player capsule
 //#define DEFAULT_SCENE	17		// cart pole SAC trained controller
 //#define DEFAULT_SCENE	18		// cart pole PPO trained controller
-#define DEFAULT_SCENE	19		// prcedurally animated quadrup spider
+#define DEFAULT_SCENE	19		// procedurally animated quadrup spider
 
 // These are the machine learning training demos
 //#define DEFAULT_SCENE			(MACHINE_LEARNING_BASE + 0)	// train cart pole using SAC agent
