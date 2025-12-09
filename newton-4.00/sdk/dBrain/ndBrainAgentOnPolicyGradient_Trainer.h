@@ -104,7 +104,6 @@ class ndBrainAgentOnPolicyGradient_Agent: public ndBrainAgent
 	virtual void SampleActions(ndBrainVector& action);
 	
 	ndTrajectory m_trajectory;
-	//ndRandomGenerator m_randomGenerator;
 	ndNomalDistribution m_normalDistribution;
 	
 	ndBrainAgentOnPolicyGradient_Trainer* m_owner;
@@ -181,7 +180,13 @@ class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 	ndBrainFloat CalculateKLdivergence();
 	void SaveTrajectory(ndBrainAgentOnPolicyGradient_Agent* const agent);
 
-	public:
+	class ndScore
+	{
+		public:
+		ndFloat32 m_trajectoryReward;
+		ndInt32 m_trajectorySteps;
+	};
+
 	ndString m_name;
 	HyperParameters m_parameters;
 	ndSharedPtr<ndBrainContext> m_context;
@@ -221,6 +226,7 @@ class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 	ndBrainVector m_scratchBuffer;
 	ndArray<ndInt32> m_shuffleBuffer;
 	ndArray<ndInt32> m_tmpShuffleBuffer;
+	ndArray<ndScore> m_trajectoryScore;
 	ndBrainAgentOnPolicyGradient_Agent::ndTrajectory m_trajectoryAccumulator;
 	ndMovingAverage<ND_ON_POLICY_MOVING_AVERAGE_SCORE> m_averageExpectedRewards;
 	ndMovingAverage<ND_ON_POLICY_MOVING_AVERAGE_SCORE> m_averageFramesPerEpisodes;

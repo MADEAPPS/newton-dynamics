@@ -304,6 +304,7 @@ ndBrainAgentOnPolicyGradient_Trainer::ndBrainAgentOnPolicyGradient_Trainer(const
 	,m_lastPolicy()
 	,m_scratchBuffer()
 	,m_shuffleBuffer()
+	,m_trajectoryScore()
 	,m_trajectoryAccumulator()
 	,m_averageExpectedRewards()
 	,m_averageFramesPerEpisodes()
@@ -509,16 +510,35 @@ void ndBrainAgentOnPolicyGradient_Trainer::SaveTrajectory(ndBrainAgentOnPolicyGr
 		}
 	}
 
+	ndMemCpy(trajectory.GetNextObservations(trajectory.GetCount() - 1), trajectory.GetObservations(trajectory.GetCount() - 1), m_parameters.m_numberOfObservations);
 	for (ndInt32 i = trajectory.GetCount() - 2; i >= 0; --i)
 	{
 		ndMemCpy(trajectory.GetNextObservations(i), trajectory.GetObservations(i + 1), m_parameters.m_numberOfObservations);
 	}
 
-	if (trajectory.GetCount() >= m_parameters.m_maxTrajectorySteps)
+	ndBrainFloat gamma = m_parameters.m_discountRewardFactor;
+	ndBrainFloat stateExpectedReward = trajectory.GetReward(trajectory.GetCount() - 1);
+	if ((trajectory.GetCount() - 1) > m_parameters.m_maxTrajectorySteps)
 	{
+		for (ndInt32 i = trajectory.GetCount() - 2; i >= m_parameters.m_maxTrajectorySteps; --i)
+		{
+			ndBrainFloat r = trajectory.GetReward(i);
+			stateExpectedReward = r + gamma * stateExpectedReward;
+		}
 		trajectory.SetCount(m_parameters.m_maxTrajectorySteps);
-		trajectory.SetTerminalState(m_parameters.m_maxTrajectorySteps - 1, true);
 	}
+	ndBrainFloat trajectoryReward = ndBrainFloat(0.0f);
+	for (ndInt32 i = trajectory.GetCount() - 2; i >= 0; --i)
+	{
+		ndBrainFloat r = trajectory.GetReward(i);
+		stateExpectedReward = r + gamma * stateExpectedReward;
+		trajectoryReward += stateExpectedReward;
+	}
+
+	ndScore score;
+	score.m_trajectoryReward = trajectoryReward;
+	score.m_trajectorySteps = ndInt32(trajectory.GetCount());
+	m_trajectoryScore.PushBack(score);
 
 	ndInt32 base = m_trajectoryAccumulator.GetCount();
 	m_trajectoryAccumulator.SetCount(m_trajectoryAccumulator.GetCount() + trajectory.GetCount());
@@ -534,16 +554,25 @@ void ndBrainAgentOnPolicyGradient_Trainer::UpdateScore()
 {
 	// using the Bellman equation to calculate trajectory expected rewards score.
 	// (Monte Carlo method)
+	//ndBrainFloat averageSum = ndBrainFloat(0.0f);
+	//ndBrainFloat expectedReward = m_trajectoryAccumulator.GetReward(m_trajectoryAccumulator.GetCount() - 1);
+	//for (ndInt32 i = m_trajectoryAccumulator.GetCount() - 2; i >= 0; --i)
+	//{
+	//	ndBrainFloat teminate = m_trajectoryAccumulator.GetTerminalState(i) ? ndBrainFloat(0.0) : ndBrainFloat(1.0f);
+	//	expectedReward = m_trajectoryAccumulator.GetReward(i) + expectedReward * teminate * m_parameters.m_discountRewardFactor;
+	//	averageSum += expectedReward;
+	//}
+
+	ndInt32 steps = 0;
 	ndBrainFloat averageSum = ndBrainFloat(0.0f);
-	ndBrainFloat expectedReward = m_trajectoryAccumulator.GetReward(m_trajectoryAccumulator.GetCount() - 1);
-	for (ndInt32 i = m_trajectoryAccumulator.GetCount() - 2; i >= 0; --i)
+	for (ndInt32 i = ndInt32(m_trajectoryScore.GetCount()) - 1; i >= 0; --i)
 	{
-		ndBrainFloat teminate = m_trajectoryAccumulator.GetTerminalState(i) ? ndBrainFloat(0.0) : ndBrainFloat(1.0f);
-		expectedReward = m_trajectoryAccumulator.GetReward(i) + expectedReward * teminate * m_parameters.m_discountRewardFactor;
-		averageSum += expectedReward;
+		steps += m_trajectoryScore[i].m_trajectorySteps;
+		averageSum += m_trajectoryScore[i].m_trajectoryReward;
 	}
-	m_averageExpectedRewards.Update(averageSum / ndBrainFloat(m_trajectoryAccumulator.GetCount()));
-	m_averageFramesPerEpisodes.Update(ndBrainFloat(m_trajectoryAccumulator.GetCount()) / ndBrainFloat(m_parameters.m_batchTrajectoryCount));
+	m_averageExpectedRewards.Update(averageSum / ndBrainFloat(steps));
+	m_averageFramesPerEpisodes.Update(ndBrainFloat(steps) / ndBrainFloat(m_trajectoryScore.GetCount()));
+	m_trajectoryScore.SetCount(0);
 }
 
 void ndBrainAgentOnPolicyGradient_Trainer::TrajectoryToGpuBuffers()
