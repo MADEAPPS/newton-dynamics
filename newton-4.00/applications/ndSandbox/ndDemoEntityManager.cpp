@@ -38,7 +38,7 @@
 //#define DEFAULT_SCENE	11		// basic model, a npd vehicle prop
 //#define DEFAULT_SCENE	12		// basic rag doll
 //#define DEFAULT_SCENE	13		// complex model, implement a complex model with joints
-//#define DEFAULT_SCENE	14		// basics muti body vehicle
+//#define DEFAULT_SCENE	14		// basics multi body vehicle
 //#define DEFAULT_SCENE	15		// object Placement
 //#define DEFAULT_SCENE	16		// third person player capsule
 //#define DEFAULT_SCENE	17		// cart pole SAC trained controller
