@@ -1189,15 +1189,18 @@ void ndDynamicsUpdate::InitSkeletons()
 			for (ndInt32 i = 0; i < activeSkeletons.GetCount(); ++i)
 			{
 				ndInt32 jointCount = activeSkeletons[i]->GetNodeList().GetCount();
-				if (jointCount > D_NUMBER_OF_PARALLER_SKELETON_JOINTS)
+				ndInt32 nextJointCount = ((i + 1) < activeSkeletons.GetCount()) ? activeSkeletons[i]->GetNodeList().GetCount() : 0;
+				ndAssert(jointCount >= nextJointCount);
+
+				if (jointCount > (nextJointCount * 2))
 				{
 					activeSkeletons[i]->InitMassMatrix(scene, &m_leftHandSide[0], &m_rightHandSide[0]);
 					m_parallelSkeletons++;
 				}
-			}
-			if (m_parallelSkeletons > threadCount)
-			{
-				m_parallelSkeletons = 0;
+				else
+				{
+					break;
+				}
 			}
 		}
 
@@ -1247,7 +1250,7 @@ void ndDynamicsUpdate::UpdateSkeletons()
 	const ndInt32 count = ndInt32(activeSkeletons.GetCount()) - m_parallelSkeletons;
 	if (count)
 	{
-		scene->ParallelExecute(UpdateSkeletons, count, 2);
+		scene->ParallelExecute(UpdateSkeletons, count, 1);
 	}
 }
 
