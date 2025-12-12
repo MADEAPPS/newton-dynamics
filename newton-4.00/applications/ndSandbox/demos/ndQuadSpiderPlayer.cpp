@@ -21,6 +21,9 @@
 
 namespace ndQuadSpiderPlayer
 {
+	#define D_WALK_STRIDE	ndFloat32(0.4f)
+	#define D_TURN_RATE		ndFloat32(0.3f)
+
 	class ndAnimatedHelper : public ndDemoEntityManager::ndDemoHelper
 	{
 		virtual void PresentHelp(ndDemoEntityManager* const scene) override
@@ -34,7 +37,6 @@ namespace ndQuadSpiderPlayer
 		:ndAnimationSequence()
 		,m_owner(controller)
 		,m_omega(ndFloat32(0.3f))
-		//,m_omega(ndFloat32(0.0f))
 		,m_stride(ndFloat32(0.0f))
 		,m_timeAcc(ndFloat32(0.0f))
 	{
@@ -219,9 +221,10 @@ namespace ndQuadSpiderPlayer
 		m_timeLine[1] = ndFloat32(0.25f) * m_duration;
 		m_timeLine[2] = ndFloat32(1.00f) * m_duration;
 
-		m_stride = ndFloat32(0.4f);
 		//m_stride = ndFloat32(0.0f);
-		m_omega = ndFloat32(0.0f);
+		//m_omega = ndFloat32(0.0f);
+		m_stride = ndFloat32(0.4f);
+		m_omega = ndFloat32(0.3f);
 
 		// gait one
 		m_gaitSequence[0] = 3;
@@ -249,9 +252,7 @@ namespace ndQuadSpiderPlayer
 		ndModelArticulation* const model = GetModel()->GetAsModelArticulation();
 		ndBodyKinematic* const rootBody = model->GetRoot()->m_body->GetAsBodyKinematic();
 		rootBody->SetSleepState(false);
-
-		ndFloat32 animSpeed = 0.5f;
-		m_animBlendTree->Update(timestep * animSpeed);
+		m_animBlendTree->Update(timestep);
 
 		ndVector veloc;
 		m_animBlendTree->Evaluate(m_pose, veloc);
@@ -292,6 +293,39 @@ namespace ndQuadSpiderPlayer
 		}
 	}
 
+	void ndController::PostTransformUpdate(ndFloat32)
+	{
+		ndPhysicsWorld* const world = (ndPhysicsWorld*)GetModel()->GetWorld();
+		ndDemoEntityManager* const scene = world->GetManager();
+
+		ndRender* const renderer = *scene->GetRenderer();
+		ndSharedPtr<ndRenderSceneNode> camera(renderer->GetCamera());
+		if (camera == m_cameraNode)
+		{
+			m_walkGait->m_stride = 0.0f;
+			if (scene->GetKeyState(ImGuiKey_W))
+			{
+				m_walkGait->m_stride = D_WALK_STRIDE;
+			}
+			//else if (scene->GetKeyState(ImGuiKey_S))
+			//{
+			//	//turnSign = ndFloat32(-0.75f);
+			//	//m_targetOmega = ND_EXCAVATOR_ENGINE_OMEGA;
+			//	//engine->SetSleepState(false);
+			//}
+
+			m_walkGait->m_omega = 0.0f;
+			if (scene->GetKeyState(ImGuiKey_A))
+			{
+				m_walkGait->m_omega = -D_TURN_RATE;
+			}
+			else if (scene->GetKeyState(ImGuiKey_D))
+			{
+				m_walkGait->m_omega = D_TURN_RATE;
+			}
+		}
+	}
+
 	void ndController::ResetModel()
 	{
 		ndAssert(0);
@@ -299,7 +333,8 @@ namespace ndQuadSpiderPlayer
 
 	void ndController::CreateAnimationBlendTree()
 	{
-		ndSharedPtr<ndAnimationSequence> walkSequence(new ndGeneratorWalkGait(this));
+		m_walkGait = ndSharedPtr<ndGeneratorWalkGait>(new ndGeneratorWalkGait(this));
+		ndSharedPtr<ndAnimationSequence> walkSequence = (ndSharedPtr<ndAnimationSequence>&)m_walkGait;
 
 		ndSharedPtr<ndAnimationBlendTreeNode> proceduralPoseGenerator (new ndAnimationSequencePlayer(walkSequence));
 		m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(proceduralPoseGenerator);
@@ -424,6 +459,7 @@ namespace ndQuadSpiderPlayer
 		ndMatrix matrix(location);
 		matrix.m_posit = FindFloor(*scene->GetWorld(), matrix.m_posit, 200.0f);
 		matrix.m_posit.m_y += ndFloat32(0.5f);
+		const ndMatrix saveMatrix(loader.m_mesh->m_matrix);
 		loader.m_mesh->m_matrix = loader.m_mesh->m_matrix * matrix;
 		
 		ndSharedPtr<ndRenderSceneNode> visualMesh(loader.m_renderMesh->Clone());
@@ -444,6 +480,8 @@ namespace ndQuadSpiderPlayer
 		world->AddModel(model);
 		scene->AddEntity(visualMesh);
 		model->AddBodiesAndJointsToWorld();
+
+		loader.m_mesh->m_matrix = saveMatrix;
 		return model;
 	}
 }
@@ -464,13 +502,24 @@ void ndQuadSpiderAnimated(ndDemoEntityManager* const scene)
 	loader.LoadMesh(ndGetWorkingFileName("spider.nd"));
 	ndSharedPtr<ndModel> model (ndController::CreateModel(scene, matrix, loader));
 
+#if 1
+	ndMatrix matrix1(ndYawMatrix (45.0f * ndDegreeToRad) * matrix);
+	matrix1.m_posit.m_x += 2.0f;
+	matrix1.m_posit.m_z += 3.0f;
+	ndController::CreateModel(scene, matrix1, loader);
+
+	matrix1 = ndYawMatrix(-45.0f * ndDegreeToRad) * matrix;
+	matrix1.m_posit.m_x += 2.0f;
+	matrix1.m_posit.m_z -= 3.0f;
+	ndController::CreateModel(scene, matrix1, loader);
+
+	matrix1 = ndYawMatrix(-45.0f * ndDegreeToRad) * matrix;
+	matrix1.m_posit.m_x += 2.0f;
+	matrix1.m_posit.m_z -= 0.0f;
+	ndController::CreateModel(scene, matrix1, loader);
+
+#endif
 	ndController* const controller = (ndController*)*model->GetNotifyCallback();
 	ndRender* const renderer = *scene->GetRenderer();
 	renderer->SetCamera(controller->m_cameraNode);
-
-	//matrix.m_posit.m_x -= 0.0f;
-	//matrix.m_posit.m_y += 0.5f;
-	//matrix.m_posit.m_z += -2.0f;
-	//ndQuaternion rotation(ndVector(0.0f, 1.0f, 0.0f, 0.0f), -90.0f * ndDegreeToRad);
-	//scene->SetCameraMatrix(rotation, matrix.m_posit);
 }

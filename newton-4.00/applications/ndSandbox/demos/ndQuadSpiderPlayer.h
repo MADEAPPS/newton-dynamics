@@ -93,6 +93,7 @@ namespace ndQuadSpiderPlayer
 		ndController();
 
 		void Update(ndFloat32 timestep);
+		void PostTransformUpdate(ndFloat32 timetep);
 
 		void ResetModel();
 		bool IsTerminal() const;
@@ -109,7 +110,10 @@ namespace ndQuadSpiderPlayer
 		ndAnimationPose m_pose;
 		ndFixSizeArray<ndEffectorInfo, 4> m_legs;
 		ndSharedPtr<ndRenderSceneNode> m_cameraNode;
+
+		ndSharedPtr<ndGeneratorWalkGait> m_walkGait;
 		ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
+
 		ndFloat32 m_timestep;
 	};
 };
