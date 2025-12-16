@@ -126,7 +126,7 @@ namespace ndCartpoleTrainer_ppo
 			hyperParameters.m_numberOfObservations = m_observationsSize;
 			
 			m_master = ndSharedPtr<ndBrainAgentOnPolicyGradient_Trainer>(new ndBrainAgentOnPolicyGradient_Trainer(hyperParameters));
-			m_bestActor = ndSharedPtr< ndBrain>(new ndBrain(*m_master->GetPolicyNetwork()));
+			m_bestActor = ndSharedPtr<ndBrain>(new ndBrain(**m_master->GetPolicyNetwork()));
 			
 			snprintf(name, sizeof(name), "%s.dnn", CONTROLLER_NAME_PPO);
 			m_master->SetName(name);
@@ -209,7 +209,7 @@ namespace ndCartpoleTrainer_ppo
 					if (m_lastEpisode != m_master->GetEposideCount())
 					{
 						m_maxScore = rewardTrajectory;
-						m_bestActor->CopyFrom(*m_master->GetPolicyNetwork());
+						m_bestActor->CopyFrom(**m_master->GetPolicyNetwork());
 						ndExpandTraceMessage("best actor episode: %d\treward %f\ttrajectoryFrames: %f\n", m_master->GetEposideCount(), 100.0f * m_master->GetAverageScore() / m_horizon, m_master->GetAverageFrames());
 						m_lastEpisode = m_master->GetEposideCount();
 					}
@@ -220,7 +220,7 @@ namespace ndCartpoleTrainer_ppo
 					m_saveScore = ndFloor(rewardTrajectory) + 2.0f;
 			
 					// save partial controller in case of crash 
-					ndBrain* const actor = m_master->GetPolicyNetwork();
+					ndBrain* const actor = *m_master->GetPolicyNetwork();
 					ndString fileName(ndGetWorkingFileName(m_master->GetName().GetStr()));
 					m_master->GetPolicyNetwork()->SaveToFile(fileName.GetStr());
 					actor->SaveToFile(fileName.GetStr());

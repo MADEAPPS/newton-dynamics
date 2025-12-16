@@ -225,7 +225,7 @@ void ndBrainAgentOnPolicyGradient_Agent::ndTrajectory::GetFlatArray(ndInt32 inde
 }
 
 ndBrainAgentOnPolicyGradient_Agent::ndBrainAgentOnPolicyGradient_Agent(ndBrainAgentOnPolicyGradient_Trainer* const master)
-	:ndBrainAgent()
+	:ndBrainAgent(master->GetPolicyNetwork())
 	,m_trajectory()
 	,m_normalDistribution()
 	,m_owner(master)
@@ -264,7 +264,7 @@ void ndBrainAgentOnPolicyGradient_Agent::Step()
 
 	ndBrainAgentOnPolicyGradient_Trainer* const owner = m_owner;
 
-	const ndBrain* const policy = owner->GetPolicyNetwork();
+	const ndBrain* const policy = *GetBrain();
 	ndBrainMemVector actions(m_trajectory.GetActions(entryIndex), policy->GetOutputSize());
 	ndBrainMemVector observation(m_trajectory.GetObservations(entryIndex), owner->m_parameters.m_numberOfObservations);
 	
@@ -372,9 +372,9 @@ ndBrainAgentOnPolicyGradient_Trainer::ndBrainAgentOnPolicyGradient_Trainer(const
 	m_randomShuffleBuffer = ndSharedPtr<ndBrainIntegerBuffer>(new ndBrainIntegerBuffer(*m_context, m_parameters.m_criticValueIterations * m_parameters.m_batchTrajectoryCount * m_parameters.m_maxTrajectorySteps));
 }
 
-ndBrain* ndBrainAgentOnPolicyGradient_Trainer::GetPolicyNetwork()
+ndSharedPtr<ndBrain> ndBrainAgentOnPolicyGradient_Trainer::GetPolicyNetwork()
 {
-	return *m_policyTrainer->GetBrain();
+	return m_policyTrainer->GetBrain();
 }
 
 void ndBrainAgentOnPolicyGradient_Trainer::AddAgent(ndSharedPtr<ndBrainAgentOnPolicyGradient_Agent>& agent)

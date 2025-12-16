@@ -33,6 +33,50 @@ namespace ndQuadSpiderPlayer
 		}
 	};
 
+	ndBodySwingControl::ndBodySwingControl(const ndSharedPtr<ndAnimationBlendTreeNode>& input)
+		:ndAnimationBlendTreeNode(input)
+		,m_x(ndReal(0.0f))
+		,m_y(ndReal(0.0f))
+		,m_z(ndReal(0.0f))
+		,m_yaw(ndReal(0.0f))
+		,m_roll(ndReal(0.0f))
+		,m_pitch(ndReal(0.0f))
+	{
+		Reset();
+	}
+
+	void ndBodySwingControl::Reset()
+	{
+		m_x = ndReal(0.0f);
+		m_y = ndReal(0.0f);
+		m_z = ndReal(0.0f);
+		m_yaw = ndReal(0.0f);
+		m_roll = ndReal(0.0f);
+		m_pitch = ndReal(0.0f);
+	}
+
+	void ndBodySwingControl::Evaluate(ndAnimationPose& output, ndVector& veloc)
+	{
+		ndAnimationBlendTreeNode::Evaluate(output, veloc);
+
+		ndMatrix matrix(ndPitchMatrix(m_pitch * ndDegreeToRad) * ndYawMatrix(m_yaw * ndDegreeToRad) * ndRollMatrix(m_roll * ndDegreeToRad));
+		matrix.m_posit.m_x = m_x;
+		matrix.m_posit.m_y = m_y - 0.0f;
+		matrix.m_posit.m_z = m_z;
+		for (ndInt32 i = 0; i < output.GetCount(); ++i)
+		{
+			ndAnimKeyframe& keyFrame = output[i];
+			ndEffectorInfo* const info = (ndEffectorInfo*)keyFrame.m_userData;
+			ndIkSwivelPositionEffector* const effector = (ndIkSwivelPositionEffector*)info->m_effector;
+		
+			ndMatrix localMatrix(effector->GetLocalMatrix1());
+			ndVector p0(localMatrix.TransformVector(keyFrame.m_posit));
+			ndVector p1(matrix.TransformVector(p0));
+			ndVector p2(localMatrix.UntransformVector(p1));
+			keyFrame.m_posit = p2;
+		}
+	}
+
 	ndProdeduralGaitGenerator::ndProdeduralGaitGenerator(ndController* const controller)
 		:ndAnimationSequence()
 		,m_owner(controller)
@@ -112,13 +156,6 @@ namespace ndQuadSpiderPlayer
 	{
 		output[legIndex].m_userParamFloat = ndFloat32(0.0f);
 
-		//if (legIndex > 0)
-		//{
-		//	output[legIndex].m_posit = m_pose[legIndex].m_posit;
-		//	return;
-		//}
-
-		//ndFloat32 gait[] = { 0.5f, 0.25f, -0.25f, -0.5f };
 		State state = ndProdeduralGaitGenerator::GetState(legIndex);
 		switch (state)
 		{
@@ -214,7 +251,7 @@ namespace ndQuadSpiderPlayer
 	ndGeneratorWalkGait::ndGeneratorWalkGait(ndController* const controller)
 		:ndProdeduralGaitGenerator(controller)
 	{
-		m_duration = ndFloat32(2.0f);
+		m_duration = ndFloat32(1.0f);
 		//m_duration = ndFloat32(5.0f);
 
 		m_timeLine[0] = ndFloat32(0.00f) * m_duration;
@@ -337,7 +374,8 @@ namespace ndQuadSpiderPlayer
 		ndSharedPtr<ndAnimationSequence> walkSequence = (ndSharedPtr<ndAnimationSequence>&)m_walkGait;
 
 		ndSharedPtr<ndAnimationBlendTreeNode> proceduralPoseGenerator (new ndAnimationSequencePlayer(walkSequence));
-		m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(proceduralPoseGenerator);
+		ndSharedPtr<ndAnimationBlendTreeNode> controlNode(new ndBodySwingControl(proceduralPoseGenerator));
+		m_animBlendTree = ndSharedPtr<ndBodySwingControl> ((ndSharedPtr<ndBodySwingControl>&)controlNode);
 		
 		for (ndInt32 i = 0; i < m_legs.GetCount(); ++i)
 		{
@@ -502,7 +540,7 @@ void ndQuadSpiderAnimated(ndDemoEntityManager* const scene)
 	loader.LoadMesh(ndGetWorkingFileName("spider.nd"));
 	ndSharedPtr<ndModel> model (ndController::CreateModel(scene, matrix, loader));
 
-#if 1
+#if 0
 	ndMatrix matrix1(ndYawMatrix (45.0f * ndDegreeToRad) * matrix);
 	matrix1.m_posit.m_x += 2.0f;
 	matrix1.m_posit.m_z += 3.0f;
@@ -517,8 +555,8 @@ void ndQuadSpiderAnimated(ndDemoEntityManager* const scene)
 	matrix1.m_posit.m_x += 2.0f;
 	matrix1.m_posit.m_z -= 0.0f;
 	ndController::CreateModel(scene, matrix1, loader);
-
 #endif
+
 	ndController* const controller = (ndController*)*model->GetNotifyCallback();
 	ndRender* const renderer = *scene->GetRenderer();
 	renderer->SetCamera(controller->m_cameraNode);

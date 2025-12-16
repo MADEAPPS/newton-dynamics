@@ -25,17 +25,16 @@
 #include "ndBrainAgentContinuePolicyGradient.h"
 
 ndBrainAgentContinuePolicyGradient::ndBrainAgentContinuePolicyGradient(const ndSharedPtr<ndBrain>& policy)
-	:ndBrainAgent()
-	,m_policy(policy)
+	:ndBrainAgent(policy)
 {
-	m_actions.SetCount(m_policy->GetOutputSize());
-	m_observations.SetCount(m_policy->GetInputSize());
+	m_actions.SetCount(m_brain->GetOutputSize());
+	m_observations.SetCount(m_brain->GetInputSize());
 }
 
 ndBrainAgentContinuePolicyGradient::ndBrainAgentContinuePolicyGradient(const ndBrainAgentContinuePolicyGradient& src)
 	:ndBrainAgent(src)
-	,m_policy(src.m_policy)
 {
+	SetBrain(src.m_brain);
 }
 
 ndBrainAgentContinuePolicyGradient::~ndBrainAgentContinuePolicyGradient()
@@ -88,6 +87,6 @@ void ndBrainAgentContinuePolicyGradient::OptimizeStep()
 void ndBrainAgentContinuePolicyGradient::Step()
 {
 	GetObservation(&m_observations[0]);
-	m_policy->MakePrediction(m_observations, m_actions);
+	m_brain->MakePrediction(m_observations, m_actions);
 	ApplyActions(&m_actions[0]);
 }

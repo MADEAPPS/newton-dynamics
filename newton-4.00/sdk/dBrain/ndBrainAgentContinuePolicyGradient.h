@@ -45,7 +45,6 @@ class ndBrainAgentContinuePolicyGradient: public ndBrainAgent
 	ndInt32 GetEpisodeFrames() const override;
 	void Save(ndBrainSave* const loadSave) override;
 	
-	ndSharedPtr<ndBrain> m_policy;
 	ndBrainVector m_actions;
 	ndBrainVector m_observations;
 };

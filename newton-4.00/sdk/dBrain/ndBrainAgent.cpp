@@ -24,21 +24,32 @@
 #include "ndBrainAgent.h"
 #include "ndBrainSaveLoad.h"
 
-ndBrainAgent::ndBrainAgent()
+ndBrainAgent::ndBrainAgent(const ndSharedPtr<ndBrain>& brain)
 	:ndClassAlloc()
 	,m_name()
+	,m_brain(brain)
 {
 }
 
 ndBrainAgent::ndBrainAgent(const ndBrainAgent& src)
 	:ndClassAlloc()
 	,m_name(src.m_name)
+	,m_brain(src.m_brain)
 {
-
 }
 
 ndBrainAgent::~ndBrainAgent()
 {
+}
+
+ndSharedPtr<ndBrain>& ndBrainAgent::GetBrain()
+{
+	return m_brain;
+}
+
+void ndBrainAgent::SetBrain(const ndSharedPtr<ndBrain>& brain)
+{
+	m_brain = brain;
 }
 
 const ndString& ndBrainAgent::GetName() const

@@ -237,14 +237,13 @@ void ndBrainAgentOffPolicyGradient_Agent::ndTrajectory::GetFlatArray(ndInt32 ind
 }
 
 ndBrainAgentOffPolicyGradient_Agent::ndBrainAgentOffPolicyGradient_Agent(ndBrainAgentOffPolicyGradient_Trainer* const master)
-	:ndBrainAgent()
+	:ndBrainAgent(master->m_policyTrainer->GetBrain())
 	,m_owner(master)
 	,m_trajectory()
 	,m_randomGenerator()
 	,m_trajectoryBaseIndex(0)
 {
-	const ndBrain* const brain = *master->m_policyTrainer->GetBrain();
-	m_trajectory.Init(brain->GetOutputSize(), master->m_parameters.m_numberOfObservations);
+	m_trajectory.Init(m_brain->GetOutputSize(), master->m_parameters.m_numberOfObservations);
 	ndUnsigned32 agentSeed = m_owner->m_uniformDistribution.Generate();
 	m_randomGenerator.Init(agentSeed);
 }
@@ -276,8 +275,8 @@ void ndBrainAgentOffPolicyGradient_Agent::Step()
 	m_trajectory.Clear(entryIndex);
 
 	ndBrainAgentOffPolicyGradient_Trainer* const owner = m_owner;
-
-	const ndBrain* const policy = owner->GetPolicyNetwork();
+	//const ndBrain* const policy = owner->GetPolicyNetwork();
+	const ndBrain* const policy = *GetBrain();
 	ndBrainMemVector actions(m_trajectory.GetActions(entryIndex), policy->GetOutputSize());
 	ndBrainMemVector observation(m_trajectory.GetObservations(entryIndex), owner->m_parameters.m_numberOfObservations);
 	

@@ -27,12 +27,15 @@ class ndBrainSave;
 class ndBrainAgent: public ndClassAlloc
 {
 	public: 
-	ndBrainAgent();
+	ndBrainAgent(const ndSharedPtr<ndBrain>& brain);
 	ndBrainAgent(const ndBrainAgent& src);
 	virtual ~ndBrainAgent();
 
 	virtual void Step() = 0;
 	virtual void OptimizeStep() = 0;
+
+	ndSharedPtr<ndBrain>& GetBrain(); 
+	void SetBrain(const ndSharedPtr<ndBrain>& brain);
 
 	const ndString& GetName() const;
 	void SetName(const ndString& name);
@@ -51,9 +54,8 @@ class ndBrainAgent: public ndClassAlloc
 	virtual void GetObservation(ndBrainFloat* const observation) = 0;
 
 	ndString m_name;
+	ndSharedPtr<ndBrain> m_brain;
 };
-
-
 
 #endif 
 

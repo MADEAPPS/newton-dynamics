@@ -39,6 +39,23 @@ namespace ndQuadSpiderPlayer
 		ndIkSwivelPositionEffector* m_effector;
 	};
 
+	class ndBodySwingControl : public ndAnimationBlendTreeNode
+	{
+		public:
+		ndBodySwingControl(const ndSharedPtr<ndAnimationBlendTreeNode>& input);
+		void Reset();
+		void Evaluate(ndAnimationPose& output, ndVector& veloc) override;;
+
+		ndReal m_x;
+		ndReal m_y;
+		ndReal m_z;
+		ndReal m_yaw;
+		ndReal m_roll;
+		ndReal m_pitch;
+		//ndReal m_animSpeed;
+		//bool m_enableController;
+	};
+
 	class ndProdeduralGaitGenerator : public ndAnimationSequence
 	{
 		public:
@@ -112,7 +129,7 @@ namespace ndQuadSpiderPlayer
 		ndSharedPtr<ndRenderSceneNode> m_cameraNode;
 
 		ndSharedPtr<ndGeneratorWalkGait> m_walkGait;
-		ndSharedPtr<ndAnimationBlendTreeNode> m_animBlendTree;
+		ndSharedPtr<ndBodySwingControl> m_animBlendTree;
 
 		ndFloat32 m_timestep;
 	};

@@ -60,8 +60,6 @@ namespace ndCarpolePlayer
 			:ndController()
 		{
 		}
-
-		//ndSharedPtr<ndBrainAgent> m_myAgent;
 	};
 
 	ndController::ndController()
@@ -225,7 +223,6 @@ namespace ndCarpolePlayer
 		ndString fileName(ndGetWorkingFileName(nameExt));
 		ndSharedPtr<ndBrain> policy(ndBrainLoad::Load(fileName.GetStr()));
 		playerController->m_agent = ndSharedPtr<ndBrainAgent>(new ndController::ndAgent(policy, playerController));
-		//playerController->m_agent = *playerController->m_myAgent;
 
 		// add model a visual mesh to the scene and world
 		ndWorld* const world = scene->GetWorld();

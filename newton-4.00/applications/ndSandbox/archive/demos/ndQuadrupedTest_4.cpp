@@ -492,10 +492,10 @@ namespace ndQuadruped_4
 			ndFloat32 m_stride_z;
 		};
 
-		class ndUIControlNode : public ndAnimationBlendTreeNode
+		class ndBodySwingControl : public ndAnimationBlendTreeNode
 		{
 			public:
-			ndUIControlNode(ndAnimationBlendTreeNode* const input)
+			ndBodySwingControl(ndAnimationBlendTreeNode* const input)
 				:ndAnimationBlendTreeNode(input)
 				,m_x(ndReal(0.0f))
 				,m_y(ndReal(0.0f))
@@ -630,7 +630,7 @@ namespace ndQuadruped_4
 			ndSharedPtr<ndAnimationSequence> sequence(new ndPoseGenerator(phase));
 
 			m_poseGenerator = new ndAnimationSequencePlayer(sequence);
-			m_control = new ndUIControlNode(m_poseGenerator);
+			m_control = new ndBodySwingControl(m_poseGenerator);
 			m_animBlendTree = ndSharedPtr<ndAnimationBlendTreeNode>(m_control);
 
 			ndFloat32 duration = m_poseGenerator->GetSequence()->GetDuration();
@@ -1326,7 +1326,7 @@ namespace ndQuadruped_4
 
 		ndIkSolver m_invDynamicsSolver;
 		ndAnimationPose m_animPose;
-		ndUIControlNode* m_control;
+		ndBodySwingControl* m_control;
 		ndAnimationSequencePlayer* m_poseGenerator;
 		ndVector m_animPrevPose[4];
 		ndFixSizeArray<ndEffectorInfo, 4> m_effectorsInfo;
@@ -1363,7 +1363,7 @@ namespace ndQuadruped_4
 			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			//m_scene->Print(color, "Control panel");
 			
-			RobotModelNotify::ndUIControlNode* const control = m_modelNotify->m_control;
+			RobotModelNotify::ndBodySwingControl* const control = m_modelNotify->m_control;
 
 			bool change = false;
 			change = change || ImGui::SliderFloat("x", &control->m_x, -D_MAX_SWING_DIST_X, D_MAX_SWING_DIST_X);

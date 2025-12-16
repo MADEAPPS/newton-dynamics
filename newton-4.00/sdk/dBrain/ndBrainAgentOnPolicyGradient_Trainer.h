@@ -152,7 +152,7 @@ class ndBrainAgentOnPolicyGradient_Trainer : public ndClassAlloc
 	const ndString& GetName() const;
 	void SetName(const ndString& name);
 
-	ndBrain* GetPolicyNetwork();
+	ndSharedPtr<ndBrain> GetPolicyNetwork();
 
 	void OptimizeStep();
 
