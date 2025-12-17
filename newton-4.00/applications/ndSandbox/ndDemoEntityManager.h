@@ -240,7 +240,7 @@ class ndDemoEntityManager : public ndClassAlloc
 	ndInt32 m_solverSubSteps;
 	ndInt32 m_workerThreads;
 	ndInt32 m_debugDisplayMode;
-	ndInt32 m_collisionDisplayMode;
+	ndInt32 m_showCollisionMeshMode;
 
 	ndFloat32 m_fps;
 	ndFloat32 m_timestepAcc;
@@ -277,6 +277,7 @@ class ndDemoEntityManager : public ndClassAlloc
 	static ndDemos m_machineLearning[];
 
 	friend class ndPhysicsWorld;
+	friend class ndDebugDisplayRenderPass;
 };
 
 

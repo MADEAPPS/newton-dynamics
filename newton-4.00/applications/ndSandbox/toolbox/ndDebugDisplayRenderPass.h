@@ -16,7 +16,6 @@ class ndDemoEntityManager;
 class ndDebugDisplayRenderPass : public ndRenderPass
 {
 	public:
-
 	class ndDebugMesh
 	{
 		public:
@@ -37,18 +36,34 @@ class ndDebugDisplayRenderPass : public ndRenderPass
 	ndDebugDisplayRenderPass(ndDemoEntityManager* const owner);
 	~ndDebugDisplayRenderPass();
 
-	void SetDisplayMode(ndInt32 mode);
+	void SetDebugDisplayOptions();
+
+	private:
+	void RenderDebugLines();
+	void RenderCollisionShape();
+	void GenerateCenterOfMass();
 
 	virtual void ResetScene() override;
 	virtual void RenderScene() override;
-
 	ndDebugMesh* CreateRenderPrimitive(const ndShapeInstance& shapeInstance) const;
 
 	ndVector m_awakeColor;
 	ndVector m_sleepColor;
 	ndDemoEntityManager* m_manager;
 	ndTree<ndSharedPtr<ndDebugMesh>, ndShape*> m_meshCache;
-	ndInt32 m_collisionDisplayMode;
+
+	ndInt32 m_showCollisionMeshMode;
+	bool m_showCenterOfMass;
+
+	class ndLine
+	{
+		public:
+		ndVector m_p0;
+		ndVector m_p1;
+		ndVector m_color;
+	};
+	ndArray<ndLine> m_debugLines;
+	ndSharedPtr<ndRenderPrimitive> m_renderLinesPrimitive;
 };
 
 #endif

@@ -47,6 +47,10 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(ndRenderPrimitive* const 
 	{
 		BuildFromNewtonMeshEffect(descriptor);
 	}
+	else if (descriptor.m_meshBuildMode == ndRenderPrimitive::m_debugLineArray)
+	{
+		BuildDebugLineArray(descriptor);
+	}
 	else
 	{
 		ndAssert(*descriptor.m_simpleMesh);
@@ -765,6 +769,11 @@ void ndRenderPrimitiveImplement::BuildDebugFlatShadedMesh(const ndRenderPrimitiv
 		segment.m_indexCount = m_indexCount;
 		m_debugFlatShadedColorBlock.GetShaderParameters(*m_context->m_shaderCache);
 	}
+}
+
+void ndRenderPrimitiveImplement::BuildDebugLineArray(const ndRenderPrimitive::ndDescriptor& descriptor)
+{
+
 }
 
 void ndRenderPrimitiveImplement::BuildWireframeDebugMesh(const ndRenderPrimitive::ndDescriptor& descriptor)

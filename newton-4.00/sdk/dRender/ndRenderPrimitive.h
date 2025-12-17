@@ -85,6 +85,7 @@ class ndRenderPrimitive : public ndContainersFreeListAlloc<ndRenderPrimitive>
 		m_debugFlatShaded,
 		m_debugWireFrame,
 		m_debugHiddenLines,
+		m_debugLineArray,
 	};
 
 	enum ndUvMapingMode

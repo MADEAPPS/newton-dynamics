@@ -47,6 +47,7 @@ class ndRenderPrimitiveImplement : public ndContainersFreeListAlloc<ndRenderPrim
 	void BuildRenderSkinnedMeshFromMeshEffect(const ndRenderPrimitive::ndDescriptor& descriptor);
 	void BuildDebugFlatShadedMesh(const ndRenderPrimitive::ndDescriptor& descriptor);
 	void BuildRenderInstanceMesh(const ndRenderPrimitive::ndDescriptor& descriptor);
+	void BuildDebugLineArray(const ndRenderPrimitive::ndDescriptor& descriptor);
 	void BuildWireframeDebugMesh(const ndRenderPrimitive::ndDescriptor& descriptor);
 	void BuildSetZBufferDebugMesh(const ndRenderPrimitive::ndDescriptor& descriptor);
 

@@ -30,7 +30,7 @@
 //#define DEFAULT_SCENE	3		// basic sliding platform
 //#define DEFAULT_SCENE	4		// basic Trigger
 //#define DEFAULT_SCENE	5		// conservation of momentum 
-//#define DEFAULT_SCENE	6		// basic joints
+#define DEFAULT_SCENE	6		// basic joints
 //#define DEFAULT_SCENE	7		// static mesh collision
 //#define DEFAULT_SCENE	8		// Highfield collision
 //#define DEFAULT_SCENE	9		// static compound scene collision
@@ -43,7 +43,7 @@
 //#define DEFAULT_SCENE	16		// third person player capsule
 //#define DEFAULT_SCENE	17		// cart pole SAC trained controller
 //#define DEFAULT_SCENE	18		// cart pole PPO trained controller
-#define DEFAULT_SCENE	19		// procedurally animated quadruped spider
+//#define DEFAULT_SCENE	19		// procedurally animated quadruped spider
 
 // These are the machine learning training demos
 //#define DEFAULT_SCENE			(MACHINE_LEARNING_BASE + 0)	// train cart pole using SAC agent
@@ -439,7 +439,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	,m_solverSubSteps(2)
 	,m_workerThreads(4)
 	,m_debugDisplayMode(0)
-	,m_collisionDisplayMode(0)
+	,m_showCollisionMeshMode(0)
 	,m_fps(0.0f)
 	,m_timestepAcc(0.0f)
 	,m_currentListenerTimestep(0.0f)
@@ -529,14 +529,14 @@ ndDemoEntityManager::ndDemoEntityManager()
 	m_workerThreads = 1;
 	//m_solverSubSteps = 2;
 	//m_showRaycastHit = true;
-	//m_showCenterOfMass = false;
+	m_showCenterOfMass = true;
 	//m_showNormalForces = true;
 	//m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
 	//m_showModelsDebugInfo = true;
-	//m_collisionDisplayMode = 1;
-	//m_collisionDisplayMode = 2;	
-	//m_collisionDisplayMode = 3;		// solid wire frame
+	//m_showCollisionMeshMode = 1;
+	//m_showCollisionMeshMode = 2;	
+	//m_showCollisionMeshMode = 3;		// solid wire frame
 	m_synchronousPhysicsUpdate = true;
 	m_synchronousParticlesUpdate = true;
 
@@ -837,7 +837,7 @@ void ndDemoEntityManager::ApplyOptions()
 	m_transparentRenderPass->MakeActive(!m_hideVisualMeshes);
 
 	ndDebugDisplayRenderPass* const debugDisplay = (ndDebugDisplayRenderPass*)*m_debugDisplayRenderPass;
-	debugDisplay->SetDisplayMode(m_collisionDisplayMode);
+	debugDisplay->SetDebugDisplayOptions();
 }
 
 void ndDemoEntityManager::ShowMainMenuBar()
@@ -922,10 +922,10 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Separator();
 
 			//ImGui::RadioButton("show UI", &m_showUI);
-			ImGui::RadioButton("hide collision Mesh", &m_collisionDisplayMode, 0);
-			ImGui::RadioButton("show solid collision", &m_collisionDisplayMode, 1);
-			ImGui::RadioButton("show wire frame collision", &m_collisionDisplayMode, 2);
-			ImGui::RadioButton("show hidden wire frame collision", &m_collisionDisplayMode, 3);
+			ImGui::RadioButton("hide collision Mesh", &m_showCollisionMeshMode, 0);
+			ImGui::RadioButton("show solid collision", &m_showCollisionMeshMode, 1);
+			ImGui::RadioButton("show wire frame collision", &m_showCollisionMeshMode, 2);
+			ImGui::RadioButton("show hidden wire frame collision", &m_showCollisionMeshMode, 3);
 			ImGui::Separator();
 	
 			ImGui::Checkbox("show aabb", &m_showAABB);
@@ -1244,7 +1244,7 @@ void ndDemoEntityManager::CalculateFPS(ndFloat32 timestep)
 void ndDemoEntityManager::ImportPLYfile(const char* const)
 {
 	ndAssert(0);
-	//m_collisionDisplayMode = 2;
+	//m_showCollisionMeshMode = 2;
 	//CreatePLYMesh (this, fileName, true);
 }
 
