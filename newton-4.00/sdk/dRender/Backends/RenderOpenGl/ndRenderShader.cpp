@@ -804,19 +804,19 @@ void ndRenderShaderGenerateSkinShadowMapBlock::Render(const ndRenderPrimitiveImp
 // *********************************************************************
 // 
 // *********************************************************************
-void ndRenderShaderLineArrayBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
+void ndRenderShaderStaticLinesArrayBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
 {
 	SetParameters(shaderCache->m_wireFrameEffect);
 	EndParameters();
 }
 
-void ndRenderShaderLineArrayBlock::SetParameters(GLuint shader)
+void ndRenderShaderStaticLinesArrayBlock::SetParameters(GLuint shader)
 {
 	ndRenderShaderBlock::SetParameters(shader);
 	m_viewModelProjectionMatrix = glGetUniformLocation(m_shader, "viewModelProjectionMatrix");
 }
 
-void ndRenderShaderLineArrayBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
+void ndRenderShaderStaticLinesArrayBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
 	const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
 
@@ -830,5 +830,40 @@ void ndRenderShaderLineArrayBlock::Render(const ndRenderPrimitiveImplement* cons
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+	glUseProgram(0);
+}
+
+// *********************************************************************
+// 
+// *********************************************************************
+void ndRenderShaderDynamicLinesArrayBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
+{
+	SetParameters(shaderCache->m_lineEffect);
+	EndParameters();
+}
+
+void ndRenderShaderDynamicLinesArrayBlock::SetParameters(GLuint shader)
+{
+	ndRenderShaderBlock::SetParameters(shader);
+	m_viewModelProjectionMatrix = glGetUniformLocation(m_shader, "viewModelProjectionMatrix");
+}
+
+void ndRenderShaderDynamicLinesArrayBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
+{
+	const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
+	
+	glUseProgram(m_shader);
+	ndRenderPassDebugLines* const debugPass = render->m_cachedDebugLinePass;
+	ndAssert(debugPass);
+
+	const ndMatrix modelViewProjectionMatrixMatrix(modelMatrix * camera->m_invViewMatrix * camera->m_projectionMatrix);
+	const glMatrix glViewModelProjectionMatrix(modelViewProjectionMatrixMatrix);
+	glUniformMatrix4fv(m_viewModelProjectionMatrix, 1, false, &glViewModelProjectionMatrix[0][0]);
+	
+	//glBindVertexArray(self->m_vertextArrayBuffer);
+	//glDrawArrays(GL_LINES, 0, self->m_vertexCount);
+	//
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	//glBindVertexArray(0);
 	glUseProgram(0);
 }

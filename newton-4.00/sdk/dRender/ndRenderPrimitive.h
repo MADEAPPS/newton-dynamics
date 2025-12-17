@@ -24,6 +24,7 @@ enum ndRenderPassMode
 	m_generateShadowMaps,
 	m_transparencyBackface,
 	m_transparencyFrontface,
+	m_debugLineArray,
 	m_debugDisplaySolidMesh,
 	m_debugDisplaySetZbuffer,
 	m_debugDisplayWireFrameMesh,

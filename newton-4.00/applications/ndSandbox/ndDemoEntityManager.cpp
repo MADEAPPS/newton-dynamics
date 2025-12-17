@@ -30,7 +30,7 @@
 //#define DEFAULT_SCENE	3		// basic sliding platform
 //#define DEFAULT_SCENE	4		// basic Trigger
 //#define DEFAULT_SCENE	5		// conservation of momentum 
-#define DEFAULT_SCENE	6		// basic joints
+//#define DEFAULT_SCENE	6		// basic joints
 //#define DEFAULT_SCENE	7		// static mesh collision
 //#define DEFAULT_SCENE	8		// Highfield collision
 //#define DEFAULT_SCENE	9		// static compound scene collision
@@ -42,7 +42,7 @@
 //#define DEFAULT_SCENE	15		// object Placement
 //#define DEFAULT_SCENE	16		// third person player capsule
 //#define DEFAULT_SCENE	17		// cart pole SAC trained controller
-//#define DEFAULT_SCENE	18		// cart pole PPO trained controller
+#define DEFAULT_SCENE	18		// cart pole PPO trained controller
 //#define DEFAULT_SCENE	19		// procedurally animated quadruped spider
 
 // These are the machine learning training demos

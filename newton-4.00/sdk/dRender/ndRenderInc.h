@@ -34,6 +34,7 @@
 #include <ndRenderSceneCamera.h>
 #include <ndRenderPassShadows.h>
 #include <ndRenderTextureCache.h>
+#include <ndRenderPassDebugLines.h>
 #include <ndRenderPassEnvironment.h>
 #include <ndRenderPassTransparency.h>
 #include <ndRenderSceneNodeInstance.h>

@@ -9,41 +9,44 @@
 * freely
 */
 
-#include "ndSandboxStdafx.h"
-#include "ndPhysicsWorld.h"
-#include "ndDemoEntityManager.h"
-#include "ndDebugDisplayRenderPass.h"
+#include "ndRenderStdafx.h"
+#include "ndRender.h"
+#include "ndRenderTexture.h"
+#include "ndRenderSceneNode.h"
+#include "ndRenderPrimitive.h"
+#include "ndRenderPassDebugLines.h"
 
-ndDebugDisplayRenderPass::ndDebugDisplayRenderPass(ndDemoEntityManager* const owner)
-	:ndRenderPassDebugLines(*owner->GetRenderer(), owner->GetWorld())
+#if 0
+ndRenderPassDebugLines::ndRenderPassDebugLines(ndDemoEntityManager* const owner)
+	:ndRenderPass(*owner->GetRenderer())
 	,m_awakeColor(ndFloat32(1.0f))
 	,m_sleepColor(ndFloat32(0.42f), ndFloat32(0.73f), ndFloat32(0.98f), ndFloat32(1.0f))
 	,m_manager(owner)
 	,m_meshCache()
 	,m_showCollisionMeshMode(0)
+	,m_showCenterOfMass(false)
 {
+	// make the render mesh
+	ndRender* const render = m_owner;
+	ndRenderPrimitive::ndDescriptor descriptor(render);
+
+	m_owner->m_cachedDebugLinePass = this;
+	descriptor.m_meshBuildMode = ndRenderPrimitive::m_debugLineArray;
+	m_renderLinesPrimitive = ndSharedPtr<ndRenderPrimitive>(new ndRenderPrimitive(descriptor));
 }
 
-ndDebugDisplayRenderPass::~ndDebugDisplayRenderPass()
+void ndRenderPassDebugLines::SetDebugDisplayOptions()
 {
-}
-
-void ndDebugDisplayRenderPass::SetDebugDisplayOptions()
-{
-	//m_showCenterOfMass = m_manager->m_showCenterOfMass;
+	m_showCenterOfMass = m_manager->m_showCenterOfMass;
 	m_showCollisionMeshMode = m_manager->m_showCollisionMeshMode;
-
-	ndDebugLineOptions options;
-	options.m_showCentreOfMass = m_manager->m_showCenterOfMass;
-	ndRenderPassDebugLines::SetDebugDisplayOptions(options);
 }
 
-void ndDebugDisplayRenderPass::ResetScene()
+void ndRenderPassDebugLines::ResetScene()
 {
 	m_meshCache.RemoveAll();
 }
 
-ndDebugDisplayRenderPass::ndDebugMesh* ndDebugDisplayRenderPass::CreateRenderPrimitive(const ndShapeInstance& shapeInstance) const
+ndRenderPassDebugLines::ndDebugMesh* ndRenderPassDebugLines::CreateRenderPrimitive(const ndShapeInstance& shapeInstance) const
 {
 	ndSharedPtr<ndShapeInstance>shape(new ndShapeInstance(shapeInstance));
 	shape->SetLocalMatrix(ndGetIdentityMatrix());
@@ -66,7 +69,7 @@ ndDebugDisplayRenderPass::ndDebugMesh* ndDebugDisplayRenderPass::CreateRenderPri
 	return debugMesh;
 }
 
-void ndDebugDisplayRenderPass::RenderCollisionShape()
+void ndRenderPassDebugLines::RenderCollisionShape()
 {
 	ndPhysicsWorld* const world = m_manager->GetWorld();
 	const ndBodyListView& bodyList = world->GetBodyList();
@@ -152,13 +155,123 @@ void ndDebugDisplayRenderPass::RenderCollisionShape()
 	}
 }
 
-
-void ndDebugDisplayRenderPass::RenderScene()
+void ndRenderPassDebugLines::GenerateCenterOfMass()
 {
-	m_world = m_manager->GetWorld();
-	ndRenderPassDebugLines::RenderScene();
+	ndFloat32 scale = ndFloat32(0.25f);
+
+	ndPhysicsWorld* const world = m_manager->GetWorld();
+	const ndBodyListView& bodyList = world->GetBodyList();
+	for (ndBodyListView::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	{
+		const ndBodyKinematic* const body = bodyNode->GetInfo()->GetAsBodyKinematic();
+		const ndMatrix matrix(body->GetMatrix());
+		ndVector com(matrix.TransformVector(body->GetCentreOfMass()));
+		
+		for (ndInt32 i = 0; i < 3; ++i)
+		{
+			ndLine line;
+			line.m_p0 = com;
+			line.m_color0 = ndVector::m_wOne;
+			line.m_color0[i] = ndFloat32(1.0f);
+			line.m_color1 = line.m_color0;
+			line.m_p1 = com + matrix[i].Scale(scale);
+			m_debugLines.PushBack(line);
+		}
+	}
+}
+
+void ndRenderPassDebugLines::RenderDebugLines()
+{
+	const ndMatrix matrix(ndGetIdentityMatrix());
+	m_renderLinesPrimitive->Render(m_owner, matrix, m_debugLineArray);
+}
+
+void ndRenderPassDebugLines::RenderScene()
+{
 	if (m_showCollisionMeshMode)
 	{
 		RenderCollisionShape();
+	}
+
+	m_debugLines.SetCount(0);
+	if (m_showCenterOfMass)
+	{
+		GenerateCenterOfMass();
+	}
+
+	if (m_debugLines.GetCount())
+	{
+		RenderDebugLines();
+	}
+}
+#endif
+
+ndRenderPassDebugLines::ndRenderPassDebugLines(ndRender* const owner, ndWorld* const world)
+	:ndRenderPass(owner)
+	,m_world(world)
+{
+	ndRender* const render = m_owner;
+	m_owner->m_cachedDebugLinePass = this;
+	ndRenderPrimitive::ndDescriptor descriptor(render);
+	descriptor.m_meshBuildMode = ndRenderPrimitive::m_debugLineArray;
+	m_renderLinesPrimitive = ndSharedPtr<ndRenderPrimitive>(new ndRenderPrimitive(descriptor));
+
+	memset(&m_options, 0, sizeof(ndDebugLineOptions));
+}
+
+ndRenderPassDebugLines::~ndRenderPassDebugLines()
+{
+	m_owner->m_cachedDebugLinePass = nullptr;
+}
+
+void ndRenderPassDebugLines::SetDebugDisplayOptions(const ndDebugLineOptions& options)
+{
+	m_options = options;
+}
+
+void ndRenderPassDebugLines::GenerateCenterOfMass()
+{
+	ndFloat32 scale = ndFloat32(0.25f);
+
+	const ndBodyListView& bodyList = m_world->GetBodyList();
+	for (ndBodyListView::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	{
+		const ndBodyKinematic* const body = bodyNode->GetInfo()->GetAsBodyKinematic();
+		const ndMatrix matrix(body->GetMatrix());
+		ndVector com(matrix.TransformVector(body->GetCentreOfMass()));
+	
+		for (ndInt32 i = 0; i < 3; ++i)
+		{
+			ndLine line;
+			line.m_point = com;
+			line.m_color = ndVector::m_wOne;
+			line.m_color[i] = ndFloat32(1.0f);
+			m_debugLines.PushBack(line);
+
+			line.m_point += matrix[i].Scale(scale);
+			m_debugLines.PushBack(line);
+		}
+	}
+}
+
+void ndRenderPassDebugLines::RenderDebugLines()
+{
+	const ndMatrix matrix(ndGetIdentityMatrix());
+	m_renderLinesPrimitive->Render(m_owner, matrix, m_debugLineArray);
+}
+
+void ndRenderPassDebugLines::RenderScene()
+{
+	ndAssert(m_world);
+
+	m_debugLines.SetCount(0);
+	if (m_options.m_showCentreOfMass)
+	{
+		GenerateCenterOfMass();
+	}
+	
+	if (m_debugLines.GetCount())
+	{
+		RenderDebugLines();
 	}
 }

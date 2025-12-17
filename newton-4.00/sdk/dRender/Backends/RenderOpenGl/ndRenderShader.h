@@ -200,11 +200,10 @@ class ndRenderShaderOpaqueDiffusedShadowSkinColorBlock : public ndRenderShaderOp
 	GLint m_matrixPalette;
 };
 
-
 // *********************************************************************
 // 
 // *********************************************************************
-class ndRenderShaderLineArrayBlock : public ndRenderShaderBlock
+class ndRenderShaderStaticLinesArrayBlock : public ndRenderShaderBlock
 {
 	public:
 	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) override;
@@ -215,5 +214,21 @@ class ndRenderShaderLineArrayBlock : public ndRenderShaderBlock
 
 	GLint m_viewModelProjectionMatrix;
 };
+
+// *********************************************************************
+// 
+// *********************************************************************
+class ndRenderShaderDynamicLinesArrayBlock : public ndRenderShaderBlock
+{
+	public:
+	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) override;
+	virtual void Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
+
+	protected:
+	virtual void SetParameters(GLuint shader) override;
+
+	GLint m_viewModelProjectionMatrix;
+};
+
 
 #endif

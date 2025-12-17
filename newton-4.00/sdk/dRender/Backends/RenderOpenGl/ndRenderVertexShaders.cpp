@@ -27,7 +27,7 @@ R""""(
 	}
 )"""";
 
-const char* ndRenderShaderCache::m_wireFrameVertex =
+const char* ndRenderShaderCache::m_wireFrameVertexColor =
 R""""(
 	#version 450 core
 

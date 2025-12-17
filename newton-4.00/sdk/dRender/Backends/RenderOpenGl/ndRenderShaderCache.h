@@ -30,6 +30,7 @@ class ndRenderShaderCache
 	{
 		struct
 		{
+			GLuint m_lineEffect;
 			GLuint m_skyBoxEffect;
 			GLuint m_diffuseEffect;
 			GLuint m_wireFrameEffect;
@@ -50,6 +51,7 @@ class ndRenderShaderCache
 	static const char* m_skyBoxVertex;
 	static const char* m_wireFrameVertex;
 	static const char* m_setZbufferVertex;
+	static const char* m_wireFrameVertexColor;
 	static const char* m_generateShadowMapVertex;
 	static const char* m_directionalDiffuseVertex;
 	static const char* m_generateShadowMapSkinVertex;

@@ -220,7 +220,8 @@ ndRenderPrimitiveImplement::~ndRenderPrimitiveImplement()
 
 void ndRenderPrimitiveImplement::InitShaderBlocks()
 {
-	m_lineArrayBlock.GetShaderParameters(*m_context->m_shaderCache);
+	m_staticLinesArrayBlock.GetShaderParameters(*m_context->m_shaderCache);
+	m_dynamicLinesArrayBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_generateShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_transparencyDiffusedBlock.GetShaderParameters(*m_context->m_shaderCache);
 	m_generateSkinShadowMapsBlock.GetShaderParameters(*m_context->m_shaderCache);
@@ -773,7 +774,29 @@ void ndRenderPrimitiveImplement::BuildDebugFlatShadedMesh(const ndRenderPrimitiv
 
 void ndRenderPrimitiveImplement::BuildDebugLineArray(const ndRenderPrimitive::ndDescriptor& descriptor)
 {
+	//ndArray<ndInt32> m_lines(drawShapes.m_lines.GetCount());
+	//m_lines.SetCount(drawShapes.m_lines.GetCount());
 
+	//m_indexCount = ndInt32(m_lines.GetCount());
+	//ndInt32 vertexCount = ndVertexListToIndexList(&drawShapes.m_lines[0].m_posit.m_x, sizeof(glPositionNormal), 6, ndInt32(drawShapes.m_lines.GetCount()), &m_lines[0], GLfloat(1.0e-6f));
+
+	glGenVertexArrays(1, &m_vertextArrayBuffer);
+	glBindVertexArray(m_vertextArrayBuffer);
+
+	glGenBuffers(1, &m_vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+
+	m_vertexCount = 32 * 1024;
+	m_vertexSize = sizeof(glPointColor);
+	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(m_vertexCount * sizeof(glPointColor)), nullptr, GL_DYNAMIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPointColor), (void*)OFFSETOF(glPointColor, m_point));
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glPointColor), (void*)OFFSETOF(glPointColor, m_color));
+		
+	m_dynamicLinesArrayBlock.GetShaderParameters(*m_context->m_shaderCache);
 }
 
 void ndRenderPrimitiveImplement::BuildWireframeDebugMesh(const ndRenderPrimitive::ndDescriptor& descriptor)
@@ -1172,6 +1195,10 @@ void ndRenderPrimitiveImplement::Render(const ndRender* const render, const ndMa
 			RenderGenerateInstancedShadowMaps(render, modelMatrix);
 			break;
 
+		case m_debugLineArray:
+			RenderDebugLineArray(render, modelMatrix);
+			break;
+
 		default:
 			ndAssert(0);
 	}
@@ -1194,7 +1221,12 @@ void ndRenderPrimitiveImplement::RenderDebugShapeWireFrame(const ndRender* const
 
 void ndRenderPrimitiveImplement::RenderSimplePrimitive(const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	m_lineArrayBlock.Render(this, render, modelMatrix);
+	m_staticLinesArrayBlock.Render(this, render, modelMatrix);
+}
+
+void ndRenderPrimitiveImplement::RenderDebugLineArray(const ndRender* const render, const ndMatrix& modelViewMatrix) const
+{
+	m_dynamicLinesArrayBlock.Render(this, render, modelViewMatrix);
 }
 
 void ndRenderPrimitiveImplement::RenderGenerateShadowMaps(const ndRender* const render, const ndMatrix& lightMatrix) const

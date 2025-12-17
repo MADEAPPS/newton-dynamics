@@ -174,6 +174,13 @@ class glMatrix
 	glVector4 m_data[4];
 };
 
+class glPointColor
+{
+	public:
+	glVector3 m_point;
+	glVector3 m_color;
+};
+
 class glPositionNormal
 {
 	public:
@@ -200,7 +207,6 @@ class glSkinVertex : public glPositionNormalUV
 	glVector4 m_weighs;
 	ndInt32 m_boneIndex[4];
 };
-
 
 #endif 
 
