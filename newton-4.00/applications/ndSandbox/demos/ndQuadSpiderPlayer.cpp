@@ -252,7 +252,7 @@ namespace ndQuadSpiderPlayer
 		:ndProdeduralGaitGenerator(controller)
 	{
 		m_duration = ndFloat32(1.0f);
-		//m_duration = ndFloat32(5.0f);
+m_duration = ndFloat32(5.0f);
 
 		m_timeLine[0] = ndFloat32(0.00f) * m_duration;
 		m_timeLine[1] = ndFloat32(0.25f) * m_duration;
@@ -361,6 +361,12 @@ namespace ndQuadSpiderPlayer
 				m_walkGait->m_omega = D_TURN_RATE;
 			}
 		}
+	}
+
+	void ndController::Debug(ndConstraintDebugCallback& callback) const
+	{
+		const ndEffectorInfo& leg = m_legs[0];
+		leg.m_calf->DebugJoint(callback);
 	}
 
 	void ndController::ResetModel()

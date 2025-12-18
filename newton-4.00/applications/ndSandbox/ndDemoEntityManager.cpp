@@ -115,7 +115,7 @@ ndDemoEntityManager::ndDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic player", ndPlayerCapsule_ThirdPerson},
 	{ "cart pole SAC player controller", ndCartpolePlayer_SAC},
 	{ "cart pole PPO player controller", ndCartpolePlayer_PPO},
-	{ "procedural  animated quad spider", ndQuadSpiderAnimated},
+	{ "procedural animated quad spider", ndQuadSpiderAnimated},
 	
 
 #if 0
@@ -532,8 +532,8 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//m_showCenterOfMass = true;
 	//m_showNormalForces = true;
 	//m_showContactPoints = true;
-	m_showJointDebugInfo = true;
-	//m_showModelsDebugInfo = true;
+	//m_showJointDebugInfo = true;
+	m_showModelsDebugInfo = true;
 	//m_showCollisionMeshMode = 1;
 	//m_showCollisionMeshMode = 2;	
 	//m_showCollisionMeshMode = 3;		// solid wire frame

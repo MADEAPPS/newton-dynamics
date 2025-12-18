@@ -101,10 +101,25 @@ void ndRenderPassDebugLines::GenerateJointsDebug()
 	debugCallback.SetScale(scale);
 
 	const ndJointList& jointList = m_world->GetJointList();
-	for (ndJointList::ndNode* bodyNode = jointList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	for (ndJointList::ndNode* node = jointList.GetFirst(); node; node = node->GetNext())
 	{
-		ndSharedPtr<ndJointBilateralConstraint>& joint = bodyNode->GetInfo();
+		ndSharedPtr<ndJointBilateralConstraint>& joint = node->GetInfo();
 		joint->DebugJoint(debugCallback);
+	}
+}
+
+void ndRenderPassDebugLines::GenerateModelsDebug()
+{
+	ndFloat32 scale = ndFloat32(0.25f);
+
+	ndCallback debugCallback(this);
+	debugCallback.SetScale(scale);
+
+	const ndModelList& modelList = m_world->GetModelList();
+	for (ndModelList::ndNode* node = modelList.GetFirst(); node; node = node->GetNext())
+	{
+		ndSharedPtr<ndModelNotify>& notify = node->GetInfo()->GetNotifyCallback();
+		notify->Debug(debugCallback);
 	}
 }
 
@@ -127,7 +142,11 @@ void ndRenderPassDebugLines::RenderScene()
 	{
 		GenerateJointsDebug();
 	}
-	
+	if (m_options.m_showModelsDebugInfo)
+	{
+		GenerateModelsDebug();
+	}
+
 	if (m_debugLines.GetCount())
 	{
 		RenderDebugLines();

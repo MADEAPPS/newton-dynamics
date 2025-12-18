@@ -33,6 +33,7 @@ void ndDebugDisplayRenderPass::SetDebugDisplayOptions()
 	ndDebugLineOptions options;
 	options.m_showCentreOfMass = m_manager->m_showCenterOfMass;
 	options.m_showJointDebugInfo = m_manager->m_showJointDebugInfo;
+	options.m_showModelsDebugInfo = m_manager->m_showModelsDebugInfo;
 	ndRenderPassDebugLines::SetDebugDisplayOptions(options);
 
 	m_showCollisionMeshMode = m_manager->m_showCollisionMeshMode;
@@ -151,7 +152,6 @@ void ndDebugDisplayRenderPass::RenderCollisionShape()
 		}
 	}
 }
-
 
 void ndDebugDisplayRenderPass::RenderScene()
 {
