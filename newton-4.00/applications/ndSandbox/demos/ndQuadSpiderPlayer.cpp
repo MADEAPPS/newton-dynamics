@@ -21,9 +21,9 @@
 
 namespace ndQuadSpiderPlayer
 {
-	#define D_WALK_STRIDE		ndFloat32(0.4f)
+	#define D_WALK_STRIDE		ndFloat32(0.3f)
 	#define D_STRIDE_AMPLITUD	ndFloat32(0.35f)
-	#define D_TURN_RATE			ndFloat32(0.3f)
+	#define D_TURN_RATE			ndFloat32(0.25f)
 
 	class ndAnimatedHelper : public ndDemoEntityManager::ndDemoHelper
 	{
@@ -278,8 +278,8 @@ namespace ndQuadSpiderPlayer
 	ndGeneratorWalkGait::ndGeneratorWalkGait(ndController* const controller)
 		:ndProdeduralGaitGenerator(controller)
 	{
-		m_duration = ndFloat32(1.0f);
-m_duration = ndFloat32(5.0f);
+		m_duration = ndFloat32(2.0f);
+//m_duration = ndFloat32(5.0f);
 
 		m_timeLine[0] = ndFloat32(0.00f) * m_duration;
 		m_timeLine[1] = ndFloat32(0.25f) * m_duration;
@@ -393,8 +393,10 @@ m_duration = ndFloat32(5.0f);
 
 	void ndController::Debug(ndConstraintDebugCallback& callback) const
 	{
+		// just debug one leg
 		const ndEffectorInfo& leg = m_legs[0];
 		leg.m_calf->DebugJoint(callback);
+		leg.m_effector->DebugJoint(callback);
 	}
 
 	void ndController::ResetModel()
