@@ -155,7 +155,7 @@ void ndJointHinge::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 	debugCallback.DrawFrame(matrix1, 0.5f);
 
 	const ndInt32 subdiv = 8;
-	const ndFloat32 radius = debugCallback.m_debugScale;
+	const ndFloat32 radius = debugCallback.m_debugScale * ndFloat32(0.8f);
 	ndVector arch[subdiv + 1];
 
 	ndFloat32 deltaTwist = m_maxLimit - m_minLimit;
