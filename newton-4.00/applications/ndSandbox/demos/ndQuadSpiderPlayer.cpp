@@ -21,8 +21,9 @@
 
 namespace ndQuadSpiderPlayer
 {
-	#define D_WALK_STRIDE	ndFloat32(0.4f)
-	#define D_TURN_RATE		ndFloat32(0.3f)
+	#define D_WALK_STRIDE		ndFloat32(0.4f)
+	#define D_STRIDE_AMPLITUD	ndFloat32(0.35f)
+	#define D_TURN_RATE			ndFloat32(0.3f)
 
 	class ndAnimatedHelper : public ndDemoEntityManager::ndDemoHelper
 	{
@@ -61,7 +62,7 @@ namespace ndQuadSpiderPlayer
 
 		ndMatrix matrix(ndPitchMatrix(m_pitch * ndDegreeToRad) * ndYawMatrix(m_yaw * ndDegreeToRad) * ndRollMatrix(m_roll * ndDegreeToRad));
 		matrix.m_posit.m_x = m_x;
-		matrix.m_posit.m_y = m_y - 0.1f;
+		matrix.m_posit.m_y = m_y - 0.0f;
 		matrix.m_posit.m_z = m_z;
 		for (ndInt32 i = 0; i < output.GetCount(); ++i)
 		{
@@ -115,7 +116,7 @@ namespace ndQuadSpiderPlayer
 		ndFloat32 angle0 = m_timeAcc * ndFloat32(2.0f) * ndPi / m_duration;
 		ndFloat32 deltaAngle = m_owner->m_timestep * ndFloat32(2.0f) * ndPi / m_duration;
 		ndFloat32 angle1 = ndAnglesAdd(angle0, deltaAngle);
-		if (angle1 < -0.0f)
+		if (angle1 < ndFloat32(0.0f))
 		{
 			angle1 += ndFloat32(2.0f) * ndPi;
 		}
@@ -123,10 +124,10 @@ namespace ndQuadSpiderPlayer
 		return time;
 	}
 
-	ndProdeduralGaitGenerator::State ndProdeduralGaitGenerator::GetState(ndInt32 legIndex____) const
+	ndProdeduralGaitGenerator::State ndProdeduralGaitGenerator::GetState(ndInt32 legIndex) const
 	{
 		// get the quadrant for this leg
-		ndFloat32 sequenceOffset = ndFloat32(0.25f) * ndFloat32(m_gaitSequence[legIndex____]);
+		ndFloat32 sequenceOffset = ndFloat32(0.25f) * ndFloat32(m_gaitSequence[legIndex]);
 		ndFloat32 t0 = ndMod(m_timeAcc + sequenceOffset * m_duration, m_duration);
 		// get the next time
 		ndFloat32 t1 = t0 + m_owner->m_timestep;
@@ -157,6 +158,11 @@ namespace ndQuadSpiderPlayer
 		output[legIndex].m_userParamFloat = ndFloat32(0.0f);
 
 		State state = ndProdeduralGaitGenerator::GetState(legIndex);
+//if (legIndex != 0)
+//{
+//	state = airToGround;
+//}
+
 		switch (state)
 		{
 			case groundToAir:
@@ -175,10 +181,17 @@ namespace ndQuadSpiderPlayer
 				ndFloat32 y0 = m_pose[legIndex].m_start.m_y;
 				ndFloat32 y1 = m_pose[legIndex].m_end.m_y;
 
-				ndFloat32 h = m_stride * ndFloat32(0.25f);
-				m_pose[legIndex].m_a0 = y0;
-				m_pose[legIndex].m_a1 = ndFloat32(4.0f) * (h - y0) + ndFloat32(0.5f) * (y1 + y0);
-				m_pose[legIndex].m_a2 = -m_pose[legIndex].m_a1;
+				ndFloat32 h = ndFloat32(0.5f) * (y1 + y0) + m_stride * D_STRIDE_AMPLITUD;
+
+				ndFloat32 a0 = y0;
+				ndFloat32 a1 = ndFloat32(4.0f) * (h - y0) - (y1 - y0);
+				ndFloat32 a2 = y1 - y0 - a1;
+				m_pose[legIndex].m_a0 = a0;
+				m_pose[legIndex].m_a1 = a1;
+				m_pose[legIndex].m_a2 = a2;
+
+				float xxx0 = a0 + a1 * 0.5 + a2 * 0.5 * 0.5;
+				float xxx1 = a0 + a1 * 1.0 + a2 * 1.0 * 1.0;
 
 				output[legIndex].m_posit = m_pose[legIndex].m_posit;
 				break;
@@ -186,6 +199,22 @@ namespace ndQuadSpiderPlayer
 
 			case airToGround:
 			{
+				if (legIndex == 0)
+				{
+					// integrate last step
+					m_pose[legIndex].m_time += m_owner->m_timestep;
+					ndFloat32 param = m_pose[legIndex].m_time / m_pose[legIndex].m_maxTime;
+					ndVector step(m_pose[legIndex].m_end - m_pose[legIndex].m_start);
+					ndVector posit(m_pose[legIndex].m_start + step.Scale(param));
+
+					ndFloat32 a0 = m_pose[legIndex].m_a0;
+					ndFloat32 a1 = m_pose[legIndex].m_a1;
+					ndFloat32 a2 = m_pose[legIndex].m_a2;
+					posit.m_y = a0 + a1 * param + a2 * param * param;
+
+					m_pose[legIndex].m_posit = posit;
+				}
+
 				ndVector target(m_pose[legIndex].m_base);
 				target.m_x -= m_stride * ndFloat32 (0.5f);
 
@@ -209,13 +238,14 @@ namespace ndQuadSpiderPlayer
 				m_pose[legIndex].m_time += m_owner->m_timestep;
 				ndFloat32 param = m_pose[legIndex].m_time / m_pose[legIndex].m_maxTime;
 				ndVector step(m_pose[legIndex].m_end - m_pose[legIndex].m_start);
-				m_pose[legIndex].m_posit = m_pose[legIndex].m_start + step.Scale(param);
+				ndVector posit(m_pose[legIndex].m_start + step.Scale(param));
 
 				ndFloat32 a0 = m_pose[legIndex].m_a0;
 				ndFloat32 a1 = m_pose[legIndex].m_a1;
 				ndFloat32 a2 = m_pose[legIndex].m_a2;
-				m_pose[legIndex].m_posit.m_y = a0 + a1 * param + a2 * param * param;
+				posit.m_y = a0 + a1 * param + a2 * param * param;
 
+				m_pose[legIndex].m_posit = posit;
 				output[legIndex].m_posit = m_pose[legIndex].m_posit;
 				break;
 			}
@@ -339,7 +369,8 @@ m_duration = ndFloat32(5.0f);
 		ndSharedPtr<ndRenderSceneNode> camera(renderer->GetCamera());
 		if (camera == m_cameraNode)
 		{
-			m_walkGait->m_stride = 0.0f;
+			//m_walkGait->m_stride = 0.0f;
+			m_walkGait->m_stride = D_WALK_STRIDE;
 			if (scene->GetKeyState(ImGuiKey_W))
 			{
 				m_walkGait->m_stride = D_WALK_STRIDE;
@@ -365,7 +396,7 @@ m_duration = ndFloat32(5.0f);
 
 	void ndController::Debug(ndConstraintDebugCallback& callback) const
 	{
-		const ndEffectorInfo& leg = m_legs[1];
+		const ndEffectorInfo& leg = m_legs[0];
 		leg.m_calf->DebugJoint(callback);
 	}
 
@@ -436,7 +467,7 @@ m_duration = ndFloat32(5.0f);
 			ndModelArticulation::ndNode* const calfNode = model->AddLimb(thighNode, calfBody, calfHinge);
 			
 			((ndIkJointHinge*)*calfHinge)->SetLimitState(true);
-			((ndIkJointHinge*)*calfHinge)->SetLimits(-60.0f * ndDegreeToRad, 80.0f * ndDegreeToRad);
+			((ndIkJointHinge*)*calfHinge)->SetLimits(-80.0f * ndDegreeToRad, 80.0f * ndDegreeToRad);
 			
 			// build heel
 			ndSharedPtr<ndMesh> heelMesh(calfMesh->GetChildren().GetFirst()->GetInfo());
@@ -451,8 +482,11 @@ m_duration = ndFloat32(5.0f);
 			// create effector
 			ndAssert(heelMesh->FindByClosestMatch("-effector"));
 			ndSharedPtr<ndMesh>footMesh(heelMesh->FindByClosestMatch("-effector")->GetSharedPtr());
-			ndMatrix effectPivot(footMesh->CalculateGlobalMatrix());
-			ndVector effectOffset(effectPivot.m_posit);
+			//ndMatrix effectPivot(footMesh->CalculateGlobalMatrix());
+			//const ndVector effectOffset(effectPivot.m_posit);
+			const ndVector effectOffset(footMesh->CalculateGlobalMatrix().m_posit);
+			//effectPivot.m_posit = thighMatrix.m_posit;
+			ndMatrix effectPivot(rootBody->GetMatrix());
 			effectPivot.m_posit = thighMatrix.m_posit;
 			
 			ndFloat32 regularizer = ndFloat32(0.001f);

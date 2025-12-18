@@ -70,9 +70,9 @@ namespace ndQuadSpiderPlayer
 		class ndPose
 		{
 			public:
-			ndVector m_base;
-			ndVector m_end;
 			ndVector m_start;
+			ndVector m_end;
+			ndVector m_base;
 			ndVector m_posit;
 			ndFloat32 m_time;
 			ndFloat32 m_maxTime;
