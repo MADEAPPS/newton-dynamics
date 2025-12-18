@@ -80,7 +80,7 @@ namespace ndQuadSpiderPlayer
 	ndProdeduralGaitGenerator::ndProdeduralGaitGenerator(ndController* const controller)
 		:ndAnimationSequence()
 		,m_owner(controller)
-		,m_omega(ndFloat32(0.3f))
+		,m_omega(ndFloat32(0.0f))
 		,m_stride(ndFloat32(0.0f))
 		,m_timeAcc(ndFloat32(0.0f))
 	{
@@ -260,8 +260,8 @@ m_duration = ndFloat32(5.0f);
 
 		//m_stride = ndFloat32(0.0f);
 		//m_omega = ndFloat32(0.0f);
-		m_stride = ndFloat32(0.4f);
-		m_omega = ndFloat32(0.3f);
+		//m_stride = ndFloat32(0.4f);
+		//m_omega = ndFloat32(0.3f);
 
 		// gait one
 		m_gaitSequence[0] = 3;
