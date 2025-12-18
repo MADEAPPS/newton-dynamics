@@ -264,7 +264,6 @@ class ndDemoEntityManager : public ndClassAlloc
 	bool m_showJointDebugInfo;
 	bool m_showModelsDebugInfo;
 	bool m_showCollidingFaces;
-	bool m_hidePostUpdate;
 	bool m_suspendPhysicsUpdate;
 	bool m_synchronousPhysicsUpdate;
 	bool m_synchronousParticlesUpdate;

@@ -461,7 +461,6 @@ ndDemoEntityManager::ndDemoEntityManager()
 	,m_showJointDebugInfo(false)
 	,m_showModelsDebugInfo(false)
 	,m_showCollidingFaces(false)
-	,m_hidePostUpdate(false)
 	,m_suspendPhysicsUpdate(false)
 	,m_synchronousPhysicsUpdate(false)
 	,m_synchronousParticlesUpdate(false)
@@ -515,8 +514,8 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	// initialized the physics world for the new scene
 	//m_showUI = false;
-	//m_showAABB = true;
-	//m_showScene = true;
+	m_showAABB = true;
+	m_showScene = true;
 	//m_showConcaveEdge = true;
 	//m_showMeshSkeleton = true;
 	//m_autoSleepMode = false;
@@ -931,14 +930,13 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("show aabb", &m_showAABB);
 			ImGui::Checkbox("show broad phase", &m_showScene);
 			ImGui::Checkbox("show concave edges", &m_showConcaveEdge);
-			ImGui::Checkbox("hide post update", &m_hidePostUpdate);
 			ImGui::Checkbox("hide visual meshes", &m_hideVisualMeshes);
 			ImGui::Checkbox("show mesh skeleton", &m_showMeshSkeleton);
 			ImGui::Checkbox("show contact points", &m_showContactPoints);
 			ImGui::Checkbox("show ray cast hit point", &m_showRaycastHit);
 			ImGui::Checkbox("show normal forces", &m_showNormalForces);
-			ImGui::Checkbox("show center of mass", &m_showCenterOfMass);
 			ImGui::Checkbox("show body frame", &m_showBodyFrame);
+			ImGui::Checkbox("show center of mass", &m_showCenterOfMass);
 			ImGui::Checkbox("show joints debug info", &m_showJointDebugInfo);
 			ImGui::Checkbox("show models debug info", &m_showModelsDebugInfo);
 			ImGui::Checkbox("show colliding faces", &m_showCollidingFaces);

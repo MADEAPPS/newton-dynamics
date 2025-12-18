@@ -28,6 +28,14 @@ class ndRenderPassDebugLines : public ndRenderPass
 	class ndDebugLineOptions
 	{
 		public:
+		ndDebugLineOptions()
+		{
+			memset(this, 0, sizeof(ndDebugLineOptions));
+		}
+
+		bool m_showBodyAABB;
+		bool m_showBodyFrame;
+		bool m_showBroadPhase;
 		bool m_showCentreOfMass;
 		bool m_showJointDebugInfo;
 		bool m_showModelsDebugInfo;
@@ -41,13 +49,17 @@ class ndRenderPassDebugLines : public ndRenderPass
 
 	protected:
 	class ndCallback;
-
 	void RenderDebugLines();
+	void GenerateBodyAABB();
+	void GenerateBroadphase();
+	void GenerateBodyFrames();
 	void GenerateJointsDebug();
 	void GenerateModelsDebug();
 	void GenerateCenterOfMass();
 	virtual void RenderScene() override;
+
 	
+
 	ndDebugLineOptions m_options;
 
 	ndWorld* m_world;

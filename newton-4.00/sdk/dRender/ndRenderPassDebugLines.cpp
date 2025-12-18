@@ -45,6 +45,51 @@ class ndRenderPassDebugLines::ndCallback : public ndConstraintDebugCallback
 		m_owner->m_debugLines.PushBack(line);
 	}
 
+	void DrawBox(const ndVector& p0, const ndVector& p1, const ndVector& color)
+	{
+		ndVector box[12][2];
+		box[0][0] = ndVector(p0.m_x, p0.m_y, p0.m_z, ndFloat32(1.0f));
+		box[0][1] = ndVector(p1.m_x, p0.m_y, p0.m_z, ndFloat32(1.0f));
+
+		box[1][0] = ndVector(p0.m_x, p1.m_y, p0.m_z, ndFloat32(1.0f));
+		box[1][1] = ndVector(p1.m_x, p1.m_y, p0.m_z, ndFloat32(1.0f));
+
+		box[2][0] = ndVector(p0.m_x, p1.m_y, p1.m_z, ndFloat32(1.0f));
+		box[2][1] = ndVector(p1.m_x, p1.m_y, p1.m_z, ndFloat32(1.0f));
+
+		box[3][0] = ndVector(p0.m_x, p0.m_y, p1.m_z, ndFloat32(1.0f));
+		box[3][1] = ndVector(p1.m_x, p0.m_y, p1.m_z, ndFloat32(1.0f));
+
+		box[4][0] = ndVector(p0.m_x, p0.m_y, p0.m_z, ndFloat32(1.0f));
+		box[4][1] = ndVector(p0.m_x, p1.m_y, p0.m_z, ndFloat32(1.0f));
+
+		box[5][0] = ndVector(p1.m_x, p0.m_y, p0.m_z, ndFloat32(1.0f));
+		box[5][1] = ndVector(p1.m_x, p1.m_y, p0.m_z, ndFloat32(1.0f));
+
+		box[6][0] = ndVector(p0.m_x, p0.m_y, p1.m_z, ndFloat32(1.0f));
+		box[6][1] = ndVector(p0.m_x, p1.m_y, p1.m_z, ndFloat32(1.0f));
+
+		box[7][0] = ndVector(p1.m_x, p0.m_y, p1.m_z, ndFloat32(1.0f));
+		box[7][1] = ndVector(p1.m_x, p1.m_y, p1.m_z, ndFloat32(1.0f));
+
+		box[8][0] = ndVector(p0.m_x, p0.m_y, p0.m_z, ndFloat32(1.0f));
+		box[8][1] = ndVector(p0.m_x, p0.m_y, p1.m_z, ndFloat32(1.0f));
+
+		box[9][0] = ndVector(p1.m_x, p0.m_y, p0.m_z, ndFloat32(1.0f));
+		box[9][1] = ndVector(p1.m_x, p0.m_y, p1.m_z, ndFloat32(1.0f));
+
+		box[10][0] = ndVector(p0.m_x, p1.m_y, p0.m_z, ndFloat32(1.0f));
+		box[10][1] = ndVector(p0.m_x, p1.m_y, p1.m_z, ndFloat32(1.0f));
+
+		box[11][0] = ndVector(p1.m_x, p1.m_y, p0.m_z, ndFloat32(1.0f));
+		box[11][1] = ndVector(p1.m_x, p1.m_y, p1.m_z, ndFloat32(1.0f));
+
+		for (ndInt32 i = 0; i < 12; ++i)
+		{
+			DrawLine(box[i][0], box[i][1], color, ndFloat32(1.0f));
+		}
+	}
+
 	ndRenderPassDebugLines* m_owner;
 };
 
@@ -57,8 +102,6 @@ ndRenderPassDebugLines::ndRenderPassDebugLines(ndRender* const owner, ndWorld* c
 	ndRenderPrimitive::ndDescriptor descriptor(render);
 	descriptor.m_meshBuildMode = ndRenderPrimitive::m_debugLineArray;
 	m_renderLinesPrimitive = ndSharedPtr<ndRenderPrimitive>(new ndRenderPrimitive(descriptor));
-
-	memset(&m_options, 0, sizeof(ndDebugLineOptions));
 }
 
 ndRenderPassDebugLines::~ndRenderPassDebugLines()
@@ -74,6 +117,46 @@ const ndArray<ndRenderPassDebugLines::ndLine>& ndRenderPassDebugLines::GetVertex
 void ndRenderPassDebugLines::SetDebugDisplayOptions(const ndDebugLineOptions& options)
 {
 	m_options = options;
+}
+
+void ndRenderPassDebugLines::RenderDebugLines()
+{
+	const ndMatrix matrix(ndGetIdentityMatrix());
+	m_renderLinesPrimitive->Render(m_owner, matrix, m_debugLineArray);
+}
+
+void ndRenderPassDebugLines::GenerateBodyAABB()
+{
+	ndCallback debugCallback(this);
+
+	ndVector color(ndVector::m_wOne);
+	color.m_z = ndFloat32(1.0f);
+	debugCallback.SetScale(1.0f);
+	const ndBodyListView& bodyList = m_world->GetBodyList();
+	for (ndBodyListView::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	{
+		ndVector p0;
+		ndVector p1;
+		const ndBodyKinematic* const body = bodyNode->GetInfo()->GetAsBodyKinematic();
+		body->GetAABB(p0, p1);
+		debugCallback.DrawBox(p0, p1, color);
+	}
+}
+
+void ndRenderPassDebugLines::GenerateBodyFrames()
+{
+	ndFloat32 scale = ndFloat32(0.25f);
+
+	ndCallback debugCallback(this);
+	debugCallback.SetScale(scale);
+
+	const ndBodyListView& bodyList = m_world->GetBodyList();
+	for (ndBodyListView::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	{
+		const ndBodyKinematic* const body = bodyNode->GetInfo()->GetAsBodyKinematic();
+		ndMatrix matrix(body->GetMatrix());
+		debugCallback.DrawFrame(matrix);
+	}
 }
 
 void ndRenderPassDebugLines::GenerateCenterOfMass()
@@ -123,10 +206,34 @@ void ndRenderPassDebugLines::GenerateModelsDebug()
 	}
 }
 
-void ndRenderPassDebugLines::RenderDebugLines()
+void ndRenderPassDebugLines::GenerateBroadphase()
 {
-	const ndMatrix matrix(ndGetIdentityMatrix());
-	m_renderLinesPrimitive->Render(m_owner, matrix, m_debugLineArray);
+	class ndDrawScene : public ndSceneTreeNotiFy, public ndCallback
+	{
+		public:
+		ndDrawScene(ndRenderPassDebugLines* const owner)
+			:ndSceneTreeNotiFy()
+			,ndCallback(owner)
+			,m_color(ndVector::m_wOne)
+		{
+			m_color.m_x = ndFloat32(0.75f);
+			m_color.m_y = ndFloat32(0.75f);
+			m_color.m_z = ndFloat32(0.75f);
+		}
+
+		virtual void OnDebugNode(const ndBvhNode* const node)
+		{
+			ndVector p0;
+			ndVector p1;
+			node->GetAabb(p0, p1);
+			DrawBox(p0, p1, m_color);
+		}
+		
+		ndVector m_color;
+	};
+
+	ndDrawScene drawBroaphase(this);
+	m_world->DebugScene(&drawBroaphase);
 }
 
 void ndRenderPassDebugLines::RenderScene()
@@ -134,6 +241,18 @@ void ndRenderPassDebugLines::RenderScene()
 	ndAssert(m_world);
 
 	m_debugLines.SetCount(0);
+	if (m_options.m_showBroadPhase)
+	{
+		GenerateBroadphase();
+	}
+	if (m_options.m_showBodyAABB)
+	{
+		GenerateBodyAABB();
+	}
+	if (m_options.m_showBodyFrame)
+	{
+		GenerateBodyFrames();
+	}
 	if (m_options.m_showCentreOfMass)
 	{
 		GenerateCenterOfMass();

@@ -31,6 +31,9 @@ ndDebugDisplayRenderPass::~ndDebugDisplayRenderPass()
 void ndDebugDisplayRenderPass::SetDebugDisplayOptions()
 {
 	ndDebugLineOptions options;
+	options.m_showBodyAABB = m_manager->m_showAABB;
+	options.m_showBroadPhase = m_manager->m_showScene;
+	options.m_showBodyFrame = m_manager->m_showBodyFrame;
 	options.m_showCentreOfMass = m_manager->m_showCenterOfMass;
 	options.m_showJointDebugInfo = m_manager->m_showJointDebugInfo;
 	options.m_showModelsDebugInfo = m_manager->m_showModelsDebugInfo;

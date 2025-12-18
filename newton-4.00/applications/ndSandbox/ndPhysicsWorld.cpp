@@ -145,7 +145,8 @@ void ndPhysicsWorld::PostUpdate(ndFloat32 timestep)
 	if (m_manager->m_onPostUpdate)
 	{
 		m_manager->m_onPostUpdate->Update(m_manager, timestep);
-		m_manager->m_onPostUpdate->OnDebug(m_manager, m_manager->m_hidePostUpdate);
+		//m_manager->m_onPostUpdate->OnDebug(m_manager, m_manager->m_hidePostUpdate);
+		m_manager->m_onPostUpdate->OnDebug(m_manager, false);
 	}
 
 	ndScopeSpinLock Lock(m_lock);
