@@ -864,6 +864,8 @@ void ndRenderShaderDynamicLinesArrayBlock::Render(const ndRenderPrimitiveImpleme
 	glBindVertexArray(self->m_vertextArrayBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, self->m_vertexBuffer);
 	const ndArray<ndRenderPassDebugLines::ndLine>& points = debugPass->GetVertex();
+
+	glLineWidth(2.0f);
 	for (ndInt32 j = 0; j < points.GetCount(); j += self->m_vertexCount)
 	{
 		glPointColor* const bufferData = (glPointColor*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
@@ -879,6 +881,7 @@ void ndRenderShaderDynamicLinesArrayBlock::Render(const ndRenderPrimitiveImpleme
 		glDrawArrays(GL_LINES, 0, pointCount);
 	}
 
+	glLineWidth(1.0f);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 	glUseProgram(0);
