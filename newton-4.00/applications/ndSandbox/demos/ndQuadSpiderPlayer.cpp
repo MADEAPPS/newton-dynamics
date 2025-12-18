@@ -190,9 +190,6 @@ namespace ndQuadSpiderPlayer
 				m_pose[legIndex].m_a1 = a1;
 				m_pose[legIndex].m_a2 = a2;
 
-				float xxx0 = a0 + a1 * 0.5 + a2 * 0.5 * 0.5;
-				float xxx1 = a0 + a1 * 1.0 + a2 * 1.0 * 1.0;
-
 				output[legIndex].m_posit = m_pose[legIndex].m_posit;
 				break;
 			}
@@ -467,7 +464,7 @@ m_duration = ndFloat32(5.0f);
 			ndModelArticulation::ndNode* const calfNode = model->AddLimb(thighNode, calfBody, calfHinge);
 			
 			((ndIkJointHinge*)*calfHinge)->SetLimitState(true);
-			((ndIkJointHinge*)*calfHinge)->SetLimits(-80.0f * ndDegreeToRad, 80.0f * ndDegreeToRad);
+			((ndIkJointHinge*)*calfHinge)->SetLimits(-80.0f * ndDegreeToRad, 60.0f * ndDegreeToRad);
 			
 			// build heel
 			ndSharedPtr<ndMesh> heelMesh(calfMesh->GetChildren().GetFirst()->GetInfo());
@@ -482,10 +479,7 @@ m_duration = ndFloat32(5.0f);
 			// create effector
 			ndAssert(heelMesh->FindByClosestMatch("-effector"));
 			ndSharedPtr<ndMesh>footMesh(heelMesh->FindByClosestMatch("-effector")->GetSharedPtr());
-			//ndMatrix effectPivot(footMesh->CalculateGlobalMatrix());
-			//const ndVector effectOffset(effectPivot.m_posit);
 			const ndVector effectOffset(footMesh->CalculateGlobalMatrix().m_posit);
-			//effectPivot.m_posit = thighMatrix.m_posit;
 			ndMatrix effectPivot(rootBody->GetMatrix());
 			effectPivot.m_posit = thighMatrix.m_posit;
 			
