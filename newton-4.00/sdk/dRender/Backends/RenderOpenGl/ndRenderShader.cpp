@@ -876,7 +876,7 @@ void ndRenderShaderDynamicLinesArrayBlock::Render(const ndRenderPrimitiveImpleme
 			bufferData[i].m_color = glVector3(points[i + j].m_color);
 		}
 		glUnmapBuffer(GL_ARRAY_BUFFER);
-		glDrawArrays(GL_LINES, 0, self->m_vertexCount / 2);
+		glDrawArrays(GL_LINES, 0, pointCount);
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);

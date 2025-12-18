@@ -529,10 +529,10 @@ ndDemoEntityManager::ndDemoEntityManager()
 	m_workerThreads = 1;
 	//m_solverSubSteps = 2;
 	//m_showRaycastHit = true;
-	m_showCenterOfMass = true;
+	//m_showCenterOfMass = true;
 	//m_showNormalForces = true;
 	//m_showContactPoints = true;
-	//m_showJointDebugInfo = true;
+	m_showJointDebugInfo = true;
 	//m_showModelsDebugInfo = true;
 	//m_showCollisionMeshMode = 1;
 	//m_showCollisionMeshMode = 2;	

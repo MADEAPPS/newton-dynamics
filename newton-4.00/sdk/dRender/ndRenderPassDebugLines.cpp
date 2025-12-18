@@ -16,6 +16,38 @@
 #include "ndRenderPrimitive.h"
 #include "ndRenderPassDebugLines.h"
 
+class ndRenderPassDebugLines::ndCallback : public ndConstraintDebugCallback
+{
+	public:
+	ndCallback(ndRenderPassDebugLines* const owner)
+		:ndConstraintDebugCallback()
+		,m_owner(owner)
+	{
+	}
+
+	//void DrawPoint(const ndVector& point, const ndVector& color, ndFloat32 thickness) override
+	void DrawPoint(const ndVector&, const ndVector&, ndFloat32) override
+	{
+
+	}
+
+	//void DrawLine(const ndVector& p0, const ndVector& p1, const ndVector& color, ndFloat32 thickness = ndFloat32(1.0f)) override
+	void DrawLine(const ndVector& p0, const ndVector& p1, const ndVector& color, ndFloat32) override
+	{
+		ndLine line;
+
+		line.m_point = p0;
+		line.m_color = color;
+		m_owner->m_debugLines.PushBack(line);
+
+		line.m_point = p1;
+		line.m_color = color;
+		m_owner->m_debugLines.PushBack(line);
+	}
+
+	ndRenderPassDebugLines* m_owner;
+};
+
 ndRenderPassDebugLines::ndRenderPassDebugLines(ndRender* const owner, ndWorld* const world)
 	:ndRenderPass(owner)
 	,m_world(world)
@@ -48,24 +80,31 @@ void ndRenderPassDebugLines::GenerateCenterOfMass()
 {
 	ndFloat32 scale = ndFloat32(0.25f);
 
+	ndCallback debugCallback(this);
+	debugCallback.SetScale(scale);
+
 	const ndBodyListView& bodyList = m_world->GetBodyList();
 	for (ndBodyListView::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	{
 		const ndBodyKinematic* const body = bodyNode->GetInfo()->GetAsBodyKinematic();
-		const ndMatrix matrix(body->GetMatrix());
-		ndVector com(matrix.TransformVector(body->GetCentreOfMass()));
-	
-		for (ndInt32 i = 0; i < 3; ++i)
-		{
-			ndLine line;
-			line.m_point = com;
-			line.m_color = ndVector::m_wOne;
-			line.m_color[i] = ndFloat32(1.0f);
-			m_debugLines.PushBack(line);
+		ndMatrix matrix(body->GetMatrix());
+		matrix.m_posit = matrix.TransformVector(body->GetCentreOfMass());
+		debugCallback.DrawFrame(matrix);
+	}
+}
 
-			line.m_point += matrix[i].Scale(scale);
-			m_debugLines.PushBack(line);
-		}
+void ndRenderPassDebugLines::GenerateJointsDebug()
+{
+	ndFloat32 scale = ndFloat32(0.25f);
+
+	ndCallback debugCallback(this);
+	debugCallback.SetScale(scale);
+
+	const ndJointList& jointList = m_world->GetJointList();
+	for (ndJointList::ndNode* bodyNode = jointList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	{
+		ndSharedPtr<ndJointBilateralConstraint>& joint = bodyNode->GetInfo();
+		joint->DebugJoint(debugCallback);
 	}
 }
 
@@ -83,6 +122,10 @@ void ndRenderPassDebugLines::RenderScene()
 	if (m_options.m_showCentreOfMass)
 	{
 		GenerateCenterOfMass();
+	}
+	if (m_options.m_showJointDebugInfo)
+	{
+		GenerateJointsDebug();
 	}
 	
 	if (m_debugLines.GetCount())

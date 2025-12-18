@@ -29,6 +29,7 @@ class ndRenderPassDebugLines : public ndRenderPass
 	{
 		public:
 		bool m_showCentreOfMass;
+		bool m_showJointDebugInfo;
 	};
 
 	ndRenderPassDebugLines(ndRender* const owner, ndWorld* const world);
@@ -38,7 +39,10 @@ class ndRenderPassDebugLines : public ndRenderPass
 	void SetDebugDisplayOptions(const ndDebugLineOptions& options);
 
 	protected:
+	class ndCallback;
+
 	void RenderDebugLines();
+	void GenerateJointsDebug();
 	void GenerateCenterOfMass();
 	virtual void RenderScene() override;
 	
