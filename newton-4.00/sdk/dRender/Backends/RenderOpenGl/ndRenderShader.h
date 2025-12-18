@@ -230,5 +230,19 @@ class ndRenderShaderDynamicLinesArrayBlock : public ndRenderShaderBlock
 	GLint m_viewModelProjectionMatrix;
 };
 
+// *********************************************************************
+// 
+// *********************************************************************
+class ndRenderShaderDynamicPointArrayBlock : public ndRenderShaderBlock
+{
+	public:
+	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) override;
+	virtual void Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const override;
+
+	protected:
+	virtual void SetParameters(GLuint shader) override;
+
+	GLint m_viewModelProjectionMatrix;
+};
 
 #endif

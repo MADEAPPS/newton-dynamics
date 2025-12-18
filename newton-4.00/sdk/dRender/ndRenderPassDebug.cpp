@@ -12,14 +12,14 @@
 #include "ndRenderStdafx.h"
 #include "ndRender.h"
 #include "ndRenderTexture.h"
+#include "ndRenderPassDebug.h"
 #include "ndRenderSceneNode.h"
 #include "ndRenderPrimitive.h"
-#include "ndRenderPassDebugLines.h"
 
-class ndRenderPassDebugLines::ndCallback : public ndConstraintDebugCallback
+class ndRenderPassDebug::ndCallback : public ndConstraintDebugCallback
 {
 	public:
-	ndCallback(ndRenderPassDebugLines* const owner)
+	ndCallback(ndRenderPassDebug* const owner)
 		:ndConstraintDebugCallback()
 		,m_owner(owner)
 	{
@@ -28,13 +28,13 @@ class ndRenderPassDebugLines::ndCallback : public ndConstraintDebugCallback
 	//void DrawPoint(const ndVector& point, const ndVector& color, ndFloat32 thickness) override
 	void DrawPoint(const ndVector&, const ndVector&, ndFloat32) override
 	{
-
+		ndAssert(0);
 	}
 
 	//void DrawLine(const ndVector& p0, const ndVector& p1, const ndVector& color, ndFloat32 thickness = ndFloat32(1.0f)) override
 	void DrawLine(const ndVector& p0, const ndVector& p1, const ndVector& color, ndFloat32) override
 	{
-		ndLine line;
+		ndPoint line;
 
 		line.m_point = p0;
 		line.m_color = color;
@@ -90,42 +90,46 @@ class ndRenderPassDebugLines::ndCallback : public ndConstraintDebugCallback
 		}
 	}
 
-	ndRenderPassDebugLines* m_owner;
+	ndRenderPassDebug* m_owner;
 };
 
-ndRenderPassDebugLines::ndRenderPassDebugLines(ndRender* const owner, ndWorld* const world)
+ndRenderPassDebug::ndRenderPassDebug(ndRender* const owner, ndWorld* const world)
 	:ndRenderPass(owner)
 	,m_world(world)
 {
 	ndRender* const render = m_owner;
 	m_owner->m_cachedDebugLinePass = this;
 	ndRenderPrimitive::ndDescriptor descriptor(render);
+
+	descriptor.m_meshBuildMode = ndRenderPrimitive::m_debugPointArray;
+	m_renderPointsPrimitive = ndSharedPtr<ndRenderPrimitive>(new ndRenderPrimitive(descriptor));
+
 	descriptor.m_meshBuildMode = ndRenderPrimitive::m_debugLineArray;
 	m_renderLinesPrimitive = ndSharedPtr<ndRenderPrimitive>(new ndRenderPrimitive(descriptor));
 }
 
-ndRenderPassDebugLines::~ndRenderPassDebugLines()
+ndRenderPassDebug::~ndRenderPassDebug()
 {
 	m_owner->m_cachedDebugLinePass = nullptr;
 }
 
-const ndArray<ndRenderPassDebugLines::ndLine>& ndRenderPassDebugLines::GetVertex() const
+const ndArray<ndRenderPassDebug::ndPoint>& ndRenderPassDebug::GetVertex() const
 {
 	return m_debugLines;
 }
 
-void ndRenderPassDebugLines::SetDebugDisplayOptions(const ndDebugLineOptions& options)
+void ndRenderPassDebug::SetDebugDisplayOptions(const ndDebugLineOptions& options)
 {
 	m_options = options;
 }
 
-void ndRenderPassDebugLines::RenderDebugLines()
+void ndRenderPassDebug::RenderDebugLines()
 {
 	const ndMatrix matrix(ndGetIdentityMatrix());
 	m_renderLinesPrimitive->Render(m_owner, matrix, m_debugLineArray);
 }
 
-void ndRenderPassDebugLines::GenerateBodyAABB()
+void ndRenderPassDebug::GenerateBodyAABB()
 {
 	ndCallback debugCallback(this);
 
@@ -143,7 +147,7 @@ void ndRenderPassDebugLines::GenerateBodyAABB()
 	}
 }
 
-void ndRenderPassDebugLines::GenerateBodyFrames()
+void ndRenderPassDebug::GenerateBodyFrames()
 {
 	ndFloat32 scale = ndFloat32(0.25f);
 
@@ -159,7 +163,7 @@ void ndRenderPassDebugLines::GenerateBodyFrames()
 	}
 }
 
-void ndRenderPassDebugLines::GenerateCenterOfMass()
+void ndRenderPassDebug::GenerateCenterOfMass()
 {
 	ndFloat32 scale = ndFloat32(0.25f);
 
@@ -176,7 +180,7 @@ void ndRenderPassDebugLines::GenerateCenterOfMass()
 	}
 }
 
-void ndRenderPassDebugLines::GenerateJointsDebug()
+void ndRenderPassDebug::GenerateJointsDebug()
 {
 	ndFloat32 scale = ndFloat32(0.25f);
 
@@ -191,7 +195,7 @@ void ndRenderPassDebugLines::GenerateJointsDebug()
 	}
 }
 
-void ndRenderPassDebugLines::GenerateModelsDebug()
+void ndRenderPassDebug::GenerateModelsDebug()
 {
 	ndFloat32 scale = ndFloat32(0.25f);
 
@@ -206,12 +210,12 @@ void ndRenderPassDebugLines::GenerateModelsDebug()
 	}
 }
 
-void ndRenderPassDebugLines::GenerateBroadphase()
+void ndRenderPassDebug::GenerateBroadphase()
 {
 	class ndDrawScene : public ndSceneTreeNotiFy, public ndCallback
 	{
 		public:
-		ndDrawScene(ndRenderPassDebugLines* const owner)
+		ndDrawScene(ndRenderPassDebug* const owner)
 			:ndSceneTreeNotiFy()
 			,ndCallback(owner)
 			,m_color(ndVector::m_wOne)
@@ -236,11 +240,13 @@ void ndRenderPassDebugLines::GenerateBroadphase()
 	m_world->DebugScene(&drawBroaphase);
 }
 
-void ndRenderPassDebugLines::RenderScene()
+void ndRenderPassDebug::RenderScene()
 {
 	ndAssert(m_world);
 
 	m_debugLines.SetCount(0);
+	m_debugPoints.SetCount(0);
+
 	if (m_options.m_showBroadPhase)
 	{
 		GenerateBroadphase();

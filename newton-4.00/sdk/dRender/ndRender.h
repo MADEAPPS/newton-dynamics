@@ -29,7 +29,7 @@ class ndRenderContext;
 class ndRenderSceneNode;
 class ndRenderSceneCamera;
 class ndRenderTextureCache;
-class ndRenderPassDebugLines;
+class ndRenderPassDebug;
 class ndRenderPassEnvironment;
 class ndRenderPassShadowsImplement;
 
@@ -103,7 +103,7 @@ class ndRender: public ndClassAlloc
 	ndVector m_sunLightIntesity;
 	ndVector m_backgroundColor;
 
-	ndRenderPassDebugLines* m_cachedDebugLinePass;
+	ndRenderPassDebug* m_cachedDebugLinePass;
 	ndRenderPassShadowsImplement* m_cachedShadowPass;
 	ndRenderPassEnvironment* m_cachedEnvironmentPass;
 
@@ -113,7 +113,7 @@ class ndRender: public ndClassAlloc
 	friend class ndRenderPassShadows;
 	friend class ndRenderSceneCamera;
 	friend class ndRenderTextureCache;
-	friend class ndRenderPassDebugLines;
+	friend class ndRenderPassDebug;
 	friend class ndRenderPassEnvironment;
 	friend class ndRenderPassTransparency;
 	friend class ndRenderPrimitiveImplement;

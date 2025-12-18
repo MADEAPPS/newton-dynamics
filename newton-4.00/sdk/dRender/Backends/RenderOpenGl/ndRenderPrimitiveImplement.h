@@ -48,6 +48,7 @@ class ndRenderPrimitiveImplement : public ndContainersFreeListAlloc<ndRenderPrim
 	void BuildDebugFlatShadedMesh(const ndRenderPrimitive::ndDescriptor& descriptor);
 	void BuildRenderInstanceMesh(const ndRenderPrimitive::ndDescriptor& descriptor);
 	void BuildDebugLineArray(const ndRenderPrimitive::ndDescriptor& descriptor);
+	void BuildDebugPointArray(const ndRenderPrimitive::ndDescriptor& descriptor);
 	void BuildWireframeDebugMesh(const ndRenderPrimitive::ndDescriptor& descriptor);
 	void BuildSetZBufferDebugMesh(const ndRenderPrimitive::ndDescriptor& descriptor);
 
@@ -96,6 +97,7 @@ class ndRenderPrimitiveImplement : public ndContainersFreeListAlloc<ndRenderPrim
 	ndRenderShaderSetZbufferCleanBlock m_setZbufferBlock;
 	ndRenderShaderStaticLinesArrayBlock m_staticLinesArrayBlock;
 	ndRenderShaderDynamicLinesArrayBlock m_dynamicLinesArrayBlock;
+	ndRenderShaderDynamicPointArrayBlock m_dynamicPointsArrayBlock;
 	ndRenderShaderDebugWireframeDiffuseBlock m_debugWireframeColorBlock;
 	ndRenderShaderDebugFlatShadedDiffusedBlock m_debugFlatShadedColorBlock;
 

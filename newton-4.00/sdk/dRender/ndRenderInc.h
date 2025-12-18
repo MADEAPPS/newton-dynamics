@@ -27,6 +27,7 @@
 #include <ndRenderPass.h>
 #include <ndRenderTexture.h>
 #include <ndRenderPassGui.h>
+#include <ndRenderPassDebug.h>
 #include <ndRenderPrimitive.h>
 #include <ndRenderPassColor.h>
 #include <ndRenderSceneNode.h>
@@ -34,7 +35,6 @@
 #include <ndRenderSceneCamera.h>
 #include <ndRenderPassShadows.h>
 #include <ndRenderTextureCache.h>
-#include <ndRenderPassDebugLines.h>
 #include <ndRenderPassEnvironment.h>
 #include <ndRenderPassTransparency.h>
 #include <ndRenderSceneNodeInstance.h>

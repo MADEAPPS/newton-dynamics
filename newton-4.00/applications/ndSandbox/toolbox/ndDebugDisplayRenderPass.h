@@ -13,7 +13,7 @@
 
 class ndDemoEntityManager;
 
-class ndDebugDisplayRenderPass : public ndRenderPassDebugLines
+class ndDebugDisplayRenderPass : public ndRenderPassDebug
 {
 	public:
 	class ndDebugMesh

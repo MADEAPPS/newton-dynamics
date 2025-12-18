@@ -15,7 +15,7 @@
 #include "ndDebugDisplayRenderPass.h"
 
 ndDebugDisplayRenderPass::ndDebugDisplayRenderPass(ndDemoEntityManager* const owner)
-	:ndRenderPassDebugLines(*owner->GetRenderer(), owner->GetWorld())
+	:ndRenderPassDebug(*owner->GetRenderer(), owner->GetWorld())
 	,m_awakeColor(ndFloat32(1.0f))
 	,m_sleepColor(ndFloat32(0.42f), ndFloat32(0.73f), ndFloat32(0.98f), ndFloat32(1.0f))
 	,m_manager(owner)
@@ -37,7 +37,7 @@ void ndDebugDisplayRenderPass::SetDebugDisplayOptions()
 	options.m_showCentreOfMass = m_manager->m_showCenterOfMass;
 	options.m_showJointDebugInfo = m_manager->m_showJointDebugInfo;
 	options.m_showModelsDebugInfo = m_manager->m_showModelsDebugInfo;
-	ndRenderPassDebugLines::SetDebugDisplayOptions(options);
+	ndRenderPassDebug::SetDebugDisplayOptions(options);
 
 	m_showCollisionMeshMode = m_manager->m_showCollisionMeshMode;
 }
@@ -159,7 +159,7 @@ void ndDebugDisplayRenderPass::RenderCollisionShape()
 void ndDebugDisplayRenderPass::RenderScene()
 {
 	m_world = m_manager->GetWorld();
-	ndRenderPassDebugLines::RenderScene();
+	ndRenderPassDebug::RenderScene();
 	if (m_showCollisionMeshMode)
 	{
 		RenderCollisionShape();

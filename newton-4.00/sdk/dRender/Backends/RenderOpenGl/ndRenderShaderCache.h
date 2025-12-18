@@ -31,6 +31,7 @@ class ndRenderShaderCache
 		struct
 		{
 			GLuint m_lineEffect;
+			GLuint m_pointEffect;
 			GLuint m_skyBoxEffect;
 			GLuint m_diffuseEffect;
 			GLuint m_wireFrameEffect;

@@ -51,6 +51,10 @@ ndRenderPrimitiveImplement::ndRenderPrimitiveImplement(ndRenderPrimitive* const 
 	{
 		BuildDebugLineArray(descriptor);
 	}
+	else if (descriptor.m_meshBuildMode == ndRenderPrimitive::m_debugPointArray)
+	{
+		BuildDebugPointArray(descriptor);
+	}
 	else
 	{
 		ndAssert(*descriptor.m_simpleMesh);
@@ -772,7 +776,7 @@ void ndRenderPrimitiveImplement::BuildDebugFlatShadedMesh(const ndRenderPrimitiv
 	}
 }
 
-void ndRenderPrimitiveImplement::BuildDebugLineArray(const ndRenderPrimitive::ndDescriptor& descriptor)
+void ndRenderPrimitiveImplement::BuildDebugLineArray(const ndRenderPrimitive::ndDescriptor&)
 {
 	glGenVertexArrays(1, &m_vertextArrayBuffer);
 	glBindVertexArray(m_vertextArrayBuffer);
@@ -794,6 +798,30 @@ void ndRenderPrimitiveImplement::BuildDebugLineArray(const ndRenderPrimitive::nd
 	glBindVertexArray(0);
 
 	m_dynamicLinesArrayBlock.GetShaderParameters(*m_context->m_shaderCache);
+}
+
+void ndRenderPrimitiveImplement::BuildDebugPointArray(const ndRenderPrimitive::ndDescriptor&)
+{
+	glGenVertexArrays(1, &m_vertextArrayBuffer);
+	glBindVertexArray(m_vertextArrayBuffer);
+
+	glGenBuffers(1, &m_vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+
+	m_vertexCount = 16 * 1024;
+	m_vertexSize = sizeof(glPointColor);
+	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(m_vertexCount * sizeof(glPointColor)), nullptr, GL_DYNAMIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPointColor), (void*)OFFSETOF(glPointColor, m_point));
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glPointColor), (void*)OFFSETOF(glPointColor, m_color));
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+	m_dynamicPointsArrayBlock.GetShaderParameters(*m_context->m_shaderCache);
 }
 
 void ndRenderPrimitiveImplement::BuildWireframeDebugMesh(const ndRenderPrimitive::ndDescriptor& descriptor)

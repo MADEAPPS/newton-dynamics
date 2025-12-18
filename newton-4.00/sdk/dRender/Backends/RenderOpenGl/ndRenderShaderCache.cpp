@@ -52,6 +52,7 @@ bool ndRenderShaderCache::CreateAllEffects()
 	m_diffuseShadowSkinEffect = CreateShaderEffect(m_directionalDiffuseShadowSkinVertex, m_directionalDiffuseShadowPixel);
 
 	// some special and debug effects
+	m_pointEffect = CreateShaderEffect(m_wireFrameVertexColor, m_wireFramePixel);
 	m_lineEffect = CreateShaderEffect(m_wireFrameVertexColor, m_wireFramePixel);
 	m_wireFrameEffect = CreateShaderEffect(m_wireFrameVertexColor, m_wireFramePixel);
 
