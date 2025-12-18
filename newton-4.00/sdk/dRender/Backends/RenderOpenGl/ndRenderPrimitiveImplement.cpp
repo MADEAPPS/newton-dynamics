@@ -774,12 +774,6 @@ void ndRenderPrimitiveImplement::BuildDebugFlatShadedMesh(const ndRenderPrimitiv
 
 void ndRenderPrimitiveImplement::BuildDebugLineArray(const ndRenderPrimitive::ndDescriptor& descriptor)
 {
-	//ndArray<ndInt32> m_lines(drawShapes.m_lines.GetCount());
-	//m_lines.SetCount(drawShapes.m_lines.GetCount());
-
-	//m_indexCount = ndInt32(m_lines.GetCount());
-	//ndInt32 vertexCount = ndVertexListToIndexList(&drawShapes.m_lines[0].m_posit.m_x, sizeof(glPositionNormal), 6, ndInt32(drawShapes.m_lines.GetCount()), &m_lines[0], GLfloat(1.0e-6f));
-
 	glGenVertexArrays(1, &m_vertextArrayBuffer);
 	glBindVertexArray(m_vertextArrayBuffer);
 
@@ -795,7 +789,10 @@ void ndRenderPrimitiveImplement::BuildDebugLineArray(const ndRenderPrimitive::nd
 
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glPointColor), (void*)OFFSETOF(glPointColor, m_color));
-		
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
 	m_dynamicLinesArrayBlock.GetShaderParameters(*m_context->m_shaderCache);
 }
 

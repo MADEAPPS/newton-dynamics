@@ -18,6 +18,7 @@
 #include "ndRenderShaderCache.h"
 #include "ndRenderPassShadows.h"
 #include "ndRenderTextureImage.h"
+#include "ndRenderPassDebugLines.h"
 #include "ndRenderPassEnvironment.h"
 #include "ndRenderPrimitiveImplement.h"
 #include "ndRenderPassShadowsImplement.h"
@@ -859,11 +860,26 @@ void ndRenderShaderDynamicLinesArrayBlock::Render(const ndRenderPrimitiveImpleme
 	const ndMatrix modelViewProjectionMatrixMatrix(modelMatrix * camera->m_invViewMatrix * camera->m_projectionMatrix);
 	const glMatrix glViewModelProjectionMatrix(modelViewProjectionMatrixMatrix);
 	glUniformMatrix4fv(m_viewModelProjectionMatrix, 1, false, &glViewModelProjectionMatrix[0][0]);
-	
-	//glBindVertexArray(self->m_vertextArrayBuffer);
-	//glDrawArrays(GL_LINES, 0, self->m_vertexCount);
-	//
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	//glBindVertexArray(0);
+
+	glBindVertexArray(self->m_vertextArrayBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, self->m_vertexBuffer);
+	const ndArray<ndRenderPassDebugLines::ndLine>& points = debugPass->GetVertex();
+	for (ndInt32 j = 0; j < points.GetCount(); j += self->m_vertexCount)
+	{
+		glPointColor* const bufferData = (glPointColor*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+		ndAssert(bufferData);
+		
+		const ndInt32 pointCount = ((j + self->m_vertexCount) > points.GetCount()) ? ndInt32(points.GetCount() - j) : self->m_vertexCount;
+		for (ndInt32 i = 0; i < pointCount; ++ i)
+		{
+			bufferData[i].m_point = glVector3(points[i + j].m_point);
+			bufferData[i].m_color = glVector3(points[i + j].m_color);
+		}
+		glUnmapBuffer(GL_ARRAY_BUFFER);
+		glDrawArrays(GL_LINES, 0, self->m_vertexCount / 2);
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 	glUseProgram(0);
 }

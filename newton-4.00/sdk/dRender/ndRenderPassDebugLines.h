@@ -34,6 +34,7 @@ class ndRenderPassDebugLines : public ndRenderPass
 	ndRenderPassDebugLines(ndRender* const owner, ndWorld* const world);
 	~ndRenderPassDebugLines();
 
+	const ndArray<ndLine>& GetVertex() const;
 	void SetDebugDisplayOptions(const ndDebugLineOptions& options);
 
 	protected:
