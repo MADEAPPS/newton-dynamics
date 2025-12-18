@@ -61,7 +61,7 @@ namespace ndQuadSpiderPlayer
 
 		ndMatrix matrix(ndPitchMatrix(m_pitch * ndDegreeToRad) * ndYawMatrix(m_yaw * ndDegreeToRad) * ndRollMatrix(m_roll * ndDegreeToRad));
 		matrix.m_posit.m_x = m_x;
-		matrix.m_posit.m_y = m_y - 0.0f;
+		matrix.m_posit.m_y = m_y - 0.1f;
 		matrix.m_posit.m_z = m_z;
 		for (ndInt32 i = 0; i < output.GetCount(); ++i)
 		{
@@ -365,7 +365,7 @@ m_duration = ndFloat32(5.0f);
 
 	void ndController::Debug(ndConstraintDebugCallback& callback) const
 	{
-		const ndEffectorInfo& leg = m_legs[0];
+		const ndEffectorInfo& leg = m_legs[1];
 		leg.m_calf->DebugJoint(callback);
 	}
 
