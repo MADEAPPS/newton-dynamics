@@ -121,7 +121,6 @@ namespace ndRagdoll
 			return false;
 		}
 
-
 		ndSharedPtr<ndBody> CreateBodyPart(
 			ndDemoEntityManager* const scene,
 			const ndSharedPtr<ndRenderSceneNode>& rootMesh,
@@ -224,7 +223,7 @@ namespace ndRagdoll
 				ndBodyDynamic* const body = bodyArray[i];
 				ndFloat32 volume = bodyArray[i]->GetCollisionShape().GetVolume();
 				ndFloat32 mass = density * volume;
-				ndTrace(("mass=%f  volume=%f\n", mass, volume));
+				//ndTrace(("mass=%f  volume=%f\n", mass, volume));
 
 				ndVector inertia(body->GetMassMatrix().Scale(mass));
 				body->SetMassMatrix(inertia);
