@@ -11,7 +11,6 @@
 #ifndef __DEMO_MAIN_FRAME_H__
 #define __DEMO_MAIN_FRAME_H__
 
-class ndUIEntity;
 class ndPhysicsWorld;
 
 class ndDemoEntityManager : public ndClassAlloc
@@ -88,6 +87,21 @@ class ndDemoEntityManager : public ndClassAlloc
 		public:
 		const char *m_name;
 		ndDemoCallbackLauncher m_demoLauncher;
+	};
+
+	class ndDemoUIpanel : public ndClassAlloc
+	{
+		public:
+		ndDemoUIpanel()
+			:ndClassAlloc()
+		{
+		}
+
+		virtual ~ndDemoUIpanel() 
+		{
+		}
+
+		virtual void Update(ndDemoEntityManager* const scene) = 0;
 	};
 
 	class ndDemoHelper: public ndClassAlloc
@@ -227,6 +241,7 @@ class ndDemoEntityManager : public ndClassAlloc
 	ndSharedPtr<ndRenderTexture> m_environmentTexture;
 
 	ndSharedPtr<ndDemoHelper> m_demoHelper;
+	ndSharedPtr<ndDemoUIpanel> m_demoUIpanel;
 	ndSharedPtr<ndRenderSceneNode> m_defaultCamera;
 
 	ndSharedPtr<OnPostUpdate> m_onPostUpdate;

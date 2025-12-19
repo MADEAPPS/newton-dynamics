@@ -430,6 +430,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	,m_debugDisplayRenderPass(nullptr)
 	,m_environmentTexture(nullptr)
 	,m_demoHelper(nullptr)
+	,m_demoUIpanel(nullptr)
 	,m_currentScene(DEFAULT_SCENE)
 	,m_lastCurrentScene(DEFAULT_SCENE)
 	,m_framesCount(0)
@@ -514,8 +515,8 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	// initialized the physics world for the new scene
 	//m_showUI = false;
-	m_showAABB = true;
-	m_showScene = true;
+	//m_showAABB = true;
+	//m_showScene = true;
 	//m_showConcaveEdge = true;
 	//m_showMeshSkeleton = true;
 	//m_autoSleepMode = false;
@@ -532,7 +533,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//m_showNormalForces = true;
 	//m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
-	m_showModelsDebugInfo = true;
+	//m_showModelsDebugInfo = true;
 	//m_showCollisionMeshMode = 1;
 	//m_showCollisionMeshMode = 2;	
 	//m_showCollisionMeshMode = 3;		// solid wire frame
@@ -1019,6 +1020,7 @@ void ndDemoEntityManager::LoadDemo(ndInt32 menuIndex)
 
 	// add a demo camera per demo
 	m_demoHelper = ndSharedPtr<ndDemoHelper>(nullptr);
+	m_demoUIpanel = ndSharedPtr<ndDemoUIpanel>(nullptr);
 	m_defaultCamera = ndSharedPtr<ndRenderSceneNode>(new ndDemoCameraNodeFlyby(*m_renderer));
 	m_renderer->SetCamera(m_defaultCamera);
 
@@ -1158,18 +1160,18 @@ void ndDemoEntityManager::RenderStats()
 				ImGui::End();
 			}
 		}
-
-		//m_demoHelper->ExpirationTime();
-		//{
-		//	m_demoHelper = ndSharedPtr<ndDemoHelper>(nullptr);
-		//}
-		//if (!m_demoHelper->ExpirationTime())
-		//{
-		//	m_demoHelper->PresentHelp(this);
-		//	ImGui::End();
-		//}
 	}
-	
+
+	if (*m_demoUIpanel)
+	{
+		bool dummy = true;
+		if (ImGui::Begin("Control panel", &dummy))
+		{
+			m_demoUIpanel->Update(this);
+			ImGui::End();
+		}
+	}
+
 	ShowMainMenuBar();
 }
 
