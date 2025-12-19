@@ -715,19 +715,42 @@ bool ndShapeInstance::ndDistanceCalculator::ClosestPoint()
 
 void ndShapeInstance::CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const
 {
-	ndMatrix scaleMatrix;
-	scaleMatrix[0] = matrix[0].Scale(m_scale.m_x);
-	scaleMatrix[1] = matrix[1].Scale(m_scale.m_y);
-	scaleMatrix[2] = matrix[2].Scale(m_scale.m_z);
-	scaleMatrix[3] = matrix[3];
-	scaleMatrix = m_alignmentMatrix * scaleMatrix;
+	ndShape* const shape = (ndShape*)m_shape;
+	if (!shape->GetAsShapeConvex())
+	{
+		ndMatrix scaleMatrix;
+		scaleMatrix[0] = matrix[0].Scale(m_scale.m_x);
+		scaleMatrix[1] = matrix[1].Scale(m_scale.m_y);
+		scaleMatrix[2] = matrix[2].Scale(m_scale.m_z);
+		scaleMatrix[3] = matrix[3];
+		scaleMatrix = m_alignmentMatrix * scaleMatrix;
 
-	const ndVector size0(m_shape->GetObbSize());
-	const ndVector origin(scaleMatrix.TransformVector(m_shape->GetObbOrigin()));
-	const ndVector size(scaleMatrix.m_front.Abs().Scale(size0.m_x) + scaleMatrix.m_up.Abs().Scale(size0.m_y) + scaleMatrix.m_right.Abs().Scale(size0.m_z));
+		const ndVector size0(m_shape->GetObbSize());
+		const ndVector origin(scaleMatrix.TransformVector(m_shape->GetObbOrigin()));
+		const ndVector size(scaleMatrix.m_front.Abs().Scale(size0.m_x) + scaleMatrix.m_up.Abs().Scale(size0.m_y) + scaleMatrix.m_right.Abs().Scale(size0.m_z));
 
-	p0 = (origin - size - m_padding) & ndVector::m_triplexMask;
-	p1 = (origin + size + m_padding) & ndVector::m_triplexMask;
-	ndAssert(p0.m_w == ndFloat32(0.0f));
-	ndAssert(p1.m_w == ndFloat32(0.0f));
+		p0 = (origin - size - m_padding) & ndVector::m_triplexMask;
+		p1 = (origin + size + m_padding) & ndVector::m_triplexMask;
+		ndAssert(p0.m_w == ndFloat32(0.0f));
+		ndAssert(p1.m_w == ndFloat32(0.0f));
+	}
+	else
+	{
+		for (ndInt32 i = 0; i < 3; ++i)
+		{
+			ndVector dir(ndVector::m_zero);
+
+			dir[i] = ndFloat32(-1.0f);
+			const ndVector q0(matrix.TransformVector(SupportVertex(matrix.UnrotateVector(dir))));
+			p0[i] = q0[i];
+
+			dir[i] = ndFloat32(1.0f);
+			const ndVector q1(matrix.TransformVector(SupportVertex(matrix.UnrotateVector(dir))));
+			p1[i] = q1[i];
+		}
+		p0 -= m_padding;
+		p1 += m_padding;
+		p0.m_w = ndFloat32(0.0f);
+		p1.m_w = ndFloat32(0.0f);
+	}
 }
