@@ -284,15 +284,16 @@ ndShapeCompound::ndShapeCompound(const ndShapeCompound& source)
 
 	if (source.m_root) 
 	{
-		ndNodeBase* pool[D_COMPOUND_STACK_DEPTH];
-		ndNodeBase* parents[D_COMPOUND_STACK_DEPTH];
-		pool[0] = source.m_root;
-		parents[0] = nullptr;
-		ndInt32 stack = 1;
-		while (stack) 
+		ndFixSizeArray<ndNodeBase*, D_COMPOUND_STACK_DEPTH> pool;
+		ndFixSizeArray<ndNodeBase*, D_COMPOUND_STACK_DEPTH> parents;
+
+		pool.PushBack(source.m_root);
+		parents.PushBack(nullptr);
+
+		while (pool.GetCount())
 		{
-			stack--;
-			ndNodeBase* const sourceNode = pool[stack];
+			ndNodeBase* const sourceNode = pool.Pop();
+			ndNodeBase* const stackParent = parents.Pop();
 	
 			ndNodeBase* parent = nullptr;
 			if (sourceNode->m_type == m_node) 
@@ -304,7 +305,7 @@ ndShapeCompound::ndShapeCompound(const ndShapeCompound& source)
 				}
 				else 
 				{
-					parent->m_parent = parents[stack];
+					parent->m_parent = stackParent;
 					if (parent->m_parent) 
 					{
 						if (sourceNode->m_parent->m_left == sourceNode) 
@@ -323,7 +324,7 @@ ndShapeCompound::ndShapeCompound(const ndShapeCompound& source)
 			{
 				ndNodeBase* const node = m_array.Find(sourceNode->m_myNode->GetKey())->GetInfo();
 				ndAssert(node);
-				node->m_parent = parents[stack];
+				node->m_parent = stackParent;
 				if (node->m_parent) 
 				{
 					if (sourceNode->m_parent->m_left == sourceNode) 
@@ -344,18 +345,14 @@ ndShapeCompound::ndShapeCompound(const ndShapeCompound& source)
 	
 			if (sourceNode->m_left) 
 			{
-				parents[stack] = parent;
-				pool[stack] = sourceNode->m_left;
-				stack++;
-				ndAssert(stack < D_COMPOUND_STACK_DEPTH);
+				parents.PushBack(parent);
+				pool.PushBack(sourceNode->m_left);
 			}
 	
 			if (sourceNode->m_right) 
 			{
-				parents[stack] = parent;
-				pool[stack] = sourceNode->m_right;
-				stack++;
-				ndAssert(stack < D_COMPOUND_STACK_DEPTH);
+				parents.PushBack(parent);
+				pool.PushBack(sourceNode->m_right);
 			}
 		}
 	}
@@ -490,21 +487,126 @@ void ndShapeCompound::CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVect
 	}
 }
 
-ndVector ndShapeCompound::SupportVertex(const ndVector&) const
+ndVector ndShapeCompound::SupportVertex(const ndVector& dir) const
 {
-	ndAssert(0);
-	return ndVector::m_zero;
+	ndVector support(ndVector::m_zero);
+	ndFloat32 maxDist2 = ndFloat32(-1.0e20f);
+
+	ndAssert(dir.m_w == ndFloat32(0.0f));
+	if (m_array.GetCount() < 8)
+	{
+		// brute force calculation
+		ndTreeArray::Iterator iter(m_array);
+		for (iter.Begin(); iter; iter++)
+		{
+			ndNodeBase* const node = iter.GetNode()->GetInfo();
+			ndShapeInstance* const collision = node->GetShape();
+
+			const ndMatrix& localMatrix = collision->GetLocalMatrix();
+			const ndVector localDir(localMatrix.UnrotateVector(dir));
+			const ndVector supportPoint(localMatrix.TransformVector(collision->SupportVertex(localDir)));
+			ndFloat32 dist2 = supportPoint.DotProduct(dir).GetScalar();
+			if (dist2 > maxDist2)
+			{
+				maxDist2 = dist2;
+				support = supportPoint;
+			}
+		}
+	}
+	else
+	{
+		// the tree is deep enought that th eoverhead of traversin 
+		// the hiearchy is smaller that teh brrute force
+		ndAssert(m_root);
+
+		const ndVector mask(dir < ndVector::m_zero);
+		auto BoxSupport = [this, &dir, &mask](const ndNodeBase* const node)
+		{
+			const ndVector support (node->m_p1.Select(node->m_p0, mask));
+			return support.DotProduct(dir).GetScalar();
+		};
+
+		ndFixSizeArray<ndFloat32, D_COMPOUND_STACK_DEPTH> distance;
+		ndFixSizeArray<const ndNodeBase*, D_COMPOUND_STACK_DEPTH> stackPool;
+
+		stackPool.PushBack(m_root);
+		distance.PushBack(BoxSupport(m_root));
+
+		ndFloat32 limitingDist2 = ndFloat32(-1.0e20f);
+		while (stackPool.GetCount())
+		{
+			const ndNodeBase* const self = stackPool.Pop();
+			ndAssert(self);
+			ndFloat32 dist = distance.Pop();
+
+			if (dist < limitingDist2)
+			{
+				break;
+			}
+			if (self->m_type == m_leaf)
+			{
+				ndShapeInstance* const collision = self->GetShape();
+				const ndMatrix& localMatrix = collision->GetLocalMatrix();
+				const ndVector localDir(localMatrix.UnrotateVector(dir));
+				const ndVector supportPoint(localMatrix.TransformVector(collision->SupportVertex(localDir)));
+				ndFloat32 dist2 = supportPoint.DotProduct(dir).GetScalar();
+				if (dist2 > maxDist2)
+				{
+					maxDist2 = dist2;
+					support = supportPoint;
+				}
+				limitingDist2 = ndMax (limitingDist2, dist2);
+			}
+			else
+			{
+				ndAssert(self->m_type == m_node);
+				const ndNodeBase* const left = self->m_left;
+				ndAssert(left);
+				ndFloat32 dist1 = BoxSupport(left);
+				if (dist1 > limitingDist2)
+				{
+					stackPool.PushBack(left);
+					distance.PushBack(dist1);
+					ndInt32 j = stackPool.GetCount() - 1;
+					for (; j && (dist1 < distance[j - 1]); --j)
+					{
+						stackPool[j] = stackPool[j - 1];
+						distance[j] = distance[j - 1];
+					}
+					stackPool[j] = left;
+					distance[j] = dist1;
+				}
+			
+				const ndNodeBase* const right = self->m_right;
+				ndAssert(right);
+				dist1 = BoxSupport(right);
+				if (dist1 > limitingDist2)
+				{
+					stackPool.PushBack(right);
+					distance.PushBack(dist1);
+					ndInt32 j = stackPool.GetCount() - 1;
+					for (; j && (dist1 < distance[j - 1]); --j)
+					{
+						stackPool[j] = stackPool[j - 1];
+						distance[j] = distance[j - 1];
+					}
+					stackPool[j] = right;
+					distance[j] = dist1;
+				}
+			}
+		}
+	}
+	return support;
 }
 
-ndVector ndShapeCompound::SupportVertexSpecialProjectPoint(const ndVector&, const ndVector&) const
+ndVector ndShapeCompound::SupportVertexSpecialProjectPoint(const ndVector&, const ndVector& dir) const
 { 
 	ndAssert(0);
-	return ndVector::m_zero;
+	return SupportVertex(dir);
 }
 
 ndVector ndShapeCompound::SupportVertexSpecial(const ndVector& dir, ndFloat32) const
 {
-	ndAssert(0);
 	return SupportVertex(dir);
 }
 
@@ -551,19 +653,18 @@ ndFloat32 ndShapeCompound::RayCast(ndRayCastNotify& callback, const ndVector& lo
 		return ndFloat32 (1.2f);
 	}
 
-	ndFloat32 distance[D_COMPOUND_STACK_DEPTH];
-	const ndNodeBase* stackPool[D_COMPOUND_STACK_DEPTH];
+	ndFixSizeArray<ndFloat32, D_COMPOUND_STACK_DEPTH> distance;
+	ndFixSizeArray<const ndNodeBase*, D_COMPOUND_STACK_DEPTH> stackPool;
 
 	ndFastRay ray (localP0, localP1);
 
-	ndInt32 stack = 1;
-	stackPool[0] = m_root;
-	distance[0] = ray.BoxIntersect(m_root->m_p0, m_root->m_p1);
+	stackPool.PushBack(m_root);
+	distance.PushBack (ray.BoxIntersect(m_root->m_p0, m_root->m_p1));
 
-	while (stack) 
+	while (stackPool.GetCount())
 	{
-		stack --;
-		ndFloat32 dist = distance[stack];
+		ndFloat32 dist = distance.Pop();
+		const ndNodeBase* const self = stackPool.Pop();
 
 		if (dist > maxT) 
 		{
@@ -571,13 +672,12 @@ ndFloat32 ndShapeCompound::RayCast(ndRayCastNotify& callback, const ndVector& lo
 		} 
 		else 
 		{
-			const ndNodeBase* const me = stackPool[stack];
-			ndAssert (me);
-			if (me->m_type == m_leaf) 
+			ndAssert (self);
+			if (self->m_type == m_leaf)
 			{
 				ndContactPoint tmpContactOut;
 				tmpContactOut.Init();
-				ndShapeInstance* const shapeInstance = me->GetShape();
+				ndShapeInstance* const shapeInstance = self->GetShape();
 				const ndVector p0 (shapeInstance->GetLocalMatrix().UntransformVector (localP0) & ndVector::m_triplexMask);
 				const ndVector p1 (shapeInstance->GetLocalMatrix().UntransformVector (localP1) & ndVector::m_triplexMask);
 				ndFloat32 param = shapeInstance->RayCast(callback, p0, p1, body, tmpContactOut, maxT);
@@ -593,39 +693,39 @@ ndFloat32 ndShapeCompound::RayCast(ndRayCastNotify& callback, const ndVector& lo
 			} 
 			else 
 			{
-				ndAssert (me->m_type == m_node);
-				const ndNodeBase* const left = me->m_left;
+				ndAssert (self->m_type == m_node);
+				const ndNodeBase* const left = self->m_left;
 				ndAssert (left);
 				ndFloat32 dist1 = ray.BoxIntersect(left->m_p0, left->m_p1);
 				if (dist1 < maxT) 
 				{
-					ndInt32 j = stack;
-					for ( ; j && (dist1 > distance[j - 1]); j --) 
+					stackPool.PushBack(left);
+					distance.PushBack(dist1);
+					ndInt32 j = stackPool.GetCount() - 1;
+					for ( ; j && (dist1 > distance[j - 1]); --j) 
 					{
 						stackPool[j] = stackPool[j - 1];
 						distance[j] = distance[j - 1];
 					}
 					stackPool[j] = left;
 					distance[j] = dist1;
-					stack++;
-					ndAssert (stack < ndInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
 				}
 				
-				const ndNodeBase* const right = me->m_right;
+				const ndNodeBase* const right = self->m_right;
 				ndAssert (right);
 				dist1 = ray.BoxIntersect(right->m_p0, right->m_p1);
 				if (dist1 < maxT) 
 				{
-					ndInt32 j = stack;
-					for ( ; j && (dist1 > distance[j - 1]); j --) 
+					stackPool.PushBack(right);
+					distance.PushBack(dist1);
+					ndInt32 j = stackPool.GetCount() - 1;
+					for ( ; j && (dist1 > distance[j - 1]); --j) 
 					{
 						stackPool[j] = stackPool[j - 1];
 						distance[j] = distance[j - 1];
 					}
 					stackPool[j] = right;
 					distance[j] = dist1;
-					stack++;
-					ndAssert (stack < ndInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
 				}
 			}
 		}
@@ -1022,7 +1122,6 @@ void ndShapeCompound::EndAddRemove()
 	}
 }
 
-//void ndShapeCompound::RemoveNode(ndTreeArray::ndNode* const node)
 void ndShapeCompound::RemoveNode(ndTreeArray::ndNode* const)
 {
 	ndAssert(0);

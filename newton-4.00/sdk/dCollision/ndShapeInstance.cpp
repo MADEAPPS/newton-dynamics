@@ -716,7 +716,8 @@ bool ndShapeInstance::ndDistanceCalculator::ClosestPoint()
 void ndShapeInstance::CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const
 {
 	ndShape* const shape = (ndShape*)m_shape;
-	if (!shape->GetAsShapeConvex())
+	//if (!shape->GetAsShapeConvex())
+	if (shape->GetAsShapeStaticMesh())
 	{
 		ndMatrix scaleMatrix;
 		scaleMatrix[0] = matrix[0].Scale(m_scale.m_x);
@@ -738,19 +739,22 @@ void ndShapeInstance::CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVect
 	{
 		for (ndInt32 i = 0; i < 3; ++i)
 		{
-			ndVector dir(ndVector::m_zero);
+			//ndVector dir__(ndVector::m_zero);
+			//dir__[i] = ndFloat32(-1.0f);
+			//const ndVector q0(matrix.TransformVector(SupportVertex(matrix.UnrotateVector(dir__))));
+			//ndFloat32 x0 = q0[i];
+			//
+			//dir__[i] = ndFloat32(1.0f);
+			//const ndVector q1(matrix.TransformVector(SupportVertex(matrix.UnrotateVector(dir__))));
+			//ndFloat32 x1 = q1[i];
 
-			dir[i] = ndFloat32(-1.0f);
-			const ndVector q0(matrix.TransformVector(SupportVertex(matrix.UnrotateVector(dir))));
-			p0[i] = q0[i];
-
-			dir[i] = ndFloat32(1.0f);
-			const ndVector q1(matrix.TransformVector(SupportVertex(matrix.UnrotateVector(dir))));
-			p1[i] = q1[i];
+			const ndVector dir(matrix[0][i], matrix[1][i], matrix[2][i], ndFloat32 (0.0f));
+			p1[i] = matrix.TransformVector(SupportVertex(dir))[i];
+			p0[i] = matrix.TransformVector(SupportVertex(dir * ndVector::m_negOne))[i];
 		}
 		p0 -= m_padding;
 		p1 += m_padding;
-		p0.m_w = ndFloat32(0.0f);
-		p1.m_w = ndFloat32(0.0f);
+		p0 = p0 & ndVector::m_triplexMask;
+		p1 = p1 & ndVector::m_triplexMask;
 	}
 }
