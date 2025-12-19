@@ -266,6 +266,7 @@ class ndBigVector: public ndClassAlloc
 	inline ndBigVector Normalize() const
 	{
 		ndFloat64 mag2 = DotProduct(*this).GetScalar();
+		ndAssert(mag2 > ndFloat32(0.0f));
 		return Scale(ndFloat64 (1.0f) / sqrt (mag2));
 	}
 
@@ -809,6 +810,7 @@ class ndBigVector : public ndClassAlloc
 	inline ndBigVector Normalize() const
 	{
 		ndFloat64 mag2 = DotProduct(*this).GetScalar();
+		ndAssert(mag2 > ndFloat32(0.0f));
 		return Scale(ndFloat64(1.0f) / sqrt(mag2));
 	}
 
@@ -1479,7 +1481,9 @@ class ndVector : public ndClassAlloc
 
 	inline ndVector Normalize() const
 	{
-		return Scale(ndFloat32(1.0f) / ndSqrt(DotProduct(*this).GetScalar()));
+		ndFloat64 mag2 = DotProduct(*this).GetScalar();
+		ndAssert(mag2 > ndFloat32(0.0f));
+		return Scale(ndFloat32(1.0f) / ndSqrt(mag2));
 	}
 
 	// relational operators
