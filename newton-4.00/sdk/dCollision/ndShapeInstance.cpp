@@ -716,7 +716,6 @@ bool ndShapeInstance::ndDistanceCalculator::ClosestPoint()
 void ndShapeInstance::CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const
 {
 	ndShape* const shape = (ndShape*)m_shape;
-	//if (!shape->GetAsShapeConvex())
 	if (shape->GetAsShapeStaticMesh())
 	{
 		ndMatrix scaleMatrix;
