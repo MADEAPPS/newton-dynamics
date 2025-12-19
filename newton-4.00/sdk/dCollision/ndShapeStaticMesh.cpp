@@ -52,10 +52,16 @@ ndFloat32 ndShapeStaticMesh::GetBoxMaxRadius() const
 	return ndFloat32(0.0f);
 }
 
-ndVector ndShapeStaticMesh::SupportVertex(const ndVector&) const
+ndVector ndShapeStaticMesh::SupportVertex(const ndVector& dir) const
 {
-	ndAssert(0);
-	return ndVector::m_zero;
+	const ndVector size(GetObbSize());
+	const ndVector origin (GetObbOrigin());
+	const ndVector p0(origin - size);
+	const ndVector p1(origin + size);
+
+	const ndVector mask(dir < ndVector::m_zero);
+	const ndVector support(p1.Select(p0, mask));
+	return support;
 }
 
 ndVector ndShapeStaticMesh::SupportVertexSpecial(const ndVector& dir, ndFloat32) const
@@ -66,6 +72,7 @@ ndVector ndShapeStaticMesh::SupportVertexSpecial(const ndVector& dir, ndFloat32)
 
 ndVector ndShapeStaticMesh::SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector&) const
 {
+	ndAssert(0);
 	return point;
 }
 
