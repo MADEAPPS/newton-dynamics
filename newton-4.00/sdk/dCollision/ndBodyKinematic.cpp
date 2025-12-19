@@ -765,10 +765,7 @@ void ndBodyKinematic::SetMatrixUpdateScene(const ndMatrix& matrix)
 			{
 				bodyNode->SetAabb(m_minAabb, m_maxAabb);
 			}
-			//sceneEquilibrium = ndUnsigned8(!sceneForceUpdate & (test != 0));
 		}
-		//m_sceneForceUpdate = 0;
-		//m_sceneEquilibrium = sceneEquilibrium;
 
 		m_equilibrium = 0;
 		m_sceneEquilibrium = 0;
