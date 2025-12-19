@@ -969,7 +969,6 @@ void ndShapeConvexHull::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& d
 {
 	ndVector vertex[512];
 	ndShapeDebugNotify::ndEdgeType edgeType[512];
-	//memset(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType));
 	ndMemSet(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType)/ sizeof(edgeType[0]));
 
 	for (ndInt32 i = 0; i < m_faceCount; ++i) 

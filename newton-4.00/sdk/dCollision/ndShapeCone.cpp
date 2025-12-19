@@ -135,7 +135,7 @@ void ndShapeCone::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCa
 	ndVector pool[NUMBER_OF_DEBUG_SEGMENTS + 1];
 	ndVector face[NUMBER_OF_DEBUG_SEGMENTS];
 	ndShapeDebugNotify::ndEdgeType edgeType[NUMBER_OF_DEBUG_SEGMENTS];
-	memset(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType));
+	ndMemSet(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType)/sizeof (edgeType[0]));
 
 	ndFloat32 angle = ndFloat32(0.0f);
 	for (ndInt32 i = 0; i < NUMBER_OF_DEBUG_SEGMENTS; ++i) 
@@ -145,6 +145,7 @@ void ndShapeCone::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCa
 		pool[i].m_x = -m_height;
 		pool[i].m_y = y;
 		pool[i].m_z = z;
+		pool[i].m_w = ndFloat32 (0.0f);
 		angle += ndFloat32 (2.0f) * ndPi / ndFloat32(NUMBER_OF_DEBUG_SEGMENTS);
 	}
 

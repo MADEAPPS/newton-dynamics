@@ -177,7 +177,6 @@ void ndShapeHeightfield::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& 
 	ndVector triangle[3];
 
 	ndShapeDebugNotify::ndEdgeType edgeType[4];
-	//memset(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType));
 	ndMemSet(edgeType, ndShapeDebugNotify::m_shared, 4);
 
 	const ndInt32* const indirectIndex = GetIndexList();

@@ -40,7 +40,7 @@ ndRender::ndRender(ndSharedPtr<ndUserCallback>& owner, ndInt32 width, ndInt32 he
 	,m_sunLightAmbient(ndFloat32(0.2f), ndFloat32(0.2f), ndFloat32(0.2f), ndFloat32(0.0f))
 	,m_sunLightIntesity(ndFloat32(0.7f), ndFloat32(0.7f), ndFloat32(0.7f), ndFloat32(0.0f))
 	,m_backgroundColor(ndFloat32(0.45f), ndFloat32(0.55f), ndFloat32(0.60f), ndFloat32(1.0f))
-	,m_cachedDebugLinePass(nullptr)
+	,m_cachedDebugPass(nullptr)
 	,m_cachedShadowPass(nullptr)
 	,m_cachedEnvironmentPass(nullptr)
 {

@@ -37,7 +37,6 @@ class ndBigVector: public ndClassAlloc
 	#define PERMUT_MASK_DOUBLE(y, x) _MM_SHUFFLE2 (y, x)
 
 	public:
-	//D_OPERATOR_NEW_AND_DELETE
 
 	inline ndBigVector()
 	{
@@ -1085,8 +1084,6 @@ class ndBigVector : public ndClassAlloc
 } D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif
-
-
 
 #ifdef D_NEWTON_USE_DOUBLE
 	//typedef ndBigVector ndVector;

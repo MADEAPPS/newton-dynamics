@@ -854,7 +854,7 @@ void ndRenderShaderDynamicLinesArrayBlock::Render(const ndRenderPrimitiveImpleme
 	const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
 	
 	glUseProgram(m_shader);
-	ndRenderPassDebug* const debugPass = render->m_cachedDebugLinePass;
+	ndRenderPassDebug* const debugPass = render->m_cachedDebugPass;
 	ndAssert(debugPass);
 
 	const ndMatrix modelViewProjectionMatrixMatrix(modelMatrix * camera->m_invViewMatrix * camera->m_projectionMatrix);
@@ -865,7 +865,7 @@ void ndRenderShaderDynamicLinesArrayBlock::Render(const ndRenderPrimitiveImpleme
 	glBindBuffer(GL_ARRAY_BUFFER, self->m_vertexBuffer);
 	const ndArray<ndRenderPassDebug::ndPoint>& points = debugPass->GetVertex();
 
-	glLineWidth(2.0f);
+	glLineWidth(ndReal(2.0f));
 	for (ndInt32 j = 0; j < points.GetCount(); j += self->m_vertexCount)
 	{
 		glPointColor* const bufferData = (glPointColor*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
@@ -881,7 +881,7 @@ void ndRenderShaderDynamicLinesArrayBlock::Render(const ndRenderPrimitiveImpleme
 		glDrawArrays(GL_LINES, 0, pointCount);
 	}
 
-	glLineWidth(1.0f);
+	glLineWidth(ndReal(1.0f));
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 	glUseProgram(0);
@@ -890,53 +890,52 @@ void ndRenderShaderDynamicLinesArrayBlock::Render(const ndRenderPrimitiveImpleme
 // *********************************************************************
 // 
 // *********************************************************************
-void ndRenderShaderDynamicPointArrayBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
+void ndRenderShaderDynamicPointsArrayBlock::GetShaderParameters(const ndRenderShaderCache* const shaderCache)
 {
 	SetParameters(shaderCache->m_pointEffect);
 	EndParameters();
 }
 
-void ndRenderShaderDynamicPointArrayBlock::SetParameters(GLuint shader)
+void ndRenderShaderDynamicPointsArrayBlock::SetParameters(GLuint shader)
 {
 	ndRenderShaderBlock::SetParameters(shader);
 	m_viewModelProjectionMatrix = glGetUniformLocation(m_shader, "viewModelProjectionMatrix");
 }
 
-void ndRenderShaderDynamicPointArrayBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
+void ndRenderShaderDynamicPointsArrayBlock::Render(const ndRenderPrimitiveImplement* const self, const ndRender* const render, const ndMatrix& modelMatrix) const
 {
-	ndAssert(0);
-	//const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
-	//
-	//glUseProgram(m_shader);
-	//ndRenderPassDebug* const debugPass = render->m_cachedDebugLinePass;
-	//ndAssert(debugPass);
-	//
-	//const ndMatrix modelViewProjectionMatrixMatrix(modelMatrix * camera->m_invViewMatrix * camera->m_projectionMatrix);
-	//const glMatrix glViewModelProjectionMatrix(modelViewProjectionMatrixMatrix);
-	//glUniformMatrix4fv(m_viewModelProjectionMatrix, 1, false, &glViewModelProjectionMatrix[0][0]);
-	//
-	//glBindVertexArray(self->m_vertextArrayBuffer);
-	//glBindBuffer(GL_ARRAY_BUFFER, self->m_vertexBuffer);
-	//const ndArray<ndRenderPassDebug::ndPoint>& points = debugPass->GetVertex();
-	//
-	//glLineWidth(2.0f);
-	//for (ndInt32 j = 0; j < points.GetCount(); j += self->m_vertexCount)
-	//{
-	//	glPointColor* const bufferData = (glPointColor*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-	//	ndAssert(bufferData);
-	//
-	//	const ndInt32 pointCount = ((j + self->m_vertexCount) > points.GetCount()) ? ndInt32(points.GetCount() - j) : self->m_vertexCount;
-	//	for (ndInt32 i = 0; i < pointCount; ++i)
-	//	{
-	//		bufferData[i].m_point = glVector3(points[i + j].m_point);
-	//		bufferData[i].m_color = glVector3(points[i + j].m_color);
-	//	}
-	//	glUnmapBuffer(GL_ARRAY_BUFFER);
-	//	glDrawArrays(GL_LINES, 0, pointCount);
-	//}
-	//
-	//glLineWidth(1.0f);
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
-	//glBindVertexArray(0);
-	//glUseProgram(0);
+	const ndRenderSceneCamera* const camera = render->GetCamera()->FindCameraNode();
+	
+	glUseProgram(m_shader);
+	ndRenderPassDebug* const debugPass = render->m_cachedDebugPass;
+	ndAssert(debugPass);
+	
+	const ndMatrix modelViewProjectionMatrixMatrix(modelMatrix * camera->m_invViewMatrix * camera->m_projectionMatrix);
+	const glMatrix glViewModelProjectionMatrix(modelViewProjectionMatrixMatrix);
+	glUniformMatrix4fv(m_viewModelProjectionMatrix, 1, false, &glViewModelProjectionMatrix[0][0]);
+	
+	glBindVertexArray(self->m_vertextArrayBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, self->m_vertexBuffer);
+	const ndArray<ndRenderPassDebug::ndPoint>& points = debugPass->GetPoints();
+	
+	glPointSize(ndReal(8.0f));
+	for (ndInt32 j = 0; j < points.GetCount(); j += self->m_vertexCount)
+	{
+		glPointColor* const bufferData = (glPointColor*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+		ndAssert(bufferData);
+	
+		const ndInt32 pointCount = ((j + self->m_vertexCount) > points.GetCount()) ? ndInt32(points.GetCount() - j) : self->m_vertexCount;
+		for (ndInt32 i = 0; i < pointCount; ++i)
+		{
+			bufferData[i].m_point = glVector3(points[i + j].m_point);
+			bufferData[i].m_color = glVector3(points[i + j].m_color);
+		}
+		glUnmapBuffer(GL_ARRAY_BUFFER);
+		glDrawArrays(GL_POINTS, 0, pointCount);
+	}
+	
+	glPointSize(ndReal(1.0f));
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	glUseProgram(0);
 }

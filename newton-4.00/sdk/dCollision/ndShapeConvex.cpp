@@ -67,9 +67,7 @@ void ndShapeConvex::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debug
 	ndAssert(m_edgeCount < D_MAX_EDGE_COUNT);
 	ndAssert(m_vertexCount < D_MAX_EDGE_COUNT);
 
-	//memset(mark, 0, sizeof(mark));
 	ndMemSet(mark, ndInt8(0), D_MAX_EDGE_COUNT);
-	//memset(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType));
 	ndMemSet(edgeType, ndShapeDebugNotify::m_shared, D_MAX_EDGE_COUNT);
 	matrix.TransformTriplex(&tmp[0].m_x, sizeof(ndVector), &m_vertex[0].m_x, sizeof(ndVector), m_vertexCount);
 	for (ndInt32 i = 0; i < m_edgeCount; ++i) 

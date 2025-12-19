@@ -229,7 +229,7 @@ inline void strtolwr(char* const string)
 
 // visual studion work around since microsf does not want to admit that
 // that ther is a bug in function exp, that can race exeption in some cases.
-D_CORE_API ndFloat32 ndExp_VS__Fix(ndFloat32 x);
+D_CORE_API ndFloat32 ndExp_VS_Fix(ndFloat32 x);
 
 /// Returns the time in micro seconds since application started 
 D_CORE_API ndUnsigned64 ndGetTimeInMicroseconds();

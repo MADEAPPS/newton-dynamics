@@ -410,7 +410,6 @@ ndShapeInstance& ndShapeInstance::operator=(const ndShapeInstance& instance)
 	m_ownerBody = instance.m_ownerBody;
 
 	m_subCollisionHandle = instance.m_subCollisionHandle;
-	//m_parent____ = instance.m_parent____;
 
 	return *this;
 }

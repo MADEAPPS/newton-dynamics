@@ -33,6 +33,7 @@ class ndRenderPassDebug : public ndRenderPass
 			memset(this, 0, sizeof(ndDebugLineOptions));
 		}
 
+		bool m_showContacts;
 		bool m_showBodyAABB;
 		bool m_showBodyFrame;
 		bool m_showBroadPhase;
@@ -45,12 +46,13 @@ class ndRenderPassDebug : public ndRenderPass
 	~ndRenderPassDebug();
 
 	const ndArray<ndPoint>& GetVertex() const;
+	const ndArray<ndPoint>& GetPoints() const;
 	void SetDebugDisplayOptions(const ndDebugLineOptions& options);
 
 	protected:
 	class ndCallback;
-	void RenderDebugLines();
 	void GenerateBodyAABB();
+	void GenerateContacts();
 	void GenerateBroadphase();
 	void GenerateBodyFrames();
 	void GenerateJointsDebug();

@@ -98,7 +98,7 @@ ndRenderPassDebug::ndRenderPassDebug(ndRender* const owner, ndWorld* const world
 	,m_world(world)
 {
 	ndRender* const render = m_owner;
-	m_owner->m_cachedDebugLinePass = this;
+	m_owner->m_cachedDebugPass = this;
 	ndRenderPrimitive::ndDescriptor descriptor(render);
 
 	descriptor.m_meshBuildMode = ndRenderPrimitive::m_debugPointArray;
@@ -110,7 +110,12 @@ ndRenderPassDebug::ndRenderPassDebug(ndRender* const owner, ndWorld* const world
 
 ndRenderPassDebug::~ndRenderPassDebug()
 {
-	m_owner->m_cachedDebugLinePass = nullptr;
+	m_owner->m_cachedDebugPass = nullptr;
+}
+
+const ndArray<ndRenderPassDebug::ndPoint>& ndRenderPassDebug::GetPoints() const
+{
+	return m_debugPoints;
 }
 
 const ndArray<ndRenderPassDebug::ndPoint>& ndRenderPassDebug::GetVertex() const
@@ -121,12 +126,6 @@ const ndArray<ndRenderPassDebug::ndPoint>& ndRenderPassDebug::GetVertex() const
 void ndRenderPassDebug::SetDebugDisplayOptions(const ndDebugLineOptions& options)
 {
 	m_options = options;
-}
-
-void ndRenderPassDebug::RenderDebugLines()
-{
-	const ndMatrix matrix(ndGetIdentityMatrix());
-	m_renderLinesPrimitive->Render(m_owner, matrix, m_debugLineArray);
 }
 
 void ndRenderPassDebug::GenerateBodyAABB()
@@ -240,6 +239,79 @@ void ndRenderPassDebug::GenerateBroadphase()
 	m_world->DebugScene(&drawBroaphase);
 }
 
+void ndRenderPassDebug::GenerateContacts()
+{
+	//ndWorld* const world = scene->GetWorld();
+	//GLuint shader = scene->GetShaderCache().m_wireFrame;
+	//
+	//ndDemoCamera* const camera = scene->GetCamera();
+	//const ndMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
+	//const ndMatrix invViewProjectionMatrix(camera->GetProjectionMatrix().Inverse4x4() * camera->GetViewMatrix().Inverse());
+	//
+	//glVector4 color(ndVector(1.0f, 0.0f, 0.0f, 1.0f));
+	//
+	//glUseProgram(shader);
+	//
+	//ndInt32 shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
+	//ndInt32 projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
+	//glUniform4fv(shadeColorLocation, 1, &color[0]);
+	//const glMatrix viewProjMatrix(viewProjectionMatrix);
+	//glUniformMatrix4fv(projectionViewModelMatrixLocation, 1, false, &viewProjMatrix[0][0]);
+	//
+	//GLint viewport[4];
+	//glGetIntegerv(GL_VIEWPORT, viewport);
+	//ndFloat32 pizelSize = 8.0f / viewport[2];
+	//
+	//glVector3 pointBuffer[4];
+	//glEnableClientState(GL_VERTEX_ARRAY);
+	//glVertexPointer(3, GL_FLOAT, sizeof(glVector3), pointBuffer);
+	//const ndContactArray& contactList = world->GetContactList();
+	//for (ndInt32 i = 0; i < contactList.GetCount(); ++i)
+	//{
+	//	const ndContact* const contact = contactList[i];
+	//	if (contact->IsActive())
+	//	{
+	//		const ndContactPointList& contactPoints = contact->GetContactPoints();
+	//		for (ndContactPointList::ndNode* contactPointsNode = contactPoints.GetFirst(); contactPointsNode; contactPointsNode = contactPointsNode->GetNext())
+	//		{
+	//			const ndContactPoint& contactPoint = contactPointsNode->GetInfo();
+	//			ndVector point(viewProjectionMatrix.TransformVector1x4(contactPoint.m_point));
+	//			ndFloat32 zDist = point.m_w;
+	//			point = point.Scale(1.0f / zDist);
+	//
+	//			pointBuffer[0] = CalculatePoint(invViewProjectionMatrix, point, -pizelSize, pizelSize, zDist);
+	//			pointBuffer[1] = CalculatePoint(invViewProjectionMatrix, point, -pizelSize, -pizelSize, zDist);
+	//			pointBuffer[2] = CalculatePoint(invViewProjectionMatrix, point, pizelSize, pizelSize, zDist);
+	//			pointBuffer[3] = CalculatePoint(invViewProjectionMatrix, point, pizelSize, -pizelSize, zDist);
+	//			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	//		}
+	//	}
+	//}
+	//
+	//glUseProgram(0);
+	//glDisableClientState(GL_VERTEX_ARRAY);
+
+	ndVector color(ndVector::m_wOne);
+	color.m_x = ndFloat32(1.0f);
+	const ndContactArray& contactList = m_world->GetContactList();
+	for (ndInt32 i = 0; i < contactList.GetCount(); ++i)
+	{
+		const ndContact* const contact = contactList[i];
+		if (contact->IsActive())
+		{
+			const ndContactPointList& contactPoints = contact->GetContactPoints();
+			for (ndContactPointList::ndNode* contactPointsNode = contactPoints.GetFirst(); contactPointsNode; contactPointsNode = contactPointsNode->GetNext())
+			{
+				const ndContactPoint& contactPoint = contactPointsNode->GetInfo();
+				ndPoint point;
+				point.m_point = contactPoint.m_point;
+				point.m_color = color;
+				m_debugPoints.PushBack(point);
+			}
+		}
+	}
+}
+
 void ndRenderPassDebug::RenderScene()
 {
 	ndAssert(m_world);
@@ -247,6 +319,10 @@ void ndRenderPassDebug::RenderScene()
 	m_debugLines.SetCount(0);
 	m_debugPoints.SetCount(0);
 
+	if (m_options.m_showContacts)
+	{
+		GenerateContacts();
+	}
 	if (m_options.m_showBroadPhase)
 	{
 		GenerateBroadphase();
@@ -272,8 +348,15 @@ void ndRenderPassDebug::RenderScene()
 		GenerateModelsDebug();
 	}
 
+	if (m_debugPoints.GetCount())
+	{
+		const ndMatrix matrix(ndGetIdentityMatrix());
+		m_renderPointsPrimitive->Render(m_owner, matrix, m_debugPointArray);
+	}
+
 	if (m_debugLines.GetCount())
 	{
-		RenderDebugLines();
+		const ndMatrix matrix(ndGetIdentityMatrix());
+		m_renderLinesPrimitive->Render(m_owner, matrix, m_debugLineArray);
 	}
 }

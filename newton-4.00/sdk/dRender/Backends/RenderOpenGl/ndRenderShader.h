@@ -233,7 +233,7 @@ class ndRenderShaderDynamicLinesArrayBlock : public ndRenderShaderBlock
 // *********************************************************************
 // 
 // *********************************************************************
-class ndRenderShaderDynamicPointArrayBlock : public ndRenderShaderBlock
+class ndRenderShaderDynamicPointsArrayBlock : public ndRenderShaderBlock
 {
 	public:
 	virtual void GetShaderParameters(const ndRenderShaderCache* const shaderCache) override;

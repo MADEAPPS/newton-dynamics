@@ -693,11 +693,13 @@ void ndRenderPrimitiveImplement::BuildDebugFlatShadedMesh(const ndRenderPrimitiv
 
 		virtual void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceVertex, const ndEdgeType* const)
 		{
-			ndVector p0(faceVertex[0]);
-			ndVector p1(faceVertex[1]);
-			ndVector p2(faceVertex[2]);
+			const ndVector p0(faceVertex[0]);
+			const ndVector p1(faceVertex[1]);
+			const ndVector p2(faceVertex[2]);
 
 			ndVector normal((p1 - p0).CrossProduct(p2 - p0));
+			ndAssert(normal.m_w == ndFloat32 (0.0f));
+			ndAssert (ndCheckVector(normal));
 			normal = normal.Normalize();
 			for (ndInt32 i = 2; i < vertexCount; ++i)
 			{
@@ -1220,6 +1222,10 @@ void ndRenderPrimitiveImplement::Render(const ndRender* const render, const ndMa
 			RenderGenerateInstancedShadowMaps(render, modelMatrix);
 			break;
 
+		case m_debugPointArray:
+			RenderDebugPointArray(render, modelMatrix);
+			break;
+
 		case m_debugLineArray:
 			RenderDebugLineArray(render, modelMatrix);
 			break;
@@ -1252,6 +1258,11 @@ void ndRenderPrimitiveImplement::RenderSimplePrimitive(const ndRender* const ren
 void ndRenderPrimitiveImplement::RenderDebugLineArray(const ndRender* const render, const ndMatrix& modelViewMatrix) const
 {
 	m_dynamicLinesArrayBlock.Render(this, render, modelViewMatrix);
+}
+
+void ndRenderPrimitiveImplement::RenderDebugPointArray(const ndRender* const render, const ndMatrix& modelViewMatrix) const
+{
+	m_dynamicPointsArrayBlock.Render(this, render, modelViewMatrix);
 }
 
 void ndRenderPrimitiveImplement::RenderGenerateShadowMaps(const ndRender* const render, const ndMatrix& lightMatrix) const

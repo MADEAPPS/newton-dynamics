@@ -32,7 +32,7 @@
 
 // do not change this pragma or you reack Viasual studio optimization bug
 #pragma optimize( "", off )
-ndFloat32 ndExp_VS__Fix(ndReal x)
+ndFloat32 ndExp_VS_Fix(ndReal x)
 {
 	return ndFloat32 (exp(x));
 }

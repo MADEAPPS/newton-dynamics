@@ -103,7 +103,7 @@ class ndRender: public ndClassAlloc
 	ndVector m_sunLightIntesity;
 	ndVector m_backgroundColor;
 
-	ndRenderPassDebug* m_cachedDebugLinePass;
+	ndRenderPassDebug* m_cachedDebugPass;
 	ndRenderPassShadowsImplement* m_cachedShadowPass;
 	ndRenderPassEnvironment* m_cachedEnvironmentPass;
 
@@ -120,6 +120,7 @@ class ndRender: public ndClassAlloc
 	friend class ndRenderPassShadowsImplement;
 
 	friend class ndRenderShaderDynamicLinesArrayBlock;
+	friend class ndRenderShaderDynamicPointsArrayBlock;
 	friend class ndRenderShaderOpaqueDiffusedColorBlock;
 	friend class ndRenderShaderDebugWireframeDiffuseBlock;
 	friend class ndRenderShaderDebugFlatShadedDiffusedBlock;

@@ -55,6 +55,7 @@ class ndRenderPrimitiveImplement : public ndContainersFreeListAlloc<ndRenderPrim
 	void RenderDebugSetZbuffer(const ndRender* const render, const ndMatrix& modelMatrix) const;
 	void RenderGenerateShadowMaps(const ndRender* const render, const ndMatrix& lightMatrix) const;
 	void RenderDebugLineArray(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
+	void RenderDebugPointArray(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
 	void RenderSimplePrimitive(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
 	void RenderDebugShapeSolid(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
 	void RenderDebugShapeWireFrame(const ndRender* const render, const ndMatrix& modelViewMatrix) const;
@@ -97,7 +98,7 @@ class ndRenderPrimitiveImplement : public ndContainersFreeListAlloc<ndRenderPrim
 	ndRenderShaderSetZbufferCleanBlock m_setZbufferBlock;
 	ndRenderShaderStaticLinesArrayBlock m_staticLinesArrayBlock;
 	ndRenderShaderDynamicLinesArrayBlock m_dynamicLinesArrayBlock;
-	ndRenderShaderDynamicPointArrayBlock m_dynamicPointsArrayBlock;
+	ndRenderShaderDynamicPointsArrayBlock m_dynamicPointsArrayBlock;
 	ndRenderShaderDebugWireframeDiffuseBlock m_debugWireframeColorBlock;
 	ndRenderShaderDebugFlatShadedDiffusedBlock m_debugFlatShadedColorBlock;
 
@@ -105,8 +106,9 @@ class ndRenderPrimitiveImplement : public ndContainersFreeListAlloc<ndRenderPrim
 	friend class ndRenderSceneNodeInstanceImplement;
 	friend class ndRenderShaderSetZbufferCleanBlock;
 	friend class ndRenderShaderStaticLinesArrayBlock;
-	friend class ndRenderShaderDynamicLinesArrayBlock;
 	friend class ndRenderShaderGenerateShadowMapBlock;
+	friend class ndRenderShaderDynamicLinesArrayBlock;
+	friend class ndRenderShaderDynamicPointsArrayBlock;
 	friend class ndRenderShaderOpaqueDiffusedColorBlock;
 	friend class ndRenderShaderDebugWireframeDiffuseBlock;
 	friend class ndRenderShaderGenerateSkinShadowMapBlock;
