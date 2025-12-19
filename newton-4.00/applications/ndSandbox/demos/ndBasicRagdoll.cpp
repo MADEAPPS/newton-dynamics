@@ -212,17 +212,20 @@ namespace ndRagdoll
 				}
 			}
 
-			ndFloat32 volume = 0.0f;
+			ndFloat32 totalVolume = 0.0f;
 			for (ndInt32 i = 0; i < bodyArray.GetCount(); ++i)
 			{
-				volume += bodyArray[i]->GetCollisionShape().GetVolume();
+				totalVolume += bodyArray[i]->GetCollisionShape().GetVolume();
 			}
-			ndFloat32 density = totalMass / volume;
+			ndFloat32 density = totalMass / totalVolume;
 
 			for (ndInt32 i = 0; i < bodyArray.GetCount(); ++i)
 			{
 				ndBodyDynamic* const body = bodyArray[i];
-				ndFloat32 mass = density * body->GetCollisionShape().GetVolume();
+				ndFloat32 volume = bodyArray[i]->GetCollisionShape().GetVolume();
+				ndFloat32 mass = density * volume;
+				ndTrace(("mass=%f  volume=%f\n", mass, volume));
+
 				ndVector inertia(body->GetMassMatrix().Scale(mass));
 				body->SetMassMatrix(inertia);
 			}
