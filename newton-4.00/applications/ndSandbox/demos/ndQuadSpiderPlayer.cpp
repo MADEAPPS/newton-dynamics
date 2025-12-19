@@ -25,15 +25,6 @@ namespace ndQuadSpiderPlayer
 	#define D_STRIDE_AMPLITUD	ndFloat32(0.35f)
 	#define D_TURN_RATE			ndFloat32(0.25f)
 
-	class ndAnimatedHelper : public ndDemoEntityManager::ndDemoHelper
-	{
-		virtual void PresentHelp(ndDemoEntityManager* const scene) override
-		{
-			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			scene->Print(color, "");
-		}
-	};
-
 	ndBodySwingControl::ndBodySwingControl(const ndSharedPtr<ndAnimationBlendTreeNode>& input)
 		:ndAnimationBlendTreeNode(input)
 		,m_x(ndReal(0.0f))
@@ -558,10 +549,38 @@ namespace ndQuadSpiderPlayer
 		loader.m_mesh->m_matrix = saveMatrix;
 		return model;
 	}
+
+	class ndAnimatedHelper : public ndDemoEntityManager::ndDemoHelper
+	{
+		virtual void PresentHelp(ndDemoEntityManager* const scene) override
+		{
+			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
+			scene->Print(color, "");
+		}
+	};
+
+	class ndAnimatedControlPanel : public ndDemoEntityManager::ndDemoUIpanel
+	{
+		public:
+		ndAnimatedControlPanel(ndSharedPtr<ndModel>& model)
+			:ndDemoUIpanel()
+		{
+			m_playerController = (ndController*)(*model->GetNotifyCallback());
+		}
+
+		virtual void Update(ndDemoEntityManager* const) override
+		{
+			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
+			ndBodySwingControl* const swingControl = (ndBodySwingControl*)*m_playerController->m_animBlendTree;
+
+			ImGui::SliderFloat("Swaying x", &swingControl->m_x, -0.05f, 0.05f);
+			ImGui::SliderFloat("Swaying z", &swingControl->m_z, -0.05f, 0.05f);
+		}
+
+		ndController* m_playerController;
+	};
 }
-
 using namespace ndQuadSpiderPlayer;
-
 
 void ndQuadSpiderAnimated(ndDemoEntityManager* const scene)
 {
@@ -575,6 +594,9 @@ void ndQuadSpiderAnimated(ndDemoEntityManager* const scene)
 	ndRenderMeshLoader loader(*scene->GetRenderer());
 	loader.LoadMesh(ndGetWorkingFileName("spider.nd"));
 	ndSharedPtr<ndModel> model (ndController::CreateModel(scene, matrix, loader));
+
+	ndSharedPtr<ndDemoEntityManager::ndDemoUIpanel> controlPanel(new ndAnimatedControlPanel(model));
+	scene->SetDemoUIpanel(controlPanel);
 
 #if 0
 	ndMatrix matrix1(ndYawMatrix (45.0f * ndDegreeToRad) * matrix);

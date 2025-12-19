@@ -1180,6 +1180,11 @@ void ndDemoEntityManager::SetDemoHelp(ndSharedPtr<ndDemoHelper>& helper)
 	m_demoHelper = helper;
 }
 
+void ndDemoEntityManager::SetDemoUIpanel(ndSharedPtr<ndDemoUIpanel>& panel)
+{
+	m_demoUIpanel = panel;
+}
+
 void ndDemoEntityManager::SetNextActiveCamera()
 {
 	if (!m_nextActiveCamera.Update(GetKeyState(ImGuiKey_C) ? true : false))

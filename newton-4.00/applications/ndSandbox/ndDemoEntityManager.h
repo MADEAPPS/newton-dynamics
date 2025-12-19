@@ -205,6 +205,7 @@ class ndDemoEntityManager : public ndClassAlloc
 	void RenderStats();
 	void SetAcceleratedUpdate();
 	void SetDemoHelp(ndSharedPtr<ndDemoHelper>& helper);
+	void SetDemoUIpanel(ndSharedPtr<ndDemoUIpanel>& panel);
 
 	void SetNextActiveCamera();
 
