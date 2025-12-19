@@ -181,11 +181,10 @@ ndFloat32 ndShapeStatic_bvh::RayCast(ndRayCastNotify& callback, const ndVector& 
 	ray.m_callback = &callback;
 	ndFloat32 t = ndFloat32 (1.2f);
 	ForAllSectorsRayHit(ray, maxT, RayHit, &ray);
-	if (ray.m_t < maxT)
+	if ((ray.m_t < maxT) && (ray.m_t < ndFloat32(1.0f)))
 	{
 		t = ray.m_t;
 		ray.m_normal = ray.m_normal & ndVector::m_triplexMask;
-		//ndAssert(ray.m_normal.m_w == ndFloat32(0.0f));
 		ndAssert(ray.m_normal.DotProduct(ray.m_normal).GetScalar() > ndFloat32(0.0f));
 		contactOut.m_normal = ray.m_normal.Normalize();
 		contactOut.m_shapeId0 = ray.m_id;
@@ -217,7 +216,6 @@ void ndShapeStatic_bvh::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 	data->m_vertexStrideInBytes = GetStrideInBytes();
 	ForAllSectors(*data, data->m_boxDistanceTravelInMeshSpace, data->m_maxT, GetPolygon, data);
 }
-
 
 ndIntersectStatus ndShapeStatic_bvh::CalculateHash(
 	void* const context, const ndFloat32* const polygon, ndInt32 strideInBytes,
