@@ -113,7 +113,7 @@ class CBasicBodyModelNotify : public ndModelNotify
 	{
 		ndModelNotify::PostUpdate(timestep);
 
-		auto myModel = (SimpleConveyorFloor*)GetModel();
+		SimpleConveyorFloor* myModel = (SimpleConveyorFloor*)GetModel();
 		ndPhysicsWorld* const world = (ndPhysicsWorld*)myModel->GetWorld();
 		ndDemoEntityManager* const scene = world->GetManager();
 
