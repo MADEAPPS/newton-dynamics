@@ -38,7 +38,6 @@ ndBody::ndBody()
 	,m_minAabb(ndVector::m_wOne)
 	,m_maxAabb(ndVector::m_wOne)
 	,m_notifyCallback(nullptr)
-	//,m_deletedNode(nullptr)
 	,m_uniqueId(m_uniqueIdCount)
 	,m_flags(0)
 	,m_isStatic(0)
@@ -67,7 +66,6 @@ ndBody::ndBody(const ndBody& src)
 	,m_minAabb(src.m_minAabb)
 	,m_maxAabb(src.m_maxAabb)
 	,m_notifyCallback(nullptr)
-	//,m_deletedNode(nullptr)
 	,m_uniqueId(m_uniqueIdCount)
 	,m_flags(0)
 	,m_isStatic(0)
@@ -90,7 +88,6 @@ ndBody::ndBody(const ndBody& src)
 
 ndBody::~ndBody()
 {
-	//ndAssert(!m_deletedNode);
 	if (m_notifyCallback)
 	{
 		delete m_notifyCallback;
