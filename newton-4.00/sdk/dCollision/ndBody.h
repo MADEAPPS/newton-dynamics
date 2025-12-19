@@ -103,10 +103,7 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	ndVector m_globalCentreOfMass;
 	ndVector m_minAabb;
 	ndVector m_maxAabb;
-
 	ndBodyNotify* m_notifyCallback;
-	//ndSpecialList<ndBody>::ndNode* m_deletedNode;
-
 	ndUnsigned32 m_uniqueId;
 	union
 	{
