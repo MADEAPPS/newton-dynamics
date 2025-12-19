@@ -38,6 +38,7 @@ class ndRenderPassDebug : public ndRenderPass
 		bool m_showBodyFrame;
 		bool m_showBroadPhase;
 		bool m_showCentreOfMass;
+		bool m_showContactsForce;
 		bool m_showJointDebugInfo;
 		bool m_showModelsDebugInfo;
 	};
@@ -58,6 +59,7 @@ class ndRenderPassDebug : public ndRenderPass
 	void GenerateJointsDebug();
 	void GenerateModelsDebug();
 	void GenerateCenterOfMass();
+	void GenerateContactForce();
 	virtual void RenderScene() override;
 	
 	ndDebugLineOptions m_options;

@@ -36,6 +36,7 @@ void ndDebugDisplayRenderPass::SetDebugDisplayOptions()
 	options.m_showBodyFrame = m_manager->m_showBodyFrame;
 	options.m_showContacts = m_manager->m_showContactPoints;
 	options.m_showCentreOfMass = m_manager->m_showCenterOfMass;
+	options.m_showContactsForce = m_manager->m_showNormalForces;
 	options.m_showJointDebugInfo = m_manager->m_showJointDebugInfo;
 	options.m_showModelsDebugInfo = m_manager->m_showModelsDebugInfo;
 	ndRenderPassDebug::SetDebugDisplayOptions(options);
