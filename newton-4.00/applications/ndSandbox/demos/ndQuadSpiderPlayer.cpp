@@ -52,9 +52,9 @@ namespace ndQuadSpiderPlayer
 		ndAnimationBlendTreeNode::Evaluate(output, veloc);
 
 		ndMatrix matrix(ndPitchMatrix(m_pitch * ndDegreeToRad) * ndYawMatrix(m_yaw * ndDegreeToRad) * ndRollMatrix(m_roll * ndDegreeToRad));
-		matrix.m_posit.m_x = m_x;
-		matrix.m_posit.m_y = m_y - 0.0f;
-		matrix.m_posit.m_z = m_z;
+		matrix.m_posit.m_x = -m_x;
+		matrix.m_posit.m_y = m_y;
+		matrix.m_posit.m_z = -m_z;
 		for (ndInt32 i = 0; i < output.GetCount(); ++i)
 		{
 			ndAnimKeyframe& keyFrame = output[i];
@@ -331,9 +331,8 @@ namespace ndQuadSpiderPlayer
 
 			if ((kneeAngle > maxAngle) || (kneeAngle < minAngle))
 			{
-				ndAssert(0);
 				// project that target to the sphere of the correct position
-				//leg.m_effector->SetAsReducedDof();
+				leg.m_effector->SetAsReducedDof();
 			}
 
 			effector->SetSwivelAngle(swivelAngle);
