@@ -73,8 +73,8 @@ void ndJointUpVector::JacobianDerivative(ndConstraintDescritor& desc)
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix (matrix0, matrix1);
-	matrix1.m_right = matrix1.m_front.CrossProduct(matrix0.m_up).Normalize();
-	matrix1.m_up = matrix1.m_right.CrossProduct(matrix1.m_front);
+	//matrix1.m_right = matrix1.m_front.CrossProduct(matrix0.m_up).Normalize();
+	//matrix1.m_up = matrix1.m_right.CrossProduct(matrix1.m_front);
   
 	// if the body has rotated by some amount, the there will be a plane of rotation
 	ndVector lateralDir (matrix0.m_front.CrossProduct(matrix1.m_front));
