@@ -577,11 +577,11 @@ namespace ndQuadSpiderPlayer
 			ImGui::SliderFloat("Swaying z", &swingControl->m_z, -0.05f, 0.05f);
 
 
-			ndModelArticulation* xxx = m_playerController->GetModel()->GetAsModelArticulation();;
-			const ndList<ndModelArticulation::ndNode>& list = xxx->GetCloseLoops();
-			ndJointUpVector* xxx1 = (ndJointUpVector*) *list.GetLast()->GetInfo().m_joint;
-			ndVector xxxxxx (xxx1->GetTorqueBody0());
-			ndTrace (("toque: %f %f %f\n", xxxxxx.m_x, xxxxxx.m_y, xxxxxx.m_z))
+			//ndModelArticulation* xxx = m_playerController->GetModel()->GetAsModelArticulation();;
+			//const ndList<ndModelArticulation::ndNode>& list = xxx->GetCloseLoops();
+			//ndJointUpVector* xxx1 = (ndJointUpVector*) *list.GetLast()->GetInfo().m_joint;
+			//ndVector xxxxxx (xxx1->GetTorqueBody0());
+			//ndTrace (("toque: %f %f %f\n", xxxxxx.m_x, xxxxxx.m_y, xxxxxx.m_z))
 		}
 
 		ndController* m_playerController;
@@ -605,7 +605,7 @@ void ndQuadSpiderAnimated(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndDemoEntityManager::ndDemoUIpanel> controlPanel(new ndAnimatedControlPanel(model));
 	scene->SetDemoUIpanel(controlPanel);
 
-#if 1
+#if 0
 	ndMatrix matrix1(ndYawMatrix (45.0f * ndDegreeToRad) * matrix);
 	matrix1.m_posit.m_x += 2.0f;
 	matrix1.m_posit.m_z += 3.0f;
@@ -621,6 +621,10 @@ void ndQuadSpiderAnimated(ndDemoEntityManager* const scene)
 	matrix1.m_posit.m_z -= 0.0f;
 	//ndController::CreateModel(scene, matrix1, loader);
 #endif
+
+	ndQuaternion rot(matrix);
+	ndVector origin(-3.0f, 1.0f, 0.0f, 1.0f);
+	scene->SetCameraMatrix(rot, origin);
 
 	ndController* const controller = (ndController*)*model->GetNotifyCallback();
 	ndRender* const renderer = *scene->GetRenderer();
