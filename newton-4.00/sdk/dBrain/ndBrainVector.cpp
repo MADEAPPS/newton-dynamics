@@ -38,7 +38,7 @@ void ndBrainVector::Exp(const ndBrainVector& data)
 {
 	for (ndInt64 i = GetCount() - 1; i >= 0; --i)
 	{
-		(*this)[i] = ndExp(data[i]);
+		(*this)[i] = ndBrainFloat(ndExp(data[i]));
 	}
 }
 
@@ -437,7 +437,7 @@ ndBrainFloat ndBrainVector::CalculateLikelihood(const ndBrainVector& varianceBuf
 
 	ndBrainFloat z2 = ndBrainFloat(0.0f);
 	ndBrainFloat invSigma2Det = ndBrainFloat(1.0f);
-	const ndFloat32 invSqrtPi = ndSqrt(1.0f / (2.0f * ndPi));
+	const ndBrainFloat invSqrtPi = ndBrainFloat(ndSqrt(1.0f / (2.0f * ndPi)));
 	for (ndInt32 i = ndInt32 (GetCount()) - 1; i >= 0; --i)
 	{
 		ndBrainFloat sigma = varianceBuffer[i];
@@ -447,7 +447,7 @@ ndBrainFloat ndBrainVector::CalculateLikelihood(const ndBrainVector& varianceBuf
 		invSigma2Det *= (invSqrtPi * invSigma);
 	}
 	ndBrainFloat exponent = ndBrainFloat(0.5f) * z2;
-	ndBrainFloat likelihood = invSigma2Det * ndExp(-exponent);
+	ndBrainFloat likelihood = invSigma2Det * ndBrainFloat(ndExp(-exponent));
 	return ndMax(likelihood, ndBrainFloat(1.0e-4f));
 }
 
@@ -477,7 +477,7 @@ ndBrainFloat ndBrainVector::CalculatePartialKlDivergence(const ndBrainVector& ga
 	ndFloat32 t3 = log_det_1 - log_det_0;
 	ndFloat32 t1 = ndBrainFloat(size);
 	ndFloat32 divergence = t0 - t1 + t2 + t3;
-	return ndFloat32 (0.5f) * divergence;
+	return ndBrainFloat(ndFloat32 (0.5f) * divergence);
 }
 
 ndBrainFloat ndBrainVector::CalculateEntropyRegularization(const ndBrainVector& varianceBuffer, ndBrainFloat regularization) const

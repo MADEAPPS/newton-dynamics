@@ -21,9 +21,12 @@
 
 namespace ndQuadSpiderPlayer
 {
-	#define D_WALK_STRIDE		ndFloat32(0.3f)
-	#define D_STRIDE_AMPLITUD	ndFloat32(0.35f)
-	#define D_TURN_RATE			ndFloat32(0.25f)
+	#define D_WALK_STRIDE		ndReal(0.3f)
+	#define D_STRIDE_AMPLITUD	ndReal(0.35f)
+	#define D_TURN_RATE			ndReal(0.25f)
+
+	#define D_HIP_SWAY_X		ndReal(0.1f)
+	#define D_HIP_SWAY_Z		ndReal(0.1f)
 
 	ndBodySwingControl::ndBodySwingControl(const ndSharedPtr<ndAnimationBlendTreeNode>& input)
 		:ndAnimationBlendTreeNode(input)
@@ -515,7 +518,7 @@ namespace ndQuadSpiderPlayer
 		const ndMatrix upMatrix(rootBody->GetMatrix());
 		ndSharedPtr<ndJointBilateralConstraint> upVector(new ndJointUpVector(upMatrix.m_up, rootBody->GetAsBodyKinematic(), world->GetSentinelBody()));
 		//ndSharedPtr<ndJointBilateralConstraint> upVector(new ndJointFix6dof(upMatrix, rootBody->GetAsBodyKinematic(), world->GetSentinelBody()));
-		model->AddCloseLoop(upVector);
+		//model->AddCloseLoop(upVector);
 	}
 
 	ndSharedPtr<ndModel> ndController::CreateModel(ndDemoEntityManager* const scene, const ndMatrix& location, const ndRenderMeshLoader& loader)
@@ -572,8 +575,8 @@ namespace ndQuadSpiderPlayer
 			ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
 			ndBodySwingControl* const swingControl = (ndBodySwingControl*)*m_playerController->m_animBlendTree;
 
-			ImGui::SliderFloat("Swaying x", &swingControl->m_x, -0.05f, 0.05f);
-			ImGui::SliderFloat("Swaying z", &swingControl->m_z, -0.05f, 0.05f);
+			ImGui::SliderFloat("Swaying x", &swingControl->m_x, -D_HIP_SWAY_X, D_HIP_SWAY_X);
+			ImGui::SliderFloat("Swaying z", &swingControl->m_z, -D_HIP_SWAY_Z, D_HIP_SWAY_Z);
 
 
 			//ndModelArticulation* xxx = m_playerController->GetModel()->GetAsModelArticulation();;

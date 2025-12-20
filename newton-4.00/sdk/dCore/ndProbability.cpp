@@ -139,13 +139,13 @@ ndFloat32 ndStandardNormalGaussian(ndFloat32 randomVariable)
 }
 
 #define TINYMT32_MUL (1.0f / 16777216.0f)
-ndReal ndUniformDistribution::operator()()
+ndFloat32 ndUniformDistribution::operator()()
 {
 	uint32_t rand = (Generate() >> 8);
-	return ndReal(rand) * TINYMT32_MUL;
+	return ndFloat32(rand) * TINYMT32_MUL;
 }
 
-D_CORE_API ndReal ndNomalDistribution::NormalGaussian(ndReal uniform)
+D_CORE_API ndFloat32 ndNomalDistribution::NormalGaussian(ndFloat32 uniform)
 {
 	// It seems the standard library normal random is based of the Box–Muller transform
 	// https://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform
@@ -231,9 +231,9 @@ D_CORE_API ndReal ndNomalDistribution::NormalGaussian(ndReal uniform)
 	return normal;
 }
 
-ndReal ndNomalDistribution::operator()()
+ndFloat32 ndNomalDistribution::operator()()
 {
 	uint32_t rand = (Generate() >> 8);
 	ndReal uniform = ndReal(rand) * TINYMT32_MUL;
-	return ndReal(NormalGaussian(uniform));
+	return NormalGaussian(uniform);
 }

@@ -249,7 +249,7 @@ void ndBrainAgentOnPolicyGradient_Agent::SampleActions(ndBrainVector& actions)
 	for (ndInt32 i = size - 1; i >= 0; --i)
 	{
 		ndBrainFloat sigma = actions[size + i];
-		ndBrainFloat normalSample = m_normalDistribution();
+		ndBrainFloat normalSample = ndBrainFloat(m_normalDistribution());
 		ndBrainFloat sample = ndBrainFloat(actions[i]) + normalSample * sigma;
 		ndBrainFloat clippedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
 		actions[i] = clippedAction;
@@ -407,7 +407,7 @@ void ndBrainAgentOnPolicyGradient_Trainer::BuildPolicyClass()
 		layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
 	}
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_numberOfActions * 2));
-	layers.PushBack(new ndBrainAgentPolicyGradientActivation(layers[layers.GetCount() - 1]->GetOutputSize(), ndSqrt(m_parameters.m_minSigmaSquared), ndSqrt(m_parameters.m_maxSigmaSquared)));
+	layers.PushBack(new ndBrainAgentPolicyGradientActivation(layers[layers.GetCount() - 1]->GetOutputSize(), ndBrainFloat(ndSqrt(m_parameters.m_minSigmaSquared)), ndBrainFloat(ndSqrt(m_parameters.m_maxSigmaSquared))));
 
 	ndSharedPtr<ndBrain> policy (new ndBrain);
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
@@ -568,7 +568,7 @@ void ndBrainAgentOnPolicyGradient_Trainer::UpdateScore()
 	for (ndInt32 i = ndInt32(m_trajectoryScore.GetCount()) - 1; i >= 0; --i)
 	{
 		steps += m_trajectoryScore[i].m_trajectorySteps;
-		averageSum += m_trajectoryScore[i].m_trajectoryReward;
+		averageSum += ndBrainFloat(m_trajectoryScore[i].m_trajectoryReward);
 	}
 	m_averageExpectedRewards.Update(averageSum / ndBrainFloat(steps));
 	m_averageFramesPerEpisodes.Update(ndBrainFloat(steps) / ndBrainFloat(m_trajectoryScore.GetCount()));
@@ -1030,7 +1030,7 @@ ndBrainFloat ndBrainAgentOnPolicyGradient_Trainer::CalculateKLdivergence()
 
 	minbatchDivergenceAcc->ReductionSum();
 	ndBrainFloat divergence = minbatchDivergenceAcc->GetElement(0);
-	return divergence / ndFloat32(m_numberOfGpuTransitions);
+	return ndBrainFloat(divergence / ndFloat32(m_numberOfGpuTransitions));
 }
 
 #pragma optimize( "", off )

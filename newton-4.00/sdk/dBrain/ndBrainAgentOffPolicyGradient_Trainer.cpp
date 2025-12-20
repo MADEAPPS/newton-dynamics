@@ -260,7 +260,7 @@ void ndBrainAgentOffPolicyGradient_Agent::SampleActions(ndBrainVector& actions)
 	for (ndInt32 i = size - 1; i >= 0; --i)
 	{
 		ndBrainFloat sigma = actions[size + i];
-		ndBrainFloat normalSample = m_randomGenerator();
+		ndBrainFloat normalSample = ndBrainFloat(m_randomGenerator());
 		ndBrainFloat sample = ndBrainFloat(actions[i]) + normalSample * sigma;
 		ndBrainFloat clippedAction = ndClamp(sample, ndBrainFloat(-1.0f), ndBrainFloat(1.0f));
 		actions[i] = clippedAction;
@@ -415,7 +415,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::BuildPolicyClass()
 		layers.PushBack(new ndBrainLayerActivationRelu(layers[layers.GetCount() - 1]->GetOutputSize()));
 	}
 	layers.PushBack(new ndBrainLayerLinear(layers[layers.GetCount() - 1]->GetOutputSize(), m_parameters.m_numberOfActions * 2));
-	layers.PushBack(new ndBrainAgentPolicyGradientActivation(layers[layers.GetCount() - 1]->GetOutputSize(), ndSqrt(m_parameters.m_minSigmaSquared), ndSqrt(m_parameters.m_maxSigmaSquared)));
+	layers.PushBack(new ndBrainAgentPolicyGradientActivation(layers[layers.GetCount() - 1]->GetOutputSize(), ndBrainFloat(ndSqrt(m_parameters.m_minSigmaSquared)), ndBrainFloat(ndSqrt(m_parameters.m_maxSigmaSquared))));
 
 	ndSharedPtr<ndBrain> policy (new ndBrain);
 	for (ndInt32 i = 0; i < layers.GetCount(); ++i)
@@ -1001,7 +1001,7 @@ void ndBrainAgentOffPolicyGradient_Trainer::Optimize()
 	{
 		for (ndInt32 j = 0; j < numberOfActions; ++j)
 		{
-			m_scratchBuffer.PushBack(m_uniformDistribution());
+			m_scratchBuffer.PushBack(ndBrainFloat(m_uniformDistribution()));
 		}
 	}
 	m_uniformRandom->VectorToDevice(m_scratchBuffer);

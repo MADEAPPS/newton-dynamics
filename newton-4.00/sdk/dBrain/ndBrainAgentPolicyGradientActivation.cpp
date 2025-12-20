@@ -82,7 +82,7 @@ ndBrainLayer* ndBrainAgentPolicyGradientActivation::Load(const ndBrainLoad* cons
 	loadSave->ReadString(buffer);
 	ndBrainFloat maxSigma2 = ndBrainFloat(loadSave->ReadFloat());
 
-	ndBrainAgentPolicyGradientActivation* const layer = new ndBrainAgentPolicyGradientActivation(inputs, ndSqrt(minSigma2), ndSqrt(maxSigma2));
+	ndBrainAgentPolicyGradientActivation* const layer = new ndBrainAgentPolicyGradientActivation(inputs, ndBrainFloat(ndSqrt(minSigma2)), ndBrainFloat(ndSqrt(maxSigma2)));
 	loadSave->ReadString(buffer);
 	return layer;
 }

@@ -37,7 +37,7 @@ ndRand127::ndRand127()
 void ndRand127::Init(uint32_t seed)
 {
     m_gen.seed(seed);
-    ndUnsigned32 rand = m_gen();
+    //ndUnsigned32 rand = m_gen();
 }
 
 uint32_t ndRand127::Generate()
