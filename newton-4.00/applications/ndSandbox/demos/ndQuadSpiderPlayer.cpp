@@ -357,8 +357,8 @@ namespace ndQuadSpiderPlayer
 		ndSharedPtr<ndRenderSceneNode> camera(renderer->GetCamera());
 		if (camera == m_cameraNode)
 		{
-			//m_walkGait->m_stride = 0.0f;
-			m_walkGait->m_stride = D_WALK_STRIDE;
+			m_walkGait->m_stride = 0.0f;
+			//m_walkGait->m_stride = D_WALK_STRIDE;
 			if (scene->GetKeyState(ImGuiKey_W))
 			{
 				m_walkGait->m_stride = D_WALK_STRIDE;
@@ -605,7 +605,7 @@ void ndQuadSpiderAnimated(ndDemoEntityManager* const scene)
 	ndSharedPtr<ndDemoEntityManager::ndDemoUIpanel> controlPanel(new ndAnimatedControlPanel(model));
 	scene->SetDemoUIpanel(controlPanel);
 
-#if 0
+#if 1
 	ndMatrix matrix1(ndYawMatrix (45.0f * ndDegreeToRad) * matrix);
 	matrix1.m_posit.m_x += 2.0f;
 	matrix1.m_posit.m_z += 3.0f;
@@ -614,12 +614,12 @@ void ndQuadSpiderAnimated(ndDemoEntityManager* const scene)
 	matrix1 = ndYawMatrix(-45.0f * ndDegreeToRad) * matrix;
 	matrix1.m_posit.m_x += 2.0f;
 	matrix1.m_posit.m_z -= 3.0f;
-	ndController::CreateModel(scene, matrix1, loader);
+	//ndController::CreateModel(scene, matrix1, loader);
 
 	matrix1 = ndYawMatrix(-45.0f * ndDegreeToRad) * matrix;
 	matrix1.m_posit.m_x += 2.0f;
 	matrix1.m_posit.m_z -= 0.0f;
-	ndController::CreateModel(scene, matrix1, loader);
+	//ndController::CreateModel(scene, matrix1, loader);
 #endif
 
 	ndController* const controller = (ndController*)*model->GetNotifyCallback();
