@@ -94,7 +94,7 @@ bool ndDemoCameraNode::UpdatePickBody()
 					ndRenderSceneCamera* const cameraNode = rootMesh->FindCameraNode();
 					if (!cameraNode || (cameraNode->GetParent() != this))
 					{
-						// only pick bodies that do no have this camera atached
+						// only pick bodies that do not have this camera atached
 						ndTrace(("picked body id: %d\n", body->GetId()));
 						m_pickedBodyParam = rayCaster.m_param;
 
