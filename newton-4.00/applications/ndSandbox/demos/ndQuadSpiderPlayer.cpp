@@ -575,6 +575,13 @@ namespace ndQuadSpiderPlayer
 
 			ImGui::SliderFloat("Swaying x", &swingControl->m_x, -0.05f, 0.05f);
 			ImGui::SliderFloat("Swaying z", &swingControl->m_z, -0.05f, 0.05f);
+
+
+			ndModelArticulation* xxx = m_playerController->GetModel()->GetAsModelArticulation();;
+			const ndList<ndModelArticulation::ndNode>& list = xxx->GetCloseLoops();
+			ndJointUpVector* xxx1 = (ndJointUpVector*) *list.GetLast()->GetInfo().m_joint;
+			ndVector xxxxxx (xxx1->GetTorqueBody0());
+			ndTrace (("toque: %f %f %f\n", xxxxxx.m_x, xxxxxx.m_y, xxxxxx.m_z))
 		}
 
 		ndController* m_playerController;

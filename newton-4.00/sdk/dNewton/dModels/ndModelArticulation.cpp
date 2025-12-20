@@ -206,34 +206,34 @@ const ndList<ndModelArticulation::ndNode>& ndModelArticulation::GetCloseLoops() 
 void ndModelArticulation::AddCloseLoop(const ndSharedPtr<ndJointBilateralConstraint>& joint, const char* const name)
 {
 	#ifdef _DEBUG
-		auto Check = [&](const ndBodyKinematic* const body)
+	auto Check = [&](const ndBodyKinematic* const body)
+	{
+		if (body->GetInvMass() == ndFloat32(0.0f))
 		{
-			if (body->GetInvMass() == ndFloat32(0.0f))
-			{
-				return false;
-			}
-			ndFixSizeArray<ndNode*, 256> stack;
-			stack.PushBack(m_rootNode);
-			while (stack.GetCount())
-			{
-				ndInt32 index = stack.GetCount() - 1;
-				ndNode* const node = stack[index];
-				stack.SetCount(index);
-				if (node->m_body->GetAsBodyKinematic() == body)
-				{
-					return true;
-				}
-
-				for (ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
-				{
-					stack.PushBack(child);
-				}
-			}
-
 			return false;
-		};
+		}
+		ndFixSizeArray<ndNode*, 256> stack;
+		stack.PushBack(m_rootNode);
+		while (stack.GetCount())
+		{
+			ndInt32 index = stack.GetCount() - 1;
+			ndNode* const node = stack[index];
+			stack.SetCount(index);
+			if (node->m_body->GetAsBodyKinematic() == body)
+			{
+				return true;
+			}
 
-		ndAssert(Check(joint->GetBody0()) || Check(joint->GetBody1()));
+			for (ndNode* child = node->GetFirstChild(); child; child = child->GetNext())
+			{
+				stack.PushBack(child);
+			}
+		}
+
+		return false;
+	};
+
+	ndAssert(Check(joint->GetBody0()) || Check(joint->GetBody1()));
 	#endif
 
 	for (ndList<ndNode>::ndNode* node = m_closeLoops.GetFirst(); node; node = node->GetNext())

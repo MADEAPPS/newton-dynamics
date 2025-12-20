@@ -63,7 +63,6 @@ ndFloat32 ndForceImpactPair::GetInitialGuess() const
 	return value;
 }
 
-
 ndConstraint::ndConstraint()
 	:ndContainersFreeListAlloc<ndConstraint>()
 	,m_forceBody0(ndVector::m_zero)
@@ -97,3 +96,96 @@ void ndConstraint::InitPointParam(ndPointParam& param, const ndVector& p0Global,
 	param.m_r1 = (p1Global - body1->m_globalCentreOfMass) & ndVector::m_triplexMask;
 }
 
+#ifdef _DEBUG
+void ndRightHandSide::SetSanityCheck(const ndConstraint* const joint)
+{
+	m_debugCheck = m_bilateral;
+	if (!joint->IsBilateral())
+	{
+		if (m_normalForceIndex == D_INDEPENDENT_ROW)
+		{
+			m_debugCheck = m_contact;
+		}
+		else if (m_normalForceIndex != D_OVERRIDE_FRICTION_ROW)
+		{
+			m_debugCheck = m_friction;
+		}
+	}
+}
+#else
+void ndRightHandSide::SetSanityCheck(const ndConstraint* const)
+{
+}
+#endif
+
+ndConstraint::~ndConstraint()
+{
+}
+
+ndContact* ndConstraint::GetAsContact()
+{
+	return nullptr;
+}
+
+ndJointBilateralConstraint* ndConstraint::GetAsBilateral()
+{
+	return nullptr;
+}
+
+bool ndConstraint::IsActive() const
+{
+	return m_active ? true : false;
+}
+
+void ndConstraint::SetActive(bool state)
+{
+	m_active = ndUnsigned8(state ? 1 : 0);
+}
+
+bool ndConstraint::IsBilateral() const
+{
+	return false;
+}
+
+ndUnsigned32 ndConstraint::GetRowsCount() const
+{
+	return m_maxDof;
+}
+
+ndBodyKinematic* ndConstraint::GetBody0() const
+{
+	return m_body0;
+}
+
+ndBodyKinematic* ndConstraint::GetBody1() const
+{
+	return m_body1;
+}
+
+void ndConstraint::DebugJoint(ndConstraintDebugCallback&) const
+{
+}
+
+ndVector ndConstraint::GetForceBody0() const
+{
+	return m_forceBody0;
+}
+
+ndVector ndConstraint::GetTorqueBody0() const
+{
+	return m_torqueBody0;
+}
+
+ndVector ndConstraint::GetForceBody1() const
+{
+	return m_forceBody1;
+}
+
+ndVector ndConstraint::GetTorqueBody1() const
+{
+	return m_torqueBody1;
+}
+
+void ndConstraint::UpdateParameters()
+{
+}

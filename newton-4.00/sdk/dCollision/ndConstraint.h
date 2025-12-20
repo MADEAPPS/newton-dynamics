@@ -262,33 +262,33 @@ class ndConstraint: public ndContainersFreeListAlloc<ndConstraint>
 	// add some reflexion to the classes
 	D_BASE_CLASS_REFLECTION(ndConstraint)
 
-	virtual ~ndConstraint();
+	D_COLLISION_API virtual ~ndConstraint();
 
-	virtual bool IsBilateral() const;
-	virtual ndContact* GetAsContact();
-	virtual ndJointBilateralConstraint* GetAsBilateral();
+	D_COLLISION_API virtual bool IsBilateral() const;
+	D_COLLISION_API virtual ndContact* GetAsContact();
+	D_COLLISION_API virtual ndJointBilateralConstraint* GetAsBilateral();
 
-	bool IsActive() const;
-	void SetActive(bool state);
+	D_COLLISION_API bool IsActive() const;
+	D_COLLISION_API void SetActive(bool state);
 
-	ndUnsigned32 GetRowsCount() const;
-	virtual void JacobianDerivative(ndConstraintDescritor& desc) = 0;
-	virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc) = 0;
+	D_COLLISION_API ndUnsigned32 GetRowsCount() const;
+	D_COLLISION_API virtual void JacobianDerivative(ndConstraintDescritor& desc) = 0;
+	D_COLLISION_API virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc) = 0;
 
-	virtual void UpdateParameters();
+	D_COLLISION_API virtual void UpdateParameters();
 
-	ndVector GetForceBody0() const;
-	ndVector GetTorqueBody0() const;
-	ndVector GetForceBody1() const;
-	ndVector GetTorqueBody1() const;
-	ndBodyKinematic* GetBody0() const;
-	ndBodyKinematic* GetBody1() const;
+	D_COLLISION_API ndVector GetForceBody0() const;
+	D_COLLISION_API ndVector GetTorqueBody0() const;
+	D_COLLISION_API ndVector GetForceBody1() const;
+	D_COLLISION_API ndVector GetTorqueBody1() const;
+	D_COLLISION_API ndBodyKinematic* GetBody0() const;
+	D_COLLISION_API ndBodyKinematic* GetBody1() const;
 	
-	virtual void DebugJoint(ndConstraintDebugCallback&) const;
-	void InitPointParam(ndPointParam& param, const ndVector& p0Global, const ndVector& p1Global) const;
+	D_COLLISION_API virtual void DebugJoint(ndConstraintDebugCallback&) const;
+	D_COLLISION_API void InitPointParam(ndPointParam& param, const ndVector& p0Global, const ndVector& p1Global) const;
 
 	protected:
-	ndConstraint();
+	D_COLLISION_API ndConstraint();
 	virtual void ClearMemory() = 0;
 
 	ndVector m_forceBody0;
@@ -314,100 +314,6 @@ class ndConstraint: public ndContainersFreeListAlloc<ndConstraint>
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
 } D_GCC_NEWTON_CLASS_ALIGN_32 ;
-
-#ifdef _DEBUG
-inline void ndRightHandSide::SetSanityCheck(const ndConstraint* const joint)
-{
-	m_debugCheck = m_bilateral;
-	if (!joint->IsBilateral())
-	{
-		if (m_normalForceIndex == D_INDEPENDENT_ROW)
-		{
-			m_debugCheck = m_contact;
-		}
-		else if (m_normalForceIndex != D_OVERRIDE_FRICTION_ROW)
-		{
-			m_debugCheck = m_friction;
-		}
-	}
-}
-#else
-inline void ndRightHandSide::SetSanityCheck(const ndConstraint* const)
-{
-}
-#endif
-
-inline ndConstraint::~ndConstraint()
-{
-}
-
-inline ndContact* ndConstraint::GetAsContact()
-{ 
-	return nullptr; 
-}
-
-inline ndJointBilateralConstraint* ndConstraint::GetAsBilateral()
-{ 
-	return nullptr; 
-}
-
-inline bool ndConstraint::IsActive() const
-{ 
-	return m_active ? true : false;
-}
-
-inline void ndConstraint::SetActive(bool state)
-{ 
-	m_active = ndUnsigned8(state ? 1 : 0);
-}
-
-inline bool ndConstraint::IsBilateral() const
-{ 
-	return false; 
-}
-
-inline ndUnsigned32 ndConstraint::GetRowsCount() const
-{
-	return m_maxDof;
-}
-
-inline ndBodyKinematic* ndConstraint::GetBody0() const
-{ 
-	return m_body0;
-}
-
-inline ndBodyKinematic* ndConstraint::GetBody1() const
-{ 
-	return m_body1;
-}
-
-inline void ndConstraint::DebugJoint(ndConstraintDebugCallback&) const
-{
-}
-
-inline ndVector ndConstraint::GetForceBody0() const
-{
-	return m_forceBody0;
-}
-
-inline ndVector ndConstraint::GetTorqueBody0() const
-{
-	return m_torqueBody0;
-}
-
-inline ndVector ndConstraint::GetForceBody1() const
-{
-	return m_forceBody1;
-}
-
-inline ndVector ndConstraint::GetTorqueBody1() const
-{
-	return m_torqueBody1;
-}
-
-inline void ndConstraint::UpdateParameters()
-{
-}
 
 #endif 
 
