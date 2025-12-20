@@ -13,6 +13,7 @@
 #include "ndPhysicsWorld.h"
 #include "ndPhysicsUtils.h"
 #include "ndDemoCameraNode.h"
+#include "ndDemoEntityNotify.h"
 #include "ndDemoEntityManager.h"
 
 ndDemoCameraNode::ndDemoCameraNode(ndRender* const owner)
@@ -82,15 +83,22 @@ bool ndDemoCameraNode::UpdatePickBody()
 			if (world->RayCast(rayCaster, p0, p1))
 			{
 				ndBodyKinematic* const body = (ndBodyKinematic*)rayCaster.m_contact.m_body0;
-				ndBodyNotify* const notify = body->GetNotifyCallback();
-				if (notify)
+				ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)body->GetNotifyCallback();
+				if (body->GetAsBodyDynamic() && notify && !strcmp(notify->ClassName(), "ndDemoEntityNotify"))
 				{
-					ndTrace(("picked body id: %d\n", body->GetId()));
-					m_pickedBodyParam = rayCaster.m_param;
-
-					if (body->GetAsBodyDynamic())
+					// filter this camera from the model hiearchy
+					// allow self picking produce a positive feeback 
+					// that make the articalation explode.
+					ndAssert(*notify->GetUserData());
+					ndRenderSceneNode* const rootMesh = notify->GetUserData()->GetRoot();
+					ndRenderSceneCamera* const cameraNode = rootMesh->FindCameraNode();
+					if (!cameraNode || (cameraNode->GetParent() != this))
 					{
-						ndVector mass(body->GetMassMatrix());
+						// only pick bodies that do no have this camera atached
+						ndTrace(("picked body id: %d\n", body->GetId()));
+						m_pickedBodyParam = rayCaster.m_param;
+
+						const ndVector mass(body->GetMassMatrix());
 
 						//change this to make the grabbing stronger or weaker
 						const ndFloat32 angularFritionAccel = 10.0f;
