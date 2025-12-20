@@ -53,6 +53,7 @@ class ndDynamicsUpdateAvx2: public ndDynamicsUpdate
 	void UpdateForceFeedback();
 	void CalculateJointsForce();
 	void IntegrateBodiesVelocity();
+	void ResolveSkeletonsViolations();
 	void CalculateJointsAcceleration();
 	void IntegrateUnconstrainedBodies();
 	
@@ -66,4 +67,3 @@ class ndDynamicsUpdateAvx2: public ndDynamicsUpdate
 } D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif
-

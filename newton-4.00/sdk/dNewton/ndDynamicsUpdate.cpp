@@ -1455,6 +1455,11 @@ void ndDynamicsUpdate::CalculateForces()
 	}
 }
 
+void ndDynamicsUpdate::ResolveSkeletonsViolations()
+{
+	ndAssert(0);
+}
+
 void ndDynamicsUpdate::Update()
 {
 	D_TRACKTIME();
@@ -1467,6 +1472,7 @@ void ndDynamicsUpdate::Update()
 	InitJacobianMatrix();
 	CalculateForces();
 	IntegrateBodies();
+	ResolveSkeletonsViolations();
 	UpdateForceFeedback();
 	DetermineSleepStates();
 }

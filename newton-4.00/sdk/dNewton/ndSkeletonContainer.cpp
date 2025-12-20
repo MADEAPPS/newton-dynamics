@@ -602,21 +602,6 @@ void ndSkeletonContainer::CheckSleepState()
 		equilibrium &= node->m_body->m_equilibrium;
 	}
 
-	if (equilibrium)
-	{
-		ndAssert(!m_transientLoopingJoints.GetCount());
-		ndAssert(!m_transientLoopingContacts.GetCount());
-		//const ndInt32 loopCount = m_jointsLoopCount + m_contactsLoopCount;
-		//for (ndInt32 i = 0; i < loopCount; ++i)
-		//{
-		//	const ndConstraint* const joint = m_loopingJoints[i];
-		//	ndBodyKinematic* const body0 = joint->GetBody0();
-		//	ndBodyKinematic* const body1 = joint->GetBody1();
-		//	equilibrium &= body0->m_equilibrium;
-		//	equilibrium &= body1->m_equilibrium;
-		//}
-	}
-
 	if (!equilibrium)
 	{
 		for (ndInt32 i = m_nodeList.GetCount() - 1; i >= 0; --i)
@@ -627,19 +612,6 @@ void ndSkeletonContainer::CheckSleepState()
 				node->m_body->m_equilibrium = 0;
 			}
 		}
-
-		//const ndInt32 loopCount = m_jointsLoopCount + m_contactsLoopCount;
-		//for (ndInt32 i = 0; i < loopCount; ++i)
-		//{
-		//	const ndConstraint* const joint = m_loopingJoints[i];
-		//	ndBodyKinematic* const body0 = joint->GetBody0();
-		//	ndBodyKinematic* const body1 = joint->GetBody1();
-		//	body0->m_equilibrium = 0;
-		//	if (body1->GetInvMass() > ndFloat32(0.0f))
-		//	{
-		//		body1->m_equilibrium = 0;
-		//	}
-		//}
 	}
 	m_isResting = equilibrium;
 }
@@ -1200,7 +1172,7 @@ void ndSkeletonContainer::SolveLcp(ndInt32 stride, ndInt32 size, ndFloat32* cons
 			rowBase += stride;
 		}
 	}
-	
+																															
 	for (ndInt32 i = 0; i < size; ++i)
 	{
 		x[i] *= m_diagonalPreconditioner[i];
@@ -2251,5 +2223,85 @@ void ndSkeletonContainer::CalculateReactionForces(ndThreadPool* const threadPool
 		{
 			UpdateForces(internalForces, force);
 		}
+	}
+}
+
+ndFloat32 ndSkeletonContainer::CalculatePositionImpulse(ndFloat32 timestep, ndForcePair* const veloc) const
+{
+	const ndSpatialVector zero(ndSpatialVector::m_zero);
+
+	ndFloat32 invTimeStep = ndFloat32(1.0f) / timestep;
+	const ndInt32 nodeCount = m_nodeList.GetCount();
+	auto CalculateJointVeloc = [this, invTimeStep, veloc, &zero](ndInt32 groupId, ndInt32)
+	{
+		ndNode* const node = m_nodesOrder[groupId];
+		ndAssert(groupId == node->m_index);
+
+		ndForcePair& v = veloc[groupId];
+		ndAssert(node->m_body);
+		v.m_body = zero;
+		v.m_joint = zero;
+
+		ndAssert(node->m_joint);
+		ndJointBilateralConstraint* const joint = node->m_joint;
+
+		const ndInt32 dof = joint->m_rowCount;
+		const ndInt32 first = joint->m_rowStart;
+
+		ndFloat32 maxPenetration2 = ndFloat32(0.0f);
+		for (ndInt32 j = 0; j < dof; ++j)
+		{
+			const ndInt32 k = node->m_ordinal.m_sourceJacobianIndex[j];
+			const ndRightHandSide* const rhs = &m_rightHandSide[first + k];
+			//ndAssert(rhs->m_penetration < 0.1f);
+			maxPenetration2 = ndMax(maxPenetration2, rhs->m_penetration * rhs->m_penetration);
+			ndFloat32 relSpeed = invTimeStep * rhs->m_penetration;
+			v.m_joint[j] = -relSpeed;
+		}
+		return maxPenetration2;
+	};
+
+	ndFloat32 maxPenetration2 = ndFloat32(0.0f);
+	for (ndInt32 index = 0; index < nodeCount - 1; ++index)
+	{
+		ndFloat32 penetration2 = CalculateJointVeloc(index, 0);
+		maxPenetration2 = ndMax(maxPenetration2, penetration2);
+	}
+
+	ndAssert((nodeCount - 1) == m_nodesOrder[nodeCount - 1]->m_index);
+	veloc[nodeCount - 1].m_body = zero;
+	veloc[nodeCount - 1].m_joint = zero;
+	return maxPenetration2;
+}
+
+void ndSkeletonContainer::ResolveJointViolations(ndFloat32 timestep)
+{
+	if (m_isResting)
+	{
+		return;
+	}
+
+	const ndInt32 nodeCount = m_nodeList.GetCount();
+	//ndForcePair* const force = ndAlloca(ndForcePair, nodeCount);
+	ndForcePair* const veloc = ndAlloca(ndForcePair, nodeCount);
+
+	// apply two impulse passes.
+	// the first one to cancel all position violations, 
+	// and the second to cancel all velocity violations.
+	
+	// apply possition violation pass.
+	ndFloat32 maxPositError2 = CalculatePositionImpulse(timestep, veloc);
+	if (maxPositError2 > (ndFloat32(0.125f) * ndFloat32(0.125f)))
+	{
+		ndAssert(0);
+		//CalculateForce(force, accel);
+		//if (m_auxiliaryRowCount)
+		//{
+		//	SolveAuxiliary(threadPool, internalForces, accel, force);
+		//}
+		//else
+		//{
+		//	UpdateForces(internalForces, force);
+		//}
 	}
 }

@@ -3460,6 +3460,28 @@
 		}
 	}
 
+	void ndDynamicsUpdateSoa::ResolveSkeletonsViolations()
+	{
+		ndScene* const scene = m_world->GetScene();
+		const ndArray<ndSkeletonContainer*>& activeSkeletons = m_world->m_activeSkeletons;
+
+		const ndFloat32 timestep = scene->GetTimestep();
+		auto UpdateSkeletons = ndMakeObject::ndFunction([this, timestep, &activeSkeletons](ndInt32 groupId, ndInt32)
+		{
+			D_TRACKTIME_NAMED(UpdateSkeletons);
+			//ndJacobian* const internalForces = &GetInternalForces()[0];
+			ndSkeletonContainer* const skeleton = activeSkeletons[groupId];
+			//skeleton->ResolveJointViolations(nullptr, internalForces);
+			skeleton->ResolveJointViolations(timestep);
+		});
+
+		const ndInt32 count = ndInt32(activeSkeletons.GetCount()) - m_parallelSkeletons;
+		if (count)
+		{
+			scene->ParallelExecute(UpdateSkeletons, count, 1);
+		}
+	}
+
 	void ndDynamicsUpdateSoa::Update()
 	{
 		D_TRACKTIME();
@@ -3472,6 +3494,7 @@
 		InitJacobianMatrix();
 		CalculateForces();
 		IntegrateBodies();
+		ResolveSkeletonsViolations();
 		UpdateForceFeedback();
 		DetermineSleepStates();
 	}

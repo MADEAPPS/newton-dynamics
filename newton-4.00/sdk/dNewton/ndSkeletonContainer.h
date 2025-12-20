@@ -215,10 +215,13 @@ class ndSkeletonContainer
 	void SolveBlockLcp(ndInt32 size, ndInt32 blockSize, ndFloat32* const x, ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex, ndFloat32 accelTol) const;
 	void SolveLcp(ndInt32 stride, ndInt32 size, ndFloat32* const x, const ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex, ndFloat32 accelTol) const;
 
-	void SolveBackward(ndForcePair* const force) const;
+	void ResolveJointViolations(ndFloat32 timestep);
+	ndFloat32 CalculatePositionImpulse(ndFloat32 timestep, ndForcePair* const veloc) const;
+
 	void CalculateForce(ndForcePair* const force, const ndForcePair* const accel) const;
 	void UpdateForces(ndJacobian* const internalForces, const ndForcePair* const force) const;
-	
+		
+	void SolveBackward(ndForcePair* const force) const;
 	void SolveForward(ndForcePair* const force, const ndForcePair* const accel, ndInt32 startNode) const;
 
 	void SolveImmediate(ndIkSolver& solverInfo);

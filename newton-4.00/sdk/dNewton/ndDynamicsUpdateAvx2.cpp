@@ -3533,6 +3533,11 @@
 		}
 	}
 
+	void ndDynamicsUpdateAvx2::ResolveSkeletonsViolations()
+	{
+		ndAssert(0);
+	}
+
 	void ndDynamicsUpdateAvx2::Update()
 	{
 		D_TRACKTIME();
@@ -3545,6 +3550,7 @@
 		InitJacobianMatrix();
 		CalculateForces();
 		IntegrateBodies();
+		ResolveSkeletonsViolations();
 		UpdateForceFeedback();
 		DetermineSleepStates();
 	}
