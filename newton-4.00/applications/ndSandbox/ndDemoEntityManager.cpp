@@ -919,17 +919,17 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::SliderInt("##intera", &m_solverPasses, 4, 32);
 			ImGui::Text("worker threads");
 			ImGui::SliderInt("##worker", &m_workerThreads, 1, ndThreadPool::GetMaxThreads());
-			ImGui::Separator();
 
+			ImGui::Separator();
+			ImGui::Checkbox("hide visual meshes", &m_hideVisualMeshes);
+			//ImGui::Checkbox("show mesh skeleton", &m_showMeshSkeleton);
+
+			ImGui::Separator();
 			//ImGui::RadioButton("show UI", &m_showUI);
 			ImGui::RadioButton("hide collision Mesh", &m_showCollisionMeshMode, 0);
 			ImGui::RadioButton("show solid collision", &m_showCollisionMeshMode, 1);
 			ImGui::RadioButton("show wire frame collision", &m_showCollisionMeshMode, 2);
 			ImGui::RadioButton("show hidden wire frame collision", &m_showCollisionMeshMode, 3);
-
-			ImGui::Separator();
-			ImGui::Checkbox("hide visual meshes", &m_hideVisualMeshes);
-			//ImGui::Checkbox("show mesh skeleton", &m_showMeshSkeleton);
 	
 			ImGui::Separator();
 			ImGui::Checkbox("show aabb", &m_showAABB);
