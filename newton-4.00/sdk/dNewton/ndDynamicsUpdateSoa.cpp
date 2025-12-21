@@ -2450,6 +2450,7 @@
 			rhs->m_coordenateAccel = constraintParam.m_jointAccel[i];
 			rhs->m_restitution = constraintParam.m_restitution[i];
 			rhs->m_penetration = constraintParam.m_penetration[i];
+			rhs->m_errorViolation = constraintParam.m_errorViolation[i];
 			rhs->m_penetrationStiffness = constraintParam.m_penetrationStiffness[i];
 			rhs->m_lowerBoundFrictionCoefficent = constraintParam.m_forceBounds[i].m_low;
 			rhs->m_upperBoundFrictionCoefficent = constraintParam.m_forceBounds[i].m_upper;

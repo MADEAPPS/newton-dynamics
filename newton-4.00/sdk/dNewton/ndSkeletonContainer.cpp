@@ -2219,7 +2219,7 @@ void ndSkeletonContainer::CalculatePositionImpulse(ndFloat32 timestep, ndForcePa
 	const ndSpatialVector zero(ndSpatialVector::m_zero);
 
 	m_auxiliaryJointViolationsRowCount = 0;
-	ndFloat32 invTimeStep = ndFloat32(1.0f) / timestep;
+	ndFloat32 invTimeStep = ndFloat32(0.9f) / timestep;
 	const ndInt32 nodeCount = m_nodeList.GetCount();
 	
 	auto CalculateJointVeloc = [this, invTimeStep, veloc, &zero](ndInt32 groupId, ndInt32)
@@ -2245,12 +2245,12 @@ void ndSkeletonContainer::CalculatePositionImpulse(ndFloat32 timestep, ndForcePa
 		{
 			const ndInt32 k = node->m_ordinal.m_sourceJacobianIndex[j];
 			const ndRightHandSide* const rhs = &m_rightHandSide[first + k];
-			maxPenetration2 = ndMax(maxPenetration2, rhs->m_penetration * rhs->m_penetration);
+			maxPenetration2 = ndMax(maxPenetration2, rhs->m_errorViolation * rhs->m_errorViolation);
 			if (maxPenetration2 > D_MAX_POSIT_ERROR_VIOLATION2)
 			{
 				maxPenetration2 *= 1;
 			}
-			ndFloat32 relSpeed = invTimeStep * rhs->m_penetration;
+			ndFloat32 relSpeed = invTimeStep * rhs->m_errorViolation;
 			v.m_joint[j] = -relSpeed;
 		}
 
@@ -2375,7 +2375,7 @@ void ndSkeletonContainer::ResolveJointsPostSolverViolations(ndFloat32 timestep)
 			body->SetOmega(omega);
 			body->SetVelocity(veloc);
 
-			//body->IntegrateVelocity(timestep);
+			body->IntegrateVelocity(timestep);
 
 			body->SetOmega(savedOmega);
 			body->SetVelocity(savedVeloc);
