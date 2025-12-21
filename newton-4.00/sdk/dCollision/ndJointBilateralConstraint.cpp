@@ -411,6 +411,7 @@ void ndJointBilateralConstraint::SetMassSpringDamperAcceleration(ndConstraintDes
 	const ndFloat32 relVeloc = (jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
 	const ndFloat32 accel = CalculateSpringDamperAcceleration(desc.m_timestep, spring, -relPosit, damper, relVeloc);
 
+	desc.m_errorViolation[index] = ndFloat32(0.0f);
 	const ndFloat32 r = ndClamp(regularizer, ndFloat32(1.e-8f), ndFloat32(0.9f));
 	desc.m_diagonalRegularizer[index] = r;
 	SetMotorAcceleration(desc, accel);
@@ -534,6 +535,7 @@ void ndJointBilateralConstraint::AddLinearRowJacobian(ndConstraintDescritor& des
 	desc.m_flags[index] = 0;
 	desc.m_jointAccel[index] = relAccel;
 	desc.m_penetration[index] = relPosit;
+	desc.m_errorViolation[index] = relPosit;
 	desc.m_jointSpeed[index] = relVeloc;
 	desc.m_restitution[index] = ndFloat32(0.0f);
 	desc.m_penetrationStiffness[index] = ndFloat32(0.0f);
@@ -589,6 +591,7 @@ void ndJointBilateralConstraint::AddAngularRowJacobian(ndConstraintDescritor& de
 	desc.m_flags[index] = 0;
 	desc.m_jointSpeed[index] = relOmega;
 	desc.m_penetration[index] = relAngle;
+	desc.m_errorViolation[index] = relAngle;
 	desc.m_jointAccel[index] = alphaError + relGyro;
 	desc.m_restitution[index] = ndFloat32(0.0f);
 	desc.m_penetrationStiffness[index] = ndFloat32(0.0f);
