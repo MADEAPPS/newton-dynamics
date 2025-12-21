@@ -186,13 +186,14 @@ ndFloat32 ndJointBilateralConstraint::GetMotorAcceleration(ndConstraintDescritor
 	return desc.m_jointAccel[index];
 }
 
-void ndJointBilateralConstraint::SetJointErrorPosit(ndConstraintDescritor& desc, ndFloat32 errorPosit)
-{
-	const ndInt32 index = desc.m_rowsCount - 1;
-	ndAssert(index >= 0);
-	ndAssert(index < ndInt32(m_maxDof));
-	desc.m_penetration[index] = errorPosit;
-}
+//void ndJointBilateralConstraint::SetJointErrorPosit(ndConstraintDescritor& desc, ndFloat32 errorPosit)
+//{
+//	const ndInt32 index = desc.m_rowsCount - 1;
+//	ndAssert(index >= 0);
+//	ndAssert(index < ndInt32(m_maxDof));
+//	ndAssert(0);
+//	desc.m_penetration[index] = errorPosit;
+//}
 
 void ndJointBilateralConstraint::SetLowerFriction(ndConstraintDescritor& desc, ndFloat32 friction)
 {
@@ -285,13 +286,13 @@ void ndJointBilateralConstraint::SetDiagonalRegularizer(ndConstraintDescritor& d
 	desc.m_diagonalRegularizer[index] = ndClamp(regularizer, ndFloat32(0.0f), ndFloat32(1.0f));
 }
 
-ndFloat32 ndJointBilateralConstraint::GetJointErrorPosit(ndConstraintDescritor& desc) const
-{
-	const ndInt32 index = desc.m_rowsCount - 1;
-	ndAssert(index >= 0);
-	ndAssert(index < ndInt32(m_maxDof));
-	return desc.m_penetration[index];
-}
+//ndFloat32 ndJointBilateralConstraint::GetJointErrorPosit(ndConstraintDescritor& desc) const
+//{
+//	const ndInt32 index = desc.m_rowsCount - 1;
+//	ndAssert(index >= 0);
+//	ndAssert(index < ndInt32(m_maxDof));
+//	return desc.m_penetration[index];
+//}
 
 ndFloat32 ndJointBilateralConstraint::GetJointErrorSpeed(ndConstraintDescritor& desc) const
 {
