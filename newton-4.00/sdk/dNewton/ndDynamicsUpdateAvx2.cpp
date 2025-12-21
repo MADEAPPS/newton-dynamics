@@ -3535,7 +3535,22 @@
 
 	void ndDynamicsUpdateAvx2::ResolveSkeletonsViolations()
 	{
-		ndAssert(0);
+		ndScene* const scene = m_world->GetScene();
+		const ndArray<ndSkeletonContainer*>& activeSkeletons = m_world->m_activeSkeletons;
+
+		const ndFloat32 timestep = scene->GetTimestep();
+		auto UpdateSkeletons = ndMakeObject::ndFunction([this, timestep, &activeSkeletons](ndInt32 groupId, ndInt32)
+		{
+			D_TRACKTIME_NAMED(UpdateSkeletons);
+			ndSkeletonContainer* const skeleton = activeSkeletons[groupId];
+			skeleton->ResolveJointsPostSolverViolations(timestep);
+		});
+
+		const ndInt32 count = ndInt32(activeSkeletons.GetCount()) - m_parallelSkeletons;
+		if (count)
+		{
+			scene->ParallelExecute(UpdateSkeletons, count, 1);
+		}
 	}
 
 	void ndDynamicsUpdateAvx2::Update()

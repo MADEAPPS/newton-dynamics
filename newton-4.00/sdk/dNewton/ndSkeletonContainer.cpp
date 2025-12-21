@@ -1161,6 +1161,11 @@ void ndSkeletonContainer::CalculateBodyImpulses(ndJacobian* const bodyImpulse, c
 	}
 }
 
+void ndSkeletonContainer::CalculateExtraBodyImpulses(ndJacobian* const bodyImpulse, const ndForcePair* const jointVeloc, const ndForcePair* const jointImpulse) const
+{
+	ndTrace(("TO DO, nothing for now\n"));
+}
+
 void ndSkeletonContainer::SolveLcp(ndInt32 stride, ndInt32 size, ndFloat32* const x, const ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex, ndFloat32 accelTol) const
 {
 	D_TRACKTIME();
@@ -1567,9 +1572,7 @@ void ndSkeletonContainer::InitLoopMassMatrix(ndThreadPool* const threadPool)
 	m_bodyForceRemap1.m_index = ndAlignedPtr(ndBodyForceIndexPair, &m_bodyForceRemap0.m_indexSpan[m_rowCount]);
 	m_bodyForceRemap1.m_indexSpan = ndAlignedPtr(ndInt32, &m_bodyForceRemap1.m_index[m_rowCount]);
 
-	//m_pairs = ndAlignedPtr(ndNodePair, &m_matrixRowsIndex[m_rowCount]);
 	m_pairs = ndAlignedPtr(ndNodePair, &m_bodyForceRemap1.m_indexSpan[m_rowCount]);
-
 	m_diagonalPreconditioner = ndAlignedPtr(ndFloat32, &m_pairs[m_rowCount]);
 	m_precondinonedMassMatrix11 = ndAlignedPtr(ndFloat32, &m_diagonalPreconditioner[m_rowCount]);
 
@@ -2221,6 +2224,7 @@ void ndSkeletonContainer::CalculatePositionImpulse(ndFloat32 timestep, ndForcePa
 	auto CalculateJointVeloc = [this, invTimeStep, veloc, &zero](ndInt32 groupId, ndInt32)
 	{
 		ndNode* const node = m_nodesOrder[groupId];
+		ndAssert(node->m_parent);
 		ndAssert(groupId == node->m_index);
 
 		ndForcePair& v = veloc[groupId];
@@ -2230,6 +2234,7 @@ void ndSkeletonContainer::CalculatePositionImpulse(ndFloat32 timestep, ndForcePa
 
 		ndAssert(node->m_joint);
 		ndJointBilateralConstraint* const joint = node->m_joint;
+		ndAssert(joint->IsBilateral());
 
 		const ndInt32 dof = joint->m_rowCount;
 		const ndInt32 first = joint->m_rowStart;
@@ -2239,14 +2244,64 @@ void ndSkeletonContainer::CalculatePositionImpulse(ndFloat32 timestep, ndForcePa
 		{
 			const ndInt32 k = node->m_ordinal.m_sourceJacobianIndex[j];
 			const ndRightHandSide* const rhs = &m_rightHandSide[first + k];
-			//ndAssert(rhs->m_penetration < 0.1f);
 			maxPenetration2 = ndMax(maxPenetration2, rhs->m_penetration * rhs->m_penetration);
 			ndFloat32 relSpeed = invTimeStep * rhs->m_penetration;
 			v.m_joint[j] = -relSpeed;
 		}
 
+		const ndInt32 m0 = node->m_index;
+		const ndInt32 m1 = node->m_parent->m_index;
 		for (ndInt32 i = node->m_dof; i < dof; ++i)
 		{
+			//for (ndInt32 i = 0; i < nodeCount; ++i)
+			//{
+				//const ndNode* const node = m_nodesOrder[i];
+				//ndJointBilateralConstraint* const joint = node->m_joint;
+				//const ndInt32 m0 = joint->GetBody0()->m_index;
+				//const ndInt32 m1 = joint->GetBody1()->m_index;
+				//const ndInt32 primaryDof = node->m_dof;
+				//const ndInt32 first = joint->m_rowStart;
+				//for (ndInt32 j = 0; j < primaryDof; ++j)
+				//{
+				//	const ndInt32 index = node->m_ordinal.m_sourceJacobianIndex[j];
+				//	m_pairs[primaryIndex].m_m0 = m0;
+				//	m_pairs[primaryIndex].m_m1 = m1;
+				//	m_pairs[primaryIndex].m_joint = joint;
+				//	m_frictionIndex[primaryIndex] = 0;
+				//	m_matrixRowsIndex[primaryIndex] = first + index;
+				//	primaryIndex++;
+				//}
+				//
+				//const ndInt32 auxiliaryDof = joint->m_rowCount - primaryDof;
+				//for (ndInt32 j = 0; j < auxiliaryDof; ++j)
+				//{
+				//	const ndInt32 index = node->m_ordinal.m_sourceJacobianIndex[primaryDof + j];
+				//	const ndRightHandSide* const rhs = &m_rightHandSide[first + index];
+				//
+				//	m_pairs[auxiliaryIndex + primaryCount].m_m0 = m0;
+				//	m_pairs[auxiliaryIndex + primaryCount].m_m1 = m1;
+				//	m_pairs[auxiliaryIndex + primaryCount].m_joint = joint;
+				//	m_frictionIndex[auxiliaryIndex + primaryCount] = m_auxiliaryRowCount - auxiliaryIndex;
+				//	m_matrixRowsIndex[auxiliaryIndex + primaryCount] = first + index;
+				//	const ndInt32 boundIndex = (rhs->m_lowerBoundFrictionCoefficent <= ndFloat32(-D_MAX_SKELETON_LCP_VALUE)) && (rhs->m_upperBoundFrictionCoefficent >= ndFloat32(D_MAX_SKELETON_LCP_VALUE)) ? 1 : 0;
+				//	ndAssert(joint->IsBilateral());
+				//	ndAssert(rhs->SanityCheck());
+				//	boundRow[auxiliaryIndex] = boundIndex;
+				//	m_blockSize += boundIndex;
+				//	auxiliaryIndex++;
+				//}
+			//}
+
+			const ndInt32 index = node->m_ordinal.m_sourceJacobianIndex[i];
+			//const ndRightHandSide* const rhs = &m_rightHandSide[first + index];
+			m_pairs[m_auxiliaryJointViolationsRowCount].m_m0 = m0;
+			m_pairs[m_auxiliaryJointViolationsRowCount].m_m1 = m1;
+			m_pairs[m_auxiliaryJointViolationsRowCount].m_joint = joint;
+			m_frictionIndex[m_auxiliaryJointViolationsRowCount] = 0;
+			m_matrixRowsIndex[m_auxiliaryJointViolationsRowCount] = first + index;
+			//const ndInt32 boundIndex = (rhs->m_lowerBoundFrictionCoefficent <= ndFloat32(-D_MAX_SKELETON_LCP_VALUE)) && (rhs->m_upperBoundFrictionCoefficent >= ndFloat32(D_MAX_SKELETON_LCP_VALUE)) ? 1 : 0;
+			//boundRow[auxiliaryIndex] = boundIndex;
+			//m_blockSize += boundIndex;
 			m_auxiliaryJointViolationsRowCount++;
 		}
 
@@ -2254,7 +2309,7 @@ void ndSkeletonContainer::CalculatePositionImpulse(ndFloat32 timestep, ndForcePa
 	};
 
 	m_maxPositError2 = ndFloat32(0.0f);
-	for (ndInt32 index = 0; index < nodeCount - 1; ++index)
+	for (ndInt32 index = 0; index < (nodeCount - 1); ++index)
 	{
 		ndFloat32 penetration2 = CalculateJointVeloc(index, 0);
 		m_maxPositError2 = ndMax(m_maxPositError2, penetration2);
@@ -2265,7 +2320,7 @@ void ndSkeletonContainer::CalculatePositionImpulse(ndFloat32 timestep, ndForcePa
 	veloc[nodeCount - 1].m_joint = zero;
 }
 
-void ndSkeletonContainer::ResolveJointViolations(ndFloat32 timestep)
+void ndSkeletonContainer::ResolveJointsPostSolverViolations(ndFloat32 timestep)
 {
 	if (m_isResting)
 	{
@@ -2288,34 +2343,35 @@ void ndSkeletonContainer::ResolveJointViolations(ndFloat32 timestep)
 		CalculateForce(jointImpulse, jointVeloc);
 		if (m_auxiliaryJointViolationsRowCount)
 		{
-			ndAssert(0);
 			//SolveAuxiliary(threadPool, internalForces, accel, force);
+			CalculateExtraBodyImpulses(bodyImpulse, jointVeloc, jointImpulse);
 		}
 		else
 		{
 			CalculateBodyImpulses(bodyImpulse, jointImpulse);
-			for (ndInt32 i = 0; i < (nodeCount - 1); ++i)
-			{
-				ndNode* const node = m_nodesOrder[i];
-				ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();;
-				ndAssert(body);
-				ndAssert(body->GetInvMass() > ndFloat32 (0.0f));
+		}
 
-				const ndVector savedOmega(body->GetOmega());
-				const ndVector savedVeloc(body->GetVelocity());
+		for (ndInt32 i = 0; i < (nodeCount - 1); ++i)
+		{
+			ndNode* const node = m_nodesOrder[i];
+			ndBodyDynamic* const body = node->m_body->GetAsBodyDynamic();;
+			ndAssert(body);
+			ndAssert(body->GetInvMass() > ndFloat32(0.0f));
 
-				const ndJacobian& impulse = bodyImpulse[i];
-				const ndVector veloc(impulse.m_linear.Scale(body->GetInvMass()));
-				const ndVector omega(body->m_invWorldInertiaMatrix.RotateVector(impulse.m_angular));
-				
-				body->SetOmega(omega);
-				body->SetVelocity(veloc);
+			const ndVector savedOmega(body->GetOmega());
+			const ndVector savedVeloc(body->GetVelocity());
 
-				body->IntegrateVelocity(timestep);
+			const ndJacobian& impulse = bodyImpulse[i];
+			const ndVector veloc(impulse.m_linear.Scale(body->GetInvMass()));
+			const ndVector omega(body->m_invWorldInertiaMatrix.RotateVector(impulse.m_angular));
 
-				body->SetOmega(savedOmega);
-				body->SetVelocity(savedVeloc);
-			}
+			body->SetOmega(omega);
+			body->SetVelocity(veloc);
+
+			body->IntegrateVelocity(timestep);
+
+			body->SetOmega(savedOmega);
+			body->SetVelocity(savedVeloc);
 		}
 	}
 }
