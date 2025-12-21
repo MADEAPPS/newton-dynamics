@@ -626,11 +626,13 @@ void ndQuadSpiderAnimated(ndDemoEntityManager* const scene)
 	//ndController::CreateModel(scene, matrix1, loader);
 #endif
 
+	// position scene camera above ground
 	ndQuaternion rot(matrix);
 	ndVector origin(-3.0f, 1.0f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(rot, origin);
 
+	// set the robot camera as the active camera
 	ndController* const controller = (ndController*)*model->GetNotifyCallback();
 	ndRender* const renderer = *scene->GetRenderer();
-	renderer->SetCamera(controller->m_cameraNode);
+	//renderer->SetCamera(controller->m_cameraNode);
 }

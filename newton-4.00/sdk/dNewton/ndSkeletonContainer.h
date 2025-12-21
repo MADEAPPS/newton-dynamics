@@ -216,7 +216,8 @@ class ndSkeletonContainer
 	void SolveLcp(ndInt32 stride, ndInt32 size, ndFloat32* const x, const ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex, ndFloat32 accelTol) const;
 
 	void ResolveJointViolations(ndFloat32 timestep);
-	ndFloat32 CalculatePositionImpulse(ndFloat32 timestep, ndForcePair* const veloc) const;
+	void CalculatePositionImpulse(ndFloat32 timestep, ndForcePair* const veloc);
+	void CalculateBodyImpulses(ndJacobian* const impulse, const ndForcePair* const veloc) const;
 
 	void CalculateForce(ndForcePair* const force, const ndForcePair* const accel) const;
 	void UpdateForces(ndJacobian* const internalForces, const ndForcePair* const force) const;
@@ -282,7 +283,10 @@ class ndSkeletonContainer
 	ndInt32 m_rowCount;
 	ndInt32 m_loopRowCount;
 	ndInt32 m_auxiliaryRowCount;
-	ndUnsigned8 m_isResting;
+	ndInt32 m_isResting;
+
+	ndFloat32 m_maxPositError2;
+	ndInt32 m_auxiliaryJointViolationsRowCount;
 
 	friend class ndWorld;
 	friend class ndIkSolver;
@@ -293,5 +297,3 @@ class ndSkeletonContainer
 };
 
 #endif
-
-
