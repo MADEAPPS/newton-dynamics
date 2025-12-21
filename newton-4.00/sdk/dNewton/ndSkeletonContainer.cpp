@@ -30,7 +30,9 @@
 #include "ndSkeletonContainer.h"
 #include "ndJointBilateralConstraint.h"
 
-#define D_MAX_SKELETON_LCP_VALUE (D_LCP_MAX_VALUE * ndFloat32 (0.25f))
+#define D_MAX_OPEN_LOOP_DOF				6
+#define D_MAX_SKELETON_LCP_VALUE		(D_LCP_MAX_VALUE * ndFloat32 (0.25f))
+#define D_MAX_POSIT_ERROR_VIOLATION2	(ndFloat32(0.125f) * ndFloat32(0.125f))
 
 ndSkeletonContainer::ndNode::ndNode()
 	:m_body(nullptr)
@@ -258,9 +260,8 @@ ndInt32 ndSkeletonContainer::ndNode::FactorizeChild(const ndLeftHandSide* const 
 			count--;
 		}
 	}
-	m_dof = ndMin(m_dof, ndInt8(6));
+	m_dof = ndMin(m_dof, ndInt8(D_MAX_OPEN_LOOP_DOF));
 	ndAssert(m_dof >= 0);
-	ndAssert(m_dof <= 6);
 
 	ndInt32 boundedDof = m_joint->m_rowCount - m_dof;
 	GetJacobians(leftHandSide, rightHandSide, jointMassArray);
@@ -2245,12 +2246,17 @@ void ndSkeletonContainer::CalculatePositionImpulse(ndFloat32 timestep, ndForcePa
 			const ndInt32 k = node->m_ordinal.m_sourceJacobianIndex[j];
 			const ndRightHandSide* const rhs = &m_rightHandSide[first + k];
 			maxPenetration2 = ndMax(maxPenetration2, rhs->m_penetration * rhs->m_penetration);
+			if (maxPenetration2 > D_MAX_POSIT_ERROR_VIOLATION2)
+			{
+				maxPenetration2 *= 1;
+			}
 			ndFloat32 relSpeed = invTimeStep * rhs->m_penetration;
 			v.m_joint[j] = -relSpeed;
 		}
 
 		const ndInt32 m0 = node->m_index;
 		const ndInt32 m1 = node->m_parent->m_index;
+
 		for (ndInt32 i = node->m_dof; i < dof; ++i)
 		{
 			//for (ndInt32 i = 0; i < nodeCount; ++i)
@@ -2292,6 +2298,7 @@ void ndSkeletonContainer::CalculatePositionImpulse(ndFloat32 timestep, ndForcePa
 				//}
 			//}
 
+			ndAssert(0);
 			const ndInt32 index = node->m_ordinal.m_sourceJacobianIndex[i];
 			//const ndRightHandSide* const rhs = &m_rightHandSide[first + index];
 			m_pairs[m_auxiliaryJointViolationsRowCount].m_m0 = m0;
@@ -2338,7 +2345,7 @@ void ndSkeletonContainer::ResolveJointsPostSolverViolations(ndFloat32 timestep)
 	
 	// apply possition violation pass.
 	CalculatePositionImpulse(timestep, jointVeloc);
-	if (m_maxPositError2 > (ndFloat32(0.125f) * ndFloat32(0.125f)))
+	if (m_maxPositError2 > D_MAX_POSIT_ERROR_VIOLATION2)
 	{
 		CalculateForce(jointImpulse, jointVeloc);
 		if (m_auxiliaryJointViolationsRowCount)
@@ -2368,7 +2375,7 @@ void ndSkeletonContainer::ResolveJointsPostSolverViolations(ndFloat32 timestep)
 			body->SetOmega(omega);
 			body->SetVelocity(veloc);
 
-			body->IntegrateVelocity(timestep);
+			//body->IntegrateVelocity(timestep);
 
 			body->SetOmega(savedOmega);
 			body->SetVelocity(savedVeloc);

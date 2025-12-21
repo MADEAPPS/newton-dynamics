@@ -189,3 +189,49 @@ ndVector ndConstraint::GetTorqueBody1() const
 void ndConstraint::UpdateParameters()
 {
 }
+
+bool ndConstraint::CheckBlockMatrixPSD(const ndLeftHandSide* const bigMatrix, const ndRightHandSide* const bigRhs) const
+{
+	ndAssert(m_rowCount <= D_CONSTRAINT_MAX_ROWS);
+	ndFloat32 matrix[D_CONSTRAINT_MAX_ROWS][D_CONSTRAINT_MAX_ROWS];
+
+	const ndInt32 index = m_rowStart;
+	const ndInt32 count = m_rowCount;
+	const ndVector zero(ndVector::m_zero);
+
+	for (ndInt32 i = 0; i < count; ++i)
+	{
+		const ndLeftHandSide* const row_i = &bigMatrix[index + i];
+		const ndRightHandSide* const rhs = &bigRhs[index + i];
+
+		const ndJacobian& JMinvM0 = row_i->m_JMinv.m_jacobianM0;
+		const ndJacobian& JMinvM1 = row_i->m_JMinv.m_jacobianM1;
+		const ndJacobian& JtM0 = row_i->m_Jt.m_jacobianM0;
+		const ndJacobian& JtM1 = row_i->m_Jt.m_jacobianM1;
+		const ndVector tmpDiag(
+			JMinvM0.m_linear * JtM0.m_linear + JMinvM0.m_angular * JtM0.m_angular +
+			JMinvM1.m_linear * JtM1.m_linear + JMinvM1.m_angular * JtM1.m_angular);
+		
+		ndFloat32 diag = tmpDiag.AddHorizontal().GetScalar();
+		diag *= (ndFloat32(1.0f) + rhs->m_diagonalRegularizer);
+		matrix[i][i] = diag;
+
+		for (ndInt32 j = i + 1; j < m_rowCount; ++j)
+		{
+			const ndLeftHandSide* const row_j = &bigMatrix[index + j];
+			const ndJacobian& JtM0_j = row_j->m_Jt.m_jacobianM0;
+			const ndJacobian& JtM1_j = row_j->m_Jt.m_jacobianM1;
+
+			const ndVector offDiag(
+				JMinvM0.m_linear * JtM0_j.m_linear + JMinvM0.m_angular * JtM0_j.m_angular +
+				JMinvM1.m_linear * JtM1_j.m_linear + JMinvM1.m_angular * JtM1_j.m_angular);
+
+			ndFloat32 off = offDiag.AddHorizontal().GetScalar();
+			matrix[i][j] = off;
+			matrix[j][i] = off;
+		}
+	}
+
+	bool test = ndTestPSDmatrix(count, D_CONSTRAINT_MAX_ROWS, &matrix[0][0]);
+	return test;
+}

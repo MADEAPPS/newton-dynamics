@@ -100,7 +100,8 @@ ndSpatialMatrix ndSpatialMatrix::Inverse(ndInt32 rows) const
 			for (ndInt32 j = i + 1; j < rows; ++j) 
 			{
 				ndFloat64 pivot1 = ndAbs(tmp[j][i]);
-				if (pivot1 > pivot) {
+				if (pivot1 > pivot) 
+				{
 					permute = j;
 					pivot = pivot1;
 				}
@@ -174,7 +175,6 @@ ndSpatialMatrix ndSpatialMatrix::Inverse(ndInt32 rows) const
 
 	return inv;
 }
-
 
 ndSpatialMatrix ndSpatialMatrix::InversePositiveDefinite(ndInt32 rows) const
 {

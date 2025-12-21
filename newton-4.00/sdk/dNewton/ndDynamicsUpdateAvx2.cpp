@@ -2536,6 +2536,8 @@
 			ndConstraint* const joint = jointArray[groupId];
 			GetJacobianDerivatives(joint);
 			BuildJacobianMatrix(joint, groupId);
+
+			ndAssert(joint->CheckBlockMatrixPSD(&m_leftHandSide[0], &m_rightHandSide[0]));
 		});
 
 		auto InitJacobianAccumulatePartialForces = ndMakeObject::ndFunction([this, &bodyArray](ndInt32 groupId, ndInt32)

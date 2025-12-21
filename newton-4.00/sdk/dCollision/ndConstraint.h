@@ -286,6 +286,7 @@ class ndConstraint: public ndContainersFreeListAlloc<ndConstraint>
 	
 	D_COLLISION_API virtual void DebugJoint(ndConstraintDebugCallback&) const;
 	D_COLLISION_API void InitPointParam(ndPointParam& param, const ndVector& p0Global, const ndVector& p1Global) const;
+	D_COLLISION_API bool CheckBlockMatrixPSD(const ndLeftHandSide* const rows, const ndRightHandSide* const rhs) const;
 
 	protected:
 	D_COLLISION_API ndConstraint();
