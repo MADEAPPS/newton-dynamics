@@ -216,9 +216,9 @@ class ndSkeletonContainer
 	void SolveLcp(ndInt32 stride, ndInt32 size, ndFloat32* const x, const ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex, ndFloat32 accelTol) const;
 
 	void ResolveJointsPostSolverViolations(ndFloat32 timestep);
-	void CalculatePositionImpulse(ndFloat32 timestep, ndForcePair* const veloc);
+	ndFloat32 CalculatePositionImpulse(ndFloat32 timestep, ndForcePair* const veloc);
 	void CalculateBodyImpulses(ndJacobian* const bodyImpulse, const ndForcePair* const jointImpulse) const;
-	void CalculateExtraBodyImpulses(ndFloat32 timestep, ndJacobian* const bodyImpulse, const ndForcePair* const jointVeloc, const ndForcePair* const jointImpulse);
+	//void CalculateExtraBodyImpulses(ndFloat32 timestep, ndJacobian* const bodyImpulse, const ndForcePair* const jointVeloc, const ndForcePair* const jointImpulse);
 
 	void CalculateForce(ndForcePair* const force, const ndForcePair* const accel) const;
 	void UpdateForces(ndJacobian* const internalForces, const ndForcePair* const force) const;
@@ -286,9 +286,9 @@ class ndSkeletonContainer
 	ndInt32 m_auxiliaryRowCount;
 	ndInt32 m_isResting;
 
-	ndFloat32 m_maxPositError2;
-	ndInt32 m_primaryJointViolationsRowCount;
-	ndInt32 m_auxiliaryJointViolationsRowCount;
+	//ndFloat32 m_maxPositError2;
+	//ndInt32 m_primaryJointViolationsRowCount;
+	//ndInt32 m_auxiliaryJointViolationsRowCount;
 
 	friend class ndWorld;
 	friend class ndIkSolver;
