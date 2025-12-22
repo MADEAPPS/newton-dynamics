@@ -347,7 +347,7 @@ ndJacobian ndBodyDynamic::IntegrateForceAndToque(const ndVector& force, const nd
 			m_uniqueId,
 			velocStep.m_angular.m_x, velocStep.m_angular.m_y, velocStep.m_angular.m_z,
 			velocStep.m_linear.m_x, velocStep.m_linear.m_y, velocStep.m_linear.m_z));
-		//ndAssert(0);
+		ndAssert(0);
 	}
 #endif
 

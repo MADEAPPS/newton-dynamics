@@ -903,7 +903,7 @@ void ndBodyKinematic::IntegrateVelocity(ndFloat32 timestep)
 			m_uniqueId,	
 			m_omega.m_x, m_omega.m_y, m_omega.m_z, 
 			m_veloc.m_x, m_veloc.m_y, m_veloc.m_z));
-		//ndAssert(0);
+		ndAssert(0);
 	}
 #endif
 
