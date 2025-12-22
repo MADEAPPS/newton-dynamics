@@ -236,10 +236,11 @@ ndVector ndMatrix::SolveByGaussianElimination(const ndVector &v) const
 				}
 			}
 
-			// Lax inside: 
-			// if the matrix becomes singular, 
-			// we can just set the row solusion to zero and use rank reduction.
-			if (!ndCheckFloat(pivot) || ndAbs(pivot) < ndFloat32(1.0e-6f))
+			// Lax insight: 
+			// if the matrix is singular, we can just set the row solusion to zero 
+			// and apply a rank reduction.
+			ndAssert(ndCheckFloat(pivot));
+			if (ndAbs(pivot) < ndFloat32(1.0e-8f))
 			{
 				// Matrix is effectively singular for this system.
 				// Fallback: zero-out remainder of solution (no angular accel contribution).
@@ -248,7 +249,6 @@ ndVector ndMatrix::SolveByGaussianElimination(const ndVector &v) const
 				ret[i] = ndFloat32(0.0f);
 				tmp[i][i] = ndFloat32(1.0f);
 			}
-			// *** END NEW ***
 
 			if (permute != i)
 			{
