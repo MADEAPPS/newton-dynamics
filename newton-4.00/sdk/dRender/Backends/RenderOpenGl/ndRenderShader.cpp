@@ -918,7 +918,7 @@ void ndRenderShaderDynamicPointsArrayBlock::Render(const ndRenderPrimitiveImplem
 	glBindBuffer(GL_ARRAY_BUFFER, self->m_vertexBuffer);
 	const ndArray<ndRenderPassDebug::ndPoint>& points = debugPass->GetPoints();
 	
-	glPointSize(ndReal(8.0f));
+	glPointSize(ndReal(4.0f));
 	for (ndInt32 j = 0; j < points.GetCount(); j += self->m_vertexCount)
 	{
 		glPointColor* const bufferData = (glPointColor*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
