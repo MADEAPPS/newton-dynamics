@@ -2450,8 +2450,10 @@ void ndSkeletonContainer::ResolveJointsPostSolverViolations(ndFloat32 timestep)
 			const ndVector savedVeloc(body->GetVelocity());
 
 			const ndJacobian& impulse = bodyImpulse[i];
+			const ndMatrix invInertia (body->CalculateInvInertiaMatrix());
 			const ndVector veloc(impulse.m_linear.Scale(body->GetInvMass()));
-			const ndVector omega(body->m_invWorldInertiaMatrix.RotateVector(impulse.m_angular));
+			//const ndVector omega(body->m_invWorldInertiaMatrix.RotateVector(impulse.m_angular));
+			const ndVector omega(invInertia.RotateVector(impulse.m_angular));
 
 			body->SetOmega(omega);
 			body->SetVelocity(veloc);
