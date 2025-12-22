@@ -157,7 +157,7 @@ bool ndTestPSDmatrix(ndInt32 size, ndInt32 stride, const T* const matrix)
 }
 
 template<class T>
-void ndSolveCholesky(ndInt32 size, ndInt32 stride, const T* const choleskyMatrix, T* const x, const T* const b)
+void ndSolveCholesky(const ndInt32 size, const ndInt32 stride, const T* const choleskyMatrix, T* const x, const T* const b)
 {
 	ndInt32 rowStart = 0;
 	for (ndInt32 i = 0; i < size; ++i) 
@@ -184,45 +184,64 @@ void ndSolveCholesky(ndInt32 size, ndInt32 stride, const T* const choleskyMatrix
 }
 
 template<class T>
-void ndSolveCholesky(ndInt32 size, T* const choleskyMatrix, T* const x)
+void ndSolveCholesky(const ndInt32 size, const ndInt32 stride, T* const choleskyMatrix, T* const x)
 {
-	ndSolveCholesky(size, size, choleskyMatrix, x);
+	ndSolveCholesky(size, stride, choleskyMatrix, x);
 }
 
 template<class T>
-bool ndSolveGaussian(ndInt32 size, T* const matrix, T* const b)
+void ndSolveGaussian(const ndInt32 size, const ndInt32 stride, const T* const matrixSrc, const T* const bsrc, T* const x)
 {
-	for (ndInt32 i = 0; i < size - 1; ++i) 
+	T* const b = ndAlloca(T, size);
+	T* const matrix = ndAlloca(T, size * size);
+	for (ndInt32 i = 0; i < size; ++i)
 	{
+		b[i] = bsrc[i];
+		ndMemCpy(&matrix[i * size], &matrixSrc[i * stride], size);
+	}
+
+	for (ndInt32 i = 0; i < (size - 1); ++i) 
+	{
+		ndInt32 permuteIndex = i;
 		const T* const rowI = &matrix[i * size];
-		ndInt32 m = i;
 		T maxVal (ndAbs(rowI[i]));
 		for (ndInt32 j = i + 1; j < size - 1; ++j) 
 		{
 			T val (ndAbs(matrix[size * j + i]));
 			if (val > maxVal) 
 			{
-				m = j;
+				permuteIndex = j;
 				maxVal = val;
 			}
 		}
-
-		if (maxVal < T(1.0e-12f)) 
+	
+		if (maxVal < T(1.0e-12f))
 		{
-			return false;
+			ndAssert(0);
+			// Matrix is effectively singular for this system.
+			// Fallback: zero-out remainder of solution (no angular accel contribution).
+			//ndTrace(("the matrix is singular, solving by rank reduction\nsomething may not be right\n\n"));
+			//permute = i;
+			//ret[i] = ndFloat32(0.0f);
+			//tmp[i][i] = ndFloat32(1.0f);
 		}
-
-		if (m != i) 
+		//if (maxVal < T(1.0e-12f)) 
+		//{
+		//  //not need to return, since we sole the rank deficient matrix
+		//	return false;
+		//}
+	
+		if (permuteIndex != i)
 		{
-			T* const rowK = &matrix[m * size];
 			T* const rowJ = &matrix[i * size];
+			T* const rowK = &matrix[permuteIndex * size];
 			for (ndInt32 j = 0; j < size; ++j) 
 			{
 				ndSwap(rowK[j], rowJ[j]);
 			}
-			ndSwap(b[i], b[m]);
+			ndSwap(b[i], b[permuteIndex]);
 		}
-
+	
 		T den = T(1.0f) / rowI[i];
 		for (ndInt32 k = i + 1; k < size; ++k) 
 		{
@@ -236,7 +255,7 @@ bool ndSolveGaussian(ndInt32 size, T* const matrix, T* const b)
 			b[k] += b[i] * factor;
 		}
 	}
-
+	
 	for (ndInt32 i = size - 1; i >= 0; i--) 
 	{
 		T acc(0);
@@ -245,9 +264,8 @@ bool ndSolveGaussian(ndInt32 size, T* const matrix, T* const b)
 		{
 			acc = acc + rowI[j] * b[j];
 		}
-		b[i] = (b[i] - acc) / rowI[i];
+		x[i] = (b[i] - acc) / rowI[i];
 	}
-	return true;
 }
 
 template <class T>
