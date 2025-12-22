@@ -465,6 +465,10 @@ void ndJointBilateralConstraint::JointAccelerations(ndJointAccelerationDecriptor
 
 			rhs[k].m_penetration = relPosit;
 			rhs[k].m_coordenateAccel = accel;
+			if (ndAbs (rhs[k].m_errorViolation) > ndFloat32 (1.0e-5f))
+			{
+				rhs[k].m_errorViolation -= vRel * dt * desc->m_firstPassCoefFlag;
+			}
 		}
 	}
 }
