@@ -67,26 +67,27 @@ class ndDGController : public ndModelNotify
         AddRagdollHuman(scene, location, 1.0f);
     }
 
-    void NormalizeMassDistribution(ndFloat32 totalMass) const
+    void NormalizeMassDistribution(const std::vector<ndFloat32>& bodypartMassweigh,ndFloat32 totalMass) const
     {
         ndFloat32 totalVolume = 0.0f;
-        for (const auto& part : m_bodypartlist)
+        //for (const auto& part : m_bodypartlist)
+        for (size_t i = 0; i < m_bodypartlist.size(); ++i)
         {
+            const auto& part = m_bodypartlist[i];
             ndFloat32 volume = part->GetAsBodyKinematic()->GetCollisionShape().GetVolume();
-            // mistake 1
-             //totalVolume += (volume > 0.0f ? volume : 0.001f);
-            totalVolume = volume;
+            totalVolume = volume * bodypartMassweigh[i];
         }
         totalVolume = ndMax(totalVolume, 1.0f);
 
         ndFloat32 density = totalMass / totalVolume;
 
-        for (const auto& part : m_bodypartlist)
+        for (size_t i = 0; i < m_bodypartlist.size(); ++i)
         {
+            const auto& part = m_bodypartlist[i];
             ndBodyKinematic* body = part->GetAsBodyKinematic();
             const ndShapeInstance& shape = body->GetCollisionShape();
 
-            ndFloat32 volume = shape.GetVolume();
+            ndFloat32 volume = shape.GetVolume() * bodypartMassweigh[i];
             ndFloat32 mass = density * volume;
 
             ndVector massMatrix (body->GetMassMatrix());
@@ -347,6 +348,31 @@ class ndDGController : public ndModelNotify
             hipRBody, cuisseRBody, tibiaRBody, piedRBody, orteilRBody
         };
 
+        std::vector<ndFloat32> bodypartMassweigh =
+        {
+            3.0f, //bassinBody, 
+            2.0f, //colonneBody, 
+            0.5f, //headBody,
+            1.0f, //epauleLBody, 
+            1.0f, //brasLBody, 
+            1.0f, //avantbrasLBody, 
+            1.0f, //handLBody,
+            1.0f, //epauleRBody, 
+            1.0f, //brasRBody, 
+            1.0f, //avantbrasRBody, 
+            1.0f, //handRBody,
+            2.0f, //hipLBody, 
+            1.0f, //cuisseLBody, 
+            1.0f, //tibiaLBody, 
+            1.0f, //piedLBody, 
+            1.0f, //orteilLBody,
+            2.0f, //hipRBody, 
+            1.0f, //cuisseRBody, 
+            1.0f, //tibiaRBody, 
+            1.0f, //piedRBody, 
+            1.0f, //orteilRBody
+        };
+
         // === Material ragdoll ===
         ndContactCallback* callback = (ndContactCallback*)world->GetContactNotify();
         DGRagdollMaterial ragdollMat;
@@ -359,7 +385,7 @@ class ndDGController : public ndModelNotify
             body->GetAsBodyDynamic()->GetCollisionShape().SetMaterial(mat);
         }
 
-        NormalizeMassDistribution(80.0f);
+        NormalizeMassDistribution(bodypartMassweigh, 80.0f);
 
         // === Tes joints (je les laisse tels quels, ils étaient déjà bons) ===
         // (tu peux les remettre exactement comme dans ton code original)
