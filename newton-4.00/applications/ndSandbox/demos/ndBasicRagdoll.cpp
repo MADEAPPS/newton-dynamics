@@ -77,7 +77,7 @@ class ndDGController : public ndModelNotify
             ndFloat32 volume = part->GetAsBodyKinematic()->GetCollisionShape().GetVolume();
             totalVolume = volume * bodypartMassweigh[i];
         }
-        totalVolume = ndMax(totalVolume, 1.0f);
+        totalVolume = ndMax(totalVolume, ndFloat32(1.0f));
 
         ndFloat32 density = totalMass / totalVolume;
 
@@ -423,7 +423,6 @@ class ndDGController : public ndModelNotify
             tmp1 = ndRollMatrix(90.0f * ndDegreeToRad) * tmp1;
             //
             joint1 = new ndJointHinge(tmp1, colonneBody->GetAsBodyKinematic(), bassinBody->GetAsBodyKinematic());
-            //joint1->SetCollidable(false);
             joint1->SetLimitState(true);
             joint1->SetLimits(-25.0f * ndDegreeToRad, 2.0f * ndDegreeToRad);
             joint1->SetAsSpringDamper(0.01f, 10.0f, 0.5f);
@@ -435,22 +434,171 @@ class ndDGController : public ndModelNotify
             nextRootTemp3 = nextRootTemp;
         }
 
-        { // head
-            ndMatrix tmp1(headBody->GetMatrix());
-            tmp1[3] = ndVector(tmp1[3][0], tmp1[3][1] - 1.05f, tmp1[3][2], 1.0f); // offset
+        //{ // head
+        //    ndMatrix tmp1(headBody->GetMatrix());
+        //    tmp1[3] = ndVector(tmp1[3][0], tmp1[3][1] - 1.05f, tmp1[3][2], 1.0f); // offset
+        //    tmp1 = ndRollMatrix(90.0f * ndDegreeToRad) * tmp1;
+        //
+        //    joint2 = new ndJointHinge(tmp1, headBody->GetAsBodyKinematic(), colonneBody->GetAsBodyKinematic());
+        //    joint2->SetLimitState(true);
+        //    joint2->SetLimits(-120.0f * ndDegreeToRad, 2.0f * ndDegreeToRad);
+        //    joint2->SetAsSpringDamper(0.01f, 25.0f, 0.5f);
+        //    //
+        //    //m_jointlist.push_back(joint2);
+        //    //
+        //    ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint2);
+        //    nextRootTemp = m_model->AddLimb(nextRootTemp, headBody, jointPtr);
+        //}
+
+#if 1
+        // upper bodi parts
+        { // epaule_R
+            ndMatrix tmp1(epauleRBody->GetMatrix());
+            tmp1[3] = ndVector(tmp1[3][0] - 0.65f, tmp1[3][1] - 0.325f, tmp1[3][2], 1.0f); // offset
             tmp1 = ndRollMatrix(90.0f * ndDegreeToRad) * tmp1;
-            
-            joint2 = new ndJointHinge(tmp1, headBody->GetAsBodyKinematic(), colonneBody->GetAsBodyKinematic());
-            joint2->SetLimitState(true);
-            joint2->SetLimits(-120.0f * ndDegreeToRad, 2.0f * ndDegreeToRad);
-            joint2->SetAsSpringDamper(0.01f, 25.0f, 0.5f);
+            tmp1 = ndPitchMatrix(-180.0f * ndDegreeToRad) * tmp1;
+            tmp1 = ndYawMatrix(-180.0f * ndDegreeToRad) * tmp1;
             //
-            //m_jointlist.push_back(joint2);
+            joint14 = new ndJointSpherical(tmp1, epauleRBody->GetAsBodyKinematic(), colonneBody->GetAsBodyKinematic());
+            //joint14->SetLimitState(true);
+            //joint14->SetLimits(-15.0f * ndDegreeToRad, 15.0f * ndDegreeToRad);
+            joint14->SetConeLimit(24.0f * ndDegreeToRad);
+            joint14->SetTwistLimits(-12.5f * ndDegreeToRad, 12.5f * ndDegreeToRad);
+            joint14->SetAsSpringDamper(0.005f, 50.0f, 10.0f);
             //
-            ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint2);
-            nextRootTemp = m_model->AddLimb(nextRootTemp, headBody, jointPtr);
+            //m_jointlist.push_back(joint14);
+            //
+            ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint14);
+            nextRootTemp2 = m_model->AddLimb(nextRootTemp3, epauleRBody, jointPtr);
         }
 
+        { // epaule_L
+            ndMatrix tmp1(epauleLBody->GetMatrix());
+            tmp1[3] = ndVector(tmp1[3][0] + 0.65f, tmp1[3][1] - 0.325f, tmp1[3][2], 1.0f); // offset
+            tmp1 = ndRollMatrix(90.0f * ndDegreeToRad) * tmp1;
+            //
+            joint13 = new ndJointSpherical(tmp1, epauleLBody->GetAsBodyKinematic(), colonneBody->GetAsBodyKinematic());
+            //joint13->SetLimitState(true);
+            //joint13->SetLimits(-15.0f * ndDegreeToRad, 15.0f * ndDegreeToRad);
+            joint13->SetConeLimit(24.0f * ndDegreeToRad);
+            joint13->SetTwistLimits(-12.5f * ndDegreeToRad, 12.5f * ndDegreeToRad);
+            joint13->SetAsSpringDamper(0.005f, 50.0f, 10.0f);
+            //
+            //m_jointlist.push_back(joint13);
+            //
+            ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint13);
+            nextRootTemp1 = m_model->AddLimb(nextRootTemp3, epauleLBody, jointPtr);
+        }
+
+        { // bras_R
+            ndMatrix tmp1(brasRBody->GetMatrix());
+            tmp1[3] = ndVector(tmp1[3][0] + 0.025f, tmp1[3][1] + 0.95f, tmp1[3][2], 1.0f); // offset
+            tmp1 = ndRollMatrix(90.0f * ndDegreeToRad) * tmp1;
+            tmp1 = ndPitchMatrix(-180.0f * ndDegreeToRad) * tmp1;
+            tmp1 = ndYawMatrix(-180.0f * ndDegreeToRad) * tmp1;
+
+            joint16 = new ndJointSpherical(tmp1, brasRBody->GetAsBodyKinematic(), epauleRBody->GetAsBodyKinematic());
+            //joint16->SetLimitState(true);
+            //joint16->SetLimits(-165.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
+            joint16->SetConeLimit(175.0f * ndDegreeToRad);
+            joint16->SetTwistLimits(-175.0f * ndDegreeToRad, 175.0f * ndDegreeToRad);
+            joint16->SetAsSpringDamper(0.005f, 50.0f, 10.0f);
+            //
+            //m_jointlist.push_back(joint16);
+            //
+            ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint16);
+            nextRootTemp2 = m_model->AddLimb(nextRootTemp2, brasRBody, jointPtr);
+        }
+
+        { // bras_L
+            ndMatrix tmp1(brasLBody->GetMatrix());
+            tmp1[3] = ndVector(tmp1[3][0] - 0.025f, tmp1[3][1] + 0.95f, tmp1[3][2], 1.0f); // offset
+            tmp1 = ndRollMatrix(90.0f * ndDegreeToRad) * tmp1;
+            //
+            joint15 = new ndJointSpherical(tmp1, brasLBody->GetAsBodyKinematic(), epauleLBody->GetAsBodyKinematic());
+            //joint15->SetLimitState(true);
+            //joint15->SetLimits(-90.0f * ndDegreeToRad, 165.0f * ndDegreeToRad);
+            joint15->SetConeLimit(175.0f * ndDegreeToRad);
+            joint15->SetTwistLimits(-175.0f * ndDegreeToRad, 175.0f * ndDegreeToRad);
+            joint15->SetAsSpringDamper(0.005f, 50.0f, 10.0f);
+            //
+            //m_jointlist.push_back(joint15);
+            //
+            ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint15);
+            nextRootTemp1 = m_model->AddLimb(nextRootTemp1, brasLBody, jointPtr);
+        }
+
+        { // avantbras_R arm
+            ndMatrix tmp1(avantbrasRBody->GetMatrix());
+            tmp1[3] = ndVector(tmp1[3][0], tmp1[3][1] + 0.7f, tmp1[3][2], 1.0f); // offset
+            tmp1 = ndRollMatrix(90.0f * ndDegreeToRad) * tmp1;
+            tmp1 = ndPitchMatrix(-180.0f * ndDegreeToRad) * tmp1;
+            tmp1 = ndYawMatrix(-180.0f * ndDegreeToRad) * tmp1;
+            //
+            joint18 = new ndJointHinge(tmp1, avantbrasRBody->GetAsBodyKinematic(), brasRBody->GetAsBodyKinematic());
+            joint18->SetLimitState(true);
+            joint18->SetLimits(-165.0f * ndDegreeToRad, 25.0f * ndDegreeToRad);
+            joint18->SetAsSpringDamper(0.005f, 50.0f, 10.0f);
+            //
+            //m_jointlist.push_back(joint18);
+            //
+            ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint18);
+            nextRootTemp2 = m_model->AddLimb(nextRootTemp2, avantbrasRBody, jointPtr);
+        }
+
+        { // avantbras_L = arm
+            ndMatrix tmp1(avantbrasLBody->GetMatrix());
+            tmp1[3] = ndVector(tmp1[3][0], tmp1[3][1] + 0.7f, tmp1[3][2], 1.0f); // offset
+            tmp1 = ndRollMatrix(90.0f * ndDegreeToRad) * tmp1;
+            //
+            joint17 = new ndJointHinge(tmp1, avantbrasLBody->GetAsBodyKinematic(), brasLBody->GetAsBodyKinematic());
+            joint17->SetLimitState(true);
+            joint17->SetLimits(-25.0f * ndDegreeToRad, 165.0f * ndDegreeToRad);
+            joint17->SetAsSpringDamper(0.005f, 50.0f, 10.0f);
+            //
+            //m_jointlist.push_back(joint17);
+            //
+            ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint17);
+            nextRootTemp1 = m_model->AddLimb(nextRootTemp1, avantbrasLBody, jointPtr);
+        }
+
+        { // hand_R
+            ndMatrix tmp1(handRBody->GetMatrix());
+            tmp1[3] = ndVector(tmp1[3][0], tmp1[3][1] + 0.25f, tmp1[3][2], 1.0f); // offset
+            //tmp1 = ndRollMatrix(180.0f * ndDegreeToRad) * tmp1;
+            tmp1 = ndPitchMatrix(-180.0f * ndDegreeToRad) * tmp1;
+            tmp1 = ndYawMatrix(-90.0f * ndDegreeToRad) * tmp1;
+            //
+            joint20 = new ndJointHinge(tmp1, handRBody->GetAsBodyKinematic(), avantbrasRBody->GetAsBodyKinematic());
+            joint20->SetLimitState(true);
+            joint20->SetLimits(-45.0f * ndDegreeToRad, 65.0f * ndDegreeToRad);
+            ////joint20->SetAsSpringDamper(0.01f, 5.0f, 0.5f);
+            //m_jointlist.push_back(joint20);
+            //
+            ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint20);
+            nextRootTemp2 = m_model->AddLimb(nextRootTemp2, handRBody, jointPtr);
+        }
+
+        { // hand_L
+            ndMatrix tmp1(handLBody->GetMatrix());
+            tmp1[3] = ndVector(tmp1[3][0], tmp1[3][1] + 0.25f, tmp1[3][2], 1.0f); // offset
+            //tmp1 = ndRollMatrix(180.0f * ndDegreeToRad) * tmp1;
+            tmp1 = ndPitchMatrix(-180.0f * ndDegreeToRad) * tmp1;
+            tmp1 = ndYawMatrix(-90.0f * ndDegreeToRad) * tmp1;
+            //
+            joint19 = new ndJointHinge(tmp1, handLBody->GetAsBodyKinematic(), avantbrasLBody->GetAsBodyKinematic());
+            joint19->SetLimitState(true);
+            joint19->SetLimits(-45.0f * ndDegreeToRad, 65.0f * ndDegreeToRad);
+            ////joint19->SetAsSpringDamper(0.01f, 5.0f, 0.5f);
+            //m_jointlist.push_back(joint19);
+
+            ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint19);
+            nextRootTemp1 = m_model->AddLimb(nextRootTemp1, handLBody, jointPtr);
+        }
+#endif
+
+#if 0
+        // lower body parts
         { // hip_L
             ndMatrix tmp1(hipLBody->GetMatrix());
             tmp1[3] = ndVector(tmp1[3][0] + 0.4f, tmp1[3][1] + 0.05f, tmp1[3][2], 1.0f); // offset
@@ -551,14 +699,12 @@ class ndDGController : public ndModelNotify
             nextRootTemp2 = m_model->AddLimb(nextRootTemp2, tibiaRBody, jointPtr);
         }
 
-#if 0
         { // pied_L
             ndMatrix tmp1(piedLBody->GetMatrix());
             tmp1[3] = ndVector(tmp1[3][0], tmp1[3][1], tmp1[3][2] - 0.15f, 1.0f); // offset
             tmp1 = ndRollMatrix(90.0f * ndDegreeToRad) * tmp1;
             //
             joint9 = new ndJointHinge(tmp1, piedLBody->GetAsBodyKinematic(), tibiaLBody->GetAsBodyKinematic());
-            joint9->SetCollidable(false);
             joint9->SetLimitState(true);
             joint9->SetLimits(-2.0f * ndDegreeToRad, 65.0f * ndDegreeToRad);
             joint9->SetAsSpringDamper(0.01f, 25.0f, 1.0f);
@@ -569,13 +715,29 @@ class ndDGController : public ndModelNotify
             nextRootTemp1 = m_model->AddLimb(nextRootTemp1, piedLBody, jointPtr);
         }
 
+        { // orteille_R
+            ndMatrix tmp1(orteilRBody->GetMatrix());
+            tmp1[3] = ndVector(tmp1[3][0], tmp1[3][1], tmp1[3][2] - 0.125f, 1.0f); // offset
+            tmp1 = ndRollMatrix(90.0f * ndDegreeToRad) * tmp1;
+            //tmp1 = ndYawMatrix(-180.0f * ndDegreeToRad) * tmp1;
+            //
+            joint12 = new ndJointHinge(tmp1, orteilRBody->GetAsBodyKinematic(), piedRBody->GetAsBodyKinematic());
+            joint12->SetLimitState(true);
+            joint12->SetLimits(-15.0f * ndDegreeToRad, 45.0f * ndDegreeToRad);
+            joint12->SetAsSpringDamper(0.01f, 100.0f, 5.0f);
+            //
+            //m_jointlist.push_back(joint12);
+            //
+            ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint12);
+            nextRootTemp2 = m_model->AddLimb(nextRootTemp2, orteilRBody, jointPtr);
+        }
+
         { // orteille_L
             ndMatrix tmp1(orteilLBody->GetMatrix());
             tmp1[3] = ndVector(tmp1[3][0], tmp1[3][1], tmp1[3][2] - 0.125f, 1.0f); // offset
             tmp1 = ndRollMatrix(90.0f * ndDegreeToRad) * tmp1;
             //
             joint11 = new ndJointHinge(tmp1, orteilLBody->GetAsBodyKinematic(), piedLBody->GetAsBodyKinematic());
-            joint11->SetCollidable(false);
             joint11->SetLimitState(true);
             joint11->SetLimits(-15.0f * ndDegreeToRad, 45.0f * ndDegreeToRad);
             joint11->SetAsSpringDamper(0.01f, 100.0f, 5.0f);
@@ -584,12 +746,7 @@ class ndDGController : public ndModelNotify
             //
             ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint11);
             nextRootTemp1 = m_model->AddLimb(nextRootTemp1, orteilLBody, jointPtr);
-
-            //model->AddCloseLoop(jointPtr);
         }
-
-
-
 
         { // pied_R
             ndMatrix tmp1(piedRBody->GetMatrix());
@@ -598,7 +755,6 @@ class ndDGController : public ndModelNotify
             tmp1 = ndYawMatrix(-180.0f * ndDegreeToRad) * tmp1;
             //
             joint10 = new ndJointHinge(tmp1, piedRBody->GetAsBodyKinematic(), tibiaRBody->GetAsBodyKinematic());
-            joint10->SetCollidable(false);
             joint10->SetLimitState(true);
             joint10->SetLimits(-2.0f * ndDegreeToRad, 65.0f * ndDegreeToRad);
             joint10->SetAsSpringDamper(0.01f, 25.0f, 1.0f);
@@ -609,185 +765,6 @@ class ndDGController : public ndModelNotify
             nextRootTemp2 = m_model->AddLimb(nextRootTemp2, piedRBody, jointPtr);
         }
 
-        { // orteille_R
-            ndMatrix tmp1(orteilRBody->GetMatrix());
-            tmp1[3] = ndVector(tmp1[3][0], tmp1[3][1], tmp1[3][2] - 0.125f, 1.0f); // offset
-            tmp1 = ndRollMatrix(90.0f * ndDegreeToRad) * tmp1;
-            //tmp1 = ndYawMatrix(-180.0f * ndDegreeToRad) * tmp1;
-            //
-            joint12 = new ndJointHinge(tmp1, orteilRBody->GetAsBodyKinematic(), piedRBody->GetAsBodyKinematic());
-            joint12->SetCollidable(false);
-            joint12->SetLimitState(true);
-            joint12->SetLimits(-15.0f * ndDegreeToRad, 45.0f * ndDegreeToRad);
-            joint12->SetAsSpringDamper(0.01f, 100.0f, 5.0f);
-            //
-            //m_jointlist.push_back(joint12);
-            //
-            ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint12);
-            nextRootTemp2 = m_model->AddLimb(nextRootTemp2, orteilRBody, jointPtr);
-
-            //model->AddCloseLoop(jointPtr);
-        }
-
-        { // epaule_R
-            ndMatrix tmp1(epauleRBody->GetMatrix());
-            tmp1[3] = ndVector(tmp1[3][0] - 0.65f, tmp1[3][1] - 0.325f, tmp1[3][2], 1.0f); // offset
-            tmp1 = ndRollMatrix(90.0f * ndDegreeToRad) * tmp1;
-            tmp1 = ndPitchMatrix(-180.0f * ndDegreeToRad) * tmp1;
-            tmp1 = ndYawMatrix(-180.0f * ndDegreeToRad) * tmp1;
-            //
-            joint14 = new ndJointSpherical(tmp1, epauleRBody->GetAsBodyKinematic(), colonneBody->GetAsBodyKinematic());
-            joint14->SetCollidable(false);
-            //joint14->SetLimitState(true);
-            //joint14->SetLimits(-15.0f * ndDegreeToRad, 15.0f * ndDegreeToRad);
-            joint14->SetConeLimit(24.0f * ndDegreeToRad);
-            joint14->SetTwistLimits(-12.5f * ndDegreeToRad, 12.5f * ndDegreeToRad);
-            joint14->SetAsSpringDamper(0.005f, 50.0f, 10.0f);
-            //
-            //m_jointlist.push_back(joint14);
-            //
-            ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint14);
-            nextRootTemp2 = m_model->AddLimb(nextRootTemp3, epauleRBody, jointPtr);
-        }
-
-        { // bras_R
-            ndMatrix tmp1(brasRBody->GetMatrix());
-            tmp1[3] = ndVector(tmp1[3][0] + 0.025f, tmp1[3][1] + 0.95f, tmp1[3][2], 1.0f); // offset
-            tmp1 = ndRollMatrix(90.0f * ndDegreeToRad) * tmp1;
-            tmp1 = ndPitchMatrix(-180.0f * ndDegreeToRad) * tmp1;
-            tmp1 = ndYawMatrix(-180.0f * ndDegreeToRad) * tmp1;
-            //
-            joint16 = new ndJointSpherical(tmp1, brasRBody->GetAsBodyKinematic(), epauleRBody->GetAsBodyKinematic());
-            joint16->SetCollidable(false);
-            //joint16->SetLimitState(true);
-            //joint16->SetLimits(-165.0f * ndDegreeToRad, 90.0f * ndDegreeToRad);
-            joint16->SetConeLimit(175.0f * ndDegreeToRad);
-            joint16->SetTwistLimits(-175.0f * ndDegreeToRad, 175.0f * ndDegreeToRad);
-            joint16->SetAsSpringDamper(0.005f, 50.0f, 10.0f);
-            //
-            //m_jointlist.push_back(joint16);
-            //
-            ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint16);
-            nextRootTemp2 = m_model->AddLimb(nextRootTemp2, brasRBody, jointPtr);
-        }
-
-        { // avantbras_R arm
-            ndMatrix tmp1(avantbrasRBody->GetMatrix());
-            tmp1[3] = ndVector(tmp1[3][0], tmp1[3][1] + 0.7f, tmp1[3][2], 1.0f); // offset
-            tmp1 = ndRollMatrix(90.0f * ndDegreeToRad) * tmp1;
-            tmp1 = ndPitchMatrix(-180.0f * ndDegreeToRad) * tmp1;
-            tmp1 = ndYawMatrix(-180.0f * ndDegreeToRad) * tmp1;
-            //
-            joint18 = new ndJointHinge(tmp1, avantbrasRBody->GetAsBodyKinematic(), brasRBody->GetAsBodyKinematic());
-            joint18->SetCollidable(false);
-            joint18->SetLimitState(true);
-            joint18->SetLimits(-165.0f * ndDegreeToRad, 25.0f * ndDegreeToRad);
-            joint18->SetAsSpringDamper(0.005f, 50.0f, 10.0f);
-            //
-            //m_jointlist.push_back(joint18);
-            //
-            ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint18);
-            nextRootTemp2 = m_model->AddLimb(nextRootTemp2, avantbrasRBody, jointPtr);
-
-            //model->AddCloseLoop(jointPtr);
-        }
-
-        { // hand_R
-            ndMatrix tmp1(handRBody->GetMatrix());
-            tmp1[3] = ndVector(tmp1[3][0], tmp1[3][1] + 0.25f, tmp1[3][2], 1.0f); // offset
-            //tmp1 = ndRollMatrix(180.0f * ndDegreeToRad) * tmp1;
-            tmp1 = ndPitchMatrix(-180.0f * ndDegreeToRad) * tmp1;
-            tmp1 = ndYawMatrix(-90.0f * ndDegreeToRad) * tmp1;
-            //
-            joint20 = new ndJointHinge(tmp1, handRBody->GetAsBodyKinematic(), avantbrasRBody->GetAsBodyKinematic());
-            joint20->SetCollidable(false);
-            joint20->SetLimitState(true);
-            joint20->SetLimits(-45.0f * ndDegreeToRad, 65.0f * ndDegreeToRad);
-            ////joint20->SetAsSpringDamper(0.01f, 5.0f, 0.5f);
-            //m_jointlist.push_back(joint20);
-            //
-            ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint20);
-            nextRootTemp2 = m_model->AddLimb(nextRootTemp2, handRBody, jointPtr);
-
-            //model->AddCloseLoop(jointPtr);
-        }
-
-        { // epaule_L
-            ndMatrix tmp1(epauleLBody->GetMatrix());
-            tmp1[3] = ndVector(tmp1[3][0] + 0.65f, tmp1[3][1] - 0.325f, tmp1[3][2], 1.0f); // offset
-            tmp1 = ndRollMatrix(90.0f * ndDegreeToRad) * tmp1;
-            //
-            joint13 = new ndJointSpherical(tmp1, epauleLBody->GetAsBodyKinematic(), colonneBody->GetAsBodyKinematic());
-            joint13->SetCollidable(false);
-            //joint13->SetLimitState(true);
-            //joint13->SetLimits(-15.0f * ndDegreeToRad, 15.0f * ndDegreeToRad);
-            joint13->SetConeLimit(24.0f * ndDegreeToRad);
-            joint13->SetTwistLimits(-12.5f * ndDegreeToRad, 12.5f * ndDegreeToRad);
-            joint13->SetAsSpringDamper(0.005f, 50.0f, 10.0f);
-            //
-            //m_jointlist.push_back(joint13);
-            //
-            ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint13);
-            nextRootTemp1 = m_model->AddLimb(nextRootTemp3, epauleLBody, jointPtr);
-        }
-
-        { // bras_L
-            ndMatrix tmp1(brasLBody->GetMatrix());
-            tmp1[3] = ndVector(tmp1[3][0] - 0.025f, tmp1[3][1] + 0.95f, tmp1[3][2], 1.0f); // offset
-            tmp1 = ndRollMatrix(90.0f * ndDegreeToRad) * tmp1;
-            //
-            joint15 = new ndJointSpherical(tmp1, brasLBody->GetAsBodyKinematic(), epauleLBody->GetAsBodyKinematic());
-            joint15->SetCollidable(false);
-            //joint15->SetLimitState(true);
-            //joint15->SetLimits(-90.0f * ndDegreeToRad, 165.0f * ndDegreeToRad);
-            joint15->SetConeLimit(175.0f * ndDegreeToRad);
-            joint15->SetTwistLimits(-175.0f * ndDegreeToRad, 175.0f * ndDegreeToRad);
-            joint15->SetAsSpringDamper(0.005f, 50.0f, 10.0f);
-            //
-            //m_jointlist.push_back(joint15);
-            //
-            ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint15);
-            nextRootTemp1 = m_model->AddLimb(nextRootTemp1, brasLBody, jointPtr);
-        }
-
-        { // avantbras_L = arm
-            ndMatrix tmp1(avantbrasLBody->GetMatrix());
-            tmp1[3] = ndVector(tmp1[3][0], tmp1[3][1] + 0.7f, tmp1[3][2], 1.0f); // offset
-            tmp1 = ndRollMatrix(90.0f * ndDegreeToRad) * tmp1;
-            //
-            joint17 = new ndJointHinge(tmp1, avantbrasLBody->GetAsBodyKinematic(), brasLBody->GetAsBodyKinematic());
-            joint17->SetCollidable(false);
-            joint17->SetLimitState(true);
-            joint17->SetLimits(-25.0f * ndDegreeToRad, 165.0f * ndDegreeToRad);
-            joint17->SetAsSpringDamper(0.005f, 50.0f, 10.0f);
-            //
-            //m_jointlist.push_back(joint17);
-            //
-            ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint17);
-            nextRootTemp1 = m_model->AddLimb(nextRootTemp1, avantbrasLBody, jointPtr);
-
-            //model->AddCloseLoop(jointPtr);
-        }
-
-        { // hand_L
-            ndMatrix tmp1(handLBody->GetMatrix());
-            tmp1[3] = ndVector(tmp1[3][0], tmp1[3][1] + 0.25f, tmp1[3][2], 1.0f); // offset
-            //tmp1 = ndRollMatrix(180.0f * ndDegreeToRad) * tmp1;
-            tmp1 = ndPitchMatrix(-180.0f * ndDegreeToRad) * tmp1;
-            tmp1 = ndYawMatrix(-90.0f * ndDegreeToRad) * tmp1;
-            //
-            joint19 = new ndJointHinge(tmp1, handLBody->GetAsBodyKinematic(), avantbrasLBody->GetAsBodyKinematic());
-            joint19->SetCollidable(false);
-            joint19->SetLimitState(true);
-            joint19->SetLimits(-45.0f * ndDegreeToRad, 65.0f * ndDegreeToRad);
-            ////joint19->SetAsSpringDamper(0.01f, 5.0f, 0.5f);
-            //m_jointlist.push_back(joint19);
-            //
-            ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint19);
-            nextRootTemp1 = m_model->AddLimb(nextRootTemp1, handLBody, jointPtr);
-
-            //model->AddCloseLoop(jointPtr);
-        }
 #endif
     }
 
