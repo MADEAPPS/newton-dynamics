@@ -32,7 +32,6 @@ ndJointBilateralConstraint::ndJointBilateralConstraint()
 	,m_worldNode(nullptr)
 	,m_body0Node(nullptr)
 	,m_body1Node(nullptr)
-	//,m_deletedNode(nullptr)
 {
 	m_mark0 = 0;
 	m_mark1 = 0;
