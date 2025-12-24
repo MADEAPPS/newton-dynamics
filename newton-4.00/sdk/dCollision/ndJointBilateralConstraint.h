@@ -122,18 +122,23 @@ class ndJointBilateralConstraint : public ndConstraint
 
 	D_COLLISION_API void SetHighFriction(ndConstraintDescritor& desc, ndFloat32 friction);
 	D_COLLISION_API void SetLowerFriction(ndConstraintDescritor& desc, ndFloat32 friction);
-	//D_COLLISION_API void SetJointErrorPosit(ndConstraintDescritor& desc, ndFloat32 errorPosit);
 	D_COLLISION_API void SetMotorAcceleration(ndConstraintDescritor& desc, ndFloat32 acceleration);
 	D_COLLISION_API void SetDiagonalRegularizer(ndConstraintDescritor& desc, ndFloat32 regularizer);
 
-	//D_COLLISION_API ndFloat32 GetJointErrorPosit(ndConstraintDescritor& desc) const;
-	D_COLLISION_API ndFloat32 GetJointErrorSpeed(ndConstraintDescritor& desc) const;
 	D_COLLISION_API ndFloat32 GetMotorAcceleration(ndConstraintDescritor& desc) const;
 	D_COLLISION_API ndFloat32 GetMotorZeroAcceleration(ndConstraintDescritor& desc) const;
 	D_COLLISION_API ndFloat32 GetDiagonalRegularizer(const ndConstraintDescritor& desc) const;
 
 	D_COLLISION_API void UpdateParameters() override;
 	D_COLLISION_API void ReplaceSentinel(ndBodyKinematic* const sentinel);
+
+	D_COLLISION_API virtual void CalculateConstraintViolations(
+		const ndLeftHandSide* const leftHandSide,
+		ndVector8& positError, ndVector8& velocError) const;
+	D_COLLISION_API void AddLinearRowError(
+		const ndJacobianPair& jacobianPair,
+		const ndVector& pivot0, const ndVector& pivot1, const ndVector& dir,
+		ndFloat32& positError, ndFloat32& velocError) const;
 
 	// inverse dynamics interface
 	D_COLLISION_API virtual void ClearMemory() override;

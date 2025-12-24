@@ -159,7 +159,6 @@ class ndConstraintDescritor
 	ndFloat32 m_jointAccel[D_CONSTRAINT_MAX_ROWS];
 	ndFloat32 m_restitution[D_CONSTRAINT_MAX_ROWS];
 	ndFloat32 m_penetration[D_CONSTRAINT_MAX_ROWS];
-	ndFloat32 m_errorViolation[D_CONSTRAINT_MAX_ROWS];
 	ndFloat32 m_diagonalRegularizer[D_CONSTRAINT_MAX_ROWS];
 	ndFloat32 m_penetrationStiffness[D_CONSTRAINT_MAX_ROWS];
 	ndFloat32 m_zeroRowAcceleration[D_CONSTRAINT_MAX_ROWS];
@@ -248,7 +247,6 @@ class ndRightHandSide
 	ndFloat32 m_penetrationStiffness;
 
 	ndFloat32 m_JinvMJt;
-	ndFloat32 m_errorViolation;
 	ndForceImpactPair* m_jointFeebackForce;
 	ndInt32 m_normalForceIndex;
 	ndInt32 m_normalForceIndexFlat;

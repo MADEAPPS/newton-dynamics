@@ -288,6 +288,29 @@ void ndJointHinge::SubmitLimits(ndConstraintDescritor& desc, const ndMatrix& mat
 	}
 }
 
+void ndJointHinge::CalculateConstraintViolations(
+	const ndLeftHandSide* const leftHandSide,
+	ndVector8& positError, ndVector8& velocError) const
+{
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	//ApplyBaseRows(desc, matrix0, matrix1);
+	AddLinearRowError(leftHandSide[0].m_Jt, matrix0.m_posit, matrix1.m_posit, matrix1[0], positError[0], velocError[0]);
+	AddLinearRowError(leftHandSide[1].m_Jt, matrix0.m_posit, matrix1.m_posit, matrix1[1], positError[1], velocError[1]);
+	AddLinearRowError(leftHandSide[2].m_Jt, matrix0.m_posit, matrix1.m_posit, matrix1[2], positError[2], velocError[2]);
+
+	// 
+	//if (m_springDamperRegularizer && ((m_springK > ndFloat32(0.0f)) || (m_damperC > ndFloat32(0.0f))))
+	//{
+	//	// spring damper with limits
+	//	SubmitSpringDamper(desc, matrix0, matrix1);
+	//}
+	//SubmitLimits(desc, matrix0, matrix1);
+
+}
+
 void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;

@@ -243,7 +243,6 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 	desc.m_flags[normalIndex] = ndInt32(contact.m_material.m_flags & m_isSoftContact);
 	desc.m_jointSpeed[normalIndex] = ndFloat32 (0.0f);
 	desc.m_penetration[normalIndex] = penetration;
-	desc.m_errorViolation[normalIndex] = ndFloat32(0.0f);
 	desc.m_restitution[normalIndex] = restitutionCoefficient;
 	desc.m_forceBounds[normalIndex].m_low = ndFloat32(0.0f);
 	desc.m_forceBounds[normalIndex].m_normalIndex = D_INDEPENDENT_ROW;
@@ -289,7 +288,6 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 		desc.m_restitution[jacobIndex] = ndFloat32(0.0f);
 		desc.m_penetration[jacobIndex] = ndFloat32(0.0f);
 		desc.m_jointSpeed[normalIndex] = ndFloat32(0.0f);
-		desc.m_errorViolation[jacobIndex] = ndFloat32(0.0f);
 
 		desc.m_penetrationStiffness[jacobIndex] = ndFloat32(0.0f);
 		if (contact.m_material.m_flags & m_override0Accel)
@@ -335,7 +333,6 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 		desc.m_restitution[jacobIndex] = ndFloat32(0.0f);
 		desc.m_penetration[jacobIndex] = ndFloat32(0.0f);
 		desc.m_jointSpeed[normalIndex] = ndFloat32(0.0f);
-		desc.m_errorViolation[jacobIndex] = ndFloat32(0.0f);
 
 		desc.m_penetrationStiffness[jacobIndex] = ndFloat32(0.0f);
 		if (contact.m_material.m_flags & m_override1Accel)
