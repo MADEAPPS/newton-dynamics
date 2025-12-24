@@ -216,13 +216,10 @@ class ndSkeletonContainer
 	void SolveLcp(ndInt32 stride, ndInt32 size, ndFloat32* const x, const ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex, ndFloat32 accelTol) const;
 
 	void ResolveJointsPostSolverViolations(ndFloat32 timestep);
-	ndFloat32 CalculatePositionImpulse(ndFloat32 timestep, ndForcePair* const veloc);
-	void CalculateBodyImpulses(ndJacobian* const bodyImpulse, const ndForcePair* const jointImpulse) const;
-	//void CalculateExtraBodyImpulses(ndFloat32 timestep, ndJacobian* const bodyImpulse, const ndForcePair* const jointVeloc, const ndForcePair* const jointImpulse);
 
 	void CalculateForce(ndForcePair* const force, const ndForcePair* const accel) const;
 	void UpdateForces(ndJacobian* const internalForces, const ndForcePair* const force) const;
-		
+	
 	void SolveBackward(ndForcePair* const force) const;
 	void SolveForward(ndForcePair* const force, const ndForcePair* const accel, ndInt32 startNode) const;
 
@@ -240,19 +237,20 @@ class ndSkeletonContainer
 	void InitMassMatrix(const ndLeftHandSide* const matrixRow, ndRightHandSide* const rightHandSide);
 	void SolveAuxiliary(ndJacobian* const internalForces, const ndForcePair* const accel, ndForcePair* const force) const;
 
-	//class ndBodyForceIndexPair
-	//{
-	//	public:
-	//	ndInt32 m_bodyIndex;
-	//	ndInt32 m_forceIndex;
-	//};
-	//class ndBodyForcePtr
-	//{
-	//	public:
-	//	ndInt32* m_indexSpan;
-	//	ndBodyForceIndexPair* m_index;
-	//	ndInt32 m_spansCount;
-	//};
+	class ndBodyForceIndexPair
+	{
+		public:
+		ndInt32 m_bodyIndex;
+		ndInt32 m_forceIndex;
+	};
+
+	class ndBodyForcePtr
+	{
+		public:
+		ndInt32* m_indexSpan;
+		ndBodyForceIndexPair* m_index;
+		ndInt32 m_spansCount;
+	};
 		
 	ndNode* m_skeleton;
 	ndNode** m_nodesOrder;
@@ -260,8 +258,8 @@ class ndSkeletonContainer
 	ndRightHandSide* m_rightHandSide;
 	const ndLeftHandSide* m_leftHandSide;
 	ndNodePair* m_pairs;
-	//ndBodyForcePtr m_bodyForceRemap0;
-	//ndBodyForcePtr m_bodyForceRemap1;
+	ndBodyForcePtr m_bodyForceRemap0;
+	ndBodyForcePtr m_bodyForceRemap1;
 	ndInt32* m_frictionIndex;
 	ndInt32* m_matrixRowsIndex;
 	ndFloat32* m_massMatrix11;
