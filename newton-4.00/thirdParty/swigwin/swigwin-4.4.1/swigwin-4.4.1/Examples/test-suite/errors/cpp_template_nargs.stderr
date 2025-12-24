@@ -1,0 +1,2 @@
+cpp_template_nargs.i:5: Error: No matching function template 'blah' found.
+cpp_template_nargs.i:6: Error: No matching function template 'blah' found.

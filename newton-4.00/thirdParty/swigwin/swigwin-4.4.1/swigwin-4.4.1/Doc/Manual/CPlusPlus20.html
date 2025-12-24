@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>SWIG and C++20</title>
+<link rel="stylesheet" type="text/css" href="style.css">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+</head>
+
+<body bgcolor="#ffffff">
+<H1><a name="CPlusPlus20">10 SWIG and C++20</a></H1>
+<!-- INDEX -->
+<div class="sectiontoc">
+<ul>
+<li><a href="#CPlusPlus20_introduction">Introduction</a>
+<li><a href="#CPlusPlus20_core_language_changes">Core language changes</a>
+<ul>
+<li><a href="#CPlusPlus20_spaceship_operator">Spaceship operator</a>
+<li><a href="#CPlusPlus20_lambda_templates">Lambda templates</a>
+<li><a href="#CPlusPlus20_constexpr_destructors">Constexpr destructors</a>
+</ul>
+<li><a href="#CPlusPlus20_preprocessor_changes">Preprocessor changes</a>
+<ul>
+<li><a href="#CPlusPlus20_va_opt">__VA_OPT__()</a>
+</ul>
+<li><a href="#CPlusPlus20_standard_library_changes">Standard library changes</a>
+</ul>
+</div>
+<!-- INDEX -->
+
+
+
+<H2><a name="CPlusPlus20_introduction">10.1 Introduction</a></H2>
+
+
+<p>This chapter gives you a brief overview about the SWIG
+implementation of the C++20 standard.
+Work has only just begun on adding C++20 support.
+</p>
+
+<p>
+<b>Compatibility note:</b> SWIG-4.1.0 is the first version to support any C++20 features.
+</p>
+
+<H2><a name="CPlusPlus20_core_language_changes">10.2 Core language changes</a></H2>
+
+
+<H3><a name="CPlusPlus20_spaceship_operator">10.2.1 Spaceship operator</a></H3>
+
+
+<p>
+SWIG supports the spaceship operator <tt>&lt;=&gt;</tt> in constant
+expressions.  To simplify handling of the return value type, it is currently
+treated as an integer rather than <tt>std::strong_ordering</tt>, etc.
+In practice we think that should do the right thing in most cases.
+</p>
+
+<p>
+SWIG also recognises <tt>operator&lt;=&gt;</tt> which can be wrapped
+if renamed.  There is not currently any default renaming for the operator
+or any attempt to automatically map it to a three-way comparison operator
+in any of the target languages.
+</p>
+
+<H3><a name="CPlusPlus20_lambda_templates">10.2.2 Lambda templates</a></H3>
+
+
+<p>
+SWIG should parse lambda templates, but like
+<a href="CPlusPlus11.html#CPlusPlus11_lambda_functions_and_expressions">
+non-templated lambdas</a> they aren't currently wrapped.
+</p>
+
+
+<H3><a name="CPlusPlus20_constexpr_destructors">10.2.3 Constexpr destructors</a></H3>
+
+
+<p>
+Destructors that are declared <tt>constexpr</tt> are parsed and handled like any other constructor.
+For example:
+</p>
+
+<div class="code">
+<pre>
+class DtorA {
+public:
+  constexpr ~DtorA() {}
+};
+</pre>
+</div>
+
+<H2><a name="CPlusPlus20_preprocessor_changes">10.3 Preprocessor changes</a></H2>
+
+
+<H3><a name="CPlusPlus20_va_opt">10.3.1 __VA_OPT__()</a></H3>
+
+
+<p>
+Support for <tt>__VA_OPT__()</tt> was added in SWIG 4.3.0.
+</p>
+
+
+<H2><a name="CPlusPlus20_standard_library_changes">10.4 Standard library changes</a></H2>
+
+
+</body>
+</html>

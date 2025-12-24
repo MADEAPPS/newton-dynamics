@@ -1,0 +1,2 @@
+cpp_nested_template.i:9: Error: 'Temply' resolves to '::Temply' and was incorrectly instantiated in scope 'A' instead of within scope ''.
+cpp_nested_template.i:18: Error: 'Temply' resolves to '::Temply' and was incorrectly instantiated in scope 'B' instead of within scope ''.
