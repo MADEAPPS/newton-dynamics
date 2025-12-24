@@ -137,7 +137,10 @@ class ndJointBilateralConstraint : public ndConstraint
 		ndVector8& positError, ndVector8& velocError) const;
 	D_COLLISION_API void AddLinearRowError(
 		const ndJacobianPair& jacobianPair,
-		const ndVector& pivot0, const ndVector& pivot1, const ndVector& dir,
+		const ndVector& pivot0, const ndVector& pivot1,
+		ndFloat32& positError, ndFloat32& velocError) const;
+	D_COLLISION_API void AddAngularRowError(
+		const ndJacobianPair& jacobianPair, const ndFloat32 angle,
 		ndFloat32& positError, ndFloat32& velocError) const;
 
 	// inverse dynamics interface

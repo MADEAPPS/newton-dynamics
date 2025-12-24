@@ -278,9 +278,6 @@ void ndJointSlider::ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& m
 	const ndVector& p1 = matrix1.m_posit;
 	const ndVector prel(p0 - p1);
 	const ndVector vrel(veloc0 - veloc1);
-
-	//m_speed = vrel.DotProduct(matrix1.m_front).GetScalar();
-	//m_posit = prel.DotProduct(matrix1.m_front).GetScalar();
 	const ndVector projectedPoint = p1 + pin.Scale(pin.DotProduct(prel).GetScalar());
 
 	AddLinearRowJacobian(desc, p0, projectedPoint, matrix1[1]);
@@ -296,6 +293,31 @@ void ndJointSlider::ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& m
 	AddAngularRowJacobian(desc, matrix1.m_right, angle2);
 }
 
+void ndJointSlider::CalculateConstraintViolations(
+	const ndLeftHandSide* const leftHandSide,
+	ndVector8& positError, ndVector8& velocError) const
+{
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	//ApplyBaseRows(desc, matrix0, matrix1);
+	AddLinearRowError(leftHandSide[0].m_Jt, matrix0.m_posit, matrix1.m_posit, positError[0], velocError[0]);
+	AddLinearRowError(leftHandSide[1].m_Jt, matrix0.m_posit, matrix1.m_posit, positError[1], velocError[1]);
+
+	const ndFloat32 angle0 = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
+	const ndFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
+	const ndFloat32 angle2 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
+	AddAngularRowError(leftHandSide[2].m_Jt, angle0, positError[2], velocError[2]);
+	AddAngularRowError(leftHandSide[3].m_Jt, angle1, positError[3], velocError[3]);
+	AddAngularRowError(leftHandSide[4].m_Jt, angle2, positError[4], velocError[4]);
+	//if (m_springDamperRegularizer && ((m_springK > ndFloat32(0.0f)) || (m_damperC > ndFloat32(0.0f))))
+	//{
+	//	SubmitSpringDamper(desc, matrix0, matrix1);
+	//}
+	//SubmitLimits(desc, matrix0, matrix1);
+}
+
 void ndJointSlider::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;
@@ -305,11 +327,9 @@ void ndJointSlider::JacobianDerivative(ndConstraintDescritor& desc)
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	ApplyBaseRows(desc, matrix0, matrix1);
-
 	if (m_springDamperRegularizer && ((m_springK > ndFloat32(0.0f)) || (m_damperC > ndFloat32(0.0f))))
 	{
 		SubmitSpringDamper(desc, matrix0, matrix1);
 	}
-
 	SubmitLimits(desc, matrix0, matrix1);
 }

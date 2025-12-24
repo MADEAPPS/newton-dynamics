@@ -50,6 +50,7 @@ class ndJointSpherical: public ndJointBilateralConstraint
 	D_NEWTON_API void SubmitTwistAngle(const ndVector& pin, ndFloat32 angle, ndConstraintDescritor& desc);
 	D_NEWTON_API void SubmitLimits(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 	D_NEWTON_API void SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
+	D_NEWTON_API void CalculateConstraintViolations(const ndLeftHandSide* const leftHandSide, ndVector8& positError, ndVector8& velocError) const;
 
 	ndMatrix m_rotation;
 	ndVector m_omegaParam;

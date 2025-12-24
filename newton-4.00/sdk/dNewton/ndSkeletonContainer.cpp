@@ -30,7 +30,7 @@
 #include "ndSkeletonContainer.h"
 #include "ndJointBilateralConstraint.h"
 
-#define D_MAX_OPEN_LOOP_DOF			6
+#define D_MAX_OPEN_LOOP_DOF				6
 #define D_MAX_SKELETON_LCP_VALUE		(D_LCP_MAX_VALUE * ndFloat32 (0.25f))
 
 #define D_TIME_CORRECTION_FRACTION		ndFloat32 (0.9f)
@@ -262,8 +262,8 @@ ndInt32 ndSkeletonContainer::ndNode::FactorizeChild(const ndLeftHandSide* const 
 			count--;
 		}
 	}
-	m_dof = ndMin(m_dof, ndInt8(D_MAX_OPEN_LOOP_DOF));
 	ndAssert(m_dof >= 0);
+	m_dof = ndMin(m_dof, ndInt8(D_MAX_OPEN_LOOP_DOF));
 
 	ndInt32 boundedDof = m_joint->m_rowCount - m_dof;
 	GetJacobians(leftHandSide, rightHandSide, jointMassArray);
@@ -2068,15 +2068,16 @@ ndFloat32 ndSkeletonContainer::CalculatePositionImpulse(ndFloat32 timestep, ndFo
 		ndJointBilateralConstraint* const joint = node->m_joint;
 		ndAssert(joint->IsBilateral());
 
-		const ndInt32 dof = joint->m_rowCount;
+		//const ndInt32 dof = joint->m_rowCount;
 		const ndInt32 first = joint->m_rowStart;
 		const ndLeftHandSide* const lhs = &m_leftHandSide[first];
 
-		ndVector8 positError;
-		ndVector8 velocError;
+		ndVector8 positError(ndVector8::m_zero);
+		ndVector8 velocError(ndVector8::m_zero);
 		joint->CalculateConstraintViolations(lhs, positError, velocError);
 
-		ndAssert(dof < 8);
+		const ndInt32 dof = node->m_dof;
+		ndAssert(dof <= D_MAX_OPEN_LOOP_DOF);
 		ndFloat32 maxPenetration2 = ndFloat32(0.0f);
 		for (ndInt32 j = 0; j < dof; ++j)
 		{
@@ -2104,11 +2105,11 @@ ndFloat32 ndSkeletonContainer::CalculatePositionImpulse(ndFloat32 timestep, ndFo
 
 void ndSkeletonContainer::ResolveJointsPostSolverViolations(ndFloat32 timestep)
 {
+#if 0
 	if (m_isResting)
 	{
 		return;
 	}
-return;
 
 	const ndInt32 nodeCount = m_nodeList.GetCount();
 	ndForcePair* const jointVeloc = ndAlloca(ndForcePair, nodeCount);
@@ -2124,18 +2125,6 @@ return;
 	if (maxViolation2 > D_MAX_POSIT_ERROR_VIOLATION2)
 	{
 		CalculateForce(jointImpulse, jointVeloc);
-		//if (m_auxiliaryJointViolationsRowCount)
-		//{
-		//	//solving the main hierachui will do for now. 
-		//	//this will require a new factroziation whis is just too expensive, 
-		//	//CalculateExtraBodyImpulses(timestep, bodyImpulse, jointVeloc, jointImpulse);
-		//	CalculateBodyImpulses(bodyImpulse, jointImpulse);
-		//}
-		//else
-		//{
-		//	CalculateBodyImpulses(bodyImpulse, jointImpulse);
-		//}
-
 		CalculateBodyImpulses(bodyImpulse, jointImpulse);
 		for (ndInt32 i = 0; i < (nodeCount - 1); ++i)
 		{
@@ -2162,4 +2151,5 @@ return;
 			body->SetVelocity(savedVeloc);
 		}
 	}
+#endif
 }

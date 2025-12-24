@@ -203,15 +203,6 @@ void ndJointHinge::ApplyBaseRows(ndConstraintDescritor& desc, const ndMatrix& ma
 
 	const ndFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 	AddAngularRowJacobian(desc, matrix1.m_right, angle1);
-
-	//// save the current joint Omega
-	//const ndVector omega0(m_body0->GetOmega());
-	//const ndVector omega1(m_body1->GetOmega());
-	//
-	//// the joint angle can be determined by getting the angle between any two non parallel vectors
-	//const ndFloat32 deltaAngle = ndAnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front), -m_angle);
-	//m_angle += deltaAngle;
-	//m_omega = matrix1.m_front.DotProduct(omega0 - omega1).GetScalar();
 }
 
 ndFloat32 ndJointHinge::PenetrationOmega(ndFloat32 penetration) const
@@ -297,18 +288,21 @@ void ndJointHinge::CalculateConstraintViolations(
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	//ApplyBaseRows(desc, matrix0, matrix1);
-	AddLinearRowError(leftHandSide[0].m_Jt, matrix0.m_posit, matrix1.m_posit, matrix1[0], positError[0], velocError[0]);
-	AddLinearRowError(leftHandSide[1].m_Jt, matrix0.m_posit, matrix1.m_posit, matrix1[1], positError[1], velocError[1]);
-	AddLinearRowError(leftHandSide[2].m_Jt, matrix0.m_posit, matrix1.m_posit, matrix1[2], positError[2], velocError[2]);
+	AddLinearRowError(leftHandSide[0].m_Jt, matrix0.m_posit, matrix1.m_posit, positError[0], velocError[0]);
+	AddLinearRowError(leftHandSide[1].m_Jt, matrix0.m_posit, matrix1.m_posit, positError[1], velocError[1]);
+	AddLinearRowError(leftHandSide[2].m_Jt, matrix0.m_posit, matrix1.m_posit, positError[2], velocError[2]);
 
-	// 
+	const ndFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
+	const ndFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
+	AddAngularRowError(leftHandSide[3].m_Jt, angle0, positError[3], velocError[3]);
+	AddAngularRowError(leftHandSide[4].m_Jt, angle1, positError[4], velocError[4]);
+
 	//if (m_springDamperRegularizer && ((m_springK > ndFloat32(0.0f)) || (m_damperC > ndFloat32(0.0f))))
 	//{
 	//	// spring damper with limits
 	//	SubmitSpringDamper(desc, matrix0, matrix1);
 	//}
 	//SubmitLimits(desc, matrix0, matrix1);
-
 }
 
 void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
