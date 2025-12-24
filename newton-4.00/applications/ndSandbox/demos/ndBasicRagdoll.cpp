@@ -453,7 +453,7 @@ class ndDGController : public ndModelNotify
 #endif
 
 #if 1
-        // upper bodi parts
+        // upper body parts
         { // epaule_R
             ndMatrix tmp1(epauleRBody->GetMatrix());
             tmp1[3] = ndVector(tmp1[3][0] - 0.65f, tmp1[3][1] - 0.325f, tmp1[3][2], 1.0f); // offset
@@ -516,7 +516,7 @@ class ndDGController : public ndModelNotify
             ndMatrix tmp1(brasLBody->GetMatrix());
             tmp1[3] = ndVector(tmp1[3][0] - 0.025f, tmp1[3][1] + 0.95f, tmp1[3][2], 1.0f); // offset
             tmp1 = ndRollMatrix(90.0f * ndDegreeToRad) * tmp1;
-            //
+            
             joint15 = new ndJointSpherical(tmp1, brasLBody->GetAsBodyKinematic(), epauleLBody->GetAsBodyKinematic());
             //joint15->SetLimitState(true);
             //joint15->SetLimits(-90.0f * ndDegreeToRad, 165.0f * ndDegreeToRad);
@@ -539,9 +539,13 @@ class ndDGController : public ndModelNotify
             //
             joint18 = new ndJointHinge(tmp1, avantbrasRBody->GetAsBodyKinematic(), brasRBody->GetAsBodyKinematic());
             joint18->SetLimitState(true);
-            joint18->SetLimits(-165.0f * ndDegreeToRad, 25.0f * ndDegreeToRad);
-            joint18->SetAsSpringDamper(0.005f, 50.0f, 10.0f);
-            //
+            joint18->SetLimits(-165.0f * ndDegreeToRad, 5.0f * ndDegreeToRad);
+
+            // Dave a cool trick that kave more relistic 
+            // is to add some viscuos drag to the free joints 
+            //joint18->SetAsSpringDamper(0.005f, 50.0f, 10.0f);
+            joint18->SetAsSpringDamper(0.1f, 0.0f, 5.0f);
+            
             //m_jointlist.push_back(joint18);
             //
             ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint18);
@@ -555,9 +559,13 @@ class ndDGController : public ndModelNotify
             //
             joint17 = new ndJointHinge(tmp1, avantbrasLBody->GetAsBodyKinematic(), brasLBody->GetAsBodyKinematic());
             joint17->SetLimitState(true);
-            joint17->SetLimits(-25.0f * ndDegreeToRad, 165.0f * ndDegreeToRad);
-            joint17->SetAsSpringDamper(0.005f, 50.0f, 10.0f);
-            //
+            joint17->SetLimits(-5.0f * ndDegreeToRad, 165.0f * ndDegreeToRad);
+
+            // Dave a cool trick that kave more relistic 
+            // is to add some viscuos drag to the free joints 
+            //joint17->SetAsSpringDamper(0.005f, 50.0f, 10.0f);
+            joint17->SetAsSpringDamper(0.1f, 0.0f, 5.0f);
+            
             //m_jointlist.push_back(joint17);
             //
             ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint17);
@@ -688,8 +696,7 @@ class ndDGController : public ndModelNotify
             ndMatrix tmp1(tibiaRBody->GetMatrix());
             tmp1[3] = ndVector(tmp1[3][0], tmp1[3][1] + 0.7f, tmp1[3][2], 1.0f); // offset
             tmp1 = ndRollMatrix(90.0f * ndDegreeToRad) * tmp1;
-            //tmp1 = ndYawMatrix(-180.0f * ndDegreeToRad) * tmp1;
-            //
+            
             joint8 = new ndJointHinge(tmp1, tibiaRBody->GetAsBodyKinematic(), cuisseRBody->GetAsBodyKinematic());
             joint8->SetLimitState(true);
             joint8->SetLimits(-165.0f * ndDegreeToRad, 2.0f * ndDegreeToRad);
@@ -703,43 +710,54 @@ class ndDGController : public ndModelNotify
 
         { // pied_L
             ndMatrix tmp1(piedLBody->GetMatrix());
-            tmp1[3] = ndVector(tmp1[3][0], tmp1[3][1], tmp1[3][2] - 0.15f, 1.0f); // offset
+            // Dave, this offset not right
+            //tmp1[3] = ndVector(tmp1[3][0], tmp1[3][1], tmp1[3][2] - 0.15f, 1.0f); // offset
+            tmp1[3].m_z += 0.15f;
             tmp1 = ndRollMatrix(90.0f * ndDegreeToRad) * tmp1;
-            //
+            
             joint9 = new ndJointHinge(tmp1, piedLBody->GetAsBodyKinematic(), tibiaLBody->GetAsBodyKinematic());
             joint9->SetLimitState(true);
-            joint9->SetLimits(-2.0f * ndDegreeToRad, 65.0f * ndDegreeToRad);
+
+            // Dave, allow the fee to rotate fond and back
+            //joint9->SetLimits(-2.0f * ndDegreeToRad, 65.0f * ndDegreeToRad);
+            joint9->SetLimits(-30.0f * ndDegreeToRad, 65.0f * ndDegreeToRad);
             joint9->SetAsSpringDamper(0.01f, 25.0f, 1.0f);
-            //
+
             //m_jointlist.push_back(joint9);
-            //
             ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint9);
             nextRootTemp1 = m_model->AddLimb(nextRootTemp1, piedLBody, jointPtr);
         }
 
         { // pied_R
             ndMatrix tmp1(piedRBody->GetMatrix());
-            tmp1[3] = ndVector(tmp1[3][0], tmp1[3][1], tmp1[3][2] - 0.15f, 1.0f); // offset
+            // Dave, this offset not right
+            //tmp1[3] = ndVector(tmp1[3][0], tmp1[3][1], tmp1[3][2] - 0.15f, 1.0f); // offset
+            tmp1[3].m_z += 0.15f;
             tmp1 = ndRollMatrix(90.0f * ndDegreeToRad) * tmp1;
-            tmp1 = ndYawMatrix(-180.0f * ndDegreeToRad) * tmp1;
-            //
+
+            // Dave, flip the matrix cause the feel to rotate back
+            //tmp1 = ndYawMatrix(-180.0f * ndDegreeToRad) * tmp1;
+            
             joint10 = new ndJointHinge(tmp1, piedRBody->GetAsBodyKinematic(), tibiaRBody->GetAsBodyKinematic());
             joint10->SetLimitState(true);
-            joint10->SetLimits(-2.0f * ndDegreeToRad, 65.0f * ndDegreeToRad);
+
+            // Dave, allow the fee to rotate fond and back
+            //joint10->SetLimits(-2.0f * ndDegreeToRad, 65.0f * ndDegreeToRad);
+            joint10->SetLimits(-30.0f * ndDegreeToRad, 65.0f * ndDegreeToRad);
             joint10->SetAsSpringDamper(0.01f, 25.0f, 1.0f);
-            //
+            
             //m_jointlist.push_back(joint10);
-            //
             ndSharedPtr<ndJointBilateralConstraint> jointPtr(joint10);
             nextRootTemp2 = m_model->AddLimb(nextRootTemp2, piedRBody, jointPtr);
         }
 
         { // orteille_R
             ndMatrix tmp1(orteilRBody->GetMatrix());
-            tmp1[3] = ndVector(tmp1[3][0], tmp1[3][1], tmp1[3][2] - 0.125f, 1.0f); // offset
+            //tmp1[3] = ndVector(tmp1[3][0], tmp1[3][1], tmp1[3][2] - 0.125f, 1.0f); // offset
+            tmp1[3].m_z += 0.1f;
             tmp1 = ndRollMatrix(90.0f * ndDegreeToRad) * tmp1;
             //tmp1 = ndYawMatrix(-180.0f * ndDegreeToRad) * tmp1;
-            //
+            
             joint12 = new ndJointHinge(tmp1, orteilRBody->GetAsBodyKinematic(), piedRBody->GetAsBodyKinematic());
             joint12->SetLimitState(true);
             joint12->SetLimits(-15.0f * ndDegreeToRad, 45.0f * ndDegreeToRad);
@@ -753,7 +771,8 @@ class ndDGController : public ndModelNotify
         
         { // orteille_L
             ndMatrix tmp1(orteilLBody->GetMatrix());
-            tmp1[3] = ndVector(tmp1[3][0], tmp1[3][1], tmp1[3][2] - 0.125f, 1.0f); // offset
+            //tmp1[3] = ndVector(tmp1[3][0], tmp1[3][1], tmp1[3][2] - 0.125f, 1.0f); // offset
+            tmp1[3].m_z += 0.1f;
             tmp1 = ndRollMatrix(90.0f * ndDegreeToRad) * tmp1;
             //
             joint11 = new ndJointHinge(tmp1, orteilLBody->GetAsBodyKinematic(), piedLBody->GetAsBodyKinematic());
@@ -773,12 +792,13 @@ class ndDGController : public ndModelNotify
     ndModelArticulation* const m_model;
 };
 
+// debugging Dave Gravel ragdoll demo.
 //void ndBasicBipedDG(ndDemoEntityManager* const scene)
 void ndBasicRagdoll(ndDemoEntityManager* const scene)
 {
     ndSharedPtr<ndBody> floor(BuildFloorBox(scene, ndGetIdentityMatrix(), "blueCheckerboard.png", 0.1f, true));
 
-    ndModelArticulation* model = new ndModelArticulation();
+    ndModelArticulation* const model = new ndModelArticulation();
     ndSharedPtr<ndModelNotify> controller(new ndDGController(scene, model));
     model->SetNotifyCallback(controller);
 
