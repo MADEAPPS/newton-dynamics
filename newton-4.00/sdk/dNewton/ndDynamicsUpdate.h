@@ -40,8 +40,6 @@
 
 class ndWorld;
 
-//#define D_USING_SINGLE_SOA_REGISTER
-
 D_MSV_NEWTON_CLASS_ALIGN_32
 class ndDynamicsUpdate : public ndClassAlloc
 {

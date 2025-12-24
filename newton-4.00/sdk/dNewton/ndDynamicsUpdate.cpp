@@ -1406,24 +1406,6 @@ void ndDynamicsUpdate::CalculateJointsForce()
 	}
 }
 
-void ndDynamicsUpdate::CalculateForces()
-{
-	D_TRACKTIME();
-	if (m_world->GetScene()->GetActiveContactArray().GetCount())
-	{
-		m_firstPassCoef = ndFloat32(0.0f);
-
-		InitSkeletons();
-		for (ndInt32 step = 0; step < 4; step++)
-		{
-			CalculateJointsAcceleration();
-			CalculateJointsForce();
-			UpdateSkeletons();
-			IntegrateBodiesVelocity();
-		}
-	}
-}
-
 void ndDynamicsUpdate::ResolveSkeletonsViolations()
 {
 	ndScene* const scene = m_world->GetScene();
@@ -1444,6 +1426,25 @@ void ndDynamicsUpdate::ResolveSkeletonsViolations()
 	}
 }
 
+void ndDynamicsUpdate::CalculateForces()
+{
+	D_TRACKTIME();
+	if (m_world->GetScene()->GetActiveContactArray().GetCount())
+	{
+		m_firstPassCoef = ndFloat32(0.0f);
+
+		InitSkeletons();
+		ResolveSkeletonsViolations();
+		for (ndInt32 step = 0; step < 4; step++)
+		{
+			CalculateJointsAcceleration();
+			CalculateJointsForce();
+			UpdateSkeletons();
+			IntegrateBodiesVelocity();
+		}
+	}
+}
+
 void ndDynamicsUpdate::Update()
 {
 	D_TRACKTIME();
@@ -1456,7 +1457,6 @@ void ndDynamicsUpdate::Update()
 	InitJacobianMatrix();
 	CalculateForces();
 	IntegrateBodies();
-	ResolveSkeletonsViolations();
 	UpdateForceFeedback();
 	DetermineSleepStates();
 }
