@@ -28,14 +28,18 @@
 
 
 %begin 
+
 %{
 	#pragma warning(disable:4127 4316 4365 4456 4701 4706)
 %}
 
+%include "stdint.i"
+%typemap(c) ndFloat32 "float"
+
 %{
-	#include <ndNewtonInc.h>
+	//#include <ndNewtonInc.h>
 	#include <newtonWorld.h>
-	#include "newtonConfig.h"
+	//#include "newtonConfig.h"
 %}
 
 //%include "newtonConfig.h"
@@ -97,20 +101,20 @@
 %rename(DestroyArray) ndClassAlloc::operator delete[];
 
 
-%include "install/source/ndNewtonInc.h"
-%include "install/source/ndTypes.h"
-%include "install/source/ndCollisionStdafx.h"
-
-%include "install/source/ndClassAlloc.h"
-%include "install/source/ndVector.h"
-%include "install/source/ndMatrix.h"
-%include "install/source/ndQuaternion.h"
-
-%include "install/source/ndShape.h"
-%include "install/source/ndShapeBox.h"
-%include "install/source/ndShapeCone.h"
-%include "install/source/ndShapeConvex.h"
-%include "install/source/ndShapeSphere.h"
+//%include "install/source/ndNewtonInc.h"
+//%include "install/source/ndTypes.h"
+//%include "install/source/ndCollisionStdafx.h"
+//
+//%include "install/source/ndClassAlloc.h"
+//%include "install/source/ndVector.h"
+//%include "install/source/ndMatrix.h"
+//%include "install/source/ndQuaternion.h"
+//
+//%include "install/source/ndShape.h"
+//%include "install/source/ndShapeBox.h"
+//%include "install/source/ndShapeCone.h"
+//%include "install/source/ndShapeConvex.h"
+//%include "install/source/ndShapeSphere.h"
 //%include "install/source/ndShapeCapsule.h"
 //%include "install/source/ndShapeCompound.h"
 //%include "install/source/ndShapeCylinder.h"

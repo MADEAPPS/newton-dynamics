@@ -61,7 +61,8 @@ class ndClassAlloc
 	/// <param name=""></param>
 	/// <param name="ptr"></param>
 	/// <returns></returns>
-	void* operator new(std::size_t, void* ptr)
+	//void* operator new(std::size_t, void* ptr)
+	void* operator new(size_t, void* ptr)
 	{
 		return ptr;
 	}

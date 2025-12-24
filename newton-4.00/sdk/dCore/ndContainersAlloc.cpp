@@ -212,7 +212,8 @@ void ndFreeListAlloc::operator delete (void* ptr)
 	dictionary.Free(ptr);
 }
 
-void* ndFreeListAlloc::operator new (std::size_t, void* ptr)
+//void* ndFreeListAlloc::operator new (std::size_t, void* ptr)
+void* ndFreeListAlloc::operator new (size_t, void* ptr)
 {
 	return ptr;
 }

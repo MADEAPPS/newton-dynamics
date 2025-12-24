@@ -55,7 +55,8 @@ class ndFreeListAlloc
 	/// <param name=""></param>
 	/// <param name="ptr"></param>
 	/// <returns></returns>
-	D_CORE_API void* operator new(std::size_t, void* ptr);
+	//D_CORE_API void* operator new(std::size_t, void* ptr);
+	D_CORE_API void* operator new(size_t, void* ptr);
 
 	/// <summary> the placemnet operators new and delete are only use by 
 	/// language like rush that use manage memory

@@ -11,9 +11,9 @@
 #ifndef __NEWTON_WORLD_H__
 #define __NEWTON_WORLD_H__
 
-#include "newtonStdafx.h"
 
-#define NOMINAL_FPS	120.0f
+//#include "newtonConfig.h"
+#include "newtonStdafx.h"
 
 
 class NewtonWorld: public ndWorld
@@ -22,15 +22,10 @@ class NewtonWorld: public ndWorld
 	NewtonWorld();
 	~NewtonWorld();
 
-	void Update(ndFloat32 timestep);
+	void Update(float timestep);
 
-	void SetSubSteps(ndFloat32 timestep);
-	void SetIterations(ndInt32 iterations);
-	void SetTimestep(ndFloat32 nominalTimestep);
-
-
-	private:
-	ndFloat32 m_nominalTimestep;
+	void SetSubSteps(int substeps);
+	void SetIterations(int iterations);
 };
 
 #endif

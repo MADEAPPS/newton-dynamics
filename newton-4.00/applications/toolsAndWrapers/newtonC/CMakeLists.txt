@@ -10,13 +10,13 @@
 
 cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR)
 
-set (projectName "newtonPy")
+set (projectName "newtonC")
 project(${projectName})
 
 message (${projectName})
 
 if(MSVC OR MINGW)
-	set (swig "${CMAKE_SOURCE_DIR}/../../../thirdParty/swigwin/swigwin-4.0.2/swig.exe")
+	set (swig "${CMAKE_SOURCE_DIR}/../../../thirdParty/swigwin/swigwin-4.4.1/swig.exe")
 else()
 	set (swig "/usr/bin/swig")
 endif()
@@ -24,7 +24,7 @@ endif()
 set (wrapper "${PROJECT_BINARY_DIR}")
 set (swigScript "${CMAKE_SOURCE_DIR}")
 
-execute_process(COMMAND ${swig} -c++ -python ${swigScript}/newton.i)
+execute_process(COMMAND ${swig} -c++ -c ${swigScript}/newton.i)
 
 # source and header files
 file(GLOB CPP_SOURCE 
@@ -32,7 +32,6 @@ file(GLOB CPP_SOURCE
 	*.cpp
 	*.cxx
 	*.i
-	*.py
 	install/source/*.h
 	install/source/*.c
 	install/source/*.cpp
@@ -45,32 +44,27 @@ add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 include_directories(.)
 include_directories(install/source)
 
-message ("$ENV{Python}/Include")
-link_directories("$ENV{Python}/Libs")
-include_directories("$ENV{Python}/Include")
-
 add_library(${projectName} SHARED ${CPP_SOURCE})
 
-set (pySrc "${CMAKE_CURRENT_SOURCE_DIR}")
-list(APPEND PY_SOURCE 
-	ndbpy.py
-	newton.py
-	newtonWorld.py)
+#set (pySrc "${CMAKE_CURRENT_SOURCE_DIR}")
+#list(APPEND PY_SOURCE 
+#	ndbpy.py
+#	newton.py
+#	newtonWorld.py)
 
 if (MSVC OR MINGW)
-  set (pySuffix ".pyd")
+  set (cSuffix ".dll")
 else()
-  set (pySuffix ".so")
+  set (cSuffix ".so")
 endif()
 
-foreach(file IN LISTS PY_SOURCE)
-	message ("copy ${pySrc}/${file} to ${wrapper}/${projectName}/${file}")
-	add_custom_command(
-	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-	ARGS -E copy ${pySrc}/${file} ${wrapper}/${projectName}/${file})
-endforeach()
+#foreach(file IN LISTS PY_SOURCE)
+#	message ("copy ${pySrc}/${file} to ${wrapper}/${projectName}/${file}")
+#	add_custom_command(
+#	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
+#	ARGS -E copy ${pySrc}/${file} ${wrapper}/${projectName}/${file})
+#endforeach()
 
 add_custom_command(
 	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-	ARGS -E copy $<TARGET_FILE:${projectName}> ${wrapper}/${projectName}/${projectName}${CMAKE_DEBUG_POSTFIX}${pySuffix})
-
+	ARGS -E copy $<TARGET_FILE:${projectName}> ${wrapper}/${projectName}/${projectName}${CMAKE_DEBUG_POSTFIX}${cSuffix})

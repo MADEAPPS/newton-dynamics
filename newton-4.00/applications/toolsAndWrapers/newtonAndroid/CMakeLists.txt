@@ -14,7 +14,7 @@ set (projectName "ndAndroidStudio")
 message (${projectName})
 
 if(MSVC OR MINGW)
-	set (swig "${CMAKE_SOURCE_DIR}/thirdParty/swigwin/swigwin-4.0.2/swig.exe")
+	set (swig "${CMAKE_SOURCE_DIR}/thirdParty/swigwin/swigwin-4.4.1/swig.exe")
 else()
 	set (swig "/usr/bin/swig")
 endif()

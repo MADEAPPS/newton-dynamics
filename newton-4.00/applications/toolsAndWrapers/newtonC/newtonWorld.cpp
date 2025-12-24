@@ -85,7 +85,6 @@ class ndContactCallback : public ndContactNotify
 
 NewtonWorld::NewtonWorld()
 	:ndWorld()
-	,m_nominalTimestep(ndFloat32 (1.0f) / NOMINAL_FPS)
 {
 	ClearCache();
 	SetContactNotify(new ndContactCallback(GetScene()));
@@ -95,16 +94,10 @@ NewtonWorld::~NewtonWorld()
 {
 }
 
-void NewtonWorld::SetSubSteps(ndFloat32 timestep)
+void NewtonWorld::SetSubSteps(int substeps)
 {
-	timestep = ndClamp(timestep, ndFloat32(1.0f/120.0f), ndFloat32(1.0f / 24.0f)) - 0.001f;
-	ndInt32 substeps = ndInt32 (ndFloor(timestep / m_nominalTimestep)) + 1;
+	substeps = ndClamp(substeps, 1, 4);
 	ndWorld::SetSubSteps(substeps);
-}
-
-void NewtonWorld::SetTimestep(ndFloat32 nominalTimestep)
-{
-	m_nominalTimestep = ndClamp(nominalTimestep, ndFloat32(60.0f), ndFloat32(600.0f));
 }
 
 void NewtonWorld::SetIterations(ndInt32 iterations)
@@ -115,6 +108,5 @@ void NewtonWorld::SetIterations(ndInt32 iterations)
 
 void NewtonWorld::Update(ndFloat32 timestep)
 {
-	timestep = ndClamp(timestep, ndFloat32(1.0f / 120.0f), ndFloat32(1.0f / 24.0f));
 	ndWorld::Update(timestep);
 }
