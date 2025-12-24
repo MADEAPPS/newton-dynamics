@@ -687,7 +687,7 @@ void ndSkeletonContainer::CalculateBufferSizeInBytes()
 void ndSkeletonContainer::CalculateLoopMassMatrixCoefficients(ndFloat32* const diagDamp)
 {
 	D_TRACKTIME();
-	auto CalculateLoopMassMatrixCoefficients = ndMakeObject::ndFunction([this, diagDamp](ndInt32 groupId, ndInt32)
+	auto CalculateLoopMassMatrixCoefficients = [this, diagDamp](ndInt32 groupId)
 	{
 		const ndInt32 index = groupId;
 		const ndVector8 zero(ndVector8::m_zero);
@@ -791,13 +791,10 @@ void ndSkeletonContainer::CalculateLoopMassMatrixCoefficients(ndFloat32* const d
 				matrixRow10[j] = val;
 			}
 		}
-	});
-
+	};
+	for (ndInt32 index = 0; index < m_auxiliaryRowCount; ++index)
 	{
-		for (ndInt32 index = 0; index < m_auxiliaryRowCount; ++index)
-		{
-			CalculateLoopMassMatrixCoefficients(index, 0);
-		}
+		CalculateLoopMassMatrixCoefficients(index);
 	}
 }
 
@@ -861,7 +858,7 @@ void ndSkeletonContainer::SolveBackward(ndForcePair* const force) const
 void ndSkeletonContainer::ConditionMassMatrix() const
 {
 	D_TRACKTIME();
-	auto ConditionMassMatrix = ndMakeObject::ndFunction([this](ndInt32 groupId, ndInt32)
+	auto ConditionMassMatrix = [this](ndInt32 groupId)
 	{
 		ndInt32 entry0 = 0;
 		const ndInt32 nodeCount = m_nodeList.GetCount();
@@ -910,20 +907,17 @@ void ndSkeletonContainer::ConditionMassMatrix() const
 				entry1++;
 			}
 		}
-	});
-
+	};
+	for (ndInt32 index = 0; index < m_auxiliaryRowCount; ++index)
 	{
-		for (ndInt32 index = 0; index < m_auxiliaryRowCount; ++index)
-		{
-			ConditionMassMatrix(index, 0);
-		}
+		ConditionMassMatrix(index);
 	}
 }
 
 void ndSkeletonContainer::RebuildMassMatrix(const ndFloat32* const diagDamp) const
 {
 	D_TRACKTIME();
-	auto RebuildMassMatrix = ndMakeObject::ndFunction([this, diagDamp](ndInt32 groupId, ndInt32)
+	auto RebuildMassMatrix = [this, diagDamp](ndInt32 groupId)
 	{
 		const ndInt32 primaryCount = m_rowCount - m_auxiliaryRowCount;
 		const ndFloat32* const matrixRow10 = &m_massMatrix10[groupId * primaryCount];
@@ -951,13 +945,10 @@ void ndSkeletonContainer::RebuildMassMatrix(const ndFloat32* const diagDamp) con
 		}
 
 		matrixRow11[groupId] = ndMax(matrixRow11[groupId], diagDamp[groupId]);
-	});
-
+	};
+	for (ndInt32 index = 0; index < m_auxiliaryRowCount; ++index)
 	{
-		for (ndInt32 index = 0; index < m_auxiliaryRowCount; ++index)
-		{
-			RebuildMassMatrix(index, 0);
-		}
+		RebuildMassMatrix(index);
 	}
 }
 
@@ -997,7 +988,7 @@ void ndSkeletonContainer::CalculateJointAccel(const ndJacobian* const internalFo
 	const ndInt32 nodeCount = m_nodeList.GetCount();
 	const ndVector8* const internalForcesArray = (ndVector8*)internalForces;
 
-	auto CalculateJointAccel = ndMakeObject::ndFunction([this, internalForcesArray, accel, &zero](ndInt32 groupId, ndInt32)
+	auto CalculateJointAccel = [this, internalForcesArray, accel, &zero](ndInt32 groupId)
 	{
 		ndNode* const node = m_nodesOrder[groupId];
 		ndAssert(groupId == node->m_index);
@@ -1026,13 +1017,10 @@ void ndSkeletonContainer::CalculateJointAccel(const ndJacobian* const internalFo
 			const ndVector8 diag((ndVector8&)row->m_JMinv.m_jacobianM0 * y0 + (ndVector8&)row->m_JMinv.m_jacobianM1 * y1);
 			a.m_joint[j] = -(rhs->m_coordenateAccel - rhs->m_force * rhs->m_diagDamp - diag.AddHorizontal());
 		}
-	});
-
+	};
+	for (ndInt32 index = 0; index < nodeCount - 1; ++index)
 	{
-		for (ndInt32 index = 0; index < nodeCount - 1; ++index)
-		{
-			CalculateJointAccel(index, 0);
-		}
+		CalculateJointAccel(index);
 	}
 
 	ndAssert((nodeCount - 1) == m_nodesOrder[nodeCount - 1]->m_index);
