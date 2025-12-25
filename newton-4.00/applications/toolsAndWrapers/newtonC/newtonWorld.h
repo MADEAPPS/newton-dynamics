@@ -22,10 +22,10 @@ class NewtonWorld: public ndWorld
 	NewtonWorld();
 	~NewtonWorld();
 
-	void Update(float timestep);
+	void Update(ndFloat32 timestep);
 
-	void SetSubSteps(int substeps);
-	void SetIterations(int iterations);
+	void SetSubSteps(ndInt32 substeps);
+	void SetIterations(ndInt32 iterations);
 };
 
 #endif
