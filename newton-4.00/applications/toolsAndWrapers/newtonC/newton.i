@@ -34,7 +34,8 @@
 %}
 
 %include "stdint.i"
-%typemap(c) ndFloat32 "float"
+%apply int32_t { ndInt32 }
+%apply float { ndFloat32 }
 
 %{
 	//#include <ndNewtonInc.h>
