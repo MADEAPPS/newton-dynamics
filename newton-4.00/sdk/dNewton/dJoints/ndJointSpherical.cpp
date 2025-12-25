@@ -362,23 +362,6 @@ void ndJointSpherical::SubmitLimits(const ndMatrix& matrix0, const ndMatrix& mat
 	}
 }
 
-D_NEWTON_API void ndJointSpherical::CalculateConstraintViolations(
-	const ndLeftHandSide* const leftHandSide,
-	ndVector8& positError, ndVector8& velocError) const
-{
-	ndMatrix matrix0;
-	ndMatrix matrix1;
-	CalculateGlobalMatrix(matrix0, matrix1);
-
-	//ApplyBaseRows(matrix0, matrix1, desc);
-	//AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
-	//AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
-	//AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
-	AddLinearRowError(leftHandSide[0].m_Jt, matrix0.m_posit, matrix1.m_posit, positError[0], velocError[0]);
-	AddLinearRowError(leftHandSide[1].m_Jt, matrix0.m_posit, matrix1.m_posit, positError[1], velocError[1]);
-	AddLinearRowError(leftHandSide[2].m_Jt, matrix0.m_posit, matrix1.m_posit, positError[2], velocError[2]);
-}
-
 void ndJointSpherical::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndMatrix matrix0;

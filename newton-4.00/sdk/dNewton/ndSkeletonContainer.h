@@ -215,7 +215,7 @@ class ndSkeletonContainer
 	void SolveBlockLcp(ndInt32 size, ndInt32 blockSize, ndFloat32* const x, ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex, ndFloat32 accelTol) const;
 	void SolveLcp(ndInt32 stride, ndInt32 size, ndFloat32* const x, const ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex, ndFloat32 accelTol) const;
 
-	void ResolveJointsPostSolverViolations(ndFloat32 timestep);
+	bool ResolveViolations(ndFloat32 timestep);
 	ndFloat32 CalculatePositionImpulse(ndFloat32 timestep, ndForcePair* const veloc);
 	void CalculateBodyImpulses(ndJacobian* const bodyImpulse, const ndForcePair* const jointImpulse) const;
 
@@ -236,7 +236,7 @@ class ndSkeletonContainer
 	void RebuildMassMatrix(const ndFloat32* const diagDamp) const;
 	void CalculateReactionForces(ndJacobian* const internalForces);
 	void CalculateJointAccel(const ndJacobian* const internalForces, ndForcePair* const accel) const;
-	void InitMassMatrix(const ndLeftHandSide* const matrixRow, ndRightHandSide* const rightHandSide);
+	void InitMassMatrix(ndFloat32 timestep, const ndLeftHandSide* const matrixRow, ndRightHandSide* const rightHandSide);
 	void SolveAuxiliary(ndJacobian* const internalForces, const ndForcePair* const accel, ndForcePair* const force) const;
 
 	class ndBodyForceIndexPair

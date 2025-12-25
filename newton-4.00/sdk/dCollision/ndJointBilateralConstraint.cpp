@@ -592,39 +592,3 @@ void ndJointBilateralConstraint::UpdateParameters()
 	ndAssert(0);
 	ndTrace(("Fix this joint paremeters\n"));
 }
-
-void ndJointBilateralConstraint::CalculateConstraintViolations(
-	const ndLeftHandSide* const, ndVector8&, ndVector8&) const
-{
-	ndTrace(("TO DO: implemet %s\n", ClassName()));
-}
-
-void ndJointBilateralConstraint::AddLinearRowError(
-	const ndJacobianPair& jacobianPair,
-	const ndVector& pivot0, const ndVector& pivot1,
-	ndFloat32& positError, ndFloat32& velocError) const
-{
-	const ndJacobian& jacobian0 = jacobianPair.m_jacobianM0;
-	const ndJacobian& jacobian1 = jacobianPair.m_jacobianM1;
-
-	const ndVector& omega0 = m_body0->m_omega;
-	const ndVector& omega1 = m_body1->m_omega;
-	const ndVector& veloc0 = m_body0->m_veloc;
-	const ndVector& veloc1 = m_body1->m_veloc;
-	positError = -(jacobian0.m_linear * pivot0 + jacobian1.m_linear * pivot1).AddHorizontal().GetScalar();
-	velocError = -(jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
-}
-
-void ndJointBilateralConstraint::AddAngularRowError(
-	const ndJacobianPair& jacobianPair,	const ndFloat32 angle,
-	ndFloat32& positError, ndFloat32& velocError) const
-{
-	const ndJacobian& jacobian0 = jacobianPair.m_jacobianM0;
-	const ndJacobian& jacobian1 = jacobianPair.m_jacobianM1;
-
-	const ndVector omega0(m_body0->GetOmega());
-	const ndVector omega1(m_body1->GetOmega());
-	
-	positError = -angle;
-	velocError = -(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular).AddHorizontal().GetScalar();
-}

@@ -132,17 +132,6 @@ class ndJointBilateralConstraint : public ndConstraint
 	D_COLLISION_API void UpdateParameters() override;
 	D_COLLISION_API void ReplaceSentinel(ndBodyKinematic* const sentinel);
 
-	D_COLLISION_API virtual void CalculateConstraintViolations(
-		const ndLeftHandSide* const leftHandSide,
-		ndVector8& positError, ndVector8& velocError) const;
-	D_COLLISION_API void AddLinearRowError(
-		const ndJacobianPair& jacobianPair,
-		const ndVector& pivot0, const ndVector& pivot1,
-		ndFloat32& positError, ndFloat32& velocError) const;
-	D_COLLISION_API void AddAngularRowError(
-		const ndJacobianPair& jacobianPair, const ndFloat32 angle,
-		ndFloat32& positError, ndFloat32& velocError) const;
-
 	// inverse dynamics interface
 	D_COLLISION_API virtual void ClearMemory() override;
 	D_COLLISION_API virtual void SetIkMode(bool mode);

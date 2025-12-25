@@ -1190,7 +1190,7 @@ void ndDynamicsUpdate::InitSkeletons()
 			const ndArray<ndLeftHandSide>& leftHandSide = m_leftHandSide;
 
 			ndSkeletonContainer* const skeleton = activeSkeletons[groupId];
-			skeleton->InitMassMatrix(&leftHandSide[0], &rightHandSide[0]);
+			skeleton->InitMassMatrix(m_timestep, &leftHandSide[0], &rightHandSide[0]);
 		});
 
 		const ndInt32 count = ndInt32(activeSkeletons.GetCount());
@@ -1406,26 +1406,6 @@ void ndDynamicsUpdate::CalculateJointsForce()
 	}
 }
 
-void ndDynamicsUpdate::ResolveSkeletonsViolations()
-{
-	ndScene* const scene = m_world->GetScene();
-	const ndArray<ndSkeletonContainer*>& activeSkeletons = m_world->m_activeSkeletons;
-
-	const ndFloat32 timestep = scene->GetTimestep();
-	auto UpdateSkeletons = ndMakeObject::ndFunction([this, timestep, &activeSkeletons](ndInt32 groupId, ndInt32)
-	{
-		D_TRACKTIME_NAMED(UpdateSkeletons);
-		ndSkeletonContainer* const skeleton = activeSkeletons[groupId];
-		skeleton->ResolveJointsPostSolverViolations(timestep);
-	});
-
-	const ndInt32 count = ndInt32(activeSkeletons.GetCount());
-	if (count)
-	{
-		scene->ParallelExecute(UpdateSkeletons, count, 1);
-	}
-}
-
 void ndDynamicsUpdate::CalculateForces()
 {
 	D_TRACKTIME();
@@ -1434,7 +1414,6 @@ void ndDynamicsUpdate::CalculateForces()
 		m_firstPassCoef = ndFloat32(0.0f);
 
 		InitSkeletons();
-		ResolveSkeletonsViolations();
 		for (ndInt32 step = 0; step < 4; step++)
 		{
 			CalculateJointsAcceleration();

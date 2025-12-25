@@ -1940,7 +1940,7 @@ void ndSkeletonContainer::SolveAuxiliary(ndJacobian* const internalForces, const
 	AddForces(1);
 }
 
-void ndSkeletonContainer::InitMassMatrix(const ndLeftHandSide* const leftHandSide, ndRightHandSide* const rightHandSide)
+void ndSkeletonContainer::InitMassMatrix(ndFloat32 timestep, const ndLeftHandSide* const leftHandSide, ndRightHandSide* const rightHandSide)
 {
 	D_TRACKTIME();
 	if (m_isResting)
@@ -1965,6 +1965,21 @@ void ndSkeletonContainer::InitMassMatrix(const ndLeftHandSide* const leftHandSid
 			auxiliaryCount += node->FactorizeChild(leftHandSide, rightHandSide, bodyMassArray, jointMassArray);
 		}
 		m_nodesOrder[nodeCount - 1]->FactorizeRoot(bodyMassArray, jointMassArray);
+
+		bool hasViolations = ResolveViolations(timestep);
+		if (hasViolations)
+		{
+			ndAssert(0);
+			rowCount = 0;
+			auxiliaryCount = 0;
+			for (ndInt32 i = 0; i < nodeCount - 1; ++i)
+			{
+				ndNode* const node = m_nodesOrder[i];
+				rowCount += node->m_joint->m_rowCount;
+				auxiliaryCount += node->FactorizeChild(leftHandSide, rightHandSide, bodyMassArray, jointMassArray);
+			}
+			m_nodesOrder[nodeCount - 1]->FactorizeRoot(bodyMassArray, jointMassArray);
+		}
 	}
 
 	m_rowCount = rowCount;
@@ -2074,7 +2089,7 @@ ndFloat32 ndSkeletonContainer::CalculatePositionImpulse(ndFloat32 timestep, ndFo
 
 		ndVector8 positError(ndVector8::m_zero);
 		ndVector8 velocError(ndVector8::m_zero);
-		joint->CalculateConstraintViolations(lhs, positError, velocError);
+		//joint->CalculateConstraintViolations(lhs, positError, velocError);
 
 		const ndInt32 dof = node->m_dof;
 		ndAssert(dof <= D_MAX_OPEN_LOOP_DOF);
@@ -2103,14 +2118,10 @@ ndFloat32 ndSkeletonContainer::CalculatePositionImpulse(ndFloat32 timestep, ndFo
 	return maxPositError2;
 }
 
-void ndSkeletonContainer::ResolveJointsPostSolverViolations(ndFloat32 timestep)
+bool ndSkeletonContainer::ResolveViolations(ndFloat32 timestep)
 {
+	return false;
 #if 0
-	if (m_isResting)
-	{
-		return;
-	}
-
 	const ndInt32 nodeCount = m_nodeList.GetCount();
 	ndForcePair* const jointVeloc = ndAlloca(ndForcePair, nodeCount);
 	ndForcePair* const jointImpulse = ndAlloca(ndForcePair, nodeCount);

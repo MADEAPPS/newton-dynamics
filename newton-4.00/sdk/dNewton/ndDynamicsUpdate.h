@@ -105,7 +105,6 @@ class ndDynamicsUpdate : public ndClassAlloc
 	void UpdateForceFeedback();
 	void CalculateJointsForce();
 	void IntegrateBodiesVelocity();
-	void ResolveSkeletonsViolations();
 	void CalculateJointsAcceleration();
 	void IntegrateUnconstrainedBodies();
 

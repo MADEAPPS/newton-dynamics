@@ -54,7 +54,6 @@ class ndDynamicsUpdateSoa: public ndDynamicsUpdate
 	void UpdateForceFeedback();
 	void CalculateJointsForce();
 	void IntegrateBodiesVelocity();
-	void ResolveSkeletonsViolations();
 	void CalculateJointsAcceleration();
 	void IntegrateUnconstrainedBodies();
 	
