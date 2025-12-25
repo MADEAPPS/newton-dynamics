@@ -797,6 +797,8 @@ void ndDynamicsUpdateAvx2::GetJacobianDerivatives(ndConstraint* const joint)
 		rhs->m_diagDamp = ndFloat32(0.0f);
 		rhs->m_diagonalRegularizer = ndMax(constraintParam.m_diagonalRegularizer[i], ndFloat32(1.0e-5f));
 
+		rhs->m_positError = constraintParam.m_positError[i];
+		rhs->m_speedError = constraintParam.m_speedError[i];
 		rhs->m_coordenateAccel = constraintParam.m_jointAccel[i];
 		rhs->m_restitution = constraintParam.m_restitution[i];
 		rhs->m_penetration = constraintParam.m_penetration[i];

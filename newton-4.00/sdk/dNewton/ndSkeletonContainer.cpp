@@ -2087,8 +2087,8 @@ ndFloat32 ndSkeletonContainer::CalculatePositionImpulse(ndFloat32 timestep, ndFo
 		const ndInt32 first = joint->m_rowStart;
 		const ndLeftHandSide* const lhs = &m_leftHandSide[first];
 
-		ndVector8 positError(ndVector8::m_zero);
-		ndVector8 velocError(ndVector8::m_zero);
+		//ndVector8 positError(ndVector8::m_zero);
+		//ndVector8 velocError(ndVector8::m_zero);
 		//joint->CalculateConstraintViolations(lhs, positError, velocError);
 
 		const ndInt32 dof = node->m_dof;
@@ -2098,8 +2098,9 @@ ndFloat32 ndSkeletonContainer::CalculatePositionImpulse(ndFloat32 timestep, ndFo
 		{
 			const ndInt32 k = node->m_ordinal.m_sourceJacobianIndex[j];
 			//const ndRightHandSide* const rhs = &m_rightHandSide[first + k];
-			maxPenetration2 = ndMax(maxPenetration2, positError[k] * positError[k]);
-			v.m_joint[j] = -invTimeStep * positError[k];
+			ndFloat32 positError = m_rightHandSide[first + k].m_positError;
+			maxPenetration2 = ndMax(maxPenetration2, positError * positError);
+			v.m_joint[j] = -invTimeStep * positError;
 		}
 
 		return maxPenetration2;
@@ -2120,8 +2121,6 @@ ndFloat32 ndSkeletonContainer::CalculatePositionImpulse(ndFloat32 timestep, ndFo
 
 bool ndSkeletonContainer::ResolveViolations(ndFloat32 timestep)
 {
-	return false;
-#if 0
 	const ndInt32 nodeCount = m_nodeList.GetCount();
 	ndForcePair* const jointVeloc = ndAlloca(ndForcePair, nodeCount);
 	ndForcePair* const jointImpulse = ndAlloca(ndForcePair, nodeCount);
@@ -2133,6 +2132,8 @@ bool ndSkeletonContainer::ResolveViolations(ndFloat32 timestep)
 
 	// apply possition violation pass.
 	ndFloat32 maxViolation2 = CalculatePositionImpulse(timestep, jointVeloc);
+
+#if 0
 	if (maxViolation2 > D_MAX_POSIT_ERROR_VIOLATION2)
 	{
 		CalculateForce(jointImpulse, jointVeloc);
@@ -2163,4 +2164,5 @@ bool ndSkeletonContainer::ResolveViolations(ndFloat32 timestep)
 		}
 	}
 #endif
+	return maxViolation2 > D_MAX_POSIT_ERROR_VIOLATION2;
 }

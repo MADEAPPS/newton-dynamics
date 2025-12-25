@@ -33,7 +33,6 @@ ndVector ndContact::m_initialSeparatingVector(ndFloat32(0.0f), ndFloat32(1.0f), 
 #define D_MAX_PENETRATION_STIFFNESS		ndFloat32 (50.0f)
 #define D_DIAGONAL_REGULARIZER			ndFloat32 (1.0e-3f)
 
-
 void ndContactMaterial::RotateTangentDirections(const ndVector& dir)
 {
 	const ndVector dir0(dir);
@@ -242,6 +241,8 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 	ndFloat32 penetration = ndClamp(contact.m_penetration - D_RESTING_CONTACT_PENETRATION, ndFloat32(0.0f), ndFloat32(0.5f));
 	desc.m_flags[normalIndex] = ndInt32(contact.m_material.m_flags & m_isSoftContact);
 	desc.m_jointSpeed[normalIndex] = ndFloat32 (0.0f);
+	desc.m_positError[normalIndex] = ndFloat32(0.0f);
+	desc.m_speedError[normalIndex] = ndFloat32(0.0f);
 	desc.m_penetration[normalIndex] = penetration;
 	desc.m_restitution[normalIndex] = restitutionCoefficient;
 	desc.m_forceBounds[normalIndex].m_low = ndFloat32(0.0f);
@@ -288,6 +289,9 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 		desc.m_restitution[jacobIndex] = ndFloat32(0.0f);
 		desc.m_penetration[jacobIndex] = ndFloat32(0.0f);
 		desc.m_jointSpeed[normalIndex] = ndFloat32(0.0f);
+		desc.m_positError[normalIndex] = ndFloat32(0.0f);
+		desc.m_speedError[normalIndex] = ndFloat32(0.0f);
+
 
 		desc.m_penetrationStiffness[jacobIndex] = ndFloat32(0.0f);
 		if (contact.m_material.m_flags & m_override0Accel)
@@ -332,7 +336,10 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 
 		desc.m_restitution[jacobIndex] = ndFloat32(0.0f);
 		desc.m_penetration[jacobIndex] = ndFloat32(0.0f);
+
 		desc.m_jointSpeed[normalIndex] = ndFloat32(0.0f);
+		desc.m_positError[normalIndex] = ndFloat32(0.0f);
+		desc.m_speedError[normalIndex] = ndFloat32(0.0f);
 
 		desc.m_penetrationStiffness[jacobIndex] = ndFloat32(0.0f);
 		if (contact.m_material.m_flags & m_override1Accel)
@@ -421,9 +428,13 @@ void ndContact::JointAccelerations(ndJointAccelerationDecriptor* const desc)
 				}
 				vRel = vRel * restitution + penetrationVeloc;
 			}
-		
+
+			rhs->m_positError = ndFloat32(0.0f);
+			rhs->m_speedError = ndFloat32(0.0f);
+
 			const ndFloat32 relGyro = (jacobian0.m_angular * gyroAlpha0 + jacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
 			rhs->m_coordenateAccel = relGyro + aRel - vRel * invTimestep;
+
 			//dTrace(("%f ", rhs->m_coordenateAccel));
 		}
 	}
