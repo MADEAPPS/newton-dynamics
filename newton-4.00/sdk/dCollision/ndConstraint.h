@@ -303,12 +303,12 @@ class ndConstraint: public ndContainersFreeListAlloc<ndConstraint>
 	//D_COLLISION_API ndBodyKinematic* GetBody0() const;
 	//D_COLLISION_API ndBodyKinematic* GetBody1() const;
 
-	ndBodyKinematic* ndConstraint::GetBody0() const
+	ndBodyKinematic* GetBody0() const
 	{
 		return m_body0;
 	}
 
-	ndBodyKinematic* ndConstraint::GetBody1() const
+	ndBodyKinematic* GetBody1() const
 	{
 		return m_body1;
 	}
