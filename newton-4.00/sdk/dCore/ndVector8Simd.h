@@ -277,27 +277,27 @@
 			}
 
 			inline ndVector8(const ndInt32 val)
-				: m_type(_mm256_castsi256_ps(_mm256_set1_epi32(val)))
+				:m_type(_mm256_castsi256_ps(_mm256_set1_epi32(val)))
 			{
 			}
 
 			inline ndVector8(const __m256 type)
-				: m_type(type)
+				:m_type(type)
 			{
 			}
 
 			inline ndVector8(const ndVector8& copy)
-				: m_type(copy.m_type)
+				:m_type(copy.m_type)
 			{
 			}
 
 			inline ndVector8(const ndVector& low, const ndVector& high)
-				: m_type(_mm256_set_m128(high.m_type, low.m_type))
+				:m_type(_mm256_set_m128(high.m_type, low.m_type))
 			{
 			}
 
 			inline ndVector8(const ndVector8* const baseAddr, const ndVector8& index)
-				: m_type(_mm256_i32gather_ps(&(*baseAddr)[0], index.m_typeInt, 4))
+				:m_type(_mm256_i32gather_ps(&(*baseAddr)[0], index.m_typeInt, 4))
 			{
 			}
 
