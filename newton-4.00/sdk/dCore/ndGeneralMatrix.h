@@ -109,11 +109,11 @@ bool ndCholeskyFactorizationAddRow(ndInt32 stride, ndInt32 n, T* const matrix, T
 	}
 
 	T diag = rowN[n] - s;
-#ifdef D_NEWTON_USE_DOUBLE
-	if (diag < T(1.0e-12f))
-#else
-	if (diag < T(1.0e-6f))
-#endif
+	#ifdef D_NEWTON_USE_DOUBLE
+		if (diag < T(1.0e-12f))
+	#else
+		if (diag < T(1.0e-6f))
+	#endif
 	{
 		return false;
 	}
