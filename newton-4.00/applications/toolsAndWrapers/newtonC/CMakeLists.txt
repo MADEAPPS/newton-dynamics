@@ -46,11 +46,6 @@ include_directories(install/source)
 
 add_library(${projectName} SHARED ${CPP_SOURCE})
 
-#set (pySrc "${CMAKE_CURRENT_SOURCE_DIR}")
-#list(APPEND PY_SOURCE 
-#	ndbpy.py
-#	newton.py
-#	newtonWorld.py)
 
 if (MSVC OR MINGW)
   set (cSuffix ".dll")

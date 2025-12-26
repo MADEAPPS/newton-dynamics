@@ -52,7 +52,7 @@
 //#define D_CLASS_REFLECTION(x,y)
 //#define D_MSV_NEWTON_ALIGN_16
 //#define D_GCC_NEWTON_ALIGN_16
-//#define D_MSV_NEWTON_ALIGN_32
+#define D_MSV_NEWTON_ALIGN_32
 //#define D_GCC_NEWTON_ALIGN_32
 
 

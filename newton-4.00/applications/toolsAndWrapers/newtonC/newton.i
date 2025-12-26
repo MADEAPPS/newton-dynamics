@@ -37,10 +37,13 @@
 %apply int32_t { ndInt32 }
 %apply float { ndFloat32 }
 
+
 %{
-	//#include <ndNewtonInc.h>
-	#include <newtonWorld.h>
-	//#include "newtonConfig.h"
+	#include <ndNewtonInc.h>
+	//#include <install/source/ndTypes.h>
+	//#include <newtonWorld.h>
+	#include "newtonConfig.h"
+	//#include <ndWorld.h>
 %}
 
 //%include "newtonConfig.h"
@@ -138,5 +141,7 @@
 //%include "install/source/ndRayCastNotify.h"
 //%include "install/source/ndBodiesInAabbNotify.h"
 
-%include "newtonWorld.h"
 
+//%include "config.i"
+%include "install/source/ndTypes.h"
+%include "NewtonWorld.h"

@@ -29,6 +29,16 @@ typedef struct SwigObj SwigObj;
 
 typedef struct SwigObj_SWIG_CException SWIG_CException;
 
+typedef struct SwigObj_ndFloatSign ndFloatSign;
+
+typedef struct SwigObj_ndIntPtr ndIntPtr;
+
+typedef struct SwigObj_ndDoubleInt ndDoubleInt;
+
+typedef struct SwigObj_ndTriplex ndTriplex;
+
+typedef struct SwigObj_ndTriplexReal ndTriplexReal;
+
 typedef struct SwigObj_NewtonWorld NewtonWorld;
 
 #ifdef __cplusplus
@@ -46,6 +56,83 @@ SWIGIMPORT char * SWIG_CException_msg_get(SWIG_CException* carg1);
 SWIGIMPORT SWIG_CException* SWIG_CException_get_pending();
 
 SWIGIMPORT void SWIG_CException_reset_pending();
+
+#define ND_NEWTON_VERSION 403
+SWIGIMPORT float newton_ndExp_VS_Fix(float carg1);
+
+SWIGIMPORT void ndFloatSign_m_iVal_set(ndFloatSign* carg1, int carg2);
+
+SWIGIMPORT int ndFloatSign_m_iVal_get(ndFloatSign* carg1);
+
+SWIGIMPORT void ndFloatSign_m_fVal_set(ndFloatSign* carg1, float carg2);
+
+SWIGIMPORT float ndFloatSign_m_fVal_get(ndFloatSign* carg1);
+
+SWIGIMPORT ndFloatSign* ndFloatSign_new();
+
+SWIGIMPORT void ndFloatSign_delete(ndFloatSign* carg1);
+
+SWIGIMPORT ndIntPtr* ndIntPtr_new();
+
+SWIGIMPORT void ndIntPtr_m_ptr_set(ndIntPtr* carg1, void * carg2);
+
+SWIGIMPORT void * ndIntPtr_m_ptr_get(ndIntPtr* carg1);
+
+SWIGIMPORT void ndIntPtr_m_int_set(ndIntPtr* carg1, long long carg2);
+
+SWIGIMPORT long long ndIntPtr_m_int_get(ndIntPtr* carg1);
+
+SWIGIMPORT void ndIntPtr_delete(ndIntPtr* carg1);
+
+SWIGIMPORT void ndDoubleInt_m_ptr_set(ndDoubleInt* carg1, void * carg2);
+
+SWIGIMPORT void * ndDoubleInt_m_ptr_get(ndDoubleInt* carg1);
+
+SWIGIMPORT void ndDoubleInt_m_int_set(ndDoubleInt* carg1, long long carg2);
+
+SWIGIMPORT long long ndDoubleInt_m_int_get(ndDoubleInt* carg1);
+
+SWIGIMPORT void ndDoubleInt_m_float_set(ndDoubleInt* carg1, double carg2);
+
+SWIGIMPORT double ndDoubleInt_m_float_get(ndDoubleInt* carg1);
+
+SWIGIMPORT ndDoubleInt* ndDoubleInt_new();
+
+SWIGIMPORT void ndDoubleInt_delete(ndDoubleInt* carg1);
+
+SWIGIMPORT void ndTriplex_m_x_set(ndTriplex* carg1, float carg2);
+
+SWIGIMPORT float ndTriplex_m_x_get(ndTriplex* carg1);
+
+SWIGIMPORT void ndTriplex_m_y_set(ndTriplex* carg1, float carg2);
+
+SWIGIMPORT float ndTriplex_m_y_get(ndTriplex* carg1);
+
+SWIGIMPORT void ndTriplex_m_z_set(ndTriplex* carg1, float carg2);
+
+SWIGIMPORT float ndTriplex_m_z_get(ndTriplex* carg1);
+
+SWIGIMPORT ndTriplex* ndTriplex_new();
+
+SWIGIMPORT void ndTriplex_delete(ndTriplex* carg1);
+
+SWIGIMPORT ndTriplexReal* ndTriplexReal_new();
+
+SWIGIMPORT ndTriplexReal* ndTriplexReal_new_f_f_f(float carg1, float carg2, float carg3);
+
+SWIGIMPORT void ndTriplexReal_m_x_set(ndTriplexReal* carg1, float carg2);
+
+SWIGIMPORT float ndTriplexReal_m_x_get(ndTriplexReal* carg1);
+
+SWIGIMPORT void ndTriplexReal_m_y_set(ndTriplexReal* carg1, float carg2);
+
+SWIGIMPORT float ndTriplexReal_m_y_get(ndTriplexReal* carg1);
+
+SWIGIMPORT void ndTriplexReal_m_z_set(ndTriplexReal* carg1, float carg2);
+
+SWIGIMPORT float ndTriplexReal_m_z_get(ndTriplexReal* carg1);
+
+SWIGIMPORT void ndTriplexReal_delete(ndTriplexReal* carg1);
 
 SWIGIMPORT NewtonWorld* NewtonWorld_new();
 
@@ -66,6 +153,11 @@ SWIGIMPORT void NewtonWorld_SetIterations(NewtonWorld* carg1, int carg2);
 namespace newton {
 
 class SWIG_CException;
+class ndFloatSign;
+class ndIntPtr;
+class ndDoubleInt;
+class ndTriplex;
+class ndTriplexReal;
 class NewtonWorld;
 
 class SWIG_CException {
@@ -93,6 +185,158 @@ public:
   }
   SwigObj_SWIG_CException* swig_self() const noexcept { return swig_self_; }
   SwigObj_SWIG_CException* swig_self_;
+  bool swig_owns_self_;
+};
+
+class ndFloatSign {
+public:
+  void m_iVal(int m_iVal);
+  int m_iVal() const;
+  void m_fVal(float m_fVal);
+  float m_fVal() const;
+  ndFloatSign();
+  ~ndFloatSign() {
+    if (swig_owns_self_)
+      ndFloatSign_delete(swig_self_);
+  }
+
+  explicit ndFloatSign(SwigObj_ndFloatSign* swig_self, bool swig_owns_self = true) noexcept : swig_self_{swig_self}, swig_owns_self_{swig_owns_self} {}
+  ndFloatSign(ndFloatSign const&) = delete;
+  ndFloatSign& operator=(ndFloatSign const&) = delete;
+  ndFloatSign(ndFloatSign&& obj) noexcept : swig_self_{obj.swig_self_}, swig_owns_self_{obj.swig_owns_self_} { obj.swig_owns_self_ = false; }
+  ndFloatSign& operator=(ndFloatSign&& obj) noexcept {
+    if (swig_owns_self_)
+      ndFloatSign_delete(swig_self_);
+    swig_self_ = obj.swig_self_;
+    swig_owns_self_ = obj.swig_owns_self_;
+    obj.swig_owns_self_ = false;
+    return *this;
+  }
+  SwigObj_ndFloatSign* swig_self() const noexcept { return swig_self_; }
+  SwigObj_ndFloatSign* swig_self_;
+  bool swig_owns_self_;
+};
+
+class ndIntPtr {
+public:
+  ndIntPtr();
+  void m_ptr(void * m_ptr);
+  void * m_ptr() const;
+  void m_int(long long m_int);
+  long long m_int() const;
+  ~ndIntPtr() {
+    if (swig_owns_self_)
+      ndIntPtr_delete(swig_self_);
+  }
+
+  explicit ndIntPtr(SwigObj_ndIntPtr* swig_self, bool swig_owns_self = true) noexcept : swig_self_{swig_self}, swig_owns_self_{swig_owns_self} {}
+  ndIntPtr(ndIntPtr const&) = delete;
+  ndIntPtr& operator=(ndIntPtr const&) = delete;
+  ndIntPtr(ndIntPtr&& obj) noexcept : swig_self_{obj.swig_self_}, swig_owns_self_{obj.swig_owns_self_} { obj.swig_owns_self_ = false; }
+  ndIntPtr& operator=(ndIntPtr&& obj) noexcept {
+    if (swig_owns_self_)
+      ndIntPtr_delete(swig_self_);
+    swig_self_ = obj.swig_self_;
+    swig_owns_self_ = obj.swig_owns_self_;
+    obj.swig_owns_self_ = false;
+    return *this;
+  }
+  SwigObj_ndIntPtr* swig_self() const noexcept { return swig_self_; }
+  SwigObj_ndIntPtr* swig_self_;
+  bool swig_owns_self_;
+};
+
+class ndDoubleInt {
+public:
+  void m_ptr(void * m_ptr);
+  void * m_ptr() const;
+  void m_int(long long m_int);
+  long long m_int() const;
+  void m_float(double m_float);
+  double m_float() const;
+  ndDoubleInt();
+  ~ndDoubleInt() {
+    if (swig_owns_self_)
+      ndDoubleInt_delete(swig_self_);
+  }
+
+  explicit ndDoubleInt(SwigObj_ndDoubleInt* swig_self, bool swig_owns_self = true) noexcept : swig_self_{swig_self}, swig_owns_self_{swig_owns_self} {}
+  ndDoubleInt(ndDoubleInt const&) = delete;
+  ndDoubleInt& operator=(ndDoubleInt const&) = delete;
+  ndDoubleInt(ndDoubleInt&& obj) noexcept : swig_self_{obj.swig_self_}, swig_owns_self_{obj.swig_owns_self_} { obj.swig_owns_self_ = false; }
+  ndDoubleInt& operator=(ndDoubleInt&& obj) noexcept {
+    if (swig_owns_self_)
+      ndDoubleInt_delete(swig_self_);
+    swig_self_ = obj.swig_self_;
+    swig_owns_self_ = obj.swig_owns_self_;
+    obj.swig_owns_self_ = false;
+    return *this;
+  }
+  SwigObj_ndDoubleInt* swig_self() const noexcept { return swig_self_; }
+  SwigObj_ndDoubleInt* swig_self_;
+  bool swig_owns_self_;
+};
+
+class ndTriplex {
+public:
+  void m_x(float m_x);
+  float m_x() const;
+  void m_y(float m_y);
+  float m_y() const;
+  void m_z(float m_z);
+  float m_z() const;
+  ndTriplex();
+  ~ndTriplex() {
+    if (swig_owns_self_)
+      ndTriplex_delete(swig_self_);
+  }
+
+  explicit ndTriplex(SwigObj_ndTriplex* swig_self, bool swig_owns_self = true) noexcept : swig_self_{swig_self}, swig_owns_self_{swig_owns_self} {}
+  ndTriplex(ndTriplex const&) = delete;
+  ndTriplex& operator=(ndTriplex const&) = delete;
+  ndTriplex(ndTriplex&& obj) noexcept : swig_self_{obj.swig_self_}, swig_owns_self_{obj.swig_owns_self_} { obj.swig_owns_self_ = false; }
+  ndTriplex& operator=(ndTriplex&& obj) noexcept {
+    if (swig_owns_self_)
+      ndTriplex_delete(swig_self_);
+    swig_self_ = obj.swig_self_;
+    swig_owns_self_ = obj.swig_owns_self_;
+    obj.swig_owns_self_ = false;
+    return *this;
+  }
+  SwigObj_ndTriplex* swig_self() const noexcept { return swig_self_; }
+  SwigObj_ndTriplex* swig_self_;
+  bool swig_owns_self_;
+};
+
+class ndTriplexReal {
+public:
+  ndTriplexReal();
+  ndTriplexReal(float x, float arg2, float arg3);
+  void m_x(float m_x);
+  float m_x() const;
+  void m_y(float m_y);
+  float m_y() const;
+  void m_z(float m_z);
+  float m_z() const;
+  ~ndTriplexReal() {
+    if (swig_owns_self_)
+      ndTriplexReal_delete(swig_self_);
+  }
+
+  explicit ndTriplexReal(SwigObj_ndTriplexReal* swig_self, bool swig_owns_self = true) noexcept : swig_self_{swig_self}, swig_owns_self_{swig_owns_self} {}
+  ndTriplexReal(ndTriplexReal const&) = delete;
+  ndTriplexReal& operator=(ndTriplexReal const&) = delete;
+  ndTriplexReal(ndTriplexReal&& obj) noexcept : swig_self_{obj.swig_self_}, swig_owns_self_{obj.swig_owns_self_} { obj.swig_owns_self_ = false; }
+  ndTriplexReal& operator=(ndTriplexReal&& obj) noexcept {
+    if (swig_owns_self_)
+      ndTriplexReal_delete(swig_self_);
+    swig_self_ = obj.swig_self_;
+    swig_owns_self_ = obj.swig_owns_self_;
+    obj.swig_owns_self_ = false;
+    return *this;
+  }
+  SwigObj_ndTriplexReal* swig_self() const noexcept { return swig_self_; }
+  SwigObj_ndTriplexReal* swig_self_;
   bool swig_owns_self_;
 };
 
@@ -153,6 +397,39 @@ template <typename T> T swig_check(T x) {
 
 #endif // SWIG_swig_check_DEFINED
 
+inline float ndExp_VS_Fix(float x) { return swig_check(newton_ndExp_VS_Fix(x)); }
+inline void ndFloatSign::m_iVal(int m_iVal) { ndFloatSign_m_iVal_set(swig_self(), m_iVal); }
+inline int ndFloatSign::m_iVal() const { return ndFloatSign_m_iVal_get(swig_self()); }
+inline void ndFloatSign::m_fVal(float m_fVal) { ndFloatSign_m_fVal_set(swig_self(), m_fVal); }
+inline float ndFloatSign::m_fVal() const { return ndFloatSign_m_fVal_get(swig_self()); }
+inline ndFloatSign::ndFloatSign() : ndFloatSign{swig_check(ndFloatSign_new())} {}
+inline ndIntPtr::ndIntPtr() : ndIntPtr{swig_check(ndIntPtr_new())} {}
+inline void ndIntPtr::m_ptr(void * m_ptr) { ndIntPtr_m_ptr_set(swig_self(), m_ptr); }
+inline void * ndIntPtr::m_ptr() const { return ndIntPtr_m_ptr_get(swig_self()); }
+inline void ndIntPtr::m_int(long long m_int) { ndIntPtr_m_int_set(swig_self(), m_int); }
+inline long long ndIntPtr::m_int() const { return ndIntPtr_m_int_get(swig_self()); }
+inline void ndDoubleInt::m_ptr(void * m_ptr) { ndDoubleInt_m_ptr_set(swig_self(), m_ptr); }
+inline void * ndDoubleInt::m_ptr() const { return ndDoubleInt_m_ptr_get(swig_self()); }
+inline void ndDoubleInt::m_int(long long m_int) { ndDoubleInt_m_int_set(swig_self(), m_int); }
+inline long long ndDoubleInt::m_int() const { return ndDoubleInt_m_int_get(swig_self()); }
+inline void ndDoubleInt::m_float(double m_float) { ndDoubleInt_m_float_set(swig_self(), m_float); }
+inline double ndDoubleInt::m_float() const { return ndDoubleInt_m_float_get(swig_self()); }
+inline ndDoubleInt::ndDoubleInt() : ndDoubleInt{swig_check(ndDoubleInt_new())} {}
+inline void ndTriplex::m_x(float m_x) { ndTriplex_m_x_set(swig_self(), m_x); }
+inline float ndTriplex::m_x() const { return ndTriplex_m_x_get(swig_self()); }
+inline void ndTriplex::m_y(float m_y) { ndTriplex_m_y_set(swig_self(), m_y); }
+inline float ndTriplex::m_y() const { return ndTriplex_m_y_get(swig_self()); }
+inline void ndTriplex::m_z(float m_z) { ndTriplex_m_z_set(swig_self(), m_z); }
+inline float ndTriplex::m_z() const { return ndTriplex_m_z_get(swig_self()); }
+inline ndTriplex::ndTriplex() : ndTriplex{swig_check(ndTriplex_new())} {}
+inline ndTriplexReal::ndTriplexReal() : ndTriplexReal{swig_check(ndTriplexReal_new())} {}
+inline ndTriplexReal::ndTriplexReal(float x, float arg2, float arg3) : ndTriplexReal{swig_check(ndTriplexReal_new_f_f_f(x, arg2, arg3))} {}
+inline void ndTriplexReal::m_x(float m_x) { ndTriplexReal_m_x_set(swig_self(), m_x); }
+inline float ndTriplexReal::m_x() const { return ndTriplexReal_m_x_get(swig_self()); }
+inline void ndTriplexReal::m_y(float m_y) { ndTriplexReal_m_y_set(swig_self(), m_y); }
+inline float ndTriplexReal::m_y() const { return ndTriplexReal_m_y_get(swig_self()); }
+inline void ndTriplexReal::m_z(float m_z) { ndTriplexReal_m_z_set(swig_self(), m_z); }
+inline float ndTriplexReal::m_z() const { return ndTriplexReal_m_z_get(swig_self()); }
 inline NewtonWorld::NewtonWorld() : NewtonWorld{swig_check(NewtonWorld_new())} {}
 inline void NewtonWorld::Update(float timestep) { NewtonWorld_Update(swig_self(), timestep); swig_check(); }
 inline void NewtonWorld::SetSubSteps(int substeps) { NewtonWorld_SetSubSteps(swig_self(), substeps); swig_check(); }
