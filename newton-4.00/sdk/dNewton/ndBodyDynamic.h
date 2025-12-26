@@ -96,9 +96,9 @@ class ndBodyDynamic: public ndBodyKinematic
 
 	friend class ndDynamicsUpdate;
 	friend class ndDynamicsUpdateSoa;
+	friend class ndSkeletonContainer;
 	friend class ndDynamicsUpdateAvx2;
-} D_GCC_NEWTON_CLASS_ALIGN_32 ;
-
+} D_GCC_NEWTON_CLASS_ALIGN_32;
 
 #endif 
 
