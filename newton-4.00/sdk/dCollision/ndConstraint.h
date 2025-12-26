@@ -300,8 +300,18 @@ class ndConstraint: public ndContainersFreeListAlloc<ndConstraint>
 	D_COLLISION_API ndVector GetTorqueBody0() const;
 	D_COLLISION_API ndVector GetForceBody1() const;
 	D_COLLISION_API ndVector GetTorqueBody1() const;
-	D_COLLISION_API ndBodyKinematic* GetBody0() const;
-	D_COLLISION_API ndBodyKinematic* GetBody1() const;
+	//D_COLLISION_API ndBodyKinematic* GetBody0() const;
+	//D_COLLISION_API ndBodyKinematic* GetBody1() const;
+
+	ndBodyKinematic* ndConstraint::GetBody0() const
+	{
+		return m_body0;
+	}
+
+	ndBodyKinematic* ndConstraint::GetBody1() const
+	{
+		return m_body1;
+	}
 	
 	D_COLLISION_API virtual void DebugJoint(ndConstraintDebugCallback&) const;
 	D_COLLISION_API void InitPointParam(ndPointParam& param, const ndVector& p0Global, const ndVector& p1Global) const;

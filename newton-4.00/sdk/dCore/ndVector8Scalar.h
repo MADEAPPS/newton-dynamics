@@ -22,9 +22,7 @@
 #ifndef __ND_VECTOR8_SCALAR_H__
 #define __ND_VECTOR8_SCALAR_H__
 
-#include "ndCore.h"
-
-#define ND_SIMD8_WORK_GROUP_SIZE	8 
+#include "ndVector.h"
 
 #ifdef D_NEWTON_USE_DOUBLE
 D_MSV_NEWTON_CLASS_ALIGN_32

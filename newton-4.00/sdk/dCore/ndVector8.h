@@ -19,8 +19,10 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_SIMD_VECTOR8_H__
-#define __ND_SIMD_VECTOR8_H__
+#ifndef __ND_VECTOR8_H__
+#define __ND_VECTOR8_H__
+
+#define ND_SIMD8_WORK_GROUP_SIZE	8 
 
 #ifdef D_SCALAR_VECTOR_CLASS
 	#include "ndVector8Scalar.h"

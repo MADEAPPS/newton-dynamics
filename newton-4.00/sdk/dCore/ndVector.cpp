@@ -24,7 +24,9 @@
 #include "ndVector.h"
 #include "ndMatrix.h"
 #include "ndVector8.h"
+#include "ndVector16.h"
 #include "ndSpatialVector.h"
+#include "ndSpatialMatrix.h"
 
 #ifndef D_NEWTON_USE_DOUBLE
 
@@ -67,6 +69,11 @@ ndVector8 ndVector8::m_mask(-1);
 ndVector8 ndVector8::m_one(ndFloat32(1.0f));
 ndVector8 ndVector8::m_zero(ndFloat32(0.0f));
 ndVector8 ndVector8::m_ordinals(ndVector(0, 1, 2, 3), ndVector(4, 5, 6, 7));
+
+ndVector16 ndVector16::m_mask(-1);
+ndVector16 ndVector16::m_one(ndFloat32(1.0f));
+ndVector16 ndVector16::m_zero(ndFloat32(0.0f));
+ndVector16 ndVector16::m_ordinals(ndVector(0, 1, 2, 3), ndVector(4, 5, 6, 7), ndVector(8, 9, 10, 11), ndVector(12, 13, 14, 15));
 
 ndSpatialVector ndSpatialVector::m_zero(ndFloat32(0.0f));
 ndSpatialMatrix ndSpatialMatrix::m_zero(ndFloat32(0.0f));

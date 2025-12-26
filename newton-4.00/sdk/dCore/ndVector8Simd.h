@@ -22,9 +22,9 @@
 #ifndef __ND_VECTOR8_SIMD_H__
 #define __ND_VECTOR8_SIMD_H__
 
-#include "ndCore.h"
+//#include "ndCore.h"
+#include "ndVector.h"
 
-#define ND_SIMD8_WORK_GROUP_SIZE	8 
 
 #ifdef D_NEWTON_USE_AVX2_OPTION
 
@@ -513,19 +513,19 @@
 		{
 		}
 
-#ifdef D_NEWTON_USE_DOUBLE
-		inline ndVector8(const ndVector8* const baseAddr, const ndVector8& index)
-			:m_linear(&baseAddr->m_linear[0], (ndInt64*)&index.m_linear[0])
-			,m_angular(&baseAddr->m_linear[0], (ndInt64*)&index.m_angular[0])
-		{
-		}
-#else
-		inline ndVector8(const ndVector8* const baseAddr, const ndVector8& index)
-			:m_linear(&baseAddr->m_linear[0], (ndInt32*)&index.m_linear[0])
-			,m_angular(&baseAddr->m_linear[0], (ndInt32*)&index.m_angular[0])
-		{
-		}
-#endif
+		#ifdef D_NEWTON_USE_DOUBLE
+			inline ndVector8(const ndVector8* const baseAddr, const ndVector8& index)
+				:m_linear(&baseAddr->m_linear[0], (ndInt64*)&index.m_linear[0])
+				,m_angular(&baseAddr->m_linear[0], (ndInt64*)&index.m_angular[0])
+			{
+			}
+		#else
+			inline ndVector8(const ndVector8* const baseAddr, const ndVector8& index)
+				:m_linear(&baseAddr->m_linear[0], (ndInt32*)&index.m_linear[0])
+				,m_angular(&baseAddr->m_linear[0], (ndInt32*)&index.m_angular[0])
+			{
+			}
+		#endif
 
 		inline ndFloat32& operator[] (ndInt32 i)
 		{

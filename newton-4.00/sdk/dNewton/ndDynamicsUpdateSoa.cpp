@@ -1771,8 +1771,8 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 			ndConstraint** const jointGroup = &jointArray[block];
 
 			ndVector8 zero(ndFloat32(0.0f));
-			const ndInt8 isUniformGruop = m_groupType[group];
-			if (isUniformGruop)
+			const ndInt8 isUniformGroup = m_groupType[group];
+			if (isUniformGroup)
 			{
 				for (ndInt32 i = 0; i < ND_SIMD8_WORK_GROUP_SIZE; ++i)
 				{

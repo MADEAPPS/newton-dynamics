@@ -44,6 +44,7 @@
 #include <ndVector8.h>
 #include <ndRand127.h>
 #include <ndFastRay.h>
+#include <ndVector16.h>
 #include <ndFastAabb.h>
 #include <ndProfiler.h>
 #include <ndPolyhedra.h>

@@ -135,15 +135,15 @@ ndUnsigned32 ndConstraint::GetRowsCount() const
 	return m_maxDof;
 }
 
-ndBodyKinematic* ndConstraint::GetBody0() const
-{
-	return m_body0;
-}
-
-ndBodyKinematic* ndConstraint::GetBody1() const
-{
-	return m_body1;
-}
+//ndBodyKinematic* ndConstraint::GetBody0() const
+//{
+//	return m_body0;
+//}
+//
+//ndBodyKinematic* ndConstraint::GetBody1() const
+//{
+//	return m_body1;
+//}
 
 void ndConstraint::DebugJoint(ndConstraintDebugCallback&) const
 {
