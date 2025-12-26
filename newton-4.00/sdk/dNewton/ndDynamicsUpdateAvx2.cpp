@@ -699,11 +699,11 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 				row->m_JMinv.m_jacobianM0.m_angular = invInertia0.RotateVector(row->m_Jt.m_jacobianM0.m_angular);
 				row->m_JMinv.m_jacobianM1.m_linear = row->m_Jt.m_jacobianM1.m_linear * invMass1;
 				row->m_JMinv.m_jacobianM1.m_angular = invInertia1.RotateVector(row->m_Jt.m_jacobianM1.m_angular);
+
 				//const ndVector8& JMinvM0 = (ndVector8&)row->m_JMinv.m_jacobianM0;
 				//const ndVector8& JMinvM1 = (ndVector8&)row->m_JMinv.m_jacobianM1;
 				//const ndVector8 tmpAccel((JMinvM0 * force0).MulAdd(JMinvM1, force1));
-
-				const ndVector16 JMinv((ndVector8&)row->m_JMinv.m_jacobianM0, (ndVector8&)row->m_JMinv.m_jacobianM1);
+				const ndVector16 JMinv(row->m_JMinv.m_jacobianM0, row->m_JMinv.m_jacobianM1);
 				const ndVector16 tmpAccel1(JMinv * force);
 				const ndVector8 tmpAccel(tmpAccel1.m_low + tmpAccel1.m_high);
 				
@@ -875,14 +875,14 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 					row.m_Jt.m_jacobianM0.m_angular.m_y.m_low,
 					row.m_Jt.m_jacobianM0.m_angular.m_z.m_low,
 					dommy,
-					(ndVector8&)row0->m_Jt.m_jacobianM0,
-					(ndVector8&)row1->m_Jt.m_jacobianM0,
-					(ndVector8&)row2->m_Jt.m_jacobianM0,
-					(ndVector8&)row3->m_Jt.m_jacobianM0,
-					(ndVector8&)row4->m_Jt.m_jacobianM0,
-					(ndVector8&)row5->m_Jt.m_jacobianM0,
-					(ndVector8&)row6->m_Jt.m_jacobianM0,
-					(ndVector8&)row7->m_Jt.m_jacobianM0);
+					row0->m_Jt.m_jacobianM0,
+					row1->m_Jt.m_jacobianM0,
+					row2->m_Jt.m_jacobianM0,
+					row3->m_Jt.m_jacobianM0,
+					row4->m_Jt.m_jacobianM0,
+					row5->m_Jt.m_jacobianM0,
+					row6->m_Jt.m_jacobianM0,
+					row7->m_Jt.m_jacobianM0);
 				
 				ndVector8::Transpose(
 					row.m_Jt.m_jacobianM1.m_linear.m_x.m_low,
@@ -893,14 +893,14 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 					row.m_Jt.m_jacobianM1.m_angular.m_y.m_low,
 					row.m_Jt.m_jacobianM1.m_angular.m_z.m_low,
 					dommy,
-					(ndVector8&)row0->m_Jt.m_jacobianM1,
-					(ndVector8&)row1->m_Jt.m_jacobianM1,
-					(ndVector8&)row2->m_Jt.m_jacobianM1,
-					(ndVector8&)row3->m_Jt.m_jacobianM1,
-					(ndVector8&)row4->m_Jt.m_jacobianM1,
-					(ndVector8&)row5->m_Jt.m_jacobianM1,
-					(ndVector8&)row6->m_Jt.m_jacobianM1,
-					(ndVector8&)row7->m_Jt.m_jacobianM1);
+					row0->m_Jt.m_jacobianM1,
+					row1->m_Jt.m_jacobianM1,
+					row2->m_Jt.m_jacobianM1,
+					row3->m_Jt.m_jacobianM1,
+					row4->m_Jt.m_jacobianM1,
+					row5->m_Jt.m_jacobianM1,
+					row6->m_Jt.m_jacobianM1,
+					row7->m_Jt.m_jacobianM1);
 				
 				ndVector8::Transpose(
 					row.m_JMinv.m_jacobianM0.m_linear.m_x.m_low,
@@ -911,14 +911,14 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 					row.m_JMinv.m_jacobianM0.m_angular.m_y.m_low,
 					row.m_JMinv.m_jacobianM0.m_angular.m_z.m_low,
 					dommy,
-					(ndVector8&)row0->m_JMinv.m_jacobianM0,
-					(ndVector8&)row1->m_JMinv.m_jacobianM0,
-					(ndVector8&)row2->m_JMinv.m_jacobianM0,
-					(ndVector8&)row3->m_JMinv.m_jacobianM0,
-					(ndVector8&)row4->m_JMinv.m_jacobianM0,
-					(ndVector8&)row5->m_JMinv.m_jacobianM0,
-					(ndVector8&)row6->m_JMinv.m_jacobianM0,
-					(ndVector8&)row7->m_JMinv.m_jacobianM0);
+					row0->m_JMinv.m_jacobianM0,
+					row1->m_JMinv.m_jacobianM0,
+					row2->m_JMinv.m_jacobianM0,
+					row3->m_JMinv.m_jacobianM0,
+					row4->m_JMinv.m_jacobianM0,
+					row5->m_JMinv.m_jacobianM0,
+					row6->m_JMinv.m_jacobianM0,
+					row7->m_JMinv.m_jacobianM0);
 				
 				ndVector8::Transpose(
 					row.m_JMinv.m_jacobianM1.m_linear.m_x.m_low,
@@ -929,14 +929,14 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 					row.m_JMinv.m_jacobianM1.m_angular.m_y.m_low,
 					row.m_JMinv.m_jacobianM1.m_angular.m_z.m_low,
 					dommy,
-					(ndVector8&)row0->m_JMinv.m_jacobianM1,
-					(ndVector8&)row1->m_JMinv.m_jacobianM1,
-					(ndVector8&)row2->m_JMinv.m_jacobianM1,
-					(ndVector8&)row3->m_JMinv.m_jacobianM1,
-					(ndVector8&)row4->m_JMinv.m_jacobianM1,
-					(ndVector8&)row5->m_JMinv.m_jacobianM1,
-					(ndVector8&)row6->m_JMinv.m_jacobianM1,
-					(ndVector8&)row7->m_JMinv.m_jacobianM1);
+					row0->m_JMinv.m_jacobianM1,
+					row1->m_JMinv.m_jacobianM1,
+					row2->m_JMinv.m_jacobianM1,
+					row3->m_JMinv.m_jacobianM1,
+					row4->m_JMinv.m_jacobianM1,
+					row5->m_JMinv.m_jacobianM1,
+					row6->m_JMinv.m_jacobianM1,
+					row7->m_JMinv.m_jacobianM1);
 
 				const ndLeftHandSide* const row8 =  &leftHandSide[jointsPtr[index + 8]->m_rowStart + k];
 				const ndLeftHandSide* const row9 =  &leftHandSide[jointsPtr[index + 9]->m_rowStart + k];
@@ -955,14 +955,14 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 					row.m_Jt.m_jacobianM0.m_angular.m_y.m_high,
 					row.m_Jt.m_jacobianM0.m_angular.m_z.m_high,
 					dommy,
-					(ndVector8&)row8->m_Jt.m_jacobianM0,
-					(ndVector8&)row9->m_Jt.m_jacobianM0,
-					(ndVector8&)row10->m_Jt.m_jacobianM0,
-					(ndVector8&)row11->m_Jt.m_jacobianM0,
-					(ndVector8&)row12->m_Jt.m_jacobianM0,
-					(ndVector8&)row13->m_Jt.m_jacobianM0,
-					(ndVector8&)row14->m_Jt.m_jacobianM0,
-					(ndVector8&)row15->m_Jt.m_jacobianM0);
+					row8->m_Jt.m_jacobianM0,
+					row9->m_Jt.m_jacobianM0,
+					row10->m_Jt.m_jacobianM0,
+					row11->m_Jt.m_jacobianM0,
+					row12->m_Jt.m_jacobianM0,
+					row13->m_Jt.m_jacobianM0,
+					row14->m_Jt.m_jacobianM0,
+					row15->m_Jt.m_jacobianM0);
 
 				ndVector8::Transpose(
 					row.m_Jt.m_jacobianM1.m_linear.m_x.m_high,
@@ -973,14 +973,14 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 					row.m_Jt.m_jacobianM1.m_angular.m_y.m_high,
 					row.m_Jt.m_jacobianM1.m_angular.m_z.m_high,
 					dommy,
-					(ndVector8&)row8->m_Jt.m_jacobianM1,
-					(ndVector8&)row9->m_Jt.m_jacobianM1,
-					(ndVector8&)row10->m_Jt.m_jacobianM1,
-					(ndVector8&)row11->m_Jt.m_jacobianM1,
-					(ndVector8&)row12->m_Jt.m_jacobianM1,
-					(ndVector8&)row13->m_Jt.m_jacobianM1,
-					(ndVector8&)row14->m_Jt.m_jacobianM1,
-					(ndVector8&)row15->m_Jt.m_jacobianM1);
+					row8->m_Jt.m_jacobianM1,
+					row9->m_Jt.m_jacobianM1,
+					row10->m_Jt.m_jacobianM1,
+					row11->m_Jt.m_jacobianM1,
+					row12->m_Jt.m_jacobianM1,
+					row13->m_Jt.m_jacobianM1,
+					row14->m_Jt.m_jacobianM1,
+					row15->m_Jt.m_jacobianM1);
 
 				ndVector8::Transpose(
 					row.m_JMinv.m_jacobianM0.m_linear.m_x.m_high,
@@ -991,14 +991,14 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 					row.m_JMinv.m_jacobianM0.m_angular.m_y.m_high,
 					row.m_JMinv.m_jacobianM0.m_angular.m_z.m_high,
 					dommy,
-					(ndVector8&)row8->m_JMinv.m_jacobianM0,
-					(ndVector8&)row9->m_JMinv.m_jacobianM0,
-					(ndVector8&)row10->m_JMinv.m_jacobianM0,
-					(ndVector8&)row11->m_JMinv.m_jacobianM0,
-					(ndVector8&)row12->m_JMinv.m_jacobianM0,
-					(ndVector8&)row13->m_JMinv.m_jacobianM0,
-					(ndVector8&)row14->m_JMinv.m_jacobianM0,
-					(ndVector8&)row15->m_JMinv.m_jacobianM0);
+					row8->m_JMinv.m_jacobianM0,
+					row9->m_JMinv.m_jacobianM0,
+					row10->m_JMinv.m_jacobianM0,
+					row11->m_JMinv.m_jacobianM0,
+					row12->m_JMinv.m_jacobianM0,
+					row13->m_JMinv.m_jacobianM0,
+					row14->m_JMinv.m_jacobianM0,
+					row15->m_JMinv.m_jacobianM0);
 
 				ndVector8::Transpose(
 					row.m_JMinv.m_jacobianM1.m_linear.m_x.m_high,
@@ -1009,14 +1009,14 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 					row.m_JMinv.m_jacobianM1.m_angular.m_y.m_high,
 					row.m_JMinv.m_jacobianM1.m_angular.m_z.m_high,
 					dommy,
-					(ndVector8&)row8->m_JMinv.m_jacobianM1,
-					(ndVector8&)row9->m_JMinv.m_jacobianM1,
-					(ndVector8&)row10->m_JMinv.m_jacobianM1,
-					(ndVector8&)row11->m_JMinv.m_jacobianM1,
-					(ndVector8&)row12->m_JMinv.m_jacobianM1,
-					(ndVector8&)row13->m_JMinv.m_jacobianM1,
-					(ndVector8&)row14->m_JMinv.m_jacobianM1,
-					(ndVector8&)row15->m_JMinv.m_jacobianM1);
+					row8->m_JMinv.m_jacobianM1,
+					row9->m_JMinv.m_jacobianM1,
+					row10->m_JMinv.m_jacobianM1,
+					row11->m_JMinv.m_jacobianM1,
+					row12->m_JMinv.m_jacobianM1,
+					row13->m_JMinv.m_jacobianM1,
+					row14->m_JMinv.m_jacobianM1,
+					row15->m_JMinv.m_jacobianM1);
 
 				#ifdef D_NEWTON_USE_DOUBLE
 					ndInt64* const normalIndex = (ndInt64*)&row.m_normalForceIndex[0];
@@ -1207,7 +1207,7 @@ void ndDynamicsUpdateAvx2::RegenerateSkeletonJacobians(ndSkeletonContainer* cons
 
 			//const ndVectorSoa& JMinvM0 = (ndVectorSoa&)row->m_JMinv.m_jacobianM0;
 			//const ndVectorSoa& JMinvM1 = (ndVectorSoa&)row->m_JMinv.m_jacobianM1;
-			const ndVector16 JMinv((ndVector8&)row->m_JMinv.m_jacobianM0, (ndVector8&)row->m_JMinv.m_jacobianM1);
+			const ndVector16 JMinv(row->m_JMinv.m_jacobianM0, row->m_JMinv.m_jacobianM1);
 			//const ndVectorSoa tmpAccel((JMinvM0 * force0).MulAdd(JMinvM1, force1));
 			const ndVector16 tmpAccel1(JMinv * forcePair);
 			const ndVector8 tmpAccel(tmpAccel1.m_low + tmpAccel1.m_high);
@@ -1446,8 +1446,8 @@ void ndDynamicsUpdateAvx2::UpdateForceFeedback()
 			rhs->m_jointFeebackForce->m_impact = rhs->m_maxImpact * timestepRK;
 		
 			const ndVector8 f(rhs->m_force);
-			force0 = force0.MulAdd((ndVector8&)lhs->m_Jt.m_jacobianM0, f);
-			force1 = force1.MulAdd((ndVector8&)lhs->m_Jt.m_jacobianM1, f);
+			force0 = force0.MulAdd(lhs->m_Jt.m_jacobianM0, f);
+			force1 = force1.MulAdd(lhs->m_Jt.m_jacobianM1, f);
 		}
 		joint->m_forceBody0 = force0.GetLow();
 		joint->m_torqueBody0 = force0.GetHigh();
@@ -1910,11 +1910,11 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 					}
 
 					const ndInt32 index0 = (block + i) * 2 + 0;
-					ndVector8& outBody0 = (ndVector8&)jointPartialForces[index0];
+					ndVector8& outBody0 = jointPartialForces[index0];
 					outBody0 = force0[i];
 
 					const ndInt32 index1 = (block + i) * 2 + 1;
-					ndVector8& outBody1 = (ndVector8&)jointPartialForces[index1];
+					ndVector8& outBody1 = jointPartialForces[index1];
 					outBody1 = force1[i];
 				}
 			}

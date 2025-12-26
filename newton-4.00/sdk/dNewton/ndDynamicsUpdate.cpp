@@ -869,8 +869,8 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 				//const ndVector tmpAccel(
 				//	JMinvM0.m_linear * force0 + JMinvM0.m_angular * torque0 +
 				//	JMinvM1.m_linear * force1 + JMinvM1.m_angular * torque1);
-				const ndVector8& JMinvM0 = (ndVector8&)row->m_JMinv.m_jacobianM0;
-				const ndVector8& JMinvM1 = (ndVector8&)row->m_JMinv.m_jacobianM1;
+				const ndVector8& JMinvM0 = row->m_JMinv.m_jacobianM0;
+				const ndVector8& JMinvM1 = row->m_JMinv.m_jacobianM1;
 
 				const ndVector8 tmpAccel((JMinvM0 * forceTorque0).MulAdd(JMinvM1, forceTorque1));
 
@@ -891,8 +891,8 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 				//	weigh0 * (JMinvM0.m_linear * JtM0.m_linear + JMinvM0.m_angular * JtM0.m_angular) +
 				//	weigh1 * (JMinvM1.m_linear * JtM1.m_linear + JMinvM1.m_angular * JtM1.m_angular));
 				//ndFloat32 diag = tmpDiag.AddHorizontal().GetScalar();
-				const ndVector8& JtM0 = (ndVector8&)row->m_Jt.m_jacobianM0;
-				const ndVector8& JtM1 = (ndVector8&)row->m_Jt.m_jacobianM1;
+				const ndVector8& JtM0 = row->m_Jt.m_jacobianM0;
+				const ndVector8& JtM1 = row->m_Jt.m_jacobianM1;
 				const ndVector8 tmpDiag(weigh0 * JMinvM0 * JtM0 + weigh1 * JMinvM1 * JtM1);
 				ndFloat32 diag = tmpDiag.AddHorizontal();
 				
@@ -1031,8 +1031,8 @@ void ndDynamicsUpdate::RegenerateSkeletonJacobians(ndSkeletonContainer* const sk
 			row->m_JMinv.m_jacobianM1.m_linear = row->m_Jt.m_jacobianM1.m_linear * invMass1;
 			row->m_JMinv.m_jacobianM1.m_angular = invInertia1.RotateVector(row->m_Jt.m_jacobianM1.m_angular);
 
-			const ndVector8& JMinvM0 = (ndVector8&)row->m_JMinv.m_jacobianM0;
-			const ndVector8& JMinvM1 = (ndVector8&)row->m_JMinv.m_jacobianM1;
+			const ndVector8& JMinvM0 = row->m_JMinv.m_jacobianM0;
+			const ndVector8& JMinvM1 = row->m_JMinv.m_jacobianM1;
 
 			const ndVector8 tmpAccel((JMinvM0 * force0).MulAdd(JMinvM1, force1));
 
@@ -1046,8 +1046,8 @@ void ndDynamicsUpdate::RegenerateSkeletonJacobians(ndSkeletonContainer* const sk
 			rhs->m_force = isBilateral ? ndClamp(force, rhs->m_lowerBoundFrictionCoefficent, rhs->m_upperBoundFrictionCoefficent) : force;
 			rhs->m_maxImpact = ndFloat32(0.0f);
 
-			const ndVector8& JtM0 = (ndVector8&)row->m_Jt.m_jacobianM0;
-			const ndVector8& JtM1 = (ndVector8&)row->m_Jt.m_jacobianM1;
+			const ndVector8& JtM0 = row->m_Jt.m_jacobianM0;
+			const ndVector8& JtM1 = row->m_Jt.m_jacobianM1;
 			const ndVector8 tmpDiag(weigh0 * JMinvM0 * JtM0 + weigh1 * JMinvM1 * JtM1);
 
 			ndFloat32 diag = tmpDiag.AddHorizontal();
@@ -1514,8 +1514,8 @@ void ndDynamicsUpdate::CalculateJointsForce()
 						//accel = accel.MulAdd(lhs->m_JMinv.m_jacobianM0.m_angular, torqueM0);
 						//accel = accel.MulAdd(lhs->m_JMinv.m_jacobianM1.m_linear, forceM1);
 						//accel = accel.MulAdd(lhs->m_JMinv.m_jacobianM1.m_angular, torqueM1);
-						ndVector8 accel(((ndVector8&)lhs->m_JMinv.m_jacobianM0) * forceTorqueM0);
-						accel = accel.MulAdd((ndVector8&)lhs->m_JMinv.m_jacobianM1, forceTorqueM1);
+						ndVector8 accel((lhs->m_JMinv.m_jacobianM0) * forceTorqueM0);
+						accel = accel.MulAdd(lhs->m_JMinv.m_jacobianM1, forceTorqueM1);
 
 						//const ndFloat32 a = coordenateAccel[i] - f0 * diagDamp[i] - accel.AddHorizontal().GetScalar();
 						const ndFloat32 a = coordenateAccel[i] - f0 * diagDamp[i] - accel.AddHorizontal();
@@ -1542,8 +1542,8 @@ void ndDynamicsUpdate::CalculateJointsForce()
 						 
 						const ndVector8 deltaForce0(deltaForce * weight0);
 						const ndVector8 deltaForce1(deltaForce * weight1);
-						forceTorqueM0 = forceTorqueM0.MulAdd((ndVector8&)lhs->m_Jt.m_jacobianM0, deltaForce0);
-						forceTorqueM1 = forceTorqueM1.MulAdd((ndVector8&)lhs->m_Jt.m_jacobianM1.m_linear, deltaForce1);
+						forceTorqueM0 = forceTorqueM0.MulAdd(lhs->m_Jt.m_jacobianM0, deltaForce0);
+						forceTorqueM1 = forceTorqueM1.MulAdd(lhs->m_Jt.m_jacobianM1, deltaForce1);
 					}
 				}
 
@@ -1573,8 +1573,8 @@ void ndDynamicsUpdate::CalculateJointsForce()
 				//torqueM1 = torqueM1.MulAdd(lhs->m_Jt.m_jacobianM1.m_angular, f);
 
 				const ndVector8 f(rhs->m_force);
-				forceTorqueM0 = forceTorqueM0.MulAdd((ndVector8&)lhs->m_Jt.m_jacobianM0, f);
-				forceTorqueM1 = forceTorqueM1.MulAdd((ndVector8&)lhs->m_Jt.m_jacobianM1, f);
+				forceTorqueM0 = forceTorqueM0.MulAdd(lhs->m_Jt.m_jacobianM0, f);
+				forceTorqueM1 = forceTorqueM1.MulAdd(lhs->m_Jt.m_jacobianM1, f);
 				rhs->m_maxImpact = ndMax(ndAbs(rhs->m_force), rhs->m_maxImpact);
 			}
 
