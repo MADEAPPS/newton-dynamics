@@ -96,13 +96,14 @@ class ndPointParam
 	ndVector m_posit1;
 } D_GCC_NEWTON_CLASS_ALIGN_32;
 
-D_MSV_NEWTON_CLASS_ALIGN_32
-class ndJacobian
-{
-	public:
-	ndVector m_linear;
-	ndVector m_angular;
-} D_GCC_NEWTON_CLASS_ALIGN_32;
+//D_MSV_NEWTON_CLASS_ALIGN_32
+//class ndJacobian
+//{
+//	public:
+//	ndVector m_linear;
+//	ndVector m_angular;
+//} D_GCC_NEWTON_CLASS_ALIGN_32;
+typedef ndVector8 ndJacobian;
 
 D_MSV_NEWTON_CLASS_ALIGN_32
 class ndJacobianPair

@@ -990,7 +990,7 @@ void ndSkeletonContainer::CalculateJointAccel(const ndJacobian* const internalFo
 	const ndSpatialVector zero(ndSpatialVector::m_zero);
 
 	const ndInt32 nodeCount = m_nodeList.GetCount();
-	const ndVector8* const internalForcesArray = (ndVector8*)internalForces;
+	const ndVector8* const internalForcesArray = internalForces;
 
 	auto CalculateJointAccel = [this, internalForcesArray, accel, &zero](ndInt32 groupId)
 	{
@@ -1858,7 +1858,7 @@ void ndSkeletonContainer::SolveAuxiliary(ndJacobian* const internalForces, const
 	}
 	ndAssert(primaryIndex == primaryCount);
 
-	ndVector8* const internalForcesArray = (ndVector8*)internalForces;
+	ndVector8* const internalForcesArray = internalForces;
 	auto SolveAuxiliary_1 = [this, primaryCount, u, f, b, low, high, internalForcesArray](ndInt32 groupId)
 	{
 		const ndInt32 index = m_matrixRowsIndex[primaryCount + groupId];

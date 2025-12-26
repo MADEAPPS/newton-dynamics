@@ -187,10 +187,10 @@ bool ndConstraint::CheckBlockMatrixPSD(const ndLeftHandSide* const bigMatrix, co
 		const ndLeftHandSide* const row_i = &bigMatrix[index + i];
 		const ndRightHandSide* const rhs = &bigRhs[index + i];
 
-		const ndJacobian& JMinvM0 = row_i->m_JMinv.m_jacobianM0;
-		const ndJacobian& JMinvM1 = row_i->m_JMinv.m_jacobianM1;
 		const ndJacobian& JtM0 = row_i->m_Jt.m_jacobianM0;
 		const ndJacobian& JtM1 = row_i->m_Jt.m_jacobianM1;
+		const ndJacobian& JMinvM0 = row_i->m_JMinv.m_jacobianM0;
+		const ndJacobian& JMinvM1 = row_i->m_JMinv.m_jacobianM1;
 		const ndVector tmpDiag(
 			JMinvM0.m_linear * JtM0.m_linear + JMinvM0.m_angular * JtM0.m_angular +
 			JMinvM1.m_linear * JtM1.m_linear + JMinvM1.m_angular * JtM1.m_angular);

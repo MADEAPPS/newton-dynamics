@@ -859,7 +859,7 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 	auto InitJacobianMatrix = ndMakeObject::ndFunction([this, &jointArray](ndInt32 groupId, ndInt32)
 	{
 		D_TRACKTIME_NAMED(InitJacobianMatrix);
-		ndVector8* const internalForces = (ndVector8*)&GetTempInternalForces()[0];
+		ndVector8* const internalForces = &GetTempInternalForces()[0];
 		auto BuildJacobianMatrix = [this, &internalForces](ndConstraint* const joint)
 		{
 			ndAssert(joint->GetBody0());
@@ -953,8 +953,8 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 
 		//ndJacobian* const internalForces = &GetInternalForces()[0];
 		//const ndJacobian* const jointInternalForces = &GetTempInternalForces()[0];
-		ndVector8* const internalForces = (ndVector8*)&GetInternalForces()[0];
-		const ndVector8* const jointInternalForces = (ndVector8*)&GetTempInternalForces()[0];
+		ndVector8* const internalForces = &GetInternalForces()[0];
+		const ndVector8* const jointInternalForces = &GetTempInternalForces()[0];
 		const ndJointBodyPairIndex* const jointBodyPairIndexBuffer = &GetJointBodyPairIndexBuffer()[0];
 
 		//ndVector force(zero);
@@ -994,7 +994,7 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 		const ndVector8 ordinals(ndVector8::m_ordinals);
 
 		ndInt8* const groupType = &m_groupType[0];
-		ndVector8* const jointMask = (ndVector8*)&(*m_jointMask)[0];
+		ndVector8* const jointMask = &(*m_jointMask)[0];
 		const ndInt32* const soaJointRows = &m_soaJointRows[0];
 
 		ndConstraint** const jointsPtr = &jointArray[0];
@@ -1276,7 +1276,7 @@ void ndDynamicsUpdateSoa::RegenerateSkeletonJacobians(ndSkeletonContainer* const
 	constraintParam.m_timestep = m_timestep;
 	constraintParam.m_invTimestep = m_invTimestep;
 
-	ndVector8* const internalForces = (ndVector8*)&GetTempInternalForces()[0];
+	ndVector8* const internalForces = &GetTempInternalForces()[0];
 	auto BuildJacobianMatrix = [this, &internalForces](ndConstraint* const joint)
 	{
 		ndAssert(joint->GetBody0());
@@ -1410,7 +1410,7 @@ void ndDynamicsUpdateSoa::RegenerateSkeletonJacobians(ndSkeletonContainer* const
 
 	const ndVector8 zero(ndVector8::m_zero);
 	const ndArray<ndInt32>& bodyIndex = GetJointForceIndexBuffer();
-	const ndVector8* const jointInternalForces = (ndVector8*)&GetTempInternalForces()[0];
+	const ndVector8* const jointInternalForces = &GetTempInternalForces()[0];
 	const ndJointBodyPairIndex* const jointBodyPairIndexBuffer = &GetJointBodyPairIndexBuffer()[0];
 	for (ndInt32 j = 0; j < nodeCount; ++j)
 	{
@@ -2015,8 +2015,8 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 		D_TRACKTIME_NAMED(ApplyJacobianAccumulatePartialForces);
 		const ndVector8 zero(ndVector8::m_zero);
 		const ndInt32* const bodyIndex = &GetJointForceIndexBuffer()[0];
-		ndVector8* const internalForces = (ndVector8*)&GetInternalForces()[0];
-		const ndVector8* const jointInternalForces = (ndVector8*)&GetTempInternalForces()[0];
+		ndVector8* const internalForces = &GetInternalForces()[0];
+		const ndVector8* const jointInternalForces = &GetTempInternalForces()[0];
 		const ndJointBodyPairIndex* const jointBodyPairIndexBuffer = &GetJointBodyPairIndexBuffer()[0];
 
 		ndVector8 force(zero);

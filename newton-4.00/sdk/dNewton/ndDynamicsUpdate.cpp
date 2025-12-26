@@ -818,7 +818,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 	{
 		D_TRACKTIME_NAMED(InitJacobianMatrix);
 		//ndJacobian* const internalForces = &GetTempInternalForces()[0];
-		ndVector8* const internalForces = (ndVector8*)&GetTempInternalForces()[0];
+		ndVector8* const internalForces = &GetTempInternalForces()[0];
 		auto BuildJacobianMatrix = [this, &internalForces](ndConstraint* const joint, ndInt32 jointIndex)
 		{
 			ndAssert(joint->GetBody0());
@@ -942,8 +942,8 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 
 		//ndJacobian* const internalForces = &GetInternalForces()[0];
 		//const ndJacobian* const jointInternalForces = &GetTempInternalForces()[0];
-		ndVector8* const internalForces = (ndVector8*)&GetInternalForces()[0];
-		const ndVector8* const jointInternalForces = (ndVector8*)&GetTempInternalForces()[0];
+		ndVector8* const internalForces = &GetInternalForces()[0];
+		const ndVector8* const jointInternalForces = &GetTempInternalForces()[0];
 		const ndJointBodyPairIndex* const jointBodyPairIndexBuffer = &GetJointBodyPairIndexBuffer()[0];
 
 		//ndVector force(zero);
@@ -995,7 +995,7 @@ void ndDynamicsUpdate::RegenerateSkeletonJacobians(ndSkeletonContainer* const sk
 	constraintParam.m_timestep = m_timestep;
 	constraintParam.m_invTimestep = m_invTimestep;
 
-	ndVector8* const internalForces = (ndVector8*)&GetTempInternalForces()[0];
+	ndVector8* const internalForces = &GetTempInternalForces()[0];
 	auto BuildJacobianMatrix = [this, &internalForces](ndConstraint* const joint)
 	{
 		ndAssert(joint->GetBody0());
@@ -1129,7 +1129,7 @@ void ndDynamicsUpdate::RegenerateSkeletonJacobians(ndSkeletonContainer* const sk
 
 	const ndVector8 zero(ndVector8::m_zero);
 	const ndArray<ndInt32>& bodyIndex = GetJointForceIndexBuffer();
-	const ndVector8* const jointInternalForces = (ndVector8*)&GetTempInternalForces()[0];
+	const ndVector8* const jointInternalForces = &GetTempInternalForces()[0];
 	const ndJointBodyPairIndex* const jointBodyPairIndexBuffer = &GetJointBodyPairIndexBuffer()[0];
 	for (ndInt32 j = 0; j < nodeCount; ++j)
 	{
@@ -1443,8 +1443,8 @@ void ndDynamicsUpdate::CalculateJointsForce()
 	{
 		D_TRACKTIME_NAMED(CalculateJointsForce);
 		//ndJacobian* const jointPartialForces = &GetTempInternalForces()[0];
-		ndVector8* const internalForces = (ndVector8*)&m_internalForces[0];
-		ndVector8* const jointPartialForces = (ndVector8*)&GetTempInternalForces()[0];
+		ndVector8* const internalForces = &m_internalForces[0];
+		ndVector8* const jointPartialForces = &GetTempInternalForces()[0];
 
 		auto JointForce = [this, &jointPartialForces, &internalForces](ndConstraint* const joint, ndInt32 jointIndex)
 		{

@@ -437,10 +437,11 @@ void ndBodyKinematic::IntegrateGyroSubstep(const ndVector&)
 
 ndJacobian ndBodyKinematic::IntegrateForceAndToque(const ndVector&, const ndVector&, const ndVector&) const
 {
-	ndJacobian step;
-	step.m_linear = ndVector::m_zero;
-	step.m_angular = ndVector::m_zero;
-	return step;
+	//ndJacobian step;
+	//step.m_linear = ndVector::m_zero;
+	//step.m_angular = ndVector::m_zero;
+	//return step;
+	return ndVector8::m_zero;
 }
 
 void ndBodyKinematic::AddImpulse(const ndVector&, const ndVector&, ndFloat32)

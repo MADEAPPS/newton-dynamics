@@ -387,12 +387,14 @@
 
 			inline ndVector GetLow() const
 			{
-				return m_vector8.m_linear;
+				//return m_vector8.m_linear;
+				return m_linear;
 			}
 
 			inline ndVector GetHigh() const
 			{
-				return m_vector8.m_angular;
+				//return m_vector8.m_angular;
+				return m_angular;
 			}
 
 			inline ndFloat32 GetMax() const
@@ -461,7 +463,8 @@
 				{
 					ndVector m_linear;
 					ndVector m_angular;
-				} m_vector8;
+				//} m_vector8;
+				};
 
 				__m256 m_type;
 				__m256i m_typeInt;

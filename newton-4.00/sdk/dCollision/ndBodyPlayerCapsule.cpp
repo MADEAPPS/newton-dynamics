@@ -649,38 +649,46 @@ ndVector ndBodyPlayerCapsuleImpulseSolver::CalculateImpulse()
 		if (bodyArray[i]) 
 		{
 			ndFloat32 invMass = bodyArray[i]->GetInvMass();
-			ndMatrix invInertia(bodyArray[i]->GetInvInertiaMatrix());
+			const ndMatrix invInertia(bodyArray[i]->GetInvInertiaMatrix());
 			jInvMass.m_jacobianM1.m_linear = jInvMass.m_jacobianM1.m_linear.Scale(invMass);
 			jInvMass.m_jacobianM1.m_angular = invInertia.RotateVector(jInvMass.m_jacobianM1.m_angular);
 		}
 		else 
 		{
-			jInvMass.m_jacobianM1.m_linear = ndVector::m_zero;
-			jInvMass.m_jacobianM1.m_angular = ndVector::m_zero;
+			//jInvMass.m_jacobianM1.m_linear = ndVector::m_zero;
+			//jInvMass.m_jacobianM1.m_angular = ndVector::m_zero;
+			jInvMass.m_jacobianM1 = ndVector8::m_zero;
 		}
 
-		ndVector tmp(
-			jInvMass.m_jacobianM0.m_linear * m_jacobianPairs[i].m_jacobianM0.m_linear +
-			jInvMass.m_jacobianM0.m_angular * m_jacobianPairs[i].m_jacobianM0.m_angular +
-			jInvMass.m_jacobianM1.m_linear * m_jacobianPairs[i].m_jacobianM1.m_linear +
-			jInvMass.m_jacobianM1.m_angular * m_jacobianPairs[i].m_jacobianM1.m_angular);
-		ndFloat32 a00 = (tmp.m_x + tmp.m_y + tmp.m_z) * ndFloat32 (1.0004f);
+		//ndVector tmp(
+		//	jInvMass.m_jacobianM0.m_linear * m_jacobianPairs[i].m_jacobianM0.m_linear +
+		//	jInvMass.m_jacobianM0.m_angular * m_jacobianPairs[i].m_jacobianM0.m_angular +
+		//	jInvMass.m_jacobianM1.m_linear * m_jacobianPairs[i].m_jacobianM1.m_linear +
+		//	jInvMass.m_jacobianM1.m_angular * m_jacobianPairs[i].m_jacobianM1.m_angular);
+		//ndFloat32 a00 = (tmp.m_x + tmp.m_y + tmp.m_z) * ndFloat32 (1.0004f);
+		const ndVector8 tmp(
+			jInvMass.m_jacobianM0 * m_jacobianPairs[i].m_jacobianM0 +
+			jInvMass.m_jacobianM1 * m_jacobianPairs[i].m_jacobianM1);
+		ndFloat32 a00 = tmp.AddHorizontal() * ndFloat32(1.0004f);
 
 		massMatrix[i][i] = a00;
 
 		m_impulseMag[i] = ndFloat32(0.0f);
 		for (ndInt32 j = i + 1; j < m_rowCount; ++j) 
 		{
-			ndVector tmp1(
-				jInvMass.m_jacobianM0.m_linear * m_jacobianPairs[j].m_jacobianM0.m_linear +
-				jInvMass.m_jacobianM0.m_angular * m_jacobianPairs[j].m_jacobianM0.m_angular);
+			//ndVector8 tmp1(
+			//	jInvMass.m_jacobianM0.m_linear * m_jacobianPairs[j].m_jacobianM0.m_linear +
+			//	jInvMass.m_jacobianM0.m_angular * m_jacobianPairs[j].m_jacobianM0.m_angular);
+			ndVector8 tmp1(jInvMass.m_jacobianM0 * m_jacobianPairs[j].m_jacobianM0);
 			if (bodyArray[i] == bodyArray[j]) 
 			{
-				tmp1 += jInvMass.m_jacobianM1.m_linear * m_jacobianPairs[j].m_jacobianM1.m_linear;
-				tmp1 += jInvMass.m_jacobianM1.m_angular * m_jacobianPairs[j].m_jacobianM1.m_angular;
+				//tmp1 += jInvMass.m_jacobianM1.m_linear * m_jacobianPairs[j].m_jacobianM1.m_linear;
+				//tmp1 += jInvMass.m_jacobianM1.m_angular * m_jacobianPairs[j].m_jacobianM1.m_angular;
+				tmp1 = tmp1.MulAdd(jInvMass.m_jacobianM1, m_jacobianPairs[j].m_jacobianM1);
 			}
 
-			ndFloat32 a01 = tmp1.m_x + tmp1.m_y + tmp1.m_z;
+			//ndFloat32 a01 = tmp1.m_x + tmp1.m_y + tmp1.m_z;
+			ndFloat32 a01 = tmp1.AddHorizontal();
 			massMatrix[i][j] = a01;
 			massMatrix[j][i] = a01;
 		}
@@ -745,10 +753,12 @@ void ndBodyPlayerCapsuleImpulseSolver::AddAngularRows()
 	for (ndInt32 i = 0; i < 3; ++i) 
 	{
 		m_contactPoint[m_rowCount] = nullptr;
-		m_jacobianPairs[m_rowCount].m_jacobianM1.m_linear = ndVector::m_zero;
-		m_jacobianPairs[m_rowCount].m_jacobianM1.m_angular = ndVector::m_zero;
-		m_jacobianPairs[m_rowCount].m_jacobianM0.m_linear = ndVector::m_zero;
-		m_jacobianPairs[m_rowCount].m_jacobianM0.m_angular = ndVector::m_zero;
+		//m_jacobianPairs[m_rowCount].m_jacobianM1.m_linear = ndVector::m_zero;
+		//m_jacobianPairs[m_rowCount].m_jacobianM1.m_angular = ndVector::m_zero;
+		//m_jacobianPairs[m_rowCount].m_jacobianM0.m_linear = ndVector::m_zero;
+		//m_jacobianPairs[m_rowCount].m_jacobianM0.m_angular = ndVector::m_zero;
+		m_jacobianPairs[m_rowCount].m_jacobianM1 = ndVector8::m_zero;
+		m_jacobianPairs[m_rowCount].m_jacobianM0 = ndVector8::m_zero;
 		m_jacobianPairs[m_rowCount].m_jacobianM0.m_angular[i] = ndFloat32(1.0f);
 		m_rhs[m_rowCount] = ndFloat32(0.0f);
 		m_low[m_rowCount] = ndFloat32(-1.0e12f);
