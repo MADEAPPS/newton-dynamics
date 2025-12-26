@@ -576,9 +576,12 @@ void ndJointBilateralConstraint::AddAngularRowJacobian(ndConstraintDescritor& de
 
 	desc.m_flags[index] = 0;
 	desc.m_jointSpeed[index] = relOmega;
-	desc.m_positError[index] = relAngle;
-	desc.m_speedError[index] = relOmega;
 	desc.m_penetration[index] = relAngle;
+
+	//desc.m_positError[index] = relAngle;
+	//desc.m_speedError[index] = relOmega;
+	desc.m_positError[index] = ndFloat32(0.0f);
+	desc.m_speedError[index] = ndFloat32(0.0f);
 
 	desc.m_jointAccel[index] = alphaError + relGyro;
 	desc.m_restitution[index] = ndFloat32(0.0f);

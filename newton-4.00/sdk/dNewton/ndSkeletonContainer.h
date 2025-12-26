@@ -216,8 +216,8 @@ class ndSkeletonContainer
 	void SolveLcp(ndInt32 stride, ndInt32 size, ndFloat32* const x, const ndFloat32* const b, const ndFloat32* const low, const ndFloat32* const high, const ndInt32* const normalIndex, ndFloat32 accelTol) const;
 
 	bool ResolveViolations(ndFloat32 timestep);
-	ndFloat32 CalculatePositionImpulse(ndFloat32 timestep, ndForcePair* const veloc);
 	void CalculateBodyImpulses(ndJacobian* const bodyImpulse, const ndForcePair* const jointImpulse) const;
+	ndFloat32 CalculateCorrectionImpulse(ndFloat32 timestep, ndForcePair* const veloc, ndForcePair* const accel) const;
 
 	void CalculateForce(ndForcePair* const force, const ndForcePair* const accel) const;
 	void UpdateForces(ndJacobian* const internalForces, const ndForcePair* const force) const;
