@@ -64,23 +64,20 @@ class ndMatrix : public ndClassAlloc
 	ndVector& operator[] (ndInt32 i);
 	const ndVector& operator[] (ndInt32 i) const;
 
-	inline ndMatrix Multiply(const ndMatrix& B) const
-	{
-		return ndMatrix(
-			B.m_front * m_front.BroadcastX() + B.m_up * m_front.BroadcastY() + B.m_right * m_front.BroadcastZ() + B.m_posit * m_front.BroadcastW(),
-			B.m_front * m_up.BroadcastX() + B.m_up * m_up.BroadcastY() + B.m_right * m_up.BroadcastZ() + B.m_posit * m_up.BroadcastW(),
-			B.m_front * m_right.BroadcastX() + B.m_up * m_right.BroadcastY() + B.m_right * m_right.BroadcastZ() + B.m_posit * m_right.BroadcastW(),
-			B.m_front * m_posit.BroadcastX() + B.m_up * m_posit.BroadcastY() + B.m_right * m_posit.BroadcastZ() + B.m_posit * m_posit.BroadcastW());
-	}
+	ndMatrix Multiply(const ndMatrix& B) const;
+	ndVector RotateVector(const ndVector& v) const;
+	ndVector UnrotateVector(const ndVector& v) const;
+	ndVector TransformVector(const ndVector& v) const;
+	ndVector UntransformVector(const ndVector& v) const;
 	
 	D_CORE_API ndMatrix Inverse() const;
 	D_CORE_API ndMatrix OrthoInverse() const;
 	D_CORE_API ndMatrix Transpose3x3 () const;
 	D_CORE_API ndMatrix Transpose4X4 () const;
-	D_CORE_API ndVector RotateVector (const ndVector &v) const;
-	D_CORE_API ndVector UnrotateVector (const ndVector &v) const;
-	D_CORE_API ndVector TransformVector (const ndVector &v) const;
-	D_CORE_API ndVector UntransformVector (const ndVector &v) const;
+	//D_CORE_API ndVector RotateVector (const ndVector &v) const;
+	//D_CORE_API ndVector UnrotateVector (const ndVector &v) const;
+	//D_CORE_API ndVector TransformVector (const ndVector &v) const;
+	//D_CORE_API ndVector UntransformVector (const ndVector &v) const;
 	D_CORE_API ndVector TransformVector1x4(const ndVector& v) const;
 	D_CORE_API ndPlane TransformPlane (const ndPlane &localPlane) const;
 	D_CORE_API ndPlane UntransformPlane (const ndPlane &globalPlane) const;
@@ -149,6 +146,35 @@ inline const ndVector& ndMatrix::operator[] (ndInt32  i) const
 	ndAssert (i < 4);
 	ndAssert (i >= 0);
 	return (&m_front)[i];
+}
+
+inline ndMatrix ndMatrix::Multiply(const ndMatrix& B) const
+{
+	return ndMatrix(
+		B.m_front * m_front.BroadcastX() + B.m_up * m_front.BroadcastY() + B.m_right * m_front.BroadcastZ() + B.m_posit * m_front.BroadcastW(),
+		B.m_front * m_up.BroadcastX() + B.m_up * m_up.BroadcastY() + B.m_right * m_up.BroadcastZ() + B.m_posit * m_up.BroadcastW(),
+		B.m_front * m_right.BroadcastX() + B.m_up * m_right.BroadcastY() + B.m_right * m_right.BroadcastZ() + B.m_posit * m_right.BroadcastW(),
+		B.m_front * m_posit.BroadcastX() + B.m_up * m_posit.BroadcastY() + B.m_right * m_posit.BroadcastZ() + B.m_posit * m_posit.BroadcastW());
+}
+
+inline ndVector ndMatrix::RotateVector(const ndVector& v) const
+{
+	return m_front * v.BroadcastX() + m_up * v.BroadcastY() + m_right * v.BroadcastZ();
+}
+
+inline ndVector ndMatrix::UnrotateVector(const ndVector& v) const
+{
+	return v.OptimizedVectorUnrotate(m_front, m_up, m_right);
+}
+
+inline ndVector ndMatrix::TransformVector(const ndVector& v) const
+{
+	return m_front * v.BroadcastX() + m_up * v.BroadcastY() + m_right * v.BroadcastZ() + m_posit;
+}
+
+inline ndVector ndMatrix::UntransformVector(const ndVector& v) const
+{
+	return UnrotateVector(v - m_posit) | ndVector::m_wOne;
 }
 
 #endif

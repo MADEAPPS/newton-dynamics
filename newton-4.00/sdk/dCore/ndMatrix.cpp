@@ -663,30 +663,31 @@ ndMatrix ndMatrix::Transpose4X4() const
 	return inv;
 }
 
-ndVector ndMatrix::RotateVector(const ndVector& v) const
-{
-	return m_front * v.BroadcastX() + m_up * v.BroadcastY() + m_right * v.BroadcastZ();
-}
+//ndVector ndMatrix::RotateVector(const ndVector& v) const
+//{
+//	return m_front * v.BroadcastX() + m_up * v.BroadcastY() + m_right * v.BroadcastZ();
+//}
 
-ndVector ndMatrix::UnrotateVector(const ndVector& v) const
-{
-	return v.OptimizedVectorUnrotate(m_front, m_up, m_right);
-}
+//ndVector ndMatrix::UnrotateVector(const ndVector& v) const
+//{
+//	return v.OptimizedVectorUnrotate(m_front, m_up, m_right);
+//}
+//
+//ndVector ndMatrix::TransformVector(const ndVector& v) const
+//{
+//	return m_front * v.BroadcastX() + m_up * v.BroadcastY() + m_right * v.BroadcastZ() + m_posit;
+//}
 
-ndVector ndMatrix::TransformVector(const ndVector& v) const
-{
-	return m_front * v.BroadcastX() + m_up * v.BroadcastY() + m_right * v.BroadcastZ() + m_posit;
-}
+//ndVector ndMatrix::UntransformVector(const ndVector& v) const
+//{
+//	return UnrotateVector(v - m_posit) | ndVector::m_wOne;
+//}
 
 ndVector ndMatrix::TransformVector1x4(const ndVector& v) const
 {
 	return m_front * v.BroadcastX() + m_up * v.BroadcastY() + m_right * v.BroadcastZ() + m_posit * v.BroadcastW();
 }
 
-ndVector ndMatrix::UntransformVector(const ndVector& v) const
-{
-	return UnrotateVector(v - m_posit) | ndVector::m_wOne;
-}
 
 ndPlane ndMatrix::TransformPlane(const ndPlane& localPlane) const
 {
