@@ -110,6 +110,7 @@ class ndDynamicsUpdate : public ndClassAlloc
 
 	void DetermineSleepStates();
 	void GetJacobianDerivatives(ndConstraint* const joint);
+	virtual void RegenerateSkeletonJacobians(ndSkeletonContainer* const skeleton);
 
 	protected:
 	void Clear();

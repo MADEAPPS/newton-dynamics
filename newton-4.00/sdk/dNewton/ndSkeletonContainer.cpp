@@ -1969,7 +1969,9 @@ void ndSkeletonContainer::InitMassMatrix(ndFloat32 timestep, const ndLeftHandSid
 		bool hasViolations = ResolveViolations(timestep);
 		if (hasViolations)
 		{
-			ndAssert(0);
+			ndWorld* const world = GetRoot()->m_body->GetScene()->GetWorld();
+			world->m_solver->RegenerateSkeletonJacobians(this);
+
 			rowCount = 0;
 			auxiliaryCount = 0;
 			for (ndInt32 i = 0; i < nodeCount - 1; ++i)
@@ -1979,6 +1981,9 @@ void ndSkeletonContainer::InitMassMatrix(ndFloat32 timestep, const ndLeftHandSid
 				auxiliaryCount += node->FactorizeChild(leftHandSide, rightHandSide, bodyMassArray, jointMassArray);
 			}
 			m_nodesOrder[nodeCount - 1]->FactorizeRoot(bodyMassArray, jointMassArray);
+
+			hasViolations = ResolveViolations(timestep);
+			hasViolations = ResolveViolations(timestep);
 		}
 	}
 
@@ -2085,8 +2090,7 @@ ndFloat32 ndSkeletonContainer::CalculatePositionImpulse(ndFloat32 timestep, ndFo
 
 		//const ndInt32 dof = joint->m_rowCount;
 		const ndInt32 first = joint->m_rowStart;
-		const ndLeftHandSide* const lhs = &m_leftHandSide[first];
-
+		//const ndLeftHandSide* const lhs = &m_leftHandSide[first];
 		//ndVector8 positError(ndVector8::m_zero);
 		//ndVector8 velocError(ndVector8::m_zero);
 		//joint->CalculateConstraintViolations(lhs, positError, velocError);
@@ -2121,6 +2125,8 @@ ndFloat32 ndSkeletonContainer::CalculatePositionImpulse(ndFloat32 timestep, ndFo
 
 bool ndSkeletonContainer::ResolveViolations(ndFloat32 timestep)
 {
+return false;
+
 	const ndInt32 nodeCount = m_nodeList.GetCount();
 	ndForcePair* const jointVeloc = ndAlloca(ndForcePair, nodeCount);
 	ndForcePair* const jointImpulse = ndAlloca(ndForcePair, nodeCount);
@@ -2133,7 +2139,6 @@ bool ndSkeletonContainer::ResolveViolations(ndFloat32 timestep)
 	// apply possition violation pass.
 	ndFloat32 maxViolation2 = CalculatePositionImpulse(timestep, jointVeloc);
 
-#if 0
 	if (maxViolation2 > D_MAX_POSIT_ERROR_VIOLATION2)
 	{
 		CalculateForce(jointImpulse, jointVeloc);
@@ -2149,10 +2154,8 @@ bool ndSkeletonContainer::ResolveViolations(ndFloat32 timestep)
 			const ndVector savedVeloc(body->GetVelocity());
 
 			const ndJacobian& impulse = bodyImpulse[i];
-			const ndMatrix invInertia(body->CalculateInvInertiaMatrix());
 			const ndVector veloc(impulse.m_linear.Scale(body->GetInvMass()));
-			//const ndVector omega(body->m_invWorldInertiaMatrix.RotateVector(impulse.m_angular));
-			const ndVector omega(invInertia.RotateVector(impulse.m_angular));
+			const ndVector omega(body->m_invWorldInertiaMatrix.RotateVector(impulse.m_angular));
 
 			body->SetOmega(omega);
 			body->SetVelocity(veloc);
@@ -2163,6 +2166,6 @@ bool ndSkeletonContainer::ResolveViolations(ndFloat32 timestep)
 			body->SetVelocity(savedVeloc);
 		}
 	}
-#endif
+
 	return maxViolation2 > D_MAX_POSIT_ERROR_VIOLATION2;
 }

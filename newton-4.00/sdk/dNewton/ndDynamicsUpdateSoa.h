@@ -59,6 +59,7 @@ class ndDynamicsUpdateSoa: public ndDynamicsUpdate
 	
 	void DetermineSleepStates();
 	void GetJacobianDerivatives(ndConstraint* const joint);
+	virtual void RegenerateSkeletonJacobians(ndSkeletonContainer* const skeleton) override;
 
 	ndVector m_ordinals;
 	ndArray<ndInt8> m_groupType;
